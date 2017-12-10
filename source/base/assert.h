@@ -155,25 +155,7 @@ namespace emp {
 
 namespace emp {
   constexpr bool assert_on = true;
-}
 
-// Generating an output to standard error is an assert is tripped.
-#define emp_assert_var(VAR) std::cerr << #VAR << ": [" << VAR << "]\n";
-
-#define emp_assert_impl_1(X)
-#define emp_assert_impl_2(X, VAR)       emp_assert_var(VAR); emp_assert_impl_1(X);
-#define emp_assert_impl_3(X, VAR, ...)  emp_assert_var(VAR); emp_assert_impl_2(X,__VA_ARGS__);
-#define emp_assert_impl_4(X, VAR, ...)  emp_assert_var(VAR); emp_assert_impl_3(X,__VA_ARGS__);
-#define emp_assert_impl_5(X, VAR, ...)  emp_assert_var(VAR); emp_assert_impl_4(X,__VA_ARGS__);
-#define emp_assert_impl_6(X, VAR, ...)  emp_assert_var(VAR); emp_assert_impl_5(X,__VA_ARGS__);
-#define emp_assert_impl_7(X, VAR, ...)  emp_assert_var(VAR); emp_assert_impl_6(X,__VA_ARGS__);
-#define emp_assert_impl_8(X, VAR, ...)  emp_assert_var(VAR); emp_assert_impl_7(X,__VA_ARGS__);
-#define emp_assert_impl_9(X, VAR, ...)  emp_assert_var(VAR); emp_assert_impl_8(X,__VA_ARGS__);
-#define emp_assert_impl_10(X, VAR, ...) emp_assert_var(VAR); emp_assert_impl_9(X,__VA_ARGS__);
-#define emp_assert_impl_11(X, VAR, ...) emp_assert_var(VAR); emp_assert_impl_10(X,__VA_ARGS__);
-#define emp_assert_impl_12(X, VAR, ...) emp_assert_var(VAR); emp_assert_impl_11(X,__VA_ARGS__);
-
-namespace emp {
   /// Base case for assert_print...
   void assert_print() { ; }
 
@@ -185,22 +167,23 @@ namespace emp {
   }
 
   template <typename... EXTRA>
-  void assert_trigger(std::string filename, size_t line, std::string expr, bool, EXTRA &&... extra) {
+  bool assert_trigger(std::string filename, size_t line, std::string expr, bool, EXTRA &&... extra) {
     std::cerr << "Assert Error (In " << filename << " line " << line
               <<  "): " << expr << std::endl;
     assert_print(std::forward<EXTRA>(extra)...);
+    return true;
   }
 }
 
-/// @endcond
-
 #define emp_assert_TO_PAIR(X) EMP_STRINGIFY(X) , X
 
-#define emp_assert(...)                                                                         \
-  do { if ( !(EMP_GET_ARG_1(__VA_ARGS__, ~)) ) {                                                \
-      emp::assert_trigger(__FILE__, __LINE__, EMP_WRAP_ARGS(emp_assert_TO_PAIR, __VA_ARGS__) ); \
-      abort();                                                                                  \
-    }                                                                                           \
+/// @endcond
+
+#define emp_assert(...)                                                                          \
+  do {                                                                                           \
+    !(EMP_GET_ARG_1(__VA_ARGS__, ~)) &&                                                          \
+    emp::assert_trigger(__FILE__, __LINE__, EMP_WRAP_ARGS(emp_assert_TO_PAIR, __VA_ARGS__) ) &&  \
+    (abort(), false);                                                                            \
   } while(0)
 
 /// @cond DEFINES
