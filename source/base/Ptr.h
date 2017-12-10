@@ -663,7 +663,7 @@ namespace emp {
     void DeleteArray() { delete [] ptr; }
 
     size_t Hash() const {
-      static constexpr size_t shift = Log2(1 + sizeof(TYPE));  // Chop off useless bits...
+      static emp_constexpr size_t shift = Log2(1 + sizeof(TYPE));  // Chop off useless bits...
       return (size_t)(ptr) >> shift;
     }
     struct hash_t { size_t operator()(const Ptr<TYPE> & t) const { return t.Hash(); } };

@@ -57,7 +57,7 @@ namespace emp {
   }
 
   /// Calculate the entropy when their are two possibile states based on one state's probability.
-  constexpr double Entropy2(const double p) {
+  emp_constexpr double Entropy2(const double p) {
     return -(p * Log2(p) + (1.0-p)*Log2(1.0-p));
   }
 

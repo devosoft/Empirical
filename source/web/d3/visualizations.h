@@ -242,7 +242,7 @@ protected:
 
 
 public:
-    HistogramChart(std::string x_var, int w=800, int h=400) :
+    HistogramChart(std::string x_var, int w=250, int h=200) :
             D3Visualization(w, h),
             x_ax("bottom", x_var),
             y_ax("left", "Frequency"){;}
@@ -257,7 +257,7 @@ public:
     }
 
 
-    void DrawData(emp::vector<DATA_TYPE> && data) {
+    void DrawData(emp::vector<DATA_TYPE> & data) {
         X_SCALE_TYPE& x = x_ax.GetScale();
         Y_SCALE_TYPE& y = y_ax.GetScale();
         double new_x_min = *std::min_element(data.begin(), data.end());
@@ -274,7 +274,7 @@ public:
         }
 
         D3::Transition t = GetSVG()->MakeTransition();
-        t.SetDuration(500);
+        t.SetDuration(100);
         if (rescale) {
             x.SetDomain(x_min, x_max);
             h.Domain(x_min, x_max);
