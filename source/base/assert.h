@@ -185,7 +185,7 @@ namespace emp {
   }
 
   template <typename... EXTRA>
-  void assert_trigger(std::string filename, size_t line, std::string expr, EXTRA &&... extra) {
+  void assert_trigger(std::string filename, size_t line, std::string expr, bool, EXTRA &&... extra) {
     std::cerr << "Assert Error (In " << filename << " line " << line
               <<  "): " << expr << std::endl;
     assert_print(std::forward<EXTRA>(extra)...);
@@ -194,14 +194,13 @@ namespace emp {
 
 /// @endcond
 
-#define emp_assert(...)                                                                 \
-  do { if ( !(EMP_GET_ARG_1(__VA_ARGS__, ~)) ) {                                        \
-      std::cerr << "Assert Error (In " << __FILE__                                      \
-                << " line " << __LINE__                                                 \
-                <<  "): " << EMP_STRINGIFY(EMP_GET_ARG_1(__VA_ARGS__, ~)) << std::endl; \
-      EMP_ASSEMBLE_MACRO(emp_assert_impl_, __VA_ARGS__)                                 \
-      abort();                                                                          \
-    }                                                                                   \
+#define emp_assert_TO_PAIR(X) EMP_STRINGIFY(X) , X
+
+#define emp_assert(...)                                                                         \
+  do { if ( !(EMP_GET_ARG_1(__VA_ARGS__, ~)) ) {                                                \
+      emp::assert_trigger(__FILE__, __LINE__, EMP_WRAP_ARGS(emp_assert_TO_PAIR, __VA_ARGS__) ); \
+      abort();                                                                                  \
+    }                                                                                           \
   } while(0)
 
 /// @cond DEFINES
