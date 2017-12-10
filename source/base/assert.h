@@ -173,6 +173,25 @@ namespace emp {
 #define emp_assert_impl_11(X, VAR, ...) emp_assert_var(VAR); emp_assert_impl_10(X,__VA_ARGS__);
 #define emp_assert_impl_12(X, VAR, ...) emp_assert_var(VAR); emp_assert_impl_11(X,__VA_ARGS__);
 
+namespace emp {
+  /// Base case for assert_print...
+  void assert_print() { ; }
+
+  /// Print out information about the next variable and recurse...
+  template <typename T, typename... EXTRA>
+  void assert_print(std::string name, T && val, EXTRA &&... extra) {
+    std::cerr << name << ": [" << val << "]" << std::endl;
+    assert_print(std::forward<EXTRA>(extra)...);
+  }
+
+  template <typename... EXTRA>
+  void assert_trigger(std::string filename, size_t line, std::string expr, EXTRA &&... extra) {
+    std::cerr << "Assert Error (In " << filename << " line " << line
+              <<  "): " << expr << std::endl;
+    assert_print(std::forward<EXTRA>(extra)...);
+  }
+}
+
 /// @endcond
 
 #define emp_assert(...)                                                                 \
