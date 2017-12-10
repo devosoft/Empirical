@@ -179,6 +179,8 @@ namespace emp {
 
 /// @endcond
 
+/// Require a specified condition to be true.  If it is false, immediately halt execution.
+/// Note: If NDEBUG is defined, emp_assert() will not do anything.
 #define emp_assert(...)                                                                          \
   do {                                                                                           \
     !(EMP_GET_ARG_1(__VA_ARGS__, ~)) &&                                                          \
