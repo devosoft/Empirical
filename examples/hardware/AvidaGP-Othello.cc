@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <utility>
+#include <string>
 
 #include "../../games/Othello.h"
 #include "../../hardware/AvidaGPOthello.h"
@@ -228,7 +229,7 @@ int main(int argc, char* argv[])
 
   emp::evo::EAWorld<emp::AvidaGP, emp::evo::FitCacheOn> world(random, "AvidaWorld"); // FitCache on
   //emp::evo::EAWorld<emp::AvidaGP> world(random, "AvidaWorld"); //FitCache off
-  auto testcases = TestcaseSet<64>("../games/data/game_0.csv", &random);
+  auto testcases = TestcaseSet<64>("../../data/game_0.csv", &random);
 
   // Fitness function that encourages playing in corners
   std::function<std::set<int>(emp::array<int, 64>)> cornerFunc = [](emp::array<int, 64> board){
@@ -364,7 +365,7 @@ int main(int argc, char* argv[])
 
   // Do the run...
   for (size_t ud = 0; ud < UPDATES; ud++) {
-    emp::vector<size_t> choices = testcases.GetValidSubset();
+   // emp::vector<size_t> choices = testcases.GetValidSubset();
 
     // for (auto org : world){
     //   emp::Othello game(BOARD_SIZE, 1); //TODO: should it be random player first?
@@ -413,9 +414,11 @@ int main(int argc, char* argv[])
   fit_fun(&(world[0]));
 
   std::cout << std::endl;
-  world[0].PrintGenome("othello_save.org");
+  for(int i = 0; i < POP_SIZE; ++i){
+    world[i].PrintGenome("orgs/othello_save" + std::to_string(i) +".org");
+  }
 
-  EvalGame(world[0], world[1], 1, true);
+  //EvalGame(world[0], world[1], 1, true);
 
   // And try playing it!
   /*
