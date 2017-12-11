@@ -51,17 +51,6 @@
 #endif
 
 
-/// It's normally not possible to put an assert in a constexpr function because printing is not
-/// available at compile time.  The "emp_constexpr" macro can replace "constexpr";
-/// emp_constexpr ignores constexpr in debug mode; regular assers disappear outside of debug mode.
-/// Of course, this requires testing with NDEBUG turned on to make sure compilation works!
-
-#ifdef EMP_NDEBUG
-#define emp_constexpr constexpr
-#else
-#define emp_constexpr
-#endif
-
 /// Helper macros used throughout...
 #define emp_assert_TO_PAIR(X) EMP_STRINGIFY(X) , X
 
@@ -107,6 +96,12 @@ namespace emp {
   } while (0)
 
 #define emp_assert(...) emp_assert_tdebug_impl( EMP_GET_ARG_1(__VA_ARGS__, ~) )
+
+#define emp_assert(...)                                                                       \
+  do {                                                                                        \
+    !(EMP_GET_ARG_1(__VA_ARGS__, ~)) &&                                                       \
+    emp::assert_trigger(__FILE__, __LINE__, EMP_WRAP_ARGS(emp_assert_TO_PAIR, __VA_ARGS__) ); \
+  } while(0)
 
 
 #elif EMSCRIPTEN  // Neither EMP_NDEBUG nor EMP_TDEBUG set, but compiling with Emscripten
