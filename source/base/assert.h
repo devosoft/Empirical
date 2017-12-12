@@ -60,6 +60,8 @@ namespace emp {
   constexpr bool assert_on = false;
 }
 
+// Debug OFF
+
 /// Ideally, this assert should use the expression (to prevent compiler error), but should not
 /// generate any assembly code.  For now, just make it blank (other options commented out)
 #define emp_assert(...)
@@ -90,6 +92,8 @@ namespace emp {
 
   void assert_clear() { emp::assert_last_fail = false; }
 }
+
+// Unit Testing ON
 
 #define emp_assert(...)                                                                       \
   do {                                                                                        \
@@ -129,6 +133,7 @@ namespace emp {
   }
 }
 
+// Debug; Emscripten ON
 
 #define emp_assert(...)                                                                       \
   do {                                                                                        \
@@ -162,6 +167,8 @@ namespace emp {
 }
 
 /// @endcond
+
+// Debug; Not Emscripten
 
 /// Require a specified condition to be true.  If it is false, immediately halt execution.
 /// Note: If NDEBUG is defined, emp_assert() will not do anything.
