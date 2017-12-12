@@ -121,8 +121,8 @@ namespace emp {
     assert_print(ss, std::forward<EXTRA>(extra)...);
   }
 
-  template <typename... EXTRA>
-  bool assert_trigger(std::string filename, size_t line, std::string expr, bool, EXTRA &&... extra) {
+  template <typename IGNORE, typename... EXTRA>
+  bool assert_trigger(std::string filename, size_t line, std::string expr, IGNORE, EXTRA &&... extra) {
     std::stringstream ss;
     ss << "Assert Error (In " << filename << " line " << line << "): " << expr << '\n';
     assert_print(ss, std::forward<EXTRA>(extra)...);
@@ -157,8 +157,8 @@ namespace emp {
     assert_print(std::forward<EXTRA>(extra)...);
   }
 
-  template <typename... EXTRA>
-  bool assert_trigger(std::string filename, size_t line, std::string expr, bool, EXTRA &&... extra) {
+  template <typename IGNORE, typename... EXTRA>
+  bool assert_trigger(std::string filename, size_t line, std::string expr, IGNORE, EXTRA &&... extra) {
     std::cerr << "Assert Error (In " << filename << " line " << line
               <<  "): " << expr << std::endl;
     assert_print(std::forward<EXTRA>(extra)...);
