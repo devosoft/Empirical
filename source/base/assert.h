@@ -77,30 +77,24 @@ namespace emp {
   };
   AssertFailInfo assert_fail_info;
   bool assert_last_fail = false;
+
+  template <typename... EXTRA>
+  bool assert_trigger(std::string filename, size_t line, std::string expr) {
+    emp::assert_fail_info.filename = __FILE__;
+    emp::assert_fail_info.line_num = __LINE__;
+    emp::assert_fail_info.error = expr;
+    emp::assert_last_fail = true;
+
+    return true;
+  }
+
+  void assert_clear() { emp::assert_last_fail = false; }
 }
-
-// Generate a pop-up alert in a web browser if an assert is tripped.
-#define emp_assert_tdebug_impl(EXPR) emp_assert_tdebug_impl2(EXPR)
-
-#define emp_assert_tdebug_impl2(EXPR)                                   \
-  do {                                                                  \
-    if ( !(EXPR) ) {                                                    \
-      emp::assert_last_fail = true;                                     \
-      emp::assert_fail_info.filename = __FILE__;                        \
-      emp::assert_fail_info.line_num = __LINE__;                        \
-      emp::assert_fail_info.error = EMP_STRINGIFY(EXPR);                \
-    }                                                                   \
-    else {                                                              \
-      emp::assert_last_fail = false;                                    \
-    }                                                                   \
-  } while (0)
-
-#define emp_assert(...) emp_assert_tdebug_impl( EMP_GET_ARG_1(__VA_ARGS__, ~) )
 
 #define emp_assert(...)                                                                       \
   do {                                                                                        \
     !(EMP_GET_ARG_1(__VA_ARGS__, ~)) &&                                                       \
-    emp::assert_trigger(__FILE__, __LINE__, EMP_WRAP_ARGS(emp_assert_TO_PAIR, __VA_ARGS__) ); \
+    emp::assert_trigger(__FILE__, __LINE__, EMP_STRINGIFY( EMP_GET_ARG_1(__VA_ARGS__, ~) ));  \
   } while(0)
 
 
