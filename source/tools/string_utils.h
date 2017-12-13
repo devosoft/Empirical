@@ -373,7 +373,7 @@ namespace emp {
       }
     }
 
-    if (last_whitespace) pos--;   // If the end of the line is whitespace, remove it.
+    if (pos && last_whitespace) pos--;   // If the end of the line is whitespace, remove it.
 
     in_string.resize(pos);
   }
