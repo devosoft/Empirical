@@ -373,6 +373,7 @@ namespace emp {
 
     // Loading whole genomes.
     bool Load(std::istream & input);
+    bool Load(const std::string & filename) { std::ifstream is(filename); return Load(is); }
 
     /// Process a specified instruction, provided by the caller.
     void ProcessInst(const inst_t & inst) { genome.inst_lib->ProcessInst(ToPtr(this), inst); }
