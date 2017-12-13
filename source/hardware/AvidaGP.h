@@ -26,6 +26,7 @@
 #include "../base/array.h"
 #include "../base/Ptr.h"
 #include "../base/vector.h"
+#include "../tools/File.h"
 #include "../tools/map_utils.h"
 #include "../tools/Random.h"
 #include "../tools/string_utils.h"
@@ -357,6 +358,13 @@ namespace emp {
     }
     void PushInst(const Instruction & inst) { genome.sequence.emplace_back(inst); }
     void PushInst(Instruction && inst) { genome.sequence.emplace_back(inst); }
+    void PushInstString(std::string info) {
+      size_t id = genome.inst_lib->GetID( string_pop(info) );
+      size_t arg1 = info.size() ? from_string<size_t>(string_pop(info)) : 0;
+      size_t arg2 = info.size() ? from_string<size_t>(string_pop(info)) : 0;
+      size_t arg3 = info.size() ? from_string<size_t>(string_pop(info)) : 0;
+      PushInst(id, arg1, arg2, arg3);
+    }
     void PushRandom(Random & rand, const size_t count=1) {
       for (size_t i = 0; i < count; i++) {
         PushInst(GetRandomInst(rand));
@@ -407,6 +415,14 @@ namespace emp {
     }
 
   };
+
+  template <typename HARDWARE>
+  bool AvidaCPU_Base<HARDWARE>::Load(std::istream & input) {
+    File file(input);
+    file.RemoveComments("--");  // Remove all comments beginning with -- (including --> and ----)
+    file.CompressWhitespace();  // Trim down remaining whitespace.
+    return true;
+  }
 
   template <typename HARDWARE>
   size_t AvidaCPU_Base<HARDWARE>::InstScope(const typename AvidaCPU_Base<HARDWARE>::inst_t & inst) const {
