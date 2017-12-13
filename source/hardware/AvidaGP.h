@@ -421,6 +421,7 @@ namespace emp {
     File file(input);
     file.RemoveComments("--");  // Remove all comments beginning with -- (including --> and ----)
     file.CompressWhitespace();  // Trim down remaining whitespace.
+    file.Apply( [this](std::string & info){ PushInstString(info); } );
     return true;
   }
 
