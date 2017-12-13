@@ -651,10 +651,13 @@ namespace evo {
       for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
 
           for (size_t org_id : ordering) {
-              double bonus = (extra_fitnesses[ex_id][org_id] / sum_extra_fit[ex_id]) * pool_sizes[ex_id];
+            double bonus = 0;
+              if (sum_extra_fit[ex_id] != 0) bonus = (extra_fitnesses[ex_id][org_id] / sum_extra_fit[ex_id]) * pool_sizes[ex_id];
+              //std::cout<<bonus<<" "<<sum_extra_fit[ex_id]<<std::endl;
               extra_fitnesses[ex_id][org_id] = emp::Pow(2.0, bonus)-1;
               //   resource_left[ex_id] -= bonus;
               base_fitness[org_id] += bonus;
+              //std::cout<<"Base: "<<base_fitness[org_id]<<std::endl;
           }
 
       }

@@ -368,25 +368,25 @@ int main(int argc, char* argv[])
 
   // Do the run...
   for (size_t ud = 0; ud < UPDATES; ud++) {
-   // emp::vector<size_t> choices = testcases.GetValidSubset();
+   emp::vector<size_t> choices = testcases.GetValidSubset();
 
-    // for (auto org : world){
-    //   emp::Othello game(BOARD_SIZE, 1); //TODO: should it be random player first?
-    //
-    //   for (size_t choice : choices){
-    //     game.SetBoard(tests[choice].first);
-    //     int move = EvalMove(game, *org);
-    //
-    //     for (int i = 0; i < correct_choices.size(); i++) {
-    //       if (correct_choices[i][choice].find(move) != correct_choices[i][choice].end()){
-    //         scores[i]++;
-    //       }
-    //     }
-    //   }
-    //   for (int i = 0; i < correct_choices.size(); i++) {
-    //       org->SetTrait(i, scores[i]);
-    //   }
-    // }
+    for (auto org : world){
+      emp::Othello game(BOARD_SIZE, 1); //TODO: should it be random player first?
+
+      for (size_t choice : choices){
+        game.SetBoard(tests[choice].first);
+        int move = EvalMove(game, *org);
+
+        for (int i = 0; i < correct_choices.size(); i++) {
+          if (correct_choices[i][choice].find(move) != correct_choices[i][choice].end()){
+            scores[i]++;
+          }
+        }
+      }
+      for (int i = 0; i < correct_choices.size(); i++) {
+          org->SetTrait(i, scores[i]);
+      }
+    }
 
     // Keep the best individual.
     world.EliteSelect(fit_fun, 1, 1);
