@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <utility>
 #include <string>
+#include <chrono>
 
 #include "../../games/Othello.h"
 #include "../../hardware/AvidaGPOthello.h"
@@ -214,9 +215,11 @@ int main(int argc, char* argv[])
 {
   // Set up initial world
 
+  std::chrono::high_resolution_clock::time_point start_s = std::chrono::high_resolution_clock::now();
   POP_SIZE = std::atoi( argv[1] );
   EVAL_TIME = std::atoi( argv[2] );
   UPDATES = std::atoi( argv[3] );
+  long time = 28800;
 
   std::cout<<"POP_SIZE: "<<POP_SIZE<<" EVAL_TIME: "<<EVAL_TIME
            <<" UPDATES: "<<UPDATES<<std::endl;
@@ -227,8 +230,8 @@ int main(int argc, char* argv[])
   random.ResetSeed(seed);
 
 
-  emp::evo::EAWorld<emp::AvidaGP, emp::evo::FitCacheOn> world(random, "AvidaWorld"); // FitCache on
-  //emp::evo::EAWorld<emp::AvidaGP> world(random, "AvidaWorld"); //FitCache off
+  //emp::evo::EAWorld<emp::AvidaGP, emp::evo::FitCacheOn> world(random, "AvidaWorld"); // FitCache on
+  emp::evo::EAWorld<emp::AvidaGP> world(random, "AvidaWorld"); //FitCache off
   auto testcases = TestcaseSet<64>("../../data/game_0.csv", &random);
 
   // Fitness function that encourages playing in corners
@@ -389,11 +392,11 @@ int main(int argc, char* argv[])
     world.EliteSelect(fit_fun, 1, 1);
 
     // Run a selection method for each spot.
-    world.TournamentSelect(fit_fun, TOURNY_SIZE, POP_SIZE-1); //TODO: Make states constant for selection methods
+    //world.TournamentSelect(fit_fun, TOURNY_SIZE, POP_SIZE-1); //TODO: Make states constant for selection methods
     //fit_set.push_back(fit_fun);
     //world.LexicaseSelect(fit_set, POP_SIZE-1);
     //world.EcoSelect(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
-    //world.EcoSelectGradation(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
+    world.EcoSelectGradation(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
 
     fit_fun.Clear();
     world.Update();
@@ -409,6 +412,10 @@ int main(int argc, char* argv[])
 
     // Mutate all but the first organism.
     world.MutatePop(1);
+
+    std::chrono::high_resolution_clock::time_point stop_s = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::seconds>( stop_s - start_s ).count();
+    if (duration > time){ break; }
   }
 
   fit_fun(&(world[0]));
