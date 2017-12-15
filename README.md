@@ -15,7 +15,7 @@ Tools in Empirical include:
 See https://empirical.readthedocs.io/en/latest/html/files.html for more detailed documentation
 on the available source files.
 
---== Directory Structure ==--
+# Directory Structure
 
 apps/        - mini projects using Empirical with broad utility.
 doc/         - Documentation files (including for auto generation of docs)
@@ -26,7 +26,7 @@ tests/       - Unit tests
 third-party/ - Non-empirical dependancies.
 
 
---== Sub-folders in source/ directory ==--
+# Sub-folders in source/ directory
 
 base/     - Debug tools used throughout Emperical for fast and efficient memory management.
 config/   - Tools to build a simple configuration system (including compile-time optimizations)
@@ -44,7 +44,7 @@ stand_alone/ - Versions of tools found elsewhere in Empricial that can be downlo
                file with no additional dependencies.
 
 
---== Development Status ==--
+# Development Status
 
 Empirical is under heavy development.  As such, many source files have at least one of the
 following statuses:
@@ -63,7 +63,7 @@ following statuses:
 * EXTERNAL - Part of another project (cited above); not developed as part of Empirical.
 
 
---== Levelization ==--
+# Levelization
 
 The structure of Empirical is levelized to facilitate development and testing.  This means
 that all directories are on a level where dependiences are either internal to that directory
@@ -71,10 +71,11 @@ or on lower levels.  Likewise, within a directory, files have a level and depend
 files at lower levels.
 
 LEVEL 0:  base/
+
 LEVEL 1:  meta/
+
 LEVEL 2:  tools/
+
 LEVEL 3:  config/  control/  data/  games/  geometry/  hardware/  scholar/
+
 LEVEL 4:  Evo/ (data, control)  web/ (config, control)
-
-
-
