@@ -51,18 +51,19 @@ on the available source files.
 Empirical is under heavy development.  As such, many source files have at least one of the
 following statuses:
 
-* DESIGN - Notes are in place, but no (or minimal) working code
-* ALPHA - Some basic functionality works, but more features still need to be added and tested
-* BETA - Basic functionality is all in place, but needs more thorough testing.
-* RELEASE - Well-tested functionality and used in multiple projects, at least by authors.
-* STABLE - Used by many non-authors in assorted projects without fixes for extended period.
-
-* ABANDONED - May have worked, or may not; no longer being developed.
-* BROKEN - Once worked (at least BETA level), but now needs to be repaired (not abandoned!)
-* CLEANUP - At least BETA, but need code cleanup, fixing of warnings, etc.
-* DEPRECATED - Functionality has been replaced and should shift to replacement.
-* EXPLORATORY - Some functionality may work, but needs re-engineering to get right.
-* EXTERNAL - Part of another project (cited above); not developed as part of Empirical.
+| Status | Meaning
+| ------ | -------
+| DESIGN | Notes are in place, but no (or minimal) working code
+| ALPHA | Some basic functionality works, but more features still need to be added and tested
+| BETA | Basic functionality is all in place, but needs more thorough testing.
+| RELEASE | Well-tested functionality and used in multiple projects, at least by authors.
+| STABLE | Used by many non-authors in assorted projects without fixes for extended period.
+| ABANDONED | May have worked, or may not; no longer being developed.
+| BROKEN | Once worked (at least BETA level), but now needs to be repaired (not abandoned!)
+| CLEANUP | At least BETA, but need code cleanup, fixing of warnings, etc.
+| DEPRECATED | Functionality has been replaced and should shift to replacement.
+| EXPLORATORY | Some functionality may work, but needs re-engineering to get right.
+| EXTERNAL | Part of another project (cited above); not developed as part of Empirical.
 
 
 # Levelization
