@@ -17,6 +17,8 @@ on the available source files.
 
 # Directory Structure
 
+| Directory    | Info
+| ------------ | ----
 | apps/        | mini projects using Empirical with broad utility.
 | doc/         | Documentation files (including for auto generation of docs)
 | examples/    | Example code for many of the above tools (sub-directory structure parallels source/)
