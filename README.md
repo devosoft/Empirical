@@ -17,13 +17,13 @@ on the available source files.
 
 # Directory Structure
 
-apps/        - mini projects using Empirical with broad utility.
-doc/         - Documentation files (including for auto generation of docs)
-examples/    - Example code for many of the above tools (sub-directory structure parallels source/)
-Planning/    - Scattered notes about future development (most notes found in GitHub issue tracker)
-source/      - Header files that make up the Empirical library (see below for details)
-tests/       - Unit tests
-third-party/ - Non-empirical dependancies.
+| apps/        | mini projects using Empirical with broad utility.
+| doc/         | Documentation files (including for auto generation of docs)
+| examples/    | Example code for many of the above tools (sub-directory structure parallels source/)
+| Planning/    | Scattered notes about future development (most notes found in GitHub issue tracker)
+| source/      | Header files that make up the Empirical library (see below for details)
+| tests/       | Unit tests
+| third-party/ | Non-empirical dependancies.
 
 
 # Sub-folders in source/ directory
