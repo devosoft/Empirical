@@ -17,7 +17,7 @@ on the available source files.
 
 # Directory Structure
 
-| Directory    | Info
+| Folder       | Info
 | ------------ | ----
 | apps/        | mini projects using Empirical with broad utility.
 | doc/         | Documentation files (including for auto generation of docs)
@@ -30,20 +30,20 @@ on the available source files.
 
 # Sub-folders in source/ directory
 
-base/     - Debug tools used throughout Emperical for fast and efficient memory management.
-config/   - Tools to build a simple configuration system (including compile-time optimizations)
-data/     - Tools for easy data management and output.
-geometry/ - Geometry and physics-based tools for implementing simple virtual worlds.
-hardware/ - Implementation of basic virtual hardware that is easy to configure.
-meta/     - Helpful tools for template meta-programming.
-scholar/  - Tools for tracking authors, citations, and bibliographies
-tools/    - Many basic tools that are generally useful for scientific software.
-web/      - Tools for builing web interfaces
-
-Evo/         - Specialized tools for building Artificial Life or Evolutionary Computation projects
-in_progress/ - Tools that are being worked on, but not at all ready for public consumption
-stand_alone/ - Versions of tools found elsewhere in Empricial that can be downloaded as a single
-               file with no additional dependencies.
+| Sub-Folder  | Info
+| ----------- | ----
+| base/       | Debug tools used throughout Emperical for fast and efficient memory management.
+| config/     | Tools to build a simple configuration system (including compile-time optimizations)
+| data/       | Tools for easy data management and output.
+| geometry/   | Geometry and physics-based tools for implementing simple virtual worlds.
+| hardware/   | Implementation of basic virtual hardware that is easy to configure.
+| meta/       | Helpful tools for template meta-programming.
+| scholar/    | Tools for tracking authors, citations, and bibliographies
+| tools/      | Many basic tools that are generally useful for scientific software.
+| web/        | Tools for builing web interfaces
+| Evo/        | Specialized tools for building Artificial Life or Evolutionary Computation projects
+| in_progress/ | Tools that are being worked on, but not at all ready for public consumption
+| stand_alone/ | Versions of tools found elsewhere in Empricial that can be downloaded as a single file with no additional dependencies.
 
 
 # Development Status
@@ -72,12 +72,10 @@ that all directories are on a level where dependiences are either internal to th
 or on lower levels.  Likewise, within a directory, files have a level and depend only on other
 files at lower levels.
 
-LEVEL 0:  base/
-
-LEVEL 1:  meta/
-
-LEVEL 2:  tools/
-
-LEVEL 3:  config/  control/  data/  games/  geometry/  hardware/  scholar/
-
-LEVEL 4:  Evo/ (data, control)  web/ (config, control)
+| Level | Folders
+| ----  | ----
+| 0 |  base/
+| 1 |  meta/
+| 2 |  tools/
+| 3 |  config/  control/  data/  games/  geometry/  hardware/  scholar/
+| 4 |  Evo/ (data, control)  web/ (config, control)
