@@ -1413,8 +1413,9 @@ namespace emp {
     static void Inst_Mod(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       const int base = (int)state.AccessLocal(inst.args[1]);
+      const int num = (int)state.AccessLocal(inst.args[0]);
       if (base == 0) ++hw.errors;
-      else state.SetLocal(inst.args[2], (int)state.AccessLocal(inst.args[0]) % base);
+      else state.SetLocal(inst.args[2], static_cast<int64_t>(num) % static_cast<int64_t>(base));
     }
 
     /// Default instruction: TestEqu
