@@ -10,6 +10,8 @@
 #ifndef EMP_AVIDA_CPU_INST_LIB_H
 #define EMP_AVIDA_CPU_INST_LIB_H
 
+#include "../tools/math.h"
+
 #include "InstLib.h"
 
 namespace emp {
@@ -44,7 +46,7 @@ namespace emp {
     static void Inst_Mod(hardware_t & hw, const inst_t & inst) {
       const double base = hw.regs[inst.args[1]];
       if (base == 0.0) ++hw.errors;
-      else hw.regs[inst.args[2]] = hw.regs[inst.args[0]] / base;
+      else hw.regs[inst.args[2]] = emp::Mod( hw.regs[inst.args[0]], base);
     }
 
     static void Inst_TestEqu(hardware_t & hw, const inst_t & inst) { hw.regs[inst.args[2]] = (hw.regs[inst.args[0]] == hw.regs[inst.args[1]]); }
