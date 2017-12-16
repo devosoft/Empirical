@@ -29,13 +29,27 @@ namespace emp {
     static constexpr size_t arg_count = ARG_COUNT;
 
     // Instructions
+
+    // One-input math
     static void Inst_Inc(hardware_t & hw, const inst_t & inst) { ++hw.regs[inst.args[0]]; }
     static void Inst_Dec(hardware_t & hw, const inst_t & inst) { --hw.regs[inst.args[0]]; }
-    static void Inst_Not(hardware_t & hw, const inst_t & inst) { hw.regs[inst.args[0]] = (hw.regs[inst.args[0]] == 0.0); }
-    static void Inst_SetReg(hardware_t & hw, const inst_t & inst) { hw.regs[inst.args[0]] = (double) inst.args[1]; }
-    static void Inst_Add(hardware_t & hw, const inst_t & inst) { hw.regs[inst.args[2]] = hw.regs[inst.args[0]] + hw.regs[inst.args[1]]; }
-    static void Inst_Sub(hardware_t & hw, const inst_t & inst) { hw.regs[inst.args[2]] = hw.regs[inst.args[0]] - hw.regs[inst.args[1]]; }
-    static void Inst_Mult(hardware_t & hw, const inst_t & inst) { hw.regs[inst.args[2]] = hw.regs[inst.args[0]] * hw.regs[inst.args[1]]; }
+
+    // Two-input math
+    static void Inst_Not(hardware_t & hw, const inst_t & inst) {
+      hw.regs[inst.args[0]] = (hw.regs[inst.args[0]] == 0.0);
+    }
+    static void Inst_SetReg(hardware_t & hw, const inst_t & inst) {
+      hw.regs[inst.args[0]] = (double) inst.args[1];
+    }
+    static void Inst_Add(hardware_t & hw, const inst_t & inst) {
+      hw.regs[inst.args[2]] = hw.regs[inst.args[0]] + hw.regs[inst.args[1]];
+    }
+    static void Inst_Sub(hardware_t & hw, const inst_t & inst) {
+      hw.regs[inst.args[2]] = hw.regs[inst.args[0]] - hw.regs[inst.args[1]];
+    }
+    static void Inst_Mult(hardware_t & hw, const inst_t & inst) {
+      hw.regs[inst.args[2]] = hw.regs[inst.args[0]] * hw.regs[inst.args[1]];
+    }
 
     static void Inst_Div(hardware_t & hw, const inst_t & inst) {
       const double denom = hw.regs[inst.args[1]];
@@ -49,10 +63,18 @@ namespace emp {
       else hw.regs[inst.args[2]] = emp::Mod( hw.regs[inst.args[0]], base);
     }
 
-    static void Inst_TestEqu(hardware_t & hw, const inst_t & inst) { hw.regs[inst.args[2]] = (hw.regs[inst.args[0]] == hw.regs[inst.args[1]]); }
-    static void Inst_TestNEqu(hardware_t & hw, const inst_t & inst) { hw.regs[inst.args[2]] = (hw.regs[inst.args[0]] != hw.regs[inst.args[1]]); }
-    static void Inst_TestLess(hardware_t & hw, const inst_t & inst) { hw.regs[inst.args[2]] = (hw.regs[inst.args[0]] < hw.regs[inst.args[1]]); }
+    // Comparisons
+    static void Inst_TestEqu(hardware_t & hw, const inst_t & inst) {
+      hw.regs[inst.args[2]] = (hw.regs[inst.args[0]] == hw.regs[inst.args[1]]);
+    }
+    static void Inst_TestNEqu(hardware_t & hw, const inst_t & inst) {
+      hw.regs[inst.args[2]] = (hw.regs[inst.args[0]] != hw.regs[inst.args[1]]);
+    }
+    static void Inst_TestLess(hardware_t & hw, const inst_t & inst) {
+      hw.regs[inst.args[2]] = (hw.regs[inst.args[0]] < hw.regs[inst.args[1]]);
+    }
 
+    // Others...
     static void Inst_If(hardware_t & hw, const inst_t & inst) { // args[0] = test, args[1] = scope
       if (hw.UpdateScope(inst.args[1]) == false) return;      // If previous scope is unfinished, stop!
       if (hw.regs[inst.args[0]] == 0.0) hw.BypassScope(inst.args[1]); // If test fails, move to scope end.
@@ -93,8 +115,12 @@ namespace emp {
       hw.inst_ptr = def_pos+1;                       // Jump to the function body (will adavance)
     }
 
-    static void Inst_Push(hardware_t & hw, const inst_t & inst) { hw.PushStack(inst.args[1], hw.regs[inst.args[0]]); }
-    static void Inst_Pop(hardware_t & hw, const inst_t & inst) { hw.regs[inst.args[1]] = hw.PopStack(inst.args[0]); }
+    static void Inst_Push(hardware_t & hw, const inst_t & inst) {
+      hw.PushStack(inst.args[1], hw.regs[inst.args[0]]);
+    }
+    static void Inst_Pop(hardware_t & hw, const inst_t & inst) {
+      hw.regs[inst.args[1]] = hw.PopStack(inst.args[0]);
+    }
 
     static void Inst_Input(hardware_t & hw, const inst_t & inst) {
       // Determine the input ID and grab it if it exists; if not, return 0.0
@@ -108,7 +134,9 @@ namespace emp {
       hw.outputs[output_id] = hw.regs[inst.args[0]];     // Copy target reg to appropriate output.
     }
 
-    static void Inst_CopyVal(hardware_t & hw, const inst_t & inst) { hw.regs[inst.args[1]] = hw.regs[inst.args[0]]; }
+    static void Inst_CopyVal(hardware_t & hw, const inst_t & inst) {
+      hw.regs[inst.args[1]] = hw.regs[inst.args[0]];
+    }
 
     static void Inst_ScopeReg(hardware_t & hw, const inst_t & inst) {
       hw.reg_stack.emplace_back(hw.CurScope(), inst.args[0], hw.regs[inst.args[0]]);
