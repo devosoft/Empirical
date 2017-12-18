@@ -11,6 +11,10 @@
  *  compiled with EMP_TRACK_MEM set, then these pointers perform extra tests to ensure that
  *  they point to valid memory and that memory is freed before pointers are released.
  *
+ *  If you trip an assert, you can re-do the run a track a specific pointer by defining
+ *  EMP_ABORT_PTR_NEW or EMP_ABORT_PTR_DELETE to the ID of the pointer in question.  This will
+ *  allow you to track the pointer more easily in a debugger.
+ *
  *  @todo Track information about emp::vector and emp::array objects to make sure we don't
  *    point directly into them? (A resize() could make such pointers invalid!)
  */
@@ -85,7 +89,8 @@ namespace emp {
     /// Add one more pointer.
     void Inc() {
       if (ptr_debug) std::cout << "Inc info for pointer " << ptr << std::endl;
-      emp_assert(status != PtrStatus::DELETED, "Incrementing deleted pointer!"); count++;
+      emp_assert(status != PtrStatus::DELETED, "Incrementing deleted pointer!");
+      count++;
     }
 
     /// Remove a pointer.
