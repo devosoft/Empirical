@@ -86,6 +86,9 @@ namespace emp {
     /// Is this pointer pointing to an array?
     bool IsArray()  const { return status == PtrStatus::ARRAY; }
 
+    /// Denote that this pointer is an array.
+    void SetArray(size_t bytes) { array_bytes = bytes; status = PtrStatus::ARRAY; }
+
     /// Add one more pointer.
     void Inc() {
       if (ptr_debug) std::cout << "Inc info for pointer " << ptr << std::endl;
@@ -204,14 +207,9 @@ namespace emp {
 
     /// This pointer was just created as a Ptr ARRAY!
     size_t NewArray(const void * ptr, size_t array_bytes) {
-      emp_assert(ptr);     // Cannot track a null pointer.
-      // Make sure pointer is not already stored -OR- has been deleted (since re-use is possible).
-      emp_assert(!HasPtr(ptr) || IsDeleted(GetCurID(ptr)));
-
-      size_t id = id_info.size();
-      if (ptr_debug) std::cout << "New Array:    " << id << " (" << ptr << ")" << std::endl;
-      id_info.emplace_back(ptr, array_bytes);
-      ptr_id[ptr] = id;
+      size_t id = New(ptr);  // Build the new pointer.
+      if (ptr_debug) std::cout << "  ...Array of size " << array_bytes << std::endl;
+      id_info[id].SetArray(array_bytes);
       return id;
     }
 
