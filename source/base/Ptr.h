@@ -197,6 +197,12 @@ namespace emp {
     size_t New(const void * ptr) {
       emp_assert(ptr);     // Cannot track a null pointer.
       size_t id = id_info.size();
+#ifdef EMP_ABORT_PTR_NEW
+      if (id == EMP_ABORT_PTR_NEW) {
+        std::cerr << "Aborting at creation of Ptr id " << id << std::endl;
+        abort();
+      }
+#endif
       if (ptr_debug) std::cout << "New:    " << id << " (" << ptr << ")" << std::endl;
       // Make sure pointer is not already stored -OR- hase been deleted (since re-use is possible).
       emp_assert(!HasPtr(ptr) || IsDeleted(GetCurID(ptr)));
@@ -232,6 +238,12 @@ namespace emp {
 
     /// Mark the pointers associated with this ID as deleted.
     void MarkDeleted(size_t id) {
+#ifdef EMP_ABORT_PTR_DELETE
+      if (id == EMP_ABORT_PTR_DELETE) {
+        std::cerr << "Aborting at creation of Ptr id " << id << std::endl;
+        abort();
+      }
+#endif
       if (ptr_debug) std::cout << "Delete: " << id << std::endl;
       id_info[id].MarkDeleted();
     }
