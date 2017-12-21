@@ -332,7 +332,7 @@ namespace emp {
     }
 
     /// Set the current position in the state grid.
-    void Set(StateGrid & grid, int new_state) {
+    void SetState(StateGrid & grid, int new_state) {
       grid.SetState(cur_state.x, cur_state.y, new_state);
     }
   };
