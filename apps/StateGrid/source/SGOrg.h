@@ -10,6 +10,7 @@
  *  or rotate.
  */
 
+#include "Evo/StateGrid.h"
 #include "hardware/AvidaGP.h"
 #include "hardware/InstLib.h"
 
@@ -63,11 +64,11 @@ class SGOrg : public emp::AvidaCPU_Base<SGOrg> {
     int val = org.sg_status.Scan(org.state_grid);
     org.regs[inst.args[0]] = val;
     switch (val) {
-    case -1: org.score -= 0.5; break;                                       // Poison
-    case 0: break;                                                          // Eaten food
-    case 1: org.score += 1.0; org.sg_status.Set(org.state_grid, 0); break;  // Food! (being eaten...)
-    case 2: break;                                                          // Empty border
-    case 3: org.score += 1.0; org.sg_status.Set(org.state_grid, 2); break;  // Border with food.
+    case -1: org.score -= 0.5; break;                                            // Poison
+    case 0: break;                                                               // Eaten food
+    case 1: org.score += 1.0; org.sg_status.SetState(org.state_grid, 0); break;  // Food! (now eaten)
+    case 2: break;                                                               // Empty border
+    case 3: org.score += 1.0; org.sg_status.SetState(org.state_grid, 2); break;  // Border with food
     }
   }
 
