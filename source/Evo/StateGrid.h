@@ -27,6 +27,7 @@
 #include "../base/Ptr.h"
 #include "../base/vector.h"
 
+#include "../tools/BitVector.h"
 #include "../tools/File.h"
 #include "../tools/map_utils.h"
 #include "../tools/math.h"
@@ -280,6 +281,16 @@ namespace emp {
     bool WasAt(size_t x, size_t y) const {
       for (const State & state : history) if (state.IsAt(x,y)) return true;
       return false;
+    }
+
+    /// Get a BitVector indicating the full history of which positions this organism has traversed.
+    emp::BitVector HistoryAt(const StateGrid & grid) const {
+      emp::BitVector at_array(grid.GetSize());
+      for (const State & state : history) {
+        size_t pos = state.x + grid.GetWidth() * state.y;
+        at_array.Set(pos);
+      }
+      return at_array;
     }
 
     StateGridStatus & TrackMoves(bool track=true) {
