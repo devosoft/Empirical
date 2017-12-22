@@ -42,7 +42,7 @@ class SGOrg : public emp::AvidaCPU_Base<SGOrg> {
 
   double GetFitness() {  // Setup the fitness function.
     ResetHardware();
-    Process(200);
+    Process(2000);
     return score;
   }
 
