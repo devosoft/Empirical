@@ -240,6 +240,7 @@ namespace emp {
       size_t facing;    ///< 0=UL, 1=Up, 2=UR, 3=Right, 4=DR, 5=Down, 6=DL, 7=Left (+=Clockwise)
 
       State(size_t _x=0, size_t _y=0, size_t _f=1) : x(_x), y(_y), facing(_f) { ; }
+      bool IsAt(size_t _x, size_t _y) const { return x == _x && y == _y; }
     };
 
     State cur_state;             ///< Position and facing currently used.
@@ -274,6 +275,12 @@ namespace emp {
     size_t GetX() const { return cur_state.x; }
     size_t GetY() const { return cur_state.y; }
     size_t GetFacing() const { return cur_state.facing; }
+
+    bool IsAt(size_t x, size_t y) const { return cur_state.IsAt(x,y); }
+    bool WasAt(size_t x, size_t y) const {
+      for (const State & state : history) if (state.IsAt(x,y)) return true;
+      return false;
+    }
 
     StateGridStatus & TrackMoves(bool track=true) {
       track_moves = track;
@@ -335,6 +342,7 @@ namespace emp {
     void SetState(StateGrid & grid, int new_state) {
       grid.SetState(cur_state.x, cur_state.y, new_state);
     }
+
   };
 
 }
