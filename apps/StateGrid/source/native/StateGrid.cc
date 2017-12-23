@@ -12,9 +12,10 @@ void Print(const emp::AvidaGP & cpu) {
   std::cout << " IP=" << cpu.GetIP() << std::endl;
 }
 
-constexpr size_t POP_SIZE = 1000;
+constexpr size_t POP_SIZE = 400;
 constexpr size_t GENOME_SIZE = 50;
 constexpr size_t UPDATES = 10000;
+constexpr size_t NUM_HINTS = 1000;
 
 int main()
 {
@@ -22,6 +23,15 @@ int main()
   SGWorld world(random, "AvidaWorld");
 
   world.SetWellMixed(true);
+
+  // Setup a set of hint functions.
+  emp::vector< std::function<double(const SGOrg &)> >  hint_funs(NUM_HINTS);
+  for (size_t h = 0; h < NUM_HINTS; h++) {
+    emp::BitVector target_sites = RandomBitVector(random, world.GetStateGrid().GetSize(), 0.01);
+    emp::BitVector good_sites = target_sites & world.GetStateGrid().IsState(1);
+    emp::BitVector bad_sites = target_sites & world.GetStateGrid().IsState(-1);
+//    hint_funs[h] = [](const SGOrg & org){};
+  }
 
   // Build a random initial popoulation.
   for (size_t i = 0; i < POP_SIZE; i++) {
