@@ -165,6 +165,13 @@ namespace emp {
       return info.GetName(GetState(x,y));
     }
 
+    /// Return a BitVector indicating which positions in the state grid have a particular state.
+    emp::BitVector IsState(int target_state) {
+      emp::BitVector sites(states.size());
+      for (size_t i = 0; i < states.size(); i++) sites[i] = (states[i] == target_state);
+      return sites;
+    }
+
     /// Setup the StateGridInfo with possible states.
     template <typename... Ts>
     void AddState(Ts &&... args) { info.AddState(std::forward<Ts>(args)...); }
