@@ -30,7 +30,12 @@ int main()
     emp::BitVector target_sites = RandomBitVector(random, world.GetStateGrid().GetSize(), 0.01);
     emp::BitVector good_sites = target_sites & world.GetStateGrid().IsState(1);
     emp::BitVector bad_sites = target_sites & world.GetStateGrid().IsState(-1);
-//    hint_funs[h] = [](const SGOrg & org){};
+    hint_funs[h] = [good_sites, bad_sites](const SGOrg & org) {
+      emp::BitVector visited_sites = org.GetVisted();
+      size_t good_count = (good_sites & visited_sites).CountOnes();
+      size_t bad_count = (bad_sites & visted_sites).CountOnes();
+      return good_count * 2 + bad_count;
+    };
   }
 
   // Build a random initial popoulation.
