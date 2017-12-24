@@ -35,6 +35,7 @@ class SGOrg : public emp::AvidaCPU_Base<SGOrg> {
   emp::StateGrid & GetStateGrid() { return state_grid; }
   const emp::StateGrid & GetStateGrid() const { return state_grid; }
   double GetScore() const { return score; }
+  emp::BitVector GetVisited() const { return sg_status.GetVisited(state_grid); }
 
   void SetPosition(size_t x, size_t y) { sg_status.SetPos(x,y); }
   void SetFacing(size_t facing) { sg_status.SetFacing(facing); }
