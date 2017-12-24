@@ -291,7 +291,7 @@ namespace emp {
     }
 
     /// Get a BitVector indicating the full history of which positions this organism has traversed.
-    emp::BitVector HistoryAt(const StateGrid & grid) const {
+    emp::BitVector GetVisited(const StateGrid & grid) const {
       emp::BitVector at_array(grid.GetSize());
       for (const State & state : history) {
         size_t pos = state.x + grid.GetWidth() * state.y;
