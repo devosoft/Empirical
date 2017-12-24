@@ -12,10 +12,14 @@ void Print(const emp::AvidaGP & cpu) {
   std::cout << " IP=" << cpu.GetIP() << std::endl;
 }
 
-constexpr size_t POP_SIZE = 400;
-constexpr size_t GENOME_SIZE = 50;
+constexpr size_t POP_SIZE = 400;    // Total population size.
+constexpr size_t ELITE_SIZE = 10;   // Top how many organisms should move to next generation?
+constexpr size_t ELITE_COPIES = 2;  // How many copies of each elite organism should be made?
+constexpr size_t GENOME_SIZE = 50;  // How long of a genome should we be using?
 constexpr size_t UPDATES = 10000;
 constexpr size_t NUM_HINTS = 1000;
+
+constexpr size_t ELITE_TOTAL = ELITE_SIZE * ELITE_COPIES;
 
 int main()
 {
@@ -51,13 +55,13 @@ int main()
     std::cout << "Update " << ud;
 
     // Keep the best individual.
-    EliteSelect(world, 1, 1);
+    EliteSelect(world, ELITE_SIZE, ELITE_COPIES);
 
     std::cout << "  fitness[0] = " << world[0].GetScore()
               << std::endl;
 
     // Run a tournament for the rest...
-    TournamentSelect(world, 4, POP_SIZE-1);
+    TournamentSelect(world, 4, POP_SIZE-ELITE_TOTAL);
 
     // Put new organisms is place.
     world.Update();
