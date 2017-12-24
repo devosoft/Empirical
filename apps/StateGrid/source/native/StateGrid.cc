@@ -31,9 +31,9 @@ int main()
     emp::BitVector good_sites = target_sites & world.GetStateGrid().IsState(1);
     emp::BitVector bad_sites = target_sites & world.GetStateGrid().IsState(-1);
     hint_funs[h] = [good_sites, bad_sites](const SGOrg & org) {
-      emp::BitVector visited_sites = org.GetVisted();
+      emp::BitVector visited_sites = org.GetVisited();
       size_t good_count = (good_sites & visited_sites).CountOnes();
-      size_t bad_count = (bad_sites & visted_sites).CountOnes();
+      size_t bad_count = (bad_sites & visited_sites).CountOnes();
       return good_count * 2 + bad_count;
     };
   }
