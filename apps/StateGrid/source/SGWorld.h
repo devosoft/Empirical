@@ -58,7 +58,9 @@ class SGWorld : public emp::World<SGOrg> {
 
       // When an organism is added to the world, supply it with a state grid.
       OnOrgPlacement( [this, &random](size_t pos){
-          pop[pos]->SetStateGrid(state_grid);
+          pop[pos]->SetStateGrid(state_grid);      // Ensure new org has access to state grid.
+          pop[pos]->GetSGStatus().SetPos(4,4);     // Start at position (4,4)
+          pop[pos]->GetSGStatus().TrackMoves();    // Make sure we have a history to refer to.
           // if (pos && random.P(0.1)) world.GetOrg(pos).GetSGStatus().Randomize(state_grid, random);
         } );
 
