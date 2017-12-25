@@ -54,7 +54,8 @@ class SGOrg : public emp::AvidaCPU_Base<SGOrg> {
 
   static void Inst_Move(SGOrg & org, const base_t::Instruction & inst) {
     emp_assert(org.state_grid.GetSize() > 0, org.state_grid.GetWidth(), org.state_grid.GetHeight());
-    org.sg_status.Move(org.state_grid, org.regs[inst.args[0]]);
+    org.sg_status.Move(org.state_grid, 1);
+    //org.sg_status.Move(org.state_grid, org.regs[inst.args[0]]);
   }
 
   static void Inst_Rotate(SGOrg & org, const base_t::Instruction & inst) {
