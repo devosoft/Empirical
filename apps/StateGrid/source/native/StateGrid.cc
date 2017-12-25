@@ -33,7 +33,7 @@ int main()
   // Setup a set of hint functions.
   emp::vector< std::function<double(const SGOrg &)> >  hint_funs(NUM_HINTS);
   for (size_t h = 0; h < NUM_HINTS; h++) {
-    emp::BitVector target_sites = RandomBitVector(random, world.GetStateGrid().GetSize(), 0.01);
+    emp::BitVector target_sites = RandomBitVector(random, world.GetStateGrid().GetSize(), 0.002);
     emp::BitVector good_sites = target_sites & world.GetStateGrid().IsState(1);
     emp::BitVector bad_sites = target_sites & world.GetStateGrid().IsState(-1);
     hint_funs[h] = [good_sites, bad_sites](const SGOrg & org) {
@@ -71,6 +71,11 @@ int main()
     world.ResetHardware();
     world.Process(2000);
 
+    // Periodically, provide the status of the best organism.
+    if (ud % 100 == 0) {
+      world[0].GetSGStatus().PrintHistory(world.GetStateGrid());
+    }
+
     // Keep the best individual.
     EliteSelect(world, ELITE_SIZE, ELITE_COPIES);
 
@@ -91,7 +96,7 @@ int main()
   }
 
   std::cout << "Final Fitness: " << world.CalcFitnessID(0) << std::endl;
-  world[0].GetStateGrid().Print();
+  world[0].GetSGStatus().PrintHistory(world.GetStateGrid());
 
   std::cout << std::endl;
   world[0].PrintGenome();
