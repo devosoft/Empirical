@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "tools/math.h"
+
 #include "../SGPatches.h"
 #include "../SGWorld.h"
 
@@ -42,16 +44,16 @@ int main()
     };
   }
 
-  // emp::BitVector good_sites = world.GetStateGrid().IsState(1);
-  // emp::BitVector bad_sites = world.GetStateGrid().IsState(-1);
-  // auto fit_fun = [good_sites, bad_sites](const SGOrg & org) {
-  //   emp::BitVector visited_sites = org.GetVisited();
-  //   double good_visits = (good_sites & visited_sites).CountOnes();
-  //   double bad_visits = (bad_sites & visited_sites).CountOnes();
-  //   double result = good_visits - bad_visits/2;
-  //   return emp::max(0.0, result);
-  // };
-  // world.SetFitFun(fit_fun);
+  emp::BitVector good_sites = world.GetStateGrid().IsState(1);
+  emp::BitVector bad_sites = world.GetStateGrid().IsState(-1);
+  auto fit_fun = [good_sites, bad_sites](const SGOrg & org) {
+    emp::BitVector visited_sites = org.GetVisited();
+    double good_visits = (good_sites & visited_sites).CountOnes();
+    double bad_visits = (bad_sites & visited_sites).CountOnes();
+    double result = good_visits - bad_visits/2;
+    return emp::Max(0.0, result);
+  };
+  world.SetFitFun(fit_fun);
 
   // Build a random initial popoulation.
   for (size_t i = 0; i < POP_SIZE; i++) {
@@ -65,10 +67,14 @@ int main()
     // Progress output...
     std::cout << "Update " << ud;
 
+    // Run all of the organisms to trace their movement.
+    world.ResetHardware();
+    world.Process(2000);
+
     // Keep the best individual.
     EliteSelect(world, ELITE_SIZE, ELITE_COPIES);
 
-    std::cout << "  fitness[0] = " << world[0].GetScore()
+    std::cout << "  fitness[0] = " << world.CalcFitnessID(0)
               << std::endl;
 
     // // Run a tournament for the rest...
