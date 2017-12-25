@@ -301,8 +301,9 @@ namespace emp {
     }
 
     StateGridStatus & TrackMoves(bool track=true) {
+      bool prev = track_moves;
       track_moves = track;
-      if (track_moves) history.push_back(cur_state);
+      if (!prev && track_moves) history.push_back(cur_state);
       else history.resize(0);
       return *this;
     }
@@ -326,6 +327,9 @@ namespace emp {
 
     /// Move in the direction currently faced.
     void Move(const StateGrid & grid, int steps=1) {
+      // std::cout << "steps = " << steps
+      //           << "  facing = " << cur_state.facing
+      //           << "  start = (" << cur_state.x << "," << cur_state.y << ")";
       switch (cur_state.facing) {
         case 0: MoveX(grid, -steps); MoveY(grid, -steps); break;
         case 1:                      MoveY(grid, -steps); break;
@@ -337,6 +341,9 @@ namespace emp {
         case 7: MoveX(grid, -steps);                      break;
       }
       UpdateHistory();
+      // std::cout << " end = (" << cur_state.x << "," << cur_state.y << ")"
+      //           << "  facing = " << cur_state.facing
+      //           << std::endl;
     }
 
     /// Rotate starting from current facing.
@@ -361,6 +368,20 @@ namespace emp {
       grid.SetState(cur_state.x, cur_state.y, new_state);
     }
 
+    /// Print the history of an organim moving around a state grid.
+    void PrintHistory(StateGrid & grid, std::ostream & os=std::cout) const {
+      emp_assert(history.size(), "You can only print history of a StateGrid if you track it!");
+      const size_t width = grid.GetWidth();
+      const size_t height = grid.GetHeight();
+      std::string out(width*2-1, ' ');
+      for (size_t i = 0; i < height; i++) {
+        for (size_t j = 1; j < width; j++) {
+          out[j*2] = grid.GetSymbol(j,i);
+          if (WasAt(j,i)) out[j*2] = '*';
+        }
+        os << out << std::endl;
+      }
+    }
   };
 
 }
