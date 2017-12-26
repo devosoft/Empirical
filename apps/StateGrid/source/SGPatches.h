@@ -23,7 +23,8 @@ public:
     AddState( 2, 'x',  0.0, "Consumed Edge", "Edge marker; previously had food.");
     AddState( 3, 'X', +1.0, "Edge",          "Edge marker with food.");
 
-    Load("state_grids/islands_50x50.cfg");
+    //Load("state_grids/islands_50x50.cfg");
+    Load("state_grids/islands_50x50_paths.cfg");
   }
 
 };
