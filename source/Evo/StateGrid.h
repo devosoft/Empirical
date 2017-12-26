@@ -143,6 +143,7 @@ namespace emp {
       emp_assert(y < height, y, height);
       return states[y*width+x];
     }
+    int GetState(size_t id) const { return states[id]; }
     StateGrid & SetState(size_t x, size_t y, int in) {
       emp_assert(x < width, x, width);
       emp_assert(y < height, y, height);
