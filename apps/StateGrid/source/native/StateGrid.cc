@@ -14,12 +14,14 @@ void Print(const emp::AvidaGP & cpu) {
   std::cout << " IP=" << cpu.GetIP() << std::endl;
 }
 
-constexpr size_t POP_SIZE = 400;    // Total population size.
-constexpr size_t ELITE_SIZE = 10;   // Top how many organisms should move to next generation?
-constexpr size_t ELITE_COPIES = 1;  // How many copies of each elite organism should be made?
-constexpr size_t GENOME_SIZE = 50;  // How long of a genome should we be using?
-constexpr size_t UPDATES = 1000;
-constexpr size_t NUM_HINTS = 1000;
+constexpr size_t POP_SIZE = 400;       // Total population size.
+constexpr size_t ELITE_SIZE = 10;      // Top how many organisms should move to next generation?
+constexpr size_t ELITE_COPIES = 1;     // How many copies of each elite organism should be made?
+constexpr size_t GENOME_SIZE = 50;     // How long of a genome should we be using?
+constexpr size_t UPDATES = 1000;       // How many generations to run?
+constexpr size_t NUM_HINTS = 1000;     // How many hints to use in Lexicase / Exocase
+constexpr size_t CPU_TIME = 5000;      // How many CPU cycles to process for?
+constexpr double GOOD_BAD_RATIO = 1.0; // Value of going to a good square vs avoiding a bad square.
 
 constexpr size_t ELITE_TOTAL = ELITE_SIZE * ELITE_COPIES;
 
@@ -40,7 +42,7 @@ int main()
       emp::BitVector visited_sites = org.GetVisited();
       size_t good_visits = (good_sites & visited_sites).CountOnes();
       size_t bad_visits = (bad_sites & visited_sites).CountOnes();
-      return good_visits * 2 - bad_visits;
+      return GOOD_BAD_RATIO * good_visits - bad_visits;
     };
   }
 
@@ -50,7 +52,7 @@ int main()
     emp::BitVector visited_sites = org.GetVisited();
     double good_visits = (good_sites & visited_sites).CountOnes();
     double bad_visits = (bad_sites & visited_sites).CountOnes();
-    double result = good_visits - bad_visits/2;
+    double result = good_visits - bad_visits/GOOD_BAD_RATIO;
     return emp::Max(0.0, result);
   };
   world.SetFitFun(fit_fun);
@@ -69,10 +71,11 @@ int main()
 
     // Run all of the organisms to trace their movement.
     world.ResetHardware();
-    world.Process(2000);
+    world.Process(CPU_TIME);
 
     // Periodically, provide the status of the best organism.
     if (ud % 100 == 0) {
+      std::cout << std::endl;
       world[0].GetSGStatus().PrintHistory(world.GetStateGrid());
     }
 
