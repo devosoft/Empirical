@@ -19,7 +19,6 @@ constexpr size_t ELITE_SIZE = 10;      // Top how many organisms should move to 
 constexpr size_t ELITE_COPIES = 1;     // How many copies of each elite organism should be made?
 constexpr size_t GENOME_SIZE = 50;     // How long of a genome should we be using?
 constexpr size_t UPDATES = 1000;       // How many generations to run?
-constexpr size_t NUM_HINTS = 1000;     // How many hints to use in Lexicase / Exocase
 constexpr size_t CPU_TIME = 5000;      // How many CPU cycles to process for?
 constexpr double GOOD_BAD_RATIO = 1.0; // Value of going to a good square vs avoiding a bad square.
 
@@ -29,22 +28,39 @@ int main()
 {
   emp::Random random;
   SGWorld world(random, "AvidaWorld");
+  auto & state_grid = world.GetStateGrid();
 
   world.SetWellMixed(true);
 
   // Setup a set of hint functions.
-  emp::vector< std::function<double(const SGOrg &)> >  hint_funs(NUM_HINTS);
-  for (size_t h = 0; h < NUM_HINTS; h++) {
-    emp::BitVector target_sites = RandomBitVector(random, world.GetStateGrid().GetSize(), 0.002);
-    emp::BitVector good_sites = target_sites & world.GetStateGrid().IsState(1);
-    emp::BitVector bad_sites = target_sites & world.GetStateGrid().IsState(-1);
-    hint_funs[h] = [good_sites, bad_sites](const SGOrg & org) {
-      emp::BitVector visited_sites = org.GetVisited();
-      size_t good_visits = (good_sites & visited_sites).CountOnes();
-      size_t bad_visits = (bad_sites & visited_sites).CountOnes();
-      return GOOD_BAD_RATIO * good_visits - bad_visits;
-    };
+  // constexpr size_t NUM_HINTS = 1000;     // How many hints to use in Lexicase / Exocase
+  // emp::vector< std::function<double(const SGOrg &)> >  hint_funs(NUM_HINTS);
+  // for (size_t h = 0; h < NUM_HINTS; h++) {
+  //   emp::BitVector target_sites = RandomBitVector(random, world.GetStateGrid().GetSize(), 0.002);
+  //   emp::BitVector good_sites = target_sites & world.GetStateGrid().IsState(1);
+  //   emp::BitVector bad_sites = target_sites & world.GetStateGrid().IsState(-1);
+  //   hint_funs[h] = [good_sites, bad_sites](const SGOrg & org) {
+  //     emp::BitVector visited_sites = org.GetVisited();
+  //     size_t good_visits = (good_sites & visited_sites).CountOnes();
+  //     size_t bad_visits = (bad_sites & visited_sites).CountOnes();
+  //     return GOOD_BAD_RATIO * good_visits - bad_visits;
+  //   };
+  // }
+
+
+  // Setup a set of HINT functions.
+  emp::vector< std::function<double(const SGOrg &)> > hint_funs;
+  for (size_t h = 0; h < state_grid.GetSize(); h++) {
+    int target_state = state_grid.GetState(h);
+    if (target_state != -1 && target_state != 1) continue;
+    size_t target_x = h % state_grid.GetWidth();
+    size_t target_y = h / state_grid.GetWidth();
+
+    hint_funs.push_back( [target_x,target_y,target_state](const SGOrg & org) {
+      return org.GetSGStatus().WasAt(target_x, target_y) ? target_state : 0.0;
+    });
   }
+
 
   emp::BitVector good_sites = world.GetStateGrid().IsState(1);
   emp::BitVector bad_sites = world.GetStateGrid().IsState(-1);
@@ -99,6 +115,8 @@ int main()
   }
 
   std::cout << "Final Fitness: " << world.CalcFitnessID(0) << std::endl;
+  world.ResetHardware();
+  world.Process(CPU_TIME);
   world[0].GetSGStatus().PrintHistory(world.GetStateGrid());
 
   std::cout << std::endl;
