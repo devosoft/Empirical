@@ -116,14 +116,17 @@ namespace emp {
   /// EACH offspring produced.
   /// @param world The emp::World object with the organisms to be selected.
   /// @param fit_funs The set of fitness functions to shuffle for each organism reproduced.
-  /// @param repro_count How many rounds of repliction should we do.
+  /// @param repro_count How many rounds of repliction should we do. (default 1)
+  /// @param max_funs The maximum number of fitness functions to use. (use 0 for all; default)
   template<typename ORG>
   void LexicaseSelect(World<ORG> & world,
                       const emp::vector< std::function<double(const ORG &)> > & fit_funs,
-                      size_t repro_count=1)
+                      size_t repro_count=1,
+                      size_t max_funs=0)
   {
     emp_assert(world.GetSize() > 0);
     emp_assert(fit_funs.size() > 0);
+    if (!max_funs) max_funs = fit_funs.size();
 
     // Collect all fitness info. (@CAO: Technically only do this is cache is turned on?)
     emp::vector< emp::vector<double> > fitnesses(fit_funs.size());
@@ -141,7 +144,15 @@ namespace emp {
 
     for (size_t repro = 0; repro < repro_count; ++repro) {
       // Determine the current ordering of the functions.
-      emp::vector<size_t> order = GetPermutation(world.GetRandom(), fit_funs.size());
+      emp::vector<size_t> order;
+
+      if (max_funs == fit_funs.size()) {
+        order = GetPermutation(world.GetRandom(), fit_funs.size());
+      } else {
+        order.resize(max_funs); // We want to limit the total numebr of tests done.
+        for (auto & x : order) x = world.GetRandom().GetUInt(fit_funs.size());
+      }
+      // @CAO: We could have selected the order more efficiently!
 
       // Step through the functions in the proper order.
       cur_orgs = all_orgs;  // Start with all of the organisms.
