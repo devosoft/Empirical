@@ -32,21 +32,6 @@ int main()
 
   world.SetWellMixed(true);
 
-  // Setup a set of hint functions.
-  // constexpr size_t NUM_HINTS = 1000;     // How many hints to use in Lexicase / Exocase
-  // emp::vector< std::function<double(const SGOrg &)> >  hint_funs(NUM_HINTS);
-  // for (size_t h = 0; h < NUM_HINTS; h++) {
-  //   emp::BitVector target_sites = RandomBitVector(random, world.GetStateGrid().GetSize(), 0.002);
-  //   emp::BitVector good_sites = target_sites & world.GetStateGrid().IsState(1);
-  //   emp::BitVector bad_sites = target_sites & world.GetStateGrid().IsState(-1);
-  //   hint_funs[h] = [good_sites, bad_sites](const SGOrg & org) {
-  //     emp::BitVector visited_sites = org.GetVisited();
-  //     size_t good_visits = (good_sites & visited_sites).CountOnes();
-  //     size_t bad_visits = (bad_sites & visited_sites).CountOnes();
-  //     return GOOD_BAD_RATIO * good_visits - bad_visits;
-  //   };
-  // }
-
 
   // Setup a set of HINT functions.
   emp::vector< std::function<double(const SGOrg &)> > hint_funs;
@@ -62,16 +47,6 @@ int main()
   }
 
 
-  emp::BitVector good_sites = world.GetStateGrid().IsState(1);
-  emp::BitVector bad_sites = world.GetStateGrid().IsState(-1);
-  auto fit_fun = [good_sites, bad_sites](const SGOrg & org) {
-    emp::BitVector visited_sites = org.GetVisited();
-    double good_visits = (good_sites & visited_sites).CountOnes();
-    double bad_visits = (bad_sites & visited_sites).CountOnes();
-    double result = good_visits - bad_visits/GOOD_BAD_RATIO;
-    return emp::Max(0.0, result);
-  };
-  world.SetFitFun(fit_fun);
 
   // Build a random initial popoulation.
   for (size_t i = 0; i < POP_SIZE; i++) {
