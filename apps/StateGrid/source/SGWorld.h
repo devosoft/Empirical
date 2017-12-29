@@ -78,6 +78,17 @@ class SGWorld : public emp::World<SGOrg> {
           }
           return num_muts;
         } );
+
+      emp::BitVector good_sites = state_grid.IsState(1);
+      emp::BitVector bad_sites = state_grid.IsState(-1);
+      auto fit_fun = [good_sites, bad_sites](const SGOrg & org) {
+        emp::BitVector visited_sites = org.GetVisited();
+        double good_visits = (good_sites & visited_sites).CountOnes();
+        double bad_visits = (bad_sites & visited_sites).CountOnes();
+        double result = good_visits - bad_visits;
+        return emp::Max(0.0, result);
+      };
+      SetFitFun(fit_fun);
     }
   ~SGWorld() { ; }
 
