@@ -60,7 +60,7 @@ namespace emp {
   constexpr bool assert_on = false;
 }
 
-// Debug OFF
+// GROUP 1:   --- Debug OFF ---
 
 /// Ideally, this assert should use the expression (to prevent compiler error), but should not
 /// generate any assembly code.  For now, just make it blank (other options commented out)
@@ -68,6 +68,11 @@ namespace emp {
 // #define emp_assert(EXPR) ((void) sizeof(EXPR) )
 // #define emp_assert(EXPR, ...) { constexpr bool __emp_assert_tmp = false && (EXPR); (void) __emp_assert_tmp; }
 
+// Asserts to check only when in Emscripten should also be disabled.
+#define emp_emscripten_assert(...)
+
+
+// GROUP 2:   --- Unit Testing ON ---
 #elif defined(EMP_TDEBUG)           // EMP_NDEBUG not set, but EMP_TDEBUG is!
 
 namespace emp {
@@ -101,7 +106,15 @@ namespace emp {
     emp::assert_trigger(__FILE__, __LINE__, EMP_STRINGIFY( EMP_GET_ARG_1(__VA_ARGS__, ~) ));  \
   } while(0)
 
+// Unit-testing asserts to check only when in Emscripten should depend on if we are in Emscripten
+#ifdef EMSCRIPTEN
+#define emp_emscripten_assert(...) emp_assert(__VA_ARGS__)
+#else
+#define emp_emscripten_assert(...)
+#endif
 
+
+// GROUP 3:   --- Emscripten debug ON ---
 #elif EMSCRIPTEN  // Neither EMP_NDEBUG nor EMP_TDEBUG set, but compiling with Emscripten
 
 namespace emp {
@@ -141,8 +154,12 @@ namespace emp {
     emp::assert_trigger(__FILE__, __LINE__, EMP_WRAP_ARGS(emp_assert_TO_PAIR, __VA_ARGS__) ); \
   } while(0)
 
+// Emscripten asserts should be on since we are in Emscripten
+#define emp_emscripten_assert(...) emp_assert(__VA_ARGS__)
 
-#else // We ARE in DEBUG, but NOT in EMSCRIPTEN
+
+// GROUP 3:   --- Debug ON, but Emscripten OFF ---
+#else
 
 namespace emp {
   constexpr bool assert_on = true;
@@ -178,6 +195,9 @@ namespace emp {
     emp::assert_trigger(__FILE__, __LINE__, EMP_WRAP_ARGS(emp_assert_TO_PAIR, __VA_ARGS__) ) &&  \
     (abort(), false);                                                                            \
   } while(0)
+
+// Emscripten-only asserts should be disabled since we are not in Emscripten
+#define emp_emscripten_assert(...) emp_assert(__VA_ARGS__)
 
 /// @cond DEFINES
 
