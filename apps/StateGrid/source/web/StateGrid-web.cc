@@ -29,7 +29,7 @@ struct SGInterface {
     , anim( [this](){ DoFrame(); }, canvas )
   {
     doc << "<h1>Hello, world!</h1>";
-    doc << "Update = " << emp::Live(update) << "<br>";
+    doc << "Update = " << UI::Live(update) << "<br>";
     doc << canvas;
     UI::Draw(canvas, (emp::StateGrid &) world.GetStateGrid(), emp::GetHueMap(5));
   }
