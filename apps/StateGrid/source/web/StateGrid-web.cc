@@ -9,27 +9,48 @@
 
 namespace UI = emp::web;
 
-UI::Document doc("emp_base");
-
 constexpr size_t UPDATES = 10000;
+
+struct SGInterface {
+  SGWorld world;
+  emp::Random random;
+  size_t update;
+
+  UI::Document doc;
+  UI::Canvas canvas;
+
+  UI::Animate anim;
+
+  SGInterface()
+    : world(random, "AvidaWorld")
+    , update(0)
+    , doc("emp_base")
+    , canvas(400,400)
+    , anim( [this](){ DoFrame(); }, canvas )
+  {
+    doc << "<h1>Hello, world!</h1>";
+    doc << "Update = " << emp::Live(update) << "<br>";
+    doc << canvas;
+    UI::Draw(canvas, (emp::StateGrid &) world.GetStateGrid(), emp::GetHueMap(5));
+  }
+
+  void DrawAll() {
+    //DrawOrgs();
+    doc.Redraw();
+
+    //LayoutDivs();
+  }
+
+  void DoFrame() {
+    world.RunUpdate();
+    DrawAll();
+  }
+};
+
+
+SGInterface interface;
 
 int main()
 {
-  UI::Canvas canvas(400,400);
-
-  doc << "<h1>Hello, world!</h1>";
-  doc << canvas;
-
-
-  emp::Random random;
-  SGWorld world(random, "AvidaWorld");
-  UI::Draw(canvas, (emp::StateGrid &) world.GetStateGrid(), emp::GetHueMap(5));
-
-
-  // Do the run...
-  for (size_t ud = 0; ud < UPDATES; ud++) {
-    world.RunUpdate();
-  }
-
   return 0;
 }
