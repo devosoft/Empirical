@@ -29,15 +29,13 @@ int main()
     world.RunUpdate();
 
     // Periodically, provide the status of the best organism.
+    world.GetOrg(0).ResetHardware();
+    world.GetOrg(0).Process(CPU_TIME);
     if (ud % 10 == 0) {
       std::cout << std::endl;
-      world.GetOrg(0).ResetHardware();
-      world.GetOrg(0).Process(CPU_TIME);
       world[0].GetSGStatus().PrintHistory(world.GetStateGrid());
     }
-
-    std::cout << "  fitness[0] = " << world.CalcFitnessID(0)
-              << std::endl;
+    std::cout << "  fitness[0] = " << world.CalcFitnessID(0) << std::endl;
   }
 
   std::cout << "Final Fitness: " << world.CalcFitnessID(0) << std::endl;
