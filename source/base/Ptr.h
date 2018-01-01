@@ -407,11 +407,15 @@ namespace emp {
     /// Reallocate this Ptr to a newly allocated value using arguments passed in.
     template <typename... T>
     void New(T &&... args) {
-      Tracker().DecID(id);                        // Remove a pointer to any old memory...
-      ptr = new TYPE(std::forward<T>(args)...);   // Build a new raw pointer.
-      emp_emscripten_assert(ptr);                 // Trigger emscripten-only assert on allocation (no exceptions available)
+      Tracker().DecID(id);                            // Remove a pointer to any old memory...
+
+      // ptr = new TYPE(std::forward<T>(args)...); // Special new that uses allocated space.
+      ptr = (TYPE*) malloc (sizeof(TYPE));            // Build a new raw pointer.
+      emp_emscripten_assert(ptr);                     // No exceptions in emscripten; assert alloc!
+      ptr = new (ptr) TYPE(std::forward<T>(args)...); // Special new that uses allocated space.
+
       if (ptr_debug) std::cout << "Ptr::New() : " << ptr << std::endl;
-      id = Tracker().New(ptr);                    // And track it!
+      id = Tracker().New(ptr);                        // And track it!
       DebugInfo().AddPtr();
     }
 
