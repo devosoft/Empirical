@@ -16,41 +16,49 @@
 
 #include <cstdlib>
 
+#include <chrono>
+
 int main(int argc, char* argv[]) {
   using namespace emp::opengl;
   using namespace emp::plot;
   using namespace emp::plot::properties;
+  using namespace emp::math;
 
-  GLCanvas canvas(1000, 1000);
+  constexpr auto MAX = 100;
+  constexpr auto MIN = -100;
+  constexpr auto STEPS = 1e3;
+  constexpr auto f_STEPS = static_cast<float>(STEPS);
 
-  auto g = graph(map(
-    [](auto&& props) {
-      auto& value = Value::get(props);
+  GLCanvas canvas;
+  canvas.bindOnMouseEvent(
+    [](auto& canvas, auto& event) { std::cout << event << std::endl; });
 
-      return std::forward<decltype(props)>(props) >> X::is(value.x()) >>
-             Y::is(value.y()) >> Fill::is(Vec4f{1, 1, 1, 1});
-
-      // return std::forward<decltype(props)>(props)
-      //   .template set<X>(value.x())
-      //   .template set<Y>(value.y())
-      //   .template set<Fill>(Vec4f{1, 1, 1, 1});
-    },
-    all(Scatter(canvas), Line(canvas))));
+  auto g{graph()
+           .then_map(CartesianData::to(Value::get),
+                     Fill::to(Vec4f{1, 1, 0.5, 1}),
+                     Stroke::to(Vec4f{0.5, 0.5, 0.5, 1}), StrokeWeight::to(2),
+                     PointSize::to(4))
+           .then_views(canvas, Line(canvas), Scatter(canvas))};
 
   std::vector<Vec2f> data;
-  for (int i = 0; i < 100; ++i) {
-    data.emplace_back(i * 10 - 50, 200 * (rand() / (float)RAND_MAX) - 100);
+  for (int i = 0; i < STEPS; ++i) {
+    float theta = (i / f_STEPS) * 2 * consts::pi<float>;
+    data.emplace_back(sin(theta) * (MAX - MIN), cos(theta) * (MAX - MIN));
   }
 
-  auto proj =
-    proj::orthoFromScreen(1000, 1000, canvas.getWidth(), canvas.getHeight());
-  auto view = Mat4x4f::translation(0, 0, 0);
-
+  float offset = 0;
   canvas.runForever([&](auto&&) {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    g.show(proj, view, data.begin(), data.end());
+    g(data.begin(), data.end(), canvas.getRegion());
+    data.clear();
+    for (int i = 0; i < STEPS; ++i) {
+      float theta = (i / f_STEPS) * 2 * consts::pi<float> + offset;
+      data.emplace_back((sin(theta) - cos(2 * theta)) / 3 * (MAX - MIN),
+                        (sin(4 * theta) + cos(theta)) / 3 * (MAX - MIN));
+    }
+    offset += 0.005;
   });
 
   return 0;

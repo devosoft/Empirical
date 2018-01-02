@@ -6,6 +6,7 @@
 
 #include "../math/region.h"
 #include "all.h"
+#include "map.h"
 #include "properties.h"
 
 namespace emp {
@@ -28,7 +29,7 @@ namespace emp {
       };
     }  // namespace detail
 
-    template <typename T = void>
+    template <typename T>
     class Graph {
       private:
       T next;
@@ -52,8 +53,20 @@ namespace emp {
       }
 
       template <typename O>
-      Graph<detail::Then<T, O>> then(O&& other) {
-        return {{next, std::forward<O>(other)}};
+      Graph<detail::Then<T, O>> then(O&& other) && {
+        return {{std::move(next), std::forward<O>(other)}};
+      }
+
+      template <typename... Args>
+      auto then_map(Args&&... args) && -> Graph<
+        detail::Then<T, decltype(map(std::forward<Args>(args)...))>> {
+        return {{std::move(next), map(std::forward<Args>(args)...)}};
+      }
+
+      template <typename... Args>
+      auto then_views(Args&&... args) && -> Graph<
+        detail::Then<T, decltype(views(std::forward<Args>(args)...))>> {
+        return {{std::move(next), views(std::forward<Args>(args)...)}};
       }
     };
 
@@ -64,12 +77,24 @@ namespace emp {
       void operator()(Args&&...) {}
 
       template <typename T>
-      Graph<std::decay_t<T>> then(T&& value) {
+      Graph<std::decay_t<T>> then(T&& value) && {
         return {std::forward<T>(value)};
+      }
+
+      template <typename... Args>
+      auto then_map(Args&&... args) && -> Graph<
+        decltype(map(std::forward<Args>(args)...))> {
+        return {map(std::forward<Args>(args)...)};
+      }
+
+      template <typename... Args>
+      auto then_views(Args&&... args) && -> Graph<
+        decltype(views(std::forward<Args>(args)...))> {
+        return {views(std::forward<Args>(args)...)};
       }
     };
 
-    Graph<> graph() { return {}; }
+    Graph<void> graph() { return {}; }
 
   }  // namespace plot
 }  // namespace emp

@@ -1,8 +1,9 @@
 #ifndef PLOT_ALL_H
 #define PLOT_ALL_H
 
-#include "../math/region.h"
 #include "math/LinAlg.h"
+#include "math/region.h"
+#include "opengl/glcanvas.h"
 #include "properties.h"
 
 namespace emp {
@@ -51,7 +52,9 @@ namespace emp {
     template <typename... T>
     class Views : All<T...> {
       public:
-      using All<T...>::All;
+      template <typename... T_>
+      Views(opengl::GLCanvas& canvas, T_&&... children)
+        : All<T...>(std::forward<T_>(children)...) {}
 
       template <typename Iter, typename... Args>
       void operator()(Iter begin, Iter end, const math::Region2D<float>& region,
@@ -85,8 +88,8 @@ namespace emp {
     };
 
     template <typename... T>
-    auto views(T&&... next) {
-      return Views<T...>{std::forward<T>(next)...};
+    auto views(opengl::GLCanvas& canvas, T&&... next) {
+      return Views<T...>{canvas, std::forward<T>(next)...};
     }
 
   }  // namespace plot
