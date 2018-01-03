@@ -421,9 +421,15 @@ namespace emp {
 
     /// Reallocate this Ptr to a newly allocated array using the size passed in.
     void NewArray(size_t array_size) {
-      Tracker().DecID(id);                        // Remove a pointer to any old memory...
-      ptr = new TYPE[array_size];                 // Build a new raw pointer to an array.
-      emp_emscripten_assert(ptr, array_size);     // Trigger emscripten-only assert on allocation (no exceptions available)
+      Tracker().DecID(id);                              // Remove a pointer to any old memory...
+
+      //ptr = new TYPE[array_size];                     // Build a new raw pointer to an array.
+      ptr = (TYPE*) malloc (array_size * sizeof(TYPE)); // Build a new raw pointer.
+      emp_emscripten_assert(ptr, array_size);           // No exceptions in emscripten; assert alloc!
+      for (size_t i = 0; i < array_size; i++) {
+        new (ptr + i*sizeof(TYPE)) TYPE();
+      }
+
       if (ptr_debug) std::cout << "Ptr::NewArray() : " << ptr << std::endl;
       id = Tracker().NewArray(ptr, array_size * sizeof(TYPE));   // And track it!
       DebugInfo().AddPtr();
