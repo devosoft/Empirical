@@ -773,11 +773,23 @@ namespace emp {
     emp_emscripten_assert(ptr);     // Trigger emscripten-only assert on allocation (no exceptions available)
     return Ptr<T>(ptr, true);
   }
-  template <typename T, typename... ARGS> Ptr<T> NewArrayPtr(size_t array_size) {
-    auto ptr = new T[array_size];
-    emp_emscripten_assert(ptr, array_size);     // Trigger emscripten-only assert on allocation (no exceptions available)
+
+  template <typename T, typename... ARGS> Ptr<T> NewArrayPtr(size_t array_size, ARGS &&... args) {
+    //auto ptr = new T[array_size];
+
+    auto ptr = (T*) malloc (array_size * sizeof(T));  // Build a new raw pointer.
+    emp_emscripten_assert(ptr, array_size);           // No exceptions in emscripten; assert alloc!
+    for (size_t i = 0; i < array_size; i++) {         // Loop through all array elements.
+      new (ptr + i*sizeof(T)) T(args...);             //    ...and initialize them.
+    }
+
     return Ptr<T>(ptr, array_size, true);
   }
+
+
+
+
+
 }
 
 #endif // EMP_PTR_H
