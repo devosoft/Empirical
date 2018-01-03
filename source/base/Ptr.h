@@ -420,14 +420,15 @@ namespace emp {
     }
 
     /// Reallocate this Ptr to a newly allocated array using the size passed in.
-    void NewArray(size_t array_size) {
+    template <typename... T>
+    void NewArray(size_t array_size, T &&... args) {
       Tracker().DecID(id);                              // Remove a pointer to any old memory...
 
       //ptr = new TYPE[array_size];                     // Build a new raw pointer to an array.
       ptr = (TYPE*) malloc (array_size * sizeof(TYPE)); // Build a new raw pointer.
       emp_emscripten_assert(ptr, array_size);           // No exceptions in emscripten; assert alloc!
       for (size_t i = 0; i < array_size; i++) {
-        new (ptr + i*sizeof(TYPE)) TYPE();
+        new (ptr + i*sizeof(TYPE)) TYPE(args...);
       }
 
       if (ptr_debug) std::cout << "Ptr::NewArray() : " << ptr << std::endl;
@@ -764,7 +765,11 @@ namespace emp {
   template <typename T> Ptr<T> TrackPtr(T * _in, bool own=true) { return Ptr<T>(_in, own); }
 
   template <typename T, typename... ARGS> Ptr<T> NewPtr(ARGS &&... args) {
-    auto ptr = new T(std::forward<ARGS>(args)...);
+    //auto ptr = new T(std::forward<ARGS>(args)...);
+    auto ptr = (T*) malloc (sizeof(T));         // Build a new raw pointer.
+    emp_emscripten_assert(ptr);                 // No exceptions in emscripten; assert alloc!
+    new (ptr) T(std::forward<ARGS>(args)...);   // Special new that uses allocated space.
+
     emp_emscripten_assert(ptr);     // Trigger emscripten-only assert on allocation (no exceptions available)
     return Ptr<T>(ptr, true);
   }
