@@ -767,22 +767,18 @@ namespace emp {
   template <typename T, typename... ARGS> Ptr<T> NewPtr(ARGS &&... args) {
     //auto ptr = new T(std::forward<ARGS>(args)...);
     auto ptr = (T*) malloc (sizeof(T));         // Build a new raw pointer.
-    emp_emscripten_assert(ptr);                 // No exceptions in emscripten; assert alloc!
+    emp_assert(ptr);                            // No exceptions in emscripten; assert alloc!
     new (ptr) T(std::forward<ARGS>(args)...);   // Special new that uses allocated space.
-
-    emp_emscripten_assert(ptr);     // Trigger emscripten-only assert on allocation (no exceptions available)
     return Ptr<T>(ptr, true);
   }
 
   template <typename T, typename... ARGS> Ptr<T> NewArrayPtr(size_t array_size, ARGS &&... args) {
     //auto ptr = new T[array_size];
-
     auto ptr = (T*) malloc (array_size * sizeof(T));  // Build a new raw pointer.
-    emp_emscripten_assert(ptr, array_size);           // No exceptions in emscripten; assert alloc!
+    emp_assert(ptr, array_size);                      // No exceptions in emscripten; assert alloc!
     for (size_t i = 0; i < array_size; i++) {         // Loop through all array elements.
       new (ptr + i*sizeof(T)) T(args...);             //    ...and initialize them.
     }
-
     return Ptr<T>(ptr, array_size, true);
   }
 
