@@ -14,15 +14,6 @@
 #include "SGOrg.h"
 #include "SGPatches.h"
 
-constexpr size_t POP_SIZE = 400;       // Total population size.
-constexpr size_t ELITE_SIZE = 10;      // Top how many organisms should move to next generation?
-constexpr size_t ELITE_COPIES = 1;     // How many copies of each elite organism should be made?
-constexpr size_t GENOME_SIZE = 50;     // How long of a genome should we be using?
-constexpr size_t CPU_TIME = 5000;      // How many CPU cycles to process for?
-constexpr double GOOD_BAD_RATIO = 1.0; // Value of going to a good square vs avoiding a bad square.
-
-constexpr size_t ELITE_TOTAL = ELITE_SIZE * ELITE_COPIES;
-
 class SGWorld : public emp::World<SGOrg> {
 public:
   using inst_lib_t = emp::AvidaCPU_InstLib<SGOrg>;
@@ -31,10 +22,26 @@ public:
   SGPatches state_grid;
   emp::vector< std::function<double(const SGOrg &)> > hint_funs;
 
+  size_t POP_SIZE;         ///< Total population size.
+  size_t GENOME_SIZE;      ///< How long of a genome should we be using?
+  size_t CPU_TIME;         ///< How many CPU cycles to process for?
+  double GOOD_BAD_RATIO;   ///< Value of going to a good square vs avoiding a bad square.
+  size_t ELITE_SIZE;       ///< Top how many organisms should move to next generation?
+  size_t ELITE_COPIES;     ///< How many copies of each elite organism should be made?
+  size_t ELITE_TOTAL;      ///< Total number of individuals produced by elite selection.
+
 public:
   SGWorld(emp::Random & random, const std::string & name)
     : emp::World<SGOrg>(random, name), inst_lib()
   {
+    POP_SIZE = 400;
+    GENOME_SIZE = 50;
+    CPU_TIME = 5000;
+    GOOD_BAD_RATIO = 1.0;
+    ELITE_SIZE = 10;
+    ELITE_COPIES = 1;
+    ELITE_TOTAL = ELITE_SIZE * ELITE_COPIES;
+
     // Build the instruction library...
     inst_lib.AddInst("Inc", inst_lib_t::Inst_Inc, 1, "Increment value in reg Arg1");
     inst_lib.AddInst("Dec", inst_lib_t::Inst_Dec, 1, "Decrement value in reg Arg1");
