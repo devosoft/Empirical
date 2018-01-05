@@ -30,7 +30,7 @@ int main()
 
     // Periodically, provide the status of the best organism.
     world.GetOrg(0).ResetHardware();
-    world.GetOrg(0).Process(CPU_TIME);
+    world.GetOrg(0).Process(world.CPU_TIME);
     if (ud % 10 == 0) {
       std::cout << std::endl;
       world[0].GetSGStatus().PrintHistory(world.GetStateGrid());
@@ -40,7 +40,7 @@ int main()
 
   std::cout << "Final Fitness: " << world.CalcFitnessID(0) << std::endl;
   world.ResetHardware();
-  world.Process(CPU_TIME);
+  world.Process(world.CPU_TIME);
   world[0].GetSGStatus().PrintHistory(world.GetStateGrid());
 
   std::cout << std::endl;
