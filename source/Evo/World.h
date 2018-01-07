@@ -310,7 +310,7 @@ namespace emp {
     /// Get the systematics manager (which is tracking lineages in the population.)
     const Systematics<genome_t> & GetSystematics() const { return systematics; }
 
-    fun_calc_fitness_t GetFitFun() {return fun_calc_fitness;}
+    fun_calc_fitness_t GetFitFun() { return fun_calc_fitness; }
 
     /// Print the full line-of-descent to the organism at the specified position in the popoulation.
     void PrintLineage(size_t id, std::ostream & os=std::cout) const {

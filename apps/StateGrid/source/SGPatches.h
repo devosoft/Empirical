@@ -16,7 +16,7 @@
 
 class SGPatches : public emp::StateGrid {
 public:
-  SGPatches() : StateGrid() {
+  SGPatches() {
     AddState(-1, '-', -0.5, "None",          "Empty space; poisonous.");
     AddState( 0, '.',  0.0, "Consumed Food", "Previously had sustanance for an organism.");
     AddState( 1, '#', +1.0, "Food",          "Sustanance to an org.");

@@ -32,7 +32,10 @@ public:
 
 public:
   SGWorld(emp::Random & random, const std::string & name)
-    : emp::World<SGOrg>(random, name), inst_lib()
+    : emp::World<SGOrg>(random, name)
+    , inst_lib()
+    , state_grid()
+    , hint_funs()
   {
     POP_SIZE = 400;
     GENOME_SIZE = 50;
