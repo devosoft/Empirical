@@ -1,4 +1,9 @@
+test:
+	cd tests && make test
+	cd tests && make test-web
+
 doc: build-doxygen-xml
+	doxygen
 	cd doc && make html
 
 build-doxygen-xml:
@@ -8,10 +13,6 @@ travis:
 	cd third-party && bash install_emscripten.sh
 	cd third-party && make install-npm-deps
 	make test
-
-test:
-	cd tests && make test
-	cd tests && make test-web
 
 install-dependencies:
 	git submodule init

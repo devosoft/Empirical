@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../tools/errors.h"
+#include "tools/errors.h"
 
 int main()
 {

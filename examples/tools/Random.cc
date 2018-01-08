@@ -7,8 +7,8 @@
 
 #include <iostream>
 #include <vector>
-#include "../../tools/Random.h"
-#include "../../tools/random_utils.h"
+#include "tools/Random.h"
+#include "tools/random_utils.h"
 
 int main()
 {

@@ -3,13 +3,13 @@
 // under the MIT Software license; see doc/LICENSE
 
 #define CATCH_CONFIG_MAIN
-#include "../third-party/Catch/single_include/catch.hpp"
+#include "third-party/Catch/single_include/catch.hpp"
 
 #include <iostream>
 
-#include "../base/assert.h"
-#include "../config/command_line.h"
-#include "../config/config.h"
+#include "base/assert.h"
+#include "config/command_line.h"
+#include "config/config.h"
 #include "config/config_setup.h"
 
 TEST_CASE("Test config", "[config]"){

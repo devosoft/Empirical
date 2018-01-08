@@ -1,12 +1,17 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017
+ *
+ *  @file  AvidaGP.h
+ *  @brief This is example code for using AvidaGP.
+ */
 
 #include <iostream>
 
-#include "../../hardware/AvidaGP.h"
-#include "../../hardware/InstLib.h"
-#include "../../tools/Random.h"
+#include "hardware/AvidaGP.h"
+#include "hardware/InstLib.h"
+#include "tools/Random.h"
 
 void Print(const emp::AvidaGP & cpu) {
   for (size_t i = 0; i < 16; i++) {
@@ -41,8 +46,15 @@ int main()
   }
 
   cpu.PrintGenome();
+  cpu.PrintGenome("test.org");
   cpu.ResetHardware();
   cpu.Trace(200);
+
+  emp::AvidaGP cpu2;
+  cpu2.Load("test.org");
+
+  std::cout << "Original CPU size: " << cpu.GetSize() << std::endl;
+  std::cout << "Reloaded CPU size: " << cpu2.GetSize() << std::endl;
 
   // Run a ton of organisms.
   for (int t = 0; t < 1000000; t++) {

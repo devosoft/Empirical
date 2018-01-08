@@ -3,12 +3,12 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  Some examples code for using math functions.
+//  Some example code for using math functions.
 
 #include <iostream>
 
-#include "../../tools/Range.h"
-#include "../../tools/string_utils.h"
+#include "tools/Range.h"
+#include "tools/string_utils.h"
 
 int main()
 {
