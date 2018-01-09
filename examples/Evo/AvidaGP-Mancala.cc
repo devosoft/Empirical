@@ -123,7 +123,7 @@ int main()
   for (size_t i = 0; i < POP_SIZE; i++) {
     emp::AvidaGP cpu;
     cpu.PushRandom(random, GENOME_SIZE);
-    world.Inject(cpu.GetGenome());
+    world.Inject(cpu);
   }
 
   // Setup the mutation function.

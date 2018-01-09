@@ -4,7 +4,7 @@
 //
 //  This is an example file demonstrating Othello.
 
-#include "../../games/Othello.h"
+#include "../../source/games/Othello.h"
 
 size_t BOARD_SIZE = 8;
 
