@@ -775,7 +775,9 @@ namespace emp {
     Ptr<Random> GetRandomPtr() { return random_ptr; }
 
     /// Get program loaded on this hardware.
-    const program_t & GetProgram() const { return program; }
+    const program_t & GetConstProgram() const { return program; }
+    program_t & GetProgram() { return program; }
+
 
     /// Get reference to a particular function in hardware's program.
     const Function & GetFunction(size_t fID) const {
