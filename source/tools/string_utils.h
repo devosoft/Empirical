@@ -300,7 +300,7 @@ namespace emp {
 
   /// Remove a prefix of the input string (up to a specified delimeter) and return it.  If the
   /// delimeter is not found, return the entire input string and clear it.
-  inline std::string string_pop(std::string & in_string, const char delim) {
+  inline std::string string_pop(std::string & in_string, const char delim=' ') {
     return string_pop_fixed(in_string, in_string.find(delim), 1);
   }
 
@@ -373,7 +373,7 @@ namespace emp {
       }
     }
 
-    if (last_whitespace) pos--;   // If the end of the line is whitespace, remove it.
+    if (pos && last_whitespace) pos--;   // If the end of the line is whitespace, remove it.
 
     in_string.resize(pos);
   }

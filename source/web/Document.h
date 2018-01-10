@@ -34,6 +34,8 @@
 #include "Text.h"
 #include "TextArea.h"
 
+#include "canvas_utils.h"
+#include "color_map.h"
 
 namespace emp {
 namespace web {

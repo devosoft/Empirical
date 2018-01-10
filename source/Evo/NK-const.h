@@ -45,16 +45,16 @@ namespace evo {
   template <size_t N, size_t K>
   class NKLandscapeConst {
   private:
-    static constexpr size_t state_count = emp::IntPow<size_t>(2,K+1);
-    static constexpr size_t total_count = N * state_count;
-    std::array< std::array<double, state_count>, N > landscape;
+    static constexpr size_t state_count() { return emp::IntPow<size_t>(2,K+1); }
+    static constexpr size_t total_count() { return N * state_count(); }
+    std::array< std::array<double, state_count()>, N > landscape;
 
   public:
     NKLandscapeConst() = delete; // { ; }
 
     /// Build a new NKLandscapeConst using the random number generator [random]
     NKLandscapeConst(emp::Random & random) : landscape() {
-      for ( std::array<double, state_count> & ltable : landscape) {
+      for ( std::array<double, state_count()> & ltable : landscape) {
         for (double & pos : ltable) {
           pos = random.GetDouble();
         }
@@ -69,15 +69,15 @@ namespace evo {
     /// Returns K
     constexpr size_t GetK() const { return K; }
     /// Get the number of posssible states for a given site
-    constexpr size_t GetStateCount() const { return state_count; }
+    constexpr size_t GetStateCount() const { return state_count(); }
     /// Get the total number of states possible in the landscape
     /// (i.e. the number of different fitness contributions in the table)
-    constexpr size_t GetTotalCount() const { return total_count; }
+    constexpr size_t GetTotalCount() const { return total_count(); }
 
     /// Get the fitness contribution of position [n] when it (and its K neighbors) have the value
     /// [state]
     double GetFitness(size_t n, size_t state) const {
-      emp_assert(state < state_count, state, state_count);
+      emp_assert(state < state_count(), state, state_count());
       // std::cout << n << " : " << state << " : " << landscape[n][state] << std::endl;
       return landscape[n][state];
     }

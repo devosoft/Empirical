@@ -5,6 +5,7 @@
  *
  *  @file  OrgInterface.h
  *  @brief An interface between an organism and the outside world.
+ *  @note Status: PLANNING
  */
 
 #ifndef EMP_ORG_INTERFACE_H
