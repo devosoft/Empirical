@@ -2,6 +2,7 @@
 #define PLOT_LINE_H
 
 #include "math/LinAlg.h"
+#include "opengl/camera.h"
 #include "opengl/defaultShaders.h"
 #include "properties.h"
 
@@ -14,35 +15,34 @@ namespace emp {
       public:
       Line(emp::opengl::GLCanvas& canvas) : shader(canvas) {}
 
-      template <typename Iter>
-      void operator()(Iter begin, Iter end,
-                      const emp::math::Mat4x4f& projection,
-                      const emp::math::Mat4x4f& view) {
+      template <typename D>
+      void show(const opengl::Camera& camera, const std::vector<D>& data) {
         using namespace properties;
         using namespace emp::math;
         using namespace emp::opengl;
         using namespace emp::opengl::shaders;
 
-        // Check that there are at least two points to draw
-        if (begin == end) return;
-        Vec3f start{CartesianScaled::get(*begin).x(),
-                    CartesianScaled::get(*begin).y(), 0};
-        Vec4f startStroke{Stroke::get(*begin)};
-        auto startStrokeWeight{StrokeWeight::get(*begin)};
-        ++begin;
-        if (begin == end) return;
+        for (auto& d : data) std::cout << d << std::endl;
+        std::cout << std::endl << std::endl;
+
+        if (data.size() <= 1) return;
 
         shader.shader.use();
         shader.vao.bind();
-        shader.proj = projection;
-        shader.view = view;
+        shader.proj = camera.getProjection();
+        shader.view = camera.getView();
         shader.model = Mat4x4f::translation(0, 0);
 
-        Vec3f middle{CartesianScaled::get(*begin).x(),
-                     CartesianScaled::get(*begin).y(), 0};
-        Vec4f middleStroke{Stroke::get(*begin)};
-        auto middleStrokeWeight{StrokeWeight::get(*begin)};
-        ++begin;
+        auto& startData = data[0];
+        Vec3f start{XY::get(startData).x(), XY::get(startData).y(), 0};
+        auto startStroke{Stroke::get(startData)};
+        auto startStrokeWeight{StrokeWeight::get(startData)};
+
+        auto& middleData = data[1];
+        Vec3f middle{XYScaled::get(middleData).x(),
+                     XYScaled::get(middleData).y(), 0};
+        Vec4f middleStroke{Stroke::get(middleData)};
+        auto middleStrokeWeight{StrokeWeight::get(middleData)};
 
         auto segment = (middle - start).normalized();
         Vec3f normal{-segment.y(), segment.x(), 0};
@@ -53,11 +53,10 @@ namespace emp {
         std::vector<GLuint> triangles;
 
         size_t i = 0;
-        for (auto iter = begin; iter != end; ++iter) {
-          Vec3f end{CartesianScaled::get(*iter).x(),
-                    CartesianScaled::get(*iter).y(), 0};
-          auto stroke{Stroke::get(*iter)};
-          auto weight{StrokeWeight::get(*iter)};
+        for (auto& value : data) {
+          Vec3f end{XYScaled::get(value).x(), XYScaled::get(value).y(), 0};
+          auto stroke{Stroke::get(value)};
+          auto weight{StrokeWeight::get(value)};
 
           auto segment1 = (middle - start).normalized();
           Vec3f normal1{-segment1.y(), segment1.x(), 0};

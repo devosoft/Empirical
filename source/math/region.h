@@ -1,6 +1,8 @@
 #ifndef PLOT_REGION_H
 #define PLOT_REGION_H
 #include <limits>
+#include <type_traits>
+#include "math/LinAlg.h"
 
 namespace emp {
   namespace math {
