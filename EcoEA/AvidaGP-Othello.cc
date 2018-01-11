@@ -8,15 +8,16 @@
 #include <string>
 #include <chrono>
 
-#include "../../games/Othello.h"
-#include "../../hardware/AvidaGPOthello.h"
-#include "../../hardware/InstLib.h"
-#include "../../tools/Random.h"
-#include "../../tools/memo_function.h"
-#include "../../evo/World.h"
-#include "../../../eco-ea-mancala/source/TestcaseSet.h"
+#include "../source/games/Othello.h"
+#include "../source/hardware/OthelloGP.h"
+#include "../source/hardware/InstLib.h"
+#include "../source/tools/Random.h"
+#include "../source/tools/memo_function.h"
+#include "../source/Evo/World.h"
+#include "../../eco-ea-mancala/source/TestcaseSet.h"
 
 using move_t = size_t;
+using othello_ai_t = std::function< size_t(emp::Othello & game) >;
 
 size_t POP_SIZE = 1000;
 constexpr size_t GENOME_SIZE = 100;
@@ -26,79 +27,12 @@ constexpr size_t TOURNY_SIZE = 4;
 constexpr size_t BOARD_SIZE = 8;
 
 
-// Determine the next move of a human player.
-
-// size_t EvalMove(emp::Othello & game, std::ostream & os=std::cout, std::istream & is=std::cin) {
-//   // Present the current board.
-//   game.Print();
-//
-//   // Request a move from the human.
-//   std::string raw_move;
-//   std::cin >> raw_move;
-//
-//   int moveX = 0;
-//   int moveY = 0;
-//
-//   // Convert move into a useful format
-//   if (!std::isdigit(raw_move[0])) {
-//     moveX = std::tolower(raw_move[0]) - 96;
-//     moveY = raw_move[1] - 48;
-//   }
-//   else if (!std::isdigit(raw_move[1])){
-//     moveX = std::tolower(raw_move[1]) - 96;
-//     moveY = raw_move[0] - 48;
-//   }
-//
-//   move_t move;
-//   bool invalid = true;
-//
-//   while (invalid) {
-//     move = game.GetIndex(move);
-//
-//     if (moveX < 1 || moveX > BOARD_SIZE) {
-//       std::cout << "Invalid move!! (choose an X value A to H)" <<  std::endl;
-//       std::cin.clear();
-//       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-//       continue;
-//     }
-//     if (moveY < 1 || moveY > BOARD_SIZE) {
-//       std::cout << "Invalid move!! (choose an Y value 1 to " << BOARD_SIZE<<")" <<  std::endl;
-//       std::cin.clear();
-//       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-//       continue;
-//     }
-//
-//
-//     if (game.GetTile(moveX, moveY) != 0) {
-//       std::cout << "Error: Cannot move to non-empty tile" << std::endl;
-//       std::cin.clear();
-//       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-//       continue;
-//     }
-//
-//     if (game.IsMoveValid(game.GetCurrPlayer(), moveXY ) == 0) {
-//         std::cout << "Invalid Move: Must flank at least one opponent disc" <<std::endl;
-//         std::cin.clear();
-//         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-//         continue;
-//     }
-//
-//     invalid = false;
-//   }
-//
-//   size_t move = game.GetIndex(moveX, moveY);
-//
-//   return move;
-// }
-
-
 // Determine the next move of an AvidaGP player.
 size_t EvalMove(emp::Othello & game, emp::AvidaGP & org) {
+
   // Setup the hardware with proper inputs.
   org.ResetHardware();
-
   size_t player = game.GetCurrPlayer();
-  //std::cout<<std::endl;
 
   for (size_t i = 0; i < BOARD_SIZE* BOARD_SIZE; i++) {
     size_t tile = game.GetTile(i);
@@ -107,8 +41,7 @@ size_t EvalMove(emp::Othello & game, emp::AvidaGP & org) {
     if (tile == player) conv_tile = 1;
     else if (tile == 0) conv_tile = 0;
     else conv_tile = -1;
-    //if (i % BOARD_SIZE == 0){std::cout<<std::endl;}
-    //std::cout<<conv_tile<<" ";
+
     org.SetInput(i, conv_tile);
   }
 
@@ -116,7 +49,7 @@ size_t EvalMove(emp::Othello & game, emp::AvidaGP & org) {
   org.Process(EVAL_TIME);
 
   // Determine the chosen move.
-  size_t best_move = 0;
+  size_t best_move = 0; // TODO: Shoul the have to make a move?
 
   for (size_t i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
     if (org.GetOutput(best_move) < org.GetOutput(i)) { best_move = i; }
@@ -125,7 +58,6 @@ size_t EvalMove(emp::Othello & game, emp::AvidaGP & org) {
   return best_move;
 }
 
-using othello_ai_t = std::function< size_t(emp::Othello & game) >;
 
 // Setup the fitness function for a whole game.
 double EvalGame(othello_ai_t & player0, othello_ai_t & player1,
@@ -215,26 +147,28 @@ int main(int argc, char* argv[])
 {
   // Set up initial world
 
-  std::chrono::high_resolution_clock::time_point start_s = std::chrono::high_resolution_clock::now();
-  POP_SIZE = std::atoi( argv[1] );
-  EVAL_TIME = std::atoi( argv[2] );
-  UPDATES = std::atoi( argv[3] );
-  long time = 28800;
-
-  std::cout<<"POP_SIZE: "<<POP_SIZE<<" EVAL_TIME: "<<EVAL_TIME
-           <<" UPDATES: "<<UPDATES<<std::endl;
-
+  // std::chrono::high_resolution_clock::time_point start_s = std::chrono::high_resolution_clock::now();
+  // POP_SIZE = std::atoi( argv[1] );
+  // EVAL_TIME = std::atoi( argv[2] );
+  // UPDATES = std::atoi( argv[3] );
+  // long time = 28800;
   size_t seed = 0;
-  if (argc == 5) seed = std::atoi( argv[4] );
+  // if (argc == 5) seed = std::atoi( argv[4] );
+  //
+  // std::cout<<"POP_SIZE: "<<POP_SIZE<<" EVAL_TIME: "<<EVAL_TIME
+  //          <<" UPDATES: "<<UPDATES<<std::endl;
+  //emp::evo::EAWorld<emp::AvidaGP, emp::evo::FitCacheOn> world(random, "AvidaWorld"); // FitCache on
+
+  // Setting up the world
   emp::Random random;
   random.ResetSeed(seed);
 
+  emp::World<emp::AvidaGP> world(random, "AvidaWorld"); //FitCache off
+  world.SetWellMixed(true);
 
-  //emp::evo::EAWorld<emp::AvidaGP, emp::evo::FitCacheOn> world(random, "AvidaWorld"); // FitCache on
-  emp::evo::EAWorld<emp::AvidaGP> world(random, "AvidaWorld"); //FitCache off
-  auto testcases = TestcaseSet<64>("../../data/game_0.csv", &random);
+  auto testcases = TestcaseSet<64>("data/game_0.csv", &random);
 
-  // Fitness function that encourages playing in corners
+  // Fitness function that encourages playing in corners TODO Move these to their own file?
   std::function<std::set<int>(emp::array<int, 64>)> cornerFunc = [](emp::array<int, 64> board){
     std::set<int> correct_moves;
     emp::Othello game(BOARD_SIZE, 1);
@@ -323,85 +257,97 @@ int main(int argc, char* argv[])
   for (size_t i = 0; i < POP_SIZE; i++) {
     emp::AvidaGP cpu;
     cpu.PushRandom(random, GENOME_SIZE);
-    world.Insert(cpu);
+    world.Inject(cpu.GetGenome());
   }
 
   // Setup the mutation function.
-  world.SetDefaultMutateFun( [](emp::AvidaGP* org, emp::Random& random) {
+  world.SetMutFun( [](emp::AvidaGP & org, emp::Random& random) {
       uint32_t num_muts = random.GetUInt(4);  // 0 to 3 mutations.
       for (uint32_t m = 0; m < num_muts; m++) {
         const uint32_t pos = random.GetUInt(GENOME_SIZE);
-        org->RandomizeInst(pos, random);
+        org.RandomizeInst(pos, random);
       }
       return (num_muts > 0);
     } );
 
   // Setup the main fitness function.
-  emp::memo_function<double(emp::AvidaGP*)> fit_fun =
-    [&random, &world](emp::AvidaGP * org) {
+  std::function<double(emp::AvidaGP &)> fit_fun =
+    [&random, &world](emp::AvidaGP & org) {
+      //Set up opponent and first player for organism to be evaluated against
       emp::AvidaGP & rand_org = world.GetRandomOrg();
       size_t first_player = random.GetInt(1, 3);
-      double best = EvalGame(*org, rand_org, first_player);
+
+      // Evaluate the fitness of the orgainsim
+      double best_fitness = EvalGame(org, rand_org, first_player);
+
+      //Take the best of 5 games as the organisms fitness TODO: Should this still be the case?
       for (int i = 0; i < 4; i++){
-          first_player = random.GetInt(1, 3);
-          emp::AvidaGP & rand_org1 = world.GetRandomOrg();
-        double temp = EvalGame(*org, rand_org1, first_player);
-        if (temp > best) best = temp;
+        first_player = random.GetInt(1, 3);
+        emp::AvidaGP & rand_org1 = world.GetRandomOrg();
+        double temp = EvalGame(org, rand_org1, first_player);
+
+        if (temp > best_fitness) best_fitness = temp;
       }
-      return best;
+
+      return best_fitness;
     };
+    world.SetFitFun(fit_fun);
 
   // Setup TestCases for secondary fitness functions
   emp::vector< std::function<double(emp::AvidaGP*)> > fit_set(testcases.GetNFuncs());
-  for (size_t fun_id = 0; fun_id < testcases.GetNFuncs(); fun_id++) {
-    // Setup the fitness function.
-    fit_set[fun_id] = [fun_id](emp::AvidaGP * org) {
-      return org->GetTrait(fun_id);
-    };
-  }
-  auto correct_choices = testcases.GetCorrectChoices();
+  auto correct_choices = testcases.GetCorrectChoices(); //TODO: Confirm this works
   emp::vector<std::pair<input_t, output_t> > tests = testcases.GetTestcases();
   emp::vector<int> scores;
+
   for (int i = 0; i < correct_choices.size(); i++) {
     scores.push_back(0);
   }
 
+  for (size_t fun_id = 0; fun_id < testcases.GetNFuncs(); fun_id++) {
+    // Create list of secondary fitness functions.
+    fit_set[fun_id] = [fun_id](emp::AvidaGP * org) {
+      return org->GetTrait(fun_id);
+    };
+  }
+
   // Do the run...
   for (size_t ud = 0; ud < UPDATES; ud++) {
-   emp::vector<size_t> choices = testcases.GetValidSubset();
+    world.ResetHardware();
 
+    emp::vector<size_t> choices = testcases.GetValidSubset();
     for (auto org : world){
       emp::Othello game(BOARD_SIZE, 1); //TODO: should it be random player first?
 
       for (size_t choice : choices){
         game.SetBoard(tests[choice].first);
-        int move = EvalMove(game, *org);
+        int move = EvalMove(game, org);
 
-        for (int i = 0; i < correct_choices.size(); i++) {
+        for (int i = 0; i < correct_choices.size(); i++) { //TODO: Make this into a function?
           if (correct_choices[i][choice].find(move) != correct_choices[i][choice].end()){
             scores[i]++;
           }
         }
       }
+
       for (int i = 0; i < correct_choices.size(); i++) {
-          org->SetTrait(i, scores[i]);
+          org.SetTrait(i, scores[i]);
       }
     }
 
     // Keep the best individual.
-    world.EliteSelect(fit_fun, 1, 1);
+    EliteSelect(world, 1, 1);
 
     // Run a selection method for each spot.
-    //world.TournamentSelect(fit_fun, TOURNY_SIZE, POP_SIZE-1); //TODO: Make states constant for selection methods
+    TournamentSelect(world, TOURNY_SIZE, POP_SIZE-1); //TODO: Make states constant for selection methods
+
     //fit_set.push_back(fit_fun);
     //world.LexicaseSelect(fit_set, POP_SIZE-1);
-    //world.EcoSelect(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
-    world.EcoSelectGradation(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
 
-    fit_fun.Clear();
+    //EcoSelectGradation(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
+
     world.Update();
 
-    std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(&(world[0])) << std::endl;
+    std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(world.GetOrg(0)) << std::endl;
     // if (ud % 10 == 0){
     //   for (int i = 0; i < POP_SIZE; i++){
     //     std::cout<<fit_fun(&(world[i]))<< " ";
@@ -411,21 +357,16 @@ int main(int argc, char* argv[])
     // }
 
     // Mutate all but the first organism.
-    world.MutatePop(1);
+    world.DoMutations(1);
 
-    std::chrono::high_resolution_clock::time_point stop_s = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::seconds>( stop_s - start_s ).count();
-    if (duration > time){ break; }
+    // std::chrono::high_resolution_clock::time_point stop_s = std::chrono::high_resolution_clock::now();
+    // auto duration = std::chrono::duration_cast<std::chrono::seconds>( stop_s - start_s ).count();
+    // if (duration > time){ break; }
   }
 
-  fit_fun(&(world[0]));
+  //fit_fun(world.GetOrg(0));
 
-  std::cout << std::endl;
-  for(int i = 0; i < POP_SIZE; ++i){
-    world[i].PrintGenome("orgs/othello_save" + std::to_string(i) +".org");
-  }
-
-  //EvalGame(world[0], world[1], 1, true);
+  EvalGame(world.GetOrg(0), world.GetOrg(1), 1, true);
 
   // And try playing it!
   /*
