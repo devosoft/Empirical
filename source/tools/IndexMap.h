@@ -74,6 +74,8 @@ namespace emp {
     /// into the data structure.  All item weigths default to zero.
     IndexMap(size_t num_items=0)
       : item_weight(num_items), tree_weight(num_items), needs_refresh(false) {;}
+    IndexMap(size_t num_items, double init_weight)
+      : item_weight(num_items, init_weight), tree_weight(num_items), needs_refresh(true) { ; }
     IndexMap(const IndexMap &) = default;
     IndexMap(IndexMap &&) = default;
     ~IndexMap() = default;
@@ -104,7 +106,7 @@ namespace emp {
     void Resize(size_t new_size, double def_value) {
       const size_t old_size = item_weight.size();
       item_weight.resize(new_size, 0.0);   // Update the size (new weights default to zero)
-      tree_weight.resize(new_size, 0.0);   // Update the size (new weights default to zero)
+      tree_weight.resize(new_size);        // Update the size
       for (size_t i=old_size; i < new_size; i++) item_weight[i] = def_value;
       needs_refresh = true;                // Update the tree weights when needed.
     }
