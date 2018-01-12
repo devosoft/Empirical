@@ -16,6 +16,7 @@ a.out.js
 *.csv
 *.cfg
 *.org
+othelloGP
 coverage.xml
 diff_cover.txt
 apps/SpatialCoop2017/SimplePDWorld
