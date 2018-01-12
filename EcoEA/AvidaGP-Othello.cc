@@ -130,16 +130,6 @@ double EvalGame(emp::AvidaGP & org0, emp::AvidaGP & org1, size_t first_player=1,
   return EvalGame(org_fun0, org_fun1, first_player, verbose);
 };
 
-// Otherwise assume a human opponent!
-// double EvalGame(emp::AvidaGP & org, size_t first_player=1) {
-//   othello_ai_t fun0 = [&org](emp::Othello & game){ return EvalMove(game, org); };
-//   othello_ai_t fun1 = [](emp::Othello & game){ return EvalMove(game, std::cout, std::cin); };
-//   std::cout<<"START"<<std::endl; //TODO
-//   std::exit(-1);
-//   return EvalGame(fun0, fun1, first_player, true);
-// };
-
-
 using input_t = emp::array<int, 64>;
 using output_t = std::set<int>;
 
@@ -348,13 +338,6 @@ int main(int argc, char* argv[])
     world.Update();
 
     std::cout << (ud+1) << " : " << 0 << " : " << fit_fun(world.GetOrg(0)) << std::endl;
-    // if (ud % 10 == 0){
-    //   for (int i = 0; i < POP_SIZE; i++){
-    //     std::cout<<fit_fun(&(world[i]))<< " ";
-    //   }
-    //   std::cout<<std::endl;
-    //   EvalGame(world[0], world[1], 1, true);
-    // }
 
     // Mutate all but the first organism.
     world.DoMutations(1);
@@ -364,17 +347,8 @@ int main(int argc, char* argv[])
     // if (duration > time){ break; }
   }
 
-  //fit_fun(world.GetOrg(0));
-
   EvalGame(world.GetOrg(0), world.GetOrg(1), 1, true);
 
-  // And try playing it!
-  /*
-  while (true) {
-    std::cout << "NEW GAME: Human vs. AI!\n";
-    EvalGame(world[0]);
-  }
-  */
 
   return 0;
 }
