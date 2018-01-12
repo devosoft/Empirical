@@ -59,7 +59,7 @@ namespace emp {
   ///
   ///  FITNESS: Most selection methods require a fitness function to help determine who should be
   ///           replicated.  Other systems merely use fitness as a measured output.
-  ///   0. If you set the fitness function using SetFitFun(), it will have priority.
+  ///   0. If you explicitly set the fitness function using SetFitFun(), it will have priority.
   ///   1. If the organism type has a "GetFitness()" member function, use it!
   ///   2. If the organism type can be cast to double, use it!
   ///   3. Start with a fitness function that throws an assert indicating function must be set.
@@ -468,7 +468,7 @@ namespace emp {
     /// into this function.
     template <typename... ARGS>
     void Process(ARGS &&... args) {   // Redirect to all orgs in the population!
-      for (Ptr<ORG> org : pop) { if (org) org->Process(std::forward<ARGS>(args)...); }
+      for (Ptr<ORG> org : pop) { if (org) org->Process(args...); }
     }
 
     /// Run the Process member function on a single, specified organism in the population;
