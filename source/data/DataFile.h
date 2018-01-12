@@ -140,6 +140,13 @@ namespace emp {
       return Add(in_fun, key, desc);
     }
     template <typename VAL_TYPE, emp::data... MODS>
+    size_t AddHistBin(DataNode<VAL_TYPE, MODS...> & node, size_t bin_id, const std::string & key="", const std::string & desc="") {
+      std::function<fun_t> in_fun =
+        [&node,bin_id](std::ostream & os){ os << node.GetHistCount(bin_id); };
+      return Add(in_fun, key, desc);
+    }
+
+    template <typename VAL_TYPE, emp::data... MODS>
     size_t AddInferiority(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [&node](std::ostream & os){
         VAL_TYPE inf = (node.GetMax() == 0) ? 0 : (node.GetMean() / node.GetMax());
