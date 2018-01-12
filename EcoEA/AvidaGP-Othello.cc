@@ -7,6 +7,7 @@
 #include <utility>
 #include <string>
 #include <chrono>
+#include <fstream>
 
 #include "../source/games/Othello.h"
 #include "../source/hardware/OthelloGP.h"
@@ -25,6 +26,12 @@ size_t EVAL_TIME = 3500;
 size_t UPDATES = 2000;
 constexpr size_t TOURNY_SIZE = 4;
 constexpr size_t BOARD_SIZE = 8;
+
+
+bool fexists(const std::string& filename) {
+  std::ifstream ifile(filename.c_str());
+  return (bool)ifile;
+}
 
 
 // Determine the next move of an AvidaGP player.
@@ -156,7 +163,20 @@ int main(int argc, char* argv[])
   emp::World<emp::AvidaGP> world(random, "AvidaWorld"); //FitCache off
   world.SetWellMixed(true);
 
-  auto testcases = TestcaseSet<64>("data/game_0.csv", &random);
+  std::string filename = "data/game_0.csv";
+  std::string otherfile = "../data/game_0.csv";
+
+  if (!fexists(filename)){
+      if (fexists(otherfile)) filename = otherfile;
+      else { 
+          std::cout<<"No game data file found at " + filename + " or " + otherfile<<std::endl;
+          exit(-1);
+      }
+  }
+  std::cout<<filename<<std::endl;
+
+
+  auto testcases = TestcaseSet<64>(filename, &random);
 
   // Fitness function that encourages playing in corners TODO Move these to their own file?
   std::function<std::set<int>(emp::array<int, 64>)> cornerFunc = [](emp::array<int, 64> board){
