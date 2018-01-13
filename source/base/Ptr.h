@@ -774,7 +774,8 @@ namespace emp {
 
   template <typename T, typename... ARGS> Ptr<T> NewArrayPtr(size_t array_size, ARGS &&... args) {
     //auto ptr = new T[array_size];
-    auto ptr = (T*) malloc (array_size * sizeof(T));  // Build a new raw pointer.
+    const size_t alloc_size = array_size * sizeof(T);
+    auto ptr = (T*) malloc (alloc_size);  // Build a new raw pointer.
     emp_assert(ptr, array_size);                      // No exceptions in emscripten; assert alloc!
     for (size_t i = 0; i < array_size; i++) {         // Loop through all array elements.
       new (ptr + i*sizeof(T)) T(args...);             //    ...and initialize them.
