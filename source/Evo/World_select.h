@@ -183,6 +183,39 @@ namespace emp {
     }
   }
 
+  template<typename ORG>
+  struct MapElitesPhenotype {
+    using pheno_fun_t = std::function<size_t(const ORG &)>;
+
+    pheno_fun_t pheno_fun;   ///< Function to categorize org into phenotype id.
+    size_t id_count;         ///< Numbe of phenotype categories.
+
+    MapElitesPhenotype() : pheno_fun_t(), id_count(0) { ; }
+    MapElitesPhenotype(const pheno_fun_t & _f, size_t _ids) : pheno_fun_t(_f), id_count(_ids) { ; }
+
+    bool OK() const { return pheno_fun && id_count; }
+  };
+
+  template<typename ORG>
+  struct MapElitesConfig {
+    emp::vector< MapElitesPhenotype<ORG> > pheno_funs; ///< Funs to categorizes orgs into phenotypes.
+
+    bool OK() const { for (auto x : pheno_funs) if (!x.OK()) return false; return true; }
+  };
+
+  /// ==MAP-ELITES== Selection looks at multiple phenotypic traits and keeps the best of each.
+  /// @param world The emp::World object with the organisms to be selected.
+  /// @param config Information about the pheonotypes that Map Elites needs to use.
+  /// @param repro_count How many rounds of repliction should we do. (default 1)
+  template<typename ORG>
+  void MapElitesSelect(World<ORG> & world,
+                       const MapElitesConfig<ORG> & config,
+                       size_t repro_count=1)
+  {
+    emp_assert(world.GetSize() > 0);
+    emp_assert(config.OK());
+  }
+
 }
 
 #endif
