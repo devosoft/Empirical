@@ -194,23 +194,60 @@ namespace emp {
     MapElitesPhenotype(const pheno_fun_t & _f, size_t _ids) : pheno_fun_t(_f), id_count(_ids) { ; }
 
     bool OK() const { return pheno_fun && id_count; }
+
+    size_t GetID(const ORG & org) const {
+      size_t id = pheno_fun(org);
+      emp_assert(id < id_count);
+      return id;
+    }
   };
 
   template<typename ORG>
   struct MapElitesConfig {
-    emp::vector< MapElitesPhenotype<ORG> > pheno_funs; ///< Funs to categorizes orgs into phenotypes.
+    emp::vector< MapElitesPhenotype<ORG> > phenotypes; ///< Funs to categorizes orgs into phenotypes.
 
-    bool OK() const { for (auto x : pheno_funs) if (!x.OK()) return false; return true; }
+    bool OK() const { for (auto & p : phenotypes) if (!p.OK()) return false; return true; }
+
+    size_t GetID(const ORG & org) const {
+      size_t id = 0, scale = 1;
+      for (const auto & p : phenotypes) {
+        const size_t pid = p.GetID(org);
+        id += pid * scale;
+        scale *= p.id_count;
+      }
+      return id;
+    }
+
+    size_t GetIDCount() const {
+      size_t id_count = 1;
+      for (const auto & p : phenotypes) id_count *= p.id_count;
+      return id_count;
+    }
   };
 
-  /// ==MAP-ELITES== Selection looks at multiple phenotypic traits and keeps the best of each.
+  /// ==MAP-ELITES== Add a new organism to MapElites.  Selection looks at multiple phenotypic
+  /// traits and keeps only the highest fitness with each combination of traits.
   /// @param world The emp::World object with the organisms to be selected.
   /// @param config Information about the pheonotypes that Map Elites needs to use.
   /// @param repro_count How many rounds of repliction should we do. (default 1)
   template<typename ORG>
-  void MapElitesSelect(World<ORG> & world,
-                       const MapElitesConfig<ORG> & config,
-                       size_t repro_count=1)
+  void MapElitesSeed(World<ORG> & world,
+                     const MapElitesConfig<ORG> & config,
+                     const ORG & org)
+  {
+    emp_assert(world.GetSize() > 0);
+    emp_assert(config.OK());
+  }
+
+  /// ==MAP-ELITES== Replicate a random organism in MapElites.  Selection looks at multiple
+  /// phenotypic traits and keeps only the highest fitness with each combination of traits.
+  /// @param world The emp::World object with the organisms to be selected.
+  /// @param config Information about the pheonotypes that Map Elites needs to use.
+  /// @param repro_count How many rounds of repliction should we do. (default 1)
+  template<typename ORG>
+  void MapElitesGrow(World<ORG> & world,
+                     const MapElitesConfig<ORG> & config,
+                     size_t repro_count=1)
   {
     emp_assert(world.GetSize() > 0);
     emp_assert(config.OK());
