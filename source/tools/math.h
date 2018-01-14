@@ -22,7 +22,7 @@
 namespace emp {
 
   /// % is actually remainder; Mod is a proper modulus command that handles negative #'s correctly
-  inline emp_constexpr int Mod(int in_val, int mod_val) {
+  inline constexpr int Mod(int in_val, int mod_val) {
     emp_assert(mod_val != 0);
     in_val %= mod_val;
     return (in_val < 0) ? (in_val + mod_val) : in_val;
@@ -40,7 +40,7 @@ namespace emp {
   template <typename T> constexpr T Abs(T in) { return (in > 0) ? in : (-in); }
 
   /// Run both min and max on a value to put it into a desired range.
-  template <typename TYPE> emp_constexpr TYPE ToRange(const TYPE & value, const TYPE & in_min, const TYPE & in_max) {
+  template <typename TYPE> constexpr TYPE ToRange(const TYPE & value, const TYPE & in_min, const TYPE & in_max) {
     emp_assert(in_min <= in_max);
     return (value < in_min) ? in_min : ((value > in_max) ? in_max : value);
   }
@@ -92,20 +92,20 @@ namespace emp {
 
   namespace {
     // A compile-time log calculator for values [1,2)
-    static emp_constexpr double Log2_base(double x) {
+    static constexpr double Log2_base(double x) {
       emp_assert(x > 0);
       return log2_chart_1_2[(int)((x-1.0)*1024)];
       // return InterpolateTable(log2_chart_1_2, x-1.0, 1024);
     }
 
     // A compile-time log calculator for values < 1
-    static emp_constexpr double Log2_frac(double x) {
+    static constexpr double Log2_frac(double x) {
       emp_assert(x > 0);
       return (x >= 1.0) ? Log2_base(x) : (Log2_frac(x*2.0) - 1.0);
     }
 
     // A compile-time log calculator for values >= 2
-    static emp_constexpr double Log2_pos(double x) {
+    static constexpr double Log2_pos(double x) {
       emp_assert(x > 0);
       return (x < 2.0) ? Log2_base(x) : (Log2_pos(x/2.0) + 1.0);
     }
@@ -115,17 +115,17 @@ namespace emp {
   /// @endcond
 
   /// Compile-time log base 2 calculator.
-  static emp_constexpr double Log2(double x) {
+  static constexpr double Log2(double x) {
     emp_assert(x > 0);
     return (x < 1.0) ? Log2_frac(x) : Log2_pos(x);
   }
 
   /// Compile-time log calculator
-  static emp_constexpr double Log(double x, double base=10.0) { return Log2(x) / Log2(base); }
+  static constexpr double Log(double x, double base=10.0) { return Log2(x) / Log2(base); }
   /// Compile-time natural log calculator
-  static emp_constexpr double Ln(double x) { return Log(x, emp::E); }   // Natural Log...
+  static constexpr double Ln(double x) { return Log(x, emp::E); }   // Natural Log...
   /// Compile-time log base 10 calculator.
-  static emp_constexpr double Log10(double x) { return Log(x, 10.0); }
+  static constexpr double Log10(double x) { return Log(x, 10.0); }
 
   namespace {
     static constexpr double Pow2_lt1(double exp, int id=0) {
@@ -167,7 +167,7 @@ namespace emp {
   // }
 
   /// A fast method of calculating e^x
-  static emp_constexpr double Exp(double exp) {
+  static constexpr double Exp(double exp) {
     return Pow2(Log2(emp::E) * exp);  // convert to a base of e.
   }
 
