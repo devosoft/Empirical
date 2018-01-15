@@ -2,13 +2,14 @@
 #define PLOT_SCATTER_H
 
 #include "math/LinAlg.h"
+#include "opengl/camera.h"
 #include "opengl/defaultShaders.h"
 #include "properties.h"
 
 namespace emp {
   namespace plot {
 
-    struct PointSize : properties::PropertyName<PointSize> {};
+    DEFINE_PROPERTY(PointSize, pointSize);
 
     class Scatter {
       private:
@@ -26,32 +27,29 @@ namespace emp {
         shader.vao.getBuffer<BufferType::ElementArray>().set(
           {
             0, 1, 2,  // First Triangle
-            2, 3, 0   // Second Triangle
+            2, 3, 0  // Second Triangle
           },
           BufferUsage::StaticDraw);
       }
 
-      template <typename Iter>
-      void operator()(Iter begin, Iter end,
-                      const emp::math::Mat4x4f& projection,
-                      const emp::math::Mat4x4f& view) {
+      template <typename D>
+      void show(const opengl::Camera& camera, const std::vector<D>& data) {
         using namespace properties;
         using namespace emp::math;
 
         shader.shader.use();
         shader.vao.bind();
 
-        shader.proj = projection;
-        shader.view = view;
+        shader.proj = camera.getProjection();
+        shader.view = camera.getView();
 
-        for (auto iter = begin; iter != end; ++iter) {
-          auto model =
-            Mat4x4f::translation(CartesianScaled::get(*iter).x(),
-                                 CartesianScaled::get(*iter).y(), 0) *
-            Mat4x4f::scale(PointSize::get(*iter));
+        for (auto& pt : data) {
+          auto model = Mat4x4f::translation(XYScaled::get(pt).x(),
+                                            XYScaled::get(pt).y(), 0) *
+                       Mat4x4f::scale(PointSize::get(pt));
 
           shader.model = model;
-          shader.color = Fill::get(*iter);
+          shader.color = Fill::get(pt);
 
           glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         }
