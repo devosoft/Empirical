@@ -149,7 +149,8 @@ namespace emp {
     emp::vector<World_file> files;  ///< Output files.
 
     bool is_synchronous;            ///< Does this world have synchronous generations?
-    bool is_structured;             ///< Do we have any structured population? (false=well mixed)
+    bool is_space_structured;       ///< Do we have a spatially structured population?
+    bool is_pheno_structured;       ///< Do we have a phenotypically structured population?
 
     /// Potential data nodes -- these should be activated only if in use.
     Ptr<DataMonitor<double>> data_node_fitness;
@@ -209,7 +210,7 @@ namespace emp {
       : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), update(0), fit_cache()
       , genotypes(), next_genotypes()
       , name(_name), cache_on(false), size_x(0), size_y(0), files()
-      , is_synchronous(false), is_structured(false)
+      , is_synchronous(false), is_space_structured(false), is_pheno_structured(false)
       , data_node_fitness(nullptr)
       , fun_calc_fitness(), fun_do_mutations(), fun_print_org(), fun_get_genome()
       , fun_add_inject(), fun_add_birth(), fun_get_neighbor()
@@ -265,9 +266,13 @@ namespace emp {
     /// (i.e., Update() places all births into the population after removing all current organisms.)
     bool IsSynchronous() const { return is_synchronous; }
 
-    /// Is there some sort of structure to the population?
-    /// (i.e., are some organisms closer together than others; false implies "well-mixed".)
-    bool IsStructured() const { return is_structured; }
+    /// Is there some sort of spatial structure to the population?
+    /// (i.e., are some organisms closer together than others.)
+    bool IsSpaceStructured() const { return is_space_structured; }
+
+    /// Is there some sort of structure to the population based on phenotype?
+    /// (i.e., are phenotypically-similar organisms forced to be closer together?)
+    bool IsPhenoStructured() const { return is_pheno_structured; }
 
     /// Index into a world to obtain a const reference to an organism.  Any manipulations to
     /// organisms should go through other functions to be tracked appropriately.
@@ -700,7 +705,8 @@ namespace emp {
   void World<ORG>::SetWellMixed(bool synchronous_gen) {
     size_x = 0; size_y = 0;
     is_synchronous = synchronous_gen;
-    is_structured = false;
+    is_space_structured = false;
+    is_pheno_structured = false;
 
     // -- Setup functions --
     // Append at end of population
@@ -735,7 +741,8 @@ namespace emp {
     size_x = width;  size_y = height;
     Resize(size_x * size_y);
     is_synchronous = synchronous_gen;
-    is_structured = true;
+    is_space_structured = true;
+    is_pheno_structured = false;
 
     // -- Setup functions --
     // Inject a random position in grid
@@ -776,7 +783,8 @@ namespace emp {
     size_x = pool_size;  size_y = num_pools;
     Resize(size_x * size_y);
     is_synchronous = synchronous_gen;
-    is_structured = true;
+    is_space_structured = true;
+    is_pheno_structured = false;
 
     // -- Setup functions --
     // Inject in a empty pool -or- randomly if none empty
@@ -1040,7 +1048,7 @@ namespace emp {
   void World<ORG>::DoBottleneck(const size_t new_size, bool choose_random) {
     if (new_size >= num_orgs) return;  // No bottleneck needed!
 
-    if (is_structured) {
+    if (is_space_structured || is_pheno_structured) {
       // @CAO: Need to implement bottlenecks for structured populations.
       emp_assert(false, "Not implemented yet.");
     } else {
@@ -1059,7 +1067,7 @@ namespace emp {
     emp_assert(keep_frac >= 0.0 && keep_frac <= 1.0, keep_frac);
 
     // For a structured population, test position-by-position.
-    if (is_structured) {
+    if (is_space_structured || is_pheno_structured) {
       // Loop over the current population to clear out anyone who fails to be transferred.
       const double remove_frac = 1.0 - keep_frac;
       for (size_t i = 0; i < pop.size(); ++i) {
