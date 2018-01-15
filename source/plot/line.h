@@ -22,9 +22,6 @@ namespace emp {
         using namespace emp::opengl;
         using namespace emp::opengl::shaders;
 
-        for (auto& d : data) std::cout << d << std::endl;
-        std::cout << std::endl << std::endl;
-
         if (data.size() <= 1) return;
 
         shader.shader.use();
@@ -34,7 +31,8 @@ namespace emp {
         shader.model = Mat4x4f::translation(0, 0);
 
         auto& startData = data[0];
-        Vec3f start{XY::get(startData).x(), XY::get(startData).y(), 0};
+        Vec3f start{XYScaled::get(startData).x(), XYScaled::get(startData).y(),
+                    0};
         auto startStroke{Stroke::get(startData)};
         auto startStrokeWeight{StrokeWeight::get(startData)};
 
