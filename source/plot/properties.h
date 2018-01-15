@@ -24,14 +24,14 @@ namespace emp {
         }
       };
 
-#define DEFINE_PROPERTY(NAME, _name)          \
-  struct NAME : Property<NAME> {              \
-    public:                                   \
-    static constexpr auto name = #NAME;       \
-  };                                          \
-  template <class V>                          \
-  constexpr Entry<NAME, V> _name(V&& value) { \
-    return {std::forward<V>(value)};          \
+#define DEFINE_PROPERTY(NAME, _name)                    \
+  struct NAME : emp::plot::properties::Property<NAME> { \
+    public:                                             \
+    static constexpr auto name = #NAME;                 \
+  };                                                    \
+  template <class V>                                    \
+  constexpr Entry<NAME, V> _name(V&& value) {           \
+    return {std::forward<V>(value)};                    \
   }
       template <class... Props>
       auto props(Props&&... props) {
