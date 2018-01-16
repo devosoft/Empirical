@@ -16,6 +16,7 @@ a.out.js
 *.csv
 *.cfg
 *.org
+*.vscode
 othelloGP
 coverage.xml
 diff_cover.txt
