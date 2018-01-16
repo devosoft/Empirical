@@ -100,6 +100,8 @@ namespace emp {
     struct Phenotype {
       std::string name;
       std::function<double(ORG &)> fun;
+
+      Phenotype(const std::string & _n, const std::function<double(ORG&)> & _f) : name(_n), fun(_f) { ; }
     };
 
     // --- Publicly available types ---
@@ -155,9 +157,9 @@ namespace emp {
     emp::vector<Phenotype> phenotypes; ///< What phenotypes are we tracking?
     emp::vector<World_file> files;     ///< Output files.
 
-    bool is_synchronous;            ///< Does this world have synchronous generations?
-    bool is_space_structured;       ///< Do we have a spatially structured population?
-    bool is_pheno_structured;       ///< Do we have a phenotypically structured population?
+    bool is_synchronous;               ///< Does this world have synchronous generations?
+    bool is_space_structured;          ///< Do we have a spatially structured population?
+    bool is_pheno_structured;          ///< Do we have a phenotypically structured population?
 
     /// Potential data nodes -- these should be activated only if in use.
     Ptr<DataMonitor<double>> data_node_fitness;
@@ -216,7 +218,7 @@ namespace emp {
     World(Ptr<Random> rnd=nullptr, std::string _name="")
       : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), update(0), fit_cache()
       , genotypes(), next_genotypes()
-      , name(_name), cache_on(false), size_x(0), size_y(0), files()
+      , name(_name), cache_on(false), size_x(0), size_y(0), phenotypes(), files()
       , is_synchronous(false), is_space_structured(false), is_pheno_structured(false)
       , data_node_fitness(nullptr)
       , fun_calc_fitness(), fun_do_mutations(), fun_print_org(), fun_get_genome()
@@ -343,6 +345,11 @@ namespace emp {
     /// migtation.  Arguments are the number of pools, the size of each pool, and whether the
     /// generations should be synchronous (true) or not (false, default).
     void SetPools(size_t num_pools, size_t pool_size, bool synchronous_gen=false);
+
+    /// Add a new phenotype measuring function.
+    void AddPhenotype(const std::string & name, std::function<double(ORG &)> fun) {
+      phenotypes.emplace_back(name, fun);
+    }
 
     /// Access a data node that tracks fitness information in the population.  The fitness will not
     /// be collected until the first Update() after this function is initially called, signaling
