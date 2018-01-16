@@ -96,6 +96,12 @@ namespace emp {
       OrgPosition(size_t _id, bool _active=true) : index(_id), is_active(_active) { ; }
     };
 
+    /// A helper struct to measure organism phenotypes in the World
+    struct Phenotype {
+      std::string name;
+      std::function<double(ORG &)> fun;
+    };
+
     // --- Publicly available types ---
     using this_t = World<ORG>;                 ///< Resolved type of this templated class.
     using org_t = ORG;                         ///< Type of organisms in this world.
@@ -142,11 +148,12 @@ namespace emp {
     emp::vector<Ptr<genotype_t>> next_genotypes; ///< Genotypes for corresponding orgs in next_pop.
 
     // Configuration settings
-    std::string name;               ///< Name of this world (for use in configuration.)
-    bool cache_on;                  ///< Should we be caching fitness values?
-    size_t size_x;                  ///< If a grid, track width; if pools, track pool size
-    size_t size_y;                  ///< If a grid, track height; if pools, track num pools.
-    emp::vector<World_file> files;  ///< Output files.
+    std::string name;                  ///< Name of this world (for use in configuration.)
+    bool cache_on;                     ///< Should we be caching fitness values?
+    size_t size_x;                     ///< If a grid, track width; if pools, track pool size
+    size_t size_y;                     ///< If a grid, track height; if pools, track num pools.
+    emp::vector<Phenotype> phenotypes; ///< What phenotypes are we tracking?
+    emp::vector<World_file> files;     ///< Output files.
 
     bool is_synchronous;            ///< Does this world have synchronous generations?
     bool is_space_structured;       ///< Do we have a spatially structured population?
