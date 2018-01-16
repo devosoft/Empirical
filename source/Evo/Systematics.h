@@ -231,6 +231,20 @@ namespace emp {
 
     /// Calculate the genetic diversity of the population.
     double CalcDiversity();
+
+    /// Are we storing all taxa that are still alive in the population?
+    void SetStoreActive(bool new_val) { store_active = new_val; }
+
+    /// Are we storing all taxa that are the ancestors of living organims in the population?
+    void SetStoreAncestors(bool new_val) { store_ancestors = new_val; }
+
+    /// Are we storing all taxa that have died out, as have all of their descendants.
+    void SetStoreOutside(bool new_val) { store_outside = new_val; }
+
+    /// Are we storing any taxa types that have died out?
+    void SetArchive(bool new_val) { archive = new_val; }
+
+
   };
 
   // =============================================================
@@ -312,7 +326,7 @@ namespace emp {
   // return a pointer for the associated taxon.
   template <typename ORG_INFO>
   Ptr<Taxon<ORG_INFO>> Systematics<ORG_INFO>::AddOrg(const ORG_INFO & info, Ptr<taxon_t> cur_taxon) {
-    emp_assert( !cur_taxon || Has(active_taxa, cur_taxon) );
+    emp_assert( !cur_taxon || Has(active_taxa, cur_taxon));
 
     // Update stats
     org_count++;                  // Keep count of how many organisms are being tracked.

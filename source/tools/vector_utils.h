@@ -109,6 +109,16 @@ namespace emp {
     }
   }
 
+  template <typename T>
+  typename std::enable_if<std::is_scalar<T>::value, T>::type
+  Sum(emp::vector<T> & v) {
+      T total = 0;
+      for (T val : v) {
+          total += val;
+      }
+      return total;
+  }
+
 }
 
 #endif

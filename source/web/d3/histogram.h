@@ -7,9 +7,9 @@
 namespace D3 {
 
     struct HistogramBin {
-        EMP_BUILD_INTROSPECTIVE_TUPLE( int, x0,
-                                       int, x1,
-                                       int, length
+        EMP_BUILD_INTROSPECTIVE_TUPLE( double, x0,
+                                       double, x1,
+                                       double, length
 
         )
     };
@@ -70,9 +70,9 @@ namespace D3 {
             emp::pass_array_to_javascript(data);
             Dataset bins = Dataset();
             EM_ASM_ARGS({
-                console.log(emp_i.__incoming_array);
+                // console.log(emp_i.__incoming_array);
                 js.objects[$1] = js.objects[$0](emp_i.__incoming_array);
-                console.log(js.objects[$1]);
+                // console.log(js.objects[$1]);
             }, this->id, bins.GetID());
 
             return bins;

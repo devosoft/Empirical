@@ -310,6 +310,13 @@ namespace emp {
     /// Get the systematics manager (which is tracking lineages in the population.)
     const Systematics<genome_t> & GetSystematics() const { return systematics; }
 
+    void SystematicsOff() {
+        // systematics.SetStoreActive(false);
+        systematics.SetStoreOutside(false);
+        systematics.SetStoreAncestors(false);
+        systematics.SetArchive(false);
+    }
+
     fun_calc_fitness_t GetFitFun() { return fun_calc_fitness; }
 
     /// Print the full line-of-descent to the organism at the specified position in the popoulation.
