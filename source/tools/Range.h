@@ -11,6 +11,8 @@
 #ifndef EMP_RANGE_H
 #define EMP_RANGE_H
 
+#include <limits>
+
 #include "../base/assert.h"
 #include "../base/vector.h"
 
@@ -36,6 +38,9 @@ namespace emp {
     void SetLower(T l) { lower = l; }
     void SetUpper(T u) { upper = u; }
     void Set(T _l, T _u) { emp_assert(_l < _u); lower = _l; upper = _u; }
+
+    void SetMaxLower() { lower = std::numeric_limits<T>::min(); }
+    void SetMaxUpper() { upper = std::numeric_limits<T>::max(); }
 
     /// Determine if a provided value is in the range.
     bool Valid(T value) { return value >= lower && value <= upper; }
