@@ -26,6 +26,7 @@ namespace emp {
     T upper;  ///< End of range, inclusive.
 
   public:
+    Range() : lower(std::numeric_limits<T>::min()), upper(std::numeric_limits<T>::max()) { ; }
     Range(T _l, T _u) : lower(_l), upper(_u) { emp_assert(_l < _u); }
 
     T GetLower() const { return lower; }
