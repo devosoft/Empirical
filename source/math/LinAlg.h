@@ -34,6 +34,11 @@ namespace emp {
         return i == j ? F{1} : F{0};
       }
 
+      template <typename F>
+      constexpr F zero(size_t, size_t) {
+        return 0;
+      }
+
       template <typename To, typename From>
       constexpr To convertImpl(From&& from, const std::true_type&) {
         return std::forward<From>(from);
@@ -272,6 +277,9 @@ namespace emp {
                                           std::forward<Args>(args)...)};
       }
 
+      template <size_t... I>
+      constexpr Mat(const std::index_sequence<I...>&) : arrayData{8 * I...} {}
+
       public:
       template <typename G, typename... Args>
       constexpr static Mat from(G&& callback, Args&&... args) {
@@ -286,6 +294,8 @@ namespace emp {
         return Mat::from(&internal::ident<F>);
       }
 
+      static constexpr Mat zero() { return Mat::from(&internal::zero<F>); }
+
       template <typename X = F, typename Y = F, typename Z = F>
       static constexpr Mat translation(X&& x, Y&& y, Z&& z = Z{0}) {
         static_assert(R == 4 && C == 4,
@@ -294,7 +304,7 @@ namespace emp {
           1, 0, 0, std::forward<X>(x),  // row 1
           0, 1, 0, std::forward<Y>(y),  // row 2
           0, 0, 1, std::forward<Z>(z),  // row 3
-          0, 0, 0, 1,                   // row 4
+          0, 0, 0, 1,  // row 4
         };
       }
 
@@ -330,6 +340,8 @@ namespace emp {
           sizeof...(Args) + 2 == rows * columns,
           "Invalid number of arguments for a matrix of the given size");
       }
+
+      constexpr Mat() : Mat(std::make_index_sequence<R * C>{}) {}
 
       constexpr Mat(const Mat&) = default;
       constexpr Mat(Mat&&) = default;
