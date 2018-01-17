@@ -20,10 +20,10 @@
 using move_t = size_t;
 using othello_ai_t = std::function< size_t(emp::Othello & game) >;
 
-size_t POP_SIZE = 1000;
+constexpr size_t POP_SIZE = 1000;
 constexpr size_t GENOME_SIZE = 100;
-size_t EVAL_TIME = 3500;
-size_t UPDATES = 2000;
+constexpr size_t EVAL_TIME = 3500;
+constexpr size_t UPDATES = 2000;
 constexpr size_t TOURNY_SIZE = 4;
 constexpr size_t BOARD_SIZE = 8;
 
@@ -144,23 +144,28 @@ int main(int argc, char* argv[])
 {
   // Set up initial world
 
-  // std::chrono::high_resolution_clock::time_point start_s = std::chrono::high_resolution_clock::now();
+  std::chrono::high_resolution_clock::time_point start_s = std::chrono::high_resolution_clock::now();
   // POP_SIZE = std::atoi( argv[1] );
   // EVAL_TIME = std::atoi( argv[2] );
   // UPDATES = std::atoi( argv[3] );
-  // long time = 28800;
+  long time = 28800;
   size_t seed = 0;
+  std::string selection = argv[1];
   // if (argc == 5) seed = std::atoi( argv[4] );
   //
-  // std::cout<<"POP_SIZE: "<<POP_SIZE<<" EVAL_TIME: "<<EVAL_TIME
-  //          <<" UPDATES: "<<UPDATES<<std::endl;
-  //emp::evo::EAWorld<emp::AvidaGP, emp::evo::FitCacheOn> world(random, "AvidaWorld"); // FitCache on
+  std::cout<<"POP_SIZE: "<<POP_SIZE<<" EVAL_TIME: "<<EVAL_TIME
+           <<" UPDATES: "<<UPDATES<<std::endl;
 
   // Setting up the world
   emp::Random random;
   random.ResetSeed(seed);
 
-  emp::World<emp::AvidaGP> world(random, "AvidaWorld"); //FitCache off
+  emp::World<emp::AvidaGP> world(random, "AvidaWorld");
+
+  if (selection == "eco") world.SetCache(0);
+  else if (selection == "tourny") world.SetCache(1);
+  else { std::cout<<"Invalid Selection Method - "<< selection <<std::endl; exit(-1); }
+
   world.SetWellMixed(true);
 
   std::string filename = "data/game_0.csv";
@@ -173,8 +178,6 @@ int main(int argc, char* argv[])
           exit(-1);
       }
   }
-  std::cout<<filename<<std::endl;
-
 
   auto testcases = TestcaseSet<64>(filename, &random);
 
@@ -283,40 +286,36 @@ int main(int argc, char* argv[])
   // Setup the main fitness function.
   std::function<double(emp::AvidaGP &)> fit_fun =
     [&random, &world](emp::AvidaGP & org) {
-      //Set up opponent and first player for organism to be evaluated against
-      emp::AvidaGP & rand_org = world.GetRandomOrg();
-      size_t first_player = random.GetInt(1, 3);
+      emp::vector<double> fit_list;
 
-      // Evaluate the fitness of the orgainsim
-      double best_fitness = EvalGame(org, rand_org, first_player);
-
-      //Take the best of 5 games as the organisms fitness TODO: Should this still be the case?
-      for (int i = 0; i < 4; i++){
-        first_player = random.GetInt(1, 3);
+      //Take the median of 5 games as the organisms fitness
+      for (int i = 0; i < 5; i++){
+        int first_player = random.GetInt(1, 3);
         emp::AvidaGP & rand_org1 = world.GetRandomOrg();
-        double temp = EvalGame(org, rand_org1, first_player);
-
-        if (temp > best_fitness) best_fitness = temp;
+        fit_list.push_back( EvalGame(org, rand_org1, first_player) );
       }
 
-      return best_fitness;
+      std::sort(fit_list.begin(), fit_list.end());
+
+      return fit_list[2]; // Return the median
     };
     world.SetFitFun(fit_fun);
 
   // Setup TestCases for secondary fitness functions
-  emp::vector< std::function<double(emp::AvidaGP*)> > fit_set(testcases.GetNFuncs());
-  auto correct_choices = testcases.GetCorrectChoices(); //TODO: Confirm this works
-  emp::vector<std::pair<input_t, output_t> > tests = testcases.GetTestcases();
-  emp::vector<int> scores;
+    emp::vector<std::function<double(const emp::AvidaGP &)>> fit_set(testcases.GetNFuncs());
+    auto correct_choices = testcases.GetCorrectChoices(); //TODO: Confirm this works
+    emp::vector<std::pair<input_t, output_t>> tests = testcases.GetTestcases();
+    emp::vector<int> scores;
 
-  for (int i = 0; i < correct_choices.size(); i++) {
-    scores.push_back(0);
+    for (int i = 0; i < correct_choices.size(); i++)
+    {
+      scores.push_back(0);
   }
 
   for (size_t fun_id = 0; fun_id < testcases.GetNFuncs(); fun_id++) {
     // Create list of secondary fitness functions.
-    fit_set[fun_id] = [fun_id](emp::AvidaGP * org) {
-      return org->GetTrait(fun_id);
+    fit_set[fun_id] = [fun_id](const emp::AvidaGP &org) {
+      return org.GetTrait(fun_id);
     };
   }
 
@@ -325,7 +324,8 @@ int main(int argc, char* argv[])
     world.ResetHardware();
 
     emp::vector<size_t> choices = testcases.GetValidSubset();
-    for (auto org : world){
+    for (emp::AvidaGP & org : world)
+    {
       emp::Othello game(BOARD_SIZE, 1); //TODO: should it be random player first?
 
       for (size_t choice : choices){
@@ -348,12 +348,13 @@ int main(int argc, char* argv[])
     EliteSelect(world, 1, 1);
 
     // Run a selection method for each spot.
-    TournamentSelect(world, TOURNY_SIZE, POP_SIZE-1); //TODO: Make states constant for selection methods
+
+    if (selection == "tourny") TournamentSelect(world, TOURNY_SIZE, POP_SIZE-1); //TODO: Make states constant for selection methods
 
     //fit_set.push_back(fit_fun);
     //world.LexicaseSelect(fit_set, POP_SIZE-1);
 
-    //EcoSelectGradation(fit_fun, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
+    else if (selection == "eco") EcoSelect(world, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
 
     world.Update();
 
@@ -362,12 +363,13 @@ int main(int argc, char* argv[])
     // Mutate all but the first organism.
     world.DoMutations(1);
 
-    // std::chrono::high_resolution_clock::time_point stop_s = std::chrono::high_resolution_clock::now();
-    // auto duration = std::chrono::duration_cast<std::chrono::seconds>( stop_s - start_s ).count();
-    // if (duration > time){ break; }
+    std::chrono::high_resolution_clock::time_point stop_s = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::seconds>( stop_s - start_s ).count();
+    if (duration > time){ break; }
   }
 
-  EvalGame(world.GetOrg(0), world.GetOrg(1), 1, true);
+  //EvalGame(world.GetOrg(0), world.GetOrg(1), 1, true);
+  world.GetOrg(0).PrintGenome("genome.org");
 
 
   return 0;
