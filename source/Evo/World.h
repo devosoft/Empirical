@@ -99,9 +99,9 @@ namespace emp {
 
     /// A helper struct to measure organism phenotypes in the World
     struct Phenotype {
-      std::string name;
-      std::function<double(ORG &)> fun;
-      emp::Range<double> range;
+      std::string name;                  ///< Unique name for this phenotype.
+      std::function<double(ORG &)> fun;  ///< Function to retrieve phenotypic value from organism.
+      emp::Range<double> range;          ///< Limits on legal values (defaults to extremes)
 
       Phenotype(const std::string & _n, const std::function<double(ORG&)> & _f)
         : name(_n), fun(_f), range() { ; }
