@@ -1,17 +1,20 @@
 #ifndef PLOT_SCATTER_H
 #define PLOT_SCATTER_H
 
+#include "data.h"
 #include "math/LinAlg.h"
-#include "opengl/camera.h"
 #include "opengl/defaultShaders.h"
-#include "properties.h"
+#include "scenegraph/camera.h"
+#include "scenegraph/core.h"
 
 namespace emp {
   namespace plot {
 
     DEFINE_PROPERTY(PointSize, pointSize);
+    DEFINE_PROPERTY(XYScaled, xyScaled);
+    DEFINE_PROPERTY(Fill, fill);
 
-    class Scatter {
+    class Scatter : public scenegraph::Child {
       private:
       emp::opengl::shaders::SimpleSolidColor shader;
 
@@ -34,7 +37,6 @@ namespace emp {
 
       template <typename D>
       void show(const opengl::Camera& camera, const std::vector<D>& data) {
-        using namespace properties;
         using namespace emp::math;
 
         shader.shader.use();
