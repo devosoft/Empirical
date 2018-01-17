@@ -33,6 +33,7 @@
 #include "../meta/reflection.h"
 #include "../tools/map_utils.h"
 #include "../tools/Random.h"
+#include "../tools/Range.h"
 #include "../tools/random_utils.h"
 #include "../tools/string_utils.h"
 
@@ -100,8 +101,10 @@ namespace emp {
     struct Phenotype {
       std::string name;
       std::function<double(ORG &)> fun;
+      emp::Range<double> range;
 
-      Phenotype(const std::string & _n, const std::function<double(ORG&)> & _f) : name(_n), fun(_f) { ; }
+      Phenotype(const std::string & _n, const std::function<double(ORG&)> & _f)
+        : name(_n), fun(_f), range() { ; }
     };
 
     // --- Publicly available types ---
