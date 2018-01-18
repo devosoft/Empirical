@@ -46,6 +46,9 @@ namespace emp {
     /// Determine if a provided value is in the range.
     bool Valid(T value) { return value >= lower && value <= upper; }
 
+    /// Force a value into range
+    T Limit(T _in) { return (_in < lower) ? lower : ((_in > upper) ? upper : _in); }
+
     /// Produce a vector that spreads values evenly across the range.
     emp::vector<T> Spread(size_t s) {
       emp_assert(s >= 1);
