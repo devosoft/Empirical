@@ -89,6 +89,14 @@ namespace emp {
 
     size_t GetSize() const { return traits.size(); }
 
+    template <typename VALUE_T, typename... EXTRA>
+    void AddTrait(const std::string & name,
+                  const std::function<VALUE_T(target_t &)> & fun,
+                  EXTRA &&... extra) {
+      auto ptr = emp::NewPtr< Trait<target_t, VALUE_T> >(name, fun, std::forward<EXTRA>(extra)...);
+      traits.push_back(ptr);
+    }
+
     std::string EvalString(size_t id, target_t & target) { return traits[id]->EvalString(target); }
     double EvalValue(size_t id, target_t & target) { return traits[id]->EvalValue(target); }
 
