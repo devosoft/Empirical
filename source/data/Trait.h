@@ -16,6 +16,8 @@
 #include <string>
 
 #include "../base/assert.h"
+#include "../base/Ptr.h"
+#include "../base/vector.h"
 #include "../tools/Range.h"
 #include "../tools/string_utils.h"
 
@@ -69,6 +71,18 @@ namespace emp {
     double EvalValue(target_t & target) { return (double) EvalLimit(target); }
   };
 
+  /// A TraitSet houses a collection of traits and can trigger them to all be evaluated at once.
+  template <typename TARGET_T>
+  class TraitSet {
+  public:
+    using target_t = TARGET_T;
+    using trait_t = BaseTrait<target_t>;
+
+  protected:
+    emp::vector<emp::Ptr<trait_t>> traits;
+
+  public:
+  };
 
 }
 
