@@ -13,13 +13,23 @@
 #ifndef EMP_DATA_TRAIT_H
 #define EMP_DATA_TRAIT_H
 
+#include <string>
+
 #include "../base/assert.h"
 #include "../tools/Range.h"
+#include "../tools/string_utils.h"
 
 namespace emp {
 
+  template <typename TARGET_T>
+  class BaseTrait {
+  public:
+    virtual std::string EvalString(TARGET_T & target) = 0;
+    virtual double EvalValue(TARGET_T & target) = 0;
+  };
+
   template <typename TARGET_T, typename VALUE_T=double>
-  class Trait {
+  class Trait : public BaseTrait<TARGET_T> {
   public:
     using target_t = TARGET_T;
     using value_t = VALUE_T;
@@ -55,6 +65,8 @@ namespace emp {
 
     value_t Eval(target_t & target) { return fun(target); }
     value_t EvalLimit(target_t & target) { return range.Limit(fun(target)); }
+    std::string EvalString(target_t & target) { return std::to_string(EvalLimit(target)); }
+    double EvalValue(target_t & target) { return (double) EvalLimit(target); }
   };
 
 
