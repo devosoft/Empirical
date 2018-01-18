@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
   world.SetWellMixed(true);
 
   std::string filename = "data/game_0.csv";
-  std::string otherfile = "../data/game_0.csv";
+  std::string otherfile = "../../data/game_0.csv";
 
   if (!fexists(filename)){
       if (fexists(otherfile)) filename = otherfile;
