@@ -23,19 +23,26 @@ namespace emp {
   public:
     using target_t = TARGET_T;
     using value_t = VALUE_T;
+    using fun_t = std::function<value_t(target_t &)>;
+    using range_t = emp::Range<value_t>;
   protected:
-    std::string name;                        ///< Unique name for this trait.
-    std::string desc;                        ///< Full description explaining this trait.
-    std::function<value_t(target_t &)> fun;   ///< Function to retrieve trait value from target.
-    emp::Range<value_t> range;                ///< Limits on legal values (defaults to extremes)
+    std::string name;              ///< Unique name for this trait.
+    std::string desc;              ///< Full description explaining this trait.
+    fun_t fun;                     ///< Function to retrieve trait value from target.
+    range_t range;     ///< Limits on legal values (defaults to extremes)
 
   public:
-    Trait(const std::string & _n, const std::function<double(TARGET_T&)> & _f)
+    Trait(const std::string & _n, const fun_t & _f)
       : name(_n), fun(_f), range() { ; }
-    Trait(const std::string & _n, const std::function<double(TARGET_T&)> & _f,
-          value_t min, value_t max)
+    Trait(const std::string & _n, const fun_t & _f, value_t min, value_t max)
       : name(_n), fun(_f), range(min, max) { ; }
+    Trait(const std::string & _n, const fun_t & _f, const range_t & _r)
+      : name(_n), fun(_f), range(_r) { ; }
 
+    const std::string & GetName() const { return name; }
+    const std::string & GetDesc() const { return desc; }
+    const fun_t & GetFun() const { return fun; }
+    const range_t & GetRange() const { return range; }
   };
 
 
