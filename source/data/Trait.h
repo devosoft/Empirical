@@ -82,6 +82,26 @@ namespace emp {
     emp::vector<emp::Ptr<trait_t>> traits;
 
   public:
+    TraitSet() { ; }
+
+    trait_t & operator[](size_t id) { return *(traits[id]); }
+    const trait_t & operator[](size_t id) const { return *(traits[id]); }
+
+    size_t GetSize() const { return traits.size(); }
+
+    std::string EvalString(size_t id, target_t & target) { return traits[id]->EvalString(target); }
+    double EvalValue(size_t id, target_t & target) { return traits[id]->EvalValue(target); }
+
+    emp::vector<std::string> EvalStrings(target_t & target) {
+      emp::vector<std::string> results(traits.size());
+      for (size_t i = 0; i < traits.size(); i++) results[i] = traits[i]->EvalString(target);
+      return results;
+    }
+    emp::vector<double> EvalValues(target_t & target) {
+      emp::vector<double> results(traits.size());
+      for (size_t i = 0; i < traits.size(); i++) results[i] = traits[i]->EvalValue(target);
+      return results;
+    }
   };
 
 }
