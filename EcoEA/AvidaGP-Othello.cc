@@ -8,7 +8,9 @@
 #include <string>
 #include <chrono>
 #include <fstream>
+#include <set>
 
+#include "AvidaGP-Othello.h"
 #include "../source/games/Othello.h"
 #include "../source/hardware/OthelloGP.h"
 #include "../source/hardware/InstLib.h"
@@ -18,6 +20,8 @@
 #include "../../eco-ea-mancala/source/TestcaseSet.h"
 
 using move_t = size_t;
+using input_t = emp::array<int, 64>;
+using output_t = std::set<int>;
 using othello_ai_t = std::function< size_t(emp::Othello & game) >;
 
 constexpr size_t POP_SIZE = 1000;
@@ -28,117 +32,10 @@ constexpr size_t TOURNY_SIZE = 4;
 constexpr size_t BOARD_SIZE = 8;
 
 
-bool fexists(const std::string& filename) {
+bool FileExists(const std::string& filename) {
   std::ifstream ifile(filename.c_str());
   return (bool)ifile;
 }
-
-
-// Determine the next move of an AvidaGP player.
-size_t EvalMove(emp::Othello & game, emp::AvidaGP & org) {
-
-  // Setup the hardware with proper inputs.
-  org.ResetHardware();
-  size_t player = game.GetCurrPlayer();
-
-  for (size_t i = 0; i < BOARD_SIZE* BOARD_SIZE; i++) {
-    size_t tile = game.GetTile(i);
-    int conv_tile;
-
-    if (tile == player) conv_tile = 1;
-    else if (tile == 0) conv_tile = 0;
-    else conv_tile = -1;
-
-    org.SetInput(i, conv_tile);
-  }
-
-  // Run the code.
-  org.Process(EVAL_TIME);
-
-  // Determine the chosen move.
-  size_t best_move = 0; // TODO: Shoul the have to make a move?
-
-  for (size_t i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
-    if (org.GetOutput(best_move) < org.GetOutput(i)) { best_move = i; }
-  }
-
-  return best_move;
-}
-
-
-// Setup the fitness function for a whole game.
-double EvalGame(othello_ai_t & player0, othello_ai_t & player1,
-                size_t first_player=1, bool verbose=false) {
-
-  emp::Othello game(BOARD_SIZE, first_player); // Check to see if Black goes first
-  size_t round = 0;
-  double score;
-
-  while (game.IsDone() == false) {
-    // Determine the current player and their move.
-    size_t player = game.GetCurrPlayer();
-    auto & play_fun = (player == 1) ? player0 : player1;
-    size_t best_move = play_fun(game);
-
-    if (verbose) {
-      std::cout<<"player: "<<player<<std::endl;
-      std::cout << "round = " << round << std::endl;
-      game.Print();
-      std::cout << "Move = " << best_move << std::endl;//best.first + " " + best.second<<std::endl;
-      if (game.GetTile(best_move) != 0) {
-        std::cout << " (illegal!)";
-      }
-      std::cout << std::endl <<player<< std::endl;
-    }
-
-    // If the chosen move is illegal, end the game
-    if (player == 1){
-      //std::cout<<"best move: "<<best_move<<std::endl;
-      if (game.IsMoveValid(player, best_move) == 0 || game.GetTile(best_move) != 0){
-        if (verbose){std::cout<<"break"<<std::endl;}
-        break;
-      }
-    }
-    else{
-      while (game.IsMoveValid(player, best_move) == 0 || game.GetTile(best_move) != 0){
-        best_move++;
-        //if (verbose) {std::cout<<"Player: "<<best_move<<"  "<<player<<std::endl;}
-        if (best_move >= BOARD_SIZE*BOARD_SIZE) { best_move = 0; }
-      }
-    }
-
-    // Do the move and determine who goes next.
-    bool go_again = game.DoMove(player, best_move);
-    if (!go_again) {game.SetTurn(game.GetOpponent(player));}
-    round++;
-  }
-
-  score = round; // Score based on total rounds without mistake
-
-  if (game.IsDone()){
-    score += 100; // Bonus for completion of a game
-    score += ((double) game.GetScore(1)) - ((double) game.GetScore(2));
-  }
-
-  if (verbose) {
-    game.Print();
-    std::cout << "Final scores -- Black: " << game.GetScore(1)
-              << "   White: " << game.GetScore(2)
-              << std::endl;
-  }
-
-  return score;
-};
-
-// Build wrappers for AvidaGP
-double EvalGame(emp::AvidaGP & org0, emp::AvidaGP & org1, size_t first_player=1, bool verbose=false) {
-  othello_ai_t org_fun0 = [&org0](emp::Othello & game){ return EvalMove(game, org0); };
-  othello_ai_t org_fun1 = [&org1](emp::Othello & game){ return EvalMove(game, org1); };
-  return EvalGame(org_fun0, org_fun1, first_player, verbose);
-};
-
-using input_t = emp::array<int, 64>;
-using output_t = std::set<int>;
 
 int main(int argc, char* argv[])
 {
@@ -171,8 +68,8 @@ int main(int argc, char* argv[])
   std::string filename = "data/game_0.csv";
   std::string otherfile = "../../data/game_0.csv";
 
-  if (!fexists(filename)){
-      if (fexists(otherfile)) filename = otherfile;
+  if (!FileExists(filename)){
+      if (FileExists(otherfile)) filename = otherfile;
       else { 
           std::cout<<"No game data file found at " + filename + " or " + otherfile<<std::endl;
           exit(-1);
@@ -292,7 +189,7 @@ int main(int argc, char* argv[])
       for (int i = 0; i < 5; i++){
         int first_player = random.GetInt(1, 3);
         emp::AvidaGP & rand_org1 = world.GetRandomOrg();
-        fit_list.push_back( EvalGame(org, rand_org1, first_player) );
+        fit_list.push_back( EvalGame(org, rand_org1, BOARD_SIZE, EVAL_TIME, first_player) );
       }
 
       std::sort(fit_list.begin(), fit_list.end());
@@ -330,7 +227,7 @@ int main(int argc, char* argv[])
 
       for (size_t choice : choices){
         game.SetBoard(tests[choice].first);
-        int move = EvalMove(game, org);
+        int move = EvalMove(game, org, EVAL_TIME);
 
         for (int i = 0; i < correct_choices.size(); i++) { //TODO: Make this into a function?
           if (correct_choices[i][choice].find(move) != correct_choices[i][choice].end()){
@@ -348,12 +245,10 @@ int main(int argc, char* argv[])
     EliteSelect(world, 1, 1);
 
     // Run a selection method for each spot.
-
     if (selection == "tourny") TournamentSelect(world, TOURNY_SIZE, POP_SIZE-1); //TODO: Make states constant for selection methods
 
     //fit_set.push_back(fit_fun);
     //world.LexicaseSelect(fit_set, POP_SIZE-1);
-
     else if (selection == "eco") EcoSelect(world, fit_set, 100, TOURNY_SIZE, POP_SIZE-1);
 
     world.Update();

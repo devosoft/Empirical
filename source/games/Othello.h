@@ -49,6 +49,8 @@ namespace emp {
 
     size_t GetTile(move_t tile) { return game_board[tile]; }
 
+    size_t GetBoardSize() { return board_size; }
+
     void SetTurn(size_t player) { cur_player = player; }
 
     void SetBoard(emp::array<int, 64> new_board) {
