@@ -30,6 +30,7 @@
 #include "../base/vector.h"
 #include "../control/Signal.h"
 #include "../control/SignalControl.h"
+#include "../data/Trait.h"
 #include "../meta/reflection.h"
 #include "../tools/map_utils.h"
 #include "../tools/Random.h"
@@ -97,16 +98,6 @@ namespace emp {
       OrgPosition(size_t _id, bool _active=true) : index(_id), is_active(_active) { ; }
     };
 
-    /// A helper struct to measure organism phenotypes in the World
-    struct Phenotype {
-      std::string name;                  ///< Unique name for this phenotype.
-      std::function<double(ORG &)> fun;  ///< Function to retrieve phenotypic value from organism.
-      emp::Range<double> range;          ///< Limits on legal values (defaults to extremes)
-
-      Phenotype(const std::string & _n, const std::function<double(ORG&)> & _f)
-        : name(_n), fun(_f), range() { ; }
-    };
-
     // --- Publicly available types ---
     using this_t = World<ORG>;                 ///< Resolved type of this templated class.
     using org_t = ORG;                         ///< Type of organisms in this world.
@@ -157,7 +148,7 @@ namespace emp {
     bool cache_on;                     ///< Should we be caching fitness values?
     size_t size_x;                     ///< If a grid, track width; if pools, track pool size
     size_t size_y;                     ///< If a grid, track height; if pools, track num pools.
-    emp::vector<Phenotype> phenotypes; ///< What phenotypes are we tracking?
+    emp::TraitSet<ORG> phenotypes;     ///< What phenotypes are we tracking?
     emp::vector<World_file> files;     ///< Output files.
 
     bool is_synchronous;               ///< Does this world have synchronous generations?
@@ -351,7 +342,7 @@ namespace emp {
 
     /// Add a new phenotype measuring function.
     void AddPhenotype(const std::string & name, std::function<double(ORG &)> fun) {
-      phenotypes.emplace_back(name, fun);
+      phenotypes.AddTrait(name, fun);
     }
 
     /// Access a data node that tracks fitness information in the population.  The fitness will not
