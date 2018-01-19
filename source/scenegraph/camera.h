@@ -5,7 +5,7 @@
 #include "math/region.h"
 
 namespace emp {
-  namespace opengl {
+  namespace scenegraph {
     class Camera {
       public:
       virtual math::Mat4x4f getProjection() const = 0;
@@ -44,7 +44,7 @@ namespace emp {
       math::Mat4x4f getProjection() const override { return projection; }
       math::Mat4x4f getView() const override { return view; }
     };
-  }  // namespace opengl
+  }  // namespace scenegraph
 }  // namespace emp
 
 #endif  // EMP_OPENGL_CAMERA

@@ -33,7 +33,7 @@ namespace emp {
             BufferUsage::StaticDraw);
         }
 
-        void renderRelative(const opengl::Camera& camera,
+        void renderRelative(const Camera& camera,
                             const math::Mat4x4f& transform) {
           using namespace emp::math;
           using namespace emp::opengl;

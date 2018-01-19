@@ -22,7 +22,7 @@ namespace emp {
         return *this;
       }
 
-      void renderRelative(const opengl::Camera& camera,
+      void renderRelative(const Camera& camera,
                           const math::Mat4x4f& transform) {
         T::renderRelative(camera, this->transform * transform);
       }

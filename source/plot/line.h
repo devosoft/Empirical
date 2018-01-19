@@ -1,14 +1,15 @@
 #ifndef PLOT_LINE_H
 #define PLOT_LINE_H
 
+#include "data.h"
 #include "math/LinAlg.h"
-#include "opengl/camera.h"
 #include "opengl/defaultShaders.h"
-#include "properties.h"
+#include "scenegraph/camera.h"
+#include "scenegraph/core.h"
 
 namespace emp {
   namespace plot {
-    class Line {
+    class Line : public scenegraph::Child {
       private:
       emp::opengl::shaders::SimpleVaryingColor shader;
 
@@ -16,7 +17,7 @@ namespace emp {
       Line(emp::opengl::GLCanvas& canvas) : shader(canvas) {}
 
       template <typename D>
-      void show(const opengl::Camera& camera, const std::vector<D>& data) {
+      void setData(const opengl::Camera& camera, const std::vector<D>& data) {
         using namespace properties;
         using namespace emp::math;
         using namespace emp::opengl;

@@ -32,7 +32,7 @@ namespace emp {
       }
 
       public:
-      void render(const opengl::Camera& camera) {
+      void render(const Camera& camera) {
         renderRelative(camera, math::Mat4x4f::identity());
       }
 
@@ -50,7 +50,7 @@ namespace emp {
       std::vector<std::shared_ptr<Child>> children;
 
       public:
-      void renderRelative(const opengl::Camera& camera,
+      void renderRelative(const Camera& camera,
                           const math::Mat4x4f& transform) override {
         for (auto& child : children) {
           if (child) {
