@@ -6,4 +6,4 @@ debug: AvidaGP-Othello.cc
 	g++ AvidaGP-Othello.cc -g --std=c++14 -I ../source -o othelloDB
 
 clean:
-	rm *.o othelloGP
+	rm *.o othelloGP othelloDB
