@@ -4,6 +4,7 @@
 #include "data.h"
 #include "math/LinAlg.h"
 #include "opengl/defaultShaders.h"
+#include "properties.h"
 #include "scenegraph/camera.h"
 #include "scenegraph/core.h"
 
@@ -16,9 +17,14 @@ namespace emp {
       public:
       Line(emp::opengl::GLCanvas& canvas) : shader(canvas) {}
 
+      void renderRelative(const scenegraph::Camera& camera,
+                          const math::Mat4x4f& transform) {
+        shader.proj = camera.getProjection();
+        shader.view = camera.getView();
+      }
+
       template <typename D>
-      void setData(const opengl::Camera& camera, const std::vector<D>& data) {
-        using namespace properties;
+      void setData(const std::vector<D>& data) {
         using namespace emp::math;
         using namespace emp::opengl;
         using namespace emp::opengl::shaders;
@@ -27,8 +33,6 @@ namespace emp {
 
         shader.shader.use();
         shader.vao.bind();
-        shader.proj = camera.getProjection();
-        shader.view = camera.getView();
         shader.model = Mat4x4f::translation(0, 0);
 
         auto& startData = data[0];
