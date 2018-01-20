@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator>
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -175,21 +176,42 @@ namespace emp {
 
     }  // namespace __impl
 
+    template <class D, class N>
+    class Step;
+    template <class D>
+    class Step<D, void> {
+      D current;
+
+      public:
+      template <class Iter>
+      decltype(auto) setData(Iter begin, Iter end) {}
+    };
+
     template <class D>
     class ListTransform {
+      constexpr D* self() { return static_cast<D*>(this); }
+      constexpr const D* self() const { return static_cast<const D*>(this); }
+      template <class... U>
+      constexpr decltype(auto) operator()(U&&... args) {
+        return (*self())(std::forward<U>(args)...);
+      }
+      template <class... U>
+      constexpr decltype(auto) operator()(U&&... args) const {
+        return (*self())(std::forward<U>(args)...);
+      }
+
       public:
       template <class InputIter, class OutputIter>
       void transform(InputIter&& begin, InputIter&& end,
                      OutputIter&& target) const {
-        std::transform(begin, end, target, static_cast<const D&>(*this));
+        std::transform(begin, end, target, *this);
       }
 
       template <class Iter>
       auto transform(Iter&& begin, Iter&& end) const {
         std::vector<decltype((*this)(*begin))> transformed;
         std::transform(std::forward<Iter>(begin), std::forward<Iter>(end),
-                       std::back_inserter(transformed),
-                       static_cast<const D&>(*this));
+                       std::back_inserter(transformed), *this);
         return transformed;
       }
 
@@ -199,7 +221,7 @@ namespace emp {
         transformed.reserve(data.size());
 
         for (auto& d : data) {
-          transformed.push_back(static_cast<const D&>(*this)(d));
+          transformed.push_back((*this)(d));
         }
 
         return transformed;
@@ -289,31 +311,6 @@ namespace emp {
 
     DEFINE_PROPERTY(XY, xy);
     DEFINE_PROPERTY(XYScaled, xyScaled);
-
-    template <class I, class M>
-    class ScaleData {
-      public:
-      using input_type = I;
-      using map_type = M;
-      using output_type = decltype(std::declval<M>()(std::declval<I>()));
-
-      private:
-      map_type map;
-      std::vector<output_type> data;
-
-      public:
-      template <class Iter>
-      ScaleData& push(Iter begin, Iter end) {
-        map.transform(begin, end, std::back_inserter(data));
-        return *this;
-      }
-
-      ScaleData& clear() {
-        data.clear();
-        return *this;
-      }
-    };
-
   }  // namespace plot
 };  // namespace emp
 

@@ -3,6 +3,7 @@
 
 #include "data.h"
 #include "math/LinAlg.h"
+#include "opengl/color.h"
 #include "opengl/defaultShaders.h"
 #include "properties.h"
 #include "scenegraph/camera.h"
@@ -13,14 +14,24 @@ namespace emp {
     class Line : public scenegraph::Child {
       private:
       emp::opengl::shaders::SimpleVaryingColor shader;
+      size_t elementCount = 0;
 
       public:
       Line(emp::opengl::GLCanvas& canvas) : shader(canvas) {}
 
       void renderRelative(const scenegraph::Camera& camera,
                           const math::Mat4x4f& transform) {
-        shader.proj = camera.getProjection();
-        shader.view = camera.getView();
+        using namespace emp::math;
+        if (elementCount > 0) {
+          shader.shader.use();
+          shader.vao.bind();
+
+          shader.model = transform * Mat4x4f::translation(0, 0);
+          shader.proj = camera.getProjection();
+          shader.view = camera.getView();
+
+          glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_INT, 0);
+        }
       }
 
       template <typename D>
@@ -29,23 +40,19 @@ namespace emp {
         using namespace emp::opengl;
         using namespace emp::opengl::shaders;
 
+        elementCount = 0;
+
         if (data.size() <= 1) return;
 
-        shader.shader.use();
-        shader.vao.bind();
-        shader.model = Mat4x4f::translation(0, 0);
-
         auto& startData = data[0];
-        Vec3f start{XYScaled::get(startData).x(), XYScaled::get(startData).y(),
-                    0};
-        auto startStroke{Stroke::get(startData)};
-        auto startStrokeWeight{StrokeWeight::get(startData)};
+        Vec3f start{startData.xyScaled.x(), startData.xyScaled.y(), 0};
+        auto startStroke{startData.stroke};
+        auto startStrokeWeight{startData.strokeWeight};
 
         auto& middleData = data[1];
-        Vec3f middle{XYScaled::get(middleData).x(),
-                     XYScaled::get(middleData).y(), 0};
-        Vec4f middleStroke{Stroke::get(middleData)};
-        auto middleStrokeWeight{StrokeWeight::get(middleData)};
+        Vec3f middle{middleData.xyScaled.x(), middleData.xyScaled.y(), 0};
+        auto middleStroke{middleData.stroke};
+        auto middleStrokeWeight{middleData.strokeWeight};
 
         auto segment = (middle - start).normalized();
         Vec3f normal{-segment.y(), segment.x(), 0};
@@ -57,9 +64,9 @@ namespace emp {
 
         size_t i = 0;
         for (auto& value : data) {
-          Vec3f end{XYScaled::get(value).x(), XYScaled::get(value).y(), 0};
-          auto stroke{Stroke::get(value)};
-          auto weight{StrokeWeight::get(value)};
+          Vec3f end{value.xyScaled.x(), value.xyScaled.y(), 0};
+          auto stroke{value.stroke};
+          auto weight{value.strokeWeight};
 
           auto segment1 = (middle - start).normalized();
           Vec3f normal1{-segment1.y(), segment1.x(), 0};
@@ -110,7 +117,8 @@ namespace emp {
                                                       BufferUsage::DynamicDraw);
         shader.vao.getBuffer<BufferType::ElementArray>().set(
           triangles, BufferUsage::DynamicDraw);
-        glDrawElements(GL_TRIANGLES, triangles.size(), GL_UNSIGNED_INT, 0);
+
+        elementCount = triangles.size();
       }
     };
   }  // namespace plot
