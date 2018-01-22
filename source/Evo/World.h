@@ -551,6 +551,12 @@ namespace emp {
       pop.resize(new_size, nullptr);                                 // Default new orgs to null.
     }
 
+    /// Change the size of the world based on width and height.
+    void Resize(size_t new_width, size_t new_height) {
+      Resize(new_width * new_height);
+      size_x = new_width; size_y = new_height;
+    }
+
     /// Inject an organism using the default injection scheme.
     void Inject(const genome_t & mem, size_t copy_count=1);
 
