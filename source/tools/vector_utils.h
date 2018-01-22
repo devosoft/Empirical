@@ -60,6 +60,19 @@ namespace emp {
   void Sort(emp::vector<T> & v, Ts... args) {
     std::sort(v.begin(), v.end(), std::forward<Ts>(args)...);
   }
+  
+  template <typename T>
+  emp::vector<T> Slice(emp::vector<T> vec, int start, int stop) {
+    emp_assert(start < stop, start, stop);
+    emp_assert(start < (int)vec.size(), start, vec.size());
+    emp_assert(stop <= (int)vec.size(), stop, vec.size());
+
+    emp::vector<T> new_vec;
+    for (int i = start; i < stop; i++){
+      new_vec.push_back(vec[i]);
+    }
+    return new_vec;
+  }
 
   /// Tree manipulation in vectors.
   constexpr size_t tree_left(size_t id) { return id*2+1; }
