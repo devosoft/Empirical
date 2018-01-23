@@ -7,10 +7,10 @@
 #include <sstream>
 #include <vector>
 
-#include "../../games/Othello.h"
-#include "../../hardware/AvidaGPOthello.h"
-#include "../../hardware/InstLib.h"
-#include "../../tools/Random.h"
+#include "../source/games/Othello.h"
+#include "../source/hardware/OthelloGP.h"
+#include "../source/hardware/InstLib.h"
+#include "../source/tools/Random.h"
 
 constexpr size_t EVAL_TIME = 3500;
 constexpr size_t BOARD_SIZE = 8;
@@ -118,6 +118,7 @@ stats EvalGame(emp::Random& random, othello_ai_t & player0, othello_ai_t & playe
     if (game.IsMoveValid(player, best_move) == 0 || game.GetTile(best_move) != 0){
       if (verbose){std::cout<<"break"<<std::endl;}
       statsM.invalid = 1;
+      std::cout<<"round: "<<round<<" player: "<<player<<std::endl;
       statsM.winner = game.GetOpponent(player);
       break;
     }
