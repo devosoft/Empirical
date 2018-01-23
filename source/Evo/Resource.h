@@ -50,7 +50,7 @@ namespace emp {
 
        emp_assert(world.GetFitFun(), "Must define a base fitness function");
        emp_assert(world.GetSize() > 0);
-       emp_assert(t_size > 0 && t_size <= world.GetSize(), t_size, world.GetSize());
+       emp_assert(t_size > 0, t_size);
        emp_assert(world.IsCacheOn() == false, "Ecologies mean constantly changing fitness!");
 
        // Setup info to track fitnesses.
@@ -64,6 +64,11 @@ namespace emp {
     //    std::cout << extra_funs.size() << std::endl;
 
        for (size_t org_id = 0; org_id < world.GetSize(); org_id++) {
+        //    std::cout << org_id << std::endl;
+         if (!world.IsOccupied(org_id)) {
+             continue;
+         }
+        //  std::cout << "still going" << std::endl;
          if (use_base) {
             base_fitness[org_id] = world.CalcFitnessID(org_id);
          } else {
@@ -71,15 +76,17 @@ namespace emp {
          }
          
          for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
-            //  std::cout << "Test" << std::endl;
+            //  std::cout << "Test " << ex_id << std::endl;
 
-           pools[ex_id].Inc(resource_inflow/world.GetSize());
+           pools[ex_id].Inc(resource_inflow/world.GetNumOrgs());
            double cur_fit = extra_funs[ex_id](world.GetOrg(org_id));
            cur_fit = emp::Pow(cur_fit, 2.0);
             //    if (org_id==0) {std::cout << "Allele: " << world[org_id][ex_id] <<" Curr fit: " << extra_funs[ex_id](world[org_id]) << " Curr fit squared: " << cur_fit << " Amount: " << pools[ex_id].GetAmount() << " Frac: " << frac;}
             cur_fit *= frac*(pools[ex_id].GetAmount()-cost);
             if (cur_fit > 0) {
                 cur_fit -= cost;
+            } else {
+                cur_fit = 0;
             }
         //    if (org_id==0) {std::cout << " Multiplied out: " << cur_fit;}
            cur_fit = std::min(cur_fit, max_bonus);
@@ -108,6 +115,7 @@ namespace emp {
        emp::vector<size_t> entries;
        for (size_t T = 0; T < tourny_count; T++) {
          entries.resize(0);
+        //  std::cout << T << std::endl;
          for (size_t i=0; i<t_size; i++) entries.push_back( world.GetRandomOrgID() ); // Allows replacement!
 
          double best_fit = base_fitness[entries[0]];
