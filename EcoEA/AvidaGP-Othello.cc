@@ -37,33 +37,31 @@ bool FileExists(const std::string& filename) {
   return (bool)ifile;
 }
 
-int main(int argc, char* argv[])
-{
-  // Set up initial world
+int main(int argc, char* argv[]){
 
   std::chrono::high_resolution_clock::time_point start_s = std::chrono::high_resolution_clock::now();
   // POP_SIZE = std::atoi( argv[1] );
-  // EVAL_TIME = std::atoi( argv[2] );
+  // EVAL_TIME = std::atoi( argv[2] ); // TODO Config files
   // UPDATES = std::atoi( argv[3] );
   long time = 28800;
   size_t seed = 0;
   std::string selection = argv[1];
   // if (argc == 5) seed = std::atoi( argv[4] );
-  //
+  
+
   std::cout<<"POP_SIZE: "<<POP_SIZE<<" EVAL_TIME: "<<EVAL_TIME
            <<" UPDATES: "<<UPDATES<<std::endl;
 
   // Setting up the world
   emp::Random random;
   random.ResetSeed(seed);
-
   emp::World<emp::AvidaGP> world(random, "AvidaWorld");
+  world.SetWellMixed(true);
 
   if (selection == "eco") world.SetCache(0);
   else if (selection == "tourny") world.SetCache(1);
   else { std::cout<<"Invalid Selection Method - "<< selection <<std::endl; exit(-1); }
 
-  world.SetWellMixed(true);
 
   std::string filename = "data/game_0.csv";
   std::string otherfile = "../../data/game_0.csv";
