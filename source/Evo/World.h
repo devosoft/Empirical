@@ -277,6 +277,18 @@ namespace emp {
     /// (i.e., are phenotypically-similar organisms forced to be closer together?)
     bool IsPhenoStructured() const { return is_pheno_structured; }
 
+    /// Denote that this World will be treated as having synchronous generations.
+    /// (Note: this function does not change functionality, just indicates what's happening!)
+    void MarkSynchronous(bool in=true) { is_synchronous = in; }
+
+    /// Denote that the World will have a spatial structure to the organisms.
+    /// (Note: this function does not change functionality, just indicates what's happening!)
+    void MarkSpaceStructured(bool in=true) { is_space_structured = in; }
+
+    /// Denote that the World will have organisms structured based on phenotype.
+    /// (Note: this function does not change functionality, just indicates what's happening!)
+    void MarkPhenoStructured(bool in=true) { is_pheno_structured = in; }
+
     /// Index into a world to obtain a const reference to an organism.  Any manipulations to
     /// organisms should go through other functions to be tracked appropriately.
     /// Will trip assert if cell is not occupied.
