@@ -23,6 +23,9 @@
 
 namespace emp {
 
+  // Pre-declaration of traits.
+  template <typename TARGET_T, typename VALUE_T> class Trait;
+
   template <typename TARGET_T>
   class BaseTrait {
   public:
