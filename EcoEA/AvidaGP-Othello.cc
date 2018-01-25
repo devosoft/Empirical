@@ -180,31 +180,36 @@ int main(int argc, char* argv[]){
 
   // Setup the main fitness function.
   std::function<double(emp::AvidaGP &)> fit_fun =
-    [&random, &world](emp::AvidaGP & org) {
+    [&random, &world](emp::AvidaGP & org) 
+    {
       emp::vector<double> fit_list;
 
       //Take the median of 5 games as the organisms fitness
       for (int i = 0; i < 5; i++){
         int first_player = random.GetInt(1, 3);
+        bool rand_player = 0;
         emp::AvidaGP & rand_org1 = world.GetRandomOrg();
-        fit_list.push_back( EvalGame(org, rand_org1, BOARD_SIZE, EVAL_TIME, first_player) );
-      }
 
+        if (i > 2) rand_player = 1;
+
+        fit_list.push_back( EvalGame(random, org, rand_org1, BOARD_SIZE, EVAL_TIME, first_player,0, rand_player) );
+      }
       std::sort(fit_list.begin(), fit_list.end());
 
       return fit_list[2]; // Return the median
-    };
-    world.SetFitFun(fit_fun);
+  };
+  
+  world.SetFitFun(fit_fun);
 
   // Setup TestCases for secondary fitness functions
-    emp::vector<std::function<double(const emp::AvidaGP &)>> fit_set(testcases.GetNFuncs());
-    auto correct_choices = testcases.GetCorrectChoices(); //TODO: Confirm this works
-    emp::vector<std::pair<input_t, output_t>> tests = testcases.GetTestcases();
-    emp::vector<int> scores;
+  emp::vector<std::function<double(const emp::AvidaGP &)>> fit_set(testcases.GetNFuncs());
+  auto correct_choices = testcases.GetCorrectChoices(); //TODO: Confirm this works
+  emp::vector<std::pair<input_t, output_t>> tests = testcases.GetTestcases();
+  emp::vector<int> scores;
 
-    for (int i = 0; i < correct_choices.size(); i++)
-    {
-      scores.push_back(0);
+  for (int i = 0; i < correct_choices.size(); i++)
+  {
+    scores.push_back(0);
   }
 
   for (size_t fun_id = 0; fun_id < testcases.GetNFuncs(); fun_id++) {
