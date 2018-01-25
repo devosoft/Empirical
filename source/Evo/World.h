@@ -279,15 +279,15 @@ namespace emp {
 
     /// Denote that this World will be treated as having synchronous generations.
     /// (Note: this function does not change functionality, just indicates what's happening!)
-    void MarkSynchronous(bool in=true) { is_synchronous = in; }
+    this_t & MarkSynchronous(bool in=true) { is_synchronous = in; return *this; }
 
     /// Denote that the World will have a spatial structure to the organisms.
     /// (Note: this function does not change functionality, just indicates what's happening!)
-    void MarkSpaceStructured(bool in=true) { is_space_structured = in; }
+    this_t & MarkSpaceStructured(bool in=true) { is_space_structured = in; return *this; }
 
     /// Denote that the World will have organisms structured based on phenotype.
     /// (Note: this function does not change functionality, just indicates what's happening!)
-    void MarkPhenoStructured(bool in=true) { is_pheno_structured = in; }
+    this_t & MarkPhenoStructured(bool in=true) { is_pheno_structured = in; return *this; }
 
     /// Index into a world to obtain a const reference to an organism.  Any manipulations to
     /// organisms should go through other functions to be tracked appropriately.
