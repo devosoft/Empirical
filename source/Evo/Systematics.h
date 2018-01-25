@@ -137,6 +137,8 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; ///< A set of all dead, ancestral taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  ///< A set of all dead taxa w/o descendants.
 
+    Signal<void(Ptr<taxon_t>)> on_prune_sig; ///< Trigger when any organism is pruned from tree
+
     // Stats about active taxa... (totals are across orgs, not taxa)
     size_t org_count;           ///< How many organisms are currently active?
     size_t total_depth;         ///< Sum of taxa depths for calculating average.
@@ -193,6 +195,11 @@ namespace emp {
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetActive() const { return active_taxa; }
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetAncestors() const { return ancestor_taxa; }
 
+    /// Privide a function for Systematics to call each time a taxon is about to be pruned.
+    /// Trigger:  Taxon is about to be killed
+    /// Argument: Pounter to taxon
+    SignalKey OnPrune(const std::function<void(Ptr<taxon_t>)> & fun) { return on_prune_sig.AddAction(fun); }
+
 
     /// How many taxa are still active in the population?
     size_t GetNumActive() const { return active_taxa.size(); }
@@ -235,7 +242,7 @@ namespace emp {
      * 
      * (From Vane-Wright et al., 1991; reviewed in Winter et al., 2013)
     */
-    double GetTaxonDistinctiveness(Ptr<taxon_t> tax) const {return 1/GeDistanceToRoot(tax);}
+    double GetTaxonDistinctiveness(Ptr<taxon_t> tax) const {return 1/GetDistanceToRoot(tax);}
 
     /** This metric (from Isaac, 2007; reviewd in Winter et al., 2013) measures how
      * distinct @param tax is from the rest of the population, weighted for the amount of
@@ -260,13 +267,15 @@ namespace emp {
         if (test_taxon == mrca || !test_taxon) {
           total += depth/divisor;
           return total;
-        } else if (test_taxon.GetNumOff() > 1) {
+        } else if (test_taxon->GetNumOff() > 1) {
           total += depth/divisor;
           depth = 0;
-          divisor = test_taxon.GetNumOff();
+          divisor = test_taxon->GetNumOff();
         }
         test_taxon = test_taxon->GetParent();
       }
+    
+      return -1;
     }
 
     /** Calculates mean pairwise distance between extant taxa (Webb and Losos, 2000).
@@ -467,6 +476,7 @@ namespace emp {
   // Should be called wheneven a taxon has no organisms AND no descendants.
   template <typename ORG_INFO>
   void Systematics<ORG_INFO>::Prune(Ptr<taxon_t> taxon) {
+    on_prune_sig.Trigger(taxon);
     RemoveOffspring( taxon->GetParent() );           // Notify parent of the pruning.
     if (store_ancestors) ancestor_taxa.erase(taxon); // Clear from ancestors set (if there)
     if (store_outside) outside_taxa.insert(taxon);   // Add to outside set (if tracked)
