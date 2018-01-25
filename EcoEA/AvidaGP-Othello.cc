@@ -64,7 +64,7 @@ int main(int argc, char* argv[]){
 
 
   std::string filename = "data/game_0.csv";
-  std::string otherfile = "../../../data/game_0.csv";
+  std::string otherfile = "../../../../data/game_0.csv";
 
   if (!FileExists(filename)){
       if (FileExists(otherfile)) filename = otherfile;
