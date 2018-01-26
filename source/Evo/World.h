@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
+ *  @date 2017-2018
  *
  *  @file  World.h
  *  @brief Definition of a base class for a World template for use in evolutionary algorithms.
@@ -403,7 +403,20 @@ namespace emp {
 
     /// Setup the function to extract or convert an organism to a genome.  It should take an
     /// organism reference and return a const genome reference.
-    void SetGetGenomeFun(const fun_get_genome_t & gen_fun) { fun_get_genome = gen_fun; }
+    void SetGetGenomeFun(const fun_get_genome_t & _fun) { fun_get_genome = _fun; }
+
+    /// Setup the function to inject an organism into the population.  It should take a pointer
+    /// to the organism to be injected and return an OrgPosition indicating where it was placed.
+    void SetAddInjectFun(const fun_add_inject_t & _fun) { fun_add_inject = _fun; }
+
+    /// Setup the function to place a newly born organism into the population.  It should take a
+    /// pointer to the new organism and the position of the parent, returning an OrgPosition
+    /// indicating where it was placed.
+    void SetAddBirthFun(const fun_add_birth_t & _fun) { fun_add_birth = _fun; }
+
+    /// Setup the function to take an organism position id and return a random neighbor id from
+    /// the population.
+    void SetGetNeighborFun(const fun_get_neighbor_t & _fun) { fun_get_neighbor = _fun; }
 
     /// Same as setting a fitness function, but uses Goldberg and Richardson's fitness sharing
     /// function (1987) to make similar organisms detract from each other's fitness and prevent
@@ -788,9 +801,9 @@ namespace emp {
     if (synchronous_gen) {
       // Place births in a neighboring position in the new grid.
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        emp_assert(new_org);                                  // New organism must exist.
-        const size_t id = fun_get_neighbor(parent_id);     // Placed near parent, in next pop.
-        return AddNextOrgAt(new_org, id, genotypes[parent_id]);
+        emp_assert(new_org);                                     // New organism must exist.
+        const size_t id = fun_get_neighbor(parent_id);           // Place near parent, in next pop.
+        return AddNextOrgAt(new_org, id, genotypes[parent_id]);  // Add org and return the position placed.
       };
       SetAttribute("SynchronousGen", "True");
     } else {
