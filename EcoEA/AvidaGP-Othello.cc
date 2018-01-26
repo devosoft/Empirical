@@ -43,7 +43,9 @@ int main(int argc, char* argv[]){
   // POP_SIZE = std::atoi( argv[1] );
   // EVAL_TIME = std::atoi( argv[2] ); // TODO Config files
   // UPDATES = std::atoi( argv[3] );
-  long time = 28800;
+  long time = std::atof( argv[2] ) * 60 * 60;
+  std::cout<<time<<std::endl;
+  exit(0);
   size_t seed = 0;
   std::string selection = argv[1];
   // if (argc == 5) seed = std::atoi( argv[4] );
