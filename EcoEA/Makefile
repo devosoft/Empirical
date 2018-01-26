@@ -7,3 +7,6 @@ debug: AvidaGP-Othello.cc
 
 clean:
 	rm *.o othelloGP othelloDB
+
+compete: compete.cc
+	g++ compete.cc -O3 -DNDEBUG --std=c++14 -I ../source -o compete
