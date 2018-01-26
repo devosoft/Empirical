@@ -65,12 +65,13 @@ size_t EvalMove(emp::Othello &game, emp::AvidaGP &org, size_t eval_time)
 }
 
 // Setup the fitness function for a whole game.
-double EvalGame(emp::Random& random, othello_ai_t &player0, othello_ai_t &player1, 
+double EvalGame(emp::Random& random, othello_ai_t &player1, othello_ai_t &player2, 
                 size_t board_size, size_t first_player = 1, 
                 bool verbose = false, bool rand_player = 0)
 {
 
   emp::Othello game(board_size, first_player); // Check to see if Black first
+
   size_t round = 0;
   double score;
 
@@ -78,7 +79,8 @@ double EvalGame(emp::Random& random, othello_ai_t &player0, othello_ai_t &player
   {
     // Determine the current player and their move.
     size_t player = game.GetCurrPlayer();
-    auto &play_fun = (player == 1) ? player0 : player1;
+
+    auto &play_fun = (player == 1) ? player1 : player2;
     size_t best_move;
 
     if (rand_player && player == 2)
@@ -138,6 +140,7 @@ double EvalGame(emp::Random& random, othello_ai_t &player0, othello_ai_t &player
       game.SetTurn(game.GetOpponent(player));
     }
     round++;
+    
   }
 
   score = round; // Score based on total rounds without mistake
@@ -155,7 +158,6 @@ double EvalGame(emp::Random& random, othello_ai_t &player0, othello_ai_t &player
               << "   White: " << game.GetScore(2)
               << std::endl;
   }
-
   return score;
 };
 

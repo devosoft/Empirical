@@ -183,11 +183,10 @@ int main(int argc, char* argv[]){
     [&random, &world](emp::AvidaGP & org) 
     {
       emp::vector<double> fit_list;
-
       //Take the median of 5 games as the organisms fitness
       for (int i = 0; i < 5; i++){
         int first_player = random.GetInt(1, 3);
-        bool rand_player = 0;
+        bool rand_player = 1;
         emp::AvidaGP & rand_org1 = world.GetRandomOrg();
 
         if (i > 2) rand_player = 1;
@@ -195,7 +194,6 @@ int main(int argc, char* argv[]){
         fit_list.push_back( EvalGame(random, org, rand_org1, BOARD_SIZE, EVAL_TIME, first_player,0, rand_player) );
       }
       std::sort(fit_list.begin(), fit_list.end());
-
       return fit_list[2]; // Return the median
   };
   
