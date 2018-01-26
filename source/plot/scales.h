@@ -1,26 +1,37 @@
 #ifndef EMP_PLOT_SCALES_H
 #define EMP_PLOT_SCALES_H
 
-#include "data.h"
+#include "attrs.h"
 #include "math/LinAlg.h"
 #include "opengl/defaultShaders.h"
 #include "scenegraph/camera.h"
 
 namespace emp {
   namespace plot {
-    DEFINE_PROPERTY(XY, xy);
-    DEFINE_PROPERTY(XYScaled, xyScaled);
 
-    template <class I, class M, class R>
-    class ScaleData {
-      private:
-      opengl::shaders::SimpleSolidColor shader;
-      std::tuple<C...> children;
-
+    class Scale {
       public:
-      template <class D>
-      void show(const opengl::Camera& camera, std::vector<D>& data) {}
+      math::Region2df screenSpace;
+
+      template <class... U>
+      constexpr Scale(U&&... args) : screenSpace(std::forward<U>(args)...) {}
+
+      template <class DataIter, class PropsIter>
+      auto apply(DataIter dbegin, DataIter dend, PropsIter pbegin,
+                 PropsIter pend) const {
+        using namespace emp::math;
+        using namespace emp::plot::attrs;
+        Region2df dataSpace;
+        for (auto iter = pbegin; iter != pend; ++iter) {
+          dataSpace.include(XY::get(*iter));
+        }
+        return xyScaled([&dataSpace, this](const auto& p) {
+                 return screenSpace.rescale(XY::get(p), dataSpace);
+               })
+          .applyToRange(pbegin, pend);
+      }
     };
+
   }  // namespace plot
 }  // namespace emp
 

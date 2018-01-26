@@ -1,6 +1,7 @@
 #ifndef DEFAULT_SHADERS_H
 #define DEFAULT_SHADERS_H
 
+#include "color.h"
 #include "glcanvas.h"
 
 namespace emp {
@@ -107,7 +108,7 @@ namespace emp {
 
         struct point_t {
           Vec3f position;
-          Vec4f color;
+          Color color;
         };
 
         SimpleVaryingColor(GLCanvas& canvas)
@@ -154,7 +155,7 @@ namespace emp {
       };
 
     }  // namespace shaders
-  }    // namespace opengl
+  }  // namespace opengl
 }  // namespace emp
 
 #endif

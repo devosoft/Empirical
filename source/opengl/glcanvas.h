@@ -295,30 +295,15 @@ namespace emp {
           &args, fps, forever);
 #else
         if (fps <= 0) fps = 60;
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_MULTISAMPLE);
 
-        const int frameLength = 1000.f / fps;
         while (!glfwWindowShouldClose(window)) {
-          glEnable(GL_MULTISAMPLE);
-          auto start = std::chrono::system_clock::now();
           onUpdate(*this);
-          auto end = std::chrono::system_clock::now();
-
-          // std::cout
-          //   << std::chrono::duration<float,
-          //   std::chrono::milliseconds::period>(
-          //        end - start)
-          //        .count()
-          //   << ": "
-          //   << 1.f / std::chrono::duration<float,
-          //   std::chrono::seconds::period>(
-          //              end - start)
-          //              .count()
-          //   << std::endl;
 
           glfwSwapBuffers(window);
           glfwPollEvents();
-
-          // std::this_thread::sleep_for(std::chrono::milliseconds(frameLength));
         }
 #endif
       }

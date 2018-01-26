@@ -33,6 +33,8 @@ namespace emp {
             BufferUsage::StaticDraw);
         }
 
+        virtual ~Rectangle() {}
+
         void renderRelative(const Camera& camera,
                             const math::Mat4x4f& transform) {
           using namespace emp::math;

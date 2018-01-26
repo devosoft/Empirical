@@ -11,7 +11,10 @@
 namespace emp {
   namespace scenegraph {
 
-    class Child : public Renderable {};
+    class Child : public Renderable {
+      public:
+      virtual ~Child() {}
+    };
 
     template <class C>
     class Parent : public Renderable {
@@ -32,6 +35,7 @@ namespace emp {
       }
 
       public:
+      virtual ~Parent() {}
       void render(const Camera& camera) {
         renderRelative(camera, math::Mat4x4f::identity());
       }
@@ -50,6 +54,7 @@ namespace emp {
       std::vector<std::shared_ptr<Child>> children;
 
       public:
+      virtual ~Group() {}
       void renderRelative(const Camera& camera,
                           const math::Mat4x4f& transform) override {
         for (auto& child : children) {

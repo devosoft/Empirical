@@ -1,11 +1,11 @@
 #ifndef PLOT_LINE_H
 #define PLOT_LINE_H
 
-#include "data.h"
+#include "attrs.h"
 #include "math/LinAlg.h"
 #include "opengl/color.h"
 #include "opengl/defaultShaders.h"
-#include "properties.h"
+#include "scales.h"
 #include "scenegraph/camera.h"
 #include "scenegraph/core.h"
 
@@ -18,6 +18,7 @@ namespace emp {
 
       public:
       Line(emp::opengl::GLCanvas& canvas) : shader(canvas) {}
+      virtual ~Line() {}
 
       void renderRelative(const scenegraph::Camera& camera,
                           const math::Mat4x4f& transform) {
@@ -34,39 +35,44 @@ namespace emp {
         }
       }
 
-      template <typename D>
-      void setData(const std::vector<D>& data) {
+      template <class DataIter, class Iter>
+      void apply(DataIter, DataIter, Iter begin, Iter end) {
         using namespace emp::math;
         using namespace emp::opengl;
         using namespace emp::opengl::shaders;
+        using namespace emp::plot::attrs;
 
+        // If there is nothing to show, the bail out
         elementCount = 0;
+        if (begin == end) return;
 
-        if (data.size() <= 1) return;
+        // Capture the first element of the dataset
+        Vec3f start{begin->xyScaled.x(), begin->xyScaled.y(), 0};
+        auto startStroke{begin->stroke};
+        auto startStrokeWeight{begin->strokeWeight * 0.5f};
+        ++begin;
+        // Make sure that there is at least one more item in the dataset
+        if (begin == end) return;
 
-        auto& startData = data[0];
-        Vec3f start{startData.xyScaled.x(), startData.xyScaled.y(), 0};
-        auto startStroke{startData.stroke};
-        auto startStrokeWeight{startData.strokeWeight};
-
-        auto& middleData = data[1];
-        Vec3f middle{middleData.xyScaled.x(), middleData.xyScaled.y(), 0};
-        auto middleStroke{middleData.stroke};
-        auto middleStrokeWeight{middleData.strokeWeight};
+        // capture the second element
+        Vec3f middle{begin->xyScaled.x(), begin->xyScaled.y(), 0};
+        auto middleStroke{begin->stroke};
+        auto middleStrokeWeight{begin->strokeWeight * 0.5f};
 
         auto segment = (middle - start).normalized();
         Vec3f normal{-segment.y(), segment.x(), 0};
 
+        // Place the first two verticies into the list of vertices
         std::vector<SimpleVaryingColor::point_t> verts{
           {start + normal * startStrokeWeight, startStroke},
           {start - normal * startStrokeWeight, startStroke}};
         std::vector<GLuint> triangles;
 
         size_t i = 0;
-        for (auto& value : data) {
-          Vec3f end{value.xyScaled.x(), value.xyScaled.y(), 0};
-          auto stroke{value.stroke};
-          auto weight{value.strokeWeight};
+        for (++begin; begin != end; ++begin) {
+          Vec3f end{begin->xyScaled.x(), begin->xyScaled.y(), 0};
+          auto stroke{begin->stroke};
+          auto weight{begin->strokeWeight * 0.5f};
 
           auto segment1 = (middle - start).normalized();
           Vec3f normal1{-segment1.y(), segment1.x(), 0};

@@ -8,6 +8,7 @@ namespace emp {
   namespace scenegraph {
     class Camera {
       public:
+      virtual ~Camera() {}
       virtual math::Mat4x4f getProjection() const = 0;
       virtual math::Mat4x4f getView() const = 0;
       virtual math::Region2D<float> getRegion() const = 0;
@@ -26,6 +27,7 @@ namespace emp {
       }
 
       public:
+      ~OrthoCamera() override {}
       template <class R = decltype(region)>
       OrthoCamera(R&& region)
         : region(std::forward<R>(region)),

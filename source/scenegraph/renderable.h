@@ -9,6 +9,7 @@ namespace emp {
 
     class Renderable {
       public:
+      virtual ~Renderable() {}
       virtual void renderRelative(const Camera& camera,
                                   const math::Mat4x4f& origin) = 0;
     };

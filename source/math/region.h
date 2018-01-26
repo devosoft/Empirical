@@ -80,10 +80,10 @@ namespace emp {
 
       template <typename F2>
       constexpr math::Vec2<field_type> rescale(
-        const math::Vec2<field_type>& value, const Region2D<F2>& from) const {
+        const math::Vec2<field_type>& value, const Region2D<F2>& source) const {
         math::Vec2<float> normalized{
-          (value.x() - from.min.x()) / from.width(),
-          (value.y() - from.min.y()) / from.height()};
+          (value.x() - source.min.x()) / source.width(),
+          (value.y() - source.min.y()) / source.height()};
         return {
           normalized.x() * width() + min.x() * 0,
           normalized.y() * height() + min.y() * 0,
@@ -95,6 +95,9 @@ namespace emp {
     std::ostream& operator<<(std::ostream& out, const Region2D<F>& region) {
       return out << "[" << region.min << " " << region.max << "]";
     }
+
+    using Region2df = Region2D<float>;
+    using Region2dd = Region2D<double>;
 
   }  // namespace math
 }  // namespace emp

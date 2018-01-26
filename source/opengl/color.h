@@ -5,19 +5,33 @@
 
 namespace emp {
   namespace opengl {
-    class Color : public math::Vec4f {
+    class Color {
       public:
-      using math::Vec4f::Vec4f;
+      float r, g, b, a;
 
-      constexpr auto red() const { return this->x(); }
-      constexpr auto green() const { return this->y(); }
-      constexpr auto blue() const { return this->z(); }
-      constexpr auto alpha() const { return this->w(); }
+      constexpr Color(float r = 0, float g = 0, float b = 0, float a = 1)
+        : r(r), g(g), b(b), a(a) {}
+
+      constexpr static Color red(float v = 1, float a = 1) {
+        return {v, 0, 0, a};
+      }
+      constexpr static Color green(float v = 1, float a = 1) {
+        return {0, v, 0, a};
+      }
+      constexpr static Color blue(float v = 1, float a = 1) {
+        return {0, 0, v, a};
+      }
+    };
+    template <>
+    struct VertexAttributes<Color> {
+      static constexpr auto size{VertexAttributeSize::Four};
+      static constexpr auto type{FloatingVertexAttributeType::Float};
     };
 
-    namespace colors {
-      constexpr Color Red{1, 0, 0, 0};
-    };
+    void setUniform(GLint uniform, const Color& value) {
+      glUniform4f(uniform, value.r, value.g, value.b, value.a);
+      utils::catchGlError();
+    }
   }  // namespace opengl
 }  // namespace emp
 
