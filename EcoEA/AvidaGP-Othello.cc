@@ -27,7 +27,7 @@ using othello_ai_t = std::function< size_t(emp::Othello & game) >;
 constexpr size_t POP_SIZE = 1000;
 constexpr size_t GENOME_SIZE = 100;
 constexpr size_t EVAL_TIME = 3500;
-constexpr size_t UPDATES = 2000;
+constexpr size_t UPDATES = 20000;
 constexpr size_t TOURNY_SIZE = 4;
 constexpr size_t BOARD_SIZE = 8;
 
@@ -64,7 +64,7 @@ int main(int argc, char* argv[]){
 
 
   std::string filename = "data/game_0.csv";
-  std::string otherfile = "../../../../data/game_0.csv";
+  std::string otherfile = "../../../data/game_0.csv";
 
   if (!FileExists(filename)){
       if (FileExists(otherfile)) filename = otherfile;
