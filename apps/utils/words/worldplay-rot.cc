@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
   for (size_t i = 0; i < file.size(); i++) {
     std::string test = file[i];
     Rot(test, rot);
-    if (emp::Has(words, test)) {
+    if (test.size() > 1 && emp::Has(words, test)) {
       std::cout << file[i] << " -> " << test << std::endl;
     }
   }
