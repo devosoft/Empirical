@@ -122,7 +122,9 @@ namespace emp {
     emp::vector<PtrInfo> id_info;                     ///< Associate IDs with pointer information.
 
     // Make PtrTracker a singleton.
-    PtrTracker() : ptr_id(), id_info() { ; }
+    PtrTracker() : ptr_id(), id_info() {
+      std::cout << "EMP_TRACK_MEM: Pointer tracking is active!\n";
+    }
     PtrTracker(const PtrTracker &) = delete;
     PtrTracker(PtrTracker &&) = delete;
     PtrTracker & operator=(const PtrTracker &) = delete;
