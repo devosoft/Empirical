@@ -4,7 +4,9 @@
 #include "attrs.h"
 #include "math/LinAlg.h"
 #include "opengl/color.h"
-#include "opengl/defaultShaders.h"
+#include "opengl/glcanvas.h"
+#include "opengl/glwrap.h"
+#include "opengl/shaders.h"
 #include "scales.h"
 #include "scenegraph/camera.h"
 #include "scenegraph/core.h"
@@ -13,22 +15,83 @@ namespace emp {
   namespace plot {
     class Line : public scenegraph::Child {
       private:
-      emp::opengl::shaders::SimpleVaryingColor shader;
+      struct __Shader {
+        opengl::ShaderProgram program;
+        opengl::Uniform model, view, projection;
+        opengl::VertexArrayObject vao;
+        struct point_t {
+          math::Vec3f position;
+          opengl::Color color;
+        };
+
+        __Shader(opengl::GLCanvas& canvas)
+          : program(canvas.makeShaderProgram(
+#ifdef EMSCRIPTEN
+              "precision mediump float;"
+#endif
+              R"glsl(
+                attribute vec3 position;
+                attribute vec4 color;
+
+                uniform mat4 model;
+                uniform mat4 view;
+                uniform mat4 projection;
+
+                varying vec4 fcolor;
+
+                void main()
+                {
+                    gl_Position = projection * view * model * vec4(position, 1.0);
+                    fcolor = color;
+                }
+            )glsl",
+#ifdef EMSCRIPTEN
+              "precision mediump float;"
+#endif
+              R"glsl(
+                  varying vec4 fcolor;
+
+                  void main()
+                  {
+                      gl_FragColor = fcolor;
+                  }
+              )glsl")),
+            model(program.uniform("model")),
+            view(program.uniform("view")),
+            projection(program.uniform("projection")),
+            vao(canvas.makeVAO()) {
+        }
+      } shader;
+      size_t activeBuffer = 0;
+      size_t maxElementCount[2]{0, 0};
+      opengl::BufferObject<opengl::BufferType::Array> verticiesBuffer;
+      opengl::BufferObject<opengl::BufferType::ElementArray> trianglesBuffer;
+      // emp::opengl::shaders::SimpleVaryingColor shader;
       size_t elementCount = 0;
 
       public:
-      Line(emp::opengl::GLCanvas& canvas) : shader(canvas) {}
+      Line(emp::opengl::GLCanvas& canvas)
+        : shader(canvas),
+          verticiesBuffer(canvas.makeBuffer<opengl::BufferType::Array>()),
+          trianglesBuffer(
+            canvas.makeBuffer<opengl::BufferType::ElementArray>()) {
+        verticiesBuffer.bind();
+        shader.vao.attr(
+          shader.program.attribute("position", &__Shader::point_t::position));
+        shader.vao.attr(
+          shader.program.attribute("color", &__Shader::point_t::color));
+      }
       virtual ~Line() {}
 
       void renderRelative(const scenegraph::Camera& camera,
                           const math::Mat4x4f& transform) {
         using namespace emp::math;
         if (elementCount > 0) {
-          shader.shader.use();
+          shader.program.use();
           shader.vao.bind();
 
           shader.model = transform * Mat4x4f::translation(0, 0);
-          shader.proj = camera.getProjection();
+          shader.projection = camera.getProjection();
           shader.view = camera.getView();
 
           glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_INT, 0);
@@ -39,7 +102,6 @@ namespace emp {
       void apply(DataIter, DataIter, Iter begin, Iter end) {
         using namespace emp::math;
         using namespace emp::opengl;
-        using namespace emp::opengl::shaders;
         using namespace emp::plot::attrs;
 
         // If there is nothing to show, the bail out
@@ -63,7 +125,7 @@ namespace emp {
         Vec3f normal{-segment.y(), segment.x(), 0};
 
         // Place the first two verticies into the list of vertices
-        std::vector<SimpleVaryingColor::point_t> verts{
+        std::vector<__Shader::point_t> verts{
           {start + normal * startStrokeWeight, startStroke},
           {start - normal * startStrokeWeight, startStroke}};
         std::vector<GLuint> triangles;
@@ -81,10 +143,8 @@ namespace emp {
 
           auto center{(normal1 + normal2).normalized() * middleStrokeWeight};
 
-          verts.push_back(
-            SimpleVaryingColor::point_t{middle + center, middleStroke});
-          verts.push_back(
-            SimpleVaryingColor::point_t{middle - center, middleStroke});
+          verts.push_back(__Shader::point_t{middle + center, middleStroke});
+          verts.push_back(__Shader::point_t{middle - center, middleStroke});
 
           triangles.push_back(i);
           triangles.push_back(i + 1);
@@ -107,10 +167,10 @@ namespace emp {
         segment = (middle - start).normalized();
         normal = {-segment.y(), segment.x(), 0};
 
-        verts.push_back(SimpleVaryingColor::point_t{
-          middle + normal * middleStrokeWeight, middleStroke});
-        verts.push_back(SimpleVaryingColor::point_t{
-          middle - normal * middleStrokeWeight, middleStroke});
+        verts.push_back(__Shader::point_t{middle + normal * middleStrokeWeight,
+                                          middleStroke});
+        verts.push_back(__Shader::point_t{middle - normal * middleStrokeWeight,
+                                          middleStroke});
         triangles.push_back(i);
         triangles.push_back(i + 1);
         triangles.push_back(i + 2);
@@ -119,12 +179,15 @@ namespace emp {
         triangles.push_back(i + 3);
         triangles.push_back(i + 1);
 
-        shader.vao.getBuffer<BufferType::Array>().set(verts,
-                                                      BufferUsage::DynamicDraw);
-        shader.vao.getBuffer<BufferType::ElementArray>().set(
-          triangles, BufferUsage::DynamicDraw);
-
         elementCount = triangles.size();
+        if (elementCount > maxElementCount) {
+          verticiesBuffer.set(verts, BufferUsage::DynamicDraw);
+          trianglesBuffer.set(triangles, BufferUsage::DynamicDraw);
+          maxElementCount = elementCount;
+        } else {
+          verticiesBuffer.subset(verts);
+          trianglesBuffer.subset(triangles);
+        }
       }
     };
   }  // namespace plot

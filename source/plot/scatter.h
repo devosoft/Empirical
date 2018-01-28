@@ -6,23 +6,87 @@
 #include "math/LinAlg.h"
 #include "math/consts.h"
 #include "opengl/color.h"
-#include "opengl/defaultShaders.h"
+#include "opengl/glcanvas.h"
+#include "opengl/glwrap.h"
+#include "opengl/shaders.h"
 #include "scales.h"
 #include "scenegraph/camera.h"
 #include "scenegraph/core.h"
 
 namespace emp {
   namespace plot {
+    namespace __shader {
+      using namespace opengl;
+      constexpr auto VertexShaderSource =
+#ifdef EMSCRIPTEN
+        "precision mediump float;"
+#endif
+        R"glsl(
+                attribute vec3 position;
+                uniform vec4 color;
+
+                uniform mat4 model;
+                uniform mat4 view;
+                uniform mat4 projection;
+
+                varying vec4 fcolor;
+
+                void main()
+                {
+                    gl_Position = projection * view * model * vec4(position, 1.0);
+                    fcolor = color;
+                }
+            )glsl";
+
+      constexpr auto FragmentShaderSource =
+#ifdef EMSCRIPTEN
+        "precision mediump float;"
+#endif
+        R"glsl(
+                  varying vec4 fcolor;
+
+                  void main()
+                  {
+                      gl_FragColor = fcolor;
+                  }
+              )glsl";
+
+      struct Shader {
+        ShaderProgram program;
+        Uniform color;
+        Uniform model;
+        Uniform view;
+        Uniform projection;
+        VertexArrayObject vao;
+
+        Shader(GLCanvas& canvas)
+          : program(canvas.makeShaderProgram(VertexShaderSource,
+                                             FragmentShaderSource)),
+            color(program.uniform("color")),
+            model(program.uniform("model")),
+            view(program.uniform("view")),
+            projection(program.uniform("projection")),
+            vao(canvas.makeVAO()) {
+          program.use();
+        }
+      };
+    }  // namespace __shader
 
     class Scatter : public scenegraph::Child {
       private:
-      emp::opengl::shaders::SimpleSolidColor shader;
+      __shader::Shader shader;
+      opengl::BufferObject<opengl::BufferType::Array> verticesBuffer;
+      opengl::BufferObject<opengl::BufferType::ElementArray> trianglesBuffer;
+
       size_t trianglesCount;
       std::vector<std::tuple<math::Mat4x4f, opengl::Color>> points;
 
       public:
       Scatter(emp::opengl::GLCanvas& canvas, size_t vertexCount = 4)
-        : shader(canvas) {
+        : shader(canvas),
+          verticesBuffer(canvas.makeBuffer<opengl::BufferType::Array>()),
+          trianglesBuffer(
+            canvas.makeBuffer<opengl::BufferType::ElementArray>()) {
         using namespace emp::opengl;
         using namespace emp::math;
         using namespace emp::plot::attrs;
@@ -44,12 +108,11 @@ namespace emp {
           triangles.push_back(i + 1);
           triangles.push_back(((i + 1) % vertexCount) + 1);
         }
-
-        shader.vao.getBuffer<BufferType::Array>().set(vertices,
-                                                      BufferUsage::StaticDraw);
-        shader.vao.getBuffer<BufferType::ElementArray>().set(
-          triangles, BufferUsage::StaticDraw);
+        verticesBuffer.set(vertices, BufferUsage::StaticDraw);
+        shader.vao.attr(shader.program.attribute<Vec3f>("position"));
+        trianglesBuffer.set(triangles, BufferUsage::StaticDraw);
       }
+
       virtual ~Scatter() {}
 
       void renderRelative(const scenegraph::Camera& camera,
@@ -57,12 +120,12 @@ namespace emp {
         using namespace emp::math;
         using namespace emp::opengl;
 
-        shader.shader.use();
+        shader.program.use();
         shader.vao.bind();
-        shader.vao.getBuffer<BufferType::Array>().bind();
-        shader.vao.getBuffer<BufferType::ElementArray>().bind();
+        verticesBuffer.bind();
+        trianglesBuffer.bind();
 
-        shader.proj = camera.getProjection();
+        shader.projection = camera.getProjection();
         shader.view = camera.getView();
 
         for (auto& pt : points) {

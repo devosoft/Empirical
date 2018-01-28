@@ -64,24 +64,21 @@ namespace emp {
       DynamicRead = GL_DYNAMIC_READ,
       DynamicCopy = GL_DYNAMIC_COPY
     };
+    namespace __impl {
+      GLuint boundBuffer = 0;
+    }
 
+    template <BufferType TYPE>
     class BufferObject {
       private:
-      bool hasValue;
-      GLuint handle;
-      BufferType type;
-      static GLuint boundBuffer;
+      GLuint handle = 0;
 
       public:
-      BufferObject(BufferType type) : hasValue(true), type(type) {
-        glGenBuffers(1, &handle);
-        utils::catchGlError();
-      }
+      BufferObject(GLuint handle) : handle(handle) {}
 
       BufferObject(const BufferObject&) = delete;
-      BufferObject(BufferObject&& other) noexcept
-        : hasValue(other.hasValue), handle(other.handle), type(other.type) {
-        other.hasValue = false;
+      BufferObject(BufferObject&& other) noexcept : handle(other.handle) {
+        other.handle = 0;
       }
 
       BufferObject& operator=(const BufferObject&) = delete;
@@ -89,11 +86,7 @@ namespace emp {
         if (this != &other) {
           destroy();
 
-          hasValue = other.hasValue;
-          handle = other.handle;
-          type = other.type;
-
-          other.hasValue = false;
+          std::swap(handle, other.handle);
         }
         return *this;
       }
@@ -101,115 +94,60 @@ namespace emp {
       ~BufferObject() { destroy(); }
 
       void destroy() {
-        if (hasValue) {
-          hasValue = false;
+        if (handle != 0) {
           glDeleteBuffers(1, &handle);
-          if (boundBuffer == handle) boundBuffer = 0;
+          if (__impl::boundBuffer == handle) __impl::boundBuffer = 0;
           utils::catchGlError();
         }
       }
 
-      template <typename T, std::size_t N>
-      void set(const T (&data)[N], BufferUsage usage) {
+      template <typename T>
+      void set(const T* data, std::size_t size, BufferUsage usage) {
         bind();
-        glBufferData(static_cast<GLenum>(type), sizeof(data), data,
+        glBufferData(static_cast<GLenum>(TYPE), size, data,
                      static_cast<GLenum>(usage));
         utils::catchGlError();
       }
 
+      template <typename T, std::size_t N>
+      void set(const T (&data)[N], BufferUsage usage) {
+        set(&data, sizeof(data), usage);
+      }
+
       template <typename T>
       void set(const std::vector<T>& data, BufferUsage usage) {
+        set(data.data(), sizeof(T) * data.size(), usage);
+      }
+
+      template <typename T>
+      void subset(const T* data, std::size_t size) {
         bind();
-        glBufferData(static_cast<GLenum>(type), sizeof(T) * data.size(),
-                     data.data(), static_cast<GLenum>(usage));
+        glBufferSubData(static_cast<GLenum>(TYPE), 0, size, data);
         utils::catchGlError();
       }
 
+      template <typename T, std::size_t N>
+      void subset(const T (&data)[N]) {
+        subset(&data, sizeof(data));
+      }
+
+      template <typename T>
+      void subset(const std::vector<T>& data) {
+        subset(data.data(), sizeof(T) * data.size());
+      }
+
       BufferObject& bind() {
-        if (boundBuffer != handle) {
-          glBindBuffer(static_cast<GLenum>(type), handle);
+        if (__impl::boundBuffer != handle) {
+          glBindBuffer(static_cast<GLenum>(TYPE), handle);
           utils::catchGlError();
-          boundBuffer = handle;
+          __impl::boundBuffer = handle;
         }
 
         return *this;
       }
-    };
 
-    GLuint BufferObject::boundBuffer = 0;
-
-    class VertexArrayObject {
-      private:
-      static GLuint boundVAO;
-      bool hasValue = true;
-      GLuint handle;
-      std::unordered_map<BufferType, BufferObject> buffers;
-
-      friend class VertexArrayObjectConfigurator;
-
-      explicit VertexArrayObject(
-        GLuint handle, std::unordered_map<BufferType, BufferObject>&& buffers)
-        : hasValue(true), handle(handle), buffers(std::move(buffers)) {}
-
-      public:
-      VertexArrayObject(const VertexArrayObject&) = delete;
-      VertexArrayObject(VertexArrayObject&& other)
-        : handle(other.handle), buffers(std::move(other.buffers)) {
-        other.hasValue = false;
-      }
-
-      VertexArrayObject& operator=(const VertexArrayObject&) = delete;
-      VertexArrayObject& operator=(VertexArrayObject&& other) {
-        if (this != &other) {
-          destoy();
-
-          hasValue = other.hasValue;
-          handle = other.handle;
-          other.hasValue = false;
-
-          buffers = std::move(other.buffers);
-        }
-        return *this;
-      }
-
-      ~VertexArrayObject() { destoy(); }
-
-      void destoy() {
-        if (hasValue) {
-          unbind();
-          glDeleteVertexArrays(1, &handle);
-          hasValue = false;
-        }
-      }
-
-      void bind() {
-        emp_assert(hasValue);
-        if (boundVAO != handle) {
-          glBindVertexArray(handle);
-          boundVAO = handle;
-        }
-      }
-
-      void unbind() {
-        emp_assert(hasValue);
-        if (boundVAO == handle) {
-          glBindVertexArray(0);
-          boundVAO = 0;
-        }
-      }
-
-      operator bool() const { return hasValue; }
+      operator bool() const { return handle != 0; }
       operator GLuint() const { return handle; }
-
-      template <BufferType TYPE>
-      BufferObject& getBuffer() {
-        return buffers.at(TYPE);
-      }
-
-      template <BufferType TYPE>
-      const BufferObject& getBuffer() const {
-        return buffers.at(TYPE);
-      }
     };
 
     class VertexAttribute {
@@ -284,62 +222,70 @@ namespace emp {
     template <>
     void applyAll() {}
 
-    GLuint VertexArrayObject::boundVAO = 0;
-
-    class VertexArrayObjectConfigurator {
+    class VertexArrayObject {
       private:
-      std::unordered_map<BufferType, BufferObject> buffers;
-      bool hasValue = true;
-      GLuint handle;
+      static GLuint boundVAO;
+      GLuint handle = 0;
 
       public:
-      VertexArrayObjectConfigurator() {
+      explicit VertexArrayObject() {
         glGenVertexArrays(1, &handle);
         utils::catchGlError();
-
-        glBindVertexArray(handle);
-        utils::catchGlError();
-        VertexArrayObject::boundVAO = handle;
       }
 
-      VertexArrayObjectConfigurator(const VertexArrayObjectConfigurator&) =
-        delete;
-      VertexArrayObjectConfigurator(VertexArrayObjectConfigurator&&) = delete;
-      VertexArrayObjectConfigurator& operator=(
-        const VertexArrayObjectConfigurator&) = delete;
-      VertexArrayObjectConfigurator& operator=(
-        VertexArrayObjectConfigurator&&) = delete;
+      explicit VertexArrayObject(GLuint handle) : handle(handle) {}
+      VertexArrayObject(const VertexArrayObject&) = delete;
+      VertexArrayObject(VertexArrayObject&& other) : handle(other.handle) {}
 
-      ~VertexArrayObjectConfigurator() { emp_assert(!hasValue); }
+      VertexArrayObject& operator=(const VertexArrayObject&) = delete;
+      VertexArrayObject& operator=(VertexArrayObject&& other) {
+        if (this != &other) {
+          destoy();
+          std::swap(handle, other.handle);
+        }
+        return *this;
+      }
 
-      operator GLuint() const {
-        emp_assert(hasValue);
-        return handle;
+      ~VertexArrayObject() { destoy(); }
+
+      void destoy() {
+        if (handle != 0) {
+          unbind();
+          glDeleteVertexArrays(1, &handle);
+          handle = 0;
+        }
+      }
+
+      void bind() {
+        emp_assert(handle != 0);
+        if (boundVAO != handle) {
+          glBindVertexArray(handle);
+          boundVAO = handle;
+        }
+      }
+
+      void unbind() {
+        emp_assert(handle != 0);
+        if (boundVAO == handle) {
+          glBindVertexArray(0);
+          boundVAO = 0;
+        }
       }
 
       template <typename... T>
-      VertexArrayObjectConfigurator& with(BufferType bufferType,
-                                          T&&... vertexAttributes) {
-        emp_assert(hasValue);
-        emp_assert(buffers.find(bufferType) == buffers.end());
-
-        // Create a new buffer. This also binds the buffer to be active
-        auto& buffer = buffers.emplace(bufferType, bufferType).first->second;
-        buffer.bind();
-
+      VertexArrayObject& attr(T&&... vertexAttributes) {
+        bind();
         applyAll(std::forward<T>(vertexAttributes)...);
 
         return *this;
       }
 
-      VertexArrayObject finish() {
-        emp_assert(hasValue);
-        hasValue = false;
-        return VertexArrayObject(handle, std::move(buffers));
-      }
-
-      operator VertexArrayObject() { return finish(); }
+      operator bool() const { return handle != 0; }
+      operator GLuint() const { return handle; }
     };
+
+    GLuint VertexArrayObject::boundVAO = 0;
+
   }  // namespace opengl
 }  // namespace emp
 #endif

@@ -298,12 +298,18 @@ namespace emp {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_MULTISAMPLE);
+        auto frameStart = std::chrono::system_clock::now();
 
         while (!glfwWindowShouldClose(window)) {
+          frameStart = std::chrono::system_clock::now();
           onUpdate(*this);
-
           glfwSwapBuffers(window);
           glfwPollEvents();
+          auto frameEnd = std::chrono::system_clock::now();
+          std::cout << std::chrono::duration_cast<std::chrono::microseconds>(
+                         frameEnd - frameStart)
+                         .count()
+                    << std::endl;
         }
 #endif
       }
@@ -316,13 +322,18 @@ namespace emp {
 #endif
       }
 
-      template <typename... Args>
-      VertexArrayObjectConfigurator makeVAO(Args&&... args) const {
-        return {std::forward<Args>(args)...};
-      }
+      VertexArrayObject makeVAO() { return VertexArrayObject(); }
       template <typename... Args>
       ShaderProgram makeShaderProgram(Args&&... args) const {
         return {std::forward<Args>(args)...};
+      }
+
+      template <BufferType TYPE>
+      BufferObject<TYPE> makeBuffer() {
+        GLuint handle;
+        glGenBuffers(1, &handle);
+        utils::catchGlError();
+        return BufferObject<TYPE>(handle);
       }
 
       auto getWidth() const { return width; }

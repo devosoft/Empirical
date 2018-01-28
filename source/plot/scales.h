@@ -3,7 +3,6 @@
 
 #include "attrs.h"
 #include "math/LinAlg.h"
-#include "opengl/defaultShaders.h"
 #include "scenegraph/camera.h"
 
 namespace emp {
@@ -12,9 +11,12 @@ namespace emp {
     class Scale {
       public:
       math::Region2df screenSpace;
+      math::Vec2f padding;
 
-      template <class... U>
-      constexpr Scale(U&&... args) : screenSpace(std::forward<U>(args)...) {}
+      template <class S, class P = math::Vec2f>
+      constexpr Scale(S&& screen, P&& padding = {0, 0})
+        : screenSpace(std::forward<S>(screen)),
+          padding(std::forward<P>(padding)) {}
 
       template <class DataIter, class PropsIter>
       auto apply(DataIter dbegin, DataIter dend, PropsIter pbegin,
@@ -25,8 +27,10 @@ namespace emp {
         for (auto iter = pbegin; iter != pend; ++iter) {
           dataSpace.include(XY::get(*iter));
         }
-        return xyScaled([&dataSpace, this](const auto& p) {
-                 return screenSpace.rescale(XY::get(p), dataSpace);
+        auto borderedSpace{screenSpace};
+        borderedSpace.addBorder(padding);
+        return xyScaled([&dataSpace, &borderedSpace](const auto& p) {
+                 return borderedSpace.rescale(XY::get(p), dataSpace);
                })
           .applyToRange(pbegin, pend);
       }
