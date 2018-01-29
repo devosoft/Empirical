@@ -29,6 +29,8 @@ namespace emp {
   template <typename TARGET_T>
   class BaseTrait {
   public:
+    virtual ~BaseTrait() { ; }
+
     virtual std::string EvalString(TARGET_T & target) = 0;
     virtual double EvalValue(TARGET_T & target) = 0;
 
