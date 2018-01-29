@@ -6,7 +6,7 @@ debug: AvidaGP-Othello.cc
 	g++ AvidaGP-Othello.cc -g --std=c++14 -I ../source -o othelloDB
 
 clean:
-	rm *.o othelloGP othelloDB
+	rm -f *.o othelloGP othelloDB
 
 compete: compete.cc
 	g++ compete.cc -O3 -DNDEBUG --std=c++14 -I ../source -o compete
