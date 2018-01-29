@@ -62,7 +62,7 @@ namespace emp {
   /// @param tourny_count How many tournaments should be run? (with replacement of organisms)
   template<typename ORG>
   void TournamentSelect(World<ORG> & world, size_t t_size, size_t tourny_count=1) {
-    emp_assert(t_size > 0 && t_size <= world.GetNumOrgs(), t_size, world.GetNumOrgs());
+    emp_assert(t_size > 0, t_size, world.GetNumOrgs());
     emp_assert(tourny_count > 0);
 
     emp::vector<size_t> entries;
@@ -242,7 +242,7 @@ namespace emp {
 
       // std::cout << depth << "abotu to calc used" <<std::endl;
       emp::vector<size_t> used = Slice(order, 0, depth+1);
-      // If the world has a TriggerOnLexicaseSelect method, call it
+      // If the world has a OnLexicaseSelect method, call it
       // std::cout << depth << " " << to_string(used) << std::endl;
       TriggerOnLexicaseSelect(world, used, repro_id);
       world.DoBirth( world.GetGenomeAt(repro_id), repro_id );

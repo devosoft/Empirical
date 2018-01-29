@@ -137,6 +137,7 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; ///< A set of all dead, ancestral taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  ///< A set of all dead taxa w/o descendants.
 
+    Signal<void(Ptr<taxon_t>)> on_new_sig; ///< Trigger when any organism is pruned from tree
     Signal<void(Ptr<taxon_t>)> on_prune_sig; ///< Trigger when any organism is pruned from tree
 
     // Stats about active taxa... (totals are across orgs, not taxa)
@@ -194,6 +195,9 @@ namespace emp {
 
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetActive() const { return active_taxa; }
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetAncestors() const { return ancestor_taxa; }
+
+
+    SignalKey OnNew(const std::function<void(Ptr<taxon_t>)> & fun) { return on_new_sig.AddAction(fun); }
 
     /// Privide a function for Systematics to call each time a taxon is about to be pruned.
     /// Trigger:  Taxon is about to be killed
@@ -560,12 +564,14 @@ namespace emp {
         mrca = nullptr;                                            // ...nix old common ancestor
       }
       cur_taxon = NewPtr<taxon_t>(++next_id, info, parent_taxon);  // Build new taxon.
+      on_new_sig.Trigger(cur_taxon);
       if (store_active) active_taxa.insert(cur_taxon);             // Store new taxon.
       if (parent_taxon) parent_taxon->AddOffspring();              // Track tree info.
+
+      cur_taxon->SetOriginationTime(update);
     }
 
     cur_taxon->AddOrg();                    // Record the current organism in its taxon.
-    cur_taxon->SetOriginationTime(update);
     total_depth += cur_taxon->GetDepth();   // Track the total depth (for averaging)
     return cur_taxon;                       // Return the taxon used.
   }
