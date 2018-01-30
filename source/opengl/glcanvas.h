@@ -301,15 +301,14 @@ namespace emp {
         auto frameStart = std::chrono::system_clock::now();
 
         while (!glfwWindowShouldClose(window)) {
-          frameStart = std::chrono::system_clock::now();
-          onUpdate(*this);
-          glfwSwapBuffers(window);
+          auto frameCurrent = std::chrono::system_clock::now();
+          if (frameCurrent - frameStart >=
+              std::chrono::milliseconds((int)(1000.f / fps))) {
+            onUpdate(*this);
+            glfwSwapBuffers(window);
+            frameStart = std::chrono::system_clock::now();
+          }
           glfwPollEvents();
-          auto frameEnd = std::chrono::system_clock::now();
-          std::cout << std::chrono::duration_cast<std::chrono::microseconds>(
-                         frameEnd - frameStart)
-                         .count()
-                    << std::endl;
         }
 #endif
       }

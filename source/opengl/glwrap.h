@@ -52,6 +52,40 @@ namespace emp {
           return out << "GL_UNIFORM_BUFFER";
       }
     }
+#ifndef EMSCRIPTEN
+    class BufferAccess {
+      private:
+      GLenum access;
+
+      constexpr BufferAccess(GLenum access) : access(access) {}
+
+      public:
+      static constexpr BufferAccess read() { return {GL_MAP_READ_BIT}; };
+      static constexpr BufferAccess write() { return {GL_MAP_WRITE_BIT}; };
+
+      BufferAccess& invalidatesRange(bool set = true) {
+        access |= GL_MAP_INVALIDATE_RANGE_BIT & set;
+        return *this;
+      }
+
+      BufferAccess& invalidatesBuffer(bool set = true) {
+        access |= GL_MAP_INVALIDATE_BUFFER_BIT & set;
+        return *this;
+      }
+
+      BufferAccess& explicitFlush(bool set = true) {
+        access |= GL_MAP_FLUSH_EXPLICIT_BIT & set;
+        return *this;
+      }
+
+      BufferAccess& unsynchronized(bool set = true) {
+        access |= GL_MAP_UNSYNCHRONIZED_BIT & set;
+        return *this;
+      }
+
+      explicit operator GLenum() const { return access; }
+    };
+#endif
 
     enum class BufferUsage : GLenum {
       StreamDraw = GL_STREAM_DRAW,
@@ -64,6 +98,7 @@ namespace emp {
       DynamicRead = GL_DYNAMIC_READ,
       DynamicCopy = GL_DYNAMIC_COPY
     };
+
     namespace __impl {
       GLuint boundBuffer = 0;
     }
@@ -102,7 +137,7 @@ namespace emp {
       }
 
       template <typename T>
-      void set(const T* data, std::size_t size, BufferUsage usage) {
+      void init(const T* data, std::size_t size, BufferUsage usage) {
         bind();
         glBufferData(static_cast<GLenum>(TYPE), size, data,
                      static_cast<GLenum>(usage));
@@ -110,19 +145,19 @@ namespace emp {
       }
 
       template <typename T, std::size_t N>
-      void set(const T (&data)[N], BufferUsage usage) {
-        set(&data, sizeof(data), usage);
+      void init(const T (&data)[N], BufferUsage usage) {
+        init(&data, sizeof(data), usage);
       }
 
       template <typename T>
-      void set(const std::vector<T>& data, BufferUsage usage) {
-        set(data.data(), sizeof(T) * data.size(), usage);
+      void init(const std::vector<T>& data, BufferUsage usage) {
+        init(data.data(), sizeof(T) * data.size(), usage);
       }
 
       template <typename T>
-      void subset(const T* data, std::size_t size) {
+      void subset(const T* data, std::size_t size, std::size_t offset = 0) {
         bind();
-        glBufferSubData(static_cast<GLenum>(TYPE), 0, size, data);
+        glBufferSubData(static_cast<GLenum>(TYPE), offset, size, data);
         utils::catchGlError();
       }
 
@@ -135,6 +170,29 @@ namespace emp {
       void subset(const std::vector<T>& data) {
         subset(data.data(), sizeof(T) * data.size());
       }
+#ifndef EMSCRIPTEN
+      template <class T>
+      T* map(std::size_t offset, std::size_t length, BufferAccess access) {
+        bind();
+        auto buffer = static_cast<T*>(
+          glMapBufferRange(static_cast<GLenum>(TYPE), offset, length,
+                           static_cast<GLenum>(access)));
+        utils::catchGlError();
+        return buffer;
+      }
+
+      template <class T>
+      T* map(std::size_t length, BufferAccess access) {
+        return map<T>(0, length, access);
+      }
+
+      bool unmap() {
+        bind();
+        auto unmap = glUnmapBuffer(static_cast<GLenum>(TYPE));
+        utils::catchGlError();
+        return unmap;
+      }
+#endif
 
       BufferObject& bind() {
         if (__impl::boundBuffer != handle) {
@@ -149,6 +207,17 @@ namespace emp {
       operator bool() const { return handle != 0; }
       operator GLuint() const { return handle; }
     };
+
+    template <class F, BufferType... TYPES>
+    void mapBuffers(F&& callback, BufferAccess access,
+                    BufferObject<TYPES>&... buffers) {
+      // Map all the buffers and send them into a callback to use them
+      std::forward<F>(callback)(buffers.map(access)...);
+      // Now that we are done with the buffers, unmap them
+      // Hack to get around not having the c++17 fold expressions
+      auto _ = [](auto&&...) {};
+      _(buffers.unmap()...);
+    }
 
     class VertexAttribute {
       private:
@@ -235,7 +304,9 @@ namespace emp {
 
       explicit VertexArrayObject(GLuint handle) : handle(handle) {}
       VertexArrayObject(const VertexArrayObject&) = delete;
-      VertexArrayObject(VertexArrayObject&& other) : handle(other.handle) {}
+      VertexArrayObject(VertexArrayObject&& other) : handle(other.handle) {
+        other.handle = 0;
+      }
 
       VertexArrayObject& operator=(const VertexArrayObject&) = delete;
       VertexArrayObject& operator=(VertexArrayObject&& other) {
