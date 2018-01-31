@@ -38,10 +38,10 @@ namespace emp {
     });
 
     // Neighbors are everyone in the same pool.
-    fun_get_neighbor = [this](size_t id) {
-      emp_assert(random_ptr);
-      return (id / size_x) * size_x + random_ptr->GetUInt(size_x);
-    };
+    world.SetGetNeighborFun( [world,pool_size](size_t id) {
+      const size_t pool_start = (id / pool_size) * pool_size;
+      return pool_start + world.GetRandom().GetUint(pool_size);
+    });
 
     if (synchronous_gen) {
       // Place births in the next open spot in the new pool (or randomly if full!)
