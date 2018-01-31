@@ -108,9 +108,10 @@ namespace emp {
           triangles.push_back(i + 1);
           triangles.push_back(((i + 1) % vertexCount) + 1);
         }
-        verticesBuffer.set(vertices, BufferUsage::StaticDraw);
+        shader.vao.bind();
+        verticesBuffer.init(vertices, BufferUsage::StaticDraw);
         shader.vao.attr(shader.program.attribute<Vec3f>("position"));
-        trianglesBuffer.set(triangles, BufferUsage::StaticDraw);
+        trianglesBuffer.init(triangles, BufferUsage::StaticDraw);
       }
 
       virtual ~Scatter() {}
@@ -122,8 +123,6 @@ namespace emp {
 
         shader.program.use();
         shader.vao.bind();
-        verticesBuffer.bind();
-        trianglesBuffer.bind();
 
         shader.projection = camera.getProjection();
         shader.view = camera.getView();

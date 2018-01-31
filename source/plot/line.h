@@ -58,28 +58,32 @@ namespace emp {
               )glsl")),
             model(program.uniform("model")),
             view(program.uniform("view")),
-            projection(program.uniform("projection")),
-            vao(canvas.makeVAO()) {
+            projection(program.uniform("projection")) {
         }
       } shader;
-      size_t activeBuffer = 0;
-      size_t maxElementCount[2]{0, 0};
+      opengl::VertexArrayObject vao;
+
       opengl::BufferObject<opengl::BufferType::Array> verticiesBuffer;
       opengl::BufferObject<opengl::BufferType::ElementArray> trianglesBuffer;
-      // emp::opengl::shaders::SimpleVaryingColor shader;
+      size_t maxElementCount = 0;
+
       size_t elementCount = 0;
 
       public:
       Line(emp::opengl::GLCanvas& canvas)
         : shader(canvas),
+          vao(canvas.makeVAO()),
           verticiesBuffer(canvas.makeBuffer<opengl::BufferType::Array>()),
           trianglesBuffer(
             canvas.makeBuffer<opengl::BufferType::ElementArray>()) {
+        using namespace emp::opengl;
+
+        vao.bind();
         verticiesBuffer.bind();
-        shader.vao.attr(
+        vao.attr(
           shader.program.attribute("position", &__Shader::point_t::position));
-        shader.vao.attr(
-          shader.program.attribute("color", &__Shader::point_t::color));
+        vao.attr(shader.program.attribute("color", &__Shader::point_t::color));
+        trianglesBuffer.bind();
       }
       virtual ~Line() {}
 
@@ -88,7 +92,9 @@ namespace emp {
         using namespace emp::math;
         if (elementCount > 0) {
           shader.program.use();
-          shader.vao.bind();
+          vao.bind();
+          verticiesBuffer.bind();
+          trianglesBuffer.bind();
 
           shader.model = transform * Mat4x4f::translation(0, 0);
           shader.projection = camera.getProjection();
@@ -104,7 +110,7 @@ namespace emp {
         using namespace emp::opengl;
         using namespace emp::plot::attrs;
 
-        // If there is nothing to show, the bail out
+        // If there is nothing to show, then bail out
         elementCount = 0;
         if (begin == end) return;
 
@@ -181,12 +187,24 @@ namespace emp {
 
         elementCount = triangles.size();
         if (elementCount > maxElementCount) {
-          verticiesBuffer.set(verts, BufferUsage::DynamicDraw);
-          trianglesBuffer.set(triangles, BufferUsage::DynamicDraw);
+          verticiesBuffer.init(verts, BufferUsage::DynamicDraw);
+          trianglesBuffer.init(triangles, BufferUsage::DynamicDraw);
           maxElementCount = elementCount;
         } else {
-          verticiesBuffer.subset(verts);
-          trianglesBuffer.subset(triangles);
+#ifdef EMSCRIPTEN
+          group.verticiesBuffer.subset(verts);
+          group.trianglesBuffer.subset(triangles);
+#else
+          auto mappedVerticiesBuffer = verticiesBuffer.map<__Shader::point_t>(
+            verts.size(), BufferAccess::write().invalidatesBuffer());
+          std::copy(verts.begin(), verts.end(), mappedVerticiesBuffer);
+          verticiesBuffer.unmap();
+
+          auto mappedTrianglesBuffer = trianglesBuffer.map<GLuint>(
+            triangles.size(), BufferAccess::write().invalidatesBuffer());
+          std::copy(triangles.begin(), triangles.end(), mappedTrianglesBuffer);
+          trianglesBuffer.unmap();
+#endif
         }
       }
     };
