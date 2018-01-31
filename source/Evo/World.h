@@ -603,7 +603,7 @@ namespace emp {
     // --- RANDOM FUNCTIONS ---
 
     /// Return a reference to the random number generator currently being used by world.
-    Random & GetRandom() { return *random_ptr; }
+    Random & GetRandom() { emp_assert(random_ptr); return *random_ptr; }
 
     /// Setup a new random number generator created elsewhere.
     void SetRandom(Random & r);
@@ -611,8 +611,14 @@ namespace emp {
     /// Create a new random number generator (that World will manage)
     void NewRandom(int seed=-1);
 
-    /// Get the position any cell, at random.
-    size_t GetRandomCellID() { return random_ptr->GetUInt(pop.size()); }
+    /// Get the position a cell, at random.
+    size_t GetRandomCellID() { return GetRandom().GetUInt(pop.size()); }
+
+    /// Get the position a cell in a range, at random.
+    size_t GetRandomCellID(size_t min_id, size_t max_id) {
+      emp_assert(min_id < max_id && max_id <= pop.size());
+      return min_id + GetRandom().GetUInt(max_id - min_id);
+    }
 
     /// Use the specified function to get a neighbor (if not set, assume well mixed).
     size_t GetRandomNeighborID(size_t id) { return fun_get_neighbor(id); }
