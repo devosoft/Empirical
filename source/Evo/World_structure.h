@@ -24,20 +24,20 @@ namespace emp {
   template<typename ORG>
   void World<ORG>::SetPools(World<ORG> & world, size_t num_pools,
                             size_t pool_size, bool synchronous_gen=false) {
-    world.Resize(num_pools, pool_size);
+    world.Resize(pool_size, num_pools);
     world.MarkSynchronous(synchronous_gen);
     world.MarkSpaceStructured(true).MarkPhenoStructured(false);
 
     // -- Setup functions --
     // Inject in a empty pool -or- randomly if none empty
-    fun_add_inject = [this](Ptr<ORG> new_org) {
-      for (size_t id = 0; id < pop.size(); id += size_x) {
-        if (pop[id] == nullptr) return AddOrgAt(new_org, id);
+    world.SetAddInjectFun( [world,pool_size](Ptr<ORG> new_org) {
+      for (size_t id = 0; id < world.GetSize(); id += pool_size) {
+        if (world.IsOccupied(id) == false) return world.AddOrgAt(new_org, id);
       }
-      return AddOrgAt(new_org, GetRandomCellID());
-    };
+      return world.AddOrgAt(new_org, world.GetRandomCellID());
+    });
 
-    // neighbors are everyone in the same pool.
+    // Neighbors are everyone in the same pool.
     fun_get_neighbor = [this](size_t id) {
       emp_assert(random_ptr);
       return (id / size_x) * size_x + random_ptr->GetUInt(size_x);
