@@ -10,13 +10,60 @@
 #include "../source/hardware/OthelloGP.h"
 #include "../source/hardware/InstLib.h"
 
-using move_t = size_t;
-using othello_ai_t = std::function<size_t(emp::Othello &game)>;
+using othello_ai_t = std::function< size_t(emp::Othello & game) >;
 
-std::vector<size_t> GetValidMoves(emp::Othello game, size_t board_size)
+size_t POP_SIZE = 1000;
+size_t GENOME_SIZE = 100;
+size_t EVAL_TIME = 3500;
+size_t UPDATES = 20000;
+size_t TIME = 1;
+
+constexpr size_t TOURNY_SIZE = 4;
+constexpr size_t BOARD_SIZE = 8;
+
+
+bool FileExists(const std::string &filename)
+{
+  std::ifstream ifile(filename.c_str());
+  return (bool)ifile;
+}
+
+bool LoadConfig(std::string path = "run.cfg")
+{
+  std::ifstream cfg_file;
+  std::string param;
+  size_t setting;
+  emp::vector<size_t> setting_list;
+
+  if (FileExists(path))
+  {
+    cfg_file.open(path);
+    while (cfg_file >> param){
+      cfg_file >> setting;
+      setting_list.push_back(setting);
+    }
+
+    if (setting_list.size() != 5)
+    {
+      std::cout<<"Invalid Config file - Invalid arg count"<<std::endl;
+      exit(-1);
+    }
+
+    POP_SIZE = setting_list[0];
+    EVAL_TIME = setting_list[1];
+    GENOME_SIZE = setting_list[2];
+    UPDATES = setting_list[3];
+    TIME = setting_list[4];
+
+    cfg_file.close();
+  }
+  return 0;
+}
+
+std::vector<size_t> GetValidMoves(emp::Othello game)
 {
   std::vector<size_t> moves;
-  for (size_t i = 0; i < board_size * board_size; i++)
+  for (size_t i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
   {
     if (game.IsMoveValid(2, i))
       moves.push_back(i);
@@ -25,7 +72,7 @@ std::vector<size_t> GetValidMoves(emp::Othello game, size_t board_size)
 }
 
 // Determine the next move of an AvidaGP player.
-size_t EvalMove(emp::Othello &game, emp::AvidaGP &org, size_t eval_time)
+size_t EvalMove(emp::Othello &game, emp::AvidaGP &org)
 {
 
   // Setup the hardware with proper inputs.
@@ -48,7 +95,7 @@ size_t EvalMove(emp::Othello &game, emp::AvidaGP &org, size_t eval_time)
   }
 
   // Run the code.
-  org.Process(eval_time);
+  org.Process(EVAL_TIME);
 
   // Determine the chosen move.
   size_t best_move = 0; // TODO: Shoul the have to make a move?
@@ -66,11 +113,10 @@ size_t EvalMove(emp::Othello &game, emp::AvidaGP &org, size_t eval_time)
 
 // Setup the fitness function for a whole game.
 double EvalGame(emp::Random& random, othello_ai_t &player1, othello_ai_t &player2, 
-                size_t board_size, size_t first_player = 1, 
-                bool verbose = false, bool rand_player = 0)
+                size_t first_player=1, bool verbose=false, bool rand_player=0)
 {
 
-  emp::Othello game(board_size, first_player); // Check to see if Black first
+  emp::Othello game(BOARD_SIZE, first_player); // Check to see if Black first
 
   size_t round = 0;
   double score;
@@ -85,7 +131,7 @@ double EvalGame(emp::Random& random, othello_ai_t &player1, othello_ai_t &player
 
     if (rand_player && player == 2)
     {
-      std::vector<size_t> validMoves = GetValidMoves(game, board_size);
+      std::vector<size_t> validMoves = GetValidMoves(game);
       int move_idx = random.GetInt(0, validMoves.size());
       best_move = validMoves[move_idx];
     }
@@ -126,7 +172,7 @@ double EvalGame(emp::Random& random, othello_ai_t &player1, othello_ai_t &player
       {
         best_move++;
         //if (verbose) {std::cout<<"Player: "<<best_move<<"  "<<player<<std::endl;}
-        if (best_move >= board_size * board_size)
+        if (best_move >= game.GetBoardSize() * game.GetBoardSize())
         {
           best_move = 0;
         }
@@ -163,12 +209,11 @@ double EvalGame(emp::Random& random, othello_ai_t &player1, othello_ai_t &player
 
 // Build wrappers for AvidaGP
 double EvalGame(emp::Random &random, emp::AvidaGP &org0, emp::AvidaGP &org1,
-                size_t board_size, size_t eval_time, size_t first_player = 1,
-                bool verbose = false, bool rand_player = 0)
+                size_t first_player=1, bool verbose=false, bool rand_player=0)
 {
-    othello_ai_t org_fun0 = [&org0, eval_time](emp::Othello &game) { return EvalMove(game, org0, eval_time); };
-    othello_ai_t org_fun1 = [&org1, eval_time](emp::Othello &game) { return EvalMove(game, org1, eval_time); };
-    return EvalGame(random, org_fun0, org_fun1, board_size, first_player, verbose, rand_player);
+    othello_ai_t org_fun0 = [&org0](emp::Othello &game) { return EvalMove(game, org0); };
+    othello_ai_t org_fun1 = [&org1](emp::Othello &game) { return EvalMove(game, org1); };
+    return EvalGame(random, org_fun0, org_fun1, first_player, verbose, rand_player);
 };
 
 

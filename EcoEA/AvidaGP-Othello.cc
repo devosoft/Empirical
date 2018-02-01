@@ -19,38 +19,20 @@
 #include "../source/Evo/World.h"
 #include "../../eco-ea-mancala/source/TestcaseSet.h"
 
-using move_t = size_t;
 using input_t = emp::array<int, 64>;
 using output_t = std::set<int>;
-using othello_ai_t = std::function< size_t(emp::Othello & game) >;
-
-constexpr size_t POP_SIZE = 1000;
-constexpr size_t GENOME_SIZE = 100;
-constexpr size_t EVAL_TIME = 3500;
-constexpr size_t UPDATES = 20000;
-constexpr size_t TOURNY_SIZE = 4;
-constexpr size_t BOARD_SIZE = 8;
-
-
-bool FileExists(const std::string& filename) {
-  std::ifstream ifile(filename.c_str());
-  return (bool)ifile;
-}
 
 int main(int argc, char* argv[]){
 
   std::chrono::high_resolution_clock::time_point start_s = std::chrono::high_resolution_clock::now();
-  // POP_SIZE = std::atoi( argv[1] );
-  // EVAL_TIME = std::atoi( argv[2] ); // TODO Config files
-  // UPDATES = std::atoi( argv[3] );
-  long time = std::atof( argv[2] ) * 60 * 60;
-  size_t seed = 0;
+
   std::string selection = argv[1];
-  // if (argc == 5) seed = std::atoi( argv[4] );
-  
+  size_t seed = std::atoi(argv[2]);
+  LoadConfig();
 
   std::cout<<"POP_SIZE: "<<POP_SIZE<<" EVAL_TIME: "<<EVAL_TIME
-           <<" UPDATES: "<<UPDATES<<std::endl;
+           <<" UPDATES: "<<UPDATES<<" SEED: "<<seed
+           <<" SELECTION: "<<selection<<std::endl;
 
   // Setting up the world
   emp::Random random;
@@ -191,7 +173,7 @@ int main(int argc, char* argv[]){
 
         if (i > 2) rand_player = 1;
 
-        fit_list.push_back( EvalGame(random, org, rand_org1, BOARD_SIZE, EVAL_TIME, first_player,0, rand_player) );
+        fit_list.push_back(EvalGame(random, org, rand_org1, first_player, false, rand_player));
       }
       std::sort(fit_list.begin(), fit_list.end());
       return fit_list[1]; // Return the median
@@ -228,7 +210,7 @@ int main(int argc, char* argv[]){
 
       for (size_t choice : choices){
         game.SetBoard(tests[choice].first);
-        int move = EvalMove(game, org, EVAL_TIME);
+        int move = EvalMove(game, org);
 
         for (int i = 0; i < correct_choices.size(); i++) { //TODO: Make this into a function?
           if (correct_choices[i][choice].find(move) != correct_choices[i][choice].end()){
@@ -261,7 +243,7 @@ int main(int argc, char* argv[]){
 
     std::chrono::high_resolution_clock::time_point stop_s = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::seconds>( stop_s - start_s ).count();
-    if (duration > time){ break; }
+    if (duration > TIME * 60 * 60){ break; }
   }
 
   //EvalGame(world.GetOrg(0), world.GetOrg(1), 1, true);
