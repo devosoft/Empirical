@@ -28,7 +28,7 @@ int main(int argc, char* argv[]){
 
   std::string selection = argv[1];
   size_t seed = std::atoi(argv[2]);
-  if (!LoadConfig()) LoadConfig("../../../run.cfg");
+  if (!LoadConfig()) LoadConfig("../../run.cfg");
 
   std::cout<<"POP_SIZE: "<<POP_SIZE<<" EVAL_TIME: "<<EVAL_TIME
            <<" UPDATES: "<<UPDATES<<" SEED: "<<seed
