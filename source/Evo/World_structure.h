@@ -45,18 +45,18 @@ namespace emp {
 
     if (synchronous_gen) {
       // Place births in the next open spot in the new pool (or randomly if full!)
-      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
+      world.SetAddBirthFun( [world,pool_size](Ptr<ORG> new_org, size_t parent_id) {
         emp_assert(new_org);                                  // New organism must exist.
-        const size_t pool_id = parent_id / size_x;
-        const size_t start_id = pool_id * size_x;
+        const size_t pool_id = parent_id / pool_size;
+        const size_t start_id = pool_id * pool_size;
         for (size_t id = start_id; id < start_id+size_x; id++) {
-          if (next_pop[id] == nullptr) {  // Search for an open positions...
-            return AddNextOrgAt(new_org, id, genotypes[parent_id]);
+          if (world.IsOccupied(id) == false) {  // Search for an open positions...
+            return world.AddNextOrgAt(new_org, id, world.GetGenotypeAt(parent_id));
           }
         }
-        const size_t id = fun_get_neighbor(parent_id);     // Placed near parent, in next pop.
-        return AddNextOrgAt(new_org, id, genotypes[parent_id]);
-      };
+        const size_t id = world.GetRandomNeighborID(parent_id);     // Placed near parent, in next pop.
+        return world.AddNextOrgAt(new_org, id, world.GetGenotypeAt(parent_id));
+      });
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neigbor in current population.
