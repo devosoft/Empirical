@@ -43,7 +43,7 @@ bool LoadConfig(std::string path = "run.cfg")
       setting_list.push_back(setting);
     }
 
-    if (setting_list.size() != 5)
+    if (setting_list.size() != 6)
     {
       std::cout<<"Invalid Config file - Invalid arg count"<<std::endl;
       exit(-1);
@@ -56,6 +56,7 @@ bool LoadConfig(std::string path = "run.cfg")
     TIME = setting_list[4];
 
     cfg_file.close();
+    return 1;
   }
   return 0;
 }

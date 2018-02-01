@@ -28,7 +28,7 @@ int main(int argc, char* argv[]){
 
   std::string selection = argv[1];
   size_t seed = std::atoi(argv[2]);
-  LoadConfig();
+  if (!LoadConfig()) LoadConfig("../../../run.cfg");
 
   std::cout<<"POP_SIZE: "<<POP_SIZE<<" EVAL_TIME: "<<EVAL_TIME
            <<" UPDATES: "<<UPDATES<<" SEED: "<<seed
@@ -43,7 +43,6 @@ int main(int argc, char* argv[]){
   if (selection == "eco") world.SetCache(0);
   else if (selection == "tourny") world.SetCache(1);
   else { std::cout<<"Invalid Selection Method - "<< selection <<std::endl; exit(-1); }
-
 
   std::string filename = "data/game_0.csv";
   std::string otherfile = "../../../data/game_0.csv";
