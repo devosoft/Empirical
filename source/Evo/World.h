@@ -330,6 +330,10 @@ namespace emp {
     /// Get the systematics manager (which is tracking lineages in the population.)
     const Systematics<genome_t> & GetSystematics() const { return systematics; }
 
+    /// Get the genotype currently associated with a specific organism.
+    Ptr<genotype_t> GetGenotypeAt(size_t id) { return genotypes[id]; }
+
+    /// Get the fitness function currently in use.
     fun_calc_fitness_t GetFitFun() { return fun_calc_fitness; }
 
     /// Print the full line-of-descent to the organism at the specified position in the popoulation.
