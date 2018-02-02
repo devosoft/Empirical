@@ -60,13 +60,15 @@ namespace emp {
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neigbor in current population.
-      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        return AddOrgAt(new_org, fun_get_neighbor(parent_id), genotypes[parent_id]); // Place org in existing population.
-      };
-      SetAttribute("SynchronousGen", "False");
+      world.SetAddBirthFun( [world](Ptr<ORG> new_org, size_t parent_id) {
+        auto id = world.GetRandomNeighborID(parent_id);
+        auto p_genotype = world.GetGenotypeAt(parent_id);
+        return world.AddOrgAt(new_org, id, p_genotype); // Place org in existing population.
+      });
+      world.SetAttribute("SynchronousGen", "False");
     }
 
-    SetAttribute("PopStruct", "Pools");
+    world.SetAttribute("PopStruct", "Pools");
   }
 
 
