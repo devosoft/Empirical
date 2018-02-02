@@ -28,7 +28,14 @@ int main(int argc, char* argv[]){
 
   std::string selection = argv[1];
   size_t seed = std::atoi(argv[2]);
-  if (!LoadConfig()) LoadConfig("../../run.cfg");
+  
+  bool cfg = 1;
+  if (!LoadConfig()) cfg = LoadConfig(argv[3]);
+  if (!cfg)
+  {
+    std::cout<<"Invalid path to config file - "<<argv[3]<<std::endl;
+    exit(-1);
+  }
 
   std::cout<<"POP_SIZE: "<<POP_SIZE<<" EVAL_TIME: "<<EVAL_TIME
            <<" UPDATES: "<<UPDATES<<" SEED: "<<seed

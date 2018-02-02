@@ -43,7 +43,7 @@ bool LoadConfig(std::string path = "run.cfg")
       setting_list.push_back(setting);
     }
 
-    if (setting_list.size() != 6)
+    if (setting_list.size() != 5)
     {
       std::cout<<"Invalid Config file - Invalid arg count"<<std::endl;
       exit(-1);
