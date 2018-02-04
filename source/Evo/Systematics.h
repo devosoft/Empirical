@@ -261,9 +261,16 @@ namespace emp {
       int total = 0;
       int divisor = 1; // Number of extant taxa this will split into
 
+      GetMRCA();
+
+      if (tax == mrca) {
+        return 0;
+      }
+
       Ptr<taxon_t> test_taxon = tax->GetParent();
       int depth = time - tax->GetOriginationTime();
       time = tax->GetOriginationTime();
+
       while (test_taxon) {
         emp_assert(time != -1, time);
         depth += time - test_taxon->GetOriginationTime();

@@ -199,6 +199,7 @@ namespace emp {
         // std::cout << to_string(fitnesses[fit_id]) << std::endl;
         // std::cout << cur_orgs[0] << std::endl;
         double max_fit = fitnesses[fit_id][cur_gens[0]];
+        next_gens.push_back(cur_gens[0]);
         // std::cout << "Starting max: " << max_fit << to_string(cur_gens) << std::endl;
         for (size_t gen_id : cur_gens) {
               
