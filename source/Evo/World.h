@@ -307,6 +307,8 @@ namespace emp {
     /// Retrive the genome corresponding to the organism at the specified position.
     const genome_t & GetGenomeAt(size_t id) { return fun_get_genome(GetOrg(id)); }
 
+    const genotype_t & GetGenotypeAt(size_t id) {return genotypes[id];}
+
     /// Get the systematics manager (which is tracking lineages in the population.)
     const Systematics<genome_t> & GetSystematics() const { return systematics; }
 
@@ -651,7 +653,7 @@ namespace emp {
     emp_assert(new_org, pos);                            // The new organism must exist.
 
     // Determine new organism's genotype.
-    Ptr<genotype_t> new_genotype = systematics.AddOrg(GetGenome(*new_org), p_genotype);
+    Ptr<genotype_t> new_genotype = systematics.AddOrg(GetGenome(*new_org), p_genotype, update);
     if (pop.size() <= pos) pop.resize(pos+1, nullptr);  // Make sure we have room.
     RemoveOrgAt(pos);                                   // Clear out any old org.
     pop[pos] = new_org;                                 // Place new org.
@@ -670,7 +672,7 @@ namespace emp {
     emp_assert(new_org, pos);                            // The new organism must exist.
 
     // Determine new organism's genotype.
-    Ptr<genotype_t> new_genotype = systematics.AddOrg(GetGenome(*new_org), p_genotype);
+    Ptr<genotype_t> new_genotype = systematics.AddOrg(GetGenome(*new_org), p_genotype, update);
     if (next_pop.size() <= pos) next_pop.resize(pos+1, nullptr);   // Make sure we have room.
     RemoveNextOrgAt(pos);                                          // Clear out any old org.
     next_pop[pos] = new_org;                                       // Place new org.

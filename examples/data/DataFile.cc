@@ -18,6 +18,8 @@ int test_fun() {
 
 int main()
 {
+  int test_int = 5;
+
   emp::DataFile dfile("test_file.dat");
 
   emp::DataMonitor<double> data_fracs;
@@ -32,9 +34,11 @@ int main()
   dfile.AddMin(data_cubes);
   dfile.AddMax(data_cubes);
   dfile.AddFun<int>(test_fun);
+  dfile.AddVar<int>(test_int);
 
   double frac = 0.0;
   for (size_t i = 0; i < 10; i++) {
+    test_int += i;
     data_fracs.Add(frac += 0.01);
     data_squares.Add((int)(i*i));
     data_cubes.Add(i*i*i);

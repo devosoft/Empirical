@@ -13,6 +13,8 @@
 
 namespace emp {
 
+  /** A generic interface to a DataNode (so that you don't need to 
+   * worry about the node's exact type)*/
   class DataInterface {
   private:
   public:
@@ -49,14 +51,35 @@ namespace emp {
     DataInterface_Impl & operator=(const DataInterface_Impl &) = delete;
     DataInterface_Impl & operator=(DataInterface_Impl &&) = delete;
 
+    /** Returns the number of times this node has been reset.*/
     size_t GetResetCount() const { return node->GetResetCount(); }
 
+    /** Returns the sum of values added since the last reset.
+     * Requires that the data::Range or data::FullRange be added
+     * to the DataNode */
     double GetTotal() const { return node->GetTotal(); }
+    /** Returns the mean of the values added since the last reset.
+     * Requires that the data::Range or data::FullRange be added
+     * to the DataNode */
     double GetMean() const { return node->GetMean(); }
+    /** Returns the minimum of the values added since the last reset.
+     * Requires that the data::Range or data::FullRange be added
+     * to the DataNode */
     double GetMin() const { return node->GetMin(); }
+    /** Returns the maximum of the values added since the last reset.
+     * Requires that the data::Range or data::FullRange be added
+     * to the DataNode */
     double GetMax() const { return node->GetMax(); }
 
+    /** Runs the Pull function for this DataNode and records the
+     * resulting values. Requires that the data::Pull module was
+     * added to this DataNode, and that a pull function was specified.
+    */
     void PullData() { node->PullData(); }
+    /** Reset this node. The exact effects of this depend on the
+     * modules that this node has, but in general it prepares the
+     * node to recieve a new set of data.
+    */
     void Reset() { node->Reset(); }
     void PrintDebug(std::ostream & os=std::cout) { node->PrintDebug(os); }
   };

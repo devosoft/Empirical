@@ -99,7 +99,8 @@ namespace emp {
 
   // Specialized forms of DataNodeModule
 
-  // == data::Current ==
+  /** == data::Current ==
+   * This module lets you track the current (i.e. most recently added) value */
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Current, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
@@ -122,7 +123,9 @@ namespace emp {
   };
 
 
-  // == data::Info ==
+  /** == data::Info ==
+   * Including this moduel allows you to add information such as a name, 
+   * description, and keyword for this node */
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Info, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
@@ -153,7 +156,8 @@ namespace emp {
   };
 
 
-  // == data::Log ==
+  /** == data::Log ==
+   * This module lets you log all of the values that have been added since the last re-set*/
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Log, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
@@ -185,7 +189,11 @@ namespace emp {
     }
   };
 
-  // == data::Archive ==
+  /** == data::Archive ==
+   * This module lets you keep track of historical values in addition to those
+   * added since the last re-set. Every time Reset() is called, all values that have
+   * been added since the previous time Reset() was called are stored in a vector in 
+   * the archive. */
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Archive, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
@@ -221,7 +229,9 @@ namespace emp {
     }
   };
 
-  // == data::Range ==
+  /** == data::Range ==
+   * This module allows this DataNode to store information (min, max, mean, count, and total) about 
+   * the distribution of the values that have been added since the last call to Reset().*/
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Range, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
@@ -262,7 +272,11 @@ namespace emp {
     }
   };
 
-  // == data::FullRange ==
+  /** == data::FullRange ==
+   * This module makes the DataNode store a full history of distributional information measured
+   * by data::Range. These numbers describe the distribution of numbers added between calls to Reset().
+   * Historical values for each measurement are stored in vectors (except mean, which is calculated
+   * from total and count). */
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::FullRange, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
@@ -314,7 +328,11 @@ namespace emp {
     }
   };
 
-  // == data::Pull ==
+  /** == data::Pull ==
+   * This module makes it possible to give the DataNode a function that it can call to calculate
+   * new values or sets of values that it will then track. These functions are called every time
+   * the PullData method is called on this node, and the values they return are measured as
+   * specified by the other modules in this node. */ 
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Pull, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
@@ -402,10 +420,23 @@ namespace emp {
 
   // Shortcuts for common types of data nodes...
 
+  /** A node that stores data about the most recent value it recieved, as well as the 
+   * distribution (min, max, count, total, and mean) of values it has recieved since
+   * the last reset. It also allows you to give it a name, description, and keyword.*/
   template <typename T, emp::data... MODS>
   using DataMonitor = DataNode<T, data::Current, data::Info, data::Range, MODS...>;
+
+  /** A node that stores data about the most recent value it recieved, as well as all 
+   * values it has recieved since the last reset. It also allows you to give it a name, 
+   * description, and keyword.*/
   template <typename T, emp::data... MODS>
   using DataLog = DataNode<T, data::Current, data::Info, data::Log, MODS...>;
+  
+  /** A node that stores all data it recieves in an archive (vector of vectors). The inner
+   * vectors are groups of data that were recieved between resets. This node also keeps 
+   * a record of the min, max, count, and total of each vector, so you don't have to 
+   * recalculate it later. Additionally, it allows you to give it a name, description,
+   * and keyword.*/
   template <typename T, emp::data... MODS>
   using DataArchive = DataNode<T, data::Info, data::Archive, data::FullRange, MODS...>;
 }

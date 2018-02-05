@@ -91,6 +91,16 @@ namespace emp {
       Genome(Genome &&) = default;
       ~Genome() { ; }
 
+      size_t Hash() const {
+        std::size_t seed = sequence.size();
+        for(auto& i : sequence) {
+          seed ^= i.id + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        }
+        return seed;
+      }
+      struct hash_t { size_t operator()(const Genome & g) const { return g.Hash(); } };
+
+
       Genome & operator=(const Genome &) = default;
       Genome & operator=(Genome &&) = default;
 
