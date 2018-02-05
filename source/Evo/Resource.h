@@ -51,7 +51,7 @@ namespace emp {
        emp_assert(world.GetFitFun(), "Must define a base fitness function");
        emp_assert(world.GetSize() > 0);
        emp_assert(t_size > 0, t_size);
-       emp_assert(world.IsCacheOn() == false, "Ecologies mean constantly changing fitness!");
+    //    emp_assert(world.IsCacheOn() == false, "Ecologies mean constantly changing fitness!");
 
        // Setup info to track fitnesses.
        emp::vector<double> base_fitness(world.GetSize());
