@@ -104,7 +104,7 @@ namespace emp {
     for (size_t n = 0; n < count; n++) {
       const double fit_pos = random.GetDouble(fitness_index.GetWeight());
       const size_t parent_id = fitness_index.Index(fit_pos);
-      const size_t offspring_id = world.DoBirth( world.GetGenomeAt(parent_id), parent_id );
+      const size_t offspring_id = world.DoBirth( world.GetGenomeAt(parent_id), parent_id ).index;
       if (world.IsSynchronous() == false) {
         fitness_index.Adjust(offspring_id, world.CalcFitnessID(offspring_id));
       }
@@ -116,14 +116,17 @@ namespace emp {
   /// EACH offspring produced.
   /// @param world The emp::World object with the organisms to be selected.
   /// @param fit_funs The set of fitness functions to shuffle for each organism reproduced.
-  /// @param repro_count How many rounds of repliction should we do.
+  /// @param repro_count How many rounds of repliction should we do. (default 1)
+  /// @param max_funs The maximum number of fitness functions to use. (use 0 for all; default)
   template<typename ORG>
   void LexicaseSelect(World<ORG> & world,
                       const emp::vector< std::function<double(const ORG &)> > & fit_funs,
-                      size_t repro_count=1)
+                      size_t repro_count=1,
+                      size_t max_funs=0)
   {
     emp_assert(world.GetSize() > 0);
     emp_assert(fit_funs.size() > 0);
+    if (!max_funs) max_funs = fit_funs.size();
 
     // Collect all fitness info. (@CAO: Technically only do this is cache is turned on?)
     emp::vector< emp::vector<double> > fitnesses(fit_funs.size());
@@ -141,7 +144,15 @@ namespace emp {
 
     for (size_t repro = 0; repro < repro_count; ++repro) {
       // Determine the current ordering of the functions.
-      emp::vector<size_t> order = GetPermutation(world.GetRandom(), fit_funs.size());
+      emp::vector<size_t> order;
+
+      if (max_funs == fit_funs.size()) {
+        order = GetPermutation(world.GetRandom(), fit_funs.size());
+      } else {
+        order.resize(max_funs); // We want to limit the total numebr of tests done.
+        for (auto & x : order) x = world.GetRandom().GetUInt(fit_funs.size());
+      }
+      // @CAO: We could have selected the order more efficiently!
 
       // Step through the functions in the proper order.
       cur_orgs = all_orgs;  // Start with all of the organisms.
@@ -170,6 +181,76 @@ namespace emp {
       size_t repro_id = cur_orgs[ world.GetRandom().GetUInt(cur_orgs.size()) ];
       world.DoBirth( world.GetGenomeAt(repro_id), repro_id );
     }
+  }
+
+  template<typename ORG>
+  struct MapElitesPhenotype {
+    using pheno_fun_t = std::function<size_t(const ORG &)>;
+
+    pheno_fun_t pheno_fun;   ///< Function to categorize org into phenotype id.
+    size_t id_count;         ///< Numbe of phenotype categories.
+
+    MapElitesPhenotype() : pheno_fun_t(), id_count(0) { ; }
+    MapElitesPhenotype(const pheno_fun_t & _f, size_t _ids) : pheno_fun_t(_f), id_count(_ids) { ; }
+
+    bool OK() const { return pheno_fun && id_count; }
+
+    size_t GetID(const ORG & org) const {
+      size_t id = pheno_fun(org);
+      emp_assert(id < id_count);
+      return id;
+    }
+  };
+
+  template<typename ORG>
+  struct MapElitesConfig {
+    emp::vector< MapElitesPhenotype<ORG> > phenotypes; ///< Funs to categorizes orgs into phenotypes.
+
+    bool OK() const { for (auto & p : phenotypes) if (!p.OK()) return false; return true; }
+
+    size_t GetID(const ORG & org) const {
+      size_t id = 0, scale = 1;
+      for (const auto & p : phenotypes) {
+        const size_t pid = p.GetID(org);
+        id += pid * scale;
+        scale *= p.id_count;
+      }
+      return id;
+    }
+
+    size_t GetIDCount() const {
+      size_t id_count = 1;
+      for (const auto & p : phenotypes) id_count *= p.id_count;
+      return id_count;
+    }
+  };
+
+  /// ==MAP-ELITES== Add a new organism to MapElites.  Selection looks at multiple phenotypic
+  /// traits and keeps only the highest fitness with each combination of traits.
+  /// @param world The emp::World object with the organisms to be selected.
+  /// @param config Information about the pheonotypes that Map Elites needs to use.
+  /// @param repro_count How many rounds of repliction should we do. (default 1)
+  template<typename ORG>
+  void MapElitesSeed(World<ORG> & world,
+                     const MapElitesConfig<ORG> & config,
+                     const ORG & org)
+  {
+    emp_assert(world.GetSize() > 0);
+    emp_assert(config.OK());
+  }
+
+  /// ==MAP-ELITES== Replicate a random organism in MapElites.  Selection looks at multiple
+  /// phenotypic traits and keeps only the highest fitness with each combination of traits.
+  /// @param world The emp::World object with the organisms to be selected.
+  /// @param config Information about the pheonotypes that Map Elites needs to use.
+  /// @param repro_count How many rounds of repliction should we do. (default 1)
+  template<typename ORG>
+  void MapElitesGrow(World<ORG> & world,
+                     const MapElitesConfig<ORG> & config,
+                     size_t repro_count=1)
+  {
+    emp_assert(world.GetSize() > 0);
+    emp_assert(config.OK());
   }
 
 }

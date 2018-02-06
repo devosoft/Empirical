@@ -300,7 +300,7 @@ namespace emp {
 
   /// Remove a prefix of the input string (up to a specified delimeter) and return it.  If the
   /// delimeter is not found, return the entire input string and clear it.
-  inline std::string string_pop(std::string & in_string, const char delim) {
+  inline std::string string_pop(std::string & in_string, const char delim=' ') {
     return string_pop_fixed(in_string, in_string.find(delim), 1);
   }
 
@@ -358,7 +358,7 @@ namespace emp {
   /// Every time one or more whitespace characters appear replace them with a single space.
   static inline void compress_whitespace(std::string & in_string) {
     const size_t strlen = in_string.size();
-    bool last_whitespace = true;
+    bool last_whitespace = true;          // Remove whitespace from beginning of line.
     size_t pos = 0;
 
     for (size_t i = 0; i < strlen; i++) {
@@ -372,6 +372,8 @@ namespace emp {
         last_whitespace = false;
       }
     }
+
+    if (pos && last_whitespace) pos--;   // If the end of the line is whitespace, remove it.
 
     in_string.resize(pos);
   }

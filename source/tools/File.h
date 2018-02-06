@@ -7,11 +7,13 @@
  *  @brief The File object maintains a simple, in-memory file.
  *  @note Status: BETA
  *
- *  @todo We need to modify this code to make sure File can also work with Emscripten, appropriately.
- *   Alternatively, we might want to have a more flexible file class that wraps this one.
+ *  @todo We need to modify this code to make sure File can also work with Emscripten,
+ *        appropriately. Alternatively, we might want to have a more flexible file class
+ *        that wraps this one.
  *
- *  @todo File should have an iterator that can handle operators << and >> to read and write.
-*/
+ *  @todo File should have an iterator that can handle operators << and >> to read and write as
+ *        well as to enable for loops.
+ */
 
 
 #ifndef EMP_FILE_H
@@ -45,6 +47,9 @@ namespace emp {
 
     /// How many lines are in this file?
     size_t GetNumLines() { return lines.size(); }
+
+    /// Compatibility with size()
+    size_t size() { return lines.size(); }
 
     /// Index into a specific line in this file.
     std::string & operator[](size_t pos) { return lines[pos]; }
@@ -92,6 +97,10 @@ namespace emp {
     File & LoadLine(std::istream & input) {
       lines.emplace_back("");
       std::getline(input, lines.back());
+
+      // If the input file is DOS formatted, make sure to remove the \r at the end of each line.
+      if (lines.back().size() && lines.back().back() == '\r') lines.back().pop_back();
+
       return *this;
     }
 
@@ -160,7 +169,7 @@ namespace emp {
 
     /// Delete all whitespace; by default keep newlines.
     File & RemoveWhitespace(bool keep_newlines=true) {
-      Apply(compress_whitespace);
+      Apply(remove_whitespace);
       RemoveEmpty();
       if (!keep_newlines) {
         std::string all_lines;

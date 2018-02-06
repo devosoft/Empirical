@@ -16,6 +16,7 @@
 #include "Canvas.h"
 
 #include "../base/vector.h"
+#include "../Evo/StateGrid.h"
 #include "../geometry/Circle2D.h"
 #include "../geometry/Surface2D.h"
 #include "../tools/BitMatrix.h"
@@ -55,6 +56,9 @@ namespace web {
 
   /// Draw a Surface2D, specifying the full colormap to be used.  The surface has a range of circle
   /// bodies, each with a color id.
+  /// @param canvas The Canvas to draw on.
+  /// @param surface A surface containing a set of shapes to draw.
+  /// @param color_map Mapping of values to the colors with which they should be associated.
   template <typename BODY_TYPE>
   void Draw(Canvas canvas,
             const Surface2D<BODY_TYPE> & surface,
@@ -79,6 +83,9 @@ namespace web {
 
   /// Draw a Surface2D, just specifying the number of colors (and using a generated hue map).
   /// The surface has a range of circle bodies, each with a color id.
+  /// @param canvas The Canvas to draw on.
+  /// @param surface A surface containing a set of shapes to draw.
+  /// @param num_colors The number of distinct colors to use in visualization.
   template <typename BODY_TYPE>
   void Draw(Canvas canvas, const Surface2D<BODY_TYPE> & surface, size_t num_colors)
   {
@@ -89,6 +96,7 @@ namespace web {
   /// Draw a grid onto a canvas.
   /// @param canvas The Canvas to draw on.
   /// @param grid A vector of vectors of color IDs.
+  /// @param color_map Mapping of values to the colors with which they should be associated.
   /// @param line_color The background line color for the grid.
   /// @param cell_width How many pixels wide is each cell to draw?
   /// @param cell_height How many pixels tall is each cell to draw?
@@ -119,9 +127,10 @@ namespace web {
     }
   }
 
-  /// Draw a grid onto a canvas.  Without offsets provided, the grid is centered.
+  /// Draw a grid onto a canvas, but without offsets provided -- the grid is centered.
   /// @param canvas The Canvas to draw on.
   /// @param grid A vector of vectors of color IDs.
+  /// @param color_map Mapping of values to the colors with which they should be associated.
   /// @param line_color The background line color for the grid.
   /// @param cell_width How many pixels wide is each cell to draw?
   /// @param cell_height How many pixels tall is each cell to draw?
@@ -144,9 +153,10 @@ namespace web {
     Draw(canvas, grid, color_map, line_color, cell_w, cell_h, offset_x, offset_y);
   }
 
-  /// Draw a grid onto a canvas.  Without cell size provided, maximize to fill the canvas!
+  /// Draw a grid onto a canvas, but without cell size provided -- maximize to fill the canvas!
   /// @param canvas The Canvas to draw on.
   /// @param grid A vector of vectors of color IDs.
+  /// @param color_map Mapping of values to the colors with which they should be associated.
   /// @param line_color The background line color for the grid.
   void Draw(Canvas canvas,
             const emp::vector<emp::vector<size_t>> & grid,
@@ -158,6 +168,87 @@ namespace web {
     const size_t cell_h = canvas.GetHeight() / grid.size();
 
     Draw(canvas, grid, color_map, line_color, cell_w, cell_h);
+  }
+
+  /// Draw a vector onto a canvas as a grid.
+  /// @param canvas The Canvas to draw on.
+  /// @param grid A vector of vectors of color IDs
+  /// @param grid_cols Number of columns in the grid
+  /// @param color_map Mapping of values to the colors with which they should be associated.
+  /// @param line_color The background line color for the grid
+  /// @param cell_width How many pixels wide is each cell to draw?
+  /// @param cell_height How many pixels tall is each cell to draw?
+  /// @param offset_x How far should we shift the grid reletive to the left side of the canvas.
+  /// @param offset_y How far should we shift the grid reletive to the top of the canvas.
+  void Draw(Canvas canvas,
+            const emp::vector<size_t> & grid,
+            size_t grid_cols,
+            const emp::vector<std::string> & color_map,
+            std::string line_color,
+            size_t cell_width, size_t cell_height,
+            size_t offset_x, size_t offset_y)
+  {
+    canvas.Clear();
+
+    // Setup a black background for the grid.
+    canvas.Rect(0, 0, canvas.GetWidth(), canvas.GetHeight(), "black");
+
+    // Fill out the grid!
+    const size_t grid_rows = grid.size() / grid_cols;
+    size_t id = 0;
+    for (size_t row = 0; row < grid_rows; row++) {
+      const size_t cur_y = offset_y + row*cell_height;
+      for (size_t col = 0; col < grid_cols; col++) {
+        const size_t cur_x = offset_x + col*cell_width;
+        const std::string & cur_color = color_map[grid[id++]];
+        canvas.Rect(cur_x, cur_y, cell_width, cell_height, cur_color, line_color);
+      }
+    }
+  }
+
+  /// Draw a state grid onto a canvas.
+  /// @param canvas The Canvas to draw on.
+  /// @param state_grid A StateGrid object.
+  /// @param color_map Mapping of values to the colors with which they should be associated.
+  /// @param line_color The background line color for the grid.
+  void Draw(Canvas canvas,
+            const StateGrid & state_grid,
+            const emp::vector<std::string> & color_map,
+            std::string line_color="black")
+  {
+    // Determine the canvas info.
+    const size_t canvas_w = canvas.GetWidth();
+    const size_t canvas_h = canvas.GetHeight();
+
+    // Determine the cell width & height.
+    const size_t cell_w = canvas_w / state_grid.GetWidth();
+    const size_t cell_h = canvas_h / state_grid.GetHeight();
+
+    // Determine the realized grid width and height on the canvas.
+    const size_t grid_w = cell_w * state_grid.GetWidth();
+    const size_t grid_h = cell_h * state_grid.GetHeight();
+
+    // Center the grid on the canvas if there's extra room.
+    const size_t offset_x = (canvas_w <= grid_w) ? 0 : (canvas_w - grid_w) / 2;
+    const size_t offset_y = (canvas_h <= grid_h) ? 0 : (canvas_h - grid_h) / 2;
+
+    canvas.Clear();
+
+    // Setup a black background for the grid.
+    canvas.Rect(0, 0, canvas.GetWidth(), canvas.GetHeight(), line_color);
+
+    // Fill out the grid!
+    size_t id = 0;
+    for (size_t row = 0; row < state_grid.GetHeight(); row++) {
+      const size_t cur_y = offset_y + row*cell_h;
+      for (size_t col = 0; col < state_grid.GetWidth(); col++) {
+        const size_t cur_x = offset_x + col*cell_w;
+        const int state = state_grid.GetStates()[id++];
+        if (state < 0) continue; // leave negative-number squares blank...
+        const std::string & cur_color = color_map[state];
+        canvas.Rect(cur_x, cur_y, cell_w, cell_h, cur_color, line_color);
+      }
+    }
   }
 
 }

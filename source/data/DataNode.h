@@ -23,6 +23,7 @@
 #include "../base/assert.h"
 #include "../meta/IntPack.h"
 #include "../tools/FunctionSet.h"
+#include "../tools/IndexMap.h"
 #include "../tools/string_utils.h"
 
 namespace emp {
@@ -38,6 +39,7 @@ namespace emp {
 
     Range,        // Track min, max, mean, total
     FullRange,    // Track Range data over time.
+    Histogram,    // Keep a full histogram.
     // Stats,        // Track Range + variance, standard deviation, skew, kertosis
     // FullStats,    // Track States + ALL values over time (with purge/merge options)
 
@@ -312,6 +314,64 @@ namespace emp {
       os << "DataNodeModule for data::FullRange. (level " << (int) data::FullRange << ")\n";
       parent_t::PrintDebug(os);
     }
+  };
+
+  // == data::Histogram ==
+  template <typename VAL_TYPE, emp::data... MODS>
+  class DataNodeModule<VAL_TYPE, data::Histogram, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
+  protected:
+    VAL_TYPE min;
+    IndexMap bins;
+    emp::vector<size_t> counts;
+
+    using this_t = DataNodeModule<VAL_TYPE, data::Histogram, MODS...>;
+    using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
+    using base_t = DataNodeModule<VAL_TYPE>;
+
+    using base_t::val_count;
+
+  public:
+    DataNodeModule() : min(0.0), bins(10,10.0), counts(10, 0) { ; }
+
+    VAL_TYPE GetHistMin() const { return min; }
+    size_t GetHistCount(size_t bin_id) const { return counts[bin_id]; }
+    double GetHistWidth(size_t bin_id) const { return bins[bin_id]; }
+    const emp::vector<size_t> & GetHistCounts() const { return counts; }
+
+    emp::vector<double> GetBinMins() const {
+      emp::vector<double> bin_mins(bins.size());
+      double cur_min = min;
+      for (size_t i = 0; i < bins.size(); i++) {
+        bin_mins[i] = cur_min;
+        cur_min += bins[i];
+      }
+      return bin_mins;
+    }
+
+    void SetupBins(VAL_TYPE _min, VAL_TYPE _max, size_t num_bins) {
+      min = _min;
+      double width = ((double) (_max - _min)) / (double) num_bins;
+      bins.Resize(num_bins, width);
+      counts.resize(num_bins);
+      for (size_t & x : counts) x = 0.0;
+    }
+
+    void AddDatum(const VAL_TYPE & val) {
+      size_t bin_id = bins.Index((double) (val - min));
+      counts[bin_id]++;
+      parent_t::AddDatum(val);
+    }
+
+    void Reset() {
+      for (size_t & x : counts) x = 0.0;
+      parent_t::Reset();
+    }
+
+    void PrintDebug(std::ostream & os=std::cout) {
+      os << "DataNodeModule for data::Histogram. (level " << (int) data::FullRange << ")\n";
+      parent_t::PrintDebug(os);
+    }
+
   };
 
   // == data::Pull ==

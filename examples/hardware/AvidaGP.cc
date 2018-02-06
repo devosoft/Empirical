@@ -46,8 +46,15 @@ int main()
   }
 
   cpu.PrintGenome();
+  cpu.PrintGenome("test.org");
   cpu.ResetHardware();
   cpu.Trace(200);
+
+  emp::AvidaGP cpu2;
+  cpu2.Load("test.org");
+
+  std::cout << "Original CPU size: " << cpu.GetSize() << std::endl;
+  std::cout << "Reloaded CPU size: " << cpu2.GetSize() << std::endl;
 
   // Run a ton of organisms.
   for (int t = 0; t < 1000000; t++) {

@@ -35,10 +35,25 @@ namespace emp {
 
   /// A version of Alert that will cap how many times it can go off
   template <typename... TYPE_SET>
-  static void CappedAlert(int cap, TYPE_SET... inputs) {
-    static int cur_count = 0;
+  static void CappedAlert(size_t cap, TYPE_SET... inputs) {
+    static size_t cur_count = 0;
     if (cur_count++ < cap) Alert(emp::to_string(inputs...));
   }
+
+  /// An object that will automatically output a message during construction or destruction,
+  /// usually for use in debugging to disentangle timings.
+  struct AlertObj {
+    std::string msg;    ///< Message for the alert to print.
+    bool on_construct;  ///< Should the message print automatically during construction?
+    bool on_destruct;   ///< Should the message print automatically during destruction?
+
+    AlertObj(const std::string & _msg, bool _on_c=true, bool _on_d=false)
+    : msg(_msg), on_construct(_on_c), on_destruct(_on_d) { if (on_construct) emp::Alert(msg); }
+    ~AlertObj() { if (on_destruct) emp::Alert(msg); }
+
+    void Trigger() { emp::Alert(msg); }
+    void SetMessage(const std::string & _msg) { msg = _msg; }
+  };
 }
 
 

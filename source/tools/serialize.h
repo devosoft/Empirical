@@ -170,7 +170,7 @@ namespace serialize {
     emp::vector<T> var;
 
     // Create vector of correct size and create elements with pod.
-    for (int i = 0; i < v_size; i++) {
+    for (uint32_t i = 0; i < v_size; i++) {
       var.emplace_back(SetupLoad(pod, &(var[0]), true));
     }
     emp_assert(pod.IStream() && "Make sure the DataPod is still okay.");

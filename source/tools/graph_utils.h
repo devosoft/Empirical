@@ -25,6 +25,28 @@
 
 namespace emp {
 
+  /// Take an existing graph, and build a new one that is isomorphic to it, but with randomized
+  /// vertex IDs.
+  Graph shuffle_graph(const Graph & in_graph, Random & random) {
+    const size_t N = in_graph.GetSize();
+    Graph out_graph(N);
+
+    // Determine new vertex IDs
+    emp::vector<size_t> v_map = BuildRange<size_t>(0, N);
+    Shuffle(random, v_map);
+
+    // Put the mapped edges into the new graph.
+    for (size_t from = 0; from < N; from++) {
+      for (size_t to = 0; to < N; to++) {
+	if (in_graph.HasEdge(from, to)) {
+	  out_graph.AddEdge( v_map[from], v_map[to] );
+	}
+      }
+    }
+
+    return out_graph;
+  }
+
   /// Construct a graph where all vertics are degree two and form a single ring.
   Graph build_graph_ring(size_t v_count, Random & random) {
     Graph graph(v_count);
@@ -69,7 +91,7 @@ namespace emp {
     (void) max_edges;
 
     emp_assert(v_count >= 2 && e_count > 0); // We need at least two vertices to support an edge.
-    emp_assert(e_count <= max_edges); // Shouldn't have more edges than can fit!
+    emp_assert(e_count <= max_edges, e_count, max_edges); // Shouldn't have more edges than can fit!
 
     Graph graph(v_count);
     size_t e_cur = 0;           // How many edges have we added?
@@ -161,6 +183,116 @@ namespace emp {
 
     return graph;
   }
+
+
+  /// Construct a random, graph with the specified number of vertices and edges.  If connected is
+  /// set, start by building a tree.  Then connect random (unconnected) pairs of vertices until
+  /// the proper number of edges are included.
+  Graph build_graph_dag(size_t v_count, size_t e_count, Random & random, bool connected=true)
+  {
+    const size_t max_edges = v_count * (v_count-1) / 2;
+    (void) max_edges;
+
+    emp_assert(v_count >= 2 && e_count > 0); // We need at least two vertices to support an edge.
+    emp_assert(e_count <= max_edges);        // Shouldn't have more edges than can fit!
+
+    Graph graph(v_count);                    //
+    size_t e_cur = 0;                        // How many edges have we added?
+
+    // If the graph should be connected, start by building a tree.
+    if (connected) {
+      emp_assert(e_count >= v_count - 1);    // We need enough edges to build a connected graph.
+
+      // Determine order to connect in new vertices.
+      emp::vector<size_t> v_map = BuildRange<size_t>(0, v_count);
+      Shuffle(random, v_map);
+
+      // Connect in each vertex to the tree.
+      for (size_t i = 1; i < v_count; i++) {
+        size_t from = v_map[i];                // Pick the next node in the shuffle.
+        size_t to = v_map[random.GetUInt(i)];  // Pick node already in the tree.
+        if (from > to) std::swap(from, to);    // Make sure lower number is first.
+        graph.AddEdge(from, to);
+      }
+      e_cur = v_count - 1;
+    }
+
+    // @CAO -- we should do something better if we are filling in most of the edges.
+
+    while (e_cur < e_count) {
+      size_t from = random.GetUInt(v_count);
+      size_t to = random.GetUInt(v_count);
+
+      if (from == to || graph.HasEdge(from,to)) continue;
+      if (from > to) std::swap(from, to); // Make sure lower number is first.
+
+      graph.AddEdge(from, to);
+      ++e_cur;
+    }
+
+    // Make sure the edge ID numbers that we return are not all in order.
+    return shuffle_graph(graph, random);
+  }
+
+  /// Construct a random WEIGHTED tree graph (new vertices are repeatedly attached to a random
+  /// position in a treee as it is constructed.)
+  WeightedGraph build_weighted_graph_tree(size_t v_count, size_t min_weight, size_t max_weight,
+                                          Random & random) {
+    WeightedGraph graph(v_count);
+
+    emp::vector<size_t> v_map = BuildRange<size_t>(0, v_count);
+    Shuffle(random, v_map);
+
+    for (size_t i = 1; i < v_count; i++) {
+      const size_t from = v_map[i];
+      const size_t to = v_map[random.GetUInt(i)];
+      const size_t weight = (size_t) random.GetDouble(min_weight, max_weight);
+      graph.AddEdgePair(from, to, weight);
+    }
+
+    return graph;
+  }
+
+  /// Construct a random, WEIGHTED graph with the specified number of vertices, edges, and range
+  /// of edge weights.  If connected is set, start by building a tree.  Then connect random
+  /// (unconnected) pairs of vertices until the proper number of edges are included.
+  WeightedGraph build_weighted_graph_random(size_t v_count, size_t e_count,
+                                            size_t min_weight, size_t max_weight,
+                                            Random & random, bool connected=true)
+  {
+    const size_t max_edges = v_count * (v_count-1) / 2;
+    (void) max_edges;
+
+    emp_assert(v_count >= 2 && e_count > 0); // We need at least two vertices to support an edge.
+    emp_assert(e_count <= max_edges, e_count, max_edges); // Shouldn't have more edges than can fit!
+
+    WeightedGraph graph(v_count);
+    size_t e_cur = 0;           // How many edges have we added?
+
+    // If the graph should be connected, start by building a tree.
+    if (connected) {
+      emp_assert(e_count >= v_count - 1);  // We need enough edges to build a connected graph.
+      graph = build_weighted_graph_tree(v_count, min_weight, max_weight, random);
+      e_cur = v_count - 1;
+    }
+
+    // @CAO -- we should do something better if we are filling in most of the edges.
+
+    while (e_cur < e_count) {
+      const size_t from = random.GetUInt(v_count);
+      const size_t to = random.GetUInt(v_count);
+
+      if (from == to || graph.HasEdge(from,to)) continue;
+
+      graph.AddEdgePair(from, to, (size_t) random.GetDouble(min_weight, max_weight));
+      ++e_cur;
+    }
+
+    return graph;
+  }
+
+
+
 
 
   /// Helper function for loading symetric graphs from an input stream.

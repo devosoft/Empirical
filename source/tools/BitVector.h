@@ -134,13 +134,11 @@ namespace emp {
       }
     };
 
-    // emp_constexpr means only make constexpr when NDEBUG is set (to otherwise allow asserts)
-
     /// Identify the field that a specified bit is in.
-    emp_constexpr static size_t FieldID(const size_t index)  { return index / FIELD_BITS; }
+    static constexpr size_t FieldID(const size_t index)  { return index / FIELD_BITS; }
 
     /// Identify the position in a field where a specified bit is.
-    emp_constexpr static size_t FieldPos(const size_t index) { return index & (FIELD_BITS-1); }
+    static constexpr size_t FieldPos(const size_t index) { return index & (FIELD_BITS-1); }
 
     /// Identify which field a specified byte position would be in.
     static constexpr size_t Byte2Field(const size_t index) { return index/sizeof(field_t); }
@@ -353,7 +351,7 @@ namespace emp {
     }
 
     /// Update the bit value at the specified index.
-    void Set(size_t index, bool value) {
+    void Set(size_t index, bool value=true) {
       emp_assert(index < num_bits, index, num_bits);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
