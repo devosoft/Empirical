@@ -87,6 +87,20 @@ namespace emp {
       Ptr<const inst_lib_t> inst_lib;
       sequence_t sequence;
 
+      size_t Hash() const
+      {
+        std::size_t seed = sequence.size();
+        for (auto &i : sequence)
+        {
+          seed ^= i.id + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        }
+        return seed;
+      }
+      struct hash_t
+      {
+        size_t operator()(const Genome &g) const { return g.Hash(); }
+      };
+
       Genome() = default;
       Genome(Ptr<const inst_lib_t> _inst_lib, const sequence_t & _seq=sequence_t(0))
         : inst_lib(_inst_lib), sequence(_seq) { ; }
