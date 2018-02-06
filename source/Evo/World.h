@@ -182,18 +182,6 @@ namespace emp {
     Signal<void(size_t)> on_update_sig;       ///< Trigger at the beginning of Update()
     Signal<void(size_t)> on_death_sig;        ///< Trigger when any organism dies.
 
-    /// AddOrgAt is the only way to add organisms to active population (others must go through here)
-    OrgPosition AddOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
-
-    /// AddNextOrgAt build up the next population during synchronous generations.
-    OrgPosition AddNextOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
-
-    /// RemoveOrgAt is the only way to remove an active organism.
-    void RemoveOrgAt(size_t pos);
-
-    /// RemoveNextOrgAt removes an organism waiting to placed into the next generation.
-    void RemoveNextOrgAt(size_t pos);
-
     /// Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
 
@@ -585,6 +573,22 @@ namespace emp {
       Resize(new_width * new_height);
       size_x = new_width; size_y = new_height;
     }
+
+    /// AddOrgAt is the core function to add organisms to active population (others must go through here)
+    /// Note: This function ignores population structue, so requires you to manage your own sturcture.
+    OrgPosition AddOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
+
+    /// AddNextOrgAt build up the next population during synchronous generations.
+    /// Note: This function ignores population structue, so requires you to manage your own sturcture.
+    OrgPosition AddNextOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
+
+    /// RemoveOrgAt is the core function to remove an active organism.
+    /// Note: This function ignores population structue, so requires you to manage your own sturcture.
+    void RemoveOrgAt(size_t pos);
+
+    /// RemoveNextOrgAt removes an organism waiting to placed into the next generation.
+    /// Note: This function ignores population structue, so requires you to manage your own sturcture.
+    void RemoveNextOrgAt(size_t pos);
 
     /// Inject an organism using the default injection scheme.
     void Inject(const genome_t & mem, size_t copy_count=1);
