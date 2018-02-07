@@ -2,6 +2,7 @@
 #define SHADERS_H
 
 #include <iostream>
+#include "VertexAttributes.h"
 #include "defaultUniforms.h"
 #include "glutils.h"
 
