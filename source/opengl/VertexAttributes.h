@@ -86,7 +86,12 @@ namespace emp {
     };
 
     template <typename T>
-    struct VertexAttributes;
+    struct VertexAttributes {
+      static_assert(VertexAttributeTypeOf<T>::supported,
+                    "The given type is not usable as a shader attribute");
+      static constexpr auto size{VertexAttributeSize::One};
+      static constexpr auto type{VertexAttributeTypeOf<T>::type};
+    };
 
     template <typename T, std::size_t N>
     struct VertexAttributes<T[N]> {
@@ -101,6 +106,7 @@ namespace emp {
 
       static constexpr auto type = VertexAttributeTypeOf<T>::type;
     };
+
   }  // namespace opengl
 }  // namespace emp
 #endif
