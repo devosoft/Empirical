@@ -431,8 +431,8 @@ namespace emp {
       DEFINE_ATTR(StrokeWeight, strokeWeight);
       DEFINE_ATTR(Fill, fill);
       DEFINE_ATTR(PointSize, pointSize);
-      DEFINE_ATTR(XY, xy);
-      DEFINE_ATTR(XYScaled, xyScaled);
+      DEFINE_ATTR(XYZ, xyz);
+      DEFINE_ATTR(XYZScaled, xyzScaled);
     }  // namespace attrs
   }  // namespace plot
 };  // namespace emp
