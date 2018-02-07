@@ -583,6 +583,8 @@ namespace emp {
         return apply(internal::RightScalarMult{}, scalar);
       }
 
+      constexpr Mat operator-() const { return (-1) * (*this); }
+
     };  // namespace math
 
     template <typename F, std::size_t R>
