@@ -36,12 +36,18 @@ constexpr decltype(auto) selfMultTest(Args&&... args) {
 }
 
 TEST_CASE("Test Matrices", "[math]") {
+  // Test default init
+  CONST_REQUIRE_EQ(Mat3x3s{}, (Mat3x3s{
+                                0u, 0u, 0u,  // row 1
+                                0u, 0u, 0u,  // row 2
+                                0u, 0u, 0u  // row 3
+                              }));
   constexpr auto rowsCheck = Mat3x3s::from(&rowsCheckGenerator);
 
   CONST_REQUIRE_EQ(rowsCheck, (Mat3x3s{
                                 1u, 1u, 1u,  // row 1
                                 2u, 2u, 2u,  // row 2
-                                3u, 3u, 3u   // row 3
+                                3u, 3u, 3u  // row 3
                               }));
 
   constexpr auto ident = Mat3x3f::identity();
@@ -49,7 +55,7 @@ TEST_CASE("Test Matrices", "[math]") {
   CONST_REQUIRE_EQ(ident, (Mat3x3f{
                             1.0f, 0.0f, 0.0f,  // row 1
                             0.0f, 1.0f, 0.0f,  // row 2
-                            0.0f, 0.0f, 1.0f   // row 3
+                            0.0f, 0.0f, 1.0f  // row 3
                           }));
 
   constexpr auto rowVec = RowVec3i{1, 2, 3};
@@ -70,14 +76,14 @@ TEST_CASE("Test Matrices", "[math]") {
   CONST_REQUIRE_EQ(rowsCheck * ident, rowsCheck);
 
   CONST_REQUIRE_EQ(rowsCheck * rowsCheck, (Mat3x3s{
-                                            6u, 6u, 6u,     // row 1
+                                            6u, 6u, 6u,  // row 1
                                             12u, 12u, 12u,  // row 2
-                                            18u, 18u, 18u   // row 3
+                                            18u, 18u, 18u  // row 3
                                           }));
   CONST_REQUIRE_EQ(rowsCheck.transposed(), (Mat3x3s{
                                              1u, 2u, 3u,  // row 1
                                              1u, 2u, 3u,  // row 2
-                                             1u, 2u, 3u   // row 3
+                                             1u, 2u, 3u  // row 3
                                            }));
 
   CONST_REQUIRE(cross({1.f, 2.f, 3.f}, {4.f, 5.f, 6.f}).feq({-3.f, 6.f, -3.f}));
@@ -112,7 +118,7 @@ TEST_CASE("Test Quaternions", "[math]") {
   constexpr auto rot = Mat4x4f{
     1.f, 0.f, 0.f,  0.f,  // row 1
     0.f, 0.f, -1.f,
-    0.f,                  // row 2
+    0.f,  // row 2
     0.f, 1.f, 0.f,  0.f,  // row 3
     0.f, 0.f, 0.f,  1.f,  // row 4
   };

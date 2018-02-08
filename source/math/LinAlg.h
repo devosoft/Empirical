@@ -139,7 +139,7 @@ namespace emp {
       };
 
       template <size_t I, class T>
-      auto pass(T&& value) {
+      constexpr auto pass(T&& value) {
         return std::forward<T>(value);
       }
 
@@ -284,8 +284,7 @@ namespace emp {
       }
 
       template <class T, size_t... I>
-      constexpr Mat(
-        const std::tuple<T, const std::index_sequence<I...>&>& value)
+      constexpr Mat(const std::tuple<T, std::index_sequence<I...>>& value)
         : arrayData{internal::pass<I>(std::get<0>(value))...} {}
 
       public:
@@ -332,12 +331,12 @@ namespace emp {
         };
       }
 
-      template <typename F_, std::size_t R_, std::size_t C_,
-                std::enable_if<(R_ != R || C_ != C) && (R_ <= R && C_ <= C),
-                               std::nullptr_t> = nullptr>
-      constexpr static Mat fillFrom(const Mat<F_, R_, C_>& other) {
-        return gen(internal::Fill<Mat<F_, R_, C_>>{other});
-      }
+      // template <typename F_, std::size_t R_, std::size_t C_,
+      //           std::enable_if<(R_ != R || C_ != C) && (R_ <= R && C_ <= C),
+      //                          std::nullptr_t> = nullptr>
+      // constexpr static Mat fillFrom(const Mat<F_, R_, C_>& other) {
+      //   return gen(internal::Fill<Mat<F_, R_, C_>>{other});
+      // }
 
       template <typename H1, typename H2, typename... Args>
       constexpr Mat(H1&& h1, H2&& h2, Args&&... args)
@@ -349,10 +348,8 @@ namespace emp {
           "Invalid number of arguments for a matrix of the given size");
       }
 
-      template <class T = F>
-      constexpr Mat(T&& value = {})
-        : Mat(std::forward_as_tuple(std::forward<T>(value),
-                                    std::make_index_sequence<R * C>{})) {}
+      constexpr Mat(const F& value = {})
+        : Mat(std::make_tuple(value, std::make_index_sequence<R * C>{})) {}
 
       constexpr Mat(const Mat&) = default;
       constexpr Mat(Mat&&) = default;
@@ -798,21 +795,21 @@ namespace emp {
                               float near = 1, float far = -1) {
         return Mat4x4f{
           2.0f / (maxX - minX),
-          0.0f,
-          0.0f,
+          0,
+          0,
           -(maxX + minX) / (maxX - minX),  // row 1
-          0.0f,
+          0,
           2.0f / (maxY - minY),
-          0.0f,
+          0,
           -(maxY + minY) / (maxY - minY),  // row 2
-          0.0f,
-          0.0f,
+          0,
+          0,
           -2.0f / (far - near),
           -(far + near) / (far - near),  // row 3
-          0.0f,
-          0.0f,
-          0.0f,
-          1.0f  // row 4
+          0,
+          0,
+          0,
+          1  // row 4
         };
       }
 
