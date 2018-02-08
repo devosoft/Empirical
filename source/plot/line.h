@@ -11,6 +11,9 @@
 #include "scenegraph/camera.h"
 #include "scenegraph/core.h"
 
+// Based on
+// https://blog.mapbox.com/drawing-antialiased-lines-with-opengl-8766f34192dc
+
 namespace emp {
   namespace plot {
     class Line : public scenegraph::Child {
@@ -21,6 +24,8 @@ namespace emp {
         opengl::VertexArrayObject vao;
         struct point_t {
           math::Vec3f position;
+          math::Vec2f normal;
+          float weight;
           opengl::Color color;
         };
 
@@ -31,6 +36,8 @@ namespace emp {
 #endif
               R"glsl(
                 attribute vec3 position;
+                attribute vec2 normal;
+                attribute float weight;
                 attribute vec4 color;
 
                 uniform mat4 model;
@@ -41,8 +48,9 @@ namespace emp {
 
                 void main()
                 {
-                    gl_Position = projection * view * model * vec4(position, 1.0);
-                    fcolor = color;
+                  vec4 delta = vec4(normal * weight, 0.0, 0.0);
+                  gl_Position = projection * (delta + view * model * vec4(position, 1.0));
+                  fcolor = color;
                 }
             )glsl",
 #ifdef EMSCRIPTEN
@@ -82,6 +90,10 @@ namespace emp {
         verticiesBuffer.bind();
         vao.attr(
           shader.program.attribute("position", &__Shader::point_t::position));
+        vao.attr(
+          shader.program.attribute("normal", &__Shader::point_t::normal));
+        vao.attr(
+          shader.program.attribute("weight", &__Shader::point_t::weight));
         vao.attr(shader.program.attribute("color", &__Shader::point_t::color));
         trianglesBuffer.bind();
       }
@@ -128,12 +140,12 @@ namespace emp {
         auto middleStrokeWeight{begin->strokeWeight * 0.5f};
 
         auto segment = (middle - start).normalized();
-        Vec3f normal{-segment.y(), segment.x(), 0};
+        Vec2f normal{-segment.y(), segment.x()};
 
         // Place the first two verticies into the list of vertices
         std::vector<__Shader::point_t> verts{
-          {start + normal * startStrokeWeight, startStroke},
-          {start - normal * startStrokeWeight, startStroke}};
+          {start, normal, startStrokeWeight, startStroke},
+          {start, -normal, startStrokeWeight, startStroke}};
         std::vector<GLuint> triangles;
 
         size_t i = 0;
@@ -143,14 +155,16 @@ namespace emp {
           auto weight{begin->strokeWeight * 0.5f};
 
           auto segment1 = (middle - start).normalized();
-          Vec3f normal1{-segment1.y(), segment1.x(), 0};
+          Vec2f normal1{-segment1.y(), segment1.x()};
           auto segment2 = (end - middle).normalized();
-          Vec3f normal2{-segment2.y(), segment2.x(), 0};
+          Vec2f normal2{-segment2.y(), segment2.x()};
 
-          auto center{(normal1 + normal2).normalized() * middleStrokeWeight};
+          auto center{(normal1 + normal2).normalized()};
 
-          verts.push_back(__Shader::point_t{middle + center, middleStroke});
-          verts.push_back(__Shader::point_t{middle - center, middleStroke});
+          verts.push_back(__Shader::point_t{middle, center, middleStrokeWeight,
+                                            middleStroke});
+          verts.push_back(__Shader::point_t{middle, -center, middleStrokeWeight,
+                                            middleStroke});
 
           triangles.push_back(i);
           triangles.push_back(i + 1);
@@ -171,12 +185,12 @@ namespace emp {
         }
 
         segment = (middle - start).normalized();
-        normal = {-segment.y(), segment.x(), 0};
+        normal = {-segment.y(), segment.x()};
 
-        verts.push_back(__Shader::point_t{middle + normal * middleStrokeWeight,
-                                          middleStroke});
-        verts.push_back(__Shader::point_t{middle - normal * middleStrokeWeight,
-                                          middleStroke});
+        verts.push_back(
+          __Shader::point_t{middle, normal, middleStrokeWeight, middleStroke});
+        verts.push_back(
+          __Shader::point_t{middle, -normal, middleStrokeWeight, middleStroke});
         triangles.push_back(i);
         triangles.push_back(i + 1);
         triangles.push_back(i + 2);

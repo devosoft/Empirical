@@ -46,6 +46,42 @@ namespace emp {
       math::Mat4x4f getProjection() const override { return projection; }
       math::Mat4x4f getView() const override { return view; }
     };
+
+    class PerspectiveCamera : public Camera {
+      private:
+      math::Region2D<float> region;
+      math::Mat4x4f projection;
+      math::Mat4x4f view;
+
+      void calculateMatrices() {
+        projection =
+          math::proj::perspective(-region.width() / 2, -region.height() / 2,
+                                  region.width() / 2, region.height() / 2);
+        // projection = math::proj::orthoFromScreen(
+        //   region.width(), region.height(), region.width(), region.height());
+        view = math::Mat4x4f::translation(0, 0, 0);
+      }
+
+      public:
+      ~PerspectiveCamera() override {}
+      template <class R = decltype(region)>
+      PerspectiveCamera(R&& region)
+        : region(std::forward<R>(region)),
+          projection(math::proj::orthoFromScreen(
+            region.width(), region.height(), region.width(), region.height())),
+          view(math::Mat4x4f::translation(0, 0, 0)) {}
+
+      template <class R = decltype(region)>
+      void setRegion(R&& region) {
+        this->region = std::forward<R>(region);
+        calculateMatrices();
+      }
+
+      math::Region2D<float> getRegion() const override { return region; }
+
+      math::Mat4x4f getProjection() const override { return projection; }
+      math::Mat4x4f getView() const override { return view; }
+    };
   }  // namespace scenegraph
 }  // namespace emp
 

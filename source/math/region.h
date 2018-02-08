@@ -7,52 +7,41 @@
 namespace emp {
   namespace math {
 
-    template <typename F>
-    class Region2D {
+    template <typename F, size_t D>
+    class Region {
       using field_type = std::decay_t<F>;
 
       public:
-      math::Vec2<field_type> min;
-      math::Vec2<field_type> max;
+      math::Vec<field_type, D> min;
+      math::Vec<field_type, D> max;
 
-      constexpr Region2D(
-        field_type minX = std::numeric_limits<field_type>::max(),
-        field_type minY = std::numeric_limits<field_type>::max(),
-        field_type maxX = std::numeric_limits<field_type>::lowest(),
-        field_type maxY = std::numeric_limits<field_type>::lowest())
-        : min{minX, minY}, max{maxX, maxY} {}
-
-      constexpr Region2D(const math::Vec2<field_type>& min,
-                         const math::Vec2<field_type>& max)
+      constexpr Region(const math::Vec<field_type, D>& min =
+                         {std::numeric_limits<field_type>::max()},
+                       const math::Vec<field_type, D>& max =
+                         {std::numeric_limits<field_type>::lowest()})
         : min{min}, max{max} {}
 
-      constexpr Region2D(const Region2D&) = default;
-      constexpr Region2D(Region2D&&) = default;
+      constexpr Region(const Region&) = default;
+      constexpr Region(Region&&) = default;
 
-      constexpr Region2D& operator=(const Region2D&) = default;
-      constexpr Region2D& operator=(Region2D&&) = default;
+      constexpr Region& operator=(const Region&) = default;
+      constexpr Region& operator=(Region&&) = default;
 
-      constexpr auto width() const { return size().x(); }
-      constexpr auto height() const { return size().y(); }
-      constexpr auto size() const {
-        if (max.x() >= min.x() && max.y() >= min.y()) {
-          return max - min;
+      constexpr auto extents() const {
+        auto size = max - min;
+        for (size_t i = 0; i < D; ++i) {
+          if (size[i] < 0) size[i] = 0;
         }
-        return Vec2<field_type>{0, 0};
+        return size;
       }
 
-      constexpr Region2D& include(const field_type& x, const field_type& y) {
-        if (x < min.x()) min.x() = x;
-        if (x > max.x()) max.x() = x;
-
-        if (y < min.y()) min.y() = y;
-        if (y > max.y()) max.y() = y;
-
+      template <class F2>
+      constexpr Region& include(const math::Vec<field_type, D>& v) {
+        for (size_t i = 0; i < D; ++i) {
+          if (v[i] < min[i]) min[i] = v[i];
+          if (v[i] > max[i]) max[i] = v[i];
+        }
         return *this;
-      }
-
-      constexpr Region2D& include(const math::Vec2<field_type>& v) {
-        return include(v.x(), v.y());
       }
 
       constexpr bool contains(const field_type& x, const field_type& y) const {
@@ -63,24 +52,21 @@ namespace emp {
         return contains(v.x(), v.y());
       }
 
-      constexpr Region2D& addBorder(const math::Vec2<field_type>& border) {
+      template <class F2>
+      constexpr Region& addBorder(const math::Vec<F2, D>& border) {
         min -= border;
         max += border;
         return *this;
       }
 
-      constexpr Region2D& addBorder(const field_type& dx,
-                                    const field_type& dy) {
-        return addBorder({dx, dy});
-      }
-
-      constexpr Region2D& addBorder(const field_type& border) {
-        return addBorder(border, border);
+      constexpr Region& addBorder(const field_type& border) {
+        return addBorder({border});
       }
 
       template <typename F2>
-      constexpr math::Vec2<field_type> rescale(
-        const math::Vec2<field_type>& value, const Region2D<F2>& source) const {
+      constexpr math::Vec<field_type, D> rescale(
+        const math::Vec<field_type, D>& value,
+        const Region<F2, D>& source) const {
         math::Vec2<float> normalized{
           (value.x() - source.min.x()) / source.width(),
           (value.y() - source.min.y()) / source.height()};
@@ -91,13 +77,10 @@ namespace emp {
       }
     };
 
-    template <typename F>
-    std::ostream& operator<<(std::ostream& out, const Region2D<F>& region) {
+    template <typename F, size_t D>
+    std::ostream& operator<<(std::ostream& out, const Region<F, D>& region) {
       return out << "[" << region.min << " " << region.max << "]";
     }
-
-    using Region2df = Region2D<float>;
-    using Region2dd = Region2D<double>;
 
   }  // namespace math
 }  // namespace emp
