@@ -688,6 +688,15 @@ namespace emp {
         internal::LeftScalarMult{}, mat, s);
     }
 
+    template <size_t D, typename F>
+    using ColVec = Mat<F, D, 1>;
+
+    template <size_t D, typename F>
+    using RowVec = Mat<F, 1, D>;
+
+    template <size_t D, typename F>
+    using Vec = ColVec<D, F>;
+
 #define MAT_SHORT(R, C)                                       \
   template <typename F>                                       \
   using Mat##R##x##C = Mat<F, R, C>;                          \
