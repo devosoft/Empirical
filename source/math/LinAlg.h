@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <limits>
 #include <ostream>
 #include <stdexcept>
 #include <tuple>
@@ -592,6 +593,31 @@ namespace emp {
       }
 
       constexpr Mat operator-() const { return (-1) * (*this); }
+#define __impl_mat_ops(op, not_op)                                           \
+  template <typename M = Mat<F, R, C>>                                       \
+  constexpr bool operator op(const M& other) const {                         \
+    static_assert(R * C == std::decay_t<M>::rows * std::decay_t<M>::columns, \
+                  "Cannot compare matrices of different sizes");             \
+                                                                             \
+    for (size_t i = 0; i < R * C; ++i) {                                     \
+      if (arrayData[i] not_op other[i]) return false;                        \
+    }                                                                        \
+    return true;                                                             \
+  }                                                                          \
+  template <typename M = Mat<F, R, C>>                                       \
+  constexpr bool operator not_op(const M& other) const {                     \
+    static_assert(R * C == std::decay_t<M>::rows * std::decay_t<M>::columns, \
+                  "Cannot compare matrices of different sizes");             \
+                                                                             \
+    for (size_t i = 0; i < R * C; ++i) {                                     \
+      if (arrayData[i] op other[i]) return false;                            \
+    }                                                                        \
+    return true;                                                             \
+  }
+
+      __impl_mat_ops(<, >=);
+      __impl_mat_ops(>, <=);
+      __impl_mat_ops(==, !=);
 
     };  // namespace math
 
@@ -696,14 +722,14 @@ namespace emp {
         internal::LeftScalarMult{}, mat, s);
     }
 
-    template <size_t D, typename F>
+    template <typename F, size_t D>
     using ColVec = Mat<F, D, 1>;
 
-    template <size_t D, typename F>
+    template <typename F, size_t D>
     using RowVec = Mat<F, 1, D>;
 
-    template <size_t D, typename F>
-    using Vec = ColVec<D, F>;
+    template <typename F, size_t D>
+    using Vec = ColVec<F, D>;
 
 #define MAT_SHORT(R, C)                                       \
   template <typename F>                                       \
