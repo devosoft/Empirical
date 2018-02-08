@@ -69,6 +69,7 @@ TEST_CASE("Test Matrices", "[math]") {
 
   CONST_REQUIRE(rowVec == colVec);
   CONST_REQUIRE(rowVec < 2 * colVec);
+  CONST_REQUIRE(rowVec < 2 * colVec);
 
   constexpr auto colVecId = rowVec * ident;
   CONST_REQUIRE_EQ(colVecId(0, 0), 1);
