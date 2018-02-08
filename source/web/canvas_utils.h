@@ -16,7 +16,7 @@
 #include "Canvas.h"
 
 #include "../base/vector.h"
-#include "../Evo/StateGrid.h"
+#include "../Evolve/StateGrid.h"
 #include "../geometry/Circle2D.h"
 #include "../geometry/Surface2D.h"
 #include "../tools/BitMatrix.h"
