@@ -18,7 +18,7 @@
 #include "plot/scatter.h"
 #include "scenegraph/camera.h"
 #include "scenegraph/core.h"
-#include "scenegraph/shapes.h"
+// #include "scenegraph/shapes.h"
 #include "scenegraph/transform.h"
 
 #include <chrono>
@@ -33,30 +33,39 @@ int main(int argc, char* argv[]) {
 
   GLCanvas canvas;
   Group root;
-  auto line{std::make_shared<Line>(canvas)};
+  // auto line{std::make_shared<Line>(canvas)};
   auto scatter{std::make_shared<Scatter>(canvas, 6)};
   auto scale{std::make_shared<Scale>(canvas.getRegion())};
-  root.attachAll(line, scatter);
+  root.attachAll(scatter);
 
-  std::vector<Vec2f> data;
-  for (int i = 0; i < 10; ++i) {
-    data.emplace_back(sin(i), cos(i));
-  }
+  std::vector<Vec3f> data;
+
   auto flow = (xy([](auto& p) { return p; }) + stroke(Color::red()) +
                strokeWeight(2) + fill(Color::blue()) + pointSize(10)) >>
-              scale >> scatter >> line;
+              scale >> scatter;
 
-  OrthoCamera camera(canvas.getRegion());
+  PerspectiveCamera camera(canvas.getRegion());
   canvas.bindOnResize([&camera, &scale](auto& canvas, auto width, auto height) {
     camera.setRegion(canvas.getRegion());
     scale->screenSpace = canvas.getRegion();
   });
+  auto random = [] {
+    using rand_t = decltype(rand());
+    using limits_t = std::numeric_limits<rand_t>;
+    return (rand() + limits_t::min()) /
+           (limits_t::max() - (float)limits_t::lowest());
+  };
+
+  for (int i = 0; i < 10; ++i) {
+    data.emplace_back(random(), random(), random());
+  }
+
+  flow.apply(data.begin(), data.end());
 
   canvas.runForever([&](auto&&) {
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    flow.apply(data.begin(), data.end());
     root.render(camera);
   });
 
