@@ -793,13 +793,6 @@ namespace emp {
               v1.x() * v2.y() - v1.y() * v2.x()};
     }
 
-    namespace camera {
-      // template <typename E = Vec3f, typename T = E, typename U = E>
-      // constexpr Mat3x3f lookAt(const E& eye, const T& target, const U& up) {
-      //   constexpr auto zaxis
-      // }
-    }  // namespace camera
-
     namespace proj {
       constexpr Mat4x4f ortho(float minX, float minY, float maxX, float maxY,
                               float near = 1, float far = -1) {
