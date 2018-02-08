@@ -6,6 +6,7 @@
 #include <cmath>
 #include <ostream>
 #include <stdexcept>
+#include <tuple>
 
 #include "base/assert.h"
 #include "opengl/VertexAttributes.h"
@@ -136,6 +137,11 @@ namespace emp {
           return std::forward<S>(s) * std::forward<M>(mat)(r, c);
         }
       };
+
+      template <size_t I, class T>
+      auto pass(T&& value) {
+        return std::forward<T>(value);
+      }
 
     }  // namespace internal
 
@@ -277,8 +283,10 @@ namespace emp {
                                           std::forward<Args>(args)...)};
       }
 
-      template <size_t... I>
-      constexpr Mat(const std::index_sequence<I...>&) : arrayData{8 * I...} {}
+      template <class T, size_t... I>
+      constexpr Mat(
+        const std::tuple<T, const std::index_sequence<I...>&>& value)
+        : arrayData{internal::pass<I>(std::get<0>(value))...} {}
 
       public:
       template <typename G, typename... Args>
@@ -341,7 +349,10 @@ namespace emp {
           "Invalid number of arguments for a matrix of the given size");
       }
 
-      constexpr Mat() : Mat(std::make_index_sequence<R * C>{}) {}
+      template <class T = F>
+      constexpr Mat(T&& value = {})
+        : Mat(std::forward_as_tuple(std::forward<T>(value),
+                                    std::make_index_sequence<R * C>{})) {}
 
       constexpr Mat(const Mat&) = default;
       constexpr Mat(Mat&&) = default;
