@@ -6,10 +6,10 @@
 #include <fstream>
 #include <vector>
 
-#include "Evo/EvoStats.h"
-#include "Evo/NK.h"
-#include "Evo/StatsManager.h"
-#include "Evo/World.h"
+#include "Evolve/EvoStats.h"
+#include "Evolve/NK.h"
+#include "Evolve/StatsManager.h"
+#include "Evolve/World.h"
 
 #include "tools/BitSet.h"
 #include "tools/Random.h"
