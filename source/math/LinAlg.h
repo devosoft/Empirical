@@ -116,6 +116,22 @@ namespace emp {
         }
       };
 
+      struct MatrixElementwiseMult {
+        template <typename A, typename B>
+        constexpr auto operator()(std::size_t r, std::size_t c, A&& a,
+                                  B&& b) const {
+          return std::forward<A>(a)(r, c) * std::forward<B>(b)(r, c);
+        }
+      };
+
+      struct MatrixElementwiseDiv {
+        template <typename A, typename B>
+        constexpr auto operator()(std::size_t r, std::size_t c, A&& a,
+                                  B&& b) const {
+          return std::forward<A>(a)(r, c) / std::forward<B>(b)(r, c);
+        }
+      };
+
       struct MatrixTranspose {
         template <typename M>
         constexpr auto operator()(std::size_t r, std::size_t c, M&& m) const {
@@ -618,8 +634,7 @@ namespace emp {
       __impl_mat_ops(<, >=);
       __impl_mat_ops(>, <=);
       __impl_mat_ops(==, !=);
-
-    };  // namespace math
+    };
 
     template <typename F, std::size_t R>
     std::ostream& operator<<(std::ostream& out, const Mat<F, R, 1>& mat) {
@@ -660,6 +675,20 @@ namespace emp {
     operator-(const Mat<F1, R, C>& a, const Mat<F2, R, C>& b) {
       return Mat<decltype(std::declval<F1>() - std::declval<F2>()), R, C>::from(
         internal::MatrixSub{}, a, b);
+    }
+
+    template <typename F1, typename F2, std::size_t R, std::size_t C>
+    constexpr Mat<decltype(std::declval<F1>() * std::declval<F2>()), R, C> mult(
+      const Mat<F1, R, C>& a, const Mat<F2, R, C>& b) {
+      return Mat<decltype(std::declval<F1>() * std::declval<F2>()), R, C>::from(
+        internal::MatrixElementwiseMult{}, a, b);
+    }
+
+    template <typename F1, typename F2, std::size_t R, std::size_t C>
+    constexpr Mat<decltype(std::declval<F1>() / std::declval<F2>()), R, C> div(
+      const Mat<F1, R, C>& a, const Mat<F2, R, C>& b) {
+      return Mat<decltype(std::declval<F1>() / std::declval<F2>()), R, C>::from(
+        internal::MatrixElementwiseDiv{}, a, b);
     }
 
     // Define the dot product
