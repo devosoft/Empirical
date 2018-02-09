@@ -123,6 +123,8 @@ namespace emp {
 
         shader.program.use();
         shader.vao.bind();
+        verticesBuffer.bind();
+        trianglesBuffer.bind();
 
         shader.projection = camera.getProjection();
         shader.view = camera.getView();
@@ -142,9 +144,9 @@ namespace emp {
         points.clear();
 
         for (; begin != end; ++begin) {
-          auto model =
-            Mat4x4f::translation(begin->xyScaled.x(), begin->xyScaled.y(), 0) *
-            Mat4x4f::scale(begin->pointSize);
+          auto model = Mat4x4f::translation(begin->xyzScaled.x(),
+                                            begin->xyzScaled.y(), 0) *
+                       Mat4x4f::scale(begin->pointSize);
 
           points.push_back({model, begin->fill});
         }

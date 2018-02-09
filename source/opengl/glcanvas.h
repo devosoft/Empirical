@@ -122,7 +122,7 @@ namespace emp {
     class GLCanvas {
       private:
       unsigned int width, height;
-      Region2D<float> region;
+      Region2f region;
       MouseEvent lastMouseEvent;
 
 #ifdef __EMSCRIPTEN__
@@ -165,14 +165,14 @@ namespace emp {
 #ifdef __EMSCRIPTEN__
         EmscriptenWebGLContextAttributes attrs;
         emscripten_webgl_init_context_attributes(&attrs);
-        attrs.majorVersion = 2;
+        attrs.majorVersion = 1;
         attrs.minorVersion = 0;
         context = emscripten_webgl_create_context(title, &attrs);
 
 #else
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
         glfwWindowHint(GLFW_SAMPLES, 8);

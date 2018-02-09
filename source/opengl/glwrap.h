@@ -207,7 +207,7 @@ namespace emp {
       operator bool() const { return handle != 0; }
       operator GLuint() const { return handle; }
     };
-
+#ifndef EMSCRIPTEN
     template <class F, BufferType... TYPES>
     void mapBuffers(F&& callback, BufferAccess access,
                     BufferObject<TYPES>&... buffers) {
@@ -218,6 +218,7 @@ namespace emp {
       auto _ = [](auto&&...) {};
       _(buffers.unmap()...);
     }
+#endif
 
     class VertexAttribute {
       private:

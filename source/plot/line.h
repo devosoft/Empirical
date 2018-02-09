@@ -127,7 +127,7 @@ namespace emp {
         if (begin == end) return;
 
         // Capture the first element of the dataset
-        Vec3f start{begin->xyScaled.x(), begin->xyScaled.y(), 0};
+        Vec3f start{begin->xyzScaled.x(), begin->xyzScaled.y(), 0};
         auto startStroke{begin->stroke};
         auto startStrokeWeight{begin->strokeWeight * 0.5f};
         ++begin;
@@ -135,7 +135,7 @@ namespace emp {
         if (begin == end) return;
 
         // capture the second element
-        Vec3f middle{begin->xyScaled.x(), begin->xyScaled.y(), 0};
+        Vec3f middle{begin->xyzScaled.x(), begin->xyzScaled.y(), 0};
         auto middleStroke{begin->stroke};
         auto middleStrokeWeight{begin->strokeWeight * 0.5f};
 
@@ -150,7 +150,7 @@ namespace emp {
 
         size_t i = 0;
         for (++begin; begin != end; ++begin) {
-          Vec3f end{begin->xyScaled.x(), begin->xyScaled.y(), 0};
+          Vec3f end{begin->xyzScaled.x(), begin->xyzScaled.y(), 0};
           auto stroke{begin->stroke};
           auto weight{begin->strokeWeight * 0.5f};
 
@@ -206,8 +206,8 @@ namespace emp {
           maxElementCount = elementCount;
         } else {
 #ifdef EMSCRIPTEN
-          group.verticiesBuffer.subset(verts);
-          group.trianglesBuffer.subset(triangles);
+          verticiesBuffer.subset(verts);
+          trianglesBuffer.subset(triangles);
 #else
           auto mappedVerticiesBuffer = verticiesBuffer.map<__Shader::point_t>(
             verts.size(), BufferAccess::write().invalidatesBuffer());

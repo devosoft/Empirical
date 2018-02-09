@@ -35,8 +35,8 @@ namespace emp {
         return size;
       }
 
-      template <class F2>
-      constexpr Region& include(const math::Vec<field_type, D>& v) {
+      template <class F2 = field_type>
+      constexpr Region& include(const math::Vec<F2, D>& v) {
         for (size_t i = 0; i < D; ++i) {
           if (v[i] < min[i]) min[i] = v[i];
           if (v[i] > max[i]) max[i] = v[i];
@@ -44,12 +44,8 @@ namespace emp {
         return *this;
       }
 
-      constexpr bool contains(const field_type& x, const field_type& y) const {
-        return min.x() <= x && x <= max.x() && min.y() <= y && y <= max.y();
-      }
-
       constexpr bool contains(const math::Vec2<field_type>& v) const {
-        return contains(v.x(), v.y());
+        return min <= v && max <= v;
       }
 
       template <class F2>
@@ -63,17 +59,11 @@ namespace emp {
         return addBorder({border});
       }
 
-      template <typename F2>
+      template <typename F2 = field_type, typename F3 = field_type>
       constexpr math::Vec<field_type, D> rescale(
-        const math::Vec<field_type, D>& value,
-        const Region<F2, D>& source) const {
-        math::Vec2<float> normalized{
-          (value.x() - source.min.x()) / source.width(),
-          (value.y() - source.min.y()) / source.height()};
-        return {
-          normalized.x() * width() + min.x() * 0,
-          normalized.y() * height() + min.y() * 0,
-        };
+        const math::Vec<F2, D>& value, const Region<F3, D>& source) const {
+        using namespace emp::math;
+        return mult(div(value - source.min, source.extents()), extents()) + min;
       }
     };
 
@@ -81,6 +71,9 @@ namespace emp {
     std::ostream& operator<<(std::ostream& out, const Region<F, D>& region) {
       return out << "[" << region.min << " " << region.max << "]";
     }
+
+    using Region2f = Region<float, 2>;
+    using Region2d = Region<double, 2>;
 
   }  // namespace math
 }  // namespace emp

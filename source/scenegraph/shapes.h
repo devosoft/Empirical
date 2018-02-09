@@ -3,29 +3,96 @@
 
 #include "core.h"
 #include "opengl/color.h"
-#include "opengl/defaultShaders.h"
+#include "opengl/glcanvas.h"
+#include "opengl/glwrap.h"
+#include "opengl/shaders.h"
 
 namespace emp {
   namespace scenegraph {
     namespace shapes {
+      namespace __shader {
+        using namespace opengl;
+        constexpr auto VertexShaderSource =
+#ifdef EMSCRIPTEN
+          "precision mediump float;"
+#endif
+          R"glsl(
+                attribute vec3 position;
+                uniform vec4 color;
+
+                uniform mat4 model;
+                uniform mat4 view;
+                uniform mat4 projection;
+
+                varying vec4 fcolor;
+
+                void main()
+                {
+                    gl_Position = projection * view * model * vec4(position, 1.0);
+                    fcolor = color;
+                }
+            )glsl";
+
+        constexpr auto FragmentShaderSource =
+#ifdef EMSCRIPTEN
+          "precision mediump float;"
+#endif
+          R"glsl(
+                  varying vec4 fcolor;
+
+                  void main()
+                  {
+                      gl_FragColor = fcolor;
+                  }
+              )glsl";
+
+        struct Shader {
+          ShaderProgram program;
+          Uniform color;
+          Uniform model;
+          Uniform view;
+          Uniform projection;
+          VertexArrayObject vao;
+
+          Shader(GLCanvas& canvas)
+            : program(canvas.makeShaderProgram(VertexShaderSource,
+                                               FragmentShaderSource)),
+              color(program.uniform("color")),
+              model(program.uniform("model")),
+              view(program.uniform("view")),
+              projection(program.uniform("projection")),
+              vao(canvas.makeVAO()) {
+            program.use();
+          }
+        };
+      }  // namespace __shader
 
       class Rectangle : public Child {
         private:
-        opengl::shaders::SimpleSolidColor shader;
+        __shader::Shader shader;
+        opengl::BufferObject<opengl::BufferType::Array> verticesBuffer;
+        opengl::BufferObject<opengl::BufferType::ElementArray> trianglesBuffer;
 
         public:
         opengl::Color fill;
 
-        Rectangle(opengl::GLCanvas& canvas) : shader(canvas), fill{0, 0, 0, 1} {
+        Rectangle(opengl::GLCanvas& canvas)
+          : shader(canvas),
+            verticesBuffer(canvas.makeBuffer<opengl::BufferType::Array>()),
+            trianglesBuffer(
+              canvas.makeBuffer<opengl::BufferType::ElementArray>()),
+            fill{0, 0, 0, 1} {
           using namespace emp::opengl;
           using namespace emp::math;
 
-          shader.vao.getBuffer<BufferType::Array>().set(
-            {Vec3f{-0.5, +0.5, 0}, Vec3f{+0.5, +0.5, 0}, Vec3f{+0.5, -0.5, 0},
-             Vec3f{-0.5, -0.5, 0}},
-            BufferUsage::StaticDraw);
+          shader.vao.bind();
 
-          shader.vao.getBuffer<BufferType::ElementArray>().set(
+          verticesBuffer.init({Vec3f{-0.5, +0.5, 0}, Vec3f{+0.5, +0.5, 0},
+                               Vec3f{+0.5, -0.5, 0}, Vec3f{-0.5, -0.5, 0}},
+                              BufferUsage::StaticDraw);
+          shader.vao.attr(shader.program.attribute<Vec3f>("position"));
+
+          trianglesBuffer.init(
             {
               0, 1, 2,  // First Triangle
               2, 3, 0  // Second Triangle
@@ -39,10 +106,10 @@ namespace emp {
                             const math::Mat4x4f& transform) {
           using namespace emp::math;
           using namespace emp::opengl;
-          shader.shader.use();
+          shader.program.use();
           shader.vao.bind();
 
-          shader.proj = camera.getProjection();
+          shader.projection = camera.getProjection();
           shader.view = camera.getView();
 
           shader.model = transform * Mat4x4f::scale(10);

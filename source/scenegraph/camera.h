@@ -11,18 +11,19 @@ namespace emp {
       virtual ~Camera() {}
       virtual math::Mat4x4f getProjection() const = 0;
       virtual math::Mat4x4f getView() const = 0;
-      virtual math::Region2D<float> getRegion() const = 0;
+      virtual math::Region2f getRegion() const = 0;
     };
 
     class OrthoCamera : public Camera {
       private:
-      math::Region2D<float> region;
+      math::Region2f region;
       math::Mat4x4f projection;
       math::Mat4x4f view;
 
       void calculateMatrices() {
         projection = math::proj::orthoFromScreen(
-          region.width(), region.height(), region.width(), region.height());
+          region.extents().x(), region.extents().y(), region.extents().x(),
+          region.extents().y());
         view = math::Mat4x4f::translation(0, 0, 0);
       }
 
@@ -41,7 +42,7 @@ namespace emp {
         calculateMatrices();
       }
 
-      math::Region2D<float> getRegion() const override { return region; }
+      math::Region2f getRegion() const override { return region; }
 
       math::Mat4x4f getProjection() const override { return projection; }
       math::Mat4x4f getView() const override { return view; }
@@ -49,14 +50,14 @@ namespace emp {
 
     class PerspectiveCamera : public Camera {
       private:
-      math::Region2D<float> region;
+      math::Region2f region;
       math::Mat4x4f projection;
       math::Mat4x4f view;
 
       void calculateMatrices() {
-        projection =
-          math::proj::perspective(-region.width() / 2, -region.height() / 2,
-                                  region.width() / 2, region.height() / 2);
+        projection = math::proj::perspective(
+          -region.extents().x() / 2, -region.extents().x() / 2,
+          region.extents().y() / 2, region.extents().y() / 2);
         // projection = math::proj::orthoFromScreen(
         //   region.width(), region.height(), region.width(), region.height());
         view = math::Mat4x4f::translation(0, 0, 0);
@@ -68,7 +69,8 @@ namespace emp {
       PerspectiveCamera(R&& region)
         : region(std::forward<R>(region)),
           projection(math::proj::orthoFromScreen(
-            region.width(), region.height(), region.width(), region.height())),
+            region.extents().x(), region.extents().y(), region.extents().x(),
+            region.extents().y())),
           view(math::Mat4x4f::translation(0, 0, 0)) {}
 
       template <class R = decltype(region)>
@@ -77,7 +79,7 @@ namespace emp {
         calculateMatrices();
       }
 
-      math::Region2D<float> getRegion() const override { return region; }
+      math::Region2f getRegion() const override { return region; }
 
       math::Mat4x4f getProjection() const override { return projection; }
       math::Mat4x4f getView() const override { return view; }
