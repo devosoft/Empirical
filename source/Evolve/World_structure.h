@@ -145,6 +145,12 @@ namespace emp {
   }
 
   template<typename ORG>
+  void SetMapElites(World<ORG> & world, const emp::vector<size_t> & trait_counts,
+                    bool synchronous_gen=false) {
+    SetMapElites(world, traits.GetPhenotypes(), trait_counts, synchronous_gen);
+  }
+
+  template<typename ORG>
   void SetMapElites(World<ORG> & world, bool synchronous_gen=false) {
     SetMapElites(world, traits.GetPhenotypes(), synchronous_gen);
   }
