@@ -132,6 +132,18 @@ namespace emp {
       for (size_t i = 0; i < traits.size(); i++) results[i] = traits[i]->EvalValue(target);
       return results;
     }
+
+    // Determine which bin a trait fits in based on the number of bins and the range.
+    size_t EvalBin(target_t & target, emp::vector<size_t> bin_counts) {
+      size_t mult = 1;
+      size_t id = 0;
+      for (size_t i = 0; i < traits.size(); i++) {
+        size_t cur_bin = traits[i]->EvalBin(target);
+        id += cur_bin * mult;
+        mult *= bin_counts[i];
+      }
+
+    }
   };
 
 }
