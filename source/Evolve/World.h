@@ -96,6 +96,7 @@ namespace emp {
       bool is_active;  ///< Is this organism in the active population (vs. waiting for Update)
 
       OrgPosition(size_t _id, bool _active=true) : index(_id), is_active(_active) { ; }
+      OrgPosition() : index((size_t) -1)), is_active(false) { ; }
     };
 
     // --- Publicly available types ---
