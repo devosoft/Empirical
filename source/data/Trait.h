@@ -77,6 +77,12 @@ namespace emp {
     value_t EvalLimit(target_t & target) { return range.Limit(fun(target)); }
     std::string EvalString(target_t & target) { return std::to_string(EvalLimit(target)); }
     double EvalValue(target_t & target) { return (double) EvalLimit(target); }
+
+    // Determine which bin a trait fits in based on the number of bins and the range.
+    size_t EvalBin(target_t & target, size_t num_bins) {
+      const value_t val = fun(target);
+      return range.CalcBin(val, num_bins);
+    }
   };
 
   /// A TraitSet houses a collection of traits and can trigger them to all be evaluated at once.
