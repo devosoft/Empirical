@@ -47,6 +47,14 @@ namespace emp {
     return sum;
   }
 
+  /// Multiple all of the contents of a vector.
+  template <typename T>
+  T Product(const emp::vector<T> & v) {
+    T product = 1;
+    for (auto x : v) product *= x;
+    return product;
+  }
+
   /// Tree manipulation in vectors.
   constexpr size_t tree_left(size_t id) { return id*2+1; }
   constexpr size_t tree_right(size_t id) { return id*2+2; }
