@@ -39,6 +39,14 @@ namespace emp {
     }
   }
 
+  /// Sum up the contents of a vector.
+  template <typename T>
+  T Sum(const emp::vector<T> & v) {
+    T sum = 0;
+    for (auto x : v) sum += x;
+    return sum;
+  }
+
   /// Tree manipulation in vectors.
   constexpr size_t tree_left(size_t id) { return id*2+1; }
   constexpr size_t tree_right(size_t id) { return id*2+2; }
