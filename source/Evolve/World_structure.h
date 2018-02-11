@@ -12,6 +12,7 @@
 
 #include "../base/assert.h"
 #include "../base/vector.h"
+#include "../data/Trait.h"
 #include "../tools/Random.h"
 
 namespace emp {
@@ -29,7 +30,7 @@ namespace emp {
     world.MarkSpaceStructured(true).MarkPhenoStructured(false);
 
     // -- Setup functions --
-    // Inject in a empty pool -or- randomly if none empty
+    // Inject in an empty pool -or- randomly if none empty
     world.SetAddInjectFun( [&world,pool_size](Ptr<ORG> new_org) {
       for (size_t id = 0; id < world.GetSize(); id += pool_size) {
         if (world.IsOccupied(id) == false) return world.AddOrgAt(new_org, id);
@@ -79,13 +80,17 @@ namespace emp {
   template<typename ORG>
   void SetMapElites(World<ORG> & world, TraitSet traits,
                     const emp::vector<size_t> & trait_counts, bool synchronous_gen=false) {
-    world.Resize(pool_size, num_pools);
+    const size_t pop_size = Product(trait_counts);  // Pop position for each combo of traits.
+    world.Resize(pop_size);
     world.MarkSynchronous(synchronous_gen);
-    world.MarkSpaceStructured(true).MarkPhenoStructured(false);
+    world.MarkSpaceStructured(false).MarkPhenoStructured(true);
 
     // -- Setup functions --
-    // Inject in a empty pool -or- randomly if none empty
-    world.SetAddInjectFun( [&world,pool_size](Ptr<ORG> new_org) {
+    // Inject into the appropriate positon based on phenotype.  Note that an inject will fail
+    // if a more fit organism is already in place; you must run clear first if you want to
+    // ensure placement.
+    world.SetAddInjectFun( [&world,traits,trait_counts](Ptr<ORG> new_org) {
+      auto coords = traits.EvalValues(new_org);
       for (size_t id = 0; id < world.GetSize(); id += pool_size) {
         if (world.IsOccupied(id) == false) return world.AddOrgAt(new_org, id);
       }
