@@ -12,53 +12,66 @@
 #include "math/LinAlg.h"
 #include "math/consts.h"
 #include "opengl/glcanvas.h"
-#include "plot/plot.h"
-
-#include <cstdlib>
+#include "plot/flow.h"
+#include "plot/line.h"
+#include "plot/scales.h"
+#include "plot/scatter.h"
+#include "scenegraph/camera.h"
+#include "scenegraph/core.h"
+// #include "scenegraph/shapes.h"
+#include "scenegraph/transform.h"
 
 #include <chrono>
+#include <cstdlib>
 
 int main(int argc, char* argv[]) {
   using namespace emp::opengl;
-  using namespace emp::plot;
-  using namespace emp::plot::properties;
   using namespace emp::math;
-
-  constexpr auto MAX = 100;
-  constexpr auto MIN = -100;
-  constexpr auto STEPS = 1e3;
-  constexpr auto f_STEPS = static_cast<float>(STEPS);
+  using namespace emp::scenegraph;
+  using namespace emp::plot;
+  using namespace emp::plot::attrs;
 
   GLCanvas canvas;
-  canvas.bindOnMouseEvent(
-    [](auto& canvas, auto& event) { std::cout << event << std::endl; });
-
-  auto g{graph()
-           .then_map(CartesianData::to(Value::get),
-                     Fill::to(Vec4f{1, 1, 0.5, 1}),
-                     Stroke::to(Vec4f{0.5, 0.5, 0.5, 1}), StrokeWeight::to(2),
-                     PointSize::to(4))
-           .then_views(canvas, Line(canvas), Scatter(canvas))};
+  Group root;
+  auto line{std::make_shared<Line>(canvas)};
+  auto scatter{std::make_shared<Scatter>(canvas, 6)};
+  auto scale{std::make_shared<Scale<2>>(canvas.getRegion())};
+  root.attachAll(scatter, line);
 
   std::vector<Vec2f> data;
-  for (int i = 0; i < STEPS; ++i) {
-    float theta = (i / f_STEPS) * 2 * consts::pi<float>;
-    data.emplace_back(sin(theta) * (MAX - MIN), cos(theta) * (MAX - MIN));
+
+  auto flow = (xyz([](auto& p) { return p; }) + stroke(Color::red()) +
+               strokeWeight(2) + fill(Color::blue()) + pointSize(10)) >>
+              scale >> scatter >> line;
+
+  PerspectiveCamera camera(canvas.getRegion());
+  canvas.bindOnResize([&camera, &scale](auto& canvas, auto width, auto height) {
+    camera.setRegion(canvas.getRegion());
+    scale->screenSpace = canvas.getRegion();
+  });
+  auto random = [] {
+    using rand_t = decltype(rand());
+    using limits_t = std::numeric_limits<rand_t>;
+    return (rand() + limits_t::min()) /
+           (limits_t::max() - (float)limits_t::lowest());
+  };
+
+  for (int i = 0; i < 10000; ++i) {
+    data.emplace_back(random(), random());
   }
 
-  float offset = 0;
+  flow.apply(data.begin(), data.end());
+
   canvas.runForever([&](auto&&) {
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    g(data.begin(), data.end(), canvas.getRegion());
+    root.render(camera);
     data.clear();
-    for (int i = 0; i < STEPS; ++i) {
-      float theta = (i / f_STEPS) * 2 * consts::pi<float> + offset;
-      data.emplace_back((sin(theta) - cos(2 * theta)) / 3 * (MAX - MIN),
-                        (sin(4 * theta) + cos(theta)) / 3 * (MAX - MIN));
+    for (int i = 0; i < 10000; ++i) {
+      data.emplace_back(random(), random());
     }
-    offset += 0.005;
+    flow.apply(data.begin(), data.end());
   });
 
   return 0;
