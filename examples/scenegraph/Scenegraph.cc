@@ -18,7 +18,7 @@
 #include "plot/scatter.h"
 #include "scenegraph/camera.h"
 #include "scenegraph/core.h"
-// #include "scenegraph/shapes.h"
+#include "scenegraph/shapes.h"
 #include "scenegraph/transform.h"
 
 #include <chrono>
@@ -28,39 +28,17 @@ int main(int argc, char* argv[]) {
   using namespace emp::opengl;
   using namespace emp::math;
   using namespace emp::scenegraph;
+  using namespace emp::scenegraph::shapes;
   using namespace emp::plot;
   using namespace emp::plot::attrs;
 
   GLCanvas canvas;
   Group root;
-  // auto line{std::make_shared<Line>(canvas)};
-  auto scatter{std::make_shared<Scatter>(canvas, 6)};
-  auto scale{std::make_shared<Scale>(canvas.getRegion())};
-  root.attachAll(scatter);
-
-  std::vector<Vec3f> data;
-
-  auto flow = (xy([](auto& p) { return p; }) + stroke(Color::red()) +
-               strokeWeight(2) + fill(Color::blue()) + pointSize(10)) >>
-              scale >> scatter;
+  auto rect = std::make_shared<Transform<Rectangle>>(canvas);
+  rect->translate(10, 10);
+  root.attachAll(rect);
 
   PerspectiveCamera camera(canvas.getRegion());
-  canvas.bindOnResize([&camera, &scale](auto& canvas, auto width, auto height) {
-    camera.setRegion(canvas.getRegion());
-    scale->screenSpace = canvas.getRegion();
-  });
-  auto random = [] {
-    using rand_t = decltype(rand());
-    using limits_t = std::numeric_limits<rand_t>;
-    return (rand() + limits_t::min()) /
-           (limits_t::max() - (float)limits_t::lowest());
-  };
-
-  for (int i = 0; i < 10; ++i) {
-    data.emplace_back(random(), random(), random());
-  }
-
-  flow.apply(data.begin(), data.end());
 
   canvas.runForever([&](auto&&) {
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
