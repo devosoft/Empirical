@@ -91,12 +91,21 @@ namespace emp {
     /// A helper struct to keep track of where an organism is in the World.  For the moment,
     /// the only informaiton beyond index position is active (vs. next) population when
     /// using synchronous generations.
-    struct OrgPosition {
+    class OrgPosition {
+    private:
       size_t index;    ///< Position of this organism in the population.
       bool is_active;  ///< Is this organism in the active population (vs. waiting for Update)
 
+    public:
       OrgPosition(size_t _id, bool _active=true) : index(_id), is_active(_active) { ; }
-      OrgPosition() : index((size_t) -1)), is_active(false) { ; }
+      OrgPosition() : index((size_t) -1), is_active(false) { ; }
+
+      size_t GetIndex() const { return index; }
+      bool IsActive() const { return is_active; }
+      bool IsValid() const { return index != (size_t) -1; }
+
+      OrgPosition & SetActive(bool _active=true) { is_active = _active; return *this; }
+      OrgPosition & SetIndex(size_t _id) { index = _id; return *this; }      
     };
 
     // --- Publicly available types ---
@@ -1015,7 +1024,7 @@ namespace emp {
       inject_ready_sig.Trigger(*new_org);
       const OrgPosition pos = fun_add_inject(new_org);
       //SetupOrg(*new_org, &callbacks, pos);
-      if (pos.is_active) org_placement_sig.Trigger(pos.index);
+      if (pos.IsActive()) org_placement_sig.Trigger(pos.GetIndex());
     }
   }
 
@@ -1046,7 +1055,7 @@ namespace emp {
     Ptr<ORG> new_org = NewPtr<ORG>(mem);
     offspring_ready_sig.Trigger(*new_org);
     const OrgPosition pos = fun_add_birth(new_org, parent_pos);
-    if (pos.is_active) org_placement_sig.Trigger(pos.index);
+    if (pos.IsActive()) org_placement_sig.Trigger(pos.GetIndex());
     // SetupOrg(*new_org, &callbacks, pos);
     return pos;
   }
@@ -1059,7 +1068,7 @@ namespace emp {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       offspring_ready_sig.Trigger(*new_org);
       const OrgPosition pos = fun_add_birth(new_org, parent_pos);
-      if (pos.is_active) org_placement_sig.Trigger(pos.index);
+      if (pos.IsActive()) org_placement_sig.Trigger(pos.GetIndex());
       // SetupOrg(*new_org, &callbacks, pos);
     }
   }
