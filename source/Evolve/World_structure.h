@@ -14,6 +14,7 @@
 #include "../base/vector.h"
 #include "../data/Trait.h"
 #include "../tools/Random.h"
+#include "../tools/vector_utils.h"
 
 namespace emp {
 
@@ -78,7 +79,7 @@ namespace emp {
   /// 1: Organism position is based on their phenotypic traits.
   /// 2: Organisms must have a higher fitness than the current resident of a position to steal it.
   template<typename ORG>
-  void SetMapElites(World<ORG> & world, TraitSet traits,
+  void SetMapElites(World<ORG> & world, TraitSet<ORG> traits,
                     const emp::vector<size_t> & trait_counts, bool synchronous_gen=false) {
     const size_t pop_size = Product(trait_counts);  // Pop position for each combo of traits.
     world.Resize(pop_size);
@@ -90,10 +91,11 @@ namespace emp {
     // if a more fit organism is already in place; you must run clear first if you want to
     // ensure placement.
     world.SetAddInjectFun( [&world,traits,trait_counts](Ptr<ORG> new_org) {
-      auto coords = traits.EvalValues(new_org);
-      for (size_t id = 0; id < world.GetSize(); id += pool_size) {
-        if (world.IsOccupied(id) == false) return world.AddOrgAt(new_org, id);
-      }
+      // Determine tha position that this phenotype fits in.
+      double org_fitness = world.CalcFitnessOrg(*new_org);
+      size_t id = traits.EvalBin(*new_org, trait_counts);
+      double cur_fitness = world.CalcFitnessID(id);
+
       return world.AddOrgAt(new_org, world.GetRandomCellID());
     });
 
