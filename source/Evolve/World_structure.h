@@ -125,7 +125,7 @@ namespace emp {
   }
 
   template<typename ORG>
-  void SetMapElites(World<ORG> & world, TraitSet traits) {
+  void SetMapElites(World<ORG> & world, TraitSet<ORG> traits) {
     emp::vector<size_t> trait_counts;
     emp_assert(traits.GetSize() > 0);
 
@@ -144,11 +144,11 @@ namespace emp {
 
   template<typename ORG>
   void SetMapElites(World<ORG> & world, const emp::vector<size_t> & trait_counts) {
-    SetMapElites(world, traits.GetPhenotypes(), trait_counts);
+    SetMapElites(world, world.GetPhenotypes(), trait_counts);
   }
 
   template<typename ORG>
-  void SetMapElites(World<ORG> & world) { SetMapElites(world, traits.GetPhenotypes()); }
+  void SetMapElites(World<ORG> & world) { SetMapElites(world, world.GetPhenotypes()); }
 }
 
 #endif
