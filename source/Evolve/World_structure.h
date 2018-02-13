@@ -61,7 +61,7 @@ namespace emp {
       });
       world.SetAttribute("SynchronousGen", "True");
     } else {
-      // Asynchronous: always go to a neigbor in current population.
+      // Asynchronous: always go to a neighbor in current population.
       world.SetAddBirthFun( [&world](Ptr<ORG> new_org, size_t parent_id) {
         auto id = world.GetRandomNeighborID(parent_id);
         auto p_genotype = world.GetGenotypeAt(parent_id);
@@ -86,10 +86,9 @@ namespace emp {
                     const emp::vector<size_t> & trait_counts) {
     // 
     // For consistency with other population structures, we are leaving the option.
-    emp_assert(synchronous_gen == false);
     const size_t pop_size = Product(trait_counts);  // Pop position for each combo of traits.
     world.Resize(pop_size);
-    world.MarkSynchronous(synchronous_gen);
+    world.MarkSynchronous(false);
     world.MarkSpaceStructured(false).MarkPhenoStructured(true);
 
     // -- Setup functions --
@@ -107,36 +106,21 @@ namespace emp {
     });
 
     // Map Elites does not have a concept of neighbors.
-    world.SetGetNeighborFun( [&world,pool_size](size_t id) {
-      emp_assert(false);
-      return id;
+    world.SetGetNeighborFun( [](size_t id) { emp_assert(false); return id; });
+
+    // Birth is effectively the same as inject.
+    world.SetAddBirthFun( [&world,traits,trait_counts](Ptr<ORG> new_org, size_t parent_id) {
+      (void) parent_id; // Parent id is not needed for MAP Elites.
+      // Determine tha position that this phenotype fits in.
+      double org_fitness = world.CalcFitnessOrg(*new_org);
+      size_t id = traits.EvalBin(*new_org, trait_counts);
+      double cur_fitness = world.CalcFitnessID(id);
+
+      if (cur_fitness > org_fitness) return World<ORG>::OrgPosition();  // Return invalid position!
+      return world.AddOrgAt(new_org, id);
     });
 
-    if (synchronous_gen) {
-      // Place births in the next open spot in the new pool (or randomly if full!)
-      world.SetAddBirthFun( [&world,pool_size](Ptr<ORG> new_org, size_t parent_id) {
-        emp_assert(new_org);                                  // New organism must exist.
-        const size_t pool_id = parent_id / pool_size;
-        const size_t start_id = pool_id * pool_size;
-        for (size_t id = start_id; id < start_id+pool_size; id++) {
-          if (world.IsOccupied(id) == false) {  // Search for an open positions...
-            return world.AddNextOrgAt(new_org, id, world.GetGenotypeAt(parent_id));
-          }
-        }
-        const size_t id = world.GetRandomNeighborID(parent_id);     // Placed near parent, in next pop.
-        return world.AddNextOrgAt(new_org, id, world.GetGenotypeAt(parent_id));
-      });
-      world.SetAttribute("SynchronousGen", "True");
-    } else {
-      // Asynchronous: always go to a neigbor in current population.
-      world.SetAddBirthFun( [&world](Ptr<ORG> new_org, size_t parent_id) {
-        auto id = world.GetRandomNeighborID(parent_id);
-        auto p_genotype = world.GetGenotypeAt(parent_id);
-        return world.AddOrgAt(new_org, id, p_genotype); // Place org in existing population.
-      });
-      world.SetAttribute("SynchronousGen", "False");
-    }
-
+    world.SetAttribute("SynchronousGen", "False");
     world.SetAttribute("PopStruct", "MapElites");
   }
 
