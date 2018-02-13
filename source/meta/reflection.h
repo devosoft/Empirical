@@ -1,8 +1,11 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  This class provides macro utilities to help determine details about unknown classes.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2018
+ *
+ *  @file  reflection.h
+ *  @brief Macros and template utilities to help determine details about unknown classes.
+ */
 
 #ifndef EMP_REFLECTION_H
 #define EMP_REFLECTION_H
@@ -10,12 +13,12 @@
 #include "meta.h"
 #include "TypePack.h"
 
-// This macro will generate a function that calls a member function on a given object IF that
-// member exists, but otherwise pass the object as an arguent to a function fallback.
-//
-// NEW_NAME - name of the function to be generated.
-// METHOD - name of the member function that should be attempted.
-// FALLBACK - function to call if no such member function exists.
+/// This macro will generate a function that calls a member function on a given object IF that
+/// member exists, but otherwise pass the object as an arguent to a function fallback.
+///
+/// NEW_NAME - name of the function to be generated.
+/// METHOD - name of the member function that should be attempted.
+/// FALLBACK - function to call if no such member function exists.
 
 #define EMP_CREATE_METHOD_FALLBACK(NAME, METHOD, FALLBACK)                                    \
   namespace {                                                                                 \
@@ -31,8 +34,7 @@
   } int ignore_semicolon_to_follow_ ## NAME = 0
 
 
-// Similar to EMP_CREATE_METHOD_FALLBACK: call method if it exists, otherwise do nothing.
-// @CAO: for some reason can't use namespace or else it breaks...
+/// Similar to EMP_CREATE_METHOD_FALLBACK: call method if it exists, otherwise do nothing.
 
 #define EMP_CREATE_OPTIONAL_METHOD(NAME, METHOD)                                            \
   template <typename T, typename... ARGS>                                                   \
@@ -45,7 +47,7 @@
   } int ignore_semicolon_to_follow_ ## NAME = 0
 
 
-// Same as above, but a return type and default value are specified.
+/// Same as above, but a return type and default value are specified.
 
 #define EMP_CREATE_METHOD_FALLBACK_VAL(NAME, METHOD, DEFAULT)	                              \
 namespace {                                                                                 \
@@ -60,9 +62,9 @@ template <class T, class... ARGS> auto NAME(T & target, ARGS &&... args) {      
 } int ignore_semicolon_to_follow_ ## NAME = 0
 
 
-// Try to perform operation EVAL1 if TEST exists, otherwise do EVAL2.
-// This is good for operations like == or << that may be defined inside
-// a class OR outside of it. (@CAO Needs more testing)
+/// Try to perform operation EVAL1 if TEST exists, otherwise do EVAL2.
+/// This is good for operations like == or << that may be defined inside
+/// a class OR outside of it. (@CAO Needs more testing)
 
 #define EMP_CREATE_EVAL_SELECT(NEW_NAME, TEST, RTYPE, EVAL1, EVAL2)  \
   template <typename... ARG_TYPES>                                   \
@@ -81,18 +83,18 @@ template <class T, class... ARGS> auto NAME(T & target, ARGS &&... args) {      
   } int ignore_semicolon_to_follow_ ## NEW_NAME = 0
 
 
-//  Build a struct which will, given a list of classes, pick the first one that has the any
-//  member MEMBER defined and call that class NAME.
-//
-//  For example:
-//    EMP_SETUP_TYPE_SELECTOR(SelectTests, is_test_type);
-//    using new_type = SelectTests<S, T>
-//
-//  If class S has a member called test_type, this is the same as:
-//    using new_type = S;
-//
-//  Otherwise, if S does not and T does, new_type will be T.  If neither has it, the new test_type
-//  will be void.
+///  Build a struct which will, given a list of classes, pick the first one that has the any
+///  member MEMBER defined and call that class NAME.
+///
+///  For example:
+///    EMP_SETUP_TYPE_SELECTOR(SelectTests, is_test_type);
+///    using new_type = SelectTests<S, T>
+///
+///  If class S has a member called test_type, this is the same as:
+///    using new_type = S;
+///
+///  Otherwise, if S does not and T does, new_type will be T.  If neither has it, the new test_type
+///  will be void.
 
 #define EMP_SETUP_TYPE_SELECTOR(NAME, MEMBER)                                    \
 template <typename T> using EMPDetect_ ## NAME = decltype(T::MEMBER);            \
@@ -100,16 +102,16 @@ template <typename... Ts>                                                       
 using NAME = typename emp::TypePack<Ts...>::template find_t<EMPDetect_ ## NAME>;
 
 
-//  Given a list of classes, pick the first one that has the type MEMBER_NAME defined and
-//  call that MEMBER type NAME.  If none have MEMBER_NAME, use FALLBACK_TYPE.
-//
-//  For example:  EMP_CHOOSE_MEMBER_TYPE(new_type, test_type, int, T);
-//
-//  If class T has a member type called test_type, this is the same as:
-//     using new_type = T::test_type;
-//
-//  If T does NOT have a member type called test_type, this is the same as:
-//     using new_type = int;
+///  Given a list of classes, pick the first one that has the type MEMBER_NAME defined and
+///  call that MEMBER type NAME.  If none have MEMBER_NAME, use FALLBACK_TYPE.
+///
+///  For example:  EMP_CHOOSE_MEMBER_TYPE(new_type, test_type, int, T);
+///
+///  If class T has a member type called test_type, this is the same as:
+///     using new_type = T::test_type;
+///
+///  If T does NOT have a member type called test_type, this is the same as:
+///     using new_type = int;
 
 #define EMP_CHOOSE_MEMBER_TYPE(NAME, MEMBER, FALLBACK_T, ...)                     \
   template <typename EMP_T> using EMP_Filter_ ## NAME = typename EMP_T::MEMBER;   \
@@ -118,10 +120,10 @@ using NAME = typename emp::TypePack<Ts...>::template find_t<EMPDetect_ ## NAME>;
     ::template find_t<EMP_Filter_ ## NAME>::MEMBER;
 
 
-// Return a type based on features in a class.
-// FUN = org_to_genome_t
-// LEVEL = int
-// OBJ = genome
+/// Return a type based on features in a class.
+/// FUN = Function name
+/// LEVEL = Level of overload to use, coming from bool (e.g., bool, int, ...)
+/// MBR = Member function to be testing
 #define EMP_IMPL_TYPE_HAS_MEMBER(FUN, LEVEL, MBR)                                   \
  template <typename EMP__T> static                                                  \
  auto FUN ## _impl(emp::sfinae_decoy<LEVEL, decltype(std::declval<EMP__T>().MBR)>)  \
@@ -160,7 +162,7 @@ using NAME = typename emp::TypePack<Ts...>::template find_t<EMPDetect_ ## NAME>;
 
 namespace emp {
 
-  // Identify the number of parameters in a function and pass in correct number of argument.
+  // Helper tools for SubsetCall.
   namespace {
     template <typename RETURN, typename... FUN_ARGS>
     struct SubsetCall_impl {
@@ -171,10 +173,24 @@ namespace emp {
     };
   }
 
+  /// Identify the number of parameters in a function and pass in correct number of argument.
   template <typename RETURN, typename... FUN_ARGS, typename... CALL_ARGS>
   auto SubsetCall(std::function<RETURN(FUN_ARGS...)> fun, CALL_ARGS... args) -> RETURN {
     return SubsetCall_impl<RETURN, FUN_ARGS...>::Call(fun, args...);
   }
+
+
+  // Helper tools for type_if.
+  namespace {
+    template< typename T, bool match_ok > struct EMP_eval_type { ; };
+    template< typename T> struct EMP_eval_type<T,true> { using type = T; }; // If match, define type!
+  }
+
+  /// A template for making a type exist if and only if it passes a template test.
+  /// For example: type_if<T, std::is_integral>
+  /// This becomes T if the type is integral; it's undefined otherwise.
+  template <typename T, template <typename...> class FILTER>
+  using type_if = typename EMP_eval_type< T, FILTER<T>::value >::type;
 
 }
 #endif

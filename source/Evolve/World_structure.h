@@ -12,7 +12,9 @@
 
 #include "../base/assert.h"
 #include "../base/vector.h"
+#include "../data/Trait.h"
 #include "../tools/Random.h"
+#include "../tools/vector_utils.h"
 
 namespace emp {
 
@@ -29,7 +31,7 @@ namespace emp {
     world.MarkSpaceStructured(true).MarkPhenoStructured(false);
 
     // -- Setup functions --
-    // Inject in a empty pool -or- randomly if none empty
+    // Inject in an empty pool -or- randomly if none empty
     world.SetAddInjectFun( [&world,pool_size](Ptr<ORG> new_org) {
       for (size_t id = 0; id < world.GetSize(); id += pool_size) {
         if (world.IsOccupied(id) == false) return world.AddOrgAt(new_org, id);
@@ -59,7 +61,7 @@ namespace emp {
       });
       world.SetAttribute("SynchronousGen", "True");
     } else {
-      // Asynchronous: always go to a neigbor in current population.
+      // Asynchronous: always go to a neighbor in current population.
       world.SetAddBirthFun( [&world](Ptr<ORG> new_org, size_t parent_id) {
         auto id = world.GetRandomNeighborID(parent_id);
         auto p_genotype = world.GetGenotypeAt(parent_id);
@@ -72,29 +74,81 @@ namespace emp {
   }
 
 
-  // template<typename ORG>
-  // void EliteSelect(World<ORG> & world, size_t e_count=1, size_t copy_count=1) {
-  //   emp_assert(e_count > 0 && e_count <= world.GetNumOrgs(), e_count);
-  //   emp_assert(copy_count > 0);
+  /// Set the population to use a MapElites structure.  This means that organism placement has
+  /// two key components:
+  /// 1: Organism position is based on their phenotypic traits.
+  /// 2: Organisms must have a higher fitness than the current resident of a position to steal it.
+  ///
+  /// Note: Since organisms compete with their predecessors for space in the populations,
+  /// synchronous generations do not make sense.
+  template<typename ORG>
+  void SetMapElites(World<ORG> & world, TraitSet<ORG> traits,
+                    const emp::vector<size_t> & trait_counts) {
+    // 
+    // For consistency with other population structures, we are leaving the option.
+    const size_t pop_size = Product(trait_counts);  // Pop position for each combo of traits.
+    world.Resize(pop_size);
+    world.MarkSynchronous(false);
+    world.MarkSpaceStructured(false).MarkPhenoStructured(true);
 
-  //   // Load the population into a multimap, sorted by fitness.
-  //   std::multimap<double, size_t> fit_map;
-  //   for (size_t id = 0; id < world.GetSize(); id++) {
-  //     if (world.IsOccupied(id)) {
-  //       const double cur_fit = world.CalcFitnessID(id);
-  //       fit_map.insert( std::make_pair(cur_fit, id) );
-  //     }
-  //   }
+    // -- Setup functions --
+    // Inject into the appropriate positon based on phenotype.  Note that an inject will fail
+    // if a more fit organism is already in place; you must run clear first if you want to
+    // ensure placement.
+    world.SetAddInjectFun( [&world,traits,trait_counts](Ptr<ORG> new_org) {
+      // Determine tha position that this phenotype fits in.
+      double org_fitness = world.CalcFitnessOrg(*new_org);
+      size_t id = traits.EvalBin(*new_org, trait_counts);
+      double cur_fitness = world.CalcFitnessID(id);
 
-  //   // Grab the top fitnesses and move them into the next generation.
-  //   auto m = fit_map.rbegin();
-  //   for (size_t i = 0; i < e_count; i++) {
-  //     const size_t repro_id = m->second;
-  //     world.DoBirth( world.GetGenomeAt(repro_id), repro_id, copy_count);
-  //     ++m;
-  //   }
-  // }
+      if (cur_fitness > org_fitness) return World<ORG>::OrgPosition();  // Return invalid position!
+      return world.AddOrgAt(new_org, id);
+    });
 
+    // Map Elites does not have a concept of neighbors.
+    world.SetGetNeighborFun( [](size_t id) { emp_assert(false); return id; });
+
+    // Birth is effectively the same as inject.
+    world.SetAddBirthFun( [&world,traits,trait_counts](Ptr<ORG> new_org, size_t parent_id) {
+      (void) parent_id; // Parent id is not needed for MAP Elites.
+      // Determine tha position that this phenotype fits in.
+      double org_fitness = world.CalcFitnessOrg(*new_org);
+      size_t id = traits.EvalBin(*new_org, trait_counts);
+      double cur_fitness = world.CalcFitnessID(id);
+
+      if (cur_fitness > org_fitness) return World<ORG>::OrgPosition();  // Return invalid position!
+      return world.AddOrgAt(new_org, id);
+    });
+
+    world.SetAttribute("SynchronousGen", "False");
+    world.SetAttribute("PopStruct", "MapElites");
+  }
+
+  template<typename ORG>
+  void SetMapElites(World<ORG> & world, TraitSet<ORG> traits) {
+    emp::vector<size_t> trait_counts;
+    emp_assert(traits.GetSize() > 0);
+
+    // If there's only a single trait, it should get the full population.
+    if (traits.GetSize() == 1) {
+      trait_counts.push_back(world.GetSize());
+      SetMapElites(world, traits, trait_counts);
+      return;
+    }
+    const size_t num_traits = traits.GetSize();
+    size_t trait_size = 1;
+    while (Pow(trait_size+1, num_traits) < world.GetSize()) trait_size++;
+    trait_counts.resize(num_traits, trait_size);
+    SetMapElites(world, traits, trait_counts);
+  }
+
+  template<typename ORG>
+  void SetMapElites(World<ORG> & world, const emp::vector<size_t> & trait_counts) {
+    SetMapElites(world, world.GetPhenotypes(), trait_counts);
+  }
+
+  template<typename ORG>
+  void SetMapElites(World<ORG> & world) { SetMapElites(world, world.GetPhenotypes()); }
 }
 
 #endif

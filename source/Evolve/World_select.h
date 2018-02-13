@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
+ *  @date 2017-2018
  *
  *  @file  World_select.h
  *  @brief Functions for popular selection methods applied to worlds.
@@ -104,7 +104,7 @@ namespace emp {
     for (size_t n = 0; n < count; n++) {
       const double fit_pos = random.GetDouble(fitness_index.GetWeight());
       const size_t parent_id = fitness_index.Index(fit_pos);
-      const size_t offspring_id = world.DoBirth( world.GetGenomeAt(parent_id), parent_id ).index;
+      const size_t offspring_id = world.DoBirth( world.GetGenomeAt(parent_id), parent_id ).GetIndex();
       if (world.IsSynchronous() == false) {
         fitness_index.Adjust(offspring_id, world.CalcFitnessID(offspring_id));
       }
