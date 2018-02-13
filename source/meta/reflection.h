@@ -162,7 +162,7 @@ using NAME = typename emp::TypePack<Ts...>::template find_t<EMPDetect_ ## NAME>;
 
 namespace emp {
 
-  /// Identify the number of parameters in a function and pass in correct number of argument.
+  // Helper tools for SubsetCall.
   namespace {
     template <typename RETURN, typename... FUN_ARGS>
     struct SubsetCall_impl {
@@ -173,10 +173,24 @@ namespace emp {
     };
   }
 
+  /// Identify the number of parameters in a function and pass in correct number of argument.
   template <typename RETURN, typename... FUN_ARGS, typename... CALL_ARGS>
   auto SubsetCall(std::function<RETURN(FUN_ARGS...)> fun, CALL_ARGS... args) -> RETURN {
     return SubsetCall_impl<RETURN, FUN_ARGS...>::Call(fun, args...);
   }
+
+
+  // Helper tools for type_if.
+  namespace {
+    template< typename T, bool match_ok > struct EMP_eval_type { ; };
+    template< typename T> struct EMP_eval_type<T,true> { using type = T; }; // If match, define type!
+  }
+
+  /// A template for making a type exist if and only if it passes a template test.
+  /// For example: type_if<T, std::is_integral>
+  /// This becomes T if the type is integral; it's undefined otherwise.
+  template <typename T, template <typename...> class FILTER>
+  using type_if = typename EMP_eval_type< T, FILTER<T>::value >::type;
 
 }
 #endif
