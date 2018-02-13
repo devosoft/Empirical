@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2018
  *
  *  @file  math.h
  *  @brief Useful mathematical functions (that are constexpr when possible.)
@@ -128,6 +128,11 @@ namespace emp {
   /// Compile-time log base 10 calculator.
   static constexpr double Log10(double x) { return Log(x, 10.0); }
 
+  /// A simple function to square a value.
+  template <typename T>
+  static constexpr T Square(T val) { return val * val; }
+
+  // Pow helper functions.
   namespace {
     static constexpr double Pow2_lt1(double exp, int id=0) {
       return (id==32) ? 1.0 :
@@ -142,13 +147,10 @@ namespace emp {
   /// A fast (O(log p)) integral-power command.
   template <typename T>
   static constexpr type_if<T, std::is_integral> Pow(T base, T p) {
-    return (p <= 0) ? 1 : base * Pow(base, p-1);
+    if (p <= 0) return 1;
+    if (p & 1) return base * Pow(base, p-1); // Odd exponent: strip one mulitple off and recurse.
+    return Square( Pow(base,p/2) );          // Even exponent: calc for half and square result.
   }
-
-  // static constexpr int Pow(int base, int p) {
-  //   return (p <= 0) ? 1 : base * Pow(base, p-1);
-  // }
-
 
   /// A fast 2^x command.
   static constexpr double Pow2(double exp) {
