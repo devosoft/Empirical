@@ -78,9 +78,15 @@ namespace emp {
   /// two key components:
   /// 1: Organism position is based on their phenotypic traits.
   /// 2: Organisms must have a higher fitness than the current resident of a position to steal it.
+  ///
+  /// Note: Since organisms compete with their predecessors for space in the populations,
+  /// synchronous generations do not make sense.
   template<typename ORG>
   void SetMapElites(World<ORG> & world, TraitSet<ORG> traits,
-                    const emp::vector<size_t> & trait_counts, bool synchronous_gen=false) {
+                    const emp::vector<size_t> & trait_counts) {
+    // 
+    // For consistency with other population structures, we are leaving the option.
+    emp_assert(synchronous_gen == false);
     const size_t pop_size = Product(trait_counts);  // Pop position for each combo of traits.
     world.Resize(pop_size);
     world.MarkSynchronous(synchronous_gen);
@@ -135,33 +141,30 @@ namespace emp {
   }
 
   template<typename ORG>
-  void SetMapElites(World<ORG> & world, TraitSet traits, bool synchronous_gen=false) {
+  void SetMapElites(World<ORG> & world, TraitSet traits) {
     emp::vector<size_t> trait_counts;
     emp_assert(traits.GetSize() > 0);
 
     // If there's only a single trait, it should get the full population.
     if (traits.GetSize() == 1) {
       trait_counts.push_back(world.GetSize());
-      SetMapElites(world, traits, trait_counts, synchronous_gen);
+      SetMapElites(world, traits, trait_counts);
       return;
     }
     const size_t num_traits = traits.GetSize();
     size_t trait_size = 1;
     while (Pow(trait_size+1, num_traits) < world.GetSize()) trait_size++;
     trait_counts.resize(num_traits, trait_size);
-    SetMapElites(world, traits, trait_counts, synchronous_gen);
+    SetMapElites(world, traits, trait_counts);
   }
 
   template<typename ORG>
-  void SetMapElites(World<ORG> & world, const emp::vector<size_t> & trait_counts,
-                    bool synchronous_gen=false) {
-    SetMapElites(world, traits.GetPhenotypes(), trait_counts, synchronous_gen);
+  void SetMapElites(World<ORG> & world, const emp::vector<size_t> & trait_counts) {
+    SetMapElites(world, traits.GetPhenotypes(), trait_counts);
   }
 
   template<typename ORG>
-  void SetMapElites(World<ORG> & world, bool synchronous_gen=false) {
-    SetMapElites(world, traits.GetPhenotypes(), synchronous_gen);
-  }
+  void SetMapElites(World<ORG> & world) { SetMapElites(world, traits.GetPhenotypes()); }
 }
 
 #endif
