@@ -17,6 +17,7 @@
 #include <cmath>
 
 #include "../base/assert.h"
+#include "../meta/reflection.h"
 #include "const.h"
 
 namespace emp {
@@ -138,10 +139,16 @@ namespace emp {
     }
   }
 
-  /// A fast (O(log p)) integer-power command.
-  static constexpr int Pow(int base, int p) {
+  /// A fast (O(log p)) integral-power command.
+  template <typename T>
+  static constexpr type_if<T, std::is_integral> Pow(T base, T p) {
     return (p <= 0) ? 1 : base * Pow(base, p-1);
   }
+
+  // static constexpr int Pow(int base, int p) {
+  //   return (p <= 0) ? 1 : base * Pow(base, p-1);
+  // }
+
 
   /// A fast 2^x command.
   static constexpr double Pow2(double exp) {
