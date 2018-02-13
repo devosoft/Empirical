@@ -100,10 +100,10 @@ namespace emp {
       return world.AddOrgAt(new_org, id);
     });
 
-    // Neighbors are everyone in the same pool.
+    // Map Elites does not have a concept of neighbors.
     world.SetGetNeighborFun( [&world,pool_size](size_t id) {
-      const size_t pool_start = (id / pool_size) * pool_size;
-      return pool_start + world.GetRandom().GetUInt(pool_size);
+      emp_assert(false);
+      return id;
     });
 
     if (synchronous_gen) {
