@@ -23,11 +23,19 @@
 
 namespace emp {
 
+  // Pre-declaration of traits.
+  template <typename TARGET_T, typename VALUE_T> class Trait;
+
   template <typename TARGET_T>
   class BaseTrait {
   public:
+    virtual ~BaseTrait() { ; }
+
     virtual std::string EvalString(TARGET_T & target) = 0;
     virtual double EvalValue(TARGET_T & target) = 0;
+
+    template <typename VALUE_T>
+    bool IsType() { return (bool) dynamic_cast<Trait<TARGET_T,VALUE_T>>(this); }
   };
 
   template <typename TARGET_T, typename VALUE_T=double>
@@ -88,6 +96,14 @@ namespace emp {
     const trait_t & operator[](size_t id) const { return *(traits[id]); }
 
     size_t GetSize() const { return traits.size(); }
+
+    size_t Find(const std::string & name) const {
+      for (size_t i = 0; i < traits.size(); i++) {
+        if (traits[i].GetName() == name) return i;
+      }
+      return (size_t) -1;
+    }
+    bool Has(const std::string & name) const { return Find(name) < traits.size(); }
 
     template <typename VALUE_T, typename... EXTRA>
     void AddTrait(const std::string & name,

@@ -122,7 +122,9 @@ namespace emp {
     emp::vector<PtrInfo> id_info;                     ///< Associate IDs with pointer information.
 
     // Make PtrTracker a singleton.
-    PtrTracker() : ptr_id(), id_info() { ; }
+    PtrTracker() : ptr_id(), id_info() {
+      std::cout << "EMP_TRACK_MEM: Pointer tracking is active!\n";
+    }
     PtrTracker(const PtrTracker &) = delete;
     PtrTracker(PtrTracker &&) = delete;
     PtrTracker & operator=(const PtrTracker &) = delete;
@@ -424,12 +426,16 @@ namespace emp {
     void NewArray(size_t array_size, T &&... args) {
       Tracker().DecID(id);                              // Remove a pointer to any old memory...
 
-      //ptr = new TYPE[array_size];                     // Build a new raw pointer to an array.
-      ptr = (TYPE*) malloc (array_size * sizeof(TYPE)); // Build a new raw pointer.
-      emp_emscripten_assert(ptr, array_size);           // No exceptions in emscripten; assert alloc!
-      for (size_t i = 0; i < array_size; i++) {
-        new (ptr + i*sizeof(TYPE)) TYPE(args...);
-      }
+      // @CAO: This next portion of code is allocating an array of the appropriat type.
+      //       We are currently using "new", but should shift over to malloc since new throws an
+      //       exception when there's a problem, which will trigger an abort in Emscripten mode.
+      //       We'd rather be able to identify a more specific problem.
+      ptr = new TYPE[array_size];                     // Build a new raw pointer to an array.
+      // ptr = (TYPE*) malloc (array_size * sizeof(TYPE)); // Build a new raw pointer.
+      // emp_emscripten_assert(ptr, array_size);           // No exceptions in emscripten; assert alloc!
+      // for (size_t i = 0; i < array_size; i++) {
+      //   new (ptr + i*sizeof(TYPE)) TYPE(args...);
+      // }
 
       if (ptr_debug) std::cout << "Ptr::NewArray() : " << ptr << std::endl;
       id = Tracker().NewArray(ptr, array_size * sizeof(TYPE));   // And track it!

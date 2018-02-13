@@ -44,5 +44,5 @@ double CalcMyVal(size_t i) {
 }
 
 In your project_name.cc file in main:
-my_world.SetupPopulationFile().SetTimingRepeat(10); //Timing repeat for how often you want data printed; Lots of premade options for files (found in source/Evo/World.h): SetupFile, setupFitnessFile, SetupSystematicsFile, SetupPopulationFile
+my_world.SetupPopulationFile().SetTimingRepeat(10); //Timing repeat for how often you want data printed; Lots of premade options for files (found in source/Evolve/World.h): SetupFile, setupFitnessFile, SetupSystematicsFile, SetupPopulationFile
 my_world.SetupMyDataFile().SetTimingRepeat(10); //Use your custom built stat tracker if you'd like
