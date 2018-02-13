@@ -96,7 +96,8 @@ namespace emp {
       size_t id = traits.EvalBin(*new_org, trait_counts);
       double cur_fitness = world.CalcFitnessID(id);
 
-      return world.AddOrgAt(new_org, world.GetRandomCellID());
+      if (cur_fitness > org_fitness) return World<ORG>::OrgPosition();  // Return invalid position!
+      return world.AddOrgAt(new_org, id);
     });
 
     // Neighbors are everyone in the same pool.
@@ -130,7 +131,7 @@ namespace emp {
       world.SetAttribute("SynchronousGen", "False");
     }
 
-    world.SetAttribute("PopStruct", "Pools");
+    world.SetAttribute("PopStruct", "MapElites");
   }
 
   template<typename ORG>
