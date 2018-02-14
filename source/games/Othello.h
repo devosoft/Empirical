@@ -58,23 +58,9 @@ namespace emp {
     Othello(size_t side_len)
       : board_size(side_len), game_board(board_size*board_size)
     {
-      emp_assert(board_size > 0);
+      emp_assert(board_size >= 4);
       ALL_DIRECTIONS = {N(), S(), E(), W(), NE(), NW(), SE(), SW()};
       Reset();
-
-      // Tests.
-      std::cout << "Looking at: 0,0" << std::endl;
-      for (size_t dir : ALL_DIRECTIONS) {
-        std::cout << "  GetNeightbor(0,0,DIR:"<<dir<<") = " << GetNeighbor(0,0,dir) <<std::endl;
-      }
-      std::cout << "Looking at: 1,0" << std::endl;
-      for (size_t dir : ALL_DIRECTIONS) {
-        std::cout << "  GetNeightbor(1,0,DIR:"<<dir<<") = " << GetNeighbor(1,0,dir) <<std::endl;
-      }
-      std::cout << "Looking at: 4,4" << std::endl;
-      for (size_t dir : ALL_DIRECTIONS) {
-        std::cout << "  GetNeightbor(4,4,DIR:"<<dir<<") = " << GetNeighbor(4,4,dir) <<std::endl;
-      }
     }
 
     ~Othello() { ; }
@@ -227,9 +213,11 @@ namespace emp {
     /// Is given move valid?
     bool IsMoveValid(size_t playerID, size_t move_id) {
       emp_assert(IsValidPlayer(playerID));
-      // 1) The move position must be empty.
+      // 1) Is move_id valid position on the board?
+      if (!IsValidPos(move_id)) return false;
+      // 2) The move position must be empty.
       if (GetPosValue(move_id) != OpenSpace()) return false;
-      // 2) A non-zero number of tiles must flip.
+      // 3) A non-zero number of tiles must flip.
       return (bool)GetFlipList(playerID, move_id, true).size();
     }
 
