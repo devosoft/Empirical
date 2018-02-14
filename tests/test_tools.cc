@@ -59,12 +59,17 @@
 #include "tools/SolveState.h"
 #include "tools/serialize_macros.h"
 
-#define CONST_REQUIRE_EQ(A, B) \
-  {                            \
-    constexpr auto __a{A};     \
-    constexpr auto __b{B};     \
-    REQUIRE(__a == __b);       \
+/// Ensures that
+/// 1) A == B
+/// 2) A and B can be constexprs or non-contexprs.
+/// 3) A and B have the same values regardless of constexpr-ness.
+#define CONSTEXPR_REQUIRE_EQ(A, B)           \
+  {                                          \
+    constexpr auto __constexpr_a{A};         \
+    constexpr auto __constexpr_b{B};         \
+    REQUIRE(__constexpr_a == __constexpr_b); \
   }
+
 #define CONST_REQUIRE(X)   \
   {                        \
     constexpr auto __x{X}; \
@@ -1394,4 +1399,29 @@ TEST_CASE("Test vector utils", "[tools]") {
   REQUIRE(!emp::Has(v1, 4));
   REQUIRE(emp::Product(v1) == 180);
   REQUIRE(emp::Slice(v1,1,3) == emp::vector<int>({2,3}));
+}
+DEFINE_ATTR(Foo, foo);
+DEFINE_ATTR(Bar, bar);
+DEFINE_ATTR(Bazz, bazz);
+constexpr struct {
+  template <typename T>
+  constexpr auto operator()(T &&value) const {
+    return std::forward<T>(value);
+  }
+} ident;
+
+TEST_CASE("Test Attribute Packs", "[tools]") {
+  using namespace emp::tools;
+
+  // Test Construction & access
+  CONSTEXPR_REQUIRE_EQ((foo(5) + bar(6)).foo, foo(5).foo);
+  CONSTEXPR_REQUIRE_EQ(foo(5) + bar(6), foo(5) + bar(6));
+
+  // Test Mapping
+  CONSTEXPR_REQUIRE_EQ((foo(ident) + bar(6))(5), foo(5) + bar(6));
+  CONSTEXPR_REQUIRE_EQ((attrs(bazz(5)).update(bar(6) + foo(7))),
+                       bazz(5) + foo(7) + bar(6));
+  CONSTEXPR_REQUIRE_EQ((foo(ident) + bar(6))(5), foo(5) + bar(6));
+  CONSTEXPR_REQUIRE_EQ((attrs(bazz(5)).update(bazz(4) + bar(6) + foo(7))),
+                       bazz(4) + foo(7) + bar(6));
 }
