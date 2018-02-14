@@ -90,6 +90,10 @@ namespace emp {
 
     template <class D>
     struct Joinable {
+      constexpr Joinable() = default;
+      constexpr Joinable(const Joinable&) = default;
+      constexpr Joinable(Joinable&&) = default;
+
       template <class T>
       constexpr Join<D, std::decay_t<T>> join(T&& to) const {
         return {static_cast<const D&>(*this), std::forward<T>(to)};
