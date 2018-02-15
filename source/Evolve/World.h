@@ -156,8 +156,6 @@ namespace emp {
     // Configuration settings
     std::string name;                  ///< Name of this world (for use in configuration.)
     bool cache_on;                     ///< Should we be caching fitness values?
-    // size_t size_x;                     ///< If a grid, track width; if pools, track pool size
-    // size_t size_y;                     ///< If a grid, track height; if pools, track num pools.
     std::vector<size_t> pop_sizes;     ///< Sizes of population dimensions (eg, 2 vals for grid)
     emp::TraitSet<ORG> phenotypes;     ///< What phenotypes are we tracking?
     emp::vector<World_file> files;     ///< Output files.
@@ -818,8 +816,9 @@ namespace emp {
     // neighbors are in 9-sized neighborhood.
     fun_get_neighbor = [this](size_t id) {
       emp_assert(random_ptr);
-      const int offset = random_ptr->GetInt(9);
       const size_t size_x = pop_sizes[0];
+      const size_t size_y = pop_sizes[1];
+      const int offset = random_ptr->GetInt(9);
       const int rand_x = (int) (id%size_x) + offset%3 - 1;
       const int rand_y = (int) (id/size_x) + offset/3 - 1;
       return (size_t) (emp::Mod(rand_x, (int) size_x) + emp::Mod(rand_y, (int) size_y) * (int)size_x);
@@ -1190,6 +1189,7 @@ namespace emp {
   void World<ORG>::PrintGrid(std::ostream& os,
                              const std::string & empty, const std::string & spacer) {
     const size_t size_x = pop_sizes[0];
+    const size_t size_y = pop_sizes[1];
     for (size_t y=0; y < size_y; y++) {
       for (size_t x = 0; x < size_x; x++) {
         Ptr<ORG> org = GetOrgPtr(x+y*size_x);
