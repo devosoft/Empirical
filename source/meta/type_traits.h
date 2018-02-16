@@ -358,6 +358,49 @@ namespace emp {
                   InB>>;
   };
 
+  template <typename Needle, typename Haystack,
+            template <typename, typename> class Cmp = std::is_same>
+  struct VariadicIndexOf;
+
+  template <typename Needle, typename Haystack,
+            template <typename, typename> class... Cmp>
+  static constexpr auto VariadicIndexOfValue{
+    VariadicIndexOf<Needle, Haystack, Cmp...>::value};
+
+  namespace __impl_variadics_type_traits {
+
+    template <size_t I, typename Needle, typename Haystack,
+              template <typename, typename> class Cmp>
+    struct VariadicIndexOf;
+
+    template <bool, size_t, typename Needle, typename Haystack,
+              template <typename, typename> class Cmp>
+    struct VariadicIndexOfSwitch;
+
+    template <size_t I, typename Needle, typename... U,
+              template <typename, typename> class Cmp>
+    struct VariadicIndexOfSwitch<true, I, Needle, pack<U...>, Cmp>
+      : std::integral_constant<size_t, I> {};
+
+    template <size_t I, typename Needle, typename... U,
+              template <typename, typename> class Cmp>
+    struct VariadicIndexOfSwitch<false, I, Needle, pack<U...>, Cmp>
+      : VariadicIndexOf<I + 1, Needle, pack<U...>, Cmp> {};
+
+    template <size_t I, typename Needle, typename U0, typename... U,
+              template <typename, typename> class Cmp>
+    struct VariadicIndexOf<I, Needle, pack<U0, U...>, Cmp>
+      : VariadicIndexOfSwitch<Cmp<Needle, U0>::value, I, Needle, pack<U...>,
+                              Cmp> {};
+
+  }  // namespace __impl_variadics_type_traits
+
+  template <typename Needle, template <typename...> class Haystack,
+            typename... U, template <typename, typename> class Cmp>
+  struct VariadicIndexOf<Needle, Haystack<U...>, Cmp>
+    : __impl_variadics_type_traits::VariadicIndexOf<
+        0, Needle, __impl_variadics_type_traits::pack<U...>, Cmp> {};
+
 }  // namespace emp
 
 #endif

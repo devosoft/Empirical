@@ -20,168 +20,245 @@ namespace emp {
     struct ValuesEq
       : std::is_same<typename V1::attr_type, typename V2::attr_type> {};
 
-#define DEFINE_ATTR(NAME, _name)                                               \
-  struct NAME {                                                                \
-    template <class T>                                                         \
-    struct Value : emp::tools::value_tag {                                     \
-      static constexpr auto name = #_name;                                     \
-      using attr_type = NAME;                                                  \
-      using value_type = T;                                                    \
-      T _name;                                                                 \
-      Value() = delete;                                                        \
-      constexpr Value(const T& value) : _name(value) {}                        \
-      constexpr Value(T&& value) : _name(std::move(value)) {}                  \
-      constexpr Value(const Value& other) : _name(other._name) {}              \
-      constexpr Value(Value&& other) : _name(std::move(other._name)) {}        \
-      Value& operator=(const T& value) {                                       \
-        _name = value;                                                         \
-        return *this;                                                          \
-      }                                                                        \
-      Value& operator=(T&& value) {                                            \
-        _name = std::move(value);                                              \
-        return *this;                                                          \
-      }                                                                        \
-      Value& operator=(const Value& other) {                                   \
-        if (this != &other) _name = other._name;                               \
-        return *this;                                                          \
-      }                                                                        \
-      Value& operator=(Value&& other) {                                        \
-        if (this != &other) _name = std::move(other._name);                    \
-        return *this;                                                          \
-      }                                                                        \
-      constexpr auto get() const { return _name; }                             \
-      static constexpr auto get(const Value& value) { return value._name; }    \
-      template <class D>                                                       \
-      static constexpr auto getOr(const Value& value, D&&) {                   \
-        return value._name;                                                    \
-      }                                                                        \
-      template <class U, class D>                                              \
-      static constexpr auto getOr(U&&, D&& value) {                            \
-        return std::forward<D>(value);                                         \
-      }                                                                        \
-      template <class D>                                                       \
-      static constexpr auto getOrElse(const Value& value, D&&) {               \
-        return value._name;                                                    \
-      }                                                                        \
-      template <class U, class D>                                              \
-      static constexpr auto getOrElse(U&&, D&& value) {                        \
-        return std::forward<D>(value)();                                       \
-      }                                                                        \
-      template <class U>                                                       \
-      constexpr auto applyToAttrs(const U& attrs) const {                      \
-        return attrs.set(attr_type::value(_name(attrs)));                      \
-      }                                                                        \
-      template <class Iter>                                                    \
-      auto applyToRange(Iter begin, Iter end) const {                          \
-        std::vector<decltype(applyToAttrs(*begin))> result;                    \
-        for (; begin != end; ++begin) {                                        \
-          result.push_back(applyToAttrs(*begin));                              \
-        }                                                                      \
-        return result;                                                         \
-      }                                                                        \
-    };                                                                         \
-    static constexpr auto name = #_name;                                       \
-    template <class T>                                                         \
-    static constexpr Value<T>& getValue(Value<T>& value) {                     \
-      return value;                                                            \
-    }                                                                          \
-    template <class T>                                                         \
-    static constexpr const Value<T>& getValue(const Value<T>& value) {         \
-      return value;                                                            \
-    }                                                                          \
-    template <class T>                                                         \
-    static constexpr auto get(const Value<T>& target) {                        \
-      return target._name;                                                     \
-    }                                                                          \
-                                                                               \
-    private:                                                                   \
-    template <class T, class... U>                                             \
-    static constexpr decltype(auto) callOrGet(                                 \
-      const std::true_type& isCallable, T&& target, U&&... args) {             \
-      return (std::forward<T>(target)._name)(std::forward<U>(args)...);        \
-    }                                                                          \
-    template <class T, class... U>                                             \
-    static constexpr auto callOrGet(const std::false_type& isCallable,         \
-                                    T&& target, U&&... args) {                 \
-      return std::forward<T>(target)._name;                                    \
-    }                                                                          \
-                                                                               \
-    public:                                                                    \
-    template <class T, class... U>                                             \
-    static constexpr decltype(auto) callOrGet(const Value<T>& target,          \
-                                              U&&... args) {                   \
-      return callOrGet(                                                        \
-        emp::is_invocable<T, decltype(std::forward<U>(args))...>{}, target,    \
-        std::forward<U>(args)...);                                             \
-    }                                                                          \
-    template <class T, class... U>                                             \
-    static constexpr decltype(auto) callOrGet(Value<T>& target, U&&... args) { \
-      return callOrGet(                                                        \
-        emp::is_invocable<T, decltype(std::forward<U>(args))...>{}, target,    \
-        std::forward<U>(args)...);                                             \
-    }                                                                          \
-                                                                               \
-    private:                                                                   \
-    template <class T>                                                         \
-    static constexpr std::true_type __in(const Value<T>&) {                    \
-      return {};                                                               \
-    }                                                                          \
-    static constexpr std::false_type __in(...) { return {}; }                  \
-                                                                               \
-    public:                                                                    \
-    template <class T>                                                         \
-    struct in : decltype(__in(std::declval<T>())) {};                          \
-    template <class T, class D>                                                \
-    static constexpr auto getOr(const Value<T>& target, D&&) {                 \
-      return get(target);                                                      \
-    }                                                                          \
-    template <class T, class D>                                                \
-    static constexpr auto getOr(                                               \
-      T&&, D&& defaultValue,                                                   \
-      std::enable_if_t<!in<T>::value, std::nullptr_t> = nullptr) {             \
-      return std::forward<D>(defaultValue);                                    \
-    }                                                                          \
-    template <class T, class D>                                                \
-    static constexpr auto getOrElse(const Value<T>& target, D&&) {             \
-      return get(target);                                                      \
-    }                                                                          \
-    template <class T, class D>                                                \
-    static constexpr auto getOrElse(                                           \
-      T&&, D&& defaultValue,                                                   \
-      std::enable_if_t<!in<T>::value, std::nullptr_t> = nullptr) {             \
-      return std::forward<D>(defaultValue)();                                  \
-    }                                                                          \
-    template <class T, class D>                                                \
-    static constexpr auto getOrGetIn(const Value<T>& target, D&&) {            \
-      return get(target);                                                      \
-    }                                                                          \
-    template <class T, class D>                                                \
-    static constexpr auto getOrGetIn(                                          \
-      T&&, D&& defaultValue,                                                   \
-      std::enable_if_t<!in<T>::value, std::nullptr_t> = nullptr) {             \
-      return get(std::forward<D>(defaultValue));                               \
-    }                                                                          \
-    template <class T, class V>                                                \
-    static constexpr void set(Value<T>& target, V&& value) {                   \
-      target._name = std::forward<V>(value);                                   \
-    }                                                                          \
-    template <class T>                                                         \
-    static constexpr Value<std::decay_t<T>> value(T&& value) {                 \
-      return {std::forward<T>(value)};                                         \
-    }                                                                          \
-  };                                                                           \
-  template <class T>                                                           \
-  constexpr auto _name(T&& value) {                                            \
-    return NAME::value(std::forward<T>(value));                                \
-  }                                                                            \
-  template <class A, class B>                                                  \
-  constexpr bool operator==(const NAME::Value<A>& a,                           \
-                            const NAME::Value<B>& b) {                         \
-    return NAME::get(a) == NAME::get(b);                                       \
-  }                                                                            \
-  template <class T>                                                           \
-  std::ostream& operator<<(std::ostream& out, const NAME::Value<T>& value) {   \
-    return out << "\"" #_name "\": " << value._name << std::endl;              \
+    template <typename T>
+    struct IsAttributeValue : std::is_base_of<value_tag, T> {};
+
+    namespace __impl_has_attr {
+      template <typename Pack, typename Attr>
+      struct HasAttr {
+        template <typename T>
+        static constexpr std::true_type hasAttr(
+          const typename Attr::template value_type<T>&) {
+          return {};
+        }
+        static constexpr std::false_type hasAttr(...) { return {}; }
+
+        using type = decltype(hasAttr(std::declval<Pack>()));
+      };
+    }  // namespace __impl_has_attr
+
+    template <typename Pack, typename Attr>
+    struct HasAttr : __impl_has_attr::HasAttr<Pack, Attr>::type {};
+
+    namespace __impl_attr_base {
+      template <typename Attr, template <typename> class Value>
+      struct AttrBase {
+        using attr_type = Attr;
+        template <typename T>
+        using value_type = Value<T>;
+
+        /// Given an attribute pack, getValue will extract just this attribute
+        template <class T>
+        static constexpr decltype(auto) getValue(value_type<T>& value) {
+          return value;
+        }
+
+        template <class T>
+        static constexpr decltype(auto) getValue(const value_type<T>& value) {
+          return value;
+        }
+
+        template <class T>
+        static constexpr decltype(auto) getValue(value_type<T>&& value) {
+          return value;
+        }
+
+        /// Given an attribute pack, get(pack) will extract the value of this
+        /// attribute in that pack
+        template <class T>
+        static constexpr decltype(auto) get(const value_type<T>& target) {
+          return target.get();
+        }
+
+        template <class T>
+        static constexpr decltype(auto) get(value_type<T>& target) {
+          return target.get();
+        }
+
+        template <class T>
+        static constexpr decltype(auto) get(value_type<T>&& target) {
+          return target.get();
+        }
+
+        // -- callOrGet --
+        private:
+        // Handle the case when get(target) is callable
+        template <class Pack, class... U>
+        static constexpr decltype(auto) __impl_callOrGet(
+          const std::true_type& isCallable, Pack&& pack, U&&... args) {
+          return get(std::forward<Pack>(pack))(std::forward<U>(args)...);
+        }
+
+        // Handle the case when get(target) is not callable
+        template <class T, class... U>
+        static constexpr decltype(auto) __impl_callOrGet(
+          const std::false_type& isCallable, T&& target, U&&... args) {
+          return get(std::forward<T>(target));
+        }
+
+        public:
+        /// Given an attribute pack, callOrGet(pack, args...) will attempt to
+        /// return get(pack)(args...). If this fails to compile, because the
+        /// value of this attribute is not callable in the given pack, then just
+        /// the value of this attribute will be returned, get(pack).
+        template <class V, class... U>
+        static constexpr decltype(auto) callOrGet(V&& target, U&&... args) {
+          using ValueOfTargetType = decltype(get(std::forward<V>(target)));
+
+          return __impl_callOrGet(
+            // Check if the target attribute value is invocable
+            emp::is_invocable<ValueOfTargetType,
+                              decltype(std::forward<U>(args))...>{},
+            std::forward<V>(target), std::forward<U>(args)...);
+        }
+        // -- getOrElse --
+        private:
+        template <class Pack, class F, class... U>
+        static constexpr decltype(auto) __impl_getOrElse(const std::true_type&,
+                                                         Pack&& pack, F&&,
+                                                         U&&...) {
+          return get(std::forward<Pack>(pack));
+        }
+
+        template <class Pack, class F, class... U>
+        static constexpr decltype(auto) __impl_getOrElse(const std::false_type&,
+                                                         Pack&&,
+                                                         F&& defaultFunction,
+                                                         U&&... args) {
+          return std::forward<F>(defaultFunction)(std::forward<U>(args)...);
+        }
+
+        public:
+        template <class Pack, class F, class... U>
+        static constexpr decltype(auto) getOrElse(Pack&& pack,
+                                                  F&& defaultFunction,
+                                                  U&&... args) {
+          return __impl_getOrElse(
+            HasAttr<std::decay_t<Pack>, attr_type>{}, std::forward<Pack>(pack),
+            std::forward<F>(defaultFunction), std::forward<U>(args)...);
+        }
+
+        private:
+        // Utility class used by getOr which simply remembers and returns a
+        // value. @todo: when we switch to c++17, we can replace this with a
+        // constexpr closure
+        template <class D>
+        struct Default {
+          D value;
+          constexpr decltype(auto) operator()() const {
+            return std::forward<D>(value);
+          }
+        };
+
+        public:
+        template <class Pack, class D>
+        static constexpr decltype(auto) getOr(Pack&& pack, D&& defaultValue) {
+          return getOrElse(std::forward<Pack>(pack),
+                           Default<D&&>{std::forward<D>(defaultValue)});
+        }
+
+        private:
+        // Utility class used by getOrGetIn which simply remembers a attribute
+        // pack.
+        template <typename...>
+        struct FallbackHandler;
+
+        template <typename Fallback>
+        struct FallbackHandler<Fallback> {
+          Fallback fallback;
+          template <typename F>
+          constexpr FallbackHandler(F&& fallback)
+            : fallback(std::forward<F>(fallback)) {}
+
+          constexpr decltype(auto) operator()() const {
+            return get(std::forward<Fallback>(fallback));
+          }
+        };
+
+        template <typename Fallback0, typename Fallback1, typename... Fallbacks>
+        struct FallbackHandler<Fallback0, Fallback1, Fallbacks...> {
+          Fallback0 fallback;
+          FallbackHandler<Fallback1, Fallbacks...> fallbacks;
+          template <typename F0, typename F1, typename... F>
+          constexpr FallbackHandler(F0&& fallback0, F1&& fallback1,
+                                    F&&... fallbacks)
+            : fallback(std::forward<F0>(fallback0)),
+              fallbacks(std::forward<F1>(fallback1),
+                        std::forward<F>(fallbacks)...) {}
+
+          constexpr decltype(auto) operator()() const {
+            return getOrElse(fallback, fallbacks);
+          }
+        };
+
+        public:
+        template <class... Fallbacks>
+        static constexpr decltype(auto) getOrGetIn(Fallbacks&&... fallbacks) {
+          return FallbackHandler<Fallbacks&&...>{
+            std::forward<Fallbacks>(fallbacks)...}();
+        }
+
+        template <class T, class V>
+        static constexpr void set(value_type<T>& target, V&& value) {
+          get(target) = std::forward<V>(value);
+        }
+        template <class T>
+        static constexpr value_type<T> value(T&& value) {
+          return {std::forward<T>(value)};
+        }
+      };
+    };  // namespace __impl_attr_base
+
+#define DEFINE_ATTR(NAME, _name)                                             \
+  struct NAME;                                                               \
+  template <class T>                                                         \
+  struct NAME##Value : emp::tools::value_tag {                               \
+    static constexpr auto name = #_name;                                     \
+    using attr_type = NAME;                                                  \
+    using value_type = T;                                                    \
+    T _name;                                                                 \
+    NAME##Value() = delete;                                                  \
+    constexpr NAME##Value(const T& value) : _name(value) {}                  \
+    constexpr NAME##Value(T&& value) : _name(std::move(value)) {}            \
+    constexpr NAME##Value(const NAME##Value& other) : _name(other._name) {}  \
+    constexpr NAME##Value(NAME##Value&& other)                               \
+      : _name(std::move(other._name)) {}                                     \
+    constexpr NAME##Value& operator=(const T& value) {                       \
+      _name = value;                                                         \
+      return *this;                                                          \
+    }                                                                        \
+    constexpr NAME##Value& operator=(T&& value) {                            \
+      _name = std::move(value);                                              \
+      return *this;                                                          \
+    }                                                                        \
+    constexpr NAME##Value& operator=(const NAME##Value& other) {             \
+      if (this != &other) _name = other._name;                               \
+      return *this;                                                          \
+    }                                                                        \
+    constexpr NAME##Value& operator=(NAME##Value&& other) {                  \
+      if (this != &other) _name = std::move(other._name);                    \
+      return *this;                                                          \
+    }                                                                        \
+    constexpr T& get() & { return _name; }                                   \
+    constexpr T&& get() && { return std::move(_name); }                      \
+    constexpr const T& get() const & { return _name; }                       \
+    constexpr const T& get() const && { return std::move(_name); }           \
+  };                                                                         \
+  struct NAME : emp::tools::__impl_attr_base::AttrBase<NAME, NAME##Value> {  \
+    static constexpr auto name = #_name;                                     \
+  };                                                                         \
+  template <class T>                                                         \
+  constexpr auto _name(T&& value) {                                          \
+    return NAME::value(std::forward<T>(value));                              \
+  }                                                                          \
+  template <class A, class B>                                                \
+  constexpr bool operator==(const NAME##Value<A>& a,                         \
+                            const NAME##Value<B>& b) {                       \
+    return NAME::get(a) == NAME::get(b);                                     \
+  }                                                                          \
+  template <class T>                                                         \
+  std::ostream& operator<<(std::ostream& out, const NAME##Value<T>& value) { \
+    return out << "\"" #_name "\": " << value._name << std::endl;            \
   }
     template <class...>
     class Attrs;
@@ -316,16 +393,51 @@ namespace emp {
             // The arguments are then forwarded as normal
             std::forward<U0>(arg), std::forward<U>(args)...) {}
 
-      template <class... U>
-      constexpr auto operator()(U... args) {
+      private:
+      template <bool Last, typename A>
+      struct GetAttr;
+      template <typename A>
+      struct GetAttr<false, A> {
+        template <typename S, typename... U>
+        static constexpr decltype(auto) get(S&& self, U&&... args) {
+          using attr_type = typename A::attr_type;
+          return attr_type::value(attr_type::callOrGet(self, args...));
+        }
+      };
+
+      template <typename A>
+      struct GetAttr<true, A> {
+        template <typename S, typename... U>
+        static constexpr decltype(auto) get(S&& self, U&&... args) {
+          using attr_type = typename A::attr_type;
+          return attr_type::value(attr_type::callOrGet(
+            std::forward<S>(self), std::forward<U>(args)...));
+        }
+      };
+
+      template <typename S, typename... U>
+      static constexpr decltype(auto) call(S&& self, U&&... args) {
+        constexpr size_t last = sizeof...(T) - 1;
         return attrs(
-          T::attr_type::value(T::attr_type::callOrGet(*this, args...))...);
+          GetAttr<VariadicIndexOfValue<T, Attrs> == last,
+                  T>::template get<S, U...>(std::forward<S>(self),
+                                            std::forward<U>(args)...)...);
+      }
+
+      public:
+      template <class... U>
+      constexpr auto operator()(U&&... args) & {
+        return call(*this, std::forward<U>(args)...);
       }
 
       template <class... U>
-      constexpr auto operator()(U... args) const {
-        return attrs(
-          T::attr_type::value(T::attr_type::callOrGet(*this, args...))...);
+      constexpr auto operator()(U&&... args) && {
+        return call(std::move(*this), std::forward<U>(args)...);
+      }
+
+      template <class... U>
+      constexpr auto operator()(U&&... args) const & {
+        return call(*this, std::forward<U>(args)...);
       }
 
       template <class P>
@@ -342,9 +454,10 @@ namespace emp {
       template <class P>
       constexpr auto set(
         P&& value,
-        std::enable_if_t<!std::decay_t<P>::attr_type::template in<Attrs>::value,
-                         std::nullptr_t> = nullptr) const {
-        return Attrs<T..., std::decay_t<P>>{T::get(*this)...,
+        std::enable_if_t<
+          !HasAttr<Attrs, typename std::decay_t<P>::attr_type>::value,
+          std::nullptr_t> = nullptr) const {
+        return Attrs<T..., std::decay_t<P>>{T::attr_type::get(*this)...,
                                             std::forward<P>(value)};
       }
 

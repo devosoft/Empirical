@@ -63,17 +63,10 @@
 /// 1) A == B
 /// 2) A and B can be constexprs or non-contexprs.
 /// 3) A and B have the same values regardless of constexpr-ness.
-#define CONSTEXPR_REQUIRE_EQ(A, B)           \
-  {                                          \
-    constexpr auto __constexpr_a{A};         \
-    constexpr auto __constexpr_b{B};         \
-    REQUIRE(__constexpr_a == __constexpr_b); \
-  }
-
-#define CONST_REQUIRE(X)   \
-  {                        \
-    constexpr auto __x{X}; \
-    REQUIRE(__x);          \
+#define CONSTEXPR_REQUIRE_EQ(A, B)       \
+  {                                      \
+    static_assert(A == B, #A " == " #B); \
+    REQUIRE(A == B);                     \
   }
 
 // this templating is necessary to force full coverage of templated classes.
@@ -1409,19 +1402,99 @@ constexpr struct {
     return std::forward<T>(value);
   }
 } ident;
+template <typename T>
+struct Callable {
+  T value;
+
+  constexpr decltype(auto) operator()() const { return std::forward<T>(value); }
+};
+template <typename T>
+constexpr Callable<T &&> callable(T &&value) {
+  return {std::forward<T>(value)};
+}
+
+struct NoCopy {
+  int value;
+  constexpr NoCopy(int value) : value(value) {}
+  constexpr NoCopy(const NoCopy &) = delete;
+  constexpr NoCopy(NoCopy &&) = default;
+
+  constexpr NoCopy &operator=(const NoCopy &) = delete;
+  constexpr NoCopy &operator=(NoCopy &&) = default;
+};
+constexpr bool operator==(const NoCopy &a, const NoCopy &b) {
+  return a.value == b.value;
+}
+std::ostream &operator<<(std::ostream &out, const NoCopy &nc) {
+  return out << "NoCopy{" << nc.value << "}";
+}
 
 TEST_CASE("Test Attribute Packs", "[tools]") {
   using namespace emp::tools;
 
   // Test Construction & access
+  CONSTEXPR_REQUIRE_EQ(Foo::callOrGet(foo(6)), 6);
+  CONSTEXPR_REQUIRE_EQ(Foo::callOrGet(foo(callable(7))), 7);
+  CONSTEXPR_REQUIRE_EQ(Foo::getOrElse(foo(7), callable(0)), 7);
+  CONSTEXPR_REQUIRE_EQ(Foo::getOrElse(foo(7) + bar(6), callable(0)), 7);
+  CONSTEXPR_REQUIRE_EQ(Foo::getOrElse(bazz(7) + bar(6), callable(0)), 0);
+  CONSTEXPR_REQUIRE_EQ(Foo::getOrGetIn(bazz(1), bar(2), foo(3)), 3);
+  CONSTEXPR_REQUIRE_EQ(Foo::getOrGetIn(bazz(1), foo(3), foo(2)), 3);
+  CONSTEXPR_REQUIRE_EQ(Foo::getOrGetIn(foo(3), bar(2), bazz(1)), 3);
+  CONSTEXPR_REQUIRE_EQ(Foo::getOrGetIn(foo(3), bar(2)), 3);
+  CONSTEXPR_REQUIRE_EQ(Foo::getOrGetIn(bar(2), foo(3)), 3);
+  CONSTEXPR_REQUIRE_EQ(Foo::getOrGetIn(foo(3)), 3);
+
+  CONSTEXPR_REQUIRE_EQ(Foo::getOr(foo(7), 0), 7);
+  CONSTEXPR_REQUIRE_EQ(Foo::getOr(foo(7) + bar(6), 0), 7);
+  CONSTEXPR_REQUIRE_EQ(Foo::getOr(bazz(7) + bar(6), 0), 0);
+
   CONSTEXPR_REQUIRE_EQ((foo(5) + bar(6)).foo, foo(5).foo);
   CONSTEXPR_REQUIRE_EQ(foo(5) + bar(6), foo(5) + bar(6));
 
+  // Test NoCopy
+  CONSTEXPR_REQUIRE_EQ(Foo::callOrGet(foo(NoCopy{7})), NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(Foo::callOrGet(foo(callable(NoCopy{7}))), NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(Foo::getOrElse(foo(NoCopy{7}), callable(NoCopy{0})),
+                       NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(
+    Foo::getOrElse(foo(NoCopy{7}) + bar(NoCopy{6}), callable(NoCopy{7})),
+    NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(
+    Foo::getOrElse(bazz(NoCopy{7}) + bar(NoCopy{6}), callable(NoCopy{0})),
+    NoCopy{0});
+
+  CONSTEXPR_REQUIRE_EQ(
+    Foo::getOrGetIn(bazz(NoCopy{1}), bar(NoCopy{2}), foo(NoCopy{3})),
+    NoCopy{3});
+  CONSTEXPR_REQUIRE_EQ(
+    Foo::getOrGetIn(bazz(NoCopy{1}), foo(NoCopy{3}), foo(NoCopy{2})),
+    NoCopy{3});
+  CONSTEXPR_REQUIRE_EQ(
+    Foo::getOrGetIn(foo(NoCopy{3}), bar(NoCopy{2}), bazz(NoCopy{1})),
+    NoCopy{3});
+  CONSTEXPR_REQUIRE_EQ(Foo::getOrGetIn(foo(NoCopy{3}), bar(NoCopy{2})),
+                       NoCopy{3});
+  CONSTEXPR_REQUIRE_EQ(Foo::getOrGetIn(bar(NoCopy{2}), foo(NoCopy{3})),
+                       NoCopy{3});
+  CONSTEXPR_REQUIRE_EQ(Foo::getOrGetIn(foo(NoCopy{3})), NoCopy{3});
+
+  CONSTEXPR_REQUIRE_EQ(Foo::getOr(foo(NoCopy{7}), NoCopy{0}), NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(Foo::getOr(foo(NoCopy{7}) + bar(NoCopy{6}), NoCopy{0}),
+                       NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(Foo::getOr(bazz(NoCopy{7}) + bar(NoCopy{6}), NoCopy{0}),
+                       NoCopy{0});
+
+  CONSTEXPR_REQUIRE_EQ((foo(NoCopy{5}) + bar(NoCopy{6})).foo,
+                       foo(NoCopy{5}).foo);
+  CONSTEXPR_REQUIRE_EQ(foo(NoCopy{5}) + bar(NoCopy{6}),
+                       foo(NoCopy{5}) + bar(NoCopy{6}));
+
   // Test Mapping
   CONSTEXPR_REQUIRE_EQ((foo(ident) + bar(6))(5), foo(5) + bar(6));
-  CONSTEXPR_REQUIRE_EQ((attrs(bazz(5)).update(bar(6) + foo(7))),
-                       bazz(5) + foo(7) + bar(6));
-  CONSTEXPR_REQUIRE_EQ((foo(ident) + bar(6))(5), foo(5) + bar(6));
-  CONSTEXPR_REQUIRE_EQ((attrs(bazz(5)).update(bazz(4) + bar(6) + foo(7))),
-                       bazz(4) + foo(7) + bar(6));
+  // CONSTEXPR_REQUIRE_EQ((attrs(bazz(5)).update(bar(6) + foo(7))),
+  //                      bazz(5) + foo(7) + bar(6));
+  // CONSTEXPR_REQUIRE_EQ((foo(ident) + bar(6))(5), foo(5) + bar(6));
+  // CONSTEXPR_REQUIRE_EQ((attrs(bazz(5)).update(bazz(4) + bar(6) + foo(7))),
+  //                      bazz(4) + foo(7) + bar(6));
 }
