@@ -56,6 +56,10 @@ namespace emp {
     UNKNOWN       ///< Unknown modifier; will trigger error.
   };
 
+  /// A template that will sort and make unique the data mods provides.
+  template<emp::data... MODS>
+  using SortDataMods = pack::RUsort<IntPack<(int) MODS...>>;
+
   /// Generic form of DataNodeModule (should never be used; trigger error!)
   template <typename VAL_TYPE, emp::data... MODS> class DataNodeModule {
   public:
@@ -418,9 +422,9 @@ namespace emp {
   };
 
   template <typename VAL_TYPE, emp::data... MODS>
-  class DataNode : public DataNode_Interface< VAL_TYPE, pack::RUsort<IntPack<(int) MODS...>> > {
+  class DataNode : public DataNode_Interface< VAL_TYPE, SortDataMods<MODS...> > {
   private:
-    using parent_t = DataNode_Interface< VAL_TYPE, pack::RUsort<IntPack<(int) MODS...>> >;
+    using parent_t = DataNode_Interface< VAL_TYPE, SortDataMods<MODS...>  >;
     using parent_t::in_vals;
     using test = IntPack<(int)MODS...>;
 
