@@ -19,7 +19,7 @@
 #include "../tools/math.h"
 
 namespace emp {
-
+  // TODO: caching status information.
   /// NOTE: This game could be made more black-box.
   ///   - Hide almost everything. Only give users access to game-advancing functions (don't allow
   ///     willy-nilly board manipulation, etc). This would let us make lots of assumptions about
@@ -132,8 +132,9 @@ namespace emp {
     bool IsValidPlayer(size_t playerID) const { return (playerID == DarkPlayerID()) || (playerID == LightPlayerID()); }
 
     /// Get location adjacent to ID in direction dir.
+    /// GetNeighbor function is save with garbage ID values.
     int GetNeighbor(size_t id, size_t dir) const {
-      emp_assert(dir >= 0 && dir <= 7 && id < game_board.size());
+      emp_assert(dir >= 0 && dir <= 7);
       size_t x = GetPosX(id);
       size_t y = GetPosY(id);
       return GetNeighbor(x, y, dir);
@@ -205,6 +206,7 @@ namespace emp {
 
     // TODO: BoardAsInput ==> Should not be in Othello.h
     board_t & GetBoard() { return game_board; }
+    const board_t & GetBoard() const { return game_board; }
 
     bool IsMoveValid(size_t playerID, size_t move_x, size_t move_y) {
       return IsMoveValid(playerID, GetPosID(move_x, move_y));
@@ -272,6 +274,36 @@ namespace emp {
       return score;
     }
 
+    /// Get number of frontier positions for given player.
+    /// Frontier position -- number empty squares adjacent to a player's pieces.
+    size_t GetFrontierPosCnt(size_t playerID) {
+      emp_assert(IsValidPlayer(playerID));
+      size_t frontier_size = 0;
+      for (size_t i = 0; i < game_board.size(); ++i) {
+        // Are we looking at an empty space?
+        if (game_board[i] == OpenSpace()) {
+          // If adjacent to playerID's token: increment player's frontier size.
+          if (IsAdjacentTo(i, GetDiskType(playerID))) ++frontier_size;
+        }
+      }
+      return frontier_size;
+    }
+
+    /// Is position given by ID adjacent to the space type given by space?
+    bool IsAdjacentTo(size_t id, BoardSpace space) {
+      for (size_t dir : ALL_DIRECTIONS) {
+        int nID = GetNeighbor(id, dir);
+        if (nID == -1) continue;
+        if (GetPosValue((size_t)nID) == space) return true;
+      }
+      return false;
+    }
+
+    /// Is position given by x,y adjacent to the space type given by space?
+    bool IsAdjacentTo(size_t x, size_t y, BoardSpace space) {
+      return IsAdjacentTo(GetPosID(x,y), space);
+    }
+
     /// Set board position (ID) to given space value.
     void SetPos(size_t id, BoardSpace space) {
       emp_assert(id < game_board.size());
@@ -302,6 +334,17 @@ namespace emp {
       emp_assert(IsValidPlayer(playerID));
       SetPos(GetPosID(x, y), GetDiskType(playerID));
     }
+
+    /// Configure board as given by copy_board input.
+    /// copy_board size must match game_board's size.
+    void SetBoard(const board_t & other_board) {
+      emp_assert(other_board.size() == game_board.size());
+      for (size_t i = 0; i < game_board.size(); ++i) {
+        game_board[i] = other_board[i];
+      }
+    }
+
+    void SetBoard(const Othello & other_othello) { SetBoard(other_othello.GetBoard()); }
 
     void SetCurPlayer(size_t playerID) {
       emp_assert(IsValidPlayer(playerID));
@@ -361,6 +404,7 @@ namespace emp {
     }
 
     /// Print board state to given ostream.
+    // TODO: dark_token_char, light_token_char, open_token_char
     void Print(std::ostream & os=std::cout) {
       // Output column labels.
       unsigned char letter = 'A';
