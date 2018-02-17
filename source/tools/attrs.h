@@ -227,6 +227,7 @@ namespace emp {
   struct NAME : emp::tools::__impl_attr_base::AttrBase<NAME, NAME##Value> {  \
     static constexpr auto name = #_name;                                     \
   };                                                                         \
+  constexpr const char* NAME::name;                                          \
   template <class T>                                                         \
   struct NAME##Value : emp::tools::value_tag {                               \
     static constexpr auto name = #_name;                                     \
@@ -278,15 +279,6 @@ namespace emp {
   std::ostream& operator<<(std::ostream& out, const NAME##Value<T>& value) { \
     return out << "\"" #_name "\": " << value._name << std::endl;            \
   }
-
-    template <class>
-    struct is_attrs : std::false_type {};
-
-    template <class... U>
-    struct is_attrs<Attrs<U...>> : std::true_type {};
-
-    template <class T>
-    constexpr auto is_attrs_v{is_attrs<T>::value};
 
     namespace __attrs_impl {
 
