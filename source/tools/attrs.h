@@ -262,6 +262,8 @@ namespace emp {
     constexpr const T& get() const && { return std::move(_name); }           \
   };                                                                         \
   template <typename T>                                                      \
+  constexpr const char* NAME##Value<T>::name;                                \
+  template <typename T>                                                      \
   struct emp::tools::IsMergeable<NAME##Value<T>> : std::true_type {};        \
   template <class T>                                                         \
   constexpr auto _name(T&& value) {                                          \
@@ -531,6 +533,51 @@ namespace emp {
         return __impl_reduce(std::forward<F>(callback), std::forward<I>(init),
                              __attrs_impl::wrapper<Attrs>{});
       };
+
+      private:
+      template <typename S, typename F, typename U0>
+      static constexpr void __impl_foreach(
+        S&& self, F&& callback, const __attrs_impl::wrapper<Attrs<U0>>&) {
+        std::forward<F>(callback)(U0::name,
+                                  U0::attr_type::get(std::forward<S>(self)));
+      }
+
+      template <typename S, typename F, typename U0, typename U1, typename... U>
+      static constexpr void __impl_foreach(
+        S&& self, F&& callback,
+        const __attrs_impl::wrapper<Attrs<U0, U1, U...>>&) {
+        callback(U0::name, U0::attr_type::get(self));
+
+        __impl_foreach(std::forward<S>(self), std::forward<F>(callback),
+                       __attrs_impl::wrapper<Attrs<U1, U...>>{});
+      }
+
+      template <typename S, typename F>
+      static constexpr void __impl_foreach(S&& self, F&& callback) {
+        __impl_foreach(std::forward<S>(self), std::forward<F>(callback),
+                       __attrs_impl::wrapper<Attrs>{});
+      };
+
+      public:
+      template <typename F>
+      constexpr void foreach (F&& callback) & {
+        __impl_foreach(*this, std::forward<F>(callback));
+      }
+
+      template <typename F>
+      constexpr void foreach (F&& callback) const & {
+        __impl_foreach(*this, std::forward<F>(callback));
+      }
+
+      template <typename F>
+      constexpr void foreach (F&& callback) && {
+        __impl_foreach(std::move(*this), std::forward<F>(callback));
+      }
+
+      template <typename F>
+      constexpr void foreach (F&& callback) const && {
+        __impl_foreach(std::move(*this), std::forward<F>(callback));
+      }
 
       template <typename O>
       constexpr decltype(auto) set(O&& other) & {
