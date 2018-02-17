@@ -1,20 +1,21 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  DataNode objects track a specific type of data over the course of a run.
-//
-//
-//  Collection: New data can be pushed or pulled.
-//   Add(VAL... v) pushes data to a node
-//   AddDatum(VAL v) pushes just one datum, but can be used as an action for a signal.
-//
-//  Process: What should happen on Reset() ?
-//   * Trigger an action to process the prior update's data stored.
-//   * Clear all data.
-//   * Send data to a stream
-//     (or stats automatically have a stream that, if non-null data is sent to?)
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2018
+ *
+ *  @file  DataNode.h
+ *  @brief DataNode objects track a specific type of data over the course of a run.
+ *
+ *  Collection: New data can be pushed or pulled.
+ *   Add(VAL... v) pushes data to a node
+ *   AddDatum(VAL v) pushes just one datum, but can be used as an action for a signal.
+ *
+ *  Process: What should happen on Reset() ?
+ *   * Trigger an action to process the prior update's data stored.
+ *   * Clear all data.
+ *   * Send data to a stream
+ *     (or stats automatically have a stream that, if non-null data is sent to?)
+ */
 
 #ifndef EMP_DATA_NODE_H
 #define EMP_DATA_NODE_H
@@ -28,45 +29,45 @@
 
 namespace emp {
 
-  // A set of modifiers are available do describe DataNode
+  /// A set of modifiers are available do describe DataNode
   enum class data {
-    Current,      // Track most recent value
+    Current,      ///< Track most recent value
 
-    Info,         // Include information (name, keyword, description) for each instance.
+    Info,         ///< Include information (name, keyword, description) for each instance.
 
-    Log,          // Track all values since last Reset()
-    Archive,      // Track Log + ALL values over time (with purge options)
+    Log,          ///< Track all values since last Reset()
+    Archive,      ///< Track Log + ALL values over time (with purge options)
 
-    Range,        // Track min, max, mean, total
-    FullRange,    // Track Range data over time.
-    Histogram,    // Keep a full histogram.
+    Range,        ///< Track min, max, mean, total
+    FullRange,    ///< Track Range data over time.
+    Histogram,    ///< Keep a full histogram.
     // Stats,        // Track Range + variance, standard deviation, skew, kertosis
     // FullStats,    // Track States + ALL values over time (with purge/merge options)
 
-    Pull,         // Enable data collection on request.
+    Pull,         ///< Enable data collection on request.
 
-    // Various signals are possible:
-    SignalReset,  // Include a signal that triggers BEFORE Reset() to process data.
-    SignalData,   // Include a signal when new data is added (as a group)
-    SignalDatum,  // Include a signal when each datum is added.
-    SignalRange,  // Include a signal for data in a range.
-    SignalLimits, // Include a signal for data OUTSIDE a range.
+    ///< Various signals are possible:
+    SignalReset,  ///< Include a signal that triggers BEFORE Reset() to process data.
+    SignalData,   ///< Include a signal when new data is added (as a group)
+    SignalDatum,  ///< Include a signal when each datum is added.
+    SignalRange,  ///< Include a signal for data in a range.
+    SignalLimits, ///< Include a signal for data OUTSIDE a range.
 
-    UNKNOWN       // Unknown modifier; will trigger error.
+    UNKNOWN       ///< Unknown modifier; will trigger error.
   };
 
-  // Generic form of DataNodeModule (should never be used; trigger error!)
+  /// Generic form of DataNodeModule (should never be used; trigger error!)
   template <typename VAL_TYPE, emp::data... MODS> class DataNodeModule {
   public:
     DataNodeModule() { emp_assert(false, "Unknown module used in DataNode!"); }
   };
 
-  // Base form of DataNodeModule (available in ALL data nodes.)
+  /// Base form of DataNodeModule (available in ALL data nodes.)
   template <typename VAL_TYPE>
   class DataNodeModule<VAL_TYPE> {
   protected:
-    size_t val_count;               // How many values have been loaded?
-    emp::vector<VAL_TYPE> in_vals;  // What values are waiting to be included?
+    size_t val_count;               ///< How many values have been loaded?
+    emp::vector<VAL_TYPE> in_vals;  ///< What values are waiting to be included?
 
     void PullData_impl() { ; }
   public:
@@ -101,11 +102,11 @@ namespace emp {
 
   // Specialized forms of DataNodeModule
 
-  // == data::Current ==
+  /// == data::Current ==
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Current, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
-    VAL_TYPE cur_val;
+    VAL_TYPE cur_val;  ///< Most recent value passed to this node.
 
     using this_t = DataNodeModule<VAL_TYPE, data::Current, MODS...>;
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
@@ -124,13 +125,13 @@ namespace emp {
   };
 
 
-  // == data::Info ==
+  /// == data::Info ==
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Info, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
-    std::string name;
-    std::string desc;
-    std::string keyword;
+    std::string name;     ///< Name of this data category.
+    std::string desc;     ///< Description of this type of data.
+    std::string keyword;  ///< Short keyword.
 
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
   public:
@@ -155,11 +156,11 @@ namespace emp {
   };
 
 
-  // == data::Log ==
+  /// == data::Log ==
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Log, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
-    emp::vector<VAL_TYPE> val_set;
+    emp::vector<VAL_TYPE> val_set;  ///< All values saved since last reset.
 
     using this_t = DataNodeModule<VAL_TYPE, data::Log, MODS...>;
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
@@ -187,11 +188,11 @@ namespace emp {
     }
   };
 
-  // == data::Archive ==
+  /// == data::Archive ==
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Archive, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
-    emp::vector<emp::vector<VAL_TYPE>> archive;
+    emp::vector<emp::vector<VAL_TYPE>> archive;  ///< Archive of data from before last reset.
 
     using this_t = DataNodeModule<VAL_TYPE, data::Archive, MODS...>;
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
@@ -223,13 +224,13 @@ namespace emp {
     }
   };
 
-  // == data::Range ==
+  /// == data::Range ==
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Range, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
-    double total;
-    double min;
-    double max;
+    double total;  ///< Total of all data since last reset.
+    double min;    ///< Smallest value passed in since last reset.
+    double max;    ///< Largest value passed in since last reset.
 
     using this_t = DataNodeModule<VAL_TYPE, data::Range, MODS...>;
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
@@ -264,14 +265,14 @@ namespace emp {
     }
   };
 
-  // == data::FullRange ==
+  /// == data::FullRange ==
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::FullRange, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
-    emp::vector<double> total_vals;
-    emp::vector<size_t> num_vals;
-    emp::vector<double> min_vals;
-    emp::vector<double> max_vals;
+    emp::vector<double> total_vals;  ///< Totals from previous resets.
+    emp::vector<size_t> num_vals;    ///< Value counts from previous resets.
+    emp::vector<double> min_vals;    ///< Minimums from previous resets.
+    emp::vector<double> max_vals;    ///< Maximums from previous resets.
 
     using this_t = DataNodeModule<VAL_TYPE, data::FullRange, MODS...>;
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
@@ -316,13 +317,13 @@ namespace emp {
     }
   };
 
-  // == data::Histogram ==
+  /// == data::Histogram ==
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Histogram, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
-    VAL_TYPE min;
-    IndexMap bins;
-    emp::vector<size_t> counts;
+    VAL_TYPE min;                    ///< Minimum value to bin.
+    IndexMap bins;                   ///< Map of values to which bin they fall in. 
+    emp::vector<size_t> counts;      ///< Counts in each bin.
 
     using this_t = DataNodeModule<VAL_TYPE, data::Histogram, MODS...>;
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
@@ -374,12 +375,12 @@ namespace emp {
 
   };
 
-  // == data::Pull ==
+  /// == data::Pull ==
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Pull, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
-    emp::FunctionSet<VAL_TYPE()> pull_funs;
-    emp::FunctionSet<emp::vector<VAL_TYPE>()> pull_set_funs;
+    emp::FunctionSet<VAL_TYPE()> pull_funs;                   ///< Functions to pull data.
+    emp::FunctionSet<emp::vector<VAL_TYPE>()> pull_set_funs;  ///< Functions to pull sets of data.
 
     using this_t = DataNodeModule<VAL_TYPE, data::Pull, MODS...>;
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
@@ -409,6 +410,7 @@ namespace emp {
 
   template <typename VAL_TYPE, typename MOD_PACK> class DataNode_Interface;
 
+  /// Outermost interface to all DataNode modules.
   template <typename VAL_TYPE, int... IMODS>
   class DataNode_Interface<VAL_TYPE, IntPack<IMODS...>>
     : public DataNodeModule<VAL_TYPE, (emp::data) IMODS...> {
