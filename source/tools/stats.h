@@ -77,6 +77,62 @@ namespace emp {
     return -1 * result;
   }
 
+  /// Calculate variance of the members of the container passed
+  /// Only works on containers with a scalar member type
+  template <typename C>
+  typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value && std::is_scalar<typename C::value_type>::value, double>::type
+  Variance(C & elements) {
+
+    double var = 0;
+    double mean = (double)Sum(elements)/elements.size();
+    for (auto element : elements) {
+      var += emp::Pow(element - mean, 2);
+    }
+    return var;
+  }
+
+  /// Calculate variance of the values pointed at by members of the container passed
+  /// Only works on containers with a scalar member type
+  template <typename C>
+  typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value && std::is_scalar<typename emp::remove_ptr_type<typename C::value_type>::type >::value, double>::type
+  Variance(C & elements) {
+
+    double var = 0;
+    double mean = (double)Sum(elements)/elements.size();
+    for (auto element : elements) {
+      var += emp::Pow(*element - mean, 2);
+    }
+    return var;
+  }
+
+  /// Calculate sum of the members of the container passed
+  /// Only works on containers with a scalar member type
+  template <typename C>
+  typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value && std::is_scalar<typename C::value_type>::value, typename C::value_type>::type
+  Sum(C & elements) {
+
+    double total = 0;
+    for (auto element : elements) {
+      total += element;
+    }
+
+    return total;
+  }
+
+  /// Calculate sum of the values pointed at by pointers in a container
+  /// Only works on containers of pointers to a scalar type
+  template <typename C>
+  typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value && std::is_scalar<typename emp::remove_ptr_type<typename C::value_type>::type >::value, typename C::value_type>::type
+  Sum(C & elements) {
+
+    double total = 0;
+    for (auto element : elements) {
+      total += *element;
+    }
+
+    return total;
+  }
+
   /// Count the number of unique elements in a container
   template <typename C>
   typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value, int>::type

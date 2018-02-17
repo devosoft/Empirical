@@ -30,6 +30,8 @@
 #include "../tools/set_utils.h"
 #include "../tools/map_utils.h"
 #include "../tools/string_utils.h"
+#include "../tools/stats.h"
+#include "../control/Signal.h"
 
 namespace emp {
 
@@ -40,24 +42,30 @@ namespace emp {
   /// genome sequence, a phenotypic trait, or a even a position in the world (if you want to
   /// track an evolutionary pathway)
 
-  template <typename ORG_INFO>
+  struct no_data {};
+
+  template <typename ORG_INFO, typename DATA_STRUCT = no_data>
   class Taxon {
   private:
     using this_t = Taxon<ORG_INFO>;
     using info_t = ORG_INFO;
+    using data_t = DATA_STRUCT;
 
     size_t id;                ///<  ID for this Taxon (Unique within this Systematics)
     const info_t info;        ///<  Details for the organims associated within this taxanomic group.
-    const Ptr<this_t> parent; ///<  Pointer to parent group (nullptr if injected)
+    Ptr<this_t> parent; ///<  Pointer to parent group (nullptr if injected)
     size_t num_orgs;          ///<  How many organisms currently exist of this group?
     size_t tot_orgs;          ///<  How many organisms have ever existed of this group?
     size_t num_offspring;     ///<  How many direct offspring groups exist from this one.
+    size_t total_offspring;   ///<  How many total extant offspring taxa exist from this one (i.e. including indirect)
     size_t depth;             ///<  How deep in tree is this node? (Root is 0)
-    int origination_time;     ///<  When did this taxon first appear in the population?
+    double origination_time;     ///<  When did this taxon first appear in the population?
+
+    data_t data;              /// A struct for storing additional information about this taxon
 
   public:
     Taxon(size_t _id, const info_t & _info, Ptr<this_t> _parent=nullptr)
-     : id (_id), info(_info), parent(_parent), num_orgs(0), tot_orgs(0), num_offspring(0)
+     : id (_id), info(_info), parent(_parent), num_orgs(0), tot_orgs(0), num_offspring(0), total_offspring(0)
      , depth(parent ? (parent->depth+1) : 0) { ; }
     Taxon(const Taxon &) = delete;
     Taxon(Taxon &&) = default;
@@ -85,14 +93,29 @@ namespace emp {
     /// Get the number of taxanomic steps since the ancestral organism was injected into the World.
     size_t GetDepth() const { return depth; }
 
-    int GetOriginationTime() const {return origination_time;}
-    void SetOriginationTime(int time) {origination_time = time;}
+    const data_t & GetData() const {return data;}
+
+    double GetOriginationTime() const {return origination_time;}
+    void SetOriginationTime(double time) {origination_time = time;}
 
     /// Add a new organism to this Taxon.
     void AddOrg() { ++num_orgs; ++tot_orgs; }
 
     /// Add a new offspring Taxon to this one.
-    void AddOffspring() { ++num_offspring; }
+    void AddOffspring() { ++num_offspring; AddTotalOffspring();}
+
+    /// Recursively increment total offspring count for this and all ancestors
+    // Should this be protected or private or something?
+    void AddTotalOffspring() {
+      ++total_offspring;
+      if (parent) { // Keep going until we hit root
+        parent->AddTotalOffspring();
+      }
+    }
+
+    /// Get total number of offspring directly or indirectly
+    /// descending from this taxon. 
+    int GetTotalOffspring(){ return total_offspring; }
 
     /// Remove an organism from this Taxon (after it dies).
     /// Removals must return true if the taxon needs to continue; false if it should deactivate.
@@ -112,6 +135,15 @@ namespace emp {
       // If we are out of BOTH offspring and organisms, this Taxon should deactivate.
       return num_orgs || num_offspring;
     }
+
+    /// Reduce the total count of extant offspring and recursively do so for
+    /// all ancestors (gets called on a taxon's parent when that taxon goes extinct)
+    void RemoveTotalOffspring() {
+      --total_offspring;
+      if (parent) { // Keep going until we hit root
+        parent->RemoveTotalOffspring();
+      }
+    }
   };
 
   /// @brief A tool to track phylogenetic relationships among organisms.
@@ -122,10 +154,10 @@ namespace emp {
   /// is formed, with genotypes.  If the organism's behavior/task set is used, then organisms are
   /// grouped by phenotypes.  If the organsims's position is used, the evolutionary path through
   /// space is tracked.  Any other aspect of organisms can be tracked this way as well.
-  template <typename ORG_INFO>
+  template <typename ORG_INFO, typename DATA_STRUCT = no_data>
   class Systematics {
   private:
-    using taxon_t = Taxon<ORG_INFO>;
+    using taxon_t = Taxon<ORG_INFO, no_data>;
     using hash_t = typename Ptr<taxon_t>::hash_t;
 
     bool store_active;     ///< Store all of the currently active taxa?
@@ -230,16 +262,21 @@ namespace emp {
     double GetAveDepth() const { return ((double) total_depth) / (double) org_count; }
 
     /** From (Faith 1992, reviewed in Winters et al., 2013), phylogenetic diversity is 
-     * "Calculated as the sum of branch lengths between root and tips for a community".
+     *  the sum of edges in the minimal spanning tree connected the taxa you're 
+     *  calculating diversity of.
+     * 
+     * This calculates phylogenetic diversity for all extant taxa in the tree, assuming
+     * all edges from parent to child have a length of one. Possible extensions to this
+     * function that might be useful in the future include:
+     * - Pass it a set of taxon_t pointers and have it calculate PD for just those taxa
+     * - Enable calculation of branch lengths by amount of time that elapsed between
+     *   origination of parent and origination of offspring
+     * - Enable a paleontology compatibility mode where only branching points are calculated
      */ 
-    double GetPhylogeneticDiversity() const {
-      int mrca_depth = GetMRCADepth();
-      if (mrca_depth != -1) {
-        return total_depth - org_count*mrca_depth;
-      }
-
-      // TODO: Track MRCA for multiple trees.
-      return total_depth;
+    int GetPhylogeneticDiversity() const {
+      // As shown on page 5 of Faith 1992, when all branch lengths are equal the phylogenetic
+      // diversity is the number of internal nodes plus the number of extant taxa - 1.
+      return ancestor_taxa.size() + active_taxa.size() - 1;
     }
  
     /** This is a metric of how distinct @param tax is from the rest of the population.
@@ -254,35 +291,59 @@ namespace emp {
      * 
      * To quantify length of evolutionary history, this method needs @param time: the current
      * time, in whatever units time is being measured in when taxa are added to the systematics
-     * manager.
+     * manager. Note that passing a time in the past will produce innacurate results (since we
+     * don't know what the state of the tree was at that time).
+     * 
+     * Assumes the tree is all connected. Will return -1 if this assumption isn't met.
     */
-    double GetEvolutionaryDistinctiveness(Ptr<taxon_t> tax, int time) const {
- 
-      int total = 0;
-      int divisor = 1; // Number of extant taxa this will split into
+    double GetEvolutionaryDistinctiveness(Ptr<taxon_t> tax, double time) const {
 
+      double depth = 0; // Length (in time units) of section we're currently exploring
+      double total = 0; // Count up scores for each section of tree
+      double divisor = tax->GetTotalOffspring() + 1; // Number of extant taxa this will split into (1 for current taxa, plus its offspring)
+
+      // We're stopping when we hit MRCA, so we need to make sure it's been calculated.
       GetMRCA();
-
       if (tax == mrca) {
         return 0;
       }
 
+      // std::cout << "Initializing divisor to " << divisor << " Offspinrg: " << tax->GetTotalOffspring() << std::endl;
+      // std::cout << "MRCA ID: " << mrca->GetID() << " Tax ID: " << tax->GetID() << " time: " << time << " Orig: " << tax->GetOriginationTime() << std::endl;
+
       Ptr<taxon_t> test_taxon = tax->GetParent();
-      int depth = time - tax->GetOriginationTime();
-      time = tax->GetOriginationTime();
+
+      emp_assert(time != -1 && "Invalid time - are you passing time to AddOrg?", time);
+      emp_assert(time >= tax->GetOriginationTime() 
+                 && "GetEvolutionaryDistinctiveness recieved a time that is earlier than the taxon's origination time.");
 
       while (test_taxon) {
-        emp_assert(time != -1, time);
+
+        emp_assert(test_taxon->GetOriginationTime() != -1 && 
+                  "Invalid time - are you passing time to AddOrg?");
+
         depth += time - test_taxon->GetOriginationTime();
+        // std::cout << "Tax: " << test_taxon->GetID() << " depth: " << depth << " time: " << time  << " Orig: " << test_taxon->GetOriginationTime() << " divisor: " << divisor << std::endl;
         time = test_taxon->GetOriginationTime();
         if (test_taxon == mrca || !test_taxon) {
+          // Stop when everything has converged or when we hit the root.
+          // std::cout << (int)(test_taxon == mrca) << " depth: " << depth << " divisor: " << divisor << std::endl;
           total += depth/divisor;
           return total;
         } else if (test_taxon->GetNumOff() > 1) {
+          // This is a branch point. We need to add the things on the other branch to the divisor..
+          // std::cout << "Branch point" << " depth: " << depth << " divisor: " << divisor << std::endl;
           total += depth/divisor;
           depth = 0;
-          divisor = test_taxon->GetNumOff();
+          divisor = test_taxon->GetTotalOffspring();
+        } else if (test_taxon->GetNumOrgs() > 0) { 
+          // If this taxon is still alive we need to update the divisor
+          // std::cout << "Alive point" << " depth: " << depth << " divisor: " << divisor << std::endl;
+          total += depth/divisor;
+          depth = 0;
+          divisor = test_taxon->GetTotalOffspring() + 1;
         }
+
         test_taxon = test_taxon->GetParent();
       }
     
@@ -297,9 +358,58 @@ namespace emp {
      * @param branch_only only counts distance in terms of nodes that represent a branch
      * between two extant taxa (poentially useful for comparison to biological data, where
      * non-branching nodes generally cannot be inferred).
+     * 
+     * This measurement assumes that the tree is fully connected. Will return infinity
+     * if this is not the case.
      * */
     double GetMeanPairwiseDistance(bool branch_only=false) {
-      
+      emp::vector<int> dists = GetPairwiseDistances(branch_only);
+      return (double)Sum(dists)/dists.size();
+    }
+
+    /** Calculates summed pairwise distance between extant taxa. Tucker et al 2017 points
+     *  out that this is a measure of phylogenetic richness.
+     * 
+     * @param branch_only only counts distance in terms of nodes that represent a branch
+     * between two extant taxa (poentially useful for comparison to biological data, where
+     * non-branching nodes generally cannot be inferred).
+     * 
+     * This measurement assumes that the tree is fully connected. Will return infinity
+     * if this is not the case.
+     * */
+    int GetSumPairwiseDistance(bool branch_only=false) {
+      return Sum(GetPairwiseDistances(branch_only));
+    }
+
+    /** Calculates variance of pairwise distance between extant taxa. Tucker et al 2017 points
+     *  out that this is a measure of phylogenetic regularity.
+     * 
+     * @param branch_only only counts distance in terms of nodes that represent a branch
+     * between two extant taxa (poentially useful for comparison to biological data, where
+     * non-branching nodes generally cannot be inferred).
+     * 
+     * This measurement assumes that the tree is fully connected. Will return infinity
+     * if this is not the case.
+     * */
+    int GetVariancePairwiseDistance(bool branch_only=false) {
+      return Variance(GetPairwiseDistances(branch_only));
+    }
+
+    /** Calculates a vector of all pairwise distances between extant taxa.
+     * 
+     * @param branch_only only counts distance in terms of nodes that represent a branch
+     * between two extant taxa (poentially useful for comparison to biological data, where
+     * non-branching nodes generally cannot be inferred).
+     * 
+     * This method assumes that the tree is fully connected. Will return infinity
+     * if this is not the case.
+     * */
+    emp::vector<int> GetPairwiseDistances(bool branch_only=false) {      
+      // The overarching approach here is to start with a bunch of pointers to all
+      // extant organisms (since that will include all leaves). Then we trace back up
+      // the tree, keeping track of distances. When things meet up, we calculate
+      // distances between the nodes on the sides that just met up.
+
       emp::vector<int> dists;
       
       std::map< Ptr<taxon_t>, emp::vector<emp::vector<int>> > curr_pointers;
@@ -387,20 +497,15 @@ namespace emp {
         return INFINITY;
       }
 
-      double total = 0;
-      for (int dist : dists) {
-        total += dist;
-      }
-
       // std::cout << "Total: " << total << "Dists: " << dists.size() << std::endl;
 
-      return total/dists.size();
+      return dists;
 
     }
 
 
     /** Counts the total number of ancestors between @param tax and MRCA, if there is one. If
-     * There is no common ancestor, distance to the root of this tree is calculated instead.
+     *  there is no common ancestor, distance to the root of this tree is calculated instead.
     */
     int GetDistanceToRoot(Ptr<taxon_t> tax) const {
       // Now, trace the line of descent, updating the candidate as we go.
@@ -409,12 +514,13 @@ namespace emp {
       int depth = 0;
       Ptr<taxon_t> test_taxon = tax->GetParent();
       while (test_taxon) {
+        depth++;
         if (test_taxon == mrca || !test_taxon) {
           return depth;
         }
-        depth++;
         test_taxon = test_taxon->GetParent();
       }
+      return depth;
     }
 
     /** Counts the number of branching points leading to multiple extant taxa 
@@ -431,12 +537,15 @@ namespace emp {
       while (test_taxon) {
         if (test_taxon == mrca || !test_taxon) {
           return depth;
-        } else if (test_taxon.GetNumOff() > 1) {
+        } else if (test_taxon->GetNumOff() > 1) {
           depth++;
         }
         test_taxon = test_taxon->GetParent();
       }
+      return depth;
     }
+
+
 
     /// Request a pointer to the Most-Recent Common Ancestor for the population.
     Ptr<taxon_t> GetMRCA() const;
@@ -445,6 +554,8 @@ namespace emp {
     int GetMRCADepth() const;
 
     /// Add information about a new organism, including its stored info and parent's taxon;
+    /// If you would like the systematics manager to track taxon age, you can also supply
+    /// the update at which the taxon is being added.
     /// return a pointer for the associated taxon.
     Ptr<taxon_t> AddOrg(const ORG_INFO & info, Ptr<taxon_t> cur_taxon=nullptr, int update=-1);
 
@@ -485,8 +596,8 @@ namespace emp {
   // =============================================================
 
   // Should be called wheneven a taxon has no organisms AND no descendants.
-  template <typename ORG_INFO>
-  void Systematics<ORG_INFO>::Prune(Ptr<taxon_t> taxon) {
+  template <typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG_INFO, DATA_STRUCT>::Prune(Ptr<taxon_t> taxon) {
     on_prune_sig.Trigger(taxon);
     RemoveOffspring( taxon->GetParent() );           // Notify parent of the pruning.
     if (store_ancestors) ancestor_taxa.erase(taxon); // Clear from ancestors set (if there)
@@ -494,8 +605,8 @@ namespace emp {
     else taxon.Delete();                             //  ...or else get rid of it.
   }
 
-  template <typename ORG_INFO>
-  void Systematics<ORG_INFO>::RemoveOffspring(Ptr<taxon_t> taxon) {
+  template <typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG_INFO, DATA_STRUCT>::RemoveOffspring(Ptr<taxon_t> taxon) {
     if (!taxon) { num_roots--; return; }               // Offspring was root; remove and return.
     bool still_active = taxon->RemoveOffspring();      // Taxon still active w/ 1 fewer offspring?
     if (!still_active) Prune(taxon);                   // If out of offspring, remove from tree.
@@ -506,10 +617,15 @@ namespace emp {
   }
 
   // Mark a taxon extinct if there are no more living members.  There may be descendants.
-  template <typename ORG_INFO>
-  void Systematics<ORG_INFO>::MarkExtinct(Ptr<taxon_t> taxon) {
+  template <typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG_INFO, DATA_STRUCT>::MarkExtinct(Ptr<taxon_t> taxon) {
     emp_assert(taxon);
     emp_assert(taxon->GetNumOrgs() == 0);
+    
+    if (taxon->GetParent()) {
+      // Update extant descendant count for all ancestors
+      taxon->GetParent()->RemoveTotalOffspring(); 
+    }
 
     if (store_active) active_taxa.erase(taxon);
     if (!archive) {   // If we don't archive taxa, delete them.
@@ -523,8 +639,8 @@ namespace emp {
 
 
   // Request a pointer to the Most-Recent Common Ancestor for the population.
-  template <typename ORG_INFO>
-  Ptr<Taxon<ORG_INFO>> Systematics<ORG_INFO>::GetMRCA() const {
+  template <typename ORG_INFO, typename DATA_STRUCT>
+  Ptr<typename Systematics<ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG_INFO, DATA_STRUCT>::GetMRCA() const {
     if (!mrca && num_roots == 1) {  // Determine if we need to calculate the MRCA.
       // First, find a candidate among the living taxa.  Only taxa that have one offsrping
       // can be on the line-of-descent to the MRCA, so anything else is a good start point.
@@ -547,8 +663,8 @@ namespace emp {
   }
 
   // Request the depth of the Most-Recent Common Ancestor; return -1 for none.
-  template <typename ORG_INFO>
-  int Systematics<ORG_INFO>::GetMRCADepth() const {
+  template <typename ORG_INFO, typename DATA_STRUCT>
+  int Systematics<ORG_INFO, DATA_STRUCT>::GetMRCADepth() const {
     GetMRCA();
     if (mrca) return mrca->GetDepth();
     return -1;
@@ -556,8 +672,8 @@ namespace emp {
 
   // Add information about a new organism, including its stored info and parent's taxon;
   // return a pointer for the associated taxon.
-  template <typename ORG_INFO>
-  Ptr<Taxon<ORG_INFO>> Systematics<ORG_INFO>::AddOrg(const ORG_INFO & info, Ptr<taxon_t> cur_taxon, int update) {
+  template <typename ORG_INFO, typename DATA_STRUCT>
+  Ptr<typename Systematics<ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG_INFO, DATA_STRUCT>::AddOrg(const ORG_INFO & info, Ptr<taxon_t> cur_taxon, int update) {
     emp_assert( !cur_taxon || Has(active_taxa, cur_taxon));
 
     // Update stats
@@ -584,8 +700,8 @@ namespace emp {
   }
 
   // Remove an instance of an organism; track when it's gone.
-  template <typename ORG_INFO>
-  bool Systematics<ORG_INFO>::RemoveOrg(Ptr<taxon_t> taxon) {
+  template <typename ORG_INFO, typename DATA_STRUCT>
+  bool Systematics<ORG_INFO, DATA_STRUCT>::RemoveOrg(Ptr<taxon_t> taxon) {
     emp_assert(taxon);
 
     // Update stats
@@ -600,16 +716,16 @@ namespace emp {
   }
 
   // Climb up a lineage...
-  template <typename ORG_INFO>
-  Ptr<Taxon<ORG_INFO>> Systematics<ORG_INFO>::Parent(Ptr<taxon_t> taxon) const {
+  template <typename ORG_INFO, typename DATA_STRUCT>
+  Ptr<typename Systematics<ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG_INFO, DATA_STRUCT>::Parent(Ptr<taxon_t> taxon) const {
     emp_assert(taxon);
     emp_assert(Has(active_taxa, taxon));
     return taxon->GetParent();
   }
 
   // Print details about the Systematics manager.
-  template <typename ORG_INFO>
-  void Systematics<ORG_INFO>::PrintStatus(std::ostream & os) const {
+  template <typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG_INFO, DATA_STRUCT>::PrintStatus(std::ostream & os) const {
     os << "Systematics Status:\n";
     os << " store_active=" << store_active
        << " store_ancestors=" << store_ancestors
@@ -640,8 +756,8 @@ namespace emp {
   }
 
   // Print whole lineage.
-  template <typename ORG_INFO>
-  void Systematics<ORG_INFO>::PrintLineage(Ptr<taxon_t> taxon, std::ostream & os) const {
+  template <typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG_INFO, DATA_STRUCT>::PrintLineage(Ptr<taxon_t> taxon, std::ostream & os) const {
     os << "Lineage:\n";
     while (taxon) {
       os << taxon->GetInfo() << std::endl;
@@ -650,8 +766,8 @@ namespace emp {
   }
 
   // Calculate the genetic diversity of the population.
-  template <typename ORG_INFO>
-  double Systematics<ORG_INFO>::CalcDiversity() {
+  template <typename ORG_INFO, typename DATA_STRUCT>
+  double Systematics<ORG_INFO, DATA_STRUCT>::CalcDiversity() {
     return emp::Entropy(active_taxa, [](Ptr<taxon_t> x){ return x->GetNumOrgs(); }, org_count);
   }
 
