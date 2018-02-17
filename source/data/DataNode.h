@@ -75,6 +75,10 @@ namespace emp {
 
     size_t GetCount() const { return val_count; }
     size_t GetResetCount() const { return 0; }    // If reset count not tracked, always return 0.
+                                                  //@ELD: This seems a little confusing - it's not 
+                                                  // obvious which modifiers can track resets.
+
+    // double GetVariance() const {emp_assert(false, "Calculating variance requires a DataNode with the Stats or FullStats modifier"); return 0;}
 
     const std::string & GetName() const { return emp::empty_string(); }
     const std::string & GetDescription() const { return emp::empty_string(); }
@@ -212,6 +216,7 @@ namespace emp {
     const emp::vector<VAL_TYPE> & GetData(size_t update) const { return archive[update]; }
     const emp::vector<VAL_TYPE> & GetData() const { return archive.back(); }
 
+    // @ELD: This is technically one more than the number of resets - should we subtract 1?
     size_t GetResetCount() const { return archive.size(); }
 
     void AddDatum(const VAL_TYPE & val) {
