@@ -1398,7 +1398,7 @@ DEFINE_ATTR(Bar, bar);
 DEFINE_ATTR(Bazz, bazz);
 constexpr struct {
   template <typename T>
-  constexpr auto operator()(T &&value) const {
+  constexpr decltype(auto) operator()(T &&value) const {
     return std::forward<T>(value);
   }
 } ident;
@@ -1429,9 +1429,18 @@ std::ostream &operator<<(std::ostream &out, const NoCopy &nc) {
   return out << "NoCopy{" << nc.value << "}";
 }
 
+struct {
+  constexpr auto operator()(int total, const char *, int x) const {
+    return total + x;
+  }
+  constexpr NoCopy operator()(NoCopy total, const char *,
+                              const NoCopy &x) const {
+    return {total.value + x.value};
+  }
+} sum;
+
 TEST_CASE("Test Attribute Packs", "[tools]") {
   using namespace emp::tools;
-
   // Test Construction & access
   CONSTEXPR_REQUIRE_EQ(Foo::callOrGet(foo(6)), 6);
   CONSTEXPR_REQUIRE_EQ(Foo::callOrGet(foo(callable(7))), 7);
@@ -1492,9 +1501,15 @@ TEST_CASE("Test Attribute Packs", "[tools]") {
 
   // Test Mapping
   CONSTEXPR_REQUIRE_EQ((foo(ident) + bar(6))(5), foo(5) + bar(6));
-  // CONSTEXPR_REQUIRE_EQ((attrs(bazz(5)).update(bar(6) + foo(7))),
-  //                      bazz(5) + foo(7) + bar(6));
-  // CONSTEXPR_REQUIRE_EQ((foo(ident) + bar(6))(5), foo(5) + bar(6));
-  // CONSTEXPR_REQUIRE_EQ((attrs(bazz(5)).update(bazz(4) + bar(6) + foo(7))),
-  //                      bazz(4) + foo(7) + bar(6));
+  CONSTEXPR_REQUIRE_EQ((foo(ident) + bar(6))(5), foo(5) + bar(6));
+
+  CONSTEXPR_REQUIRE_EQ((bar(6) + foo(ident))(NoCopy{5}),
+                       foo(NoCopy{5}) + bar(6));
+
+  CONSTEXPR_REQUIRE_EQ((bar(NoCopy{6}) + foo(ident))(NoCopy{5}),
+                       foo(NoCopy{5}) + bar(NoCopy{6}));
+
+  CONSTEXPR_REQUIRE_EQ((bar(5) + foo(6)).reduce(sum, 0), 11);
+  CONSTEXPR_REQUIRE_EQ((bar(NoCopy{5}) + foo(NoCopy{6})).reduce(sum, NoCopy{0}),
+                       NoCopy{11});
 }

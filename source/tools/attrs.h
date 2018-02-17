@@ -23,6 +23,12 @@ namespace emp {
     template <typename T>
     struct IsAttributeValue : std::is_base_of<value_tag, T> {};
 
+    template <typename T>
+    struct IsMergeable : std::false_type {};
+
+    template <typename...>
+    class Attrs;
+
     namespace __impl_has_attr {
       template <typename Pack, typename Attr>
       struct HasAttr {
@@ -66,18 +72,23 @@ namespace emp {
         /// Given an attribute pack, get(pack) will extract the value of this
         /// attribute in that pack
         template <class T>
-        static constexpr decltype(auto) get(const value_type<T>& target) {
+        static constexpr const T& get(const value_type<T>& target) {
           return target.get();
         }
 
         template <class T>
-        static constexpr decltype(auto) get(value_type<T>& target) {
+        static constexpr T& get(value_type<T>& target) {
           return target.get();
         }
 
         template <class T>
-        static constexpr decltype(auto) get(value_type<T>&& target) {
-          return target.get();
+        static constexpr T&& get(value_type<T>&& target) {
+          return std::move(target).get();
+        }
+
+        template <class T>
+        static constexpr const T&& get(const value_type<T>&& target) {
+          return std::move(target).get();
         }
 
         // -- callOrGet --
@@ -186,8 +197,9 @@ namespace emp {
               fallbacks(std::forward<F1>(fallback1),
                         std::forward<F>(fallbacks)...) {}
 
-          constexpr decltype(auto) operator()() const {
-            return getOrElse(fallback, fallbacks);
+          constexpr decltype(auto) operator()() && {
+            return getOrElse(std::forward<Fallback0>(fallback),
+                             std::move(fallbacks));
           }
         };
 
@@ -203,18 +215,23 @@ namespace emp {
           get(target) = std::forward<V>(value);
         }
         template <class T>
-        static constexpr value_type<T> value(T&& value) {
+        static constexpr value_type<std::decay_t<T>> value(T&& value) {
           return {std::forward<T>(value)};
         }
       };
     };  // namespace __impl_attr_base
 
 #define DEFINE_ATTR(NAME, _name)                                             \
-  struct NAME;                                                               \
+  template <class T>                                                         \
+  struct NAME##Value;                                                        \
+  struct NAME : emp::tools::__impl_attr_base::AttrBase<NAME, NAME##Value> {  \
+    static constexpr auto name = #_name;                                     \
+  };                                                                         \
   template <class T>                                                         \
   struct NAME##Value : emp::tools::value_tag {                               \
     static constexpr auto name = #_name;                                     \
     using attr_type = NAME;                                                  \
+    using attrs_type = emp::tools::Attrs<NAME##Value<T>>;                    \
     using value_type = T;                                                    \
     T _name;                                                                 \
     NAME##Value() = delete;                                                  \
@@ -244,9 +261,8 @@ namespace emp {
     constexpr const T& get() const & { return _name; }                       \
     constexpr const T& get() const && { return std::move(_name); }           \
   };                                                                         \
-  struct NAME : emp::tools::__impl_attr_base::AttrBase<NAME, NAME##Value> {  \
-    static constexpr auto name = #_name;                                     \
-  };                                                                         \
+  template <typename T>                                                      \
+  struct emp::tools::IsMergeable<NAME##Value<T>> : std::true_type {};        \
   template <class T>                                                         \
   constexpr auto _name(T&& value) {                                          \
     return NAME::value(std::forward<T>(value));                              \
@@ -260,8 +276,6 @@ namespace emp {
   std::ostream& operator<<(std::ostream& out, const NAME##Value<T>& value) { \
     return out << "\"" #_name "\": " << value._name << std::endl;            \
   }
-    template <class...>
-    class Attrs;
 
     template <class>
     struct is_attrs : std::false_type {};
@@ -279,16 +293,30 @@ namespace emp {
         protected:
         struct args_tag {};
         struct copy_tag {};
+        struct move_tag {};
 
         template <class U>
-        struct __attrs_impl_constructor_detector : args_tag {};
+        struct __attrs_impl_constructor_detector {
+          private:
+          template <class... X>
+          static copy_tag detect(const Attrs<X...>&) {
+            return {};
+          };
 
-        template <class... U>
-        struct __attrs_impl_constructor_detector<Attrs<U...>> : copy_tag {};
+          template <class... X>
+          static move_tag detect(Attrs<X...>&&) {
+            return {};
+          };
+
+          static args_tag detect(...) { return {}; }
+
+          public:
+          using type = decltype(detect(std::declval<U>()));
+        };
 
         template <class U>
         using constructor_detector =
-          __attrs_impl_constructor_detector<std::decay_t<U>>;
+          typename __attrs_impl_constructor_detector<U>::type;
 
         template <class... U>
         constexpr AttrsParent(const args_tag&, U&&... args)
@@ -297,7 +325,15 @@ namespace emp {
         template <class... U>
         constexpr AttrsParent(const copy_tag&, const Attrs<U...>& other)
           : T{T::attr_type::get(other)}... {}
+        template <class... U>
+        constexpr AttrsParent(const move_tag&, Attrs<U...>&& other)
+          : T{T::attr_type::get(std::move(other))}... {}
       };
+
+      // This struct exists so that we can pass around Attrs<U...> without it
+      // taking up any memory or having any side effects from construction.
+      template <class>
+      struct wrapper {};
 
     }  // namespace __attrs_impl
 
@@ -359,14 +395,15 @@ namespace emp {
       }
     };
 
-    template <class... T>
+    template <typename... T>
     constexpr Attrs<std::decay_t<T>...> attrs(T&&... props);
 
-    template <class... T>
+    template <typename... T>
     class Attrs : public Joinable<Attrs<T...>>,
                   public ListTransform<Attrs<T...>>,
                   public __attrs_impl::AttrsParent<T...> {
       public:
+      using attrs_type = Attrs;
       // This is one of the really nasty parts. The problem is that we really
       // want two constructors
       //
@@ -401,7 +438,8 @@ namespace emp {
         template <typename S, typename... U>
         static constexpr decltype(auto) get(S&& self, U&&... args) {
           using attr_type = typename A::attr_type;
-          return attr_type::value(attr_type::callOrGet(self, args...));
+          return attr_type::value(
+            attr_type::callOrGet(std::forward<S>(self), args...));
         }
       };
 
@@ -426,76 +464,32 @@ namespace emp {
 
       public:
       template <class... U>
-      constexpr auto operator()(U&&... args) & {
+      constexpr decltype(auto) operator()(U&&... args) & {
         return call(*this, std::forward<U>(args)...);
       }
 
       template <class... U>
-      constexpr auto operator()(U&&... args) && {
+      constexpr decltype(auto) operator()(U&&... args) && {
         return call(std::move(*this), std::forward<U>(args)...);
       }
 
       template <class... U>
-      constexpr auto operator()(U&&... args) const & {
+      constexpr decltype(auto) operator()(U&&... args) const & {
         return call(*this, std::forward<U>(args)...);
-      }
-
-      template <class P>
-      constexpr auto set(
-        const P& value,  // TODO: this should be a universal reference, but
-                         // that creates problems below
-        std::enable_if_t<P::attr_type::template in<Attrs>::value,
-                         std::nullptr_t> = nullptr) const {
-        return Attrs<std::conditional_t<T::attr_type::template in<P>::value,
-                                        std::decay_t<P>, T>...>{
-          std::decay_t<P>::attr_type::getOr(value, T::get(*this))...};
-      }
-
-      template <class P>
-      constexpr auto set(
-        P&& value,
-        std::enable_if_t<
-          !HasAttr<Attrs, typename std::decay_t<P>::attr_type>::value,
-          std::nullptr_t> = nullptr) const {
-        return Attrs<T..., std::decay_t<P>>{T::attr_type::get(*this)...,
-                                            std::forward<P>(value)};
-      }
-
-      private:
-      // This struct exists so that we can pass around Attrs<U...> without it
-      // taking up any memory or having any side effects from construction.
-      template <class>
-      struct wrapper {};
-
-      template <class P, class... U>
-      constexpr auto updateImpl(const P& other,
-                                const wrapper<Attrs<U...>>&) const {
-        // use the getters to extract all the data
-        return attrs(
-          U::attr_type::value(U::attr_type::getOrGetIn(other, *this))...);
-      }
-
-      public:
-      /// Creates a new attribute pack which has all the attributes of this
-      /// pack and another pack. Values will be taken from other other pack
-      /// preferentially.
-      template <class P>
-      constexpr decltype(auto) update(const P& other) const {
-        return updateImpl(
-          other, wrapper<VariadicUnionType<std::decay_t<decltype(*this)>,
-                                           std::decay_t<P>>>{});
       }
 
       private:
       template <class O>
-      constexpr bool eq(const O& other, const wrapper<Attrs<>>&) const {
+      constexpr bool eq(const O& other,
+                        const __attrs_impl::wrapper<Attrs<>>&) const {
         return true;
       }
 
       template <class O, class U0, class... U>
-      constexpr bool eq(const O& other, const wrapper<Attrs<U0, U...>>&) const {
+      constexpr bool eq(const O& other,
+                        const __attrs_impl::wrapper<Attrs<U0, U...>>&) const {
         return U0::attr_type::get(*this) == U0::attr_type::get(other) &&
-               eq(other, wrapper<Attrs<U...>>{});
+               eq(other, __attrs_impl::wrapper<Attrs<U...>>{});
       }
 
       public:
@@ -506,39 +500,116 @@ namespace emp {
       constexpr bool operator==(const Attrs<U...>& other) const {
         static_assert(sizeof...(T) == sizeof...(U),
                       "Cannot compare attribute packs with different members");
-        return eq(other, wrapper<Attrs<U...>>{});
+        return eq(other, __attrs_impl::wrapper<Attrs<U...>>{});
+      }
+
+      private:
+      template <typename F, typename I, typename U0, typename... U>
+      constexpr decltype(auto) __impl_reduce(
+        F&& callback, I&& init,
+        const __attrs_impl::wrapper<Attrs<U0, U...>>&) const {
+        return std::forward<F>(callback)(std::forward<I>(init), U0::name,
+                                         U0::attr_type::get(*this));
+      }
+
+      template <typename F, typename I, typename U0, typename U1, typename... U>
+      constexpr decltype(auto) __impl_reduce(
+        F&& callback, I&& init,
+        const __attrs_impl::wrapper<Attrs<U0, U1, U...>>&) const {
+        using new_init_t = decltype(
+          callback(std::forward<I>(init), U0::name, U0::attr_type::get(*this)));
+        return __impl_reduce(
+          std::forward<F>(callback),
+          std::forward<new_init_t>(callback(std::forward<I>(init), U0::name,
+                                            U0::attr_type::get(*this))),
+          __attrs_impl::wrapper<Attrs<U1, U...>>{});
+      }
+
+      public:
+      template <typename F, typename I>
+      constexpr decltype(auto) reduce(F&& callback, I&& init) const {
+        return __impl_reduce(std::forward<F>(callback), std::forward<I>(init),
+                             __attrs_impl::wrapper<Attrs>{});
+      };
+
+      template <typename O>
+      constexpr decltype(auto) set(O&& other) & {
+        return merge(*this, std::forward<O>(other));
+      }
+
+      template <typename O>
+      constexpr decltype(auto) set(O&& other) const & {
+        return merge(*this, std::forward<O>(other));
+      }
+
+      template <typename O>
+      constexpr decltype(auto) set(O&& other) && {
+        return merge(std::move(*this), std::forward<O>(other));
+      }
+
+      template <typename O>
+      constexpr decltype(auto) set(O&& other) const && {
+        return merge(std::move(*this), std::forward<O>(other));
       }
     };
+
+    template <typename... T>
+    struct IsMergeable<Attrs<T...>> : std::true_type {};
+
     ///  An alternative syntax for creating attribute packs. Takes any number
     ///  of attributes and returns a pack containing each of those attributes.
-    ///  Note that the values will be copied or moved into the attribute pack.
-    ///  They will not be referenced.
     template <class... T>
     constexpr Attrs<std::decay_t<T>...> attrs(T&&... props) {
       return {std::forward<T>(props)...};
     };
 
-    template <class T>
-    using is_value =
-      std::integral_constant<bool, std::is_base_of<value_tag, T>::value &&
-                                     !is_attrs_v<T>>;
-    template <class T>
-    constexpr auto is_value_v = is_value<T>::value;
+    namespace __attrs_impl {
+      template <typename S, typename P, typename... U>
+      static constexpr decltype(auto) __impl_merge(
+        S&& self, P&& other, const wrapper<Attrs<U...>>&) {
+        // use the getters to extract all the data
+        return attrs(U::attr_type::value(U::attr_type::getOrGetIn(
+          std::forward<P>(other), std::forward<S>(self)))...);
+      }
+    }  // namespace __attrs_impl
+
+    /// Creates a new attribute pack which has all the attributes of this
+    /// pack and another pack. Values will be taken from other other pack
+    /// preferentially.
+
+    template <typename A>
+    constexpr decltype(auto) merge(A&& a) {
+      return std::forward<A>(a);
+    }
+
+    template <typename A0, typename A1>
+    constexpr decltype(auto) merge(A0&& a0, A1&& a1) {
+      using self_attrs_type = typename std::decay_t<A0>::attrs_type;
+      using other_attrs_type = typename std::decay_t<A1>::attrs_type;
+
+      return __attrs_impl::__impl_merge(
+        std::forward<A0>(a0), std::forward<A1>(a1),
+        __attrs_impl::wrapper<
+          VariadicUnionType<self_attrs_type, other_attrs_type>>{});
+    }
+
+    template <typename A0, typename A1, typename A2, typename... A>
+    constexpr decltype(auto) merge(A0&& a0, A1&& a1, A2&& a2, A&&... packs) {
+      using self_attrs_type = typename std::decay_t<A0>::attrs_type;
+      using other_attrs_type = typename std::decay_t<A1>::attrs_type;
+
+      return merge(__attrs_impl::__impl_merge(
+                     std::forward<A0>(a0), std::forward<A1>(a1),
+                     __attrs_impl::wrapper<
+                       VariadicUnionType<self_attrs_type, other_attrs_type>>{}),
+                   std::forward<A2>(a2), std::forward<A>(packs)...);
+    }
 
     template <class From, class To,
-              class = std::enable_if_t<is_value_v<From> && is_value_v<To>>>
+              class = std::enable_if_t<IsMergeable<std::decay_t<From>>::value &&
+                                       IsMergeable<std::decay_t<To>>::value>>
     constexpr auto operator+(From&& from, To&& to) {
-      return attrs(std::forward<From>(from), std::forward<To>(to));
-    }
-
-    template <class... From, class To, class = std::enable_if_t<is_value_v<To>>>
-    constexpr auto operator+(const Attrs<From...>& from, To&& to) {
-      return from.set(to);
-    }
-    template <class From, class... To,
-              class = std::enable_if_t<is_value_v<From>>>
-    constexpr auto operator+(From&& from, const Attrs<To...>& to) {
-      return to.set(from);
+      return merge(std::forward<From>(from), std::forward<To>(to));
     }
 
     namespace __attrs_impl {
@@ -548,12 +619,12 @@ namespace emp {
       template <class... T, class H>
       void printAttrs(std::ostream& out, const Attrs<T...>& attrs,
                       const print_attrs_tag<H>&) {
-        out << '"' << H::name << "\": " << H::get(attrs);
+        out << '"' << H::name << "\": " << H::attr_type::get(attrs);
       }
       template <class... T, class H0, class H1, class... U>
       void printAttrs(std::ostream& out, const Attrs<T...>& attrs,
                       const print_attrs_tag<H0, H1, U...>&) {
-        out << '"' << H0::name << "\": " << H0::get(attrs) << ", ";
+        out << '"' << H0::name << "\": " << H0::attr_type::get(attrs) << ", ";
         printAttrs(out, attrs, print_attrs_tag<H1, U...>{});
       }
     }  // namespace __attrs_impl
@@ -570,6 +641,6 @@ namespace emp {
       return out << "{ }";
     }
   }  // namespace tools
-};  // namespace emp
+}  // namespace emp
 
 #endif  // EMP_PLOT_EMP
