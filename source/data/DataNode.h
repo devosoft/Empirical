@@ -24,6 +24,7 @@
 #include "../meta/IntPack.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/string_utils.h"
+#include "../tools/math.h"
 
 namespace emp {
 
@@ -38,7 +39,7 @@ namespace emp {
 
     Range,        // Track min, max, mean, total
     FullRange,    // Track Range data over time.
-    // Stats,        // Track Range + variance, standard deviation, skew, kertosis
+    Stats,        // Track Range + variance, standard deviation, skew, kertosis
     // FullStats,    // Track States + ALL values over time (with purge/merge options)
 
     Pull,         // Enable data collection on request.
@@ -324,6 +325,73 @@ namespace emp {
 
     void PrintDebug(std::ostream & os=std::cout) {
       os << "DataNodeModule for data::FullRange. (level " << (int) data::FullRange << ")\n";
+      parent_t::PrintDebug(os);
+    }
+  };
+
+  /** == data::Stats ==
+   * 
+   * Note: These statistics are calculated with the assumption that the data this node has recieved
+   * is the entire population of measurements we're interested in, not a sample.
+   * 
+   * Note: Kurtosis is calculated using Snedecor and Cochran (1967)'s formula. A perfect normal
+   * distribution has a kurtosis of 0.
+   * */
+  template <typename VAL_TYPE, emp::data... MODS>
+  class DataNodeModule<VAL_TYPE, data::Stats, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
+  protected:
+    // Running variance, skew, and kurtosis calculations based off of this class:
+    // https://www.johndcook.com/blog/skewness_kurtosis/
+
+    double M2; // Variables to store moments of the distribution
+    double M3; // We don't need the mean (M1) because it's already being tracked
+    double M4;
+
+    using this_t = DataNodeModule<VAL_TYPE, data::Stats, MODS...>;
+    using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
+    using base_t = DataNodeModule<VAL_TYPE>;
+
+    using base_t::val_count;
+    using parent_t::total;
+    using parent_t::min;
+    using parent_t::max;
+    
+  public:
+    DataNodeModule() : M2(0), M3(0), M4(0) { ; }
+
+    using parent_t::GetMean;
+
+    double GetVariance() const {return M2/val_count;}
+    double GetStandardDeviation() const {return sqrt(GetVariance());}
+    double GetSkew() const {return sqrt(double(val_count)) * M3/ emp::Pow(M2, 1.5);}
+    double GetKurtosis() const {return double(val_count)*M4 / (M2*M2) - 3.0;}
+
+    void AddDatum(const VAL_TYPE & val) {
+      double delta, delta_n, delta_n2, term1;
+      int n = val_count + 1;
+
+      // Calculate deviation from mean (the ternary avoids dividing by
+      // 0 in the case where this is the first datum added since last reset)
+      delta = val - (total/((val_count > 0) ? val_count : 1));
+      delta_n = delta / n;
+      delta_n2 = delta_n * delta_n;
+      term1 = delta * delta_n * val_count;
+      M4 += term1 * delta_n2 * (n*n - 3*n + 3) + 6 * delta_n2 * M2 - 4 * delta_n * M3;
+      M3 += term1 * delta_n * (n - 2) - 3 * delta_n * M2;
+      M2 += term1;
+
+      parent_t::AddDatum(val);
+    }
+
+    void Reset() {
+      M2 = 0;
+      M3 = 0;
+      M4 = 0;
+      parent_t::Reset();
+    }
+
+    void PrintDebug(std::ostream & os=std::cout) {
+      os << "DataNodeModule for data::Range. (level " << (int) data::Range << ")\n";
       parent_t::PrintDebug(os);
     }
   };
