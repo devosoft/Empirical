@@ -61,23 +61,25 @@ namespace emp {
     UNKNOWN       ///< Unknown modifier; will trigger error.
   };
 
-  /// List out requisites for DataNode modules here (note: currently only one requisite allowed!)
-  static constexpr emp::data GetDataModuleRequisite(emp::data in) {
-    switch (in) {
-      case data::Archive:   return data::Log;
-      case data::FullRange: return data::Range;
-      case data::Stats:     return data::Range;
-      default: return in;
-    }
-  }
+  /// A shortcut for converting DataNode mod ID's to IntPacks.
+  template <emp::data... MODS> using ModPack = emp::IntPack<(int) MODS...>;
 
-  // A set of structs to convert data modules into their requisites.
-  template <emp::data... ARGS> struct DataModuleRequisiteAdd { };
+  /// Extra info about data modules that we need to know before actually building this DataNode.
+  /// (for now, just REQUISITES for each module.)
+  template <emp::data MOD> struct DataModInfo     { using reqs = emp::ModPack<>; };
+  template <> struct DataModInfo<data::Archive>   { using reqs = emp::ModPack<data::Log>; };
+  template <> struct DataModInfo<data::FullRange> { using reqs = emp::ModPack<data::Range>; };
+  template <> struct DataModInfo<data::Stats>     { using reqs = emp::ModPack<data::Range>; };
+  //template <> struct DataModInfo<data::FullStats> { using reqs = emp::ModPack<data::Range, data::Stats>; };
+
+
+  // A set of structs to collect and merge data module requisites.
+  template <emp::data... MODS> struct DataModuleRequisiteAdd { };
   template <> struct DataModuleRequisiteAdd<> { using type = IntPack<>; };
   template <emp::data CUR_MOD, emp::data... MODS> struct DataModuleRequisiteAdd<CUR_MOD, MODS...> {
     using next_type = typename DataModuleRequisiteAdd<MODS...>::type;
-    static constexpr emp::data this_req = GetDataModuleRequisite(CUR_MOD);
-    using type = typename next_type::template push_back<(int) this_req>;
+    using this_req = typename DataModInfo<CUR_MOD>::reqs;
+    using type = typename next_type::template append<this_req>;
   };
 
 
@@ -633,9 +635,9 @@ namespace emp {
   /// The final, sorted IntPack of the requisites plus originals is in 'sorted'.
   template<emp::data... MODS>
   struct FormatDataMods {
-    using reqs = typename DataModuleRequisiteAdd<MODS...>::type;         ///< Identify requisites
-    using full = typename IntPack<(int) MODS...>::template append<reqs>; ///< Requisites + originals
-    using sorted = pack::RUsort<full>;                                   ///< Unique and in order
+    using reqs = typename DataModuleRequisiteAdd<MODS...>::type;    ///< Identify requisites
+    using full = typename ModPack<MODS...>::template append<reqs>;  ///< Requisites + originals
+    using sorted = pack::RUsort<full>;                              ///< Unique and in order
   };
 
   template <typename VAL_TYPE, emp::data... MODS>
