@@ -23,6 +23,10 @@
  *
  *  When compiled in debug mode (i.e. without the -DNDEBUG flag), this will trigger an assertion
  *  error and print the value of a.
+ * 
+ * 
+ *  @todo: Add emp_assert_warning() for non-terminating assert.  Should be able to disable with 
+ *         a command-line option (-DEMP_NO_WARNINGS)
  */
 
 #ifndef EMP_ASSERT_H

@@ -12,7 +12,7 @@
 #include "hardware/AvidaGP.h"
 #include "hardware/InstLib.h"
 #include "tools/Random.h"
-#include "Evo/World.h"
+#include "Evolve/World.h"
 
 void Print(const emp::AvidaGP & cpu) {
   for (size_t i = 0; i < 16; i++) {

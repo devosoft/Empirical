@@ -50,6 +50,21 @@ namespace emp {
       new_vec.push_back(vec[i]);
     }
     return new_vec;
+    
+  /// Sum up the contents of a vector.
+  template <typename T>
+  T Sum(const emp::vector<T> & v) {
+    T sum = 0;
+    for (auto x : v) sum += x;
+    return sum;
+  }
+
+  /// Multiple all of the contents of a vector.
+  template <typename T>
+  T Product(const emp::vector<T> & v) {
+    T product = 1;
+    for (auto x : v) product *= x;
+    return product;
   }
 
   /// Tree manipulation in vectors.

@@ -22,8 +22,8 @@
 #include "hardware/AvidaGP.h"
 #include "hardware/InstLib.h"
 #include "tools/Random.h"
-#include "Evo/StateGrid.h"
-#include "Evo/World.h"
+#include "Evolve/StateGrid.h"
+#include "Evolve/World.h"
 
 class SGOrg : public emp::AvidaCPU_Base<SGOrg> {
 protected:

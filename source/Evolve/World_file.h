@@ -1,10 +1,13 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
+ *  @date 2017-2018
  *
  *  @file  World_file.h
  *  @brief This file defines extra details needed for world data files.
+ * 
+ *  World_file behaves like DataFile, but provides extra information on timing for how often
+ *  the file should be output.  World will automatically trigger registered files.
  */
 
 

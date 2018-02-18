@@ -653,6 +653,7 @@ TEST_CASE("Test math", "[tools]")
   constexpr auto a6 = emp::Ln(3.33);             REQUIRE( a6 > 1.202 );  REQUIRE( a6 < 1.204 );
   constexpr auto a7 = emp::Pow2(2.345);          REQUIRE( a7 > 5.080 );  REQUIRE( a7 < 5.081 );
   constexpr auto a8 = emp::Pow(emp::PI, emp::E); REQUIRE( a8 > 22.440 ); REQUIRE( a8 < 22.441 );
+  constexpr auto a9 = emp::Pow(7, 10);           REQUIRE( a9 == 282475249 );
 
   REQUIRE(emp::Mod(10, 7) == 3);
   REQUIRE(emp::Mod(3, 7) == 3);

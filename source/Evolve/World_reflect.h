@@ -1,15 +1,16 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  Handle reflection on organisms to setup reasonable defaults in the World template class.
-//
-//
-//  Developer notes:
-//  * None of the functions defined here should be called from outside the world object; as such
-//    the comments below are not in Doxygen format and should only be used by LIBRARY developers.
-
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017-2018
+ *
+ *  @file  World_reflect.h
+ *  @brief Handle reflection on organisms to setup reasonable defaults in World.
+ * 
+ *  @note None of the functions defined here should be called from outside the world object;
+ *        as such the comments below are not in Doxygen format and should only be used by
+ *        LIBRARY developers working on World.
+ */
+  
 #ifndef EMP_EVO_WORLD_REFLECT_H
 #define EMP_EVO_WORLD_REFLECT_H
 

@@ -11,6 +11,8 @@
 #ifndef EMP_RANGE_H
 #define EMP_RANGE_H
 
+#include <limits>
+
 #include "../base/assert.h"
 #include "../base/vector.h"
 
@@ -24,10 +26,15 @@ namespace emp {
     T upper;  ///< End of range, inclusive.
 
   public:
+    Range() : lower(std::numeric_limits<T>::min()), upper(std::numeric_limits<T>::max()) { ; }
     Range(T _l, T _u) : lower(_l), upper(_u) { emp_assert(_l < _u); }
 
     T GetLower() const { return lower; }
     T GetUpper() const { return upper; }
+
+    size_t CalcBin(T value, size_t num_bins) const {
+      return ((double) (value - lower)) / ((double) (upper - lower)) * num_bins;
+    }
 
     Range & operator=(const Range&) = default;
     bool operator==(const Range& _in) const { return lower==_in.lower && upper==_in.upper; }
@@ -37,8 +44,14 @@ namespace emp {
     void SetUpper(T u) { upper = u; }
     void Set(T _l, T _u) { emp_assert(_l < _u); lower = _l; upper = _u; }
 
+    void SetMaxLower() { lower = std::numeric_limits<T>::min(); }
+    void SetMaxUpper() { upper = std::numeric_limits<T>::max(); }
+
     /// Determine if a provided value is in the range.
     bool Valid(T value) { return value >= lower && value <= upper; }
+
+    /// Force a value into range
+    T Limit(T _in) { return (_in < lower) ? lower : ((_in > upper) ? upper : _in); }
 
     /// Produce a vector that spreads values evenly across the range.
     emp::vector<T> Spread(size_t s) {

@@ -4,9 +4,12 @@
 #include <iostream>
 
 #include "base/array.h"
-#include "Evo/NK-const.h"
-#include "Evo/World.h"
-#include "Evo/Resource.h"
+#include "Evolve/NK-const.h"
+#include "Evolve/World.h"
+#include "Evolve/Resource.h"
+#include "Evolve/EvoStats.h"
+#include "Evolve/NK.h"
+
 #include "tools/BitSet.h"
 #include "tools/Random.h"
 #include "tools/string_utils.h"
