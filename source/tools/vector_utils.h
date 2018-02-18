@@ -50,7 +50,8 @@ namespace emp {
       new_vec.push_back(vec[i]);
     }
     return new_vec;
-    
+  }
+
   /// Sum up the contents of a vector.
   template <typename T>
   T Sum(const emp::vector<T> & v) {
