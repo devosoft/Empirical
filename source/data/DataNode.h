@@ -61,9 +61,32 @@ namespace emp {
     UNKNOWN       ///< Unknown modifier; will trigger error.
   };
 
-  /// A template that will sort and make unique the data mods provides.
-  template<emp::data... MODS>
-  using SortDataMods = pack::RUsort<IntPack<(int) MODS...>>;
+  // Base class for tracking down requisites.
+  template <emp::data... MODS> struct DataModuleRequisites { using type = IntPack<>; };
+
+  // Track down the requisites for any type.  By default, pass on references of parent type.
+  template <emp::data D, emp::data... MODS> struct DataModuleRequisites<D, MODS...> {
+    using type = typename DataModuleRequisites<MODS...>::type;
+  };
+
+  // If we have no more module, return an empty IntPack.
+  template <> struct DataModuleRequisites<> { using type = IntPack<>; };
+
+  // The Archive module requires the Log module to function properly.
+  template <emp::data... MODS> struct DataModuleRequisites<data::Archive, MODS...> {
+    using reqs = typename DataModuleRequisites<MODS...>::type::template push_back<(int) data::Log>;
+  };
+
+  // The FullRange module requires the Range module to function properly.
+  template <emp::data... MODS> struct DataModuleRequisites<data::FullRange, MODS...> {
+    using reqs = typename DataModuleRequisites<MODS...>::type::template push_back<(int) data::Range>;
+  };
+
+  // The Stats module requires the Range module to function properly.
+  template <emp::data... MODS> struct DataModuleRequisites<data::Stats, MODS...> {
+    using reqs = typename DataModuleRequisites<MODS...>::type::template push_back<(int) data::Range>;
+  };
+
 
   /// Generic form of DataNodeModule (should never be used; trigger error!)
   template <typename VAL_TYPE, emp::data... MODS> class DataNodeModule {
@@ -79,6 +102,7 @@ namespace emp {
     emp::vector<VAL_TYPE> in_vals;  ///< What values are waiting to be included?
 
     void PullData_impl() { ; }
+
   public:
     DataNodeModule() : val_count(0), in_vals() { ; }
 
@@ -135,6 +159,7 @@ namespace emp {
     using this_t = DataNodeModule<VAL_TYPE, data::Current, MODS...>;
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
     using base_t = DataNodeModule<VAL_TYPE>;
+
   public:
     DataNodeModule() : cur_val() { ; }
 
@@ -611,10 +636,14 @@ namespace emp {
     using parent_t = DataNodeModule<VAL_TYPE, (emp::data) IMODS...>;
   };
 
+  /// A template that will determing requisites, sort, make unique the data mods provided.
+  template<emp::data... MODS>
+  using FormatDataMods = pack::RUsort<IntPack<(int) MODS...>>;
+
   template <typename VAL_TYPE, emp::data... MODS>
-  class DataNode : public DataNode_Interface< VAL_TYPE, SortDataMods<MODS...> > {
+  class DataNode : public DataNode_Interface< VAL_TYPE, FormatDataMods<MODS...> > {
   private:
-    using parent_t = DataNode_Interface< VAL_TYPE, SortDataMods<MODS...>  >;
+    using parent_t = DataNode_Interface< VAL_TYPE, FormatDataMods<MODS...>  >;
     using parent_t::in_vals;
     using test = IntPack<(int)MODS...>;
 
