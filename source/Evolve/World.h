@@ -243,6 +243,7 @@ namespace emp {
 
     /// How many organisms can fit in the world?
     size_t GetSize() const { return pop.size(); }
+    size_t size() const { return pop.size(); } // For compatibility with STL containers
 
     /// How many organisms are currently in the world?
     size_t GetNumOrgs() const { return num_orgs; }
