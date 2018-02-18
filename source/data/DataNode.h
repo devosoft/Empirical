@@ -78,8 +78,15 @@ namespace emp {
                                                   //@ELD: This seems a little confusing - it's not 
                                                   // obvious which modifiers can track resets.
 
-    // double GetVariance() const {emp_assert(false, "Calculating variance requires a DataNode with the Stats or FullStats modifier"); return 0;}
-
+    double GetTotal() const {emp_assert(false, "Calculating total requires a DataNode with the Range or FullRange modifier"); return 0;}
+    double GetMean() const {emp_assert(false, "Calculating mean requires a DataNode with the Range or FullRange modifier"); return 0;}    
+    double GetMin() const {emp_assert(false, "Calculating min requires a DataNode with the Range or FullRange modifier"); return 0;}
+    double GetMax() const {emp_assert(false, "Calculating max requires a DataNode with the Range or FullRange modifier"); return 0;}
+    double GetVariance() const {emp_assert(false, "Calculating variance requires a DataNode with the Stats or FullStats modifier"); return 0;}
+    double GetStandardDeviation() const {emp_assert(false, "Calculating standard deviation requires a DataNode with the Stats or FullStats modifier"); return 0;}
+    double GetSkew() const {emp_assert(false, "Calculating skew requires a DataNode with the Stats or FullStats modifier"); return 0;}
+    double GetKurtosis() const {emp_assert(false, "Calculating kurtosis requires a DataNode with the Stats or FullStats modifier"); return 0;}
+ 
     const std::string & GetName() const { return emp::empty_string(); }
     const std::string & GetDescription() const { return emp::empty_string(); }
     const std::string & GetKeyword() const { return emp::empty_string(); }
@@ -396,7 +403,7 @@ namespace emp {
     }
 
     void PrintDebug(std::ostream & os=std::cout) {
-      os << "DataNodeModule for data::Range. (level " << (int) data::Range << ")\n";
+      os << "DataNodeModule for data::Stats. (level " << (int) data::Stats << ")\n";
       parent_t::PrintDebug(os);
     }
   };
