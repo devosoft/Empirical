@@ -61,30 +61,23 @@ namespace emp {
     UNKNOWN       ///< Unknown modifier; will trigger error.
   };
 
-  // Base class for tracking down requisites.
-  template <emp::data... MODS> struct DataModuleRequisites { using type = IntPack<>; };
+  /// List out requisites for DataNode modules here (note: currently only one requisite allowed!)
+  static constexpr emp::data GetDataModuleRequisite(emp::data in) {
+    switch (in) {
+      case data::Archive:   return data::Log;
+      case data::FullRange: return data::Range;
+      case data::Stats:     return data::Range;
+      default: return in;
+    }
+  }
 
-  // Track down the requisites for any type.  By default, pass on references of parent type.
-  template <emp::data D, emp::data... MODS> struct DataModuleRequisites<D, MODS...> {
-    using type = typename DataModuleRequisites<MODS...>::type;
-  };
-
-  // If we have no more module, return an empty IntPack.
-  template <> struct DataModuleRequisites<> { using type = IntPack<>; };
-
-  // The Archive module requires the Log module to function properly.
-  template <emp::data... MODS> struct DataModuleRequisites<data::Archive, MODS...> {
-    using reqs = typename DataModuleRequisites<MODS...>::type::template push_back<(int) data::Log>;
-  };
-
-  // The FullRange module requires the Range module to function properly.
-  template <emp::data... MODS> struct DataModuleRequisites<data::FullRange, MODS...> {
-    using reqs = typename DataModuleRequisites<MODS...>::type::template push_back<(int) data::Range>;
-  };
-
-  // The Stats module requires the Range module to function properly.
-  template <emp::data... MODS> struct DataModuleRequisites<data::Stats, MODS...> {
-    using reqs = typename DataModuleRequisites<MODS...>::type::template push_back<(int) data::Range>;
+  // A set of structs to convert data modules into their requisites.
+  template <emp::data... ARGS> struct DataModuleRequisiteAdd { };
+  template <> struct DataModuleRequisiteAdd<> { using type = IntPack<>; };
+  template <emp::data CUR_MOD, emp::data... MODS> struct DataModuleRequisiteAdd<CUR_MOD, MODS...> {
+    using next_type = typename DataModuleRequisiteAdd<MODS...>::type;
+    static constexpr emp::data this_req = GetDataModuleRequisite(CUR_MOD);
+    using type = typename next_type::template push_back<(int) this_req>;
   };
 
 
