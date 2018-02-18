@@ -11,6 +11,10 @@
  *  compiled with EMP_TRACK_MEM set, then these pointers perform extra tests to ensure that
  *  they point to valid memory and that memory is freed before pointers are released.
  *
+ *  If you trip an assert, you can re-do the run a track a specific pointer by defining
+ *  EMP_ABORT_PTR_NEW or EMP_ABORT_PTR_DELETE to the ID of the pointer in question.  This will
+ *  allow you to track the pointer more easily in a debugger.
+ *
  *  @todo Track information about emp::vector and emp::array objects to make sure we don't
  *    point directly into them? (A resize() could make such pointers invalid!)
  */
@@ -82,10 +86,14 @@ namespace emp {
     /// Is this pointer pointing to an array?
     bool IsArray()  const { return status == PtrStatus::ARRAY; }
 
+    /// Denote that this pointer is an array.
+    void SetArray(size_t bytes) { array_bytes = bytes; status = PtrStatus::ARRAY; }
+
     /// Add one more pointer.
     void Inc() {
       if (ptr_debug) std::cout << "Inc info for pointer " << ptr << std::endl;
-      emp_assert(status != PtrStatus::DELETED, "Incrementing deleted pointer!"); count++;
+      emp_assert(status != PtrStatus::DELETED, "Incrementing deleted pointer!");
+      count++;
     }
 
     /// Remove a pointer.
@@ -191,9 +199,15 @@ namespace emp {
     size_t New(const void * ptr) {
       emp_assert(ptr);     // Cannot track a null pointer.
       size_t id = id_info.size();
+#ifdef EMP_ABORT_PTR_NEW
+      if (id == EMP_ABORT_PTR_NEW) {
+        std::cerr << "Aborting at creation of Ptr id " << id << std::endl;
+        abort();
+      }
+#endif
       if (ptr_debug) std::cout << "New:    " << id << " (" << ptr << ")" << std::endl;
       // Make sure pointer is not already stored -OR- hase been deleted (since re-use is possible).
-      emp_assert(!HasPtr(ptr) || IsDeleted(GetCurID(ptr)));
+      emp_assert(!HasPtr(ptr) || IsDeleted(GetCurID(ptr)), id);
       id_info.emplace_back(ptr);
       ptr_id[ptr] = id;
       return id;
@@ -201,14 +215,9 @@ namespace emp {
 
     /// This pointer was just created as a Ptr ARRAY!
     size_t NewArray(const void * ptr, size_t array_bytes) {
-      emp_assert(ptr);     // Cannot track a null pointer.
-      // Make sure pointer is not already stored -OR- has been deleted (since re-use is possible).
-      emp_assert(!HasPtr(ptr) || IsDeleted(GetCurID(ptr)));
-
-      size_t id = id_info.size();
-      if (ptr_debug) std::cout << "New Array:    " << id << " (" << ptr << ")" << std::endl;
-      id_info.emplace_back(ptr, array_bytes);
-      ptr_id[ptr] = id;
+      size_t id = New(ptr);  // Build the new pointer.
+      if (ptr_debug) std::cout << "  ...Array of size " << array_bytes << std::endl;
+      id_info[id].SetArray(array_bytes);
       return id;
     }
 
@@ -231,6 +240,12 @@ namespace emp {
 
     /// Mark the pointers associated with this ID as deleted.
     void MarkDeleted(size_t id) {
+#ifdef EMP_ABORT_PTR_DELETE
+      if (id == EMP_ABORT_PTR_DELETE) {
+        std::cerr << "Aborting at creation of Ptr id " << id << std::endl;
+        abort();
+      }
+#endif
       if (ptr_debug) std::cout << "Delete: " << id << std::endl;
       id_info[id].MarkDeleted();
     }
@@ -335,7 +350,7 @@ namespace emp {
     template <typename T2>
     Ptr(Ptr<T2> _in) : ptr(_in.Raw()), id(_in.GetID()) {
       if (ptr_debug) std::cout << "inexact copy construct: " << ptr << std::endl;
-      emp_assert( (PtrIsConvertable<T2, TYPE>(_in.Raw())) );
+      emp_assert( (PtrIsConvertable<T2, TYPE>(_in.Raw())), id );
       Tracker().IncID(id);
     }
 
@@ -359,32 +374,32 @@ namespace emp {
 
     /// Convert this Ptr to a raw pointer that isn't going to be tracked.
     TYPE * Raw() {
-      emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to raw.");
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to raw.", id);
       return ptr;
     }
 
     /// Convert this Ptr to a const raw pointer that isn't going to be tracked.
     const TYPE * const Raw() const {
-      emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to raw.");
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to raw.", id);
       return ptr;
     }
 
     /// Cast this Ptr to a different type.
     template <typename T2> Ptr<T2> Cast() {
-      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.");
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
       return (T2*) ptr;
     }
 
     /// Cast this Ptr to a const Ptr of a different type.
     template <typename T2> const Ptr<const T2> Cast() const {
-      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.");
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
       return (T2*) ptr;
     }
 
     /// Dynamically cast this Ptr to another type; throw an assert of the cast fails.
     template <typename T2> Ptr<T2> DynamicCast() {
       emp_assert(dynamic_cast<T2*>(ptr) != nullptr);
-      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.");
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
       return (T2*) ptr;
     }
 
@@ -394,10 +409,15 @@ namespace emp {
     /// Reallocate this Ptr to a newly allocated value using arguments passed in.
     template <typename... T>
     void New(T &&... args) {
-      Tracker().DecID(id);                        // Remove a pointer to any old memory...
-      ptr = new TYPE(std::forward<T>(args)...);   // Build a new raw pointer.
+      Tracker().DecID(id);                            // Remove a pointer to any old memory...
+
+      // ptr = new TYPE(std::forward<T>(args)...); // Special new that uses allocated space.
+      ptr = (TYPE*) malloc (sizeof(TYPE));            // Build a new raw pointer.
+      emp_emscripten_assert(ptr);                     // No exceptions in emscripten; assert alloc!
+      ptr = new (ptr) TYPE(std::forward<T>(args)...); // Special new that uses allocated space.
+
       if (ptr_debug) std::cout << "Ptr::New() : " << ptr << std::endl;
-      id = Tracker().New(ptr);                    // And track it!
+      id = Tracker().New(ptr);                        // And track it!
       DebugInfo().AddPtr();
     }
 
@@ -426,7 +446,7 @@ namespace emp {
     void Delete() {
       emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
       emp_assert(ptr, "Deleting null Ptr.");
-      emp_assert(Tracker().IsArrayID(id) == false, "Trying to delete array pointer as non-array.");
+      emp_assert(Tracker().IsArrayID(id) == false, id, "Trying to delete array pointer as non-array.");
       Tracker().MarkDeleted(id);
       DebugInfo().RemovePtr();
       if (ptr_debug) std::cout << "Ptr::Delete() : " << ptr << std::endl;
@@ -437,7 +457,7 @@ namespace emp {
     void DeleteArray() {
       emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
       emp_assert(ptr, "Deleting null Ptr.");
-      emp_assert(Tracker().IsArrayID(id), "Trying to delete non-array pointer as array.");
+      emp_assert(Tracker().IsArrayID(id), id, "Trying to delete non-array pointer as array.");
       Tracker().MarkDeleted(id);
       DebugInfo().RemovePtr();
       if (ptr_debug) std::cout << "Ptr::DeleteArray() : " << ptr << std::endl;
@@ -455,7 +475,7 @@ namespace emp {
     /// Copy assignment
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
       if (ptr_debug) std::cout << "copy assignment" << std::endl;
-      emp_assert(Tracker().IsDeleted(_in.id) == false, "Do not copy deleted pointers.");
+      emp_assert(Tracker().IsDeleted(_in.id) == false, _in.id, "Do not copy deleted pointers.");
       if (id != _in.id) {        // Assignments only need to happen if ptrs are different.
         Tracker().DecID(id);
         ptr = _in.ptr;
@@ -468,7 +488,7 @@ namespace emp {
     /// Move assignment
     Ptr<TYPE> & operator=(Ptr<TYPE> && _in) {
       if (ptr_debug) std::cout << "move assignment" << std::endl;
-      emp_assert(Tracker().IsDeleted(_in.id) == false, "Do not move deleted pointers.");
+      emp_assert(Tracker().IsDeleted(_in.id) == false, _in.id, "Do not move deleted pointers.");
       if (id != _in.id) {
         Tracker().DecID(id);   // Decrement references to former pointer at this position.
         ptr = _in.ptr;
@@ -506,8 +526,8 @@ namespace emp {
     template <typename T2>
     Ptr<TYPE> & operator=(Ptr<T2> _in) {
       if (ptr_debug) std::cout << "convert-copy assignment" << std::endl;
-      emp_assert( (PtrIsConvertable<T2, TYPE>(_in.Raw())) );
-      emp_assert(Tracker().IsDeleted(_in.id) == false, "Do not copy deleted pointers.");
+      emp_assert( (PtrIsConvertable<T2, TYPE>(_in.Raw())), _in.id );
+      emp_assert(Tracker().IsDeleted(_in.id) == false, _in.id, "Do not copy deleted pointers.");
       Tracker().DecID(id);
       ptr = _in.Raw();
       id = _in.GetID();
@@ -518,7 +538,7 @@ namespace emp {
     /// Dereference a pointer.
     TYPE & operator*() {
       // Make sure a pointer is active and non-null before we dereference it.
-      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
       emp_assert(ptr != nullptr, "Do not dereference a null pointer!");
       return *ptr;
     }
@@ -526,7 +546,7 @@ namespace emp {
     /// Dereference a pointer to a const type.
     const TYPE & operator*() const {
       // Make sure a pointer is active before we dereference it.
-      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
       emp_assert(ptr != nullptr, "Do not dereference a null pointer!");
       return *ptr;
     }
@@ -534,7 +554,7 @@ namespace emp {
     /// Follow a pointer.
     TYPE * operator->() {
       // Make sure a pointer is active before we follow it.
-      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
       return ptr;
     }
@@ -542,27 +562,27 @@ namespace emp {
     /// Follow a pointer to a const target.
     const TYPE * const operator->() const {
       // Make sure a pointer is active before we follow it.
-      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
       return ptr;
     }
 
     /// Indexing into array
     TYPE & operator[](size_t pos) {
-      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
-      emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.");
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
+      emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.", id);
       emp_assert(Tracker().GetArrayBytes(id) > (pos*sizeof(TYPE)),
-        "Indexing out of range.", ptr, pos, sizeof(TYPE), Tracker().GetArrayBytes(id));
+        "Indexing out of range.", id, ptr, pos, sizeof(TYPE), Tracker().GetArrayBytes(id));
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
       return ptr[pos];
     }
 
     /// Indexing into const array
     const TYPE & operator[](size_t pos) const {
-      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
-      emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.");
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
+      emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.", id);
       emp_assert(Tracker().GetArrayBytes(id) > (pos*sizeof(TYPE)),
-        "Indexing out of range.", ptr, pos, sizeof(TYPE), Tracker().GetArrayBytes(id));
+        "Indexing out of range.", id, ptr, pos, sizeof(TYPE), Tracker().GetArrayBytes(id));
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
       return ptr[pos];
     }
@@ -570,10 +590,10 @@ namespace emp {
     /// Auto-case to raw pointer type.
     operator TYPE *() {
       // Make sure a pointer is active before we convert it.
-      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */);
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
 
       // We should not automatically convert managed pointers to raw pointers; use .Raw()
-      emp_assert(id == (size_t) -1 /*, typeid(TYPE).name() */);
+      emp_assert(id == (size_t) -1 /*, typeid(TYPE).name() */, id);
       return ptr;
     }
 
@@ -751,12 +771,12 @@ namespace emp {
   template <typename T> Ptr<T> TrackPtr(T * _in, bool own=true) { return Ptr<T>(_in, own); }
 
   template <typename T, typename... ARGS> Ptr<T> NewPtr(ARGS &&... args) {
-    return Ptr<T>(new T(std::forward<ARGS>(args)...), true);
+    //auto ptr = new T(std::forward<ARGS>(args)...);
+    auto ptr = (T*) malloc (sizeof(T));         // Build a new raw pointer.
+    emp_assert(ptr);                            // No exceptions in emscripten; assert alloc!
+    new (ptr) T(std::forward<ARGS>(args)...);   // Special new that uses allocated space.
+    return Ptr<T>(ptr, true);
   }
-<<<<<<< HEAD
-  template <typename T, typename... ARGS> Ptr<T> NewArrayPtr(size_t array_size) {
-    return Ptr<T>(new T[array_size], array_size, true);
-=======
 
   template <typename T, typename... ARGS> Ptr<T> NewArrayPtr(size_t array_size, ARGS &&... args) {
     //auto ptr = new T[array_size];
@@ -767,8 +787,12 @@ namespace emp {
       new (ptr + i*sizeof(T)) T(args...);             //    ...and initialize them.
     }
     return Ptr<T>(ptr, array_size, true);
->>>>>>> 7312792e2fa1367207cd226c2d9558421101834d
   }
+
+
+
+
+
 }
 
 #endif // EMP_PTR_H
