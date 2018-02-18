@@ -630,15 +630,19 @@ namespace emp {
   };
 
   /// A template that will determing requisites, sort, make unique the data mods provided.
+  /// The final, sorted IntPack of the requisites plus originals is in 'sorted'.
   template<emp::data... MODS>
-  using FormatDataMods = pack::RUsort<IntPack<(int) MODS...>>;
+  struct FormatDataMods {
+    using reqs = typename DataModuleRequisiteAdd<MODS...>::type;         ///< Identify requisites
+    using full = typename IntPack<(int) MODS...>::template append<reqs>; ///< Requisites + originals
+    using sorted = pack::RUsort<full>;                                   ///< Unique and in order
+  };
 
   template <typename VAL_TYPE, emp::data... MODS>
-  class DataNode : public DataNode_Interface< VAL_TYPE, FormatDataMods<MODS...> > {
+  class DataNode : public DataNode_Interface< VAL_TYPE, typename FormatDataMods<MODS...>::sorted > {
   private:
-    using parent_t = DataNode_Interface< VAL_TYPE, FormatDataMods<MODS...>  >;
+    using parent_t = DataNode_Interface< VAL_TYPE, typename FormatDataMods<MODS...>::sorted  >;
     using parent_t::in_vals;
-    using test = IntPack<(int)MODS...>;
 
   public:
 
