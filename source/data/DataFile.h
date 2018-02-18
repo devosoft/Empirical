@@ -105,6 +105,8 @@ namespace emp {
     }
 
     // If a function takes an ostream, pass in the correct one.
+    /** Generic function for adding a column to the DataFile. In practice, you probably
+     *  want to call one of the more specific ones. */
     size_t Add(const std::function<void(std::ostream &)> & fun, const std::string & key, const std::string & desc) {
       size_t id = funs.GetSize();
       funs.Add(fun);
@@ -130,37 +132,65 @@ namespace emp {
     }
 
     // Add various types of data from DataNodes
-    /** Add a function that always pulls the current value from the DataNode @param node*/
+    /** Add a function that always pulls the current value from the DataNode @param node.
+     *  Requires that @param node have the data::Current modifier.
+    */
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddCurrent(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetCurrent(); };
       return Add(in_fun, key, desc);
     }
-    /** Add a function that always pulls the mean value from the DataNode @param node*/
+    
+    /** Add a function that always pulls the mean value from the DataNode @param node.
+     *  Requires that @param node have the data::Range or data::FullRange modifier. 
+    */
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddMean(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMean(); };
       return Add(in_fun, key, desc);
     }
-    /** Add a function that always pulls the total value from the DataNode @param node*/
+    
+    /** Add a function that always pulls the total value from the DataNode @param node.
+     *  Requires that @param node have the data::Range or data::FullRange modifier. 
+    */
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddTotal(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetTotal(); };
       return Add(in_fun, key, desc);
     }
-    /** Add a function that always pulls the minimum value from the DataNode @param node*/
+    
+    /** Add a function that always pulls the minimum value from the DataNode @param node
+     *  Requires that @param node have the data::Range or data::FullRange modifier.
+    */
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddMin(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMin(); };
       return Add(in_fun, key, desc);
     }
-    /** Add a function that always pulls the maximum value from the DataNode @param node*/
+    
+    /** Add a function that always pulls the maximum value from the DataNode @param node
+     *  Requires that @param node have the data::Range or data::FullRange modifier.
+    */
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddMax(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMax(); };
       return Add(in_fun, key, desc);
     }
-    /** Add a function that always pulls the inferiority (mean divided by max) from the DataNode @param node*/
+    
+    /** Add a function that always pulls the count of the @param bin_id 'th bin of the histogram
+     * from @param node. Requires that @param node have the data::Histogram modifier and at least
+     * @bin_id bins.
+    */
+    template <typename VAL_TYPE, emp::data... MODS>
+    size_t AddHistBin(DataNode<VAL_TYPE, MODS...> & node, size_t bin_id, const std::string & key="", const std::string & desc="") {
+      std::function<fun_t> in_fun =
+        [&node,bin_id](std::ostream & os){ os << node.GetHistCount(bin_id); };
+      return Add(in_fun, key, desc);
+    }
+
+    /** Add a function that always pulls the inferiority (mean divided by max) from the DataNode @param node.
+     *  Requires that @param node have the data::Range or data::FullRange modifier.
+    */
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddInferiority(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [&node](std::ostream & os){

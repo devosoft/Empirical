@@ -10,7 +10,7 @@
  *  or rotate.
  */
 
-#include "Evo/StateGrid.h"
+#include "Evolve/StateGrid.h"
 #include "hardware/AvidaGP.h"
 #include "hardware/InstLib.h"
 

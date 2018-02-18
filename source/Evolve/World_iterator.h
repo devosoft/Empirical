@@ -1,15 +1,16 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//  (Originally called PopulationIterator.h)
-//
-//  This file defines iterators for use with emp::World objects.
-//
-//
-//  Developer notes:
-//  * It may be worth building a Const interator type to avoid unintended modifications.
-//  * Currently we do MakeValid after every change AND before many accesses.  Pick one?
-//  * operator-- is unsafe; it can go off of the beginnig of the world.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017-2018
+ *  @note Originally called PopulationIterator.h
+ *
+ *  @file  World_iterator.h
+ *  @brief This file defines iterators for use with emp::World objects.
+ * 
+ *  @todo Add a const interator.
+ *  @todo Currently we do MakeValid after every change AND before many accesses.  Pick one?
+ *  @todo Fix operator-- which can go off of the beginnig of the world.
+ */
 
 #ifndef EMP_EVO_WORLD_ITER_H
 #define EMP_EVO_WORLD_ITER_H
