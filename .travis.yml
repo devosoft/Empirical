@@ -6,7 +6,6 @@ branches:
   only:
     - master
     - travis_testing
-    - datanode
 
 notifications:
   email: false
