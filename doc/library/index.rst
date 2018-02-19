@@ -10,7 +10,7 @@ Contents:
    data/data
    web/web
    tools/tools
-   Class/Namespace Hierarchy <../html/index.html#http://>
+   Class/Namespace Hierarchy <../_build/html/index.html#http://>
 
 * :ref:`genindex`
 * :ref:`search`

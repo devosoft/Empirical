@@ -22,10 +22,21 @@ library into their own projects.
 Contents:
 
 .. toctree::
+   :caption: Using Empirical
    :maxdepth: 2
 
-   library/index
-   tutorials/index
-   dev/index
+   library/base/base
+   library/data/data
+   library/web/web
+   library/tools/tools
+   Full Class/Namespace Hierarchy <../_build/html/index.html#http://>
+
+.. toctree::
+   :caption: Contributing
+
+   dev/getting-started
+   dev/contribution-guidelines-and-review
+   dev/adding-documentation
+   dev/guide-to-testing
 
 :ref:`genindex`
