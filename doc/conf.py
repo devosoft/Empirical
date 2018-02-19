@@ -44,7 +44,7 @@ sys.path.append(os.path.abspath("../third-party/breathe"))
 # ones.
 extensions = [
     'sphinx.ext.todo',
-    'sphinx.ext.pngmath',
+    'sphinx.ext.imgmath',
     'breathe',
 ]
 
