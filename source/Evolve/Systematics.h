@@ -32,8 +32,26 @@
 #include "../tools/string_utils.h"
 #include "../tools/stats.h"
 #include "../control/Signal.h"
+#include "../data/DataNode.h"
 
 namespace emp {
+
+  /// The systematics manager allows an optional second template type that 
+  /// can store additional data about each taxon in the phylogeny. Here are
+  /// some structs containing common pieces of additional data to track.
+  /// Note: You are responsible for filling these in! Adding the template
+  /// just gives you a place to store your data.
+
+  struct no_data {}; /// The default - an empty struct
+
+  template <typename PHEN_TYPE> 
+  struct mut_landscape_info { /// Track information related to the mutational landscape
+    /// Maps a string representing a type of mutation to a count representing 
+    /// the number of that type of mutation that occured to bring about this taxon.
+    std::unordered_map<std::string, int> mut_counts;
+    double fitness; /// This taxon's fitness (for assessing deleterious mutational steps)
+    PHEN_TYPE phenotype; /// This taxon's phenotype (for assessing phenotypic change)
+  };
 
   /// @brief A Taxon represents a type of organism in a phylogeny.
   /// @param ORG_INFO The information type associated with an organism, used to categorize it.
@@ -41,13 +59,10 @@ namespace emp {
   /// Genotypes are the most commonly used Taxon; in general taxa can be anything from a shared
   /// genome sequence, a phenotypic trait, or a even a position in the world (if you want to
   /// track an evolutionary pathway)
-
-  struct no_data {};
-
   template <typename ORG_INFO, typename DATA_STRUCT = no_data>
   class Taxon {
   private:
-    using this_t = Taxon<ORG_INFO>;
+    using this_t = Taxon<ORG_INFO, DATA_STRUCT>;
     using info_t = ORG_INFO;
     using data_t = DATA_STRUCT;
 
@@ -93,7 +108,7 @@ namespace emp {
     /// Get the number of taxanomic steps since the ancestral organism was injected into the World.
     size_t GetDepth() const { return depth; }
 
-    const data_t & GetData() const {return data;}
+    data_t & GetData() {return data;}
 
     double GetOriginationTime() const {return origination_time;}
     void SetOriginationTime(double time) {origination_time = time;}
@@ -157,7 +172,7 @@ namespace emp {
   template <typename ORG_INFO, typename DATA_STRUCT = no_data>
   class Systematics {
   private:
-    using taxon_t = Taxon<ORG_INFO, no_data>;
+    using taxon_t = Taxon<ORG_INFO, DATA_STRUCT>;
     using hash_t = typename Ptr<taxon_t>::hash_t;
 
     bool store_active;     ///< Store all of the currently active taxa?
@@ -359,7 +374,7 @@ namespace emp {
      * between two extant taxa (poentially useful for comparison to biological data, where
      * non-branching nodes generally cannot be inferred).
      * 
-     * This measurement assumes that the tree is fully connected. Will return infinity
+     * This measurement assumes that the tree is fully connected. Will return -1
      * if this is not the case.
      * */
     double GetMeanPairwiseDistance(bool branch_only=false) {
@@ -374,7 +389,7 @@ namespace emp {
      * between two extant taxa (poentially useful for comparison to biological data, where
      * non-branching nodes generally cannot be inferred).
      * 
-     * This measurement assumes that the tree is fully connected. Will return infinity
+     * This measurement assumes that the tree is fully connected. Will return -1
      * if this is not the case.
      * */
     int GetSumPairwiseDistance(bool branch_only=false) {
@@ -388,7 +403,7 @@ namespace emp {
      * between two extant taxa (poentially useful for comparison to biological data, where
      * non-branching nodes generally cannot be inferred).
      * 
-     * This measurement assumes that the tree is fully connected. Will return infinity
+     * This measurement assumes that the tree is fully connected. Will return -1
      * if this is not the case.
      * */
     int GetVariancePairwiseDistance(bool branch_only=false) {
@@ -401,7 +416,7 @@ namespace emp {
      * between two extant taxa (poentially useful for comparison to biological data, where
      * non-branching nodes generally cannot be inferred).
      * 
-     * This method assumes that the tree is fully connected. Will return infinity
+     * This method assumes that the tree is fully connected. Will return -1
      * if this is not the case.
      * */
     emp::vector<int> GetPairwiseDistances(bool branch_only=false) {      
@@ -494,7 +509,7 @@ namespace emp {
       if (dists.size() != (active_taxa.size()*(active_taxa.size()-1))/2) {
         // The tree is not connected
         // Technically this means the mean distance is infinite.
-        return INFINITY;
+        return -1;
       }
 
       // std::cout << "Total: " << total << "Dists: " << dists.size() << std::endl;

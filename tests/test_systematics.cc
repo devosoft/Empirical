@@ -9,7 +9,8 @@
 
 #include "third-party/Catch/single_include/catch.hpp"
 
-#include "Evo/Systematics.h"
+#include "Evolve/Systematics.h"
+#include "Evolve/SystematicsAnalysis.h"
 #include <iostream>
 
 TEST_CASE("Test Systematics", "[evo]")
@@ -125,16 +126,27 @@ TEST_CASE("Test Systematics", "[evo]")
   sys.PrintStatus();
 }
 
-template <typename PHEN_TYPE>
-struct mut_landscape_info {
-  std::unordered_map<std::string, int> mut_counts;
-  double fitness;
-  PHEN_TYPE phenotype;
-};
-
 TEST_CASE("Test Data Struct", "[evo]")
 {
 
-  emp::Systematics<int, mut_landscape_info<int> > sys(true, true, true);
+  emp::Systematics<int, emp::mut_landscape_info<int> > sys(true, true, true);
+  auto id1 = sys.AddOrg(1, nullptr);
+  id1->GetData().fitness = 2;
+  
+  auto id2 = sys.AddOrg(2, id1);
+  id2->GetData().mut_counts["substitution"] = 2;
+  id2->GetData().fitness = 1;
+  REQUIRE(id2->GetData().mut_counts["substitution"] == 2);
+  
+  auto id3 = sys.AddOrg(3, id1);
+  id3->GetData().mut_counts["substitution"] = 5;
+  id3->GetData().fitness = 0;  
+  
+  auto id4 = sys.AddOrg(4, id2);
+  id4->GetData().mut_counts["substitution"] = 1;
+  id4->GetData().fitness = 3;
+
+  REQUIRE(CountMuts(id4) == 3);
+  REQUIRE(CountDeleteriousSteps(id4) == 1);
 
 }

@@ -32,12 +32,14 @@ namespace emp {
     template <typename taxon_t>
     int CountDeleteriousSteps(Ptr<taxon_t> taxon) {
         int count = 0;
+        Ptr<taxon_t> parent = taxon->GetParent();
 
-        while (taxon) {
-            if (taxon->GetData().fitness < taxon->GetParent()->GetData().fitness) {
+        while (parent) {
+            if (taxon->GetData().fitness < parent->GetData().fitness) {
                 count++;
             }
-            taxon = taxon->GetParent();            
+            taxon = parent;            
+            parent = taxon->GetParent();               
         }
 
         return count;
