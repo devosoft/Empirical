@@ -30,6 +30,7 @@
 #include "tools/RegEx.h"
 #include "tools/Random.h"
 #include "tools/TypeTracker.h"
+#include "tools/attrs.h"
 
 #include "tools/errors.h"
 #include "tools/flex_function.h"
@@ -58,6 +59,17 @@
 #include "tools/SolveState.h"
 #include "tools/serialize_macros.h"
 
+#define CONST_REQUIRE_EQ(A, B) \
+  {                            \
+    constexpr auto __a{A};     \
+    constexpr auto __b{B};     \
+    REQUIRE(__a == __b);       \
+  }
+#define CONST_REQUIRE(X)   \
+  {                        \
+    constexpr auto __x{X}; \
+    REQUIRE(__x);          \
+  }
 
 // this templating is necessary to force full coverage of templated classes.
 // Since c++ doesn't generate code for templated methods if those methods aren't
