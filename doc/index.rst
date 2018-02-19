@@ -12,7 +12,7 @@ emphasis on being able to build web interfaces using Mozilla's Emscripten
 compiler.  The project goal is to improve the accessibility and reproducibility
 of the computational research.
 
-Emscripten is a C++ project though it uses Python for development
+Emprical is a C++ project though it uses Python for development
 infrastructure. 
 
 The developer documentation is for contributing to the Emscripten project and
@@ -22,7 +22,7 @@ library into their own projects.
 Contents:
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 3
 
    library/index
    tutorials/index
