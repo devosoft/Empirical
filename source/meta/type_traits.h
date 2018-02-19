@@ -51,7 +51,41 @@ namespace emp {
     static constexpr bool SameBase() { return true; }
     static constexpr bool ConvertOK(T *) { return false; }
   };
-}
 
+  namespace detail {
+    template <typename Fn, typename... Args>
+    struct is_invocable_helper {
+      private:
+      // If U can be invoked with Args... for arguments, then it will have some
+      // return value, and we try to create a pointer to it. Note the use of
+      // decay_t. This will remove any references from the return value, which
+      // would cause SFINAE to fail, since C++ does not allow pointers to
+      // references
+      template <typename U>
+      static std::true_type check(
+        U &&,
+        std::decay_t<decltype(std::declval<U>()(std::declval<Args>()...))> * =
+          nullptr) {
+        return {};
+      }
+
+      // Catchall which handles the cases where U is not callable with Args
+      // arguments
+      template <typename U>
+      static std::false_type check(...) {
+        return {};
+      }
+
+      public:
+      static constexpr decltype(check<Fn>(std::declval<Fn>())) value() {
+        return {};
+      }
+    };
+  }  // namespace detail
+
+  template <typename Fn, typename... Args>
+  struct is_invocable
+    : decltype(detail::is_invocable_helper<Fn, Args...>::value()) {};
+}  // namespace emp
 
 #endif
