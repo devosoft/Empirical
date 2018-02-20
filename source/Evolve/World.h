@@ -84,7 +84,7 @@ namespace emp {
   ///   1. GetGenome member function
   ///   2. Return org AS genome.
 
-  template <typename ORG, typename DATA_TYPE>
+  template <typename ORG, typename DATA_TYPE = no_data>
   class World {
     friend class World_iterator< World<ORG, DATA_TYPE> >;
   public:
