@@ -368,21 +368,24 @@ namespace emp {
     using base_t = DataNodeModule<VAL_TYPE>;
 
     using base_t::val_count;
+    using parent_t::total;
+    using parent_t::min;
+    using parent_t::max;
   public:
     DataNodeModule()
-      : total_vals(1,0.0), num_vals(1,0), min_vals(1,0.0), max_vals(1,0.0) { ; }
+      : total_vals(), num_vals(), min_vals(), max_vals() { ; }
 
     /// Get the sum of all values added to this DataNode since the last reset
-    double GetTotal() const { return total_vals.back(); }
+    double GetTotal() const { return total; }
 
     /// Get the mean of all values added to this DataNode since the last reset
-    double GetMean() const { return total_vals.back() / (double) num_vals.back(); }
+    double GetMean() const { return total / (double) val_count; }
 
     /// Get the minimum of all values added to this DataNode since the last reset
-    double GetMin() const { return min_vals.back(); }
+    double GetMin() const { return min; }
   
     /// Get the maximum of all values added to this DataNode since the last reset
-    double GetMax() const { return max_vals.back(); }
+    double GetMax() const { return max; }
 
     /// Get the sum of all values added to this DataNode during the @param update specified.
     double GetTotal(size_t update) const { return total_vals[update]; }
@@ -400,21 +403,23 @@ namespace emp {
     ///  Note that this is one more than the number of times it has been reset
     size_t GetResetCount() const { return total_vals.size(); }
 
-    /// Add @param val to the DataNode
-    void AddDatum(const VAL_TYPE & val) {
-      total_vals.back() += val;
-      num_vals.back() += 1;
-      if (!val_count || val < min_vals.back()) min_vals.back() = val;
-      if (!val_count || val > max_vals.back()) max_vals.back() = val;
-      parent_t::AddDatum(val);
-    }
+    // NOTE: Ignoring AddDatum() since Range values track current information.
+
+    // /// Add @param val to the DataNode
+    // void AddDatum(const VAL_TYPE & val) {
+    //   total_vals.back() += val;
+    //   num_vals.back() += 1;
+    //   if (!val_count || val < min_vals.back()) min_vals.back() = val;
+    //   if (!val_count || val > max_vals.back()) max_vals.back() = val;
+    //   parent_t::AddDatum(val);
+    // }
 
     /// Store the current range statistics in the archive and reset for a new interval.
     void Reset() {
-      total_vals.push_back(0.0);
-      num_vals.push_back(0);
-      min_vals.push_back(0.0);
-      max_vals.push_back(0.0);
+      total_vals.push_back(total);
+      num_vals.push_back(val_count);
+      min_vals.push_back(min);
+      max_vals.push_back(max);
       parent_t::Reset();
     }
 
