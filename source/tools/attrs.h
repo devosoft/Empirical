@@ -451,7 +451,7 @@ namespace emp {
       static constexpr decltype(auto) call(S&& self, U&&... args) {
         constexpr size_t last = sizeof...(T) - 1;
         return attrs(
-          GetAttr<VariadicIndexOfValue<T, Attrs> == last,
+          GetAttr<variadic_index_of_v<T, Attrs> == last,
                   T>::template get<S, U...>(std::forward<S>(self),
                                             std::forward<U>(args)...)...);
       }
@@ -629,7 +629,7 @@ namespace emp {
       return __attrs_impl::__impl_merge(
         std::forward<A0>(a0), std::forward<A1>(a1),
         __attrs_impl::wrapper<
-          VariadicUnionType<self_attrs_type, other_attrs_type>>{});
+          variadic_union_t<self_attrs_type, other_attrs_type>>{});
     }
 
     template <typename A0, typename A1, typename A2, typename... A>
@@ -640,7 +640,7 @@ namespace emp {
       return merge(__attrs_impl::__impl_merge(
                      std::forward<A0>(a0), std::forward<A1>(a1),
                      __attrs_impl::wrapper<
-                       VariadicUnionType<self_attrs_type, other_attrs_type>>{}),
+                       variadic_union_t<self_attrs_type, other_attrs_type>>{}),
                    std::forward<A2>(a2), std::forward<A>(packs)...);
     }
 

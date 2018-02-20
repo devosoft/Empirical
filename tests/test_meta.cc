@@ -167,76 +167,76 @@ struct Orthogonal {};
 
 TEST_CASE("Test Variadics", "[meta]") {
   REQUIRE((
-    !emp::VariadicContains<int, std::tuple<float, char, unsigned int>>::value));
+    !emp::variadic_contains<int, std::tuple<float, char, unsigned int>>::value));
   REQUIRE(
-    (emp::VariadicContains<int,
+    (emp::variadic_contains<int,
                            std::tuple<float, int, char, unsigned int>>::value));
 
   // Check that classes with non-variadic numbers of arguments are supported
-  REQUIRE((emp::VariadicContains<int, std::pair<float, int>>::value));
+  REQUIRE((emp::variadic_contains<int, std::pair<float, int>>::value));
 
   // Check that alternative equality operators are supported
   REQUIRE(
-    (!emp::VariadicContains<Base, std::pair<Derived, Orthogonal>>::value));
-  REQUIRE((emp::VariadicContains<Base, std::pair<Derived, Orthogonal>,
+    (!emp::variadic_contains<Base, std::pair<Derived, Orthogonal>>::value));
+  REQUIRE((emp::variadic_contains<Base, std::pair<Derived, Orthogonal>,
                                  std::is_base_of>::value));
-  REQUIRE((!emp::VariadicContains<Derived, std::pair<Base, Orthogonal>,
+  REQUIRE((!emp::variadic_contains<Derived, std::pair<Base, Orthogonal>,
                                   std::is_base_of>::value));
 
   // Check concat
   REQUIRE((std::is_same<
-           emp::VariadicConcat<std::tuple<int, float, char>,
+           emp::variadic_concat<std::tuple<int, float, char>,
                                std::tuple<short, unsigned int, char*>>::type,
            std::tuple<int, float, char, short, unsigned int, char*>>::value));
 
   // Check filter
   REQUIRE((std::is_same<
-           emp::VariadicFilterType<std::tuple<int, float, long, float, char*>,
+           emp::variadic_filter_t<std::tuple<int, float, long, float, char*>,
                                    std::is_integral>,
            std::tuple<int, long>>::value));
 
   // Check remove duplicates
   REQUIRE(
     (std::is_same<
-      emp::VariadicRemoveDuplicatesType<std::tuple<int, float, float, char>>,
+      emp::variadic_remove_duplicates_t<std::tuple<int, float, float, char>>,
       std::tuple<int, float, char>>::value));
-  REQUIRE((std::is_same<emp::VariadicRemoveDuplicatesType<
+  REQUIRE((std::is_same<emp::variadic_remove_duplicates_t<
                           std::tuple<int, int, float, float, char>>,
                         std::tuple<int, float, char>>::value));
   REQUIRE((std::is_same<
-           emp::VariadicRemoveDuplicatesType<std::tuple<int, float, char>>,
+           emp::variadic_remove_duplicates_t<std::tuple<int, float, char>>,
            std::tuple<int, float, char>>::value));
-  REQUIRE((std::is_same<emp::VariadicRemoveDuplicatesType<std::tuple<int, int>>,
+  REQUIRE((std::is_same<emp::variadic_remove_duplicates_t<std::tuple<int, int>>,
                         std::tuple<int>>::value));
-  REQUIRE((std::is_same<emp::VariadicRemoveDuplicatesType<std::tuple<int>>,
+  REQUIRE((std::is_same<emp::variadic_remove_duplicates_t<std::tuple<int>>,
                         std::tuple<int>>::value));
-  REQUIRE((std::is_same<emp::VariadicRemoveDuplicatesType<std::tuple<>>,
+  REQUIRE((std::is_same<emp::variadic_remove_duplicates_t<std::tuple<>>,
                         std::tuple<>>::value));
   REQUIRE(
-    (std::is_same<emp::VariadicRemoveDuplicatesType<
+    (std::is_same<emp::variadic_remove_duplicates_t<
                     std::tuple<Base, Derived, Orthogonal>, std::is_convertible>,
                   std::tuple<Base, Orthogonal>>::value));
 
   // Test Union
-  REQUIRE((std::is_same<emp::VariadicUnionType<std::tuple<int, float, char>,
+  REQUIRE((std::is_same<emp::variadic_union_t<std::tuple<int, float, char>,
                                                std::tuple<int, char*, int*>>,
                         std::tuple<int, float, char, char*, int*>>::value));
   REQUIRE((std::is_same<
-           emp::VariadicUnionType<std::pair<int, float>, std::pair<int, float>>,
+           emp::variadic_union_t<std::pair<int, float>, std::pair<int, float>>,
            std::pair<int, float>>::value));
   REQUIRE((std::is_same<
-           emp::VariadicUnionType<std::tuple<>, std::tuple<int, char*, int*>>,
+           emp::variadic_union_t<std::tuple<>, std::tuple<int, char*, int*>>,
            std::tuple<int, char*, int*>>::value));
 
   // Test Intersection
   REQUIRE((std::is_same<
-           emp::VariadicIntersectionType<std::tuple<int, float, float, char>,
+           emp::variadic_intersection_t<std::tuple<int, float, float, char>,
                                          std::tuple<int, char*, int*, int>>,
            std::tuple<int>>::value));
   REQUIRE((std::is_same<
-           emp::VariadicUnionType<std::pair<int, float>, std::pair<int, float>>,
+           emp::variadic_union_t<std::pair<int, float>, std::pair<int, float>>,
            std::pair<int, float>>::value));
-  REQUIRE((std::is_same<emp::VariadicIntersectionType<
+  REQUIRE((std::is_same<emp::variadic_intersection_t<
                           std::tuple<>, std::tuple<int, char*, int*, int>>,
                         std::tuple<>>::value));
 }

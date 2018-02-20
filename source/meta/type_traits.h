@@ -107,252 +107,252 @@ namespace emp {
 
     template <bool, typename Needle, typename Haystack,
               template <typename, typename> class Cmp>
-    struct VariadicContainsSwitch;
+    struct variadic_contains_switch;
 
     template <typename Needle, typename Haystack,
               template <typename, typename> class Cmp>
-    struct VariadicContains;
+    struct variadic_contains;
 
     // Base case where pack<U...> == pack<>
     template <typename Needle, template <typename, typename> class Cmp>
-    struct VariadicContains<Needle, __impl_variadics_type_traits::pack<>, Cmp>
+    struct variadic_contains<Needle, __impl_variadics_type_traits::pack<>, Cmp>
       : std::false_type {};
 
     // Base case where Variadic<A...> == Variadic<>
     template <typename Needle, typename U0, typename... U,
               template <typename, typename> class Cmp>
-    struct VariadicContains<Needle,
+    struct variadic_contains<Needle,
                             __impl_variadics_type_traits::pack<U0, U...>, Cmp>
-      : __impl_variadics_type_traits::VariadicContainsSwitch<
+      : __impl_variadics_type_traits::variadic_contains_switch<
           Cmp<Needle, U0>::value, Needle,
           __impl_variadics_type_traits::pack<U...>, Cmp> {};
 
     template <typename Needle, typename Haystack,
               template <typename, typename> class Cmp>
-    struct VariadicContainsSwitch<true, Needle, Haystack, Cmp>
+    struct variadic_contains_switch<true, Needle, Haystack, Cmp>
       : std::true_type {};
 
     template <typename Needle, typename Haystack,
               template <typename, typename> class Cmp>
-    struct VariadicContainsSwitch<false, Needle, Haystack, Cmp>
-      : VariadicContains<Needle, Haystack, Cmp> {};
+    struct variadic_contains_switch<false, Needle, Haystack, Cmp>
+      : variadic_contains<Needle, Haystack, Cmp> {};
 
   }  // namespace __impl_variadics_type_traits
 
-  // -- VariadicContains --
+  // -- variadic_contains --
   // A utility for checking if any template class X<A0, A1, ..., An> has one of
   // its template parameters such that Ak == Needle
 
   template <typename Needle, typename Haystack,
             template <typename, typename> class Cmp = std::is_same>
-  struct VariadicContains;
+  struct variadic_contains;
 
   // Base case where Variadic<A...> == Variadic<>
   template <typename Needle, template <typename...> class Variadic,
             typename... U, template <typename, typename> class Cmp>
-  struct VariadicContains<Needle, Variadic<U...>, Cmp>
-    : __impl_variadics_type_traits::VariadicContains<
+  struct variadic_contains<Needle, Variadic<U...>, Cmp>
+    : __impl_variadics_type_traits::variadic_contains<
         Needle, __impl_variadics_type_traits::pack<U...>, Cmp> {};
 
   template <typename Needle, typename Haystack,
             template <typename, typename> class... Cmp>
-  constexpr bool VariadicContainsValue{
-    VariadicContains<Needle, Haystack, Cmp...>::value};
+  constexpr bool variadic_contains_v{
+    variadic_contains<Needle, Haystack, Cmp...>::value};
 
-  // -- VariadicConcat --
+  // -- variadic_concat --
   template <typename... Variadics>
-  struct VariadicConcat;
+  struct variadic_concat;
   template <typename... Variadics>
-  using VariadicConcatType = typename VariadicConcat<Variadics...>::type;
+  using variadic_concat_t = typename variadic_concat<Variadics...>::type;
 
   namespace __impl_variadics_type_traits {
 
     template <template <typename...> class Variadic, typename Pack>
-    struct VariadicConcat;
+    struct variadic_concat;
 
     template <template <typename...> class Variadic, class... U>
-    struct VariadicConcat<Variadic, pack<pack<U...>>> {
+    struct variadic_concat<Variadic, pack<pack<U...>>> {
       using type = pack<U...>;
     };
 
     template <template <typename...> class Variadic, class... A, class... B,
               class... Rest>
-    struct VariadicConcat<Variadic, pack<pack<A...>, Variadic<B...>, Rest...>> {
+    struct variadic_concat<Variadic, pack<pack<A...>, Variadic<B...>, Rest...>> {
       using type =
-        typename VariadicConcat<Variadic,
+        typename variadic_concat<Variadic,
                                 pack<pack<A..., B...>, Rest...>>::type;
     };
   }  // namespace __impl_variadics_type_traits
 
   template <template <typename...> class Variadic, class... A, class... Rest>
-  struct VariadicConcat<Variadic<A...>, Rest...> {
+  struct variadic_concat<Variadic<A...>, Rest...> {
     using type = __impl_variadics_type_traits::FromPackType<
       Variadic,
-      typename __impl_variadics_type_traits::VariadicConcat<
+      typename __impl_variadics_type_traits::variadic_concat<
         Variadic, __impl_variadics_type_traits::pack<
                     __impl_variadics_type_traits::pack<A...>, Rest...>>::type>;
   };
 
-  // -- VariadicRemoveDuplicates --
+  // -- variadic_remove_duplicates --
   template <typename Variadic, template <typename> class Filter>
-  struct VariadicFilter;
+  struct variadic_filter;
 
   template <typename Variadic, template <typename> class Filter>
-  using VariadicFilterType = typename VariadicFilter<Variadic, Filter>::type;
+  using variadic_filter_t = typename variadic_filter<Variadic, Filter>::type;
 
   namespace __impl_variadics_type_traits {
 
     template <typename Filtered, typename Unfiltered,
               template <typename> class Filter>
-    struct VariadicFilter;
+    struct variadic_filter;
 
     template <bool, typename Filtered, typename Unfiltered,
               template <typename> class Filter>
-    struct VariadicFilterSwitch;
+    struct variadic_filter_switch;
 
     template <typename Filtered, typename... Unfiltered,
               template <typename> class Filter>
-    struct VariadicFilter<Filtered, pack<Unfiltered...>, Filter> {
+    struct variadic_filter<Filtered, pack<Unfiltered...>, Filter> {
       using type = Filtered;
     };
 
     template <typename... Filtered, typename R0, typename... Rest,
               template <typename> class Filter>
-    struct VariadicFilter<pack<Filtered...>, pack<R0, Rest...>, Filter>
-      : VariadicFilterSwitch<Filter<R0>::value, pack<Filtered...>,
+    struct variadic_filter<pack<Filtered...>, pack<R0, Rest...>, Filter>
+      : variadic_filter_switch<Filter<R0>::value, pack<Filtered...>,
                              pack<R0, Rest...>, Filter> {};
 
     template <typename... Filtered, typename R0, typename... Rest,
               template <typename> class Filter>
-    struct VariadicFilterSwitch<false, pack<Filtered...>, pack<R0, Rest...>,
+    struct variadic_filter_switch<false, pack<Filtered...>, pack<R0, Rest...>,
                                 Filter> {
       using type =
-        typename VariadicFilter<pack<Filtered...>, pack<Rest...>, Filter>::type;
+        typename variadic_filter<pack<Filtered...>, pack<Rest...>, Filter>::type;
     };
 
     template <typename... Filtered, typename R0, typename... Rest,
               template <typename> class Filter>
-    struct VariadicFilterSwitch<true, pack<Filtered...>, pack<R0, Rest...>,
+    struct variadic_filter_switch<true, pack<Filtered...>, pack<R0, Rest...>,
                                 Filter> {
-      using type = typename VariadicFilter<pack<Filtered..., R0>, pack<Rest...>,
+      using type = typename variadic_filter<pack<Filtered..., R0>, pack<Rest...>,
                                            Filter>::type;
     };
   }  // namespace __impl_variadics_type_traits
 
   template <template <typename...> class Variadic, typename... U,
             template <typename> class Filter>
-  struct VariadicFilter<Variadic<U...>, Filter> {
+  struct variadic_filter<Variadic<U...>, Filter> {
     using type = __impl_variadics_type_traits::FromPackType<
-      Variadic, typename __impl_variadics_type_traits::VariadicFilter<
+      Variadic, typename __impl_variadics_type_traits::variadic_filter<
                   __impl_variadics_type_traits::pack<>,
                   __impl_variadics_type_traits::pack<U...>, Filter>::type>;
   };
 
-  // -- VariadicRemoveDuplicates --
+  // -- variadic_remove_duplicates --
   template <typename Variadic,
             template <typename, typename> class Cmp = std::is_same>
-  struct VariadicRemoveDuplicates;
+  struct variadic_remove_duplicates;
 
   template <typename Variadic, template <typename, typename> class... Cmp>
-  using VariadicRemoveDuplicatesType =
-    typename VariadicRemoveDuplicates<Variadic, Cmp...>::type;
+  using variadic_remove_duplicates_t =
+    typename variadic_remove_duplicates<Variadic, Cmp...>::type;
 
   namespace __impl_variadics_type_traits {
 
     template <typename Unique, typename Remaining,
               template <typename, typename> class Cmp>
-    struct VariadicRemoveDuplicates;
+    struct variadic_remove_duplicates;
 
     template <bool, typename Unique, typename Remaining,
               template <typename, typename> class Cmp>
-    struct VariadicRemoveDuplicatesSwitch;
+    struct variadic_remove_duplicates_switch;
 
     template <typename Unique, typename... Rest,
               template <typename, typename> class Cmp>
-    struct VariadicRemoveDuplicates<Unique, pack<Rest...>, Cmp> {
+    struct variadic_remove_duplicates<Unique, pack<Rest...>, Cmp> {
       using type = Unique;
     };
 
     template <typename... Unique, typename R0, typename... Rest,
               template <typename, typename> class Cmp>
-    struct VariadicRemoveDuplicates<pack<Unique...>, pack<R0, Rest...>, Cmp>
-      : VariadicRemoveDuplicatesSwitch<
-          VariadicContainsValue<R0, pack<Unique...>, Cmp>, pack<Unique...>,
+    struct variadic_remove_duplicates<pack<Unique...>, pack<R0, Rest...>, Cmp>
+      : variadic_remove_duplicates_switch<
+          variadic_contains_v<R0, pack<Unique...>, Cmp>, pack<Unique...>,
           pack<R0, Rest...>, Cmp> {};
 
     template <typename... Unique, typename R0, typename... Rest,
               template <typename, typename> class Cmp>
-    struct VariadicRemoveDuplicatesSwitch<false, pack<Unique...>,
+    struct variadic_remove_duplicates_switch<false, pack<Unique...>,
                                           pack<R0, Rest...>, Cmp> {
-      using type = typename VariadicRemoveDuplicates<pack<Unique..., R0>,
+      using type = typename variadic_remove_duplicates<pack<Unique..., R0>,
                                                      pack<Rest...>, Cmp>::type;
     };
 
     template <typename... Unique, typename R0, typename... Rest,
               template <typename, typename> class Cmp>
-    struct VariadicRemoveDuplicatesSwitch<true, pack<Unique...>,
+    struct variadic_remove_duplicates_switch<true, pack<Unique...>,
                                           pack<R0, Rest...>, Cmp> {
-      using type = typename VariadicRemoveDuplicates<pack<Unique...>,
+      using type = typename variadic_remove_duplicates<pack<Unique...>,
                                                      pack<Rest...>, Cmp>::type;
     };
   }  // namespace __impl_variadics_type_traits
 
   template <template <typename...> class Variadic, typename... U,
             template <typename, typename> class Cmp>
-  struct VariadicRemoveDuplicates<Variadic<U...>, Cmp> {
+  struct variadic_remove_duplicates<Variadic<U...>, Cmp> {
     using type = __impl_variadics_type_traits::FromPackType<
-      Variadic, typename __impl_variadics_type_traits::VariadicRemoveDuplicates<
+      Variadic, typename __impl_variadics_type_traits::variadic_remove_duplicates<
                   __impl_variadics_type_traits::pack<>,
                   __impl_variadics_type_traits::pack<U...>, Cmp>::type>;
   };
 
-  // -- VariadicUnion --
+  // -- variadic_union --
   // Given X<A0, A1, ... An> and X<B0, B1, ... Bm>, this gives X<Union of
   // A and B>. Note that this will also remove any duplicates in A and B.
   // Also, the ordering of the elements in the union is undefined.
   template <typename A, typename B,
             template <typename, typename> class Cmp = std::is_same>
-  struct VariadicUnion;
+  struct variadic_union;
 
   template <typename A, typename B, template <typename, typename> class... Cmp>
-  using VariadicUnionType = typename VariadicUnion<A, B, Cmp...>::type;
+  using variadic_union_t = typename variadic_union<A, B, Cmp...>::type;
 
   template <template <typename...> class Variadic, typename... A, typename... B,
             template <typename, typename> class Cmp>
-  struct VariadicUnion<Variadic<A...>, Variadic<B...>, Cmp> {
+  struct variadic_union<Variadic<A...>, Variadic<B...>, Cmp> {
     // @todo: There are more efficient ways to do this
     using type = __impl_variadics_type_traits::FromPackType<
-      Variadic, VariadicRemoveDuplicatesType<
-                  VariadicConcatType<__impl_variadics_type_traits::pack<A...>,
+      Variadic, variadic_remove_duplicates_t<
+                  variadic_concat_t<__impl_variadics_type_traits::pack<A...>,
                                      __impl_variadics_type_traits::pack<B...>>,
                   Cmp>>;
   };
 
-  // -- VariadicIntersection --
+  // -- variadic_intersection --
   // Given X<A0, A1, ... An> and X<B0, B1, ... Bm>, this gives X<Intersection of
   // A and B>
   template <typename A, typename B,
             template <typename, typename> class Cmp = std::is_same>
-  struct VariadicIntersection;
+  struct variadic_intersection;
 
   template <typename A, typename B, template <typename, typename> class... Cmp>
-  using VariadicIntersectionType =
-    typename VariadicIntersection<A, B, Cmp...>::type;
+  using variadic_intersection_t =
+    typename variadic_intersection<A, B, Cmp...>::type;
 
   template <template <typename...> class Variadic, typename... A, typename... B,
             template <typename, typename> class Cmp>
-  struct VariadicIntersection<Variadic<A...>, Variadic<B...>, Cmp> {
+  struct variadic_intersection<Variadic<A...>, Variadic<B...>, Cmp> {
     template <typename T>
     using InA =
-      VariadicContains<T, __impl_variadics_type_traits::pack<A...>, Cmp>;
+      variadic_contains<T, __impl_variadics_type_traits::pack<A...>, Cmp>;
     template <typename T>
     using InB =
-      VariadicContains<T, __impl_variadics_type_traits::pack<B...>, Cmp>;
+      variadic_contains<T, __impl_variadics_type_traits::pack<B...>, Cmp>;
 
     using type = __impl_variadics_type_traits::FromPackType<
-      Variadic, VariadicFilterType<
-                  VariadicFilterType<
-                    VariadicRemoveDuplicatesType<
+      Variadic, variadic_filter_t<
+                  variadic_filter_t<
+                    variadic_remove_duplicates_t<
                       __impl_variadics_type_traits::pack<A..., B...>, Cmp>,
                     InA>,
                   InB>>;
@@ -360,45 +360,45 @@ namespace emp {
 
   template <typename Needle, typename Haystack,
             template <typename, typename> class Cmp = std::is_same>
-  struct VariadicIndexOf;
+  struct variadic_index_of;
 
   template <typename Needle, typename Haystack,
             template <typename, typename> class... Cmp>
-  static constexpr auto VariadicIndexOfValue{
-    VariadicIndexOf<Needle, Haystack, Cmp...>::value};
+  static constexpr auto variadic_index_of_v{
+    variadic_index_of<Needle, Haystack, Cmp...>::value};
 
   namespace __impl_variadics_type_traits {
 
     template <size_t I, typename Needle, typename Haystack,
               template <typename, typename> class Cmp>
-    struct VariadicIndexOf;
+    struct variadic_index_of;
 
     template <bool, size_t, typename Needle, typename Haystack,
               template <typename, typename> class Cmp>
-    struct VariadicIndexOfSwitch;
+    struct variadic_index_ofSwitch;
 
     template <size_t I, typename Needle, typename... U,
               template <typename, typename> class Cmp>
-    struct VariadicIndexOfSwitch<true, I, Needle, pack<U...>, Cmp>
+    struct variadic_index_ofSwitch<true, I, Needle, pack<U...>, Cmp>
       : std::integral_constant<size_t, I> {};
 
     template <size_t I, typename Needle, typename... U,
               template <typename, typename> class Cmp>
-    struct VariadicIndexOfSwitch<false, I, Needle, pack<U...>, Cmp>
-      : VariadicIndexOf<I + 1, Needle, pack<U...>, Cmp> {};
+    struct variadic_index_ofSwitch<false, I, Needle, pack<U...>, Cmp>
+      : variadic_index_of<I + 1, Needle, pack<U...>, Cmp> {};
 
     template <size_t I, typename Needle, typename U0, typename... U,
               template <typename, typename> class Cmp>
-    struct VariadicIndexOf<I, Needle, pack<U0, U...>, Cmp>
-      : VariadicIndexOfSwitch<Cmp<Needle, U0>::value, I, Needle, pack<U...>,
+    struct variadic_index_of<I, Needle, pack<U0, U...>, Cmp>
+      : variadic_index_ofSwitch<Cmp<Needle, U0>::value, I, Needle, pack<U...>,
                               Cmp> {};
 
   }  // namespace __impl_variadics_type_traits
 
   template <typename Needle, template <typename...> class Haystack,
             typename... U, template <typename, typename> class Cmp>
-  struct VariadicIndexOf<Needle, Haystack<U...>, Cmp>
-    : __impl_variadics_type_traits::VariadicIndexOf<
+  struct variadic_index_of<Needle, Haystack<U...>, Cmp>
+    : __impl_variadics_type_traits::variadic_index_of<
         0, Needle, __impl_variadics_type_traits::pack<U...>, Cmp> {};
 
 }  // namespace emp
