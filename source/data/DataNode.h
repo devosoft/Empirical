@@ -61,16 +61,17 @@ namespace emp {
     UNKNOWN       ///< Unknown modifier; will trigger error.
   };
 
+
   /// A shortcut for converting DataNode mod ID's to IntPacks.
   template <emp::data... MODS> using ModPack = emp::IntPack<(int) MODS...>;
 
   /// Extra info about data modules that we need to know before actually building this DataNode.
   /// (for now, just REQUISITES for each module.)
-  template <emp::data MOD> struct DataModInfo     { using reqs = emp::ModPack<>; };
-  template <> struct DataModInfo<data::Archive>   { using reqs = emp::ModPack<data::Log>; };
-  template <> struct DataModInfo<data::FullRange> { using reqs = emp::ModPack<data::Range>; };
-  template <> struct DataModInfo<data::Stats>     { using reqs = emp::ModPack<data::Range>; };
-  //template <> struct DataModInfo<data::FullStats> { using reqs = emp::ModPack<data::Range, data::Stats>; };
+  template <emp::data MOD> struct DataModInfo     { using reqs = ModPack<>; };
+  template <> struct DataModInfo<data::Archive>   { using reqs = ModPack<data::Log>; };
+  template <> struct DataModInfo<data::FullRange> { using reqs = ModPack<data::Range>; };
+  template <> struct DataModInfo<data::Stats>     { using reqs = ModPack<data::Range>; };
+  //template <> struct DataModInfo<data::FullStats> { using reqs = ModPack<data::Range, data::Stats>; };
 
 
   // A set of structs to collect and merge data module requisites.
@@ -256,15 +257,16 @@ namespace emp {
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Archive, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
-    emp::vector<emp::vector<VAL_TYPE>> archive;  ///< Archive of data from before last reset.
+    emp::vector<emp::vector<VAL_TYPE>> archive;  ///< Data archived from before most recent reset.
 
     using this_t = DataNodeModule<VAL_TYPE, data::Archive, MODS...>;
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
     using base_t = DataNodeModule<VAL_TYPE>;
 
     using base_t::val_count;
+    using parent_t::val_set;
   public:
-    DataNodeModule() : archive(1) { ; }
+    DataNodeModule() : archive(0) { ; }
 
     /// Get all data ever added to this DataNode. Returns a vector of vectors; each vector
     /// contains all data from a single time point (interval between resets)
@@ -274,22 +276,18 @@ namespace emp {
     const emp::vector<VAL_TYPE> & GetData(size_t update) const { return archive[update]; }
     
     /// Get a vector of all data that has been added since the last reset
-    const emp::vector<VAL_TYPE> & GetData() const { return archive.back(); }
+    const emp::vector<VAL_TYPE> & GetData() const { return val_set; }
 
     /// Get the number of time intervals recorded in this DataNode.
     /// Note that this is one more than the number of times it has been reset
     size_t GetResetCount() const { return archive.size(); }
 
-    /// Add @param val to this DataNode 
-    void AddDatum(const VAL_TYPE & val) {
-      archive.back().push_back(val);
-      parent_t::AddDatum(val);
-    }
+    // NOTE: Ignoring AddDatum() since new value will be added to val_set.
 
     /// Reset this DataNode, starting a new grouping of values in the archive.  Resetting is
     /// useful for tracking data from different time points, such as per update or generation.
     void Reset() {
-      archive.resize(archive.size()+1);
+      archive.push_back(val_set);
       parent_t::Reset();
     }
 
