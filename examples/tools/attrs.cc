@@ -44,6 +44,10 @@ int main() {
         typename GenerationLength::value_t<size_t>>
     user = DEFAULT;
 
+  // Set a single member
+  user.SetDefaultGenome(10);
+  user = PopulationSize(100);
+
   print("DEFAULT >> STDIN", user);
 
   // Example of compile time-unfolded runtime reflection:

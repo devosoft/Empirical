@@ -66,29 +66,34 @@ namespace emp {
 
         template <class T>
         static constexpr decltype(auto) GetValue(value_t<T>&& value) {
-          return value;
+          return std::move(value);
+        }
+
+        template <class T>
+        static constexpr decltype(auto) GetValue(const value_t<T>&& value) {
+          return std::move(value);
         }
 
         /// Given an attribute pack, Get(pack) will extract the value of this
         /// attribute in that pack
         template <class T>
         static constexpr const T& Get(const value_t<T>& target) {
-          return target.Get();
+          return *target;
         }
 
         template <class T>
         static constexpr T& Get(value_t<T>& target) {
-          return target.Get();
+          return *target;
         }
 
         template <class T>
         static constexpr T&& Get(value_t<T>&& target) {
-          return std::move(target).Get();
+          return *std::move(target);
         }
 
         template <class T>
         static constexpr const T&& Get(const value_t<T>&& target) {
-          return std::move(target).Get();
+          return *std::move(target);
         }
 
         // -- CallOrGet --
@@ -222,67 +227,84 @@ namespace emp {
       };
     };  // namespace __impl_attr_base
 
-#define DEFINE_ATTR(NAME)                                                    \
-  template <class T>                                                         \
-  struct NAME##Value;                                                        \
-  constexpr struct NAME                                                      \
-    : emp::tools::__impl_attr_base::AttrBase<NAME, NAME##Value> {            \
-    static constexpr auto name = #NAME;                                      \
-    template <typename T>                                                    \
-    constexpr value_t<std::decay_t<T>> operator()(T&& value) const {         \
-      return {std::forward<T>(value)};                                       \
-    }                                                                        \
-  } NAME;                                                                    \
-  constexpr const char* NAME::name;                                          \
-  template <class T>                                                         \
-  struct NAME##Value : emp::tools::value_tag {                               \
-    private:                                                                 \
-    T value;                                                                 \
-                                                                             \
-    public:                                                                  \
-    static constexpr auto name = #NAME;                                      \
-    using attribute_t = struct NAME;                                         \
-    using attributes_t = emp::tools::Attrs<NAME##Value<T>>;                  \
-    using value_t = T;                                                       \
-    NAME##Value() = delete;                                                  \
-    constexpr NAME##Value(const T& value) : value(value) {}                  \
-    constexpr NAME##Value(T&& value) : value(std::move(value)) {}            \
-    constexpr NAME##Value(const NAME##Value& other) : value(other.value) {}  \
-    constexpr NAME##Value(NAME##Value&& other)                               \
-      : value(std::move(other.value)) {}                                     \
-    constexpr NAME##Value& operator=(const T& value) {                       \
-      this->value = value;                                                   \
-      return *this;                                                          \
-    }                                                                        \
-    constexpr NAME##Value& operator=(T&& value) {                            \
-      this->value = std::move(value);                                        \
-      return *this;                                                          \
-    }                                                                        \
-    constexpr NAME##Value& operator=(const NAME##Value& other) {             \
-      if (this != &other) value = other.value;                               \
-      return *this;                                                          \
-    }                                                                        \
-    constexpr NAME##Value& operator=(NAME##Value&& other) {                  \
-      if (this != &other) value = std::move(other.value);                    \
-      return *this;                                                          \
-    }                                                                        \
-    constexpr T& Get() & { return value; }                                   \
-    constexpr T&& Get() && { return std::move(value); }                      \
-    constexpr const T& Get() const & { return value; }                       \
-    constexpr const T& Get() const && { return std::move(value); }           \
-  };                                                                         \
-  template <typename T>                                                      \
-  constexpr const char* NAME##Value<T>::name;                                \
-  template <typename T>                                                      \
-  struct emp::tools::is_mergeable<NAME##Value<T>> : std::true_type {};       \
-  template <class A, class B>                                                \
-  constexpr bool operator==(const NAME##Value<A>& a,                         \
-                            const NAME##Value<B>& b) {                       \
-    return NAME::Get(a) == NAME::Get(b);                                     \
-  }                                                                          \
-  template <class T>                                                         \
-  std::ostream& operator<<(std::ostream& out, const NAME##Value<T>& value) { \
-    return out << #NAME ": " << value.value << std::endl;                    \
+#define DEFINE_ATTR(NAME)                                                      \
+  template <class T>                                                           \
+  struct NAME##Value;                                                          \
+  constexpr struct NAME                                                        \
+    : emp::tools::__impl_attr_base::AttrBase<NAME, NAME##Value> {              \
+    static constexpr auto name = #NAME;                                        \
+    template <typename T>                                                      \
+    constexpr value_t<std::decay_t<T>> operator()(T&& value) const {           \
+      return {std::forward<T>(value)};                                         \
+    }                                                                          \
+  } NAME;                                                                      \
+  constexpr const char* NAME::name;                                            \
+  template <class T>                                                           \
+  struct NAME##Value : emp::tools::value_tag {                                 \
+    private:                                                                   \
+    T value;                                                                   \
+                                                                               \
+    public:                                                                    \
+    static constexpr auto name = #NAME;                                        \
+    using attribute_t = struct NAME;                                           \
+    using attributes_t = emp::tools::Attrs<NAME##Value<T>>;                    \
+    using value_t = T;                                                         \
+    NAME##Value() = delete;                                                    \
+    constexpr NAME##Value(const T& value) : value(value) {}                    \
+    constexpr NAME##Value(T&& value) : value(std::move(value)) {}              \
+    template <typename U = T>                                                  \
+    constexpr NAME##Value(const NAME##Value<U>& other) : value(other.value) {} \
+    template <typename U = T>                                                  \
+    constexpr NAME##Value(NAME##Value<U>&& other)                              \
+      : value(std::move(other.value)) {}                                       \
+    constexpr NAME##Value& operator=(const T& value) {                         \
+      this->value = value;                                                     \
+      return *this;                                                            \
+    }                                                                          \
+    constexpr NAME##Value& operator=(T&& value) {                              \
+      this->value = std::move(value);                                          \
+      return *this;                                                            \
+    }                                                                          \
+    template <typename U = T>                                                  \
+    constexpr NAME##Value& operator=(const NAME##Value<U>& other) {            \
+      if (this != &other) value = other.value;                                 \
+      return *this;                                                            \
+    }                                                                          \
+    template <typename U = T>                                                  \
+    constexpr NAME##Value& operator=(NAME##Value<U>&& other) {                 \
+      if (this != &other) value = std::move(other.value);                      \
+      return *this;                                                            \
+    }                                                                          \
+    constexpr const T& Get##NAME() const & { return value; }                   \
+    constexpr const T&& Get##NAME() const && { return std::move(value); }      \
+    constexpr const T& Get() const & { return value; }                         \
+    constexpr const T&& Get() const && { return std::move(value); }            \
+    template <typename U = T>                                                  \
+    constexpr const NAME##Value& Set##NAME(U&& value) {                        \
+      this->value = std::forward<U>(value);                                    \
+      return *this;                                                            \
+    }                                                                          \
+    template <typename U = T>                                                  \
+    constexpr const NAME##Value& Set(U&& value) {                              \
+      return Set##NAME(std::forward<U>(value));                                \
+    }                                                                          \
+    constexpr T& operator*() & { return value; }                               \
+    constexpr T&& operator*() && { return std::move(value); }                  \
+    constexpr const T& operator*() const & { return value; }                   \
+    constexpr const T&& operator*() const && { return std::move(value); }      \
+  };                                                                           \
+  template <typename T>                                                        \
+  constexpr const char* NAME##Value<T>::name;                                  \
+  template <typename T>                                                        \
+  struct emp::tools::is_mergeable<NAME##Value<T>> : std::true_type {};         \
+  template <class A, class B>                                                  \
+  constexpr bool operator==(const NAME##Value<A>& a,                           \
+                            const NAME##Value<B>& b) {                         \
+    return NAME::Get(a) == NAME::Get(b);                                       \
+  }                                                                            \
+  template <class T>                                                           \
+  std::ostream& operator<<(std::ostream& out, const NAME##Value<T>& value) {   \
+    return out << "." #NAME ": " << value.value << std::endl;                  \
   }
 
     namespace __attrs_impl {
