@@ -17,7 +17,7 @@ namespace emp {
     struct value_tag {};
 
     template <typename V1, typename V2>
-    struct is_same_value
+    struct is_same_attribute
       : std::is_same<typename V1::attribute_t, typename V2::attribute_t> {};
 
     template <typename T>
@@ -640,7 +640,7 @@ namespace emp {
       return Merge(__attrs_impl::__impl_Merge(
                      std::forward<A0>(a0), std::forward<A1>(a1),
                      __attrs_impl::wrapper<
-                       variadic_union_t<self_attributes_t, other_attributes_t>>{}),
+                       variadic_union_t<self_attributes_t, other_attributes_t, is_same_attribute>>{}),
                    std::forward<A2>(a2), std::forward<A>(packs)...);
     }
 
