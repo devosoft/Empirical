@@ -17,14 +17,14 @@ namespace emp {
     struct value_tag {};
 
     template <typename V1, typename V2>
-    struct ValuesEq
-      : std::is_same<typename V1::attr_type, typename V2::attr_type> {};
+    struct is_same_value
+      : std::is_same<typename V1::attribute_t, typename V2::attribute_t> {};
 
     template <typename T>
-    struct IsAttributeValue : std::is_base_of<value_tag, T> {};
+    struct is_attribute_value : std::is_base_of<value_tag, T> {};
 
     template <typename T>
-    struct IsMergeable : std::false_type {};
+    struct is_mergeable : std::false_type {};
 
     template <typename...>
     class Attrs;
@@ -34,7 +34,7 @@ namespace emp {
       struct HasAttr {
         template <typename T>
         static constexpr std::true_type hasAttr(
-          const typename Attr::template value_type<T>&) {
+          const typename Attr::template value_t<T>&) {
           return {};
         }
         static constexpr std::false_type hasAttr(...) { return {}; }
@@ -49,90 +49,90 @@ namespace emp {
     namespace __impl_attr_base {
       template <typename Attr, template <typename> class Value>
       struct AttrBase {
-        using attr_type = Attr;
+        using attribute_t = Attr;
         template <typename T>
-        using value_type = Value<T>;
+        using value_t = Value<T>;
 
-        /// Given an attribute pack, getValue will extract just this attribute
+        /// Given an attribute pack, GetValue will extract just this attribute
         template <class T>
-        static constexpr decltype(auto) getValue(value_type<T>& value) {
+        static constexpr decltype(auto) GetValue(value_t<T>& value) {
           return value;
         }
 
         template <class T>
-        static constexpr decltype(auto) getValue(const value_type<T>& value) {
+        static constexpr decltype(auto) GetValue(const value_t<T>& value) {
           return value;
         }
 
         template <class T>
-        static constexpr decltype(auto) getValue(value_type<T>&& value) {
+        static constexpr decltype(auto) GetValue(value_t<T>&& value) {
           return value;
         }
 
-        /// Given an attribute pack, get(pack) will extract the value of this
+        /// Given an attribute pack, Get(pack) will extract the value of this
         /// attribute in that pack
         template <class T>
-        static constexpr const T& get(const value_type<T>& target) {
-          return target.get();
+        static constexpr const T& Get(const value_t<T>& target) {
+          return target.Get();
         }
 
         template <class T>
-        static constexpr T& get(value_type<T>& target) {
-          return target.get();
+        static constexpr T& Get(value_t<T>& target) {
+          return target.Get();
         }
 
         template <class T>
-        static constexpr T&& get(value_type<T>&& target) {
-          return std::move(target).get();
+        static constexpr T&& Get(value_t<T>&& target) {
+          return std::move(target).Get();
         }
 
         template <class T>
-        static constexpr const T&& get(const value_type<T>&& target) {
-          return std::move(target).get();
+        static constexpr const T&& Get(const value_t<T>&& target) {
+          return std::move(target).Get();
         }
 
-        // -- callOrGet --
+        // -- CallOrGet --
         private:
-        // Handle the case when get(target) is callable
+        // Handle the case when Get(target) is callable
         template <class Pack, class... U>
-        static constexpr decltype(auto) __impl_callOrGet(
+        static constexpr decltype(auto) __impl_CallOrGet(
           const std::true_type& isCallable, Pack&& pack, U&&... args) {
-          return get(std::forward<Pack>(pack))(std::forward<U>(args)...);
+          return Get(std::forward<Pack>(pack))(std::forward<U>(args)...);
         }
 
-        // Handle the case when get(target) is not callable
+        // Handle the case when Get(target) is not callable
         template <class T, class... U>
-        static constexpr decltype(auto) __impl_callOrGet(
+        static constexpr decltype(auto) __impl_CallOrGet(
           const std::false_type& isCallable, T&& target, U&&... args) {
-          return get(std::forward<T>(target));
+          return Get(std::forward<T>(target));
         }
 
         public:
-        /// Given an attribute pack, callOrGet(pack, args...) will attempt to
-        /// return get(pack)(args...). If this fails to compile, because the
+        /// Given an attribute pack, CallOrGet(pack, args...) will attempt to
+        /// return Get(pack)(args...). If this fails to compile, because the
         /// value of this attribute is not callable in the given pack, then just
-        /// the value of this attribute will be returned, get(pack).
+        /// the value of this attribute will be returned, Get(pack).
         template <class V, class... U>
-        static constexpr decltype(auto) callOrGet(V&& target, U&&... args) {
-          using ValueOfTargetType = decltype(get(std::forward<V>(target)));
+        static constexpr decltype(auto) CallOrGet(V&& target, U&&... args) {
+          using ValueOfTargetType = decltype(Get(std::forward<V>(target)));
 
-          return __impl_callOrGet(
+          return __impl_CallOrGet(
             // Check if the target attribute value is invocable
             emp::is_invocable<ValueOfTargetType,
                               decltype(std::forward<U>(args))...>{},
             std::forward<V>(target), std::forward<U>(args)...);
         }
-        // -- getOrElse --
+        // -- GetOrElse --
         private:
         template <class Pack, class F, class... U>
-        static constexpr decltype(auto) __impl_getOrElse(const std::true_type&,
+        static constexpr decltype(auto) __impl_GetOrElse(const std::true_type&,
                                                          Pack&& pack, F&&,
                                                          U&&...) {
-          return get(std::forward<Pack>(pack));
+          return Get(std::forward<Pack>(pack));
         }
 
         template <class Pack, class F, class... U>
-        static constexpr decltype(auto) __impl_getOrElse(const std::false_type&,
+        static constexpr decltype(auto) __impl_GetOrElse(const std::false_type&,
                                                          Pack&&,
                                                          F&& defaultFunction,
                                                          U&&... args) {
@@ -141,16 +141,16 @@ namespace emp {
 
         public:
         template <class Pack, class F, class... U>
-        static constexpr decltype(auto) getOrElse(Pack&& pack,
+        static constexpr decltype(auto) GetOrElse(Pack&& pack,
                                                   F&& defaultFunction,
                                                   U&&... args) {
-          return __impl_getOrElse(
-            HasAttr<std::decay_t<Pack>, attr_type>{}, std::forward<Pack>(pack),
+          return __impl_GetOrElse(
+            HasAttr<std::decay_t<Pack>, attribute_t>{}, std::forward<Pack>(pack),
             std::forward<F>(defaultFunction), std::forward<U>(args)...);
         }
 
         private:
-        // Utility class used by getOr which simply remembers and returns a
+        // Utility class used by GetOr which simply remembers and returns a
         // value. @todo: when we switch to c++17, we can replace this with a
         // constexpr closure
         template <class D>
@@ -163,13 +163,13 @@ namespace emp {
 
         public:
         template <class Pack, class D>
-        static constexpr decltype(auto) getOr(Pack&& pack, D&& defaultValue) {
-          return getOrElse(std::forward<Pack>(pack),
+        static constexpr decltype(auto) GetOr(Pack&& pack, D&& defaultValue) {
+          return GetOrElse(std::forward<Pack>(pack),
                            Default<D&&>{std::forward<D>(defaultValue)});
         }
 
         private:
-        // Utility class used by getOrGetIn which simply remembers a attribute
+        // Utility class used by GetOrGetIn which simply remembers a attribute
         // pack.
         template <typename...>
         struct FallbackHandler;
@@ -182,7 +182,7 @@ namespace emp {
             : fallback(std::forward<F>(fallback)) {}
 
           constexpr decltype(auto) operator()() const {
-            return get(std::forward<Fallback>(fallback));
+            return Get(std::forward<Fallback>(fallback));
           }
         };
 
@@ -198,24 +198,24 @@ namespace emp {
                         std::forward<F>(fallbacks)...) {}
 
           constexpr decltype(auto) operator()() && {
-            return getOrElse(std::forward<Fallback0>(fallback),
+            return GetOrElse(std::forward<Fallback0>(fallback),
                              std::move(fallbacks));
           }
         };
 
         public:
         template <class... Fallbacks>
-        static constexpr decltype(auto) getOrGetIn(Fallbacks&&... fallbacks) {
+        static constexpr decltype(auto) GetOrGetIn(Fallbacks&&... fallbacks) {
           return FallbackHandler<Fallbacks&&...>{
             std::forward<Fallbacks>(fallbacks)...}();
         }
 
         template <class T, class V>
-        static constexpr void set(value_type<T>& target, V&& value) {
-          get(target) = std::forward<V>(value);
+        static constexpr void Set(value_t<T>& target, V&& value) {
+          Get(target) = std::forward<V>(value);
         }
         template <class T>
-        static constexpr value_type<std::decay_t<T>> value(T&& value) {
+        static constexpr value_t<std::decay_t<T>> New(T&& value) {
           return {std::forward<T>(value)};
         }
       };
@@ -231,9 +231,9 @@ namespace emp {
   template <class T>                                                         \
   struct NAME##Value : emp::tools::value_tag {                               \
     static constexpr auto name = #_name;                                     \
-    using attr_type = NAME;                                                  \
-    using attrs_type = emp::tools::Attrs<NAME##Value<T>>;                    \
-    using value_type = T;                                                    \
+    using attribute_t = NAME;                                                  \
+    using attributes_t = emp::tools::Attrs<NAME##Value<T>>;                    \
+    using value_t = T;                                                    \
     T _name;                                                                 \
     NAME##Value() = delete;                                                  \
     constexpr NAME##Value(const T& value) : _name(value) {}                  \
@@ -257,23 +257,23 @@ namespace emp {
       if (this != &other) _name = std::move(other._name);                    \
       return *this;                                                          \
     }                                                                        \
-    constexpr T& get() & { return _name; }                                   \
-    constexpr T&& get() && { return std::move(_name); }                      \
-    constexpr const T& get() const & { return _name; }                       \
-    constexpr const T& get() const && { return std::move(_name); }           \
+    constexpr T& Get() & { return _name; }                                   \
+    constexpr T&& Get() && { return std::move(_name); }                      \
+    constexpr const T& Get() const & { return _name; }                       \
+    constexpr const T& Get() const && { return std::move(_name); }           \
   };                                                                         \
   template <typename T>                                                      \
   constexpr const char* NAME##Value<T>::name;                                \
   template <typename T>                                                      \
-  struct emp::tools::IsMergeable<NAME##Value<T>> : std::true_type {};        \
+  struct emp::tools::is_mergeable<NAME##Value<T>> : std::true_type {};        \
   template <class T>                                                         \
   constexpr auto _name(T&& value) {                                          \
-    return NAME::value(std::forward<T>(value));                              \
+    return NAME::New(std::forward<T>(value));                              \
   }                                                                          \
   template <class A, class B>                                                \
   constexpr bool operator==(const NAME##Value<A>& a,                         \
                             const NAME##Value<B>& b) {                       \
-    return NAME::get(a) == NAME::get(b);                                     \
+    return NAME::Get(a) == NAME::Get(b);                                     \
   }                                                                          \
   template <class T>                                                         \
   std::ostream& operator<<(std::ostream& out, const NAME##Value<T>& value) { \
@@ -293,19 +293,19 @@ namespace emp {
         struct __attrs_impl_constructor_detector {
           private:
           template <class... X>
-          static copy_tag detect(const Attrs<X...>&) {
+          static copy_tag Detect(const Attrs<X...>&) {
             return {};
           };
 
           template <class... X>
-          static move_tag detect(Attrs<X...>&&) {
+          static move_tag Detect(Attrs<X...>&&) {
             return {};
           };
 
-          static args_tag detect(...) { return {}; }
+          static args_tag Detect(...) { return {}; }
 
           public:
-          using type = decltype(detect(std::declval<U>()));
+          using type = decltype(Detect(std::declval<U>()));
         };
 
         template <class U>
@@ -318,10 +318,10 @@ namespace emp {
 
         template <class... U>
         constexpr AttrsParent(const copy_tag&, const Attrs<U...>& other)
-          : T{T::attr_type::get(other)}... {}
+          : T{T::attribute_t::Get(other)}... {}
         template <class... U>
         constexpr AttrsParent(const move_tag&, Attrs<U...>&& other)
-          : T{T::attr_type::get(std::move(other))}... {}
+          : T{T::attribute_t::Get(std::move(other))}... {}
       };
 
       // This struct exists so that we can pass around Attrs<U...> without it
@@ -333,15 +333,15 @@ namespace emp {
 
     template <class D>
     class ListTransform {
-      constexpr D* self() { return static_cast<D*>(this); }
-      constexpr const D* self() const { return static_cast<const D*>(this); }
+      constexpr D* Self() { return static_cast<D*>(this); }
+      constexpr const D* Self() const { return static_cast<const D*>(this); }
       template <class... U>
-      constexpr decltype(auto) callDerived(U&&... args) {
-        return (*self())(std::forward<U>(args)...);
+      constexpr decltype(auto) CallDerived(U&&... args) {
+        return (*Self())(std::forward<U>(args)...);
       }
       template <class... U>
-      constexpr decltype(auto) callDerived(U&&... args) const {
-        return (*self())(std::forward<U>(args)...);
+      constexpr decltype(auto) CallDerived(U&&... args) const {
+        return (*Self())(std::forward<U>(args)...);
       }
 
       public:
@@ -350,39 +350,39 @@ namespace emp {
       constexpr ListTransform(ListTransform&&) = default;
 
       template <class InputIter, class OutputIter>
-      void apply(InputIter&& begin, InputIter&& end,
+      void Apply(InputIter&& begin, InputIter&& end,
                  OutputIter&& target) const {
         std::transform(begin, end, target, [this](auto&& d) {
-          return callDerived(std::forward<decltype(d)>(d));
+          return CallDerived(std::forward<decltype(d)>(d));
         });
       }
 
       template <class DataIter, class PrevIter>
-      auto apply(DataIter dbegin, DataIter dend, PrevIter pbegin,
+      auto Apply(DataIter dbegin, DataIter dend, PrevIter pbegin,
                  PrevIter pend) const {
-        std::vector<decltype(pbegin->update(callDerived(*dbegin)))> transformed;
+        std::vector<decltype(pbegin->update(CallDerived(*dbegin)))> transformed;
         for (; dbegin != dend && pbegin != pend; ++pbegin, ++dbegin) {
-          transformed.push_back(pbegin->update(callDerived(*dbegin)));
+          transformed.push_back(pbegin->update(CallDerived(*dbegin)));
         }
         return transformed;
       }
 
       template <class Iter>
-      auto apply(Iter begin, Iter end) const {
-        std::vector<decltype(callDerived(*begin))> transformed;
+      auto Apply(Iter begin, Iter end) const {
+        std::vector<decltype(CallDerived(*begin))> transformed;
         for (; begin != end; ++begin) {
-          transformed.push_back(callDerived(*begin));
+          transformed.push_back(CallDerived(*begin));
         }
         return transformed;
       }
 
       template <class U>
-      auto apply(const std::vector<U>& data) const {
-        std::vector<decltype(callDerived(data[0]))> transformed;
+      auto Apply(const std::vector<U>& data) const {
+        std::vector<decltype(CallDerived(data[0]))> transformed;
         transformed.reserve(data.size());
 
         for (auto& d : data) {
-          transformed.push_back(callDerived(d));
+          transformed.push_back(CallDerived(d));
         }
 
         return transformed;
@@ -390,18 +390,18 @@ namespace emp {
     };
 
     template <typename... T>
-    constexpr Attrs<std::decay_t<T>...> attrs(T&&... props);
+    constexpr Attrs<std::decay_t<T>...> MakeAttrs(T&&... props);
 
     template <typename... T>
     class Attrs : public Joinable<Attrs<T...>>,
                   public ListTransform<Attrs<T...>>,
                   public __attrs_impl::AttrsParent<T...> {
       public:
-      using attrs_type = Attrs;
+      using attributes_t = Attrs;
       // This is one of the really nasty parts. The problem is that we really
       // want two constructors
       //
-      // (1) template<class... U> Attrs(U&& ... attrs),
+      // (1) template<class... U> Attrs(U&& ... MakeAttrs),
       // which initializes all the members of the attribute pack and
       //
       // (2) template<class... U> Attrs(const Attrs<U...>& other),
@@ -409,7 +409,7 @@ namespace emp {
       // one.
       //
       // Sadly, C++ can't tell the difference between these two signatures,
-      // and will only call the first because of how c++ decides the order to
+      // and will only Call the first because of how c++ decides the order to
       // resolve overloads in. In ordered to ensure that the correct
       // constructor is called, we calculate which constructor should be
       // called, and then pass the result into AttrsParent, which has
@@ -430,60 +430,60 @@ namespace emp {
       template <typename A>
       struct GetAttr<false, A> {
         template <typename S, typename... U>
-        static constexpr decltype(auto) get(S&& self, U&&... args) {
-          using attr_type = typename A::attr_type;
-          return attr_type::value(
-            attr_type::callOrGet(std::forward<S>(self), args...));
+        static constexpr decltype(auto) Get(S&& Self, U&&... args) {
+          using attribute_t = typename A::attribute_t;
+          return attribute_t::New(
+            attribute_t::CallOrGet(std::forward<S>(Self), args...));
         }
       };
 
       template <typename A>
       struct GetAttr<true, A> {
         template <typename S, typename... U>
-        static constexpr decltype(auto) get(S&& self, U&&... args) {
-          using attr_type = typename A::attr_type;
-          return attr_type::value(attr_type::callOrGet(
-            std::forward<S>(self), std::forward<U>(args)...));
+        static constexpr decltype(auto) Get(S&& Self, U&&... args) {
+          using attribute_t = typename A::attribute_t;
+          return attribute_t::New(attribute_t::CallOrGet(
+            std::forward<S>(Self), std::forward<U>(args)...));
         }
       };
 
       template <typename S, typename... U>
-      static constexpr decltype(auto) call(S&& self, U&&... args) {
+      static constexpr decltype(auto) Call(S&& Self, U&&... args) {
         constexpr size_t last = sizeof...(T) - 1;
-        return attrs(
+        return MakeAttrs(
           GetAttr<variadic_index_of_v<T, Attrs> == last,
-                  T>::template get<S, U...>(std::forward<S>(self),
+                  T>::template Get<S, U...>(std::forward<S>(Self),
                                             std::forward<U>(args)...)...);
       }
 
       public:
       template <class... U>
       constexpr decltype(auto) operator()(U&&... args) & {
-        return call(*this, std::forward<U>(args)...);
+        return Call(*this, std::forward<U>(args)...);
       }
 
       template <class... U>
       constexpr decltype(auto) operator()(U&&... args) && {
-        return call(std::move(*this), std::forward<U>(args)...);
+        return Call(std::move(*this), std::forward<U>(args)...);
       }
 
       template <class... U>
       constexpr decltype(auto) operator()(U&&... args) const & {
-        return call(*this, std::forward<U>(args)...);
+        return Call(*this, std::forward<U>(args)...);
       }
 
       private:
       template <class O>
-      constexpr bool eq(const O& other,
+      constexpr bool Equal(const O& other,
                         const __attrs_impl::wrapper<Attrs<>>&) const {
         return true;
       }
 
       template <class O, class U0, class... U>
-      constexpr bool eq(const O& other,
+      constexpr bool Equal(const O& other,
                         const __attrs_impl::wrapper<Attrs<U0, U...>>&) const {
-        return U0::attr_type::get(*this) == U0::attr_type::get(other) &&
-               eq(other, __attrs_impl::wrapper<Attrs<U...>>{});
+        return U0::attribute_t::Get(*this) == U0::attribute_t::Get(other) &&
+               Equal(other, __attrs_impl::wrapper<Attrs<U...>>{});
       }
 
       public:
@@ -494,121 +494,121 @@ namespace emp {
       constexpr bool operator==(const Attrs<U...>& other) const {
         static_assert(sizeof...(T) == sizeof...(U),
                       "Cannot compare attribute packs with different members");
-        return eq(other, __attrs_impl::wrapper<Attrs<U...>>{});
+        return Equal(other, __attrs_impl::wrapper<Attrs<U...>>{});
       }
 
       private:
       template <typename F, typename I, typename U0, typename... U>
-      constexpr decltype(auto) __impl_reduce(
+      constexpr decltype(auto) __impl_Reduce(
         F&& callback, I&& init,
         const __attrs_impl::wrapper<Attrs<U0, U...>>&) const {
         return std::forward<F>(callback)(std::forward<I>(init), U0::name,
-                                         U0::attr_type::get(*this));
+                                         U0::attribute_t::Get(*this));
       }
 
       template <typename F, typename I, typename U0, typename U1, typename... U>
-      constexpr decltype(auto) __impl_reduce(
+      constexpr decltype(auto) __impl_Reduce(
         F&& callback, I&& init,
         const __attrs_impl::wrapper<Attrs<U0, U1, U...>>&) const {
         using new_init_t = decltype(
-          callback(std::forward<I>(init), U0::name, U0::attr_type::get(*this)));
-        return __impl_reduce(
+          callback(std::forward<I>(init), U0::name, U0::attribute_t::Get(*this)));
+        return __impl_Reduce(
           std::forward<F>(callback),
           std::forward<new_init_t>(callback(std::forward<I>(init), U0::name,
-                                            U0::attr_type::get(*this))),
+                                            U0::attribute_t::Get(*this))),
           __attrs_impl::wrapper<Attrs<U1, U...>>{});
       }
 
       public:
       template <typename F, typename I>
-      constexpr decltype(auto) reduce(F&& callback, I&& init) const {
-        return __impl_reduce(std::forward<F>(callback), std::forward<I>(init),
+      constexpr decltype(auto) Reduce(F&& callback, I&& init) const {
+        return __impl_Reduce(std::forward<F>(callback), std::forward<I>(init),
                              __attrs_impl::wrapper<Attrs>{});
       };
 
       private:
       template <typename S, typename F, typename U0>
-      static constexpr void __impl_foreach(
-        S&& self, F&& callback, const __attrs_impl::wrapper<Attrs<U0>>&) {
+      static constexpr void __impl_Foreach(
+        S&& Self, F&& callback, const __attrs_impl::wrapper<Attrs<U0>>&) {
         std::forward<F>(callback)(U0::name,
-                                  U0::attr_type::get(std::forward<S>(self)));
+                                  U0::attribute_t::Get(std::forward<S>(Self)));
       }
 
       template <typename S, typename F, typename U0, typename U1, typename... U>
-      static constexpr void __impl_foreach(
-        S&& self, F&& callback,
+      static constexpr void __impl_Foreach(
+        S&& Self, F&& callback,
         const __attrs_impl::wrapper<Attrs<U0, U1, U...>>&) {
-        callback(U0::name, U0::attr_type::get(self));
+        callback(U0::name, U0::attribute_t::Get(Self));
 
-        __impl_foreach(std::forward<S>(self), std::forward<F>(callback),
+        __impl_Foreach(std::forward<S>(Self), std::forward<F>(callback),
                        __attrs_impl::wrapper<Attrs<U1, U...>>{});
       }
 
       template <typename S, typename F>
-      static constexpr void __impl_foreach(S&& self, F&& callback) {
-        __impl_foreach(std::forward<S>(self), std::forward<F>(callback),
+      static constexpr void __impl_Foreach(S&& Self, F&& callback) {
+        __impl_Foreach(std::forward<S>(Self), std::forward<F>(callback),
                        __attrs_impl::wrapper<Attrs>{});
       };
 
       public:
       template <typename F>
-      constexpr void foreach (F&& callback) & {
-        __impl_foreach(*this, std::forward<F>(callback));
+      constexpr void Foreach (F&& callback) & {
+        __impl_Foreach(*this, std::forward<F>(callback));
       }
 
       template <typename F>
-      constexpr void foreach (F&& callback) const & {
-        __impl_foreach(*this, std::forward<F>(callback));
+      constexpr void Foreach (F&& callback) const & {
+        __impl_Foreach(*this, std::forward<F>(callback));
       }
 
       template <typename F>
-      constexpr void foreach (F&& callback) && {
-        __impl_foreach(std::move(*this), std::forward<F>(callback));
+      constexpr void Foreach (F&& callback) && {
+        __impl_Foreach(std::move(*this), std::forward<F>(callback));
       }
 
       template <typename F>
-      constexpr void foreach (F&& callback) const && {
-        __impl_foreach(std::move(*this), std::forward<F>(callback));
+      constexpr void Foreach (F&& callback) const && {
+        __impl_Foreach(std::move(*this), std::forward<F>(callback));
       }
 
       template <typename O>
-      constexpr decltype(auto) set(O&& other) & {
-        return merge(*this, std::forward<O>(other));
+      constexpr decltype(auto) Set(O&& other) & {
+        return Merge(*this, std::forward<O>(other));
       }
 
       template <typename O>
-      constexpr decltype(auto) set(O&& other) const & {
-        return merge(*this, std::forward<O>(other));
+      constexpr decltype(auto) Set(O&& other) const & {
+        return Merge(*this, std::forward<O>(other));
       }
 
       template <typename O>
-      constexpr decltype(auto) set(O&& other) && {
-        return merge(std::move(*this), std::forward<O>(other));
+      constexpr decltype(auto) Set(O&& other) && {
+        return Merge(std::move(*this), std::forward<O>(other));
       }
 
       template <typename O>
-      constexpr decltype(auto) set(O&& other) const && {
-        return merge(std::move(*this), std::forward<O>(other));
+      constexpr decltype(auto) Set(O&& other) const && {
+        return Merge(std::move(*this), std::forward<O>(other));
       }
     };
 
     template <typename... T>
-    struct IsMergeable<Attrs<T...>> : std::true_type {};
+    struct is_mergeable<Attrs<T...>> : std::true_type {};
 
     ///  An alternative syntax for creating attribute packs. Takes any number
     ///  of attributes and returns a pack containing each of those attributes.
     template <class... T>
-    constexpr Attrs<std::decay_t<T>...> attrs(T&&... props) {
+    constexpr Attrs<std::decay_t<T>...> MakeAttrs(T&&... props) {
       return {std::forward<T>(props)...};
     };
 
     namespace __attrs_impl {
       template <typename S, typename P, typename... U>
-      static constexpr decltype(auto) __impl_merge(
-        S&& self, P&& other, const wrapper<Attrs<U...>>&) {
+      static constexpr decltype(auto) __impl_Merge(
+        S&& Self, P&& other, const wrapper<Attrs<U...>>&) {
         // use the getters to extract all the data
-        return attrs(U::attr_type::value(U::attr_type::getOrGetIn(
-          std::forward<P>(other), std::forward<S>(self)))...);
+        return MakeAttrs(U::attribute_t::New(U::attribute_t::GetOrGetIn(
+          std::forward<P>(other), std::forward<S>(Self)))...);
       }
     }  // namespace __attrs_impl
 
@@ -617,38 +617,38 @@ namespace emp {
     /// preferentially.
 
     template <typename A>
-    constexpr decltype(auto) merge(A&& a) {
+    constexpr decltype(auto) Merge(A&& a) {
       return std::forward<A>(a);
     }
 
     template <typename A0, typename A1>
-    constexpr decltype(auto) merge(A0&& a0, A1&& a1) {
-      using self_attrs_type = typename std::decay_t<A0>::attrs_type;
-      using other_attrs_type = typename std::decay_t<A1>::attrs_type;
+    constexpr decltype(auto) Merge(A0&& a0, A1&& a1) {
+      using self_attributes_t = typename std::decay_t<A0>::attributes_t;
+      using other_attributes_t = typename std::decay_t<A1>::attributes_t;
 
-      return __attrs_impl::__impl_merge(
+      return __attrs_impl::__impl_Merge(
         std::forward<A0>(a0), std::forward<A1>(a1),
         __attrs_impl::wrapper<
-          variadic_union_t<self_attrs_type, other_attrs_type>>{});
+          variadic_union_t<self_attributes_t, other_attributes_t>>{});
     }
 
     template <typename A0, typename A1, typename A2, typename... A>
-    constexpr decltype(auto) merge(A0&& a0, A1&& a1, A2&& a2, A&&... packs) {
-      using self_attrs_type = typename std::decay_t<A0>::attrs_type;
-      using other_attrs_type = typename std::decay_t<A1>::attrs_type;
+    constexpr decltype(auto) Merge(A0&& a0, A1&& a1, A2&& a2, A&&... packs) {
+      using self_attributes_t = typename std::decay_t<A0>::attributes_t;
+      using other_attributes_t = typename std::decay_t<A1>::attributes_t;
 
-      return merge(__attrs_impl::__impl_merge(
+      return Merge(__attrs_impl::__impl_Merge(
                      std::forward<A0>(a0), std::forward<A1>(a1),
                      __attrs_impl::wrapper<
-                       variadic_union_t<self_attrs_type, other_attrs_type>>{}),
+                       variadic_union_t<self_attributes_t, other_attributes_t>>{}),
                    std::forward<A2>(a2), std::forward<A>(packs)...);
     }
 
     template <class From, class To,
-              class = std::enable_if_t<IsMergeable<std::decay_t<From>>::value &&
-                                       IsMergeable<std::decay_t<To>>::value>>
+              class = std::enable_if_t<is_mergeable<std::decay_t<From>>::value &&
+                                       is_mergeable<std::decay_t<To>>::value>>
     constexpr auto operator+(From&& from, To&& to) {
-      return merge(std::forward<From>(from), std::forward<To>(to));
+      return Merge(std::forward<From>(from), std::forward<To>(to));
     }
 
     namespace __attrs_impl {
@@ -656,22 +656,22 @@ namespace emp {
       struct print_attrs_tag {};
 
       template <class... T, class H>
-      void printAttrs(std::ostream& out, const Attrs<T...>& attrs,
+      void PrintAttrs(std::ostream& out, const Attrs<T...>& attrs,
                       const print_attrs_tag<H>&) {
-        out << '"' << H::name << "\": " << H::attr_type::get(attrs);
+        out << '"' << H::name << "\": " << H::attribute_t::Get(attrs);
       }
       template <class... T, class H0, class H1, class... U>
-      void printAttrs(std::ostream& out, const Attrs<T...>& attrs,
+      void PrintAttrs(std::ostream& out, const Attrs<T...>& attrs,
                       const print_attrs_tag<H0, H1, U...>&) {
-        out << '"' << H0::name << "\": " << H0::attr_type::get(attrs) << ", ";
-        printAttrs(out, attrs, print_attrs_tag<H1, U...>{});
+        out << '"' << H0::name << "\": " << H0::attribute_t::Get(attrs) << ", ";
+        PrintAttrs(out, attrs, print_attrs_tag<H1, U...>{});
       }
     }  // namespace __attrs_impl
 
     template <class H, class... T>
     std::ostream& operator<<(std::ostream& out, const Attrs<H, T...>& attrs) {
       out << "{ ";
-      __attrs_impl::printAttrs(out, attrs,
+      __attrs_impl::PrintAttrs(out, attrs,
                                __attrs_impl::print_attrs_tag<H, T...>{});
       return out << " }";
     }

@@ -13,16 +13,16 @@ constexpr auto DEFAULT{populationSize(100) + generationLength(100) +
 
 // Notice that this function has a different ordering than DEFAULT
 void print(const std::string& name,
-           const Attrs<typename PopulationSize::value_type<size_t>,
-                       typename DefaultGenome::value_type<std::string>,
-                       typename GenerationLength::value_type<size_t>>& args) {
+           const Attrs<typename PopulationSize::value_t<size_t>,
+                       typename DefaultGenome::value_t<std::string>,
+                       typename GenerationLength::value_t<size_t>>& args) {
   std::cout << name << " = " << args << std::endl;
 }
 
 void printSubset(
   const std::string& name,
-  const Attrs<typename PopulationSize::value_type<size_t>,
-              typename GenerationLength::value_type<size_t>>& args) {
+  const Attrs<typename PopulationSize::value_t<size_t>,
+              typename GenerationLength::value_t<size_t>>& args) {
   std::cout << name << " = " << args << std::endl;
 }
 
@@ -34,14 +34,14 @@ int main() {
   printSubset("DEFAULT [SUBSET]", DEFAULT);
 
   // demo adding/chaning data
-  print("DEFAULT.set(populationSize(10))", DEFAULT.set(populationSize(10)));
+  print("DEFAULT.set(populationSize(10))", DEFAULT.Set(populationSize(10)));
   print("DEFAULT + populationSize(10)", DEFAULT + populationSize(10));
 
-  Attrs<typename PopulationSize::value_type<size_t>,
-        typename DefaultGenome::value_type<
+  Attrs<typename PopulationSize::value_t<size_t>,
+        typename DefaultGenome::value_t<
           std::string>,  // Notice that this will be auto-converted from const
                          // char* to std::string
-        typename GenerationLength::value_type<size_t>>
+        typename GenerationLength::value_t<size_t>>
     user = DEFAULT;
 
   // We can use these attribute packs just like structs
@@ -52,7 +52,7 @@ int main() {
 
   // Example of compile time-unfolded runtime reflection:
   std::cout << "Updating the whole USER settings:" << std::endl;
-  user.foreach ([](auto& name, auto& value) {
+  user.Foreach ([](auto& name, auto& value) {
     std::cout << "set " << name << " (" << value << "): ";
     std::cin >> value;
   });
