@@ -341,5 +341,5 @@ TEST_CASE("Test DataFile", "[data]") {
         std::cout << i << std::endl;
     }
 
-    REQUIRE(compareFiles("test_file.dat", "test-data/test_file.dat"));
+    REQUIRE(compareFiles("test_file.dat", "data/test_file.dat"));
 }
