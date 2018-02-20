@@ -11,6 +11,8 @@
 
 #include "Evolve/Systematics.h"
 #include "Evolve/SystematicsAnalysis.h"
+#include "Evolve/World.h"
+#include "base/vector.h"
 #include <iostream>
 
 TEST_CASE("Test Systematics", "[evo]")
@@ -132,21 +134,60 @@ TEST_CASE("Test Data Struct", "[evo]")
   emp::Systematics<int, emp::mut_landscape_info<int> > sys(true, true, true);
   auto id1 = sys.AddOrg(1, nullptr);
   id1->GetData().fitness = 2;
+  id1->GetData().phenotype = 6;
   
   auto id2 = sys.AddOrg(2, id1);
   id2->GetData().mut_counts["substitution"] = 2;
   id2->GetData().fitness = 1;
+  id2->GetData().phenotype = 6;
   REQUIRE(id2->GetData().mut_counts["substitution"] == 2);
   
   auto id3 = sys.AddOrg(3, id1);
   id3->GetData().mut_counts["substitution"] = 5;
   id3->GetData().fitness = 0;  
-  
+  id3->GetData().phenotype = 6;
+
   auto id4 = sys.AddOrg(4, id2);
   id4->GetData().mut_counts["substitution"] = 1;
   id4->GetData().fitness = 3;
+  id4->GetData().phenotype = 3;
+
+  auto id5 = sys.AddOrg(5, id4);
+  id5->GetData().mut_counts["substitution"] = 1;
+  id5->GetData().fitness = 2;
+  id5->GetData().phenotype = 6;
+
 
   REQUIRE(CountMuts(id4) == 3);
   REQUIRE(CountDeleteriousSteps(id4) == 1);
+  REQUIRE(CountPhenotypeChanges(id4) == 1);
+  REQUIRE(CountUniquePhenotypes(id4) == 2);
+
+  REQUIRE(CountMuts(id3) == 5);
+  REQUIRE(CountDeleteriousSteps(id3) == 1);
+  REQUIRE(CountPhenotypeChanges(id3) == 0);
+  REQUIRE(CountUniquePhenotypes(id3) == 1);  
+
+  REQUIRE(CountMuts(id5) == 4);
+  REQUIRE(CountDeleteriousSteps(id5) == 2);
+  REQUIRE(CountPhenotypeChanges(id5) == 2);
+  REQUIRE(CountUniquePhenotypes(id5) == 2);  
+
+}
+
+
+TEST_CASE("World systematics integration", "[evo]") {
+
+  std::function<void(emp::Ptr<emp::Taxon<emp::vector<int>, emp::mut_landscape_info<int>>>)> setup_phenotype = [](emp::Ptr<emp::Taxon<emp::vector<int>, emp::mut_landscape_info<int>>> tax){
+    tax->GetData().phenotype = emp::Sum(tax->GetInfo());
+  };
+
+
+  emp::World<emp::vector<int>, emp::mut_landscape_info<int>> world;
+  world.GetSystematics().OnNew(setup_phenotype);
+  world.Inject(emp::vector<int>({1,2,3}));
+
+  REQUIRE(world.GetGenotypeAt(0)->GetData().phenotype == 6);
+
 
 }

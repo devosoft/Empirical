@@ -244,12 +244,12 @@ namespace emp {
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetAncestors() const { return ancestor_taxa; }
 
 
-    SignalKey OnNew(const std::function<void(Ptr<taxon_t>)> & fun) { return on_new_sig.AddAction(fun); }
+    SignalKey OnNew(std::function<void(Ptr<taxon_t>)> & fun) { return on_new_sig.AddAction(fun); }
 
     /// Privide a function for Systematics to call each time a taxon is about to be pruned.
     /// Trigger:  Taxon is about to be killed
     /// Argument: Pounter to taxon
-    SignalKey OnPrune(const std::function<void(Ptr<taxon_t>)> & fun) { return on_prune_sig.AddAction(fun); }
+    SignalKey OnPrune(std::function<void(Ptr<taxon_t>)> & fun) { return on_prune_sig.AddAction(fun); }
 
 
     /// How many taxa are still active in the population?
