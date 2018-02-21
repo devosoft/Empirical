@@ -358,71 +358,11 @@ namespace emp {
 
     }  // namespace __attrs_impl
 
-    template <class D>
-    class ListTransform {
-      constexpr D* Self() { return static_cast<D*>(this); }
-      constexpr const D* Self() const { return static_cast<const D*>(this); }
-      template <class... U>
-      constexpr decltype(auto) CallDerived(U&&... args) {
-        return (*Self())(std::forward<U>(args)...);
-      }
-      template <class... U>
-      constexpr decltype(auto) CallDerived(U&&... args) const {
-        return (*Self())(std::forward<U>(args)...);
-      }
-
-      public:
-      constexpr ListTransform() = default;
-      constexpr ListTransform(const ListTransform&) = default;
-      constexpr ListTransform(ListTransform&&) = default;
-
-      template <class InputIter, class OutputIter>
-      void Apply(InputIter&& begin, InputIter&& end,
-                 OutputIter&& target) const {
-        std::transform(begin, end, target, [this](auto&& d) {
-          return CallDerived(std::forward<decltype(d)>(d));
-        });
-      }
-
-      template <class DataIter, class PrevIter>
-      auto Apply(DataIter dbegin, DataIter dend, PrevIter pbegin,
-                 PrevIter pend) const {
-        std::vector<decltype(pbegin->update(CallDerived(*dbegin)))> transformed;
-        for (; dbegin != dend && pbegin != pend; ++pbegin, ++dbegin) {
-          transformed.push_back(pbegin->update(CallDerived(*dbegin)));
-        }
-        return transformed;
-      }
-
-      template <class Iter>
-      auto Apply(Iter begin, Iter end) const {
-        std::vector<decltype(CallDerived(*begin))> transformed;
-        for (; begin != end; ++begin) {
-          transformed.push_back(CallDerived(*begin));
-        }
-        return transformed;
-      }
-
-      template <class U>
-      auto Apply(const std::vector<U>& data) const {
-        std::vector<decltype(CallDerived(data[0]))> transformed;
-        transformed.reserve(data.size());
-
-        for (auto& d : data) {
-          transformed.push_back(CallDerived(d));
-        }
-
-        return transformed;
-      }
-    };
-
     template <typename... T>
     constexpr Attrs<std::decay_t<T>...> MakeAttrs(T&&... props);
 
     template <typename... T>
-    class Attrs : public Joinable<Attrs<T...>>,
-                  public ListTransform<Attrs<T...>>,
-                  public __attrs_impl::AttrsParent<T...> {
+    class Attrs : public __attrs_impl::AttrsParent<T...> {
       public:
       using attributes_t = Attrs;
       // This is one of the really nasty parts. The problem is that we really
@@ -451,6 +391,15 @@ namespace emp {
             // The arguments are then forwarded as normal
             std::forward<U0>(arg), std::forward<U>(args)...) {}
 
+      // private:
+      // constexpr static struct {
+      //   template <typename T>
+      // } __impl_AssignOp_asssigner;
+
+      // template <typename... U>
+      // void __impl_AssignOp(const Attrs<U...>& other) {}
+
+      // public:
       private:
       template <bool Last, typename A>
       struct GetAttr;
@@ -525,77 +474,154 @@ namespace emp {
       }
 
       private:
-      template <typename F, typename I, typename U0, typename... U>
-      constexpr decltype(auto) __impl_Reduce(
-        F&& callback, I&& init,
-        const __attrs_impl::wrapper<Attrs<U0, U...>>&) const {
-        return std::forward<F>(callback)(std::forward<I>(init), U0::name,
-                                         U0::attribute_t::Get(*this));
+      template <typename S, typename F, typename I>
+      static constexpr decltype(auto) __impl_ReduceValue(
+        S&& self, F&& callback, I&& init,
+        const __attrs_impl::wrapper<Attrs<>>&) {
+        return std::forward<I>(init);
       }
 
-      template <typename F, typename I, typename U0, typename U1, typename... U>
-      constexpr decltype(auto) __impl_Reduce(
-        F&& callback, I&& init,
-        const __attrs_impl::wrapper<Attrs<U0, U1, U...>>&) const {
-        using new_init_t = decltype(callback(std::forward<I>(init), U0::name,
-                                             U0::attribute_t::Get(*this)));
-        return __impl_Reduce(
-          std::forward<F>(callback),
-          std::forward<new_init_t>(callback(std::forward<I>(init), U0::name,
-                                            U0::attribute_t::Get(*this))),
+      template <typename S, typename F, typename I, typename U0>
+      static constexpr decltype(auto) __impl_ReduceValue(
+        S&& self, F&& callback, I&& init,
+        const __attrs_impl::wrapper<Attrs<U0>>&) {
+        return std::forward<F>(callback)(
+          U0::attribute_t::GetValue(std::forward<S>(self)),
+          std::forward<I>(init));
+      }
+
+      template <typename S, typename F, typename I, typename U0, typename U1,
+                typename... U>
+      static constexpr decltype(auto) __impl_ReduceValue(
+        S&& self, F&& callback, I&& init,
+        const __attrs_impl::wrapper<Attrs<U0, U1, U...>>&) {
+        using new_init_t =
+          decltype(callback(U0::attribute_t::GetValue(std::forward<S>(self)),
+                            std::forward<I>(init)));
+        return __impl_ReduceValue(
+          std::forward<S>(self), std::forward<F>(callback),
+          std::forward<new_init_t>(
+            callback(U0::attribute_t::GetValue(std::forward<S>(self)),
+                     std::forward<I>(init))),
           __attrs_impl::wrapper<Attrs<U1, U...>>{});
+      }
+
+      template <typename F>
+      struct __impl_reduce_from_reduce_value {
+        F callback;
+        constexpr __impl_reduce_from_reduce_value(F callback)
+          : callback(callback) {}
+        template <typename U, typename I>
+        constexpr decltype(auto) operator()(U&& value, I&& init) {
+          return std::forward<F>(callback)(U::name, *std::forward<U>(value),
+                                           std::forward<I>(init));
+        }
+      };
+
+      template <typename S, typename F, typename I>
+      static constexpr decltype(auto) ReduceValue(S&& self, F&& callback,
+                                                  I&& init) {
+        return __impl_ReduceValue(std::forward<S>(self),
+                                  std::forward<F>(callback),
+                                  std::forward<I>(init));
       }
 
       public:
       template <typename F, typename I>
+      constexpr decltype(auto) ReduceValue(F&& callback, I&& init) & {
+        return __impl_ReduceValue(std::forward<F>(callback),
+                                  std::forward<I>(init),
+                                  __attrs_impl::wrapper<Attrs>{});
+      };
+
+      template <typename F, typename I>
       constexpr decltype(auto) Reduce(F&& callback, I&& init) const {
-        return __impl_Reduce(std::forward<F>(callback), std::forward<I>(init),
-                             __attrs_impl::wrapper<Attrs>{});
+        return ReduceValue(std::forward<F>(callback), std::forward<I>(init),
+                           __attrs_impl::wrapper<Attrs>{});
       };
 
       private:
       template <typename S, typename F, typename U0>
-      static constexpr void __impl_Foreach(
+      static constexpr void __impl_ForeachValue(
         S&& Self, F&& callback, const __attrs_impl::wrapper<Attrs<U0>>&) {
-        std::forward<F>(callback)(U0::name,
-                                  U0::attribute_t::Get(std::forward<S>(Self)));
+        std::forward<F>(callback)(
+          U0::attribute_t::GetValue(std::forward<S>(Self)));
       }
 
       template <typename S, typename F, typename U0, typename U1, typename... U>
-      static constexpr void __impl_Foreach(
+      static constexpr void __impl_ForeachValue(
         S&& Self, F&& callback,
         const __attrs_impl::wrapper<Attrs<U0, U1, U...>>&) {
-        callback(U0::name, U0::attribute_t::Get(Self));
+        // Forwarding here is indeed correct. This will cause the callback to
+        // get an rvalue or lvalue if Self is an rvalue or an lvalue
+        // respectively. Even if the value is moved, it will not change any of
+        // the other attributes, so this remains safe.
+        callback(U0::attribute_t::GetValue(std::forward<S>(Self)));
 
-        __impl_Foreach(std::forward<S>(Self), std::forward<F>(callback),
-                       __attrs_impl::wrapper<Attrs<U1, U...>>{});
+        __impl_ForeachValue(std::forward<S>(Self), std::forward<F>(callback),
+                            __attrs_impl::wrapper<Attrs<U1, U...>>{});
       }
 
       template <typename S, typename F>
-      static constexpr void __impl_Foreach(S&& Self, F&& callback) {
-        __impl_Foreach(std::forward<S>(Self), std::forward<F>(callback),
-                       __attrs_impl::wrapper<Attrs>{});
+      static constexpr void __impl_ForeachValue(S&& Self, F&& callback) {
+        __impl_ForeachValue(std::forward<S>(Self), std::forward<F>(callback),
+                            __attrs_impl::wrapper<Attrs>{});
+      };
+
+      template <typename F>
+      struct __impl_foreach_from_foreach_value {
+        F callback;
+        constexpr __impl_foreach_from_foreach_value(F callback)
+          : callback(callback) {}
+        template <typename U>
+        constexpr void operator()(U&& value) {
+          std::forward<F>(callback)(U::name, *std::forward<U>(value));
+        }
       };
 
       public:
       template <typename F>
+      constexpr void ForeachValue(F&& callback) & {
+        __impl_ForeachValue(*this, std::forward<F>(callback));
+      }
+
+      template <typename F>
+      constexpr void ForeachValue(F&& callback) const & {
+        __impl_ForeachValue(*this, std::forward<F>(callback));
+      }
+
+      template <typename F>
+      constexpr void ForeachValue(F&& callback) && {
+        __impl_Foreach(std::move(*this), std::forward<F>(callback));
+      }
+
+      template <typename F>
+      constexpr void ForeachValue(F&& callback) const && {
+        __impl_Foreach(std::move(*this), std::forward<F>(callback));
+      }
+
+      template <typename F>
       constexpr void Foreach(F&& callback) & {
-        __impl_Foreach(*this, std::forward<F>(callback));
+        ForeachValue(__impl_foreach_from_foreach_value<decltype(
+                       std::forward<F>(callback))>{std::forward<F>(callback)});
       }
 
       template <typename F>
       constexpr void Foreach(F&& callback) const & {
-        __impl_Foreach(*this, std::forward<F>(callback));
+        ForeachValue(__impl_foreach_from_foreach_value<decltype(
+                       std::forward<F>(callback))>{std::forward<F>(callback)});
       }
 
       template <typename F>
       constexpr void Foreach(F&& callback) && {
-        __impl_Foreach(std::move(*this), std::forward<F>(callback));
+        ForeachValue(__impl_foreach_from_foreach_value<decltype(
+                       std::forward<F>(callback))>{std::forward<F>(callback)});
       }
 
       template <typename F>
       constexpr void Foreach(F&& callback) const && {
-        __impl_Foreach(std::move(*this), std::forward<F>(callback));
+        ForeachValue(__impl_foreach_from_foreach_value<decltype(
+                       std::forward<F>(callback))>{std::forward<F>(callback)});
       }
 
       template <typename O>
