@@ -93,6 +93,8 @@ TEST_CASE("Test fitness sharing", "[evo]")
   grid_world.SetPrintFun(print_fun);
 
   emp_assert(grid_world.GetSize() == POP_SIZE); // POP_SIZE needs to be a perfect square.
+  test.open("temp/Result-grid.csv");
+  correct.open("data/Result-grid.csv");
 
 
   grid_world.InjectAt(30, side+1);
@@ -154,9 +156,14 @@ TEST_CASE("Test resources", "[evo]")
 
   emp::vector<std::function<double(const BitOrg&)> > fit_funs;
 
+<<<<<<< HEAD
   fit_funs.push_back([](const BitOrg &org){ return org.CountOnes()/N; });
   fit_funs.push_back([](const BitOrg &org){ return org[0]; });
   fit_funs.push_back([](const BitOrg &org){ return 1 - org[0]; });
+=======
+  test.open("temp/Result-mixed.csv");
+  correct.open("data/Result-mixed.csv");
+>>>>>>> 4c62a6dd50239c12c63807dfab0a0c5d87233fde
 
   emp::ResourceSelect(pop, fit_funs, resources, 5, POP_SIZE);
 

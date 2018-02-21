@@ -61,9 +61,28 @@ namespace emp {
     UNKNOWN       ///< Unknown modifier; will trigger error.
   };
 
-  /// A template that will sort and make unique the data mods provides.
-  template<emp::data... MODS>
-  using SortDataMods = pack::RUsort<IntPack<(int) MODS...>>;
+
+  /// A shortcut for converting DataNode mod ID's to IntPacks.
+  template <emp::data... MODS> using ModPack = emp::IntPack<(int) MODS...>;
+
+  /// Extra info about data modules that we need to know before actually building this DataNode.
+  /// (for now, just REQUISITES for each module.)
+  template <emp::data MOD> struct DataModInfo     { using reqs = ModPack<>; };
+  template <> struct DataModInfo<data::Archive>   { using reqs = ModPack<data::Log>; };
+  template <> struct DataModInfo<data::FullRange> { using reqs = ModPack<data::Range>; };
+  template <> struct DataModInfo<data::Stats>     { using reqs = ModPack<data::Range>; };
+  //template <> struct DataModInfo<data::FullStats> { using reqs = ModPack<data::Range, data::Stats>; };
+
+
+  // A set of structs to collect and merge data module requisites.
+  template <emp::data... MODS> struct DataModuleRequisiteAdd { };
+  template <> struct DataModuleRequisiteAdd<> { using type = IntPack<>; };
+  template <emp::data CUR_MOD, emp::data... MODS> struct DataModuleRequisiteAdd<CUR_MOD, MODS...> {
+    using next_type = typename DataModuleRequisiteAdd<MODS...>::type;
+    using this_req = typename DataModInfo<CUR_MOD>::reqs;
+    using type = typename next_type::template append<this_req>;
+  };
+
 
   /// Generic form of DataNodeModule (should never be used; trigger error!)
   template <typename VAL_TYPE, emp::data... MODS> class DataNodeModule {
@@ -79,6 +98,7 @@ namespace emp {
     emp::vector<VAL_TYPE> in_vals;  ///< What values are waiting to be included?
 
     void PullData_impl() { ; }
+
   public:
     DataNodeModule() : val_count(0), in_vals() { ; }
 
@@ -135,6 +155,7 @@ namespace emp {
     using this_t = DataNodeModule<VAL_TYPE, data::Current, MODS...>;
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
     using base_t = DataNodeModule<VAL_TYPE>;
+
   public:
     DataNodeModule() : cur_val() { ; }
 
@@ -236,15 +257,16 @@ namespace emp {
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Archive, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
-    emp::vector<emp::vector<VAL_TYPE>> archive;  ///< Archive of data from before last reset.
+    emp::vector<emp::vector<VAL_TYPE>> archive;  ///< Data archived from before most recent reset.
 
     using this_t = DataNodeModule<VAL_TYPE, data::Archive, MODS...>;
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
     using base_t = DataNodeModule<VAL_TYPE>;
 
     using base_t::val_count;
+    using parent_t::val_set;
   public:
-    DataNodeModule() : archive(1) { ; }
+    DataNodeModule() : archive(0) { ; }
 
     /// Get all data ever added to this DataNode. Returns a vector of vectors; each vector
     /// contains all data from a single time point (interval between resets)
@@ -254,22 +276,18 @@ namespace emp {
     const emp::vector<VAL_TYPE> & GetData(size_t update) const { return archive[update]; }
     
     /// Get a vector of all data that has been added since the last reset
-    const emp::vector<VAL_TYPE> & GetData() const { return archive.back(); }
+    const emp::vector<VAL_TYPE> & GetData() const { return val_set; }
 
     /// Get the number of time intervals recorded in this DataNode.
     /// Note that this is one more than the number of times it has been reset
     size_t GetResetCount() const { return archive.size(); }
 
-    /// Add @param val to this DataNode 
-    void AddDatum(const VAL_TYPE & val) {
-      archive.back().push_back(val);
-      parent_t::AddDatum(val);
-    }
+    // NOTE: Ignoring AddDatum() since new value will be added to val_set.
 
     /// Reset this DataNode, starting a new grouping of values in the archive.  Resetting is
     /// useful for tracking data from different time points, such as per update or generation.
     void Reset() {
-      archive.resize(archive.size()+1);
+      archive.push_back(val_set);
       parent_t::Reset();
     }
 
@@ -350,21 +368,24 @@ namespace emp {
     using base_t = DataNodeModule<VAL_TYPE>;
 
     using base_t::val_count;
+    using parent_t::total;
+    using parent_t::min;
+    using parent_t::max;
   public:
     DataNodeModule()
-      : total_vals(1,0.0), num_vals(1,0), min_vals(1,0.0), max_vals(1,0.0) { ; }
+      : total_vals(), num_vals(), min_vals(), max_vals() { ; }
 
     /// Get the sum of all values added to this DataNode since the last reset
-    double GetTotal() const { return total_vals.back(); }
+    double GetTotal() const { return total; }
 
     /// Get the mean of all values added to this DataNode since the last reset
-    double GetMean() const { return total_vals.back() / (double) num_vals.back(); }
+    double GetMean() const { return total / (double) val_count; }
 
     /// Get the minimum of all values added to this DataNode since the last reset
-    double GetMin() const { return min_vals.back(); }
+    double GetMin() const { return min; }
   
     /// Get the maximum of all values added to this DataNode since the last reset
-    double GetMax() const { return max_vals.back(); }
+    double GetMax() const { return max; }
 
     /// Get the sum of all values added to this DataNode during the @param update specified.
     double GetTotal(size_t update) const { return total_vals[update]; }
@@ -382,21 +403,23 @@ namespace emp {
     ///  Note that this is one more than the number of times it has been reset
     size_t GetResetCount() const { return total_vals.size(); }
 
-    /// Add @param val to the DataNode
-    void AddDatum(const VAL_TYPE & val) {
-      total_vals.back() += val;
-      num_vals.back() += 1;
-      if (!val_count || val < min_vals.back()) min_vals.back() = val;
-      if (!val_count || val > max_vals.back()) max_vals.back() = val;
-      parent_t::AddDatum(val);
-    }
+    // NOTE: Ignoring AddDatum() since Range values track current information.
+
+    // /// Add @param val to the DataNode
+    // void AddDatum(const VAL_TYPE & val) {
+    //   total_vals.back() += val;
+    //   num_vals.back() += 1;
+    //   if (!val_count || val < min_vals.back()) min_vals.back() = val;
+    //   if (!val_count || val > max_vals.back()) max_vals.back() = val;
+    //   parent_t::AddDatum(val);
+    // }
 
     /// Store the current range statistics in the archive and reset for a new interval.
     void Reset() {
-      total_vals.push_back(0.0);
-      num_vals.push_back(0);
-      min_vals.push_back(0.0);
-      max_vals.push_back(0.0);
+      total_vals.push_back(total);
+      num_vals.push_back(val_count);
+      min_vals.push_back(min);
+      max_vals.push_back(max);
       parent_t::Reset();
     }
 
@@ -611,12 +634,20 @@ namespace emp {
     using parent_t = DataNodeModule<VAL_TYPE, (emp::data) IMODS...>;
   };
 
+  /// A template that will determing requisites, sort, make unique the data mods provided.
+  /// The final, sorted IntPack of the requisites plus originals is in 'sorted'.
+  template<emp::data... MODS>
+  struct FormatDataMods {
+    using reqs = typename DataModuleRequisiteAdd<MODS...>::type;    ///< Identify requisites
+    using full = typename ModPack<MODS...>::template append<reqs>;  ///< Requisites + originals
+    using sorted = pack::RUsort<full>;                              ///< Unique and in order
+  };
+
   template <typename VAL_TYPE, emp::data... MODS>
-  class DataNode : public DataNode_Interface< VAL_TYPE, SortDataMods<MODS...> > {
+  class DataNode : public DataNode_Interface< VAL_TYPE, typename FormatDataMods<MODS...>::sorted > {
   private:
-    using parent_t = DataNode_Interface< VAL_TYPE, SortDataMods<MODS...>  >;
+    using parent_t = DataNode_Interface< VAL_TYPE, typename FormatDataMods<MODS...>::sorted  >;
     using parent_t::in_vals;
-    using test = IntPack<(int)MODS...>;
 
   public:
 
