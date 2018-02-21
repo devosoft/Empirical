@@ -473,6 +473,7 @@ namespace emp {
     inline std::string to_string_impl(bool, uint32_t v) { return std::to_string(v); }
     inline std::string to_string_impl(bool, int64_t v) { return std::to_string(v); }
     inline std::string to_string_impl(bool, uint64_t v) { return std::to_string(v); }
+    inline std::string to_string_impl(bool, unsigned long v) { return std::to_string(v); }
     inline std::string to_string_impl(bool, float v) { return std::to_string(v); }
     inline std::string to_string_impl(bool, double v) { return std::to_string(v); }
     inline std::string to_string_impl(bool, char c) { return std::string(1,c); }
@@ -484,7 +485,7 @@ namespace emp {
     to_string_impl(bool, T container) {
       std::stringstream ss;
       ss << "[ ";
-      for (auto el : container) {
+      for (const auto & el : container) {
         ss << to_string_impl(true, el);
         ss << " ";
       }
