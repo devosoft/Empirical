@@ -519,7 +519,7 @@ namespace emp {
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Histogram, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
-    VAL_TYPE min;                    ///< Minimum value to bin.
+    VAL_TYPE offset;                 ///< Min value in first bin; others are offset by this much.
     IndexMap bins;                   ///< Map of values to which bin they fall in. 
     emp::vector<size_t> counts;      ///< Counts in each bin.
 
@@ -530,11 +530,11 @@ namespace emp {
     using base_t::val_count;
 
   public:
-    DataNodeModule() : min(0.0), bins(10,10.0), counts(10, 0) { ; }
+    DataNodeModule() : offset(0.0), bins(10,10.0), counts(10, 0) { ; }
 
     /// Returns the minimum value this histogram is capable of containing
-    /// (i.e. the minimum value for the minimum bin)
-    VAL_TYPE GetHistMin() const { return min; }
+    /// (i.e. the minimum value for the first bin)
+    VAL_TYPE GetHistMin() const { return offset; }
 
     /// Return the count of items in the @param bin_id 'th bin of the histogram
     size_t GetHistCount(size_t bin_id) const { return counts[bin_id]; }
@@ -546,7 +546,7 @@ namespace emp {
     /// Return a vector containing the lowest value allowed in each bin.
     emp::vector<double> GetBinMins() const {
       emp::vector<double> bin_mins(bins.size());
-      double cur_min = min;
+      double cur_min = offset;
       for (size_t i = 0; i < bins.size(); i++) {
         bin_mins[i] = cur_min;
         cur_min += bins[i];
@@ -560,16 +560,17 @@ namespace emp {
     /// @param num_bins - The number of bins the histogram should have. The distance
     ///                   between min and max will be easily divided among this many bins.
     void SetupBins(VAL_TYPE _min, VAL_TYPE _max, size_t num_bins) {
-      min = _min;
+      offset = _min;
       double width = ((double) (_max - _min)) / (double) num_bins;
-      bins.Resize(num_bins, width);
+      bins.Resize(num_bins);
+      bins.AdjustAll(width);
       counts.resize(num_bins);
       for (size_t & x : counts) x = 0.0;
     }
 
     /// Add @param val to the DataNode
     void AddDatum(const VAL_TYPE & val) {
-      size_t bin_id = bins.Index((double) (val - min));
+      size_t bin_id = bins.Index((double) (val - offset));
       counts[bin_id]++;
       parent_t::AddDatum(val);
     }
