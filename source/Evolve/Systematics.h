@@ -48,9 +48,30 @@ namespace emp {
   struct mut_landscape_info { /// Track information related to the mutational landscape
     /// Maps a string representing a type of mutation to a count representing 
     /// the number of that type of mutation that occured to bring about this taxon.
+    using phen_t = PHEN_TYPE;
+
     std::unordered_map<std::string, int> mut_counts;
-    double fitness; /// This taxon's fitness (for assessing deleterious mutational steps)
+    DataNode<double, data::Current, data::Range> fitness; /// This taxon's fitness (for assessing deleterious mutational steps)
     PHEN_TYPE phenotype; /// This taxon's phenotype (for assessing phenotypic change)
+
+    void RecordMutation(std::unordered_map<std::string, int> muts) {
+      for (auto mut : muts) {
+        if (Has(mut_counts, mut.first)) {
+          mut_counts[mut.first] += mut.second;
+        } else {
+          mut_counts[mut.first] = mut.second;
+        }
+      }
+    }
+
+    void RecordFitness(double fit) {
+      fitness.Add(fit);
+    }
+
+    void RecordPhenotype(PHEN_TYPE phen) {
+      phenotype = phen;
+    }
+
   };
 
   /// @brief A Taxon represents a type of organism in a phylogeny.
@@ -243,6 +264,26 @@ namespace emp {
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetActive() const { return active_taxa; }
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetAncestors() const { return ancestor_taxa; }
 
+    EMP_CREATE_OPTIONAL_METHOD(RecordMutation, RecordMutation);
+    EMP_CREATE_OPTIONAL_METHOD(RecordFitness, RecordFitness);
+    EMP_CREATE_OPTIONAL_METHOD(RecordPhenotype, RecordPhenotype);
+
+    /// Currently records mutation information if appropriate for DATA_TYPE and also
+    /// adjusts for the fact that mutations aren't happening at birth. 
+    void HandleMutation(Ptr<taxon_t> old_org, ORG_INFO & new_org, std::unordered_map<std::string, int> mut_counts, int update=-1) {
+      auto new_tax = AddOrg(new_org, old_org, update);
+      RemoveOrg(old_org);
+      RecordMutation(new_tax->GetData(), mut_counts);
+    }
+
+    void RecordFitnessData(Ptr<taxon_t> tax, double fitness) {
+      RecordFitness(tax->GetData(), fitness);
+    }
+
+    template <typename phen_t>
+    void RecordPhenotypeData(Ptr<taxon_t> tax, phen_t phen) {
+      RecordPhenotype(tax->GetData(), phen);
+    }
 
     SignalKey OnNew(std::function<void(Ptr<taxon_t>)> & fun) { return on_new_sig.AddAction(fun); }
 
