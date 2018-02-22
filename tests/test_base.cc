@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  Tests for files in the base/ folder.
@@ -340,8 +340,9 @@ TEST_CASE("Test macros", "[tools]")
 
 
   // Test EMP_STRINGIFY_EACH
-  std::array<std::string, 2> test = {EMP_STRINGIFY_EACH(some, words)};
-  std::array<std::string, 9> test9 = {EMP_STRINGIFY_EACH(one, two, three, four, five, six, seven, eight, nine)};
+  std::array<std::string, 2> test = {{ EMP_STRINGIFY_EACH(some, words) }};
+  std::array<std::string, 9> test9 =
+    {{ EMP_STRINGIFY_EACH(one, two, three, four, five, six, seven, eight, nine) }};
 
   REQUIRE(test.size() == 2);
   REQUIRE(test[0] == "some");
