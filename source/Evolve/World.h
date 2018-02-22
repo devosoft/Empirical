@@ -376,7 +376,7 @@ namespace emp {
     DataMonitor<double> & GetFitnessDataNode() {
       Ptr<DataMonitor<double>> node;      
       
-      if (!HasNode(data_nodes, "fitness")) {
+      if (!data_nodes.HasNode("fitness")) {
         node = data_nodes.New("fitness");
 
         // Collect fitnesses each update...

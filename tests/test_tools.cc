@@ -11,8 +11,6 @@
 #define EMP_DECORATE(X) [X]
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]
 #define CATCH_CONFIG_MAIN
-#undef NDEBUG
-#define TDEBUG 1
 
 #include "third-party/Catch/single_include/catch.hpp"
 
@@ -45,7 +43,8 @@
 #include "tools/mem_track.h"
 #include "tools/memo_function.h"
 #include "tools/sequence_utils.h"
-#include "tools/serialize.h"
+// #include "tools/serialize.h"
+#include "tools/set_utils.h"
 #include "tools/stats.h"
 #include "tools/string_utils.h"
 #include "tools/tuple_struct.h"
@@ -930,135 +929,135 @@ TEST_CASE("Test sequence utils", "[tools]")
 
 
 
-struct SerializeTest {
-  int a;
-  float b;        // unimportant data!
-  std::string c;
+// struct SerializeTest {
+//   int a;
+//   float b;        // unimportant data!
+//   std::string c;
 
-  SerializeTest(int _a, float _b, std::string _c) : a(_a), b(_b), c(_c) { ; }
-  EMP_SETUP_DATAPOD(SerializeTest, a, c);
-};
+//   SerializeTest(int _a, float _b, std::string _c) : a(_a), b(_b), c(_c) { ; }
+//   EMP_SETUP_DATAPOD(SerializeTest, a, c);
+// };
 
-struct SerializeTest_D : public SerializeTest {
-  char d = '$';
+// struct SerializeTest_D : public SerializeTest {
+//   char d = '$';
 
-  SerializeTest_D(int _a, float _b, std::string _c, char _d)
-    : SerializeTest(_a, _b, _c), d(_d) { ; }
-  EMP_SETUP_DATAPOD_D(SerializeTest_D, SerializeTest, d);
-};
+//   SerializeTest_D(int _a, float _b, std::string _c, char _d)
+//     : SerializeTest(_a, _b, _c), d(_d) { ; }
+//   EMP_SETUP_DATAPOD_D(SerializeTest_D, SerializeTest, d);
+// };
 
-struct ExtraBase {
-  double e;
+// struct ExtraBase {
+//   double e;
 
-  ExtraBase(double _e) : e(_e) { ; }
-  EMP_SETUP_DATAPOD(ExtraBase, e);
-};
+//   ExtraBase(double _e) : e(_e) { ; }
+//   EMP_SETUP_DATAPOD(ExtraBase, e);
+// };
 
-struct MultiTest : public SerializeTest, public ExtraBase {
-  bool f;
+// struct MultiTest : public SerializeTest, public ExtraBase {
+//   bool f;
 
-  MultiTest(int _a, float _b, std::string _c, double _e, bool _f)
-    : SerializeTest(_a, _b, _c), ExtraBase(_e), f(_f) { ; }
-  EMP_SETUP_DATAPOD_D2(MultiTest, SerializeTest, ExtraBase, f);
-};
+//   MultiTest(int _a, float _b, std::string _c, double _e, bool _f)
+//     : SerializeTest(_a, _b, _c), ExtraBase(_e), f(_f) { ; }
+//   EMP_SETUP_DATAPOD_D2(MultiTest, SerializeTest, ExtraBase, f);
+// };
 
-struct NestedTest {
-  SerializeTest st;
-  std::string name;
-  SerializeTest_D std;
-  MultiTest mt;
+// struct NestedTest {
+//   SerializeTest st;
+//   std::string name;
+//   SerializeTest_D std;
+//   MultiTest mt;
 
-  NestedTest(int a1, float b1, std::string c1,
-             int a2, float b2, std::string c2, char d2,
-             int a3, float b3, std::string c3, double e3, bool f3)
-    : st(a1, b1, c1), name("my_class"), std(a2, b2, c2, d2), mt(a3, b3, c3, e3, f3) { ; }
+//   NestedTest(int a1, float b1, std::string c1,
+//              int a2, float b2, std::string c2, char d2,
+//              int a3, float b3, std::string c3, double e3, bool f3)
+//     : st(a1, b1, c1), name("my_class"), std(a2, b2, c2, d2), mt(a3, b3, c3, e3, f3) { ; }
 
-  EMP_SETUP_DATAPOD(NestedTest, st, name, std, mt);
-};
+//   EMP_SETUP_DATAPOD(NestedTest, st, name, std, mt);
+// };
 
-struct BuiltInTypesTest {
-  const int a;
-  emp::vector<int> int_v;
+// struct BuiltInTypesTest {
+//   const int a;
+//   emp::vector<int> int_v;
 
-  BuiltInTypesTest(int _a, size_t v_size) : a(_a), int_v(v_size) {
-    for (size_t i = 0; i < v_size; i++) int_v[i] = (int)(i*i);
-  }
+//   BuiltInTypesTest(int _a, size_t v_size) : a(_a), int_v(v_size) {
+//     for (size_t i = 0; i < v_size; i++) int_v[i] = (int)(i*i);
+//   }
 
-  EMP_SETUP_DATAPOD(BuiltInTypesTest, a, int_v);
-};
+//   EMP_SETUP_DATAPOD(BuiltInTypesTest, a, int_v);
+// };
 
-TEST_CASE("Test serialize", "[tools]")
-{
-  std::stringstream ss;
-  emp::serialize::DataPod pod(ss);
-
-
-  // Basic test...
-
-  SerializeTest st(7, 2.34, "my_test_string");
-  st.EMP_Store(pod);
-
-  SerializeTest st2(pod);
-
-  REQUIRE(st2.a == 7);                 // Make sure a was reloaded correctly.
-  REQUIRE(st2.c == "my_test_string");  // Make sure c was reloaded correctly.
+// TEST_CASE("Test serialize", "[tools]")
+// {
+//   std::stringstream ss;
+//   emp::serialize::DataPod pod(ss);
 
 
-  // Derived class Test
+//   // Basic test...
 
-  SerializeTest_D stD(10,0.2,"three",'D');
-  stD.EMP_Store(pod);
+//   SerializeTest st(7, 2.34, "my_test_string");
+//   st.EMP_Store(pod);
 
-  SerializeTest_D stD2(pod);
+//   SerializeTest st2(pod);
 
-  REQUIRE(stD2.a == 10);
-  REQUIRE(stD2.c == "three");
-  REQUIRE(stD2.d == 'D');
-
-  // Multiply-derived class Test
-
-  MultiTest stM(111,2.22,"ttt",4.5,true);
-  stM.EMP_Store(pod);
-
-  MultiTest stM2(pod);
+//   REQUIRE(st2.a == 7);                 // Make sure a was reloaded correctly.
+//   REQUIRE(st2.c == "my_test_string");  // Make sure c was reloaded correctly.
 
 
-  REQUIRE(stM2.a == 111);
-  REQUIRE(stM2.c == "ttt");
-  REQUIRE(stM2.e == 4.5);
-  REQUIRE(stM2.f == true);
+//   // Derived class Test
+
+//   SerializeTest_D stD(10,0.2,"three",'D');
+//   stD.EMP_Store(pod);
+
+//   SerializeTest_D stD2(pod);
+
+//   REQUIRE(stD2.a == 10);
+//   REQUIRE(stD2.c == "three");
+//   REQUIRE(stD2.d == 'D');
+
+//   // Multiply-derived class Test
+
+//   MultiTest stM(111,2.22,"ttt",4.5,true);
+//   stM.EMP_Store(pod);
+
+//   MultiTest stM2(pod);
 
 
-  // Nested objects test...
-
-  NestedTest nt(91, 3.14, "magic numbers",
-                100, 0.01, "powers of 10", '1',
-                1001, 1.001, "ones and zeros", 0.125, true);
-  nt.EMP_Store(pod);
-
-  NestedTest nt2(pod);
-
-  REQUIRE(nt2.st.a == 91);
-  REQUIRE(nt2.st.c == "magic numbers");
-  REQUIRE(nt2.name == "my_class");
-  REQUIRE(nt2.std.a == 100);
-  REQUIRE(nt2.std.c == "powers of 10");
-  REQUIRE(nt2.std.d == '1');
-  REQUIRE(nt2.mt.a == 1001);
-  REQUIRE(nt2.mt.c == "ones and zeros");
-  REQUIRE(nt2.mt.e == 0.125);
-  REQUIRE(nt2.mt.f == true);
+//   REQUIRE(stM2.a == 111);
+//   REQUIRE(stM2.c == "ttt");
+//   REQUIRE(stM2.e == 4.5);
+//   REQUIRE(stM2.f == true);
 
 
-  // If we made it this far, everything must have worked!;
+//   // Nested objects test...
 
-  const int v_size = 43;
-  BuiltInTypesTest bitt(91, v_size);
-  bitt.EMP_Store(pod);
+//   NestedTest nt(91, 3.14, "magic numbers",
+//                 100, 0.01, "powers of 10", '1',
+//                 1001, 1.001, "ones and zeros", 0.125, true);
+//   nt.EMP_Store(pod);
+
+//   NestedTest nt2(pod);
+
+//   REQUIRE(nt2.st.a == 91);
+//   REQUIRE(nt2.st.c == "magic numbers");
+//   REQUIRE(nt2.name == "my_class");
+//   REQUIRE(nt2.std.a == 100);
+//   REQUIRE(nt2.std.c == "powers of 10");
+//   REQUIRE(nt2.std.d == '1');
+//   REQUIRE(nt2.mt.a == 1001);
+//   REQUIRE(nt2.mt.c == "ones and zeros");
+//   REQUIRE(nt2.mt.e == 0.125);
+//   REQUIRE(nt2.mt.f == true);
 
 
-  BuiltInTypesTest bitt2(pod);
-}
+//   // If we made it this far, everything must have worked!;
+
+//   const int v_size = 43;
+//   BuiltInTypesTest bitt(91, v_size);
+//   bitt.EMP_Store(pod);
+
+
+//   BuiltInTypesTest bitt2(pod);
+// }
 
 
 
@@ -1271,5 +1270,82 @@ TEST_CASE("Test stats", "[tools]") {
   REQUIRE(emp::MinResult(invert, vec1) == -3);
   REQUIRE(emp::MeanResult(invert, vec1) == Approx(-1.666666667));
   REQUIRE(emp::ApplyFunction(invert, vec1) == emp::vector<int>({-1,-2,-1,-1,-2,-3}));
+
+}
+
+TEST_CASE("Test set utils", "[tools]") {
+  std::set<int> s1; 
+  std::set<int> s2; 
+  std::set<int> comp_set; 
+  emp::vector<int> v1;
+  emp::vector<int> v2;
+
+  s1.insert(1);
+  s1.insert(2);
+  s2.insert(2);
+  s2.insert(3);
+  v1.push_back(1);
+  v1.push_back(3);
+  v2.push_back(4);
+  v2.push_back(1);
+
+  REQUIRE(emp::Has(s1, 1));
+  REQUIRE(!emp::Has(s1, 3));
+
+  comp_set.insert(1);
+  REQUIRE(emp::difference(s1, s2) == comp_set);
+  comp_set.clear();
+  comp_set.insert(3);
+  REQUIRE(emp::difference(s2, s1) == comp_set);
+  comp_set.clear();
+  comp_set.insert(2);
+  REQUIRE(emp::intersection(s1, s2) == comp_set);
+  REQUIRE(emp::intersection(s2, s1) == comp_set);
+  comp_set.clear();
+  comp_set.insert(2);
+  REQUIRE(emp::difference(s1, v1) == comp_set);
+  comp_set.clear();
+  comp_set.insert(1);
+  REQUIRE(emp::intersection(s1, v1) == comp_set);
+  REQUIRE(emp::intersection(v1, s1) == comp_set);
+  REQUIRE(emp::intersection(v2, v1) == comp_set);
+  REQUIRE(emp::intersection(v1, v2) == comp_set);
+  comp_set.clear();
+  comp_set.insert(4);
+  REQUIRE(emp::difference(v2, v1) == comp_set);
+  comp_set.clear();
+  comp_set.insert(1);
+  comp_set.insert(2);
+  comp_set.insert(3);
+  REQUIRE(emp::set_union(s1, s2) == comp_set);
+  REQUIRE(emp::set_union(s2, s1) == comp_set);
+  comp_set.clear();
+  comp_set.insert(1);
+  comp_set.insert(2);
+  comp_set.insert(3);
+  comp_set.insert(4);
+  REQUIRE(emp::set_union(v2, s2) == comp_set);
+  REQUIRE(emp::set_union(s2, v2) == comp_set);
+  comp_set.clear();
+  comp_set.insert(1);
+  comp_set.insert(3);
+  comp_set.insert(4);
+  REQUIRE(emp::set_union(v2, v1) == comp_set);
+  REQUIRE(emp::set_union(v1, v2) == comp_set);
+  comp_set.clear();
+  comp_set.insert(1);
+  comp_set.insert(3);
+  REQUIRE(emp::symmetric_difference(s1, s2) == comp_set);
+  REQUIRE(emp::symmetric_difference(s2, s1) == comp_set);
+  comp_set.clear();
+  comp_set.insert(4);
+  comp_set.insert(3);
+  REQUIRE(emp::symmetric_difference(v1, v2) == comp_set);
+  REQUIRE(emp::symmetric_difference(v2, v1) == comp_set);
+  comp_set.clear();
+  comp_set.insert(2);
+  comp_set.insert(3);
+  REQUIRE(emp::symmetric_difference(v1, s1) == comp_set);
+  REQUIRE(emp::symmetric_difference(s1, v1) == comp_set);
 
 }

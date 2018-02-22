@@ -4,9 +4,6 @@
 #define EMP_TRACK_MEM
 #endif
 
-// #undef NDEBUG
-// #define TDEBUG 1
-
 #include "third-party/Catch/single_include/catch.hpp"
 
 #include "Evolve/Systematics.h"
@@ -331,7 +328,7 @@ TEST_CASE("Run world", "[evo]") {
     TournamentSelect(world, 2, 99);
     // LexicaseSelect(world, fit_set, POP_SIZE-1);
     // EcoSelect(world, fit_fun, fit_set, 100, 5, POP_SIZE-1);
-    for (int i = 0; i < world.GetSize(); i++) {
+    for (size_t i = 0; i < world.GetSize(); i++) {
       record_fit_sig.Trigger(i, world.CalcFitnessID(i));
       // record_phen_sig.Trigger(i, emp::Sum(world.GetGenomeAt(i)));
     }
