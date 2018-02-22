@@ -19,11 +19,41 @@ the `git-scm book <http://git-scm.com/book/en/Git-Branching>`__.
 One-time Preparation
 --------------------
 
-#. Install the dependencies.
+#. Get a `GitHub <http://github.com>`__ account.
 
-   OS X users
+   (We use GitHub to manage Empirical contributions.)
 
-.. TODO: Get a hold of an OSX machine to figure out what has to be done
+#. Fork `github.com/devosoft/Empirical <https://github.com/devosoft/Empirical>`__.
+
+   Visit that page, and then click on the 'fork' button (upper right).
+
+   This makes a copy of the Empirical source code in your own GitHub account.
+   If you have contributor permissions to the main Empirical library, this step
+   is optional (you can instead develop on a branch within the main repo).
+
+#. Clone your copy of Empirical to your local development environment.
+
+   Your clone URL should look something like this::
+
+       https://github.com/bocajnotnef/Empirical.git
+
+   and the UNIX shell command should be::
+
+       git clone https://github.com/bocajnotnef/Empirical.git
+
+   (This makes a local copy of Empirical on your development machine.)
+
+#. Add a git reference to the Empirical repository::
+
+       cd Empirical
+       git remote add upstream https://github.com/devosoft/Empirical.git
+       cd ../
+
+   (This makes it easy for you to pull down the latest changes in the
+   main repository.)
+
+#. Install the development dependencies.
+
 
    Linux users
 
@@ -35,39 +65,15 @@ One-time Preparation
    b.  Run the install-dependencies maketarget::
 
            make install-dependencies
+	
+	This will create a virtual python environment to use for Empirical development.
+	In this environment it will install: `Sphinx <http://sphinx-doc.org/>`__, `Breathe
+   	<https://breathe.readthedocs.org/en/latest/>`__, and `doxygen
+   	<http://www.stack.nl/~dimitri/doxygen/>`__, packages we use to generate the
+   	documentation for Empirical
 
-#. Get a `GitHub <http://github.com>`__ account.
 
-   (We use GitHub to manage Empirical contributions.)
-
-#. Fork `github.com/mercere99/Empirical <https://github.com/devosoft/Empirical>`__.
-
-   Visit that page, and then click on the 'fork' button (upper right).
-
-   (This makes a copy of the Empirical source code in your own GitHub account.)
-
-#. Clone your copy of Empirical to your local development environment.
-
-   Your clone URL should look something like this::
-
-       https://github.com/bocajnotnef/Epirical.git
-
-   and the UNIX shell command should be::
-
-       git clone https://github.com/bocajnotnef/Empirical.git
-
-   (This makes a local copy of Empirical on your development machine.)
-
-#. Add a git reference to the Empirical repository::
-
-       cd Empirical
-       git remote add upstream https://github.com/mercere99/Empirical.git
-       cd ../
-
-   (This makes it easy for you to pull down the latest changes in the
-   main repository.)
-
-#. Create a virtual Python environment within which to work with
+.. #. Create a virtual Python environment within which to work with
    `virtualenv <https://pypi.python.org/pypi/virtualenv>`__::
 
        cd Empirical
@@ -90,7 +96,7 @@ One-time Preparation
    already installed
 
 
-#. Activate the virtualenv and install a few packages::
+.. #. Activate the virtualenv and install a few packages::
 
        source third-party/env/bin/activate
        make install-dependencies
