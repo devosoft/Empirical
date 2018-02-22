@@ -138,11 +138,10 @@ namespace emp {
       size_t mult = 1;
       size_t id = 0;
       for (size_t i = 0; i < traits.size(); i++) {
-        size_t cur_bin = traits[i]->EvalBin(target);
-        id += cur_bin * mult;
+        id += traits[i]->EvalBin(target) * mult;
         mult *= bin_counts[i];
       }
-
+      return id;
     }
   };
 
