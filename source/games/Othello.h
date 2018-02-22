@@ -439,8 +439,8 @@ namespace emp {
     }
 
     /// Print board state to given ostream.
-    // TODO: dark_token_char, light_token_char, open_token_char
-    void Print(std::ostream & os=std::cout) {
+    void Print(std::ostream & os=std::cout, std::string dark_token = "D",
+                std::string light_token = "L", std::string open_space = "O") {
       // Output column labels.
       unsigned char letter = 'A';
       os << "\n  ";
@@ -451,9 +451,9 @@ namespace emp {
         os << y << " ";
         for (size_t x = 0; x < board_size; ++x) {
           BoardSpace space = GetPosValue(x,y);
-          if (space == DarkDisk())  { os << "D "; }
-          else if (space == LightDisk()) { os << "L "; }
-          else { os << "O "; }
+          if (space == DarkDisk())  { os << dark_token << " "; }
+          else if (space == LightDisk()) { os << light_token << " "; }
+          else { os << open_space << " "; }
         }
         os << "\n";
       }
