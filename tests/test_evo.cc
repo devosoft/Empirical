@@ -100,7 +100,7 @@ TEST_CASE("Test Stats/NK-Grid", "[stats]"){
   std::ifstream correct, test;
 
   test.open("temp/Result-grid.csv");
-  correct.open("test-data/Result-grid.csv");
+  correct.open("data/Result-grid.csv");
 
   std::string line = "";
   std::vector<std::string> file1, file2;
@@ -203,7 +203,7 @@ TEST_CASE("Test-stats-NK-Mixed","[stats]"){
   std::ifstream correct, test;
 
   test.open("temp/Result-mixed.csv");
-  correct.open("test-data/Result-mixed.csv");
+  correct.open("data/Result-mixed.csv");
 
   std::string line = "";
   std::vector<std::string> file1, file2;

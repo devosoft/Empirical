@@ -43,7 +43,7 @@ D3::Selection sub_div;
 void MakeLineGraph(std::string callback) {
   doc << line_graph;
   line_graph.SetDrawCallback(callback);
-  line_graph.LoadDataFromFile("/base/tests/test-data/test-line-graph.csv");
+  line_graph.LoadDataFromFile("/base/tests/data/test-line-graph.csv");
 };
 
 void TestAnimateStep_LineGraph(std::string callback) {
@@ -58,7 +58,7 @@ void ClearLineGraph() {
 void MakeTreeViz(std::string callback) {
   tree_viz << tree;
   tree.SetDrawCallback(callback);
-  tree.LoadDataFromFile("/base/tests/test-data/lineage-example.json");
+  tree.LoadDataFromFile("/base/tests/data/lineage-example.json");
 };
 
 void TestAnimateStep_Tree(std::string callback) {

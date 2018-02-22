@@ -156,8 +156,7 @@ namespace emp {
     // Configuration settings
     std::string name;                  ///< Name of this world (for use in configuration.)
     bool cache_on;                     ///< Should we be caching fitness values?
-    size_t size_x;                     ///< If a grid, track width; if pools, track pool size
-    size_t size_y;                     ///< If a grid, track height; if pools, track num pools.
+    std::vector<size_t> pop_sizes;     ///< Sizes of population dimensions (eg, 2 vals for grid)
     emp::TraitSet<ORG> phenotypes;     ///< What phenotypes are we tracking?
     emp::vector<World_file> files;     ///< Output files.
 
@@ -210,7 +209,7 @@ namespace emp {
     World(Ptr<Random> rnd=nullptr, std::string _name="")
       : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), update(0), fit_cache()
       , genotypes(), next_genotypes()
-      , name(_name), cache_on(false), size_x(0), size_y(0), phenotypes(), files()
+      , name(_name), cache_on(false), pop_sizes(1,0), phenotypes(), files()
       , is_synchronous(false), is_space_structured(false), is_pheno_structured(false)
       , data_node_fitness(nullptr)
       , fun_calc_fitness(), fun_do_mutations(), fun_print_org(), fun_get_genome()
@@ -252,10 +251,10 @@ namespace emp {
     size_t GetUpdate() const { return update; }
 
     /// How many cells wide is the world? (assumes grids are active.)
-    size_t GetWidth() const { return size_x; }
+    size_t GetWidth() const { return pop_sizes[0]; }
 
     /// How many cells tall is the world? (assumes grids are active.)
-    size_t GetHeight() const { return size_y; }
+    size_t GetHeight() const { return pop_sizes[1]; }
 
     /// Does the specified cell ID have an organism in it?
     bool IsOccupied(size_t i) const { return pop[i] != nullptr; }
@@ -304,8 +303,8 @@ namespace emp {
     }
 
     /// Retrieve a const reference to the organsim as the specified x,y coordinates.
-    /// (currently used only in a grid world)
-    ORG & GetOrg(size_t x, size_t y) { return GetOrg(x+y*size_x); }
+    /// @CAO: Technically, we should set this up with any number of coordinates.
+    ORG & GetOrg(size_t x, size_t y) { return GetOrg(x+y*GetWidth()); }
 
     /// Retrive a pointer to the contents of a speciefied cell; will be nullptr if the cell is
     /// not occupied.
@@ -580,8 +579,10 @@ namespace emp {
 
     /// Change the size of the world based on width and height.
     void Resize(size_t new_width, size_t new_height) {
+      // @CAO: Technically we should allow any number of dimensions.
       Resize(new_width * new_height);
-      size_x = new_width; size_y = new_height;
+      pop_sizes.resize(2);
+      pop_sizes[0] = new_width; pop_sizes[1] = new_height;
     }
 
     /// AddOrgAt is the core function to add organisms to active population (others must go through here)
@@ -766,7 +767,7 @@ namespace emp {
 
   template<typename ORG>
   void World<ORG>::SetWellMixed(bool synchronous_gen) {
-    size_x = 0; size_y = 0;
+    pop_sizes.resize(0);
     is_synchronous = synchronous_gen;
     is_space_structured = false;
     is_pheno_structured = false;
@@ -801,8 +802,7 @@ namespace emp {
 
   template<typename ORG>
   void World<ORG>::SetGrid(size_t width, size_t height, bool synchronous_gen) {
-    size_x = width;  size_y = height;
-    Resize(size_x * size_y);
+    Resize(width, height);
     is_synchronous = synchronous_gen;
     is_space_structured = true;
     is_pheno_structured = false;
@@ -816,6 +816,8 @@ namespace emp {
     // neighbors are in 9-sized neighborhood.
     fun_get_neighbor = [this](size_t id) {
       emp_assert(random_ptr);
+      const size_t size_x = pop_sizes[0];
+      const size_t size_y = pop_sizes[1];
       const int offset = random_ptr->GetInt(9);
       const int rand_x = (int) (id%size_x) + offset%3 - 1;
       const int rand_y = (int) (id/size_x) + offset/3 - 1;
@@ -843,8 +845,7 @@ namespace emp {
 
   template<typename ORG>
   void World<ORG>::SetPools(size_t num_pools, size_t pool_size, bool synchronous_gen) {
-    size_x = pool_size;  size_y = num_pools;
-    Resize(size_x * size_y);
+    Resize(pool_size, num_pools);
     is_synchronous = synchronous_gen;
     is_space_structured = true;
     is_pheno_structured = false;
@@ -852,7 +853,7 @@ namespace emp {
     // -- Setup functions --
     // Inject in a empty pool -or- randomly if none empty
     fun_add_inject = [this](Ptr<ORG> new_org) {
-      for (size_t id = 0; id < pop.size(); id += size_x) {
+      for (size_t id = 0; id < pop.size(); id += pop_sizes[0]) {
         if (pop[id] == nullptr) return AddOrgAt(new_org, id);
       }
       return AddOrgAt(new_org, GetRandomCellID());
@@ -861,6 +862,7 @@ namespace emp {
     // neighbors are everyone in the same pool.
     fun_get_neighbor = [this](size_t id) {
       emp_assert(random_ptr);
+      const size_t size_x = pop_sizes[0];
       return (id / size_x) * size_x + random_ptr->GetUInt(size_x);
     };
 
@@ -868,6 +870,7 @@ namespace emp {
       // Place births in the next open spot in the new pool (or randomly if full!)
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
         emp_assert(new_org);                                  // New organism must exist.
+        const size_t size_x = pop_sizes[0];
         const size_t pool_id = parent_id / size_x;
         const size_t start_id = pool_id * size_x;
         for (size_t id = start_id; id < start_id+size_x; id++) {
@@ -1185,6 +1188,8 @@ namespace emp {
   template<typename ORG>
   void World<ORG>::PrintGrid(std::ostream& os,
                              const std::string & empty, const std::string & spacer) {
+    const size_t size_x = pop_sizes[0];
+    const size_t size_y = pop_sizes[1];
     for (size_t y=0; y < size_y; y++) {
       for (size_t x = 0; x < size_x; x++) {
         Ptr<ORG> org = GetOrgPtr(x+y*size_x);
