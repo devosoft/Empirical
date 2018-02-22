@@ -19,7 +19,6 @@
 #include "../tools/math.h"
 
 namespace emp {
-  // TODO: Make direction IDs move in-order clock-wise. (instead of current setup)
   /// NOTE: This game could be made more black-box.
   ///   - Hide almost everything. Only give users access to game-advancing functions (don't allow
   ///     willy-nilly board manipulation, etc). This would let us make lots of assumptions about
@@ -27,11 +26,11 @@ namespace emp {
   ///     times during a turn.
   class Othello {
   public:
-    enum BoardSpace { DARK, LIGHT, OPEN };
+    enum BoardSpace { DARK, LIGHT, OPEN };        ///< All possible states of a board space.
     using board_t = emp::vector<BoardSpace>;
     // Player IDs.
-    static constexpr size_t PLAYER_ID__DARK = 0;
-    static constexpr size_t PLAYER_ID__LIGHT = 1;
+    static constexpr size_t PLAYER_ID__DARK = 0;  ///< Darkplayer ID
+    static constexpr size_t PLAYER_ID__LIGHT = 1; ///< Lightplayer ID
     // Direction IDs.
     static constexpr size_t DIRECTION_ID__N = 0;
     static constexpr size_t DIRECTION_ID__NE = 1;
@@ -42,7 +41,7 @@ namespace emp {
     static constexpr size_t DIRECTION_ID__SW = 6;
     static constexpr size_t DIRECTION_ID__NW = 7;
     // Useful array of all directions.
-    static constexpr size_t NUM_DIRECTIONS = 8;
+    static constexpr size_t NUM_DIRECTIONS = 8;   ///< Number of neighbors each board space has.
 
     static inline constexpr size_t DarkPlayerID() { return PLAYER_ID__DARK; }
     static inline constexpr size_t LightPlayerID() { return PLAYER_ID__LIGHT; }
@@ -68,10 +67,12 @@ namespace emp {
     size_t board_size;    ///< Game board is board_size X board_size
     board_t game_board;   ///< Game board
 
+    /// Internal function for accessing the neighbors vector.
     size_t GetNeighborIndex(size_t posID, size_t dir) const {
       return (posID * NUM_DIRECTIONS) + dir;
     }
 
+    /// Internal GetNeighbor function (actually does work).
     int GetNeighbor__Internal(size_t id, size_t dir) const {
       emp_assert(dir >= 0 && dir <= 7);
       size_t x = GetPosX(id);
@@ -79,7 +80,8 @@ namespace emp {
       return GetNeighbor__Internal(x, y, dir);
     }
 
-    /// Get location adjacent to x,y position on board in given direction.
+    /// Internal function to get location adjacent to x,y position on board in given direction.
+    /// (actually does work) Used when generating the adjacency network.
     int GetNeighbor__Internal(size_t x, size_t y, size_t dir) const {
       emp_assert(dir >= 0 && dir <= 7);
       int facing_x = 0, facing_y = 0;
@@ -100,6 +102,8 @@ namespace emp {
       return GetPosID(facing_x, facing_y);
     }
 
+    /// Generates neighbor network (populates neighbors member variable).
+    /// Only used during construction.
     void GenerateNeighborNetwork() {
       neighbors.resize(game_board.size() * NUM_DIRECTIONS);
       for (size_t posID = 0; posID < game_board.size(); ++posID) {
@@ -110,7 +114,6 @@ namespace emp {
     }
 
   public:
-
     Othello(size_t side_len)
       : ALL_DIRECTIONS(), board_size(side_len), game_board(board_size*board_size)
     {
@@ -122,6 +125,7 @@ namespace emp {
 
     ~Othello() { ; }
 
+    /// Reset the board to the starting condition.
     void Reset() {
       // Reset the board.
       for (size_t i = 0; i < game_board.size(); ++i) game_board[i] = OpenSpace();
@@ -140,11 +144,9 @@ namespace emp {
       cur_player = DarkPlayerID();
     }
 
-    ///
     size_t GetBoardWidth() const { return board_size; }
     size_t GetBoardHeight() const { return board_size; }
     size_t GetBoardSize() const { return game_board.size(); }
-
     size_t GetCurPlayer() const { return cur_player; }
 
     /// Get opponent ID of give player ID.
@@ -163,6 +165,7 @@ namespace emp {
     /// Get board ID of  given an x, y position.
     size_t GetPosID(size_t x, size_t y) const { return (y * board_size) + x; }
 
+    /// Is the given x,y position valid?
     bool IsValidPos(size_t x, size_t y) const {
       return x < board_size && y < board_size;
     }
@@ -230,10 +233,10 @@ namespace emp {
       return GetPosOwner(GetPosID(x, y));
     }
 
-    // TODO: BoardAsInput ==> Should not be in Othello.h
     board_t & GetBoard() { return game_board; }
     const board_t & GetBoard() const { return game_board; }
 
+    /// Is give move (move_x, move_y) valid?
     bool IsMoveValid(size_t playerID, size_t move_x, size_t move_y) {
       return IsMoveValid(playerID, GetPosID(move_x, move_y));
     }
@@ -277,6 +280,7 @@ namespace emp {
       return flip_list;
     }
 
+    /// Get a list of valid move options for given disk_type.
     emp::vector<size_t> GetMoveOptions(BoardSpace disk_type) {
       return GetMoveOptions(GetPlayerID(disk_type));
     }
@@ -291,6 +295,7 @@ namespace emp {
       return valid_moves;
     }
 
+    /// Get the current score for a given player.
     double GetScore(size_t playerID) {
       emp_assert(IsValidPlayer(playerID));
       double score = 0;
@@ -347,10 +352,12 @@ namespace emp {
       SetPos(id, GetDiskType(playerID));
     }
 
+    /// Set positions given by ids to belong to given player.
     void SetPositions(emp::vector<size_t> ids, size_t playerID) {
       for (size_t i = 0; i < ids.size(); ++i) SetPos(ids[i], playerID);
     }
 
+    /// Set positions given by ids to be given board space type.
     void SetPositions(emp::vector<size_t> ids, BoardSpace space) {
       for (size_t i = 0; i < ids.size(); ++i) SetPos(ids[i], space);
     }
@@ -370,8 +377,10 @@ namespace emp {
       }
     }
 
+    /// Set current board to be the same as board from other othello game.
     void SetBoard(const Othello & other_othello) { SetBoard(other_othello.GetBoard()); }
 
+    /// Set the current player.
     void SetCurPlayer(size_t playerID) {
       emp_assert(IsValidPlayer(playerID));
       cur_player = playerID;
