@@ -63,29 +63,32 @@ One-time Preparation
 
            sudo apt-get install python-virtualenv python-pip gcc g++ git gcovr bison flex
 
-	OS X users and others may need to download virtualenv first::
 
-	curl -O https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.11.6.tar.gz
-	tar xzf virtualenv*
-	cd virtualenv-*; python2.7 virtualenv.py ../env; cd ..
+       OS X users and others may need to download virtualenv first::
 
-   	`Mac ports <https://www.macports.org/>`__ users on the OS X platform can
-   	install pip by execution from the command line::
+	   curl -O https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.11.6.tar.gz
+	   tar xzf virtualenv*
+	   cd virtualenv-*; python2.7 virtualenv.py ../env; cd ..
+
+
+      `Mac ports <https://www.macports.org/>`__ users on the OS X platform can
+         install pip by execution from the command line::
      
-       	sudo port install py27-pip
-     
-   	`Homebrew <http://brew.sh/>`__ users on the OS X platform will have pip
+       	   sudo port install py27-pip
+
+
+      `Homebrew <http://brew.sh/>`__ users on the OS X platform will have pip
    	 already installed
 
 b.  Run the install-dependencies maketarget::
 
            make install-dependencies
 	
-	This will create a virtual python environment to use for Empirical development.
-	In this environment it will install: `Sphinx <http://sphinx-doc.org/>`__, `Breathe
-   	<https://breathe.readthedocs.org/en/latest/>`__, and `doxygen
-   	<http://www.stack.nl/~dimitri/doxygen/>`__, packages we use to generate the
-   	documentation for Empirical
+    This will create a virtual python environment to use for Empirical development.
+    In this environment it will install: `Sphinx <http://sphinx-doc.org/>`__, `Breathe
+    <https://breathe.readthedocs.org/en/latest/>`__, and `doxygen
+    <http://www.stack.nl/~dimitri/doxygen/>`__, packages we use to generate the
+    documentation for Empirical
 
 
 .. #. Create a virtual Python environment within which to work with
