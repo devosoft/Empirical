@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  Tests for files in the tools/ folder.
@@ -49,6 +49,7 @@
 #include "tools/string_utils.h"
 #include "tools/tuple_struct.h"
 #include "tools/unit_tests.h"
+#include "tools/vector_utils.h"
 
 // currently these have no coveage; we include them so we get metrics on them
 // this doesn't actually work--TODO: figure out why this doesn't work
@@ -1180,7 +1181,7 @@ TEST_CASE("Test string utils", "[tools]")
   std::string cat_full = emp::to_string(cat_a, cat_b, cat_c, cat_d);
 
   REQUIRE(cat_full == "ABC123");
-  std::array<int, 3> test_arr({4, 2, 5});
+  std::array<int, 3> test_arr({{ 4, 2, 5 }});
   REQUIRE(emp::to_string(test_arr) == "[ 4 2 5 ]");
 }
 
@@ -1348,4 +1349,16 @@ TEST_CASE("Test set utils", "[tools]") {
   REQUIRE(emp::symmetric_difference(v1, s1) == comp_set);
   REQUIRE(emp::symmetric_difference(s1, v1) == comp_set);
 
+}
+
+TEST_CASE("Test vector utils", "[tools]") {
+  emp::vector<int> v1({6,2,5,1,3});
+  emp::Sort(v1);
+  REQUIRE(v1 == emp::vector<int>({1,2,3,5,6}));
+  REQUIRE(emp::FindPos(v1, 3) == 2);
+  REQUIRE(emp::Sum(v1) == 17);
+  REQUIRE(emp::Has(v1, 3));
+  REQUIRE(!emp::Has(v1, 4));
+  REQUIRE(emp::Product(v1) == 180);
+  REQUIRE(emp::Slice(v1,1,3) == emp::vector<int>({2,3}));
 }

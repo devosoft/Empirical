@@ -47,7 +47,7 @@ namespace emp {
     return sum;
   }
 
-  /// Multiple all of the contents of a vector.
+  /// Multiply all of the contents of a vector.
   template <typename T>
   T Product(const emp::vector<T> & v) {
     T product = 1;
@@ -60,7 +60,9 @@ namespace emp {
   void Sort(emp::vector<T> & v, Ts... args) {
     std::sort(v.begin(), v.end(), std::forward<Ts>(args)...);
   }
-  
+
+  /// Returns a vector containing a chunk of elements from @param vec
+  /// starting at @param start and going up to but not including @param stop.
   template <typename T>
   emp::vector<T> Slice(emp::vector<T> vec, int start, int stop) {
     emp_assert(start < stop, start, stop);
