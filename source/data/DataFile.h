@@ -170,7 +170,53 @@ namespace emp {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMax(); };
       return Add(in_fun, key, desc);
     }
-    
+
+    /// Add a function that always pulls the variance from the DataNode @param node
+    /// Requires that @param node have the data::Stats or data::FullStats modifier.
+    template <typename VAL_TYPE, emp::data... MODS>
+    size_t AddVariance(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
+      std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetVariance(); };
+      return Add(in_fun, key, desc);
+    }
+
+    /// Add a function that always pulls the standard deviation from the DataNode @param node
+    /// Requires that @param node have the data::Stats or data::FullStats modifier.
+    template <typename VAL_TYPE, emp::data... MODS>
+    size_t AddStandardDeviation(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
+      std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetStandardDeviation(); };
+      return Add(in_fun, key, desc);
+    }
+
+    /// Add a function that always pulls the skewness from the DataNode @param node
+    /// Requires that @param node have the data::Stats or data::FullStats modifier.
+    template <typename VAL_TYPE, emp::data... MODS>
+    size_t AddSkew(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
+      std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetSkew(); };
+      return Add(in_fun, key, desc);
+    }
+
+    /// Add a function that always pulls the kurtosis from the DataNode @param node
+    /// Requires that @param node have the data::Stats or data::FullStats modifier.
+    template <typename VAL_TYPE, emp::data... MODS>
+    size_t AddKurtosis(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
+      std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetKurtosis(); };
+      return Add(in_fun, key, desc);
+    }
+
+    /// Add multiple functions that pull all stats measurements from the DataNode @param node
+    /// Requires that @param node have the data::Stats or data::FullStats modifier.
+    /// @param key and @param desc will have the name of the stat appended to the beginning.
+    /// Note: excludes standard deviation, because it is easily calculated from variance
+    template <typename VAL_TYPE, emp::data... MODS>
+    void AddStats(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
+      AddMean(node, "mean_" + key, "mean of " + desc);
+      AddMin(node, "min_" + key, "min of " + desc);
+      AddMax(node, "max_" + key, "max of " + desc);
+      AddVariance(node, "variance_" + key, "variance of " + desc);
+      AddSkew(node, "skew_" + key, "skew of " + desc);
+      AddKurtosis(node, "kurtosis_" + key, "kurtosis of " + desc);
+    }
+
     /// Add a function that always pulls the count of the @param bin_id 'th bin of the histogram
     /// from @param node. Requires that @param node have the data::Histogram modifier and at least
     /// @bin_id bins.
