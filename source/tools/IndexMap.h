@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  IndexMap.h
  *  @brief A simple class to weight items differently within a container and return the correct index.
@@ -104,7 +104,6 @@ namespace emp {
 
     /// Change the number of indecies in the map, using the default weight for new indices.
     void Resize(size_t new_size, double def_value) {
-      const size_t old_size = item_weight.size();
       item_weight.resize(new_size, def_value);   // Update the size (new weights default to zero)
       tree_weight.resize(new_size);              // Update the size
       needs_refresh = true;                      // Update the tree weights when needed.
