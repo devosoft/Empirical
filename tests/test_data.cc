@@ -4,9 +4,6 @@
 #define EMP_TRACK_MEM
 #endif
 
-#undef NDEBUG
-#define TDEBUG 1
-
 #include "third-party/Catch/single_include/catch.hpp"
 
 #include "data/DataNode.h"
@@ -348,3 +345,22 @@ TEST_CASE("Test DataFile", "[data]") {
 
     REQUIRE(compareFiles("test_file.dat", "data/test_file.dat"));
 }
+
+// TEST_CASE("Test histogram", "[data]") {
+//     emp::DataNode<double, emp::data::Current, emp::data::Range, emp::data::Histogram, emp::data::Pull, emp::data::Log> data;
+//     data.SetupBins(1,21,10);
+//     data.Add(1,2,1,19);
+
+//     REQUIRE(data.GetHistMin() == 1);
+//     REQUIRE(data.GetHistWidth(5) == 2);
+
+//     REQUIRE(data.GetBinMins() == emp::vector<double>({1,3,5,7,9,11,13,15,17,19}));
+
+//     std::cout << emp::to_string(data.GetBinMins()) << std::endl;
+//     std::cout << emp::to_string(data.GetHistCounts()) << std::endl;
+//     REQUIRE(data.GetHistCount(9) == 1);
+//     REQUIRE(data.GetHistCounts() == emp::vector<size_t>({3,0,0,0,0,0,0,0,0,1}));
+
+//     data.Reset();
+//     REQUIRE(data.GetHistCounts() == emp::vector<size_t>({0,0,0,0,0,0,0,0,0,0}));    
+// }
