@@ -7,6 +7,9 @@
  * have non-null DATA_TYPES.
 **/
 
+#ifndef EMP_EVO_SYSTEMATICS_ANALYSIS_H
+#define EMP_EVO_SYSTEMATICS_ANALYSIS_H
+
 #include "Systematics.h"
 
 
@@ -88,3 +91,5 @@ namespace emp {
     }
 
 };
+
+#endif

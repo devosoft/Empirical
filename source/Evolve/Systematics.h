@@ -268,21 +268,18 @@ namespace emp {
     EMP_CREATE_OPTIONAL_METHOD(RecordFitness, RecordFitness);
     EMP_CREATE_OPTIONAL_METHOD(RecordPhenotype, RecordPhenotype);
 
-    /// Currently records mutation information if appropriate for DATA_TYPE and also
-    /// adjusts for the fact that mutations aren't happening at birth. 
-    void HandleMutation(Ptr<taxon_t> old_org, ORG_INFO & new_org, std::unordered_map<std::string, int> mut_counts, int update=-1) {
-      auto new_tax = AddOrg(new_org, old_org, update);
-      RemoveOrg(old_org);
-      RecordMutation(new_tax->GetData(), mut_counts);
+    /// Currently records mutation information if appropriate for DATA_TYPE 
+    void RecordMutationData(Ptr<taxon_t> org, std::unordered_map<std::string, int> mut_counts) {
+      RecordMutation(org->GetData(), mut_counts);
     }
 
-    void RecordFitnessData(Ptr<taxon_t> tax, double fitness) {
-      RecordFitness(tax->GetData(), fitness);
+    void RecordFitnessData(Ptr<taxon_t> org, double fitness) {
+      RecordFitness(org->GetData(), fitness);
     }
 
     template <typename phen_t>
-    void RecordPhenotypeData(Ptr<taxon_t> tax, phen_t phen) {
-      RecordPhenotype(tax->GetData(), phen);
+    void RecordPhenotypeData(Ptr<taxon_t> org, phen_t phen) {
+      RecordPhenotype(org->GetData(), phen);
     }
 
     SignalKey OnNew(std::function<void(Ptr<taxon_t>)> & fun) { return on_new_sig.AddAction(fun); }
@@ -292,6 +289,16 @@ namespace emp {
     /// Argument: Pounter to taxon
     SignalKey OnPrune(std::function<void(Ptr<taxon_t>)> & fun) { return on_prune_sig.AddAction(fun); }
 
+    // Shoot, there could be multiple taxa with the same info
+    // Ptr<taxon_t> GetActiveTaxon(const ORG_INFO & org) {
+    //   for (auto tax : active_taxa) {
+    //     if (tax->GetInfo() == org) {
+    //       return tax;
+    //     }
+    //   }
+    //   emp_assert(false, "No matching active taxa.");
+    //   return nullptr;
+    // }
 
     /// How many taxa are still active in the population?
     size_t GetNumActive() const { return active_taxa.size(); }
@@ -339,7 +346,7 @@ namespace emp {
      * 
      * (From Vane-Wright et al., 1991; reviewed in Winter et al., 2013)
     */
-    double GetTaxonDistinctiveness(Ptr<taxon_t> tax) const {return 1/GetDistanceToRoot(tax);}
+    double GetTaxonDistinctiveness(Ptr<taxon_t> tax) const {return 1.0/GetDistanceToRoot(tax);}
 
     /** This metric (from Isaac, 2007; reviewd in Winter et al., 2013) measures how
      * distinct @param tax is from the rest of the population, weighted for the amount of
@@ -386,18 +393,18 @@ namespace emp {
           // std::cout << (int)(test_taxon == mrca) << " depth: " << depth << " divisor: " << divisor << std::endl;
           total += depth/divisor;
           return total;
-        } else if (test_taxon->GetNumOff() > 1) {
-          // This is a branch point. We need to add the things on the other branch to the divisor..
-          // std::cout << "Branch point" << " depth: " << depth << " divisor: " << divisor << std::endl;
-          total += depth/divisor;
-          depth = 0;
-          divisor = test_taxon->GetTotalOffspring();
         } else if (test_taxon->GetNumOrgs() > 0) { 
           // If this taxon is still alive we need to update the divisor
           // std::cout << "Alive point" << " depth: " << depth << " divisor: " << divisor << std::endl;
           total += depth/divisor;
           depth = 0;
           divisor = test_taxon->GetTotalOffspring() + 1;
+        } else if (test_taxon->GetNumOff() > 1) {
+          // This is a branch point. We need to add the things on the other branch to the divisor..
+          // std::cout << "Branch point" << " depth: " << depth << " divisor: " << divisor << std::endl;
+          total += depth/divisor;
+          depth = 0;
+          divisor = test_taxon->GetTotalOffspring();
         }
 
         test_taxon = test_taxon->GetParent();
@@ -549,8 +556,8 @@ namespace emp {
 
       if (dists.size() != (active_taxa.size()*(active_taxa.size()-1))/2) {
         // The tree is not connected
-        // Technically this means the mean distance is infinite.
-        return -1;
+        // It's possible we should do something different here...
+        return dists;
       }
 
       // std::cout << "Total: " << total << "Dists: " << dists.size() << std::endl;
