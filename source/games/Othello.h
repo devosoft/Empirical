@@ -19,7 +19,7 @@
 #include "../tools/math.h"
 
 namespace emp {
-  // TODO: caching status information.
+  // TODO: Make direction IDs move in-order clock-wise. (instead of current setup)
   /// NOTE: This game could be made more black-box.
   ///   - Hide almost everything. Only give users access to game-advancing functions (don't allow
   ///     willy-nilly board manipulation, etc). This would let us make lots of assumptions about
@@ -28,42 +28,21 @@ namespace emp {
   class Othello {
   public:
     enum BoardSpace { DARK, LIGHT, OPEN };
-
     using board_t = emp::vector<BoardSpace>;
-
-  protected:
-
-    emp::vector<size_t> ALL_DIRECTIONS;
-
+    // Player IDs.
     static constexpr size_t PLAYER_ID__DARK = 0;
     static constexpr size_t PLAYER_ID__LIGHT = 1;
+    // Direction IDs.
     static constexpr size_t DIRECTION_ID__N = 0;
-    static constexpr size_t DIRECTION_ID__S = 1;
+    static constexpr size_t DIRECTION_ID__NE = 1;
     static constexpr size_t DIRECTION_ID__E = 2;
-    static constexpr size_t DIRECTION_ID__W = 3;
-    static constexpr size_t DIRECTION_ID__NE = 4;
-    static constexpr size_t DIRECTION_ID__NW = 5;
-    static constexpr size_t DIRECTION_ID__SE = 6;
-    static constexpr size_t DIRECTION_ID__SW = 7;
-
-    bool over = false;    ///< Is the game over?
-    size_t cur_player;    ///< Is it DARK player's turn?
-
-    size_t board_size;    ///< Game board is board_size X board_size
-
-    board_t game_board;  ///< Game board
-
-  public:
-
-    Othello(size_t side_len)
-      : board_size(side_len), game_board(board_size*board_size)
-    {
-      emp_assert(board_size >= 4);
-      ALL_DIRECTIONS = {N(), S(), E(), W(), NE(), NW(), SE(), SW()};
-      Reset();
-    }
-
-    ~Othello() { ; }
+    static constexpr size_t DIRECTION_ID__SE = 3;
+    static constexpr size_t DIRECTION_ID__S = 4;
+    static constexpr size_t DIRECTION_ID__W = 5;
+    static constexpr size_t DIRECTION_ID__SW = 6;
+    static constexpr size_t DIRECTION_ID__NW = 7;
+    // Useful array of all directions.
+    static constexpr size_t NUM_DIRECTIONS = 8;
 
     static inline constexpr size_t DarkPlayerID() { return PLAYER_ID__DARK; }
     static inline constexpr size_t LightPlayerID() { return PLAYER_ID__LIGHT; }
@@ -79,6 +58,69 @@ namespace emp {
     static inline constexpr size_t SE() { return DIRECTION_ID__SE; }
     static inline constexpr size_t SW() { return DIRECTION_ID__SW; }
 
+  protected:
+
+    std::array<size_t, NUM_DIRECTIONS> ALL_DIRECTIONS;
+    emp::vector<int> neighbors; ///< On construction, pre-compute adjacency network.
+
+    bool over = false;    ///< Is the game over?
+    size_t cur_player;    ///< Is it DARK player's turn?
+    size_t board_size;    ///< Game board is board_size X board_size
+    board_t game_board;   ///< Game board
+
+    size_t GetNeighborIndex(size_t posID, size_t dir) const {
+      return (posID * NUM_DIRECTIONS) + dir;
+    }
+
+    int GetNeighbor__Internal(size_t id, size_t dir) const {
+      emp_assert(dir >= 0 && dir <= 7);
+      size_t x = GetPosX(id);
+      size_t y = GetPosY(id);
+      return GetNeighbor__Internal(x, y, dir);
+    }
+
+    /// Get location adjacent to x,y position on board in given direction.
+    int GetNeighbor__Internal(size_t x, size_t y, size_t dir) const {
+      emp_assert(dir >= 0 && dir <= 7);
+      int facing_x = 0, facing_y = 0;
+      switch(dir) {
+        case N():  { facing_x = x;   facing_y = y-1; break; }
+        case S():  { facing_x = x;   facing_y = y+1; break; }
+        case E():  { facing_x = x+1; facing_y = y;   break; }
+        case W():  { facing_x = x-1; facing_y = y;   break; }
+        case NE(): { facing_x = x+1; facing_y = y-1; break; }
+        case NW(): { facing_x = x-1; facing_y = y-1; break; }
+        case SE(): { facing_x = x+1; facing_y = y+1; break; }
+        case SW(): { facing_x = x-1; facing_y = y+1; break; }
+        default:
+          std::cout << "Bad direction!" << std::endl;
+          break;
+      }
+      if (!IsValidPos(facing_x, facing_y)) return -1;
+      return GetPosID(facing_x, facing_y);
+    }
+
+    void GenerateNeighborNetwork() {
+      neighbors.resize(game_board.size() * NUM_DIRECTIONS);
+      for (size_t posID = 0; posID < game_board.size(); ++posID) {
+        for (size_t dir : ALL_DIRECTIONS) {
+          neighbors[GetNeighborIndex(posID, dir)] = GetNeighbor__Internal(posID, dir);
+        }
+      }
+    }
+
+  public:
+
+    Othello(size_t side_len)
+      : ALL_DIRECTIONS(), board_size(side_len), game_board(board_size*board_size)
+    {
+      emp_assert(board_size >= 4);
+      ALL_DIRECTIONS = {{N(), NE(), E(), SE(), S(), W(), SW(), NW()}};
+      GenerateNeighborNetwork();
+      Reset();
+    }
+
+    ~Othello() { ; }
 
     void Reset() {
       // Reset the board.
@@ -135,30 +177,14 @@ namespace emp {
     /// GetNeighbor function is save with garbage ID values.
     int GetNeighbor(size_t id, size_t dir) const {
       emp_assert(dir >= 0 && dir <= 7);
-      size_t x = GetPosX(id);
-      size_t y = GetPosY(id);
-      return GetNeighbor(x, y, dir);
+      if (!IsValidPos(id)) return -1; // If not valid position to lookup, return -1.
+      return neighbors[GetNeighborIndex(id, dir)];
     }
 
     /// Get location adjacent to x,y position on board in given direction.
     int GetNeighbor(size_t x, size_t y, size_t dir) const {
       emp_assert(dir >= 0 && dir <= 7);
-      int facing_x = 0, facing_y = 0;
-      switch(dir) {
-        case N():  { facing_x = x;   facing_y = y-1; break; }
-        case S():  { facing_x = x;   facing_y = y+1; break; }
-        case E():  { facing_x = x+1; facing_y = y;   break; }
-        case W():  { facing_x = x-1; facing_y = y;   break; }
-        case NE(): { facing_x = x+1; facing_y = y-1; break; }
-        case NW(): { facing_x = x-1; facing_y = y-1; break; }
-        case SE(): { facing_x = x+1; facing_y = y+1; break; }
-        case SW(): { facing_x = x-1; facing_y = y+1; break; }
-        default:
-          std::cout << "Bad direction!" << std::endl;
-          break;
-      }
-      if (!IsValidPos(facing_x, facing_y)) return -1;
-      return GetPosID(facing_x, facing_y);
+      return GetNeighbor(GetPosID(x,y), dir);
     }
 
     /// Given a player ID (0 or 1 are valid), what Disk type does that player use?
