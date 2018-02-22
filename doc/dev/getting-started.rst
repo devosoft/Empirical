@@ -55,14 +55,29 @@ One-time Preparation
 #. Install the development dependencies.
 
 
-   Linux users
+   Unix users
 
    a.  Install the python  virtualenv, pip, gcc, and g++, bison, flex
 
        On recent Debian and Ubuntu this can be done with::
 
            sudo apt-get install python-virtualenv python-pip gcc g++ git gcovr bison flex
-   b.  Run the install-dependencies maketarget::
+
+	OS X users and others may need to download virtualenv first::
+
+	curl -O https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.11.6.tar.gz
+	tar xzf virtualenv*
+	cd virtualenv-*; python2.7 virtualenv.py ../env; cd ..
+
+   	`Mac ports <https://www.macports.org/>`__ users on the OS X platform can
+   	install pip by execution from the command line::
+     
+       	sudo port install py27-pip
+     
+   	`Homebrew <http://brew.sh/>`__ users on the OS X platform will have pip
+   	 already installed
+
+b.  Run the install-dependencies maketarget::
 
            make install-dependencies
 	
@@ -80,20 +95,6 @@ One-time Preparation
        python2.7 -m virtualenv third-party/env
 
    This gives you a place to install packages necessary for running Empirical.
-
-   OS X users and others may need to download virtualenv first::
-
-	curl -O https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.11.6.tar.gz
-	tar xzf virtualenv*
-	cd virtualenv-*; python2.7 virtualenv.py ../env; cd ..
-
-   `Mac ports <https://www.macports.org/>`__ users on the OS X platform can
-   install pip by execution from the command line::
-     
-       sudo port install py27-pip
-     
-   `Homebrew <http://brew.sh/>`__ users on the OS X platform will have pip
-   already installed
 
 
 .. #. Activate the virtualenv and install a few packages::
