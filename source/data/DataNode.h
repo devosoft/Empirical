@@ -519,9 +519,10 @@ namespace emp {
   template <typename VAL_TYPE, emp::data... MODS>
   class DataNodeModule<VAL_TYPE, data::Histogram, MODS...> : public DataNodeModule<VAL_TYPE, MODS...> {
   protected:
-    VAL_TYPE offset;                 ///< Min value in first bin; others are offset by this much.
-    IndexMap bins;                   ///< Map of values to which bin they fall in. 
-    emp::vector<size_t> counts;      ///< Counts in each bin.
+    VAL_TYPE offset;              ///< Min value in first bin; others are offset by this much.
+    VAL_TYPE width;               ///< How wide is the overall histogram?
+    //IndexMap bins;                ///< Map of values to which bin they fall in. 
+    emp::vector<size_t> counts;   ///< Counts in each bin.
 
     using this_t = DataNodeModule<VAL_TYPE, data::Histogram, MODS...>;
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
@@ -530,26 +531,33 @@ namespace emp {
     using base_t::val_count;
 
   public:
-    DataNodeModule() : offset(0.0), bins(10,10.0), counts(10, 0) { ; }
+    DataNodeModule() : offset(0.0), width(0), counts(10, 0) { ; }
 
     /// Returns the minimum value this histogram is capable of containing
     /// (i.e. the minimum value for the first bin)
     VAL_TYPE GetHistMin() const { return offset; }
 
+    /// Returns the maximum value this histogram is capable of containing
+    /// (i.e. the maximum value for the last bin)
+    VAL_TYPE GetHistMax() const { return offset + width; }
+
     /// Return the count of items in the @param bin_id 'th bin of the histogram
     size_t GetHistCount(size_t bin_id) const { return counts[bin_id]; }
+
     /// Return the width of the @param bin_id 'th bin of the histogram
-    double GetHistWidth(size_t bin_id) const { return bins[bin_id]; }
+    double GetHistWidth(size_t bin_id) const { return width / (double) counts.size(); } //bins[bin_id]; }
+
     /// Return a vector containing the count of items in each bin of the histogram
     const emp::vector<size_t> & GetHistCounts() const { return counts; }
 
     /// Return a vector containing the lowest value allowed in each bin.
     emp::vector<double> GetBinMins() const {
-      emp::vector<double> bin_mins(bins.size());
+      emp::vector<double> bin_mins(counts.size());
+      double bin_width = width / (double) counts.size();
       double cur_min = offset;
-      for (size_t i = 0; i < bins.size(); i++) {
+      for (size_t i = 0; i < counts.size(); i++) {
         bin_mins[i] = cur_min;
-        cur_min += bins[i];
+        cur_min += bin_width; // bins[i];
       }
       return bin_mins;
     }
@@ -561,16 +569,18 @@ namespace emp {
     ///                   between min and max will be easily divided among this many bins.
     void SetupBins(VAL_TYPE _min, VAL_TYPE _max, size_t num_bins) {
       offset = _min;
-      double width = ((double) (_max - _min)) / (double) num_bins;
-      bins.Resize(num_bins);
-      bins.AdjustAll(width);
+      // width = ((double) (_max - _min)) / (double) num_bins;
+      width = _max - _min;
+      // bins.Resize(num_bins);
+      // bins.AdjustAll(width);
       counts.resize(num_bins);
       for (size_t & x : counts) x = 0.0;
     }
 
     /// Add @param val to the DataNode
     void AddDatum(const VAL_TYPE & val) {
-      size_t bin_id = bins.Index((double) (val - offset));
+      // size_t bin_id = bins.Index((double) (val - offset));
+      size_t bin_id = counts.size() * ((double) (val - offset)) / (double) width;
       counts[bin_id]++;
       parent_t::AddDatum(val);
     }
