@@ -2,6 +2,7 @@
 #define EMP_EVENT_DRIVEN_GP_H
 
 #include <functional>
+#include <tuple>
 #include <unordered_map>
 #include <deque>
 #include <utility>
@@ -288,6 +289,11 @@ namespace emp {
         return id == in.id && args == in.args && affinity == in.affinity;
       }
       bool operator!=(const Instruction & in) const { return !(*this == in); }
+
+      bool operator<(const Instruction & other) const {
+          return std::tie(id, args, affinity) < std::tie(other.id, other.args, other.affinity);
+      }
+
     };
 
     using inst_t = Instruction;                    //< Convenient Instruction type alias.
@@ -314,6 +320,10 @@ namespace emp {
         return inst_seq == in.inst_seq && affinity == in.affinity;
       }
       bool operator!=(const Function & in) const { return !(*this == in); }
+
+      bool operator<(const Function & other) const {
+          return std::tie(inst_seq, affinity) < std::tie(other.inst_seq, other.affinity);
+      }
 
       size_t GetSize() const { return inst_seq.size(); }
 
@@ -359,6 +369,10 @@ namespace emp {
 
       bool operator==(const Program & in) const { return program == in.program; }
       bool operator!=(const Program & in) const { return !(*this == in); }
+
+      bool operator<(const Program & other) const {
+          return program < other.program;
+      }
 
       /// Get number of functions that make up this program.
       size_t GetSize() const { return program.size(); }
@@ -775,7 +789,9 @@ namespace emp {
     Ptr<Random> GetRandomPtr() { return random_ptr; }
 
     /// Get program loaded on this hardware.
-    const program_t & GetProgram() const { return program; }
+    const program_t & GetConstProgram() const { return program; }
+    program_t & GetProgram() { return program; }
+
 
     /// Get reference to a particular function in hardware's program.
     const Function & GetFunction(size_t fID) const {
@@ -1413,8 +1429,9 @@ namespace emp {
     static void Inst_Mod(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       const int base = (int)state.AccessLocal(inst.args[1]);
+      const int num = (int)state.AccessLocal(inst.args[0]);
       if (base == 0) ++hw.errors;
-      else state.SetLocal(inst.args[2], (int)state.AccessLocal(inst.args[0]) % base);
+      else state.SetLocal(inst.args[2], static_cast<int64_t>(num) % static_cast<int64_t>(base));
     }
 
     /// Default instruction: TestEqu
