@@ -67,7 +67,7 @@ namespace emp {
       Instruction & operator=(const Instruction &) = default;
       Instruction & operator=(Instruction &&) = default;
       bool operator<(const Instruction & other) const {
-          return id < other.id;
+          return std::tie(id, args) < std::tie(other.id, other.args);
       }
 
       void Set(size_t _id, size_t _a0=0, size_t _a1=0, size_t _a2=0)
