@@ -29,27 +29,29 @@ void printSubset(
 int main() {
   // Ok, so these objects will auto convert when we need them to. Ordering of
   // fields is not important
-  print("DEFAULT", DEFAULT);
+  // print("DEFAULT", DEFAULT);
   // Also, we can select for a subset of a attribute pack when we want to
   printSubset("DEFAULT [SUBSET]", DEFAULT);
 
   // demo adding/chaning data
-  print("DEFAULT.set(populationSize(10))", DEFAULT.Set(PopulationSize(10)));
+  print("DEFAULT.set(populationSize(10))",
+        DEFAULT.SetAttribute(PopulationSize(10)));
   print("DEFAULT + populationSize(10)", DEFAULT + PopulationSize(10));
 
   Attrs<typename PopulationSize::value_t<size_t>,
-        typename DefaultGenome::value_t<
-          std::string>,  // Notice that this will be auto-converted from const
-                         // char* to std::string
+        typename DefaultGenome::value_t<std::string>,  // Notice that this will
+                                                       // be auto-converted from
+        const
+        // char* to std::string
         typename GenerationLength::value_t<size_t>>
     user = DEFAULT;
-
   // Set a single member
-  user.SetDefaultGenome(10);
-  user = PopulationSize(100);
+  user.SetDefaultGenome("ASDEDFDFSA");
+  // user = PopulationSize(100);
 
   print("DEFAULT >> STDIN", user);
 
+  //
   // Example of compile time-unfolded runtime reflection:
   std::cout << "Updating the whole USER settings:" << std::endl;
   user.Foreach([](auto& name, auto& value) {

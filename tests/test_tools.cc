@@ -1400,7 +1400,7 @@ DEFINE_ATTR(Bazz);
 
 constexpr struct {
   template <typename T>
-  constexpr decltype(auto) operator()(T &&value) const {
+  constexpr decltype(auto) operator()(T&& value) const {
     return std::forward<T>(value);
   }
 } ident;
@@ -1408,44 +1408,69 @@ template <typename T>
 struct Callable {
   T value;
 
-  constexpr decltype(auto) operator()() const { return std::forward<T>(value); }
+  constexpr decltype(auto) operator()() & { return value; }
+  constexpr decltype(auto) operator()() const & { return value; }
+  constexpr decltype(auto) operator()() && { return std::move(value); }
+  constexpr decltype(auto) operator()() const && { return std::move(value); }
 };
 template <typename T>
-constexpr Callable<T &&> callable(T &&value) {
+constexpr Callable<std::decay_t<T>> callable(T&& value) {
   return {std::forward<T>(value)};
 }
 
 struct NoCopy {
   int value;
   constexpr NoCopy(int value) : value(value) {}
-  constexpr NoCopy(const NoCopy &) = delete;
-  constexpr NoCopy(NoCopy &&) = default;
+  constexpr NoCopy(const NoCopy&) = delete;
+  constexpr NoCopy(NoCopy&&) = default;
 
-  constexpr NoCopy &operator=(const NoCopy &) = delete;
-  constexpr NoCopy &operator=(NoCopy &&) = default;
+  constexpr NoCopy& operator=(const NoCopy&) = delete;
+  constexpr NoCopy& operator=(NoCopy&&) = default;
 };
-constexpr bool operator==(const NoCopy &a, const NoCopy &b) {
+constexpr bool operator==(const NoCopy& a, const NoCopy& b) {
   return a.value == b.value;
 }
-std::ostream &operator<<(std::ostream &out, const NoCopy &nc) {
+std::ostream& operator<<(std::ostream& out, const NoCopy& nc) {
   return out << "NoCopy{" << nc.value << "}";
 }
 
 struct {
-  constexpr auto operator()(int total, const char *, int x) const {
-    return total + x;
+  template <typename I, typename T>
+  constexpr auto operator()(I&& init, T&& value) const {
+    return std::forward<I>(init) + std::forward<T>(value).Get();
   }
-  constexpr NoCopy operator()(NoCopy total, const char *,
-                              const NoCopy &x) const {
-    return {total.value + x.value};
+
+  template <typename I, typename T>
+  constexpr auto operator()(const char* name, I&& init, T&& value) const {
+    return std::forward<I>(init) + std::forward<T>(value);
   }
 } sum;
+
+struct {
+  template <typename I, typename A, typename B>
+  constexpr auto operator()(I&& init, A&& a, B&& b) const {
+    return std::forward<I>(init) +
+           (std::forward<A>(a).Get() * std::forward<B>(b).Get());
+  }
+} dot;
+
+struct {
+  template <typename I, typename T>
+  constexpr NoCopy operator()(I&& init, T&& value) const {
+    return {std::forward<I>(init).value + std::forward<T>(value).Get().value};
+  }
+
+  template <typename I, typename T>
+  constexpr NoCopy operator()(const char* name, I&& init, T&& value) const {
+    return {std::forward<I>(init).value + std::forward<T>(value).value};
+  }
+} sum_nocopy;
 
 TEST_CASE("Test Attribute Packs", "[tools]") {
   using namespace emp::tools;
   // Test Construction & access
-  CONSTEXPR_REQUIRE_EQ(Foo::CallOrGet(Foo(6)), 6);
-  CONSTEXPR_REQUIRE_EQ(Foo::CallOrGet(Foo(callable(7))), 7);
+  CONSTEXPR_REQUIRE_EQ(Foo::CallOrGetAttribute(Foo(6)).Get(), 6);
+  CONSTEXPR_REQUIRE_EQ(Foo::CallOrGetAttribute(Foo(callable(7))).Get(), 7);
   CONSTEXPR_REQUIRE_EQ(Foo::GetOrElse(Foo(7), callable(0)), 7);
   CONSTEXPR_REQUIRE_EQ(Foo::GetOrElse(Foo(7) + Bar(6), callable(0)), 7);
   CONSTEXPR_REQUIRE_EQ(Foo::GetOrElse(Bazz(7) + Bar(6), callable(0)), 0);
@@ -1463,8 +1488,10 @@ TEST_CASE("Test Attribute Packs", "[tools]") {
   CONSTEXPR_REQUIRE_EQ(Foo(5) + Bar(6), Foo(5) + Bar(6));
 
   // Test NoCopy
-  CONSTEXPR_REQUIRE_EQ(Foo::CallOrGet(Foo(NoCopy{7})), NoCopy{7});
-  CONSTEXPR_REQUIRE_EQ(Foo::CallOrGet(Foo(callable(NoCopy{7}))), NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(Foo::CallOrGetAttribute(Foo(NoCopy{7})).Get(),
+                       NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(Foo::CallOrGetAttribute(Foo(callable(NoCopy{7}))).Get(),
+                       NoCopy{7});
   CONSTEXPR_REQUIRE_EQ(Foo::GetOrElse(Foo(NoCopy{7}), callable(NoCopy{0})),
                        NoCopy{7});
   CONSTEXPR_REQUIRE_EQ(
@@ -1505,10 +1532,15 @@ TEST_CASE("Test Attribute Packs", "[tools]") {
   CONSTEXPR_REQUIRE_EQ((Bar(6) + Foo(ident))(NoCopy{5}),
                        Foo(NoCopy{5}) + Bar(6));
 
-  CONSTEXPR_REQUIRE_EQ((Bar(NoCopy{6}) + Foo(ident))(NoCopy{5}),
-                       Foo(NoCopy{5}) + Bar(NoCopy{6}));
+  CONSTEXPR_REQUIRE_EQ((Bar(NoCopy{6}) + Foo(ident))(5),
+                       Foo(5) + Bar(NoCopy{6}));
 
-  CONSTEXPR_REQUIRE_EQ((Bar(5) + Foo(6)).Reduce(sum, 0), 11);
-  CONSTEXPR_REQUIRE_EQ((Bar(NoCopy{5}) + Foo(NoCopy{6})).Reduce(sum, NoCopy{0}),
-                       NoCopy{11});
+  CONSTEXPR_REQUIRE_EQ((Bar(5) + Foo(6)).Reduce(0, sum), 11);
+  CONSTEXPR_REQUIRE_EQ(
+    (Bar(NoCopy{5}) + Foo(NoCopy{6})).Reduce(NoCopy{0}, sum_nocopy),
+    NoCopy{11});
+  CONSTEXPR_REQUIRE_EQ(MergeReduce(0, sum, Bar(6) + Foo(7)), 6 + 7);
+  // CONSTEXPR_REQUIRE_EQ(MergeReduce(0, [](auto init, auto& a, auto& b) {return
+  // init + a.Get() * b.Get();}, Bar(6) + Foo(7), Bar(11) + Foo(12)),
+  //                      6 + 7);
 }
