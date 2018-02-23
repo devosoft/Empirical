@@ -239,6 +239,100 @@ namespace emp {
     }
   };
 
+  template <typename CONTAINER>
+  class CollectionDataFile : public DataFile {
+  private:
+    using data_t = typename CONTAINER::value_type;
+    using coll_fun_t = void(std::ostream &, data_t);
+    using fun_update_container_t = std::function<CONTAINER(void)>;
+
+    std::function<void(void)> update_container_fun;
+
+    CONTAINER current_rows;
+    FunctionSet<coll_fun_t> collection_funs;
+    emp::vector<std::string> collection_keys;
+    emp::vector<std::string> collection_descs;
+  public:
+
+    CollectionDataFile(const std::string & filename,
+             const std::string & b="", const std::string & s=", ", const std::string & e="\n")
+             : DataFile(filename, b, s, e), update_container_fun() {;}
+
+    void SetUpdateContainerFun(const fun_update_container_t & fun) {
+      update_container_fun = [fun, this](){current_rows = fun();};
+    }
+
+    /// Print a header containing the name of each column 
+    void PrintHeaderKeys() {
+      *os << line_begin;
+      for (size_t i = 0; i < keys.size(); i++) {
+        if (i > 0) *os << line_spacer;
+        *os << keys[i];
+      }
+      for (size_t i = 0; i < collection_keys.size(); i++) {
+        if (i > 0 || keys.size() > 0) *os << line_spacer;
+        *os << collection_keys[i];
+      }
+      *os << line_end;
+      os->flush();
+    }
+
+    /// Print a header containing comments describing all of the columns
+    void PrintHeaderComment(const std::string & cstart = "# ") {
+      for (size_t i = 0; i < keys.size(); i++) {
+        *os << cstart << i << ": " << descs[i] << " (" << keys[i] << ")" << std::endl;
+      }
+      for (size_t i = 0; i < collection_keys.size(); i++) {
+        *os << cstart << i+keys.size() << ": " << collection_descs[i] << " (" << collection_keys[i] << ")" << std::endl;
+      }
+
+      os->flush();
+    }
+
+    /// Run all of the functions and print the results as a new line in the file
+    void Update() {
+      emp_assert(update_container_fun);
+      update_container_fun();
+
+      for (data_t & d : current_rows) {
+        *os << line_begin;
+        for (size_t i = 0; i < funs.size(); i++) {
+          if (i > 0) *os << line_spacer;
+          funs[i](*os);
+        }
+
+        for (size_t i = 0; i < collection_funs.size(); i++) {
+          if (i > 0 || keys.size() > 0) *os << line_spacer;
+          collection_funs[i](*os, d);
+        }
+      *os << line_end;
+      }
+  
+      os->flush();
+    }
+
+    /// If a function takes an ostream, pass in the correct one.
+    /// Generic function for adding a column to the DataFile. In practice, you probably
+    /// want to call one of the more specific ones.
+    size_t AddCollection(const std::function<void(std::ostream &, data_t)> & fun, const std::string & key, const std::string & desc) {
+      size_t id = collection_funs.GetSize();
+      collection_funs.Add(fun);
+      collection_keys.emplace_back(key);
+      collection_descs.emplace_back(desc);
+      return id;
+    }
+
+    /// Add a function that returns a value to be printed to the file.
+    template <typename T>
+    size_t AddCollectionFun(const std::function<T(data_t)> & fun, const std::string & key="", const std::string & desc="") {
+      std::function<coll_fun_t> in_fun = [fun](std::ostream & os, data_t data){ os << fun(data); };
+      return AddCollection(in_fun, key, desc);
+    }
+
+
+  };
+
+
 }
 
 #endif
