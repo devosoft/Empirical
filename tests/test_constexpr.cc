@@ -11,8 +11,7 @@
 #define EMP_DECORATE(X) [X]
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]
 #define CATCH_CONFIG_MAIN
-#undef NDEBUG
-#define TDEBUG 1
+
 
 #include "third-party/Catch/single_include/catch.hpp"
 
