@@ -272,6 +272,9 @@ TEST_CASE("Run world", "[evo]") {
   emp::AddPhylodiversityFile(world).SetTimingRepeat(1);
   emp::AddLineageMutationFile(world).SetTimingRepeat(1);
   AddDominantFile(world).SetTimingRepeat(1);
+  auto muller_file = emp::AddMullerPlotFile(world);
+  
+  world.OnUpdate([&muller_file](size_t ud){muller_file.Update();});
 
   // Setup the mutation function.
   world.SetMutFun( [&on_mutate_sig, &world](emp::AvidaGP & org, emp::Random & random) {

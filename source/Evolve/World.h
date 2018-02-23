@@ -374,24 +374,22 @@ namespace emp {
     /// be collected until the first Update() after this function is initially called, signaling
     /// the need for this information.
     DataMonitor<double> & GetFitnessDataNode() {
-      Ptr<DataMonitor<double>> node;      
       
       if (!data_nodes.HasNode("fitness")) {
-        node = data_nodes.New("fitness");
+        DataMonitor<double> & node = data_nodes.New("fitness");
 
         // Collect fitnesses each update...
         OnUpdate(
           [this, &node](size_t){
-            node->Reset();
+            node.Reset();
             for (size_t i = 0; i < pop.size(); i++) {
-              if (IsOccupied(i)) node->AddDatum( CalcFitnessID(i) );
+              if (IsOccupied(i)) node.AddDatum( CalcFitnessID(i) );
             }
           }
         );
-      } else {
-        node = data_nodes.Get("fitness");
-      }
-      return *node;
+      } 
+
+      return data_nodes.Get("fitness");
     }
 
     // Returns a reference so that capturing it in a lambda to call on update
