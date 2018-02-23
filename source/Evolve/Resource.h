@@ -44,9 +44,9 @@ namespace emp {
         }
     };
 
-    template <typename ORG>
-    void ResourceSelect(World<ORG> & world, const emp::vector<typename World<ORG>::fun_calc_fitness_t > & extra_funs,
-                   emp::vector<emp::Resource> & pools, size_t t_size, size_t tourny_count=1, double frac = .0025, double max_bonus = 5, double resource_inflow = 100, double cost = 0, bool use_base = true) {
+    template <typename ORG, typename DATA_TYPE>
+    void ResourceSelect(World<ORG, DATA_TYPE> & world, const emp::vector<typename World<ORG, DATA_TYPE>::fun_calc_fitness_t > & extra_funs,
+                   emp::vector<emp::Resource> & pools, size_t t_size, size_t tourny_count=1, double frac = .0025, double max_bonus = 5, double cost = 0, bool use_base = true) {
 
        emp_assert(world.GetFitFun(), "Must define a base fitness function");
        emp_assert(world.GetSize() > 0);
@@ -74,11 +74,11 @@ namespace emp {
          } else {
             base_fitness[org_id] = 0;
          }
-         
+
          for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
             //  std::cout << "Test " << ex_id << std::endl;
 
-           pools[ex_id].Inc(resource_inflow/world.GetNumOrgs());
+           pools[ex_id].Inc(pools[ex_id].GetInflow()/world.GetNumOrgs());
            double cur_fit = extra_funs[ex_id](world.GetOrg(org_id));
            cur_fit = emp::Pow(cur_fit, 2.0);
             //    if (org_id==0) {std::cout << "Allele: " << world[org_id][ex_id] <<" Curr fit: " << extra_funs[ex_id](world[org_id]) << " Curr fit squared: " << cur_fit << " Amount: " << pools[ex_id].GetAmount() << " Frac: " << frac;}

@@ -49,6 +49,7 @@
 #include "tools/string_utils.h"
 #include "tools/tuple_struct.h"
 #include "tools/unit_tests.h"
+#include "tools/vector_utils.h"
 
 // currently these have no coveage; we include them so we get metrics on them
 // this doesn't actually work--TODO: figure out why this doesn't work
@@ -1275,15 +1276,15 @@ TEST_CASE("Test stats", "[tools]") {
 
   REQUIRE(emp::Sum(vec1) == 10);
   REQUIRE(emp::Sum(vec2) == 5);
-  REQUIRE(emp::Sum(deque1) == 27);  
+  REQUIRE(emp::Sum(deque1) == 27);
 
   REQUIRE(emp::UniqueCount(vec1) == 3);
   REQUIRE(emp::UniqueCount(vec2) == 2);
-  REQUIRE(emp::UniqueCount(deque1) == 4);  
+  REQUIRE(emp::UniqueCount(deque1) == 4);
 
   REQUIRE(emp::Mean(vec1) == Approx(1.6666666666667));
   REQUIRE(emp::Mean(vec2) == Approx(1.25));
-  REQUIRE(emp::Mean(deque1) == 4.5);  
+  REQUIRE(emp::Mean(deque1) == 4.5);
 
   std::function<int(int)> invert = [](int i){return i*-1;};
 
@@ -1295,9 +1296,9 @@ TEST_CASE("Test stats", "[tools]") {
 }
 
 TEST_CASE("Test set utils", "[tools]") {
-  std::set<int> s1; 
-  std::set<int> s2; 
-  std::set<int> comp_set; 
+  std::set<int> s1;
+  std::set<int> s2;
+  std::set<int> comp_set;
   emp::vector<int> v1;
   emp::vector<int> v2;
 
@@ -1369,4 +1370,16 @@ TEST_CASE("Test set utils", "[tools]") {
   REQUIRE(emp::symmetric_difference(v1, s1) == comp_set);
   REQUIRE(emp::symmetric_difference(s1, v1) == comp_set);
 
+}
+
+TEST_CASE("Test vector utils", "[tools]") {
+  emp::vector<int> v1({6,2,5,1,3});
+  emp::Sort(v1);
+  REQUIRE(v1 == emp::vector<int>({1,2,3,5,6}));
+  REQUIRE(emp::FindPos(v1, 3) == 2);
+  REQUIRE(emp::Sum(v1) == 17);
+  REQUIRE(emp::Has(v1, 3));
+  REQUIRE(!emp::Has(v1, 4));
+  REQUIRE(emp::Product(v1) == 180);
+  REQUIRE(emp::Slice(v1,1,3) == emp::vector<int>({2,3}));
 }

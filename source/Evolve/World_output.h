@@ -2,7 +2,7 @@
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
- * 
+ *
  * This file contains functions for adding additional data files to Worlds.
 **/
 
@@ -17,8 +17,8 @@
 namespace emp {
 
     template <typename WORLD_TYPE>
-    World_file AddPhylodiversityFile(WORLD_TYPE & world){
-        auto & file = world.SetupFile("phylodiversity.csv");
+    World_file & AddPhylodiversityFile(WORLD_TYPE & world, const std::string & fpath="phylodiversity.csv"){
+        auto & file = world.SetupFile(fpath);
         auto & distinctiveness_node = world.AddDataNode("evolutionary_distinctiveness");
         auto & pair_dist_node = world.AddDataNode("pairwise_distance");
         auto & phylo_div_node = world.AddDataNode("phylogenetic_diversity");
@@ -39,9 +39,9 @@ namespace emp {
             }
             phylo_div_node.Add(world.GetSystematics().GetPhylogeneticDiversity());
         });
-        
+
         std::function<size_t(void)> get_update = [&world](){return world.GetUpdate();};
-        
+
         file.AddFun(get_update, "update", "Update");
         file.AddStats(distinctiveness_node, "evolutionary_distinctiveness", "evolutionary distinctiveness for a single update");
         file.AddStats(pair_dist_node, "pairwise_distance", "pairwise distance for a single update");
@@ -52,8 +52,8 @@ namespace emp {
     }
 
     template <typename WORLD_TYPE>
-    World_file AddLineageMutationFile(WORLD_TYPE & world){
-        auto & file = world.SetupFile("lineage_mutations.csv");
+    World_file & AddLineageMutationFile(WORLD_TYPE & world, const std::string & fpath="lineage_mutations.csv"){
+        auto & file = world.SetupFile(fpath);
         auto & mut_count_node = world.AddDataNode("mut_count");
         auto & del_step_node = world.AddDataNode("deleterious_step");
         auto & phen_volatility_node = world.AddDataNode("phenotypic_volatility");
@@ -86,29 +86,29 @@ namespace emp {
     }
 
     template <typename WORLD_TYPE>
-    CollectionDataFile<std::unordered_set<Ptr<typename WORLD_TYPE::genotype_t>, typename Ptr<typename WORLD_TYPE::genotype_t>::hash_t>> AddMullerPlotFile(WORLD_TYPE & world) {
+    CollectionDataFile<std::unordered_set<Ptr<typename WORLD_TYPE::genotype_t>, typename Ptr<typename WORLD_TYPE::genotype_t>::hash_t>> AddMullerPlotFile(WORLD_TYPE & world, const std::string & fpath="muller_data.dat") {
         using taxon_t = typename WORLD_TYPE::genotype_t;
         using taxon_ptr_t = Ptr<typename WORLD_TYPE::genotype_t>;
         using container_t = std::unordered_set<taxon_ptr_t, typename taxon_ptr_t::hash_t>;
-        
-        CollectionDataFile<container_t> file("muller_data.dat");
+
+        CollectionDataFile<container_t> file(fpath);
         file.SetUpdateContainerFun([&world](){return world.GetSystematics().GetActive();});
-        
+
         std::function<size_t(void)> get_update = [&world](){return world.GetUpdate();};
         std::function<int(const taxon_ptr_t)> get_tax_id = [&world](const taxon_ptr_t t){
             return t->GetID();
-        };        
+        };
         std::function<int(const taxon_ptr_t)> get_num_orgs = [&world](const taxon_ptr_t t){
             return t->GetNumOrgs();
         };
-        // std::function<std::string(const taxon_ptr_t)> get_phenotype = [&world](const taxon_ptr_t t){
-        //     return to_string(t->GetData().GetPhenotype());
-        // };
+        std::function<std::string(const taxon_ptr_t)> get_phenotype = [&world](const taxon_ptr_t t){
+            return to_string(t->GetData().GetPhenotype());
+        };
 
         file.AddFun(get_update, "update", "Update");
         file.AddCollectionFun(get_tax_id, "tax_id", "The id of the taxon for this row");
         file.AddCollectionFun(get_num_orgs, "num_orgs", "The number of orgs of this taxon on this update");
-        // file.AddCollectionFun(get_phenotype, "phenotype", "This taxon's phenotype");
+        file.AddCollectionFun(get_phenotype, "phenotype", "This taxon's phenotype");
         file.PrintHeaderKeys();
         return file;
     }
