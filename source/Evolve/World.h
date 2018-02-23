@@ -197,6 +197,7 @@ namespace emp {
     Signal<void(size_t)> org_placement_sig;   ///< Trigger when any organism is placed into world.
     Signal<void(size_t)> on_update_sig;       ///< Trigger at the beginning of Update()
     Signal<void(size_t)> on_death_sig;        ///< Trigger when any organism dies.
+    Signal<void(Ptr<genotype_t>, size_t)> on_genotype_known; ///< Trigger when we know the genotype of a new organism.
 
     /// Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
@@ -508,6 +509,8 @@ namespace emp {
     /// Return:   Key value needed to make future modifications.
     SignalKey OnOrgDeath(const std::function<void(size_t)> & fun) { return on_death_sig.AddAction(fun); }
 
+    /// TODO: document this
+    SignalKey OnGenotypeKnown(const std::function<void(Ptr<genotype_t>, size_t)> & fun) { return on_genotype_known.AddAction(fun); }
 
     // --- MANAGE ATTRIBUTES ---
 
@@ -759,7 +762,7 @@ namespace emp {
     // Track the new genotype.
     if (genotypes.size() <= pos) genotypes.resize(pos+1, nullptr);   // Make sure we fit genotypes.
     genotypes[pos] = new_genotype;
-
+    on_genotype_known.Trigger(new_genotype, pos);
     return OrgPosition(pos, true);
   }
 
@@ -781,7 +784,7 @@ namespace emp {
     // Track the new genotype.
     if (next_genotypes.size() <= pos) next_genotypes.resize(pos+1, nullptr);  // Make sure we fit genotypes.
     next_genotypes[pos] = new_genotype;
-
+    on_genotype_known.Trigger(new_genotype, pos);
     return OrgPosition(pos, false);
   }
 
