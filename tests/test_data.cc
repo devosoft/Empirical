@@ -367,19 +367,17 @@ TEST_CASE("Test Collection DataFile", "[data]") {
 }
 
 TEST_CASE("Test histogram", "[data]") {
-  emp::DataNode<double, emp::data::Current, emp::data::Range, emp::data::Histogram, emp::data::Pull, emp::data::Log> data;
-  data.SetupBins(1,21,10);
-  data.Add(1,2,1,19);
+    emp::DataNode<double, emp::data::Current, emp::data::Range, emp::data::Histogram, emp::data::Pull, emp::data::Log> data;
+    data.SetupBins(1,21,10);
+    data.Add(1,2,1,19);
 
-  REQUIRE(data.GetHistMin() == 1);
-  REQUIRE(data.GetHistWidth(5) == 2);
+    REQUIRE(data.GetHistMin() == 1);
+    REQUIRE(data.GetHistWidth(5) == 2);
 
-  REQUIRE(data.GetBinMins() == emp::vector<double>({1,3,5,7,9,11,13,15,17,19}));
+    REQUIRE(data.GetBinMins() == emp::vector<double>({1,3,5,7,9,11,13,15,17,19}));
 
-  std::cout << emp::to_string(data.GetBinMins()) << std::endl;
-  std::cout << emp::to_string(data.GetHistCounts()) << std::endl;
-  REQUIRE(data.GetHistCount(9) == 1);
-  REQUIRE(data.GetHistCounts() == emp::vector<size_t>({3,0,0,0,0,0,0,0,0,1}));
+    REQUIRE(data.GetHistCount(9) == 1);
+    REQUIRE(data.GetHistCounts() == emp::vector<size_t>({3,0,0,0,0,0,0,0,0,1}));
 
   data.Reset();
   REQUIRE(data.GetHistCounts() == emp::vector<size_t>({0,0,0,0,0,0,0,0,0,0}));
