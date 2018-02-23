@@ -106,7 +106,7 @@ namespace emp {
       bool IsValid() const { return index != (size_t) -1; }
 
       OrgPosition & SetActive(bool _active=true) { is_active = _active; return *this; }
-      OrgPosition & SetIndex(size_t _id) { index = _id; return *this; }      
+      OrgPosition & SetIndex(size_t _id) { index = _id; return *this; }
     };
 
     // --- Publicly available types ---
@@ -170,7 +170,7 @@ namespace emp {
     bool is_pheno_structured;          ///< Do we have a phenotypically structured population?
 
     /// Potential data nodes -- these should be activated only if in use.
-    
+
     DataManager<double, data::Current, data::Info, data::Range, data::Stats> data_nodes;
 
     // Configurable functions.
@@ -374,24 +374,21 @@ namespace emp {
     /// be collected until the first Update() after this function is initially called, signaling
     /// the need for this information.
     DataMonitor<double> & GetFitnessDataNode() {
-      Ptr<DataMonitor<double>> node;      
-      
+
       if (!data_nodes.HasNode("fitness")) {
-        node = data_nodes.New("fitness");
+        DataMonitor<double> & node = data_nodes.New("fitness");
 
         // Collect fitnesses each update...
         OnUpdate(
           [this, &node](size_t){
-            node->Reset();
+            node.Reset();
             for (size_t i = 0; i < pop.size(); i++) {
-              if (IsOccupied(i)) node->AddDatum( CalcFitnessID(i) );
+              if (IsOccupied(i)) node.AddDatum( CalcFitnessID(i) );
             }
           }
         );
-      } else {
-        node = data_nodes.Get("fitness");
       }
-      return *node;
+      return data_nodes.Get("fitness");
     }
 
     // Returns a reference so that capturing it in a lambda to call on update
@@ -401,7 +398,7 @@ namespace emp {
       emp_assert(!data_nodes.HasNode(name));
       return data_nodes.New(name);
     }
-    
+
     DataMonitor<double> & GetDataNode(const std::string & name) {
       return data_nodes.Get(name);
     }
@@ -424,13 +421,13 @@ namespace emp {
 
     /// Setup the function to be used to mutate an organism.  It should take a reference to an
     /// organism and return the number of mutations that occurred.
-    void SetMutFun(const fun_do_mutations_t & mut_fun, size_t pos=0) { 
+    void SetMutFun(const fun_do_mutations_t & mut_fun, size_t pos=0) {
       fun_do_mutations = mut_fun;
       SetShouldMutateFun([pos](size_t loc){return loc >= pos;});
     }
 
     /// Setup the function to be used to determine if an organism should mutate
-    void SetShouldMutateFun(const fun_should_mutate_t & should_mut_fun) { 
+    void SetShouldMutateFun(const fun_should_mutate_t & should_mut_fun) {
       fun_should_mutate = should_mut_fun;
     }
 
@@ -775,7 +772,7 @@ namespace emp {
     if (fun_should_mutate(pos)) {
       DoMutationsOrg(*new_org);
     }
-    
+
     // Determine new organism's genotype.
     Ptr<genotype_t> new_genotype = systematics.AddOrg(GetGenome(*new_org), p_genotype, update);
     if (next_pop.size() <= pos) next_pop.resize(pos+1, nullptr);   // Make sure we have room.
