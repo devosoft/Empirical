@@ -657,7 +657,7 @@ want to convert it to coordinates on our screen from 0 to 100. We can make a sca
   circles.SetAttr("cx", 5).SetAttr("r", 3);
 
 Great - we've used a scale to plot our data. But how are we supposed to know what the original
-data values were, now? With an :ref:`axis <Axes_API` object! Axes are a way of creating a visual
+data values were, now? With an :ref:`axis <Axes_API>` object! Axes are a way of creating a visual
 representation of a scale:
 
 .. code-block:: c++
@@ -751,6 +751,7 @@ In Empirical, there are a number of ways to pass functions as arguments into d3 
   // the previous example, we could use d3's built-in
   // "ascending" function:
   s.sort("ascending");
+
 - If you're going to be repeatedly using a C++ function as a callback, you may improve the efficiency
   of your code by combining the two previous approaches, using Empirical's :ref:`JSWrap <JSWrap>` function.
 

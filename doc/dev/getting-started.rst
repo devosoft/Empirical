@@ -19,38 +19,23 @@ the `git-scm book <http://git-scm.com/book/en/Git-Branching>`__.
 One-time Preparation
 --------------------
 
-#. Install the dependencies.
-
-   OS X users
-
-.. TODO: Get a hold of an OSX machine to figure out what has to be done
-
-   Linux users
-
-   a.  Install the python  virtualenv, pip, gcc, and g++, bison, flex
-
-       On recent Debian and Ubuntu this can be done with::
-
-           sudo apt-get install python-virtualenv python-pip gcc g++ git gcovr bison flex
-   b.  Run the install-dependencies maketarget::
-
-           make install-dependencies
-
 #. Get a `GitHub <http://github.com>`__ account.
 
    (We use GitHub to manage Empirical contributions.)
 
-#. Fork `github.com/mercere99/Empirical <https://github.com/devosoft/Empirical>`__.
+#. Fork `github.com/devosoft/Empirical <https://github.com/devosoft/Empirical>`__.
 
    Visit that page, and then click on the 'fork' button (upper right).
 
-   (This makes a copy of the Empirical source code in your own GitHub account.)
+   This makes a copy of the Empirical source code in your own GitHub account.
+   If you have contributor permissions to the main Empirical library, this step
+   is optional (you can instead develop on a branch within the main repo).
 
 #. Clone your copy of Empirical to your local development environment.
 
    Your clone URL should look something like this::
 
-       https://github.com/bocajnotnef/Epirical.git
+       https://github.com/bocajnotnef/Empirical.git
 
    and the UNIX shell command should be::
 
@@ -61,13 +46,52 @@ One-time Preparation
 #. Add a git reference to the Empirical repository::
 
        cd Empirical
-       git remote add upstream https://github.com/mercere99/Empirical.git
+       git remote add upstream https://github.com/devosoft/Empirical.git
        cd ../
 
    (This makes it easy for you to pull down the latest changes in the
    main repository.)
 
-#. Create a virtual Python environment within which to work with
+#. Install the development dependencies.
+
+
+   Unix users
+
+   a.  Install the python  virtualenv, pip, gcc, and g++, bison, flex
+
+       On recent Debian and Ubuntu this can be done with::
+
+           sudo apt-get install python-virtualenv python-pip gcc g++ git gcovr bison flex
+
+
+       OS X users and others may need to download virtualenv first::
+
+	   curl -O https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.11.6.tar.gz
+	   tar xzf virtualenv*
+	   cd virtualenv-*; python2.7 virtualenv.py ../env; cd ..
+
+
+      `Mac ports <https://www.macports.org/>`__ users on the OS X platform can
+         install pip by execution from the command line::
+     
+       	   sudo port install py27-pip
+
+
+      `Homebrew <http://brew.sh/>`__ users on the OS X platform will have pip
+   	 already installed
+
+b.  Run the install-dependencies maketarget::
+
+           make install-dependencies
+	
+    This will create a virtual python environment to use for Empirical development.
+    In this environment it will install: `Sphinx <http://sphinx-doc.org/>`__, `Breathe
+    <https://breathe.readthedocs.org/en/latest/>`__, and `doxygen
+    <http://www.stack.nl/~dimitri/doxygen/>`__, packages we use to generate the
+    documentation for Empirical
+
+
+.. #. Create a virtual Python environment within which to work with
    `virtualenv <https://pypi.python.org/pypi/virtualenv>`__::
 
        cd Empirical
@@ -75,22 +99,8 @@ One-time Preparation
 
    This gives you a place to install packages necessary for running Empirical.
 
-   OS X users and others may need to download virtualenv first::
 
-	curl -O https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.11.6.tar.gz
-	tar xzf virtualenv*
-	cd virtualenv-*; python2.7 virtualenv.py ../env; cd ..
-
-   `Mac ports <https://www.macports.org/>`__ users on the OS X platform can
-   install pip by execution from the command line::
-     
-       sudo port install py27-pip
-     
-   `Homebrew <http://brew.sh/>`__ users on the OS X platform will have pip
-   already installed
-
-
-#. Activate the virtualenv and install a few packages::
+.. #. Activate the virtualenv and install a few packages::
 
        source third-party/env/bin/activate
        make install-dependencies
