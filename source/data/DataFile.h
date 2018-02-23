@@ -294,7 +294,11 @@ namespace emp {
       emp_assert(update_container_fun);
       update_container_fun();
 
+<<<<<<< HEAD
       for (const data_t & d : current_rows) {
+=======
+      for (data_t & d : current_rows) {
+>>>>>>> e00d374e13b6f2cb023b64f9dee25a6c82ff4caa
         *os << line_begin;
         for (size_t i = 0; i < funs.size(); i++) {
           if (i > 0) *os << line_spacer;
@@ -324,8 +328,13 @@ namespace emp {
 
     /// Add a function that returns a value to be printed to the file.
     template <typename T>
+<<<<<<< HEAD
     size_t AddCollectionFun(const std::function<T(const data_t)> & fun, const std::string & key="", const std::string & desc="") {
       std::function<coll_fun_t> in_fun = [fun](std::ostream & os, const data_t data){ os << fun(data); };
+=======
+    size_t AddCollectionFun(const std::function<T(data_t)> & fun, const std::string & key="", const std::string & desc="") {
+      std::function<coll_fun_t> in_fun = [fun](std::ostream & os, data_t data){ os << fun(data); };
+>>>>>>> e00d374e13b6f2cb023b64f9dee25a6c82ff4caa
       return AddCollection(in_fun, key, desc);
     }
 

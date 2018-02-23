@@ -346,6 +346,33 @@ TEST_CASE("Test DataFile", "[data]") {
 }
 
 TEST_CASE("Test Collection DataFile", "[data]") {
+<<<<<<< HEAD
+=======
+
+    emp::vector<int> cool_data({1,2,3});
+    std::function<emp::vector<int>(void)> get_data = [&cool_data](){return cool_data;};
+    emp::CollectionDataFile<emp::vector<int>> dfile("test_collection_file.dat");
+
+    dfile.SetUpdateContainerFun(get_data);
+
+    std::function<int(int)> return_val = [](int i){return i;};
+    std::function<int(int)> square_val = [](int i){return i*i;};
+
+    dfile.AddCollectionFun(return_val, "value", "value");
+    dfile.AddCollectionFun(square_val, "squared", "value squared");
+
+    dfile.PrintHeaderKeys();
+    dfile.Update();
+    cool_data.push_back(5);
+    dfile.Update();
+    REQUIRE(compareFiles("test_collection_file.dat", "data/test_collection_file.dat"));
+}
+
+// TEST_CASE("Test histogram", "[data]") {
+//     emp::DataNode<double, emp::data::Current, emp::data::Range, emp::data::Histogram, emp::data::Pull, emp::data::Log> data;
+//     data.SetupBins(1,21,10);
+//     data.Add(1,2,1,19);
+>>>>>>> e00d374e13b6f2cb023b64f9dee25a6c82ff4caa
 
     emp::vector<int> cool_data({1,2,3});
     std::function<emp::vector<int>(void)> get_data = [&cool_data](){return cool_data;};
