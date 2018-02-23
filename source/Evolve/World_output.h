@@ -12,6 +12,7 @@
 #include "base/vector.h"
 #include "World_file.h"     // Helper to determine when specific events should occur.
 #include "SystematicsAnalysis.h"
+#include "tools/string_utils.h"
 
 namespace emp {
 
@@ -80,6 +81,34 @@ namespace emp {
         file.AddStats(del_step_node, "deleterious_steps", "counts of deleterious steps along each lineage");
         file.AddStats(phen_volatility_node, "phenotypic_volatility", "counts of changes in phenotype along each lineage");
         file.AddStats(unique_phen_node, "unique_phenotypes", "counts of unique phenotypes along each lineage");
+        file.PrintHeaderKeys();
+        return file;
+    }
+
+    template <typename WORLD_TYPE>
+    CollectionDataFile<std::unordered_set<Ptr<typename WORLD_TYPE::genotype_t>, typename Ptr<typename WORLD_TYPE::genotype_t>::hash_t>> AddMullerPlotFile(WORLD_TYPE & world) {
+        using taxon_t = typename WORLD_TYPE::genotype_t;
+        using taxon_ptr_t = Ptr<typename WORLD_TYPE::genotype_t>;
+        using container_t = std::unordered_set<taxon_ptr_t, typename taxon_ptr_t::hash_t>;
+        
+        CollectionDataFile<container_t> file("muller_data.dat");
+        file.SetUpdateContainerFun([&world](){return world.GetSystematics().GetActive();});
+        
+        std::function<size_t(void)> get_update = [&world](){return world.GetUpdate();};
+        std::function<int(const taxon_ptr_t)> get_tax_id = [&world](const taxon_ptr_t t){
+            return t->GetID();
+        };        
+        std::function<int(const taxon_ptr_t)> get_num_orgs = [&world](const taxon_ptr_t t){
+            return t->GetNumOrgs();
+        };
+        // std::function<std::string(const taxon_ptr_t)> get_phenotype = [&world](const taxon_ptr_t t){
+        //     return to_string(t->GetData().GetPhenotype());
+        // };
+
+        file.AddFun(get_update, "update", "Update");
+        file.AddCollectionFun(get_tax_id, "tax_id", "The id of the taxon for this row");
+        file.AddCollectionFun(get_num_orgs, "num_orgs", "The number of orgs of this taxon on this update");
+        // file.AddCollectionFun(get_phenotype, "phenotype", "This taxon's phenotype");
         file.PrintHeaderKeys();
         return file;
     }

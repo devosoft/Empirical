@@ -374,7 +374,6 @@ namespace emp {
     /// be collected until the first Update() after this function is initially called, signaling
     /// the need for this information.
     DataMonitor<double> & GetFitnessDataNode() {
-
       if (!data_nodes.HasNode("fitness")) {
         DataMonitor<double> & node = data_nodes.New("fitness");
 

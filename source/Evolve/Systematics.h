@@ -54,6 +54,10 @@ namespace emp {
     DataNode<double, data::Current, data::Range> fitness; /// This taxon's fitness (for assessing deleterious mutational steps)
     PHEN_TYPE phenotype; /// This taxon's phenotype (for assessing phenotypic change)
 
+    const PHEN_TYPE & GetPhenotype() const {
+      return phenotype;
+    }
+
     void RecordMutation(std::unordered_map<std::string, int> muts) {
       for (auto mut : muts) {
         if (Has(mut_counts, mut.first)) {
@@ -85,7 +89,6 @@ namespace emp {
   private:
     using this_t = Taxon<ORG_INFO, DATA_STRUCT>;
     using info_t = ORG_INFO;
-    using data_t = DATA_STRUCT;
 
     size_t id;                ///<  ID for this Taxon (Unique within this Systematics)
     const info_t info;        ///<  Details for the organims associated within this taxanomic group.
@@ -97,9 +100,11 @@ namespace emp {
     size_t depth;             ///<  How deep in tree is this node? (Root is 0)
     double origination_time;     ///<  When did this taxon first appear in the population?
 
-    data_t data;              /// A struct for storing additional information about this taxon
+    DATA_STRUCT data;              /// A struct for storing additional information about this taxon
 
   public:
+    using data_t = DATA_STRUCT;
+
     Taxon(size_t _id, const info_t & _info, Ptr<this_t> _parent=nullptr)
      : id (_id), info(_info), parent(_parent), num_orgs(0), tot_orgs(0), num_offspring(0), total_offspring(0)
      , depth(parent ? (parent->depth+1) : 0) { ; }
@@ -130,6 +135,7 @@ namespace emp {
     size_t GetDepth() const { return depth; }
 
     data_t & GetData() {return data;}
+    const data_t & GetData() const {return data;}
 
     double GetOriginationTime() const {return origination_time;}
     void SetOriginationTime(double time) {origination_time = time;}
@@ -232,6 +238,7 @@ namespace emp {
      * @param store_ancestors  Should ancestral organims' taxa be maintained?  (yes for lineages!)
      * @param store_outside    Should all dead taxa be maintained? (typically no; it gets BIG!)
      */
+
     Systematics(bool _active=true, bool _anc=true, bool _all=false)
       : store_active(_active), store_ancestors(_anc), store_outside(_all)
       , archive(store_ancestors || store_outside)
