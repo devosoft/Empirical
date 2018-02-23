@@ -321,7 +321,7 @@ namespace emp {
       }
       bool operator!=(const Function & in) const { return !(*this == in); }
 
-      bool operator<(const Instruction & other) const {
+      bool operator<(const Function & other) const {
           return std::tie(inst_seq, affinity) < std::tie(other.inst_seq, other.affinity);
       }
 
@@ -370,7 +370,7 @@ namespace emp {
       bool operator==(const Program & in) const { return program == in.program; }
       bool operator!=(const Program & in) const { return !(*this == in); }
 
-      bool operator<(const Instruction & other) const {
+      bool operator<(const Program & other) const {
           return program < other.program;
       }
 
