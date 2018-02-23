@@ -26,6 +26,35 @@
 
 namespace emp {
 
+  /// Calculate sum of the members of the container passed
+  /// Only works on containers with a scalar member type
+  template <typename C>
+  typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value && std::is_scalar<typename C::value_type>::value, typename C::value_type>::type
+  Sum(C & elements) {
+
+    double total = 0;
+    for (auto element : elements) {
+      total += element;
+    }
+
+    return total;
+  }
+
+  /// Calculate sum of the values pointed at by pointers in a container
+  /// Only works on containers of pointers to a scalar type
+  template <typename C>
+  typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value && std::is_scalar<typename emp::remove_ptr_type<typename C::value_type>::type >::value, typename emp::remove_ptr_type<typename C::value_type>::type >::type
+  Sum(C & elements) {
+
+    double total = 0;
+    for (auto element : elements) {
+      total += *element;
+    }
+
+    return total;
+  }
+
+
   /// Calculate Shannon Entropy of the members of the container passed
   template <typename C>
   typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value, double>::type
@@ -45,7 +74,7 @@ namespace emp {
     double result = 0;
     for (auto element : counts) {
       double p = double(element.second)/elements.size();
-      result +=  p * log2(p);
+      result +=  p * Log2(p);
     }
 
     return -1 * result;
@@ -70,11 +99,57 @@ namespace emp {
     // Shannon entropy calculation
     double result = 0;
     for (auto element : counts) {
-      double p = double(element.second)/elements.GetSize();
+      double p = double(element.second)/elements.size();
       result +=  p * log2(p);
     }
     //   std::cout<< "leaving se" << std::endl;
     return -1 * result;
+  }
+
+  /// Calculate variance of the members of the container passed
+  /// Only works on containers with a scalar member type
+  template <typename C>
+  typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value && std::is_scalar<typename C::value_type>::value, double>::type
+  Variance(C & elements) {
+
+    double var = 0;
+    double mean = (double)Sum(elements)/elements.size();
+    for (auto element : elements) {
+      var += emp::Pow(element - mean, 2);
+    }
+    return var/elements.size();
+  }
+
+  /// Calculate variance of the values pointed at by members of the container passed
+  /// Only works on containers with a scalar member type
+  template <typename C>
+  typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value && std::is_scalar<typename emp::remove_ptr_type<typename C::value_type>::type >::value, double>::type
+  Variance(C & elements) {
+
+    double var = 0;
+    double mean = (double)Sum(elements)/elements.size();
+    for (auto element : elements) {
+      var += emp::Pow(*element - mean, 2);
+    }
+    return var/elements.size();
+  }
+
+  /// Calculate the mean of the values in a container
+  /// If values are pointers, they will be automatically de-referenced
+  /// Values must be numeric.
+  template <typename C>
+  emp::sfinae_decoy<double, typename C::value_type> 
+  Mean(C & elements) {
+    return (double)Sum(elements)/elements.size();
+  }
+
+  /// Calculate the standard deviation of the values in a container
+  /// If values are pointers, they will be automatically de-referenced
+  /// Values must be numeric.
+  template <typename C>
+  emp::sfinae_decoy<double, typename C::value_type> 
+  StandardDeviation(C & elements) {
+    return sqrt(Variance(elements));
   }
 
   /// Count the number of unique elements in a container
@@ -125,9 +200,10 @@ namespace emp {
   }
 
   /// Run the provided function on every member of a container and return the AVERAGE result.
-  /// Function must return a double.
-  template <typename C, typename ARG_TYPE>
-  double MeanResult(std::function<double(ARG_TYPE)> & fun, C & elements){
+  /// Function must return a scalar (i.e. numeric) type.
+  template <typename C, typename RET_TYPE, typename ARG_TYPE>
+  typename std::enable_if<std::is_scalar<RET_TYPE>::value, double>::type 
+  MeanResult(std::function<RET_TYPE(ARG_TYPE)> & fun, C & elements){
     double cumulative_value = 0;
     double count = 0;
     for (auto element : elements){
