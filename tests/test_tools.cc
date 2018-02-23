@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  Tests for files in the tools/ folder.
@@ -1172,6 +1172,27 @@ TEST_CASE("Test string utils", "[tools]")
   REQUIRE(slices[3] == "t ");
 
 
+  // Some tests of to_string() function.
+  REQUIRE(emp::to_string((int) 1) == "1");
+  REQUIRE(emp::to_string("2") == "2");
+  REQUIRE(emp::to_string(std::string("3")) == "3");
+  REQUIRE(emp::to_string('4') == "4");
+  REQUIRE(emp::to_string((int16_t) 5) == "5");
+  REQUIRE(emp::to_string((int32_t) 6) == "6");
+  REQUIRE(emp::to_string((int64_t) 7) == "7");
+  REQUIRE(emp::to_string((uint16_t) 8) == "8");
+  REQUIRE(emp::to_string((uint32_t) 9) == "9");
+  REQUIRE(emp::to_string((uint64_t) 10) == "10");
+  REQUIRE(emp::to_string((size_t) 11) == "11");
+  REQUIRE(emp::to_string((long) 12) == "12");
+  REQUIRE(emp::to_string((unsigned long) 13) == "13");
+  REQUIRE(emp::to_string((float) 14.0) == "14.000000");
+  REQUIRE(emp::to_string((double) 15.0) == "15.000000");
+  REQUIRE(emp::to_string(16.0) == "16.000000");
+  REQUIRE(emp::to_string(emp::vector<size_t>({17,18,19})) == "[ 17 18 19 ]");
+  REQUIRE(emp::to_string((char) 32) == " ");
+  REQUIRE(emp::to_string((unsigned char) 33) == "!");
+
   std::string cat_a = "ABC";
   bool cat_b = true;
   char cat_c = '2';
@@ -1180,7 +1201,7 @@ TEST_CASE("Test string utils", "[tools]")
   std::string cat_full = emp::to_string(cat_a, cat_b, cat_c, cat_d);
 
   REQUIRE(cat_full == "ABC123");
-  std::array<int, 3> test_arr({4, 2, 5});
+  std::array<int, 3> test_arr({{ 4, 2, 5 }});
   REQUIRE(emp::to_string(test_arr) == "[ 4 2 5 ]");
 }
 

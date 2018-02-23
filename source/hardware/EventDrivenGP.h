@@ -775,7 +775,9 @@ namespace emp {
     Ptr<Random> GetRandomPtr() { return random_ptr; }
 
     /// Get program loaded on this hardware.
-    const program_t & GetProgram() const { return program; }
+    const program_t & GetConstProgram() const { return program; }
+    program_t & GetProgram() { return program; }
+
 
     /// Get reference to a particular function in hardware's program.
     const Function & GetFunction(size_t fID) const {
@@ -1413,8 +1415,9 @@ namespace emp {
     static void Inst_Mod(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       const int base = (int)state.AccessLocal(inst.args[1]);
+      const int num = (int)state.AccessLocal(inst.args[0]);
       if (base == 0) ++hw.errors;
-      else state.SetLocal(inst.args[2], (int)state.AccessLocal(inst.args[0]) % base);
+      else state.SetLocal(inst.args[2], static_cast<int64_t>(num) % static_cast<int64_t>(base));
     }
 
     /// Default instruction: TestEqu
