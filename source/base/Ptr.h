@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2018
  *
  *  @file Ptr.h
  *  @brief A wrapper for pointers that does careful memory tracking (but only in debug mode).
@@ -426,7 +426,7 @@ namespace emp {
     void NewArray(size_t array_size, T &&... args) {
       Tracker().DecID(id);                              // Remove a pointer to any old memory...
 
-      // @CAO: This next portion of code is allocating an array of the appropriat type.
+      // @CAO: This next portion of code is allocating an array of the appropriate type.
       //       We are currently using "new", but should shift over to malloc since new throws an
       //       exception when there's a problem, which will trigger an abort in Emscripten mode.
       //       We'd rather be able to identify a more specific problem.
@@ -489,7 +489,7 @@ namespace emp {
     Ptr<TYPE> & operator=(Ptr<TYPE> && _in) {
       if (ptr_debug) std::cout << "move assignment" << std::endl;
       emp_assert(Tracker().IsDeleted(_in.id) == false, _in.id, "Do not move deleted pointers.");
-      if (id != _in.id) {
+      if (ptr != _in.ptr) {
         Tracker().DecID(id);   // Decrement references to former pointer at this position.
         ptr = _in.ptr;
         id = _in.id;
