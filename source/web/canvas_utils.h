@@ -100,8 +100,8 @@ namespace web {
   /// @param line_color The background line color for the grid.
   /// @param cell_width How many pixels wide is each cell to draw?
   /// @param cell_height How many pixels tall is each cell to draw?
-  /// @param offset_x How far should we shift the grid reletive to the left side of the canvas.
-  /// @param offset_y How far should we shift the grid reletive to the top of the canvas.
+  /// @param offset_x How far should we shift the grid relative to the left side of the canvas?
+  /// @param offset_y How far should we shift the grid relative to the top of the canvas?
   void Draw(Canvas canvas,
             const emp::vector<emp::vector<size_t>> & grid,
             const emp::vector<std::string> & color_map,
@@ -178,8 +178,8 @@ namespace web {
   /// @param line_color The background line color for the grid
   /// @param cell_width How many pixels wide is each cell to draw?
   /// @param cell_height How many pixels tall is each cell to draw?
-  /// @param offset_x How far should we shift the grid reletive to the left side of the canvas.
-  /// @param offset_y How far should we shift the grid reletive to the top of the canvas.
+  /// @param offset_x How far should we shift the grid relative to the left side of the canvas?
+  /// @param offset_y How far should we shift the grid relative to the top of the canvas?
   void Draw(Canvas canvas,
             const emp::vector<size_t> & grid,
             size_t grid_cols,

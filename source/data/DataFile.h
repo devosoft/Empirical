@@ -24,9 +24,9 @@
 
 namespace emp {
 
-  /** This class keep track of everything associated with periodically printing data to a file.
+  /** This class keeps track of everything associated with periodically printing data to a file.
    * It maintains a set of functions for calculating the desired measurements at each point in
-   * time that they are required. It also handles the formating of the file. 
+   * time that they are required. It also handles the formating of the file.
    */
   class DataFile {
   protected:
@@ -69,14 +69,14 @@ namespace emp {
     void SetSpacer(const std::string & _in) { line_spacer = _in; }
     /// Print @param _in at the end of each line.
     void SetLineEnd(const std::string & _in) { line_end = _in; }
-    /// Set line begin character (@param b), column delimeter (@param s), and line end character (@param e) 
+    /// Set line begin character (@param b), column delimeter (@param s), and line end character (@param e)
     void SetupLine(const std::string & b, const std::string & s, const std::string & e) {
       line_begin = b;
       line_spacer = s;
       line_end = e;
     }
 
-    /// Print a header containing the name of each column 
+    /// Print a header containing the name of each column
     void PrintHeaderKeys() {
       *os << line_begin;
       for (size_t i = 0; i < keys.size(); i++) {
@@ -138,23 +138,23 @@ namespace emp {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetCurrent(); };
       return Add(in_fun, key, desc);
     }
-    
+
     /// Add a function that always pulls the mean value from the DataNode @param node.
-    /// Requires that @param node have the data::Range or data::FullRange modifier. 
+    /// Requires that @param node have the data::Range or data::FullRange modifier.
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddMean(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMean(); };
       return Add(in_fun, key, desc);
     }
-    
+
     /// Add a function that always pulls the total value from the DataNode @param node.
-    /// Requires that @param node have the data::Range or data::FullRange modifier. 
+    /// Requires that @param node have the data::Range or data::FullRange modifier.
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddTotal(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetTotal(); };
       return Add(in_fun, key, desc);
     }
-    
+
     /// Add a function that always pulls the minimum value from the DataNode @param node
     /// Requires that @param node have the data::Range or data::FullRange modifier.
     template <typename VAL_TYPE, emp::data... MODS>
@@ -162,7 +162,7 @@ namespace emp {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMin(); };
       return Add(in_fun, key, desc);
     }
-    
+
     /// Add a function that always pulls the maximum value from the DataNode @param node
     /// Requires that @param node have the data::Range or data::FullRange modifier.
     template <typename VAL_TYPE, emp::data... MODS>
@@ -170,7 +170,7 @@ namespace emp {
       std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMax(); };
       return Add(in_fun, key, desc);
     }
-    
+
     /// Add a function that always pulls the count of the @param bin_id 'th bin of the histogram
     /// from @param node. Requires that @param node have the data::Histogram modifier and at least
     /// @bin_id bins.

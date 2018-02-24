@@ -13,7 +13,7 @@
  *  Where my_button is the C++ object linking to the button, MyFun is the
  *  function you want to call on clicks, "Button Name" is the label on the
  *  button itself, and "html_id" is the optional id you want it to use in the
- *  HTML code (otherwise it will generate a unique name on it's own.)
+ *  HTML code (otherwise it will generate a unique name on its own.)
  *
  *  Member functions to set state:
  *    Button & Callback(const std::function<void()> & in_callback)
