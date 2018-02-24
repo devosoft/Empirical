@@ -17,6 +17,7 @@
 
 #include "../base/assert.h"
 #include "../base/vector.h"
+#include "../meta/type_traits.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/string_utils.h"
 
@@ -239,27 +240,75 @@ namespace emp {
     }
   };
 
+
+  template <typename container_t>
+  class CollectionDataFile;
+
+  namespace internal {
+
+    template <typename container_t>
+    struct update_impl {
+      void Update(CollectionDataFile<container_t> * df) {
+        using data_t = typename container_t::value_type;
+        for (const data_t & d : df->GetCurrentRows()) {
+          df->OutputLine(d);
+        }        
+      }
+    };
+
+    template <typename container_t>
+    struct update_impl<Ptr<container_t>> {
+      void Update(CollectionDataFile<Ptr<container_t>> * df) {
+        using data_t = typename remove_ptr_type<container_t>::type::value_type;
+
+        for (const data_t & d : *(df->GetCurrentRows())) {
+          df->OutputLine(d);
+        }
+      }
+    };
+
+    template <typename container_t>
+    struct update_impl<container_t*> {
+      void Update(CollectionDataFile<container_t*> * df) {
+        using data_t = typename remove_ptr_type<container_t>::type::value_type;
+
+        for (const data_t & d : *(df->GetCurrentRows())) {
+          df->OutputLine(d);
+        }
+      }
+    };
+
+  }
+
+
   template <typename CONTAINER>
   class CollectionDataFile : public DataFile {
   private:
-    using data_t = typename CONTAINER::value_type;
+    using container_t = typename std::remove_reference<CONTAINER>::type; 
+    using raw_container_t = typename remove_ptr_type<container_t>::type;
+    // using non_const_container_t = typename std::remove_const<raw_container_t>::type;
+    // using data_t = typename non_const_container_t::value_type;
+    using data_t = typename raw_container_t::value_type;
     using coll_fun_t = void(std::ostream &, data_t);
-    using fun_update_container_t = std::function<CONTAINER(void)>;
+    using fun_update_container_t = std::function<container_t(void)>;
 
-    std::function<void(void)> update_container_fun;
+    // std::cout << typeid(container_t).name() << " " << typeid(raw_container_t).name() << " " 
 
-    CONTAINER current_rows;
+    fun_update_container_t update_container_fun;
+
+    container_t current_rows;
     FunctionSet<coll_fun_t> collection_funs;
     emp::vector<std::string> collection_keys;
     emp::vector<std::string> collection_descs;
+
   public:
 
     CollectionDataFile(const std::string & filename,
              const std::string & b="", const std::string & s=", ", const std::string & e="\n")
-             : DataFile(filename, b, s, e), update_container_fun() {;}
+             : DataFile(filename, b, s, e), update_container_fun(), current_rows() {;}
 
-    void SetUpdateContainerFun(fun_update_container_t fun) {
-      update_container_fun = [fun, this](){current_rows = fun();};
+    void SetUpdateContainerFun(const fun_update_container_t fun) {
+      update_container_fun = fun;
     }
 
     /// Print a header containing the name of each column
@@ -289,13 +338,10 @@ namespace emp {
       os->flush();
     }
 
-    /// Run all of the functions and print the results as a new line in the file
-    void Update() {
-      emp_assert(update_container_fun);
-      update_container_fun();
+    const container_t GetCurrentRows() const {return current_rows;}
 
-      for (const data_t & d : current_rows) {
-        *os << line_begin;
+    void OutputLine(const data_t d) {
+      *os << line_begin;
         for (size_t i = 0; i < funs.size(); i++) {
           if (i > 0) *os << line_spacer;
           funs[i](*os);
@@ -305,9 +351,46 @@ namespace emp {
           if (i > 0 || keys.size() > 0) *os << line_spacer;
           collection_funs[i](*os, d);
         }
-      *os << line_end;
-      }
+      *os << line_end;  
+    }
 
+    /// Run all of the functions and print the results as a new line in the file
+    void Update(){
+      emp_assert(update_container_fun);
+      current_rows = update_container_fun();
+    // std::cout << "curr: " << to_string(current_rows) << std::endl;  
+      // if (emp::is_ptr_type<container_t>::value) {
+      //   for (const data_t & d : *current_rows) {
+      //     *os << line_begin;
+      //     for (size_t i = 0; i < funs.size(); i++) {
+      //       if (i > 0) *os << line_spacer;
+      //       funs[i](*os);
+      //     }
+
+      //     for (size_t i = 0; i < collection_funs.size(); i++) {
+      //       if (i > 0 || keys.size() > 0) *os << line_spacer;
+      //       collection_funs[i](*os, d);
+      //     }
+      //   *os << line_end;
+      //   }
+      // } else {
+      //   for (const data_t & d : current_rows) {
+      //     *os << line_begin;
+      //     for (size_t i = 0; i < funs.size(); i++) {
+      //       if (i > 0) *os << line_spacer;
+      //       funs[i](*os);
+      //     }
+
+      //     for (size_t i = 0; i < collection_funs.size(); i++) {
+      //       if (i > 0 || keys.size() > 0) *os << line_spacer;
+      //       collection_funs[i](*os, d);
+      //     }
+      //   *os << line_end;
+      //   }
+      // }        
+      // os->flush();
+
+      internal::update_impl<container_t>().Update(this);
       os->flush();
     }
 

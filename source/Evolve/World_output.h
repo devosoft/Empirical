@@ -86,13 +86,15 @@ namespace emp {
     }
 
     template <typename WORLD_TYPE>
-    CollectionDataFile<std::unordered_set<Ptr<typename WORLD_TYPE::genotype_t>, typename Ptr<typename WORLD_TYPE::genotype_t>::hash_t>> AddMullerPlotFile(WORLD_TYPE & world, const std::string & fpath="muller_data.dat") {
-        using taxon_t = typename WORLD_TYPE::genotype_t;
-        using taxon_ptr_t = Ptr<typename WORLD_TYPE::genotype_t>;
-        using container_t = std::unordered_set<taxon_ptr_t, typename taxon_ptr_t::hash_t>;
+    auto
+    AddMullerPlotFile(WORLD_TYPE & world, const std::string & fpath="muller_data.dat") -> CollectionDataFile<decltype(world.GetSystematics().GetActivePtr())> {
 
+        using taxon_ptr_t = Ptr<typename WORLD_TYPE::genotype_t>;
+        using container_t = decltype(world.GetSystematics().GetActivePtr());
+        
         CollectionDataFile<container_t> file(fpath);
-        file.SetUpdateContainerFun([&world](){return world.GetSystematics().GetActive();});
+       
+        file.SetUpdateContainerFun([&world](){return world.GetSystematics().GetActivePtr();});
 
         std::function<size_t(void)> get_update = [&world](){return world.GetUpdate();};
         std::function<int(const taxon_ptr_t)> get_tax_id = [&world](const taxon_ptr_t t){

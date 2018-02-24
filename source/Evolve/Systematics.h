@@ -268,6 +268,8 @@ namespace emp {
     /// Are we storing any taxa types that have died out?
     bool GetArchive() const { return archive; }
 
+    // Currently using raw pointers because of a weird bug in emp::Ptr. Should switch when fixed.
+    std::unordered_set< Ptr<taxon_t>, hash_t >* GetActivePtr() { return &active_taxa; }
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetActive() const { return active_taxa; }
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetAncestors() const { return ancestor_taxa; }
 
