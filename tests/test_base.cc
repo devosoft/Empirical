@@ -36,7 +36,7 @@
   } while (false)
 
 
-TEST_CASE("Test array", "[tools]")
+TEST_CASE("Test array", "[base]")
 {
   constexpr int A_SIZE = 50;
   emp::array<int, A_SIZE> test_array;
@@ -54,7 +54,7 @@ TEST_CASE("Test array", "[tools]")
 }
 
 
-TEST_CASE("Test macro_math", "[tools]")
+TEST_CASE("Test macro_math", "[base]")
 {
 
   // Test converting between binary, decimal, and sum formats.
@@ -252,7 +252,7 @@ TEST_CASE("Test macro_math", "[tools]")
 
 
 
-TEST_CASE("Test macros", "[tools]")
+TEST_CASE("Test macros", "[base]")
 {
   EMP_TEST_MACRO( EMP_POP_ARGS_32(1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0), "3,4,5,6,7,8,9,0");
   EMP_TEST_MACRO( EMP_POP_ARGS(32, 1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0), "3,4,5,6,7,8,9,0");
@@ -355,7 +355,7 @@ TEST_CASE("Test macros", "[tools]")
 }
 
 
-TEST_CASE("Test Ptr", "[tools]")
+TEST_CASE("Test Ptr", "[base]")
 {
   // Test default constructor.
   emp::Ptr<int> ptr1;
@@ -406,6 +406,15 @@ TEST_CASE("Test Ptr", "[tools]")
   ptr_set[3]->Delete();
   ptr_set[1]->Delete();
 
+  // Make sure that we are properly handling temporary pointets moved to uninitialized pointes.
+  // (Previously breaking, now fixed.)
+  int a = 9;
+  emp::Ptr<int> ptr_a;
+  ptr_a = emp::ToPtr(&a);
+  int a_val = *(ptr_a);
+  REQUIRE(a_val == 9);
+
+
   // std::cout << ptr_set[0]->DebugGetCount() << std::endl;
 
 //   // @CAO Make sure we don't delete below 0
@@ -454,8 +463,7 @@ TEST_CASE("Test Ptr", "[tools]")
 }
 
 
-
-TEST_CASE("Test vector", "[tools]")
+TEST_CASE("Test vector", "[base]")
 {
   emp::vector<int> v(20);
 
@@ -471,7 +479,7 @@ TEST_CASE("Test vector", "[tools]")
 
 
 
-TEST_CASE("Test assert", "[tools]")
+TEST_CASE("Test assert", "[base]")
 {
   // Asserts are tricky to test.  Here are a bunch that should PASS.
   emp_assert(true);
