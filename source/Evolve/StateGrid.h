@@ -43,7 +43,7 @@ namespace emp {
     struct StateInfo {
       int state_id;        ///< Ordinal id for this state.
       char symbol;         ///< Symbol for printing this state.
-      double score_change; ///< Change ammount for organism score by stepping on this squre.
+      double score_change; ///< Change ammount for organism score by stepping on this square.
       std::string name;    ///< Name of this state.
       std::string desc;    ///< Explanation of this state.
 
