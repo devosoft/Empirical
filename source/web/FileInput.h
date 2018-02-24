@@ -97,8 +97,8 @@ namespace web {
     FileInput(FileInputInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:
-    /// Create a new Fileinput; supply the function to call with the file contents as a string.
-    /// (and optionally the HTML identifier to be used.)
+    /// Create a new Fileinput; supply the function to call with the file contents as a string
+    /// (and optionally the HTML identifier to be used).
     FileInput(const std::function<void(const std::string &)> & in_cb, const std::string & in_id="")
       : WidgetFacet(in_id)
     {
@@ -114,8 +114,8 @@ namespace web {
       Info()->callback_id = JSWrap( callback_t( [w_info](const std::string & file_body){w_info->DoCallback(file_body);} )  );
     }
 
-    /// Create a new Fileinput; supply the function to call with the file contents as a File obejct.
-    /// (and optionally the HTML identifier to be used.)
+    /// Create a new Fileinput; supply the function to call with the file contents as a File object
+    /// (and optionally the HTML identifier to be used).
     FileInput(const std::function<void(const emp::File &)> & cb, const std::string & in_id="")
       : FileInput( [cb](const std::string & in){ std::stringstream ss(in); File file(ss); cb(file); } ) { ; }
 
