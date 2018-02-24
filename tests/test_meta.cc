@@ -7,12 +7,14 @@
 
 #include "base/array.h"
 #include "base/vector.h"
+#include "base/Ptr.h"
 #include "tools/tuple_utils.h"
 
 #include "meta/meta.h"
 #include "meta/reflection.h"
 #include "meta/TypeID.h"
 #include "meta/TypePack.h"
+#include "meta/type_traits.h"
 
 
 char result_char;
@@ -159,4 +161,20 @@ TEST_CASE("Test TypePack", "[meta]")
 
   using shuffle_t = test_t::select<2,3,4,1,3,3,3,0>;
   REQUIRE(emp::TypeID<shuffle_t>::GetName() == "emp::TypePack<float,bool,double,std::string,bool,bool,bool,int32_t>");
+}
+
+TEST_CASE("Test type traits", "[meta]") {
+  REQUIRE((emp::test_type<std::is_pointer, emp::remove_ptr_type_t<int*>>()) == false);
+  REQUIRE((emp::test_type<emp::is_ptr_type, emp::remove_ptr_type_t<int*>>()) == false);
+  REQUIRE((emp::test_type<std::is_pointer, emp::remove_ptr_type_t<emp::Ptr<int>>>()) == false);
+  REQUIRE((emp::test_type<emp::is_ptr_type, emp::remove_ptr_type_t<emp::Ptr<int>>>()) == false);
+  REQUIRE((emp::test_type<std::is_pointer, emp::remove_ptr_type_t<int>>()) == false);
+  REQUIRE((emp::test_type<emp::is_ptr_type, emp::remove_ptr_type_t<int>>()) == false);
+
+  REQUIRE((emp::test_type<emp::is_ptr_type, int*>()) == true);
+  REQUIRE((emp::test_type<emp::is_ptr_type, emp::Ptr<int>>()) == true);
+
+  REQUIRE((std::is_same<int, emp::remove_ptr_type_t<int*>>()) == true);
+  REQUIRE((std::is_same<int, emp::remove_ptr_type_t<emp::Ptr<int>>>()) == true);
+
 }
