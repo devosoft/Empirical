@@ -374,7 +374,7 @@ namespace emp {
     /// Access a data node that tracks fitness information in the population.  The fitness will not
     /// be collected until the first Update() after this function is initially called, signaling
     /// the need for this information.
-    DataMonitor<double> & GetFitnessDataNode() {
+    Ptr<DataMonitor<double>> GetFitnessDataNode() {
       if (!data_nodes.HasNode("fitness")) {
         DataMonitor<double> & node = data_nodes.New("fitness");
 
@@ -388,19 +388,19 @@ namespace emp {
           }
         );
       }
-      return data_nodes.Get("fitness");
+      return &(data_nodes.Get("fitness"));
     }
 
     // Returns a reference so that capturing it in a lambda to call on update
     // is less confusing. It's possible we should change it to be consistent
     // with GetFitnessDataNode, though.
-    DataMonitor<double> & AddDataNode(const std::string & name) {
+    Ptr<DataMonitor<double>> AddDataNode(const std::string & name) {
       emp_assert(!data_nodes.HasNode(name));
-      return data_nodes.New(name);
+      return &(data_nodes.New(name));
     }
 
-    DataMonitor<double> & GetDataNode(const std::string & name) {
-      return data_nodes.Get(name);
+    Ptr<DataMonitor<double>> GetDataNode(const std::string & name) {
+      return &(data_nodes.Get(name));
     }
 
     /// Setup an arbitrary file; no default filename available.
