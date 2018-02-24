@@ -949,12 +949,12 @@ namespace emp {
   template<typename ORG, typename DATA_TYPE>
   World_file & World<ORG, DATA_TYPE>::SetupFitnessFile(const std::string & filename) {
     auto & file = SetupFile(filename);
-    auto & node = GetFitnessDataNode();
+    auto node = GetFitnessDataNode();
     file.AddVar(update, "update", "Update");
-    file.AddMean(node, "mean_fitness", "Average organism fitness in current population.");
-    file.AddMin(node, "min_fitness", "Minimum organism fitness in current population.");
-    file.AddMax(node, "max_fitness", "Maximum organism fitness in current population.");
-    file.AddInferiority(node, "inferiority", "Average fitness / maximum fitness in current population.");
+    file.AddMean(*node, "mean_fitness", "Average organism fitness in current population.");
+    file.AddMin(*node, "min_fitness", "Minimum organism fitness in current population.");
+    file.AddMax(*node, "max_fitness", "Maximum organism fitness in current population.");
+    file.AddInferiority(*node, "inferiority", "Average fitness / maximum fitness in current population.");
     file.PrintHeaderKeys();
     return file;
   }
