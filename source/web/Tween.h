@@ -8,7 +8,7 @@
  *
  *  To create a Tween, a duration must be specified, along with an optional default
  *  target.  Once a Tween is setup, paths can be added to it, which represent the
- *  changes that should occure over the specified duration.
+ *  changes that should occur over the specified duration.
  *
  *  A path can be a function to call (with the 0.0 to 1.0 fraction of the time that's
  *  gone by) or a variable to set to the current fraction.  Dependants can also be set

@@ -1,5 +1,4 @@
 #define CATCH_CONFIG_MAIN
-#undef NDEBUG
 
 #include "third-party/Catch/single_include/catch.hpp"
 
