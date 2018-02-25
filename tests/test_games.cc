@@ -24,14 +24,14 @@ TEST_CASE("Test Othello", "[games]") {
   // Legal directions.
   int eSid = 8, eSEid = 9, eEid = 1;
   // What does othello say the neighbors are for 0,0?
-  int Nid = othello_w8.GetNeighbor(0, emp::Othello::N());
-  int NEid = othello_w8.GetNeighbor(0, emp::Othello::NE());
-  int Eid = othello_w8.GetNeighbor(0, emp::Othello::E());
-  int SEid = othello_w8.GetNeighbor(0, emp::Othello::SE());
-  int Sid = othello_w8.GetNeighbor(0, emp::Othello::S());
-  int SWid = othello_w8.GetNeighbor(0, emp::Othello::SW());
-  int Wid = othello_w8.GetNeighbor(0, emp::Othello::W());
-  int NWid = othello_w8.GetNeighbor(0, emp::Othello::NW());
+  int Nid = othello_w8.GetNeighbor(0, emp::Othello::N);
+  int NEid = othello_w8.GetNeighbor(0, emp::Othello::NE);
+  int Eid = othello_w8.GetNeighbor(0, emp::Othello::E);
+  int SEid = othello_w8.GetNeighbor(0, emp::Othello::SE);
+  int Sid = othello_w8.GetNeighbor(0, emp::Othello::S);
+  int SWid = othello_w8.GetNeighbor(0, emp::Othello::SW);
+  int Wid = othello_w8.GetNeighbor(0, emp::Othello::W);
+  int NWid = othello_w8.GetNeighbor(0, emp::Othello::NW);
   REQUIRE(Nid == eNid);
   REQUIRE(NEid == eNEid);
   REQUIRE(Eid == eEid);
@@ -43,8 +43,8 @@ TEST_CASE("Test Othello", "[games]") {
 
   // On initial board:
   // - Make sure all positions we expect to be valid are valid.
-  size_t darkID = emp::Othello::DarkPlayerID();
-  size_t lightID = emp::Othello::LightPlayerID();
+  size_t darkID = emp::Othello::DarkPlayerID;
+  size_t lightID = emp::Othello::LightPlayerID;
   REQUIRE(othello_w8.IsMoveValid(lightID, 4,2));
   REQUIRE(othello_w8.IsMoveValid(lightID, 2,4));
   REQUIRE(othello_w8.IsMoveValid(lightID, 5,3));
