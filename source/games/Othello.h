@@ -26,22 +26,9 @@ namespace emp {
   ///     times during a turn.
   class Othello {
   public:
-    enum BoardSpace { DARK, LIGHT, OPEN };        ///< All possible states of a board space.
-    using board_t = emp::vector<BoardSpace>;
-
-    // Player IDs.
-    static constexpr int DarkPlayerID = 0;
-    static constexpr int LightPlayerID = 1;
-
-    // Which piece is in a board space?
-    static constexpr BoardSpace DarkDisk = BoardSpace::DARK;
-    static constexpr BoardSpace LightDisk = BoardSpace::LIGHT;
-    static constexpr BoardSpace OpenSpace = BoardSpace::OPEN;
-
-    // Direction IDs.
-    enum Facing { N, NE, E, SE, S, SW, W, NW };
-
-    // Useful array of all directions.
+    enum Player { NONE=0, DARK, LIGHT };         ///< All possible states of a board space.
+    enum Facing { N, NE, E, SE, S, SW, W, NW };  ///< All possible directions
+    using board_t = emp::vector<Player>;
     static constexpr size_t NUM_DIRECTIONS = 8;   ///< Number of neighbors each board space has.
 
   protected:
@@ -50,7 +37,7 @@ namespace emp {
     emp::vector<int> neighbors; ///< On construction, pre-compute adjacency network.
 
     bool over = false;    ///< Is the game over?
-    size_t cur_player;    ///< Is it DARK player's turn?
+    Player cur_player;    ///< Is it DARK player's turn?
     size_t board_size;    ///< Game board is board_size X board_size
     board_t game_board;   ///< Game board
 
@@ -114,32 +101,32 @@ namespace emp {
     /// Reset the board to the starting condition.
     void Reset() {
       // Reset the board.
-      for (size_t i = 0; i < game_board.size(); ++i) game_board[i] = OpenSpace;
+      for (size_t i = 0; i < game_board.size(); ++i) game_board[i] = Player::NONE;
 
       // Setup Initial board
       //  ........
       //  ...LD...
       //  ...DL...
       //  ........
-      SetPos(board_size/2 - 1, board_size/2 - 1, LightDisk);
-      SetPos(board_size/2 - 1, board_size/2, DarkDisk);
-      SetPos(board_size/2, board_size/2 - 1, DarkDisk);
-      SetPos(board_size/2, board_size/2, LightDisk);
+      SetPos(board_size/2 - 1, board_size/2 - 1, Player::LIGHT);
+      SetPos(board_size/2 - 1, board_size/2, Player::DARK);
+      SetPos(board_size/2, board_size/2 - 1, Player::DARK);
+      SetPos(board_size/2, board_size/2, Player::LIGHT);
 
       over = false;
-      cur_player = DarkPlayerID;
+      cur_player = Player::DARK;
     }
 
     size_t GetBoardWidth() const { return board_size; }
     size_t GetBoardHeight() const { return board_size; }
     size_t GetBoardSize() const { return game_board.size(); }
-    size_t GetCurPlayer() const { return cur_player; }
+    Player GetCurPlayer() const { return cur_player; }
 
     /// Get opponent ID of give player ID.
-    int GetOpponentID(int playerID) const {
-      emp_assert(IsValidPlayer(playerID));
-      if (playerID == DarkPlayerID) return LightPlayerID;
-      return DarkPlayerID;
+    Player GetOpponent(Player player) const {
+      emp_assert(IsValidPlayer(player));
+      if (player == Player::DARK) return Player::LIGHT;
+      return Player::DARK;
     }
 
     /// Get x location in board grid given loc ID.
@@ -160,7 +147,7 @@ namespace emp {
     bool IsValidPos(size_t id) const { return id < game_board.size(); }
 
     /// Is the given player ID a valid player?
-    bool IsValidPlayer(int playerID) const { return (playerID == DarkPlayerID) || (playerID == LightPlayerID); }
+    bool IsValidPlayer(int player) const { return (player == Player::DARK) || (player == Player::LIGHT); }
 
     /// Get location adjacent to ID in direction dir.
     /// GetNeighbor function is save with garbage ID values.
@@ -174,89 +161,57 @@ namespace emp {
       return GetNeighbor(GetPosID(x,y), dir);
     }
 
-    /// Given a player ID (0 or 1 are valid), what Disk type does that player use?
-    BoardSpace GetDiskType(size_t player_id) {
-      emp_assert(IsValidPlayer(player_id));
-      if (player_id == DarkPlayerID) return DarkDisk;
-      else return LightDisk;
-    }
-
-    /// Given a disk type (light or dark), get the player id that uses that disk type.
-    int GetPlayerID(BoardSpace disk_type) {
-      emp_assert(disk_type == DarkDisk || disk_type == LightDisk);
-      if (disk_type == DarkDisk) return DarkPlayerID;
-      else return LightPlayerID;
-    }
-
     /// Get the value (light, dark or open) at an x,y location on the board.
-    BoardSpace GetPosValue(size_t x, size_t y) const {
-      return GetPosValue(GetPosID(x, y));
+    Player GetPosOwner(size_t x, size_t y) const {
+      return GetPosOwner(GetPosID(x, y));
     }
 
     /// Get the value (light, dark, or open) at a position on the board.
-    BoardSpace GetPosValue(size_t id) const {
+    Player GetPosOwner(size_t id) const {
       emp_assert(id < game_board.size());
       return game_board[id];
-    }
-
-    /// Get the owner (playerID) at a position on the board.
-    /// Returns a -1 if no owner.
-    int GetPosOwner(int id) {
-      if (GetPosValue(id) == DarkDisk) {
-        return DarkPlayerID;
-      } else if (GetPosValue(id) == LightDisk) {
-        return LightPlayerID;
-      } else {
-        return -1;
-      }
-    }
-
-    /// Get the owner (playerID) at an x,y position on the board.
-    /// Returns a -1 if no owner.
-    int GetPosOwner(size_t x, size_t y) {
-      return GetPosOwner(GetPosID(x, y));
     }
 
     board_t & GetBoard() { return game_board; }
     const board_t & GetBoard() const { return game_board; }
 
     /// Is give move (move_x, move_y) valid?
-    bool IsMoveValid(int playerID, size_t move_x, size_t move_y) {
-      return IsMoveValid(playerID, GetPosID(move_x, move_y));
+    bool IsMoveValid(Player player, size_t move_x, size_t move_y) {
+      return IsMoveValid(player, GetPosID(move_x, move_y));
     }
 
     /// Is given move valid?
-    bool IsMoveValid(int playerID, size_t move_id) {
-      emp_assert(IsValidPlayer(playerID));
+    bool IsMoveValid(Player player, size_t move_id) {
+      emp_assert(IsValidPlayer(player));
       // 1) Is move_id valid position on the board?
       if (!IsValidPos(move_id)) return false;
       // 2) The move position must be empty.
-      if (GetPosValue(move_id) != OpenSpace) return false;
+      if (GetPosOwner(move_id) != Player::NONE) return false;
       // 3) A non-zero number of tiles must flip.
-      return (bool)GetFlipList(playerID, move_id, true).size();
+      return (bool)GetFlipList(player, move_id, true).size();
     }
 
     bool IsOver() const { return over; }
 
-    /// Get positions that would flip if a player (playerID) made a particular move (move_id).
+    /// Get positions that would flip if a player (player) made a particular move (move_id).
     /// - Does not check move validity.
     /// - If only_first_valid: return the first valid flip set (in any direction).
-    emp::vector<size_t> GetFlipList(int playerID, size_t move_id, bool only_first_valid=false) {
+    emp::vector<size_t> GetFlipList(Player player, size_t move_id, bool only_first_valid=false) {
       emp::vector<size_t> flip_list;
       size_t prev_len = 0;
       for (Facing dir : ALL_DIRECTIONS) {
-        int neighborID = GetNeighbor(move_id, dir);
-        while (neighborID != -1) {
-          if (GetPosValue(neighborID) == OpenSpace) {
+        int neighbor_pos = GetNeighbor(move_id, dir);
+        while (neighbor_pos != -1) {
+          if (GetPosOwner(neighbor_pos) == Player::NONE) {
             flip_list.resize(prev_len);
             break;
-          } else if (GetPosOwner(neighborID) == GetOpponentID(playerID)) {
-            flip_list.emplace_back(neighborID);
+          } else if (GetPosOwner(neighbor_pos) == GetOpponent(player)) {
+            flip_list.emplace_back(neighbor_pos);
           } else {
             prev_len = flip_list.size();
             break;
           }
-          neighborID = GetNeighbor((size_t)neighborID, dir);
+          neighbor_pos = GetNeighbor((size_t)neighbor_pos, dir);
         }
         flip_list.resize(prev_len);
         if (only_first_valid && flip_list.size()) break;
@@ -264,92 +219,70 @@ namespace emp {
       return flip_list;
     }
 
-    /// Get a list of valid move options for given disk_type.
-    emp::vector<size_t> GetMoveOptions(BoardSpace disk_type) {
-      return GetMoveOptions(GetPlayerID(disk_type));
-    }
-
-    /// Get a list of valid moves for the given player ID on the current board state.
-    emp::vector<size_t> GetMoveOptions(int playerID) {
-      emp_assert(IsValidPlayer(playerID));
+    /// Get a list of valid move options for given owner.
+    emp::vector<size_t> GetMoveOptions(Player player) {
+      emp_assert(IsValidPlayer(player));
       emp::vector<size_t> valid_moves;
       for (size_t i = 0; i < game_board.size(); ++i) {
-        if (IsMoveValid(playerID, i)) valid_moves.emplace_back(i);
+        if (IsMoveValid(player, i)) valid_moves.emplace_back(i);
       }
       return valid_moves;
     }
 
     /// Get the current score for a given player.
-    double GetScore(int playerID) {
-      emp_assert(IsValidPlayer(playerID));
+    double GetScore(Player player) {
+      emp_assert(IsValidPlayer(player));
       double score = 0;
       for (size_t i = 0; i < game_board.size(); ++i) {
-        if (GetPosOwner(i) == playerID) score++;
+        if (GetPosOwner(i) == player) score++;
       }
       return score;
     }
 
     /// Get number of frontier positions for given player.
     /// Frontier position -- number empty squares adjacent to a player's pieces.
-    size_t GetFrontierPosCnt(int playerID) {
-      emp_assert(IsValidPlayer(playerID));
+    size_t GetFrontierPosCnt(Player player) {
+      emp_assert(IsValidPlayer(player));
       size_t frontier_size = 0;
       for (size_t i = 0; i < game_board.size(); ++i) {
         // Are we looking at an empty space?
-        if (game_board[i] == OpenSpace) {
-          // If adjacent to playerID's token: increment player's frontier size.
-          if (IsAdjacentTo(i, GetDiskType(playerID))) ++frontier_size;
+        if (game_board[i] == Player::NONE) {
+          // If adjacent to player's token: increment player's frontier size.
+          if (IsAdjacentTo(i, player)) ++frontier_size;
         }
       }
       return frontier_size;
     }
 
-    /// Is position given by ID adjacent to the space type given by space?
-    bool IsAdjacentTo(size_t id, BoardSpace space) {
+    /// Is position given by ID adjacent to the given owner?
+    bool IsAdjacentTo(size_t id, Player owner) {
       for (Facing dir : ALL_DIRECTIONS) {
         int nID = GetNeighbor(id, dir);
         if (nID == -1) continue;
-        if (GetPosValue((size_t)nID) == space) return true;
+        if (GetPosOwner((size_t)nID) == owner) return true;
       }
       return false;
     }
 
-    /// Is position given by x,y adjacent to the space type given by space?
-    bool IsAdjacentTo(size_t x, size_t y, BoardSpace space) {
-      return IsAdjacentTo(GetPosID(x,y), space);
+    /// Is position given by x,y adjacent to the given owner?
+    bool IsAdjacentTo(size_t x, size_t y, Player owner) {
+      return IsAdjacentTo(GetPosID(x,y), owner);
     }
 
     /// Set board position (ID) to given space value.
-    void SetPos(size_t id, BoardSpace space) {
+    void SetPos(size_t id, Player player) {
       emp_assert(id < game_board.size());
-      game_board[id] = space;
+      game_board[id] = player;
     }
 
     /// Set board position (x,y) to given space value.
-    void SetPos(size_t x, size_t y, BoardSpace space) {
-      SetPos(GetPosID(x, y), space);
+    void SetPos(size_t x, size_t y, Player player) {
+      SetPos(GetPosID(x, y), player);
     }
 
-    /// Set board position (ID) to disk type used by playerID.
-    void SetPos(size_t id, int playerID) {
-      emp_assert(IsValidPlayer(playerID));
-      SetPos(id, GetDiskType(playerID));
-    }
-
-    /// Set positions given by ids to belong to given player.
-    void SetPositions(emp::vector<size_t> ids, int playerID) {
-      for (size_t i = 0; i < ids.size(); ++i) SetPos(ids[i], playerID);
-    }
-
-    /// Set positions given by ids to be given board space type.
-    void SetPositions(emp::vector<size_t> ids, BoardSpace space) {
-      for (size_t i = 0; i < ids.size(); ++i) SetPos(ids[i], space);
-    }
-
-    /// Set board position (x,y) to disk type used by playerID.
-    void SetPos(size_t x, size_t y, int playerID) {
-      emp_assert(IsValidPlayer(playerID));
-      SetPos(GetPosID(x, y), GetDiskType(playerID));
+    /// Set positions given by ids to be owned by the given player.
+    void SetPositions(emp::vector<size_t> ids, Player player) {
+      for (size_t i = 0; i < ids.size(); ++i) SetPos(ids[i], player);
     }
 
     /// Configure board as given by copy_board input.
@@ -365,9 +298,9 @@ namespace emp {
     void SetBoard(const Othello & other_othello) { SetBoard(other_othello.GetBoard()); }
 
     /// Set the current player.
-    void SetCurPlayer(int playerID) {
-      emp_assert(IsValidPlayer(playerID));
-      cur_player = playerID;
+    void SetCurPlayer(Player player) {
+      emp_assert(IsValidPlayer(player));
+      cur_player = player;
     }
 
     /// Do current player's move (moveID).
@@ -384,42 +317,42 @@ namespace emp {
     }
 
     /// Do move from any player's perspective.
-    bool DoMove(int playerID, size_t x, size_t y) {
-      return DoMove(playerID, GetPosID(x,y));
+    bool DoMove(Player player, size_t x, size_t y) {
+      return DoMove(player, GetPosID(x,y));
     }
 
-    /// Do move (moveID) for player (playerID). Return bool whether player can go again.
+    /// Do move (moveID) for player. Return bool whether player can go again.
     /// After making move, update current player.
     /// NOTE: Does not check validity.
-    /// Will switch cur_player from playerID to Opp(playerID) if opponent has a move to make.
-    bool DoMove(int playerID, size_t moveID) {
-      emp_assert(IsValidPlayer(playerID));
-      // 1) Take position for playerID.
-      SetPos(moveID, playerID);
+    /// Will switch cur_player from player to Opp(player) if opponent has a move to make.
+    bool DoMove(Player player, size_t moveID) {
+      emp_assert(IsValidPlayer(player));
+      // 1) Take position for player.
+      SetPos(moveID, player);
       // 2) Affect board appropriately: flip tiles!
-      DoFlips(playerID, moveID);
+      DoFlips(player, moveID);
       // 3) Who's turn is next?
-      emp::vector<size_t> player_moves = GetMoveOptions(playerID);
-      emp::vector<size_t> opp_moves = GetMoveOptions(GetOpponentID(playerID));
+      emp::vector<size_t> player_moves = GetMoveOptions(player);
+      emp::vector<size_t> opp_moves = GetMoveOptions(GetOpponent(player));
       bool go_again = false;
       if (!player_moves.size() && !opp_moves.size()) {
         // No one has any moves! Game over!
         over = true;
       } else if (!opp_moves.size()) {
-        // Opponent has no moves! PlayerID goes again!
+        // Opponent has no moves! Player goes again!
         go_again = true;
       } else {
         // Opponent has a move to make! Give 'em a shot at it.
-        cur_player = GetOpponentID(playerID);
+        cur_player = GetOpponent(player);
       }
       return go_again;
     }
 
     /// NOTE: does not check for move validity.
-    void DoFlips(int playerID, size_t moveID) {
-      emp_assert(IsValidPlayer(playerID));
-      vector<size_t> flip_list = GetFlipList(playerID, moveID);
-      for (size_t flip : flip_list) { SetPos(flip, playerID); }
+    void DoFlips(Player player, size_t moveID) {
+      emp_assert(IsValidPlayer(player));
+      vector<size_t> flip_list = GetFlipList(player, moveID);
+      for (size_t flip : flip_list) { SetPos(flip, player); }
     }
 
     /// Print board state to given ostream.
@@ -434,9 +367,9 @@ namespace emp {
       for (size_t y = 0; y < board_size; ++y) {
         os << y << " ";
         for (size_t x = 0; x < board_size; ++x) {
-          BoardSpace space = GetPosValue(x,y);
-          if (space == DarkDisk)  { os << dark_token << " "; }
-          else if (space == LightDisk) { os << light_token << " "; }
+          Player space = GetPosOwner(x,y);
+          if (space == Player::DARK)  { os << dark_token << " "; }
+          else if (space == Player::LIGHT) { os << light_token << " "; }
           else { os << open_space << " "; }
         }
         os << "\n";
