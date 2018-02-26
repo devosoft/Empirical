@@ -24,12 +24,21 @@ namespace emp {
   ///     willy-nilly board manipulation, etc). This would let us make lots of assumptions about
   ///     calculating flip lists, scores, etc, which would speed up asking for flip lists, etc. multiple
   ///     times during a turn.
-  class Othello {
-  public:
+
+  /// Base class for all sizes of Othello games.
+  struct Othello_Base {
     enum Player { NONE=0, DARK, LIGHT };         ///< All possible states of a board space.
     enum Facing { N, NE, E, SE, S, SW, W, NW };  ///< All possible directions
     static constexpr size_t NUM_DIRECTIONS = 8;  ///< Number of neighbors each board space has.
-    using board_t = emp::vector<Player>;
+  };
+
+  /// Class for othello games of a specific size.
+  template <size_t BOARD_SIZE>
+  class Othello_Game : public Othello_Base {
+  public:
+    static constexpr size_t BOARD_CELLS = BOARD_SIZE * BOARD_SIZE;
+    using this_t = Othello_Game<BOARD_SIZE>;
+    using board_t = std::array<Player, BOARD_CELLS>;
 
   protected:
     std::array<Facing, NUM_DIRECTIONS> ALL_DIRECTIONS;
@@ -37,7 +46,6 @@ namespace emp {
 
     bool over = false;    ///< Is the game over?
     Player cur_player;    ///< Who is the current player set to move next?
-    size_t board_size;    ///< Game board is board_size X board_size
     board_t game_board;   ///< Game board
 
     /// Internal function for accessing the neighbors vector.
@@ -79,17 +87,17 @@ namespace emp {
     }
 
   public:
-    Othello(size_t side_len)
-      : ALL_DIRECTIONS(), board_size(side_len), game_board(board_size*board_size)
+    Othello_Game()
+      : ALL_DIRECTIONS(), game_board()
     {
-      emp_assert(board_size >= 4);
+      emp_assert(BOARD_SIZE >= 4);
       ALL_DIRECTIONS = { Facing::N, Facing::NE, Facing::E, Facing::SE,
                          Facing::S, Facing::SW, Facing::W, Facing::NW };
       GenerateNeighborNetwork();
       Reset();
     }
 
-    ~Othello() { ; }
+    ~Othello_Game() { ; }
 
     /// Reset the board to the starting condition.
     void Reset() {
@@ -101,18 +109,17 @@ namespace emp {
       //  ...LD...
       //  ...DL...
       //  ........
-      SetPos(board_size/2 - 1, board_size/2 - 1, Player::LIGHT);
-      SetPos(board_size/2 - 1, board_size/2, Player::DARK);
-      SetPos(board_size/2, board_size/2 - 1, Player::DARK);
-      SetPos(board_size/2, board_size/2, Player::LIGHT);
+      SetPos(BOARD_SIZE/2 - 1, BOARD_SIZE/2 - 1, Player::LIGHT);
+      SetPos(BOARD_SIZE/2 - 1, BOARD_SIZE/2, Player::DARK);
+      SetPos(BOARD_SIZE/2, BOARD_SIZE/2 - 1, Player::DARK);
+      SetPos(BOARD_SIZE/2, BOARD_SIZE/2, Player::LIGHT);
 
       over = false;
       cur_player = Player::DARK;
     }
 
-    size_t GetBoardWidth() const { return board_size; }
-    size_t GetBoardHeight() const { return board_size; }
-    size_t GetBoardSize() const { return game_board.size(); }
+    constexpr size_t GetBoardWidth() const { return BOARD_SIZE; }
+    size_t GetBoardCells() const { return game_board.size(); }
     Player GetCurPlayer() const { return cur_player; }
 
     /// Get opponent ID of give player ID.
@@ -123,16 +130,16 @@ namespace emp {
     }
 
     /// Get x location in board grid given loc ID.
-    size_t GetPosX(size_t id) const { return id % board_size; }
+    size_t GetPosX(size_t id) const { return id % BOARD_SIZE; }
 
     /// Get Y location in board grid given loc ID.
-    size_t GetPosY(size_t id) const { return id / board_size; }
+    size_t GetPosY(size_t id) const { return id / BOARD_SIZE; }
 
     /// Get board ID of  given an x, y position.
-    size_t GetPosID(size_t x, size_t y) const { return (y * board_size) + x; }
+    size_t GetPosID(size_t x, size_t y) const { return (y * BOARD_SIZE) + x; }
 
     /// Is the given x,y position valid?
-    bool IsValidPos(size_t x, size_t y) const { return x < board_size && y < board_size; }
+    bool IsValidPos(size_t x, size_t y) const { return x < BOARD_SIZE && y < BOARD_SIZE; }
 
     /// Is the given board position ID a valid position on the board?
     bool IsValidPos(size_t id) const { return id < game_board.size(); }
@@ -280,7 +287,7 @@ namespace emp {
     }
 
     /// Set current board to be the same as board from other othello game.
-    void SetBoard(const Othello & other_othello) { SetBoard(other_othello.GetBoard()); }
+    void SetBoard(const this_t & other_othello) { SetBoard(other_othello.GetBoard()); }
 
     /// Set the current player.
     void SetCurPlayer(Player player) {
@@ -346,12 +353,12 @@ namespace emp {
       // Output column labels.
       unsigned char letter = 'A';
       os << "\n  ";
-      for (size_t i = 0; i < board_size; ++i) os << char(letter + i) << " ";
+      for (size_t i = 0; i < BOARD_SIZE; ++i) os << char(letter + i) << " ";
       os << "\n";
       // Output row labels and board information.
-      for (size_t y = 0; y < board_size; ++y) {
+      for (size_t y = 0; y < BOARD_SIZE; ++y) {
         os << y << " ";
-        for (size_t x = 0; x < board_size; ++x) {
+        for (size_t x = 0; x < BOARD_SIZE; ++x) {
           Player space = GetPosOwner(x,y);
           if (space == Player::DARK)  { os << dark_token << " "; }
           else if (space == Player::LIGHT) { os << light_token << " "; }
@@ -361,6 +368,8 @@ namespace emp {
       }
     }
   };
+
+  using Othello = Othello_Game<8>;
 }
 
 #endif
