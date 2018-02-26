@@ -382,3 +382,74 @@ TEST_CASE("Test histogram", "[data]") {
   data.Reset();
   REQUIRE(data.GetHistCounts() == emp::vector<size_t>({0,0,0,0,0,0,0,0,0,0}));
 }
+
+TEST_CASE("Test timing", "[data]") {
+    int test_int = 5;
+
+    emp::DataFile dfile("test_timing_file.dat");
+
+    emp::DataMonitor<double> data_fracs;
+    emp::DataMonitor<int> data_squares;
+    emp::DataMonitor<uint64_t> data_cubes;
+
+    dfile.AddVar<int>(test_int);
+    dfile.AddCurrent(data_fracs);
+    dfile.AddCurrent(data_squares);
+    dfile.AddCurrent(data_cubes);
+    dfile.AddMean(data_cubes);
+    dfile.AddTotal(data_cubes);
+    dfile.AddMin(data_cubes);
+    dfile.AddMax(data_cubes);
+    dfile.AddFun<int>(test_fun);
+
+    double frac = 0.0;
+
+    dfile.SetTimingRepeat(2);
+
+    for (size_t i = 0; i < 10; i++) {
+        test_int = i;
+        data_fracs.Add(frac += 0.01);
+        data_squares.Add((int)(i*i));
+        data_cubes.Add(i*i*i);
+        dfile.Update(i);
+
+        // std::cout << i << std::endl;
+    }
+
+    dfile.SetTimingOnce(5);
+
+    for (size_t i = 0; i < 10; i++) {
+        test_int = i;
+        data_fracs.Add(frac += 0.01);
+        data_squares.Add((int)(i*i));
+        data_cubes.Add(i*i*i);
+        dfile.Update(i);
+        // std::cout << i << std::endl;
+    }
+
+    dfile.SetTimingRange(2, 3, 9);
+
+    for (size_t i = 0; i < 10; i++) {
+        test_int = i;
+        data_fracs.Add(frac += 0.01);
+        data_squares.Add((int)(i*i));
+        data_cubes.Add(i*i*i);
+        dfile.Update(i);
+
+        // std::cout << i << std::endl;
+    }
+
+    dfile.SetTiming([](size_t ud){return (bool)floor(sqrt((double)ud) == ceil(sqrt((double)ud)));});
+
+    for (size_t i = 0; i < 10; i++) {
+        test_int = i;
+        data_fracs.Add(frac += 0.01);
+        data_squares.Add((int)(i*i));
+        data_cubes.Add(i*i*i);
+        dfile.Update(i);
+
+        // std::cout << i << std::endl;
+    }
+
+    REQUIRE(compareFiles("test_timing_file.dat", "data/test_timing_file.dat"));
+}

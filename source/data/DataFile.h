@@ -33,6 +33,9 @@ namespace emp {
   protected:
     using fun_t = void(std::ostream &);
 
+    using time_fun_t = std::function<bool(size_t)>;
+    time_fun_t timing_fun;
+
     std::ostream * os;
     FunctionSet<fun_t> funs;
     emp::vector<std::string> keys;
@@ -45,11 +48,12 @@ namespace emp {
   public:
     DataFile(const std::string & filename,
              const std::string & b="", const std::string & s=", ", const std::string & e="\n")
-      : os(new std::ofstream(filename)), funs(), keys(), descs()
+      : timing_fun([](size_t){return true;}), os(new std::ofstream(filename)), funs(), keys(), descs()
       , line_begin(b), line_spacer(s), line_end(e) { ; }
     DataFile(std::ostream & in_os,
              const std::string & b="", const std::string & s=", ", const std::string & e="\n")
-      : os(&in_os), funs(), keys(), descs(), line_begin(b), line_spacer(s), line_end(e) { ; }
+      : timing_fun([](size_t){return true;}), os(&in_os), funs(), keys(), descs(), line_begin(b)
+      , line_spacer(s), line_end(e) { ; }
     DataFile(const DataFile &) = default;
     DataFile(DataFile &&) = default;
     ~DataFile() { os->flush(); }
@@ -105,6 +109,37 @@ namespace emp {
       }
       *os << line_end;
       os->flush();
+    }
+
+    /// Update the file with an additional line.
+    void Update(size_t update) {
+      if (timing_fun(update)) DataFile::Update();
+    }
+
+        /// Provide a timing function that with a bool(size_t update) signature.  The timing function
+    /// is called with the current update, and returns if filed should print this update.
+    void SetTiming(time_fun_t fun) { timing_fun = fun; }
+
+    /// Setup this file to print only once, at the specified update.  Note that this timing
+    /// function can be replaced at any time, even after being triggered.
+    void SetTimingOnce(size_t print_time) {
+      timing_fun = [print_time](size_t update) { return update == print_time; };
+    }
+
+    /// Setup this file to print every 'step' updates.
+    void SetTimingRepeat(size_t step) {
+      emp_assert(step > 0);
+      timing_fun = [step](size_t update) { return update % step == 0; };
+    }
+
+    /// Setup this file to print only in a specified time range, and a given frequency (step).
+    void SetTimingRange(size_t first, size_t step, size_t last) {
+      emp_assert(step > 0);
+      emp_assert(first < last);
+      timing_fun = [first,step,last](size_t update) {
+	      if (update < first || update > last) return false;
+	      return ((update - first) % step) == 0;
+      };
     }
 
     /// If a function takes an ostream, pass in the correct one.
