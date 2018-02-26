@@ -28,16 +28,15 @@ namespace emp {
   public:
     enum Player { NONE=0, DARK, LIGHT };         ///< All possible states of a board space.
     enum Facing { N, NE, E, SE, S, SW, W, NW };  ///< All possible directions
+    static constexpr size_t NUM_DIRECTIONS = 8;  ///< Number of neighbors each board space has.
     using board_t = emp::vector<Player>;
-    static constexpr size_t NUM_DIRECTIONS = 8;   ///< Number of neighbors each board space has.
 
   protected:
-
     std::array<Facing, NUM_DIRECTIONS> ALL_DIRECTIONS;
     emp::vector<int> neighbors; ///< On construction, pre-compute adjacency network.
 
     bool over = false;    ///< Is the game over?
-    Player cur_player;    ///< Is it DARK player's turn?
+    Player cur_player;    ///< Who is the current player set to move next?
     size_t board_size;    ///< Game board is board_size X board_size
     board_t game_board;   ///< Game board
 
@@ -46,16 +45,10 @@ namespace emp {
       return (posID * NUM_DIRECTIONS) + (size_t) dir;
     }
 
-    /// Internal GetNeighbor function (actually does work).
+    /// Internal GetNeighbor function.
     int GetNeighbor__Internal(size_t id, Facing dir) const {
       size_t x = GetPosX(id);
       size_t y = GetPosY(id);
-      return GetNeighbor__Internal(x, y, dir);
-    }
-
-    /// Internal function to get location adjacent to x,y position on board in given direction.
-    /// (actually does work) Used when generating the adjacency network.
-    int GetNeighbor__Internal(size_t x, size_t y, Facing dir) const {
       int facing_x = 0, facing_y = 0;
       switch(dir) {
         case Facing::N:  { facing_x = x;   facing_y = y-1; break; }
@@ -90,8 +83,8 @@ namespace emp {
       : ALL_DIRECTIONS(), board_size(side_len), game_board(board_size*board_size)
     {
       emp_assert(board_size >= 4);
-      ALL_DIRECTIONS = {{ Facing::N, Facing::NE, Facing::E, Facing::SE,
-                          Facing::S, Facing::SW, Facing::W, Facing::NW}};
+      ALL_DIRECTIONS = { Facing::N, Facing::NE, Facing::E, Facing::SE,
+                         Facing::S, Facing::SW, Facing::W, Facing::NW };
       GenerateNeighborNetwork();
       Reset();
     }
@@ -139,15 +132,13 @@ namespace emp {
     size_t GetPosID(size_t x, size_t y) const { return (y * board_size) + x; }
 
     /// Is the given x,y position valid?
-    bool IsValidPos(size_t x, size_t y) const {
-      return x < board_size && y < board_size;
-    }
+    bool IsValidPos(size_t x, size_t y) const { return x < board_size && y < board_size; }
 
     /// Is the given board position ID a valid position on the board?
     bool IsValidPos(size_t id) const { return id < game_board.size(); }
 
     /// Is the given player ID a valid player?
-    bool IsValidPlayer(int player) const { return (player == Player::DARK) || (player == Player::LIGHT); }
+    bool IsValidPlayer(Player player) const { return (player == Player::DARK) || (player == Player::LIGHT); }
 
     /// Get location adjacent to ID in direction dir.
     /// GetNeighbor function is save with garbage ID values.
@@ -176,12 +167,12 @@ namespace emp {
     const board_t & GetBoard() const { return game_board; }
 
     /// Is give move (move_x, move_y) valid?
-    bool IsMoveValid(Player player, size_t move_x, size_t move_y) {
-      return IsMoveValid(player, GetPosID(move_x, move_y));
+    bool IsValidMove(Player player, size_t move_x, size_t move_y) {
+      return IsValidMove(player, GetPosID(move_x, move_y));
     }
 
     /// Is given move valid?
-    bool IsMoveValid(Player player, size_t move_id) {
+    bool IsValidMove(Player player, size_t move_id) {
       emp_assert(IsValidPlayer(player));
       // 1) Is move_id valid position on the board?
       if (!IsValidPos(move_id)) return false;
@@ -219,12 +210,12 @@ namespace emp {
       return flip_list;
     }
 
-    /// Get a list of valid move options for given owner.
+    /// Get a list of valid move options for given player.
     emp::vector<size_t> GetMoveOptions(Player player) {
       emp_assert(IsValidPlayer(player));
       emp::vector<size_t> valid_moves;
       for (size_t i = 0; i < game_board.size(); ++i) {
-        if (IsMoveValid(player, i)) valid_moves.emplace_back(i);
+        if (IsValidMove(player, i)) valid_moves.emplace_back(i);
       }
       return valid_moves;
     }
@@ -232,11 +223,7 @@ namespace emp {
     /// Get the current score for a given player.
     double GetScore(Player player) {
       emp_assert(IsValidPlayer(player));
-      double score = 0;
-      for (size_t i = 0; i < game_board.size(); ++i) {
-        if (GetPosOwner(i) == player) score++;
-      }
-      return score;
+      return std::count(game_board.begin(), game_board.end(), player);
     }
 
     /// Get number of frontier positions for given player.
@@ -282,16 +269,14 @@ namespace emp {
 
     /// Set positions given by ids to be owned by the given player.
     void SetPositions(emp::vector<size_t> ids, Player player) {
-      for (size_t i = 0; i < ids.size(); ++i) SetPos(ids[i], player);
+      for (auto x : ids) SetPos(x, player);
     }
 
     /// Configure board as given by copy_board input.
     /// copy_board size must match game_board's size.
     void SetBoard(const board_t & other_board) {
       emp_assert(other_board.size() == game_board.size());
-      for (size_t i = 0; i < game_board.size(); ++i) {
-        game_board[i] = other_board[i];
-      }
+      game_board = other_board;
     }
 
     /// Set current board to be the same as board from other othello game.
