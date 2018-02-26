@@ -6,17 +6,17 @@
 #include "tools/Random.h"
 
 TEST_CASE("Test Othello", "[games]") {
-  size_t board_width_w8 = 8;
-  size_t board_width_w1024 = 1024;
+  constexpr size_t board_width_w8 = 8;
+  constexpr size_t board_width_w1024 = 1024;
 
-  emp::Othello othello_w8(board_width_w8);
-  emp::Othello othello_w1024(board_width_w1024);
+  emp::Othello othello_w8;
+  emp::Othello_Game<board_width_w1024> othello_w1024;
 
   emp::Random random(2);
 
   // Check board sizes.
-  REQUIRE(othello_w8.GetBoardSize() == 8*8);
-  REQUIRE(othello_w1024.GetBoardSize() == 1024*1024);
+  REQUIRE(othello_w8.GetBoardCells() == 8*8);
+  REQUIRE(othello_w1024.GetBoardCells() == 1024*1024);
 
   // Check get neighbors function for 0,0
   // Illegal directions.
