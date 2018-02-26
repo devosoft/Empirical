@@ -118,11 +118,19 @@ namespace emp {
         std::function<std::string(const taxon_ptr_t)> get_phenotype = [&world](const taxon_ptr_t t){
             return to_string(t->GetData().GetPhenotype());
         };
+        std::function<std::string(const taxon_ptr_t)> get_parent = [&world](const taxon_ptr_t t){
+            if (t->GetParent()) {
+                return to_string(t->GetParent()->GetID());
+            } else {
+                return to_string("-1");
+            }
+        };
 
         file.AddFun(get_update, "update", "Update");
         file.AddCollectionFun(get_tax_id, "tax_id", "The id of the taxon for this row");
         file.AddCollectionFun(get_num_orgs, "num_orgs", "The number of orgs of this taxon on this update");
         file.AddCollectionFun(get_phenotype, "phenotype", "This taxon's phenotype");
+        file.AddCollectionFun(get_parent, "parent_id", "This taxon's parent's id");
         file.PrintHeaderKeys();
         return file;
     }
