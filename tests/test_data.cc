@@ -345,25 +345,51 @@ TEST_CASE("Test DataFile", "[data]") {
     REQUIRE(compareFiles("test_file.dat", "data/test_file.dat"));
 }
 
-TEST_CASE("Test Collection DataFile", "[data]") {
+TEST_CASE("Test Container DataFile", "[data]") {
 
     emp::vector<int> cool_data({1,2,3});
     std::function<emp::vector<int>(void)> get_data = [&cool_data](){return cool_data;};
-    emp::CollectionDataFile<emp::vector<int>> dfile("test_collection_file.dat");
+    emp::ContainerDataFile<emp::vector<int>> dfile("test_container_file.dat");
 
     dfile.SetUpdateContainerFun(get_data);
 
     std::function<int(int)> return_val = [](int i){return i;};
     std::function<int(int)> square_val = [](int i){return i*i;};
 
-    dfile.AddCollectionFun(return_val, "value", "value");
-    dfile.AddCollectionFun(square_val, "squared", "value squared");
+    dfile.AddContainerFun(return_val, "value", "value");
+    dfile.AddContainerFun(square_val, "squared", "value squared");
 
     dfile.PrintHeaderKeys();
     dfile.Update();
     cool_data.push_back(5);
     dfile.Update();
-    REQUIRE(compareFiles("test_collection_file.dat", "data/test_collection_file.dat"));
+
+    // Since update is virtual, this should work on a pointer to a base datafile
+    emp::DataFile * data_ptr = & dfile;
+
+    cool_data.push_back(6);
+    data_ptr->Update();
+
+    dfile.SetTimingRepeat(2);
+    cool_data.clear();
+    cool_data.push_back(7);
+    cool_data.push_back(3);
+    dfile.Update(2);
+    dfile.Update(3);
+    cool_data.push_back(2);
+    data_ptr->Update(4);
+    data_ptr->Update(5);
+    
+    REQUIRE(compareFiles("test_container_file.dat", "data/test_container_file.dat"));
+
+    auto dfile2 = MakeContainerDataFile(get_data, "test_make_container_file.dat");
+    dfile2.AddContainerFun(return_val, "value", "value");
+    dfile2.AddContainerFun(square_val, "squared", "value squared");
+
+    dfile2.PrintHeaderKeys();
+    dfile2.Update();
+
+    REQUIRE(compareFiles("test_make_container_file.dat", "data/test_make_container_file.dat"));
 }
 
 TEST_CASE("Test histogram", "[data]") {
