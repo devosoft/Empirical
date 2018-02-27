@@ -56,7 +56,7 @@ namespace emp {
       , line_spacer(s), line_end(e) { ; }
     DataFile(const DataFile &) = default;
     DataFile(DataFile &&) = default;
-    ~DataFile() { os->flush(); }
+    virtual ~DataFile() { os->flush(); }
 
     DataFile & operator=(const DataFile &) = default;
     DataFile & operator=(DataFile &&) = default;
@@ -112,7 +112,7 @@ namespace emp {
     }
 
     /// Update the file with an additional line.
-    void Update(size_t update) {
+    virtual void Update(size_t update) {
       if (timing_fun(update)) Update();
     }
 
@@ -351,6 +351,8 @@ namespace emp {
     ContainerDataFile(const std::string & filename,
              const std::string & b="", const std::string & s=", ", const std::string & e="\n")
              : DataFile(filename, b, s, e), update_container_fun(), current_rows() {;}
+
+    ~ContainerDataFile() {;}
 
     void SetUpdateContainerFun(const fun_update_container_t fun) {
       update_container_fun = fun;

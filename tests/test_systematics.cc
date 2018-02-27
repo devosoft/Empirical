@@ -214,7 +214,7 @@ TEST_CASE("World systematics integration", "[evo]") {
 }
 
 template <typename WORLD_TYPE>
-emp::World_file AddDominantFile(WORLD_TYPE & world){
+emp::DataFile AddDominantFile(WORLD_TYPE & world){
     auto & file = world.SetupFile("dominant.csv");
 
     std::function<size_t(void)> get_update = [&world](){return world.GetUpdate();};
@@ -272,22 +272,7 @@ TEST_CASE("Run world", "[evo]") {
   emp::AddPhylodiversityFile(world).SetTimingRepeat(1);
   emp::AddLineageMutationFile(world).SetTimingRepeat(1);
   AddDominantFile(world).SetTimingRepeat(1);
-
-  auto muller_file = emp::AddMullerPlotFile(world);
-  world.OnUpdate([&muller_file](size_t ud){muller_file.Update();});
-
-  using test_t = const std::unordered_set<emp::Ptr<emp::Taxon<emp::AvidaCPU_Base<emp::AvidaGP>::Genome, emp::mut_landscape_info<emp::vector<double> > > >, emp::Ptr<emp::Taxon<emp::AvidaCPU_Base<emp::AvidaGP>::Genome, emp::mut_landscape_info<emp::vector<double> > > >::hash_t, std::equal_to<emp::Ptr<emp::Taxon<emp::AvidaCPU_Base<emp::AvidaGP>::Genome, emp::mut_landscape_info<emp::vector<double> > > > >, std::allocator<emp::Ptr<emp::Taxon<emp::AvidaCPU_Base<emp::AvidaGP>::Genome, emp::mut_landscape_info<emp::vector<double> > > > > >;
-
-  // using test_t = emp::Ptr<const std::unordered_set<emp::Ptr<emp::Taxon<emp::AvidaCPU_Base<emp::AvidaGP>::Genome,
-  //     emp::mut_landscape_info<emp::vector<double> > > >, emp::Ptr<emp::Taxon<emp::AvidaCPU_Base<emp::AvidaGP>::Genome, emp::mut_landscape_info<emp::vector<double> > > >::hash_t,
-  //     std::equal_to<emp::Ptr<emp::Taxon<emp::AvidaCPU_Base<emp::AvidaGP>::Genome, emp::mut_landscape_info<emp::vector<double> > > > >,
-  //     std::allocator<emp::Ptr<emp::Taxon<emp::AvidaCPU_Base<emp::AvidaGP>::Genome, emp::mut_landscape_info<emp::vector<double> > > > > > >;
-
-  if (emp::is_ptr_type<test_t>::value) {
-    std::cout << "is pointer" << std::endl;
-  } else {
-    std::cout << "not pointer" << std::endl;
-  }
+  emp::AddMullerPlotFile(world).SetTimingOnce(1);
 
 
   // Setup the mutation function.

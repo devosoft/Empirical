@@ -31,6 +31,7 @@
 #include "../control/Signal.h"
 #include "../control/SignalControl.h"
 #include "../data/Trait.h"
+#include "../data/DataFile.h"
 #include "../data/DataManager.h"
 #include "../meta/reflection.h"
 #include "../tools/map_utils.h"
@@ -41,7 +42,7 @@
 
 // World-specific includes.
 #include "Systematics.h"    // Track relationships among organisms.
-#include "World_file.h"     // Helper to determine when specific events should occur.
+// #include "World_file.h"     // Helper to determine when specific events should occur.
 #include "World_iterator.h" // Allow iteration through organisms in a world.
 #include "World_reflect.h"  // Handle needed reflection on incoming organism classes.
 #include "World_select.h"   // Include all built-in selection functions for World.
@@ -163,7 +164,7 @@ namespace emp {
     bool cache_on;                     ///< Should we be caching fitness values?
     std::vector<size_t> pop_sizes;     ///< Sizes of population dimensions (eg, 2 vals for grid)
     emp::TraitSet<ORG> phenotypes;     ///< What phenotypes are we tracking?
-    emp::vector<World_file> files;     ///< Output files.
+    emp::vector<Ptr<DataFile>> files;     ///< Output files.
 
     bool is_synchronous;               ///< Does this world have synchronous generations?
     bool is_space_structured;          ///< Do we have a spatially structured population?
@@ -242,6 +243,7 @@ namespace emp {
 
     ~World() {
       Clear();
+      for (auto file : files) {file.Delete();}
       if (random_owner) random_ptr.Delete();
     }
 
@@ -404,16 +406,19 @@ namespace emp {
     }
 
     /// Setup an arbitrary file; no default filename available.
-    World_file & SetupFile(const std::string & filename);
+    DataFile & SetupFile(const std::string & filename);
+
+    /// Add an already-constructed datafile.
+    DataFile & AddDataFile(Ptr<DataFile> file);
 
     /// Setup a file to be printed that collects fitness information over time.
-    World_file & SetupFitnessFile(const std::string & filename="fitness.csv");
+    DataFile & SetupFitnessFile(const std::string & filename="fitness.csv");
 
     /// Setup a file to be printed that collects systematics information over time.
-    World_file & SetupSystematicsFile(const std::string & filename="systematics.csv");
+    DataFile & SetupSystematicsFile(const std::string & filename="systematics.csv");
 
     /// Setup a file to be printed that collects population information over time.
-    World_file & SetupPopulationFile(const std::string & filename="population.csv");
+    DataFile & SetupPopulationFile(const std::string & filename="population.csv");
 
     /// Setup the function to be used when fitness needs to be calculated.  The provided function
     /// should take a reference to an organism and return a fitness value of type double.
@@ -939,15 +944,24 @@ namespace emp {
 
   // A new, arbitrary file.
   template<typename ORG, typename DATA_TYPE>
-  World_file & World<ORG, DATA_TYPE>::SetupFile(const std::string & filename) {
+  DataFile & World<ORG, DATA_TYPE>::SetupFile(const std::string & filename) {
     size_t id = files.size();
-    files.emplace_back(filename);
-    return files[id];
+    files.emplace_back();
+    files[id].New(filename);
+    return *files[id];
+  }
+
+  // Add a new data file constructed elsewhere.
+  template<typename ORG, typename DATA_TYPE>
+  DataFile & World<ORG, DATA_TYPE>::AddDataFile(Ptr<DataFile> file) {
+    size_t id = files.size();
+    files.push_back(file);
+    return *files[id];
   }
 
   // A data file (default="fitness.csv") that contains information about the population's fitness.
   template<typename ORG, typename DATA_TYPE>
-  World_file & World<ORG, DATA_TYPE>::SetupFitnessFile(const std::string & filename) {
+  DataFile & World<ORG, DATA_TYPE>::SetupFitnessFile(const std::string & filename) {
     auto & file = SetupFile(filename);
     auto node = GetFitnessDataNode();
     file.AddVar(update, "update", "Update");
@@ -962,7 +976,7 @@ namespace emp {
   // A data file (default="systematics.csv") that contains information about the population's
   // phylogeny and lineages.
   template<typename ORG, typename DATA_TYPE>
-  World_file & World<ORG, DATA_TYPE>::SetupSystematicsFile(const std::string & filename) {
+  DataFile & World<ORG, DATA_TYPE>::SetupSystematicsFile(const std::string & filename) {
     auto & file = SetupFile(filename);
     file.AddVar(update, "update", "Update");
     file.template AddFun<size_t>( [this](){ return systematics.GetNumActive(); }, "num_genotypes", "Number of unique genotype groups currently active." );
@@ -977,7 +991,7 @@ namespace emp {
 
   // A data file (default="population.csv") contains information about the current population.
   template<typename ORG, typename DATA_TYPE>
-  World_file & World<ORG, DATA_TYPE>::SetupPopulationFile(const std::string & filename) {
+  DataFile & World<ORG, DATA_TYPE>::SetupPopulationFile(const std::string & filename) {
     auto & file = SetupFile(filename);
     file.AddVar(update, "update", "Update");
     file.template AddFun<size_t>( [this](){ return GetNumOrgs(); }, "num_orgs", "Number of organisms currently living in the population." );
@@ -1030,7 +1044,7 @@ namespace emp {
     }
 
     // 3. Handle any data files that need to be printed this update.
-    for (auto & file : files) file.Update(update);
+    for (auto & file : files) file->Update(update);
 
     // 4. Increment the current update number; i.e., count calls to Update().
     update++;
