@@ -34,20 +34,20 @@ int main() {
   printSubset("DEFAULT [SUBSET]", DEFAULT);
 
   // demo adding/chaning data
-  print("DEFAULT.set(populationSize(10))",
+  print("DEFAULT.SetAttribute(populationSize(10))",
         DEFAULT.SetAttribute(PopulationSize(10)));
   print("DEFAULT + populationSize(10)", DEFAULT + PopulationSize(10));
 
   Attrs<typename PopulationSize::value_t<size_t>,
         typename DefaultGenome::value_t<std::string>,  // Notice that this will
-                                                       // be auto-converted from
-        const
-        // char* to std::string
+                                                       // be auto-converted
         typename GenerationLength::value_t<size_t>>
     user = DEFAULT;
   // Set a single member
   user.SetDefaultGenome("ASDEDFDFSA");
-  // user = PopulationSize(100);
+
+  // Set multiple members at a time
+  user = PopulationSize(100) + GenerationLength(10);
 
   print("DEFAULT >> STDIN", user);
 

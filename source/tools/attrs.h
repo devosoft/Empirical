@@ -369,21 +369,26 @@ namespace emp {
     constexpr NAME##Value(NAME##Value<U>&& other)                              \
       : value(std::move(other.value)) {}                                       \
     constexpr NAME##Value& operator=(const T& value) {                         \
+      /* Don't check for self assignment, and assume that value will handle it \
+       * correcly */                                                           \
       this->value = value;                                                     \
       return *this;                                                            \
     }                                                                          \
     constexpr NAME##Value& operator=(T&& value) {                              \
+      /* Assume value handles self assigment correctly */                      \
       this->value = std::move(value);                                          \
       return *this;                                                            \
     }                                                                          \
     template <typename U = T>                                                  \
     constexpr NAME##Value& operator=(const NAME##Value<U>& other) {            \
-      if (this != &other) value = other.value;                                 \
+      /* Assume value handles self assigment correctly */                      \
+      value = *other;                                                          \
       return *this;                                                            \
     }                                                                          \
     template <typename U = T>                                                  \
     constexpr NAME##Value& operator=(NAME##Value<U>&& other) {                 \
-      if (this != &other) value = std::move(other.value);                      \
+      /* Assume value handles self assigment correctly */                      \
+      value = *std::move(other);                                               \
       return *this;                                                            \
     }                                                                          \
     constexpr const T& Get##NAME() const & { return value; }                   \
@@ -675,15 +680,23 @@ namespace emp {
             // The arguments are then forwarded as normal
             std::forward<U0>(arg), std::forward<U>(args)...) {}
 
-      // private:
-      // constexpr static struct {
-      //   template <typename T>
-      // } __impl_AssignOp_asssigner;
+      private:
+      constexpr static struct {
+        template <typename T1, typename T2>
+        constexpr void operator()(T1& to, T2&& from) const {
+          to = std::forward<T2>(from);
+        }
+      } __impl_AssignOp_asssigner{};
 
-      // template <typename... U>
-      // void __impl_AssignOp(const Attrs<U...>& other) {}
+      public:
+      template <typename F>
+      Attrs& operator=(F&& from) {
+        emp::tools::Foreach(__impl_AssignOp_asssigner, *this,
+                            std ::forward<F>(from));
 
-      // public:
+        return *this;
+      }
+
       private:
       template <bool Last, typename A>
       struct GetAttr;
@@ -717,6 +730,12 @@ namespace emp {
       }
 
       public:
+      /// Provide a call operator for attribute packs. This will attempt to call
+      /// each member of the attribute pack with the given arguments, and maps
+      /// the result of that call into a new parameter pack as the same
+      /// attribute. If one of the members of the pack cannot be called with the
+      /// given pack, then it is put into the new pack unchanged. Mostly, this
+      /// is meant to allow the opengl plotting library to do mapping operations
       template <class... U>
       constexpr decltype(auto) operator()(U&&... args) & {
         return Call(*this, std::forward<U>(args)...);
@@ -751,8 +770,8 @@ namespace emp {
       /// user's perspective.
       template <class... U>
       constexpr bool operator==(const Attrs<U...>& other) const {
-        static_assert(sizeof...(T) == sizeof...(U),
-                      "Cannot compare attribute packs with different members");
+        // @todo: this needs more carefull checking, as it will have strange
+        // behavior when the other attribute pack has different types
         return tools::Reduce(true, eq_reducer{}, *this, other);
       }
 
