@@ -118,10 +118,10 @@ namespace emp {
       //  ...LD...
       //  ...DL...
       //  ........
-      SetPos(BOARD_SIZE/2 - 1, BOARD_SIZE/2 - 1, Player::LIGHT);
-      SetPos(BOARD_SIZE/2 - 1, BOARD_SIZE/2, Player::DARK);
-      SetPos(BOARD_SIZE/2, BOARD_SIZE/2 - 1, Player::DARK);
-      SetPos(BOARD_SIZE/2, BOARD_SIZE/2, Player::LIGHT);
+      SetPos({BOARD_SIZE/2 - 1, BOARD_SIZE/2 - 1}, Player::LIGHT);
+      SetPos({BOARD_SIZE/2 - 1, BOARD_SIZE/2    }, Player::DARK);
+      SetPos({BOARD_SIZE/2,     BOARD_SIZE/2 - 1}, Player::DARK);
+      SetPos({BOARD_SIZE/2,     BOARD_SIZE/2    }, Player::LIGHT);
 
       over = false;
       cur_player = Player::DARK;
@@ -147,22 +147,15 @@ namespace emp {
       if (!id.IsValid()) return Index(); 
       return neighbors[GetNeighborIndex(id, dir)];
     }
-    Index GetNeighbor(size_t x, size_t y, Facing dir) const { return GetNeighbor(Index(x,y), dir); }
 
     /// Get the value (light, dark, or open) at a position on the board.
     Player GetPosOwner(Index id) const {
       emp_assert(id.IsValid());
       return game_board[id];
     }
-    Player GetPosOwner(size_t x, size_t y) const { return GetPosOwner(Index(x,y)); }
 
     board_t & GetBoard() { return game_board; }
     const board_t & GetBoard() const { return game_board; }
-
-    /// Is give move (move_x, move_y) valid?
-    bool IsValidMove(Player player, size_t move_x, size_t move_y) {
-      return IsValidMove(player, Index(move_x, move_y));
-    }
 
     /// Is given move valid?
     bool IsValidMove(Player player, Index pos) {
@@ -244,20 +237,10 @@ namespace emp {
       return false;
     }
 
-    /// Is position given by x,y adjacent to the given owner?
-    bool IsAdjacentTo(size_t x, size_t y, Player owner) {
-      return IsAdjacentTo(Index(x,y), owner);
-    }
-
     /// Set board position (ID) to given space value.
     void SetPos(Index pos, Player player) {
       emp_assert(pos.IsValid());
       game_board[pos] = player;
-    }
-
-    /// Set board position (x,y) to given space value.
-    void SetPos(size_t x, size_t y, Player player) {
-      SetPos(Index(x, y), player);
     }
 
     /// Set positions given by ids to be owned by the given player.
@@ -282,13 +265,9 @@ namespace emp {
     /// Return bool indicating whether current player goes again. (false=new cur player or game over)
     bool DoNextMove(Index pos) { return DoMove(cur_player, pos); }
 
-    /// Do current player's move (moveID).
-    /// Return bool indicating whether current player goes again. (false=new cur player or game over)
-    bool DoNextMove(size_t x, size_t y) { return DoNextMove(Index(x,y)); }
-
-    /// Do move (at pos) for player. Return bool whether player can go again.
+    /// Do move (at pos) for specified player. Return bool whether player can go again.
     /// After making move, update current player.
-    /// NOTE: Does not check validity.
+    /// NOTE: Does not verify validity.
     /// Will switch cur_player from player to Opp(player) if opponent has a move to make.
     bool DoMove(Player player, Index pos) {
       emp_assert(IsValidPlayer(player) && pos.IsValid());      
@@ -303,9 +282,6 @@ namespace emp {
       over = true;                                           // No one can go; game over!
       return false;
     }
-
-    /// Do move from any player's perspective.
-    bool DoMove(Player player, size_t x, size_t y) { return DoMove(player, Index(x,y)); }
 
     /// NOTE: does not check for move validity.
     void DoFlips(Player player, Index pos) {
