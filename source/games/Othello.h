@@ -44,9 +44,9 @@ namespace emp {
       size_t pos;
 
       Index() : pos(NUM_CELLS) { ; }  // Default constructor is invalid position.
-      Index(size_t _pos) : pos(_pos) { emp_assert(pos < NUM_CELLS); }
+      Index(size_t _pos) : pos(_pos) { emp_assert(pos <= NUM_CELLS); }
       Index(size_t x, size_t y) { Set(x,y); }
-      Index(const Index & _in) : pos(_in.pos) { emp_assert(pos < NUM_CELLS); }
+      Index(const Index & _in) : pos(_in.pos) { emp_assert(pos <= NUM_CELLS); }
 
       operator size_t() const { return pos; }
       size_t x() const { return pos % BOARD_SIZE; }
@@ -105,6 +105,8 @@ namespace emp {
     }
 
     ~Othello_Game() { ; }
+
+    Index GetIndex(size_t x, size_t y) const { return Index(x, y); }
 
     /// Reset the board to the starting condition.
     void Reset() {
@@ -282,21 +284,21 @@ namespace emp {
 
     /// Do current player's move (moveID).
     /// Return bool indicating whether current player goes again. (false=new cur player or game over)
-    bool DoNextMove(size_t x, size_t y) { return DoNextMove(GetPosID(x,y)); }
+    bool DoNextMove(size_t x, size_t y) { return DoNextMove(Index(x,y)); }
 
-    /// Do move (moveID) for player. Return bool whether player can go again.
+    /// Do move (at pos) for player. Return bool whether player can go again.
     /// After making move, update current player.
     /// NOTE: Does not check validity.
     /// Will switch cur_player from player to Opp(player) if opponent has a move to make.
     bool DoMove(Player player, Index pos) {
       emp_assert(IsValidPlayer(player) && pos.IsValid());      
-      SetPos(moveID, player);                                // Take position for player.
-      DoFlips(player, moveID);                               // Flip tiles on the board.      
+      SetPos(pos, player);                                   // Take position for player.
+      DoFlips(player, pos);                                  // Flip tiles on the board.      
       auto opp_moves = GetMoveOptions(GetOpponent(player));  // Test if opponent can go.
-      if (opp_moves) { cur_player = GetOpponent(player); return false; }
+      if (opp_moves.size()) { cur_player = GetOpponent(player); return false; }
 
-      auto player_moves = GetMoveOptions(player);
-      if (player_moves) { return true; }                     // This player can go again!
+      auto player_moves = GetMoveOptions(player);            // Opponent can't go; test cur player
+      if (player_moves.size()) { return true; }              // This player can go again!
 
       over = true;                                           // No one can go; game over!
       return false;
