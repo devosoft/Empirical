@@ -40,6 +40,21 @@ namespace emp {
     using this_t = Othello_Game<BOARD_SIZE>;
     using board_t = std::array<Player, BOARD_CELLS>;
 
+    struct Index {
+      size_t pos;
+
+      static constexpr size_t BOARD_CELLS = BOARD_SIZE * BOARD_SIZE;
+      static constexpr size_t INVALID = BOARD_CELLS;
+
+      Index(size_t _pos) : pos(_pos) { emp_assert(pos < BOARD_CELLS); }
+      Index(size_t x, size_t y) : pos(x + y*BOARD_SIZE) { emp_assert(x < BOARD_SIZE && y < BOARD_SIZE); }
+      Index(const Index & _in) : pos(_in.pos) { emp_assert(pos < BOARD_CELLS); }
+
+      operator size_t() const { return pos; }
+      size_t x() const { return pos % BOARD_SIZE; }
+      size_t y() const { return pos / BOARD_SIZE; }
+    };
+
   protected:
     std::array<Facing, NUM_DIRECTIONS> ALL_DIRECTIONS;
     emp::vector<int> neighbors; ///< On construction, pre-compute adjacency network.
