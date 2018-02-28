@@ -173,24 +173,20 @@ namespace emp {
     /// Get positions that would flip if a player (player) made a particular move (pos).
     /// - Does not check move validity.
     /// - If only_first_valid: return the first valid flip set (in any direction).
-    emp::vector<size_t> GetFlipList(Player player, Index pos, bool only_first_valid=false) {
-      emp::vector<size_t> flip_list;
+    emp::vector<Index> GetFlipList(Player player, Index pos, bool only_first_valid=false) {
+      emp::vector<Index> flip_list;
       size_t prev_len = 0;
       for (Facing dir : ALL_DIRECTIONS) {
         Index neighbor_pos = GetNeighbor(pos, dir);
-        while (neighbor_pos.IsValid()) {
-          if (GetPosOwner(neighbor_pos) == Player::NONE) {
-            flip_list.resize(prev_len);
-            break;
-          } else if (GetPosOwner(neighbor_pos) == GetOpponent(player)) {
-            flip_list.emplace_back(neighbor_pos);
-          } else {
-            prev_len = flip_list.size();
-            break;
-          }
+        // Collect opponent spaces in this direction.
+        while (neighbor_pos.IsValid() && GetPosOwner(neighbor_pos) == GetOpponent(player)) {
+          flip_list.emplace_back(neighbor_pos);
           neighbor_pos = GetNeighbor(neighbor_pos, dir);
         }
-        flip_list.resize(prev_len);
+        // If this line didn't end in current color, throw out everything we found.
+        if (!neighbor_pos.IsValid() || GetPosOwner(neighbor_pos) == Player::NONE) { flip_list.resize(prev_len); }
+        // Otherwise keep iit and update the locked in flips.
+        else { prev_len = flip_list.size(); }
         if (only_first_valid && flip_list.size()) break;
       }
       return flip_list;
@@ -286,8 +282,8 @@ namespace emp {
     /// NOTE: does not check for move validity.
     void DoFlips(Player player, Index pos) {
       emp_assert(IsValidPlayer(player));
-      vector<size_t> flip_list = GetFlipList(player, pos);
-      for (size_t flip : flip_list) { SetPos(flip, player); }
+      auto flip_list = GetFlipList(player, pos);
+      for (Index flip : flip_list) { SetPos(flip, player); }
     }
 
     /// Print board state to given ostream.
