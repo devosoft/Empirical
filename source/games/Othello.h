@@ -160,12 +160,9 @@ namespace emp {
     /// Is given move valid?
     bool IsValidMove(Player player, Index pos) {
       emp_assert(IsValidPlayer(player));
-      // 1) Is pos a valid position on the board?
-      if (!pos.IsValid()) return false;
-      // 2) The move position must be empty.
-      if (GetPosOwner(pos) != Player::NONE) return false;
-      // 3) A non-zero number of tiles must flip.
-      return (bool) GetFlipList(player, pos, true).size();
+      if (!pos.IsValid()) return false;                     // Is pos even on the board?
+      if (GetPosOwner(pos) != Player::NONE) return false;   // Is pos empty?
+      return (bool) GetFlipList(player, pos, true).size();  // Will any tiles flip?
     }
 
     bool IsOver() const { return over; }
@@ -185,12 +182,31 @@ namespace emp {
         }
         // If this line didn't end in current color, throw out everything we found.
         if (!neighbor_pos.IsValid() || GetPosOwner(neighbor_pos) == Player::NONE) { flip_list.resize(prev_len); }
-        // Otherwise keep iit and update the locked in flips.
+        // Otherwise keep it and update the locked in flips.
         else { prev_len = flip_list.size(); }
         if (only_first_valid && flip_list.size()) break;
       }
       return flip_list;
     }
+
+    /// Are there any valid flips from this position?
+    emp::vector<Index> HasValidFlips(Player player, Index pos) {
+      for (Facing dir : ALL_DIRECTIONS) {             // Loop through directions to explore
+        Index neighbor_pos = GetNeighbor(pos, dir);   // Start at first neighbor.
+        size_t count = 0;
+        // Collect opponent spaces in this direction.
+        while (neighbor_pos.IsValid() && GetPosOwner(neighbor_pos) == GetOpponent(player)) {
+          count++;
+          neighbor_pos = GetNeighbor(neighbor_pos, dir);
+        }
+        // If this line didn't end in current color, throw out everything we found.
+        if (!count || !neighbor_pos.IsValid() || GetPosOwner(neighbor_pos) == Player::NONE) continue;
+        // Otherwise we found a legal series of flips!
+        else { return true; }
+      }
+      return false;
+    }
+
 
     /// Get a list of valid move options for given player.
     emp::vector<Index> GetMoveOptions(Player player) {
@@ -208,16 +224,13 @@ namespace emp {
       return std::count(game_board.begin(), game_board.end(), player);
     }
 
-    /// Get number of frontier positions for given player.
-    /// Frontier position -- number empty squares adjacent to a player's pieces.
-    size_t GetFrontierPosCnt(Player player) {
+    /// Count the number of empty squares adjacent to a player's pieces (frontier size)
+    size_t CountFrontierPos(Player player) {
       emp_assert(IsValidPlayer(player));
       size_t frontier_size = 0;
-      for (size_t i = 0; i < NUM_CELLS; ++i) {
-        // Are we looking at an empty space?
-        if (game_board[i] == Player::NONE) {
-          // If adjacent to player's token: increment player's frontier size.
-          if (IsAdjacentTo(i, player)) ++frontier_size;
+      for (size_t i = 0; i < NUM_CELLS; ++i) {           // Search through all cells
+        if (game_board[i] == Player::NONE) {             // Is the test cell empty?
+          if (IsAdjacentTo(i, player)) ++frontier_size;  // If so, test if on player's frontier
         }
       }
       return frontier_size;
