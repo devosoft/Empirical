@@ -99,7 +99,7 @@ namespace web {
     Canvas(CanvasInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:
-    /// Create a new canvas with the specified size and option HTML identifier.
+    /// Create a new canvas with the specified size and optional HTML identifier.
     Canvas(size_t w, size_t h, const std::string & in_id="")
       : WidgetFacet(in_id)
     {

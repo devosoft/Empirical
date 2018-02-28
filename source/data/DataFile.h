@@ -25,7 +25,7 @@
 
 namespace emp {
 
-  /** This class keep track of everything associated with periodically printing data to a file.
+  /** This class keeps track of everything associated with periodically printing data to a file.
    * It maintains a set of functions for calculating the desired measurements at each point in
    * time that they are required. It also handles the formating of the file.
    */

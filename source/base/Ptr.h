@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2018
  *
  *  @file Ptr.h
  *  @brief A wrapper for pointers that does careful memory tracking (but only in debug mode).
@@ -120,6 +120,7 @@ namespace emp {
   private:
     std::unordered_map<const void *, size_t> ptr_id;  ///< Associate raw pointers with unique IDs
     emp::vector<PtrInfo> id_info;                     ///< Associate IDs with pointer information.
+    static constexpr size_t UNTRACKED_ID = (size_t) -1;
 
     // Make PtrTracker a singleton.
     PtrTracker() : ptr_id(), id_info() {
@@ -171,7 +172,7 @@ namespace emp {
 
     /// Check if an ID is for a pointer that has been deleted.
     bool IsDeleted(size_t id) const {
-      if (id == (size_t) -1) return false;   // Not tracked!
+      if (id == UNTRACKED_ID) return false;   // Not tracked!
       if (ptr_debug) std::cout << "IsDeleted: " << id << std::endl;
       return !id_info[id].IsActive();
     }
@@ -223,14 +224,14 @@ namespace emp {
 
     /// Increment the nuber of Pointers associated with an ID
     void IncID(size_t id) {
-      if (id == (size_t) -1) return;   // Not tracked!
+      if (id == UNTRACKED_ID) return;   // Not tracked!
       if (ptr_debug) std::cout << "Inc:    " << id << std::endl;
       id_info[id].Inc();
     }
 
     /// Decrement the nuber of Pointers associated with an ID
     void DecID(size_t id) {
-      if (id == (size_t) -1) return;   // Not tracked!
+      if (id == UNTRACKED_ID) return;   // Not tracked!
       auto & info = id_info[id];
       if (ptr_debug) std::cout << "Dec:    " << id << "(" << info.GetPtr() << ")" << std::endl;
       emp_assert(info.GetCount() > 0, "Decrementing Ptr, but already zero!",
@@ -283,11 +284,13 @@ namespace emp {
     size_t id;                  ///< A unique ID for this pointer type.
     using element_type = TYPE;  ///< Type being pointed at.
 
+    static constexpr size_t UNTRACKED_ID = (size_t) -1;
+
     static PtrDebug & DebugInfo() { static PtrDebug info; return info; } // Debug info for each type
     static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
 
     /// Construct a null Ptr by default.
-    Ptr() : ptr(nullptr), id((size_t) -1) {
+    Ptr() : ptr(nullptr), id(UNTRACKED_ID) {
       if (ptr_debug) std::cout << "null construct: " << ptr << std::endl;
     }
 
@@ -300,13 +303,13 @@ namespace emp {
     /// Construct using move constructor
     Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr), id(_in.id) {
       if (ptr_debug) std::cout << "move construct: " << ptr << std::endl;
-      _in.id = (size_t) -1;
+      _in.id = UNTRACKED_ID;
       // No IncID or DecID in Tracker since we just move the id.
     }
 
     /// Construct from a raw pointer of campatable type.
     template <typename T2>
-    Ptr(T2 * in_ptr, bool track=false) : ptr(in_ptr), id((size_t) -1)
+    Ptr(T2 * in_ptr, bool track=false) : ptr(in_ptr), id(UNTRACKED_ID)
     {
       if (ptr_debug) std::cout << "raw construct: " << ptr << ". track=" << track << std::endl;
       emp_assert( (PtrIsConvertable<T2, TYPE>(in_ptr)) );
@@ -325,7 +328,7 @@ namespace emp {
 
     /// Construct from a raw pointer of campatable ARRAY type.
     template <typename T2>
-    Ptr(T2 * _ptr, size_t array_size, bool track) : ptr(_ptr), id((size_t) -1)
+    Ptr(T2 * _ptr, size_t array_size, bool track) : ptr(_ptr), id(UNTRACKED_ID)
     {
       const size_t array_bytes = array_size * sizeof(T2);
       if (ptr_debug) std::cout << "raw ARRAY construct: " << ptr
@@ -426,7 +429,7 @@ namespace emp {
     void NewArray(size_t array_size, T &&... args) {
       Tracker().DecID(id);                              // Remove a pointer to any old memory...
 
-      // @CAO: This next portion of code is allocating an array of the appropriat type.
+      // @CAO: This next portion of code is allocating an array of the appropriate type.
       //       We are currently using "new", but should shift over to malloc since new throws an
       //       exception when there's a problem, which will trigger an abort in Emscripten mode.
       //       We'd rather be able to identify a more specific problem.
@@ -489,12 +492,12 @@ namespace emp {
     Ptr<TYPE> & operator=(Ptr<TYPE> && _in) {
       if (ptr_debug) std::cout << "move assignment" << std::endl;
       emp_assert(Tracker().IsDeleted(_in.id) == false, _in.id, "Do not move deleted pointers.");
-      if (id != _in.id) {
+      if (ptr != _in.ptr) {
         Tracker().DecID(id);   // Decrement references to former pointer at this position.
         ptr = _in.ptr;
         id = _in.id;
         _in.ptr = nullptr;
-        _in.id = (size_t) -1;
+        _in.id = UNTRACKED_ID;
       }
       return *this;
     }
@@ -516,7 +519,7 @@ namespace emp {
       }
       // Otherwise, since this ptr was passed in as a raw pointer, we do not manage it.
       else {
-        id = (size_t) -1;
+        id = UNTRACKED_ID;
       }
 
       return *this;
@@ -593,7 +596,7 @@ namespace emp {
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
 
       // We should not automatically convert managed pointers to raw pointers; use .Raw()
-      emp_assert(id == (size_t) -1 /*, typeid(TYPE).name() */, id);
+      emp_assert(id == UNTRACKED_ID /*, typeid(TYPE).name() */, id);
       return ptr;
     }
 
