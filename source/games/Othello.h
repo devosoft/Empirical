@@ -162,7 +162,7 @@ namespace emp {
       emp_assert(IsValidPlayer(player));
       if (!pos.IsValid()) return false;                     // Is pos even on the board?
       if (GetPosOwner(pos) != Player::NONE) return false;   // Is pos empty?
-      return (bool) GetFlipList(player, pos, true).size();  // Will any tiles flip?
+      return HasValidFlips(player, pos).size();             // Will any tiles flip?
     }
 
     bool IsOver() const { return over; }
