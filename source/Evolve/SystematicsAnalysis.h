@@ -20,6 +20,56 @@
 
 namespace emp {
 
+    /// Returns the total number of times a mutation of type @param type
+    /// that along @param taxon 's lineage. (Different from CountMuts in
+    /// that CountMuts sums them whereas CountMutSteps would count two
+    /// simultaneous mutations of the same type as one event)
+    template <typename taxon_t>
+    int LineageLength(Ptr<taxon_t> taxon) {
+        int count = 0;
+
+        while (taxon) {
+            count++;
+            taxon = taxon->GetParent();            
+        }
+
+        return count;
+    }
+
+    /// Returns the total number of times a mutation of type @param type
+    /// that along @param taxon 's lineage. (Different from CountMuts in
+    /// that CountMuts sums them whereas CountMutSteps would count two
+    /// simultaneous mutations of the same type as one event)
+    template <typename taxon_t>
+    int CountMutSteps(Ptr<taxon_t> taxon, std::string type="substitution") {
+        int count = 0;
+
+        while (taxon) {
+            count += (int)(taxon->GetData().mut_counts[type] > 0);
+            taxon = taxon->GetParent();            
+        }
+
+        return count;
+    }
+
+    /// Returns the total number of times a mutation of type @param type
+    /// that along @param taxon 's lineage. (Different from CountMuts in
+    /// that CountMuts sums them whereas CountMutSteps would count two
+    /// simultaneous mutations of the same type as one event)
+    template <typename taxon_t>
+    int CountMutSteps(Ptr<taxon_t> taxon, emp::vector<std::string> types) {
+        int count = 0;
+
+        while (taxon) {
+            for (std::string type : types) {
+                count += (int)(taxon->GetData().mut_counts[type] > 0);
+            }
+            taxon = taxon->GetParent();            
+        }
+
+        return count;
+    }
+
     /// Returns the total number of mutations of type @param type that occurred
     /// along @param taxon 's lineage.
     template <typename taxon_t>
@@ -28,6 +78,22 @@ namespace emp {
 
         while (taxon) {
             count += taxon->GetData().mut_counts[type];
+            taxon = taxon->GetParent();            
+        }
+
+        return count;
+    }
+
+    /// Returns the total number of mutations of type @param type that occurred
+    /// along @param taxon 's lineage.
+    template <typename taxon_t>
+    int CountMuts(Ptr<taxon_t> taxon, emp::vector<std::string> types) {
+        int count = 0;
+
+        while (taxon) {
+            for (std::string type : types) {
+                count += taxon->GetData().mut_counts[type];
+            }
             taxon = taxon->GetParent();            
         }
 
