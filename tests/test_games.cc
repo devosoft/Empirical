@@ -45,14 +45,14 @@ TEST_CASE("Test Othello", "[games]") {
   // - Make sure all positions we expect to be valid are valid.
   auto player_dark = emp::Othello::Player::DARK;
   auto player_light = emp::Othello::Player::LIGHT;
-  REQUIRE(othello_w8.IsValidMove(player_light, 4,2));
-  REQUIRE(othello_w8.IsValidMove(player_light, 2,4));
-  REQUIRE(othello_w8.IsValidMove(player_light, 5,3));
-  REQUIRE(othello_w8.IsValidMove(player_light, 3,5));
-  REQUIRE(othello_w8.IsValidMove(player_dark, 3,2));
-  REQUIRE(othello_w8.IsValidMove(player_dark, 2,3));
-  REQUIRE(othello_w8.IsValidMove(player_dark, 5,4));
-  REQUIRE(othello_w8.IsValidMove(player_dark, 4,5));
+  REQUIRE(othello_w8.IsValidMove(player_light, {4,2}));
+  REQUIRE(othello_w8.IsValidMove(player_light, {2,4}));
+  REQUIRE(othello_w8.IsValidMove(player_light, {5,3}));
+  REQUIRE(othello_w8.IsValidMove(player_light, {3,5}));
+  REQUIRE(othello_w8.IsValidMove(player_dark, {3,2}));
+  REQUIRE(othello_w8.IsValidMove(player_dark, {2,3}));
+  REQUIRE(othello_w8.IsValidMove(player_dark, {5,4}));
+  REQUIRE(othello_w8.IsValidMove(player_dark, {4,5}));
   // - And all positions are owned by who we expect.
   auto l0id = othello_w8.GetIndex(3,3); // light
   auto d0id = othello_w8.GetIndex(3,4); // dark
@@ -69,15 +69,15 @@ TEST_CASE("Test Othello", "[games]") {
   REQUIRE(othello_w1024.GetScore(player_dark) == 2);
   REQUIRE(othello_w1024.GetScore(player_light) == 2);
   // -- Check get Frontier position count.
-  REQUIRE(othello_w8.GetFrontierPosCnt(player_dark) == 10);
-  REQUIRE(othello_w8.GetFrontierPosCnt(player_light) == 10);
+  REQUIRE(othello_w8.CountFrontierPos(player_dark) == 10);
+  REQUIRE(othello_w8.CountFrontierPos(player_light) == 10);
   // -- Check get flip list for 1 valid move.
   REQUIRE(othello_w8.GetFlipList(player_dark, othello_w8.GetIndex(3,2)).size() == 1);
 
   // Make some moves. Check that they altered the board properly.
-  othello_w8.DoMove(player_dark, 3,2);
-  REQUIRE(othello_w8.GetPosOwner(3,2) == player_dark);
-  REQUIRE(othello_w8.GetPosOwner(3,3) == player_dark);
+  othello_w8.DoMove(player_dark, {3,2});
+  REQUIRE(othello_w8.GetPosOwner({3,2}) == player_dark);
+  REQUIRE(othello_w8.GetPosOwner({3,3}) == player_dark);
   REQUIRE(othello_w8.GetScore(player_dark) == 4);
   REQUIRE(othello_w8.GetScore(player_light) == 1);
   REQUIRE(othello_w8.GetCurPlayer() == player_light);
