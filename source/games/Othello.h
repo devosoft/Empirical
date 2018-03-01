@@ -4,6 +4,10 @@
 //
 //
 //  A simple Othello game state handler.
+//
+//  Developer Notes:
+//  * Add Hash for boards to be able to cachce moves.
+//  * setup OPTIONAL caching of expensive board measures.
 
 #ifndef EMP_GAME_OTHELLO_H
 #define EMP_GAME_OTHELLO_H
@@ -106,7 +110,7 @@ namespace emp {
 
     ~Othello_Game() { ; }
 
-    Index GetIndex(size_t x, size_t y) const { return Index(x, y); }
+    static constexpr Index GetIndex(size_t x, size_t y) { return Index(x, y); }
 
     /// Reset the board to the starting condition.
     void Reset() {
@@ -134,8 +138,7 @@ namespace emp {
     /// Get opponent ID of give player ID.
     Player GetOpponent(Player player) const {
       emp_assert(IsValidPlayer(player));
-      if (player == Player::DARK) return Player::LIGHT;
-      return Player::DARK;
+      return (player == Player::DARK) ? Player::LIGHT : Player::DARK;
     }
 
     /// Is the given player ID a valid player?
@@ -162,21 +165,21 @@ namespace emp {
       emp_assert(IsValidPlayer(player));
       if (!pos.IsValid()) return false;                     // Is pos even on the board?
       if (GetPosOwner(pos) != Player::NONE) return false;   // Is pos empty?
-      return HasValidFlips(player, pos).size();             // Will any tiles flip?
+      return HasValidFlips(player, pos);                    // Will any tiles flip?
     }
 
     bool IsOver() const { return over; }
 
     /// Get positions that would flip if a player (player) made a particular move (pos).
     /// - Does not check move validity.
-    /// - If only_first_valid: return the first valid flip set (in any direction).
-    emp::vector<Index> GetFlipList(Player player, Index pos, bool only_first_valid=false) {
+    emp::vector<Index> GetFlipList(Player player, Index pos) {
       emp::vector<Index> flip_list;
       size_t prev_len = 0;
+      const Player opponent = GetOpponent(player);
       for (Facing dir : ALL_DIRECTIONS) {
         Index neighbor_pos = GetNeighbor(pos, dir);
         // Collect opponent spaces in this direction.
-        while (neighbor_pos.IsValid() && GetPosOwner(neighbor_pos) == GetOpponent(player)) {
+        while (neighbor_pos.IsValid() && GetPosOwner(neighbor_pos) == opponent) {
           flip_list.emplace_back(neighbor_pos);
           neighbor_pos = GetNeighbor(neighbor_pos, dir);
         }
@@ -184,25 +187,41 @@ namespace emp {
         if (!neighbor_pos.IsValid() || GetPosOwner(neighbor_pos) == Player::NONE) { flip_list.resize(prev_len); }
         // Otherwise keep it and update the locked in flips.
         else { prev_len = flip_list.size(); }
-        if (only_first_valid && flip_list.size()) break;
       }
       return flip_list;
     }
 
+    /// Count the number of positions that would flip if we placed a piece at a specific location.
+    size_t GetFlipCount(Player player, Index pos) {
+      size_t flip_count = 0;
+      const Player opponent = GetOpponent(player);
+      for (Facing dir : ALL_DIRECTIONS) {
+        // Collect opponent spaces in this direction.
+        size_t dir_count = 0;
+        Index neighbor_pos = GetNeighbor(pos, dir);
+        while (neighbor_pos.IsValid() && GetPosOwner(neighbor_pos) == opponent) {
+          dir_count++;
+          neighbor_pos = GetNeighbor(neighbor_pos, dir);
+        }
+        // If this line ended in the correct color, add this direction to the total_count.
+        if (neighbor_pos.IsValid() && GetPosOwner(neighbor_pos) == player) { flip_count += dir_count; }
+      }
+      return flip_count;
+    }
+
     /// Are there any valid flips from this position?
-    emp::vector<Index> HasValidFlips(Player player, Index pos) {
+    bool HasValidFlips(Player player, Index pos) {
+      const Player opponent = GetOpponent(player);
       for (Facing dir : ALL_DIRECTIONS) {             // Loop through directions to explore
         Index neighbor_pos = GetNeighbor(pos, dir);   // Start at first neighbor.
         size_t count = 0;
         // Collect opponent spaces in this direction.
-        while (neighbor_pos.IsValid() && GetPosOwner(neighbor_pos) == GetOpponent(player)) {
+        while (neighbor_pos.IsValid() && GetPosOwner(neighbor_pos) == opponent) {
           count++;
           neighbor_pos = GetNeighbor(neighbor_pos, dir);
         }
-        // If this line didn't end in current color, throw out everything we found.
-        if (!count || !neighbor_pos.IsValid() || GetPosOwner(neighbor_pos) == Player::NONE) continue;
-        // Otherwise we found a legal series of flips!
-        else { return true; }
+        // If this line ended with current color (and has spots to flip) we found a good solution!
+        if (count && neighbor_pos.IsValid() && GetPosOwner(neighbor_pos) == player) { return true; }
       }
       return false;
     }
