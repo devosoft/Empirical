@@ -70,7 +70,7 @@ namespace emp {
           case Facing::SE: { faced_id.Set(x() + 1, y() + 1); break; }
           case Facing::SW: { faced_id.Set(x() - 1, y() + 1); break; }
         }
-        return faced_id;        
+        return faced_id;
       }
     };
 
@@ -147,7 +147,7 @@ namespace emp {
     /// Get location adjacent to ID in direction dir.
     /// GetNeighbor function is save with garbage ID values.
     Index GetNeighbor(Index id, Facing dir) const {
-      if (!id.IsValid()) return Index(); 
+      if (!id.IsValid()) return Index();
       return neighbors[GetNeighborIndex(id, dir)];
     }
 
@@ -298,9 +298,9 @@ namespace emp {
     /// NOTE: Does not verify validity.
     /// Will switch cur_player from player to Opp(player) if opponent has a move to make.
     bool DoMove(Player player, Index pos) {
-      emp_assert(IsValidPlayer(player) && pos.IsValid());      
+      emp_assert(IsValidPlayer(player) && pos.IsValid());
       SetPos(pos, player);                                   // Take position for player.
-      DoFlips(player, pos);                                  // Flip tiles on the board.      
+      DoFlips(player, pos);                                  // Flip tiles on the board.
       auto opp_moves = GetMoveOptions(GetOpponent(player));  // Test if opponent can go.
       if (opp_moves.size()) { cur_player = GetOpponent(player); return false; }
 
@@ -330,7 +330,7 @@ namespace emp {
       for (size_t y = 0; y < BOARD_SIZE; ++y) {
         os << y << " ";
         for (size_t x = 0; x < BOARD_SIZE; ++x) {
-          Player space = GetPosOwner(x,y);
+          Player space = GetPosOwner({x,y});
           if (space == Player::DARK)  { os << dark_token << " "; }
           else if (space == Player::LIGHT) { os << light_token << " "; }
           else { os << open_space << " "; }
