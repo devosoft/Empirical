@@ -26,9 +26,6 @@ namespace emp {
     template <typename T>
     constexpr bool is_attribute_value_v = is_attribute_value<T>::value;
 
-    template <typename T>
-    struct is_mergeable : std::false_type {};
-
     template <typename...>
     class Attrs;
 
@@ -435,8 +432,6 @@ namespace emp {
   };                                                                           \
   template <typename T>                                                        \
   constexpr const char* NAME##Value<T>::name;                                  \
-  template <typename T>                                                        \
-  struct emp::tools::is_mergeable<NAME##Value<T>> : std::true_type {};         \
   template <class A, class B>                                                  \
   constexpr bool operator==(const NAME##Value<A>& a,                           \
                             const NAME##Value<B>& b) {                         \
@@ -445,6 +440,22 @@ namespace emp {
   template <class T>                                                           \
   std::ostream& operator<<(std::ostream& out, const NAME##Value<T>& value) {   \
     return out << #NAME "(" << value.Get() << ")";                             \
+  }                                                                            \
+  template <typename U, typename T>                                            \
+  constexpr auto operator+(NAME##Value<U>& from, T&& to) {                     \
+    return Merge(from, std::forward<T>(to));                                   \
+  }                                                                            \
+  template <typename U, typename T>                                            \
+  constexpr auto operator+(const NAME##Value<U>& from, T&& to) {               \
+    return Merge(from, std::forward<T>(to));                                   \
+  }                                                                            \
+  template <typename U, typename T>                                            \
+  constexpr auto operator+(NAME##Value<U>&& from, T&& to) {                    \
+    return Merge(std::move(from), std::forward<T>(to));                        \
+  }                                                                            \
+  template <typename U, typename T>                                            \
+  constexpr auto operator+(const NAME##Value<U>&& from, T&& to) {              \
+    return Merge(std::move(from), std::forward<T>(to));                        \
   }
 
     namespace __attrs_impl {
@@ -917,9 +928,6 @@ namespace emp {
       }
     };
 
-    template <typename... T>
-    struct is_mergeable<Attrs<T...>> : std::true_type {};
-
     ///  An alternative syntax for creating attribute packs. Takes any number
     ///  of attributes and returns a pack containing each of those attributes.
     template <class... T>
@@ -946,12 +954,24 @@ namespace emp {
                          std::forward<U>(packs)...);
     }
 
-    template <
-      class From, class To,
-      class = std::enable_if_t<is_mergeable<std::decay_t<From>>::value &&
-                               is_mergeable<std::decay_t<To>>::value>>
-    constexpr auto operator+(From&& from, To&& to) {
-      return Merge(std::forward<From>(from), std::forward<To>(to));
+    template <typename... U, typename T>
+    constexpr auto operator+(Attrs<U...>& from, T&& to) {
+      return Merge(from, std::forward<T>(to));
+    }
+
+    template <typename... U, typename T>
+    constexpr auto operator+(const Attrs<U...>& from, T&& to) {
+      return Merge(from, std::forward<T>(to));
+    }
+
+    template <typename... U, typename T>
+    constexpr auto operator+(Attrs<U...>&& from, T&& to) {
+      return Merge(std::move(from), std::forward<T>(to));
+    }
+
+    template <typename... U, typename T>
+    constexpr auto operator+(const Attrs<U...>&& from, T&& to) {
+      return Merge(std::move(from), std::forward<T>(to));
     }
 
     namespace __attrs_impl {
