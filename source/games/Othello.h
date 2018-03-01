@@ -1,13 +1,14 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  A simple Othello game state handler.
-//
-//  Developer Notes:
-//  * Add Hash for boards to be able to cachce moves.
-//  * setup OPTIONAL caching of expensive board measures.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2018
+ *
+ *  @file  Othello.h
+ *  @brief A simple Othello game state handler.
+ * 
+ *  @todo Add Hash for boards to be able to cachce moves.
+ *  @todo Setup OPTIONAL caching of expensive board measures.
+ */
 
 #ifndef EMP_GAME_OTHELLO_H
 #define EMP_GAME_OTHELLO_H
@@ -70,12 +71,17 @@ namespace emp {
           case Facing::SE: { faced_id.Set(x() + 1, y() + 1); break; }
           case Facing::SW: { faced_id.Set(x() - 1, y() + 1); break; }
         }
-        return faced_id;        
+        return faced_id;
       }
     };
 
   protected:
-    std::array<Facing, NUM_DIRECTIONS> ALL_DIRECTIONS;
+    static const auto & ALL_DIRECTIONS() {
+      static std::array<Facing, NUM_DIRECTIONS> dirs =
+        { Facing::N, Facing::NE, Facing::E, Facing::SE,
+          Facing::S, Facing::SW, Facing::W, Facing::NW };
+      return dirs;
+    }
     emp::vector<Index> neighbors; ///< On construction, pre-compute adjacency network.
 
     bool over = false;    ///< Is the game over?
@@ -93,17 +99,15 @@ namespace emp {
       neighbors.resize(NUM_CELLS * NUM_DIRECTIONS);
       for (size_t posID = 0; posID < NUM_CELLS; ++posID) {
         Index pos(posID);
-        for (Facing dir : ALL_DIRECTIONS) {
+        for (Facing dir : ALL_DIRECTIONS()) {
           neighbors[GetNeighborIndex(posID, dir)] = pos.CalcNeighbor(dir);
         }
       }
     }
 
   public:
-    Othello_Game() : ALL_DIRECTIONS(), neighbors(), cur_player(Player::DARK), game_board() {
+    Othello_Game() : neighbors(), cur_player(Player::DARK), game_board() {
       emp_assert(BOARD_SIZE >= 4);
-      ALL_DIRECTIONS = { Facing::N, Facing::NE, Facing::E, Facing::SE,
-                         Facing::S, Facing::SW, Facing::W, Facing::NW };
       GenerateNeighborNetwork();
       Reset();
     }
@@ -171,12 +175,12 @@ namespace emp {
     bool IsOver() const { return over; }
 
     /// Get positions that would flip if a player (player) made a particular move (pos).
+    /// Note: May be called before or after piece is placed.
     emp::vector<Index> GetFlipList(Player player, Index pos) {
       emp::vector<Index> flip_list;
-      if (GetPosOwner(pos) != Player::NONE) return flip_list; // Invalid move -- nothing flips!
       size_t prev_len = 0;
       const Player opponent = GetOpponent(player);
-      for (Facing dir : ALL_DIRECTIONS) {
+      for (Facing dir : ALL_DIRECTIONS()) {
         Index neighbor_pos = GetNeighbor(pos, dir);
         // Collect opponent spaces in this direction.
         while (neighbor_pos.IsValid() && GetPosOwner(neighbor_pos) == opponent) {
@@ -193,10 +197,9 @@ namespace emp {
 
     /// Count the number of positions that would flip if we placed a piece at a specific location.
     size_t GetFlipCount(Player player, Index pos) {
-      if (GetPosOwner(pos) != Player::NONE) return 0; // Invalid move -- nothing flips!
       size_t flip_count = 0;
       const Player opponent = GetOpponent(player);
-      for (Facing dir : ALL_DIRECTIONS) {
+      for (Facing dir : ALL_DIRECTIONS()) {
         // Collect opponent spaces in this direction.
         size_t dir_count = 0;
         Index neighbor_pos = GetNeighbor(pos, dir);
@@ -212,9 +215,8 @@ namespace emp {
 
     /// Are there any valid flips from this position?
     bool HasValidFlips(Player player, Index pos) {
-      if (GetPosOwner(pos) != Player::NONE) return false; // Invalid move -- nothing flips!
       const Player opponent = GetOpponent(player);
-      for (Facing dir : ALL_DIRECTIONS) {             // Loop through directions to explore
+      for (Facing dir : ALL_DIRECTIONS()) {             // Loop through directions to explore
         Index neighbor_pos = GetNeighbor(pos, dir);   // Start at first neighbor.
         size_t count = 0;
         // Collect opponent spaces in this direction.
@@ -259,7 +261,7 @@ namespace emp {
 
     /// Is position given by ID adjacent to the given owner?
     bool IsAdjacentTo(Index pos, Player owner) {
-      for (Facing dir : ALL_DIRECTIONS) {
+      for (Facing dir : ALL_DIRECTIONS()) {
         Index nID = GetNeighbor(pos, dir);
         if (!nID.IsValid()) continue;
         if (GetPosOwner(nID) == owner) return true;
@@ -300,7 +302,8 @@ namespace emp {
     /// NOTE: Does not verify validity.
     /// Will switch cur_player from player to Opp(player) if opponent has a move to make.
     bool DoMove(Player player, Index pos) {
-      emp_assert(IsValidPlayer(player) && pos.IsValid());      
+      emp_assert(IsValidPlayer(player) && pos.IsValid());    // Validate position and player.
+      emp_assert(GetPosOwner(pos) == Player::NONE);          // Make sure position is empty.
       SetPos(pos, player);                                   // Take position for player.
       DoFlips(player, pos);                                  // Flip tiles on the board.      
       auto opp_moves = GetMoveOptions(GetOpponent(player));  // Test if opponent can go.
