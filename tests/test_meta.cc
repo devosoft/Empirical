@@ -13,6 +13,7 @@
 #include "meta/reflection.h"
 #include "meta/TypeID.h"
 #include "meta/TypePack.h"
+#include "meta/type_traits.h"
 
 
 char result_char;
