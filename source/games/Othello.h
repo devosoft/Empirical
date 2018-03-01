@@ -76,39 +76,26 @@ namespace emp {
     };
 
   protected:
+    /// All eight cardinal directions.
     static const auto & ALL_DIRECTIONS() {
       static std::array<Facing, NUM_DIRECTIONS> dirs =
         { Facing::N, Facing::NE, Facing::E, Facing::SE,
           Facing::S, Facing::SW, Facing::W, Facing::NW };
       return dirs;
     }
-    emp::vector<Index> neighbors; ///< On construction, pre-compute adjacency network.
 
     bool over = false;    ///< Is the game over?
     Player cur_player;    ///< Who is the current player set to move next?
     board_t game_board;   ///< Game board
 
     /// Internal function for accessing the neighbors vector.
-    size_t GetNeighborIndex(Index pos, Facing dir) const {
+    static size_t GetNeighborIndex(Index pos, Facing dir) {
       return (((size_t) pos) * NUM_DIRECTIONS) + (size_t) dir;
     }
 
-    /// Generates neighbor network (populates neighbors member variable).
-    /// Only used during construction.
-    void GenerateNeighborNetwork() {
-      neighbors.resize(NUM_CELLS * NUM_DIRECTIONS);
-      for (size_t posID = 0; posID < NUM_CELLS; ++posID) {
-        Index pos(posID);
-        for (Facing dir : ALL_DIRECTIONS()) {
-          neighbors[GetNeighborIndex(posID, dir)] = pos.CalcNeighbor(dir);
-        }
-      }
-    }
-
   public:
-    Othello_Game() : neighbors(), cur_player(Player::DARK), game_board() {
+    Othello_Game() : cur_player(Player::DARK), game_board() {
       emp_assert(BOARD_SIZE >= 4);
-      GenerateNeighborNetwork();
       Reset();
     }
 
@@ -150,8 +137,20 @@ namespace emp {
 
     /// Get location adjacent to ID in direction dir.
     /// GetNeighbor function is save with garbage ID values.
-    Index GetNeighbor(Index id, Facing dir) const {
+    static Index GetNeighbor(Index id, Facing dir) {
       if (!id.IsValid()) return Index(); 
+
+      static emp::vector<Index> neighbors;
+      if (neighbors.size() == 0) {
+        neighbors.resize(NUM_CELLS * NUM_DIRECTIONS);
+        for (size_t posID = 0; posID < NUM_CELLS; ++posID) {
+          Index pos(posID);
+          for (Facing dir : ALL_DIRECTIONS()) {
+            neighbors[GetNeighborIndex(posID, dir)] = pos.CalcNeighbor(dir);
+          }
+        }
+      }
+
       return neighbors[GetNeighborIndex(id, dir)];
     }
 
