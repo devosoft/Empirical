@@ -49,7 +49,7 @@ namespace emp {
 
       Index() : pos(NUM_CELLS) { ; }  // Default constructor is invalid position.
       Index(size_t _pos) : pos(_pos) { emp_assert(pos <= NUM_CELLS); }
-      Index(size_t x, size_t y) { Set(x,y); }
+      Index(size_t x, size_t y) : pos() { Set(x,y); }
       Index(const Index & _in) : pos(_in.pos) { emp_assert(pos <= NUM_CELLS); }
 
       operator size_t() const { return pos; }
@@ -100,7 +100,7 @@ namespace emp {
     }
 
   public:
-    Othello_Game() {
+    Othello_Game() : ALL_DIRECTIONS(), neighbors(), cur_player(Player::DARK), game_board() {
       emp_assert(BOARD_SIZE >= 4);
       ALL_DIRECTIONS = { Facing::N, Facing::NE, Facing::E, Facing::SE,
                          Facing::S, Facing::SW, Facing::W, Facing::NW };
@@ -171,9 +171,9 @@ namespace emp {
     bool IsOver() const { return over; }
 
     /// Get positions that would flip if a player (player) made a particular move (pos).
-    /// - Does not check move validity.
     emp::vector<Index> GetFlipList(Player player, Index pos) {
       emp::vector<Index> flip_list;
+      if (GetPosOwner(pos) != Player::NONE) return flip_list; // Invalid move -- nothing flips!
       size_t prev_len = 0;
       const Player opponent = GetOpponent(player);
       for (Facing dir : ALL_DIRECTIONS) {
@@ -193,6 +193,7 @@ namespace emp {
 
     /// Count the number of positions that would flip if we placed a piece at a specific location.
     size_t GetFlipCount(Player player, Index pos) {
+      if (GetPosOwner(pos) != Player::NONE) return 0; // Invalid move -- nothing flips!
       size_t flip_count = 0;
       const Player opponent = GetOpponent(player);
       for (Facing dir : ALL_DIRECTIONS) {
@@ -211,6 +212,7 @@ namespace emp {
 
     /// Are there any valid flips from this position?
     bool HasValidFlips(Player player, Index pos) {
+      if (GetPosOwner(pos) != Player::NONE) return false; // Invalid move -- nothing flips!
       const Player opponent = GetOpponent(player);
       for (Facing dir : ALL_DIRECTIONS) {             // Loop through directions to explore
         Index neighbor_pos = GetNeighbor(pos, dir);   // Start at first neighbor.
