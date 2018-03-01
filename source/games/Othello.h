@@ -83,6 +83,7 @@ namespace emp {
           Facing::S, Facing::SW, Facing::W, Facing::NW };
       return dirs;
     }
+    emp::vector<Index> neighbors;
 
     bool over = false;    ///< Is the game over?
     Player cur_player;    ///< Who is the current player set to move next?
@@ -94,7 +95,7 @@ namespace emp {
     }
 
   public:
-    Othello_Game() : cur_player(Player::DARK), game_board() {
+    Othello_Game() : neighbors(BuildNeighbors()), cur_player(Player::DARK), game_board() {
       emp_assert(BOARD_SIZE >= 4);
       Reset();
     }
@@ -135,12 +136,9 @@ namespace emp {
     /// Is the given player ID a valid player?
     bool IsValidPlayer(Player player) const { return (player == Player::DARK) || (player == Player::LIGHT); }
 
-    /// Get location adjacent to ID in direction dir.
-    /// GetNeighbor function is save with garbage ID values.
-    static Index GetNeighbor(Index id, Facing dir) {
-      if (!id.IsValid()) return Index(); 
+    static auto BuildNeighbors() {
+      emp::vector<Index> neighbors;
 
-      static emp::vector<Index> neighbors;
       if (neighbors.size() == 0) {
         neighbors.resize(NUM_CELLS * NUM_DIRECTIONS);
         for (size_t posID = 0; posID < NUM_CELLS; ++posID) {
@@ -151,6 +149,13 @@ namespace emp {
         }
       }
 
+      return neighbors;
+    }
+
+    /// Get location adjacent to ID in direction dir.
+    /// GetNeighbor function is save with garbage ID values.
+    Index GetNeighbor(Index id, Facing dir) {
+      if (!id.IsValid()) return Index(); 
       return neighbors[GetNeighborIndex(id, dir)];
     }
 
