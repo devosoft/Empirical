@@ -245,6 +245,18 @@ namespace emp {
       return valid_moves;
     }
 
+    /// GetMoveOptions() without a specified player used current player.
+    emp::vector<Index> GetMoveOptions() { return GetMoveOptions(cur_player); }
+
+    /// Determine if there are any move options for given player.
+    bool HasMoveOptions(Player player) {
+      emp_assert(IsValidPlayer(player));
+      for (size_t i = 0; i < NUM_CELLS; ++i) {
+        if (IsValidMove(player, i)) return true;
+      }
+      return false;
+    }
+
     /// Get the current score for a given player.
     double GetScore(Player player) {
       emp_assert(IsValidPlayer(player));
@@ -310,11 +322,11 @@ namespace emp {
       emp_assert(GetPosOwner(pos) == Player::NONE);          // Make sure position is empty.
       SetPos(pos, player);                                   // Take position for player.
       DoFlips(player, pos);                                  // Flip tiles on the board.      
-      auto opp_moves = GetMoveOptions(GetOpponent(player));  // Test if opponent can go.
-      if (opp_moves.size()) { cur_player = GetOpponent(player); return false; }
+      auto opp_moves = HasMoveOptions(GetOpponent(player));  // Test if opponent can go.
+      if (opp_moves) { cur_player = GetOpponent(player); return false; }
 
-      auto player_moves = GetMoveOptions(player);            // Opponent can't go; test cur player
-      if (player_moves.size()) { return true; }              // This player can go again!
+      auto player_moves = HasMoveOptions(player);            // Opponent can't go; test cur player
+      if (player_moves) { return true; }                     // This player can go again!
 
       over = true;                                           // No one can go; game over!
       return false;
