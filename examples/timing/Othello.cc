@@ -12,12 +12,23 @@
 #include <vector>
 
 #include "games/Othello.h"
+#include "tools/Random.h"
 
 int main()
 {
-  emp::Othello game;
+  emp::Random random;
+
   emp::Othello::Player player1 = emp::Othello::Player::DARK;
   emp::Othello::Player player2 = emp::Othello::Player::LIGHT;
+
+  emp::Othello game;
+  // Make a bunch of moves!
+  for (size_t i = 0; i < 30; i++) {
+    auto moves = game.GetMoveOptions();
+    if (moves.size() == 0) break;
+    game.DoNextMove(moves[random.GetUInt(moves.size())]);
+  }
+
   constexpr size_t NUM_LOOPS = 100000;
 
   std::clock_t base_start_time = std::clock();
