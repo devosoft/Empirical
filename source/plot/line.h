@@ -1,7 +1,7 @@
 #ifndef PLOT_LINE_H
 #define PLOT_LINE_H
 
-#include "attrs.h"
+#include "flow.h"
 #include "math/LinAlg.h"
 #include "opengl/color.h"
 #include "opengl/glcanvas.h"
@@ -10,13 +10,14 @@
 #include "scales.h"
 #include "scenegraph/camera.h"
 #include "scenegraph/core.h"
+#include "tools/attrs.h"
 
 // Based on
 // https://blog.mapbox.com/drawing-antialiased-lines-with-opengl-8766f34192dc
 
 namespace emp {
   namespace plot {
-    class Line : public scenegraph::Child {
+    class Line : public scenegraph::Child, public Joinable<Line> {
       private:
       struct __Shader {
         opengl::ShaderProgram program;
@@ -117,27 +118,27 @@ namespace emp {
       }
 
       template <class DataIter, class Iter>
-      void apply(DataIter, DataIter, Iter begin, Iter end) {
+      void Apply(DataIter, DataIter, Iter begin, Iter end) {
         using namespace emp::math;
         using namespace emp::opengl;
-        using namespace emp::plot::attrs;
+        using namespace emp::plot::attributes;
 
         // If there is nothing to show, then bail out
         elementCount = 0;
         if (begin == end) return;
 
         // Capture the first element of the dataset
-        Vec3f start{begin->xyzScaled.x(), begin->xyzScaled.y(), 0};
-        auto startStroke{begin->stroke};
-        auto startStrokeWeight{begin->strokeWeight * 0.5f};
+        Vec3f start{XyzScaled::Get(*begin).x(), XyzScaled::Get(*begin).y(), 0};
+        auto startStroke{Stroke::Get(*begin)};
+        auto startStrokeWeight{StrokeWeight::Get(*begin) * 0.5f};
         ++begin;
         // Make sure that there is at least one more item in the dataset
         if (begin == end) return;
 
         // capture the second element
-        Vec3f middle{begin->xyzScaled.x(), begin->xyzScaled.y(), 0};
-        auto middleStroke{begin->stroke};
-        auto middleStrokeWeight{begin->strokeWeight * 0.5f};
+        Vec3f middle{XyzScaled::Get(*begin).x(), XyzScaled::Get(*begin).y(), 0};
+        auto middleStroke{Stroke::Get(*begin)};
+        auto middleStrokeWeight{StrokeWeight::Get(*begin) * 0.5f};
 
         auto segment = (middle - start).normalized();
         Vec2f normal{-segment.y(), segment.x()};
@@ -150,9 +151,9 @@ namespace emp {
 
         size_t i = 0;
         for (++begin; begin != end; ++begin) {
-          Vec3f end{begin->xyzScaled.x(), begin->xyzScaled.y(), 0};
-          auto stroke{begin->stroke};
-          auto weight{begin->strokeWeight * 0.5f};
+          Vec3f end{XyzScaled::Get(*begin).x(), XyzScaled::Get(*begin).y(), 0};
+          auto stroke{Stroke::Get(*begin)};
+          auto weight{StrokeWeight::Get(*begin) * 0.5f};
 
           auto segment1 = (middle - start).normalized();
           Vec2f normal1{-segment1.y(), segment1.x()};

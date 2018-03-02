@@ -2,7 +2,7 @@
 #define PLOT_SCATTER_H
 
 #include <cmath>
-#include "attrs.h"
+#include "flow.h"
 #include "math/LinAlg.h"
 #include "math/consts.h"
 #include "opengl/color.h"
@@ -12,6 +12,7 @@
 #include "scales.h"
 #include "scenegraph/camera.h"
 #include "scenegraph/core.h"
+#include "tools/attrs.h"
 
 namespace emp {
   namespace plot {
@@ -72,7 +73,7 @@ namespace emp {
       };
     }  // namespace __shader
 
-    class Scatter : public scenegraph::Child {
+    class Scatter : public scenegraph::Child, public Joinable<Scatter> {
       private:
       __shader::Shader shader;
       opengl::BufferObject<opengl::BufferType::Array> verticesBuffer;
@@ -89,7 +90,6 @@ namespace emp {
             canvas.makeBuffer<opengl::BufferType::ElementArray>()) {
         using namespace emp::opengl;
         using namespace emp::math;
-        using namespace emp::plot::attrs;
 
         std::vector<Vec3f> vertices;
         vertices.reserve(vertexCount + 1);
@@ -139,16 +139,17 @@ namespace emp {
       }
 
       template <class DataIter, class Iter>
-      void apply(DataIter, DataIter, Iter begin, Iter end) {
+      void Apply(DataIter, DataIter, Iter begin, Iter end) {
         using namespace emp::math;
+        using namespace emp::plot::attributes;
         points.clear();
 
         for (; begin != end; ++begin) {
-          auto model = Mat4x4f::translation(begin->xyzScaled.x(),
-                                            begin->xyzScaled.y(), 0) *
-                       Mat4x4f::scale(begin->pointSize);
+          auto model = Mat4x4f::translation(XyzScaled::Get(*begin).x(),
+                                            XyzScaled::Get(*begin).y(), 0) *
+                       Mat4x4f::scale(PointSize::Get(*begin));
 
-          points.push_back({model, begin->fill});
+          points.push_back({model, Fill::Get(*begin)});
         }
       }
     };

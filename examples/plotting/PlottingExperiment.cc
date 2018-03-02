@@ -12,12 +12,12 @@
 #include "math/LinAlg.h"
 #include "math/consts.h"
 #include "opengl/glcanvas.h"
-#include "plot/flow.h"
 #include "plot/line.h"
 #include "plot/scales.h"
 #include "plot/scatter.h"
 #include "scenegraph/camera.h"
 #include "scenegraph/core.h"
+#include "tools/attrs.h"
 // #include "scenegraph/shapes.h"
 #include "scenegraph/transform.h"
 
@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
   using namespace emp::math;
   using namespace emp::scenegraph;
   using namespace emp::plot;
-  using namespace emp::plot::attrs;
+  using namespace emp::plot::attributes;
 
   GLCanvas canvas;
   Group root;
@@ -40,8 +40,8 @@ int main(int argc, char* argv[]) {
 
   std::vector<Vec2f> data;
 
-  auto flow = (xyz([](auto& p) { return p; }) + stroke(Color::red()) +
-               strokeWeight(2) + fill(Color::blue()) + pointSize(10)) >>
+  auto flow = (Xyz([](auto& p) { return p; }) + Stroke(Color::red()) +
+               StrokeWeight(2) + Fill(Color::blue()) + PointSize(10)) >>
               scale >> scatter >> line;
 
   PerspectiveCamera camera(canvas.getRegion());
@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
     data.emplace_back(random(), random());
   }
 
-  flow.apply(data.begin(), data.end());
+  flow.Apply(data.begin(), data.end());
 
   canvas.runForever([&](auto&&) {
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < 10000; ++i) {
       data.emplace_back(random(), random());
     }
-    flow.apply(data.begin(), data.end());
+    flow.Apply(data.begin(), data.end());
   });
 
   return 0;
