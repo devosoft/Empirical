@@ -21,30 +21,33 @@ int main()
   emp::Othello::Player player1 = emp::Othello::Player::DARK;
   emp::Othello::Player player2 = emp::Othello::Player::LIGHT;
 
-  emp::Othello game;
-  // Make a bunch of moves!
-  for (size_t i = 0; i < 30; i++) {
-    auto moves = game.GetMoveOptions();
-    if (moves.size() == 0) break;
-    game.DoNextMove(moves[random.GetUInt(moves.size())]);
-  }
-
-  constexpr size_t NUM_LOOPS = 100000;
+  constexpr size_t NUM_BOARDS = 10;
+  constexpr size_t NUM_LOOPS = 10000;
+  size_t count = 0;
 
   std::clock_t base_start_time = std::clock();
 
-  size_t count = 0;
-  for (size_t test = 0; test < NUM_LOOPS; test++) {
-    for (size_t i = 0; i < 64; i++) {
-      if (game.GetFlipList(player1,i).size() == game.GetFlipCount(player1,i)) {
-	      count++;
-      } else {
-	      std::cout << "Oh oh... didn't match!" << std::endl;
-      }
-      if (game.GetFlipList(player2,i).size() == game.GetFlipCount(player2,i)) {
-	      count++;
-      } else {
-	      std::cout << "Oh oh... didn't match!" << std::endl;
+  for (size_t board_id = 0; board_id < NUM_BOARDS; board_id++) {
+    emp::Othello game;
+    // Make a bunch of moves!
+    for (size_t i = 0; i < 30; i++) {
+      auto moves = game.GetMoveOptions();
+      if (moves.size() == 0) break;
+      game.DoNextMove(moves[random.GetUInt(moves.size())]);
+    }
+
+    for (size_t test = 0; test < NUM_LOOPS; test++) {
+      for (size_t i = 0; i < 64; i++) {
+        if (game.GetFlipList(player1,i).size() == game.GetFlipCount(player1,i)) {
+          count++;
+        } else {
+          std::cout << "Oh oh... didn't match!" << std::endl;
+        }
+        if (game.GetFlipList(player2,i).size() == game.GetFlipCount(player2,i)) {
+          count++;
+        } else {
+          std::cout << "Oh oh... didn't match!" << std::endl;
+        }
       }
     }
   }
