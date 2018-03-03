@@ -22,6 +22,7 @@
 #include "../base/assert.h"
 #include "../base/vector.h"
 #include "../tools/math.h"
+#include "../tools/bitset_utils.h"
 
 namespace emp {
   /// NOTE: This game could be made more black-box.
@@ -33,13 +34,12 @@ namespace emp {
   /// Class for size-8 othello games.
   class Othello8 {
   public:
-    enum Player { NONE=0, DARK, LIGHT };            ///< All possible states of a board space.
+    enum Player { DARK=0, LIGHT=1, NONE };          ///< All possible states of a board space.
     enum Facing { N, NE, E, SE, S, SW, W, NW };     ///< All possible directions
     static constexpr size_t NUM_DIRECTIONS = 8;     ///< Number of neighbors each board space has.
     static constexpr size_t BOARD_SIZE = 8;         ///< Size of a side of the board.
     static constexpr size_t NUM_CELLS = 64;         ///< Number of cells on total board.
     using this_t = Othello8;
-    using board_t = std::array<Player, NUM_CELLS>;
 
     struct Index {
       size_t pos;
@@ -50,9 +50,9 @@ namespace emp {
       constexpr Index(const Index & _in) : pos(_in.pos) { emp_assert(pos <= NUM_CELLS); }
 
       operator size_t() const { return pos; }
-      size_t x() const { return pos % BOARD_SIZE; }
-      size_t y() const { return pos / BOARD_SIZE; }
-      void Set(size_t x, size_t y) { pos = (x<BOARD_SIZE && y<BOARD_SIZE) ? (x+y*BOARD_SIZE) : NUM_CELLS; }
+      size_t x() const { return pos & 7; }
+      size_t y() const { return pos >> 3; }
+      void Set(size_t x, size_t y) { pos = (x<BOARD_SIZE && y<BOARD_SIZE) ? (x+(y<<3)) : NUM_CELLS; }
       bool IsValid() const { return pos < NUM_CELLS; }
 
       Index CalcNeighbor(Facing dir) {
@@ -71,6 +71,30 @@ namespace emp {
       }
     };
 
+    struct Board {
+      uint64_t occupied;
+      uint64_t player;
+
+      void Clear() { occupied = 0; }
+      void Clear(Index pos) { occupied &= ~(1 << pos); }
+      Player Owner(Index pos) const {
+        uint64_t id = (1 << pos);
+        if (occupied & id) return (player & id) ? Player::LIGHT : Player::DARK;
+        else return Player::NONE;
+      }
+      void SetOwner(Index pos, Player owner) {
+        const uint64_t id = 1 << pos;
+        occupied |= id;
+        if (owner == Player::DARK) occupied &= ~id;
+        else occupied |= id;
+      }
+
+      size_t Score(Player owner) {
+        if (owner == Player::DARK) return count_bits(occupied & ~player);
+        return count_bits(occupied & player);
+      }
+    };
+
   protected:
     /// All eight cardinal directions.
     static const auto & ALL_DIRECTIONS() {
@@ -79,20 +103,15 @@ namespace emp {
           Facing::S, Facing::SW, Facing::W, Facing::NW };
       return dirs;
     }
-    emp::vector<Index> neighbors;
-
-    bool over = false;    ///< Is the game over?
-    Player cur_player;    ///< Who is the current player set to move next?
-    board_t game_board;   ///< Game board
 
     /// Internal function for accessing the neighbors vector.
     static size_t GetNeighborIndex(Index pos, Facing dir) {
       return (((size_t) pos) * NUM_DIRECTIONS) + (size_t) dir;
     }
 
-    static auto BuildNeighbors() {
-      emp::vector<Index> neighbors;
-
+    /// Precalculated neighbors
+    static const auto & NEIGHBORS() {
+      static emp::vector<Index> neighbors;
       if (neighbors.size() == 0) {
         neighbors.resize(NUM_CELLS * NUM_DIRECTIONS);
         for (size_t posID = 0; posID < NUM_CELLS; ++posID) {
@@ -102,15 +121,15 @@ namespace emp {
           }
         }
       }
-
       return neighbors;
     }
 
+    bool over = false;    ///< Is the game over?
+    Player cur_player;    ///< Who is the current player set to move next?
+    Board game_board;     ///< Game board
+
   public:
-    Othello8() : neighbors(BuildNeighbors()), cur_player(Player::DARK), game_board() {
-      emp_assert(BOARD_SIZE >= 4);
-      Reset();
-    }
+    Othello8() : cur_player(Player::DARK), game_board() { Reset(); }
 
     ~Othello8() { ; }
 
@@ -119,7 +138,7 @@ namespace emp {
     /// Reset the board to the starting condition.
     void Reset() {
       // Reset the board.
-      for (size_t i = 0; i < NUM_CELLS; ++i) game_board[i] = Player::NONE;
+      game_board.Clear();
 
       // Setup Initial board
       //  ........
@@ -141,7 +160,6 @@ namespace emp {
 
     /// Get opponent ID of give player ID.
     Player GetOpponent(Player player) const {
-      emp_assert(IsValidPlayer(player));
       return (player == Player::DARK) ? Player::LIGHT : Player::DARK;
     }
 
@@ -152,17 +170,17 @@ namespace emp {
     /// GetNeighbor function is save with garbage ID values.
     Index GetNeighbor(Index id, Facing dir) {
       if (!id.IsValid()) return Index(); 
-      return neighbors[GetNeighborIndex(id, dir)];
+      return NEIGHBORS()[GetNeighborIndex(id, dir)];
     }
 
     /// Get the value (light, dark, or open) at a position on the board.
     Player GetPosOwner(Index id) const {
       emp_assert(id.IsValid());
-      return game_board[id];
+      return game_board.Owner(id);
     }
 
-    board_t & GetBoard() { return game_board; }
-    const board_t & GetBoard() const { return game_board; }
+    Board & GetBoard() { return game_board; }
+    const Board & GetBoard() const { return game_board; }
 
     /// Is given move valid?
     bool IsValidMove(Player player, Index pos) {
@@ -256,7 +274,7 @@ namespace emp {
     /// Get the current score for a given player.
     double GetScore(Player player) {
       emp_assert(IsValidPlayer(player));
-      return std::count(game_board.begin(), game_board.end(), player);
+      return game_board.Score(player);
     }
 
     /// Count the number of empty squares adjacent to a player's pieces (frontier size)
@@ -264,7 +282,7 @@ namespace emp {
       emp_assert(IsValidPlayer(player));
       size_t frontier_size = 0;
       for (size_t i = 0; i < NUM_CELLS; ++i) {           // Search through all cells
-        if (game_board[i] == Player::NONE) {             // Is the test cell empty?
+        if (game_board.Owner(i) == Player::NONE) {        // Is the test cell empty?
           if (IsAdjacentTo(i, player)) ++frontier_size;  // If so, test if on player's frontier
         }
       }
@@ -284,7 +302,11 @@ namespace emp {
     /// Set board position (ID) to given space value.
     void SetPos(Index pos, Player player) {
       emp_assert(pos.IsValid());
-      game_board[pos] = player;
+      game_board.SetOwner(pos, player);
+    }
+
+    void ClearPos(Index pos) {
+      game_board.Clear(pos);
     }
 
     /// Set positions given by ids to be owned by the given player.
@@ -294,7 +316,7 @@ namespace emp {
 
     /// Configure board as given by copy_board input.
     /// copy_board size must match game_board's size.
-    void SetBoard(const board_t & other_board) { game_board = other_board; }
+    void SetBoard(const Board & other_board) { game_board = other_board; }
 
     /// Set current board to be the same as board from other othello game.
     void SetBoard(const this_t & other_othello) { SetBoard(other_othello.GetBoard()); }
