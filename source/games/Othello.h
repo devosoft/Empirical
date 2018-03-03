@@ -76,13 +76,7 @@ namespace emp {
     };
 
   protected:
-    /// All eight cardinal directions.
-    static const auto & ALL_DIRECTIONS() {
-      static std::array<Facing, NUM_DIRECTIONS> dirs =
-        { Facing::N, Facing::NE, Facing::E, Facing::SE,
-          Facing::S, Facing::SW, Facing::W, Facing::NW };
-      return dirs;
-    }
+    std::array<Facing, NUM_DIRECTIONS> ALL_DIRECTIONS;
     emp::vector<Index> neighbors;
 
     bool over = false;    ///< Is the game over?
@@ -95,7 +89,8 @@ namespace emp {
     }
 
   public:
-    Othello_Game() : neighbors(BuildNeighbors()), cur_player(Player::DARK), game_board() {
+    Othello_Game() : ALL_DIRECTIONS({ Facing::N, Facing::NE, Facing::E, Facing::SE, Facing::S, Facing::SW, Facing::W, Facing::NW })
+                   , neighbors(BuildNeighbors()), cur_player(Player::DARK), game_board() {
       emp_assert(BOARD_SIZE >= 4);
       Reset();
     }
@@ -136,14 +131,14 @@ namespace emp {
     /// Is the given player ID a valid player?
     bool IsValidPlayer(Player player) const { return (player == Player::DARK) || (player == Player::LIGHT); }
 
-    static auto BuildNeighbors() {
+    auto BuildNeighbors() {
       emp::vector<Index> neighbors;
 
       if (neighbors.size() == 0) {
         neighbors.resize(NUM_CELLS * NUM_DIRECTIONS);
         for (size_t posID = 0; posID < NUM_CELLS; ++posID) {
           Index pos(posID);
-          for (Facing dir : ALL_DIRECTIONS()) {
+          for (Facing dir : ALL_DIRECTIONS) {
             neighbors[GetNeighborIndex(posID, dir)] = pos.CalcNeighbor(dir);
           }
         }
@@ -184,7 +179,7 @@ namespace emp {
       emp::vector<Index> flip_list;
       size_t prev_len = 0;
       const Player opponent = GetOpponent(player);
-      for (Facing dir : ALL_DIRECTIONS()) {
+      for (Facing dir : ALL_DIRECTIONS) {
         Index neighbor_pos = GetNeighbor(pos, dir);
         // Collect opponent spaces in this direction.
         while (neighbor_pos.IsValid() && GetPosOwner(neighbor_pos) == opponent) {
@@ -203,7 +198,7 @@ namespace emp {
     size_t GetFlipCount(Player player, Index pos) {
       size_t flip_count = 0;
       const Player opponent = GetOpponent(player);
-      for (Facing dir : ALL_DIRECTIONS()) {
+      for (Facing dir : ALL_DIRECTIONS) {
         // Collect opponent spaces in this direction.
         size_t dir_count = 0;
         Index neighbor_pos = GetNeighbor(pos, dir);
@@ -220,7 +215,7 @@ namespace emp {
     /// Are there any valid flips from this position?
     bool HasValidFlips(Player player, Index pos) {
       const Player opponent = GetOpponent(player);
-      for (Facing dir : ALL_DIRECTIONS()) {             // Loop through directions to explore
+      for (Facing dir : ALL_DIRECTIONS) {             // Loop through directions to explore
         Index neighbor_pos = GetNeighbor(pos, dir);   // Start at first neighbor.
         size_t count = 0;
         // Collect opponent spaces in this direction.
@@ -277,7 +272,7 @@ namespace emp {
 
     /// Is position given by ID adjacent to the given owner?
     bool IsAdjacentTo(Index pos, Player owner) {
-      for (Facing dir : ALL_DIRECTIONS()) {
+      for (Facing dir : ALL_DIRECTIONS) {
         Index nID = GetNeighbor(pos, dir);
         if (!nID.IsValid()) continue;
         if (GetPosOwner(nID) == owner) return true;
