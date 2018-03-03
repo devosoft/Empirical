@@ -19,50 +19,53 @@ int main()
 {
   emp::Random random;
 
-  emp::Othello::Player player1 = emp::Othello::Player::DARK;
-  emp::Othello::Player player2 = emp::Othello::Player::LIGHT;
-
-  constexpr size_t NUM_BOARDS = 10;
-  constexpr size_t NUM_LOOPS = 10000;
+  constexpr size_t NUM_BOARDS = 100;
+  constexpr size_t NUM_LOOPS = 1000;
   size_t count = 0;
 
   // Setup the boards.
   std::array<emp::Othello, NUM_BOARDS> games;
-  std::array<emp::Othello, NUM_BOARDS> games8;
+  std::array<emp::Othello8, NUM_BOARDS> games8;
   for (size_t board_id = 0; board_id < NUM_BOARDS; board_id++) {
     // Make a bunch of moves on each board!
-    for (size_t i = 0; i < 30; i++) {
+    size_t num_moves = random.GetUInt(10,50);
+    for (size_t i = 0; i < num_moves; i++) {
       auto moves = games[board_id].GetMoveOptions();
-      if (moves.size() == 0) break;
-      auto next_move = moves[random.GetUInt(moves.size())];
+      if (moves.size() == 0) { board_id--; break; }
+      size_t next_move = moves[random.GetUInt(moves.size())];
       games[board_id].DoNextMove(next_move);
       games8[board_id].DoNextMove(next_move);
     }
   }
 
+  std::cout << "Finished generating boards!" << std::endl;
 
   // START TIMER!
   std::clock_t base_start_time = std::clock();
 
-  for (size_t board_id = 0; board_id < NUM_BOARDS; board_id++) {
-    for (size_t test = 0; test < NUM_LOOPS; test++) {
-      for (size_t i = 0; i < 64; i++) {
-        if (games[board_id].GetFlipList(player1,i).size() == games[board_id].GetFlipCount(player1,i)) {
-          count++;
-        } else {
-          std::cout << "Oh oh... didn't match!" << std::endl;
-        }
-        if (games[board_id].GetFlipList(player2,i).size() == games[board_id].GetFlipCount(player2,i)) {
-          count++;
-        } else {
-          std::cout << "Oh oh... didn't match!" << std::endl;
+  {
+    emp::Othello::Player player1 = emp::Othello::Player::DARK;
+    emp::Othello::Player player2 = emp::Othello::Player::LIGHT;
+    for (size_t board_id = 0; board_id < NUM_BOARDS; board_id++) {
+      for (size_t test = 0; test < NUM_LOOPS; test++) {
+        for (size_t i = 0; i < 64; i++) {
+          if (games[board_id].GetFlipList(player1,i).size() == games[board_id].GetFlipCount(player1,i)) {
+            count++;
+          } else {
+            std::cout << "Oh oh... didn't match!" << std::endl;
+          }
+          if (games[board_id].GetFlipList(player2,i).size() == games[board_id].GetFlipCount(player2,i)) {
+            count++;
+          } else {
+            std::cout << "Oh oh... didn't match!" << std::endl;
+          }
         }
       }
     }
   }
 
   std::clock_t base_tot_time = std::clock() - base_start_time;
-  std::cout << "Othello<8> count = " << count
+  std::cout << "Othello count = " << count
             << ";  time = " << 1000.0 * ((double) base_tot_time) / (double) CLOCKS_PER_SEC
             << " ms." << std::endl;
 
@@ -70,19 +73,23 @@ int main()
   // RESTART TIMER!
   base_start_time = std::clock();
 
-  count = 0;
-  for (size_t board_id = 0; board_id < NUM_BOARDS; board_id++) {
-    for (size_t test = 0; test < NUM_LOOPS; test++) {
-      for (size_t i = 0; i < 64; i++) {
-        if (games8[board_id].GetFlipList(player1,i).size() == games8[board_id].GetFlipCount(player1,i)) {
-          count++;
-        } else {
-          std::cout << "Oh oh... didn't match!" << std::endl;
-        }
-        if (games8[board_id].GetFlipList(player2,i).size() == games8[board_id].GetFlipCount(player2,i)) {
-          count++;
-        } else {
-          std::cout << "Oh oh... didn't match!" << std::endl;
+  {
+    emp::Othello8::Player player1 = emp::Othello8::Player::DARK;
+    emp::Othello8::Player player2 = emp::Othello8::Player::LIGHT;
+    count = 0;
+    for (size_t board_id = 0; board_id < NUM_BOARDS; board_id++) {
+      for (size_t test = 0; test < NUM_LOOPS; test++) {
+        for (size_t i = 0; i < 64; i++) {
+          if (games8[board_id].GetFlipList(player1,i).size() == games8[board_id].GetFlipCount(player1,i)) {
+            count++;
+          } else {
+            std::cout << "Oh oh... didn't match!" << std::endl;
+          }
+          if (games8[board_id].GetFlipList(player2,i).size() == games8[board_id].GetFlipCount(player2,i)) {
+            count++;
+          } else {
+            std::cout << "Oh oh... didn't match!" << std::endl;
+          }
         }
       }
     }
