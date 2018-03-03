@@ -25,25 +25,30 @@ int main()
   constexpr size_t NUM_LOOPS = 10000;
   size_t count = 0;
 
+  // Setup the boards.
+  std::array<emp::Othello, NUM_BOARDS> games;
+  for (size_t board_id = 0; board_id < NUM_BOARDS; board_id++) {
+    // Make a bunch of moves on each board!
+    for (size_t i = 0; i < 30; i++) {
+      auto moves = games[board_id].GetMoveOptions();
+      if (moves.size() == 0) break;
+      games[board_id].DoNextMove(moves[random.GetUInt(moves.size())]);
+    }
+  }
+
+
+  // START TIMER!
   std::clock_t base_start_time = std::clock();
 
   for (size_t board_id = 0; board_id < NUM_BOARDS; board_id++) {
-    emp::Othello game;
-    // Make a bunch of moves!
-    for (size_t i = 0; i < 30; i++) {
-      auto moves = game.GetMoveOptions();
-      if (moves.size() == 0) break;
-      game.DoNextMove(moves[random.GetUInt(moves.size())]);
-    }
-
     for (size_t test = 0; test < NUM_LOOPS; test++) {
       for (size_t i = 0; i < 64; i++) {
-        if (game.GetFlipList(player1,i).size() == game.GetFlipCount(player1,i)) {
+        if (games[board_id].GetFlipList(player1,i).size() == games[board_id].GetFlipCount(player1,i)) {
           count++;
         } else {
           std::cout << "Oh oh... didn't match!" << std::endl;
         }
-        if (game.GetFlipList(player2,i).size() == game.GetFlipCount(player2,i)) {
+        if (games[board_id].GetFlipList(player2,i).size() == games[board_id].GetFlipCount(player2,i)) {
           count++;
         } else {
           std::cout << "Oh oh... didn't match!" << std::endl;
