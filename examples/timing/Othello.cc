@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "games/Othello.h"
+#include "games/Othello8.h"
 #include "tools/Random.h"
 
 int main()
@@ -27,12 +28,15 @@ int main()
 
   // Setup the boards.
   std::array<emp::Othello, NUM_BOARDS> games;
+  std::array<emp::Othello, NUM_BOARDS> games8;
   for (size_t board_id = 0; board_id < NUM_BOARDS; board_id++) {
     // Make a bunch of moves on each board!
     for (size_t i = 0; i < 30; i++) {
       auto moves = games[board_id].GetMoveOptions();
       if (moves.size() == 0) break;
-      games[board_id].DoNextMove(moves[random.GetUInt(moves.size())]);
+      auto next_move = moves[random.GetUInt(moves.size())];
+      games[board_id].DoNextMove(next_move);
+      games8[board_id].DoNextMove(next_move);
     }
   }
 
@@ -58,7 +62,34 @@ int main()
   }
 
   std::clock_t base_tot_time = std::clock() - base_start_time;
-  std::cout << "count = " << count
+  std::cout << "Othello<8> count = " << count
+            << ";  time = " << 1000.0 * ((double) base_tot_time) / (double) CLOCKS_PER_SEC
+            << " ms." << std::endl;
+
+
+  // RESTART TIMER!
+  base_start_time = std::clock();
+
+  count = 0;
+  for (size_t board_id = 0; board_id < NUM_BOARDS; board_id++) {
+    for (size_t test = 0; test < NUM_LOOPS; test++) {
+      for (size_t i = 0; i < 64; i++) {
+        if (games8[board_id].GetFlipList(player1,i).size() == games8[board_id].GetFlipCount(player1,i)) {
+          count++;
+        } else {
+          std::cout << "Oh oh... didn't match!" << std::endl;
+        }
+        if (games8[board_id].GetFlipList(player2,i).size() == games8[board_id].GetFlipCount(player2,i)) {
+          count++;
+        } else {
+          std::cout << "Oh oh... didn't match!" << std::endl;
+        }
+      }
+    }
+  }
+
+  base_tot_time = std::clock() - base_start_time;
+  std::cout << "Othello8 count = " << count
             << ";  time = " << 1000.0 * ((double) base_tot_time) / (double) CLOCKS_PER_SEC
             << " ms." << std::endl;
 
