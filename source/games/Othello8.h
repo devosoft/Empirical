@@ -76,18 +76,19 @@ namespace emp {
       uint64_t player;
 
       void Clear() { occupied = 0; }
-      void Clear(Index pos) { occupied &= ~(1 << pos); }
+      void Clear(Index pos) { occupied &= ~(((uint64_t) 1) << pos); }
       Player Owner(Index pos) const {
-        uint64_t id = (1 << pos);
+        uint64_t id = (((uint64_t) 1) << pos);
         if (occupied & id) return (player & id) ? Player::LIGHT : Player::DARK;
         else return Player::NONE;
       }
       void SetOwner(Index pos, Player owner) {
-        const uint64_t id = 1 << pos;
+        const uint64_t id = ((uint64_t) 1) << pos;
         occupied |= id;
-        if (owner == Player::DARK) occupied &= ~id;
-        else occupied |= id;
+        if (owner == Player::DARK) player &= ~id;
+        else player |= id;
       }
+      bool Occupied(Index pos) { return (occupied >> pos) & (size_t) 1; }
 
       size_t Score(Player owner) {
         if (owner == Player::DARK) return count_bits(occupied & ~player);
@@ -185,9 +186,9 @@ namespace emp {
     /// Is given move valid?
     bool IsValidMove(Player player, Index pos) {
       emp_assert(IsValidPlayer(player));
-      if (!pos.IsValid()) return false;                     // Is pos even on the board?
-      if (GetPosOwner(pos) != Player::NONE) return false;   // Is pos empty?
-      return HasValidFlips(player, pos);                    // Will any tiles flip?
+      if (!pos.IsValid()) return false;               // Is pos even on the board?
+      if (game_board.Occupied(pos)) return false;     // Is pos empty?
+      return HasValidFlips(player, pos);              // Will any tiles flip?
     }
 
     bool IsOver() const { return over; }
@@ -206,7 +207,7 @@ namespace emp {
           neighbor_pos = GetNeighbor(neighbor_pos, dir);
         }
         // If this line didn't end in current color, throw out everything we found.
-        if (!neighbor_pos.IsValid() || GetPosOwner(neighbor_pos) == Player::NONE) { flip_list.resize(prev_len); }
+        if (!neighbor_pos.IsValid() || !game_board.Occupied(neighbor_pos)) { flip_list.resize(prev_len); }
         // Otherwise keep it and update the locked in flips.
         else { prev_len = flip_list.size(); }
       }
@@ -282,7 +283,7 @@ namespace emp {
       emp_assert(IsValidPlayer(player));
       size_t frontier_size = 0;
       for (size_t i = 0; i < NUM_CELLS; ++i) {           // Search through all cells
-        if (game_board.Owner(i) == Player::NONE) {        // Is the test cell empty?
+        if (game_board.Occupied(i) == false) {           // Is the test cell empty?
           if (IsAdjacentTo(i, player)) ++frontier_size;  // If so, test if on player's frontier
         }
       }
