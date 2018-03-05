@@ -110,4 +110,34 @@ int main()
             << ";  time = " << 1000.0 * ((double) base_tot_time) / (double) CLOCKS_PER_SEC
             << " ms." << std::endl;
 
+  // RESTART TIMER!
+  base_start_time = std::clock();
+
+  {
+    emp::Othello8::Player player1 = emp::Othello8::Player::DARK;
+    emp::Othello8::Player player2 = emp::Othello8::Player::LIGHT;
+    count = 0;
+    for (size_t board_id = 0; board_id < NUM_BOARDS; board_id++) {
+      games8[board_id].SetupCache();
+      for (size_t test = 0; test < NUM_LOOPS; test++) {
+        for (size_t i = 0; i < 64; i++) {
+          if (games8[board_id].GetFlipList(player1,i).size() == games8[board_id].GetFlipCount(player1,i)) {
+            count++;
+          } else {
+            std::cout << "Oh oh... didn't match!" << std::endl;
+          }
+          if (games8[board_id].GetFlipList(player2,i).size() == games8[board_id].GetFlipCount(player2,i)) {
+            count++;
+          } else {
+            std::cout << "Oh oh... didn't match!" << std::endl;
+          }
+        }
+      }
+    }
+  }
+
+  base_tot_time = std::clock() - base_start_time;
+  std::cout << "Othello8 count (with Caching) = " << count
+            << ";  time = " << 1000.0 * ((double) base_tot_time) / (double) CLOCKS_PER_SEC
+            << " ms." << std::endl;
 }
