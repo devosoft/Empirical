@@ -26,17 +26,27 @@ int main()
   // Setup the boards.
   std::array<emp::Othello, NUM_BOARDS> games;
   std::array<emp::Othello8, NUM_BOARDS> games8;
+
+  games[0].Print();
+  std::cout << std::endl;
+  games8[0].Print();
+
   for (size_t board_id = 0; board_id < NUM_BOARDS; board_id++) {
     // Make a bunch of moves on each board!
-    size_t num_moves = random.GetUInt(10,50);
+    size_t num_moves = random.GetUInt(10,60);
     for (size_t i = 0; i < num_moves; i++) {
       auto moves = games[board_id].GetMoveOptions();
       if (moves.size() == 0) { board_id--; break; }
       size_t next_move = moves[random.GetUInt(moves.size())];
-      games[board_id].DoNextMove(next_move);
-      games8[board_id].DoNextMove(next_move);
+      bool again = games[board_id].DoNextMove(next_move);
+      bool again8 = games8[board_id].DoNextMove(next_move);
+      if (again != again8) std::cout << "Ack!  Game boards do not agree!" << std::endl;
     }
   }
+
+  games[0].Print();
+  std::cout << std::endl;
+  games8[0].Print();
 
   std::cout << "Finished generating boards!" << std::endl;
 
