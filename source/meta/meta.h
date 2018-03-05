@@ -179,14 +179,30 @@ namespace emp {
   };
 
 
+  namespace {
+    // By default, use std::hash if nothing else exists.
+    template <typename T>
+    std::size_t Hash_impl(const T & x, int) { return std::hash<T>()(x); }
+
+    // Allow a hash to be updated a GetHash() member function.
+    template <typename T>
+    auto Hash_impl(const T & x, bool) -> decltype(x.GetHash()) { return x.GetHash(); }
+  }
+
+  // Setup hashes to be dynamically determined.
+  template <typename T>
+  std::size_t Hash(const T & x) { return Hash_impl(x, true); }
+
   // Combine multiple keys into a single hash value.
   template <typename T>
-  std::size_t CombineHash(const T & x) { return std::hash<T>()(x); }
+  //std::size_t CombineHash(const T & x) { return std::hash<T>()(x); }
+  std::size_t CombineHash(const T & x) { return Hash<T>(x); }
 
   template<typename T1, typename T2, typename... EXTRA>
   std::size_t CombineHash(const T1 & x1, const T2 & x2, const EXTRA &... x_extra) {
     const std::size_t hash2 = CombineHash(x2, x_extra...);
-    return std::hash<T1>()(x1) + 0x9e3779b9 + (hash2 << 19) + (hash2 >> 13);
+    //return std::hash<T1>()(x1) + 0x9e3779b9 + (hash2 << 19) + (hash2 >> 13);
+    return Hash<T1>(x1) + 0x9e3779b9 + (hash2 << 19) + (hash2 >> 13);
   }
 
 
