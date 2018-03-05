@@ -180,9 +180,13 @@ namespace emp {
 
 
   namespace {
+    // Try to cast to size_t if nothing else works.
+    template <typename T>
+    std::size_t Hash_impl(const T & x, ...) { return (size_t) x; }
+
     // By default, use std::hash if nothing else exists.
     template <typename T>
-    std::size_t Hash_impl(const T & x, int) { return std::hash<T>()(x); }
+    auto Hash_impl(const T & x, int) -> decltype(std::hash<T>()(x);) { return std::hash<T>()(x); }
 
     // Allow a hash to be updated a GetHash() member function.
     template <typename T>
