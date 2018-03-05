@@ -149,8 +149,8 @@ namespace emp {
 
     /// Get location adjacent to ID in direction dir.
     /// GetNeighbor function is save with garbage ID values.
-    Index GetNeighbor(Index id, Facing dir) {
-      if (!id.IsValid()) return Index(); 
+    Index GetNeighbor(Index id, Facing dir) const {
+      if (!id.IsValid()) return Index();
       return neighbors[GetNeighborIndex(id, dir)];
     }
 
