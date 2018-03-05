@@ -129,8 +129,13 @@ namespace emp {
     Player cur_player;    ///< Who is the current player set to move next?
     Board game_board;     ///< Game board
 
+    using flip_list_t = emp::vector<Index>;
+    std::array<flip_list_t, NUM_CELLS> light_flips;
+    std::array<flip_list_t, NUM_CELLS> dark_flips;
+    bool cache_ok;
+
   public:
-    Othello8() : cur_player(Player::DARK), game_board() { Reset(); }
+    Othello8() : cur_player(Player::DARK), game_board(), light_flips(), dark_flips(), cache_ok(false) { Reset(); }
 
     ~Othello8() { ; }
 
@@ -151,6 +156,8 @@ namespace emp {
 
       over = false;
       cur_player = Player::DARK;
+
+      cache_ok = false;
     }
 
     static constexpr Index GetIndex(size_t x, size_t y) { return Index(x, y); }    
@@ -193,29 +200,44 @@ namespace emp {
 
     bool IsOver() const { return over; }
 
+    void SetupCache() {
+      for (size_t pos = 0; pos < NUM_CELLS; pos++) {
+        GetFlipList(Player::LIGHT, pos);
+        GetFlipList(Player::DARK, pos);
+      }
+      cache_ok = true;
+    }
+
     /// Get positions that would flip if a player (player) made a particular move (pos).
     /// Note: May be called before or after piece is placed.
-    emp::vector<Index> GetFlipList(Player player, Index pos) {
-      emp::vector<Index> flip_list;
-      size_t prev_len = 0;
-      const Player opponent = GetOpponent(player);
-      for (Facing dir : ALL_DIRECTIONS()) {
-        Index neighbor_pos = GetNeighbor(pos, dir);
-        // Collect opponent spaces in this direction.
-        while (neighbor_pos.IsValid() && GetPosOwner(neighbor_pos) == opponent) {
-          flip_list.emplace_back(neighbor_pos);
-          neighbor_pos = GetNeighbor(neighbor_pos, dir);
+    const emp::vector<Index> & GetFlipList(Player player, Index pos) {
+      emp_assert(player != Player::NONE);
+      emp::vector<Index> & flip_list = (player == Player::LIGHT) ? light_flips[pos] : dark_flips[pos];
+      if (cache_ok == false) {
+        flip_list.resize(0);
+        size_t prev_len = 0;
+        const Player opponent = GetOpponent(player);
+        for (Facing dir : ALL_DIRECTIONS()) {
+          Index neighbor_pos = GetNeighbor(pos, dir);
+          // Collect opponent spaces in this direction.
+          while (neighbor_pos.IsValid() && GetPosOwner(neighbor_pos) == opponent) {
+            flip_list.emplace_back(neighbor_pos);
+            neighbor_pos = GetNeighbor(neighbor_pos, dir);
+          }
+          // If this line didn't end in current color, throw out everything we found.
+          if (!neighbor_pos.IsValid() || !game_board.Occupied(neighbor_pos)) { flip_list.resize(prev_len); }
+          // Otherwise keep it and update the locked in flips.
+          else { prev_len = flip_list.size(); }
         }
-        // If this line didn't end in current color, throw out everything we found.
-        if (!neighbor_pos.IsValid() || !game_board.Occupied(neighbor_pos)) { flip_list.resize(prev_len); }
-        // Otherwise keep it and update the locked in flips.
-        else { prev_len = flip_list.size(); }
       }
       return flip_list;
     }
 
     /// Count the number of positions that would flip if we placed a piece at a specific location.
     size_t GetFlipCount(Player player, Index pos) {
+      if (cache_ok) {
+        return (player == Player::LIGHT) ? light_flips[pos].size() : dark_flips[pos].size();
+      }
       size_t flip_count = 0;
       const Player opponent = GetOpponent(player);
       for (Facing dir : ALL_DIRECTIONS()) {
@@ -234,6 +256,9 @@ namespace emp {
 
     /// Are there any valid flips from this position?
     bool HasValidFlips(Player player, Index pos) {
+      if (cache_ok) {
+        return (player == Player::LIGHT) ? light_flips[pos].size() : dark_flips[pos].size();
+      }
       const Player opponent = GetOpponent(player);
       for (Facing dir : ALL_DIRECTIONS()) {             // Loop through directions to explore
         Index neighbor_pos = GetNeighbor(pos, dir);   // Start at first neighbor.
@@ -304,9 +329,13 @@ namespace emp {
     void SetPos(Index pos, Player player) {
       emp_assert(pos.IsValid());
       game_board.SetOwner(pos, player);
+      cache_ok = false;
     }
 
-    void ClearPos(Index pos) { game_board.Clear(pos); }
+    void ClearPos(Index pos) {
+      game_board.Clear(pos);
+      cache_ok = false;
+    }
 
     /// Set positions given by ids to be owned by the given player.
     void SetPositions(emp::vector<Index> ids, Player player) {
@@ -315,7 +344,7 @@ namespace emp {
 
     /// Configure board as given by copy_board input.
     /// copy_board size must match game_board's size.
-    void SetBoard(const Board & other_board) { game_board = other_board; }
+    void SetBoard(const Board & other_board) { game_board = other_board; cache_ok = false; }
 
     /// Set current board to be the same as board from other othello game.
     void SetBoard(const this_t & other_othello) { SetBoard(other_othello.GetBoard()); }
