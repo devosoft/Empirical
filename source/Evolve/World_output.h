@@ -10,14 +10,14 @@
 #define EMP_EVO_WORLD_OUTPUT_H
 
 #include "base/vector.h"
-#include "World_file.h"     // Helper to determine when specific events should occur.
+#include "data/DataFile.h"     // Helper to determine when specific events should occur.
 #include "SystematicsAnalysis.h"
 #include "tools/string_utils.h"
 
 namespace emp {
 
     template <typename WORLD_TYPE>
-    World_file & AddPhylodiversityFile(WORLD_TYPE & world, const std::string & fpath="phylodiversity.csv"){
+    DataFile & AddPhylodiversityFile(WORLD_TYPE & world, const std::string & fpath="phylodiversity.csv"){
         auto & file = world.SetupFile(fpath);
         Ptr<DataMonitor<double>> distinctiveness_node = world.AddDataNode("evolutionary_distinctiveness");
         Ptr<DataMonitor<double>> pair_dist_node = world.AddDataNode("pairwise_distance");
@@ -52,7 +52,7 @@ namespace emp {
     }
 
     template <typename WORLD_TYPE>
-    World_file & AddLineageMutationFile(WORLD_TYPE & world, const std::string & fpath="lineage_mutations.csv", emp::vector<std::string> mut_types = {"substitution"}){
+    DataFile & AddLineageMutationFile(WORLD_TYPE & world, const std::string & fpath="lineage_mutations.csv", emp::vector<std::string> mut_types = {"substitution"}){
         auto & file = world.SetupFile(fpath);
         emp::vector<Ptr<DataMonitor<double>>> mut_count_nodes;
         for (size_t i = 0; i < mut_types.size(); i++) {
@@ -99,14 +99,15 @@ namespace emp {
 
     template <typename WORLD_TYPE>
     auto
-    AddMullerPlotFile(WORLD_TYPE & world, const std::string & fpath="muller_data.dat") -> CollectionDataFile<decltype(world.GetSystematics().GetActivePtr())> {
+    AddMullerPlotFile(WORLD_TYPE & world, const std::string & fpath="muller_data.dat") -> ContainerDataFile<decltype(world.GetSystematics().GetActivePtr())> & {
 
         using taxon_ptr_t = Ptr<typename WORLD_TYPE::genotype_t>;
         using container_t = decltype(world.GetSystematics().GetActivePtr());
         
-        CollectionDataFile<container_t> file(fpath);
-       
-        file.SetUpdateContainerFun([&world](){return world.GetSystematics().GetActivePtr();});
+        Ptr<ContainerDataFile<container_t>> file;
+        file.New(fpath);
+
+        auto & world_file = static_cast<ContainerDataFile<container_t>&>(world.AddDataFile(file));
 
         std::function<size_t(void)> get_update = [&world](){return world.GetUpdate();};
         std::function<int(const taxon_ptr_t)> get_tax_id = [&world](const taxon_ptr_t t){
@@ -126,13 +127,16 @@ namespace emp {
             }
         };
 
-        file.AddFun(get_update, "update", "Update");
-        file.AddCollectionFun(get_tax_id, "tax_id", "The id of the taxon for this row");
-        file.AddCollectionFun(get_num_orgs, "num_orgs", "The number of orgs of this taxon on this update");
-        file.AddCollectionFun(get_phenotype, "phenotype", "This taxon's phenotype");
-        file.AddCollectionFun(get_parent, "parent_id", "This taxon's parent's id");
-        file.PrintHeaderKeys();
-        return file;
+        world_file.SetUpdateContainerFun([&world](){return world.GetSystematics().GetActivePtr();});
+
+        world_file.AddFun(get_update, "update", "Update");
+        world_file.AddContainerFun(get_tax_id, "tax_id", "The id of the taxon for this row");
+        world_file.AddContainerFun(get_num_orgs, "num_orgs", "The number of orgs of this taxon on this update");
+        world_file.AddContainerFun(get_phenotype, "phenotype", "This taxon's phenotype");
+        world_file.AddContainerFun(get_parent, "parent_id", "This taxon's parent's id");
+        world_file.PrintHeaderKeys();
+        
+        return world_file;
     }
 
 };

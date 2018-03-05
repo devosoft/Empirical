@@ -33,6 +33,9 @@ namespace emp {
   protected:
     using fun_t = void(std::ostream &);
 
+    using time_fun_t = std::function<bool(size_t)>;
+    time_fun_t timing_fun;
+
     std::ostream * os;
     FunctionSet<fun_t> funs;
     emp::vector<std::string> keys;
@@ -45,14 +48,15 @@ namespace emp {
   public:
     DataFile(const std::string & filename,
              const std::string & b="", const std::string & s=", ", const std::string & e="\n")
-      : os(new std::ofstream(filename)), funs(), keys(), descs()
+      : timing_fun([](size_t){return true;}), os(new std::ofstream(filename)), funs(), keys(), descs()
       , line_begin(b), line_spacer(s), line_end(e) { ; }
     DataFile(std::ostream & in_os,
              const std::string & b="", const std::string & s=", ", const std::string & e="\n")
-      : os(&in_os), funs(), keys(), descs(), line_begin(b), line_spacer(s), line_end(e) { ; }
+      : timing_fun([](size_t){return true;}), os(&in_os), funs(), keys(), descs(), line_begin(b)
+      , line_spacer(s), line_end(e) { ; }
     DataFile(const DataFile &) = default;
     DataFile(DataFile &&) = default;
-    ~DataFile() { os->flush(); }
+    virtual ~DataFile() { os->flush(); }
 
     DataFile & operator=(const DataFile &) = default;
     DataFile & operator=(DataFile &&) = default;
@@ -78,7 +82,7 @@ namespace emp {
     }
 
     /// Print a header containing the name of each column
-    void PrintHeaderKeys() {
+    virtual void PrintHeaderKeys() {
       *os << line_begin;
       for (size_t i = 0; i < keys.size(); i++) {
         if (i > 0) *os << line_spacer;
@@ -89,7 +93,7 @@ namespace emp {
     }
 
     /// Print a header containing comments describing all of the columns
-    void PrintHeaderComment(const std::string & cstart = "# ") {
+    virtual void PrintHeaderComment(const std::string & cstart = "# ") {
       for (size_t i = 0; i < keys.size(); i++) {
         *os << cstart << i << ": " << descs[i] << " (" << keys[i] << ")" << std::endl;
       }
@@ -97,7 +101,7 @@ namespace emp {
     }
 
     /// Run all of the functions and print the results as a new line in the file
-    void Update() {
+    virtual void Update() {
       *os << line_begin;
       for (size_t i = 0; i < funs.size(); i++) {
         if (i > 0) *os << line_spacer;
@@ -105,6 +109,37 @@ namespace emp {
       }
       *os << line_end;
       os->flush();
+    }
+
+    /// Update the file with an additional line.
+    virtual void Update(size_t update) {
+      if (timing_fun(update)) Update();
+    }
+
+    /// Provide a timing function that with a bool(size_t update) signature.  The timing function
+    /// is called with the current update, and returns if filed should print this update.
+    void SetTiming(time_fun_t fun) { timing_fun = fun; }
+
+    /// Setup this file to print only once, at the specified update.  Note that this timing
+    /// function can be replaced at any time, even after being triggered.
+    void SetTimingOnce(size_t print_time) {
+      timing_fun = [print_time](size_t update) { return update == print_time; };
+    }
+
+    /// Setup this file to print every 'step' updates.
+    void SetTimingRepeat(size_t step) {
+      emp_assert(step > 0);
+      timing_fun = [step](size_t update) { return update % step == 0; };
+    }
+
+    /// Setup this file to print only in a specified time range, and a given frequency (step).
+    void SetTimingRange(size_t first, size_t step, size_t last) {
+      emp_assert(step > 0);
+      emp_assert(first < last);
+      timing_fun = [first,step,last](size_t update) {
+	      if (update < first || update > last) return false;
+	      return ((update - first) % step) == 0;
+      };
     }
 
     /// If a function takes an ostream, pass in the correct one.
@@ -204,7 +239,8 @@ namespace emp {
       return Add(in_fun, key, desc);
     }
 
-    /// Add multiple functions that pull all stats measurements from the DataNode @param node
+    /// Add multiple functions that pull common stats measurements (mean, variance, min, and max)
+    /// from the DataNode @param node.
     /// Requires that @param node have the data::Stats or data::FullStats modifier.
     /// @param key and @param desc will have the name of the stat appended to the beginning.
     /// Note: excludes standard deviation, because it is easily calculated from variance
@@ -214,6 +250,17 @@ namespace emp {
       AddMin(node, "min_" + key, "min of " + desc);
       AddMax(node, "max_" + key, "max of " + desc);
       AddVariance(node, "variance_" + key, "variance of " + desc);
+    }
+
+
+    /// Add multiple functions that pull all stats measurements (mean, variance, min, max, 
+    /// skew, and kurtosis) from the DataNode @param node
+    /// Requires that @param node have the data::Stats or data::FullStats modifier.
+    /// @param key and @param desc will have the name of the stat appended to the beginning.
+    /// Note: excludes standard deviation, because it is easily calculated from variance
+    template <typename VAL_TYPE, emp::data... MODS>
+    void AddAllStats(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
+      AddStats(node, key, desc);
       AddSkew(node, "skew_" + key, "skew of " + desc);
       AddKurtosis(node, "kurtosis_" + key, "kurtosis of " + desc);
     }
@@ -242,13 +289,13 @@ namespace emp {
 
 
   template <typename container_t>
-  class CollectionDataFile;
+  class ContainerDataFile;
 
   namespace internal {
 
     template <typename container_t>
     struct update_impl {
-      void Update(CollectionDataFile<container_t> * df) {
+      void Update(ContainerDataFile<container_t> * df) {
         using data_t = typename container_t::value_type;
         for (const data_t & d : df->GetCurrentRows()) {
           df->OutputLine(d);
@@ -258,7 +305,7 @@ namespace emp {
 
     template <typename container_t>
     struct update_impl<Ptr<container_t>> {
-      void Update(CollectionDataFile<Ptr<container_t>> * df) {
+      void Update(ContainerDataFile<Ptr<container_t>> * df) {
         using data_t = typename remove_ptr_type<container_t>::type::value_type;
 
         for (const data_t & d : *(df->GetCurrentRows())) {
@@ -269,7 +316,7 @@ namespace emp {
 
     template <typename container_t>
     struct update_impl<container_t*> {
-      void Update(CollectionDataFile<container_t*> * df) {
+      void Update(ContainerDataFile<container_t*> * df) {
         using data_t = typename remove_ptr_type<container_t>::type::value_type;
 
         for (const data_t & d : *(df->GetCurrentRows())) {
@@ -282,30 +329,30 @@ namespace emp {
 
 
   template <typename CONTAINER>
-  class CollectionDataFile : public DataFile {
+  class ContainerDataFile : public DataFile {
   private:
+
+    // The container type cannot be a reference
     using container_t = typename std::remove_reference<CONTAINER>::type; 
     using raw_container_t = typename remove_ptr_type<container_t>::type;
-    // using non_const_container_t = typename std::remove_const<raw_container_t>::type;
-    // using data_t = typename non_const_container_t::value_type;
     using data_t = typename raw_container_t::value_type;
-    using coll_fun_t = void(std::ostream &, data_t);
+    using container_fun_t = void(std::ostream &, data_t);
     using fun_update_container_t = std::function<container_t(void)>;
-
-    // std::cout << typeid(container_t).name() << " " << typeid(raw_container_t).name() << " " 
 
     fun_update_container_t update_container_fun;
 
     container_t current_rows;
-    FunctionSet<coll_fun_t> collection_funs;
-    emp::vector<std::string> collection_keys;
-    emp::vector<std::string> collection_descs;
+    FunctionSet<container_fun_t> container_funs;
+    emp::vector<std::string> container_keys;
+    emp::vector<std::string> container_descs;
 
   public:
 
-    CollectionDataFile(const std::string & filename,
+    ContainerDataFile(const std::string & filename,
              const std::string & b="", const std::string & s=", ", const std::string & e="\n")
              : DataFile(filename, b, s, e), update_container_fun(), current_rows() {;}
+
+    ~ContainerDataFile() {;}
 
     void SetUpdateContainerFun(const fun_update_container_t fun) {
       update_container_fun = fun;
@@ -318,9 +365,9 @@ namespace emp {
         if (i > 0) *os << line_spacer;
         *os << keys[i];
       }
-      for (size_t i = 0; i < collection_keys.size(); i++) {
+      for (size_t i = 0; i < container_keys.size(); i++) {
         if (i > 0 || keys.size() > 0) *os << line_spacer;
-        *os << collection_keys[i];
+        *os << container_keys[i];
       }
       *os << line_end;
       os->flush();
@@ -331,14 +378,14 @@ namespace emp {
       for (size_t i = 0; i < keys.size(); i++) {
         *os << cstart << i << ": " << descs[i] << " (" << keys[i] << ")" << std::endl;
       }
-      for (size_t i = 0; i < collection_keys.size(); i++) {
-        *os << cstart << i+keys.size() << ": " << collection_descs[i] << " (" << collection_keys[i] << ")" << std::endl;
+      for (size_t i = 0; i < container_keys.size(); i++) {
+        *os << cstart << i+keys.size() << ": " << container_descs[i] << " (" << container_keys[i] << ")" << std::endl;
       }
 
       os->flush();
     }
 
-    const container_t GetCurrentRows() const {return current_rows;}
+    const container_t GetCurrentRows() const { return current_rows; }
 
     void OutputLine(const data_t d) {
       *os << line_begin;
@@ -347,73 +394,57 @@ namespace emp {
           funs[i](*os);
         }
 
-        for (size_t i = 0; i < collection_funs.size(); i++) {
+        for (size_t i = 0; i < container_funs.size(); i++) {
           if (i > 0 || keys.size() > 0) *os << line_spacer;
-          collection_funs[i](*os, d);
+          container_funs[i](*os, d);
         }
       *os << line_end;  
     }
 
     /// Run all of the functions and print the results as a new line in the file
-    void Update(){
+    void Update() override {
       emp_assert(update_container_fun);
       current_rows = update_container_fun();
-    // std::cout << "curr: " << to_string(current_rows) << std::endl;  
-      // if (emp::is_ptr_type<container_t>::value) {
-      //   for (const data_t & d : *current_rows) {
-      //     *os << line_begin;
-      //     for (size_t i = 0; i < funs.size(); i++) {
-      //       if (i > 0) *os << line_spacer;
-      //       funs[i](*os);
-      //     }
-
-      //     for (size_t i = 0; i < collection_funs.size(); i++) {
-      //       if (i > 0 || keys.size() > 0) *os << line_spacer;
-      //       collection_funs[i](*os, d);
-      //     }
-      //   *os << line_end;
-      //   }
-      // } else {
-      //   for (const data_t & d : current_rows) {
-      //     *os << line_begin;
-      //     for (size_t i = 0; i < funs.size(); i++) {
-      //       if (i > 0) *os << line_spacer;
-      //       funs[i](*os);
-      //     }
-
-      //     for (size_t i = 0; i < collection_funs.size(); i++) {
-      //       if (i > 0 || keys.size() > 0) *os << line_spacer;
-      //       collection_funs[i](*os, d);
-      //     }
-      //   *os << line_end;
-      //   }
-      // }        
-      // os->flush();
-
       internal::update_impl<container_t>().Update(this);
       os->flush();
+    }
+
+    /// Update the file with an additional line.
+    void Update(size_t update) {
+      if (timing_fun(update)) Update();
     }
 
     /// If a function takes an ostream, pass in the correct one.
     /// Generic function for adding a column to the DataFile. In practice, you probably
     /// want to call one of the more specific ones.
-    size_t AddCollection(const std::function<void(std::ostream &, data_t)> & fun, const std::string & key, const std::string & desc) {
-      size_t id = collection_funs.GetSize();
-      collection_funs.Add(fun);
-      collection_keys.emplace_back(key);
-      collection_descs.emplace_back(desc);
+    size_t Add(const std::function<void(std::ostream &, data_t)> & fun, const std::string & key, const std::string & desc) {
+      size_t id = container_funs.GetSize();
+      container_funs.Add(fun);
+      container_keys.emplace_back(key);
+      container_descs.emplace_back(desc);
       return id;
     }
 
     /// Add a function that returns a value to be printed to the file.
     template <typename T>
-    size_t AddCollectionFun(const std::function<T(const data_t)> & fun, const std::string & key="", const std::string & desc="") {
-      std::function<coll_fun_t> in_fun = [fun](std::ostream & os, const data_t data){ os << fun(data); };
-      return AddCollection(in_fun, key, desc);
+    size_t AddContainerFun(const std::function<T(const data_t)> & fun, const std::string & key="", const std::string & desc="") {
+      std::function<container_fun_t> in_fun = [fun](std::ostream & os, const data_t data){ os << fun(data); };
+      return Add(in_fun, key, desc);
     }
 
 
   };
+
+  template <typename CONTAINER>
+  ContainerDataFile<CONTAINER> MakeContainerDataFile(std::function<CONTAINER(void)> fun, 
+                                                    const std::string & filename,
+                                                    const std::string & b="",
+                                                    const std::string & s=", ",
+                                                    const std::string & e="\n") {
+    ContainerDataFile<CONTAINER> dfile(filename, b, s, e);
+    dfile.SetUpdateContainerFun(fun);
+    return dfile;
+  }
 
 
 }
