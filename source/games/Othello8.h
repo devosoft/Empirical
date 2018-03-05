@@ -134,8 +134,6 @@ namespace emp {
 
     ~Othello8() { ; }
 
-    static constexpr Index GetIndex(size_t x, size_t y) { return Index(x, y); }
-
     /// Reset the board to the starting condition.
     void Reset() {
       // Reset the board.
@@ -155,9 +153,11 @@ namespace emp {
       cur_player = Player::DARK;
     }
 
+    static constexpr Index GetIndex(size_t x, size_t y) { return Index(x, y); }    
     static constexpr size_t GetBoardWidth() { return BOARD_SIZE; }
     size_t GetNumCells() const { return NUM_CELLS; }
     Player GetCurPlayer() const { return cur_player; }
+    size_t GetHash() const { return game_board.occupied; }
 
     /// Get opponent ID of give player ID.
     Player GetOpponent(Player player) const {
@@ -306,9 +306,7 @@ namespace emp {
       game_board.SetOwner(pos, player);
     }
 
-    void ClearPos(Index pos) {
-      game_board.Clear(pos);
-    }
+    void ClearPos(Index pos) { game_board.Clear(pos); }
 
     /// Set positions given by ids to be owned by the given player.
     void SetPositions(emp::vector<Index> ids, Player player) {
