@@ -346,7 +346,7 @@ namespace emp {
       for (size_t y = 0; y < BOARD_SIZE; ++y) {
         os << y << " ";
         for (size_t x = 0; x < BOARD_SIZE; ++x) {
-          Player space = GetPosOwner(x,y);
+          Player space = GetPosOwner({x,y});
           if (space == Player::DARK)  { os << dark_token << " "; }
           else if (space == Player::LIGHT) { os << light_token << " "; }
           else { os << open_space << " "; }
