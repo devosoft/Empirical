@@ -196,11 +196,12 @@ namespace emp {
   /// is formed, with genotypes.  If the organism's behavior/task set is used, then organisms are
   /// grouped by phenotypes.  If the organsims's position is used, the evolutionary path through
   /// space is tracked.  Any other aspect of organisms can be tracked this way as well.
-  template <typename ORG_INFO, typename DATA_STRUCT = no_data>
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT = no_data>
   class Systematics {
   private:
     using taxon_t = Taxon<ORG_INFO, DATA_STRUCT>;
     using hash_t = typename Ptr<taxon_t>::hash_t;
+    using fun_calc_info_t = std::function<ORG_INFO(ORG)>;
 
     bool store_active;     ///< Store all of the currently active taxa?
     bool store_ancestors;  ///< Store all of the direct ancestors from living taxa?
@@ -668,8 +669,8 @@ namespace emp {
   // =============================================================
 
   // Should be called wheneven a taxon has no organisms AND no descendants.
-  template <typename ORG_INFO, typename DATA_STRUCT>
-  void Systematics<ORG_INFO, DATA_STRUCT>::Prune(Ptr<taxon_t> taxon) {
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::Prune(Ptr<taxon_t> taxon) {
     on_prune_sig.Trigger(taxon);
     RemoveOffspring( taxon->GetParent() );           // Notify parent of the pruning.
     if (store_ancestors) ancestor_taxa.erase(taxon); // Clear from ancestors set (if there)
@@ -677,8 +678,8 @@ namespace emp {
     else taxon.Delete();                             //  ...or else get rid of it.
   }
 
-  template <typename ORG_INFO, typename DATA_STRUCT>
-  void Systematics<ORG_INFO, DATA_STRUCT>::RemoveOffspring(Ptr<taxon_t> taxon) {
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOffspring(Ptr<taxon_t> taxon) {
     if (!taxon) { num_roots--; return; }               // Offspring was root; remove and return.
     bool still_active = taxon->RemoveOffspring();      // Taxon still active w/ 1 fewer offspring?
     if (!still_active) Prune(taxon);                   // If out of offspring, remove from tree.
@@ -689,8 +690,8 @@ namespace emp {
   }
 
   // Mark a taxon extinct if there are no more living members.  There may be descendants.
-  template <typename ORG_INFO, typename DATA_STRUCT>
-  void Systematics<ORG_INFO, DATA_STRUCT>::MarkExtinct(Ptr<taxon_t> taxon) {
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::MarkExtinct(Ptr<taxon_t> taxon) {
     emp_assert(taxon);
     emp_assert(taxon->GetNumOrgs() == 0);
     
@@ -711,8 +712,8 @@ namespace emp {
 
 
   // Request a pointer to the Most-Recent Common Ancestor for the population.
-  template <typename ORG_INFO, typename DATA_STRUCT>
-  Ptr<typename Systematics<ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG_INFO, DATA_STRUCT>::GetMRCA() const {
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetMRCA() const {
     if (!mrca && num_roots == 1) {  // Determine if we need to calculate the MRCA.
       // First, find a candidate among the living taxa.  Only taxa that have one offsrping
       // can be on the line-of-descent to the MRCA, so anything else is a good start point.
@@ -735,8 +736,8 @@ namespace emp {
   }
 
   // Request the depth of the Most-Recent Common Ancestor; return -1 for none.
-  template <typename ORG_INFO, typename DATA_STRUCT>
-  int Systematics<ORG_INFO, DATA_STRUCT>::GetMRCADepth() const {
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  int Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetMRCADepth() const {
     GetMRCA();
     if (mrca) return mrca->GetDepth();
     return -1;
@@ -744,8 +745,8 @@ namespace emp {
 
   // Add information about a new organism, including its stored info and parent's taxon;
   // return a pointer for the associated taxon.
-  template <typename ORG_INFO, typename DATA_STRUCT>
-  Ptr<typename Systematics<ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG_INFO, DATA_STRUCT>::AddOrg(const ORG_INFO & info, Ptr<taxon_t> cur_taxon, int update) {
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(const ORG_INFO & info, Ptr<taxon_t> cur_taxon, int update) {
     emp_assert( !cur_taxon || Has(active_taxa, cur_taxon));
 
     // Update stats
@@ -772,8 +773,8 @@ namespace emp {
   }
 
   // Remove an instance of an organism; track when it's gone.
-  template <typename ORG_INFO, typename DATA_STRUCT>
-  bool Systematics<ORG_INFO, DATA_STRUCT>::RemoveOrg(Ptr<taxon_t> taxon) {
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrg(Ptr<taxon_t> taxon) {
     emp_assert(taxon);
 
     // Update stats
@@ -788,16 +789,16 @@ namespace emp {
   }
 
   // Climb up a lineage...
-  template <typename ORG_INFO, typename DATA_STRUCT>
-  Ptr<typename Systematics<ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG_INFO, DATA_STRUCT>::Parent(Ptr<taxon_t> taxon) const {
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG, ORG_INFO, DATA_STRUCT>::Parent(Ptr<taxon_t> taxon) const {
     emp_assert(taxon);
     emp_assert(Has(active_taxa, taxon));
     return taxon->GetParent();
   }
 
   // Print details about the Systematics manager.
-  template <typename ORG_INFO, typename DATA_STRUCT>
-  void Systematics<ORG_INFO, DATA_STRUCT>::PrintStatus(std::ostream & os) const {
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::PrintStatus(std::ostream & os) const {
     os << "Systematics Status:\n";
     os << " store_active=" << store_active
        << " store_ancestors=" << store_ancestors
@@ -828,8 +829,8 @@ namespace emp {
   }
 
   // Print whole lineage.
-  template <typename ORG_INFO, typename DATA_STRUCT>
-  void Systematics<ORG_INFO, DATA_STRUCT>::PrintLineage(Ptr<taxon_t> taxon, std::ostream & os) const {
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::PrintLineage(Ptr<taxon_t> taxon, std::ostream & os) const {
     os << "Lineage:\n";
     while (taxon) {
       os << taxon->GetInfo() << std::endl;
@@ -838,8 +839,8 @@ namespace emp {
   }
 
   // Calculate the genetic diversity of the population.
-  template <typename ORG_INFO, typename DATA_STRUCT>
-  double Systematics<ORG_INFO, DATA_STRUCT>::CalcDiversity() {
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  double Systematics<ORG, ORG_INFO, DATA_STRUCT>::CalcDiversity() {
     return emp::Entropy(active_taxa, [](Ptr<taxon_t> x){ return x->GetNumOrgs(); }, org_count);
   }
 

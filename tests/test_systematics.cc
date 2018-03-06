@@ -16,7 +16,7 @@
 
 TEST_CASE("Test Systematics", "[evo]")
 {
-  emp::Systematics<int> sys(true, true, true);
+  emp::Systematics<int, int> sys(true, true, true);
 
   std::cout << "\nAddOrg 25 (id1, no parent)\n";
   auto id1 = sys.AddOrg(25, nullptr, 0);
@@ -137,7 +137,7 @@ TEST_CASE("Test Systematics", "[evo]")
 TEST_CASE("Test Data Struct", "[evo]")
 {
 
-  emp::Systematics<int, emp::mut_landscape_info<int> > sys(true, true, true);
+  emp::Systematics<int, int, emp::mut_landscape_info<int> > sys(true, true, true);
   auto id1 = sys.AddOrg(1, nullptr);
   id1->GetData().fitness.Add(2);
   id1->GetData().phenotype = 6;
