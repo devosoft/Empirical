@@ -212,6 +212,8 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; ///< A set of all dead, ancestral taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  ///< A set of all dead taxa w/o descendants.
 
+    emp::vector<Ptr<taxon_t> > taxon_locations;
+
     Signal<void(Ptr<taxon_t>)> on_new_sig; ///< Trigger when any organism is pruned from tree
     Signal<void(Ptr<taxon_t>)> on_prune_sig; ///< Trigger when any organism is pruned from tree
 
