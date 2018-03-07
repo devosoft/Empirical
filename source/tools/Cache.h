@@ -18,13 +18,13 @@ namespace emp {
 
   template <class Key,                                        // Cache::key_type
 	    class T,                                                // Cache::mapped_type
-	    class Hash = std::hash<Key>,                            // Cache::hasher
+	    class HASH = std::hash<Key>,                            // Cache::hasher
 	    class Pred = std::equal_to<Key>,                        // Cache::key_equal
 	    class Alloc = std::allocator< std::pair<const Key,T> >  // Cache::allocator_type
 	   >
   class Cache {
   private:
-    std::unordered_map<Key, T, Hash, Pred, Alloc> cache_map;
+    std::unordered_map<Key, T, HASH, Pred, Alloc> cache_map;
 
   public:
     Cache() : cache_map() { }
@@ -35,7 +35,7 @@ namespace emp {
 
     using key_type = Key;          ///< Type we are using to look up values.
     using mapped_type = T;         ///< Contents of the value we look up.
-    using hasher = Hash;           ///< Hash method to use.
+    using hasher = HASH;           ///< Hash method to use.
     using key_equal = Pred;        ///< Function to test if two values are identical.
     using allocator_type = Alloc;  ///< Function to allocate new space.
 
