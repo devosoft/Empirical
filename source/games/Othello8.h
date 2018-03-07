@@ -75,8 +75,8 @@ namespace emp {
       uint64_t occupied;
       uint64_t player;
 
-      void Clear() { occupied = 0; }
-      void Clear(Index pos) { occupied &= ~(((uint64_t) 1) << pos); }
+      void Clear() { occupied = 0; player = 0; }
+      void Clear(Index pos) { uint64_t mask = ~(((uint64_t) 1) << pos); occupied &= mask; player &= mask; }
       Player Owner(Index pos) const {
         uint64_t id = (((uint64_t) 1) << pos);
         if (occupied & id) return (player & id) ? Player::LIGHT : Player::DARK;
@@ -92,7 +92,7 @@ namespace emp {
 
       size_t Score(Player owner) {
         if (owner == Player::DARK) return count_bits(occupied & ~player);
-        return count_bits(occupied & player);
+        return count_bits(player);
       }
     };
 
@@ -300,7 +300,7 @@ namespace emp {
     /// Get the current score for a given player.
     double GetScore(Player player) {
       emp_assert(IsValidPlayer(player));
-      return game_board.Score(player);
+      return (double) game_board.Score(player);
     }
 
     /// Count the number of empty squares adjacent to a player's pieces (frontier size)
