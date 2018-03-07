@@ -18,10 +18,11 @@
 #include <string>
 
 #include "base/array.h"
-#include "base/Ptr.h"
 #include "base/assert.h"
+#include "base/errors.h"
 #include "base/macro_math.h"
 #include "base/macros.h"
+#include "base/Ptr.h"
 #include "base/vector.h"
 
 
@@ -350,6 +351,23 @@ TEST_CASE("Test macros", "[base]")
   REQUIRE(test9[7] == "eight");
 
   EMP_TEST_MACRO( EMP_STRINGIFY_EACH(some, words), "\"some\" , \"words\"" );
+}
+
+
+TEST_CASE("Test errors", "[tools]")
+{
+  emp::TriggerExcept("test_fail", "The test failed.  *sob*");
+  emp::TriggerExcept("test_fail2", "The second test failed too.  But it's not quite as aweful.", false);
+  emp::TriggerExcept("test_fail2", "The third test is just test 2 again, but worse", true);
+
+  REQUIRE( emp::CountExcepts() == 3 );
+  auto except = emp::PopExcept("test_fail2");
+  REQUIRE( emp::CountExcepts() == 2 );
+  REQUIRE( except.desc == "The second test failed too.  But it's not quite as aweful." );
+  REQUIRE( emp::HasExcept("test_fail2") == true );
+  REQUIRE( emp::HasExcept("test_fail3") == false );
+  emp::ClearExcepts();
+  REQUIRE( emp::CountExcepts() == 0 );
 }
 
 

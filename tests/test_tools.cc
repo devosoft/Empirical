@@ -31,7 +31,6 @@
 #include "tools/Random.h"
 #include "tools/TypeTracker.h"
 
-#include "tools/errors.h"
 #include "tools/flex_function.h"
 #include "tools/functions.h"
 #include "tools/graph_utils.h"
@@ -303,22 +302,6 @@ TEST_CASE("Test DynamicString", "[tools]")
   REQUIRE(test_set[2] == "Line Two");
   REQUIRE(test_set[3] == "Line Three");
   REQUIRE(test_set[4] == "Line 4");
-}
-
-TEST_CASE("Test errors", "[tools]")
-{
-  emp::TriggerExcept("test_fail", "The test failed.  *sob*");
-  emp::TriggerExcept("test_fail2", "The second test failed too.  But it's not quite as aweful.", false);
-  emp::TriggerExcept("test_fail2", "The third test is just test 2 again, but worse", true);
-
-  REQUIRE( emp::CountExcepts() == 3 );
-  auto except = emp::PopExcept("test_fail2");
-  REQUIRE( emp::CountExcepts() == 2 );
-  REQUIRE( except.desc == "The second test failed too.  But it's not quite as aweful." );
-  REQUIRE( emp::HasExcept("test_fail2") == true );
-  REQUIRE( emp::HasExcept("test_fail3") == false );
-  emp::ClearExcepts();
-  REQUIRE( emp::CountExcepts() == 0 );
 }
 
 int Sum4(int a1, int a2, int a3, int a4) {
