@@ -491,5 +491,18 @@ TEST_CASE("Test vector", "[base]")
   for (int i : v) total += i;
 
   REQUIRE(total == 2470);
+
+  // Examine vector<bool> specialization.
+  emp::vector<bool> vb(1000,false);
+  for (size_t i = 0; i < vb.size(); i++) {
+    if (i%3==0 || i%5 == 0) vb[i] = true;
+  }
+  size_t count = 0;
+  const auto vb2 = vb;
+  for (size_t i = 0; i < vb.size(); i++) {
+    if (vb2[i]) count++;
+  }
+
+  REQUIRE(count == 467);
 }
 
