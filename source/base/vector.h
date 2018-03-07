@@ -96,6 +96,65 @@ namespace emp {
     }
   };
 
+  /// Build a specialized debug wrapper for emp::vector<bool>
+  template <typename... Ts>
+  class vector<bool, Ts...> : public std::vector<bool,Ts...> {
+  private:
+    using this_t = emp::vector<bool,Ts...>;
+    using stdv_t = std::vector<bool,Ts...>;
+
+    /// Setup a threshold; if we try to make a vector bigger than MAX_SIZE, throw a warning.
+    constexpr static const size_t MAX_SIZE = 2000000001;
+
+  public:
+    using iterator = typename stdv_t::iterator;
+    using const_iterator = typename stdv_t::const_iterator;
+    using value_type = bool;
+    using size_type = typename stdv_t::size_type;
+    using reference = typename stdv_t::reference;
+    using const_reference = typename stdv_t::const_reference;
+
+    vector() : stdv_t() {};
+    vector(const this_t & _in) : stdv_t(_in) {};
+    vector(size_t size) : stdv_t(size) { emp_assert(size < MAX_SIZE, size); }
+    vector(size_t size, bool val) : stdv_t(size, val) { emp_assert(size < MAX_SIZE, size); }
+    vector(std::initializer_list<bool> in_list) : stdv_t(in_list) { ; }
+    vector(const stdv_t & in) : stdv_t(in) { ; }         // Emergency fallback conversion.
+    template <typename InputIt>
+    vector(InputIt first, InputIt last) : stdv_t(first, last){;}
+
+
+    // operator stdv_t &() { return v; }
+    // operator const stdv_t &() const { return v; }
+
+    void resize(size_t new_size) { emp_assert(new_size < MAX_SIZE, new_size); stdv_t::resize(new_size); }
+    void resize(size_t new_size, bool val) {
+      emp_assert(new_size < MAX_SIZE, new_size);
+      stdv_t::resize(new_size, val);
+    }
+    // this_t & operator=(const this_t &) = default;
+
+    auto operator[](size_t pos) -> decltype(stdv_t::operator[](pos)) {
+      emp_assert(pos < stdv_t::size(), pos, stdv_t::size());
+      return stdv_t::operator[](pos);
+    }
+
+    bool operator[](size_t pos) const {
+      emp_assert(pos < stdv_t::size(), pos, stdv_t::size());
+      return stdv_t::operator[](pos);
+    }
+
+    auto & back() { emp_assert(stdv_t::size() > 0); return stdv_t::back(); }
+    bool back() const { emp_assert(stdv_t::size() > 0); return stdv_t::back(); }
+    auto & front() { emp_assert(stdv_t::size() > 0); return stdv_t::front(); }
+    bool front() const { emp_assert(stdv_t::size() > 0); return stdv_t::front(); }
+
+    void pop_back() {
+      emp_assert(stdv_t::size() > 0, stdv_t::size());
+      stdv_t::pop_back();
+    }
+  };
+
 }
 
 // A crude, generic printing function for vectors.
