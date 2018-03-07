@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2018
  *
  *  @file  errors.h
  *  @brief Tools to help manage various problems in command-line or Emscripten-based applications.
@@ -41,8 +41,6 @@
 #include <map>
 #include <sstream>
 #include <string>
-
-#include "../meta/meta.h"
 
 namespace emp {
 
@@ -106,11 +104,24 @@ namespace emp {
     if (it != fail_map.end()) fail_map.erase(it);
   }
 
+  namespace {
+    // Copy all of the args into the stringstream.
+    // Base case
+    void Notify_impl(std::stringstream &) { ; }
+
+    // For each arg, copy it into the provided stringstream and recurse to do the rest.
+    template <typename T, typename... Ts>
+    void Notify_impl(std::stringstream & ss, T && arg1, Ts &&... args) {
+      ss << std::forward<T>(arg1);
+      Notify_impl(ss, std::forward<Ts>(args)...);
+    }
+  }
+
   /// Send information to a program user (via standard error in native mode, or alter in Emscripten)
   template <typename... Ts>
-  void Notify(Ts... args) {
+  void Notify(Ts &&... args) {
     std::stringstream ss;
-    EMP_EXPAND_PPACK( (ss << args) );
+    Notify_impl(ss, std::forward<Ts>(args)...);
 #ifdef EMSCRIPTEN
     EM_ASM_ARGS({ msg = Pointer_stringify($0); alert(msg); }, ss.str().c_str());
 #else
@@ -120,23 +131,23 @@ namespace emp {
 
   /// End user has done something possibly a problem.
   template <typename... Ts>
-  void NotifyWarning(Ts... msg) { Notify("WARNING: ", msg...); }
+  void NotifyWarning(Ts &&... msg) { Notify("WARNING: ", std::forward<Ts>(msg)...); }
 
   /// End user has done something resulting in an non-recoverable problem.
   template <typename... Ts>
-  void NotifyError(Ts... msg) { Notify("ERROR: ", msg...); }
+  void NotifyError(Ts &&... msg) { Notify("ERROR: ", std::forward<Ts>(msg)...); }
 
   /// Library user has made an error in how they are using the library.
   template <typename... Ts>
-  void LibraryWarning(Ts... msg) { Notify("EMPIRICAL USE WARNING: ", msg...); }
+  void LibraryWarning(Ts &&... msg) { Notify("EMPIRICAL USE WARNING: ", std::forward<Ts>(msg)...); }
 
   /// Library user has made an error in how they are using the library.
   template <typename... Ts>
-  void LibraryError(Ts... msg) { Notify("EMPIRICAL USE ERROR: ", msg...); }
+  void LibraryError(Ts &&... msg) { Notify("EMPIRICAL USE ERROR: ", std::forward<Ts>(msg)...); }
 
   /// Original library implementers must have made an error.
   template <typename... Ts>
-  void InternalError(Ts... msg) { Notify("INTERNAL EMPIRICAL ERROR: ", msg...); }
+  void InternalError(Ts &&... msg) { Notify("INTERNAL EMPIRICAL ERROR: ", std::forward<Ts>(msg)...); }
 
 }
 
