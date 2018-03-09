@@ -39,11 +39,12 @@
 #include "../tools/string_utils.h"
 
 // World-specific includes.
-#include "Systematics.h"    // Track relationships among organisms.
-#include "World_file.h"     // Helper to determine when specific events should occur.
-#include "World_iterator.h" // Allow iteration through organisms in a world.
-#include "World_reflect.h"  // Handle needed reflection on incoming organism classes.
-#include "World_select.h"   // Include all built-in selection functions for World.
+#include "Systematics.h"     // Track relationships among organisms.
+#include "World_file.h"      // Helper to determine when specific events should occur.
+#include "World_iterator.h"  // Allow iteration through organisms in a world.
+#include "World_reflect.h"   // Handle needed reflection on incoming organism classes.
+#include "World_select.h"    // Include all built-in selection functions for World.
+#include "World_structure.h" // Include additional function to setup world structure.
 
 namespace emp {
 
