@@ -349,11 +349,6 @@ namespace emp {
     /// argument determines if the generations should be synchronous (true) or not (false, default)
     void SetGrid(size_t width, size_t height, bool synchronous_gen=false);
 
-    /// Set the population to be a set of pools that are individually well mixed, but with limited
-    /// migtation.  Arguments are the number of pools, the size of each pool, and whether the
-    /// generations should be synchronous (true) or not (false, default).
-    void SetPools(size_t num_pools, size_t pool_size, bool synchronous_gen=false);
-
     /// Add a new phenotype measuring function.
     void AddPhenotype(const std::string & name, std::function<double(ORG &)> fun) {
       phenotypes.AddTrait(name, fun);
@@ -842,56 +837,6 @@ namespace emp {
     }
 
     SetAttribute("PopStruct", "Grid");
-  }
-
-  template<typename ORG>
-  void World<ORG>::SetPools(size_t num_pools, size_t pool_size, bool synchronous_gen) {
-    Resize(pool_size, num_pools);
-    is_synchronous = synchronous_gen;
-    is_space_structured = true;
-    is_pheno_structured = false;
-
-    // -- Setup functions --
-    // Inject in a empty pool -or- randomly if none empty
-    fun_add_inject = [this](Ptr<ORG> new_org) {
-      for (size_t id = 0; id < pop.size(); id += pop_sizes[0]) {
-        if (pop[id] == nullptr) return AddOrgAt(new_org, id);
-      }
-      return AddOrgAt(new_org, GetRandomCellID());
-    };
-
-    // neighbors are everyone in the same pool.
-    fun_get_neighbor = [this](size_t id) {
-      emp_assert(random_ptr);
-      const size_t size_x = pop_sizes[0];
-      return (id / size_x) * size_x + random_ptr->GetUInt(size_x);
-    };
-
-    if (synchronous_gen) {
-      // Place births in the next open spot in the new pool (or randomly if full!)
-      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        emp_assert(new_org);                                  // New organism must exist.
-        const size_t size_x = pop_sizes[0];
-        const size_t pool_id = parent_id / size_x;
-        const size_t start_id = pool_id * size_x;
-        for (size_t id = start_id; id < start_id+size_x; id++) {
-          if (next_pop[id] == nullptr) {  // Search for an open positions...
-            return AddNextOrgAt(new_org, id, genotypes[parent_id]);
-          }
-        }
-        const size_t id = fun_get_neighbor(parent_id);     // Placed near parent, in next pop.
-        return AddNextOrgAt(new_org, id, genotypes[parent_id]);
-      };
-      SetAttribute("SynchronousGen", "True");
-    } else {
-      // Asynchronous: always go to a neigbor in current population.
-      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        return AddOrgAt(new_org, fun_get_neighbor(parent_id), genotypes[parent_id]); // Place org in existing population.
-      };
-      SetAttribute("SynchronousGen", "False");
-    }
-
-    SetAttribute("PopStruct", "Pools");
   }
 
   // A new, arbitrary file.
