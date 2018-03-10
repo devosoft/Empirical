@@ -350,8 +350,12 @@ namespace emp {
     void SetGrid(size_t width, size_t height, bool synchronous_gen=false);
 
     /// Add a new phenotype measuring function.
-    void AddPhenotype(const std::string & name, std::function<double(ORG &)> fun) {
-      phenotypes.AddTrait(name, fun);
+    // void AddPhenotype(const std::string & name, std::function<double(ORG &)> fun) {
+    //   phenotypes.AddTrait(name, fun);
+    // }
+    template <typename... Ts>
+    void AddPhenotype(Ts &&... args) {
+      phenotypes.AddTrait(std::forward<Ts>(args)...);
     }
 
     /// Access a data node that tracks fitness information in the population.  The fitness will not
