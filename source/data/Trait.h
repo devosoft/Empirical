@@ -31,8 +31,9 @@ namespace emp {
   public:
     virtual ~BaseTrait() { ; }
 
-    virtual std::string EvalString(TARGET_T & target) = 0;
-    virtual double EvalValue(TARGET_T & target) = 0;
+    virtual std::string EvalString(TARGET_T & target) const = 0;
+    virtual double EvalValue(TARGET_T & target) const = 0;
+    virtual size_t EvalBin(TARGET_T & target, size_t num_bins) const = 0;
 
     template <typename VALUE_T>
     bool IsType() { return (bool) dynamic_cast<Trait<TARGET_T,VALUE_T>>(this); }
@@ -54,11 +55,11 @@ namespace emp {
 
   public:
     Trait(const std::string & _n, const fun_t & _f)
-      : name(_n), fun(_f), range() { ; }
+      : name(_n), desc(""), fun(_f), range() { ; }
     Trait(const std::string & _n, const fun_t & _f, value_t min, value_t max)
-      : name(_n), fun(_f), range(min, max) { ; }
+      : name(_n), desc(""), fun(_f), range(min, max) { ; }
     Trait(const std::string & _n, const fun_t & _f, const range_t & _r)
-      : name(_n), fun(_f), range(_r) { ; }
+      : name(_n), desc(""), fun(_f), range(_r) { ; }
 
     const std::string & GetName() const { return name; }
     const std::string & GetDesc() const { return desc; }
@@ -73,13 +74,13 @@ namespace emp {
     void SetMin(value_t min) { range.SetLower(min); }
     void SetMax(value_t max) { range.SetUpper(max); }
 
-    value_t Eval(target_t & target) { return fun(target); }
-    value_t EvalLimit(target_t & target) { return range.Limit(fun(target)); }
-    std::string EvalString(target_t & target) { return std::to_string(EvalLimit(target)); }
-    double EvalValue(target_t & target) { return (double) EvalLimit(target); }
+    value_t Eval(target_t & target) const { return fun(target); }
+    value_t EvalLimit(target_t & target) const { return range.Limit(fun(target)); }
+    std::string EvalString(target_t & target) const { return std::to_string(EvalLimit(target)); }
+    double EvalValue(target_t & target) const { return (double) EvalLimit(target); }
 
     // Determine which bin a trait fits in based on the number of bins and the range.
-    size_t EvalBin(target_t & target, size_t num_bins) {
+    size_t EvalBin(target_t & target, size_t num_bins) const {
       const value_t val = fun(target);
       return range.CalcBin(val, num_bins);
     }
@@ -96,7 +97,7 @@ namespace emp {
     emp::vector<emp::Ptr<trait_t>> traits;
 
   public:
-    TraitSet() { ; }
+    TraitSet() : traits(0) { ; }
 
     trait_t & operator[](size_t id) { return *(traits[id]); }
     const trait_t & operator[](size_t id) const { return *(traits[id]); }
@@ -119,26 +120,26 @@ namespace emp {
       traits.push_back(ptr);
     }
 
-    std::string EvalString(size_t id, target_t & target) { return traits[id]->EvalString(target); }
-    double EvalValue(size_t id, target_t & target) { return traits[id]->EvalValue(target); }
+    std::string EvalString(size_t id, target_t & target) const { return traits[id]->EvalString(target); }
+    double EvalValue(size_t id, target_t & target) const { return traits[id]->EvalValue(target); }
 
-    emp::vector<std::string> EvalStrings(target_t & target) {
+    emp::vector<std::string> EvalStrings(target_t & target) const {
       emp::vector<std::string> results(traits.size());
       for (size_t i = 0; i < traits.size(); i++) results[i] = traits[i]->EvalString(target);
       return results;
     }
-    emp::vector<double> EvalValues(target_t & target) {
+    emp::vector<double> EvalValues(target_t & target) const {
       emp::vector<double> results(traits.size());
       for (size_t i = 0; i < traits.size(); i++) results[i] = traits[i]->EvalValue(target);
       return results;
     }
 
     // Determine which bin a trait fits in based on the number of bins and the range.
-    size_t EvalBin(target_t & target, emp::vector<size_t> bin_counts) {
+    size_t EvalBin(target_t & target, emp::vector<size_t> bin_counts) const {
       size_t mult = 1;
       size_t id = 0;
       for (size_t i = 0; i < traits.size(); i++) {
-        id += traits[i]->EvalBin(target) * mult;
+        id += traits[i]->EvalBin(target, bin_counts[i]) * mult;
         mult *= bin_counts[i];
       }
       return id;
