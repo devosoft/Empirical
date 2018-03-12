@@ -19,8 +19,9 @@ int main()
 
   // Organisms are unsigned ints.
   using org_t = uint64_t;
-  org_t MIN_ORG = 0;
-  org_t MAX_ORG = 8192;
+  constexpr org_t MIN_ORG = 0;
+  constexpr org_t MAX_ORG = 8192;
+  constexpr org_t MAX_ORG_DIFF = MAX_ORG - MIN_ORG;
 
   emp::Random random;
   emp::World<org_t> map_world(random);
@@ -46,7 +47,7 @@ int main()
 
 
   // Start off world with random organism.
-  map_world.Inject(random.GetUInt64(MIN_ORG, MAX_ORG))
+  map_world.Inject(random.GetUInt64(MAX_ORG_DIFF));
   map_world.PrintGrid();
 
   for (size_t g = 0; g < GENS; g++) {
