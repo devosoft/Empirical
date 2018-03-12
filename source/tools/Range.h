@@ -48,13 +48,13 @@ namespace emp {
     void SetMaxUpper() { upper = std::numeric_limits<T>::max(); }
 
     /// Determine if a provided value is in the range.
-    bool Valid(T value) { return value >= lower && value <= upper; }
+    bool Valid(T value) const { return value >= lower && value <= upper; }
 
     /// Force a value into range
-    T Limit(T _in) { return (_in < lower) ? lower : ((_in > upper) ? upper : _in); }
+    T Limit(T _in) const { return (_in < lower) ? lower : ((_in > upper) ? upper : _in); }
 
     /// Produce a vector that spreads values evenly across the range.
-    emp::vector<T> Spread(size_t s) {
+    emp::vector<T> Spread(size_t s) const {
       emp_assert(s >= 1);
       emp::vector<T> out(s);
       out[0] = lower;
