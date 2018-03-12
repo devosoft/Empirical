@@ -257,6 +257,9 @@ namespace emp {
     /// How many cells tall is the world? (assumes grids are active.)
     size_t GetHeight() const { return pop_sizes[1]; }
 
+    /// What phenotypic traits is the population tracking?
+    const emp::TraitSet<ORG> & GetPhenotypes() const { return phenotypes; }
+
     /// Does the specified cell ID have an organism in it?
     bool IsOccupied(size_t i) const { return pop[i] != nullptr; }
 
