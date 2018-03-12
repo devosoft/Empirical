@@ -82,12 +82,13 @@ namespace emp {
   /// Note: Since organisms compete with their predecessors for space in the populations,
   /// synchronous generations do not make sense.
   ///
-  /// Whis for version will setup a MAP-Elites world; traits to use an how many bins for each
+  /// This for version will setup a MAP-Elites world; traits to use an how many bins for each
   /// (trait counts) must be provided.
   template<typename ORG>
   void SetMapElites(World<ORG> & world, TraitSet<ORG> traits,
                     const emp::vector<size_t> & trait_counts) {
-    // 
+    using org_pos_t = typename World<ORG>::OrgPosition;
+
     // For consistency with other population structures, we are leaving the option.
     const size_t pop_size = Product(trait_counts);  // Pop position for each combo of traits.
     world.Resize(pop_size);
@@ -104,7 +105,7 @@ namespace emp {
       size_t id = traits.EvalBin(*new_org, trait_counts);
       double cur_fitness = world.CalcFitnessID(id);
 
-      if (cur_fitness > org_fitness) return World<ORG>::OrgPosition();  // Return invalid position!
+      if (cur_fitness > org_fitness) return org_pos_t();  // Return invalid position!
       return world.AddOrgAt(new_org, id);
     });
 
@@ -119,7 +120,7 @@ namespace emp {
       size_t id = traits.EvalBin(*new_org, trait_counts);
       double cur_fitness = world.CalcFitnessID(id);
 
-      if (cur_fitness > org_fitness) return World<ORG>::OrgPosition();  // Return invalid position!
+      if (cur_fitness > org_fitness) return org_pos_t();  // Return invalid position!
       return world.AddOrgAt(new_org, id);
     });
 
