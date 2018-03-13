@@ -108,7 +108,6 @@ namespace emp {
     /// Indicate that the associated position has been deleted.
     void MarkDeleted() {
       if (ptr_debug) std::cout << "Marked deleted for pointer " << ptr << std::endl;
-      emp_assert(status != PtrStatus::DELETED, "Deleting same emp::Ptr a second time!");
       status = PtrStatus::DELETED;
     }
 
@@ -248,6 +247,7 @@ namespace emp {
       }
 #endif
       if (ptr_debug) std::cout << "Delete: " << id << std::endl;
+      emp_assert(id_info[id].IsActive(), "Deleting same emp::Ptr a second time!", id);
       id_info[id].MarkDeleted();
     }
   };
