@@ -35,6 +35,8 @@ namespace emp {
     virtual double EvalValue(TARGET_T & target) const = 0;
     virtual size_t EvalBin(TARGET_T & target, size_t num_bins) const = 0;
 
+    virtual Ptr<BaseTrait<TARGET_T>> Clone() const = 0;
+
     template <typename VALUE_T>
     bool IsType() { return (bool) dynamic_cast<Trait<TARGET_T,VALUE_T>>(this); }
   };
@@ -42,6 +44,7 @@ namespace emp {
   template <typename TARGET_T, typename VALUE_T=double>
   class Trait : public BaseTrait<TARGET_T> {
   public:
+    using this_t = Trait<TARGET_T, VALUE_T>;
     using target_t = TARGET_T;
     using value_t = VALUE_T;
     using fun_t = std::function<value_t(target_t &)>;
@@ -89,6 +92,10 @@ namespace emp {
       const value_t val = fun(target);
       return range.CalcBin(val, num_bins);
     }
+
+    Ptr<BaseTrait<TARGET_T>> Clone() const {
+      return NewPtr<this_t>(*this);
+    };
   };
 
   /// A TraitSet houses a collection of traits and can trigger them to all be evaluated at once.
@@ -104,7 +111,7 @@ namespace emp {
   public:
     TraitSet() : traits(0) { ; }
     TraitSet(TraitSet && in) : traits(in.traits) { in.traits.resize(0); }
-    TraitSet(const TraitSet & in) : traits(CopyPtrs(in.traits)) { ; }
+    TraitSet(const TraitSet & in) : traits(ClonePtrs(in.traits)) { ; }
     ~TraitSet() { Clear(); }
 
     TraitSet & operator=(TraitSet && in) {
@@ -115,7 +122,7 @@ namespace emp {
     }
     TraitSet & operator=(const TraitSet & in) {
       Clear();
-      traits = CopyPtrs(in.traits);
+      traits = ClonePtrs(in.traits);
       return *this;
     }
 
