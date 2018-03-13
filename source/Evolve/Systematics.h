@@ -207,12 +207,15 @@ namespace emp {
     bool store_ancestors;  ///< Store all of the direct ancestors from living taxa?
     bool store_outside;    ///< Store taxa that are extinct with no living descendants?
     bool archive;          ///< Set to true if we are supposed to do any archiving of extinct taxa.
+    bool store_position;   ///< Keep a vector mapping  positions to pointers
+    bool track_synchronous;///< Does this systematics manager need to keep track of current and next positions?
 
     std::unordered_set< Ptr<taxon_t>, hash_t > active_taxa;   ///< A set of all living taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; ///< A set of all dead, ancestral taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  ///< A set of all dead taxa w/o descendants.
 
     emp::vector<Ptr<taxon_t> > taxon_locations;
+    emp::vector<Ptr<taxon_t> > next_taxon_locations;
 
     Signal<void(Ptr<taxon_t>)> on_new_sig; ///< Trigger when any organism is pruned from tree
     Signal<void(Ptr<taxon_t>)> on_prune_sig; ///< Trigger when any organism is pruned from tree
@@ -242,8 +245,8 @@ namespace emp {
      * @param store_outside    Should all dead taxa be maintained? (typically no; it gets BIG!)
      */
 
-    Systematics(bool _active=true, bool _anc=true, bool _all=false)
-      : store_active(_active), store_ancestors(_anc), store_outside(_all)
+    Systematics(bool _active=true, bool _anc=true, bool _all=false, bool _pos=true)
+      : store_active(_active), store_ancestors(_anc), store_outside(_all), store_position(_pos)
       , archive(store_ancestors || store_outside)
       , active_taxa(), ancestor_taxa(), outside_taxa()
       , org_count(0), total_depth(0), num_roots(0), next_id(0)
@@ -270,6 +273,9 @@ namespace emp {
 
     /// Are we storing any taxa types that have died out?
     bool GetArchive() const { return archive; }
+
+    /// Are we storing the positions of taxa?
+    bool GetStorePosition() const { return store_position; }
 
     // Currently using raw pointers because of a weird bug in emp::Ptr. Should switch when fixed.
     std::unordered_set< Ptr<taxon_t>, hash_t >* GetActivePtr() { return &active_taxa; }
@@ -632,6 +638,7 @@ namespace emp {
     /// If you would like the systematics manager to track taxon age, you can also supply
     /// the update at which the taxon is being added.
     /// return a pointer for the associated taxon.
+    Ptr<taxon_t> AddOrg(const ORG_INFO & info, size_t cur_taxon_pos=-1, int update=-1);
     Ptr<taxon_t> AddOrg(const ORG_INFO & info, Ptr<taxon_t> cur_taxon=nullptr, int update=-1);
 
     /// Remove an instance of an organism; track when it's gone.
@@ -660,6 +667,9 @@ namespace emp {
 
     /// Are we storing any taxa types that have died out?
     void SetArchive(bool new_val) { archive = new_val; }
+
+    /// Are we storing the location of taxa?
+    void SetStorePosition(bool new_val) { store_position = new_val; }
 
 
   };
@@ -748,7 +758,41 @@ namespace emp {
   // Add information about a new organism, including its stored info and parent's taxon;
   // return a pointer for the associated taxon.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(const ORG_INFO & info, Ptr<taxon_t> cur_taxon, int update) {
+  Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(const ORG_INFO & info, size_t cur_taxon_pos, int update) {
+    emp_assert( cur_taxon_pos == -1 || (taxon_locations[cur_taxon_pos] && Has(active_taxa, taxon_locations[cur_taxon_pos])));
+    Ptr<taxon_t> cur_taxon;
+    // Update stats
+    org_count++;                  // Keep count of how many organisms are being tracked.
+
+    // If this organism needs a new taxon, build it!
+    if (cur_taxon_pos == -1 || taxon_locations[cur_taxon_pos]->GetInfo() != info) {
+      Ptr<taxon_t> parent_taxon;                               // Provided taxon is parent.
+      if (cur_taxon_pos == -1) {                                         // No parnet -> NEW tree
+        num_roots++;                                               // ...track extra root.
+        mrca = nullptr;
+        parent_taxon = nullptr;                                            // ...nix old common ancestor
+      } else {
+        emp_assert(taxon_locations[cur_taxon_pos], "Invalid parent position");
+        parent_taxon = taxon_locations[cur_taxon_pos];
+      }
+
+      cur_taxon = NewPtr<taxon_t>(++next_id, info, parent_taxon);  // Build new taxon.
+      on_new_sig.Trigger(cur_taxon);
+      if (store_active) active_taxa.insert(cur_taxon);             // Store new taxon.
+      if (parent_taxon) parent_taxon->AddOffspring();              // Track tree info.
+
+      cur_taxon->SetOriginationTime(update);
+    }
+
+    cur_taxon->AddOrg();                    // Record the current organism in its taxon.
+    total_depth += cur_taxon->GetDepth();   // Track the total depth (for averaging)
+    return cur_taxon;                       // Return the taxon used.
+  }
+
+  // Add information about a new organism, including its stored info and parent's taxon;
+  // return a pointer for the associated taxon.
+  template <typename ORG_INFO, typename DATA_STRUCT>
+  Ptr<typename Systematics<ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG_INFO, DATA_STRUCT>::AddOrg(const ORG_INFO & info, Ptr<taxon_t> cur_taxon, int update) {
     emp_assert( !cur_taxon || Has(active_taxa, cur_taxon));
 
     // Update stats
