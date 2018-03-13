@@ -76,6 +76,18 @@ TEST_CASE("Test meta-programming helpers (meta.h)", "[meta]")
   REQUIRE( meta2.b == true );
   REQUIRE( meta3.a == "65.5" );
   REQUIRE( meta3.b == 65.5 );
+
+  // Combine hash should always return the original values if only one combined.
+  REQUIRE( emp::CombineHash(1) == 1 );
+  REQUIRE( emp::CombineHash(2) == std::hash<int>()(2) );
+	REQUIRE( emp::CombineHash(3) == std::hash<int>()(3) );
+	REQUIRE( emp::CombineHash(4) == std::hash<int>()(4) );
+	REQUIRE( emp::CombineHash(2,3) == 0x9e4f79bb );
+	REQUIRE( emp::CombineHash(3,2) == 0x9e4779bc);
+	REQUIRE( emp::CombineHash(1,2) == 0x9e4779ba);
+	REQUIRE( emp::CombineHash(3,4) == 0x9e5779bc);
+	REQUIRE( emp::CombineHash(2,3,4) == 0x4f2bc6c1c6c76 );
+
 }
 
 

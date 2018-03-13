@@ -32,7 +32,6 @@
 #include "tools/TypeTracker.h"
 #include "tools/attrs.h"
 
-#include "tools/errors.h"
 #include "tools/flex_function.h"
 #include "tools/functions.h"
 #include "tools/graph_utils.h"
@@ -313,22 +312,6 @@ TEST_CASE("Test DynamicString", "[tools]")
   REQUIRE(test_set[2] == "Line Two");
   REQUIRE(test_set[3] == "Line Three");
   REQUIRE(test_set[4] == "Line 4");
-}
-
-TEST_CASE("Test errors", "[tools]")
-{
-  emp::TriggerExcept("test_fail", "The test failed.  *sob*");
-  emp::TriggerExcept("test_fail2", "The second test failed too.  But it's not quite as aweful.", false);
-  emp::TriggerExcept("test_fail2", "The third test is just test 2 again, but worse", true);
-
-  REQUIRE( emp::CountExcepts() == 3 );
-  auto except = emp::PopExcept("test_fail2");
-  REQUIRE( emp::CountExcepts() == 2 );
-  REQUIRE( except.desc == "The second test failed too.  But it's not quite as aweful." );
-  REQUIRE( emp::HasExcept("test_fail2") == true );
-  REQUIRE( emp::HasExcept("test_fail3") == false );
-  emp::ClearExcepts();
-  REQUIRE( emp::CountExcepts() == 0 );
 }
 
 int Sum4(int a1, int a2, int a3, int a4) {
@@ -1286,15 +1269,15 @@ TEST_CASE("Test stats", "[tools]") {
 
   REQUIRE(emp::Sum(vec1) == 10);
   REQUIRE(emp::Sum(vec2) == 5);
-  REQUIRE(emp::Sum(deque1) == 27);  
+  REQUIRE(emp::Sum(deque1) == 27);
 
   REQUIRE(emp::UniqueCount(vec1) == 3);
   REQUIRE(emp::UniqueCount(vec2) == 2);
-  REQUIRE(emp::UniqueCount(deque1) == 4);  
+  REQUIRE(emp::UniqueCount(deque1) == 4);
 
   REQUIRE(emp::Mean(vec1) == Approx(1.6666666666667));
   REQUIRE(emp::Mean(vec2) == Approx(1.25));
-  REQUIRE(emp::Mean(deque1) == 4.5);  
+  REQUIRE(emp::Mean(deque1) == 4.5);
 
   std::function<int(int)> invert = [](int i){return i*-1;};
 
@@ -1306,9 +1289,9 @@ TEST_CASE("Test stats", "[tools]") {
 }
 
 TEST_CASE("Test set utils", "[tools]") {
-  std::set<int> s1; 
-  std::set<int> s2; 
-  std::set<int> comp_set; 
+  std::set<int> s1;
+  std::set<int> s2;
+  std::set<int> comp_set;
   emp::vector<int> v1;
   emp::vector<int> v2;
 

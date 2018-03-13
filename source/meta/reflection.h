@@ -182,7 +182,7 @@ namespace emp {
 
   // Helper tools for type_if.
   namespace {
-    template< typename T, bool match_ok > struct EMP_eval_type { ; };
+    template< typename T, bool match_ok > struct EMP_eval_type { };
     template< typename T> struct EMP_eval_type<T,true> { using type = T; }; // If match, define type!
   }
 

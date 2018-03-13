@@ -18,10 +18,11 @@
 #include <string>
 
 #include "base/array.h"
-#include "base/Ptr.h"
 #include "base/assert.h"
+#include "base/errors.h"
 #include "base/macro_math.h"
 #include "base/macros.h"
+#include "base/Ptr.h"
 #include "base/vector.h"
 
 
@@ -353,6 +354,23 @@ TEST_CASE("Test macros", "[base]")
 }
 
 
+TEST_CASE("Test errors", "[tools]")
+{
+  emp::TriggerExcept("test_fail", "The test failed.  *sob*");
+  emp::TriggerExcept("test_fail2", "The second test failed too.  But it's not quite as aweful.", false);
+  emp::TriggerExcept("test_fail2", "The third test is just test 2 again, but worse", true);
+
+  REQUIRE( emp::CountExcepts() == 3 );
+  auto except = emp::PopExcept("test_fail2");
+  REQUIRE( emp::CountExcepts() == 2 );
+  REQUIRE( except.desc == "The second test failed too.  But it's not quite as aweful." );
+  REQUIRE( emp::HasExcept("test_fail2") == true );
+  REQUIRE( emp::HasExcept("test_fail3") == false );
+  emp::ClearExcepts();
+  REQUIRE( emp::CountExcepts() == 0 );
+}
+
+
 TEST_CASE("Test Ptr", "[base]")
 {
   // Test default constructor.
@@ -473,5 +491,18 @@ TEST_CASE("Test vector", "[base]")
   for (int i : v) total += i;
 
   REQUIRE(total == 2470);
+
+  // Examine vector<bool> specialization.
+  emp::vector<bool> vb(1000,false);
+  for (size_t i = 0; i < vb.size(); i++) {
+    if (i%3==0 || i%5 == 0) vb[i] = true;
+  }
+  size_t count = 0;
+  const auto vb2 = vb;
+  for (size_t i = 0; i < vb.size(); i++) {
+    if (vb2[i]) count++;
+  }
+
+  REQUIRE(count == 467);
 }
 
