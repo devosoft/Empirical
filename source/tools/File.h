@@ -164,6 +164,15 @@ namespace emp {
       return *this;
     }
 
+    /// Convert this file into an std::set of lines (loses line ordering).
+    std::set<std::string> AsSet() const {
+      std::set<std::string> line_set;
+      for (size_t i = 0; i < lines.size(); i++) {
+        line_set.insert(lines[i]);
+      }
+      return line_set;
+    }
+
     /// Apply a string manipulation function to all lines in the file.
     File & Apply(const std::function<void(std::string &)> & fun) {
       for (std::string & cur_line : lines) {
