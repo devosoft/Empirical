@@ -60,6 +60,11 @@ namespace emp {
       : name(_n), desc(""), fun(_f), range(min, max) { ; }
     Trait(const std::string & _n, const fun_t & _f, const range_t & _r)
       : name(_n), desc(""), fun(_f), range(_r) { ; }
+    Trait(const Trait &) = default;
+    Trait(Trait &&) = default;
+
+    Trait & operator=(const Trait &) = default;
+    Trait & operator=(Trait &&) = default;
 
     const std::string & GetName() const { return name; }
     const std::string & GetDesc() const { return desc; }
@@ -98,15 +103,32 @@ namespace emp {
 
   public:
     TraitSet() : traits(0) { ; }
+    TraitSet(TraitSet && in) : traits(in.traits) { in.traits.resize(0); }
+    TraitSet(const TraitSet & in) : traits(CopyPtrs(in.traits)) { ; }
+    ~TraitSet() { Clear(); }
+
+    TraitSet & operator=(TraitSet && in) {
+      Clear();
+      traits = in.traits;
+      in.traits.resize(0);
+      return *this;
+    }
+    TraitSet & operator=(const TraitSet & in) {
+      Clear();
+      traits = CopyPtrs(in.traits);
+      return *this;
+    }
 
     trait_t & operator[](size_t id) { return *(traits[id]); }
     const trait_t & operator[](size_t id) const { return *(traits[id]); }
 
     size_t GetSize() const { return traits.size(); }
 
+    void Clear() { for (auto & ptr : traits) ptr.Delete(); traits.resize(0); }
+
     size_t Find(const std::string & name) const {
       for (size_t i = 0; i < traits.size(); i++) {
-        if (traits[i].GetName() == name) return i;
+        if (traits[i]->GetName() == name) return i;
       }
       return (size_t) -1;
     }
