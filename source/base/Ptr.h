@@ -793,6 +793,13 @@ namespace emp {
     return out_ptrs;
   }
 
+  /// Copy a vector of objects pointed to by using their Clone() member function; return vector.
+  template <typename T> emp::vector<Ptr<T>> ClonePtrs(const emp::vector<Ptr<T>> & in) {
+    emp::vector<Ptr<T>> out_ptrs(in.size());
+    for (size_t i = 0; i < in.size(); i++) out_ptrs[i] = in[i]->Clone();
+    return out_ptrs;
+  }
+
   /// Create a pointer to an array of objects.
   template <typename T, typename... ARGS> Ptr<T> NewArrayPtr(size_t array_size, ARGS &&... args) {
     //auto ptr = new T[array_size];
