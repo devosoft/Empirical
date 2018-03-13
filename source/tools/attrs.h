@@ -127,7 +127,7 @@ namespace emp {
 
         // Handle the case when Get(target) is not callable
         template <class T, class... U>
-        static constexpr decltype(auto) __impl_CallOrGetAttribute(
+        static constexpr auto __impl_CallOrGetAttribute(
           const std::false_type& isCallable, T&& target, U&&... args) {
           return GetAttribute(std::forward<T>(target));
         }
@@ -413,19 +413,19 @@ namespace emp {
     constexpr const T& operator*() const & { return value; }                   \
     constexpr const T&& operator*() const && { return std::move(value); }      \
     template <typename M>                                                      \
-    constexpr decltype(auto) Map(M&& map) & {                                  \
+    constexpr auto Map(M&& map) & {                                            \
       return attribute_t::Make(std::forward<M>(value));                        \
     }                                                                          \
     template <typename M>                                                      \
-    constexpr decltype(auto) Map(M&& map) const & {                            \
+    constexpr auto Map(M&& map) const & {                                      \
       return attribute_t::Make(std::forward<M>(value));                        \
     }                                                                          \
     template <typename M>                                                      \
-    constexpr decltype(auto) Map(M&& map) && {                                 \
+    constexpr auto Map(M&& map) && {                                           \
       return attribute_t::Make(std::forward<M>(std::move(value)));             \
     }                                                                          \
     template <typename M>                                                      \
-    constexpr decltype(auto) Map(M&& map) const && {                           \
+    constexpr auto Map(M&& map) const && {                                     \
       return attribute_t::Make(std::forward<M>(std::move(value)));             \
     }                                                                          \
   };                                                                           \
@@ -521,13 +521,11 @@ namespace emp {
       template <>
       struct AttrsIter<__impl_variadics_type_traits::pack<>> {
         template <typename I, typename R, typename... A>
-        static constexpr decltype(auto) MergeReduce(I&& init, R&& reducer,
-                                                    A&&... attrs) {
+        static constexpr I&& MergeReduce(I&& init, R&& reducer, A&&... attrs) {
           return std::forward<I>(init);
         }
         template <typename I, typename R, typename... A>
-        static constexpr decltype(auto) Reduce(I&& init, R&& reducer,
-                                               A&&... attrs) {
+        static constexpr I&& Reduce(I&& init, R&& reducer, A&&... attrs) {
           return std::forward<I>(init);
         }
 
@@ -541,15 +539,13 @@ namespace emp {
       template <typename U>
       struct AttrsIter<__impl_variadics_type_traits::pack<U>> {
         template <typename I, typename R, typename... A>
-        static constexpr decltype(auto) MergeReduce(I&& init, R&& reducer,
-                                                    A&&... attrs) {
+        static constexpr auto MergeReduce(I&& init, R&& reducer, A&&... attrs) {
           return std::forward<R>(reducer)(
             std::forward<I>(init), U::attribute_t::GetAttributeOrGetAttributeIn(
                                      std::forward<A>(attrs)...));
         }
         template <typename I, typename R, typename... A>
-        static constexpr decltype(auto) Reduce(I&& init, R&& reducer,
-                                               A&&... attrs) {
+        static constexpr auto Reduce(I&& init, R&& reducer, A&&... attrs) {
           return std::forward<R>(reducer)(
             std::forward<I>(init),
             U::attribute_t::GetAttribute(std::forward<A>(attrs))...);
@@ -570,8 +566,7 @@ namespace emp {
       template <typename U0, typename U1, typename... U>
       struct AttrsIter<__impl_variadics_type_traits::pack<U0, U1, U...>> {
         template <typename I, typename R, typename... A>
-        static constexpr decltype(auto) MergeReduce(I&& init, R&& reducer,
-                                                    A&&... attrs) {
+        static constexpr auto MergeReduce(I&& init, R&& reducer, A&&... attrs) {
           using new_init_t =
             decltype(reducer(std::forward<I>(init),
                              U0::attribute_t::GetAttributeOrGetAttributeIn(
@@ -586,8 +581,7 @@ namespace emp {
         }
 
         template <typename I, typename R, typename... A>
-        static constexpr decltype(auto) Reduce(I&& init, R&& reducer,
-                                               A&&... attrs) {
+        static constexpr auto Reduce(I&& init, R&& reducer, A&&... attrs) {
           using new_init_t = decltype(
             reducer(std::forward<I>(init),
                     U0::attribute_t::GetAttribute(std::forward<A>(attrs))...));
@@ -620,7 +614,7 @@ namespace emp {
     }  // namespace __impl_attrs_reduce
 
     template <typename I, typename R, typename... A>
-    constexpr decltype(auto) MergeReduce(I&& init, R&& reducer, A&&... attrs) {
+    constexpr auto MergeReduce(I&& init, R&& reducer, A&&... attrs) {
       return __impl_attrs_reduce::AttrsIter<
         variadic_union_t<is_same_attribute,
                          __impl_variadics_type_traits::ToPackType<
@@ -630,7 +624,7 @@ namespace emp {
     }
 
     template <typename I, typename R, typename... A>
-    constexpr decltype(auto) Reduce(I&& init, R&& reducer, A&&... attrs) {
+    constexpr auto Reduce(I&& init, R&& reducer, A&&... attrs) {
       return __impl_attrs_reduce::AttrsIter<variadic_intersection_t<
         is_same_attribute,
         __impl_variadics_type_traits::ToPackType<
@@ -731,7 +725,7 @@ namespace emp {
       };
 
       template <typename S, typename... U>
-      static constexpr decltype(auto) Call(S&& Self, U&&... args) {
+      static constexpr auto Call(S&& Self, U&&... args) {
         constexpr size_t last = sizeof...(T) - 1;
         return MakeAttrs(
           GetAttr<variadic_index_of_v<T, Attrs> == last,
@@ -747,22 +741,22 @@ namespace emp {
       /// given pack, then it is put into the new pack unchanged. Mostly, this
       /// is meant to allow the opengl plotting library to do mapping operations
       template <class... U>
-      constexpr decltype(auto) operator()(U&&... args) & {
+      constexpr auto operator()(U&&... args) & {
         return Call(*this, std::forward<U>(args)...);
       }
 
       template <class... U>
-      constexpr decltype(auto) operator()(U&&... args) const & {
+      constexpr auto operator()(U&&... args) const & {
         return Call(*this, std::forward<U>(args)...);
       }
 
       template <class... U>
-      constexpr decltype(auto) operator()(U&&... args) && {
+      constexpr auto operator()(U&&... args) && {
         return Call(std::move(*this), std::forward<U>(args)...);
       }
 
       template <class... U>
-      constexpr decltype(auto) operator()(U&&... args) const && {
+      constexpr auto operator()(U&&... args) const && {
         return Call(std::move(*this), std::forward<U>(args)...);
       }
 
@@ -792,7 +786,7 @@ namespace emp {
         constexpr __impl_reduce_from_reduce_value(F callback)
           : callback(std::forward<F>(callback)) {}
         template <typename I, typename U>
-        constexpr decltype(auto) operator()(I&& init, U&& value) {
+        constexpr auto operator()(I&& init, U&& value) {
           return std::forward<F>(callback)(value.name, std::forward<I>(init),
                                            *std::forward<U>(value));
         }
@@ -800,35 +794,34 @@ namespace emp {
 
       public:
       template <typename I, typename F>
-      constexpr decltype(auto) AttributeReduce(I&& init, F&& callback) & {
+      constexpr auto AttributeReduce(I&& init, F&& callback) & {
         return emp::tools::Reduce(std::forward<I>(init),
                                   std::forward<F>(callback), *this);
       }
       template <typename I, typename F>
-      constexpr decltype(auto) AttributeReduce(I&& init, F&& callback) const & {
+      constexpr auto AttributeReduce(I&& init, F&& callback) const & {
         return emp::tools::Reduce(std::forward<I>(init),
                                   std::forward<F>(callback), *this);
       }
       template <typename I, typename F>
-      constexpr decltype(auto) AttributeReduce(I&& init, F&& callback) && {
+      constexpr auto AttributeReduce(I&& init, F&& callback) && {
         return emp::tools::Reduce(std::forward<I>(init),
                                   std::forward<F>(callback), std::move(*this));
       }
       template <typename I, typename F>
-      constexpr decltype(auto) AttributeReduce(I&& init,
-                                               F&& callback) const && {
+      constexpr auto AttributeReduce(I&& init, F&& callback) const && {
         return emp::tools::Reduce(std::forward<I>(init),
                                   std::forward<F>(callback), std::move(*this));
       }
 
       template <typename I, typename F>
-      constexpr decltype(auto) Reduce(I&& init, F&& callback) {
+      constexpr auto Reduce(I&& init, F&& callback) {
         return AttributeReduce(
           std::forward<I>(init),
           __impl_reduce_from_reduce_value<F&&>{std::forward<F>(callback)});
       }
       template <typename I, typename F>
-      constexpr decltype(auto) Reduce(I&& init, F&& callback) const {
+      constexpr auto Reduce(I&& init, F&& callback) const {
         return AttributeReduce(
           std::forward<I>(init),
           __impl_reduce_from_reduce_value<F&&>{std::forward<F>(callback)});
@@ -883,21 +876,20 @@ namespace emp {
 
       private:
       template <typename S, typename U>
-      constexpr static decltype(auto) __impl_SetAttribute(
+      constexpr static Attrs<T..., std::decay_t<U>> __impl_SetAttribute(
         const std::false_type& has_attr, S&& self, U&& attribute) {
         return MakeAttrs(T::attribute_t::GetAttribute(std::forward<S>(self))...,
                          std::forward<U>(attribute));
       }
       template <typename S, typename U>
-      constexpr static decltype(auto) __impl_SetAttribute(
-        const std::true_type& has_attr, S&& self, U&& attribute) {
+      constexpr static auto __impl_SetAttribute(const std::true_type& has_attr,
+                                                S&& self, U&& attribute) {
         return MakeAttrs(T::attribute_t::GetAttributeOrGetAttributeIn(
           std::forward<S>(self), std::forward<U>(attribute))...);
       }
 
       template <typename S, typename U>
-      constexpr static decltype(auto) __impl_SetAttribute(S&& self,
-                                                          U&& attribute) {
+      constexpr static auto __impl_SetAttribute(S&& self, U&& attribute) {
         return __impl_SetAttribute(
           has_attribute<S, typename std::decay_t<U>::attribute_t>{},
           std::forward<S>(self), std::forward<U>(attribute));
@@ -905,23 +897,23 @@ namespace emp {
 
       public:
       template <typename U>
-      constexpr decltype(auto) SetAttribute(U&& attribute) & {
+      constexpr auto SetAttribute(U&& attribute) & {
         return __impl_SetAttribute(*this, std::forward<U>(attribute));
       }
 
       template <typename U>
-      constexpr decltype(auto) SetAttribute(U&& attribute) const & {
+      constexpr auto SetAttribute(U&& attribute) const & {
         return __impl_SetAttribute(*this, std::forward<U>(attribute));
       }
 
       template <typename U>
-      constexpr decltype(auto) SetAttribute(U&& attribute) && {
+      constexpr auto SetAttribute(U&& attribute) && {
         return __impl_SetAttribute(std::move(*this),
                                    std::forward<U>(attribute));
       }
 
       template <typename U>
-      constexpr decltype(auto) SetAttribute(U&& attribute) const && {
+      constexpr auto SetAttribute(U&& attribute) const && {
         return __impl_SetAttribute(std::move(*this),
                                    std::forward<U>(attribute));
       }
@@ -937,7 +929,7 @@ namespace emp {
     namespace __impl_attrs_merge {
       constexpr struct {
         template <typename I, typename A>
-        constexpr decltype(auto) operator()(I&& init, A&& next) const {
+        constexpr auto operator()(I&& init, A&& next) const {
           return std::forward<I>(init).SetAttribute(std::forward<A>(next));
         }
       } attrs_merge{};
@@ -946,9 +938,11 @@ namespace emp {
     /// Creates a new attribute pack which has all the attributes of this
     /// pack and another pack. Values will be taken from other other pack
     /// preferentially.
-
     template <typename... U>
-    constexpr decltype(auto) Merge(U&&... packs) {
+    constexpr auto Merge(U&&... packs)
+      // This hint is required by some older compilers
+      -> decltype(MergeReduce(Attrs<>{}, __impl_attrs_merge::attrs_merge,
+                              std::forward<U>(packs)...)) {
       return MergeReduce(Attrs<>{}, __impl_attrs_merge::attrs_merge,
                          std::forward<U>(packs)...);
     }

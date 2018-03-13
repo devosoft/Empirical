@@ -1398,12 +1398,15 @@ DEFINE_ATTR(Foo);
 DEFINE_ATTR(Bar);
 DEFINE_ATTR(Bazz);
 
-constexpr struct {
+struct ident_t {
   template <typename T>
   constexpr decltype(auto) operator()(T&& value) const {
     return std::forward<T>(value);
   }
-} ident;
+};
+
+constexpr ident_t ident{};
+
 template <typename T>
 struct Callable {
   T value;
