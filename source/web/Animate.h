@@ -176,7 +176,7 @@ namespace web {
     /// Determine if this animation is currently in the process of running a single step.
     bool GetDoStep() const { return do_step; }
 
-    /// Return the time point that this animation start MOST RECENTLY.
+    /// Return the time point that this animation started MOST RECENTLY.
     double GetStartTime() const { return start_time; }
 
     /// Determine the time point when this animation last updated a frame.

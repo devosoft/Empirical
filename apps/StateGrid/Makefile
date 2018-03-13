@@ -14,7 +14,8 @@ CFLAGS_nat_debug := -g $(CFLAGS_all)
 CXX_web := emcc
 OFLAGS_web_all := -s TOTAL_MEMORY=134217728 --js-library $(EMP_DIR)/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s ABORTING_MALLOC=0 --preload-file state_grids #--embed-file configs
 OFLAGS_web := -Oz -DNDEBUG
-OFLAGS_web_debug := -g4 -Oz -DNDEBUG -pedantic -Wno-dollar-in-identifier-extension -s DEMANGLE_SUPPORT=1
+OFLAGS_web_debug := -g4 -pedantic -Wno-dollar-in-identifier-extension -s DEMANGLE_SUPPORT=1
+#OFLAGS_web_debug := -g4 -DNDEBUG -pedantic -Wno-dollar-in-identifier-extension -s DEMANGLE_SUPPORT=1
 
 CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) $(OFLAGS_web_all)
 CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) $(OFLAGS_web_all)

@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
+ *  @date 2017-2018
  *
  *  @file vector_utils.h
  *  @brief A set of simple functions to manipulate emp::vector
@@ -37,6 +37,43 @@ namespace emp {
       if (id) os << spacer; // Put a space before second element and beyond.
       os << v[id];
     }
+  }
+
+  /// Sum up the contents of a vector.
+  template <typename T>
+  T Sum(const emp::vector<T> & v) {
+    T sum = 0;
+    for (auto x : v) sum += x;
+    return sum;
+  }
+
+  /// Multiply all of the contents of a vector.
+  template <typename T>
+  T Product(const emp::vector<T> & v) {
+    T product = 1;
+    for (auto x : v) product *= x;
+    return product;
+  }
+
+  /// A quick shortcut for sorting a vector.
+  template <typename T, typename... Ts>
+  void Sort(emp::vector<T> & v, Ts... args) {
+    std::sort(v.begin(), v.end(), std::forward<Ts>(args)...);
+  }
+
+  /// Returns a vector containing a chunk of elements from @param vec
+  /// starting at @param start and going up to but not including @param stop.
+  template <typename T>
+  emp::vector<T> Slice(emp::vector<T> vec, int start, int stop) {
+    emp_assert(start < stop, start, stop);
+    emp_assert(start < (int)vec.size(), start, vec.size());
+    emp_assert(stop <= (int)vec.size(), stop, vec.size());
+
+    emp::vector<T> new_vec;
+    for (int i = start; i < stop; i++){
+      new_vec.push_back(vec[i]);
+    }
+    return new_vec;
   }
 
   /// Tree manipulation in vectors.

@@ -13,6 +13,8 @@ int main()
 {
   emp::DataNode<int, emp::data::Current, emp::data::Range, emp::data::Pull, emp::data::Log> data;
   emp::DataNode<int, emp::data::Archive, emp::data::Current, emp::data::FullRange, emp::data::Info> data2;
+  emp::DataNode<double, emp::data::Current, emp::data::Range, emp::data::Stats, emp::data::Log> data3;
+
   emp::DataNode<double> data_empty; // Build an empty DataNode to make sure no modules are required.
   data.Add(27, 28, 29);
 
@@ -81,4 +83,17 @@ int main()
   std::cout << "Max     = " << data2.GetMax() << std::endl;
 
   data2.SetInfo("Best Data", "This is the best of all possible data.", "best_data");
+
+  std::cout << "\nSetup data3 with values 1 through 9" << std::endl;
+
+  data3.Add(1,2,3,4,5,6,7,8,8);
+  std::cout << "Current = " << data3.GetCurrent() << std::endl;
+  std::cout << "Total   = " << data3.GetTotal() << std::endl;
+  std::cout << "Mean    = " << data3.GetMean() << std::endl;
+  std::cout << "Min     = " << data3.GetMin() << std::endl;
+  std::cout << "Max     = " << data3.GetMax() << std::endl;
+  std::cout << "Variance= " << data3.GetVariance() << std::endl;
+  std::cout << "Std Dev = " << data3.GetStandardDeviation() << std::endl;
+  std::cout << "Skew    = " << data3.GetSkew() << std::endl;
+  std::cout << "Kurtosis= " << data3.GetKurtosis() << std::endl;
 }

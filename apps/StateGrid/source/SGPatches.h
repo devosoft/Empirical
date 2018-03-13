@@ -12,7 +12,7 @@
 #ifndef STATE_GRID_PATCHES_H
 #define STATE_GRID_PATCHES_H
 
-#include "Evo/StateGrid.h"
+#include "Evolve/StateGrid.h"
 
 class SGPatches : public emp::StateGrid {
 public:

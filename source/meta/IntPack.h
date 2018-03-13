@@ -1,14 +1,17 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  IntPack represents a collection of integers for easy manipulation and use in
-//  template specification (typically for metaprogramming)
-//
-//
-//  Developer Notes:
-//  * Can we shift this to a ValPack where the type is specified and then the values?  then
-//    we would be able to create an IntPack as a specialty on ValPack.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2018
+ *
+ *  @file  IntPack.h
+ *  @brief A set of integers that can be manipulated at compile time (good for metaprogramming)
+ *
+ *  These objects are able to measure a specific trait on another object.  They
+ *  (will eventually) interface smoothly with DataNodes for data collection.
+ *
+ *  @todo Shift to ValPack where the type is specified and then the values; specialize as IntPack.
+ */
+
 
 #ifndef EMP_INT_PACK_H
 #define EMP_INT_PACK_H

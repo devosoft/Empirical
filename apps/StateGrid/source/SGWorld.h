@@ -7,8 +7,8 @@
  *  @brief A world a population of SGOrgs.
  */
 
-#include "Evo/StateGrid.h"
-#include "Evo/World.h"
+#include "Evolve/StateGrid.h"
+#include "Evolve/World.h"
 #include "tools/Random.h"
 
 #include "SGOrg.h"

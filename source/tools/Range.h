@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2018
  *
  *  @file  Range.h
  *  @brief A simple way to track value ranges
@@ -31,6 +31,10 @@ namespace emp {
 
     T GetLower() const { return lower; }
     T GetUpper() const { return upper; }
+
+    size_t CalcBin(T value, size_t num_bins) const {
+      return ((double) (value - lower)) / ((double) (upper - lower)) * num_bins;
+    }
 
     Range & operator=(const Range&) = default;
     bool operator==(const Range& _in) const { return lower==_in.lower && upper==_in.upper; }

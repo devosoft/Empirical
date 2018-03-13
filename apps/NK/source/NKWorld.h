@@ -1,6 +1,6 @@
 #include "config/ArgManager.h"
-#include "Evo/NK.h"
-#include "Evo/World.h"
+#include "Evolve/NK.h"
+#include "Evolve/World.h"
 #include "tools/BitVector.h"
 #include "tools/Random.h"
 

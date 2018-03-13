@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2018
  *
  *  @file  flex_function.h
  *  @brief A collection of broadly-useful functions (that don't fit elsewhere)
@@ -65,9 +65,9 @@ namespace emp {
   /// Build a vector with a range of values from min to max at the provided step size.
   template <typename T>
   static inline emp::vector<T> BuildRange(T min, T max, T step=1) {
-    size_t size = (size_t) ((max-min) / step);
-    emp_assert(size >= 0);
-    emp::vector<T> out_v((size_t) size);
+    emp_assert(max > min);
+    size_t vsize = (size_t) ((max-min) / step) + 1;
+    emp::vector<T> out_v(vsize);
     size_t pos = 0;
     for (T i = min; i < max; i += step) {
       out_v[pos++] = i;

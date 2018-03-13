@@ -11,8 +11,6 @@
  *        appropriately. Alternatively, we might want to have a more flexible file class
  *        that wraps this one.
  *
- *  @todo File should have an iterator that can handle operators << and >> to read and write as
- *        well as to enable for loops.
  */
 
 
@@ -45,11 +43,23 @@ namespace emp {
     File & operator=(const File &) = default;
     File & operator=(File &&) = default;
 
+	// Return const iterator to beginning of file
+    auto begin() const { return std::begin(lines); }
+
+	// Return const iterator to end of file
+    auto end() const { return std::end(lines); }
+
+	// Return iterator to beginning of file
+    auto begin() { return std::begin(lines); }
+
+	// Return iterator to end of file
+    auto end() { return std::end(lines); }
+
     /// How many lines are in this file?
-    size_t GetNumLines() { return lines.size(); }
+    size_t GetNumLines() const { return lines.size(); }
 
     /// Compatibility with size()
-    size_t size() { return lines.size(); }
+    size_t size() const { return lines.size(); }
 
     /// Index into a specific line in this file.
     std::string & operator[](size_t pos) { return lines[pos]; }
@@ -81,11 +91,26 @@ namespace emp {
       }
       return *this;
     }
+
+	// Append 2 files
     File & Append(const File & in_file) { return Append(in_file.lines); }
 
     /// Append to the end of a file.
     template <typename T>
     File & operator+=(T && in) { Append( std::forward<T>(in) ); return *this; }
+
+	// Insert formatted data into file
+	// This is exactly the same as operator+=
+    template <typename T> auto operator<<(T &&in) {
+      Append(std::forward<T>(in));
+      return *this;
+    }
+
+	// Extract first line from file
+    auto operator>>(std::string &out) {
+      out = size() ? front() : out;
+      lines.erase(begin());
+    }
 
     /// Test if two files are identical.
     bool operator==(const File in) { return lines == in.lines; }
@@ -113,10 +138,13 @@ namespace emp {
     }
 
     /// Load a file from disk using the provided name.
+	// If file does not exist, this is a nop
     File & Load(const std::string & filename) {
       std::ifstream file(filename);
-      Load(file);
-      file.close();
+      if (file.is_open()) {
+        Load(file);
+        file.close();
+      }
       return *this;
     }
 

@@ -23,6 +23,10 @@
  *
  *  When compiled in debug mode (i.e. without the -DNDEBUG flag), this will trigger an assertion
  *  error and print the value of a.
+ * 
+ * 
+ *  @todo: Add emp_assert_warning() for non-terminating assert.  Should be able to disable with 
+ *         a command-line option (-DEMP_NO_WARNINGS)
  */
 
 #ifndef EMP_ASSERT_H
@@ -200,6 +204,8 @@ namespace emp {
   } while(0)
 
 // Emscripten-only asserts should be disabled since we are not in Emscripten
+/// Require a specified condition to be true if this program was compiled to Javascript with Emscripten.
+/// Note: If NDEBUG is defined, emp_emscripten_assert() will not do anything.
 #define emp_emscripten_assert(...) emp_assert(__VA_ARGS__)
 
 /// @cond DEFINES

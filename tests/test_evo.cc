@@ -1,224 +1,163 @@
 #define CATCH_CONFIG_MAIN
 #include "third-party/Catch/single_include/catch.hpp"
 
-#include <string>
 #include <iostream>
-#include <fstream>
-#include <vector>
 
-#include "Evo/EvoStats.h"
-#include "Evo/NK.h"
-#include "Evo/StatsManager.h"
-#include "Evo/World.h"
+#include "base/array.h"
+#include "Evolve/NK-const.h"
+#include "Evolve/World.h"
+#include "Evolve/Resource.h"
+#include "Evolve/NK.h"
 
 #include "tools/BitSet.h"
 #include "tools/Random.h"
+#include "tools/string_utils.h"
 
-using BitOrg = emp::BitVector;
+constexpr size_t K = 3;
+constexpr size_t N = 40;
 
-template <typename ORG>
-using MixedWorld = emp::evo::World<ORG, emp::evo::PopulationManager_Base<ORG>>;
+using BitOrg = emp::BitSet<N>;
 
-TEST_CASE("Test Stats/NK-Grid", "[stats]"){
+TEST_CASE("Test fitness sharing", "[evo]")
+{
+  size_t POP_SIZE = 100;
 
-  // k controls # of hills in the fitness landscape
-  const int K = 0;
-  const int N = 30;
-  const double MUTATION_RATE = .0001;
+  emp::Random random(1);
+  emp::World<BitOrg> pop(random);
+  pop.SetWellMixed(true);
 
-  const int TOURNAMENT_SIZE = 20;
-  const int POP_SIZE = 100;
-  const int UD_COUNT = 100;
-
-  emp::Random random(123);
-  emp::evo::NKLandscape landscape(N, K, random);
-
-  std::string prefix;
-  prefix = "temp/Result-";
-
-
-  emp::evo::GridWorld<BitOrg, emp::evo::LineagePruned > grid_pop(random);
-  REQUIRE(&(grid_pop.GetRandom()) == &random);
-
-  const size_t side_size = (size_t) std::sqrt((double)POP_SIZE);
-  grid_pop.ConfigPop(side_size, side_size);
-
-  std::function<double(BitOrg *)> fit_func =[&landscape](BitOrg * org) { return landscape.GetFitness(*org);};
-
-  grid_pop.SetDefaultFitnessFun(fit_func);
-
-
-  // Setup some types...
-  using fitM_t = emp::evo::FitnessManager_Dynamic;
-  using popM_t = emp::evo::PopulationManager_Grid<BitOrg, fitM_t>;
-
-  // Make a fitness manager.
-  fitM_t fitM;
-
-  // Make a stats manager
-  emp::evo::StatsManager_AdvancedStats<popM_t> grid_stats (&grid_pop, prefix + "grid.csv");
-
-  grid_stats.SetDefaultFitnessFun(fit_func);
-
-
-    // Insert default organisms into world
+  // Build a random initial population
   for (size_t i = 0; i < POP_SIZE; i++) {
-    BitOrg next_org(N);
-    for (size_t j = 0; j < N; j++) next_org[j] = random.P(0.5);
-
-    // looking at the Insert() func it looks like it does a deep copy, so we should be safe in
-    // doing this. Theoretically...
-    grid_pop.Insert(next_org);
+    BitOrg next_org;
+    for (size_t j = 0; j < N; j++) next_org[j] = 0;
+    pop.Inject(next_org);
   }
 
 
-  // mutation function:
-  // for every site in the gnome there is a MUTATION_RATE chance that the
-  // site will flip it's value.
-  grid_pop.SetDefaultMutateFun( [MUTATION_RATE, N](BitOrg* org, emp::Random& random) {
-      bool mutated = false;
-      for (size_t site = 0; site < N; site++) {
-        if (random.P(MUTATION_RATE)) {
-          (*org)[site] = !(*org)[site];
-          mutated = true;
-        }
-      }
-        return mutated;
-    } );
+  // Setup the (shared) fitness function.
+  pop.SetSharedFitFun( [](BitOrg &org){ return 10 + N - org.CountOnes(); },
+                       [](BitOrg& org1, BitOrg& org2){ return (double)(org1.XOR(org2)).CountOnes();},
+                       10, 1 );
 
 
-  // Loop through updates
-  for (int ud = 0; ud < UD_COUNT; ud++) {
-    // Run a tournament
-    grid_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
-            , TOURNAMENT_SIZE, POP_SIZE);
-
-    grid_pop.Update();
-    grid_pop.MutatePop();
-  }
-
-  std::ifstream correct, test;
-
-  test.open("temp/Result-grid.csv");
-  correct.open("test-data/Result-grid.csv");
-
-  std::string line = "";
-  std::vector<std::string> file1, file2;
-
-  while(getline(correct, line) ) {
-    file1.push_back(line);
-  }
-  while(getline(test, line)) {
-    file2.push_back(line);
-  }
+  REQUIRE(pop.CalcFitnessID(0) == 0.50);
 
 
-  REQUIRE(file1.size() == file2.size());
-  if (file1.size() == file2.size()) {
-    for (size_t i = 0; i < file1.size(); i++) {
-      REQUIRE(file1[i] == file2[i]);
-    }
-  }
+  BitOrg next_org;
+  for (size_t j = 0; j < N; j++) next_org[j] = 1;
+  pop.InjectAt(next_org, POP_SIZE-1);
+  pop.InjectAt(next_org, POP_SIZE-2);
+  pop.InjectAt(next_org, POP_SIZE-3);
+  pop.InjectAt(next_org, POP_SIZE-4);
+  pop.InjectAt(next_org, POP_SIZE-5);
+
+  REQUIRE(pop.CalcFitnessID(0) == Approx(0.526316));
+  REQUIRE(pop.CalcFitnessID(POP_SIZE-1) == 2);
+
+  // Run a tournament...
+  emp::TournamentSelect(pop, 5, POP_SIZE);
+  pop.Update();
+
+  REQUIRE(pop.CalcFitnessID(0) == Approx(0.322581));
+
+  pop.SetFitFun([](const BitOrg &org){ return N - org.CountOnes(); });
+
+  emp::vector<std::function<double(const BitOrg&)> > fit_funs;
+
+  fit_funs.push_back([](const BitOrg &org){ return org.CountOnes(); });
+  fit_funs.push_back([](const BitOrg &org){ return org[0]; });
+  fit_funs.push_back([](const BitOrg &org){ return 1 - org[0]; });
+
+  // pop.SetCache(true);
+
+  emp::EcoSelect(pop, fit_funs, 1000, 5, POP_SIZE);
+
+  // TODO: Come up with better tests for EcoSelect
+
+  std::cout << "--- Grid example ---\n";
+
+  POP_SIZE = 400;
+
+  std::function<void(int &, std::ostream &)> print_fun = [](int & val, std::ostream & os) {
+    val %= 63;
+    if (val < 10) os << (char) ('0' + val);
+    else if (val < 36) os << (char) ('a' + (val - 10));
+    else if (val < 62) os << (char) ('A' + (val - 36));
+    else os << '+';
+  };
+
+  emp::World<int> grid_world(random);
+  const size_t side = (size_t) std::sqrt(POP_SIZE);
+  grid_world.SetGrid(side, side);
+  grid_world.SetPrintFun(print_fun);
+
+  emp_assert(grid_world.GetSize() == POP_SIZE); // POP_SIZE needs to be a perfect square.
+
+  grid_world.InjectAt(30, side+1);
+  grid_world.InjectAt(4, side*(side+1)/2);
+  grid_world.PrintGrid();
+
+  auto fit_fun = [](int & org){ return (double) org; };
+  grid_world.SetSharedFitFun(fit_fun, [](int & a, int & b){ return (double) (a>b)?(a-b):(b-a); }, 3, 1);
+  RouletteSelect(grid_world, 500);
+
+  std::cout << std::endl;
+  grid_world.PrintGrid();
+  std::cout << "Final Org Counts:\n";
+  //   grid_world.PrintOrgCounts(print_fun);
+  //   std::cout << std::endl;
 
 }
 
-TEST_CASE("Test-stats-NK-Mixed","[stats]"){
 
-  // k controls # of hills in the fitness landscape
-  const int K = 0;
-  const int N = 30;
-  const double MUTATION_RATE = .0001;
+TEST_CASE("Test resources", "[evo]")
+{
+  size_t POP_SIZE = 100;
 
-  const int TOURNAMENT_SIZE = 20;
-  const int POP_SIZE = 100;
-  const int UD_COUNT = 100;
+  emp::Random random(1);
+  emp::World<BitOrg> pop(random);
+  pop.SetWellMixed(true);
 
-  emp::Random random(123);
-  emp::evo::NKLandscape landscape(N, K, random);
+  emp::vector<emp::Resource> resources;
+  resources.push_back(emp::Resource(100, 100, .01));
+  resources.push_back(emp::Resource(100, 100, .01));
+  resources.push_back(emp::Resource(100, 100, .01));
 
-  std::string prefix;
-  prefix = "temp/Result-";
+  pop.OnUpdate([&resources](int ud){
+      for (emp::Resource& res : resources) {
+          res.Update();
+      }
+  });
 
-  // Create World
-  MixedWorld<BitOrg> mixed_pop(random);
+  REQUIRE(resources[0].GetAmount() == 100);
 
-  std::function<double(BitOrg *)> fit_func =[&landscape](BitOrg * org) { return landscape.GetFitness(*org);};
+  pop.Update();
 
-  mixed_pop.SetDefaultFitnessFun(fit_func);
+  REQUIRE(resources[0].GetAmount() == Approx(199.0));
 
-  // Setup some types...
-  using fitM_t = emp::evo::FitnessManager_Dynamic;
-  using popM_t = emp::evo::PopulationManager_Base<BitOrg, fitM_t>;
+  pop.Update();
+  pop.Update();
+  pop.Update();
+  pop.Update();
+  pop.Update();
 
-  // Make a fitness manager.
-  fitM_t fitM;
-
-  // Make a stats manager
-  emp::evo::StatsManager_DefaultStats<popM_t> mixed_stats (&mixed_pop, prefix + "mixed.csv");
-
-  mixed_stats.SetDefaultFitnessFun(fit_func);
-
-  // Insert default organisms into world
+  // Build a random initial population
   for (size_t i = 0; i < POP_SIZE; i++) {
-    BitOrg next_org(N);
-    for (size_t j = 0; j < N; j++) next_org[j] = random.P(0.5);
-
-    // looking at the Insert() func it looks like it does a deep copy, so we should be safe in
-    // doing this. Theoretically...
-    mixed_pop.Insert(next_org);
+    BitOrg next_org;
+    for (size_t j = 0; j < N; j++) next_org[j] = 0;
+    pop.Inject(next_org);
   }
 
+  pop.SetFitFun([](const BitOrg &org){ return 10; });
 
-  // mutation function:
-  // for every site in the gnome there is a MUTATION_RATE chance that the
-  // site will flip it's value.
-  mixed_pop.SetDefaultMutateFun( [MUTATION_RATE, N](BitOrg* org, emp::Random& random) {
-    bool mutated = false;
-      for (size_t site = 0; site < N; site++) {
-        if (random.P(MUTATION_RATE)) {
-          (*org)[site] = !(*org)[site];
-          mutated = true;
-        }
-      }
-      return mutated;
-    } );
+  emp::vector<std::function<double(const BitOrg&)> > fit_funs;
 
+  fit_funs.push_back([](const BitOrg &org){ return org.CountOnes()/N; });
+  fit_funs.push_back([](const BitOrg &org){ return org[0]; });
+  fit_funs.push_back([](const BitOrg &org){ return 1 - org[0]; });
 
-  // Loop through updates
-  for (int ud = 0; ud < UD_COUNT; ud++) {
+  emp::ResourceSelect(pop, fit_funs, resources, 5, POP_SIZE);
 
-    // Keep the best individual.
-    //mixed_pop.EliteSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }, 1, 100);
-    // Run a tournament for the rest...
-
-    mixed_pop.TournamentSelect([&landscape](BitOrg * org){ return landscape.GetFitness(*org); }
-			 , TOURNAMENT_SIZE, POP_SIZE);
-
-    mixed_pop.Update();
-    mixed_pop.MutatePop();
-
-  }
-
-
-  std::ifstream correct, test;
-
-  test.open("temp/Result-mixed.csv");
-  correct.open("test-data/Result-mixed.csv");
-
-  std::string line = "";
-  std::vector<std::string> file1, file2;
-
-  while(getline(correct, line) ){
-      file1.push_back(line);
-  }
-  while(getline(test, line)){
-      file2.push_back(line);
-  }
-  REQUIRE(file1.size() == file2.size());
-  if(file1.size() == file2.size()){
-      for(size_t i = 0; i < file1.size(); i++){
-          REQUIRE(file1[i] == file2[i]);
-      }
-  }
+  REQUIRE(resources[2].GetAmount() == Approx(179.347));
 
 }
