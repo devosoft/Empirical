@@ -37,12 +37,12 @@ std::cout << "World build." << std::endl;
   std::function<double(org_t &)> trait2_fun = [](org_t & val){ return (double) (val % 31); };
 
   map_world.SetFitFun(fit_fun);
-  map_world.AddPhenotype("Num Bits", trait1_fun, 0, 13);
+  map_world.AddPhenotype("Num Bits", trait1_fun, 0, 14);
   map_world.AddPhenotype("Mod 31", trait2_fun, 0, 31);
 
 std::cout << "Phenotype functions in place." << std::endl;
 
-  emp::SetMapElites(map_world, {13,31});
+  emp::SetMapElites(map_world, {14,31});
 
 std::cout << "Setup MAP-Elites" << std::endl;
 
@@ -58,10 +58,10 @@ std::cout << "Setup MAP-Elites" << std::endl;
 std::cout << "Setup print functions." << std::endl;
 
   // Start off world with random organism.
-  map_world.Inject(random.GetUInt64(MAX_ORG_DIFF));
+  map_world.Inject(random.GetUInt64(MAX_ORG_DIFF/4));
   map_world.PrintGrid(std::cout, "----");
 
-  for (size_t g = 0; g < GENS; g++) {
+  for (size_t g = 0; g <= GENS; g++) {
     for (size_t i = 0; i < map_world.GetSize(); ++i) {
       size_t id = random.GetUInt(map_world.GetSize());      
       if (map_world.IsOccupied(id)) {
@@ -70,8 +70,10 @@ std::cout << "Setup print functions." << std::endl;
         map_world.DoBirth(offspring , id);
       }
     }
-    std::cout << "UD: " << g << std::endl;
-    map_world.PrintGrid(std::cout, "----");
+    if (g % 50 == 0) {
+      std::cout << "UD: " << g << std::endl;
+      map_world.PrintGrid(std::cout, "----");
+    }
   }
 
 
