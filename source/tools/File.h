@@ -20,6 +20,7 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <set>
 #include <string>
 
 #include "../base/vector.h"
