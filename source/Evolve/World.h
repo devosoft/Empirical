@@ -582,10 +582,15 @@ namespace emp {
 
     /// Change the size of the world based on width and height.
     void Resize(size_t new_width, size_t new_height) {
-      // @CAO: Technically we should allow any number of dimensions.
       Resize(new_width * new_height);
       pop_sizes.resize(2);
       pop_sizes[0] = new_width; pop_sizes[1] = new_height;
+    }
+
+    /// Change the size of the world based on a vector of dimensions.
+    void Resize(const emp::vector<size_t> & dims) {
+      Resize(emp::Product(dims));
+      pop_sizes = dims;
     }
 
     /// AddOrgAt is the core function to add organisms to active population (others must go through here)
@@ -1141,6 +1146,7 @@ namespace emp {
   template<typename ORG>
   void World<ORG>::PrintGrid(std::ostream& os,
                              const std::string & empty, const std::string & spacer) {
+    emp_assert(pop_sizes.size() == 2);
     const size_t size_x = pop_sizes[0];
     const size_t size_y = pop_sizes[1];
     for (size_t y=0; y < size_y; y++) {
