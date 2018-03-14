@@ -5,7 +5,8 @@
 //
 //  This file explores the MAP-Elites selection scheme.
 //
-//  In this example, we will be evolving 
+//  In this example, we will be evolving 4-digit integers.
+//  The two traits measured are nunmber of bits and value mod 31.
 
 #include <iostream>
 
@@ -15,7 +16,7 @@
 
 int main()
 {
-  constexpr size_t GENS = 10000;
+  constexpr size_t GENS = 1000;
 
   // Organisms are unsigned ints.
   using org_t = uint64_t;
@@ -23,8 +24,12 @@ int main()
   constexpr org_t MAX_ORG = 8192;
   constexpr org_t MAX_ORG_DIFF = MAX_ORG - MIN_ORG;
 
+std::cout << "START!" << std::endl;
+
   emp::Random random;
   emp::World<org_t> map_world(random);
+
+std::cout << "World build." << std::endl;
 
   // Fitness = value; trait 1 = num bits; trait 2 = value mod 31
   std::function<double(org_t &)> fit_fun =    [](org_t & val){ return (double) val; };
@@ -35,7 +40,11 @@ int main()
   map_world.AddPhenotype("Num Bits", trait1_fun, 0, 13);
   map_world.AddPhenotype("Mod 31", trait2_fun, 0, 31);
 
+std::cout << "Phenotype functions in place." << std::endl;
+
   emp::SetMapElites(map_world, {13,31});
+
+std::cout << "Setup MAP-Elites" << std::endl;
 
   // Setup the print function to output the appropriate number of characters.
   std::function<void(org_t&,std::ostream &)> print_fun = [](org_t & val, std::ostream & os) {
@@ -46,20 +55,27 @@ int main()
   map_world.SetPrintFun(print_fun);
 
 
+std::cout << "Setup print functions." << std::endl;
+
   // Start off world with random organism.
   map_world.Inject(random.GetUInt64(MAX_ORG_DIFF));
-  map_world.PrintGrid();
+  map_world.PrintGrid(std::cout, "----");
 
   for (size_t g = 0; g < GENS; g++) {
     for (size_t i = 0; i < map_world.GetSize(); ++i) {
-      size_t id = random.GetUInt(map_world.GetSize());
-      if (map_world.IsOccupied(id)) map_world.DoBirth(map_world[id], id);
+      size_t id = random.GetUInt(map_world.GetSize());      
+      if (map_world.IsOccupied(id)) {
+        org_t offspring = map_world[id] + random.GetUInt64(200) - 100;
+        if (offspring > MAX_ORG) continue; // Invalid mutation!  No birth.
+        map_world.DoBirth(offspring , id);
+      }
     }
+    std::cout << "UD: " << g << std::endl;
+    map_world.PrintGrid(std::cout, "----");
   }
 
-  std::cout << std::endl;
-  map_world.PrintGrid();
-  std::cout << "Final Org Counts:\n";
-  map_world.PrintOrgCounts();
+
+  // std::cout << "Final Org Counts:\n";
+  // map_world.PrintOrgCounts();
   std::cout << std::endl;
 }
