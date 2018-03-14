@@ -108,7 +108,6 @@ namespace emp {
     /// Indicate that the associated position has been deleted.
     void MarkDeleted() {
       if (ptr_debug) std::cout << "Marked deleted for pointer " << ptr << std::endl;
-      emp_assert(status != PtrStatus::DELETED, "Deleting same emp::Ptr a second time!");
       status = PtrStatus::DELETED;
     }
 
@@ -243,11 +242,12 @@ namespace emp {
     void MarkDeleted(size_t id) {
 #ifdef EMP_ABORT_PTR_DELETE
       if (id == EMP_ABORT_PTR_DELETE) {
-        std::cerr << "Aborting at creation of Ptr id " << id << std::endl;
+        std::cerr << "Aborting at deletion of Ptr id " << id << std::endl;
         abort();
       }
 #endif
       if (ptr_debug) std::cout << "Delete: " << id << std::endl;
+      emp_assert(id_info[id].IsActive(), "Deleting same emp::Ptr a second time!", id);
       id_info[id].MarkDeleted();
     }
   };
@@ -768,11 +768,13 @@ namespace emp {
     return is;
   }
 
-
-  // Create a helper to replace & operator.
+  /// Convert a T* to a Ptr<T>.  By default, don't track.
   template <typename T> Ptr<T> ToPtr(T * _in, bool own=false) { return Ptr<T>(_in, own); }
+
+  /// Convert a T* to a Ptr<T> that we DO track.
   template <typename T> Ptr<T> TrackPtr(T * _in, bool own=true) { return Ptr<T>(_in, own); }
 
+  /// Create a new Ptr of the target type; use the args in the constructor.
   template <typename T, typename... ARGS> Ptr<T> NewPtr(ARGS &&... args) {
     //auto ptr = new T(std::forward<ARGS>(args)...);
     auto ptr = (T*) malloc (sizeof(T));         // Build a new raw pointer.
@@ -781,6 +783,24 @@ namespace emp {
     return Ptr<T>(ptr, true);
   }
 
+  /// Copy an object pointed to and return a Ptr to the copy.
+  template <typename T> Ptr<T> CopyPtr(Ptr<T> in) { return NewPtr<T>(*in); }
+
+  /// Copy a vector of objects pointed to; return a vector of Ptrs to the new copies.
+  template <typename T> emp::vector<Ptr<T>> CopyPtrs(const emp::vector<Ptr<T>> & in) {
+    emp::vector<Ptr<T>> out_ptrs(in.size());
+    for (size_t i = 0; i < in.size(); i++) out_ptrs[i] = CopyPtr(in[i]);
+    return out_ptrs;
+  }
+
+  /// Copy a vector of objects pointed to by using their Clone() member function; return vector.
+  template <typename T> emp::vector<Ptr<T>> ClonePtrs(const emp::vector<Ptr<T>> & in) {
+    emp::vector<Ptr<T>> out_ptrs(in.size());
+    for (size_t i = 0; i < in.size(); i++) out_ptrs[i] = in[i]->Clone();
+    return out_ptrs;
+  }
+
+  /// Create a pointer to an array of objects.
   template <typename T, typename... ARGS> Ptr<T> NewArrayPtr(size_t array_size, ARGS &&... args) {
     //auto ptr = new T[array_size];
     const size_t alloc_size = array_size * sizeof(T);

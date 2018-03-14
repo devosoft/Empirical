@@ -355,6 +355,16 @@ namespace emp {
     while (is_whitespace(in_string.back())) in_string.pop_back();
   }
 
+  /// Remove instances of characters from file.
+  static inline void remove_chars(std::string & in_string, std::string chars) {
+    size_t cur_pos = 0;
+    for (size_t i = 0; i < in_string.size(); i++) {
+      if (is_one_of(in_string[i], chars)) continue;
+      in_string[cur_pos++] = in_string[i];
+    }
+    in_string.resize(cur_pos);
+  }
+
   /// Every time one or more whitespace characters appear replace them with a single space.
   static inline void compress_whitespace(std::string & in_string) {
     const size_t strlen = in_string.size();

@@ -405,15 +405,6 @@ namespace emp {
 
     // NOTE: Ignoring AddDatum() since Range values track current information.
 
-    // /// Add @param val to the DataNode
-    // void AddDatum(const VAL_TYPE & val) {
-    //   total_vals.back() += val;
-    //   num_vals.back() += 1;
-    //   if (!val_count || val < min_vals.back()) min_vals.back() = val;
-    //   if (!val_count || val > max_vals.back()) max_vals.back() = val;
-    //   parent_t::AddDatum(val);
-    // }
-
     /// Store the current range statistics in the archive and reset for a new interval.
     void Reset() {
       total_vals.push_back(total);
@@ -463,7 +454,7 @@ namespace emp {
     using parent_t::GetMean;
 
     /// Get the variance (squared deviation from the mean) of values added since the last reset
-    double GetVariance() const {return M2/val_count;}
+    double GetVariance() const {return M2/(double)val_count;}
     
     /// Get the standard deviation of values added since the last reset
     double GetStandardDeviation() const {return sqrt(GetVariance());}
@@ -483,17 +474,16 @@ namespace emp {
 
     /// Add @param val to this DataNode
     void AddDatum(const VAL_TYPE & val) {
-      double delta, delta_n, delta_n2, term1;
-      int n = val_count + 1;
-
       // Calculate deviation from mean (the ternary avoids dividing by
       // 0 in the case where this is the first datum added since last reset)
-      delta = val - (total/((val_count > 0) ? val_count : 1));
-      delta_n = delta / n;
-      delta_n2 = delta_n * delta_n;
-      term1 = delta * delta_n * val_count;
-      M4 += term1 * delta_n2 * (n*n - 3*n + 3) + 6 * delta_n2 * M2 - 4 * delta_n * M3;
-      M3 += term1 * delta_n * (n - 2) - 3 * delta_n * M2;
+      const double n = (double) (val_count + 1);
+      const double delta = ((double) val) - (total/((val_count > 0) ? (double) val_count : 1.0));
+      const double delta_n = delta / n;
+      const double delta_n2 = delta_n * delta_n;
+      const double term1 = delta * delta_n * (double) val_count;
+
+      M4 += term1 * delta_n2 * (n*n - 3.0*n + 3.0) + 6.0 * delta_n2 * M2 - 4.0 * delta_n * M3;
+      M3 += term1 * delta_n * (n - 2.0) - 3.0 * delta_n * M2;
       M2 += term1;
 
       parent_t::AddDatum(val);
