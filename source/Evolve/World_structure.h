@@ -89,9 +89,7 @@ namespace emp {
                     const emp::vector<size_t> & trait_counts) {
     using org_pos_t = typename World<ORG>::OrgPosition;
 
-    // For consistency with other population structures, we are leaving the option.
-    const size_t pop_size = Product(trait_counts);  // Pop position for each combo of traits.
-    world.Resize(pop_size);
+    world.Resize(trait_counts);  // World sizes are based on counts of traits options.
     world.MarkSynchronous(false);
     world.MarkSpaceStructured(false).MarkPhenoStructured(true);
 
