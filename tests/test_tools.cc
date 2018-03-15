@@ -30,6 +30,7 @@
 #include "tools/RegEx.h"
 #include "tools/Random.h"
 #include "tools/TypeTracker.h"
+#include "tools/attrs.h"
 
 #include "tools/flex_function.h"
 #include "tools/functions.h"
@@ -57,6 +58,15 @@
 #include "tools/SolveState.h"
 #include "tools/serialize_macros.h"
 
+/// Ensures that
+/// 1) A == B
+/// 2) A and B can be constexprs or non-contexprs.
+/// 3) A and B have the same values regardless of constexpr-ness.
+#define CONSTEXPR_REQUIRE_EQ(A, B)       \
+  {                                      \
+    static_assert(A == B, #A " == " #B); \
+    REQUIRE(A == B);                     \
+  }
 
 // this templating is necessary to force full coverage of templated classes.
 // Since c++ doesn't generate code for templated methods if those methods aren't
@@ -1259,15 +1269,15 @@ TEST_CASE("Test stats", "[tools]") {
 
   REQUIRE(emp::Sum(vec1) == 10);
   REQUIRE(emp::Sum(vec2) == 5);
-  REQUIRE(emp::Sum(deque1) == 27);  
+  REQUIRE(emp::Sum(deque1) == 27);
 
   REQUIRE(emp::UniqueCount(vec1) == 3);
   REQUIRE(emp::UniqueCount(vec2) == 2);
-  REQUIRE(emp::UniqueCount(deque1) == 4);  
+  REQUIRE(emp::UniqueCount(deque1) == 4);
 
   REQUIRE(emp::Mean(vec1) == Approx(1.6666666666667));
   REQUIRE(emp::Mean(vec2) == Approx(1.25));
-  REQUIRE(emp::Mean(deque1) == 4.5);  
+  REQUIRE(emp::Mean(deque1) == 4.5);
 
   std::function<int(int)> invert = [](int i){return i*-1;};
 
@@ -1279,9 +1289,9 @@ TEST_CASE("Test stats", "[tools]") {
 }
 
 TEST_CASE("Test set utils", "[tools]") {
-  std::set<int> s1; 
-  std::set<int> s2; 
-  std::set<int> comp_set; 
+  std::set<int> s1;
+  std::set<int> s2;
+  std::set<int> comp_set;
   emp::vector<int> v1;
   emp::vector<int> v2;
 
@@ -1365,4 +1375,158 @@ TEST_CASE("Test vector utils", "[tools]") {
   REQUIRE(!emp::Has(v1, 4));
   REQUIRE(emp::Product(v1) == 180);
   REQUIRE(emp::Slice(v1,1,3) == emp::vector<int>({2,3}));
+}
+
+DEFINE_ATTR(Foo);
+DEFINE_ATTR(Bar);
+DEFINE_ATTR(Bazz);
+
+struct ident_t {
+  template <typename T>
+  constexpr decltype(auto) operator()(T&& value) const {
+    return std::forward<T>(value);
+  }
+};
+
+constexpr ident_t ident{};
+
+template <typename T>
+struct Callable {
+  T value;
+
+  constexpr decltype(auto) operator()() & { return value; }
+  constexpr decltype(auto) operator()() const & { return value; }
+  constexpr decltype(auto) operator()() && { return std::move(value); }
+  constexpr decltype(auto) operator()() const && { return std::move(value); }
+};
+template <typename T>
+constexpr Callable<std::decay_t<T>> callable(T&& value) {
+  return {std::forward<T>(value)};
+}
+
+struct NoCopy {
+  int value;
+  constexpr NoCopy(int value) : value(value) {}
+  constexpr NoCopy(const NoCopy&) = delete;
+  constexpr NoCopy(NoCopy&&) = default;
+
+  constexpr NoCopy& operator=(const NoCopy&) = delete;
+  constexpr NoCopy& operator=(NoCopy&&) = default;
+};
+constexpr bool operator==(const NoCopy& a, const NoCopy& b) {
+  return a.value == b.value;
+}
+std::ostream& operator<<(std::ostream& out, const NoCopy& nc) {
+  return out << "NoCopy{" << nc.value << "}";
+}
+
+struct {
+  template <typename I, typename T>
+  constexpr auto operator()(I&& init, T&& value) const {
+    return std::forward<I>(init) + std::forward<T>(value).Get();
+  }
+
+  template <typename I, typename T>
+  constexpr auto operator()(const char* name, I&& init, T&& value) const {
+    return std::forward<I>(init) + std::forward<T>(value);
+  }
+} sum;
+
+struct {
+  template <typename I, typename A, typename B>
+  constexpr auto operator()(I&& init, A&& a, B&& b) const {
+    return std::forward<I>(init) +
+           (std::forward<A>(a).Get() * std::forward<B>(b).Get());
+  }
+} dot;
+
+struct {
+  template <typename I, typename T>
+  constexpr NoCopy operator()(I&& init, T&& value) const {
+    return {std::forward<I>(init).value + std::forward<T>(value).Get().value};
+  }
+
+  template <typename I, typename T>
+  constexpr NoCopy operator()(const char* name, I&& init, T&& value) const {
+    return {std::forward<I>(init).value + std::forward<T>(value).value};
+  }
+} sum_nocopy;
+
+TEST_CASE("Test Attribute Packs", "[tools]") {
+  using namespace emp::tools;
+  // Test Construction & access
+  CONSTEXPR_REQUIRE_EQ(Foo::CallOrGetAttribute(Foo(6)).Get(), 6);
+  CONSTEXPR_REQUIRE_EQ(Foo::CallOrGetAttribute(Foo(callable(7))).Get(), 7);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrElse(Foo(7), callable(0)), 7);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrElse(Foo(7) + Bar(6), callable(0)), 7);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrElse(Bazz(7) + Bar(6), callable(0)), 0);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrGetIn(Bazz(1), Bar(2), Foo(3)), 3);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrGetIn(Bazz(1), Foo(3), Foo(2)), 3);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrGetIn(Foo(3), Bar(2), Bazz(1)), 3);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrGetIn(Foo(3), Bar(2)), 3);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrGetIn(Bar(2), Foo(3)), 3);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrGetIn(Foo(3)), 3);
+
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOr(Foo(7), 0), 7);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOr(Foo(7) + Bar(6), 0), 7);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOr(Bazz(7) + Bar(6), 0), 0);
+
+  CONSTEXPR_REQUIRE_EQ(Foo(5) + Bar(6), Foo(5) + Bar(6));
+
+  // Test NoCopy
+  CONSTEXPR_REQUIRE_EQ(Foo::CallOrGetAttribute(Foo(NoCopy{7})).Get(),
+                       NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(Foo::CallOrGetAttribute(Foo(callable(NoCopy{7}))).Get(),
+                       NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrElse(Foo(NoCopy{7}), callable(NoCopy{0})),
+                       NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(
+    Foo::GetOrElse(Foo(NoCopy{7}) + Bar(NoCopy{6}), callable(NoCopy{7})),
+    NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(
+    Foo::GetOrElse(Bazz(NoCopy{7}) + Bar(NoCopy{6}), callable(NoCopy{0})),
+    NoCopy{0});
+
+  CONSTEXPR_REQUIRE_EQ(
+    Foo::GetOrGetIn(Bazz(NoCopy{1}), Bar(NoCopy{2}), Foo(NoCopy{3})),
+    NoCopy{3});
+  CONSTEXPR_REQUIRE_EQ(
+    Foo::GetOrGetIn(Bazz(NoCopy{1}), Foo(NoCopy{3}), Foo(NoCopy{2})),
+    NoCopy{3});
+  CONSTEXPR_REQUIRE_EQ(
+    Foo::GetOrGetIn(Foo(NoCopy{3}), Bar(NoCopy{2}), Bazz(NoCopy{1})),
+    NoCopy{3});
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrGetIn(Foo(NoCopy{3}), Bar(NoCopy{2})),
+                       NoCopy{3});
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrGetIn(Bar(NoCopy{2}), Foo(NoCopy{3})),
+                       NoCopy{3});
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrGetIn(Foo(NoCopy{3})), NoCopy{3});
+
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOr(Foo(NoCopy{7}), NoCopy{0}), NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOr(Foo(NoCopy{7}) + Bar(NoCopy{6}), NoCopy{0}),
+                       NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOr(Bazz(NoCopy{7}) + Bar(NoCopy{6}), NoCopy{0}),
+                       NoCopy{0});
+
+  CONSTEXPR_REQUIRE_EQ(Foo(NoCopy{5}) + Bar(NoCopy{6}),
+                       Foo(NoCopy{5}) + Bar(NoCopy{6}));
+
+  // Test Mapping
+  CONSTEXPR_REQUIRE_EQ((Foo(ident) + Bar(6))(5), Foo(5) + Bar(6));
+  CONSTEXPR_REQUIRE_EQ((Foo(ident) + Bar(6))(5), Foo(5) + Bar(6));
+
+  CONSTEXPR_REQUIRE_EQ((Bar(6) + Foo(ident))(NoCopy{5}),
+                       Foo(NoCopy{5}) + Bar(6));
+
+  CONSTEXPR_REQUIRE_EQ((Bar(NoCopy{6}) + Foo(ident))(5),
+                       Foo(5) + Bar(NoCopy{6}));
+
+  CONSTEXPR_REQUIRE_EQ((Bar(5) + Foo(6)).Reduce(0, sum), 11);
+  CONSTEXPR_REQUIRE_EQ(
+    (Bar(NoCopy{5}) + Foo(NoCopy{6})).Reduce(NoCopy{0}, sum_nocopy),
+    NoCopy{11});
+  CONSTEXPR_REQUIRE_EQ(MergeReduce(0, sum, Bar(6) + Foo(7)), 6 + 7);
+  // CONSTEXPR_REQUIRE_EQ(MergeReduce(0, [](auto init, auto& a, auto& b) {return
+  // init + a.Get() * b.Get();}, Bar(6) + Foo(7), Bar(11) + Foo(12)),
+  //                      6 + 7);
 }
