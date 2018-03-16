@@ -74,6 +74,8 @@ namespace emp {
 
     using Region2f = Region<float, 2>;
     using Region2d = Region<double, 2>;
+    using Region3f = Region<float, 3>;
+    using Region3d = Region<double, 3>;
 
   }  // namespace math
 }  // namespace emp

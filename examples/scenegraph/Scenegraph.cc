@@ -12,10 +12,6 @@
 #include "math/LinAlg.h"
 #include "math/consts.h"
 #include "opengl/glcanvas.h"
-#include "plot/flow.h"
-#include "plot/line.h"
-#include "plot/scales.h"
-#include "plot/scatter.h"
 #include "scenegraph/camera.h"
 #include "scenegraph/core.h"
 #include "scenegraph/shapes.h"
@@ -29,22 +25,52 @@ int main(int argc, char* argv[]) {
   using namespace emp::math;
   using namespace emp::scenegraph;
   using namespace emp::scenegraph::shapes;
-  using namespace emp::plot;
-  using namespace emp::plot::attrs;
 
   GLCanvas canvas;
-  Group root;
-  auto rect = std::make_shared<Transform<Rectangle>>(canvas);
-  rect->translate(10, 10);
-  root.attachAll(rect);
 
-  PerspectiveCamera camera(canvas.getRegion());
+  Region3f region{{-100, -100, -100}, {100, 100, 100}};
+
+  Stage stage(region);
+
+  // stage.MakeRoot<Group>()->Attach(
+  //   std::make_shared<Transform<Rectangle>>(canvas, 1.f, Color::red()));
+
+  stage.MakeRoot<Group>()->Fill(100, [&canvas](auto...) {
+    auto r =
+      std::make_shared<Transform<Rectangle>>(canvas, 5.f, Color::red(1, 0.5));
+
+    r->translate(rand() % 50 - 25, rand() % 50 - 25, 0);
+
+    return r;
+  });
+
+  OrthoCamera camera(region);
+
+  // PerspectiveCamera camera(consts::pi<float> / 4,
+  //                          canvas.getWidth() / (float)canvas.getHeight(),
+  //                          0.1, 100);
+
+  SimpleEye eye;
+  eye.LookAt({40, 30, 30}, {0, 0, 0}, {0, 0, -1});
+  // eye.LookAt({10, 10, 10}, {0, 1, 0}, {0, 0, 0});
+
+  // canvas.on_mouse_event.bind(
+  //   [&camera, &depth, &eye](auto&, const MouseEvent& event) {
+  //     // if (event.button.Clicked()) {
+  //     //   if (event.button.button == MouseEvent::Button::Left) {
+  //     //     camera.next();
+  //     //   } else {
+  //     //     ++depth;
+  //     //     eye.LookAt({0, 0, depth}, {0, 1, 0}, {0, 0, 0});
+  //     //   }
+  //     // }
+  //   });
 
   canvas.runForever([&](auto&&) {
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    root.render(camera);
+    stage.Render(camera, eye);
   });
 
   return 0;

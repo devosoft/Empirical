@@ -116,7 +116,7 @@ namespace emp {
 
       virtual ~Scatter() {}
 
-      void renderRelative(const scenegraph::Camera& camera,
+      void RenderRelative(const scenegraph::RenderSettings& settings,
                           const math::Mat4x4f& transform) {
         using namespace emp::math;
         using namespace emp::opengl;
@@ -126,8 +126,8 @@ namespace emp {
         verticesBuffer.bind();
         trianglesBuffer.bind();
 
-        shader.projection = camera.getProjection();
-        shader.view = camera.getView();
+        shader.projection = settings.projection;
+        shader.view = settings.view;
 
         for (auto& pt : points) {
           Mat4x4f model;
@@ -145,9 +145,9 @@ namespace emp {
         points.clear();
 
         for (; begin != end; ++begin) {
-          auto model = Mat4x4f::translation(XyzScaled::Get(*begin).x(),
+          auto model = Mat4x4f::Translation(XyzScaled::Get(*begin).x(),
                                             XyzScaled::Get(*begin).y(), 0) *
-                       Mat4x4f::scale(PointSize::Get(*begin));
+                       Mat4x4f::Scale(PointSize::Get(*begin));
 
           points.push_back({model, Fill::Get(*begin)});
         }

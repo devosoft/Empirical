@@ -100,8 +100,8 @@ namespace emp {
       }
       virtual ~Line() {}
 
-      void renderRelative(const scenegraph::Camera& camera,
-                          const math::Mat4x4f& transform) {
+      void RenderRelative(const scenegraph::RenderSettings& settings,
+                          const math::Mat4x4f& transform) override {
         using namespace emp::math;
         if (elementCount > 0) {
           shader.program.use();
@@ -109,9 +109,9 @@ namespace emp {
           verticiesBuffer.bind();
           trianglesBuffer.bind();
 
-          shader.model = transform * Mat4x4f::translation(0, 0);
-          shader.projection = camera.getProjection();
-          shader.view = camera.getView();
+          shader.model = transform * Mat4x4f::Translation(0, 0);
+          shader.projection = settings.projection;
+          shader.view = settings.view;
 
           glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_INT, 0);
         }
@@ -140,7 +140,7 @@ namespace emp {
         auto middleStroke{Stroke::Get(*begin)};
         auto middleStrokeWeight{StrokeWeight::Get(*begin) * 0.5f};
 
-        auto segment = (middle - start).normalized();
+        auto segment = (middle - start).Normalized();
         Vec2f normal{-segment.y(), segment.x()};
 
         // Place the first two verticies into the list of vertices
@@ -155,12 +155,12 @@ namespace emp {
           auto stroke{Stroke::Get(*begin)};
           auto weight{StrokeWeight::Get(*begin) * 0.5f};
 
-          auto segment1 = (middle - start).normalized();
+          auto segment1 = (middle - start).Normalized();
           Vec2f normal1{-segment1.y(), segment1.x()};
-          auto segment2 = (end - middle).normalized();
+          auto segment2 = (end - middle).Normalized();
           Vec2f normal2{-segment2.y(), segment2.x()};
 
-          auto center{(normal1 + normal2).normalized()};
+          auto center{(normal1 + normal2).Normalized()};
 
           verts.push_back(__Shader::point_t{middle, center, middleStrokeWeight,
                                             middleStroke});
@@ -185,7 +185,7 @@ namespace emp {
           middleStrokeWeight = std::move(weight);
         }
 
-        segment = (middle - start).normalized();
+        segment = (middle - start).Normalized();
         normal = {-segment.y(), segment.x()};
 
         verts.push_back(

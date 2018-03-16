@@ -74,14 +74,17 @@ namespace emp {
         opengl::BufferObject<opengl::BufferType::ElementArray> trianglesBuffer;
 
         public:
+        float size;
         opengl::Color fill;
 
-        Rectangle(opengl::GLCanvas& canvas)
+        Rectangle(opengl::GLCanvas& canvas, float size = 2,
+                  const opengl::Color& fill = {0, 0, 0, 1})
           : shader(canvas),
             verticesBuffer(canvas.makeBuffer<opengl::BufferType::Array>()),
             trianglesBuffer(
               canvas.makeBuffer<opengl::BufferType::ElementArray>()),
-            fill{0, 0, 0, 1} {
+            size{size},
+            fill{fill} {
           using namespace emp::opengl;
           using namespace emp::math;
 
@@ -102,18 +105,17 @@ namespace emp {
 
         virtual ~Rectangle() {}
 
-        void renderRelative(const Camera& camera,
+        void RenderRelative(const RenderSettings& settings,
                             const math::Mat4x4f& transform) {
           using namespace emp::math;
           using namespace emp::opengl;
           shader.program.use();
           shader.vao.bind();
 
-          shader.projection = camera.getProjection();
-          shader.view = camera.getView();
+          shader.projection = settings.projection;
+          shader.view = settings.view;
 
-          shader.model = transform * Mat4x4f::scale(10);
-
+          shader.model = transform * Mat4x4f::Scale(size);
           shader.color = fill;
 
           glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

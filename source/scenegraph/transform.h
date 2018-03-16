@@ -13,18 +13,18 @@ namespace emp {
 
       template <class... U>
       Transform(U&&... args)
-        : T{std::forward<U>(args)...}, transform{math::Mat4x4f::identity()} {}
+        : T{std::forward<U>(args)...}, transform{math::Mat4x4f::Identity()} {}
 
       template <class... U>
       Transform& translate(U&&... args) {
         transform =
-          transform * math::Mat4x4f::translation(std::forward<U>(args)...);
+          transform * math::Mat4x4f::Translation(std::forward<U>(args)...);
         return *this;
       }
 
-      void renderRelative(const Camera& camera,
-                          const math::Mat4x4f& transform) {
-        T::renderRelative(camera, this->transform * transform);
+      void RenderRelative(const RenderSettings& settings,
+                          const math::Mat4x4f& transform) override {
+        T::RenderRelative(settings, this->transform * transform);
       }
     };
   }  // namespace scenegraph
