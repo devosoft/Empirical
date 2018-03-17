@@ -33,16 +33,16 @@ namespace emp {
     using fun_t = void(std::ostream &);
     using time_fun_t = std::function<bool(size_t)>;
 
-    std::string filename;
-    std::ostream * os;
-    FunctionSet<fun_t> funs;
-    emp::vector<std::string> keys;
-    emp::vector<std::string> descs;
-    time_fun_t timing_fun;
+    std::string filename;            ///< Name of the file that we are printing to (if one exists)
+    std::ostream * os;               ///< Stream to print to.
+    FunctionSet<fun_t> funs;         ///< Set of functions to call, one per column in the file.
+    emp::vector<std::string> keys;   ///< Keywords associated with each column.
+    emp::vector<std::string> descs;  ///< Full description for each column.
+    time_fun_t timing_fun;           ///< Function to determine updates to print on (default: all)
 
-    std::string line_begin;   ///< What should we print at the start of each line?
-    std::string line_spacer;  ///< What should we print between entries?
-    std::string line_end;     ///< What should we print at the end of each line?
+    std::string line_begin;          ///< What should we print at the start of each line?
+    std::string line_spacer;         ///< What should we print between entries?
+    std::string line_end;            ///< What should we print at the end of each line?
 
   public:
     DataFile(const std::string & in_filename,
