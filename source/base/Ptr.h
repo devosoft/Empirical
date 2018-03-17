@@ -445,7 +445,7 @@ namespace emp {
       DebugInfo().AddPtr();
     }
 
-    /// Delete this pointer (ust NOT be an array).
+    /// Delete this pointer (must NOT be an array).
     void Delete() {
       emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
       emp_assert(ptr, "Deleting null Ptr.");
