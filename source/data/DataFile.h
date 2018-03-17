@@ -32,6 +32,7 @@ namespace emp {
   protected:
     using fun_t = void(std::ostream &);
 
+    std::string filename;
     std::ostream * os;
     FunctionSet<fun_t> funs;
     emp::vector<std::string> keys;
@@ -42,19 +43,22 @@ namespace emp {
     std::string line_end;     ///< What should we print at the end of each line?
 
   public:
-    DataFile(const std::string & filename,
+    DataFile(const std::string & in_filename,
              const std::string & b="", const std::string & s=", ", const std::string & e="\n")
-      : os(new std::ofstream(filename)), funs(), keys(), descs()
+      : filename(in_filename), os(new std::ofstream(in_filename)), funs(), keys(), descs()
       , line_begin(b), line_spacer(s), line_end(e) { ; }
     DataFile(std::ostream & in_os,
              const std::string & b="", const std::string & s=", ", const std::string & e="\n")
-      : os(&in_os), funs(), keys(), descs(), line_begin(b), line_spacer(s), line_end(e) { ; }
+      : filename(), os(&in_os), funs(), keys(), descs(), line_begin(b), line_spacer(s), line_end(e) { ; }
     DataFile(const DataFile &) = default;
     DataFile(DataFile &&) = default;
     ~DataFile() { os->flush(); }
 
     DataFile & operator=(const DataFile &) = default;
     DataFile & operator=(DataFile &&) = default;
+
+    /// Get the filename used for this file.
+    const std::string & GetFilename() const { return filename; }
 
     /// Returns the string that is printed at the beginning of each line.
     const std::string & GetLineBegin() const { return line_begin; }
