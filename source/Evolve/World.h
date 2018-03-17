@@ -106,7 +106,7 @@ namespace emp {
       bool IsValid() const { return index != (size_t) -1; }
 
       OrgPosition & SetActive(bool _active=true) { is_active = _active; return *this; }
-      OrgPosition & SetIndex(size_t _id) { index = _id; return *this; }      
+      OrgPosition & SetIndex(size_t _id) { index = _id; return *this; }
     };
 
     // --- Publicly available types ---
@@ -124,7 +124,7 @@ namespace emp {
     /// Function type for calculating the distance between two organisms.
     using fun_calc_dist_t    = std::function<double(ORG&,ORG&)>;
 
-    /// Function type for a mutation operator on an organisms.
+    /// Function type for a mutation operator on an organism.
     using fun_do_mutations_t = std::function<size_t(ORG&,Random&)>;
 
     /// Function type for printing an organism's info to an output stream.
@@ -474,13 +474,13 @@ namespace emp {
     /// Return:   Key value needed to make future modifications.
     SignalKey OnOrgPlacement(const std::function<void(size_t)> & fun) { return org_placement_sig.AddAction(fun); }
 
-    /// Privide a function for World to call each time Update() is run.
+    /// Provide a function for World to call each time Update() is run.
     /// Trigger:  New update is starting
     /// Argument: Update number (sequentially increasing)
     /// Return:   Key value needed to make future modifications.
     SignalKey OnUpdate(const std::function<void(size_t)> & fun) { return on_update_sig.AddAction(fun); }
 
-    /// Privide a function for World to call each time an organism is about to die.
+    /// Provide a function for World to call each time an organism is about to die.
     /// Trigger:  Organism is about to be killed
     /// Argument: Position of organism about to die
     /// Return:   Key value needed to make future modifications.
