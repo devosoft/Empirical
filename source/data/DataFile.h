@@ -24,19 +24,21 @@
 
 namespace emp {
 
-  /** This class keeps track of everything associated with periodically printing data to a file.
-   * It maintains a set of functions for calculating the desired measurements at each point in
-   * time that they are required. It also handles the formating of the file.
-   */
+  /// Keep track of everything associated with periodically printing data to a file.
+  /// Maintain a set of functions for calculating the desired measurements at each point in
+  /// time that they are required. It also handles the formating of the file.
+
   class DataFile {
   protected:
     using fun_t = void(std::ostream &);
+    using time_fun_t = std::function<bool(size_t)>;
 
     std::string filename;
     std::ostream * os;
     FunctionSet<fun_t> funs;
     emp::vector<std::string> keys;
     emp::vector<std::string> descs;
+    time_fun_t timing_fun;
 
     std::string line_begin;   ///< What should we print at the start of each line?
     std::string line_spacer;  ///< What should we print between entries?
@@ -46,10 +48,12 @@ namespace emp {
     DataFile(const std::string & in_filename,
              const std::string & b="", const std::string & s=", ", const std::string & e="\n")
       : filename(in_filename), os(new std::ofstream(in_filename)), funs(), keys(), descs()
+      , timing_fun([](size_t){return true;})
       , line_begin(b), line_spacer(s), line_end(e) { ; }
     DataFile(std::ostream & in_os,
              const std::string & b="", const std::string & s=", ", const std::string & e="\n")
-      : filename(), os(&in_os), funs(), keys(), descs(), line_begin(b), line_spacer(s), line_end(e) { ; }
+      : filename(), os(&in_os), funs(), keys(), descs(), timing_fun([](size_t){return true;})
+      , line_begin(b), line_spacer(s), line_end(e) { ; }
     DataFile(const DataFile &) = default;
     DataFile(DataFile &&) = default;
     ~DataFile() { os->flush(); }
@@ -66,6 +70,32 @@ namespace emp {
     const std::string & GetSpacer() const { return line_spacer; }
     /// Returns the string that is printed at the end of each line.
     const std::string & GetLineEnd() const { return line_end; }
+
+    /// Provide a timing function with a bool(size_t update) signature.  The timing function is
+    /// called with the update, and returns a bool to indicate if files should print this update.
+    void SetTiming(time_fun_t fun) { timing_fun = fun; }
+
+    /// Setup this file to print only once, at the specified update.  Note that this timing
+    /// function can be replaced at any time, even after being triggered.
+    void SetTimingOnce(size_t print_time) {
+      timing_fun = [print_time](size_t update) { return update == print_time; };
+    }
+
+    /// Setup this file to print every 'step' updates.
+    void SetTimingRepeat(size_t step) {
+      emp_assert(step > 0);
+      timing_fun = [step](size_t update) { return update % step == 0; };
+    }
+
+    /// Setup this file to print only in a specified time range, and a given frequency (step).
+    void SetTimingRange(size_t first, size_t step, size_t last) {
+      emp_assert(step > 0);
+      emp_assert(first < last);
+      timing_fun = [first,step,last](size_t update) {
+	      if (update < first || update > last) return false;
+	      return ((update - first) % step) == 0;
+      };
+    }
 
     /// Print @param _in at the beginning of each line.
     void SetLineBegin(const std::string & _in) { line_begin = _in; }
@@ -109,6 +139,11 @@ namespace emp {
       *os << line_end;
       os->flush();
     }
+
+    /// If Update is called with an update number, call the full version of update only if the update value
+    /// passes the timing function (that is, the timing function returns true).
+    void Update(size_t update) { if (timing_fun(update)) Update(); }
+
 
     /// If a function takes an ostream, pass in the correct one.
     /// Generic function for adding a column to the DataFile. In practice, you probably
