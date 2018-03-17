@@ -260,6 +260,14 @@ namespace emp {
     /// What phenotypic traits is the population tracking?
     const emp::TraitSet<ORG> & GetPhenotypes() const { return phenotypes; }
 
+    /// Lookup a file by name.
+    World_file & GetFile(const std::string & filename) {
+      for (World_file & file : files) {
+        if (file.GetFilename() == filename) return file;
+      }
+      emp_assert(!"Trying to lookup a file that does not exist.", filename);
+    }
+
     /// Does the specified cell ID have an organism in it?
     bool IsOccupied(size_t i) const { return pop[i] != nullptr; }
 
