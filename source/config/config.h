@@ -83,14 +83,28 @@ namespace emp {
     ConfigEntry & SetDefault(const std::string & _in) { default_val = _in; return *this; }
     ConfigEntry & SetDescription(const std::string & _in) { desc = _in; return *this; }
 
+    /// Alert this setting that it is aliased to alternate possible names.
     ConfigEntry & AddAlias(const std::string & _in) { alias_set.insert(_in); return *this; }
+
+    /// Are there any alternate names for this setting?
     bool HasAlias(const std::string & _in) { return alias_set.find(_in) != alias_set.end(); }
+
+    /// Will the provided name match this setting?
     bool IsMatch(const std::string & _in) { return name == _in || HasAlias(_in); }
+
+    /// Retrieve the full set of aliases.
     const std::unordered_set<std::string> & GetAliases() { return alias_set; }
 
+    /// Retrieve the value of this setting as a string.
     virtual std::string GetValue() const = 0;
+
+    /// Conver the value of this setting into a literal that C++ would recognize as its current value.
     virtual std::string GetLiteralValue() const = 0;
+
+    /// Use a string to set the value of this setting.
     virtual ConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) = 0;
+
+    /// Identify if this setting is fixed at compile time.
     virtual bool IsConst() const = 0;
   };
 
