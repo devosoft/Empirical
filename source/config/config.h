@@ -479,8 +479,8 @@ namespace emp {
     }
 
 
-    // Read in from a text representation (typically a file) to set the state of Config.
-    // Return success state.
+    /// Read in from a text representation (typically a file) to set the state of Config.
+    /// Return success state.
     bool Read(std::istream & input) {
       // Load in the file one line at a time and process each line.
       std::string cur_line, extras;
@@ -494,7 +494,6 @@ namespace emp {
         if (cur_line == "") continue;          // Skip empty lines.
 
         std::string command = emp::string_pop_word(cur_line);
-        emp::right_justify(cur_line);
 
         if (command == "include") {
           // Recursively include another configuration file.
@@ -504,6 +503,7 @@ namespace emp {
         else if (command == "new") {
           std::string type_name = emp::string_pop_word(cur_line);
           // @CAO Make sure type exists!
+          // @CAO Make sure remainder of line is a single identifier.
           new_map[type_name](cur_line);
         }
         else if (command == "set") {
@@ -673,20 +673,20 @@ namespace emp {
 
 #define EMP_BUILD_CONFIG(CLASS_NAME, ...) EMP_EXTEND_CONFIG(CLASS_NAME, emp::Config, __VA_ARGS__)
 
-#define EMP_EXTEND_CONFIG(CLASS_NAME, BASE_NAME, ...)            \
-  EMP_WRAP_EACH(EMP_CONFIG__ERROR_CHECK, __VA_ARGS__)            \
-  class CLASS_NAME : public BASE_NAME {                          \
-  protected:                                                     \
-    bool is_ ## CLASS_NAME;                                      \
-    EMP_WRAP_EACH(EMP_CONFIG__DECLARE, __VA_ARGS__)              \
-  public:                                                        \
-    CLASS_NAME() : is_ ## CLASS_NAME(true)                       \
-    EMP_WRAP_EACH(EMP_CONFIG__CONSTRUCT, __VA_ARGS__)            \
-    {                                                            \
-      class_names.push_back(#CLASS_NAME);                        \
-      EMP_WRAP_EACH(EMP_CONFIG__INIT, __VA_ARGS__)               \
-    }                                                            \
-    EMP_WRAP_EACH(EMP_CONFIG__ACCESS, __VA_ARGS__)               \
+#define EMP_EXTEND_CONFIG(CLASS_NAME, BASE_NAME, ...)     \
+  EMP_WRAP_EACH(EMP_CONFIG__ERROR_CHECK, __VA_ARGS__)     \
+  class CLASS_NAME : public BASE_NAME {                   \
+  protected:                                              \
+    bool is_ ## CLASS_NAME;                               \
+    EMP_WRAP_EACH(EMP_CONFIG__DECLARE, __VA_ARGS__)       \
+  public:                                                 \
+    CLASS_NAME() : is_ ## CLASS_NAME(true)                \
+    EMP_WRAP_EACH(EMP_CONFIG__CONSTRUCT, __VA_ARGS__)     \
+    {                                                     \
+      class_names.push_back(#CLASS_NAME);                 \
+      EMP_WRAP_EACH(EMP_CONFIG__INIT, __VA_ARGS__)        \
+    }                                                     \
+    EMP_WRAP_EACH(EMP_CONFIG__ACCESS, __VA_ARGS__)        \
   };
 
 #endif
