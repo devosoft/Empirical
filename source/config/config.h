@@ -112,6 +112,7 @@ namespace emp {
   /// Master configuration class that manages all of the settings.
   class Config {
   protected:
+
     /// Type-specific versions of ConfigEntry class to manage settings.
     template <class VAR_TYPE> class tConfigEntry : public ConfigEntry {
     protected:
@@ -123,10 +124,9 @@ namespace emp {
         : ConfigEntry(_name, _type, _d_val, _desc), entry_ref(_ref) { ; }
       ~tConfigEntry() { ; }
 
-      std::string GetValue() const { std::stringstream ss; ss << entry_ref; return ss.str(); }
+      std::string GetValue() const { return emp::to_string(entry_ref); }
       std::string GetLiteralValue() const { return to_literal(entry_ref); }
-      ConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) {
-        (void) warnings;
+      ConfigEntry & SetValue(const std::string & in_val, std::stringstream & /* warnings */) {
         std::stringstream ss; ss << in_val; ss >> entry_ref; return *this;
       }
       bool IsConst() const { return false; }
