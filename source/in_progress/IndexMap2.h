@@ -84,11 +84,11 @@ namespace emp {
 
     /// What is the current weight of the specified index?
     double RawWeight(size_t id) const { return weights[id]; }
-    double GetWeight(size_t id) const { return RawWeight(id+num_nodes-1); }
+    double GetWeight(size_t id) const { return RawWeight(id+num_items-1); }
 
     /// What is the probability of the specified index being selected?
     double RawProb(size_t id) const { ResolveRefresh(); return weights[id] / weights[0]; }
-    double GetProb(size_t id) const { return RawProb(id+num_nodes-1); }
+    double GetProb(size_t id) const { return RawProb(id+num_items-1); }
 
     /// Change the number of indecies in the map.
     void Resize(size_t new_size, double def_value=0.0) {
@@ -138,7 +138,7 @@ namespace emp {
       }
     }
 
-    void Adjust(size_t id, const double new_weight) { AdjustRaw(id + num_items - 1, new_weight); }
+    void Adjust(size_t id, const double new_weight) { RawAdjust(id + num_items - 1, new_weight); }
 
     /// Adjust all index weights to the set provided.
     void Adjust(const emp::vector<double> & new_weights) {
