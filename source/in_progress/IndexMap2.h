@@ -124,40 +124,34 @@ namespace emp {
     /// Adjust the weight associated with a particular index in the map.
     /// @param id is the identification number of the item whose weight is being adjusted.
     /// @param weight is the new weight for that entry.
-    void Adjust(size_t id, const double new_weight) {
+    void RawAdjust(size_t id, const double new_weight) {
       // Update this node.
-      const double weight_diff = new_weight - item_weight[id];
-      item_weight[id] = new_weight;  // Update item weight
+      const double weight_diff = new_weight - weights[id];
+      weights[id] = new_weight;    // Update item weight
 
       if (needs_refresh) return;     // If we already need a refresh don't update tree weights!
 
-      tree_weight[id] += weight_diff;
       // Update tree to root.
       while (id > 0) {
         id = ParentID(id);
-        tree_weight[id] += weight_diff;
+        weights[id] += weight_diff;
       }
     }
 
+    void Adjust(size_t id, const double new_weight) { AdjustRaw(id + num_items - 1, new_weight); }
+
     /// Adjust all index weights to the set provided.
     void Adjust(const emp::vector<double> & new_weights) {
-      item_weight = new_weights;
+      num_items = new_weights.size();
+      weights.resize(num_items*2 - 1);
+      for (size_t i = 0; i < num_items; i++) weights[num_items - 1 + i]  = new_weights[i];
       needs_refresh = true;
     }
 
     /// Adjust all index weights to the set provided.
     void AdjustAll(double new_weight) {
-      for (auto & x : item_weight) x = new_weight;
+      for (auto & x : weights) x = new_weight;
       needs_refresh = true;
-    }
-
-    /// Insert a new ID with the provided weight.
-    size_t Insert(double in_weight) {
-      size_t id = item_weight.size();
-      item_weight.emplace_back(0.0);
-      tree_weight.emplace_back(0.0);
-      Adjust(id, in_weight);
-      return id;
     }
 
     /// Determine the ID at the specified index position.
@@ -165,31 +159,29 @@ namespace emp {
       ResolveRefresh();
 
       // Make sure we don't try to index beyond end of map.
-      emp_assert(index < tree_weight[0], index, tree_weight.size(), tree_weight[0]);
+      emp_assert(index < weights[cur_id], index, cur_id, weights.size(), weights[cur_id]);
 
-      // If our target is in the current node, return it!
-      const double cur_weight = item_weight[cur_id];
-      if (index < cur_weight) return cur_id;
+      // If we are on a leaf, we have our answer!
+      if (cur_id >= num_items - 1) return cur_id - (num_items - 1);
 
-      // Otherwise determine if we need to recurse left or right.
-      index -= cur_weight;
       const size_t left_id = LeftID(cur_id);
-      const double left_weight = tree_weight[left_id];
+      const double left_weight = weights[left_id];
 
-      return (index < left_weight) ? Index(index, left_id) : Index(index-left_weight, left_id+1);
+      if (index < left_weight) return Index(index, left_id);
+      return Index(index-left_weight, left_id+1);
     }
 
     // size_t operator[](double index) { return Index(index,0); }
 
     /// Index into a specified ID.
     Proxy operator[](size_t id) { return Proxy(*this,id); }
-    double operator[](size_t id) const { return item_weight[id]; }
+    double operator[](size_t id) const { return weights[id+num_items-1]; }
 
     /// Add the weights in another index map to this one.
     IndexMap & operator+=(IndexMap & in_map) {
       emp_assert(size() == in_map.size());
       for (size_t i = 0; i < in_map.size(); i++) {
-        item_weight[i] += in_map.item_weight[i];
+        weights[i+num_items-1] += in_map.weights[i+num_items-1];
       }
       needs_refresh = true;
       return *this;
@@ -199,7 +191,7 @@ namespace emp {
     IndexMap & operator-=(IndexMap & in_map) {
       emp_assert(size() == in_map.size());
       for (size_t i = 0; i < in_map.size(); i++) {
-        item_weight[i] -= in_map.item_weight[i];
+        weights[i+num_items-1] -= in_map.weights[i+num_items-1];
       }
       needs_refresh = true;
       return *this;
