@@ -43,11 +43,11 @@ namespace emp {
 
   public:
     DataFile(const std::string & filename,
-             const std::string & b="", const std::string & s=", ", const std::string & e="\n")
+             const std::string & b="", const std::string & s=",", const std::string & e="\n")
       : os(new std::ofstream(filename)), funs(), keys(), descs()
       , line_begin(b), line_spacer(s), line_end(e) { ; }
     DataFile(std::ostream & in_os,
-             const std::string & b="", const std::string & s=", ", const std::string & e="\n")
+             const std::string & b="", const std::string & s=",", const std::string & e="\n")
       : os(&in_os), funs(), keys(), descs(), line_begin(b), line_spacer(s), line_end(e) { ; }
     DataFile(const DataFile &) = default;
     DataFile(DataFile &&) = default;
