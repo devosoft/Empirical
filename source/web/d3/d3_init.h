@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include "../../tools/errors.h"
+#include "../../base/errors.h"
 #include "../init.h"
 #include "../JSWrap.h"
 #include "utils.h"

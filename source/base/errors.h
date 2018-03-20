@@ -17,12 +17,14 @@
  *  - Errors if something has gone so horribly wrong that it is impossible to recover from.
  *  - Exceptions if something didn't go the way we expected, but we can still recover.
  *
+ *  In general, most of the content of this file is targeted at providing useful tools for library
+ *  users; end-users should receive more customized messages and asserts should capture
+ *  suposedly "impossible" situations that none-the-less occur in the library itself.
+ * 
  *  NOTES:
  *  - Whenever possible, exceptions should be preferred.  They are more specific than warnings,
  *    but don't halt execution like errors.
- *  - Asserts should usually be used instead of Errors when the target audience is a developer.
- *    (A user won't know what to do with a failed assert, while an error can abort gracefully.)
- *  - Warnings should always specify what should be done differently to surpress the warning.
+ *  - Warnings should always detail what should be done differently to surpress the warning.
  *
  *
  *  @todo We should move over to a pure replacement for exceptions.

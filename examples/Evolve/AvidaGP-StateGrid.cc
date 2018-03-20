@@ -154,8 +154,8 @@ int main()
   emp::StateGrid state_grid;
 
   state_grid.AddState(-1, '-', -0.5, "None",          "Empty space; poisonous.");
-  state_grid.AddState( 0, '.',  0.0, "Consumed Food", "Previously had sustanance for an organism.");
-  state_grid.AddState( 1, '#', +1.0, "Food",          "Sustanance to an org.");
+  state_grid.AddState( 0, '.',  0.0, "Consumed Food", "Previously had sustenance for an organism.");
+  state_grid.AddState( 1, '#', +1.0, "Food",          "sustenance to an org.");
   state_grid.AddState( 2, 'x',  0.0, "Consumed Edge", "Edge marker; previously had food.");
   state_grid.AddState( 3, 'X', +1.0, "Edge",          "Edge marker with food.");
 
@@ -169,7 +169,7 @@ int main()
 
   world.SetWellMixed(true);
 
-  // Build a random initial popoulation.
+  // Build a random initial population.
   for (size_t i = 0; i < POP_SIZE; i++) {
     SGOrg cpu(&(world.inst_lib));
     cpu.SetStateGrid(state_grid);
@@ -201,7 +201,7 @@ int main()
     // Run a tournament for the rest...
     TournamentSelect(world, 4, POP_SIZE-1);
 
-    // Put new organisms is place.
+    // Put new organisms in place.
     world.Update();
 
     // Mutate all but the first organism.
