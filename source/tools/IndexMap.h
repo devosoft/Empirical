@@ -56,7 +56,7 @@ namespace emp {
 
       // Internal nodes sum their two sub-trees.
       const size_t pivot = num_items - 1; // Transition between internal and leaf nodes.
-      for (size_t i = 0; i < pivot; i--) {
+      for (size_t i = pivot-1; i < pivot; i--) {
         weights[i] = weights[LeftID(i)] + weights[RightID(i)];
       }
 
@@ -67,7 +67,7 @@ namespace emp {
     /// Construct an IndexMap where num_items is the maximum number of items that can be placed
     /// into the data structure.  All item weigths default to zero.
     IndexMap(size_t _items=0)
-      : num_items(_items), needs_refresh(false), weights(_items*2-1,0) {;}
+      : num_items(_items), needs_refresh(false), weights(0) { if (_items > 0) weights.resize(_items*2-1, 0.0); }
     IndexMap(size_t _items, double init_weight)
       : num_items(_items), needs_refresh(true), weights(num_items, init_weight) { ; }
     IndexMap(const IndexMap &) = default;
@@ -122,7 +122,8 @@ namespace emp {
 
     /// Change the size of this map AND change all weights to zero.
     void ResizeClear(size_t new_size) {
-      weights.resize(2*new_size - 1);
+      if (new_size == 0) weights.resize(0);   // If there are no items, zero-out weights array.
+      else weights.resize(2*new_size - 1);    // Else size for N values and N-1 internal nodes.
       num_items = new_size;
       Clear();
     }
@@ -149,8 +150,10 @@ namespace emp {
     /// Adjust all index weights to the set provided.
     void Adjust(const emp::vector<double> & new_weights) {
       num_items = new_weights.size();
-      weights.resize(num_items*2 - 1);
-      for (size_t i = 0; i < num_items; i++) weights[i + num_items - 1] = new_weights[i];
+      if (num_items > 0) {
+        weights.resize(num_items*2 - 1);
+        for (size_t i = 0; i < num_items; i++) weights[i + num_items - 1] = new_weights[i];
+      }
       needs_refresh = true;
     }
 
