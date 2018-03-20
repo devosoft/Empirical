@@ -55,8 +55,8 @@ namespace emp {
       if (!needs_refresh) return;
 
       // Internal nodes sum their two sub-trees.
-      const size_t pivot = num_items - 2; // Transition between internal and leaf nodes.
-      for (size_t i = pivot; i < pivot; i--) {
+      const size_t pivot = num_items - 1; // Transition between internal and leaf nodes.
+      for (size_t i = 0; i < pivot; i--) {
         weights[i] = weights[LeftID(i)] + weights[RightID(i)];
       }
 
@@ -67,9 +67,9 @@ namespace emp {
     /// Construct an IndexMap where num_items is the maximum number of items that can be placed
     /// into the data structure.  All item weigths default to zero.
     IndexMap(size_t _items=0)
-      : num_items(_items), weights(_items*2-1,0), needs_refresh(false) {;}
+      : num_items(_items), needs_refresh(false), weights(_items*2-1,0) {;}
     IndexMap(size_t _items, double init_weight)
-      : num_items(_items), weights(num_items, init_weight), needs_refresh(true) { ; }
+      : num_items(_items), needs_refresh(true), weights(num_items, init_weight) { ; }
     IndexMap(const IndexMap &) = default;
     IndexMap(IndexMap &&) = default;
     ~IndexMap() = default;
@@ -84,34 +84,40 @@ namespace emp {
 
     /// What is the current weight of the specified index?
     double RawWeight(size_t id) const { return weights[id]; }
-    double GetWeight(size_t id) const { return RawWeight(id+num_items-1); }
+    double GetWeight(size_t id) const { return RawWeight(id + num_items-1); }
 
     /// What is the probability of the specified index being selected?
     double RawProb(size_t id) const { ResolveRefresh(); return weights[id] / weights[0]; }
-    double GetProb(size_t id) const { return RawProb(id+num_items-1); }
+    double GetProb(size_t id) const { return RawProb(id + num_items-1); }
 
     /// Change the number of indecies in the map.
     void Resize(size_t new_size, double def_value=0.0) {
       const size_t min_size = std::min(num_items, new_size);
-
       emp::vector<double> new_weights(2*new_size - 1);
+
+      // Copy over all values that still exist.
       for (size_t i = 0; i < min_size; i++) {
         new_weights[new_size - 1 + i] = weights[num_items - 1 + i];
       }
+
+      // Set to default all new values.
       for (size_t i = min_size; i < new_size; i++) {
         new_weights[new_size - 1 + i] = def_value;
       }
+
+      // Finalize info for new IndexMap size.
       needs_refresh = true;                      // Update the tree weights when needed.
       num_items = new_size;
+      std::swap(weights, new_weights);
     }
 
-    size_t size() const { return num_items; }  ///< Standard library compatibility
+    size_t size() const { return num_items; }           ///< Standard library compatibility
     void resize(size_t new_size) { Resize(new_size); }  ///< Standard library compatibility
 
     /// Reset all item weights to zero.
     void Clear() {
-      for (auto & x : weights) { x = 0.0; }
-      needs_refresh = false;  // If all weights are zero, no refresh needed.
+      for (auto & x : weights) { x = 0.0; }  // Set all weights to zero since map is now empty.
+      needs_refresh = false;                 // Given all weights are zero, no refresh needed.
     }
 
     /// Change the size of this map AND change all weights to zero.
@@ -126,8 +132,8 @@ namespace emp {
     /// @param weight is the new weight for that entry.
     void RawAdjust(size_t id, const double new_weight) {
       // Update this node.
-      const double weight_diff = new_weight - weights[id];
-      weights[id] = new_weight;    // Update item weight
+      const double weight_diff = new_weight - weights[id]; // Track change size for tree weights.
+      weights[id] = new_weight;                            // Update THIS item weight
 
       if (needs_refresh) return;     // If we already need a refresh don't update tree weights!
 
@@ -144,13 +150,13 @@ namespace emp {
     void Adjust(const emp::vector<double> & new_weights) {
       num_items = new_weights.size();
       weights.resize(num_items*2 - 1);
-      for (size_t i = 0; i < num_items; i++) weights[num_items - 1 + i]  = new_weights[i];
+      for (size_t i = 0; i < num_items; i++) weights[i + num_items - 1] = new_weights[i];
       needs_refresh = true;
     }
 
     /// Adjust all index weights to the set provided.
     void AdjustAll(double new_weight) {
-      for (auto & x : weights) x = new_weight;
+      for (size_t i = 0; i < num_items; i++) weights[i + num_items - 1] = new_weight;
       needs_refresh = true;
     }
 
@@ -174,8 +180,8 @@ namespace emp {
     // size_t operator[](double index) { return Index(index,0); }
 
     /// Index into a specified ID.
-    Proxy operator[](size_t id) { return Proxy(*this,id); }
-    double operator[](size_t id) const { return weights[id+num_items-1]; }
+    Proxy operator[](size_t id) { return Proxy(*this, id + num_items-1); }
+    double operator[](size_t id) const { return weights[id + num_items-1]; }
 
     /// Add the weights in another index map to this one.
     IndexMap & operator+=(IndexMap & in_map) {
