@@ -26,8 +26,7 @@ namespace emp {
     // which are the length of the number of values stored.  Note that portions are mutable so
     // that we can do a lazy updating of tree_weight when needs_refresh is set.
 
-    size_t num_items;                      ///< How many items are being stored in this IndexMap?
-    size_t zero_offset;                    ///< Position of id zero.
+    size_t num_items;                      ///< How many items are being stores in this IndexMap?
     mutable bool needs_refresh;            ///< Are tree weights out of date?
     mutable emp::vector<double> weights;   ///< The total weights in each sub-tree.
 
@@ -39,25 +38,6 @@ namespace emp {
 
     /// Which ID is the right child of the ID provided?
     size_t RightID(size_t id) const { return 2*id + 2; }
-
-    /// Sift through the nodes to find the where index zero maps to.
-    size_t CalcZeroOffset() const {
-      size_t id = 0;
-      while (id < num_items - 1) id = LeftID(id);
-      return id - (num_items - 1);
-    }
-
-    size_t ToInternalID(size_t id) const {
-      return (id + zero_offset) % num_items + num_items-1;
-    }
-
-    size_t ToInternalID(size_t id, size_t _items, size_t _offset) const {
-      return (id + _offset) % _items + _items-1;
-    }
-
-    size_t ToExternalID(size_t id) const {
-      return (id + 1 - zero_offset) % num_items;
-    }
 
     /// A Proxy class so that an index can be treated as an l-value.
     class Proxy {
@@ -87,13 +67,9 @@ namespace emp {
     /// Construct an IndexMap where num_items is the maximum number of items that can be placed
     /// into the data structure.  All item weigths default to zero.
     IndexMap(size_t _items=0)
-      : num_items(_items), zero_offset(CalcZeroOffset()), needs_refresh(false), weights(0)
-    {
-      if (_items > 0) weights.resize(_items*2-1, 0.0);
-    }
+      : num_items(_items), needs_refresh(false), weights(0) { if (_items > 0) weights.resize(_items*2-1, 0.0); }
     IndexMap(size_t _items, double init_weight)
-      : num_items(_items), zero_offset(CalcZeroOffset()), needs_refresh(true)
-      , weights(num_items, init_weight) { ; }
+      : num_items(_items), needs_refresh(true), weights(num_items, init_weight) { ; }
     IndexMap(const IndexMap &) = default;
     IndexMap(IndexMap &&) = default;
     ~IndexMap() = default;
@@ -108,35 +84,31 @@ namespace emp {
 
     /// What is the current weight of the specified index?
     double RawWeight(size_t id) const { return weights[id]; }
-    double GetWeight(size_t id) const { return RawWeight(ToInternalID(id)); }
+    double GetWeight(size_t id) const { return RawWeight(id + num_items-1); }
 
     /// What is the probability of the specified index being selected?
     double RawProb(size_t id) const { ResolveRefresh(); return weights[id] / weights[0]; }
-    double GetProb(size_t id) const { return RawProb(ToInternalID(id)); }
+    double GetProb(size_t id) const { return RawProb(id + num_items-1); }
 
     /// Change the number of indecies in the map.
     void Resize(size_t new_size, double def_value=0.0) {
-      if (new_size == num_items) return;                     // Already the right size?  Stop!
-
-      const size_t min_size = std::min(num_items, new_size); // Min size determines how much to copy.
-      emp::vector<double> old_weights(2*new_size - 1);       // Create NEW vector to swap into place.
-      size_t old_size = num_items;
-      size_t old_offset = zero_offset;
-
-      num_items = new_size;
-      zero_offset = CalcZeroOffset();
-      needs_refresh = true;                      // Update the tree weights when needed.
-      std::swap(weights, old_weights);
+      const size_t min_size = std::min(num_items, new_size);
+      emp::vector<double> new_weights(2*new_size - 1);
 
       // Copy over all values that still exist.
       for (size_t i = 0; i < min_size; i++) {
-        weights[ToInternalID(i)] = old_weights[ToInternalID(i, old_size, old_offset)];
+        new_weights[new_size - 1 + i] = weights[num_items - 1 + i];
       }
 
       // Set to default all new values.
       for (size_t i = min_size; i < new_size; i++) {
-        weights[ToInternalID(i)] = def_value;
+        new_weights[new_size - 1 + i] = def_value;
       }
+
+      // Finalize info for new IndexMap size.
+      needs_refresh = true;                      // Update the tree weights when needed.
+      num_items = new_size;
+      std::swap(weights, new_weights);
     }
 
     size_t size() const { return num_items; }           ///< Standard library compatibility
@@ -173,22 +145,21 @@ namespace emp {
       }
     }
 
-    void Adjust(size_t id, const double new_weight) { RawAdjust(ToInternalID(id), new_weight); }
+    void Adjust(size_t id, const double new_weight) { RawAdjust(id + num_items - 1, new_weight); }
 
     /// Adjust all index weights to the set provided.
     void Adjust(const emp::vector<double> & new_weights) {
       num_items = new_weights.size();
       if (num_items > 0) {
         weights.resize(num_items*2 - 1);
-        zero_offset = CalcZeroOffset();
-        for (size_t i = 0; i < num_items; i++) weights[ToInternalID(i)] = new_weights[i];
+        for (size_t i = 0; i < num_items; i++) weights[i + num_items - 1] = new_weights[i];
       }
       needs_refresh = true;
     }
 
     /// Adjust all index weights to the set provided.
     void AdjustAll(double new_weight) {
-      for (size_t i = 0; i < num_items; i++) weights[ToInternalID(i)] = new_weight;
+      for (size_t i = 0; i < num_items; i++) weights[i + num_items - 1] = new_weight;
       needs_refresh = true;
     }
 
@@ -200,7 +171,7 @@ namespace emp {
       emp_assert(index < weights[cur_id], index, cur_id, weights.size(), weights[cur_id]);
 
       // If we are on a leaf, we have our answer!
-      if (cur_id >= num_items - 1) return ToExternalID(cur_id);
+      if (cur_id >= num_items - 1) return cur_id - (num_items - 1);
 
       const size_t left_id = LeftID(cur_id);
       const double left_weight = weights[left_id];
@@ -212,8 +183,8 @@ namespace emp {
     // size_t operator[](double index) { return Index(index,0); }
 
     /// Index into a specified ID.
-    Proxy operator[](size_t id) { return Proxy(*this, ToInternalID(id)); }
-    double operator[](size_t id) const { return weights[ToInternalID(id)]; }
+    Proxy operator[](size_t id) { return Proxy(*this, id + num_items-1); }
+    double operator[](size_t id) const { return weights[id + num_items-1]; }
 
     /// Add the weights in another index map to this one.
     IndexMap & operator+=(IndexMap & in_map) {
