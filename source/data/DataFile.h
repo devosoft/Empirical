@@ -46,14 +46,15 @@ namespace emp {
 
   public:
     DataFile(const std::string & in_filename,
-             const std::string & b="", const std::string & s=", ", const std::string & e="\n")
+             const std::string & b="", const std::string & s=",", const std::string & e="\n")
       : filename(in_filename), os(new std::ofstream(in_filename)), funs(), keys(), descs()
       , timing_fun([](size_t){return true;})
       , line_begin(b), line_spacer(s), line_end(e) { ; }
     DataFile(std::ostream & in_os,
-             const std::string & b="", const std::string & s=", ", const std::string & e="\n")
+             const std::string & b="", const std::string & s=",", const std::string & e="\n")
       : filename(), os(&in_os), funs(), keys(), descs(), timing_fun([](size_t){return true;})
       , line_begin(b), line_spacer(s), line_end(e) { ; }
+
     DataFile(const DataFile &) = default;
     DataFile(DataFile &&) = default;
     ~DataFile() { os->flush(); }
@@ -172,61 +173,96 @@ namespace emp {
 
     /// Add a function that always pulls the current value from the DataNode @param node.
     /// Requires that @param node have the data::Current modifier.
+    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// current value from the node
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddCurrent(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
-      std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetCurrent(); };
+    size_t AddCurrent(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false) {
+      std::function<fun_t> in_fun = [&node, reset](std::ostream & os){
+        os << node.GetCurrent();
+        if (reset) node.Reset();
+      };
       return Add(in_fun, key, desc);
     }
+
 
     /// Add a function that always pulls the mean value from the DataNode @param node.
     /// Requires that @param node have the data::Range or data::FullRange modifier.
+    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// current value from the node
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddMean(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
-      std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMean(); };
+    size_t AddMean(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false) {
+      std::function<fun_t> in_fun = [&node, reset](std::ostream & os){
+        os << node.GetMean();
+        if (reset) node.Reset();
+      };
       return Add(in_fun, key, desc);
     }
+
 
     /// Add a function that always pulls the total value from the DataNode @param node.
     /// Requires that @param node have the data::Range or data::FullRange modifier.
+    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// current value from the node
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddTotal(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
-      std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetTotal(); };
+    size_t AddTotal(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false) {
+      std::function<fun_t> in_fun = [&node, reset](std::ostream & os){
+        os << node.GetTotal();
+        if (reset) node.Reset();
+      };
       return Add(in_fun, key, desc);
     }
 
-    /// Add a function that always pulls the minimum value from the DataNode @param node
+    /// Add a function that always pulls the minimum value from the DataNode @param node.
     /// Requires that @param node have the data::Range or data::FullRange modifier.
+    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// current value from the node
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddMin(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
-      std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMin(); };
+    size_t AddMin(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false) {
+      std::function<fun_t> in_fun = [&node, reset](std::ostream & os){
+        os << node.GetMin();
+        if (reset) node.Reset();
+      };
       return Add(in_fun, key, desc);
     }
 
-    /// Add a function that always pulls the maximum value from the DataNode @param node
+    /// Add a function that always pulls the maximum value from the DataNode @param node.
     /// Requires that @param node have the data::Range or data::FullRange modifier.
+    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// current value from the node
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddMax(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
-      std::function<fun_t> in_fun = [&node](std::ostream & os){ os << node.GetMax(); };
+    size_t AddMax(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false) {
+      std::function<fun_t> in_fun = [&node, reset](std::ostream & os){
+        os << node.GetMax();
+        if (reset) node.Reset();
+      };
       return Add(in_fun, key, desc);
     }
 
     /// Add a function that always pulls the count of the @param bin_id 'th bin of the histogram
     /// from @param node. Requires that @param node have the data::Histogram modifier and at least
     /// @bin_id bins.
+    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// current value from the node
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddHistBin(DataNode<VAL_TYPE, MODS...> & node, size_t bin_id, const std::string & key="", const std::string & desc="") {
+    size_t AddHistBin(DataNode<VAL_TYPE, MODS...> & node, size_t bin_id, const std::string & key="", const std::string & desc="", const bool & reset=false) {
       std::function<fun_t> in_fun =
-        [&node,bin_id](std::ostream & os){ os << node.GetHistCount(bin_id); };
+        [&node,bin_id,reset](std::ostream & os){
+          os << node.GetHistCount(bin_id);
+          if (reset) node.Reset();
+        };
       return Add(in_fun, key, desc);
     }
 
     /// Add a function that always pulls the inferiority (mean divided by max) from the DataNode @param node.
     /// Requires that @param node have the data::Range or data::FullRange modifier.
+    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// current value from the node
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddInferiority(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="") {
-      std::function<fun_t> in_fun = [&node](std::ostream & os){
+    size_t AddInferiority(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false) {
+      std::function<fun_t> in_fun = [&node, reset](std::ostream & os){
         VAL_TYPE inf = (node.GetMax() == 0) ? 0 : (node.GetMean() / node.GetMax());
         os << inf;
+        if (reset) node.Reset();
       };
       return Add(in_fun, key, desc);
     }
