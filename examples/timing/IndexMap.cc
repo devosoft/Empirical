@@ -23,7 +23,7 @@ int main()
   std::array<double, NUM_WEIGHTS> weights;
   std::array<double, NUM_CALLS> calls;
 
-  size_t total_weight = 0.0;
+  double total_weight = 0.0;
   for (double & x : weights) {
     x = random.GetDouble(MAX_WEIGHT);
     total_weight += x;
