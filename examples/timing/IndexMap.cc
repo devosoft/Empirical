@@ -39,9 +39,11 @@ int main()
   for (size_t id = 0; id < NUM_WEIGHTS; id++) index_map[id] = weights[id];
 
   // Run the tests.
+  size_t total_ids = 0;
+  for (double x : calls) total_ids += index_map.Index(x);
 
   std::clock_t tot_time1 = std::clock() - start_time1;
-  std::cout << "base sum = " << 1
+  std::cout << "Ordered total = " << total_ids
             << ";  time = " << 1000.0 * ((double) tot_time1) / (double) CLOCKS_PER_SEC
             << " ms." << std::endl;
 
@@ -50,10 +52,16 @@ int main()
 
   std::clock_t start_time2 = std::clock();
 
-  // ...
+  // Setup this index_map.
+  emp::UnorderedIndexMap index_map2(NUM_WEIGHTS);
+  for (size_t id = 0; id < NUM_WEIGHTS; id++) index_map2[id] = weights[id];
+
+  // Run the tests.
+  size_t total_ids2 = 0;
+  for (double x : calls) total_ids2 += index_map2.Index(x);
 
   std::clock_t tot_time2 = std::clock() - start_time2;
-  std::cout << "std sum = " << 2
+  std::cout << "Unordered total = " << total_ids2
             << ";  time = " << 1000.0 * ((double) tot_time2) / (double) CLOCKS_PER_SEC
             << " ms." << std::endl;
 
