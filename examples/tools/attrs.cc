@@ -8,8 +8,8 @@ DEFINE_ATTR(PopulationSize);
 DEFINE_ATTR(GenerationLength);
 DEFINE_ATTR(DefaultGenome);
 
-constexpr auto DEFAULT{PopulationSize(100) + GenerationLength(100) +
-                       DefaultGenome("asdfferaefadfe")};
+constexpr auto DEFAULT{MakeAttrs(PopulationSize(100), GenerationLength(100),
+                                 DefaultGenome("asdfferaefadfe"))};
 
 // Notice that this function has a different ordering than DEFAULT
 void print(const std::string& name,
@@ -36,7 +36,7 @@ int main() {
   // demo adding/chaning data
   print("DEFAULT.SetAttribute(populationSize(10))",
         DEFAULT.SetAttribute(PopulationSize(10)));
-  print("DEFAULT + populationSize(10)", DEFAULT + PopulationSize(10));
+  print("DEFAULT + populationSize(10)", Merge(DEFAULT, PopulationSize(10)));
 
   Attrs<typename PopulationSize::value_t<size_t>,
         typename DefaultGenome::value_t<std::string>,  // Notice that this will
@@ -47,7 +47,7 @@ int main() {
   user.SetDefaultGenome("ASDEDFDFSA");
 
   // Set multiple members at a time
-  user = PopulationSize(100) + GenerationLength(10);
+  user = MakeAttrs(PopulationSize(100), GenerationLength(10));
 
   print("DEFAULT >> STDIN", user);
 
