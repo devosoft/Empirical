@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  IndexMap.h
+ *  @file  UnorderedIndexMap.h
  *  @brief A simple class to weight items differently within a container and return the correct index.
  *  @note Status: BETA
  *
@@ -20,13 +20,13 @@ namespace emp {
 
   /// A map of weighted indecies.  If a random index is selected, the probability of an index being
   /// returned is directly proportional to its weight.
-  class IndexMap {
+  class UnorderedIndexMap {
   private:
     // Internally, item_weight should be thought of as following tree_weight as a vector, both of
     // which are the length of the number of values stored.  Note that portions are mutable so
     // that we can do a lazy updating of tree_weight when needs_refresh is set.
 
-    size_t num_items;                      ///< How many items are being stores in this IndexMap?
+    size_t num_items;                      ///< How many items are being stores in this UnorderedIndexMap?
     mutable bool needs_refresh;            ///< Are tree weights out of date?
     mutable emp::vector<double> weights;   ///< The total weights in each sub-tree.
 
@@ -42,10 +42,10 @@ namespace emp {
     /// A Proxy class so that an index can be treated as an l-value.
     class Proxy {
     private:
-      IndexMap & index_map;  ///< Which index map is this proxy from?
+      UnorderedIndexMap & index_map;  ///< Which index map is this proxy from?
       size_t id;             ///< Which id does it represent?
     public:
-      Proxy(IndexMap & _im, size_t _id) : index_map(_im), id(_id) { ; }
+      Proxy(UnorderedIndexMap & _im, size_t _id) : index_map(_im), id(_id) { ; }
       operator double() const { return index_map.RawWeight(id); }
       Proxy & operator=(double new_weight) { index_map.RawAdjust(id, new_weight); return *this; }
     };
@@ -64,17 +64,17 @@ namespace emp {
     }
 
   public:
-    /// Construct an IndexMap where num_items is the maximum number of items that can be placed
+    /// Construct an UnorderedIndexMap where num_items is the maximum number of items that can be placed
     /// into the data structure.  All item weigths default to zero.
-    IndexMap(size_t _items=0)
+    UnorderedIndexMap(size_t _items=0)
       : num_items(_items), needs_refresh(false), weights(0) { if (_items > 0) weights.resize(_items*2-1, 0.0); }
-    IndexMap(size_t _items, double init_weight)
+    UnorderedIndexMap(size_t _items, double init_weight)
       : num_items(_items), needs_refresh(true), weights(num_items, init_weight) { ; }
-    IndexMap(const IndexMap &) = default;
-    IndexMap(IndexMap &&) = default;
-    ~IndexMap() = default;
-    IndexMap & operator=(const IndexMap &) = default;
-    IndexMap & operator=(IndexMap &&) = default;
+    UnorderedIndexMap(const UnorderedIndexMap &) = default;
+    UnorderedIndexMap(UnorderedIndexMap &&) = default;
+    ~UnorderedIndexMap() = default;
+    UnorderedIndexMap & operator=(const UnorderedIndexMap &) = default;
+    UnorderedIndexMap & operator=(UnorderedIndexMap &&) = default;
 
     /// How many indices are in this map?
     size_t GetSize() const { return num_items; }
@@ -105,7 +105,7 @@ namespace emp {
         new_weights[new_size - 1 + i] = def_value;
       }
 
-      // Finalize info for new IndexMap size.
+      // Finalize info for new UnorderedIndexMap size.
       needs_refresh = true;                      // Update the tree weights when needed.
       num_items = new_size;
       std::swap(weights, new_weights);
@@ -187,7 +187,7 @@ namespace emp {
     double operator[](size_t id) const { return weights[id + num_items-1]; }
 
     /// Add the weights in another index map to this one.
-    IndexMap & operator+=(IndexMap & in_map) {
+    UnorderedIndexMap & operator+=(UnorderedIndexMap & in_map) {
       emp_assert(size() == in_map.size());
       for (size_t i = 0; i < in_map.size(); i++) {
         weights[i+num_items-1] += in_map.weights[i+num_items-1];
@@ -197,7 +197,7 @@ namespace emp {
     }
 
     /// Substract the weigthes from another index map from this one.
-    IndexMap & operator-=(IndexMap & in_map) {
+    UnorderedIndexMap & operator-=(UnorderedIndexMap & in_map) {
       emp_assert(size() == in_map.size());
       for (size_t i = 0; i < in_map.size(); i++) {
         weights[i+num_items-1] -= in_map.weights[i+num_items-1];
