@@ -11,8 +11,8 @@
  *  @todo Should operator[] index by element count or by weight?
  */
 
-#ifndef EMP_INDEX_MAP_H
-#define EMP_INDEX_MAP_H
+#ifndef EMP_UNORDERED_INDEX_MAP_H
+#define EMP_UNORDERED_INDEX_MAP_H
 
 #include "../base/vector.h"
 
