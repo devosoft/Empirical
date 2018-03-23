@@ -26,7 +26,8 @@ namespace emp {
     // which are the length of the number of values stored.  Note that portions are mutable so
     // that we can do a lazy updating of tree_weight when needs_refresh is set.
 
-    size_t num_items;                      ///< How many items are being stores in this UnorderedIndexMap?
+    size_t num_items;                      ///< Num items stored in this UnorderedIndexMap
+    size_t num_nodes;                      ///< Num internal nodes to organize items (num_items-1)
     mutable bool needs_refresh;            ///< Are tree weights out of date?
     mutable emp::vector<double> weights;   ///< The total weights in each sub-tree.
 
@@ -66,10 +67,9 @@ namespace emp {
   public:
     /// Construct an UnorderedIndexMap where num_items is the maximum number of items that can be placed
     /// into the data structure.  All item weigths default to zero.
-    UnorderedIndexMap(size_t _items=0)
-      : num_items(_items), needs_refresh(false), weights(0) { if (_items > 0) weights.resize(_items*2-1, 0.0); }
-    UnorderedIndexMap(size_t _items, double init_weight)
-      : num_items(_items), needs_refresh(true), weights(num_items, init_weight) { ; }
+    UnorderedIndexMap(size_t _items=0, double init_weight=0.0)
+      : num_items(_items), num_nodes(_items-1), needs_refresh(_items && init_weight), weights(0)
+      { if (_items > 0) weights.resize(_items*2-1, init_weight); }
     UnorderedIndexMap(const UnorderedIndexMap &) = default;
     UnorderedIndexMap(UnorderedIndexMap &&) = default;
     ~UnorderedIndexMap() = default;
@@ -84,11 +84,11 @@ namespace emp {
 
     /// What is the current weight of the specified index?
     double RawWeight(size_t id) const { return weights[id]; }
-    double GetWeight(size_t id) const { return RawWeight(id + num_items-1); }
+    double GetWeight(size_t id) const { return RawWeight(id + num_nodes); }
 
     /// What is the probability of the specified index being selected?
     double RawProb(size_t id) const { ResolveRefresh(); return weights[id] / weights[0]; }
-    double GetProb(size_t id) const { return RawProb(id + num_items-1); }
+    double GetProb(size_t id) const { return RawProb(id + num_nodes); }
 
     /// Change the number of indecies in the map.
     void Resize(size_t new_size, double def_value=0.0) {
@@ -97,7 +97,7 @@ namespace emp {
 
       // Copy over all values that still exist.
       for (size_t i = 0; i < min_size; i++) {
-        new_weights[new_size - 1 + i] = weights[num_items - 1 + i];
+        new_weights[new_size - 1 + i] = weights[num_nodes + i];
       }
 
       // Set to default all new values.
@@ -108,6 +108,7 @@ namespace emp {
       // Finalize info for new UnorderedIndexMap size.
       needs_refresh = true;                      // Update the tree weights when needed.
       num_items = new_size;
+      num_nodes = num_items - 1;
       std::swap(weights, new_weights);
     }
 
@@ -125,6 +126,7 @@ namespace emp {
       if (new_size == 0) weights.resize(0);   // If there are no items, zero-out weights array.
       else weights.resize(2*new_size - 1);    // Else size for N values and N-1 internal nodes.
       num_items = new_size;
+      num_nodes = num_items - 1;
       Clear();
     }
 
@@ -145,21 +147,22 @@ namespace emp {
       }
     }
 
-    void Adjust(size_t id, const double new_weight) { RawAdjust(id + num_items - 1, new_weight); }
+    void Adjust(size_t id, const double new_weight) { RawAdjust(id + num_nodes, new_weight); }
 
     /// Adjust all index weights to the set provided.
     void Adjust(const emp::vector<double> & new_weights) {
       num_items = new_weights.size();
+      num_nodes = num_items - 1;
       if (num_items > 0) {
         weights.resize(num_items*2 - 1);
-        for (size_t i = 0; i < num_items; i++) weights[i + num_items - 1] = new_weights[i];
+        for (size_t i = 0; i < num_items; i++) weights[i + num_nodes] = new_weights[i];
       }
       needs_refresh = true;
     }
 
     /// Adjust all index weights to the set provided.
     void AdjustAll(double new_weight) {
-      for (size_t i = 0; i < num_items; i++) weights[i + num_items - 1] = new_weight;
+      for (size_t i = 0; i < num_items; i++) weights[i + num_nodes] = new_weight;
       needs_refresh = true;
     }
 
@@ -171,7 +174,7 @@ namespace emp {
       emp_assert(index < weights[cur_id], index, cur_id, weights.size(), weights[cur_id]);
 
       // If we are on a leaf, we have our answer!
-      if (cur_id >= num_items - 1) return cur_id - (num_items - 1);
+      if (cur_id >= num_nodes) return cur_id - num_nodes;
 
       const size_t left_id = LeftID(cur_id);
       const double left_weight = weights[left_id];
@@ -183,14 +186,14 @@ namespace emp {
     // size_t operator[](double index) { return Index(index,0); }
 
     /// Index into a specified ID.
-    Proxy operator[](size_t id) { return Proxy(*this, id + num_items-1); }
-    double operator[](size_t id) const { return weights[id + num_items-1]; }
+    Proxy operator[](size_t id) { return Proxy(*this, id + num_nodes); }
+    double operator[](size_t id) const { return weights[id + num_nodes]; }
 
     /// Add the weights in another index map to this one.
     UnorderedIndexMap & operator+=(UnorderedIndexMap & in_map) {
       emp_assert(size() == in_map.size());
       for (size_t i = 0; i < in_map.size(); i++) {
-        weights[i+num_items-1] += in_map.weights[i+num_items-1];
+        weights[i+num_nodes] += in_map.weights[i+num_nodes];
       }
       needs_refresh = true;
       return *this;
@@ -200,7 +203,7 @@ namespace emp {
     UnorderedIndexMap & operator-=(UnorderedIndexMap & in_map) {
       emp_assert(size() == in_map.size());
       for (size_t i = 0; i < in_map.size(); i++) {
-        weights[i+num_items-1] -= in_map.weights[i+num_items-1];
+        weights[i+num_nodes] -= in_map.weights[i+num_nodes];
       }
       needs_refresh = true;
       return *this;
