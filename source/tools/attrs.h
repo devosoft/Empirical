@@ -360,10 +360,10 @@ namespace emp {
     constexpr NAME##Value(const T& value) : value(value) {}                    \
     constexpr NAME##Value(T&& value) : value(std::move(value)) {}              \
     template <typename U = T>                                                  \
-    constexpr NAME##Value(const NAME##Value<U>& other) : value(other.value) {} \
+    constexpr NAME##Value(const NAME##Value<U>& other) : value(*other) {}      \
     template <typename U = T>                                                  \
     constexpr NAME##Value(NAME##Value<U>&& other)                              \
-      : value(std::move(other.value)) {}                                       \
+      : value(*std::move(other)) {}                                            \
     constexpr NAME##Value& operator=(const T& value) {                         \
       /* Don't check for self assignment, and assume that value will handle it \
        * correcly */                                                           \
