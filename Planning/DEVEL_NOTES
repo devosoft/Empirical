@@ -10,7 +10,7 @@ Setup environments
 
 
 -= NEXT STEPS =-
-Working on Singals/Actions
+Working on Signals/Actions
 * In the case of physics, each body shouldn't need its own signal.
   - Do we have the physics manage this?
   - Or should signals be static to a class?
@@ -50,7 +50,7 @@ Why are styles applied AFTER GetHTML is run; can't they be done at the same time
 Forms
 JQuerryUI Tabs? (or other UI Elements?)
 Span (?) for future manual references
-Dynamic web link? (Easy to change and verify, rather than embeded in text.)
+Dynamic web link? (Easy to change and verify, rather than embedded in text.)
 
 
 -= Evolution-specific Tools =-
@@ -69,7 +69,7 @@ Fix how sectors are handled in surfaces to be more dynamic based on sizes of org
 
 
 -= Specific ideas for Configurtion tools =-
-* Build an HTML object to automatically allow adjustment of settings in a running ap.
+* Build an HTML object to automatically allow adjustment of settings in a running app.
 * Allow other commands to redirect the rest of the line to a specific object for processing.
 * Auto-generation of config file entries beyond just "set"
 * See about uniting library user config file and end user config file into consistent format.
@@ -102,4 +102,4 @@ JQuery Sparklines -- Inline graphs
 
 -= Frameworks to consider wrapping =-
 Ionic
-Ember -- read strong arguments from developer; built to be practical in getting good aps fast.
+Ember -- read strong arguments from developer; built to be practical in getting good apps fast.
