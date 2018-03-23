@@ -303,6 +303,7 @@ namespace emp {
     /// Construct using move constructor
     Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr), id(_in.id) {
       if (ptr_debug) std::cout << "move construct: " << ptr << std::endl;
+      _in.ptr = nullptr;
       _in.id = UNTRACKED_ID;
       // No IncID or DecID in Tracker since we just move the id.
     }
@@ -490,7 +491,7 @@ namespace emp {
 
     /// Move assignment
     Ptr<TYPE> & operator=(Ptr<TYPE> && _in) {
-      if (ptr_debug) std::cout << "move assignment" << std::endl;
+      if (ptr_debug) std::cout << "move assignment: " << _in.ptr << std::endl;
       emp_assert(Tracker().IsDeleted(_in.id) == false, _in.id, "Do not move deleted pointers.");
       if (ptr != _in.ptr) {
         Tracker().DecID(id);   // Decrement references to former pointer at this position.
