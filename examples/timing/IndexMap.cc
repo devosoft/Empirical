@@ -5,27 +5,27 @@
 //
 //  Comparing the ordered versus unordered versions of IndexMap
 
-#include <array>
 #include <ctime>         // For std::clock
 
+#include "base/vector.h"
 #include "tools/IndexMap.h"
 #include "tools/UnorderedIndexMap.h"
 #include "tools/Random.h"
 
-constexpr size_t NUM_WEIGHTS = 1000;
-constexpr size_t NUM_CALLS = 10000;
+constexpr size_t NUM_WEIGHTS = 1000000;
+constexpr size_t NUM_CALLS = 10000000;
 constexpr double MAX_WEIGHT = 100.0;
 
 int main()
 {
   // Prepare some data.
   emp::Random random;
-  std::array<double, NUM_WEIGHTS> weights;
-  std::array<double, NUM_CALLS> calls;
+  std::vector<double> weights(NUM_WEIGHTS);
+  std::vector<double> calls(NUM_CALLS);
 
   double total_weight = 0.0;
   for (double & x : weights) {
-    x = random.GetDouble(MAX_WEIGHT);
+    x = std::pow(random.GetDouble(MAX_WEIGHT), 2.0);
     total_weight += x;
   }
   for (double & x : calls) {
