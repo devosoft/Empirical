@@ -17,7 +17,7 @@ on the available source files.
 
 # Directory Structure
 
-| Folder       | Info
+| Folder       | Description
 | ------------ | ----
 | apps/        | mini projects using Empirical with broad utility
 | doc/         | Documentation files (including for auto generation of docs)
@@ -30,7 +30,7 @@ on the available source files.
 
 # Sub-folders in source/ directory
 
-| Sub-Folder  | Info
+| Sub-Folder  | Description
 | ----------- | ----
 | base/       | Debug tools used throughout Empirical for fast and efficient memory management
 | config/     | Tools to build a simple configuration system (including compile-time optimizations)
@@ -41,7 +41,7 @@ on the available source files.
 | scholar/    | Tools for tracking authors, citations, and bibliographies
 | tools/      | Many basic tools that are generally useful for scientific software
 | web/        | Tools for building web interfaces
-| Evo/        | Specialized tools for building Artificial Life or Evolutionary Computation projects
+| Evolve/        | Specialized tools for building Artificial Life or Evolutionary Computation projects
 | in_progress/ | Tools that are being worked on, but not at all ready for public consumption
 | stand_alone/ | Versions of tools found elsewhere in Empirical that can be downloaded as a single file with no additional dependencies
 
@@ -79,4 +79,4 @@ files at lower levels.
 | 1 |  meta/
 | 2 |  tools/
 | 3 |  config/  control/  data/  games/  geometry/  hardware/  scholar/
-| 4 |  Evo/ (data, control)  web/ (config, control)
+| 4 |  Evolve/ (data, control)  web/ (config, control)
