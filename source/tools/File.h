@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
+ *  @date 2018
  *
  *  @file  File.h
  *  @brief The File object maintains a simple, in-memory file.
@@ -44,16 +44,16 @@ namespace emp {
     File & operator=(const File &) = default;
     File & operator=(File &&) = default;
 
-	// Return const iterator to beginning of file
+    /// Return const iterator to beginning of file
     auto begin() const { return std::begin(lines); }
 
-	// Return const iterator to end of file
+    /// Return const iterator to end of file
     auto end() const { return std::end(lines); }
 
-	// Return iterator to beginning of file
+    /// Return iterator to beginning of file
     auto begin() { return std::begin(lines); }
 
-	// Return iterator to end of file
+    /// Return iterator to end of file
     auto end() { return std::end(lines); }
 
     /// How many lines are in this file?
@@ -93,21 +93,21 @@ namespace emp {
       return *this;
     }
 
-	// Append 2 files
+    /// Join two files
     File & Append(const File & in_file) { return Append(in_file.lines); }
 
     /// Append to the end of a file.
     template <typename T>
     File & operator+=(T && in) { Append( std::forward<T>(in) ); return *this; }
 
-	// Insert formatted data into file
-	// This is exactly the same as operator+=
+    /// Insert formatted data into file
+    /// This is exactly the same as operator+=
     template <typename T> auto operator<<(T &&in) {
       Append(std::forward<T>(in));
       return *this;
     }
 
-	// Extract first line from file
+    /// Extract first line from file
     auto operator>>(std::string &out) {
       out = size() ? front() : out;
       lines.erase(begin());
@@ -139,7 +139,7 @@ namespace emp {
     }
 
     /// Load a file from disk using the provided name.
-	// If file does not exist, this is a nop
+    /// If file does not exist, this is a nop
     File & Load(const std::string & filename) {
       std::ifstream file(filename);
       if (file.is_open()) {
