@@ -246,6 +246,12 @@ namespace emp {
       });
     }
 
+    template <typename T>
+    emp::vector<T> ExtractColAs(char delim=',') {
+      return Process<T>( [delim](std::string & line){
+        return emp::from_string<T>(string_pop(line, delim));
+      });
+    }
   };
   
 }
