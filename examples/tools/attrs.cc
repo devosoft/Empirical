@@ -12,10 +12,10 @@ constexpr auto DEFAULT{MakeAttrs(PopulationSize(100), GenerationLength(100),
                                  DefaultGenome("asdfferaefadfe"))};
 
 // Notice that this function has a different ordering than DEFAULT
-void print(const std::string& name,
-           const Attrs<typename PopulationSize::value_t<size_t>,
-                       typename DefaultGenome::value_t<std::string>,
-                       typename GenerationLength::value_t<size_t>>& args) {
+void print(
+  const std::string& name,
+  const Attrs<PopulationSizeValue<size_t>, DefaultGenomeValue<std::string>,
+              GenerationLengthValue<size_t>>& args) {
   std::cout << name << " = " << args << std::endl;
 }
 
@@ -33,10 +33,15 @@ int main() {
   // Also, we can select for a subset of a attribute pack when we want to
   printSubset("DEFAULT [SUBSET]", DEFAULT);
 
-  // demo adding/chaning data
+  // demo adding/chaining data
   print("DEFAULT.SetAttribute(populationSize(10))",
         DEFAULT.SetAttribute(PopulationSize(10)));
   print("DEFAULT + populationSize(10)", Merge(DEFAULT, PopulationSize(10)));
+
+  // Examples of using the universal constructor to pass function arguments
+  print(
+    "Using Universal Constructor: ",
+    {PopulationSize(1), DefaultGenome("Hello World"), GenerationLength(50)});
 
   Attrs<typename PopulationSize::value_t<size_t>,
         typename DefaultGenome::value_t<std::string>,  // Notice that this will
@@ -48,7 +53,6 @@ int main() {
 
   // Set multiple members at a time
   user = MakeAttrs(PopulationSize(100), GenerationLength(10));
-
   print("DEFAULT >> STDIN", user);
 
   //
