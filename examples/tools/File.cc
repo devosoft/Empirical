@@ -32,4 +32,9 @@ int main()
   spreadsheet.Write(std::cout);
   std::cout << "Extracted column: " << emp::to_string(first_col) << std::endl;
 
+  emp::vector<size_t> second_col = spreadsheet.ExtractColAs<size_t>();
+  std::cout << "\nAfter another column is extracted as size_t:" << std::endl;
+  spreadsheet.Write(std::cout);
+  std::cout << "Extracted column: " << emp::to_string(second_col) << std::endl;
+  
 }
