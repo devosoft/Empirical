@@ -16,7 +16,7 @@
 
 int main()
 {
-  // using rise_t = emp::IntPack<0,1,2,3,4,5,6,7,8,9,10>;
+  // using rise_t = emp::IntPack<1,2,3,4,5,6,7,8,9,10>;
   using rise_t = emp::IntPackRange<1,11>;
   std::cout << "using rise_t = emp::IntPack<1,2,3,4,5,6,7,8,9,10>" << std::endl;
   std::cout << "Printing Pack: emp::IntPack<";
@@ -50,7 +50,7 @@ int main()
   EMP_PRINT_VAL(fib_t::Product());
 
   std::cout << "\nTesting sorting and removing.\n";
-  using test_t = emp::IntPack<0,1,2,1,3,4,1,4,5,6,1,1,-1,-1,0>;
+  using test_t = emp::IntPack<0,1,2,1,3,4,1,4,5,6,1,1,-1,-1>::push_back<0>;
   std::cout << "Starting pack: ";  test_t::PrintInts(); std::cout << std::endl;
   EMP_PRINT_VAL(test_t::Min());
   EMP_PRINT_VAL(test_t::Max());

@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  Tests for files in the base/ folder.
@@ -11,8 +11,6 @@
 #define EMP_DECORATE(X) [X]
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]
 #define CATCH_CONFIG_MAIN
-#undef NDEBUG
-#define TDEBUG 1
 
 #include "../third-party/Catch/single_include/catch.hpp"
 
@@ -20,10 +18,11 @@
 #include <string>
 
 #include "base/array.h"
-#include "base/Ptr.h"
 #include "base/assert.h"
+#include "base/errors.h"
 #include "base/macro_math.h"
 #include "base/macros.h"
+#include "base/Ptr.h"
 #include "base/vector.h"
 
 
@@ -36,7 +35,7 @@
   } while (false)
 
 
-TEST_CASE("Test array", "[tools]")
+TEST_CASE("Test array", "[base]")
 {
   constexpr int A_SIZE = 50;
   emp::array<int, A_SIZE> test_array;
@@ -54,7 +53,7 @@ TEST_CASE("Test array", "[tools]")
 }
 
 
-TEST_CASE("Test macro_math", "[tools]")
+TEST_CASE("Test macro_math", "[base]")
 {
 
   // Test converting between binary, decimal, and sum formats.
@@ -252,7 +251,7 @@ TEST_CASE("Test macro_math", "[tools]")
 
 
 
-TEST_CASE("Test macros", "[tools]")
+TEST_CASE("Test macros", "[base]")
 {
   EMP_TEST_MACRO( EMP_POP_ARGS_32(1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0), "3,4,5,6,7,8,9,0");
   EMP_TEST_MACRO( EMP_POP_ARGS(32, 1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0), "3,4,5,6,7,8,9,0");
@@ -340,8 +339,9 @@ TEST_CASE("Test macros", "[tools]")
 
 
   // Test EMP_STRINGIFY_EACH
-  std::array<std::string, 2> test = {EMP_STRINGIFY_EACH(some, words)};
-  std::array<std::string, 9> test9 = {EMP_STRINGIFY_EACH(one, two, three, four, five, six, seven, eight, nine)};
+  std::array<std::string, 2> test = {{ EMP_STRINGIFY_EACH(some, words) }};
+  std::array<std::string, 9> test9 =
+    {{ EMP_STRINGIFY_EACH(one, two, three, four, five, six, seven, eight, nine) }};
 
   REQUIRE(test.size() == 2);
   REQUIRE(test[0] == "some");
@@ -354,7 +354,24 @@ TEST_CASE("Test macros", "[tools]")
 }
 
 
-TEST_CASE("Test Ptr", "[tools]")
+TEST_CASE("Test errors", "[tools]")
+{
+  emp::TriggerExcept("test_fail", "The test failed.  *sob*");
+  emp::TriggerExcept("test_fail2", "The second test failed too.  But it's not quite as aweful.", false);
+  emp::TriggerExcept("test_fail2", "The third test is just test 2 again, but worse", true);
+
+  REQUIRE( emp::CountExcepts() == 3 );
+  auto except = emp::PopExcept("test_fail2");
+  REQUIRE( emp::CountExcepts() == 2 );
+  REQUIRE( except.desc == "The second test failed too.  But it's not quite as aweful." );
+  REQUIRE( emp::HasExcept("test_fail2") == true );
+  REQUIRE( emp::HasExcept("test_fail3") == false );
+  emp::ClearExcepts();
+  REQUIRE( emp::CountExcepts() == 0 );
+}
+
+
+TEST_CASE("Test Ptr", "[base]")
 {
   // Test default constructor.
   emp::Ptr<int> ptr1;
@@ -405,6 +422,15 @@ TEST_CASE("Test Ptr", "[tools]")
   ptr_set[3]->Delete();
   ptr_set[1]->Delete();
 
+  // Make sure that we are properly handling temporary pointets moved to uninitialized pointes.
+  // (Previously breaking, now fixed.)
+  int a = 9;
+  emp::Ptr<int> ptr_a;
+  ptr_a = emp::ToPtr(&a);
+  int a_val = *(ptr_a);
+  REQUIRE(a_val == 9);
+
+
   // std::cout << ptr_set[0]->DebugGetCount() << std::endl;
 
 //   // @CAO Make sure we don't delete below 0
@@ -453,8 +479,7 @@ TEST_CASE("Test Ptr", "[tools]")
 }
 
 
-
-TEST_CASE("Test vector", "[tools]")
+TEST_CASE("Test vector", "[base]")
 {
   emp::vector<int> v(20);
 
@@ -466,34 +491,18 @@ TEST_CASE("Test vector", "[tools]")
   for (int i : v) total += i;
 
   REQUIRE(total == 2470);
+
+  // Examine vector<bool> specialization.
+  emp::vector<bool> vb(1000,false);
+  for (size_t i = 0; i < vb.size(); i++) {
+    if (i%3==0 || i%5 == 0) vb[i] = true;
+  }
+  size_t count = 0;
+  const auto vb2 = vb;
+  for (size_t i = 0; i < vb.size(); i++) {
+    if (vb2[i]) count++;
+  }
+
+  REQUIRE(count == 467);
 }
 
-
-
-TEST_CASE("Test assert", "[tools]")
-{
-  // Asserts are tricky to test.  Here are a bunch that should PASS.
-  emp_assert(true);
-  REQUIRE(emp::assert_last_fail == 0);
-
-  emp_assert(100);
-  REQUIRE(emp::assert_last_fail == 0);
-
-  emp_assert(23 < 24);
-  REQUIRE(emp::assert_last_fail == 0);
-
-  emp_assert((14 < 13)?0:1);
-  REQUIRE(emp::assert_last_fail == 0);
-
-
-  // Now here are some that should FAIL
-/*  emp_assert(false);
-  EMP_TEST_VALUE(emp::assert_last_fail, "1");
-  EMP_TEST_VALUE(emp::assert_fail_info.filename, "assert.cc");
-  EMP_TEST_VALUE(emp::assert_fail_info.line_num, "31");
-  EMP_TEST_VALUE(emp::assert_fail_info.error, "false");
-*/
-  // if (emp::assert_fail_info.filename != "assert.cc") std::cerr << "Failed case 6!" << std::endl;
-  // if (emp::assert_fail_info.line_num != __LINE__ - 3) std::cerr << "Failed case 7!" << std::endl;
-  // if (emp::assert_fail_info.error != "false") std::cerr << "Failed case 8!" << std::endl;
-}

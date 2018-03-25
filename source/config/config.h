@@ -1,34 +1,38 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  This file defines a master configuration option Config, whose values can be loaded
-//  at runtime or else set as constant values throughout the code.
-//
-//  Assuming you have an emp::Config object called config, you can:
-//
-//  access a setting value:            config.SETTING_NAME()
-//  adjust a setting value:            config.SETTING_NAME(new_value)
-//  determine if a setting is locked:  config.SETTING_NAME_is_const()
-//  lookup a setting dynamically:      config("SETTING_NAME")
-//  adjust a setting dynamically:      config("SETTING_NAME", "new_value")
-//
-//  load settings from a stream:       config.Read(stream);
-//  load settings from a file:         config.Read(filename);
-//  save settings to a stream:         config.Write(stream);
-//  save settings to a file:           config.Write(filename);
-//
-//  write settings macros to a stream: config.WriteMacros(stream);
-//  write settings macros to a file:   config.WriteMacros(filename);
-//
-//
-//  The configuration files generated can use the following keywords in order to
-//  configure this object:
-//   include OTHER_FILENAME         -- Load in all data from another file.
-//   set SETTING_NAME VALUE         -- Set a basic configuration setting.
-//   new OBJECT_TYPE OBJECT_NAME    -- Create a new config object of a managed class.
-//   use OBJECT_TYPE OBJECT_NAME    -- Use a previouly create configuration object.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2018
+ *
+ *  @file  config.h
+ *  @brief Maintains a set of configuration options.
+ *
+ *  This file defines a master configuration option Config, whose values can be loaded
+ *  at runtime or else set as constant values throughout the code.
+ *
+ *  Assuming you have an emp::Config object called config, you can:
+ *
+ *  access a setting value:            config.SETTING_NAME()
+ *  adjust a setting value:            config.SETTING_NAME(new_value)
+ *  determine if a setting is locked:  config.SETTING_NAME_is_const()
+ *  lookup a setting dynamically:      config("SETTING_NAME")
+ *  adjust a setting dynamically:      config("SETTING_NAME", "new_value")
+ *
+ *  load settings from a stream:       config.Read(stream);
+ *  load settings from a file:         config.Read(filename);
+ *  save settings to a stream:         config.Write(stream);
+ *  save settings to a file:           config.Write(filename);
+ *
+ *  write settings macros to a stream: config.WriteMacros(stream);
+ *  write settings macros to a file:   config.WriteMacros(filename);
+ *
+ *
+ *  The configuration files generated can use the following keywords in order to
+ *  configure this object:
+ *   include OTHER_FILENAME         -- Load in all data from another file.
+ *   set SETTING_NAME VALUE         -- Set a basic configuration setting.
+ *   new OBJECT_TYPE OBJECT_NAME    -- Create a new config object of a managed class.
+ *   use OBJECT_TYPE OBJECT_NAME    -- Use a previouly create configuration object.
+ */
 
 #ifndef EMP_CONFIG_H
 #define EMP_CONFIG_H
@@ -42,8 +46,8 @@
 #include <sstream>
 #include <unordered_set>
 
+#include "../base/errors.h"
 #include "../base/vector.h"
-#include "../tools/errors.h"
 #include "../tools/functions.h"
 #include "../tools/string_utils.h"
 #include "ConfigManager.h"
@@ -52,6 +56,7 @@ using namespace std::placeholders;
 
 namespace emp {
 
+  /// Base class for all configuration settings.
   class ConfigEntry {
   protected:
     std::string name;
@@ -60,6 +65,7 @@ namespace emp {
     std::string desc;
 
     std::unordered_set<std::string> alias_set;
+
   public:
     ConfigEntry(const std::string _name, const std::string _type,
                  const std::string _d_val, const std::string _desc)
@@ -77,22 +83,37 @@ namespace emp {
     ConfigEntry & SetDefault(const std::string & _in) { default_val = _in; return *this; }
     ConfigEntry & SetDescription(const std::string & _in) { desc = _in; return *this; }
 
+    /// Alert this setting that it is aliased to alternate possible names.
     ConfigEntry & AddAlias(const std::string & _in) { alias_set.insert(_in); return *this; }
+
+    /// Are there any alternate names for this setting?
     bool HasAlias(const std::string & _in) { return alias_set.find(_in) != alias_set.end(); }
+
+    /// Will the provided name match this setting?
     bool IsMatch(const std::string & _in) { return name == _in || HasAlias(_in); }
+
+    /// Retrieve the full set of aliases.
     const std::unordered_set<std::string> & GetAliases() { return alias_set; }
 
+    /// Retrieve the value of this setting as a string.
     virtual std::string GetValue() const = 0;
+
+    /// Conver the value of this setting into a literal that C++ would recognize as its current value.
     virtual std::string GetLiteralValue() const = 0;
+
+    /// Use a string to set the value of this setting.
     virtual ConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) = 0;
+
+    /// Identify if this setting is fixed at compile time.
     virtual bool IsConst() const = 0;
   };
 
 
-  // Master configuration class.
+  /// Master configuration class that manages all of the settings.
   class Config {
   protected:
-    // We need type-specific versions on this class to manage variables
+
+    /// Type-specific versions of ConfigEntry class to manage settings.
     template <class VAR_TYPE> class tConfigEntry : public ConfigEntry {
     protected:
       VAR_TYPE & entry_ref;
@@ -103,16 +124,15 @@ namespace emp {
         : ConfigEntry(_name, _type, _d_val, _desc), entry_ref(_ref) { ; }
       ~tConfigEntry() { ; }
 
-      std::string GetValue() const { std::stringstream ss; ss << entry_ref; return ss.str(); }
+      std::string GetValue() const { return emp::to_string(entry_ref); }
       std::string GetLiteralValue() const { return to_literal(entry_ref); }
-      ConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) {
-        (void) warnings;
+      ConfigEntry & SetValue(const std::string & in_val, std::stringstream & /* warnings */) {
         std::stringstream ss; ss << in_val; ss >> entry_ref; return *this;
       }
       bool IsConst() const { return false; }
     };
 
-    // We need a special entry type to represent constant values.
+    /// Type-specific and CONST versions of ConfigEntry class to manage fixed settings.
     template <class VAR_TYPE> class tConfigConstEntry : public ConfigEntry {
     protected:
       const VAR_TYPE literal_val;
@@ -137,7 +157,7 @@ namespace emp {
       bool IsConst() const { return true; }
     };
 
-    // A special entry for settings created during the run (only accissibly dynamically)
+    /// Special settings entry for settings created during the run (only accissibly dynamically)
     class ConfigLiveEntry : public ConfigEntry {
     public:
       ConfigLiveEntry(const std::string _name, const std::string _type,
@@ -155,7 +175,7 @@ namespace emp {
       bool IsConst() const { return false; }
     };
 
-    // Entrys should be divided into groups
+    /// Information about a sub-group of settings.
     class ConfigGroup {
     protected:
       std::string name;
@@ -341,18 +361,9 @@ namespace emp {
 
   public:
     Config(const std::string & in_version = "")
-      : class_names()
-      , var_map()
-      , version_id(in_version)
-      , group_set()
-      , warnings()
-      , delay_warnings(0)
-      , alias_map()
-      , type_manager_map()
-      , command_map()
-      , new_map()
-      , use_map()
-      , expand_ok(true)
+      : class_names(), var_map(), version_id(in_version), group_set(), warnings()
+      , delay_warnings(0), alias_map(), type_manager_map(), command_map()
+      , new_map(), use_map(), expand_ok(true)
     {
       class_names.push_back("emp::Config");
     }
@@ -482,8 +493,8 @@ namespace emp {
     }
 
 
-    // Read in from a text representation (typically a file) to set the state of Config.
-    // Return success state.
+    /// Read in from a text representation (typically a file) to set the state of Config.
+    /// Return success state.
     bool Read(std::istream & input) {
       // Load in the file one line at a time and process each line.
       std::string cur_line, extras;
@@ -497,7 +508,6 @@ namespace emp {
         if (cur_line == "") continue;          // Skip empty lines.
 
         std::string command = emp::string_pop_word(cur_line);
-        emp::right_justify(cur_line);
 
         if (command == "include") {
           // Recursively include another configuration file.
@@ -507,6 +517,7 @@ namespace emp {
         else if (command == "new") {
           std::string type_name = emp::string_pop_word(cur_line);
           // @CAO Make sure type exists!
+          // @CAO Make sure remainder of line is a single identifier.
           new_map[type_name](cur_line);
         }
         else if (command == "set") {
@@ -676,20 +687,20 @@ namespace emp {
 
 #define EMP_BUILD_CONFIG(CLASS_NAME, ...) EMP_EXTEND_CONFIG(CLASS_NAME, emp::Config, __VA_ARGS__)
 
-#define EMP_EXTEND_CONFIG(CLASS_NAME, BASE_NAME, ...)            \
-  EMP_WRAP_EACH(EMP_CONFIG__ERROR_CHECK, __VA_ARGS__)            \
-  class CLASS_NAME : public BASE_NAME {                          \
-  protected:                                                     \
-    bool is_ ## CLASS_NAME;                                      \
-    EMP_WRAP_EACH(EMP_CONFIG__DECLARE, __VA_ARGS__)              \
-  public:                                                        \
-    CLASS_NAME() : is_ ## CLASS_NAME(true)                       \
-    EMP_WRAP_EACH(EMP_CONFIG__CONSTRUCT, __VA_ARGS__)            \
-    {                                                            \
-      class_names.push_back(#CLASS_NAME);                        \
-      EMP_WRAP_EACH(EMP_CONFIG__INIT, __VA_ARGS__)               \
-    }                                                            \
-    EMP_WRAP_EACH(EMP_CONFIG__ACCESS, __VA_ARGS__)               \
+#define EMP_EXTEND_CONFIG(CLASS_NAME, BASE_NAME, ...)     \
+  EMP_WRAP_EACH(EMP_CONFIG__ERROR_CHECK, __VA_ARGS__)     \
+  class CLASS_NAME : public BASE_NAME {                   \
+  protected:                                              \
+    bool is_ ## CLASS_NAME;                               \
+    EMP_WRAP_EACH(EMP_CONFIG__DECLARE, __VA_ARGS__)       \
+  public:                                                 \
+    CLASS_NAME() : is_ ## CLASS_NAME(true)                \
+    EMP_WRAP_EACH(EMP_CONFIG__CONSTRUCT, __VA_ARGS__)     \
+    {                                                     \
+      class_names.push_back(#CLASS_NAME);                 \
+      EMP_WRAP_EACH(EMP_CONFIG__INIT, __VA_ARGS__)        \
+    }                                                     \
+    EMP_WRAP_EACH(EMP_CONFIG__ACCESS, __VA_ARGS__)        \
   };
 
 #endif

@@ -81,13 +81,15 @@ namespace emp {
   ///
   /// Note: Since organisms compete with their predecessors for space in the populations,
   /// synchronous generations do not make sense.
+  ///
+  /// This for version will setup a MAP-Elites world; traits to use an how many bins for each
+  /// (trait counts) must be provided.
   template<typename ORG>
   void SetMapElites(World<ORG> & world, TraitSet<ORG> traits,
                     const emp::vector<size_t> & trait_counts) {
-    // 
-    // For consistency with other population structures, we are leaving the option.
-    const size_t pop_size = Product(trait_counts);  // Pop position for each combo of traits.
-    world.Resize(pop_size);
+    using org_pos_t = typename World<ORG>::OrgPosition;
+
+    world.Resize(trait_counts);  // World sizes are based on counts of traits options.
     world.MarkSynchronous(false);
     world.MarkSpaceStructured(false).MarkPhenoStructured(true);
 
@@ -101,7 +103,7 @@ namespace emp {
       size_t id = traits.EvalBin(*new_org, trait_counts);
       double cur_fitness = world.CalcFitnessID(id);
 
-      if (cur_fitness > org_fitness) return World<ORG>::OrgPosition();  // Return invalid position!
+      if (cur_fitness > org_fitness) return org_pos_t();  // Return invalid position!
       return world.AddOrgAt(new_org, id);
     });
 
@@ -116,7 +118,7 @@ namespace emp {
       size_t id = traits.EvalBin(*new_org, trait_counts);
       double cur_fitness = world.CalcFitnessID(id);
 
-      if (cur_fitness > org_fitness) return World<ORG>::OrgPosition();  // Return invalid position!
+      if (cur_fitness > org_fitness) return org_pos_t();  // Return invalid position!
       return world.AddOrgAt(new_org, id);
     });
 
@@ -124,6 +126,8 @@ namespace emp {
     world.SetAttribute("PopStruct", "MapElites");
   }
 
+  /// Setup a MAP-Elites world, given the provided set of traits.
+  /// Requires world to already have a size; that size is respected when deciding trait bins.
   template<typename ORG>
   void SetMapElites(World<ORG> & world, TraitSet<ORG> traits) {
     emp::vector<size_t> trait_counts;
@@ -142,11 +146,15 @@ namespace emp {
     SetMapElites(world, traits, trait_counts);
   }
 
+  /// Setup a MAP-Elites world, given the provided trait counts (number of bins).
+  /// Requires world to already have a phenotypes that those counts are applied to.
   template<typename ORG>
   void SetMapElites(World<ORG> & world, const emp::vector<size_t> & trait_counts) {
     SetMapElites(world, world.GetPhenotypes(), trait_counts);
   }
 
+  /// Setup a MAP-Elites world, given the provided worlds already has size AND set of phenotypes.
+  /// Requires world to already have a size; that size is respected when deciding trait bins.
   template<typename ORG>
   void SetMapElites(World<ORG> & world) { SetMapElites(world, world.GetPhenotypes()); }
 }

@@ -80,6 +80,8 @@ namespace web {
 
     Button toggle_but;                  ///< A button to start/stop this animation.
 
+    Button step_but;                    ///< A button to advance this animation one step.
+
     void LoadTargets() { ; }
     template <typename... T>
     void LoadTargets(const web::Widget & target1, const T&... other_targets) {
@@ -176,7 +178,7 @@ namespace web {
     /// Determine if this animation is currently in the process of running a single step.
     bool GetDoStep() const { return do_step; }
 
-    /// Return the time point that this animation start MOST RECENTLY.
+    /// Return the time point that this animation started MOST RECENTLY.
     double GetStartTime() const { return start_time; }
 
     /// Determine the time point when this animation last updated a frame.
@@ -219,6 +221,17 @@ namespace web {
           toggle_but.Label(active ? stop_label : start_label);
         }, start_label, but_name);
       return toggle_but;
+    }
+
+    /// Get a step button that will advance this animation one frame.
+    /// @param but_name The HTML identifier used for this button.
+    /// @param label The name shown on the button.
+    Button GetStepButton(const std::string & but_name, const std::string & label="Step") {
+      step_but = Button( [this, but_name, label]() {
+          this->do_step = true;
+          this->AdvanceFrame();
+        }, label, but_name);
+      return step_but;
     }
   };
 

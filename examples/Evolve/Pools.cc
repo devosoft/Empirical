@@ -10,7 +10,6 @@
 #include "Evolve/World.h"
 #include "tools/Random.h"
 #include "tools/string_utils.h"
-#include "Evolve/World_structure.h"
 
 int main()
 {

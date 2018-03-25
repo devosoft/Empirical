@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  Tests for files in the tools/ folder.
@@ -11,13 +11,12 @@
 #define EMP_DECORATE(X) [X]
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]
 #define CATCH_CONFIG_MAIN
-#undef NDEBUG
-#define TDEBUG 1
 
 #include "third-party/Catch/single_include/catch.hpp"
 
 #include <sstream>
 #include <string>
+#include <deque>
 
 #include "tools/BitMatrix.h"
 #include "tools/BitSet.h"
@@ -31,8 +30,8 @@
 #include "tools/RegEx.h"
 #include "tools/Random.h"
 #include "tools/TypeTracker.h"
+#include "tools/attrs.h"
 
-#include "tools/errors.h"
 #include "tools/flex_function.h"
 #include "tools/functions.h"
 #include "tools/graph_utils.h"
@@ -44,10 +43,13 @@
 #include "tools/mem_track.h"
 #include "tools/memo_function.h"
 #include "tools/sequence_utils.h"
-#include "tools/serialize.h"
+// #include "tools/serialize.h"
+#include "tools/set_utils.h"
+#include "tools/stats.h"
 #include "tools/string_utils.h"
 #include "tools/tuple_struct.h"
 #include "tools/unit_tests.h"
+#include "tools/vector_utils.h"
 
 // currently these have no coveage; we include them so we get metrics on them
 // this doesn't actually work--TODO: figure out why this doesn't work
@@ -56,6 +58,15 @@
 #include "tools/SolveState.h"
 #include "tools/serialize_macros.h"
 
+/// Ensures that
+/// 1) A == B
+/// 2) A and B can be constexprs or non-contexprs.
+/// 3) A and B have the same values regardless of constexpr-ness.
+#define CONSTEXPR_REQUIRE_EQ(A, B)       \
+  {                                      \
+    static_assert(A == B, #A " == " #B); \
+    REQUIRE(A == B);                     \
+  }
 
 // this templating is necessary to force full coverage of templated classes.
 // Since c++ doesn't generate code for templated methods if those methods aren't
@@ -211,31 +222,31 @@ TEST_CASE("Test BitSet timing", "[tools]")
 }
 
 
-TEST_CASE("Test BitVector", "[tools]")
-{
-  emp::BitVector bv10(10);
-  emp::BitVector bv32(32);
-  emp::BitVector bv50(50);
-  emp::BitVector bv64(64);
-  emp::BitVector bv80(80);
+// TEST_CASE("Test BitVector", "[tools]")
+// {
+//   emp::BitVector bv10(10);
+//   emp::BitVector bv32(32);
+//   emp::BitVector bv50(50);
+//   emp::BitVector bv64(64);
+//   emp::BitVector bv80(80);
 
-  bv80[70] = 1;
-  emp::BitVector bv80c(bv80);
+//   bv80[70] = 1;
+//   emp::BitVector bv80c(bv80);
 
-  bv80 <<= 1;
+//   bv80 <<= 1;
 
-  for (size_t i = 0; i < 75; i += 2) {
-    emp::BitVector shift_vector = bv80 >> i;
-    REQUIRE((shift_vector.CountOnes() == 1) == (i <= 71));
-  }
+//   for (size_t i = 0; i < 75; i += 2) {
+//     emp::BitVector shift_vector = bv80 >> i;
+//     REQUIRE((shift_vector.CountOnes() == 1) == (i <= 71));
+//   }
 
-  bv10 = (bv80 >> 70);
+//   bv10 = (bv80 >> 70);
 
-  // Test arbitrary bit retrieval of UInts
-  bv80[65] = 1;
-  REQUIRE(bv80.GetUIntAtBit(64) == 130);
-  REQUIRE(bv80.GetValueAtBit<5>(64) == 2);
-}
+//   // Test arbitrary bit retrieval of UInts
+//   bv80[65] = 1;
+//   REQUIRE(bv80.GetUIntAtBit(64) == 130);
+//   REQUIRE(bv80.GetValueAtBit<5>(64) == 2);
+// }
 
 
 TEST_CASE("Test DFA", "[tools]")
@@ -301,22 +312,6 @@ TEST_CASE("Test DynamicString", "[tools]")
   REQUIRE(test_set[2] == "Line Two");
   REQUIRE(test_set[3] == "Line Three");
   REQUIRE(test_set[4] == "Line 4");
-}
-
-TEST_CASE("Test errors", "[tools]")
-{
-  emp::TriggerExcept("test_fail", "The test failed.  *sob*");
-  emp::TriggerExcept("test_fail2", "The second test failed too.  But it's not quite as aweful.", false);
-  emp::TriggerExcept("test_fail2", "The third test is just test 2 again, but worse", true);
-
-  REQUIRE( emp::CountExcepts() == 3 );
-  auto except = emp::PopExcept("test_fail2");
-  REQUIRE( emp::CountExcepts() == 2 );
-  REQUIRE( except.desc == "The second test failed too.  But it's not quite as aweful." );
-  REQUIRE( emp::HasExcept("test_fail2") == true );
-  REQUIRE( emp::HasExcept("test_fail3") == false );
-  emp::ClearExcepts();
-  REQUIRE( emp::CountExcepts() == 0 );
 }
 
 int Sum4(int a1, int a2, int a3, int a4) {
@@ -928,135 +923,135 @@ TEST_CASE("Test sequence utils", "[tools]")
 
 
 
-struct SerializeTest {
-  int a;
-  float b;        // unimportant data!
-  std::string c;
+// struct SerializeTest {
+//   int a;
+//   float b;        // unimportant data!
+//   std::string c;
 
-  SerializeTest(int _a, float _b, std::string _c) : a(_a), b(_b), c(_c) { ; }
-  EMP_SETUP_DATAPOD(SerializeTest, a, c);
-};
+//   SerializeTest(int _a, float _b, std::string _c) : a(_a), b(_b), c(_c) { ; }
+//   EMP_SETUP_DATAPOD(SerializeTest, a, c);
+// };
 
-struct SerializeTest_D : public SerializeTest {
-  char d = '$';
+// struct SerializeTest_D : public SerializeTest {
+//   char d = '$';
 
-  SerializeTest_D(int _a, float _b, std::string _c, char _d)
-    : SerializeTest(_a, _b, _c), d(_d) { ; }
-  EMP_SETUP_DATAPOD_D(SerializeTest_D, SerializeTest, d);
-};
+//   SerializeTest_D(int _a, float _b, std::string _c, char _d)
+//     : SerializeTest(_a, _b, _c), d(_d) { ; }
+//   EMP_SETUP_DATAPOD_D(SerializeTest_D, SerializeTest, d);
+// };
 
-struct ExtraBase {
-  double e;
+// struct ExtraBase {
+//   double e;
 
-  ExtraBase(double _e) : e(_e) { ; }
-  EMP_SETUP_DATAPOD(ExtraBase, e);
-};
+//   ExtraBase(double _e) : e(_e) { ; }
+//   EMP_SETUP_DATAPOD(ExtraBase, e);
+// };
 
-struct MultiTest : public SerializeTest, public ExtraBase {
-  bool f;
+// struct MultiTest : public SerializeTest, public ExtraBase {
+//   bool f;
 
-  MultiTest(int _a, float _b, std::string _c, double _e, bool _f)
-    : SerializeTest(_a, _b, _c), ExtraBase(_e), f(_f) { ; }
-  EMP_SETUP_DATAPOD_D2(MultiTest, SerializeTest, ExtraBase, f);
-};
+//   MultiTest(int _a, float _b, std::string _c, double _e, bool _f)
+//     : SerializeTest(_a, _b, _c), ExtraBase(_e), f(_f) { ; }
+//   EMP_SETUP_DATAPOD_D2(MultiTest, SerializeTest, ExtraBase, f);
+// };
 
-struct NestedTest {
-  SerializeTest st;
-  std::string name;
-  SerializeTest_D std;
-  MultiTest mt;
+// struct NestedTest {
+//   SerializeTest st;
+//   std::string name;
+//   SerializeTest_D std;
+//   MultiTest mt;
 
-  NestedTest(int a1, float b1, std::string c1,
-             int a2, float b2, std::string c2, char d2,
-             int a3, float b3, std::string c3, double e3, bool f3)
-    : st(a1, b1, c1), name("my_class"), std(a2, b2, c2, d2), mt(a3, b3, c3, e3, f3) { ; }
+//   NestedTest(int a1, float b1, std::string c1,
+//              int a2, float b2, std::string c2, char d2,
+//              int a3, float b3, std::string c3, double e3, bool f3)
+//     : st(a1, b1, c1), name("my_class"), std(a2, b2, c2, d2), mt(a3, b3, c3, e3, f3) { ; }
 
-  EMP_SETUP_DATAPOD(NestedTest, st, name, std, mt);
-};
+//   EMP_SETUP_DATAPOD(NestedTest, st, name, std, mt);
+// };
 
-struct BuiltInTypesTest {
-  const int a;
-  emp::vector<int> int_v;
+// struct BuiltInTypesTest {
+//   const int a;
+//   emp::vector<int> int_v;
 
-  BuiltInTypesTest(int _a, size_t v_size) : a(_a), int_v(v_size) {
-    for (size_t i = 0; i < v_size; i++) int_v[i] = (int)(i*i);
-  }
+//   BuiltInTypesTest(int _a, size_t v_size) : a(_a), int_v(v_size) {
+//     for (size_t i = 0; i < v_size; i++) int_v[i] = (int)(i*i);
+//   }
 
-  EMP_SETUP_DATAPOD(BuiltInTypesTest, a, int_v);
-};
+//   EMP_SETUP_DATAPOD(BuiltInTypesTest, a, int_v);
+// };
 
-TEST_CASE("Test serialize", "[tools]")
-{
-  std::stringstream ss;
-  emp::serialize::DataPod pod(ss);
-
-
-  // Basic test...
-
-  SerializeTest st(7, 2.34, "my_test_string");
-  st.EMP_Store(pod);
-
-  SerializeTest st2(pod);
-
-  REQUIRE(st2.a == 7);                 // Make sure a was reloaded correctly.
-  REQUIRE(st2.c == "my_test_string");  // Make sure c was reloaded correctly.
+// TEST_CASE("Test serialize", "[tools]")
+// {
+//   std::stringstream ss;
+//   emp::serialize::DataPod pod(ss);
 
 
-  // Derived class Test
+//   // Basic test...
 
-  SerializeTest_D stD(10,0.2,"three",'D');
-  stD.EMP_Store(pod);
+//   SerializeTest st(7, 2.34, "my_test_string");
+//   st.EMP_Store(pod);
 
-  SerializeTest_D stD2(pod);
+//   SerializeTest st2(pod);
 
-  REQUIRE(stD2.a == 10);
-  REQUIRE(stD2.c == "three");
-  REQUIRE(stD2.d == 'D');
-
-  // Multiply-derived class Test
-
-  MultiTest stM(111,2.22,"ttt",4.5,true);
-  stM.EMP_Store(pod);
-
-  MultiTest stM2(pod);
+//   REQUIRE(st2.a == 7);                 // Make sure a was reloaded correctly.
+//   REQUIRE(st2.c == "my_test_string");  // Make sure c was reloaded correctly.
 
 
-  REQUIRE(stM2.a == 111);
-  REQUIRE(stM2.c == "ttt");
-  REQUIRE(stM2.e == 4.5);
-  REQUIRE(stM2.f == true);
+//   // Derived class Test
+
+//   SerializeTest_D stD(10,0.2,"three",'D');
+//   stD.EMP_Store(pod);
+
+//   SerializeTest_D stD2(pod);
+
+//   REQUIRE(stD2.a == 10);
+//   REQUIRE(stD2.c == "three");
+//   REQUIRE(stD2.d == 'D');
+
+//   // Multiply-derived class Test
+
+//   MultiTest stM(111,2.22,"ttt",4.5,true);
+//   stM.EMP_Store(pod);
+
+//   MultiTest stM2(pod);
 
 
-  // Nested objects test...
-
-  NestedTest nt(91, 3.14, "magic numbers",
-                100, 0.01, "powers of 10", '1',
-                1001, 1.001, "ones and zeros", 0.125, true);
-  nt.EMP_Store(pod);
-
-  NestedTest nt2(pod);
-
-  REQUIRE(nt2.st.a == 91);
-  REQUIRE(nt2.st.c == "magic numbers");
-  REQUIRE(nt2.name == "my_class");
-  REQUIRE(nt2.std.a == 100);
-  REQUIRE(nt2.std.c == "powers of 10");
-  REQUIRE(nt2.std.d == '1');
-  REQUIRE(nt2.mt.a == 1001);
-  REQUIRE(nt2.mt.c == "ones and zeros");
-  REQUIRE(nt2.mt.e == 0.125);
-  REQUIRE(nt2.mt.f == true);
+//   REQUIRE(stM2.a == 111);
+//   REQUIRE(stM2.c == "ttt");
+//   REQUIRE(stM2.e == 4.5);
+//   REQUIRE(stM2.f == true);
 
 
-  // If we made it this far, everything must have worked!;
+//   // Nested objects test...
 
-  const int v_size = 43;
-  BuiltInTypesTest bitt(91, v_size);
-  bitt.EMP_Store(pod);
+//   NestedTest nt(91, 3.14, "magic numbers",
+//                 100, 0.01, "powers of 10", '1',
+//                 1001, 1.001, "ones and zeros", 0.125, true);
+//   nt.EMP_Store(pod);
+
+//   NestedTest nt2(pod);
+
+//   REQUIRE(nt2.st.a == 91);
+//   REQUIRE(nt2.st.c == "magic numbers");
+//   REQUIRE(nt2.name == "my_class");
+//   REQUIRE(nt2.std.a == 100);
+//   REQUIRE(nt2.std.c == "powers of 10");
+//   REQUIRE(nt2.std.d == '1');
+//   REQUIRE(nt2.mt.a == 1001);
+//   REQUIRE(nt2.mt.c == "ones and zeros");
+//   REQUIRE(nt2.mt.e == 0.125);
+//   REQUIRE(nt2.mt.f == true);
 
 
-  BuiltInTypesTest bitt2(pod);
-}
+//   // If we made it this far, everything must have worked!;
+
+//   const int v_size = 43;
+//   BuiltInTypesTest bitt(91, v_size);
+//   bitt.EMP_Store(pod);
+
+
+//   BuiltInTypesTest bitt2(pod);
+// }
 
 
 
@@ -1171,6 +1166,27 @@ TEST_CASE("Test string utils", "[tools]")
   REQUIRE(slices[3] == "t ");
 
 
+  // Some tests of to_string() function.
+  REQUIRE(emp::to_string((int) 1) == "1");
+  REQUIRE(emp::to_string("2") == "2");
+  REQUIRE(emp::to_string(std::string("3")) == "3");
+  REQUIRE(emp::to_string('4') == "4");
+  REQUIRE(emp::to_string((int16_t) 5) == "5");
+  REQUIRE(emp::to_string((int32_t) 6) == "6");
+  REQUIRE(emp::to_string((int64_t) 7) == "7");
+  REQUIRE(emp::to_string((uint16_t) 8) == "8");
+  REQUIRE(emp::to_string((uint32_t) 9) == "9");
+  REQUIRE(emp::to_string((uint64_t) 10) == "10");
+  REQUIRE(emp::to_string((size_t) 11) == "11");
+  REQUIRE(emp::to_string((long) 12) == "12");
+  REQUIRE(emp::to_string((unsigned long) 13) == "13");
+  REQUIRE(emp::to_string((float) 14.0) == "14.000000");
+  REQUIRE(emp::to_string((double) 15.0) == "15.000000");
+  REQUIRE(emp::to_string(16.0) == "16.000000");
+  REQUIRE(emp::to_string(emp::vector<size_t>({17,18,19})) == "[ 17 18 19 ]");
+  REQUIRE(emp::to_string((char) 32) == " ");
+  REQUIRE(emp::to_string((unsigned char) 33) == "!");
+
   std::string cat_a = "ABC";
   bool cat_b = true;
   char cat_c = '2';
@@ -1179,7 +1195,7 @@ TEST_CASE("Test string utils", "[tools]")
   std::string cat_full = emp::to_string(cat_a, cat_b, cat_c, cat_d);
 
   REQUIRE(cat_full == "ABC123");
-  std::array<int, 3> test_arr({4, 2, 5});
+  std::array<int, 3> test_arr({{ 4, 2, 5 }});
   REQUIRE(emp::to_string(test_arr) == "[ 4 2 5 ]");
 }
 
@@ -1226,4 +1242,291 @@ TEST_CASE("Test type tracker (TypeTracker)", "[tools]")
 
   REQUIRE( (tt_t::GetID<int,std::string,double>()) == (tt_t::GetTrackedID(tt_int1, tt_str, tt_doub)) );
   REQUIRE( (tt_t::GetComboID<int,std::string,double>()) == (tt_t::GetTrackedComboID(tt_int1, tt_str, tt_doub)) );
+}
+
+TEST_CASE("Test stats", "[tools]") {
+  emp::vector<int> vec1({1,2,1,1,2,3});
+  double i1 = 1;
+  double i2 = 1;
+  double i3 = 1;
+  double i4 = 2;
+
+  emp::vector<double*> vec2({&i1, &i2, &i3, &i4});
+
+  std::deque<double> deque1({5,4,3,5,4,6});
+
+  REQUIRE(emp::ShannonEntropy(vec1) == Approx(1.459324));
+  REQUIRE(emp::ShannonEntropy(vec2) == Approx(0.81128));
+  REQUIRE(emp::ShannonEntropy(deque1) == Approx(1.918648));
+
+  REQUIRE(emp::Variance(vec1) == Approx(0.55539));
+  REQUIRE(emp::Variance(vec2) == Approx(0.1875));
+  REQUIRE(emp::Variance(deque1) == Approx(0.9166666667));
+
+  REQUIRE(emp::StandardDeviation(vec1) == Approx(0.745245));
+  REQUIRE(emp::StandardDeviation(vec2) == Approx(0.433013));
+  REQUIRE(emp::StandardDeviation(deque1) == Approx(0.957427));
+
+  REQUIRE(emp::Sum(vec1) == 10);
+  REQUIRE(emp::Sum(vec2) == 5);
+  REQUIRE(emp::Sum(deque1) == 27);
+
+  REQUIRE(emp::UniqueCount(vec1) == 3);
+  REQUIRE(emp::UniqueCount(vec2) == 2);
+  REQUIRE(emp::UniqueCount(deque1) == 4);
+
+  REQUIRE(emp::Mean(vec1) == Approx(1.6666666666667));
+  REQUIRE(emp::Mean(vec2) == Approx(1.25));
+  REQUIRE(emp::Mean(deque1) == 4.5);
+
+  std::function<int(int)> invert = [](int i){return i*-1;};
+
+  REQUIRE(emp::MaxResult(invert, vec1) == -1);
+  REQUIRE(emp::MinResult(invert, vec1) == -3);
+  REQUIRE(emp::MeanResult(invert, vec1) == Approx(-1.666666667));
+  REQUIRE(emp::ApplyFunction(invert, vec1) == emp::vector<int>({-1,-2,-1,-1,-2,-3}));
+
+}
+
+TEST_CASE("Test set utils", "[tools]") {
+  std::set<int> s1;
+  std::set<int> s2;
+  std::set<int> comp_set;
+  emp::vector<int> v1;
+  emp::vector<int> v2;
+
+  s1.insert(1);
+  s1.insert(2);
+  s2.insert(2);
+  s2.insert(3);
+  v1.push_back(1);
+  v1.push_back(3);
+  v2.push_back(4);
+  v2.push_back(1);
+
+  REQUIRE(emp::Has(s1, 1));
+  REQUIRE(!emp::Has(s1, 3));
+
+  comp_set.insert(1);
+  REQUIRE(emp::difference(s1, s2) == comp_set);
+  comp_set.clear();
+  comp_set.insert(3);
+  REQUIRE(emp::difference(s2, s1) == comp_set);
+  comp_set.clear();
+  comp_set.insert(2);
+  REQUIRE(emp::intersection(s1, s2) == comp_set);
+  REQUIRE(emp::intersection(s2, s1) == comp_set);
+  comp_set.clear();
+  comp_set.insert(2);
+  REQUIRE(emp::difference(s1, v1) == comp_set);
+  comp_set.clear();
+  comp_set.insert(1);
+  REQUIRE(emp::intersection(s1, v1) == comp_set);
+  REQUIRE(emp::intersection(v1, s1) == comp_set);
+  REQUIRE(emp::intersection(v2, v1) == comp_set);
+  REQUIRE(emp::intersection(v1, v2) == comp_set);
+  comp_set.clear();
+  comp_set.insert(4);
+  REQUIRE(emp::difference(v2, v1) == comp_set);
+  comp_set.clear();
+  comp_set.insert(1);
+  comp_set.insert(2);
+  comp_set.insert(3);
+  REQUIRE(emp::set_union(s1, s2) == comp_set);
+  REQUIRE(emp::set_union(s2, s1) == comp_set);
+  comp_set.clear();
+  comp_set.insert(1);
+  comp_set.insert(2);
+  comp_set.insert(3);
+  comp_set.insert(4);
+  REQUIRE(emp::set_union(v2, s2) == comp_set);
+  REQUIRE(emp::set_union(s2, v2) == comp_set);
+  comp_set.clear();
+  comp_set.insert(1);
+  comp_set.insert(3);
+  comp_set.insert(4);
+  REQUIRE(emp::set_union(v2, v1) == comp_set);
+  REQUIRE(emp::set_union(v1, v2) == comp_set);
+  comp_set.clear();
+  comp_set.insert(1);
+  comp_set.insert(3);
+  REQUIRE(emp::symmetric_difference(s1, s2) == comp_set);
+  REQUIRE(emp::symmetric_difference(s2, s1) == comp_set);
+  comp_set.clear();
+  comp_set.insert(4);
+  comp_set.insert(3);
+  REQUIRE(emp::symmetric_difference(v1, v2) == comp_set);
+  REQUIRE(emp::symmetric_difference(v2, v1) == comp_set);
+  comp_set.clear();
+  comp_set.insert(2);
+  comp_set.insert(3);
+  REQUIRE(emp::symmetric_difference(v1, s1) == comp_set);
+  REQUIRE(emp::symmetric_difference(s1, v1) == comp_set);
+
+}
+
+TEST_CASE("Test vector utils", "[tools]") {
+  emp::vector<int> v1({6,2,5,1,3});
+  emp::Sort(v1);
+  REQUIRE(v1 == emp::vector<int>({1,2,3,5,6}));
+  REQUIRE(emp::FindPos(v1, 3) == 2);
+  REQUIRE(emp::Sum(v1) == 17);
+  REQUIRE(emp::Has(v1, 3));
+  REQUIRE(!emp::Has(v1, 4));
+  REQUIRE(emp::Product(v1) == 180);
+  REQUIRE(emp::Slice(v1,1,3) == emp::vector<int>({2,3}));
+}
+
+DEFINE_ATTR(Foo);
+DEFINE_ATTR(Bar);
+DEFINE_ATTR(Bazz);
+
+struct ident_t {
+  template <typename T>
+  constexpr decltype(auto) operator()(T&& value) const {
+    return std::forward<T>(value);
+  }
+};
+
+constexpr ident_t ident{};
+
+template <typename T>
+struct Callable {
+  T value;
+
+  constexpr decltype(auto) operator()() & { return value; }
+  constexpr decltype(auto) operator()() const & { return value; }
+  constexpr decltype(auto) operator()() && { return std::move(value); }
+  constexpr decltype(auto) operator()() const && { return std::move(value); }
+};
+template <typename T>
+constexpr Callable<std::decay_t<T>> callable(T&& value) {
+  return {std::forward<T>(value)};
+}
+
+struct NoCopy {
+  int value;
+  constexpr NoCopy(int value) : value(value) {}
+  constexpr NoCopy(const NoCopy&) = delete;
+  constexpr NoCopy(NoCopy&&) = default;
+
+  constexpr NoCopy& operator=(const NoCopy&) = delete;
+  constexpr NoCopy& operator=(NoCopy&&) = default;
+};
+constexpr bool operator==(const NoCopy& a, const NoCopy& b) {
+  return a.value == b.value;
+}
+std::ostream& operator<<(std::ostream& out, const NoCopy& nc) {
+  return out << "NoCopy{" << nc.value << "}";
+}
+
+struct {
+  template <typename I, typename T>
+  constexpr auto operator()(I&& init, T&& value) const {
+    return std::forward<I>(init) + std::forward<T>(value).Get();
+  }
+
+  template <typename I, typename T>
+  constexpr auto operator()(const char* name, I&& init, T&& value) const {
+    return std::forward<I>(init) + std::forward<T>(value);
+  }
+} sum;
+
+struct {
+  template <typename I, typename A, typename B>
+  constexpr auto operator()(I&& init, A&& a, B&& b) const {
+    return std::forward<I>(init) +
+           (std::forward<A>(a).Get() * std::forward<B>(b).Get());
+  }
+} dot;
+
+struct {
+  template <typename I, typename T>
+  constexpr NoCopy operator()(I&& init, T&& value) const {
+    return {std::forward<I>(init).value + std::forward<T>(value).Get().value};
+  }
+
+  template <typename I, typename T>
+  constexpr NoCopy operator()(const char* name, I&& init, T&& value) const {
+    return {std::forward<I>(init).value + std::forward<T>(value).value};
+  }
+} sum_nocopy;
+
+TEST_CASE("Test Attribute Packs", "[tools]") {
+  using namespace emp::tools;
+  // Test Construction & access
+  CONSTEXPR_REQUIRE_EQ(Foo::CallOrGetAttribute(Foo(6)).Get(), 6);
+  CONSTEXPR_REQUIRE_EQ(Foo::CallOrGetAttribute(Foo(callable(7))).Get(), 7);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrElse(Foo(7), callable(0)), 7);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrElse(Merge(Foo(7), Bar(6)), callable(0)), 7);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrElse(Merge(Bazz(7), Bar(6)), callable(0)), 0);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrGetIn(Bazz(1), Bar(2), Foo(3)), 3);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrGetIn(Bazz(1), Foo(3), Foo(2)), 3);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrGetIn(Foo(3), Bar(2), Bazz(1)), 3);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrGetIn(Foo(3), Bar(2)), 3);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrGetIn(Bar(2), Foo(3)), 3);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrGetIn(Foo(3)), 3);
+
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOr(Foo(7), 0), 7);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOr(Merge(Foo(7), Bar(6)), 0), 7);
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOr(Merge(Bazz(7), Bar(6)), 0), 0);
+
+  CONSTEXPR_REQUIRE_EQ(Merge(Foo(5), Bar(6)), Merge(Foo(5), Bar(6)));
+
+  // Test NoCopy
+  CONSTEXPR_REQUIRE_EQ(Foo::CallOrGetAttribute(Foo(NoCopy{7})).Get(),
+                       NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(Foo::CallOrGetAttribute(Foo(callable(NoCopy{7}))).Get(),
+                       NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrElse(Foo(NoCopy{7}), callable(NoCopy{0})),
+                       NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(
+    Foo::GetOrElse(Merge(Foo(NoCopy{7}), Bar(NoCopy{6})), callable(NoCopy{7})),
+    NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(
+    Foo::GetOrElse(Merge(Bazz(NoCopy{7}), Bar(NoCopy{6})), callable(NoCopy{0})),
+    NoCopy{0});
+
+  CONSTEXPR_REQUIRE_EQ(
+    Foo::GetOrGetIn(Bazz(NoCopy{1}), Bar(NoCopy{2}), Foo(NoCopy{3})),
+    NoCopy{3});
+  CONSTEXPR_REQUIRE_EQ(
+    Foo::GetOrGetIn(Bazz(NoCopy{1}), Foo(NoCopy{3}), Foo(NoCopy{2})),
+    NoCopy{3});
+  CONSTEXPR_REQUIRE_EQ(
+    Foo::GetOrGetIn(Foo(NoCopy{3}), Bar(NoCopy{2}), Bazz(NoCopy{1})),
+    NoCopy{3});
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrGetIn(Foo(NoCopy{3}), Bar(NoCopy{2})),
+                       NoCopy{3});
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrGetIn(Bar(NoCopy{2}), Foo(NoCopy{3})),
+                       NoCopy{3});
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOrGetIn(Foo(NoCopy{3})), NoCopy{3});
+
+  CONSTEXPR_REQUIRE_EQ(Foo::GetOr(Foo(NoCopy{7}), NoCopy{0}), NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(
+    Foo::GetOr(Merge(Foo(NoCopy{7}), Bar(NoCopy{6})), NoCopy{0}), NoCopy{7});
+  CONSTEXPR_REQUIRE_EQ(
+    Foo::GetOr(Merge(Bazz(NoCopy{7}), Bar(NoCopy{6})), NoCopy{0}), NoCopy{0});
+
+  CONSTEXPR_REQUIRE_EQ(Merge(Foo(NoCopy{5}), Bar(NoCopy{6})),
+                       Merge(Foo(NoCopy{5}), Bar(NoCopy{6})));
+
+  // Test Mapping
+  CONSTEXPR_REQUIRE_EQ(Merge(Foo(ident), Bar(6))(5), Merge(Foo(5), Bar(6)));
+  CONSTEXPR_REQUIRE_EQ(Merge(Foo(ident), Bar(6))(5), Merge(Foo(5), Bar(6)));
+
+  CONSTEXPR_REQUIRE_EQ(Merge(Bar(6), Foo(ident))(NoCopy{5}),
+                       Merge(Foo(NoCopy{5}), Bar(6)));
+
+  CONSTEXPR_REQUIRE_EQ(Merge(Bar(NoCopy{6}), Foo(ident))(5),
+                       Merge(Foo(5), Bar(NoCopy{6})));
+
+  CONSTEXPR_REQUIRE_EQ(Merge(Bar(5), Foo(6)).Reduce(0, sum), 11);
+  CONSTEXPR_REQUIRE_EQ(
+    Merge(Bar(NoCopy{5}), Foo(NoCopy{6})).Reduce(NoCopy{0}, sum_nocopy),
+    NoCopy{11});
+  CONSTEXPR_REQUIRE_EQ(MergeReduce(0, sum, Bar(6), Foo(7)), 6 + 7);
+  // CONSTEXPR_REQUIRE_EQ(MergeReduce(0, [](auto init, auto& a, auto& b) {return
+  // init + a.Get() * b.Get();}, Bar(6) + Foo(7), Bar(11) + Foo(12)),
+  //                      6 + 7);
 }

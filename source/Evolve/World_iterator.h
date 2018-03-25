@@ -6,7 +6,7 @@
  *
  *  @file  World_iterator.h
  *  @brief This file defines iterators for use with emp::World objects.
- * 
+ *
  *  @todo Add a const interator.
  *  @todo Currently we do MakeValid after every change AND before many accesses.  Pick one?
  *  @todo Fix operator-- which can go off of the beginnig of the world.
@@ -97,16 +97,16 @@ namespace emp {
     /// Is this iterator pointing to a valid cell in the world?
     operator bool() const { MakeValid(); return pos < WorldSize(); }
 
-    /// Return an iterator poit to the first occupied cell in the world.
+    /// Return an iterator pointing to the first occupied cell in the world.
     this_t begin() { return this_t(world_ptr, 0); }
 
-    /// Return a const iterator poit to the first occupied cell in the world.
+    /// Return a const iterator pointing to the first occupied cell in the world.
     const this_t begin() const { return this_t(world_ptr, 0); }
 
-    /// Return an iterator poit to just past the end of the world.
+    /// Return an iterator pointing to just past the end of the world.
     this_t end() { return this_t(world_ptr, WorldSize()); }
 
-    /// Return a const iterator poit to just past the end of the world.
+    /// Return a const iterator pointing to just past the end of the world.
     const this_t end() const { return this_t(world_ptr, WorldSize()); }
   };
 

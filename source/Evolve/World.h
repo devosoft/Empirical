@@ -30,6 +30,7 @@
 #include "../base/vector.h"
 #include "../control/Signal.h"
 #include "../control/SignalControl.h"
+#include "../data/DataFile.h"
 #include "../data/Trait.h"
 #include "../meta/reflection.h"
 #include "../tools/map_utils.h"
@@ -39,11 +40,11 @@
 #include "../tools/string_utils.h"
 
 // World-specific includes.
-#include "Systematics.h"    // Track relationships among organisms.
-#include "World_file.h"     // Helper to determine when specific events should occur.
-#include "World_iterator.h" // Allow iteration through organisms in a world.
-#include "World_reflect.h"  // Handle needed reflection on incoming organism classes.
-#include "World_select.h"   // Include all built-in selection functions for World.
+#include "Systematics.h"     // Track relationships among organisms.
+#include "World_iterator.h"  // Allow iteration through organisms in a world.
+#include "World_reflect.h"   // Handle needed reflection on incoming organism classes.
+#include "World_select.h"    // Include all built-in selection functions for World.
+#include "World_structure.h" // Include additional function to setup world structure.
 
 namespace emp {
 
@@ -105,7 +106,7 @@ namespace emp {
       bool IsValid() const { return index != (size_t) -1; }
 
       OrgPosition & SetActive(bool _active=true) { is_active = _active; return *this; }
-      OrgPosition & SetIndex(size_t _id) { index = _id; return *this; }      
+      OrgPosition & SetIndex(size_t _id) { index = _id; return *this; }
     };
 
     // --- Publicly available types ---
@@ -123,7 +124,7 @@ namespace emp {
     /// Function type for calculating the distance between two organisms.
     using fun_calc_dist_t    = std::function<double(ORG&,ORG&)>;
 
-    /// Function type for a mutation operator on an organisms.
+    /// Function type for a mutation operator on an organism.
     using fun_do_mutations_t = std::function<size_t(ORG&,Random&)>;
 
     /// Function type for printing an organism's info to an output stream.
@@ -154,15 +155,15 @@ namespace emp {
     emp::vector<Ptr<genotype_t>> next_genotypes; ///< Genotypes for corresponding orgs in next_pop.
 
     // Configuration settings
-    std::string name;                  ///< Name of this world (for use in configuration.)
-    bool cache_on;                     ///< Should we be caching fitness values?
-    std::vector<size_t> pop_sizes;     ///< Sizes of population dimensions (eg, 2 vals for grid)
-    emp::TraitSet<ORG> phenotypes;     ///< What phenotypes are we tracking?
-    emp::vector<World_file> files;     ///< Output files.
+    std::string name;               ///< Name of this world (for use in configuration.)
+    bool cache_on;                  ///< Should we be caching fitness values?
+    std::vector<size_t> pop_sizes;  ///< Sizes of population dimensions (eg, 2 vals for grid)
+    emp::TraitSet<ORG> phenotypes;  ///< What phenotypes are we tracking?
+    emp::vector<DataFile> files;    ///< Output files.
 
-    bool is_synchronous;               ///< Does this world have synchronous generations?
-    bool is_space_structured;          ///< Do we have a spatially structured population?
-    bool is_pheno_structured;          ///< Do we have a phenotypically structured population?
+    bool is_synchronous;            ///< Does this world have synchronous generations?
+    bool is_space_structured;       ///< Do we have a spatially structured population?
+    bool is_pheno_structured;       ///< Do we have a phenotypically structured population?
 
     /// Potential data nodes -- these should be activated only if in use.
     Ptr<DataMonitor<double>> data_node_fitness;
@@ -256,6 +257,17 @@ namespace emp {
     /// How many cells tall is the world? (assumes grids are active.)
     size_t GetHeight() const { return pop_sizes[1]; }
 
+    /// What phenotypic traits is the population tracking?
+    const emp::TraitSet<ORG> & GetPhenotypes() const { return phenotypes; }
+
+    /// Lookup a file by name.
+    DataFile & GetFile(const std::string & filename) {
+      for (DataFile & file : files) {
+        if (file.GetFilename() == filename) return file;
+      }
+      emp_assert(!"Trying to lookup a file that does not exist.", filename);
+    }
+
     /// Does the specified cell ID have an organism in it?
     bool IsOccupied(size_t i) const { return pop[i] != nullptr; }
 
@@ -348,14 +360,13 @@ namespace emp {
     /// argument determines if the generations should be synchronous (true) or not (false, default)
     void SetGrid(size_t width, size_t height, bool synchronous_gen=false);
 
-    /// Set the population to be a set of pools that are individually well mixed, but with limited
-    /// migtation.  Arguments are the number of pools, the size of each pool, and whether the
-    /// generations should be synchronous (true) or not (false, default).
-    void SetPools(size_t num_pools, size_t pool_size, bool synchronous_gen=false);
-
     /// Add a new phenotype measuring function.
-    void AddPhenotype(const std::string & name, std::function<double(ORG &)> fun) {
-      phenotypes.AddTrait(name, fun);
+    // void AddPhenotype(const std::string & name, std::function<double(ORG &)> fun) {
+    //   phenotypes.AddTrait(name, fun);
+    // }
+    template <typename... Ts>
+    void AddPhenotype(Ts &&... args) {
+      phenotypes.AddTrait(std::forward<Ts>(args)...);
     }
 
     /// Access a data node that tracks fitness information in the population.  The fitness will not
@@ -378,16 +389,16 @@ namespace emp {
     }
 
     /// Setup an arbitrary file; no default filename available.
-    World_file & SetupFile(const std::string & filename);
+    DataFile & SetupFile(const std::string & filename);
 
     /// Setup a file to be printed that collects fitness information over time.
-    World_file & SetupFitnessFile(const std::string & filename="fitness.csv");
+    DataFile & SetupFitnessFile(const std::string & filename="fitness.csv", const bool & print_header=true);
 
     /// Setup a file to be printed that collects systematics information over time.
-    World_file & SetupSystematicsFile(const std::string & filename="systematics.csv");
+    DataFile & SetupSystematicsFile(const std::string & filename="systematics.csv", const bool & print_header=true);
 
     /// Setup a file to be printed that collects population information over time.
-    World_file & SetupPopulationFile(const std::string & filename="population.csv");
+    DataFile & SetupPopulationFile(const std::string & filename="population.csv", const bool & print_header=true);
 
     /// Setup the function to be used when fitness needs to be calculated.  The provided function
     /// should take a reference to an organism and return a fitness value of type double.
@@ -463,13 +474,13 @@ namespace emp {
     /// Return:   Key value needed to make future modifications.
     SignalKey OnOrgPlacement(const std::function<void(size_t)> & fun) { return org_placement_sig.AddAction(fun); }
 
-    /// Privide a function for World to call each time Update() is run.
+    /// Provide a function for World to call each time Update() is run.
     /// Trigger:  New update is starting
     /// Argument: Update number (sequentially increasing)
     /// Return:   Key value needed to make future modifications.
     SignalKey OnUpdate(const std::function<void(size_t)> & fun) { return on_update_sig.AddAction(fun); }
 
-    /// Privide a function for World to call each time an organism is about to die.
+    /// Provide a function for World to call each time an organism is about to die.
     /// Trigger:  Organism is about to be killed
     /// Argument: Position of organism about to die
     /// Return:   Key value needed to make future modifications.
@@ -579,10 +590,15 @@ namespace emp {
 
     /// Change the size of the world based on width and height.
     void Resize(size_t new_width, size_t new_height) {
-      // @CAO: Technically we should allow any number of dimensions.
       Resize(new_width * new_height);
       pop_sizes.resize(2);
       pop_sizes[0] = new_width; pop_sizes[1] = new_height;
+    }
+
+    /// Change the size of the world based on a vector of dimensions.
+    void Resize(const emp::vector<size_t> & dims) {
+      Resize(emp::Product(dims));
+      pop_sizes = dims;
     }
 
     /// AddOrgAt is the core function to add organisms to active population (others must go through here)
@@ -843,59 +859,9 @@ namespace emp {
     SetAttribute("PopStruct", "Grid");
   }
 
-  template<typename ORG>
-  void World<ORG>::SetPools(size_t num_pools, size_t pool_size, bool synchronous_gen) {
-    Resize(pool_size, num_pools);
-    is_synchronous = synchronous_gen;
-    is_space_structured = true;
-    is_pheno_structured = false;
-
-    // -- Setup functions --
-    // Inject in a empty pool -or- randomly if none empty
-    fun_add_inject = [this](Ptr<ORG> new_org) {
-      for (size_t id = 0; id < pop.size(); id += pop_sizes[0]) {
-        if (pop[id] == nullptr) return AddOrgAt(new_org, id);
-      }
-      return AddOrgAt(new_org, GetRandomCellID());
-    };
-
-    // neighbors are everyone in the same pool.
-    fun_get_neighbor = [this](size_t id) {
-      emp_assert(random_ptr);
-      const size_t size_x = pop_sizes[0];
-      return (id / size_x) * size_x + random_ptr->GetUInt(size_x);
-    };
-
-    if (synchronous_gen) {
-      // Place births in the next open spot in the new pool (or randomly if full!)
-      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        emp_assert(new_org);                                  // New organism must exist.
-        const size_t size_x = pop_sizes[0];
-        const size_t pool_id = parent_id / size_x;
-        const size_t start_id = pool_id * size_x;
-        for (size_t id = start_id; id < start_id+size_x; id++) {
-          if (next_pop[id] == nullptr) {  // Search for an open positions...
-            return AddNextOrgAt(new_org, id, genotypes[parent_id]);
-          }
-        }
-        const size_t id = fun_get_neighbor(parent_id);     // Placed near parent, in next pop.
-        return AddNextOrgAt(new_org, id, genotypes[parent_id]);
-      };
-      SetAttribute("SynchronousGen", "True");
-    } else {
-      // Asynchronous: always go to a neigbor in current population.
-      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        return AddOrgAt(new_org, fun_get_neighbor(parent_id), genotypes[parent_id]); // Place org in existing population.
-      };
-      SetAttribute("SynchronousGen", "False");
-    }
-
-    SetAttribute("PopStruct", "Pools");
-  }
-
   // A new, arbitrary file.
   template<typename ORG>
-  World_file & World<ORG>::SetupFile(const std::string & filename) {
+  DataFile & World<ORG>::SetupFile(const std::string & filename) {
     size_t id = files.size();
     files.emplace_back(filename);
     return files[id];
@@ -903,7 +869,7 @@ namespace emp {
 
   // A data file (default="fitness.csv") that contains information about the population's fitness.
   template<typename ORG>
-  World_file & World<ORG>::SetupFitnessFile(const std::string & filename) {
+  DataFile & World<ORG>::SetupFitnessFile(const std::string & filename, const bool & print_header) {
     auto & file = SetupFile(filename);
     auto & node = GetFitnessDataNode();
     file.AddVar(update, "update", "Update");
@@ -911,14 +877,14 @@ namespace emp {
     file.AddMin(node, "min_fitness", "Minimum organism fitness in current population.");
     file.AddMax(node, "max_fitness", "Maximum organism fitness in current population.");
     file.AddInferiority(node, "inferiority", "Average fitness / maximum fitness in current population.");
-    file.PrintHeaderKeys();
+    if (print_header) file.PrintHeaderKeys();
     return file;
   }
 
   // A data file (default="systematics.csv") that contains information about the population's
   // phylogeny and lineages.
   template<typename ORG>
-  World_file & World<ORG>::SetupSystematicsFile(const std::string & filename) {
+  DataFile & World<ORG>::SetupSystematicsFile(const std::string & filename, const bool & print_header) {
     auto & file = SetupFile(filename);
     file.AddVar(update, "update", "Update");
     file.template AddFun<size_t>( [this](){ return systematics.GetNumActive(); }, "num_genotypes", "Number of unique genotype groups currently active." );
@@ -927,17 +893,17 @@ namespace emp {
     file.template AddFun<size_t>( [this](){ return systematics.GetNumRoots(); }, "num_roots", "Number of independent roots for phlogenies." );
     file.template AddFun<int>( [this](){ return systematics.GetMRCADepth(); }, "mrca_depth", "Phylogenetic Depth of the Most Recent Common Ancestor (-1=none)." );
     file.template AddFun<double>( [this](){ return systematics.CalcDiversity(); }, "diversity", "Genotypic Diversity (entropy of genotypes in population)." );
-    file.PrintHeaderKeys();
+    if (print_header) file.PrintHeaderKeys();
     return file;
   }
 
   // A data file (default="population.csv") contains information about the current population.
   template<typename ORG>
-  World_file & World<ORG>::SetupPopulationFile(const std::string & filename) {
+  DataFile & World<ORG>::SetupPopulationFile(const std::string & filename, const bool & print_header) {
     auto & file = SetupFile(filename);
     file.AddVar(update, "update", "Update");
     file.template AddFun<size_t>( [this](){ return GetNumOrgs(); }, "num_orgs", "Number of organisms currently living in the population." );
-    file.PrintHeaderKeys();
+    if (print_header) file.PrintHeaderKeys();
     return file;
   }
 
@@ -1188,6 +1154,7 @@ namespace emp {
   template<typename ORG>
   void World<ORG>::PrintGrid(std::ostream& os,
                              const std::string & empty, const std::string & spacer) {
+    emp_assert(pop_sizes.size() == 2);
     const size_t size_x = pop_sizes[0];
     const size_t size_y = pop_sizes[1];
     for (size_t y=0; y < size_y; y++) {

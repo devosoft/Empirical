@@ -1,6 +1,7 @@
 GCOV_FLAGS = -o0 -g --coverage
- 
-TEST_NAMES = base constexpr geometry meta scholar tools
+
+TEST_NAMES = assert base constexpr data geometry meta scholar tools games
+
 FLAGS = -std=c++14 -Wall -Wno-unused-function -I../source/ -I../
 #CXX = clang++
 #CXX = g++
@@ -23,11 +24,11 @@ opt: FLAGS := -std=c++14 -DNDEBUG -O3
 opt: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
-debug: FLAGS := -std=c++14 -g -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 # -Wmisleading-indentation
+debug: FLAGS := -std=c++14 -g -Wall -Wno-unused-function -I../source/ -I../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 # -Wmisleading-indentation
 debug: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
-cranky: FLAGS := -std=c++14 -g -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
+cranky: FLAGS := -std=c++14 -g -Wall -Wno-unused-function -I../source/ -I../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
 cranky: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 

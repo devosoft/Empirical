@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2016-2018
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  A bunch of C++ Template Meta-programming tricks.
@@ -28,7 +28,7 @@ namespace emp {
   template <typename T1, typename T2, typename T3, typename... Ts> using third_type = T3;
 
   // Index into a template parameter pack to grab a specific type.
-  namespace {
+  namespace internal {
     template <size_t ID, typename T, typename... Ts>
     struct pack_id_impl { using type = typename pack_id_impl<ID-1,Ts...>::type; };
 
@@ -37,7 +37,7 @@ namespace emp {
   }
 
   template <size_t ID, typename... Ts>
-  using pack_id = typename pack_id_impl<ID,Ts...>::type;
+  using pack_id = typename internal::pack_id_impl<ID,Ts...>::type;
 
   // Trim off the last type from a pack.
   template <typename... Ts> using last_type = pack_id<sizeof...(Ts)-1,Ts...>;
@@ -56,7 +56,7 @@ namespace emp {
   constexpr size_t count_type() { return count_type<TEST,OTHERS...>() + (std::is_same<TEST, FIRST>()?1:0); }
 
   // Return the index of a test type in a set of types.
-  namespace {
+  namespace internal {
     template <typename TEST_T> constexpr int get_type_index_impl() { return -1; } // Not found!
     template <typename TEST_T, typename T1, typename... Ts>
     constexpr int get_type_index_impl() {
@@ -67,7 +67,7 @@ namespace emp {
     }
   }
   template <typename TEST_T, typename... Ts>
-  constexpr int get_type_index() { return get_type_index_impl<TEST_T, Ts...>(); }
+  constexpr int get_type_index() { return internal::get_type_index_impl<TEST_T, Ts...>(); }
 
 
   // These functions can be used to test if a type-set has all unique types or not.
@@ -107,7 +107,7 @@ namespace emp {
   //
   // Two helper functions exist to test each part: test_type_exist and test_type_value.
 
-  namespace {
+  namespace internal {
     template <template <typename...> class FILTER, typename T>
     constexpr bool tt_exist_impl(bool_decoy<FILTER<T>> x) { return true; }
     template <template <typename...> class FILTER, typename T>
@@ -115,12 +115,12 @@ namespace emp {
   }
 
   template <template <typename...> class TEST, typename T>
-  constexpr bool test_type_exist() { return tt_exist_impl<TEST, T>(true); }
+  constexpr bool test_type_exist() { return internal::tt_exist_impl<TEST, T>(true); }
 
   template <template <typename...> class TEST, typename T>
   constexpr bool test_type_value() { return TEST<T>::value; }
 
-  namespace {
+  namespace internal {
     // If a test does have a value field, that value determines success.
     template <typename RESULT, bool value_exist>
     struct test_type_v_impl { constexpr static bool Test() { return RESULT::value; } };
@@ -146,14 +146,14 @@ namespace emp {
   // Function to actually perform a universal test.
   template <template <typename...> class TEST, typename T>
   constexpr bool test_type() {
-    return test_type_e_impl<TEST,T,test_type_exist<TEST,T>()>::Test();
+    return internal::test_type_e_impl<TEST,T,test_type_exist<TEST,T>()>::Test();
   }
 
 
   // TruncateCall reduces the number of arguments for calling a function if too many are used.
   // @CAO: This should be simplified using TypeSet
 
-  namespace {
+  namespace internal {
     template <typename... PARAMS>
     struct tcall_impl {
       template <typename FUN_T, typename... EXTRA>
@@ -166,7 +166,7 @@ namespace emp {
   // Truncate the arguments provided, using only the relevant ones for a function call.
   template <typename R, typename... PARAMS, typename... ARGS>
   auto TruncateCall(std::function<R(PARAMS...)> fun, ARGS &&... args) {
-    return tcall_impl<PARAMS...>::call(fun, std::forward<ARGS>(args)...);
+    return internal::tcall_impl<PARAMS...>::call(fun, std::forward<ARGS>(args)...);
   }
 
   // Expand a function to take (and ignore) extra arguments.
@@ -179,14 +179,38 @@ namespace emp {
   };
 
 
+  namespace internal {
+    // Allow a hash to be determined by a GetHash() member function.
+    template <typename T>
+    auto Hash_impl(const T & x, bool) -> decltype(x.GetHash()) { return x.GetHash(); }
+
+    // By default, use std::hash if nothing else exists.
+    template <typename T>
+    auto Hash_impl(const T & x, int) -> decltype(std::hash<T>()(x)) { return std::hash<T>()(x); }
+
+    // Try direct cast to size_t if nothing else works.
+    template <typename T>
+    std::size_t Hash_impl(const T & x, ...) {
+      // @CAO Setup directory structure to allow the following to work:
+      // LibraryWarning("Resorting to casting to size_t for emp::Hash implementation.");
+      return (size_t) x;
+    }
+  }
+
+  // Setup hashes to be dynamically determined.
+  template <typename T>
+  std::size_t Hash(const T & x) { return internal::Hash_impl(x, true); }
+
   // Combine multiple keys into a single hash value.
   template <typename T>
-  std::size_t CombineHash(const T & x) { return std::hash<T>()(x); }
+  //std::size_t CombineHash(const T & x) { return std::hash<T>()(x); }
+  std::size_t CombineHash(const T & x) { return Hash<T>(x); }
 
   template<typename T1, typename T2, typename... EXTRA>
   std::size_t CombineHash(const T1 & x1, const T2 & x2, const EXTRA &... x_extra) {
     const std::size_t hash2 = CombineHash(x2, x_extra...);
-    return std::hash<T1>()(x1) + 0x9e3779b9 + (hash2 << 19) + (hash2 >> 13);
+    //return std::hash<T1>()(x1) + 0x9e3779b9 + (hash2 << 19) + (hash2 >> 13);
+    return Hash<T1>(x1) + 0x9e3779b9 + (hash2 << 19) + (hash2 >> 13);
   }
 
 
@@ -194,7 +218,7 @@ namespace emp {
   // Change the internal type arguments on a template...
   // Adapted from: Sam Varshavchik
   // http://stackoverflow.com/questions/36511990/is-it-possible-to-disentangle-a-template-from-its-arguments-in-c
-  namespace {
+  namespace internal {
     template<typename T, typename ...U> struct AdaptTemplateHelper {
       using type = T;
     };
@@ -206,11 +230,11 @@ namespace emp {
   }
 
   template<typename T, typename... U>
-  using AdaptTemplate = typename AdaptTemplateHelper<T, U...>::type;
+  using AdaptTemplate = typename internal::AdaptTemplateHelper<T, U...>::type;
 
 
   // Variation of AdaptTemplate that only adapts first template argument.
-  namespace {
+  namespace internal {
     template<typename T, typename U> class AdaptTemplateHelper_Arg1 {
     public:
       using type = T;
@@ -224,7 +248,7 @@ namespace emp {
   }
 
   template<typename T, typename U>
-  using AdaptTemplate_Arg1 = typename AdaptTemplateHelper_Arg1<T, U>::type;
+  using AdaptTemplate_Arg1 = typename internal::AdaptTemplateHelper_Arg1<T, U>::type;
 
 
   // Some math inside templates...
