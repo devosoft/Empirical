@@ -18,4 +18,18 @@ int main()
   file.RemoveComments("//");   // Remove all C++ style comments.
   file.CompressWhitespace();
   file.Write(std::cout);
+
+  std::cout << "\nTrying out spreadsheet.  Initial:" << std::endl;
+  emp::File spreadsheet;
+  spreadsheet.Append("1,2,3");
+  spreadsheet.Append("14,25,36");
+  spreadsheet.Append("104,205,306,407,508");
+
+  spreadsheet.Write(std::cout);
+
+  emp::vector<std::string> first_col = spreadsheet.ExtractCol();
+  std::cout << "\nAfter column is extracted:" << std::endl;
+  spreadsheet.Write(std::cout);
+  std::cout << "Extracted column: " << emp::to_string(first_col) << std::endl;
+
 }
