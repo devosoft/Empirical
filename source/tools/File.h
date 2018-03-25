@@ -228,8 +228,26 @@ namespace emp {
       } );
       return *this;
     }
-  };
 
+    /// Run a function on each line of a file and return the restults as a vector.
+    /// Note: Function is allowed to modify string.
+    template <typename T>
+    emp::vector<T> Process(const std::function<T(std::string &)> & fun) {
+      emp::vector<T> results(lines.size());
+      for (size_t i = 0; i < lines.size(); i++) {
+        results[i] = fun(lines[i]);
+      }
+      return results;
+    }
+
+    emp::vector<std::string> ExtractCol(char delim=',') {
+      return Process<std::string>( [delim](std::string & line){
+        return string_pop(line, delim);
+      });
+    }
+
+  };
+  
 }
 
 #endif
