@@ -266,6 +266,12 @@ namespace emp {
       };
       return Add(in_fun, key, desc);
     }
+
+    template <typename T>
+    std::ostream& operator<<(const T & obj) {
+      *os << obj;
+      return *os;
+    }
   };
 
 }
