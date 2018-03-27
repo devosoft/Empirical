@@ -51,6 +51,13 @@ namespace emp {
     /// Setup an iterator wrapper to make sure that they're not used again after a vector changes.
     template<typename ITERATOR_T>
     struct iterator_wrapper : public ITERATOR_T {
+      using this_t = iterator_wrapper<ITERATOR_T>;
+      using wrapped_t = ITERATOR_T;
+
+      iterator_wrapper(ITERATOR_T _in) : ITERATOR_T(_in) { ; }
+      iterator_wrapper(const this_t &) = default;
+      iterator_wrapper(this_t &&) = default;
+
       size_t revision;
     };
 
@@ -72,6 +79,10 @@ namespace emp {
     template <typename InputIt>
     vector(InputIt first, InputIt last) : stdv_t(first, last){;}
 
+    iterator begin() noexcept { return stdv_t::begin(); }
+    const_iterator begin() const noexcept { return const_iterator(stdv_t::begin()); }
+    iterator end() noexcept { return iterator(stdv_t::end()); }
+    const_iterator end() const noexcept { return const_iterator(stdv_t::end()); }
 
     // operator stdv_t &() { return v; }
     // operator const stdv_t &() const { return v; }
