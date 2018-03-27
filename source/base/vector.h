@@ -48,8 +48,16 @@ namespace emp {
     constexpr static const size_t MAX_SIZE = 2000000001;
 
   public:
-    using iterator = typename stdv_t::iterator;
-    using const_iterator = typename stdv_t::const_iterator;
+    /// Setup an iterator wrapper to make sure that they're not used again after a vector changes.
+    template<typename ITERATOR_T>
+    struct iterator_wrapper : public ITERATOR_T {
+      size_t revision;
+    };
+
+    using iterator = iterator_wrapper< typename stdv_t::iterator >;
+    using const_iterator = iterator_wrapper< typename stdv_t::const_iterator >;
+    using reverse_iterator = iterator_wrapper< typename stdv_t::reverse_iterator >;
+    using const_reverse_iterator = iterator_wrapper< typename stdv_t::const_reverse_iterator >;
     using value_type = T;
     using size_type = typename stdv_t::size_type;
     using reference = typename stdv_t::reference;
