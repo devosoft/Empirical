@@ -54,9 +54,13 @@ namespace emp {
       using this_t = iterator_wrapper<ITERATOR_T>;
       using wrapped_t = ITERATOR_T;
 
-      iterator_wrapper(ITERATOR_T _in) : ITERATOR_T(_in) { ; }
+      iterator_wrapper(const ITERATOR_T & _in) : ITERATOR_T(_in) { ; }
       iterator_wrapper(const this_t &) = default;
       iterator_wrapper(this_t &&) = default;
+
+      this_t & operator=(const ITERATOR_T & _in) { wrapped_t::operator=(_in); }
+      this_t & operator=(const this_t &) = default;
+      this_t & operator=(this_t &&) = default;
 
       size_t revision;
     };
