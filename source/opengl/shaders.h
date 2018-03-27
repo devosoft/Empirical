@@ -5,6 +5,7 @@
 #include "VertexAttributes.h"
 #include "defaultUniforms.h"
 #include "glutils.h"
+#include "glwrap.h"
 
 namespace emp {
   namespace opengl {
@@ -128,6 +129,8 @@ namespace emp {
 
     class ShaderProgram {
       private:
+      mutable std::unordered_map<std::string, GLint> attributes;
+      mutable std::unordered_map<std::string, GLint> uniforms;
       GLuint handle;
 
       public:
@@ -187,55 +190,82 @@ namespace emp {
       operator GLuint() const { return handle; }
       operator bool() const { return handle != 0; }
 
-      VertexAttribute getAttribute(const std::string& name,
+      private:
+      GLint GetAttribLocation(const std::string& name) const {
+        auto attr{attributes.find(name)};
+        if (attr != attributes.end()) {
+          return attr->second;
+        }
+
+        auto attr_loc = glGetAttribLocation(handle, name.c_str());
+        utils::catchGlError();
+
+        attributes[name] = attr_loc;
+        return attr_loc;
+      }
+      GLint GetUniformLocation(const std::string& name) const {
+        auto uniform{uniforms.find(name)};
+        if (uniform != uniforms.end()) {
+          return uniform->second;
+        }
+
+        auto uniform_loc = glGetUniformLocation(handle, name.c_str());
+        utils::catchGlError();
+
+        uniforms[name] = uniform_loc;
+        return uniform_loc;
+      }
+
+      public:
+      VertexAttribute GetAttribute(const std::string& name,
                                    VertexAttributeSize size,
                                    VertexAttributeType type, GLsizei stride = 0,
-                                   const void* offset = nullptr) {
-        auto loc = glGetAttribLocation(handle, name.c_str());
+                                   const void* offset = nullptr) const {
+        auto loc = GetAttribLocation(name.c_str());
 
         return VertexAttribute(loc, size, type, stride, offset);
       }
 
-      FloatingVertexAttribute getAttribute(const std::string& name,
+      FloatingVertexAttribute GetAttribute(const std::string& name,
                                            VertexAttributeSize size,
                                            FloatingVertexAttributeType type,
                                            GLsizei stride = 0,
                                            const void* offset = nullptr,
-                                           bool normalized = false) {
-        auto loc = glGetAttribLocation(handle, name.c_str());
+                                           bool normalized = false) const {
+        auto loc = GetAttribLocation(name.c_str());
 
         return FloatingVertexAttribute(loc, size, type, normalized, stride,
                                        offset);
       }
 
       template <typename T, typename... Args>
-      decltype(auto) attribute(const std::string& name, Args&&... args) {
+      decltype(auto) Attribute(const std::string& name, Args&&... args) const {
         using attribs = VertexAttributes<T>;
-        return getAttribute(name, attribs::size, attribs::type,
+        return GetAttribute(name, attribs::size, attribs::type,
                             std::forward<Args>(args)...);
       }
 
       template <typename U, typename T, typename... Args>
-      decltype(auto) attribute(const std::string& name, T U::*member,
+      decltype(auto) Attribute(const std::string& name, T U::*member,
                                Args&&... args) {
         using attribs = VertexAttributes<T>;
 
 #if !(defined(__clang__) || defined(__GNUC__))
 #pragma message( \
-  "ShaderProgram::attribute([attribute name], &[Class]::[member]) may not be supported on this compiler")
+  "ShaderProgram::Attribute([attribute name], &[Class]::[member]) may not be supported on this compiler")
 #endif
 
         auto offset =
           reinterpret_cast<std::uintptr_t>(&(static_cast<U*>(0)->*member)) -
           reinterpret_cast<std::uintptr_t>(static_cast<U*>(0));
 
-        return getAttribute(name, attribs::size, attribs::type, sizeof(U),
+        return GetAttribute(name, attribs::size, attribs::type, sizeof(U),
                             reinterpret_cast<const void*>(offset),
                             std::forward<Args>(args)...);
       }
 
-      Uniform uniform(const std::string& name) const {
-        return glGetUniformLocation(handle, name.c_str());
+      Uniform Uniform(const std::string& name) const {
+        return GetUniformLocation(name);
       }
     };
   }  // namespace opengl

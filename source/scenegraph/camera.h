@@ -74,11 +74,58 @@ namespace emp {
         // auto xaxis = Cross(up, zaxis).Normalized();
         // auto yaxis = Cross(zaxis, xaxis).Normalized();
         // Mat4x4f orientation{xaxis.x(), yaxis.x(), zaxis.x(), 0};
-
-        std::cout << view << std::endl;
       }
 
       math::Mat4x4f CalculateView() const override { return view; }
+    };
+
+    class OrbitController {
+      math::Vec3f position;
+      float min_distance;
+      float max_distance;
+      float distance;
+      math::Vec3f target;
+
+      public:
+      template <typename T = math::Vec3f>
+      OrbitController(const math::Vec3f& position, T&& target = {0, 0, 0})
+        : OrbitController(position, (position - target).mag(),
+                          std::forward<T>(target)) {}
+
+      template <typename P = math::Vec3f, typename T = math::Vec3f>
+      OrbitController(P&& position, float distance, T&& target = {0, 0, 0})
+        : OrbitController(std::forward<P>(position), distance / 1.5,
+                          distance * 1.5, distance, std::forward<T>(target)) {}
+
+      template <typename P = math::Vec3f, typename T = math::Vec3f>
+      OrbitController(P&& position, float min_distance, float max_distance,
+                      T&& target = {0, 0, 0})
+        : OrbitController(std::forward<P>(position), min_distance, max_distance,
+                          (max_distance - min_distance) / 2,
+                          std::forward<T>(target)) {}
+
+      template <typename P = math::Vec3f, typename T = math::Vec3f>
+      OrbitController(P&& position, float min_distance, float max_distance,
+                      float distance, T&& target = {0, 0, 0})
+        : position(std::forward<P>(position)),
+          min_distance(min_distance),
+          max_distance(max_distance),
+          distance(distance),
+          target(std::forward<T>(target)) {}
+
+      void Move(const math::Vec3f& delta) {
+        position = (position + delta - target).Normalized() * distance + target;
+      }
+
+      void Zoom(float delta) {
+        distance += delta;
+        if (distance < min_distance) distance = min_distance;
+        if (distance > max_distance) distance = max_distance;
+      }
+
+      void Apply(SimpleEye& eye, const math::Vec3f& up = {0, 0, -1}) const {
+        eye.LookAt(position, target, up);
+      }
     };
 
   }  // namespace scenegraph

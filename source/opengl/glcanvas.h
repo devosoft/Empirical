@@ -499,7 +499,7 @@ namespace emp {
 #endif
       }
 
-      VertexArrayObject makeVAO() { return VertexArrayObject(); }
+      VertexArrayObject MakeVAO() { return VertexArrayObject(); }
       template <typename... Args>
       ShaderProgram makeShaderProgram(Args&&... args) const {
         return {std::forward<Args>(args)...};
