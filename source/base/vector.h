@@ -100,10 +100,15 @@ namespace emp {
     // operator stdv_t &() { return v; }
     // operator const stdv_t &() const { return v; }
 
-    void resize(size_t new_size) { emp_assert(new_size < MAX_SIZE, new_size); stdv_t::resize(new_size); }
+    void resize(size_t new_size) {
+      emp_assert(new_size < MAX_SIZE, new_size);
+      stdv_t::resize(new_size);
+      revision++;
+    }
     void resize(size_t new_size, const T & val) {
       emp_assert(new_size < MAX_SIZE, new_size);
       stdv_t::resize(new_size, val);
+      revision++;
     }
     // this_t & operator=(const this_t &) = default;
 
@@ -125,6 +130,18 @@ namespace emp {
     void pop_back() {
       emp_assert(stdv_t::size() > 0, stdv_t::size());
       stdv_t::pop_back();
+    }
+
+    template <typename... PB_Ts>
+    void push_back(PB_Ts &&... args) {
+      stdv_t::push_back(std::forward<PB_Ts>(args)...);
+      revision++;
+    }
+
+    template <typename... EB_Ts>
+    void emplace_back(EB_Ts &&... args) {
+      stdv_t::emplace_back(std::forward<EB_Ts>(args)...);
+      revision++;
     }
   };
 
