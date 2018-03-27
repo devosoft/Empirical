@@ -44,6 +44,9 @@ namespace emp {
     using this_t = emp::vector<T,Ts...>;
     using stdv_t = std::vector<T,Ts...>;
 
+    /// Setup a revision number - iterators must match the revision of their vector.
+    int revision;
+
     /// Setup a threshold; if we try to make a vector bigger than MAX_SIZE, throw a warning.
     constexpr static const size_t MAX_SIZE = 2000000001;
 
@@ -54,15 +57,17 @@ namespace emp {
       using this_t = iterator_wrapper<ITERATOR_T>;
       using wrapped_t = ITERATOR_T;
 
-      iterator_wrapper(const ITERATOR_T & _in) : ITERATOR_T(_in) { ; }
+      /// What vector revision was this iterator created using?
+      int revision;
+
+      iterator_wrapper(const ITERATOR_T & _in, int vector_revision=0)
+        : ITERATOR_T(_in), revision(vector_revision) { ; }
       iterator_wrapper(const this_t &) = default;
       iterator_wrapper(this_t &&) = default;
 
-      this_t & operator=(const ITERATOR_T & _in) { wrapped_t::operator=(_in); }
+      this_t & operator=(const ITERATOR_T & _in) { wrapped_t::operator=(_in); revision=0; }
       this_t & operator=(const this_t &) = default;
       this_t & operator=(this_t &&) = default;
-
-      size_t revision;
     };
 
     using iterator = iterator_wrapper< typename stdv_t::iterator >;
@@ -83,10 +88,10 @@ namespace emp {
     template <typename InputIt>
     vector(InputIt first, InputIt last) : stdv_t(first, last){;}
 
-    iterator begin() noexcept { return stdv_t::begin(); }
-    const_iterator begin() const noexcept { return const_iterator(stdv_t::begin()); }
-    iterator end() noexcept { return iterator(stdv_t::end()); }
-    const_iterator end() const noexcept { return const_iterator(stdv_t::end()); }
+    iterator begin() noexcept { return iterator(stdv_t::begin(), revision); }
+    const_iterator begin() const noexcept { return const_iterator(stdv_t::begin(), revision); }
+    iterator end() noexcept { return iterator(stdv_t::end(), revision); }
+    const_iterator end() const noexcept { return const_iterator(stdv_t::end(), revision); }
 
     // operator stdv_t &() { return v; }
     // operator const stdv_t &() const { return v; }
