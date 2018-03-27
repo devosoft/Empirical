@@ -44,24 +44,28 @@ namespace emp {
     using this_t = emp::vector<T,Ts...>;
     using stdv_t = std::vector<T,Ts...>;
 
-    /// Setup a revision number - iterators must match the revision of their vector.
-    int revision;
-
     /// Setup a threshold; if we try to make a vector bigger than MAX_SIZE, throw a warning.
     constexpr static const size_t MAX_SIZE = 2000000001;
 
   public:
+    /// Setup a revision number - iterators must match the revision of their vector.
+    int revision;
+
     /// Setup an iterator wrapper to make sure that they're not used again after a vector changes.
     template<typename ITERATOR_T>
     struct iterator_wrapper : public ITERATOR_T {
       using this_t = iterator_wrapper<ITERATOR_T>;
       using wrapped_t = ITERATOR_T;
+      using vec_t = emp::vector<T,Ts...>;
 
-      /// What vector revision was this iterator created using?
+      /// What vector and revision was this iterator created from?
+      const vec_t * v_ptr;
       int revision;
 
-      iterator_wrapper(const ITERATOR_T & _in, int vector_revision=0)
-        : ITERATOR_T(_in), revision(vector_revision) { ; }
+      iterator_wrapper(const ITERATOR_T & _in)
+        : ITERATOR_T(_in), v_ptr(nullptr), revision(0) { ; }
+      iterator_wrapper(const ITERATOR_T & _in, const vec_t * _v)
+        : ITERATOR_T(_in), v_ptr(_v), revision(_v->revision) { ; }
       iterator_wrapper(const this_t &) = default;
       iterator_wrapper(this_t &&) = default;
 
@@ -79,19 +83,19 @@ namespace emp {
     using reference = typename stdv_t::reference;
     using const_reference = typename stdv_t::const_reference;
 
-    vector() : stdv_t() {};
-    vector(const this_t & _in) : stdv_t(_in) {};
-    vector(size_t size) : stdv_t(size) { emp_assert(size < MAX_SIZE, size); }
-    vector(size_t size, const T & val) : stdv_t(size, val) { emp_assert(size < MAX_SIZE, size); }
-    vector(std::initializer_list<T> in_list) : stdv_t(in_list) { ; }
-    vector(const stdv_t & in) : stdv_t(in) { ; }         // Emergency fallback conversion.
+    vector() : stdv_t(), revision(1) {};
+    vector(const this_t & _in) : stdv_t(_in), revision(1) {};
+    vector(size_t size) : stdv_t(size), revision(1) { emp_assert(size < MAX_SIZE, size); }
+    vector(size_t size, const T & val) : stdv_t(size, val), revision(1) { emp_assert(size < MAX_SIZE, size); }
+    vector(std::initializer_list<T> in_list) : stdv_t(in_list), revision(1) { ; }
+    vector(const stdv_t & in) : stdv_t(in), revision(1) { ; }         // Emergency fallback conversion.
     template <typename InputIt>
-    vector(InputIt first, InputIt last) : stdv_t(first, last){;}
+    vector(InputIt first, InputIt last) : stdv_t(first, last), revision(1) { ; }
 
-    iterator begin() noexcept { return iterator(stdv_t::begin(), revision); }
-    const_iterator begin() const noexcept { return const_iterator(stdv_t::begin(), revision); }
-    iterator end() noexcept { return iterator(stdv_t::end(), revision); }
-    const_iterator end() const noexcept { return const_iterator(stdv_t::end(), revision); }
+    iterator begin() noexcept { return iterator(stdv_t::begin(), this); }
+    const_iterator begin() const noexcept { return const_iterator(stdv_t::begin(), this); }
+    iterator end() noexcept { return iterator(stdv_t::end(), this); }
+    const_iterator end() const noexcept { return const_iterator(stdv_t::end(), this); }
 
     // operator stdv_t &() { return v; }
     // operator const stdv_t &() const { return v; }
