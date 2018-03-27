@@ -16,7 +16,9 @@
  *  allow you to track the pointer more easily in a debugger.
  *
  *  @todo Track information about emp::vector and emp::array objects to make sure we don't
- *    point directly into them? (A resize() could make such pointers invalid!)
+ *    point directly into them? (A resize() could make such pointers invalid!) Or better, warn
+ *    it vector memory could have moved.
+ *  @todo Get working with threads
  */
 
 #ifndef EMP_PTR_H
