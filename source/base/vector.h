@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2018
  *
  *  @file vector.h
  *  @brief A drop-in wrapper for std::vector; adds on bounds checking in debug mode.
@@ -12,7 +12,6 @@
  *
  *  @todo Need an automatic conversion from emp::vector to std::vector and back to interface with
  *     non-empirical code.
- *  @todo Need emp::vector<bool> to function properly.
  */
 
 
@@ -72,6 +71,15 @@ namespace emp {
       this_t & operator=(const ITERATOR_T & _in) { wrapped_t::operator=(_in); revision=0; }
       this_t & operator=(const this_t &) = default;
       this_t & operator=(this_t &&) = default;
+
+      auto & operator*() {
+        emp_assert(revision == v_ptr->revision);  // Ensure vector hasn't changed since making iterator.
+        return wrapped_t::operator*();
+      }
+      const auto & operator*() const {
+        emp_assert(revision == v_ptr->revision);  // Ensure vector hasn't changed since making iterator.
+        return wrapped_t::operator*();
+      }
     };
 
     using iterator = iterator_wrapper< typename stdv_t::iterator >;
@@ -130,6 +138,7 @@ namespace emp {
     void pop_back() {
       emp_assert(stdv_t::size() > 0, stdv_t::size());
       stdv_t::pop_back();
+      revision++;           // Technically reducing size can cause memory reallocation, but less likely.
     }
 
     template <typename... PB_Ts>
