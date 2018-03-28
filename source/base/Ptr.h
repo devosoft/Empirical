@@ -649,6 +649,9 @@ namespace emp {
 
     /// Some debug testing functions
     int DebugGetCount() const { return Tracker().GetIDCount(id); }
+    bool DebugIsArray() const { return Tracker().IsArrayID(id); }
+    size_t DebugGetArrayBytes() const { return Tracker().GetArrayBytes(id); }
+
 
     // Prevent use of new and delete on Ptr
     // static void* operator new(std::size_t) noexcept {
@@ -750,6 +753,9 @@ namespace emp {
     bool operator>(const TYPE * in_ptr)  const { return ptr > in_ptr; }
     bool operator>=(const TYPE * in_ptr) const { return ptr >= in_ptr; }
 
+    int DebugGetCount() const { return -1; }
+    bool DebugIsArray() const { return false; }
+    size_t DebugGetArrayBytes() const { return 0; }
   };
 
 #endif
@@ -805,18 +811,15 @@ namespace emp {
 
   /// Create a pointer to an array of objects.
   template <typename T, typename... ARGS> Ptr<T> NewArrayPtr(size_t array_size, ARGS &&... args) {
-    //auto ptr = new T[array_size];
-    const size_t alloc_size = array_size * sizeof(T);
-    auto ptr = (T*) malloc (alloc_size);  // Build a new raw pointer.
+    auto ptr = new T[array_size];                     // Build a new raw pointer.
+    // const size_t alloc_size = array_size * sizeof(T);
+    // auto ptr = (T*) malloc (alloc_size);
     emp_assert(ptr, array_size);                      // No exceptions in emscripten; assert alloc!
     for (size_t i = 0; i < array_size; i++) {         // Loop through all array elements.
       new (ptr + i*sizeof(T)) T(args...);             //    ...and initialize them.
     }
     return Ptr<T>(ptr, array_size, true);
   }
-
-
-
 
 
 }
