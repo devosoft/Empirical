@@ -151,6 +151,9 @@ namespace emp {
     /// Assume that the size of the bit_set has already been adjusted to be the size of the one
     /// being copied and only the fields need to be copied over.
     void RawCopy(const Ptr<field_t> in_set) {
+      emp_assert(bit_set.DebugIsArray() && in_set.DebugIsArray());
+      emp_assert(bit_set.DebugGetArrayBytes() == in_set.DebugGetArrayBytes(),
+                 bit_set.DebugGetArrayBytes(), in_set.DebugGetArrayBytes());
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
     }
