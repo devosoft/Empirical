@@ -669,6 +669,12 @@ namespace emp {
     size_t DebugGetArrayBytes() const { return Tracker().GetArrayBytes(id); }
 
     bool OK() const {
+      if (id == UNTRACKED_ID) return true;
+
+      // Make sure this pointer is linked to the correct info.
+      if (Tracker().GetInfo(id.ptr != ptr) return false;
+
+      // And make sure that info itself is okay.
       return Tracker().GetInfo(id).OK();
     }
 
