@@ -113,6 +113,19 @@ namespace emp {
       status = PtrStatus::DELETED;
     }
 
+    /// Debug utility to determine if everything looks okay with this pointer's information.
+    bool OK() {
+      if (ptr == nullptr) return false;     // Should not have info for a null pointer.
+      if (status == PtrStatus::ARRAY) {
+        if (array_bytes == 0) return false; // Arrays cannot be size 0.
+        if (count == 0) return false;       // Active arrays must have pointers to them.
+      }
+      if (status == PtrStatus::ACTIVE) {
+        if (array_bytes > 0) return false;  // non-arrays must be array size 0.
+        if (count == 0) return false;       // Active pointers must have references to them.
+      }
+      return true;
+    }
   };
 
 
