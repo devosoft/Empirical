@@ -815,9 +815,9 @@ namespace emp {
     // const size_t alloc_size = array_size * sizeof(T);
     // auto ptr = (T*) malloc (alloc_size);
     emp_assert(ptr, array_size);                      // No exceptions in emscripten; assert alloc!
-    for (size_t i = 0; i < array_size; i++) {         // Loop through all array elements.
-      new (ptr + i*sizeof(T)) T(args...);             //    ...and initialize them.
-    }
+    // for (size_t i = 0; i < array_size; i++) {         // Loop through all array elements.
+    //   new (ptr + i*sizeof(T)) T(args...);             //    ...and initialize them.
+    // }
     return Ptr<T>(ptr, array_size, true);
   }
 
