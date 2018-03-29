@@ -74,22 +74,22 @@ namespace emp {
     }
 
     /// What pointer does this one hold information about?
-    const void * GetPtr() const { return ptr; }
+    const void * GetPtr() const noexcept { return ptr; }
 
     /// How many Ptr objects point to the associated position?
-    int GetCount() const { return count; }
+    int GetCount() const noexcept { return count; }
 
     /// If this ptr is to an array, how many bytes large is the array (may be different from size!)
-    size_t GetArrayBytes() const { return array_bytes; }
+    size_t GetArrayBytes() const noexcept { return array_bytes; }
 
     /// Is this pointer currently valid to access?
-    bool IsActive() const { return (bool) status; }
+    bool IsActive() const noexcept { return (bool) status; }
 
     /// Is this pointer pointing to an array?
-    bool IsArray()  const { return status == PtrStatus::ARRAY; }
+    bool IsArray() const noexcept { return status == PtrStatus::ARRAY; }
 
     /// Denote that this pointer is an array.
-    void SetArray(size_t bytes) { array_bytes = bytes; status = PtrStatus::ARRAY; }
+    void SetArray(size_t bytes) noexcept { array_bytes = bytes; status = PtrStatus::ARRAY; }
 
     /// Add one more pointer.
     void Inc() {
@@ -114,7 +114,7 @@ namespace emp {
     }
 
     /// Debug utility to determine if everything looks okay with this pointer's information.
-    bool OK() {
+    bool OK() const noexcept {
       if (ptr == nullptr) return false;     // Should not have info for a null pointer.
       if (status == PtrStatus::ARRAY) {
         if (array_bytes == 0) return false; // Arrays cannot be size 0.
@@ -145,7 +145,6 @@ namespace emp {
     PtrTracker & operator=(const PtrTracker &) = delete;
     PtrTracker & operator=(PtrTracker &&) = delete;
 
-    PtrInfo & GetInfo(const void * ptr) { return id_info[ptr_id[ptr]]; }
   public:
     ~PtrTracker() {
       // Track stats about pointer record.
@@ -168,6 +167,10 @@ namespace emp {
 
     /// Treat this class as a singleton with a single Get() method to retrieve it.
     static PtrTracker & Get() { static PtrTracker tracker; return tracker; }
+
+    /// Get the info associated with an existing pointer.
+    PtrInfo & GetInfo(const void * ptr) { return id_info[ptr_id[ptr]]; }
+    PtrInfo & GetInfo(size_t id) { return id_info[id]; }
 
     /// Determine if a pointer is being tracked.
     bool HasPtr(const void * ptr) const {
@@ -665,6 +668,9 @@ namespace emp {
     bool DebugIsArray() const { return Tracker().IsArrayID(id); }
     size_t DebugGetArrayBytes() const { return Tracker().GetArrayBytes(id); }
 
+    bool OK() const {
+      return Tracker().GetInfo(id).OK();
+    }
 
     // Prevent use of new and delete on Ptr
     // static void* operator new(std::size_t) noexcept {
