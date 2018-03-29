@@ -234,7 +234,7 @@ namespace emp {
 
     /// Move constructor of existing bit field.
     BitVector(BitVector && in_set) : num_bits(in_set.num_bits), bit_set(in_set.bit_set) {
-      emp_assert(bit_set == nullptr || (bit_set.DebugIsArray() && bit_set.DebugGetArrayBytes() > 0);
+      emp_assert(bit_set == nullptr || (bit_set.DebugIsArray() && bit_set.DebugGetArrayBytes() > 0));
       emp_assert(bit_set != nullptr || num_bits == 0);
       in_set.bit_set = nullptr;
     }
