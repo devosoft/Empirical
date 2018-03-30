@@ -779,9 +779,11 @@ namespace emp {
     bool operator>(const TYPE * in_ptr)  const { return ptr > in_ptr; }
     bool operator>=(const TYPE * in_ptr) const { return ptr >= in_ptr; }
 
+    // Stubs for debug-related functions when outside debug mode.
     int DebugGetCount() const { return -1; }
     bool DebugIsArray() const { return false; }
     size_t DebugGetArrayBytes() const { return 0; }
+    bool OK() const { return true; }
   };
 
 #endif
