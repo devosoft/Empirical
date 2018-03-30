@@ -19,6 +19,7 @@
 #define EMP_VECTOR_H
 
 #include <initializer_list>
+#include <iterator>
 #include <utility>
 #include <vector>
 
@@ -44,7 +45,7 @@ namespace emp {
     using stdv_t = std::vector<T,Ts...>;
 
     /// Setup a threshold; if we try to make a vector bigger than MAX_SIZE, throw a warning.
-    constexpr static const size_t MAX_SIZE = 2000000001;
+    constexpr static const size_t MAX_SIZE = 2000000001; // 2x10^9 + 1
 
   public:
     /// Setup a revision number - iterators must match the revision of their vector.
@@ -72,6 +73,9 @@ namespace emp {
       this_t & operator=(const this_t &) = default;
       this_t & operator=(this_t &&) = default;
 
+      operator ITERATOR_T() { return *this; }
+      operator const ITERATOR_T() const { return *this; }
+
       auto & operator*() {
         emp_assert(revision == v_ptr->revision);  // Ensure vector hasn't changed since making iterator.
         return wrapped_t::operator*();
@@ -80,6 +84,18 @@ namespace emp {
         emp_assert(revision == v_ptr->revision);  // Ensure vector hasn't changed since making iterator.
         return wrapped_t::operator*();
       }
+
+      auto operator++() { return this_t(wrapped_t::operator++()); }
+      auto operator++(int x) { return this_t(wrapped_t::operator++(x)); }
+      auto operator--() { return this_t(wrapped_t::operator--()); }
+      auto operator--(int x) { return this_t(wrapped_t::operator--(x)); }
+
+      //template <typename T2> auto operator+(T2 in) { return this_t(wrapped_t::operator+(in)); }
+      auto operator+(int in) { return this_t(wrapped_t::operator+(in)); }
+      //template <typename T2> auto operator-(T2 in) { return this_t(wrapped_t::operator-(in)); }
+      auto operator-(int in) { return this_t(wrapped_t::operator-(in)); }
+      //auto operator-(const wrapped_t & in) { return wrapped_t::operator-(in); }
+      auto operator-(const wrapped_t & in) { return std::distance((wrapped_t) *this, in); }
     };
 
     using iterator = iterator_wrapper< typename stdv_t::iterator >;
