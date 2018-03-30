@@ -2,6 +2,8 @@
 //  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 
+#include <algorithm>
+
 #include "base/vector.h"
 
 int main()
@@ -9,7 +11,7 @@ int main()
   // Try out a regular vector
   emp::vector<int> v;
   for (int i = 0; i < 10; i++) {
-    v.push_back( 10*i );
+    v.push_back( 100 - 10*i );
   }
 
   v.insert(v.begin() + 3, -1);
@@ -30,4 +32,12 @@ int main()
     if (vb2[i]) count++;
   }
   std::cout << "Count = " << count << std::endl;
+
+
+  // Try running vector through sort.
+  std::sort(v.begin(), v.end());
+  for (auto x : v) {
+    std::cout << x << ' ';
+  }
+  std::cout << std::endl;
 }
