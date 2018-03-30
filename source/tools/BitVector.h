@@ -227,15 +227,15 @@ namespace emp {
     /// Copy constructor of existing bit field.
     BitVector(const BitVector & in_set) : num_bits(in_set.num_bits), bit_set(nullptr) {
       emp_assert(in_set.bit_set.IsNull() || in_set.bit_set.DebugIsArray());
-      emp_assert(in_set.bit_set.IsNull() || in_set.bit_set.DebugGetArrayBytes() > 0);
+      emp_assert(in_set.bit_set.OK());
       if (num_bits) bit_set = NewArrayPtr<field_t>(NumFields());
       RawCopy(in_set.bit_set);
     }
 
     /// Move constructor of existing bit field.
     BitVector(BitVector && in_set) : num_bits(in_set.num_bits), bit_set(in_set.bit_set) {
-      emp_assert(bit_set == nullptr || (bit_set.DebugIsArray() && bit_set.DebugGetArrayBytes() > 0));
-      emp_assert(bit_set != nullptr || num_bits == 0);
+      emp_assert(bit_set == nullptr || bit_set.DebugIsArray());
+      emp_assert(bit_set.OK());
       in_set.bit_set = nullptr;
     }
 
@@ -249,9 +249,9 @@ namespace emp {
 
     /// Assignment operator.
     BitVector & operator=(const BitVector & in_set) {
-      emp_assert(in_set.bit_set == nullptr ||
-                 (in_set.bit_set.DebugIsArray() && in_set.bit_set.DebugGetArrayBytes() > 0));
+      emp_assert(in_set.bit_set == nullptr || in_set.bit_set.DebugIsArray());
       emp_assert(in_set.bit_set != nullptr || in_set.num_bits == 0);
+      emp_assert(in_set.bit_set.OK());
       if (&in_set == this) return *this;
       const size_t in_num_fields = in_set.NumFields();
       const size_t prev_num_fields = NumFields();
