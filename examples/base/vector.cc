@@ -10,15 +10,11 @@ int main()
 {
   // Try out a regular vector
   emp::vector<int> v;
-  for (int i = 0; i < 10; i++) {
-    v.push_back( 100 - 10*i );
-  }
+  for (int i = 0; i < 10; i++) v.push_back( 100 - 10*i );
 
   v.insert(v.begin() + 3, -1);
 
-  for (auto x : v) {
-    std::cout << x << ' ';
-  }
+  for (auto x : v) std::cout << x << ' ';
   std::cout << std::endl;
 
   // Examine vector<bool> specialization.
@@ -52,8 +48,4 @@ int main()
   std::cout << "After inserting four values in place of 30: " << std::endl; 
   for (auto x : v) { std::cout << x << ' '; }
   std::cout << std::endl;
-
-  // nodes.erase(nodes.begin() + (long) i);  // Remove block from nodes.
-  // nodes.insert(nodes.begin() + (long) i, old_node->nodes.begin(), old_node->nodes.end());
-
 }
