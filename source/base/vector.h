@@ -96,7 +96,8 @@ namespace emp {
       //template <typename T2> auto operator-(T2 in) { return this_t(wrapped_t::operator-(in)); }
       auto operator-(int in) { return this_t(wrapped_t::operator-(in), v_ptr); }
       //auto operator-(const wrapped_t & in) { return wrapped_t::operator-(in); }
-      auto operator-(const wrapped_t & in) { return std::distance((wrapped_t) *this, in); }
+      //auto operator-(const wrapped_t & in) { return std::distance((wrapped_t) *this, in); }
+      auto operator-(const this_t & in) { return ((wrapped_t) *this) - (wrapped_t) in; }
     };
 
     using iterator = iterator_wrapper< typename stdv_t::iterator >;
