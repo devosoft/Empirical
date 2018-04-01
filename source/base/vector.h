@@ -70,6 +70,16 @@ namespace emp {
       iterator_wrapper(this_t &&) = default;
       ~iterator_wrapper() { ; }
 
+      // Debug tools to make sure this iterator is okay.
+      bool IsUsable() const {
+        if (v_ptr == nullptr) return false;                      // Invalid vector
+        if (v_ptr->revision == 0) return false;                  // Vector has been deleted!
+        if (revision != v_ptr->revision) return false;           // Vector has changed memory!
+        int pos = *this - v_ptr->begin();
+        if (pos < 0 || pos >= (int) v_ptr->size()) return false; // Iterator out of range.
+        return true;
+      }
+
       // this_t & operator=(const ITERATOR_T & _in) { wrapped_t::operator=(_in); revision=0; }
       this_t & operator=(const this_t &) = default;
       this_t & operator=(this_t &&) = default;
@@ -113,6 +123,7 @@ namespace emp {
     vector(const stdv_t & in) : stdv_t(in), revision(1) { ; }         // Emergency fallback conversion.
     template <typename InputIt>
     vector(InputIt first, InputIt last) : stdv_t(first, last), revision(1) { ; }
+    ~vector() { revision = 0; } // Clear out revision when vector is deleted.
 
     iterator begin() noexcept { return iterator(stdv_t::begin(), this); }
     const_iterator begin() const noexcept { return const_iterator(stdv_t::begin(), this); }
