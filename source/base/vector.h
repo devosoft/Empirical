@@ -53,7 +53,7 @@ namespace emp {
 
     /// Setup an iterator wrapper to make sure that they're not used again after a vector changes.
     template<typename ITERATOR_T>
-    struct iterator_wrapper : public ITERATOR_T {
+    struct iterator_wrapper : private ITERATOR_T {
       using this_t = iterator_wrapper<ITERATOR_T>;
       using wrapped_t = ITERATOR_T;
       using vec_t = emp::vector<T,Ts...>;
@@ -107,14 +107,18 @@ namespace emp {
         return wrapped_t::operator->();
       }
 
-      this_t & operator++() { emp_assert(OK(true,false)); return wrapped_t::operator++(); return *this; }
+      this_t & operator++() { emp_assert(OK(true,false)); wrapped_t::operator++(); return *this; }
       this_t operator++(int x) { emp_assert(OK(true,false)); return this_t(wrapped_t::operator++(x), v_ptr); }
-      this_t & operator--() { emp_assert(OK(false,true)); return wrapped_t::operator--(); return *this; }
+      this_t & operator--() { emp_assert(OK(false,true)); wrapped_t::operator--(); return *this; }
       this_t operator--(int x) { emp_assert(OK(false,true)); return this_t(wrapped_t::operator--(x), v_ptr); }
 
       auto operator+(int in) { emp_assert(OK()); return this_t(wrapped_t::operator+(in), v_ptr); }
       auto operator-(int in) { emp_assert(OK()); return this_t(wrapped_t::operator-(in), v_ptr); }
       auto operator-(const this_t & in) { emp_assert(OK()); return ((wrapped_t) *this) - (wrapped_t) in; }
+
+      this_t & operator+=(int in) { emp_assert(OK()); wrapped_t::operator+=(in); return *this; }
+      this_t & operator-=(int in) { emp_assert(OK()); wrapped_t::operator-=(in); return *this; }
+      auto & operator[](int offset) { emp_assert(OK()); return wrapped_t::operator[](offset); }
     };
 
     using iterator = iterator_wrapper< typename stdv_t::iterator >;
