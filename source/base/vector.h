@@ -71,12 +71,12 @@ namespace emp {
       ~iterator_wrapper() { ; }
 
       // Debug tools to make sure this iterator is okay.
-      bool IsUsable() const {
-        if (v_ptr == nullptr) return false;                      // Invalid vector
-        if (v_ptr->revision == 0) return false;                  // Vector has been deleted!
-        if (revision != v_ptr->revision) return false;           // Vector has changed memory!
-        int pos = *this - v_ptr->begin();
-        if (pos < 0 || pos >= (int) v_ptr->size()) return false; // Iterator out of range.
+      bool IsUsable(bool begin_ok=true, bool end_ok=false) const {
+        if (v_ptr == nullptr) return false;              // Invalid vector
+        if (v_ptr->revision == 0) return false;          // Vector has been deleted!
+        if (revision != v_ptr->revision) return false;   // Vector has changed memory!
+        size_t pos = (size_t) (*this - v_ptr->begin());
+        if (pos > v_ptr->size()) return false;           // Iterator out of range.
         return true;
       }
 
@@ -88,22 +88,22 @@ namespace emp {
       operator const ITERATOR_T() const { return *this; }
 
       auto & operator*() {
-        emp_assert(revision == v_ptr->revision);  // Ensure vector hasn't changed since making iterator.
+        emp_assert(IsUsable());  // Ensure vector hasn't changed since making iterator.
         return wrapped_t::operator*();
       }
       const auto & operator*() const {
-        emp_assert(revision == v_ptr->revision);  // Ensure vector hasn't changed since making iterator.
+        emp_assert(IsUsable());  // Ensure vector hasn't changed since making iterator.
         return wrapped_t::operator*();
       }
 
-      auto operator++() { return this_t(wrapped_t::operator++(), v_ptr); }
-      auto operator++(int x) { return this_t(wrapped_t::operator++(x), v_ptr); }
-      auto operator--() { return this_t(wrapped_t::operator--(), v_ptr); }
-      auto operator--(int x) { return this_t(wrapped_t::operator--(x), v_ptr); }
+      auto operator++() { emp_assert(IsUsable()); return this_t(wrapped_t::operator++(), v_ptr); }
+      auto operator++(int x) { emp_assert(IsUsable()); return this_t(wrapped_t::operator++(x), v_ptr); }
+      auto operator--() { emp_assert(IsUsable()); return this_t(wrapped_t::operator--(), v_ptr); }
+      auto operator--(int x) { emp_assert(IsUsable()); return this_t(wrapped_t::operator--(x), v_ptr); }
 
-      auto operator+(int in) { return this_t(wrapped_t::operator+(in), v_ptr); }
-      auto operator-(int in) { return this_t(wrapped_t::operator-(in), v_ptr); }
-      auto operator-(const this_t & in) { return ((wrapped_t) *this) - (wrapped_t) in; }
+      auto operator+(int in) { emp_assert(IsUsable()); return this_t(wrapped_t::operator+(in), v_ptr); }
+      auto operator-(int in) { emp_assert(IsUsable()); return this_t(wrapped_t::operator-(in), v_ptr); }
+      auto operator-(const this_t & in) { emp_assert(IsUsable()); return ((wrapped_t) *this) - (wrapped_t) in; }
     };
 
     using iterator = iterator_wrapper< typename stdv_t::iterator >;
