@@ -107,10 +107,10 @@ namespace emp {
         return wrapped_t::operator->();
       }
 
-      auto operator++() { emp_assert(OK(true,false)); return this_t(wrapped_t::operator++(), v_ptr); }
-      auto operator++(int x) { emp_assert(OK(true,false)); return this_t(wrapped_t::operator++(x), v_ptr); }
-      auto operator--() { emp_assert(OK(false,true)); return this_t(wrapped_t::operator--(), v_ptr); }
-      auto operator--(int x) { emp_assert(OK(false,true)); return this_t(wrapped_t::operator--(x), v_ptr); }
+      this_t & operator++() { emp_assert(OK(true,false)); return wrapped_t::operator++(); return *this; }
+      this_t operator++(int x) { emp_assert(OK(true,false)); return this_t(wrapped_t::operator++(x), v_ptr); }
+      this_t & operator--() { emp_assert(OK(false,true)); return wrapped_t::operator--(); return *this; }
+      this_t operator--(int x) { emp_assert(OK(false,true)); return this_t(wrapped_t::operator--(x), v_ptr); }
 
       auto operator+(int in) { emp_assert(OK()); return this_t(wrapped_t::operator+(in), v_ptr); }
       auto operator-(int in) { emp_assert(OK()); return this_t(wrapped_t::operator-(in), v_ptr); }
