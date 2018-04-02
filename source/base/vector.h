@@ -72,11 +72,13 @@ namespace emp {
 
       // Debug tools to make sure this iterator is okay.
       bool OK(bool begin_ok=true, bool end_ok=true) const {
-        if (v_ptr == nullptr) return false;              // Invalid vector
-        if (v_ptr->revision == 0) return false;          // Vector has been deleted!
-        if (revision != v_ptr->revision) return false;   // Vector has changed memory!
+        if (v_ptr == nullptr) return false;                // Invalid vector
+        if (v_ptr->revision == 0) return false;            // Vector has been deleted!
+        if (revision != v_ptr->revision) return false;     // Vector has changed memory!
         size_t pos = (size_t) (*this - v_ptr->begin());
-        if (pos > v_ptr->size()) return false;           // Iterator out of range.
+        if (pos > v_ptr->size()) return false;             // Iterator out of range.
+        if (!begin_ok && pos == 0) return false;           // Iterator not allowed at beginning.
+        if (!end_ok && pos == v_ptr->size()) return false; // Iterator not allowed at end.
         return true;
       }
 
@@ -94,6 +96,15 @@ namespace emp {
       const auto & operator*() const {
         emp_assert(OK(true, false));  // Ensure vector hasn't changed since making iterator.
         return wrapped_t::operator*();
+      }
+
+      auto operator->() {
+        emp_assert(OK(true, false));  // Ensure vector hasn't changed since making iterator.
+        return wrapped_t::operator->();
+      }
+      const auto operator->() const {
+        emp_assert(OK(true, false));  // Ensure vector hasn't changed since making iterator.
+        return wrapped_t::operator->();
       }
 
       auto operator++() { emp_assert(OK(true,false)); return this_t(wrapped_t::operator++(), v_ptr); }
