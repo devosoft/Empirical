@@ -53,7 +53,7 @@ namespace emp {
 
     /// Setup an iterator wrapper to make sure that they're not used again after a vector changes.
     template<typename ITERATOR_T>
-    struct iterator_wrapper : private ITERATOR_T {
+    struct iterator_wrapper : public ITERATOR_T {
       using this_t = iterator_wrapper<ITERATOR_T>;
       using wrapped_t = ITERATOR_T;
       using vec_t = emp::vector<T,Ts...>;
@@ -82,7 +82,6 @@ namespace emp {
         return true;
       }
 
-      // this_t & operator=(const ITERATOR_T & _in) { wrapped_t::operator=(_in); revision=0; }
       this_t & operator=(const this_t &) = default;
       this_t & operator=(this_t &&) = default;
 
@@ -119,6 +118,14 @@ namespace emp {
       this_t & operator+=(int in) { emp_assert(OK()); wrapped_t::operator+=(in); return *this; }
       this_t & operator-=(int in) { emp_assert(OK()); wrapped_t::operator-=(in); return *this; }
       auto & operator[](int offset) { emp_assert(OK()); return wrapped_t::operator[](offset); }
+
+      bool operator==(const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator==(in); }
+      bool operator!=(const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator!=(in); }
+
+      bool operator< (const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator< (in); }
+      bool operator<=(const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator<=(in); }
+      bool operator> (const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator> (in); }
+      bool operator>=(const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator>=(in); }
     };
 
     using iterator = iterator_wrapper< typename stdv_t::iterator >;
@@ -158,7 +165,7 @@ namespace emp {
       stdv_t::resize(new_size, val);
       revision++;
     }
-    // this_t & operator=(const this_t &) = default;
+    this_t & operator=(const this_t &) = default;
 
     T & operator[](size_t pos) {
       emp_assert(pos < stdv_t::size(), pos, stdv_t::size());
@@ -175,21 +182,36 @@ namespace emp {
     T & front() { emp_assert(stdv_t::size() > 0); return stdv_t::front(); }
     const T & front() const { emp_assert(stdv_t::size() > 0); return stdv_t::front(); }
 
-    void pop_back() {
-      emp_assert(stdv_t::size() > 0, stdv_t::size());
-      stdv_t::pop_back();
-      revision++;           // Technically reducing size can cause memory reallocation, but less likely.
-    }
-
     template <typename... PB_Ts>
     void push_back(PB_Ts &&... args) {
       stdv_t::push_back(std::forward<PB_Ts>(args)...);
       revision++;
     }
 
-    template <typename... EB_Ts>
-    void emplace_back(EB_Ts &&... args) {
-      stdv_t::emplace_back(std::forward<EB_Ts>(args)...);
+    void pop_back() {
+      emp_assert(stdv_t::size() > 0, stdv_t::size());
+      stdv_t::pop_back();
+      revision++;           // Technically reducing size can cause memory reallocation, but less likely.
+    }
+
+    template <typename... ARGS>
+    iterator insert(ARGS &&... args) {
+      return iterator( stdv_t::insert(std::forward<ARGS>(args)...), ++revision );
+    }
+
+    template <typename... ARGS>
+    iterator erase(ARGS &&... args) {
+      return iterator( stdv_t::erase(std::forward<ARGS>(args)...), ++revision );
+    }
+
+    template <typename... ARGS>
+    iterator emplace(ARGS &&... args) {
+      return iterator( stdv_t::emplace(std::forward<ARGS>(args)...), ++revision );
+    }
+
+    template <typename... ARGS>
+    void emplace_back(ARGS &&... args) {
+      stdv_t::emplace_back(std::forward<ARGS>(args)...);
       revision++;
     }
   };
@@ -230,7 +252,7 @@ namespace emp {
       emp_assert(new_size < MAX_SIZE, new_size);
       stdv_t::resize(new_size, val);
     }
-    // this_t & operator=(const this_t &) = default;
+    this_t & operator=(const this_t &) = default;
 
     auto operator[](size_t pos) -> decltype(stdv_t::operator[](pos)) {
       emp_assert(pos < stdv_t::size(), pos, stdv_t::size());
