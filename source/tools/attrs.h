@@ -360,10 +360,10 @@ namespace emp {
     constexpr NAME##Value(const T& value) : value(value) {}                    \
     constexpr NAME##Value(T&& value) : value(std::move(value)) {}              \
     template <typename U = T>                                                  \
-    constexpr NAME##Value(const NAME##Value<U>& other) : value(other.value) {} \
+    constexpr NAME##Value(const NAME##Value<U>& other) : value(*other) {}      \
     template <typename U = T>                                                  \
     constexpr NAME##Value(NAME##Value<U>&& other)                              \
-      : value(std::move(other.value)) {}                                       \
+      : value(*std::move(other)) {}                                            \
     constexpr NAME##Value& operator=(const T& value) {                         \
       /* Don't check for self assignment, and assume that value will handle it \
        * correcly */                                                           \
@@ -669,7 +669,7 @@ namespace emp {
             std::forward<U0>(arg), std::forward<U>(args)...) {}
 
       private:
-      constexpr static struct {
+      constexpr static struct __impl_AssignOp_asssigner_t {
         template <typename T1, typename T2>
         constexpr void operator()(T1& to, T2&& from) const {
           to = std::forward<T2>(from);
@@ -902,6 +902,10 @@ namespace emp {
                                    std::forward<U>(attribute));
       }
     };
+
+    template <typename... T>
+    const typename Attrs<T...>::__impl_AssignOp_asssigner_t
+      Attrs<T...>::__impl_AssignOp_asssigner;
 
     ///  An alternative syntax for creating attribute packs. Takes any number
     ///  of attributes and returns a pack containing each of those attributes.
