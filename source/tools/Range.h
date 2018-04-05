@@ -33,7 +33,7 @@ namespace emp {
     T GetUpper() const { return upper; }
 
     size_t CalcBin(T value, size_t num_bins) const {
-      return ((double) (value - lower)) / ((double) (upper - lower)) * num_bins;
+      return (size_t) (((double) (value - lower)) / ((double) (upper - lower)) * (double) num_bins);
     }
 
     Range & operator=(const Range&) = default;
