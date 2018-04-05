@@ -19,5 +19,11 @@ int main()
     sum += test_array[i];
   }
 
-  std::cout << sum << std::endl;
+  std::cout << "Sum of 0 through " << A_SIZE << " = " << sum << std::endl;
+
+  emp::array<std::string, 5> array_lit = {{ "this", "is", "an", "array", "literal" }};
+  for (const std::string & word : array_lit) {
+    std::cout << word << " ";
+  }
+  std::cout << std::endl;
 }
