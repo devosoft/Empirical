@@ -904,7 +904,7 @@ namespace emp {
     };
 
     template <typename... T>
-    const typename Attrs<T...>::__impl_AssignOp_asssigner_t
+    constexpr typename Attrs<T...>::__impl_AssignOp_asssigner_t
       Attrs<T...>::__impl_AssignOp_asssigner;
 
     ///  An alternative syntax for creating attribute packs. Takes any number
