@@ -119,13 +119,13 @@ namespace emp {
       this_t & operator-=(int in) { emp_assert(OK()); wrapped_t::operator-=(in); return *this; }
       auto & operator[](int offset) { emp_assert(OK()); return wrapped_t::operator[](offset); }
 
-      bool operator==(const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator==(in); }
-      bool operator!=(const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator!=(in); }
+      //bool operator==(const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator==(in); }
+      //bool operator!=(const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator!=(in); }
 
-      bool operator< (const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator< (in); }
-      bool operator<=(const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator<=(in); }
-      bool operator> (const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator> (in); }
-      bool operator>=(const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator>=(in); }
+      //bool operator< (const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator< (in); }
+      //bool operator<=(const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator<=(in); }
+      //bool operator> (const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator> (in); }
+      //bool operator>=(const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator>=(in); }
     };
 
     using iterator = iterator_wrapper< typename stdv_t::iterator >;
@@ -146,6 +146,8 @@ namespace emp {
     template <typename InputIt>
     vector(InputIt first, InputIt last) : stdv_t(first, last), revision(1) { ; }
     ~vector() { revision = 0; } // Clear out revision when vector is deleted.
+
+    size_t size() const { return stdv_t::size(); }
 
     iterator begin() noexcept { return iterator(stdv_t::begin(), this); }
     const_iterator begin() const noexcept { return const_iterator(stdv_t::begin(), this); }
@@ -196,17 +198,20 @@ namespace emp {
 
     template <typename... ARGS>
     iterator insert(ARGS &&... args) {
-      return iterator( stdv_t::insert(std::forward<ARGS>(args)...), ++revision );
+      ++revision;
+      return iterator( stdv_t::insert(std::forward<ARGS>(args)...), this );
     }
 
     template <typename... ARGS>
     iterator erase(ARGS &&... args) {
-      return iterator( stdv_t::erase(std::forward<ARGS>(args)...), ++revision );
+      ++revision;
+      return iterator( stdv_t::erase(std::forward<ARGS>(args)...), this );
     }
 
     template <typename... ARGS>
     iterator emplace(ARGS &&... args) {
-      return iterator( stdv_t::emplace(std::forward<ARGS>(args)...), ++revision );
+      ++revision;
+      return iterator( stdv_t::emplace(std::forward<ARGS>(args)...), this );
     }
 
     template <typename... ARGS>
