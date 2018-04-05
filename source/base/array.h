@@ -135,12 +135,6 @@ namespace emp {
     iterator end() noexcept { return iterator(base_t::end(), this); }
     const_iterator end() const noexcept { return const_iterator(base_t::end(), this); }
 
-    // operator base_t &() { return v; }
-    // operator const base_t &() const { return v; }
-
-    void resize(size_t new_size) { emp_assert(false, "invalid operation for array!"); }
-    void resize(size_t new_size, const T & val) { emp_assert(false, "invalid operation for array!"); }
-
     this_t & operator=(const this_t &) = default;
 
     T & operator[](size_t pos) {
@@ -157,6 +151,13 @@ namespace emp {
     const T & back() const { emp_assert(N > 0); return base_t::back(); }
     T & front() { emp_assert(N > 0); return base_t::front(); }
     const T & front() const { emp_assert(N > 0); return base_t::front(); }
+
+    void fill(const T & val) { this->assign(N, val); }
+
+    // Functions to make sure to throw an error on:
+
+    void resize(size_t new_size) { emp_assert(false, "invalid operation for array!"); }
+    void resize(size_t new_size, const T & val) { emp_assert(false, "invalid operation for array!"); }
 
     template <typename... PB_Ts>
     void push_back(PB_Ts &&... args) { emp_assert(false, "invalid operation for array!"); }
@@ -203,5 +204,16 @@ std::istream & operator>>(std::istream & is, emp::array<T,N> & v) {
 }
 
 #endif
+
+namespace emp{
+  /// Ensure that emp::array works with TypeID
+  template <typename T, size_t N> struct TypeID<emp::array<T,N>> {
+    static std::string GetName() {
+      std::stringstream ss;
+      ss << "emp::array<" << TypeID<T>::GetName() << "," << N << ">";
+      return ss.str();
+    }
+  };
+}
 
 #endif
