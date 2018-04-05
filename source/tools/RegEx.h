@@ -189,7 +189,7 @@ namespace emp {
           if (i > 0 && nodes[i]->AsString() && nodes[i-1]->AsString()) {
             nodes[i-1]->AsString()->str += nodes[i]->AsString()->str;
             nodes[i].Delete();
-            nodes.erase(nodes.begin() + (long) i);
+            nodes.erase(nodes.begin() + (int) i);
             i--;
             modify = true;
             continue;
@@ -198,8 +198,8 @@ namespace emp {
           // If blocks are nested, merge them into a single block.
           if (nodes[i]->AsBlock()) {
             auto old_node = nodes[i]->AsBlock();    // Save the old node for merging.
-            nodes.erase(nodes.begin() + (long) i);  // Remove block from nodes.
-            nodes.insert(nodes.begin() + (long) i, old_node->nodes.begin(), old_node->nodes.end());
+            nodes.erase(nodes.begin() + (int) i);  // Remove block from nodes.
+            nodes.insert(nodes.begin() + (int) i, old_node->nodes.begin(), old_node->nodes.end());
             old_node->nodes.resize(0);  // Don't recurse delete since nodes were moved!
             old_node.Delete();
             i--;
