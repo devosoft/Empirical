@@ -26,7 +26,7 @@ int main()
 
 std::cout << "START!" << std::endl;
 
-  emp::Random random;
+  emp::Random random(1);
   emp::World<org_t> map_world(random);
 
 std::cout << "World build." << std::endl;
