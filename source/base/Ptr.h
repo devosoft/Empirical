@@ -92,18 +92,18 @@ namespace emp {
     void SetArray(size_t bytes) noexcept { array_bytes = bytes; status = PtrStatus::ARRAY; }
 
     /// Add one more pointer.
-    void Inc() {
+    void Inc(size_t id) {
       if (ptr_debug) std::cout << "Inc info for pointer " << ptr << std::endl;
-      emp_assert(status != PtrStatus::DELETED, "Incrementing deleted pointer!");
+      emp_assert(status != PtrStatus::DELETED, "Incrementing deleted pointer!", id);
       count++;
     }
 
     /// Remove a pointer.
-    void Dec() {
+    void Dec(size_t id) {
       if (ptr_debug) std::cout << "Dec info for pointer " << ptr << std::endl;
 
       // Make sure that we have more than one copy, -or- we've already deleted this pointer
-      emp_assert(count > 1 || status == PtrStatus::DELETED, "Removing last reference to owned Ptr!");
+      emp_assert(count > 1 || status == PtrStatus::DELETED, "Removing last reference to owned Ptr!", id);
       count--;
     }
 
@@ -243,7 +243,7 @@ namespace emp {
     void IncID(size_t id) {
       if (id == UNTRACKED_ID) return;   // Not tracked!
       if (ptr_debug) std::cout << "Inc:    " << id << std::endl;
-      id_info[id].Inc();
+      id_info[id].Inc(id);
     }
 
     /// Decrement the nuber of Pointers associated with an ID
@@ -253,7 +253,7 @@ namespace emp {
       if (ptr_debug) std::cout << "Dec:    " << id << "(" << info.GetPtr() << ")" << std::endl;
       emp_assert(info.GetCount() > 0, "Decrementing Ptr, but already zero!",
                  id, info.GetPtr(), info.IsActive());
-      info.Dec();
+      info.Dec(id);
     }
 
     /// Mark the pointers associated with this ID as deleted.
