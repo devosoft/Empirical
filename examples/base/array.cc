@@ -6,6 +6,13 @@
 
 #define A_SIZE 50
 
+// Function to print an std::array; will it work with emp::array?
+template <size_t N>
+void ArrayPrint(std::array<int,N> ar) {
+  for (int x : ar) std::cout << x << " ";
+  std::cout << std::endl;
+}
+
 int main()
 {
   emp::array<int, A_SIZE> test_array;
@@ -13,6 +20,9 @@ int main()
   for (size_t i = 0; i < A_SIZE; i++) {
     test_array[i] = (int) (i * i);
   }
+
+  std::cout << "First array: " << std::endl;
+  ArrayPrint<A_SIZE>(test_array);
 
   int sum = 0;
   for (size_t i = 0; i < A_SIZE; i++) {
