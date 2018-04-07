@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include "base/array.h"
@@ -8,7 +8,7 @@
 
 // Function to print an std::array; will it work with emp::array?
 template <size_t N>
-void ArrayPrint(std::array<int,N> ar) {
+void ArrayPrint(const std::array<int,N> & ar) {
   for (int x : ar) std::cout << x << " ";
   std::cout << std::endl;
 }
