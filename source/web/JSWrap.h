@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  JSWrap.h
  *  @brief Wrap a C++ function and convert it to an integer that can be called from Javascript
@@ -116,7 +116,7 @@ namespace emp {
     arg_var = tmp_var;   // @CAO Do we need to free the memory in tmp_var?
   }
 
-  template <int ARG_ID, size_t SIZE, typename T> static void LoadArg(std::array<T, SIZE> & arg_var){
+  template <int ARG_ID, size_t SIZE, typename T> static void LoadArg(emp::array<T, SIZE> & arg_var){
     EM_ASM_ARGS({emp_i.__outgoing_array = emp_i.cb_args[$0];}, ARG_ID);
     pass_array_to_cpp(arg_var);
   }
@@ -265,7 +265,7 @@ namespace emp {
   }
 
   template <typename T, size_t N>
-  static void StoreReturn(const std::array<T, N> & ret_var) {
+  static void StoreReturn(const emp::array<T, N> & ret_var) {
     pass_array_to_javascript(ret_var);
     EM_ASM({ emp_i.cb_return = emp_i.__incoming_array; });
   }
@@ -292,7 +292,7 @@ namespace emp {
   }
 
   template <typename T, size_t N>
-  static void StoreReturn(const std::array<T, N> & ret_var, std::string var) {
+  static void StoreReturn(const emp::array<T, N> & ret_var, std::string var) {
     pass_array_to_javascript(ret_var);
     EM_ASM_ARGS({ emp_i.curr_obj[Pointer_stringify($0)] = emp_i.__incoming_array;}, var.c_str());
   }
