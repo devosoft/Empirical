@@ -25,7 +25,7 @@ int main()
   std::clock_t base_start_time = std::clock();
 
   std::vector<int *> v_base(N);
-  for (size_t i = 0; i < N; i++) v_base[i] = new int((i*7)%N);
+  for (size_t i = 0; i < N; i++) v_base[i] = new int((int)((i*7)%N));
   std::vector<int *> v_base2(v_base);
   std::sort( v_base2.begin(), v_base2.end(), [](int *p1,int *p2){ return *p1 < *p2; } );
   v_base.resize(0);
@@ -43,7 +43,7 @@ int main()
   std::clock_t std_start_time = std::clock();
 
   std::vector<std::shared_ptr<int>> v_std(N);
-  for (size_t i = 0; i < N; i++) v_std[i] = std::make_shared<int>( (i*7)%N );
+  for (size_t i = 0; i < N; i++) v_std[i] = std::make_shared<int>( (int)((i*7)%N) );
   std::vector<std::shared_ptr<int>> v_std2(v_std);
   std::sort( v_std2.begin(), v_std2.end(),
              [](std::shared_ptr<int> p1, std::shared_ptr<int> p2){ return *p1 < *p2; } );
@@ -61,7 +61,7 @@ int main()
   std::clock_t emp_start_time = std::clock();
 
   std::vector<emp::Ptr<int>> v_emp(N);
-  for (size_t i = 0; i < N; i++) v_emp[i] = emp::NewPtr<int>((i*7)%N);
+  for (size_t i = 0; i < N; i++) v_emp[i] = emp::NewPtr<int>((int)((i*7)%N));
   std::vector<emp::Ptr<int>> v_emp2(v_emp);
   std::sort( v_emp2.begin(), v_emp2.end(),
              [](emp::Ptr<int> p1, emp::Ptr<int> p2){ return *p1 < *p2; } );
