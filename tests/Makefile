@@ -4,7 +4,7 @@ TEST_NAMES = assert base constexpr data geometry meta scholar tools games
 
 FLAGS = -std=c++14 -Wall -Wno-unused-function -I../source/ -I../
 #CXX = clang++
-CXX = g++
+#CXX = g++
 
 default: test
 
