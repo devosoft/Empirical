@@ -1,5 +1,14 @@
-#ifndef __SVG_SHAPES_H__
-#define __SVG_SHAPES_H__
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2018
+ *
+ *  @file  svg_shapes.h
+ *  @brief Tools to build common SVG shapes.
+ */
+
+#ifndef EMP_D3_SVG_SHAPES_H
+#define EMP_D3_SVG_SHAPES_H
 
 #include "d3_init.h"
 #include "selection.h"
@@ -28,7 +37,7 @@ namespace D3 {
     /// Assumes [data] is an array of 2-element arrays describing (x,y) coordinates and makes
     /// the line that connects them
     template <typename T, size_t SIZE>
-    std::string Generate(std::array<std::array<T, 2>, SIZE> & data){
+    std::string Generate(emp::array<emp::array<T, 2>, SIZE> & data){
       emp::pass_array_to_javascript(data);
 
       char * buffer = (char *)EM_ASM_INT({
@@ -46,7 +55,7 @@ namespace D3 {
     /// Draws the path associated with [data] onto the [s] selection (must contain a single SVG)
     /// element).
     template <typename T, std::size_t SIZE>
-    Selection DrawShape(std::array<std::array<T, 2>, SIZE> & data, Selection & s) {
+    Selection DrawShape(emp::array<emp::array<T, 2>, SIZE> & data, Selection & s) {
       Selection path = s.Append("path");
       path.SetAttr("d", Generate(data));
       return path;
@@ -65,7 +74,7 @@ namespace D3 {
 
    /// If you pass a triple-nested array, it will be treated as an array of paths
     template <typename T, std::size_t SIZE, std::size_t SIZE2>
-    Selection DrawShape(std::array<std::array<std::array<T, 2>, SIZE>,\
+    Selection DrawShape(emp::array<emp::array<emp::array<T, 2>, SIZE>,\
 			 SIZE2> & data) {
       Selection group = Select("svg").Append("g");
       for (auto arr: data) {
@@ -229,7 +238,7 @@ namespace D3 {
     /// As an example, the default function expects data like this (array of arrays):
     /// [[0,0], [1,1], [2,2]]
     /// And has (a Javascript equivalent of) this accessor:
-    /// int x(std::array<int, 2> d) {return d[0];}
+    /// int x(emp::array<int, 2> d) {return d[0];}
     ///
     /// If your data instead looked like this (array of Javascript objects with x and y values):
     /// [{x:0, y:0}, {x:1, y:1}, {x:2, y:2}]
@@ -276,7 +285,7 @@ namespace D3 {
     /// As an example, the default function expects data like this (array of arrays):
     /// [[0,0], [1,1], [2,2]]
     /// And has (a Javascript equivalent of) this accessor:
-    /// int x(std::array<int, 2> d) {return d[1];}
+    /// int x(emp::array<int, 2> d) {return d[1];}
     ///
     /// If your data instead looked like this (array of Javascript objects with x and y values):
     /// [{x:0, y:0}, {x:1, y:1}, {x:2, y:2}]
