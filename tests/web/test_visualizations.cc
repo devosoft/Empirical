@@ -29,7 +29,7 @@ struct LineageTreeNode {
 
 emp::web::Document doc("line_graph");
 emp::web::Document tree_viz("tree_viz");
-emp::web::LineGraph<std::array<double, 2> > line_graph("x", "y", 500, 250);
+emp::web::LineGraph<emp::array<double, 2> > line_graph("x", "y", 500, 250);
 
 emp::web::TreeVisualization<LineageTreeNode> tree(500, 250);
 D3::Selection example_selection;
@@ -76,7 +76,7 @@ int MakeSVG(){
 }
 
 int BindData() {
-  D3::Selection temp_circles = example_selection.SelectAll("circle").Data(std::array<int, 4>({{8,3,5,2}}));
+  D3::Selection temp_circles = example_selection.SelectAll("circle").Data(emp::array<int, 4>{{8,3,5,2}});
   circles = temp_circles.Enter().Append("circle").Merge(temp_circles);
   return circles.GetID();
 }
@@ -397,7 +397,7 @@ int main() {
 
   emp::JSWrap([](){ax.SetScale(scale);}, "TestSetScale");
   emp::JSWrap([](){return ax.GetScale().GetID();}, "TestGetScale");
-  emp::JSWrap([](){ax.SetTickValues(std::array<int, 3>({{4,5,7}}));}, "TestSetTickValues");
+  emp::JSWrap([](){ax.SetTickValues(emp::array<int, 3>{{4,5,7}});}, "TestSetTickValues");
   emp::JSWrap([](){ax.SetTickSize(.2);}, "TestSetTickSize");
   emp::JSWrap([](){ax.SetTickSizeInner(.7);}, "TestSetInnerTickSize");
   emp::JSWrap([](){ax.SetTickSizeOuter(1.1);}, "TestSetOuterTickSize");
