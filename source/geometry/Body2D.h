@@ -70,9 +70,10 @@ namespace emp {
     Point total_abs_shift;  // Total absolute-value of shifts (to calculate pressure)
     double pressure;        // Current pressure on this body.
 
-    bool detach_on_divide;  // Should offspring detach on birth (or stay linked to parent)
+    bool detach_on_divide;  // Should offspring detach when born (or stay linked to parent)
   public:
-    Body2D_Base() : birth_time(0.0), mass(1.0), color_id(0), repro_count(0), pressure(0) { ; }
+    Body2D_Base() : birth_time(0.0), mass(1.0), color_id(0), repro_count(0)
+                  , pressure(0), detach_on_divide(true) { ; }
     ~Body2D_Base() { ; }
 
     double GetBirthTime() const { return birth_time; }
@@ -235,7 +236,7 @@ namespace emp {
     }
 
     // If a body is not at its target radius, grow it or shrink it, as needed.
-    void BodyUpdate(double change_factor=1, bool detach_on_birth=true) {
+    void BodyUpdate(double change_factor=1) {
       // Test if this body needs to grow or shrink.
       if ((int) target_radius > (int) GetRadius()) SetRadius(GetRadius() + change_factor);
       else if ((int) target_radius < (int) GetRadius()) SetRadius(GetRadius() - change_factor);
@@ -248,10 +249,11 @@ namespace emp {
         // If we're within the change_factor, just set pair_dist to target.
         if (std::abs(link->cur_dist - link->target_dist) <= change_factor) {
           link->cur_dist = link->target_dist;
+          // IF this organism was gestating, finish the reproduction.
           if (link->type == LINK_TYPE::REPRODUCTION) {
             emp_assert(repro_count > 0);
             repro_count--;
-            if (detach_on_birth) {   // Flag link for removal!
+            if (detach_on_divide) {   // Flag link for removal!
               RemoveLink(link);      // Remove the link.
               i--;                   // Check this position again.
             }
