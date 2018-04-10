@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -40,7 +40,7 @@ namespace emp {
     // REPRODUCTION -> "from" is gestating "to"
     // ATTACK -> "from" is trying to eat "to"
     // PARASITE -> "from" is stealing resources from "to"
-    enum class LINK_TYPE { DEFAULT, REPRODUCTION, ATTACK, PARASITE };
+    enum class LINK_TYPE { DEFAULT, REPRODUCTION, ATTACK, PARASITE, MULTICELL };
 
     template <typename BODY_TYPE>
     struct BodyLink {
@@ -70,6 +70,7 @@ namespace emp {
     Point total_abs_shift;  // Total absolute-value of shifts (to calculate pressure)
     double pressure;        // Current pressure on this body.
 
+    bool detach_on_divide;  // Should offspring detach on birth (or stay linked to parent)
   public:
     Body2D_Base() : birth_time(0.0), mass(1.0), color_id(0), repro_count(0), pressure(0) { ; }
     ~Body2D_Base() { ; }
@@ -83,7 +84,7 @@ namespace emp {
     int GetReproCount() const { return repro_count; }
     Point GetShift() const { return shift; }
     double GetPressure() const { return pressure; }
-
+    bool GetDetachOnDivide() const { return detach_on_divide; }
 
     void SetBirthTime(double in_time) { birth_time = in_time; }
     void SetColorID(uint32_t in_id) { color_id = in_id; }
@@ -101,6 +102,9 @@ namespace emp {
 
     // Shift to apply next update.
     void AddShift(const Point & s) { shift += s; total_abs_shift += s.Abs(); }
+
+    // Controls about replication
+    void SetDetachOnDivide(bool in=true) { detach_on_divide = in; }
   };
 
   class CircleBody2D : public Body2D_Base {
