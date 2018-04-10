@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  This class maintains an angle on a 2D surface.
@@ -147,10 +147,8 @@ namespace emp {
 
     Angle & operator+=(const Angle & _in) { angle += _in.angle; return *this; }
     Angle & operator-=(const Angle & _in) { angle -= _in.angle; return *this; }
-    Angle & operator*=(double _in)        { angle *= _in; return *this; }
-    Angle & operator/=(double _in)        { angle /= _in; return *this; }
-    // Angle & operator*=(int _in)           { angle *= _in; return *this; }
-    // Angle & operator/=(int _in)           { angle /= _in; return *this; }
+    Angle & operator*=(double _in)        { angle = (uint32_t) (angle * _in); return *this; }
+    Angle & operator/=(double _in)        { angle = (uint32_t) (angle / _in); return *this; }
 
     double Sin() const { return sin(AsRadians()); }
     double Cos() const { return cos(AsRadians()); }
