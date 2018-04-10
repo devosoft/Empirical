@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -40,7 +40,13 @@ namespace emp {
     const Surface_t & GetBackground() const { return background; }
     bool GetDetach() const { return detach_on_birth; }
 
-    Physics2D & SetDetach(bool _in) { detach_on_birth = _in; return *this; }
+    Physics2D & SetDetach(bool _in) {
+      detach_on_birth = _in;
+      // Set all current bodies to new detach setting.
+      auto & body_set = surface.GetBodySet();
+      for (auto * cur_body : body_set) { cur_body->SetDetachOnDivide(_in); }
+      return *this;
+    }
 
     Physics2D & AddBody(BODY_TYPE * in_body) { surface.AddBody(in_body); return *this; }
     Physics2D & AddBackground(BODY_TYPE * in_body) { background.AddBody(in_body); return *this; }
@@ -136,8 +142,8 @@ namespace emp {
       auto & body_set = surface.GetBodySet();
 
       for (auto * cur_body : body_set) {
-        cur_body->BodyUpdate(0.25, detach_on_birth); // Let a body change size or shape, as needed.
-        cur_body->ProcessStep(0.0125);               // Update position and velocity.
+        cur_body->BodyUpdate(0.25);       // Let a body change size or shape, as needed.
+        cur_body->ProcessStep(0.0125);    // Update position and velocity.
       }
 
       // Handle collisions
