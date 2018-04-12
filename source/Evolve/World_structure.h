@@ -157,6 +157,67 @@ namespace emp {
   /// Requires world to already have a size; that size is respected when deciding trait bins.
   template<typename ORG>
   void SetMapElites(World<ORG> & world) { SetMapElites(world, world.GetPhenotypes()); }
+
+
+
+  /// DiverseElites is similar to MAP-Elites, but rather than merely keep the elites on
+  /// a pre-defined grid, it merely tries to maintain maximal distance between elites in
+  /// trait space.  The main advantages to this technique are (1) It's easy to build
+  /// up an inital population that grows in diversity over time, and (2) You don't need to
+  /// predefine box sizes or even limits to trait values.
+
+  /// Set the population to use a DiverseElites structure.  This means that organism placement has
+  /// two key components:
+  /// 1: Organism position is in continuous space based on phenotypic traits.
+  /// 2: When the population is full, nearby organisms must battle to keep their position.
+  ///
+  /// Note: Since organisms compete with their predecessors for space in the populations,
+  /// synchronous generations do not make sense.
+  ///
+  /// This first version will setup a Diverse-Elites world and specify traits to use.
+  template<typename ORG>
+  void SetDiverseElites(World<ORG> & world, TraitSet<ORG> traits, size_t world_size) { 
+    using org_pos_t = typename World<ORG>::OrgPosition;
+
+    world.Resize(world_size);
+    world.MarkSynchronous(false);
+    world.MarkSpaceStructured(false).MarkPhenoStructured(true);
+
+    // -- Setup functions --
+    // Inject into the appropriate positon based on phenotype.  Note that an inject will fail
+    // if a more fit organism is already in place; you must run clear first if you want to
+    // ensure placement.
+    world.SetAddInjectFun( [&world,traits](Ptr<ORG> new_org) {
+      // Determine tha position that this phenotype fits in.
+      double org_fitness = world.CalcFitnessOrg(*new_org);
+
+      // @CAO Find empty spot?  Or compete nearby orgs to clear out a spot?
+      return org_pos_t();  // @CAO For now, Return invalid position!
+    });
+
+    // Map Elites does not have a concept of neighbors.
+    world.SetGetNeighborFun( [](size_t id) { emp_assert(false); return id; });
+
+    // Birth is effectively the same as inject.
+    world.SetAddBirthFun( [&world,traits](Ptr<ORG> new_org, size_t parent_id) {
+      (void) parent_id; // Parent id is not needed for MAP Elites.
+
+      // Determine tha position that this phenotype fits in.
+      double org_fitness = world.CalcFitnessOrg(*new_org);
+
+      // @CAO Find empty spot?  Or compete nearby orgs to clear out a spot?
+      return org_pos_t();  // @CAO For now, Return invalid position!
+    });
+
+    world.SetAttribute("SynchronousGen", "False");
+    world.SetAttribute("PopStruct", "DiverseElites");
+  }
+
+  /// Setup a MAP-Elites world, given the provided worlds already has set of phenotypes.
+  template<typename ORG>
+  void SetMapElites(World<ORG> & world, size_t world_size) {
+    SetMapElites(world, world.GetPhenotypes(), world_size);
+  }
 }
 
 #endif
