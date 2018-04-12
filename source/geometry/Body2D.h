@@ -74,7 +74,7 @@ namespace emp {
   public:
     Body2D_Base() : birth_time(0.0), orientation(), velocity(), mass(1.0), color_id(0), repro_count(0)
                   , shift(), cum_shift(), total_abs_shift(), pressure(0), detach_on_divide(true) { ; }
-    ~Body2D_Base() { ; }
+    virtual ~Body2D_Base() { ; }
 
     double GetBirthTime() const { return birth_time; }
     const Angle & GetOrientation() const { return orientation; }
@@ -116,17 +116,6 @@ namespace emp {
     // Information about other bodies that this one is linked to.
     emp::vector< Ptr< BodyLink<CircleBody2D> > > from_links;  // Active links initiated by body
     emp::vector< Ptr< BodyLink<CircleBody2D> > > to_links;    // Active links targeting body
-
-    void RemoveFromLink(size_t link_id) {
-      emp_assert(link_id < from_links.size());
-      from_links[link_id] = from_links.back();
-      from_links.pop_back();
-    }
-    void RemoveToLink(size_t link_id) {
-      emp_assert(link_id < to_links.size());
-      to_links[link_id] = to_links.back();
-      to_links.pop_back();
-    }
 
   public:
     CircleBody2D(const Circle2D<double> & _p)
@@ -178,20 +167,30 @@ namespace emp {
 
 
     void RemoveLink(Ptr< BodyLink<CircleBody2D> > link) {
+      // We should always initiate link removal from the FROM side.
       if (link->to == ToPtr(this)) {
         link->from->RemoveLink(link);
         return;
       }
 
-      // Remove the FROM link.
+      // Find and remove the associated FROM link from this body.
       for (size_t i = 0; i < from_links.size(); i++) {
-        if (from_links[i]->to == link->to) { RemoveFromLink(i); break; }
+        if (from_links[i]->to == link->to) {
+          from_links[i] = from_links.back();
+          from_links.pop_back();
+          break;
+        }
       }
 
-      // Remove the TO link.
+      // Find and remove the TO link from the attached body.
       const size_t to_size = link->to->to_links.size();
       for (size_t i = 0; i < to_size; i++) {
-        if (link->to->to_links[i]->from == ToPtr(this)) { link->to->RemoveToLink(i); break; }
+        if (link->to->to_links[i]->from == ToPtr(this)) {
+          auto & other_links = link->to->to_links;
+          other_links[i] = other_links.back();
+          other_links.pop_back();
+          break;
+        }
       }
 
       link.Delete();
