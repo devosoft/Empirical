@@ -469,10 +469,10 @@ namespace emp {
       emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
       emp_assert(ptr, "Deleting null Ptr.");
       emp_assert(Tracker().IsArrayID(id) == false, id, "Trying to delete array pointer as non-array.");
-      Tracker().MarkDeleted(id);
-      DebugInfo().RemovePtr();
       if (ptr_debug) std::cout << "Ptr::Delete() : " << ptr << std::endl;
       delete ptr;
+      Tracker().MarkDeleted(id);
+      DebugInfo().RemovePtr();
     }
 
     /// Delete this pointer to an array (must be an array).
@@ -480,10 +480,10 @@ namespace emp {
       emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
       emp_assert(ptr, "Deleting null Ptr.");
       emp_assert(Tracker().IsArrayID(id), id, "Trying to delete non-array pointer as array.");
-      Tracker().MarkDeleted(id);
-      DebugInfo().RemovePtr();
       if (ptr_debug) std::cout << "Ptr::DeleteArray() : " << ptr << std::endl;
       delete [] ptr;
+      Tracker().MarkDeleted(id);
+      DebugInfo().RemovePtr();
     }
 
     /// Convert this pointer to a hash value.
