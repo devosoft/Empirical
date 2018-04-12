@@ -911,7 +911,7 @@ namespace emp {
     ///  of attributes and returns a pack containing each of those attributes.
     template <class... T>
     constexpr Attrs<std::decay_t<T>...> MakeAttrs(T&&... props) {
-      return {std::forward<T>(props)...};
+      return Attrs<std::decay_t<T>...>(std::forward<T>(props)...);
     };
 
     namespace __impl_attrs_merge {
