@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
   emp::Initialize();
 
   //Test passing arrays to Javascript
-  std::array<int32_t, 3> test_data = {{10,30,60}};
+  emp::array<int32_t, 3> test_data = {{10,30,60}};
 
   JSDataObject test_obj_1;
   test_obj_1.val() = 10;
@@ -41,13 +41,13 @@ int main(int argc, char* argv[]) {
   test_obj_2.word() = "hi2";
   test_obj_2.val2() = 11.2;
 
-  std::array<JSDataObject, 2> test_data_2 = {{test_obj_1, test_obj_2}};
+  emp::array<JSDataObject, 2> test_data_2 = {{test_obj_1, test_obj_2}};
 
-  std::array<std::array<std::array<int, 2>, 1>, 5> horrible_array = {{{{{{0,0}}}}, {{{{0,10}}}}, {{{{10,10}}}}, {{{{20,20}}}}, {{{{30, 30}}}}}};
+  emp::array<emp::array<emp::array<int, 2>, 1>, 5> horrible_array = {{{{{{0,0}}}}, {{{{0,10}}}}, {{{{10,10}}}}, {{{{20,20}}}}, {{{{30, 30}}}}}};
 
-  std::array<std::array<JSDataObject, 2>, 2> test_data_4 = {{{{test_obj_1, test_obj_2}}, {{test_obj_2, test_obj_2}}}};
+  emp::array<emp::array<JSDataObject, 2>, 2> test_data_4 = {{{{test_obj_1, test_obj_2}}, {{test_obj_2, test_obj_2}}}};
 
-  std::array<std::array<std::string, 5>, 1> string_arr = {{{{"do", "strings", "work", "in", "arrays?"}}}};
+  emp::array<emp::array<std::string, 5>, 1> string_arr = {{{{"do", "strings", "work", "in", "arrays?"}}}};
 
   emp::vector<int> int_vec = {5,1,2,3,6};
 
@@ -111,7 +111,7 @@ int main(int argc, char* argv[]) {
   //Test passing arrays to C++
   //Test ints
   EM_ASM({emp_i.__outgoing_array = [5, 1, 3]});
-  std::array<int, 3> test_arr_1;
+  emp::array<int, 3> test_arr_1;
   emp::pass_array_to_cpp(test_arr_1);
   EMP_TEST_VALUE(test_arr_1[0], "5");
   EMP_TEST_VALUE(test_arr_1[1], "1");
@@ -119,7 +119,7 @@ int main(int argc, char* argv[]) {
 
   //Test floats
   EM_ASM({emp_i.__outgoing_array = [5.2, 1.5, 3.1]});
-  std::array<float, 3> test_arr_2;
+  emp::array<float, 3> test_arr_2;
   emp::pass_array_to_cpp(test_arr_2);
   EMP_TEST_VALUE(test_arr_2[0], "5.2");
   EMP_TEST_VALUE(test_arr_2[1], "1.5");
@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
 
   //Test doubles
   EM_ASM({emp_i.__outgoing_array = [5.2, 1.5, 3.1]});
-  std::array<double, 3> test_arr_3;
+  emp::array<double, 3> test_arr_3;
   emp::pass_array_to_cpp(test_arr_3);
   EMP_TEST_VALUE(test_arr_3[0], "5.2");
   EMP_TEST_VALUE(test_arr_3[1], "1.5");
@@ -143,7 +143,7 @@ int main(int argc, char* argv[]) {
 
   //Test chars
   EM_ASM({emp_i.__outgoing_array = ["h", "i", "!"]});
-  std::array<char, 3> test_arr_4;
+  emp::array<char, 3> test_arr_4;
   emp::pass_array_to_cpp(test_arr_4);
   EMP_TEST_VALUE(test_arr_4[0], "h");
   EMP_TEST_VALUE(test_arr_4[1], "i");
@@ -157,7 +157,7 @@ int main(int argc, char* argv[]) {
 
   //Test std::strings
   EM_ASM({emp_i.__outgoing_array = ["jello", "world", "!!"]});
-  std::array<std::string, 3> test_arr_5;
+  emp::array<std::string, 3> test_arr_5;
   emp::pass_array_to_cpp(test_arr_5);
   EMP_TEST_VALUE(test_arr_5[0], "jello");
   EMP_TEST_VALUE(test_arr_5[1], "world");
@@ -170,7 +170,7 @@ int main(int argc, char* argv[]) {
 
   //Test nested arrays
   EM_ASM({emp_i.__outgoing_array = [[4,5], [3,1], [7,8]]});
-  std::array<std::array<int, 2>, 3> test_arr_6;
+  emp::array<emp::array<int, 2>, 3> test_arr_6;
   emp::pass_array_to_cpp(test_arr_6);
   EMP_TEST_VALUE(test_arr_6[0][0], "4");
   EMP_TEST_VALUE(test_arr_6[0][1], "5");
@@ -193,7 +193,7 @@ int main(int argc, char* argv[]) {
   EM_ASM({emp_i.__outgoing_array = [[["Sooo", "many"], ["strings", "here"]],
 				  [["and", "they're"], ["all", "nested"]],
 				  [["in", "this"], ["nested", "array!"]]];});
-  std::array<std::array<std::array<std::string, 2>, 2>, 3> test_arr_7;
+  emp::array<emp::array<emp::array<std::string, 2>, 2>, 3> test_arr_7;
   emp::pass_array_to_cpp(test_arr_7);
   EMP_TEST_VALUE(test_arr_7[0][0][0], "Sooo");
   EMP_TEST_VALUE(test_arr_7[0][0][1], "many");

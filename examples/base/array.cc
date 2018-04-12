@@ -1,10 +1,17 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include "base/array.h"
 
 #define A_SIZE 50
+
+// Function to print an std::array; will it work with emp::array?
+template <size_t N>
+void ArrayPrint(const std::array<int,N> & ar) {
+  for (int x : ar) std::cout << x << " ";
+  std::cout << std::endl;
+}
 
 int main()
 {
@@ -13,6 +20,9 @@ int main()
   for (size_t i = 0; i < A_SIZE; i++) {
     test_array[i] = (int) (i * i);
   }
+
+  std::cout << "First array: " << std::endl;
+  ArrayPrint<A_SIZE>(test_array);
 
   int sum = 0;
   for (size_t i = 0; i < A_SIZE; i++) {

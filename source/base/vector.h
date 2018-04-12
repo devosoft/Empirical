@@ -10,8 +10,8 @@
  *  This class is a drop-in wrapper for std::vector, adding on bounds checking.
  *  If EMP_NDEBUG is set then it reverts back to std::vector.
  *
- *  @todo Need an automatic conversion from emp::vector to std::vector and back to interface with
- *     non-empirical code.
+ *  @todo Debug code: member functions that take iterators should also take emp iterators that verify
+ *        whether those iterators are valid.
  */
 
 
@@ -62,6 +62,7 @@ namespace emp {
       const vec_t * v_ptr;
       int revision;
 
+      // @CAO: For the moment cannot create an emp iterator from a base since we don't know vector to use.
       // iterator_wrapper(const ITERATOR_T & _in)
       //   : ITERATOR_T(_in), v_ptr(nullptr), revision(0) { ; }
       iterator_wrapper(const ITERATOR_T & _in, const vec_t * _v)

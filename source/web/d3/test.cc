@@ -29,14 +29,14 @@ void mouseover(int id){
 
 void make_graph() {
   D3::Selection svg = D3::Selection("body").Append("svg");
-  //std::array<std::array<int, 2>, 5> data;
+  //emp::array<emp::array<int, 2>, 5> data;
   //EM_ASM({emp.__outgoing_array = emp.__incoming_data;});
   //emp::pass_array_to_cpp(data);
   D3::Dataset data = D3::Dataset();
   D3::Axis<D3::LinearScale> x_axis = D3::Axis<D3::LinearScale>();
   x_axis.SetScale(D3::LinearScale());
-  std::array<int, 2> domain = {0, 60};
-  std::array<int, 2> range = {0, 250};
+  emp::array<int, 2> domain = {0, 60};
+  emp::array<int, 2> range = {0, 250};
   x_axis.GetScale().SetDomain(domain);
   x_axis.GetScale().SetRange(range);
   x_axis.SetTicks(3);
@@ -59,7 +59,7 @@ int main()
   emp::JSWrap(make_graph, "make_graph");
 
   EM_ASM({emp.__outgoing_array = ["hi", "eeee", "l", "l", "o"]; });
-  std::array<std::string, 5> new_array;
+  emp::array<std::string, 5> new_array;
   emp::pass_array_to_cpp(new_array);
   std::cout << new_array[0] << " " << new_array[1] << " " << new_array[2] << std::endl;
 
@@ -77,9 +77,9 @@ int main()
   std::cout << n_objects() << std::endl;
 
   D3::LinearScale s = D3::LinearScale();
-  s.SetRange(std::array<int,2>({2,3}));
+  s.SetRange(emp::array<int,2>({2,3}));
 
-  std::array<int32_t, 3> test_data = {10,30,60};
+  emp::array<int32_t, 3> test_data = {10,30,60};
   JSDataObject test_obj_1;
   test_obj_1.val() = 10;
   test_obj_1.word() = "hi";
@@ -90,11 +90,11 @@ int main()
   test_obj_2.word() = "hi2";
   test_obj_2.val2() = 11.2;
 
-  std::array<JSDataObject, 2> test_data_2 = {test_obj_1, test_obj_2};
+  emp::array<JSDataObject, 2> test_data_2 = {test_obj_1, test_obj_2};
 
-  std::array<std::array<int,2>, 5> test_path = {{{0,0}, {0,10}, {10,10}, {20,20}, {30, 30}}};
+  emp::array<emp::array<int,2>, 5> test_path = {{{0,0}, {0,10}, {10,10}, {20,20}, {30, 30}}};
 
-  std::array<std::array<std::array<int,2>, 2>, 3> test_paths = {{ {{{0,0}, {100,0}}}, {{{0,10}, {100,100}}}, {{{20,20}, {300, 300}}} }};
+  emp::array<emp::array<emp::array<int,2>, 2>, 3> test_paths = {{ {{{0,0}, {100,0}}}, {{{0,10}, {100,100}}}, {{{20,20}, {300, 300}}} }};
 
   //D3::ShapesFromData(test_data, "circle");
   //EM_ASM({d3.select("svg").selectAll("circle").data([{val:5, word:"hi", val2:6.3}]).enter().append("circle")});

@@ -1,5 +1,14 @@
-#ifndef __LOAD_DATA_H__
-#define __LOAD_DATA_H__
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2018
+ *
+ *  @file  dataset.h
+ *  @brief Tools to maintain data in D3.
+ */
+
+#ifndef EMP_D3_LOAD_DATA_H
+#define EMP_D3_LOAD_DATA_H
 
 #include <functional>
 
@@ -225,7 +234,7 @@ namespace D3 {
 
     /// Put the last row of the array into arr
     template <std::size_t N, typename T>
-    void GetLastRow(std::array<T, N> & arr) {
+    void GetLastRow(emp::array<T, N> & arr) {
       EM_ASM_ARGS({
         emp_i.__outgoing_array = js.objects[$0][js.objects[$0].length - 1];
       }, GetID());

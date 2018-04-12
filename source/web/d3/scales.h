@@ -1,5 +1,14 @@
-#ifndef __SCALES_H__
-#define __SCALES_H__
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2018
+ *
+ *  @file  scales.h
+ *  @brief Tools for scaling graph axes in D3.
+ */
+
+#ifndef EMP_D3_SCALES_H
+#define EMP_D3_SCALES_H
 
 #include "d3_init.h"
 #include "utils.h"
@@ -26,7 +35,7 @@ namespace D3 {
     /// will be interpolated with a function determined by the type of the scale.
     /// Array should contain same number of elements as the one used to set the domain.
     template <typename T, size_t SIZE>
-    Scale& SetRange(std::array<T,SIZE> values) {
+    Scale& SetRange(emp::array<T,SIZE> values) {
       emp::pass_array_to_javascript(values);
       EM_ASM_ARGS({js.objects[$0].range(emp_i.__incoming_array);}, this->id);
       return *this;
@@ -40,7 +49,7 @@ namespace D3 {
     /// Set the input values corresponding to values in the range.
     /// Array should contain same number of elements as the one used to set the range.
     template <typename T, size_t SIZE>
-    Scale& SetDomain(std::array<T,SIZE> values) {
+    Scale& SetDomain(emp::array<T,SIZE> values) {
       emp::pass_array_to_javascript(values);
       EM_ASM_ARGS({js.objects[$0].domain(emp_i.__incoming_array);}, this->id);
       return *this;
@@ -139,7 +148,7 @@ namespace D3 {
     LinearScale(bool derived) : IdentityScale(true) {;}
 
     template <typename T, size_t SIZE>
-    LinearScale& SetRangeRound(std::array<T,SIZE> values) {
+    LinearScale& SetRangeRound(emp::array<T,SIZE> values) {
       emp::pass_array_to_javascript(values);
       EM_ASM_ARGS({js.objects[$0].rangeRound(emp.__incoming_array);}, this->id);
       return *this;
