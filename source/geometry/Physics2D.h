@@ -138,6 +138,11 @@ namespace emp {
       return true;
     }
 
+    void DeleteOrg(size_t id) {
+      auto & body_set = surface.GetBodySet();
+      body_set[id].Delete();                   // Delete cell.      
+    }
+
     void Update() {
       // Handle movement of bodies
 
@@ -162,7 +167,7 @@ namespace emp {
 
         // @CAO Arbitrary pressure threshold!
         if (cur_pressure > 3.0) {                // If pressure too high, burst this cell!
-          body_set[cur_id].Delete();             // Delete the burst cell.
+          DeleteOrg(cur_id);                     // Delete the burst cell.
           cur_size--;                            // Indicate one fewer cells in population.
           body_set[cur_id] = body_set[cur_size]; // Move last cell to popped position.
         }
