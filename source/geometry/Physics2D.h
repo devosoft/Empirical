@@ -160,10 +160,12 @@ namespace emp {
         const double cur_pressure = body_set[cur_id]->GetPressure();
 
         // @CAO Arbitrary pressure threshold!
-        if (cur_pressure > 3.0) {              // If pressure too high, burst this cell!
-          body_set[cur_id].Delete();           // Delete the burst cell.      
-          body_set[cur_id] = body_set.back();  // Move last cell to popped position.
-          body_set.pop_back();                 // Remove the last element now that it was moved away.
+        if (cur_pressure > 3.0) {                // If pressure too high, burst this cell!
+          body_set[cur_id].Delete();             // Delete the burst cell.      
+          if (cur_id < body_set.size() - 1) {    // If we are not at the end of the body set...
+            body_set[cur_id] = body_set.back();  // ...move last cell to popped position.
+          }
+          body_set.pop_back();                   // Remove the last element now that it was moved away.
         }
         else cur_id++;
       }
