@@ -138,11 +138,6 @@ namespace emp {
       return true;
     }
 
-    void DeleteOrg(size_t id) {
-      auto & body_set = surface.GetBodySet();
-      body_set[id].Delete();                   // Delete cell.      
-    }
-
     void Update() {
       // Handle movement of bodies
 
@@ -159,23 +154,19 @@ namespace emp {
       surface.TestCollisions(collide_fun);
 
       // Determine which bodies we should remove.
-      int cur_size = (int) body_set.size();
-      int cur_id = 0;
-      while (cur_id < cur_size) {
+      size_t cur_id = 0;
+      while (cur_id < body_set.size()) {
         emp_assert(body_set[cur_id] != nullptr);
         const double cur_pressure = body_set[cur_id]->GetPressure();
 
         // @CAO Arbitrary pressure threshold!
-        if (cur_pressure > 3.0) {                // If pressure too high, burst this cell!
-          DeleteOrg(cur_id);                     // Delete the burst cell.
-          cur_size--;                            // Indicate one fewer cells in population.
-          body_set[cur_id] = body_set[cur_size]; // Move last cell to popped position.
+        if (cur_pressure > 3.0) {              // If pressure too high, burst this cell!
+          body_set[cur_id].Delete();           // Delete the burst cell.      
+          body_set[cur_id] = body_set.back();  // Move last cell to popped position.
+          body_set.pop_back();                 // Remove the last element now that it was moved away.
         }
         else cur_id++;
       }
-
-      // Now that some cells are removed, resize number of bodies
-      body_set.resize(cur_size);
     }
 
     // Access to bodies
