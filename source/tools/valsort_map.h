@@ -28,8 +28,13 @@ private:
   std::map<Key,T> item_map;
   std::set< value_type > val_set;
 
+  static bool val_less(const value_type & in1, const value_type & in2) {
+    if (in1.second == in2.second) return (in1.first < in2.first);
+    return in1.second < in2.second;
+  }
+
 public:
-  valsort_map() : item_map(), val_set() { ; }
+  valsort_map() : item_map(), val_set(val_less) { ; }
   valsort_map(const valsort_map &) = default;
   valsort_map(valsort_map &&) = default;
   ~valsort_map() { ; }
