@@ -27,16 +27,18 @@ namespace emp {
     using mapped_type = T;
     using value_type = std::pair<const Key,T>;
   private:
-    std::map<Key,T> item_map;
-    std::set< value_type > val_set;
+    struct SortOrder {
+      bool operator()(const value_type & in1, const value_type & in2) {
+        if (in1.second == in2.second) return (in1.first < in2.first);
+        return in1.second < in2.second;
+      }
+    };
 
-    static bool val_less(const value_type & in1, const value_type & in2) {
-      if (in1.second == in2.second) return (in1.first < in2.first);
-      return in1.second < in2.second;
-    }
+    std::map<Key,T> item_map;
+    std::set< value_type, SortOrder > val_set;
 
   public:
-    valsort_map() : item_map(), val_set(val_less) { ; }
+    valsort_map() : item_map(), val_set() { ; }
     valsort_map(const valsort_map &) = default;
     valsort_map(valsort_map &&) = default;
     ~valsort_map() { ; }
@@ -49,9 +51,14 @@ namespace emp {
 
     void Set(key_type key, const mapped_type & value) {
       auto map_it = item_map.find(key);
-      if (map_it != item_map.end()) val_set.remove(*map_it);
-      map_it->second = value;
-      val_set.insert(*map_it);
+      if (map_it != item_map.end()) {
+        val_set.erase(*map_it);    // Erase the old pair from the set.
+        map_it->second = value;    // Update the map
+        val_set.emplace(*map_it);  // Place the new map entry into the set.
+      } else {
+        item_map[key] = value;
+        val_set.emplace(*item_map.find(key));
+      }
     }
 
     // For now, don't change values using iterators, just look at them.
@@ -65,8 +72,8 @@ namespace emp {
     auto cvend() { return val_set.cend(); }
     auto crvbegin() { return val_set.crbegin(); }
     auto crvend() { return val_set.crend(); }
-  };
 
+  };
 }
 
 #endif
