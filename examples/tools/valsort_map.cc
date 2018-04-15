@@ -6,6 +6,7 @@
 //  Some example code for using emp::valsort_map
 
 #include <set>
+#include <string>
 
 #include "tools/valsort_map.h"
 #include "tools/Random.h"
@@ -28,5 +29,23 @@ int main()
   std::cout << "\nSORTED ORDER:" << std::endl;
   for (auto it = test_map.cvbegin(); it != test_map.cvend(); it++) {
     std::cout << it->first << " : " << it->second << std::endl;
+  }
+
+  emp::valsort_map<std::string, int> score_map;
+  score_map.Set("Tytalus", 11);
+  score_map.Set("Tremere", 10);
+  score_map.Set("Bonesagus", 12);
+  score_map.Set("Verditius", 3);
+  score_map.Set("Mercere", 8);
+  score_map.Set("ExMisc", 7);
+
+  std::cout << "\n\nBY NAME:\n";
+  for (auto it = score_map.cbegin(); it != score_map.cend(); it++) {
+    std::cout << it->first << " : " << it->second << std::endl;
+  }
+
+  std::cout << "\nBY HIGH SCORE\n";
+  for (auto it = score_map.crvbegin(); it != score_map.crvend(); it++) {
+    std::cout << it->first << " : " << it->second << std::endl;    
   }
 }
