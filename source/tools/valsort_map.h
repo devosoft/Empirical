@@ -6,6 +6,13 @@
  *  @file  valsort_map.h
  *  @brief This file defines a map that is sorted by value, not key.
  *  @note Status: ALPHA
+ * 
+ *  valsort_map is a limited implementation of map that also keeps track of the values set, in
+ *  order, as you go.  This is accomplished by keeping a second data structure, a sorted set, of
+ *  all of the values maintained in the map.
+ * 
+ *  The member functions cbegin() and cend() work as in map, but cvbegin() and cvend() produce
+ *  the same set of results, except in value order.  (reverse versions of each work as well)
  */
 
 #ifndef EMP_VALSORT_MAP_H
