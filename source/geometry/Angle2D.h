@@ -2,7 +2,7 @@
 //  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 //
-//  This class maintains an angle on a 2D surface.
+//  emp::Angle maintains an angle on a 2D surface.
 //
 //  The internal representation uses an int to represent angles.
 //  First two bytes are number of full circles.
@@ -159,8 +159,11 @@ namespace emp {
     constexpr int Cos_Quick1K() const { return emp::cos_chart_1K[ (angle >> 8) & 255 ]; }
     constexpr int Tan_Quick1K() const { return emp::tan_chart_1K[ (angle >> 8) & 255 ]; }
 
-    template <typename BASE_TYPE> Point2D<BASE_TYPE> GetPoint(BASE_TYPE distance=1.0) const {
-      return Point2D<BASE_TYPE>(Sin() * distance, Cos() * distance);
+    Point GetPoint(double distance=1.0) const {
+      return Point(Sin() * distance, Cos() * distance);
+    }
+    Point GetPoint(const Point & start_point, double distance=1.0) const {
+      return start_point.GetOffset(Sin() * distance, Cos() * distance);
     }
   };
 
