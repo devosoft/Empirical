@@ -52,6 +52,7 @@ namespace emp {
     constexpr Point2D GetRot90() const { return Point2D(y, -x); }
     constexpr Point2D GetRot180() const { return Point2D(-x, -y); }
     constexpr Point2D GetRot270() const { return Point2D(-y, x); }
+    constexpr Point2D GetOffset(TYPE off_x, TYPE off_y) const { return Point2D(x+off_x, y+off_y); }
 
     constexpr Point2D operator+(const Point2D & _in) const { return Point2D(x + _in.x , y + _in.y); }
     constexpr Point2D operator-(const Point2D & _in) const { return Point2D(x - _in.x , y - _in.y); }
