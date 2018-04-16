@@ -96,8 +96,8 @@ namespace emp {
 
     // Velocity control...
     void IncSpeed(const Point & offset) { velocity += offset; }
-    void IncSpeed() { velocity += orientation.GetPoint<double>(); }
-    void DecSpeed() { velocity -= orientation.GetPoint<double>(); }
+    void IncSpeed() { velocity += orientation.GetPoint(); }
+    void DecSpeed() { velocity -= orientation.GetPoint(); }
     void SetVelocity(double x, double y) { velocity.Set(x, y); }
     void SetVelocity(const Point & v) { velocity = v; }
 
