@@ -19,6 +19,9 @@
  *  @todo We should be able to have any number of systematics managers, based on various type_trait
  *        information a that we want to track.
  *  @todo Add a signal for DoBirth() for when a birth fails.
+ *  @todo Add a feature to maintain population sorted by each phenotypic trait.  This will allow
+ *        us to more rapidly find phenotypic neighbors and know the current extremes for each
+ *        phenotype.
  */
 
 #ifndef EMP_EVO_WORLD_H
@@ -257,6 +260,9 @@ namespace emp {
 
     /// How many cells tall is the world? (assumes grids are active.)
     size_t GetHeight() const { return pop_sizes[1]; }
+
+    /// Get the full population to analyze externally.
+    const emp::vector<Ptr<ORG>> & GetFullPop() const { return pop; }
 
     /// What phenotypic traits is the population tracking?
     const emp::TraitSet<ORG> & GetPhenotypes() const { return phenotypes; }
