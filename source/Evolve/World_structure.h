@@ -18,12 +18,12 @@
 
 namespace emp {
 
-  template<typename ORG> class World;
+  template <typename ORG> class World;
 
   /// Set the population to be a set of pools that are individually well mixed, but with limited
   /// migtation.  Arguments are the number of pools, the size of each pool, and whether the
   /// generations should be synchronous (true) or not (false, default).
-  template<typename ORG>
+  template <typename ORG>
   void SetPools(World<ORG> & world, size_t num_pools,
                 size_t pool_size, bool synchronous_gen=false) {
     world.Resize(pool_size, num_pools);
@@ -84,7 +84,7 @@ namespace emp {
   ///
   /// This for version will setup a MAP-Elites world; traits to use an how many bins for each
   /// (trait counts) must be provided.
-  template<typename ORG>
+  template <typename ORG>
   void SetMapElites(World<ORG> & world, TraitSet<ORG> traits,
                     const emp::vector<size_t> & trait_counts) {
     using org_pos_t = typename World<ORG>::OrgPosition;
@@ -128,7 +128,7 @@ namespace emp {
 
   /// Setup a MAP-Elites world, given the provided set of traits.
   /// Requires world to already have a size; that size is respected when deciding trait bins.
-  template<typename ORG>
+  template <typename ORG>
   void SetMapElites(World<ORG> & world, TraitSet<ORG> traits) {
     emp::vector<size_t> trait_counts;
     emp_assert(traits.GetSize() > 0);
@@ -148,14 +148,14 @@ namespace emp {
 
   /// Setup a MAP-Elites world, given the provided trait counts (number of bins).
   /// Requires world to already have a phenotypes that those counts are applied to.
-  template<typename ORG>
+  template <typename ORG>
   void SetMapElites(World<ORG> & world, const emp::vector<size_t> & trait_counts) {
     SetMapElites(world, world.GetPhenotypes(), trait_counts);
   }
 
   /// Setup a MAP-Elites world, given the provided worlds already has size AND set of phenotypes.
   /// Requires world to already have a size; that size is respected when deciding trait bins.
-  template<typename ORG>
+  template <typename ORG>
   void SetMapElites(World<ORG> & world) { SetMapElites(world, world.GetPhenotypes()); }
 
 
@@ -173,9 +173,48 @@ namespace emp {
   ///
   /// Note: Since organisms compete with their predecessors for space in the populations,
   /// synchronous generations do not make sense.
-  ///
+
+  /// Function to kill off an organism in DiverseElites to help maintain population size.
+  /// Go one trait at a time and repeatedly use it to cut trait-space into segments, keeping the
+  /// most populated group each time.
+  tempalte <typename ORG>
+  auto DiverseElites_Kill(World<ORG> & world, TraitSet<ORG> traits) {
+    emp::vector<Ptr<ORG>> orgs = world.GetFullPop();
+    constexpr size_t num_groups = 4;
+    emp::array<size_t, num_groups> group_sizes;
+    size_t trait_id = 0;
+
+    // Loop until we've found the most dense portion of the population.
+    while (orgs.size() > num_groups) {
+      // Determine the range on the current trait.
+      Trait<ORG, double> & trait = traits[trait_id];
+      double min_val = trait.Eval(*orgs[0]);
+      double max_val = min_val
+      for (size_t i = 1; i < orgs.size(); i++) {
+        double val = trait.Eval(*orgs[i]);
+        if (val < min_val) min_val = val;
+        if (val > max_val) max_val = val;
+      }
+      
+      // Determine how population divides into groups.
+      double trait_width = (max_val - min_val) * 1.0000001;
+      double group_width = trait_width / (double) num_groups;
+      group_sizes.fill(0);
+      for (size_t i = 0; i < orgs.size(); i++) {
+        double val = trait.Eval(*orgs[i]);
+        size_t group_id = (val - min_val) / group_width;   // @CAO Watch out for zero group_width!
+        group_sizes[group_id]++;
+      }
+
+      // @CAO: Keep only those orgs in the biggest bin and repeat!
+
+      // Shift to use the next trait.
+      if (++trait_id == traits.GetSize()) trait_id = 0;
+    }
+  }
+
   /// This first version will setup a Diverse-Elites world and specify traits to use.
-  template<typename ORG>
+  template <typename ORG>
   void SetDiverseElites(World<ORG> & world, TraitSet<ORG> traits, size_t world_size) { 
     using org_pos_t = typename World<ORG>::OrgPosition;
 
@@ -214,7 +253,7 @@ namespace emp {
   }
 
   /// Setup a MAP-Elites world, given the provided worlds already has set of phenotypes.
-  template<typename ORG>
+  template <typename ORG>
   void SetMapElites(World<ORG> & world, size_t world_size) {
     SetMapElites(world, world.GetPhenotypes(), world_size);
   }
