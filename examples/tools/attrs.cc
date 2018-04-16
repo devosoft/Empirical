@@ -14,15 +14,14 @@ constexpr auto DEFAULT{MakeAttrs(PopulationSize(100), GenerationLength(100),
 // Notice that this function has a different ordering than DEFAULT
 void print(
   const std::string& name,
-  const Attrs<PopulationSizeValue<size_t>, DefaultGenomeValue<std::string>,
-              GenerationLengthValue<size_t>>& args) {
+  const Attrs<PopulationSizeValue<int>, DefaultGenomeValue<std::string>,
+              GenerationLengthValue<int>>& args) {
   std::cout << name << " = " << args << std::endl;
 }
 
-void printSubset(
-  const std::string& name,
-  const Attrs<typename PopulationSize::value_t<size_t>,
-              typename GenerationLength::value_t<size_t>>& args) {
+void printSubset(const std::string& name,
+                 const Attrs<typename PopulationSize::value_t<int>,
+                             typename GenerationLength::value_t<int>>& args) {
   std::cout << name << " = " << args << std::endl;
 }
 
@@ -43,10 +42,10 @@ int main() {
     "Using Universal Constructor: ",
     {PopulationSize(1), DefaultGenome("Hello World"), GenerationLength(50)});
 
-  Attrs<typename PopulationSize::value_t<size_t>,
+  Attrs<typename PopulationSize::value_t<int>,
         typename DefaultGenome::value_t<std::string>,  // Notice that this will
                                                        // be auto-converted
-        typename GenerationLength::value_t<size_t>>
+        typename GenerationLength::value_t<int>>
     user = DEFAULT;
   // Set a single member
   user.SetDefaultGenome("ASDEDFDFSA");
