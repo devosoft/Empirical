@@ -91,9 +91,14 @@ namespace emp {
     constexpr Angle(double radians) : angle((uint32_t)(radians * ANGLE_CAP / (2.0*PI))) { ; }
     constexpr Angle(uint32_t in_angle, bool) : angle(in_angle) { ; } // directly set internal value
 
+    constexpr double AsPortion() const { return ((double) (angle % 0xFFFF)) / ANGLE_CAP; }
     constexpr double AsRadians() const { return ((double) angle) * 2.0 * PI / ANGLE_CAP; }
     constexpr double AsDegrees() const { return ((double) angle) * 360.0 / ANGLE_CAP; }
 
+    Angle & SetPortion(double portion) {
+      angle = (uint32_t) (portion * ANGLE_CAP);
+      return *this;
+    }
     Angle & SetRadians(double radians) {
       angle = (uint32_t) (radians * ANGLE_CAP / (2.0 * PI));
       return *this;
