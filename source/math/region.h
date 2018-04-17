@@ -65,6 +65,12 @@ namespace emp {
         using namespace emp::math;
         return mult(div(value - source.min, source.extents()), extents()) + min;
       }
+
+      constexpr auto SetAspect(float aspectRatio) const {
+        auto e = extents();
+        auto max = std::max(e.begin(), e.end());
+        return *this;
+      }
     };
 
     template <typename F, size_t D>
@@ -72,8 +78,10 @@ namespace emp {
       return out << "[" << region.min << " " << region.max << "]";
     }
 
+    using Region2i = Region<int, 2>;
     using Region2f = Region<float, 2>;
     using Region2d = Region<double, 2>;
+    using Region3i = Region<int, 3>;
     using Region3f = Region<float, 3>;
     using Region3d = Region<double, 3>;
 

@@ -287,9 +287,9 @@ namespace emp {
       static constexpr auto columns = C;
 
       protected:
-      // This needs to wait until c++17 so that arrayData.Data() is constexpr
-      // std::array<F, rows * columns> arrayData;
-      F arrayData[rows * columns];
+      // This needs to wait until c++17 so that data.Data() is constexpr
+      // std::array<F, rows * columns> data;
+      F data[rows * columns];
 
       private:
       template <typename G, typename... Args, std::size_t... I>
@@ -302,7 +302,7 @@ namespace emp {
 
       template <class T, size_t... I>
       constexpr Mat(const std::tuple<T, std::index_sequence<I...>>& value)
-        : arrayData{internal::pass<I>(std::get<0>(value))...} {}
+        : data{internal::pass<I>(std::get<0>(value))...} {}
 
       public:
       template <typename G, typename... Args>
@@ -350,9 +350,9 @@ namespace emp {
 
       template <typename H1, typename H2, typename... Args>
       constexpr Mat(H1&& h1, H2&& h2, Args&&... args)
-        : arrayData{internal::convert<F>(std::forward<H1>(h1)),
-                    internal::convert<F>(std::forward<H2>(h2)),
-                    internal::convert<F>(std::forward<Args>(args))...} {
+        : data{internal::convert<F>(std::forward<H1>(h1)),
+               internal::convert<F>(std::forward<H2>(h2)),
+               internal::convert<F>(std::forward<Args>(args))...} {
         static_assert(
           sizeof...(Args) + 2 == rows * columns,
           "Invalid number of arguments for a matrix of the given size");
@@ -370,62 +370,62 @@ namespace emp {
         static_assert((R >= 1 && C == 1) || (R == 1 && C >= 1),
                       "A matrix must be a row matrix or a column matrix with "
                       "at least one entry to have an x component");
-        return arrayData[0];
+        return data[0];
       }
 
       constexpr F& x() {
         static_assert((R >= 1 && C == 1) || (R == 1 && C >= 1),
                       "A matrix must be a row matrix or a column matrix with "
                       "at least one entry to have an x component");
-        return arrayData[0];
+        return data[0];
       }
 
       constexpr const F& y() const {
         static_assert((R >= 2 && C == 1) || (R == 1 && C >= 2),
                       "A matrix must be a row matrix or a column matrix with "
                       "at least two entries to have an y component");
-        return arrayData[1];
+        return data[1];
       }
 
       constexpr F& y() {
         static_assert((R >= 2 && C == 1) || (R == 1 && C >= 2),
                       "A matrix must be a row matrix or a column matrix with "
                       "at least two entries to have an y component");
-        return arrayData[1];
+        return data[1];
       }
 
       constexpr const F& z() const {
         static_assert((R >= 3 && C == 1) || (R == 1 && C >= 3),
                       "A matrix must be a row matrix or a column matrix with "
                       "at least three entries to have an z component");
-        return arrayData[2];
+        return data[2];
       }
 
       constexpr F& z() {
         static_assert((R >= 3 && C == 1) || (R == 1 && C >= 3),
                       "A matrix must be a row matrix or a column matrix with "
                       "at least three entries to have an z component");
-        return arrayData[2];
+        return data[2];
       }
 
       constexpr const F& w() const {
         static_assert((R >= 4 && C == 1) || (R == 1 && C >= 4),
                       "A matrix must be a row matrix or a column matrix with "
                       "at least four entries to have an w component");
-        return arrayData[3];
+        return data[3];
       }
 
       constexpr F& w() {
         static_assert((R >= 4 && C == 1) || (R == 1 && C >= 4),
                       "A matrix must be a row matrix or a column matrix with "
                       "at least four entries to have an w component");
-        return arrayData[3];
+        return data[3];
       }
 
       template <typename G>
       constexpr bool operator==(const Mat<G, R, C>& other) const {
         for (std::size_t i = 0; i < rows * columns; ++i) {
-          if (arrayData[i] != other.Data()[i]) {
+          if (data[i] != other.Data()[i]) {
             return false;
           }
         }
@@ -443,7 +443,7 @@ namespace emp {
         }
         // emp_assert(r < rows, "rows out of bounds");
         // emp_assert(c < columns, "columns out of bounds");
-        return arrayData[r * columns + c];
+        return data[r * columns + c];
       }
 
       constexpr F& operator()(std::size_t r, std::size_t c) {
@@ -455,7 +455,7 @@ namespace emp {
         }
         // emp_assert(r < rows, "rows out of bounds");
         // emp_assert(c < columns, "columns out of bounds");
-        return arrayData[r * columns + c];
+        return data[r * columns + c];
       }
 
       constexpr Row<const F, C> Row(std::size_t r) const {
@@ -463,7 +463,7 @@ namespace emp {
           throw std::out_of_range("rows out of bounds");
         }
         // emp_assert(r < rows, "rows out of bounds");
-        return math::Row<const F, C>(&arrayData[r * columns]);
+        return math::Row<const F, C>(&data[r * columns]);
       }
 
       constexpr math::Row<F, C> Row(std::size_t r) {
@@ -471,7 +471,7 @@ namespace emp {
           throw std::out_of_range("rows out of bounds");
         }
         // emp_assert(r < rows, "rows out of bounds");
-        return math::Row<F, C>(&arrayData[r * columns]);
+        return math::Row<F, C>(&data[r * columns]);
       }
 
       constexpr Col<const F, R> Col(std::size_t c) const {
@@ -479,7 +479,7 @@ namespace emp {
           throw std::out_of_range("columns out of bounds");
         }
         // emp_assert(c < columns, "columns out of bounds");
-        return math::Col<const F, R>(&arrayData[c]);
+        return math::Col<const F, R>(&data[c]);
       }
 
       constexpr math::Col<F, R> Col(std::size_t c) {
@@ -487,7 +487,7 @@ namespace emp {
           throw std::out_of_range("columns out of bounds");
         }
         // emp_assert(c < columns, "columns out of bounds");
-        return math::Col<F, R>(&arrayData[c]);
+        return math::Col<F, R>(&data[c]);
       }
 
       template <typename I>
@@ -520,15 +520,15 @@ namespace emp {
       /// A pointer to the raw array that this matrix is wrapping
       constexpr F* Data() noexcept {
         // Waiting for std::array::Data() to get constexpr in c++17
-        // return arrayData.Data();
-        return arrayData;
+        // return data.Data();
+        return data;
       }
 
       /// A pointer to the raw array that this matrix is wrapping
       constexpr const F* Data() const noexcept {
         // Waiting for std::array::Data() to get constexpr in c++17
-        // return arrayData.Data();
-        return arrayData;
+        // return data.Data();
+        return data;
       }
 
       /// Gets the transpose of this matrix
@@ -543,7 +543,7 @@ namespace emp {
       constexpr bool Feq(const Mat<H, R, C>& other,
                          const H& tolerance = 0.0001) const {
         for (std::size_t i = 0; i < rows * columns; ++i) {
-          if (abs(arrayData[i] - other.Data()[i]) > tolerance) {
+          if (abs(data[i] - other.Data()[i]) > tolerance) {
             return false;
           }
         }
@@ -557,7 +557,7 @@ namespace emp {
         static_assert(R == 1 || C == 1,
                       "A matrix must be a column matrix or a row matrix to "
                       "have a magnitude");
-        return internal::dotProduct<R * C>(arrayData, arrayData);
+        return internal::dotProduct<R * C>(data, data);
       }
 
       /// Finds the magnitude of this row or column vector. Using this on a
@@ -609,7 +609,7 @@ namespace emp {
                   "Cannot compare matrices of different sizes");             \
                                                                              \
     for (size_t i = 0; i < R * C; ++i) {                                     \
-      if (arrayData[i] not_op other[i]) return false;                        \
+      if (data[i] not_op other[i]) return false;                             \
     }                                                                        \
     return true;                                                             \
   }                                                                          \
@@ -619,7 +619,7 @@ namespace emp {
                   "Cannot compare matrices of different sizes");             \
                                                                              \
     for (size_t i = 0; i < R * C; ++i) {                                     \
-      if (arrayData[i] op other[i]) return false;                            \
+      if (data[i] op other[i]) return false;                                 \
     }                                                                        \
     return true;                                                             \
   }
@@ -627,6 +627,11 @@ namespace emp {
       __impl_mat_ops(<, >=);
       __impl_mat_ops(>, <=);
       __impl_mat_ops(==, !=);
+
+      constexpr auto begin() { return std::begin(data); }
+      constexpr auto begin() const { return std::begin(data); }
+      constexpr auto end() { return std::end(data); }
+      constexpr auto end() const { return std::end(data); }
     };
 
     template <typename F, std::size_t R>

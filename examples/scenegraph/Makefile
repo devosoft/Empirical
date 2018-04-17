@@ -1,5 +1,9 @@
 # Flags to use regardless of compiler
-GLFW_LIBS := $(shell pkg-config --static --libs glfw3) $(shell pkg-config --static --libs gl) $(shell pkg-config --cflags --libs glew)
+GLFW_LIBS := $(shell pkg-config --static --libs glfw3) \
+	$(shell pkg-config --static --libs gl) \
+	$(shell pkg-config --cflags --libs glew) \
+	$(shell pkg-config --cflags --libs freetype2) 
+
 CFLAGS_all := -Wall -Wno-unused-function -I../../source/
 CFLAGS_version := -std=c++14
 
@@ -19,8 +23,8 @@ CFLAGS_native_opt := $(CFLAGS_all) $(OFLAGS_native_opt)
 CFLAGS_native_debug := $(CFLAGS_all) $(OFLAGS_native_debug)
 CFLAGS_native_grumpy := $(CFLAGS_all) $(OFLAGS_native_grumpy)
 
-CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['Pointer_stringify']" -s NO_EXIT_RUNTIME=1
-CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['Pointer_stringify']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) -preload-file Assets/Roboto -s USE_FREETYPE=1 --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['Pointer_stringify']" -s NO_EXIT_RUNTIME=1 --source-map-base "http://localhost:8080/"
+CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) -preload-file Assets/Roboto -s USE_FREETYPE=1 --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['Pointer_stringify']" -s NO_EXIT_RUNTIME=1
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 JS_TARGETS := Scenegraph.js
