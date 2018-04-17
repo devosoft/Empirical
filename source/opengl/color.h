@@ -21,6 +21,14 @@ namespace emp {
       constexpr static Color blue(float v = 1, float a = 1) {
         return {0, 0, v, a};
       }
+
+      constexpr static Color grey(float i = 1, float a = 1) {
+        return {i, i, i, a};
+      }
+      constexpr static Color white(float a = 1) { return Color::grey(1, a); }
+      constexpr static Color black(float a = 1) { return Color::grey(0, a); }
+
+      const float* RgbaPtr() const { return &r; }
     };
     template <>
     struct VertexAttributes<Color> {
@@ -32,7 +40,8 @@ namespace emp {
       glUniform4f(uniform, value.r, value.g, value.b, value.a);
       utils::catchGlError();
     }
-  }  // namespace opengl
+
+  };  // namespace opengl
 }  // namespace emp
 
 #endif  // EMP_OPENGL_COLOR_H
