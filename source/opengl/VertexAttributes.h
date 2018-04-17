@@ -12,6 +12,11 @@ namespace emp {
       Four = 4
     };
 
+    std::ostream& operator<<(std::ostream& out,
+                             const VertexAttributeSize& size) {
+      return out << static_cast<GLint>(size);
+    }
+
     enum class VertexAttributeType : GLenum {
       Byte = GL_BYTE,
       UnsignedByte = GL_UNSIGNED_BYTE,
@@ -20,6 +25,24 @@ namespace emp {
       Int = GL_INT,
       UnsignedInt = GL_UNSIGNED_INT,
     };
+
+    std::ostream& operator<<(std::ostream& out,
+                             const VertexAttributeType& type) {
+      switch (type) {
+        case VertexAttributeType::Byte:
+          return out << "byte";
+        case VertexAttributeType::UnsignedByte:
+          return out << "unsigned byte";
+        case VertexAttributeType::Short:
+          return out << "short";
+        case VertexAttributeType::UnsignedShort:
+          return out << "unsigned short";
+        case VertexAttributeType::Int:
+          return out << "int";
+        case VertexAttributeType::UnsignedInt:
+          return out << "unsigned int";
+      }
+    }
 
     enum class FloatingVertexAttributeType : GLenum {
       Byte = GL_BYTE,
@@ -34,6 +57,28 @@ namespace emp {
       // INT_2_10_10_10_REV = GL_INT_2_10_10_10_REV,
       // UNSIGNED_INT_2_10_10_10_REV = GL_UNSIGNED_INT_2_10_10_10_REV
     };
+
+    std::ostream& operator<<(std::ostream& out,
+                             const FloatingVertexAttributeType& type) {
+      switch (type) {
+        case FloatingVertexAttributeType::Byte:
+          return out << "byte";
+        case FloatingVertexAttributeType::UnsignedByte:
+          return out << "unsigned byte";
+        case FloatingVertexAttributeType::Short:
+          return out << "short";
+        case FloatingVertexAttributeType::UnsignedShort:
+          return out << "unsigned short";
+        case FloatingVertexAttributeType::Int:
+          return out << "int";
+        case FloatingVertexAttributeType::UnsignedInt:
+          return out << "unsigned int";
+        case FloatingVertexAttributeType::Float:
+          return out << "float";
+        case FloatingVertexAttributeType::Fixed:
+          return out << "fixed";
+      }
+    }
 
     template <typename T>
     struct VertexAttributeTypeOf {
