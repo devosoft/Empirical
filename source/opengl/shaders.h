@@ -199,6 +199,12 @@ namespace emp {
 
         auto attr_loc = glGetAttribLocation(handle, name.c_str());
         utils::catchGlError();
+        if (attr_loc < 0) {
+          std::stringstream s;
+          s << "OpenGL errors: no such attribute as \"" << name.c_str() << "\"";
+          auto str = s.str();
+          throw std::runtime_error(str.c_str());
+        }
 
         attributes[name] = attr_loc;
         return attr_loc;
@@ -211,6 +217,12 @@ namespace emp {
 
         auto uniform_loc = glGetUniformLocation(handle, name.c_str());
         utils::catchGlError();
+        if (uniform_loc < 0) {
+          std::stringstream s;
+          s << "OpenGL errors: no such uniform as \"" << name.c_str() << "\"";
+          auto str = s.str();
+          throw std::runtime_error(str.c_str());
+        }
 
         uniforms[name] = uniform_loc;
         return uniform_loc;
@@ -222,7 +234,6 @@ namespace emp {
                                    VertexAttributeType type, GLsizei stride = 0,
                                    const void* offset = nullptr) const {
         auto loc = GetAttribLocation(name.c_str());
-
         return VertexAttribute(loc, size, type, stride, offset);
       }
 
