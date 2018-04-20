@@ -29,7 +29,7 @@
 #include "assert.h"
 #include "vector.h"
 
-namespace {
+namespace internal {
   /// An anonymous log2 calculator for hashing below.
   static constexpr size_t Log2(size_t x) { return x <= 1 ? 0 : (Log2(x/2) + 1); }
 }
@@ -489,7 +489,7 @@ namespace emp {
     /// Convert this pointer to a hash value.
     size_t Hash() const {
       // Chop off useless bits of pointer...
-      static constexpr size_t shift = Log2(1 + sizeof(TYPE));
+      static constexpr size_t shift = internal::Log2(1 + sizeof(TYPE));
       return (size_t)(ptr) >> shift;
     }
     struct hash_t { size_t operator()(const Ptr<TYPE> & t) const { return t.Hash(); } };
@@ -732,7 +732,7 @@ namespace emp {
     void DeleteArray() { delete [] ptr; }
 
     size_t Hash() const {
-      static constexpr size_t shift = Log2(1 + sizeof(TYPE));  // Chop off useless bits...
+      static constexpr size_t shift = internal::Log2(1 + sizeof(TYPE));  // Chop off useless bits...
       return (size_t)(ptr) >> shift;
     }
     struct hash_t { size_t operator()(const Ptr<TYPE> & t) const { return t.Hash(); } };
