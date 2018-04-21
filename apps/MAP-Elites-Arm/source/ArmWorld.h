@@ -75,13 +75,20 @@ class ArmWorld : public emp::World<ArmOrg> {
 private:
   emp::vector<double> segments;
 public:
-  ArmWorld(emp::Random & random, emp::vector<double> in_segments={2.0,1.0,4.0,1.0,3.0})
+  ArmWorld(emp::Random & random, emp::vector<double> in_segments={2.0,1.0,3.5,1.0,2.5})
     : emp::World<ArmOrg>(random, "ArmWorld"), segments(in_segments)
   {
     SetupFitnessFile().SetTimingRepeat(10);
     SetupSystematicsFile().SetTimingRepeat(10);
     SetupPopulationFile().SetTimingRepeat(10);
-    SetWellMixed(true);
+
+    std::function<double(ArmOrg &)> traitX_fun = [this](ArmOrg & org){ return org.CalcEndPoint(segments).GetX(); };
+    std::function<double(ArmOrg &)> traitY_fun = [this](ArmOrg & org){ return org.CalcEndPoint(segments).GetY(); };
+
+    map_world.AddPhenotype("End X", traitX_fun, -10.0, 10.0);
+    map_world.AddPhenotype("End Y", traitY_fun, -10.0, 10.0);
+
+    emp::SetMapElites(map_world, {40, 40});
     SetCache();
 
     for (size_t i = 0; i < 100; i++) Inject(ArmOrg(random, segments.size()));
