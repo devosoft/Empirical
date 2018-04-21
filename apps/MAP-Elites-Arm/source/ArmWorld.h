@@ -9,8 +9,9 @@
 
 struct ArmOrg {
   emp::vector<emp::Angle> angles;
+  mutable emp::Point end_point;
 
-  ArmOrg() : angles() { ; }
+  ArmOrg() : angles(), end_point(0.0, 0.0) { ; }
   ArmOrg(const ArmOrg &) = default;
   ArmOrg(ArmOrg &&) = default;
   ArmOrg(emp::Random & random, size_t in_size) {
@@ -29,13 +30,26 @@ struct ArmOrg {
   }
 
   size_t DoMutations(emp::Random & random) {
-    std::cout << "Ping!" << std::endl;
     if (random.P(0.5)) {
       size_t pos = random.GetUInt(angles.size());
       angles[pos].SetPortion(random.GetDouble());
       return 1;
     }
     return 0;
+  }
+
+  emp::Point CalcEndPoint(const emp::vector<double> & segments) const {
+    // If we haven't caclulated the end point yet, do so.
+    if (end_point.AtOrigin()) {
+      emp::Angle facing(angles[0]);
+      end_point = facing.GetPoint(segments[0]);
+      for (size_t i = 1; i < segments.size(); i++) {
+        facing += angles[i];
+        end_point = facing.GetPoint(end_point, segments[i]);
+      }
+    }
+
+    return end_point;
   }
 
   bool operator==(const ArmOrg & in) const { return angles == in.angles; }
@@ -86,15 +100,7 @@ public:
     return points;
   }
 
-  emp::Point CalcEndPoint(const ArmOrg & org) {
-    emp::Angle facing(org.angles[0]);
-    emp::Point position(facing.GetPoint(segments[0]));
-    for (size_t i = 1; i < segments.size(); i++) {
-      facing += org.angles[i];
-      position = facing.GetPoint(position, segments[i]);
-    }
-    return position;
-  }
+  emp::Point CalcEndPoint(const ArmOrg & org) { return org.CalcEndPoint(segments); }
 };
 
 #endif
