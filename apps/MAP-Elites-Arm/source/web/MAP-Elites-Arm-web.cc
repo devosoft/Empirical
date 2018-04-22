@@ -15,6 +15,7 @@ namespace UI = emp::web;
 
 UI::Document doc("emp_base");
 ArmWorld world;
+const double world_size = 600;
 
 void DrawWorldCanvas() {
   UI::Canvas canvas = doc.Canvas("world_canvas");
@@ -34,9 +35,16 @@ void DrawWorldCanvas() {
 
   for (size_t x = 0; x < world_x; x++) {
     for (size_t y = 0; y < world_y; y++) {
-      size_t cur_x = org_x * (0.5 + (double) x);
-      size_t cur_y = org_y * (0.5 + (double) y);
-      canvas.Circle(cur_x, cur_y, org_r, "pink");
+      const size_t org_id = y * world_x + x;
+      const size_t cur_x = org_x * (0.5 + (double) x);
+      const size_t cur_y = org_y * (0.5 + (double) y);
+      const double fitness = world.CalcFitnessID(org_id);
+      if (fitness == 0.0) {
+        canvas.Circle(cur_x, cur_y, org_r, "black");
+      } else {
+        canvas.Circle(cur_x, cur_y, org_r, "pink");
+        
+      }
     }
   }
 
@@ -53,5 +61,7 @@ void DrawWorldCanvas() {
 
 int main()
 {
-  doc << "<h1>Hello, world!</h1>";
+  doc << "<h1>MAP-Elites: Arm Positioning Challenge</h1>";
+  auto world_canvas = doc.AddCanvas(world_size, world_size, "world_canvas");
+  DrawWorldCanvas();
 }
