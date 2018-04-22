@@ -30,7 +30,7 @@ struct ArmOrg {
   }
 
   size_t DoMutations(emp::Random & random) {
-    if (random.P(0.5)) {
+    if (random.P(1.0)) {
       size_t pos = random.GetUInt(angles.size());
       angles[pos].SetPortion(random.GetDouble());
       end_point.ToOrigin();
