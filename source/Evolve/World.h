@@ -209,10 +209,10 @@ namespace emp {
     /// The World constructor can take two arguments, both optional:
     /// * a random number generator (either a pointer or reference)
     /// * a unique name for the world
-    /// If no random number generator is provided, one is created within the world.
     /// If no name is provided, the world remains nameless.
-    World(Ptr<Random> rnd=nullptr, std::string _name="")
-      : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), update(0), fit_cache()
+    /// If no random number generator is provided, gen_random determines if one shold be created.
+    World(std::string _name="", bool gen_random=true)
+      : random_ptr(nullptr), random_owner(false), pop(), next_pop(), num_orgs(0), update(0), fit_cache()
       , genotypes(), next_genotypes()
       , name(_name), cache_on(false), pop_sizes(1,0), phenotypes(), files()
       , is_synchronous(false), is_space_structured(false), is_pheno_structured(false)
@@ -228,15 +228,14 @@ namespace emp {
       , on_update_sig(to_string(name,"::on-update"), control)
       , on_death_sig(to_string(name,"::on-death"), control)
     {
-      if (!rnd) NewRandom();
+      if (gen_random) NewRandom();
       SetDefaultFitFun<this_t, ORG>(*this);
       SetDefaultMutFun<this_t, ORG>(*this);
       SetDefaultPrintFun<this_t, ORG>(*this);
       SetDefaultGetGenomeFun<this_t, ORG>(*this);
       SetWellMixed();  // World default structure is well-mixed.
     }
-    World(Random & rnd, std::string _name="") : World(&rnd, _name) { ; }
-    World(std::string _name) : World(nullptr, _name) { ; }
+    World(Random & rnd, std::string _name="") : World(_name,false) { random_ptr = &rnd; }
 
     ~World() {
       Clear();
