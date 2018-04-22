@@ -9,7 +9,7 @@
 
 int main(int argc, char* argv[])
 {
-  constexpr size_t MAX_GENS = 10;
+  constexpr size_t MAX_GENS = 100;
   constexpr size_t POP_SIZE = 100;
 
   emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
@@ -18,6 +18,7 @@ int main(int argc, char* argv[])
 
   emp::Random random;
   ArmWorld world(random);
+  world.SetMutateBeforeBirth();
 
   // Loop through updates
   for (size_t ud = 0; ud < MAX_GENS; ud++) {
@@ -32,7 +33,6 @@ int main(int argc, char* argv[])
     // Run a tournament for the rest...
     TournamentSelect(world, 5, POP_SIZE-1);
     world.Update();
-    world.DoMutations(0);
   }
 
 }
