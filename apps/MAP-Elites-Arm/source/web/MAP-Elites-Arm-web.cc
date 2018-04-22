@@ -7,11 +7,49 @@
  *  @brief Controller for WEB version of MAP-Elites app.
  */
 
+#include "tools/math.h"
 #include "web/web.h"
+#include "../ArmWorld.h"
 
 namespace UI = emp::web;
 
 UI::Document doc("emp_base");
+ArmWorld world;
+
+void DrawWorldCanvas() {
+  UI::Canvas canvas = doc.Canvas("world_canvas");
+  canvas.Clear("gray");
+
+  const size_t world_x = world.GetWidth();
+  const size_t world_y = world.GetHeight();
+  const double canvas_x = (double) canvas.GetWidth();
+  const double canvas_y = (double) canvas.GetHeight();
+
+  const auto & pop = world.GetFullPop();
+  (void) pop;
+
+  const double org_x = canvas_x / (double) world_x;
+  const double org_y = canvas_y / (double) world_y;
+  const double org_r = emp::Min(org_x, org_y) / 2.0;
+
+  for (size_t x = 0; x < world_x; x++) {
+    for (size_t y = 0; y < world_y; y++) {
+      size_t cur_x = org_x * (0.5 + (double) x);
+      size_t cur_y = org_y * (0.5 + (double) y);
+      canvas.Circle(cur_x, cur_y, org_r, "pink");
+    }
+  }
+
+  // for (const Org & org : pop) {
+  //   if (org.coop) {
+  //     canvas.Circle(org.x*world_size, org.y*world_size, 2, "blue", "#8888FF");
+  //   } else {
+  //     canvas.Circle(org.x*world_size, org.y*world_size, 2, "#FF8888", "red");
+  //   }
+  // }
+
+  doc.Text("ud_text").Redraw();
+}
 
 int main()
 {
