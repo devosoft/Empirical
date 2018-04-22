@@ -88,9 +88,10 @@ public:
     AddPhenotype("End X", traitX_fun, -10.0, 10.0);
     AddPhenotype("End Y", traitY_fun, -10.0, 10.0);
 
-//    emp::SetMapElites(*this, {40, 40});
-    SetWellMixed(true);
+    emp::SetMapElites(*this, {40, 40});
+    // SetWellMixed(true);
     SetCache();
+    SetMutateBeforeBirth();
 
     for (size_t i = 0; i < 100; i++) Inject(ArmOrg(random, segments.size()));
   }
