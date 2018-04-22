@@ -85,10 +85,11 @@ public:
     std::function<double(ArmOrg &)> traitX_fun = [this](ArmOrg & org){ return org.CalcEndPoint(segments).GetX(); };
     std::function<double(ArmOrg &)> traitY_fun = [this](ArmOrg & org){ return org.CalcEndPoint(segments).GetY(); };
 
-    map_world.AddPhenotype("End X", traitX_fun, -10.0, 10.0);
-    map_world.AddPhenotype("End Y", traitY_fun, -10.0, 10.0);
+    AddPhenotype("End X", traitX_fun, -10.0, 10.0);
+    AddPhenotype("End Y", traitY_fun, -10.0, 10.0);
 
-    emp::SetMapElites(map_world, {40, 40});
+//    emp::SetMapElites(*this, {40, 40});
+    SetWellMixed(true);
     SetCache();
 
     for (size_t i = 0; i < 100; i++) Inject(ArmOrg(random, segments.size()));
