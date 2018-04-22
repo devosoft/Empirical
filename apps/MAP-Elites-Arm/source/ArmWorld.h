@@ -85,8 +85,10 @@ class ArmWorld : public emp::World<ArmOrg> {
 private:
   emp::vector<double> segments;
 public:
-  ArmWorld(emp::Random & random, emp::vector<double> in_segments={2.0,1.0,3.5,1.0,2.5})
-    : emp::World<ArmOrg>(random, "ArmWorld"), segments(in_segments)
+  // ArmWorld(emp::Random & random, emp::vector<double> in_segments={2.0,1.0,3.5,1.0,2.5})
+  //   : emp::World<ArmOrg>(random, "ArmWorld"), segments(in_segments)
+  ArmWorld(emp::vector<double> in_segments={2.0,1.0,3.5,1.0,2.5})
+    : emp::World<ArmOrg>("ArmWorld"), segments(in_segments)
   {
     SetupFitnessFile().SetTimingRepeat(10);
     SetupSystematicsFile().SetTimingRepeat(10);
@@ -103,7 +105,7 @@ public:
     SetCache();
     SetMutateBeforeBirth();
 
-    for (size_t i = 0; i < 100; i++) Inject(ArmOrg(random, segments.size()));
+    for (size_t i = 0; i < 100; i++) Inject(ArmOrg(*random_ptr, segments.size()));
   }
   ~ArmWorld() { ; }
 
