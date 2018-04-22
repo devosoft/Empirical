@@ -38,11 +38,13 @@ int main(int argc, char* argv[])
     //           << std::endl;
     world.PrintGrid();
 
-    // Keep the best individual.
-    emp::EliteSelect(world, 1, 1);
+    emp::RandomSelect(world, POP_SIZE);
 
-    // Run a tournament for the rest...
-    TournamentSelect(world, 5, POP_SIZE-1);
+    // // Keep the best individual.
+    // emp::EliteSelect(world, 1, 1);
+
+    // // Run a tournament for the rest...
+    // TournamentSelect(world, 5, POP_SIZE-1);
     world.Update();
   }
 
