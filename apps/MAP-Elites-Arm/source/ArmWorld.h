@@ -35,7 +35,9 @@ struct ArmOrg {
       if (angle_diff > 0.5) angle_diff = 1.0 - angle_diff;
       sqr_diffs += angle_diff * angle_diff;
     }
-    return ((double) angles.size()) - sqr_diffs;
+
+    // Return a normalized fitness between 0.0 and 1.0.
+    return (((double) angles.size()) - sqr_diffs * 4.0) / (double) angles.size();
   }
 
   size_t DoMutations(emp::Random & random) {
