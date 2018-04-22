@@ -56,7 +56,7 @@ namespace emp {
   /// @param copy_count How many copies should be made of each chosen organism?
   template<typename ORG>
   void RandomSelect(World<ORG> & world, size_t r_count=1, size_t copy_count=1) {
-    emp_assert(r_count > 0 && r_count <= world.GetNumOrgs(), r_count);
+    emp_assert(r_count > 0, r_count);
     emp_assert(copy_count > 0);
 
     Random & random = world.GetRandom();
