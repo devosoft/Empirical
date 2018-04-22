@@ -367,6 +367,12 @@ namespace emp {
     /// argument determines if the generations should be synchronous (true) or not (false, default)
     void SetGrid(size_t width, size_t height, bool synchronous_gen=false);
 
+    /// Setup the population to automatically test for mutations before deciding where a newborn offspring
+    /// should be placed (placement may need to know fitness or other phenotypic traits).
+    void SetMutateBeforeBirth() {
+      OnOffspringReady( [this](ORG & org){ DoMutationsOrg(org); } );
+    }
+
     /// Add a new phenotype measuring function.
     // void AddPhenotype(const std::string & name, std::function<double(ORG &)> fun) {
     //   phenotypes.AddTrait(name, fun);
