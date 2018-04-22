@@ -1,4 +1,11 @@
-// This is the main function for the NATIVE version of this project.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2018
+ *
+ *  @file  MAP-Elites-Arm.cc
+ *  @brief Controller for NATIVE (Command Line) version of MAP-Elites app.
+ */
 
 #include <iostream>
 

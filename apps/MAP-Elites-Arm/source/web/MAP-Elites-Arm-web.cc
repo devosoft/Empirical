@@ -1,6 +1,11 @@
-//  This file is part of Project Name
-//  Copyright (C) Michigan State University, 2017.
-//  Released under the MIT Software license; see doc/LICENSE
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2018
+ *
+ *  @file  MAP-Elites-Arm-web.cc
+ *  @brief Controller for WEB version of MAP-Elites app.
+ */
 
 #include "web/web.h"
 
