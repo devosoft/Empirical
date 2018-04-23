@@ -72,7 +72,7 @@ void DrawWorldCanvas() {
   emp::vector<emp::Point> draw_points = world.CalcPoints(target_arm, start_point, dilation);
   //canvas.MultiLine(start_point, draw_points, arm_color);
   for (emp::Point p : draw_points) {
-    canvas.Line(start_point, p, arm_color);
+    canvas.Line(start_point, p, arm_color, 3.0);
     start_point = p;
   }
 
