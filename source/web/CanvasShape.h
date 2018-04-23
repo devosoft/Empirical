@@ -156,6 +156,8 @@ namespace web {
     CanvasLine(double _x1, double _y1, double _x2, double _y2,
                const std::string & lc="")
       : CanvasShape(_x1, _y1, "", lc), x2(_x2), y2(_y2) { ; }
+    CanvasLine(Point p1, Point p2, const std::string & lc="")
+      : CanvasLine(p1.GetX(), p1.GetY(), p2.GetX(), p2.GetY()) { ; }
 
     void Apply() {
       EM_ASM_ARGS({
@@ -168,6 +170,35 @@ namespace web {
       Stroke(line_color);
     }
     CanvasAction * Clone() const { return new CanvasLine(*this); }
+  };
+
+  /// A line segment on the canvas.
+  class CanvasMultiLine : public CanvasShape {
+  private:
+    emp::vector<Point> points;
+
+  public:
+    CanvasMultiLine(double _x1, double _y1, const emp::vector<Point> & _points,
+               const std::string & lc="")
+      : CanvasShape(_x1, _y1, "", lc), points(_points) { ; }
+    CanvasMultiLine(Point p1, const emp::vector<Point> & _points, const std::string & lc="")
+      : CanvasMultiLine(p1.GetX(), p1.GetY(), _points) { ; }
+
+    void Apply() {
+      // Startup the line path.
+      EM_ASM_ARGS({
+        emp_i.ctx.beginPath();
+        emp_i.ctx.moveTo($0, $1);
+      }, x, y);
+      // Loop through all internal points...
+      for (auto p : points) {
+        EM_ASM_ARGS({ emp_i.ctx.lineTo($0, $1); }, p.GetX(), p.GetY());
+      }
+
+      EM_ASM({ emp_i.ctx.closePath(); });
+      Stroke(line_color);
+    }
+    CanvasAction * Clone() const { return new CanvasMultiLine(*this); }
   };
 
   /// Text to be written on a canvas.
