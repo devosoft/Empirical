@@ -17,6 +17,7 @@ UI::Document doc("emp_base");
 ArmWorld world;
 const double world_size = 600;
 size_t target_id = 0;
+ArmOrg target_arm;
 
 void DrawWorldCanvas() {
   UI::Canvas canvas = doc.Canvas("world_canvas");
@@ -38,7 +39,7 @@ void DrawWorldCanvas() {
       const size_t cur_y = org_y * (0.5 + (double) y);
       const double fitness = world.CalcFitnessID(org_id);
       if (fitness == 0.0) {
-        canvas.Circle(cur_x, cur_y, org_r, "black");
+        canvas.Circle(cur_x, cur_y, org_r, "#444444");
       } else if (fitness < 0.6) {
         canvas.Circle(cur_x, cur_y, org_r, "pink");
       } else if (fitness < 0.8) {
@@ -49,20 +50,31 @@ void DrawWorldCanvas() {
         canvas.Circle(cur_x, cur_y, org_r, "green");
       }
 
-      if (!target_id && fitness > 0.0) target_id = org_id;
+      if (!target_id && fitness > 0.0) {
+        target_id = org_id;
+        target_arm = world[org_id];
+      }
     }
   }
-
-  // Setup the arm.
-  const std::string arm_color = "#8888FF";
 
   // Add a plus sign in the middle.
   const double mid_x = org_x * world_x / 2.0;
   const double mid_y = org_y * world_y / 2.0;
   const double plus_bar = org_r * world_x;
-  canvas.Line(mid_x, mid_y-plus_bar, mid_x, mid_y+plus_bar, arm_color);
-  canvas.Line(mid_x-plus_bar, mid_y, mid_x+plus_bar, mid_y, arm_color);
+  canvas.Line(mid_x, mid_y-plus_bar, mid_x, mid_y+plus_bar, "#8888FF");
+  canvas.Line(mid_x-plus_bar, mid_y, mid_x+plus_bar, mid_y, "#8888FF");
 
+  // Setup the arm.
+  const std::string arm_color = "white";
+  const double total_length = world.CalcTotalLength();
+  const double dilation = canvas_x / (total_length * 2.0);
+  emp::Point start_point(mid_x, mid_y);
+  emp::vector<emp::Point> draw_points = world.CalcPoints(target_arm, start_point, dilation);
+  //canvas.MultiLine(start_point, draw_points, arm_color);
+  for (emp::Point p : draw_points) {
+    canvas.Line(start_point, p, arm_color);
+    start_point = p;
+  }
 
   // for (const Org & org : pop) {
   //   if (org.coop) {
