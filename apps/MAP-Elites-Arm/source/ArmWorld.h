@@ -28,6 +28,9 @@ struct ArmOrg {
     for (emp::Angle & angle : angles) angle.SetPortion(random.GetDouble());
   }
 
+  ArmOrg & operator=(const ArmOrg &) = default;
+  ArmOrg & operator=(ArmOrg &&) = default;
+
   double GetFitness() const {
     double sqr_diffs = 0.0;  // Total the squares of all of the differences between angles.
     for (size_t i = 1; i < angles.size(); i++) {
@@ -99,8 +102,10 @@ public:
     std::function<double(ArmOrg &)> traitX_fun = [this](ArmOrg & org){ return org.CalcEndPoint(segments).GetX(); };
     std::function<double(ArmOrg &)> traitY_fun = [this](ArmOrg & org){ return org.CalcEndPoint(segments).GetY(); };
 
-    AddPhenotype("End X", traitX_fun, -10.0, 10.0);
-    AddPhenotype("End Y", traitY_fun, -10.0, 10.0);
+    const double total = CalcTotalLength();
+
+    AddPhenotype("End X", traitX_fun, -total, total);
+    AddPhenotype("End Y", traitY_fun, -total, total);
 
     emp::SetMapElites(*this, {40, 40});
     // SetWellMixed(true);
@@ -110,6 +115,12 @@ public:
     for (size_t i = 0; i < 100; i++) Inject(ArmOrg(*random_ptr, segments.size()));
   }
   ~ArmWorld() { ; }
+
+  double CalcTotalLength() const {
+    double total = 0.0;
+    for (auto x : segments) total += x;
+    return total;
+  }
 
   emp::vector<emp::Point> CalcPoints(const ArmOrg & org) {
     emp::Angle facing(0);
