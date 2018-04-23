@@ -122,19 +122,28 @@ public:
     return total;
   }
 
-  emp::vector<emp::Point> CalcPoints(const ArmOrg & org) {
+  emp::vector<emp::Point> CalcPoints( const ArmOrg & org,
+                                      emp::Point start_pos=emp::Point(0.0,0.0),
+                                      double dilation=1.0 ) {
     emp::Angle facing(0);
-    emp::Point position(0.0, 0.0);
+    emp::Point position(start_pos);
     emp::vector<emp::Point> points(segments.size());
     for (size_t i = 0; i < segments.size(); i++) {
       facing += org.angles[i];
-      position = facing.GetPoint(position, segments[i]);
+      position = facing.GetPoint(position, segments[i]*dilation);
       points[i] = position;
     }
     return points;
   }
 
   emp::Point CalcEndPoint(const ArmOrg & org) { return org.CalcEndPoint(segments); }
+
+  emp::vector<emp::Point> CalcPoints( size_t id,
+                                      emp::Point start_pos=emp::Point(0.0,0.0),
+                                      double dilation=1.0 ) {
+    return CalcPoints(*pop[id], start_pos, dilation);
+  }
+
 };
 
 #endif
