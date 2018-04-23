@@ -125,18 +125,23 @@ namespace web {
     /// Set Canvas size.
     void SetSize(size_t w, size_t h) { Info()->width=w; Info()->height=h; }
 
-    /// Add a Circle to this canvas centered at x,y with radius r.  Optional face color and
-    /// line color.
+    /// Add a Circle to this canvas centered at x,y with radius r.  Optional face and line color.
     Canvas & Circle(double x, double y, double r,
-                    const std::string & fc="", const std::string & lc="") {
-      Info()->AddAction( new CanvasCircle(x, y, r, fc, lc) );
+                    const std::string & fc="", const std::string & lc="", double lw=1.0) {
+      Info()->AddAction( new CanvasCircle(x, y, r, fc, lc, lw) );
+      return *this;
+    }
+
+    /// Add a Circle to this canvas centered at point with radius r.  Optional face and line color.
+    Canvas & Circle(Point p, double r, const std::string & fc="", const std::string & lc="", double lw=1.0) {
+      Info()->AddAction( new CanvasCircle(p, r, fc, lc, lw) );
       return *this;
     }
 
     /// Add a Circle specified with a Circle object.  Optional face color and line color.
     Canvas & Circle(const emp::Circle & circle,
-                    const std::string & fc="", const std::string & lc="") {
-      Info()->AddAction( new CanvasCircle(circle, fc, lc) );
+                    const std::string & fc="", const std::string & lc="", double lw=1.0) {
+      Info()->AddAction( new CanvasCircle(circle, fc, lc, lw) );
       return *this;
     }
 
