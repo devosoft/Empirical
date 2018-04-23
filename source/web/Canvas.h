@@ -154,6 +154,18 @@ namespace web {
       return *this;
     }
 
+    /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
+    Canvas & Line(emp::Point p1, emp::Point p2, const std::string & lc="") {
+      Info()->AddAction( new CanvasLine(p1, p2, lc) );
+      return *this;
+    }
+
+    /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
+    Canvas & MultiLine(emp::Point p1, const emp::vector<emp::Point> & points, const std::string & lc="") {
+      Info()->AddAction( new CanvasMultiLine(p1, points, lc) );
+      return *this;
+    }
+
     /// Add a string to this canvas at x,y with specified text.  Optional face color and
     /// line color.
     Canvas & Text(double x, double y, const std::string text,
