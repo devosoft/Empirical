@@ -39,15 +39,15 @@ void DrawWorldCanvas() {
       const size_t cur_y = org_y * (0.5 + (double) y);
       const double fitness = world.CalcFitnessID(org_id);
       if (fitness == 0.0) {
-        canvas.Circle(cur_x, cur_y, org_r, "#444444");
+        canvas.Circle(cur_x, cur_y, org_r, "#444444", "black");
       } else if (fitness < 0.6) {
-        canvas.Circle(cur_x, cur_y, org_r, "pink");
+        canvas.Circle(cur_x, cur_y, org_r, "pink", "black");
       } else if (fitness < 0.8) {
-        canvas.Circle(cur_x, cur_y, org_r, "#EEEE33");  // Pale Yellow
+        canvas.Circle(cur_x, cur_y, org_r, "#EEEE33", "black");  // Pale Yellow
       } else if (fitness < 0.95) {
-        canvas.Circle(cur_x, cur_y, org_r, "#88FF88");  // Pale green
+        canvas.Circle(cur_x, cur_y, org_r, "#88FF88", "black");  // Pale green
       } else {
-        canvas.Circle(cur_x, cur_y, org_r, "green");
+        canvas.Circle(cur_x, cur_y, org_r, "green", "black");
       }
 
       if (!target_id && fitness > 0.0) {
@@ -87,9 +87,32 @@ void DrawWorldCanvas() {
   doc.Text("ud_text").Redraw();
 }
 
+void CanvasClick(int x, int y) {
+  UI::Canvas canvas = doc.Canvas("world_canvas");
+  const double canvas_x = (double) canvas.GetWidth();
+  const double canvas_y = (double) canvas.GetHeight();
+  double px = ((double) x) / canvas_x;
+  double py = ((double) y) / canvas_y;
+
+  const size_t world_x = world.GetWidth();
+  const size_t world_y = world.GetHeight();
+  size_t pos_x = (size_t) (world_x * px);
+  size_t pos_y = (size_t) (world_y * py);
+
+  size_t org_id = pos_y * world_x + pos_x;
+  if (world.CalcFitnessID(org_id) > 0.0) {
+    target_id = org_id;
+    target_arm = world[org_id];
+    DrawWorldCanvas();
+  }
+
+  //emp::Alert("Click at (", pos_x, ",", pos_y, ") = ", id);
+}
+
 int main()
 {
   doc << "<h1>MAP-Elites: Arm Positioning Challenge</h1>";
   auto world_canvas = doc.AddCanvas(world_size, world_size, "world_canvas");
+  world_canvas.On("click", CanvasClick);
   DrawWorldCanvas();
 }
