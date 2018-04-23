@@ -186,10 +186,11 @@ namespace web {
 
   public:
     CanvasMultiLine(double _x1, double _y1, const emp::vector<Point> & _points,
-               const std::string & lc="")
-      : CanvasShape(_x1, _y1, "", lc), points(_points) { ; }
-    CanvasMultiLine(Point p1, const emp::vector<Point> & _points, const std::string & lc="")
-      : CanvasMultiLine(p1.GetX(), p1.GetY(), _points) { ; }
+                    const std::string & lc="", double lw=1.0)
+      : CanvasShape(_x1, _y1, "", lc, lw), points(_points) { ; }
+    CanvasMultiLine(Point p1, const emp::vector<Point> & _points,
+                    const std::string & lc="", double lw=1.0)
+      : CanvasMultiLine(p1.GetX(), p1.GetY(), _points, lc, lw) { ; }
 
     void Apply() {
       // Startup the line path.
@@ -201,7 +202,6 @@ namespace web {
       for (auto p : points) {
         EM_ASM_ARGS({ emp_i.ctx.lineTo($0, $1); }, p.GetX(), p.GetY());
       }
-      EM_ASM({ emp_i.ctx.closePath(); });
 
       LineWidth(line_width);
       Stroke(line_color);

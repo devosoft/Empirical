@@ -161,8 +161,8 @@ namespace web {
     }
 
     /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
-    Canvas & MultiLine(emp::Point p1, const emp::vector<emp::Point> & points, const std::string & lc="") {
-      Info()->AddAction( new CanvasMultiLine(p1, points, lc) );
+    Canvas & MultiLine(emp::Point p1, const emp::vector<emp::Point> & points, const std::string & lc="", double lw=1.0) {
+      Info()->AddAction( new CanvasMultiLine(p1, points, lc, lw) );
       return *this;
     }
 
