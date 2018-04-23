@@ -70,10 +70,12 @@ void DrawWorldCanvas() {
   const double dilation = canvas_x / (total_length * 2.0);
   emp::Point start_point(mid_x, mid_y);
   emp::vector<emp::Point> draw_points = world.CalcPoints(target_arm, start_point, dilation);
-  //canvas.MultiLine(start_point, draw_points, arm_color);
+  canvas.MultiLine(start_point, draw_points, arm_color, 3.0);
+
+  // Add joints along arm.
+  canvas.Circle(start_point, 5, "blue", "black");
   for (emp::Point p : draw_points) {
-    canvas.Line(start_point, p, arm_color, 3.0);
-    start_point = p;
+    canvas.Circle(p, 3, "#blue", "black");
   }
 
   // for (const Org & org : pop) {
@@ -112,7 +114,16 @@ void CanvasClick(int x, int y) {
 int main()
 {
   doc << "<h1>MAP-Elites: Arm Positioning Challenge</h1>";
+
+  // Add some Buttons
+  doc << UI::Button( [](){ emp::RandomSelect(world, 1); DrawWorldCanvas(); }, "Do Birth", "birth_button");
+  doc << UI::Button( [](){ emp::RandomSelect(world, 100); DrawWorldCanvas(); }, "Do Birth 100", "birth_100_button");
+  doc << UI::Button( [](){ emp::RandomSelect(world, 10000); DrawWorldCanvas(); }, "Do Birth 10000", "birth_10000_button");
+  doc << "<br>";
+
+  // Add the Canvas
   auto world_canvas = doc.AddCanvas(world_size, world_size, "world_canvas");
   world_canvas.On("click", CanvasClick);
   DrawWorldCanvas();
+
 }
