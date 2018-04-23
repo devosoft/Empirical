@@ -149,14 +149,14 @@ namespace web {
     }
 
     /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
-    Canvas & Line(double x1, double y1, double x2, double y2, const std::string & lc="") {
-      Info()->AddAction( new CanvasLine(x1, y1, x2, y2, lc) );
+    Canvas & Line(double x1, double y1, double x2, double y2, const std::string & lc="", double lw=1.0) {
+      Info()->AddAction( new CanvasLine(x1, y1, x2, y2, lc, lw) );
       return *this;
     }
 
     /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
-    Canvas & Line(emp::Point p1, emp::Point p2, const std::string & lc="") {
-      Info()->AddAction( new CanvasLine(p1, p2, lc) );
+    Canvas & Line(emp::Point p1, emp::Point p2, const std::string & lc="", double lw=1.0) {
+      Info()->AddAction( new CanvasLine(p1, p2, lc, lw) );
       return *this;
     }
 

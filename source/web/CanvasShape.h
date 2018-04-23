@@ -33,14 +33,18 @@ namespace web {
     double x; double y;      ///< Anchor point for this shape.
     std::string fill_color;  ///< Internal color to fill shape with.
     std::string line_color;  ///< Border color for shape.
+    double line_width;       ///< How wide should lines be?
 
   public:
-    CanvasShape(double _x, double _y, const std::string & fc="", const std::string & lc="")
-      : x(_x), y(_y), fill_color(fc), line_color(lc) { ; }
+    CanvasShape(double _x, double _y, const std::string & fc="", const std::string & lc="", double lw=1.0)
+      : x(_x), y(_y), fill_color(fc), line_color(lc), line_width(lw) { ; }
     virtual ~CanvasShape() { ; }
 
     /// Shift the position of this shape.
     void MoveTo(double _x, double _y) { x=_x; y=_y; }
+
+    /// Setup details needed before drawing lines.
+    void SetLineWidth(double lw = 1.0) { line_width = lw; }
 
     /// Change the fill color of this shape.
     void SetFillColor(const std::string & color) { fill_color = color; }
@@ -50,6 +54,7 @@ namespace web {
 
     /// Actually change the color on screen.
     void ApplyColor() {
+      LineWidth(line_width);
       Fill(fill_color);
       Stroke(line_color);
     }
@@ -154,10 +159,10 @@ namespace web {
     double y2;  /// Y-position for second point of line segment.
   public:
     CanvasLine(double _x1, double _y1, double _x2, double _y2,
-               const std::string & lc="")
-      : CanvasShape(_x1, _y1, "", lc), x2(_x2), y2(_y2) { ; }
-    CanvasLine(Point p1, Point p2, const std::string & lc="")
-      : CanvasLine(p1.GetX(), p1.GetY(), p2.GetX(), p2.GetY()) { ; }
+               const std::string & lc="", double lw=1.0)
+      : CanvasShape(_x1, _y1, "", lc, lw), x2(_x2), y2(_y2) { ; }
+    CanvasLine(Point p1, Point p2, const std::string & lc="", double lw=1.0)
+      : CanvasLine(p1.GetX(), p1.GetY(), p2.GetX(), p2.GetY(), lc, lw) { ; }
 
     void Apply() {
       EM_ASM_ARGS({
@@ -167,12 +172,14 @@ namespace web {
         emp_i.ctx.closePath();
       }, x, y, x2, y2);
       // ApplyColor();
+      LineWidth(line_width);
       Stroke(line_color);
     }
     CanvasAction * Clone() const { return new CanvasLine(*this); }
   };
 
-  /// A line segment on the canvas.
+  /// A whole series of line segments on the canvas.
+  /// Currently not working...
   class CanvasMultiLine : public CanvasShape {
   private:
     emp::vector<Point> points;
@@ -194,8 +201,9 @@ namespace web {
       for (auto p : points) {
         EM_ASM_ARGS({ emp_i.ctx.lineTo($0, $1); }, p.GetX(), p.GetY());
       }
-
       EM_ASM({ emp_i.ctx.closePath(); });
+
+      LineWidth(line_width);
       Stroke(line_color);
     }
     CanvasAction * Clone() const { return new CanvasMultiLine(*this); }
