@@ -46,8 +46,10 @@ void DrawWorldCanvas() {
         canvas.Circle(cur_x, cur_y, org_r, "#EEEE33", "black");  // Pale Yellow
       } else if (fitness < 0.95) {
         canvas.Circle(cur_x, cur_y, org_r, "#88FF88", "black");  // Pale green
+      } else if (fitness < 0.98) {
+        canvas.Circle(cur_x, cur_y, org_r, "#00CC00", "black");  // Mid green
       } else {
-        canvas.Circle(cur_x, cur_y, org_r, "green", "black");
+        canvas.Circle(cur_x, cur_y, org_r, "green", "black");    // Full green
       }
 
       if (!target_id && fitness > 0.0) {
