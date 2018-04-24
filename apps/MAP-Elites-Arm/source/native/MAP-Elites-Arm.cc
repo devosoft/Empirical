@@ -23,8 +23,7 @@ int main(int argc, char* argv[])
 
   std::cout << "Hello World!" << std::endl;
 
-  emp::Random random;
-  ArmWorld world(random);
+  ArmWorld world;
 
   // Setup the print function to indicate if a function exists.
   std::function<void(ArmOrg&,std::ostream &)> print_fun = [](ArmOrg & val, std::ostream & os) {
