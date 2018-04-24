@@ -38,19 +38,16 @@ void DrawWorldCanvas() {
       const size_t cur_x = org_x * (0.5 + (double) x);
       const size_t cur_y = org_y * (0.5 + (double) y);
       const double fitness = world.CalcFitnessID(org_id);
-      if (fitness == 0.0) {
-        canvas.Circle(cur_x, cur_y, org_r, "#444444", "black");
-      } else if (fitness < 0.6) {
-        canvas.Circle(cur_x, cur_y, org_r, "pink", "black");
-      } else if (fitness < 0.8) {
-        canvas.Circle(cur_x, cur_y, org_r, "#EEEE33", "black");  // Pale Yellow
-      } else if (fitness < 0.95) {
-        canvas.Circle(cur_x, cur_y, org_r, "#88FF88", "black");  // Pale green
-      } else if (fitness < 0.98) {
-        canvas.Circle(cur_x, cur_y, org_r, "#00CC00", "black");  // Mid green
-      } else {
-        canvas.Circle(cur_x, cur_y, org_r, "green", "black");    // Full green
-      }
+
+      std::string circle_color;
+      if (fitness == 0.0) { circle_color = "#444444"; }          // Dark Gray
+      else if (fitness < 0.6) { circle_color = "#FFC0CB"; }      // Pink
+      else if (fitness < 0.8) { circle_color = "#FFD899"; }      // Pale Orange
+      else if (fitness < 0.95) { circle_color = "#EEEE33"; }     // Pale Yellow
+      else if (fitness < 0.98) { circle_color = "#88FF88"; }     // Pale green
+      else if (fitness < 0.995) { circle_color = "#00CC00"; }    // Mid green
+      else { circle_color = "green"; }                           // Full green
+      canvas.Circle(cur_x, cur_y, org_r, circle_color, "black");
 
       if (!target_id && fitness > 0.0) {
         target_id = org_id;
@@ -80,15 +77,16 @@ void DrawWorldCanvas() {
     canvas.Circle(p, 3, "#blue", "black");
   }
 
-  // for (const Org & org : pop) {
-  //   if (org.coop) {
-  //     canvas.Circle(org.x*world_size, org.y*world_size, 2, "blue", "#8888FF");
-  //   } else {
-  //     canvas.Circle(org.x*world_size, org.y*world_size, 2, "#FF8888", "red");
-  //   }
-  // }
+  // doc.Text("ud_text").Redraw();
 
-  doc.Text("ud_text").Redraw();
+  // UI::Text("ud_text").Redraw();   // FAILS
+  // UI::Text("").Redraw();          // FAILS
+  // UI::Text("(none)").Redraw();       // WORKS (WTF???)
+
+  // UI::Text tmp = doc.Text("ud_text");  // WORKS
+  // emp::Alert(tmp.GetID());             // Prints: (none)
+  // tmp.Redraw();
+
 }
 
 void CanvasClick(int x, int y) {
@@ -109,8 +107,6 @@ void CanvasClick(int x, int y) {
     target_arm = world[org_id];
     DrawWorldCanvas();
   }
-
-  //emp::Alert("Click at (", pos_x, ",", pos_y, ") = ", id);
 }
 
 int main()
@@ -127,5 +123,15 @@ int main()
   auto world_canvas = doc.AddCanvas(world_size, world_size, "world_canvas");
   world_canvas.On("click", CanvasClick);
   DrawWorldCanvas();
+
+  //UI::Text("(none)").Redraw();       // WORKS (WTF???)
+
+  // EM_ASM_ARGS({
+  //     var widget_id = Pointer_stringify($0);
+  //     var out_html = Pointer_stringify($1);
+  //     $('#' + widget_id).replaceWith(out_html);
+  //   }, "(none)", "<span id='(none)'></span>");
+
+  EM_ASM({ $('#(x)'); });
 
 }
