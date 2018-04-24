@@ -320,7 +320,7 @@ namespace web {
         // If this node is frozen, don't change it!
         if (state == Widget::FROZEN) return;
 
-        // If this node is active, fill put its contents in ss; otherwise make ss an empty span.
+        // If this node is active, put its contents in ss; otherwise make ss an empty span.
         std::stringstream ss;
         if (state == Widget::ACTIVE) GetHTML(ss);
         else ss << "<span id='" << id << "'></span>";
@@ -424,6 +424,7 @@ namespace web {
 
   double Widget::GetXPos() {
     if (!info) return -1.0;
+    emp_assert(GetID() != "");  // Must have a name!
     return EM_ASM_DOUBLE({
       var id = Pointer_stringify($0);
       var rect = $('#' + id).position();
@@ -433,6 +434,7 @@ namespace web {
 
   double Widget::GetYPos() {
     if (!info) return -1.0;
+    emp_assert(GetID() != "");  // Must have a name!
     return EM_ASM_DOUBLE({
       var id = Pointer_stringify($0);
       var rect = $('#' + id).position();
@@ -442,6 +444,7 @@ namespace web {
 
   double Widget::GetWidth(){
     if (!info) return -1.0;
+    emp_assert(GetID() != "");  // Must have a name!
     return EM_ASM_DOUBLE({
       var id = Pointer_stringify($0);
       return $('#' + id).width();
@@ -449,6 +452,7 @@ namespace web {
   }
   double Widget::GetHeight(){
     if (!info) return -1.0;
+    emp_assert(GetID() != "");  // Must have a name!
     return EM_ASM_DOUBLE({
       var id = Pointer_stringify($0);
       return $('#' + id).height();
@@ -456,6 +460,7 @@ namespace web {
   }
   double Widget::GetInnerWidth(){
     if (!info) return -1.0;
+    emp_assert(GetID() != "");  // Must have a name!
     return EM_ASM_DOUBLE({
       var id = Pointer_stringify($0);
       return $('#' + id).innerWidth();
@@ -463,6 +468,7 @@ namespace web {
   }
   double Widget::GetInnerHeight(){
     if (!info) return -1.0;
+    emp_assert(GetID() != "");  // Must have a name!
     return EM_ASM_DOUBLE({
       var id = Pointer_stringify($0);
       return $('#' + id).innerHeight();
@@ -470,6 +476,7 @@ namespace web {
   }
   double Widget::GetOuterWidth(){
     if (!info) return -1.0;
+    emp_assert(GetID() != "");  // Must have a name!
     return EM_ASM_DOUBLE({
       var id = Pointer_stringify($0);
       return $('#' + id).outerWidth();
@@ -477,6 +484,7 @@ namespace web {
   }
   double Widget::GetOuterHeight(){
     if (!info) return -1.0;
+    emp_assert(GetID() != "");  // Must have a name!
     return EM_ASM_DOUBLE({
       var id = Pointer_stringify($0);
       return $('#' + id).outerHeight();
