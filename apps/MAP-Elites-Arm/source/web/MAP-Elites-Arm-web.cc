@@ -74,18 +74,8 @@ void DrawWorldCanvas() {
   // Add joints along arm.
   canvas.Circle(start_point, 5, "blue", "black");
   for (emp::Point p : draw_points) {
-    canvas.Circle(p, 3, "#blue", "black");
+    canvas.Circle(p, 3, "blue", "black");
   }
-
-  // doc.Text("ud_text").Redraw();
-
-  // UI::Text("ud_text").Redraw();   // FAILS
-  // UI::Text("").Redraw();          // FAILS
-  // UI::Text("(none)").Redraw();       // WORKS (WTF???)
-
-  // UI::Text tmp = doc.Text("ud_text");  // WORKS
-  // emp::Alert(tmp.GetID());             // Prints: (none)
-  // tmp.Redraw();
 
 }
 
@@ -124,14 +114,7 @@ int main()
   world_canvas.On("click", CanvasClick);
   DrawWorldCanvas();
 
-  //UI::Text("(none)").Redraw();       // WORKS (WTF???)
 
-  // EM_ASM_ARGS({
-  //     var widget_id = Pointer_stringify($0);
-  //     var out_html = Pointer_stringify($1);
-  //     $('#' + widget_id).replaceWith(out_html);
-  //   }, "(none)", "<span id='(none)'></span>");
-
-  EM_ASM({ $('#(x)'); });
+  EM_ASM({ $('#(x)'); });  // <-- What is this needed for?  Clicking on the canvas doesn't work without it.
 
 }
