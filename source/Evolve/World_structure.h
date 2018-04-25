@@ -174,6 +174,90 @@ namespace emp {
   /// Note: Since organisms compete with their predecessors for space in the populations,
   /// synchronous generations do not make sense.
 
+  /// Build a class to track distances between organisms.
+  // Note: Assuming that once a position is filled it will never be empty again.
+  template <typename ORG>
+  struct World_MinDistInfo {
+    constexpr size_t ID_NONE = (size_t) -1;  ///< ID for organism does not exist.
+    emp::vector<size_t> nearest_id;          ///< For each individual in world, whom are they closest to?
+    emp::vector<double> distance;            ///< And what is their distance?
+
+    World<ORG> & world;
+    std::function<double(ORG&,ORG&)> dist_fun;
+
+    World_MinDistInfo(World<ORG> & in_world, const std::function<double(ORG&,ORG&)> & in_dist_fun)
+     : world(in_world), dist_fun(in_dist_fun)
+     { ; }
+
+    double CalcDist(size_t id1, size_t id2) {
+      return dist_fun(world.GetOrg(id1), world.GetOrg(id2));
+    }
+
+    void Setup() {
+      emp_assert(world.GetSize() >= 2); // Must have at least 2 orgs in the population to setup.
+      nearest_id.resize(world.GetSize());
+      distance.resize(world.GetSize());
+
+      // Startup with legal values...
+      nearest_id[0] = 1;
+      distance[0] = CalcDist(0,1);
+
+      for (size_t id = 1; id < world.GetSize(); id++) {
+        nearest_id[id] = 0;
+        distance[id] = CalcDist(0,id);
+      }
+
+      // And see if we can find better...
+      for (size_t id1 = 0; id1 < world.GetSize(); id1++) {
+        for (size_t id2 = id1+1; id2 < world.GetSize(); id2++) {
+          const double cur_dist = CalcDist(id1, id2);
+          if (cur_dist < distance[id1]) {
+            distance[id1] = cur_dist;
+            nearest_id[id1] = id2;
+          }
+          if (cur_dist < distance[id2]) {
+            distance[id2] = cur_dist;
+            nearest_id[id2] = id1;
+          }
+        }
+      }
+    }
+
+    size_t FindKill() {
+      if (distance.size() == 0) return ID_NONE;
+      size_t min_id = 0;
+      double min_dist = distance[0];
+      for (size_t dist_id = 1; dist_id < distance.size(); dist_id++) {
+        if (distance[dist_id] < min_dist) { min_id = dist_id; min_dist = distance[dist_id]; }
+      }
+      if (world.GetFitnessID(min_id) < world.GetFitnessID(nearest_id[min_id])) return min_id;
+      else return nearest_id[min_id];
+    }
+
+    // Find the closest connection to a position again.
+    void Refresh(size_t pos) {
+      emp_assert(pos < world.GetSize());
+      if (pos == 0) { nearest_id[0] = 1; distance[0] = CalcDist(0,1); }
+      else { nearest_id[pos] = 0; distance[pos] = CalcDist(0, pos); }
+      for (size_t id = 1; id < world.GetSize(); id++) {
+        if (id == pos) continue;
+        const double cur_dist = CalcDist(id, pos);
+        if (cur_dist < distance[pos]) {
+          distance[pos] = cur_dist;
+          nearest_id[pos] = id;
+        }
+      }
+    }
+
+    // Assume a position has changed; refresh it AND everything that had it as a closest connection.
+    void Update(size_t pos) {
+      emp_assert(pos < world.GetSize());
+      for (size_t id = 0; id < world.GetSize(); id++) {
+        if (nearest_id[id] == pos || id == pos) Refresh(id);
+      }
+    }
+  };
+
   /// This first version will setup a Diverse-Elites world and specify traits to use.
   template <typename ORG>
   void SetDiverseElites(World<ORG> & world, TraitSet<ORG> traits, size_t world_size) { 
@@ -188,8 +272,9 @@ namespace emp {
     // if a more fit organism is already in place; you must run clear first if you want to
     // ensure placement.
     world.SetAddInjectFun( [&world,traits](Ptr<ORG> new_org) {
-      // Determine tha position that this phenotype fits in.
+      // Determine the position that this phenotype fits in.
       double org_fitness = world.CalcFitnessOrg(*new_org);
+      (void) org_fitness;
 
       // @CAO Find empty spot?  Or compete nearby orgs to clear out a spot?
       return org_pos_t();  // @CAO For now, Return invalid position!
@@ -204,6 +289,7 @@ namespace emp {
 
       // Determine tha position that this phenotype fits in.
       double org_fitness = world.CalcFitnessOrg(*new_org);
+      (void) org_fitness;
 
       // @CAO Find empty spot?  Or compete nearby orgs to clear out a spot?
       return org_pos_t();  // @CAO For now, Return invalid position!
