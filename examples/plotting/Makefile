@@ -1,5 +1,9 @@
 # Flags to use regardless of compiler
-GLFW_LIBS := $(shell pkg-config --static --libs glfw3) $(shell pkg-config --static --libs gl) $(shell pkg-config --cflags --libs glew)
+GLFW_LIBS := $(shell pkg-config --static --libs glfw3) \
+    $(shell pkg-config --static --libs gl) \
+    $(shell pkg-config --cflags --libs glew) \
+  	$(shell pkg-config --cflags --libs freetype2)
+	  
 CFLAGS_all := -Wall -Wno-unused-function -I../../source/
 CFLAGS_version := -std=c++14
 

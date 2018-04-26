@@ -11,6 +11,7 @@
 #include "scenegraph/camera.h"
 #include "scenegraph/core.h"
 #include "tools/attrs.h"
+#include "tools/resources.h"
 
 // Based on
 // https://blog.mapbox.com/drawing-antialiased-lines-with-opengl-8766f34192dc
@@ -19,58 +20,16 @@ namespace emp {
   namespace plot {
     class Line : public scenegraph::Child, public Joinable<Line> {
       private:
-      struct __Shader {
-        opengl::ShaderProgram program;
-        opengl::Uniform model, view, projection;
-        opengl::VertexArrayObject vao;
-        struct point_t {
-          math::Vec3f position;
-          math::Vec2f normal;
-          float weight;
-          opengl::Color color;
-        };
+      ResourceRef<opengl::ShaderProgram> shader;
 
-        __Shader(opengl::GLCanvas& canvas)
-          : program(canvas.makeShaderProgram(
-#ifdef EMSCRIPTEN
-              "precision mediump float;"
-#endif
-              R"glsl(
-                attribute vec3 position;
-                attribute vec2 normal;
-                attribute float weight;
-                attribute vec4 color;
-
-                uniform mat4 model;
-                uniform mat4 view;
-                uniform mat4 projection;
-
-                varying vec4 fcolor;
-
-                void main()
-                {
-                  vec4 delta = vec4(normal * weight, 0.0, 0.0);
-                  gl_Position = projection * (delta + view * model * vec4(position, 1.0));
-                  fcolor = color;
-                }
-            )glsl",
-#ifdef EMSCRIPTEN
-              "precision mediump float;"
-#endif
-              R"glsl(
-                  varying vec4 fcolor;
-
-                  void main()
-                  {
-                      gl_FragColor = fcolor;
-                  }
-              )glsl")),
-            model(program.uniform("model")),
-            view(program.uniform("view")),
-            projection(program.uniform("projection")) {
-        }
-      } shader;
+      opengl::Uniform model, view, projection;
       opengl::VertexArrayObject vao;
+      struct point_t {
+        math::Vec3f position;
+        math::Vec2f normal;
+        float weight;
+        opengl::Color color;
+      };
 
       opengl::BufferObject<opengl::BufferType::Array> verticiesBuffer;
       opengl::BufferObject<opengl::BufferType::ElementArray> trianglesBuffer;
@@ -79,24 +38,24 @@ namespace emp {
       size_t elementCount = 0;
 
       public:
-      Line(emp::opengl::GLCanvas& canvas)
-        : shader(canvas),
-          vao(canvas.makeVAO()),
+      template <typename S = std::string>
+      Line(opengl::GLCanvas& canvas, S&& shader = "DefaultVaryingColor")
+        : shader(std::forward<S>(shader)),
+          vao(canvas.MakeVAO()),
           verticiesBuffer(canvas.makeBuffer<opengl::BufferType::Array>()),
           trianglesBuffer(
             canvas.makeBuffer<opengl::BufferType::ElementArray>()) {
         using namespace emp::opengl;
 
-        vao.bind();
-        verticiesBuffer.bind();
-        vao.attr(
-          shader.program.attribute("position", &__Shader::point_t::position));
-        vao.attr(
-          shader.program.attribute("normal", &__Shader::point_t::normal));
-        vao.attr(
-          shader.program.attribute("weight", &__Shader::point_t::weight));
-        vao.attr(shader.program.attribute("color", &__Shader::point_t::color));
-        trianglesBuffer.bind();
+        this->shader.OnSet([this](auto& shader) {
+          vao.bind();
+          trianglesBuffer.bind();
+          verticiesBuffer.bind();
+          vao.attr(shader.Attribute("position", &point_t::position));
+          vao.attr(shader.Attribute("normal", &point_t::normal));
+          vao.attr(shader.Attribute("weight", &point_t::weight));
+          vao.attr(shader.Attribute("color", &point_t::color));
+        });
       }
       virtual ~Line() {}
 
@@ -104,14 +63,14 @@ namespace emp {
                           const math::Mat4x4f& transform) override {
         using namespace emp::math;
         if (elementCount > 0) {
-          shader.program.use();
+          shader->Use();
           vao.bind();
           verticiesBuffer.bind();
           trianglesBuffer.bind();
 
-          shader.model = transform * Mat4x4f::Translation(0, 0);
-          shader.projection = settings.projection;
-          shader.view = settings.view;
+          shader->Uniform("model") = transform * Mat4x4f::Translation(0, 0);
+          shader->Uniform("projection") = settings.projection;
+          shader->Uniform("view") = settings.view;
 
           glDrawElements(GL_TRIANGLES, elementCount, GL_UNSIGNED_INT, 0);
         }
@@ -144,7 +103,7 @@ namespace emp {
         Vec2f normal{-segment.y(), segment.x()};
 
         // Place the first two verticies into the list of vertices
-        std::vector<__Shader::point_t> verts{
+        std::vector<point_t> verts{
           {start, normal, startStrokeWeight, startStroke},
           {start, -normal, startStrokeWeight, startStroke}};
         std::vector<GLuint> triangles;
@@ -162,10 +121,10 @@ namespace emp {
 
           auto center{(normal1 + normal2).Normalized()};
 
-          verts.push_back(__Shader::point_t{middle, center, middleStrokeWeight,
-                                            middleStroke});
-          verts.push_back(__Shader::point_t{middle, -center, middleStrokeWeight,
-                                            middleStroke});
+          verts.push_back(
+            point_t{middle, center, middleStrokeWeight, middleStroke});
+          verts.push_back(
+            point_t{middle, -center, middleStrokeWeight, middleStroke});
 
           triangles.push_back(i);
           triangles.push_back(i + 1);
@@ -189,9 +148,9 @@ namespace emp {
         normal = {-segment.y(), segment.x()};
 
         verts.push_back(
-          __Shader::point_t{middle, normal, middleStrokeWeight, middleStroke});
+          point_t{middle, normal, middleStrokeWeight, middleStroke});
         verts.push_back(
-          __Shader::point_t{middle, -normal, middleStrokeWeight, middleStroke});
+          point_t{middle, -normal, middleStrokeWeight, middleStroke});
         triangles.push_back(i);
         triangles.push_back(i + 1);
         triangles.push_back(i + 2);
@@ -210,7 +169,7 @@ namespace emp {
           verticiesBuffer.subset(verts);
           trianglesBuffer.subset(triangles);
 #else
-          auto mappedVerticiesBuffer = verticiesBuffer.map<__Shader::point_t>(
+          auto mappedVerticiesBuffer = verticiesBuffer.map<point_t>(
             verts.size(), BufferAccess::write().invalidatesBuffer());
           std::copy(verts.begin(), verts.end(), mappedVerticiesBuffer);
           verticiesBuffer.unmap();

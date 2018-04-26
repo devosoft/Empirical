@@ -15,7 +15,8 @@ namespace emp {
       GLint handle;
 
       public:
-      Uniform(GLint handle) : handle(handle) {}
+      Uniform(GLint handle = 0) : handle(handle) {}
+
       operator GLint() const { return handle; }
 
       template <typename T>
@@ -166,22 +167,22 @@ namespace emp {
       ShaderProgram& operator=(const ShaderProgram&) = delete;
       ShaderProgram& operator=(ShaderProgram&& other) {
         if (this != &other) {
-          destory();
+          Destory();
           std::swap(handle, other.handle);
         }
         return *this;
       }
 
-      ~ShaderProgram() { destory(); }
+      ~ShaderProgram() { Destory(); }
 
-      void destory() {
+      void Destory() {
         if (handle != 0) {
           glDeleteProgram(handle);
           handle = 0;
         }
       }
 
-      void use() {
+      void Use() {
         if (handle != 0) {
           glUseProgram(handle);
         }
@@ -275,7 +276,10 @@ namespace emp {
                             std::forward<Args>(args)...);
       }
 
-      Uniform Uniform(const std::string& name) const {
+      const Uniform Uniform(const std::string& name) const {
+        return GetUniformLocation(name);
+      }
+      class Uniform Uniform(const std::string& name) {
         return GetUniformLocation(name);
       }
     };

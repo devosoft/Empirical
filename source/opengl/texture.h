@@ -35,9 +35,9 @@ namespace emp {
 
       MirroredRepeat = GL_MIRRORED_REPEAT,
       Repeat = GL_REPEAT,
+      ClampToEdge = GL_CLAMP_TO_EDGE,
 #ifndef __EMSCRIPTEN__
       MirrorClampToEdge = GL_MIRROR_CLAMP_TO_EDGE,
-      ClampToEdge = GL_CLAMP_TO_EDGE,
       ClampToBorder = GL_CLAMP_TO_BORDER,
 #endif
     };
@@ -57,11 +57,18 @@ namespace emp {
     };
 
     enum class Texture2DFormat : GLint {
-      Alpha = GL_ALPHA,
+#if EMSCRIPTEN
       Luminance = GL_LUMINANCE,
       LuminanceAlpha = GL_LUMINANCE_ALPHA,
+      Alpha = GL_ALPHA,
+#else
+      DepthComponent = GL_DEPTH_COMPONENT,
+      DepthStencil = GL_DEPTH_STENCIL,
+      R = GL_RED,
+      RG = GL_RG,
+#endif
       RGB = GL_RGB,
-      RGBA = GL_RGBA
+      RGBA = GL_RGBA,
     };
 
     enum class TextureType : GLenum {
@@ -150,14 +157,19 @@ namespace emp {
         }
 
         Texture(const Texture&) = delete;
-        // Texture(Texture&& other) : name(other.name) { other.name = 0; }
-        Texture(Texture&& other) = delete;
+        Texture(Texture&& other) : texture(other.texture), name(other.name) {
+          other.name = 0;
+        }
+
         Texture& operator=(const Texture&) = delete;
-        Texture& operator=(Texture&&) = delete;
-        // Texture& operator=(Texture&& other) {
-        //   std::swap(name, other.name);
-        //   return *this;
-        // }
+        Texture& operator=(Texture&& other) {
+          if (this != &other) {
+            std::swap(name, other.name);
+            texture = other.texture;
+          }
+
+          return *this;
+        }
 
         virtual ~Texture() {
           if (name != 0) {
@@ -312,6 +324,18 @@ namespace emp {
         public:
         using Texture<TARGET>::target;
         using Texture<TARGET>::Texture;
+        using Texture<TARGET>::operator=;
+
+        void Data(GLint mipmap_level, Texture2DFormat internal_format,
+                  GLsizei width, GLsizei height, Texture2DFormat format,
+                  TextureType type, std::nullptr_t) {
+          Texture<TARGET>::Bind();
+          glTexImage2D(static_cast<GLenum>(target), mipmap_level,
+                       static_cast<GLint>(internal_format), width, height, 0,
+                       static_cast<GLint>(format), static_cast<GLenum>(type),
+                       nullptr);
+          utils::catchGlError();
+        }
 
         template <typename T>
         void Data(GLint mipmap_level, Texture2DFormat internal_format,
@@ -372,6 +396,58 @@ namespace emp {
           using value_type = std::decay_t<decltype(*std::begin(data))>;
           Data(mipmap_level, Texture2DFormatOf<value_type>(), width, height,
                data);
+        }
+        //////
+
+        template <typename T>
+        void SubData(GLint mipmap_level, GLint xoffset, GLint yoffset,
+                     GLsizei width, GLsizei height, Texture2DFormat format,
+                     TextureType type, T&& data) {
+          Texture<TARGET>::Bind();
+          glTexSubImage2D(static_cast<GLenum>(target), mipmap_level, xoffset,
+                          yoffset, width, height, static_cast<GLint>(format),
+                          static_cast<GLenum>(type), &data[0]);
+          utils::catchGlError();
+        }
+
+        template <typename T>
+        void SubData(GLint mipmap_level, GLint xoffset, GLint yoffset,
+                     GLsizei width, GLsizei height, Texture2DFormat format,
+                     T&& data) {
+          using value_type = std::decay_t<decltype(data[0])>;
+          SubData(mipmap_level, xoffset, yoffset, width, height, format,
+                  TextureTypeOf<value_type>(), std::forward<T>(data));
+        }
+
+        template <typename T>
+        void SubData(GLint xoffset, GLint yoffset, GLsizei width,
+                     GLsizei height, Texture2DFormat format, T&& data) {
+          SubData(0, xoffset, yoffset, width, height, format,
+                  std::forward<T>(data));
+        }
+
+        template <typename T>
+        void SubData(GLint xoffset, GLint yoffset, GLsizei width,
+                     GLsizei height, Texture2DFormat format, TextureType type,
+                     T&& data) {
+          SubData(0, xoffset, yoffset, width, height, format, type,
+                  std::forward<T>(data));
+        }
+
+        template <typename T>
+        void SubData(GLint xoffset, GLint yoffset, GLsizei width,
+                     GLsizei height, T&& data) {
+          using value_type = std::decay_t<decltype(*std::begin(data))>;
+          SubData(0, xoffset, yoffset, width, height,
+                  Texture2DFormatOf<value_type>(), data);
+        }
+
+        template <typename T>
+        void SubData(GLint mipmap_level, GLint xoffset, GLint yoffset,
+                     GLsizei width, GLsizei height, T&& data) {
+          using value_type = std::decay_t<decltype(*std::begin(data))>;
+          SubData(mipmap_level, xoffset, yoffset, width, height,
+                  Texture2DFormatOf<value_type>(), data);
         }
 
         void SetTextureWrap(TextureWrap s, TextureWrap t) {

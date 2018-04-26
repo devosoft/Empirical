@@ -8,6 +8,7 @@
 #include "flow.h"
 #include "math/LinAlg.h"
 #include "scenegraph/camera.h"
+#include "scenegraph/core.h"
 #include "tools/attrs.h"
 
 namespace emp {
@@ -18,8 +19,8 @@ namespace emp {
       math::Region<float, D> screenSpace;
       math::Vec<float, D> padding;
 
-      template <class S, class P = math::Vec2f>
-      constexpr Scale(S&& screen, P&& padding = {0, 0})
+      template <class S, class P = math::Vec<float, D>>
+      constexpr Scale(S&& screen, P&& padding = {0})
         : screenSpace(std::forward<S>(screen)),
           padding(std::forward<P>(padding)) {}
 
@@ -37,7 +38,7 @@ namespace emp {
 
         auto scale =
           MakeAttrs(XyzScaled([&dataSpace, &borderedSpace](const auto& p) {
-            return borderedSpace.rescale(Xyz::Get(p), dataSpace);
+            return borderedSpace.RescalePoint(Xyz::Get(p), dataSpace);
           }));
 
         auto map = [&scale](const auto& attrs) {

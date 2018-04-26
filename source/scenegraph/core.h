@@ -28,11 +28,10 @@ namespace emp {
     template <class C = Child>
     class Parent : public Child {
       private:
-      template <class... Tail>
-      void __impl_AttachAll(Tail&&...) {}
+      void __impl_AttachAll() {}
 
       template <class Head>
-      void __impl_attachAll(Head&& head) {
+      void __impl_AttachAll(Head&& head) {
         Attach(std::forward<Head>(head));
       }
 

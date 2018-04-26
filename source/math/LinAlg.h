@@ -155,6 +155,14 @@ namespace emp {
         }
       };
 
+      struct RightScalarDiv {
+        template <typename M, typename S>
+        constexpr auto operator()(std::size_t r, std::size_t c, M&& mat,
+                                  S&& s) const {
+          return std::forward<M>(mat)(r, c) / std::forward<S>(s);
+        }
+      };
+
       template <size_t I, class T>
       constexpr auto pass(T&& value) {
         return std::forward<T>(value);
@@ -172,12 +180,35 @@ namespace emp {
       protected:
       F* ref;
 
+      template <typename, size_t>
+      friend class Row;
+
       public:
-      constexpr Row(F* ref) : ref(ref) {}
-      constexpr Row(const Row&) = default;
-      constexpr Row(Row&&) = default;
-      Row& operator=(const Row&) = default;
-      Row& operator=(Row&&) = default;
+      constexpr explicit Row(F* ref) : ref(ref) {}
+      constexpr Row(const Row& other) : ref(other.ref) {}
+      constexpr Row(Row&& other) : ref(other.ref) { other.ref = nullptr; }
+
+      template <typename U>
+      Row& operator=(const Row<U, D>& other) {
+        if (ref != other.ref) {
+          for (std::size_t i = 0; i < rows * columns; ++i) {
+            ref[i] = other.ref[i];
+          }
+        }
+
+        return *this;
+      }
+
+      template <typename U>
+      Row& operator=(Row<U, D>&& other) {
+        if (ref != other.ref) {
+          for (std::size_t i = 0; i < rows * columns; ++i) {
+            ref[i] = std::move(other.ref[i]);
+          }
+        }
+
+        return *this;
+      }
 
       template <typename G>
       constexpr bool operator==(const Row<G, D>& other) const {
@@ -199,15 +230,19 @@ namespace emp {
         return true;
       }
 
-      constexpr decltype(auto) operator[](std::size_t i) const {
+      constexpr const std::remove_reference_t<F>& operator[](
+        std::size_t i) const {
         return ref[i];
       }
-      constexpr decltype(auto) operator()(std::size_t i) const {
+      constexpr const std::remove_reference_t<F>& operator()(
+        std::size_t i) const {
         return (*this)[i];
       }
 
-      F& operator[](std::size_t i) { return ref[i]; }
-      decltype(auto) operator()(std::size_t i) { return (*this)[i]; }
+      std::remove_reference_t<F>& operator[](std::size_t i) { return ref[i]; }
+      std::remove_reference_t<F>& operator()(std::size_t i) {
+        return (*this)[i];
+      }
 
       constexpr F* Data() noexcept { return ref; }
       constexpr const F* Data() const noexcept { return ref; }
@@ -236,17 +271,40 @@ namespace emp {
       protected:
       F* ref;
 
+      template <typename, size_t>
+      friend class Col;
+
       public:
-      constexpr Col(F* ref) : ref(ref) {}
-      constexpr Col(const Col&) = default;
-      constexpr Col(Col&&) = default;
-      Col& operator=(const Col&) = default;
-      Col& operator=(Col&&) = default;
+      constexpr explicit Col(F* ref) : ref(ref) {}
+      constexpr Col(const Col& other) : ref(other.ref) {}
+      constexpr Col(Col&& other) : ref(other.ref) { other.ref = nullptr; }
+
+      template <typename U>
+      Col& operator=(const Col<U, D>& other) {
+        if (ref != other.ref) {
+          for (std::size_t i = 0; i < rows * columns; ++i) {
+            ref[i * rows] = other.ref[i * rows];
+          }
+        }
+
+        return *this;
+      }
+
+      template <typename U>
+      Col& operator=(Col<U, D>&& other) {
+        if (ref != other.ref) {
+          for (std::size_t i = 0; i < rows * columns; ++i) {
+            ref[i * rows] = std::move(other.ref[i * rows]);
+          }
+        }
+
+        return *this;
+      }
 
       template <typename G>
       constexpr bool operator==(const Col<G, D>& other) const {
         for (std::size_t i = 0; i < rows * columns; ++i) {
-          if (ref[i] != other.ref[i]) {
+          if (ref[i * rows] != other.ref[i * rows]) {
             return false;
           }
         }
@@ -256,22 +314,22 @@ namespace emp {
       template <typename G>
       constexpr bool operator==(const Mat<G, D, 1>& other) const {
         for (std::size_t i = 0; i < rows * columns; ++i) {
-          if (ref[i] != other.data[i]) {
+          if (ref[i * rows] != other.data[i * rows]) {
             return false;
           }
         }
         return true;
       }
 
-      constexpr decltype(auto) operator[](std::size_t i) const {
+      constexpr std::remove_reference_t<F>& operator[](std::size_t i) const {
         return ref[i * rows];
       }
-      constexpr decltype(auto) operator()(std::size_t i) const {
+      constexpr std::remove_reference_t<F>& operator()(std::size_t i) const {
         return (*this)[i];
       }
 
-      F& operator[](std::size_t i) { return ref[i * rows]; }
-      decltype(auto) operator()(std::size_t i) { return (*this)[i]; }
+      const std::decay_t<F>& operator[](std::size_t i) { return ref[i * rows]; }
+      const std::decay_t<F>& operator()(std::size_t i) { return (*this)[i]; }
 
       constexpr F* Data() noexcept { return ref; }
       constexpr const F* Data() const noexcept { return ref; }
@@ -365,6 +423,20 @@ namespace emp {
       constexpr Mat(Mat&&) = default;
       Mat& operator=(const Mat&) = default;
       Mat& operator=(Mat&&) = default;
+
+      private:
+      template <typename F2>
+      struct __impl_ExplicitConvert {
+        constexpr F2 operator()(size_t r, size_t c, const Mat& mat) const {
+          return static_cast<F2>(mat(r, c));
+        }
+      };
+
+      public:
+      template <typename F2>
+      explicit operator Mat<F2, R, C>() const {
+        return Mat<F2, R, C>::gen(__impl_ExplicitConvert<F2>{}, *this);
+      }
 
       constexpr const F& x() const {
         static_assert((R >= 1 && C == 1) || (R == 1 && C >= 1),
@@ -597,8 +669,14 @@ namespace emp {
         return Apply(internal::MatrixSub{}, std::forward<M>(other));
       }
 
-      constexpr Mat& operator*=(const F& scalar) {
-        return Apply(internal::RightScalarMult{}, scalar);
+      template <typename S = F>
+      constexpr Mat& operator*=(S&& scalar) {
+        return Apply(internal::RightScalarMult{}, std::forward<S>(scalar));
+      }
+
+      template <typename S = F>
+      constexpr Mat& operator/=(S&& scalar) {
+        return Apply(internal::RightScalarDiv{}, std::forward<S>(scalar));
       }
 
       constexpr Mat operator-() const { return (-1) * (*this); }
@@ -632,7 +710,217 @@ namespace emp {
       constexpr auto begin() const { return std::begin(data); }
       constexpr auto end() { return std::end(data); }
       constexpr auto end() const { return std::end(data); }
+
+      template <typename N, size_t S>
+      constexpr auto WithRows(const N (&rows)[S]) const {
+        Mat<F, S, C> swizzle;
+        size_t r = 0;
+        for (auto& s : rows) {
+          swizzle.Row(r++) = Row(s);
+        }
+        return swizzle;
+      }
+
+      template <typename... U>
+      constexpr auto WithRows(U&&... args) const {
+        return WithRows({std ::forward<U>(args)...});
+      }
+
+      template <size_t... Idxs>
+      constexpr auto WithRowsIdxSeq(
+        const std::index_sequence<Idxs...>& = {}) const {
+        return WithRows(Idxs...);
+      }
+
+      template <typename N, size_t S>
+      constexpr auto WithCols(const N (&columns)[S]) const {
+        Mat<F, R, S> swizzle;
+        size_t c = 0;
+        for (auto& s : columns) {
+          swizzle.Col(c++) = Col(s);
+        }
+        return swizzle;
+      }
+
+      template <typename... U>
+      constexpr auto WithCols(U&&... args) const {
+        return WithCols({std ::forward<U>(args)...});
+      }
+
+      template <size_t... Idxs>
+      constexpr auto WithColsIdxSeq(
+        const std::index_sequence<Idxs...>& = {}) const {
+        return WithCols(Idxs...);
+      }
+
+      template <typename... U>
+      constexpr auto With(U&&... args) const {
+        return WithRows(std::forward<U>(args)...);
+      }
+
+      template <size_t N>
+      constexpr auto WithoutLastRows() const {
+        return WithRowsIdxSeq(std::make_index_sequence<R - N>{});
+      }
+
+      template <size_t N>
+      constexpr auto WithoutLastCols() const {
+        return WithColsIdxSeq(std::make_index_sequence<R - N>{});
+      }
+
+      constexpr auto WithoutLastRow() const { return WithoutLastRows<1>(); }
+
+      constexpr auto WithoutLastCols() const { return WithoutLastCols<1>(); }
+
+      constexpr auto DropDimension() const { return WithoutLastRow(); }
+
+      private:
+      template <typename... U, size_t... I>
+      constexpr auto __impl_AddRowAtEnd(const std::index_sequence<I...>&,
+                                        U&&... row) & {
+        return Mat<F, R + 1, C>{data[I]..., std::forward<U>(row)...};
+      }
+      template <typename... U, size_t... I>
+      constexpr auto __impl_AddRowAtEnd(const std::index_sequence<I...>&,
+                                        U&&... row) const& {
+        return Mat<F, R + 1, C>{data[I]..., std::forward<U>(row)...};
+      }
+
+      template <typename... U, size_t... I>
+      constexpr auto __impl_AddRowAtEnd(const std::index_sequence<I...>&,
+                                        U&&... row) && {
+        return Mat<F, R + 1, C>{std::move(data[I])..., std::forward<U>(row)...};
+      }
+      template <typename... U, size_t... I>
+      constexpr auto __impl_AddRowAtEnd(const std::index_sequence<I...>&,
+                                        U&&... row) const&& {
+        return Mat<F, R + 1, C>{std::move(data[I])..., std::forward<U>(row)...};
+      }
+
+      template <typename... U, size_t... I>
+      constexpr auto __impl_AddRowAtFront(const std::index_sequence<I...>&,
+                                          U&&... row) & {
+        return Mat<F, R + 1, C>{std::forward<U>(row)..., data[I]...};
+      }
+      template <typename... U, size_t... I>
+      constexpr auto __impl_AddRowAtFront(const std::index_sequence<I...>&,
+                                          U&&... row) const& {
+        return Mat<F, R + 1, C>{std::forward<U>(row)..., data[I]...};
+      }
+
+      template <typename... U, size_t... I>
+      constexpr auto __impl_AddRowAtFront(const std::index_sequence<I...>&,
+                                          U&&... row) && {
+        return Mat<F, R + 1, C>{std::forward<U>(row)..., std::move(data[I])...};
+      }
+      template <typename... U, size_t... I>
+      constexpr auto __impl_AddRowAtFront(const std::index_sequence<I...>&,
+                                          U&&... row) const&& {
+        return Mat<F, R + 1, C>{std::forward<U>(row)..., std::move(data[I])...};
+      }
+
+      public:
+      template <typename... U>
+      constexpr auto AddRowAtEnd(U&&... row) & {
+        static_assert(sizeof...(U) == C,
+                      "Added row must match the dimension of the matrix");
+
+        return __impl_AddRowAtEnd(std::make_index_sequence<R * C>{},
+                                  std::forward<U>(row)...);
+      }
+      template <typename... U>
+      constexpr auto AddRowAtEnd(U&&... row) const& {
+        static_assert(sizeof...(U) == C,
+                      "Added row must match the dimension of the matrix");
+
+        return __impl_AddRowAtEnd(std::make_index_sequence<R * C>{},
+                                  std::forward<U>(row)...);
+      }
+      template <typename... U>
+      constexpr auto AddRowAtEnd(U&&... row) && {
+        static_assert(sizeof...(U) == C,
+                      "Added row must match the dimension of the matrix");
+
+        return __impl_AddRowAtEnd(std::make_index_sequence<R * C>{},
+                                  std::forward<U>(row)...);
+      }
+      template <typename... U>
+      constexpr auto AddRowAtEnd(U&&... row) const&& {
+        return AddRowAtEnd(std::forward<U>(row)...);
+      }
+
+      template <typename... U>
+      constexpr auto AddRow(U&&... row) & {
+        return AddRowAtEnd(std::forward<U>(row)...);
+      }
+      template <typename... U>
+      constexpr auto AddRow(U&&... row) const& {
+        return AddRowAtEnd(std::forward<U>(row)...);
+      }
+      template <typename... U>
+      constexpr auto AddRow(U&&... row) && {
+        return AddRowAtEnd(std::forward<U>(row)...);
+      }
+      template <typename... U>
+      constexpr auto AddRow(U&&... row) const&& {
+        return AddRowAtEnd(std::forward<U>(row)...);
+      }
+
+      template <typename... U>
+      constexpr auto AddRowAtFront(U&&... row) & {
+        static_assert(sizeof...(U) == C,
+                      "Added row must match the dimension of the matrix");
+
+        return __impl_AddRowAtFrom(std::make_index_sequence<R * C>{},
+                                   std::forward<U>(row)...);
+      }
+      template <typename... U>
+      constexpr auto AddRowAtFront(U&&... row) const& {
+        static_assert(sizeof...(U) == C,
+                      "Added row must match the dimension of the matrix");
+
+        return __impl_AddRowAtFrom(std::make_index_sequence<R * C>{},
+                                   std::forward<U>(row)...);
+      }
+      template <typename... U>
+      constexpr auto AddRowAtFront(U&&... row) && {
+        static_assert(sizeof...(U) == C,
+                      "Added row must match the dimension of the matrix");
+
+        return __impl_AddRowAtFrom(std::make_index_sequence<R * C>{},
+                                   std::forward<U>(row)...);
+      }
+      template <typename... U>
+      constexpr auto AddRowAtFront(U&&... row) const&& {
+        static_assert(sizeof...(U) == C,
+                      "Added row must match the dimension of the matrix");
+
+        return __impl_AddRowAtFrom(std::make_index_sequence<R * C>{},
+                                   std::forward<U>(row)...);
+      }
     };
+
+    template <typename F, size_t R, size_t C>
+    constexpr const F& MatrixGetter(size_t r, size_t c,
+                                    const Mat<F, R, C>& mat) {
+      return mat(r, c);
+    }
+
+    template <typename F, size_t R, size_t C>
+    constexpr F& MatrixGetter(size_t r, size_t c, Mat<F, R, C>& mat) {
+      return mat(r, c);
+    }
+
+    template <typename F, size_t R, size_t C>
+    constexpr F&& MatrixGetter(size_t r, size_t c, Mat<F, R, C>&& mat) {
+      return mat(r, c);
+    }
+
+    template <typename F, size_t R, size_t C>
+    constexpr const F&& MatrixGetter(size_t r, size_t c,
+                                     const Mat<F, R, C>&& mat) {
+      return mat(r, c);
+    }
 
     template <typename F, std::size_t R>
     std::ostream& operator<<(std::ostream& out, const Mat<F, R, 1>& mat) {
@@ -747,6 +1035,12 @@ namespace emp {
     constexpr auto operator*(const F1& s, const Mat<F2, R, C>& mat) {
       return Mat<decltype(std::declval<F1>() * std::declval<F2>()), R, C>::From(
         internal::LeftScalarMult{}, mat, s);
+    }
+
+    template <typename F1, typename F2, std::size_t R, std::size_t C>
+    constexpr auto operator/(const Mat<F1, R, C>& mat, const F2& s) {
+      return Mat<decltype(std::declval<F1>() / std::declval<F2>()), R, C>::From(
+        internal::RightScalarDiv{}, mat, s);
     }
 
     template <typename F, size_t D>
@@ -1026,7 +1320,7 @@ namespace emp {
 
       constexpr auto MagSq() const { return x * x + y * y + z * z + w * w; }
 
-      constexpr Mat<T, 4, 4> rotMat() const {
+      constexpr Mat<T, 4, 4> RotMat() const {
         return {
           1 - 2 * (y * y + z * z),
           2 * (x * y - w * z),

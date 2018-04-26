@@ -14,77 +14,30 @@
 #include "scenegraph/core.h"
 #include "tools/attrs.h"
 
+#include "tools/resources.h"
+
 namespace emp {
   namespace plot {
-    namespace __shader {
-      using namespace opengl;
-      constexpr auto VertexShaderSource =
-#ifdef EMSCRIPTEN
-        "precision mediump float;"
-#endif
-        R"glsl(
-                attribute vec3 position;
-                uniform vec4 color;
-
-                uniform mat4 model;
-                uniform mat4 view;
-                uniform mat4 projection;
-
-                varying vec4 fcolor;
-
-                void main()
-                {
-                    gl_Position = projection * view * model * vec4(position, 1.0);
-                    fcolor = color;
-                }
-            )glsl";
-
-      constexpr auto FragmentShaderSource =
-#ifdef EMSCRIPTEN
-        "precision mediump float;"
-#endif
-        R"glsl(
-                  varying vec4 fcolor;
-
-                  void main()
-                  {
-                      gl_FragColor = fcolor;
-                  }
-              )glsl";
-
-      struct Shader {
-        ShaderProgram program;
-        Uniform color;
-        Uniform model;
-        Uniform view;
-        Uniform projection;
-        VertexArrayObject vao;
-
-        Shader(GLCanvas& canvas)
-          : program(canvas.makeShaderProgram(VertexShaderSource,
-                                             FragmentShaderSource)),
-            color(program.uniform("color")),
-            model(program.uniform("model")),
-            view(program.uniform("view")),
-            projection(program.uniform("projection")),
-            vao(canvas.makeVAO()) {
-          program.use();
-        }
-      };
-    }  // namespace __shader
-
     class Scatter : public scenegraph::Child, public Joinable<Scatter> {
       private:
-      __shader::Shader shader;
+      ResourceRef<opengl::ShaderProgram> shader;
+      opengl::VertexArrayObject vao;
       opengl::BufferObject<opengl::BufferType::Array> verticesBuffer;
       opengl::BufferObject<opengl::BufferType::ElementArray> trianglesBuffer;
 
       size_t trianglesCount;
       std::vector<std::tuple<math::Mat4x4f, opengl::Color>> points;
 
+      // opengl::Uniform color;
+      // opengl::Uniform model;
+      // opengl::Uniform projection;
+      // opengl::Uniform view;
+
       public:
-      Scatter(emp::opengl::GLCanvas& canvas, size_t vertexCount = 4)
-        : shader(canvas),
+      template <typename S = std::string>
+      Scatter(emp::opengl::GLCanvas& canvas, size_t vertexCount = 4,
+              S&& shader = "DefaultSolidColor")
+        : shader(std::forward<S>(shader)),
           verticesBuffer(canvas.makeBuffer<opengl::BufferType::Array>()),
           trianglesBuffer(
             canvas.makeBuffer<opengl::BufferType::ElementArray>()) {
@@ -108,10 +61,15 @@ namespace emp {
           triangles.push_back(i + 1);
           triangles.push_back(((i + 1) % vertexCount) + 1);
         }
-        shader.vao.bind();
         verticesBuffer.init(vertices, BufferUsage::StaticDraw);
-        shader.vao.attr(shader.program.attribute<Vec3f>("position"));
         trianglesBuffer.init(triangles, BufferUsage::StaticDraw);
+
+        this->shader.OnSet([this](auto&) {
+          vao.bind();
+          verticesBuffer.bind();
+          trianglesBuffer.bind();
+          vao.attr(this->shader->Attribute<Vec3f>("position"));
+        });
       }
 
       virtual ~Scatter() {}
@@ -121,18 +79,15 @@ namespace emp {
         using namespace emp::math;
         using namespace emp::opengl;
 
-        shader.program.use();
-        shader.vao.bind();
-        verticesBuffer.bind();
-        trianglesBuffer.bind();
+        shader->Use();
+        vao.bind();
 
-        shader.projection = settings.projection;
-        shader.view = settings.view;
+        shader->Uniform("projection") = settings.projection;
+        shader->Uniform("view") = settings.view;
 
         for (auto& pt : points) {
-          Mat4x4f model;
-          std::tie(model, shader.color) = pt;
-          shader.model = transform * model;
+          shader->Uniform("model") = transform * std::get<0>(pt);
+          shader->Uniform("color") = std::get<1>(pt);
 
           glDrawElements(GL_TRIANGLES, trianglesCount, GL_UNSIGNED_INT, 0);
         }

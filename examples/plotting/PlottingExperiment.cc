@@ -11,6 +11,7 @@
 
 #include "math/LinAlg.h"
 #include "math/consts.h"
+#include "opengl/defaultShaders.h"
 #include "opengl/glcanvas.h"
 #include "plot/line.h"
 #include "plot/scales.h"
@@ -19,6 +20,7 @@
 #include "scenegraph/core.h"
 #include "tools/attrs.h"
 // #include "scenegraph/shapes.h"
+#include "scenegraph/shapes.h"
 #include "scenegraph/transform.h"
 
 #include <chrono>
@@ -31,45 +33,47 @@ int main(int argc, char* argv[]) {
   using namespace emp::plot;
   using namespace emp::plot::attributes;
 
-  GLCanvas canvas;
+  using namespace emp::scenegraph::shapes;
 
-  Region3f region{{-100, -100, -100}, {100, 100, 100}};
+  GLCanvas canvas;
+  shaders::LoadShaders(canvas);
+
+  Region3f region = SetAspectRatioMax(Region2f{{-100, -100}, {100, 100}},
+                                      AspectRatio(canvas.getRegion()))
+                      .AddDimension(-100, 100);
+
   Stage stage(region);
   auto root = stage.MakeRoot<Group>();
-  auto line{std::make_shared<Line>(canvas)};
+  // auto line{std::make_shared<Line>(canvas)};
   auto scatter{std::make_shared<Scatter>(canvas, 6)};
-  auto scale{std::make_shared<Scale<2>>(canvas.getRegion())};
-  root->AttachAll(scatter, line);
+  auto scale{std::make_shared<Scale<3>>(region)};
+
+  auto r = std::make_shared<FilledRectangle>(canvas, Region2f{{0, 0}, {8, 8}});
+  root->AttachAll(r, scatter);
 
   std::vector<Vec2f> data;
 
-  auto flow = (Xyz([](auto& p) { return p; }) + Stroke(Color::red()) +
+  auto flow = (Xyz([](auto& p) { return p.AddRow(0); }) + Stroke(Color::red()) +
                StrokeWeight(2) + Fill(Color::blue()) + PointSize(10)) >>
-              scale >> scatter >> line;
+              scale >> scatter /*>> line*/;
 
-  PerspectiveCamera camera(consts::pi<float> / 4,
-                           canvas.getWidth() / (float)canvas.getHeight(), 0.1,
-                           100);
+  // PerspectiveCamera camera(consts::pi<float> / 4,
+  //                          canvas.getWidth() / (float)canvas.getHeight(),
+  //                          0.1, 100);
 
+  OrthoCamera camera(region);
   SimpleEye eye;
-  eye.LookAt({40, 30, 30}, {0, 0, 0}, {0, 0, -1});
+  // eye.LookAt({40, 30, 30}, {0, 0, 0}, {0, 0, -1});
 
-  canvas.on_resize_event.bind(
-    [&camera, &scale](auto& canvas, auto width, auto height) {
-      // camera.setRegion(canvas.getRegion());
-      // scale->screenSpace = canvas.getRegion();
-      std::cout << width << " x " << height << std::endl;
-    });
-
-  auto random = [] {
-    using rand_t = decltype(rand());
-    using limits_t = std::numeric_limits<rand_t>;
-    return (rand() + limits_t::min()) /
-           (limits_t::max() - (float)limits_t::lowest());
-  };
+  // canvas.on_resize_event.bind(
+  //   [&camera, &scale](auto& canvas, auto width, auto height) {
+  //     // camera.setRegion(canvas.getRegion());
+  //     // scale->screenSpace = canvas.getRegion();
+  //     std::cout << width << " x " << height << std::endl;
+  //   });
 
   for (int i = 0; i < 100; ++i) {
-    data.emplace_back(random(), random());
+    data.emplace_back(i * 100, i * 100);
   }
 
   flow.Apply(data.begin(), data.end());

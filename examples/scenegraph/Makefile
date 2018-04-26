@@ -12,7 +12,7 @@ CXX_web := emcc
 CXX_native := clang++
 # CXX_native := g++
 
-OFLAGS_native_opt := $(GLFW_LIBS) -O3 -DNDEBUG
+OFLAGS_native_opt := $(GLFW_LIBS)  -DNDEBUG
 OFLAGS_native_debug := $(GLFW_LIBS) -g -pedantic -DEMP_TRACK_MEM  -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual
 OFLAGS_native_grumpy := $(GLFW_LIBS) -g -pedantic -DEMP_TRACK_MEM  -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
 
@@ -23,8 +23,8 @@ CFLAGS_native_opt := $(CFLAGS_all) $(OFLAGS_native_opt)
 CFLAGS_native_debug := $(CFLAGS_all) $(OFLAGS_native_debug)
 CFLAGS_native_grumpy := $(CFLAGS_all) $(OFLAGS_native_grumpy)
 
-CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) -preload-file Assets/Roboto -s USE_FREETYPE=1 --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['Pointer_stringify']" -s NO_EXIT_RUNTIME=1 --source-map-base "http://localhost:8080/"
-CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) -preload-file Assets/Roboto -s USE_FREETYPE=1 --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['Pointer_stringify']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --preload-file Assets -s USE_FREETYPE=1 --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['Pointer_stringify']" -s NO_EXIT_RUNTIME=1 --source-map-base "http://localhost:8080/"
+CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) -s USE_FREETYPE=1 --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['Pointer_stringify']" -s NO_EXIT_RUNTIME=1
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 JS_TARGETS := Scenegraph.js

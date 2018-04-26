@@ -11,14 +11,19 @@
 
 #include "math/LinAlg.h"
 #include "math/consts.h"
+#include "opengl/defaultShaders.h"
 #include "opengl/glcanvas.h"
+#include "opengl/texture.h"
 #include "scenegraph/camera.h"
 #include "scenegraph/core.h"
+#include "scenegraph/freetype.h"
 #include "scenegraph/shapes.h"
 #include "scenegraph/transform.h"
 
 #include <chrono>
 #include <cstdlib>
+
+emp::scenegraph::FreeType ft;
 
 int main(int argc, char* argv[]) {
   using namespace emp::opengl;
@@ -27,51 +32,58 @@ int main(int argc, char* argv[]) {
   using namespace emp::scenegraph::shapes;
 
   GLCanvas canvas;
+  shaders::LoadShaders(canvas);
 
-  Region3f region{{-100, -100, -100}, {100, 100, 100}};
+  emp::Resources<FontFace>::Add("Roboto", [] {
+    auto font = ft.load("Assets/RobotoMono-Regular.ttf");
+
+    font.SetPixelSize(0, 64);
+    font.BulidAsciiAtlas();
+    return font;
+  });
+
+  Region3f region = SetAspectRatioMax(Region2f{{-100, -100}, {100, 100}},
+                                      AspectRatio(canvas.getRegion()))
+                      .AddDimension(-100, 100);
 
   Stage stage(region);
+  auto root = stage.MakeRoot<Group>();
 
-  // stage.MakeRoot<Group>()->Attach(
-  //   std::make_shared<Transform<Rectangle>>(canvas, 1.f, Color::red()));
+  constexpr auto width = 64;
+  constexpr auto height = 64;
+  std::vector<uint8_t> pixels(width * height * 4);
+  for (int i = pixels.size() - 1; i >= 0; --i) {
+    pixels[i] = 255 / (i % 20 + 1);
+  }
 
-  stage.MakeRoot<Group>()->Fill(100, [&canvas](auto...) {
-    auto r =
-      std::make_shared<Transform<Rectangle>>(canvas, 5.f, Color::red(1, 0.5));
+  auto texture = std::make_shared<Texture2d>();
+  texture->Data(Texture2DFormat::RGBA, width, height, pixels);
+  texture->SetMinFilter(TextureMinFilter::Linear);
+  texture->SetMagFilter(TextureMagFilter::Linear);
 
-    r->translate(rand() % 50 - 25, rand() % 50 - 25, 0);
+  root->Attach(
+    std::make_shared<TextureView>(canvas, Region2f{{0, 0}, {8, 8}}, texture));
 
-    return r;
-  });
+  root->Attach(std::make_shared<Text>(canvas, "Hello World", "Roboto"));
 
   OrthoCamera camera(region);
 
   // PerspectiveCamera camera(consts::pi<float> / 4,
   //                          canvas.getWidth() / (float)canvas.getHeight(),
-  //                          0.1, 100);
+  //                          0.1, 1000);
 
   SimpleEye eye;
-  eye.LookAt({40, 30, 30}, {0, 0, 0}, {0, 0, -1});
+  // OrbitController orbit({40, 30, 30});
   // eye.LookAt({10, 10, 10}, {0, 1, 0}, {0, 0, 0});
 
-  // canvas.on_mouse_event.bind(
-  //   [&camera, &depth, &eye](auto&, const MouseEvent& event) {
-  //     // if (event.button.Clicked()) {
-  //     //   if (event.button.button == MouseEvent::Button::Left) {
-  //     //     camera.next();
-  //     //   } else {
-  //     //     ++depth;
-  //     //     eye.LookAt({0, 0, depth}, {0, 1, 0}, {0, 0, 0});
-  //     //   }
-  //     // }
-  //   });
-
   canvas.runForever([&](auto&&) {
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
+    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // orbit.Apply(eye);
     stage.Render(camera, eye);
   });
+
+  // glDeleteTextures(1, &name);
 
   return 0;
 }
