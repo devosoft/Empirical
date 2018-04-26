@@ -58,7 +58,7 @@ namespace emp {
 
     DataFile(const DataFile &) = default;
     DataFile(DataFile &&) = default;
-    ~DataFile() { os->flush(); }
+    virtual ~DataFile() { os->flush(); }
 
     DataFile & operator=(const DataFile &) = default;
     DataFile & operator=(DataFile &&) = default;
