@@ -1055,7 +1055,13 @@ namespace emp {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       offspring_ready_sig.Trigger(*new_org);
       const OrgPosition pos = fun_add_birth(new_org, parent_pos);
-      if (pos.IsActive()) org_placement_sig.Trigger(pos.GetIndex());
+      if (pos.IsActive()) {
+        // If organism was placed right into the active population, trigger placement signal.
+        org_placement_sig.Trigger(pos.GetIndex());
+      } else if (!pos.IsValid()) {
+        // Organism failed to be placed in the population.  Delete it.
+        new_org.Delete();
+      }
       // SetupOrg(*new_org, &callbacks, pos);
     }
   }
