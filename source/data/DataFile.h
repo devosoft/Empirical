@@ -17,6 +17,7 @@
 
 #include "../base/assert.h"
 #include "../base/vector.h"
+#include "../meta/type_traits.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/string_utils.h"
 
@@ -131,7 +132,7 @@ namespace emp {
     }
 
     /// Run all of the functions and print the results as a new line in the file
-    void Update() {
+    virtual void Update() {
       *os << line_begin;
       for (size_t i = 0; i < funs.size(); i++) {
         if (i > 0) *os << line_spacer;
@@ -268,6 +269,176 @@ namespace emp {
     }
   };
 
+
+  template <typename container_t>
+  class ContainerDataFile;
+
+  // This handles all possible forms of pointers to containers.
+  namespace internal {
+
+    template <typename container_t>
+    struct update_impl {
+      void Update(ContainerDataFile<container_t> * df) {
+        using data_t = typename container_t::value_type;
+        for (const data_t & d : df->GetCurrentRows()) {
+          df->OutputLine(d);
+        }        
+      }
+    };
+
+    template <typename container_t>
+    struct update_impl<Ptr<container_t>> {
+      void Update(ContainerDataFile<Ptr<container_t>> * df) {
+        using data_t = typename remove_ptr_type<container_t>::type::value_type;
+
+        for (const data_t & d : *(df->GetCurrentRows())) {
+          df->OutputLine(d);
+        }
+      }
+    };
+
+    template <typename container_t>
+    struct update_impl<container_t*> {
+      void Update(ContainerDataFile<container_t*> * df) {
+        using data_t = typename remove_ptr_type<container_t>::type::value_type;
+
+        for (const data_t & d : *(df->GetCurrentRows())) {
+          df->OutputLine(d);
+        }
+      }
+    };
+
+  }
+
+  /// Sometimes you may want a data file where a set
+  /// of functions is run on every item in a container
+  /// every time you write to the file. ContainerDataFiles do that.
+  ///
+  /// Note: CONTAINER type can be a pointer to a container and the
+  /// datafile will handle derefeferencing it appropriately.
+  
+  template <typename CONTAINER>
+  class ContainerDataFile : public DataFile {
+  private:
+
+    // The container type cannot be a reference
+    using container_t = typename std::remove_reference<CONTAINER>::type; 
+    using raw_container_t = typename remove_ptr_type<container_t>::type;
+    using data_t = typename raw_container_t::value_type;
+    using container_fun_t = void(std::ostream &, data_t);
+    using fun_update_container_t = std::function<container_t(void)>;
+
+    fun_update_container_t update_container_fun;
+
+    container_t current_rows;
+    FunctionSet<container_fun_t> container_funs;
+    emp::vector<std::string> container_keys;
+    emp::vector<std::string> container_descs;
+
+  public:
+
+    ContainerDataFile(const std::string & filename,
+             const std::string & b="", const std::string & s=",", const std::string & e="\n")
+             : DataFile(filename, b, s, e), update_container_fun(), current_rows() {;}
+
+    ~ContainerDataFile() {;}
+
+    /// Tell this file what function to run to update the contents of the
+    /// container that data is being calculated on.
+    void SetUpdateContainerFun(const fun_update_container_t fun) {
+      update_container_fun = fun;
+    }
+
+    /// Print a header containing the name of each column
+    void PrintHeaderKeys() {
+      *os << line_begin;
+      for (size_t i = 0; i < keys.size(); i++) {
+        if (i > 0) *os << line_spacer;
+        *os << keys[i];
+      }
+      for (size_t i = 0; i < container_keys.size(); i++) {
+        if (i > 0 || keys.size() > 0) *os << line_spacer;
+        *os << container_keys[i];
+      }
+      *os << line_end;
+      os->flush();
+    }
+
+    /// Print a header containing comments describing all of the columns
+    void PrintHeaderComment(const std::string & cstart = "# ") {
+      for (size_t i = 0; i < keys.size(); i++) {
+        *os << cstart << i << ": " << descs[i] << " (" << keys[i] << ")" << std::endl;
+      }
+      for (size_t i = 0; i < container_keys.size(); i++) {
+        *os << cstart << i+keys.size() << ": " << container_descs[i] << " (" << container_keys[i] << ")" << std::endl;
+      }
+
+      os->flush();
+    }
+
+    const container_t GetCurrentRows() const { return current_rows; }
+
+    void OutputLine(const data_t d) {
+      *os << line_begin;
+        for (size_t i = 0; i < funs.size(); i++) {
+          if (i > 0) *os << line_spacer;
+          funs[i](*os);
+        }
+
+        for (size_t i = 0; i < container_funs.size(); i++) {
+          if (i > 0 || keys.size() > 0) *os << line_spacer;
+          container_funs[i](*os, d);
+        }
+      *os << line_end;  
+    }
+
+    /// Run all of the functions and print the results as a new line in the file
+    void Update() override {
+      emp_assert(update_container_fun);
+      current_rows = update_container_fun();
+      internal::update_impl<container_t>().Update(this);
+      os->flush();
+    }
+
+    /// Update the file with an additional set of lines.
+    void Update(size_t update) {
+      if (timing_fun(update)) Update();
+    }
+
+    /// If a function takes an ostream, pass in the correct one.
+    /// Generic function for adding a column to the DataFile. In practice, you probably
+    /// want to call one of the more specific ones.
+    size_t Add(const std::function<void(std::ostream &, data_t)> & fun, const std::string & key, const std::string & desc) {
+      size_t id = container_funs.GetSize();
+      container_funs.Add(fun);
+      container_keys.emplace_back(key);
+      container_descs.emplace_back(desc);
+      return id;
+    }
+
+    /// Add a function that returns a value to be printed to the file.
+    template <typename T>
+    size_t AddContainerFun(const std::function<T(const data_t)> & fun, const std::string & key="", const std::string & desc="") {
+      std::function<container_fun_t> in_fun = [fun](std::ostream & os, const data_t data){ os << fun(data); };
+      return Add(in_fun, key, desc);
+    }
+
+
+  };
+
+  /// Convenience function for building a container data file.
+  /// @param fun is the function to call to update the container
+  template <typename CONTAINER>
+  ContainerDataFile<CONTAINER> MakeContainerDataFile(std::function<CONTAINER(void)> fun, 
+                                                    const std::string & filename,
+                                                    const std::string & b="",
+                                                    const std::string & s=",",
+                                                    const std::string & e="\n") {
+    ContainerDataFile<CONTAINER> dfile(filename, b, s, e);
+    dfile.SetUpdateContainerFun(fun);
+    return dfile;
+  }
+  
 }
 
 #endif
