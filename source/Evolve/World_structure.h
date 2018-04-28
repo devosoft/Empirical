@@ -226,6 +226,12 @@ namespace emp {
       is_setup = true;
     }
 
+    void Clear() {
+      nearest_id.resize(0);
+      distance.resize(0);
+      is_setup = false;
+    }
+
     size_t FindKill() {
       if (!is_setup) Setup();  // The first time we run out of space and need to kill, setup structure!
       if (distance.size() == 0) return ID_NONE;
