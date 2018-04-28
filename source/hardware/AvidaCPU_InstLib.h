@@ -93,6 +93,13 @@ namespace emp {
       else hw.regs[inst.args[0]]--;
     }
 
+    // static void Inst_ForInput(hardware_t & hw, const inst_t & inst) {  // Loops over inputs.
+    //   // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
+    //   if (hw.UpdateScope(inst.args[1], ScopeType::LOOP) == false) return;
+    //   if (hw.regs[inst.args[0]] == 0.0) hw.BypassScope(inst.args[1]);   // If test fails, move to scope end.
+    //   else hw.regs[inst.args[0]]--;
+    // }
+
     static void Inst_Break(hardware_t & hw, const inst_t & inst) { hw.BypassScope(inst.args[0]); }
     static void Inst_Scope(hardware_t & hw, const inst_t & inst) { hw.UpdateScope(inst.args[0]); }
 
@@ -138,6 +145,12 @@ namespace emp {
       hw.regs[inst.args[1]] = hw.regs[inst.args[0]];
     }
 
+    static void Inst_Dereference(hardware_t & hw, const inst_t & inst) {
+      if (hw.regs[inst.args[0]] >= 0 and hw.regs[inst.args[0]] < hw.regs.size()) {
+        hw.regs[inst.args[1]] = hw.regs[hw.regs[inst.args[0]]];
+      }
+    }    
+
     static void Inst_ScopeReg(hardware_t & hw, const inst_t & inst) {
       hw.reg_stack.emplace_back(hw.CurScope(), inst.args[0], hw.regs[inst.args[0]]);
     }
@@ -170,6 +183,7 @@ namespace emp {
         inst_lib.AddInst("Input", Inst_Input, 2, "Pull next value from input Arg1 into reg Arg2");
         inst_lib.AddInst("Output", Inst_Output, 2, "Push reg Arg1 into output Arg2");
         inst_lib.AddInst("CopyVal", Inst_CopyVal, 2, "Copy reg Arg1 into reg Arg2");
+        inst_lib.AddInst("Dereference", Inst_Dereference, 2, "Copy the contents of the register id stored in reg Arg1 into reg Arg2");
         inst_lib.AddInst("ScopeReg", Inst_ScopeReg, 1, "Backup reg Arg1; restore at end of scope");
 
         for (size_t i = 0; i < hardware_t::CPU_SIZE; i++) {
