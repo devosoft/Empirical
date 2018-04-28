@@ -190,11 +190,12 @@ namespace emp {
     // == Signals ==
     SignalControl control;  // Setup the world to control various signals.
     Signal<void(size_t)> before_repro_sig;    ///< Trigger signal before organism gives birth.
-    Signal<void(ORG &)> offspring_ready_sig;  ///< Trigger signal when offspring organism is built.
-    Signal<void(ORG &)> inject_ready_sig;     ///< Trigger when external organism is ready to inject.
+    Signal<void(ORG &)>  offspring_ready_sig; ///< Trigger signal when offspring organism is built.
+    Signal<void(ORG &)>  inject_ready_sig;    ///< Trigger when external organism is ready to inject.
     Signal<void(size_t)> org_placement_sig;   ///< Trigger when any organism is placed into world.
     Signal<void(size_t)> on_update_sig;       ///< Trigger at the beginning of Update()
     Signal<void(size_t)> on_death_sig;        ///< Trigger when any organism dies.
+    Signal<void()>       world_destruct_sig;  ///< Trigger in the World destructor.
 
     /// Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
@@ -227,6 +228,7 @@ namespace emp {
       , org_placement_sig(to_string(name,"::org-placement"), control)
       , on_update_sig(to_string(name,"::on-update"), control)
       , on_death_sig(to_string(name,"::on-death"), control)
+      , world_destruct_sig(to_string(name,"::wolrd-destruct"), control)
     {
       if (gen_random) NewRandom();
       SetDefaultFitFun<this_t, ORG>(*this);
@@ -238,6 +240,7 @@ namespace emp {
     World(Random & rnd, std::string _name="") : World(_name,false) { random_ptr = &rnd; }
 
     ~World() {
+      world_destruct_sig.Trigger();
       Clear();
       if (random_owner) random_ptr.Delete();
       if (data_node_fitness) data_node_fitness.Delete();
@@ -498,6 +501,11 @@ namespace emp {
     /// Return:   Key value needed to make future modifications.
     SignalKey OnOrgDeath(const std::function<void(size_t)> & fun) { return on_death_sig.AddAction(fun); }
 
+    /// Provide a function for World to call at the start of its destructor (for additional cleanup).
+    /// Trigger:  Destructor has begun to execture
+    /// Argument: None
+    /// Return:   Key value needed to make future modifications.
+    SignalKey OnWorldDestruct(const std::function<void()> & fun) { return world_destruct_sig.AddAction(fun); }
 
     // --- MANAGE ATTRIBUTES ---
 
