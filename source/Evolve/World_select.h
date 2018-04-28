@@ -72,6 +72,32 @@ namespace emp {
     }
   }
 
+
+  /// ==RANDOM== Selection picks an organism with uniform-random probability form the populaiton.
+  /// This variant is designed to be more efficient if the world is sparsely populated,
+  /// at the cost of being less efficient if the world is densely populated.
+  /// @param world The emp::World object with the organisms to be selected.
+  /// @param r_count How many distinct organisms should be chosen?
+  /// @param copy_count How many copies should be made of each chosen organism?
+  template<typename ORG>
+    void RandomSelectSparse(World<ORG> & world, size_t r_count=1, size_t copy_count=1) {
+    emp_assert(r_count > 0, r_count);
+    emp_assert(copy_count > 0);
+
+    Random & random = world.GetRandom();
+    emp::vector<size_t> valid_orgs = world.GetValidOrgIDs();
+    emp_assert(valid_orgs.size() > 0 && "There are no organisms in the population to select!");
+    // Pick r_count organisms;
+    for (size_t i = 0; i < r_count; i++) {
+      // Choose an organism at random
+      size_t id = valid_orgs[random.GetUInt(valid_orgs.size())];
+
+      // Make copy_count copies.
+      world.DoBirth( world.GetGenomeAt(id), id, copy_count);
+    }
+  }
+
+
   /// ==TOURNAMENT== Selection creates a tournament with a random sub-set of organisms,
   /// finds the one with the highest fitness, and moves it to the next generation.
   /// User provides the world (with a fitness function), the tournament size, and
