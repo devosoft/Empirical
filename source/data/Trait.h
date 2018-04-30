@@ -173,6 +173,14 @@ namespace emp {
       }
       return id;
     }
+
+    emp::vector<double> CalcOffsets(target_t & target1, target_t & target2) {
+      emp::vector<double offsets(traits.size());
+      for (size_t i = 0; i < traits.size(); i++) {
+        offsets[i] = traits[i]->EvalBin(target2, bin_counts[i]) - traits[i]->EvalBin(target1, bin_counts[i]);
+      }
+      return offsets;
+    }
   };
 
 }
