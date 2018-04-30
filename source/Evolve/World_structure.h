@@ -179,7 +179,7 @@ namespace emp {
   template <typename ORG>
   struct World_MinDistInfo {
     static constexpr size_t ID_NONE = (size_t) -1;                         ///< ID for organism does not exist.
-    static constexpr double MAX_DIST = std::numeric_limits<DOUBLE>::max(); ///< Highest distance for init.
+    static constexpr double MAX_DIST = std::numeric_limits<double>::max(); ///< Highest distance for init.
 
     emp::vector<size_t> nearest_id;                 ///< For each individual, whom are they closest to?
     emp::vector<double> distance;                   ///< And what is their distance?
@@ -279,11 +279,14 @@ namespace emp {
       double dist = 0.0;
       for (double offset : offsets) dist += offset * offset;
       return dist;
-    }
+    };
 
     // Build a pointer to the current information (and make sure it's deleted later)
-    Ptr<World_MinDistInfo> info_ptr = NewPtr<World_MinDistInfo>(world, dist_fun);
+    Ptr<World_MinDistInfo<ORG>> info_ptr = NewPtr<World_MinDistInfo<ORG>>(world, dist_fun);
     world.OnWorldDestruct([info_ptr](){ info_ptr.Delete(); });
+
+    // Make sure to update info whenever a new org is placed into the population.
+    world.OnOrganismPlacement( [info_ptr](size_t pos){ info_ptr->Update(pos); } );
 
     // -- Setup functions --
     // Inject into the appropriate positon based on phenotype.  Note that an inject will fail
@@ -291,28 +294,17 @@ namespace emp {
     // ensure placement.
     world.SetAddInjectFun( [&world, traits, world_size, info_ptr](Ptr<ORG> new_org) {
       size_t pos = info_ptr->GetEmptyPos(world_size);
-
-      // Determine the position that this phenotype fits in.
-      double org_fitness = world.CalcFitnessOrg(*new_org);
-      (void) org_fitness;
-
-      // @CAO Find empty spot?  Or compete nearby orgs to clear out a spot?
-      return org_pos_t();  // @CAO For now, Return invalid position!
+      return org_pos_t(pos);
     });
 
-    // Map Elites does not have a concept of neighbors.
+    // Diverse Elites does not have a concept of neighbors.
+    // @CAO Or should we return closest individual, which we already save?
     world.SetGetNeighborFun( [](size_t id) { emp_assert(false); return id; });
 
     // Birth is effectively the same as inject.
-    world.SetAddBirthFun( [&world,traits](Ptr<ORG> new_org, size_t parent_id) {
-      (void) parent_id; // Parent id is not needed for MAP Elites.
-
-      // Determine tha position that this phenotype fits in.
-      double org_fitness = world.CalcFitnessOrg(*new_org);
-      (void) org_fitness;
-
-      // @CAO Find empty spot?  Or compete nearby orgs to clear out a spot?
-      return org_pos_t();  // @CAO For now, Return invalid position!
+    world.SetAddBirthFun( [&world, traits, world_size, info_ptr](Ptr<ORG> new_org, size_t parent_id) {
+      size_t pos = info_ptr->GetEmptyPos(world_size);
+      return org_pos_t(pos);
     });
 
     world.SetAttribute("SynchronousGen", "False");
