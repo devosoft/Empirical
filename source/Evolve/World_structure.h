@@ -264,6 +264,18 @@ namespace emp {
     world.MarkSynchronous(false);
     world.MarkSpaceStructured(false).MarkPhenoStructured(true);
 
+    // Calculate the square distance (good enough since we only look for minimum distance)
+    auto dist_fun = [traits](ORG& in1, ORG& in2){
+      emp::vector<double> offsets = traits.CalcOffsets(in1,in2);
+      double dist = 0.0;
+      for (double offset : offsets) dist += offset * offset;
+      return dist;
+    }
+
+    // Build a pointer to the current information (and make sure it's deleted later)
+    Ptr<World_MinDistInfo> info_ptr = NewPtr<World_MinDistInfo>(world, dist_fun);
+    world.OnWorldDestruct([info_ptr](){ info_ptr.Delete(); });
+
     // -- Setup functions --
     // Inject into the appropriate positon based on phenotype.  Note that an inject will fail
     // if a more fit organism is already in place; you must run clear first if you want to
