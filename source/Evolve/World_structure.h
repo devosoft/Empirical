@@ -232,6 +232,8 @@ namespace emp {
       is_setup = false;
     }
 
+    /// Find the best organism to kill in the popualtion.  In this case, find the two closest organisms
+    /// and kill the one with the lower fitness.
     size_t FindKill() {
       if (!is_setup) Setup();  // The first time we run out of space and need to kill, setup structure!
       if (distance.size() == 0) return ID_NONE;
@@ -244,7 +246,15 @@ namespace emp {
       else return nearest_id[min_id];
     }
 
-    // Assume a position has changed; refresh it AND everything that had it as a closest connection.
+    /// Return an empty world position.  If none are available, kill and organism to make room.
+    size_t GetEmptyPos(size_t world_size) {
+      // If there's room in the world for one more, get the next empty position.
+      if (world.GetSize() < world_size) { return world.GetSize(); }
+      // Otherwise, determine whom to kill return their position to be used.
+      else { return FindKill(); }
+    }
+
+    /// Assume a position has changed; refresh it AND everything that had it as a closest connection.
     void Update(size_t pos) {
       if (!is_setup) return;  // Until structure is setup, don't worry about maintaining.
       emp_assert(pos < world.GetSize());
@@ -260,7 +270,6 @@ namespace emp {
   void SetDiverseElites(World<ORG> & world, TraitSet<ORG> traits, size_t world_size) { 
     using org_pos_t = typename World<ORG>::OrgPosition;
 
-    world.Resize(world_size);
     world.MarkSynchronous(false);
     world.MarkSpaceStructured(false).MarkPhenoStructured(true);
 
@@ -280,7 +289,9 @@ namespace emp {
     // Inject into the appropriate positon based on phenotype.  Note that an inject will fail
     // if a more fit organism is already in place; you must run clear first if you want to
     // ensure placement.
-    world.SetAddInjectFun( [&world,traits](Ptr<ORG> new_org) {
+    world.SetAddInjectFun( [&world, traits, world_size, info_ptr](Ptr<ORG> new_org) {
+      size_t pos = info_ptr->GetEmptyPos(world_size);
+
       // Determine the position that this phenotype fits in.
       double org_fitness = world.CalcFitnessOrg(*new_org);
       (void) org_fitness;
