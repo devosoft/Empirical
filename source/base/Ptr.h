@@ -580,7 +580,7 @@ namespace emp {
     }
 
     /// Follow a pointer to a const target.
-    const TYPE * const operator->() const {
+    TYPE * const operator->() const {
       // Make sure a pointer is active before we follow it.
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
@@ -749,7 +749,7 @@ namespace emp {
 
     // Follow a pointer.
     TYPE * operator->() { return ptr; }
-    const TYPE * const operator->() const { return ptr; }
+    TYPE * const operator->() const { return ptr; }
 
     // Indexing into array
     TYPE & operator[](size_t pos) { return ptr[pos]; }
