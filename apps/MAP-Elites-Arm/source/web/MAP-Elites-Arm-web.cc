@@ -107,6 +107,8 @@ int main()
   doc << UI::Button( [](){ emp::RandomSelect(world, 1); DrawWorldCanvas(); }, "Do Birth", "birth_button");
   doc << UI::Button( [](){ emp::RandomSelect(world, 100); DrawWorldCanvas(); }, "Do Birth 100", "birth_100_button");
   doc << UI::Button( [](){ emp::RandomSelect(world, 10000); DrawWorldCanvas(); }, "Do Birth 10000", "birth_10000_button");
+  doc << UI::Button( [](){ world.ResetMAP(); DrawWorldCanvas(); }, "Reset MAP-Elites", "reset_map_button");
+  doc << UI::Button( [](){ world.ResetMixed(); DrawWorldCanvas(); }, "Reset Well Mixed", "reset_mixed_button");
   doc << "<br>";
 
   // Add the Canvas
