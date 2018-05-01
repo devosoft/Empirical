@@ -376,7 +376,7 @@ namespace emp {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-        glfwWindowHint(GLFW_SAMPLES, 8);
+        glfwWindowHint(GLFW_SAMPLES, 16);
 
         window = glfwCreateWindow(width, height, title, nullptr, nullptr);
         glfwSetWindowUserPointer(window, this);
@@ -473,8 +473,6 @@ namespace emp {
           &args, fps, forever);
 #else
         if (fps <= 0) fps = 60;
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_MULTISAMPLE);
         auto frameStart = std::chrono::system_clock::now();
 
@@ -519,7 +517,7 @@ namespace emp {
       auto getRegion() const { return region; }
     };
 
-  }  // namespace emp
+  }  // namespace opengl
 }  // namespace emp
 
 #endif

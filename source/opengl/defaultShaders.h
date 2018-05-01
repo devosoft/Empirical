@@ -36,18 +36,18 @@ namespace emp {
 #endif
         R"glsl(
                 attribute vec3 position;
-                uniform vec4 color;
+                uniform vec4 fill;
 
                 uniform mat4 model;
                 uniform mat4 view;
                 uniform mat4 projection;
 
-                varying vec4 fcolor;
+                varying vec4 f_fill;
 
                 void main()
                 {
                     gl_Position = projection * view * model * vec4(position, 1.0);
-                    fcolor = color;
+                    f_fill = fill;
                 }
             )glsl";
 
@@ -56,11 +56,11 @@ namespace emp {
         "precision mediump float;"
 #endif
         R"glsl(
-                  varying vec4 fcolor;
+                  varying vec4 f_fill;
 
                   void main()
                   {
-                      gl_FragColor = fcolor;
+                      gl_FragColor = f_fill;
                   }
               )glsl";
 

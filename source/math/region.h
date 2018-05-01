@@ -35,7 +35,7 @@ namespace emp {
         return size;
       }
 
-      constexpr auto Center() const { return (max - min) / 2; }
+      constexpr auto Center() const { return (max + min) / 2; }
 
       template <class F2 = field_type>
       constexpr Region& include(const math::Vec<F2, D>& v) {

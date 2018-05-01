@@ -23,6 +23,8 @@
 #include "scenegraph/shapes.h"
 #include "scenegraph/transform.h"
 
+#include "scenegraph/rendering.h"
+
 #include <chrono>
 #include <cstdlib>
 
@@ -78,11 +80,19 @@ int main(int argc, char* argv[]) {
 
   flow.Apply(data.begin(), data.end());
 
+  Graphics g(canvas);
+
   canvas.runForever([&](auto&&) {
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    stage.Render(camera, eye);
+    auto ctx = g.Context({camera.GetProjection(), eye.CalculateView()});
+
+    ctx.Fill([](auto& pen) {
+      pen.Move({5, 5, 50}).Ellipse({20, 20}, Color::black());
+    });
+
+    // stage.Render(camera, eye);
     // data.clear();
     // for (int i = 0; i < 10000; ++i) {
     //   data.emplace_back(random(), random());

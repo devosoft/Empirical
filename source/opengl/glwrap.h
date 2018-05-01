@@ -205,7 +205,7 @@ namespace emp {
       }
 
       operator bool() const { return handle != 0; }
-      operator GLuint() const { return handle; }
+      explicit operator GLuint() const { return handle; }
     };
 #ifndef EMSCRIPTEN
     template <class F, BufferType... TYPES>
@@ -219,6 +219,119 @@ namespace emp {
       _(buffers.unmap()...);
     }
 #endif
+
+    namespace __impl_VertexBuffer {
+      template <BufferType TYPE, typename T>
+      class BufferVector : public BufferObject<TYPE> {
+        protected:
+        std::vector<T> data;
+        size_t gpu_buffer_size = 0;
+
+        public:
+        BufferVector(const BufferObject<TYPE>& buffer)
+          : BufferObject<TYPE>(buffer){};
+        BufferVector(BufferObject<TYPE>&& buffer)
+          : BufferObject<TYPE>(std::move(buffer)){};
+
+        BufferVector(BufferVector&& other)
+          : BufferObject<TYPE>(std::move(other)), data(std::move(other.data)) {}
+
+        BufferVector& operator=(BufferVector&& other) {
+          BufferObject<TYPE>::operator=(std::move(other.gpu_buffer));
+          data = std::move(other.data);
+          return *this;
+        }
+
+        template <typename U = T>
+        void PushData(U&& i) {
+          data.push_back(std::forward<U>(i));
+        }
+
+        template <typename U0 = T, typename... U>
+        void EmplaceData(U0&& arg0, U&&... args) {
+          data.emplace_back(std::forward<U0>(arg0), std::forward<U>(args)...);
+        }
+
+        template <typename Iter>
+        void PushAll(Iter begin, Iter end) {
+          data.insert(data.end(), begin, end);
+        }
+
+        template <typename C>
+        void PushAll(const C& collection) {
+          PushAll(std::begin(collection), std::end(collection));
+        }
+
+        void Reserve(size_t size, BufferUsage usage) {
+          data.reserve(size);
+          if (size > gpu_buffer_size) {
+            BufferObject<TYPE>::init(nullptr, size, usage);
+            gpu_buffer_size = size;
+          }
+        }
+
+        void Clear() { data.clear(); }
+
+        auto Size() const { return data.size(); }
+        auto GpuCapacity() const { return gpu_buffer_size; }
+
+        T& operator[](size_t i) { return data[i]; }
+        const T& operator[](size_t i) const { return data[i]; }
+
+        void SendToGPU(BufferUsage usage = BufferUsage::DynamicDraw) {
+          if (data.size() > gpu_buffer_size) {
+            BufferObject<TYPE>::init(data, usage);
+          } else {
+#ifdef EMSCRIPTEN
+            BufferObject<TYPE>::subset(data);
+#else
+            auto mem_mapped_buffer = BufferObject<TYPE>::template map<T>(
+              data.size(), BufferAccess::write().invalidatesBuffer());
+
+            std::copy(data.begin(), data.end(), mem_mapped_buffer);
+            BufferObject<TYPE>::unmap();
+#endif
+          }
+        }
+      };
+    }  // namespace __impl_VertexBuffer
+    template <BufferType TYPE, typename T>
+    class BufferVector : public __impl_VertexBuffer::BufferVector<TYPE, T> {
+      public:
+      using __impl_VertexBuffer::BufferVector<TYPE, T>::BufferVector;
+    };
+
+    template <typename T>
+    class BufferVector<BufferType::Array, T>
+      : public __impl_VertexBuffer::BufferVector<BufferType::Array, T> {
+      public:
+      using __impl_VertexBuffer::BufferVector<BufferType::Array,
+                                              T>::BufferVector;
+
+      void Draw(GLenum mode, int start = 0, int count = -1) {
+        if (count < 0) {
+          count = __impl_VertexBuffer::BufferVector<BufferType::Array, T>::data
+                    .size();
+          count -= start;
+        }
+        glDrawArrays(mode, start, count);
+      }
+    };
+
+    template <typename T>
+    class BufferVector<BufferType::ElementArray, T>
+      : public __impl_VertexBuffer::BufferVector<BufferType::ElementArray, T> {
+      public:
+      using __impl_VertexBuffer::BufferVector<BufferType::ElementArray,
+                                              T>::BufferVector;
+      void Draw(GLenum mode) {
+        glDrawElements(
+          mode,
+          __impl_VertexBuffer::BufferVector<BufferType::ElementArray, T>::data
+            .size(),
+          GL_UNSIGNED_INT, nullptr);
+      }
+    };
 
     class VertexAttribute {
       private:

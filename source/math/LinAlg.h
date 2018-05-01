@@ -18,6 +18,88 @@ namespace emp {
     template <typename F, std::size_t R, std::size_t C>
     class Mat;
 
+    template <typename F, size_t D>
+    using ColVec = Mat<F, D, 1>;
+
+    template <typename F, size_t D>
+    using RowVec = Mat<F, 1, D>;
+
+    template <typename F, size_t D>
+    using Vec = ColVec<F, D>;
+
+#define MAT_SHORT(R, C)                                       \
+  template <typename F>                                       \
+  using Mat##R##x##C = Mat<F, R, C>;                          \
+  using Mat##R##x##C##f = Mat##R##x##C<float>;                \
+  using Mat##R##x##C##d = Mat##R##x##C<double>;               \
+  using Mat##R##x##C##i = Mat##R##x##C<int>;                  \
+  using Mat##R##x##C##l = Mat##R##x##C<long>;                 \
+  using Mat##R##x##C##ll = Mat##R##x##C<long long>;           \
+  using Mat##R##x##C##u = Mat##R##x##C<unsigned>;             \
+  using Mat##R##x##C##ul = Mat##R##x##C<unsigned long>;       \
+  using Mat##R##x##C##ull = Mat##R##x##C<unsigned long long>; \
+  using Mat##R##x##C##s = Mat##R##x##C<std::size_t>;
+
+#define VEC_SHORT(D)                                    \
+  template <typename F>                                 \
+  using ColVec##D = Mat<F, D, 1>;                       \
+  using ColVec##D##f = ColVec##D<float>;                \
+  using ColVec##D##d = ColVec##D<double>;               \
+  using ColVec##D##i = ColVec##D<int>;                  \
+  using ColVec##D##l = ColVec##D<long>;                 \
+  using ColVec##D##ll = ColVec##D<long long>;           \
+  using ColVec##D##u = ColVec##D<unsigned>;             \
+  using ColVec##D##ul = ColVec##D<unsigned long>;       \
+  using ColVec##D##ull = ColVec##D<unsigned long long>; \
+  using ColVec##D##s = ColVec##D<std::size_t>;          \
+  template <typename F>                                 \
+  using RowVec##D = Mat<F, 1, D>;                       \
+  using RowVec##D##f = RowVec##D<float>;                \
+  using RowVec##D##d = RowVec##D<double>;               \
+  using RowVec##D##i = RowVec##D<int>;                  \
+  using RowVec##D##l = RowVec##D<long>;                 \
+  using RowVec##D##ll = RowVec##D<long long>;           \
+  using RowVec##D##u = RowVec##D<unsigned>;             \
+  using RowVec##D##ul = RowVec##D<unsigned long>;       \
+  using RowVec##D##ull = RowVec##D<unsigned long long>; \
+  using RowVec##D##s = RowVec##D<std::size_t>;          \
+  template <typename F>                                 \
+  using Vec##D = ColVec##D<F>;                          \
+  using Vec##D##f = ColVec##D<float>;                   \
+  using Vec##D##d = ColVec##D<double>;                  \
+  using Vec##D##i = ColVec##D<int>;                     \
+  using Vec##D##l = ColVec##D<long>;                    \
+  using Vec##D##ll = ColVec##D<long long>;              \
+  using Vec##D##u = ColVec##D<unsigned>;                \
+  using Vec##D##ul = ColVec##D<unsigned long>;          \
+  using Vec##D##ull = ColVec##D<unsigned long long>;    \
+  using Vec##D##s = ColVec##D<std::size_t>;
+
+    MAT_SHORT(1, 1)
+    MAT_SHORT(2, 1)
+    MAT_SHORT(3, 1)
+    MAT_SHORT(4, 1)
+
+    MAT_SHORT(1, 2)
+    MAT_SHORT(2, 2)
+    MAT_SHORT(3, 2)
+    MAT_SHORT(4, 2)
+
+    MAT_SHORT(1, 3)
+    MAT_SHORT(2, 3)
+    MAT_SHORT(3, 3)
+    MAT_SHORT(4, 3)
+
+    MAT_SHORT(1, 4)
+    MAT_SHORT(2, 4)
+    MAT_SHORT(3, 4)
+    MAT_SHORT(4, 4)
+
+    VEC_SHORT(1)
+    VEC_SHORT(2)
+    VEC_SHORT(3)
+    VEC_SHORT(4)
+
     namespace internal {
       template <std::size_t R, std::size_t C, typename F, std::size_t... I>
       constexpr std::array<F, R * C> unfoldArrayImpl(
@@ -386,6 +468,15 @@ namespace emp {
           1, 0, 0, std::forward<X>(x),  // row 1
           0, 1, 0, std::forward<Y>(y),  // row 2
           0, 0, 1, std::forward<Z>(z),  // row 3
+          0, 0, 0, 1,  // row 4
+        };
+      }
+      template <typename U>
+      static constexpr Mat Translation(const Vec<U, 3>& translation) {
+        return {
+          1, 0, 0, translation.x(),  // row 1
+          0, 1, 0, translation.y(),  // row 2
+          0, 0, 1, translation.z(),  // row 3
           0, 0, 0, 1,  // row 4
         };
       }
@@ -1042,88 +1133,6 @@ namespace emp {
       return Mat<decltype(std::declval<F1>() / std::declval<F2>()), R, C>::From(
         internal::RightScalarDiv{}, mat, s);
     }
-
-    template <typename F, size_t D>
-    using ColVec = Mat<F, D, 1>;
-
-    template <typename F, size_t D>
-    using RowVec = Mat<F, 1, D>;
-
-    template <typename F, size_t D>
-    using Vec = ColVec<F, D>;
-
-#define MAT_SHORT(R, C)                                       \
-  template <typename F>                                       \
-  using Mat##R##x##C = Mat<F, R, C>;                          \
-  using Mat##R##x##C##f = Mat##R##x##C<float>;                \
-  using Mat##R##x##C##d = Mat##R##x##C<double>;               \
-  using Mat##R##x##C##i = Mat##R##x##C<int>;                  \
-  using Mat##R##x##C##l = Mat##R##x##C<long>;                 \
-  using Mat##R##x##C##ll = Mat##R##x##C<long long>;           \
-  using Mat##R##x##C##u = Mat##R##x##C<unsigned>;             \
-  using Mat##R##x##C##ul = Mat##R##x##C<unsigned long>;       \
-  using Mat##R##x##C##ull = Mat##R##x##C<unsigned long long>; \
-  using Mat##R##x##C##s = Mat##R##x##C<std::size_t>;
-
-#define VEC_SHORT(D)                                    \
-  template <typename F>                                 \
-  using ColVec##D = Mat<F, D, 1>;                       \
-  using ColVec##D##f = ColVec##D<float>;                \
-  using ColVec##D##d = ColVec##D<double>;               \
-  using ColVec##D##i = ColVec##D<int>;                  \
-  using ColVec##D##l = ColVec##D<long>;                 \
-  using ColVec##D##ll = ColVec##D<long long>;           \
-  using ColVec##D##u = ColVec##D<unsigned>;             \
-  using ColVec##D##ul = ColVec##D<unsigned long>;       \
-  using ColVec##D##ull = ColVec##D<unsigned long long>; \
-  using ColVec##D##s = ColVec##D<std::size_t>;          \
-  template <typename F>                                 \
-  using RowVec##D = Mat<F, 1, D>;                       \
-  using RowVec##D##f = RowVec##D<float>;                \
-  using RowVec##D##d = RowVec##D<double>;               \
-  using RowVec##D##i = RowVec##D<int>;                  \
-  using RowVec##D##l = RowVec##D<long>;                 \
-  using RowVec##D##ll = RowVec##D<long long>;           \
-  using RowVec##D##u = RowVec##D<unsigned>;             \
-  using RowVec##D##ul = RowVec##D<unsigned long>;       \
-  using RowVec##D##ull = RowVec##D<unsigned long long>; \
-  using RowVec##D##s = RowVec##D<std::size_t>;          \
-  template <typename F>                                 \
-  using Vec##D = ColVec##D<F>;                          \
-  using Vec##D##f = ColVec##D<float>;                   \
-  using Vec##D##d = ColVec##D<double>;                  \
-  using Vec##D##i = ColVec##D<int>;                     \
-  using Vec##D##l = ColVec##D<long>;                    \
-  using Vec##D##ll = ColVec##D<long long>;              \
-  using Vec##D##u = ColVec##D<unsigned>;                \
-  using Vec##D##ul = ColVec##D<unsigned long>;          \
-  using Vec##D##ull = ColVec##D<unsigned long long>;    \
-  using Vec##D##s = ColVec##D<std::size_t>;
-
-    MAT_SHORT(1, 1)
-    MAT_SHORT(2, 1)
-    MAT_SHORT(3, 1)
-    MAT_SHORT(4, 1)
-
-    MAT_SHORT(1, 2)
-    MAT_SHORT(2, 2)
-    MAT_SHORT(3, 2)
-    MAT_SHORT(4, 2)
-
-    MAT_SHORT(1, 3)
-    MAT_SHORT(2, 3)
-    MAT_SHORT(3, 3)
-    MAT_SHORT(4, 3)
-
-    MAT_SHORT(1, 4)
-    MAT_SHORT(2, 4)
-    MAT_SHORT(3, 4)
-    MAT_SHORT(4, 4)
-
-    VEC_SHORT(1)
-    VEC_SHORT(2)
-    VEC_SHORT(3)
-    VEC_SHORT(4)
 
     template <typename M1 = Mat<float, 1, 3>, typename M2 = M1>
     constexpr Mat<decltype(std::declval<typename M1::value_type>() *

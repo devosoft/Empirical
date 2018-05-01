@@ -2,7 +2,7 @@
 GLFW_LIBS := $(shell pkg-config --static --libs glfw3) \
     $(shell pkg-config --static --libs gl) \
     $(shell pkg-config --cflags --libs glew) \
-  	$(shell pkg-config --cflags --libs freetype2)
+    $(shell pkg-config --cflags --libs freetype2)
 	  
 CFLAGS_all := -Wall -Wno-unused-function -I../../source/
 CFLAGS_version := -std=c++14
@@ -23,14 +23,14 @@ CFLAGS_native_opt := $(CFLAGS_all) $(OFLAGS_native_opt)
 CFLAGS_native_debug := $(CFLAGS_all) $(OFLAGS_native_debug)
 CFLAGS_native_grumpy := $(CFLAGS_all) $(OFLAGS_native_grumpy)
 
-CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['Pointer_stringify']"-s NO_EXIT_RUNTIME=1
-CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['Pointer_stringify']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web_debug := $(GLFW_LIBS) $(CFLAGS_all) $(OFLAGS_web_debug) -s USE_FREETYPE=1 --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['Pointer_stringify']"-s NO_EXIT_RUNTIME=1
+CFLAGS_web_opt := $(GLFW_LIBS) $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['Pointer_stringify']" -s NO_EXIT_RUNTIME=1
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 JS_TARGETS := PlottingExperiment.js
 TARGETS := PlottingExperiment
 
-EVO_DEPEND := $(wildcard ../../source/opengl/*.h) $(wildcard ../../source/math/*.h) $(wildcard ../../source/plot/*.h)
+EVO_DEPEND := $(wildcard ../../source/opengl/*.h) $(wildcard ../../source/math/*.h) $(wildcard ../../source/plot/*.h) $(wildcard ../../source/scenegraph/*.h)
 
 default: native
 

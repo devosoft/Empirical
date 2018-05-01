@@ -99,6 +99,12 @@ namespace emp {
     friend ResourceRef<T>;
 
     public:
+    Resource(const Resource&) = delete;
+    Resource(Resource&&) = delete;
+
+    Resource& operator=(const Resource&) = delete;
+    Resource& operator=(Resource&&) = delete;
+
     Resource(const std::string& name) : name(name) {}
 
     Resource(const std::string& name, const lazy_t& lazy)

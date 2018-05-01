@@ -29,16 +29,16 @@ namespace emp {
                  PropsIter pend) const {
         using namespace emp::math;
         using namespace emp::plot::attributes;
-        Region<float, D> dataSpace;
+        Region<float, D> data_space;
         for (auto iter = pbegin; iter != pend; ++iter) {
-          dataSpace.include(Xyz::Get(*iter));
+          data_space.include(Xyz::Get(*iter));
         }
-        auto borderedSpace{screenSpace};
-        borderedSpace.addBorder(padding);
+        auto bordered_space{screenSpace};
+        bordered_space.addBorder(padding);
 
         auto scale =
-          MakeAttrs(XyzScaled([&dataSpace, &borderedSpace](const auto& p) {
-            return borderedSpace.RescalePoint(Xyz::Get(p), dataSpace);
+          MakeAttrs(XyzScaled([&data_space, &bordered_space](const auto& p) {
+            return bordered_space.RescalePoint(Xyz::Get(p), data_space);
           }));
 
         auto map = [&scale](const auto& attrs) {
@@ -49,6 +49,12 @@ namespace emp {
         std::vector<result_t> results;
         std::transform(pbegin, pend, std::back_inserter(results), map);
         return results;
+      }
+
+      void RenderRelative(const scenegraph::RenderSettings& settings,
+                          const math::Mat4x4f& transform) {
+        using namespace emp::math;
+        using namespace emp::opengl;
       }
     };
 
