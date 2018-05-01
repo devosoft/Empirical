@@ -174,7 +174,7 @@ namespace emp {
       return id;
     }
 
-    emp::vector<double> CalcOffsets(target_t & target1, target_t & target2) {
+    emp::vector<double> CalcOffsets(target_t & target1, target_t & target2) const {
       emp::vector<double> offsets(traits.size());
       for (size_t i = 0; i < traits.size(); i++) {
         offsets[i] = traits[i]->EvalValue(target2) - traits[i]->EvalValue(target1);
