@@ -242,7 +242,7 @@ namespace emp {
       for (size_t dist_id = 1; dist_id < distance.size(); dist_id++) {
         if (distance[dist_id] < min_dist) { min_id = dist_id; min_dist = distance[dist_id]; }
       }
-      if (world.GetFitnessID(min_id) < world.GetFitnessID(nearest_id[min_id])) return min_id;
+      if (world.CalcFitnessID(min_id) < world.CalcFitnessID(nearest_id[min_id])) return min_id;
       else return nearest_id[min_id];
     }
 
@@ -283,10 +283,10 @@ namespace emp {
 
     // Build a pointer to the current information (and make sure it's deleted later)
     Ptr<World_MinDistInfo<ORG>> info_ptr = NewPtr<World_MinDistInfo<ORG>>(world, dist_fun);
-    world.OnWorldDestruct([info_ptr](){ info_ptr.Delete(); });
+    world.OnWorldDestruct([info_ptr]() mutable { info_ptr.Delete(); });
 
     // Make sure to update info whenever a new org is placed into the population.
-    world.OnOrganismPlacement( [info_ptr](size_t pos){ info_ptr->Update(pos); } );
+    world.OnOrgPlacement( [info_ptr](size_t pos) mutable { info_ptr->Update(pos); } );
 
     // -- Setup functions --
     // Inject into the appropriate positon based on phenotype.  Note that an inject will fail
@@ -311,10 +311,10 @@ namespace emp {
     world.SetAttribute("PopStruct", "DiverseElites");
   }
 
-  /// Setup a MAP-Elites world, given the provided worlds already has set of phenotypes.
+  /// Setup a Diverse-Elites world, given the provided world already has set of phenotypes.
   template <typename ORG>
-  void SetMapElites(World<ORG> & world, size_t world_size) {
-    SetMapElites(world, world.GetPhenotypes(), world_size);
+  void SetDiverseElites(World<ORG> & world, size_t world_size) {
+    SetDiverseElites(world, world.GetPhenotypes(), world_size);
   }
 }
 
