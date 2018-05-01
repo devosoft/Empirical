@@ -87,12 +87,14 @@ struct ArmOrg {
 };
 
 class ArmWorld : public emp::World<ArmOrg> {
-private:
+protected:
+  static constexpr size_t WORLD_X = 40;
+  static constexpr size_t WORLD_Y = 40;
+  static constexpr size_t WORLD_SIZE = WORLD_X * WORLD_Y;
+
   emp::vector<double> segments;
 public:
-  // ArmWorld(emp::Random & random, emp::vector<double> in_segments={2.0,1.0,3.5,1.0,2.5})
-  //   : emp::World<ArmOrg>(random, "ArmWorld"), segments(in_segments)
-  ArmWorld(emp::vector<double> in_segments={2.0,1.0,3.5,1.0,2.5})
+  ArmWorld(emp::vector<double> in_segments={1,2,3,4,5,6})
     : emp::World<ArmOrg>("ArmWorld"), segments(in_segments)
   {
     SetupFitnessFile().SetTimingRepeat(10);
@@ -107,14 +109,24 @@ public:
     AddPhenotype("End X", traitX_fun, -total, total);
     AddPhenotype("End Y", traitY_fun, -total, total);
 
-    emp::SetMapElites(*this, {40, 40});
-    // SetWellMixed(true);
     SetCache();
     SetMutateBeforeBirth();
 
-    for (size_t i = 0; i < 100; i++) Inject(ArmOrg(*random_ptr, segments.size()));
+    ResetMAP();
   }
   ~ArmWorld() { ; }
+
+  void ResetMAP() {
+    Reset();
+    emp::SetMapElites(*this, {WORLD_X, WORLD_Y});
+    for (size_t i = 0; i < 100; i++) Inject(ArmOrg(*random_ptr, segments.size()));
+  }
+
+  void ResetMixed() {
+    Reset();
+    SetWellMixed();
+    for (size_t i = 0; i < WORLD_SIZE; i++) Inject(ArmOrg(*random_ptr, segments.size()));
+  }
 
   double CalcTotalLength() const {
     double total = 0.0;
