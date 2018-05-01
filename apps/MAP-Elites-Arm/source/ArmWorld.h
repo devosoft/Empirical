@@ -116,16 +116,22 @@ public:
   }
   ~ArmWorld() { ; }
 
+  void ResetMixed() {
+    Reset();
+    SetWellMixed();
+    for (size_t i = 0; i < WORLD_SIZE; i++) Inject(ArmOrg(*random_ptr, segments.size()));
+  }
+
   void ResetMAP() {
     Reset();
     emp::SetMapElites(*this, {WORLD_X, WORLD_Y});
     for (size_t i = 0; i < 100; i++) Inject(ArmOrg(*random_ptr, segments.size()));
   }
 
-  void ResetMixed() {
+  void ResetDiverse() {
     Reset();
-    SetWellMixed();
-    for (size_t i = 0; i < WORLD_SIZE; i++) Inject(ArmOrg(*random_ptr, segments.size()));
+    emp::SetDiverseElites(*this, WORLD_SIZE);
+    for (size_t i = 0; i < 100; i++) Inject(ArmOrg(*random_ptr, segments.size()));    
   }
 
   double CalcTotalLength() const {
