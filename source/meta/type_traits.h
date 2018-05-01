@@ -1,8 +1,12 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2018.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  Extensions on the standard library type traits to handle Empirical classes (such as Ptr).
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2018
+ *
+ *  @file  type_traits.h
+ *  @brief Extensions on the standard library type traits to handle Empirical classes (such as Ptr).
+ */
+
 
 #ifndef EMP_TYPE_TRAITS_H
 #define EMP_TYPE_TRAITS_H
@@ -23,7 +27,7 @@ namespace emp {
   template <typename T>
   constexpr bool is_ptr_type_v(const T&) { return is_ptr_type<T>::value; }
 
-  template <typename T> struct remove_ptr_type { };    // Not ponter; should break!
+  template <typename T> struct remove_ptr_type         { using type = T; };
   template <typename T> struct remove_ptr_type<T*>     { using type = T; };
   template <typename T> struct remove_ptr_type<Ptr<T>> { using type = T; };
   template <typename T>

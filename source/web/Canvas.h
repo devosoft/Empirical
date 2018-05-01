@@ -125,18 +125,23 @@ namespace web {
     /// Set Canvas size.
     void SetSize(size_t w, size_t h) { Info()->width=w; Info()->height=h; }
 
-    /// Add a Circle to this canvas centered at x,y with radius r.  Optional face color and
-    /// line color.
+    /// Add a Circle to this canvas centered at x,y with radius r.  Optional face and line color.
     Canvas & Circle(double x, double y, double r,
-                    const std::string & fc="", const std::string & lc="") {
-      Info()->AddAction( new CanvasCircle(x, y, r, fc, lc) );
+                    const std::string & fc="", const std::string & lc="", double lw=1.0) {
+      Info()->AddAction( new CanvasCircle(x, y, r, fc, lc, lw) );
+      return *this;
+    }
+
+    /// Add a Circle to this canvas centered at point with radius r.  Optional face and line color.
+    Canvas & Circle(Point p, double r, const std::string & fc="", const std::string & lc="", double lw=1.0) {
+      Info()->AddAction( new CanvasCircle(p, r, fc, lc, lw) );
       return *this;
     }
 
     /// Add a Circle specified with a Circle object.  Optional face color and line color.
     Canvas & Circle(const emp::Circle & circle,
-                    const std::string & fc="", const std::string & lc="") {
-      Info()->AddAction( new CanvasCircle(circle, fc, lc) );
+                    const std::string & fc="", const std::string & lc="", double lw=1.0) {
+      Info()->AddAction( new CanvasCircle(circle, fc, lc, lw) );
       return *this;
     }
 
@@ -149,8 +154,20 @@ namespace web {
     }
 
     /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
-    Canvas & Line(double x1, double y1, double x2, double y2, const std::string & lc="") {
-      Info()->AddAction( new CanvasLine(x1, y1, x2, y2, lc) );
+    Canvas & Line(double x1, double y1, double x2, double y2, const std::string & lc="", double lw=1.0) {
+      Info()->AddAction( new CanvasLine(x1, y1, x2, y2, lc, lw) );
+      return *this;
+    }
+
+    /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
+    Canvas & Line(emp::Point p1, emp::Point p2, const std::string & lc="", double lw=1.0) {
+      Info()->AddAction( new CanvasLine(p1, p2, lc, lw) );
+      return *this;
+    }
+
+    /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
+    Canvas & MultiLine(emp::Point p1, const emp::vector<emp::Point> & points, const std::string & lc="", double lw=1.0) {
+      Info()->AddAction( new CanvasMultiLine(p1, points, lc, lw) );
       return *this;
     }
 

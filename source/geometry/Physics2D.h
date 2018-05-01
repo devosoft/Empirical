@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -9,9 +9,11 @@
 #ifndef EMP_PHYSICS_2D_H
 #define EMP_PHYSICS_2D_H
 
-#include <vector>
 #include <unordered_set>
 #include <functional>
+
+#include "base/Ptr.h"
+#include "base/vector.h"
 
 using namespace std::placeholders;
 
@@ -40,10 +42,16 @@ namespace emp {
     const Surface_t & GetBackground() const { return background; }
     bool GetDetach() const { return detach_on_birth; }
 
-    Physics2D & SetDetach(bool _in) { detach_on_birth = _in; return *this; }
+    Physics2D & SetDetach(bool _in) {
+      detach_on_birth = _in;
+      // Set all current bodies to new detach setting.
+      auto & body_set = surface.GetBodySet();
+      for (auto cur_body : body_set) { cur_body->SetDetachOnDivide(_in); }
+      return *this;
+    }
 
-    Physics2D & AddBody(BODY_TYPE * in_body) { surface.AddBody(in_body); return *this; }
-    Physics2D & AddBackground(BODY_TYPE * in_body) { background.AddBody(in_body); return *this; }
+    Physics2D & AddBody(Ptr<BODY_TYPE> in_body) { surface.AddBody(in_body); return *this; }
+    Physics2D & AddBackground(Ptr<BODY_TYPE> in_body) { background.AddBody(in_body); return *this; }
 
     Physics2D & Clear() { surface.Clear(); background.Clear(); return *this; }
 
@@ -60,7 +68,7 @@ namespace emp {
       }
 
       // Now kill it!
-      delete body_set[oldest_id];
+      body_set[oldest_id].Delete();
       body_set[oldest_id] = body_set.back();
       body_set.resize(body_set.size() - 1);
 
@@ -135,9 +143,9 @@ namespace emp {
 
       auto & body_set = surface.GetBodySet();
 
-      for (auto * cur_body : body_set) {
-        cur_body->BodyUpdate(0.25, detach_on_birth); // Let a body change size or shape, as needed.
-        cur_body->ProcessStep(0.0125);               // Update position and velocity.
+      for (auto cur_body : body_set) {
+        cur_body->BodyUpdate(0.25);       // Let a body change size or shape, as needed.
+        cur_body->ProcessStep(0.0125);    // Update position and velocity.
       }
 
       // Handle collisions
@@ -146,42 +154,40 @@ namespace emp {
       surface.TestCollisions(collide_fun);
 
       // Determine which bodies we should remove.
-      int cur_size = (int) body_set.size();
-      int cur_id = 0;
-      while (cur_id < cur_size) {
+      size_t cur_id = 0;
+      while (cur_id < body_set.size()) {
         emp_assert(body_set[cur_id] != nullptr);
         const double cur_pressure = body_set[cur_id]->GetPressure();
 
         // @CAO Arbitrary pressure threshold!
         if (cur_pressure > 3.0) {                // If pressure too high, burst this cell!
-          delete body_set[cur_id];               // Delete the burst cell.
-          cur_size--;                            // Indicate one fewer cells in population.
-          body_set[cur_id] = body_set[cur_size]; // Move last cell to popped position.
+          body_set[cur_id].Delete();             // Delete the burst cell.      
+          if (cur_id < body_set.size() - 1) {    // If we are not at the end of the body set...
+            body_set[cur_id] = body_set.back();  // ...move last cell to popped position.
+          }
+          body_set.pop_back();                   // Remove the last element now that it was moved away.
         }
         else cur_id++;
       }
-
-      // Now that some cells are removed, resize number of bodies
-      body_set.resize(cur_size);
     }
 
     // Access to bodies
-    emp::vector<BODY_TYPE *> & GetBodySet() {
+    emp::vector<Ptr<BODY_TYPE>> & GetBodySet() {
       return surface.GetBodySet();
     }
-    emp::vector<BODY_TYPE *> & GetBackgroundSet() {
+    emp::vector<Ptr<BODY_TYPE>> & GetBackgroundSet() {
       return background.GetBodySet();
     }
 
     // Access to bodies in a const physics...
-    const emp::vector<BODY_TYPE *> & GetConstBodySet() const {
+    const emp::vector<Ptr<BODY_TYPE>> & GetConstBodySet() const {
       return surface.GetConstBodySet();
     }
-    const emp::vector<BODY_TYPE *> & GetConstBackgroundSet() const {
+    const emp::vector<Ptr<BODY_TYPE>> & GetConstBackgroundSet() const {
       return background.GetConstBodySet();
     }
   };
 
-};
+}
 
 #endif

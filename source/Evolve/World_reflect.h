@@ -60,9 +60,9 @@ namespace emp {
     // 2. Empty, with assert.
 
     template <typename WORLD, typename ORG>
-    void SetDefaultMutFun_impl(WORLD & world, bool_decoy<decltype( declval<ORG>().DoMutations(Random()) )>) {
+    void SetDefaultMutFun_impl(WORLD & world, bool_decoy<decltype( declval<ORG>().DoMutations( *((Random*)nullptr) ) )>) {
       world.SetMutFun( [](ORG & org, Random & random) {
-        return (double) org.DoMutations(random)();
+        return (double) org.DoMutations(random);
       } );
     }
 

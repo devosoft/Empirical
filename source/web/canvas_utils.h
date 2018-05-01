@@ -74,7 +74,7 @@ namespace web {
 
     // Draw the circles.
     const auto & body_set = surface.GetConstBodySet();
-    for (auto * body : body_set) {
+    for (auto body : body_set) {
       //canvas.Circle(body->GetPerimeter(), color_map[body->GetColorID()], "white");
       canvas.Circle(body->GetPerimeter(), "", color_map[body->GetColorID()]);
       //canvas.Circle(body->GetPerimeter(), "", "white");
