@@ -23,7 +23,7 @@ struct ArmOrg {
   ArmOrg() : angles(), end_point(0.0, 0.0) { ; }
   ArmOrg(const ArmOrg &) = default;
   ArmOrg(ArmOrg &&) = default;
-  ArmOrg(emp::Random & random, size_t in_size) {
+  ArmOrg(emp::Random & random, size_t in_size) : angles(), end_point(0.0,0.0) {
     angles.resize(in_size);
     for (emp::Angle & angle : angles) angle.SetPortion(random.GetDouble());
   }
@@ -131,7 +131,7 @@ public:
   void ResetDiverse() {
     Reset();
     emp::SetDiverseElites(*this, WORLD_SIZE);
-    for (size_t i = 0; i < 100; i++) Inject(ArmOrg(*random_ptr, segments.size()));    
+    for (size_t i = 0; i < WORLD_SIZE; i++) Inject(ArmOrg(*random_ptr, segments.size()));    
   }
 
   double CalcTotalLength() const {
