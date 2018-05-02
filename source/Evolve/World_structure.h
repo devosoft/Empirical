@@ -246,12 +246,12 @@ namespace emp {
       else return nearest_id[min_id];
     }
 
-    /// Return an empty world position.  If none are available, kill and organism to make room.
-    size_t GetEmptyPos(size_t world_size) {
+    /// Return an empty world position.  If none are available, return the position of an org to be killed.
+    size_t GetBirthPos(size_t world_size) {
       // If there's room in the world for one more, get the next empty position.
       if (world.GetSize() < world_size) { return world.GetSize(); }
       // Otherwise, determine whom to kill return their position to be used.
-      else { return FindKill(); }
+      return FindKill();
     }
 
     /// Assume a position has changed; refresh it AND everything that had it as a closest connection.
@@ -268,8 +268,6 @@ namespace emp {
   /// This first version will setup a Diverse-Elites world and specify traits to use.
   template <typename ORG>
   void SetDiverseElites(World<ORG> & world, TraitSet<ORG> traits, size_t world_size) { 
-    using org_pos_t = typename World<ORG>::OrgPosition;
-
     world.MarkSynchronous(false);
     world.MarkSpaceStructured(false).MarkPhenoStructured(true);
 
@@ -293,8 +291,8 @@ namespace emp {
     // if a more fit organism is already in place; you must run clear first if you want to
     // ensure placement.
     world.SetAddInjectFun( [&world, traits, world_size, info_ptr](Ptr<ORG> new_org) {
-      size_t pos = info_ptr->GetEmptyPos(world_size);
-      return org_pos_t(pos);
+      size_t pos = info_ptr->GetBirthPos(world_size);
+      return world.AddOrgAt(new_org, pos);
     });
 
     // Diverse Elites does not have a concept of neighbors.
@@ -303,8 +301,8 @@ namespace emp {
 
     // Birth is effectively the same as inject.
     world.SetAddBirthFun( [&world, traits, world_size, info_ptr](Ptr<ORG> new_org, size_t parent_id) {
-      size_t pos = info_ptr->GetEmptyPos(world_size);
-      return org_pos_t(pos);
+      size_t pos = info_ptr->GetBirthPos(world_size);
+      return world.AddOrgAt(new_org, pos);
     });
 
     world.SetAttribute("SynchronousGen", "False");
