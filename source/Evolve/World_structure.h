@@ -189,7 +189,7 @@ namespace emp {
     bool is_setup;
 
     World_MinDistInfo(World<ORG> & in_world, const std::function<double(ORG&,ORG&)> & in_dist_fun)
-     : world(in_world), dist_fun(in_dist_fun), is_setup(false)
+     : nearest_id(), distance(), world(in_world), dist_fun(in_dist_fun), is_setup(false)
      { ; }
 
     double CalcDist(size_t id1, size_t id2) {
