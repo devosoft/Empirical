@@ -1013,7 +1013,15 @@ namespace emp {
       inject_ready_sig.Trigger(*new_org);
       const OrgPosition pos = fun_add_inject(new_org);
       //SetupOrg(*new_org, &callbacks, pos);
-      if (pos.IsActive()) org_placement_sig.Trigger(pos.GetIndex());
+
+      if (pos.IsActive()) {
+        // Organism is in the population!  Trigger assicated signal.
+        org_placement_sig.Trigger(pos.GetIndex());
+      }
+      else if (!pos.IsValid()) {
+        // Organism failed to be placed in the population.  Delete it.
+        new_org.Delete();
+      }    
     }
   }
 
@@ -1032,9 +1040,17 @@ namespace emp {
     emp_assert(random_ptr != nullptr && "InjectRandomOrg() requires active random_ptr");
     Ptr<ORG> new_org = NewPtr<ORG>(*random_ptr, std::forward<ARGS>(args)...);
     inject_ready_sig.Trigger(*new_org);
-    const size_t pos = fun_add_inject(new_org);
-    org_placement_sig.Trigger(pos);
+    const OrgPosition pos = fun_add_inject(new_org);
     // SetupOrg(*new_org, &callbacks, pos);
+
+    if (pos.IsActive()) {
+      // Organism is in the population!  Trigger assicated signal.
+      org_placement_sig.Trigger(pos.GetIndex());
+    }
+    else if (!pos.IsValid()) {
+      // Organism failed to be placed in the population.  Delete it.
+      new_org.Delete();
+    }    
   }
 
   // Give birth to a single offspring; return offspring position.
@@ -1063,7 +1079,13 @@ namespace emp {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       offspring_ready_sig.Trigger(*new_org);
       const OrgPosition pos = fun_add_birth(new_org, parent_pos);
-      if (pos.IsActive()) org_placement_sig.Trigger(pos.GetIndex());
+      if (pos.IsActive()) {
+        // If organism was placed right into the active population, trigger placement signal.
+        org_placement_sig.Trigger(pos.GetIndex());
+      } else if (!pos.IsValid()) {
+        // Organism failed to be placed in the population.  Delete it.
+        new_org.Delete();
+      }
       // SetupOrg(*new_org, &callbacks, pos);
     }
   }
