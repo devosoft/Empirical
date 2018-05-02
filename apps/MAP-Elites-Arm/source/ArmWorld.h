@@ -155,6 +155,7 @@ public:
   }
 
   emp::Point CalcEndPoint(const ArmOrg & org) { return org.CalcEndPoint(segments); }
+  emp::Point CalcEndPoint(size_t id) { return pop[id]->CalcEndPoint(segments); }
 
   emp::vector<emp::Point> CalcPoints( size_t id,
                                       emp::Point start_pos=emp::Point(0.0,0.0),
