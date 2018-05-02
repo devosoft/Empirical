@@ -19,7 +19,7 @@ const double world_size = 600;
 size_t target_id = 0;
 ArmOrg target_arm;
 
-void DrawWorldCanvas() {
+void DrawWorldCanvas_Grid() {
   UI::Canvas canvas = doc.Canvas("world_canvas");
   canvas.Clear("gray");
 
@@ -79,6 +79,66 @@ void DrawWorldCanvas() {
 
 }
 
+void DrawWorldCanvas_Scatter() {
+  UI::Canvas canvas = doc.Canvas("world_canvas");
+  canvas.Clear("gray");
+
+  const size_t world_size = world.GetSize();
+  const double total_length = world.CalcTotalLength();
+
+  const double canvas_x = (double) canvas.GetWidth();
+  const double canvas_y = (double) canvas.GetHeight();
+
+  const double org_r = emp::Min(canvas_x, canvas_y) / 120.0;
+  const emp::Point middle(canvas_x / 2.0, canvas_y / 2.0);
+  const double arm_scale = (canvas_x / total_length) / 2.0;
+
+  for (size_t org_id = 0; org_id < world_size; org_id++) {
+    if (world.IsOccupied(org_id) == false) continue;
+
+    const double fitness = world.CalcFitnessID(org_id);
+
+    std::string circle_color;
+    if (fitness == 0.0) { circle_color = "#444444"; }          // Dark Gray
+    else if (fitness < 0.6) { circle_color = "#FFC0CB"; }      // Pink
+    else if (fitness < 0.8) { circle_color = "#FFD899"; }      // Pale Orange
+    else if (fitness < 0.95) { circle_color = "#EEEE33"; }     // Pale Yellow
+    else if (fitness < 0.98) { circle_color = "#88FF88"; }     // Pale green
+    else if (fitness < 0.995) { circle_color = "#00CC00"; }    // Mid green
+    else { circle_color = "green"; }                           // Full green
+
+    emp::Point org_pos = world.CalcEndPoint(org_id);
+    org_pos.Scale(arm_scale) += middle;
+
+    canvas.Circle(org_pos, org_r, circle_color, "black");
+
+    if (!target_id && fitness > 0.0) {
+      target_id = org_id;
+      target_arm = world[org_id];
+    }
+  }
+
+  // Add a plus sign in the middle.
+  const double plus_bar = org_r * 3;
+  canvas.Line(middle.GetX(), middle.GetY()-plus_bar, middle.GetX(), middle.GetY()+plus_bar, "#8888FF");
+  canvas.Line(middle.GetX()-plus_bar, middle.GetY(), middle.GetX()+plus_bar, middle.GetY(), "#8888FF");
+
+  // Setup the arm.
+  const std::string arm_color = "white";
+  const double dilation = canvas_x / (total_length * 2.0);
+  emp::vector<emp::Point> draw_points = world.CalcPoints(target_arm, middle, dilation);
+  canvas.MultiLine(middle, draw_points, arm_color, 3.0);
+
+  // Add joints along arm.
+  canvas.Circle(middle, 5, "blue", "black");
+  for (emp::Point p : draw_points) {
+    canvas.Circle(p, 3, "blue", "black");
+  }
+
+}
+
+void DrawWorldCanvas() { DrawWorldCanvas_Scatter(); }
+
 void CanvasClick(int x, int y) {
   UI::Canvas canvas = doc.Canvas("world_canvas");
   const double canvas_x = (double) canvas.GetWidth();
@@ -107,8 +167,9 @@ int main()
   doc << UI::Button( [](){ emp::RandomSelect(world, 1); DrawWorldCanvas(); }, "Do Birth", "birth_button");
   doc << UI::Button( [](){ emp::RandomSelect(world, 100); DrawWorldCanvas(); }, "Do Birth 100", "birth_100_button");
   doc << UI::Button( [](){ emp::RandomSelect(world, 10000); DrawWorldCanvas(); }, "Do Birth 10000", "birth_10000_button");
-  doc << UI::Button( [](){ world.ResetMAP(); DrawWorldCanvas(); }, "Reset MAP-Elites", "reset_map_button");
   doc << UI::Button( [](){ world.ResetMixed(); DrawWorldCanvas(); }, "Reset Well Mixed", "reset_mixed_button");
+  doc << UI::Button( [](){ world.ResetMAP(); DrawWorldCanvas(); }, "Reset MAP-Elites", "reset_map_button");
+  doc << UI::Button( [](){ world.ResetDiverse(); DrawWorldCanvas(); }, "Reset DiverseElites", "reset_diverse_button");
   doc << "<br>";
 
   // Add the Canvas
