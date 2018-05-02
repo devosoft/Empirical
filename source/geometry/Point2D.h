@@ -68,6 +68,8 @@ namespace emp {
     Point2D & Translate(TYPE shift_x, TYPE shift_y) { x += shift_x; y += shift_y; return *this; }
     Point2D & TranslateX(TYPE shift) { x += shift; return *this; }
     Point2D & TranslateY(TYPE shift) { y += shift; return *this; }
+    Point2D & Scale(double scale) { x *= scale; y *= scale; return *this; }
+    Point2D & Scale(double scale_x, double scale_y) { x *= scale_x; y *= scale_y; return *this; }
     Point2D & ToOrigin() { x = 0; y = 0; return *this; }
     Point2D & NegateX() { x = -x; return *this; }
     Point2D & NegateY() { y = -y; return *this; }
