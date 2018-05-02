@@ -32,6 +32,7 @@ void DrawWorldCanvas_Grid() {
   const double org_y = canvas_y / (double) world_y;
   const double org_r = emp::Min(org_x, org_y) / 2.0;
 
+  // Draw all of the organisms
   for (size_t y = 0; y < world_y; y++) {
     for (size_t x = 0; x < world_x; x++) {
       const size_t org_id = y * world_x + x;
@@ -81,7 +82,6 @@ void DrawWorldCanvas_Grid() {
 
 void DrawWorldCanvas_Scatter() {
   UI::Canvas canvas = doc.Canvas("world_canvas");
-  canvas.Clear("gray");
 
   const size_t world_size = world.GetSize();
   const double total_length = world.CalcTotalLength();
@@ -93,6 +93,17 @@ void DrawWorldCanvas_Scatter() {
   const emp::Point middle(canvas_x / 2.0, canvas_y / 2.0);
   const double arm_scale = (canvas_x / total_length) / 2.0;
 
+  // Draw the background grid.
+  canvas.Clear("#202020");
+  constexpr size_t grid_count = 40;
+  for (size_t i = 0; i <= grid_count; i++) {
+    double x = canvas_x * i / grid_count;
+    double y = canvas_y * i / grid_count;
+    canvas.Line(0, y, canvas_x, y, "#606060");
+    canvas.Line(x, 0, x, canvas_y, "#606060");
+  }
+
+  // Draw all of the organisms
   for (size_t org_id = 0; org_id < world_size; org_id++) {
     if (world.IsOccupied(org_id) == false) continue;
 
