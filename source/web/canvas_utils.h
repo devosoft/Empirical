@@ -251,6 +251,33 @@ namespace web {
     }
   }
 
+  /// Draw a grid as the background of a canvas.
+  /// Since this is a BG, clear the canvas first.
+  /// @param canvas The Canvas to draw on.
+  /// @param rows Number of rows to draw in the grid.
+  /// @param cols Number of columns to draw in the grid.
+  /// @param bg_color The background color for the grid.
+  /// @param line_color The color of the liens on the grid.
+  void DrawGridBG(Canvas canvas, size_t rows, size_t cols,
+                  const std::string & bg_color, const std::string & line_color) {
+    canvas.Clear(bg_color);
+
+    const double canvas_x = (double) canvas.GetWidth();
+    const double canvas_y = (double) canvas.GetHeight();
+    const double cell_width = canvas_x / cols;
+    const double cell_height = canvas_y / rows;
+
+    for (size_t i = 0; i <= cols; i++) {
+      double x = cell_width * i;
+      canvas.Line(x, 0, x, canvas_y, line_color);
+    }
+    for (size_t i = 0; i <= rows; i++) {
+      double y = cell_height * i;
+      canvas.Line(0, y, canvas_x, y, line_color);
+    }
+  }
+
+
 }
 }
 
