@@ -361,3 +361,121 @@ TEST_CASE("Test histogram", "[data]") {
     data.Reset();
     REQUIRE(data.GetHistCounts() == emp::vector<size_t>({0,0,0,0,0,0,0,0,0,0}));    
 }
+
+TEST_CASE("Test Container DataFile", "[data]") {
+
+    emp::vector<int> cool_data({1,2,3});
+    std::function<emp::vector<int>(void)> get_data = [&cool_data](){return cool_data;};
+    emp::ContainerDataFile<emp::vector<int>> dfile("test_container_file.dat");
+
+    dfile.SetUpdateContainerFun(get_data);
+
+    std::function<int(int)> return_val = [](int i){return i;};
+    std::function<int(int)> square_val = [](int i){return i*i;};
+
+    dfile.AddContainerFun(return_val, "value", "value");
+    dfile.AddContainerFun(square_val, "squared", "value squared");
+
+    dfile.PrintHeaderKeys();
+    dfile.Update();
+    cool_data.push_back(5);
+    dfile.Update();
+
+    // Since update is virtual, this should work on a pointer to a base datafile
+    emp::DataFile * data_ptr = & dfile;
+
+    cool_data.push_back(6);
+    data_ptr->Update();
+
+    dfile.SetTimingRepeat(2);
+    cool_data.clear();
+    cool_data.push_back(7);
+    cool_data.push_back(3);
+    dfile.Update(2);
+    dfile.Update(3);
+    cool_data.push_back(2);
+    data_ptr->Update(4);
+    data_ptr->Update(5);
+    
+    REQUIRE(compareFiles("test_container_file.dat", "data/test_container_file.dat"));
+
+    auto dfile2 = MakeContainerDataFile(get_data, "test_make_container_file.dat");
+    dfile2.AddContainerFun(return_val, "value", "value");
+    dfile2.AddContainerFun(square_val, "squared", "value squared");
+
+    dfile2.PrintHeaderKeys();
+    dfile2.Update();
+
+    REQUIRE(compareFiles("test_make_container_file.dat", "data/test_make_container_file.dat"));
+}
+
+TEST_CASE("Test timing", "[data]") {
+    int test_int = 5;
+
+    emp::DataFile dfile("test_timing_file.dat");
+
+    emp::DataMonitor<double> data_fracs;
+    emp::DataMonitor<int> data_squares;
+    emp::DataMonitor<uint64_t> data_cubes;
+
+    dfile.AddVar<int>(test_int);
+    dfile.AddCurrent(data_fracs);
+    dfile.AddCurrent(data_squares);
+    dfile.AddCurrent(data_cubes);
+    dfile.AddMean(data_cubes);
+    dfile.AddTotal(data_cubes);
+    dfile.AddMin(data_cubes);
+    dfile.AddMax(data_cubes);
+    dfile.AddFun<int>(test_fun);
+
+    double frac = 0.0;
+
+    dfile.SetTimingRepeat(2);
+
+    for (size_t i = 0; i < 10; i++) {
+        test_int = i;
+        data_fracs.Add(frac += 0.01);
+        data_squares.Add((int)(i*i));
+        data_cubes.Add(i*i*i);
+        dfile.Update(i);
+
+        // std::cout << i << std::endl;
+    }
+
+    dfile.SetTimingOnce(5);
+
+    for (size_t i = 0; i < 10; i++) {
+        test_int = i;
+        data_fracs.Add(frac += 0.01);
+        data_squares.Add((int)(i*i));
+        data_cubes.Add(i*i*i);
+        dfile.Update(i);
+        // std::cout << i << std::endl;
+    }
+
+    dfile.SetTimingRange(2, 3, 9);
+
+    for (size_t i = 0; i < 10; i++) {
+        test_int = i;
+        data_fracs.Add(frac += 0.01);
+        data_squares.Add((int)(i*i));
+        data_cubes.Add(i*i*i);
+        dfile.Update(i);
+
+        // std::cout << i << std::endl;
+    }
+
+    dfile.SetTiming([](size_t ud){return (bool)floor(sqrt((double)ud) == ceil(sqrt((double)ud)));});
+
+    for (size_t i = 0; i < 10; i++) {
+        test_int = i;
+        data_fracs.Add(frac += 0.01);
+        data_squares.Add((int)(i*i));
+        data_cubes.Add(i*i*i);
+        dfile.Update(i);
+
+        // std::cout << i << std::endl;
+    }
+
+    REQUIRE(compareFiles("test_timing_file.dat", "data/test_timing_file.dat"));
+}
