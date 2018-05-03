@@ -94,14 +94,7 @@ void DrawWorldCanvas_Scatter() {
   const double arm_scale = (canvas_x / total_length) / 2.0;
 
   // Draw the background grid.
-  canvas.Clear("#202020");
-  constexpr size_t grid_count = 40;
-  for (size_t i = 0; i <= grid_count; i++) {
-    double x = canvas_x * i / grid_count;
-    double y = canvas_y * i / grid_count;
-    canvas.Line(0, y, canvas_x, y, "#606060");
-    canvas.Line(x, 0, x, canvas_y, "#606060");
-  }
+  UI::DrawGridBG(canvas, 40, 40, "#202020", "#606060");
 
   // Draw all of the organisms
   for (size_t org_id = 0; org_id < world_size; org_id++) {
