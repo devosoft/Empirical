@@ -163,6 +163,43 @@ void CanvasClick(int x, int y) {
   }
 }
 
+void CanvasClick2(int x, int y) {
+  const size_t world_size = world.GetSize();
+  const double total_length = world.CalcTotalLength();
+
+  UI::Canvas canvas = doc.Canvas("world_canvas");
+  const double canvas_x = (double) canvas.GetWidth();
+  const double canvas_y = (double) canvas.GetHeight();
+
+  const emp::Point middle(canvas_x / 2.0, canvas_y / 2.0);
+  const double inv_arm_scale = 2.0 / (canvas_x / total_length);
+
+  size_t best_id = 0;
+  double best_dist = 1000000.0;
+
+  emp::Point target(x,y);
+  target -= middle;
+  target.Scale(inv_arm_scale);
+
+  // Determine which organism is closest to the click.
+  for (size_t org_id = 0; org_id < world_size; org_id++) {
+    if (world.IsOccupied(org_id) == false) continue;
+
+    emp::Point org_pos = world.CalcEndPoint(org_id);
+    double dist = org_pos.SquareDistance(target);
+    if (dist < best_dist) {
+      best_dist = dist;
+      best_id = org_id;
+    }
+  }
+
+  // Update the target and redraw.
+  target_id = best_id;
+  target_arm = world[best_id];
+  DrawWorldCanvas();
+
+}
+
 int main()
 {
   doc << "<h1>MAP-Elites: Arm Positioning Challenge</h1>";
@@ -178,7 +215,7 @@ int main()
 
   // Add the Canvas
   auto world_canvas = doc.AddCanvas(world_size, world_size, "world_canvas");
-  world_canvas.On("click", CanvasClick);
+  world_canvas.On("click", CanvasClick2);
   DrawWorldCanvas();
 
 
