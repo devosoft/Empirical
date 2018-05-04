@@ -86,7 +86,7 @@ namespace emp {
   /// track an evolutionary pathway)
   template <typename ORG_INFO, typename DATA_STRUCT = no_data>
   class Taxon {
-  private:
+  protected:
     using this_t = Taxon<ORG_INFO, DATA_STRUCT>;
     using info_t = ORG_INFO;
 
@@ -188,6 +188,103 @@ namespace emp {
     }
   };
 
+  template <typename ORG>
+  class SystematicsBase {
+
+  protected:
+    bool store_active;     ///< Store all of the currently active taxa?
+    bool store_ancestors;  ///< Store all of the direct ancestors from living taxa?
+    bool store_outside;    ///< Store taxa that are extinct with no living descendants?
+    bool archive;          ///< Set to true if we are supposed to do any archiving of extinct taxa.
+    bool store_position;   ///< Keep a vector mapping  positions to pointers
+    bool track_synchronous;///< Does this systematics manager need to keep track of current and next positions?
+
+    // Stats about active taxa... (totals are across orgs, not taxa)
+    size_t org_count;           ///< How many organisms are currently active?
+    size_t total_depth;         ///< Sum of taxa depths for calculating average.
+    size_t num_roots;           ///< How many distint injected ancestors are currently in population?
+
+    size_t next_id;             ///< What ID value should the next new taxon have?
+
+    public:
+
+    SystematicsBase(bool _active=true, bool _anc=true, bool _all=false, bool _pos=true)
+      : store_active(_active), store_ancestors(_anc), store_outside(_all), store_position(_pos)
+      , archive(store_ancestors || store_outside), track_synchronous(false) { ; }
+
+    virtual ~SystematicsBase(){;}
+
+    /// Are we tracking a synchronous population?
+    bool GetTrackSynchronous() const {return track_synchronous; }
+
+    /// Are we storing all taxa that are still alive in the population?
+    bool GetStoreActive() const { return store_active; }
+
+    /// Are we storing all taxa that are the ancestors of living organims in the population?
+    bool GetStoreAncestors() const { return store_ancestors; }
+
+    /// Are we storing all taxa that have died out, as have all of their descendants.
+    bool GetStoreOutside() const { return store_outside; }
+
+    /// Are we storing any taxa types that have died out?
+    bool GetArchive() const { return archive; }
+
+    /// Are we storing the positions of taxa?
+    bool GetStorePosition() const { return store_position; }
+
+    /// How many living organisms are currently being tracked?
+    size_t GetTotalOrgs() const { return org_count; }
+
+    /// How many independent trees are being tracked?
+    size_t GetNumRoots() const { return num_roots; }
+
+    /// What is the average phylogenetic depth of organisms in the population?
+    double GetAveDepth() const { return ((double) total_depth) / (double) org_count; }
+
+    /// Are we tracking organisms evolving in synchronous generations?
+    void SetTrackSynchronous(bool new_val) {track_synchronous = new_val; }
+
+    /// Are we storing all taxa that are still alive in the population?
+    void SetStoreActive(bool new_val) { store_active = new_val; }
+
+    /// Are we storing all taxa that are the ancestors of living organims in the population?
+    void SetStoreAncestors(bool new_val) { store_ancestors = new_val; }
+
+    /// Are we storing all taxa that have died out, as have all of their descendants.
+    void SetStoreOutside(bool new_val) { store_outside = new_val; }
+
+    /// Are we storing any taxa types that have died out?
+    void SetArchive(bool new_val) { archive = new_val; }
+
+    /// Are we storing the location of taxa?
+    void SetStorePosition(bool new_val) { store_position = new_val; }
+  
+    virtual size_t GetNumActive() const = 0;
+    virtual size_t GetNumAncestors() const = 0;
+    virtual size_t GetNumOutside() const = 0;
+    virtual size_t GetTreeSize() const = 0;
+    virtual size_t GetNumTaxa() const = 0;
+    virtual int GetPhylogeneticDiversity() const = 0;
+    // virtual double GetTaxonDistinctiveness() const = 0;
+    // virtual double GetEvolutionaryDistinctiveness() const = 0;
+    virtual double GetMeanPairwiseDistance(bool branch_only) const = 0;
+    virtual int GetSumPairwiseDistance(bool branch_only) const = 0;
+    virtual double GetVariancePairwiseDistance(bool branch_only) const = 0;
+    virtual emp::vector<int> GetPairwiseDistances(bool branch_only) const = 0;
+    // virtual int GetDistanceToRoot() = 0;
+    // virtual int GetBranchesToRoot() = 0;    
+    // virtual void GetMRCA() = 0;
+    virtual int GetMRCADepth() const = 0;
+    virtual void AddOrg(const ORG & org, int pos, int parent_pos, int update) = 0;
+    virtual bool RemoveOrg(int pos) = 0;
+    virtual bool RemoveNextOrg(int pos) = 0;
+    // virtual void Parent() const = 0;
+    virtual void PrintStatus(std::ostream & os) const = 0;
+    // virtual void PrintLineage() const = 0;
+    virtual double CalcDiversity() const = 0;
+    virtual void Update() = 0;
+  };
+
   /// @brief A tool to track phylogenetic relationships among organisms.
   /// The systematics class tracks the relationships among all organisms based on the INFO_TYPE
   /// provided.  If an offspring has the same value for INFO_TYPE as its parent, it is grouped into
@@ -197,18 +294,51 @@ namespace emp {
   /// grouped by phenotypes.  If the organsims's position is used, the evolutionary path through
   /// space is tracked.  Any other aspect of organisms can be tracked this way as well.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT = no_data>
-  class Systematics {
+  class Systematics : public SystematicsBase<ORG> {
   private:
     using taxon_t = Taxon<ORG_INFO, DATA_STRUCT>;
     using hash_t = typename Ptr<taxon_t>::hash_t;
-    using fun_calc_info_t = std::function<ORG_INFO(ORG)>;
+    using fun_calc_info_t = std::function<ORG_INFO(const ORG)>;
 
-    bool store_active;     ///< Store all of the currently active taxa?
-    bool store_ancestors;  ///< Store all of the direct ancestors from living taxa?
-    bool store_outside;    ///< Store taxa that are extinct with no living descendants?
-    bool archive;          ///< Set to true if we are supposed to do any archiving of extinct taxa.
-    bool store_position;   ///< Keep a vector mapping  positions to pointers
-    bool track_synchronous;///< Does this systematics manager need to keep track of current and next positions?
+    fun_calc_info_t calc_info_fun;
+
+    using SystematicsBase<ORG>::store_active;
+    using SystematicsBase<ORG>::store_ancestors;
+    using SystematicsBase<ORG>::store_outside;
+    using SystematicsBase<ORG>::archive;
+    using SystematicsBase<ORG>::store_position;
+    using SystematicsBase<ORG>::track_synchronous;
+    using SystematicsBase<ORG>::org_count;
+    using SystematicsBase<ORG>::total_depth;
+    using SystematicsBase<ORG>::num_roots;
+    using SystematicsBase<ORG>::next_id;
+
+    using SystematicsBase<ORG>::GetNumActive;
+    using SystematicsBase<ORG>::GetNumAncestors;
+    using SystematicsBase<ORG>::GetNumOutside;
+    using SystematicsBase<ORG>::GetTreeSize;
+    using SystematicsBase<ORG>::GetNumTaxa;
+    // using SystematicsBase<ORG>::OnNew;
+    // using SystematicsBase<ORG>::OnPrune;
+    using SystematicsBase<ORG>::GetPhylogeneticDiversity;
+    // using SystematicsBase<ORG>::GetTaxonDistinctiveness;
+    // using SystematicsBase<ORG>::GetEvolutionaryDistinctiveness;
+    using SystematicsBase<ORG>::GetMeanPairwiseDistance;
+    using SystematicsBase<ORG>::GetSumPairwiseDistance;
+    using SystematicsBase<ORG>::GetVariancePairwiseDistance;
+    using SystematicsBase<ORG>::GetPairwiseDistances;
+    // using SystematicsBase<ORG>::GetDistanceToRoot;
+    // using SystematicsBase<ORG>::GetBranchesToRoot;
+    // using SystematicsBase<ORG>::GetMRCA;
+    using SystematicsBase<ORG>::GetMRCADepth;
+    using SystematicsBase<ORG>::AddOrg;
+    using SystematicsBase<ORG>::RemoveOrg;
+    using SystematicsBase<ORG>::RemoveNextOrg;
+    // using SystematicsBase<ORG>::Parent;
+    using SystematicsBase<ORG>::PrintStatus;
+    // using SystematicsBase<ORG>::PrintLineage;
+    using SystematicsBase<ORG>::CalcDiversity;
+    using SystematicsBase<ORG>::Update;
 
     std::unordered_set< Ptr<taxon_t>, hash_t > active_taxa;   ///< A set of all living taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; ///< A set of all dead, ancestral taxa.
@@ -220,12 +350,6 @@ namespace emp {
     Signal<void(Ptr<taxon_t>)> on_new_sig; ///< Trigger when any organism is pruned from tree
     Signal<void(Ptr<taxon_t>)> on_prune_sig; ///< Trigger when any organism is pruned from tree
 
-    // Stats about active taxa... (totals are across orgs, not taxa)
-    size_t org_count;           ///< How many organisms are currently active?
-    size_t total_depth;         ///< Sum of taxa depths for calculating average.
-    size_t num_roots;           ///< How many distint injected ancestors are currently in population?
-
-    size_t next_id;             ///< What ID value should the next new taxon have?
     mutable Ptr<taxon_t> mrca;  ///< Most recent common ancestor in the population.
 
     /// Called wheneven a taxon has no organisms AND no descendants.
@@ -245,11 +369,10 @@ namespace emp {
      * @param store_outside    Should all dead taxa be maintained? (typically no; it gets BIG!)
      */
 
-    Systematics(bool _active=true, bool _anc=true, bool _all=false, bool _pos=true)
-      : store_active(_active), store_ancestors(_anc), store_outside(_all), store_position(_pos)
-      , archive(store_ancestors || store_outside)
+    Systematics(fun_calc_info_t calc_taxon, bool _active=true, bool _anc=true, bool _all=false, bool _pos=true)
+      : SystematicsBase<ORG>(_active, _anc, _all, _pos)
+      , calc_info_fun(calc_taxon)
       , active_taxa(), ancestor_taxa(), outside_taxa()
-      , org_count(0), total_depth(0), num_roots(0), next_id(0)
       , mrca(nullptr) { ; }
     Systematics(const Systematics &) = delete;
     Systematics(Systematics &&) = default;
@@ -262,61 +385,18 @@ namespace emp {
       outside_taxa.clear();
     }
 
-    /// Are we storing all taxa that are still alive in the population?
-    bool GetStoreActive() const { return store_active; }
 
-    /// Are we storing all taxa that are the ancestors of living organims in the population?
-    bool GetStoreAncestors() const { return store_ancestors; }
+    void Update() {
+      std::swap(taxon_locations, next_taxon_locations);
+      next_taxon_locations.resize(0);
+    }
 
-    /// Are we storing all taxa that have died out, as have all of their descendants.
-    bool GetStoreOutside() const { return store_outside; }
-
-    /// Are we storing any taxa types that have died out?
-    bool GetArchive() const { return archive; }
-
-    /// Are we storing the positions of taxa?
-    bool GetStorePosition() const { return store_position; }
+    void SetCalcInfoFun(fun_calc_info_t f) {calc_info_fun = f;}
 
     // Currently using raw pointers because of a weird bug in emp::Ptr. Should switch when fixed.
     std::unordered_set< Ptr<taxon_t>, hash_t >* GetActivePtr() { return &active_taxa; }
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetActive() const { return active_taxa; }
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetAncestors() const { return ancestor_taxa; }
-
-    EMP_CREATE_OPTIONAL_METHOD(RecordMutation, RecordMutation);
-    EMP_CREATE_OPTIONAL_METHOD(RecordFitness, RecordFitness);
-    EMP_CREATE_OPTIONAL_METHOD(RecordPhenotype, RecordPhenotype);
-
-    /// Currently records mutation information if appropriate for DATA_TYPE 
-    void RecordMutationData(Ptr<taxon_t> org, std::unordered_map<std::string, int> mut_counts) {
-      RecordMutation(org->GetData(), mut_counts);
-    }
-
-    void RecordFitnessData(Ptr<taxon_t> org, double fitness) {
-      RecordFitness(org->GetData(), fitness);
-    }
-
-    template <typename phen_t>
-    void RecordPhenotypeData(Ptr<taxon_t> org, phen_t phen) {
-      RecordPhenotype(org->GetData(), phen);
-    }
-
-    SignalKey OnNew(std::function<void(Ptr<taxon_t>)> & fun) { return on_new_sig.AddAction(fun); }
-
-    /// Privide a function for Systematics to call each time a taxon is about to be pruned.
-    /// Trigger:  Taxon is about to be killed
-    /// Argument: Pounter to taxon
-    SignalKey OnPrune(std::function<void(Ptr<taxon_t>)> & fun) { return on_prune_sig.AddAction(fun); }
-
-    // Shoot, there could be multiple taxa with the same info
-    // Ptr<taxon_t> GetActiveTaxon(const ORG_INFO & org) {
-    //   for (auto tax : active_taxa) {
-    //     if (tax->GetInfo() == org) {
-    //       return tax;
-    //     }
-    //   }
-    //   emp_assert(false, "No matching active taxa.");
-    //   return nullptr;
-    // }
 
     /// How many taxa are still active in the population?
     size_t GetNumActive() const { return active_taxa.size(); }
@@ -333,14 +413,15 @@ namespace emp {
     /// How many taxa are stored in total?
     size_t GetNumTaxa() const { return GetTreeSize() + GetNumOutside(); }
 
-    /// How many living organisms are currently being tracked?
-    size_t GetTotalOrgs() const { return org_count; }
+    SignalKey OnNew(std::function<void(Ptr<taxon_t>)> & fun) { return on_new_sig.AddAction(fun); }
 
-    /// How many independent trees are being tracked?
-    size_t GetNumRoots() const { return num_roots; }
+    /// Privide a function for Systematics to call each time a taxon is about to be pruned.
+    /// Trigger:  Taxon is about to be killed
+    /// Argument: Pounter to taxon
+    SignalKey OnPrune(std::function<void(Ptr<taxon_t>)> & fun) { return on_prune_sig.AddAction(fun); }
 
-    /// What is the average phylogenetic depth of organisms in the population?
-    double GetAveDepth() const { return ((double) total_depth) / (double) org_count; }
+    Ptr<taxon_t> GetTaxonAt(int id) {return taxon_locations[id];}
+    Ptr<taxon_t> GetNextTaxonAt(int id) {return next_taxon_locations[id];}
 
     /** From (Faith 1992, reviewed in Winters et al., 2013), phylogenetic diversity is 
      *  the sum of edges in the minimal spanning tree connected the taxa you're 
@@ -443,7 +524,7 @@ namespace emp {
      * This measurement assumes that the tree is fully connected. Will return -1
      * if this is not the case.
      * */
-    double GetMeanPairwiseDistance(bool branch_only=false) {
+    double GetMeanPairwiseDistance(bool branch_only=false) const {
       emp::vector<int> dists = GetPairwiseDistances(branch_only);
       return (double)Sum(dists)/dists.size();
     }
@@ -458,8 +539,9 @@ namespace emp {
      * This measurement assumes that the tree is fully connected. Will return -1
      * if this is not the case.
      * */
-    int GetSumPairwiseDistance(bool branch_only=false) {
-      return Sum(GetPairwiseDistances(branch_only));
+    int GetSumPairwiseDistance(bool branch_only=false) const {
+      emp::vector<int> v = GetPairwiseDistances(branch_only);
+      return Sum(v);
     }
 
     /** Calculates variance of pairwise distance between extant taxa. Tucker et al 2017 points
@@ -472,8 +554,9 @@ namespace emp {
      * This measurement assumes that the tree is fully connected. Will return -1
      * if this is not the case.
      * */
-    int GetVariancePairwiseDistance(bool branch_only=false) {
-      return Variance(GetPairwiseDistances(branch_only));
+    double GetVariancePairwiseDistance(bool branch_only=false) const {
+      emp::vector<int> v = GetPairwiseDistances(branch_only);
+      return Variance(v);
     }
 
     /** Calculates a vector of all pairwise distances between extant taxa.
@@ -485,7 +568,7 @@ namespace emp {
      * This method assumes that the tree is fully connected. Will return -1
      * if this is not the case.
      * */
-    emp::vector<int> GetPairwiseDistances(bool branch_only=false) {      
+    emp::vector<int> GetPairwiseDistances(bool branch_only=false) const {      
       // The overarching approach here is to start with a bunch of pointers to all
       // extant organisms (since that will include all leaves). Then we trace back up
       // the tree, keeping track of distances. When things meet up, we calculate
@@ -638,11 +721,17 @@ namespace emp {
     /// If you would like the systematics manager to track taxon age, you can also supply
     /// the update at which the taxon is being added.
     /// return a pointer for the associated taxon.
-    Ptr<taxon_t> AddOrg(const ORG_INFO & info, size_t cur_taxon_pos=-1, int update=-1);
-    Ptr<taxon_t> AddOrg(const ORG_INFO & info, Ptr<taxon_t> cur_taxon=nullptr, int update=-1);
+    void AddOrg(const ORG & org, int pos, int parent_pos=-1, int update=-1);
+    Ptr<taxon_t> AddOrg(const ORG & org, int pos, Ptr<taxon_t> parent=nullptr, int update=-1);
+    Ptr<taxon_t> AddOrg(const ORG & org, Ptr<taxon_t> parent=nullptr, int update=-1);
 
     /// Remove an instance of an organism; track when it's gone.
+    bool RemoveOrg(int pos);
     bool RemoveOrg(Ptr<taxon_t> taxon);
+
+    /// Remove org from next population (for use with synchronous generations)
+    bool RemoveNextOrg(int pos);
+    bool RemoveNextOrg(Ptr<taxon_t> taxon);
 
     /// Climb up a lineage...
     Ptr<taxon_t> Parent(Ptr<taxon_t> taxon) const;
@@ -654,23 +743,7 @@ namespace emp {
     void PrintLineage(Ptr<taxon_t> taxon, std::ostream & os=std::cout) const;
 
     /// Calculate the genetic diversity of the population.
-    double CalcDiversity();
-
-    /// Are we storing all taxa that are still alive in the population?
-    void SetStoreActive(bool new_val) { store_active = new_val; }
-
-    /// Are we storing all taxa that are the ancestors of living organims in the population?
-    void SetStoreAncestors(bool new_val) { store_ancestors = new_val; }
-
-    /// Are we storing all taxa that have died out, as have all of their descendants.
-    void SetStoreOutside(bool new_val) { store_outside = new_val; }
-
-    /// Are we storing any taxa types that have died out?
-    void SetArchive(bool new_val) { archive = new_val; }
-
-    /// Are we storing the location of taxa?
-    void SetStorePosition(bool new_val) { store_position = new_val; }
-
+    double CalcDiversity() const;
 
   };
 
@@ -755,31 +828,67 @@ namespace emp {
     return -1;
   }
 
+
+
+  // Add information about a new organism, including its stored info and parent's taxon;
+  // Can't return a pointer for the associated taxon because of obnoxious inheritance problems
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> 
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(const ORG & org, int pos, int parent_pos, int update) {
+    emp_assert(store_position, "Trying to pass position to a systematics manager that can't use it");
+    emp_assert( parent_pos == -1 || (taxon_locations[parent_pos] && Has(active_taxa, taxon_locations[parent_pos])));
+    if (parent_pos == -1) {
+      AddOrg(org, pos, nullptr, update);
+    } else {
+      AddOrg(org, pos, taxon_locations[parent_pos], update);
+    }
+  }
+
+  // Version for if you aren't tracking positions
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> 
+  Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(const ORG & org, Ptr<taxon_t> parent, int update) {
+    // TODO_Warning: Once we have warnings, put a warning here if store_position is true
+    return AddOrg(org, -1, parent, update);
+  }
+
   // Add information about a new organism, including its stored info and parent's taxon;
   // return a pointer for the associated taxon.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(const ORG_INFO & info, size_t cur_taxon_pos, int update) {
-    emp_assert( cur_taxon_pos == -1 || (taxon_locations[cur_taxon_pos] && Has(active_taxa, taxon_locations[cur_taxon_pos])));
-    Ptr<taxon_t> cur_taxon;
-    // Update stats
+  Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
+  Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(const ORG & org, int pos, Ptr<taxon_t> parent, int update) {
+    emp_assert(store_position, "Trying to pass position to a systematics manager that can't use it");
     org_count++;                  // Keep count of how many organisms are being tracked.
 
-    // If this organism needs a new taxon, build it!
-    if (cur_taxon_pos == -1 || taxon_locations[cur_taxon_pos]->GetInfo() != info) {
-      Ptr<taxon_t> parent_taxon;                               // Provided taxon is parent.
-      if (cur_taxon_pos == -1) {                                         // No parnet -> NEW tree
-        num_roots++;                                               // ...track extra root.
-        mrca = nullptr;
-        parent_taxon = nullptr;                                            // ...nix old common ancestor
-      } else {
-        emp_assert(taxon_locations[cur_taxon_pos], "Invalid parent position");
-        parent_taxon = taxon_locations[cur_taxon_pos];
-      }
+    ORG_INFO info = calc_info_fun(org);
 
-      cur_taxon = NewPtr<taxon_t>(++next_id, info, parent_taxon);  // Build new taxon.
+    Ptr<taxon_t> cur_taxon = parent;
+
+    // If this organism needs a new taxon, build it!
+    if (!cur_taxon || cur_taxon->GetInfo() != info) {
+      if (!cur_taxon) {                                         // No parent -> NEW tree
+        num_roots++;                                               // ...track extra root.
+        mrca = nullptr;                                 // ...nix old common ancestor
+      } 
+
+      cur_taxon = NewPtr<taxon_t>(++next_id, info, parent);  // Build new taxon.
       on_new_sig.Trigger(cur_taxon);
       if (store_active) active_taxa.insert(cur_taxon);             // Store new taxon.
-      if (parent_taxon) parent_taxon->AddOffspring();              // Track tree info.
+      if (parent) parent->AddOffspring();              // Track tree info.
+      if (store_position) {
+        if (track_synchronous) {
+          if (pos > (int)next_taxon_locations.size()) {
+            next_taxon_locations.resize(pos+1);
+          }
+          next_taxon_locations[pos] = cur_taxon;
+
+        } else {
+          if (pos > (int)taxon_locations.size()) {
+            taxon_locations.resize(pos+1);
+          }
+          taxon_locations[pos] = cur_taxon;
+        }
+      }
 
       cur_taxon->SetOriginationTime(update);
     }
@@ -789,33 +898,13 @@ namespace emp {
     return cur_taxon;                       // Return the taxon used.
   }
 
-  // Add information about a new organism, including its stored info and parent's taxon;
-  // return a pointer for the associated taxon.
-  template <typename ORG_INFO, typename DATA_STRUCT>
-  Ptr<typename Systematics<ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG_INFO, DATA_STRUCT>::AddOrg(const ORG_INFO & info, Ptr<taxon_t> cur_taxon, int update) {
-    emp_assert( !cur_taxon || Has(active_taxa, cur_taxon));
-
-    // Update stats
-    org_count++;                  // Keep count of how many organisms are being tracked.
-
-    // If this organism needs a new taxon, build it!
-    if (!cur_taxon || cur_taxon->GetInfo() != info) {
-      auto parent_taxon = cur_taxon;                               // Provided taxon is parent.
-      if (!parent_taxon) {                                         // No parnet -> NEW tree
-        num_roots++;                                               // ...track extra root.
-        mrca = nullptr;                                            // ...nix old common ancestor
-      }
-      cur_taxon = NewPtr<taxon_t>(++next_id, info, parent_taxon);  // Build new taxon.
-      on_new_sig.Trigger(cur_taxon);
-      if (store_active) active_taxa.insert(cur_taxon);             // Store new taxon.
-      if (parent_taxon) parent_taxon->AddOffspring();              // Track tree info.
-
-      cur_taxon->SetOriginationTime(update);
-    }
-
-    cur_taxon->AddOrg();                    // Record the current organism in its taxon.
-    total_depth += cur_taxon->GetDepth();   // Track the total depth (for averaging)
-    return cur_taxon;                       // Return the taxon used.
+  // Remove an instance of an organism; track when it's gone.
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrg(int pos) {
+    emp_assert(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
+    bool active = RemoveOrg(taxon_locations[pos]);
+    taxon_locations[pos] = nullptr;
+    return active;
   }
 
   // Remove an instance of an organism; track when it's gone.
@@ -833,6 +922,31 @@ namespace emp {
 
     return active;
   }
+
+  // Remove an instance of an organism; track when it's gone.
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveNextOrg(int pos) {
+    bool active = RemoveOrg(next_taxon_locations[pos]);
+    next_taxon_locations[pos] = nullptr;
+    return active;
+  }
+
+  // Remove an instance of an organism; track when it's gone.
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveNextOrg(Ptr<taxon_t> taxon) {
+    emp_assert(taxon);
+
+    // Update stats
+    org_count--;
+    total_depth -= taxon->GetDepth();
+
+    // emp_assert(Has(active_taxa, taxon));
+    const bool active = taxon->RemoveOrg();
+    if (!active) MarkExtinct(taxon);
+
+    return active;
+  }
+
 
   // Climb up a lineage...
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
@@ -886,7 +1000,7 @@ namespace emp {
 
   // Calculate the genetic diversity of the population.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  double Systematics<ORG, ORG_INFO, DATA_STRUCT>::CalcDiversity() {
+  double Systematics<ORG, ORG_INFO, DATA_STRUCT>::CalcDiversity() const {
     return emp::Entropy(active_taxa, [](Ptr<taxon_t> x){ return x->GetNumOrgs(); }, org_count);
   }
 
