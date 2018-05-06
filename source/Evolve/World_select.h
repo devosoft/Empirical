@@ -13,6 +13,7 @@
 #include <map>
 #include <functional>
 
+#include "../base/array.h"
 #include "../base/assert.h"
 #include "../base/vector.h"
 #include "../base/macros.h"
@@ -52,6 +53,27 @@ namespace emp {
     }
   }
 
+  /// ==RANDOM== Selection picks an organism with uniform-random probability form the populaiton.
+  /// @param world The emp::World object with the organisms to be selected.
+  /// @param r_count How many distinct organisms should be chosen?
+  /// @param copy_count How many copies should be made of each chosen organism?
+  template<typename ORG>
+  void RandomSelect(World<ORG> & world, size_t r_count=1, size_t copy_count=1) {
+    emp_assert(r_count > 0, r_count);
+    emp_assert(copy_count > 0);
+
+    Random & random = world.GetRandom();
+
+    // Pick r_count organisms;
+    for (size_t i = 0; i < r_count; i++) {
+      // Choose an organism at random
+      size_t id = random.GetUInt(world.GetSize());
+      while (world.IsOccupied(id) == false) id = random.GetUInt(world.GetSize());
+
+      // Make copy_count copies.
+      world.DoBirth( world.GetGenomeAt(id), id, copy_count);
+    }
+  }
 
   /// ==TOURNAMENT== Selection creates a tournament with a random sub-set of organisms,
   /// finds the one with the highest fitness, and moves it to the next generation.
@@ -62,7 +84,8 @@ namespace emp {
   /// @param tourny_count How many tournaments should be run? (with replacement of organisms)
   template<typename ORG>
   void TournamentSelect(World<ORG> & world, size_t t_size, size_t tourny_count=1) {
-    emp_assert(t_size > 0, t_size, world.GetNumOrgs());
+    emp_assert(t_size > 0, "Cannot have a tournament with zero organisms.", t_size, world.GetNumOrgs());
+    emp_assert(t_size <= world.GetNumOrgs(), "Tournament too big for world.", t_size, world.GetNumOrgs());
     emp_assert(tourny_count > 0);
 
     emp::vector<size_t> entries;
@@ -87,6 +110,48 @@ namespace emp {
       world.DoBirth( world.GetGenomeAt(best_id), best_id, 1 );
     }
   }
+
+
+
+  /// Function to kill off an organism in DiverseElites to help maintain population size.
+  /// Generate a tournament.  Find the two closest together.  Kill the one with the lower fitness.
+  template <typename ORG>
+  auto DiverseElites_Kill(World<ORG> & world, TraitSet<ORG> traits) {
+    emp::vector<Ptr<ORG>> orgs = world.GetFullPop();
+    constexpr size_t num_groups = 4;
+    emp::array<size_t, num_groups> group_sizes;
+    size_t trait_id = 0;
+
+    // Loop until we've found the most dense portion of the population.
+    while (orgs.size() > num_groups) {
+      // Determine the range on the current trait.
+      Trait<ORG, double> & trait = traits[trait_id];
+      double min_val = trait.Eval(*orgs[0]);
+      double max_val = min_val;
+      for (size_t i = 1; i < orgs.size(); i++) {
+        double val = trait.Eval(*orgs[i]);
+        if (val < min_val) min_val = val;
+        if (val > max_val) max_val = val;
+      }
+      
+      // Determine how population divides into groups.
+      double trait_width = (max_val - min_val) * 1.0000001;
+      double group_width = trait_width / (double) num_groups;
+      group_sizes.fill(0);
+      for (size_t i = 0; i < orgs.size(); i++) {
+        double val = trait.Eval(*orgs[i]);
+        size_t group_id = (val - min_val) / group_width;   // @CAO Watch out for zero group_width!
+        group_sizes[group_id]++;
+      }
+
+      // @CAO: Keep only those orgs in the biggest bin and repeat!
+
+      // Shift to use the next trait.
+      if (++trait_id == traits.GetSize()) trait_id = 0;
+    }
+  }
+
+
 
   /// ==ROULETTE== Selection (aka Fitness-Proportional Selection) chooses organisms to
   /// reproduce based on their current fitness.
@@ -125,7 +190,7 @@ namespace emp {
   /// @param max_funs The maximum number of fitness functions to use. (use 0 for all; default)
   template<typename ORG>
   void LexicaseSelect(World<ORG> & world,
-                      const emp::vector< std::function<double(const ORG &)> > & fit_funs,
+                      const emp::vector< std::function<double(ORG &)> > & fit_funs,
                       size_t repro_count=1,
                       size_t max_funs=0)
   {

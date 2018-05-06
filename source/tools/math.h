@@ -91,7 +91,7 @@ namespace emp {
   }
 
 
-  namespace {
+  namespace internal {
     // A compile-time log calculator for values [1,2)
     static constexpr double Log2_base(double x) {
       emp_assert(x > 0);
@@ -119,7 +119,7 @@ namespace emp {
   /// Compile-time log base 2 calculator.
   static constexpr double Log2(double x) {
     emp_assert(x > 0);
-    return (x < 1.0) ? Log2_frac(x) : Log2_pos(x);
+    return (x < 1.0) ? internal::Log2_frac(x) : internal::Log2_pos(x);
   }
 
   /// Compile-time log calculator
@@ -134,7 +134,7 @@ namespace emp {
   static constexpr T Square(T val) { return val * val; }
 
   // Pow helper functions.
-  namespace {
+  namespace internal {
     static constexpr double Pow2_lt1(double exp, int id=0) {
       return (id==32) ? 1.0 :
         ( (exp > 0.5) ? (pow2_chart_bits[id]*Pow2_lt1(exp*2.0-1.0,id+1)) : Pow2_lt1(exp*2.0,id+1) );
@@ -155,7 +155,7 @@ namespace emp {
 
   /// A fast 2^x command.
   static constexpr double Pow2(double exp) {
-    return (exp < 0.0) ? (1.0/Pow2_impl(-exp)) : Pow2_impl(exp);
+    return (exp < 0.0) ? (1.0/internal::Pow2_impl(-exp)) : internal::Pow2_impl(exp);
   }
 
   /// A fast method for calculating exponents for int types.

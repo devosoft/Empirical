@@ -210,7 +210,8 @@ namespace emp {
 
     SystematicsBase(bool _active=true, bool _anc=true, bool _all=false, bool _pos=true)
       : store_active(_active), store_ancestors(_anc), store_outside(_all)
-      , archive(store_ancestors || store_outside), store_position(_pos), track_synchronous(false) { ; }
+      , archive(store_ancestors || store_outside), store_position(_pos), track_synchronous(false)
+      , org_count(0), total_depth(0), num_roots(0), next_id(0) { ; }
 
     virtual ~SystematicsBase(){;}
 
@@ -510,7 +511,7 @@ namespace emp {
 
         emp_assert(test_taxon->GetOriginationTime() != -1 && 
                   "Invalid time - are you passing time to rg?");
-
+        
         depth += time - test_taxon->GetOriginationTime();
         // std::cout << "Tax: " << test_taxon->GetID() << " depth: " << depth << " time: " << time  << " Orig: " << test_taxon->GetOriginationTime() << " divisor: " << divisor << std::endl;
         time = test_taxon->GetOriginationTime();
@@ -856,7 +857,7 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   int Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetMRCADepth() const {
     GetMRCA();
-    if (mrca) return mrca->GetDepth();
+    if (mrca) return (int) mrca->GetDepth();
     return -1;
   }
 
@@ -1062,7 +1063,7 @@ namespace emp {
   // Calculate the genetic diversity of the population.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   double Systematics<ORG, ORG_INFO, DATA_STRUCT>::CalcDiversity() const {
-    return emp::Entropy(active_taxa, [](Ptr<taxon_t> x){ return x->GetNumOrgs(); }, org_count);
+    return emp::Entropy(active_taxa, [](Ptr<taxon_t> x){ return x->GetNumOrgs(); }, (double) org_count);
   }
 
 }

@@ -1,5 +1,14 @@
-#ifndef __LAYOUT_H__
-#define __LAYOUT_H__
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2016-2018
+ *
+ *  @file  layout.h
+ *  @brief Tools for laying out nodes in D3.
+ */
+
+#ifndef EMP_D3_LAYOUT_H
+#define EMP_D3_LAYOUT_H
 
 #include "d3_init.h"
 #include "dataset.h"
@@ -80,8 +89,8 @@ namespace D3{
 
         make_line = new D3::LinkGenerator("horizontal");
 
-        // std::function<std::array<double, 2>(NODE_TYPE, int, int)> projection = [](NODE_TYPE n, int i, int k){
-        //   return std::array<double, 2>({n.y(), n.x()});
+        // std::function<emp::array<double, 2>(NODE_TYPE, int, int)> projection = [](NODE_TYPE n, int i, int k){
+        //   return emp::array<double, 2>({n.y(), n.x()});
         // };
         //
         // emp::JSWrap(projection, "projection");
@@ -96,8 +105,8 @@ namespace D3{
 
         make_line = new D3::LinkGenerator("horizontal");
 
-        // std::function<std::array<double, 2>(NODE_TYPE, int, int)> projection = [](NODE_TYPE n, int i, int k){
-        //   return std::array<double, 2>({{n.y(), n.x()}});
+        // std::function<emp::array<double, 2>(NODE_TYPE, int, int)> projection = [](NODE_TYPE n, int i, int k){
+        //   return emp::array<double, 2>({{n.y(), n.x()}});
         // };
         //
         // emp::JSWrap(projection, "projection");
@@ -123,7 +132,7 @@ namespace D3{
     //to do more with it. It would be nice to return the enter selection for
     //links too, but C++ makes that super cumbersome, and it's definitely the less
     //common use case
-    std::array<Selection, 4> GenerateNodesAndLinks(Selection svg) {
+    emp::array<Selection, 4> GenerateNodesAndLinks(Selection svg) {
       int node_enter = NextD3ID();
       int node_exit = NextD3ID();
       int link_enter = NextD3ID();
@@ -179,8 +188,8 @@ namespace D3{
         js.objects[$7] = linkExit;
     }, this->id, data->GetID(), make_line->GetID(), svg.GetID(), node_enter, node_exit, link_enter, link_exit);
       std::cout << "Done generating" << std::endl;
-      return std::array<Selection, 4>({{Selection(node_enter), Selection(node_exit),
-                                        Selection(link_enter), Selection(link_exit)}});
+      return emp::array<Selection, 4>{{Selection(node_enter), Selection(node_exit),
+                                       Selection(link_enter), Selection(link_exit)}};
     }
 
 

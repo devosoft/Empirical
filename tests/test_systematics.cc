@@ -305,8 +305,7 @@ TEST_CASE("Run world", "[evo]") {
   });
 
   // world.OnOrgPlacement([&last_mutation, &world](size_t pos){
-  //   std::cout << pos << std::endl;
-  //   // world.GetSystematics(0).Cast<systematics_t>()->GetTaxonAt(pos)->GetData().RecordMutation(last_mutation);
+  //   world.GetSystematics(0).Cast<systematics_t>()->GetTaxonAt(pos)->GetData().RecordMutation(last_mutation);
   // });
 
   // emp::AddPhylodiversityFile(world).SetTimingRepeat(1);

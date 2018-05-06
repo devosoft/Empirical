@@ -1,5 +1,14 @@
-#ifndef __AXIS_H__
-#define __AXIS_H__
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017-2018
+ *
+ *  @file  axis.h
+ *  @brief Handle drawing of axes on D3 graphts.
+ */
+
+#ifndef EMP_D3_AXIS_H
+#define EMP_D3_AXIS_H
 
 #include "../js_utils.h"
 #include "../../tools/string_utils.h"
@@ -171,7 +180,7 @@ namespace D3 {
     }
 
     template <typename T, std::size_t SIZE>
-    Axis& SetTickValues(std::array<T, SIZE> values) {
+    Axis& SetTickValues(emp::array<T, SIZE> values) {
       emp::pass_array_to_javascript(values);
 
       EM_ASM_ARGS({
@@ -231,7 +240,7 @@ namespace D3 {
     /// transition, then the rescaling will be animated.
     template <typename T>
     Axis& Rescale(double new_min, double new_max, const D3::SelectionOrTransition<T> & svg){
-      this->scale.SetDomain(std::array<double, 2>({{new_min, new_max}}));
+      this->scale.SetDomain(emp::array<double, 2>{{new_min, new_max}});
       ApplyAxis(svg.Select("#"+dom_id));
       return *this;
     }

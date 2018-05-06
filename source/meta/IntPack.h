@@ -26,7 +26,7 @@ namespace emp {
   template <int... Ts> struct IntPack;
 
   // Anonymous implementations of IntPack interface.
-  namespace {
+  namespace internal {
     template <bool DONE, int START, int END, int STEP, int... VALS>
     struct ip_range {
       static constexpr int NEXT = START + STEP;
@@ -114,7 +114,7 @@ namespace emp {
 
   // Generate an IntPack with a specified range of values.
   template <int START, int END, int STEP=1>
-  using IntPackRange = typename ip_range<(START >= END), START, END, STEP>::type;
+  using IntPackRange = typename internal::ip_range<(START >= END), START, END, STEP>::type;
 
   // IntPack with at least one value.
   template <int V1, int... Vs>
@@ -126,11 +126,11 @@ namespace emp {
 
     template <int V> using push = IntPack<V, V1, Vs...>;
     template <int V> using push_back = IntPack<V1, Vs..., V>;
-    template <int V, int X> using push_if_not = typename ip_push_if_not<V,X,this_t>::result;
-    template <int V, int X> using push_back_if_not = typename ip_push_if_not<V,X,this_t>::back;
-    template <int V> using pop_val = typename ip_loop<this_t, IntPack<>, false, 2>::template pop_val<V>;
-    template <int V> using remove = typename ip_loop<this_t, IntPack<>, false, 3>::template remove<V>;
-    template <typename T> using append = typename ip_concat<this_t,T>::result;
+    template <int V, int X> using push_if_not = typename internal::ip_push_if_not<V,X,this_t>::result;
+    template <int V, int X> using push_back_if_not = typename internal::ip_push_if_not<V,X,this_t>::back;
+    template <int V> using pop_val = typename internal::ip_loop<this_t, IntPack<>, false, 2>::template pop_val<V>;
+    template <int V> using remove = typename internal::ip_loop<this_t, IntPack<>, false, 3>::template remove<V>;
+    template <typename T> using append = typename internal::ip_concat<this_t,T>::result;
 
     constexpr static bool Has(int V) { return (V==V1) | pop::Has(V); }
     constexpr static int Count(int V) { return pop::Count(V) + (V==V1); }
@@ -162,8 +162,8 @@ namespace emp {
 
     template <int V> using push = IntPack<V>;
     template <int V> using push_back = IntPack<V>;
-    template <int V, int X> using push_if_not = typename ip_push_if_not<V,X,IntPack<>>::result;
-    template <int V, int X> using push_back_if_not = typename ip_push_if_not<V,X,IntPack<>>::back;
+    template <int V, int X> using push_if_not = typename internal::ip_push_if_not<V,X,IntPack<>>::result;
+    template <int V, int X> using push_back_if_not = typename internal::ip_push_if_not<V,X,IntPack<>>::back;
     template <int V> using pop_val = IntPack<>;  // No value to pop!  Faulure?
     template <int V> using remove = IntPack<>;
     template <typename T> using append = T;
@@ -187,10 +187,10 @@ namespace emp {
   };
 
   namespace pack {
-    template <typename T> using reverse = typename ip_reverse<T>::result;
-    template <typename T> using uniq = typename ip_uniq<T>::result;
+    template <typename T> using reverse = typename internal::ip_reverse<T>::result;
+    template <typename T> using uniq = typename internal::ip_uniq<T>::result;
 
-    template <typename T> using sort = typename ip_sort<T>::result;
+    template <typename T> using sort = typename internal::ip_sort<T>::result;
     template <typename T> using Rsort = reverse< sort<T> >;
     template <typename T> using Usort = uniq< sort<T> >;
     template <typename T> using RUsort = reverse< Usort<T> >;

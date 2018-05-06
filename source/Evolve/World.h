@@ -18,6 +18,10 @@
  *        facilitate demes, pools, islands, etc.
  *  @todo We should be able to have any number of systematics managers, based on various type_trait
  *        information a that we want to track.
+ *  @todo Add a signal for DoBirth() for when a birth fails.
+ *  @todo Add a feature to maintain population sorted by each phenotypic trait.  This will allow
+ *        us to more rapidly find phenotypic neighbors and know the current extremes for each
+ *        phenotype.
  */
 
 #ifndef EMP_EVO_WORLD_H
@@ -30,6 +34,7 @@
 #include "../base/vector.h"
 #include "../control/Signal.h"
 #include "../control/SignalControl.h"
+#include "../data/DataFile.h"
 #include "../data/Trait.h"
 #include "../data/DataFile.h"
 #include "../data/DataManager.h"
@@ -41,11 +46,11 @@
 #include "../tools/string_utils.h"
 
 // World-specific includes.
-#include "Systematics.h"    // Track relationships among organisms.
-// #include "World_file.h"     // Helper to determine when specific events should occur.
-#include "World_iterator.h" // Allow iteration through organisms in a world.
-#include "World_reflect.h"  // Handle needed reflection on incoming organism classes.
-#include "World_select.h"   // Include all built-in selection functions for World.
+#include "Systematics.h"     // Track relationships among organisms.
+#include "World_iterator.h"  // Allow iteration through organisms in a world.
+#include "World_reflect.h"   // Handle needed reflection on incoming organism classes.
+#include "World_select.h"    // Include all built-in selection functions for World.
+#include "World_structure.h" // Include additional function to setup world structure.
 
 namespace emp {
 
@@ -124,7 +129,7 @@ namespace emp {
     /// Function type for calculating the distance between two organisms.
     using fun_calc_dist_t    = std::function<double(ORG&,ORG&)>;
 
-    /// Function type for a mutation operator on an organisms.
+    /// Function type for a mutation operator on an organism.
     using fun_do_mutations_t = std::function<size_t(ORG&,Random&)>;
 
     /// Function type for determining if a mutation should happen
@@ -156,15 +161,15 @@ namespace emp {
     emp::vector<double> fit_cache;  ///< vector size == 0 when not caching; uncached values == 0.
 
     // Configuration settings
-    std::string name;                  ///< Name of this world (for use in configuration.)
-    bool cache_on;                     ///< Should we be caching fitness values?
-    std::vector<size_t> pop_sizes;     ///< Sizes of population dimensions (eg, 2 vals for grid)
-    emp::TraitSet<ORG> phenotypes;     ///< What phenotypes are we tracking?
-    emp::vector<Ptr<DataFile>> files;     ///< Output files.
+    std::string name;               ///< Name of this world (for use in configuration.)
+    bool cache_on;                  ///< Should we be caching fitness values?
+    std::vector<size_t> pop_sizes;  ///< Sizes of population dimensions (eg, 2 vals for grid)
+    emp::TraitSet<ORG> phenotypes;  ///< What phenotypes are we tracking?
+    emp::vector<emp::Ptr<DataFile>> files;    ///< Output files.
 
-    bool is_synchronous;               ///< Does this world have synchronous generations?
-    bool is_space_structured;          ///< Do we have a spatially structured population?
-    bool is_pheno_structured;          ///< Do we have a phenotypically structured population?
+    bool is_synchronous;            ///< Does this world have synchronous generations?
+    bool is_space_structured;       ///< Do we have a spatially structured population?
+    bool is_pheno_structured;       ///< Do we have a phenotypically structured population?
 
     /// Potential data nodes -- these should be activated only if in use.
 
@@ -195,6 +200,7 @@ namespace emp {
     Signal<void(size_t)> org_placement_sig;   ///< Trigger when any organism is placed into world.
     Signal<void(size_t)> on_update_sig;       ///< Trigger at the beginning of Update()
     Signal<void(size_t)> on_death_sig;        ///< Trigger when any organism dies.
+    Signal<void()>       world_destruct_sig;  ///< Trigger in the World destructor.
 
     /// Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
@@ -209,10 +215,10 @@ namespace emp {
     /// The World constructor can take two arguments, both optional:
     /// * a random number generator (either a pointer or reference)
     /// * a unique name for the world
-    /// If no random number generator is provided, one is created within the world.
     /// If no name is provided, the world remains nameless.
-    World(Ptr<Random> rnd=nullptr, std::string _name="")
-      : random_ptr(rnd), random_owner(false), pop(), next_pop(), num_orgs(0), update(0), fit_cache()
+    /// If no random number generator is provided, gen_random determines if one shold be created.
+    World(std::string _name="", bool gen_random=true)
+      : random_ptr(nullptr), random_owner(false), pop(), next_pop(), num_orgs(0), update(0), fit_cache()
       , name(_name), cache_on(false), pop_sizes(1,0), phenotypes(), files()
       , is_synchronous(false), is_space_structured(false), is_pheno_structured(false)
       , fun_calc_fitness(), fun_do_mutations(), fun_print_org(), fun_get_genome()
@@ -225,23 +231,27 @@ namespace emp {
       , org_placement_sig(to_string(name,"::org-placement"), control)
       , on_update_sig(to_string(name,"::on-update"), control)
       , on_death_sig(to_string(name,"::on-death"), control)
+      , world_destruct_sig(to_string(name,"::wolrd-destruct"), control)
     {
-      if (!rnd) NewRandom();
+      if (gen_random) NewRandom();
       SetDefaultFitFun<this_t, ORG>(*this);
       SetDefaultMutFun<this_t, ORG>(*this);
       SetDefaultPrintFun<this_t, ORG>(*this);
       SetDefaultGetGenomeFun<this_t, ORG>(*this);
       SetWellMixed();  // World default structure is well-mixed.
     }
-    World(Random & rnd, std::string _name="") : World(&rnd, _name) { ; }
-    World(std::string _name) : World(nullptr, _name) { ; }
+    World(Random & rnd, std::string _name="") : World(_name,false) { random_ptr = &rnd; }
 
     ~World() {
+      world_destruct_sig.Trigger();
       Clear();
-      for (auto file : files) {file.Delete();}
       if (random_owner) random_ptr.Delete();
       for (Ptr<SystematicsBase<ORG> > s : systematics) {
         s.Delete();
+      }
+
+      for (auto file : files) {
+        file.Delete();
       }
     }
 
@@ -261,6 +271,23 @@ namespace emp {
 
     /// How many cells tall is the world? (assumes grids are active.)
     size_t GetHeight() const { return pop_sizes[1]; }
+
+    /// Get the full population to analyze externally.
+    const emp::vector<Ptr<ORG>> & GetFullPop() const { return pop; }
+
+    /// What phenotypic traits is the population tracking?
+    const emp::TraitSet<ORG> & GetPhenotypes() const { return phenotypes; }
+
+    /// Add an already-constructed datafile.
+    DataFile & AddDataFile(emp::Ptr<DataFile> file);
+
+    /// Lookup a file by name.
+    DataFile & GetFile(const std::string & filename) {
+      for (emp::Ptr<DataFile> file : files) {
+        if (file->GetFilename() == filename) return *file;
+      }
+      emp_assert(!"Trying to lookup a file that does not exist.", filename);
+    }
 
     /// Does the specified cell ID have an organism in it?
     bool IsOccupied(size_t i) const { return pop[i] != nullptr; }
@@ -368,14 +395,25 @@ namespace emp {
     /// argument determines if the generations should be synchronous (true) or not (false, default)
     void SetGrid(size_t width, size_t height, bool synchronous_gen=false);
 
-    /// Set the population to be a set of pools that are individually well mixed, but with limited
-    /// migtation.  Arguments are the number of pools, the size of each pool, and whether the
-    /// generations should be synchronous (true) or not (false, default).
-    void SetPools(size_t num_pools, size_t pool_size, bool synchronous_gen=false);
+    /// Setup the population to automatically test for mutations before deciding where a newborn offspring
+    /// should be placed (placement may need to know fitness or other phenotypic traits).
+    void SetMutateBeforeBirth() {
+      OnOffspringReady( [this](ORG & org){ DoMutationsOrg(org); } );
+    }
+
+    void SetSynchronousSystematics(bool synchronous) {
+      for (Ptr<SystematicsBase<ORG> > s : systematics) {
+        s->SetTrackSynchronous(synchronous);
+      }
+    }
 
     /// Add a new phenotype measuring function.
-    void AddPhenotype(const std::string & name, std::function<double(ORG &)> fun) {
-      phenotypes.AddTrait(name, fun);
+    // void AddPhenotype(const std::string & name, std::function<double(ORG &)> fun) {
+    //   phenotypes.AddTrait(name, fun);
+    // }
+    template <typename... Ts>
+    void AddPhenotype(Ts &&... args) {
+      phenotypes.AddTrait(std::forward<Ts>(args)...);
     }
 
     /// Access a data node that tracks fitness information in the population.  The fitness will not
@@ -412,21 +450,14 @@ namespace emp {
 
     /// Setup an arbitrary file; no default filename available.
     DataFile & SetupFile(const std::string & filename);
-
-    /// Add an already-constructed datafile.
-    DataFile & AddDataFile(Ptr<DataFile> file);
-
+    
     /// Setup a file to be printed that collects fitness information over time.
-    DataFile & SetupFitnessFile(const std::string & filename="fitness.csv");
+    DataFile & SetupFitnessFile(const std::string & filename="fitness.csv", const bool & print_header=true);
 
     /// Setup a file to be printed that collects systematics information over time.
-    /// @param id - which systematics tracker to report data from
-    /// @param filename - what to name the file (make sure to set this differently
-    /// for each systematics manager you're tracking)
-    DataFile & SetupSystematicsFile(int id=0, const std::string & filename="systematics.csv");
-
+    DataFile & SetupSystematicsFile(int id=0, const std::string & filename="systematics.csv", const bool & print_header=true);
     /// Setup a file to be printed that collects population information over time.
-    DataFile & SetupPopulationFile(const std::string & filename="population.csv");
+    DataFile & SetupPopulationFile(const std::string & filename="population.csv", const bool & print_header=true);
 
     /// Setup the function to be used when fitness needs to be calculated.  The provided function
     /// should take a reference to an organism and return a fitness value of type double.
@@ -514,17 +545,23 @@ namespace emp {
     /// Return:   Key value needed to make future modifications.
     SignalKey OnOrgPlacement(const std::function<void(size_t)> & fun) { return org_placement_sig.AddAction(fun); }
 
-    /// Privide a function for World to call each time Update() is run.
+    /// Provide a function for World to call each time Update() is run.
     /// Trigger:  New update is starting
     /// Argument: Update number (sequentially increasing)
     /// Return:   Key value needed to make future modifications.
     SignalKey OnUpdate(const std::function<void(size_t)> & fun) { return on_update_sig.AddAction(fun); }
 
-    /// Privide a function for World to call each time an organism is about to die.
+    /// Provide a function for World to call each time an organism is about to die.
     /// Trigger:  Organism is about to be killed
     /// Argument: Position of organism about to die
     /// Return:   Key value needed to make future modifications.
     SignalKey OnOrgDeath(const std::function<void(size_t)> & fun) { return on_death_sig.AddAction(fun); }
+
+    /// Provide a function for World to call at the start of its destructor (for additional cleanup).
+    /// Trigger:  Destructor has begun to execture
+    /// Argument: None
+    /// Return:   Key value needed to make future modifications.
+    SignalKey OnWorldDestruct(const std::function<void()> & fun) { return world_destruct_sig.AddAction(fun); }
 
     // --- MANAGE ATTRIBUTES ---
 
@@ -629,10 +666,15 @@ namespace emp {
 
     /// Change the size of the world based on width and height.
     void Resize(size_t new_width, size_t new_height) {
-      // @CAO: Technically we should allow any number of dimensions.
       Resize(new_width * new_height);
       pop_sizes.resize(2);
       pop_sizes[0] = new_width; pop_sizes[1] = new_height;
+    }
+
+    /// Change the size of the world based on a vector of dimensions.
+    void Resize(const emp::vector<size_t> & dims) {
+      Resize(emp::Product(dims));
+      pop_sizes = dims;
     }
 
     /// AddOrgAt is the core function to add organisms to active population (others must go through here)
@@ -933,66 +975,14 @@ namespace emp {
     SetAttribute("PopStruct", "Grid");
   }
 
-  template<typename ORG>
-  void World<ORG>::SetPools(size_t num_pools, size_t pool_size, bool synchronous_gen) {
-    Resize(pool_size, num_pools);
-    is_synchronous = synchronous_gen;
-    is_space_structured = true;
-    is_pheno_structured = false;
-
-    // -- Setup functions --
-    // Inject in a empty pool -or- randomly if none empty
-    fun_add_inject = [this](Ptr<ORG> new_org) {
-      for (size_t id = 0; id < pop.size(); id += pop_sizes[0]) {
-        if (pop[id] == nullptr) return AddOrgAt(new_org, id);
-      }
-      return AddOrgAt(new_org, GetRandomCellID());
-    };
-
-    // neighbors are everyone in the same pool.
-    fun_get_neighbor = [this](size_t id) {
-      emp_assert(random_ptr);
-      const size_t size_x = pop_sizes[0];
-      return (id / size_x) * size_x + random_ptr->GetUInt(size_x);
-    };
-
-    if (synchronous_gen) {
-      // Place births in the next open spot in the new pool (or randomly if full!)
-      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        emp_assert(new_org);                                  // New organism must exist.
-        const size_t size_x = pop_sizes[0];
-        const size_t pool_id = parent_id / size_x;
-        const size_t start_id = pool_id * size_x;
-        for (size_t id = start_id; id < start_id+size_x; id++) {
-          if (next_pop[id] == nullptr) {  // Search for an open positions...
-            return AddNextOrgAt(new_org, id, parent_id);
-          }
-        }
-        const size_t id = fun_get_neighbor(parent_id);     // Placed near parent, in next pop.
-        return AddNextOrgAt(new_org, id, parent_id);
-      };
-
-      for (Ptr<SystematicsBase<ORG> > s : systematics) {
-        s->SetTrackSynchronous(true);
-      }
-
-      SetAttribute("SynchronousGen", "True");
-
-    } else {
-      // Asynchronous: always go to a neigbor in current population.
-      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        return AddOrgAt(new_org, fun_get_neighbor(parent_id), parent_id); // Place org in existing population.
-      };
-
-      for (Ptr<SystematicsBase<ORG> > s : systematics) {
-        s->SetTrackSynchronous(false);
-      }
-
-      SetAttribute("SynchronousGen", "False");
+    // Add a new data file constructed elsewhere.
+    template<typename ORG>
+    DataFile & World<ORG>::AddDataFile(emp::Ptr<DataFile> file) {
+      size_t id = files.size();
+      files.push_back(file);
+      return *files[id];
     }
 
-    SetAttribute("PopStruct", "Pools");
-  }
 
   // A new, arbitrary file.
   template<typename ORG>
@@ -1003,17 +993,9 @@ namespace emp {
     return *files[id];
   }
 
-  // Add a new data file constructed elsewhere.
-  template<typename ORG>
-  DataFile & World<ORG>::AddDataFile(Ptr<DataFile> file) {
-    size_t id = files.size();
-    files.push_back(file);
-    return *files[id];
-  }
-
   // A data file (default="fitness.csv") that contains information about the population's fitness.
   template<typename ORG>
-  DataFile & World<ORG>::SetupFitnessFile(const std::string & filename) {
+  DataFile & World<ORG>::SetupFitnessFile(const std::string & filename, const bool & print_header) {
     auto & file = SetupFile(filename);
     auto node = GetFitnessDataNode();
     file.AddVar(update, "update", "Update");
@@ -1021,14 +1003,14 @@ namespace emp {
     file.AddMin(*node, "min_fitness", "Minimum organism fitness in current population.");
     file.AddMax(*node, "max_fitness", "Maximum organism fitness in current population.");
     file.AddInferiority(*node, "inferiority", "Average fitness / maximum fitness in current population.");
-    file.PrintHeaderKeys();
+    if (print_header) file.PrintHeaderKeys();
     return file;
   }
 
   /// A data file (default="systematics.csv") that contains information about the population's
   /// phylogeny and lineages.
   template<typename ORG>
-  DataFile & World<ORG>::SetupSystematicsFile(int id, const std::string & filename) {
+  DataFile & World<ORG>::SetupSystematicsFile(int id, const std::string & filename, const bool & print_header) {
     emp_assert(systematics.size() > 0, "Cannot track systematics file. No systematics file to track.");
     emp_assert(id < systematics.size(), "Invalid systematics file requested to be tracked.");
     auto & file = SetupFile(filename);
@@ -1039,17 +1021,17 @@ namespace emp {
     file.template AddFun<size_t>( [this, id](){ return systematics[id].GetNumRoots(); }, "num_roots", "Number of independent roots for phlogenies." );
     file.template AddFun<int>( [this, id](){ return systematics[id].GetMRCADepth(); }, "mrca_depth", "Phylogenetic Depth of the Most Recent Common Ancestor (-1=none)." );
     file.template AddFun<double>( [this, id](){ return systematics[id].CalcDiversity(); }, "diversity", "Genotypic Diversity (entropy of genotypes in population)." );
-    file.PrintHeaderKeys();
+    if (print_header) file.PrintHeaderKeys();
     return file;
   }
 
   // A data file (default="population.csv") contains information about the current population.
   template<typename ORG>
-  DataFile & World<ORG>::SetupPopulationFile(const std::string & filename) {
+  DataFile & World<ORG>::SetupPopulationFile(const std::string & filename, const bool & print_header) {
     auto & file = SetupFile(filename);
     file.AddVar(update, "update", "Update");
     file.template AddFun<size_t>( [this](){ return GetNumOrgs(); }, "num_orgs", "Number of organisms currently living in the population." );
-    file.PrintHeaderKeys();
+    if (print_header) file.PrintHeaderKeys();
     return file;
   }
 
@@ -1101,7 +1083,7 @@ namespace emp {
     }
 
     // 3. Handle any data files that need to be printed this update.
-    for (auto & file : files) file->Update(update);
+    for (auto file : files) file->Update(update);
 
     // 4. Increment the current update number; i.e., count calls to Update().
     update++;
@@ -1142,7 +1124,15 @@ namespace emp {
       inject_ready_sig.Trigger(*new_org);
       const OrgPosition pos = fun_add_inject(new_org);
       //SetupOrg(*new_org, &callbacks, pos);
-      if (pos.IsActive()) org_placement_sig.Trigger(pos.GetIndex());
+
+      if (pos.IsActive()) {
+        // Organism is in the population!  Trigger assicated signal.
+        org_placement_sig.Trigger(pos.GetIndex());
+      }
+      else if (!pos.IsValid()) {
+        // Organism failed to be placed in the population.  Delete it.
+        new_org.Delete();
+      }    
     }
   }
 
@@ -1161,9 +1151,17 @@ namespace emp {
     emp_assert(random_ptr != nullptr && "InjectRandomOrg() requires active random_ptr");
     Ptr<ORG> new_org = NewPtr<ORG>(*random_ptr, std::forward<ARGS>(args)...);
     inject_ready_sig.Trigger(*new_org);
-    const size_t pos = fun_add_inject(new_org);
-    org_placement_sig.Trigger(pos);
+    const OrgPosition pos = fun_add_inject(new_org);
     // SetupOrg(*new_org, &callbacks, pos);
+
+    if (pos.IsActive()) {
+      // Organism is in the population!  Trigger assicated signal.
+      org_placement_sig.Trigger(pos.GetIndex());
+    }
+    else if (!pos.IsValid()) {
+      // Organism failed to be placed in the population.  Delete it.
+      new_org.Delete();
+    }    
   }
 
   // Give birth to a single offspring; return offspring position.
@@ -1173,7 +1171,13 @@ namespace emp {
     Ptr<ORG> new_org = NewPtr<ORG>(mem);
     offspring_ready_sig.Trigger(*new_org);
     const OrgPosition pos = fun_add_birth(new_org, parent_pos);
-    if (pos.IsActive()) org_placement_sig.Trigger(pos.GetIndex());
+    if (pos.IsActive()) {
+      // If organism was placed right into the active population, trigger placement signal.
+      org_placement_sig.Trigger(pos.GetIndex());
+    } else if (!pos.IsValid()) {
+      // Organism failed to be placed in the population.  Delete it.
+      new_org.Delete();
+    }
     // SetupOrg(*new_org, &callbacks, pos);
     return pos;
   }
@@ -1186,7 +1190,13 @@ namespace emp {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       offspring_ready_sig.Trigger(*new_org);
       const OrgPosition pos = fun_add_birth(new_org, parent_pos);
-      if (pos.IsActive()) org_placement_sig.Trigger(pos.GetIndex());
+      if (pos.IsActive()) {
+        // If organism was placed right into the active population, trigger placement signal.
+        org_placement_sig.Trigger(pos.GetIndex());
+      } else if (!pos.IsValid()) {
+        // Organism failed to be placed in the population.  Delete it.
+        new_org.Delete();
+      }
       // SetupOrg(*new_org, &callbacks, pos);
     }
   }
@@ -1303,6 +1313,7 @@ namespace emp {
   template<typename ORG>
   void World<ORG>::PrintGrid(std::ostream& os,
                              const std::string & empty, const std::string & spacer) {
+    emp_assert(pop_sizes.size() == 2);
     const size_t size_x = pop_sizes[0];
     const size_t size_y = pop_sizes[1];
     for (size_t y=0; y < size_y; y++) {

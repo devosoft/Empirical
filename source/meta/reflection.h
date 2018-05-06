@@ -21,7 +21,7 @@
 /// FALLBACK - function to call if no such member function exists.
 
 #define EMP_CREATE_METHOD_FALLBACK(NAME, METHOD, FALLBACK)                                    \
-  namespace {                                                                                 \
+  namespace internal {                                                                        \
     template <class T, class... ARGS>    /* T::METHOD exists! */                              \
     auto EMPCall_ ## NAME(emp::bool_decoy<decltype(&T::METHOD)>, T & target, ARGS &&... args) \
      { return target.METHOD(std::forward<ARGS>(args)...); }                                   \
@@ -30,7 +30,7 @@
      { return FALLBACK(target, std::forward<ARGS>(args)...); }                                \
   }                                                                                           \
   template <class T, class... ARGS> auto NAME(T & target, ARGS &&... args) {                  \
-    return EMPCall_ ## NAME(true, target, std::forward<ARGS>(args)...);                       \
+    return internal::EMPCall_ ## NAME(true, target, std::forward<ARGS>(args)...);             \
   } int ignore_semicolon_to_follow_ ## NAME = 0
 
 
@@ -50,7 +50,7 @@
 /// Same as above, but a return type and default value are specified.
 
 #define EMP_CREATE_METHOD_FALLBACK_VAL(NAME, METHOD, DEFAULT)	                              \
-namespace {                                                                                 \
+namespace internal {                                                                        \
   template <class T, class... ARGS>    /* T::METHOD exists! */                              \
   auto EMPCall_ ## NAME(emp::bool_decoy<decltype(&T::METHOD)>, T & target, ARGS &&... args) \
    { return target.METHOD(std::forward<ARGS>(args)...); }                                   \
@@ -58,7 +58,7 @@ namespace {                                                                     
    { return DEFAULT; }                                                                      \
 }                                                                                           \
 template <class T, class... ARGS> auto NAME(T & target, ARGS &&... args) {                  \
-  return EMPCall_ ## NAME(true, target, std::forward<ARGS>(args)...);                       \
+  return internal::EMPCall_ ## NAME(true, target, std::forward<ARGS>(args)...);             \
 } int ignore_semicolon_to_follow_ ## NAME = 0
 
 
@@ -163,7 +163,7 @@ using NAME = typename emp::TypePack<Ts...>::template find_t<EMPDetect_ ## NAME>;
 namespace emp {
 
   // Helper tools for SubsetCall.
-  namespace {
+  namespace internal {
     template <typename RETURN, typename... FUN_ARGS>
     struct SubsetCall_impl {
       template <typename... EXTRA_ARGS>
@@ -176,13 +176,13 @@ namespace emp {
   /// Identify the number of parameters in a function and pass in correct number of argument.
   template <typename RETURN, typename... FUN_ARGS, typename... CALL_ARGS>
   auto SubsetCall(std::function<RETURN(FUN_ARGS...)> fun, CALL_ARGS... args) -> RETURN {
-    return SubsetCall_impl<RETURN, FUN_ARGS...>::Call(fun, args...);
+    return internal::SubsetCall_impl<RETURN, FUN_ARGS...>::Call(fun, args...);
   }
 
 
   // Helper tools for type_if.
-  namespace {
-    template< typename T, bool match_ok > struct EMP_eval_type { ; };
+  namespace internal {
+    template< typename T, bool match_ok > struct EMP_eval_type { };
     template< typename T> struct EMP_eval_type<T,true> { using type = T; }; // If match, define type!
   }
 
@@ -190,7 +190,7 @@ namespace emp {
   /// For example: type_if<T, std::is_integral>
   /// This becomes T if the type is integral; it's undefined otherwise.
   template <typename T, template <typename...> class FILTER>
-  using type_if = typename EMP_eval_type< T, FILTER<T>::value >::type;
+  using type_if = typename internal::EMP_eval_type< T, FILTER<T>::value >::type;
 
 }
 #endif

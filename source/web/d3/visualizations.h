@@ -1,5 +1,14 @@
-#ifndef VISUALIZATION_UTILS_H
-#define VISUALIZATION_UTILS_H
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2017-2018
+ *
+ *  @file  visualizations.h
+ *  @brief Tools to build D3 visualizations.
+ */
+
+#ifndef EMP_VISUALIZATION_UTILS_H
+#define EMP_VISUALIZATION_UTILS_H
 
 #include <functional>
 #include <algorithm>
@@ -181,10 +190,10 @@ public:
     //Set up scales
     y_scale = new D3::LinearScale();
     x_scale = new D3::LinearScale();
-    y_scale->SetDomain(std::array<double, 2>({{highest*value_growth_margin, lowest*value_loss_margin}}));
-    y_scale->SetRange(std::array<double, 2>({{margin, GetHeight() - margin}}));
-    x_scale->SetDomain(std::array<double, 2>({{0, x_max}}));
-    x_scale->SetRange(std::array<double, 2>({{axis_width, GetHeight()-margin}}));
+    y_scale->SetDomain(emp::array<double, 2>{{highest*value_growth_margin, lowest*value_loss_margin}});
+    y_scale->SetRange(emp::array<double, 2>{{margin, GetHeight() - margin}});
+    x_scale->SetDomain(emp::array<double, 2>{{0, x_max}});
+    x_scale->SetRange(emp::array<double, 2>{{axis_width, GetHeight()-margin}});
 
     //Set up axis
     ax = new D3::Axis<D3::LinearScale>("right");
@@ -316,7 +325,7 @@ public:
     // }
 };
 
-template <typename DATA_TYPE = std::array<double, 2>,
+template <typename DATA_TYPE = emp::array<double, 2>,
           typename  X_SCALE_TYPE = D3::LinearScale,
           typename  Y_SCALE_TYPE = D3::LinearScale >
 class LineGraph : public D3Visualization {
@@ -384,10 +393,12 @@ public:
     GetSVG()->SetupToolTip(tip);
 
     //Set up scales
-    y_scale.SetDomain(std::array<double, 2>({{y_max, y_min}}));
-    y_scale.SetRange(std::array<double, 2>({{y_margin, (double)GetHeight() - axis_width}}));
-    x_scale.SetDomain(std::array<double, 2>({{x_min,x_max}}));
-    x_scale.SetRange(std::array<double, 2>({{axis_width, GetWidth()-x_margin}}));
+    y_scale = new Y_SCALE_TYPE();
+    x_scale = new X_SCALE_TYPE();
+    y_scale->SetDomain(emp::array<double, 2>{{y_max, y_min}});
+    y_scale->SetRange(emp::array<double, 2>{{y_margin, (double)GetHeight() - axis_width}});
+    x_scale->SetDomain(emp::array<double, 2>{{x_min,x_max}});
+    x_scale->SetRange(emp::array<double, 2>{{axis_width, GetWidth()-x_margin}});
 
     //Set up axes
     x_axis.SetScale(x_scale);
@@ -691,7 +702,7 @@ public:
 
     // //We can't draw a line on the first update
     if (prev_data[0] >= 0 ){
-      std::array<DATA_TYPE, 2> line_data;
+      emp::array<DATA_TYPE, 2> line_data;
       line_data[0] = prev_data;
       line_data[1] = data[0];
 
@@ -703,7 +714,7 @@ public:
     }
 
     // If it isn't nested, D3 will think it's 2 separate points
-    std::array<DATA_TYPE, 1> new_point = {{data[0]}};
+    emp::array<DATA_TYPE, 1> new_point = {{data[0]}};
     // GetSVG()->SelectAll(".data-point").Log();
     GetSVG()->SelectAll(".data-point")
             .Data(new_point, GetID()+"return_x")

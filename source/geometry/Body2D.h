@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -40,19 +40,19 @@ namespace emp {
     // REPRODUCTION -> "from" is gestating "to"
     // ATTACK -> "from" is trying to eat "to"
     // PARASITE -> "from" is stealing resources from "to"
-    enum class LINK_TYPE { DEFAULT, REPRODUCTION, ATTACK, PARASITE };
+    enum class LINK_TYPE { DEFAULT, REPRODUCTION, ATTACK, PARASITE, MULTICELL };
 
     template <typename BODY_TYPE>
     struct BodyLink {
-      LINK_TYPE type;      // DEFAULT, REPRODUCTION, ATTACK, PARASITE
-      BODY_TYPE * from;    // Initiator of the connection (e.g., parent, attacker)
-      BODY_TYPE * to;      // Target of the connection (e.g., offspring, prey/host)
-      double cur_dist;     // How far are bodies currently being kept apart?
-      double target_dist;  // How far should the be moved to? (e.g., if growing)
+      LINK_TYPE type;       // DEFAULT, REPRODUCTION, ATTACK, PARASITE
+      Ptr<BODY_TYPE> from;  // Initiator of the connection (e.g., parent, attacker)
+      Ptr<BODY_TYPE> to;    // Target of the connection (e.g., offspring, prey/host)
+      double cur_dist;      // How far are bodies currently being kept apart?
+      double target_dist;   // How far should the be moved to? (e.g., if growing)
 
       BodyLink() : type(LINK_TYPE::DEFAULT), from(nullptr), to(nullptr), cur_dist(0)
                  , target_dist(0) { ; }
-      BodyLink(LINK_TYPE t, BODY_TYPE * _frm, BODY_TYPE * _to, double cur=0, double target=0)
+      BodyLink(LINK_TYPE t, Ptr<BODY_TYPE> _frm, Ptr<BODY_TYPE> _to, double cur=0, double target=0)
         : type(t), from(_frm), to(_to), cur_dist(cur), target_dist(target) { ; }
       BodyLink(const BodyLink &) = default;
       ~BodyLink() { ; }
@@ -70,9 +70,11 @@ namespace emp {
     Point total_abs_shift;  // Total absolute-value of shifts (to calculate pressure)
     double pressure;        // Current pressure on this body.
 
+    bool detach_on_divide;  // Should offspring detach when born (or stay linked to parent)
   public:
-    Body2D_Base() : birth_time(0.0), mass(1.0), color_id(0), repro_count(0), pressure(0) { ; }
-    ~Body2D_Base() { ; }
+    Body2D_Base() : birth_time(0.0), orientation(), velocity(), mass(1.0), color_id(0), repro_count(0)
+                  , shift(), cum_shift(), total_abs_shift(), pressure(0), detach_on_divide(true) { ; }
+    virtual ~Body2D_Base() { ; }
 
     double GetBirthTime() const { return birth_time; }
     const Angle & GetOrientation() const { return orientation; }
@@ -83,7 +85,7 @@ namespace emp {
     int GetReproCount() const { return repro_count; }
     Point GetShift() const { return shift; }
     double GetPressure() const { return pressure; }
-
+    bool GetDetachOnDivide() const { return detach_on_divide; }
 
     void SetBirthTime(double in_time) { birth_time = in_time; }
     void SetColorID(uint32_t in_id) { color_id = in_id; }
@@ -94,13 +96,16 @@ namespace emp {
 
     // Velocity control...
     void IncSpeed(const Point & offset) { velocity += offset; }
-    void IncSpeed() { velocity += orientation.GetPoint<double>(); }
-    void DecSpeed() { velocity -= orientation.GetPoint<double>(); }
+    void IncSpeed() { velocity += orientation.GetPoint(); }
+    void DecSpeed() { velocity -= orientation.GetPoint(); }
     void SetVelocity(double x, double y) { velocity.Set(x, y); }
     void SetVelocity(const Point & v) { velocity = v; }
 
     // Shift to apply next update.
     void AddShift(const Point & s) { shift += s; total_abs_shift += s.Abs(); }
+
+    // Controls about replication
+    void SetDetachOnDivide(bool in=true) { detach_on_divide = in; }
   };
 
   class CircleBody2D : public Body2D_Base {
@@ -109,23 +114,12 @@ namespace emp {
     double target_radius;      // For growing/shrinking
 
     // Information about other bodies that this one is linked to.
-    emp::vector< BodyLink<CircleBody2D> * > from_links;   // Active links initiated by body
-    emp::vector< BodyLink<CircleBody2D> * > to_links;   // Active links targeting body
-
-    void RemoveFromLink(size_t link_id) {
-      emp_assert(link_id < from_links.size());
-      from_links[link_id] = from_links.back();
-      from_links.pop_back();
-    }
-    void RemoveToLink(size_t link_id) {
-      emp_assert(link_id < to_links.size());
-      to_links[link_id] = to_links.back();
-      to_links.pop_back();
-    }
+    emp::vector< Ptr< BodyLink<CircleBody2D> > > from_links;  // Active links initiated by body
+    emp::vector< Ptr< BodyLink<CircleBody2D> > > to_links;    // Active links targeting body
 
   public:
     CircleBody2D(const Circle2D<double> & _p)
-      : perimeter(_p), target_radius(_p.GetRadius())
+      : perimeter(_p), target_radius(_p.GetRadius()), from_links(0), to_links(0)
     {
       EMP_TRACK_CONSTRUCT(CircleBody2D);
     }
@@ -152,7 +146,7 @@ namespace emp {
 
     // Creating, testing, and unlinking other organisms
     bool IsLinkedFrom(const CircleBody2D & link_org) const {
-      for (auto * cur_link : from_links) if (cur_link->to == &link_org) return true;
+      for (auto cur_link : from_links) if (cur_link->to == &link_org) return true;
       return false;
     }
     bool IsLinkedTo(const CircleBody2D & link_org) const { return link_org.IsLinkedFrom(*this); }
@@ -166,41 +160,51 @@ namespace emp {
       emp_assert(!IsLinked(link_org));  // Don't link twice!
 
       // Build connections in both directions.
-      auto * new_link = new BodyLink<CircleBody2D>(type, this, &link_org, cur_dist, target_dist);
+      auto new_link = NewPtr< BodyLink<CircleBody2D> >(type, this, &link_org, cur_dist, target_dist);
       from_links.push_back(new_link);
       link_org.to_links.push_back(new_link);
     }
 
 
-    void RemoveLink(BodyLink<CircleBody2D> * link) {
-      if (link->to == this) {
+    void RemoveLink(Ptr< BodyLink<CircleBody2D> > link) {
+      // We should always initiate link removal from the FROM side.
+      if (link->to == ToPtr(this)) {
         link->from->RemoveLink(link);
         return;
       }
 
-      // Remove the FROM link.
+      // Find and remove the associated FROM link from this body.
       for (size_t i = 0; i < from_links.size(); i++) {
-        if (from_links[i]->to == link->to) { RemoveFromLink(i); break; }
+        if (from_links[i]->to == link->to) {
+          from_links[i] = from_links.back();
+          from_links.pop_back();
+          break;
+        }
       }
 
-      // Remove the TO link.
+      // Find and remove the TO link from the attached body.
       const size_t to_size = link->to->to_links.size();
       for (size_t i = 0; i < to_size; i++) {
-        if (link->to->to_links[i]->from == this) { link->to->RemoveToLink(i); break; }
+        if (link->to->to_links[i]->from == ToPtr(this)) {
+          auto & other_links = link->to->to_links;
+          other_links[i] = other_links.back();
+          other_links.pop_back();
+          break;
+        }
       }
 
-      delete link;
+      link.Delete();
     }
 
     const BodyLink<CircleBody2D> & FindLink(const CircleBody2D & link_org) const {
       emp_assert(IsLinked(link_org));
-      for (auto * link : from_links) if ( link->to == &link_org) return *link;
+      for (auto link : from_links) if ( link->to == &link_org) return *link;
       return link_org.FindLink(*this);
     }
 
     BodyLink<CircleBody2D> & FindLink(CircleBody2D & link_org)  {
       emp_assert(IsLinked(link_org));
-      for (auto * link : from_links) if ( link->to == &link_org) return *link;
+      for (auto link : from_links) if ( link->to == ToPtr(&link_org) ) return *link;
       return link_org.FindLink(*this);
     }
 
@@ -217,12 +221,12 @@ namespace emp {
       link.cur_dist += change;
     }
 
-    CircleBody2D * BuildOffspring(Point offset) {
+    Ptr<CircleBody2D> BuildOffspring(Point offset) {
       // Offspring cannot be right on top of parent.
       emp_assert(offset.GetX() != 0 || offset.GetY() != 0);
 
       // Create the offspring as a paired link.
-      auto * offspring = new CircleBody2D(perimeter);
+      auto offspring = NewPtr<CircleBody2D>(perimeter);
       AddLink(LINK_TYPE::REPRODUCTION, *offspring, offset.Magnitude(), perimeter.GetRadius()*2.0);
       offspring->Translate(offset);
       repro_count++;
@@ -231,23 +235,24 @@ namespace emp {
     }
 
     // If a body is not at its target radius, grow it or shrink it, as needed.
-    void BodyUpdate(double change_factor=1, bool detach_on_birth=true) {
+    void BodyUpdate(double change_factor=1) {
       // Test if this body needs to grow or shrink.
       if ((int) target_radius > (int) GetRadius()) SetRadius(GetRadius() + change_factor);
       else if ((int) target_radius < (int) GetRadius()) SetRadius(GetRadius() - change_factor);
 
       // Test if the link distance for this body needs to be updated
       for (size_t i = 0; i < from_links.size(); i++) {
-        auto * link = from_links[i];
+        auto link = from_links[i];
         if (link->cur_dist == link->target_dist) continue; // No adjustment needed.
 
         // If we're within the change_factor, just set pair_dist to target.
         if (std::abs(link->cur_dist - link->target_dist) <= change_factor) {
           link->cur_dist = link->target_dist;
+          // IF this organism was gestating, finish the reproduction.
           if (link->type == LINK_TYPE::REPRODUCTION) {
             emp_assert(repro_count > 0);
             repro_count--;
-            if (detach_on_birth) {   // Flag link for removal!
+            if (detach_on_divide) {   // Flag link for removal!
               RemoveLink(link);      // Remove the link.
               i--;                   // Check this position again.
             }
@@ -296,7 +301,7 @@ namespace emp {
       total_abs_shift.ToOrigin();
 
       // If this body is linked to another, enforce the distance between them.
-      for (auto * link : from_links) {
+      for (auto link : from_links) {
         if (GetAnchor() == link->to->GetAnchor()) {
           // If two organisms are on top of each other... shift one.
           Translate(Point(0.01, 0.01));
@@ -333,7 +338,7 @@ namespace emp {
 
     // Check to make sure there are no obvious issues with this object.
     bool OK() {
-      for (auto * link : from_links) {
+      for (auto link : from_links) {
         (void) link;
         emp_assert(link->cur_dist >= 0);          // Distances cannot be negative.
         emp_assert(link->target_dist >= 0);       // Distances cannot be negative.

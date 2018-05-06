@@ -405,15 +405,6 @@ namespace emp {
 
     // NOTE: Ignoring AddDatum() since Range values track current information.
 
-    // /// Add @param val to the DataNode
-    // void AddDatum(const VAL_TYPE & val) {
-    //   total_vals.back() += val;
-    //   num_vals.back() += 1;
-    //   if (!val_count || val < min_vals.back()) min_vals.back() = val;
-    //   if (!val_count || val > max_vals.back()) max_vals.back() = val;
-    //   parent_t::AddDatum(val);
-    // }
-
     /// Store the current range statistics in the archive and reset for a new interval.
     void Reset() {
       total_vals.push_back(total);
@@ -463,7 +454,7 @@ namespace emp {
     using parent_t::GetMean;
 
     /// Get the variance (squared deviation from the mean) of values added since the last reset
-    double GetVariance() const {return M2/val_count;}
+    double GetVariance() const {return M2/(double)val_count;}
     
     /// Get the standard deviation of values added since the last reset
     double GetStandardDeviation() const {return sqrt(GetVariance());}
@@ -483,17 +474,16 @@ namespace emp {
 
     /// Add @param val to this DataNode
     void AddDatum(const VAL_TYPE & val) {
-      double delta, delta_n, delta_n2, term1;
-      int n = val_count + 1;
-
       // Calculate deviation from mean (the ternary avoids dividing by
       // 0 in the case where this is the first datum added since last reset)
-      delta = val - (total/((val_count > 0) ? val_count : 1));
-      delta_n = delta / n;
-      delta_n2 = delta_n * delta_n;
-      term1 = delta * delta_n * val_count;
-      M4 += term1 * delta_n2 * (n*n - 3*n + 3) + 6 * delta_n2 * M2 - 4 * delta_n * M3;
-      M3 += term1 * delta_n * (n - 2) - 3 * delta_n * M2;
+      const double n = (double) (val_count + 1);
+      const double delta = ((double) val) - (total/((val_count > 0) ? (double) val_count : 1.0));
+      const double delta_n = delta / n;
+      const double delta_n2 = delta_n * delta_n;
+      const double term1 = delta * delta_n * (double) val_count;
+
+      M4 += term1 * delta_n2 * (n*n - 3.0*n + 3.0) + 6.0 * delta_n2 * M2 - 4.0 * delta_n * M3;
+      M3 += term1 * delta_n * (n - 2.0) - 3.0 * delta_n * M2;
       M2 += term1;
 
       parent_t::AddDatum(val);
@@ -521,7 +511,7 @@ namespace emp {
   protected:
     VAL_TYPE offset;              ///< Min value in first bin; others are offset by this much.
     VAL_TYPE width;               ///< How wide is the overall histogram?
-    //IndexMap bins;                ///< Map of values to which bin they fall in. 
+    IndexMap bins;                ///< Map of values to which bin they fall in. 
     emp::vector<size_t> counts;   ///< Counts in each bin.
 
     using this_t = DataNodeModule<VAL_TYPE, data::Histogram, MODS...>;
@@ -531,7 +521,7 @@ namespace emp {
     using base_t::val_count;
 
   public:
-    DataNodeModule() : offset(0.0), width(0), counts(10, 0) { ; }
+    DataNodeModule() : offset(0.0), width(0), bins(), counts() { ; }
 
     /// Returns the minimum value this histogram is capable of containing
     /// (i.e. the minimum value for the first bin)
@@ -545,7 +535,7 @@ namespace emp {
     size_t GetHistCount(size_t bin_id) const { return counts[bin_id]; }
 
     /// Return the width of the @param bin_id 'th bin of the histogram
-    double GetHistWidth(size_t bin_id) const { return width / (double) counts.size(); } //bins[bin_id]; }
+    double GetHistWidth(size_t bin_id) const { return bins[bin_id]; } //width / (double) counts.size(); } 
 
     /// Return a vector containing the count of items in each bin of the histogram
     const emp::vector<size_t> & GetHistCounts() const { return counts; }
@@ -553,11 +543,11 @@ namespace emp {
     /// Return a vector containing the lowest value allowed in each bin.
     emp::vector<double> GetBinMins() const {
       emp::vector<double> bin_mins(counts.size());
-      double bin_width = width / (double) counts.size();
+      // double bin_width = width / (double) counts.size();
       double cur_min = offset;
       for (size_t i = 0; i < counts.size(); i++) {
         bin_mins[i] = cur_min;
-        cur_min += bin_width; // bins[i];
+        cur_min += bins[i]; // bin_width;
       }
       return bin_mins;
     }
@@ -569,18 +559,18 @@ namespace emp {
     ///                   between min and max will be easily divided among this many bins.
     void SetupBins(VAL_TYPE _min, VAL_TYPE _max, size_t num_bins) {
       offset = _min;
-      // width = ((double) (_max - _min)) / (double) num_bins;
       width = _max - _min;
-      // bins.Resize(num_bins);
-      // bins.AdjustAll(width);
+      double bin_width = ((double) width) / (double) num_bins;
+      bins.Resize(num_bins);
+      bins.AdjustAll(bin_width);
       counts.resize(num_bins);
       for (size_t & x : counts) x = 0.0;
     }
 
     /// Add @param val to the DataNode
     void AddDatum(const VAL_TYPE & val) {
-      // size_t bin_id = bins.Index((double) (val - offset));
-      size_t bin_id = counts.size() * ((double) (val - offset)) / (double) width;
+      size_t bin_id = bins.Index((double) (val - offset));
+      // size_t bin_id = counts.size() * ((double) (val - offset)) / (double) width;
       counts[bin_id]++;
       parent_t::AddDatum(val);
     }

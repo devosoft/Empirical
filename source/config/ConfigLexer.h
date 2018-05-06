@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  A simple lexer for the Empirical configuration language.
@@ -15,7 +15,7 @@
 #include <map>
 #include <string>
 
-#include "../tools/errors.h"
+#include "../base/errors.h"
 
 #include "Token.h"
 

@@ -1,13 +1,14 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//
-//  A simple Othello game state handler.
-//
-//  Developer Notes:
-//  * Add Hash for boards to be able to cachce moves.
-//  * setup OPTIONAL caching of expensive board measures.
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2018
+ *
+ *  @file  Othello.h
+ *  @brief A simple Othello game state handler.
+ * 
+ *  @todo Add Hash for boards to be able to cachce moves.
+ *  @todo Setup OPTIONAL caching of expensive board measures.
+ */
 
 #ifndef EMP_GAME_OTHELLO_H
 #define EMP_GAME_OTHELLO_H
@@ -49,7 +50,7 @@ namespace emp {
 
       Index() : pos(NUM_CELLS) { ; }  // Default constructor is invalid position.
       Index(size_t _pos) : pos(_pos) { emp_assert(pos <= NUM_CELLS); }
-      Index(size_t x, size_t y) { Set(x,y); }
+      Index(size_t x, size_t y) : pos() { Set(x,y); }
       Index(const Index & _in) : pos(_in.pos) { emp_assert(pos <= NUM_CELLS); }
 
       operator size_t() const { return pos; }
@@ -76,35 +77,21 @@ namespace emp {
 
   protected:
     std::array<Facing, NUM_DIRECTIONS> ALL_DIRECTIONS;
-    emp::vector<Index> neighbors; ///< On construction, pre-compute adjacency network.
+    emp::vector<Index> neighbors;
 
     bool over = false;    ///< Is the game over?
     Player cur_player;    ///< Who is the current player set to move next?
     board_t game_board;   ///< Game board
 
     /// Internal function for accessing the neighbors vector.
-    size_t GetNeighborIndex(Index pos, Facing dir) const {
+    static size_t GetNeighborIndex(Index pos, Facing dir) {
       return (((size_t) pos) * NUM_DIRECTIONS) + (size_t) dir;
     }
 
-    /// Generates neighbor network (populates neighbors member variable).
-    /// Only used during construction.
-    void GenerateNeighborNetwork() {
-      neighbors.resize(NUM_CELLS * NUM_DIRECTIONS);
-      for (size_t posID = 0; posID < NUM_CELLS; ++posID) {
-        Index pos(posID);
-        for (Facing dir : ALL_DIRECTIONS) {
-          neighbors[GetNeighborIndex(posID, dir)] = pos.CalcNeighbor(dir);
-        }
-      }
-    }
-
   public:
-    Othello_Game() {
+    Othello_Game() : ALL_DIRECTIONS({ Facing::N, Facing::NE, Facing::E, Facing::SE, Facing::S, Facing::SW, Facing::W, Facing::NW })
+                   , neighbors(BuildNeighbors()), cur_player(Player::DARK), game_board() {
       emp_assert(BOARD_SIZE >= 4);
-      ALL_DIRECTIONS = { Facing::N, Facing::NE, Facing::E, Facing::SE,
-                         Facing::S, Facing::SW, Facing::W, Facing::NW };
-      GenerateNeighborNetwork();
       Reset();
     }
 
@@ -144,6 +131,22 @@ namespace emp {
     /// Is the given player ID a valid player?
     bool IsValidPlayer(Player player) const { return (player == Player::DARK) || (player == Player::LIGHT); }
 
+    auto BuildNeighbors() {
+      emp::vector<Index> neighbors;
+
+      if (neighbors.size() == 0) {
+        neighbors.resize(NUM_CELLS * NUM_DIRECTIONS);
+        for (size_t posID = 0; posID < NUM_CELLS; ++posID) {
+          Index pos(posID);
+          for (Facing dir : ALL_DIRECTIONS) {
+            neighbors[GetNeighborIndex(posID, dir)] = pos.CalcNeighbor(dir);
+          }
+        }
+      }
+
+      return neighbors;
+    }
+
     /// Get location adjacent to ID in direction dir.
     /// GetNeighbor function is save with garbage ID values.
     Index GetNeighbor(Index id, Facing dir) const {
@@ -171,7 +174,7 @@ namespace emp {
     bool IsOver() const { return over; }
 
     /// Get positions that would flip if a player (player) made a particular move (pos).
-    /// - Does not check move validity.
+    /// Note: May be called before or after piece is placed.
     emp::vector<Index> GetFlipList(Player player, Index pos) {
       emp::vector<Index> flip_list;
       size_t prev_len = 0;
@@ -237,6 +240,18 @@ namespace emp {
       return valid_moves;
     }
 
+    /// GetMoveOptions() without a specified player used current player.
+    emp::vector<Index> GetMoveOptions() { return GetMoveOptions(cur_player); }
+
+    /// Determine if there are any move options for given player.
+    bool HasMoveOptions(Player player) {
+      emp_assert(IsValidPlayer(player));
+      for (size_t i = 0; i < NUM_CELLS; ++i) {
+        if (IsValidMove(player, i)) return true;
+      }
+      return false;
+    }
+
     /// Get the current score for a given player.
     double GetScore(Player player) {
       emp_assert(IsValidPlayer(player));
@@ -298,14 +313,15 @@ namespace emp {
     /// NOTE: Does not verify validity.
     /// Will switch cur_player from player to Opp(player) if opponent has a move to make.
     bool DoMove(Player player, Index pos) {
-      emp_assert(IsValidPlayer(player) && pos.IsValid());
+      emp_assert(IsValidPlayer(player) && pos.IsValid());    // Validate position and player.
+      emp_assert(GetPosOwner(pos) == Player::NONE);          // Make sure position is empty.
       SetPos(pos, player);                                   // Take position for player.
-      DoFlips(player, pos);                                  // Flip tiles on the board.
-      auto opp_moves = GetMoveOptions(GetOpponent(player));  // Test if opponent can go.
-      if (opp_moves.size()) { cur_player = GetOpponent(player); return false; }
+      DoFlips(player, pos);                                  // Flip tiles on the board.      
+      auto opp_moves = HasMoveOptions(GetOpponent(player));  // Test if opponent can go.
+      if (opp_moves) { cur_player = GetOpponent(player); return false; }
 
-      auto player_moves = GetMoveOptions(player);            // Opponent can't go; test cur player
-      if (player_moves.size()) { return true; }              // This player can go again!
+      auto player_moves = HasMoveOptions(player);            // Opponent can't go; test cur player
+      if (player_moves) { return true; }                     // This player can go again!
 
       over = true;                                           // No one can go; game over!
       return false;

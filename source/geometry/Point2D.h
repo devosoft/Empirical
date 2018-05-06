@@ -52,6 +52,7 @@ namespace emp {
     constexpr Point2D GetRot90() const { return Point2D(y, -x); }
     constexpr Point2D GetRot180() const { return Point2D(-x, -y); }
     constexpr Point2D GetRot270() const { return Point2D(-y, x); }
+    constexpr Point2D GetOffset(TYPE off_x, TYPE off_y) const { return Point2D(x+off_x, y+off_y); }
 
     constexpr Point2D operator+(const Point2D & _in) const { return Point2D(x + _in.x , y + _in.y); }
     constexpr Point2D operator-(const Point2D & _in) const { return Point2D(x - _in.x , y - _in.y); }
@@ -67,6 +68,8 @@ namespace emp {
     Point2D & Translate(TYPE shift_x, TYPE shift_y) { x += shift_x; y += shift_y; return *this; }
     Point2D & TranslateX(TYPE shift) { x += shift; return *this; }
     Point2D & TranslateY(TYPE shift) { y += shift; return *this; }
+    Point2D & Scale(double scale) { x *= scale; y *= scale; return *this; }
+    Point2D & Scale(double scale_x, double scale_y) { x *= scale_x; y *= scale_y; return *this; }
     Point2D & ToOrigin() { x = 0; y = 0; return *this; }
     Point2D & NegateX() { x = -x; return *this; }
     Point2D & NegateY() { y = -y; return *this; }
