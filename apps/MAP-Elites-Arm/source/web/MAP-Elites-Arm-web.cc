@@ -14,6 +14,11 @@
 namespace UI = emp::web;
 
 UI::Document doc("emp_base");
+UI::Div div_pop("div_pop");
+UI::Div div_stats("div_stats");
+UI::Div div_controls("div_controls");
+UI::Div div_vis("div_vis");
+
 ArmWorld world;
 const double world_size = 600;
 size_t target_id = 0;
@@ -204,20 +209,28 @@ int main()
 {
   doc << "<h1>MAP-Elites: Arm Positioning Challenge</h1>";
 
+  UI::Canvas world_canvas(world_size, world_size, "world_canvas");
+  div_pop << world_canvas;
+
   // Add some Buttons
-  doc << UI::Button( [](){ emp::RandomSelect(world, 1); DrawWorldCanvas(); }, "Do Birth", "birth_button");
-  doc << UI::Button( [](){ emp::RandomSelect(world, 100); DrawWorldCanvas(); }, "Do Birth 100", "birth_100_button");
-  doc << UI::Button( [](){ emp::RandomSelect(world, 10000); DrawWorldCanvas(); }, "Do Birth 10000", "birth_10000_button");
-  doc << UI::Button( [](){ world.ResetMixed(); DrawWorldCanvas(); }, "Reset Well Mixed", "reset_mixed_button");
-  doc << UI::Button( [](){ world.ResetMAP(); DrawWorldCanvas(); }, "Reset MAP-Elites", "reset_map_button");
-  doc << UI::Button( [](){ world.ResetDiverse(); DrawWorldCanvas(); }, "Reset DiverseElites", "reset_diverse_button");
-  doc << "<br>";
+  div_controls << UI::Button( [](){ emp::RandomSelect(world, 1); DrawWorldCanvas(); }, "Do Birth", "birth_button");
+  div_controls << UI::Button( [](){ emp::RandomSelect(world, 100); DrawWorldCanvas(); }, "Do Birth 100", "birth_100_button");
+  div_controls << UI::Button( [](){ emp::RandomSelect(world, 10000); DrawWorldCanvas(); }, "Do Birth 10000", "birth_10000_button");
+  div_controls << UI::Button( [](){ world.ResetMixed(); DrawWorldCanvas(); }, "Reset Well Mixed", "reset_mixed_button");
+  div_controls << UI::Button( [](){ world.ResetMAP(); DrawWorldCanvas(); }, "Reset MAP-Elites", "reset_map_button");
+  div_controls << UI::Button( [](){ world.ResetDiverse(); DrawWorldCanvas(); }, "Reset DiverseElites", "reset_diverse_button");
+  div_controls << "<br>";
 
   // Add the Canvas
-  auto world_canvas = doc.AddCanvas(world_size, world_size, "world_canvas");
+  // auto world_canvas = doc.AddCanvas(world_size, world_size, "world_canvas");
   world_canvas.On("click", CanvasClick2);
-  DrawWorldCanvas();
 
+  doc << div_pop;
+  doc << div_stats;
+  doc << div_controls;
+  doc << div_vis;
+
+  DrawWorldCanvas();
 
   EM_ASM({ $('#(x)'); });  // <-- What is this needed for?  Clicking on the canvas doesn't work without it.
 
