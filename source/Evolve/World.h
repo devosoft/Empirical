@@ -232,11 +232,6 @@ namespace emp {
       SetDefaultPrintFun<this_t, ORG>(*this);
       SetDefaultGetGenomeFun<this_t, ORG>(*this);
       SetWellMixed();  // World default structure is well-mixed.
-      OnUpdate([this](int ud){
-        for (Ptr<SystematicsBase<ORG>> s : systematics) {
-          s->Update();
-        }
-      });
     }
     World(Random & rnd, std::string _name="") : World(&rnd, _name) { ; }
     World(std::string _name) : World(nullptr, _name) { ; }
@@ -340,7 +335,7 @@ namespace emp {
     /// stored in the order they are added to the world.
     Ptr<SystematicsBase<ORG> > GetSystematics(int id=0) { 
       emp_assert(systematics.size() > 0, "Cannot get systematics file. No systematics file to track.");
-      emp_assert(id < systematics.size(), "Invalid systematics file requested.", id, systematics.size());
+      emp_assert(id < (int)systematics.size(), "Invalid systematics file requested.", id, systematics.size());
 
       return systematics[id]; 
     }
@@ -771,14 +766,19 @@ namespace emp {
       DoMutationsOrg(*new_org);
     }
 
+    for (Ptr<SystematicsBase<ORG> > s : systematics) {
+      s->SetNextParent(p_pos);
+    }
+
     after_mutation_sig.Trigger(*new_org, pos, p_pos);
     if (pop.size() <= pos) pop.resize(pos+1, nullptr);  // Make sure we have room.
+
     RemoveOrgAt(pos);                                   // Clear out any old org.
     pop[pos] = new_org;                                 // Place new org.
     ++num_orgs;                                         // Track number of orgs.
 
     for (Ptr<SystematicsBase<ORG> > s : systematics) {
-      s->AddOrg(*new_org, pos, p_pos, update);
+      s->AddOrg(*new_org, pos, update, false);
     }
 
     return OrgPosition(pos, true);
@@ -793,6 +793,10 @@ namespace emp {
       DoMutationsOrg(*new_org);
     }
 
+    for (Ptr<SystematicsBase<ORG> > s : systematics) {
+      s->SetNextParent(p_pos);
+    }
+
     after_mutation_sig.Trigger(*new_org, pos, p_pos);
 
     if (next_pop.size() <= pos) next_pop.resize(pos+1, nullptr);   // Make sure we have room.
@@ -800,7 +804,7 @@ namespace emp {
     next_pop[pos] = new_org;                                       // Place new org.
 
     for (Ptr<SystematicsBase<ORG> > s : systematics) {
-      s->AddOrg(*new_org, pos, p_pos, update);
+      s->AddOrg(*new_org, pos, update, true);
     }
 
     return OrgPosition(pos, false);
@@ -1072,7 +1076,7 @@ namespace emp {
     // 1. Send out an update signal for any external functions to trigger.
     on_update_sig.Trigger(update);
 
-    // 2. If synchronous generationsm (i.e, next_pop is not empty), move next population into
+    // 2. If synchronous generations (i.e, next_pop is not empty), move next population into
     //    place as the current popoulation.
     if (next_pop.size()) {
       // Clear out current pop.
@@ -1089,6 +1093,11 @@ namespace emp {
           org_placement_sig.Trigger(i);  // ...and trigger org placement.
         }
       }
+    }
+
+    // Tell systematics manager to swap next population and population
+    for (Ptr<SystematicsBase<ORG>> s : systematics) {
+      s->Update();
     }
 
     // 3. Handle any data files that need to be printed this update.

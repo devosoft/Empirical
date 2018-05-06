@@ -209,8 +209,8 @@ namespace emp {
     public:
 
     SystematicsBase(bool _active=true, bool _anc=true, bool _all=false, bool _pos=true)
-      : store_active(_active), store_ancestors(_anc), store_outside(_all), store_position(_pos)
-      , archive(store_ancestors || store_outside), track_synchronous(false) { ; }
+      : store_active(_active), store_ancestors(_anc), store_outside(_all)
+      , archive(store_ancestors || store_outside), store_position(_pos), track_synchronous(false) { ; }
 
     virtual ~SystematicsBase(){;}
 
@@ -275,7 +275,8 @@ namespace emp {
     // virtual int GetBranchesToRoot() = 0;    
     // virtual void GetMRCA() = 0;
     virtual int GetMRCADepth() const = 0;
-    virtual void AddOrg(const ORG & org, int pos, int parent_pos, int update) = 0;
+    virtual void AddOrg(ORG && org, int pos, int update, bool next) = 0;
+    virtual void AddOrg(ORG & org, int pos, int update, bool next) = 0;
     virtual bool RemoveOrg(int pos) = 0;
     virtual bool RemoveNextOrg(int pos) = 0;
     // virtual void Parent() const = 0;
@@ -283,6 +284,7 @@ namespace emp {
     // virtual void PrintLineage() const = 0;
     virtual double CalcDiversity() const = 0;
     virtual void Update() = 0;
+    virtual void SetNextParent(int pos) = 0;
   };
 
   /// @brief A tool to track phylogenetic relationships among organisms.
@@ -298,9 +300,10 @@ namespace emp {
   private:
     using taxon_t = Taxon<ORG_INFO, DATA_STRUCT>;
     using hash_t = typename Ptr<taxon_t>::hash_t;
-    using fun_calc_info_t = std::function<ORG_INFO(const ORG)>;
+    using fun_calc_info_t = std::function<ORG_INFO(ORG &)>;
 
     fun_calc_info_t calc_info_fun;
+    Ptr<taxon_t> next_parent;
 
     using SystematicsBase<ORG>::store_active;
     using SystematicsBase<ORG>::store_ancestors;
@@ -339,6 +342,7 @@ namespace emp {
     // using SystematicsBase<ORG>::PrintLineage;
     using SystematicsBase<ORG>::CalcDiversity;
     using SystematicsBase<ORG>::Update;
+    using SystematicsBase<ORG>::SetNextParent;
 
     std::unordered_set< Ptr<taxon_t>, hash_t > active_taxa;   ///< A set of all living taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; ///< A set of all dead, ancestral taxa.
@@ -413,6 +417,20 @@ namespace emp {
     /// How many taxa are stored in total?
     size_t GetNumTaxa() const { return GetTreeSize() + GetNumOutside(); }
 
+    void SetNextParent(int pos) {
+      emp_assert(pos < (int)taxon_locations.size(), "Invalid parent", pos, taxon_locations.size());
+      if (pos == -1) {
+        next_parent = nullptr;
+      } else {
+        emp_assert(pos >= 0, "Invalid parent", pos);
+        next_parent = taxon_locations[pos];
+      }
+    }
+
+    void SetNextParent(Ptr<taxon_t> p) {
+      next_parent = p;
+    }
+
     SignalKey OnNew(std::function<void(Ptr<taxon_t>)> & fun) { return on_new_sig.AddAction(fun); }
 
     /// Privide a function for Systematics to call each time a taxon is about to be pruned.
@@ -420,8 +438,17 @@ namespace emp {
     /// Argument: Pounter to taxon
     SignalKey OnPrune(std::function<void(Ptr<taxon_t>)> & fun) { return on_prune_sig.AddAction(fun); }
 
-    Ptr<taxon_t> GetTaxonAt(int id) {return taxon_locations[id];}
-    Ptr<taxon_t> GetNextTaxonAt(int id) {return next_taxon_locations[id];}
+    Ptr<taxon_t> GetTaxonAt(int id) {
+      emp_assert(id < (int) taxon_locations.size(), "Invalid taxon location", id, taxon_locations.size());
+      emp_assert(taxon_locations[id], "No taxon at specified location");
+      return taxon_locations[id];
+    }
+    Ptr<taxon_t> GetNextTaxonAt(int id) {
+      emp_assert(id < (int)next_taxon_locations.size(), "Invalid taxon location");
+      emp_assert(next_taxon_locations[id], "No taxon at specified location");
+
+      return next_taxon_locations[id];
+    }
 
     /** From (Faith 1992, reviewed in Winters et al., 2013), phylogenetic diversity is 
      *  the sum of edges in the minimal spanning tree connected the taxa you're 
@@ -475,14 +502,14 @@ namespace emp {
 
       Ptr<taxon_t> test_taxon = tax->GetParent();
 
-      emp_assert(time != -1 && "Invalid time - are you passing time to AddOrg?", time);
+      emp_assert(time != -1 && "Invalid time - are you passing time to rg?", time);
       emp_assert(time >= tax->GetOriginationTime() 
                  && "GetEvolutionaryDistinctiveness recieved a time that is earlier than the taxon's origination time.");
 
       while (test_taxon) {
 
         emp_assert(test_taxon->GetOriginationTime() != -1 && 
-                  "Invalid time - are you passing time to AddOrg?");
+                  "Invalid time - are you passing time to rg?");
 
         depth += time - test_taxon->GetOriginationTime();
         // std::cout << "Tax: " << test_taxon->GetID() << " depth: " << depth << " time: " << time  << " Orig: " << test_taxon->GetOriginationTime() << " divisor: " << divisor << std::endl;
@@ -721,9 +748,14 @@ namespace emp {
     /// If you would like the systematics manager to track taxon age, you can also supply
     /// the update at which the taxon is being added.
     /// return a pointer for the associated taxon.
-    void AddOrg(const ORG & org, int pos, int parent_pos=-1, int update=-1);
-    Ptr<taxon_t> AddOrg(const ORG & org, int pos, Ptr<taxon_t> parent=nullptr, int update=-1);
-    Ptr<taxon_t> AddOrg(const ORG & org, Ptr<taxon_t> parent=nullptr, int update=-1);
+    void AddOrg(ORG && org, int pos, int update=-1, bool next=false);
+    Ptr<taxon_t> AddOrg(ORG && org, int pos, Ptr<taxon_t> parent=nullptr, int update=-1, bool next=false);
+    Ptr<taxon_t> AddOrg(ORG && org, Ptr<taxon_t> parent=nullptr, int update=-1, bool next=false);
+
+    void AddOrg(ORG & org, int pos, int update=-1, bool next=false);
+    Ptr<taxon_t> AddOrg(ORG & org, int pos, Ptr<taxon_t> parent=nullptr, int update=-1, bool next=false);
+    Ptr<taxon_t> AddOrg(ORG & org, Ptr<taxon_t> parent=nullptr, int update=-1, bool next=false);
+
 
     /// Remove an instance of an organism; track when it's gone.
     bool RemoveOrg(int pos);
@@ -834,30 +866,52 @@ namespace emp {
   // Can't return a pointer for the associated taxon because of obnoxious inheritance problems
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> 
-  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(const ORG & org, int pos, int parent_pos, int update) {
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG & org, int pos, int update, bool next) {
     emp_assert(store_position, "Trying to pass position to a systematics manager that can't use it");
-    emp_assert( parent_pos == -1 || (taxon_locations[parent_pos] && Has(active_taxa, taxon_locations[parent_pos])));
-    if (parent_pos == -1) {
-      AddOrg(org, pos, nullptr, update);
-    } else {
-      AddOrg(org, pos, taxon_locations[parent_pos], update);
-    }
+    // emp_assert(next_parent, "Adding organism with no parent specified and no next_parent set");
+    AddOrg(org, pos, next_parent, update, next);
+    next_parent = nullptr;
+  }
+
+  // Add information about a new organism, including its stored info and parent's taxon;
+  // Can't return a pointer for the associated taxon because of obnoxious inheritance problems
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> 
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG && org, int pos, int update, bool next) {
+    emp_assert(store_position, "Trying to pass position to a systematics manager that can't use it");
+    // emp_assert(next_parent, "Adding organism with no parent specified and no next_parent set");
+    AddOrg(org, pos, next_parent, update, next);
+    next_parent = nullptr;
+  }
+
+
+  // Version for if you aren't tracking positions
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> 
+  Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG & org, Ptr<taxon_t> parent, int update, bool next) {
+    return AddOrg(org, -1, parent, update, next);
   }
 
   // Version for if you aren't tracking positions
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> 
-  Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(const ORG & org, Ptr<taxon_t> parent, int update) {
-    // TODO_Warning: Once we have warnings, put a warning here if store_position is true
-    return AddOrg(org, -1, parent, update);
+  Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG && org, Ptr<taxon_t> parent, int update, bool next) {
+    return AddOrg(org, -1, parent, update, next);
   }
 
   // Add information about a new organism, including its stored info and parent's taxon;
   // return a pointer for the associated taxon.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
-  Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(const ORG & org, int pos, Ptr<taxon_t> parent, int update) {
-    emp_assert(store_position, "Trying to pass position to a systematics manager that can't use it");
+  Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG && org, int pos, Ptr<taxon_t> parent, int update, bool next) {
+    return AddOrg(org, pos, parent, update, next);
+  }
+
+  // Add information about a new organism, including its stored info and parent's taxon;
+  // return a pointer for the associated taxon.
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
+  Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG & org, int pos, Ptr<taxon_t> parent, int update, bool next) {
     org_count++;                  // Keep count of how many organisms are being tracked.
 
     ORG_INFO info = calc_info_fun(org);
@@ -875,22 +929,23 @@ namespace emp {
       on_new_sig.Trigger(cur_taxon);
       if (store_active) active_taxa.insert(cur_taxon);             // Store new taxon.
       if (parent) parent->AddOffspring();              // Track tree info.
-      if (store_position) {
-        if (track_synchronous) {
-          if (pos > (int)next_taxon_locations.size()) {
-            next_taxon_locations.resize(pos+1);
-          }
-          next_taxon_locations[pos] = cur_taxon;
-
-        } else {
-          if (pos > (int)taxon_locations.size()) {
-            taxon_locations.resize(pos+1);
-          }
-          taxon_locations[pos] = cur_taxon;
-        }
-      }
 
       cur_taxon->SetOriginationTime(update);
+    }
+
+    if (store_position && pos >= 0) {
+      if (next) {
+        if (pos >= (int)next_taxon_locations.size()) {
+          next_taxon_locations.resize(pos+1);
+        }
+        next_taxon_locations[pos] = cur_taxon;
+
+      } else {
+        if (pos >= (int)taxon_locations.size()) {
+          taxon_locations.resize(pos+1);
+        }
+        taxon_locations[pos] = cur_taxon;
+      }
     }
 
     cur_taxon->AddOrg();                    // Record the current organism in its taxon.
@@ -902,6 +957,7 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrg(int pos) {
     emp_assert(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
+    emp_assert(pos < (int)taxon_locations.size(), "Invalid position requested for removal", pos, taxon_locations.size());
     bool active = RemoveOrg(taxon_locations[pos]);
     taxon_locations[pos] = nullptr;
     return active;
@@ -926,6 +982,10 @@ namespace emp {
   // Remove an instance of an organism; track when it's gone.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveNextOrg(int pos) {
+    emp_assert(track_synchronous, "Calling RemoveNextOrg on non-synchronous population. Did you mean to use RemoveOrg?");
+    emp_assert(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
+    emp_assert(pos < (int)next_taxon_locations.size(), "Invalid position requested for removal", pos, taxon_locations.size());
+
     bool active = RemoveOrg(next_taxon_locations[pos]);
     next_taxon_locations[pos] = nullptr;
     return active;
@@ -934,6 +994,7 @@ namespace emp {
   // Remove an instance of an organism; track when it's gone.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveNextOrg(Ptr<taxon_t> taxon) {
+    emp_assert(track_synchronous, "Calling RemoveNextOrg on non-synchronous population. Did you mean to use RemoveOrg?");
     emp_assert(taxon);
 
     // Update stats
