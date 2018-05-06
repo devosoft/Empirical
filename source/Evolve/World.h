@@ -34,7 +34,6 @@
 #include "../base/vector.h"
 #include "../control/Signal.h"
 #include "../control/SignalControl.h"
-#include "../data/DataFile.h"
 #include "../data/Trait.h"
 #include "../data/DataFile.h"
 #include "../data/DataManager.h"
