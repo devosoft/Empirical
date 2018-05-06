@@ -165,7 +165,7 @@ TEST_CASE("Test DataArchive", "[data]") {
     data2.Reset();
 
     // Generate what the archive should look like now that we Reset
-    emp::vector<emp::vector<int>> arch_comp;
+    emp::vector<emp::vector<int>> arch_comp; 
     arch_comp.push_back(emp::vector<int>({1,2,3,4,5,6,7,9,8}));
 
     // Compare archives as strings for easy reading of errors.
@@ -345,6 +345,23 @@ TEST_CASE("Test DataFile", "[data]") {
     REQUIRE(compareFiles("test_file.dat", "data/test_file.dat"));
 }
 
+TEST_CASE("Test histogram", "[data]") {
+    emp::DataNode<double, emp::data::Current, emp::data::Range, emp::data::Histogram, emp::data::Pull, emp::data::Log> data;
+    data.SetupBins(1,21,10);
+    data.Add(1,2,1,19);
+
+    REQUIRE(data.GetHistMin() == 1);
+    REQUIRE(data.GetHistWidth(5) == 2);
+
+    REQUIRE(data.GetBinMins() == emp::vector<double>({1,3,5,7,9,11,13,15,17,19}));
+
+    REQUIRE(data.GetHistCount(9) == 1);
+    REQUIRE(data.GetHistCounts() == emp::vector<size_t>({3,0,0,0,0,0,0,0,0,1}));
+
+    data.Reset();
+    REQUIRE(data.GetHistCounts() == emp::vector<size_t>({0,0,0,0,0,0,0,0,0,0}));    
+}
+
 TEST_CASE("Test Container DataFile", "[data]") {
 
     emp::vector<int> cool_data({1,2,3});
@@ -390,23 +407,6 @@ TEST_CASE("Test Container DataFile", "[data]") {
     dfile2.Update();
 
     REQUIRE(compareFiles("test_make_container_file.dat", "data/test_make_container_file.dat"));
-}
-
-TEST_CASE("Test histogram", "[data]") {
-    emp::DataNode<double, emp::data::Current, emp::data::Range, emp::data::Histogram, emp::data::Pull, emp::data::Log> data;
-    data.SetupBins(1,21,10);
-    data.Add(1,2,1,19);
-
-    REQUIRE(data.GetHistMin() == 1);
-    REQUIRE(data.GetHistWidth(5) == 2);
-
-    REQUIRE(data.GetBinMins() == emp::vector<double>({1,3,5,7,9,11,13,15,17,19}));
-
-    REQUIRE(data.GetHistCount(9) == 1);
-    REQUIRE(data.GetHistCounts() == emp::vector<size_t>({3,0,0,0,0,0,0,0,0,1}));
-
-  data.Reset();
-  REQUIRE(data.GetHistCounts() == emp::vector<size_t>({0,0,0,0,0,0,0,0,0,0}));
 }
 
 TEST_CASE("Test timing", "[data]") {

@@ -368,13 +368,16 @@ namespace emp {
 
   }
 
+  /// Sometimes you may want a data file where a set
+  /// of functions is run on every item in a container
+  /// every time you write to the file. ContainerDataFiles do that.
   ///
   /// Note: CONTAINER type can be a pointer to a container and the
   /// datafile will handle derefeferencing it appropriately.
   
   template <typename CONTAINER>
   class ContainerDataFile : public DataFile {
-
+    protected:
     // The container type cannot be a reference
     using container_t = typename std::remove_reference<CONTAINER>::type; 
     using raw_container_t = typename remove_ptr_type<container_t>::type;
@@ -394,7 +397,9 @@ namespace emp {
     ContainerDataFile(const std::string & filename,
              const std::string & b="", const std::string & s=",", const std::string & e="\n")
              : DataFile(filename, b, s, e), update_container_fun(), current_rows() {;}
+
     ~ContainerDataFile() {;}
+
     /// Tell this file what function to run to update the contents of the
     /// container that data is being calculated on.
     void SetUpdateContainerFun(const fun_update_container_t fun) {
