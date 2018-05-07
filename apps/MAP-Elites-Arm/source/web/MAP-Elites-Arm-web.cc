@@ -24,6 +24,18 @@ const double world_size = 600;
 size_t target_id = 0;
 ArmOrg target_arm;
 
+void LayoutDivs() {
+  double x1 = 10;
+  double y1 = 70;
+  double x2 = 650;
+  double y2 = 300;
+  double y3 = 700;
+  div_pop.SetPosition(x1, y1);
+  div_controls.SetPosition(x2, y1);
+  div_stats.SetPosition(x2, y2);
+  div_vis.SetPosition(x1,y3);
+}
+
 void DrawWorldCanvas_Grid() {
   UI::Canvas canvas = doc.Canvas("world_canvas");
   canvas.Clear("gray");
@@ -86,6 +98,8 @@ void DrawWorldCanvas_Grid() {
 }
 
 void DrawWorldCanvas_Scatter() {
+  LayoutDivs();
+
   UI::Canvas canvas = doc.Canvas("world_canvas");
 
   const size_t world_size = world.GetSize();
@@ -221,8 +235,10 @@ int main()
   div_controls << UI::Button( [](){ world.ResetDiverse(); DrawWorldCanvas(); }, "Reset DiverseElites", "reset_diverse_button");
   div_controls << "<br>";
 
-  // Add the Canvas
-  // auto world_canvas = doc.AddCanvas(world_size, world_size, "world_canvas");
+  // Add some stats
+  div_stats << "<h3>Stats</h3>";
+
+  // Setup canvas interactions
   world_canvas.On("click", CanvasClick2);
 
   doc << div_pop;
@@ -231,6 +247,8 @@ int main()
   doc << div_vis;
 
   DrawWorldCanvas();
+
+  emp::web::OnDocumentReady( [](){ LayoutDivs(); } );
 
   EM_ASM({ $('#(x)'); });  // <-- What is this needed for?  Clicking on the canvas doesn't work without it.
 
