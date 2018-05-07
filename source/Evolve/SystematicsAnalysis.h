@@ -110,7 +110,7 @@ namespace emp {
         Ptr<taxon_t> parent = taxon->GetParent();
 
         while (parent) {
-            if (taxon->GetData().fitness.GetMean() < parent->GetData().fitness.GetMean()) {
+            if (taxon->GetData().GetFitness() < parent->GetData().GetFitness()) {
                 count++;
             }
             taxon = parent;            

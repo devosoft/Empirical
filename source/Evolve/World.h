@@ -53,19 +53,6 @@
 
 namespace emp {
 
-  enum class SystematicsType {
-    GENOME,      /// Taxa in the systematics manager are genomes (world's genome_t)
-    NUMERIC,     /// Taxa in the systematics manager are numbers
-    STRING,      /// Taxa in the systematics manager are strings
-    UNKNOWN      /// Taxa in the systematics manager are something else
-  };
-
-  // template <typename ORG>
-  // struct SystematicsInfo {
-  //   SystematicsBase<ORG> s;
-  //   using 
-  // }
-
   ///  @brief Setup a World with a population of organisms that can evolve or deal with ecological effects.
   ///
   ///  There are three ways that organisms can enter the population:
@@ -202,7 +189,6 @@ namespace emp {
 
     /// Phylogeny and line-of-descent data collection.
     emp::vector<Ptr<SystematicsBase<ORG> >> systematics;
-    emp::vector<emp::SystematicsType> systematics_types;
     std::unordered_map<std::string, int> systematics_labels;
 
     // == Signals ==
@@ -425,16 +411,6 @@ namespace emp {
         s->SetTrackSynchronous(true);
       }
 
-      if (std::is_arithmetic<ORG_INFO>::value) {
-        systematics_types.push_back(SystematicsType::NUMERIC);
-      } else if (std::is_convertible<ORG_INFO, genome_t>::value) {
-        systematics_types.push_back(SystematicsType::GENOME);
-      } else if (std::is_convertible<ORG_INFO, std::string>::value) {
-        systematics_types.push_back(SystematicsType::STRING);
-      } else {
-        systematics_types.push_back(SystematicsType::UNKNOWN);
-      }
-
       systematics.push_back(s);
     }
 
@@ -516,7 +492,10 @@ namespace emp {
     DataFile & SetupFitnessFile(const std::string & filename="fitness.csv", const bool & print_header=true);
 
     /// Setup a file to be printed that collects systematics information over time.
+    DataFile & SetupSystematicsFile(std::string label, const std::string & filename="systematics.csv", const bool & print_header=true);
+    /// Setup a file to be printed that collects systematics information over time.
     DataFile & SetupSystematicsFile(int id=0, const std::string & filename="systematics.csv", const bool & print_header=true);
+
     /// Setup a file to be printed that collects population information over time.
     DataFile & SetupPopulationFile(const std::string & filename="population.csv", const bool & print_header=true);
 
@@ -1071,17 +1050,25 @@ namespace emp {
   /// A data file (default="systematics.csv") that contains information about the population's
   /// phylogeny and lineages.
   template<typename ORG>
+  DataFile & World<ORG>::SetupSystematicsFile(std::string label, const std::string & filename, const bool & print_header) {
+    emp_assert(Has(systematics_labels, label), "Invalid systematics tracker requested.", label);
+    SetupSystematicsFile(systematics_labels[label], filename, print_header);
+  }
+
+  /// A data file (default="systematics.csv") that contains information about the population's
+  /// phylogeny and lineages.
+  template<typename ORG>
   DataFile & World<ORG>::SetupSystematicsFile(int id, const std::string & filename, const bool & print_header) {
     emp_assert(systematics.size() > 0, "Cannot track systematics file. No systematics file to track.");
-    emp_assert(id < systematics.size(), "Invalid systematics file requested to be tracked.");
+    emp_assert(id < (int)systematics.size(), "Invalid systematics file requested to be tracked.");
     auto & file = SetupFile(filename);
     file.AddVar(update, "update", "Update");
-    file.template AddFun<size_t>( [this, id](){ return systematics[id].GetNumActive(); }, "num_genotypes", "Number of unique genotype groups currently active." );
-    file.template AddFun<size_t>( [this, id](){ return systematics[id].GetTotalOrgs(); }, "total_orgs", "Number of organisms tracked." );
-    file.template AddFun<double>( [this, id](){ return systematics[id].GetAveDepth(); }, "ave_depth", "Average Phylogenetic Depth of Organisms." );
-    file.template AddFun<size_t>( [this, id](){ return systematics[id].GetNumRoots(); }, "num_roots", "Number of independent roots for phlogenies." );
-    file.template AddFun<int>( [this, id](){ return systematics[id].GetMRCADepth(); }, "mrca_depth", "Phylogenetic Depth of the Most Recent Common Ancestor (-1=none)." );
-    file.template AddFun<double>( [this, id](){ return systematics[id].CalcDiversity(); }, "diversity", "Genotypic Diversity (entropy of genotypes in population)." );
+    file.template AddFun<size_t>( [this, id](){ return systematics[id]->GetNumActive(); }, "num_taxa", "Number of unique taxonomic groups currently active." );
+    file.template AddFun<size_t>( [this, id](){ return systematics[id]->GetTotalOrgs(); }, "total_orgs", "Number of organisms tracked." );
+    file.template AddFun<double>( [this, id](){ return systematics[id]->GetAveDepth(); }, "ave_depth", "Average Phylogenetic Depth of Organisms." );
+    file.template AddFun<size_t>( [this, id](){ return systematics[id]->GetNumRoots(); }, "num_roots", "Number of independent roots for phlogenies." );
+    file.template AddFun<int>( [this, id](){ return systematics[id]->GetMRCADepth(); }, "mrca_depth", "Phylogenetic Depth of the Most Recent Common Ancestor (-1=none)." );
+    file.template AddFun<double>( [this, id](){ return systematics[id]->CalcDiversity(); }, "diversity", "Genotypic Diversity (entropy of genotypes in population)." );
     if (print_header) file.PrintHeaderKeys();
     return file;
   }

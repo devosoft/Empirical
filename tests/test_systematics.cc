@@ -303,11 +303,11 @@ TEST_CASE("Run world", "[evo]") {
   world.AddSystematics(gene_sys);
   world.AddSystematics(phen_sys);
 
-  // emp::Signal<void(mut_count_t)> on_mutate_sig;    ///< Trigger signal before organism gives birth.
+  emp::Signal<void(mut_count_t)> on_mutate_sig;    ///< Trigger signal before organism gives birth.
   // emp::Signal<void(size_t pos, double)> record_fit_sig;    ///< Trigger signal before organism gives birth.
   // emp::Signal<void(size_t pos, emp::vector<double>)> record_phen_sig;    ///< Trigger signal before organism gives birth.
 
-  // on_mutate_sig.AddAction([&last_mutation](mut_count_t muts){last_mutation = muts;});
+  on_mutate_sig.AddAction([&last_mutation](mut_count_t muts){last_mutation = muts;});
 
   // record_fit_sig.AddAction([&world](size_t pos, double fit){
   //   world.GetSystematics(0).Cast<systematics_t>()->GetTaxonAt(pos)->GetData().RecordFitness(fit);
@@ -321,23 +321,25 @@ TEST_CASE("Run world", "[evo]") {
   //   world.GetSystematics(0).Cast<systematics_t>()->GetTaxonAt(pos)->GetData().RecordMutation(last_mutation);
   // });
 
+  world.SetupSystematicsFile().SetTimingRepeat(1);
+  world.SetupFitnessFile().SetTimingRepeat(1);
+  world.SetupPopulationFile().SetTimingRepeat(1);
   emp::AddPhylodiversityFile(world, 0, "geneotype_phylodiversity.csv").SetTimingRepeat(1);
   emp::AddPhylodiversityFile(world, 1, "phenotype_phylodiversity.csv").SetTimingRepeat(1);
-  // emp::AddLineageMutationFile(world).SetTimingRepeat(1);
+  emp::AddLineageMutationFile(world).SetTimingRepeat(1);
   // AddDominantFile(world).SetTimingRepeat(1);
   // emp::AddMullerPlotFile(world).SetTimingOnce(1);
 
 
   // Setup the mutation function.
-  world.SetMutFun( [&world](emp::AvidaGP & org, emp::Random & random) {
+  world.SetMutFun( [&world, &on_mutate_sig](emp::AvidaGP & org, emp::Random & random) {
      
       uint32_t num_muts = random.GetUInt(4);  // 0 to 3 mutations.
       for (uint32_t m = 0; m < num_muts; m++) {
         const uint32_t pos = random.GetUInt(20);
         org.RandomizeInst(pos, random);
       }
-      // on_mutate_sig.Trigger({{"substitution",num_muts}});
-      // std::cout << num_muts << " muttaions" << std::endl;
+      on_mutate_sig.Trigger({{"substitution",num_muts}});
       return num_muts;
     });
 

@@ -43,13 +43,20 @@ namespace emp {
   /// Note: You are responsible for filling these in! Adding the template
   /// just gives you a place to store your data.
 
-  struct no_data {}; /// The default - an empty struct
+  struct no_data {
+      using has_fitness_t = std::false_type;
+      using has_mutations_t = std::false_type;
+      using has_phen_t = std::false_type;
+  }; /// The default - an empty struct
 
   template <typename PHEN_TYPE> 
   struct mut_landscape_info { /// Track information related to the mutational landscape
     /// Maps a string representing a type of mutation to a count representing 
     /// the number of that type of mutation that occured to bring about this taxon.
     using phen_t = PHEN_TYPE;
+    using has_mutations_t = std::true_type;
+    using has_fitness_t = std::true_type;
+    // using has_phenotype_t = true;
 
     std::unordered_map<std::string, int> mut_counts;
     DataNode<double, data::Current, data::Range> fitness; /// This taxon's fitness (for assessing deleterious mutational steps)
@@ -57,6 +64,10 @@ namespace emp {
 
     const PHEN_TYPE & GetPhenotype() const {
       return phenotype;
+    }
+
+    const double GetFitness() const {
+      return fitness.GetMean();
     }
 
     void RecordMutation(std::unordered_map<std::string, int> muts) {
@@ -272,6 +283,21 @@ namespace emp {
       return &(data_nodes.New(name));
     }
 
+    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddDataNode(std::function<emp::vector<double>()> pull_set_fun, const std::string & name) {
+      emp_assert(!data_nodes.HasNode(name));
+      auto node = AddDataNode(name);
+      node->AddPullSet(pull_set_fun);
+      return node;
+    }
+
+    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddDataNode(std::function<double()> pull_fun, const std::string & name) {
+      emp_assert(!data_nodes.HasNode(name));
+      auto node = AddDataNode(name);
+      node->AddPull(pull_fun);
+      return node;
+    }
+
+
     Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> GetDataNode(const std::string & name) {
       return &(data_nodes.Get(name));
     }
@@ -279,6 +305,10 @@ namespace emp {
     virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddEvolutionaryDistinctivenessDataNode(const std::string & name = "evolutionary_distinctiveness") = 0;
     virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddPairwiseDistanceDataNode(const std::string & name = "pairwise_distance") = 0;
     virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddPhylogeneticDiversityDataNode(const std::string & name = "phylogenetic_diversity") = 0;
+    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddDeleteriousStepDataNode(const std::string & name = "deleterious_steps") = 0;
+    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddVolatilityDataNode(const std::string & name = "volatility") = 0;
+    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddUniqueTaxaDataNode(const std::string & name = "unique_taxa") = 0;
+    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddMutationCountDataNode(const std::string & name = "mutation_count", const std::string & mutation = "substitution") = 0;
 
     virtual size_t GetNumActive() const = 0;
     virtual size_t GetNumAncestors() const = 0;
@@ -365,6 +395,10 @@ namespace emp {
     using SystematicsBase<ORG>::AddEvolutionaryDistinctivenessDataNode;
     using SystematicsBase<ORG>::AddPairwiseDistanceDataNode;
     using SystematicsBase<ORG>::AddPhylogeneticDiversityDataNode;
+    using SystematicsBase<ORG>::AddDeleteriousStepDataNode;
+    using SystematicsBase<ORG>::AddVolatilityDataNode;
+    using SystematicsBase<ORG>::AddUniqueTaxaDataNode;
+    using SystematicsBase<ORG>::AddMutationCountDataNode;
 
     std::unordered_set< Ptr<taxon_t>, hash_t > active_taxa;   ///< A set of all living taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; ///< A set of all dead, ancestral taxa.
@@ -463,16 +497,17 @@ namespace emp {
     /// Argument: Pounter to taxon
     SignalKey OnPrune(std::function<void(Ptr<taxon_t>)> & fun) { return on_prune_sig.AddAction(fun); }
 
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddEvolutionaryDistinctivenessDataNode(const std::string & name = "evolutionary_distinctiveness") {
+    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> 
+    AddEvolutionaryDistinctivenessDataNode(const std::string & name = "evolutionary_distinctiveness") {
       auto node = AddDataNode(name);
       node->AddPullSet([this](){
         emp::vector<double> result;
         for (auto tax : active_taxa) {
           result.push_back(GetEvolutionaryDistinctiveness(tax, curr_update));
         }
-
         return result;
       });
+
       return node;
     }
 
@@ -491,6 +526,75 @@ namespace emp {
       });
       return node;
     }
+
+
+    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> 
+    AddDeleteriousStepDataNode(const std::string & name = "deleterious_steps") {
+      return AddDeleteriousStepDataNodeImpl(1, name);
+    }
+
+    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddDeleteriousStepDataNodeImpl(bool decoy, const std::string & name = "deleterious_steps") {
+      emp_assert(false, "Calculating deleterious steps requires suitable DATA_STRUCT");
+      return AddDataNode(name);
+    }
+ 
+    template <typename T=int>
+    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>>
+    AddDeleteriousStepDataNodeImpl(typename std::enable_if<DATA_STRUCT::has_fitness_t::value, T>::type decoy, const std::string & name = "deleterious_steps") {
+      auto node = AddDataNode(name);
+      node->AddPullSet([this](){
+        emp::vector<double> result;
+        for (auto tax : active_taxa) {
+          result.push_back(CountDeleteriousSteps(tax));
+        }
+        return result;
+      });
+
+      return node;
+    }
+
+    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> 
+    AddVolatilityDataNode(const std::string & name = "volatility") {
+      auto node = AddDataNode(name);
+      node->AddPullSet([this](){
+        emp::vector<double> result;
+        for (auto tax : active_taxa) {
+          // result.push_back(CountPhenotypeChanges(tax));
+        }
+        return result;
+      });
+
+      return node;
+    }
+
+    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> 
+    AddUniqueTaxaDataNode(const std::string & name = "unique_taxa") {
+      auto node = AddDataNode(name);
+      node->AddPullSet([this](){
+        emp::vector<double> result;
+        for (auto tax : active_taxa) {
+          // result.push_back(CountUniquePhenotypes(tax));
+        }
+        return result;
+      });
+
+      return node;
+    }
+
+    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> 
+    AddMutationCountDataNode(const std::string & name = "mutation_count", const std::string & mutation = "substitution") {
+      auto node = AddDataNode(name);
+      node->AddPullSet([this, mutation](){
+        emp::vector<double> result;
+        for (auto tax : active_taxa) {
+          // result.push_back(CountMuts(tax, mutation));
+        }
+        return result;
+      });
+
+      return node;
+    }
+
 
     Ptr<taxon_t> GetTaxonAt(int id) {
       emp_assert(id < (int) taxon_locations.size(), "Invalid taxon location", id, taxon_locations.size());
