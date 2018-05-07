@@ -19,21 +19,22 @@ UI::Div div_stats("div_stats");
 UI::Div div_controls("div_controls");
 UI::Div div_vis("div_vis");
 
+double layout_x1 = 10;
+double layout_y1 = 70;
+double layout_x2 = 650;
+double layout_y2 = 300;
+double layout_y3 = 700;
+
 ArmWorld world;
 const double world_size = 600;
 size_t target_id = 0;
 ArmOrg target_arm;
 
 void LayoutDivs() {
-  double x1 = 10;
-  double y1 = 70;
-  double x2 = 650;
-  double y2 = 300;
-  double y3 = 700;
-  div_pop.SetPosition(x1, y1);
-  div_controls.SetPosition(x2, y1);
-  div_stats.SetPosition(x2, y2);
-  div_vis.SetPosition(x1,y3);
+  div_pop.SetPosition(layout_x1, layout_y1);
+  div_controls.SetPosition(layout_x2, layout_y1);
+  div_stats.SetPosition(layout_x2, layout_y2);
+  div_vis.SetPosition(layout_x1, layout_y3);
 }
 
 void DrawWorldCanvas_Grid() {
@@ -183,6 +184,8 @@ void CanvasClick(int x, int y) {
 }
 
 void CanvasClick2(int x, int y) {
+  x -= layout_x1;
+  y -= layout_y1;
   const size_t world_size = world.GetSize();
   const double total_length = world.CalcTotalLength();
 
