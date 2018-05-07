@@ -53,6 +53,19 @@
 
 namespace emp {
 
+  enum class SystematicsType {
+    GENOME,      /// Taxa in the systematics manager are genomes (world's genome_t)
+    NUMERIC,     /// Taxa in the systematics manager are numbers
+    STRING,      /// Taxa in the systematics manager are strings
+    UNKNOWN      /// Taxa in the systematics manager are something else
+  };
+
+  // template <typename ORG>
+  // struct SystematicsInfo {
+  //   SystematicsBase<ORG> s;
+  //   using 
+  // }
+
   ///  @brief Setup a World with a population of organisms that can evolve or deal with ecological effects.
   ///
   ///  There are three ways that organisms can enter the population:
@@ -189,6 +202,8 @@ namespace emp {
 
     /// Phylogeny and line-of-descent data collection.
     emp::vector<Ptr<SystematicsBase<ORG> >> systematics;
+    emp::vector<emp::SystematicsType> systematics_types;
+    std::unordered_map<std::string, int> systematics_labels;
 
     // == Signals ==
     SignalControl control;  // Setup the world to control various signals.
@@ -366,20 +381,67 @@ namespace emp {
       return systematics[id]; 
     }
 
+    /// Get a systematics manager (which is tracking lineages in the population.)
+    /// @param id - which systematics manager to return? Systematics managers are
+    /// stored in the order they are added to the world.
+    Ptr<SystematicsBase<ORG> > GetSystematics(std::string label) { 
+      emp_assert(Has(systematics_labels, label), "Invalid systematics manager label");
+
+      return systematics[systematics_labels[label]]; 
+    }
+
+
     void RemoveSystematics(int id) { 
       emp_assert(systematics.size() > 0, "Cannot remove systematics file. No systematics file to track.");
       emp_assert(id < systematics.size(), "Invalid systematics file requested to be removed.", id, systematics.size());
       
       systematics[id].Delete(); 
       systematics[id] = nullptr; 
+
+      for (auto el : systematics_labels) {
+        if (el.second == id) {
+          systematics_labels.erase(el.first);
+        }
+      }
     }
 
-    void AddSystematics(Ptr<SystematicsBase<ORG> > s) {
+    void RemoveSystematics(std::string label) { 
+      emp_assert(Has(systematics_labels, label), "Invalid systematics manager label");
+
+      systematics[systematics_labels[label]].Delete(); 
+      systematics[systematics_labels[label]] = nullptr;
+      systematics_labels.erase(label) ;
+    }
+
+
+    template <typename ORG_INFO, typename DATA_STRUCT>
+    void AddSystematics(Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT> > s, std::string label="systematics") {
+      if (Has(systematics_labels, label)) {
+        label += to_string(systematics.size());
+      }
+      systematics_labels[label] = systematics.size();
+
       if (is_synchronous) {
         s->SetTrackSynchronous(true);
       }
+
+      if (std::is_arithmetic<ORG_INFO>::value) {
+        systematics_types.push_back(SystematicsType::NUMERIC);
+      } else if (std::is_convertible<ORG_INFO, genome_t>::value) {
+        systematics_types.push_back(SystematicsType::GENOME);
+      } else if (std::is_convertible<ORG_INFO, std::string>::value) {
+        systematics_types.push_back(SystematicsType::STRING);
+      } else {
+        systematics_types.push_back(SystematicsType::UNKNOWN);
+      }
+
       systematics.push_back(s);
     }
+
+    auto GetActiveTaxa(int id=0) {
+
+    }
+
 
     /// Get the fitness function currently in use.
     fun_calc_fitness_t GetFitFun() { return fun_calc_fitness; }

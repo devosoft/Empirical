@@ -4,7 +4,7 @@
 #define EMP_TRACK_MEM
 #endif
 
-#include "third-party/Catch/single_include/catch.hpp"
+#include "../third-party/Catch/single_include/catch.hpp"
 
 #include "Evolve/Systematics.h"
 #include "Evolve/SystematicsAnalysis.h"
@@ -271,68 +271,90 @@ TEST_CASE("Run world", "[evo]") {
   using mut_count_t = std::unordered_map<std::string, int>;
   using data_t = emp::mut_landscape_info<emp::vector<double>>;
   using org_t = emp::AvidaGP;
-  using systematics_t = emp::Systematics<org_t, emp::vector<double>, data_t>;
+  using gene_systematics_t = emp::Systematics<org_t, org_t::genome_t, data_t>;
+  using phen_systematics_t = emp::Systematics<org_t, emp::vector<double>, data_t>;
+
+  emp::Random random;
+  emp::World<org_t> world(random, "AvidaWorld");
+  world.SetWellMixed(true);
+
+
+  std::function<emp::AvidaGP::genome_t(emp::AvidaGP &)> gene_fun =
+    [](emp::AvidaGP & org) {
+      return org.GetGenome();
+    };
 
   std::function<emp::vector<double>(emp::AvidaGP &)> phen_fun =
-    [](const emp::AvidaGP & org) {
+    [](emp::AvidaGP & org) {
       emp::vector<double> phen;
       for (int i = 0; i < 16; i++) {
+        org.ResetHardware();
+        org.Process(20);
         phen.push_back(org.GetOutput(i));
       }
       return phen;
     };
 
   mut_count_t last_mutation;
-  emp::Random random;
-  emp::World<org_t> world(random, "AvidaWorld");
-  world.SetWellMixed(true);
-  emp::Ptr<systematics_t> sys;
-  sys.New(phen_fun, true,true,true);
-  world.AddSystematics(sys);
+  emp::Ptr<gene_systematics_t> gene_sys;
+  emp::Ptr<phen_systematics_t> phen_sys;
+  gene_sys.New(gene_fun, true,true,true);
+  phen_sys.New(phen_fun, true,true,true);
+  world.AddSystematics(gene_sys);
+  world.AddSystematics(phen_sys);
 
-  emp::Signal<void(mut_count_t)> on_mutate_sig;    ///< Trigger signal before organism gives birth.
-  emp::Signal<void(size_t pos, double)> record_fit_sig;    ///< Trigger signal before organism gives birth.
-  emp::Signal<void(size_t pos, emp::vector<double>)> record_phen_sig;    ///< Trigger signal before organism gives birth.
+  // emp::Signal<void(mut_count_t)> on_mutate_sig;    ///< Trigger signal before organism gives birth.
+  // emp::Signal<void(size_t pos, double)> record_fit_sig;    ///< Trigger signal before organism gives birth.
+  // emp::Signal<void(size_t pos, emp::vector<double>)> record_phen_sig;    ///< Trigger signal before organism gives birth.
 
-  on_mutate_sig.AddAction([&last_mutation](mut_count_t muts){last_mutation = muts;});
+  // on_mutate_sig.AddAction([&last_mutation](mut_count_t muts){last_mutation = muts;});
 
-  record_fit_sig.AddAction([&world](size_t pos, double fit){
-    world.GetSystematics(0).Cast<systematics_t>()->GetTaxonAt(pos)->GetData().RecordFitness(fit);
-  });
+  // record_fit_sig.AddAction([&world](size_t pos, double fit){
+  //   world.GetSystematics(0).Cast<systematics_t>()->GetTaxonAt(pos)->GetData().RecordFitness(fit);
+  // });
 
-  record_phen_sig.AddAction([&world](size_t pos, emp::vector<double> phen){
-    world.GetSystematics(0).Cast<systematics_t>()->GetTaxonAt(pos)->GetData().RecordPhenotype(phen);
-  });
+  // record_phen_sig.AddAction([&world](size_t pos, emp::vector<double> phen){
+  //   world.GetSystematics(0).Cast<systematics_t>()->GetTaxonAt(pos)->GetData().RecordPhenotype(phen);
+  // });
 
   // world.OnOrgPlacement([&last_mutation, &world](size_t pos){
   //   world.GetSystematics(0).Cast<systematics_t>()->GetTaxonAt(pos)->GetData().RecordMutation(last_mutation);
   // });
 
-  // emp::AddPhylodiversityFile(world).SetTimingRepeat(1);
+  emp::AddPhylodiversityFile(world, 0, "geneotype_phylodiversity.csv").SetTimingRepeat(1);
+  emp::AddPhylodiversityFile(world, 1, "phenotype_phylodiversity.csv").SetTimingRepeat(1);
   // emp::AddLineageMutationFile(world).SetTimingRepeat(1);
   // AddDominantFile(world).SetTimingRepeat(1);
   // emp::AddMullerPlotFile(world).SetTimingOnce(1);
 
 
   // Setup the mutation function.
-  world.SetMutFun( [&on_mutate_sig, &world](emp::AvidaGP & org, emp::Random & random) {
-      org_t parent_genome = world.GetGenome(org);
-      
+  world.SetMutFun( [&world](emp::AvidaGP & org, emp::Random & random) {
+     
       uint32_t num_muts = random.GetUInt(4);  // 0 to 3 mutations.
       for (uint32_t m = 0; m < num_muts; m++) {
-        const uint32_t pos = random.GetUInt(200);
+        const uint32_t pos = random.GetUInt(20);
         org.RandomizeInst(pos, random);
       }
-      on_mutate_sig.Trigger({{"substitution",num_muts}});
+      // on_mutate_sig.Trigger({{"substitution",num_muts}});
+      // std::cout << num_muts << " muttaions" << std::endl;
       return num_muts;
-    }, 1 );
+    });
 
   // Setup the fitness function.
   std::function<double(emp::AvidaGP &)> fit_fun =
-    [&record_fit_sig, &record_phen_sig](emp::AvidaGP & org) {
+    [](emp::AvidaGP & org) {
       int count = 0;
       for (int i = 0; i < 16; i++) {
-        if (org.GetOutput(i) == (double) (i*i)) count++;
+        org.ResetHardware();
+        org.SetInput(0,i);
+        org.SetOutput(0, -99999);
+        org.Process(20);
+        double score = 1.0 / (org.GetOutput(i) - (double) (i*i));
+        if (score > 1000) {
+          score = 1000;
+        }
+        count += score;
       }
       return (double) count;
     };
@@ -340,22 +362,25 @@ TEST_CASE("Run world", "[evo]") {
 
   world.SetFitFun(fit_fun);
 
-  emp::vector< std::function<double(const emp::AvidaGP &)> > fit_set(16);
-  for (size_t out_id = 0; out_id < 16; out_id++) {
-    // Setup the fitness function.
-    fit_set[out_id] = [out_id](const emp::AvidaGP & org) {
-      return (double) -std::abs(org.GetOutput((int)out_id) - (double) (out_id * out_id));
-    };
-  }
+  // emp::vector< std::function<double(const emp::AvidaGP &)> > fit_set(16);
+  // for (size_t out_id = 0; out_id < 16; out_id++) {
+  //   // Setup the fitness function.
+  //   fit_set[out_id] = [out_id](const emp::AvidaGP & org) {
+  //     return (double) -std::abs(org.GetOutput((int)out_id) - (double) (out_id * out_id));
+  //   };
+  // }
 
   // Build a random initial popoulation.
-  for (size_t i = 0; i < 100; i++) {
+  for (size_t i = 0; i < 1; i++) {
     emp::AvidaGP cpu;
-    cpu.PushRandom(random, 200);
+    cpu.PushRandom(random, 20);
     world.Inject(cpu.GetGenome());
   }
 
-  // world.Update();
+  for (size_t i = 0; i < 100; i++) {
+      EliteSelect(world, 1, 1);
+  }
+  world.Update();
 
   // Do the run...
   for (size_t ud = 0; ud < 100; ud++) {
@@ -372,10 +397,10 @@ TEST_CASE("Run world", "[evo]") {
     TournamentSelect(world, 2, 99);
     // LexicaseSelect(world, fit_set, POP_SIZE-1);
     // EcoSelect(world, fit_fun, fit_set, 100, 5, POP_SIZE-1);
-    for (size_t i = 0; i < world.GetSize(); i++) {
-      record_fit_sig.Trigger(i, world.CalcFitnessID(i));
-      // record_phen_sig.Trigger(i, emp::Sum(world.GetGenomeAt(i)));
-    }
+    // for (size_t i = 0; i < world.GetSize(); i++) {
+    //   record_fit_sig.Trigger(i, world.CalcFitnessID(i));
+    //   // record_phen_sig.Trigger(i, emp::Sum(world.GetGenomeAt(i)));
+    // }
 
     world.Update();
 

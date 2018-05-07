@@ -33,6 +33,7 @@
 #include "../tools/stats.h"
 #include "../control/Signal.h"
 #include "../data/DataNode.h"
+#include "../data/DataManager.h"
 
 namespace emp {
 
@@ -205,13 +206,16 @@ namespace emp {
     size_t num_roots;           ///< How many distint injected ancestors are currently in population?
 
     size_t next_id;             ///< What ID value should the next new taxon have?
+    size_t curr_update;
+
+    DataManager<double, data::Current, data::Info, data::Range, data::Stats, data::Pull> data_nodes;
 
     public:
 
     SystematicsBase(bool _active=true, bool _anc=true, bool _all=false, bool _pos=true)
       : store_active(_active), store_ancestors(_anc), store_outside(_all)
       , archive(store_ancestors || store_outside), store_position(_pos), track_synchronous(false)
-      , org_count(0), total_depth(0), num_roots(0), next_id(0) { ; }
+      , org_count(0), total_depth(0), num_roots(0), next_id(0), curr_update(0) { ; }
 
     virtual ~SystematicsBase(){;}
 
@@ -259,33 +263,43 @@ namespace emp {
 
     /// Are we storing the location of taxa?
     void SetStorePosition(bool new_val) { store_position = new_val; }
-  
+
+    // Returns a reference so that capturing it in a lambda to call on update
+    // is less confusing. It's possible we should change it to be consistent
+    // with GetFitnessDataNode, though.
+    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddDataNode(const std::string & name) {
+      emp_assert(!data_nodes.HasNode(name));
+      return &(data_nodes.New(name));
+    }
+
+    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> GetDataNode(const std::string & name) {
+      return &(data_nodes.Get(name));
+    }
+
+    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddEvolutionaryDistinctivenessDataNode(const std::string & name = "evolutionary_distinctiveness") = 0;
+    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddPairwiseDistanceDataNode(const std::string & name = "pairwise_distance") = 0;
+    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddPhylogeneticDiversityDataNode(const std::string & name = "phylogenetic_diversity") = 0;
+
     virtual size_t GetNumActive() const = 0;
     virtual size_t GetNumAncestors() const = 0;
     virtual size_t GetNumOutside() const = 0;
     virtual size_t GetTreeSize() const = 0;
     virtual size_t GetNumTaxa() const = 0;
     virtual int GetPhylogeneticDiversity() const = 0;
-    // virtual double GetTaxonDistinctiveness() const = 0;
-    // virtual double GetEvolutionaryDistinctiveness() const = 0;
     virtual double GetMeanPairwiseDistance(bool branch_only) const = 0;
-    virtual int GetSumPairwiseDistance(bool branch_only) const = 0;
+    virtual double GetSumPairwiseDistance(bool branch_only) const = 0;
     virtual double GetVariancePairwiseDistance(bool branch_only) const = 0;
-    virtual emp::vector<int> GetPairwiseDistances(bool branch_only) const = 0;
-    // virtual int GetDistanceToRoot() = 0;
-    // virtual int GetBranchesToRoot() = 0;    
-    // virtual void GetMRCA() = 0;
+    virtual emp::vector<double> GetPairwiseDistances(bool branch_only) const = 0;
     virtual int GetMRCADepth() const = 0;
     virtual void AddOrg(ORG && org, int pos, int update, bool next) = 0;
     virtual void AddOrg(ORG & org, int pos, int update, bool next) = 0;
     virtual bool RemoveOrg(int pos) = 0;
     virtual bool RemoveNextOrg(int pos) = 0;
-    // virtual void Parent() const = 0;
     virtual void PrintStatus(std::ostream & os) const = 0;
-    // virtual void PrintLineage() const = 0;
     virtual double CalcDiversity() const = 0;
     virtual void Update() = 0;
     virtual void SetNextParent(int pos) = 0;
+
   };
 
   /// @brief A tool to track phylogenetic relationships among organisms.
@@ -316,6 +330,7 @@ namespace emp {
     using SystematicsBase<ORG>::total_depth;
     using SystematicsBase<ORG>::num_roots;
     using SystematicsBase<ORG>::next_id;
+    using SystematicsBase<ORG>::curr_update;
 
     using SystematicsBase<ORG>::GetNumActive;
     using SystematicsBase<ORG>::GetNumAncestors;
@@ -345,6 +360,12 @@ namespace emp {
     using SystematicsBase<ORG>::Update;
     using SystematicsBase<ORG>::SetNextParent;
 
+    using SystematicsBase<ORG>::GetDataNode;
+    using SystematicsBase<ORG>::AddDataNode;
+    using SystematicsBase<ORG>::AddEvolutionaryDistinctivenessDataNode;
+    using SystematicsBase<ORG>::AddPairwiseDistanceDataNode;
+    using SystematicsBase<ORG>::AddPhylogeneticDiversityDataNode;
+
     std::unordered_set< Ptr<taxon_t>, hash_t > active_taxa;   ///< A set of all living taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; ///< A set of all dead, ancestral taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  ///< A set of all dead taxa w/o descendants.
@@ -366,7 +387,9 @@ namespace emp {
     /// Called when there are no more living members of a taxon.  There may be descendants.
     void MarkExtinct(Ptr<taxon_t> taxon);
 
+
   public:
+
     /**
      * Contructor for Systematics; controls what information should be stored.
      * @param store_active     Should living organisms' taxa be tracked? (typically yes!)
@@ -392,6 +415,7 @@ namespace emp {
 
 
     void Update() {
+      ++curr_update;
       std::swap(taxon_locations, next_taxon_locations);
       next_taxon_locations.resize(0);
     }
@@ -438,6 +462,35 @@ namespace emp {
     /// Trigger:  Taxon is about to be killed
     /// Argument: Pounter to taxon
     SignalKey OnPrune(std::function<void(Ptr<taxon_t>)> & fun) { return on_prune_sig.AddAction(fun); }
+
+    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddEvolutionaryDistinctivenessDataNode(const std::string & name = "evolutionary_distinctiveness") {
+      auto node = AddDataNode(name);
+      node->AddPullSet([this](){
+        emp::vector<double> result;
+        for (auto tax : active_taxa) {
+          result.push_back(GetEvolutionaryDistinctiveness(tax, curr_update));
+        }
+
+        return result;
+      });
+      return node;
+    }
+
+    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddPairwiseDistanceDataNode(const std::string & name = "pairwise_distances") {
+      auto node = AddDataNode(name);
+      node->AddPullSet([this](){
+        return GetPairwiseDistances();
+      });
+      return node;
+    }
+
+    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddPhylogeneticDiversityDataNode(const std::string & name = "phylogenetic_diversity") {
+      auto node = AddDataNode(name);
+      node->AddPull([this](){
+        return GetPhylogeneticDiversity();
+      });
+      return node;
+    }
 
     Ptr<taxon_t> GetTaxonAt(int id) {
       emp_assert(id < (int) taxon_locations.size(), "Invalid taxon location", id, taxon_locations.size());
@@ -553,7 +606,7 @@ namespace emp {
      * if this is not the case.
      * */
     double GetMeanPairwiseDistance(bool branch_only=false) const {
-      emp::vector<int> dists = GetPairwiseDistances(branch_only);
+      emp::vector<double> dists = GetPairwiseDistances(branch_only);
       return (double)Sum(dists)/dists.size();
     }
 
@@ -567,8 +620,8 @@ namespace emp {
      * This measurement assumes that the tree is fully connected. Will return -1
      * if this is not the case.
      * */
-    int GetSumPairwiseDistance(bool branch_only=false) const {
-      emp::vector<int> v = GetPairwiseDistances(branch_only);
+    double GetSumPairwiseDistance(bool branch_only=false) const {
+      emp::vector<double> v = GetPairwiseDistances(branch_only);
       return Sum(v);
     }
 
@@ -583,7 +636,7 @@ namespace emp {
      * if this is not the case.
      * */
     double GetVariancePairwiseDistance(bool branch_only=false) const {
-      emp::vector<int> v = GetPairwiseDistances(branch_only);
+      emp::vector<double> v = GetPairwiseDistances(branch_only);
       return Variance(v);
     }
 
@@ -596,13 +649,13 @@ namespace emp {
      * This method assumes that the tree is fully connected. Will return -1
      * if this is not the case.
      * */
-    emp::vector<int> GetPairwiseDistances(bool branch_only=false) const {      
+    emp::vector<double> GetPairwiseDistances(bool branch_only=false) const {      
       // The overarching approach here is to start with a bunch of pointers to all
       // extant organisms (since that will include all leaves). Then we trace back up
       // the tree, keeping track of distances. When things meet up, we calculate
       // distances between the nodes on the sides that just met up.
 
-      emp::vector<int> dists;
+      emp::vector<double> dists;
       
       std::map< Ptr<taxon_t>, emp::vector<emp::vector<int>> > curr_pointers;
       std::map< Ptr<taxon_t>, emp::vector<emp::vector<int>> > next_pointers;

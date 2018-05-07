@@ -19,34 +19,18 @@ namespace emp {
     template <typename WORLD_TYPE>
     DataFile & AddPhylodiversityFile(WORLD_TYPE & world, int systematics_id=0, const std::string & fpath="phylodiversity.csv"){
         auto & file = world.SetupFile(fpath);
-        Ptr<DataMonitor<double>> distinctiveness_node = world.AddDataNode("evolutionary_distinctiveness");
-        Ptr<DataMonitor<double>> pair_dist_node = world.AddDataNode("pairwise_distance");
-        Ptr<DataMonitor<double>> phylo_div_node = world.AddDataNode("phylogenetic_diversity");
+        auto sys = world.GetSystematics(systematics_id);
 
-        world.OnUpdate([distinctiveness_node, pair_dist_node, phylo_div_node, systematics_id, &world](size_t ud) mutable -> void {
-            distinctiveness_node->Reset();
-            pair_dist_node->Reset();
-            // Don't reset pd_node, because it's tracking summary statistics over time
-            // (since there's only one PD for a given update)
-
-            for (auto tax : world.GetSystematics(systematics_id)->GetActive()) {
-                distinctiveness_node->Add(world.GetSystematics(systematics_id).GetEvolutionaryDistinctiveness(tax, world.GetUpdate()));
-            }
-
-            emp::vector<int> mpd = world.GetSystematics(systematics_id)->GetPairwiseDistances();
-            for (int d : mpd) {
-                pair_dist_node->Add(d);
-            }
-            phylo_div_node->Add(world.GetSystematics(systematics_id)->GetPhylogeneticDiversity());
-        });
+        sys->AddEvolutionaryDistinctivenessDataNode();
+        sys->AddPairwiseDistanceDataNode();
+        sys->AddPhylogeneticDiversityDataNode();
 
         std::function<size_t(void)> get_update = [&world](){return world.GetUpdate();};
 
         file.AddFun(get_update, "update", "Update");
-        file.AddStats(*distinctiveness_node, "evolutionary_distinctiveness", "evolutionary distinctiveness for a single update");
-        file.AddStats(*pair_dist_node, "pairwise_distance", "pairwise distance for a single update");
-        file.AddStats(*phylo_div_node, "phylogenetic_diversity", "phylogenetic diversity for entire run");
-        file.AddCurrent(*phylo_div_node, "current_phylogenetic_diversity", "current phylogenetic_diversity");
+        file.AddStats(*sys->GetDataNode("evolutionary_distinctiveness") , "evolutionary_distinctiveness", "evolutionary distinctiveness for a single update", true, true);
+        file.AddStats(*sys->GetDataNode("pairwise_distance"), "pairwise_distance", "pairwise distance for a single update", true, true);
+        file.AddCurrent(*sys->GetDataNode("phylogenetic_diversity"), "current_phylogenetic_diversity", "current phylogenetic_diversity", true, true);
         file.PrintHeaderKeys();
         return file;
     }
