@@ -229,13 +229,19 @@ int main()
   UI::Canvas world_canvas(world_size, world_size, "world_canvas");
   div_pop << world_canvas;
 
+  // Setup Selector
+  auto mode_select = UI::Selector("mode_select");
+  mode_select.SetOption("Well Mixed", [](){ world.ResetMixed(); DrawWorldCanvas(); });
+  mode_select.SetOption("MAP-Elites", [](){ world.ResetMAP(); DrawWorldCanvas(); });
+  mode_select.SetOption("DiverseElites", [](){ world.ResetDiverse(); DrawWorldCanvas(); });
+  mode_select.SelectID(1);
+
   // Add some Buttons
   div_controls << UI::Button( [](){ emp::RandomSelect(world, 1); DrawWorldCanvas(); }, "Do Birth", "birth_button");
   div_controls << UI::Button( [](){ emp::RandomSelect(world, 100); DrawWorldCanvas(); }, "Do Birth 100", "birth_100_button");
   div_controls << UI::Button( [](){ emp::RandomSelect(world, 10000); DrawWorldCanvas(); }, "Do Birth 10000", "birth_10000_button");
-  div_controls << UI::Button( [](){ world.ResetMixed(); DrawWorldCanvas(); }, "Reset Well Mixed", "reset_mixed_button");
-  div_controls << UI::Button( [](){ world.ResetMAP(); DrawWorldCanvas(); }, "Reset MAP-Elites", "reset_map_button");
-  div_controls << UI::Button( [](){ world.ResetDiverse(); DrawWorldCanvas(); }, "Reset DiverseElites", "reset_diverse_button");
+  div_controls << "<br>";
+  div_controls << "Mode: " << mode_select;
   div_controls << "<br>";
 
   // Add some stats
