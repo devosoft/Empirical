@@ -192,7 +192,7 @@ namespace emp {
     Signal<void(size_t)> before_repro_sig;    ///< Trigger signal before organism gives birth.
     Signal<void(ORG &)>  offspring_ready_sig; ///< Trigger signal when offspring organism is built.
     Signal<void(ORG &)>  inject_ready_sig;    ///< Trigger when external organism is ready to inject.
-    Signal<void(size_t)> org_placement_sig;   ///< Trigger when any organism is placed into world.
+    Signal<void(size_t)> org_placement_sig;   ///< Trigger after any organism is placed into world.
     Signal<void(size_t)> on_update_sig;       ///< Trigger at the beginning of Update()
     Signal<void(size_t)> on_death_sig;        ///< Trigger when any organism dies.
     Signal<void()>       world_destruct_sig;  ///< Trigger in the World destructor.
@@ -366,6 +366,10 @@ namespace emp {
     }
 
     // --- CONFIGURE ---
+
+    /// Set the population to always append new organisms on the end.
+    /// Argument determines if the generations should be synchronous (true) or not (false, default)
+    void SetStructGrow(bool synchronous_gen=false);
 
     /// Set the population to be well-mixed (with all organisms counting as neighbors.)
     /// Argument determines if the generations should be synchronous (true) or not (false, default)
@@ -805,6 +809,41 @@ namespace emp {
     next_pop[pos] = nullptr;                      // ..and reset the pointer to null
     systematics.RemoveOrg( next_genotypes[pos] ); // Notify systematics manager about removal
     next_genotypes[pos] = nullptr;                // No longer track a genotype at this position
+  }
+
+  template<typename ORG>
+  void World<ORG>::SetStructGrow(bool synchronous_gen) {
+    pop_sizes.resize(0);
+    is_synchronous = synchronous_gen;
+    is_space_structured = false;
+    is_pheno_structured = false;
+
+    // -- Setup functions --
+    // Append at end of population
+    fun_add_inject = [this](Ptr<ORG> new_org) {
+      return AddOrgAt(new_org, pop.size());
+    };
+
+    // neighbors are anywhere in the population.
+    fun_get_neighbor = [this](size_t) { return GetRandomCellID(); };
+
+    if (synchronous_gen) {
+      // Append births into the next population.
+      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
+        emp_assert(new_org);                            // New organism must exist.
+        return AddNextOrgAt(new_org, next_pop.size(), genotypes[parent_id]);  // Append it to the NEXT population
+      };
+
+      SetAttribute("SynchronousGen", "True");
+    } else {
+      // Asynchronous: always append to current population.
+      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
+        return AddOrgAt(new_org, pop.size(), genotypes[parent_id]);
+      };
+      SetAttribute("SynchronousGen", "False");
+    }
+
+    SetAttribute("PopStruct", "Grow");    
   }
 
   template<typename ORG>
