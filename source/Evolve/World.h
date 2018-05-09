@@ -93,26 +93,6 @@ namespace emp {
   class World {
     friend class World_iterator< World<ORG> >;
   public:
-    /// A helper struct to keep track of where an organism is in the World.  For the moment,
-    /// the only informaiton beyond index position is active (vs. next) population when
-    /// using synchronous generations.
-    class OrgPosition {
-    private:
-      size_t index;    ///< Position of this organism in the population.
-      bool is_active;  ///< Is this organism in the active population (vs. waiting for Update)
-
-    public:
-      OrgPosition(size_t _id, bool _active=true) : index(_id), is_active(_active) { ; }
-      OrgPosition() : index((size_t) -1), is_active(false) { ; }
-
-      size_t GetIndex() const { return index; }
-      bool IsActive() const { return is_active; }
-      bool IsValid() const { return index != (size_t) -1; }
-
-      OrgPosition & SetActive(bool _active=true) { is_active = _active; return *this; }
-      OrgPosition & SetIndex(size_t _id) { index = _id; return *this; }
-    };
-
     // --- Publicly available types ---
     using this_t = World<ORG>;                 ///< Resolved type of this templated class.
     using org_t = ORG;                         ///< Type of organisms in this world.
@@ -138,10 +118,10 @@ namespace emp {
     using fun_get_genome_t      = std::function<const genome_t & (ORG &)>;
 
     /// Function type for injecting organisms into a world (returns inject position)
-    using fun_find_inject_pos_t = std::function<OrgPosition(Ptr<ORG>)>;
+    using fun_find_inject_pos_t = std::function<WorldPosition(Ptr<ORG>)>;
 
     /// Function type for adding a newly born organism into a world (returns birth position)
-    using fun_find_birth_pos_t  = std::function<OrgPosition(Ptr<ORG>, size_t)>;
+    using fun_find_birth_pos_t  = std::function<WorldPosition(Ptr<ORG>, size_t)>;
 
     /// Function type for identifying an organism's random neighbor.
     using fun_get_neighbor_t    = std::function<size_t(size_t)>;
@@ -443,11 +423,11 @@ namespace emp {
     void SetGetGenomeFun(const fun_get_genome_t & _fun) { fun_get_genome = _fun; }
 
     /// Setup the function to inject an organism into the population.  It should take a pointer
-    /// to the organism to be injected and return an OrgPosition indicating where it was placed.
+    /// to the organism to be injected and return a WorldPosition indicating where it was placed.
     void SetAddInjectFun(const fun_find_inject_pos_t & _fun) { fun_find_inject_pos = _fun; }
 
     /// Setup the function to place a newly born organism into the population.  It should take a
-    /// pointer to the new organism and the position of the parent, returning an OrgPosition
+    /// pointer to the new organism and the position of the parent, returning a WorldPosition
     /// indicating where it was placed.
     void SetAddBirthFun(const fun_find_birth_pos_t & _fun) { fun_find_birth_pos = _fun; }
 
@@ -633,7 +613,7 @@ namespace emp {
 
     /// AddOrgAt is the core function to add organisms to active population (others must go through here)
     /// Note: This function ignores population structure, so requires you to manage your own structure.
-    void AddOrgAt(Ptr<ORG> new_org, OrgPosition pos, Ptr<genotype_t> p_genotype=nullptr);
+    void AddOrgAt(Ptr<ORG> new_org, WorldPosition pos, Ptr<genotype_t> p_genotype=nullptr);
 
     /// RemoveOrgAt is the core function to remove an active organism.
     /// Note: This function ignores population structure, so requires you to manage your own structure.
@@ -653,7 +633,7 @@ namespace emp {
     template <typename... ARGS> void InjectRandomOrg(ARGS &&... args);
 
     /// Place a newborn organism into the population, by default rules and with parent information.
-    OrgPosition DoBirth(const genome_t & mem, size_t parent_pos);
+    WorldPosition DoBirth(const genome_t & mem, size_t parent_pos);
 
     /// Place multiple copies of a newborn organism into the population.
     void DoBirth(const genome_t & mem, size_t parent_pos, size_t copy_count);
@@ -750,7 +730,7 @@ namespace emp {
   // =============================================================
 
   template <typename ORG>
-  void World<ORG>::AddOrgAt(Ptr<ORG> new_org, World<ORG>::OrgPosition pos, Ptr<genotype_t> p_genotype) {
+  void World<ORG>::AddOrgAt(Ptr<ORG> new_org, WorldPosition pos, Ptr<genotype_t> p_genotype) {
     emp_assert(new_org);    // The new organism must exist.
     emp_assert(pos.IsValid());     // Position must be legal.
 
@@ -825,14 +805,14 @@ namespace emp {
       // Append births into the next population.
       fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
         emp_assert(new_org);      // New organism must exist.
-        return OrgPosition(next_pop.size(), false);   // Append it to the NEXT population
+        return WorldPosition(next_pop.size(), false);   // Append it to the NEXT population
       };
 
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always append to current population.
       fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
-        return OrgPosition(pop.size());
+        return WorldPosition(pop.size());
       };
       SetAttribute("SynchronousGen", "False");
     }
@@ -861,14 +841,14 @@ namespace emp {
       // Append births into the next population.
       fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
         emp_assert(new_org);                          // New organism must exist.
-        return OrgPosition(next_pop.size(), false);   // Append it to the NEXT population
+        return WorldPosition(next_pop.size(), false);   // Append it to the NEXT population
       };
 
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neigbor in current population.
       fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
-        return OrgPosition(fun_get_neighbor(parent_id)); // Place org in existing population.
+        return WorldPosition(fun_get_neighbor(parent_id)); // Place org in existing population.
       };
       SetAttribute("SynchronousGen", "False");
     }
@@ -887,7 +867,7 @@ namespace emp {
     // Inject a random position in grid
     fun_find_inject_pos = [this](Ptr<ORG> new_org) {
       (void) new_org;
-      return OrgPosition(GetRandomCellID());
+      return WorldPosition(GetRandomCellID());
     };
 
     // neighbors are in 9-sized neighborhood.
@@ -906,13 +886,13 @@ namespace emp {
       fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
         emp_assert(new_org);                            // New organism must exist.
         const size_t id = fun_get_neighbor(parent_id);  // Place near parent, in next pop.
-        return OrgPosition(id, false);                  // Add org and return the position placed.
+        return WorldPosition(id, false);                  // Add org and return the position placed.
       };
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neigbor in current population.
       fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
-        return OrgPosition(fun_get_neighbor(parent_id)); // Place org in existing population.
+        return WorldPosition(fun_get_neighbor(parent_id)); // Place org in existing population.
       };
       SetAttribute("SynchronousGen", "False");
     }
@@ -1062,7 +1042,7 @@ namespace emp {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       inject_ready_sig.Trigger(*new_org);
-      const OrgPosition pos = fun_find_inject_pos(new_org);
+      const WorldPosition pos = fun_find_inject_pos(new_org);
       AddOrgAt(new_org, pos);
 
       //SetupOrg(*new_org, &callbacks, pos);
@@ -1093,7 +1073,7 @@ namespace emp {
     emp_assert(random_ptr != nullptr && "InjectRandomOrg() requires active random_ptr");
     Ptr<ORG> new_org = NewPtr<ORG>(*random_ptr, std::forward<ARGS>(args)...);
     inject_ready_sig.Trigger(*new_org);
-    const OrgPosition pos = fun_find_inject_pos(new_org);
+    const WorldPosition pos = fun_find_inject_pos(new_org);
     AddOrgAt(new_org, pos);
     // SetupOrg(*new_org, &callbacks, pos);
 
@@ -1109,11 +1089,11 @@ namespace emp {
 
   // Give birth to a single offspring; return offspring position.
   template <typename ORG>
-  typename World<ORG>::OrgPosition World<ORG>::DoBirth(const genome_t & mem, size_t parent_pos) {
+  WorldPosition World<ORG>::DoBirth(const genome_t & mem, size_t parent_pos) {
     before_repro_sig.Trigger(parent_pos);
     Ptr<ORG> new_org = NewPtr<ORG>(mem);
     offspring_ready_sig.Trigger(*new_org);
-    const OrgPosition pos = fun_find_birth_pos(new_org, parent_pos);
+    const WorldPosition pos = fun_find_birth_pos(new_org, parent_pos);
     AddOrgAt(new_org, pos, genotypes[parent_pos]);
 
     if (pos.IsActive()) {
@@ -1134,7 +1114,7 @@ namespace emp {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       offspring_ready_sig.Trigger(*new_org);
-      const OrgPosition pos = fun_find_birth_pos(new_org, parent_pos);
+      const WorldPosition pos = fun_find_birth_pos(new_org, parent_pos);
       AddOrgAt(new_org, pos, genotypes[parent_pos]);
       
       if (pos.IsActive()) {
