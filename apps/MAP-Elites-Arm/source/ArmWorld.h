@@ -118,7 +118,7 @@ public:
 
   void ResetMixed() {
     Reset();
-    SetWellMixed();
+    SetPopStruct_Mixed();
     for (size_t i = 0; i < WORLD_SIZE; i++) Inject(ArmOrg(*random_ptr, segments.size()));
   }
 
