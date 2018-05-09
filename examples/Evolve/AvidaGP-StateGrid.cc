@@ -167,7 +167,7 @@ int main()
     // if (pos && random.P(0.1)) world.GetOrg(pos).GetSGStatus().Randomize(state_grid, random);
   } );
 
-  world.SetWellMixed(true);
+  world.SetPopStruct_Mixed(true);
 
   // Build a random initial population.
   for (size_t i = 0; i < POP_SIZE; i++) {

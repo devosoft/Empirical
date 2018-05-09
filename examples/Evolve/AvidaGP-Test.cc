@@ -38,7 +38,7 @@ int main()
 {
   emp::Random random;
   emp::World<emp::AvidaGP> world(random, "AvidaWorld");
-  world.SetWellMixed(true);
+  world.SetPopStruct_Mixed(true);
 
   // Add a random organism.
   emp::AvidaGP cpu;
