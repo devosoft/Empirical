@@ -123,28 +123,28 @@ namespace emp {
     using genotype_t = emp::Taxon<genome_t>;            ///< Type of full genome category.
 
     /// Function type for calculating fitness.
-    using fun_calc_fitness_t = std::function<double(ORG&)>;
+    using fun_calc_fitness_t    = std::function<double(ORG&)>;
 
     /// Function type for calculating the distance between two organisms.
-    using fun_calc_dist_t    = std::function<double(ORG&,ORG&)>;
+    using fun_calc_dist_t       = std::function<double(ORG&,ORG&)>;
 
     /// Function type for a mutation operator on an organism.
-    using fun_do_mutations_t = std::function<size_t(ORG&,Random&)>;
+    using fun_do_mutations_t    = std::function<size_t(ORG&,Random&)>;
 
     /// Function type for printing an organism's info to an output stream.
-    using fun_print_org_t    = std::function<void(ORG&,std::ostream &)>;
+    using fun_print_org_t       = std::function<void(ORG&,std::ostream &)>;
 
     /// Function type for retrieving a genome from an organism.
-    using fun_get_genome_t   = std::function<const genome_t & (ORG &)>;
+    using fun_get_genome_t      = std::function<const genome_t & (ORG &)>;
 
     /// Function type for injecting organisms into a world (returns inject position)
-    using fun_add_inject_t   = std::function<OrgPosition(Ptr<ORG>)>;
+    using fun_find_inject_pos_t = std::function<OrgPosition(Ptr<ORG>)>;
 
     /// Function type for adding a newly born organism into a world (returns birth position)
-    using fun_add_birth_t    = std::function<OrgPosition(Ptr<ORG>, size_t)>;
+    using fun_add_birth_t       = std::function<OrgPosition(Ptr<ORG>, size_t)>;
 
     /// Function type for identifying an organism's random neighbor.
-    using fun_get_neighbor_t = std::function<size_t(size_t)>;
+    using fun_get_neighbor_t    = std::function<size_t(size_t)>;
 
   protected:
     // Internal state member variables
@@ -173,13 +173,13 @@ namespace emp {
     Ptr<DataMonitor<double>> data_node_fitness;
 
     // Configurable functions.
-    fun_calc_fitness_t  fun_calc_fitness;   ///< Function to evaluate fitness for provided organism.
-    fun_do_mutations_t  fun_do_mutations;   ///< Function to mutate an organism.
-    fun_print_org_t     fun_print_org;      ///< Function to print an organism.
-    fun_get_genome_t    fun_get_genome;     ///< Determine the genome object of an organism.
-    fun_add_inject_t    fun_add_inject;     ///< Technique to inject a new, external organism.
-    fun_add_birth_t     fun_add_birth;      ///< Technique to add a new offspring organism.
-    fun_get_neighbor_t  fun_get_neighbor;   ///< Choose a random neighbor near specified id.
+    fun_calc_fitness_t     fun_calc_fitness;    ///< Function to evaluate fitness for provided organism.
+    fun_do_mutations_t     fun_do_mutations;    ///< Function to mutate an organism.
+    fun_print_org_t        fun_print_org;       ///< Function to print an organism.
+    fun_get_genome_t       fun_get_genome;      ///< Determine the genome object of an organism.
+    fun_find_inject_pos_t  fun_find_inject_pos; ///< Technique to inject a new, external organism.
+    fun_add_birth_t        fun_add_birth;       ///< Technique to add a new offspring organism.
+    fun_get_neighbor_t     fun_get_neighbor;    ///< Choose a random neighbor near specified id.
 
     /// Attributes are a dynamic way to track extra characteristics about a world.
     std::map<std::string, std::string> attributes;
@@ -219,7 +219,7 @@ namespace emp {
       , is_synchronous(false), is_space_structured(false), is_pheno_structured(false)
       , data_node_fitness(nullptr)
       , fun_calc_fitness(), fun_do_mutations(), fun_print_org(), fun_get_genome()
-      , fun_add_inject(), fun_add_birth(), fun_get_neighbor()
+      , fun_find_inject_pos(), fun_add_birth(), fun_get_neighbor()
       , attributes(), systematics(true,true,false)
       , control()
       , before_repro_sig(to_string(name,"::before-repro"), control)
@@ -444,7 +444,7 @@ namespace emp {
 
     /// Setup the function to inject an organism into the population.  It should take a pointer
     /// to the organism to be injected and return an OrgPosition indicating where it was placed.
-    void SetAddInjectFun(const fun_add_inject_t & _fun) { fun_add_inject = _fun; }
+    void SetAddInjectFun(const fun_find_inject_pos_t & _fun) { fun_find_inject_pos = _fun; }
 
     /// Setup the function to place a newly born organism into the population.  It should take a
     /// pointer to the new organism and the position of the parent, returning an OrgPosition
@@ -632,19 +632,19 @@ namespace emp {
     }
 
     /// AddOrgAt is the core function to add organisms to active population (others must go through here)
-    /// Note: This function ignores population structue, so requires you to manage your own sturcture.
-    OrgPosition AddOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
+    /// Note: This function ignores population structue, so requires you to manage your own structure.
+    OrgPosition AddOrgAt(Ptr<ORG> new_org, OrgPosition pos, Ptr<genotype_t> p_genotype=nullptr);
 
     /// AddNextOrgAt build up the next population during synchronous generations.
-    /// Note: This function ignores population structue, so requires you to manage your own sturcture.
+    /// Note: This function ignores population structue, so requires you to manage your own structure.
     OrgPosition AddNextOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
 
     /// RemoveOrgAt is the core function to remove an active organism.
-    /// Note: This function ignores population structue, so requires you to manage your own sturcture.
+    /// Note: This function ignores population structue, so requires you to manage your own structure.
     void RemoveOrgAt(size_t pos);
 
     /// RemoveNextOrgAt removes an organism waiting to placed into the next generation.
-    /// Note: This function ignores population structue, so requires you to manage your own sturcture.
+    /// Note: This function ignores population structue, so requires you to manage your own structure.
     void RemoveNextOrgAt(size_t pos);
 
     /// Inject an organism using the default injection scheme.
@@ -755,21 +755,24 @@ namespace emp {
 
   template <typename ORG>
   typename World<ORG>::OrgPosition
-  World<ORG>::AddOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype) {
-    emp_assert(new_org, pos);                            // The new organism must exist.
+  World<ORG>::AddOrgAt(Ptr<ORG> new_org, World<ORG>::OrgPosition pos, Ptr<genotype_t> p_genotype) {
+    const size_t index = pos.GetIndex();
+
+    emp_assert(new_org, index);       // The new organism must exist.
+    emp_assert(index.IsActive());     // Index must be in the active population.
 
     // Determine new organism's genotype.
     Ptr<genotype_t> new_genotype = systematics.AddOrg(GetGenome(*new_org), p_genotype);
-    if (pop.size() <= pos) pop.resize(pos+1, nullptr);  // Make sure we have room.
-    RemoveOrgAt(pos);                                   // Clear out any old org.
-    pop[pos] = new_org;                                 // Place new org.
+    if (pop.size() <= index) pop.resize(index+1, nullptr);  // Make sure we have room.
+    RemoveOrgAt(index);                                   // Clear out any old org.
+    pop[index] = new_org;                                 // Place new org.
     ++num_orgs;                                         // Track number of orgs.
 
     // Track the new genotype.
-    if (genotypes.size() <= pos) genotypes.resize(pos+1, nullptr);   // Make sure we fit genotypes.
-    genotypes[pos] = new_genotype;
+    if (genotypes.size() <= index) genotypes.resize(index+1, nullptr);   // Make sure we fit genotypes.
+    genotypes[index] = new_genotype;
 
-    return OrgPosition(pos, true);
+    return pos;
   }
 
   template <typename ORG>
@@ -820,8 +823,9 @@ namespace emp {
 
     // -- Setup functions --
     // Append at end of population
-    fun_add_inject = [this](Ptr<ORG> new_org) {
-      return AddOrgAt(new_org, pop.size());
+    fun_find_inject_pos = [this](Ptr<ORG> new_org) {
+      (void) new_org;
+      return pop.size();
     };
 
     // neighbors are anywhere in the population.
@@ -855,8 +859,9 @@ namespace emp {
 
     // -- Setup functions --
     // Append at end of population
-    fun_add_inject = [this](Ptr<ORG> new_org) {
-      return AddOrgAt(new_org, pop.size());
+    fun_find_inject_pos = [this](Ptr<ORG> new_org) {
+      (void) new_org;
+      return pop.size();
     };
 
     // neighbors are anywhere in the population.
@@ -890,8 +895,9 @@ namespace emp {
 
     // -- Setup functions --
     // Inject a random position in grid
-    fun_add_inject = [this](Ptr<ORG> new_org) {
-      return AddOrgAt(new_org, GetRandomCellID());
+    fun_find_inject_pos = [this](Ptr<ORG> new_org) {
+      (void) new_org;
+      return GetRandomCellID();
     };
 
     // neighbors are in 9-sized neighborhood.
@@ -1066,7 +1072,9 @@ namespace emp {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       inject_ready_sig.Trigger(*new_org);
-      const OrgPosition pos = fun_add_inject(new_org);
+      const OrgPosition pos = fun_find_inject_pos(new_org);
+      AddOrgAt(new_org, pos);
+
       //SetupOrg(*new_org, &callbacks, pos);
 
       if (pos.IsActive()) {
@@ -1095,7 +1103,8 @@ namespace emp {
     emp_assert(random_ptr != nullptr && "InjectRandomOrg() requires active random_ptr");
     Ptr<ORG> new_org = NewPtr<ORG>(*random_ptr, std::forward<ARGS>(args)...);
     inject_ready_sig.Trigger(*new_org);
-    const OrgPosition pos = fun_add_inject(new_org);
+    const OrgPosition pos = fun_find_inject_pos(new_org);
+    AddOrgAt(new_org, pos);
     // SetupOrg(*new_org, &callbacks, pos);
 
     if (pos.IsActive()) {
