@@ -54,6 +54,7 @@ namespace emp {
     /// Maps a string representing a type of mutation to a count representing 
     /// the number of that type of mutation that occured to bring about this taxon.
     using phen_t = PHEN_TYPE;
+    using has_phen_t = std::true_type;
     using has_mutations_t = std::true_type;
     using has_fitness_t = std::true_type;
     // using has_phenotype_t = true;
@@ -555,11 +556,22 @@ namespace emp {
 
     virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> 
     AddVolatilityDataNode(const std::string & name = "volatility") {
+      return AddVolatilityDataNodeImpl(1, name);
+    }
+
+    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddVolatilityDataNodeImpl(bool decoy, const std::string & name = "volatility") {
+      emp_assert(false, "Calculating taxon volatility requires suitable DATA_STRUCT");
+      return AddDataNode(name);
+    }
+ 
+    template <typename T=int>
+    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>>
+    AddVolatilityDataNodeImpl(typename std::enable_if<DATA_STRUCT::has_phen_t::value, T>::type decoy, const std::string & name = "volatility") {
       auto node = AddDataNode(name);
       node->AddPullSet([this](){
         emp::vector<double> result;
         for (auto tax : active_taxa) {
-          // result.push_back(CountPhenotypeChanges(tax));
+          result.push_back(CountPhenotypeChanges(tax));
         }
         return result;
       });
@@ -569,11 +581,22 @@ namespace emp {
 
     virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> 
     AddUniqueTaxaDataNode(const std::string & name = "unique_taxa") {
+      return AddUniqueTaxaDataNodeImpl(1, name);
+    }
+
+    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddUniqueTaxaDataNodeImpl(bool decoy, const std::string & name = "unique_taxa") {
+      emp_assert(false, "Calculating uniqe taxa requires suitable DATA_STRUCT");
+      return AddDataNode(name);
+    }
+ 
+    template <typename T=int>
+    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>>
+    AddUniqueTaxaDataNodeImpl(typename std::enable_if<DATA_STRUCT::has_phen_t::value, T>::type decoy, const std::string & name = "unique_taxa") {
       auto node = AddDataNode(name);
       node->AddPullSet([this](){
         emp::vector<double> result;
         for (auto tax : active_taxa) {
-          // result.push_back(CountUniquePhenotypes(tax));
+          result.push_back(CountUniquePhenotypes(tax));
         }
         return result;
       });
@@ -583,18 +606,28 @@ namespace emp {
 
     virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> 
     AddMutationCountDataNode(const std::string & name = "mutation_count", const std::string & mutation = "substitution") {
+      return AddMutationCountDataNodeImpl(1, name, mutation);
+    }
+
+    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddMutationCountDataNodeImpl(bool decoy, const std::string & name = "mutation_count", const std::string & mutation = "substitution") {
+      emp_assert(false, "Calculating mutation count requires suitable DATA_STRUCT");
+      return AddDataNode(name);
+    }
+ 
+    template <typename T=int>
+    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>>
+    AddMutationCountDataNodeImpl(typename std::enable_if<DATA_STRUCT::has_mutations_t::value, T>::type decoy, const std::string & name = "mutation_count", const std::string & mutation = "substitution") {
       auto node = AddDataNode(name);
-      node->AddPullSet([this, mutation](){
+      node->AddPullSet([this,mutation](){
         emp::vector<double> result;
         for (auto tax : active_taxa) {
-          // result.push_back(CountMuts(tax, mutation));
+          result.push_back(CountMuts(tax, mutation));
         }
         return result;
       });
 
       return node;
     }
-
 
     Ptr<taxon_t> GetTaxonAt(int id) {
       emp_assert(id < (int) taxon_locations.size(), "Invalid taxon location", id, taxon_locations.size());

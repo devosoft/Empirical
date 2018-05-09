@@ -304,18 +304,20 @@ TEST_CASE("Run world", "[evo]") {
   world.AddSystematics(phen_sys);
 
   emp::Signal<void(mut_count_t)> on_mutate_sig;    ///< Trigger signal before organism gives birth.
-  // emp::Signal<void(size_t pos, double)> record_fit_sig;    ///< Trigger signal before organism gives birth.
-  // emp::Signal<void(size_t pos, emp::vector<double>)> record_phen_sig;    ///< Trigger signal before organism gives birth.
+  emp::Signal<void(size_t pos, double)> record_fit_sig;    ///< Trigger signal before organism gives birth.
+  emp::Signal<void(size_t pos, emp::vector<double>)> record_phen_sig;    ///< Trigger signal before organism gives birth.
 
   on_mutate_sig.AddAction([&last_mutation](mut_count_t muts){last_mutation = muts;});
 
-  // record_fit_sig.AddAction([&world](size_t pos, double fit){
-  //   world.GetSystematics(0).Cast<systematics_t>()->GetTaxonAt(pos)->GetData().RecordFitness(fit);
-  // });
+  record_fit_sig.AddAction([&world](size_t pos, double fit){
+    world.GetSystematics(0).Cast<gene_systematics_t>()->GetTaxonAt(pos)->GetData().RecordFitness(fit);
+    world.GetSystematics(1).Cast<phen_systematics_t>()->GetTaxonAt(pos)->GetData().RecordFitness(fit);
+  });
 
-  // record_phen_sig.AddAction([&world](size_t pos, emp::vector<double> phen){
-  //   world.GetSystematics(0).Cast<systematics_t>()->GetTaxonAt(pos)->GetData().RecordPhenotype(phen);
-  // });
+  record_phen_sig.AddAction([&world](size_t pos, emp::vector<double> phen){
+    world.GetSystematics(0).Cast<gene_systematics_t>()->GetTaxonAt(pos)->GetData().RecordPhenotype(phen);
+    world.GetSystematics(1).Cast<phen_systematics_t>()->GetTaxonAt(pos)->GetData().RecordPhenotype(phen);
+  });
 
   // world.OnOrgPlacement([&last_mutation, &world](size_t pos){
   //   world.GetSystematics(0).Cast<systematics_t>()->GetTaxonAt(pos)->GetData().RecordMutation(last_mutation);
@@ -324,7 +326,7 @@ TEST_CASE("Run world", "[evo]") {
   world.SetupSystematicsFile().SetTimingRepeat(1);
   world.SetupFitnessFile().SetTimingRepeat(1);
   world.SetupPopulationFile().SetTimingRepeat(1);
-  emp::AddPhylodiversityFile(world, 0, "geneotype_phylodiversity.csv").SetTimingRepeat(1);
+  emp::AddPhylodiversityFile(world, 0, "genotype_phylodiversity.csv").SetTimingRepeat(1);
   emp::AddPhylodiversityFile(world, 1, "phenotype_phylodiversity.csv").SetTimingRepeat(1);
   emp::AddLineageMutationFile(world).SetTimingRepeat(1);
   // AddDominantFile(world).SetTimingRepeat(1);
@@ -399,10 +401,10 @@ TEST_CASE("Run world", "[evo]") {
     TournamentSelect(world, 2, 99);
     // LexicaseSelect(world, fit_set, POP_SIZE-1);
     // EcoSelect(world, fit_fun, fit_set, 100, 5, POP_SIZE-1);
-    // for (size_t i = 0; i < world.GetSize(); i++) {
-    //   record_fit_sig.Trigger(i, world.CalcFitnessID(i));
-    //   // record_phen_sig.Trigger(i, emp::Sum(world.GetGenomeAt(i)));
-    // }
+    for (size_t i = 0; i < world.GetSize(); i++) {
+      record_fit_sig.Trigger(i, world.CalcFitnessID(i));
+      record_phen_sig.Trigger(i, phen_fun(world.GetOrg(i)));
+    }
 
     world.Update();
 

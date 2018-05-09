@@ -40,24 +40,24 @@ namespace emp {
         auto & file = world.SetupFile(fpath);
         auto sys = world.GetSystematics(systematics_id);
 
-        // for (size_t i = 0; i < mut_types.size(); i++) {
-        //     sys->AddMutationDataNode(mut_types[i]+"_mut_count", mut_types[i]));
-        // }
+        for (size_t i = 0; i < mut_types.size(); i++) {
+            sys->AddMutationCountDataNode(mut_types[i]+"_mut_count", mut_types[i]);
+        }
 
         auto node = sys->AddDeleteriousStepDataNode();
-        // sys->AddVolatilityDataNode();
-        // sys->AddUniqueTaxaDataNode();
+        sys->AddVolatilityDataNode();
+        sys->AddUniqueTaxaDataNode();
 
-        // std::function<size_t(void)> get_update = [&world](){return world.GetUpdate();};
+        std::function<size_t(void)> get_update = [&world](){return world.GetUpdate();};
 
-        // file.AddFun(get_update, "update", "Update");
-        // for (size_t i = 0; i < mut_types.size(); i++) {
-        //     file.AddStats(*sys->GetDataNode(mut_types[i]+"_mut_count"), mut_types[i] + "_mutations_on_lineage", "counts of" + mut_types[i] + "mutations along each lineage", true, true);
-        // }
+        file.AddFun(get_update, "update", "Update");
+        for (size_t i = 0; i < mut_types.size(); i++) {
+            file.AddStats(*sys->GetDataNode(mut_types[i]+"_mut_count"), mut_types[i] + "_mutations_on_lineage", "counts of" + mut_types[i] + "mutations along each lineage", true, true);
+        }
 
         file.AddStats(*sys->GetDataNode("deleterious_steps"), "deleterious_steps", "counts of deleterious steps along each lineage", true, true);
-        // file.AddStats(*sys->GetDataNode("volatility"), "taxon_volatility", "counts of changes in taxon along each lineage", true, true);
-        // file.AddStats(*sys->GetDataNode("unique_taxa"), "unique_taxa", "counts of unique taxa along each lineage", true, true);
+        file.AddStats(*sys->GetDataNode("volatility"), "taxon_volatility", "counts of changes in taxon along each lineage", true, true);
+        file.AddStats(*sys->GetDataNode("unique_taxa"), "unique_taxa", "counts of unique taxa along each lineage", true, true);
         file.PrintHeaderKeys();
         return file;
     }
