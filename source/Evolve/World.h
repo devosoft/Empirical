@@ -125,7 +125,7 @@ namespace emp {
     using fun_find_birth_pos_t  = std::function<WorldPosition(Ptr<ORG>, size_t)>;
 
     /// Function type for identifying an organism's random neighbor.
-    using fun_get_neighbor_t    = std::function<size_t(size_t)>;
+    using fun_get_neighbor_t    = std::function<WorldPosition(WorldPosition)>;
 
   protected:
     // Internal state member variables
@@ -265,7 +265,11 @@ namespace emp {
     }
 
     /// Does the specified cell ID have an organism in it?
-    bool IsOccupied(size_t i) const { return pop[i] != nullptr; }
+    bool IsOccupied(WorldPosition pos) const {
+      size_t id = pos.GetIndex();
+      if (pos.IsActive()) return (id < pop.size()) ? pop[id] : false;
+      return (id < next_pop.size()) ? next_pop[id] : false;
+    }
 
     /// Are we currently caching fitness values?
     bool IsCacheOn() const { return cache_on; }
@@ -336,7 +340,9 @@ namespace emp {
     const Systematics<genome_t> & GetSystematics() const { return systematics; }
 
     /// Get the genotype currently associated with a specific organism.
-    Ptr<genotype_t> GetGenotypeAt(size_t id) { return genotypes[id]; }
+    Ptr<genotype_t> GetGenotypeAt(WorldPosition pos) {
+      return pos.IsActive() ? genotypes[pos.GetIndex()] : next_genotypes[pos.GetIndex()];
+    }
 
     /// Get the fitness function currently in use.
     fun_calc_fitness_t GetFitFun() { return fun_calc_fitness; }
@@ -663,7 +669,7 @@ namespace emp {
     }
 
     /// Use the specified function to get a neighbor (if not set, assume well mixed).
-    size_t GetRandomNeighborID(size_t id) { return fun_get_neighbor(id); }
+    WorldPosition GetRandomNeighborPos(WorldPosition pos) { return fun_get_neighbor(pos); }
 
     /// Get the id of a random *occupied* cell.
     size_t GetRandomOrgID();
@@ -799,8 +805,8 @@ namespace emp {
       return pop.size();
     };
 
-    // neighbors are anywhere in the population.
-    fun_get_neighbor = [this](size_t) { return GetRandomCellID(); };
+    // Neighbors are anywhere in the same population.
+    fun_get_neighbor = [this](WorldPosition pos) { return pos.SetIndex(GetRandomCellID()); };
 
     if (synchronous_gen) {
       // Append births into the next population.
@@ -835,20 +841,20 @@ namespace emp {
       return pop.size();
     };
 
-    // neighbors are anywhere in the population.
-    fun_get_neighbor = [this](size_t) { return GetRandomCellID(); };
+    // Neighbors are anywhere in the same population.
+    fun_get_neighbor = [this](WorldPosition pos) { return pos.SetIndex(GetRandomCellID()); };
 
     if (synchronous_gen) {
       // Append births into the next population.
-      fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
-        emp_assert(new_org);                          // New organism must exist.
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_id) {
+        emp_assert(new_org);                        // New organism must exist.
         return WorldPosition(next_pop.size(), 1);   // Append it to the NEXT population
       };
 
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neigbor in current population.
-      fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_id) {
         return WorldPosition(fun_get_neighbor(parent_id)); // Place org in existing population.
       };
       SetAttribute("SynchronousGen", "False");
@@ -872,28 +878,31 @@ namespace emp {
     };
 
     // neighbors are in 9-sized neighborhood.
-    fun_get_neighbor = [this](size_t id) {
+    fun_get_neighbor = [this](WorldPosition pos) {
       emp_assert(random_ptr);
+      emp_assert(pop_sizes.size() == 2);
       const size_t size_x = pop_sizes[0];
       const size_t size_y = pop_sizes[1];
+      const size_t id = pos.GetIndex();
       const int offset = random_ptr->GetInt(9);
       const int rand_x = (int) (id%size_x) + offset%3 - 1;
       const int rand_y = (int) (id/size_x) + offset/3 - 1;
-      return (size_t) (emp::Mod(rand_x, (int) size_x) + emp::Mod(rand_y, (int) size_y) * (int)size_x);
+      const auto neighbor_id = emp::Mod(rand_x, (int) size_x) + emp::Mod(rand_y, (int) size_y) * (int)size_x;
+      return pos.SetIndex(neighbor_id);
     };
 
     if (synchronous_gen) {
       // Place births in a neighboring position in the new grid.
-      fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
-        emp_assert(new_org);                            // New organism must exist.
-        const size_t id = fun_get_neighbor(parent_id);  // Place near parent, in next pop.
-        return WorldPosition(id, 1);                  // Add org and return the position placed.
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
+        emp_assert(new_org);                                    // New organism must exist.
+        WorldPosition next_pos = fun_get_neighbor(parent_pos);  // Place near parent.
+        return next_pos.SetPopID(1);                            // Adjust position to next pop and place..
       };
       SetAttribute("SynchronousGen", "True");
     } else {
-      // Asynchronous: always go to a neigbor in current population.
-      fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
-        return WorldPosition(fun_get_neighbor(parent_id)); // Place org in existing population.
+      // Asynchronous: always go to a neighbor in current population.
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
+        return WorldPosition(fun_get_neighbor(parent_pos)); // Place org in existing population.
       };
       SetAttribute("SynchronousGen", "False");
     }
