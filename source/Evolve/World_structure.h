@@ -23,21 +23,33 @@ namespace emp {
   /// A class to track positions in World.
   /// For the moment, the only informaiton beyond index is active (vs. next) population when
   /// using synchronous generations.
+  //
+  //  Developer NOTE: For efficiency, internal class members are uint32_t, but to prevent compiler
+  //                  warnings, size_t values are accepted; asserts ensure safe conversions.
   class WorldPosition {
   private:
-    size_t index;    ///< Position of this organism in the population.
-    bool is_active;  ///< Is this organism in the active population (vs. waiting for Update)
+    uint32_t index;   ///<  Position of this organism in the population.
+    uint32_t pop_id;  ///<  ID of the population we are in; 0 is always the active population.
 
   public:
-    WorldPosition(size_t _id, bool _active=true) : index(_id), is_active(_active) { ; }
-    WorldPosition() : index((size_t) -1), is_active(false) { ; }
+    static constexpr size_t invalid_id = (uint32_t) -1;
 
-    size_t GetIndex() const { return index; }
-    bool IsActive() const { return is_active; }
-    bool IsValid() const { return index != (size_t) -1; }
+    WorldPosition() : index(invalid_id), pop_id(invalid_id) { ; }
+    WorldPosition(size_t _id, size_t _pop_id=0) : index((uint32_t) _id), pop_id((uint32_t) _pop_id) {
+      emp_assert(_id <= invalid_id);
+      emp_assert(_pop_id <= invalid_id);
+    }
+    WorldPosition(const WorldPosition &) = default;
 
-    WorldPosition & SetActive(bool _active=true) { is_active = _active; return *this; }
-    WorldPosition & SetIndex(size_t _id) { index = _id; return *this; }
+    uint32_t GetIndex() const { return index; }
+
+    bool IsActive() const { return pop_id == 0; }
+    bool IsValid() const { return index != invalid_id; }
+
+    WorldPosition & SetActive(bool _active=true) { pop_id = 0; return *this; }
+    WorldPosition & SetPopID(size_t _id) { emp_assert(_id <= invalid_id); pop_id = (uint32_t) _id; return *this; }
+    WorldPosition & SetIndex(size_t _id) { emp_assert(_id <= invalid_id); index = (uint32_t) _id; return *this; }
+    WorldPosition & MarkInvalid() { index = invalid_id; pop_id = invalid_id; return *this; }
   };
 
   /// Set the population to be a set of pools that are individually well mixed, but with limited
@@ -73,11 +85,11 @@ namespace emp {
         const size_t start_id = pool_id * pool_size;
         for (size_t id = start_id; id < start_id+pool_size; id++) {
           if (world.IsOccupied(id) == false) {  // Search for an open positions...
-            return WorldPosition(id, false);
+            return WorldPosition(id, 1);
           }
         }
         const size_t id = world.GetRandomNeighborID(parent_id);     // Placed near parent, in next pop.
-        return WorldPosition(id, false);
+        return WorldPosition(id, 1);
       });
       world.SetAttribute("SynchronousGen", "True");
     } else {
