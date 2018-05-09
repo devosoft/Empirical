@@ -24,7 +24,7 @@ struct TestOrg1 {
 
 int main() {
   emp::World<int> world;
-  world.SetWellMixed(true);
+  world.SetPopStruct_Mixed(true);
 
   world.SetFitFun([](int & i){ return (double) i; });
   for (int i = 0; i < 100; i++) {
@@ -55,7 +55,7 @@ int main() {
 
 
   emp::World<TestOrg1> ea_world;
-  ea_world.SetWellMixed(true);
+  ea_world.SetPopStruct_Mixed(true);
   for (int i = 0; i < 100; i++) ea_world.Inject(i+200);
 
   std::cout << "\nStart Size = " << ea_world.GetSize() << std::endl;
@@ -77,7 +77,7 @@ int main() {
   // Test grid Populations
   emp::Random random;
   emp::World<int> grid_world(random);
-  grid_world.SetGrid(10,10);
+  grid_world.SetPopStruct_Grid(10,10);
   for (int i = 0; i < 10; i++) grid_world.Inject(i);
   grid_world.PrintGrid();
 

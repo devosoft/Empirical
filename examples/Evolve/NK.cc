@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
   pop.SetupFitnessFile().SetTimingRepeat(10);
   pop.SetupSystematicsFile().SetTimingRepeat(10);
   pop.SetupPopulationFile().SetTimingRepeat(10);
-  pop.SetWellMixed(true);
+  pop.SetPopStruct_Mixed(true);
   pop.SetCache();
 
   // Build a random initial population

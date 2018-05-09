@@ -16,7 +16,7 @@
 
 int main() {
   emp::World<int> world;
-  world.SetWellMixed(true);
+  world.SetPopStruct_Mixed(true);
 
   // Inject from 100 to 199.
   for (int i = 0; i < 100; i++) { world.Inject(i+200); }
