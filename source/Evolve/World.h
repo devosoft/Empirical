@@ -19,6 +19,7 @@
  *  @todo Add a signal for DoBirth() for when a birth fails.
  *  @todo Add a signal for once a birth position is determined, but before it is used.
  *  @todo Add a signal for when organism positions are swapped.
+ *  @todo Add a signal for population Reset() (and possibly Clear?)
  *  @todo Add a feature to maintain population sorted by each phenotypic trait.  This will allow
  *        us to more rapidly find phenotypic neighbors and know the current extremes for each
  *        phenotype.
@@ -128,12 +129,12 @@ namespace emp {
 
   protected:
     // Internal state member variables
+    size_t update;                  ///< How many times has Update() been called?
     Ptr<Random> random_ptr;         ///< @brief Random object to use.
     bool random_owner;              ///< Did we create our own random number generator?
     emp::vector<Ptr<ORG>> pop;      ///< All of the spots in the population.
     emp::vector<Ptr<ORG>> next_pop; ///< Population being setup for next generation.
     size_t num_orgs;                ///< How many organisms are actually in the population.
-    size_t update;                  ///< How many times has Update() been called?
     emp::vector<double> fit_cache;  ///< vector size == 0 when not caching; uncached values == 0.
     emp::vector<Ptr<genotype_t>> genotypes;      ///< Genotypes for the corresponding orgs.
     emp::vector<Ptr<genotype_t>> next_genotypes; ///< Genotypes for corresponding orgs in next_pop.
@@ -193,7 +194,7 @@ namespace emp {
     /// If no name is provided, the world remains nameless.
     /// If no random number generator is provided, gen_random determines if one shold be created.
     World(std::string _name="", bool gen_random=true)
-      : random_ptr(nullptr), random_owner(false), pop(), next_pop(), num_orgs(0), update(0), fit_cache()
+      : update(0), random_ptr(nullptr), random_owner(false), pop(), next_pop(), num_orgs(0), fit_cache()
       , genotypes(), next_genotypes()
       , name(_name), cache_on(false), pop_sizes(1,0), phenotypes(), files()
       , is_synchronous(false), is_space_structured(false), is_pheno_structured(false)
@@ -805,7 +806,7 @@ namespace emp {
       // Append births into the next population.
       fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
         emp_assert(new_org);      // New organism must exist.
-        return WorldPosition(next_pop.size(), false);   // Append it to the NEXT population
+        return WorldPosition(next_pop.size(), 1);   // Append it to the NEXT population
       };
 
       SetAttribute("SynchronousGen", "True");
@@ -841,7 +842,7 @@ namespace emp {
       // Append births into the next population.
       fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
         emp_assert(new_org);                          // New organism must exist.
-        return WorldPosition(next_pop.size(), false);   // Append it to the NEXT population
+        return WorldPosition(next_pop.size(), 1);   // Append it to the NEXT population
       };
 
       SetAttribute("SynchronousGen", "True");
@@ -886,7 +887,7 @@ namespace emp {
       fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
         emp_assert(new_org);                            // New organism must exist.
         const size_t id = fun_get_neighbor(parent_id);  // Place near parent, in next pop.
-        return WorldPosition(id, false);                  // Add org and return the position placed.
+        return WorldPosition(id, 1);                  // Add org and return the position placed.
       };
       SetAttribute("SynchronousGen", "True");
     } else {
