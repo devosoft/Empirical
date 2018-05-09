@@ -142,8 +142,8 @@ namespace emp {
     world.SetGetNeighborFun( [](WorldPosition pos) { emp_assert(false); return pos; });
 
     // Birth is effectively the same as inject.
-    world.SetAddBirthFun( [&world,traits,trait_counts](Ptr<ORG> new_org, size_t parent_id) {
-      (void) parent_id; // Parent id is not needed for MAP Elites.
+    world.SetAddBirthFun( [&world,traits,trait_counts](Ptr<ORG> new_org, WorldPosition parent_pos) {
+      (void) parent_pos; // Parent position is not needed for MAP Elites.
       // Determine tha position that this phenotype fits in.
       double org_fitness = world.CalcFitnessOrg(*new_org);
       size_t id = traits.EvalBin(*new_org, trait_counts);
@@ -331,7 +331,8 @@ namespace emp {
     world.SetGetNeighborFun( [](WorldPosition pos) { emp_assert(false); return pos; });
 
     // Birth is effectively the same as inject.
-    world.SetAddBirthFun( [&world, traits, world_size, info_ptr](Ptr<ORG> new_org, size_t parent_id) {
+    world.SetAddBirthFun( [&world, traits, world_size, info_ptr](Ptr<ORG> new_org, WorldPosition parent_pos) {
+      (void) parent_pos;
       size_t pos = info_ptr->GetBirthPos(world_size);
       return WorldPosition(pos);
     });
