@@ -122,7 +122,7 @@ namespace emp {
     using fun_find_inject_pos_t = std::function<WorldPosition(Ptr<ORG>)>;
 
     /// Function type for adding a newly born organism into a world (returns birth position)
-    using fun_find_birth_pos_t  = std::function<WorldPosition(Ptr<ORG>, size_t)>;
+    using fun_find_birth_pos_t  = std::function<WorldPosition(Ptr<ORG>, WorldPosition)>;
 
     /// Function type for identifying an organism's random neighbor.
     using fun_get_neighbor_t    = std::function<WorldPosition(WorldPosition)>;
@@ -170,8 +170,8 @@ namespace emp {
 
     // == Signals ==
     SignalControl control;  // Setup the world to control various signals.
-    Signal<void(size_t)> before_repro_sig;    ///< Trigger signal before organism gives birth.
-    Signal<void(ORG &)>  offspring_ready_sig; ///< Trigger signal when offspring organism is built.
+    Signal<void(size_t)> before_repro_sig;    ///< Trigger before organism gives birth w/ position.
+    Signal<void(ORG &)>  offspring_ready_sig; ///< Trigger when offspring organism is built.
     Signal<void(ORG &)>  inject_ready_sig;    ///< Trigger when external organism is ready to inject.
     Signal<void(size_t)> org_placement_sig;   ///< Trigger after any organism is placed into world.
     Signal<void(size_t)> on_update_sig;       ///< Trigger at the beginning of Update()
@@ -618,17 +618,13 @@ namespace emp {
       pop_sizes = dims;
     }
 
-    /// AddOrgAt is the core function to add organisms to active population (others must go through here)
+    /// AddOrgAt is the core function to add organisms to the population (others must go through here)
     /// Note: This function ignores population structure, so requires you to manage your own structure.
     void AddOrgAt(Ptr<ORG> new_org, WorldPosition pos, Ptr<genotype_t> p_genotype=nullptr);
 
-    /// RemoveOrgAt is the core function to remove an active organism.
+    /// RemoveOrgAt is the core function to remove organisms from the population.
     /// Note: This function ignores population structure, so requires you to manage your own structure.
-    void RemoveOrgAt(size_t pos);
-
-    /// RemoveNextOrgAt removes an organism waiting to placed into the next generation.
-    /// Note: This function ignores population structure, so requires you to manage your own structure.
-    void RemoveNextOrgAt(size_t pos);
+    void RemoveOrgAt(WorldPosition pos);
 
     /// Inject an organism using the default injection scheme.
     void Inject(const genome_t & mem, size_t copy_count=1);
@@ -741,6 +737,7 @@ namespace emp {
     emp_assert(new_org);    // The new organism must exist.
     emp_assert(pos.IsValid());     // Position must be legal.
 
+    RemoveOrgAt(pos);                         // Clear out any old org.
     const size_t index = pos.GetIndex();
 
     // Determine new organism's genotype.
@@ -749,7 +746,6 @@ namespace emp {
     // Should we place this organisms in the active population?
     if (pos.IsActive()) {
       if (pop.size() <= index) pop.resize(index+1, nullptr);  // Make sure we have room.
-      RemoveOrgAt(index);                                     // Clear out any old org.
       pop[index] = new_org;                                   // Place new org.
       ++num_orgs;                                             // Track number of orgs.
 
@@ -761,7 +757,6 @@ namespace emp {
     // ...or should the organism go in the next population?
     else {
       if (next_pop.size() <= index) next_pop.resize(index+1, nullptr);   // Make sure we have room.
-      RemoveNextOrgAt(index);                                            // Clear out any old org.
       next_pop[index] = new_org;                                         // Place new org.
 
       // Track the new genotype.
@@ -771,24 +766,24 @@ namespace emp {
   }
 
   template<typename ORG>
-  void World<ORG>::RemoveOrgAt(size_t pos) {
-    if (!pop[pos]) return;                   // Nothing to remove!
-    on_death_sig.Trigger(pos);               // Identify that this position is about to be removed
-    pop[pos].Delete();                       // Delete the organism...
-    pop[pos] = nullptr;                      // ...and reset the pointer to null
-    --num_orgs;                              // Track one fewer organisms in the population
-    if (cache_on) ClearCache(pos);           // Delete any cached info about this organism
-    systematics.RemoveOrg( genotypes[pos] ); // Notify systematics about organism removal
-    genotypes[pos] = nullptr;                // No longer track a genotype at this position
-  }
-
-  template<typename ORG>
-  void World<ORG>::RemoveNextOrgAt(size_t pos) {
-    if (!next_pop[pos]) return;                   // Nothing to remove!
-    next_pop[pos].Delete();                       // Delete the organism...
-    next_pop[pos] = nullptr;                      // ..and reset the pointer to null
-    systematics.RemoveOrg( next_genotypes[pos] ); // Notify systematics manager about removal
-    next_genotypes[pos] = nullptr;                // No longer track a genotype at this position
+  void World<ORG>::RemoveOrgAt(WorldPosition pos) {
+    size_t id = pos.GetIndex(); // Identify specific index.
+    if (pos.IsActive()) {
+      if (!pop[id]) return;                   // Nothing to remove!
+      on_death_sig.Trigger(id);               // Identify that this position is about to be removed
+      pop[id].Delete();                       // Delete the organism...
+      pop[id] = nullptr;                      // ...and reset the pointer to null
+      --num_orgs;                              // Track one fewer organisms in the population
+      if (cache_on) ClearCache(id);           // Delete any cached info about this organism
+      systematics.RemoveOrg( genotypes[id] ); // Notify systematics about organism removal
+      genotypes[id] = nullptr;                // No longer track a genotype at this position
+    } else {
+      if (!next_pop[id]) return;                   // Nothing to remove!
+      next_pop[id].Delete();                       // Delete the organism...
+      next_pop[id] = nullptr;                      // ..and reset the pointer to null
+      systematics.RemoveOrg( next_genotypes[id] ); // Notify systematics manager about removal
+      next_genotypes[id] = nullptr;                // No longer track a genotype at this position
+    }
   }
 
   template<typename ORG>
@@ -1042,7 +1037,7 @@ namespace emp {
   template<typename ORG>
   void World<ORG>::Clear() {
     for (size_t i = 0; i < pop.size(); i++) RemoveOrgAt(i);
-    for (size_t i = 0; i < next_pop.size(); i++) RemoveNextOrgAt(i);
+    for (size_t i = 0; i < next_pop.size(); i++) RemoveOrgAt(WorldPosition(i,1));
     pop.resize(0);
     next_pop.resize(0);
   }
