@@ -141,7 +141,7 @@ namespace emp {
     using fun_find_inject_pos_t = std::function<OrgPosition(Ptr<ORG>)>;
 
     /// Function type for adding a newly born organism into a world (returns birth position)
-    using fun_add_birth_t       = std::function<OrgPosition(Ptr<ORG>, size_t)>;
+    using fun_find_birth_pos_t  = std::function<OrgPosition(Ptr<ORG>, size_t)>;
 
     /// Function type for identifying an organism's random neighbor.
     using fun_get_neighbor_t    = std::function<size_t(size_t)>;
@@ -178,7 +178,7 @@ namespace emp {
     fun_print_org_t        fun_print_org;       ///< Function to print an organism.
     fun_get_genome_t       fun_get_genome;      ///< Determine the genome object of an organism.
     fun_find_inject_pos_t  fun_find_inject_pos; ///< Technique to inject a new, external organism.
-    fun_add_birth_t        fun_add_birth;       ///< Technique to add a new offspring organism.
+    fun_find_birth_pos_t   fun_find_birth_pos;  ///< Technique to add a new offspring organism.
     fun_get_neighbor_t     fun_get_neighbor;    ///< Choose a random neighbor near specified id.
 
     /// Attributes are a dynamic way to track extra characteristics about a world.
@@ -219,7 +219,7 @@ namespace emp {
       , is_synchronous(false), is_space_structured(false), is_pheno_structured(false)
       , data_node_fitness(nullptr)
       , fun_calc_fitness(), fun_do_mutations(), fun_print_org(), fun_get_genome()
-      , fun_find_inject_pos(), fun_add_birth(), fun_get_neighbor()
+      , fun_find_inject_pos(), fun_find_birth_pos(), fun_get_neighbor()
       , attributes(), systematics(true,true,false)
       , control()
       , before_repro_sig(to_string(name,"::before-repro"), control)
@@ -449,7 +449,7 @@ namespace emp {
     /// Setup the function to place a newly born organism into the population.  It should take a
     /// pointer to the new organism and the position of the parent, returning an OrgPosition
     /// indicating where it was placed.
-    void SetAddBirthFun(const fun_add_birth_t & _fun) { fun_add_birth = _fun; }
+    void SetAddBirthFun(const fun_find_birth_pos_t & _fun) { fun_find_birth_pos = _fun; }
 
     /// Setup the function to take an organism position id and return a random neighbor id from
     /// the population.
@@ -632,19 +632,15 @@ namespace emp {
     }
 
     /// AddOrgAt is the core function to add organisms to active population (others must go through here)
-    /// Note: This function ignores population structue, so requires you to manage your own structure.
-    OrgPosition AddOrgAt(Ptr<ORG> new_org, OrgPosition pos, Ptr<genotype_t> p_genotype=nullptr);
-
-    /// AddNextOrgAt build up the next population during synchronous generations.
-    /// Note: This function ignores population structue, so requires you to manage your own structure.
-    OrgPosition AddNextOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
+    /// Note: This function ignores population structure, so requires you to manage your own structure.
+    void AddOrgAt(Ptr<ORG> new_org, OrgPosition pos, Ptr<genotype_t> p_genotype=nullptr);
 
     /// RemoveOrgAt is the core function to remove an active organism.
-    /// Note: This function ignores population structue, so requires you to manage your own structure.
+    /// Note: This function ignores population structure, so requires you to manage your own structure.
     void RemoveOrgAt(size_t pos);
 
     /// RemoveNextOrgAt removes an organism waiting to placed into the next generation.
-    /// Note: This function ignores population structue, so requires you to manage your own structure.
+    /// Note: This function ignores population structure, so requires you to manage your own structure.
     void RemoveNextOrgAt(size_t pos);
 
     /// Inject an organism using the default injection scheme.
@@ -754,43 +750,37 @@ namespace emp {
   // =============================================================
 
   template <typename ORG>
-  typename World<ORG>::OrgPosition
-  World<ORG>::AddOrgAt(Ptr<ORG> new_org, World<ORG>::OrgPosition pos, Ptr<genotype_t> p_genotype) {
+  void World<ORG>::AddOrgAt(Ptr<ORG> new_org, World<ORG>::OrgPosition pos, Ptr<genotype_t> p_genotype) {
+    emp_assert(new_org);    // The new organism must exist.
+    emp_assert(pos.IsValid());     // Position must be legal.
+
     const size_t index = pos.GetIndex();
 
-    emp_assert(new_org, index);       // The new organism must exist.
-    emp_assert(index.IsActive());     // Index must be in the active population.
-
     // Determine new organism's genotype.
     Ptr<genotype_t> new_genotype = systematics.AddOrg(GetGenome(*new_org), p_genotype);
-    if (pop.size() <= index) pop.resize(index+1, nullptr);  // Make sure we have room.
-    RemoveOrgAt(index);                                   // Clear out any old org.
-    pop[index] = new_org;                                 // Place new org.
-    ++num_orgs;                                         // Track number of orgs.
 
-    // Track the new genotype.
-    if (genotypes.size() <= index) genotypes.resize(index+1, nullptr);   // Make sure we fit genotypes.
-    genotypes[index] = new_genotype;
+    // Should we place this organisms in the active population?
+    if (pos.IsActive()) {
+      if (pop.size() <= index) pop.resize(index+1, nullptr);  // Make sure we have room.
+      RemoveOrgAt(index);                                     // Clear out any old org.
+      pop[index] = new_org;                                   // Place new org.
+      ++num_orgs;                                             // Track number of orgs.
 
-    return pos;
-  }
+      // Track the new genotype.
+      if (genotypes.size() <= index) genotypes.resize(index+1, nullptr);   // Make sure we fit genotypes.
+      genotypes[index] = new_genotype;
+    }
 
-  template <typename ORG>
-  typename World<ORG>::OrgPosition
-  World<ORG>::AddNextOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype) {
-    emp_assert(new_org, pos);                            // The new organism must exist.
+    // ...or should the organism go in the next population?
+    else {
+      if (next_pop.size() <= index) next_pop.resize(index+1, nullptr);   // Make sure we have room.
+      RemoveNextOrgAt(index);                                            // Clear out any old org.
+      next_pop[index] = new_org;                                         // Place new org.
 
-    // Determine new organism's genotype.
-    Ptr<genotype_t> new_genotype = systematics.AddOrg(GetGenome(*new_org), p_genotype);
-    if (next_pop.size() <= pos) next_pop.resize(pos+1, nullptr);   // Make sure we have room.
-    RemoveNextOrgAt(pos);                                          // Clear out any old org.
-    next_pop[pos] = new_org;                                       // Place new org.
-
-    // Track the new genotype.
-    if (next_genotypes.size() <= pos) next_genotypes.resize(pos+1, nullptr);  // Make sure we fit genotypes.
-    next_genotypes[pos] = new_genotype;
-
-    return OrgPosition(pos, false);
+      // Track the new genotype.
+      if (next_genotypes.size() <= index) next_genotypes.resize(index+1, nullptr);  // Make sure we fit genotypes.
+      next_genotypes[index] = new_genotype;
+    }
   }
 
   template<typename ORG>
@@ -833,16 +823,16 @@ namespace emp {
 
     if (synchronous_gen) {
       // Append births into the next population.
-      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        emp_assert(new_org);                            // New organism must exist.
-        return AddNextOrgAt(new_org, next_pop.size(), genotypes[parent_id]);  // Append it to the NEXT population
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
+        emp_assert(new_org);      // New organism must exist.
+        return OrgPosition(next_pop.size(), false);   // Append it to the NEXT population
       };
 
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always append to current population.
-      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        return AddOrgAt(new_org, pop.size(), genotypes[parent_id]);
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
+        return OrgPosition(pop.size());
       };
       SetAttribute("SynchronousGen", "False");
     }
@@ -869,16 +859,16 @@ namespace emp {
 
     if (synchronous_gen) {
       // Append births into the next population.
-      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        emp_assert(new_org);                            // New organism must exist.
-        return AddNextOrgAt(new_org, next_pop.size(), genotypes[parent_id]);  // Append it to the NEXT population
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
+        emp_assert(new_org);                          // New organism must exist.
+        return OrgPosition(next_pop.size(), false);   // Append it to the NEXT population
       };
 
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neigbor in current population.
-      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        return AddOrgAt(new_org, fun_get_neighbor(parent_id), genotypes[parent_id]); // Place org in existing population.
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
+        return OrgPosition(fun_get_neighbor(parent_id)); // Place org in existing population.
       };
       SetAttribute("SynchronousGen", "False");
     }
@@ -897,7 +887,7 @@ namespace emp {
     // Inject a random position in grid
     fun_find_inject_pos = [this](Ptr<ORG> new_org) {
       (void) new_org;
-      return GetRandomCellID();
+      return OrgPosition(GetRandomCellID());
     };
 
     // neighbors are in 9-sized neighborhood.
@@ -913,16 +903,16 @@ namespace emp {
 
     if (synchronous_gen) {
       // Place births in a neighboring position in the new grid.
-      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        emp_assert(new_org);                                     // New organism must exist.
-        const size_t id = fun_get_neighbor(parent_id);           // Place near parent, in next pop.
-        return AddNextOrgAt(new_org, id, genotypes[parent_id]);  // Add org and return the position placed.
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
+        emp_assert(new_org);                            // New organism must exist.
+        const size_t id = fun_get_neighbor(parent_id);  // Place near parent, in next pop.
+        return OrgPosition(id, false);                  // Add org and return the position placed.
       };
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neigbor in current population.
-      fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        return AddOrgAt(new_org, fun_get_neighbor(parent_id), genotypes[parent_id]); // Place org in existing population.
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
+        return OrgPosition(fun_get_neighbor(parent_id)); // Place org in existing population.
       };
       SetAttribute("SynchronousGen", "False");
     }
@@ -1123,7 +1113,9 @@ namespace emp {
     before_repro_sig.Trigger(parent_pos);
     Ptr<ORG> new_org = NewPtr<ORG>(mem);
     offspring_ready_sig.Trigger(*new_org);
-    const OrgPosition pos = fun_add_birth(new_org, parent_pos);
+    const OrgPosition pos = fun_find_birth_pos(new_org, parent_pos);
+    AddOrgAt(new_org, pos, genotypes[parent_pos]);
+
     if (pos.IsActive()) {
       // If organism was placed right into the active population, trigger placement signal.
       org_placement_sig.Trigger(pos.GetIndex());
@@ -1142,7 +1134,9 @@ namespace emp {
     for (size_t i = 0; i < copy_count; i++) {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       offspring_ready_sig.Trigger(*new_org);
-      const OrgPosition pos = fun_add_birth(new_org, parent_pos);
+      const OrgPosition pos = fun_find_birth_pos(new_org, parent_pos);
+      AddOrgAt(new_org, pos, genotypes[parent_pos]);
+      
       if (pos.IsActive()) {
         // If organism was placed right into the active population, trigger placement signal.
         org_placement_sig.Trigger(pos.GetIndex());
