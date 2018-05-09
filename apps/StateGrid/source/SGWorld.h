@@ -124,7 +124,7 @@ public:
     }
 
     // Setup a well-mixed population structure
-    SetWellMixed(true);
+    SetPopStruct_Mixed(true);
 
     // Build a random initial popoulation.
     for (size_t i = 0; i < POP_SIZE; i++) {
