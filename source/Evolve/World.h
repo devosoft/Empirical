@@ -194,7 +194,7 @@ namespace emp {
     Signal<void(ORG &)>  inject_ready_sig;    ///< Trigger when external organism is ready to inject.
     Signal<void(size_t)> org_placement_sig;   ///< Trigger after any organism is placed into world.
     Signal<void(size_t)> on_update_sig;       ///< Trigger at the beginning of Update()
-    Signal<void(size_t)> on_death_sig;        ///< Trigger when any organism dies.
+    Signal<void(size_t)> on_death_sig;        ///< Trigger immediately before any organism dies.
     Signal<void()>       world_destruct_sig;  ///< Trigger in the World destructor.
 
     /// Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
@@ -235,7 +235,7 @@ namespace emp {
       SetDefaultMutFun<this_t, ORG>(*this);
       SetDefaultPrintFun<this_t, ORG>(*this);
       SetDefaultGetGenomeFun<this_t, ORG>(*this);
-      SetWellMixed();  // World default structure is well-mixed.
+      SetPopStruct_Mixed();  // World default structure is well-mixed.
     }
     World(Random & rnd, std::string _name="") : World(_name,false) { random_ptr = &rnd; }
 
@@ -369,15 +369,15 @@ namespace emp {
 
     /// Set the population to always append new organisms on the end.
     /// Argument determines if the generations should be synchronous (true) or not (false, default)
-    void SetStructGrow(bool synchronous_gen=false);
+    void SetPopStruct_Grow(bool synchronous_gen=false);
 
     /// Set the population to be well-mixed (with all organisms counting as neighbors.)
     /// Argument determines if the generations should be synchronous (true) or not (false, default)
-    void SetWellMixed(bool synchronous_gen=false);
+    void SetPopStruct_Mixed(bool synchronous_gen=false);
 
     /// Set the population to be a grid of cells using the specified dimensions.  The third
     /// argument determines if the generations should be synchronous (true) or not (false, default)
-    void SetGrid(size_t width, size_t height, bool synchronous_gen=false);
+    void SetPopStruct_Grid(size_t width, size_t height, bool synchronous_gen=false);
 
     /// Setup the population to automatically test for mutations before deciding where a newborn offspring
     /// should be placed (placement may need to know fitness or other phenotypic traits).
@@ -812,7 +812,7 @@ namespace emp {
   }
 
   template<typename ORG>
-  void World<ORG>::SetStructGrow(bool synchronous_gen) {
+  void World<ORG>::SetPopStruct_Grow(bool synchronous_gen) {
     pop_sizes.resize(0);
     is_synchronous = synchronous_gen;
     is_space_structured = false;
@@ -847,7 +847,7 @@ namespace emp {
   }
 
   template<typename ORG>
-  void World<ORG>::SetWellMixed(bool synchronous_gen) {
+  void World<ORG>::SetPopStruct_Mixed(bool synchronous_gen) {
     pop_sizes.resize(0);
     is_synchronous = synchronous_gen;
     is_space_structured = false;
@@ -882,7 +882,7 @@ namespace emp {
   }
 
   template<typename ORG>
-  void World<ORG>::SetGrid(size_t width, size_t height, bool synchronous_gen) {
+  void World<ORG>::SetPopStruct_Grid(size_t width, size_t height, bool synchronous_gen) {
     Resize(width, height);
     is_synchronous = synchronous_gen;
     is_space_structured = true;
@@ -1178,7 +1178,7 @@ namespace emp {
     return valid_IDs;
   }
 
-  // Run population through a bottleneck to (potentially) shrink it.
+  // Run population through a bottleneck to (probably) shrink it.
   template<typename ORG>
   void World<ORG>::DoBottleneck(const size_t new_size, bool choose_random) {
     if (new_size >= num_orgs) return;  // No bottleneck needed!
@@ -1190,7 +1190,7 @@ namespace emp {
       // If we are supposed to keep only random organisms, shuffle the beginning into place!
       if (choose_random) emp::Shuffle<Ptr<ORG>>(*random_ptr, pop, new_size);
 
-      // Clear out all of the organisms we are removing and resize the population.
+      // Clear out all of the organisms we are removing and shrink the population.
       for (size_t i = new_size; i < pop.size(); ++i) RemoveOrgAt(i);
       pop.resize(new_size);
       ClearCache();
