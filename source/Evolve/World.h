@@ -10,15 +10,15 @@
  *  and selection techniques for evolutionary computation applications.
  *
  *
- *  @todo Mutations are currently not interacting properly with lineages.  Organisms are born,
- *        added to the lineage and THEN mutated.  Ideally, all mutations should occur on birth
- *        (via a signal?), but we have to make sure things like elite selection can still turn
- *        off mutations.
- *  @todo We should Specialize World so that ANOTHER world can be used with proper delegation to
- *        facilitate demes, pools, islands, etc.
+ *  @todo Adjust automatic mutations to be done AFTER positions are determined so that a function
+ *        can be provided that excludes some sites from being mutated.
+ *  @todo We should Specialize World so that ANOTHER world can be used as an ORG, with proper
+ *        delegation to facilitate demes, pools, islands, etc.
  *  @todo We should be able to have any number of systematics managers, based on various type_trait
  *        information a that we want to track.
  *  @todo Add a signal for DoBirth() for when a birth fails.
+ *  @todo Add a signal for once a birth position is determined, but before it is used.
+ *  @todo Add a signal for when organism positions are swapped.
  *  @todo Add a feature to maintain population sorted by each phenotypic trait.  This will allow
  *        us to more rapidly find phenotypic neighbors and know the current extremes for each
  *        phenotype.
