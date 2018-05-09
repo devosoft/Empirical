@@ -20,6 +20,26 @@ namespace emp {
 
   template <typename ORG> class World;
 
+  /// A class to track positions in World.
+  /// For the moment, the only informaiton beyond index is active (vs. next) population when
+  /// using synchronous generations.
+  class WorldPosition {
+  private:
+    size_t index;    ///< Position of this organism in the population.
+    bool is_active;  ///< Is this organism in the active population (vs. waiting for Update)
+
+  public:
+    WorldPosition(size_t _id, bool _active=true) : index(_id), is_active(_active) { ; }
+    WorldPosition() : index((size_t) -1), is_active(false) { ; }
+
+    size_t GetIndex() const { return index; }
+    bool IsActive() const { return is_active; }
+    bool IsValid() const { return index != (size_t) -1; }
+
+    WorldPosition & SetActive(bool _active=true) { is_active = _active; return *this; }
+    WorldPosition & SetIndex(size_t _id) { index = _id; return *this; }
+  };
+
   /// Set the population to be a set of pools that are individually well mixed, but with limited
   /// migtation.  Arguments are the number of pools, the size of each pool, and whether the
   /// generations should be synchronous (true) or not (false, default).
@@ -34,9 +54,9 @@ namespace emp {
     // Inject in an empty pool -or- randomly if none empty
     world.SetAddInjectFun( [&world,pool_size](Ptr<ORG> new_org) {
       for (size_t id = 0; id < world.GetSize(); id += pool_size) {
-        if (world.IsOccupied(id) == false) return id;
+        if (world.IsOccupied(id) == false) return WorldPosition(id);
       }
-      return World<ORG>::OrgPosition(world.GetRandomCellID());
+      return WorldPosition(world.GetRandomCellID());
     });
 
     // Neighbors are everyone in the same pool.
@@ -53,11 +73,11 @@ namespace emp {
         const size_t start_id = pool_id * pool_size;
         for (size_t id = start_id; id < start_id+pool_size; id++) {
           if (world.IsOccupied(id) == false) {  // Search for an open positions...
-            return World<ORG>::OrgPosition(id, false);
+            return WorldPosition(id, false);
           }
         }
         const size_t id = world.GetRandomNeighborID(parent_id);     // Placed near parent, in next pop.
-        return World<ORG>::OrgPosition(id, false);
+        return WorldPosition(id, false);
       });
       world.SetAttribute("SynchronousGen", "True");
     } else {
@@ -65,7 +85,7 @@ namespace emp {
       world.SetAddBirthFun( [&world](Ptr<ORG> new_org, size_t parent_id) {
         auto id = world.GetRandomNeighborID(parent_id);
         auto p_genotype = world.GetGenotypeAt(parent_id);
-        return World<ORG>::OrgPosition(id); // Place org in existing population.
+        return WorldPosition(id); // Place org in existing population.
       });
       world.SetAttribute("SynchronousGen", "False");
     }
@@ -87,8 +107,6 @@ namespace emp {
   template <typename ORG>
   void SetMapElites(World<ORG> & world, TraitSet<ORG> traits,
                     const emp::vector<size_t> & trait_counts) {
-    using org_pos_t = typename World<ORG>::OrgPosition;
-
     world.Resize(trait_counts);  // World sizes are based on counts of traits options.
     world.MarkSynchronous(false);
     world.MarkSpaceStructured(false).MarkPhenoStructured(true);
@@ -103,8 +121,8 @@ namespace emp {
       size_t id = traits.EvalBin(*new_org, trait_counts);
       double cur_fitness = world.CalcFitnessID(id);
 
-      if (cur_fitness > org_fitness) return org_pos_t();  // Return invalid position!
-      return org_pos_t(id);
+      if (cur_fitness > org_fitness) return WorldPosition();  // Return invalid position!
+      return WorldPosition(id);
     });
 
     // Map Elites does not have a concept of neighbors.
@@ -118,8 +136,8 @@ namespace emp {
       size_t id = traits.EvalBin(*new_org, trait_counts);
       double cur_fitness = world.CalcFitnessID(id);
 
-      if (cur_fitness > org_fitness) return org_pos_t();  // Return invalid position!
-      return World<ORG>::OrgPosition(id);
+      if (cur_fitness > org_fitness) return WorldPosition();  // Return invalid position!
+      return WorldPosition(id);
     });
 
     world.SetAttribute("SynchronousGen", "False");
@@ -292,7 +310,7 @@ namespace emp {
     // ensure placement.
     world.SetAddInjectFun( [&world, traits, world_size, info_ptr](Ptr<ORG> new_org) {
       size_t pos = info_ptr->GetBirthPos(world_size);
-      return World<ORG>::OrgPosition(pos);
+      return WorldPosition(pos);
     });
 
     // Diverse Elites does not have a concept of neighbors.
@@ -302,7 +320,7 @@ namespace emp {
     // Birth is effectively the same as inject.
     world.SetAddBirthFun( [&world, traits, world_size, info_ptr](Ptr<ORG> new_org, size_t parent_id) {
       size_t pos = info_ptr->GetBirthPos(world_size);
-      return World<ORG>::OrgPosition(pos);
+      return WorldPosition(pos);
     });
 
     world.SetAttribute("SynchronousGen", "False");
