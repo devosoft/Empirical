@@ -33,7 +33,7 @@ struct NKWorld : public emp::World<BitOrg> {
 
   // Run setup after config has been loaded.
   void Setup() {
-    SetWellMixed(true);
+    SetPopStruct_Mixed(true);
     SetCache();
 
     // Load in config values for easy access.
