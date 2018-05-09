@@ -42,6 +42,7 @@ namespace emp {
     WorldPosition(const WorldPosition &) = default;
 
     uint32_t GetIndex() const { return index; }
+    uint32_t GetPopID() const { return pop_id; }
 
     bool IsActive() const { return pop_id == 0; }
     bool IsValid() const { return index != invalid_id; }
@@ -72,32 +73,32 @@ namespace emp {
     });
 
     // Neighbors are everyone in the same pool.
-    world.SetGetNeighborFun( [&world,pool_size](size_t id) {
-      const size_t pool_start = (id / pool_size) * pool_size;
-      return pool_start + world.GetRandom().GetUInt(pool_size);
+    world.SetGetNeighborFun( [&world,pool_size](WorldPosition pos) {
+      const size_t pool_start = (pos.GetIndex() / pool_size) * pool_size;
+      return pos.SetIndex(pool_start + world.GetRandom().GetUInt(pool_size));
     });
 
     if (synchronous_gen) {
       // Place births in the next open spot in the new pool (or randomly if full!)
-      world.SetAddBirthFun( [&world,pool_size](Ptr<ORG> new_org, size_t parent_id) {
+      world.SetAddBirthFun( [&world,pool_size](Ptr<ORG> new_org, WorldPosition parent_pos) {
         emp_assert(new_org);                                  // New organism must exist.
+        const size_t parent_id = parent_pos.GetIndex();
         const size_t pool_id = parent_id / pool_size;
         const size_t start_id = pool_id * pool_size;
         for (size_t id = start_id; id < start_id+pool_size; id++) {
-          if (world.IsOccupied(id) == false) {  // Search for an open positions...
+          if (world.IsOccupied(WorldPosition(id,1)) == false) {  // Search for an open position...
             return WorldPosition(id, 1);
           }
         }
-        const size_t id = world.GetRandomNeighborID(parent_id);     // Placed near parent, in next pop.
-        return WorldPosition(id, 1);
+        WorldPosition pos = world.GetRandomNeighborPos(parent_pos);  // Placed near parent, in next pop.
+        return pos.SetPopID(1);
       });
       world.SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neighbor in current population.
-      world.SetAddBirthFun( [&world](Ptr<ORG> new_org, size_t parent_id) {
-        auto id = world.GetRandomNeighborID(parent_id);
-        auto p_genotype = world.GetGenotypeAt(parent_id);
-        return WorldPosition(id); // Place org in existing population.
+      world.SetAddBirthFun( [&world](Ptr<ORG> new_org, WorldPosition parent_pos) {
+        auto pos = world.GetRandomNeighborPos(parent_pos);
+        return pos; // Place org in existing population.
       });
       world.SetAttribute("SynchronousGen", "False");
     }
@@ -138,7 +139,7 @@ namespace emp {
     });
 
     // Map Elites does not have a concept of neighbors.
-    world.SetGetNeighborFun( [](size_t id) { emp_assert(false); return id; });
+    world.SetGetNeighborFun( [](WorldPosition pos) { emp_assert(false); return pos; });
 
     // Birth is effectively the same as inject.
     world.SetAddBirthFun( [&world,traits,trait_counts](Ptr<ORG> new_org, size_t parent_id) {
@@ -327,7 +328,7 @@ namespace emp {
 
     // Diverse Elites does not have a concept of neighbors.
     // @CAO Or should we return closest individual, which we already save?
-    world.SetGetNeighborFun( [](size_t id) { emp_assert(false); return id; });
+    world.SetGetNeighborFun( [](WorldPosition pos) { emp_assert(false); return pos; });
 
     // Birth is effectively the same as inject.
     world.SetAddBirthFun( [&world, traits, world_size, info_ptr](Ptr<ORG> new_org, size_t parent_id) {
