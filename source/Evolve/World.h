@@ -638,7 +638,7 @@ namespace emp {
     void Inject(const genome_t & mem, size_t copy_count=1);
 
     /// Inject an organism at a specific position.
-    void InjectAt(const genome_t & mem, const size_t pos);
+    void InjectAt(const genome_t & mem, const WorldPosition pos);
 
     /// Inject a random organism (constructor must facilitate!)
     template <typename... ARGS> void InjectRandomOrg(ARGS &&... args);
@@ -742,8 +742,8 @@ namespace emp {
 
   template <typename ORG>
   void World<ORG>::AddOrgAt(Ptr<ORG> new_org, WorldPosition pos, Ptr<genotype_t> p_genotype) {
-    emp_assert(new_org);    // The new organism must exist.
-    emp_assert(pos.IsValid());     // Position must be legal.
+    emp_assert(new_org);         // The new organism must exist.
+    emp_assert(pos.IsValid());   // Position must be legal.
 
     RemoveOrgAt(pos);                         // Clear out any old org.
     const size_t index = pos.GetIndex();
@@ -770,19 +770,19 @@ namespace emp {
   void World<ORG>::RemoveOrgAt(WorldPosition pos) {
     size_t id = pos.GetIndex(); // Identify specific index.
     pop_t & cur_pop = pops[pos.GetPopID()];
-    if (!cur_pop[id]) return;                      // Nothing to remove!
-    if (pos.IsActive()) on_death_sig.Trigger(id);  // If active, signal that org is about to die.
-    cur_pop[id].Delete();                          // Delete the organism...
-    cur_pop[id] = nullptr;                         // ...and reset the pointer to null
+    if (id < cur_pop.size() || !cur_pop[id]) return; // Nothing to remove!
+    if (pos.IsActive()) on_death_sig.Trigger(id);    // If active, signal that org is about to die.
+    cur_pop[id].Delete();                            // Delete the organism...
+    cur_pop[id] = nullptr;                           // ...and reset the pointer to null
 
     if (pos.IsActive()) {
-      --num_orgs;                                  // Track one fewer organisms in the population
-      if (cache_on) ClearCache(id);                // Delete any cached info about this organism
-      systematics.RemoveOrg( genotypes[id] );      // Notify systematics about organism removal
-      genotypes[id] = nullptr;                     // No longer track a genotype at this position
+      --num_orgs;                                    // Track one fewer organisms in the population
+      if (cache_on) ClearCache(id);                  // Delete any cached info about this organism
+      systematics.RemoveOrg( genotypes[id] );        // Notify systematics about organism removal
+      genotypes[id] = nullptr;                       // No longer track a genotype at this position
     } else {
-      systematics.RemoveOrg( next_genotypes[id] ); // Notify systematics about organism removal
-      next_genotypes[id] = nullptr;                // No longer track a genotype at this position
+      systematics.RemoveOrg( next_genotypes[id] );   // Notify systematics about organism removal
+      next_genotypes[id] = nullptr;                  // No longer track a genotype at this position
     }
   }
 
@@ -1048,15 +1048,13 @@ namespace emp {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       inject_ready_sig.Trigger(*new_org);
       const WorldPosition pos = fun_find_inject_pos(new_org);
-      AddOrgAt(new_org, pos);
 
-      //SetupOrg(*new_org, &callbacks, pos);
-
-      if (pos.IsActive()) {
-        // Organism is in the population!  Trigger assicated signal.
-        org_placement_sig.Trigger(pos.GetIndex());
-      }
-      else if (!pos.IsValid()) {
+      if (pos.IsValid()) {
+        AddOrgAt(new_org, pos);
+        //SetupOrg(*new_org, &callbacks, pos);
+        // If new organism is in the active population, trigger associated signal.
+        if (pos.IsActive()) { org_placement_sig.Trigger(pos.GetIndex()); }
+      } else {
         // Organism failed to be placed in the population.  Delete it.
         new_org.Delete();
       }    
@@ -1064,11 +1062,12 @@ namespace emp {
   }
 
   template <typename ORG>
-  void World<ORG>::InjectAt(const genome_t & mem, const size_t pos) {
+  void World<ORG>::InjectAt(const genome_t & mem, const WorldPosition pos) {
+    emp_assert(pos.IsValid());
     Ptr<ORG> new_org = NewPtr<ORG>(mem);
     inject_ready_sig.Trigger(*new_org);
     AddOrgAt(new_org, pos);
-    org_placement_sig.Trigger(pos);
+    org_placement_sig.Trigger(pos.GetIndex());
     // SetupOrg(*new_org, &callbacks, pos);
   }
 
@@ -1079,14 +1078,13 @@ namespace emp {
     Ptr<ORG> new_org = NewPtr<ORG>(*random_ptr, std::forward<ARGS>(args)...);
     inject_ready_sig.Trigger(*new_org);
     const WorldPosition pos = fun_find_inject_pos(new_org);
-    AddOrgAt(new_org, pos);
-    // SetupOrg(*new_org, &callbacks, pos);
 
-    if (pos.IsActive()) {
-      // Organism is in the population!  Trigger assicated signal.
-      org_placement_sig.Trigger(pos.GetIndex());
-    }
-    else if (!pos.IsValid()) {
+    if (pos.IsValid()) {
+      AddOrgAt(new_org, pos);
+      // SetupOrg(*new_org, &callbacks, pos);
+      // If new organism is in the active population, trigger associated signal.
+      if (pos.IsActive()) { org_placement_sig.Trigger(pos.GetIndex()); }
+    } else {
       // Organism failed to be placed in the population.  Delete it.
       new_org.Delete();
     }    
@@ -1099,16 +1097,17 @@ namespace emp {
     Ptr<ORG> new_org = NewPtr<ORG>(mem);
     offspring_ready_sig.Trigger(*new_org);
     const WorldPosition pos = fun_find_birth_pos(new_org, parent_pos);
-    AddOrgAt(new_org, pos, genotypes[parent_pos]);
 
-    if (pos.IsActive()) {
-      // If organism was placed right into the active population, trigger placement signal.
-      org_placement_sig.Trigger(pos.GetIndex());
-    } else if (!pos.IsValid()) {
+    if (pos.IsValid()) {
+      AddOrgAt(new_org, pos, genotypes[parent_pos]);
+      // SetupOrg(*new_org, &callbacks, pos);
+      // If new organism is in the active population, trigger associated signal.
+      if (pos.IsActive()) { org_placement_sig.Trigger(pos.GetIndex()); }
+    } else {
       // Organism failed to be placed in the population.  Delete it.
       new_org.Delete();
-    }
-    // SetupOrg(*new_org, &callbacks, pos);
+    }    
+
     return pos;
   }
 
@@ -1120,16 +1119,16 @@ namespace emp {
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       offspring_ready_sig.Trigger(*new_org);
       const WorldPosition pos = fun_find_birth_pos(new_org, parent_pos);
-      AddOrgAt(new_org, pos, genotypes[parent_pos]);
-      
-      if (pos.IsActive()) {
-        // If organism was placed right into the active population, trigger placement signal.
-        org_placement_sig.Trigger(pos.GetIndex());
-      } else if (!pos.IsValid()) {
+
+      if (pos.IsValid()) {
+        AddOrgAt(new_org, pos, genotypes[parent_pos]);
+        // SetupOrg(*new_org, &callbacks, pos);
+        // If new organism is in the active population, trigger associated signal.
+        if (pos.IsActive()) { org_placement_sig.Trigger(pos.GetIndex()); }
+      } else {
         // Organism failed to be placed in the population.  Delete it.
         new_org.Delete();
-      }
-      // SetupOrg(*new_org, &callbacks, pos);
+      }    
     }
   }
 
