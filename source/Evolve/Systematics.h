@@ -11,9 +11,11 @@
  *        If we delete all of their descendants they should automaticaly be deleted.
  *  @todo We should provide an option to back up systematics data to a file so that it doesn't all
  *        need to be kept in memory, especially if we're only doing post-analysis.
- *  @todo We should have a systematics interface that will convert organisms into a different
- *        (internal) type to track.  This would allow us to have an arbitrary number of systematics
- *        trackers in world, all of which take an organism, but store different types of data.
+ *  @todo This inheritance system makes adding new systematics-related data tracking kind of a pain.
+ *        Over time, this will probably become a maintainability problem. We can probably make the
+ *        whole inheritance thing go away through judicious use of signals.
+ * @todo This does not currently handle situations where organisms change locations during their 
+ *       lifetimes gracefully.
  */
 
 

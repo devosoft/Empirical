@@ -1,3 +1,18 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2018
+ *
+ *  @file  Resource.h
+ *  @brief Implement resource-based selection.
+ *
+ *
+ *  @todo Ultimately, we probably want a much more full-featured resource system.
+ *        This one works for Eco-EA and could be the basis for something Avida-like
+ *        but lacks a lot of features for Artificial Life systems.
+ */
+
+
 #ifndef EMP_EVO_RESOURCE_H
 #define EMP_EVO_RESOURCE_H
 
