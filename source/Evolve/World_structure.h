@@ -241,7 +241,7 @@ namespace emp {
         }
         if (cur_dist < distance[id2]) {
           distance[id2] = cur_dist;
-          nearest_id[id2] = id2;          
+          nearest_id[id2] = refresh_id;          
         }
       }
     }
@@ -267,12 +267,10 @@ namespace emp {
     /// and kill the one with the lower fitness.
     size_t FindKill() {
       if (!is_setup) Setup();  // The first time we run out of space and need to kill, setup structure!
-      if (distance.size() == 0) return ID_NONE;
-      size_t min_id = 0;
-      double min_dist = distance[0];
-      for (size_t dist_id = 1; dist_id < distance.size(); dist_id++) {
-        if (distance[dist_id] < min_dist) { min_id = dist_id; min_dist = distance[dist_id]; }
-      }
+
+      emp_assert(distance.size() > 0);  // After setup, we should always have distances stored.
+
+      const size_t min_id = FindMinIndex(distance);
       if (world.CalcFitnessID(min_id) < world.CalcFitnessID(nearest_id[min_id])) return min_id;
       else return nearest_id[min_id];
     }
@@ -293,6 +291,24 @@ namespace emp {
         if (nearest_id[id] == pos) Refresh(id);
       }
       Refresh(pos);
+    }
+
+    /// A debug function to make sure the internal state is all valid.
+    bool OK() {
+      if (!dist_fun) return false; // Dist fun should be initialized during construction.
+
+      // These tests only matter BEFORE Setup() is run.
+      if (!is_setup) {
+        if (nearest_id.size() != 0) return false;
+        if (distance.size() != 0) return false;
+      }
+ 
+      // Tests for AFTER Setup() is run.
+      else {
+        if (nearest_id.size() != world.GetSize()) return false;
+        if (distance.size() != world.GetSize()) return false;
+      }
+      return true;
     }
   };
 
@@ -323,6 +339,7 @@ namespace emp {
     // ensure placement.
     world.SetAddInjectFun( [&world, traits, world_size, info_ptr](Ptr<ORG> new_org) {
       size_t pos = info_ptr->GetBirthPos(world_size);
+      std::cout << "Ping!" << std::endl;
       return WorldPosition(pos);
     });
 
