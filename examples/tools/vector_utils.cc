@@ -17,7 +17,8 @@ int main()
   
   emp::Print(v);  std::cout << std::endl;
 
-  std::cout << "Min index = " << emp::MinIndex(v) << std::endl;
+  std::cout << "Min index = " << emp::FindMinIndex(v) << std::endl;
+  std::cout << "Max index = " << emp::FindMaxIndex(v) << std::endl;
 
   emp::Heapify(v);
 
@@ -29,9 +30,13 @@ int main()
 
   std::cout << "\nPost Extract-Max:\n";
   emp::Print(v);  std::cout << std::endl;
+  std::cout << "Min index = " << emp::FindMinIndex(v) << std::endl;
+  std::cout << "Max index = " << emp::FindMaxIndex(v) << std::endl;
   
   emp::HeapInsert(v, 11);
 
   std::cout << "\nPost Insert(11):\n";
   emp::Print(v);  std::cout << std::endl;
+  std::cout << "Min index = " << emp::FindMinIndex(v) << std::endl;
+  std::cout << "Max index = " << emp::FindMaxIndex(v) << std::endl;
 }
