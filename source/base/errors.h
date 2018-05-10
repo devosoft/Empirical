@@ -44,6 +44,11 @@
 #include <sstream>
 #include <string>
 
+/// If we are in emscripten, make sure to include the header.
+#ifdef EMSCRIPTEN
+#include <emscripten.h>
+#endif
+
 namespace emp {
 
   /// Information about an exception that has occured.

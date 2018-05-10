@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -28,7 +28,7 @@ int main()
   std::cout << "Ping!" << std::endl;
 
   emp::Random random;
-  emp::vector<int> count(10,0);
+  emp::vector<int> count((size_t)10,(int)0);
   for (size_t i = 0; i < 45000; i++) {
     size_t id = test_imap.Index(random.GetDouble(0,test_imap.GetWeight()));
     count[id]++;

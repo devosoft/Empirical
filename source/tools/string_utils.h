@@ -459,7 +459,7 @@ namespace emp {
   // The next functions are not efficient, but they will take any number of inputs and
   // dynamically convert them all into a single, concatanated strings or stringstreams.
 
-  namespace {
+  namespace internal {
     inline void append_sstream(std::stringstream & ss) { (void) ss; }
 
     template <typename TYPE, typename... OTHER_TYPES>
@@ -509,7 +509,7 @@ namespace emp {
   /// any normal (POD) data type, container, or anything that can be passed into a stringstream.
   template <typename... ALL_TYPES>
   inline std::string to_string(ALL_TYPES &&... all_values) {
-    return to_string_impl(true, std::forward<ALL_TYPES>(all_values)...);
+    return internal::to_string_impl(true, std::forward<ALL_TYPES>(all_values)...);
   }
 
   /// This function tries to convert a string into any type you're looking for...  You just
@@ -523,7 +523,7 @@ namespace emp {
     return out_val;
   }
 
-  namespace {
+  namespace internal {
     static inline void _from_string(std::stringstream &) { ; }
 
     template <typename T, typename... Ts>
@@ -538,7 +538,7 @@ namespace emp {
   inline void from_string(const std::string & str, Ts &... args) {
     std::stringstream ss;
     ss << str;
-    _from_string(ss, args...);
+    internal::_from_string(ss, args...);
   }
 
   /// The from_strings() function takes a vector of strings and convets them into a vector

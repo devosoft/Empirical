@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2018
  *
  *  @file set_utils.h
  *  @brief Tools to save and load data from classes.
@@ -68,7 +68,7 @@ namespace emp {
     return result;
   }
 
-  /// Compute the set difference of @param s1 and @param s2 (elements that are in S1 but no S2)
+  /// Compute the set difference of @param s1 and @param s2 (elements that are in S1 but not S2)
   template <typename T>
   std::set<T> difference(std::set<T> & s1, emp::vector<T> s2) {
     // Based on PierreBdR's answer to https://stackoverflow.com/questions/283977/c-stl-set-difference

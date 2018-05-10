@@ -151,6 +151,10 @@ namespace emp {
     /// Assume that the size of the bit_set has already been adjusted to be the size of the one
     /// being copied and only the fields need to be copied over.
     void RawCopy(const Ptr<field_t> in_set) {
+      emp_assert(in_set.IsNull() == false);
+      emp_assert(bit_set.DebugIsArray() && in_set.DebugIsArray());
+      emp_assert(bit_set.DebugGetArrayBytes() == in_set.DebugGetArrayBytes(),
+                 bit_set.DebugGetArrayBytes(), in_set.DebugGetArrayBytes());
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
     }
@@ -222,12 +226,16 @@ namespace emp {
 
     /// Copy constructor of existing bit field.
     BitVector(const BitVector & in_set) : num_bits(in_set.num_bits), bit_set(nullptr) {
+      emp_assert(in_set.bit_set.IsNull() || in_set.bit_set.DebugIsArray());
+      emp_assert(in_set.bit_set.OK());
       if (num_bits) bit_set = NewArrayPtr<field_t>(NumFields());
       RawCopy(in_set.bit_set);
     }
 
     /// Move constructor of existing bit field.
     BitVector(BitVector && in_set) : num_bits(in_set.num_bits), bit_set(in_set.bit_set) {
+      emp_assert(bit_set == nullptr || bit_set.DebugIsArray());
+      emp_assert(bit_set.OK());
       in_set.bit_set = nullptr;
     }
 
@@ -241,6 +249,9 @@ namespace emp {
 
     /// Assignment operator.
     BitVector & operator=(const BitVector & in_set) {
+      emp_assert(in_set.bit_set == nullptr || in_set.bit_set.DebugIsArray());
+      emp_assert(in_set.bit_set != nullptr || in_set.num_bits == 0);
+      emp_assert(in_set.bit_set.OK());
       if (&in_set == this) return *this;
       const size_t in_num_fields = in_set.NumFields();
       const size_t prev_num_fields = NumFields();
@@ -248,7 +259,7 @@ namespace emp {
 
       if (in_num_fields != prev_num_fields) {
         if (bit_set) bit_set.DeleteArray();
-	      if (num_bits) bit_set = NewArrayPtr<field_t>(NumFields());
+	      if (num_bits) bit_set = NewArrayPtr<field_t>(in_num_fields);
         else bit_set = nullptr;
       }
 
@@ -259,11 +270,11 @@ namespace emp {
 
     /// Move operator.
     BitVector & operator=(BitVector && in_set) {
-      if (&in_set == this) return *this;
-      if (bit_set) bit_set.DeleteArray();
-      num_bits = in_set.num_bits;
-      bit_set = in_set.bit_set;
-      in_set.bit_set = nullptr;
+      emp_assert(&in_set != this);        // in_set is an r-value, so this shouldn't be possible...
+      if (bit_set) bit_set.DeleteArray(); // If we already had a bitset, get rid of it.
+      num_bits = in_set.num_bits;         // Update the number of bits...
+      bit_set = in_set.bit_set;           // And steal the old memory for what those bits are.
+      in_set.bit_set = nullptr;           // Prepare in_set for deletion without deallocating.
 
       return *this;
     }

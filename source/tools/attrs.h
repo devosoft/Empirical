@@ -360,10 +360,10 @@ namespace emp {
     constexpr NAME##Value(const T& value) : value(value) {}                    \
     constexpr NAME##Value(T&& value) : value(std::move(value)) {}              \
     template <typename U = T>                                                  \
-    constexpr NAME##Value(const NAME##Value<U>& other) : value(other.value) {} \
+    constexpr NAME##Value(const NAME##Value<U>& other) : value(*other) {}      \
     template <typename U = T>                                                  \
     constexpr NAME##Value(NAME##Value<U>&& other)                              \
-      : value(std::move(other.value)) {}                                       \
+      : value(*std::move(other)) {}                                            \
     constexpr NAME##Value& operator=(const T& value) {                         \
       /* Don't check for self assignment, and assume that value will handle it \
        * correcly */                                                           \
@@ -439,22 +439,6 @@ namespace emp {
   template <class T>                                                           \
   std::ostream& operator<<(std::ostream& out, const NAME##Value<T>& value) {   \
     return out << #NAME "(" << value.Get() << ")";                             \
-  }                                                                            \
-  template <typename U, typename T>                                            \
-  constexpr auto operator+(NAME##Value<U>& from, T&& to) {                     \
-    return Merge(from, std::forward<T>(to));                                   \
-  }                                                                            \
-  template <typename U, typename T>                                            \
-  constexpr auto operator+(const NAME##Value<U>& from, T&& to) {               \
-    return Merge(from, std::forward<T>(to));                                   \
-  }                                                                            \
-  template <typename U, typename T>                                            \
-  constexpr auto operator+(NAME##Value<U>&& from, T&& to) {                    \
-    return Merge(std::move(from), std::forward<T>(to));                        \
-  }                                                                            \
-  template <typename U, typename T>                                            \
-  constexpr auto operator+(const NAME##Value<U>&& from, T&& to) {              \
-    return Merge(std::move(from), std::forward<T>(to));                        \
   }
 
     namespace __attrs_impl {
@@ -685,7 +669,7 @@ namespace emp {
             std::forward<U0>(arg), std::forward<U>(args)...) {}
 
       private:
-      constexpr static struct {
+      constexpr static struct __impl_AssignOp_asssigner_t {
         template <typename T1, typename T2>
         constexpr void operator()(T1& to, T2&& from) const {
           to = std::forward<T2>(from);
@@ -919,6 +903,10 @@ namespace emp {
       }
     };
 
+    template <typename... T>
+    constexpr typename Attrs<T...>::__impl_AssignOp_asssigner_t
+      Attrs<T...>::__impl_AssignOp_asssigner;
+
     ///  An alternative syntax for creating attribute packs. Takes any number
     ///  of attributes and returns a pack containing each of those attributes.
     template <class... T>
@@ -945,26 +933,6 @@ namespace emp {
                               std::forward<U>(packs)...)) {
       return MergeReduce(Attrs<>{}, __impl_attrs_merge::attrs_merge,
                          std::forward<U>(packs)...);
-    }
-
-    template <typename... U, typename T>
-    constexpr auto operator+(Attrs<U...>& from, T&& to) {
-      return Merge(from, std::forward<T>(to));
-    }
-
-    template <typename... U, typename T>
-    constexpr auto operator+(const Attrs<U...>& from, T&& to) {
-      return Merge(from, std::forward<T>(to));
-    }
-
-    template <typename... U, typename T>
-    constexpr auto operator+(Attrs<U...>&& from, T&& to) {
-      return Merge(std::move(from), std::forward<T>(to));
-    }
-
-    template <typename... U, typename T>
-    constexpr auto operator+(const Attrs<U...>&& from, T&& to) {
-      return Merge(std::move(from), std::forward<T>(to));
     }
 
     namespace __attrs_impl {

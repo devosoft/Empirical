@@ -49,7 +49,13 @@ namespace web {
           }, style.c_str());
       }
       EM_ASM({ emp_i.ctx.stroke(); });
+    }
 
+    /// Helper function to set the stroke status.
+    void LineWidth(double line_width=1.0) {
+      EM_ASM_ARGS({
+          emp_i.ctx.lineWidth = $0;
+        }, line_width);
     }
 
   public:

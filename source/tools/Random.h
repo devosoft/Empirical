@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  Random.h
  *  @brief A versatile and non-patterned pseudo-random-number generator.
@@ -155,7 +155,7 @@ namespace emp {
      * @param max The upper bound for the random numbers (will never be returned).
      **/
     inline double GetDouble(const double max) {
-      emp_assert(max <= (double) _RAND_MBIG, max);  // Precision will be too low past this point...
+      // emp_assert(max <= (double) _RAND_MBIG, max, (double) _RAND_MBIG);  // Precision will be too low past this point...
       return GetDouble() * max;
     }
 

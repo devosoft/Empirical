@@ -304,7 +304,7 @@ namespace emp {
   template <typename ORG_INFO>
   int Systematics<ORG_INFO>::GetMRCADepth() const {
     GetMRCA();
-    if (mrca) return mrca->GetDepth();
+    if (mrca) return (int) mrca->GetDepth();
     return -1;
   }
 
@@ -403,7 +403,7 @@ namespace emp {
   // Calculate the genetic diversity of the population.
   template <typename ORG_INFO>
   double Systematics<ORG_INFO>::CalcDiversity() {
-    return emp::Entropy(active_taxa, [](Ptr<taxon_t> x){ return x->GetNumOrgs(); }, org_count);
+    return emp::Entropy(active_taxa, [](Ptr<taxon_t> x){ return x->GetNumOrgs(); }, (double) org_count);
   }
 
 }

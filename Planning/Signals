@@ -18,7 +18,7 @@ of actions, which themselves are just function points.  Both signals and
 actions are templated so that specific arguments can be passed if desired.
 
 If a signal is triggered and no actions are associated with it, only a single
-test is done, so this should be faster than the long list of if-statments that
+test is done, so this should be faster than the long list of if-statements that
 were previously used to allow dynamic configurations.
 
 Since each action goes through a function pointer, there is an extra level of
@@ -31,18 +31,18 @@ The challenge lies in the questions:
 
 For Q1, I see three options:
 1a: Put signals statically affected classes. (e.g., in emp::Organism)
-    Pros: Low memory footpring, easy to access.
+    Pros: Low memory footprint, easy to access.
     Cons: Any signal MUST affect all objects within the class.
 1b: Put signals into each object (e.g., in each individual organism)
     Pros: Very flexible.
     Cons: Annoying to initialize; takes up more space.
-1c: Put signals into continer objects (e.g., in Population)
+1c: Put signals into container objects (e.g., in Population)
     Pros: Selectively flexible
     Const: internal object need a way to link back to container; possibly pointer.
 
 
 The answer to Q1 heavily impacts Q2.  If we go with 1a, then we can simply name
-singals like "org_repro" or "org_mutate" and there's only one option.  If we go
+signals like "org_repro" or "org_mutate" and there's only one option.  If we go
 with 1b, we need a unique name for every signal (or some dynamic way of setting
 them up, which limits the power of signals.  In the end, both 1a and 1b have
 sufficiently large negatives that 1c is probably the way to go.

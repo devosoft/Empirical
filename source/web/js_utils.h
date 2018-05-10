@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  js_utils.h
  *  @brief Tools for passing data between C++ and Javascript.
@@ -218,7 +218,7 @@ namespace emp {
   // This version of the function handles nested arrays with recursive calls
   // until a non-array type is found.
   template<std::size_t SIZE1, std::size_t SIZE2, typename T>
-  void pass_array_to_javascript(std::array<std::array<T, SIZE1>, SIZE2> values,
+  void pass_array_to_javascript(emp::array<emp::array<T, SIZE1>, SIZE2> values,
 				emp::vector<int> recursive_el = emp::vector<int>()) {
 
     // Initialize if this is the first call to this function
@@ -296,7 +296,7 @@ namespace emp {
   // Don't worry about the recurse argument - it's for handling nested arrays
   // internally
   template <std::size_t SIZE, typename T>
-  void pass_array_to_cpp(std::array<T, SIZE> & arr, bool recurse = false) {
+  void pass_array_to_cpp(emp::array<T, SIZE> & arr, bool recurse = false) {
 
     //Figure out type stuff
     std::map<std::string, std::string> map_type_names = get_type_to_string_map();
@@ -397,7 +397,7 @@ namespace emp {
   // Chars aren't one of the types supported by setValue, but by treating them
   // as strings in Javascript we can pass them out to a C++ array
   template <std::size_t SIZE>
-  void pass_array_to_cpp(std::array<char, SIZE> & arr, bool recurse = false) {
+  void pass_array_to_cpp(emp::array<char, SIZE> & arr, bool recurse = false) {
 
     emp_assert(arr.size() == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
 
@@ -446,7 +446,7 @@ namespace emp {
 
   // We can handle strings in a similar way
   template <std::size_t SIZE>
-  void pass_array_to_cpp(std::array<std::string, SIZE> & arr, bool recurse = false) {
+  void pass_array_to_cpp(emp::array<std::string, SIZE> & arr, bool recurse = false) {
 
     emp_assert(arr.size() == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
 
@@ -515,7 +515,7 @@ namespace emp {
 
   // We can handle nested arrays through recursive calls on chunks of them
   template <std::size_t SIZE, std::size_t SIZE2, typename T>
-  void pass_array_to_cpp(std::array<std::array<T, SIZE2>, SIZE> & arr, bool recurse = false) {
+  void pass_array_to_cpp(emp::array<emp::array<T, SIZE2>, SIZE> & arr, bool recurse = false) {
 
     emp_assert(arr.size() == EM_ASM_INT_V({return emp_i.__outgoing_array.length}));
 
