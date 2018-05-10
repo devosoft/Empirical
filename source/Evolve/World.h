@@ -814,7 +814,7 @@ namespace emp {
 
     if (synchronous_gen) {
       // Append births into the next population.
-      fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
         emp_assert(new_org);      // New organism must exist.
         return WorldPosition(next_pop.size(), 1);   // Append it to the NEXT population
       };
@@ -822,7 +822,7 @@ namespace emp {
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always append to current population.
-      fun_find_birth_pos = [this](Ptr<ORG> new_org, size_t parent_id) {
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
         return WorldPosition(pop.size());
       };
       SetAttribute("SynchronousGen", "False");
