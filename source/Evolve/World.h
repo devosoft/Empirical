@@ -598,6 +598,15 @@ namespace emp {
     /// Clear all of the orgs and reset stats.
     void Reset() { Clear(); update = 0; }
 
+    /// Swap the positions of two organisms.
+    void Swap(WorldPosition pos1, WorldPosition pos2) {
+      const bool active1 = pos1.IsActive();  const bool active2 = pos2.IsActive();
+      const size_t id1 = pos1.GetIndex();    const size_t id2 = pos2.GetIndex();
+      Ptr<ORG> & ptr1 = active1 ? pop[id1] : next_pop[id1];
+      Ptr<ORG> & ptr2 = active2 ? pop[id2] : next_pop[id2];
+      std::swap(ptr1, ptr2);
+    }
+
     /// Change the size of the world.  If the new size is smaller than the old, remove any
     /// organisms outside the new range.  If larger, new positions are empty.
     void Resize(size_t new_size) {
@@ -1176,7 +1185,13 @@ namespace emp {
       emp_assert(false, "Not implemented yet.");
     } else {
       // If we are supposed to keep only random organisms, shuffle the beginning into place!
-      if (choose_random) emp::Shuffle<Ptr<ORG>>(*random_ptr, pop, new_size);
+      if (choose_random) {
+        for (size_t to = 0; to < new_size; to++) {
+          const size_t from = random_ptr->GetUInt(to, pop.size());
+          if (from == to) continue;
+          Swap(to, from);
+        }
+      }
 
       // Clear out all of the organisms we are removing and shrink the population.
       for (size_t i = new_size; i < pop.size(); ++i) RemoveOrgAt(i);
