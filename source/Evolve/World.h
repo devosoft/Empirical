@@ -98,6 +98,7 @@ namespace emp {
     using this_t = World<ORG>;                 ///< Resolved type of this templated class.
     using org_t = ORG;                         ///< Type of organisms in this world.
     using value_type = org_t;                  ///< Identical to org_t; vector compatibility.
+    using pop_t = emp::vector<Ptr<ORG>>;       ///< Type for whole populations.
     using iterator_t = World_iterator<this_t>; ///< Type for this world's iterators.
 
     using genome_t = typename emp::find_genome_t<ORG>;  ///< Type of underlying genomes.
@@ -132,12 +133,12 @@ namespace emp {
     size_t update;                  ///< How many times has Update() been called?
     Ptr<Random> random_ptr;         ///< @brief Random object to use.
     bool random_owner;              ///< Did we create our own random number generator?
-    emp::vector<Ptr<ORG>> pop;      ///< All of the spots in the population.
-    emp::vector<Ptr<ORG>> next_pop; ///< Population being setup for next generation.
+    emp::array<pop_t,2> pops;       ///< The set of active [0] and "next" [1] organisms in population.
+    pop_t & pop;                    ///< A shortcut to pops[0].
     size_t num_orgs;                ///< How many organisms are actually in the population.
     emp::vector<double> fit_cache;  ///< vector size == 0 when not caching; uncached values == 0.
     emp::vector<Ptr<genotype_t>> genotypes;      ///< Genotypes for the corresponding orgs.
-    emp::vector<Ptr<genotype_t>> next_genotypes; ///< Genotypes for corresponding orgs in next_pop.
+    emp::vector<Ptr<genotype_t>> next_genotypes; ///< Genotypes for corresponding orgs in next pop.
 
     // Configuration settings
     std::string name;               ///< Name of this world (for use in configuration.)
@@ -194,8 +195,8 @@ namespace emp {
     /// If no name is provided, the world remains nameless.
     /// If no random number generator is provided, gen_random determines if one shold be created.
     World(std::string _name="", bool gen_random=true)
-      : update(0), random_ptr(nullptr), random_owner(false), pop(), next_pop(), num_orgs(0), fit_cache()
-      , genotypes(), next_genotypes()
+      : update(0), random_ptr(nullptr), random_owner(false), pops(), pop(pops[0]), num_orgs(0)
+      , fit_cache(), genotypes(), next_genotypes()
       , name(_name), cache_on(false), pop_sizes(1,0), phenotypes(), files()
       , is_synchronous(false), is_space_structured(false), is_pheno_structured(false)
       , data_node_fitness(nullptr)
@@ -248,7 +249,7 @@ namespace emp {
     size_t GetHeight() const { return pop_sizes[1]; }
 
     /// Get the full population to analyze externally.
-    const emp::vector<Ptr<ORG>> & GetFullPop() const { return pop; }
+    const pop_t & GetFullPop() const { return pop; }
 
     /// What phenotypic traits is the population tracking?
     const emp::TraitSet<ORG> & GetPhenotypes() const { return phenotypes; }
@@ -266,9 +267,9 @@ namespace emp {
 
     /// Does the specified cell ID have an organism in it?
     bool IsOccupied(WorldPosition pos) const {
-      size_t id = pos.GetIndex();
-      if (pos.IsActive()) return (id < pop.size()) ? pop[id] : false;
-      return (id < next_pop.size()) ? next_pop[id] : false;
+      const size_t org_id = pos.GetIndex();
+      const pop_t & cur_pop = pops[pos.GetPopID()];
+      return (org_id < cur_pop.size()) ? cur_pop[org_id] : false;
     }
 
     /// Are we currently caching fitness values?
@@ -325,9 +326,9 @@ namespace emp {
     /// Retrieve a reference to the organsim as the specified position in the NEXT population.
     /// Will trip assert if cell is not occupied.
     ORG & GetNextOrg(size_t id) {
-      emp_assert(id < next_pop.size());         // Next pop must be large enough.
-      emp_assert(next_pop[id] != nullptr, id);  // Should not index to a null organism!
-      return *(next_pop[id]);
+      emp_assert(id < pops[1].size());         // Next pop must be large enough.
+      emp_assert(pops[1][id] != nullptr, id);  // Should not index to a null organism!
+      return *(pops[1][id]);
     }
 
     /// Retrieve the genome corresponding to a specified organism.
@@ -600,11 +601,9 @@ namespace emp {
 
     /// Swap the positions of two organisms.
     void Swap(WorldPosition pos1, WorldPosition pos2) {
-      const bool active1 = pos1.IsActive();  const bool active2 = pos2.IsActive();
-      const size_t id1 = pos1.GetIndex();    const size_t id2 = pos2.GetIndex();
-      Ptr<ORG> & ptr1 = active1 ? pop[id1] : next_pop[id1];
-      Ptr<ORG> & ptr2 = active2 ? pop[id2] : next_pop[id2];
-      std::swap(ptr1, ptr2);
+      const size_t pop1 = pos1.GetPopID();  const size_t pop2 = pos2.GetPopID();
+      const size_t id1 = pos1.GetIndex();   const size_t id2 = pos2.GetIndex();
+      std::swap(pops[pop1][id1], pops[pop2][id2]);
     }
 
     /// Change the size of the world.  If the new size is smaller than the old, remove any
@@ -748,27 +747,20 @@ namespace emp {
 
     RemoveOrgAt(pos);                         // Clear out any old org.
     const size_t index = pos.GetIndex();
+    pop_t & cur_pop = pops[pos.GetPopID()];
 
     // Determine new organism's genotype.
     Ptr<genotype_t> new_genotype = systematics.AddOrg(GetGenome(*new_org), p_genotype);
 
-    // Should we place this organisms in the active population?
-    if (pos.IsActive()) {
-      if (pop.size() <= index) pop.resize(index+1, nullptr);  // Make sure we have room.
-      pop[index] = new_org;                                   // Place new org.
-      ++num_orgs;                                             // Track number of orgs.
+    if (cur_pop.size() <= index) cur_pop.resize(index+1, nullptr);   // Make sure we have room.
+    cur_pop[index] = new_org;                                        // Place new org.
 
-      // Track the new genotype.
+    // Track org count and the new genotype
+    if (pos.IsActive()) {
+      ++num_orgs;                                                          // Track number of orgs.
       if (genotypes.size() <= index) genotypes.resize(index+1, nullptr);   // Make sure we fit genotypes.
       genotypes[index] = new_genotype;
-    }
-
-    // ...or should the organism go in the next population?
-    else {
-      if (next_pop.size() <= index) next_pop.resize(index+1, nullptr);   // Make sure we have room.
-      next_pop[index] = new_org;                                         // Place new org.
-
-      // Track the new genotype.
+    } else {
       if (next_genotypes.size() <= index) next_genotypes.resize(index+1, nullptr);  // Make sure we fit genotypes.
       next_genotypes[index] = new_genotype;
     }
@@ -777,20 +769,19 @@ namespace emp {
   template<typename ORG>
   void World<ORG>::RemoveOrgAt(WorldPosition pos) {
     size_t id = pos.GetIndex(); // Identify specific index.
+    pop_t & cur_pop = pops[pos.GetPopID()];
+    if (!cur_pop[id]) return;                      // Nothing to remove!
+    if (pos.IsActive()) on_death_sig.Trigger(id);  // If active, signal that org is about to die.
+    cur_pop[id].Delete();                          // Delete the organism...
+    cur_pop[id] = nullptr;                         // ...and reset the pointer to null
+
     if (pos.IsActive()) {
-      if (!pop[id]) return;                   // Nothing to remove!
-      on_death_sig.Trigger(id);               // Identify that this position is about to be removed
-      pop[id].Delete();                       // Delete the organism...
-      pop[id] = nullptr;                      // ...and reset the pointer to null
-      --num_orgs;                              // Track one fewer organisms in the population
-      if (cache_on) ClearCache(id);           // Delete any cached info about this organism
-      systematics.RemoveOrg( genotypes[id] ); // Notify systematics about organism removal
-      genotypes[id] = nullptr;                // No longer track a genotype at this position
+      --num_orgs;                                  // Track one fewer organisms in the population
+      if (cache_on) ClearCache(id);                // Delete any cached info about this organism
+      systematics.RemoveOrg( genotypes[id] );      // Notify systematics about organism removal
+      genotypes[id] = nullptr;                     // No longer track a genotype at this position
     } else {
-      if (!next_pop[id]) return;                   // Nothing to remove!
-      next_pop[id].Delete();                       // Delete the organism...
-      next_pop[id] = nullptr;                      // ..and reset the pointer to null
-      systematics.RemoveOrg( next_genotypes[id] ); // Notify systematics manager about removal
+      systematics.RemoveOrg( next_genotypes[id] ); // Notify systematics about organism removal
       next_genotypes[id] = nullptr;                // No longer track a genotype at this position
     }
   }
@@ -816,7 +807,7 @@ namespace emp {
       // Append births into the next population.
       fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
         emp_assert(new_org);      // New organism must exist.
-        return WorldPosition(next_pop.size(), 1);   // Append it to the NEXT population
+        return WorldPosition(pops[1].size(), 1);   // Append it to the NEXT population
       };
 
       SetAttribute("SynchronousGen", "True");
@@ -852,7 +843,7 @@ namespace emp {
       // Append births into the next population.
       fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_id) {
         emp_assert(new_org);                        // New organism must exist.
-        return WorldPosition(next_pop.size(), 1);   // Append it to the NEXT population
+        return WorldPosition(pops[1].size(), 1);   // Append it to the NEXT population
       };
 
       SetAttribute("SynchronousGen", "True");
@@ -995,14 +986,14 @@ namespace emp {
     // 1. Send out an update signal for any external functions to trigger.
     on_update_sig.Trigger(update);
 
-    // 2. If synchronous generationsm (i.e, next_pop is not empty), move next population into
+    // 2. If synchronous generationsm (i.e, pops[1] is not empty), move next population into
     //    place as the current popoulation.
-    if (next_pop.size()) {
+    if (pops[1].size()) {
       // Clear out current pop.
       for (size_t i = 0; i < pop.size(); i++) RemoveOrgAt(i);
       pop.resize(0);
 
-      std::swap(pop, next_pop);               // Move next_pop into place.
+      std::swap(pops[0], pops[1]);            // Move next pop into place.
       std::swap(genotypes, next_genotypes);   // Move next_genotypes into place.
       next_genotypes.resize(0);               // Clear out genotype names.
 
@@ -1045,10 +1036,10 @@ namespace emp {
   // Delete all organisms.
   template<typename ORG>
   void World<ORG>::Clear() {
-    for (size_t i = 0; i < pop.size(); i++) RemoveOrgAt(i);
-    for (size_t i = 0; i < next_pop.size(); i++) RemoveOrgAt(WorldPosition(i,1));
-    pop.resize(0);
-    next_pop.resize(0);
+    for (size_t pop_id = 0; pop_id < 2; pop_id++) {
+      for (size_t i = 0; i < pops[pop_id].size(); i++) RemoveOrgAt(WorldPosition(i,pop_id));
+      pops[pop_id].resize(0);
+    }
   }
 
   template <typename ORG>
