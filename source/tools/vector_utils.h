@@ -39,6 +39,22 @@ namespace emp {
     }
   }
 
+  /// Find the index with the minimal value (picks first in cases of a tie).
+  template <typename T>
+  size_t MinIndex(const T & v) {
+    emp_assert(v.size() > 0);
+    using v_type = typename T::value_type;
+    v_type min_val = v[0];
+    size_t min_index = 0;
+    for (size_t i = 1; i < v.size(); i++) {
+      if (v[i] < min_val) {
+        min_val = v[i];
+        min_index = i;
+      }
+    }
+    return min_index;
+  }
+
   /// Sum up the contents of a vector.
   template <typename T>
   T Sum(const emp::vector<T> & v) {
