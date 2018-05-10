@@ -43,53 +43,55 @@ namespace emp {
   /// Note: You are responsible for filling these in! Adding the template
   /// just gives you a place to store your data.
 
-  struct no_data {
-      using has_fitness_t = std::false_type;
-      using has_mutations_t = std::false_type;
-      using has_phen_t = std::false_type;
-  }; /// The default - an empty struct
+  namespace datastruct {
+    struct no_data {
+        using has_fitness_t = std::false_type;
+        using has_mutations_t = std::false_type;
+        using has_phen_t = std::false_type;
+    }; /// The default - an empty struct
 
-  template <typename PHEN_TYPE> 
-  struct mut_landscape_info { /// Track information related to the mutational landscape
-    /// Maps a string representing a type of mutation to a count representing 
-    /// the number of that type of mutation that occured to bring about this taxon.
-    using phen_t = PHEN_TYPE;
-    using has_phen_t = std::true_type;
-    using has_mutations_t = std::true_type;
-    using has_fitness_t = std::true_type;
-    // using has_phenotype_t = true;
+    template <typename PHEN_TYPE> 
+    struct mut_landscape_info { /// Track information related to the mutational landscape
+      /// Maps a string representing a type of mutation to a count representing 
+      /// the number of that type of mutation that occured to bring about this taxon.
+      using phen_t = PHEN_TYPE;
+      using has_phen_t = std::true_type;
+      using has_mutations_t = std::true_type;
+      using has_fitness_t = std::true_type;
+      // using has_phenotype_t = true;
 
-    std::unordered_map<std::string, int> mut_counts;
-    DataNode<double, data::Current, data::Range> fitness; /// This taxon's fitness (for assessing deleterious mutational steps)
-    PHEN_TYPE phenotype; /// This taxon's phenotype (for assessing phenotypic change)
+      std::unordered_map<std::string, int> mut_counts;
+      DataNode<double, data::Current, data::Range> fitness; /// This taxon's fitness (for assessing deleterious mutational steps)
+      PHEN_TYPE phenotype; /// This taxon's phenotype (for assessing phenotypic change)
 
-    const PHEN_TYPE & GetPhenotype() const {
-      return phenotype;
-    }
+      const PHEN_TYPE & GetPhenotype() const {
+        return phenotype;
+      }
 
-    const double GetFitness() const {
-      return fitness.GetMean();
-    }
+      const double GetFitness() const {
+        return fitness.GetMean();
+      }
 
-    void RecordMutation(std::unordered_map<std::string, int> muts) {
-      for (auto mut : muts) {
-        if (Has(mut_counts, mut.first)) {
-          mut_counts[mut.first] += mut.second;
-        } else {
-          mut_counts[mut.first] = mut.second;
+      void RecordMutation(std::unordered_map<std::string, int> muts) {
+        for (auto mut : muts) {
+          if (Has(mut_counts, mut.first)) {
+            mut_counts[mut.first] += mut.second;
+          } else {
+            mut_counts[mut.first] = mut.second;
+          }
         }
       }
-    }
 
-    void RecordFitness(double fit) {
-      fitness.Add(fit);
-    }
+      void RecordFitness(double fit) {
+        fitness.Add(fit);
+      }
 
-    void RecordPhenotype(PHEN_TYPE phen) {
-      phenotype = phen;
-    }
+      void RecordPhenotype(PHEN_TYPE phen) {
+        phenotype = phen;
+      }
 
-  };
+    };
+  }
 
   /// @brief A Taxon represents a type of organism in a phylogeny.
   /// @param ORG_INFO The information type associated with an organism, used to categorize it.
@@ -97,7 +99,7 @@ namespace emp {
   /// Genotypes are the most commonly used Taxon; in general taxa can be anything from a shared
   /// genome sequence, a phenotypic trait, or a even a position in the world (if you want to
   /// track an evolutionary pathway)
-  template <typename ORG_INFO, typename DATA_STRUCT = no_data>
+  template <typename ORG_INFO, typename DATA_STRUCT = emp::datastruct::no_data>
   class Taxon {
   protected:
     using this_t = Taxon<ORG_INFO, DATA_STRUCT>;
@@ -341,7 +343,7 @@ namespace emp {
   /// is formed, with genotypes.  If the organism's behavior/task set is used, then organisms are
   /// grouped by phenotypes.  If the organsims's position is used, the evolutionary path through
   /// space is tracked.  Any other aspect of organisms can be tracked this way as well.
-  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT = no_data>
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT = emp::datastruct::no_data>
   class Systematics : public SystematicsBase<ORG> {
   private:
     using taxon_t = Taxon<ORG_INFO, DATA_STRUCT>;

@@ -143,7 +143,7 @@ TEST_CASE("Pointer to systematics", "[evo]") {
 TEST_CASE("Test Data Struct", "[evo]")
 {
 
-  emp::Ptr<emp::Systematics<int, int, emp::mut_landscape_info<int> >> sys;
+  emp::Ptr<emp::Systematics<int, int, emp::datastruct::mut_landscape_info<int> >> sys;
   sys.New([](int & i){return i;}, true, true, true);
   auto id1 = sys->AddOrg(1, nullptr);
   id1->GetData().fitness.Add(2);
@@ -193,14 +193,14 @@ TEST_CASE("Test Data Struct", "[evo]")
 
 TEST_CASE("World systematics integration", "[evo]") {
 
-  // std::function<void(emp::Ptr<emp::Taxon<emp::vector<int>, emp::mut_landscape_info<int>>>)> setup_phenotype = [](emp::Ptr<emp::Taxon<emp::vector<int>, emp::mut_landscape_info<int>>> tax){
+  // std::function<void(emp::Ptr<emp::Taxon<emp::vector<int>, emp::datastruct::mut_landscape_info<int>>>)> setup_phenotype = [](emp::Ptr<emp::Taxon<emp::vector<int>, emp::datastruct::mut_landscape_info<int>>> tax){
   //   tax->GetData().phenotype = emp::Sum(tax->GetInfo());
   // };
 
   using systematics_t = emp::Systematics<
       emp::vector<int>, 
       emp::vector<int>, 
-      emp::mut_landscape_info< int >
+      emp::datastruct::mut_landscape_info< int >
     >;
 
 
@@ -236,7 +236,7 @@ TEST_CASE("World systematics integration", "[evo]") {
 template <typename WORLD_TYPE>
 emp::DataFile AddDominantFile(WORLD_TYPE & world){
   using mut_count_t = std::unordered_map<std::string, int>;
-  using data_t = emp::mut_landscape_info<emp::vector<double>>;
+  using data_t = emp::datastruct::mut_landscape_info<emp::vector<double>>;
   using org_t = emp::AvidaGP;
   using systematics_t = emp::Systematics<org_t, org_t, data_t>;
 
@@ -269,7 +269,7 @@ emp::DataFile AddDominantFile(WORLD_TYPE & world){
 
 TEST_CASE("Run world", "[evo]") {
   using mut_count_t = std::unordered_map<std::string, int>;
-  using data_t = emp::mut_landscape_info<emp::vector<double>>;
+  using data_t = emp::datastruct::mut_landscape_info<emp::vector<double>>;
   using org_t = emp::AvidaGP;
   using gene_systematics_t = emp::Systematics<org_t, org_t::genome_t, data_t>;
   using phen_systematics_t = emp::Systematics<org_t, emp::vector<double>, data_t>;
