@@ -18,6 +18,6 @@ TEST_CASE("OEE", "[evo]") {
     world.AddSystematics(sys_ptr);
     world.SetWellMixed(true);
 
-    emp::OEETracker<int, int> oee(sys_ptr);
+    emp::OEETracker<int, int> oee(sys_ptr, [](int org){return org;});
     world.OnUpdate([&oee](size_t ud){oee.Update(ud);});
 }
