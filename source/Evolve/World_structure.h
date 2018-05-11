@@ -331,7 +331,7 @@ namespace emp {
     world.OnWorldDestruct([info_ptr]() mutable { info_ptr.Delete(); });
 
     // Make sure to update info whenever a new org is placed into the population.
-    world.OnOrgPlacement( [info_ptr](size_t pos) mutable { info_ptr->Update(pos); } );
+    world.OnPlacement( [info_ptr](size_t pos) mutable { info_ptr->Update(pos); } );
 
     // -- Setup functions --
     // Inject into the appropriate positon based on phenotype.  Note that an inject will fail
