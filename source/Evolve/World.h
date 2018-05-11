@@ -667,8 +667,8 @@ namespace emp {
     /// Inject a random organism (constructor must facilitate!)
     template <typename... ARGS> void InjectRandomOrg(ARGS &&... args);
 
-    /// Place multiple copies of a newborn organism into the population.
-    void DoBirth(const genome_t & mem, size_t parent_pos, size_t copy_count=1);
+    /// Place one or more copies of an offspring into population; return position of last placed.
+    WorldPosition DoBirth(const genome_t & mem, size_t parent_pos, size_t copy_count=1);
 
     // Kill off organism at the specified position (same as RemoveOrgAt, but callable externally)
     void DoDeath(const size_t pos) { RemoveOrgAt(pos); }
@@ -769,15 +769,19 @@ namespace emp {
     // If new organism is going into the active population, trigger signal before doing so.
     if (pos.IsActive()) { before_placement_sig.Trigger(*new_org, pos.GetIndex()); }
 
-    RemoveOrgAt(pos);                         // Clear out any old org.
-    const size_t index = pos.GetIndex();
-    pop_t & cur_pop = pops[pos.GetPopID()];
-
     // Determine new organism's genotype.
     Ptr<genotype_t> new_genotype = systematics.AddOrg(GetGenome(*new_org), p_genotype);
 
-    if (cur_pop.size() <= index) cur_pop.resize(index+1, nullptr);   // Make sure we have room.
-    cur_pop[index] = new_org;                                        // Place new org.
+    // Clear out any old organism at this position.
+    RemoveOrgAt(pos);
+
+    // Identify population used and index into that population.
+    pop_t & cur_pop = pops[pos.GetPopID()];
+    const size_t index = pos.GetIndex();
+
+    // Make sure we have room for new organism and then put it into place.
+    if (cur_pop.size() <= index) cur_pop.resize(index+1, nullptr);
+    cur_pop[index] = new_org;
 
     // Track org count and the new genotype
     if (pos.IsActive()) {
@@ -1018,7 +1022,7 @@ namespace emp {
     //    place as the current popoulation.
     if (pops[1].size()) {
       // Trigger signals for orgs in next pop before they are moved into the active pop.
-      for (size_t i = 0; i < pop.size(); i++) {
+      for (size_t i = 0; i < pops[1].size(); i++) {
         if (!pops[1][i]) continue;
         before_placement_sig.Trigger(*pops[1][i], i);  // Trigger that org is about to be placed.
       } 
@@ -1107,18 +1111,22 @@ namespace emp {
     else new_org.Delete();                      // Otherwise delete the organism.
   }
 
-  // Give birth to (potentially) multiple offspring; no return, but triggers can be tracked.
+  // Give birth to (potentially) multiple offspring; return position of last placed.
+  // Triggers 'before repro' signal on parent (once) and 'offspring ready' on each offspring.
+  // Additional signal triggers occur in AddOrgAt.
   template <typename ORG>
-  void World<ORG>::DoBirth(const genome_t & mem, size_t parent_pos, size_t copy_count) {
+  WorldPosition World<ORG>::DoBirth(const genome_t & mem, size_t parent_pos, size_t copy_count) {
     before_repro_sig.Trigger(parent_pos);
-    for (size_t i = 0; i < copy_count; i++) {
+    WorldPosition pos;                                                   // Position of each offspring placed.
+    for (size_t i = 0; i < copy_count; i++) {                            // Loop through offspring, adding each
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
       offspring_ready_sig.Trigger(*new_org);
-      const WorldPosition pos = fun_find_birth_pos(new_org, parent_pos);
+      pos = fun_find_birth_pos(new_org, parent_pos);
 
       if (pos.IsValid()) AddOrgAt(new_org, pos, genotypes[parent_pos]);  // If placement pos is valid, do so!
       else new_org.Delete();                                             // Otherwise delete the organism.
     }
+    return pos;
   }
 
   template<typename ORG>
