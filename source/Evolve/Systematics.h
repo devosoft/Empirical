@@ -125,10 +125,15 @@ namespace emp {
     Taxon(size_t _id, const info_t & _info, Ptr<this_t> _parent=nullptr)
      : id (_id), info(_info), parent(_parent), num_orgs(0), tot_orgs(0), num_offspring(0), total_offspring(0)
      , depth(parent ? (parent->depth+1) : 0) { ; }
-    Taxon(const Taxon &) = delete;
+    // Taxon(const Taxon &) = delete;
+    Taxon(const Taxon &) = default; // TODO: Check with Charles about this
     Taxon(Taxon &&) = default;
     Taxon & operator=(const Taxon &) = delete;
     Taxon & operator=(Taxon &&) = default;
+
+    bool operator<(const Taxon & other) const {
+      return id < other.GetID();
+    }
 
     /// Get a unique ID for this taxon; IDs are assigned sequentially, so newer taxa have higher IDs.
     size_t GetID() const { return id; }
