@@ -192,11 +192,18 @@ namespace emp {
       return !id_info[id].IsActive();
     }
 
-    /// If a pointer active and ready to be used?
+    /// Is a pointer active and ready to be used?
     bool IsActive(const void * ptr) {
       if (internal::ptr_debug) std::cout << "IsActive: " << ptr << std::endl;
       if (ptr_id.find(ptr) == ptr_id.end()) return false; // Not in database.
       return GetInfo(ptr).IsActive();
+    }
+
+    /// Is a pointer id associated with a pointer that's active and ready to be used?
+    bool IsActiveID(size_t id) {
+      if (id == UNTRACKED_ID) return false;
+      if (id >= id_info.size()) return false;
+      return id_info[id].IsActive();
     }
 
     /// Is an ID associated with an array?
@@ -665,6 +672,7 @@ namespace emp {
     int DebugGetCount() const { return Tracker().GetIDCount(id); }
     bool DebugIsArray() const { return Tracker().IsArrayID(id); }
     size_t DebugGetArrayBytes() const { return Tracker().GetArrayBytes(id); }
+    bool DebugIsActive() const { return Tracker().IsActiveID(id); }
 
     bool OK() const {
       // Untracked ID's should not have pointers in the Tracker.
@@ -781,6 +789,7 @@ namespace emp {
     int DebugGetCount() const { return -1; }
     bool DebugIsArray() const { return false; }
     size_t DebugGetArrayBytes() const { return 0; }
+    bool DebugIsActive() const { return true; }
     bool OK() const { return true; }
   };
 
