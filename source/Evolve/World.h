@@ -17,7 +17,6 @@
  *  @todo We should be able to have any number of systematics managers, based on various type_trait
  *        information a that we want to track.
  *  @todo Add a signal for DoBirth() for when a birth fails.
- *  @todo Add a signal for once a birth position is determined, but before it is used.
  *  @todo Add a signal for when organism positions are swapped.
  *  @todo Add a signal for population Reset() (and possibly Clear?)
  *  @todo Add a feature to maintain population sorted by each phenotypic trait.  This will allow
@@ -668,11 +667,8 @@ namespace emp {
     /// Inject a random organism (constructor must facilitate!)
     template <typename... ARGS> void InjectRandomOrg(ARGS &&... args);
 
-    /// Place a newborn organism into the population, by default rules and with parent information.
-    WorldPosition DoBirth(const genome_t & mem, size_t parent_pos);
-
     /// Place multiple copies of a newborn organism into the population.
-    void DoBirth(const genome_t & mem, size_t parent_pos, size_t copy_count);
+    void DoBirth(const genome_t & mem, size_t parent_pos, size_t copy_count=1);
 
     // Kill off organism at the specified position (same as RemoveOrgAt, but callable externally)
     void DoDeath(const size_t pos) { RemoveOrgAt(pos); }
@@ -1109,20 +1105,6 @@ namespace emp {
 
     if (pos.IsValid()) AddOrgAt(new_org, pos);  // If placement position is valid, do so!
     else new_org.Delete();                      // Otherwise delete the organism.
-  }
-
-  // Give birth to a single offspring; return offspring position.
-  template <typename ORG>
-  WorldPosition World<ORG>::DoBirth(const genome_t & mem, size_t parent_pos) {
-    before_repro_sig.Trigger(parent_pos);
-    Ptr<ORG> new_org = NewPtr<ORG>(mem);
-    offspring_ready_sig.Trigger(*new_org);
-    const WorldPosition pos = fun_find_birth_pos(new_org, parent_pos);
-
-    if (pos.IsValid()) AddOrgAt(new_org, pos, genotypes[parent_pos]);  // If placement pos is valid, do so!
-    else new_org.Delete();                                             // Otherwise delete the organism.
-
-    return pos;
   }
 
   // Give birth to (potentially) multiple offspring; no return, but triggers can be tracked.
