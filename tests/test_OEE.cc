@@ -8,6 +8,7 @@
 
 #include "Evolve/OEE.h"
 #include "Evolve/World.h"
+#include "Evolve/World_output.h"
 
 TEST_CASE("OEE", "[evo]") {
     emp::Random random;
@@ -19,6 +20,7 @@ TEST_CASE("OEE", "[evo]") {
     world.SetWellMixed(true);
 
     emp::OEETracker<int, int> oee(sys_ptr, [](int org){return org;});
+    AddOEEFile(world, oee).SetTimingRepeat(10);
     world.OnUpdate([&oee](size_t ud){oee.Update(ud);});
     world.SetFitFun([](int & org){return org;});
     world.SetMutFun([](int & org, emp::Random r){

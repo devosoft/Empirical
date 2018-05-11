@@ -33,10 +33,10 @@ namespace emp {
         OEETracker(Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> s, fun_calc_complexity_t c) : 
             systematics_manager(s), complexity_fun(c) {
             
-            auto change_node = data_nodes.New("change");            
-            auto novelty_node = data_nodes.New("novelty");
-            auto diversity_node = data_nodes.New("diversity");
-            auto complexity_node = data_nodes.New("complexity");
+            data_nodes.New("change");            
+            data_nodes.New("novelty");
+            data_nodes.New("diversity");
+            data_nodes.New("complexity");
         }
 
         void Update(size_t ud) {
@@ -95,6 +95,10 @@ namespace emp {
             }
             return t;
         }
+
+        Ptr<DataNode<double, data::Current, data::Info>> GetDataNode(const std::string & name) {
+        return &(data_nodes.Get(name));
+        }        
 
     };
 
