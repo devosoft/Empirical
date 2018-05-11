@@ -171,13 +171,14 @@ namespace emp {
 
     // == Signals ==
     SignalControl control;  // Setup the world to control various signals.
-    Signal<void(size_t)> before_repro_sig;    ///< Trigger before organism gives birth w/ position.
-    Signal<void(ORG &)>  offspring_ready_sig; ///< Trigger when offspring organism is built.
-    Signal<void(ORG &)>  inject_ready_sig;    ///< Trigger when external organism is ready to inject.
-    Signal<void(size_t)> org_placement_sig;   ///< Trigger after any organism is placed into world.
-    Signal<void(size_t)> on_update_sig;       ///< Trigger at the beginning of Update()
-    Signal<void(size_t)> on_death_sig;        ///< Trigger immediately before any organism dies.
-    Signal<void()>       world_destruct_sig;  ///< Trigger in the World destructor.
+    Signal<void(size_t)>       before_repro_sig;     ///< Trigger before organism gives birth w/ position.
+    Signal<void(ORG &)>        offspring_ready_sig;  ///< Trigger when offspring organism is built.
+    Signal<void(ORG &)>        inject_ready_sig;     ///< Trigger when outside organism is ready to inject.
+    Signal<void(ORG &,size_t)> before_placement_sig; /// Trigger before placing organism into target cell.
+    Signal<void(size_t)>       on_placement_sig;     ///< Trigger after any organism is placed into world.
+    Signal<void(size_t)>       on_update_sig;        ///< Trigger at the beginning of Update()
+    Signal<void(size_t)>       on_death_sig;         ///< Trigger immediately before any organism dies.
+    Signal<void()>             world_destruct_sig;   ///< Trigger in the World destructor.
 
     /// Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
@@ -207,7 +208,8 @@ namespace emp {
       , before_repro_sig(to_string(name,"::before-repro"), control)
       , offspring_ready_sig(to_string(name,"::offspring-ready"), control)
       , inject_ready_sig(to_string(name,"::inject-ready"), control)
-      , org_placement_sig(to_string(name,"::org-placement"), control)
+      , before_placement_sig(to_string(name,"::before-placement"), control)
+      , on_placement_sig(to_string(name,"::on-placement"), control)
       , on_update_sig(to_string(name,"::on-update"), control)
       , on_death_sig(to_string(name,"::on-death"), control)
       , world_destruct_sig(to_string(name,"::wolrd-destruct"), control)
@@ -465,45 +467,68 @@ namespace emp {
     /// Trigger:  Immediately prior to parent producing offspring
     /// Argument: World ID for the parent-to-be
     /// Return:   Key value needed to make future modifications.
-    SignalKey OnBeforeRepro(const std::function<void(size_t)> & fun) { return before_repro_sig.AddAction(fun); }
+    SignalKey OnBeforeRepro(const std::function<void(size_t)> & fun) {
+      return before_repro_sig.AddAction(fun);
+    }
 
     /// Provide a function for World to call after an offspring organism has been created, but
     /// before it is inserted into the World.
     /// Trigger:  Offspring about to enter population
     /// Argument: Reference to organism about to be placed in population.
     /// Return:   Key value needed to make future modifications.
-    SignalKey OnOffspringReady(const std::function<void(ORG &)> & fun) { return offspring_ready_sig.AddAction(fun); }
+    SignalKey OnOffspringReady(const std::function<void(ORG &)> & fun) {
+      return offspring_ready_sig.AddAction(fun);
+    }
 
     /// Provide a function for World to call before an external organim is injected into the World.
     /// Trigger:  New organism about to be added to population from outside
     /// Argument: Reference to organism about to be placed in population.
     /// Return:   Key value needed to make future modifications.
-    SignalKey OnInjectReady(const std::function<void(ORG &)> & fun) { return inject_ready_sig.AddAction(fun); }
+    SignalKey OnInjectReady(const std::function<void(ORG &)> & fun) {
+      return inject_ready_sig.AddAction(fun);
+    }
+
+    /// Provide a function for World to call before an organism is added to the active population,
+    /// but after position is found.  With synchonous generations, this occurs during Update().
+    /// Trigger:  Organism is about to be added to population; position is known (either born or injected)
+    /// Args:     (1) Reference to organism about to be placed; (2) Position organism will be placed.
+    /// Return:   Key value needed to make future modifications.
+    SignalKey OnBeforePlacement(const std::function<void(ORG &,size_t)> & fun) {
+      return before_placement_sig.AddAction(fun);
+    }
 
     /// Provide a function for World to call immediately after any organism has been added to the
-    /// active population.  With synchonous generations, this occurs on Update().
+    /// active population.  With synchonous generations, this occurs during Update().
     /// Trigger:  Organism has been added to population (either born or injected)
     /// Argument: Position of organism placed in the population.
     /// Return:   Key value needed to make future modifications.
-    SignalKey OnOrgPlacement(const std::function<void(size_t)> & fun) { return org_placement_sig.AddAction(fun); }
+    SignalKey OnPlacement(const std::function<void(size_t)> & fun) {
+      return on_placement_sig.AddAction(fun);
+    }
 
     /// Provide a function for World to call each time Update() is run.
     /// Trigger:  New update is starting
     /// Argument: Update number (sequentially increasing)
     /// Return:   Key value needed to make future modifications.
-    SignalKey OnUpdate(const std::function<void(size_t)> & fun) { return on_update_sig.AddAction(fun); }
+    SignalKey OnUpdate(const std::function<void(size_t)> & fun) {
+      return on_update_sig.AddAction(fun);
+    }
 
     /// Provide a function for World to call each time an organism is about to die.
     /// Trigger:  Organism is about to be killed
     /// Argument: Position of organism about to die
     /// Return:   Key value needed to make future modifications.
-    SignalKey OnOrgDeath(const std::function<void(size_t)> & fun) { return on_death_sig.AddAction(fun); }
+    SignalKey OnOrgDeath(const std::function<void(size_t)> & fun) {
+      return on_death_sig.AddAction(fun);
+    }
 
     /// Provide a function for World to call at the start of its destructor (for additional cleanup).
     /// Trigger:  Destructor has begun to execture
     /// Argument: None
     /// Return:   Key value needed to make future modifications.
-    SignalKey OnWorldDestruct(const std::function<void()> & fun) { return world_destruct_sig.AddAction(fun); }
+    SignalKey OnWorldDestruct(const std::function<void()> & fun) {
+      return world_destruct_sig.AddAction(fun);
+    }
 
     // --- MANAGE ATTRIBUTES ---
 
@@ -745,6 +770,9 @@ namespace emp {
     emp_assert(new_org);         // The new organism must exist.
     emp_assert(pos.IsValid());   // Position must be legal.
 
+    // If new organism is going into the active population, trigger signal before doing so.
+    if (pos.IsActive()) { before_placement_sig.Trigger(*new_org, pos.GetIndex()); }
+
     RemoveOrgAt(pos);                         // Clear out any old org.
     const size_t index = pos.GetIndex();
     pop_t & cur_pop = pops[pos.GetPopID()];
@@ -767,7 +795,7 @@ namespace emp {
 
     // SetupOrg(*new_org, &callbacks, pos);
     // If new organism is in the active population, trigger associated signal.
-    if (pos.IsActive()) { org_placement_sig.Trigger(pos.GetIndex()); }
+    if (pos.IsActive()) { on_placement_sig.Trigger(pos.GetIndex()); }
   }
 
   template<typename ORG>
@@ -993,6 +1021,12 @@ namespace emp {
     // 2. If synchronous generationsm (i.e, pops[1] is not empty), move next population into
     //    place as the current popoulation.
     if (pops[1].size()) {
+      // Trigger signals for orgs in next pop before they are moved into the active pop.
+      for (size_t i = 0; i < pop.size(); i++) {
+        if (!pops[1][i]) continue;
+        before_placement_sig.Trigger(*pops[1][i], i);  // Trigger that org is about to be placed.
+      } 
+
       // Clear out current pop.
       for (size_t i = 0; i < pop.size(); i++) RemoveOrgAt(i);
       pop.resize(0);
@@ -1004,10 +1038,9 @@ namespace emp {
       // Update the active population.
       num_orgs = 0;
       for (size_t i = 0; i < pop.size(); i++) {
-        if (pop[i]) {                    // If position is occupied n the newly active population...
-          ++num_orgs;                    // ...keep count of number of organisms
-          org_placement_sig.Trigger(i);  // ...and trigger org placement.
-        }
+        if (!pop[i]) continue;        // Ignore empty positions.
+        ++num_orgs;                   // Keep count of number of organisms
+        on_placement_sig.Trigger(i);  // Trigger that organism has been placed.
       }
     }
 
