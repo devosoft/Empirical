@@ -764,13 +764,17 @@ namespace emp {
       if (next_genotypes.size() <= index) next_genotypes.resize(index+1, nullptr);  // Make sure we fit genotypes.
       next_genotypes[index] = new_genotype;
     }
+
+    // SetupOrg(*new_org, &callbacks, pos);
+    // If new organism is in the active population, trigger associated signal.
+    if (pos.IsActive()) { org_placement_sig.Trigger(pos.GetIndex()); }
   }
 
   template<typename ORG>
   void World<ORG>::RemoveOrgAt(WorldPosition pos) {
     size_t id = pos.GetIndex(); // Identify specific index.
     pop_t & cur_pop = pops[pos.GetPopID()];
-    if (id < cur_pop.size() || !cur_pop[id]) return; // Nothing to remove!
+    if (id >= cur_pop.size() || !cur_pop[id]) return; // Nothing to remove!
     if (pos.IsActive()) on_death_sig.Trigger(id);    // If active, signal that org is about to die.
     cur_pop[id].Delete();                            // Delete the organism...
     cur_pop[id] = nullptr;                           // ...and reset the pointer to null
@@ -1049,15 +1053,8 @@ namespace emp {
       inject_ready_sig.Trigger(*new_org);
       const WorldPosition pos = fun_find_inject_pos(new_org);
 
-      if (pos.IsValid()) {
-        AddOrgAt(new_org, pos);
-        //SetupOrg(*new_org, &callbacks, pos);
-        // If new organism is in the active population, trigger associated signal.
-        if (pos.IsActive()) { org_placement_sig.Trigger(pos.GetIndex()); }
-      } else {
-        // Organism failed to be placed in the population.  Delete it.
-        new_org.Delete();
-      }    
+      if (pos.IsValid()) AddOrgAt(new_org, pos);  // If placement position is valid, do so!
+      else new_org.Delete();                      // Otherwise delete the organism.
     }
   }
 
@@ -1067,8 +1064,6 @@ namespace emp {
     Ptr<ORG> new_org = NewPtr<ORG>(mem);
     inject_ready_sig.Trigger(*new_org);
     AddOrgAt(new_org, pos);
-    org_placement_sig.Trigger(pos.GetIndex());
-    // SetupOrg(*new_org, &callbacks, pos);
   }
 
   template <typename ORG>
@@ -1079,15 +1074,8 @@ namespace emp {
     inject_ready_sig.Trigger(*new_org);
     const WorldPosition pos = fun_find_inject_pos(new_org);
 
-    if (pos.IsValid()) {
-      AddOrgAt(new_org, pos);
-      // SetupOrg(*new_org, &callbacks, pos);
-      // If new organism is in the active population, trigger associated signal.
-      if (pos.IsActive()) { org_placement_sig.Trigger(pos.GetIndex()); }
-    } else {
-      // Organism failed to be placed in the population.  Delete it.
-      new_org.Delete();
-    }    
+    if (pos.IsValid()) AddOrgAt(new_org, pos);  // If placement position is valid, do so!
+    else new_org.Delete();                      // Otherwise delete the organism.
   }
 
   // Give birth to a single offspring; return offspring position.
@@ -1098,15 +1086,8 @@ namespace emp {
     offspring_ready_sig.Trigger(*new_org);
     const WorldPosition pos = fun_find_birth_pos(new_org, parent_pos);
 
-    if (pos.IsValid()) {
-      AddOrgAt(new_org, pos, genotypes[parent_pos]);
-      // SetupOrg(*new_org, &callbacks, pos);
-      // If new organism is in the active population, trigger associated signal.
-      if (pos.IsActive()) { org_placement_sig.Trigger(pos.GetIndex()); }
-    } else {
-      // Organism failed to be placed in the population.  Delete it.
-      new_org.Delete();
-    }    
+    if (pos.IsValid()) AddOrgAt(new_org, pos, genotypes[parent_pos]);  // If placement pos is valid, do so!
+    else new_org.Delete();                                             // Otherwise delete the organism.
 
     return pos;
   }
@@ -1120,15 +1101,8 @@ namespace emp {
       offspring_ready_sig.Trigger(*new_org);
       const WorldPosition pos = fun_find_birth_pos(new_org, parent_pos);
 
-      if (pos.IsValid()) {
-        AddOrgAt(new_org, pos, genotypes[parent_pos]);
-        // SetupOrg(*new_org, &callbacks, pos);
-        // If new organism is in the active population, trigger associated signal.
-        if (pos.IsActive()) { org_placement_sig.Trigger(pos.GetIndex()); }
-      } else {
-        // Organism failed to be placed in the population.  Delete it.
-        new_org.Delete();
-      }    
+      if (pos.IsValid()) AddOrgAt(new_org, pos, genotypes[parent_pos]);  // If placement pos is valid, do so!
+      else new_org.Delete();                                             // Otherwise delete the organism.
     }
   }
 
