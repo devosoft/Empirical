@@ -339,7 +339,6 @@ namespace emp {
     // ensure placement.
     world.SetAddInjectFun( [&world, traits, world_size, info_ptr](Ptr<ORG> new_org) {
       size_t pos = info_ptr->GetBirthPos(world_size);
-      std::cout << "Ping!" << std::endl;
       return WorldPosition(pos);
     });
 
