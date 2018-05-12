@@ -370,8 +370,14 @@ namespace emp {
 
     /// Setup the population to automatically test for mutations before deciding where a newborn offspring
     /// should be placed (placement may need to know fitness or other phenotypic traits).
-    void SetMutateBeforeBirth() {
+    void SetMutateOffspringReady() {
       OnOffspringReady( [this](ORG & org){ DoMutationsOrg(org); } );
+    }
+
+    /// Setup the population to automatically test for mutations after deciding where a newborn offspring
+    /// should be placed, but before doing so.
+    void SetMutateBeforePlacement() {
+      OnBeforePlacement( [this](ORG & org, size_t){ DoMutationsOrg(org); } );
     }
 
     /// Add a new phenotype measuring function.
