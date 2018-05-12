@@ -18,12 +18,10 @@ namespace emp {
         emp::vector<taxa_set_t> snapshots;
         Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> systematics_manager;
 
-        // TODO: These probably can't just be pointers  - they could technically
-        // get deleted by systematics before the OEE stuff is done with them.
-        std::unordered_set<Ptr<taxon_t>, hash_t> prev_coal_set;
+        taxa_set_t prev_coal_set;
+        taxa_set_t seen;
 
         fun_calc_complexity_t complexity_fun;
-        std::set<taxon_t> seen;
         size_t generation_interval;
         int resolution = 10;
 
@@ -33,11 +31,19 @@ namespace emp {
         OEETracker(Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> s, fun_calc_complexity_t c) : 
             systematics_manager(s), complexity_fun(c) {
             
+            emp_assert(s->GetStoreOutside(), "OEE tracker only works with systematics manager where store_outside is set to true");
+
             data_nodes.New("change");            
             data_nodes.New("novelty");
             data_nodes.New("diversity");
             data_nodes.New("complexity");
         }
+
+        int GetResolution() const {return resolution;}
+        size_t GetGenerationInterval() const {return generation_interval;}
+
+        void SetResolution(int r) const {resolution = r;}
+        void SetGenerationInterval(size_t g) const {generation_interval = g;}
 
         void Update(size_t ud) {
             taxa_set_t active = systematics_manager->GetActive();
@@ -48,7 +54,7 @@ namespace emp {
         }
 
         void CalcStats() {
-            std::unordered_set<Ptr<taxon_t>, hash_t > coal_set = CoalescenceFilter();
+            taxa_set_t coal_set = CoalescenceFilter();
             int change = 0;
             int novelty = 0;
             double most_complex = 0;
@@ -57,9 +63,9 @@ namespace emp {
                 if (!Has(prev_coal_set, tax)) {
                     change++;
                 }
-                if (!Has(seen, *tax)) {
+                if (!Has(seen, tax)) {
                     novelty++;
-                    seen.insert(*tax);
+                    seen.insert(tax);
                 }
                 double complexity = complexity_fun(tax);
                 if (complexity > most_complex) {
@@ -75,8 +81,8 @@ namespace emp {
             std::swap(prev_coal_set, coal_set);
         }
 
-        std::unordered_set<Ptr<taxon_t>, hash_t > CoalescenceFilter() {
-            std::unordered_set<Ptr<taxon_t>, hash_t > include_set;
+        taxa_set_t CoalescenceFilter() {
+            taxa_set_t include_set;
             for (Ptr<taxon_t> tax : snapshots[0]) {
                 Ptr<taxon_t> ancestor = GetAncestor(tax);
                 if (ancestor) {
@@ -97,7 +103,7 @@ namespace emp {
         }
 
         Ptr<DataNode<double, data::Current, data::Info>> GetDataNode(const std::string & name) {
-        return &(data_nodes.Get(name));
+            return &(data_nodes.Get(name));
         }        
 
     };
