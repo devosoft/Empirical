@@ -108,6 +108,29 @@ namespace emp {
 
     };
 
+    // Helper function for skeletonization
+
+    // Assumes org is sequence of inst_type
+    template <typename ORG_TYPE, typename INST_TYPE>
+    emp::vector<INST_TYPE> Skeletonize(const ORG_TYPE & org, INST_TYPE null_value, std::function<double(ORG_TYPE&)> fit_fun) {
+        emp_assert(org.size() > 0, "Empty org passed to skeletonize");
+
+        emp::vector<INST_TYPE> skeleton;
+        double fitness = fit_fun(org);
+        ORG_TYPE test_org = ORG_TYPE(org);
+
+        for (size_t i = 0; i < org.size(); i++) {
+            test_org[i] = null_value;
+            if (fit_fun(test_org) >= fitness) {
+                skeleton.push_back(null_value);
+            } else {
+                skeleton.push_back(org[i]);
+            }
+        }
+
+        return skeleton;
+    }
+
 }
 
 #endif
