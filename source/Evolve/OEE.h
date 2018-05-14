@@ -112,7 +112,7 @@ namespace emp {
 
     // Assumes org is sequence of inst_type
     template <typename ORG_TYPE, typename INST_TYPE>
-    emp::vector<INST_TYPE> Skeletonize(const ORG_TYPE & org, INST_TYPE null_value, std::function<double(ORG_TYPE&)> fit_fun) {
+    emp::vector<INST_TYPE> Skeletonize(const ORG_TYPE & org, const INST_TYPE null_value, std::function<double(const ORG_TYPE&)> fit_fun) {
         emp_assert(org.size() > 0, "Empty org passed to skeletonize");
 
         emp::vector<INST_TYPE> skeleton;
