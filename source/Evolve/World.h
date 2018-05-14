@@ -368,16 +368,24 @@ namespace emp {
     /// argument determines if the generations should be synchronous (true) or not (false, default)
     void SetPopStruct_Grid(size_t width, size_t height, bool synchronous_gen=false);
 
-    /// Setup the population to automatically test for mutations before deciding where a newborn offspring
-    /// should be placed (placement may need to know fitness or other phenotypic traits).
+    /// Setup the population to automatically test for mutations before deciding where a newborn
+    /// offspring should be placed.  This pre-placement timing may be helpful if fitness or other
+    /// phenotypic traits are required to determine placement.
     void SetMutateOffspringReady() {
       OnOffspringReady( [this](ORG & org){ DoMutationsOrg(org); } );
     }
 
-    /// Setup the population to automatically test for mutations after deciding where a newborn offspring
-    /// should be placed, but before doing so.
+    /// Setup the population to automatically test for mutations after deciding where a newborn
+    /// offspring should be placed, but before doing so.
     void SetMutateBeforePlacement() {
       OnBeforePlacement( [this](ORG & org, size_t){ DoMutationsOrg(org); } );
+    }
+
+    /// Provide a test function that indicates (true/false) whether mutations should be processed after
+    /// deciding where to place an offspring, but before actually putting it in the population.  This
+    /// timing allows position to influence mutations.
+    void SetMutateBeforePlacement(const std::function<bool(size_t pos)> & test_fun) {
+      OnBeforePlacement( [this](ORG & org, size_t pos){ if (test_fun(pos)) DoMutationsOrg(org); } );
     }
 
     /// Add a new phenotype measuring function.
