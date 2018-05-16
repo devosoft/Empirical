@@ -112,7 +112,7 @@ public:
     AddPhenotype("End Y", traitY_fun, -total, total);
 
     SetCache();
-    SetMutateOffspringReady();
+    SetAutoMutate();
 
     ResetMAP();
   }
