@@ -209,18 +209,22 @@ namespace emp {
   // Note: Assuming that once a position is filled it will never be empty again.
   template <typename ORG>
   struct World_MinDistInfo {
-    static constexpr size_t ID_NONE = (size_t) -1;                         ///< ID for organism does not exist.
-    static constexpr double MAX_DIST = std::numeric_limits<double>::max(); ///< Highest distance for init.
+    static constexpr size_t ID_NONE = (size_t) -1;  ///< ID for organism does not exist.
 
-    emp::vector<size_t> nearest_id;                 ///< For each individual, whom are they closest to?
-    emp::vector<double> distance;                   ///< And what is their distance?
+    emp::vector<size_t> nearest_id;       ///< For each individual, whom are they closest to?
+    emp::vector<double> distance;         ///< And what is their distance?
 
-    World<ORG> & world;
-    TraitSet<ORG> traits;
+    World<ORG> & world;                   ///< World object being tracked.
+    TraitSet<ORG> traits;                 ///< Traits we are tryng to spread
+    emp::vector<double> min_vals;         ///< Smallest value found for each trait.
+    emp::vector<double> max_vals;         ///< Largest value found for each trait.
     bool is_setup;
 
     World_MinDistInfo(World<ORG> & in_world, const TraitSet<ORG> & in_traits)
-     : nearest_id(), distance(), world(in_world), traits(in_traits), is_setup(false)
+     : nearest_id(), distance(), world(in_world), traits(in_traits)
+     , min_vals(traits.GetSize(), std::numeric_limits<double>::max())
+     , max_vals(traits.GetSize(), std::numeric_limits<double>::min())
+     , is_setup(false)
      { ; }
 
     double CalcDist(size_t id1, size_t id2) {
@@ -234,7 +238,7 @@ namespace emp {
     void Refresh(size_t refresh_id, size_t start_id = 0) {
       emp_assert(refresh_id < world.GetSize()); // Make sure ID is legal.
       nearest_id[refresh_id] = ID_NONE;
-      distance[refresh_id] = MAX_DIST;
+      distance[refresh_id] = std::numeric_limits<double>::max();
       for (size_t id2 = start_id; id2 < world.GetSize(); id2++) {
         if (id2 == refresh_id) continue;
         const double cur_dist = CalcDist(id2, refresh_id);
@@ -288,12 +292,40 @@ namespace emp {
 
     /// Assume a position has changed; refresh it AND everything that had it as a closest connection.
     void Update(size_t pos) {
-      if (!is_setup) return;  // Until structure is setup, don't worry about maintaining.
-      emp_assert(pos < world.GetSize());
-      for (size_t id = 0; id < world.GetSize(); id++) {
-        if (nearest_id[id] == pos) Refresh(id);
+
+      /// Determine if this new point extends the range of any phenotypes.
+      bool update_dist = false;
+      emp::vector<double> cur_vals = traits.EvalValues(world.GetOrg(pos));
+      for (size_t i = 0; i < cur_vals.size(); i++) {
+        if (cur_vals[i] < min_vals[i]) { 
+          min_vals[i] = cur_vals[i];
+          update_dist = true;
+        }
+        if (cur_vals[i] > max_vals[i]) { 
+          max_vals[i] = cur_vals[i];
+          update_dist = true;
+        }
       }
-      Refresh(pos);
+
+      // Until min-dist tracking structure is setup, don't worry about maintaining.
+      if (!is_setup) return;  
+      emp_assert(pos < world.GetSize());
+
+      /// Determine if we need to re-place all orgs in the structure
+      if (update_dist == true) {
+        for (size_t id = 0; id < world.GetSize(); id++) {
+          if (nearest_id[id] == pos) Refresh(id);
+        }
+        Refresh(pos);
+      }
+
+      /// Otherwise just update closest connections to this org.
+      else {
+        for (size_t id = 0; id < world.GetSize(); id++) {
+          if (nearest_id[id] == pos) Refresh(id);
+        }
+        Refresh(pos);
+      }
     }
 
     /// A debug function to make sure the internal state is all valid.
