@@ -170,10 +170,10 @@ namespace emp {
 
     // == Signals ==
     SignalControl control;  // Setup the world to control various signals.
-    Signal<void(size_t)>       before_repro_sig;     ///< Trigger before organism gives birth w/ position.
+    Signal<void(size_t)>       before_repro_sig;     ///< Trigger before organism gives birth w/parent position.
     Signal<void(ORG &)>        offspring_ready_sig;  ///< Trigger when offspring organism is built.
     Signal<void(ORG &)>        inject_ready_sig;     ///< Trigger when outside organism is ready to inject.
-    Signal<void(ORG &,size_t)> before_placement_sig; /// Trigger before placing organism into target cell.
+    Signal<void(ORG &,size_t)> before_placement_sig; ///< Trigger before placing any organism into target cell.
     Signal<void(size_t)>       on_placement_sig;     ///< Trigger after any organism is placed into world.
     Signal<void(size_t)>       on_update_sig;        ///< Trigger at the beginning of Update()
     Signal<void(size_t)>       on_death_sig;         ///< Trigger immediately before any organism dies.
