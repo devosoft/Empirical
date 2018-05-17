@@ -211,20 +211,26 @@ namespace emp {
   struct World_MinDistInfo {
     static constexpr size_t ID_NONE = (size_t) -1;  ///< ID for organism does not exist.
 
-    emp::vector<size_t> nearest_id;       ///< For each individual, whom are they closest to?
-    emp::vector<double> distance;         ///< And what is their distance?
+    emp::vector<size_t> nearest_id;  ///< For each individual, whom are they closest to?
+    emp::vector<double> distance;    ///< And what is their distance?
 
-    World<ORG> & world;                   ///< World object being tracked.
-    TraitSet<ORG> traits;                 ///< Traits we are tryng to spread
-    emp::vector<double> min_vals;         ///< Smallest value found for each trait.
-    emp::vector<double> max_vals;         ///< Largest value found for each trait.
-    bool is_setup;
+    World<ORG> & world;              ///< World object being tracked.
+    TraitSet<ORG> traits;            ///< Traits we are tryng to spread
+    emp::vector<double> min_vals;    ///< Smallest value found for each trait.
+    emp::vector<double> max_vals;    ///< Largest value found for each trait.
+    emp::vector<double> bin_width;   ///< Largest value found for each trait.
+
+    bool is_setup;                          ///< Have we initialized the internal data stucture? 
+    size_t num_trait_bins;                  ///< How many bins should we use for each trait?
+    size_t num_total_bins;                  ///< How many bins are there overall?
+    emp::vector<std::set<size_t>> bin_ids;  ///< Which org ids fall into each bin?
 
     World_MinDistInfo(World<ORG> & in_world, const TraitSet<ORG> & in_traits)
      : nearest_id(), distance(), world(in_world), traits(in_traits)
      , min_vals(traits.GetSize(), std::numeric_limits<double>::max())
      , max_vals(traits.GetSize(), std::numeric_limits<double>::min())
-     , is_setup(false)
+     , bin_width(traits.GetSize(), 0.0)
+     , is_setup(false), num_trait_bins(0), num_total_bins(0), bin_ids()
      { ; }
 
     double CalcDist(size_t id1, size_t id2) {
@@ -253,12 +259,48 @@ namespace emp {
       }
     }
 
-    void Setup() {
-      emp_assert(world.GetSize() >= 2); // Must have at least 2 orgs in the population to setup.
-      nearest_id.resize(world.GetSize());
-      distance.resize(world.GetSize());
+    /// Calculate which bin an organism should be in.
+    size_t CalcBin(size_t id) {
+      static emp::vector<double> t_vals;
+      t_vals = traits.EvalValues(world.GetOrg(id));
+      size_t scale = 1;
+      size_t bin_id = 0;
+      for (size_t i = 0; i < traits.GetSize(); i++) {
+        size_t cur_bin = (size_t) ((t_vals[i] - min_vals[i]) / bin_width[i]);
+        bin_id += cur_bin * scale;
+        scale *= num_trait_bins;
+      }
+      return bin_id;
+    }
 
-      for (size_t id = 0; id < world.GetSize(); id++) {
+    /// Reset all of the bins in the multidimensional grid for nearest-neighbor analysis.
+    void ResetBins() {
+      bin_ids.resize(num_total_bins);
+      for (auto & bin : bin_ids) bin.clear();
+      for (size_t trait_id = 0; trait_id < traits.GetSize(); trait_id++) {
+        bin_width[trait_id] = (max_vals[trait_id] - min_vals[trait_id]) / (double) num_trait_bins;
+      }
+      for (size_t org_id = 0; org_id < world.GetSize(); org_id++) {
+        size_t cur_bin = CalcBin(org_id);
+        bin_ids[cur_bin].insert(org_id);
+      }
+    }
+
+    void Setup() {
+      const size_t num_orgs = world.GetSize();
+      emp_assert(num_orgs >= 2); // Must have at least 2 orgs in the population to setup.
+      const size_t num_traits = traits.GetSize();
+      emp_assert(num_traits >= 1); // We must have at least one dimension!
+
+      nearest_id.resize(num_orgs);
+      distance.resize(num_orgs);
+
+      // How many bins should each trait be divided into?
+      num_trait_bins = (size_t) (std::pow(num_orgs, 1.0 / (double)num_traits) + 0.5);
+      num_total_bins = (size_t) (std::pow(num_trait_bins, num_traits) + 0.5);
+      ResetBins();
+
+      for (size_t id = 0; id < num_orgs; id++) {
         Refresh(id, id+1);
       }
       is_setup = true;
@@ -294,16 +336,16 @@ namespace emp {
     void Update(size_t pos) {
 
       /// Determine if this new point extends the range of any phenotypes.
-      bool update_dist = false;
+      bool update_chart = false;
       emp::vector<double> cur_vals = traits.EvalValues(world.GetOrg(pos));
       for (size_t i = 0; i < cur_vals.size(); i++) {
         if (cur_vals[i] < min_vals[i]) { 
-          min_vals[i] = cur_vals[i];
-          update_dist = true;
+          min_vals[i] = cur_vals[i] - bin_width[i]/2.0;
+          update_chart = true;
         }
         if (cur_vals[i] > max_vals[i]) { 
-          max_vals[i] = cur_vals[i];
-          update_dist = true;
+          max_vals[i] = cur_vals[i] + bin_width[i]/2.0;
+          update_chart = true;
         }
       }
 
@@ -312,7 +354,9 @@ namespace emp {
       emp_assert(pos < world.GetSize());
 
       /// Determine if we need to re-place all orgs in the structure
-      if (update_dist == true) {
+      if (update_chart == true) {
+        ResetBins();
+        // @CAO FIX THIS!!
         for (size_t id = 0; id < world.GetSize(); id++) {
           if (nearest_id[id] == pos) Refresh(id);
         }
