@@ -216,15 +216,18 @@ namespace emp {
     emp::vector<double> distance;                   ///< And what is their distance?
 
     World<ORG> & world;
-    std::function<double(ORG&,ORG&)> dist_fun;
+    TraitSet<ORG> traits;
     bool is_setup;
 
-    World_MinDistInfo(World<ORG> & in_world, const std::function<double(ORG&,ORG&)> & in_dist_fun)
-     : nearest_id(), distance(), world(in_world), dist_fun(in_dist_fun), is_setup(false)
+    World_MinDistInfo(World<ORG> & in_world, const TraitSet<ORG> & in_traits)
+     : nearest_id(), distance(), world(in_world), traits(in_traits), is_setup(false)
      { ; }
 
     double CalcDist(size_t id1, size_t id2) {
-      return dist_fun(world.GetOrg(id1), world.GetOrg(id2));
+      emp::vector<double> offsets = traits.CalcOffsets(world.GetOrg(id1), world.GetOrg(id2));
+      double dist = 0.0;
+      for (double offset : offsets) dist += offset * offset;
+      return dist;
     }
 
     // Find the closest connection to a position again; update neighbors as well!
@@ -295,8 +298,6 @@ namespace emp {
 
     /// A debug function to make sure the internal state is all valid.
     bool OK() {
-      if (!dist_fun) return false; // Dist fun should be initialized during construction.
-
       // These tests only matter BEFORE Setup() is run.
       if (!is_setup) {
         if (nearest_id.size() != 0) return false;
@@ -318,16 +319,8 @@ namespace emp {
     world.MarkSynchronous(false);
     world.MarkSpaceStructured(false).MarkPhenoStructured(true);
 
-    // Calculate the square distance (good enough since we only look for minimum distance)
-    auto dist_fun = [traits](ORG& in1, ORG& in2){
-      emp::vector<double> offsets = traits.CalcOffsets(in1,in2);
-      double dist = 0.0;
-      for (double offset : offsets) dist += offset * offset;
-      return dist;
-    };
-
     // Build a pointer to the current information (and make sure it's deleted later)
-    Ptr<World_MinDistInfo<ORG>> info_ptr = NewPtr<World_MinDistInfo<ORG>>(world, dist_fun);
+    Ptr<World_MinDistInfo<ORG>> info_ptr = NewPtr<World_MinDistInfo<ORG>>(world, traits);
     world.OnWorldDestruct([info_ptr]() mutable { info_ptr.Delete(); });
 
     // Make sure to update info whenever a new org is placed into the population.
