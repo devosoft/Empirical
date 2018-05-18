@@ -229,7 +229,7 @@ namespace emp {
      : nearest_id(), distance(), world(in_world), traits(in_traits)
      , min_vals(traits.GetSize(), std::numeric_limits<double>::max())
      , max_vals(traits.GetSize(), std::numeric_limits<double>::min())
-     , bin_width(traits.GetSize(), 0.0)
+     , bin_width(traits.GetSize(), 0.00001)
      , is_setup(false), num_trait_bins(0), num_total_bins(0), bin_ids()
      { ; }
 
