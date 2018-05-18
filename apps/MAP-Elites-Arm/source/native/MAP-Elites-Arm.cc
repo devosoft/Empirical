@@ -17,7 +17,7 @@
 int main(int argc, char* argv[])
 {
   constexpr size_t MAX_GENS = 100;
-  constexpr size_t POP_SIZE = 100;
+  constexpr size_t POP_SIZE = 1600;
 
   emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
 
