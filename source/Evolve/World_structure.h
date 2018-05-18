@@ -240,12 +240,9 @@ namespace emp {
       return dist;
     }
 
-    // Find the closest connection to a position again; update neighbors as well!
-    void Refresh(size_t refresh_id, size_t start_id = 0) {
-      emp_assert(refresh_id < world.GetSize()); // Make sure ID is legal.
-      nearest_id[refresh_id] = ID_NONE;
-      distance[refresh_id] = std::numeric_limits<double>::max();
-      for (size_t id2 = start_id; id2 < world.GetSize(); id2++) {
+    // Helper function for testing an organism against everything in a specified bin.
+    void Refresh_AgainstBin(size_t refresh_id, size_t target_bin) {
+      for (size_t id2 : bin_ids[target_bin]) {
         if (id2 == refresh_id) continue;
         const double cur_dist = CalcDist(id2, refresh_id);
         if (cur_dist < distance[refresh_id]) {
@@ -254,9 +251,36 @@ namespace emp {
         }
         if (cur_dist < distance[id2]) {
           distance[id2] = cur_dist;
-          nearest_id[id2] = refresh_id;          
+          nearest_id[id2] = refresh_id;   
         }
       }
+    }
+
+    // Find the closest connection to a position again; update neighbors as well!
+    void Refresh(size_t refresh_id, size_t start_id = 0) {
+      emp_assert(refresh_id < world.GetSize()); // Make sure ID is legal.
+      nearest_id[refresh_id] = ID_NONE;
+      distance[refresh_id] = std::numeric_limits<double>::max();
+
+      // First compare against everything else in the current bin.
+      size_t bin_id = CalcBin(refresh_id);
+      Refresh_AgainstBin(refresh_id, bin_id);
+
+      // Then check all neighbor bins.  Ignoring diagnols for now since they could be expensive...
+      // (though technically we need them...)
+      size_t trait_offset = 1;
+      for (size_t trait_id = 0; trait_id < traits.GetSize(); trait_id++) {
+        size_t prev_bin_id = bin_id - trait_offset;
+        if (prev_bin_id < num_total_bins) {
+          Refresh_AgainstBin(refresh_id, prev_bin_id);
+        }
+        size_t next_bin_id = bin_id + trait_offset;
+        if (next_bin_id < num_total_bins) {
+          Refresh_AgainstBin(refresh_id, next_bin_id);
+        }
+        trait_offset *= num_trait_bins;
+      }
+
     }
 
     /// Calculate which bin an organism should be in.
@@ -356,7 +380,7 @@ namespace emp {
       /// Determine if we need to re-place all orgs in the structure
       if (update_chart == true) {
         ResetBins();
-        // @CAO FIX THIS!!
+        // @CAO: We only really need to test orgs in this bin and neighboring bins.
         for (size_t id = 0; id < world.GetSize(); id++) {
           if (nearest_id[id] == pos) Refresh(id);
         }
