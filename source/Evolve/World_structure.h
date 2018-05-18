@@ -224,13 +224,14 @@ namespace emp {
     size_t num_trait_bins;                  ///< How many bins should we use for each trait?
     size_t num_total_bins;                  ///< How many bins are there overall?
     emp::vector<std::set<size_t>> bin_ids;  ///< Which org ids fall into each bin?
+    emp::vector<size_t> cur_bin;            ///< Which bin is each org currently in?
 
     World_MinDistInfo(World<ORG> & in_world, const TraitSet<ORG> & in_traits)
      : nearest_id(), distance(), world(in_world), traits(in_traits)
      , min_vals(traits.GetSize(), std::numeric_limits<double>::max())
      , max_vals(traits.GetSize(), std::numeric_limits<double>::min())
      , bin_width(traits.GetSize(), 0.00001)
-     , is_setup(false), num_trait_bins(0), num_total_bins(0), bin_ids()
+     , is_setup(false), num_trait_bins(0), num_total_bins(0), bin_ids(), cur_bin()
      { ; }
 
     double CalcDist(size_t id1, size_t id2) {
@@ -304,9 +305,10 @@ namespace emp {
       for (size_t trait_id = 0; trait_id < traits.GetSize(); trait_id++) {
         bin_width[trait_id] = (max_vals[trait_id] - min_vals[trait_id]) / (double) num_trait_bins;
       }
+      cur_bin.resize(world.GetSize());
       for (size_t org_id = 0; org_id < world.GetSize(); org_id++) {
-        size_t cur_bin = CalcBin(org_id);
-        bin_ids[cur_bin].insert(org_id);
+        cur_bin[org_id] = CalcBin(org_id);
+        bin_ids[cur_bin[org_id]].insert(org_id);
       }
     }
 
@@ -343,7 +345,10 @@ namespace emp {
 
       emp_assert(distance.size() > 0);  // After setup, we should always have distances stored.
 
-      const size_t min_id = FindMinIndex(distance);
+      const size_t min_id = emp::FindMinIndex(distance);
+      emp_assert(min_id >= 0 && min_id < world.GetSize(), min_id);
+      emp_assert(nearest_id[min_id] >= 0 && nearest_id[min_id] < world.GetSize(),
+                 min_id, distance[min_id], nearest_id[min_id], distance.size());
       if (world.CalcFitnessID(min_id) < world.CalcFitnessID(nearest_id[min_id])) return min_id;
       else return nearest_id[min_id];
     }
@@ -358,7 +363,6 @@ namespace emp {
 
     /// Assume a position has changed; refresh it AND everything that had it as a closest connection.
     void Update(size_t pos) {
-
       /// Determine if this new point extends the range of any phenotypes.
       bool update_chart = false;
       emp::vector<double> cur_vals = traits.EvalValues(world.GetOrg(pos));
@@ -377,14 +381,17 @@ namespace emp {
       if (!is_setup) return;  
       emp_assert(pos < world.GetSize());
 
+      /// Remove org if from the bin we currently have it in.
+      bin_ids[cur_bin[pos]].erase(pos);
+
       /// Determine if we need to re-place all orgs in the structure
       if (update_chart == true) {
         ResetBins();
-        // @CAO: We only really need to test orgs in this bin and neighboring bins.
+
+        // Rescaled bins might skew distances.  Refresh everyone!
         for (size_t id = 0; id < world.GetSize(); id++) {
-          if (nearest_id[id] == pos) Refresh(id);
+          Refresh(id);
         }
-        Refresh(pos);
       }
 
       /// Otherwise just update closest connections to this org.
