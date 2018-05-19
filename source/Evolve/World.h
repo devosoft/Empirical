@@ -182,6 +182,7 @@ namespace emp {
     Signal<void(size_t)>       on_placement_sig;     ///< ...after any organism is placed into world.
     Signal<void(size_t)>       on_update_sig;        ///< ...at the beginning of Update()
     Signal<void(size_t)>       on_death_sig;         ///< ...immediately before any organism dies.
+    Signal<void(WorldPosition,WorldPosition)> on_swap_sig; ///< ...any time org positions are swapped
     Signal<void()>             world_destruct_sig;   ///< ...in the World destructor.
 
     /// Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
@@ -216,6 +217,7 @@ namespace emp {
       , on_placement_sig(to_string(name,"::on-placement"), control)
       , on_update_sig(to_string(name,"::on-update"), control)
       , on_death_sig(to_string(name,"::on-death"), control)
+      , on_swap_sig(to_string(name,"::on-swap"), control)
       , world_destruct_sig(to_string(name,"::wolrd-destruct"), control)
     {
       if (gen_random) NewRandom();
@@ -268,7 +270,7 @@ namespace emp {
       for (emp::Ptr<DataFile> file : files) {
         if (file->GetFilename() == filename) return *file;
       }
-      emp_assert(!"Trying to lookup a file that does not exist.", filename);
+      emp_assert(false, "Trying to lookup a file that does not exist.", filename);
     }
 
     /// Does the specified cell ID have an organism in it?
@@ -539,6 +541,14 @@ namespace emp {
       return on_death_sig.AddAction(fun);
     }
 
+    /// Provide a function for World to call each time two organisms swap positions in world.
+    /// Trigger:   Organisms are about to swap positions.
+    /// Arguments: Positions of the two organisms.
+    /// Return:    Key value needed to make future modifications.
+    SignalKey OnSwapOrgs(const std::function<void(WorldPosition,WorldPosition)> & fun) {
+      return on_swap_sig.AddAction(fun);
+    }
+
     /// Provide a function for World to call at the start of its destructor (for additional cleanup).
     /// Trigger:  Destructor has begun to execture
     /// Argument: None
@@ -645,6 +655,7 @@ namespace emp {
     void Swap(WorldPosition pos1, WorldPosition pos2) {
       const size_t pop1 = pos1.GetPopID();  const size_t pop2 = pos2.GetPopID();
       const size_t id1 = pos1.GetIndex();   const size_t id2 = pos2.GetIndex();
+      on_swap_sig.Trigger(pos1, pos2);
       std::swap(pops[pop1][id1], pops[pop2][id2]);
     }
 
