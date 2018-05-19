@@ -855,6 +855,8 @@ namespace emp {
 
     // Neighbors are anywhere in the same population.
     fun_get_neighbor = [this](WorldPosition pos) { return pos.SetIndex(GetRandomCellID()); };
+
+    // Kill random organisms and move end into vacant position to keep pop compact.
     fun_kill_org = [this](){
       const size_t last_id = pop.size() - 1;
       Swap(GetRandomCellID(), last_id);
@@ -898,6 +900,13 @@ namespace emp {
 
     // Neighbors are anywhere in the same population.
     fun_get_neighbor = [this](WorldPosition pos) { return pos.SetIndex(GetRandomCellID()); };
+
+    // Kill random organisms and move end into vacant position to keep pop compact.
+    fun_kill_org = [this](){
+      const size_t kill_id = GetRandomCellID();
+      RemoveOrgAt(kill_id);
+      return kill_id;
+    };
 
     if (synchronous_gen) {
       // Append births into the next population.
@@ -946,6 +955,12 @@ namespace emp {
       return pos.SetIndex(neighbor_id);
     };
 
+    fun_kill_org = [this](){
+      const size_t kill_id = GetRandomCellID();
+      RemoveOrgAt(kill_id);
+      return kill_id;
+    };
+
     if (synchronous_gen) {
       // Place births in a neighboring position in the new grid.
       fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
@@ -965,13 +980,13 @@ namespace emp {
     SetAttribute("PopStruct", "Grid");
   }
 
-    // Add a new data file constructed elsewhere.
-    template<typename ORG>
-    DataFile & World<ORG>::AddDataFile(emp::Ptr<DataFile> file) {
-      size_t id = files.size();
-      files.push_back(file);
-      return *files[id];
-    }
+  // Add a new data file constructed elsewhere.
+  template<typename ORG>
+  DataFile & World<ORG>::AddDataFile(emp::Ptr<DataFile> file) {
+    size_t id = files.size();
+    files.push_back(file);
+    return *files[id];
+  }
 
 
   // A new, arbitrary file.
