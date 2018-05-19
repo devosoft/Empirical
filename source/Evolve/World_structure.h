@@ -224,14 +224,14 @@ namespace emp {
     size_t num_trait_bins;                  ///< How many bins should we use for each trait?
     size_t num_total_bins;                  ///< How many bins are there overall?
     emp::vector<std::set<size_t>> bin_ids;  ///< Which org ids fall into each bin?
-    emp::vector<size_t> cur_bin;            ///< Which bin is each org currently in?
+    emp::vector<size_t> org_bins;           ///< Which bin is each org currently in?
 
     World_MinDistInfo(World<ORG> & in_world, const TraitSet<ORG> & in_traits)
      : nearest_id(), distance(), world(in_world), traits(in_traits)
      , min_vals(traits.GetSize(), std::numeric_limits<double>::max())
      , max_vals(traits.GetSize(), std::numeric_limits<double>::min())
      , bin_width(traits.GetSize(), 0.00001)
-     , is_setup(false), num_trait_bins(0), num_total_bins(0), bin_ids(), cur_bin()
+     , is_setup(false), num_trait_bins(0), num_total_bins(0), bin_ids(), org_bins()
      { ; }
 
     double CalcDist(size_t id1, size_t id2) {
@@ -265,7 +265,7 @@ namespace emp {
       distance[refresh_id] = std::numeric_limits<double>::max();
 
       // First compare against everything else in the current bin.
-      size_t bin_id = CalcBin(refresh_id);
+      size_t bin_id = org_bins[refresh_id];
       Refresh_AgainstBin(refresh_id, bin_id);
 
       // Then check all neighbor bins.  Ignoring diagnols for now since they could be expensive...
@@ -290,12 +290,14 @@ namespace emp {
       static emp::vector<double> t_vals;
       t_vals = traits.EvalValues(world.GetOrg(id));
       size_t scale = 1;
-      size_t bin_id = 0;
+      size_t bin_id = (size_t) -1;
       for (size_t i = 0; i < traits.GetSize(); i++) {
-        size_t cur_bin = (size_t) ((t_vals[i] - min_vals[i]) / bin_width[i]);
+        const size_t cur_bin = (size_t) ((t_vals[i] - min_vals[i]) / bin_width[i]);
+        emp_assert(cur_bin < num_total_bins);
         bin_id += cur_bin * scale;
         scale *= num_trait_bins;
       }
+      emp_assert(bin_id < num_total_bins, bin_id, num_total_bins, scale);
       return bin_id;
     }
 
@@ -306,10 +308,11 @@ namespace emp {
       for (size_t trait_id = 0; trait_id < traits.GetSize(); trait_id++) {
         bin_width[trait_id] = (max_vals[trait_id] - min_vals[trait_id]) / (double) num_trait_bins;
       }
-      cur_bin.resize(world.GetSize());
+      org_bins.resize(world.GetSize());
       for (size_t org_id = 0; org_id < world.GetSize(); org_id++) {
-        cur_bin[org_id] = CalcBin(org_id);
-        bin_ids[cur_bin[org_id]].insert(org_id);
+        size_t cur_bin = CalcBin(org_id);
+        org_bins[org_id] = cur_bin;
+        bin_ids[cur_bin].insert(org_id);
       }
     }
 
@@ -367,11 +370,11 @@ namespace emp {
       bool update_chart = false;
       emp::vector<double> cur_vals = traits.EvalValues(world.GetOrg(pos));
       for (size_t i = 0; i < cur_vals.size(); i++) {
-        if (cur_vals[i] < min_vals[i]) { 
+        if (cur_vals[i] <= min_vals[i]) { 
           min_vals[i] = cur_vals[i] - bin_width[i]/2.0;
           update_chart = true;
         }
-        if (cur_vals[i] > max_vals[i]) { 
+        if (cur_vals[i] >= max_vals[i]) { 
           max_vals[i] = cur_vals[i] + bin_width[i]/2.0;
           update_chart = true;
         }
@@ -382,8 +385,9 @@ namespace emp {
       emp_assert(pos < world.GetSize());
 
       /// Remove org if from the bin we currently have it in.
-      bin_ids[cur_bin[pos]].erase(pos);
-      cur_bin[pos] = (size_t) -1;
+      bin_ids[org_bins[pos]].erase(pos);
+      org_bins[pos] = CalcBin(pos);
+      bin_ids[org_bins[pos]].insert(pos);
 
       /// Determine if we need to re-place all orgs in the structure
       if (update_chart == true) {
@@ -393,6 +397,7 @@ namespace emp {
         for (size_t id = 0; id < world.GetSize(); id++) {
           Refresh(id);
         }
+        emp_assert(org_bins[pos] != (size_t) -1);
       }
 
       /// Otherwise just update closest connections to this org.
@@ -401,7 +406,10 @@ namespace emp {
           if (nearest_id[id] == pos) Refresh(id);
         }
         Refresh(pos);
+        emp_assert(org_bins[pos] != (size_t) -1);
       }
+
+      emp_assert(OK());
     }
 
     /// A debug function to make sure the internal state is all valid.
@@ -417,16 +425,17 @@ namespace emp {
         emp_assert(nearest_id.size() == num_orgs);
         emp_assert(distance.size() == num_orgs);
         for (size_t i = 0; i < num_orgs; i++) {
-          emp_assert(cur_bin[i] < num_total_bins);
+          emp_assert(org_bins[i] < num_total_bins, i, org_bins[i], num_total_bins,
+                     world.GetNumOrgs());
         }
         size_t org_count = 0;
         for (size_t i = 0; i < num_total_bins; i++) {
           org_count += bin_ids[i].size();
           for (size_t org_id : bin_ids[i]) {
-            emp_assert(cur_bin[org_id] == i);
+            emp_assert(org_bins[org_id] == i);
           }
         }
-        emp_assert(org_count == num_orgs, org_count, num_orgs);
+        emp_assert(org_count == num_orgs, org_count, num_orgs, world.GetNumOrgs());
       }
 
       return true;
