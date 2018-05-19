@@ -124,6 +124,9 @@ namespace emp {
     /// Function type for adding a newly born organism into a world (returns birth position)
     using fun_find_birth_pos_t  = std::function<WorldPosition(Ptr<ORG>, WorldPosition)>;
 
+    /// Function type for determining picking and killing an organism (returns newly empty position)
+    using fun_kill_org_t        = std::function<WorldPosition()>;
+
     /// Function type for identifying an organism's random neighbor.
     using fun_get_neighbor_t    = std::function<WorldPosition(WorldPosition)>;
 
@@ -153,14 +156,15 @@ namespace emp {
     /// Potential data nodes -- these should be activated only if in use.
     Ptr<DataMonitor<double>> data_node_fitness;
 
-    // Configurable functions.
-    fun_calc_fitness_t     fun_calc_fitness;    ///< Function to evaluate fitness for provided organism.
-    fun_do_mutations_t     fun_do_mutations;    ///< Function to mutate an organism.
-    fun_print_org_t        fun_print_org;       ///< Function to print an organism.
-    fun_get_genome_t       fun_get_genome;      ///< Determine the genome object of an organism.
-    fun_find_inject_pos_t  fun_find_inject_pos; ///< Technique to inject a new, external organism.
-    fun_find_birth_pos_t   fun_find_birth_pos;  ///< Technique to add a new offspring organism.
-    fun_get_neighbor_t     fun_get_neighbor;    ///< Choose a random neighbor near specified id.
+    // Configurable functions.                       Function to...
+    fun_calc_fitness_t     fun_calc_fitness;    ///< ...evaluate fitness for provided organism.
+    fun_do_mutations_t     fun_do_mutations;    ///< ...mutate an organism.
+    fun_print_org_t        fun_print_org;       ///< ...print an organism.
+    fun_get_genome_t       fun_get_genome;      ///< ...determine the genome object of an organism.
+    fun_find_inject_pos_t  fun_find_inject_pos; ///< ...find where to inject a new, external organism.
+    fun_find_birth_pos_t   fun_find_birth_pos;  ///< ...find where to add a new offspring organism.
+    fun_kill_org_t         fun_kill_org;        ///< ...kill an organism.
+    fun_get_neighbor_t     fun_get_neighbor;    ///< ...choose a random neighbor "near" specified id.
 
     /// Attributes are a dynamic way to track extra characteristics about a world.
     std::map<std::string, std::string> attributes;
@@ -170,14 +174,15 @@ namespace emp {
 
     // == Signals ==
     SignalControl control;  // Setup the world to control various signals.
-    Signal<void(size_t)>       before_repro_sig;     ///< Trigger before organism gives birth w/parent position.
-    Signal<void(ORG &)>        offspring_ready_sig;  ///< Trigger when offspring organism is built.
-    Signal<void(ORG &)>        inject_ready_sig;     ///< Trigger when outside organism is ready to inject.
-    Signal<void(ORG &,size_t)> before_placement_sig; ///< Trigger before placing any organism into target cell.
-    Signal<void(size_t)>       on_placement_sig;     ///< Trigger after any organism is placed into world.
-    Signal<void(size_t)>       on_update_sig;        ///< Trigger at the beginning of Update()
-    Signal<void(size_t)>       on_death_sig;         ///< Trigger immediately before any organism dies.
-    Signal<void()>             world_destruct_sig;   ///< Trigger in the World destructor.
+                                                     //   Trigger signal...
+    Signal<void(size_t)>       before_repro_sig;     ///< ...before organism gives birth w/parent position.
+    Signal<void(ORG &)>        offspring_ready_sig;  ///< ...when offspring organism is built.
+    Signal<void(ORG &)>        inject_ready_sig;     ///< ...when outside organism is ready to inject.
+    Signal<void(ORG &,size_t)> before_placement_sig; ///< ...before placing any organism into target cell.
+    Signal<void(size_t)>       on_placement_sig;     ///< ...after any organism is placed into world.
+    Signal<void(size_t)>       on_update_sig;        ///< ...at the beginning of Update()
+    Signal<void(size_t)>       on_death_sig;         ///< ...immediately before any organism dies.
+    Signal<void()>             world_destruct_sig;   ///< ...in the World destructor.
 
     /// Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
     EMP_CREATE_OPTIONAL_METHOD(SetupOrg, Setup);
@@ -201,7 +206,7 @@ namespace emp {
       , is_synchronous(false), is_space_structured(false), is_pheno_structured(false)
       , data_node_fitness(nullptr)
       , fun_calc_fitness(), fun_do_mutations(), fun_print_org(), fun_get_genome()
-      , fun_find_inject_pos(), fun_find_birth_pos(), fun_get_neighbor()
+      , fun_find_inject_pos(), fun_find_birth_pos(), fun_kill_org(), fun_get_neighbor()
       , attributes(), systematics(true,true,false)
       , control()
       , before_repro_sig(to_string(name,"::before-repro"), control)
@@ -449,6 +454,10 @@ namespace emp {
     /// indicating where it was placed.
     void SetAddBirthFun(const fun_find_birth_pos_t & _fun) { fun_find_birth_pos = _fun; }
 
+    /// Setup the function to kill an organism.  It should return a WorldPosition indicating
+    /// the newly empty cell, which is not necessarily where the kill occurred.
+    void SetKillOrgFun(const fun_kill_org_t & _fun) { fun_kill_org = _fun; }
+
     /// Setup the function to take an organism position id and return a random neighbor id from
     /// the population.
     void SetGetNeighborFun(const fun_get_neighbor_t & _fun) { fun_get_neighbor = _fun; }
@@ -680,7 +689,10 @@ namespace emp {
     WorldPosition DoBirth(const genome_t & mem, size_t parent_pos, size_t copy_count=1);
 
     // Kill off organism at the specified position (same as RemoveOrgAt, but callable externally)
-    void DoDeath(const size_t pos) { RemoveOrgAt(pos); }
+    void DoDeath(const WorldPosition pos) { RemoveOrgAt(pos); }
+
+    // Kill off an organism using internal kill method setup by population structure.
+    void DoDeath() { fun_kill_org(); }
 
     // --- RANDOM FUNCTIONS ---
 
@@ -843,6 +855,18 @@ namespace emp {
 
     // Neighbors are anywhere in the same population.
     fun_get_neighbor = [this](WorldPosition pos) { return pos.SetIndex(GetRandomCellID()); };
+    fun_kill_org = [this](){
+      const size_t last_id = pop.size() - 1;
+
+      // SwapOrgs(GetRandomCellID(), last_id);
+      std::swap(pop[GetRandomCellID()], pop[last_id]);
+      RemoveOrgAt(last_id);
+      
+      SwapOrgs(GetRandomCellID(), last_id);
+      RemoveOrgAt(last_id);
+      pop.resize(last_id);
+      return last_id;
+    };
 
     if (synchronous_gen) {
       // Append births into the next population.
