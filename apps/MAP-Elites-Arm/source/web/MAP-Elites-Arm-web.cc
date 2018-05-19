@@ -240,6 +240,7 @@ int main()
   div_controls << UI::Button( [](){ emp::RandomSelect(world, 1); DrawWorldCanvas(); }, "Do Birth", "birth_button");
   div_controls << UI::Button( [](){ emp::RandomSelect(world, 100); DrawWorldCanvas(); }, "Do Birth 100", "birth_100_button");
   div_controls << UI::Button( [](){ emp::RandomSelect(world, 10000); DrawWorldCanvas(); }, "Do Birth 10000", "birth_10000_button");
+  div_controls << UI::Button( [](){ for (size_t i=0; i<100; i++) world.DoDeath(); DrawWorldCanvas(); }, "Clean", "clean_button");
   div_controls << "<br>";
   div_controls << "Mode: " << mode_select;
   div_controls << "<br>";
