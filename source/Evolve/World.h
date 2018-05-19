@@ -857,12 +857,7 @@ namespace emp {
     fun_get_neighbor = [this](WorldPosition pos) { return pos.SetIndex(GetRandomCellID()); };
     fun_kill_org = [this](){
       const size_t last_id = pop.size() - 1;
-
-      // SwapOrgs(GetRandomCellID(), last_id);
-      std::swap(pop[GetRandomCellID()], pop[last_id]);
-      RemoveOrgAt(last_id);
-      
-      SwapOrgs(GetRandomCellID(), last_id);
+      Swap(GetRandomCellID(), last_id);
       RemoveOrgAt(last_id);
       pop.resize(last_id);
       return last_id;
@@ -1242,7 +1237,7 @@ namespace emp {
       for (size_t test_pos = 0; test_pos < pop.size(); test_pos++) {
         // If this organism is kept, keep it compact with the others.
         if (random_ptr->P(keep_frac)) {
-          pop[live_pos] = pop[test_pos];
+          Swap(live_pos, test_pos);
           live_pos++;
         }
 
