@@ -243,6 +243,7 @@ namespace emp {
 
     // Helper function for testing an organism against everything in a specified bin.
     void Refresh_AgainstBin(size_t refresh_id, size_t target_bin) {
+      emp_assert(target_bin < bin_ids.size(), target_bin, bin_ids.size());
       for (size_t id2 : bin_ids[target_bin]) {
         if (id2 == refresh_id) continue;
         const double cur_dist = CalcDist(id2, refresh_id);
@@ -326,9 +327,8 @@ namespace emp {
       num_total_bins = (size_t) (std::pow(num_trait_bins, num_traits) + 0.5);
       ResetBins();
 
-      for (size_t id = 0; id < num_orgs; id++) {
-        Refresh(id, id+1);
-      }
+      // Setup (Refresh) all distances.
+      for (size_t id = 0; id < num_orgs; id++) { Refresh(id, id+1); }
       is_setup = true;
     }
 
@@ -383,6 +383,7 @@ namespace emp {
 
       /// Remove org if from the bin we currently have it in.
       bin_ids[cur_bin[pos]].erase(pos);
+      cur_bin[pos] = (size_t) -1;
 
       /// Determine if we need to re-place all orgs in the structure
       if (update_chart == true) {
@@ -406,16 +407,28 @@ namespace emp {
     /// A debug function to make sure the internal state is all valid.
     bool OK() {
       // These tests only matter BEFORE Setup() is run.
-      if (!is_setup) {
-        if (nearest_id.size() != 0) return false;
-        if (distance.size() != 0) return false;
-      }
+      emp_assert(is_setup || nearest_id.size() == 0);
+      emp_assert(is_setup || distance.size() == 0);
  
       // Tests for AFTER Setup() is run.
-      else {
-        if (nearest_id.size() != world.GetSize()) return false;
-        if (distance.size() != world.GetSize()) return false;
+
+      if (is_setup) {
+        const size_t num_orgs = world.GetSize();
+        emp_assert(nearest_id.size() == num_orgs);
+        emp_assert(distance.size() == num_orgs);
+        for (size_t i = 0; i < num_orgs; i++) {
+          emp_assert(cur_bin[i] < num_total_bins);
+        }
+        size_t org_count = 0;
+        for (size_t i = 0; i < num_total_bins; i++) {
+          org_count += bin_ids[i].size();
+          for (size_t org_id : bin_ids[i]) {
+            emp_assert(cur_bin[org_id] == i);
+          }
+        }
+        emp_assert(org_count == num_orgs, org_count, num_orgs);
       }
+
       return true;
     }
   };
