@@ -99,9 +99,11 @@ namespace emp {
     using value_type = org_t;                  ///< Identical to org_t; vector compatibility.
     using pop_t = emp::vector<Ptr<ORG>>;       ///< Type for whole populations.
     using iterator_t = World_iterator<this_t>; ///< Type for this world's iterators.
+    using fit_cache_t = emp::vector<double>;   ///< Type for fitness caches for pops.
 
-    using genome_t = typename emp::find_genome_t<ORG>;  ///< Type of underlying genomes.
-    using genotype_t = emp::Taxon<genome_t>;            ///< Type of full genome category.
+    using genome_t = typename emp::find_genome_t<ORG>;   ///< Type of underlying genomes.
+    using genotype_t = emp::Taxon<genome_t>;             ///< Type of full genome category.
+    using genotype_vec_t = emp::vector<Ptr<genotype_t>>; ///< Type of genotype vectors.
 
     /// Function type for calculating fitness.
     using fun_calc_fitness_t    = std::function<double(ORG&)>;
@@ -138,9 +140,9 @@ namespace emp {
     emp::array<pop_t,2> pops;       ///< The set of active [0] and "next" [1] organisms in population.
     pop_t & pop;                    ///< A shortcut to pops[0].
     size_t num_orgs;                ///< How many organisms are actually in the population.
-    emp::vector<double> fit_cache;  ///< vector size == 0 when not caching; uncached values == 0.
-    emp::vector<Ptr<genotype_t>> genotypes;      ///< Genotypes for the corresponding orgs.
-    emp::vector<Ptr<genotype_t>> next_genotypes; ///< Genotypes for corresponding orgs in next pop.
+    fit_cache_t fit_cache;          ///< vector size == 0 when not caching; uncached values == 0.
+    genotype_vec_t genotypes;       ///< Genotypes for the corresponding orgs.
+    genotype_vec_t next_genotypes;  ///< Genotypes for corresponding orgs in next pop.
 
     // Configuration settings
     std::string name;               ///< Name of this world (for use in configuration.)
