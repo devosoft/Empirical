@@ -78,6 +78,12 @@ namespace emp {
       return pos.SetIndex(pool_start + world.GetRandom().GetUInt(pool_size));
     });
 
+    world.SetKillOrgFun( [&world](){
+      const size_t kill_id = world.GetRandomCellID();
+      world.RemoveOrgAt(kill_id);
+      return kill_id;
+    });
+
     if (synchronous_gen) {
       // Place births in the next open spot in the new pool (or randomly if full!)
       world.SetAddBirthFun( [&world,pool_size](Ptr<ORG> new_org, WorldPosition parent_pos) {
@@ -138,8 +144,15 @@ namespace emp {
       return WorldPosition(id);
     });
 
-    // Map Elites does not have a concept of neighbors.
+    // Map-Elites does not have a concept of neighbors.
     world.SetGetNeighborFun( [](WorldPosition pos) { emp_assert(false); return pos; });
+
+    // Map-Elites doesn't have a real meaning for killing organisms, so do so randomly.
+    world.SetKillOrgFun( [&world](){
+      const size_t kill_id = world.GetRandomCellID();
+      world.RemoveOrgAt(kill_id);
+      return kill_id;
+    });
 
     // Birth is effectively the same as inject.
     world.SetAddBirthFun( [&world,traits,trait_counts](Ptr<ORG> new_org, WorldPosition parent_pos) {
@@ -470,6 +483,17 @@ namespace emp {
     // Diverse Elites does not have a concept of neighbors.
     // @CAO Or should we return closest individual, which we already save?
     world.SetGetNeighborFun( [](WorldPosition pos) { emp_assert(false); return pos; });
+
+    // Find the two closest organisms and kill the lower fit one.  (Killing sparsely...)
+    // Must unsetup population for next birth to work.
+    world.SetKillOrgFun( [&world, info_ptr](){
+      const size_t last_id = world.GetSize() - 1;
+      world.Swap(info_ptr->FindKill(), last_id);
+      info_ptr->is_setup = false;
+      world.RemoveOrgAt(last_id);
+      world.Resize(last_id);
+      return last_id;
+    });
 
     // Birth is effectively the same as inject.
     world.SetAddBirthFun( [&world, traits, world_size, info_ptr](Ptr<ORG> new_org, WorldPosition parent_pos) {
