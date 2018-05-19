@@ -386,12 +386,12 @@ namespace emp {
 
       /// Remove org if from the bin we currently have it in.
       bin_ids[org_bins[pos]].erase(pos);
-      org_bins[pos] = CalcBin(pos);
-      bin_ids[org_bins[pos]].insert(pos);
 
       /// Determine if we need to re-place all orgs in the structure
       if (update_chart == true) {
         ResetBins();
+        org_bins[pos] = CalcBin(pos);
+        bin_ids[org_bins[pos]].insert(pos);
 
         // Rescaled bins might skew distances.  Refresh everyone!
         for (size_t id = 0; id < world.GetSize(); id++) {
@@ -402,6 +402,8 @@ namespace emp {
 
       /// Otherwise just update closest connections to this org.
       else {
+        org_bins[pos] = CalcBin(pos);
+        bin_ids[org_bins[pos]].insert(pos);
         for (size_t id = 0; id < world.GetSize(); id++) {
           if (nearest_id[id] == pos) Refresh(id);
         }
@@ -432,6 +434,7 @@ namespace emp {
         for (size_t i = 0; i < num_total_bins; i++) {
           org_count += bin_ids[i].size();
           for (size_t org_id : bin_ids[i]) {
+            (void) org_id;
             emp_assert(org_bins[org_id] == i);
           }
         }
