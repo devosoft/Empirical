@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
     pop.DoMutations(1);
   }
 
-  pop.PrintLineage(0);
+  // pop.PrintLineage(0);
 
 //  std::cout << MAX_GENS << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 
