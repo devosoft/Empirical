@@ -140,8 +140,6 @@ namespace emp {
     pop_t & pop;                    ///< A shortcut to pops[0].
     size_t num_orgs;                ///< How many organisms are actually in the population.
     fit_cache_t fit_cache;          ///< vector size == 0 when not caching; uncached values == 0.
-    genotype_vec_t genotypes;       ///< Genotypes for the corresponding orgs.
-    genotype_vec_t next_genotypes;  ///< Genotypes for corresponding orgs in next pop.
 
     // Configuration settings
     std::string name;               ///< Name of this world (for use in configuration.)
@@ -488,7 +486,7 @@ namespace emp {
     DataFile & SetupSystematicsFile(std::string label, const std::string & filename="systematics.csv", const bool & print_header=true);
 
     /// Setup a file (by id) to be printed that collects systematics information over time.
-    DataFile & SetupSystematicsFile(int id=0, const std::string & filename="systematics.csv", const bool & print_header=true);
+    DataFile & SetupSystematicsFile(size_t id=0, const std::string & filename="systematics.csv", const bool & print_header=true);
 
     /// Setup a file to be printed that collects population information over time.
     DataFile & SetupPopulationFile(const std::string & filename="population.csv", const bool & print_header=true);
@@ -863,7 +861,7 @@ namespace emp {
     if (pos.IsActive()) { before_placement_sig.Trigger(*new_org, pos.GetIndex()); }
 
     for (Ptr<SystematicsBase<ORG> > s : systematics) {
-      s->SetNextParent(p_pos.GetIndex());
+      s->SetNextParent((int) p_pos.GetIndex());
     }
 
     // Clear out any old organism at this position.
@@ -871,14 +869,13 @@ namespace emp {
 
     pops.MakeValid(pos);                 // Make sure we have room for new organism
     pops(pos) = new_org;                 // Put org into place.
-    const size_t index = pos.GetIndex(); // Determine the index of position (for genotypes)
 
     // Track org count 
     if (pos.IsActive()) ++num_orgs;
 
     // Track the new systematics info
     for (Ptr<SystematicsBase<ORG> > s : systematics) {
-      s->AddOrg(*new_org, pos, update, !pos.IsActive());
+      s->AddOrg(*new_org, (int) pos.GetIndex(), (int) update, !pos.IsActive());
     }
 
     // SetupOrg(*new_org, &callbacks, pos);
@@ -899,11 +896,11 @@ namespace emp {
       --num_orgs;                                    // Track one fewer organisms in the population
       if (cache_on) ClearCache(id);                  // Delete any cached info about this organism
       for (Ptr<SystematicsBase<ORG> > s : systematics) {
-        s->RemoveOrg(pos);            // Notify systematics about organism removal
+        s->RemoveOrg((int) pos.GetIndex());          // Notify systematics about organism removal
       }
     } else {
       for (Ptr<SystematicsBase<ORG> > s : systematics) {
-        s->RemoveNextOrg(pos);            // Notify systematics about organism removal
+        s->RemoveNextOrg((int) pos.GetIndex());      // Notify systematics about organism removal
       }
     }
   }
@@ -1095,9 +1092,9 @@ namespace emp {
   // A data file (default="systematics.csv") that contains information about the population's
   // phylogeny and lineages.
   template<typename ORG>
-  DataFile & World<ORG>::SetupSystematicsFile(int id, const std::string & filename, const bool & print_header) {
+  DataFile & World<ORG>::SetupSystematicsFile(size_t id, const std::string & filename, const bool & print_header) {
     emp_assert(systematics.size() > 0, "Cannot track systematics file. No systematics file to track.");
-    emp_assert(id < (int)systematics.size(), "Invalid systematics file requested to be tracked.");
+    emp_assert(id < systematics.size(), "Invalid systematics file requested to be tracked.");
     auto & file = SetupFile(filename);
     file.AddVar(update, "update", "Update");
     file.template AddFun<size_t>( [this, id](){ return systematics[id]->GetNumActive(); }, "num_taxa", "Number of unique taxonomic groups currently active." );
@@ -1105,7 +1102,7 @@ namespace emp {
     file.template AddFun<double>( [this, id](){ return systematics[id]->GetAveDepth(); }, "ave_depth", "Average Phylogenetic Depth of Organisms." );
     file.template AddFun<size_t>( [this, id](){ return systematics[id]->GetNumRoots(); }, "num_roots", "Number of independent roots for phlogenies." );
     file.template AddFun<int>(    [this, id](){ return systematics[id]->GetMRCADepth(); }, "mrca_depth", "Phylogenetic Depth of the Most Recent Common Ancestor (-1=none)." );
-    file.template AddFun<double>( [this, id](){ return systematics[id]->CalcDiversity(); }, "diversity", "Genotypic Diversity (entropy of genotypes in population)." );
+    file.template AddFun<double>( [this, id](){ return systematics[id]->CalcDiversity(); }, "diversity", "Genotypic Diversity (entropy of taxa in population)." );
 
     if (print_header) file.PrintHeaderKeys();
     return file;
