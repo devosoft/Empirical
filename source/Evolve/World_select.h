@@ -258,7 +258,7 @@ namespace emp {
 
       for (size_t gen : cur_gens) {
         if (winner < genotype_lists[gen].size()) {
-          repro_id = genotype_lists[gen][winner];
+          repro_id = (int) genotype_lists[gen][winner];
           break;
         }
         winner -= genotype_lists[gen].size();

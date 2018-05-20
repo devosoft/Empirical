@@ -107,7 +107,6 @@ namespace emp {
     man_t * prime_manager;                     ///< Which manager leads deletion? (nullptr for self)
 
     // Helper Functions
-    // @CAO FIX!!!
     SignalKey NextSignalKey() { return SignalKey(signal_id,++next_link_id); }
 
     // SignalBase should only be constructable from derrived classes.
