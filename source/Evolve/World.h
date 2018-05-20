@@ -137,7 +137,7 @@ namespace emp {
     size_t update;                  ///< How many times has Update() been called?
     Ptr<Random> random_ptr;         ///< @brief Random object to use.
     bool random_owner;              ///< Did we create our own random number generator?
-    emp::array<pop_t,2> pops;       ///< The set of active [0] and "next" [1] organisms in population.
+    WorldVector<Ptr<ORG>> pops;     ///< The set of active [0] and "next" [1] organisms in population.
     pop_t & pop;                    ///< A shortcut to pops[0].
     size_t num_orgs;                ///< How many organisms are actually in the population.
     fit_cache_t fit_cache;          ///< vector size == 0 when not caching; uncached values == 0.
@@ -184,7 +184,7 @@ namespace emp {
     Signal<void(size_t)>       on_placement_sig;     ///< ...after any organism is placed into world.
     Signal<void(size_t)>       on_update_sig;        ///< ...at the beginning of Update()
     Signal<void(size_t)>       on_death_sig;         ///< ...immediately before any organism dies.
-    Signal<void(WorldPosition,WorldPosition)> on_swap_sig; ///< ...any time org positions are swapped
+    Signal<void(WorldPosition,WorldPosition)> on_swap_sig; ///< ...after org positions are swapped
     Signal<void()>             world_destruct_sig;   ///< ...in the World destructor.
 
     /// Build a Setup function in world that calls ::Setup() on whatever is passed in IF it exists.
@@ -276,11 +276,7 @@ namespace emp {
     }
 
     /// Does the specified cell ID have an organism in it?
-    bool IsOccupied(WorldPosition pos) const {
-      const size_t org_id = pos.GetIndex();
-      const pop_t & cur_pop = pops[pos.GetPopID()];
-      return (org_id < cur_pop.size()) ? cur_pop[org_id] : false;
-    }
+    bool IsOccupied(WorldPosition pos) const { return pops.IsValid(pos) && pops(pos); }
 
     /// Are we currently caching fitness values?
     bool IsCacheOn() const { return cache_on; }
@@ -544,7 +540,7 @@ namespace emp {
     }
 
     /// Provide a function for World to call each time two organisms swap positions in world.
-    /// Trigger:   Organisms are about to swap positions.
+    /// Trigger:   Organisms have just swapped positions.
     /// Arguments: Positions of the two organisms.
     /// Return:    Key value needed to make future modifications.
     SignalKey OnSwapOrgs(const std::function<void(WorldPosition,WorldPosition)> & fun) {
@@ -655,10 +651,8 @@ namespace emp {
 
     /// Swap the positions of two organisms.
     void Swap(WorldPosition pos1, WorldPosition pos2) {
-      const size_t pop1 = pos1.GetPopID();  const size_t pop2 = pos2.GetPopID();
-      const size_t id1 = pos1.GetIndex();   const size_t id2 = pos2.GetIndex();
+      std::swap(pops(pos1), pops(pos2));
       on_swap_sig.Trigger(pos1, pos2);
-      std::swap(pops[pop1][id1], pops[pop2][id2]);
     }
 
     /// Change the size of the world.  If the new size is smaller than the old, remove any
@@ -809,13 +803,9 @@ namespace emp {
     // Clear out any old organism at this position.
     RemoveOrgAt(pos);
 
-    // Identify population used and index into that population.
-    pop_t & cur_pop = pops[pos.GetPopID()];
-    const size_t index = pos.GetIndex();
-
-    // Make sure we have room for new organism and then put it into place.
-    if (cur_pop.size() <= index) cur_pop.resize(index+1, nullptr);
-    cur_pop[index] = new_org;
+    pops.MakeValid(pos);                 // Make sure we have room for new organism
+    pops(pos) = new_org;                 // Put org into place.
+    const size_t index = pos.GetIndex(); // Determine the index of position (for genotypes)
 
     // Track org count and the new genotype
     if (pos.IsActive()) {
