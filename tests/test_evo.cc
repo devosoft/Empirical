@@ -24,7 +24,7 @@ TEST_CASE("Test fitness sharing", "[evo]")
 
   emp::Random random(1);
   emp::World<BitOrg> pop(random);
-  pop.SetWellMixed(true);
+  pop.SetPopStruct_Mixed(true);
   pop.SetMutFun([](BitOrg & org, emp::Random & r){return 0;});
 
   // Build a random initial population
@@ -90,7 +90,7 @@ TEST_CASE("Test fitness sharing", "[evo]")
   emp::World<int> grid_world(random);
   grid_world.SetMutFun([](int & org, emp::Random & r){return 0;});
   const size_t side = (size_t) std::sqrt(POP_SIZE);
-  grid_world.SetGrid(side, side);
+  grid_world.SetPopStruct_Grid(side, side);
   grid_world.SetPrintFun(print_fun);
 
   emp_assert(grid_world.GetSize() == POP_SIZE); // POP_SIZE needs to be a perfect square.
@@ -118,7 +118,7 @@ TEST_CASE("Test resources", "[evo]")
 
   emp::Random random(1);
   emp::World<BitOrg> pop(random);
-  pop.SetWellMixed(true);
+  pop.SetPopStruct_Mixed(true);
   pop.SetMutFun([](BitOrg & org, emp::Random & r){return 0;});
 
   emp::vector<emp::Resource> resources;
