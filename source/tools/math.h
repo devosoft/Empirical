@@ -108,6 +108,7 @@ namespace emp {
     // A compile-time log calculator for values >= 2
     static constexpr double Log2_pos(double x) {
       emp_assert(x > 0);
+      emp_assert(x != INFINITY);
       return (x < 2.0) ? Log2_base(x) : (Log2_pos(x/2.0) + 1.0);
     }
 

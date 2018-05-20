@@ -506,3 +506,32 @@ TEST_CASE("Test vector", "[base]")
   REQUIRE(count == 467);
 }
 
+TEST_CASE("Replicate ptr bug", "[ptr]") {
+  struct testA {
+    int a = 9;
+    emp::Ptr<int> GetA() {return emp::ToPtr(&a);}
+  };
+
+  struct testB {
+    std::function<emp::Ptr<int>(void)> b_fun;
+    emp::Ptr<int> b;
+    
+    void SetBFun(std::function<emp::Ptr<int>(void)> fun) {
+      b_fun = fun;
+    }
+
+    void RunBFun() {
+      b = b_fun();
+    }
+
+  };
+
+  testA ta;
+  testB tb;
+  
+  std::function<emp::Ptr<int>(void)> return_a = [&ta](){return ta.GetA();};
+  tb.SetBFun(return_a);
+  tb.RunBFun();
+  REQUIRE(*(tb.b) == 9);
+
+}

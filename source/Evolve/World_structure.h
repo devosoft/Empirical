@@ -59,6 +59,7 @@ namespace emp {
         const size_t id = world.GetRandomNeighborID(parent_id);     // Placed near parent, in next pop.
         return world.AddNextOrgAt(new_org, id, world.GetGenotypeAt(parent_id));
       });
+      world.SetSynchronousSystematics(true);
       world.SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neighbor in current population.
@@ -67,6 +68,7 @@ namespace emp {
         auto p_genotype = world.GetGenotypeAt(parent_id);
         return world.AddOrgAt(new_org, id, p_genotype); // Place org in existing population.
       });
+      world.SetSynchronousSystematics(false);
       world.SetAttribute("SynchronousGen", "False");
     }
 
@@ -121,7 +123,7 @@ namespace emp {
       if (cur_fitness > org_fitness) return org_pos_t();  // Return invalid position!
       return world.AddOrgAt(new_org, id);
     });
-
+    world.SetSynchronousSystematics(false);
     world.SetAttribute("SynchronousGen", "False");
     world.SetAttribute("PopStruct", "MapElites");
   }
@@ -304,7 +306,7 @@ namespace emp {
       size_t pos = info_ptr->GetBirthPos(world_size);
       return world.AddOrgAt(new_org, pos);
     });
-
+    world.SetSynchronousSystematics(false);
     world.SetAttribute("SynchronousGen", "False");
     world.SetAttribute("PopStruct", "DiverseElites");
   }

@@ -1,6 +1,6 @@
 GCOV_FLAGS = -o0 -g --coverage
 
-TEST_NAMES = assert base constexpr data geometry meta scholar tools games
+TEST_NAMES = assert base evo constexpr data geometry meta scholar systematics tools games
 
 FLAGS = -std=c++14 -Wall -Wno-unused-function -I../source/ -I../
 #CXX = clang++

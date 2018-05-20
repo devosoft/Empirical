@@ -34,8 +34,9 @@
 #include "../base/vector.h"
 #include "../control/Signal.h"
 #include "../control/SignalControl.h"
-#include "../data/DataFile.h"
 #include "../data/Trait.h"
+#include "../data/DataFile.h"
+#include "../data/DataManager.h"
 #include "../meta/reflection.h"
 #include "../tools/map_utils.h"
 #include "../tools/Random.h"
@@ -120,7 +121,6 @@ namespace emp {
     using iterator_t = World_iterator<this_t>; ///< Type for this world's iterators.
 
     using genome_t = typename emp::find_genome_t<ORG>;  ///< Type of underlying genomes.
-    using genotype_t = emp::Taxon<genome_t>;            ///< Type of full genome category.
 
     /// Function type for calculating fitness.
     using fun_calc_fitness_t = std::function<double(ORG&)>;
@@ -130,6 +130,9 @@ namespace emp {
 
     /// Function type for a mutation operator on an organism.
     using fun_do_mutations_t = std::function<size_t(ORG&,Random&)>;
+
+    /// Function type for determining if a mutation should happen
+    using fun_should_mutate_t = std::function<bool(size_t pos)>;
 
     /// Function type for printing an organism's info to an output stream.
     using fun_print_org_t    = std::function<void(ORG&,std::ostream &)>;
@@ -155,8 +158,6 @@ namespace emp {
     size_t num_orgs;                ///< How many organisms are actually in the population.
     size_t update;                  ///< How many times has Update() been called?
     emp::vector<double> fit_cache;  ///< vector size == 0 when not caching; uncached values == 0.
-    emp::vector<Ptr<genotype_t>> genotypes;      ///< Genotypes for the corresponding orgs.
-    emp::vector<Ptr<genotype_t>> next_genotypes; ///< Genotypes for corresponding orgs in next_pop.
 
     // Configuration settings
     std::string name;               ///< Name of this world (for use in configuration.)
@@ -170,7 +171,8 @@ namespace emp {
     bool is_pheno_structured;       ///< Do we have a phenotypically structured population?
 
     /// Potential data nodes -- these should be activated only if in use.
-    Ptr<DataMonitor<double>> data_node_fitness;
+
+    DataManager<double, data::Current, data::Info, data::Range, data::Stats> data_nodes;
 
     // Configurable functions.
     fun_calc_fitness_t  fun_calc_fitness;   ///< Function to evaluate fitness for provided organism.
@@ -180,18 +182,21 @@ namespace emp {
     fun_add_inject_t    fun_add_inject;     ///< Technique to inject a new, external organism.
     fun_add_birth_t     fun_add_birth;      ///< Technique to add a new offspring organism.
     fun_get_neighbor_t  fun_get_neighbor;   ///< Choose a random neighbor near specified id.
+    fun_should_mutate_t fun_should_mutate;  ///< Determine if an organism should be mutated
 
     /// Attributes are a dynamic way to track extra characteristics about a world.
     std::map<std::string, std::string> attributes;
 
     /// Phylogeny and line-of-descent data collection.
-    Systematics<genome_t> systematics;
+    emp::vector<Ptr<SystematicsBase<ORG> >> systematics;
+    std::unordered_map<std::string, int> systematics_labels;
 
     // == Signals ==
     SignalControl control;  // Setup the world to control various signals.
     Signal<void(size_t)> before_repro_sig;    ///< Trigger signal before organism gives birth.
-    Signal<void(ORG &)>  offspring_ready_sig; ///< Trigger signal when offspring organism is built.
-    Signal<void(ORG &)>  inject_ready_sig;    ///< Trigger when external organism is ready to inject.
+    Signal<void(ORG &)> offspring_ready_sig;  ///< Trigger signal when offspring organism is built.
+    Signal<void(ORG &)> inject_ready_sig;     ///< Trigger when external organism is ready to inject.
+    Signal<void(ORG &, size_t, size_t)> after_mutation_sig;   ///< Trigger when mutations to new org are done being made
     Signal<void(size_t)> org_placement_sig;   ///< Trigger when any organism is placed into world.
     Signal<void(size_t)> on_update_sig;       ///< Trigger at the beginning of Update()
     Signal<void(size_t)> on_death_sig;        ///< Trigger when any organism dies.
@@ -214,13 +219,11 @@ namespace emp {
     /// If no random number generator is provided, gen_random determines if one shold be created.
     World(std::string _name="", bool gen_random=true)
       : random_ptr(nullptr), random_owner(false), pop(), next_pop(), num_orgs(0), update(0), fit_cache()
-      , genotypes(), next_genotypes()
       , name(_name), cache_on(false), pop_sizes(1,0), phenotypes(), files()
       , is_synchronous(false), is_space_structured(false), is_pheno_structured(false)
-      , data_node_fitness(nullptr)
       , fun_calc_fitness(), fun_do_mutations(), fun_print_org(), fun_get_genome()
-      , fun_add_inject(), fun_add_birth(), fun_get_neighbor()
-      , attributes(), systematics(true,true,false)
+      , fun_add_inject(), fun_add_birth(), fun_get_neighbor(), fun_should_mutate([](size_t pos){return true;})
+      , attributes()
       , control()
       , before_repro_sig(to_string(name,"::before-repro"), control)
       , offspring_ready_sig(to_string(name,"::offspring-ready"), control)
@@ -243,7 +246,10 @@ namespace emp {
       world_destruct_sig.Trigger();
       Clear();
       if (random_owner) random_ptr.Delete();
-      if (data_node_fitness) data_node_fitness.Delete();
+      for (Ptr<SystematicsBase<ORG> > s : systematics) {
+        s.Delete();
+      }
+
       for (auto file : files) {
         file.Delete();
       }
@@ -351,19 +357,70 @@ namespace emp {
     /// Retrive the genome corresponding to the organism at the specified position.
     const genome_t & GetGenomeAt(size_t id) { return fun_get_genome(GetOrg(id)); }
 
-    /// Get the systematics manager (which is tracking lineages in the population.)
-    const Systematics<genome_t> & GetSystematics() const { return systematics; }
+    /// Get a systematics manager (which is tracking lineages in the population.)
+    /// @param id - which systematics manager to return? Systematics managers are
+    /// stored in the order they are added to the world.
+    Ptr<SystematicsBase<ORG> > GetSystematics(int id=0) { 
+      emp_assert(systematics.size() > 0, "Cannot get systematics file. No systematics file to track.");
+      emp_assert(id < (int)systematics.size(), "Invalid systematics file requested.", id, systematics.size());
 
-    /// Get the genotype currently associated with a specific organism.
-    Ptr<genotype_t> GetGenotypeAt(size_t id) { return genotypes[id]; }
+      return systematics[id]; 
+    }
+
+    /// Get a systematics manager (which is tracking lineages in the population.)
+    /// @param id - which systematics manager to return? Systematics managers are
+    /// stored in the order they are added to the world.
+    Ptr<SystematicsBase<ORG> > GetSystematics(std::string label) { 
+      emp_assert(Has(systematics_labels, label), "Invalid systematics manager label");
+
+      return systematics[systematics_labels[label]]; 
+    }
+
+
+    void RemoveSystematics(int id) { 
+      emp_assert(systematics.size() > 0, "Cannot remove systematics file. No systematics file to track.");
+      emp_assert(id < systematics.size(), "Invalid systematics file requested to be removed.", id, systematics.size());
+      
+      systematics[id].Delete(); 
+      systematics[id] = nullptr; 
+
+      for (auto el : systematics_labels) {
+        if (el.second == id) {
+          systematics_labels.erase(el.first);
+        }
+      }
+    }
+
+    void RemoveSystematics(std::string label) { 
+      emp_assert(Has(systematics_labels, label), "Invalid systematics manager label");
+
+      systematics[systematics_labels[label]].Delete(); 
+      systematics[systematics_labels[label]] = nullptr;
+      systematics_labels.erase(label) ;
+    }
+
+
+    template <typename ORG_INFO, typename DATA_STRUCT>
+    void AddSystematics(Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT> > s, std::string label="systematics") {
+      if (Has(systematics_labels, label)) {
+        label += to_string(systematics.size());
+      }
+      systematics_labels[label] = systematics.size();
+
+      if (is_synchronous) {
+        s->SetTrackSynchronous(true);
+      }
+
+      systematics.push_back(s);
+    }
+
+    auto GetActiveTaxa(int id=0) {
+
+    }
+
 
     /// Get the fitness function currently in use.
     fun_calc_fitness_t GetFitFun() { return fun_calc_fitness; }
-
-    /// Print the full line-of-descent to the organism at the specified position in the popoulation.
-    void PrintLineage(size_t id, std::ostream & os=std::cout) const {
-      systematics.PrintLineage(genotypes[id], os);
-    }
 
     // --- CONFIGURE ---
 
@@ -381,6 +438,12 @@ namespace emp {
       OnOffspringReady( [this](ORG & org){ DoMutationsOrg(org); } );
     }
 
+    void SetSynchronousSystematics(bool synchronous) {
+      for (Ptr<SystematicsBase<ORG> > s : systematics) {
+        s->SetTrackSynchronous(synchronous);
+      }
+    }
+
     /// Add a new phenotype measuring function.
     // void AddPhenotype(const std::string & name, std::function<double(ORG &)> fun) {
     //   phenotypes.AddTrait(name, fun);
@@ -393,30 +456,45 @@ namespace emp {
     /// Access a data node that tracks fitness information in the population.  The fitness will not
     /// be collected until the first Update() after this function is initially called, signaling
     /// the need for this information.
-    DataMonitor<double> & GetFitnessDataNode() {
-      if (!data_node_fitness) {
-        data_node_fitness.New();
+    Ptr<DataMonitor<double>> GetFitnessDataNode() {
+      if (!data_nodes.HasNode("fitness")) {
+        DataMonitor<double> & node = data_nodes.New("fitness");
+
         // Collect fitnesses each update...
         OnUpdate(
-          [this](size_t){
-            data_node_fitness->Reset();
+          [this, &node](size_t){
+            node.Reset();
             for (size_t i = 0; i < pop.size(); i++) {
-              if (IsOccupied(i)) data_node_fitness->AddDatum( CalcFitnessID(i) );
+              if (IsOccupied(i)) node.AddDatum( CalcFitnessID(i) );
             }
           }
         );
       }
-      return *data_node_fitness;
+      return &(data_nodes.Get("fitness"));
+    }
+
+    // Returns a reference so that capturing it in a lambda to call on update
+    // is less confusing. It's possible we should change it to be consistent
+    // with GetFitnessDataNode, though.
+    Ptr<DataMonitor<double>> AddDataNode(const std::string & name) {
+      emp_assert(!data_nodes.HasNode(name));
+      return &(data_nodes.New(name));
+    }
+
+    Ptr<DataMonitor<double>> GetDataNode(const std::string & name) {
+      return &(data_nodes.Get(name));
     }
 
     /// Setup an arbitrary file; no default filename available.
     DataFile & SetupFile(const std::string & filename);
-
+    
     /// Setup a file to be printed that collects fitness information over time.
     DataFile & SetupFitnessFile(const std::string & filename="fitness.csv", const bool & print_header=true);
 
     /// Setup a file to be printed that collects systematics information over time.
-    DataFile & SetupSystematicsFile(const std::string & filename="systematics.csv", const bool & print_header=true);
+    DataFile & SetupSystematicsFile(std::string label, const std::string & filename="systematics.csv", const bool & print_header=true);
+    /// Setup a file to be printed that collects systematics information over time.
+    DataFile & SetupSystematicsFile(int id=0, const std::string & filename="systematics.csv", const bool & print_header=true);
 
     /// Setup a file to be printed that collects population information over time.
     DataFile & SetupPopulationFile(const std::string & filename="population.csv", const bool & print_header=true);
@@ -427,7 +505,15 @@ namespace emp {
 
     /// Setup the function to be used to mutate an organism.  It should take a reference to an
     /// organism and return the number of mutations that occurred.
-    void SetMutFun(const fun_do_mutations_t & mut_fun) { fun_do_mutations = mut_fun; }
+    void SetMutFun(const fun_do_mutations_t & mut_fun, size_t pos=0) {
+      fun_do_mutations = mut_fun;
+      SetShouldMutateFun([pos](size_t loc){return loc >= pos;});
+    }
+
+    /// Setup the function to be used to determine if an organism should mutate
+    void SetShouldMutateFun(const fun_should_mutate_t & should_mut_fun) {
+      fun_should_mutate = should_mut_fun;
+    }
 
     /// Setup the function to be used to print an organism.  It should take a reference to an
     /// organism and an std::ostream, with a void return.  The organism should get printed to
@@ -487,6 +573,10 @@ namespace emp {
     /// Argument: Reference to organism about to be placed in population.
     /// Return:   Key value needed to make future modifications.
     SignalKey OnInjectReady(const std::function<void(ORG &)> & fun) { return inject_ready_sig.AddAction(fun); }
+
+
+    // TODO
+    SignalKey OnAfterMutation(const std::function<void(ORG &, size_t pos, size_t p_pos)> & fun) { return after_mutation_sig.AddAction(fun); }
 
     /// Provide a function for World to call immediately after any organism has been added to the
     /// active population.  With synchonous generations, this occurs on Update().
@@ -629,11 +719,11 @@ namespace emp {
 
     /// AddOrgAt is the core function to add organisms to active population (others must go through here)
     /// Note: This function ignores population structue, so requires you to manage your own sturcture.
-    OrgPosition AddOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
+    OrgPosition AddOrgAt(Ptr<ORG> new_org, size_t pos, size_t p_pos=-1);
 
     /// AddNextOrgAt build up the next population during synchronous generations.
     /// Note: This function ignores population structue, so requires you to manage your own sturcture.
-    OrgPosition AddNextOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype=nullptr);
+    OrgPosition AddNextOrgAt(Ptr<ORG> new_org, size_t pos, size_t p_pos=-1);
 
     /// RemoveOrgAt is the core function to remove an active organism.
     /// Note: This function ignores population structue, so requires you to manage your own sturcture.
@@ -751,37 +841,53 @@ namespace emp {
 
   template <typename ORG>
   typename World<ORG>::OrgPosition
-  World<ORG>::AddOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype) {
+  World<ORG>::AddOrgAt(Ptr<ORG> new_org, size_t pos, size_t p_pos) {
     emp_assert(new_org, pos);                            // The new organism must exist.
 
-    // Determine new organism's genotype.
-    Ptr<genotype_t> new_genotype = systematics.AddOrg(GetGenome(*new_org), p_genotype);
+    if (fun_should_mutate(pos)) {
+      DoMutationsOrg(*new_org);
+    }
+
+    for (Ptr<SystematicsBase<ORG> > s : systematics) {
+      s->SetNextParent(p_pos);
+    }
+
+    after_mutation_sig.Trigger(*new_org, pos, p_pos);
     if (pop.size() <= pos) pop.resize(pos+1, nullptr);  // Make sure we have room.
+
     RemoveOrgAt(pos);                                   // Clear out any old org.
     pop[pos] = new_org;                                 // Place new org.
     ++num_orgs;                                         // Track number of orgs.
 
-    // Track the new genotype.
-    if (genotypes.size() <= pos) genotypes.resize(pos+1, nullptr);   // Make sure we fit genotypes.
-    genotypes[pos] = new_genotype;
+    for (Ptr<SystematicsBase<ORG> > s : systematics) {
+      s->AddOrg(*new_org, pos, update, false);
+    }
 
     return OrgPosition(pos, true);
   }
 
   template <typename ORG>
   typename World<ORG>::OrgPosition
-  World<ORG>::AddNextOrgAt(Ptr<ORG> new_org, size_t pos, Ptr<genotype_t> p_genotype) {
+  World<ORG>::AddNextOrgAt(Ptr<ORG> new_org, size_t pos, size_t p_pos) {
     emp_assert(new_org, pos);                            // The new organism must exist.
 
-    // Determine new organism's genotype.
-    Ptr<genotype_t> new_genotype = systematics.AddOrg(GetGenome(*new_org), p_genotype);
+    if (fun_should_mutate(pos)) {
+      DoMutationsOrg(*new_org);
+    }
+
+    for (Ptr<SystematicsBase<ORG> > s : systematics) {
+      s->SetNextParent(p_pos);
+    }
+
+    after_mutation_sig.Trigger(*new_org, pos, p_pos);
+
     if (next_pop.size() <= pos) next_pop.resize(pos+1, nullptr);   // Make sure we have room.
     RemoveNextOrgAt(pos);                                          // Clear out any old org.
     next_pop[pos] = new_org;                                       // Place new org.
 
-    // Track the new genotype.
-    if (next_genotypes.size() <= pos) next_genotypes.resize(pos+1, nullptr);  // Make sure we fit genotypes.
-    next_genotypes[pos] = new_genotype;
+    for (Ptr<SystematicsBase<ORG> > s : systematics) {
+      s->AddOrg(*new_org, pos, update, true);
+    }
 
     return OrgPosition(pos, false);
   }
@@ -794,8 +900,10 @@ namespace emp {
     pop[pos] = nullptr;                      // ...and reset the pointer to null
     --num_orgs;                              // Track one fewer organisms in the population
     if (cache_on) ClearCache(pos);           // Delete any cached info about this organism
-    systematics.RemoveOrg( genotypes[pos] ); // Notify systematics about organism removal
-    genotypes[pos] = nullptr;                // No longer track a genotype at this position
+    for (Ptr<SystematicsBase<ORG> > s : systematics) {
+      s->RemoveOrg(pos);            // Notify systematics about organism removal
+    }
+
   }
 
   template<typename ORG>
@@ -803,8 +911,11 @@ namespace emp {
     if (!next_pop[pos]) return;                   // Nothing to remove!
     next_pop[pos].Delete();                       // Delete the organism...
     next_pop[pos] = nullptr;                      // ..and reset the pointer to null
-    systematics.RemoveOrg( next_genotypes[pos] ); // Notify systematics manager about removal
-    next_genotypes[pos] = nullptr;                // No longer track a genotype at this position
+    
+    for (Ptr<SystematicsBase<ORG> > s : systematics) {
+      s->RemoveNextOrg(pos);            // Notify systematics about organism removal
+    }
+
   }
 
   template<typename ORG>
@@ -827,15 +938,24 @@ namespace emp {
       // Append births into the next population.
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
         emp_assert(new_org);                            // New organism must exist.
-        return AddNextOrgAt(new_org, next_pop.size(), genotypes[parent_id]);  // Append it to the NEXT population
+        return AddNextOrgAt(new_org, next_pop.size(), parent_id);  // Append it to the NEXT population
       };
+
+      for (Ptr<SystematicsBase<ORG> > s : systematics) {
+        s->SetTrackSynchronous(true);
+      }
 
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neigbor in current population.
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        return AddOrgAt(new_org, fun_get_neighbor(parent_id), genotypes[parent_id]); // Place org in existing population.
+        return AddOrgAt(new_org, fun_get_neighbor(parent_id), parent_id); // Place org in existing population.
       };
+
+      for (Ptr<SystematicsBase<ORG> > s : systematics) {
+        s->SetTrackSynchronous(false);
+      }
+
       SetAttribute("SynchronousGen", "False");
     }
 
@@ -871,14 +991,24 @@ namespace emp {
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
         emp_assert(new_org);                                     // New organism must exist.
         const size_t id = fun_get_neighbor(parent_id);           // Place near parent, in next pop.
-        return AddNextOrgAt(new_org, id, genotypes[parent_id]);  // Add org and return the position placed.
+        return AddNextOrgAt(new_org, id, parent_id);  // Add org and return the position placed.
       };
+
+      for (Ptr<SystematicsBase<ORG> > s : systematics) {
+        s->SetTrackSynchronous(true);
+      }
+
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always go to a neigbor in current population.
       fun_add_birth = [this](Ptr<ORG> new_org, size_t parent_id) {
-        return AddOrgAt(new_org, fun_get_neighbor(parent_id), genotypes[parent_id]); // Place org in existing population.
+        return AddOrgAt(new_org, fun_get_neighbor(parent_id), parent_id); // Place org in existing population.
       };
+
+      for (Ptr<SystematicsBase<ORG> > s : systematics) {
+        s->SetTrackSynchronous(false);
+      }
+
       SetAttribute("SynchronousGen", "False");
     }
 
@@ -907,28 +1037,38 @@ namespace emp {
   template<typename ORG>
   DataFile & World<ORG>::SetupFitnessFile(const std::string & filename, const bool & print_header) {
     auto & file = SetupFile(filename);
-    auto & node = GetFitnessDataNode();
+    auto node = GetFitnessDataNode();
     file.AddVar(update, "update", "Update");
-    file.AddMean(node, "mean_fitness", "Average organism fitness in current population.");
-    file.AddMin(node, "min_fitness", "Minimum organism fitness in current population.");
-    file.AddMax(node, "max_fitness", "Maximum organism fitness in current population.");
-    file.AddInferiority(node, "inferiority", "Average fitness / maximum fitness in current population.");
+    file.AddMean(*node, "mean_fitness", "Average organism fitness in current population.");
+    file.AddMin(*node, "min_fitness", "Minimum organism fitness in current population.");
+    file.AddMax(*node, "max_fitness", "Maximum organism fitness in current population.");
+    file.AddInferiority(*node, "inferiority", "Average fitness / maximum fitness in current population.");
     if (print_header) file.PrintHeaderKeys();
     return file;
   }
 
-  // A data file (default="systematics.csv") that contains information about the population's
-  // phylogeny and lineages.
+  /// A data file (default="systematics.csv") that contains information about the population's
+  /// phylogeny and lineages.
   template<typename ORG>
-  DataFile & World<ORG>::SetupSystematicsFile(const std::string & filename, const bool & print_header) {
+  DataFile & World<ORG>::SetupSystematicsFile(std::string label, const std::string & filename, const bool & print_header) {
+    emp_assert(Has(systematics_labels, label), "Invalid systematics tracker requested.", label);
+    SetupSystematicsFile(systematics_labels[label], filename, print_header);
+  }
+
+  /// A data file (default="systematics.csv") that contains information about the population's
+  /// phylogeny and lineages.
+  template<typename ORG>
+  DataFile & World<ORG>::SetupSystematicsFile(int id, const std::string & filename, const bool & print_header) {
+    emp_assert(systematics.size() > 0, "Cannot track systematics file. No systematics file to track.");
+    emp_assert(id < (int)systematics.size(), "Invalid systematics file requested to be tracked.");
     auto & file = SetupFile(filename);
     file.AddVar(update, "update", "Update");
-    file.template AddFun<size_t>( [this](){ return systematics.GetNumActive(); }, "num_genotypes", "Number of unique genotype groups currently active." );
-    file.template AddFun<size_t>( [this](){ return systematics.GetTotalOrgs(); }, "total_orgs", "Number of organisms tracked." );
-    file.template AddFun<double>( [this](){ return systematics.GetAveDepth(); }, "ave_depth", "Average Phylogenetic Depth of Organisms." );
-    file.template AddFun<size_t>( [this](){ return systematics.GetNumRoots(); }, "num_roots", "Number of independent roots for phlogenies." );
-    file.template AddFun<int>( [this](){ return systematics.GetMRCADepth(); }, "mrca_depth", "Phylogenetic Depth of the Most Recent Common Ancestor (-1=none)." );
-    file.template AddFun<double>( [this](){ return systematics.CalcDiversity(); }, "diversity", "Genotypic Diversity (entropy of genotypes in population)." );
+    file.template AddFun<size_t>( [this, id](){ return systematics[id]->GetNumActive(); }, "num_taxa", "Number of unique taxonomic groups currently active." );
+    file.template AddFun<size_t>( [this, id](){ return systematics[id]->GetTotalOrgs(); }, "total_orgs", "Number of organisms tracked." );
+    file.template AddFun<double>( [this, id](){ return systematics[id]->GetAveDepth(); }, "ave_depth", "Average Phylogenetic Depth of Organisms." );
+    file.template AddFun<size_t>( [this, id](){ return systematics[id]->GetNumRoots(); }, "num_roots", "Number of independent roots for phlogenies." );
+    file.template AddFun<int>( [this, id](){ return systematics[id]->GetMRCADepth(); }, "mrca_depth", "Phylogenetic Depth of the Most Recent Common Ancestor (-1=none)." );
+    file.template AddFun<double>( [this, id](){ return systematics[id]->CalcDiversity(); }, "diversity", "Genotypic Diversity (entropy of genotypes in population)." );
     if (print_header) file.PrintHeaderKeys();
     return file;
   }
@@ -966,7 +1106,7 @@ namespace emp {
     // 1. Send out an update signal for any external functions to trigger.
     on_update_sig.Trigger(update);
 
-    // 2. If synchronous generationsm (i.e, next_pop is not empty), move next population into
+    // 2. If synchronous generations (i.e, next_pop is not empty), move next population into
     //    place as the current popoulation.
     if (next_pop.size()) {
       // Clear out current pop.
@@ -974,8 +1114,6 @@ namespace emp {
       pop.resize(0);
 
       std::swap(pop, next_pop);               // Move next_pop into place.
-      std::swap(genotypes, next_genotypes);   // Move next_genotypes into place.
-      next_genotypes.resize(0);               // Clear out genotype names.
 
       // Update the active population.
       num_orgs = 0;
@@ -985,6 +1123,11 @@ namespace emp {
           org_placement_sig.Trigger(i);  // ...and trigger org placement.
         }
       }
+    }
+
+    // Tell systematics manager to swap next population and population
+    for (Ptr<SystematicsBase<ORG>> s : systematics) {
+      s->Update();
     }
 
     // 3. Handle any data files that need to be printed this update.
