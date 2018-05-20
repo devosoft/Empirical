@@ -40,6 +40,10 @@ namespace emp {
     /// Returns the std::map mapping node names (strings) to DataNodes
     auto & GetNodes() const { return node_map; }
 
+    bool HasNode(const std::string & name) {
+      return Has(node_map, name);
+    }
+
     /// Creates and adds a new DataNode, with the name specified in @param name.
     node_t & New(const std::string & name) {
       emp_assert(!Has(node_map, name), name);

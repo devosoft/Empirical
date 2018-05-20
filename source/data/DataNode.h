@@ -695,7 +695,7 @@ namespace emp {
    * distribution (min, max, count, total, and mean) of values it has recieved since
    * the last reset. It also allows you to give it a name, description, and keyword.*/
   template <typename T, emp::data... MODS>
-  using DataMonitor = DataNode<T, data::Current, data::Info, data::Range, MODS...>;
+  using DataMonitor = DataNode<T, data::Current, data::Info, data::Range, data::Stats, MODS...>;
 
   /** A node that stores data about the most recent value it recieved, as well as all 
    * values it has recieved since the last reset. It also allows you to give it a name, 

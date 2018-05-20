@@ -25,6 +25,7 @@ TEST_CASE("Test fitness sharing", "[evo]")
   emp::Random random(1);
   emp::World<BitOrg> pop(random);
   pop.SetWellMixed(true);
+  pop.SetMutFun([](BitOrg & org, emp::Random & r){return 0;});
 
   // Build a random initial population
   for (size_t i = 0; i < POP_SIZE; i++) {
@@ -60,7 +61,7 @@ TEST_CASE("Test fitness sharing", "[evo]")
 
   REQUIRE(pop.CalcFitnessID(0) == Approx(0.322581));
 
-  pop.SetFitFun([](const BitOrg &org){ return N - org.CountOnes(); });
+  pop.SetFitFun([](BitOrg &org){ return N - org.CountOnes(); });
 
   emp::vector<std::function<double(const BitOrg&)> > fit_funs;
 
@@ -87,6 +88,7 @@ TEST_CASE("Test fitness sharing", "[evo]")
   };
 
   emp::World<int> grid_world(random);
+  grid_world.SetMutFun([](int & org, emp::Random & r){return 0;});
   const size_t side = (size_t) std::sqrt(POP_SIZE);
   grid_world.SetGrid(side, side);
   grid_world.SetPrintFun(print_fun);
@@ -117,6 +119,7 @@ TEST_CASE("Test resources", "[evo]")
   emp::Random random(1);
   emp::World<BitOrg> pop(random);
   pop.SetWellMixed(true);
+  pop.SetMutFun([](BitOrg & org, emp::Random & r){return 0;});
 
   emp::vector<emp::Resource> resources;
   resources.push_back(emp::Resource(100, 100, .01));
@@ -148,7 +151,8 @@ TEST_CASE("Test resources", "[evo]")
     pop.Inject(next_org);
   }
 
-  pop.SetFitFun([](const BitOrg &org){ return 10; });
+  pop.SetFitFun([](BitOrg &org){ return 10; });
+
 
   emp::vector<std::function<double(const BitOrg&)> > fit_funs;
 
@@ -158,6 +162,8 @@ TEST_CASE("Test resources", "[evo]")
 
   emp::ResourceSelect(pop, fit_funs, resources, 5, POP_SIZE);
 
-  REQUIRE(resources[2].GetAmount() == Approx(179.347));
+  REQUIRE(resources[0].GetAmount() == Approx(779.346));
+  REQUIRE(resources[1].GetAmount() == Approx(779.346));
+  REQUIRE(resources[2].GetAmount() == Approx(617.265));
 
 }

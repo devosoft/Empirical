@@ -113,7 +113,7 @@ namespace emp {
     }
 
     /// Print a header containing the name of each column
-    void PrintHeaderKeys() {
+    virtual void PrintHeaderKeys() {
       *os << line_begin;
       for (size_t i = 0; i < keys.size(); i++) {
         if (i > 0) *os << line_spacer;
@@ -124,7 +124,7 @@ namespace emp {
     }
 
     /// Print a header containing comments describing all of the columns
-    void PrintHeaderComment(const std::string & cstart = "# ") {
+    virtual void PrintHeaderComment(const std::string & cstart = "# ") {
       for (size_t i = 0; i < keys.size(); i++) {
         *os << cstart << i << ": " << descs[i] << " (" << keys[i] << ")" << std::endl;
       }
@@ -149,7 +149,7 @@ namespace emp {
 
     /// If a function takes an ostream, pass in the correct one.
     /// Generic function for adding a column to the DataFile. In practice, you probably
-    /// want to call one of the more specific ones. */
+    /// want to call one of the more specific ones.
     size_t Add(const std::function<void(std::ostream &)> & fun, const std::string & key, const std::string & desc) {
       size_t id = funs.GetSize();
       funs.Add(fun);
@@ -177,8 +177,9 @@ namespace emp {
     /// If @param reset is set true, we will call Reset on that DataNode after pulling the
     /// current value from the node
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddCurrent(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false) {
-      std::function<fun_t> in_fun = [&node, reset](std::ostream & os){
+    size_t AddCurrent(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
+        if (pull) node.PullData();
         os << node.GetCurrent();
         if (reset) node.Reset();
       };
@@ -191,8 +192,9 @@ namespace emp {
     /// If @param reset is set true, we will call Reset on that DataNode after pulling the
     /// current value from the node
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddMean(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false) {
-      std::function<fun_t> in_fun = [&node, reset](std::ostream & os){
+    size_t AddMean(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
+        if (pull) node.PullData();
         os << node.GetMean();
         if (reset) node.Reset();
       };
@@ -205,8 +207,9 @@ namespace emp {
     /// If @param reset is set true, we will call Reset on that DataNode after pulling the
     /// current value from the node
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddTotal(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false) {
-      std::function<fun_t> in_fun = [&node, reset](std::ostream & os){
+    size_t AddTotal(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
+        if (pull) node.PullData();
         os << node.GetTotal();
         if (reset) node.Reset();
       };
@@ -218,8 +221,9 @@ namespace emp {
     /// If @param reset is set true, we will call Reset on that DataNode after pulling the
     /// current value from the node
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddMin(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false) {
-      std::function<fun_t> in_fun = [&node, reset](std::ostream & os){
+    size_t AddMin(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
+        if (pull) node.PullData();
         os << node.GetMin();
         if (reset) node.Reset();
       };
@@ -231,12 +235,87 @@ namespace emp {
     /// If @param reset is set true, we will call Reset on that DataNode after pulling the
     /// current value from the node
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddMax(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false) {
-      std::function<fun_t> in_fun = [&node, reset](std::ostream & os){
+    size_t AddMax(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
+        if (pull) node.PullData();
         os << node.GetMax();
         if (reset) node.Reset();
       };
       return Add(in_fun, key, desc);
+    }
+
+    /// Add a function that always pulls the variance from the DataNode @param node
+    /// Requires that @param node have the data::Stats or data::FullStats modifier.
+    template <typename VAL_TYPE, emp::data... MODS>
+    size_t AddVariance(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){ 
+        if (pull) node.PullData();
+        os << node.GetVariance(); 
+        if (reset) node.Reset();
+      };
+      return Add(in_fun, key, desc);
+    }
+
+    /// Add a function that always pulls the standard deviation from the DataNode @param node
+    /// Requires that @param node have the data::Stats or data::FullStats modifier.
+    template <typename VAL_TYPE, emp::data... MODS>
+    size_t AddStandardDeviation(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){ 
+        if (pull) node.PullData();
+        os << node.GetStandardDeviation(); 
+        if (reset) node.Reset();  
+      };
+      return Add(in_fun, key, desc);
+    }
+
+    /// Add a function that always pulls the skewness from the DataNode @param node
+    /// Requires that @param node have the data::Stats or data::FullStats modifier.
+    template <typename VAL_TYPE, emp::data... MODS>
+    size_t AddSkew(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){ 
+        if (pull) node.PullData();
+        os << node.GetSkew(); 
+        if (reset) node.Reset();  
+      };
+      return Add(in_fun, key, desc);
+    }
+
+    /// Add a function that always pulls the kurtosis from the DataNode @param node
+    /// Requires that @param node have the data::Stats or data::FullStats modifier.
+    template <typename VAL_TYPE, emp::data... MODS>
+    size_t AddKurtosis(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){ 
+        if (pull) node.PullData();
+        os << node.GetKurtosis(); 
+        if (reset) node.Reset();
+      };
+      return Add(in_fun, key, desc);
+    }
+
+    /// Add multiple functions that pull common stats measurements (mean, variance, min, and max)
+    /// from the DataNode @param node.
+    /// Requires that @param node have the data::Stats or data::FullStats modifier.
+    /// @param key and @param desc will have the name of the stat appended to the beginning.
+    /// Note: excludes standard deviation, because it is easily calculated from variance
+    template <typename VAL_TYPE, emp::data... MODS>
+    void AddStats(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
+      AddMean(node, "mean_" + key, "mean of " + desc, reset, pull);
+      AddMin(node, "min_" + key, "min of " + desc, reset, pull);
+      AddMax(node, "max_" + key, "max of " + desc, reset, pull);
+      AddVariance(node, "variance_" + key, "variance of " + desc, reset, pull);
+    }
+
+
+    /// Add multiple functions that pull all stats measurements (mean, variance, min, max, 
+    /// skew, and kurtosis) from the DataNode @param node
+    /// Requires that @param node have the data::Stats or data::FullStats modifier.
+    /// @param key and @param desc will have the name of the stat appended to the beginning.
+    /// Note: excludes standard deviation, because it is easily calculated from variance
+    template <typename VAL_TYPE, emp::data... MODS>
+    void AddAllStats(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
+      AddStats(node, key, desc, reset, pull);
+      AddSkew(node, "skew_" + key, "skew of " + desc, reset, pull);
+      AddKurtosis(node, "kurtosis_" + key, "kurtosis of " + desc, reset, pull);
     }
 
     /// Add a function that always pulls the count of the @param bin_id 'th bin of the histogram
@@ -245,9 +324,10 @@ namespace emp {
     /// If @param reset is set true, we will call Reset on that DataNode after pulling the
     /// current value from the node
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddHistBin(DataNode<VAL_TYPE, MODS...> & node, size_t bin_id, const std::string & key="", const std::string & desc="", const bool & reset=false) {
+    size_t AddHistBin(DataNode<VAL_TYPE, MODS...> & node, size_t bin_id, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
       std::function<fun_t> in_fun =
-        [&node,bin_id,reset](std::ostream & os){
+        [&node,bin_id,reset, pull](std::ostream & os){
+          if (pull) node.PullData();
           os << node.GetHistCount(bin_id);
           if (reset) node.Reset();
         };
@@ -259,8 +339,9 @@ namespace emp {
     /// If @param reset is set true, we will call Reset on that DataNode after pulling the
     /// current value from the node
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddInferiority(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false) {
-      std::function<fun_t> in_fun = [&node, reset](std::ostream & os){
+    size_t AddInferiority(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
+        if (pull) node.PullData();
         VAL_TYPE inf = (node.GetMax() == 0) ? 0 : (node.GetMean() / node.GetMax());
         os << inf;
         if (reset) node.Reset();
@@ -319,8 +400,7 @@ namespace emp {
   
   template <typename CONTAINER>
   class ContainerDataFile : public DataFile {
-  private:
-
+    protected:
     // The container type cannot be a reference
     using container_t = typename std::remove_reference<CONTAINER>::type; 
     using raw_container_t = typename remove_ptr_type<container_t>::type;
@@ -438,7 +518,7 @@ namespace emp {
     dfile.SetUpdateContainerFun(fun);
     return dfile;
   }
-  
+
 }
 
 #endif

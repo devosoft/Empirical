@@ -146,6 +146,7 @@ namespace emp {
     }
 
     world.SetAttribute("PopStruct", "Pools");
+    world.SetSynchronousSystematics(synchronous_gen);
   }
 
 
@@ -204,6 +205,7 @@ namespace emp {
 
     world.SetAttribute("SynchronousGen", "False");
     world.SetAttribute("PopStruct", "MapElites");
+    world.SetSynchronousSystematics(false);
   }
 
   /// Setup a MAP-Elites world, given the provided set of traits.
@@ -540,6 +542,7 @@ namespace emp {
 
     world.SetAttribute("SynchronousGen", "False");
     world.SetAttribute("PopStruct", "DiverseElites");
+    world.SetSynchronousSystematics(false);
   }
 
   /// Setup a Diverse-Elites world, given the provided world already has set of phenotypes.
