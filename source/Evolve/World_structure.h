@@ -53,6 +53,42 @@ namespace emp {
     WorldPosition & MarkInvalid() { index = invalid_id; pop_id = invalid_id; return *this; }
   };
 
+  /// A vector that can be indexed with a WorldPosition
+  template <typename T>
+  class WorldVector : public emp::array<emp::vector<T>, 2> {
+  public:
+    using base_t = emp::array<emp::vector<T>, 2>;
+
+    /// Test if a position is currently valid.
+    bool IsValid(WorldPosition pos) const {
+      const size_t pop_id = pos.GetPopID();
+      const size_t id = pos.GetIndex();
+      emp_assert(pop_id < 2);
+      return id < base_t::operator[](pop_id).size();
+    }
+
+    /// Make sure position is valid; if not expand relevant vector.
+    void MakeValid(WorldPosition pos) {
+      const size_t pop_id = pos.GetPopID();
+      const size_t id = pos.GetIndex();
+      emp_assert(pop_id < 2);
+      if (id >= base_t::operator[](pop_id).size()) {
+        base_t::operator[](pop_id).resize(id+1);
+      }
+    }
+
+    T & operator()(WorldPosition pos) { 
+      const size_t pop_id = pos.GetPopID();
+      const size_t id = pos.GetIndex();
+      return base_t::operator[](pop_id)[id];
+    }
+    const T & operator()(WorldPosition pos) const {
+      const size_t pop_id = pos.GetPopID();
+      const size_t id = pos.GetIndex();
+      return base_t::operator[](pop_id)[id];
+    }
+  };
+
   /// Set the population to be a set of pools that are individually well mixed, but with limited
   /// migtation.  Arguments are the number of pools, the size of each pool, and whether the
   /// generations should be synchronous (true) or not (false, default).
