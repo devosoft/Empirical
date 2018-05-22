@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
+ *  @date 2017-2018
  *
  *  @file  Systematics.h
  *  @brief Track genotypes, species, clades, or lineages of organisms in a world.
@@ -28,14 +28,14 @@
 #include <map>
 
 #include "../base/Ptr.h"
-#include "../tools/info_theory.h"
-#include "../tools/set_utils.h"
-#include "../tools/map_utils.h"
-#include "../tools/string_utils.h"
-#include "../tools/stats.h"
 #include "../control/Signal.h"
-#include "../data/DataNode.h"
 #include "../data/DataManager.h"
+#include "../data/DataNode.h"
+#include "../tools/info_theory.h"
+#include "../tools/map_utils.h"
+#include "../tools/set_utils.h"
+#include "../tools/stats.h"
+#include "../tools/string_utils.h"
 
 namespace emp {
 
@@ -109,21 +109,22 @@ namespace emp {
 
     size_t id;                ///<  ID for this Taxon (Unique within this Systematics)
     const info_t info;        ///<  Details for the organims associated within this taxanomic group.
-    Ptr<this_t> parent; ///<  Pointer to parent group (nullptr if injected)
+    Ptr<this_t> parent;       ///<  Pointer to parent group (nullptr if injected)
     size_t num_orgs;          ///<  How many organisms currently exist of this group?
     size_t tot_orgs;          ///<  How many organisms have ever existed of this group?
     size_t num_offspring;     ///<  How many direct offspring groups exist from this one.
     size_t total_offspring;   ///<  How many total extant offspring taxa exist from this one (i.e. including indirect)
     size_t depth;             ///<  How deep in tree is this node? (Root is 0)
-    double origination_time;     ///<  When did this taxon first appear in the population?
+    double origination_time;  ///<  When did this taxon first appear in the population?
 
-    DATA_STRUCT data;              /// A struct for storing additional information about this taxon
+    DATA_STRUCT data;         ///< A struct for storing additional information about this taxon
 
   public:
     using data_t = DATA_STRUCT;
 
     Taxon(size_t _id, const info_t & _info, Ptr<this_t> _parent=nullptr)
-     : id (_id), info(_info), parent(_parent), num_orgs(0), tot_orgs(0), num_offspring(0), total_offspring(0)
+     : id (_id), info(_info), parent(_parent)
+     , num_orgs(0), tot_orgs(0), num_offspring(0), total_offspring(0)
      , depth(parent ? (parent->depth+1) : 0) { ; }
     Taxon(const Taxon &) = delete;
     Taxon(Taxon &&) = default;
@@ -205,35 +206,40 @@ namespace emp {
     }
   };
 
+
+  /// A base class for Systematics, maintaining information common to all systematics managers
+  /// and providing virtual functaions.
+
   template <typename ORG>
   class SystematicsBase {
-
   protected:
-    bool store_active;     ///< Store all of the currently active taxa?
-    bool store_ancestors;  ///< Store all of the direct ancestors from living taxa?
-    bool store_outside;    ///< Store taxa that are extinct with no living descendants?
-    bool archive;          ///< Set to true if we are supposed to do any archiving of extinct taxa.
-    bool store_position;   ///< Keep a vector mapping  positions to pointers
-    bool track_synchronous;///< Does this systematics manager need to keep track of current and next positions?
+    bool store_active;        ///< Store all of the currently active taxa?
+    bool store_ancestors;     ///< Store all of the direct ancestors from living taxa?
+    bool store_outside;       ///< Store taxa that are extinct with no living descendants?
+    bool archive;             ///< Set to true if we are supposed to do any archiving of extinct taxa.
+    bool store_position;      ///< Keep a vector mapping  positions to pointers
+    bool track_synchronous;   ///< Does this systematics manager need to keep track of current and next positions?
 
     // Stats about active taxa... (totals are across orgs, not taxa)
-    size_t org_count;           ///< How many organisms are currently active?
-    size_t total_depth;         ///< Sum of taxa depths for calculating average.
-    size_t num_roots;           ///< How many distint injected ancestors are currently in population?
+    size_t org_count;         ///< How many organisms are currently active?
+    size_t total_depth;       ///< Sum of taxa depths for calculating average.
+    size_t num_roots;         ///< How many distint injected ancestors are currently in population?
 
-    size_t next_id;             ///< What ID value should the next new taxon have?
+    size_t next_id;           ///< What ID value should the next new taxon have?
     size_t curr_update;
 
     DataManager<double, data::Current, data::Info, data::Range, data::Stats, data::Pull> data_nodes;
 
-    public:
-
+  public:
     SystematicsBase(bool _active=true, bool _anc=true, bool _all=false, bool _pos=true)
       : store_active(_active), store_ancestors(_anc), store_outside(_all)
       , archive(store_ancestors || store_outside), store_position(_pos), track_synchronous(false)
       , org_count(0), total_depth(0), num_roots(0), next_id(0), curr_update(0) { ; }
 
     virtual ~SystematicsBase(){;}
+
+    using data_node_t = DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>;
+    using data_ptr_t = Ptr<data_node_t>;
 
     /// Are we tracking a synchronous population?
     bool GetTrackSynchronous() const {return track_synchronous; }
@@ -283,19 +289,19 @@ namespace emp {
     // Returns a reference so that capturing it in a lambda to call on update
     // is less confusing. It's possible we should change it to be consistent
     // with GetFitnessDataNode, though.
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddDataNode(const std::string & name) {
+    data_ptr_t AddDataNode(const std::string & name) {
       emp_assert(!data_nodes.HasNode(name));
       return &(data_nodes.New(name));
     }
 
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddDataNode(std::function<emp::vector<double>()> pull_set_fun, const std::string & name) {
+    data_ptr_t AddDataNode(std::function<emp::vector<double>()> pull_set_fun, const std::string & name) {
       emp_assert(!data_nodes.HasNode(name));
       auto node = AddDataNode(name);
       node->AddPullSet(pull_set_fun);
       return node;
     }
 
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddDataNode(std::function<double()> pull_fun, const std::string & name) {
+    data_ptr_t AddDataNode(std::function<double()> pull_fun, const std::string & name) {
       emp_assert(!data_nodes.HasNode(name));
       auto node = AddDataNode(name);
       node->AddPull(pull_fun);
@@ -303,17 +309,17 @@ namespace emp {
     }
 
 
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> GetDataNode(const std::string & name) {
+    data_ptr_t GetDataNode(const std::string & name) {
       return &(data_nodes.Get(name));
     }
 
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddEvolutionaryDistinctivenessDataNode(const std::string & name = "evolutionary_distinctiveness") = 0;
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddPairwiseDistanceDataNode(const std::string & name = "pairwise_distance") = 0;
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddPhylogeneticDiversityDataNode(const std::string & name = "phylogenetic_diversity") = 0;
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddDeleteriousStepDataNode(const std::string & name = "deleterious_steps") = 0;
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddVolatilityDataNode(const std::string & name = "volatility") = 0;
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddUniqueTaxaDataNode(const std::string & name = "unique_taxa") = 0;
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddMutationCountDataNode(const std::string & name = "mutation_count", const std::string & mutation = "substitution") = 0;
+    virtual data_ptr_t AddEvolutionaryDistinctivenessDataNode(const std::string & name = "evolutionary_distinctiveness") = 0;
+    virtual data_ptr_t AddPairwiseDistanceDataNode(const std::string & name = "pairwise_distance") = 0;
+    virtual data_ptr_t AddPhylogeneticDiversityDataNode(const std::string & name = "phylogenetic_diversity") = 0;
+    virtual data_ptr_t AddDeleteriousStepDataNode(const std::string & name = "deleterious_steps") = 0;
+    virtual data_ptr_t AddVolatilityDataNode(const std::string & name = "volatility") = 0;
+    virtual data_ptr_t AddUniqueTaxaDataNode(const std::string & name = "unique_taxa") = 0;
+    virtual data_ptr_t AddMutationCountDataNode(const std::string & name = "mutation_count", const std::string & mutation = "substitution") = 0;
 
     virtual size_t GetNumActive() const = 0;
     virtual size_t GetNumAncestors() const = 0;
@@ -367,6 +373,7 @@ namespace emp {
     using SystematicsBase<ORG>::next_id;
     using SystematicsBase<ORG>::curr_update;
 
+    using typename SystematicsBase<ORG>::data_ptr_t;
     using SystematicsBase<ORG>::GetNumActive;
     using SystematicsBase<ORG>::GetNumAncestors;
     using SystematicsBase<ORG>::GetNumOutside;
@@ -462,7 +469,7 @@ namespace emp {
     void SetCalcInfoFun(fun_calc_info_t f) {calc_info_fun = f;}
 
     // Currently using raw pointers because of a weird bug in emp::Ptr. Should switch when fixed.
-    std::unordered_set< Ptr<taxon_t>, hash_t >* GetActivePtr() { return &active_taxa; }
+    std::unordered_set< Ptr<taxon_t>, hash_t > * GetActivePtr() { return &active_taxa; }
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetActive() const { return active_taxa; }
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetAncestors() const { return ancestor_taxa; }
 
@@ -502,7 +509,7 @@ namespace emp {
     /// Argument: Pounter to taxon
     SignalKey OnPrune(std::function<void(Ptr<taxon_t>)> & fun) { return on_prune_sig.AddAction(fun); }
 
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> 
+    virtual data_ptr_t 
     AddEvolutionaryDistinctivenessDataNode(const std::string & name = "evolutionary_distinctiveness") {
       auto node = AddDataNode(name);
       node->AddPullSet([this](){
@@ -516,7 +523,7 @@ namespace emp {
       return node;
     }
 
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddPairwiseDistanceDataNode(const std::string & name = "pairwise_distances") {
+    virtual data_ptr_t AddPairwiseDistanceDataNode(const std::string & name = "pairwise_distances") {
       auto node = AddDataNode(name);
       node->AddPullSet([this](){
         return GetPairwiseDistances();
@@ -524,7 +531,7 @@ namespace emp {
       return node;
     }
 
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddPhylogeneticDiversityDataNode(const std::string & name = "phylogenetic_diversity") {
+    virtual data_ptr_t AddPhylogeneticDiversityDataNode(const std::string & name = "phylogenetic_diversity") {
       auto node = AddDataNode(name);
       node->AddPull([this](){
         return GetPhylogeneticDiversity();
@@ -533,18 +540,18 @@ namespace emp {
     }
 
 
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> 
+    virtual data_ptr_t 
     AddDeleteriousStepDataNode(const std::string & name = "deleterious_steps") {
       return AddDeleteriousStepDataNodeImpl(1, name);
     }
 
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddDeleteriousStepDataNodeImpl(bool decoy, const std::string & name = "deleterious_steps") {
+    data_ptr_t AddDeleteriousStepDataNodeImpl(bool decoy, const std::string & name = "deleterious_steps") {
       emp_assert(false, "Calculating deleterious steps requires suitable DATA_STRUCT");
       return AddDataNode(name);
     }
  
     template <typename T=int>
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>>
+    data_ptr_t
     AddDeleteriousStepDataNodeImpl(typename std::enable_if<DATA_STRUCT::has_fitness_t::value, T>::type decoy, const std::string & name = "deleterious_steps") {
       auto node = AddDataNode(name);
       node->AddPullSet([this](){
@@ -558,18 +565,18 @@ namespace emp {
       return node;
     }
 
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> 
+    virtual data_ptr_t 
     AddVolatilityDataNode(const std::string & name = "volatility") {
       return AddVolatilityDataNodeImpl(1, name);
     }
 
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddVolatilityDataNodeImpl(bool decoy, const std::string & name = "volatility") {
+    data_ptr_t AddVolatilityDataNodeImpl(bool decoy, const std::string & name = "volatility") {
       emp_assert(false, "Calculating taxon volatility requires suitable DATA_STRUCT");
       return AddDataNode(name);
     }
  
     template <typename T=int>
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>>
+    data_ptr_t
     AddVolatilityDataNodeImpl(typename std::enable_if<DATA_STRUCT::has_phen_t::value, T>::type decoy, const std::string & name = "volatility") {
       auto node = AddDataNode(name);
       node->AddPullSet([this](){
@@ -583,18 +590,18 @@ namespace emp {
       return node;
     }
 
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> 
+    virtual data_ptr_t 
     AddUniqueTaxaDataNode(const std::string & name = "unique_taxa") {
       return AddUniqueTaxaDataNodeImpl(1, name);
     }
 
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddUniqueTaxaDataNodeImpl(bool decoy, const std::string & name = "unique_taxa") {
+    data_ptr_t AddUniqueTaxaDataNodeImpl(bool decoy, const std::string & name = "unique_taxa") {
       emp_assert(false, "Calculating uniqe taxa requires suitable DATA_STRUCT");
       return AddDataNode(name);
     }
  
     template <typename T=int>
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>>
+    data_ptr_t
     AddUniqueTaxaDataNodeImpl(typename std::enable_if<DATA_STRUCT::has_phen_t::value, T>::type decoy, const std::string & name = "unique_taxa") {
       auto node = AddDataNode(name);
       node->AddPullSet([this](){
@@ -608,18 +615,18 @@ namespace emp {
       return node;
     }
 
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> 
+    virtual data_ptr_t 
     AddMutationCountDataNode(const std::string & name = "mutation_count", const std::string & mutation = "substitution") {
       return AddMutationCountDataNodeImpl(1, name, mutation);
     }
 
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddMutationCountDataNodeImpl(bool decoy, const std::string & name = "mutation_count", const std::string & mutation = "substitution") {
+    data_ptr_t AddMutationCountDataNodeImpl(bool decoy, const std::string & name = "mutation_count", const std::string & mutation = "substitution") {
       emp_assert(false, "Calculating mutation count requires suitable DATA_STRUCT");
       return AddDataNode(name);
     }
  
     template <typename T=int>
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>>
+    data_ptr_t
     AddMutationCountDataNodeImpl(typename std::enable_if<DATA_STRUCT::has_mutations_t::value, T>::type decoy, const std::string & name = "mutation_count", const std::string & mutation = "substitution") {
       auto node = AddDataNode(name);
       node->AddPullSet([this,mutation](){
@@ -992,9 +999,9 @@ namespace emp {
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOffspring(Ptr<taxon_t> taxon) {
-    if (!taxon) { num_roots--; return; }               // Offspring was root; remove and return.
-    bool still_active = taxon->RemoveOffspring();      // Taxon still active w/ 1 fewer offspring?
-    if (!still_active) Prune(taxon);                   // If out of offspring, remove from tree.
+    if (!taxon) { num_roots--; return; }             // Offspring was root; remove and return.
+    bool still_active = taxon->RemoveOffspring();    // Taxon still active w/ 1 fewer offspring?
+    if (!still_active) Prune(taxon);                 // If out of offspring, remove from tree.
 
     // If the taxon is still active AND the is the current mrca AND now has only one offspring,
     // clear the MRCA for lazy re-evaluation later.
@@ -1115,15 +1122,15 @@ namespace emp {
 
     // If this organism needs a new taxon, build it!
     if (!cur_taxon || cur_taxon->GetInfo() != info) {
-      if (!cur_taxon) {                                         // No parent -> NEW tree
-        num_roots++;                                               // ...track extra root.
+      if (!cur_taxon) {                                 // No parent -> NEW tree
+        num_roots++;                                    // ...track extra root.
         mrca = nullptr;                                 // ...nix old common ancestor
       } 
 
       cur_taxon = NewPtr<taxon_t>(++next_id, info, parent);  // Build new taxon.
       on_new_sig.Trigger(cur_taxon);
-      if (store_active) active_taxa.insert(cur_taxon);             // Store new taxon.
-      if (parent) parent->AddOffspring();              // Track tree info.
+      if (store_active) active_taxa.insert(cur_taxon);       // Store new taxon.
+      if (parent) parent->AddOffspring();                    // Track tree info.
 
       cur_taxon->SetOriginationTime(update);
     }
