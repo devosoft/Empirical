@@ -354,6 +354,7 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT = emp::datastruct::no_data>
   class Systematics : public SystematicsBase<ORG> {
   private:
+    using parent_t = SystematicsBase<ORG>;
     using taxon_t = Taxon<ORG_INFO, DATA_STRUCT>;
     using hash_t = typename Ptr<taxon_t>::hash_t;
     using fun_calc_info_t = std::function<ORG_INFO(ORG &)>;
@@ -361,56 +362,56 @@ namespace emp {
     fun_calc_info_t calc_info_fun;
     Ptr<taxon_t> next_parent;
 
-    using SystematicsBase<ORG>::store_active;
-    using SystematicsBase<ORG>::store_ancestors;
-    using SystematicsBase<ORG>::store_outside;
-    using SystematicsBase<ORG>::archive;
-    using SystematicsBase<ORG>::store_position;
-    using SystematicsBase<ORG>::track_synchronous;
-    using SystematicsBase<ORG>::org_count;
-    using SystematicsBase<ORG>::total_depth;
-    using SystematicsBase<ORG>::num_roots;
-    using SystematicsBase<ORG>::next_id;
-    using SystematicsBase<ORG>::curr_update;
+    using parent_t::store_active;
+    using parent_t::store_ancestors;
+    using parent_t::store_outside;
+    using parent_t::archive;
+    using parent_t::store_position;
+    using parent_t::track_synchronous;
+    using parent_t::org_count;
+    using parent_t::total_depth;
+    using parent_t::num_roots;
+    using parent_t::next_id;
+    using parent_t::curr_update;
 
-    using typename SystematicsBase<ORG>::data_ptr_t;
-    using SystematicsBase<ORG>::GetNumActive;
-    using SystematicsBase<ORG>::GetNumAncestors;
-    using SystematicsBase<ORG>::GetNumOutside;
-    using SystematicsBase<ORG>::GetTreeSize;
-    using SystematicsBase<ORG>::GetNumTaxa;
-    // using SystematicsBase<ORG>::OnNew;
-    // using SystematicsBase<ORG>::OnPrune;
-    using SystematicsBase<ORG>::GetPhylogeneticDiversity;
-    // using SystematicsBase<ORG>::GetTaxonDistinctiveness;
-    // using SystematicsBase<ORG>::GetEvolutionaryDistinctiveness;
-    using SystematicsBase<ORG>::GetMeanPairwiseDistance;
-    using SystematicsBase<ORG>::GetSumPairwiseDistance;
-    using SystematicsBase<ORG>::GetVariancePairwiseDistance;
-    using SystematicsBase<ORG>::GetPairwiseDistances;
-    // using SystematicsBase<ORG>::GetDistanceToRoot;
-    // using SystematicsBase<ORG>::GetBranchesToRoot;
-    // using SystematicsBase<ORG>::GetMRCA;
-    using SystematicsBase<ORG>::GetMRCADepth;
-    using SystematicsBase<ORG>::AddOrg;
-    using SystematicsBase<ORG>::RemoveOrg;
-    using SystematicsBase<ORG>::RemoveNextOrg;
-    // using SystematicsBase<ORG>::Parent;
-    using SystematicsBase<ORG>::PrintStatus;
-    // using SystematicsBase<ORG>::PrintLineage;
-    using SystematicsBase<ORG>::CalcDiversity;
-    using SystematicsBase<ORG>::Update;
-    using SystematicsBase<ORG>::SetNextParent;
+    using typename parent_t::data_ptr_t;
+    using parent_t::GetNumActive;
+    using parent_t::GetNumAncestors;
+    using parent_t::GetNumOutside;
+    using parent_t::GetTreeSize;
+    using parent_t::GetNumTaxa;
+    // using parent_t::OnNew;
+    // using parent_t::OnPrune;
+    using parent_t::GetPhylogeneticDiversity;
+    // using parent_t::GetTaxonDistinctiveness;
+    // using parent_t::GetEvolutionaryDistinctiveness;
+    using parent_t::GetMeanPairwiseDistance;
+    using parent_t::GetSumPairwiseDistance;
+    using parent_t::GetVariancePairwiseDistance;
+    using parent_t::GetPairwiseDistances;
+    // using parent_t::GetDistanceToRoot;
+    // using parent_t::GetBranchesToRoot;
+    // using parent_t::GetMRCA;
+    using parent_t::GetMRCADepth;
+    using parent_t::AddOrg;
+    using parent_t::RemoveOrg;
+    using parent_t::RemoveNextOrg;
+    // using parent_t::Parent;
+    using parent_t::PrintStatus;
+    // using parent_t::PrintLineage;
+    using parent_t::CalcDiversity;
+    using parent_t::Update;
+    using parent_t::SetNextParent;
 
-    using SystematicsBase<ORG>::GetDataNode;
-    using SystematicsBase<ORG>::AddDataNode;
-    using SystematicsBase<ORG>::AddEvolutionaryDistinctivenessDataNode;
-    using SystematicsBase<ORG>::AddPairwiseDistanceDataNode;
-    using SystematicsBase<ORG>::AddPhylogeneticDiversityDataNode;
-    using SystematicsBase<ORG>::AddDeleteriousStepDataNode;
-    using SystematicsBase<ORG>::AddVolatilityDataNode;
-    using SystematicsBase<ORG>::AddUniqueTaxaDataNode;
-    using SystematicsBase<ORG>::AddMutationCountDataNode;
+    using parent_t::GetDataNode;
+    using parent_t::AddDataNode;
+    using parent_t::AddEvolutionaryDistinctivenessDataNode;
+    using parent_t::AddPairwiseDistanceDataNode;
+    using parent_t::AddPhylogeneticDiversityDataNode;
+    using parent_t::AddDeleteriousStepDataNode;
+    using parent_t::AddVolatilityDataNode;
+    using parent_t::AddUniqueTaxaDataNode;
+    using parent_t::AddMutationCountDataNode;
 
     std::unordered_set< Ptr<taxon_t>, hash_t > active_taxa;   ///< A set of all living taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; ///< A set of all dead, ancestral taxa.
@@ -444,7 +445,7 @@ namespace emp {
      */
 
     Systematics(fun_calc_info_t calc_taxon, bool _active=true, bool _anc=true, bool _all=false, bool _pos=true)
-      : SystematicsBase<ORG>(_active, _anc, _all, _pos)
+      : parent_t(_active, _anc, _all, _pos)
       , calc_info_fun(calc_taxon)
       , active_taxa(), ancestor_taxa(), outside_taxa()
       , mrca(nullptr) { ; }
