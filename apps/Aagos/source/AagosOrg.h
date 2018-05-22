@@ -7,7 +7,12 @@ private:
 
 public:
   Aagos() { ; }
+  Aagos(const Aagos &) = default;
+  Aagos(Aagos &&) = default;
   ~Aagos() { ; }
+
+  Aagos & operator=(const Aagos &) = default;
+  Aagos & operator=(Aagos &&) = default;
 
   size_t GetNumBits() const { return genome.size(); }
   size_t GetNumGenes() const { return gen_pos.size(); }
