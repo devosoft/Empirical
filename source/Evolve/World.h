@@ -1086,7 +1086,7 @@ namespace emp {
   template<typename ORG>
   DataFile & World<ORG>::SetupSystematicsFile(std::string label, const std::string & filename, const bool & print_header) {
     emp_assert(Has(systematics_labels, label), "Invalid systematics tracker requested.", label);
-    SetupSystematicsFile(systematics_labels[label], filename, print_header);
+    return SetupSystematicsFile(systematics_labels[label], filename, print_header);
   }
 
   // A data file (default="systematics.csv") that contains information about the population's
