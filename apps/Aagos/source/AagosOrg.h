@@ -1,21 +1,22 @@
-#include "source/tools/BitVector.h"
+#include "tools/BitVector.h"
 
 class AagosOrg {
 private:
   emp::BitVector bits;
+  size_t gene_size;
   emp::vector<size_t> gene_starts;
 
 public:
-  Aagos() { ; }
-  Aagos(const Aagos &) = default;
-  Aagos(Aagos &&) = default;
-  ~Aagos() { ; }
+  AagosOrg() { ; }
+  AagosOrg(const AagosOrg &) = default;
+  AagosOrg(AagosOrg &&) = default;
+  ~AagosOrg() { ; }
 
-  Aagos & operator=(const Aagos &) = default;
-  Aagos & operator=(Aagos &&) = default;
+  AagosOrg & operator=(const AagosOrg &) = default;
+  AagosOrg & operator=(AagosOrg &&) = default;
 
-  size_t GetNumBits() const { return genome.size(); }
-  size_t GetNumGenes() const { return gen_pos.size(); }
+  size_t GetNumBits() const { return bits.size(); }
+  size_t GetNumGenes() const { return gene_starts.size(); }
 
   const emp::BitVector & GetBits() const { return bits; }
   const emp::vector<size_t> & GetGeneStarts() const { return gene_starts; }
