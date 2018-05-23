@@ -97,6 +97,19 @@ namespace emp {
     for (T & v : vals) v = (T) random.GetDouble((double) min, (double) max);
     return vals;
   }
+
+  /// Generate a random BitVector of the specified size.
+  inline void RandomizeBitVector(BitVector & bits, Random & random, double p=0.5)
+  {
+    emp_assert(p >= 0.0 && p <= 1.0);
+    for (size_t i = 0; i < bits.size(); i++) bits[i] = random.P(p);
+  }
+
+  /// Generate a random vector in the specified type and range.
+  template <typename T>
+  inline void RandomizeVector(emp::vector<T> & vals, Random & random, T min, T max) {
+    for (T & v : vals) v = (T) random.GetDouble((double) min, (double) max);
+  }
 }
 
 #endif
