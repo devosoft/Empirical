@@ -1,3 +1,6 @@
+#ifndef AAGOS_ORG_H
+#define AAGOS_ORG_H
+
 #include "tools/BitVector.h"
 #include "tools/Random.h"
 #include "tools/random_utils.h"
@@ -10,7 +13,7 @@ private:
 
 public:
   AagosOrg(size_t num_bits=64, size_t num_genes=64, size_t in_gene_size=8)
-   : bits(num_bits), gene_starts(num_genes,0), gen_size(in_gene_size)
+   : bits(num_bits), gene_starts(num_genes,0), gene_size(in_gene_size)
   { ; }
   AagosOrg(const AagosOrg &) = default;
   AagosOrg(AagosOrg &&) = default;
@@ -27,6 +30,8 @@ public:
 
   void Randomize(emp::Random & random) {
     emp::RandomizeBitVector(bits, random);
-    emp::RandomizeVector(gene_starts, random, 0, bits.size());
+    emp::RandomizeVector<size_t>(gene_starts, random, 0, bits.size());
   }
 };
+
+#endif
