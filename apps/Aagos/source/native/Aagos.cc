@@ -8,7 +8,11 @@
 
 int main(int argc, char* argv[])
 {
-  AagosWorld world;
+  constexpr size_t NUM_BITS = 64;
+  constexpr size_t NUM_GENES = 64;
+  constexpr size_t GENE_SIZE = 8;
+
+  AagosWorld world(NUM_BITS, NUM_GENES, GENE_SIZE);
 
   emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
 
