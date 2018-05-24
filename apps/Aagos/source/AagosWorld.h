@@ -11,6 +11,8 @@
 
 class AagosWorld : public emp::World<AagosOrg> {
 private:
+  using base_t = emp::World<AagosOrg>;
+
   emp::NKLandscape landscape;
 
   // Configued values
@@ -43,8 +45,38 @@ public:
       return fitness;
     };
     SetFitFun(fit_fun);
+
+    // Setup the mutation function.
+    std::function<size_t(AagosOrg &, emp::Random &)> mut_fun =
+      [this](AagosOrg & org, emp::Random & random) {
+        constexpr size_t MUT_COUNT = 3;
+        size_t num_muts = 0;
+        for (uint32_t m = 0; m < MUT_COUNT; m++) {
+          const uint32_t pos = random.GetUInt(org.GetNumBits());
+          if (random.P(0.5)) {
+            org.bits[pos] ^= 1;
+            num_muts++;
+          }
+        }
+
+        // Mutate a gene position?
+        if (random.P(0.1)) {
+          size_t gene_id = random.GetUInt(org.GetNumGenes());
+          org.gene_starts[gene_id] = random.GetUInt(org.GetNumBits());
+        }
+
+        return num_muts;
+      };
+    SetMutFun( mut_fun );
+
+    SetPopStruct_Mixed(true);
   }
   ~AagosWorld() { ; }
+
+  void Update() {
+    if (change_rate) landscape.RandomizeStates(GetRandom(), change_rate);
+    base_t::Update();
+  }
 };
 
 #endif
