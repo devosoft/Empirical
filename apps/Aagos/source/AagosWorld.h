@@ -9,6 +9,27 @@
 
 #include "AagosOrg.h"
 
+EMP_BUILD_CONFIG( AagosConfig,
+  GROUP(DEFAULT, "Default settings for Aagos model"),
+  VALUE(NUM_BITS, size_t, 64, "Starting number of bits in each organism"),
+  VALUE(NUM_GENES, size_t, 64, "Number of genes in each organism"),
+  VALUE(GENE_SIZE, size_t, 8, "Size of each gene in each organism"),
+  VALUE(CHANGE_RATE, size_t, 0, "How many changes to fitness tables each generation?"),
+
+  VALUE(POP_SIZE, size_t, 400, "How many organisms should be in the population?"),
+  VALUE(MAX_GENS, size_t, 10000, "How many generations should the runs go for?"),
+
+  VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
+
+  VALUE(GENE_MOVE_PROB, double, 0.001, "Probability of each gene moving each generation"),
+  VALUE(BIT_FLIP_PROB, double, 0.01, "Probability of each bit toggling"),
+  VALUE(BIT_INS_PROB, double, 0.01, "Probability of a single bit being inserted."),
+  VALUE(BIT_DEL_PROB, double, 0.01, "Probability of a single bit being removed."),
+
+  VALUE(PRINT_INTERVAL, size_t, 100, "How many updates between prints?")
+)
+
+
 class AagosWorld : public emp::World<AagosOrg> {
 private:
   using base_t = emp::World<AagosOrg>;
