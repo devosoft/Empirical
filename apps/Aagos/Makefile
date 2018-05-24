@@ -8,7 +8,7 @@ CFLAGS_all := -Wall -Wno-unused-function -std=c++14 -I$(EMP_DIR)/
 # Native compiler information
 CXX_nat := g++
 CFLAGS_nat := -O3 -DNDEBUG $(CFLAGS_all)
-CFLAGS_nat_debug := -g $(CFLAGS_all)
+CFLAGS_nat_debug := -g -pedantic -DEMP_TRACK_MEM  -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++ $(CFLAGS_all)
 
 # Emscripten compiler information
 CXX_web := emcc
