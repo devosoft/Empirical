@@ -110,7 +110,25 @@ public:
           // std::cout << "-----------" << std::endl;
         }
 
-        
+        // Do deletions
+        if (do_delete) {
+          size_t pos = random.GetUInt(org.GetNumBits());      // Figure out position to delete.
+          // std::cout << "pos = " << pos << std::endl;
+          // std::cout << "start = " << org.bits << std::endl;
+          emp::BitVector mask(pos, 1);                              // Setup a mask to preserve early bits.
+          mask.Resize(org.bits.GetSize());                          // Align mask size.
+          // std::cout << "mask =  " << mask << std::endl;
+          
+          org.bits = (mask & org.bits) | ((org.bits >> 1) & ~mask); // Build the new string!
+          org.bits.Resize(org.bits.GetSize() - 1);                  // Decrease size to account for deletion
+
+          // Shift any genes that started at pos or later.
+          if (pos == 0) pos = 1;                                    // Adjust position if beginning was deleted.
+          for (auto & x : org.gene_starts) if (x >= pos) x--;
+
+          // std::cout << "end =    " << org.bits << std::endl;
+          // std::cout << "-----------" << std::endl;          
+        }
 
         return num_moves + num_flips + do_insert + do_delete;
       };
