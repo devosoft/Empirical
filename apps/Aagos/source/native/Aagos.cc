@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "base/vector.h"
+#include "config/ArgManager.h"
 #include "config/command_line.h"
 
 #include "../AagosOrg.h"
@@ -8,30 +9,27 @@
 
 int main(int argc, char* argv[])
 {
-  emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
+  AagosConfig config;
+  // Deal with loading config values via native interface (config file and command line args)
+  config.Read("Aagos.cfg");
+  auto args = emp::cl::ArgManager(argc, argv);
+  if (args.ProcessConfigOptions(config, std::cout, "Aagos.cfg", "Aagos-macros.h") == false) exit(0);
+  if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
 
-  constexpr size_t NUM_BITS = 64;
-  constexpr size_t NUM_GENES = 64;
-  constexpr size_t GENE_SIZE = 8;
-  constexpr size_t CHANGE_RATE = 0;
 
-  constexpr size_t POP_SIZE = 400;
-  constexpr size_t MAX_GENS = 1000;
-  constexpr size_t MUT_COUNT = 3;
-
-  AagosWorld world(NUM_BITS, NUM_GENES, GENE_SIZE, CHANGE_RATE);
+  AagosWorld world(config.NUM_BITS(), config.NUM_GENES(), config.GENE_SIZE(), config.CHANGE_RATE());
 
   emp::Random & random = world.GetRandom();
 
   // Build a random initial population
-  for (uint32_t i = 0; i < POP_SIZE; i++) {
-    AagosOrg next_org(NUM_BITS, NUM_GENES, GENE_SIZE);
+  for (uint32_t i = 0; i < config.POP_SIZE(); i++) {
+    AagosOrg next_org(config.NUM_BITS(), config.NUM_GENES(), config.GENE_SIZE());
     next_org.Randomize(random);
     std::cout << next_org.GetNumBits() << std::endl;
     world.Inject(next_org);
   }
 
-  for (size_t gen = 0; gen < MAX_GENS; gen++) {
+  for (size_t gen = 0; gen < config.MAX_GENS(); gen++) {
     // Do mutations on the population.
     world.DoMutations(1);
 
@@ -39,11 +37,14 @@ int main(int argc, char* argv[])
     emp::EliteSelect(world, 1, 1);
 
     // Run a tournament for the rest...
-    emp::TournamentSelect(world, 5, POP_SIZE-1);
+    emp::TournamentSelect(world, 5, config.POP_SIZE()-1);
 
     world.Update();
 
-    std::cout << gen << std::endl;
+    if (gen % 100 == 0) {
+      std::cout << gen << " : fitness=" << world.CalcFitnessID(0) << std::endl;
+      world[0].Print();
+    }
   }
 
   std::cout << "Hello World!" << std::endl;
