@@ -276,7 +276,7 @@ TEST_CASE("Run world", "[evo]") {
 
   emp::Random random;
   emp::World<org_t> world(random, "AvidaWorld");
-  world.SetWellMixed(true);
+  world.SetPopStruct_Mixed(true);
 
 
   std::function<emp::AvidaGP::genome_t(emp::AvidaGP &)> gene_fun =

@@ -126,7 +126,7 @@ public:
     inst_lib.AddInst("Rotate", SGOrg::Inst_Rotate, 1, "Rotate in place in state grid.");
     inst_lib.AddInst("Scan",   SGOrg::Inst_Scan,   1, "Idenify state of current position in state grid.");
 
-    // OnOrgPlacement( [this](size_t world_id){
+    // OnPlacement( [this](size_t world_id){
     //   pop[world_id]->SetWorldID(world_id);  // Tell organisms their position in environment.
     // } );
   }
@@ -162,12 +162,12 @@ int main()
   state_grid.Load("state_grids/islands_50x50.cfg");
 
   // When an organism is added to the world, supply it with a state grid.
-  world.OnOrgPlacement( [&state_grid, &world, &random](size_t pos){
+  world.OnPlacement( [&state_grid, &world, &random](size_t pos){
     world.GetOrg(pos).SetStateGrid(state_grid);
     // if (pos && random.P(0.1)) world.GetOrg(pos).GetSGStatus().Randomize(state_grid, random);
   } );
 
-  world.SetWellMixed(true);
+  world.SetPopStruct_Mixed(true);
 
   // Build a random initial population.
   for (size_t i = 0; i < POP_SIZE; i++) {

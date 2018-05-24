@@ -14,10 +14,28 @@
 namespace UI = emp::web;
 
 UI::Document doc("emp_base");
+UI::Div div_pop("div_pop");
+UI::Div div_stats("div_stats");
+UI::Div div_controls("div_controls");
+UI::Div div_vis("div_vis");
+
+double layout_x1 = 10;
+double layout_y1 = 70;
+double layout_x2 = 650;
+double layout_y2 = 300;
+double layout_y3 = 700;
+
 ArmWorld world;
 const double world_size = 600;
 size_t target_id = 0;
 ArmOrg target_arm;
+
+void LayoutDivs() {
+  div_pop.SetPosition(layout_x1, layout_y1);
+  div_controls.SetPosition(layout_x2, layout_y1);
+  div_stats.SetPosition(layout_x2, layout_y2);
+  div_vis.SetPosition(layout_x1, layout_y3);
+}
 
 void DrawWorldCanvas_Grid() {
   UI::Canvas canvas = doc.Canvas("world_canvas");
@@ -81,6 +99,8 @@ void DrawWorldCanvas_Grid() {
 }
 
 void DrawWorldCanvas_Scatter() {
+  LayoutDivs();
+
   UI::Canvas canvas = doc.Canvas("world_canvas");
 
   const size_t world_size = world.GetSize();
@@ -164,6 +184,8 @@ void CanvasClick(int x, int y) {
 }
 
 void CanvasClick2(int x, int y) {
+  x -= layout_x1;
+  y -= layout_y1;
   const size_t world_size = world.GetSize();
   const double total_length = world.CalcTotalLength();
 
@@ -204,20 +226,39 @@ int main()
 {
   doc << "<h1>MAP-Elites: Arm Positioning Challenge</h1>";
 
-  // Add some Buttons
-  doc << UI::Button( [](){ emp::RandomSelect(world, 1); DrawWorldCanvas(); }, "Do Birth", "birth_button");
-  doc << UI::Button( [](){ emp::RandomSelect(world, 100); DrawWorldCanvas(); }, "Do Birth 100", "birth_100_button");
-  doc << UI::Button( [](){ emp::RandomSelect(world, 10000); DrawWorldCanvas(); }, "Do Birth 10000", "birth_10000_button");
-  doc << UI::Button( [](){ world.ResetMixed(); DrawWorldCanvas(); }, "Reset Well Mixed", "reset_mixed_button");
-  doc << UI::Button( [](){ world.ResetMAP(); DrawWorldCanvas(); }, "Reset MAP-Elites", "reset_map_button");
-  doc << UI::Button( [](){ world.ResetDiverse(); DrawWorldCanvas(); }, "Reset DiverseElites", "reset_diverse_button");
-  doc << "<br>";
+  UI::Canvas world_canvas(world_size, world_size, "world_canvas");
+  div_pop << world_canvas;
 
-  // Add the Canvas
-  auto world_canvas = doc.AddCanvas(world_size, world_size, "world_canvas");
+  // Setup Selector
+  auto mode_select = UI::Selector("mode_select");
+  mode_select.SetOption("Well Mixed", [](){ world.ResetMixed(); DrawWorldCanvas(); });
+  mode_select.SetOption("MAP-Elites", [](){ world.ResetMAP(); DrawWorldCanvas(); });
+  mode_select.SetOption("DiverseElites", [](){ world.ResetDiverse(); DrawWorldCanvas(); });
+  mode_select.SelectID(1);
+
+  // Add some Buttons
+  div_controls << UI::Button( [](){ emp::RandomSelect(world, 1); DrawWorldCanvas(); }, "Do Birth", "birth_button");
+  div_controls << UI::Button( [](){ emp::RandomSelect(world, 100); DrawWorldCanvas(); }, "Do Birth 100", "birth_100_button");
+  div_controls << UI::Button( [](){ emp::RandomSelect(world, 10000); DrawWorldCanvas(); }, "Do Birth 10000", "birth_10000_button");
+  div_controls << UI::Button( [](){ for (size_t i=0; i<100; i++) world.DoDeath(); DrawWorldCanvas(); }, "Clean", "clean_button");
+  div_controls << "<br>";
+  div_controls << "Mode: " << mode_select;
+  div_controls << "<br>";
+
+  // Add some stats
+  div_stats << "<h3>Stats</h3>";
+
+  // Setup canvas interactions
   world_canvas.On("click", CanvasClick2);
+
+  doc << div_pop;
+  doc << div_stats;
+  doc << div_controls;
+  doc << div_vis;
+
   DrawWorldCanvas();
 
+  emp::web::OnDocumentReady( [](){ LayoutDivs(); } );
 
   EM_ASM({ $('#(x)'); });  // <-- What is this needed for?  Clicking on the canvas doesn't work without it.
 

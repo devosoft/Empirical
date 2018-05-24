@@ -12,8 +12,8 @@
 #include "hardware/AvidaGP.h"
 #include "hardware/InstLib.h"
 #include "tools/Random.h"
-#include "Evo/World.h"
-#include "Evo/Resource.h"
+#include "Evolve/World.h"
+#include "Evolve/Resource.h"
 
 void Print(const emp::AvidaGP & cpu) {
   for (size_t i = 0; i < 16; i++) {
@@ -30,7 +30,7 @@ int main()
 {
   emp::Random random;
   emp::World<emp::AvidaGP> world(random, "AvidaWorld");
-  world.SetWellMixed(true);
+  world.SetPopStruct_Mixed(true);
 
   emp::vector<emp::Resource> resources;
   resources.push_back(emp::Resource(100, 100, .01));

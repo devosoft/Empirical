@@ -11,10 +11,10 @@ EMP_BUILD_CONFIG( NKConfig,
   VALUE(K, uint32_t, 10, "Level of epistasis in the NK model"),
   VALUE(N, uint32_t, 100, "Number of bits in each organisms (must be > K)"), ALIAS(GENOME_SIZE),
   VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
-  VALUE(POP_SIZE, uint32_t, 100, "Number of organisms in the popoulation."),
-  VALUE(MAX_GENS, uint32_t, 2000, "How many generations should we process?"),
+  VALUE(MIN_POP_SIZE, uint32_t, 10, "Number of organisms AFTER bottleneck."),
+  VALUE(MAX_POP_SIZE, uint32_t, 100, "Number of organisms to trigger bottleneck."),
+  VALUE(MAX_GENS, uint32_t, 10000, "How many generations should we process?"),
   VALUE(MUT_COUNT, uint32_t, 3, "How many bit positions should be randomized?"), ALIAS(NUM_MUTS),
-  VALUE(TEST, std::string, "TestString", "This is a test string.")
 )
 
 struct NKWorld : public emp::World<BitOrg> {
@@ -23,23 +23,25 @@ struct NKWorld : public emp::World<BitOrg> {
 
   uint32_t N;
   uint32_t K;
-  uint32_t POP_SIZE;
+  uint32_t MIN_POP_SIZE;
+  uint32_t MAX_POP_SIZE;
   uint32_t MAX_GENS;
   uint32_t MUT_COUNT;
 
   NKWorld(const std::string & world_name="NKWorld")
-  : emp::World<BitOrg>(world_name) {
-  }
+    : emp::World<BitOrg>(world_name)
+  { ; }
 
   // Run setup after config has been loaded.
   void Setup() {
-    SetPopStruct_Mixed(true);
+    SetPopStruct_Grow(false);
     SetCache();
 
     // Load in config values for easy access.
     N = config.N();
     K = config.K();
-    POP_SIZE = config.POP_SIZE();
+    MIN_POP_SIZE = config.MIN_POP_SIZE();
+    MAX_POP_SIZE = config.MAX_POP_SIZE();
     MAX_GENS = config.MAX_GENS();
     MUT_COUNT = config.MUT_COUNT();
 
@@ -47,7 +49,7 @@ struct NKWorld : public emp::World<BitOrg> {
     landscape.Config(N, K, random);
 
     // Build a random initial population
-    for (uint32_t i = 0; i < POP_SIZE; i++) {
+    for (uint32_t i = 0; i < MIN_POP_SIZE; i++) {
       BitOrg next_org(N);
       for (uint32_t j = 0; j < N; j++) next_org[j] = random.P(0.5);
       Inject(next_org);
@@ -72,46 +74,36 @@ struct NKWorld : public emp::World<BitOrg> {
         return num_muts;
       };
     SetMutFun( mut_fun );
+    SetMutateBeforeBirth();
+
+    SetupFitnessFile();
+    SetupPopulationFile();
+    SetupSystematicsFile();
+
   }
 
   void RunStep() {
-    // Do mutations on the population.
-    DoMutations(1);
-
-    // Keep the best individual.
-    emp::EliteSelect(*this, 1, 1);
-
-    // Run a tournament for the rest...
-    emp::TournamentSelect(*this, 5, POP_SIZE-1);
-    //emp::TournamentSelect(*this, 10, 10);
-
-    // Run a lexicase selection mechanism
-    // emp::vector< std::function<double(const BitOrg &)> > lexi_funs(N);
-    // for (size_t n = 0; n < N; n++) {
-    //   if (n+K < N) {
-    //     lexi_funs[n] = [this,n](const BitOrg & org){
-    //       const size_t cur_val = (org >> n).GetUInt(0) & emp::MaskLow<size_t>(K+1);
-	  //       return landscape.GetFitness(n, cur_val);
-    //     };
-    //   } else {
-    //     lexi_funs[n] = [this,n](const BitOrg & org){
-    //       const size_t cur_val = ((org >> n) | (org << (N-n))).GetUInt(0) & emp::MaskLow<size_t>(K+1);
-    //       return landscape.GetFitness(n, cur_val);
-    //     };
-    //   }
-    // }
-    // emp::LexicaseSelect<BitOrg>(*this, lexi_funs, POP_SIZE - 11);
+    const size_t start_orgs = GetNumOrgs();
+    if (start_orgs >= MAX_POP_SIZE) {
+      DoBottleneck(MIN_POP_SIZE);
+    }
+    else {
+      // Determine number of births for this step.
+      size_t num_births = start_orgs;
+      if (2 * num_births > MAX_POP_SIZE) num_births = MAX_POP_SIZE - num_births;
+      emp::RouletteSelect(*this, num_births);
+    }
 
     Update();
   }
 
   void Run() {
-    std::cout << 0 << " : " << *pop[0] << " : " << landscape.GetFitness(*pop[0]) << std::endl;
+    std::cout << 0 << " : " << GetNumOrgs() << std::endl;
 
     // Loop through updates
     for (uint32_t ud = 0; ud < MAX_GENS; ud++) {
       RunStep();
-      std::cout << (ud+1) << " : " << *pop[0] << " : " << landscape.GetFitness(*pop[0]) << std::endl;
+      std::cout << (ud+1) << " : " << GetNumOrgs() << std::endl;
     }
   }
 };

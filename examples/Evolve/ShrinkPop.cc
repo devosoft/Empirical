@@ -29,7 +29,7 @@ int main()
   };
 
   emp::World<int> grid_world(random);
-  grid_world.SetGrid(POP_SIDE, POP_SIDE);
+  grid_world.SetPopStruct_Grid(POP_SIDE, POP_SIDE);
   grid_world.SetPrintFun(print_fun);
 
   for (size_t i = 0; i < POP_SIZE; i++) grid_world.InjectAt((int)i,i);
@@ -60,7 +60,7 @@ int main()
 
 
   emp::World<int> mass_world(random);
-  grid_world.SetWellMixed();
+  grid_world.SetPopStruct_Mixed();
   grid_world.SetPrintFun(print_fun);
 
   for (size_t i = 0; i < POP_SIZE; i++) grid_world.InjectAt((int)i%10,i);

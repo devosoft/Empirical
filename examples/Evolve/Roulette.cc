@@ -28,7 +28,7 @@ int main()
 
   emp::World<int> grid_world(random);
   const size_t side = (size_t) std::sqrt(POP_SIZE);
-  grid_world.SetGrid(side, side);
+  grid_world.SetPopStruct_Grid(side, side);
   grid_world.SetPrintFun(print_fun);
 
   emp_assert(grid_world.GetSize() == POP_SIZE); // POP_SIZE needs to be a perfect square.

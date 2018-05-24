@@ -97,6 +97,8 @@ public:
   ArmWorld(emp::vector<double> in_segments={1,2,3,4,5,6})
     : emp::World<ArmOrg>("ArmWorld"), segments(in_segments)
   {
+    NewRandom(1);
+
     SetupFitnessFile().SetTimingRepeat(10);
     SetupSystematicsFile().SetTimingRepeat(10);
     SetupPopulationFile().SetTimingRepeat(10);
@@ -110,7 +112,7 @@ public:
     AddPhenotype("End Y", traitY_fun, -total, total);
 
     SetCache();
-    SetMutateBeforeBirth();
+    SetAutoMutate();
 
     ResetMAP();
   }
@@ -118,7 +120,7 @@ public:
 
   void ResetMixed() {
     Reset();
-    SetWellMixed();
+    SetPopStruct_Mixed();
     for (size_t i = 0; i < WORLD_SIZE; i++) Inject(ArmOrg(*random_ptr, segments.size()));
   }
 

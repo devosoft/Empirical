@@ -17,8 +17,8 @@ namespace emp {
 
   /// Return the first position of a value in a vector (or -1 if none exists)
   template <typename T>
-  int FindPos(const emp::vector<T> vec, const T & val) {
-    for (size_t i = 0; i < vec.size(); i++) {
+  int FindValue(const emp::vector<T> vec, const T & val, size_t start_pos=0) {
+    for (size_t i = start_pos; i < vec.size(); i++) {
       if (vec[i] == val) return (int) i;
     }
     return -1;
@@ -38,6 +38,40 @@ namespace emp {
       os << v[id];
     }
   }
+
+  /// Find the index with the "optimal" value (picks first in cases of a tie).
+  /// @param v Any object allowing indexing (e.g. vector, array, etc.)
+  /// @param fun Comparison function; returns true if the first value os more optimal than second.
+  template <typename T>
+  size_t FindIndex(const T & v,
+                   const std::function<bool(typename T::value_type, typename T::value_type)> & fun) {
+    emp_assert(v.size() > 0);
+    using v_type = typename T::value_type;
+    v_type best_val = v[0];
+    size_t best_index = 0;
+    for (size_t i = 1; i < v.size(); i++) {
+      if (fun(v[i], best_val)) {
+        best_val = v[i];
+        best_index = i;
+      }
+    }
+    return best_index;
+  }
+
+  /// Find the index with the minimal value (picks first in cases of a tie).
+  template <typename T>
+  size_t FindMinIndex(const T & v) {
+    using v_type = typename T::value_type;
+    return FindIndex(v, [](v_type a, v_type b){ return a < b; });
+  }
+
+  /// Find the index with the maximal value (picks first in cases of a tie).
+  template <typename T>
+  size_t FindMaxIndex(const T & v) {
+    using v_type = typename T::value_type;
+    return FindIndex(v, [](v_type a, v_type b){ return a > b; });
+  }
+
 
   /// Sum up the contents of a vector.
   template <typename T>
