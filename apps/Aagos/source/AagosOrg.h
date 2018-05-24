@@ -4,6 +4,7 @@
 #include "tools/BitVector.h"
 #include "tools/Random.h"
 #include "tools/random_utils.h"
+#include "tools/string_utils.h"
 
 class AagosOrg {
   friend class AagosWorld;
@@ -32,6 +33,11 @@ public:
   void Randomize(emp::Random & random) {
     emp::RandomizeBitVector(bits, random);
     emp::RandomizeVector<size_t>(gene_starts, random, 0, bits.size());
+  }
+
+  void Print(std::ostream & is) {
+    is << "Bits: " << bits << '\n';
+    is << "Gene Starts: " << emp::to_string(gene_starts) << std::endl;
   }
 };
 
