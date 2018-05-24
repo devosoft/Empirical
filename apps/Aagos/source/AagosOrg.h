@@ -16,7 +16,11 @@ private:
 public:
   AagosOrg(size_t num_bits=64, size_t num_genes=64, size_t in_gene_size=8)
    : bits(num_bits), gene_starts(num_genes,0), gene_size(in_gene_size)
-  { ; }
+  {
+    emp_assert(num_bits > 0, num_bits);
+    emp_assert(num_genes > 0, num_genes);
+    emp_assert(gene_size > 0, gene_size);
+  }
   AagosOrg(const AagosOrg &) = default;
   AagosOrg(AagosOrg &&) = default;
   ~AagosOrg() { ; }
@@ -35,7 +39,7 @@ public:
     emp::RandomizeVector<size_t>(gene_starts, random, 0, bits.size());
   }
 
-  void Print(std::ostream & is) {
+  void Print(std::ostream & is=std::cout) const {
     is << "Bits: " << bits << '\n';
     is << "Gene Starts: " << emp::to_string(gene_starts) << std::endl;
   }
