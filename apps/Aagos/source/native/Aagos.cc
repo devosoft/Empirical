@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
   if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
 
 
-  AagosWorld world(config.NUM_BITS(), config.NUM_GENES(), config.GENE_SIZE(), config.CHANGE_RATE());
+  AagosWorld world(config);
 
   emp::Random & random = world.GetRandom();
 
@@ -46,6 +46,4 @@ int main(int argc, char* argv[])
       world[0].Print();
     }
   }
-
-  std::cout << "Hello World!" << std::endl;
 }
