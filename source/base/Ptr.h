@@ -438,10 +438,10 @@ namespace emp {
     void New(T &&... args) {
       Tracker().DecID(id);                            // Remove a pointer to any old memory...
 
-      // ptr = new TYPE(std::forward<T>(args)...); // Special new that uses allocated space.
-      ptr = (TYPE*) malloc (sizeof(TYPE));            // Build a new raw pointer.
-      emp_emscripten_assert(ptr);                     // No exceptions in emscripten; assert alloc!
-      ptr = new (ptr) TYPE(std::forward<T>(args)...); // Special new that uses allocated space.
+      ptr = new TYPE(std::forward<T>(args)...); // Special new that uses allocated space.
+      // ptr = (TYPE*) malloc (sizeof(TYPE));            // Build a new raw pointer.
+      // emp_emscripten_assert(ptr);                     // No exceptions in emscripten; assert alloc!
+      // ptr = new (ptr) TYPE(std::forward<T>(args)...); // Special new that uses allocated space.
 
       if (internal::ptr_debug) std::cout << "Ptr::New() : " << ptr << std::endl;
       id = Tracker().New(ptr);                        // And track it!
@@ -787,7 +787,7 @@ namespace emp {
 
     // Stubs for debug-related functions when outside debug mode.
     int DebugGetCount() const { return -1; }
-    bool DebugIsArray() const { return false; }
+    bool DebugIsArray() const { emp_assert(false); return false; }
     size_t DebugGetArrayBytes() const { return 0; }
     bool DebugIsActive() const { return true; }
     bool OK() const { return true; }
@@ -820,10 +820,10 @@ namespace emp {
 
   /// Create a new Ptr of the target type; use the args in the constructor.
   template <typename T, typename... ARGS> Ptr<T> NewPtr(ARGS &&... args) {
-    //auto ptr = new T(std::forward<ARGS>(args)...);
-    auto ptr = (T*) malloc (sizeof(T));         // Build a new raw pointer.
-    emp_assert(ptr);                            // No exceptions in emscripten; assert alloc!
-    new (ptr) T(std::forward<ARGS>(args)...);   // Special new that uses allocated space.
+    auto ptr = new T(std::forward<ARGS>(args)...);
+    // auto ptr = (T*) malloc (sizeof(T));         // Build a new raw pointer.
+    // emp_assert(ptr);                            // No exceptions in emscripten; assert alloc!
+    // new (ptr) T(std::forward<ARGS>(args)...);   // Special new that uses allocated space.
     return Ptr<T>(ptr, true);
   }
 
