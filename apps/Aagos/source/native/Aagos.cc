@@ -41,8 +41,11 @@ int main(int argc, char* argv[])
 
     world.Update();
 
-    if (gen % 100 == 0) {
-      std::cout << gen << " : fitness=" << world.CalcFitnessID(0) << std::endl;
+    if (gen % config.PRINT_INTERVAL() == 0) {
+      std::cout << gen
+                << " : fitness=" << world.CalcFitnessID(0)
+                << " size=" << world[0].GetNumBits()
+                << std::endl;
       world[0].Print();
     }
   }
