@@ -21,11 +21,13 @@ EMP_BUILD_CONFIG( AagosConfig,
 
   VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
 
+  GROUP(MUTATIONS, "Various mutation rates for Aagos"),
   VALUE(GENE_MOVE_PROB, double, 0.001, "Probability of each gene moving each generation"),
   VALUE(BIT_FLIP_PROB, double, 0.01, "Probability of each bit toggling"),
   VALUE(BIT_INS_PROB, double, 0.01, "Probability of a single bit being inserted."),
   VALUE(BIT_DEL_PROB, double, 0.01, "Probability of a single bit being removed."),
 
+  GROUP(OUTPUT, "Output rates for Aagos"),
   VALUE(PRINT_INTERVAL, size_t, 100, "How many updates between prints?")
 )
 
@@ -34,27 +36,26 @@ class AagosWorld : public emp::World<AagosOrg> {
 private:
   using base_t = emp::World<AagosOrg>;
 
+  AagosConfig & config;
   emp::NKLandscape landscape;
 
   // Configued values
   size_t num_bits;
   size_t num_genes;
   size_t gene_size;
-  size_t change_rate;   ///< How many state-fitnesses should change in the landscape each generation?
 
   // Calculated values
   size_t gene_mask; 
 
 public:
-  AagosWorld(size_t _num_bits, size_t _num_genes, size_t _gene_size, size_t _change_rate=0,
-             const std::string & world_name="AagosWorld")
+  AagosWorld(AagosConfig & _config, const std::string & world_name="AagosWorld")
     : emp::World<AagosOrg>(world_name)
-    , landscape(_num_genes, _gene_size-1, GetRandom())
-    , num_bits(_num_bits)
-    , num_genes(_num_genes)
-    , gene_size(_gene_size)
-    , change_rate(_change_rate)
-    , gene_mask(emp::MaskLow<size_t>(gene_size))
+    , config(_config)
+    , landscape(config.NUM_GENES(), config.GENE_SIZE()-1, GetRandom())
+    , num_bits(config.NUM_BITS())
+    , num_genes(config.NUM_GENES())
+    , gene_size(config.GENE_SIZE())
+    , gene_mask(emp::MaskLow<size_t>(config.GENE_SIZE()))
   {
     auto fit_fun = [this](AagosOrg & org){
       double fitness = 0.0;
@@ -70,23 +71,48 @@ public:
     // Setup the mutation function.
     std::function<size_t(AagosOrg &, emp::Random &)> mut_fun =
       [this](AagosOrg & org, emp::Random & random) {
-        constexpr size_t MUT_COUNT = 3;
-        size_t num_muts = 0;
-        for (uint32_t m = 0; m < MUT_COUNT; m++) {
-          const uint32_t pos = random.GetUInt(org.GetNumBits());
-          if (random.P(0.5)) {
-            org.bits[pos] ^= 1;
-            num_muts++;
-          }
-        }
-
-        // Mutate a gene position?
-        if (random.P(0.1)) {
+        // Do gene moves.
+        size_t num_moves = random.GetRandBinomial(org.GetNumGenes(), config.GENE_MOVE_PROB());
+        for (size_t m = 0; m < num_moves; m++) {
           size_t gene_id = random.GetUInt(org.GetNumGenes());
-          org.gene_starts[gene_id] = random.GetUInt(org.GetNumBits());
+          org.gene_starts[gene_id] = random.GetUInt(org.GetNumBits());          
         }
 
-        return num_muts;
+        // Do bit flips.
+        size_t num_flips = random.GetRandBinomial(org.GetNumBits(), config.BIT_FLIP_PROB());
+        for (size_t m = 0; m < num_flips; m++) {
+          const size_t pos = random.GetUInt(org.GetNumBits());
+          org.bits[pos] ^= 1;
+        }
+
+        // Check on insertions and deletions.
+        size_t do_insert = random.P(config.BIT_INS_PROB());
+        size_t do_delete = random.P(config.BIT_DEL_PROB());
+
+        // Do insertions.
+        if (do_insert) {
+          const size_t pos = random.GetUInt(org.GetNumBits());  // Figure out position for insertion.
+          // std::cout << "pos = " << pos << std::endl;
+          // std::cout << "start =  " << org.bits << std::endl;
+          org.bits.Resize(org.bits.GetSize() + 1);              // Increase size to make room for insertion.
+          emp::BitVector mask(pos, 1);                          // Setup a mask to preserve early bits.
+          mask.Resize(org.bits.GetSize());                      // Align mask size.
+          // std::cout << "mask =  " << mask << std::endl;
+
+          // Now build the new string!
+          org.bits = (mask & org.bits) | ((org.bits << 1) & ~mask);
+          org.bits[pos] = random.P(0.5);                        // Randomize the new bit.
+
+          // Shift any genes that started at pos or later.
+          for (auto & x : org.gene_starts) if (x >= pos) x++;
+
+          // std::cout << "end =   " << org.bits << std::endl;
+          // std::cout << "-----------" << std::endl;
+        }
+
+        
+
+        return num_moves + num_flips + do_insert + do_delete;
       };
     SetMutFun( mut_fun );
 
@@ -95,7 +121,7 @@ public:
   ~AagosWorld() { ; }
 
   void Update() {
-    if (change_rate) landscape.RandomizeStates(GetRandom(), change_rate);
+    landscape.RandomizeStates(GetRandom(), config.CHANGE_RATE());
     base_t::Update();
   }
 };
