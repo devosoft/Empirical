@@ -8,6 +8,8 @@
  *  @note Status: RELEASE
  *
  *  @todo Implement append(), resize()...
+ *  @todo Implement techniques to push bits (we have pop)
+ *  @todo Implement techniques to insert of remove bits from middle.
  *
  *  @note This class is 15-20% slower than emp::BitSet, but more flexible & run-time configurable.
  */
@@ -226,7 +228,7 @@ namespace emp {
 
     /// Copy constructor of existing bit field.
     BitVector(const BitVector & in_set) : num_bits(in_set.num_bits), bit_set(nullptr) {
-      emp_assert(in_set.bit_set.IsNull() || in_set.bit_set.DebugIsArray());
+      emp_assert(in_set.bit_set.IsNull() || in_set.bit_set.DebugIsArray(), in_set.bit_set.IsNull(), in_set.bit_set.DebugIsArray());
       emp_assert(in_set.bit_set.OK());
       if (num_bits) bit_set = NewArrayPtr<field_t>(NumFields());
       RawCopy(in_set.bit_set);
@@ -584,7 +586,7 @@ namespace emp {
       return out_set;
     }
 
-    /// Perform a Boolean NOT on this BitSet and return the result.
+    /// Perform a Boolean NOT on this BitVector and return the result.
     BitVector NOT() const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
@@ -593,7 +595,7 @@ namespace emp {
       return out_set;
     }
 
-    /// Perform a Boolean AND on this BitSet and return the result.
+    /// Perform a Boolean AND on this BitVector and return the result.
     BitVector AND(const BitVector & set2) const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
@@ -601,7 +603,7 @@ namespace emp {
       return out_set;
     }
 
-    /// Perform a Boolean OR on this BitSet and return the result.
+    /// Perform a Boolean OR on this BitVector and return the result.
     BitVector OR(const BitVector & set2) const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
@@ -609,7 +611,7 @@ namespace emp {
       return out_set;
     }
 
-    /// Perform a Boolean NAND on this BitSet and return the result.
+    /// Perform a Boolean NAND on this BitVector and return the result.
     BitVector NAND(const BitVector & set2) const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
@@ -618,7 +620,7 @@ namespace emp {
       return out_set;
     }
 
-    /// Perform a Boolean NOR on this BitSet and return the result.
+    /// Perform a Boolean NOR on this BitVector and return the result.
     BitVector NOR(const BitVector & set2) const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
@@ -627,7 +629,7 @@ namespace emp {
       return out_set;
     }
 
-    /// Perform a Boolean XOR on this BitSet and return the result.
+    /// Perform a Boolean XOR on this BitVector and return the result.
     BitVector XOR(const BitVector & set2) const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
@@ -635,7 +637,7 @@ namespace emp {
       return out_set;
     }
 
-    /// Perform a Boolean EQU on this BitSet and return the result.
+    /// Perform a Boolean EQU on this BitVector and return the result.
     BitVector EQU(const BitVector & set2) const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
@@ -645,7 +647,7 @@ namespace emp {
     }
 
 
-    /// Perform a Boolean NOT with this BitSet, store result here, and return this object.
+    /// Perform a Boolean NOT with this BitVector, store result here, and return this object.
     BitVector & NOT_SELF() {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
@@ -653,21 +655,21 @@ namespace emp {
       return *this;
     }
 
-    /// Perform a Boolean AND with this BitSet, store result here, and return this object.
+    /// Perform a Boolean AND with this BitVector, store result here, and return this object.
     BitVector & AND_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] & set2.bit_set[i];
       return *this;
     }
 
-    /// Perform a Boolean OR with this BitSet, store result here, and return this object.
+    /// Perform a Boolean OR with this BitVector, store result here, and return this object.
     BitVector & OR_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] | set2.bit_set[i];
       return *this;
     }
 
-    /// Perform a Boolean NAND with this BitSet, store result here, and return this object.
+    /// Perform a Boolean NAND with this BitVector, store result here, and return this object.
     BitVector & NAND_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
@@ -675,7 +677,7 @@ namespace emp {
       return *this;
     }
 
-    /// Perform a Boolean NOR with this BitSet, store result here, and return this object.
+    /// Perform a Boolean NOR with this BitVector, store result here, and return this object.
     BitVector & NOR_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
@@ -683,14 +685,14 @@ namespace emp {
       return *this;
     }
 
-    /// Perform a Boolean XOR with this BitSet, store result here, and return this object.
+    /// Perform a Boolean XOR with this BitVector, store result here, and return this object.
     BitVector & XOR_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] ^ set2.bit_set[i];
       return *this;
     }
 
-    /// Perform a Boolean EQU with this BitSet, store result here, and return this object.
+    /// Perform a Boolean EQU with this BitVector, store result here, and return this object.
     BitVector & EQU_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
