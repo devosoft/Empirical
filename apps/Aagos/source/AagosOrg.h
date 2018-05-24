@@ -6,6 +6,7 @@
 #include "tools/random_utils.h"
 
 class AagosOrg {
+  friend class AagosWorld;
 private:
   emp::BitVector bits;
   emp::vector<size_t> gene_starts;
