@@ -16,6 +16,8 @@ int main(int argc, char* argv[])
   if (args.ProcessConfigOptions(config, std::cout, "Aagos.cfg", "Aagos-macros.h") == false) exit(0);
   if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
 
+  constexpr size_t ELITE_COUNT = 0;
+  constexpr size_t TOURNAMENT_SIZE = 4;
 
   AagosWorld world(config);
 
@@ -34,10 +36,10 @@ int main(int argc, char* argv[])
     world.DoMutations(1);
 
     // Keep the best individual.
-    emp::EliteSelect(world, 1, 1);
+    if (ELITE_COUNT) emp::EliteSelect(world, ELITE_COUNT, 1);
 
     // Run a tournament for the rest...
-    emp::TournamentSelect(world, 5, config.POP_SIZE()-1);
+    emp::TournamentSelect(world, TOURNAMENT_SIZE, config.POP_SIZE()-ELITE_COUNT);
 
     world.Update();
 
