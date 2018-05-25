@@ -28,6 +28,8 @@
 #include <chrono>
 #include <cstdlib>
 
+emp::scenegraph::FreeType ft;
+
 int main(int argc, char* argv[]) {
   using namespace emp::opengl;
   using namespace emp::math;
@@ -39,6 +41,14 @@ int main(int argc, char* argv[]) {
 
   GLCanvas canvas;
   shaders::LoadShaders(canvas);
+
+  emp::Resources<FontFace>::Add("Roboto", [] {
+    auto font = ft.load("Assets/RobotoMono-Regular.ttf");
+
+    font.SetPixelSize(0, 64);
+    font.BulidAsciiAtlas();
+    return font;
+  });
 
   Region3f region = SetAspectRatioMax(Region2f{{-100, -100}, {100, 100}},
                                       AspectRatio(canvas.getRegion()))
@@ -55,9 +65,10 @@ int main(int argc, char* argv[]) {
 
   std::vector<Vec2f> data;
 
-  auto flow = (Xyz([](auto& p) { return p.AddRow(0); }) + Stroke(Color::red()) +
-               StrokeWeight(2) + Fill(Color::blue()) + PointSize(10)) >>
-              scale >> scatter /*>> line*/;
+  // auto flow = (Xyz([](auto& p) { return p.AddRow(0); }) +
+  // Stroke(Color::red()) +
+  //              StrokeWeight(2) + Fill(Color::blue()) + PointSize(10)) >>
+  //             scale >> scatter /*>> line*/;
 
   // PerspectiveCamera camera(consts::pi<float> / 4,
   //                          canvas.getWidth() / (float)canvas.getHeight(),
@@ -78,19 +89,29 @@ int main(int argc, char* argv[]) {
     data.emplace_back(i * 100, i * 100);
   }
 
-  flow.Apply(data.begin(), data.end());
+  // flow.Apply(data.begin(), data.end());
 
-  Graphics g(canvas);
+  emp::graphics::Graphics g(canvas, "Roboto");
 
   canvas.runForever([&](auto&&) {
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    auto ctx = g.Context({camera.GetProjection(), eye.CalculateView()});
+    g.FillRegularPolygons({camera.GetProjection(), eye.CalculateView()}, 5,
+                          {10, 10})
+      .Draw({emp::graphics::Transform(Mat4x4f::Translation(5, 5, 0)),
+             emp::graphics::Color(Color::red())})
+      .Draw({
+        emp::graphics::Color(Color::red()),
+        emp::graphics::Transform(Mat4x4f::Translation(-5, -5, 0)),
+      });
 
-    ctx.Fill([](auto& pen) {
-      pen.Move({5, 5, 50}).Ellipse({20, 20}, Color::black());
-    });
+    g.Text({camera.GetProjection(), eye.CalculateView()})
+      .Draw({
+        emp::graphics::Transform(Mat4x4f::Translation(5, 5, 0)),
+        emp::graphics::Color(Color::red()),
+        emp::graphics::Text("Hello World"),
+      });
 
     // stage.Render(camera, eye);
     // data.clear();

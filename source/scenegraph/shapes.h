@@ -169,8 +169,6 @@ namespace emp {
         opengl::BufferObject<opengl::BufferType::Array> vertices_buffer;
         ResourceRef<FontFace> font;
         ResourceRef<opengl::ShaderProgram> shader;
-        // opengl::BufferObject<opengl::BufferType::ElementArray>
-        // triangles_buffer;
 
         struct data_t {
           math::Vec3f position;

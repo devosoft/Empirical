@@ -7,254 +7,20 @@
 #include "opengl/glwrap.h"
 #include "opengl/shaders.h"
 #include "scenegraph/core.h"
+#include "scenegraph/freetype.h"
+#include "tools/attrs.h"
 #include "tools/resources.h"
 
 #include <vector>
 
 namespace emp {
-  namespace scenegraph {
-    class FillPen;
-    class Context;
+  namespace graphics {
 
-    namespace __impl_render_cmds {
+    DEFINE_ATTR(Transform);
+    DEFINE_ATTR(Color);
+    DEFINE_ATTR(Text);
 
-      struct Ellipse {
-        math::Vec2f radius;
-      };
-
-      struct FillRegularPolygon {
-        size_t vertex_count;
-        math::Vec2f radius;
-      };
-
-      struct FillPolygon {
-        std::vector<math::Vec3f> vertices;
-        std::vector<int> triangles;
-      };
-
-      class FillCmd {
-        private:
-        union data_t {
-          FillRegularPolygon regular_polygon;
-          FillPolygon polygon;
-          Ellipse ellipse;
-
-          data_t() {}
-          ~data_t() {}
-        } data;
-        enum class cmd_t { Ellipse, RegularPolygon, Polygon } cmd;
-
-        public:
-        math::Mat4x4f model;
-        opengl::Color fill;
-
-        FillCmd(const math::Mat4x4f& model, const opengl::Color& fill)
-          : cmd(cmd_t::Ellipse), model(model), fill(fill) {}
-
-        FillCmd(const FillRegularPolygon& fill_regular_polygon,
-                const math::Mat4x4f& model, const opengl::Color& fill)
-          : cmd(cmd_t::RegularPolygon), model(model), fill(fill) {
-          new (&data.regular_polygon) struct FillRegularPolygon(
-            fill_regular_polygon);
-        }
-
-        FillCmd(FillRegularPolygon&& fill_regular_polygon,
-                const math::Mat4x4f& model, const opengl::Color& fill)
-          : cmd(cmd_t::RegularPolygon), model(model), fill(fill) {
-          new (&data.regular_polygon) struct FillRegularPolygon(
-            std::move(fill_regular_polygon));
-        }
-
-        FillCmd(const FillPolygon& fill_polygon, const math::Mat4x4f& model,
-                const opengl::Color& fill)
-          : cmd(cmd_t::Polygon), model(model), fill(fill) {
-          new (&data.polygon) struct FillPolygon(fill_polygon);
-        }
-
-        FillCmd(FillPolygon&& fill_polygon, const math::Mat4x4f& model,
-                const opengl::Color& fill)
-          : cmd(cmd_t::Polygon), model(model), fill(fill) {
-          new (&data.polygon) struct FillPolygon(std::move(fill_polygon));
-        }
-
-        FillCmd(const Ellipse& ellipse, const math::Mat4x4f& model,
-                const opengl::Color& fill)
-          : cmd(cmd_t::Polygon), model(model), fill(fill) {
-          new (&data.ellipse) struct Ellipse(ellipse);
-        }
-
-        FillCmd(Ellipse&& ellipse, const math::Mat4x4f& model,
-                const opengl::Color& fill)
-          : cmd(cmd_t::Polygon), model(model), fill(fill) {
-          new (&data.ellipse) struct Ellipse(std::move(ellipse));
-        }
-
-        FillCmd(const FillCmd& other)
-          : cmd(other.cmd), model(other.model), fill(other.fill) {
-          switch (cmd) {
-            case cmd_t::RegularPolygon:
-              new (&data.regular_polygon) struct FillRegularPolygon(
-                other.data.regular_polygon);
-              break;
-            case cmd_t::Polygon:
-              new (&data.polygon) struct FillPolygon(other.data.polygon);
-              break;
-            case cmd_t::Ellipse:
-              new (&data.ellipse) struct Ellipse(other.data.ellipse);
-              break;
-          }
-        }
-
-        FillCmd(FillCmd&& other)
-          : cmd(other.cmd),
-            model(std::move(other.model)),
-            fill(std::move(other.fill)) {
-          switch (cmd) {
-            case cmd_t::RegularPolygon:
-              new (&data.regular_polygon) struct FillRegularPolygon(
-                std::move(other.data.regular_polygon));
-              break;
-            case cmd_t::Polygon:
-              new (&data.polygon) struct FillPolygon(
-                std::move(other.data.polygon));
-              break;
-            case cmd_t::Ellipse:
-              new (&data.ellipse) struct Ellipse(std::move(other.data.ellipse));
-              break;
-          }
-        }
-
-        FillCmd& operator=(const FillCmd& other) {
-          if (this != &other) {
-            if (cmd == other.cmd) {
-              switch (cmd) {
-                case cmd_t::RegularPolygon:
-                  data.regular_polygon = other.data.regular_polygon;
-                  break;
-                case cmd_t::Polygon:
-                  data.polygon = other.data.polygon;
-                  break;
-                case cmd_t::Ellipse:
-                  data.ellipse = other.data.ellipse;
-                  break;
-              }
-            } else {
-              Free();
-              switch (cmd) {
-                case cmd_t::RegularPolygon:
-                  new (&data.regular_polygon) struct FillRegularPolygon(
-                    other.data.regular_polygon);
-                  break;
-                case cmd_t::Polygon:
-                  new (&data.polygon) struct FillPolygon(other.data.polygon);
-                  break;
-                case cmd_t::Ellipse:
-                  new (&data.ellipse) struct Ellipse(other.data.ellipse);
-                  break;
-              }
-            }
-
-            cmd = other.cmd;
-            model = other.model;
-            fill = other.fill;
-          }
-          return *this;
-        }
-
-        FillCmd& operator=(FillCmd&& other) {
-          if (this != &other) {
-            if (cmd == other.cmd) {
-              switch (cmd) {
-                case cmd_t::RegularPolygon:
-                  data.regular_polygon = std::move(other.data.regular_polygon);
-                  break;
-                case cmd_t::Polygon:
-                  data.polygon = std::move(other.data.polygon);
-                  break;
-                case cmd_t::Ellipse:
-                  data.ellipse = std::move(other.data.ellipse);
-                  break;
-              }
-            } else {
-              Free();
-              switch (cmd) {
-                case cmd_t::RegularPolygon:
-                  new (&data.regular_polygon) struct FillRegularPolygon(
-                    std::move(other.data.regular_polygon));
-                  break;
-                case cmd_t::Polygon:
-                  new (&data.polygon) struct FillPolygon(
-                    std::move(other.data.polygon));
-                  break;
-                case cmd_t::Ellipse:
-                  new (&data.ellipse) struct Ellipse(
-                    std::move(other.data.ellipse));
-                  break;
-              }
-            }
-
-            cmd = other.cmd;
-            model = other.model;
-            fill = other.fill;
-          }
-          return *this;
-        }
-
-        void Free() {
-          std::cout << "FREE" << std::endl;
-          switch (cmd) {
-            case cmd_t::RegularPolygon:
-              data.regular_polygon.~FillRegularPolygon();
-              break;
-            case cmd_t::Polygon:
-              data.polygon.~FillPolygon();
-              break;
-            case cmd_t::Ellipse:
-              data.ellipse.~Ellipse();
-              break;
-          }
-        }
-
-        ~FillCmd() { Free(); }
-
-        bool IsEllipse() const { return cmd == cmd_t::Ellipse; }
-        bool IsPolygon() const { return cmd == cmd_t::Polygon; }
-        bool IsRegularPolygon() const { return cmd == cmd_t::RegularPolygon; }
-
-        template <typename F1, typename F2, typename F3>
-        void Apply(F1&& ellipse, F2&& polygon, F3&& regular_polygon) {
-          switch (cmd) {
-            case cmd_t::Ellipse:
-              std::forward<F1>(ellipse)(data.ellipse);
-              break;
-            case cmd_t::Polygon:
-              std::forward<F2>(polygon)(data.polygon);
-              break;
-            case cmd_t::RegularPolygon:
-              std::forward<F3>(regular_polygon)(data.regular_polygon);
-              break;
-          }
-        }
-
-        template <typename F1, typename F2, typename F3>
-        void Apply(F1&& ellipse, F2&& polygon, F3&& regular_polygon) const {
-          switch (cmd) {
-            case cmd_t::Ellipse:
-              std::forward<F1>(ellipse)(data.ellipse);
-              break;
-            case cmd_t::Polygon:
-              std::forward<F2>(polygon)(data.polygon);
-              break;
-            case cmd_t::RegularPolygon:
-              std::forward<F3>(regular_polygon)(data.regular_polygon);
-              break;
-          }
-        }
-
-      };  // namespace __impl_render_cmds
-    }  // namespace __impl_render_cmds
-
-    class Graphics {
+    class FillRegularPolygonRenderer {
       ResourceRef<opengl::ShaderProgram> fill_shader;
 
       opengl::VertexArrayObject vao;
@@ -271,11 +37,33 @@ namespace emp {
         opengl::Uniform fill;
       } fill_shader_uniforms;
 
-      friend Context;
-      friend FillPen;
+      public:
+      using instance_attributes_type =
+        tools::Attrs<TransformValue<math::Mat4x4f>, ColorValue<opengl::Color>>;
 
-      void GenerateRegularPolygon(size_t vertex_count,
-                                  const math::Vec2f& radius) {
+      template <typename S = const char*>
+      FillRegularPolygonRenderer(opengl::GLCanvas& canvas,
+                                 S&& fill_shader = "DefaultSolidColor")
+        : fill_shader(std::forward<S>(fill_shader)),
+          gpu_vertex_buffer(canvas.makeBuffer<opengl::BufferType::Array>()),
+          gpu_elements_buffer(
+            canvas.makeBuffer<opengl::BufferType::ElementArray>()) {
+        this->fill_shader.OnSet([this](auto&) {
+          fill_shader_uniforms.model = this->fill_shader->Uniform("model");
+          fill_shader_uniforms.view = this->fill_shader->Uniform("view");
+          fill_shader_uniforms.projection =
+            this->fill_shader->Uniform("projection");
+          fill_shader_uniforms.fill = this->fill_shader->Uniform("fill");
+
+          vao.bind();
+          gpu_vertex_buffer.bind();
+          gpu_elements_buffer.bind();
+          vao.attr(this->fill_shader->Attribute<math::Vec3f>("position"));
+        });
+      }
+
+      void BeginBatch(const scenegraph::RenderSettings& settings,
+                      size_t vertex_count, const math::Vec2f& radius) {
         auto first = 0;
 
         for (auto i = 0; i < vertex_count; ++i) {
@@ -298,185 +86,199 @@ namespace emp {
           gpu_elements_buffer.PushData(num);
           gpu_elements_buffer.PushData(next);
         }
+        gpu_vertex_buffer.SendToGPU();
+        gpu_elements_buffer.SendToGPU();
+        fill_shader_uniforms.projection = settings.projection;
+        fill_shader_uniforms.view = settings.view;
       }
 
+      void Instance(const instance_attributes_type& attrs) {
+        fill_shader->Use();
+
+        fill_shader_uniforms.model = attrs.GetTransform();
+        fill_shader_uniforms.fill = attrs.GetColor();
+
+        gpu_elements_buffer.Draw(GL_TRIANGLES);
+      }
+
+      void FinishBatch() {}
+    };
+
+    class TextRenderer {
+      struct data_t {
+        math::Vec3f position;
+        math::Vec2f texture_coordinates;
+      };
+
+      std::string font_name;
+      std::string text;
+      float height = 8;
+      opengl::VertexArrayObject vao;
+      opengl::BufferVector<opengl::BufferType::Array, data_t> vertices_buffer;
+      ResourceRef<scenegraph::FontFace> font;
+      ResourceRef<opengl::ShaderProgram> shader;
+
+      struct {
+        opengl::Uniform model;
+        opengl::Uniform view;
+        opengl::Uniform projection;
+        opengl::Uniform tex;
+      } shader_uniforms;
+
       public:
-      template <typename S = const char*>
-      Graphics(opengl::GLCanvas& canvas, S&& fill_shader = "DefaultSolidColor")
-        : fill_shader(std::forward<S>(fill_shader)),
-          gpu_vertex_buffer(canvas.makeBuffer<opengl::BufferType::Array>()),
-          gpu_elements_buffer(
-            canvas.makeBuffer<opengl::BufferType::ElementArray>()) {
-        this->fill_shader.OnSet([this](auto&) {
-          fill_shader_uniforms.model = this->fill_shader->Uniform("model");
-          fill_shader_uniforms.view = this->fill_shader->Uniform("view");
-          fill_shader_uniforms.projection =
-            this->fill_shader->Uniform("projection");
-          fill_shader_uniforms.fill = this->fill_shader->Uniform("fill");
+      using instance_attributes_type =
+        tools::Attrs<TransformValue<math::Mat4x4f>, ColorValue<opengl::Color>,
+                     TextValue<std::string>>;
+
+      template <typename F, typename S = std::string>
+      TextRenderer(opengl::GLCanvas& canvas, F&& font,
+                   S&& shader = "DefaultFont")
+        : vao(canvas.MakeVAO()),
+          vertices_buffer(canvas.makeBuffer<opengl::BufferType::Array>()),
+          font(std::forward<F>(font)),
+          shader(std::forward<S>(shader)) {
+        using namespace emp::opengl;
+        using namespace emp::math;
+
+        // SetText(text);
+
+        this->shader.OnSet([this](auto& value) {
+          shader_uniforms.model = this->shader->Uniform("model");
+          shader_uniforms.view = this->shader->Uniform("view");
+          shader_uniforms.projection = this->shader->Uniform("projection");
+          shader_uniforms.tex = this->shader->Uniform("tex");
 
           vao.bind();
-          gpu_vertex_buffer.bind();
-          gpu_elements_buffer.bind();
-          vao.attr(this->fill_shader->Attribute<math::Vec3f>("position"));
+          vertices_buffer.bind();
+          vao.attr(this->shader->Attribute("position", &data_t::position));
+          vao.attr(this->shader->Attribute("uv", &data_t::texture_coordinates));
         });
       }
 
-      template <typename Iter>
-      auto RenderBatch(const RenderSettings& settings, Iter begin, Iter end) ->
-        typename std::enable_if<
-          std::is_convertible<decltype(*begin),
-                              __impl_render_cmds::FillCmd>::value,
-          void>::type {
+      void BeginBatch(const scenegraph::RenderSettings& settings) {
+        shader_uniforms.projection = settings.projection;
+        shader_uniforms.view = settings.view;
+      }
+
+      void Instance(const instance_attributes_type& attrs) {
+        using namespace emp::opengl;
+        using namespace emp::math;
+
+        // std::vector<data_t> points;
+        Vec2f cursor{0, 0};
+
+        float scale = height / font->atlas_height;
+
+        int i = 0;
+        for (auto& c : attrs.GetText()) {
+          auto info = font->Lookup(c);
+          auto lcursor = cursor;
+          cursor = cursor + Vec2f{info.cursor_advance.x() * scale,
+                                  info.cursor_advance.y() * scale};
+
+          if (info.size.x() <= 0 || info.size.y() <= 0) continue;
+
+          auto max =
+            lcursor + Vec2f{info.bearing.x() * scale, info.bearing.y() * scale};
+          auto min = max - Vec2f{info.size.x() * scale, info.size.y() * scale};
+
+          auto tmin = info.texture_region.min;
+          auto tmax = info.texture_region.max;
+
+          vertices_buffer.PushData(
+            {{min.x(), min.y(), 0}, {tmin.x(), tmax.y()}});
+          vertices_buffer.PushData(
+            {{max.x(), min.y(), 0}, {tmax.x(), tmax.y()}});
+
+          vertices_buffer.PushData(
+            {{min.x(), max.y(), 0}, {tmin.x(), tmin.y()}});
+          vertices_buffer.PushData(
+            {{max.x(), min.y(), 0}, {tmax.x(), tmax.y()}});
+
+          vertices_buffer.PushData(
+            {{min.x(), max.y(), 0}, {tmin.x(), tmin.y()}});
+          vertices_buffer.PushData(
+            {{max.x(), max.y(), 0}, {tmax.x(), tmin.y()}});
+        }
+        vao.bind();
+        vertices_buffer.SendToGPU();
+
+        shader->Use();
+
+        shader_uniforms.model = attrs.GetTransform();
+        shader_uniforms.tex = font->GetAtlasTexture();
+        // fill_shader_uniforms.fill = attrs.GetColor();
+
+        vertices_buffer.Draw(GL_TRIANGLES);
+      }
+
+      void FinishBatch() {}
+    };
+
+    template <typename R>
+    class Pen {
+      private:
+      R* renderer;
+
+      public:
+      using instance_attributes_type = typename R::instance_attributes_type;
+
+      template <typename... T>
+      Pen(R* renderer, const scenegraph::RenderSettings& settings, T&&... args)
+        : renderer(renderer) {
+        renderer->BeginBatch(settings, std::forward<T>(args)...);
+      }
+
+      Pen(const Pen&) = delete;
+      Pen(Pen&&) = delete;
+
+      Pen& operator=(const Pen&) = delete;
+      Pen& operator=(Pen&&) = delete;
+
+      template <typename I, typename U>
+      Pen& Data(I begin, I end, const U& transform) {
         for (; begin != end; ++begin) {
-          begin->Apply(
-            [this](const __impl_render_cmds::Ellipse& ellipse) {
-              GenerateRegularPolygon(64, ellipse.radius);
-            },
-            [this](const __impl_render_cmds::FillPolygon& polygon) {
-              gpu_vertex_buffer.PushAll(polygon.vertices);
-              gpu_elements_buffer.PushAll(polygon.triangles);
-            },
-            [this](
-              const __impl_render_cmds::FillRegularPolygon& regular_polygon) {
-              GenerateRegularPolygon(regular_polygon.vertex_count,
-                                     regular_polygon.radius);
-            });
-
-          gpu_vertex_buffer.SendToGPU();
-          gpu_elements_buffer.SendToGPU();
-          fill_shader->Use();
-
-          fill_shader_uniforms.projection = settings.projection;
-          fill_shader_uniforms.view = settings.view;
-          fill_shader_uniforms.model = begin->model;
-          fill_shader_uniforms.fill = begin->fill;
-
-          gpu_elements_buffer.Draw(GL_TRIANGLES);
+          Draw(transform(*begin));
         }
+        return *this;
       }
 
-      Context Context(RenderSettings settings);
+      template <typename T0 = instance_attributes_type, typename... T>
+      Pen& Draw(T0&& args0, T&&... args) {
+        renderer->Instance({std::forward<T0>(args0), std::forward<T>(args)...});
+        return *this;
+      }
+
+      ~Pen() { renderer->FinishBatch(); }
     };
 
-    class Context {
-      private:
-      Graphics* g;
-      RenderSettings settings;
-
-      friend FillPen;
-
-      template <typename Iter>
-      void RenderBatch(Iter begin, Iter end) {
-        g->RenderBatch(settings, begin, end);
-      }
+    class Graphics {
+      FillRegularPolygonRenderer fill_regular_polygon_renderer;
+      TextRenderer text_renderer;
 
       public:
-      Context(Graphics* g, RenderSettings settings)
-        : g(g), settings(settings) {}
-
-      Context(const Context& other) : g(other.g), settings(other.settings) {}
-      Context(Context&& other)
-        : g(other.g), settings(std::move(other.settings)) {}
-
-      Context& operator=(const Context& other) {
-        g = other.g;
-        settings = other.settings;
-        return *this;
-      }
-
-      Context& operator=(Context&& other) {
-        g = other.g;
-        settings = std::move(other.settings);
-        return *this;
-      }
-
       template <typename F>
-      void Fill(F&& callback);
-    };
+      Graphics(opengl::GLCanvas& canvas, F&& font)
+        : fill_regular_polygon_renderer(canvas),
+          text_renderer(canvas, std::forward<F>(font)) {}
 
-    class FillPen {
-      private:
-      Context* ctx;
-      friend Context;
-      math::Mat4x4f model_transform;
+      Graphics(const Graphics&) = delete;
+      Graphics(Graphics&&) = delete;
 
-      std::vector<__impl_render_cmds::FillCmd> cmds;
+      Graphics& operator=(const Graphics&) = delete;
+      Graphics& operator=(Graphics&&) = delete;
 
-      FillPen(Context* ctx)
-        : ctx(ctx), model_transform(math::Mat4x4f::Identity()) {}
-
-      public:
-      FillPen(const FillPen& other) = delete;
-      FillPen(FillPen&& other)
-        : ctx(other.ctx),
-          model_transform(std::move(other.model_transform)),
-          cmds(std::move(other.cmds)) {
-        other.ctx = nullptr;
+      Pen<FillRegularPolygonRenderer> FillRegularPolygons(
+        const scenegraph::RenderSettings& settings, size_t vertex_count,
+        const math::Vec2f& radius) {
+        return {&fill_regular_polygon_renderer, settings, vertex_count, radius};
       }
 
-      FillPen& operator=(const FillPen&) = delete;
-      FillPen& operator=(FillPen&& other) {
-        if (this != &other) {
-          ctx = other.ctx;
-          other.ctx = nullptr;
-
-          model_transform = std::move(other.model_transform);
-          cmds = std::move(other.cmds);
-        }
-        return *this;
-      };
-
-      ~FillPen() {
-        if (ctx != nullptr || !cmds.empty()) {
-          ctx->RenderBatch(cmds.begin(), cmds.end());
-          cmds.clear();
-        }
-      }
-
-      template <typename U0 = math::Vec3f, typename... U>
-      FillPen& Move(U0&& arg0, U&&... args) {
-        model_transform =
-          model_transform * math::Mat4x4f::Translation(
-                              std::forward<U0>(arg0), std::forward<U>(args)...);
-        return *this;
-      }
-
-      template <typename U0 = math::Vec3f, typename... U>
-      FillPen& Scale(U0&& arg0, U&&... args) {
-        model_transform *= math::Mat4x4f::Scale(std::forward<U0>(arg0),
-                                                std::forward<U>(args)...);
-        return *this;
-      }
-
-      FillPen& Reset() {
-        model_transform = math::Mat4x4f::Identity();
-        return *this;
-      }
-
-      FillPen& Rect(const math::Vec2f& size, const opengl::Color& fill) {
-        cmds.emplace_back(__impl_render_cmds::FillRegularPolygon{4, size},
-                          model_transform, fill);
-        return *this;
-      }
-
-      FillPen& Ellipse(const math::Vec2f& radius, const opengl::Color& fill) {
-        cmds.emplace_back(__impl_render_cmds::Ellipse{radius}, model_transform,
-                          fill);
-        return *this;
+      Pen<TextRenderer> Text(const scenegraph::RenderSettings& settings) {
+        return {&text_renderer, settings};
       }
     };
-
-    template <typename F>
-    void Context::Fill(F&& callback) {
-      auto pen = FillPen{this};
-      std::forward<F>(callback)(pen);
-    }
-
-    Context Graphics::Context(RenderSettings settings) {
-      return {this, settings};
-    }
-
-  }  // namespace scenegraph
+  }  // namespace graphics
 }  // namespace emp
 
 #endif
