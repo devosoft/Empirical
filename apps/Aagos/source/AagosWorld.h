@@ -10,16 +10,18 @@
 #include "AagosOrg.h"
 
 EMP_BUILD_CONFIG( AagosConfig,
-  GROUP(DEFAULT, "Default settings for Aagos model"),
+  GROUP(WORLD_STRUCTURE, "How should each organism's genome be setup?"),
+  VALUE(CHANGE_RATE, size_t, 0, "How many changes to fitness tables each generation?"),
+  VALUE(POP_SIZE, size_t, 400, "How many organisms should be in the population?"),
+  VALUE(MAX_GENS, size_t, 10000, "How many generations should the runs go for?"),
+  VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
+  VALUE(ELITE_COUNT, size_t, 0, "How many organisms should be selected via elite selection?"),
+  VALUE(TOURNAMENT_SIZE, size_t, 4, "How many organisms should be chosen for each tournament?"),
+
+  GROUP(GENOME_STRUCTURE, "How should each organism's genome be setup?"),
   VALUE(NUM_BITS, size_t, 64, "Starting number of bits in each organism"),
   VALUE(NUM_GENES, size_t, 64, "Number of genes in each organism"),
   VALUE(GENE_SIZE, size_t, 8, "Size of each gene in each organism"),
-  VALUE(CHANGE_RATE, size_t, 0, "How many changes to fitness tables each generation?"),
-
-  VALUE(POP_SIZE, size_t, 400, "How many organisms should be in the population?"),
-  VALUE(MAX_GENS, size_t, 10000, "How many generations should the runs go for?"),
-
-  VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
 
   GROUP(MUTATIONS, "Various mutation rates for Aagos"),
   VALUE(GENE_MOVE_PROB, double, 0.001, "Probability of each gene moving each generation"),
@@ -62,6 +64,12 @@ public:
       for (size_t gene_id = 0; gene_id < num_genes; gene_id++) {
         const size_t gene_pos = org.gene_starts[gene_id];
         const size_t gene_val = org.bits.GetUIntAtBit(gene_pos) & gene_mask;
+        const size_t tail_bits = num_bits - gene_pos;
+
+        // If a gene runs off the end of the bitstring, loop around to the beginning.
+        if (tail_bits < gene_size) {
+          gene_val |= (org.bits.GetUInt(0) << tail_bits) & gene_mask;
+        }
         fitness += landscape.GetFitness(gene_id, gene_val);
       }
       return fitness;
@@ -92,12 +100,9 @@ public:
         // Do insertions.
         if (do_insert) {
           const size_t pos = random.GetUInt(org.GetNumBits());  // Figure out position for insertion.
-          // std::cout << "pos = " << pos << std::endl;
-          // std::cout << "start =  " << org.bits << std::endl;
           org.bits.Resize(org.bits.GetSize() + 1);              // Increase size to make room for insertion.
           emp::BitVector mask(pos, 1);                          // Setup a mask to preserve early bits.
           mask.Resize(org.bits.GetSize());                      // Align mask size.
-          // std::cout << "mask =  " << mask << std::endl;
 
           // Now build the new string!
           org.bits = (mask & org.bits) | ((org.bits << 1) & ~mask);
@@ -105,19 +110,13 @@ public:
 
           // Shift any genes that started at pos or later.
           for (auto & x : org.gene_starts) if (x >= pos) x++;
-
-          // std::cout << "end =   " << org.bits << std::endl;
-          // std::cout << "-----------" << std::endl;
         }
 
         // Do deletions
         if (do_delete) {
           size_t pos = random.GetUInt(org.GetNumBits());      // Figure out position to delete.
-          // std::cout << "pos = " << pos << std::endl;
-          // std::cout << "start = " << org.bits << std::endl;
           emp::BitVector mask(pos, 1);                              // Setup a mask to preserve early bits.
           mask.Resize(org.bits.GetSize());                          // Align mask size.
-          // std::cout << "mask =  " << mask << std::endl;
           
           org.bits = (mask & org.bits) | ((org.bits >> 1) & ~mask); // Build the new string!
           org.bits.Resize(org.bits.GetSize() - 1);                  // Decrease size to account for deletion
@@ -125,9 +124,6 @@ public:
           // Shift any genes that started at pos or later.
           if (pos == 0) pos = 1;                                    // Adjust position if beginning was deleted.
           for (auto & x : org.gene_starts) if (x >= pos) x--;
-
-          // std::cout << "end =    " << org.bits << std::endl;
-          // std::cout << "-----------" << std::endl;          
         }
 
         return num_moves + num_flips + do_insert + do_delete;
