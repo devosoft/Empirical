@@ -80,7 +80,7 @@ namespace emp {
   ///
   ///  PRINTING: How should organisms be printed to the command line?
   ///   0. Setting the print function with SetPrintFun() member function.
-  ///   1. Org Print() member function
+  ///   1. Org Print() member function that takes an ostream & argument
   ///   2. Proper operator<<
   ///   3. Do not print, just Assert
   ///
