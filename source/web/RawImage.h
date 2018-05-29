@@ -15,12 +15,77 @@
 #include <string>
 #include <vector>
 
+#include "../control/Signal.h"
 #include "../tools/map_utils.h"
 
 #include "emfunctions.h"
 #include "JSWrap.h"
 
 namespace emp {
+
+  namespace internal {
+    /// Detailed information about an image
+    struct Image_Info {
+      int img_id;                    ///< Unique ID for this image.
+      std::string filename;          ///< Full URL of file containing image.
+      mutable bool has_loaded;       ///< Is this image finished loading?
+      mutable bool has_error;        ///< Were there any errors in loading image?
+      Signal<void()> on_load;        ///< Actions for when image is finished loading.
+      Signal<void()> on_error;       ///< Actions for when image has trouble loading.
+
+      Image_Info(const std::string & _filename)
+        : img_id(-1), filename(_filename), has_loaded(false), has_error(false), on_load(), on_error()
+      {
+        size_t loaded_callback = JSWrapOnce( std::function<void()>(std::bind(&Image_Info::MarkLoaded, this)) );
+        size_t error_callback = JSWrapOnce( std::function<void()>(std::bind(&Image_Info::MarkError, this)) );
+
+        img_id = EM_ASM_INT({
+          var file = Pointer_stringify($0);
+          var img_id = emp_info.images.length;
+          emp_info.images[img_id] = new Image();
+          emp_info.images[img_id].src = file;
+
+          emp_info.images[img_id].onload = function() {
+              emp_info.image_load_count += 1;
+              emp.Callback($1);
+          };
+
+          emp_info.images[img_id].onerror = function() {
+              emp_info.image_error_count += 1;
+              emp.Callback($2);
+          };
+
+          return img_id;
+        }, filename.c_str(), loaded_callback, error_callback);
+      }
+
+      /// Trigger this image as loaded.
+      void MarkLoaded() {
+        has_loaded = true;  // Mark that load is finished for future use.
+        on_load.Trigger();  // Trigger any other code that needs to be run now.
+        on_load.Clear();    // Now that the load is finished, we don't need to run these again.
+      }
+
+      /// Trigger this image as having an error.
+      void MarkError() {
+        has_error = true;
+        emp::Alert(std::string("Error loading image: ") + filename);
+        on_error.Trigger();  // Trigger any other code that needs to be run now.
+        on_error.Clear();    // Now that the load is finished, we don't need to run these again.
+      }
+
+      /// Add a new function to be called when the image finishes loading.
+      void OnLoad(const std::function<void()> & callback_fun) {
+        on_load.AddAction(callback_fun);
+      }
+
+      /// Add a new function to be called if an image load has an error.
+      void OnError(const std::function<void()> & callback_fun) {
+        on_error.AddAction(callback_fun);
+      }
+
+    };
+  }
 
   /// Fundamental information about a single image.
   class RawImage {
@@ -38,8 +103,8 @@ namespace emp {
     RawImage(const std::string & _filename)
       : filename(_filename), has_loaded(false), has_error(false)
     {
-      loaded_callback = JSWrapOnce( std::function<void()>(std::bind(&RawImage::MarkLoaded, this)) );
-      error_callback = JSWrapOnce( std::function<void()>(std::bind(&RawImage::MarkError, this)) );
+      size_t loaded_callback = JSWrapOnce( std::function<void()>(std::bind(&RawImage::MarkLoaded, this)) );
+      size_t error_callback = JSWrapOnce( std::function<void()>(std::bind(&RawImage::MarkError, this)) );
 
       img_id = EM_ASM_INT({
         var file = Pointer_stringify($0);
