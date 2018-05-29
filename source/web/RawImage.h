@@ -15,6 +15,8 @@
 #include <string>
 #include <vector>
 
+#include "../base/Ptr.h"
+#include "../base/vector.h"
 #include "../control/Signal.h"
 #include "../tools/map_utils.h"
 
@@ -83,7 +85,37 @@ namespace emp {
       void OnError(const std::function<void()> & callback_fun) {
         on_error.AddAction(callback_fun);
       }
+    };
 
+    class Image_Manager {
+    private:
+      emp::vector<Ptr<Image_Info>> image_info;            ///< Information about each loaded image.
+      std::map<std::string, size_t> image_id_map;  ///< Map of filenames to loaded image ids.
+
+    public:
+      Image_Manager() : image_info(0), image_id_map() { ; }
+      ~Image_Manager() {
+        for (auto ptr : image_info) ptr.Delete();
+      }
+
+      /// Is an image with the provided name currently being managed?
+      bool Has(const std::string & filename) { return emp::Has(image_id_map, filename); }
+
+      /// Create a new image with the provided name.
+      Image_Info & Add(const std::string & filename) {
+        emp_assert(Has(image_id_map, filename) == false);
+        size_t img_id = image_info.size();
+        Ptr<Image_Info> new_info = NewPtr<Image_Info>(filename);
+        image_info.push_back(new_info);
+        image_id_map[filename] = img_id;
+        return *image_info[img_id];
+      }
+
+      /// Get the info about a specified image (loading it only if needed!)
+      Image_Info & GetInfo(const std::string & filename) {
+        if (Has(filename)) return *image_info[ image_id_map[filename] ];
+        return Add(filename);
+      }
     };
   }
 
@@ -173,7 +205,7 @@ namespace emp {
                           const std::function<void()> & error_callback=NULL)
   {
     auto & raw_image_map = internal::RawImageMap();
-    RawImage * raw_image;
+    Ptr<RawImage> raw_image;
     if (!Has(raw_image_map, filename)) {        // New filename
       raw_image = new RawImage(filename);
       raw_image_map[filename] = raw_image;
