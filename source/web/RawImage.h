@@ -29,14 +29,14 @@ namespace emp {
     /// Detailed information about an image
     struct ImageInfo {
       int img_id;                    ///< Unique ID for this image.
-      std::string filename;          ///< Full URL of file containing image.
+      std::string url;               ///< Full URL of file containing image.
       mutable bool has_loaded;       ///< Is this image finished loading?
       mutable bool has_error;        ///< Were there any errors in loading image?
       Signal<void()> on_load;        ///< Actions for when image is finished loading.
       Signal<void()> on_error;       ///< Actions for when image has trouble loading.
 
-      ImageInfo(const std::string & _filename)
-        : img_id(-1), filename(_filename), has_loaded(false), has_error(false), on_load(), on_error()
+      ImageInfo(const std::string & _url)
+        : img_id(-1), url(_url), has_loaded(false), has_error(false), on_load(), on_error()
       {
         size_t loaded_callback = JSWrapOnce( std::function<void()>(std::bind(&ImageInfo::MarkLoaded, this)) );
         size_t error_callback = JSWrapOnce( std::function<void()>(std::bind(&ImageInfo::MarkError, this)) );
@@ -58,7 +58,7 @@ namespace emp {
           };
 
           return img_id;
-        }, filename.c_str(), loaded_callback, error_callback);
+        }, url.c_str(), loaded_callback, error_callback);
       }
 
       /// Trigger this image as loaded.
@@ -71,7 +71,7 @@ namespace emp {
       /// Trigger this image as having an error.
       void MarkError() {
         has_error = true;
-        emp::Alert(std::string("Error loading image: ") + filename);
+        emp::Alert(std::string("Error loading image: ") + url);
         on_error.Trigger();  // Trigger any other code that needs to be run now.
         on_error.Clear();    // Now that the load is finished, we don't need to run these again.
       }
@@ -89,8 +89,8 @@ namespace emp {
 
     class ImageManager {
     private:
-      emp::vector<Ptr<ImageInfo>> image_info;            ///< Information about each loaded image.
-      std::map<std::string, size_t> image_id_map;  ///< Map of filenames to loaded image ids.
+      emp::vector<Ptr<ImageInfo>> image_info;        ///< Information about each loaded image.
+      std::map<std::string, size_t> image_id_map;    ///< Map of urls to loaded image ids.
 
     public:
       ImageManager() : image_info(0), image_id_map() { ; }
@@ -99,22 +99,22 @@ namespace emp {
       }
 
       /// Is an image with the provided name currently being managed?
-      bool Has(const std::string & filename) { return emp::Has(image_id_map, filename); }
+      bool Has(const std::string & url) { return emp::Has(image_id_map, url); }
 
       /// Create a new image with the provided name.
-      Ptr<ImageInfo> Add(const std::string & filename) {
-        emp_assert(Has(image_id_map, filename) == false);
+      Ptr<ImageInfo> Add(const std::string & url) {
+        emp_assert(Has(image_id_map, url) == false);
         size_t img_id = image_info.size();
-        Ptr<ImageInfo> new_info = NewPtr<ImageInfo>(filename);
+        Ptr<ImageInfo> new_info = NewPtr<ImageInfo>(url);
         image_info.push_back(new_info);
-        image_id_map[filename] = img_id;
+        image_id_map[url] = img_id;
         return image_info[img_id];
       }
 
       /// Get the info about a specified image (loading it only if needed!)
-      Ptr<ImageInfo> GetInfo(const std::string & filename) {
-        if (Has(filename)) return image_info[ image_id_map[filename] ];
-        return Add(filename);
+      Ptr<ImageInfo> GetInfo(const std::string & url) {
+        if (Has(url)) return image_info[ image_id_map[url] ];
+        return Add(url);
       }
     };
 
@@ -130,11 +130,14 @@ namespace emp {
       return manager;
     }
   public:
-    RawImage(const std::string & filename) : info(GetManager().GetInfo(filename)) { ; }
+    RawImage(const std::string & url) : info(GetManager().GetInfo(url)) { ; }
+    RawImage(const RawImage &) = default;
     ~RawImage() { ; }
 
-    int GetImgID() const { return info->img_id; }
-    const std::string & GetFilename() const { return info->filename; }
+    RawImage & operator=(const RawImage &) = default;
+
+    int GetID() const { return info->img_id; }
+    const std::string & GetURL() const { return info->url; }
     bool HasLoaded() const { return info->has_loaded; }
     bool HasError() const { return info->has_error; }
 
