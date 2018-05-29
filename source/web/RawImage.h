@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  RawImage.h
  *  @brief Handle the fundamental loading of an image (without Widget tracking)
@@ -14,6 +14,8 @@
 #include <map>
 #include <string>
 #include <vector>
+
+#include "../tools/map_utils.h"
 
 #include "emfunctions.h"
 #include "JSWrap.h"
@@ -96,6 +98,7 @@ namespace emp {
   namespace internal {
     static std::map<std::string, RawImage *> & RawImageMap() {
       static std::map<std::string, RawImage *> raw_image_map;
+      return raw_image_map;
     }
   }
 
@@ -105,15 +108,12 @@ namespace emp {
                           const std::function<void()> & error_callback=NULL)
   {
     auto & raw_image_map = internal::RawImageMap();
-    auto it = raw_image_map.find(filename);
     RawImage * raw_image;
-    if (it == raw_image_map.end()) {        // New filename
+    if (!Has(raw_image_map, filename)) {        // New filename
       raw_image = new RawImage(filename);
       raw_image_map[filename] = raw_image;
     }
-    else {                                  // Pre-existing filename
-      raw_image = raw_image_map[filename];
-    }
+    else raw_image = raw_image_map[filename];   // Pre-existing filename
 
     if (load_callback) {
       if (raw_image->HasLoaded()) load_callback();
