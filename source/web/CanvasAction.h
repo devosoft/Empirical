@@ -23,6 +23,7 @@
 
 #include <string>
 
+#include "RawImage.h"
 #include "Widget.h"
 
 namespace emp {
@@ -119,14 +120,16 @@ namespace web {
   /// Change the default font to be used.
   class CanvasImage : public CanvasAction {
   protected:
-    RawImage image;
+    size_t image_id;
   public:
-    CanvasImage(const std::string & filename) : image(filename) { ; }
+    CanvasImage(size_t _id) : image_id(_id) { ; }
+    CanvasImage(const RawImage & raw_image) : image_id(raw_image.GetImgID()) { ; }
+    CanvasImage(const std::string & filename) : image_id(RawImage(filename).GetImgID()) { ; }
 
     void Apply() {
       EM_ASM_ARGS({
-        emp_i.ctx.drawImage(img);
-      }, image.c_str());
+        emp_i.ctx.drawImage(emp_info.images[$0]);
+      }, image_id);
     }
     CanvasAction * Clone() const { return new CanvasImage(*this); }
   };
