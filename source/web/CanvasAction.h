@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  CanvasAction.h
  *  @brief Define a base class for all actions that can be done to widgets, plus simple actions.
@@ -114,6 +114,21 @@ namespace web {
       }, font.c_str());
     }
     CanvasAction * Clone() const { return new CanvasFont(*this); }
+  };
+
+  /// Change the default font to be used.
+  class CanvasImage : public CanvasAction {
+  protected:
+    RawImage image;
+  public:
+    CanvasImage(const std::string & filename) : image(filename) { ; }
+
+    void Apply() {
+      EM_ASM_ARGS({
+        emp_i.ctx.drawImage(img);
+      }, image.c_str());
+    }
+    CanvasAction * Clone() const { return new CanvasImage(*this); }
   };
 
 }
