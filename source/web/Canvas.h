@@ -153,6 +153,14 @@ namespace web {
       return *this;
     }
 
+    /// Add an Image to this canvas at x,y with width w and heigh h.
+    template <typename... Ts>
+    Canvas & Image(Ts &&... vals) {
+      Info()->AddAction( new CanvasImage(std::forward<Ts>(vals)...) );
+      return *this;
+    }
+
+
     /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
     Canvas & Line(double x1, double y1, double x2, double y2, const std::string & lc="", double lw=1.0) {
       Info()->AddAction( new CanvasLine(x1, y1, x2, y2, lc, lw) );
