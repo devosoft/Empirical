@@ -540,7 +540,7 @@ namespace emp {
         (int) (find_bit(bit_set[field_id]) + (field_id * FIELD_BITS))  :  -1;
     }
 
-    /// Return the position of the first one and chang it to a zero.  Return -1 if no ones.
+    /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
     int PopBit() {
       const size_t NUM_FIELDS = NumFields();
       size_t field_id = 0;

@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
+//  Copyright (C) Michigan State University, 2015-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 
 mergeInto(LibraryManager.library, {
@@ -205,7 +205,7 @@ mergeInto(LibraryManager.library, {
     },
 
     // Data internal to EMP
-    $emp_i: { cb_args:[], cb_return:0
+    $emp_i: { cb_args:[], cb_return:0, images:[]
             },
 
     EMP_Initialize__deps: ['$emp', '$emp_i'],
