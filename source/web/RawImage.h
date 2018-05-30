@@ -42,18 +42,18 @@ namespace emp {
         size_t error_callback = JSWrapOnce( std::function<void()>(std::bind(&ImageInfo::MarkError, this)) );
 
         img_id = EM_ASM_INT({
-          var file = Pointer_stringify($0);
-          var img_id = emp_info.images.length;
-          emp_info.images[img_id] = new Image();
-          emp_info.images[img_id].src = file;
+          var url = Pointer_stringify($0);
+          var img_id = emp_i.images.length;
+          emp_i.images[img_id] = new Image();
+          emp_i.images[img_id].src = url;
 
-          emp_info.images[img_id].onload = function() {
-              emp_info.image_load_count += 1;
+          emp_i.images[img_id].onload = function() {
+              emp_i.image_load_count += 1;
               emp.Callback($1);
           };
 
-          emp_info.images[img_id].onerror = function() {
-              emp_info.image_error_count += 1;
+          emp_i.images[img_id].onerror = function() {
+              emp_i.image_error_count += 1;
               emp.Callback($2);
           };
 
@@ -103,7 +103,7 @@ namespace emp {
 
       /// Create a new image with the provided name.
       Ptr<ImageInfo> Add(const std::string & url) {
-        emp_assert(Has(image_id_map, url) == false);
+        emp_assert(Has(url) == false);
         size_t img_id = image_info.size();
         Ptr<ImageInfo> new_info = NewPtr<ImageInfo>(url);
         image_info.push_back(new_info);
