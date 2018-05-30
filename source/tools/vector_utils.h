@@ -24,10 +24,10 @@ namespace emp {
     return -1;
   }
 
-  /// Return whether a value exists in a vector.
+  /// Return whether a value exists in a vector.s
   template <typename T>
   bool Has(const emp::vector<T> vec, const T & val) {
-    return FindPos(vec, val) >= 0;
+    return FindValue(vec, val) >= 0;
   }
 
   /// Print the contects of a vector.
