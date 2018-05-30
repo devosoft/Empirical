@@ -24,7 +24,7 @@ namespace emp {
     return -1;
   }
 
-  /// Return whether a value exists in a vector.
+  /// Return whether a value exists in a vector.s
   template <typename T>
   bool Has(const emp::vector<T> vec, const T & val) {
     return FindValue(vec, val) >= 0;

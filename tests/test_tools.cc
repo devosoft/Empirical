@@ -1369,7 +1369,7 @@ TEST_CASE("Test vector utils", "[tools]") {
   emp::vector<int> v1({6,2,5,1,3});
   emp::Sort(v1);
   REQUIRE(v1 == emp::vector<int>({1,2,3,5,6}));
-  REQUIRE(emp::FindPos(v1, 3) == 2);
+  REQUIRE(emp::FindValue(v1, 3) == 2);
   REQUIRE(emp::Sum(v1) == 17);
   REQUIRE(emp::Has(v1, 3));
   REQUIRE(!emp::Has(v1, 4));
@@ -1377,9 +1377,9 @@ TEST_CASE("Test vector utils", "[tools]") {
   REQUIRE(emp::Slice(v1,1,3) == emp::vector<int>({2,3}));
 }
 
-DEFINE_ATTR(Foo);
-DEFINE_ATTR(Bar);
-DEFINE_ATTR(Bazz);
+// DEFINE_ATTR(Foo);
+// DEFINE_ATTR(Bar);
+// DEFINE_ATTR(Bazz);
 
 struct ident_t {
   template <typename T>
