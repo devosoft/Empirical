@@ -118,7 +118,7 @@ private:
     emp_assert(to < nodes.size());
     if (from > to) std::swap(from,to);
 
-    edges.erase(edges.begin() + emp::FindPos(edges, Edge(from, to)));
+    edges.erase(edges.begin() + emp::FindValue(edges, Edge(from, to)));
     adj_matrix(from, to) = 0;
     adj_matrix(to, from) = 0;
     // adj_list[from].push_back(to);
