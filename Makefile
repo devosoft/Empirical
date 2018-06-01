@@ -3,8 +3,7 @@ test:
 	cd tests && make test-web
 
 doc: build-doxygen-xml
-	doxygen
-	cd doc && make html
+	cd doc && ./make_docs.sh
 
 build-doxygen-xml:
 	./third-party/doxygen/build/bin/doxygen Doxyfile
