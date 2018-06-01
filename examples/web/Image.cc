@@ -22,15 +22,17 @@ private:
   double cx = 150.0;
   double cy = 150.0;
   double cr = 50;
-  const double can_size = 600;
+  const double can_size = 700;
 
   emp::vector<emp::Point> position;
   emp::vector<emp::Point> velocity;
-  const double image_size = 10.0;
-  const size_t num_images = 4000;
+  const double image_size = 100.0;
+  const size_t num_images = 100;
+
+  const double can_limit = can_size - image_size;
 
 public:
-  MyAnimate() : doc("emp_base"), poly(200, 300, "red", "black"), line(5,5, 595, 595, "green") {
+  MyAnimate() : doc("emp_base"), poly(200, 300, "red", "black"), line(5,5, 695, 695, "red") {
     // How big should each canvas be?
     const double w = can_size;
     const double h = can_size;
@@ -83,23 +85,24 @@ public:
     mycanvas.Circle(cx, cy, cr, "blue", "purple");
     if (cx + cr > can_size) mycanvas.Circle(cx-can_size, cy, cr, "blue", "purple");
 
-    emp::RawImage cell("images/cell2.png");
+    // Update the line.
+    mycanvas.Draw(line);
+
+    // Draw the cells...
+    emp::RawImage cell("images/cell.png");
     emp::Point offsetX(can_size, 0.0);
     emp::Point offsetY(0.0, can_size);
 
     for (size_t i = 0; i < position.size(); i++) {
       mycanvas.Image(cell, position[i], image_size, image_size);
-      mycanvas.Image(cell, position[i] - offsetX, image_size, image_size);
-      mycanvas.Image(cell, position[i] - offsetY, image_size, image_size);
+      if (position[i].GetX() > can_limit) mycanvas.Image(cell, position[i] - offsetX, image_size, image_size);
+      if (position[i].GetY() > can_limit) mycanvas.Image(cell, position[i] - offsetY, image_size, image_size);
       position[i] += velocity[i];
       if (position[i].GetX() < 0.0) position[i] += offsetX;
       if (position[i].GetY() < 0.0) position[i] += offsetY;
       if (position[i].GetX() > can_size) position[i] -= offsetX;
       if (position[i].GetY() > can_size) position[i] -= offsetY;
     }
-
-    // Update the line.
-    mycanvas.Draw(line);
 
     doc.Text("fps").Redraw();
 
