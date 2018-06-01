@@ -31,7 +31,7 @@ namespace web {
             const std::string & line="")
   {
     canvas.Clear();
-    canvas.Circle(circle, fill, line);
+    canvas.Draw(circle, fill, line);
   }
 
 
@@ -138,16 +138,16 @@ namespace web {
             const emp::vector<emp::vector<size_t>> & grid,
             const emp::vector<std::string> & color_map,
             std::string line_color,
-            size_t cell_w, size_t cell_h)
+            double cell_w, double cell_h)
   {
-    const size_t canvas_w = canvas.GetWidth();
-    const size_t canvas_h = canvas.GetHeight();
-    const size_t grid_w = cell_w * grid[0].size();
-    const size_t grid_h = cell_h * grid.size();
+    const double canvas_w = canvas.GetWidth();
+    const double canvas_h = canvas.GetHeight();
+    const double grid_w = cell_w * grid[0].size();
+    const double grid_h = cell_h * grid.size();
 
     // Center the grid on the canvas if there's extra room.
-    const size_t offset_x = (canvas_w <= grid_w) ? 0 : (canvas_w - grid_w) / 2;
-    const size_t offset_y = (canvas_h <= grid_h) ? 0 : (canvas_h - grid_h) / 2;
+    const double offset_x = (canvas_w <= grid_w) ? 0 : (canvas_w - grid_w) / 2;
+    const double offset_y = (canvas_h <= grid_h) ? 0 : (canvas_h - grid_h) / 2;
 
     // Call Draw with all of the extra details.
     Draw(canvas, grid, color_map, line_color, cell_w, cell_h, offset_x, offset_y);
@@ -164,8 +164,8 @@ namespace web {
             std::string line_color="black")
   {
     // Determine the cell width & height
-    const size_t cell_w = canvas.GetWidth() / grid[0].size();
-    const size_t cell_h = canvas.GetHeight() / grid.size();
+    const double cell_w = canvas.GetWidth() / grid[0].size();
+    const double cell_h = canvas.GetHeight() / grid.size();
 
     Draw(canvas, grid, color_map, line_color, cell_w, cell_h);
   }
