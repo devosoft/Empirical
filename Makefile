@@ -9,6 +9,7 @@ build-doxygen-xml:
 	./third-party/doxygen/build/bin/doxygen Doxyfile
 
 travis: 
+	make install-dependencies
 	cd third-party && bash install_emscripten.sh
 	cd third-party && make install-npm-deps
 	make test
