@@ -25,7 +25,7 @@ private:
   double poly_rot = 0.0;
 
 public:
-  MyAnimate() : doc("emp_base"), poly( {200,300}, "red", "black"), line({5,5}, {395,395}, "green") {
+  MyAnimate() : doc("emp_base"), poly( 200, 300, "red", "black"), line({5,5}, {395,395}, "green") {
     // How big should each canvas be?
     const double w = can_size;
     const double h = can_size;
@@ -60,7 +60,7 @@ public:
 
     // Draw the new circle.
     mycanvas.Clear();
-    mycanvas.Circle(emp::Circle(cx,cy,cr), "blue", "purple");
+    mycanvas.Draw(emp::Circle(cx,cy,cr), "blue", "purple");
     if (cx + cr > can_size) mycanvas.Circle(cx-can_size, cy, cr, "blue", "purple");
 
     // Update the polygon position
