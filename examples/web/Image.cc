@@ -22,7 +22,10 @@ private:
   double cx = 150.0;
   double cy = 150.0;
   double cr = 50;
-  double can_size = 400;
+  double can_size = 600;
+
+  emp::vector<emp::Point> position;
+  emp::vector<emp::Point> velocity;
 
 public:
   MyAnimate() : doc("emp_base"), poly(200, 300, "red", "black"), line(5,5, 395,395, "green") {
@@ -56,6 +59,15 @@ public:
       doc << "<br>" << color_map[i];
     }
 
+    const size_t num_images = 100;
+    position.resize(num_images);
+    velocity.resize(num_images);
+    emp::Angle angle;
+
+    for (size_t i = 0; i < num_images; i++) {
+      position[i] = emp::Point(random.GetDouble(can_size), random.GetDouble(can_size));
+      velocity[i] = angle.SetPortion(random.GetDouble()).GetPoint(random.GetDouble(1.0,3.0));
+    }
   }
 
   void DoFrame() {
@@ -71,9 +83,19 @@ public:
     if (cx + cr > can_size) mycanvas.Circle(cx-can_size, cy, cr, "blue", "purple");
 
     emp::RawImage cell("images/cell2.png");
-    mycanvas.Image(cell, cx, cy+100, 50, 50);
-    mycanvas.Image(cell, cx-can_size, cy+100, 50, 50);
+    emp::Point offsetX(can_size, 0.0);
+    emp::Point offsetY(0.0, can_size);
 
+    for (size_t i = 0; i < position.size(); i++) {
+      mycanvas.Image(cell, position[i], 50, 50);
+      mycanvas.Image(cell, position[i] - offsetX, 50, 50);
+      mycanvas.Image(cell, position[i] - offsetY, 50, 50);
+      position[i] += velocity[i];
+      if (position[i].GetX() < 0.0) position[i] += offsetX;
+      if (position[i].GetY() < 0.0) position[i] += offsetY;
+      if (position[i].GetX() > can_size) position[i] -= offsetX;
+      if (position[i].GetY() > can_size) position[i] -= offsetY;
+    }
 
     // Update the line.
     mycanvas.Draw(line);
