@@ -22,13 +22,15 @@ private:
   double cx = 150.0;
   double cy = 150.0;
   double cr = 50;
-  double can_size = 600;
+  const double can_size = 600;
 
   emp::vector<emp::Point> position;
   emp::vector<emp::Point> velocity;
+  const double image_size = 10.0;
+  const size_t num_images = 4000;
 
 public:
-  MyAnimate() : doc("emp_base"), poly(200, 300, "red", "black"), line(5,5, 395,395, "green") {
+  MyAnimate() : doc("emp_base"), poly(200, 300, "red", "black"), line(5,5, 595, 595, "green") {
     // How big should each canvas be?
     const double w = can_size;
     const double h = can_size;
@@ -59,7 +61,6 @@ public:
       doc << "<br>" << color_map[i];
     }
 
-    const size_t num_images = 100;
     position.resize(num_images);
     velocity.resize(num_images);
     emp::Angle angle;
@@ -87,9 +88,9 @@ public:
     emp::Point offsetY(0.0, can_size);
 
     for (size_t i = 0; i < position.size(); i++) {
-      mycanvas.Image(cell, position[i], 50, 50);
-      mycanvas.Image(cell, position[i] - offsetX, 50, 50);
-      mycanvas.Image(cell, position[i] - offsetY, 50, 50);
+      mycanvas.Image(cell, position[i], image_size, image_size);
+      mycanvas.Image(cell, position[i] - offsetX, image_size, image_size);
+      mycanvas.Image(cell, position[i] - offsetY, image_size, image_size);
       position[i] += velocity[i];
       if (position[i].GetX() < 0.0) position[i] += offsetX;
       if (position[i].GetY() < 0.0) position[i] += offsetY;
