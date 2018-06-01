@@ -77,7 +77,7 @@ public:
     inst_lib.AddInst("Scan",   SGOrg::Inst_Scan,   1, "Idenify state of current position in state grid.");
 
     // When an organism is added to the world, supply it with a state grid.
-    OnOrgPlacement( [this, &random](size_t pos) {
+    OnPlacement( [this, &random](size_t pos) {
       pop[pos]->SetStateGrid(state_grid);      // Ensure new org has access to state grid.
       pop[pos]->GetSGStatus().SetPos(4,4);     // Start at position (4,4)
       pop[pos]->GetSGStatus().TrackMoves();    // Make sure we have a history to refer to.
