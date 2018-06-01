@@ -121,24 +121,28 @@ namespace web {
   class CanvasImage : public CanvasAction {
   protected:
     RawImage image;
-    double x; double y;
+    Point position;
     double width; double height;
   public:
     CanvasImage(const RawImage & raw_image, double _x=0.0, double _y=0.0, double _w=0.0, double _h=0.0)
-      : image(raw_image), x(_x), y(_y), width(_w), height(_h) { ; }
+      : image(raw_image), position(_x,_y), width(_w), height(_h) { ; }
+    CanvasImage(const RawImage & raw_image, Point _p, double _w=0.0, double _h=0.0)
+      : image(raw_image), position(_p), width(_w), height(_h) { ; }
     CanvasImage(const std::string & url, double _x=0.0, double _y=0.0, double _w=0.0, double _h=0.0)
-      : image(url), x(_x), y(_y), width(_w), height(_h) { ; }
+      : image(url), position(_x,_y), width(_w), height(_h) { ; }
+    CanvasImage(const std::string & url, Point _p, double _w=0.0, double _h=0.0)
+      : image(url), position(_p), width(_w), height(_h) { ; }
 
     void Apply() {
       image.OnLoad([this](){
         if (width == 0.0) {
           EM_ASM_ARGS({
             emp_i.ctx.drawImage(emp_i.images[$0], $1, $2);
-          }, image.GetID(), x, y);
+          }, image.GetID(), position.GetX(), position.GetY());
         } else {
           EM_ASM_ARGS({
             emp_i.ctx.drawImage(emp_i.images[$0], $1, $2, $3, $4);
-          }, image.GetID(), x, y, width, height);
+          }, image.GetID(), position.GetX(), position.GetY(), width, height);
         }
       });
     }
