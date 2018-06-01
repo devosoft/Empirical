@@ -129,7 +129,7 @@ namespace web {
     /// as well as optional face color, line color, and line width.
     template <typename... Ts>
     Canvas & Circle(Point center, double _r, Ts &&... vals) {
-      Info()->AddAction( new CanvasCircle(Circle(center, _r), std::forward<Ts>(vals)...) );
+      Info()->AddAction( new CanvasCircle(emp::Circle(center, _r), std::forward<Ts>(vals)...) );
       return *this;
     }
 
@@ -139,41 +139,41 @@ namespace web {
       return *this;
     }
 
-    template <typename... Ts>
-    Canvas & Circle(const emp::Circle & circle, Ts &&... vals) {
-      Info()->AddAction( new CanvasCircle(circle, std::forward<Ts>(vals)...) );
-      return *this;
-    }
-
     /// Add a Rectangle to this canvas at x,y with width w and heigh h.  Optional face color and
     /// line color.
     template <typename... Ts>
-    Canvas & Rect(Point corner, Ts &&... vals) {
-      Info()->AddAction( new CanvasRect(corner, std::forward<Ts>(vals)...) );
+    Canvas & Rect(Point corner, double w, double h, Ts &&... vals) {
+      Info()->AddAction( new CanvasRect(corner, w, h, std::forward<Ts>(vals)...) );
       return *this;
     }
 
     template <typename... Ts>
-    Canvas & Rect(double x, double y, Ts &&... vals) {
-      Info()->AddAction( new CanvasRect(x, y, std::forward<Ts>(vals)...) );
+    Canvas & Rect(double x, double y, double w, double h, Ts &&... vals) {
+      Info()->AddAction( new CanvasRect(x, y, w, h, std::forward<Ts>(vals)...) );
       return *this;
     }
 
     /// Add an Image to this canvas at x,y with width w and heigh h.
     template <typename... Ts>
-    Canvas & Image(Point corner, Ts &&... vals) {
-      Info()->AddAction( new CanvasImage(corner, std::forward<Ts>(vals)...) );
+    Canvas & Image(const emp::RawImage & image, Point corner, Ts &&... vals) {
+      Info()->AddAction( new CanvasImage(image, corner, std::forward<Ts>(vals)...) );
       return *this;
     }
 
     template <typename... Ts>
-    Canvas & Image(double x, double y, Ts &&... vals) {
-      Info()->AddAction( new CanvasImage(x, y, std::forward<Ts>(vals)...) );
+    Canvas & Image(const emp::RawImage & image, double x, double y, Ts &&... vals) {
+      Info()->AddAction( new CanvasImage(image, x, y, std::forward<Ts>(vals)...) );
       return *this;
     }
 
 
     /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
+    template <typename... Ts>
+    Canvas & Line(double x1, double y1, double x2, double y2, Ts &&... vals) {
+      Info()->AddAction( new CanvasLine(x1, y1, x2, y2, std::forward<Ts>(vals)...) );
+      return *this;
+    }
+
     template <typename... Ts>
     Canvas & Line(emp::Point p1, emp::Point p2, Ts &&... vals) {
       Info()->AddAction( new CanvasLine(p1, p2, std::forward<Ts>(vals)...) );
@@ -195,11 +195,25 @@ namespace web {
       return *this;
     }
 
+    template <typename... Ts>
+    Canvas & Text(double x, double y, Ts &&... vals) {
+      Info()->AddAction( new CanvasText(x, y, std::forward<Ts>(vals)...) );
+      return *this;
+    }
+
     /// Add a string to this canvas centered at x,y with specified text.  Optional face color and
     /// line color.
     template <typename... Ts>
     Canvas & CenterText(emp::Point p, Ts &&... vals) {
       auto * ctext = new CanvasText(p, std::forward<Ts>(vals)...);
+      ctext->Center();
+      Info()->AddAction( ctext );
+      return *this;
+    }
+
+    template <typename... Ts>
+    Canvas & CenterText(double x, double y, Ts &&... vals) {
+      auto * ctext = new CanvasText({x, y}, std::forward<Ts>(vals)...);
       ctext->Center();
       Info()->AddAction( ctext );
       return *this;
