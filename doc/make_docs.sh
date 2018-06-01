@@ -1,4 +1,5 @@
  #!/bin/bash
 
-source ../third-party/env/bin/activate
+. ../third-party/env/bin/activate
 make html
+deactivate
