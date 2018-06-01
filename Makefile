@@ -12,6 +12,7 @@ travis:
 	cd third-party && bash install_emscripten.sh
 	cd third-party && make install-npm-deps
 	make test
+	make doc
 
 install-dependencies:
 	git submodule init
