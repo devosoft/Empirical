@@ -99,6 +99,10 @@ namespace web {
                const std::string & fc="", const std::string & lc="")
       : CanvasShape(_p, fc, lc), w(_w), h(_h) { ; }
 
+    CanvasRect(double _x, double _y, double _w, double _h,
+               const std::string & fc="", const std::string & lc="")
+      : CanvasShape(_x, _y, fc, lc), w(_w), h(_h) { ; }
+
     void Apply() {
       EM_ASM_ARGS({
           emp_i.ctx.beginPath();
