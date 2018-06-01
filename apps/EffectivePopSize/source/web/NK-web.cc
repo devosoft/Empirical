@@ -46,12 +46,12 @@ struct NKInterface {
     // div_pop << "<br>";
     div_pop << org_canvas;
 
-    auto & fit_node = world.GetFitnessDataNode();
+    auto fit_node = world.GetFitnessDataNode();
     div_stats << "<b>Stats:</b>";
     div_stats << "<br>Update: " << UI::Live( [this](){ return world.GetUpdate(); } );
-    div_stats << "<br>Min Fitness: " << UI::Live( [&fit_node](){ return fit_node.GetMin(); } );
-    div_stats << "<br>Mean Fitness: " << UI::Live( [&fit_node](){ return fit_node.GetMean(); } );
-    div_stats << "<br>Max Fitness: " << UI::Live( [&fit_node](){ return fit_node.GetMax(); } );
+    div_stats << "<br>Min Fitness: "  << UI::Live( [fit_node](){ return fit_node->GetMin(); } );
+    div_stats << "<br>Mean Fitness: " << UI::Live( [fit_node](){ return fit_node->GetMean(); } );
+    div_stats << "<br>Max Fitness: "  << UI::Live( [fit_node](){ return fit_node->GetMax(); } );
 
     doc << "<h1>NK World</h1>";
     doc << div_pop;
