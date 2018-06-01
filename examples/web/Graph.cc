@@ -61,9 +61,9 @@ struct Edge {
 
 class GraphDriver : public UI::Animate {
 private:
-  size_t can_w = 500;
-  size_t can_h = 500;
-  size_t node_r = 15;
+  double can_w = 500;
+  double can_h = 500;
+  double node_r = 15;
 
   double node_r_sqr = node_r * node_r;
 
