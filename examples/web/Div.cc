@@ -61,7 +61,7 @@ int main() {
     .SetCSS("border-radius", "15px")
       << "Testing out the new slate object with some wide text!";
 
-  doc << "<br>" << UI::Image("motivator.jpg").SetWidth(300).SetOpacity(0.8);
+  doc << "<br>" << UI::Image("images/motivator.jpg").SetWidth(300).SetOpacity(0.8);
 
   myvar = 100;
 

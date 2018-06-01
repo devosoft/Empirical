@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2018.
+//  Copyright (C) Michigan State University, 2018.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include "tools/Random.h"
@@ -19,14 +19,18 @@ private:
 
   emp::Random random;
 
-  double cx = 150;
-  double cy = 150;
+  double cx = 150.0;
+  double cy = 150.0;
   double cr = 50;
-  double can_size = 400;
-  double poly_rot = 0.0;
+  const double can_size = 600;
+
+  emp::vector<emp::Point> position;
+  emp::vector<emp::Point> velocity;
+  const double image_size = 10.0;
+  const size_t num_images = 4000;
 
 public:
-  MyAnimate() : doc("emp_base"), poly(200, 300, "red", "black"), line({5,5}, {395,395}, "green") {
+  MyAnimate() : doc("emp_base"), poly(200, 300, "red", "black"), line(5,5, 595, 595, "green") {
     // How big should each canvas be?
     const double w = can_size;
     const double h = can_size;
@@ -52,18 +56,26 @@ public:
     const double buffer = 20;
     const double radius = (can_size - 2 * buffer)/(color_map.size()*2);
     for (size_t i = 0; i < color_map.size(); i++) {
-      int x_pos = (int) (buffer + (2*i+1) * radius);
-      mycanvas.Circle(emp::Point(x_pos, 300), radius, color_map[i]);
+      double x_pos = (double) (buffer + (2*i+1) * radius);
+      mycanvas.Circle(x_pos, 300.0, radius, color_map[i]);
       doc << "<br>" << color_map[i];
     }
 
+    position.resize(num_images);
+    velocity.resize(num_images);
+    emp::Angle angle;
+
+    for (size_t i = 0; i < num_images; i++) {
+      position[i] = emp::Point(random.GetDouble(can_size), random.GetDouble(can_size));
+      velocity[i] = angle.SetPortion(random.GetDouble()).GetPoint(random.GetDouble(1.0,3.0));
+    }
   }
 
   void DoFrame() {
     auto mycanvas = doc.Canvas("can");
 
     // Update the circle position.
-    cx+=3;
+    cx+=3.0;
     if (cx >= can_size + cr) cx -= can_size;
 
     // Draw the new circle.
@@ -71,11 +83,20 @@ public:
     mycanvas.Circle(cx, cy, cr, "blue", "purple");
     if (cx + cr > can_size) mycanvas.Circle(cx-can_size, cy, cr, "blue", "purple");
 
-    // Update the polygon position
-    poly_rot += 0.01;
-    mycanvas.Rotate(poly_rot);
-    mycanvas.Draw(poly);
-    mycanvas.Rotate(-poly_rot);
+    emp::RawImage cell("images/cell2.png");
+    emp::Point offsetX(can_size, 0.0);
+    emp::Point offsetY(0.0, can_size);
+
+    for (size_t i = 0; i < position.size(); i++) {
+      mycanvas.Image(cell, position[i], image_size, image_size);
+      mycanvas.Image(cell, position[i] - offsetX, image_size, image_size);
+      mycanvas.Image(cell, position[i] - offsetY, image_size, image_size);
+      position[i] += velocity[i];
+      if (position[i].GetX() < 0.0) position[i] += offsetX;
+      if (position[i].GetY() < 0.0) position[i] += offsetY;
+      if (position[i].GetX() > can_size) position[i] -= offsetX;
+      if (position[i].GetY() > can_size) position[i] -= offsetY;
+    }
 
     // Update the line.
     mycanvas.Draw(line);

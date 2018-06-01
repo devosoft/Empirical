@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2018
  *
  *  @file  Action.h
  *  @brief Allow functions to be bundled (as Actions) and triggered enmasse.
@@ -136,13 +136,21 @@ namespace emp {
     template <typename... ARGS>
     void BaseTrigger(ARGS... args);
 
-    // Actions without arguments or a return type can be associated with any signal.
+    /// Actions without arguments or a return type can be associated with any signal.
     template <typename... ARGS>
     SignalKey AddAction(const std::function<void(ARGS...)> & in_fun);
 
-    // Add an action using an Action object.
+    /// Add an action using an Action object.
     virtual SignalKey AddAction(ActionBase &) = 0;
+
+    /// Remove an action specified by its key.
     virtual void Remove(SignalKey key) = 0;
+
+    /// Remove all actions from this signal.
+    void Clear() {
+      // While we still have keys, remove them!
+      while (link_key_map.size()) Remove(link_key_map.begin()->first);
+    }
 
     bool Has(SignalKey key) const { return emp::Has(link_key_map, key); }
   };
@@ -172,9 +180,10 @@ namespace emp {
     size_t GetNumArgs() const { return sizeof...(ARGS); }
     size_t GetNumActions() const { return actions.GetSize(); }
 
+    /// Trigger this signal, providing all needed arguments.
     void Trigger(ARGS... args) { actions.Run(args...); }
 
-    // Add an action that takes the proper arguments.
+    /// Add an action that takes the proper arguments.
     SignalKey AddAction(const std::function<void(ARGS...)> & in_fun) {
       const SignalKey link_id = NextSignalKey();
       link_key_map[link_id] = actions.size();
@@ -182,13 +191,14 @@ namespace emp {
       return link_id;
     }
 
+    /// Add a specified action to this signal.
     SignalKey AddAction(ActionBase & in_action) {
       Action<fun_t> * a = dynamic_cast< Action<fun_t>* >(&in_action);
       emp_assert( a != nullptr && "action type must match signal type." );
       return AddAction(a->GetFun());
     }
 
-    // Add an action that takes too few arguments... but provide specific padding info.
+    /// Add an action that takes too few arguments... but provide specific padding info.
     template <typename... FUN_ARGS, typename... EXTRA_ARGS>
     SignalKey AddAction(const std::function<void(FUN_ARGS...)> & in_fun, TypePack<EXTRA_ARGS...>)
     {
@@ -202,8 +212,8 @@ namespace emp {
       return link_id;
     }
 
-    // Add an std::function that takes the wrong number of arguments.  For now, we will assume
-    // that there are too few and we need to figure out how to pad it out.
+    /// Add an std::function that takes the wrong number of arguments.  For now, we will assume
+    /// that there are too few and we need to figure out how to pad it out.
     template <typename... FUN_ARGS>
     SignalKey AddAction(const std::function<void(FUN_ARGS...)> & in_fun) {
       // Identify the extra arguments by removing the ones that we know about.
@@ -211,8 +221,8 @@ namespace emp {
       return AddAction(in_fun, extra_type());
     }
 
-    // Add a regular function that takes the wrong number of arguments.  For now, we will assume
-    // that there are too few and we need to figure out how to pad it out.
+    /// Add a regular function that takes the wrong number of arguments.  For now, we will assume
+    /// that there are too few and we need to figure out how to pad it out.
     template <typename... FUN_ARGS>
     SignalKey AddAction(void in_fun(FUN_ARGS...)) {
       // Identify the extra arguments by removing the ones that we know about.
@@ -220,6 +230,7 @@ namespace emp {
       return AddAction(std::function<void(FUN_ARGS...)>(in_fun), extra_type());
     }
 
+    /// Remove an action from this signal by providing its key.
     void Remove(SignalKey key) {
       // Find the action associate with this key.
       emp_assert(emp::Has(link_key_map, key));
@@ -235,6 +246,7 @@ namespace emp {
       }
     }
 
+    /// Retrieve the relative priority associated with a specific
     size_t GetPriority(SignalKey key) {
       emp_assert(emp::Has(link_key_map, key));
       return link_key_map[key];

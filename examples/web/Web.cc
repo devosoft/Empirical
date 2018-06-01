@@ -18,7 +18,7 @@ int main()
 {
   UI::Text text("my_text");
 
-  UI::Image motiv("../UI/motivator.jpg");
+  UI::Image motiv("../UI/images/motivator.jpg");
 
   UI::Table tab(5,5);
 
