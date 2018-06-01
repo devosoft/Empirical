@@ -20,7 +20,7 @@ test-%: test_%.cc
 test: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
-opt: FLAGS := -std=c++14 -DNDEBUG -O3
+opt: FLAGS := -std=c++14 -DNDEBUG -O3 -Wno-unused-function -I../source/ -I../
 opt: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 

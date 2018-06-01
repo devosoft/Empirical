@@ -1,5 +1,7 @@
 test:
 	cd tests && make test
+	cd tests && make debug
+	cd tests && make opt
 	cd tests && make test-web
 
 doc: build-doxygen-xml
