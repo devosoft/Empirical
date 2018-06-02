@@ -49,5 +49,6 @@ before_script:
 - bash install_emscripten.sh
 - make install-npm-deps
 - . emsdk_portable_repo/emsdk_portable/emsdk_env.sh
+- cd ..
 script:
 - make travis
