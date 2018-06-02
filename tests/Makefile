@@ -17,15 +17,18 @@ test-%: test_%.cc
 	# execute test
 	./$@.out
 
+# Test in debug mode without pointer tracker
 test: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
+# Test optimized version without debug features
 opt: FLAGS := -std=c++14 -DNDEBUG -O3 -Wno-unused-function -I../source/ -I../
 opt: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
-debug: FLAGS := -std=c++14 -g -Wall -Wno-unused-function -I../source/ -I../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 # -Wmisleading-indentation
-debug: test-prep $(addprefix test-, $(TEST_NAMES))
+# Test in debug mode with pointer tracking
+fulldebug: FLAGS := -std=c++14 -g -Wall -Wno-unused-function -I../source/ -I../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 # -Wmisleading-indentation
+fulldebug: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
 cranky: FLAGS := -std=c++14 -g -Wall -Wno-unused-function -I../source/ -I../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
