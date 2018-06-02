@@ -13,6 +13,7 @@ notifications:
 compiler:
 - g++-5
 - clang++-5.0
+- emcc
 python:
 - '3.5'
 install:
@@ -41,7 +42,11 @@ before_script:
 - export DISPLAY=:99.0
 - sh -e /etc/init.d/xvfb start
 - sleep 3 # give xvfb some time to start
-script:
 - git fetch origin master:refs/remotes/origin/master
 - npm install source-map
+- make install-dependencies
+- cd third-party && bash install_emscripten.sh
+- cd third-party && make install-npm-deps
+- . third-party/emsdk_portable_repo/emsdk_portable/emsdk_env.sh
+script:
 - make travis
