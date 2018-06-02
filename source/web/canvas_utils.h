@@ -76,8 +76,7 @@ namespace web {
     const auto & body_set = surface.GetConstBodySet();
     for (auto body : body_set) {
       //canvas.Circle(body->GetPerimeter(), color_map[body->GetColorID()], "white");
-      canvas.Circle(body->GetPerimeter(), "", color_map[body->GetColorID()]);
-      //canvas.Circle(body->GetPerimeter(), "", "white");
+      canvas.Draw(body->GetPerimeter(), "", color_map[body->GetColorID()]);
     }
   }
 
