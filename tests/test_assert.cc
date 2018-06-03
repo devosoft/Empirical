@@ -4,9 +4,6 @@
 //
 //  Tests for files in the base/ folder.
 
-#ifndef EMP_TRACK_MEM
-#define EMP_TRACK_MEM
-#endif
 
 #define CATCH_CONFIG_MAIN
 #undef NDEBUG

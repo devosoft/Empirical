@@ -153,10 +153,13 @@ namespace emp {
     /// Assume that the size of the bit_set has already been adjusted to be the size of the one
     /// being copied and only the fields need to be copied over.
     void RawCopy(const Ptr<field_t> in_set) {
+      #ifdef EMP_TRACK_MEM
       emp_assert(in_set.IsNull() == false);
       emp_assert(bit_set.DebugIsArray() && in_set.DebugIsArray());
       emp_assert(bit_set.DebugGetArrayBytes() == in_set.DebugGetArrayBytes(),
                  bit_set.DebugGetArrayBytes(), in_set.DebugGetArrayBytes());
+      #endif
+      
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
     }
@@ -228,16 +231,22 @@ namespace emp {
 
     /// Copy constructor of existing bit field.
     BitVector(const BitVector & in_set) : num_bits(in_set.num_bits), bit_set(nullptr) {
+      #ifdef EMP_TRACK_MEM
       emp_assert(in_set.bit_set.IsNull() || in_set.bit_set.DebugIsArray(), in_set.bit_set.IsNull(), in_set.bit_set.DebugIsArray());
       emp_assert(in_set.bit_set.OK());
+      #endif
+
       if (num_bits) bit_set = NewArrayPtr<field_t>(NumFields());
       RawCopy(in_set.bit_set);
     }
 
     /// Move constructor of existing bit field.
     BitVector(BitVector && in_set) : num_bits(in_set.num_bits), bit_set(in_set.bit_set) {
+      #ifdef EMP_TRACK_MEM
       emp_assert(bit_set == nullptr || bit_set.DebugIsArray());
       emp_assert(bit_set.OK());
+      #endif
+
       in_set.bit_set = nullptr;
     }
 
@@ -251,9 +260,12 @@ namespace emp {
 
     /// Assignment operator.
     BitVector & operator=(const BitVector & in_set) {
+      #ifdef EMP_TRACK_MEM
       emp_assert(in_set.bit_set == nullptr || in_set.bit_set.DebugIsArray());
       emp_assert(in_set.bit_set != nullptr || in_set.num_bits == 0);
       emp_assert(in_set.bit_set.OK());
+      #endif
+      
       if (&in_set == this) return *this;
       const size_t in_num_fields = in_set.NumFields();
       const size_t prev_num_fields = NumFields();

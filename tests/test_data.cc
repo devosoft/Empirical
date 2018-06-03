@@ -399,7 +399,7 @@ TEST_CASE("Test Container DataFile", "[data]") {
     
     REQUIRE(compareFiles("test_container_file.dat", "data/test_container_file.dat"));
 
-    auto dfile2 = MakeContainerDataFile(get_data, "test_make_container_file.dat");
+    auto dfile2 = emp::MakeContainerDataFile(get_data, "test_make_container_file.dat");
     dfile2.AddContainerFun(return_val, "value", "value");
     dfile2.AddContainerFun(square_val, "squared", "value squared");
 
