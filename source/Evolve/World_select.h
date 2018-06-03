@@ -279,7 +279,7 @@ namespace emp {
     // functions.  The best individuals on each supplemental function divide up a resource pool.
     // NOTE: You must turn off the FitnessCache for this function to work properly.
     template<typename ORG>
-    void EcoSelect(World<ORG> & world, const emp::vector<std::function<double(const ORG &)> > & extra_funs,
+    void EcoSelect(World<ORG> & world, const emp::vector<std::function<double(ORG &)> > & extra_funs,
                    const emp::vector<double> & pool_sizes, size_t t_size, size_t tourny_count=1)
     {
       emp_assert(world.GetFitFun(), "Must define a base fitness function");
@@ -304,7 +304,7 @@ namespace emp {
       for (size_t org_id = 0; org_id < world.GetSize(); org_id++) {
         base_fitness[org_id] = world.CalcFitnessID(org_id);
         for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
-          double cur_fit = extra_funs[ex_id](world[org_id]);
+          double cur_fit = extra_funs[ex_id](world.GetOrg(org_id));
           extra_fitnesses[ex_id][org_id] = cur_fit;
           if (cur_fit > max_extra_fit[ex_id]) {
             max_extra_fit[ex_id] = cur_fit;

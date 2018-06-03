@@ -4,10 +4,6 @@
 //
 //  Tests for files in the base/ folder.
 
-#ifndef EMP_TRACK_MEM
-#define EMP_TRACK_MEM
-#endif
-
 #define EMP_DECORATE(X) [X]
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]
 #define CATCH_CONFIG_MAIN
@@ -412,6 +408,7 @@ TEST_CASE("Test Ptr", "[base]")
   for (size_t i = 1; i < 10; i++) ptr_set[i] = new emp::Ptr<char>(*(ptr_set[0]));
 
   // Do we have a proper count of 10?
+  #ifdef EMP_TRACK_MEM
   REQUIRE(ptr_set[0]->DebugGetCount() == 10);
   ptr_set[1]->New(91);
   REQUIRE(ptr_set[0]->DebugGetCount() == 9);
@@ -421,8 +418,9 @@ TEST_CASE("Test Ptr", "[base]")
 
   ptr_set[3]->Delete();
   ptr_set[1]->Delete();
+  #endif 
 
-  // Make sure that we are properly handling temporary pointets moved to uninitialized pointes.
+  // Make sure that we are properly handling temporary pointers moved to uninitialized pointes.
   // (Previously breaking, now fixed.)
   int a = 9;
   emp::Ptr<int> ptr_a;

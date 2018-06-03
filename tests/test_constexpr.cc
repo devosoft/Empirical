@@ -4,9 +4,6 @@
 //
 //  Tests for files in the tools/ folder.
 
-#ifndef EMP_TRACK_MEM
-#define EMP_TRACK_MEM
-#endif
 
 #define EMP_DECORATE(X) [X]
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]

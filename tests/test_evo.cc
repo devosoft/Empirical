@@ -63,11 +63,11 @@ TEST_CASE("Test fitness sharing", "[evo]")
 
   pop.SetFitFun([](BitOrg &org){ return N - org.CountOnes(); });
 
-  emp::vector<std::function<double(const BitOrg&)> > fit_funs;
+  emp::vector<std::function<double(BitOrg&)> > fit_funs;
 
-  fit_funs.push_back([](const BitOrg &org){ return org.CountOnes(); });
-  fit_funs.push_back([](const BitOrg &org){ return org[0]; });
-  fit_funs.push_back([](const BitOrg &org){ return 1 - org[0]; });
+  fit_funs.push_back([](BitOrg &org){ return org.CountOnes(); });
+  fit_funs.push_back([](BitOrg &org){ return org[0]; });
+  fit_funs.push_back([](BitOrg &org){ return 1 - org[0]; });
 
   // pop.SetCache(true);
 

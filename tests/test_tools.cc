@@ -4,9 +4,6 @@
 //
 //  Tests for files in the tools/ folder.
 
-#ifndef EMP_TRACK_MEM
-#define EMP_TRACK_MEM
-#endif
 
 #define EMP_DECORATE(X) [X]
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]
@@ -473,8 +470,8 @@ TEST_CASE("Test graph", "[tools]")
 
 }
 
-// TODO: add asserts
-emp::Random grand;
+// // TODO: add asserts
+// emp::Random grand;
 TEST_CASE("Test Graph utils", "[tools]")
 {
   emp::Random random;
@@ -698,21 +695,26 @@ TEST_CASE("Test mem_track", "[tools]")
   emp::vector<TestClass1 *> test_v;
   TestClass2 class2_mem;
 
+  #ifdef EMP_TRACK_MEM
   REQUIRE(EMP_TRACK_COUNT(TestClass1) == 0);
+  #endif
 
   for (int i = 0; i < 1000; i++) {
     test_v.push_back( new TestClass1 );
   }
 
+  #ifdef EMP_TRACK_MEM
   REQUIRE(EMP_TRACK_COUNT(TestClass1) == 1000);
-
+  #endif
 
   for (size_t i = 500; i < 1000; i++) {
     delete test_v[i];
   }
 
+  #ifdef EMP_TRACK_MEM
   REQUIRE(EMP_TRACK_COUNT(TestClass1) == 500);
   //REQUIRE(EMP_TRACK_STATUS == 0);
+  #endif
 
 }
 
