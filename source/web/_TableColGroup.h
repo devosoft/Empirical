@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
+ *  @date 2017-2018.
  *
  *  @file  _TableColGroup.h
  *  @brief The TableColGoup widget, which behaves like the Table widget, but focuses on a group of columns.
@@ -50,7 +50,7 @@ namespace web {
     TableColGroup & ClearChildren() { Info()->ClearColGroupChildren(cur_col); return *this; }
     TableColGroup & ClearCells() { Info()->ClearColGroup(cur_col); return *this; }
 
-    std::string GetCSS(const std::string & setting) override {
+    const std::string & GetCSS(const std::string & setting) const override {
       return Info()->col_groups[cur_col].extras.GetStyle(setting);
     }
 
