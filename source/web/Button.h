@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2018
+ *  @date 2015-2018.
  *
  *  @file  Button.h
  *  @brief Create/control an HTML button and call a specified function when that button is clicked.
@@ -49,8 +49,6 @@ namespace web {
     protected:
       std::string label;
 
-      bool autofocus;
-
       std::function<void()> callback;
       uint32_t callback_id;
 
@@ -85,14 +83,7 @@ namespace web {
         label = in_label;
         if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
       }
-      void UpdateTitle(const std::string & in_title) {
-        extras.SetAttr("title", in_title);
-        if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
-      }
-      void UpdateAutofocus(bool in_af) {
-        autofocus = in_af;
-        if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
-      }
+
       void UpdateDisabled(bool in_dis) {
         if (in_dis) extras.SetAttr("disabled", "true");
         else extras.RemoveAttr("disabled");
@@ -123,7 +114,6 @@ namespace web {
       info = new ButtonInfo(in_id);
 
       Info()->label = in_label;
-      Info()->autofocus = false;
 
       Info()->callback = in_cb;
       ButtonInfo * b_info = Info();
@@ -149,10 +139,10 @@ namespace web {
     Button & Label(const std::string & in_label) { Info()->UpdateLabel(in_label); return *this; }
 
     /// Create a tooltip for this Button.
-    Button & Title(const std::string & in_t) { Info()->UpdateTitle(in_t); return *this; }
+    Button & Title(const std::string & in_t) { SetAttr("title", in_t); return *this; }
 
     /// Setup this button to have autofocus (or remove it!)
-    Button & Autofocus(bool in_af=true) { Info()->UpdateAutofocus(in_af); return *this; }
+    Button & Autofocus(bool _in=true) { SetAttr("autofocus", ToJSLiteral(_in)); return *this; }
 
     /// Setup this button to be disabled (or re-enable it!)
     Button & Disabled(bool in_dis=true) { Info()->UpdateDisabled(in_dis); return *this; }
@@ -164,7 +154,7 @@ namespace web {
     const std::string & GetTitle() const { return GetAttr("title"); }
 
     /// Determine if this button currently has autofocus.
-    bool HasAutofocus() const { return Info()->autofocus; }
+    bool HasAutofocus() const { return GetAttr("autofocus") == "True"; }
 
     /// Determine if this button is currently disabled.
     bool IsDisabled() const { return Info()->extras.HasAttr("disabled"); }
