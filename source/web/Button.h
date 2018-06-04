@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  Button.h
  *  @brief Create/control an HTML button and call a specified function when that button is clicked.
@@ -48,13 +48,11 @@ namespace web {
       friend Button;
     protected:
       std::string label;
-      std::string title;
 
       bool autofocus;
 
       std::function<void()> callback;
       uint32_t callback_id;
-      std::string onclick_info;
 
       ButtonInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
       ButtonInfo(const ButtonInfo &) = delete;               // No copies of INFO allowed
@@ -75,9 +73,7 @@ namespace web {
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");                                           // Clear the current text.
         HTML << "<button";                                      // Start the button tag.
-        if (title != "") HTML << " title=\"" << title << "\"";  // Add a title if there is one.
         HTML << " id=\"" << id << "\"";                         // Indicate ID.
-        HTML << " onclick=\"" << onclick_info << "\"";          // Indicate action on click.
         HTML << ">" << label << "</button>";                    // Close and label the button.
       }
 
@@ -90,7 +86,7 @@ namespace web {
         if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
       }
       void UpdateTitle(const std::string & in_title) {
-        title = in_title;
+        extras.SetAttr("title", in_title);
         if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
       }
       void UpdateAutofocus(bool in_af) {
@@ -127,13 +123,12 @@ namespace web {
       info = new ButtonInfo(in_id);
 
       Info()->label = in_label;
-      Info()->title = "";
       Info()->autofocus = false;
 
       Info()->callback = in_cb;
       ButtonInfo * b_info = Info();
       Info()->callback_id = JSWrap( std::function<void()>( [b_info](){b_info->DoCallback();} )  );
-      Info()->onclick_info = emp::to_string("emp.Callback(", Info()->callback_id, ")");
+      SetAttr("onclick", emp::to_string("emp.Callback(", Info()->callback_id, ")"));
     }
 
     /// Link to an existing button.
@@ -166,7 +161,7 @@ namespace web {
     const std::string & GetLabel() const { return Info()->label; }
 
     /// Get the current tooltip on this button.
-    const std::string & GetTitle() const { return Info()->title; }
+    const std::string & GetTitle() const { return GetAttr("title"); }
 
     /// Determine if this button currently has autofocus.
     bool HasAutofocus() const { return Info()->autofocus; }
