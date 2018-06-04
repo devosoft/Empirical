@@ -52,6 +52,7 @@ int main() {
                    but.Disabled(!but.IsDisabled());
                  }, "Disable Button");
 
+  doc.Button("but").Title("Testing if button titles do proper hover-over!");
 
 
   doc << "<p>" << UI::Div("new_slate")
