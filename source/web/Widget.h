@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  Widget.h
  *  @brief Widgets maintain individual components on a web page and link to Elements
@@ -139,13 +139,13 @@ namespace web {
 
     /// Retrieve a specific CSS trait associated with this Widget.
     /// Note: CSS-related options may be overridden in derived classes that have multiple styles.
-    virtual std::string GetCSS(const std::string & setting);
+    virtual const std::string & GetCSS(const std::string & setting) const;
 
     /// Determine is a CSS trait has been set on this Widget.
     virtual bool HasCSS(const std::string & setting);
 
     /// Retrieve a specific attribute associated with this Widget.
-    virtual std::string GetAttr(const std::string & setting);
+    virtual const std::string & GetAttr(const std::string & setting) const;
 
     /// Determine is an attribute has been set on this Widget.
     virtual bool HasAttr(const std::string & setting);
@@ -408,15 +408,15 @@ namespace web {
   bool Widget::IsTable() const { if (!info) return false; return info->IsTableInfo(); }
   bool Widget::IsText() const { if (!info) return false; return info->IsTextInfo(); }
 
-  std::string Widget::GetCSS(const std::string & setting) {
-    return info ? info->extras.GetStyle(setting) : "";
+  const std::string & Widget::GetCSS(const std::string & setting) const {
+    return info ? info->extras.GetStyle(setting) : emp::empty_string();
   }
   bool Widget::HasCSS(const std::string & setting) {
     return info ? info->extras.HasStyle(setting) : false;
   }
 
-  std::string Widget::GetAttr(const std::string & setting) {
-    return info ? info->extras.GetAttr(setting) : "";
+  const std::string & Widget::GetAttr(const std::string & setting) const {
+    return info ? info->extras.GetAttr(setting) : emp::empty_string();
   }
   bool Widget::HasAttr(const std::string & setting) {
     return info ? info->extras.HasAttr(setting) : false;
