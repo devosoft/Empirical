@@ -48,7 +48,6 @@ namespace web {
       friend Button;
     protected:
       std::string label;
-
       std::function<void()> callback;
       uint32_t callback_id;
 
@@ -59,9 +58,7 @@ namespace web {
         if (callback_id) emp::JSDelete(callback_id);         // Delete callback wrapper.
       }
 
-      std::string TypeName() const override { return "ButtonInfo"; }
-
-      virtual bool IsButtonInfo() const override { return true; }
+      std::string GetTypeName() const override { return "ButtonInfo"; }
 
       void DoCallback() {
         callback();
@@ -114,7 +111,7 @@ namespace web {
 
     /// Link to an existing button.
     Button(const Button & in) : WidgetFacet(in) { ; }
-    Button(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsButtonInfo()); }
+    Button(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsButton()); }
     Button() : WidgetFacet("") { info = nullptr; }
     virtual ~Button() { ; }
 
