@@ -84,12 +84,6 @@ namespace web {
         if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
       }
 
-      void UpdateDisabled(bool in_dis) {
-        if (in_dis) extras.SetAttr("disabled", "true");
-        else extras.RemoveAttr("disabled");
-        if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
-      }
-
     public:
       virtual std::string GetType() override { return "web::ButtonInfo"; }
     }; // End of ButtonInfo definition
@@ -139,13 +133,21 @@ namespace web {
     Button & Label(const std::string & in_label) { Info()->UpdateLabel(in_label); return *this; }
 
     /// Create a tooltip for this Button.
-    Button & Title(const std::string & in_t) { SetAttr("title", in_t); return *this; }
+    Button & Title(const std::string & _in) { SetAttr("title", _in); return *this; }
 
     /// Setup this button to have autofocus (or remove it!)
     Button & Autofocus(bool _in=true) { SetAttr("autofocus", ToJSLiteral(_in)); return *this; }
 
     /// Setup this button to be disabled (or re-enable it!)
-    Button & Disabled(bool in_dis=true) { Info()->UpdateDisabled(in_dis); return *this; }
+    Button & Disabled(bool _in=true) {
+      if (_in) SetAttr("disabled", "disabled");
+      else {
+        Info()->extras.RemoveAttr("disabled");
+        if (IsActive()) Info()->ReplaceHTML();
+      }
+
+      return *this;
+    }
 
     /// Get the current label on this button.
     const std::string & GetLabel() const { return Info()->label; }
@@ -154,7 +156,7 @@ namespace web {
     const std::string & GetTitle() const { return GetAttr("title"); }
 
     /// Determine if this button currently has autofocus.
-    bool HasAutofocus() const { return GetAttr("autofocus") == "True"; }
+    bool HasAutofocus() const { return GetAttr("autofocus") == "true"; }
 
     /// Determine if this button is currently disabled.
     bool IsDisabled() const { return Info()->extras.HasAttr("disabled"); }
