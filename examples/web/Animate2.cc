@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
+//  Copyright (C) Michigan State University, 2015-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include "tools/Random.h"
@@ -69,8 +69,8 @@ int main()
   doc.AddButton([anim](){
       anim->ToggleActive();
       auto but = doc.Button("toggle");
-      if (anim->GetActive()) but.Label("Pause");
-      else but.Label("Start");
+      if (anim->GetActive()) but.SetLabel("Pause");
+      else but.SetLabel("Start");
     }, "Start", "toggle");
 
   doc << UI::Text("fps") << "FPS = " << UI::Live( [anim](){return anim->GetStepTime();} ) ;

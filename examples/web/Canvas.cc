@@ -40,8 +40,8 @@ public:
     doc.AddButton([this](){
         ToggleActive();
         auto but = doc.Button("toggle");
-        if (GetActive()) but.Label("Pause");
-        else but.Label("Start");
+        if (GetActive()) but.SetLabel("Pause");
+        else but.SetLabel("Start");
       }, "Start", "toggle");
 
     doc << UI::Text("fps") << "FPS = " << UI::Live( [this](){return 1000.0 / GetStepTime();} ) ;

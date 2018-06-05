@@ -49,10 +49,10 @@ int main() {
                << UI::Button(IncVar, "MyButton", "but")
                << UI::Button([](){
                    auto but = doc.Button("but");
-                   but.Disabled(!but.IsDisabled());
+                   but.SetDisabled(!but.IsDisabled());
                  }, "Disable Button");
 
-  doc.Button("but").Title("Testing if button titles do proper hover-over!");
+  doc.Button("but").SetTitle("Testing if button titles do proper hover-over!");
 
 
   doc << "<p>" << UI::Div("new_slate")
