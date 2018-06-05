@@ -69,10 +69,7 @@ namespace web {
       }
 
       virtual void GetHTML(std::stringstream & HTML) override {
-        HTML.str("");                                           // Clear the current text.
-        HTML << "<button";                                      // Start the button tag.
-        HTML << " id=\"" << id << "\"";                         // Indicate ID.
-        HTML << ">" << label << "</button>";                    // Close and label the button.
+        HTML.str(to_string("<button id=\"", id, "\">", label, "</button>"));
       }
 
       void UpdateCallback(const std::function<void()> & in_cb) {
@@ -124,22 +121,22 @@ namespace web {
     using INFO_TYPE = ButtonInfo;
 
     /// Set a new callback function to trigger when the button is clicked.
-    Button & Callback(const std::function<void()> & in_cb) {
+    Button & SetCallback(const std::function<void()> & in_cb) {
       Info()->UpdateCallback(in_cb);
       return *this;
     }
 
     /// Set a new label to appear on this Button.
-    Button & Label(const std::string & in_label) { Info()->UpdateLabel(in_label); return *this; }
+    Button & SetLabel(const std::string & in_label) { Info()->UpdateLabel(in_label); return *this; }
 
     /// Create a tooltip for this Button.
-    Button & Title(const std::string & _in) { SetAttr("title", _in); return *this; }
+    Button & SetTitle(const std::string & _in) { SetAttr("title", _in); return *this; }
 
     /// Setup this button to have autofocus (or remove it!)
-    Button & Autofocus(bool _in=true) { SetAttr("autofocus", ToJSLiteral(_in)); return *this; }
+    Button & SetAutofocus(bool _in=true) { SetAttr("autofocus", ToJSLiteral(_in)); return *this; }
 
     /// Setup this button to be disabled (or re-enable it!)
-    Button & Disabled(bool _in=true) {
+    Button & SetDisabled(bool _in=true) {
       if (_in) SetAttr("disabled", "disabled");
       else {
         Info()->extras.RemoveAttr("disabled");
