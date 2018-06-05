@@ -801,8 +801,8 @@ TEST_CASE("Test random", "[tools]")
 
   {
     const double expected_mean = (min_value + max_value) / 2.0;
-    const double min_threshold = (expected_mean*0.997);
-    const double max_threshold = (expected_mean*1.004);
+    const double min_threshold = (expected_mean*0.995);
+    const double max_threshold = (expected_mean*1.005);
     double mean_value = total/(double) num_tests;
 
     REQUIRE(mean_value > min_threshold);
