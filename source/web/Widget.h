@@ -117,7 +117,7 @@ namespace web {
     bool IsNull() const { return info == nullptr; }
 
     /// Some debugging helpers...
-    std::string InfoTypeName() const;
+    std::string GetInfoTypeName() const;
 
     bool IsInactive() const;  ///< Test if the activity state of this widget is currently INACTIVE
     bool IsWaiting() const;   ///< Test if the activity state of this widget is currently WAITING
@@ -135,6 +135,7 @@ namespace web {
     bool IsDiv() const;       ///< Is this Widget a Div?
     bool IsTable() const;     ///< Is this Widget a Table?
     bool IsText() const;      ///< Is this Widget a Text?
+    bool IsTextArea() const;  ///< Is this Widget a Text?
 
     const std::string & GetID() const;  ///< What is the HTML string ID for this Widget?
 
@@ -236,18 +237,7 @@ namespace web {
       }
 
       /// Debugging helpers...
-      virtual std::string TypeName() const { return "WidgetInfo base"; }
-
-      virtual bool IsButtonInfo() const { return false; }
-      virtual bool IsInputInfo() const { return false; }
-      virtual bool IsCanvasInfo() const { return false; }
-      virtual bool IsImageInfo() const { return false; }
-      virtual bool IsSelectorInfo() const { return false; }
-      virtual bool IsDivInfo() const { return false; }
-      virtual bool IsTableInfo() const { return false; }
-      virtual bool IsTextInfo() const { return false; }
-      virtual bool IsTextAreaInfo() const { return false; }
-      virtual bool IsD3VisualiationInfo() const { return false; }
+      virtual std::string GetTypeName() const { return "WidgetInfo"; }
 
       // If not overloaded, pass along widget registration to parent.
       virtual void Register_recurse(Widget & w) { if (parent) parent->Register_recurse(w); }
@@ -283,7 +273,7 @@ namespace web {
       }
 
       virtual bool AppendOK() const { return false; } // Most widgets can't be appended to.
-      virtual void PreventAppend() { emp_assert(false, TypeName()); } // Only for appendable widgets.
+      virtual void PreventAppend() { emp_assert(false, GetTypeName()); } // Only for appendable widgets.
 
       // By default, elements should forward unknown appends to their parents.
       virtual Widget Append(const std::string & text) { return ForwardAppend(text); }
@@ -372,7 +362,7 @@ namespace web {
     EMP_TRACK_DESTRUCT(WebWidget);
   }
 
-  std::string Widget::InfoTypeName() const { if (IsNull()) return "NULL"; return info->TypeName(); }
+  std::string Widget::GetInfoTypeName() const { if (IsNull()) return "NULL"; return info->GetTypeName(); }
 
   Widget & Widget::SetInfo(WidgetInfo * in_info) {
     // If the widget is already set correctly, stop here.
@@ -402,14 +392,15 @@ namespace web {
   const std::string Widget::no_name = "(none)";
   const std::string & Widget::GetID() const { return info ? info->id : no_name; }
 
-  bool Widget::IsButton() const { if (!info) return false; return info->IsButtonInfo(); }
-  bool Widget::IsInput() const { if (!info) return false; return info->IsInputInfo(); }
-  bool Widget::IsCanvas() const { if (!info) return false; return info->IsCanvasInfo(); }
-  bool Widget::IsImage() const { if (!info) return false; return info->IsImageInfo(); }
-  bool Widget::IsSelector() const { if (!info) return false; return info->IsSelectorInfo(); }
-  bool Widget::IsDiv() const { if (!info) return false; return info->IsDivInfo(); }
-  bool Widget::IsTable() const { if (!info) return false; return info->IsTableInfo(); }
-  bool Widget::IsText() const { if (!info) return false; return info->IsTextInfo(); }
+  bool Widget::IsButton()   const { return GetInfoTypeName() == "ButtonInfo"; }
+  bool Widget::IsCanvas()   const { return GetInfoTypeName() == "CanvasInfo"; }
+  bool Widget::IsDiv()      const { return GetInfoTypeName() == "DivInfo"; }
+  bool Widget::IsImage()    const { return GetInfoTypeName() == "ImageInfo"; }
+  bool Widget::IsInput()    const { return GetInfoTypeName() == "InputInfo"; }
+  bool Widget::IsSelector() const { return GetInfoTypeName() == "SelectorInfo"; }
+  bool Widget::IsTable()    const { return GetInfoTypeName() == "TableInfo"; }
+  bool Widget::IsText()     const { return GetInfoTypeName() == "TextInfo"; }
+  bool Widget::IsTextArea() const { return GetInfoTypeName() == "TextAreaInfo"; }
 
   const std::string & Widget::GetCSS(const std::string & setting) const {
     return info ? info->extras.GetStyle(setting) : emp::empty_string();
