@@ -128,6 +128,7 @@ namespace web {
     void PreventAppend();     ///< Disallow further appending to this Widget.
 
     bool IsButton() const;    ///< Is this Widget a Button?
+    bool IsInput() const;     ///< Is this Widget an Input?
     bool IsCanvas() const;    ///< Is this Widget a Canvas?
     bool IsImage() const;     ///< Is this Widget an Image?
     bool IsSelector() const;  ///< Is this Widget a Selector?
@@ -238,6 +239,7 @@ namespace web {
       virtual std::string TypeName() const { return "WidgetInfo base"; }
 
       virtual bool IsButtonInfo() const { return false; }
+      virtual bool IsInputInfo() const { return false; }
       virtual bool IsCanvasInfo() const { return false; }
       virtual bool IsImageInfo() const { return false; }
       virtual bool IsSelectorInfo() const { return false; }
@@ -401,6 +403,7 @@ namespace web {
   const std::string & Widget::GetID() const { return info ? info->id : no_name; }
 
   bool Widget::IsButton() const { if (!info) return false; return info->IsButtonInfo(); }
+  bool Widget::IsInput() const { if (!info) return false; return info->IsInputInfo(); }
   bool Widget::IsCanvas() const { if (!info) return false; return info->IsCanvasInfo(); }
   bool Widget::IsImage() const { if (!info) return false; return info->IsImageInfo(); }
   bool Widget::IsSelector() const { if (!info) return false; return info->IsSelectorInfo(); }
