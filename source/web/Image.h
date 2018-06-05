@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  Image.h
  *  @brief Easily load an image and place it in a document.
@@ -39,8 +39,7 @@ namespace web {
       ImageInfo & operator=(const ImageInfo &) = delete;   // No copies of INFO allowed
       virtual ~ImageInfo() { ; }
 
-      std::string TypeName() const override { return "ImageInfo"; }
-      virtual bool IsImageInfo() const override { return true; }
+      std::string GetTypeName() const override { return "ImageInfo"; }
 
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");                                      // Clear the current text.
@@ -80,7 +79,7 @@ namespace web {
 
     /// Link to an existing Image widget.
     Image(const Image & in) : WidgetFacet(in) { ; }
-    Image(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsImageInfo()); }
+    Image(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsImage()); }
     virtual ~Image() { ; }
 
     using INFO_TYPE = ImageInfo;

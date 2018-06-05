@@ -70,9 +70,7 @@ namespace web {
         if (callback_id) emp::JSDelete(callback_id);         // Delete callback wrapper.
       }
 
-      std::string TypeName() const override { return "InputInfo"; }
-
-      virtual bool IsInputInfo() const override { return true; }
+      std::string GetTypeName() const override { return "InputInfo"; }
 
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");                                           // Clear the current text.
@@ -190,7 +188,7 @@ namespace web {
 
     /// Link to an existing Input.
     Input(const Input & in) : WidgetFacet(in) { ; }
-    Input(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsInputInfo()); }
+    Input(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsInput()); }
     Input() : WidgetFacet("") { info = nullptr; }
     virtual ~Input() { ; }
 

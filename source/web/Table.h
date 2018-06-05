@@ -124,8 +124,7 @@ namespace web {
       TableInfo & operator=(const TableInfo &) = delete;   // No copies of INFO allowed
       virtual ~TableInfo() { ; }
 
-      std::string TypeName() const override { return "TableInfo"; }
-      virtual bool IsTableInfo() const override { return true; }
+      std::string GetTypeName() const override { return "TableInfo"; }
 
       void Resize(size_t new_rows, size_t new_cols) {
         // Resize preexisting rows if remaining
@@ -551,7 +550,7 @@ namespace web {
     TableWidget(const TableWidget & in)
       : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col) { ; }
     TableWidget(const Widget & in) : WidgetFacet(in), cur_row(0), cur_col(0) {
-      emp_assert(info->IsTableInfo());
+      emp_assert(in.IsTable());
     }
     TableWidget() { ; }
     virtual ~TableWidget() { ; }

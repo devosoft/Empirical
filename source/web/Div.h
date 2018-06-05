@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  Div.h
  *  @note Formerly called Slate.h
@@ -71,10 +71,7 @@ namespace web {
         for (auto & p : anim_map) delete p.second;    // Delete this document's animations.
       }
 
-      std::string TypeName() const override { return "DivInfo"; }
-
-      virtual bool IsDivInfo() const override { return true; }
-
+      std::string GetTypeName() const override { return "DivInfo"; }
 
       bool IsRegistered(const std::string & test_name) const {
         return (widget_dict.find(test_name) != widget_dict.end());
@@ -272,7 +269,7 @@ namespace web {
       info = new internal::DivInfo(in_name);
     }
     Div(const Div & in) : WidgetFacet(in) { ; }
-    Div(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsDivInfo()); }
+    Div(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsDiv()); }
     Div() { ; }
     ~Div() { ; }
 

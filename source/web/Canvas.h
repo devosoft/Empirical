@@ -42,9 +42,7 @@ namespace web {
       CanvasInfo & operator=(const CanvasInfo &) = delete;   // No copies of INFO allowed
       virtual ~CanvasInfo() { ClearActions(); }
 
-      std::string TypeName() const override { return "CanvasInfo"; }
-
-      virtual bool IsCanvasInfo() const override { return true; }
+      std::string GetTypeName() const override { return "CanvasInfo"; }
 
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");                                           // Clear the current text.
@@ -110,7 +108,7 @@ namespace web {
 
     /// Link to an existing canvas.
     Canvas(const Canvas & in) : WidgetFacet(in) { ; }
-    Canvas(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsCanvasInfo()); }
+    Canvas(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsCanvas()); }
     Canvas() { ; }
     virtual ~Canvas() { ; }
 

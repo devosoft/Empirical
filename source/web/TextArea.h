@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  TextArea.h
  *  @brief Specs for the TextArea widget.
@@ -49,8 +49,7 @@ namespace web {
         if (callback_id) emp::JSDelete(callback_id);             // Delete callback wrapper.
       }
 
-      std::string TypeName() const override { return "TextAreaInfo"; }
-      virtual bool IsTextAreaInfo() const override { return true; }
+      std::string GetTypeName() const override { return "TextAreaInfo"; }
 
       void DoCallback(std::string in_text) {
         cur_text = in_text;
@@ -132,7 +131,7 @@ namespace web {
 
     /// Connect to an existing TextArea
     TextArea(const TextArea & in) : WidgetFacet(in) { ; }
-    TextArea(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsTextAreaInfo()); }
+    TextArea(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsTextArea()); }
     virtual ~TextArea() { ; }
 
     using INFO_TYPE = TextAreaInfo;

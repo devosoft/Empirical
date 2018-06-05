@@ -52,7 +52,7 @@ namespace web {
         if (callback_id) emp::JSDelete(callback_id);               // Delete callback wrapper.
       }
 
-      std::string TypeName() const override { return "FileInputInfo"; }
+      std::string GetTypeName() const override { return "FileInputInfo"; }
 
       void DoCallback(const std::string & file_body) {
         callback(file_body);
