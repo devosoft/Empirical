@@ -1332,7 +1332,8 @@ namespace emp {
       //    ...
       // Print shared memory
       os << "Shared memory: ";
-      for (auto mem : shared_mem) os << '{' << mem.first << ':' << mem.second << '}'; os << '\n';
+      for (auto mem : shared_mem) os << '{' << mem.first << ':' << mem.second << '}';
+      os << '\n';
       os << "Traits: "; PrintTraits(os); os << "\n";
       os << "Errors: " << errors << "\n";
       // Print events.
@@ -1356,11 +1357,14 @@ namespace emp {
           os << ")" << "\n";
           os << "    Func ptr: " << state.func_ptr << "\n";
           os << "    Input memory: ";
-          for (auto mem : state.input_mem) os << "{" << mem.first << ":" << mem.second << "}"; os << "\n";
+          for (auto mem : state.input_mem) os << "{" << mem.first << ":" << mem.second << "}";
+          os << "\n";
           os << "    Local memory: ";
-          for (auto mem : state.local_mem) os << "{" << mem.first << ":" << mem.second << "}"; os << "\n";
+          for (auto mem : state.local_mem) os << "{" << mem.first << ":" << mem.second << "}";
+          os << "\n";
           os << "    Output memory: ";
-          for (auto mem : state.output_mem) os << "{" << mem.first << ":" << mem.second << "}"; os << "\n";
+          for (auto mem : state.output_mem) os << "{" << mem.first << ":" << mem.second << "}";
+          os << "\n";
           os << "    ---\n";
         }
       }
