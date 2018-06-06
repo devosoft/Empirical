@@ -127,15 +127,15 @@ namespace web {
     bool AppendOK() const;    ///< Is it okay to add more internal Widgets into this one?
     void PreventAppend();     ///< Disallow further appending to this Widget.
 
-    bool IsButton() const;    ///< Is this Widget a Button?
-    bool IsInput() const;     ///< Is this Widget an Input?
-    bool IsCanvas() const;    ///< Is this Widget a Canvas?
-    bool IsImage() const;     ///< Is this Widget an Image?
-    bool IsSelector() const;  ///< Is this Widget a Selector?
-    bool IsDiv() const;       ///< Is this Widget a Div?
-    bool IsTable() const;     ///< Is this Widget a Table?
-    bool IsText() const;      ///< Is this Widget a Text?
-    bool IsTextArea() const;  ///< Is this Widget a Text?
+    bool IsButton()   const { return GetInfoTypeName() == "ButtonInfo"; }
+    bool IsCanvas()   const { return GetInfoTypeName() == "CanvasInfo"; }
+    bool IsDiv()      const { return GetInfoTypeName() == "DivInfo"; }
+    bool IsImage()    const { return GetInfoTypeName() == "ImageInfo"; }
+    bool IsInput()    const { return GetInfoTypeName() == "InputInfo"; }
+    bool IsSelector() const { return GetInfoTypeName() == "SelectorInfo"; }
+    bool IsTable()    const { return GetInfoTypeName() == "TableInfo"; }
+    bool IsText()     const { return GetInfoTypeName() == "TextInfo"; }
+    bool IsTextArea() const { return GetInfoTypeName() == "TextAreaInfo"; }
 
     const std::string & GetID() const;  ///< What is the HTML string ID for this Widget?
 
@@ -391,16 +391,6 @@ namespace web {
 
   const std::string Widget::no_name = "(none)";
   const std::string & Widget::GetID() const { return info ? info->id : no_name; }
-
-  bool Widget::IsButton()   const { return GetInfoTypeName() == "ButtonInfo"; }
-  bool Widget::IsCanvas()   const { return GetInfoTypeName() == "CanvasInfo"; }
-  bool Widget::IsDiv()      const { return GetInfoTypeName() == "DivInfo"; }
-  bool Widget::IsImage()    const { return GetInfoTypeName() == "ImageInfo"; }
-  bool Widget::IsInput()    const { return GetInfoTypeName() == "InputInfo"; }
-  bool Widget::IsSelector() const { return GetInfoTypeName() == "SelectorInfo"; }
-  bool Widget::IsTable()    const { return GetInfoTypeName() == "TableInfo"; }
-  bool Widget::IsText()     const { return GetInfoTypeName() == "TextInfo"; }
-  bool Widget::IsTextArea() const { return GetInfoTypeName() == "TextAreaInfo"; }
 
   const std::string & Widget::GetCSS(const std::string & setting) const {
     return info ? info->extras.GetStyle(setting) : emp::empty_string();
