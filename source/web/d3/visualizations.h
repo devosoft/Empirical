@@ -58,8 +58,6 @@ protected:
       D3VisualizationInfo & operator=(const D3VisualizationInfo &) = delete;
       virtual ~D3VisualizationInfo(){;}
 
-      virtual bool IsD3VisualiationInfo() const override {return true;}
-
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");
         HTML << "<svg id=\"" << id
@@ -78,7 +76,7 @@ protected:
       }
 
     public:
-      virtual std::string GetType() override {return "web::D3VisualizationInfo";}
+      virtual std::string GetType() override {return "D3VisualizationInfo";}
 
   };
 
@@ -108,7 +106,7 @@ public:
   }
 
   D3Visualization(const D3Visualization & in) : WidgetFacet(in) { ; }
-  D3Visualization(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsD3VisualiationInfo()); }
+  D3Visualization(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsD3Visualiation()); }
   virtual ~D3Visualization() { ; }
 
   using INFO_TYPE = D3VisualizationInfo;
