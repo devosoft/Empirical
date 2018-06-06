@@ -18,13 +18,11 @@
  *  Member functions to set state:
  *    Button & Callback(const std::function<void()> & in_callback)
  *    Button & Label(const std::string & in_label)
- *    Button & Title(const std::string & in_t)
  *    Button & Autofocus(bool in_af)
  *    Button & Disabled(bool in_dis)
  *
  *  Retriving current state:
  *    const std::string & GetLabel() const
- *    const std::string & GetTitle() const
  *    bool HasAutofocus() const
  *    bool IsDisabled() const
  */
@@ -126,9 +124,6 @@ namespace web {
     /// Set a new label to appear on this Button.
     Button & SetLabel(const std::string & in_label) { Info()->UpdateLabel(in_label); return *this; }
 
-    /// Create a tooltip for this Button.
-    Button & SetTitle(const std::string & _in) { SetAttr("title", _in); return *this; }
-
     /// Setup this button to have autofocus (or remove it!)
     Button & SetAutofocus(bool _in=true) { SetAttr("autofocus", ToJSLiteral(_in)); return *this; }
 
@@ -145,9 +140,6 @@ namespace web {
 
     /// Get the current label on this button.
     const std::string & GetLabel() const { return Info()->label; }
-
-    /// Get the current tooltip on this button.
-    const std::string & GetTitle() const { return GetAttr("title"); }
 
     /// Determine if this button currently has autofocus.
     bool HasAutofocus() const { return GetAttr("autofocus") == "true"; }
