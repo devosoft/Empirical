@@ -13,6 +13,9 @@ class OpenWorld : public emp::World<OpenOrg> {
 private:
   static constexpr size_t TAG_WIDTH = 16;
   using hardware_t = emp::EventDrivenGP_AW<TAG_WIDTH>;
+  using program_t = hardware_t::Program;
+  using prog_fun_t = hardware_t::Function;
+  using prog_tag_t = hardware_t::affinity_t;
   using event_lib_t = hardware_t::event_lib_t;
   using inst_t = hardware_t::inst_t;
   using inst_lib_t = hardware_t::inst_lib_t;
@@ -49,11 +52,32 @@ public:
       double y = random_ptr->GetDouble(config.WORLD_Y());
       GetOrg(i).body.SetPosition({x,y});
       surface.AddBody(&GetOrg(i).body);
+      GetOrg(i).brain.SetProgram(GenerateRandomProgram());
     }
   }
   ~OpenWorld() { ; }
 
   surface_t & GetSurface() { return surface; }
+
+  program_t GenerateRandomProgram() {
+    program_t prog(&inst_lib);
+    size_t fcnt = random_ptr->GetUInt(config.PROGRAM_MIN_FUN_CNT(), config.PROGRAM_MAX_FUN_CNT());
+    for (size_t fID = 0; fID < fcnt; ++fID) {
+      prog_fun_t new_fun;
+      new_fun.affinity.Randomize(*random_ptr);
+      size_t icnt = random_ptr->GetUInt(config.PROGRAM_MIN_INST_CNT(), config.PROGRAM_MAX_INST_CNT());
+      for (size_t iID = 0; iID < icnt; ++iID) {
+        new_fun.PushInst(random_ptr->GetUInt(prog.GetInstLib()->GetSize()),
+                             random_ptr->GetInt(config.PROGRAM_MAX_ARG_VAL()),
+                             random_ptr->GetInt(config.PROGRAM_MAX_ARG_VAL()),
+                             random_ptr->GetInt(config.PROGRAM_MAX_ARG_VAL()),
+                             prog_tag_t());
+        new_fun.inst_seq.back().affinity.Randomize(*random_ptr);
+      }
+      prog.PushFunction(new_fun);
+    }
+    return prog;
+  }
 };
 
 #endif
