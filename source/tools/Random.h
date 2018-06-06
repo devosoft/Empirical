@@ -15,7 +15,6 @@
 #include <climits>
 #include <cmath>
 #include <iterator>
-#include <unistd.h>
 
 #include "../base/assert.h"
 #include "Range.h"
