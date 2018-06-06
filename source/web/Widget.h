@@ -161,6 +161,8 @@ namespace web {
     /// Conver Widget to bool (I.e., is this Widget active?)
     operator bool() const { return info != nullptr; }
 
+    const std::string & GetTitle() const { return GetAttr("title"); }  /// Get current tooltip on this widget.
+
     double GetXPos();          ///< Get the X-position of this Widget within its parent.
     double GetYPos();          ///< Get the Y-position of this Widget within its parent.
     double GetWidth();         ///< Get the width of this Widget on screen.
@@ -693,6 +695,8 @@ namespace web {
       /// Provide a function to be called whenever text is pasted in this Widget.
       template <typename T> return_t & OnPaste(T && arg) { return On("paste", arg); }
 
+      /// Create a tooltip for this Widget.
+      return_t & SetTitle(const std::string & _in) { return SetAttr("title", _in); }
 
       /// Update the width of this Widget.
       /// @param unit defaults to pixels ("px"), but can also be a measured distance (e.g, "inches") or a percentage("%")
