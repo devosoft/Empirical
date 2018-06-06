@@ -4,12 +4,18 @@
 
 #include "base/vector.h"
 #include "config/command_line.h"
+#include "config/ArgManager.h"
 
+#include "../config.h"
 #include "../OpenWorld.h"
 
 int main(int argc, char* argv[])
 {
-  emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
+  OpenWorldConfig config;
+  config.Read("OpenWorld.cfg");
+  auto args = emp::cl::ArgManager(argc, argv);
+  if (args.ProcessConfigOptions(config, std::cout, "OpenWorld.cfg", "OpenWorld-macros.h") == false) exit(0);
+  if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
 
-  OpenWorld world;
+  OpenWorld world(config);
 }
