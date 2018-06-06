@@ -137,6 +137,8 @@ namespace web {
     bool IsText()     const { return GetInfoTypeName() == "TextInfo"; }
     bool IsTextArea() const { return GetInfoTypeName() == "TextAreaInfo"; }
 
+    bool IsD3Visualiation() const { return GetInfoTypeName() == "D3VisualizationInfo"; }
+
     const std::string & GetID() const;  ///< What is the HTML string ID for this Widget?
 
     /// Retrieve a specific CSS trait associated with this Widget.
