@@ -18,13 +18,11 @@
  *  Member functions to set state:
  *    Input & Callback(const std::function<void()> & in_callback)
  *    Input & Label(const std::string & in_label)
- *    Input & Title(const std::string & in_t)
  *    Input & Autofocus(bool in_af)
  *    Input & Disabled(bool in_dis)
  *
  *  Retriving current state:
  *    const std::string & GetLabel() const
- *    const std::string & GetTitle() const
  *    bool HasAutofocus() const
  *    bool IsDisabled() const
  */
@@ -48,7 +46,6 @@ namespace web {
       friend Input;
     protected:
       std::string label;
-      std::string title;
       std::string type;
       std::string min = "";
       std::string max = "";
@@ -74,9 +71,7 @@ namespace web {
 
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");                                           // Clear the current text.
-        HTML << "<input";                                       // Start the Input tag.
-        if (title != "") HTML << " title=\"" << title << "\"";  // Add a title if there is one.
-        HTML << " type=\"" << type << "\"";                     // Indicate input type.
+        HTML << "<input type=\"" << type << "\"";               // Indicate input type.
         if (min != "") HTML << " min=\"" << min << "\"";        // Add a min allowed value if there is one.
         if (max != "") HTML << " max=\"" << max << "\"";        // Add a max allowed value if there is one.
         if (value != "") HTML << " value=\"" << value << "\"";  // Add a current value if there is one.
@@ -98,10 +93,6 @@ namespace web {
 
       void UpdateLabel(const std::string & in_label) {
         label = in_label;
-        if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
-      }
-      void UpdateTitle(const std::string & in_title) {
-        title = in_title;
         if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
       }
       void UpdateType(const std::string & in_type) {
@@ -176,7 +167,6 @@ namespace web {
 
       Info()->label = in_label;
       Info()->type = in_type;
-      Info()->title = "";
       Info()->autofocus = false;
       Info()->curr_val = "";
 
@@ -202,9 +192,6 @@ namespace web {
 
     /// Set a new label to appear on this Input.
     Input & Label(const std::string & in_label) { Info()->UpdateLabel(in_label); return *this; }
-
-    /// Create a tooltip for this Input.
-    Input & Title(const std::string & in_t) { Info()->UpdateTitle(in_t); return *this; }
 
     /// Update the type
     Input & Type(const std::string & in_t) { Info()->UpdateType(in_t); return *this; }
@@ -236,9 +223,6 @@ namespace web {
 
     /// Get the current label on this Input.
     const std::string & GetLabel() const { return Info()->label; }
-
-    /// Get the current tooltip on this Input.
-    const std::string & GetTitle() const { return Info()->title; }
 
     /// Get the current type of this input.
     const std::string & GetType() const { return Info()->type; }
