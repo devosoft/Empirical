@@ -15,8 +15,9 @@ OpenWorld world(config);
 UI::Animate anim;
 
 void Animate(const UI::Animate & anim) {
-  world.Process(10);
-   UI::Draw( doc.Canvas("pop_view"),
+  world.Update();
+
+  UI::Draw( doc.Canvas("pop_view"),
             world.GetSurface(),
             emp::GetHueMap(360));
 }
