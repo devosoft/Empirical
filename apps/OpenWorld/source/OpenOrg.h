@@ -46,7 +46,7 @@ struct OpenOrg {
   OpenOrg & operator=(OpenOrg &&) = default;
 
   void Setup(emp::WorldPosition pos) {
-    std::cerr << "Seting up at pos " << pos.GetIndex() << std::endl;
+    // std::cerr << "Seting up at pos " << pos.GetIndex() << std::endl;
   }
 
   void Process(size_t exe_count) {
