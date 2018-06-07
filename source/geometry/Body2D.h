@@ -93,6 +93,7 @@ namespace emp {
     // Orientation control...
     void TurnLeft(int steps=1) { orientation.RotateDegrees(45); }
     void TurnRight(int steps=1) { orientation.RotateDegrees(-45); }
+    void RotateDegrees(double degrees) { orientation.RotateDegrees(degrees); }
 
     // Velocity control...
     void IncSpeed(const Point & offset) { velocity += offset; }
