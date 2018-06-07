@@ -12,7 +12,15 @@ namespace UI = emp::web;
 OpenWorldConfig config;
 UI::Document doc("emp_base");
 OpenWorld world(config);
-  
+UI::Animate anim;
+
+void Animate(const UI::Animate & anim) {
+  world.Process(10);
+   UI::Draw( doc.Canvas("pop_view"),
+            world.GetSurface(),
+            emp::GetHueMap(360));
+}
+
 int main()
 {
   config.Read("OpenWorld.cfg");
@@ -28,10 +36,12 @@ int main()
             world.GetSurface(),
             emp::GetHueMap(360));
 
+  anim.SetCallback(Animate);
+
   // Add buttons.
   auto control_set = doc.AddDiv("buttons");
   control_set.SetPosition(10, 70+config.WORLD_Y());
-  control_set << UI::Button([](){emp::Alert("Pressed Button!");}, "Start", "start_but");
-  control_set << UI::Button([](){emp::Alert("Pressed Button!");}, "Step", "step_but");
+  control_set << UI::Button([](){ anim.Start(); }, "Start", "start_but");
+  control_set << UI::Button([](){ Animate(anim); }, "Step", "step_but");
   control_set << UI::Button([](){emp::Alert("Pressed Button!");}, "Reset", "reset_but");
 }
