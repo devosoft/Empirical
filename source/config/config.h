@@ -552,12 +552,12 @@ namespace emp {
       return true;
     }
 
-    bool Read(std::string filename) {
+    bool Read(std::string filename, bool error_on_missing_file=true) {
       std::ifstream in_file(filename);
       if (in_file.fail()) {
         std::stringstream ss;
         ss << "Unable to open config file '" << filename << "'. Ignoring." << std::endl;
-        emp::NotifyError(ss.str());
+        if (error_on_missing_file) emp::NotifyError(ss.str());
         return false;
       }
       bool success = Read(in_file);
