@@ -43,7 +43,13 @@ public:
       const size_t id = (size_t) hw.GetTrait((size_t) OpenOrg::Trait::ORG_ID);
       emp::Ptr<OpenOrg> org_ptr = id_map[id];
       emp::Angle facing = org_ptr->body.GetOrientation();
-      facing.GetPoint(10.0);
+      org_ptr->body.Translate( facing.GetPoint(1.0) );
+    }, 1, "Move forward.");
+
+    inst_lib.AddInst("Spinout", [this](hardware_t & hw, const inst_t & inst) mutable {
+      const size_t id = (size_t) hw.GetTrait((size_t) OpenOrg::Trait::ORG_ID);
+      emp::Ptr<OpenOrg> org_ptr = id_map[id];
+      org_ptr->body.RotateDegrees(5);
     }, 1, "Move forward.");
 
     Inject(OpenOrg(inst_lib, event_lib, random_ptr), config.INIT_POP_SIZE());
@@ -68,10 +74,10 @@ public:
       size_t icnt = random_ptr->GetUInt(config.PROGRAM_MIN_INST_CNT(), config.PROGRAM_MAX_INST_CNT());
       for (size_t iID = 0; iID < icnt; ++iID) {
         new_fun.PushInst(random_ptr->GetUInt(prog.GetInstLib()->GetSize()),
-                             random_ptr->GetInt(config.PROGRAM_MAX_ARG_VAL()),
-                             random_ptr->GetInt(config.PROGRAM_MAX_ARG_VAL()),
-                             random_ptr->GetInt(config.PROGRAM_MAX_ARG_VAL()),
-                             prog_tag_t());
+                         random_ptr->GetInt(config.PROGRAM_MAX_ARG_VAL()),
+                         random_ptr->GetInt(config.PROGRAM_MAX_ARG_VAL()),
+                         random_ptr->GetInt(config.PROGRAM_MAX_ARG_VAL()),
+                         prog_tag_t());
         new_fun.inst_seq.back().affinity.Randomize(*random_ptr);
       }
       prog.PushFunction(new_fun);
