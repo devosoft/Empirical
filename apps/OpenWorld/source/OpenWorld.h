@@ -36,9 +36,11 @@ public:
   OpenWorld(OpenWorldConfig & _config)
     : config(_config), inst_lib(), event_lib(), surface(config.WORLD_X(), config.WORLD_Y())
   {
+    // Make sure that we are tracking organisms by their IDs.
     OnPlacement( [this](size_t pos){ id_map[ GetOrg(pos).id ] = &GetOrg(pos); } );
     OnOrgDeath( [this](size_t pos){ id_map.erase( GetOrg(pos).id ); } );
 
+    // Setup new instructions for the instruction set.
     inst_lib.AddInst("Vroom", [this](hardware_t & hw, const inst_t & inst) {
       const size_t id = (size_t) hw.GetTrait((size_t) OpenOrg::Trait::ORG_ID);
       emp::Ptr<OpenOrg> org_ptr = id_map[id];
@@ -50,8 +52,23 @@ public:
       const size_t id = (size_t) hw.GetTrait((size_t) OpenOrg::Trait::ORG_ID);
       emp::Ptr<OpenOrg> org_ptr = id_map[id];
       org_ptr->body.RotateDegrees(5);
-    }, 1, "Move forward.");
+    }, 1, "Rotate 5 degrees.");
 
+    // On each update, run organisms and make sure they stay on the surface.
+    OnUpdate([this](size_t){
+      Process(10);
+      for (auto & org : *this) {
+        double x = org.body.GetPosition().GetX();
+        double y = org.body.GetPosition().GetY();
+        if (x < 0.0) x += config.WORLD_X();
+        if (y < 0.0) y += config.WORLD_Y();
+        if (x >= config.WORLD_X()) x -= config.WORLD_X();
+        if (y >= config.WORLD_Y()) y -= config.WORLD_Y();
+        org.body.SetPosition({x,y});
+      }
+    });
+
+    // Initialize a populaton of random organisms.
     Inject(OpenOrg(inst_lib, event_lib, random_ptr), config.INIT_POP_SIZE());
     for (size_t i = 0; i < config.INIT_POP_SIZE(); i++) {
       double x = random_ptr->GetDouble(config.WORLD_X());
