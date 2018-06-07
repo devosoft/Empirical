@@ -91,8 +91,8 @@ namespace emp {
     void SetColorID(uint32_t in_id) { color_id = in_id; }
 
     // Orientation control...
-    void TurnLeft(int steps=1) { orientation.RotateDegrees(45); }
-    void TurnRight(int steps=1) { orientation.RotateDegrees(-45); }
+    void TurnLeft(int steps=1) { orientation.RotateDegrees(steps * 45); }
+    void TurnRight(int steps=1) { orientation.RotateDegrees(steps * -45); }
     void RotateDegrees(double degrees) { orientation.RotateDegrees(degrees); }
 
     // Velocity control...
@@ -133,7 +133,7 @@ namespace emp {
     }
 
     const Circle2D<double> & GetPerimeter() const { return perimeter; }
-    const Point & GetAnchor() const { return perimeter.GetCenter(); }
+    const Point & GetPosition() const { return perimeter.GetCenter(); }
     const Point & GetCenter() const { return perimeter.GetCenter(); }
     double GetRadius() const { return perimeter.GetRadius(); }
     double GetTargetRadius() const { return target_radius; }
@@ -303,17 +303,17 @@ namespace emp {
 
       // If this body is linked to another, enforce the distance between them.
       for (auto link : from_links) {
-        if (GetAnchor() == link->to->GetAnchor()) {
+        if (GetPosition() == link->to->GetPosition()) {
           // If two organisms are on top of each other... shift one.
           Translate(Point(0.01, 0.01));
         }
 
         // Figure out how much each oragnism should move so that they will be properly spaced.
-        const double start_dist = GetAnchor().Distance(link->to->GetAnchor());
+        const double start_dist = GetPosition().Distance(link->to->GetPosition());
         const double link_dist = link->cur_dist;
         const double frac_change = (1.0 - ((double) link_dist) / ((double) start_dist)) / 2.0;
 
-        Point dist_move = (GetAnchor() - link->to->GetAnchor()) * frac_change;
+        Point dist_move = (GetPosition() - link->to->GetPosition()) * frac_change;
 
         perimeter.Translate(-dist_move);
         link->to->perimeter.Translate(dist_move);
