@@ -220,7 +220,8 @@ namespace emp {
 
     template <typename N, typename... U>
     static void Add(const N& name, U&&... args) {
-      emp_assert(resources.count(name) == 0);
+      emp_assert(resources.count(name) == 0,
+                 "Attempting to create a resource which already exists");
       resources.emplace(std::piecewise_construct, std::forward_as_tuple(name),
                         std::forward_as_tuple(name, std::forward<U>(args)...));
     }
@@ -287,11 +288,23 @@ namespace emp {
       }
     }
 
-    const T& operator*() const { return **resource; }
-    T& operator*() { return **resource; }
+    const T& operator*() const {
+      emp_assert(resource != nullptr, "Resources must be initialized");
+      return **resource;
+    }
+    T& operator*() {
+      emp_assert(resource != nullptr, "Resources must be initialized");
+      return **resource;
+    }
 
-    const T* operator->() const { return resource->Ptr(); }
-    T* operator->() { return resource->Ptr(); }
+    const T* operator->() const {
+      emp_assert(resource != nullptr, "Resources must be initialized");
+      return resource->Ptr();
+    }
+    T* operator->() {
+      emp_assert(resource != nullptr, "Resources must be initialized");
+      return resource->Ptr();
+    }
 
     template <typename F>
     void OnUnset(F&& function) {

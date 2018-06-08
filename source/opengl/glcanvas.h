@@ -463,6 +463,8 @@ namespace emp {
       template <typename R>
       void runForever(R&& onUpdate, int fps = -1, bool forever = true) {
         makeCurrent();
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 #ifdef __EMSCRIPTEN__
         auto args = std::make_tuple(std::forward<R>(onUpdate), this);
         emscripten_set_main_loop_arg(
@@ -506,8 +508,7 @@ namespace emp {
       template <BufferType TYPE>
       BufferObject<TYPE> makeBuffer() {
         GLuint handle;
-        glGenBuffers(1, &handle);
-        utils::catchGlError();
+        emp_checked_gl_void(glGenBuffers(1, &handle));
         return BufferObject<TYPE>(handle);
       }
 

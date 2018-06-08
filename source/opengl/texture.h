@@ -147,11 +147,9 @@ namespace emp {
 
         public:
         explicit Texture(GLenum texture = GL_TEXTURE0) : texture(texture) {
-          glActiveTexture(texture);
-          utils::catchGlError();
+          emp_checked_gl_void(glActiveTexture(texture));
 
-          glGenTextures(1, &name);
-          utils::catchGlError();
+          emp_checked_gl_void(glGenTextures(1, &name));
 
           Bind();
         }
@@ -175,8 +173,7 @@ namespace emp {
           if (name != 0) {
             if (name == bound) bound = 0;
 
-            glDeleteTextures(1, &name);
-            utils::catchGlError();
+            emp_checked_gl_void(glDeleteTextures(1, &name));
           }
         }
 
@@ -188,30 +185,26 @@ namespace emp {
           Activate();
         }
 
-        void Activate() {
-          glActiveTexture(texture);
-          utils::catchGlError();
-        }
+        void Activate() { emp_checked_gl_void(glActiveTexture(texture)); }
 
         void Bind() {
           Activate();
           if (bound != name) {
-            glBindTexture(static_cast<GLenum>(target), name);
-            utils::catchGlError();
+            emp_checked_gl_void(
+              glBindTexture(static_cast<GLenum>(target), name));
           }
         }
 
         void SetDepthStencilTextureMode() {}
         void SetBaseMipmapLevel(GLint value = 0) {
-          glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_BASE_LEVEL,
-                          value);
-          utils::catchGlError();
+          emp_checked_gl_void(glTexParameteri(static_cast<GLenum>(target),
+                                              GL_TEXTURE_BASE_LEVEL, value));
         }
 #ifndef __EMSCRIPTEN__
         void SetBorderColor(const Color& color) {
-          glTexParameterfv(static_cast<GLenum>(target), GL_TEXTURE_BORDER_COLOR,
-                           color.RgbaPtr());
-          utils::catchGlError();
+          emp_checked_gl_void(glTexParameterfv(static_cast<GLenum>(target),
+                                               GL_TEXTURE_BORDER_COLOR,
+                                               color.RgbaPtr()));
         }
 #endif
 
@@ -223,60 +216,57 @@ namespace emp {
 
         void SetMinFilter(TextureMinFilter filter) {
           Bind();
-          glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_MIN_FILTER,
-                          static_cast<decltype(GL_NEAREST)>(filter));
-          utils::catchGlError();
+          emp_checked_gl_void(
+            glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_MIN_FILTER,
+                            static_cast<decltype(GL_NEAREST)>(filter)));
         }
 
         void SetMagFilter(TextureMagFilter filter) {
           Bind();
-          glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_MAG_FILTER,
-                          static_cast<decltype(GL_NEAREST)>(filter));
-          utils::catchGlError();
+          emp_checked_gl_void(
+            glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_MAG_FILTER,
+                            static_cast<decltype(GL_NEAREST)>(filter)));
         }
 
         void SetMinLOD(float value) {
           Bind();
-          glTexParameterf(static_cast<GLenum>(target), GL_TEXTURE_MIN_LOD,
-                          value);
-          utils::catchGlError();
+          emp_checked_gl_void(glTexParameterf(static_cast<GLenum>(target),
+                                              GL_TEXTURE_MIN_LOD, value));
         }
         void SetMaxLOD(float value) {
           Bind();
-          glTexParameterf(static_cast<GLenum>(target), GL_TEXTURE_MAX_LOD,
-                          value);
-          utils::catchGlError();
+          emp_checked_gl_void(glTexParameterf(static_cast<GLenum>(target),
+                                              GL_TEXTURE_MAX_LOD, value));
         }
         void SetMaxMipmapLevel(int value) {
           Bind();
-          glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_MAX_LEVEL,
-                          value);
-          utils::catchGlError();
+          emp_checked_gl_void(glTexParameteri(static_cast<GLenum>(target),
+                                              GL_TEXTURE_MAX_LEVEL, value));
         }
 
         void SetRedSwizzle(TextureSwizzle value) {
           Bind();
-          glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_SWIZZLE_R,
-                          static_cast<GLint>(value));
-          utils::catchGlError();
+          emp_checked_gl_void(glTexParameteri(static_cast<GLenum>(target),
+                                              GL_TEXTURE_SWIZZLE_R,
+                                              static_cast<GLint>(value)));
         }
         void SetGreenSwizzle(TextureSwizzle value) {
           Bind();
-          glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_SWIZZLE_G,
-                          static_cast<GLint>(value));
-          utils::catchGlError();
+          emp_checked_gl_void(glTexParameteri(static_cast<GLenum>(target),
+                                              GL_TEXTURE_SWIZZLE_G,
+                                              static_cast<GLint>(value)));
         }
         void SetBlueSwizzle(TextureSwizzle value) {
           Bind();
-          glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_SWIZZLE_B,
-                          static_cast<GLint>(value));
-          utils::catchGlError();
+          emp_checked_gl_void(glTexParameteri(static_cast<GLenum>(target),
+                                              GL_TEXTURE_SWIZZLE_B,
+                                              static_cast<GLint>(value)));
         }
         void SetAlphaSwizzle(TextureSwizzle value) {
           Bind();
-          glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_SWIZZLE_A,
-                          static_cast<GLint>(value));
-          utils::catchGlError();
+          emp_checked_gl_void(glTexParameteri(static_cast<GLenum>(target),
+                                              GL_TEXTURE_SWIZZLE_A,
+                                              static_cast<GLint>(value)));
         }
 
         void SetSwizzle(TextureSwizzle red = TextureSwizzle::Red,
@@ -293,24 +283,23 @@ namespace emp {
                             static_cast<GLint>(blue),
                             static_cast<GLint>(alpha)};
           Bind();
-          glTexParameteriv(static_cast<GLenum>(target), GL_TEXTURE_SWIZZLE_RGBA,
-                           params);
-          utils::catchGlError();
+          emp_checked_gl_void(glTexParameteriv(
+            static_cast<GLenum>(target), GL_TEXTURE_SWIZZLE_RGBA, params));
 #endif
         }
 
         void SetTextureWrapS(TextureWrap wrap) {
           Bind();
-          glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_WRAP_S,
-                          static_cast<GLint>(wrap));
-          utils::catchGlError();
+          emp_checked_gl_void(glTexParameteri(static_cast<GLenum>(target),
+                                              GL_TEXTURE_WRAP_S,
+                                              static_cast<GLint>(wrap)));
         }
 
         void SetTextureWrapT(TextureWrap wrap) {
           Bind();
-          glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_WRAP_T,
-                          static_cast<GLint>(wrap));
-          utils::catchGlError();
+          emp_checked_gl_void(glTexParameteri(static_cast<GLenum>(target),
+                                              GL_TEXTURE_WRAP_T,
+                                              static_cast<GLint>(wrap)));
         }
       };
       template <TextureBindTarget TARGET>
@@ -330,11 +319,10 @@ namespace emp {
                   GLsizei width, GLsizei height, Texture2DFormat format,
                   TextureType type, std::nullptr_t) {
           Texture<TARGET>::Bind();
-          glTexImage2D(static_cast<GLenum>(target), mipmap_level,
-                       static_cast<GLint>(internal_format), width, height, 0,
-                       static_cast<GLint>(format), static_cast<GLenum>(type),
-                       nullptr);
-          utils::catchGlError();
+          emp_checked_gl_void(glTexImage2D(
+            static_cast<GLenum>(target), mipmap_level,
+            static_cast<GLint>(internal_format), width, height, 0,
+            static_cast<GLint>(format), static_cast<GLenum>(type), nullptr));
         }
 
         template <typename T>
@@ -342,11 +330,10 @@ namespace emp {
                   GLsizei width, GLsizei height, Texture2DFormat format,
                   TextureType type, T&& data) {
           Texture<TARGET>::Bind();
-          glTexImage2D(static_cast<GLenum>(target), mipmap_level,
-                       static_cast<GLint>(internal_format), width, height, 0,
-                       static_cast<GLint>(format), static_cast<GLenum>(type),
-                       &data[0]);
-          utils::catchGlError();
+          emp_checked_gl_void(glTexImage2D(
+            static_cast<GLenum>(target), mipmap_level,
+            static_cast<GLint>(internal_format), width, height, 0,
+            static_cast<GLint>(format), static_cast<GLenum>(type), &data[0]));
         }
 
         template <typename T>
@@ -404,10 +391,10 @@ namespace emp {
                      GLsizei width, GLsizei height, Texture2DFormat format,
                      TextureType type, T&& data) {
           Texture<TARGET>::Bind();
-          glTexSubImage2D(static_cast<GLenum>(target), mipmap_level, xoffset,
-                          yoffset, width, height, static_cast<GLint>(format),
-                          static_cast<GLenum>(type), &data[0]);
-          utils::catchGlError();
+          emp_checked_gl_void(
+            glTexSubImage2D(static_cast<GLenum>(target), mipmap_level, xoffset,
+                            yoffset, width, height, static_cast<GLint>(format),
+                            static_cast<GLenum>(type), &data[0]));
         }
 
         template <typename T>
@@ -475,8 +462,7 @@ namespace emp {
     void setUniform(
       GLint uniform,
       const __impl_emp_opengl_texture_base::Texture<TARGET>& texture) {
-      glUniform1i(uniform, texture.texture - GL_TEXTURE0);
-      utils::catchGlError();
+      emp_checked_gl_void(glUniform1i(uniform, texture.texture - GL_TEXTURE0));
     }
 
   }  // namespace opengl

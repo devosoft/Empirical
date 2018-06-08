@@ -44,7 +44,6 @@ int main(int argc, char* argv[]) {
 
   emp::Resources<FontFace>::Add("Roboto", [] {
     auto font = ft.load("Assets/RobotoMono-Regular.ttf");
-
     font.SetPixelSize(0, 64);
     font.BulidAsciiAtlas();
     return font;
@@ -57,11 +56,11 @@ int main(int argc, char* argv[]) {
   Stage stage(region);
   auto root = stage.MakeRoot<Group>();
   // auto line{std::make_shared<Line>(canvas)};
-  auto scatter{std::make_shared<Scatter>(canvas, 6)};
-  auto scale{std::make_shared<Scale<3>>(region)};
+  // auto scatter{std::make_shared<Scatter>(canvas, 6)};
+  // auto scale{std::make_shared<Scale<3>>(region)};
 
-  auto r = std::make_shared<FilledRectangle>(canvas, Region2f{{0, 0}, {8, 8}});
-  root->AttachAll(r, scatter);
+  // auto r = std::make_shared<FilledRectangle>(canvas, Region2f{{0, 0}, {8,
+  // 8}}); root->AttachAll(r, scatter);
 
   std::vector<Vec2f> data;
 
@@ -70,12 +69,12 @@ int main(int argc, char* argv[]) {
   //              StrokeWeight(2) + Fill(Color::blue()) + PointSize(10)) >>
   //             scale >> scatter /*>> line*/;
 
-  // PerspectiveCamera camera(consts::pi<float> / 4,
-  //                          canvas.getWidth() / (float)canvas.getHeight(),
-  //                          0.1, 100);
+  // auto camera = std::make_shared<PerspectiveCamera>(
+  //   consts::pi<float> / 4, canvas.getWidth() / (float)canvas.getHeight(),
+  //   0.1, 100);
 
-  OrthoCamera camera(region);
-  SimpleEye eye;
+  auto camera = std::make_shared<OrthoCamera>(region);
+  auto eye = std::make_shared<SimpleEye>();
   // eye.LookAt({40, 30, 30}, {0, 0, 0}, {0, 0, -1});
 
   // canvas.on_resize_event.bind(
@@ -91,27 +90,32 @@ int main(int argc, char* argv[]) {
 
   // flow.Apply(data.begin(), data.end());
 
-  emp::graphics::Graphics g(canvas, "Roboto");
-
+  emp::graphics::Graphics g(canvas, "Roboto", camera, eye);
+  float t = 0;
   canvas.runForever([&](auto&&) {
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    g.FillRegularPolygons({camera.GetProjection(), eye.CalculateView()}, 5,
-                          {10, 10})
-      .Draw({emp::graphics::Transform(Mat4x4f::Translation(5, 5, 0)),
-             emp::graphics::Color(Color::red())})
+    g.Text()
       .Draw({
-        emp::graphics::Color(Color::red()),
-        emp::graphics::Transform(Mat4x4f::Translation(-5, -5, 0)),
-      });
+        emp::graphics::Transform = Mat4x4f::Translation(0, 0, 0),
+        emp::graphics::Fill = Color::green(),
+        emp::graphics::Text = "Hello World",
+      })
+      .Flush();
 
-    g.Text({camera.GetProjection(), eye.CalculateView()})
-      .Draw({
-        emp::graphics::Transform(Mat4x4f::Translation(5, 5, 0)),
-        emp::graphics::Color(Color::red()),
-        emp::graphics::Text("Hello World"),
+    auto pen = g.FillRegularPolygons(5, {10, 10});
+    for (int i = 0; i < 100; ++i) {
+      pen.Draw({
+        emp::graphics::Fill = Color::red(),
+        emp::graphics::Transform =
+          Mat4x4f::Translation((sin(0.5 * t + i) + cos(t - i)) * 50,
+                               (sin(t + i) - cos(0.5 * t - i)) * 50, 0) *
+          Mat4x4f::Scale(0.5),
       });
+    }
+    pen.Flush();
+    t += 0.1;
 
     // stage.Render(camera, eye);
     // data.clear();

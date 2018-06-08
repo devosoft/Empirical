@@ -345,6 +345,10 @@ namespace emp {
     constexpr value_t<std::decay_t<T>> operator()(T&& value) const {           \
       return {std::forward<T>(value)};                                         \
     }                                                                          \
+    template <typename T>                                                      \
+    constexpr value_t<std::decay_t<T>> operator=(T&& value) const {            \
+      return {std::forward<T>(value)};                                         \
+    }                                                                          \
   } NAME;                                                                      \
   constexpr const char* NAME::name;                                            \
   template <class T>                                                           \
@@ -447,19 +451,22 @@ namespace emp {
       template <typename A>
       struct SelectHelper {
         template <typename U0, typename... U>
-        static constexpr auto Select(U0&& arg0, U&&... args)
-          -> std::enable_if_t<
-            std::is_same<A, typename U0::attribute_type>::value,
-            decltype(std::forward<U0>(arg0))> {
+        static constexpr U0&& SelectImpl(const std::true_type&, U0&& arg0,
+                                         U&&... args) {
           return std::forward<U0>(arg0);
         }
 
         template <typename U0, typename... U>
-        static constexpr auto Select(U0&& arg0, U&&... args)
-          -> std::enable_if_t<
-            !std::is_same<A, typename U0::attribute_type>::value,
-            decltype(SelectHelper<A>::Select(std::forward<U>(args)...))> {
+        static constexpr decltype(auto) SelectImpl(const std::false_type&,
+                                                   U0&& arg0, U&&... args) {
           return SelectHelper<A>::Select(std::forward<U>(args)...);
+        }
+
+        template <typename U0, typename... U>
+        static constexpr decltype(auto) Select(U0&& arg0, U&&... args) {
+          return SelectHelper<A>::SelectImpl(
+            std::is_same<A, typename U0::attribute_type>{},
+            std::forward<U0>(arg0), std::forward<U>(args)...);
         }
       };
       template <class... T>

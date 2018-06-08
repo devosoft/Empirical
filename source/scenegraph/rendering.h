@@ -6,18 +6,20 @@
 #include "opengl/glcanvas.h"
 #include "opengl/glwrap.h"
 #include "opengl/shaders.h"
+#include "scenegraph/camera.h"
 #include "scenegraph/core.h"
 #include "scenegraph/freetype.h"
 #include "tools/attrs.h"
 #include "tools/resources.h"
 
+#include <memory>
 #include <vector>
 
 namespace emp {
   namespace graphics {
 
     DEFINE_ATTR(Transform);
-    DEFINE_ATTR(Color);
+    DEFINE_ATTR(Fill);
     DEFINE_ATTR(Text);
 
     class FillRegularPolygonRenderer {
@@ -39,12 +41,13 @@ namespace emp {
 
       public:
       using instance_attributes_type =
-        tools::Attrs<TransformValue<math::Mat4x4f>, ColorValue<opengl::Color>>;
+        tools::Attrs<TransformValue<math::Mat4x4f>, FillValue<opengl::Color>>;
 
       template <typename S = const char*>
       FillRegularPolygonRenderer(opengl::GLCanvas& canvas,
                                  S&& fill_shader = "DefaultSolidColor")
         : fill_shader(std::forward<S>(fill_shader)),
+          vao(canvas.MakeVAO()),
           gpu_vertex_buffer(canvas.makeBuffer<opengl::BufferType::Array>()),
           gpu_elements_buffer(
             canvas.makeBuffer<opengl::BufferType::ElementArray>()) {
@@ -66,6 +69,7 @@ namespace emp {
                       size_t vertex_count, const math::Vec2f& radius) {
         auto first = 0;
 
+        gpu_elements_buffer.Clear();
         for (auto i = 0; i < vertex_count; ++i) {
           auto r =
             static_cast<float>(i) / vertex_count * 2 * math::consts::pi<float> +
@@ -86,17 +90,21 @@ namespace emp {
           gpu_elements_buffer.PushData(num);
           gpu_elements_buffer.PushData(next);
         }
+        vao.bind();
         gpu_vertex_buffer.SendToGPU();
         gpu_elements_buffer.SendToGPU();
+
+        fill_shader->Use();
         fill_shader_uniforms.projection = settings.projection;
         fill_shader_uniforms.view = settings.view;
       }
 
       void Instance(const instance_attributes_type& attrs) {
         fill_shader->Use();
+        vao.bind();
 
         fill_shader_uniforms.model = attrs.GetTransform();
-        fill_shader_uniforms.fill = attrs.GetColor();
+        fill_shader_uniforms.fill = attrs.GetFill();
 
         gpu_elements_buffer.Draw(GL_TRIANGLES);
       }
@@ -110,8 +118,6 @@ namespace emp {
         math::Vec2f texture_coordinates;
       };
 
-      std::string font_name;
-      std::string text;
       float height = 8;
       opengl::VertexArrayObject vao;
       opengl::BufferVector<opengl::BufferType::Array, data_t> vertices_buffer;
@@ -123,11 +129,12 @@ namespace emp {
         opengl::Uniform view;
         opengl::Uniform projection;
         opengl::Uniform tex;
+        opengl::Uniform fill;
       } shader_uniforms;
 
       public:
       using instance_attributes_type =
-        tools::Attrs<TransformValue<math::Mat4x4f>, ColorValue<opengl::Color>,
+        tools::Attrs<TransformValue<math::Mat4x4f>, FillValue<opengl::Color>,
                      TextValue<std::string>>;
 
       template <typename F, typename S = std::string>
@@ -140,13 +147,12 @@ namespace emp {
         using namespace emp::opengl;
         using namespace emp::math;
 
-        // SetText(text);
-
         this->shader.OnSet([this](auto& value) {
           shader_uniforms.model = this->shader->Uniform("model");
           shader_uniforms.view = this->shader->Uniform("view");
           shader_uniforms.projection = this->shader->Uniform("projection");
           shader_uniforms.tex = this->shader->Uniform("tex");
+          shader_uniforms.fill = this->shader->Uniform("fill");
 
           vao.bind();
           vertices_buffer.bind();
@@ -156,6 +162,7 @@ namespace emp {
       }
 
       void BeginBatch(const scenegraph::RenderSettings& settings) {
+        this->shader->Use();
         shader_uniforms.projection = settings.projection;
         shader_uniforms.view = settings.view;
       }
@@ -164,8 +171,8 @@ namespace emp {
         using namespace emp::opengl;
         using namespace emp::math;
 
-        // std::vector<data_t> points;
         Vec2f cursor{0, 0};
+        vertices_buffer.Clear();
 
         float scale = height / font->atlas_height;
 
@@ -200,14 +207,13 @@ namespace emp {
           vertices_buffer.PushData(
             {{max.x(), max.y(), 0}, {tmax.x(), tmin.y()}});
         }
+        shader->Use();
         vao.bind();
         vertices_buffer.SendToGPU();
 
-        shader->Use();
-
         shader_uniforms.model = attrs.GetTransform();
-        shader_uniforms.tex = font->GetAtlasTexture();
-        // fill_shader_uniforms.fill = attrs.GetColor();
+        shader_uniforms.tex = *font->GetAtlasTexture();
+        shader_uniforms.fill = attrs.GetFill();
 
         vertices_buffer.Draw(GL_TRIANGLES);
       }
@@ -229,14 +235,8 @@ namespace emp {
         renderer->BeginBatch(settings, std::forward<T>(args)...);
       }
 
-      Pen(const Pen&) = delete;
-      Pen(Pen&&) = delete;
-
-      Pen& operator=(const Pen&) = delete;
-      Pen& operator=(Pen&&) = delete;
-
-      template <typename I, typename U>
-      Pen& Data(I begin, I end, const U& transform) {
+      template <typename I, typename... U>
+      Pen& Data(I begin, I end, const tools::Attrs<U...>& transform) {
         for (; begin != end; ++begin) {
           Draw(transform(*begin));
         }
@@ -249,7 +249,7 @@ namespace emp {
         return *this;
       }
 
-      ~Pen() { renderer->FinishBatch(); }
+      void Flush() { renderer->FinishBatch(); }
     };
 
     class Graphics {
@@ -257,10 +257,17 @@ namespace emp {
       TextRenderer text_renderer;
 
       public:
+      std::shared_ptr<scenegraph::Camera> camera;
+      std::shared_ptr<scenegraph::Eye> eye;
+
       template <typename F>
-      Graphics(opengl::GLCanvas& canvas, F&& font)
+      Graphics(opengl::GLCanvas& canvas, F&& font,
+               std::shared_ptr<scenegraph::Camera> camera,
+               std::shared_ptr<scenegraph::Eye> eye)
         : fill_regular_polygon_renderer(canvas),
-          text_renderer(canvas, std::forward<F>(font)) {}
+          text_renderer(canvas, std::forward<F>(font)),
+          camera(camera),
+          eye(eye) {}
 
       Graphics(const Graphics&) = delete;
       Graphics(Graphics&&) = delete;
@@ -269,13 +276,16 @@ namespace emp {
       Graphics& operator=(Graphics&&) = delete;
 
       Pen<FillRegularPolygonRenderer> FillRegularPolygons(
-        const scenegraph::RenderSettings& settings, size_t vertex_count,
-        const math::Vec2f& radius) {
-        return {&fill_regular_polygon_renderer, settings, vertex_count, radius};
+        size_t vertex_count, const math::Vec2f& radius) {
+        return {&fill_regular_polygon_renderer,
+                {camera->GetProjection(), eye->CalculateView()},
+                vertex_count,
+                radius};
       }
 
-      Pen<TextRenderer> Text(const scenegraph::RenderSettings& settings) {
-        return {&text_renderer, settings};
+      Pen<TextRenderer> Text() {
+        return {&text_renderer,
+                {camera->GetProjection(), eye->CalculateView()}};
       }
     };
   }  // namespace graphics

@@ -198,8 +198,8 @@ namespace emp {
           return attr->second;
         }
 
-        auto attr_loc = glGetAttribLocation(handle, name.c_str());
-        utils::catchGlError();
+        auto attr_loc =
+          emp_checked_gl(glGetAttribLocation(handle, name.c_str()));
         if (attr_loc < 0) {
           std::stringstream s;
           s << "OpenGL errors: no such attribute as \"" << name.c_str() << "\"";
@@ -216,14 +216,10 @@ namespace emp {
           return uniform->second;
         }
 
-        auto uniform_loc = glGetUniformLocation(handle, name.c_str());
-        utils::catchGlError();
-        if (uniform_loc < 0) {
-          std::stringstream s;
-          s << "OpenGL errors: no such uniform as \"" << name.c_str() << "\"";
-          auto str = s.str();
-          throw std::runtime_error(str.c_str());
-        }
+        auto uniform_loc =
+          emp_checked_gl(glGetUniformLocation(handle, name.c_str()));
+        emp_assert(uniform_loc >= 0,
+                   "Uniform with the given name does not exist on this shader");
 
         uniforms[name] = uniform_loc;
         return uniform_loc;

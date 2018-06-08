@@ -167,6 +167,92 @@ namespace emp {
              std::forward<To>(to);
     }
 
+    // namespace impl_emp_detail {
+    //   template <typename T, typename... U>
+    //   constexpr decltype(auto) Apply(std::shared_ptr<T> target, U&&... args)
+    //   {
+    //     return target->Apply(std::forward<U>(args)...);
+    //   }
+    //   template <typename T, typename... U>
+    //   constexpr decltype(auto) Apply(std::weak_ptr<T> target, U&&... args) {
+    //     return target->Apply(std::forward<U>(args)...);
+    //   }
+    //   template <typename T, typename... U>
+    //   constexpr decltype(auto) Apply(std::unique_ptr<T> target, U&&... args)
+    //   {
+    //     return target->Apply(std::forward<U>(args)...);
+    //   }
+    //   template <typename T, typename... U>
+    //   constexpr decltype(auto) Apply(T* target, U&&... args) {
+    //     return target->Apply(std::forward<U>(args)...);
+    //   }
+    //   template <typename T, typename... U>
+    //   constexpr decltype(auto) Apply(const T* target, U&&... args) {
+    //     return target->Apply(std::forward<U>(args)...);
+    //   }
+
+    //   template <typename T, typename... U>
+    //   constexpr decltype(auto) Apply(T& target, U&&... args) {
+    //     return target.Apply(std::forward<U>(args)...);
+    //   }
+    //   template <typename T, typename... U>
+    //   constexpr decltype(auto) Apply(const T& target, U&&... args) {
+    //     return target.Apply(std::forward<U>(args)...);
+    //   }
+    // };  // namespace impl_emp_detail
+
+    // struct sink_tag {};
+    // struct transform_tag {};
+
+    // template <typename...>
+    // struct Flow;
+
+    // template <typename F0>
+    // class Flow<F0> {
+    //   F0 head;
+    //   using input_attributes_type = typename F0::input_attributes_type;
+
+    //   public:
+    //   template <typename Iter>
+    //   constexpr auto Apply(Iter begin, Iter end)
+    //     -> decltype(impl_emp_detail::Apply(head, begin, end)) {
+    //     return impl_emp_detail::Apply(head, begin, end);
+    //   }
+    // };
+
+    // template <typename F0, typename F1, typename... F>
+    // class Flow<F0, F1, F...> {
+    //   private:
+    //   F0 head;
+    //   Flow<F1, F...> tail;
+
+    //   template <typename U, typename Iter>
+    //   constexpr static bool IsSink(U&& target, Iter begin, Iter end) {
+    //     return std::is_void<decltype(
+    //       impl_emp_detail::Apply(std::forward<U>(target), begin,
+    //       end))>::value;
+    //   }
+
+    //   public:
+    //   template <typename Iter>
+    //   constexpr auto Apply(Iter begin, Iter end)
+    //     -> std::enable_if<IsSink(head, begin, end),
+    //                       decltype(impl_emp_detail::Apply(tail, begin, end))>
+    //                       {
+    //     impl_emp_detail::Apply(head, begin, end);
+    //     return impl_emp_detail::Apply(tail, begin, end);
+    //   }
+
+    //   template <typename Iter>
+    //   constexpr auto Apply(Iter begin, Iter end)
+    //     -> std::enable_if<!IsSink(head, begin, end),
+    //                       decltype(impl_emp_detail::Apply(tail, begin, end))>
+    //                       {
+    //     impl_emp_detail::Apply(head, begin, end);
+    //     return impl_emp_detail::Apply(tail, begin, end);
+    //   }
+    // };
+
   }  // namespace plot
 
 }  // namespace emp

@@ -2,6 +2,7 @@
 #define EMP_SCENEGRAPH_FREETYPE_H
 
 #include <algorithm>
+#include <iomanip>
 #include <stdexcept>
 
 #include <ft2build.h>
@@ -24,11 +25,7 @@ namespace emp {
       public:
       FreeType() {
         auto err = FT_Init_FreeType(&library);
-        emp_assert(err == 0);
-        if (err != 0) {
-          std::cout << "Warning: FreeType failed to initialize with error 0x"
-                    << std::hex << err << std::endl;
-        }
+        emp_assert(err == 0, "Warning: FreeType failed to initialize");
       }
       FreeType(const FreeType&) = delete;
       FreeType(FreeType&&) = delete;
@@ -67,17 +64,13 @@ namespace emp {
 
       FontFace(const FreeType& library, const char* path, FT_Long face_index,
                GLenum texture)
-        : atlas_texture(texture) {
+        : atlas_texture(std::make_shared<opengl::Texture2d>(texture)) {
         auto err = FT_New_Face(library, path, face_index, &face);
-        emp_assert(err == 0);
-        if (err) {
-          std::cout << "Warning: FreeTyppe failed to load '" << path
-                    << "' with error 0x" << std::hex << err << std::endl;
-        }
+        emp_assert(err == 0, "Warning: FreeType failed to load font");
       }
 
       friend FreeType;
-      opengl::Texture2d atlas_texture;
+      std::shared_ptr<opengl::Texture2d> atlas_texture;
 
       public:
       float atlas_width, atlas_height;
@@ -121,13 +114,9 @@ namespace emp {
       void BulidAsciiAtlas() {
         using namespace emp::opengl;
 
-        emp_assert(face != nullptr);
-        if (face == nullptr) {
-          std::cout << "Warning: Failed to build atlas for font, because the "
-                       "font is not properly initialized"
-                    << std::endl;
-          return;
-        }
+        emp_assert(face != nullptr,
+                   "Warning: Failed to build atlas for font, because the font "
+                   "is not properly initialized");
 
         atlas_width = 0;
         atlas_height = 0;
@@ -136,10 +125,8 @@ namespace emp {
         for (char c = begin_ascii; c < end_ascii; ++c) {
           auto err = FT_Load_Char(face, c, FT_LOAD_RENDER);
           if (err) {
-            emp_assert(err != FT_Err_Invalid_Size_Handle);
-            if (err == FT_Err_Invalid_Size_Handle) {
-              std::cerr << "Warning: You forgot to set the size " << std::endl;
-            }
+            emp_assert(err != FT_Err_Invalid_Size_Handle,
+                       "Warning: You forgot to set the size");
             std::cerr << "Warning: faild to load glyph '" << c << "'"
                       << std::endl;
             continue;
@@ -168,11 +155,11 @@ namespace emp {
         constexpr auto format{Texture2DFormat::R};
 #endif
 
-        atlas_texture.Activate();
-        atlas_texture.Bind();
+        atlas_texture->Activate();
+        atlas_texture->Bind();
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        atlas_texture.Data(format, atlas_width, atlas_height,
-                           TextureType::UnsignedByte, nullptr);
+        atlas_texture->Data(format, atlas_width, atlas_height,
+                            TextureType::UnsignedByte, nullptr);
 
         for (auto& character : atlas) {
           if (FT_Load_Char(face, character.character, FT_LOAD_RENDER)) continue;
@@ -188,16 +175,14 @@ namespace emp {
 
           auto g = face->glyph;
 
-          atlas_texture.SubData(character.atlas_x, character.atlas_y,
-                                character.size.x(), character.size.y(), format,
-                                TextureType::UnsignedByte, g->bitmap.buffer);
+          atlas_texture->SubData(character.atlas_x, character.atlas_y,
+                                 character.size.x(), character.size.y(), format,
+                                 TextureType::UnsignedByte, g->bitmap.buffer);
         }
-        atlas_texture.SetMinFilter(TextureMinFilter::Linear);
-        atlas_texture.SetMagFilter(TextureMagFilter::Linear);
-        atlas_texture.SetTextureWrap(TextureWrap::ClampToEdge,
-                                     TextureWrap::ClampToEdge);
-
-        // std::cout << (int)end_ascii - begin_ascii << std::endl;
+        atlas_texture->SetMinFilter(TextureMinFilter::Linear);
+        atlas_texture->SetMagFilter(TextureMagFilter::Linear);
+        atlas_texture->SetTextureWrap(TextureWrap::ClampToEdge,
+                                      TextureWrap::ClampToEdge);
       }
 
       atlas_char_t Lookup(char character) const {
@@ -206,7 +191,9 @@ namespace emp {
         return atlas[idx];
       }
 
-      const opengl::Texture2d& GetAtlasTexture() const { return atlas_texture; }
+      const std::shared_ptr<opengl::Texture2d> GetAtlasTexture() const {
+        return atlas_texture;
+      }
     };
 
     FontFace FreeType::load(const char* path, FT_Long face_index,

@@ -1,13 +1,11 @@
 #ifndef GL_UTILS_H
 #define GL_UTILS_H
 
-#include "gl.h"
+#include "assert.h"
 
 #include <ostream>
-#ifndef NDEBUG
-#include <sstream>
-#include <stdexcept>
-#endif
+
+#include "gl.h"
 
 namespace emp {
   namespace opengl {
@@ -40,19 +38,28 @@ namespace emp {
         }
       }
 
-      inline void catchGlError() {
 #ifndef NDEBUG
-        auto error{glGetError()};
-        if (error != GL_NO_ERROR) {
-          std::stringstream stream;
-          stream << "gl error: " << static_cast<GlError>(error);
-          auto str = stream.str();
-          throw std::runtime_error(str.c_str());
-        }
+#define emp_checked_gl(GL_CALL)                 \
+  ([&] {                                        \
+    auto result{GL_CALL};                       \
+    auto error{glGetError()};                   \
+    emp_assert(error == GL_NO_ERROR, #GL_CALL); \
+    return result;                              \
+  })()
+#define emp_checked_gl_void(GL_CALL)            \
+  ([&] {                                        \
+    GL_CALL;                                    \
+    auto error{glGetError()};                   \
+    emp_assert(error == GL_NO_ERROR, #GL_CALL); \
+  })()
+#else
+
+#define emp_checked_gl(GL_CALL) GL_CALL
+#define emp_checked_gl_void(GL_CALL) GL_CALL
 #endif
-      }
+
     }  // namespace utils
-  }    // namespace opengl
+  }  // namespace opengl
 }  // namespace emp
 
 #endif  // GL_UTILS_H

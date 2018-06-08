@@ -23,8 +23,8 @@ CFLAGS_native_opt := $(CFLAGS_all) $(OFLAGS_native_opt)
 CFLAGS_native_debug := $(CFLAGS_all) $(OFLAGS_native_debug)
 CFLAGS_native_grumpy := $(CFLAGS_all) $(OFLAGS_native_grumpy)
 
-CFLAGS_web_debug := $(GLFW_LIBS) $(CFLAGS_all) $(OFLAGS_web_debug) -s USE_FREETYPE=1 --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['Pointer_stringify']"-s NO_EXIT_RUNTIME=1
-CFLAGS_web_opt := $(GLFW_LIBS) $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['Pointer_stringify']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --preload-file Assets -s USE_FREETYPE=1 --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['Pointer_stringify']" -s NO_EXIT_RUNTIME=1 -s DISABLE_EXCEPTION_CATCHING=0
+CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt)  --preload-file Assets -s USE_FREETYPE=1 --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS="['Pointer_stringify']" -s NO_EXIT_RUNTIME=1
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 JS_TARGETS := PlottingExperiment.js

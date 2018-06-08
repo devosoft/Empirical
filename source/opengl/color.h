@@ -37,8 +37,8 @@ namespace emp {
     };
 
     void setUniform(GLint uniform, const Color& value) {
-      glUniform4f(uniform, value.r, value.g, value.b, value.a);
-      utils::catchGlError();
+      emp_checked_gl_void(
+        glUniform4f(uniform, value.r, value.g, value.b, value.a));
     }
 
   };  // namespace opengl

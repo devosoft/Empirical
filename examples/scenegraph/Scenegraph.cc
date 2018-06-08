@@ -61,8 +61,9 @@ int main(int argc, char* argv[]) {
   texture->SetMinFilter(TextureMinFilter::Linear);
   texture->SetMagFilter(TextureMagFilter::Linear);
 
-  root->Attach(
-    std::make_shared<TextureView>(canvas, Region2f{{0, 0}, {8, 8}}, texture));
+  root->Attach(std::make_shared<TextureView>(
+    canvas, Region2f{{-128, 0}, {256, 64}},
+    emp::Resources<FontFace>::Get("Roboto")->GetAtlasTexture()));
 
   root->Attach(std::make_shared<Text>(canvas, "Hello World", "Roboto"));
 

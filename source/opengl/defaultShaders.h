@@ -160,7 +160,6 @@ namespace emp {
           uniform mat4 model;
           uniform mat4 view;
           uniform mat4 projection;
-          uniform vec4 color;
           out vec2 f_uv;
 
           void main()
@@ -176,13 +175,14 @@ namespace emp {
         R"glsl(
           precision mediump float;
 
-	  varying vec2 f_uv;
+          varying vec2 f_uv;
           uniform sampler2D tex;
+          uniform vec4 fill;
 
           void main()
           {
               // gl_FragColor = vec4(1, 1, 1, texture2D(tex, f_uv).r);
-               gl_FragColor = texture2D(tex, f_uv);
+               gl_FragColor = vec4(0, 0, 0, fill.a * texture2D(tex, f_uv).a);
               // gl_FragColor =  texture2D(tex, f_uv);
           }
         )glsl";
@@ -192,12 +192,15 @@ namespace emp {
 
           in vec2 f_uv;
 
+          uniform vec4 fill;
           uniform sampler2D tex;
+
           out vec4 color;
 
           void main()
           {
-            color = vec4(1, 1, 1, texture2D(tex, f_uv).r);
+            // color = vec4(1, 1, 1, texture2D(tex, f_uv).b);
+            color = vec4(fill.rgb, fill.a * texture2D(tex, f_uv).r);
           }
         )glsl";
 #endif

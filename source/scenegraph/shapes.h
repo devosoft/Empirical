@@ -261,7 +261,7 @@ namespace emp {
 
           shader->Uniform("model") = transform;
           // shader.Uniform("color") = Color::white();
-          shader->Uniform("tex") = font->GetAtlasTexture();
+          shader->Uniform("tex") = *font->GetAtlasTexture();
 
           // glDrawElements(GL_TRIANGLES, 6 * text.size(), GL_UNSIGNED_INT,
           // 0);

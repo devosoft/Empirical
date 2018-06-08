@@ -130,18 +130,16 @@ namespace emp {
 
       void destroy() {
         if (handle != 0) {
-          glDeleteBuffers(1, &handle);
+          emp_checked_gl_void(glDeleteBuffers(1, &handle));
           if (__impl::boundBuffer == handle) __impl::boundBuffer = 0;
-          utils::catchGlError();
         }
       }
 
       template <typename T>
       void init(const T* data, std::size_t size, BufferUsage usage) {
         bind();
-        glBufferData(static_cast<GLenum>(TYPE), size, data,
-                     static_cast<GLenum>(usage));
-        utils::catchGlError();
+        emp_checked_gl_void(glBufferData(static_cast<GLenum>(TYPE), size, data,
+                                         static_cast<GLenum>(usage)));
       }
 
       template <typename T, std::size_t N>
@@ -157,8 +155,8 @@ namespace emp {
       template <typename T>
       void subset(const T* data, std::size_t size, std::size_t offset = 0) {
         bind();
-        glBufferSubData(static_cast<GLenum>(TYPE), offset, size, data);
-        utils::catchGlError();
+        emp_checked_gl_void(
+          glBufferSubData(static_cast<GLenum>(TYPE), offset, size, data));
       }
 
       template <typename T, std::size_t N>
@@ -174,10 +172,9 @@ namespace emp {
       template <class T>
       T* map(std::size_t offset, std::size_t length, BufferAccess access) {
         bind();
-        auto buffer = static_cast<T*>(
+        auto buffer = static_cast<T*>(emp_checked_gl(
           glMapBufferRange(static_cast<GLenum>(TYPE), offset, length,
-                           static_cast<GLenum>(access)));
-        utils::catchGlError();
+                           static_cast<GLenum>(access))));
         return buffer;
       }
 
@@ -188,16 +185,14 @@ namespace emp {
 
       bool unmap() {
         bind();
-        auto unmap = glUnmapBuffer(static_cast<GLenum>(TYPE));
-        utils::catchGlError();
+        auto unmap = emp_checked_gl(glUnmapBuffer(static_cast<GLenum>(TYPE)));
         return unmap;
       }
 #endif
 
       BufferObject& bind() {
         if (__impl::boundBuffer != handle) {
-          glBindBuffer(static_cast<GLenum>(TYPE), handle);
-          utils::catchGlError();
+          emp_checked_gl_void(glBindBuffer(static_cast<GLenum>(TYPE), handle));
           __impl::boundBuffer = handle;
         }
 
@@ -225,7 +220,7 @@ namespace emp {
       class BufferVector : public BufferObject<TYPE> {
         protected:
         std::vector<T> data;
-        size_t gpu_buffer_size = 0;
+        size_t gpu_buffer_capacity = 0;
 
         public:
         BufferVector(const BufferObject<TYPE>& buffer)
@@ -264,23 +259,24 @@ namespace emp {
 
         void Reserve(size_t size, BufferUsage usage) {
           data.reserve(size);
-          if (size > gpu_buffer_size) {
+          if (size > gpu_buffer_capacity) {
             BufferObject<TYPE>::init(nullptr, size, usage);
-            gpu_buffer_size = size;
+            gpu_buffer_capacity = size;
           }
         }
 
         void Clear() { data.clear(); }
 
         auto Size() const { return data.size(); }
-        auto GpuCapacity() const { return gpu_buffer_size; }
+        auto GpuCapacity() const { return gpu_buffer_capacity; }
 
         T& operator[](size_t i) { return data[i]; }
         const T& operator[](size_t i) const { return data[i]; }
 
         void SendToGPU(BufferUsage usage = BufferUsage::DynamicDraw) {
-          if (data.size() > gpu_buffer_size) {
+          if (data.size() > gpu_buffer_capacity) {
             BufferObject<TYPE>::init(data, usage);
+            gpu_buffer_capacity = data.size();
           } else {
 #ifdef EMSCRIPTEN
             BufferObject<TYPE>::subset(data);
@@ -314,7 +310,7 @@ namespace emp {
                     .size();
           count -= start;
         }
-        glDrawArrays(mode, start, count);
+        emp_checked_gl_void(glDrawArrays(mode, start, count));
       }
     };
 
@@ -325,11 +321,11 @@ namespace emp {
       using __impl_VertexBuffer::BufferVector<BufferType::ElementArray,
                                               T>::BufferVector;
       void Draw(GLenum mode) {
-        glDrawElements(
+        emp_checked_gl_void(glDrawElements(
           mode,
           __impl_VertexBuffer::BufferVector<BufferType::ElementArray, T>::data
             .size(),
-          GL_UNSIGNED_INT, nullptr);
+          GL_UNSIGNED_INT, nullptr));
       }
     };
 
@@ -352,12 +348,11 @@ namespace emp {
           offset(offset) {}
 
       void apply() {
-        glVertexAttribIPointer(index, static_cast<GLint>(size),
-                               static_cast<GLenum>(type), stride, offset);
-        utils::catchGlError();
+        emp_checked_gl_void(
+          glVertexAttribIPointer(index, static_cast<GLint>(size),
+                                 static_cast<GLenum>(type), stride, offset));
 
-        glEnableVertexAttribArray(index);
-        utils::catchGlError();
+        emp_checked_gl_void(glEnableVertexAttribArray(index));
       }
     };
 
@@ -383,13 +378,11 @@ namespace emp {
           offset(offset) {}
 
       void apply() {
-        glVertexAttribPointer(index, static_cast<GLint>(size),
-                              static_cast<GLenum>(type), normalized, stride,
-                              offset);
-        utils::catchGlError();
+        emp_checked_gl_void(glVertexAttribPointer(
+          index, static_cast<GLint>(size), static_cast<GLenum>(type),
+          normalized, stride, offset));
 
-        glEnableVertexAttribArray(index);
-        utils::catchGlError();
+        emp_checked_gl_void(glEnableVertexAttribArray(index));
       }
     };
 
@@ -412,8 +405,7 @@ namespace emp {
 
       public:
       explicit VertexArrayObject() {
-        glGenVertexArrays(1, &handle);
-        utils::catchGlError();
+        emp_checked_gl_void(glGenVertexArrays(1, &handle));
       }
 
       explicit VertexArrayObject(GLuint handle) : handle(handle) {}
@@ -436,7 +428,7 @@ namespace emp {
       void destoy() {
         if (handle != 0) {
           unbind();
-          glDeleteVertexArrays(1, &handle);
+          emp_checked_gl_void(glDeleteVertexArrays(1, &handle));
           handle = 0;
         }
       }
@@ -444,15 +436,15 @@ namespace emp {
       void bind() {
         emp_assert(handle != 0);
         if (boundVAO != handle) {
-          glBindVertexArray(handle);
+          emp_checked_gl_void(glBindVertexArray(handle));
           boundVAO = handle;
         }
       }
 
       void unbind() {
-        emp_assert(handle != 0);
+        emp_assert(handle != 0, "Ensure that this buffer has been created");
         if (boundVAO == handle) {
-          glBindVertexArray(0);
+          emp_checked_gl_void(glBindVertexArray(0));
           boundVAO = 0;
         }
       }
