@@ -27,17 +27,25 @@ private:
   inst_lib_t inst_lib;
   event_lib_t event_lib;
   surface_t surface;
+  size_t next_id;
 
   // double pop_pressure = 1.0;  // How much pressure before an organism dies? 
 
   std::unordered_map<size_t, emp::Ptr<OpenOrg>> id_map;
 
+
 public:  
   OpenWorld(OpenWorldConfig & _config)
-    : config(_config), inst_lib(), event_lib(), surface(config.WORLD_X(), config.WORLD_Y())
+    : config(_config), inst_lib(), event_lib(),
+      surface(config.WORLD_X(), config.WORLD_Y()),
+      next_id(1), id_map()
   {
     // Make sure that we are tracking organisms by their IDs.
-    OnPlacement( [this](size_t pos){ id_map[ GetOrg(pos).id ] = &GetOrg(pos); } );
+    OnPlacement( [this](size_t pos){
+      size_t id = next_id++;
+      GetOrg(pos).brain.SetTrait((size_t)OpenOrg::Trait::ORG_ID, id);
+      id_map[id] = &GetOrg(pos);
+    });
     OnOrgDeath( [this](size_t pos){ id_map.erase( GetOrg(pos).id ); } );
 
     // Setup new instructions for the instruction set.
@@ -56,7 +64,7 @@ public:
 
     // On each update, run organisms and make sure they stay on the surface.
     OnUpdate([this](size_t){
-      Process(10);
+      Process(5);
       for (auto & org : *this) {
         double x = org.body.GetPosition().GetX();
         double y = org.body.GetPosition().GetY();
