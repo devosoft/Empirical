@@ -27,17 +27,10 @@ struct OpenOrg {
 
   emp::CircleBody2D body;
 
-  static size_t NextID() {
-    static size_t next_id = 0;
-    return next_id++;
-  }
-
   OpenOrg(inst_lib_t & inst_lib, event_lib_t & event_lib, emp::Ptr<emp::Random> random_ptr)
-    : id(NextID()), brain(inst_lib, event_lib, random_ptr), energy(0.0), size(0.0)
+    : id(0), brain(inst_lib, event_lib, random_ptr), energy(0.0), size(0.0)
 	  , time_born(0.0), time_dead(-1.0), body({100.0,100.0,5.0})
-  {
-    brain.SetTrait((size_t)Trait::ORG_ID, id);
-  }
+  { ; }
   OpenOrg(const OpenOrg &) = default;
   OpenOrg(OpenOrg &&) = default;
   ~OpenOrg() { ; }
