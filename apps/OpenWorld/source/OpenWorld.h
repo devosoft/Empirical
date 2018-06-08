@@ -40,6 +40,8 @@ public:
       surface(config.WORLD_X(), config.WORLD_Y()),
       next_id(1), id_map()
   {
+    SetPopStruct_Grow(false); // Don't automatically delete organism when new ones are born.
+
     // Make sure that we are tracking organisms by their IDs.
     OnPlacement( [this](size_t pos){
       size_t id = next_id++;
@@ -56,10 +58,16 @@ public:
       org_ptr->body.Translate( facing.GetPoint(1.0) );
     }, 1, "Move forward.");
 
-    inst_lib.AddInst("Spinout", [this](hardware_t & hw, const inst_t & inst) mutable {
+    inst_lib.AddInst("SpinRight", [this](hardware_t & hw, const inst_t & inst) mutable {
       const size_t id = (size_t) hw.GetTrait((size_t) OpenOrg::Trait::ORG_ID);
       emp::Ptr<OpenOrg> org_ptr = id_map[id];
-      org_ptr->body.RotateDegrees(5);
+      org_ptr->body.RotateDegrees(-5.0);
+    }, 1, "Rotate -5 degrees.");
+
+    inst_lib.AddInst("SpinLeft", [this](hardware_t & hw, const inst_t & inst) mutable {
+      const size_t id = (size_t) hw.GetTrait((size_t) OpenOrg::Trait::ORG_ID);
+      emp::Ptr<OpenOrg> org_ptr = id_map[id];
+      org_ptr->body.RotateDegrees(5.0);
     }, 1, "Rotate 5 degrees.");
 
     // On each update, run organisms and make sure they stay on the surface.
@@ -74,6 +82,12 @@ public:
         if (y >= config.WORLD_Y()) y -= config.WORLD_Y();
         org.body.SetPosition({x,y});
       }
+    });
+
+    // Setup a mutation function.
+    SetMutFun( [this](OpenOrg & org, emp::Random & random){
+      org.radius = org.radius * random.GetDouble(0.96, 1.05);
+      return 1;
     });
 
     // Initialize a populaton of random organisms.
