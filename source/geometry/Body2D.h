@@ -87,20 +87,22 @@ namespace emp {
     double GetPressure() const { return pressure; }
     bool GetDetachOnDivide() const { return detach_on_divide; }
 
-    void SetBirthTime(double in_time) { birth_time = in_time; }
-    void SetColorID(uint32_t in_id) { color_id = in_id; }
+    void SetBirthTime(double _in) { birth_time = _in; }
+    void SetOrientation(Angle _in) { orientation = _in; }
+    void SetVelocity(Point _in) { velocity = _in; }
+    void SetMass(double _in) { mass = _in; }
+    void SetColorID(uint32_t _in) { color_id = _in; }
 
-    // Orientation control...
+    // Other orientation controls...
     void TurnLeft(int steps=1) { orientation.RotateDegrees(steps * 45); }
     void TurnRight(int steps=1) { orientation.RotateDegrees(steps * -45); }
     void RotateDegrees(double degrees) { orientation.RotateDegrees(degrees); }
 
-    // Velocity control...
+    // Other velocity controls...
     void IncSpeed(const Point & offset) { velocity += offset; }
     void IncSpeed() { velocity += orientation.GetPoint(); }
     void DecSpeed() { velocity -= orientation.GetPoint(); }
     void SetVelocity(double x, double y) { velocity.Set(x, y); }
-    void SetVelocity(const Point & v) { velocity = v; }
 
     // Shift to apply next update.
     void AddShift(const Point & s) { shift += s; total_abs_shift += s.Abs(); }
@@ -110,9 +112,9 @@ namespace emp {
   };
 
   class CircleBody2D : public Body2D_Base {
-  private:
+  protected:
     Circle2D<double> perimeter;  // Includes position and size.
-    double target_radius;      // For growing/shrinking
+    double target_radius;        // For growing/shrinking
 
     // Information about other bodies that this one is linked to.
     emp::vector< Ptr< BodyLink<CircleBody2D> > > from_links;  // Active links initiated by body
