@@ -21,7 +21,7 @@ private:
   using inst_lib_t = hardware_t::inst_lib_t;
   using hw_state_t = hardware_t::State;
  
-  using surface_t = emp::Surface2D<emp::CircleBody2D>;
+  using surface_t = emp::Surface2D<OpenOrg>;
 
   OpenWorldConfig & config;
   inst_lib_t inst_lib;
@@ -54,39 +54,39 @@ public:
     inst_lib.AddInst("Vroom", [this](hardware_t & hw, const inst_t & inst) {
       const size_t id = (size_t) hw.GetTrait((size_t) OpenOrg::Trait::ORG_ID);
       emp::Ptr<OpenOrg> org_ptr = id_map[id];
-      emp::Angle facing = org_ptr->body.GetOrientation();
-      org_ptr->body.Translate( facing.GetPoint(1.0) );
+      emp::Angle facing = org_ptr->GetOrientation();
+      org_ptr->Translate( facing.GetPoint(1.0) );
     }, 1, "Move forward.");
 
     inst_lib.AddInst("SpinRight", [this](hardware_t & hw, const inst_t & inst) mutable {
       const size_t id = (size_t) hw.GetTrait((size_t) OpenOrg::Trait::ORG_ID);
       emp::Ptr<OpenOrg> org_ptr = id_map[id];
-      org_ptr->body.RotateDegrees(-5.0);
+      org_ptr->RotateDegrees(-5.0);
     }, 1, "Rotate -5 degrees.");
 
     inst_lib.AddInst("SpinLeft", [this](hardware_t & hw, const inst_t & inst) mutable {
       const size_t id = (size_t) hw.GetTrait((size_t) OpenOrg::Trait::ORG_ID);
       emp::Ptr<OpenOrg> org_ptr = id_map[id];
-      org_ptr->body.RotateDegrees(5.0);
+      org_ptr->RotateDegrees(5.0);
     }, 1, "Rotate 5 degrees.");
 
     // On each update, run organisms and make sure they stay on the surface.
     OnUpdate([this](size_t){
       Process(5);
       for (auto & org : *this) {
-        double x = org.body.GetPosition().GetX();
-        double y = org.body.GetPosition().GetY();
+        double x = org.GetPosition().GetX();
+        double y = org.GetPosition().GetY();
         if (x < 0.0) x += config.WORLD_X();
         if (y < 0.0) y += config.WORLD_Y();
         if (x >= config.WORLD_X()) x -= config.WORLD_X();
         if (y >= config.WORLD_Y()) y -= config.WORLD_Y();
-        org.body.SetPosition({x,y});
+        org.SetPosition({x,y});
       }
     });
 
     // Setup a mutation function.
     SetMutFun( [this](OpenOrg & org, emp::Random & random){
-      org.radius = org.radius * random.GetDouble(0.96, 1.05);
+      org.SetRadius(org.GetRadius() * random.GetDouble(0.96, 1.05));
       return 1;
     });
 
@@ -95,8 +95,8 @@ public:
     for (size_t i = 0; i < config.INIT_POP_SIZE(); i++) {
       double x = random_ptr->GetDouble(config.WORLD_X());
       double y = random_ptr->GetDouble(config.WORLD_Y());
-      GetOrg(i).body.SetPosition({x,y});
-      surface.AddBody(&GetOrg(i).body);
+      GetOrg(i).SetPosition({x,y});
+      surface.AddBody(&GetOrg(i));
       GetOrg(i).brain.SetProgram(GenerateRandomProgram());
     }
   }
@@ -122,6 +122,23 @@ public:
       prog.PushFunction(new_fun);
     }
     return prog;
+  }
+
+  /// Test if two bodies have collided and act accordingly if they have.
+  bool TestPairCollision(OpenOrg & body1, OpenOrg & body2) {
+    // if (body1.IsLinked(body2)) return false;  // Linked bodies can overlap.
+
+    const emp::Point dist = body1.GetCenter() - body2.GetCenter();
+    const double sq_pair_dist = dist.SquareMagnitude();
+    const double radius_sum = body1.GetRadius() + body2.GetRadius();
+    const double sq_min_dist = radius_sum * radius_sum;
+
+    // If there was no collision, return false.
+    if (sq_pair_dist >= sq_min_dist) { return false; }
+
+    // If we made it this far, there was a collision!
+
+    return true;
   }
 };
 
