@@ -9,49 +9,64 @@
 //  overlapping.
 //
 //  BODY_TYPE is the class that represents the body geometry.
+//
+//  To work, the BODY_TYPE must have:
+//  - GetCenter() which returns a Point indicating the center of the organism.
+//  - GetRadius() which returns a distance under which you want to perfor a more detailed
+//                check as to whether two bodies actually overlap.
 
 
 #ifndef EMP_SURFACE_H
 #define EMP_SURFACE_H
 
-#include "../base/Ptr.h"
-#include "../tools/functions.h"
-#include "Body2D.h"
-
 #include <functional>
+
+#include "../base/Ptr.h"
+
+#include "Angle2D.h"
+#include "Point2D.h"
 
 namespace emp {
 
   template <typename BODY_TYPE>
-  class Surface2D {
-  private:
-    const Point max_pos;     // Lower-left corner of the surface.
-    emp::vector<Ptr<BODY_TYPE>> body_set;  // Set of all bodies on surface
-
+  class Surface {
   public:
-    Surface2D(double _width, double _height)
-      : max_pos(_width, _height), body_set() { ; }
-    ~Surface2D() { Clear(); }
+    using body_t = BODY_TYPE;
+  protected:
+    const Point max_pos;                // Lower-left corner of the surface.
+    emp::vector<Ptr<body_t>> body_set;  // Set of all bodies on surface
+
+    // Data tracking the current bodies on this surface.
+    bool data_active;                   // Are we trying to keep data up-to-date?
+    double max_radius;                  // Largest radius of any body.
+    size_t max_count;                   // How many bodies have the max radius?
+  public:
+    Surface(Point _max) : max_pos(_max), body_set(), max_radius(0.0) { ; }
+    ~Surface() { Clear(); }
 
     double GetWidth() const { return max_pos.GetX(); }
     double GetHeight() const { return max_pos.GetY(); }
     const Point & GetMaxPosition() const { return max_pos; }
 
-    emp::vector<Ptr<BODY_TYPE>> & GetBodySet() { return body_set; }
-    const emp::vector<Ptr<BODY_TYPE>> & GetConstBodySet() const { return body_set; }
+    emp::vector<Ptr<body_t>> & GetBodySet() { return body_set; }
+    const emp::vector<Ptr<body_t>> & GetBodySet() const { return body_set; }
 
-    // Add a single body.  Surface now controls this body and must delete it.
-    Surface2D & AddBody(Ptr<BODY_TYPE> new_body) {
+    /// Add a single body.
+    Surface & AddBody(Ptr<body_t> new_body) {
       body_set.push_back(new_body);     // Add body to master list
       return *this;
     }
 
-    // Clear all bodies on the surface.
-    Surface2D & Clear() {
-      for (auto body : body_set) body.Delete();
+    /// Remove all bodies from the surface.
+    Surface & Clear() {
+      data_active = false;
       body_set.resize(0);
       return *this;
     }
+
+
+
+
 
     // The following function will test pairs of collisions and run the passed-in function
     // on pairs of objects that *may* collide.
