@@ -25,7 +25,7 @@
 
 #include "RawImage.h"
 #include "Widget.h"
-#include "source/geometry/Point2D.h"
+#include "../geometry/Point2D.h"
 
 namespace emp {
 namespace web {
