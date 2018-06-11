@@ -40,6 +40,43 @@ namespace emp {
     bool data_active;                   // Are we trying to keep data up-to-date?
     double max_radius;                  // Largest radius of any body.
     size_t max_count;                   // How many bodies have the max radius?
+
+    // Update active data associated with a single body.
+    void UpdateBody(Ptr<body_t> body) {
+      const double cur_radius = body->GetRadius();
+      if (cur_radius > max_radius) {
+        max_radius = cur_radius;      // Record the new radius.
+        max_count = 1;                // New radius has only this body thus far.
+        data_active = false;          // May need to rebuild sectors, so deactivate data.
+      }
+      else if (cur_radius == max_radius) { max_count++; }
+    }
+
+    // Cleanup all of the data and mark the data as active.
+    void Activate() {
+      if (data_active) return; // Already active!
+
+      // Determine the largest radius.
+      max_radius = 0.0; max_count = 0;
+      for (Ptr<body_t> body : body_set) UpdateBody(body);
+
+      // Figure out the actual number of sectors to use (currently no more than 1024).
+      const double max_diameter = max_radius * 2.0;
+      emp_assert(max_diameter < max_pos.GetX());  // Surface must be bigger than biggest body
+      emp_assert(max_diameter < max_pos.GetY());
+      const size_t num_cols = std::min(max_pos.GetX()/max_diameter, 32.0);
+      const size_t num_rows = std::min(max_pos.GetY()/max_diameter, 32.0);
+      const size_t max_col = num_cols-1;
+      const size_t max_row = num_rows-1;
+
+      const size_t num_sectors = num_cols * num_rows;
+      const double sector_width = max_pos.GetX() / (double) num_cols;
+      const double sector_height = max_pos.GetY() / (double) num_rows;
+
+      emp::vector< emp::vector<Ptr<body_t>> > sector_set(num_sectors);
+
+      data_active = true;
+    }
   public:
     Surface(Point _max) : max_pos(_max), body_set(), max_radius(0.0) { ; }
     ~Surface() { Clear(); }
@@ -47,9 +84,6 @@ namespace emp {
     double GetWidth() const { return max_pos.GetX(); }
     double GetHeight() const { return max_pos.GetY(); }
     const Point & GetMaxPosition() const { return max_pos; }
-
-    emp::vector<Ptr<body_t>> & GetBodySet() { return body_set; }
-    const emp::vector<Ptr<body_t>> & GetBodySet() const { return body_set; }
 
     /// Add a single body.
     Surface & AddBody(Ptr<body_t> new_body) {
@@ -91,6 +125,7 @@ namespace emp {
       const double sector_height = max_pos.GetY() / (double) num_rows;
 
       emp::vector< emp::vector<Ptr<BODY_TYPE>> > sector_set(num_sectors);
+
 
 
       int hit_count = 0;
