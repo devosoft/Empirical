@@ -17,6 +17,7 @@
 #include "../base/assert.h"
 #include "../base/vector.h"
 #include "../base/macros.h"
+#include "../meta/reflection.h"
 #include "../tools/IndexMap.h"
 #include "../tools/Random.h"
 #include "../tools/vector_utils.h"

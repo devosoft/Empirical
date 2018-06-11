@@ -111,6 +111,12 @@ namespace emp {
     return true;
   }
 
+  namespace web {
+    inline std::string ToJSLiteral(bool x) {
+      if (x == true) return "true";
+      else return "false";
+    }
+  }
 
 }
 
