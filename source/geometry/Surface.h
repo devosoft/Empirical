@@ -32,48 +32,87 @@ namespace emp {
   class Surface {
   public:
     using body_t = BODY_TYPE;
+    using body_set_t = emp::vector<Ptr<body_t>>;
   protected:
-    const Point max_pos;                // Lower-left corner of the surface.
-    emp::vector<Ptr<body_t>> body_set;  // Set of all bodies on surface
+    const Point max_pos;     // Lower-left corner of the surface.
+    body_set_t body_set;     // Set of all bodies on surface
 
     // Data tracking the current bodies on this surface.
-    bool data_active;                   // Are we trying to keep data up-to-date?
-    double max_radius;                  // Largest radius of any body.
-    size_t max_count;                   // How many bodies have the max radius?
+    bool data_active;                 // Are we trying to keep data up-to-date?
+    double max_radius;                // Largest radius of any body.
+    size_t max_count;                 // How many bodies have the max radius?
+    size_t num_cols;                  // How many cols of sectors are there?
+    size_t num_rows;                  // How many rows of sectors are there?
+    size_t num_sectors;               // How many total sectors are there?
+    double sector_width;              // How wide is each sector?
+    double sector_height;             // How tall is each sector?
+    emp::vector<body_set_t> sectors;  // Which bodies are in each sector?
 
-    // Update active data associated with a single body.
-    void UpdateBody(Ptr<body_t> body) {
+    // Make sure there are num_sectors sectors and remove all bodies from existing ones.
+    void SetupSectors() {
+      size_t min_size = std::min(num_sectors, sectors.size());
+      sectors.resize(num_sectors);
+      for (size_t i = 0; i < min_size; i++) sectors[i].resize(0);
+    }
+
+    // Keep track of the largest body size found.
+    // Note: Uses watermarking, so largest body will never shrink, even if removed
+    //       unless the user explicitly calls RefreshBodySize()
+    inline void TestBodySize(Ptr<body_t> body) {
       const double cur_radius = body->GetRadius();
       if (cur_radius > max_radius) {
         max_radius = cur_radius;      // Record the new radius.
-        max_count = 1;                // New radius has only this body thus far.
         data_active = false;          // May need to rebuild sectors, so deactivate data.
       }
-      else if (cur_radius == max_radius) { max_count++; }
+    }
+
+    // Clear out the watermarked body size and update the current largest.
+    inline void RefreshBodySize() {
+      max_radius = 0.0;
+      for (Ptr<body_t> body : body_set) TestBodySize(body);      
+    }
+
+    // Place an active body into a sector.
+    inline void PlaceBody(Ptr<body_t> body) {
+      // Where is the current body?
+      const double body_x = body->GetCenter().GetX()
+      const double body_y = body->GetCenter().GetY()
+
+      // Make sure the current body is in the sectors.
+      emp_assert(body_x >= 0.0 && body_x < max_pos.GetX());
+      emp_assert(body_y >= 0.0 && body_y < max_pos.GetY());
+
+      // Determine which sector the current body is in.
+      const double sector_x = body_x / sector_width;
+      const double sector_y = body_y / sector_height;
+
+      const size_t cur_col = (size_t) sector_x;
+      const size_t cur_row = (size_t) sector_y;
+      const size_t cur_sector = cur_col + cur_row * num_cols;
+
+      emp_assert(cur_sector < sector_set.size());
+      sector_set[cur_sector].push_back(body);
     }
 
     // Cleanup all of the data and mark the data as active.
     void Activate() {
       if (data_active) return; // Already active!
 
-      // Determine the largest radius.
-      max_radius = 0.0; max_count = 0;
-      for (Ptr<body_t> body : body_set) UpdateBody(body);
-
       // Figure out the actual number of sectors to use (currently no more than 1024).
       const double max_diameter = max_radius * 2.0;
       emp_assert(max_diameter < max_pos.GetX());  // Surface must be bigger than biggest body
       emp_assert(max_diameter < max_pos.GetY());
-      const size_t num_cols = std::min(max_pos.GetX()/max_diameter, 32.0);
-      const size_t num_rows = std::min(max_pos.GetY()/max_diameter, 32.0);
-      const size_t max_col = num_cols-1;
-      const size_t max_row = num_rows-1;
+      num_cols = std::min(max_pos.GetX()/max_diameter, 32);
+      num_rows = std::min(max_pos.GetY()/max_diameter, 32);
 
-      const size_t num_sectors = num_cols * num_rows;
-      const double sector_width = max_pos.GetX() / (double) num_cols;
-      const double sector_height = max_pos.GetY() / (double) num_rows;
+      num_sectors = num_cols * num_rows;
+      sector_width = max_pos.GetX() / (double) num_cols;
+      sector_height = max_pos.GetY() / (double) num_rows;
 
-      emp::vector< emp::vector<Ptr<body_t>> > sector_set(num_sectors);
+      SetupSectors();   // Now that we know the sizes, we can initialize sectors.
+
+      // Put all of the bodies into sectors
+      for (Ptr<body_t> body : body_set) PlaceBody();
 
       data_active = true;
     }
@@ -87,7 +126,9 @@ namespace emp {
 
     /// Add a single body.
     Surface & AddBody(Ptr<body_t> new_body) {
-      body_set.push_back(new_body);     // Add body to master list
+      body_set.push_back(new_body);          // Add body to master list
+      TestBodySize(new_body);                // Keep track of largest body seen.
+      if (data_active) PlaceBody(new_body);  // Add new body to a sector (if active).
       return *this;
     }
 
@@ -95,6 +136,9 @@ namespace emp {
     Surface & Clear() {
       data_active = false;
       body_set.resize(0);
+      sectors.resize(0);
+      max_radius = 0.0;
+      num_sectors = 0;
       return *this;
     }
 
