@@ -30,7 +30,7 @@
 #ifndef EMP_WEB_BUTTON_H
 #define EMP_WEB_BUTTON_H
 
-
+#include "init.h"
 #include "Widget.h"
 
 namespace emp {

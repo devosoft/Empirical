@@ -23,6 +23,7 @@
 
 #include "../base/vector.h"
 #include "../meta/type_traits.h"
+#include "math.h"
 
 namespace emp {
 

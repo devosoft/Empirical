@@ -19,6 +19,7 @@
 
 #include "../base/assert.h"
 #include "../meta/reflection.h"
+#include "../tools/Random.h"
 
 namespace emp {
 
