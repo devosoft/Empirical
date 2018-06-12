@@ -40,7 +40,6 @@ namespace emp {
     // Data tracking the current bodies on this surface.
     bool data_active;                 // Are we trying to keep data up-to-date?
     double max_radius;                // Largest radius of any body.
-    size_t max_count;                 // How many bodies have the max radius?
     size_t num_cols;                  // How many cols of sectors are there?
     size_t num_rows;                  // How many rows of sectors are there?
     size_t num_sectors;               // How many total sectors are there?
@@ -146,36 +145,35 @@ namespace emp {
 
 
 
-    // The following function will test pairs of collisions and run the passed-in function
-    // on pairs of objects that *may* collide.
+    // The following function will test all relevant pairs of bodies and run the passed-in
+    // function on those objects that overlap.
 
-    void TestCollisions(std::function<bool(BODY_TYPE &, BODY_TYPE &)> collide_fun) {
-      emp_assert(collide_fun);
+    void FindOverlaps(std::function<bool(body_t &, body_t &)> overlap_fun) {
+      emp_assert(overlap_fun);
 
-      // Find the size of the largest body to determine minimum sector size.
-      double max_radius = 0.0;
-      for (auto body : body_set) {
-        if (body->GetRadius() > max_radius) max_radius = body->GetRadius();
+      Activate();  // Make sure data structures are setup.
+
+      // Loop through all of the sectors to identify collisions.
+      for (size_t sector_id = 0; sector_id < num_sectors; sector_id++) {
+        const auto & cur_sector = sectors[sector_id];
+
+        // Loop through all bodies in this sector
+        for (size_t body1_id = 0; body1_id < cur_sector.size(); body1_id++) {
+          const auto & body1 = *cur_sector[body1_id];
+
+          // Compare against the bodies before this one in this sector.
+          for (size_t body2_id = 0; body2_id < body1_id; body2_id++) {
+            const auto & body2 = *cur_sector[body2_id];
+            const Point dist = body1.GetCenter() - body2.GetCenter();
+            const double sqr_dist = dist.SquareMagnitude();
+            const double total_radius = body1.GetRadius() + body2.GetRadius();
+            const double sqr_radius = total_radius * total_radius;
+            if (sqr_dist < sqr_radius) overlap_fun(body1, body2);
+          }
+        }
       }
 
-      // Figure out the actual number of sectors to use (currently no more than 1024).
-      const int num_cols = std::min<int>((int)(max_pos.GetX() / (max_radius * 2.0)), 32);
-      const int num_rows = std::min<int>((int)(max_pos.GetY() / (max_radius * 2.0)), 32);
-      const int max_col = num_cols-1;
-      const int max_row = num_rows-1;
-
-      const int num_sectors = num_cols * num_rows;
-      const double sector_width = max_pos.GetX() / (double) num_cols;
-      const double sector_height = max_pos.GetY() / (double) num_rows;
-
-      emp::vector< emp::vector<Ptr<BODY_TYPE>> > sector_set(num_sectors);
-
-
-
-      int hit_count = 0;
-      int test_count = 0;
-
-      // Loop through all of the bodies on this surface placing them in sectors and testing for
+      // Loop through all of the bodies on this surface and test for
       // collisions with other bodies already in nearby sectors.
       for (auto body : body_set) {
         emp_assert(body);
