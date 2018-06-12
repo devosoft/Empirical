@@ -19,6 +19,7 @@
 #ifndef EMP_SURFACE_H
 #define EMP_SURFACE_H
 
+#include <algorithm>
 #include <functional>
 
 #include "../base/Ptr.h"
@@ -33,7 +34,7 @@ namespace emp {
   public:
     using body_t = BODY_TYPE;
     using body_set_t = emp::vector<Ptr<body_t>>;
-    using overlap_fun_t = std::function<bool(body_t &, body_t &)>;
+    using overlap_fun_t = std::function<void(body_t &, body_t &)>;
   protected:
     const Point max_pos;     // Lower-left corner of the surface.
     body_set_t body_set;     // Set of all bodies on surface
@@ -102,8 +103,8 @@ namespace emp {
       const double max_diameter = max_radius * 2.0;
       emp_assert(max_diameter < max_pos.GetX());  // Surface must be bigger than biggest body
       emp_assert(max_diameter < max_pos.GetY());
-      num_cols = std::min(max_pos.GetX()/max_diameter, 32);
-      num_rows = std::min(max_pos.GetY()/max_diameter, 32);
+      num_cols = (size_t) std::min(max_pos.GetX()/max_diameter, 32.0);
+      num_rows = (size_t) std::min(max_pos.GetY()/max_diameter, 32.0);
 
       num_sectors = num_cols * num_rows;
       sector_width = max_pos.GetX() / (double) num_cols;
@@ -112,7 +113,7 @@ namespace emp {
       SetupSectors();   // Now that we know the sizes, we can initialize sectors.
 
       // Put all of the bodies into sectors
-      for (Ptr<body_t> body : body_set) PlaceBody();
+      for (Ptr<body_t> body : body_set) PlaceBody(body);
 
       data_active = true;
     }
@@ -154,9 +155,9 @@ namespace emp {
     // Determine if a body overlaps with any others in a specified sector.
     inline void FindSectorOverlaps(body_t & body1, size_t sector_id,
                                    const overlap_fun_t & overlap_fun) {
-      const auto & sector = sectors[sector_id];
+      auto & sector = sectors[sector_id];
       for (size_t body2_id = 0; body2_id < sector.size(); body2_id++){
-        body_t & body2 = sector[body2_id];
+        body_t & body2 = *sector[body2_id];
         if (TestOverlap(body1, body2)) overlap_fun(body1, body2);
       }
     }
@@ -171,7 +172,7 @@ namespace emp {
 
       // Loop through all of the sectors to identify collisions.
       for (size_t sector_id = 0; sector_id < num_sectors; sector_id++) {
-        const auto & cur_sector = sectors[sector_id];
+        auto & cur_sector = sectors[sector_id];
 
         const size_t sector_col = sector_id % num_cols;
         const size_t sector_row = sector_id / num_cols;
@@ -183,11 +184,11 @@ namespace emp {
 
         // Loop through all bodies in this sector
         for (size_t body1_id = 0; body1_id < cur_sector.size(); body1_id++) {
-          const auto & body1 = *cur_sector[body1_id];
+          auto & body1 = *cur_sector[body1_id];
 
           // Compare against the bodies before this one in this sector.
           for (size_t body2_id = 0; body2_id < body1_id; body2_id++) {
-            const auto & body2 = *cur_sector[body2_id];
+            auto & body2 = *cur_sector[body2_id];
             if (TestOverlap(body1, body2)) overlap_fun(body1, body2);
           }
 
