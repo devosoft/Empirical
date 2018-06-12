@@ -75,8 +75,8 @@ namespace emp {
     // Place an active body into a sector.
     inline void PlaceBody(Ptr<body_t> body) {
       // Where is the current body?
-      const double body_x = body->GetCenter().GetX()
-      const double body_y = body->GetCenter().GetY()
+      const double body_x = body->GetCenter().GetX();
+      const double body_y = body->GetCenter().GetY();
 
       // Make sure the current body is in the sectors.
       emp_assert(body_x >= 0.0 && body_x < max_pos.GetX());
@@ -90,8 +90,8 @@ namespace emp {
       const size_t cur_row = (size_t) sector_y;
       const size_t cur_sector = cur_col + cur_row * num_cols;
 
-      emp_assert(cur_sector < sector_set.size());
-      sector_set[cur_sector].push_back(body);
+      emp_assert(cur_sector < sectors.size());
+      sectors[cur_sector].push_back(body);
     }
 
     // Cleanup all of the data and mark the data as active.
@@ -156,6 +156,7 @@ namespace emp {
                                    const overlap_fun_t & overlap_fun) {
       const auto & sector = sectors[sector_id];
       for (size_t body2_id = 0; body2_id < sector.size(); body2_id++){
+        body_t & body2 = sector[body2_id];
         if (TestOverlap(body1, body2)) overlap_fun(body1, body2);
       }
     }
