@@ -33,6 +33,7 @@ namespace emp {
   public:
     using body_t = BODY_TYPE;
     using body_set_t = emp::vector<Ptr<body_t>>;
+    using overlap_fun_t = std::function<bool(body_t &, body_t &)>;
   protected:
     const Point max_pos;     // Lower-left corner of the surface.
     body_set_t body_set;     // Set of all bodies on surface
@@ -141,14 +142,28 @@ namespace emp {
       return *this;
     }
 
+    // Determine if two bodies overlap.
+    static inline bool TestOverlap(body_t & body1, body_t & body2) {
+      const Point xy_dist = body1.GetCenter() - body2.GetCenter();
+      const double sqr_dist = xy_dist.SquareMagnitude();
+      const double total_radius = body1.GetRadius() + body2.GetRadius();
+      const double sqr_radius = total_radius * total_radius;
+      return (sqr_dist < sqr_radius);
+    }
 
-
-
+    // Determine if a body overlaps with any others in a specified sector.
+    inline void FindSectorOverlaps(body_t & body1, size_t sector_id,
+                                   const overlap_fun_t & overlap_fun) {
+      const auto & sector = sectors[sector_id];
+      for (size_t body2_id = 0; body2_id < sector.size(); body2_id++){
+        if (TestOverlap(body1, body2)) overlap_fun(body1, body2);
+      }
+    }
 
     // The following function will test all relevant pairs of bodies and run the passed-in
     // function on those objects that overlap.
 
-    void FindOverlaps(std::function<bool(body_t &, body_t &)> overlap_fun) {
+    void FindOverlaps(const overlap_fun_t & overlap_fun) {
       emp_assert(overlap_fun);
 
       Activate();  // Make sure data structures are setup.
@@ -157,6 +172,14 @@ namespace emp {
       for (size_t sector_id = 0; sector_id < num_sectors; sector_id++) {
         const auto & cur_sector = sectors[sector_id];
 
+        const size_t sector_col = sector_id % num_cols;
+        const size_t sector_row = sector_id / num_cols;
+        const bool left_ok = (sector_col > 0);
+        const bool up_ok = (sector_row > 0);
+        const bool ul_ok = left_ok && up_ok;
+        const bool ur_ok = up_ok && (sector_col < num_cols - 1);
+        const size_t ul_sector_id = sector_id - num_cols - 1;
+
         // Loop through all bodies in this sector
         for (size_t body1_id = 0; body1_id < cur_sector.size(); body1_id++) {
           const auto & body1 = *cur_sector[body1_id];
@@ -164,48 +187,21 @@ namespace emp {
           // Compare against the bodies before this one in this sector.
           for (size_t body2_id = 0; body2_id < body1_id; body2_id++) {
             const auto & body2 = *cur_sector[body2_id];
-            const Point dist = body1.GetCenter() - body2.GetCenter();
-            const double sqr_dist = dist.SquareMagnitude();
-            const double total_radius = body1.GetRadius() + body2.GetRadius();
-            const double sqr_radius = total_radius * total_radius;
-            if (sqr_dist < sqr_radius) overlap_fun(body1, body2);
+            if (TestOverlap(body1, body2)) overlap_fun(body1, body2);
           }
+
+          if (ul_ok) FindSectorOverlaps(body1, ul_sector_id, overlap_fun);   // Test bodies to upper-left.
+          if (up_ok) FindSectorOverlaps(body1, ul_sector_id+1, overlap_fun); // Test bodies above
+          if (ur_ok) FindSectorOverlaps(body1, ul_sector_id+2, overlap_fun); // Test bodies to upper-right.
+          if (left_ok) FindSectorOverlaps(body1, sector_id-1, overlap_fun);  // Test bodies to left.
         }
-      }
-
-      // Loop through all of the bodies on this surface and test for
-      // collisions with other bodies already in nearby sectors.
-      for (auto body : body_set) {
-        emp_assert(body);
-        // Determine which sector the current body is in.
-        const int cur_col = emp::ToRange<int>((int)(body->GetCenter().GetX()/sector_width), 0, max_col);
-        const int cur_row = emp::ToRange<int>((int)(body->GetCenter().GetY()/sector_height), 0, max_row);
-
-        // See if this body may collide with any of the bodies previously put into sectors.
-        for (int i = std::max(0, cur_col-1); i <= std::min(cur_col+1, num_cols-1); i++) {
-          for (int j = std::max(0, cur_row-1); j <= std::min(cur_row+1, num_rows-1); j++) {
-            const int sector_id = i + num_cols * j;
-            if (sector_set[sector_id].size() == 0) continue;
-
-            for (auto body2 : sector_set[sector_id]) {
-              test_count++;
-              if (collide_fun(*body, *body2)) hit_count++;
-            }
-
-          }
-        }
-
-        // Add this body to the current sector for future tests to compare with.
-        const int cur_sector = cur_col + cur_row * num_cols;
-        emp_assert(cur_sector < (int) sector_set.size());
-
-        sector_set[cur_sector].push_back(body);
       }
 
       // Make sure all bodies are in a legal position on the surface.
-      for (Ptr<BODY_TYPE> cur_body : body_set) {
-        cur_body->FinalizePosition(max_pos);
-      }
+      // @CAO: Need to move to physics!
+      // for (Ptr<BODY_TYPE> cur_body : body_set) {
+      //   cur_body->FinalizePosition(max_pos);
+      // }
     }
 
   };
