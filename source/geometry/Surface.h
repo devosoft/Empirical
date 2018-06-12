@@ -124,6 +124,7 @@ namespace emp {
     double GetWidth() const { return max_pos.GetX(); }
     double GetHeight() const { return max_pos.GetY(); }
     const Point & GetMaxPosition() const { return max_pos; }
+    const body_set_t & GetBodySet() const { return body_set; }
 
     /// Add a single body.
     Surface & AddBody(Ptr<body_t> new_body) {
