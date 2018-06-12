@@ -11,6 +11,9 @@
 #ifndef EMP_VECTOR_UTILS_H
 #define EMP_VECTOR_UTILS_H
 
+#include <algorithm>
+#include <functional>
+
 #include "../base/vector.h"
 
 namespace emp {

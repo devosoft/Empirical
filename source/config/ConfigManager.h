@@ -28,6 +28,8 @@
 #include <string>
 #include <sstream>
 
+#include "../base/errors.h"
+
 namespace emp {
 
   class ConfigManager_Base {

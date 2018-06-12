@@ -19,6 +19,7 @@
 #define EMP_VALSORT_MAP_H
 
 #include <map>
+#include <set>
 
 #include "../base/vector.h"
 
