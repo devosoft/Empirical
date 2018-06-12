@@ -48,7 +48,7 @@ int main()
 {
   emp::Random random;
   emp::Surface<TestBody> surface({1000, 1000});
-  emp::vector<TestBody> bodies(10);
+  emp::vector<TestBody> bodies(20);
 
   size_t id = 0;  
   for (auto & body : bodies) {
@@ -57,5 +57,20 @@ int main()
     surface.AddBody(&body);
   }
 
+  std::cout << "---- surface results ----" << std::endl;
   surface.FindOverlaps(PrintOverlap);
+
+  std::cout << "\n---- brute force ----" << std::endl;
+  for (size_t id1 = 1; id1 < bodies.size(); id1++) {
+    auto & body1 = bodies[id1];
+    for (size_t id2 = 0; id2 < id1; id2++) {
+      auto & body2 = bodies[id2];
+      double radius_sum = body1.GetRadius() + body2.GetRadius();
+      if (body1.GetCenter().Distance(body2.GetCenter()) < radius_sum) {
+        PrintOverlap(body1, body2);
+      }
+    }
+  }
+
+  std::cout << std::endl;
 }
