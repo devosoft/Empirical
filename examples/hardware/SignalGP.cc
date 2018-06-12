@@ -75,6 +75,10 @@ int main() {
   hw16_1.SetMaxCores(HW_MAX_THREADS);
   hw16_1.SetMaxCallDepth(HW_MAX_CALL_DEPTH);  
 
+  hw16_2.SetMinBindThresh(HW_MIN_SIM_THRESH);
+  hw16_2.SetMaxCores(HW_MAX_THREADS);
+  hw16_2.SetMaxCallDepth(HW_MAX_CALL_DEPTH);  
+  
   // - We'll setup a hardware trait that will help us identify which hardware is which. 
   const size_t TRAIT_IDX__ID = 0;
   hw16_1.SetTrait(TRAIT_IDX__ID, 1);
