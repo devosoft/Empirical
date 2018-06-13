@@ -1,5 +1,5 @@
 //  This file is part of Project Name
-//  Copyright (C) Michigan State University, 2017.
+//  Copyright (C) Michigan State University, 2018.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include "web/web.h"
