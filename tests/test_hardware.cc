@@ -1,8 +1,11 @@
 #define CATCH_CONFIG_MAIN
 #include "third-party/Catch/single_include/catch.hpp"
 
+#include <unordered_set>
+
 #include "base/Ptr.h"
 #include "hardware/EventDrivenGP.h"
+#include "hardware/signalgp_utils.h"
 #include "hardware/InstLib.h"
 #include "hardware/EventLib.h"
 #include "tools/Random.h"
@@ -209,3 +212,64 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h')", "[hardware]")
   }
 }
 
+TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPTag", "[hardware]") {
+  // Generate some random tags w/no guarantee of uniqueness
+
+  constexpr size_t RANDOM_SEED = 1;
+  emp::Random random(RANDOM_SEED);
+
+  // Generate a bunch of big random tags. No uniqueness guarantees. 
+  for (size_t i = 0; i < 100; ++i) auto tag = emp::GenRandSignalGPTag<1024>(random); 
+
+  std::unordered_set<uint32_t> uset; 
+  
+  // Enumerate all 2-bit tags
+  emp::vector<emp::BitSet<2>> tags2;
+  uset.clear();
+  std::cout << "All two-bit tags: " << std::endl;
+  for (size_t i = 0; i < emp::Pow2(2); ++i) {
+    tags2.emplace_back(emp::GenRandSignalGPTag<2>(random, tags2));
+    uset.emplace(tags2.back().GetUInt(0)); 
+    std::cout << "  "; 
+    tags2.back().Print(); 
+    std::cout << " : " << tags2.back().GetUInt(0) << std::endl;
+  }
+  REQUIRE(tags2.size() == emp::Pow2(2));
+  REQUIRE(uset.size() == emp::Pow2(2));
+  for (size_t i = 0; i < emp::Pow2(2); ++i) REQUIRE(emp::Has(uset, i));
+  
+  // Enumerate all 4-bit tags
+  emp::vector<emp::BitSet<4>> tags4;
+  uset.clear();
+  std::cout << "All four-bit tags: " << std::endl;
+  for (size_t i = 0; i < emp::Pow2(4); ++i) {
+    tags4.emplace_back(emp::GenRandSignalGPTag<4>(random, tags4));
+    uset.emplace(tags4.back().GetUInt(0));
+    std::cout << "  "; 
+    tags4.back().Print(); 
+    std::cout << " : " << tags4.back().GetUInt(0) << std::endl;
+  }
+  REQUIRE(tags4.size() == emp::Pow2(4));
+  REQUIRE(uset.size() == emp::Pow2(4));
+  for (size_t i = 0; i < emp::Pow2(4); ++i) REQUIRE(emp::Has(uset, i));
+
+  // Generate a bunch of 16-bit tags. 
+  emp::vector<emp::BitSet<16>> tags16;
+  for (size_t k = 0; k < 100; ++k) {
+    uset.clear();
+    tags16.clear();
+    for (size_t i = 0; i < 1000; ++i) {
+      tags16.emplace_back(emp::GenRandSignalGPTag<16>(random, tags16));
+      uset.emplace(tags16.back().GetUInt(0));
+    }
+    REQUIRE(uset.size() == 1000);
+  }  
+}
+
+// TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPTags", "[hardware]") {
+  
+// }
+
+// TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPInst", "[hardware]") {
+  
+// }
