@@ -213,16 +213,14 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h')", "[hardware]")
 }
 
 TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPTag", "[hardware]") {
-  // Generate some random tags w/no guarantee of uniqueness
-
   constexpr size_t RANDOM_SEED = 1;
   emp::Random random(RANDOM_SEED);
+
+  std::unordered_set<uint32_t> uset; // Will be used to double-check uniqueness. 
 
   // Generate a bunch of big random tags. No uniqueness guarantees. 
   for (size_t i = 0; i < 100; ++i) auto tag = emp::GenRandSignalGPTag<1024>(random); 
 
-  std::unordered_set<uint32_t> uset; 
-  
   // Enumerate all 2-bit tags
   emp::vector<emp::BitSet<2>> tags2;
   uset.clear();
@@ -266,9 +264,58 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPTag", "[har
   }  
 }
 
-// TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPTags", "[hardware]") {
-  
-// }
+TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPTags", "[hardware]") {
+  constexpr size_t RANDOM_SEED = 1;
+  emp::Random random(RANDOM_SEED);
+
+  std::unordered_set<uint32_t> uset; // Will be used to double-check uniqueness. 
+
+  // Generate lots of small tags with no guarantees on uniqueness.
+  auto small_tags = emp::GenRandSignalGPTags<2>(random, 1000);
+  REQUIRE(small_tags.size() == 1000);
+  // Generate lots of large tags with no guarantees on uniqueness.
+  auto big_tags = emp::GenRandSignalGPTags<1024>(random, 1000);
+  REQUIRE(big_tags.size() == 1000);
+
+  // Use generator to enumerate all 2-bit tags.
+  auto tags2 = emp::GenRandSignalGPTags<2>(random, emp::Pow2(2), true);
+  uset.clear();
+  for (size_t i = 0; i < tags2.size(); ++i) {
+    uset.emplace(tags2[i].GetUInt(0));
+  }
+  REQUIRE(tags2.size() == emp::Pow2(2));
+  REQUIRE(uset.size() == emp::Pow2(2));
+  for (size_t i = 0; i < emp::Pow2(2); ++i) REQUIRE(emp::Has(uset, i));
+
+  // Use generator to enumerate all 4-bit tags.
+  auto tags4 = emp::GenRandSignalGPTags<4>(random, emp::Pow2(4), true);
+  uset.clear();
+  for (size_t i = 0; i < tags4.size(); ++i) {
+    uset.emplace(tags4[i].GetUInt(0));
+  }
+  REQUIRE(tags4.size() == emp::Pow2(4));
+  REQUIRE(uset.size() == emp::Pow2(4));
+  for (size_t i = 0; i < emp::Pow2(4); ++i) REQUIRE(emp::Has(uset, i));
+
+  // Generate a bunch of 8-bit tags (50% of the tag-space). 
+  // Check for uniqueness. 
+  auto tags8 = emp::GenRandSignalGPTags<8>(random, 128, true);
+  uset.clear();
+  for (size_t i = 0; i < tags8.size(); ++i) uset.emplace(tags8[i].GetUInt(0));
+  REQUIRE(tags8.size() == 128);
+  REQUIRE(uset.size() == 128);
+
+  // Generate a bunch of 8-bit tags using previously generated tag as 
+  // reserved tag-space. Check for proper uniqueness. 
+  for (size_t i = 0; i < 100; ++i) {
+    std::unordered_set<uint32_t> temp_set(uset);
+    auto tags = emp::GenRandSignalGPTags<8>(random, 64, true, tags8);
+    REQUIRE(tags.size() == 64);
+    for (size_t t = 0; t < tags.size(); ++t) temp_set.emplace(tags[t].GetUInt(0));
+    REQUIRE(temp_set.size() == 128+64);
+  }
+
+}
 
 // TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPInst", "[hardware]") {
   
