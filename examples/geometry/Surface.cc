@@ -13,12 +13,12 @@
 #include "tools/string_utils.h"
 
 class TestBody {
-private:
+protected:
   emp::Point center;
   double radius;
   size_t id;
 public:
-  TestBody(emp::Point _center={0,0}, double _radius=1.0) : center(_center), radius(_radius) { ; }
+  TestBody(emp::Point _center={0,0}, double _radius=1.0) : center(_center), radius(_radius), id(0) { ; }
   ~TestBody() { ; }
 
   emp::Point GetCenter() const { return center; }
