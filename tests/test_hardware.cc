@@ -354,3 +354,125 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPInst", "[ha
     REQUIRE(inst.id < inst_lib.GetSize());
   }
 }
+
+TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPFunction", "[hardware]") {
+  using hardware_t = emp::EventDrivenGP_AW<16>;  // SignalGP hardware with 16-bit tags.
+  using inst_lib_t = emp::InstLib<hardware_t>;   // Instruction library 
+  using inst_t = typename hardware_t::Instruction;
+  using fun_t = typename hardware_t::Function;
+
+  constexpr int RANDOM_SEED = 1;
+  
+  constexpr size_t MIN_ARG_VAL = 0;
+  constexpr size_t MAX_ARG_VAL = 15;
+  constexpr size_t MIN_INST_CNT = 1;
+  constexpr size_t MAX_INST_CNT = 32;
+
+  emp::Random random(RANDOM_SEED);
+
+  // Build a limited instruction library. 
+  inst_lib_t inst_lib;
+  inst_lib.AddInst("Inc", hardware_t::Inst_Inc, 1, "Increment value in local memory Arg1");
+  inst_lib.AddInst("Dec", hardware_t::Inst_Dec, 1, "Decrement value in local memory Arg1");
+  inst_lib.AddInst("Not", hardware_t::Inst_Not, 1, "Logically toggle value in local memory Arg1");
+  inst_lib.AddInst("TestLess", hardware_t::Inst_TestLess, 3, "Local memory: Arg3 = (Arg1 < Arg2)");
+  inst_lib.AddInst("If", hardware_t::Inst_If, 1, "Local memory: If Arg1 != 0, proceed; else, skip block.", emp::ScopeType::BASIC, 0, {"block_def"});
+  inst_lib.AddInst("While", hardware_t::Inst_While, 1, "Local memory: If Arg1 != 0, loop; else, skip block.", emp::ScopeType::BASIC, 0, {"block_def"});
+  inst_lib.AddInst("Close", hardware_t::Inst_Close, 0, "Close current block if there is a block to close.", emp::ScopeType::BASIC, 0, {"block_close"});
+  inst_lib.AddInst("Break", hardware_t::Inst_Break, 0, "Break out of current block.");
+  inst_lib.AddInst("Call", hardware_t::Inst_Call, 0, "Call function that best matches call affinity.");
+  inst_lib.AddInst("Return", hardware_t::Inst_Return, 0, "Return from current function if possible.");
+  inst_lib.AddInst("SetMem", hardware_t::Inst_SetMem, 2, "Local memory: Arg1 = numerical value of Arg2");
+  inst_lib.AddInst("Fork", hardware_t::Inst_Fork, 0, "Fork a new thread. Local memory contents of callee are loaded into forked thread's input memory.");
+
+  // Generate a bunch of random functions. 
+  // Check that constraints weren't violated. 
+  for (size_t f = 0; f < 10000; ++f) {
+    fun_t fun(emp::GenRandSignalGPFunction(random, inst_lib, MIN_INST_CNT, MAX_INST_CNT, MIN_ARG_VAL, MAX_ARG_VAL));
+    REQUIRE(fun.GetSize() >= MIN_INST_CNT);
+    REQUIRE(fun.GetSize() <= MAX_INST_CNT);
+    for (size_t i = 0; i < fun.GetSize(); ++i) {
+      inst_t & inst = fun[i];
+      REQUIRE(inst.args[0] >= MIN_ARG_VAL);
+      REQUIRE(inst.args[0] <= MAX_ARG_VAL);
+      REQUIRE(inst.args[1] >= MIN_ARG_VAL);
+      REQUIRE(inst.args[1] <= MAX_ARG_VAL);
+      REQUIRE(inst.args[2] >= MIN_ARG_VAL);
+      REQUIRE(inst.args[2] <= MAX_ARG_VAL);
+      REQUIRE(inst.id < inst_lib.GetSize());
+    }
+  }
+}
+
+TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPProgram", "[hardware]") {
+  using hardware_t = emp::EventDrivenGP_AW<16>;  // SignalGP hardware with 16-bit tags.
+  using inst_lib_t = emp::InstLib<hardware_t>;   // Instruction library 
+  using event_lib_t = emp::EventLib<hardware_t>;
+  using inst_t = typename hardware_t::Instruction;
+  using fun_t = typename hardware_t::Function;
+  using program_t = typename hardware_t::Program;
+
+  constexpr int RANDOM_SEED = 1;
+  
+  constexpr size_t MIN_ARG_VAL = 0;
+  constexpr size_t MAX_ARG_VAL = 15;
+  constexpr size_t MIN_INST_CNT = 1;
+  constexpr size_t MAX_INST_CNT = 32;
+  constexpr size_t MIN_FUN_CNT = 1;
+  constexpr size_t MAX_FUN_CNT = 32;
+
+  constexpr double HW_MIN_SIM_THRESH = 0.0;
+  constexpr size_t HW_MAX_THREADS = 32;
+  constexpr size_t HW_MAX_CALL_DEPTH = 128;
+
+  emp::Random random(RANDOM_SEED);
+
+  // Build a limited instruction library. 
+  inst_lib_t inst_lib;
+  inst_lib.AddInst("Inc", hardware_t::Inst_Inc, 1, "Increment value in local memory Arg1");
+  inst_lib.AddInst("Dec", hardware_t::Inst_Dec, 1, "Decrement value in local memory Arg1");
+  inst_lib.AddInst("Not", hardware_t::Inst_Not, 1, "Logically toggle value in local memory Arg1");
+  inst_lib.AddInst("TestLess", hardware_t::Inst_TestLess, 3, "Local memory: Arg3 = (Arg1 < Arg2)");
+  inst_lib.AddInst("If", hardware_t::Inst_If, 1, "Local memory: If Arg1 != 0, proceed; else, skip block.", emp::ScopeType::BASIC, 0, {"block_def"});
+  inst_lib.AddInst("While", hardware_t::Inst_While, 1, "Local memory: If Arg1 != 0, loop; else, skip block.", emp::ScopeType::BASIC, 0, {"block_def"});
+  inst_lib.AddInst("Close", hardware_t::Inst_Close, 0, "Close current block if there is a block to close.", emp::ScopeType::BASIC, 0, {"block_close"});
+  inst_lib.AddInst("Break", hardware_t::Inst_Break, 0, "Break out of current block.");
+  inst_lib.AddInst("Call", hardware_t::Inst_Call, 0, "Call function that best matches call affinity.");
+  inst_lib.AddInst("Return", hardware_t::Inst_Return, 0, "Return from current function if possible.");
+  inst_lib.AddInst("SetMem", hardware_t::Inst_SetMem, 2, "Local memory: Arg1 = numerical value of Arg2");
+  inst_lib.AddInst("Fork", hardware_t::Inst_Fork, 0, "Fork a new thread. Local memory contents of callee are loaded into forked thread's input memory.");
+
+  // We'll use some SignalGP hardware to test randomly generated programs. 
+  event_lib_t event_lib;
+  hardware_t hw(&inst_lib, &event_lib, &random);
+  hw.SetMinBindThresh(HW_MIN_SIM_THRESH);
+  hw.SetMaxCores(HW_MAX_THREADS);
+  hw.SetMaxCallDepth(HW_MAX_CALL_DEPTH);  
+
+  // Generate a bunch of random programs. 
+  // Check that constraints weren't violated.
+  for (size_t p = 0; p < 1000; ++p) {
+    program_t program(emp::GenRandSignalGPProgram(random, inst_lib, MIN_FUN_CNT, MAX_FUN_CNT, MIN_INST_CNT, MAX_INST_CNT, MIN_ARG_VAL, MAX_ARG_VAL));
+    REQUIRE(program.GetSize() >= MIN_FUN_CNT);
+    REQUIRE(program.GetSize() <= MAX_FUN_CNT);
+    for (size_t f = 0; f < program.GetSize(); ++f) {
+      fun_t & fun = program[f];
+      REQUIRE(fun.GetSize() >= MIN_INST_CNT);
+      REQUIRE(fun.GetSize() <= MAX_INST_CNT);
+      for (size_t i = 0; i < fun.GetSize(); ++i) {
+        inst_t & inst = fun[i];
+        REQUIRE(inst.args[0] >= MIN_ARG_VAL);
+        REQUIRE(inst.args[0] <= MAX_ARG_VAL);
+        REQUIRE(inst.args[1] >= MIN_ARG_VAL);
+        REQUIRE(inst.args[1] <= MAX_ARG_VAL);
+        REQUIRE(inst.args[2] >= MIN_ARG_VAL);
+        REQUIRE(inst.args[2] <= MAX_ARG_VAL);
+        REQUIRE(inst.id < inst_lib.GetSize());
+      }
+    }
+    // Run program on hardware.
+    hw.Reset();
+    hw.SetProgram(program);
+    hw.Process(128);
+  }
+}
