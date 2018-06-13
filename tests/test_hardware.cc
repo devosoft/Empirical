@@ -317,6 +317,40 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPTags", "[ha
 
 }
 
-// TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPInst", "[hardware]") {
-  
-// }
+TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPInst", "[hardware]") {
+  using hardware_t = emp::EventDrivenGP_AW<16>;  // SignalGP hardware with 16-bit tags.
+  using inst_lib_t = emp::InstLib<hardware_t>;   // Instruction library 
+  using inst_t = hardware_t::Instruction;
+
+  constexpr int RANDOM_SEED = 1;
+  constexpr size_t MIN_ARG_VAL = 0;
+  constexpr size_t MAX_ARG_VAL = 15;
+  emp::Random random(RANDOM_SEED);
+
+  // Build a limited instruction library. 
+  inst_lib_t inst_lib;
+  inst_lib.AddInst("Inc", hardware_t::Inst_Inc, 1, "Increment value in local memory Arg1");
+  inst_lib.AddInst("Dec", hardware_t::Inst_Dec, 1, "Decrement value in local memory Arg1");
+  inst_lib.AddInst("Not", hardware_t::Inst_Not, 1, "Logically toggle value in local memory Arg1");
+  inst_lib.AddInst("TestLess", hardware_t::Inst_TestLess, 3, "Local memory: Arg3 = (Arg1 < Arg2)");
+  inst_lib.AddInst("If", hardware_t::Inst_If, 1, "Local memory: If Arg1 != 0, proceed; else, skip block.", emp::ScopeType::BASIC, 0, {"block_def"});
+  inst_lib.AddInst("While", hardware_t::Inst_While, 1, "Local memory: If Arg1 != 0, loop; else, skip block.", emp::ScopeType::BASIC, 0, {"block_def"});
+  inst_lib.AddInst("Close", hardware_t::Inst_Close, 0, "Close current block if there is a block to close.", emp::ScopeType::BASIC, 0, {"block_close"});
+  inst_lib.AddInst("Break", hardware_t::Inst_Break, 0, "Break out of current block.");
+  inst_lib.AddInst("Call", hardware_t::Inst_Call, 0, "Call function that best matches call affinity.");
+  inst_lib.AddInst("Return", hardware_t::Inst_Return, 0, "Return from current function if possible.");
+  inst_lib.AddInst("SetMem", hardware_t::Inst_SetMem, 2, "Local memory: Arg1 = numerical value of Arg2");
+  inst_lib.AddInst("Fork", hardware_t::Inst_Fork, 0, "Fork a new thread. Local memory contents of callee are loaded into forked thread's input memory.");
+
+  // Generate a bunch of random instructions, check that they conform with requested bounds. 
+  for (size_t i = 0; i < 10000; ++i) {
+    inst_t inst(emp::GenRandSignalGPInst(random, inst_lib, MIN_ARG_VAL, MAX_ARG_VAL));
+    REQUIRE(inst.args[0] >= MIN_ARG_VAL);
+    REQUIRE(inst.args[0] <= MAX_ARG_VAL);
+    REQUIRE(inst.args[1] >= MIN_ARG_VAL);
+    REQUIRE(inst.args[1] <= MAX_ARG_VAL);
+    REQUIRE(inst.args[2] >= MIN_ARG_VAL);
+    REQUIRE(inst.args[2] <= MAX_ARG_VAL);
+    REQUIRE(inst.id < inst_lib.GetSize());
+  }
+}
