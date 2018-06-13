@@ -10,9 +10,13 @@
 #ifndef EMP_EVO_WORLD_STRUCTURE_H
 #define EMP_EVO_WORLD_STRUCTURE_H
 
+#include <set>
+
 #include "../base/assert.h"
 #include "../base/vector.h"
+#include "../base/array.h"
 #include "../data/Trait.h"
+#include "../tools/math.h"
 #include "../tools/Random.h"
 #include "../tools/vector_utils.h"
 
