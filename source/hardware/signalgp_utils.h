@@ -7,6 +7,11 @@
  *  @brief Helper functions for working with SignalGP virtual hardware/programs.
  *  
  *  @todo Generate random function/program/instruction/tag (as separate helper functions)
+      - [x] Tag
+      - [x] Tags
+      - [ ] Instruction
+      - [ ] Function
+      - [ ] Program
  *  @todo Generate random tags (w/uniqueness)
  *  @todo Mutator class
  *  @todo tests
@@ -29,7 +34,7 @@ namespace emp {
   /// @param rnd - Random number generator to use when generating a random tag. 
   /// @param unique_from - Other tags that the tag being generated should be unique with respect to. 
   template<size_t TAG_WIDTH>
-  BitSet<TAG_WIDTH> GenRandTag(emp::Random & rnd, emp::vector<BitSet<TAG_WIDTH>> & unique_from=emp::vector<BitSet<TAG_WIDTH>>()) {
+  BitSet<TAG_WIDTH> GenRandSignalGPTag(emp::Random & rnd, emp::vector<BitSet<TAG_WIDTH>> & unique_from=emp::vector<BitSet<TAG_WIDTH>>()) {
     using tag_t = BitSet<TAG_WIDTH>;  
     emp_assert(unique_from.size() < emp::Pow2(TAG_WIDTH), "Tag width is not large enough to be able to guarantee requested number of unique tags"); 
     tag_t new_tag(rnd, 0.5); // Make a random tag.
@@ -55,7 +60,7 @@ namespace emp {
   /// @param guarantee_unique - Should generated tags be guaranteed to be unique from each other and from tags in 'unique_from'?
   /// @param unique_from - Other tags that the tag being generated should be unique with respect to. Only used if 'guarantee_unique' is true. 
   template<size_t TAG_WIDTH>
-  emp::vector<BitSet<TAG_WIDTH>> GenRandTags(emp::Random & rnd, size_t count, bool guarantee_unique=false, 
+  emp::vector<BitSet<TAG_WIDTH>> GenRandSignalGPTags(emp::Random & rnd, size_t count, bool guarantee_unique=false, 
                                              emp::vector<BitSet<TAG_WIDTH>> & unique_from=emp::vector<BitSet<TAG_WIDTH>>()) {
     using tag_t = BitSet<TAG_WIDTH>;  
     emp_assert(unique_from.size()+count < emp::Pow2(TAG_WIDTH), "Tag width is not large enough to be able to guarantee requested number of unique tags"); 
@@ -81,6 +86,26 @@ namespace emp {
     }
     return new_tags;
   }
+
+  /// Generate a random SignalGP instruction (templated off of tag width). 
+  /// @param rnd - Random number generator to use when generating a random tag. 
+  /// @param inst_lib - Instruction library used to generate the instruction (instruction will be valid within instruction library)
+  /// @param min_arg_val - Mininum value for an instruction argument.
+  /// @param max_arg_val - Maximum value for an instruction argument.
+  template<size_t TAG_WIDTH>
+  EventDrivenGP_AW<TAG_WIDTH>::Instruction GenRandSignalGPInst(emp::Random & rnd, emp::InstLib<EventDrivenGP_AW<TAG_WIDTH>> & inst_lib, size_t min_arg_val=0, size_t max_arg_val=15) {
+    emp_assert(inst_lib.GetSize() > 0, "Instruction library must have at least one instruction definition before being used to generate a random instruction.");
+    using inst_t = EventDrivenGP_AW<TAG_WIDTH>::Instruction;
+    using tag_t = BitSet<TAG_WIDTH>;
+    return inst_t(rnd.GetUInt(inst_lib.GetSize()),
+                  rnd.GetInt(min_arg_val, max_arg_val+1),
+                  rnd.GetInt(min_arg_val, max_arg_val+1),
+                  rnd.GetInt(min_arg_val, max_arg_val+1),
+                  tag_t(rnd, 0.5));
+                  
+  }
+
+
   
 }
 
