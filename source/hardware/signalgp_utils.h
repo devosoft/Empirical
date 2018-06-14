@@ -90,8 +90,9 @@ namespace emp {
   /// @param min_arg_val - Mininum value for an instruction argument.
   /// @param max_arg_val - Maximum value for an instruction argument.
   template<size_t TAG_WIDTH> 
-  typename EventDrivenGP_AW<TAG_WIDTH>::Instruction GenRandSignalGPInst(emp::Random & rnd, const emp::InstLib<EventDrivenGP_AW<TAG_WIDTH>> & inst_lib, size_t min_arg_val=0, size_t max_arg_val=15) {
+  typename EventDrivenGP_AW<TAG_WIDTH>::Instruction GenRandSignalGPInst(emp::Random & rnd, const emp::InstLib<EventDrivenGP_AW<TAG_WIDTH>> & inst_lib, int min_arg_val=0, int max_arg_val=15) {
     emp_assert(inst_lib.GetSize() > 0, "Instruction library must have at least one instruction definition before being used to generate a random instruction.");
+    emp_assert(min_arg_val < max_arg_val, "Minimum argument value must be less than maximum argument value to generate a number between the two.");
     using inst_t = typename EventDrivenGP_AW<TAG_WIDTH>::Instruction;
     using tag_t = BitSet<TAG_WIDTH>;
     return inst_t(rnd.GetUInt(inst_lib.GetSize()),
@@ -111,7 +112,7 @@ namespace emp {
   template<size_t TAG_WIDTH>
   typename EventDrivenGP_AW<TAG_WIDTH>::Function GenRandSignalGPFunction(emp::Random & rnd, const emp::InstLib<EventDrivenGP_AW<TAG_WIDTH>> & inst_lib, 
                                                                             size_t min_inst_cnt=1, size_t max_inst_cnt=32, 
-                                                                            size_t min_arg_val=0, size_t max_arg_val=15) {
+                                                                            int min_arg_val=0, int max_arg_val=15) {
     emp_assert(inst_lib.GetSize() > 0, "Instruction library must have at least one instruction definition before being used to generate a random instruction.");
     using fun_t = typename EventDrivenGP_AW<TAG_WIDTH>::Function;
     size_t inst_cnt = rnd.GetUInt(min_inst_cnt, max_inst_cnt+1);
@@ -133,7 +134,7 @@ namespace emp {
   typename EventDrivenGP_AW<TAG_WIDTH>::Program GenRandSignalGPProgram(emp::Random & rnd, const emp::InstLib<EventDrivenGP_AW<TAG_WIDTH>> & inst_lib, 
                                                                        size_t min_func_cnt=1, size_t max_func_cnt=16,
                                                                        size_t min_fun_len=1, size_t max_fun_len=32, 
-                                                                       size_t min_arg_val=0, size_t max_arg_val=15) {
+                                                                       int min_arg_val=0, int max_arg_val=15) {
     emp_assert(inst_lib.GetSize() > 0, "Instruction library must have at least one instruction definition before being used to generate a random instruction.");
     using program_t = typename EventDrivenGP_AW<TAG_WIDTH>::Program;
     program_t program(&inst_lib);
@@ -145,7 +146,7 @@ namespace emp {
 
   /// The SignalGPMutator struct... 
   /// NOTE: could use some feedback on this!
-  /// Question: switch the rate library to just a parameter library?
+  ///  - Not loving the inconsistency between rates and constraints at the moment. 
   template<size_t TAG_WIDTH>
   class SignalGPMutator {
   public:
@@ -183,17 +184,6 @@ namespace emp {
       MutatorDef(const std::string & _n, const mutator_fun_t & _fun, const std::string & _d) 
         : name(_n), mutator(_fun), desc(_d), last_mut_cnt(0) { ; }
     };
-
-    // -- General parameters --
-    // Program constraints
-    size_t PROG_MIN_FUNC_CNT;   ///< Minimum number of functions mutations are allowed to reduce a SignalGP program to.
-    size_t PROG_MAX_FUNC_CNT;   ///< Maximum number of functions a mutated SignalGP program can grow to. 
-    size_t PROG_MIN_FUNC_LEN;   ///< Minimum number of instructions a SignalGP function can shrink to.
-    size_t PROG_MAX_FUNC_LEN;   ///< Maximum number of instructions a SignalGP function can grow to.
-    size_t PROG_MAX_TOTAL_LEN;  ///< Maximum number of *total* instructions a SignalGP program can grow to.
-
-    int PROG_MIN_ARG_VAL;       ///< Minimum argument value a SignalGP instruction can mutate to.
-    int PROG_MAX_ARG_VAL;       ///< Maximum argument value a SignalGP instruction can mutate to.
   
   protected:
     emp::vector<MutatorParamDef> param_lib;
@@ -201,6 +191,18 @@ namespace emp {
 
     emp::vector<MutatorDef> mutator_lib;
     std::map<std::string, size_t> mutator_name_map;
+
+    // -- General SignalGP program constraints --
+    // Program constraints
+    size_t prog_min_func_cnt;   ///< Minimum number of functions mutations are allowed to reduce a SignalGP program to.
+    size_t prog_max_func_cnt;   ///< Maximum number of functions a mutated SignalGP program can grow to. 
+    size_t prog_min_func_len;   ///< Minimum number of instructions a SignalGP function can shrink to.
+    size_t prog_max_func_len;   ///< Maximum number of instructions a SignalGP function can grow to.
+    size_t prog_max_total_len;  ///< Maximum number of *total* instructions a SignalGP program can grow to. 
+
+    int prog_min_arg_val;       ///< Minimum argument value a SignalGP instruction can mutate to. 
+    int prog_max_arg_val;       ///< Maximum argument value a SignalGP instruction can mutate to.       
+
 
     // IDs to default mutate rates. 
     size_t arg_sub__per_arg__id;      ///< Rate ID for: Rate to apply substitutions to instruction arguments.
@@ -232,15 +234,15 @@ namespace emp {
                     size_t _PROG_MAX_TOTAL_LEN=256,
                     int _PROG_MIN_ARG_VAL=0,
                     int _PROG_MAX_ARG_VAL=15)
-      : PROG_MIN_FUNC_CNT(_PROG_MIN_FUNC_CNT),
-        PROG_MAX_FUNC_CNT(_PROG_MAX_FUNC_CNT),
-        PROG_MIN_FUNC_LEN(_PROG_MIN_FUNC_LEN),
-        PROG_MAX_FUNC_LEN(_PROG_MAX_FUNC_LEN),
-        PROG_MAX_TOTAL_LEN(_PROG_MAX_TOTAL_LEN),
-        PROG_MIN_ARG_VAL(_PROG_MIN_ARG_VAL),
-        PROG_MAX_ARG_VAL(_PROG_MAX_ARG_VAL),
-        param_lib(), param_name_map(),
-        mutator_lib(), mutator_name_map()
+      : param_lib(), param_name_map(),
+        mutator_lib(), mutator_name_map(),
+        prog_min_func_cnt(_PROG_MIN_FUNC_CNT),
+        prog_max_func_cnt(_PROG_MAX_FUNC_CNT),
+        prog_min_func_len(_PROG_MIN_FUNC_LEN),
+        prog_max_func_len(_PROG_MAX_FUNC_LEN),
+        prog_max_total_len(_PROG_MAX_TOTAL_LEN),
+        prog_min_arg_val(_PROG_MIN_ARG_VAL),
+        prog_max_arg_val(_PROG_MAX_ARG_VAL)
         {
           // Setup default rates. 
           arg_sub__per_arg__id = AddParam("ARG_SUB__PER_ARG", 0.005, "Rate to apply substitutions to instruction arguments.");
@@ -283,8 +285,20 @@ namespace emp {
       return GetMutator(id).last_mut_cnt;
     }
 
-    // ---------------------------------------------
-    // ---- Functions related to mutation rates ----
+    size_t GetProgMinFuncCnt() const { return prog_min_func_cnt; }
+    size_t GetProgMaxFuncCnt() const { return prog_max_func_cnt; }
+    size_t GetProgMinFuncLen() const { return prog_min_func_len; }
+    size_t GetProgMaxFuncLen() const { return prog_max_func_len; }
+    size_t GetProgMaxTotalLen() const { return prog_max_total_len; }
+    int GetProgMinArgVal() const { return prog_min_arg_val; }
+    int GetProgMaxArgVal() const { return prog_max_arg_val; }
+    void SetProgMinFuncCnt(size_t val) { prog_min_func_cnt = val; }
+    void SetProgMaxFuncCnt(size_t val) { prog_max_func_cnt = val; }
+    void SetProgMinFuncLen(size_t val) { prog_min_func_len = val; }
+    void SetProgMaxFuncLen(size_t val) { prog_max_func_len = val; }
+    void SetProgMaxTotalLen(size_t val) { prog_max_total_len = val; }
+    void SetProgMinArgVal(int val) { prog_min_arg_val = val; }
+    void SetProgMaxArgVal(int val) { prog_max_arg_val = val; }
 
     // Getters and setters for default mutation rates. 
     double ARG_SUB__PER_ARG() const { return GetParam(arg_sub__per_arg__id); }
@@ -382,8 +396,8 @@ namespace emp {
         // Should we duplicate this function?
         if (fID < orig_func_wall &&
             rnd.P(FUNC_DUP__PER_FUNC()) && 
-            program.GetSize() < PROG_MAX_FUNC_CNT && 
-            expected_prog_len + program[fID].GetSize() <= PROG_MAX_TOTAL_LEN) {
+            program.GetSize() < GetProgMaxFuncCnt() && 
+            expected_prog_len + program[fID].GetSize() <= GetProgMaxTotalLen()) {
             // Duplicate!
             program.PushFunction(program[fID]);
             expected_prog_len += program[fID].GetSize();
@@ -400,10 +414,10 @@ namespace emp {
       for (int fID = 0; fID < program.GetSize(); ++fID) {
         // Should we delete this function?
         if (rnd.P(FUNC_DEL__PER_FUNC()) &&
-            program.GetSize() > PROG_MIN_FUNC_CNT) 
+            program.GetSize() > GetProgMinFuncCnt()) 
           {
-            expected_prog_len -= program[fID].GetSize();
-            program[fID] = program[program.GetSize() - 1];
+            expected_prog_len -= program[(size_t)fID].GetSize();
+            program[(size_t)fID] = program[program.GetSize() - 1];
             program.program.resize(program.GetSize() - 1);
             ++mut_cnt;
             fID -= 1;
@@ -415,7 +429,6 @@ namespace emp {
 
     size_t DefaultMutator_FuncTag(program_t & program, emp::Random & rnd) {
       size_t mut_cnt = 0;
-      size_t expected_prog_len = program.GetInstCnt();
       // Perform function tag mutations!
       for (size_t fID = 0; fID < program.GetSize(); ++fID) {
         tag_t & tag = program[fID].GetAffinity();
@@ -442,20 +455,20 @@ namespace emp {
           const int dup_size = (int)end - (int)begin;
           const int del_size = (int)begin - (int)end;
           if (dup && 
-              (expected_prog_len + dup_size <= PROG_MAX_TOTAL_LEN) &&
-              (program[fID].GetSize() + dup_size <= PROG_MAX_FUNC_LEN)) {
+              (expected_prog_len + (size_t)dup_size <= GetProgMaxTotalLen()) &&
+              (program[fID].GetSize() + (size_t)dup_size <= GetProgMaxFuncLen())) {
             // Duplicate begin:end!
             const size_t new_size = program[fID].GetSize() + (size_t)dup_size;
             fun_t new_fun(program[fID].GetAffinity());
             for (size_t i = 0; i < new_size; ++i) {
               if (i < end) new_fun.PushInst(program[fID][i]);
-              else new_fun.PushInst(program[fID][i - dup_size]);
+              else new_fun.PushInst(program[fID][i - (size_t)dup_size]);
             }
             program[fID] = new_fun;
             ++mut_cnt;
-            expected_prog_len += dup_size;
+            expected_prog_len += (size_t)dup_size;
           } else if (del && 
-                     (program[fID].GetSize() - del_size) >= PROG_MIN_FUNC_LEN) {
+                     (program[fID].GetSize() - (size_t)del_size) >= GetProgMinFuncLen()) {
             // Delete end:begin!
             fun_t new_fun(program[fID].GetAffinity());
             for (size_t i = 0; i < end; ++i)
@@ -464,7 +477,7 @@ namespace emp {
               new_fun.PushInst(program[fID][i]);
             program[fID] = new_fun;
             ++mut_cnt;
-            expected_prog_len -= del_size;
+            expected_prog_len -= (size_t)del_size;
           }
         }
       }
@@ -473,7 +486,6 @@ namespace emp {
 
     size_t DefaultMutator_Subs(program_t & program, emp::Random & rnd) {
       size_t mut_cnt = 0;
-      size_t expected_prog_len = program.GetInstCnt();
       // Perform single-instruction substitutions!
       for (size_t fID = 0; fID < program.GetSize(); ++fID) {
         for (size_t iID = 0; iID < program[fID].GetSize(); ++fID) {
@@ -497,7 +509,7 @@ namespace emp {
           // Mutate instruction arguments.
           for (size_t k = 0; k < hardware_t::MAX_INST_ARGS; ++k) {
             if (rnd.P(ARG_SUB__PER_ARG())) {
-              inst.args[k] = rnd.GetInt(PROG_MIN_ARG_VAL, PROG_MAX_ARG_VAL);
+              inst.args[k] = rnd.GetInt(GetProgMinArgVal(), GetProgMaxArgVal());
               ++mut_cnt;
             }
           }
@@ -510,11 +522,11 @@ namespace emp {
       size_t mut_cnt = 0;
       size_t expected_prog_len = program.GetInstCnt();
             // Perform single-instruction insertion/deletions
-      for (int fID = 0; fID < program.GetSize(); ++fID) {
+      for (size_t fID = 0; fID < program.GetSize(); ++fID) {
         fun_t new_fun(program[fID].GetAffinity());
         size_t expected_func_len = program[fID].GetSize();
         // Compute number and location of insertions.
-        const int num_ins = rnd.GetRandBinomial(program[fID].GetSize(), INST_INS__PER_INST());
+        const uint32_t num_ins = rnd.GetRandBinomial(program[fID].GetSize(), INST_INS__PER_INST());
         emp::vector<size_t> ins_locs;
         if (num_ins > 0) {
           ins_locs = emp::RandomUIntVector(rnd, num_ins, 0, program[fID].GetSize());
@@ -525,10 +537,10 @@ namespace emp {
           // Should we insert?
           if (ins_locs.size() > 0) {
             if (rhead >= ins_locs.back() && 
-                expected_func_len < PROG_MAX_FUNC_LEN && 
-                expected_prog_len < PROG_MAX_TOTAL_LEN) {
+                expected_func_len < GetProgMaxFuncLen() && 
+                expected_prog_len < GetProgMaxTotalLen()) {
               // Insert a random instruction.
-              new_fun.PushInst(GenRandSignalGPInst(rnd, *(program.GetInstLib()), PROG_MIN_ARG_VAL, PROG_MAX_ARG_VAL));
+              new_fun.PushInst(GenRandSignalGPInst(rnd, *(program.GetInstLib()), GetProgMinArgVal(), GetProgMaxArgVal()));
               ++mut_cnt;
               ++expected_prog_len;
               ++expected_func_len;
@@ -539,7 +551,7 @@ namespace emp {
 
           // Should we delete this instruction?
           if (rnd.P(INST_DEL__PER_INST()) && 
-              expected_func_len > PROG_MIN_FUNC_LEN) {
+              expected_func_len > GetProgMinFuncLen()) {
             // Delete this instruction!
             ++mut_cnt;
             --expected_func_len;
@@ -554,8 +566,23 @@ namespace emp {
       return mut_cnt;
     }
 
-    // TODO: Print
-
+    void Print(std::ostream & os=std::cout) {
+      os << "== MUTATOR PARAMETERS ==\n";
+      os << "PROG_MIN_FUNC_CNT = " << GetProgMinFuncCnt() << "\n";
+      os << "PROG_MAX_FUNC_CNT = " << GetProgMaxFuncCnt() << "\n";
+      os << "PROG_MIN_FUNC_LEN = " << GetProgMinFuncLen() << "\n";
+      os << "PROG_MAX_FUNC_LEN = " << GetProgMaxFuncLen() << "\n";
+      os << "PROG_MAX_TOTAL_LEN = " << GetProgMaxTotalLen() << "\n";
+      os << "PROG_MIN_ARG_VAL = " << GetProgMinArgVal() << "\n";
+      os << "PROG_MAX_ARG_VAL = " << GetProgMaxArgVal() << "\n";
+      for (auto & param : param_lib) {
+        os << param.name << " = " << param.param << " (" << param.desc << ")\n";
+      }
+      os << "== MUTATORS ==\n";
+      for (auto & mutator_type : mutator_lib) {
+        os << mutator_type.name << " : " << mutator_type.desc << "\n";
+      } 
+    }
   };
 
 
