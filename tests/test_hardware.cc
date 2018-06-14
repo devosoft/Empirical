@@ -516,11 +516,6 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: SignalGPMutator struct", "
   inst_lib.AddInst("Fork", hardware_t::Inst_Fork, 0, "Fork a new thread. Local memory contents of callee are loaded into forked thread's input memory.");
   inst_lib.AddInst("Nop", hardware_t::Inst_Nop, 0, "No operation.");
 
-  // Tests: 
-  //  - [ ] Test many mutations to many random programs
-  //  - [ ] Test some extreme examples w/handcoded program (where I know what to expect)
-  //  - [ ] Test mutation tracking on handcoded examples
-
   // Check parameter adding. 
   size_t default_param_cnt = mutator.GetParamCnt();
   size_t param1_id = mutator.AddParam("test1", 1.0, "Test parameter one!");
