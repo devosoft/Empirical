@@ -476,3 +476,146 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPProgram", "
     hw.Process(128);
   }
 }
+
+
+TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: SignalGPMutator struct", "[hardware]") {
+  using hardware_t = emp::EventDrivenGP_AW<16>;  // SignalGP hardware with 16-bit tags.
+  using inst_lib_t = emp::InstLib<hardware_t>;   // Instruction library 
+  using program_t = typename hardware_t::Program;
+
+  constexpr int RANDOM_SEED = 1;
+  
+  size_t MIN_ARG_VAL = 0;
+  size_t MAX_ARG_VAL = 15;
+  size_t MIN_FUNC_LEN = 1;
+  size_t MAX_FUNC_LEN = 128;
+  size_t MIN_FUNC_CNT = 1;
+  size_t MAX_FUNC_CNT = 32;
+  size_t MAX_TOTAL_LEN = 1024;
+
+  emp::Random random(RANDOM_SEED);
+  
+  auto mutator = emp::SignalGPMutator<16>(MIN_FUNC_CNT, MAX_FUNC_CNT, 
+                                          MIN_FUNC_LEN, MAX_FUNC_LEN, 
+                                          MAX_TOTAL_LEN, 
+                                          MIN_ARG_VAL, MAX_ARG_VAL);
+
+  // Build a limited instruction library. 
+  inst_lib_t inst_lib;
+  inst_lib.AddInst("Inc", hardware_t::Inst_Inc, 1, "Increment value in local memory Arg1");
+  inst_lib.AddInst("Dec", hardware_t::Inst_Dec, 1, "Decrement value in local memory Arg1");
+  inst_lib.AddInst("Not", hardware_t::Inst_Not, 1, "Logically toggle value in local memory Arg1");
+  inst_lib.AddInst("TestLess", hardware_t::Inst_TestLess, 3, "Local memory: Arg3 = (Arg1 < Arg2)");
+  inst_lib.AddInst("If", hardware_t::Inst_If, 1, "Local memory: If Arg1 != 0, proceed; else, skip block.", emp::ScopeType::BASIC, 0, {"block_def"});
+  inst_lib.AddInst("While", hardware_t::Inst_While, 1, "Local memory: If Arg1 != 0, loop; else, skip block.", emp::ScopeType::BASIC, 0, {"block_def"});
+  inst_lib.AddInst("Close", hardware_t::Inst_Close, 0, "Close current block if there is a block to close.", emp::ScopeType::BASIC, 0, {"block_close"});
+  inst_lib.AddInst("Break", hardware_t::Inst_Break, 0, "Break out of current block.");
+  inst_lib.AddInst("Call", hardware_t::Inst_Call, 0, "Call function that best matches call affinity.");
+  inst_lib.AddInst("Return", hardware_t::Inst_Return, 0, "Return from current function if possible.");
+  inst_lib.AddInst("SetMem", hardware_t::Inst_SetMem, 2, "Local memory: Arg1 = numerical value of Arg2");
+  inst_lib.AddInst("Fork", hardware_t::Inst_Fork, 0, "Fork a new thread. Local memory contents of callee are loaded into forked thread's input memory.");
+  inst_lib.AddInst("Nop", hardware_t::Inst_Nop, 0, "No operation.");
+
+  // Tests: 
+  //  - [ ] Test many mutations to many random programs
+  //  - [ ] Test some extreme examples w/handcoded program (where I know what to expect)
+  //  - [ ] Test mutation tracking on handcoded examples
+
+  // Check parameter adding. 
+  size_t default_param_cnt = mutator.GetParamCnt();
+  size_t param1_id = mutator.AddParam("test1", 1.0, "Test parameter one!");
+  size_t param2_id = mutator.AddParam("test2", 2.0, "Test parameter two!");
+  size_t param3_id = mutator.AddParam("test3", 3.0, "Test parameter three!");
+  REQUIRE(mutator.GetParamCnt() == default_param_cnt+3);
+  REQUIRE(mutator.GetParam(param1_id) == 1.0);
+  REQUIRE(mutator.GetParam(param1_id) == mutator.GetParam("test1"));
+  REQUIRE(mutator.GetParamName(param1_id) == "test1");
+  REQUIRE(mutator.GetParamDesc(param1_id) == "Test parameter one!");
+  REQUIRE(mutator.GetParamID("test1") == param1_id);
+  // Check parameter editing. 
+  mutator.SetParam(param1_id, 10.0);
+  REQUIRE(mutator.GetParam(param1_id) == 10.0);
+  mutator.SetParam(param1_id, 100.0);
+  REQUIRE(mutator.GetParam("test1") == 100.0);
+
+  // Add mutators. 
+  size_t default_mutator_cnt = mutator.GetMutatorCnt();
+  mutator.ClearMutators();
+  REQUIRE(mutator.GetMutatorCnt() == 0);
+  mutator.AddMutator("99BottlesOfNothing", [](program_t &, emp::Random &) { return 99; }, "This mutator does nothing and returns 99.");
+  mutator.AddMutator("AllFunTagsAllOnes", [](program_t & p, emp::Random & r) { 
+    for (size_t fID = 0; fID < p.GetSize(); ++fID) {
+      p[fID].GetAffinity().SetAll();
+    }
+    return p.GetSize();
+  });
+
+  // Generate a nop program to test custom mutators on. 
+  program_t nop_prog(&inst_lib);
+  for (size_t f = 0; f < 3; ++f) {
+    nop_prog.PushFunction();
+    for (size_t i = 0; i < 8; ++i) nop_prog.PushInst("Nop");
+  }
+  size_t total_muts = mutator.ApplyMutations(nop_prog, random);
+  REQUIRE(mutator.GetLastMutationCnt("99BottlesOfNothing") == 99);
+  REQUIRE(mutator.GetLastMutationCnt("AllFunTagsAllOnes") == 3);
+  REQUIRE(total_muts == 102);
+  
+  // Check removing a mutator. 
+  mutator.RemoveMutator("99BottlesOfNothing");
+  REQUIRE(mutator.GetMutatorCnt() == 1);
+  mutator.RemoveMutator("AllFunTagsAllOnes");
+  REQUIRE(mutator.GetMutatorCnt() == 0);
+
+  // Reset back to default.
+  mutator.ResetMutators();
+  REQUIRE(mutator.GetMutatorCnt() == default_mutator_cnt);
+  // Crank up the mutation rates!
+  mutator.SLIP__PER_FUNC(0.5);
+  mutator.FUNC_DUP__PER_FUNC(0.5);
+  mutator.FUNC_DEL__PER_FUNC(0.5);
+  mutator.INST_INS__PER_INST(0.5);
+  mutator.INST_DEL__PER_INST(0.5);
+  mutator.ARG_SUB__PER_ARG(0.5);
+  mutator.INST_SUB__PER_INST(0.5);
+  mutator.TAG_BIT_FLIP__PER_BIT(0.5);
+  // Generate many random programs, apply mutations, check constraints. 
+  for (size_t i = 0; i < 1000; ++i) {
+    program_t prog(emp::GenRandSignalGPProgram(random, inst_lib, 
+                                              1, 8,
+                                              mutator.GetProgMinFuncLen(), mutator.GetProgMaxFuncLen(),
+                                              mutator.GetProgMinArgVal(), mutator.GetProgMaxArgVal()));
+    for (size_t m = 0; m < 100; ++m) {
+      mutator.ApplyMutations(prog, random);
+      REQUIRE(mutator.VerifyProgram(prog));
+    }
+  }
+
+  // Zero out all of the mutation rates. 
+  mutator.ARG_SUB__PER_ARG(0.0);
+  mutator.INST_SUB__PER_INST(0.0);
+  mutator.INST_INS__PER_INST(0.0);
+  mutator.INST_DEL__PER_INST(0.0);
+  mutator.SLIP__PER_FUNC(0.0);
+  mutator.FUNC_DUP__PER_FUNC(0.0);
+  mutator.FUNC_DEL__PER_FUNC(0.0);
+  mutator.TAG_BIT_FLIP__PER_BIT(0.0);
+  program_t prog1(emp::GenRandSignalGPProgram(random, inst_lib, 
+                                              mutator.GetProgMinFuncCnt(), mutator.GetProgMaxFuncCnt(),
+                                              mutator.GetProgMinFuncLen(), mutator.GetProgMaxFuncLen(),
+                                              mutator.GetProgMinArgVal(), mutator.GetProgMaxArgVal()));
+  program_t prog2(prog1);
+  mutator.ApplyMutations(prog1, random);
+  REQUIRE(prog1 == prog2);
+
+  // Check function duplications.
+  mutator.FUNC_DUP__PER_FUNC(1.0);
+  size_t orig_f_cnt = nop_prog.GetSize();
+  mutator.ApplyMutations(nop_prog, random);
+  REQUIRE(nop_prog.GetSize() == 2*orig_f_cnt);
+  // Check function deletions.
+  mutator.FUNC_DEL__PER_FUNC(1.0);
+  mutator.FUNC_DUP__PER_FUNC(0.0);
+  mutator.ApplyMutations(nop_prog, random);
+  REQUIRE(nop_prog.GetSize() == mutator.GetProgMinFuncCnt());
+}
