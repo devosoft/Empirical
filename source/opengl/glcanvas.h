@@ -432,9 +432,13 @@ namespace emp {
 
 #if !defined(EMSCRIPTEN)
         glewExperimental = GL_TRUE;
-        if (glewInit() != GLEW_OK) {
-          throw std::runtime_error("Could not initialize GLEW");
-        }
+#if !defined(EMP_NDEBUG)
+        auto glew_status =
+#endif
+          glewInit();
+
+        emp_assert(glew_status == GLEW_OK, "GLEW initialized");
+
 #endif  // !defined(EMSCRIPTEN)
       }
 

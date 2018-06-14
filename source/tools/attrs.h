@@ -67,22 +67,24 @@ namespace emp {
           /// Given an attribute pack, GetAttribute will extract just this
           /// attribute
           template <class T>
-          constexpr decltype(auto) operator()(value_t<T>& value) const {
+          constexpr value_t<T>& operator()(value_t<T>& value) const {
             return value;
           }
 
           template <class T>
-          constexpr decltype(auto) operator()(const value_t<T>& value) const {
+          constexpr const value_t<T>& operator()(
+            const value_t<T>& value) const {
             return value;
           }
 
           template <class T>
-          constexpr decltype(auto) operator()(value_t<T>&& value) const {
+          constexpr value_t<T>&& operator()(value_t<T>&& value) const {
             return std::move(value);
           }
 
           template <class T>
-          constexpr decltype(auto) operator()(const value_t<T>&& value) const {
+          constexpr const value_t<T>&& operator()(
+            const value_t<T>&& value) const {
             return std::move(value);
           }
         } GetAttribute{};
@@ -465,7 +467,7 @@ namespace emp {
         template <typename U0, typename... U>
         static constexpr decltype(auto) Select(U0&& arg0, U&&... args) {
           return SelectHelper<A>::SelectImpl(
-            std::is_same<A, typename U0::attribute_type>{},
+            std::is_same<A, typename std::decay_t<U0>::attribute_type>{},
             std::forward<U0>(arg0), std::forward<U>(args)...);
         }
       };
@@ -971,13 +973,12 @@ namespace emp {
       template <class... T, class H>
       void PrintAttrs(std::ostream& out, const Attrs<T...>& attrs,
                       const print_attrs_tag<H>&) {
-        out << '"' << H::name << "\": " << H::attribute_type::Get(attrs);
+        out << H::name << " = " << H::attribute_type::Get(attrs);
       }
       template <class... T, class H0, class H1, class... U>
       void PrintAttrs(std::ostream& out, const Attrs<T...>& attrs,
                       const print_attrs_tag<H0, H1, U...>&) {
-        out << '"' << H0::name << "\": " << H0::attribute_type::Get(attrs)
-            << ", ";
+        out << H0::name << " = " << H0::attribute_type::Get(attrs) << ", ";
         PrintAttrs(out, attrs, print_attrs_tag<H1, U...>{});
       }
     }  // namespace __attrs_impl

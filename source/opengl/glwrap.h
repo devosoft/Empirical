@@ -224,9 +224,9 @@ namespace emp {
 
         public:
         BufferVector(const BufferObject<TYPE>& buffer)
-          : BufferObject<TYPE>(buffer){};
+          : BufferObject<TYPE>(buffer) {}
         BufferVector(BufferObject<TYPE>&& buffer)
-          : BufferObject<TYPE>(std::move(buffer)){};
+          : BufferObject<TYPE>(std::move(buffer)) {}
 
         BufferVector(BufferVector&& other)
           : BufferObject<TYPE>(std::move(other)), data(std::move(other.data)) {}

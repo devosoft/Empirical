@@ -13,9 +13,9 @@
 #include "math/consts.h"
 #include "opengl/defaultShaders.h"
 #include "opengl/glcanvas.h"
-#include "plot/line.h"
-#include "plot/scales.h"
-#include "plot/scatter.h"
+// #include "plot/line.h"
+// #include "plot/scales.h"
+// #include "plot/scatter.h"
 #include "scenegraph/camera.h"
 #include "scenegraph/core.h"
 #include "tools/attrs.h"
@@ -28,14 +28,33 @@
 #include <chrono>
 #include <cstdlib>
 
+struct Particle {
+  float mass;
+  emp::math::Vec3f position;
+  emp::math::Vec3f velocity;
+  emp::math::Vec3f acceleration;
+
+  Particle(float mass, const emp::math::Vec3f& position)
+    : mass(mass), position(position) {}
+
+  void Step(float dt) {
+    velocity += acceleration * dt;
+    position += velocity * dt;
+    acceleration = {0, 0, 0};
+  }
+
+  void AddForce(const emp::math::Vec3f& force) { acceleration += force / mass; }
+};
+
 emp::scenegraph::FreeType ft;
 
 int main(int argc, char* argv[]) {
   using namespace emp::opengl;
   using namespace emp::math;
   using namespace emp::scenegraph;
-  using namespace emp::plot;
-  using namespace emp::plot::attributes;
+  using namespace emp::graphics;
+  // using namespace emp::plot;
+  // using namespace emp::plot::attributes;
 
   using namespace emp::scenegraph::shapes;
 
@@ -54,7 +73,7 @@ int main(int argc, char* argv[]) {
                       .AddDimension(-100, 100);
 
   Stage stage(region);
-  auto root = stage.MakeRoot<Group>();
+  // auto root = stage.MakeRoot<Group>();
   // auto line{std::make_shared<Line>(canvas)};
   // auto scatter{std::make_shared<Scatter>(canvas, 6)};
   // auto scale{std::make_shared<Scale<3>>(region)};
@@ -62,7 +81,7 @@ int main(int argc, char* argv[]) {
   // auto r = std::make_shared<FilledRectangle>(canvas, Region2f{{0, 0}, {8,
   // 8}}); root->AttachAll(r, scatter);
 
-  std::vector<Vec2f> data;
+  std::vector<Particle> particles;
 
   // auto flow = (Xyz([](auto& p) { return p.AddRow(0); }) +
   // Stroke(Color::red()) +
@@ -84,34 +103,53 @@ int main(int argc, char* argv[]) {
   //     std::cout << width << " x " << height << std::endl;
   //   });
 
-  for (int i = 0; i < 100; ++i) {
-    data.emplace_back(i * 100, i * 100);
+  for (int i = 0; i < 10000; ++i) {
+    particles.emplace_back(10, Vec3f{rand() % 100 - 50, rand() % 100 - 50, 0});
   }
 
   // flow.Apply(data.begin(), data.end());
 
+  float flength = 0;
+  float clength;
+  int count = 0;
+
+  auto lastFrame = std::chrono::high_resolution_clock::now();
+
   emp::graphics::Graphics g(canvas, "Roboto", camera, eye);
   float t = 0;
   canvas.runForever([&](auto&&) {
+    auto start = std::chrono::high_resolution_clock::now();
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    g.Text()
-      .Draw({
-        emp::graphics::Transform = Mat4x4f::Translation(0, 0, 0),
-        emp::graphics::Fill = Color::green(),
-        emp::graphics::Text = "Hello World",
-      })
-      .Flush();
+    auto start_compute = std::chrono::high_resolution_clock::now();
+    for (auto& p : particles) {
+      p.Step(0.1);
+    }
 
-    auto pen = g.FillRegularPolygons(5, {10, 10});
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < particles.size(); ++i) {
+      auto& p1 = particles[i];
+      p1.AddForce(
+        {10 * (rand() / (float)std::numeric_limits<decltype(rand())>::max()) -
+           5,
+         10 * (rand() / (float)std::numeric_limits<decltype(rand())>::max()) -
+           5,
+         0});
+    }
+
+    for (auto& p : particles) {
+      if (p.position.x() < region.min.x() || p.position.x() > region.max.x())
+        p.velocity.x() *= -1;
+      if (p.position.y() < region.min.y() || p.position.y() > region.max.y())
+        p.velocity.y() *= -1;
+    }
+    auto finished_compute = std::chrono::high_resolution_clock::now();
+
+    auto pen = g.FillRegularPolygons(32, {5, 5});
+    for (int i = 0; i < particles.size(); ++i) {
       pen.Draw({
-        emp::graphics::Fill = Color::red(),
-        emp::graphics::Transform =
-          Mat4x4f::Translation((sin(0.5 * t + i) + cos(t - i)) * 50,
-                               (sin(t + i) - cos(0.5 * t - i)) * 50, 0) *
-          Mat4x4f::Scale(0.5),
+        emp::graphics::Fill = Color::red(1, 0.5),
+        emp::graphics::Transform = Mat4x4f::Translation(particles[i].position),
       });
     }
     pen.Flush();
@@ -123,6 +161,29 @@ int main(int argc, char* argv[]) {
     //   data.emplace_back(random(), random());
     // }
     // flow.Apply(data.begin(), data.end());
+
+    flength +=
+      std::chrono::duration_cast<std::chrono::milliseconds>(start - lastFrame)
+        .count();
+    clength += std::chrono::duration_cast<std::chrono::microseconds>(
+                 finished_compute - start_compute)
+                 .count();
+    lastFrame = start;
+
+    if (count++ == 100) {
+      auto mean_flength = flength / 100.0;
+      auto mean_fps = 1000.0 / mean_flength;
+      auto mean_clength = clength / 100.0;
+
+      std::cout << particles.size()
+                << " particles (last 100 frames):" << std::endl
+                << "\tFPS          = " << mean_fps << std::endl
+                << "\tFrame Length = " << mean_flength << " milliseconds"
+                << std::endl
+                << "\tCompute Time = " << mean_clength << " microseconds"
+                << std::endl;
+      clength = flength = count = 0;
+    }
   });
 
   return 0;

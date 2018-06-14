@@ -133,6 +133,7 @@ namespace emp {
       mutable std::unordered_map<std::string, GLint> attributes;
       mutable std::unordered_map<std::string, GLint> uniforms;
       GLuint handle;
+      static GLuint active;
 
       public:
       ShaderProgram(const VertexShader& vertexShader,
@@ -183,7 +184,7 @@ namespace emp {
       }
 
       void Use() {
-        if (handle != 0) {
+        if (handle != 0 && active != handle) {
           glUseProgram(handle);
         }
       }
@@ -279,6 +280,8 @@ namespace emp {
         return GetUniformLocation(name);
       }
     };
+
+    GLuint ShaderProgram::active = 0;
   }  // namespace opengl
 }  // namespace emp
 
