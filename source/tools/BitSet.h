@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2018
  *
  *  @file  BitSet.h
  *  @brief A drop-in replacement for std::bitset, with additional bit magic features.
@@ -143,8 +143,11 @@ namespace emp {
     /// Copy constructor from another BitSet
     BitSet(const BitSet & in_set) { Copy(in_set.bit_set); }
 
-    /// Constructor to generate a random BitSet.
-    BitSet(Random & random, const double p1=0.5) { Randomize(random, p1); }
+    /// Constructor to generate a random BitSet (with equal prob of 0 or 1).
+    BitSet(Random & random) { Randomize(random); }
+
+    /// Constructor to generate a random BitSet with provided prob of 1's.
+    BitSet(Random & random, const double p1) { Clear(); Randomize(random, p1); }
 
     /// Destructor.
     ~BitSet() = default;
@@ -155,8 +158,16 @@ namespace emp {
       return *this;
     }
 
+    /// Set all bits randomly, with a 50% probability of being a 0 or 1.
+    void Randomize(Random & random) {
+      // Randomize all fields, then mask off bits in the last field if not complete.
+      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = random.GetUInt();
+      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT);
+    }
+
     /// Set all bits randomly, with a given probability of being a 1.
-    void Randomize(Random & random, const double p1=0.5) {
+    void Randomize(Random & random, const double p1) {
+      if (p1 == 0.5) return Randomize(random); // If 0.5 probability, generate by field!
       for (size_t i = 0; i < NUM_BITS; i++) Set(i, random.P(p1));
     }
 
