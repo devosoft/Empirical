@@ -488,7 +488,7 @@ namespace emp {
       size_t mut_cnt = 0;
       // Perform single-instruction substitutions!
       for (size_t fID = 0; fID < program.GetSize(); ++fID) {
-        for (size_t iID = 0; iID < program[fID].GetSize(); ++fID) {
+        for (size_t iID = 0; iID < program[fID].GetSize(); ++iID) {
           inst_t & inst = program[fID][iID];
           
           // Mutate affinity
