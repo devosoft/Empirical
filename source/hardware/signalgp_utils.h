@@ -15,11 +15,14 @@
 #include <unordered_set>
 #include <string>
 #include <functional>
+#include <algorithm>
 
 #include "base/errors.h"
 #include "hardware/EventDrivenGP.h"
 #include "tools/BitSet.h"
 #include "tools/math.h"
+#include "tools/Random.h"
+#include "tools/random_utils.h"
 
 namespace emp {
 
@@ -160,14 +163,14 @@ namespace emp {
     enum TagType { FUNCTION=0, INSTRUCTION=1 }; 
 
     /// Struct used to define a mutation rate.
-    struct MutRateDef {
+    struct MutatorParamDef {
       std::string name;
-      double rate;
+      double param;
       std::string desc;
 
-      MutRateDef(const std::string & _n, double _r, const std::string & _d)
-        : name(_n), rate(_r), desc(_d) { ; }
-      MutRateDef(const MutRateDef &) = default;
+      MutatorParamDef(const std::string & _n, double _p, const std::string & _d)
+        : name(_n), param(_p), desc(_d) { ; }
+      MutatorParamDef(const MutatorParamDef &) = default;
     };
 
     /// Struct used to define a mutation operator. 
@@ -175,8 +178,10 @@ namespace emp {
       std::string name;
       mutator_fun_t mutator;
       std::string desc;
+      size_t last_mut_cnt;
+
       MutatorDef(const std::string & _n, const mutator_fun_t & _fun, const std::string & _d) 
-        : name(_n), mutator(_fun), desc(_d) { ; }
+        : name(_n), mutator(_fun), desc(_d), last_mut_cnt(0) { ; }
     };
 
     // -- General parameters --
@@ -191,8 +196,8 @@ namespace emp {
     int PROG_MAX_ARG_VAL;       ///< Maximum argument value a SignalGP instruction can mutate to.
   
   protected:
-    emp::vector<MutRateDef> rate_lib;
-    std::map<std::string, size_t> rate_name_map;
+    emp::vector<MutatorParamDef> param_lib;
+    std::map<std::string, size_t> param_name_map;
 
     emp::vector<MutatorDef> mutator_lib;
     std::map<std::string, size_t> mutator_name_map;
@@ -233,20 +238,27 @@ namespace emp {
         PROG_MAX_FUNC_LEN(_PROG_MAX_FUNC_LEN),
         PROG_MAX_TOTAL_LEN(_PROG_MAX_TOTAL_LEN),
         PROG_MIN_ARG_VAL(_PROG_MIN_ARG_VAL),
-        PROG_MAX_ARG_VAL(_PROG_MAX_ARG_VAL)  
+        PROG_MAX_ARG_VAL(_PROG_MAX_ARG_VAL),
+        param_lib(), param_name_map(),
+        mutator_lib(), mutator_name_map()
         {
           // Setup default rates. 
-          arg_sub__per_arg__id = AddRate("ARG_SUB__PER_ARG", 0.005, "Rate to apply substitutions to instruction arguments.");
-          inst_sub__per_inst__id = AddRate("INST_SUB__PER_INST", 0.005, "Per-instruction rate to apply instruction substitutions. ");
-          inst_ins__per_inst__id = AddRate("INST_INS__PER_INST", 0.005, "Per-instruction rate to apply instruction insertions.");
-          inst_del__per_inst__id = AddRate("INST_DEL__PER_INST", 0.005, "Per-instruction rate to apply instruction deletions.");
-          slip__per_func__id = AddRate("SLIP__PER_FUNC", 0.05, "Per-function rate to apply slip-mutations.");
-          func_dup__per_func__id = AddRate("FUNC_DUP__PER_FUNC", 0.05, "Per-function rate to apply function duplications.");
-          func_del__per_func__id = AddRate("FUNC_DEL__PER_FUNC", 0.05, "Per-function rate to apply function deletions.");
-          tag_bit_flip__per_bit__id = AddRate("TAG_BIT_FLIP__PER_BIT", 0.005, "Per-bit rate to apply tag bit flips. ");
-          
-          // Setup default mutation function.  
-          AddMutator("Default", [this](program_t & p, emp::Random & r) { return this->DefaultMutator(p, r); }, "Default SignalGP mutation operator.");
+          arg_sub__per_arg__id = AddParam("ARG_SUB__PER_ARG", 0.005, "Rate to apply substitutions to instruction arguments.");
+          inst_sub__per_inst__id = AddParam("INST_SUB__PER_INST", 0.005, "Per-instruction rate to apply instruction substitutions. ");
+          inst_ins__per_inst__id = AddParam("INST_INS__PER_INST", 0.005, "Per-instruction rate to apply instruction insertions.");
+          inst_del__per_inst__id = AddParam("INST_DEL__PER_INST", 0.005, "Per-instruction rate to apply instruction deletions.");
+          slip__per_func__id = AddParam("SLIP__PER_FUNC", 0.05, "Per-function rate to apply slip-mutations.");
+          func_dup__per_func__id = AddParam("FUNC_DUP__PER_FUNC", 0.05, "Per-function rate to apply function duplications.");
+          func_del__per_func__id = AddParam("FUNC_DEL__PER_FUNC", 0.05, "Per-function rate to apply function deletions.");
+          tag_bit_flip__per_bit__id = AddParam("TAG_BIT_FLIP__PER_BIT", 0.005, "Per-bit rate to apply tag bit flips. ");
+          // Setup default mutators.
+          AddMutator("FuncDup", [this](program_t & p, emp::Random & r) { return this->DefaultMutator_FuncDup(p, r); }, "Default mutator. Whole-function duplications applied at a per-function rate.");
+          AddMutator("FuncDel", [this](program_t & p, emp::Random & r) { return this->DefaultMutator_FuncDel(p, r); }, "Default mutator. Whole-function deletions applied at a per-function rate.");
+          AddMutator("FuncTag", [this](program_t & p, emp::Random & r) { return this->DefaultMutator_FuncTag(p, r); }, "Default mutator. Function tag mutations applied at a per-bit rate.");
+          AddMutator("Slip", [this](program_t & p, emp::Random & r) { return this->DefaultMutator_Slip(p, r); }, "Default mutator. Slip mutations (multi-instruction sequence duplication/deletions) applied at a per-function rate.");
+          AddMutator("Subs", [this](program_t & p, emp::Random & r) { return this->DefaultMutator_Subs(p, r); }, "Default mutator. Single-instruction substitutions applied at a per-instruction rate, argument substitutions applied at a per-argument rate, and instruction tag mutations applied at a per-bit rate.");
+          AddMutator("InstInDels", [this](program_t & p, emp::Random & r) { return this->DefaultMutator_InstInDels(p, r); }, "Default mutator. Single-instruction insertions and deletions applied at a per-instruction rate.");
+
         }
 
     SignalGPMutator(const SignalGPMutator &) = default;
@@ -258,74 +270,79 @@ namespace emp {
 
     size_t ApplyMutations(program_t & p, emp::Random & r) {
       size_t mut_cnt = 0;
-      for (auto mutator_type : mutator_lib) mut_cnt += mutator_type.mutator(p, r);
+      for (auto & mutator_type : mutator_lib) {
+        mutator_type.last_mut_cnt = mutator_type.mutator(p, r);
+        mut_cnt += mutator_type.last_mut_cnt;
+      }
       return mut_cnt;
     }
 
     size_t ApplyMutator(const std::string & name, program_t & p, emp::Random & r) {
-      return GetMutator(GetMutatorID(name)).mutator(p, r);
+      const size_t id = GetMutatorID(name);
+      GetMutator(id).last_mut_cnt = GetMutator(id).mutator(p, r);
+      return GetMutator(id).last_mut_cnt;
     }
 
     // ---------------------------------------------
     // ---- Functions related to mutation rates ----
 
     // Getters and setters for default mutation rates. 
-    double ARG_SUB__PER_ARG() const { return GetRate(arg_sub__per_arg__id); }
-    double INST_SUB__PER_INST() const { return GetRate(inst_sub__per_inst__id); }
-    double INST_INS__PER_INST() const { return GetRate(inst_ins__per_inst__id); }
-    double INST_DEL__PER_INST() const { return GetRate(inst_del__per_inst__id); }
-    double SLIP__PER_FUNC() const { return GetRate(slip__per_func__id); }
-    double FUNC_DUP__PER_FUNC() const { return GetRate(func_dup__per_func__id); }
-    double FUNC_DEL__PER_FUNC() const { return GetRate(func_del__per_func__id); }
-    double TAG_BIT_FLIP__PER_BIT() const { return GetRate(tag_bit_flip__per_bit__id); }
-    void ARG_SUB__PER_ARG(double val) { SetRate(arg_sub__per_arg__id, val); }
-    void INST_SUB__PER_INST(double val) { SetRate(inst_sub__per_inst__id, val); }
-    void INST_INS__PER_INST(double val) { SetRate(inst_ins__per_inst__id, val); }
-    void INST_DEL__PER_INST(double val) { SetRate(inst_del__per_inst__id, val); }
-    void SLIP__PER_FUNC(double val) { SetRate(slip__per_func__id, val); }
-    void FUNC_DUP__PER_FUNC(double val) { SetRate(func_dup__per_func__id, val); }
-    void FUNC_DEL__PER_FUNC(double val) { SetRate(func_del__per_func__id, val); }
-    void TAG_BIT_FLIP__PER_BIT(double val) { SetRate(tag_bit_flip__per_bit__id, val); }
+    double ARG_SUB__PER_ARG() const { return GetParam(arg_sub__per_arg__id); }
+    double INST_SUB__PER_INST() const { return GetParam(inst_sub__per_inst__id); }
+    double INST_INS__PER_INST() const { return GetParam(inst_ins__per_inst__id); }
+    double INST_DEL__PER_INST() const { return GetParam(inst_del__per_inst__id); }
+    double SLIP__PER_FUNC() const { return GetParam(slip__per_func__id); }
+    double FUNC_DUP__PER_FUNC() const { return GetParam(func_dup__per_func__id); }
+    double FUNC_DEL__PER_FUNC() const { return GetParam(func_del__per_func__id); }
+    double TAG_BIT_FLIP__PER_BIT() const { return GetParam(tag_bit_flip__per_bit__id); }
+    void ARG_SUB__PER_ARG(double val) { SetParam(arg_sub__per_arg__id, val); }
+    void INST_SUB__PER_INST(double val) { SetParam(inst_sub__per_inst__id, val); }
+    void INST_INS__PER_INST(double val) { SetParam(inst_ins__per_inst__id, val); }
+    void INST_DEL__PER_INST(double val) { SetParam(inst_del__per_inst__id, val); }
+    void SLIP__PER_FUNC(double val) { SetParam(slip__per_func__id, val); }
+    void FUNC_DUP__PER_FUNC(double val) { SetParam(func_dup__per_func__id, val); }
+    void FUNC_DEL__PER_FUNC(double val) { SetParam(func_del__per_func__id, val); }
+    void TAG_BIT_FLIP__PER_BIT(double val) { SetParam(tag_bit_flip__per_bit__id, val); }
 
     /// Return the ID of the mutation rate type that has the specified name.
     /// Return (size_t)-1 if nothing found. 
-    size_t GetRateID(const std::string & name) const { 
-      emp_assert(Has(rate_name_map, name), name);
-      return Find(rate_name_map, name, (size_t)-1);
+    size_t GetParamID(const std::string & name) const { 
+      emp_assert(Has(param_name_map, name), name);
+      return Find(param_name_map, name, (size_t)-1);
     }
 
     /// Return the rate associated with the specified mutation rate ID. 
-    double GetRate(size_t id) const { return rate_lib[id].rate; }
+    double GetParam(size_t id) const { return param_lib[id].param; }
 
     /// Return the rate associated with the specified mutation rate name.
-    double GetRate(const std::string & rate_name) const { return GetRate(GetRateID(rate_name)); }
+    double GetParam(const std::string & param_name) const { return GetParam(GetParamID(param_name)); }
 
-    const std::string & GetDesc(size_t id) const { return rate_lib[id].desc; }
+    const std::string & GetDesc(size_t id) const { return param_lib[id].desc; }
 
-    const std::string & GetDesc(const std::string & name) { return GetDesc(GetRateID(name)); }
+    const std::string & GetDesc(const std::string & name) { return GetDesc(GetParamID(name)); }
 
-    const std::string & GetName(size_t id) const { return rate_lib[id].name; } 
+    const std::string & GetName(size_t id) const { return param_lib[id].name; } 
     
     /// Add a known mutation rate to mutator. 
     /// Return ID of that rate.
-    size_t AddRate(const std::string & name, double rate, const std::string & desc="") {
-      emp_assert(!Has(rate_name_map, name));
-      const size_t id = rate_lib.size();
-      rate_lib.emplace_back(name, rate, desc);
-      rate_name_map[name] = id;
+    size_t AddParam(const std::string & name, double param, const std::string & desc="") {
+      emp_assert(!Has(param_name_map, name));
+      const size_t id = param_lib.size();
+      param_lib.emplace_back(name, param, desc);
+      param_name_map[name] = id;
       return id;
     }
 
     /// Modify existing mutation rate (by name).  
-    void SetRate(const std::string & name, double rate) {
-      emp_assert(Has(rate_name_map, name));
-      SetRate(GetRateID(name), rate);
+    void SetParam(const std::string & name, double param) {
+      emp_assert(Has(param_name_map, name));
+      SetParam(GetParamID(name), param);
     }
 
     /// Modify existing mutation rate (by ID).
-    void SetRate(size_t id, double rate) {
-      emp_assert(id < rate_lib.size());
-      rate_lib[id].rate = rate;
+    void SetParam(size_t id, double param) {
+      emp_assert(id < param_lib.size());
+      param_lib[id].param = param;
     }
 
     // -------------------------------------------------
@@ -343,7 +360,7 @@ namespace emp {
       if (rm_id < mutator_lib.size()-1) {
         size_t mv_id = mutator_lib.size()-1;
         mutator_name_map[mutator_lib[mv_id].name] = rm_id;
-        mutator_lib[rm_id] = std::swap(mutator_lib[rm_id], mutator_lib[mv_id]);
+        std::swap(mutator_lib[rm_id], mutator_lib[mv_id]);
         mutator_name_map.erase(name);
       } 
       mutator_lib.pop_back();
@@ -354,14 +371,11 @@ namespace emp {
       mutator_name_map.clear();
     }
 
-    // TODO: break this up
-
-    /// Default function duplication mutator.
-
-    size_t DefaultMutator(program_t & program, emp::Random & rnd) {
+    // ---------------------------------------
+    // --- Default mutator implementations ---
+    size_t DefaultMutator_FuncDup(program_t & program, emp::Random & rnd) {
       size_t mut_cnt = 0;
       size_t expected_prog_len = program.GetInstCnt();
-      
       // Perform function duplications!
       size_t orig_func_wall = program.GetSize();
       for (size_t fID = 0; fID < orig_func_wall; ++fID) {
@@ -375,9 +389,13 @@ namespace emp {
             expected_prog_len += program[fID].GetSize();
             ++mut_cnt;
         }
-
       }
-      
+      return mut_cnt;
+    }
+
+    size_t DefaultMutator_FuncDel(program_t & program, emp::Random & rnd) {
+      size_t mut_cnt = 0;
+      size_t expected_prog_len = program.GetInstCnt();
       // Perform function deletions!
       for (int fID = 0; fID < program.GetSize(); ++fID) {
         // Should we delete this function?
@@ -392,7 +410,12 @@ namespace emp {
             continue;
         }
       }
+      return mut_cnt;
+    }
 
+    size_t DefaultMutator_FuncTag(program_t & program, emp::Random & rnd) {
+      size_t mut_cnt = 0;
+      size_t expected_prog_len = program.GetInstCnt();
       // Perform function tag mutations!
       for (size_t fID = 0; fID < program.GetSize(); ++fID) {
         tag_t & tag = program[fID].GetAffinity();
@@ -403,7 +426,12 @@ namespace emp {
           }
         }
       }
+      return mut_cnt;
+    }
 
+    size_t DefaultMutator_Slip(program_t & program, emp::Random & rnd) {
+      size_t mut_cnt = 0;
+      size_t expected_prog_len = program.GetInstCnt();
       // Perform per-function slip-mutations!
       for (size_t fID = 0; fID < program.GetSize(); ++fID) {
         if (rnd.P(SLIP__PER_FUNC())) {
@@ -440,7 +468,12 @@ namespace emp {
           }
         }
       }
+      return mut_cnt;
+    }
 
+    size_t DefaultMutator_Subs(program_t & program, emp::Random & rnd) {
+      size_t mut_cnt = 0;
+      size_t expected_prog_len = program.GetInstCnt();
       // Perform single-instruction substitutions!
       for (size_t fID = 0; fID < program.GetSize(); ++fID) {
         for (size_t iID = 0; iID < program[fID].GetSize(); ++fID) {
@@ -470,10 +503,54 @@ namespace emp {
           }
         } 
       }
+      return mut_cnt;
+    }
 
-      // Perform single-instruction insertion/deletions
-      // TODO
+    size_t DefaultMutator_InstInDels(program_t & program, emp::Random & rnd) {
+      size_t mut_cnt = 0;
+      size_t expected_prog_len = program.GetInstCnt();
+            // Perform single-instruction insertion/deletions
+      for (int fID = 0; fID < program.GetSize(); ++fID) {
+        fun_t new_fun(program[fID].GetAffinity());
+        size_t expected_func_len = program[fID].GetSize();
+        // Compute number and location of insertions.
+        const int num_ins = rnd.GetRandBinomial(program[fID].GetSize(), INST_INS__PER_INST());
+        emp::vector<size_t> ins_locs;
+        if (num_ins > 0) {
+          ins_locs = emp::RandomUIntVector(rnd, num_ins, 0, program[fID].GetSize());
+          std::sort(ins_locs.begin(), ins_locs.end(), std::greater<size_t>());
+        }
+        size_t rhead = 0;
+        while (rhead < program[fID].GetSize()) {
+          // Should we insert?
+          if (ins_locs.size() > 0) {
+            if (rhead >= ins_locs.back() && 
+                expected_func_len < PROG_MAX_FUNC_LEN && 
+                expected_prog_len < PROG_MAX_TOTAL_LEN) {
+              // Insert a random instruction.
+              new_fun.PushInst(GenRandSignalGPInst(rnd, *(program.GetInstLib()), PROG_MIN_ARG_VAL, PROG_MAX_ARG_VAL));
+              ++mut_cnt;
+              ++expected_prog_len;
+              ++expected_func_len;
+              ins_locs.pop_back();
+              continue;
+            }
+          }
 
+          // Should we delete this instruction?
+          if (rnd.P(INST_DEL__PER_INST()) && 
+              expected_func_len > PROG_MIN_FUNC_LEN) {
+            // Delete this instruction!
+            ++mut_cnt;
+            --expected_func_len;
+            --expected_prog_len;
+          } else {
+            new_fun.PushInst(program[fID][rhead]);
+          }
+          ++rhead;
+        }
+        program[fID] = new_fun;
+      }
       return mut_cnt;
     }
 
