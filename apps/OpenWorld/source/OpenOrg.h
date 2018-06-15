@@ -9,6 +9,10 @@
 class OpenOrg {
 public:
   static constexpr size_t TAG_WIDTH = 16;
+  static constexpr size_t HW_MAX_THREADS = 16;     // Max execution threads/'cores' active at once.
+  static constexpr size_t HW_MAX_CALL_DEPTH = 128; // Max active calls at once.
+  static constexpr double HW_MIN_SIM_THRESH = 0.0; // Min similarity threshold for match. 
+
   using hardware_t = emp::EventDrivenGP_AW<TAG_WIDTH>;
   using event_lib_t = hardware_t::event_lib_t;
   using inst_t = hardware_t::inst_t;
@@ -38,7 +42,11 @@ public:
     : id(0), color_id(0), brain(inst_lib, event_lib, random_ptr)
     , center(1.0, 1.0), radius(5.0), facing()
     , energy(0.0), time_born(0.0), time_dead(-1.0), base_cost(radius*radius*0.01)
-  { ; }
+  {
+    brain.SetMinBindThresh(HW_MIN_SIM_THRESH);
+    brain.SetMaxCores(HW_MAX_THREADS);
+    brain.SetMaxCallDepth(HW_MAX_CALL_DEPTH);  
+  }
   OpenOrg(const OpenOrg &) = default;
   OpenOrg(OpenOrg &&) = default;
   ~OpenOrg() { ; }
