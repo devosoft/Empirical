@@ -32,7 +32,8 @@ namespace emp {
 
   /**
    *  @brief A linear GP (inspired by AvidaGP) virtual hardware CPU that supports an event-driven programming paradigm.
-   *
+   *  @note The terminology used throughout this class is out of date. EventDrivenGP will eventually change to 'SignalGP', 
+    *       and our terminology will be updated throughout. 
    *  @details
    *  The EventDrivenGP virtual hardware runs programs where each program is a set of named functions.
    *  Function names are mutable bit strings, or affinities, and each function consists of a sequence
@@ -1606,6 +1607,26 @@ namespace emp {
       state.SetLocal(inst.args[1], hw.AccessShared(inst.args[0]));
     }
 
+    /// Default instruction: Fork
+    /// Number of instruction arguments: 0
+    /// Description: Self-signal. Fork a new thread, using tag-based referencing to determine the appropriate
+    ///              function to call on the new thread. 
+    static void Inst_Fork(EventDrivenGP_t & hw, const inst_t & inst) {
+      State & state = hw.GetCurState();
+      hw.SpawnCore(inst.affinity, hw.GetMinBindThresh(), state.local_mem, false);
+    }
+
+    /// Default instruction: Terminate
+    /// Number of instruction arguments: 0
+    /// Description: Terminate the thread that executes this instruction. 
+    /// WARNING: This instruction does not respect any 'main' function calls. 
+    ///          *Any* thread where this is called is terminated. 
+    static void Inst_Terminate(EventDrivenGP_t & hw, const inst_t & inst) {
+      // Pop all the call states from current core.
+      exec_stk_t & core = hw.GetCurCore();
+      core.resize(0);
+    }
+
     /// Default instruction: Nop
     /// Number of arguments: 0
     /// Description: No operation.
@@ -1662,6 +1683,8 @@ namespace emp {
         inst_lib.AddInst("Pull", Inst_Pull, 2, "Shared memory Arg1 => Shared memory Arg2.");
         inst_lib.AddInst("BroadcastMsg", Inst_BroadcastMsg, 0, "Broadcast output memory as message event.", ScopeType::BASIC, 0, {"affinity"});
         inst_lib.AddInst("SendMsg", Inst_SendMsg, 0, "Send output memory as message event.", ScopeType::BASIC, 0, {"affinity"});
+        inst_lib.AddInst("Fork", Inst_Fork, 0, "Fork a new thread, using tag-based referencing to determine which function to call on the new thread.", ScopeType::BASIC, 0, {"affinity"});
+        inst_lib.AddInst("Terminate", Inst_Terminate, 0, "Terminate current thread.");
         inst_lib.AddInst("Nop", Inst_Nop, 0, "No operation.");
       }
       return &inst_lib;
