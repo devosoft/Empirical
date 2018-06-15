@@ -20,6 +20,7 @@
 #include "scenegraph/core.h"
 #include "tools/attrs.h"
 // #include "scenegraph/shapes.h"
+#include "plot/flow.h"
 #include "scenegraph/shapes.h"
 #include "scenegraph/transform.h"
 
@@ -103,7 +104,7 @@ int main(int argc, char* argv[]) {
   //     std::cout << width << " x " << height << std::endl;
   //   });
 
-  for (int i = 0; i < 10000; ++i) {
+  for (int i = 0; i < 100000; ++i) {
     particles.emplace_back(10, Vec3f{rand() % 100 - 50, rand() % 100 - 50, 0});
   }
 
