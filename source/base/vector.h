@@ -155,6 +155,17 @@ namespace emp {
     iterator end() noexcept { return iterator(stdv_t::end(), this); }
     const_iterator end() const noexcept { return const_iterator(stdv_t::end(), this); }
 
+    const_iterator cbegin() const noexcept { return const_iterator(stdv_t::cbegin(), this); }
+    const_iterator cend() const noexcept { return const_iterator(stdv_t::cend(), this); }
+
+    reverse_iterator rbegin() noexcept { return reverse_iterator(stdv_t::rbegin(), this); }
+    const_reverse_iterator rbegin() const noexcept { return const_reverse_iterator(stdv_t::rbegin(), this); }
+    reverse_iterator rend() noexcept { return reverse_iterator(stdv_t::rend(), this); }
+    const_reverse_iterator rend() const noexcept { return const_reverse_iterator(stdv_t::rend(), this); }
+
+    const_reverse_iterator crbegin() const noexcept { return const_reverse_iterator(stdv_t::crbegin(), this); }
+    const_reverse_iterator crend() const noexcept { return const_reverse_iterator(stdv_t::crend(), this); }
+
     // operator stdv_t &() { return v; }
     // operator const stdv_t &() const { return v; }
 
