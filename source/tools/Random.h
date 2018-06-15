@@ -193,6 +193,16 @@ namespace emp {
     }
 
     /**
+     * Generate a random 32-bit block of bits.
+     *
+     * @return The pseudo random number.
+     **/
+    inline uint32_t GetUInt() {
+      return ( static_cast<uint32_t>(GetDouble() * 65536.0) << 16 )
+             + static_cast<uint32_t>(GetDouble() * 65536.0);
+    }
+
+    /**
      * Generate an uint64_t.
      *
      * @return The pseudo random number.
