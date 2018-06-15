@@ -29,6 +29,7 @@ namespace emp {
 
       opengl::BufferVector<opengl::BufferType::Array, math::Vec3f>
         gpu_vertex_buffer;
+
       opengl::BufferVector<opengl::BufferType::ElementArray, int>
         gpu_elements_buffer;
 
@@ -103,11 +104,18 @@ namespace emp {
         fill_shader_uniforms.view = settings.view;
       }
 
-      void Instance(const instance_attributes_type& attrs) {
-        draw_queue.emplace_back(attrs);
+      template <typename I = instance_attributes_type>
+      void Instance(I&& attrs) {
+        draw_queue.emplace_back(std::forward<I>(attrs));
       }
 
       void FinishBatch() {
+        // #ifndef EMSCRIPTEN
+        //         if (draw_queue.size() > 10000) {
+        //           return;
+        //         }
+        // #endif
+
         fill_shader->Use();
         vao.bind();
 
