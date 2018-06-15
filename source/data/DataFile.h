@@ -144,7 +144,7 @@ namespace emp {
 
     /// If Update is called with an update number, call the full version of update only if the update value
     /// passes the timing function (that is, the timing function returns true).
-    void Update(size_t update) { if (timing_fun(update)) Update(); }
+    virtual void Update(size_t update) { if (timing_fun(update)) Update(); }
 
 
     /// If a function takes an ostream, pass in the correct one.
@@ -430,7 +430,7 @@ namespace emp {
     }
 
     /// Print a header containing the name of each column
-    void PrintHeaderKeys() {
+    void PrintHeaderKeys() override {
       *os << line_begin;
       for (size_t i = 0; i < keys.size(); i++) {
         if (i > 0) *os << line_spacer;
@@ -445,7 +445,7 @@ namespace emp {
     }
 
     /// Print a header containing comments describing all of the columns
-    void PrintHeaderComment(const std::string & cstart = "# ") {
+    void PrintHeaderComment(const std::string & cstart = "# ") override {
       for (size_t i = 0; i < keys.size(); i++) {
         *os << cstart << i << ": " << descs[i] << " (" << keys[i] << ")" << std::endl;
       }
@@ -481,7 +481,7 @@ namespace emp {
     }
 
     /// Update the file with an additional set of lines.
-    void Update(size_t update) {
+    void Update(size_t update) override {
       if (timing_fun(update)) Update();
     }
 
