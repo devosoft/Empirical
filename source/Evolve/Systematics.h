@@ -463,8 +463,10 @@ namespace emp {
 
     void Update() {
       ++curr_update;
-      std::swap(taxon_locations, next_taxon_locations);
-      next_taxon_locations.resize(0);
+      if (track_synchronous) {
+        std::swap(taxon_locations, next_taxon_locations);
+        next_taxon_locations.resize(0);
+      }
     }
 
     void SetCalcInfoFun(fun_calc_info_t f) {calc_info_fun = f;}
