@@ -483,13 +483,13 @@ namespace emp {
         auto frameStart = std::chrono::system_clock::now();
 
         while (!glfwWindowShouldClose(window)) {
-          auto frameCurrent = std::chrono::system_clock::now();
-          if (frameCurrent - frameStart >=
-              std::chrono::milliseconds((int)(1000.f / fps))) {
-            onUpdate(*this);
-            glfwSwapBuffers(window);
-            frameStart = std::chrono::system_clock::now();
-          }
+          // auto frameCurrent = std::chrono::system_clock::now();
+          // if (frameCurrent - frameStart >=
+          //     std::chrono::milliseconds((int)(1000.f / fps))) {
+          onUpdate(*this);
+          glfwSwapBuffers(window);
+          // frameStart = std::chrono::system_clock::now();
+          // }
           glfwPollEvents();
         }
 #endif

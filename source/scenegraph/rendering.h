@@ -43,6 +43,10 @@ namespace emp {
       using instance_attributes_type =
         tools::Attrs<TransformValue<math::Mat4x4f>, FillValue<opengl::Color>>;
 
+      private:
+      std::vector<instance_attributes_type> draw_queue;
+
+      public:
       template <typename S = const char*>
       FillRegularPolygonRenderer(opengl::GLCanvas& canvas,
                                  S&& fill_shader = "DefaultSolidColor")
@@ -100,16 +104,21 @@ namespace emp {
       }
 
       void Instance(const instance_attributes_type& attrs) {
+        draw_queue.emplace_back(attrs);
+      }
+
+      void FinishBatch() {
         fill_shader->Use();
         vao.bind();
 
-        fill_shader_uniforms.model = attrs.GetTransform();
-        fill_shader_uniforms.fill = attrs.GetFill();
+        for (auto& attrs : draw_queue) {
+          fill_shader_uniforms.model = attrs.GetTransform();
+          fill_shader_uniforms.fill = attrs.GetFill();
 
-        gpu_elements_buffer.Draw(GL_TRIANGLES);
+          gpu_elements_buffer.Draw(GL_TRIANGLES);
+        }
+        draw_queue.clear();
       }
-
-      void FinishBatch() {}
     };
 
     class TextRenderer {
