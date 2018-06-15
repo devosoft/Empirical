@@ -73,17 +73,17 @@ namespace emp {
       for (Ptr<body_t> body : body_set) TestBodySize(body);      
     }
 
-    // Place an active body into a sector.
-    inline void PlaceBody(Ptr<body_t> body) {
-      // Where is the current body?
+    // Determine which sector a body should be in.
+    size_t FindSector(Ptr<body_t> body) {
+      // Where is the body?
       const double body_x = body->GetCenter().GetX();
       const double body_y = body->GetCenter().GetY();
 
-      // Make sure the current body is in the sectors.
+      // Make sure the body is in the sectors.
       emp_assert(body_x >= 0.0 && body_x < max_pos.GetX());
       emp_assert(body_y >= 0.0 && body_y < max_pos.GetY());
 
-      // Determine which sector the current body is in.
+      // Determine which sector the body is in.
       const double sector_x = body_x / sector_width;
       const double sector_y = body_y / sector_height;
 
@@ -92,6 +92,12 @@ namespace emp {
       const size_t cur_sector = cur_col + cur_row * num_cols;
 
       emp_assert(cur_sector < sectors.size());
+      return cur_sector;
+    }
+
+    // Place an active body into a sector.
+    inline void PlaceBody(Ptr<body_t> body) {
+      size_t cur_sector = FindSector(body);
       sectors[cur_sector].push_back(body);
     }
 
@@ -207,6 +213,37 @@ namespace emp {
       // }
     }
 
+    /// Determine if there are any overlaps with a specific body.
+    void FindOverlap(Ptr<body_t> test_body, const overlap_fun_t & overlap_fun) {
+      const size_t sector_id = FindSector(test_body);
+      const size_t sector_col = sector_id % num_cols;
+      const size_t sector_row = sector_id / num_cols;
+      auto & cur_sector = sectors[sector_id];
+
+      // Compare against bodies in its own sector.
+      for (Ptr<body_t> body2 : cur_sector) {
+        if (test_body == body2) continue; // Don't match with self!
+        if (TestOverlap(*test_body, *body2)) overlap_fun(test_body, body2);
+      }
+
+      const bool left_ok  = (sector_col > 0);
+      const bool right_ok = (sector_col < num_cols - 1);
+      const bool up_ok    = (sector_row > 0);
+      const bool down_ok  = (sector_row < num_rows - 1);
+
+      const size_t up_sector_id = sector_id - num_cols;
+      const size_t down_sector_id = sector_id + num_cols;
+
+      // Compare against bodies in other sectors....
+      if (up_ok)               FindSectorOverlaps(*test_body, up_sector_id, overlap_fun);
+      if (up_ok && left_ok)    FindSectorOverlaps(*test_body, up_sector_id-1, overlap_fun);
+      if (up_ok && right_ok)   FindSectorOverlaps(*test_body, up_sector_id+1, overlap_fun);
+      if (left_ok)             FindSectorOverlaps(*test_body, sector_id-1, overlap_fun);
+      if (right_ok)            FindSectorOverlaps(*test_body, sector_id+1, overlap_fun);
+      if (down_ok)             FindSectorOverlaps(*test_body, down_sector_id, overlap_fun); 
+      if (down_ok && left_ok)  FindSectorOverlaps(*test_body, down_sector_id-1, overlap_fun);
+      if (down_ok && right_ok) FindSectorOverlaps(*test_body, down_sector_id+1, overlap_fun);
+    }
   };
 
 
