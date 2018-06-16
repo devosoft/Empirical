@@ -50,6 +50,7 @@ before_script:
 script: make test
 
 jobs:
+  include:
   - stage: test
     compiler: clang++-5.0
     install:
@@ -72,7 +73,6 @@ jobs:
     - git fetch origin master:refs/remotes/origin/master
     - make install-doc-dependencies
     script: make doc
-  include:
   - stage: test
     compiler: clang++-5.0
     install:
