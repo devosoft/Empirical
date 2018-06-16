@@ -79,6 +79,8 @@ public:
   OpenOrg & SetTimeDead(double _in) { time_dead = _in; return *this; }
   OpenOrg & SetBaseCost(double _in) { base_cost = _in; return *this; }
 
+  OpenOrg & ChangeEnergy(double _in) { energy += _in; return *this; }
+
   OpenOrg & RotateDegrees(double degrees) { facing.RotateDegrees(degrees); return *this; }
   OpenOrg & Translate(emp::Point shift) { center += shift; return *this; }
 
