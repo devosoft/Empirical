@@ -20,6 +20,7 @@
 #include "../meta/type_traits.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/string_utils.h"
+#include "../tools/NullStream.h"
 
 #include "DataNode.h"
 
@@ -48,7 +49,13 @@ namespace emp {
   public:
     DataFile(const std::string & in_filename,
              const std::string & b="", const std::string & s=",", const std::string & e="\n")
-      : filename(in_filename), os(new std::ofstream(in_filename)), funs(), keys(), descs()
+      : filename(in_filename), os(
+      #ifdef EMSCRIPTEN
+      new emp::NullStream()
+      #else
+      new std::ofstream(in_filename)
+      #endif
+      ), funs(), keys(), descs()
       , timing_fun([](size_t){return true;})
       , line_begin(b), line_spacer(s), line_end(e) { ; }
     DataFile(std::ostream & in_os,
