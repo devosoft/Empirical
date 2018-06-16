@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 cp -r ../source ../coverage_source
 for filename in `find ../coverage_source -name "*.h" ! -name "_*" ! -path "*/OLD/*" ! -path "*/in_progress/*" ! -name "*template_instantiations.h"`
 do
