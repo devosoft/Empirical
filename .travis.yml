@@ -74,17 +74,19 @@ jobs:
     - make install-doc-dependencies
     script: make doc
   - stage: test
-    compiler: clang++-5.0
+    compiler: clang++
     install:
     - if [ "$CXX" = "clang++" ]; then export CXX="clang++-5.0" CC="clang-5.0"; fi
     addons:
       apt:
         sources:
+        - ubuntu-toolchain-r-test
         - llvm-toolchain-trusty-5.0
         packages:
         - clang-5.0
         - libclang-5.0-dev
         - llvm-5.0
+        - g++-5
         - build-essential
         - tar
         - gzip
