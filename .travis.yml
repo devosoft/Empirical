@@ -50,32 +50,6 @@ before_script:
 script: make test
 
 jobs:
-  include:
-  - stage: doc
-    compiler: clang++-5.0
-    install:
-    - if [ "$CXX" = "clang++" ]; then export CXX="clang++-5.0" CC="clang-5.0"; fi
-    addons:
-      apt:
-        sources:
-        - kalakris-cmake
-        - llvm-toolchain-trusty-5.0
-        - ubuntu-toolchain-r-test
-        packages:
-        - g++-5
-        - clang-5.0
-        - llvm
-        - cmake
-        - build-essential
-        - bison
-        - tar
-        - gzip
-    before_script:
-    - git fetch origin master:refs/remotes/origin/master
-    - make install-test-dependencies
-    script: make coverage
-    after_success: 
-      - bash <(curl -s https://codecov.io/bash)
   - stage: test
     compiler: clang++-5.0
     install:
@@ -98,10 +72,8 @@ jobs:
     - git fetch origin master:refs/remotes/origin/master
     - make install-doc-dependencies
     script: make doc
-
-jobs:
   include:
-  - stage: coverage
+  - stage: test
     compiler: clang++-5.0
     install:
     - if [ "$CXX" = "clang++" ]; then export CXX="clang++-5.0" CC="clang-5.0"; fi
