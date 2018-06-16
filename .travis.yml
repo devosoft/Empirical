@@ -81,11 +81,12 @@ jobs:
       apt:
         sources:
         - kalakris-cmake
+        - ubuntu-toolchain-r-test
         - llvm-toolchain-trusty-5.0
         packages:
         - clang-5.0
         - libclang-5.0-dev
-        - llvm
+        - llvm-5.0
         - cmake
         - build-essential
         - bison
