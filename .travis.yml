@@ -80,16 +80,12 @@ jobs:
     addons:
       apt:
         sources:
-        - kalakris-cmake
-        - ubuntu-toolchain-r-test
         - llvm-toolchain-trusty-5.0
         packages:
         - clang-5.0
         - libclang-5.0-dev
         - llvm-5.0
-        - cmake
         - build-essential
-        - bison
         - tar
         - gzip
     before_script:
