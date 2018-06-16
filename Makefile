@@ -26,6 +26,9 @@ install-doc-dependencies:
 install-test-dependencies:
 	cd third-party && make install-test-dependencies
 
+install-coverage-dependencies:
+	cd third-party && make install-coverage-dependencies
+
 clean:
 	rm -rf build/*
 	cd tests && make clean
