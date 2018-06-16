@@ -96,4 +96,4 @@ jobs:
     - make install-coverage-dependencies
     script: make coverage
     after_success: 
-      - bash <(curl -s https://codecov.io/bash)
+      - curl -s https://codecov.io/bash | bash
