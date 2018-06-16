@@ -49,7 +49,8 @@ test-web:
 	  cd web && bash run_tests.sh
 	  cd .. && third-party/node_modules/karma/bin/karma start tests/web/karma.conf.js
 
-coverage_conversion: ./convert_for_tests.sh
+coverage_conversion:
+          ./convert_for_tests.sh
 
 test-coverage: FLAGS := -std=c++14 -g -Wall -Wno-unused-function -I../coverage_source/ -I../ -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 -fprofile-instr-generate -fcoverage-mapping -fno-inline -fno-elide-constructors -O0
 test-coverage: coverage_conversion test-prep $(addprefix cover-test-, $(TEST_NAMES))
