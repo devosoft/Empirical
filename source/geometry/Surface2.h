@@ -37,31 +37,32 @@ namespace emp {
   class Surface {
   public:
     using body_t = BODY_TYPE;
-    using body_set_t = emp::vector<Ptr<body_t>>;
+    using sector_t = emp::vector<Ptr<body_t>>;
     using overlap_fun_t = std::function<void(body_t &, body_t &)>;
 
-  protected:
     struct BodyInfo {
-      Point center;
-      double radius = 1.0;
-      size_t color = 0;
+      Ptr<body_t> org_ptr;   // Pointer to the bodies 
+      Point center;          // Center position of this body
+      double radius = 1.0;   // Size of this body
+      size_t color = 0;      // Color of this body.
     };
 
-    const Point max_pos;     // Lower-left corner of the surface.
-    body_set_t body_set;     // Set of all bodies on surface
+  protected:
+    const Point max_pos;             // Lower-left corner of the surface.
+    emp::vector<BodyInfo> body_set;  // Set of all bodies on surface
 
-    // Data tracking the current bodies on this surface.
-    bool data_active;                 // Are we trying to keep data up-to-date?
-    double max_radius;                // Largest radius of any body.
-    size_t num_cols;                  // How many cols of sectors are there?
-    size_t num_rows;                  // How many rows of sectors are there?
-    size_t num_sectors;               // How many total sectors are there?
-    double sector_width;              // How wide is each sector?
-    double sector_height;             // How tall is each sector?
-    emp::vector<body_set_t> sectors;  // Which bodies are in each sector?
+    // Data tracking the current bodies on this surface using sectors.
+    bool data_active;                // Are we trying to keep data up-to-date?
+    double max_radius;               // Largest radius of any body.
+    size_t num_cols;                 // How many cols of sectors are there?
+    size_t num_rows;                 // How many rows of sectors are there?
+    size_t num_sectors;              // How many total sectors are there?
+    double sector_width;             // How wide is each sector?
+    double sector_height;            // How tall is each sector?
+    emp::vector<sector_t> sectors;   // Which bodies are in each sector?
 
     // Make sure there are num_sectors sectors and remove all bodies from existing ones.
-    void SetupSectors() {
+    void InitSectors() {
       size_t min_size = std::min(num_sectors, sectors.size());
       sectors.resize(num_sectors);
       for (size_t i = 0; i < min_size; i++) sectors[i].resize(0);
@@ -70,8 +71,8 @@ namespace emp {
     // Keep track of the largest body size found.
     // Note: Uses watermarking, so largest body will never shrink, even if removed
     //       unless the user explicitly calls RefreshBodySize()
-    inline void TestBodySize(Ptr<body_t> body) {
-      const double cur_radius = body->GetRadius();
+    inline void TestBodySize(BodyInfo & body) {
+      const double cur_radius = body.radius;
       if (cur_radius > max_radius) {
         max_radius = cur_radius;      // Record the new radius.
         data_active = false;          // May need to rebuild sectors, so deactivate data.
@@ -81,14 +82,14 @@ namespace emp {
     // Clear out the watermarked body size and update the current largest.
     inline void RefreshBodySize() {
       max_radius = 0.0;
-      for (Ptr<body_t> body : body_set) TestBodySize(body);      
+      for (BodyInfo & body : body_set) TestBodySize(body);      
     }
 
     // Determine which sector a body should be in.
-    size_t FindSector(Ptr<body_t> body) {
+    size_t FindSector(BodyInfo & body) {
       // Where is the body?
-      const double body_x = body->GetCenter().GetX();
-      const double body_y = body->GetCenter().GetY();
+      const double body_x = body.center.GetX();
+      const double body_y = body.center.GetY();
 
       // Make sure the body is in the sectors.
       emp_assert(body_x >= 0.0 && body_x < max_pos.GetX());
@@ -107,9 +108,9 @@ namespace emp {
     }
 
     // Place an active body into a sector.
-    inline void PlaceBody(Ptr<body_t> body) {
+    inline void PlaceBody(BodyInfo & body) {
       size_t cur_sector = FindSector(body);
-      sectors[cur_sector].push_back(body);
+      sectors[cur_sector].push_back(body.org_ptr);
     }
 
     // Cleanup all of the data and mark the data as active.
@@ -127,7 +128,7 @@ namespace emp {
       sector_width = max_pos.GetX() / (double) num_cols;
       sector_height = max_pos.GetY() / (double) num_rows;
 
-      SetupSectors();   // Now that we know the sizes, we can initialize sectors.
+      InitSectors();   // Now that we know the sizes, we can initialize sectors.
 
       // Put all of the bodies into sectors
       for (Ptr<body_t> body : body_set) PlaceBody(body);
@@ -141,7 +142,7 @@ namespace emp {
     double GetWidth() const { return max_pos.GetX(); }
     double GetHeight() const { return max_pos.GetY(); }
     const Point & GetMaxPosition() const { return max_pos; }
-    const body_set_t & GetBodySet() const { return body_set; }
+    const emp::vector<BodyInfo> & GetBodySet() const { return body_set; }
 
     /// Add a single body.
     Surface & AddBody(Ptr<body_t> new_body) {
