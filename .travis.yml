@@ -51,7 +51,7 @@ script: make test
 
 jobs:
   include:
-  - stage: test
+  - stage: doc
     compiler: clang++-5.0
     install:
     - if [ "$CXX" = "clang++" ]; then export CXX="clang++-5.0" CC="clang-5.0"; fi
@@ -110,7 +110,6 @@ jobs:
         sources:
         - kalakris-cmake
         - llvm-toolchain-trusty-5.0
-        - ubuntu-toolchain-r-test
         packages:
         - clang-5.0
         - libclang-5.0-dev
