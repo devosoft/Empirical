@@ -39,6 +39,7 @@
 #include "tools/math.h"
 #include "tools/mem_track.h"
 #include "tools/memo_function.h"
+#include "tools/NullStream.h"
 #include "tools/sequence_utils.h"
 // #include "tools/serialize.h"
 #include "tools/set_utils.h"
@@ -779,6 +780,16 @@ TEST_CASE("Test NFA", "[tools]")
   REQUIRE(state2.GetSize() == 7);
 }
 
+
+TEST_CASE("Test NullStream", "[tools]")
+{
+  emp::NullStream ns;
+  ns << "abcdefg";
+  ns << std::endl;
+  ns << 123;
+  ns << 123.456;
+  ns.flush();
+}
 
 
 TEST_CASE("Test random", "[tools]")
