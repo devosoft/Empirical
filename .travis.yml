@@ -114,7 +114,7 @@ jobs:
         packages:
         - clang-5.0
         - libclang-5.0-dev
-	- llvm
+        - llvm
         - cmake
         - build-essential
         - bison
