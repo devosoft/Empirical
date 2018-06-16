@@ -112,10 +112,9 @@ jobs:
         - llvm-toolchain-trusty-5.0
         - ubuntu-toolchain-r-test
         packages:
-        - g++-5
         - clang-5.0
-	- libclang-5.0-dev
-        - llvm
+        - libclang-5.0-dev
+	- llvm
         - cmake
         - build-essential
         - bison
