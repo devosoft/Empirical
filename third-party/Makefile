@@ -6,8 +6,8 @@ install-test-dependencies: install-pip-deps install-npm-deps
 	git submodule update --init
 
 install-coverage-dependencies:
-        git submodule update --init
-        cd force-cover && make
+	git submodule update --init
+	cd force-cover && make
 
 install-dependencies: install-doc-dependencies install-test-dependencies install-coverage-dependencies
 
