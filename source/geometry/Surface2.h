@@ -41,10 +41,15 @@ namespace emp {
     using overlap_fun_t = std::function<void(body_t &, body_t &)>;
 
     struct BodyInfo {
-      Ptr<body_t> org_ptr;   // Pointer to the bodies 
+      Ptr<body_t> body_ptr;  // Pointer to the bodies 
       Point center;          // Center position of this body
-      double radius = 1.0;   // Size of this body
-      size_t color = 0;      // Color of this body.
+      double radius;         // Size of this body
+      size_t color;          // Color of this body.
+
+      BodyInfo(Ptr<body_t> _ptr=nullptr, Point _center=Point(0.0,0.0),
+               double _radius=1.0, size_t _color=0)
+        : body_ptr(_ptr), center(_center), radius(_radius), color(_color) { ; }
+      BodyInfo(Point _center, double _radius) : BodyInfo(nullptr, _center, _radius) { ; }
     };
 
   protected:
@@ -86,10 +91,10 @@ namespace emp {
     }
 
     // Determine which sector a body should be in.
-    size_t FindSector(BodyInfo & body) {
+    size_t FindSector(Point point) {
       // Where is the body?
-      const double body_x = body.center.GetX();
-      const double body_y = body.center.GetY();
+      const double body_x = point.GetX();
+      const double body_y = point.GetY();
 
       // Make sure the body is in the sectors.
       emp_assert(body_x >= 0.0 && body_x < max_pos.GetX());
@@ -109,8 +114,8 @@ namespace emp {
 
     // Place an active body into a sector.
     inline void PlaceBody(BodyInfo & body) {
-      size_t cur_sector = FindSector(body);
-      sectors[cur_sector].push_back(body.org_ptr);
+      size_t cur_sector = FindSector(body.center);
+      sectors[cur_sector].push_back(body.body_ptr);
     }
 
     // Cleanup all of the data and mark the data as active.
@@ -144,40 +149,42 @@ namespace emp {
     const Point & GetMaxPosition() const { return max_pos; }
     const emp::vector<BodyInfo> & GetBodySet() const { return body_set; }
 
-    /// Add a single body.
-    Surface & AddBody(Ptr<body_t> new_body) {
-      body_set.push_back(new_body);          // Add body to master list
-      TestBodySize(new_body);                // Keep track of largest body seen.
-      if (data_active) PlaceBody(new_body);  // Add new body to a sector (if active).
-      return *this;
+    /// Add a single body; return its unique ID.
+    size_t AddBody(Ptr<body_t> _body, Point _center, double _radius, size_t _color=0) {
+      BodyInfo info = { _body, _center, _radius, _color };
+      size_t id = body_set.size();        // Figure out the ID for this body
+      body_set.emplace_back(info);        // Add body to master list
+      TestBodySize(info);                 // Keep track of largest body seen.
+      if (data_active) PlaceBody(info);   // Add new body to a sector (if active).
+      return id;
     }
 
     /// Remove all bodies from the surface.
     Surface & Clear() {
       data_active = false;
       body_set.resize(0);
-      sectors.resize(0);
       max_radius = 0.0;
       num_sectors = 0;
       return *this;
     }
 
     // Determine if two bodies overlap.
-    static inline bool TestOverlap(body_t & body1, body_t & body2) {
-      const Point xy_dist = body1.GetCenter() - body2.GetCenter();
+    static inline bool TestOverlap(const BodyInfo & body1, const BodyInfo & body2) {
+      const Point xy_dist = body1.center - body2.center;
       const double sqr_dist = xy_dist.SquareMagnitude();
-      const double total_radius = body1.GetRadius() + body2.GetRadius();
+      const double total_radius = body1.radius + body2.radius;
       const double sqr_radius = total_radius * total_radius;
       return (sqr_dist < sqr_radius);
     }
 
     // Determine if a body overlaps with any others in a specified sector.
-    inline void FindSectorOverlaps(body_t & body1, size_t sector_id,
-                                   const overlap_fun_t & overlap_fun) {
+    inline void FindSectorOverlaps(const BodyInfo & body1, size_t sector_id,
+                                   const overlap_fun_t & overlap_fun,
+                                   size_t start_id=0) {
       auto & sector = sectors[sector_id];
-      for (size_t body2_id = 0; body2_id < sector.size(); body2_id++){
-        body_t & body2 = *sector[body2_id];
-        if (TestOverlap(body1, body2)) overlap_fun(body1, body2);
+      for (size_t body2_id = start_id; body2_id < sector.size(); body2_id++){
+        BodyInfo & body2 = *sector[body2_id];
+        if (TestOverlap(body1, body2)) overlap_fun(*body1.body_ptr, *body2.body_ptr);
       }
     }
 
@@ -202,19 +209,15 @@ namespace emp {
         const size_t ul_sector_id = sector_id - num_cols - 1;
 
         // Loop through all bodies in this sector
-        for (size_t body1_id = 0; body1_id < cur_sector.size(); body1_id++) {
-          auto & body1 = *cur_sector[body1_id];
+        for (size_t body_id = 0; body_id < cur_sector.size(); body_id++) {
+          auto & body = *cur_sector[body_id];
 
-          // Compare against the bodies before this one in this sector.
-          for (size_t body2_id = 0; body2_id < body1_id; body2_id++) {
-            auto & body2 = *cur_sector[body2_id];
-            if (TestOverlap(body1, body2)) overlap_fun(body1, body2);
-          }
-
-          if (ul_ok) FindSectorOverlaps(body1, ul_sector_id, overlap_fun);   // Test bodies to upper-left.
-          if (up_ok) FindSectorOverlaps(body1, ul_sector_id+1, overlap_fun); // Test bodies above
-          if (ur_ok) FindSectorOverlaps(body1, ul_sector_id+2, overlap_fun); // Test bodies to upper-right.
-          if (left_ok) FindSectorOverlaps(body1, sector_id-1, overlap_fun);  // Test bodies to left.
+          // Compare against the bodies after this one in the current sector.
+          FindSectorOverlaps(body, sector_id, overlap_fun, body_id+1);      // Test remaining bodies here.
+          if (ul_ok) FindSectorOverlaps(body, ul_sector_id, overlap_fun);   // Test bodies to upper-left.
+          if (up_ok) FindSectorOverlaps(body, ul_sector_id+1, overlap_fun); // Test bodies above
+          if (ur_ok) FindSectorOverlaps(body, ul_sector_id+2, overlap_fun); // Test bodies to upper-right.
+          if (left_ok) FindSectorOverlaps(body, sector_id-1, overlap_fun);  // Test bodies to left.
         }
       }
 
@@ -225,17 +228,17 @@ namespace emp {
       // }
     }
 
-    /// Determine if there are any overlaps with a specific body.
-    void FindOverlap(Ptr<body_t> test_body, const overlap_fun_t & overlap_fun) {
-      const size_t sector_id = FindSector(test_body);
+    /// Determine if there are any overlaps with a provided body (that may or may not be on surface).
+    void FindOverlap(const BodyInfo & body, const overlap_fun_t & overlap_fun) {
+      const size_t sector_id = FindSector(body.center);
       const size_t sector_col = sector_id % num_cols;
       const size_t sector_row = sector_id / num_cols;
       auto & cur_sector = sectors[sector_id];
 
       // Compare against bodies in its own sector.
-      for (Ptr<body_t> body2 : cur_sector) {
-        if (test_body == body2) continue; // Don't match with self!
-        if (TestOverlap(*test_body, *body2)) overlap_fun(test_body, body2);
+      for (BodyInfo & body2 : cur_sector) {
+        if (body == body2) continue; // Don't match with self!
+        if (TestOverlap(body, body2)) overlap_fun(*body.body_ptr, *body2.body_ptr);
       }
 
       const bool left_ok  = (sector_col > 0);
@@ -247,15 +250,22 @@ namespace emp {
       const size_t down_sector_id = sector_id + num_cols;
 
       // Compare against bodies in other sectors....
-      if (up_ok)               FindSectorOverlaps(*test_body, up_sector_id, overlap_fun);
-      if (up_ok && left_ok)    FindSectorOverlaps(*test_body, up_sector_id-1, overlap_fun);
-      if (up_ok && right_ok)   FindSectorOverlaps(*test_body, up_sector_id+1, overlap_fun);
-      if (left_ok)             FindSectorOverlaps(*test_body, sector_id-1, overlap_fun);
-      if (right_ok)            FindSectorOverlaps(*test_body, sector_id+1, overlap_fun);
-      if (down_ok)             FindSectorOverlaps(*test_body, down_sector_id, overlap_fun); 
-      if (down_ok && left_ok)  FindSectorOverlaps(*test_body, down_sector_id-1, overlap_fun);
-      if (down_ok && right_ok) FindSectorOverlaps(*test_body, down_sector_id+1, overlap_fun);
+      if (up_ok)               FindSectorOverlaps(body, up_sector_id,     overlap_fun);
+      if (up_ok && left_ok)    FindSectorOverlaps(body, up_sector_id-1,   overlap_fun);
+      if (up_ok && right_ok)   FindSectorOverlaps(body, up_sector_id+1,   overlap_fun);
+      if (left_ok)             FindSectorOverlaps(body, sector_id-1,      overlap_fun);
+      if (right_ok)            FindSectorOverlaps(body, sector_id+1,      overlap_fun);
+      if (down_ok)             FindSectorOverlaps(body, down_sector_id,   overlap_fun); 
+      if (down_ok && left_ok)  FindSectorOverlaps(body, down_sector_id-1, overlap_fun);
+      if (down_ok && right_ok) FindSectorOverlaps(body, down_sector_id+1, overlap_fun);
     }
+
+    // Find overlaps using a distance from a point.
+    void FindOverlap(Point center, double radius, const overlap_fun_t & overlap_fun) {
+      BodyInfo temp_body(center, radius);
+      FindOverlap(tmp_body, overlap_fun);
+    }
+
   };
 
 
