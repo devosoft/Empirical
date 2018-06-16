@@ -105,8 +105,15 @@ public:
 
     // On each update, run organisms and make sure they stay on the surface.
     OnUpdate([this](size_t){
+      // Process all organisms.
       Process(5);
-      for (auto & org : *this) {
+
+      // Update each organism.
+      for (size_t pos = 0; pos < pop.size(); pos++) {
+        if (pop[pos].IsNull()) continue;
+        auto & org = *pop[pos];
+
+        // Make sure organisms are on the surface (wrap around if not)
         double x = org.GetCenter().GetX();
         double y = org.GetCenter().GetY();
         if (x < 0.0) x += config.WORLD_X();
@@ -114,6 +121,15 @@ public:
         if (x >= config.WORLD_X()) x -= config.WORLD_X();
         if (y >= config.WORLD_Y()) y -= config.WORLD_Y();
         org.SetCenter({x,y});
+
+        // Provide additional resources toward reproduction.
+        org.ChangeEnergy( random_ptr->GetDouble(1.0) );
+
+        // If an organism has enough energy to reproduce, do so.
+        // if (org.GetEnergy() > org.GetMass()) {
+        //   DoBirth(org, pos);
+        //   //emp::Alert("Birth!");
+        // }
       }
     });
 
