@@ -150,6 +150,11 @@ namespace emp {
     const Point & GetMaxPosition() const { return max_pos; }
     const emp::vector<BodyInfo> & GetBodySet() const { return body_set; }
 
+    Ptr<body_t> GetPtr(size_t id) const { return body_set[id].body_ptr; }
+    Point GetCenter(size_t id) const { return body_set[id].center; }
+    double GetRadius(size_t id) const { return body_set[id].radius; }
+    size_t GetColor(size_t id) const { return body_set[id].color; }
+
     /// Add a single body; return its unique ID.
     size_t AddBody(Ptr<body_t> _body, Point _center, double _radius, size_t _color=0) {
       BodyInfo info = { _body, _center, _radius, _color };
