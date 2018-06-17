@@ -16,30 +16,31 @@ struct TestBody {
   size_t id = 0;
 };
 
-//   std::string AsString() const {
-//     size_t x = (size_t) (center.GetX() + 0.5);
-//     size_t y = (size_t) (center.GetY() + 0.5);
-//     return emp::to_string("(", x, ",", y, "):", (size_t) radius);
-//   }
+class TestSurface : public emp::Surface<TestBody> {
+public:
+  TestSurface() : emp::Surface<TestBody>({1000,1000}) { ; }
 
+  std::string AsString(const TestBody & body) const {
+    size_t x = (size_t) (GetCenter(body.id).GetX() + 0.5);
+    size_t y = (size_t) (GetCenter(body.id).GetY() + 0.5);
+    return emp::to_string(" (", x, ",", y, "):", (size_t) GetRadius(body.id));
+  }
+};
 
-// void PrintOverlap(const TestBody & body1, const TestBody & body2) {
-//   std::cout << "Overlap " << body1.id << " and " << body2.id << ": "
-//             << body1.AsString() << " and " << body2.AsString()
-//             << "  dist=" << body1.GetCenter().Distance(body2.GetCenter())
-//             << std::endl;
-// }
+TestSurface surface;
 
 void PrintOverlap(const TestBody & body1, const TestBody & body2) {
-  std::cout << "Overlap " << body1.id << " and " << body2.id << ".\n";
+  std::cout << "Overlap " << body1.id << " and " << body2.id
+            << surface.AsString(body1) << " and " << surface.AsString(body2)
+            << "  dist=" << surface.GetCenter(body1.id).Distance(surface.GetCenter(body2.id))
+            << ".\n";
 }
 
 
 int main()
 {
   emp::Random random;
-  emp::Surface<TestBody> surface({1000, 1000});
-  emp::vector<TestBody> bodies(20);
+  emp::vector<TestBody> bodies(10);
 
   for (auto & body : bodies) {
     body.id = surface.AddBody(&body,
