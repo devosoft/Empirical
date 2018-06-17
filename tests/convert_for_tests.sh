@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -e # exit with error if any of this fails
 cp -r ../source ../coverage_source
 for filename in $(find ../coverage_source -name "*.h" ! -name "_*" ! -path "*/OLD/*" ! -path "*/in_progress/*" ! -path "*/web/*")
 do
