@@ -70,47 +70,47 @@ namespace emp {
     size_t GetResetCount() const { return node->GetResetCount(); }
 
     /// Returns the sum of values added since the last reset.
-    /// Requires that the data::Range or data::FullRange be added to the DataNode 
+    /// Requires that the data::Range or data::FullRange be added to the DataNode
     double GetTotal() const { return node->GetTotal(); }
 
     /// Returns the mean of the values added since the last reset.
-    /// Requires that the data::Range or data::FullRange be added to the DataNode 
+    /// Requires that the data::Range or data::FullRange be added to the DataNode
     double GetMean() const { return node->GetMean(); }
 
     /// Returns the minimum of the values added since the last reset.
-    /// Requires that the data::Range or data::FullRange be added to the DataNode 
+    /// Requires that the data::Range or data::FullRange be added to the DataNode
     double GetMin() const { return node->GetMin(); }
 
     /// Returns the maximum of the values added since the last reset.
-    /// Requires that the data::Range or data::FullRange be added to the DataNode 
+    /// Requires that the data::Range or data::FullRange be added to the DataNode
     double GetMax() const { return node->GetMax(); }
 
     /// Returns the variance of the values added since the last reset.
-    /// Requires that the data::Stats or data::FullStats be added to the DataNode 
+    /// Requires that the data::Stats or data::FullStats be added to the DataNode
     double GetVariance() const { return node->GetVariance(); }
 
     /// Returns the standard deviation of the values added since the last reset.
-    /// Requires that the data::Stats or data::FullStats be added to the DataNode 
+    /// Requires that the data::Stats or data::FullStats be added to the DataNode
     double GetStandardDeviation() const { return node->GetStandardDeviation(); }
 
     /// Returns the skewness of the values added since the last reset.
-    /// Requires that the data::Stats or data::FullStats be added to the DataNode 
+    /// Requires that the data::Stats or data::FullStats be added to the DataNode
     double GetSkew() const { return node->GetSkew(); }
 
     /// Returns the kurtosis of the values added since the last reset.
-    /// Requires that the data::Stats or data::FullStats be added to the DataNode 
+    /// Requires that the data::Stats or data::FullStats be added to the DataNode
     double GetKurtosis() const { return node->GetKurtosis(); }
 
     /// Runs the Pull function for this DataNode and records the resulting values.
     /// Requires that the data::Pull module was added to this DataNode, and that a pull function
     /// was specified.
     void PullData() { node->PullData(); }
-    
+
     /// Reset this node. The exact effects of this depend on the modules that this node has,
     /// but in general it prepares the node to recieve a new set of data.
     void Reset() { node->Reset(); }
 
-    /// Print debug information about this node to @param os. 
+    /// Print debug information about this node to @param os.
     /// Useful for tracking which modifiers are included.
     void PrintDebug(std::ostream & os=std::cout) { node->PrintDebug(os); }
 

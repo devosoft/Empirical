@@ -128,7 +128,7 @@ namespace emp {
     array(InputIt first, InputIt last) : base_t(first, last), valid(true) { emp_assert(size() == N); }
     ~array() { valid=false; } // No longer valid when array is deleted.
 
-    operator std::array<T,N>() { 
+    operator std::array<T,N>() {
       std::array<T,N> ar;
       for (size_t i = 0; i < N; i++) ar[i] = base_t::operator[](i);
       return ar;

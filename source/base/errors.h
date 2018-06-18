@@ -20,7 +20,7 @@
  *  In general, most of the content of this file is targeted at providing useful tools for library
  *  users; end-users should receive more customized messages and asserts should capture
  *  suposedly "impossible" situations that none-the-less occur in the library itself.
- * 
+ *
  *  NOTES:
  *  - Whenever possible, exceptions should be preferred.  They are more specific than warnings,
  *    but don't halt execution like errors.
