@@ -27,6 +27,7 @@
 #include <functional>
 
 #include "../base/Ptr.h"
+#include "../tools/vector_utils.h"
 
 #include "Angle2D.h"
 #include "Point2D.h"
@@ -115,7 +116,7 @@ namespace emp {
     }
 
     // Place an active body into a sector.
-    inline void PlaceBody(BodyInfo & body) {
+    void PlaceBody(BodyInfo & body) {
       size_t cur_sector = FindSector(body.center);
       sectors[cur_sector].push_back(body.id);
     }
@@ -155,6 +156,35 @@ namespace emp {
     Point GetCenter(size_t id) const { return body_set[id].center; }
     double GetRadius(size_t id) const { return body_set[id].radius; }
     size_t GetColor(size_t id) const { return body_set[id].color; }
+
+    void SetPtr(size_t id, Ptr<body_t> _in) const { body_set[id].body_ptr = _in; }
+    void SetCenter(size_t id, Point _in) const {
+      // If not active, just move the body.
+      if (data_active == false) body_set[id].center = _in;
+      // Otherwise need to update data.
+      else {
+        const size_t old_sector_id = FindSector(body_set[id].center);
+        const size_t new_sector_id = FindSector(_in);
+        body_set[id].center = _in;
+        if (old_sector_id != new_sector_id) {
+          emp::RemoveValue(sectors[old_sector_id], id); // Remove from old sector.
+          sectors[new_sector_id].push_back(id);         // Insert into new sector.
+        }
+      }
+    }
+    void SetRadius(size_t id, double _in) const {
+      body_set[id].radius = _in;
+      TestBodySize(body_set[id]);
+    }
+    void SetColor(size_t id, size_t _in) const { body_set[id].color = _in; }
+    
+    void RemoveBody(size_t id) {
+      // @CAO Change id in body_set to nullptr; record cell id for re-use
+      if (data_active) {
+        const size_t sector_id = FindSector(body_set[id].center);
+        emp::RemoveValue(sectors[sector_id], id);
+      }
+    }
 
     /// Add a single body; return its unique ID.
     size_t AddBody(Ptr<body_t> _body, Point _center, double _radius, size_t _color=0) {
