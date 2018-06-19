@@ -5,6 +5,8 @@
 
 #include "Evolve/World.h"
 #include "geometry/Surface.h"
+#include "hardware/signalgp_utils.h"
+#include "tools/math.h"
 
 #include "config.h"
 #include "OpenOrg.h"
@@ -22,12 +24,15 @@ private:
   using hw_state_t = hardware_t::State;
  
   using surface_t = emp::Surface<OpenOrg>;
+  using mutator_t = emp::SignalGPMutator<TAG_WIDTH>;
 
   OpenWorldConfig & config;
   inst_lib_t inst_lib;
   event_lib_t event_lib;
   surface_t surface;
   size_t next_id;
+
+  mutator_t signalgp_mutator;
 
   // double pop_pressure = 1.0;  // How much pressure before an organism dies? 
 
@@ -38,7 +43,7 @@ public:
   OpenWorld(OpenWorldConfig & _config)
     : config(_config), inst_lib(), event_lib(),
       surface({config.WORLD_X(), config.WORLD_Y()}),
-      next_id(1), id_map()
+      next_id(1), signalgp_mutator(), id_map()
   {
     SetPopStruct_Grow(false); // Don't automatically delete organism when new ones are born.
 
@@ -49,6 +54,23 @@ public:
       id_map[id] = &GetOrg(pos);
     });
     OnOrgDeath( [this](size_t pos){ id_map.erase( GetOrg(pos).GetID() ); } );
+
+    signalgp_mutator.SetProgMinFuncCnt(config.PROGRAM_MIN_FUN_CNT());
+    signalgp_mutator.SetProgMaxFuncCnt(config.PROGRAM_MAX_FUN_CNT());
+    signalgp_mutator.SetProgMinFuncLen(config.PROGRAM_MIN_FUN_LEN());
+    signalgp_mutator.SetProgMaxFuncLen(config.PROGRAM_MAX_FUN_LEN());
+    signalgp_mutator.SetProgMinArgVal(config.PROGRAM_MIN_ARG_VAL());
+    signalgp_mutator.SetProgMaxArgVal(config.PROGRAM_MAX_ARG_VAL());
+    signalgp_mutator.SetProgMaxTotalLen(config.PROGRAM_MAX_FUN_CNT() * config.PROGRAM_MAX_FUN_LEN());
+
+    signalgp_mutator.ARG_SUB__PER_ARG(config.ARG_SUB__PER_ARG());
+    signalgp_mutator.INST_SUB__PER_INST(config.INST_SUB__PER_INST());
+    signalgp_mutator.INST_INS__PER_INST(config.INST_INS__PER_INST());
+    signalgp_mutator.INST_DEL__PER_INST(config.INST_DEL__PER_INST());
+    signalgp_mutator.SLIP__PER_FUNC(config.SLIP__PER_FUNC());
+    signalgp_mutator.FUNC_DUP__PER_FUNC(config.FUNC_DUP__PER_FUNC());
+    signalgp_mutator.FUNC_DEL__PER_FUNC(config.FUNC_DEL__PER_FUNC());
+    signalgp_mutator.TAG_BIT_FLIP__PER_BIT(config.TAG_BIT_FLIP__PER_BIT());
 
     // Setup the default instruction set.
     inst_lib.AddInst("Inc", hardware_t::Inst_Inc, 1, "Increment value in local memory Arg1");
@@ -135,7 +157,8 @@ public:
 
     // Setup a mutation function.
     SetMutFun( [this](OpenOrg & org, emp::Random & random){
-      org.SetRadius(org.GetRadius() * random.GetDouble(0.95, 1.05));
+      signalgp_mutator.ApplyMutations(org.GetBrain().GetProgram(), random);
+      org.SetRadius(org.GetRadius() * emp::Pow2(random.GetDouble(-0.1, 0.1)));
       return 1;
     });
 
@@ -146,32 +169,12 @@ public:
       double y = random_ptr->GetDouble(config.WORLD_Y());
       GetOrg(i).SetCenter({x,y});
       surface.AddBody(&GetOrg(i));
-      GetOrg(i).GetBrain().SetProgram(GenerateRandomProgram());
+      GetOrg(i).GetBrain().SetProgram(emp::GenRandSignalGPProgram(*random_ptr, inst_lib, config.PROGRAM_MIN_FUN_CNT(), config.PROGRAM_MAX_FUN_CNT(), config.PROGRAM_MIN_FUN_LEN(), config.PROGRAM_MAX_FUN_LEN(), config.PROGRAM_MIN_ARG_VAL(), config.PROGRAM_MAX_ARG_VAL()));
     }
   }
   ~OpenWorld() { ; }
 
   surface_t & GetSurface() { return surface; }
-
-  program_t GenerateRandomProgram() {
-    program_t prog(&inst_lib);
-    size_t fcnt = random_ptr->GetUInt(config.PROGRAM_MIN_FUN_CNT(), config.PROGRAM_MAX_FUN_CNT());
-    for (size_t fID = 0; fID < fcnt; ++fID) {
-      prog_fun_t new_fun;
-      new_fun.affinity.Randomize(*random_ptr);
-      size_t icnt = random_ptr->GetUInt(config.PROGRAM_MIN_INST_CNT(), config.PROGRAM_MAX_INST_CNT());
-      for (size_t iID = 0; iID < icnt; ++iID) {
-        new_fun.PushInst(random_ptr->GetUInt(prog.GetInstLib()->GetSize()),
-                         random_ptr->GetInt(config.PROGRAM_MAX_ARG_VAL()),
-                         random_ptr->GetInt(config.PROGRAM_MAX_ARG_VAL()),
-                         random_ptr->GetInt(config.PROGRAM_MAX_ARG_VAL()),
-                         prog_tag_t());
-        new_fun.inst_seq.back().affinity.Randomize(*random_ptr);
-      }
-      prog.PushFunction(new_fun);
-    }
-    return prog;
-  }
 
   /// Test if two bodies have collided and act accordingly if they have.
   bool TestPairCollision(OpenOrg & body1, OpenOrg & body2) {
