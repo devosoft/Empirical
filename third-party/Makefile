@@ -1,8 +1,15 @@
-install-dependencies: build-doxygen install-pip-deps install-npm-deps
+install-doc-dependencies: build-doxygen install-pip-deps
 	git submodule update --init
 
-travis-install-dependencies: build-doxygen install-npm-deps
-	sudo pip install -r requirements.txt
+install-test-dependencies: install-pip-deps install-npm-deps
+	bash ./install_emscripten.sh
+	git submodule update --init
+
+install-coverage-dependencies:
+	git submodule update --init
+	cd force-cover && make
+
+install-dependencies: install-doc-dependencies install-test-dependencies install-coverage-dependencies
 
 download-doxygen:
 	bash download_doxygen.sh

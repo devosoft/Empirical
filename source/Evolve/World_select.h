@@ -158,7 +158,7 @@ namespace emp {
     emp_assert(fit_funs.size() > 0);
 
     // @CAO: Can probably optimize a bit!
-    
+
     std::map<typename ORG::genome_t, int> genotype_counts;
     emp::vector<emp::vector<size_t>> genotype_lists;
 
@@ -227,7 +227,7 @@ namespace emp {
         next_gens.push_back(cur_gens[0]);
         // std::cout << "Starting max: " << max_fit << to_string(cur_gens) << std::endl;
         for (size_t gen_id : cur_gens) {
-              
+
           const double cur_fit = fitnesses[fit_id][gen_id];
           // std::cout << "gen_id: " << gen_id << "Fit: " << cur_fit << std::endl;
           if (cur_fit > max_fit) {
@@ -244,7 +244,7 @@ namespace emp {
         // Make next_orgs into new cur_orgs; make cur_orgs allocated space for next_orgs.
         std::swap(cur_gens, next_gens);
         next_gens.resize(0);
-        
+
         if (cur_gens.size() == 1) break;  // Stop if we're down to just one organism.
       }
 
