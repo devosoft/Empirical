@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
+ *  @date 2017-2018.
  *
  *  @file  _TableCol.h
  *  @brief The TableCol widget, which behaves like the Table widget, but focuses on a single column.
@@ -51,7 +51,7 @@ namespace web {
     TableCol & ClearCells() { Info()->ClearCol(cur_col); return *this; }
 
     /// Get the current CSS value for the specified setting of this Table column.
-    std::string GetCSS(const std::string & setting) override {
+    const std::string & GetCSS(const std::string & setting) const override {
       return Info()->cols[cur_col].extras.GetStyle(setting);
     }
 

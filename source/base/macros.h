@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2018
  *
  *  @file macros.h
  *  @brief Generally useful macros that can perform cools tricks.
@@ -564,8 +564,13 @@
 #define EMP_GET_ODD_ARGS(...) EMP_SELECT_ARGS((i,x), __VA_ARGS__)
 
 
-/// Enable an arbitrary number of arguments (well, up to 10) to be merged AFTER being processed!
+/// Enable an arbitrary number of arguments (well, up to 10) to be merged BEFORE being processed!
 #define EMP_MERGE(...) EMP_ASSEMBLE_MACRO(EMP_MERGE_, __VA_ARGS__)
+
+/// Enable an arbitrary number of arguments (well, up to 10) to be INDIRECTLY merged, that is,
+/// AFTER being processed!
+#define EMP_IMERGE(...) EMP_ASSEMBLE_MACRO(EMP_IMERGE_, __VA_ARGS__)
+
 /// @cond MACROS
 #define EMP_MERGE_1(A1) A1
 #define EMP_MERGE_2(A1,A2) A1 ## A2
@@ -579,7 +584,18 @@
 #define EMP_MERGE_10(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10) A1 ## A2 ## A3 ## A4 ## A5 ## A6 ## A7 ## A8 ## A9 ## A10
 
 // Indirect merges to give a chance for arg evaluation...
-#define EMP_IMERGE_2(A1, A2) EMP_MERGE_2(A1, A2)
+
+#define EMP_IMERGE_1(A1) EMP_MERGE_1(A1)
+#define EMP_IMERGE_2(A1,A2) EMP_MERGE_2(A1, A2)
+#define EMP_IMERGE_3(A1,A2,A3) EMP_MERGE_3(A1, A2, A3)
+#define EMP_IMERGE_4(A1,A2,A3,A4) EMP_MERGE_4(A1, A2, A3, A4)
+#define EMP_IMERGE_5(A1,A2,A3,A4,A5) EMP_MERGE_5(A1, A2, A3, A4, A5)
+#define EMP_IMERGE_6(A1,A2,A3,A4,A5,A6) EMP_MERGE_6(A1, A2, A3, A4, A5, A6)
+#define EMP_IMERGE_7(A1,A2,A3,A4,A5,A6,A7) EMP_MERGE_7(A1, A2, A3, A4, A5, A6, A7)
+#define EMP_IMERGE_8(A1,A2,A3,A4,A5,A6,A7,A8) EMP_MERGE_8(A1, A2, A3, A4, A5, A6, A7, A8)
+#define EMP_IMERGE_9(A1,A2,A3,A4,A5,A6,A7,A8,A9) EMP_MERGE_9(A1, A2, A3, A4, A5, A6, A7, A8, A9)
+#define EMP_IMERGE_10(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10) EMP_MERGE_10(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10)
+
 /// @endcond
 
 // EMP_WRAP_EACH takes a wrapper macro and a variable set of arguments,

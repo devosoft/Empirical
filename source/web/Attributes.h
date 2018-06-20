@@ -61,10 +61,10 @@ namespace web {
     }
 
     /// Return the (string) value of "setting" that has been recorded in this Attributes obj.
-    /// If setting did not exist, this does create an empty entry and return it.
-    const std::string & Get(const std::string & setting) {
-      // Note: if setting did not exist, this does create an empty entry.
-      return settings[setting];
+    const std::string & Get(const std::string & setting) const {
+      // Note: if setting did not exist, this does return (but not create) an empty entry.
+      auto it = settings.find(setting);
+      return (it == settings.end()) ? emp::empty_string() : it->second;
     }
 
     const std::map<std::string, std::string> & GetMap() const {

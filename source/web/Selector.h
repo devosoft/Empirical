@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  Selector.h
  *  @brief Specs for the Selector widget.
@@ -57,8 +57,7 @@ namespace web {
         if (callback_id) emp::JSDelete(callback_id);             // Delete callback wrapper.
       }
 
-      std::string TypeName() const override { return "SelectorInfo"; }
-      virtual bool IsSelectorInfo() const override { return true; }
+      std::string GetTypeName() const override { return "SelectorInfo"; }
 
       void SetOption(const std::string & name, const std::function<void()> & cb, size_t id) {
         // If we need more room for options, increase the array size.
@@ -129,7 +128,7 @@ namespace web {
         JSWrap( std::function<void(size_t)>([s_info](size_t new_id){s_info->DoChange(new_id);}) );
     }
     Selector(const Selector & in) : WidgetFacet(in) { ; }
-    Selector(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsSelectorInfo()); }
+    Selector(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsSelector()); }
     virtual ~Selector() { ; }
 
     using INFO_TYPE = SelectorInfo;

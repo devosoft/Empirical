@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018.
  *
  *  @file  init.h
  *  @brief Define Initialize() and other functions to set up Empirical to build Emscripten projects.
@@ -54,7 +54,7 @@ namespace emp {
   namespace web {
     // Some helper functions.
     // Live keyword means that whatever is passed in needs to be re-evaluated every update.
-    namespace {
+    namespace internal {
       /// If a variable is passed in to Live(), construct a function to look up its current value.
       template <typename VAR_TYPE>
       std::function<std::string()> Live_impl(VAR_TYPE & var, bool) {
@@ -71,7 +71,12 @@ namespace emp {
     /// Take a function or variable and set it up so that it can update each time a text box is redrawn.
     template <typename T>
     std::function<std::string()> Live(T && val) {
-      return Live_impl(std::forward<T>(val), true);
+      return internal::Live_impl(std::forward<T>(val), true);
+    }
+
+    inline std::string ToJSLiteral(bool x) {
+      if (x == true) return "true";
+      else return "false";
     }
   }
 
@@ -97,6 +102,7 @@ namespace emp {
   /// Stub for when Emscripten is not in use.
   static bool Initialize() {
     // Nothing to do here yet...
+    static_assert(false, "Emscripten web tools require emcc for compilation (for now).");
     return true;
   }
 
@@ -106,6 +112,12 @@ namespace emp {
     return true;
   }
 
+  namespace web {
+    inline std::string ToJSLiteral(bool x) {
+      if (x == true) return "true";
+      else return "false";
+    }
+  }
 
 }
 

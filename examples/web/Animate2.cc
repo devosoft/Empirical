@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
+//  Copyright (C) Michigan State University, 2015-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include "tools/Random.h"
@@ -14,10 +14,10 @@ UI::Document doc("emp_base");
 UI::CanvasPolygon poly(200, 300, "red", "black");
 UI::CanvasLine line(5,5, 395,395, "green");
 
-size_t cx = 150;
-size_t cy = 150;
-size_t cr = 50;
-size_t can_size = 400;
+double cx = 150;
+double cy = 150;
+double cr = 50;
+double can_size = 400;
 double poly_rot = 0.0;
 
 void CanvasAnim(double time) {
@@ -49,8 +49,8 @@ void CanvasAnim(double time) {
 int main()
 {
   // How big should each canvas be?
-  const size_t w = can_size;
-  const size_t h = can_size;
+  const double w = can_size;
+  const double h = can_size;
 
   emp::Random random;
 
@@ -69,8 +69,8 @@ int main()
   doc.AddButton([anim](){
       anim->ToggleActive();
       auto but = doc.Button("toggle");
-      if (anim->GetActive()) but.Label("Pause");
-      else but.Label("Start");
+      if (anim->GetActive()) but.SetLabel("Pause");
+      else but.SetLabel("Start");
     }, "Start", "toggle");
 
   doc << UI::Text("fps") << "FPS = " << UI::Live( [anim](){return anim->GetStepTime();} ) ;

@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
+ *  @date 2017-2018.
  *
  *  @file  _TableRow.h
  *  @brief The TableRow widget, which behaves like the Table widget, but focuses on a single row.
@@ -49,7 +49,7 @@ namespace web {
     TableRow & ClearChildren() { Info()->ClearRowChildren(cur_row); return *this; }
     TableRow & ClearCells() { Info()->ClearRow(cur_row); return *this; }
 
-    std::string GetCSS(const std::string & setting) override {
+    const std::string & GetCSS(const std::string & setting) const override {
       return Info()->rows[cur_row].extras.GetStyle(setting);
     }
 

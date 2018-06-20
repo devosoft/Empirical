@@ -2,6 +2,8 @@ Empirical is a library of tools for developing efficient, reliable, and accessib
 software.  The provided code is all header-only and encapsulated into the emp namespace, so it
 is simple to incorporate into existing projects.
 
+[![Build Status](https://travis-ci.org/devosoft/Empirical.svg?branch=master)](https://travis-ci.org/devosoft/Empirical) [![Documentation Status](https://readthedocs.org/projects/empirical/badge/?version=latest)](https://empirical.readthedocs.io/en/latest/?badge=latest)
+
 See the doc/QuickStartGuides/ folder to start using the library.
 
 Tools in Empirical include:
@@ -12,7 +14,7 @@ Tools in Empirical include:
 * Many other helper tools to streamline common scientific computing tasks (configuration,
   randomization, bit manipulation, etc.)
 
-See https://empirical.readthedocs.io/en/latest/html/files.html for more detailed documentation
+See https://empirical.readthedocs.io/en/latest for more detailed documentation
 on the available source files.
 
 # Directory Structure

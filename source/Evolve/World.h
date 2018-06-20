@@ -344,28 +344,28 @@ namespace emp {
     /// Get a systematics manager (which is tracking lineages in the population.)
     /// @param id - which systematics manager to return? Systematics managers are
     /// stored in the order they are added to the world.
-    Ptr<SystematicsBase<ORG> > GetSystematics(int id=0) { 
+    Ptr<SystematicsBase<ORG> > GetSystematics(int id=0) {
       emp_assert(systematics.size() > 0, "Cannot get systematics file. No systematics file to track.");
       emp_assert(id < (int)systematics.size(), "Invalid systematics file requested.", id, systematics.size());
-      return systematics[id]; 
+      return systematics[id];
     }
 
     /// Get a systematics manager (which is tracking lineages in the population.)
     /// @param id - which systematics manager to return? Systematics managers are
     /// stored in the order they are added to the world.
-    Ptr<SystematicsBase<ORG> > GetSystematics(std::string label) { 
+    Ptr<SystematicsBase<ORG> > GetSystematics(std::string label) {
       emp_assert(Has(systematics_labels, label), "Invalid systematics manager label");
 
-      return systematics[systematics_labels[label]]; 
+      return systematics[systematics_labels[label]];
     }
 
 
-    void RemoveSystematics(int id) { 
+    void RemoveSystematics(int id) {
       emp_assert(systematics.size() > 0, "Cannot remove systematics file. No systematics file to track.");
       emp_assert(id < systematics.size(), "Invalid systematics file requested to be removed.", id, systematics.size());
-      
-      systematics[id].Delete(); 
-      systematics[id] = nullptr; 
+
+      systematics[id].Delete();
+      systematics[id] = nullptr;
 
       for (auto el : systematics_labels) {
         if (el.second == id) {
@@ -374,10 +374,10 @@ namespace emp {
       }
     }
 
-    void RemoveSystematics(std::string label) { 
+    void RemoveSystematics(std::string label) {
       emp_assert(Has(systematics_labels, label), "Invalid systematics manager label");
 
-      systematics[systematics_labels[label]].Delete(); 
+      systematics[systematics_labels[label]].Delete();
       systematics[systematics_labels[label]] = nullptr;
       systematics_labels.erase(label) ;
     }
@@ -870,7 +870,7 @@ namespace emp {
     pops.MakeValid(pos);                 // Make sure we have room for new organism
     pops(pos) = new_org;                 // Put org into place.
 
-    // Track org count 
+    // Track org count
     if (pos.IsActive()) ++num_orgs;
 
     // Track the new systematics info
@@ -937,7 +937,7 @@ namespace emp {
         emp_assert(new_org);      // New organism must exist.
         return WorldPosition(pops[1].size(), 1);   // Append it to the NEXT population
       };
-      
+
       SetAttribute("SynchronousGen", "True");
     } else {
       // Asynchronous: always append to current population.
@@ -947,7 +947,7 @@ namespace emp {
       SetAttribute("SynchronousGen", "False");
     }
 
-    SetAttribute("PopStruct", "Grow");    
+    SetAttribute("PopStruct", "Grow");
     SetSynchronousSystematics(synchronous_gen);
   }
 
@@ -1148,7 +1148,7 @@ namespace emp {
       for (size_t i = 0; i < pops[1].size(); i++) {
         if (!pops[1][i]) continue;
         before_placement_sig.Trigger(*pops[1][i], i);  // Trigger that org is about to be placed.
-      } 
+      }
 
       // Clear out current pop.
       for (size_t i = 0; i < pop.size(); i++) RemoveOrgAt(i);

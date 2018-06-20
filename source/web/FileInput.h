@@ -37,8 +37,6 @@ namespace web {
     class FileInputInfo : public internal::WidgetInfo {
       friend FileInput;
     protected:
-      std::string title;
-
       bool autofocus;
       bool disabled;
 
@@ -52,7 +50,7 @@ namespace web {
         if (callback_id) emp::JSDelete(callback_id);               // Delete callback wrapper.
       }
 
-      std::string TypeName() const override { return "FileInputInfo"; }
+      std::string GetTypeName() const override { return "FileInputInfo"; }
 
       void DoCallback(const std::string & file_body) {
         callback(file_body);
@@ -62,7 +60,6 @@ namespace web {
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");                                             // Clear the current text.
         HTML <<"<input type=\"file\"";
-        if (title != "") HTML << " title=\"" << title << "\"";    // Add a title if there is one
         if (disabled) { HTML << " disabled=true"; }               // Check if should be disabled
         HTML << " id=\"" << id << "\"";                           // Indicate ID.
         HTML << " name=\"" << id << "\"";                         // Use same name as ID
@@ -74,10 +71,6 @@ namespace web {
         callback = in_cb;
       }
 
-      void UpdateTitle(const std::string & in_title) {
-        title = in_title;
-        if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
-      }
       void UpdateAutofocus(bool in_af) {
         autofocus = in_af;
         if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
@@ -106,7 +99,6 @@ namespace web {
     {
       info = new FileInputInfo(in_id);
 
-      Info()->title = "";
       Info()->autofocus = false;
       Info()->disabled = false;
 
@@ -134,17 +126,11 @@ namespace web {
       return *this;
     }
 
-    /// Set a ToolTip for this FileInput object.
-    FileInput & Title(const std::string & in_t) { Info()->UpdateTitle(in_t); return *this; }
-
     /// Set this FileInput object to have autofocus (or not)
     FileInput & Autofocus(bool in_af) { Info()->UpdateAutofocus(in_af); return *this; }
 
     /// Set this FileInput object to be disabled (or renable it.)
     FileInput & Disabled(bool in_dis) { Info()->UpdateDisabled(in_dis); return *this; }
-
-    /// Get the current tooltip.
-    const std::string & GetTitle() const { return Info()->title; }
 
     /// Determine if this object currently has autofocus.
     bool HasAutofocus() const { return Info()->autofocus; }

@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  Widget.h
  *  @brief Widgets maintain individual components on a web page and link to Elements
@@ -117,7 +117,7 @@ namespace web {
     bool IsNull() const { return info == nullptr; }
 
     /// Some debugging helpers...
-    std::string InfoTypeName() const;
+    std::string GetInfoTypeName() const;
 
     bool IsInactive() const;  ///< Test if the activity state of this widget is currently INACTIVE
     bool IsWaiting() const;   ///< Test if the activity state of this widget is currently WAITING
@@ -127,25 +127,29 @@ namespace web {
     bool AppendOK() const;    ///< Is it okay to add more internal Widgets into this one?
     void PreventAppend();     ///< Disallow further appending to this Widget.
 
-    bool IsButton() const;    ///< Is this Widget a Button?
-    bool IsCanvas() const;    ///< Is this Widget a Canvas?
-    bool IsImage() const;     ///< Is this Widget an Image?
-    bool IsSelector() const;  ///< Is this Widget a Selector?
-    bool IsDiv() const;       ///< Is this Widget a Div?
-    bool IsTable() const;     ///< Is this Widget a Table?
-    bool IsText() const;      ///< Is this Widget a Text?
+    bool IsButton()   const { return GetInfoTypeName() == "ButtonInfo"; }
+    bool IsCanvas()   const { return GetInfoTypeName() == "CanvasInfo"; }
+    bool IsDiv()      const { return GetInfoTypeName() == "DivInfo"; }
+    bool IsImage()    const { return GetInfoTypeName() == "ImageInfo"; }
+    bool IsInput()    const { return GetInfoTypeName() == "InputInfo"; }
+    bool IsSelector() const { return GetInfoTypeName() == "SelectorInfo"; }
+    bool IsTable()    const { return GetInfoTypeName() == "TableInfo"; }
+    bool IsText()     const { return GetInfoTypeName() == "TextInfo"; }
+    bool IsTextArea() const { return GetInfoTypeName() == "TextAreaInfo"; }
+
+    bool IsD3Visualiation() const { return GetInfoTypeName() == "D3VisualizationInfo"; }
 
     const std::string & GetID() const;  ///< What is the HTML string ID for this Widget?
 
     /// Retrieve a specific CSS trait associated with this Widget.
     /// Note: CSS-related options may be overridden in derived classes that have multiple styles.
-    virtual std::string GetCSS(const std::string & setting);
+    virtual const std::string & GetCSS(const std::string & setting) const;
 
     /// Determine is a CSS trait has been set on this Widget.
     virtual bool HasCSS(const std::string & setting);
 
     /// Retrieve a specific attribute associated with this Widget.
-    virtual std::string GetAttr(const std::string & setting);
+    virtual const std::string & GetAttr(const std::string & setting) const;
 
     /// Determine is an attribute has been set on this Widget.
     virtual bool HasAttr(const std::string & setting);
@@ -158,6 +162,8 @@ namespace web {
 
     /// Conver Widget to bool (I.e., is this Widget active?)
     operator bool() const { return info != nullptr; }
+
+    const std::string & GetTitle() const { return GetAttr("title"); }  /// Get current tooltip on this widget.
 
     double GetXPos();          ///< Get the X-position of this Widget within its parent.
     double GetYPos();          ///< Get the Y-position of this Widget within its parent.
@@ -235,17 +241,7 @@ namespace web {
       }
 
       /// Debugging helpers...
-      virtual std::string TypeName() const { return "WidgetInfo base"; }
-
-      virtual bool IsButtonInfo() const { return false; }
-      virtual bool IsCanvasInfo() const { return false; }
-      virtual bool IsImageInfo() const { return false; }
-      virtual bool IsSelectorInfo() const { return false; }
-      virtual bool IsDivInfo() const { return false; }
-      virtual bool IsTableInfo() const { return false; }
-      virtual bool IsTextInfo() const { return false; }
-      virtual bool IsTextAreaInfo() const { return false; }
-      virtual bool IsD3VisualiationInfo() const { return false; }
+      virtual std::string GetTypeName() const { return "WidgetInfo"; }
 
       // If not overloaded, pass along widget registration to parent.
       virtual void Register_recurse(Widget & w) { if (parent) parent->Register_recurse(w); }
@@ -281,7 +277,7 @@ namespace web {
       }
 
       virtual bool AppendOK() const { return false; } // Most widgets can't be appended to.
-      virtual void PreventAppend() { emp_assert(false, TypeName()); } // Only for appendable widgets.
+      virtual void PreventAppend() { emp_assert(false, GetTypeName()); } // Only for appendable widgets.
 
       // By default, elements should forward unknown appends to their parents.
       virtual Widget Append(const std::string & text) { return ForwardAppend(text); }
@@ -370,7 +366,7 @@ namespace web {
     EMP_TRACK_DESTRUCT(WebWidget);
   }
 
-  std::string Widget::InfoTypeName() const { if (IsNull()) return "NULL"; return info->TypeName(); }
+  std::string Widget::GetInfoTypeName() const { if (IsNull()) return "NULL"; return info->GetTypeName(); }
 
   Widget & Widget::SetInfo(WidgetInfo * in_info) {
     // If the widget is already set correctly, stop here.
@@ -400,23 +396,15 @@ namespace web {
   const std::string Widget::no_name = "(none)";
   const std::string & Widget::GetID() const { return info ? info->id : no_name; }
 
-  bool Widget::IsButton() const { if (!info) return false; return info->IsButtonInfo(); }
-  bool Widget::IsCanvas() const { if (!info) return false; return info->IsCanvasInfo(); }
-  bool Widget::IsImage() const { if (!info) return false; return info->IsImageInfo(); }
-  bool Widget::IsSelector() const { if (!info) return false; return info->IsSelectorInfo(); }
-  bool Widget::IsDiv() const { if (!info) return false; return info->IsDivInfo(); }
-  bool Widget::IsTable() const { if (!info) return false; return info->IsTableInfo(); }
-  bool Widget::IsText() const { if (!info) return false; return info->IsTextInfo(); }
-
-  std::string Widget::GetCSS(const std::string & setting) {
-    return info ? info->extras.GetStyle(setting) : "";
+  const std::string & Widget::GetCSS(const std::string & setting) const {
+    return info ? info->extras.GetStyle(setting) : emp::empty_string();
   }
   bool Widget::HasCSS(const std::string & setting) {
     return info ? info->extras.HasStyle(setting) : false;
   }
 
-  std::string Widget::GetAttr(const std::string & setting) {
-    return info ? info->extras.GetAttr(setting) : "";
+  const std::string & Widget::GetAttr(const std::string & setting) const {
+    return info ? info->extras.GetAttr(setting) : emp::empty_string();
   }
   bool Widget::HasAttr(const std::string & setting) {
     return info ? info->extras.HasAttr(setting) : false;
@@ -709,6 +697,8 @@ namespace web {
       /// Provide a function to be called whenever text is pasted in this Widget.
       template <typename T> return_t & OnPaste(T && arg) { return On("paste", arg); }
 
+      /// Create a tooltip for this Widget.
+      return_t & SetTitle(const std::string & _in) { return SetAttr("title", _in); }
 
       /// Update the width of this Widget.
       /// @param unit defaults to pixels ("px"), but can also be a measured distance (e.g, "inches") or a percentage("%")

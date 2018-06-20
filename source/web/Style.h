@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  Style.h
  *  @brief A CSS class for tracking font style, etc.
@@ -63,10 +63,9 @@ namespace web {
     }
 
     /// Return the (string) value of "setting" that has been recorded in this Style.
-    /// If setting did not exist, this does create an empty entry and return it.
-    const std::string & Get(const std::string & setting) {
-      emp_assert(Has(setting));
-      return settings[setting];
+    const std::string & Get(const std::string & setting) const {
+      auto it = settings.find(setting);
+      return (it == settings.end()) ? emp::empty_string() : it->second;
     }
 
     const std::map<std::string, std::string> & GetMap() const {

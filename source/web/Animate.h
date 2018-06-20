@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  Animate.h
  *  @brief Manage animations on a web site.
@@ -218,7 +218,7 @@ namespace web {
     Button GetToggleButton(const std::string & but_name, const std::string & start_label="Start", const std::string & stop_label="Stop") {
       toggle_but = Button( [this, but_name, start_label, stop_label]() {
           ToggleActive();
-          toggle_but.Label(active ? stop_label : start_label);
+          toggle_but.SetLabel(active ? stop_label : start_label);
         }, start_label, but_name);
       return toggle_but;
     }

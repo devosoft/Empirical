@@ -1,4 +1,6 @@
-sphinx
-breathe
+sphinx==1.6.6
+breathe==4.8.0
 gcovr
-diff-cover
+diff
+sphinx_rtd_theme
+
