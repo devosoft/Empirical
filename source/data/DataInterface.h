@@ -134,6 +134,11 @@ namespace emp {
     return new DataInterface_Impl<VAL_TYPE, EXTRA...>();
   }
 
+  template <typename VAL_TYPE, emp::data... EXTRA>
+  DataInterface * MakeDataInterface(DataNode<VAL_TYPE, EXTRA...>* dn) {
+    return new DataInterface_Impl<VAL_TYPE, EXTRA...>(dn);
+  }
+
 }
 
 #endif

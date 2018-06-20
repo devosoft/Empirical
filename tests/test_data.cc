@@ -275,17 +275,43 @@ TEST_CASE("Test DataInterface", "[data]") {
 
     emp::DataNode<double, emp::data::Current, emp::data::Range> node;
     node.Add(5.5, .6); // Put in some test data, since we can't add through the interface
+    auto * di2 = emp::MakeDataInterface(&node);
 
-    auto * di2(&node);
     REQUIRE(di2->GetTotal() == 6.1);
     REQUIRE(di2->GetMin() == .6);
     REQUIRE(di2->GetMax() == 5.5);
     REQUIRE(di2->GetMean() == 3.05);
 
+    // make sure everything as expected when passing as a reference
+    REQUIRE([](emp::DataInterface& di){ return di.GetTotal(); }(*di2) == 6.1);
+    REQUIRE([](emp::DataInterface& di){ return di.GetMin(); }(*di2) == .6);
+
+    // make sure delet works as expected!
+    delete di2;
+
+    // make sure adding more data later works as expected
+    node.Add(5.6,.5);
+
+    // make sure that we can have two DataInterfaces to the same node
+    di2 = emp::MakeDataInterface(&node);
+    auto * di2_2 = emp::MakeDataInterface(&node);
+
+    REQUIRE(di2->GetTotal() == 12.2);
+    REQUIRE(di2->GetMin() == .5);
+    REQUIRE(di2->GetMax() == 5.6);
+    REQUIRE(di2->GetMean() == 3.05);
+    REQUIRE(di2_2->GetTotal() == 12.2);
+    REQUIRE(di2_2->GetMin() == .5);
+    REQUIRE(di2_2->GetMax() == 5.6);
+    REQUIRE(di2_2->GetMean() == 3.05);
+
+    delete di2;
+    delete di2_2;
+
     emp::DataNode<double, emp::data::Current, emp::data::Range, emp::data::Stats> node2;
     node2.Add(5.5, .6); // Put in some test data, since we can't add through the interface
 
-    auto * di3(&node2);
+    auto * di3 = emp::MakeDataInterface(&node2);
 
     REQUIRE(di3->GetTotal() == 6.1);
     REQUIRE(di3->GetMin() == .6);
@@ -295,6 +321,8 @@ TEST_CASE("Test DataInterface", "[data]") {
     REQUIRE(di3->GetStandardDeviation() == Approx(2.45));
     REQUIRE(di3->GetSkew() == 0);
     REQUIRE(di3->GetKurtosis() == -2);
+
+    delete di3;
 }
 
 int test_fun() {
