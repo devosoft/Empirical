@@ -51,6 +51,7 @@ public:
     OnPlacement( [this](size_t pos){
       size_t id = next_id++;
       GetOrg(pos).GetBrain().SetTrait((size_t)OpenOrg::Trait::ORG_ID, id);
+      surface.AddBody(&GetOrg(pos));
       id_map[id] = &GetOrg(pos);
     });
     OnOrgDeath( [this](size_t pos){ id_map.erase( GetOrg(pos).GetID() ); } );
@@ -145,13 +146,16 @@ public:
         org.SetCenter({x,y});
 
         // Provide additional resources toward reproduction.
-        org.ChangeEnergy( random_ptr->GetDouble(1.0) );
+        org.AdjustEnergy( random_ptr->GetDouble(0.1) );
 
         // If an organism has enough energy to reproduce, do so.
-        // if (org.GetEnergy() > org.GetMass()) {
-        //   DoBirth(org, pos);
-        //   //emp::Alert("Birth!");
-        // }
+        if (org.GetEnergy() > org.GetMass()) {
+          // Remove energy for building offspring; cut rest in half, so it is effectively
+          // split between parent and child when copied into child.
+          org.SetEnergy((org.GetEnergy() - org.GetMass() / 2.0));
+          DoBirth(org, pos);
+//          emp::Alert("Birth!");
+        }
       }
     });
 
