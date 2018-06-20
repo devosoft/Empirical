@@ -91,9 +91,11 @@ TEST_CASE("Test array constructors", "[base]")
   emp::array<int, A_SIZE> test_array(test_in_array);
   CHECK(test_array[1] ==2);
 
+  #ifndef NDEBUG
   std::vector<int> test_in_vec({10,2,3,4,5});
   emp::array<int, A_SIZE> test_array_2(test_in_vec);
   CHECK(test_array[2] ==3);
+  #endif
 
   std::array<int, A_SIZE> test_in_std_array({10,2,3,4,5});
   emp::array<int, A_SIZE> test_array_3(test_in_std_array);
