@@ -165,7 +165,7 @@ TEST_CASE("Test DataArchive", "[data]") {
     data2.Reset();
 
     // Generate what the archive should look like now that we Reset
-    emp::vector<emp::vector<int>> arch_comp; 
+    emp::vector<emp::vector<int>> arch_comp;
     arch_comp.push_back(emp::vector<int>({1,2,3,4,5,6,7,9,8}));
 
     // Compare archives as strings for easy reading of errors.
@@ -359,7 +359,7 @@ TEST_CASE("Test histogram", "[data]") {
     REQUIRE(data.GetHistCounts() == emp::vector<size_t>({3,0,0,0,0,0,0,0,0,1}));
 
     data.Reset();
-    REQUIRE(data.GetHistCounts() == emp::vector<size_t>({0,0,0,0,0,0,0,0,0,0}));    
+    REQUIRE(data.GetHistCounts() == emp::vector<size_t>({0,0,0,0,0,0,0,0,0,0}));
 }
 
 TEST_CASE("Test Container DataFile", "[data]") {
@@ -396,7 +396,7 @@ TEST_CASE("Test Container DataFile", "[data]") {
     cool_data.push_back(2);
     data_ptr->Update(4);
     data_ptr->Update(5);
-    
+
     REQUIRE(compareFiles("test_container_file.dat", "data/test_container_file.dat"));
 
     auto dfile2 = emp::MakeContainerDataFile(get_data, "test_make_container_file.dat");
