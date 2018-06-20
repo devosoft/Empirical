@@ -48,6 +48,59 @@ TEST_CASE("Test array", "[base]")
   REQUIRE(sum == 40425);
 }
 
+TEST_CASE("Test array iterator", "[base]")
+{
+  constexpr int A_SIZE = 5;
+  emp::array<int, A_SIZE> test_array({10,2,3,4,5});
+
+  int sum = 0;
+  for (int i : test_array) {
+    sum += i;
+  }
+
+  REQUIRE(sum == 24);
+
+  test_array = {5,2,7,1,0};
+  sum = 0;
+  for (const int i : test_array) {
+    sum += i;
+  }
+
+  REQUIRE(sum == 15);
+
+  #ifndef NDEBUG 
+  REQUIRE(test_array.begin().OK());
+  #endif
+
+  // Test const array
+  const emp::array<int, A_SIZE> const_array({1,2,3,4,5});
+  sum = 0;
+  for (const int i : test_array) {
+    sum += i;
+  }
+
+  REQUIRE(sum == 15);
+
+}
+
+
+TEST_CASE("Test array constructors", "[base]")
+{
+  constexpr int A_SIZE = 5;
+  emp::array<int, A_SIZE> test_in_array({10,2,3,4,5});
+  emp::array<int, A_SIZE> test_array(test_in_array);
+  CHECK(test_array[1] ==2);
+
+  std::vector<int> test_in_vec({10,2,3,4,5});
+  emp::array<int, A_SIZE> test_array_2(test_in_vec);
+  CHECK(test_array[2] ==3);
+
+  std::array<int, A_SIZE> test_in_std_array({10,2,3,4,5});
+  emp::array<int, A_SIZE> test_array_3(test_in_std_array);
+  CHECK(test_array[3] == 4);
+
+}
+
 
 TEST_CASE("Test macro_math", "[base]")
 {
