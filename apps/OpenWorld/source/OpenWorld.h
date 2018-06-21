@@ -4,7 +4,7 @@
 #define OPEN_WORLD_H
 
 #include "Evolve/World.h"
-#include "geometry/Surface.h"
+#include "geometry/Surface2.h"
 #include "hardware/signalgp_utils.h"
 #include "tools/math.h"
 
@@ -51,7 +51,9 @@ public:
     OnPlacement( [this](size_t pos){
       size_t id = next_id++;
       GetOrg(pos).GetBrain().SetTrait((size_t)OpenOrg::Trait::ORG_ID, id);
-      surface.AddBody(&GetOrg(pos));
+      // @CAO Org should actually be placed with parent, but spun.
+      size_t surface_id = surface.AddBody(&GetOrg(pos), {50.0,50.0}, 5);
+      GetOrg(pos).SetSurfaceID(surface_id);
       id_map[id] = &GetOrg(pos);
     });
     OnOrgDeath( [this](size_t pos){ id_map.erase( GetOrg(pos).GetID() ); } );
@@ -111,7 +113,7 @@ public:
       const size_t id = (size_t) hw.GetTrait((size_t) OpenOrg::Trait::ORG_ID);
       emp::Ptr<OpenOrg> org_ptr = id_map[id];
       emp::Angle facing = org_ptr->GetFacing();
-      org_ptr->Translate( facing.GetPoint(1.0) );
+      surface.Translate( org_ptr->GetSurfaceID(), facing.GetPoint(1.0) );
     }, 1, "Move forward.");
 
     inst_lib.AddInst("SpinRight", [this](hardware_t & hw, const inst_t & inst) mutable {
@@ -135,24 +137,27 @@ public:
       for (size_t pos = 0; pos < pop.size(); pos++) {
         if (pop[pos].IsNull()) continue;
         auto & org = *pop[pos];
+        const size_t surface_id = org.GetSurfaceID();
 
         // Make sure organisms are on the surface (wrap around if not)
-        double x = org.GetCenter().GetX();
-        double y = org.GetCenter().GetY();
+        double x = surface.GetCenter(surface_id).GetX();
+        double y = surface.GetCenter(surface_id).GetY();
         if (x < 0.0) x += config.WORLD_X();
         if (y < 0.0) y += config.WORLD_Y();
         if (x >= config.WORLD_X()) x -= config.WORLD_X();
         if (y >= config.WORLD_Y()) y -= config.WORLD_Y();
-        org.SetCenter({x,y});
+        surface.SetCenter(surface_id, {x,y});
 
         // Provide additional resources toward reproduction.
         org.AdjustEnergy( random_ptr->GetDouble(0.1) );
 
         // If an organism has enough energy to reproduce, do so.
-        if (org.GetEnergy() > org.GetMass()) {
+        const size_t radius = surface.GetRadius(surface_id);
+        const size_t mass = radius * radius;
+        if (org.GetEnergy() > mass) {
           // Remove energy for building offspring; cut rest in half, so it is effectively
           // split between parent and child when copied into child.
-          org.SetEnergy((org.GetEnergy() - org.GetMass() / 2.0));
+          org.SetEnergy((org.GetEnergy() - mass / 2.0));
           DoBirth(org, pos);
 //          emp::Alert("Birth!");
         }
@@ -162,7 +167,8 @@ public:
     // Setup a mutation function.
     SetMutFun( [this](OpenOrg & org, emp::Random & random){
       signalgp_mutator.ApplyMutations(org.GetBrain().GetProgram(), random);
-      org.SetRadius(org.GetRadius() * emp::Pow2(random.GetDouble(-0.1, 0.1)));
+      double radius_change = emp::Pow2(random.GetDouble(-0.1, 0.1));
+      surface.ScaleRadius(org.GetSurfaceID(), radius_change);
       return 1;
     });
 
@@ -171,29 +177,18 @@ public:
     for (size_t i = 0; i < config.INIT_POP_SIZE(); i++) {
       double x = random_ptr->GetDouble(config.WORLD_X());
       double y = random_ptr->GetDouble(config.WORLD_Y());
-      GetOrg(i).SetCenter({x,y});
-      surface.AddBody(&GetOrg(i));
-      GetOrg(i).GetBrain().SetProgram(emp::GenRandSignalGPProgram(*random_ptr, inst_lib, config.PROGRAM_MIN_FUN_CNT(), config.PROGRAM_MAX_FUN_CNT(), config.PROGRAM_MIN_FUN_LEN(), config.PROGRAM_MAX_FUN_LEN(), config.PROGRAM_MIN_ARG_VAL(), config.PROGRAM_MAX_ARG_VAL()));
+      OpenOrg & org = GetOrg(i);
+      size_t surface_id = surface.AddBody(&org, {x,y}, 5.0);
+      org.SetSurfaceID(surface_id);
+      org.GetBrain().SetProgram(emp::GenRandSignalGPProgram(*random_ptr, inst_lib, config.PROGRAM_MIN_FUN_CNT(), config.PROGRAM_MAX_FUN_CNT(), config.PROGRAM_MIN_FUN_LEN(), config.PROGRAM_MAX_FUN_LEN(), config.PROGRAM_MIN_ARG_VAL(), config.PROGRAM_MAX_ARG_VAL()));
     }
   }
-  ~OpenWorld() { ; }
+  ~OpenWorld() { id_map.clear(); }
 
   surface_t & GetSurface() { return surface; }
 
-  /// Test if two bodies have collided and act accordingly if they have.
-  bool TestPairCollision(OpenOrg & body1, OpenOrg & body2) {
-    // if (body1.IsLinked(body2)) return false;  // Linked bodies can overlap.
-
-    const emp::Point dist = body1.GetCenter() - body2.GetCenter();
-    const double sq_pair_dist = dist.SquareMagnitude();
-    const double radius_sum = body1.GetRadius() + body2.GetRadius();
-    const double sq_min_dist = radius_sum * radius_sum;
-
-    // If there was no collision, return false.
-    if (sq_pair_dist >= sq_min_dist) { return false; }
-
-    // If we made it this far, there was a collision!
-
+  /// React to two bodies having collided.
+  bool PairCollision(OpenOrg & body1, OpenOrg & body2) {
     return true;
   }
 };
