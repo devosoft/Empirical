@@ -35,7 +35,6 @@ TEST_CASE("Test array", "[base]")
 {
   constexpr int A_SIZE = 50;
   emp::array<int, A_SIZE> test_array;
-
   for (size_t i = 0; i < A_SIZE; i++) {
     test_array[i] = (int) (i * i);
   }
@@ -45,7 +44,9 @@ TEST_CASE("Test array", "[base]")
     sum += test_array[i];
   }
 
-  REQUIRE(sum == 40425);
+  CHECK(sum == 40425);
+  CHECK(test_array.front() == 0);
+  CHECK(test_array.back() == 2401);
 }
 
 TEST_CASE("Test array iterator", "[base]")
@@ -73,7 +74,7 @@ TEST_CASE("Test array iterator", "[base]")
   #endif
 
   // Test const array
-  const emp::array<int, A_SIZE> const_array({1,2,3,4,5});
+  const emp::array<int, A_SIZE> const_array({5,3,4,2,1});
   sum = 0;
   for (const int i : test_array) {
     sum += i;
@@ -81,6 +82,19 @@ TEST_CASE("Test array iterator", "[base]")
 
   REQUIRE(sum == 15);
 
+  auto it = const_array.begin();
+  CHECK(*it == 5);
+  CHECK(*(++it) == 3);
+  CHECK(*(it+2) == 2);
+
+  it += 1;
+  CHECK(*it == 3);
+  it -= 1:
+  CHECK(*it == 5);
+
+  it = const_array.end();
+  CHECK(*(--it) == 1);
+  
 }
 
 
@@ -91,15 +105,12 @@ TEST_CASE("Test array constructors", "[base]")
   emp::array<int, A_SIZE> test_array(test_in_array);
   CHECK(test_array[1] ==2);
 
-  #ifndef NDEBUG
-  std::vector<int> test_in_vec({10,2,3,4,5});
-  emp::array<int, A_SIZE> test_array_2(test_in_vec);
-  CHECK(test_array[2] ==3);
-  #endif
-
   std::array<int, A_SIZE> test_in_std_array({10,2,3,4,5});
-  emp::array<int, A_SIZE> test_array_3(test_in_std_array);
+  const emp::array<int, A_SIZE> test_array_3(test_in_std_array);
   CHECK(test_array[3] == 4);
+
+  emp::array<int, A_SIZE> test_array_4(test_array_3.begin(), test_array_3.end());
+  CHECK(test_array[2] == 3);
 
 }
 
