@@ -19,7 +19,7 @@
 #include "../Evolve/StateGrid.h"
 #include "../geometry/Circle2D.h"
 #include "../geometry/Surface2D.h"
-#include "../geometry/Surface.h"
+#include "../geometry/Surface2.h"
 #include "../tools/BitMatrix.h"
 #include "color_map.h"
 
@@ -55,7 +55,7 @@ namespace web {
   }
 
 
-  /// Draw a Surface2D, specifying the full colormap to be used.  The surface has a range of circle
+  /// Draw a Surface, specifying the full colormap to be used.  The surface has a range of circle
   /// bodies, each with a color id.
   /// @param canvas The Canvas to draw on.
   /// @param surface A surface containing a set of shapes to draw.
@@ -76,15 +76,15 @@ namespace web {
     // Draw the circles.
     const auto & body_set = surface.GetBodySet();
     // RawImage image("images/cell.png");
-    for (auto body : body_set) {
-      canvas.Circle(body->GetCenter(), body->GetRadius(), color_map[body->GetColorID()], "white");
+    for (auto & body : body_set) {
+      canvas.Circle(body.center, body.radius, color_map[body.color], "white");
       // canvas.Draw(body->GetPerimeter(), "", color_map[body->GetColorID()]);
       // emp::Circle per = body->GetPerimeter();
       // canvas.Image(image, (size_t) per.GetCenterX(), (size_t) per.GetCenterY(), per.GetRadius()*2.0, per.GetRadius()*2.0);
     }
   }
 
-  /// Draw a Surface2D, just specifying the number of colors (and using a generated hue map).
+  /// Draw a Surface, just specifying the number of colors (and using a generated hue map).
   /// The surface has a range of circle bodies, each with a color id.
   /// @param canvas The Canvas to draw on.
   /// @param surface A surface containing a set of shapes to draw.
