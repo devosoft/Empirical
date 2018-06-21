@@ -33,7 +33,7 @@ debug-web:	$(PROJECT).js
 
 web-debug:	debug-web
 
-$(PROJECT):	source/native/$(PROJECT).cc
+$(PROJECT):	source/OpenWorld.h source/OpenOrg.h source/native/$(PROJECT).cc
 	$(CXX_nat) $(CFLAGS_nat) source/native/$(PROJECT).cc -o $(PROJECT)
 	@echo To build the web version use: make web
 
