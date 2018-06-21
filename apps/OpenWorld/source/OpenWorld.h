@@ -47,15 +47,19 @@ public:
   {
     SetPopStruct_Grow(false); // Don't automatically delete organism when new ones are born.
 
-    // Make sure that we are tracking organisms by their IDs.
-    OnPlacement( [this](size_t pos){
+    // Setup organism to share parent's surface features.
+    OnOffspringReady( [this](OpenOrg & org, size_t parent_pos){
+      emp::Point parent_center = surface.GetCenter(GetOrg(parent_pos).GetSurfaceID());
+      double parent_radius = surface.GetRadius(GetOrg(parent_pos).GetSurfaceID());
+      size_t surface_id = surface.AddBody(&org, parent_center, parent_radius);
+      org.SetSurfaceID(surface_id);
+    });
+    // Make sure that we are tracking organisms by their IDs once placed.
+    OnPlacement( [this](size_t pos){ 
       size_t id = next_id++;
       GetOrg(pos).GetBrain().SetTrait((size_t)OpenOrg::Trait::ORG_ID, id);
-      // @CAO Org should actually be placed with parent, but spun.
-      size_t surface_id = surface.AddBody(&GetOrg(pos), {50.0,50.0}, 5);
-      GetOrg(pos).SetSurfaceID(surface_id);
       id_map[id] = &GetOrg(pos);
-    });
+    } );
     OnOrgDeath( [this](size_t pos){ id_map.erase( GetOrg(pos).GetID() ); } );
 
     signalgp_mutator.SetProgMinFuncCnt(config.PROGRAM_MIN_FUN_CNT());
