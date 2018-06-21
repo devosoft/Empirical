@@ -88,9 +88,9 @@ TEST_CASE("Test array iterator", "[base]")
   CHECK(*(it+2) == 2);
 
   it += 1;
+  CHECK(*it == 4);
+  it -= 1;
   CHECK(*it == 3);
-  it -= 1:
-  CHECK(*it == 5);
 
   it = const_array.end();
   CHECK(*(--it) == 1);
