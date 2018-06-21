@@ -10,18 +10,13 @@
 //
 //  BODY_TYPE is the class that represents the body geometry.
 //
-//  To work, the BODY_TYPE must have:
-//  - GetCenter() which returns a Point indicating the center of the organism.
-//  - GetRadius() which returns a distance under which you want to perfor a more detailed
-//                check as to whether two bodies actually overlap.
-//
 //  Developer Notes:
 //  * Sould add enums to control boundary conditions (INFINITE, TOROIDAL, BOUNDED)
 //  * Incorporate physics?  Can have various plug-in modules.
 //  * Use TypeTracker to allow variable types of bodies.
 
-#ifndef EMP_SURFACE_H
-#define EMP_SURFACE_H
+#ifndef EMP_SURFACE2_H
+#define EMP_SURFACE2_H
 
 #include <algorithm>
 #include <functional>
@@ -41,18 +36,18 @@ namespace emp {
 
     struct BodyInfo {
       Ptr<body_t> body_ptr;  // Pointer to the bodies
-      uint32_t id;             // Position in body_set to find body info
+      size_t id;             // Position in body_set to find body info
       Point center;          // Center position of this body
       double radius;         // Size of this body
       size_t color;          // Color of this body
 
-      BodyInfo(Ptr<body_t> _ptr, uint32_t _id, Point _center, double _radius, size_t _color=0)
+      BodyInfo(Ptr<body_t> _ptr, size_t _id, Point _center, double _radius, size_t _color=0)
         : body_ptr(_ptr), id(_id), center(_center), radius(_radius), color(_color) { ; }
-      BodyInfo(uint32_t _id, Point _center, double _radius)
+      BodyInfo(size_t _id, Point _center, double _radius)
         : BodyInfo(nullptr, _id, _center, _radius) { ; }
     };
 
-    using sector_t = emp::vector<uint32_t>;
+    using sector_t = emp::vector<size_t>;
     using overlap_fun_t = std::function<void(body_t &, body_t &)>;
 
   protected:
@@ -157,8 +152,8 @@ namespace emp {
     double GetRadius(size_t id) const { return body_set[id].radius; }
     size_t GetColor(size_t id) const { return body_set[id].color; }
 
-    void SetPtr(size_t id, Ptr<body_t> _in) const { body_set[id].body_ptr = _in; }
-    void SetCenter(size_t id, Point _in) const {
+    void SetPtr(size_t id, Ptr<body_t> _in) { body_set[id].body_ptr = _in; }
+    void SetCenter(size_t id, Point _in) {
       // If not active, just move the body.
       if (data_active == false) body_set[id].center = _in;
       // Otherwise need to update data.
@@ -172,11 +167,21 @@ namespace emp {
         }
       }
     }
-    void SetRadius(size_t id, double _in) const {
-      body_set[id].radius = _in;
-      TestBodySize(body_set[id]);
+    void Translate(size_t id, Point translation) {
+      SetCenter(id, body_set[id].center + translation);
     }
-    void SetColor(size_t id, size_t _in) const { body_set[id].color = _in; }
+
+    void SetRadius(size_t id, double _in) {
+      BodyInfo & body = body_set[id];
+      body.radius = _in;
+      TestBodySize(body);
+    }
+    void ScaleRadius(size_t id, double scale) {
+      BodyInfo & body = body_set[id];
+      body.radius *= scale;
+      TestBodySize(body);
+    }
+    void SetColor(size_t id, size_t _in) { body_set[id].color = _in; }
     
     void RemoveBody(size_t id) {
       // @CAO Change id in body_set to nullptr; record cell id for re-use
@@ -188,7 +193,7 @@ namespace emp {
 
     /// Add a single body; return its unique ID.
     size_t AddBody(Ptr<body_t> _body, Point _center, double _radius, size_t _color=0) {
-      uint32_t id = (uint32_t) body_set.size();        // Figure out the ID for this body
+      size_t id = body_set.size();        // Figure out the ID for this body
       BodyInfo info = { _body, id, _center, _radius, _color };
 
       body_set.emplace_back(info);        // Add body to master list
@@ -274,7 +279,7 @@ namespace emp {
       auto & cur_sector = sectors[sector_id];
 
       // Compare against bodies in its own sector.
-      for (uint32_t body2_id : cur_sector) {
+      for (size_t body2_id : cur_sector) {
         BodyInfo & body2 = body_set[body2_id];
         if (body == body2) continue; // Don't match with self!
         if (TestOverlap(body, body2)) overlap_fun(*body.body_ptr, *body2.body_ptr);
