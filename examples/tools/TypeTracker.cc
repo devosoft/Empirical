@@ -91,13 +91,13 @@ int main()
   EMP_DEBUG_PRINT(tt_t::GetComboID<double,double>());
   EMP_DEBUG_PRINT(tt_t::GetComboID<int,double,int,std::string>());
 
-  emp::TrackedType * tval1 = tt.New<int>(3);
-  emp::TrackedType * tval2 = tt.New<std::string>("FOUR");
-  emp::TrackedType * tval3 = tt.New<double>(5.5);
-  emp::TrackedType * tval4 = tt.New<int>(6);
-  emp::TrackedType * tval5 = tt.New<int>(7);
-  emp::TrackedType * tval6 = tt.New<int>(8);
-  emp::TrackedType * tval7 = tt.New<int>(9);
+  emp::Ptr<emp::TrackedType> tval1 = tt.New<int>(3);
+  emp::Ptr<emp::TrackedType> tval2 = tt.New<std::string>("FOUR");
+  emp::Ptr<emp::TrackedType> tval3 = tt.New<double>(5.5);
+  emp::Ptr<emp::TrackedType> tval4 = tt.New<int>(6);
+  emp::Ptr<emp::TrackedType> tval5 = tt.New<int>(7);
+  emp::Ptr<emp::TrackedType> tval6 = tt.New<int>(8);
+  emp::Ptr<emp::TrackedType> tval7 = tt.New<int>(9);
 
   std::cout << std::endl;
   EMP_DEBUG_PRINT(tt_t::GetID<int,std::string,double>());
