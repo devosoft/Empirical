@@ -158,9 +158,11 @@ namespace emp {
       }
 
       std::cout << "EMP_TRACK_MEM: No memory leaks found!\n "
-                << total << " pointers found; "
-                << remain << " still exist with a non-null value (but have been properly deleted)"
-                << std::endl;
+                << total << " pointers found; ";
+      if (remain) {
+        std::cout << remain << " still exist with a non-null value (but have been properly deleted)";
+      } else std::cout << "all have been cleaned up fully.";
+      std::cout << std::endl;
     }
 
     /// Treat this class as a singleton with a single Get() method to retrieve it.
@@ -620,7 +622,8 @@ namespace emp {
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
 
       // We should not automatically convert managed pointers to raw pointers; use .Raw()
-      emp_assert(id == UNTRACKED_ID /*, typeid(TYPE).name() */, id);
+      emp_assert(id == UNTRACKED_ID /*, typeid(TYPE).name() */, id,
+                 "Use Raw() to convert to an untracked Ptr");
       return ptr;
     }
 
