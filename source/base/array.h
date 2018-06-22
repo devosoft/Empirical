@@ -123,7 +123,6 @@ namespace emp {
     array() : base_t(N), valid(true) {};
     array(const this_t & _in) : base_t(_in), valid(true) { emp_assert(_in.size() == N); };
     array(std::initializer_list<T> in_list) : base_t(in_list), valid(true) { emp_assert(size() == N); }
-    array(const base_t & in) : base_t(in), valid(true) { emp_assert(size() == N); }   // Emergency fallback
     array(const std::array<T, N> & in) : base_t(in.begin(), in.end()), valid(true) { emp_assert(size() == N); }  
     ~array() { valid=false; } // No longer valid when array is deleted.
 
