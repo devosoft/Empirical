@@ -1233,12 +1233,12 @@ TEST_CASE("Test type tracker (TypeTracker)", "[tools]")
   tt.AddFunction(fun_int_double);
   tt.AddFunction(fun_string_int);
 
-  emp::TrackedType * tt_int1 = tt.New<int>(1);
-  emp::TrackedType * tt_int2 = tt.New<int>(2);
-  emp::TrackedType * tt_int3 = tt.New<int>(3);
+  emp::Ptr<emp::TrackedType> tt_int1 = tt.New<int>(1);
+  emp::Ptr<emp::TrackedType> tt_int2 = tt.New<int>(2);
+  emp::Ptr<emp::TrackedType> tt_int3 = tt.New<int>(3);
 
-  emp::TrackedType * tt_str  = tt.New<std::string>("FOUR");
-  emp::TrackedType * tt_doub = tt.New<double>(5.5);
+  emp::Ptr<emp::TrackedType> tt_str  = tt.New<std::string>("FOUR");
+  emp::Ptr<emp::TrackedType> tt_doub = tt.New<double>(5.5);
 
   tt.RunFunction(tt_int1, tt_int2);  // An int and another int should add.
   REQUIRE( tt_result == "3" );
