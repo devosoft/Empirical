@@ -1,12 +1,19 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2018
  *
  *  @file TypeTracker.h
  *  @brief Track class types abstractly to dynamically call correct function overloads.
  *  @note Status: BETA
  *
+ *  TypeTracker is a templated class that must be declared with all of the types that can
+ *  possibly be tracked.  For example:
+ * 
+ *      emp::TypeTracker<int, std::string, double> tt;
+ * 
+ *  ...would create a TypeTracker that can manage the three types listed and convert back.
+ * 
  *  @todo Should use std::is_convertible<X,Y>::value to determine if casting on base type is allowed.
  *  @todo Functions should be able to have fixed type values mixed in.
  */
@@ -19,6 +26,7 @@
 #include "../base/array.h"
 #include "../base/assert.h"
 #include "../meta/meta.h"
+#include "../base/Ptr.h"
 
 #include "functions.h"
 #include "GenericFunction.h"
@@ -102,11 +110,11 @@ namespace emp {
     }
 
     /// We should also about able to use a pointer to access tracked IDs
-    static size_t GetTrackedID(TrackedType * tt) { return tt->GetTypeTrackerID(); }
+    static size_t GetTrackedID(Ptr<TrackedType> tt) { return tt->GetTypeTrackerID(); }
 
     /// A set of pointers to access tracked IDs
     template <typename... Ts>
-    static size_t GetTrackedID(TrackedType * tt1, TrackedType * tt2, Ts *... ARGS) {
+    static size_t GetTrackedID(Ptr<TrackedType> tt1, Ptr<TrackedType> tt2, Ptr<Ts>... ARGS) {
       return tt1->GetTypeTrackerID() + GetTrackedID(tt2, ARGS...) * GetNumTypes();
     }
 
@@ -118,7 +126,7 @@ namespace emp {
     }
 
     /// fun_map is a hash table that maps a set of inputs to the appropriate function.
-    std::unordered_map<size_t, emp::GenericFunction *> fun_map;
+    std::unordered_map<size_t, Ptr<emp::GenericFunction>> fun_map;
 
     // Constructors!
     TypeTracker() : fun_map() { ; }
@@ -139,13 +147,13 @@ namespace emp {
     }
 
     /// Create an input value in a TypeTracker_Class maintaining the value (reference version)
-    template <typename REAL_T> wrap_t<REAL_T> * New(REAL_T & val) {
+    template <typename REAL_T> Ptr<wrap_t<REAL_T>> New(REAL_T & val) {
       emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.
       return new wrap_t<REAL_T>(val);
     }
 
     /// Create an input value in a TypeTracker_Class maintaining the value (move version)
-    template <typename REAL_T> wrap_t<REAL_T> * New(REAL_T && val) {
+    template <typename REAL_T> Ptr<wrap_t<REAL_T>> New(REAL_T && val) {
       emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.
       return new wrap_t<REAL_T>(std::forward<REAL_T>(val));
     }
@@ -158,18 +166,18 @@ namespace emp {
 
     /// Test if the tracked type points to TEST_T
     template <typename TEST_T>
-    bool IsType( TrackedType * tt ) { return IsType(*tt); }
+    bool IsType( Ptr<TrackedType> tt ) { return IsType(*tt); }
 
     /// Convert the tracked type back to REAL_T.  Assert that this is type safe!
     template <typename REAL_T>
     REAL_T ToType( TrackedType & tt ) {
       emp_assert(IsType<REAL_T>(tt));
-      return ((wrap_t<REAL_T> *) &tt)->value;
+      return ( (wrap_t<REAL_T> *) &tt )->value;
     }
 
     /// Convert the tracked type pointer back to REAL_T.  Assert that this is type safe!
     template <typename REAL_T>
-    REAL_T ToType( TrackedType * tt ) { return ToType(*tt); }
+    REAL_T ToType( Ptr<TrackedType> tt ) { return ToType(*tt); }
 
     /// Cast the tracked type to OUT_T.  Try to do so even if NOT original type!
     template <typename OUT_T>
@@ -177,10 +185,12 @@ namespace emp {
 
     /// Cast the tracked type pointer to OUT_T.  Try to do so even if NOT original type!
     template <typename OUT_T>
-    OUT_T Cast( TrackedType * tt ) { return Cast(*tt); }
+    OUT_T Cast( Ptr<TrackedType> tt ) { return Cast(*tt); }
 
     /// Add a new std::function that this TypeTracker should call if the appropriate types are
     /// passed in.
+    template <typename T> using tt_decoy = Ptr<TrackedType>;
+
     template <typename... Ts>
     this_t & AddFunction( std::function<void(Ts...)> fun ) {
       constexpr size_t ID = GetComboID<Ts...>();
@@ -189,15 +199,16 @@ namespace emp {
       // function as there were typed parameters in the original.  To accomplish this task, we
       // will expand the original type pack, but use decoys to convert to TrackedType.
 
-      auto fun_wrap = [fun](emp::type_decoy<TrackedType *,Ts>... args) {
+      auto fun_wrap = [fun](tt_decoy<Ts>... args) {
         // Ensure all types can be cast appropriately
-        emp_assert( AllTrue( dynamic_cast<wrap_t<Ts> *>(args)... ) );
+        bool result = AllTrue( args.template DynamicCast<wrap_t<Ts>>()... );
+        emp_assert( result );
 
         // Now run the function with the correct type conversions
-        fun( ((wrap_t<Ts> *) args)->value... );
+        fun( (args.template Cast<wrap_t<Ts>>())->value... );
       };
 
-      fun_map[ID] = new Function<void(emp::type_decoy<TrackedType *,Ts>...)>(fun_wrap);
+      fun_map[ID] = new Function<void(emp::type_decoy<Ptr<TrackedType>,Ts>...)>(fun_wrap);
 
       return *this;
     }
@@ -214,8 +225,8 @@ namespace emp {
     void RunFunction( Ts... args ) {                 // args must all be TrackedType pointers!
       const size_t pos = GetTrackedComboID(args...);
       if (Has(fun_map, pos)) {  // If a redirect exists, use it!
-        GenericFunction * gfun = fun_map[pos];
-        gfun->Call<void, emp::type_decoy<TrackedType *,Ts>...>(((emp::type_decoy<TrackedType *,Ts>) args)...);
+        Ptr<GenericFunction> gfun = fun_map[pos];
+        gfun->Call<void, emp::type_decoy<Ptr<TrackedType>,Ts>...>(((emp::type_decoy<Ptr<TrackedType>,Ts>) args)...);
       }
     }
 
