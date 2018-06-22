@@ -149,13 +149,13 @@ namespace emp {
     /// Create an input value in a TypeTracker_Class maintaining the value (reference version)
     template <typename REAL_T> Ptr<wrap_t<REAL_T>> New(REAL_T & val) {
       emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.
-      return new wrap_t<REAL_T>(val);
+      return emp::NewPtr< wrap_t<REAL_T> >(val);
     }
 
     /// Create an input value in a TypeTracker_Class maintaining the value (move version)
     template <typename REAL_T> Ptr<wrap_t<REAL_T>> New(REAL_T && val) {
       emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.
-      return new wrap_t<REAL_T>(std::forward<REAL_T>(val));
+      return emp::NewPtr< wrap_t<REAL_T> >(std::forward<REAL_T>(val));
     }
 
     /// Test if the tracked type is TEST_T
