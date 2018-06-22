@@ -36,7 +36,7 @@ int main()
   tt.AddFunction(fun_5ints);
 
   // Crate a vector of objects of the generic, tracked type that will need to be converted back.
-  emp::vector<emp::TrackedType *> objs;
+  emp::vector< emp::Ptr<emp::TrackedType> > objs;
   objs.push_back( tt.New<int>(12) );
   objs.push_back( tt.New<int>(100) );
   objs.push_back( tt.New<double>(1.25) );
@@ -58,7 +58,7 @@ int main()
   std::cout << "And the second value was " << x << std::endl;
 
   // Cleanup objects.
-  for (auto x : objs) delete x;
+  for (auto x : objs) x.Delete();
   objs.resize(0);
 
 
@@ -109,4 +109,14 @@ int main()
 
   tt.RunFunction(tval1, tval4, tval5, tval6, tval7);
   tt(tval1, tval4, tval5, tval6, tval7);
+
+  // Cleanup!
+  for (auto x : objs) x.Delete();
+  tval1.Delete();
+  tval2.Delete();
+  tval3.Delete();
+  tval4.Delete();
+  tval5.Delete();
+  tval6.Delete();
+  tval7.Delete();
 }
