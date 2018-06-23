@@ -60,7 +60,24 @@ namespace emp {
   /// Dynamic functions that are indexed by parameter types; calls lookup the correct function
   /// to forward arguments into.
   template <typename... TYPES>
-  struct TypeTracker {
+  class TypeTracker {
+  protected:
+    /// fun_map is a hash table that maps a set of inputs to the appropriate function.
+    std::unordered_map<size_t, Ptr<emp::GenericFunction>> fun_map;
+
+  public:
+    // Constructors!
+    TypeTracker() : fun_map() { ; }
+    TypeTracker(const TypeTracker &) = default;
+    TypeTracker(TypeTracker &&) = default;
+    TypeTracker & operator=(const TypeTracker &) = default;
+    TypeTracker & operator=(TypeTracker &&) = default;
+
+    // Destructor!
+    ~TypeTracker() {
+      for (auto x : fun_map) delete x.second;  // Clear out Functions.
+    }
+
     using this_t = TypeTracker<TYPES...>;
     template <typename REAL_T>
     using wrap_t = TypeTracker_Class< REAL_T, get_type_index<REAL_T,TYPES...>() >;
@@ -115,7 +132,7 @@ namespace emp {
     /// A set of pointers to access tracked IDs
     template <typename... Ts>
     static size_t GetTrackedID(Ptr<TrackedType> tt1, Ptr<TrackedType> tt2, Ptr<Ts>... ARGS) {
-      return tt1->GetTypeTrackerID() + GetTrackedID(tt2, ARGS...) * GetNumTypes();
+      return tt1->GetTypeTrackerID() + (GetTrackedID(tt2, ARGS...) * GetNumTypes());
     }
 
     /// A tracked COMBO ID, is an ID for this combination of types, unique among all possible type
@@ -123,21 +140,6 @@ namespace emp {
     template <typename... Ts>
     constexpr static size_t GetTrackedComboID(Ts... ARGS) {
       return GetCumCombos(sizeof...(Ts)-1) + GetTrackedID(ARGS...);
-    }
-
-    /// fun_map is a hash table that maps a set of inputs to the appropriate function.
-    std::unordered_map<size_t, Ptr<emp::GenericFunction>> fun_map;
-
-    // Constructors!
-    TypeTracker() : fun_map() { ; }
-    TypeTracker(const TypeTracker &) = default;
-    TypeTracker(TypeTracker &&) = default;
-    TypeTracker & operator=(const TypeTracker &) = default;
-    TypeTracker & operator=(TypeTracker &&) = default;
-
-    // Destructor!
-    ~TypeTracker() {
-      for (auto x : fun_map) delete x.second;  // Clear out Functions.
     }
 
     /// Convert an input value into a TypeTracker_Class maintaining the value (universal version)
