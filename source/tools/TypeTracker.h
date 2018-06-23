@@ -40,20 +40,20 @@ namespace emp {
     virtual ~TrackedType() {;}
   };
 
-  /// The derived classes to be tracked should inherit from TypeTracker_Class<ID>
+  /// The derived classes to be tracked should inherit from TrackedType_Value<ID>
   /// where ID is the position in the type list for TypeTracker.  Note: this value can
   /// be obtained dyanmically at compile type by using TypeTracker<...>::GetID<TYPE>()
   template <typename REAL_T, size_t ID>
-  struct TypeTracker_Class : public TrackedType {
+  struct TrackedType_Value : public TrackedType {
     using real_t = REAL_T;
     REAL_T value;
 
-    TypeTracker_Class(const REAL_T & in) : value(in) { ; }
-    TypeTracker_Class(REAL_T && in) : value(std::forward<REAL_T>(in)) { ; }
-    TypeTracker_Class(const TypeTracker_Class &) = default;
-    TypeTracker_Class(TypeTracker_Class &&) = default;
-    TypeTracker_Class & operator=(const TypeTracker_Class &) = default;
-    TypeTracker_Class & operator=(TypeTracker_Class &&) = default;
+    TrackedType_Value(const REAL_T & in) : value(in) { ; }
+    TrackedType_Value(REAL_T && in) : value(std::forward<REAL_T>(in)) { ; }
+    TrackedType_Value(const TrackedType_Value &) = default;
+    TrackedType_Value(TrackedType_Value &&) = default;
+    TrackedType_Value & operator=(const TrackedType_Value &) = default;
+    TrackedType_Value & operator=(TrackedType_Value &&) = default;
     virtual size_t GetTypeTrackerID() const noexcept { return ID; }
   };
 
@@ -80,7 +80,7 @@ namespace emp {
 
     using this_t = TypeTracker<TYPES...>;
     template <typename REAL_T>
-    using wrap_t = TypeTracker_Class< REAL_T, get_type_index<REAL_T,TYPES...>() >;
+    using wrap_t = TrackedType_Value< REAL_T, get_type_index<REAL_T,TYPES...>() >;
 
     /// How many types are we working with?
     constexpr static size_t GetNumTypes() { return sizeof...(TYPES); }
@@ -142,52 +142,55 @@ namespace emp {
       return GetCumCombos(sizeof...(Ts)-1) + GetTrackedID(ARGS...);
     }
 
-    /// Convert an input value into a TypeTracker_Class maintaining the value (universal version)
-    template <typename REAL_T> wrap_t<REAL_T> Wrap(REAL_T && val) {
+    /// Convert an input value into a TrackedType_Value maintaining the value (universal version)
+    template <typename REAL_T>
+    static wrap_t<REAL_T> Wrap(REAL_T && val) {
       emp_assert((has_type<REAL_T,TYPES...>()));    // Make sure we're wrapping a legal type.
       return wrap_t<REAL_T>(std::forward<REAL_T>(val));
     }
 
-    /// Create an input value in a TypeTracker_Class maintaining the value (reference version)
-    template <typename REAL_T> Ptr<wrap_t<REAL_T>> New(REAL_T & val) {
+    /// Create an input value in a TrackedType_Value maintaining the value (reference version)
+    template <typename REAL_T>
+    static Ptr<wrap_t<REAL_T>> New(REAL_T & val) {
       emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.
       return emp::NewPtr< wrap_t<REAL_T> >(val);
     }
 
-    /// Create an input value in a TypeTracker_Class maintaining the value (move version)
-    template <typename REAL_T> Ptr<wrap_t<REAL_T>> New(REAL_T && val) {
+    /// Create an input value in a TrackedType_Value maintaining the value (move version)
+    template <typename REAL_T>
+    static Ptr<wrap_t<REAL_T>> New(REAL_T && val) {
       emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.
       return emp::NewPtr< wrap_t<REAL_T> >(std::forward<REAL_T>(val));
     }
 
     /// Test if the tracked type is TEST_T
     template <typename TEST_T>
-    bool IsType( TrackedType & tt ) {
+    static bool IsType( TrackedType & tt ) {
       return tt.GetTypeTrackerID() == get_type_index<TEST_T,TYPES...>();
     }
 
     /// Test if the tracked type points to TEST_T
     template <typename TEST_T>
-    bool IsType( Ptr<TrackedType> tt ) { return IsType(*tt); }
+    static bool IsType( Ptr<TrackedType> tt ) { return IsType(*tt); }
 
     /// Convert the tracked type back to REAL_T.  Assert that this is type safe!
     template <typename REAL_T>
-    REAL_T ToType( TrackedType & tt ) {
+    static REAL_T ToType( TrackedType & tt ) {
       emp_assert(IsType<REAL_T>(tt));
       return ( (wrap_t<REAL_T> *) &tt )->value;
     }
 
     /// Convert the tracked type pointer back to REAL_T.  Assert that this is type safe!
     template <typename REAL_T>
-    REAL_T ToType( Ptr<TrackedType> tt ) { return ToType(*tt); }
+    static REAL_T ToType( Ptr<TrackedType> tt ) { return ToType(*tt); }
 
     /// Cast the tracked type to OUT_T.  Try to do so even if NOT original type!
     template <typename OUT_T>
-    OUT_T Cast( TrackedType & tt ) { return ((wrap_t<OUT_T> *) &tt)->value; }
+    static OUT_T Cast( TrackedType & tt ) { return ((wrap_t<OUT_T> *) &tt)->value; }
 
     /// Cast the tracked type pointer to OUT_T.  Try to do so even if NOT original type!
     template <typename OUT_T>
-    OUT_T Cast( Ptr<TrackedType> tt ) { return Cast(*tt); }
+    static OUT_T Cast( Ptr<TrackedType> tt ) { return Cast(*tt); }
 
     /// Add a new std::function that this TypeTracker should call if the appropriate types are
     /// passed in.
