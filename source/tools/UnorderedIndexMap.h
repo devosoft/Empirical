@@ -68,7 +68,7 @@ namespace emp {
     /// Construct an UnorderedIndexMap where num_items is the maximum number of items that can be placed
     /// into the data structure.  All item weigths default to zero.
     UnorderedIndexMap(size_t _items=0, double init_weight=0.0)
-      : num_items(_items), num_nodes(_items-1), needs_refresh(_items && init_weight), weights(0)
+      : num_items(_items), num_nodes(_items-1), needs_refresh(_items && (init_weight > 0.0)), weights(0)
       { if (_items > 0) weights.resize(_items*2-1, init_weight); }
     UnorderedIndexMap(const UnorderedIndexMap &) = default;
     UnorderedIndexMap(UnorderedIndexMap &&) = default;
