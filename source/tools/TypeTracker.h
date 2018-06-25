@@ -35,26 +35,53 @@
 namespace emp {
 
   /// The base class of any type to be tracked.
-  struct TrackedType {
-    virtual size_t GetTypeTrackerID() const noexcept = 0;
-    virtual ~TrackedType() {;}
+  struct TrackedInfo_Base {
+    virtual size_t GetTypeID() const noexcept = 0;
+    // @CAO: DO THIS...
+    // virtual TrackedInfo_Base * Clone() = 0;
+    virtual ~TrackedInfo_Base () {;}
   };
 
-  /// The derived classes to be tracked should inherit from TrackedType_Value<ID>
-  /// where ID is the position in the type list for TypeTracker.  Note: this value can
-  /// be obtained dyanmically at compile type by using TypeTracker<...>::GetID<TYPE>()
+  /// The actual TrackedVar object that manages a Ptr to the value.
+  struct TrackedVar {
+    emp::Ptr<TrackedInfo_Base> ptr;
+
+    // Note: This is the primary constructor for new TrackedVar and should be built only in
+    //       TypeTracker; since that is a template, it can't be a friend.
+    TrackedVar(emp::Ptr<TrackedInfo_Base> _ptr) : ptr(_ptr) { ; }
+
+    /// Move constructor takes control of the pointer.
+    TrackedVar(TrackedVar && _in) : ptr(_in.ptr) { _in.ptr = nullptr; }
+
+    /// Cleanup ptr on destruct.
+    ~TrackedVar() { ptr.Delete(); }
+
+    /// Move assignment hands over control of the pointer.
+    TrackedVar & operator=(TrackedVar && _in) {
+      ptr = _in.ptr;
+      _in.ptr = nullptr;
+      return *this;
+    }
+
+    size_t GetTypeID() const noexcept { return ptr->GetTypeID(); }
+  };
+
+  /// TrackedInfo_Value store both the real type and an ID for it (to be identified from
+  /// the base class for each conversion back.)
   template <typename REAL_T, size_t ID>
-  struct TrackedType_Value : public TrackedType {
+  struct TrackedInfo_Value : public TrackedInfo_Base {
     using real_t = REAL_T;
     REAL_T value;
 
-    TrackedType_Value(const REAL_T & in) : value(in) { ; }
-    TrackedType_Value(REAL_T && in) : value(std::forward<REAL_T>(in)) { ; }
-    TrackedType_Value(const TrackedType_Value &) = default;
-    TrackedType_Value(TrackedType_Value &&) = default;
-    TrackedType_Value & operator=(const TrackedType_Value &) = default;
-    TrackedType_Value & operator=(TrackedType_Value &&) = default;
-    virtual size_t GetTypeTrackerID() const noexcept { return ID; }
+    TrackedInfo_Value(const REAL_T & in) : value(in) { ; }
+    TrackedInfo_Value(REAL_T && in) : value(std::forward<REAL_T>(in)) { ; }
+    TrackedInfo_Value(const TrackedInfo_Value &) = default;
+    TrackedInfo_Value(TrackedInfo_Value &&) = default;
+
+    TrackedInfo_Value & operator=(const TrackedInfo_Value &) = default;
+    TrackedInfo_Value & operator=(TrackedInfo_Value &&) = default;
+
+    virtual size_t GetTypeID() const noexcept override { return ID; }
   };
 
   /// Dynamic functions that are indexed by parameter types; calls lookup the correct function
@@ -80,7 +107,7 @@ namespace emp {
 
     using this_t = TypeTracker<TYPES...>;
     template <typename REAL_T>
-    using wrap_t = TrackedType_Value< REAL_T, get_type_index<REAL_T,TYPES...>() >;
+    using wrap_t = TrackedInfo_Value< REAL_T, get_type_index<REAL_T,TYPES...>() >;
 
     /// How many types are we working with?
     constexpr static size_t GetNumTypes() { return sizeof...(TYPES); }
@@ -118,102 +145,68 @@ namespace emp {
     }
 
     /// A Tracked ID is simply the unique ID of the type being tracked.
-    static size_t GetTrackedID(const TrackedType & tt) { return tt.GetTypeTrackerID(); }
+    static size_t GetTrackedID(const TrackedVar & tt) { return tt.GetTypeID(); }
     template <typename... Ts>
 
     /// Or set of types being tracked...
-    static size_t GetTrackedID(const TrackedType & tt1, const TrackedType & tt2, const Ts &... ARGS) {
-      return tt1.GetTypeTrackerID() + GetTrackedID(tt2, ARGS...) * GetNumTypes();
-    }
-
-    /// We should also about able to use a pointer to access tracked IDs
-    static size_t GetTrackedID(Ptr<TrackedType> tt) { return tt->GetTypeTrackerID(); }
-
-    /// A set of pointers to access tracked IDs
-    template <typename... Ts>
-    static size_t GetTrackedID(Ptr<TrackedType> tt1, Ptr<TrackedType> tt2, Ptr<Ts>... ARGS) {
-      return tt1->GetTypeTrackerID() + (GetTrackedID(tt2, ARGS...) * GetNumTypes());
+    static size_t GetTrackedID(const TrackedVar & tt1, const TrackedVar & tt2, const Ts &... ARGS) {
+      return tt1.GetTypeID() + GetTrackedID(tt2, ARGS...) * GetNumTypes();
     }
 
     /// A tracked COMBO ID, is an ID for this combination of types, unique among all possible type
     /// combinations.  Consistent with GetComboID with the same underlying types.
     template <typename... Ts>
-    constexpr static size_t GetTrackedComboID(Ts... ARGS) {
+    constexpr static size_t GetTrackedComboID(const Ts &... ARGS) {
       return GetCumCombos(sizeof...(Ts)-1) + GetTrackedID(ARGS...);
     }
 
-    /// Convert an input value into a TrackedType_Value maintaining the value (universal version)
+    /// Convert an input value into a TrackedInfo_Value maintaining the value (universal version)
     template <typename REAL_T>
-    static wrap_t<REAL_T> Wrap(REAL_T && val) {
+    static TrackedVar Convert(const REAL_T & val) {
       emp_assert((has_type<REAL_T,TYPES...>()));    // Make sure we're wrapping a legal type.
-      return wrap_t<REAL_T>(std::forward<REAL_T>(val));
-    }
-
-    /// Create an input value in a TrackedType_Value maintaining the value (reference version)
-    template <typename REAL_T>
-    static Ptr<wrap_t<REAL_T>> New(REAL_T & val) {
-      emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.
-      return emp::NewPtr< wrap_t<REAL_T> >(val);
-    }
-
-    /// Create an input value in a TrackedType_Value maintaining the value (move version)
-    template <typename REAL_T>
-    static Ptr<wrap_t<REAL_T>> New(REAL_T && val) {
-      emp_assert((has_type<REAL_T, TYPES...>()));   // Make sure we're wrapping a legal type.
-      return emp::NewPtr< wrap_t<REAL_T> >(std::forward<REAL_T>(val));
+      using decay_t = std::decay_t<REAL_T>;
+      return TrackedVar( NewPtr<wrap_t<decay_t>>(val) );
     }
 
     /// Test if the tracked type is TEST_T
     template <typename TEST_T>
-    static bool IsType( TrackedType & tt ) {
-      return tt.GetTypeTrackerID() == get_type_index<TEST_T,TYPES...>();
+    static bool IsType( TrackedVar & tt ) {
+      return tt.GetTypeID() == get_type_index<TEST_T,TYPES...>();
     }
-
-    /// Test if the tracked type points to TEST_T
-    template <typename TEST_T>
-    static bool IsType( Ptr<TrackedType> tt ) { return IsType(*tt); }
 
     /// Convert the tracked type back to REAL_T.  Assert that this is type safe!
     template <typename REAL_T>
-    static REAL_T ToType( TrackedType & tt ) {
+    static REAL_T ToType( TrackedVar & tt ) {
       emp_assert(IsType<REAL_T>(tt));
-      return ( (wrap_t<REAL_T> *) &tt )->value;
+      return (tt.ptr.Cast<wrap_t<REAL_T>>() )->value;
     }
-
-    /// Convert the tracked type pointer back to REAL_T.  Assert that this is type safe!
-    template <typename REAL_T>
-    static REAL_T ToType( Ptr<TrackedType> tt ) { return ToType(*tt); }
 
     /// Cast the tracked type to OUT_T.  Try to do so even if NOT original type!
     template <typename OUT_T>
-    static OUT_T Cast( TrackedType & tt ) { return ((wrap_t<OUT_T> *) &tt)->value; }
+    static OUT_T Cast( TrackedVar & tt ) { return tt.ptr.Cast<wrap_t<OUT_T>>()->value; }
 
-    /// Cast the tracked type pointer to OUT_T.  Try to do so even if NOT original type!
-    template <typename OUT_T>
-    static OUT_T Cast( Ptr<TrackedType> tt ) { return Cast(*tt); }
+    /// var_decoy converts any variable into a TrackedVar (used to have correct number of vars)
+    template <typename T> using var_decoy = TrackedVar;
 
     /// Add a new std::function that this TypeTracker should call if the appropriate types are
     /// passed in.
-    template <typename T> using tt_decoy = Ptr<TrackedType>;
-
     template <typename... Ts>
     this_t & AddFunction( std::function<void(Ts...)> fun ) {
       constexpr size_t ID = GetComboID<Ts...>();
 
-      // We need to ensure there are the same number of TrackedType parameters in the wrapped
+      // We need to ensure there are the same number of TrackedVar parameters in the wrapped
       // function as there were typed parameters in the original.  To accomplish this task, we
-      // will expand the original type pack, but use decoys to convert to TrackedType.
+      // will expand the original type pack, but use decoys to convert to TrackedVar.
 
-      auto fun_wrap = [fun](tt_decoy<Ts>... args) {
+      auto fun_wrap = [fun](var_decoy<Ts> &... args) {
         // Ensure all types can be cast appropriately
-        bool result = AllTrue( args.template DynamicCast<wrap_t<Ts>>()... );
-        emp_assert( result );
+        emp_assert( AllTrue( args.ptr. template DynamicCast<wrap_t<Ts>>()... ) );
 
         // Now run the function with the correct type conversions
-        fun( (args.template Cast<wrap_t<Ts>>())->value... );
+        fun( (args.ptr. template Cast<wrap_t<Ts>>())->value... );
       };
 
-      fun_map[ID] = new Function<void(emp::type_decoy<Ptr<TrackedType>,Ts>...)>(fun_wrap);
+      fun_map[ID] = new Function<void(var_decoy<Ts> &...)>(fun_wrap);
 
       return *this;
     }
@@ -227,17 +220,17 @@ namespace emp {
 
     /// Run the appropriate function based on the argument types received.
     template <typename... Ts>
-    void RunFunction( Ts... args ) {                 // args must all be TrackedType pointers!
+    void RunFunction( Ts &&... args ) {                 // args must all be TrackedVar pointers!
       const size_t pos = GetTrackedComboID(args...);
       if (Has(fun_map, pos)) {  // If a redirect exists, use it!
         Ptr<GenericFunction> gfun = fun_map[pos];
-        gfun->Call<void, emp::type_decoy<Ptr<TrackedType>,Ts>...>(((emp::type_decoy<Ptr<TrackedType>,Ts>) args)...);
+        gfun->Call<void, var_decoy<Ts> &...>(((var_decoy<Ts>) args)...);
       }
     }
 
     /// Call TypeTracker as a function (refers call to RunFunction)
     template <typename... Ts>
-    void operator()(Ts... args) { RunFunction(args...); }
+    void operator()(Ts &&... args) { RunFunction(std::forward<Ts...>(args)...); }
   };
 
 }
