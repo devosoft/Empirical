@@ -27,6 +27,13 @@ EMP_BUILD_CONFIG( OpenWorldConfig,
   VALUE(POINT_MUTATE_PROB, double, 0.001, "Probability of instructions being mutated"),
   VALUE(BIT_FLIP_PROB, double, 0.00001, "Probability of each tag bit toggling"),
 
+  GROUP(PROGRAM, "Various configuration options for SignalGP programs."),
+  VALUE(PROGRAM_MAX_FUN_CNT, size_t, 8, "Maximum number of functions in a SignalGP program."),
+  VALUE(PROGRAM_MIN_FUN_CNT, size_t, 1, "Minimum number of functions in a SignalGP program."),
+  VALUE(PROGRAM_MAX_INST_CNT, size_t, 16, "Maximum number of instructions in a SignalGP function."),
+  VALUE(PROGRAM_MIN_INST_CNT, size_t, 1, "Minimum number of instructions in a SignalGP function."),
+  VALUE(PROGRAM_MAX_ARG_VAL, size_t, 16, "Maximum argument value in a SignalGP program instruction."),
+
   GROUP(OUTPUT, "Output rates for OpenWorld"),
   VALUE(PRINT_INTERVAL, size_t, 100, "How many updates between prints?")
 )

@@ -87,19 +87,22 @@ namespace emp {
     double GetPressure() const { return pressure; }
     bool GetDetachOnDivide() const { return detach_on_divide; }
 
-    void SetBirthTime(double in_time) { birth_time = in_time; }
-    void SetColorID(uint32_t in_id) { color_id = in_id; }
+    void SetBirthTime(double _in) { birth_time = _in; }
+    void SetOrientation(Angle _in) { orientation = _in; }
+    void SetVelocity(Point _in) { velocity = _in; }
+    void SetMass(double _in) { mass = _in; }
+    void SetColorID(uint32_t _in) { color_id = _in; }
 
-    // Orientation control...
-    void TurnLeft(int steps=1) { orientation.RotateDegrees(45); }
-    void TurnRight(int steps=1) { orientation.RotateDegrees(-45); }
+    // Other orientation controls...
+    void TurnLeft(int steps=1) { orientation.RotateDegrees(steps * 45); }
+    void TurnRight(int steps=1) { orientation.RotateDegrees(steps * -45); }
+    void RotateDegrees(double degrees) { orientation.RotateDegrees(degrees); }
 
-    // Velocity control...
+    // Other velocity controls...
     void IncSpeed(const Point & offset) { velocity += offset; }
     void IncSpeed() { velocity += orientation.GetPoint(); }
     void DecSpeed() { velocity -= orientation.GetPoint(); }
     void SetVelocity(double x, double y) { velocity.Set(x, y); }
-    void SetVelocity(const Point & v) { velocity = v; }
 
     // Shift to apply next update.
     void AddShift(const Point & s) { shift += s; total_abs_shift += s.Abs(); }
@@ -109,9 +112,9 @@ namespace emp {
   };
 
   class CircleBody2D : public Body2D_Base {
-  private:
+  protected:
     Circle2D<double> perimeter;  // Includes position and size.
-    double target_radius;      // For growing/shrinking
+    double target_radius;        // For growing/shrinking
 
     // Information about other bodies that this one is linked to.
     emp::vector< Ptr< BodyLink<CircleBody2D> > > from_links;  // Active links initiated by body
@@ -132,7 +135,7 @@ namespace emp {
     }
 
     const Circle2D<double> & GetPerimeter() const { return perimeter; }
-    const Point & GetAnchor() const { return perimeter.GetCenter(); }
+    const Point & GetPosition() const { return perimeter.GetCenter(); }
     const Point & GetCenter() const { return perimeter.GetCenter(); }
     double GetRadius() const { return perimeter.GetRadius(); }
     double GetTargetRadius() const { return target_radius; }
@@ -302,17 +305,17 @@ namespace emp {
 
       // If this body is linked to another, enforce the distance between them.
       for (auto link : from_links) {
-        if (GetAnchor() == link->to->GetAnchor()) {
+        if (GetPosition() == link->to->GetPosition()) {
           // If two organisms are on top of each other... shift one.
           Translate(Point(0.01, 0.01));
         }
 
         // Figure out how much each oragnism should move so that they will be properly spaced.
-        const double start_dist = GetAnchor().Distance(link->to->GetAnchor());
+        const double start_dist = GetPosition().Distance(link->to->GetPosition());
         const double link_dist = link->cur_dist;
         const double frac_change = (1.0 - ((double) link_dist) / ((double) start_dist)) / 2.0;
 
-        Point dist_move = (GetAnchor() - link->to->GetAnchor()) * frac_change;
+        Point dist_move = (GetPosition() - link->to->GetPosition()) * frac_change;
 
         perimeter.Translate(-dist_move);
         link->to->perimeter.Translate(dist_move);

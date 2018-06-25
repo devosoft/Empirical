@@ -878,7 +878,8 @@ namespace emp {
       s->AddOrg(*new_org, (int) pos.GetIndex(), (int) update, !pos.IsActive());
     }
 
-    // SetupOrg(*new_org, &callbacks, pos);
+    SetupOrg(*new_org, pos, *random_ptr);
+
     // If new organism is in the active population, trigger associated signal.
     if (pos.IsActive()) { on_placement_sig.Trigger(pos.GetIndex()); }
   }

@@ -12,7 +12,7 @@
 int main(int argc, char* argv[])
 {
   OpenWorldConfig config;
-  config.Read("OpenWorld.cfg");
+  config.Read("OpenWorld.cfg", false);
   auto args = emp::cl::ArgManager(argc, argv);
   if (args.ProcessConfigOptions(config, std::cout, "OpenWorld.cfg", "OpenWorld-macros.h") == false) exit(0);
   if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
