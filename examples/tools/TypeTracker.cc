@@ -36,41 +36,42 @@ int main()
   tt.AddFunction(fun_5ints);
 
   // Crate a vector of objects of the generic, tracked type that will need to be converted back.
-  emp::vector< emp::Ptr<emp::TrackedType> > objs;
-  objs.push_back( tt.New<int>(12) );
-  objs.push_back( tt.New<int>(100) );
-  objs.push_back( tt.New<double>(1.25) );
-  objs.push_back( tt.New<std::string>("Ping!") );
+  emp::vector< emp::TrackedVar > objs;
+  objs.push_back( tt.Convert<int>(12) );
+  objs.push_back( tt.Convert<int>(100) );
+  objs.push_back( tt.Convert<double>(1.25) );
+  objs.push_back( tt.Convert<std::string>("Ping!") );
 
   // Now run the appropriate function for any pair of objects.  Undefined ones should be skipped.
-  for (auto x : objs) {
-    if (tt.IsType<int>(*x)) std::cout << "INT" << std::endl;
-    if (tt.IsType<double>(*x)) std::cout << "DOUBLE" << std::endl;
-    if (tt.IsType<std::string>(*x)) std::cout << "STRING" << std::endl;
+  for (auto & x : objs) {
+    if (tt.IsType<int>(x)) std::cout << "INT" << std::endl;
+    if (tt.IsType<double>(x)) std::cout << "DOUBLE" << std::endl;
+    if (tt.IsType<std::string>(x)) std::cout << "STRING" << std::endl;
     tt.RunFunction(x);
-    for (auto y : objs) {
+    for (auto & y : objs) {
       tt.RunFunction(x,y);
     }
   }
 
   // Let's convert one back!
-  int x = tt.ToType<int>(*(objs[1]));
+  int x = tt.ToType<int>(objs[1]);
   std::cout << "And the second value was " << x << std::endl;
 
   // Cleanup objects.
-  for (auto x : objs) x.Delete();
-  objs.resize(0);
+  objs.clear();
 
 
   // Try another tracker with pointers.
-  emp::TypeTracker<int*, std::string*, double*> tt2;
-  int * int_ptr = new int(12);
-  std::string * str_ptr = new std::string("allocated string");
-  double * double_ptr = new double(1.25);
-  objs.push_back( tt2.New<int*>(int_ptr) );
-  objs.push_back( tt2.New<std::string*>(str_ptr) );
-  objs.push_back( tt2.New<double*>(double_ptr) );
+  emp::TypeTracker<emp::Ptr<int>, emp::Ptr<std::string>, emp::Ptr<double>> tt2;
+  emp::Ptr<int> int_ptr = emp::NewPtr<int>(12);
+  emp::Ptr<std::string> str_ptr = emp::NewPtr<std::string>("allocated string");
+  emp::Ptr<double> double_ptr = emp::NewPtr<double>(1.25);
 
+  //objs.push_back( tt2.Convert<emp::Ptr<int>>(int_ptr) );
+  objs.push_back( tt2.Convert(int_ptr) );
+
+  objs.push_back( tt2.Convert<emp::Ptr<std::string>>(str_ptr) );
+  objs.push_back( tt2.Convert<emp::Ptr<double>>(double_ptr) );
 
   // Explore IDs and ComboIDs.
   EMP_DEBUG_PRINT(tt_t::GetID<int>());
@@ -89,15 +90,16 @@ int main()
   EMP_DEBUG_PRINT(tt_t::GetComboID<std::string,std::string>());
   EMP_DEBUG_PRINT(tt_t::GetComboID<int,double>());
   EMP_DEBUG_PRINT(tt_t::GetComboID<double,double>());
+
   EMP_DEBUG_PRINT(tt_t::GetComboID<int,double,int,std::string>());
 
-  emp::Ptr<emp::TrackedType> tval1 = tt.New<int>(3);
-  emp::Ptr<emp::TrackedType> tval2 = tt.New<std::string>("FOUR");
-  emp::Ptr<emp::TrackedType> tval3 = tt.New<double>(5.5);
-  emp::Ptr<emp::TrackedType> tval4 = tt.New<int>(6);
-  emp::Ptr<emp::TrackedType> tval5 = tt.New<int>(7);
-  emp::Ptr<emp::TrackedType> tval6 = tt.New<int>(8);
-  emp::Ptr<emp::TrackedType> tval7 = tt.New<int>(9);
+  emp::TrackedVar tval1( tt.Convert<int>(3) );
+  emp::TrackedVar tval2( tt.Convert<std::string>("FOUR") );
+  emp::TrackedVar tval3( tt.Convert<double>(5.5) );
+  emp::TrackedVar tval4( tt.Convert<int>(6) );
+  emp::TrackedVar tval5( tt.Convert<int>(7) );
+  emp::TrackedVar tval6( tt.Convert<int>(8) );
+  emp::TrackedVar tval7( tt.Convert<int>(9) );
 
   std::cout << std::endl;
   EMP_DEBUG_PRINT(tt_t::GetID<int,std::string,double>());
@@ -110,13 +112,7 @@ int main()
   tt.RunFunction(tval1, tval4, tval5, tval6, tval7);
   tt(tval1, tval4, tval5, tval6, tval7);
 
-  // Cleanup!
-  for (auto x : objs) x.Delete();
-  tval1.Delete();
-  tval2.Delete();
-  tval3.Delete();
-  tval4.Delete();
-  tval5.Delete();
-  tval6.Delete();
-  tval7.Delete();
+  int_ptr.Delete();
+  str_ptr.Delete();
+  double_ptr.Delete();
 }
