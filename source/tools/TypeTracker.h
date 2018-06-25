@@ -54,7 +54,7 @@ namespace emp {
     TrackedVar(TrackedVar && _in) : ptr(_in.ptr) { _in.ptr = nullptr; }
 
     /// Cleanup ptr on destruct.
-    ~TrackedVar() { ptr.Delete(); }
+    ~TrackedVar() { if (ptr) ptr.Delete(); }
 
     /// Move assignment hands over control of the pointer.
     TrackedVar & operator=(TrackedVar && _in) {
