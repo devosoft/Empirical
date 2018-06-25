@@ -473,8 +473,8 @@ namespace emp {
 
     /// Delete this pointer (must NOT be an array).
     void Delete() {
-      emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
       emp_assert(ptr, "Deleting null Ptr.");
+      emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
       emp_assert(Tracker().IsArrayID(id) == false, id, "Trying to delete array pointer as non-array.");
       if (internal::ptr_debug) std::cout << "Ptr::Delete() : " << ptr << std::endl;
       delete ptr;
