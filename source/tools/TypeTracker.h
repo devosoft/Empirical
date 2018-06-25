@@ -224,13 +224,13 @@ namespace emp {
       const size_t pos = GetTrackedComboID(args...);
       if (Has(fun_map, pos)) {  // If a redirect exists, use it!
         Ptr<GenericFunction> gfun = fun_map[pos];
-        gfun->Call<void, var_decoy<Ts> &...>(((var_decoy<Ts>) args)...);
+        gfun->Call<void, var_decoy<Ts> &...>(args...);
       }
     }
 
     /// Call TypeTracker as a function (refers call to RunFunction)
     template <typename... Ts>
-    void operator()(Ts &&... args) { RunFunction(std::forward<Ts...>(args)...); }
+    void operator()(Ts &&... args) { RunFunction(args...); }
   };
 
 }
