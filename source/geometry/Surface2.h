@@ -22,6 +22,7 @@
 #include <functional>
 
 #include "../base/Ptr.h"
+#include "../meta/TypePack.h"
 #include "../tools/vector_utils.h"
 
 #include "Angle2D.h"
@@ -29,19 +30,19 @@
 
 namespace emp {
 
-  template <typename BODY_TYPE>
+  template <typename... BODY_TYPES>
   class Surface {
   public:
-    using body_t = BODY_TYPE;
+    using body_types = TypePack<BODY_TYPES...>;
 
     struct BodyInfo {
-      Ptr<body_t> body_ptr;  // Pointer to the bodies
-      size_t id;             // Position in body_set to find body info
-      Point center;          // Center position of this body
-      double radius;         // Size of this body
-      size_t color;          // Color of this body
+      TrackedVar body_ptr;  ///< Pointer to the bodies
+      size_t id;            ///< Index in body_set to find body info
+      Point center;         ///< Center position of this body on surface.
+      double radius;        ///< Size of this body
+      size_t color;         ///< Color of this body
 
-      BodyInfo(Ptr<body_t> _ptr, size_t _id, Point _center, double _radius, size_t _color=0)
+      BodyInfo(TrackedVar && _ptr, size_t _id, Point _center, double _radius, size_t _color=0)
         : body_ptr(_ptr), id(_id), center(_center), radius(_radius), color(_color) { ; }
       BodyInfo(size_t _id, Point _center, double _radius)
         : BodyInfo(nullptr, _id, _center, _radius) { ; }
@@ -51,18 +52,21 @@ namespace emp {
     using overlap_fun_t = std::function<void(body_t &, body_t &)>;
 
   protected:
-    const Point max_pos;             // Lower-left corner of the surface.
-    emp::vector<BodyInfo> body_set;  // Set of all bodies on surface
+    /// The TypeTracker manages pointers to arbitrary surface objects.
+    TypeTracker< emp::Ptr<BODY_TYPES>... > type_tracker;
+
+    const Point max_pos;             ///< Lower-left corner of the surface.
+    emp::vector<BodyInfo> body_set;  ///< Set of all bodies on surface
 
     // Data tracking the current bodies on this surface using sectors.
-    bool data_active;                // Are we trying to keep data up-to-date?
-    double max_radius;               // Largest radius of any body.
-    size_t num_cols;                 // How many cols of sectors are there?
-    size_t num_rows;                 // How many rows of sectors are there?
-    size_t num_sectors;              // How many total sectors are there?
-    double sector_width;             // How wide is each sector?
-    double sector_height;            // How tall is each sector?
-    emp::vector<sector_t> sectors;   // Which bodies are in each sector?
+    bool data_active;                ///< Are we trying to keep data up-to-date?
+    double max_radius;               ///< Largest radius of any body.
+    size_t num_cols;                 ///< How many cols of sectors are there?
+    size_t num_rows;                 ///< How many rows of sectors are there?
+    size_t num_sectors;              ///< How many total sectors are there?
+    double sector_width;             ///< How wide is each sector?
+    double sector_height;            ///< How tall is each sector?
+    emp::vector<sector_t> sectors;   ///< Which bodies are in each sector?
 
     // Make sure there are num_sectors sectors and remove all bodies from existing ones.
     void InitSectors() {
@@ -147,12 +151,18 @@ namespace emp {
     const Point & GetMaxPosition() const { return max_pos; }
     const emp::vector<BodyInfo> & GetBodySet() const { return body_set; }
 
-    Ptr<body_t> GetPtr(size_t id) const { return body_set[id].body_ptr; }
+    template <typename ORIGINAL_T>
+    Ptr<ORIGINAL_T> GetPtr(size_t id) const {
+      return type_tracker.ToType<Ptr<ORIGINAL_T>>( body_set[id].body_ptr );
+    }
     Point GetCenter(size_t id) const { return body_set[id].center; }
     double GetRadius(size_t id) const { return body_set[id].radius; }
     size_t GetColor(size_t id) const { return body_set[id].color; }
 
-    void SetPtr(size_t id, Ptr<body_t> _in) { body_set[id].body_ptr = _in; }
+    template <typename BODY_T>
+    void SetPtr(size_t id, Ptr<body_t> _in) {
+      body_set[id].body_ptr = type_tracker.Convert(_in);
+    }
     void SetCenter(size_t id, Point _in) {
       // If not active, just move the body.
       if (data_active == false) body_set[id].center = _in;
@@ -192,9 +202,11 @@ namespace emp {
     }
 
     /// Add a single body; return its unique ID.
-    size_t AddBody(Ptr<body_t> _body, Point _center, double _radius, size_t _color=0) {
+    template <typename BODY_T>
+    size_t AddBody(Ptr<BODY_T> _body, Point _center, double _radius, size_t _color=0) {
+      static_assert(body_types.Has<BODY_T>(), "Can only add a body to surface if type was declared.");
       size_t id = body_set.size();        // Figure out the ID for this body
-      BodyInfo info = { _body, id, _center, _radius, _color };
+      BodyInfo info = { type_tracker.Convert(_body), id, _center, _radius, _color };
 
       body_set.emplace_back(info);        // Add body to master list
       TestBodySize(info);                 // Keep track of largest body seen.
