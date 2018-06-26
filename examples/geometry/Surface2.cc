@@ -29,7 +29,7 @@ public:
 
 TestSurface surface;
 
-void PrintOverlap(const TestBody & body1, const TestBody & body2) {
+void PrintOverlap(TestBody & body1, TestBody & body2) {
   std::cout << "Overlap " << body1.id << " and " << body2.id
             << surface.AsString(body1) << " and " << surface.AsString(body2)
             << "  dist=" << surface.GetCenter(body1.id).Distance(surface.GetCenter(body2.id))
@@ -44,12 +44,13 @@ int main()
 
   for (auto & body : bodies) {
     body.id = surface.AddBody(&body,
-			      {random.GetDouble(1000.0), random.GetDouble(1000.0)},
-			      random.GetDouble(10.0, 100.0));
+			                        { random.GetDouble(1000.0), random.GetDouble(1000.0) },
+		                  	      random.GetDouble(10.0, 100.0));
   }
 
   std::cout << "---- surface results ----" << std::endl;
-  surface.FindOverlaps(PrintOverlap);
+  surface.AddOverlapFun(PrintOverlap);
+  surface.FindOverlaps();
 
 //   std::cout << "\n---- brute force ----" << std::endl;
 //   for (size_t id1 = 1; id1 < bodies.size(); id1++) {
