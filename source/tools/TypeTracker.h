@@ -37,9 +37,8 @@ namespace emp {
   /// The base class of any type to be tracked.
   struct TrackedInfo_Base {
     virtual size_t GetTypeID() const noexcept = 0;
-    // @CAO: DO THIS...
-    // virtual TrackedInfo_Base * Clone() = 0;
     virtual ~TrackedInfo_Base () {;}
+    virtual emp::Ptr<TrackedInfo_Base> Clone() const = 0;
   };
 
   /// The actual TrackedVar object that manages a Ptr to the value.
@@ -47,8 +46,12 @@ namespace emp {
     emp::Ptr<TrackedInfo_Base> ptr;
 
     // Note: This is the primary constructor for new TrackedVar and should be built only in
-    //       TypeTracker; since that is a template, it can't be a friend.
+    //       TypeTracker; since that is a template, it can't be a friend.  The one exception is
+    //       if you want to create an empty TrackedVar, you can pass in a nullptr.
     TrackedVar(emp::Ptr<TrackedInfo_Base> _ptr) : ptr(_ptr) { ; }
+
+    /// Copy constructor; use judiciously since it copies the contents!
+    TrackedVar(const TrackedVar & _in) : ptr(_in.ptr->Clone()) { ; }
 
     /// Move constructor takes control of the pointer.
     TrackedVar(TrackedVar && _in) : ptr(_in.ptr) { _in.ptr = nullptr; }
@@ -71,6 +74,7 @@ namespace emp {
   template <typename REAL_T, size_t ID>
   struct TrackedInfo_Value : public TrackedInfo_Base {
     using real_t = REAL_T;
+    using this_t = TrackedInfo_Value<REAL_T,ID>;
     REAL_T value;
 
     TrackedInfo_Value(const REAL_T & in) : value(in) { ; }
@@ -81,7 +85,12 @@ namespace emp {
     TrackedInfo_Value & operator=(const TrackedInfo_Value &) = default;
     TrackedInfo_Value & operator=(TrackedInfo_Value &&) = default;
 
-    virtual size_t GetTypeID() const noexcept override { return ID; }
+    size_t GetTypeID() const noexcept override { return ID; }
+
+    /// Build a copy of this TrackedInfo_Value; recipient is in charge of deletion.
+    emp::Ptr<TrackedInfo_Base> Clone() const override {
+      return emp::NewPtr<this_t>(value);
+    }
   };
 
   /// Dynamic functions that are indexed by parameter types; calls lookup the correct function
@@ -132,7 +141,10 @@ namespace emp {
 
     /// Each type should have a unique ID.
     template <typename T>
-    constexpr static size_t GetID() { return get_type_index<T,TYPES...>(); }
+    constexpr static size_t GetID() {
+      static_assert(get_type_index<T,TYPES...>() != -1, "Can only get IDs for pre-specified types.");
+      return (size_t) get_type_index<T,TYPES...>();
+    }
 
     /// Each set of types should have an ID unique within that number of types.
     template <typename T1, typename T2, typename... Ts>
@@ -216,6 +228,13 @@ namespace emp {
     template <typename... Ts>
     this_t & AddFunction( void (*fun)(Ts...) ) {
       return AddFunction( std::function<void(Ts...)>(fun) );
+    }
+
+    /// Add a new lambda function that this TypeTracker should call if the appropriate types are
+    /// passed in.
+    template <typename LAMBDA_T>
+    this_t & AddFunction( const LAMBDA_T & fun ) {
+      return AddFunction( to_function(fun) );
     }
 
     /// Run the appropriate function based on the argument types received.
