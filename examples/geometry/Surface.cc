@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include "geometry/Point2D.h"
-#include "geometry/Surface2.h"
+#include "geometry/Surface.h"
 #include "tools/Random.h"
 #include "tools/random_utils.h"
 #include "tools/string_utils.h"
