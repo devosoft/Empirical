@@ -23,6 +23,7 @@
 
 #include "../base/Ptr.h"
 #include "../meta/TypePack.h"
+#include "../tools/TypeTracker.h"
 #include "../tools/vector_utils.h"
 
 #include "Angle2D.h"
@@ -49,7 +50,6 @@ namespace emp {
     };
 
     using sector_t = emp::vector<size_t>;
-    using overlap_fun_t = std::function<void(body_t &, body_t &)>;
 
   protected:
     /// The TypeTracker manages pointers to arbitrary surface objects.
@@ -153,14 +153,14 @@ namespace emp {
 
     template <typename ORIGINAL_T>
     Ptr<ORIGINAL_T> GetPtr(size_t id) const {
-      return type_tracker.ToType<Ptr<ORIGINAL_T>>( body_set[id].body_ptr );
+      return type_tracker.template ToType<Ptr<ORIGINAL_T>>( body_set[id].body_ptr );
     }
     Point GetCenter(size_t id) const { return body_set[id].center; }
     double GetRadius(size_t id) const { return body_set[id].radius; }
     size_t GetColor(size_t id) const { return body_set[id].color; }
 
     template <typename BODY_T>
-    void SetPtr(size_t id, Ptr<body_t> _in) {
+    void SetPtr(size_t id, Ptr<BODY_T> _in) {
       body_set[id].body_ptr = type_tracker.Convert(_in);
     }
     void SetCenter(size_t id, Point _in) {
@@ -204,7 +204,8 @@ namespace emp {
     /// Add a single body; return its unique ID.
     template <typename BODY_T>
     size_t AddBody(Ptr<BODY_T> _body, Point _center, double _radius, size_t _color=0) {
-      static_assert(body_types.Has<BODY_T>(), "Can only add a body to surface if type was declared.");
+      static_assert(body_types::template Has<BODY_T>(),
+                    "Can only add a body to surface if type was declared.");
       size_t id = body_set.size();        // Figure out the ID for this body
       BodyInfo info = { type_tracker.Convert(_body), id, _center, _radius, _color };
 
@@ -212,6 +213,12 @@ namespace emp {
       TestBodySize(info);                 // Keep track of largest body seen.
       if (data_active) PlaceBody(info);   // Add new body to a sector (if active).
       return id;
+    }
+
+    /// Allow bodies to be provided as raw pointers as well.
+    template <typename BODY_T>
+    size_t AddBody(BODY_T * _body, Point _center, double _radius, size_t _color=0) {
+      return AddBody(emp::ToPtr<BODY_T>(_body), _center, _radius, _color);
     }
 
     /// Remove all bodies from the surface.
@@ -223,7 +230,28 @@ namespace emp {
       return *this;
     }
 
-    // Determine if two bodies overlap.
+    /// Add a function to call in the case of overlaps (using an std::function object)
+    template <typename BODY1_T, typename BODY2_T>
+    void AddOverlapFun(const std::function< void(BODY1_T &, BODY2_T &) > & overlap_fun) {
+      type_tracker.template AddFunction(
+        [overlap_fun](Ptr<BODY1_T> ptr1, Ptr<BODY2_T> ptr2){ overlap_fun(*ptr1, *ptr2); }
+      );
+    }
+
+    /// Add a function to call in the case of overlaps (using a function pointer)
+    template <typename BODY1_T, typename BODY2_T>
+    void AddOverlapFun( void (*overlap_fun)(BODY1_T &, BODY2_T &) ) {
+      AddOverlapFun( std::function<void(BODY1_T&, BODY2_T&)>(overlap_fun) );
+    }
+ 
+    /// Add a to call a lambda function in the case of overlaps (using a function pointer)
+    template <typename LAMBDA_T>
+    void AddOverlapFun( const LAMBDA_T & fun ) {
+      AddOverlapFun( to_function(fun) );
+    }
+
+
+    /// Determine if two bodies overlap.
     static inline bool TestOverlap(const BodyInfo & body1, const BodyInfo & body2) {
       const Point xy_dist = body1.center - body2.center;
       const double sqr_dist = xy_dist.SquareMagnitude();
@@ -234,21 +262,18 @@ namespace emp {
 
     // Determine if a body overlaps with any others in a specified sector.
     inline void FindSectorOverlaps(BodyInfo & body1, size_t sector_id,
-                                   const overlap_fun_t & overlap_fun,
                                    size_t start_id=0) {
       auto & sector = sectors[sector_id];
       for (size_t body2_id = start_id; body2_id < sector.size(); body2_id++){
         BodyInfo & body2 = body_set[sector[body2_id]];
-        if (TestOverlap(body1, body2)) overlap_fun(*body1.body_ptr, *body2.body_ptr);
+        if (TestOverlap(body1, body2)) type_tracker(body1.body_ptr, body2.body_ptr);
       }
     }
 
     // The following function will test all relevant pairs of bodies and run the passed-in
     // function on those objects that overlap.
 
-    void FindOverlaps(const overlap_fun_t & overlap_fun) {
-      emp_assert(overlap_fun);
-
+    void FindOverlaps() {
       Activate();  // Make sure data structures are setup.
 
       // Loop through all of the sectors to identify collisions.
@@ -268,11 +293,11 @@ namespace emp {
           BodyInfo & body = body_set[cur_sector[body_id]];
 
           // Compare against the bodies after this one in the current sector.
-          FindSectorOverlaps(body, sector_id, overlap_fun, body_id+1);      // Test remaining bodies here.
-          if (ul_ok) FindSectorOverlaps(body, ul_sector_id, overlap_fun);   // Test bodies to upper-left.
-          if (up_ok) FindSectorOverlaps(body, ul_sector_id+1, overlap_fun); // Test bodies above
-          if (ur_ok) FindSectorOverlaps(body, ul_sector_id+2, overlap_fun); // Test bodies to upper-right.
-          if (left_ok) FindSectorOverlaps(body, sector_id-1, overlap_fun);  // Test bodies to left.
+          FindSectorOverlaps(body, sector_id, body_id+1);      // Test remaining bodies here.
+          if (ul_ok) FindSectorOverlaps(body, ul_sector_id);   // Test bodies to upper-left.
+          if (up_ok) FindSectorOverlaps(body, ul_sector_id+1); // Test bodies above
+          if (ur_ok) FindSectorOverlaps(body, ul_sector_id+2); // Test bodies to upper-right.
+          if (left_ok) FindSectorOverlaps(body, sector_id-1);  // Test bodies to left.
         }
       }
 
@@ -284,7 +309,7 @@ namespace emp {
     }
 
     /// Determine if there are any overlaps with a provided body (that may or may not be on surface).
-    void FindOverlap(const BodyInfo & body, const overlap_fun_t & overlap_fun) {
+    void FindOverlap(const BodyInfo & body) {
       const size_t sector_id = FindSector(body.center);
       const size_t sector_col = sector_id % num_cols;
       const size_t sector_row = sector_id / num_cols;
@@ -294,7 +319,7 @@ namespace emp {
       for (size_t body2_id : cur_sector) {
         BodyInfo & body2 = body_set[body2_id];
         if (body == body2) continue; // Don't match with self!
-        if (TestOverlap(body, body2)) overlap_fun(*body.body_ptr, *body2.body_ptr);
+        if (TestOverlap(body, body2)) type_tracker(body.body_ptr, body2.body_ptr);
       }
 
       const bool left_ok  = (sector_col > 0);
@@ -306,20 +331,20 @@ namespace emp {
       const size_t down_sector_id = sector_id + num_cols;
 
       // Compare against bodies in other sectors....
-      if (up_ok)               FindSectorOverlaps(body, up_sector_id,     overlap_fun);
-      if (up_ok && left_ok)    FindSectorOverlaps(body, up_sector_id-1,   overlap_fun);
-      if (up_ok && right_ok)   FindSectorOverlaps(body, up_sector_id+1,   overlap_fun);
-      if (left_ok)             FindSectorOverlaps(body, sector_id-1,      overlap_fun);
-      if (right_ok)            FindSectorOverlaps(body, sector_id+1,      overlap_fun);
-      if (down_ok)             FindSectorOverlaps(body, down_sector_id,   overlap_fun); 
-      if (down_ok && left_ok)  FindSectorOverlaps(body, down_sector_id-1, overlap_fun);
-      if (down_ok && right_ok) FindSectorOverlaps(body, down_sector_id+1, overlap_fun);
+      if (up_ok)               FindSectorOverlaps(body, up_sector_id);
+      if (up_ok && left_ok)    FindSectorOverlaps(body, up_sector_id-1);
+      if (up_ok && right_ok)   FindSectorOverlaps(body, up_sector_id+1);
+      if (left_ok)             FindSectorOverlaps(body, sector_id-1);
+      if (right_ok)            FindSectorOverlaps(body, sector_id+1);
+      if (down_ok)             FindSectorOverlaps(body, down_sector_id); 
+      if (down_ok && left_ok)  FindSectorOverlaps(body, down_sector_id-1);
+      if (down_ok && right_ok) FindSectorOverlaps(body, down_sector_id+1);
     }
 
     // Find overlaps using a distance from a point.
-    void FindOverlap(Point center, double radius, const overlap_fun_t & overlap_fun) {
+    void FindOverlap(Point center, double radius) {
       BodyInfo tmp_body(center, radius);
-      FindOverlap(tmp_body, overlap_fun);
+      FindOverlap(tmp_body);
     }
 
   };
