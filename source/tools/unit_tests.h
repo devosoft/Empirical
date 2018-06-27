@@ -18,12 +18,18 @@
 #include "../config/command_line.h"
 
 namespace emp {
-  static bool & UnitTestVerbose() {
-    static bool verbose = false;
+
+  // Unit tests verbosity levels:
+  //  0 = SILENT  - Just return error code.
+  //  1 = NORMAL  - Print errors and summary.
+  //  2 = VERBOSE - Print results for each test performed.
+
+  static size_t & UnitTestVerbose() {
+    static size_t verbose = 1;
     return verbose;
   }
 
-  static bool & UnitTestVerbose(bool in_verbose) {
+  static size_t & UnitTestVerbose(size_t in_verbose) {
     return (UnitTestVerbose() = in_verbose);
   }
 
@@ -41,15 +47,15 @@ namespace emp {
   do {                                                                  \
     std::string result = std::string(EMP_STRINGIFY( MACRO ));           \
     bool match = (result == EXP_RESULT);                                \
-    if (emp::UnitTestVerbose() || !match) {                             \
+    if (emp::UnitTestVerbose()==2 || !match) {                          \
       std::cout << __FILE__ << ", line " << __LINE__ << ": "            \
                 << #MACRO << " == " << result << std::endl;             \
     }                                                                   \
-    if (!match) {                                                       \
+    if (emp::UnitTestVerbose()>=1 && !match) {                          \
       std::cout << "-> \033[1;31mMATCH FAILED!  Expected: "             \
                 << EXP_RESULT << "\033[0m" << std::endl;                \
       emp::UnitTestErrors()++;                                          \
-    } else if (emp::UnitTestVerbose()) {                                \
+    } else if (emp::UnitTestVerbose()==2) {                             \
       std::cout << "-> \033[1;32mPASSED!"                               \
                 << "\033[0m" << std::endl;                              \
     }                                                                   \
@@ -66,15 +72,15 @@ namespace emp {
   do {                                                                  \
     auto result = VALUE;                                                \
     bool match = (result == (EXP_RESULT));                              \
-    if (emp::UnitTestVerbose() || !match) {                             \
+    if (emp::UnitTestVerbose()==2 || !match) {                          \
       std::cout << __FILE__ << ", line " << __LINE__ << ": "            \
                 << #VALUE << " == " << result << std::endl;             \
     }                                                                   \
-    if (!match) {                                                       \
+    if (emp::UnitTestVerbose()>=1 && !match) {                          \
       std::cout << "-> \033[1;31mMATCH FAILED!  Expected: "             \
                 << #EXP_RESULT << "\033[0m" << std::endl;               \
       emp::UnitTestErrors()++;                                          \
-    } else if (emp::UnitTestVerbose()) {                                \
+    } else if (emp::UnitTestVerbose()==2) {                             \
       std::cout << "-> \033[1;32mPASSED!"                               \
                 << "\033[0m" << std::endl;                              \
     }                                                                   \
@@ -85,15 +91,20 @@ namespace emp {
   emp_main_function();                                                       \
   int main(int argc, char * argv[]) {                                        \
     auto args = emp::cl::args_to_strings(argc, argv);                        \
-    emp::UnitTestVerbose() = emp::cl::use_arg(args, "--verbose");            \
+    size_t & verbose = emp::UnitTestVerbose();                               \
+    if (emp::cl::use_arg(args, "--verbose")) verbose = 2;                    \
+    if (emp::cl::use_arg(args, "--silent")) verbose = 0;                     \
+                                                                             \
     emp_main_function();                                                     \
     int num_errors = emp::UnitTestErrors();                                  \
-    if (emp::UnitTestErrors()) {                                             \
-      std::cout << "\033[1;31mRESULT: " << num_errors << " tests failed!"    \
-                << "\033[0m" << std::endl;                                   \
-    } else {                                                                 \
-      std::cout << "\033[1;32mRESULT: all tests PASSED!"                     \
-                << "\033[0m" << std::endl;                                   \
+    if (verbose>=1) {                                                        \
+      if (emp::UnitTestErrors()) {                                           \
+        std::cout << "\033[1;31mRESULT: " << num_errors << " tests failed!"  \
+                  << "\033[0m" << std::endl;                                 \
+      } else {                                                               \
+        std::cout << "\033[1;32mRESULT: all tests PASSED!"                   \
+                  << "\033[0m" << std::endl;                                 \
+      }                                                                      \
     }                                                                        \
     return num_errors;                                                       \
   }                                                                          \
