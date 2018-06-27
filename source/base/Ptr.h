@@ -154,7 +154,9 @@ namespace emp {
         total++;
         if (info.GetCount()) remain++;
 
-        emp_assert(info.IsActive() == false, info.GetPtr(), info.GetCount(), info.IsActive());
+        emp_assert(info.IsActive() == false,
+                   info.GetPtr(), info.GetCount(), info.IsActive(), ptr_id[info.GetPtr()],
+                   "Undeleted pointer at end of execution.");
       }
 
       std::cout << "EMP_TRACK_MEM: No memory leaks found!\n "
