@@ -28,11 +28,17 @@
 #include <string>
 #include "../source/tools/string_utils.h"
 
+// You may create an extra functins or macros that you may need.
+
+#define TRIPLE_INPUT(VAL) VAL+VAL+VAL 
+
 // Define the main function like the one below.  You do NOT create main(); that will be done
 // for you and cammand-line arguments will be handled automatically.
 
 int emp_test_main()
 {
+  std::cout << "Run with --verbose flag in order to get more detailed output." << std::endl;
+
   int x = 5;
 
   // Simple tests might examine the value of a variable.
@@ -46,5 +52,6 @@ int emp_test_main()
   // Tests can be run with expressions.
   EMP_TEST_VALUE(4*x, 100);
 
-  
+  // You can also test macros.  Provide the expected macro translation as a string.
+  EMP_TEST_MACRO(TRIPLE_INPUT(7), "7+7+7");
 }
