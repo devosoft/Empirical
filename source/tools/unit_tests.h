@@ -40,12 +40,16 @@ namespace emp {
     std::string result = std::string(EMP_STRINGIFY( MACRO ));           \
     bool match = (result == EXP_RESULT);                                \
     if (emp::UnitTestVerbose() || !match) {                             \
-      std::cout << #MACRO << " == " << result << std::endl;             \
+      std::cout << __FILE__ << ", line " << __LINE__ << ": "            \
+                << #MACRO << " == " << result << std::endl;             \
     }                                                                   \
     if (!match) {                                                       \
-      std::cout << "MATCH FAILED!  Expected: "                          \
-                << EXP_RESULT << std::endl;                             \
+      std::cout << "\033[1;31mMATCH FAILED!  Expected: "                \
+                << EXP_RESULT << "\033[0m" << std::endl;               \
       emp::UnitTestErrors()++;                                          \
+    } else if (emp::UnitTestVerbose()) {                                \
+      std::cout << "\033[1;32mPASSED!"                                  \
+                << "\033[0m" << std::endl;                              \
     }                                                                   \
   } while (false)
 
