@@ -15,6 +15,8 @@
 #include <iostream>
 #include <sstream>
 
+#include "../config/command_line.h"
+
 namespace emp {
   static bool & UnitTestVerbose() {
     static bool verbose = false;
@@ -44,11 +46,11 @@ namespace emp {
                 << #MACRO << " == " << result << std::endl;             \
     }                                                                   \
     if (!match) {                                                       \
-      std::cout << "\033[1;31mMATCH FAILED!  Expected: "                \
-                << EXP_RESULT << "\033[0m" << std::endl;               \
+      std::cout << "-> \033[1;31mMATCH FAILED!  Expected: "             \
+                << EXP_RESULT << "\033[0m" << std::endl;                \
       emp::UnitTestErrors()++;                                          \
     } else if (emp::UnitTestVerbose()) {                                \
-      std::cout << "\033[1;32mPASSED!"                                  \
+      std::cout << "-> \033[1;32mPASSED!"                               \
                 << "\033[0m" << std::endl;                              \
     }                                                                   \
   } while (false)
@@ -69,30 +71,32 @@ namespace emp {
                 << #VALUE << " == " << result << std::endl;             \
     }                                                                   \
     if (!match) {                                                       \
-      std::cout << "\033[1;31mMATCH FAILED!  Expected: "                \
+      std::cout << "-> \033[1;31mMATCH FAILED!  Expected: "             \
                 << #EXP_RESULT << "\033[0m" << std::endl;               \
       emp::UnitTestErrors()++;                                          \
     } else if (emp::UnitTestVerbose()) {                                \
-      std::cout << "\033[1;32mPASSED!"                                  \
+      std::cout << "-> \033[1;32mPASSED!"                               \
                 << "\033[0m" << std::endl;                              \
     }                                                                   \
   } while (false)
 
 
-#define emp_test_main                                                     \
-  emp_main_function();                                                    \
-  int main() {                                                            \
-    emp_main_function();                                                  \
-    int num_errors = emp::UnitTestErrors();                               \
-    if (emp::UnitTestErrors()) {                                          \
-      std::cout << "\033[1;31mRESULT: " << num_errors << " tests failed!" \
-                << "\033[0m" << std::endl;                                \
-    } else {                                                              \
-      std::cout << "\033[1;32mRESULT: all tests PASSED!"                  \
-                << "\033[0m" << std::endl;                                \
-    }                                                                     \
-    return num_errors;                                                    \
-  }                                                                       \
+#define emp_test_main                                                        \
+  emp_main_function();                                                       \
+  int main(int argc, char * argv[]) {                                        \
+    auto args = emp::cl::args_to_strings(argc, argv);                        \
+    emp::UnitTestVerbose() = emp::cl::use_arg(args, "--verbose");            \
+    emp_main_function();                                                     \
+    int num_errors = emp::UnitTestErrors();                                  \
+    if (emp::UnitTestErrors()) {                                             \
+      std::cout << "\033[1;31mRESULT: " << num_errors << " tests failed!"    \
+                << "\033[0m" << std::endl;                                   \
+    } else {                                                                 \
+      std::cout << "\033[1;32mRESULT: all tests PASSED!"                     \
+                << "\033[0m" << std::endl;                                   \
+    }                                                                        \
+    return num_errors;                                                       \
+  }                                                                          \
   int emp_main_function
 
 #endif
