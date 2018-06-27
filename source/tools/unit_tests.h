@@ -58,10 +58,8 @@ namespace emp {
 
 #define EMP_TEST_VALUE( VALUE, EXP_RESULT )                             \
   do {                                                                  \
-    std::stringstream ss;                                               \
     auto result = VALUE;                                                \
-    ss << result;                                                       \
-    bool match = (ss.str() == EXP_RESULT);                              \
+    bool match = (result == (EXP_RESULT));                              \
     if (emp::UnitTestVerbose() || !match) {                             \
       std::cout << __FILE__ << ", line " << __LINE__ << ": "            \
                 << #VALUE << " == " << result << std::endl;             \
