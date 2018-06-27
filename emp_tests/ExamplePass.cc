@@ -5,6 +5,16 @@
  *
  *  @file ExamplePass.cc
  *  @brief An example file to show what PASSING unit tests look like, with commentary.
+ *
+ *  Unit tests can be built easily, with a good bit of flexibility, as described below.
+ *  
+ *  All unit tests can take command line arguments:
+ *
+ *    --help
+ *    --silent
+ *    --verbose
+ *
+ *  Try running the executable with --verbose to see the full information provided.
  */
 
 
@@ -25,15 +35,16 @@ int emp_test_main()
 {
   int x = 5;
 
-  emp::UnitTestVerbose(true);
-  EMP_TEST_VALUE(x, "5");
+  // Simple tests might examine the value of a variable.
+  EMP_TEST_VALUE(x, 5);
 
   x *= 5;
 
-  EMP_TEST_VALUE(x, "25");
+  // Variables always use their most up-to-date values, and can be test again.
+  EMP_TEST_VALUE(x, 25);
 
   // Tests can be run with expressions.
-  EMP_TEST_VALUE(4*x, "100");
+  EMP_TEST_VALUE(4*x, 100);
 
   
 }
