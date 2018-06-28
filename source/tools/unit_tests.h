@@ -87,34 +87,33 @@ namespace emp {
   } while (false)
 
 
-#define emp_test_main                                                        \
-  emp_main_function();                                                       \
-  int main(int argc, char * argv[]) {                                        \
-    auto args = emp::cl::args_to_strings(argc, argv);                        \
-    size_t & verbose = emp::UnitTestVerbose();                               \
-    if (emp::cl::use_arg(args, "--help")) {                                  \
-      std::cout << "Usage: \033[1;36m" << args[0] << " [args]\033[0m\n"      \
-        << "  \033[1m--help\033[0m    : This message.\n"                           \
-        << "  \033[1m--silent\033[0m  : Produce no output except result code.\n"   \
-        << "  \033[1m--verbose\033[0m : Produce detailed output for each test.\n"; \
-      exit(0);                                                               \
-    }                                                                        \
-    if (emp::cl::use_arg(args, "--verbose")) verbose = 2;                    \
-    if (emp::cl::use_arg(args, "--silent")) verbose = 0;                     \
-                                                                             \
-    emp_main_function();                                                     \
-    int num_errors = emp::UnitTestErrors();                                  \
-    if (verbose>=1) {                                                        \
-      if (emp::UnitTestErrors()) {                                           \
-        std::cout << "\033[1;31mRESULT: " << num_errors << " tests failed!"  \
-                  << "\033[0m" << std::endl;                                 \
-      } else {                                                               \
-        std::cout << "\033[1;32mRESULT: all tests PASSED!"                   \
-                  << "\033[0m" << std::endl;                                 \
-      }                                                                      \
-    }                                                                        \
-    return num_errors;                                                       \
-  }                                                                          \
-  int emp_main_function
+  int emp_test_main();
+
+  int main(int argc, char * argv[]) {
+    auto args = emp::cl::args_to_strings(argc, argv);
+    size_t & verbose = emp::UnitTestVerbose();
+    if (emp::cl::use_arg(args, "--help")) {
+      std::cout << "Usage: \033[1;36m" << args[0] << " [args]\033[0m\n"
+        << "  \033[1m--help\033[0m    : This message.\n"
+        << "  \033[1m--silent\033[0m  : Produce no output except result code.\n"
+        << "  \033[1m--verbose\033[0m : Produce detailed output for each test.\n";
+      exit(0);
+    }
+    if (emp::cl::use_arg(args, "--verbose")) verbose = 2;
+    if (emp::cl::use_arg(args, "--silent")) verbose = 0;
+
+    emp_test_main();
+    int num_errors = emp::UnitTestErrors();
+    if (verbose>=1) {
+      if (emp::UnitTestErrors()) {
+        std::cout << "\033[1;31mRESULT: " << num_errors << " tests failed!"
+                  << "\033[0m" << std::endl;
+      } else {
+        std::cout << "\033[1;32mRESULT: all tests PASSED!"
+                  << "\033[0m" << std::endl;
+      }
+    }
+    return num_errors;
+  }
 
 #endif
