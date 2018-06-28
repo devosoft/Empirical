@@ -27,12 +27,12 @@ namespace emp {
     VERBOSE = 2    // Print results for each test performed.
   };
 
-  static size_t & UnitTestVerbose() {
-    static size_t verbose = 1;
+  static UnitTestOutput & UnitTestVerbose() {
+    static UnitTestOutput verbose = UnitTestOutput::NORMAL;
     return verbose;
   }
 
-  static size_t & UnitTestVerbose(size_t in_verbose) {
+  static UnitTestOutput & UnitTestVerbose(UnitTestOutput in_verbose) {
     return (UnitTestVerbose() = in_verbose);
   }
 
@@ -45,16 +45,16 @@ namespace emp {
   void ResolveUnitTest(bool pass, const std::string & test_input,
                    const std::string & result, const std::string & exp_result,
                    const std::string & filename, size_t line_num) {
-    const size_t verbose = emp::UnitTestVerbose();
-    if (verbose == 2 || !pass) {
+    const UnitTestOutput verbose = emp::UnitTestVerbose();
+    if (verbose == UnitTestOutput::VERBOSE || !pass) {
       std::cout << filename << ", line " << line_num << ": "
                 << test_input << " == " << result << std::endl;
     }
-    if (verbose >= 1 && !pass) {
+    if (!pass) {
       std::cout << "-> \033[1;31mMATCH FAILED!  Expected: "
                 << exp_result << "\033[0m" << std::endl;
       emp::UnitTestErrors()++;
-    } else if (verbose == 2) {
+    } else if (verbose == UnitTestOutput::VERBOSE) {
       std::cout << "-> \033[1;32mPASSED!" << "\033[0m" << std::endl;
     }
   }
@@ -91,30 +91,29 @@ namespace emp {
 
   int main(int argc, char * argv[]) {
     auto args = emp::cl::args_to_strings(argc, argv);
-    size_t & verbose = emp::UnitTestVerbose();
+    emp::UnitTestOutput & verbose = emp::UnitTestVerbose();
     if (emp::cl::use_arg(args, "--help")) {
       std::cout << "Usage: \033[1;36m" << args[0] << " [args]\033[0m\n"
+        << "  \033[1m--abort\033[0m   : Stop execution immediately if a test fails.\n"
         << "  \033[1m--help\033[0m    : This message.\n"
         << "  \033[1m--silent\033[0m  : Produce no output except result code.\n"
         << "  \033[1m--verbose\033[0m : Produce detailed output for each test.\n";
       exit(0);
     }
-    if (emp::cl::use_arg(args, "--verbose")) verbose = 2;
+    if (emp::cl::use_arg(args, "--verbose")) verbose = emp::UnitTestOutput::VERBOSE;
     if (emp::cl::use_arg(args, "--silent")) {
       std::cout.setstate(std::ios_base::failbit); // Disable cout
-      verbose = 0;
+      verbose = emp::UnitTestOutput::SILENT;
     }
 
     emp_test_main();
     int num_errors = emp::UnitTestErrors();
-    if (verbose>=1) {
-      if (emp::UnitTestErrors()) {
-        std::cout << "\033[1;31mRESULT: " << num_errors << " tests failed!"
-                  << "\033[0m" << std::endl;
-      } else {
-        std::cout << "\033[1;32mRESULT: all tests PASSED!"
-                  << "\033[0m" << std::endl;
-      }
+    if (emp::UnitTestErrors()) {
+      std::cout << "\033[1;31mRESULT: " << num_errors << " tests failed!"
+                << "\033[0m" << std::endl;
+    } else {
+      std::cout << "\033[1;32mRESULT: all tests PASSED!"
+                << "\033[0m" << std::endl;
     }
     return num_errors;
   }
