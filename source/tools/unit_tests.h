@@ -41,11 +41,15 @@ namespace emp {
     return errors;
   }
 
+  static bool & UnitTestAbort() {
+    static bool abort = false;
+    return abort;
+  }
 
   void ResolveUnitTest(bool pass, const std::string & test_input,
                    const std::string & result, const std::string & exp_result,
                    const std::string & filename, size_t line_num) {
-    const UnitTestOutput verbose = emp::UnitTestVerbose();
+    const UnitTestOutput verbose = UnitTestVerbose();
     if (verbose == UnitTestOutput::VERBOSE || !pass) {
       std::cout << filename << ", line " << line_num << ": "
                 << test_input << " == " << result << std::endl;
@@ -53,7 +57,11 @@ namespace emp {
     if (!pass) {
       std::cout << "-> \033[1;31mMATCH FAILED!  Expected: "
                 << exp_result << "\033[0m" << std::endl;
-      emp::UnitTestErrors()++;
+      UnitTestErrors()++;
+      if (UnitTestAbort() == true) {
+        std::cout << "Aborting!\n";
+        abort();
+      }
     } else if (verbose == UnitTestOutput::VERBOSE) {
       std::cout << "-> \033[1;32mPASSED!" << "\033[0m" << std::endl;
     }
@@ -100,6 +108,7 @@ namespace emp {
         << "  \033[1m--verbose\033[0m : Produce detailed output for each test.\n";
       exit(0);
     }
+    if (emp::cl::use_arg(args, "--abort")) { emp::UnitTestAbort() = true; }
     if (emp::cl::use_arg(args, "--verbose")) verbose = emp::UnitTestOutput::VERBOSE;
     if (emp::cl::use_arg(args, "--silent")) {
       std::cout.setstate(std::ios_base::failbit); // Disable cout
