@@ -100,7 +100,10 @@ namespace emp {
       exit(0);
     }
     if (emp::cl::use_arg(args, "--verbose")) verbose = 2;
-    if (emp::cl::use_arg(args, "--silent")) verbose = 0;
+    if (emp::cl::use_arg(args, "--silent")) {
+      std::cout.setstate(std::ios_base::failbit); // Disable cout
+      verbose = 0;
+    }
 
     emp_test_main();
     int num_errors = emp::UnitTestErrors();
