@@ -85,12 +85,14 @@ namespace emp {
 ///     Output: Code to evaluate the expression and optionally print it (if either in verbose mode
 ///             or the macro does not produce the expected result).
 
-#define EMP_TEST_VALUE( VALUE, EXP_RESULT )                                           \
-  do {                                                                                \
-    auto result = VALUE;                                                              \
-    bool match = (result == (EXP_RESULT));                                            \
-    std::string result_str = emp::to_string(result);                                  \
-    emp::ResolveUnitTest(match, #VALUE, result_str, #EXP_RESULT, __FILE__, __LINE__); \
+#define EMP_TEST_VALUE( VALUE, EXP_RESULT )                                              \
+  do {                                                                                   \
+    auto result = VALUE;                                                                 \
+    auto exp_result = EXP_RESULT;                                                        \
+    bool match = (result == (EXP_RESULT));                                               \
+    std::string result_str = emp::to_string(result);                                     \
+    std::string exp_result_str = emp::to_string(exp_result);                             \
+    emp::ResolveUnitTest(match, #VALUE, result_str, exp_result_str, __FILE__, __LINE__); \
   } while (false)
 
 
