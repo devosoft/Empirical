@@ -124,7 +124,7 @@ namespace emp {
                 << " tests failed!"
                 << "\033[0m" << std::endl;
     } else {
-      std::cout << "\033[1;32mRESULT: all " << num_tests << " tests PASSED!"
+      std::cout << "\033[1;32mRESULT: " << num_tests << "/" << num_tests << " tests PASSED!"
                 << "\033[0m" << std::endl;
     }
     return num_errors;
