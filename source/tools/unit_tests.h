@@ -5,9 +5,13 @@
  *
  *  @file unit_tests.h
  *  @brief Macros to facilitate unit testing.
- *  @note Status: technically DEPRECATED (now using Catch, but may revert back)
+ *  @note Status: RESURGENT (Was depricated; now back to ALPHA)
+ * 
+ *  @todo Setup proper command line color handline (probably in its own file.)
+ *  @todo Add EMP_TEST_BELOW, EMP_TEST_ABOVE, and EMP_TEST_RANGE to ensurge that a
+ *        value is in a certain range.
+ *  @todo Consider adding EMP_TEST_ASSERT to ensure that the contained value is true.
  */
-
 
 #ifndef EMP_UNIT_TESTS_H
 #define EMP_UNIT_TESTS_H
