@@ -33,6 +33,7 @@ namespace emp {
     };
 
     UnitTestOutput::Mode verbose = UnitTestOutput::Mode::NORMAL;
+    size_t num_tests = 0;
     size_t errors = 0;
     bool abort = false;
   };
@@ -47,6 +48,7 @@ namespace emp {
                    const std::string & result, const std::string & exp_result,
                    const std::string & filename, size_t line_num) {
     const UnitTestOutput::Mode verbose = GetUnitTestOutput().verbose;
+    GetUnitTestOutput().num_tests++;
     if (verbose == UnitTestOutput::Mode::VERBOSE || !pass) {
       std::cout << filename << ", line " << line_num << ": "
                 << test_input << " == " << result << std::endl;
@@ -114,11 +116,13 @@ namespace emp {
 
     emp_test_main();
     int num_errors = emp::GetUnitTestOutput().errors;
+    int num_tests = emp::GetUnitTestOutput().num_tests;
     if (num_errors) {
-      std::cout << "\033[1;31mRESULT: " << num_errors << " tests failed!"
+      std::cout << "\033[1;31mRESULT: " << num_errors << "/" << num_tests
+                << " tests failed!"
                 << "\033[0m" << std::endl;
     } else {
-      std::cout << "\033[1;32mRESULT: all tests PASSED!"
+      std::cout << "\033[1;32mRESULT: all " << num_tests << " tests PASSED!"
                 << "\033[0m" << std::endl;
     }
     return num_errors;
