@@ -5,7 +5,6 @@
  *
  *  @file ExampleFail.cc
  *  @brief An example file to show what FAILING unit tests look like, with commentary.
- *
  */
 
 
@@ -19,7 +18,7 @@
 #include <string>
 #include "../source/tools/string_utils.h"
 
-// You may create an extra functins or macros that you may need.
+// You may create an extra functions or macros that you may need.
 
 #define TRIPLE_INPUT(VAL) VAL+VAL+VAL 
 

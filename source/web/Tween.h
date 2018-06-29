@@ -115,8 +115,7 @@ namespace web {
       emp::InitializeAnim();  // Make sure JS is intialized for animations.
       callback_id = JSWrap( std::function<void()>([this](){ this->AdvanceFrame(); }) );
     }
-    ~Tween()
-    {
+    ~Tween() {
       for (auto * p : paths) delete p;
       for (auto * e : events) delete e;
     }

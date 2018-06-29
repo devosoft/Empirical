@@ -158,9 +158,9 @@ namespace emp {
 
     /// A Tracked ID is simply the unique ID of the type being tracked.
     static size_t GetTrackedID(const TrackedVar & tt) { return tt.GetTypeID(); }
-    template <typename... Ts>
 
     /// Or set of types being tracked...
+    template <typename... Ts>
     static size_t GetTrackedID(const TrackedVar & tt1, const TrackedVar & tt2, const Ts &... ARGS) {
       return tt1.GetTypeID() + GetTrackedID(tt2, ARGS...) * GetNumTypes();
     }
