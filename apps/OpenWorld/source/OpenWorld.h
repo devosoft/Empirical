@@ -10,6 +10,7 @@
 
 #include "config.h"
 #include "OpenOrg.h"
+#include "OpenResource.h"
 
 class OpenWorld : public emp::World<OpenOrg> {
 private:
@@ -23,7 +24,7 @@ private:
   using inst_lib_t = hardware_t::inst_lib_t;
   using hw_state_t = hardware_t::State;
  
-  using surface_t = emp::Surface<OpenOrg>;
+  using surface_t = emp::Surface<OpenOrg, OpenResource>;
   using mutator_t = emp::SignalGPMutator<TAG_WIDTH>;
 
   OpenWorldConfig & config;
