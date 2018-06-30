@@ -193,13 +193,13 @@ namespace emp {
     }
     void SetColor(size_t id, size_t _in) { body_set[id].color = _in; }
     
-    void RemoveBody(size_t id) {
-      // @CAO Change id in body_set to nullptr; record cell id for re-use
-      if (data_active) {
-        const size_t sector_id = FindSector(body_set[id].center);
-        emp::RemoveValue(sectors[sector_id], id);
-      }
-    }
+    // void RemoveBody(size_t id) {
+    //   // @CAO Change id in body_set to nullptr; record cell id for re-use
+    //   if (data_active) {
+    //     const size_t sector_id = FindSector(body_set[id].center);
+    //     emp::RemoveValue(sectors[sector_id], id);
+    //   }
+    // }
 
     /// Add a single body; return its unique ID.
     template <typename BODY_T>
