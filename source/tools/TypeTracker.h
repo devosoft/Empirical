@@ -34,7 +34,7 @@
 
 namespace emp {
 
-  /// The base class of any type to be tracked.
+  /// The proxy base class of any type to be tracked.
   struct TrackedInfo_Base {
     virtual size_t GetTypeID() const noexcept = 0;
     virtual ~TrackedInfo_Base () {;}

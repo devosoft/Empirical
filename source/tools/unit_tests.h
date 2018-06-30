@@ -11,6 +11,7 @@
  *  @todo Add EMP_TEST_BELOW, EMP_TEST_ABOVE, and EMP_TEST_RANGE to ensurge that a
  *        value is in a certain range.
  *  @todo Consider adding EMP_TEST_ASSERT to ensure that the contained value is true.
+ *  @todo Consider adding EMP_TEST_APPROX to compare within a tollerance level.
  */
 
 #ifndef EMP_UNIT_TESTS_H
