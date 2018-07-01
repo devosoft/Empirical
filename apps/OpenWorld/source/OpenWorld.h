@@ -39,6 +39,7 @@ private:
 
   std::unordered_map<size_t, emp::Ptr<OpenOrg>> id_map;
 
+  emp::vector<OpenResource> resources;
 
 public:  
   OpenWorld(OpenWorldConfig & _config)
@@ -186,6 +187,14 @@ public:
       size_t surface_id = surface.AddBody(&org, {x,y}, 5.0);
       org.SetSurfaceID(surface_id);
       org.GetBrain().SetProgram(emp::GenRandSignalGPProgram(*random_ptr, inst_lib, config.PROGRAM_MIN_FUN_CNT(), config.PROGRAM_MAX_FUN_CNT(), config.PROGRAM_MIN_FUN_LEN(), config.PROGRAM_MAX_FUN_LEN(), config.PROGRAM_MIN_ARG_VAL(), config.PROGRAM_MAX_ARG_VAL()));
+    }
+
+    // Add in resources.
+    resources.resize(config.NUM_RESOURCE_SOURCES());
+    for (OpenResource & res : resources) {
+      double x = random_ptr->GetDouble(config.WORLD_X());
+      double y = random_ptr->GetDouble(config.WORLD_Y());
+      res.surface_id = surface.AddBody(&res, {x,y}, 2.0);
     }
   }
   ~OpenWorld() { id_map.clear(); }
