@@ -60,9 +60,9 @@ namespace web {
   /// @param canvas The Canvas to draw on.
   /// @param surface A surface containing a set of shapes to draw.
   /// @param color_map Mapping of values to the colors with which they should be associated.
-  template <typename BODY_TYPE>
+  template <typename... BODY_TYPES>
   void Draw(Canvas canvas,
-            const Surface<BODY_TYPE> & surface,
+            const Surface<BODY_TYPES...> & surface,
             const emp::vector<std::string> & color_map)
   {
     canvas.Clear();
@@ -89,8 +89,8 @@ namespace web {
   /// @param canvas The Canvas to draw on.
   /// @param surface A surface containing a set of shapes to draw.
   /// @param num_colors The number of distinct colors to use in visualization.
-  template <typename BODY_TYPE>
-  void Draw(Canvas canvas, const Surface<BODY_TYPE> & surface, size_t num_colors)
+  template <typename... BODY_TYPES>
+  void Draw(Canvas canvas, const Surface<BODY_TYPES...> & surface, size_t num_colors)
   {
     Draw(canvas, surface, GetHueMap(num_colors));
   }
