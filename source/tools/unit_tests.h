@@ -96,6 +96,20 @@ namespace emp {
     emp::ResolveUnitTest(match, #VALUE, result_str, exp_result_str, __FILE__, __LINE__); \
   } while (false)
 
+#define EMP_TEST_APPROX(...) EMP_TEST_APPROX_impl(__VA_ARGS__, 1.0, ~)
+
+#define EMP_TEST_APPROX_impl( VALUE, EXP_RESULT, THRESHOLD, ...)                          \
+  do {                                                                                    \
+    auto result = VALUE;                                                                  \
+    auto exp_result = EXP_RESULT;                                                         \
+    auto upper_bound = exp_result + THRESHOLD;                                            \
+    auto lower_bound = exp_result - THRESHOLD;                                            \
+    bool match = (result <= upper_bound && result >= lower_bound);                        \
+    std::string result_str = emp::to_string(result);                                      \
+    std::string exp_result_str = emp::to_string('[', lower_bound, ',', upper_bound, ']'); \
+    emp::ResolveUnitTest(match, #VALUE, result_str, exp_result_str, __FILE__, __LINE__);  \
+  } while (false)
+
 
   void emp_test_main();
 
@@ -118,8 +132,8 @@ namespace emp {
     }
 
     emp_test_main();
-    int num_errors = emp::GetUnitTestOutput().errors;
-    int num_tests = emp::GetUnitTestOutput().num_tests;
+    int num_errors = (int) emp::GetUnitTestOutput().errors;
+    int num_tests = (int) emp::GetUnitTestOutput().num_tests;
     if (num_errors) {
       std::cout << "\033[1;31mRESULT: " << num_errors << "/" << num_tests
                 << " tests failed!"
