@@ -10,7 +10,7 @@
 #include "../source/tools/unit_tests.h"
 
 
-int emp_test_main()
+void emp_test_main()
 {
   std::cout << "Run with --verbose flag in order to get more detailed output." << std::endl;
 }

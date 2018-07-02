@@ -28,7 +28,7 @@ bool IsOdd(int val) { return val % 2; }
 // Define the main function like the one below.  You do NOT create main(); that will be done
 // for you and cammand-line arguments will be handled automatically.
 
-int emp_test_main()
+void emp_test_main()
 {
   // A simple example in a loop.
   for (int x = 2; x < 15; x++) {
