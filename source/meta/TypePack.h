@@ -74,7 +74,7 @@ namespace emp {
   struct null_t {};
 
   // Anonymous helpers for TypePack
-  namespace {
+  namespace internal {
     // Create add N copies of the same type to the end of a TypePack.
     template <typename START, typename T, int N>
     struct tp_pad { using type = typename tp_pad<START,T,N-1>::type::template add<T>; };
@@ -140,7 +140,8 @@ namespace emp {
       using tp_wrap_t = typename tp_wrap<T,W,T::SIZE>::type;
   }
 
-  template <typename T, int N> using TypePackFill = typename tp_pad<TypePack<>,T,N>::type;
+  template <typename T, int N>
+  using TypePackFill = typename internal::tp_pad<TypePack<>,T,N>::type;
 
   // Specialized TypePack with at least one type.
   template <typename T1, typename... Ts>
@@ -155,7 +156,8 @@ namespace emp {
     template <typename T> constexpr static int GetID() { return get_type_index<T,T1,Ts...>(); }
 
     /// Return the position of the type of owner.
-    template <typename T> constexpr static int GetID(const T &) { return get_type_index<T,T1,Ts...>(); }
+    template <typename T>
+    constexpr static int GetID(const T &) { return get_type_index<T,T1,Ts...>(); }
 
     /// Set to the number of types in this pack.
     constexpr static int SIZE = 1+sizeof...(Ts);
@@ -197,20 +199,20 @@ namespace emp {
 
     /// Remove the first type from this TypePack and return the rest.
     using pop = TypePack<Ts...>;
-    template <int N> using popN = typename tp_shift<N, TypePack<>, this_t>::type2;
+    template <int N> using popN = typename internal::tp_shift<N, TypePack<>, this_t>::type2;
 
     /// Reduce the size of this TypePack down to N.
-    template <int N> using shrink = typename tp_shift<N, TypePack<>, this_t>::type1;
+    template <int N> using shrink = typename internal::tp_shift<N, TypePack<>, this_t>::type1;
 
     /// Add N new entries onto TypePack, all of provided type T.
-    template <typename T, int N=1> using pad = typename tp_pad<this_t,T,N>::type;
+    template <typename T, int N=1> using pad = typename internal::tp_pad<this_t,T,N>::type;
 
     /// Make this TypePack the specified size, padding with provided type T.
     template <int N, typename DEFAULT=null_t>
       using resize = typename pad<DEFAULT,(N>SIZE)?(N-SIZE):0>::template shrink<N>;
 
     /// Join this TypePack with another TypePack.
-    template <typename IN> using merge = typename tp_shift<IN::SIZE, this_t, IN>::type1;
+    template <typename IN> using merge = typename internal::tp_shift<IN::SIZE, this_t, IN>::type1;
 
     /// Rearrange types in TypePack into reverse order.
     using reverse = typename pop::reverse::template push_back<T1>;
@@ -232,14 +234,16 @@ namespace emp {
     template <template <typename...> class TEMPLATE> using apply = TEMPLATE<T1, Ts...>;
 
     /// Remove all types that cannot pass a filter.  Return as new TypePack.
-    template <template <typename...> class FILTER> using filter = tp_filter_t<this_t, FILTER>;
+    template <template <typename...> class FILTER>
+    using filter = internal::tp_filter_t<this_t, FILTER>;
 
     /// Return the first type that satisfies a filter.
     template <template <typename...> class FILTER>
-      using find_t = typename tp_filter_t<this_t, FILTER>::first_t;
+    using find_t = typename internal::tp_filter_t<this_t, FILTER>::first_t;
 
     /// Wrap all types in a specified wrapper template.
-    template <template <typename...> class WRAPPER> using wrap = tp_wrap_t<this_t, WRAPPER>;
+    template <template <typename...> class WRAPPER>
+    using wrap = internal::tp_wrap_t<this_t, WRAPPER>;
   };
 
   // Specialized TypePack with no types.
@@ -268,7 +272,7 @@ namespace emp {
     template <int N> using popN = this_t;
     template <int N> using shrink = this_t;
 
-    template <typename T, int N=1> using pad = typename tp_pad<this_t,T,N>::type;
+    template <typename T, int N=1> using pad = typename internal::tp_pad<this_t,T,N>::type;
     template <int N, typename DEFAULT=null_t> using resize = pad<DEFAULT,N>;
 
     template <typename IN> using merge = IN;
