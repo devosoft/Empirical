@@ -29,7 +29,7 @@ void fun_5ints(int v, int w, int x, int y, int z) {
   tt_result = emp::to_string(v, '+', w, '+', x, '+', y, '+', z, '=', v+w+x+y+z);
 }
 
-int emp_test_main()
+void emp_test_main()
 {
   using tt_t = emp::TypeTracker<int, std::string, double>;   // Setup the tracker type.
   tt_t tt;                                                   // Build the tracker.
