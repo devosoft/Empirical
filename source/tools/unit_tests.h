@@ -97,7 +97,7 @@ namespace emp {
   } while (false)
 
 
-  int emp_test_main();
+  void emp_test_main();
 
   int main(int argc, char * argv[]) {
     auto args = emp::cl::args_to_strings(argc, argv);
