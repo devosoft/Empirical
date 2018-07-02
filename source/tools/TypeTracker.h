@@ -61,6 +61,7 @@ namespace emp {
 
     /// Move assignment hands over control of the pointer.
     TrackedVar & operator=(TrackedVar && _in) {
+      if (ptr) ptr.Delete();
       ptr = _in.ptr;
       _in.ptr = nullptr;
       return *this;
