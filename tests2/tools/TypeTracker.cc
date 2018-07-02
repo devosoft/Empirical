@@ -7,9 +7,9 @@
  *  @brief Unit tests for TypeTracker class.
  */
 
-#include "../../source/base/vector.h"
-#include "../../source/tools/TypeTracker.h"
-#include "../../source/tools/unit_tests.h"
+#include "base/vector.h"
+#include "tools/TypeTracker.h"
+#include "tools/unit_tests.h"
 
 std::string tt_result;
 
