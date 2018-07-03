@@ -113,9 +113,8 @@ namespace emp {
 
   void emp_test_main();
 
-  int main(int argc, char * argv[]) {
-    auto args = emp::cl::args_to_strings(argc, argv);
-    emp::UnitTestOutput::Mode & verbose = emp::GetUnitTestOutput().verbose;
+  void SetupUnitTestArgs(emp::vector<std::string> args) {
+        emp::UnitTestOutput::Mode & verbose = emp::GetUnitTestOutput().verbose;
     if (emp::cl::use_arg(args, "--help")) {
       std::cout << "Usage: \033[1;36m" << args[0] << " [args]\033[0m\n"
         << "  \033[1m--abort\033[0m   : Stop execution immediately if a test fails.\n"
@@ -130,8 +129,9 @@ namespace emp {
       std::cout.setstate(std::ios_base::failbit); // Disable cout
       verbose = emp::UnitTestOutput::SILENT;
     }
+  }
 
-    emp_test_main();
+  int ProcessUnitTestResults() {
     int num_errors = (int) emp::GetUnitTestOutput().errors;
     int num_tests = (int) emp::GetUnitTestOutput().num_tests;
     if (num_errors) {
@@ -143,6 +143,12 @@ namespace emp {
                 << "\033[0m" << std::endl;
     }
     return num_errors;
+  }
+
+  int main(int argc, char * argv[]) {
+    SetupUnitTestArgs( emp::cl::args_to_strings(argc, argv) );
+    emp_test_main();
+    return ProcessUnitTestResults();
   }
 
 #endif
