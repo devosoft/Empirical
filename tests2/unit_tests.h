@@ -20,8 +20,8 @@
 #include <iostream>
 #include <sstream>
 
-#include "../config/command_line.h"
-#include "../tools/string_utils.h"
+#include "../source/config/command_line.h"
+#include "../source/tools/string_utils.h"
 
 namespace emp {
 
