@@ -46,7 +46,6 @@
 #include "tools/stats.h"
 #include "tools/string_utils.h"
 #include "tools/tuple_struct.h"
-#include "tools/unit_tests.h"
 #include "tools/vector_utils.h"
 
 // currently these have no coveage; we include them so we get metrics on them
