@@ -11,7 +11,7 @@
 // The only required include for unit tests is the one below.
 // It includes everything else it needs.
 
-#include "../source/tools/unit_tests.h"
+#include "unit_tests.h"
 
 // You may also include any other files that you need for your specific tests.
 

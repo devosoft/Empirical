@@ -7,7 +7,7 @@
  *  @brief A starting point for writing unit tests.
  */
 
-#include "../source/tools/unit_tests.h"
+#include "unit_tests.h"
 
 
 void emp_test_main()
