@@ -111,8 +111,6 @@ namespace emp {
   } while (false)
 
 
-  void emp_test_main();
-
   void SetupUnitTestArgs(emp::vector<std::string> args) {
         emp::UnitTestOutput::Mode & verbose = emp::GetUnitTestOutput().verbose;
     if (emp::cl::use_arg(args, "--help")) {
@@ -145,10 +143,12 @@ namespace emp {
     return num_errors;
   }
 
-  int main(int argc, char * argv[]) {
-    SetupUnitTestArgs( emp::cl::args_to_strings(argc, argv) );
-    emp_test_main();
-    return ProcessUnitTestResults();
-  }
+#define emp_test_main() emp_test_main_impl();                    \
+  int main(int argc, char * argv[]) {                            \
+    SetupUnitTestArgs( emp::cl::args_to_strings(argc, argv) );   \
+    emp_test_main_impl();                                        \
+    return ProcessUnitTestResults();                             \
+  }                                                              \
+  void emp_test_main_impl()
 
 #endif
