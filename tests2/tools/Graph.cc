@@ -8,7 +8,8 @@
  */
 
 #include "../../source/tools/Graph.h"
-#include "../../source/tools/unit_tests.h"
+
+#include "../unit_tests.h"
 
 
 void emp_test_main()

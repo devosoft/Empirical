@@ -12,7 +12,8 @@
 #include "base/vector.h"
 #include "tools/Binomial.h"
 #include "tools/Random.h"
-#include "tools/unit_tests.h"
+
+#include "../unit_tests.h"
 
 void emp_test_main()
 {

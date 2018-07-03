@@ -9,7 +9,8 @@
 
 #include "base/vector.h"
 #include "tools/TypeTracker.h"
-#include "tools/unit_tests.h"
+
+#include "../unit_tests.h"
 
 std::string tt_result;
 
