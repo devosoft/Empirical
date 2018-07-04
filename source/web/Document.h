@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  Document.h
  *  @brief Manage an entire document.
@@ -36,6 +36,20 @@
 
 #include "canvas_utils.h"
 #include "color_map.h"
+
+// Create an optional alternative to main, emp_main, that is only available after a document 
+// has loaded and is ready.
+#ifdef EMPIRICAL
+
+#define emp_main() emp_main_on_ready();              \
+  int main() {                                       \
+    emp::web::OnDocumentReady( emp_main_on_ready );  \
+  }                                                  \
+  emp_main_on_ready()
+
+#else
+#define emp_main main
+#endif
 
 namespace emp {
 namespace web {
