@@ -7,7 +7,6 @@
 #include "opengl/glwrap.h"
 #include "opengl/shaders.h"
 #include "scenegraph/camera.h"
-#include "scenegraph/core.h"
 #include "scenegraph/freetype.h"
 #include "tools/attrs.h"
 #include "tools/resources.h"
@@ -17,12 +16,61 @@
 
 namespace emp {
   namespace graphics {
+    struct RenderSettings {
+      math::Mat4x4f projection;
+      math::Mat4x4f view;
+    };
 
     DEFINE_ATTR(Transform);
     DEFINE_ATTR(Fill);
     DEFINE_ATTR(Text);
+    DEFINE_ATTR(TextSize);
 
-    class FillRegularPolygonRenderer {
+    struct Face {
+      int a, b, c;
+    };
+
+    struct Mesh {
+      std::vector<emp::math::Vec3f> verticies;
+      std::vector<Face> faces;
+
+      static Mesh Region(const emp::math::Region2f& region) {
+        emp::math::Vec3f bottom_left{region.min.x(), region.min.y(), 0};
+        emp::math::Vec3f bottom_right{region.max.x(), region.min.y(), 0};
+        emp::math::Vec3f upper_right{region.max.x(), region.max.y(), 0};
+        emp::math::Vec3f upper_left{region.min.x(), region.max.y(), 0};
+
+        return {{bottom_left, bottom_right, upper_right, upper_left},
+                {{0, 3, 1}, {3, 2, 1}}};
+      }
+      static Mesh Polygon(size_t vertex_count,
+                          const emp::math::Vec2f& radius = {0.5, 0.5}) {
+        Mesh mesh;
+        int first = 0;
+        for (auto i = 0; i < vertex_count; ++i) {
+          auto r =
+            static_cast<float>(i) / vertex_count * 2 * math::consts::pi<float> +
+            math::consts::pi<float> / vertex_count;
+
+          int num = mesh.verticies.size();
+          mesh.verticies.emplace_back(cos(r) * radius.x() * 2,
+                                      sin(r) * radius.y() * 2, 0);
+
+          if (i == 0) first = num;
+
+          auto next = num + 1;
+          if (i == vertex_count - 1) {
+            next = first;
+          }
+
+          mesh.faces.push_back({first, num, next});
+        }
+
+        return mesh;
+      }
+    };
+
+    class FillRenderer {
       ResourceRef<opengl::ShaderProgram> fill_shader;
 
       opengl::VertexArrayObject vao;
@@ -49,8 +97,8 @@ namespace emp {
 
       public:
       template <typename S = const char*>
-      FillRegularPolygonRenderer(opengl::GLCanvas& canvas,
-                                 S&& fill_shader = "DefaultSolidColor")
+      FillRenderer(opengl::GLCanvas& canvas,
+                   S&& fill_shader = "DefaultSolidColor")
         : fill_shader(std::forward<S>(fill_shader)),
           vao(canvas.MakeVAO()),
           gpu_vertex_buffer(canvas.makeBuffer<opengl::BufferType::Array>()),
@@ -70,31 +118,22 @@ namespace emp {
         });
       }
 
-      void BeginBatch(const scenegraph::RenderSettings& settings,
-                      size_t vertex_count, const math::Vec2f& radius) {
+      void BeginBatch(const RenderSettings& settings, const Mesh& mesh) {
         auto first = 0;
 
         gpu_elements_buffer.Clear();
-        for (auto i = 0; i < vertex_count; ++i) {
-          auto r =
-            static_cast<float>(i) / vertex_count * 2 * math::consts::pi<float> +
-            math::consts::pi<float> / vertex_count;
+        gpu_vertex_buffer.Clear();
 
-          auto num = gpu_vertex_buffer.Size();
-          gpu_vertex_buffer.EmplaceData(cos(r) * radius.x(),
-                                        sin(r) * radius.y(), 0);
-
-          if (i == 0) first = num;
-
-          auto next = num + 1;
-          if (i == vertex_count - 1) {
-            next = first;
-          }
-
-          gpu_elements_buffer.PushData(first);
-          gpu_elements_buffer.PushData(num);
-          gpu_elements_buffer.PushData(next);
+        for (auto& vertex : mesh.verticies) {
+          gpu_vertex_buffer.EmplaceData(vertex);
         }
+
+        for (auto& face : mesh.faces) {
+          gpu_elements_buffer.PushData(face.a);
+          gpu_elements_buffer.PushData(face.b);
+          gpu_elements_buffer.PushData(face.c);
+        }
+
         vao.bind();
         gpu_vertex_buffer.SendToGPU();
         gpu_elements_buffer.SendToGPU();
@@ -106,6 +145,13 @@ namespace emp {
 
       template <typename I = instance_attributes_type>
       void Instance(I&& attrs) {
+        draw_queue.emplace_back(std::forward<I>(attrs));
+      }
+
+      template <typename I = instance_attributes_type>
+      void Instance(I&& attrs, float width, float height) {
+        Transform::Get(attrs) *= emp::math::Mat4x4f::Scale(width, height, 1);
+
         draw_queue.emplace_back(std::forward<I>(attrs));
       }
 
@@ -135,7 +181,6 @@ namespace emp {
         math::Vec2f texture_coordinates;
       };
 
-      float height = 8;
       opengl::VertexArrayObject vao;
       opengl::BufferVector<opengl::BufferType::Array, data_t> vertices_buffer;
       ResourceRef<scenegraph::FontFace> font;
@@ -152,7 +197,7 @@ namespace emp {
       public:
       using instance_attributes_type =
         tools::Attrs<TransformValue<math::Mat4x4f>, FillValue<opengl::Color>,
-                     TextValue<std::string>>;
+                     TextValue<std::string>, TextSizeValue<float>>;
 
       template <typename F, typename S = std::string>
       TextRenderer(opengl::GLCanvas& canvas, F&& font,
@@ -178,7 +223,7 @@ namespace emp {
         });
       }
 
-      void BeginBatch(const scenegraph::RenderSettings& settings) {
+      void BeginBatch(const RenderSettings& settings) {
         this->shader->Use();
         shader_uniforms.projection = settings.projection;
         shader_uniforms.view = settings.view;
@@ -191,7 +236,7 @@ namespace emp {
         Vec2f cursor{0, 0};
         vertices_buffer.Clear();
 
-        float scale = height / font->atlas_height;
+        float scale = attrs.GetTextSize() / font->atlas_height;
 
         int i = 0;
         for (auto& c : attrs.GetText()) {
@@ -229,7 +274,7 @@ namespace emp {
         vertices_buffer.SendToGPU();
 
         shader_uniforms.model = attrs.GetTransform();
-        shader_uniforms.tex = *font->GetAtlasTexture();
+        shader_uniforms.tex = *font->ComputeAtlasTexture();
         shader_uniforms.fill = attrs.GetFill();
 
         vertices_buffer.Draw(GL_TRIANGLES);
@@ -247,7 +292,7 @@ namespace emp {
       using instance_attributes_type = typename R::instance_attributes_type;
 
       template <typename... T>
-      Pen(R* renderer, const scenegraph::RenderSettings& settings, T&&... args)
+      Pen(R* renderer, const RenderSettings& settings, T&&... args)
         : renderer(renderer) {
         renderer->BeginBatch(settings, std::forward<T>(args)...);
       }
@@ -270,7 +315,7 @@ namespace emp {
     };
 
     class Graphics {
-      FillRegularPolygonRenderer fill_regular_polygon_renderer;
+      FillRenderer fill_renderer;
       TextRenderer text_renderer;
 
       public:
@@ -281,7 +326,7 @@ namespace emp {
       Graphics(opengl::GLCanvas& canvas, F&& font,
                std::shared_ptr<scenegraph::Camera> camera,
                std::shared_ptr<scenegraph::Eye> eye)
-        : fill_regular_polygon_renderer(canvas),
+        : fill_renderer(canvas),
           text_renderer(canvas, std::forward<F>(font)),
           camera(camera),
           eye(eye) {}
@@ -292,12 +337,27 @@ namespace emp {
       Graphics& operator=(const Graphics&) = delete;
       Graphics& operator=(Graphics&&) = delete;
 
-      Pen<FillRegularPolygonRenderer> FillRegularPolygons(
-        size_t vertex_count, const math::Vec2f& radius) {
-        return {&fill_regular_polygon_renderer,
+      void Clear(float r, float g, float b, float a = 1) {
+        glClearColor(r, g, b, a);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      }
+
+      void Clear(const opengl::Color& color) {
+        Clear(color.r, color.g, color.b, color.a);
+      }
+
+      Pen<FillRenderer> Fill(const Mesh& mesh) {
+        return {&fill_renderer,
                 {camera->GetProjection(), eye->CalculateView()},
-                vertex_count,
-                radius};
+                mesh};
+      }
+
+      template <typename A0 = typename FillRenderer::instance_attributes_type,
+                typename... A>
+      void DrawFilled(const Mesh& mesh, A0&& attributes, A&&... args) {
+        Fill(mesh)
+          .Draw(std::forward<A0>(attributes), std::forward<A>(args)...)
+          .Flush();
       }
 
       Pen<TextRenderer> Text() {

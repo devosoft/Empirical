@@ -9,19 +9,15 @@
 #include "camera.h"
 #include "math/LinAlg.h"
 #include "math/region.h"
+#include "rendering.h"
 
 namespace emp {
   namespace scenegraph {
 
-    struct RenderSettings {
-      math::Mat4x4f projection;
-      math::Mat4x4f view;
-    };
-
     class Child {
       public:
       virtual ~Child() {}
-      virtual void RenderRelative(const RenderSettings& settings,
+      virtual void RenderRelative(emp::graphics::Graphics& g,
                                   const math::Mat4x4f& transform) = 0;
     };
 
@@ -71,11 +67,11 @@ namespace emp {
 
       public:
       virtual ~Group() {}
-      void RenderRelative(const RenderSettings& settings,
+      void RenderRelative(emp::graphics::Graphics& g,
                           const math::Mat4x4f& transform) override {
         for (auto& child : children) {
           if (child) {
-            child->RenderRelative(settings, transform);
+            child->RenderRelative(g, transform);
           }
         }
 
@@ -112,10 +108,9 @@ namespace emp {
         return root;
       }
 
-      void Render(const Camera& camera, const Eye& eye) {
+      void Render(emp::graphics::Graphics& g) {
         if (root) {
-          root->RenderRelative({camera.GetProjection(), eye.CalculateView()},
-                               math::Mat4x4f::Identity());
+          root->RenderRelative(g, math::Mat4x4f::Identity());
         }
       }
     };

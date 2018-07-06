@@ -72,6 +72,8 @@ namespace emp {
       friend FreeType;
       std::shared_ptr<opengl::Texture2d> atlas_texture;
 
+      bool dirty = true;
+
       public:
       float atlas_width, atlas_height;
 
@@ -95,6 +97,7 @@ namespace emp {
 
           atlas_width = other.atlas_width;
           atlas_height = other.atlas_height;
+          dirty = other.dirty;
         }
         return *this;
       }
@@ -106,13 +109,14 @@ namespace emp {
         }
       }
 
-      void SetPixelSize(FT_UInt width, FT_UInt height) {
+      void SetFreeTypePixelSize(FT_UInt width, FT_UInt height) {
         auto err = FT_Set_Pixel_Sizes(face, width, height);
         emp_assert(err == 0);
+        dirty = true;
       }
 
       void BulidAsciiAtlas() {
-        using namespace emp::opengl;
+        if (!dirty) return;
 
         emp_assert(face != nullptr,
                    "Warning: Failed to build atlas for font, because the font "
@@ -150,16 +154,16 @@ namespace emp {
         }
 
 #ifdef EMSCRIPTEN
-        constexpr auto format{Texture2DFormat::Alpha};
+        constexpr auto format{opengl::Texture2DFormat::Alpha};
 #else
-        constexpr auto format{Texture2DFormat::R};
+        constexpr auto format{opengl::Texture2DFormat::R};
 #endif
 
         atlas_texture->Activate();
         atlas_texture->Bind();
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         atlas_texture->Data(format, atlas_width, atlas_height,
-                            TextureType::UnsignedByte, nullptr);
+                            opengl::TextureType::UnsignedByte, nullptr);
 
         for (auto& character : atlas) {
           if (FT_Load_Char(face, character.character, FT_LOAD_RENDER)) continue;
@@ -177,12 +181,15 @@ namespace emp {
 
           atlas_texture->SubData(character.atlas_x, character.atlas_y,
                                  character.size.x(), character.size.y(), format,
-                                 TextureType::UnsignedByte, g->bitmap.buffer);
+                                 opengl::TextureType::UnsignedByte,
+                                 g->bitmap.buffer);
         }
-        atlas_texture->SetMinFilter(TextureMinFilter::Linear);
-        atlas_texture->SetMagFilter(TextureMagFilter::Linear);
-        atlas_texture->SetTextureWrap(TextureWrap::ClampToEdge,
-                                      TextureWrap::ClampToEdge);
+        atlas_texture->SetMinFilter(opengl::TextureMinFilter::Linear);
+        atlas_texture->SetMagFilter(opengl::TextureMagFilter::Linear);
+        atlas_texture->SetTextureWrap(opengl::TextureWrap::ClampToEdge,
+                                      opengl::TextureWrap::ClampToEdge);
+
+        dirty = false;
       }
 
       atlas_char_t Lookup(char character) const {
@@ -191,7 +198,8 @@ namespace emp {
         return atlas[idx];
       }
 
-      const std::shared_ptr<opengl::Texture2d> GetAtlasTexture() const {
+      const std::shared_ptr<opengl::Texture2d> ComputeAtlasTexture() {
+        BulidAsciiAtlas();
         return atlas_texture;
       }
     };

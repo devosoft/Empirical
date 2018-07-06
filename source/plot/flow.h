@@ -1,268 +1,211 @@
-// #ifndef EMP_PLOT_FLOW_H
-// #define EMP_PLOT_FLOW_H
+#ifndef EMP_PLOT_FLOW_H
+#define EMP_PLOT_FLOW_H
 
-// #include <algorithm>
-// #include <iterator>
-// #include <memory>
-// #include <vector>
+#include <algorithm>
+#include <iterator>
+#include <memory>
+#include <vector>
 
-// #include "tools/attrs.h"
+#include "scenegraph/rendering.h"
+#include "tools/attrs.h"
 
-// namespace emp {
-//   namespace plot {
-//     // struct flow_member_tag {};
-//     // template <class T>
-//     // using is_flow_member = std::is_base_of<flow_member_tag, T>;
-//     // template <class T>
-//     // constexpr auto is_flow_member_v = is_flow_member<T>::value;
+namespace emp {
+  namespace plot {
 
-//     // template <class D>
-//     // struct Joinable;
+    namespace impl__emp_flow {
+      struct generic_deref {
+        template <typename T>
+        static constexpr T& deref(T& target) {
+          return target;
+        }
+        template <typename T>
+        static constexpr const T& deref(const T& target) {
+          return target;
+        }
 
-//     // template <class From, class To>
-//     // class Join : public Joinable<Join<From, To>> {
-//     //   From from;
-//     //   To to;
-//     //   template <class T, class... Args>
-//     //   static decltype(auto) ApplyTo(std::shared_ptr<T> target, Args&&...
-//     //   args) {
-//     //     return target->Apply(std::forward<Args>(args)...);
-//     //   }
+        template <typename T>
+        static constexpr T& deref(T* target) {
+          return *target;
+        }
+        template <typename T>
+        static constexpr const T& deref(const T* target) {
+          return *target;
+        }
 
-//     //   template <class T, class... Args>
-//     //   static decltype(auto) ApplyTo(const T& target, Args&&... args) {
-//     //     return target.Apply(std::forward<Args>(args)...);
-//     //   }
+        template <typename T>
+        static constexpr T& deref(std::shared_ptr<T> target) {
+          return *target;
+        }
+      };
 
-//     //   template <class DataIter, class PrevIter>
-//     //   auto _ApplySecond(const std::true_type& toIsVoid, DataIter dbegin,
-//     //                     DataIter dend, PrevIter pbegin, PrevIter pend)
-//     const
-//     //                     {
-//     //     ApplyTo(to, dbegin, dend, pbegin, pend);
-//     //     return std::vector<typename
-//     //     std::iterator_traits<PrevIter>::value_type>(
-//     //       pbegin, pend);
-//     //   }
+    }  // namespace impl__emp_flow
 
-//     //   template <class... Args>
-//     //   decltype(auto) _ApplySecond(const std::false_type& toIsVoid,
-//     //                               Args&&... args) const {
-//     //     return ApplyTo(to, std::forward<Args>(args)...);
-//     //   }
+    template <typename...>
+    class Sinks;
+    template <typename, typename>
+    class Source;
 
-//     //   template <class... Args>
-//     //   decltype(auto) ApplySecond(Args&&... args) const {
-//     //     return _ApplySecond(
-//     //       std::is_void<decltype(ApplyTo(to,
-//     std::forward<Args>(args)...))>{},
-//     //       std::forward<Args>(args)...);
-//     //   }
+    template <>
+    class Sinks<> {
+      public:
+      constexpr Sinks() = default;
+      constexpr Sinks(const Sinks&) = default;
+      constexpr Sinks(Sinks&&) = default;
+      constexpr Sinks& operator=(const Sinks&) = default;
+      constexpr Sinks& operator=(Sinks&&) = default;
 
-//     //   template <class Iter, class... Args>
-//     //   decltype(auto) Apply(const std::false_type& fromIsVoid, Iter begin,
-//     //                        Iter end, Args&&... args) const {
-//     //     auto intermediate{
-//     //       ApplyTo(from, begin, end, std::forward<Args>(args)...)};
-//     //     return ApplySecond(begin, end, std::begin(intermediate),
-//     //                        std::end(intermediate));
-//     //   }
+      template <typename INPUT_ITER>
+      constexpr void operator()(INPUT_ITER begin, INPUT_ITER end) const {}
 
-//     //   // template <class... Args>
-//     //   // decltype(auto) Apply(const std::true_type& fromIsVoid,
-//     //   //                      Args&&... args) const {
-//     //   //   ApplyTo(from, args...);
-//     //   //   return ApplySecond(std::forward<Args>(args)...);
-//     //   // }
+      template <typename NEXT>
+      constexpr Sinks<std::decay_t<NEXT>> Then(NEXT&& next) const {
+        return {std::forward<NEXT>(next), *this};
+      }
 
-//     //   public:
-//     //   template <class _From, class _To>
-//     //   Join(_From&& from, _To&& to)
-//     //     : from(std::forward<_From>(from)), to(std::forward<_To>(to)) {}
+      template <typename MAP>
+      constexpr Source<std::decay_t<MAP>, Sinks> Data(MAP&& map) const {
+        return {std::forward<MAP>(map), *this};
+      }
+    };
 
-//     //   template <class DataIter, class PrevIter>
-//     //   decltype(auto) Apply(DataIter dbegin, DataIter dend, PrevIter
-//     pbegin,
-//     //                        PrevIter pend) const {
-//     //     return Apply(
-//     //       std::is_void<decltype(ApplyTo(from, dbegin, dend, pbegin,
-//     //       pend))>{}, dbegin, dend, pbegin, pend);
-//     //   }
+    Sinks<> MakeFlow() { return {}; }
 
-//     //   template <class DataIter>
-//     //   decltype(auto) Apply(DataIter begin, DataIter end) const {
-//     //     return Apply(std::is_void<decltype(ApplyTo(from, begin, end))>{},
-//     //     begin,
-//     //                  end);
-//     //   }
-//     // };
+    template <typename HEAD, typename... TAIL>
+    class Sinks<HEAD, TAIL...> {
+      private:
+      HEAD head;
+      Sinks<TAIL...> tail;
 
-//     // template <class D>
-//     // struct Joinable {
-//     //   constexpr Joinable() = default;
-//     //   constexpr Joinable(const Joinable&) = default;
-//     //   constexpr Joinable(Joinable&&) = default;
+      public:
+      template <typename H, typename T>
+      Sinks(H&& head, T&& tail)
+        : head(std::forward<H>(head)), tail(std::forward<T>(tail)) {}
 
-//     //   template <class T>
-//     //   constexpr Join<D, std::decay_t<T>> Join(T&& to) const {
-//     //     return {static_cast<const D&>(*this), std::forward<T>(to)};
-//     //   }
-//     // };
+      constexpr Sinks() = delete;
+      constexpr Sinks(const Sinks&) = default;
+      constexpr Sinks(Sinks&&) = default;
+      constexpr Sinks& operator=(const Sinks&) = default;
+      constexpr Sinks& operator=(Sinks&&) = default;
 
-//     // template <class From, class To>
-//     // auto operator>>(const Joinable<From>& from, To&& to) {
-//     //   return from.Join(std::forward<To>(to));
-//     // }
+      private:
+      template <typename INPUT_ITER>
+      constexpr auto impl_CallHead(INPUT_ITER begin, INPUT_ITER end) const {
+        return impl__emp_flow::generic_deref::deref(head)(begin, end);
+      }
 
-//     // template <class From, class To>
-//     // auto operator>>(Joinable<From>&& from, To&& to) {
-//     //   return std::move(from).Join(std::forward<To>(to));
-//     // }
+      template <typename INPUT_ITER>
+      constexpr auto impl_CallTail(INPUT_ITER begin, INPUT_ITER end) const {
+        return impl__emp_flow::generic_deref::deref(tail)(begin, end);
+      }
 
-//     // template <typename... A>
-//     // class AttrsMap : public Joinable<AttrsMap<A...>> {
-//     //   tools::Attrs<A...> attrs;
+      template <typename INPUT_ITER>
+      constexpr auto impl_Apply(
+        INPUT_ITER begin, INPUT_ITER end,
+        const std::false_type& tail_is_not_transform) const {
+        auto tmp{impl_CallTail(begin, end)};
+        return impl_CallHead(std::begin(tmp), std::end(tmp));
+      }
 
-//     //   public:
-//     //   AttrsMap(tools::Attrs<A...>& attrs) : attrs(attrs) {}
-//     //   AttrsMap(const tools::Attrs<A...>& attrs) : attrs(attrs) {}
-//     //   AttrsMap(tools::Attrs<A...>&& attrs) : attrs(std::move(attrs)) {}
-//     //   AttrsMap(const tools::Attrs<A...>&& attrs) : attrs(std::move(attrs))
-//     {}
+      template <typename INPUT_ITER>
+      constexpr auto impl_Apply(
+        INPUT_ITER begin, INPUT_ITER end,
+        const std::true_type& tail_is_not_transform) const {
+        impl_CallTail(begin, end);
+        // Note that it's safe to reuse begin and end here, because they get
+        // COPYED into impl_CallTail, not passed by reference.
+        return impl_CallHead(begin, end);
+      }
 
-//     //   template <class DataIter, class PropsIter>
-//     //   auto Apply(DataIter dbegin, DataIter dend, PropsIter pbegin,
-//     //              PropsIter pend) const {
-//     //     using result_t = decltype(Merge(attrs(*dbegin), *pbegin));
-//     //     std::vector<result_t> results;
-//     //     while (dbegin != dend && pbegin != pend) {
-//     //       results.emplace_back(Merge(attrs(*dbegin), *pbegin));
-//     //       ++dbegin;
-//     //       ++pbegin;
-//     //     }
+      public:
+      template <typename INPUT_ITER>
+      constexpr auto operator()(INPUT_ITER begin, INPUT_ITER end) const {
+        return impl_Apply(begin, end,
+                          std::is_void<decltype(impl_CallTail(begin, end))>{});
+      }
 
-//     //     return results;
-//     //   }
+      template <typename NEXT>
+      constexpr Sinks<std::decay_t<NEXT>, HEAD, TAIL...> Then(
+        NEXT&& next) const {
+        return {std::forward<NEXT>(next), *this};
+      }
 
-//     //   template <class DataIter>
-//     //   auto Apply(DataIter dbegin, DataIter dend) const {
-//     //     using result_t = decltype(attrs(*dbegin));
-//     //     std::vector<result_t> results;
-//     //     while (dbegin != dend) {
-//     //       results.emplace_back(attrs(*dbegin));
-//     //       ++dbegin;
-//     //     }
-//     //     return results;
-//     //   }
-//     // };
+      template <typename MAP>
+      constexpr Source<std::decay_t<MAP>, Sinks> Data(MAP&& map) const {
+        return {std::forward<MAP>(map), *this};
+      }
+    };  // namespace plot
 
-//     // template <typename... A, class To>
-//     // auto operator>>(tools::Attrs<A...>& from, To&& to) {
-//     //   return AttrsMap<std::decay_t<A>...>{from} >> std::forward<To>(to);
-//     // }
-//     // template <typename... A, class To>
-//     // auto operator>>(const tools::Attrs<A...>& from, To&& to) {
-//     //   return AttrsMap<std::decay_t<A>...>{from} >> std::forward<To>(to);
-//     // }
-//     // template <typename... A, class To>
-//     // auto operator>>(tools::Attrs<A...>&& from, To&& to) {
-//     //   return AttrsMap<std::decay_t<A>...>{std::move(from)} >>
-//     //          std::forward<To>(to);
-//     // }
-//     // template <typename... A, class To>
-//     // auto operator>>(const tools::Attrs<A...>&& from, To&& to) {
-//     //   return AttrsMap<std::decay_t<A>...>{std::move(from)} >>
-//     //          std::forward<To>(to);
-//     // }
+    template <typename MAP, typename TARGET>
+    class Source {
+      public:
+      using map_t = MAP;
+      using target_t = TARGET;
 
-//     namespace impl_emp_detail {
-//       template <typename T, typename... U>
-//       constexpr decltype(auto) Apply(std::shared_ptr<T> target, U&&... args)
-//       {
-//         return target->Apply(std::forward<U>(args)...);
-//       }
-//       template <typename T, typename... U>
-//       constexpr decltype(auto) Apply(std::weak_ptr<T> target, U&&... args) {
-//         return target->Apply(std::forward<U>(args)...);
-//       }
-//       template <typename T, typename... U>
-//       constexpr decltype(auto) Apply(std::unique_ptr<T> target, U&&... args)
-//       {
-//         return target->Apply(std::forward<U>(args)...);
-//       }
-//       template <typename T, typename... U>
-//       constexpr decltype(auto) Apply(T* target, U&&... args) {
-//         return target->Apply(std::forward<U>(args)...);
-//       }
-//       template <typename T, typename... U>
-//       constexpr decltype(auto) Apply(const T* target, U&&... args) {
-//         return target->Apply(std::forward<U>(args)...);
-//       }
+      private:
+      map_t map;
+      target_t target;
 
-//       template <typename T, typename... U>
-//       constexpr decltype(auto) Apply(T& target, U&&... args) {
-//         return target.Apply(std::forward<U>(args)...);
-//       }
-//       template <typename T, typename... U>
-//       constexpr decltype(auto) Apply(const T& target, U&&... args) {
-//         return target.Apply(std::forward<U>(args)...);
-//       }
-//     };  // namespace impl_emp_detail
+      public:
+      template <typename M, typename T>
+      Source(M&& map, T&& target)
+        : map(std::forward<M>(map)), target(std::forward<T>(target)) {}
 
-//     struct sink_tag {};
-//     struct transform_tag {};
+      constexpr Source() = default;
+      constexpr Source(const Source&) = default;
+      constexpr Source(Source&&) = default;
+      constexpr Source& operator=(const Source&) = default;
+      constexpr Source& operator=(Source&&) = default;
 
-//     template <typename...>
-//     struct Flow;
+      template <typename DATA_ITER>
+      void operator()(DATA_ITER begin, DATA_ITER end) const {
+        // Todo: setup typesafe cacheing
+        std::vector<decltype(map(*begin))> mapped;
 
-//     template <typename F0>
-//     class Flow<F0> {
-//       F0 head;
-//       using input_attributes_type = typename F0::input_attributes_type;
+        std::transform(begin, end, std::back_inserter(mapped), map);
 
-//       public:
-//       template <typename Iter>
-//       constexpr auto Apply(Iter begin, Iter end)
-//         -> decltype(impl_emp_detail::Apply(head, begin, end)) {
-//         return impl_emp_detail::Apply(head, begin, end);
-//       }
-//     };
+        impl__emp_flow::generic_deref::deref(target)(mapped.begin(),
+                                                     mapped.end());
+      }
+    };
 
-//     template <typename F0, typename F1, typename... F>
-//     class Flow<F0, F1, F...> {
-//       private:
-//       F0 head;
-//       Flow<F1, F...> tail;
+    template <typename TRANSFORM, typename TARGET>
+    class Transform {
+      public:
+      using transform_t = TRANSFORM;
+      using target_t = TARGET;
 
-//       template <typename U, typename Iter>
-//       constexpr static bool IsSink(U&& target, Iter begin, Iter end) {
-//         return std::is_void<decltype(
-//           impl_emp_detail::Apply(std::forward<U>(target), begin,
-//           end))>::value;
-//       }
+      private:
+      transform_t transform;
+      target_t target;
 
-//       public:
-//       template <typename Iter>
-//       constexpr auto Apply(Iter begin, Iter end)
-//         -> std::enable_if<IsSink(head, begin, end),
-//                           decltype(impl_emp_detail::Apply(tail, begin, end))>
-//                           {
-//         impl_emp_detail::Apply(head, begin, end);
-//         return impl_emp_detail::Apply(tail, begin, end);
-//       }
+      public:
+      template <typename Tr, typename T>
+      Transform(Tr&& transform, T&& target)
+        : transform(std::forward<Tr>(transform)),
+          target(std::forward<T>(target)) {}
 
-//       template <typename Iter>
-//       constexpr auto Apply(Iter begin, Iter end)
-//         -> std::enable_if<!IsSink(head, begin, end),
-//                           decltype(impl_emp_detail::Apply(tail, begin, end))>
-//                           {
-//         impl_emp_detail::Apply(head, begin, end);
-//         return impl_emp_detail::Apply(tail, begin, end);
-//       }
-//     };
+      constexpr Transform() = default;
+      constexpr Transform(const Transform&) = default;
+      constexpr Transform(Transform&&) = default;
+      constexpr Transform& operator=(const Transform&) = default;
+      constexpr Transform& operator=(Transform&&) = default;
 
-//   }  // namespace plot
+      template <typename DATA_ITER>
+      void operator()(DATA_ITER begin, DATA_ITER end) const {
+        auto tmp{
+          impl__emp_flow::generic_deref::deref(transform)(begin, end),
+        };
+        impl__emp_flow::generic_deref::deref(target)(tmp.begin(), tmp.end());
+      }
 
-// }  // namespace emp
+      template <typename MAP>
+      constexpr Source<std::decay_t<MAP>, Transform> Data(MAP&& map) const {
+        return {std::forward<MAP>(map), *this};
+      }
+    };
 
-// #endif  // EMP_PLOT_FLOW_H
+  };  // namespace plot
+
+}  // namespace emp
+
+#endif  // EMP_PLOT_FLOW_H

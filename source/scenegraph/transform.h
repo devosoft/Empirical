@@ -22,9 +22,9 @@ namespace emp {
         return *this;
       }
 
-      void RenderRelative(const RenderSettings& settings,
+      void RenderRelative(const graphics::Graphics& g,
                           const math::Mat4x4f& transform) override {
-        T::RenderRelative(settings, this->transform * transform);
+        T::RenderRelative(g, this->transform * transform);
       }
     };
   }  // namespace scenegraph

@@ -27,6 +27,11 @@ namespace emp {
       constexpr Region& operator=(const Region&) = default;
       constexpr Region& operator=(Region&&) = default;
 
+      constexpr void Reset() {
+        min = {std::numeric_limits<field_type>::max()};
+        max = {std::numeric_limits<field_type>::lowest()};
+      }
+
       constexpr auto extents() const {
         auto size = max - min;
         for (size_t i = 0; i < D; ++i) {
@@ -51,14 +56,14 @@ namespace emp {
       }
 
       template <class F2>
-      constexpr Region& addBorder(const math::Vec<F2, D>& border) {
-        min -= border;
-        max += border;
+      constexpr Region& AddBorder(const math::Vec<F2, D>& border) {
+        min += border;
+        max -= border;
         return *this;
       }
 
-      constexpr Region& addBorder(const field_type& border) {
-        return addBorder({border});
+      constexpr Region& AddBorder(const field_type& border) {
+        return AddBorder({border});
       }
 
       template <typename F2 = field_type, typename F3 = field_type>

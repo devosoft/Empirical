@@ -10,8 +10,6 @@ namespace emp {
       DEFINE_ATTR(XyzScaled);
       DEFINE_ATTR(PointSize);
       DEFINE_ATTR(StrokeWeight);
-      DEFINE_ATTR(Fill);
-      DEFINE_ATTR(Stroke);
     }  // namespace attributes
   }  // namespace plot
 }  // namespace emp

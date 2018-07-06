@@ -481,18 +481,31 @@ namespace emp {
         };
       }
 
-      template <typename S>
+      template <typename S = F>
       static constexpr Mat Scale(S&& scale) {
+        return Scale(scale, scale, std::forward<S>(scale));
+      }
+
+      template <typename S1 = F, typename S2 = S1, typename S3 = S1>
+      static constexpr Mat Scale(S1&& scale_x, S2&& scale_y, S3&& scale_z) {
         static_assert(R == 4 && C == 4,
                       "Homogenous coordinate translation matrices must be 4x4");
         return {
-          scale, 0,     0,
+          std::forward<S1>(scale_x),
+          0,
+          0,
           0,  // row 1
-          0,     scale, 0,
+          0,
+          std::forward<S2>(scale_y),
+          0,
           0,  // row 2
-          0,     0,     std::forward<S>(scale),
+          0,
+          0,
+          std::forward<S3>(scale_z),
           0,  // row 3
-          0,     0,     0,
+          0,
+          0,
+          0,
           1,  // row 4
         };
       }

@@ -12,99 +12,59 @@
 #include "scales.h"
 #include "scenegraph/camera.h"
 #include "scenegraph/core.h"
+#include "scenegraph/rendering.h"
 #include "tools/attrs.h"
 
 #include "tools/resources.h"
 
 namespace emp {
   namespace plot {
-    class Scatter : public scenegraph::Child, public Joinable<Scatter> {
+    class Scatter : public scenegraph::Child {
       private:
-      ResourceRef<opengl::ShaderProgram> shader;
-      opengl::VertexArrayObject vao;
-      opengl::BufferObject<opengl::BufferType::Array> verticesBuffer;
-      opengl::BufferObject<opengl::BufferType::ElementArray> trianglesBuffer;
-
-      size_t trianglesCount;
+      size_t vertexCount;
       std::vector<std::tuple<math::Mat4x4f, opengl::Color>> points;
-
-      // opengl::Uniform color;
-      // opengl::Uniform model;
-      // opengl::Uniform projection;
-      // opengl::Uniform view;
+      graphics::Mesh point_mesh;
 
       public:
       template <typename S = std::string>
-      Scatter(emp::opengl::GLCanvas& canvas, size_t vertexCount = 4,
-              S&& shader = "DefaultSolidColor")
-        : shader(std::forward<S>(shader)),
-          verticesBuffer(canvas.makeBuffer<opengl::BufferType::Array>()),
-          trianglesBuffer(
-            canvas.makeBuffer<opengl::BufferType::ElementArray>()) {
+      Scatter(emp::opengl::GLCanvas& canvas, graphics::Mesh point_mesh)
+        : point_mesh(point_mesh) {
         using namespace emp::opengl;
         using namespace emp::math;
-
-        std::vector<Vec3f> vertices;
-        vertices.reserve(vertexCount + 1);
-        std::vector<int> triangles;
-        trianglesCount = vertexCount * 3;
-        triangles.reserve(trianglesCount);
-
-        vertices.emplace_back(0, 0, 0);
-
-        for (auto i = 0; i < vertexCount; ++i) {
-          auto r = static_cast<float>(i) / vertexCount * 2 * consts::pi<float>;
-
-          vertices.emplace_back(cos(r) * 0.5f, sin(r) * 0.5f, 0);
-
-          triangles.push_back(0);
-          triangles.push_back(i + 1);
-          triangles.push_back(((i + 1) % vertexCount) + 1);
-        }
-        verticesBuffer.init(vertices, BufferUsage::StaticDraw);
-        trianglesBuffer.init(triangles, BufferUsage::StaticDraw);
-
-        this->shader.OnSet([this](auto&) {
-          vao.bind();
-          verticesBuffer.bind();
-          trianglesBuffer.bind();
-          vao.attr(this->shader->Attribute<Vec3f>("position"));
-        });
       }
 
       virtual ~Scatter() {}
 
-      void RenderRelative(const scenegraph::RenderSettings& settings,
+      void RenderRelative(graphics::Graphics& g,
                           const math::Mat4x4f& transform) {
         using namespace emp::math;
         using namespace emp::opengl;
 
-        shader->Use();
-        vao.bind();
-
-        shader->Uniform("projection") = settings.projection;
-        shader->Uniform("view") = settings.view;
+        auto pen = g.Fill(point_mesh);
 
         for (auto& pt : points) {
-          shader->Uniform("model") = transform * std::get<0>(pt);
-          shader->Uniform("color") = std::get<1>(pt);
-
-          glDrawElements(GL_TRIANGLES, trianglesCount, GL_UNSIGNED_INT, 0);
+          pen.Draw({
+            emp::graphics::Fill = std::get<1>(pt),
+            emp::graphics::Transform = std::get<0>(pt) * transform,
+          });
         }
+
+        pen.Flush();
       }
 
-      template <class DataIter, class Iter>
-      void Apply(DataIter, DataIter, Iter begin, Iter end) {
+      template <typename DATA_ITER>
+      void operator()(DATA_ITER begin, DATA_ITER end) {
         using namespace emp::math;
         using namespace emp::plot::attributes;
         points.clear();
 
         for (; begin != end; ++begin) {
-          auto model = Mat4x4f::Translation(XyzScaled::Get(*begin).x(),
-                                            XyzScaled::Get(*begin).y(), 0) *
-                       Mat4x4f::Scale(PointSize::Get(*begin));
+          auto model =
+            Mat4x4f::Translation(graphics::Transform::Get(*begin).x(),
+                                 graphics::Transform::Get(*begin).y(), 0) *
+            Mat4x4f::Scale(PointSize::Get(*begin));
 
-          points.push_back({model, Fill::Get(*begin)});
+          points.push_back({model, graphics::Fill::Get(*begin)});
         }
       }
     };

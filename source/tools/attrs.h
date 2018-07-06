@@ -54,7 +54,7 @@ namespace emp {
     template <typename Pack, typename Attr>
     struct has_attribute : __impl_has_attr::has_attribute<Pack, Attr>::type {};
     template <typename Pack, typename Attr>
-    constexpr bool has_attribute_v = has_attribute<Pack, Attr>::value;
+    constexpr auto has_attribute_v = has_attribute<Pack, Attr>{};
 
     namespace __impl_attr_base {
       template <typename Attr, template <typename> class Value>
@@ -66,27 +66,28 @@ namespace emp {
         static constexpr struct get_attribute_type {
           /// Given an attribute pack, GetAttribute will extract just this
           /// attribute
-          template <class T>
+          template <typename T>
           constexpr value_t<T>& operator()(value_t<T>& value) const {
             return value;
           }
 
-          template <class T>
+          template <typename T>
           constexpr const value_t<T>& operator()(
             const value_t<T>& value) const {
             return value;
           }
 
-          template <class T>
+          template <typename T>
           constexpr value_t<T>&& operator()(value_t<T>&& value) const {
             return std::move(value);
           }
 
-          template <class T>
+          template <typename T>
           constexpr const value_t<T>&& operator()(
             const value_t<T>&& value) const {
             return std::move(value);
           }
+
         } GetAttribute{};
 
         /// Given an attribute pack, Get(pack) will extract the value of this
@@ -351,6 +352,15 @@ namespace emp {
     constexpr value_t<std::decay_t<T>> operator=(T&& value) const {            \
       return {std::forward<T>(value)};                                         \
     }                                                                          \
+    template <typename... U>                                                   \
+    constexpr static auto CheckForAttrInArguments(U&&...) {                    \
+      constexpr auto has_attribute =                                           \
+        emp::tools::has_attribute_v<emp::tools::Attrs<std::decay_t<U>...>,     \
+                                    NAME>;                                     \
+      static_assert(has_attribute,                                             \
+                    "No such attribute as '" #NAME "' in the arguments list"); \
+      return has_attribute;                                                    \
+    }                                                                          \
   } NAME;                                                                      \
   constexpr const char* NAME::name;                                            \
   template <class T>                                                           \
@@ -453,24 +463,31 @@ namespace emp {
       template <typename A>
       struct SelectHelper {
         template <typename U0, typename... U>
-        static constexpr U0&& SelectImpl(const std::true_type&, U0&& arg0,
-                                         U&&... args) {
+        static constexpr U0&& SelectImpl(const std::true_type& enable,
+                                         const std::true_type& u0_is_target,
+                                         U0&& arg0, U&&... args) {
           return std::forward<U0>(arg0);
         }
 
         template <typename U0, typename... U>
-        static constexpr decltype(auto) SelectImpl(const std::false_type&,
-                                                   U0&& arg0, U&&... args) {
+        static constexpr decltype(auto) SelectImpl(
+          const std::true_type& enable, const std::false_type& u0_is_target,
+          U0&& arg0, U&&... args) {
           return SelectHelper<A>::Select(std::forward<U>(args)...);
         }
+        template <typename... U>
+        static constexpr void SelectImpl(const std::false_type& enable,
+                                         U&&... args) {}
 
         template <typename U0, typename... U>
         static constexpr decltype(auto) Select(U0&& arg0, U&&... args) {
           return SelectHelper<A>::SelectImpl(
+            A::CheckForAttrInArguments(arg0, args...),
             std::is_same<A, typename std::decay_t<U0>::attribute_type>{},
             std::forward<U0>(arg0), std::forward<U>(args)...);
         }
       };
+
       template <class... T>
       class AttrsParent : public T... {
         protected:
