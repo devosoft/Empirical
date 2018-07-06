@@ -51,11 +51,11 @@ void DoReset() {
             emp::GetHueMap(360));
 }
 
-int main()
+int emp_main()
 {
   config.Read("OpenWorld.cfg", false);
 
-  doc << "<h1>Hello, Open World!</h1>";
+  doc << "<h1>Hello, OpenWorld!</h1>";
 
   // Link keypresses to the proper handlers
   // keypress_manager.AddKeydownCallback(std::bind(&EvokeInterface::OnKeydown, this, _1));
@@ -74,4 +74,9 @@ int main()
   control_set << UI::Button(DoStart, "Start", "start_but");
   control_set << UI::Button(DoStep, "Step", "step_but");
   control_set << UI::Button(DoReset, "Reset", "reset_but");
+
+  // Add Info
+  auto data_set = doc.AddDiv("raw_data");
+  data_set.SetPosition(70+config.WORLD_X(), 70);
+  data_set << "Testing! " << UI::Live( [](){ return doc.Canvas("pop_view").GetYPos(); } ) << " XX";
 }
