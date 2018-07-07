@@ -157,20 +157,36 @@ namespace emp {
     const Point & GetMaxPosition() const { return max_pos; }
     const emp::vector<BodyInfo> & GetBodySet() const { return body_set; }
 
+    bool IsActive(size_t id) const {
+      return body_set[id].IsActive();
+    }
     template <typename ORIGINAL_T>
     Ptr<ORIGINAL_T> GetPtr(size_t id) const {
+      emp_assert(body_set[id].IsActive());
       return type_tracker.template ToType<Ptr<ORIGINAL_T>>( body_set[id].body_ptr );
     }
-    Point GetCenter(size_t id) const { return body_set[id].center; }
-    double GetRadius(size_t id) const { return body_set[id].radius; }
-    size_t GetColor(size_t id) const { return body_set[id].color; }
+    Point GetCenter(size_t id) const {
+      emp_assert(body_set[id].IsActive());
+      return body_set[id].center;
+    }
+    double GetRadius(size_t id) const {
+      emp_assert(body_set[id].IsActive());
+      return body_set[id].radius;
+    }
+    size_t GetColor(size_t id) const {
+      emp_assert(body_set[id].IsActive());
+      return body_set[id].color;
+    }
 
     template <typename BODY_T>
     void SetPtr(size_t id, Ptr<BODY_T> _in) {
+      emp_assert(body_set[id].IsActive());
       body_set[id].body_ptr = type_tracker.Convert(_in);
     }
     void SetCenter(size_t id, Point _in) {
-      // If not active, just move the body.
+      emp_assert(body_set[id].IsActive());
+
+      // If data not active, just move the body.
       if (data_active == false) body_set[id].center = _in;
       // Otherwise need to update data.
       else {
@@ -184,23 +200,30 @@ namespace emp {
       }
     }
     void Translate(size_t id, Point translation) {
+      emp_assert(body_set[id].IsActive());
       SetCenter(id, body_set[id].center + translation);
     }
 
     void SetRadius(size_t id, double _in) {
+      emp_assert(body_set[id].IsActive());
       BodyInfo & body = body_set[id];
       body.radius = _in;
       TestBodySize(body);
     }
     void ScaleRadius(size_t id, double scale) {
+      emp_assert(body_set[id].IsActive());
       BodyInfo & body = body_set[id];
       body.radius *= scale;
       TestBodySize(body);
     }
-    void SetColor(size_t id, size_t _in) { body_set[id].color = _in; }
+    void SetColor(size_t id, size_t _in) {
+      emp_assert(body_set[id].IsActive());
+      body_set[id].color = _in;
+    }
     
     // void RemoveBody(size_t id) {
     //   // @CAO Change id in body_set to nullptr; record cell id for re-use
+    //   emp_assert(body_set[id].IsActive());
     //   if (data_active) {
     //     const size_t sector_id = FindSector(body_set[id].center);
     //     emp::RemoveValue(sectors[sector_id], id);
@@ -269,8 +292,10 @@ namespace emp {
     // Determine if a body overlaps with any others in a specified sector.
     inline void FindSectorOverlaps(BodyInfo & body1, size_t sector_id,
                                    size_t start_id=0) {
+      emp_assert(body1.IsActive());
       auto & sector = sectors[sector_id];
       for (size_t body2_id = start_id; body2_id < sector.size(); body2_id++){
+        if (body_set[id].IsActive() == false) continue;
         BodyInfo & body2 = body_set[sector[body2_id]];
         if (TestOverlap(body1, body2)) type_tracker(body1.body_ptr, body2.body_ptr);
       }
@@ -296,6 +321,7 @@ namespace emp {
 
         // Loop through all bodies in this sector
         for (size_t body_id = 0; body_id < cur_sector.size(); body_id++) {
+          if (body_set[body_id].IsActive() == false) continue;
           BodyInfo & body = body_set[cur_sector[body_id]];
 
           // Compare against the bodies after this one in the current sector.
@@ -310,12 +336,14 @@ namespace emp {
       // Make sure all bodies are in a legal position on the surface.
       // @CAO: Need to move to physics!
       // for (Ptr<BODY_TYPE> cur_body : body_set) {
+      //   if (body_set[id].IsActive() == false) continue;
       //   cur_body->FinalizePosition(max_pos);
       // }
     }
 
     /// Determine if there are any overlaps with a provided body (that may or may not be on surface).
     void FindOverlap(const BodyInfo & body) {
+      emp_assert(body.IsActive());
       const size_t sector_id = FindSector(body.center);
       const size_t sector_col = sector_id % num_cols;
       const size_t sector_row = sector_id / num_cols;
@@ -323,6 +351,7 @@ namespace emp {
 
       // Compare against bodies in its own sector.
       for (size_t body2_id : cur_sector) {
+        emp_assert(body_set[body2_id].IsActive());
         BodyInfo & body2 = body_set[body2_id];
         if (body == body2) continue; // Don't match with self!
         if (TestOverlap(body, body2)) type_tracker(body.body_ptr, body2.body_ptr);
