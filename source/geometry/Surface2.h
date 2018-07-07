@@ -221,24 +221,27 @@ namespace emp {
       body_set[id].color = _in;
     }
     
-    // void RemoveBody(size_t id) {
-    //   // @CAO Change id in body_set to nullptr; record cell id for re-use
-    //   emp_assert(body_set[id].IsActive());
-    //   if (data_active) {
-    //     const size_t sector_id = FindSector(body_set[id].center);
-    //     emp::RemoveValue(sectors[sector_id], id);
-    //   }
-    // }
+    void RemoveBody(size_t id) {
+      emp_assert(body_set[id].IsActive());
+      body_set[id].Deactivate();
+      open_ids.push_back(id);
+      if (data_active) {
+        const size_t sector_id = FindSector(body_set[id].center);
+        emp::RemoveValue(sectors[sector_id], id);
+      }
+    }
 
     /// Add a single body; return its unique ID.
     template <typename BODY_T>
     size_t AddBody(Ptr<BODY_T> _body, Point _center, double _radius, size_t _color=0) {
       static_assert(body_types::template Has<BODY_T>(),
                     "Can only add a body to surface if type was declared.");
-      size_t id = body_set.size();        // Figure out the ID for this body
+      size_t id = -1;
+      if (open_ids.size()) { id = open_ids.back(); open_ids.pop_back(); }
+      else { id = body_set.size(); body_set.push_back(); }
       BodyInfo info = { type_tracker.Convert(_body), id, _center, _radius, _color };
 
-      body_set.emplace_back(info);        // Add body to master list
+      body_set[id] = info;        // Add body to master list
       TestBodySize(info);                 // Keep track of largest body seen.
       if (data_active) PlaceBody(info);   // Add new body to a sector (if active).
       return id;
