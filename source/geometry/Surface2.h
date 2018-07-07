@@ -47,6 +47,9 @@ namespace emp {
         : body_ptr(_ptr), id(_id), center(_center), radius(_radius), color(_color) { ; }
       BodyInfo(size_t _id, Point _center, double _radius)
         : BodyInfo(nullptr, _id, _center, _radius) { ; }
+
+      bool IsActive() const { return id == (size_t) -1; }
+      void Deactivate() { radius = 0.0; id = (size_t) -1; }
     };
 
     using sector_t = emp::vector<size_t>;
@@ -57,8 +60,9 @@ namespace emp {
 
     const Point max_pos;             ///< Lower-left corner of the surface.
     emp::vector<BodyInfo> body_set;  ///< Set of all bodies on surface
+    emp::vector<size_t> open_ids;    ///< Set of body_set positions ready for re-use.
 
-    // Data tracking the current bodies on this surface using sectors.
+    // Data tracking the current bodies on this surface using SECTORS.
     bool data_active;                ///< Are we trying to keep data up-to-date?
     double max_radius;               ///< Largest radius of any body.
     size_t num_cols;                 ///< How many cols of sectors are there?
@@ -116,8 +120,10 @@ namespace emp {
 
     // Place an active body into a sector.
     void PlaceBody(BodyInfo & body) {
-      size_t cur_sector = FindSector(body.center);
-      sectors[cur_sector].push_back(body.id);
+      if (body.IsActive()) {                          // Only place active bodies.
+        size_t cur_sector = FindSector(body.center);
+        sectors[cur_sector].push_back(body.id);
+      }
     }
 
     // Cleanup all of the data and mark the data as active.
