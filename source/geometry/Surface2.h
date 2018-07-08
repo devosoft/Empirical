@@ -45,8 +45,13 @@ namespace emp {
 
       BodyInfo(TrackedVar && _ptr, size_t _id, Point _center, double _radius, size_t _color=0)
         : body_ptr(_ptr), id(_id), center(_center), radius(_radius), color(_color) { ; }
-      BodyInfo(size_t _id, Point _center, double _radius)
+      BodyInfo(size_t _id=(size_t)-1, Point _center=Point(), double _radius=0.0)
         : BodyInfo(nullptr, _id, _center, _radius) { ; }
+      BodyInfo(const BodyInfo &) = default;
+      BodyInfo(BodyInfo  &&) = default;
+
+      BodyInfo & operator=(const BodyInfo &) = default;
+      BodyInfo & operator=(BodyInfo &&) = default;
 
       bool IsActive() const { return id == (size_t) -1; }
       void Deactivate() { radius = 0.0; id = (size_t) -1; }
@@ -236,12 +241,12 @@ namespace emp {
     size_t AddBody(Ptr<BODY_T> _body, Point _center, double _radius, size_t _color=0) {
       static_assert(body_types::template Has<BODY_T>(),
                     "Can only add a body to surface if type was declared.");
-      size_t id = -1;
+      size_t id = (size_t) -1;
       if (open_ids.size()) { id = open_ids.back(); open_ids.pop_back(); }
-      else { id = body_set.size(); body_set.push_back(); }
+      else { id = body_set.size(); body_set.resize(body_set.size()+1); }
       BodyInfo info = { type_tracker.Convert(_body), id, _center, _radius, _color };
 
-      body_set[id] = info;        // Add body to master list
+      body_set.emplace(id, info);        // Add body to master list
       TestBodySize(info);                 // Keep track of largest body seen.
       if (data_active) PlaceBody(info);   // Add new body to a sector (if active).
       return id;
@@ -298,7 +303,7 @@ namespace emp {
       emp_assert(body1.IsActive());
       auto & sector = sectors[sector_id];
       for (size_t body2_id = start_id; body2_id < sector.size(); body2_id++){
-        if (body_set[id].IsActive() == false) continue;
+        if (body_set[body2_id].IsActive() == false) continue;
         BodyInfo & body2 = body_set[sector[body2_id]];
         if (TestOverlap(body1, body2)) type_tracker(body1.body_ptr, body2.body_ptr);
       }
