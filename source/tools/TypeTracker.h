@@ -45,13 +45,12 @@ namespace emp {
   struct TrackedVar {
     emp::Ptr<TrackedInfo_Base> ptr;
 
-    // Note: This is the primary constructor for new TrackedVar and should be built only in
-    //       TypeTracker; since that is a template, it can't be a friend.  The one exception is
-    //       if you want to create an empty TrackedVar, you can pass in a nullptr.
+    // Note: This is the primary constructor for new TrackedVar and non-null values should be
+    //       built only in TypeTracker; since that is a template, it can't be a friend.
     TrackedVar(emp::Ptr<TrackedInfo_Base> _ptr) : ptr(_ptr) { ; }
 
     /// Copy constructor; use judiciously since it copies the contents!
-    TrackedVar(const TrackedVar & _in) : ptr(_in.ptr->Clone()) { ; }
+    TrackedVar(const TrackedVar & _in) : ptr(nullptr) { if (_in.ptr) ptr = _in.ptr->Clone(); }
 
     /// Move constructor takes control of the pointer.
     TrackedVar(TrackedVar && _in) : ptr(_in.ptr) { _in.ptr = nullptr; }
