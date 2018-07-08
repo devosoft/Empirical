@@ -46,7 +46,7 @@ namespace emp {
       BodyInfo(TrackedVar && _ptr, size_t _id, Point _center, double _radius, size_t _color=0)
         : body_ptr(_ptr), id(_id), center(_center), radius(_radius), color(_color) { ; }
       BodyInfo(size_t _id=(size_t)-1, Point _center=Point(), double _radius=0.0)
-        : BodyInfo(nullptr, _id, _center, _radius) { ; }
+        : BodyInfo(TrackedVar(nullptr), _id, _center, _radius) { ; }
       BodyInfo(const BodyInfo &) = default;
       BodyInfo(BodyInfo  &&) = default;
 
@@ -246,9 +246,9 @@ namespace emp {
       else { id = body_set.size(); body_set.resize(body_set.size()+1); }
       BodyInfo info = { type_tracker.Convert(_body), id, _center, _radius, _color };
 
-      body_set.emplace(id, info);        // Add body to master list
-      TestBodySize(info);                 // Keep track of largest body seen.
-      if (data_active) PlaceBody(info);   // Add new body to a sector (if active).
+      body_set.emplace(body_set.begin()+(int)id, info);  // Add body to master list
+      TestBodySize(info);                                // Keep track of largest body seen.
+      if (data_active) PlaceBody(info);                  // Add new body to a sector (if tracking).
       return id;
     }
 
