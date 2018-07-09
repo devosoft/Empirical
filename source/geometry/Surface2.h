@@ -13,7 +13,6 @@
 //  Developer Notes:
 //  * Sould add enums to control boundary conditions (INFINITE, TOROIDAL, BOUNDED)
 //  * Incorporate physics?  Can have various plug-in modules.
-//  * Use TypeTracker to allow variable types of bodies.
 
 #ifndef EMP_SURFACE2_H
 #define EMP_SURFACE2_H
@@ -155,6 +154,7 @@ namespace emp {
       data_active = true;
     }
   public:
+    /// Create a surface providing maxumum size.
     Surface(Point _max) : max_pos(_max), body_set(), max_radius(0.0) { ; }
     ~Surface() { Clear(); }
 
@@ -163,6 +163,7 @@ namespace emp {
     const Point & GetMaxPosition() const { return max_pos; }
     const emp::vector<BodyInfo> & GetBodySet() const { return body_set; }
 
+    /// Determine if an id represents an active body on a surface.
     bool IsActive(size_t id) const {
       return body_set[id].IsActive();
     }
