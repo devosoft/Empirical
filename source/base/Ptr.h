@@ -148,15 +148,29 @@ namespace emp {
       // Track stats about pointer record.
       size_t total = 0;
       size_t remain = 0;
+      emp::vector<PtrInfo> undeleted_info;
 
       // Scan through live pointers and make sure all have been deleted.
       for (const auto & info : id_info) {
         total++;
         if (info.GetCount()) remain++;
 
-        emp_assert(info.IsActive() == false,
-                   info.GetPtr(), info.GetCount(), info.IsActive(), ptr_id[info.GetPtr()],
-                   "Undeleted pointer at end of execution.");
+        if (info.IsActive()) {
+          undeleted_info.push_back(info);
+        }
+      }
+
+      if (undeleted_info.size()) {
+        std::cerr << undeleted_info.size() << " undeleted pointers at end of exectution.\n";
+        for (size_t i = 0; i < undeleted_info.size() && i < 10; ++i) {
+          const auto & info = undeleted_info[i];
+          std::cerr << "  PTR=" << info.GetPtr()
+                    << "  count=" << info.GetCount()
+                    << "  active=" << info.IsActive()
+                    << "  id=" << ptr_id[info.GetPtr()]
+                    << std::endl;
+        }
+        abort();
       }
 
       std::cout << "EMP_TRACK_MEM: No memory leaks found!\n "
