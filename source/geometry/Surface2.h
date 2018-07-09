@@ -53,7 +53,7 @@ namespace emp {
       BodyInfo & operator=(const BodyInfo &) = default;
       BodyInfo & operator=(BodyInfo &&) = default;
 
-      bool IsActive() const { return id == (size_t) -1; }
+      bool IsActive() const { return id != (size_t) -1; }
       void Deactivate() { radius = 0.0; id = (size_t) -1; }
     };
 
@@ -127,6 +127,7 @@ namespace emp {
     void PlaceBody(BodyInfo & body) {
       if (body.IsActive()) {                          // Only place active bodies.
         size_t cur_sector = FindSector(body.center);
+        emp_assert(body.id < body_set.size(), body.id);
         sectors[cur_sector].push_back(body.id);
       }
     }
@@ -149,7 +150,7 @@ namespace emp {
       InitSectors();   // Now that we know the sizes, we can initialize sectors.
 
       // Put all of the bodies into sectors
-      for (BodyInfo & body : body_set) PlaceBody(body);
+      for (BodyInfo & body : body_set) if (body.IsActive()) PlaceBody(body);
 
       data_active = true;
     }
@@ -241,12 +242,17 @@ namespace emp {
     size_t AddBody(Ptr<BODY_T> _body, Point _center, double _radius, size_t _color=0) {
       static_assert(body_types::template Has<BODY_T>(),
                     "Can only add a body to surface if type was declared.");
-      size_t id = (size_t) -1;
-      if (open_ids.size()) { id = open_ids.back(); open_ids.pop_back(); }
-      else { id = body_set.size(); body_set.resize(body_set.size()+1); }
+
+      const size_t id = (open_ids.size()) ? open_ids.back() : body_set.size();
       BodyInfo info = { type_tracker.Convert(_body), id, _center, _radius, _color };
 
-      body_set.emplace(body_set.begin()+(int)id, info);  // Add body to master list
+      // Recycle an id if we can (otherwise extend the array)
+      if (open_ids.size()) {
+        open_ids.pop_back();
+        body_set.emplace(body_set.begin()+(int)id, info);  // Add body to master list
+      } else {
+        body_set.emplace_back(info);  // Add body to master list
+      }
       TestBodySize(info);                                // Keep track of largest body seen.
       if (data_active) PlaceBody(info);                  // Add new body to a sector (if tracking).
       return id;
