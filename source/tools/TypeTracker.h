@@ -59,6 +59,13 @@ namespace emp {
     ~TrackedVar() { if (ptr) ptr.Delete(); }
 
     /// Move assignment hands over control of the pointer.
+    TrackedVar & operator=(const TrackedVar & _in) {
+      if (ptr) ptr.Delete();
+      ptr = _in.ptr->Clone();
+      return *this;
+    }
+
+    /// Move assignment hands over control of the pointer.
     TrackedVar & operator=(TrackedVar && _in) {
       if (ptr) ptr.Delete();
       ptr = _in.ptr;
