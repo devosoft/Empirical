@@ -27,18 +27,11 @@ public:
   }
 };
 
-TestSurface surface;
-
-void PrintOverlap(TestBody & body1, TestBody & body2) {
-  std::cout << "Overlap " << body1.id << " and " << body2.id
-            << surface.AsString(body1) << " and " << surface.AsString(body2)
-            << "  dist=" << surface.GetCenter(body1.id).Distance(surface.GetCenter(body2.id))
-            << ".\n";
-}
-
 
 int main()
 {
+  TestSurface surface;
+
   emp::Random random;
   emp::vector<TestBody> bodies(10);
 
@@ -49,7 +42,14 @@ int main()
   }
 
   std::cout << "---- surface results ----" << std::endl;
-  surface.AddOverlapFun(PrintOverlap);
+  surface.AddOverlapFun(
+    [&surface](TestBody & body1, TestBody & body2) {
+      std::cout << "Overlap " << body1.id << " and " << body2.id
+                << surface.AsString(body1) << " and " << surface.AsString(body2)
+                << "  dist=" << surface.GetCenter(body1.id).Distance(surface.GetCenter(body2.id))
+                << ".\n";
+    }
+  );
   surface.FindOverlaps();
 
 //   std::cout << "\n---- brute force ----" << std::endl;
