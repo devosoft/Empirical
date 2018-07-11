@@ -250,12 +250,12 @@ namespace emp {
       // Recycle an id if we can (otherwise extend the array)
       if (open_ids.size()) {
         open_ids.pop_back();
-        body_set.emplace(body_set.begin()+(int)id, info);  // Add body to master list
+        body_set.emplace(body_set.begin()+(int)id, info); // Add body to master list
       } else {
-        body_set.emplace_back(info);  // Add body to master list
+        body_set.emplace_back(info);                      // Add body to master list
       }
-      TestBodySize(info);                                // Keep track of largest body seen.
-      if (data_active) PlaceBody(info);                  // Add new body to a sector (if tracking).
+      TestBodySize(info);                                 // Keep track of largest body seen.
+      if (data_active) PlaceBody(info);                   // Add new body to a sector (if tracking).
       return id;
     }
 
