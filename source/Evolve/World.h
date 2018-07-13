@@ -417,7 +417,7 @@ namespace emp {
     /// occurs before deciding where an offspring should be placed. Note that this pre-placement
     /// timing may be needed if fitness or other phenotypic traits are required to determine placement.
     void SetAutoMutate() {
-      OnOffspringReady( [this](ORG & org){ DoMutationsOrg(org); } );
+      OnOffspringReady( [this](ORG & org, size_t){ DoMutationsOrg(org); } );
     }
 
     /// Setup the population to automatically test for and trigger mutations based on a provided
