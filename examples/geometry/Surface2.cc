@@ -18,7 +18,9 @@ struct TestBody {
 
 class TestSurface : public emp::Surface<TestBody> {
 public:
-  TestSurface() : emp::Surface<TestBody>({1000,1000}) { ; }
+  static constexpr double GetDim() { return 1000; }
+
+  TestSurface() : emp::Surface<TestBody>({GetDim(),GetDim()}) { ; }
 
   std::string AsString(const TestBody & body) const {
     size_t x = (size_t) (GetCenter(body.id).GetX() + 0.5);
@@ -37,7 +39,7 @@ int main()
 
   for (auto & body : bodies) {
     body.id = surface.AddBody(&body,
-			                        { random.GetDouble(1000.0), random.GetDouble(1000.0) },
+			                        { random.GetDouble(surface.GetDim()), random.GetDouble(surface.GetDim()) },
 		                  	      random.GetDouble(10.0, 100.0));
   }
 
@@ -64,5 +66,9 @@ int main()
 //     }
 //   }
 
-  std::cout << std::endl;
+  std::cout << std::endl << "Moving bodies...\n";
+  for (auto & body : bodies) {
+    surface.SetCenter(body.id, { random.GetDouble(surface.GetDim()), random.GetDouble(surface.GetDim()) });
+  }
+  surface.FindOverlaps();
 }
