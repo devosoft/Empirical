@@ -472,7 +472,7 @@ namespace emp {
       size_t mut_cnt = 0;
       size_t expected_prog_len = program.GetInstCnt();
       // Perform function deletions!
-      for (int fID = 0; fID < program.GetSize(); ++fID) {
+      for (int fID = 0; fID < (int) program.GetSize(); ++fID) {
         // Should we delete this function?
         if (rnd.P(FUNC_DEL__PER_FUNC()) &&
             program.GetSize() > GetProgMinFuncCnt()) 

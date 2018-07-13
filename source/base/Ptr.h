@@ -148,19 +148,37 @@ namespace emp {
       // Track stats about pointer record.
       size_t total = 0;
       size_t remain = 0;
+      emp::vector<PtrInfo> undeleted_info;
 
       // Scan through live pointers and make sure all have been deleted.
       for (const auto & info : id_info) {
         total++;
         if (info.GetCount()) remain++;
 
-        emp_assert(info.IsActive() == false, info.GetPtr(), info.GetCount(), info.IsActive());
+        if (info.IsActive()) {
+          undeleted_info.push_back(info);
+        }
+      }
+
+      if (undeleted_info.size()) {
+        std::cerr << undeleted_info.size() << " undeleted pointers at end of exectution.\n";
+        for (size_t i = 0; i < undeleted_info.size() && i < 10; ++i) {
+          const auto & info = undeleted_info[i];
+          std::cerr << "  PTR=" << info.GetPtr()
+                    << "  count=" << info.GetCount()
+                    << "  active=" << info.IsActive()
+                    << "  id=" << ptr_id[info.GetPtr()]
+                    << std::endl;
+        }
+        abort();
       }
 
       std::cout << "EMP_TRACK_MEM: No memory leaks found!\n "
-                << total << " pointers found; "
-                << remain << " still exist with a non-null value (but have been properly deleted)"
-                << std::endl;
+                << total << " pointers found; ";
+      if (remain) {
+        std::cout << remain << " still exist with a non-null value (but have been properly deleted)";
+      } else std::cout << "all have been cleaned up fully.";
+      std::cout << std::endl;
     }
 
     /// Treat this class as a singleton with a single Get() method to retrieve it.
@@ -471,8 +489,8 @@ namespace emp {
 
     /// Delete this pointer (must NOT be an array).
     void Delete() {
-      emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
       emp_assert(ptr, "Deleting null Ptr.");
+      emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
       emp_assert(Tracker().IsArrayID(id) == false, id, "Trying to delete array pointer as non-array.");
       if (internal::ptr_debug) std::cout << "Ptr::Delete() : " << ptr << std::endl;
       delete ptr;
@@ -620,7 +638,8 @@ namespace emp {
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
 
       // We should not automatically convert managed pointers to raw pointers; use .Raw()
-      emp_assert(id == UNTRACKED_ID /*, typeid(TYPE).name() */, id);
+      emp_assert(id == UNTRACKED_ID /*, typeid(TYPE).name() */, id,
+                 "Use Raw() to convert to an untracked Ptr");
       return ptr;
     }
 

@@ -416,6 +416,7 @@ namespace web {
     return EM_ASM_DOUBLE({
       var id = Pointer_stringify($0);
       var rect = $('#' + id).position();
+      if (rect === undefined) return -1.0;
       return rect.left;
     }, GetID().c_str());
   }
@@ -426,6 +427,7 @@ namespace web {
     return EM_ASM_DOUBLE({
       var id = Pointer_stringify($0);
       var rect = $('#' + id).position();
+      if (rect === undefined) return -1.0;
       return rect.top;
     }, GetID().c_str());
   }

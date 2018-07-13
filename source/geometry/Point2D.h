@@ -100,11 +100,12 @@ namespace emp {
 
 }
 
-// Overload ostream to work with points.
-template <typename TYPE> std::ostream & operator<<(std::ostream & os,
-                                                   const emp::Point2D<TYPE> & point) {
-  return os << "(" << point.GetX() << "," << point.GetY() << ")";
+namespace std {
+  // Overload ostream to work with points.
+  template <typename TYPE> std::ostream & operator<<(std::ostream & os,
+                                                    const emp::Point2D<TYPE> & point) {
+    return os << "(" << point.GetX() << "," << point.GetY() << ")";
+  }
 }
-
 
 #endif

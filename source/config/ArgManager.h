@@ -62,7 +62,7 @@ namespace emp {
       bool UseFlag(const std::string & name, const std::string & desc="") {
         arg_names.push_back(name);
         arg_descs.push_back(desc);
-        return use_flag(args, name);
+        return use_arg(args, name);
       }
 
       void PrintHelp(std::ostream & os) const {

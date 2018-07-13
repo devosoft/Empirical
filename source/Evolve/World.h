@@ -176,7 +176,7 @@ namespace emp {
     SignalControl control;  // Setup the world to control various signals.
                                                      //   Trigger signal...
     Signal<void(size_t)>       before_repro_sig;     ///< ...before organism gives birth w/parent position.
-    Signal<void(ORG &)>        offspring_ready_sig;  ///< ...when offspring organism is built.
+    Signal<void(ORG &,size_t)> offspring_ready_sig;  ///< ...when offspring organism is built.
     Signal<void(ORG &)>        inject_ready_sig;     ///< ...when outside organism is ready to inject.
     Signal<void(ORG &,size_t)> before_placement_sig; ///< ...before placing any organism into target cell.
     Signal<void(size_t)>       on_placement_sig;     ///< ...after any organism is placed into world.
@@ -417,7 +417,7 @@ namespace emp {
     /// occurs before deciding where an offspring should be placed. Note that this pre-placement
     /// timing may be needed if fitness or other phenotypic traits are required to determine placement.
     void SetAutoMutate() {
-      OnOffspringReady( [this](ORG & org){ DoMutationsOrg(org); } );
+      OnOffspringReady( [this](ORG & org, size_t){ DoMutationsOrg(org); } );
     }
 
     /// Setup the population to automatically test for and trigger mutations based on a provided
@@ -554,9 +554,10 @@ namespace emp {
     /// Provide a function for World to call after an offspring organism has been created, but
     /// before it is inserted into the World.
     /// Trigger:  Offspring about to enter population
-    /// Argument: Reference to organism about to be placed in population.
+    /// Args:     Reference to organism about to be placed in population and position of parent.
+    ///           (note: for multi-offspring orgs, parent may have been replaced already!)
     /// Return:   Key value needed to make future modifications.
-    SignalKey OnOffspringReady(const std::function<void(ORG &)> & fun) {
+    SignalKey OnOffspringReady(const std::function<void(ORG &,size_t)> & fun) {
       return offspring_ready_sig.AddAction(fun);
     }
 
@@ -1247,7 +1248,7 @@ namespace emp {
     WorldPosition pos;                                        // Position of each offspring placed.
     for (size_t i = 0; i < copy_count; i++) {                 // Loop through offspring, adding each
       Ptr<ORG> new_org = NewPtr<ORG>(mem);
-      offspring_ready_sig.Trigger(*new_org);
+      offspring_ready_sig.Trigger(*new_org, parent_pos);
       pos = fun_find_birth_pos(new_org, parent_pos);
 
       if (pos.IsValid()) AddOrgAt(new_org, pos, parent_pos);  // If placement pos is valid, do so!
