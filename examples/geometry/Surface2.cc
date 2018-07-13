@@ -32,10 +32,14 @@ public:
 
 int main()
 {
+  constexpr size_t BODY_COUNT1 = 20;   // Starting body count
+  constexpr size_t BODY_COUNT2 = 10;   // How far to cut down to?
+  constexpr size_t BODY_COUNT3 = 5;    // How many new bodies to add later?
+
   TestSurface surface;
 
   emp::Random random;
-  emp::vector<TestBody> bodies(10);
+  emp::vector<TestBody> bodies(BODY_COUNT1);
 
   for (auto & body : bodies) {
     body.id = surface.AddBody(&body,
@@ -71,4 +75,24 @@ int main()
     surface.SetCenter(body.id, { random.GetDouble(surface.GetDim()), random.GetDouble(surface.GetDim()) });
   }
   surface.FindOverlaps();
+
+  std::cout << "\nREMOVING bodies " << BODY_COUNT2 << " and higher...\n";
+  for (size_t i = BODY_COUNT2; i < BODY_COUNT1; i++) {
+    surface.RemoveBody(bodies[i].id);
+  }
+  surface.FindOverlaps();
+
+
+  std::cout << "\nAdding " << BODY_COUNT3 << " brand new bodies. ( ";
+  emp::vector<TestBody> bodies3(BODY_COUNT3);
+
+  for (auto & body : bodies3) {
+    body.id = surface.AddBody(&body,
+			                        { random.GetDouble(surface.GetDim()), random.GetDouble(surface.GetDim()) },
+		                  	      random.GetDouble(10.0, 100.0));
+    std::cout << body.id << " ";
+  }
+  std::cout << ")\n";
+  surface.FindOverlaps();
+
 }
