@@ -80,12 +80,12 @@ void TogglePlay()
   auto & anim = doc.AddAnimation("anim_world");
   anim.ToggleActive();
   auto but = doc.Button("start_but");
-  if (anim.GetActive()) but.Label("Pause");
-  else but.Label("Start");
+  if (anim.GetActive()) but.SetLabel("Pause");
+  else but.SetLabel("Start");
 
   but = doc.Button("run_but");
-  if (anim.GetActive()) but.Label("Stop");
-  else but.Label("Fast Forward!");
+  if (anim.GetActive()) but.SetLabel("Stop");
+  else but.SetLabel("Fast Forward!");
 }
 
 int main()
