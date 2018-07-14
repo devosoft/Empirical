@@ -26,6 +26,7 @@ namespace emp {
   namespace {
 
     // Setup Fitness reflection.
+    // 0. A manually set fitness function will override any of the options below.
     // 1. If an organism has a "GetFitness()" member function, use it!
     // 2. If an organim can be cast to double, use it!
     // 3. Start with a fitness function that throws an assert indicating function must be set.
@@ -57,6 +58,7 @@ namespace emp {
 
   namespace {
     // Setup Mutation function
+    // 0. A manually set mutation function will override any of the below.
     // 1. DoMutations(random)
     // 2. Empty, with assert.
 
@@ -83,6 +85,7 @@ namespace emp {
 
   namespace {
     // Setup Print function
+    // 0. A manually set print function will override any of the below.
     // 1. Org Print()
     // 2. Proper operator<<
     // 3. Assert
