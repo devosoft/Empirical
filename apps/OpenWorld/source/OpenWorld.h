@@ -4,7 +4,7 @@
 #define OPEN_WORLD_H
 
 #include "Evolve/World.h"
-#include "geometry/Surface2.h"
+#include "geometry/Surface.h"
 #include "hardware/signalgp_utils.h"
 #include "tools/math.h"
 
