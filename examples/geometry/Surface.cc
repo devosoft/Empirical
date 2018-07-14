@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include "geometry/Point2D.h"
-#include "geometry/Surface.h"
+#include "geometry/Surface2.h"
 #include "tools/Random.h"
 #include "tools/random_utils.h"
 #include "tools/string_utils.h"
@@ -29,7 +29,7 @@ public:
 
 TestSurface surface;
 
-void PrintOverlap(const TestBody & body1, const TestBody & body2) {
+void PrintOverlap(TestBody & body1, TestBody & body2) {
   std::cout << "Overlap " << body1.id << " and " << body2.id
             << surface.AsString(body1) << " and " << surface.AsString(body2)
             << "  dist=" << surface.GetCenter(body1.id).Distance(surface.GetCenter(body2.id))
@@ -49,7 +49,8 @@ int main()
   }
 
   std::cout << "---- surface results ----" << std::endl;
-  surface.FindOverlaps(PrintOverlap);
+  surface.AddOverlapFun(PrintOverlap);
+  surface.FindOverlaps();
 
 //   std::cout << "\n---- brute force ----" << std::endl;
 //   for (size_t id1 = 1; id1 < bodies.size(); id1++) {
