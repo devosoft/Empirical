@@ -11,7 +11,7 @@
 //  BODY_TYPE is the class that represents the body geometry.
 //
 //  Developer Notes:
-//  * Sould add enums to control boundary conditions (INFINITE, TOROIDAL, BOUNDED)
+//  * Should add enums to control boundary conditions (INFINITE, TOROIDAL, BOUNDED)
 //  * Incorporate physics?  Can have various plug-in modules.
 
 #ifndef EMP_SURFACE2_H
@@ -97,7 +97,7 @@ namespace emp {
     // Clear out the watermarked body size and update the current largest.
     inline void RefreshBodySize() {
       max_radius = 0.0;
-      for (BodyInfo & body : body_set) TestBodySize(body);      
+      for (BodyInfo & body : body_set) if (body.IsActive()) TestBodySize(body);      
     }
 
     // Determine which sector a body should be in.
@@ -250,9 +250,9 @@ namespace emp {
       // Recycle an id if we can (otherwise extend the array)
       if (open_ids.size()) {
         open_ids.pop_back();
-        body_set.emplace(body_set.begin()+(int)id, info); // Add body to master list
+        body_set[id] = info; // Add body to master list
       } else {
-        body_set.emplace_back(info);                      // Add body to master list
+        body_set.push_back(info);                         // Add body to master list
       }
       TestBodySize(info);                                 // Keep track of largest body seen.
       if (data_active) PlaceBody(info);                   // Add new body to a sector (if tracking).
