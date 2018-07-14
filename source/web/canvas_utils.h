@@ -19,7 +19,7 @@
 #include "../Evolve/StateGrid.h"
 #include "../geometry/Circle2D.h"
 #include "../geometry/Surface2D.h"
-#include "../geometry/Surface2.h"
+#include "../geometry/Surface.h"
 #include "../tools/BitMatrix.h"
 #include "color_map.h"
 
