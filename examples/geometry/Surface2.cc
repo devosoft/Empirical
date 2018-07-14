@@ -34,7 +34,7 @@ int main()
 {
   constexpr size_t BODY_COUNT1 = 20;   // Starting body count
   constexpr size_t BODY_COUNT2 = 10;   // How far to cut down to?
-  constexpr size_t BODY_COUNT3 = 5;    // How many new bodies to add later?
+  constexpr size_t BODY_COUNT3 = 15;    // How many new bodies to add later?
 
   TestSurface surface;
 
