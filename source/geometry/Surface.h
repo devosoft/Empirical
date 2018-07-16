@@ -367,8 +367,8 @@ namespace emp {
       // Compare against bodies in its own sector.
       for (size_t body2_id : cur_sector) {
         emp_assert(body_set[body2_id].IsActive());
+        if (body.id == body2_id) continue;             // Don't match with self!
         BodyInfo & body2 = body_set[body2_id];
-        if (body == body2) continue; // Don't match with self!
         if (TestOverlap(body, body2)) type_tracker(body.body_ptr, body2.body_ptr);
       }
 
@@ -389,6 +389,11 @@ namespace emp {
       if (down_ok)             FindSectorOverlaps(body, down_sector_id); 
       if (down_ok && left_ok)  FindSectorOverlaps(body, down_sector_id-1);
       if (down_ok && right_ok) FindSectorOverlaps(body, down_sector_id+1);
+    }
+    
+    void FindOverlap(size_t body_id) {
+      emp_assert(body_set[id].IsActive());
+      FindOverlap(body_set[id]);
     }
 
     // Find overlaps using a distance from a point.
