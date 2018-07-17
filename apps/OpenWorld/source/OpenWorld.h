@@ -134,6 +134,13 @@ public:
       org_ptr->RotateDegrees(5.0);
     }, 1, "Rotate 5 degrees.");
 
+    inst_lib.AddInst("Consume", [this](hardware_t & hw, const inst_t & inst) mutable {
+      const size_t id = (size_t) hw.GetTrait((size_t) OpenOrg::Trait::ORG_ID);
+      emp::Ptr<OpenOrg> org_ptr = id_map[id];
+      emp::Angle facing = org_ptr->GetFacing();
+      surface.Translate( org_ptr->GetSurfaceID(), facing.GetPoint(1.0) );
+    }, 1, "Rotate 5 degrees.");
+
     // On each update, run organisms and make sure they stay on the surface.
     OnUpdate([this](size_t){
       // Process all organisms.
