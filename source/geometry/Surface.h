@@ -357,7 +357,7 @@ namespace emp {
     }
 
     /// Determine if there are any overlaps with a provided body (that may or may not be on surface).
-    void FindOverlap(const BodyInfo & body) {
+    void FindOverlap(BodyInfo & body) {
       emp_assert(body.IsActive());
       const size_t sector_id = FindSector(body.center);
       const size_t sector_col = sector_id % num_cols;
@@ -392,8 +392,8 @@ namespace emp {
     }
     
     void FindOverlap(size_t body_id) {
-      emp_assert(body_set[id].IsActive());
-      FindOverlap(body_set[id]);
+      emp_assert(body_set[body_id].IsActive());
+      FindOverlap(body_set[body_id]);
     }
 
     // Find overlaps using a distance from a point.
