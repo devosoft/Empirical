@@ -64,6 +64,7 @@ public:
     } );
     OnOrgDeath( [this](size_t pos){ id_map.erase( GetOrg(pos).GetID() ); } );
 
+    // Setup SignalGP mutations.
     signalgp_mutator.SetProgMinFuncCnt(config.PROGRAM_MIN_FUN_CNT());
     signalgp_mutator.SetProgMaxFuncCnt(config.PROGRAM_MAX_FUN_CNT());
     signalgp_mutator.SetProgMinFuncLen(config.PROGRAM_MIN_FUN_LEN());
@@ -72,6 +73,7 @@ public:
     signalgp_mutator.SetProgMaxArgVal(config.PROGRAM_MAX_ARG_VAL());
     signalgp_mutator.SetProgMaxTotalLen(config.PROGRAM_MAX_FUN_CNT() * config.PROGRAM_MAX_FUN_LEN());
 
+    // Setup other SignalGP functions.
     signalgp_mutator.ARG_SUB__PER_ARG(config.ARG_SUB__PER_ARG());
     signalgp_mutator.INST_SUB__PER_INST(config.INST_SUB__PER_INST());
     signalgp_mutator.INST_INS__PER_INST(config.INST_INS__PER_INST());
@@ -80,6 +82,20 @@ public:
     signalgp_mutator.FUNC_DUP__PER_FUNC(config.FUNC_DUP__PER_FUNC());
     signalgp_mutator.FUNC_DEL__PER_FUNC(config.FUNC_DEL__PER_FUNC());
     signalgp_mutator.TAG_BIT_FLIP__PER_BIT(config.TAG_BIT_FLIP__PER_BIT());
+
+    // Setup surface functions to allow organisms to eat.
+    surface.AddOverlapFun( [](OpenOrg &, OpenOrg &) {
+      std::cerr << "Org eating org!" << std::endl;
+    });
+    surface.AddOverlapFun( [](OpenOrg &, OpenResource &) {
+      std::cerr << "Org eating resource!" << std::endl;
+    });
+    surface.AddOverlapFun( [](OpenResource &, OpenResource &) {
+      std::cerr << "Resources should not try to eat other resources!" << std::endl;
+    });
+    surface.AddOverlapFun( [](OpenResource &, OpenOrg &) {
+      std::cerr << "Resources should not try to eat organisms!" << std::endl;
+    });
 
     // Setup the default instruction set.
     inst_lib.AddInst("Inc", hardware_t::Inst_Inc, 1, "Increment value in local memory Arg1");
@@ -137,8 +153,7 @@ public:
     inst_lib.AddInst("Consume", [this](hardware_t & hw, const inst_t & inst) mutable {
       const size_t id = (size_t) hw.GetTrait((size_t) OpenOrg::Trait::ORG_ID);
       emp::Ptr<OpenOrg> org_ptr = id_map[id];
-      emp::Angle facing = org_ptr->GetFacing();
-      surface.Translate( org_ptr->GetSurfaceID(), facing.GetPoint(1.0) );
+      surface.FindOverlap( org_ptr->GetSurfaceID() );  // Surface functions automatically try to eat on overlap!
     }, 1, "Rotate 5 degrees.");
 
     // On each update, run organisms and make sure they stay on the surface.
