@@ -48,3 +48,19 @@ able to more deeply examine an environment to, for example, make sure the config
 handling it correctly without any extra effort on the part of the library user.
 
 
+The last two components of a MABE run are Archivists and Selection Mechanisms.
+
+In principle, I think Archivists cover everything that doesn't feed back into a run (and
+hance propose a re-name to Listeners), while Selection Mechanisms describe how a run should
+be advanced over time (and not limited to synchronous generations as they are in MABE 1.0),
+thus we could call them Update Schema.
+
+
+As such, there would be four high-level interchangable components in MABE 2.0:
+
+* Organisms (which are built from controllers and genomes, also with a rigid interface)
+* Environments (which can have common sub-parts, such as grids, continuous, etc.)
+* Listeners (such as systematics trackers or other data management techniques)
+* Update Schemas (selection techqniues, mutations, etc; can be applied in sets or bundled)
+
+
