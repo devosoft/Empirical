@@ -7,9 +7,9 @@ These include:
 
 * Brains (Controllers? or simply Control Modules, since multiple ones can plug togeter?)
 * Genomes
-* Archivsts (Listeners? Recorders?)
 * Worlds (Environments)
-* Selection Scheme
+* Archivsts (Listeners? Recorders?)
+* Selection Scheme (Update Schema?)
 
 An organism is zero or more brains and zero or more genomes.
 ...this arrangement should be doable with templates...
@@ -34,5 +34,17 @@ As long as environemnts have a fixed API, we could just use:
 
   world.SetupEnvironment(my_env);
 
-This would automatically built the patch board for the organism and fill it out in some
-reasonable way by default.
+This sertup would automatically build the patch board for the organism and fill it out in
+some reasonable way by default.
+
+Alternatively, if we want to do as much as possible at compile time, we could instead expand
+the world and include the environment right there along with whatever org types we need.
+
+  emp::World<org1_t, org2_t, env_t> world;
+
+The advantage of method 1 is that it makes it easier to setup an environment in code before
+handing it over to the world.  The advantage to method 2 is that it allows the world to be
+able to more deeply examine an environment to, for example, make sure the config object is
+handling it correctly without any extra effort on the part of the library user.
+
+
