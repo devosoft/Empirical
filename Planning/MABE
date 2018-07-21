@@ -64,3 +64,20 @@ As such, there would be four high-level interchangable components in MABE 2.0:
 * Update Schemas (selection techqniues, mutations, etc; can be applied in sets or bundled)
 
 
+Given all of this, we might setup a MABE run as:
+
+  int main(int argc, char * argv[]) {
+    // Determine the types of everything that you want to use to build the world.
+    using sheep_t = mabe::Organism<mabe::MarkovBrain, mabe::LinearGenome>;
+    using wolf_t = mabe::Organism<mabe::MarkovBrain, mabe::NetworkGenome>;
+    using env_t = mabe::FarmEnvironment;
+    using track_t = mabe::TrackLineage;
+    using select_t = mabe::TournamentSelect;
+
+    // Build the world using these types.  Giving it a config filename plus argv and argc
+    // will allow it to process all configuration inputs.
+    mabe::World<sheep_t, wolf_t, env_t, track_t, select_t> world("farm.cfg", argv, argc);
+
+    // Running world will go for full configured duration; can also manually Update() it.
+    return world.Run();
+  }
