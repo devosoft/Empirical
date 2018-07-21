@@ -1,0 +1,38 @@
+We plan to implement MABE 2.0 using Empirical.
+
+What might this look like?
+
+Our goal is to have a set of components that have a common interface and easily plug together.
+These include:
+
+* Brains (Controllers? or simply Control Modules, since multiple ones can plug togeter?)
+* Genomes
+* Archivsts (Listeners? Recorders?)
+* Worlds (Environments)
+* Selection Scheme
+
+An organism is zero or more brains and zero or more genomes.
+...this arrangement should be doable with templates...
+
+Brains can emit signals and can listen for signals of pre-specified types.
+(these are actions and sensors, respectively)
+
+Similarly Worlds can emit signals (events) and listen for signal (responding to actions).
+
+By default, these are hooked together automatically.
+
+What might this look like?  Well, first, we'll build an org:
+
+  using org_t = mabe::Organism<mabe::MarkovBrain, mabe::LinearGenome>;
+
+We should be able to plunk this into any world type.  In Empirical, we would do this with:
+
+  emp::World<org_t> world;
+
+But in that case a World and Environemnt are separate.  What if we stick with that, though?
+As long as environemnts have a fixed API, we could just use:
+
+  world.SetupEnvironment(my_env);
+
+This would automatically built the patch board for the organism and fill it out in some
+reasonable way by default.
