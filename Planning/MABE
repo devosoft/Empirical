@@ -104,3 +104,42 @@ As such, if you build a world without any arguments, you can then run config lat
   world.NameOrgType<1>("Wolves");
   world.Config("farm.cfg", argv, argc);
 
+Even simpler is if we REQUIRE both names for each component type and for the configuration to occur second.
+Then we would be able to have the names in the world constructor and write:
+
+  mabe::World<sheep_t, wolf_t, env_t, track_t, select_t>
+  world("Sheep", "Wolves", "FarmEnvironment", "LineageTracker", "TournamentSelection");
+  world.Config("farm.cfg", argv, argc);
+
+Knowing this additional information up front will allow us to use scoping in the configuration file.
+
+
+
+Given the current thoughts, here's what a full file might look like:
+
+  #include "mabe.h"
+  #include "brains/MarkovBrain.h"
+  #include "genomes/LinearGenome.h"
+  #include "genomes/NetworkGenome.h"
+  #include "environments/FarmEnvironment.h"
+  #include "listeners/TrackLineage.h"
+  #include "schemas/TournamentSelect.h"
+
+  int main(int argc, char * argv[]) {
+    // Determine the types of everything that you want to use to build the world.
+    using sheep_t = mabe::Organism<mabe::MarkovBrain, mabe::LinearGenome>;
+    using wolf_t = mabe::Organism<mabe::MarkovBrain, mabe::NetworkGenome>;
+    using env_t = mabe::FarmEnvironment;
+    using track_t = mabe::TrackLineage;
+    using select_t = mabe::TournamentSelect;
+
+    // Build the world using these types.
+    mabe::World<sheep_t, wolf_t, env_t, track_t, select_t>
+    world("Sheep", "Wolves", "FarmEnvironment", "LineageTracker", "TournamentSelection");
+
+    // Configure the world using the "farm.cfg" file and command-line overrides.
+    world.Config("farm.cfg", argv, argc);
+
+    // Running world will go for full configured duration; can also manually Update() it.
+    return world.Run();
+  }
