@@ -107,8 +107,8 @@ namespace emp {
       const double body_y = point.GetY();
 
       // Make sure the body is in the sectors.
-      emp_assert(body_x >= 0.0 && body_x < max_pos.GetX());
-      emp_assert(body_y >= 0.0 && body_y < max_pos.GetY());
+      emp_assert(body_x >= 0.0 && body_y >= 0.0, body_x, body_y);
+      emp_assert(point <= max_pos, point, max_pos);
 
       // Determine which sector the body is in.
       const double sector_x = body_x / sector_width;
@@ -127,6 +127,7 @@ namespace emp {
       if (body.IsActive()) {                          // Only place active bodies.
         size_t cur_sector = FindSector(body.center);
         emp_assert(body.id < body_set.size(), body.id);
+        emp_assert(body.center <= max_pos, body.center, max_pos);
         sectors[cur_sector].push_back(body.id);
       }
     }
@@ -192,6 +193,7 @@ namespace emp {
     }
     void SetCenter(size_t id, Point _in) {
       emp_assert(body_set[id].IsActive());
+      emp_assert(body_set[id].center <= max_pos, body_set[id].center, max_pos);
 
       // If data not active, just move the body.
       if (data_active == false) body_set[id].center = _in;
@@ -209,6 +211,7 @@ namespace emp {
     void Translate(size_t id, Point translation) {
       emp_assert(body_set[id].IsActive());
       SetCenter(id, body_set[id].center + translation);
+      emp_assert(body_set[id].center <= max_pos, body_set[id].center, max_pos);
     }
 
     void SetRadius(size_t id, double _in) {
@@ -243,6 +246,7 @@ namespace emp {
     size_t AddBody(Ptr<BODY_T> _body, Point _center, double _radius, size_t _color=0) {
       static_assert(body_types::template Has<BODY_T>(),
                     "Can only add a body to surface if type was declared.");
+      emp_assert(_center <= max_pos, _center, max_pos);
 
       const size_t id = (open_ids.size()) ? open_ids.back() : body_set.size();
       BodyInfo info = { type_tracker.Convert(_body), id, _center, _radius, _color };
@@ -356,8 +360,10 @@ namespace emp {
       // }
     }
 
-    /// Determine if there are any overlaps with a provided body (that may or may not be on surface).
+    /// Determine if there are any overlaps with a single provided body (that may or may not be on surface).
     void FindOverlap(BodyInfo & body) {
+      Activate();  // Make sure data structures are setup.
+
       emp_assert(body.IsActive());
       const size_t sector_id = FindSector(body.center);
       const size_t sector_col = sector_id % num_cols;
