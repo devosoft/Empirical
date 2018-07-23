@@ -3,23 +3,26 @@ We plan to implement MABE 2.0 using Empirical.
 What might this look like?
 
 Our goal is to have a set of components that have a common interface and easily plug together.
-These include:
+
+In the current version of MABE the types of components are:
 
 * Brains (Controllers? or simply Control Modules, since multiple ones can plug togeter?)
-* Genomes
-* Worlds (Environments)
+* Genomes (Representations?)
+* Worlds (Environments?)
 * Archivsts (Listeners? Recorders?)
-* Selection Scheme (Update Schema?)
+* Optimizers (Selection Scheme? Update Schema?)
 
-An organism is zero or more brains and zero or more genomes.
-...this arrangement should be doable with templates...
+An organism has zero or more brains and zero or more genomes.
+...this arrangement should be doable with templates to have all of this at compile time.
+Indeed, other components (Worlds especially) could also contribute portions of an organism at compile time;
+Bodies, for example, are NOT currently considered part of the organism because they are provided by the World;
+it seems better to have a single class, if possible, that bundles all organism-related information.
 
-Brains can emit signals and can listen for signals of pre-specified types.
+The new version of brains will be able emit signals and can listen for signals of pre-specified types.
 (these are actions and sensors, respectively)
 
 Similarly Worlds can emit signals (events) and listen for signal (responding to actions).
 
-By default, these are hooked together automatically.
 
 What might this look like?  Well, first, we'll build an org:
 
@@ -95,3 +98,9 @@ Any updates to details may be needed to be done before the config object is acce
 example, configuration groups may need to be named.
 
 As such, if you build a world without any arguments, you can then run config later.
+
+  mabe::World<sheep_t, wolf_t, env_t, track_t, select_t> world;
+  world.NameOrgType<0>("Sheep");
+  world.NameOrgType<1>("Wolves");
+  world.Config("farm.cfg", argv, argc);
+
