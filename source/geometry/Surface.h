@@ -35,19 +35,31 @@ namespace emp {
   public:
     using body_types = TypePack<BODY_TYPES...>;
 
-    struct BodyInfo {
+    class BodyInfo {
+    private:      
       TrackedVar body_ptr;  ///< Pointer to the bodies
       size_t id;            ///< Index in body_set to find body info
       Point center;         ///< Center position of this body on surface.
       double radius;        ///< Size of this body
       size_t color;         ///< Color of this body
 
+    public:
       BodyInfo(TrackedVar && _ptr, size_t _id, Point _center, double _radius, size_t _color=0)
         : body_ptr(_ptr), id(_id), center(_center), radius(_radius), color(_color) { ; }
       BodyInfo(size_t _id=(size_t)-1, Point _center=Point(), double _radius=0.0)
         : BodyInfo(TrackedVar(nullptr), _id, _center, _radius) { ; }
       BodyInfo(const BodyInfo &) = default;
       BodyInfo(BodyInfo  &&) = default;
+
+      TrackedVar & GetBodyPtr() { return body_ptr; }
+      size_t GetID() const { return id; }
+      Point GetCenter() const { return center; }
+      double GetRadius() const { return radius; }
+      size_t GetColor() const { return color; }
+
+      void SetCenter(Point _in) { center = _in; }
+      void SetRadius(double _in) { radius = _in; }
+      void SetColor(size_t _in) { color = _in; }
 
       BodyInfo & operator=(const BodyInfo &) = default;
       BodyInfo & operator=(BodyInfo &&) = default;
@@ -87,7 +99,7 @@ namespace emp {
     // Note: Uses watermarking, so largest body will never shrink, even if removed
     //       unless the user explicitly calls RefreshBodySize()
     inline void TestBodySize(BodyInfo & body) {
-      const double cur_radius = body.radius;
+      const double cur_radius = body.GetRadius();
       if (cur_radius > max_radius) {
         max_radius = cur_radius;      // Record the new radius.
         data_active = false;          // May need to rebuild sectors, so deactivate data.
@@ -125,10 +137,10 @@ namespace emp {
     // Place an active body into a sector.
     void PlaceBody(BodyInfo & body) {
       if (body.IsActive()) {                          // Only place active bodies.
-        size_t cur_sector = FindSector(body.center);
-        emp_assert(body.id < body_set.size(), body.id);
-        emp_assert(body.center <= max_pos, body.center, max_pos);
-        sectors[cur_sector].push_back(body.id);
+        size_t cur_sector = FindSector(body.GetCenter());
+        emp_assert(body.GetID() < body_set.size(), body.GetID());
+        emp_assert(body.GetCenter() <= max_pos, body.GetCenter(), max_pos);
+        sectors[cur_sector].push_back(body.GetID());
       }
     }
 
@@ -171,37 +183,38 @@ namespace emp {
     template <typename ORIGINAL_T>
     Ptr<ORIGINAL_T> GetPtr(size_t id) const {
       emp_assert(body_set[id].IsActive());
-      return type_tracker.template ToType<Ptr<ORIGINAL_T>>( body_set[id].body_ptr );
+      return type_tracker.template ToType<Ptr<ORIGINAL_T>>( body_set[id].GetBodyPtr() );
     }
     Point GetCenter(size_t id) const {
       emp_assert(body_set[id].IsActive());
-      return body_set[id].center;
+      return body_set[id].GetCenter();
     }
     double GetRadius(size_t id) const {
       emp_assert(body_set[id].IsActive());
-      return body_set[id].radius;
+      return body_set[id].GetRadius();
     }
     size_t GetColor(size_t id) const {
       emp_assert(body_set[id].IsActive());
-      return body_set[id].color;
+      return body_set[id].GetColor();
     }
 
-    template <typename BODY_T>
-    void SetPtr(size_t id, Ptr<BODY_T> _in) {
-      emp_assert(body_set[id].IsActive());
-      body_set[id].body_ptr = type_tracker.Convert(_in);
-    }
+    // template <typename BODY_T>
+    // void SetPtr(size_t id, Ptr<BODY_T> _in) {
+    //   emp_assert(body_set[id].IsActive());
+    //   body_set[id].body_ptr = type_tracker.Convert(_in);
+    // }
     void SetCenter(size_t id, Point _in) {
       emp_assert(body_set[id].IsActive());
-      emp_assert(body_set[id].center <= max_pos, body_set[id].center, max_pos);
+      emp_assert(_in <= max_pos, _in, max_pos);
+      emp_assert(_in >= emp::Point());
 
       // If data not active, just move the body.
-      if (data_active == false) body_set[id].center = _in;
+      if (data_active == false) body_set[id].SetCenter(_in);
       // Otherwise need to update data.
       else {
-        const size_t old_sector_id = FindSector(body_set[id].center);
+        const size_t old_sector_id = FindSector(body_set[id].GetCenter());
         const size_t new_sector_id = FindSector(_in);
-        body_set[id].center = _in;
+        body_set[id].SetCenter(_in);
         if (old_sector_id != new_sector_id) {
           emp::RemoveValue(sectors[old_sector_id], id); // Remove from old sector.
           sectors[new_sector_id].push_back(id);         // Insert into new sector.
@@ -210,25 +223,24 @@ namespace emp {
     }
     void Translate(size_t id, Point translation) {
       emp_assert(body_set[id].IsActive());
-      SetCenter(id, body_set[id].center + translation);
-      emp_assert(body_set[id].center <= max_pos, body_set[id].center, max_pos);
+      SetCenter(id, body_set[id].GetCenter() + translation);
     }
 
     void SetRadius(size_t id, double _in) {
       emp_assert(body_set[id].IsActive());
       BodyInfo & body = body_set[id];
-      body.radius = _in;
+      body.SetRadius(_in);
       TestBodySize(body);
     }
     void ScaleRadius(size_t id, double scale) {
       emp_assert(body_set[id].IsActive());
       BodyInfo & body = body_set[id];
-      body.radius *= scale;
+      body.SetRadius(body.GetRadius() * scale);
       TestBodySize(body);
     }
     void SetColor(size_t id, size_t _in) {
       emp_assert(body_set[id].IsActive());
-      body_set[id].color = _in;
+      body_set[id].SetColor(_in);
     }
     
     void RemoveBody(size_t id) {
@@ -236,7 +248,7 @@ namespace emp {
       body_set[id].Deactivate();
       open_ids.push_back(id);
       if (data_active) {
-        const size_t sector_id = FindSector(body_set[id].center);
+        const size_t sector_id = FindSector(body_set[id].GetCenter());
         emp::RemoveValue(sectors[sector_id], id);
       }
     }
@@ -301,9 +313,9 @@ namespace emp {
 
     /// Determine if two bodies overlap.
     static inline bool TestOverlap(const BodyInfo & body1, const BodyInfo & body2) {
-      const Point xy_dist = body1.center - body2.center;
+      const Point xy_dist = body1.GetCenter() - body2.GetCenter();
       const double sqr_dist = xy_dist.SquareMagnitude();
-      const double total_radius = body1.radius + body2.radius;
+      const double total_radius = body1.GetRadius() + body2.GetRadius();
       const double sqr_radius = total_radius * total_radius;
       return (sqr_dist < sqr_radius);
     }
@@ -316,7 +328,7 @@ namespace emp {
       for (size_t body2_id = start_id; body2_id < sector.size(); body2_id++){
         if (body_set[body2_id].IsActive() == false) continue;
         BodyInfo & body2 = body_set[sector[body2_id]];
-        if (TestOverlap(body1, body2)) type_tracker(body1.body_ptr, body2.body_ptr);
+        if (TestOverlap(body1, body2)) type_tracker(body1.GetBodyPtr(), body2.GetBodyPtr());
       }
     }
 
@@ -365,7 +377,7 @@ namespace emp {
       Activate();  // Make sure data structures are setup.
 
       emp_assert(body.IsActive());
-      const size_t sector_id = FindSector(body.center);
+      const size_t sector_id = FindSector(body.GetCenter());
       const size_t sector_col = sector_id % num_cols;
       const size_t sector_row = sector_id / num_cols;
       auto & cur_sector = sectors[sector_id];
@@ -373,9 +385,9 @@ namespace emp {
       // Compare against bodies in its own sector.
       for (size_t body2_id : cur_sector) {
         emp_assert(body_set[body2_id].IsActive());
-        if (body.id == body2_id) continue;             // Don't match with self!
+        if (body.GetID() == body2_id) continue;             // Don't match with self!
         BodyInfo & body2 = body_set[body2_id];
-        if (TestOverlap(body, body2)) type_tracker(body.body_ptr, body2.body_ptr);
+        if (TestOverlap(body, body2)) type_tracker(body.GetBodyPtr(), body2.GetBodyPtr());
       }
 
       const bool left_ok  = (sector_col > 0);
