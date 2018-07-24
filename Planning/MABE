@@ -114,11 +114,29 @@ Then we would be able to have the names in the world constructor and write:
 Knowing this additional information up front will allow us to use scoping in the configuration file.
 
 
+DEFAULTS should all be as reasonable and simple as possible.
+* If an organism has only one brain, it should automatically be used for everything with no extra work.
+  (if there is more than one brain, the programmer should be required to specify how they are hooked up since any
+  default behaviors will be couter-intuitive in some circumstances.)
+* If a World has only one environment, it should trivially be used.  If there is more than one, environments
+  need to be clearly specified.
 
-Given the current thoughts, here's what a full file might look like:
+
+
+======== SUMMARY for MABE 2.0 proposal ========
+
+Four types of components:
+ * ORGANISMS (with tools to easily plug together CONTROL MODULES and GENOMES, but you can build your own)
+ * ENVIRONMENTS (interactive "worlds" -or- optimization problems; tools for continuous, state grid, etc.)
+ * LISTENERS (for data collections, such as summary printing, lineage tracking, population cross sections, etc.)
+ * UPDATE SCHEMA (to control how change occurs over time -- run asynchronously? use tournaments?  Etc)
+
+
+
+Here's what a full file might look like:
 
   #include "mabe.h"
-  #include "brains/MarkovBrain.h"
+  #include "controlers/MarkovBrain.h"
   #include "genomes/LinearGenome.h"
   #include "genomes/NetworkGenome.h"
   #include "environments/FarmEnvironment.h"
@@ -143,3 +161,44 @@ Given the current thoughts, here's what a full file might look like:
     // Running world will go for full configured duration; can also manually Update() it.
     return world.Run();
   }
+
+
+The automatically generated configuration file for this code would look something like:
+
+  namespace Sheep.MarkovBrain
+  set input_nodes 10
+  set hidden_nodes 20
+  set output_nodes 10
+
+  namespace Sheep.Genomes
+  set alphabet_size 2
+  set genome_length 1000
+  set point_mutation_prob 0.001
+  set insertion_prob 0.0001
+  set deletion_prob 0.0001
+
+  namspace Wolves.MakovBrain
+  set input_nodes 50
+  set hidden_nodes 100
+  set output_nodes 10
+
+  namespace Sheep.Genomes
+  set alphabet_size 2
+  set genome_size 1000
+  set genome_branch_factor 3
+  set point_mutation_prob 0.001
+  set connection_prob 0.05
+
+  namespace FarmEnvironment
+  set world_x 500
+  set world_y 500
+  set tree_desnity 0.24
+
+  namespace LineageTracker
+  set archive_mrca 1
+  set snapshot_period 1000
+
+  namespace TournamentSelection
+  set tourny_size 5
+  set tourny_count 1000
+  set num_generations 2000
