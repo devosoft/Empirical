@@ -228,7 +228,7 @@ namespace emp {
     void TranslateWrap(size_t id, Point translation) {
       emp_assert(body_set[id].IsActive());
       Point new_pos = body_set[id].GetCenter() + translation;
-      new_pos.Wrap(max_pos);
+      new_pos.Mod(max_pos);
       SetCenter(id, new_pos);
     }
 

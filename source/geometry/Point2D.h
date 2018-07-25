@@ -77,7 +77,7 @@ namespace emp {
     Point2D & ToOrigin() { x = 0; y = 0; return *this; }
     Point2D & NegateX() { x = -x; return *this; }
     Point2D & NegateY() { y = -y; return *this; }
-    Point2D & Wrap(const Point2D & limits) { x = emp::Mod(x, limits.x); y = emp::Mod(y, limits.y); return *this; }
+    Point2D & Mod(const Point2D & limits) { x = emp::Mod(x, limits.x); y = emp::Mod(y, limits.y); return *this; }
 
     Point2D & operator+=(const Point2D & _in) { x += _in.x; y += _in.y; return *this; }
     Point2D & operator-=(const Point2D & _in) { x -= _in.x; y -= _in.y; return *this; }
