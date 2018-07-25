@@ -225,6 +225,12 @@ namespace emp {
       emp_assert(body_set[id].IsActive());
       SetCenter(id, body_set[id].GetCenter() + translation);
     }
+    void TranslateWrap(size_t id, Point translation) {
+      emp_assert(body_set[id].IsActive());
+      Point new_pos = body_set[id].GetCenter() + translation;
+      new_pos.Wrap(max_pos);
+      SetCenter(id, new_pos);
+    }
 
     void SetRadius(size_t id, double _in) {
       emp_assert(body_set[id].IsActive());
