@@ -135,7 +135,7 @@ public:
       const size_t id = (size_t) hw.GetTrait((size_t) OpenOrg::Trait::ORG_ID);
       emp::Ptr<OpenOrg> org_ptr = id_map[id];
       emp::Angle facing = org_ptr->GetFacing();
-      surface.Translate( org_ptr->GetSurfaceID(), facing.GetPoint(1.0) );
+      surface.TranslateWrap( org_ptr->GetSurfaceID(), facing.GetPoint(1.0) );
     }, 1, "Move forward.");
 
     inst_lib.AddInst("SpinRight", [this](hardware_t & hw, const inst_t & inst) mutable {
@@ -166,15 +166,6 @@ public:
         if (pop[pos].IsNull()) continue;
         auto & org = *pop[pos];
         const size_t surface_id = org.GetSurfaceID();
-
-        // Make sure organisms are on the surface (wrap around if not)
-        double x = surface.GetCenter(surface_id).GetX();
-        double y = surface.GetCenter(surface_id).GetY();
-        if (x < 0.0) x += config.WORLD_X();
-        if (y < 0.0) y += config.WORLD_Y();
-        if (x >= config.WORLD_X()) x -= config.WORLD_X();
-        if (y >= config.WORLD_Y()) y -= config.WORLD_Y();
-        surface.SetCenter(surface_id, {x,y});
 
         // Provide additional resources toward reproduction.
         org.AdjustEnergy( random_ptr->GetDouble(0.1) );
