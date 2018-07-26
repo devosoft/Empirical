@@ -16,9 +16,11 @@
 #ifndef MABE_UPDATE_SCHEMA_BASE_H
 #define MABE_UPDATE_SCHEMA_BASE_H
 
+#include "ModuleBase.h"
+
 namespace mabe {
 
-  class SchemaBase {
+  class SchemaBase : public ModuleBase {
   };
 
 }

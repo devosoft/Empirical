@@ -7,15 +7,18 @@
  *  @brief Base class for all Listeners in MABE
  *
  *  This file details all of the basic functionality that all listeners MUST have, providing
- *  reasonable defaults when such are possible.
+ *  reasonable defaults when such are possible.  Listeners are tools that monitor an evolving
+ *  population (collecting data or performing analyses), but do not alter its progress.
  */
 
 #ifndef MABE_LISTENER_BASE_H
 #define MABE_LISTENER_BASE_H
 
+#include "ModuleBase.h"
+
 namespace mabe {
 
-  class ListenerBase {
+  class ListenerBase : public ModuleBase {
   };
 
 }
