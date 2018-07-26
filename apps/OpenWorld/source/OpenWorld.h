@@ -62,7 +62,10 @@ public:
       GetOrg(pos).GetBrain().SetTrait((size_t)OpenOrg::Trait::ORG_ID, id);
       id_map[id] = &GetOrg(pos);
     } );
-    OnOrgDeath( [this](size_t pos){ id_map.erase( GetOrg(pos).GetID() ); } );
+    OnOrgDeath( [this](size_t pos) {
+      surface.RemoveBody(GetOrg(pos).GetSurfaceID());
+      id_map.erase(GetOrg(pos).GetID());
+    });
 
     // Setup SignalGP mutations.
     signalgp_mutator.SetProgMinFuncCnt(config.PROGRAM_MIN_FUN_CNT());
@@ -84,17 +87,30 @@ public:
     signalgp_mutator.TAG_BIT_FLIP__PER_BIT(config.TAG_BIT_FLIP__PER_BIT());
 
     // Setup surface functions to allow organisms to eat.
-    surface.AddOverlapFun( [](OpenOrg &, OpenOrg &) {
-      std::cerr << "Org eating org!" << std::endl;
+    surface.AddOverlapFun( [this](OpenOrg & pred, OpenOrg & prey) {
+      const size_t pred_id = pred.GetSurfaceID();
+      const size_t prey_id = prey.GetSurfaceID();
+      const double pred_radius = surface.GetRadius(pred_id);
+      const double prey_radius = surface.GetRadius(prey_id);
+      const double consume_ratio = prey_radius / pred_radius;
+      if (consume_ratio > config.MAX_CONSUME_RATIO()) return;
+      if (consume_ratio < config.MIN_CONSUME_RATIO()) return;
+
+      std::cerr << "Org Consumed!"
+                << "   pred:radius=" << pred_radius << "; id=" << pred_id
+                << "   prey:radius=" << prey_radius << "; id=" << prey_id
+                << std::endl;
+      pred.AdjustEnergy( prey_radius * prey_radius / 10.0 );
+      // @CAO: MUST KILL PREY!!
     });
-    surface.AddOverlapFun( [](OpenOrg &, OpenResource &) {
-      std::cerr << "Org eating resource!" << std::endl;
+    surface.AddOverlapFun( [this](OpenOrg & org, OpenResource & res) {
+      std::cerr << "Resoure Consumed!" << std::endl;
     });
     surface.AddOverlapFun( [](OpenResource &, OpenResource &) {
-      std::cerr << "Resources should not try to eat other resources!" << std::endl;
+      std::cerr << "ERROR: Resources should not try to eat other resources!" << std::endl;
     });
     surface.AddOverlapFun( [](OpenResource &, OpenOrg &) {
-      std::cerr << "Resources should not try to eat organisms!" << std::endl;
+      std::cerr << "ERROR: Resources should not try to eat organisms!" << std::endl;
     });
 
     // Setup the default instruction set.
