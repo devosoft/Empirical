@@ -14,7 +14,10 @@
 #ifndef MABE_WORLD_H
 #define MABE_WORLD_H
 
+#include <iostream>
 #include <string>
+
+#include "../base/OrganismBase.h"
 
 #include "../../base/vector.h"
 #include "../../meta/TypePack.h"
@@ -23,10 +26,12 @@ namespace mabe {
 
   template <typename... MODULES>
   class World {
-  public:
+  private:
     using modules_t = emp::TypePack<MODULES...>;
 
-  private:
+    template <typename T> using is_organism = std::is_base_of<OrganismBase, T>;
+    using organisms_t = typename modules_t::template filter<is_organism>;
+
     emp::vector<std::string> module_names;
 
   public:
