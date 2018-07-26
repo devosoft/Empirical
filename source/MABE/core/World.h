@@ -43,13 +43,26 @@ namespace mabe {
 
     emp::vector<std::string> module_names;
 
+    void SetModuleNames() { ; }
+    template <typename... Ts>
+    void SetModuleNames(const std::string & name, Ts &&... extras...) {
+      module_names.push_back(name);
+      SetModuleNames(extras...);
+    }
+
   public:
-    World() {
+    template <typename... Ts>
+    World(Ts... names) {
+      SetModuleNames(names...);
+
       std::cout << "#modules = " << modules_t::GetSize() << std::endl;
       std::cout << "#environment types = " << environments_t::GetSize() << std::endl;
       std::cout << "#listener types    = " << listeners_t::GetSize() << std::endl;
       std::cout << "#organism types    = " << organisms_t::GetSize() << std::endl;
       std::cout << "#schema types      = " << schemas_t::GetSize() << std::endl;
+
+      std::cout << "\nModule Names:\n";
+      for (const std::string & name : module_names) std::cout << "  " << name << std::endl;
     }
   };
 
