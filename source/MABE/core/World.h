@@ -35,6 +35,12 @@ namespace mabe {
     using populations_t  = typename organisms_t::template wrap<Population>;     ///< Org types determine pop types.
     using schemas_t      = typename modules_t::template filter<is_schema>;
 
+    emp::vector<emp::Ptr<EnvironmentBase>> environments;
+    emp::vector<emp::Ptr<ListenerBase>> listeners;
+    emp::vector<emp::Ptr<PopulationBase>> populations;
+    emp::vector<emp::Ptr<SchemaBase>> schemas;
+
+    emp::vector<emp::Ptr<ModuleBase>> all_modules;
     emp::vector<std::string> module_names;
 
     void SetModuleNames() { ; }
@@ -42,6 +48,22 @@ namespace mabe {
     void SetModuleNames(const std::string & name, Ts &&... extras...) {
       module_names.push_back(name);
       SetModuleNames(extras...);
+    }
+
+    void AddModule(emp::Ptr<EnvironmentBase> env_ptr) { environments.push_back(env_ptr); }
+    void AddModule(emp::Ptr<ListenerBase> lis_ptr) { listeners.push_back(lis_ptr); }
+    void AddModule(emp::Ptr<PopulationBase> pop_ptr) { populations.push_back(pop_ptr); }
+    void AddModule(emp::Ptr<SchemaBase> schema_ptr) { schemas.push_back(schema_ptr); }
+
+    template <typename T> void BuildModules() {
+      emp::Ptr<T> new_ptr = emp::NewPtr<T>();
+      AddModule(new_ptr);
+      all_modules.push_back(new_ptr);
+    }
+    template <typename T1, typename T2, typename... Ts>
+    void BuildModules() {
+      BuildModules<T1>();
+      BuildModules<T2, Ts...>();
     }
 
   public:
@@ -58,6 +80,11 @@ namespace mabe {
 
       std::cout << "\nModule Names:\n";
       for (const std::string & name : module_names) std::cout << "  " << name << std::endl;
+    }
+
+    ~World() {
+      /// Delete all modules.
+      for (auto & x : all_modules) x.Delete();
     }
   };
 
