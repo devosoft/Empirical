@@ -25,6 +25,8 @@ namespace mabe {
     std::string name;
 
   public:
+    virtual ~ModuleBase() { ; }  ///< Make sure all modules can be deleted properly.
+
     const std::string & GetName() const { return name; }
     void SetName(std::string _in) { name = _in; }
 
