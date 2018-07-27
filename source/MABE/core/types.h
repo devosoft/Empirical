@@ -13,21 +13,20 @@
 #include "../../base/vector.h"
 #include "../../meta/TypePack.h"
 
-class EnvironmentBase;
-class ListenerBase;
-class OrganismBase;
-class SchemaBase;
+#include "../base/EnvironmentBase.h"
+#include "../base/ListenerBase.h"
+#include "../base/OrganismBase.h"
+#include "../base/SchemaBase.h"
 
+#include "Population.h"
 
 namespace mabe {
+  template <typename T> using is_module      = std::is_base_of<ModuleBase, T>;
   template <typename T> using is_environment = std::is_base_of<EnvironmentBase, T>;
   template <typename T> using is_listener    = std::is_base_of<ListenerBase, T>;
   template <typename T> using is_organism    = std::is_base_of<OrganismBase, T>;
+  template <typename T> using is_population  = std::is_base_of<PopulationBase, T>;
   template <typename T> using is_schema      = std::is_base_of<SchemaBase, T>;
-
-  /// Notes to track the specific type associated with a module.
-  enum class ModuleType { NONE=0, ENVIRONMENT, LISTENER, ORGANISM, POPULATION, SCHEMA, UNKNOWN };
-
 }
 
 #endif
