@@ -21,6 +21,9 @@
 namespace mabe {
 
   class SchemaBase : public ModuleBase {
+  private:
+  public:
+    static constexpr mabe::ModuleType GetModuleType() { return ModuleType::SCHEMA; }
   };
 
 }

@@ -20,6 +20,9 @@
 namespace mabe {
 
   class EnvironmentBase : public ModuleBase {
+  private:
+  public:
+    static constexpr mabe::ModuleType GetModuleType() { return ModuleType::ENVIRONMENT; }
   };
 
 }

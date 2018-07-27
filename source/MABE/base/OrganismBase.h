@@ -16,6 +16,9 @@
 namespace mabe {
 
   class OrganismBase {
+  private:
+  public:
+    static constexpr mabe::ModuleType GetModuleType() { return ModuleType::ORGANISM; }
   };
 
 }

@@ -19,6 +19,9 @@
 namespace mabe {
 
   class ListenerBase : public ModuleBase {
+  private:
+  public:
+    static constexpr mabe::ModuleType GetModuleType() { return ModuleType::LISTENER; }
   };
 
 }

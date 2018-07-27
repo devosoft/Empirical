@@ -16,6 +16,10 @@
 
 namespace mabe {
 
+  /// Track the specific type associated with a module.
+  enum class ModuleType { NONE=0, BASE, ENVIRONMENT, LISTENER, ORGANISM, POPULATION, SCHEMA, UNKNOWN };
+
+  /// Base class for all major MABE modules that can receive names.
   class ModuleBase {
   private:
     std::string name;
@@ -23,6 +27,8 @@ namespace mabe {
   public:
     const std::string & GetName() const { return name; }
     void SetName(std::string _in) { name = _in; }
+
+    static constexpr mabe::ModuleType GetModuleType() { return ModuleType::BASE; }
   };
 
 }
