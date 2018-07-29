@@ -35,41 +35,45 @@ namespace mabe {
     using populations_t  = typename organisms_t::template wrap<Population>;     ///< Org types determine pop types.
     using schemas_t      = typename modules_t::template filter<is_schema>;
 
-    emp::vector<emp::Ptr<EnvironmentBase>> environments;
-    emp::vector<emp::Ptr<ListenerBase>> listeners;
-    emp::vector<emp::Ptr<PopulationBase>> populations;
-    emp::vector<emp::Ptr<SchemaBase>> schemas;
+    using environments_tup_t = typename environments_t::template apply<std::tuple>;
+    using listeners_tup_t    = typename listeners_t::template apply<std::tuple>;
+    using populations_tup_t  = typename populations_t::template apply<std::tuple>;
+    using schemas_tup_t      = typename schemas_t::template apply<std::tuple>;
 
-    emp::vector<emp::Ptr<ModuleBase>> all_modules;
-    emp::vector<std::string> module_names;
+    environments_tup_t environments;  ///< Instances of environment modules.
+    listeners_tup_t listeners;        ///< Instances of listener modules. 
+    populations_tup_t populations;    ///< Instances of population modules.
+    schemas_tup_t schemas;            ///< Instances of schema modules.
 
-    void SetModuleNames() { ; }
-    template <typename... Ts>
-    void SetModuleNames(const std::string & name, Ts &&... extras...) {
-      module_names.push_back(name);
-      SetModuleNames(extras...);
-    }
+    /// Pointers to modules for easy iterartive access.
+    emp::vector<emp::Ptr<ModuleBase>> module_ptrs;
 
-    void AddModule(emp::Ptr<EnvironmentBase> env_ptr) { environments.push_back(env_ptr); }
-    void AddModule(emp::Ptr<ListenerBase> lis_ptr) { listeners.push_back(lis_ptr); }
-    void AddModule(emp::Ptr<PopulationBase> pop_ptr) { populations.push_back(pop_ptr); }
-    void AddModule(emp::Ptr<SchemaBase> schema_ptr) { schemas.push_back(schema_ptr); }
+    emp::vector<emp::Ptr<EnvironmentBase>> environment_ptrs;
+    emp::vector<emp::Ptr<ListenerBase>> listener_ptrs;
+    emp::vector<emp::Ptr<PopulationBase>> population_ptrs;
+    emp::vector<emp::Ptr<SchemaBase>> schema_ptrs;
 
-    template <typename T> void BuildModules() {
-      emp::Ptr<T> new_ptr = emp::NewPtr<T>();
-      AddModule(new_ptr);
-      all_modules.push_back(new_ptr);
-    }
-    template <typename T1, typename T2, typename... Ts>
-    void BuildModules() {
-      BuildModules<T1>();
-      BuildModules<T2, Ts...>();
-    }
+
+    void AddModule(emp::Ptr<EnvironmentBase> env_ptr) { environment_ptrs.push_back(env_ptr); }
+    void AddModule(emp::Ptr<ListenerBase> lis_ptr) { listener_ptrs.push_back(lis_ptr); }
+    void AddModule(emp::Ptr<PopulationBase> pop_ptr) { population_ptrs.push_back(pop_ptr); }
+    void AddModule(emp::Ptr<SchemaBase> schema_ptr) { schema_ptrs.push_back(schema_ptr); }
+
+    // template <typename T> void BuildModules() {
+    //   emp::Ptr<T> new_ptr = emp::NewPtr<T>();
+    //   AddModule(new_ptr);
+    //   all_modules.push_back(new_ptr);
+    // }
+    // template <typename T1, typename T2, typename... Ts>
+    // void BuildModules() {
+    //   BuildModules<T1>();
+    //   BuildModules<T2, Ts...>();
+    // }
 
   public:
-    template <typename... Ts>
-    World(Ts... names) {
-      SetModuleNames(names...);
+    World(emp::vector<std::string> names) {
+      // ConfigModules<MODULES...>();
+      // module_names = names;
 
       std::cout << "#modules = " << modules_t::GetSize() << std::endl;
       std::cout << "#environment types = " << environments_t::GetSize() << std::endl;
@@ -79,13 +83,9 @@ namespace mabe {
       std::cout << "#schema types      = " << schemas_t::GetSize() << std::endl;
 
       std::cout << "\nModule Names:\n";
-      for (const std::string & name : module_names) std::cout << "  " << name << std::endl;
+      for (const std::string & name : names) std::cout << "  " << name << std::endl;
     }
 
-    ~World() {
-      /// Delete all modules.
-      for (auto & x : all_modules) x.Delete();
-    }
   };
 
 }
