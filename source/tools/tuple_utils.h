@@ -62,23 +62,23 @@ namespace emp {
     // Recursive case for the tuple.
     template <typename TUPLE_T, typename FUN_T, size_t TOT, size_t POS>
     struct TupleIterate_impl {
-      static void operator(TUPLE_T & tup, FUN_T & fun) const {
-        fun(std::get<POS>(tup));                                 // Call the function!
-        TupleIterate_impl<TUPLE_T, FUN_T, TOT, POS+1>(tup, fun); // Recurse!
+      static void Run(TUPLE_T & tup, FUN_T & fun) {
+        fun(std::get<POS>(tup));                                       // Call the function!
+        TupleIterate_impl<TUPLE_T, FUN_T, TOT, POS+1>::Run(tup, fun);  // Recurse!
       }
     };
 
     // End case... we've already hit all elements in the tuple!
     template <typename TUPLE_T, typename FUN_T, size_t END_POS>
     struct TupleIterate_impl<TUPLE_T, FUN_T, END_POS, END_POS> {
-      static void operator(TUPLE_T & tup, FUN_T & fun) const { ; }
+      static void Run(TUPLE_T & tup, FUN_T & fun) { ; }
     };
   }
 
   /// Call a provided function on each element of a tuple.
   template <typename TUPLE_T, typename FUN_T>
   void TupleIterate(TUPLE_T & tup, FUN_T & fun) {
-    internal::TupleIterate_impl<TUPLE_T, FUN_T, tup.size(), 0>(tup, fun);
+    internal::TupleIterate_impl<TUPLE_T, FUN_T, tuple_size<TUPLE_T>(), 0>::Run(tup, fun);
   }
 }
 
