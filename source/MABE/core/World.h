@@ -19,6 +19,7 @@
 
 #include "../../base/vector.h"
 #include "../../meta/TypePack.h"
+#include "../../tools/tuple_utils.h"
 
 #include "types.h"
 
@@ -72,8 +73,7 @@ namespace mabe {
 
   public:
     World(emp::vector<std::string> names) {
-      // ConfigModules<MODULES...>();
-      // module_names = names;
+      emp::TupleIterate(populations, [this](PopulationBase & pop) mutable { module_ptrs.push_back(&pop); });
 
       std::cout << "#modules = " << modules_t::GetSize() << std::endl;
       std::cout << "#environment types = " << environments_t::GetSize() << std::endl;
