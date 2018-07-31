@@ -13,6 +13,8 @@
 #ifndef MABE_ORGANISM_BASE_H
 #define MABE_ORGANISM_BASE_H
 
+#include "ModuleBase.h"
+
 namespace mabe {
 
   class OrganismBase {
