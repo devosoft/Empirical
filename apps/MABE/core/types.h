@@ -26,6 +26,14 @@ namespace mabe {
   template <typename T> using is_organism_type = std::is_base_of<OrganismTypeBase, T>;
   template <typename T> using is_schema        = std::is_base_of<SchemaBase, T>;
   template <typename T> using is_watchner      = std::is_base_of<WatcherBase, T>;
+
+  const EnvironmentBase & ToModule(const EnvironmentBase & module) { return module; }
+  const OrganismTypeBase & ToModule(const OrganismTypeBase & module) { return module; }
+  const SchemaBase & ToModule(const SchemaBase & module) { return module; }
+  const WatcherBase & ToModule(const WatcherBase & module) { return module; }
+
+  template <typename T>
+  using to_module_t = std::decay<decltype(ToModule(*((T*) nullptr)))>;
 }
 
 #endif
