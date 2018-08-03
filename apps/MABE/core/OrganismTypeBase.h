@@ -3,8 +3,8 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  OrganismBase.h
- *  @brief Base class for all Organsims in MABE
+ *  @file  OrganismTypeBase.h
+ *  @brief Base class for all Organsim types in MABE; describes how organism functions.
  *
  *  This file details all of the basic functionality that all organisms MUST have, providing
  *  reasonable defaults when such are possible.
@@ -17,7 +17,7 @@
 
 namespace mabe {
 
-  class OrganismTypeBase {
+  class OrganismTypeBase : public ModuleBase {
   private:
   public:
     OrganismTypeBase(const std::string & in_name) : ModuleBase(in_name) { ; }    
