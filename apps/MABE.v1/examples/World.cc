@@ -9,6 +9,12 @@
 
 #include "../core/World.h"
 
+class MyOrganism : public mabe::OrganismBase {
+  int x;
+};
+
 int main(int argc, char *argvp[])
 {
+  mabe::World<MyOrganism, int, mabe::OrganismBase, std::string>
+    world({"my_org", "int", "base_org", "string"});
 }

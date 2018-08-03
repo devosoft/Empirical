@@ -11,8 +11,8 @@ Example code:
   #include "genomes/LinearGenome.h"
   #include "genomes/NetworkGenome.h"
   #include "environments/FarmEnvironment.h"
-  #include "listeners/TrackLineage.h"
   #include "schemas/TournamentSelect.h"
+  #include "watchers/TrackLineage.h"
 
   int main(int argc, char * argv[]) {
     // Determine the types of everything that you want to use to build the world.

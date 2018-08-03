@@ -21,7 +21,7 @@ namespace mabe {
   class WatcherBase : public ModuleBase {
   private:
   public:
-    WarcherBase(const std::string & in_name) : ModuleBase(in_name) { ; }
+    WatcherBase(const std::string & in_name) : ModuleBase(in_name) { ; }
 
     static constexpr mabe::ModuleType GetModuleType() { return ModuleType::WATCHER; }
   };
