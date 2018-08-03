@@ -17,6 +17,7 @@
 #include <iostream>
 #include <string>
 
+#include "base/Ptr.h"
 #include "base/vector.h"
 #include "meta/TypePack.h"
 #include "tools/tuple_utils.h"
@@ -42,19 +43,19 @@ namespace mabe {
     watchers_t & watchers;             ///< Direct link to watchers vector of modules. 
 
     void AddModule(emp::Ptr<EnvironmentBase> env_ptr) { environments.push_back(env_ptr); }
-    void AddModule(emp::Ptr<ListenerBase> lis_ptr) { listeners.push_back(lis_ptr); }
+    void AddModule(emp::Ptr<WatcherBase> watch_ptr) { watchers.push_back(watch_ptr); }
     void AddModule(emp::Ptr<OrganismTypeBase> pop_ptr) { organism_types.push_back(pop_ptr); }
     void AddModule(emp::Ptr<SchemaBase> schema_ptr) { schemas.push_back(schema_ptr); }
 
-    void ForEachModule(emp::function<void(emp::Ptr<ModuleBase>)> fun) {
-      foreach (Ptr<Module> x : environments) { fun(x); }
-      foreach (Ptr<Module> x : organism_types)  { fun(x); }
-      foreach (Ptr<Module> x : schemas)      { fun(x); }
-      foreach (Ptr<Module> x : watchers)     { fun(x); }
+    void ForEachModule(std::function<void(emp::Ptr<ModuleBase>)> fun) {
+      for (emp::Ptr<ModuleBase> x : environments)    { fun(x); }
+      for (emp::Ptr<ModuleBase> x : organism_types)  { fun(x); }
+      for (emp::Ptr<ModuleBase> x : schemas)         { fun(x); }
+      for (emp::Ptr<ModuleBase> x : watchers)        { fun(x); }
     }
 
   public:
-    World(emp::vector<std::string> names)
+    World()
     : environments(std::get<environments_t>(modules))
     , organism_types(std::get<organism_types_t>(modules))
     , schemas(std::get<schemas_t>(modules))
@@ -70,16 +71,27 @@ namespace mabe {
     T & BuildModule(const std::string name) {
       using module_t = to_module_t<T>;
       using mvector_t = emp::vector<emp::Ptr<module_t>>;
-      emp::Ptr<module_t> new_mod = emp::NewPtr<T>(name)
+      emp::Ptr<T> new_mod = emp::NewPtr<T>(name);
       std::get<mvector_t>(modules).push_back(new_mod);
       return *new_mod;
     }
 
+    void Config(const std::string & filename, int argc, char * argv[]) {
+      (void) filename;
+      (void) argc;
+      (void) argv;
+      // @CAO Setup configurations here!
+    }
+    
+    int Run() {
+      return 0;
+    }
+
     void PrintStatus() {
-      std::cout << "Environemnts: " << environments.GetSize() << std::endl;
-      std::cout << "Organism Types: " << organism_types.GetSize() << std::endl;
-      std::cout << "Schemas: " << schemas.GetSize() << std::endl;
-      std::cout << "Watchers: " << watchers.GetSize() << std::endl;
+      std::cout << "Environemnts: " << environments.size() << std::endl;
+      std::cout << "Organism Types: " << organism_types.size() << std::endl;
+      std::cout << "Schemas: " << schemas.size() << std::endl;
+      std::cout << "Watchers: " << watchers.size() << std::endl;
     }
   };
 
