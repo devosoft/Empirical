@@ -13,6 +13,8 @@
 #ifndef MABE_ORGANISM_TYPE_H
 #define MABE_ORGANISM_TYPE_H
 
+#include "meta/TypePack.h"
+
 #include "OrganismTypeBase.h"
 
 namespace mabe {
@@ -20,6 +22,7 @@ namespace mabe {
   template <typename... Ts>
   class OrganismType : public OrganismTypeBase {
   private:
+    using modules_t = emp::TypePack<Ts...>;
     using genomes_t = typename modules_t::template filter<is_genome>;
     using controllers_t = typename modules_t::template filter<is_controller>;
 
