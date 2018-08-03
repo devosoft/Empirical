@@ -7,8 +7,10 @@
  *  @brief An example of building a MABE world where AvidaGP organisms evovle to forage.
  */
 
-#include "mabe.h"
-#include "controlers/AvidaGP.h"
+#include "../core/World.h"
+#include "../core/OrganismType.h"
+
+#include "controllers/AvidaGP.h"
 #include "genomes/LinearGenome.h"
 #include "environments/ResourceGrid.h"
 #include "schemas/TournamentSelect.h"
@@ -23,9 +25,11 @@ int main(int argc, char * argv[]) {
   auto & resource_grid   = world.BuildModule<mabe::ResourceGrid>("ResourceGrid");
   auto & tourny_schema   = world.BuildModule<mabe::TournamentSelect>("TournamentSelect");
   auto & lineage_tracker = world.BuildModule<mabe::TrackLineage>("LineageTracker");
-  
+
+  (void) org_type; (void) resource_grid; (void) tourny_schema; (void) lineage_tracker;
+
   // Configure the world using the "farm.cfg" file and command-line overrides.
-  world.Config("forage.cfg", argv, argc);
+  world.Config("forage.cfg", argc, argv);
   
   // Running world will go for full configured duration; can also manually Update() it.
   return world.Run();
