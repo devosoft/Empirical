@@ -20,6 +20,7 @@
 #include "base/Ptr.h"
 #include "base/vector.h"
 #include "meta/TypePack.h"
+#include "tools/Random.h"
 #include "tools/tuple_utils.h"
 
 #include "types.h"
@@ -40,9 +41,8 @@ namespace mabe {
     using environments_t = emp::vector<emp::Ptr<EnvironmentBase>>;
     using organism_types_t = emp::vector<emp::Ptr<OrganismTypeBase>>;
     using schemas_t = emp::vector<emp::Ptr<SchemaBase>>;
-    using watchers_t = emp::vector<emp::Ptr<WatcherBase>>;
 
-    using modules_t = std::tuple<environments_t, organism_types_t, schemas_t, watchers_t>;
+    using modules_t = std::tuple<environments_t, organism_types_t, schemas_t>;
 
 
     // ----- World MODULES -----
@@ -52,10 +52,8 @@ namespace mabe {
     environments_t & environments;     ///< Direct link to environments vector of modules. 
     organism_types_t & organism_types; ///< Direct link to organism types vector of modules. 
     schemas_t & schemas;               ///< Direct link to schemas vector of modules. 
-    watchers_t & watchers;             ///< Direct link to watchers vector of modules. 
 
     void AddModule(emp::Ptr<EnvironmentBase> env_ptr) { environments.push_back(env_ptr); }
-    void AddModule(emp::Ptr<WatcherBase> watch_ptr) { watchers.push_back(watch_ptr); }
     void AddModule(emp::Ptr<OrganismTypeBase> pop_ptr) { organism_types.push_back(pop_ptr); }
     void AddModule(emp::Ptr<SchemaBase> schema_ptr) { schemas.push_back(schema_ptr); }
 
@@ -63,7 +61,6 @@ namespace mabe {
       for (emp::Ptr<ModuleBase> x : environments)    { fun(x); }
       for (emp::Ptr<ModuleBase> x : organism_types)  { fun(x); }
       for (emp::Ptr<ModuleBase> x : schemas)         { fun(x); }
-      for (emp::Ptr<ModuleBase> x : watchers)        { fun(x); }
     }
 
 
@@ -77,10 +74,9 @@ namespace mabe {
 
   public:
     World()
-    : environments(std::get<environments_t>(modules))
-    , organism_types(std::get<organism_types_t>(modules))
-    , schemas(std::get<schemas_t>(modules))
-    , watchers(std::get<watchers_t>(modules))
+      : environments(std::get<environments_t>(modules))
+      , organism_types(std::get<organism_types_t>(modules))
+      , schemas(std::get<schemas_t>(modules))
     {
     }
 
@@ -120,10 +116,6 @@ namespace mabe {
       }
       std::cout << "Schemas: " << schemas.size() << std::endl;
       for (auto x : schemas) { 
-        std::cout << "  " << x->GetName() << " (class name: " << x->GetClassName() << ")" << std::endl;
-      }
-      std::cout << "Watchers: " << watchers.size() << std::endl;
-      for (auto x : watchers) { 
         std::cout << "  " << x->GetName() << " (class name: " << x->GetClassName() << ")" << std::endl;
       }
     }
