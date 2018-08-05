@@ -14,7 +14,7 @@
 #include "genomes/LinearGenome.h"
 #include "environments/ResourceGrid.h"
 #include "schemas/TournamentSelect.h"
-#include "watchers/TrackLineage.h"
+#include "schemas/TrackLineage.h"
 
 int main(int argc, char * argv[]) {
   // Build the world using these types.
@@ -31,6 +31,9 @@ int main(int argc, char * argv[]) {
   // Configure the world using the "farm.cfg" file and command-line overrides.
   world.Config("forage.cfg", argc, argv);
   
+  // Get details on how the population is configured.
+  world.PrintStatus();
+
   // Running world will go for full configured duration; can also manually Update() it.
   return world.Run();
 }

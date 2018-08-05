@@ -10,14 +10,14 @@
 #ifndef MABE_TRACK_LINEAGE_H
 #define MABE_TRACK_LINEAGE_H
 
-#include "core/WatcherBase.h"
+#include "core/SchemaBase.h"
 
 namespace mabe {
 
-  class TrackLineage : public WatcherBase {
+  class TrackLineage : public SchemaBase {
   private:
   public:
-    TrackLineage(const std::string & name) : WatcherBase(name) { ; }
+    TrackLineage(const std::string & name) : SchemaBase(name) { ; }
 
     std::string GetClassName() const override { return "TrackLineage"; }
   };

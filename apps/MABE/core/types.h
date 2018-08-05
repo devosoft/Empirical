@@ -16,9 +16,9 @@
 #include "../core/ControllerBase.h"
 #include "../core/EnvironmentBase.h"
 #include "../core/GenomeBase.h"
+#include "../core/OrganismBase.h"
 #include "../core/OrganismTypeBase.h"
 #include "../core/SchemaBase.h"
-#include "../core/WatcherBase.h"
 
 namespace mabe {
   template <typename T> using is_module        = std::is_base_of<ModuleBase, T>;
@@ -29,12 +29,10 @@ namespace mabe {
   template <typename T> using is_environment   = std::is_base_of<EnvironmentBase, T>;
   template <typename T> using is_organism_type = std::is_base_of<OrganismTypeBase, T>;
   template <typename T> using is_schema        = std::is_base_of<SchemaBase, T>;
-  template <typename T> using is_watcher        = std::is_base_of<WatcherBase, T>;
 
   const EnvironmentBase & ToModule(const EnvironmentBase & module) { return module; }
   const OrganismTypeBase & ToModule(const OrganismTypeBase & module) { return module; }
   const SchemaBase & ToModule(const SchemaBase & module) { return module; }
-  const WatcherBase & ToModule(const WatcherBase & module) { return module; }
 
   template <typename T>
   using to_module_t = std::decay_t<decltype(ToModule(*((T*) nullptr)))>;
