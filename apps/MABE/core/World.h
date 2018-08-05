@@ -69,11 +69,12 @@ namespace mabe {
 
     template <typename T>
     T & BuildModule(const std::string name) {
-      using module_t = to_module_t<T>;
-      using mvector_t = emp::vector<emp::Ptr<module_t>>;
-      emp::Ptr<T> new_mod = emp::NewPtr<T>(name);
-      std::get<mvector_t>(modules).push_back(new_mod);
-      return *new_mod;
+      using module_t = to_module_t<T>;                   // Determine category type of module.
+      using mvector_t = emp::vector<emp::Ptr<module_t>>; // Determine vector type for category.
+      emp::Ptr<T> new_mod = emp::NewPtr<T>(name);        // Build the new module.
+      std::get<mvector_t>(modules).push_back(new_mod);   // Add new module to appropriate vector.
+      new_mod->SetupWorld(*this);                        // Allow module to setup world as needed.
+      return *new_mod;                                   // Return the final module.
     }
 
     void Config(const std::string & filename, int argc, char * argv[]) {
