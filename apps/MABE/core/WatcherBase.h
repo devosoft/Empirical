@@ -6,8 +6,8 @@
  *  @file  WatcherBase.h
  *  @brief Base class for all watchers in MABE
  *
- *  This file details all of the basic functionality that all warchers MUST have, providing
- *  reasonable defaults when such are possible.  Warchers are tools that monitor an evolving
+ *  This file details all of the basic functionality that all watchers MUST have, providing
+ *  reasonable defaults when such are possible.  Watchers are tools that monitor an evolving
  *  population (collecting data or performing analyses), but do not alter its progress.
  */
 

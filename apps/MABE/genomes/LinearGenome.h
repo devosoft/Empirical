@@ -19,7 +19,7 @@ namespace mabe {
   public:
     LinearGenome() { ; }
 
-    std::string GetClassName() const override { return "LinearGeneome"; }
+    std::string GetClassName() const override { return "LinearGenome"; }
   };
 
 }
