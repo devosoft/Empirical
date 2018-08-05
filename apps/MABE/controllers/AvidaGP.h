@@ -18,6 +18,8 @@ namespace mabe {
   private:
   public:
     AvidaGP() { ; }
+
+    std::string GetClassName() const override { return "AvidaGP"; }
   };
 
 }

@@ -18,6 +18,8 @@ namespace mabe {
   private:
   public:
     TournamentSelect(const std::string & name) : SchemaBase(name) { ; }
+
+    std::string GetClassName() const override { return "TournamentSelect"; }
   };
 
 }

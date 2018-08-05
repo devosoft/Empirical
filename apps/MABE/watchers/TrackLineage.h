@@ -18,6 +18,8 @@ namespace mabe {
   private:
   public:
     TrackLineage(const std::string & name) : WatcherBase(name) { ; }
+
+    std::string GetClassName() const override { return "TrackLineage"; }
   };
 
 }
