@@ -89,13 +89,21 @@ namespace mabe {
 
     void PrintStatus() {
       std::cout << "Environemnts: " << environments.size() << std::endl;
-      for (auto x : environments) std::cout << "  " << x->GetName() << std::endl;
+      for (auto x : environments) { 
+        std::cout << "  " << x->GetName() << " (class name: " << x->GetClassName() << ")" << std::endl;
+      }
       std::cout << "Organism Types: " << organism_types.size() << std::endl;
-      for (auto x : organism_types) std::cout << "  " << x->GetName() << std::endl;
+      for (auto x : organism_types) { 
+        std::cout << "  " << x->GetName() << " (class name: " << x->GetClassName() << ")" << std::endl;
+      }
       std::cout << "Schemas: " << schemas.size() << std::endl;
-      for (auto x : schemas) std::cout << "  " << x->GetName() << std::endl;
+      for (auto x : schemas) { 
+        std::cout << "  " << x->GetName() << " (class name: " << x->GetClassName() << ")" << std::endl;
+      }
       std::cout << "Watchers: " << watchers.size() << std::endl;
-      for (auto x : watchers) std::cout << "  " << x->GetName() << std::endl;
+      for (auto x : watchers) { 
+        std::cout << "  " << x->GetName() << " (class name: " << x->GetClassName() << ")" << std::endl;
+      }
     }
   };
 
