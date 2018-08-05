@@ -19,6 +19,8 @@ namespace mabe {
   public:
     GenomeBase() { ; }
     virtual ~GenomeBase() { ; }
+
+    virtual std::string GetClassName() const = 0;
   };
 
 }

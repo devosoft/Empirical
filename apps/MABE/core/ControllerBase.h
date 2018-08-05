@@ -19,6 +19,8 @@ namespace mabe {
   public:
     ControllerBase() { ; }
     virtual ~ControllerBase() { ; }
+
+    virtual std::string GetClassName() const = 0;
   };
 
 }
