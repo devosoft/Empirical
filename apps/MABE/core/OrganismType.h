@@ -14,11 +14,11 @@
 #define MABE_ORGANISM_TYPE_H
 
 #include "meta/TypePack.h"
+#include "tools/string_utils.h"
 
 #include "OrganismTypeBase.h"
 
 namespace mabe {
-
   template <typename... Ts>
   class OrganismType : public OrganismTypeBase {
   private:
@@ -29,10 +29,24 @@ namespace mabe {
     using genomes_tup_t     = typename genomes_t::template apply<std::tuple>;
     using controllers_tup_t = typename controllers_t::template apply<std::tuple>;
 
+    /// Collect the class names of internal modules.
+    template <typename T>
+    std::string GetModuleClassNames() const { T tmp_module; return tmp_module.GetClassName(); }
+    template <typename T1, typename T2, typename... EXTRA>
+    std::string GetModuleClassNames() const {
+      return emp::to_string( GetModuleClassNames<T1>(), ",", GetModuleClassNames<T2, EXTRA...>() );
+    }
+
     // @CAO: Some kind of switchboard should be established here for organism setup.
+
 
   public:
     OrganismType(const std::string & in_name) : OrganismTypeBase(in_name) { ; }    
+
+    /// Print out the name of this class, including template parameters (for debugging)
+    std::string GetClassName() const override {
+      return emp::to_string("OrganismType<", GetModuleClassNames<Ts...>(), ">");
+    }
   };
 
 }
