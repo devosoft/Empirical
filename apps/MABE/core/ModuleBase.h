@@ -15,7 +15,9 @@
  * 
  *  The author of a new MABE module *may* also choose to override:
  * 
- *    The distructor.
+ *    SetupWorld(World &)
+ *      As modules are created, they will be given the opportunity to either modify world settings
+ *      or attach to world signals, as needed.
  *    
  */
 
@@ -31,6 +33,9 @@ namespace mabe {
     NONE=0, BASE, ENVIRONMENT, ORGANISM_TYPE, SCHEMA, WATCHER, UNKNOWN
   };
 
+  /// Allow modules to know about the eventual existance for the world object.
+  class World;
+
   /// Base class for all major MABE modules that can receive names.
   class ModuleBase {
   private:
@@ -41,6 +46,7 @@ namespace mabe {
     virtual ~ModuleBase() { ; }  ///< Make sure all modules can be deleted properly.
 
     /// Identify the broad type of this module at compile time; ModuleType is enumerated above.
+    /// These should be taken care of in the base classes of modules and not needed in derived class
     static constexpr mabe::ModuleType GetModuleType() { return ModuleType::BASE; }
 
     /// Every module must have a unique name to identify its section of config files.
@@ -48,6 +54,9 @@ namespace mabe {
 
     /// Every module type needs to specify its derived class name as a string.
     virtual std::string GetClassName() const = 0;
+
+    /// At creation, modules will be provided with a World object to configure or use signalling.
+    virtual void SetupWorld(World &) { ; }
 
   };
 
