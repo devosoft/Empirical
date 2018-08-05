@@ -6,7 +6,7 @@
  *  @file  GenomeBase.h
  *  @brief Base class for all genome types.
  *
- *  Genomes are generic ways of representing controllers.
+ *  Genomes are generic ways of encoding Brains or other aspects of organisms.
  */
 
 #ifndef MABE_GENOME_BASE_H

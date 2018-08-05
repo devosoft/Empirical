@@ -4,17 +4,17 @@
  *  @date 2018
  *
  *  @file  AvidaGP.h
- *  @brief Contoller usng AvidaGP virtual CPU
+ *  @brief Brain usng AvidaGP virtual CPU
  */
 
 #ifndef MABE_AVIDA_GP_H
 #define MABE_AVIDA_GP_H
 
-#include "core/ControllerBase.h"
+#include "core/BrainBase.h"
 
 namespace mabe {
 
-  class AvidaGP : public ControllerBase {
+  class AvidaGP : public BrainBase {
   private:
   public:
     AvidaGP() { ; }

@@ -4,9 +4,9 @@
  *  @date 2018
  *
  *  @file  OrganismType.h
- *  @brief Template to construct organisms from controllers and genomes.
+ *  @brief Template to construct organisms from brains and genomes.
  *
- *  Organisms can be made directly -OR- be built using zero or more controllerts (brains) and
+ *  Organisms can be made directly -OR- be built using zero or more brains (controllers) and
  *  zero or more genomes.  An OrgaanismType template will automatically handle that assembly.
  */
 
@@ -24,10 +24,10 @@ namespace mabe {
   private:
     using modules_t = emp::TypePack<Ts...>;
     using genomes_t = typename modules_t::template filter<is_genome>;
-    using controllers_t = typename modules_t::template filter<is_controller>;
+    using brains_t = typename modules_t::template filter<is_brain>;
 
-    using genomes_tup_t     = typename genomes_t::template apply<std::tuple>;
-    using controllers_tup_t = typename controllers_t::template apply<std::tuple>;
+    using genomes_tup_t = typename genomes_t::template apply<std::tuple>;
+    using brains_tup_t  = typename brains_t::template apply<std::tuple>;
 
     /// Collect the class names of internal modules.
     template <typename T>

@@ -3,22 +3,22 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  ControllerBase.h
- *  @brief Base class for all controller types.
+ *  @file  BrainBase.h
+ *  @brief Base class for all brain types.
  *
- *  Controllers are generic forms of agent brains.
+ *  Brains are basic forms of agent contollers.
  */
 
-#ifndef MABE_CONTROLLER_BASE_H
-#define MABE_CONTROLLER_BASE_H
+#ifndef MABE_BRAIN_BASE_H
+#define MABE_BRAIN_BASE_H
 
 namespace mabe {
 
-  class ControllerBase {
+  class BrainBase {
   private:
   public:
-    ControllerBase() { ; }
-    virtual ~ControllerBase() { ; }
+    BrainBase() { ; }
+    virtual ~BrainBase() { ; }
 
     virtual std::string GetClassName() const = 0;
   };

@@ -10,7 +10,7 @@
 #include "../core/World.h"
 #include "../core/OrganismType.h"
 
-#include "controllers/AvidaGP.h"
+#include "brains/AvidaGP.h"
 #include "genomes/LinearGenome.h"
 #include "environments/ResourceGrid.h"
 #include "schemas/TournamentSelect.h"
