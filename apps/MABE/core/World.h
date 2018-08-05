@@ -27,13 +27,25 @@
 namespace mabe {
 
   class World {
+  public:
+    using value_type = OrganismBase;   // For compatability with vectors.
+    using org_t = OrganismBase;
+    using org_ptr_t = emp::Ptr<org_t>;
+
   private:
+    /// Function type for calculating fitness, typically set by the environment.
+    using fun_calc_fitness_t    = std::function<double(OrganismBase&)>;
+
+
     using environments_t = emp::vector<emp::Ptr<EnvironmentBase>>;
     using organism_types_t = emp::vector<emp::Ptr<OrganismTypeBase>>;
     using schemas_t = emp::vector<emp::Ptr<SchemaBase>>;
     using watchers_t = emp::vector<emp::Ptr<WatcherBase>>;
 
     using modules_t = std::tuple<environments_t, organism_types_t, schemas_t, watchers_t>;
+
+
+    // ----- World MODULES -----
 
     modules_t modules;    ///< Pointers to all modules, divided into module-type vectors.
 
@@ -53,6 +65,15 @@ namespace mabe {
       for (emp::Ptr<ModuleBase> x : schemas)         { fun(x); }
       for (emp::Ptr<ModuleBase> x : watchers)        { fun(x); }
     }
+
+
+    // ----- World STATE -----
+    size_t update;                    ///< How many times has Update() been called?
+    emp::Ptr<emp::Random> random_ptr; ///< Random object to use.
+    bool random_owner;                ///< Did we create our own random number generator?
+    //WorldVector pops;                 ///< Set of active [0] and "next" [1] orgs in population.
+    size_t num_orgs;                  ///< How many organisms are actually in the population.
+    emp::vector<double> fit_cache;    ///< vector size==0 when not caching; uncached values==0.0
 
   public:
     World()
