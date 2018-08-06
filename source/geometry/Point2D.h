@@ -15,6 +15,8 @@
 #include <cmath>
 #include <iostream>
 
+#include "../tools/math.h"
+
 namespace emp {
 
   template <typename TYPE=double> class Point2D {
