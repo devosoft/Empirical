@@ -516,21 +516,40 @@ namespace emp {
 
         std::string command = emp::string_pop_word(cur_line);
 
-        if (command == "include") {
-          // Recursively include another configuration file.
+        if (command == "set") {
+          // Set a specific value.
+          std::string setting_name = emp::string_pop_word(cur_line);
+          Set(setting_name, cur_line);
+        }
+        else if (command == "include") {
+          // Determine the filename to include.
           std::string filename = emp::string_pop_word(cur_line);
+
+          // Process the new file (before automatically coming back to this one)
           Read(filename);
+        }
+        else if (command == "namespace") {
+          std::string namespace_name = emp::string_pop_word(cur_line);
+          if (cur_line.size() > 0) {
+            warnings << "namespace " << namespace_name
+                     << " cannot have additional arguments.  Ignoring.\n";
+          }
+          // @CAO Make sure this is a legal namespace!
+          ConfigBase * ns_config = namespace_map[namespace_name];
+          ns_config->Read(input, namespace_name);
+        }
+        else if (command == "end_namespace") {
+          std::string namespace_name = emp::string_pop_word(cur_line);
+          // @CAO Make sure remainder of line is a single identifier.
+          // @CAO Make sure we are ending the current namespace!
+          if (namespace_name != cur_namespace); // @CAO ERROR!
+          return true;
         }
         else if (command == "new") {
           std::string type_name = emp::string_pop_word(cur_line);
           // @CAO Make sure type exists!
           // @CAO Make sure remainder of line is a single identifier.
           new_map[type_name](cur_line);
-        }
-        else if (command == "set") {
-          // Set a specific value.
-          std::string setting_name = emp::string_pop_word(cur_line);
-          Set(setting_name, cur_line);
         }
         else if (command == "use") {
           std::string type_name = emp::string_pop_word(cur_line);
