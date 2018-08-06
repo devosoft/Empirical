@@ -30,7 +30,7 @@ namespace mabe {
 
   /// Track the specific type associated with a module.
   enum class ModuleType {
-    NONE=0, BASE, ENVIRONMENT, ORGANISM_TYPE, SCHEMA, WATCHER, UNKNOWN
+    NONE=0, BASE, ENVIRONMENT, ORGANISM_TYPE, SCHEMA, UNKNOWN
   };
 
   /// Allow modules to know about the eventual existance for the world object.
