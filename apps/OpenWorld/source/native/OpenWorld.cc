@@ -21,6 +21,8 @@ int main(int argc, char* argv[])
 
   for (size_t ud = 0; ud < config.MAX_GENS(); ud++) {
     world.Update();
-    std::cout << "UD: " << ud << std::endl;
+    std::cout << "UD: " << ud
+              << "  NumOrgs=" << world.GetNumOrgs()
+              << std::endl;
   }
 }

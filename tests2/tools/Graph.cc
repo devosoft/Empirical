@@ -35,4 +35,6 @@ void emp_test_main()
   // Both graphs should be back to zero edges
   EMP_TEST_VALUE(graph.GetEdgeCount(), 0);
   EMP_TEST_VALUE(graph2.GetEdgeCount(), 0);
+
+  emp::WeightedGraph graph3(1);
 }

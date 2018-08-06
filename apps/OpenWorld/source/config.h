@@ -20,7 +20,7 @@ EMP_BUILD_CONFIG( OpenWorldConfig,
   VALUE(INIT_ENERGY, double, 100.0, "How much energy should organisms start with?"),  
   VALUE(MAX_ENERGY_RATIO, double, 1.0, "Maximum energy that an organism can carry, based on size."),
   VALUE(MAX_SPEED_RATIO, double, 1.0, "Maximum speed that an organism can reach, based on size."),
-  VALUE(NUM_RESOURCE_SOURCES, size_t, 10, "How many sources of resouces should there be?"),
+  VALUE(NUM_RESOURCE_SOURCES, size_t, 100, "How many sources of resouces should there be?"),
   VALUE(RESOURCE_PATCH_SIZE, double, 10.0, "How large should each resource patch be?"),
 
   GROUP(MUTATIONS, "Various mutation rates for SignalGP Brains"),
