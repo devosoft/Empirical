@@ -108,14 +108,8 @@ namespace emp {
     virtual bool IsConst() const = 0;
   };
 
-  /// A base class for Config objects to allow them to call one another without knowing var types.
-  class ConfigBase {
-  public:
-    virtual bool Read(std::istream & input, const std::string & cur_namespace="") = 0;
-  };
-
   /// Master configuration class that manages all of the settings.
-  class Config : public ConfigBase {
+  class Config {
   protected:
 
     /// Type-specific versions of ConfigEntry class to manage settings.
@@ -354,7 +348,7 @@ namespace emp {
     std::map<std::string, std::string> alias_map;   // Map all aliases to original name.
 
     // Map namespaces to the appropriate config object.
-    std::map<std::string, ConfigBase *> namespace_map;
+    std::map<std::string, Config *> namespace_map;
 
     // Map new type names to the manager that handles them.
     std::map<std::string, ConfigManager_Base *> type_manager_map;
@@ -539,7 +533,7 @@ namespace emp {
             emp::NotifyError(emp::to_string("Unknown namespace '", namespace_name, "'.  Aborting."));
             return false;
           }
-          ConfigBase * ns_config = namespace_map[namespace_name];
+          Config * ns_config = namespace_map[namespace_name];
           ns_config->Read(input, namespace_name);
         }
         else if (command == "end_namespace") {
@@ -605,7 +599,7 @@ namespace emp {
       return success;
     }
 
-    void AddNameSpace(const std::string & namespace_name, ConfigBase & config) {
+    void AddNameSpace(const std::string & namespace_name, Config & config) {
       namespace_map[namespace_name] = &config;
     }
 
