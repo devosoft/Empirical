@@ -31,7 +31,7 @@
  *   include OTHER_FILENAME         -- Load in all data from another file.
  *   set SETTING_NAME VALUE         -- Set a basic configuration setting.
  *   new OBJECT_TYPE OBJECT_NAME    -- Create a new config object of a managed class.
- *   use OBJECT_TYPE OBJECT_NAME    -- Use a previouly create configuration object.
+ *   use OBJECT_TYPE OBJECT_NAME    -- Use a previouly created configuration object.
  */
 
 #ifndef EMP_CONFIG_H
@@ -49,6 +49,7 @@
 #include "../base/errors.h"
 #include "../base/vector.h"
 #include "../tools/functions.h"
+#include "../tools/map_utils.h"
 #include "../tools/string_utils.h"
 #include "ConfigManager.h"
 
@@ -534,21 +535,34 @@ namespace emp {
             warnings << "namespace " << namespace_name
                      << " cannot have additional arguments.  Ignoring.\n";
           }
-          // @CAO Make sure this is a legal namespace!
+          if (emp::Has(namespace_map, namespace_name) == false) {
+            emp::NotifyError(emp::to_string("Unknown namespace '", namespace_name, "'.  Aborting."));
+            return false;
+          }
           ConfigBase * ns_config = namespace_map[namespace_name];
           ns_config->Read(input, namespace_name);
         }
         else if (command == "end_namespace") {
           std::string namespace_name = emp::string_pop_word(cur_line);
-          // @CAO Make sure remainder of line is a single identifier.
-          // @CAO Make sure we are ending the current namespace!
-          if (namespace_name != cur_namespace); // @CAO ERROR!
+          if (cur_line.size() > 0) {
+            warnings << "end_namespace " << namespace_name
+                     << " cannot have additional arguments.  Ignoring.\n";
+          }
+          if (namespace_name != cur_namespace) {
+            emp::NotifyError(emp::to_string("Cannot end namespace '", namespace_name,
+                                            "' while in namespace '", cur_namespace, "'.  Aborting."));
+            return false;
+          }
           return true;
         }
         else if (command == "new") {
           std::string type_name = emp::string_pop_word(cur_line);
-          // @CAO Make sure type exists!
-          // @CAO Make sure remainder of line is a single identifier.
+          if (emp::Has(new_map, type_name) == false) {
+            emp::NotifyError(emp::to_string("Command 'new' failede: Unknown type '",
+                                            type_name, "'.  Aborting."));
+            return false;
+          }
+          // @CAO Make sure remainder of line is a single identifier?
           new_map[type_name](cur_line);
         }
         else if (command == "use") {
@@ -621,7 +635,7 @@ namespace emp {
 
     void AddUseCallback(const std::string & type_name, std::function<bool(std::string)> use_fun) {
       // Give a warning if we are re-defining an existing command.
-      if (use_map.find(type_name) != use_map.end()) {
+      if (emp::Has(use_map, type_name)) {
         warnings << "Re-defining config type '" << type_name << "'. Allowing." << std::endl;
         if (!delay_warnings) {
           emp::NotifyWarning(warnings.str());
