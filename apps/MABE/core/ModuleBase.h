@@ -13,6 +13,9 @@
  *    const std::string & GetClassName() const
  *      Provide a unique name for module class, usually the same as in code (used for debugging).
  * 
+ *    emp::Config & GetConfig()
+ *      Provide access to this modules configuation file needs.
+ * 
  *  The author of a new MABE module *may* also choose to override:
  * 
  *    SetupWorld(World &)
@@ -25,6 +28,7 @@
 #define MABE_MODULE_BASE_H
 
 #include <string>
+#include "config/config.h"
 
 namespace mabe {
 
@@ -54,6 +58,10 @@ namespace mabe {
 
     /// Every module type needs to specify its derived class name as a string.
     virtual std::string GetClassName() const = 0;
+
+    /// Every module type needs to be able to provide the config object that it's using.
+    /// (and empty emp::Config can be returned if there really are no config parameters.)
+    virtual emp::Config & GetConfig() = 0;
 
     /// At creation, modules will be provided with a World object to configure or use signalling.
     virtual void SetupWorld(World &) { ; }
