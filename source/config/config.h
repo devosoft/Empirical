@@ -52,9 +52,8 @@
 #include "../tools/string_utils.h"
 #include "ConfigManager.h"
 
-using namespace std::placeholders;
-
 namespace emp {
+  using namespace std::placeholders;
 
   /// Base class for all configuration settings.
   class ConfigEntry {
@@ -108,9 +107,14 @@ namespace emp {
     virtual bool IsConst() const = 0;
   };
 
+  /// A base class for Config objects to allow them to call one another without knowing var types.
+  class ConfigBase {
+  public:
+    virtual bool Read(std::istream & input, const std::string & cur_namespace="") = 0;
+  };
 
   /// Master configuration class that manages all of the settings.
-  class Config {
+  class Config : public ConfigBase {
   protected:
 
     /// Type-specific versions of ConfigEntry class to manage settings.
@@ -348,6 +352,9 @@ namespace emp {
     int delay_warnings;                             // Count of delays to collect warnings for printing.
     std::map<std::string, std::string> alias_map;   // Map all aliases to original name.
 
+    // Map namespaces to the appropriate config object.
+    std::map<std::string, ConfigBase *> namespace_map;
+
     // Map new type names to the manager that handles them.
     std::map<std::string, ConfigManager_Base *> type_manager_map;
 
@@ -362,7 +369,7 @@ namespace emp {
   public:
     Config(const std::string & in_version = "")
       : class_names(), var_map(), version_id(in_version), group_set(), warnings()
-      , delay_warnings(0), alias_map(), type_manager_map(), command_map()
+      , delay_warnings(0), alias_map(), namespace_map(), type_manager_map(), command_map()
       , new_map(), use_map(), expand_ok(true)
     {
       class_names.push_back("emp::Config");
@@ -495,7 +502,7 @@ namespace emp {
 
     /// Read in from a text representation (typically a file) to set the state of Config.
     /// Return success state.
-    bool Read(std::istream & input) {
+    bool Read(std::istream & input, const std::string & cur_namespace="") {
       // Load in the file one line at a time and process each line.
       std::string cur_line, extras;
       delay_warnings++;
@@ -565,6 +572,9 @@ namespace emp {
       return success;
     }
 
+    void AddNameSpace(const std::string & namespace_name, ConfigBase & config) {
+      namespace_map[namespace_name] = &config;
+    }
 
     void AddCommand(const std::string & command_name, std::function<bool(std::string)> command_fun) {
       // Give a warning if we are re-defining an existing command.
