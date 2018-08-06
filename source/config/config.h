@@ -215,6 +215,7 @@ namespace emp {
           if (max_length < setting_info[i].size()) max_length = setting_info[i].size();
         }
 
+        // Loop through a second time to actually do the printing with properly spaced comments.
         max_length += 2;
         for (size_t i = 0; i < entry_count; i++) {
           out << setting_info[i];
@@ -439,6 +440,14 @@ namespace emp {
       for (auto it = group_set.begin(); it != group_set.end(); it++) {
         (*it)->Write(out);
       }
+
+      // Next, loop through all internal namespaces and print them out.
+      for (auto & x : namespace_map) {
+        out << "############################################################\n";
+        out << "namespace " << x.first << "\n\n";
+        x.second->Write(out);
+        out << "end_namespace " << x.first << "\n";
+      }
     }
 
     // If a string is passed into Write, treat it as a filename.
@@ -599,7 +608,7 @@ namespace emp {
       return success;
     }
 
-    void AddNameSpace(const std::string & namespace_name, Config & config) {
+    void AddNameSpace(Config & config, const std::string & namespace_name) {
       namespace_map[namespace_name] = &config;
     }
 
