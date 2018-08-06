@@ -29,6 +29,10 @@ namespace mabe {
     using genomes_tup_t = typename genomes_t::template apply<std::tuple>;
     using brains_tup_t  = typename brains_t::template apply<std::tuple>;
 
+    /// The configuration object for organisms is a set of namespaces for its components.
+    // @CAO: Setup these namespaces!
+    emp::Config config;
+
     /// Collect the class names of internal modules.
     template <typename T>
     std::string GetModuleClassNames() const { T tmp_module; return tmp_module.GetClassName(); }
@@ -47,6 +51,9 @@ namespace mabe {
     std::string GetClassName() const override {
       return emp::to_string("OrganismType<", GetModuleClassNames<Ts...>(), ">");
     }
+
+    /// Required accessor for configuration objects.
+    emp::Config & GetConfig() override { return config; }
   };
 
 }

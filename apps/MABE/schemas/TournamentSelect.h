@@ -16,10 +16,20 @@ namespace mabe {
 
   class TournamentSelect : public SchemaBase {
   private:
+    EMP_BUILD_CONFIG( TSConfig,
+      GROUP(DEFAULT_GROUP, "Tournament Selection Settings"),
+      VALUE(TOURNAMENT_SIZE, size_t, 4, "Number of individuals chosen for each tournament."),
+      VALUE(BIRTHS_PER_GENERATION, size_t, 500, "Number of tournaments to run each generation."),
+    )  
+
+    TSConfig config;
   public:
     TournamentSelect(const std::string & name) : SchemaBase(name) { ; }
 
     std::string GetClassName() const override { return "TournamentSelect"; }
+
+    /// Required accessor for configuration objects.
+    emp::Config & GetConfig() override { return config; }
   };
 
 }
