@@ -78,18 +78,20 @@ namespace emp {
         }
       }
 
-      // Test Unknown sees if there are any unprocessed arguments, and if so, gives and error.
-      // Return bool for "should program proceed" (i.e., true=continue, false=exit).
-      bool TestUnknown(std::ostream & os=std::cerr) const {
+      /// Test if there are any unprocessed arguments, and if so, output an error.
+      bool HasUnknown(std::ostream & os=std::cerr) const {
         if (args.size() > 1) {
           os << "Unknown args:";
           for (size_t i = 1; i < args.size(); i++) os << " " << args[i];
           os << std::endl;
           PrintHelp(os);
-          return false;
+          return true;
         }
-        return true;
+        return false;
       }
+
+      /// Leaving TestUnknown for backward compatability; returns opposite of HasUnknown().
+      bool TestUnknown(std::ostream & os=std::cerr) const { return !HasUnknown(os); }
 
       // ProcessConfigOptions converts settings from a configure object to command-line arguments.
       // Return bool for "should program proceed" (i.e., true=continue, false=exit).
