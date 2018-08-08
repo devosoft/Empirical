@@ -19,6 +19,8 @@
 
 #include "base/Ptr.h"
 #include "base/vector.h"
+#include "config/ArgManager.h"
+#include "config/config.h"
 #include "control/Signal.h"
 #include "control/SignalControl.h"
 #include "data/DataFile.h"
@@ -43,21 +45,28 @@ namespace mabe {
     /// Function type for calculating fitness, typically set by the environment.
     using fun_calc_fitness_t    = std::function<double(OrganismBase&)>;
 
+    using environments_t = emp::vector<emp::Ptr<EnvironmentBase>>;    ///< Type of vector of all Environments
+    using organism_types_t = emp::vector<emp::Ptr<OrganismTypeBase>>; ///< Type of vector of all OrganismTypes
+    using schemas_t = emp::vector<emp::Ptr<SchemaBase>>;              ///< Type of vector of all Schemas
 
-    using environments_t = emp::vector<emp::Ptr<EnvironmentBase>>;
-    using organism_types_t = emp::vector<emp::Ptr<OrganismTypeBase>>;
-    using schemas_t = emp::vector<emp::Ptr<SchemaBase>>;
-
+    /// Type of tuple of all modules to be built in the world.
     using modules_t = std::tuple<environments_t, organism_types_t, schemas_t>;
 
+    /// Type of master World config file.
+    EMP_BUILD_CONFIG( config_t,
+      GROUP(DEFAULT_GROUP, "Master World Settings"),
+      VALUE(RANDOM_SEED, int, 0, "Seed for main random number generator. Use 0 for based on time."),
+    )  
 
     // ----- World MODULES -----
 
-    modules_t modules;    ///< Pointers to all modules, divided into module-type vectors.
+    modules_t modules;    ///< Pointers to all modules, divided into tuple of type-specific vectors.
 
     environments_t & environments;     ///< Direct link to environments vector of modules. 
     organism_types_t & organism_types; ///< Direct link to organism types vector of modules. 
     schemas_t & schemas;               ///< Direct link to schemas vector of modules. 
+
+    config_t config;                   ///< Master configuration object.
 
     void AddModule(emp::Ptr<EnvironmentBase> env_ptr) { environments.push_back(env_ptr); }
     void AddModule(emp::Ptr<OrganismTypeBase> pop_ptr) { organism_types.push_back(pop_ptr); }
@@ -262,18 +271,24 @@ namespace mabe {
       using mvector_t = emp::vector<emp::Ptr<module_t>>; // Determine vector type for category.
       emp::Ptr<T> new_mod = emp::NewPtr<T>(name);        // Build the new module.
       std::get<mvector_t>(modules).push_back(new_mod);   // Add new module to appropriate vector.
+      config.AddNameSpace(new_mod->GetConfig(), name);   // Setup this module's config in a namespace.
       return *new_mod;                                   // Return the final module.
     }
 
-    void Config(const std::string & filename, int argc, char * argv[]) {
-      (void) filename;
-      (void) argc;
-      (void) argv;
-      // @CAO Load in all config files.
-      // @CAO Setup config for world (including RNG with seed so it can be used elsewhere)
+    bool Config(int argc, char * argv[], const std::string & filename,
+                const std::string & macro_filename="") {
+      config.Read(filename, false);
+      auto args = emp::cl::ArgManager(argc, argv);
+      bool config_ok = args.ProcessConfigOptions(config, std::cout, filename, macro_filename);
+      if (!config_ok || args.HasUnknown()) return false;  // If there are leftover args, fail!
+
+      // Setup World with Config options.
+      random.ResetSeed(config.RANDOM_SEED());
 
       // Now that all of the modules have been configured, allow them to setup the world.
       ForEachModule( [this](emp::Ptr<ModuleBase> x){ x->SetupWorld(*this); } );
+
+      return true;
     }
     
     int Run() {
