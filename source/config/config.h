@@ -443,7 +443,7 @@ namespace emp {
 
       // Next, loop through all internal namespaces and print them out.
       for (auto & x : namespace_map) {
-        out << "############################################################\n";
+        out << "\n############################################################\n";
         out << "namespace " << x.first << "\n\n";
         x.second->Write(out);
         out << "end_namespace " << x.first << "\n";
