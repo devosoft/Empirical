@@ -20,7 +20,7 @@ int main(int argc, char * argv[]) {
 
   using org_t = mabe::OrganismType<mabe::VectorGenome<bool>, mabe::VectorGenome<int>>;
   auto & org_type       = world.BuildModule<org_t>("Organisms");
-  org_type.GetGenome<1>().SetName("GenePositions");
+  org_type.GetGenomeType<1>().SetName("GenePositions");
 
   auto & landscape      = world.BuildModule<mabe::NKLandscape>("NKLandscape");
   auto & tourny_schema  = world.BuildModule<mabe::TournamentSelect>("TournamentSelect");
