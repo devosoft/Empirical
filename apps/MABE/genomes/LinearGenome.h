@@ -20,6 +20,10 @@ namespace mabe {
     LinearGenome() { ; }
 
     std::string GetClassName() const override { return "LinearGenome"; }
+
+    struct data_t {
+      emp::vector<unsigned char> data;
+    };
   };
 
 }

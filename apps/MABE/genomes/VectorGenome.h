@@ -18,12 +18,14 @@ namespace mabe {
 
   template <typename T>
   class VectorGenome : public GenomeBase {
-  private:
-    emp::vector<T> data;
   public:
     VectorGenome() { ; }
 
     std::string GetClassName() const override { return "VectorGenome"; }
+
+    struct data_t {
+      emp::vector<T> data;
+    };
   };
 
 }
