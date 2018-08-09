@@ -20,6 +20,9 @@ namespace mabe {
     AvidaGP() { ; }
 
     std::string GetClassName() const override { return "AvidaGP"; }
+
+    struct compute_t {
+    };
   };
 
 }
