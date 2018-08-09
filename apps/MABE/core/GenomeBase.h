@@ -6,21 +6,30 @@
  *  @file  GenomeBase.h
  *  @brief Base class for all genome types.
  *
- *  Genomes are generic ways of encoding Brains or other aspects of organisms.
+ *  Genomes are generic ways of encoding info for Brains or other aspects of organisms.
+ *
+ *  Each derived genome class much have a data_t type indicating a struct with the set of
+ *  information it needs to store in organisms.
  */
 
 #ifndef MABE_GENOME_BASE_H
 #define MABE_GENOME_BASE_H
 
+#include <string>
+
 namespace mabe {
 
   class GenomeBase {
   private:
+    std::string name;
   public:
     GenomeBase() { ; }
     virtual ~GenomeBase() { ; }
 
     virtual std::string GetClassName() const = 0;
+
+    const std::string & GetName() { return name; }
+    void SetName(const std::string & in_name) { name = in_name; }
   };
 
 }
