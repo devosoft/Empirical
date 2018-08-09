@@ -32,7 +32,7 @@ namespace mabe {
     std::string GetClassName() const override { return "ResourceGrid"; }
 
     /// Required accessor for configuration objects.
-    emp::Config & GetConfig() override { return config; }
+    RGConfig & GetConfig() override { return config; }
   };
 
 }
