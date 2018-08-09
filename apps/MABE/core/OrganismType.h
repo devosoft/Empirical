@@ -23,15 +23,34 @@ namespace mabe {
   class OrganismType : public OrganismTypeBase {
   private:
     using modules_t = emp::TypePack<Ts...>;
-    using genomes_t = typename modules_t::template filter<is_genome>;
-    using brains_t = typename modules_t::template filter<is_brain>;
 
+    using genomes_t = typename modules_t::template filter<is_genome>;
     using genomes_tup_t = typename genomes_t::template apply<std::tuple>;
+    template <typename T> using to_data = typename T::data_t;
+    using genomes_data_t = typename genomes_t::template wrap<to_data>;
+    using data_tup_t = typename genomes_data_t::template apply<std::tuple>;
+
+    using brains_t = typename modules_t::template filter<is_brain>;
     using brains_tup_t  = typename brains_t::template apply<std::tuple>;
+    template <typename T> using to_compute = typename T::compute_t;
+    using brains_compute_t = typename brains_t::template wrap<to_compute>;
+    using compute_tup_t  = typename brains_compute_t::template apply<std::tuple>;
+
+    genomes_tup_t genome_types;
+    brains_tup_t brain_types;
 
     /// The configuration object for organisms is a set of namespaces for its components.
     // @CAO: Setup these namespaces!
     emp::Config config;
+
+    class Organism : public OrganismBase {
+    private:
+      data_tup_t genomes;
+      compute_tup_t brains;
+    public:
+      template<int ID> auto & GetGenome() { return std::get<ID>(genomes); }
+      template<int ID> auto & GetBrain() { return std::get<ID>(brains); }
+    };
 
     /// Collect the class names of internal modules.
     template <typename T>
@@ -54,6 +73,14 @@ namespace mabe {
 
     /// Required accessor for configuration objects.
     emp::Config & GetConfig() override { return config; }
+
+    /// Access a specific genome 
+    template<int ID>
+    auto & GetGenomeType() { return std::get<ID>(genome_types); }
+
+    template<int ID>
+    auto & GetBrainType() { return std::get<ID>(brain_types); }
+
   };
 
 }
