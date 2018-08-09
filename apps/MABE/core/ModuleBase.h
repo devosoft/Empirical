@@ -18,9 +18,9 @@
  * 
  *  The author of a new MABE module *may* also choose to override:
  * 
- *    SetupWorld(World &)
- *      As modules are created, they will be given the opportunity to either modify world settings
- *      or attach to world signals, as needed.
+ *    Setup(World &)
+ *      As modules are created, they will be given the opportunity to modify world settings,
+ *      module settings, or attach to world signals, as needed.
  *    
  */
 
@@ -63,8 +63,9 @@ namespace mabe {
     /// (and empty emp::Config can be returned if there really are no config parameters.)
     virtual emp::Config & GetConfig() = 0;
 
-    /// At creation, modules will be provided with a World object to configure or use signalling.
-    virtual void SetupWorld(World &) { ; }
+    /// After config is finalized, modules will be provided with a World object.  This function
+    /// should be used to configure world, to configure the module, or link up signals.
+    virtual void Setup(World &) { ; }
 
   };
 
