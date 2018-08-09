@@ -286,7 +286,7 @@ namespace mabe {
       random.ResetSeed(config.RANDOM_SEED());
 
       // Now that all of the modules have been configured, allow them to setup the world.
-      ForEachModule( [this](emp::Ptr<ModuleBase> x){ x->SetupWorld(*this); } );
+      ForEachModule( [this](emp::Ptr<ModuleBase> x){ x->Setup(*this); } );
 
       return true;
     }
