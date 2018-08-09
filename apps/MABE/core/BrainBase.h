@@ -16,11 +16,15 @@ namespace mabe {
 
   class BrainBase {
   private:
+    std::string name;
   public:
     BrainBase() { ; }
     virtual ~BrainBase() { ; }
 
     virtual std::string GetClassName() const = 0;
+
+    const std::string & GetName() { return name; }
+    void SetName(const std::string & in_name) { name = in_name; }
   };
 
 }
