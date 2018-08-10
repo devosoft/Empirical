@@ -34,6 +34,12 @@ namespace emp {
     /// A generic form of the function call operator; use arg types to determine derived form.
     template <typename RETURN, typename... Ts> auto Call(Ts &&... args);
 
+    /// Test if a function call will succeed before trying it.
+    template <typename RETURN, typename... Ts> bool CallOK(Ts &&...);
+
+    /// Test if a function call will succeed before trying it, based only on types.
+    template <typename RETURN, typename... Ts> bool CallTypeOK();
+
     /// A generic form of the function call operator; use arg types to determine derived form.
     template <typename RETURN, typename... Ts> auto operator()(Ts &&... args) {
       return Call<RETURN, Ts...>( std::forward<Ts>(args)... );
@@ -73,6 +79,18 @@ namespace emp {
 
     fun_t * fun = (fun_t *) this;
     return fun->Call( std::forward<Ts>(args)... );
+  }
+
+  template <typename RETURN, typename... Ts>
+  bool GenericFunction::CallOK(Ts &&...) {
+    using fun_t = Function<RETURN(Ts...)>;
+    return dynamic_cast<fun_t *>(this);    
+  }
+
+  template <typename RETURN, typename... Ts>
+  bool GenericFunction::CallTypeOK() {
+    using fun_t = Function<RETURN(Ts...)>;
+    return dynamic_cast<fun_t *>(this);    
   }
 
   template <typename T> auto GenericFunction::Convert() {
