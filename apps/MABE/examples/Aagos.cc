@@ -18,14 +18,22 @@ int main(int argc, char * argv[]) {
   // Build the world using these types.
   mabe::World world("AagosWorld");
 
-  using org_t = mabe::OrganismType<mabe::VectorGenome<bool>, mabe::VectorGenome<int>>;
-  auto & org_type       = world.BuildModule<org_t>("Organisms");
+  using org_type_t = mabe::OrganismType<mabe::VectorGenome<bool>, mabe::VectorGenome<int>>;
+  using org_t = org_type_t::Organism;
+
+  auto & org_type       = world.BuildModule<org_type_t>("Organisms");
   org_type.GetGenomeType<1>().SetName("GenePositions");
 
   auto & landscape      = world.BuildModule<mabe::NKLandscape>("NKLandscape");
   auto & tourny_schema  = world.BuildModule<mabe::TournamentSelect>("TournamentSelect");
 
-  (void) org_type; (void) landscape; (void) tourny_schema;
+  auto fit_fun = [&landscape](mabe::Organism & base_org){
+    org_t & org = (org_t &) base_org;
+    (void) org;
+    (void) landscape;
+    return 1.0;
+  };
+  tourny_schema.SetFitFun(fit_fun);
 
   // Configure the world using the "Aagos.cfg" file and command-line overrides.
   world.Config(argc, argv, "Aagos.cfg");
