@@ -43,15 +43,6 @@ namespace mabe {
     // @CAO: Setup these namespaces!
     emp::Config config;
 
-    class Organism : public OrganismBase {
-    private:
-      data_tup_t genomes;
-      compute_tup_t brains;
-    public:
-      template<int ID> auto & GetGenome() { return std::get<ID>(genomes); }
-      template<int ID> auto & GetBrain() { return std::get<ID>(brains); }
-    };
-
     /// Collect the class names of internal modules.
     template <typename T>
     std::string GetModuleClassNames() const { T tmp_module; return tmp_module.GetClassName(); }
@@ -65,6 +56,15 @@ namespace mabe {
 
   public:
     OrganismType(const std::string & in_name) : OrganismTypeBase(in_name) { ; }    
+
+    class Organism : public OrganismBase {
+    private:
+      data_tup_t genomes;
+      compute_tup_t brains;
+    public:
+      template<int ID> auto & GetGenome() { return std::get<ID>(genomes); }
+      template<int ID> auto & GetBrain() { return std::get<ID>(brains); }
+    };
 
     /// Print out the name of this class, including template parameters (for debugging)
     std::string GetClassName() const override {
