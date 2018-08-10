@@ -4,10 +4,13 @@
  *  @date 2018
  *
  *  @file  OrganismTypeBase.h
- *  @brief Base class for all Organsim types in MABE; describes how organism functions.
+ *  @brief Base class for all Organsim Types in MABE; describes how organism functions.
  *
  *  This file details all of the basic functionality that all organisms MUST have, providing
  *  reasonable defaults when such are possible.
+ * 
+ *  Every organism type must define an internal type 'Organism' that determines the type of each
+ *  individual org.
  */
 
 #ifndef MABE_ORGANISM_TYPE_BASE_H
