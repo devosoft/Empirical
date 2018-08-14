@@ -20,6 +20,7 @@
 
 #include "base/Ptr.h"
 #include "base/vector.h"
+#include "tools/GenericFunction.h"
 
 #include "ModuleBase.h"
 
@@ -27,13 +28,7 @@ namespace mabe {
 
   class OrganismTypeBase : public ModuleBase {
   protected:
-    struct FunctionBase { template <typename T> auto Convert(); };
-    template <typename T> struct Function : public FunctionBase {
-      std::function<T> fun;
-      Function(std::function<T> _fun) : fun(_fun) { ; }
-    };
-
-    using fun_ptr_t = emp::Ptr<FunctionBase>;
+    using fun_ptr_t = emp::Ptr<emp::GenericFunction>;
     using fun_vec_t = emp::vector<fun_ptr_t>;
     std::map< std::string, fun_vec_t > fun_map;
 
@@ -43,9 +38,6 @@ namespace mabe {
     static constexpr mabe::ModuleType GetModuleType() { return ModuleType::ORGANISM_TYPE; }
   };
 
-  template <typename T> auto OrganismTypeBase::FunctionBase::Convert() {
-    return (emp::Ptr<OrganismTypeBase::Function<T>>) dynamic_cast< OrganismTypeBase::Function<T> >(this);
-  }
 }
 
 #endif
