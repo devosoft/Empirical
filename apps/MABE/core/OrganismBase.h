@@ -13,11 +13,6 @@
 #ifndef MABE_ORGANISM_BASE_H
 #define MABE_ORGANISM_BASE_H
 
-#include <map>
-
-#include "base/Ptr.h"
-#include "base/vector.h"
-
 namespace mabe {
 
   class OrganismBase {
