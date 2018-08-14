@@ -56,7 +56,8 @@ namespace emp {
   template <typename RETURN, typename... PARAMS>
   class Function<RETURN(PARAMS...)> : public GenericFunction {
   protected:
-    std::function<RETURN(PARAMS...)> fun;  /// The std::function to be called.
+    using fun_t = std::function<RETURN(PARAMS...)>;
+    fun_t fun;  ///< The std::function to be called.
   public:
     /// Forward all args to std::function constructor...
     template <typename... Ts>
@@ -69,6 +70,9 @@ namespace emp {
     /// Forward all args to std::function call.
     template <typename... Ts>
     RETURN operator()(Ts &&... args) { return fun(std::forward<Ts>(args)...); }
+
+    /// Get the std::function to be called.
+    const fun_t & GetFunction() const { return fun; }
   };
 
   template <typename RETURN, typename... Ts>
