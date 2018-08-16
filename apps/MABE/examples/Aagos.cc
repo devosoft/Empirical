@@ -3,8 +3,8 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  Forage.cc
- *  @brief An example of building a MABE world where AvidaGP organisms evovle to forage.
+ *  @file  Aagos.cc
+ *  @brief An example of building a custom MABE world based on NK, but more specialized.
  */
 
 #include "../core/World.h"
@@ -27,7 +27,7 @@ int main(int argc, char * argv[]) {
   auto & landscape      = world.BuildModule<mabe::NKLandscape>("NKLandscape");
   auto & tourny_schema  = world.BuildModule<mabe::TournamentSelect>("TournamentSelect");
 
-  auto fit_fun = [&landscape](mabe::Organism & base_org){
+  auto fit_fun = [&landscape](mabe::OrganismBase & base_org){
     org_t & org = (org_t &) base_org;
     (void) org;
     (void) landscape;
