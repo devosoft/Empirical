@@ -23,6 +23,9 @@ namespace mabe {
     )  
 
     TSConfig config;
+
+    using fit_fun_t = std::function< double(mabe::OrganismBase &) >;
+    fit_fun_t fit_fun;
   public:
     TournamentSelect(const std::string & name) : SchemaBase(name) { ; }
 
@@ -30,6 +33,8 @@ namespace mabe {
 
     /// Required accessor for configuration objects.
     emp::Config & GetConfig() override { return config; }
+
+    void SetFitFun( fit_fun_t in_fun ) { fit_fun = in_fun; }
   };
 
 }
