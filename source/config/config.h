@@ -31,7 +31,7 @@
  *   include OTHER_FILENAME         -- Load in all data from another file.
  *   set SETTING_NAME VALUE         -- Set a basic configuration setting.
  *   new OBJECT_TYPE OBJECT_NAME    -- Create a new config object of a managed class.
- *   use OBJECT_TYPE OBJECT_NAME    -- Use a previouly create configuration object.
+ *   use OBJECT_TYPE OBJECT_NAME    -- Use a previouly created configuration object.
  */
 
 #ifndef EMP_CONFIG_H
@@ -49,12 +49,12 @@
 #include "../base/errors.h"
 #include "../base/vector.h"
 #include "../tools/functions.h"
+#include "../tools/map_utils.h"
 #include "../tools/string_utils.h"
 #include "ConfigManager.h"
 
-using namespace std::placeholders;
-
 namespace emp {
+  using namespace std::placeholders;
 
   /// Base class for all configuration settings.
   class ConfigEntry {
@@ -107,7 +107,6 @@ namespace emp {
     /// Identify if this setting is fixed at compile time.
     virtual bool IsConst() const = 0;
   };
-
 
   /// Master configuration class that manages all of the settings.
   class Config {
@@ -216,6 +215,7 @@ namespace emp {
           if (max_length < setting_info[i].size()) max_length = setting_info[i].size();
         }
 
+        // Loop through a second time to actually do the printing with properly spaced comments.
         max_length += 2;
         for (size_t i = 0; i < entry_count; i++) {
           out << setting_info[i];
@@ -348,6 +348,9 @@ namespace emp {
     int delay_warnings;                             // Count of delays to collect warnings for printing.
     std::map<std::string, std::string> alias_map;   // Map all aliases to original name.
 
+    // Map namespaces to the appropriate config object.
+    std::map<std::string, Config *> namespace_map;
+
     // Map new type names to the manager that handles them.
     std::map<std::string, ConfigManager_Base *> type_manager_map;
 
@@ -362,7 +365,7 @@ namespace emp {
   public:
     Config(const std::string & in_version = "")
       : class_names(), var_map(), version_id(in_version), group_set(), warnings()
-      , delay_warnings(0), alias_map(), type_manager_map(), command_map()
+      , delay_warnings(0), alias_map(), namespace_map(), type_manager_map(), command_map()
       , new_map(), use_map(), expand_ok(true)
     {
       class_names.push_back("emp::Config");
@@ -437,6 +440,14 @@ namespace emp {
       for (auto it = group_set.begin(); it != group_set.end(); it++) {
         (*it)->Write(out);
       }
+
+      // Next, loop through all internal namespaces and print them out.
+      for (auto & x : namespace_map) {
+        out << "\n############################################################\n";
+        out << "namespace " << x.first << "\n\n";
+        x.second->Write(out);
+        out << "end_namespace " << x.first << "\n";
+      }
     }
 
     // If a string is passed into Write, treat it as a filename.
@@ -495,7 +506,7 @@ namespace emp {
 
     /// Read in from a text representation (typically a file) to set the state of Config.
     /// Return success state.
-    bool Read(std::istream & input) {
+    bool Read(std::istream & input, const std::string & cur_namespace="") {
       // Load in the file one line at a time and process each line.
       std::string cur_line, extras;
       delay_warnings++;
@@ -509,21 +520,53 @@ namespace emp {
 
         std::string command = emp::string_pop_word(cur_line);
 
-        if (command == "include") {
-          // Recursively include another configuration file.
-          std::string filename = emp::string_pop_word(cur_line);
-          Read(filename);
-        }
-        else if (command == "new") {
-          std::string type_name = emp::string_pop_word(cur_line);
-          // @CAO Make sure type exists!
-          // @CAO Make sure remainder of line is a single identifier.
-          new_map[type_name](cur_line);
-        }
-        else if (command == "set") {
+        if (command == "set") {
           // Set a specific value.
           std::string setting_name = emp::string_pop_word(cur_line);
           Set(setting_name, cur_line);
+        }
+        else if (command == "include") {
+          // Determine the filename to include.
+          std::string filename = emp::string_pop_word(cur_line);
+
+          // Process the new file (before automatically coming back to this one)
+          Read(filename);
+        }
+        else if (command == "namespace") {
+          std::string namespace_name = emp::string_pop_word(cur_line);
+          if (cur_line.size() > 0) {
+            warnings << "namespace " << namespace_name
+                     << " cannot have additional arguments.  Ignoring.\n";
+          }
+          if (emp::Has(namespace_map, namespace_name) == false) {
+            emp::NotifyError(emp::to_string("Unknown namespace '", namespace_name, "'.  Aborting."));
+            return false;
+          }
+          Config * ns_config = namespace_map[namespace_name];
+          ns_config->Read(input, namespace_name);
+        }
+        else if (command == "end_namespace") {
+          std::string namespace_name = emp::string_pop_word(cur_line);
+          if (cur_line.size() > 0) {
+            warnings << "end_namespace " << namespace_name
+                     << " cannot have additional arguments.  Ignoring.\n";
+          }
+          if (namespace_name != cur_namespace) {
+            emp::NotifyError(emp::to_string("Cannot end namespace '", namespace_name,
+                                            "' while in namespace '", cur_namespace, "'.  Aborting."));
+            return false;
+          }
+          return true;
+        }
+        else if (command == "new") {
+          std::string type_name = emp::string_pop_word(cur_line);
+          if (emp::Has(new_map, type_name) == false) {
+            emp::NotifyError(emp::to_string("Command 'new' failede: Unknown type '",
+                                            type_name, "'.  Aborting."));
+            return false;
+          }
+          // @CAO Make sure remainder of line is a single identifier?
+          new_map[type_name](cur_line);
         }
         else if (command == "use") {
           std::string type_name = emp::string_pop_word(cur_line);
@@ -565,6 +608,9 @@ namespace emp {
       return success;
     }
 
+    void AddNameSpace(Config & config, const std::string & namespace_name) {
+      namespace_map[namespace_name] = &config;
+    }
 
     void AddCommand(const std::string & command_name, std::function<bool(std::string)> command_fun) {
       // Give a warning if we are re-defining an existing command.
@@ -592,7 +638,7 @@ namespace emp {
 
     void AddUseCallback(const std::string & type_name, std::function<bool(std::string)> use_fun) {
       // Give a warning if we are re-defining an existing command.
-      if (use_map.find(type_name) != use_map.end()) {
+      if (emp::Has(use_map, type_name)) {
         warnings << "Re-defining config type '" << type_name << "'. Allowing." << std::endl;
         if (!delay_warnings) {
           emp::NotifyWarning(warnings.str());

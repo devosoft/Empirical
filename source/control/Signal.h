@@ -143,6 +143,9 @@ namespace emp {
     /// Add an action using an Action object.
     virtual SignalKey AddAction(ActionBase &) = 0;
 
+    /// Test if an action is compatible with a signal.
+    virtual bool TestMatch(ActionBase &) = 0;
+
     /// Remove an action specified by its key.
     virtual void Remove(SignalKey key) = 0;
 
@@ -196,6 +199,10 @@ namespace emp {
       Action<fun_t> * a = dynamic_cast< Action<fun_t>* >(&in_action);
       emp_assert( a != nullptr && "action type must match signal type." );
       return AddAction(a->GetFun());
+    }
+
+    bool TestMatch(ActionBase & in_action) {
+      return dynamic_cast< Action<fun_t>* >(&in_action);
     }
 
     /// Add an action that takes too few arguments... but provide specific padding info.
@@ -290,6 +297,10 @@ namespace emp {
       Action<fun_t> * a = dynamic_cast< Action<fun_t>* >(&in_action);
       emp_assert( a != nullptr && "action type must match signal type." );
       return AddAction(a->GetFun());
+    }
+
+    bool TestMatch(ActionBase & in_action) {
+      return dynamic_cast< Action<fun_t>* >(&in_action);
     }
 
     // Add an action that takes too few arguments... but provide specific padding info.

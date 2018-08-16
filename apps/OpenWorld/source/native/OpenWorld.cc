@@ -18,4 +18,11 @@ int main(int argc, char* argv[])
   if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
 
   OpenWorld world(config);
+
+  for (size_t ud = 0; ud < config.MAX_GENS(); ud++) {
+    world.Update();
+    std::cout << "UD: " << ud
+              << "  NumOrgs=" << world.GetNumOrgs()
+              << std::endl;
+  }
 }

@@ -134,7 +134,7 @@ namespace emp {
   protected:
     // Internal state member variables
     size_t update;                  ///< How many times has Update() been called?
-    Ptr<Random> random_ptr;         ///< @brief Random object to use.
+    Ptr<Random> random_ptr;         ///< Random object to use.
     bool random_owner;              ///< Did we create our own random number generator?
     WorldVector<Ptr<ORG>> pops;     ///< The set of active [0] and "next" [1] organisms in population.
     pop_t & pop;                    ///< A shortcut to pops[0].

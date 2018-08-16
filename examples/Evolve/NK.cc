@@ -75,6 +75,7 @@ int main(int argc, char* argv[])
       return num_muts;
     };
   pop.SetMutFun( mut_fun );
+  pop.SetAutoMutate();
 
   std::cout << 0 << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
 
@@ -95,7 +96,6 @@ int main(int argc, char* argv[])
     TournamentSelect(pop, 5, POP_SIZE-1);
     pop.Update();
     std::cout << (ud+1) << " : " << pop[0] << " : " << landscape.GetFitness(pop[0]) << std::endl;
-    pop.DoMutations(1);
   }
 
   // pop.PrintLineage(0);

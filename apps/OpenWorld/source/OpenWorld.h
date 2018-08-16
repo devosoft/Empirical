@@ -4,7 +4,7 @@
 #define OPEN_WORLD_H
 
 #include "Evolve/World.h"
-#include "geometry/Surface2.h"
+#include "geometry/Surface.h"
 #include "hardware/signalgp_utils.h"
 #include "tools/math.h"
 
@@ -62,8 +62,12 @@ public:
       GetOrg(pos).GetBrain().SetTrait((size_t)OpenOrg::Trait::ORG_ID, id);
       id_map[id] = &GetOrg(pos);
     } );
-    OnOrgDeath( [this](size_t pos){ id_map.erase( GetOrg(pos).GetID() ); } );
+    OnOrgDeath( [this](size_t pos) {
+      surface.RemoveBody(GetOrg(pos).GetSurfaceID());
+      id_map.erase(GetOrg(pos).GetID());
+    });
 
+    // Setup SignalGP mutations.
     signalgp_mutator.SetProgMinFuncCnt(config.PROGRAM_MIN_FUN_CNT());
     signalgp_mutator.SetProgMaxFuncCnt(config.PROGRAM_MAX_FUN_CNT());
     signalgp_mutator.SetProgMinFuncLen(config.PROGRAM_MIN_FUN_LEN());
@@ -72,6 +76,7 @@ public:
     signalgp_mutator.SetProgMaxArgVal(config.PROGRAM_MAX_ARG_VAL());
     signalgp_mutator.SetProgMaxTotalLen(config.PROGRAM_MAX_FUN_CNT() * config.PROGRAM_MAX_FUN_LEN());
 
+    // Setup other SignalGP functions.
     signalgp_mutator.ARG_SUB__PER_ARG(config.ARG_SUB__PER_ARG());
     signalgp_mutator.INST_SUB__PER_INST(config.INST_SUB__PER_INST());
     signalgp_mutator.INST_INS__PER_INST(config.INST_INS__PER_INST());
@@ -80,6 +85,33 @@ public:
     signalgp_mutator.FUNC_DUP__PER_FUNC(config.FUNC_DUP__PER_FUNC());
     signalgp_mutator.FUNC_DEL__PER_FUNC(config.FUNC_DEL__PER_FUNC());
     signalgp_mutator.TAG_BIT_FLIP__PER_BIT(config.TAG_BIT_FLIP__PER_BIT());
+
+    // Setup surface functions to allow organisms to eat.
+    surface.AddOverlapFun( [this](OpenOrg & pred, OpenOrg & prey) {
+      const size_t pred_id = pred.GetSurfaceID();
+      const size_t prey_id = prey.GetSurfaceID();
+      const double pred_radius = surface.GetRadius(pred_id);
+      const double prey_radius = surface.GetRadius(prey_id);
+      const double consume_ratio = prey_radius / pred_radius;
+      if (consume_ratio > config.MAX_CONSUME_RATIO()) return;
+      if (consume_ratio < config.MIN_CONSUME_RATIO()) return;
+
+      std::cerr << "Org Consumed!"
+                << "   pred:radius=" << pred_radius << "; id=" << pred_id
+                << "   prey:radius=" << prey_radius << "; id=" << prey_id
+                << std::endl;
+      pred.AdjustEnergy( prey_radius * prey_radius / 10.0 );
+      // @CAO: MUST KILL PREY!!
+    });
+    surface.AddOverlapFun( [this](OpenOrg & org, OpenResource & res) {
+      std::cerr << "Resoure Consumed!" << std::endl;
+    });
+    surface.AddOverlapFun( [](OpenResource &, OpenResource &) {
+      std::cerr << "ERROR: Resources should not try to eat other resources!" << std::endl;
+    });
+    surface.AddOverlapFun( [](OpenResource &, OpenOrg &) {
+      std::cerr << "ERROR: Resources should not try to eat organisms!" << std::endl;
+    });
 
     // Setup the default instruction set.
     inst_lib.AddInst("Inc", hardware_t::Inst_Inc, 1, "Increment value in local memory Arg1");
@@ -119,7 +151,7 @@ public:
       const size_t id = (size_t) hw.GetTrait((size_t) OpenOrg::Trait::ORG_ID);
       emp::Ptr<OpenOrg> org_ptr = id_map[id];
       emp::Angle facing = org_ptr->GetFacing();
-      surface.Translate( org_ptr->GetSurfaceID(), facing.GetPoint(1.0) );
+      surface.TranslateWrap( org_ptr->GetSurfaceID(), facing.GetPoint(1.0) );
     }, 1, "Move forward.");
 
     inst_lib.AddInst("SpinRight", [this](hardware_t & hw, const inst_t & inst) mutable {
@@ -134,6 +166,12 @@ public:
       org_ptr->RotateDegrees(5.0);
     }, 1, "Rotate 5 degrees.");
 
+    inst_lib.AddInst("Consume", [this](hardware_t & hw, const inst_t & inst) mutable {
+      const size_t id = (size_t) hw.GetTrait((size_t) OpenOrg::Trait::ORG_ID);
+      emp::Ptr<OpenOrg> org_ptr = id_map[id];
+      surface.FindOverlap( org_ptr->GetSurfaceID() );  // Surface functions automatically try to eat on overlap!
+    }, 1, "Rotate 5 degrees.");
+
     // On each update, run organisms and make sure they stay on the surface.
     OnUpdate([this](size_t){
       // Process all organisms.
@@ -144,15 +182,6 @@ public:
         if (pop[pos].IsNull()) continue;
         auto & org = *pop[pos];
         const size_t surface_id = org.GetSurfaceID();
-
-        // Make sure organisms are on the surface (wrap around if not)
-        double x = surface.GetCenter(surface_id).GetX();
-        double y = surface.GetCenter(surface_id).GetY();
-        if (x < 0.0) x += config.WORLD_X();
-        if (y < 0.0) y += config.WORLD_Y();
-        if (x >= config.WORLD_X()) x -= config.WORLD_X();
-        if (y >= config.WORLD_Y()) y -= config.WORLD_Y();
-        surface.SetCenter(surface_id, {x,y});
 
         // Provide additional resources toward reproduction.
         org.AdjustEnergy( random_ptr->GetDouble(0.1) );
