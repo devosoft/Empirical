@@ -29,13 +29,36 @@ namespace mabe {
   class OrganismTypeBase : public ModuleBase {
   protected:
     using fun_ptr_t = emp::Ptr<emp::GenericFunction>;
-    using fun_vec_t = emp::vector<fun_ptr_t>;
-    std::map< std::string, fun_vec_t > fun_map;
+    std::map< std::string, fun_ptr_t > event_fun_map;
+    std::map< std::string, fun_ptr_t > response_fun_map;
 
   public:
     OrganismTypeBase(const std::string & in_name) : ModuleBase(in_name) { ; }    
+    virtual ~OrganismTypeBase() {
+      for (auto & x : event_fun_map) x.second.Delete();
+      for (auto & x : response_fun_map) x.second.Delete();
+    }
 
     static constexpr mabe::ModuleType GetModuleType() { return ModuleType::ORGANISM_TYPE; }
+
+    /// Event functions are provided by the derived OrganismType and called by the environment
+    /// whenever there is an event, such as resources appearing, movement occuring, etc.  The
+    /// environment must specify which organism is affected by the event, and any unique event
+    /// information.
+    template <typename... Ts>
+    void AddEventFunction(const std::string & event_name, std::function<void(size_t, Ts...)> fun) {
+      auto new_fun = emp::NewPtr< emp::Function<void(size_t, Ts...)> >(fun);
+      event_fun_map[event_name] = new_fun;
+    }
+
+    /// Response functions are provided by the environment and allow organisms to take actions
+    /// such as moving, sensing, etc.  The function call must specify the unique organism ID and
+    /// any extra information needed by the environment.
+    template <typename... Ts>
+    void AddResponseFunction(const std::string & response_name, std::function<void(size_t, Ts...)> fun) {
+      auto new_fun = emp::NewPtr< emp::Function<void(size_t, Ts...)> >(fun);
+      response_fun_map[response_name] = new_fun;
+    }
   };
 
 }
