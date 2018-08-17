@@ -26,7 +26,7 @@ int main(int argc, char * argv[]) {
   world.BuildModule<mabe::TournamentSelect>("TournamentSelect");
 
   // Configure the world using the "Aagos.cfg" file and command-line overrides.
-  world.Config(argc, argv, "Aagos.cfg");
+  world.Config(argc, argv, "NK.cfg");
   
   // Get details on how the population was configured.
   world.PrintStatus();
