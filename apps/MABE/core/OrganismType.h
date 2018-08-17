@@ -58,16 +58,18 @@ namespace mabe {
     OrganismType(const std::string & in_name) : OrganismTypeBase(in_name) { 
       // Loop through all genome types.
       size_t genome_count = 0;
-      emp::TupleIterate(genome_types, [&genome_count](GenomeBase & genome_type){
+      emp::TupleIterate(genome_types, [this, &genome_count](GenomeBase & genome_type){
         genome_type.SetName( emp::to_string("genome", genome_count) );
         genome_count++;
+        config.AddNameSpace(genome_type.GetConfig(), genome_type.GetName());
       });
 
       // Loop through all brain types.
       size_t brain_count = 0;
-      emp::TupleIterate(brain_types, [&brain_count](BrainBase & brain_type){
+      emp::TupleIterate(brain_types, [this, &brain_count](BrainBase & brain_type){
         brain_type.SetName( emp::to_string("brain", brain_count) );
         brain_count++;
+        config.AddNameSpace(brain_type.GetConfig(), brain_type.GetName());
       });
 
       std::cout << "OrganismType `" << GetName() << "' has "
