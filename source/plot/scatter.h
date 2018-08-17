@@ -19,7 +19,9 @@
 
 namespace emp {
   namespace plot {
-    class Scatter : public scenegraph::Child {
+
+    template <size_t D>
+    class Scatter : public scenegraph::Node<D> {
       private:
       size_t vertexCount;
       std::vector<std::tuple<math::Mat4x4f, opengl::Color>> points;
@@ -27,16 +29,15 @@ namespace emp {
 
       public:
       template <typename S = std::string>
-      Scatter(emp::opengl::GLCanvas& canvas, graphics::Mesh point_mesh)
-        : point_mesh(point_mesh) {
+      Scatter(graphics::Mesh point_mesh) : point_mesh(point_mesh) {
         using namespace emp::opengl;
         using namespace emp::math;
       }
 
       virtual ~Scatter() {}
 
-      void RenderRelative(graphics::Graphics& g,
-                          const math::Mat4x4f& transform) {
+      void RenderRelative(graphics::Graphics& g, const math::Mat4x4f& transform,
+                          const math::Vec<float, D>& allocated_size) {
         using namespace emp::math;
         using namespace emp::opengl;
 
@@ -59,10 +60,8 @@ namespace emp {
         points.clear();
 
         for (; begin != end; ++begin) {
-          auto model =
-            Mat4x4f::Translation(graphics::Transform::Get(*begin).x(),
-                                 graphics::Transform::Get(*begin).y(), 0) *
-            Mat4x4f::Scale(PointSize::Get(*begin));
+          auto model = Mat4x4f::Translation(graphics::Transform::Get(*begin)) *
+                       Mat4x4f::Scale(PointSize::Get(*begin));
 
           points.push_back({model, graphics::Fill::Get(*begin)});
         }

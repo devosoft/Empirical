@@ -17,16 +17,15 @@ namespace emp {
   namespace plot {
 
     template <size_t D>
-    class Scale : public scenegraph::Child {
+    class Scale : public scenegraph::Node<D> {
       public:
-      math::Region<float, D> screenSpace;
       math::Vec<float, D> padding;
+      math::Vec<float, D> screen_space;
       math::Region<float, D> data_space;
 
-      template <class S, class P = math::Vec<float, D>>
-      constexpr Scale(S&& screen, P&& padding = {0})
-        : screenSpace(std::forward<S>(screen)),
-          padding(std::forward<P>(padding)) {}
+      template <typename P = math::Vec<float, D>,
+                typename S = math::Vec<float, D>>
+      constexpr Scale(P&& padding = {0}) : padding(std::forward<P>(padding)) {}
 
       template <class DATA_ITER>
       auto operator()(DATA_ITER begin, DATA_ITER end) {
@@ -38,7 +37,7 @@ namespace emp {
         for (auto iter = begin; iter != end; ++iter) {
           data_space.include(Xyz::Get(*iter));
         }
-        auto bordered_space{screenSpace};
+        emp::math::Region<float, D> bordered_space{{0}, screen_space};
         bordered_space.AddBorder(padding);
 
         auto scale =
@@ -57,39 +56,55 @@ namespace emp {
       }
 
       void RenderRelative(emp::graphics::Graphics& g,
-                          const math::Mat4x4f& transform) override {
+                          const math::Mat4x4f& transform,
+                          const emp::math::Vec2f& allocated_size) override {
         using namespace emp::math;
         using namespace emp::opengl;
 
-        auto bordered_space{screenSpace};
-        bordered_space.AddBorder(padding);
-
-        auto width = bordered_space.extents().x();
-        auto height = bordered_space.extents().y();
-
-        g.DrawFilled(graphics::Mesh::Region({
-                       {bordered_space.min.x(), bordered_space.min.y()},
-                       {bordered_space.max.x(), bordered_space.min.y() + 1},
-                     }),
-                     emp::graphics::Fill = Color::black(1),
-                     emp::graphics::Transform = Mat4x4f::Identity());
-
-        g.DrawFilled(graphics::Mesh::Region({
-                       {bordered_space.min.x(), bordered_space.min.y()},
-                       {bordered_space.min.x() + 1, bordered_space.max.y()},
-                     }),
-                     emp::graphics::Fill = Color::black(1),
-                     emp::graphics::Transform = Mat4x4f::Identity());
+        screen_space.x() = allocated_size.x();
+        screen_space.y() = allocated_size.y();
 
         std::stringstream f;
         f << data_space.min.x();
 
+        auto text = f.str();
+
+        auto size = g.Measure(text, 16);
+        padding.x() = std::max(padding.x(), size.x());
+        padding.y() = std::max(padding.y(), size.y());
+
+        screen_space = allocated_size;
+
+        auto bordered_space = screen_space;
+
+        // Draw the axies
+        g.DrawFilled(graphics::Mesh::Region({
+                       {padding.x(), padding.y()},
+                       {bordered_space.x() - padding.x(), padding.y() + 1},
+                     }),
+                     emp::graphics::Fill = Color::black(1),
+                     emp::graphics::Transform = transform);
+
+        g.DrawFilled(graphics::Mesh::Region({
+                       {
+                         padding.x(),
+                         padding.y(),
+                       },
+                       {
+                         padding.x() + 1,
+                         bordered_space.y() - padding.y(),
+                       },
+                     }),
+                     emp::graphics::Fill = Color::black(1),
+                     emp::graphics::Transform = transform);
+
         g.Text()
           .Draw({
-            emp::graphics::Text = f.str(),
-            emp::graphics::Fill = Color::green(1),
-            emp::graphics::Transform = Mat4x4f::Translation(
-              bordered_space.min.x(), bordered_space.min.y(), 0),
+            emp::graphics::Text = text,
+            emp::graphics::Fill = Color::black(1),
+            emp::graphics::Transform =
+              transform *
+              Mat4x4f::Translation(0, bordered_space.y() - padding.y()),
             emp::graphics::TextSize = 16,
           })
           .Flush();

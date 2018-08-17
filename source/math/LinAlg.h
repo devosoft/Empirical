@@ -480,6 +480,10 @@ namespace emp {
           0, 0, 0, 1,  // row 4
         };
       }
+      template <typename U>
+      static constexpr Mat Translation(const Vec<U, 2>& translation) {
+        return Translation(translation.x(), translation.y());
+      }
 
       template <typename S = F>
       static constexpr Mat Scale(S&& scale) {

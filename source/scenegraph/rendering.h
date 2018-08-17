@@ -2,6 +2,7 @@
 #define EMP_SCENEGRAPH_RENDERING_H
 
 #include "math/consts.h"
+#include "math/region.h"
 #include "opengl/color.h"
 #include "opengl/glcanvas.h"
 #include "opengl/glwrap.h"
@@ -21,10 +22,13 @@ namespace emp {
       math::Mat4x4f view;
     };
 
+    enum class TextDirections { Horizontal, Vertical };
+
     DEFINE_ATTR(Transform);
     DEFINE_ATTR(Fill);
     DEFINE_ATTR(Text);
     DEFINE_ATTR(TextSize);
+    DEFINE_ATTR(TextDirection);
 
     struct Face {
       int a, b, c;
@@ -229,6 +233,31 @@ namespace emp {
         shader_uniforms.view = settings.view;
       }
 
+      emp::math::Vec2f Measure(
+        const std::string& text, float text_size,
+        TextDirections direction = TextDirections::Horizontal) const {
+        float scale = text_size / font->atlas_height;
+        emp::math::Vec2f cursor{0, 0};
+
+        for (auto& c : text) {
+          auto info = font->Lookup(c);
+
+          switch (direction) {
+              // Advance the cursor by the size of the character
+            case TextDirections::Horizontal:
+              cursor.x() += info.cursor_advance.x() * scale;
+              cursor.y() = std::max(cursor.y(), info.bitmap_size.y() * scale);
+              break;
+            case TextDirections::Vertical:
+              cursor.x() = std::max(cursor.x(), info.bitmap_size.x() * scale);
+              cursor.y() += info.cursor_advance.y() * scale;
+              break;
+          }
+        }
+
+        return cursor;
+      }
+
       void Instance(const instance_attributes_type& attrs) {
         using namespace emp::opengl;
         using namespace emp::math;
@@ -236,20 +265,26 @@ namespace emp {
         Vec2f cursor{0, 0};
         vertices_buffer.Clear();
 
-        float scale = attrs.GetTextSize() / font->atlas_height;
+        float scale = TextSize::Get(attrs) / font->atlas_height;
 
         int i = 0;
         for (auto& c : attrs.GetText()) {
           auto info = font->Lookup(c);
           auto lcursor = cursor;
+          // Calculate the start of the next character
           cursor = cursor + Vec2f{info.cursor_advance.x() * scale,
                                   info.cursor_advance.y() * scale};
 
-          if (info.size.x() <= 0 || info.size.y() <= 0) continue;
+          // Skip characters who have no size, such as spaces
+          if (info.bitmap_size.x() <= 0 || info.bitmap_size.y() <= 0) continue;
 
+          // See https://www.freetype.org/freetype2/docs/tutorial/step2.html for
+          // what bearing is. Basically, it is the position of this character
+          // relative to the last
           auto max =
             lcursor + Vec2f{info.bearing.x() * scale, info.bearing.y() * scale};
-          auto min = max - Vec2f{info.size.x() * scale, info.size.y() * scale};
+          auto min = max - Vec2f{info.bitmap_size.x() * scale,
+                                 info.bitmap_size.y() * scale};
 
           auto tmin = info.texture_region.min;
           auto tmax = info.texture_region.max;
@@ -336,6 +371,10 @@ namespace emp {
 
       Graphics& operator=(const Graphics&) = delete;
       Graphics& operator=(Graphics&&) = delete;
+
+      auto Measure(const std::string& text, float text_size) const {
+        return text_renderer.Measure(text, text_size);
+      }
 
       void Clear(float r, float g, float b, float a = 1) {
         glClearColor(r, g, b, a);

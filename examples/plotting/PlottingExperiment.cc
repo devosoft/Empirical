@@ -30,20 +30,20 @@
 
 struct Particle {
   float mass;
-  emp::math::Vec3f position;
-  emp::math::Vec3f velocity;
-  emp::math::Vec3f acceleration;
+  emp::math::Vec2f position;
+  emp::math::Vec2f velocity;
+  emp::math::Vec2f acceleration;
 
-  Particle(float mass, const emp::math::Vec3f& position)
+  Particle(float mass, const emp::math::Vec2f& position)
     : mass(mass), position(position) {}
 
   void Step(float dt) {
     velocity += acceleration * dt;
     position += velocity * dt;
-    acceleration = {0, 0, 0};
+    acceleration = {0, 0};
   }
 
-  void AddForce(const emp::math::Vec3f& force) { acceleration += force / mass; }
+  void AddForce(const emp::math::Vec2f& force) { acceleration += force / mass; }
 };
 
 template <typename P, typename R>
@@ -54,10 +54,10 @@ void UpdateParticles(P& particles, const R& region) {
 
   for (int i = 0; i < particles.size(); ++i) {
     auto& p1 = particles[i];
-    p1.AddForce(
-      {10 * (rand() / (float)std::numeric_limits<decltype(rand())>::max()) - 5,
-       10 * (rand() / (float)std::numeric_limits<decltype(rand())>::max()) - 5,
-       0});
+    p1.AddForce({
+      10 * (rand() / (float)std::numeric_limits<decltype(rand())>::max()) - 5,
+      10 * (rand() / (float)std::numeric_limits<decltype(rand())>::max()) - 5,
+    });
   }
 
   // for (auto& p : particles) {
@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
   using namespace emp::plot;
   using namespace emp::plot::attributes;
 
-  GLCanvas canvas;
+  GLCanvas canvas(500, 500);
   shaders::LoadShaders(canvas);
 
   emp::Resources<FontFace>::Add("Roboto", [] {
@@ -88,14 +88,16 @@ int main(int argc, char* argv[]) {
     return font;
   });
 
-  Region3f region = canvas.getRegion().AddDimension(-100, 100);
-
-  Stage stage(region);
-  auto root = stage.MakeRoot<Group>();
+  Stage<2> stage(canvas.getRegion());
+  auto root = stage.MakeRoot<Flow<2>>(true, FlowDirection<2>::Y);
   // auto line{std::make_shared<Line>(canvas)};
-  auto scatter{std::make_shared<Scatter>(canvas, Mesh::Polygon(32, {2, 2}))};
-  auto scale{std::make_shared<Scale<3>>(region, Vec3f{10, 10, 10})};
-  root->AttachAll(scatter, scale);
+  auto scatter{std::make_shared<Scatter<2>>(Mesh::Polygon(32, {2, 2}))};
+  auto scale{std::make_shared<Scale<2>>()};
+
+  auto plot{std::make_shared<Stack<2>>()};
+  auto plot_title{std::make_shared<Text<2>>("Hello World", 32)};
+  plot->Append(scatter).Append(scale);
+  root->Append(plot_title, 0).Append(plot);
 
   std::vector<Particle> particles;
 
@@ -103,18 +105,19 @@ int main(int argc, char* argv[]) {
     Xyz = [](auto& p) { return p.position; }, PointSize = 1,
     emp::graphics::Fill = Color::red(1, 0.5), emp::graphics::TextSize = 16));
 
-  auto camera = std::make_shared<OrthoCamera>(region);
+  auto camera =
+    std::make_shared<OrthoCamera>(canvas.getRegion().AddDimension(-100, 100));
   auto eye = std::make_shared<SimpleEye>();
 
   for (int i = 0; i < 10000; ++i) {
-    particles.emplace_back(10, Vec3f{rand() % 100 - 50, rand() % 100 - 50, 0});
+    particles.emplace_back(10, Vec2f{rand() % 100 - 50, rand() % 100 - 50});
   }
 
   emp::graphics::Graphics g(canvas, "Roboto", camera, eye);
   canvas.runForever([&](auto&&) {
-    g.Clear(Color::grey(0.9));
+    g.Clear(Color::grey(0.8));
 
-    UpdateParticles(particles, region);
+    UpdateParticles(particles, canvas.getRegion());
     flow(particles.begin(), particles.end());
 
     stage.Render(g);

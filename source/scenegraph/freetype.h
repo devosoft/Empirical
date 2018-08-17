@@ -42,7 +42,8 @@ namespace emp {
 
     struct atlas_char_t {
       char character;
-      math::Vec2f size;
+      math::Vec2f bitmap_size;
+      math::Vec2f metrics_size;
 
       float atlas_x;
       float atlas_y;
@@ -140,6 +141,7 @@ namespace emp {
           atlas_char_t character{c,
                                  {static_cast<float>(g->bitmap.width),
                                   static_cast<float>(g->bitmap.rows)},
+                                 {g->metrics.width, g->metrics.height},
                                  atlas_width + 1,
                                  0,
                                  {static_cast<float>(g->advance.x / 64),
@@ -147,8 +149,8 @@ namespace emp {
                                  {static_cast<float>(g->bitmap_left),
                                   static_cast<float>(g->bitmap_top)}};
 
-          atlas_width += character.size.x() + 1;
-          atlas_height = std::max(atlas_height, character.size.y());
+          atlas_width += character.bitmap_size.x() + 1;
+          atlas_height = std::max(atlas_height, character.bitmap_size.y());
 
           atlas.push_back(character);
         }
@@ -167,22 +169,23 @@ namespace emp {
 
         for (auto& character : atlas) {
           if (FT_Load_Char(face, character.character, FT_LOAD_RENDER)) continue;
-          if (character.size.x() <= 0 || character.size.y() <= 0) continue;
+          if (character.bitmap_size.x() <= 0 || character.bitmap_size.y() <= 0)
+            continue;
 
           float atlas_texture_x = character.atlas_x / atlas_width;
           float atlas_texture_y = character.atlas_y / atlas_height;
 
           character.texture_region.min = {atlas_texture_x, atlas_texture_y};
           character.texture_region.max = {
-            atlas_texture_x + character.size.x() / atlas_width,
-            atlas_texture_y + character.size.y() / atlas_height};
+            atlas_texture_x + character.bitmap_size.x() / atlas_width,
+            atlas_texture_y + character.bitmap_size.y() / atlas_height};
 
           auto g = face->glyph;
 
-          atlas_texture->SubData(character.atlas_x, character.atlas_y,
-                                 character.size.x(), character.size.y(), format,
-                                 opengl::TextureType::UnsignedByte,
-                                 g->bitmap.buffer);
+          atlas_texture->SubData(
+            character.atlas_x, character.atlas_y, character.bitmap_size.x(),
+            character.bitmap_size.y(), format,
+            opengl::TextureType::UnsignedByte, g->bitmap.buffer);
         }
         atlas_texture->SetMinFilter(opengl::TextureMinFilter::Linear);
         atlas_texture->SetMagFilter(opengl::TextureMagFilter::Linear);
