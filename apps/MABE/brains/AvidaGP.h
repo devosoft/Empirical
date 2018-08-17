@@ -16,10 +16,19 @@ namespace mabe {
 
   class AvidaGP : public BrainBase {
   private:
+    EMP_BUILD_CONFIG( AvidaGPConfig,
+      GROUP(DEFAULT_GROUP, "Vector Genome Settings"),
+      VALUE(MIN_LENGTH, size_t, 8, "Minimum number of instructions in a genome."),
+      VALUE(MAX_LENGTH, size_t, 1024, "Maximum number of instructions in a genome.")
+    )
+
+    AvidaGPConfig config;
+
   public:
     AvidaGP() { ; }
 
     std::string GetClassName() const override { return "AvidaGP"; }
+    AvidaGPConfig & GetConfig() override { return config; }
 
     struct compute_t {
     };
