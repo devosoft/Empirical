@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
+ *  @date 2017-2018
  *
  *  @file  GenericFunction.h
  *  @brief Based on std::function, but with a common base class.
@@ -47,6 +47,9 @@ namespace emp {
 
     /// Convert this GenericFunction into a derived emp::Function
     template <typename T> auto Convert();
+
+    /// Determine if this GenericFunction can be converted into a derived emp::Function
+    template <typename T> bool ConvertOK();
   };
 
   // Undefined base type for Function, to create an error if a function type is not passed in.
@@ -100,6 +103,10 @@ namespace emp {
   template <typename T> auto GenericFunction::Convert() {
     emp_assert(dynamic_cast<Function<T> *>(this));
     return (Function<T> *) this;
+  }
+
+  template <typename T> bool GenericFunction::ConvertOK() {
+    return dynamic_cast<Function<T> *>(this);
   }
 
 }
