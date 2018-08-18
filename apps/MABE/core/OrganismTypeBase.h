@@ -27,38 +27,34 @@
 namespace mabe {
 
   class OrganismTypeBase : public ModuleBase {
-  protected:
-    using fun_ptr_t = emp::Ptr<emp::GenericFunction>;
-    std::map< std::string, fun_ptr_t > event_fun_map;
-    std::map< std::string, fun_ptr_t > action_fun_map;
+  private:
+    /// These are functions that were originally provided by the environment and wrapped by
+    /// this organism type so that it will take an OrganismBase reference as its only argument
+    /// and return a double.  The environment will call these functions when specific events
+    /// are triggered.  Anything more complex than a double should be handled with a callback
+    /// using one of the action functions in the next group.
+    using event_fun_t = std::function<double(OrganismBase &)>;
+    emp::vector<event_fun_t> event_funs;
+
+    /// These are functions that were originally provided by the environment and wrapped by
+    /// this organism type to be callable with a common interface (providing a reference to the
+    /// calling organism).  The only return type allowed is a double; anything more complex
+    /// should be handed with a callback.
+    emp::vector<event_fun_t> action_funs;
 
   public:
     OrganismTypeBase(const std::string & in_name) : ModuleBase(in_name) { ; }    
     virtual ~OrganismTypeBase() {
-      for (auto & x : event_fun_map) x.second.Delete();
-      for (auto & x : action_fun_map) x.second.Delete();
     }
 
     static constexpr mabe::ModuleType GetModuleType() { return ModuleType::ORGANISM_TYPE; }
 
-    /// Event functions are provided by the derived OrganismType and called by the environment
-    /// whenever there is an event, such as resources appearing, movement occuring, etc.  The
-    /// environment must specify which organism is affected by the event, and any unique event
-    /// information.
-    template <typename... Ts>
-    void AddEventFunction(const std::string & event_name, std::function<void(size_t, Ts...)> fun) {
-      auto new_fun = emp::NewPtr< emp::Function<void(size_t, Ts...)> >(fun);
-      event_fun_map[event_name] = new_fun;
-    }
+    /// Add a new event function for this organism type; wrap the function and store it.
+    virtual void AddEventFunction(FunctionInfo & info) = 0;
 
-    /// Action functions are provided by the environment and allow organisms to take actions
-    /// such as moving, sensing, etc.  The function call must specify the unique organism ID and
-    /// any extra information needed by the environment.
-    template <typename... Ts>
-    void AddActionFunction(const std::string & action_name, std::function<void(size_t, Ts...)> fun) {
-      auto new_fun = emp::NewPtr< emp::Function<void(size_t, Ts...)> >(fun);
-      action_fun_map[action_name] = new_fun;
-    }
+    /// Add a new action function for this organism type; wrap the function and store it.
+    virtual void AddActionFunction(FunctionInfo & info) = 0;
+
   };
 
 }
