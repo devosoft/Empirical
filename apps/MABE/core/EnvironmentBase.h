@@ -15,12 +15,18 @@
 #ifndef MABE_ENVIRONMENT_BASE_H
 #define MABE_ENVIRONMENT_BASE_H
 
+#include "tools/GenericFunction.h"
+
 #include "ModuleBase.h"
 
 namespace mabe {
 
   class EnvironmentBase : public ModuleBase {
   private:
+    using fun_ptr_t = emp::Ptr<emp::GenericFunction>;
+    std::map< std::string, fun_ptr_t > event_fun_map;   ///< Functions triggered by environment.
+    std::map< std::string, fun_ptr_t > action_fun_map;  ///< Functions orgs trigger to take actions.
+
   public:
     EnvironmentBase(const std::string & in_name) : ModuleBase(in_name) { ; }
 
