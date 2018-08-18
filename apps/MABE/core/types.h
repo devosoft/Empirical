@@ -10,8 +10,12 @@
 #ifndef MABE_TYPES_H
 #define MABE_TYPES_H
 
+#include <string>
+
+#include "base/Ptr.h"
 #include "base/vector.h"
 #include "meta/TypePack.h"
+#include "tools/GenericFunction.h"
 
 #include "../core/BrainBase.h"
 #include "../core/EnvironmentBase.h"
@@ -21,6 +25,17 @@
 #include "../core/SchemaBase.h"
 
 namespace mabe {
+
+  /// Details about a generic function being passed between OrganismTypes and Environments.
+  struct FunctionInfo {
+    using fun_ptr_t = emp::Ptr<emp::GenericFunction>;
+    size_t id;          ///< Unique ID for this type of function.
+    fun_ptr_t fun_ptr;  ///< Pointer to generic function to be called.
+    std::string type;   ///< A string representation of the C++ type of this function.
+    std::string name;   ///< Unique name for this function.
+    std::string desc;   ///< Full description for what this function does.
+  };
+
   template <typename T> using is_module        = std::is_base_of<ModuleBase, T>;
 
   template <typename T> using is_genome        = std::is_base_of<GenomeBase, T>;
