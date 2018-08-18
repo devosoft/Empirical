@@ -30,9 +30,7 @@ namespace mabe {
     std::string GetClassName() const override { return "LinearGenome"; }
     LGConfig & GetConfig() override { return config; }
 
-    struct data_t {
-      emp::vector<unsigned char> data;
-    };
+    using data_t = emp::vector<unsigned char>;
   };
 
 }

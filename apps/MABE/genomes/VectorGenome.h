@@ -34,9 +34,7 @@ namespace mabe {
     std::string GetClassName() const override { return "VectorGenome"; }
     VGConfig & GetConfig() override { return config; }
 
-    struct data_t {
-      emp::vector<T> data;
-    };
+    using data_t = emp::vector<T>;
   };
 
 }
