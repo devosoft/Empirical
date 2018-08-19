@@ -29,6 +29,7 @@ namespace mabe {
     template <typename T> using to_data = typename T::data_t;
     using genomes_data_t = typename genomes_t::template wrap<to_data>;
     using data_tup_t = typename genomes_data_t::template apply<std::tuple>;
+    using data_fun_t = std::function<typename genomes_data_t::template to_function_t<double>>;
 
     using brains_t = typename modules_t::template filter<is_brain>;
     using brains_tup_t  = typename brains_t::template apply<std::tuple>;
@@ -102,6 +103,34 @@ namespace mabe {
     template<int ID>
     auto & GetBrainType() { return std::get<ID>(brain_types); }
 
+    /// Add a new event function for this organism type; wrap the function and store it.
+    bool AddEventFunction(FunctionInfo & info) override {
+      std::function<double(OrganismBase &)> out_fun;
+      // If the input can be handled by a brain, use it!
+      // @CAO WRITE THIS!!
+
+      // If the input wasn't handled by a brain, try out the genome state.
+      if (info.fun_ptr->ConvertOK<data_fun_t>()) {
+        auto genome_fun = *( info.fun_ptr->template Convert<data_fun_t>() );
+        event_fun_t event_fun = [genome_fun](OrganismBase & org){
+          ApplyTuple(genome_fun, ((Organism&) org).genomes);
+        };
+        event_funs.push_back(event_fun);
+        return true;
+      }
+
+      // If we don't know how to deal with this info (i.e., we made it this far), return false.
+      return false;
+    }
+
+    /// Add a new action function for this organism type; wrap the function and store it.
+    bool AddActionFunction(FunctionInfo & info) override {
+      std::function<double(OrganismBase &)> out_fun;
+      // If the input can be handled by a brain, use it!
+      // If the input wasn't handled by a brain, try out the genome state.
+      // If we don't know how to deal with this info (i.e., we made it this far), return false.
+      return false;
+    }
   };
 
 }
