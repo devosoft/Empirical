@@ -27,7 +27,7 @@
 namespace mabe {
 
   class OrganismTypeBase : public ModuleBase {
-  private:
+  protected:
     /// These are functions that were originally provided by the environment and wrapped by
     /// this organism type so that it will take an OrganismBase reference as its only argument
     /// and return a double.  The environment will call these functions when specific events
@@ -50,10 +50,10 @@ namespace mabe {
     static constexpr mabe::ModuleType GetModuleType() { return ModuleType::ORGANISM_TYPE; }
 
     /// Add a new event function for this organism type; wrap the function and store it.
-    virtual void AddEventFunction(FunctionInfo & info) = 0;
+    virtual bool AddEventFunction(FunctionInfo & info) = 0;
 
     /// Add a new action function for this organism type; wrap the function and store it.
-    virtual void AddActionFunction(FunctionInfo & info) = 0;
+    virtual bool AddActionFunction(FunctionInfo & info) = 0;
 
   };
 
