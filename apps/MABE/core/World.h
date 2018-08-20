@@ -42,51 +42,25 @@ namespace mabe {
     using org_ptr_t = emp::Ptr<org_t>;    ///< To restore from base class, org pointers are used.
     using pop_t = emp::vector<org_ptr_t>; ///< Populations are tracked by vectors
   protected:
-  public:
-    WorldBase () { ; }
-    virtual ~WorldBase() { ; }
-  };
-
-  template <typename ENV_T>
-  class World : public WorldBase {
-  public:
-    using env_t = ENV_T;                  ///< Specify the environment type for this world.
-
-  private:
     /// Function type for calculating fitness, typically set by the environment.
     using fun_calc_fitness_t    = std::function<double(OrganismBase&)>;
 
-    using organism_types_t = emp::vector<emp::Ptr<OrganismTypeBase>>; ///< Type of vector of all OrganismTypes
-    using schemas_t = emp::vector<emp::Ptr<SchemaBase>>;              ///< Type of vector of all Schemas
+    using organism_types_t = emp::vector<emp::Ptr<OrganismTypeBase>>; ///< Type for vector of OrganismTypes
+    using schemas_t = emp::vector<emp::Ptr<SchemaBase>>;              ///< Type for vector of Schemas
 
     /// Type of tuple of all dynamic modules to be built in the world.
     using modules_t = std::tuple<organism_types_t, schemas_t>;
 
     /// Type of master World config file.
-    EMP_BUILD_CONFIG( config_t,
+    EMP_BUILD_CONFIG( base_config_t,
       GROUP(DEFAULT_GROUP, "Master World Settings"),
       VALUE(RANDOM_SEED, int, 0, "Seed for main random number generator. Use 0 for based on time."),
-    )  
+    )
 
-    // ----- World MODULES -----
-
-    env_t environment;    ///< Current environment. 
     modules_t modules;    ///< Pointers to all modules, divided into tuple of type-specific vectors.
 
     organism_types_t & organism_types; ///< Direct link to organism types vector of modules. 
     schemas_t & schemas;               ///< Direct link to schemas vector of modules. 
-
-    config_t config;                   ///< Master configuration object.
-
-    void AddModule(emp::Ptr<OrganismTypeBase> pop_ptr) { organism_types.push_back(pop_ptr); }
-    void AddModule(emp::Ptr<SchemaBase> schema_ptr) { schemas.push_back(schema_ptr); }
-
-    void ForEachModule(std::function<void(emp::Ptr<ModuleBase>)> fun) {
-      fun(&environment);
-      for (emp::Ptr<ModuleBase> x : organism_types)  { fun(x); }
-      for (emp::Ptr<ModuleBase> x : schemas)         { fun(x); }
-    }
-
 
     // ----- World STATE -----
     const std::string name;           ///< Unique name for this World (for use in configuration.)
@@ -116,7 +90,7 @@ namespace mabe {
 
     // @CAO: Still need to port over systematics!
 
-     // == Signals ==
+    // == Signals ==
     emp::SignalControl control;  // Setup the world to control various signals.
     
     /// Trigger signal... before organism gives birth w/parent position.
@@ -145,9 +119,14 @@ namespace mabe {
     
     /// Trigger signal... in the World destructor.
     emp::Signal<void()> world_destruct_sig;
-    
+  
+
+    // ----- Internal helper functions -----
+    void AddModule(emp::Ptr<OrganismTypeBase> pop_ptr) { organism_types.push_back(pop_ptr); }
+    void AddModule(emp::Ptr<SchemaBase> schema_ptr) { schemas.push_back(schema_ptr); }
+
   public:
-    World(const std::string & _name="World")
+    WorldBase(const std::string & _name="World")
       : organism_types(std::get<organism_types_t>(modules))
       , schemas(std::get<schemas_t>(modules))
       , name(_name), update(0), random()
@@ -165,17 +144,11 @@ namespace mabe {
       , on_death_sig(emp::to_string(name,"::on-death"), control)
       , on_swap_sig(emp::to_string(name,"::on-swap"), control)
       , world_destruct_sig(emp::to_string(name,"::wolrd-destruct"), control)
-    {
+    {      
     }
+    virtual ~WorldBase() { ; }
 
-    ~World() {
-      Clear();
-      world_destruct_sig.Trigger();
-      ForEachModule( [](emp::Ptr<ModuleBase> x){ x.Delete(); } );
-      for (auto file : files) file.Delete();
-    }
-
-    /// How many organisms can fit in the world?
+        /// How many organisms can fit in the world?
     size_t GetSize() const { return pops[0].size(); }
 
     /// How many organisms are currently in the world?
@@ -270,35 +243,6 @@ namespace mabe {
       return *(pops[1][id]);
     }
 
-
-
-    /// Build a new module in the World.    
-    template <typename T>
-    T & BuildModule(const std::string name) {
-      using module_t = to_module_t<T>;                   // Determine category type of module.
-      using mvector_t = emp::vector<emp::Ptr<module_t>>; // Determine vector type for category.
-      emp::Ptr<T> new_mod = emp::NewPtr<T>(name);        // Build the new module.
-      std::get<mvector_t>(modules).push_back(new_mod);   // Add new module to appropriate vector.
-      config.AddNameSpace(new_mod->GetConfig(), name);   // Setup this module's config in a namespace.
-      return *new_mod;                                   // Return the final module.
-    }
-
-    bool Config(int argc, char * argv[], const std::string & filename,
-                const std::string & macro_filename="") {
-      config.Read(filename, false);
-      auto args = emp::cl::ArgManager(argc, argv);
-      bool config_ok = args.ProcessConfigOptions(config, std::cout, filename, macro_filename);
-      if (!config_ok || args.HasUnknown()) return false;  // If there are leftover args, fail!
-
-      // Setup World with Config options.
-      random.ResetSeed(config.RANDOM_SEED());
-
-      // Now that all of the modules have been configured, allow them to setup the world.
-      ForEachModule( [this](emp::Ptr<ModuleBase> x){ x->Setup(*this); } );
-
-      return true;
-    }
-    
     int Run() {
       return 0;
     }
@@ -347,6 +291,75 @@ namespace mabe {
     /// Note: This function ignores population structure, so requires you to manage your own structure.
     void RemoveOrgAt(WorldPosition pos);
 
+  };
+
+
+  // ============================================
+  // ===                                      ===
+  // ===       class World<environment>       ===
+  // ===                                      ===
+  // ============================================
+
+
+  template <typename ENV_T>
+  class World : public WorldBase {
+  public:
+    using env_t = ENV_T;              ///< Specify the environment type for this world.
+    using config_t = base_config_t;   ///< @CAO: For now, just use the base config.
+
+  private:
+    // ----- World MODULES -----
+    env_t environment;    ///< Current environment. 
+    config_t config;      ///< Master configuration object.
+
+    void ForEachModule(std::function<void(emp::Ptr<ModuleBase>)> fun) {
+      fun(&environment);
+      for (emp::Ptr<ModuleBase> x : organism_types)  { fun(x); }
+      for (emp::Ptr<ModuleBase> x : schemas)         { fun(x); }
+    }
+
+
+  public:
+    World(const std::string & _name="World")
+      : WorldBase(_name), environment(), config()
+    {
+    }
+
+    ~World() {
+      Clear();
+      world_destruct_sig.Trigger();
+      ForEachModule( [](emp::Ptr<ModuleBase> x){ x.Delete(); } );
+      for (auto file : files) file.Delete();
+    }
+
+
+    /// Build a new module in the World.    
+    template <typename T>
+    T & BuildModule(const std::string name) {
+      using module_t = to_module_t<T>;                   // Determine category type of module.
+      using mvector_t = emp::vector<emp::Ptr<module_t>>; // Determine vector type for category.
+      emp::Ptr<T> new_mod = emp::NewPtr<T>(name);        // Build the new module.
+      std::get<mvector_t>(modules).push_back(new_mod);   // Add new module to appropriate vector.
+      config.AddNameSpace(new_mod->GetConfig(), name);   // Setup this module's config in a namespace.
+      return *new_mod;                                   // Return the final module.
+    }
+
+    bool Config(int argc, char * argv[], const std::string & filename,
+                const std::string & macro_filename="") {
+      config.Read(filename, false);
+      auto args = emp::cl::ArgManager(argc, argv);
+      bool config_ok = args.ProcessConfigOptions(config, std::cout, filename, macro_filename);
+      if (!config_ok || args.HasUnknown()) return false;  // If there are leftover args, fail!
+
+      // Setup World with Config options.
+      random.ResetSeed(config.RANDOM_SEED());
+
+      // Now that all of the modules have been configured, allow them to setup the world.
+      ForEachModule( [this](emp::Ptr<ModuleBase> x){ x->Setup(*this); } );
+
+      return true;
+    }
+    
 
     void PrintStatus() {
       std::cout << "Environemnt: " << environment->GetName()
@@ -362,13 +375,14 @@ namespace mabe {
     }
   };
 
+
   // =============================================================
   // ===                                                       ===
   // ===  Out-of-class member function definitions from above  ===
   // ===                                                       ===
   // =============================================================
 
-  void World::AddOrgAt(emp::Ptr<OrganismBase> new_org, WorldPosition pos, WorldPosition p_pos) {
+  void WorldBase::AddOrgAt(emp::Ptr<OrganismBase> new_org, WorldPosition pos, WorldPosition p_pos) {
     emp_assert(new_org);         // The new organism must exist.
     emp_assert(pos.IsValid());   // Position must be legal.
 
@@ -399,7 +413,7 @@ namespace mabe {
     if (pos.IsActive()) { on_placement_sig.Trigger(pos.GetIndex()); }
   }
 
-  void World::RemoveOrgAt(WorldPosition pos) {
+  void WorldBase::RemoveOrgAt(WorldPosition pos) {
     size_t id = pos.GetIndex();                       // Identify specific index.
     pop_t & cur_pop = pops[pos.GetPopID()];
     if (id >= cur_pop.size() || !cur_pop[id]) return; // Nothing to remove!
