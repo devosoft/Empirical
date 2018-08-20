@@ -16,7 +16,7 @@
 
 int main(int argc, char * argv[]) {
   // Build the world using these types.
-  mabe::World world("AagosWorld");
+  mabe::World world<mabe::NKLandscape>("AagosWorld");
 
   using org_type_t = mabe::OrganismType<mabe::VectorGenome<bool>, mabe::VectorGenome<int>>;
   using org_t = org_type_t::Organism;
@@ -24,13 +24,12 @@ int main(int argc, char * argv[]) {
   auto & org_type       = world.BuildModule<org_type_t>("Organisms");
   org_type.GetGenomeType<1>().SetName("GenePositions");
 
-  auto & landscape      = world.BuildModule<mabe::NKLandscape>("NKLandscape");
   auto & tourny_schema  = world.BuildModule<mabe::TournamentSelect>("TournamentSelect");
 
-  auto fit_fun = [&landscape](mabe::OrganismBase & base_org){
+  auto fit_fun = [&world](mabe::OrganismBase & base_org){
     org_t & org = (org_t &) base_org;
     (void) org;
-    (void) landscape;
+    // @CAO: world.GetEnvironment() ...
     return 1.0;
   };
   tourny_schema.SetFitFun(fit_fun);
