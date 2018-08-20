@@ -18,7 +18,7 @@
  * 
  *  The author of a new MABE module *may* also choose to override:
  * 
- *    Setup(World &)
+ *    Setup(WorldBase &)
  *      As modules are created, they will be given the opportunity to modify world settings,
  *      module settings, or attach to world signals, as needed.
  *    
@@ -37,8 +37,8 @@ namespace mabe {
     NONE=0, BASE, ENVIRONMENT, ORGANISM_TYPE, SCHEMA, UNKNOWN
   };
 
-  /// Allow modules to know about the eventual existance for the world object.
-  class World;
+  /// Allow modules to know about the eventual existance for the WorldBase object.
+  class WorldBase;
 
   /// Base class for all major MABE modules that can receive names.
   class ModuleBase {
@@ -65,7 +65,7 @@ namespace mabe {
 
     /// After config is finalized, modules will be provided with a World object.  This function
     /// should be used to configure world, to configure the module, or link up signals.
-    virtual void Setup(World &) { ; }
+    virtual void Setup(WorldBase &) { ; }
 
   };
 
