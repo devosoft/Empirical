@@ -16,13 +16,12 @@
 
 int main(int argc, char * argv[]) {
   // Build the world using these types.
-  mabe::World world("NKWorld");
+  mabe::World world<mabe::NKLandscape>("NKWorld");
 
   using org_type_t = mabe::OrganismType<mabe::VectorGenome<bool>>;
   using org_t = org_type_t::Organism;
 
   world.BuildModule<org_type_t>("Organisms");
-  world.BuildModule<mabe::NKLandscape>("NKLandscape");
   world.BuildModule<mabe::TournamentSelect>("TournamentSelect");
 
   // Configure the world using the "Aagos.cfg" file and command-line overrides.
