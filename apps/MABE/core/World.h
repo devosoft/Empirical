@@ -34,23 +34,33 @@
 
 namespace mabe {
 
-  class World {
+  /// A base class for all world types, containing common functionality and all interfaces.
+  class WorldBase {
   public:
-    using value_type = OrganismBase;   // For compatability with vectors.
-    using org_t = OrganismBase;
-    using org_ptr_t = emp::Ptr<org_t>;
-    using pop_t = emp::vector<org_ptr_t>;
+    using org_t = OrganismBase;           ///< Organisms are tracked by base classes.
+    using value_type = OrganismBase;      ///< For compatability with vectors.
+    using org_ptr_t = emp::Ptr<org_t>;    ///< To restore from base class, org pointers are used.
+    using pop_t = emp::vector<org_ptr_t>; ///< Populations are tracked by vectors
+  protected:
+  public:
+    WorldBase () { ; }
+    virtual ~WorldBase() { ; }
+  };
+
+  template <typename ENV_T>
+  class World : public WorldBase {
+  public:
+    using env_t = ENV_T;                  ///< Specify the environment type for this world.
 
   private:
     /// Function type for calculating fitness, typically set by the environment.
     using fun_calc_fitness_t    = std::function<double(OrganismBase&)>;
 
-    using environments_t = emp::vector<emp::Ptr<EnvironmentBase>>;    ///< Type of vector of all Environments
     using organism_types_t = emp::vector<emp::Ptr<OrganismTypeBase>>; ///< Type of vector of all OrganismTypes
     using schemas_t = emp::vector<emp::Ptr<SchemaBase>>;              ///< Type of vector of all Schemas
 
-    /// Type of tuple of all modules to be built in the world.
-    using modules_t = std::tuple<environments_t, organism_types_t, schemas_t>;
+    /// Type of tuple of all dynamic modules to be built in the world.
+    using modules_t = std::tuple<organism_types_t, schemas_t>;
 
     /// Type of master World config file.
     EMP_BUILD_CONFIG( config_t,
@@ -60,20 +70,19 @@ namespace mabe {
 
     // ----- World MODULES -----
 
+    env_t environment;    ///< Current environment. 
     modules_t modules;    ///< Pointers to all modules, divided into tuple of type-specific vectors.
 
-    environments_t & environments;     ///< Direct link to environments vector of modules. 
     organism_types_t & organism_types; ///< Direct link to organism types vector of modules. 
     schemas_t & schemas;               ///< Direct link to schemas vector of modules. 
 
     config_t config;                   ///< Master configuration object.
 
-    void AddModule(emp::Ptr<EnvironmentBase> env_ptr) { environments.push_back(env_ptr); }
     void AddModule(emp::Ptr<OrganismTypeBase> pop_ptr) { organism_types.push_back(pop_ptr); }
     void AddModule(emp::Ptr<SchemaBase> schema_ptr) { schemas.push_back(schema_ptr); }
 
     void ForEachModule(std::function<void(emp::Ptr<ModuleBase>)> fun) {
-      for (emp::Ptr<ModuleBase> x : environments)    { fun(x); }
+      fun(&environment);
       for (emp::Ptr<ModuleBase> x : organism_types)  { fun(x); }
       for (emp::Ptr<ModuleBase> x : schemas)         { fun(x); }
     }
@@ -139,8 +148,7 @@ namespace mabe {
     
   public:
     World(const std::string & _name="World")
-      : environments(std::get<environments_t>(modules))
-      , organism_types(std::get<organism_types_t>(modules))
+      : organism_types(std::get<organism_types_t>(modules))
       , schemas(std::get<schemas_t>(modules))
       , name(_name), update(0), random()
       , pops(), active_pop(pops[0]), next_pop(pops[1]), num_orgs(0)
@@ -341,10 +349,8 @@ namespace mabe {
 
 
     void PrintStatus() {
-      std::cout << "Environemnts: " << environments.size() << std::endl;
-      for (auto x : environments) { 
-        std::cout << "  " << x->GetName() << " (class name: " << x->GetClassName() << ")" << std::endl;
-      }
+      std::cout << "Environemnt: " << environment->GetName()
+                << " (class name: " << environment->GetClassName() << ")" << std::endl;
       std::cout << "Organism Types: " << organism_types.size() << std::endl;
       for (auto x : organism_types) { 
         std::cout << "  " << x->GetName() << " (class name: " << x->GetClassName() << ")" << std::endl;
