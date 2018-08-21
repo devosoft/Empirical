@@ -48,19 +48,14 @@ namespace mabe {
     using organism_types_t = emp::vector<emp::Ptr<OrganismTypeBase>>; ///< Type for vector of OrganismTypes
     using schemas_t = emp::vector<emp::Ptr<SchemaBase>>;              ///< Type for vector of Schemas
 
-    /// Type of tuple of all dynamic modules to be built in the world.
-    using modules_t = std::tuple<organism_types_t, schemas_t>;
-
     /// Type of master World config file.
     EMP_BUILD_CONFIG( base_config_t,
       GROUP(DEFAULT_GROUP, "Master World Settings"),
       VALUE(RANDOM_SEED, int, 0, "Seed for main random number generator. Use 0 for based on time."),
     )
 
-    modules_t modules;    ///< Pointers to all modules, divided into tuple of type-specific vectors.
-
-    organism_types_t & organism_types; ///< Direct link to organism types vector of modules. 
-    schemas_t & schemas;               ///< Direct link to schemas vector of modules. 
+    organism_types_t organism_types;  ///< Vector of organism-type modules. 
+    schemas_t schemas;                ///< Vector of schema modules. 
 
     // ----- World STATE -----
     const std::string name;           ///< Unique name for this World (for use in configuration.)
@@ -127,8 +122,7 @@ namespace mabe {
 
   public:
     WorldBase(const std::string & _name="World")
-      : organism_types(std::get<organism_types_t>(modules))
-      , schemas(std::get<schemas_t>(modules))
+      : organism_types(), schemas()
       , name(_name), update(0), random()
       , pops(), active_pop(pops[0]), next_pop(pops[1]), num_orgs(0)
       , fit_cache(), cache_on(false), pop_sizes(1,0), phenotypes(), files()
