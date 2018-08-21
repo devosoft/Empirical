@@ -24,7 +24,7 @@
 
 namespace mabe {
 
-  class World;
+  template <typename ENV_T> class World;
 
   /// A class to track positions in World.
   /// For the moment, the only informaiton beyond index is active (vs. next) population when
