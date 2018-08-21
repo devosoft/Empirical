@@ -323,6 +323,7 @@ namespace mabe {
     World(const std::string & _name="World")
       : WorldBase(_name), environment(_name), config()
     {
+      config.AddNameSpace(environment.GetConfig(), name);   // Setup environment config in a namespace.
     }
 
     ~World() {
@@ -338,6 +339,7 @@ namespace mabe {
       for (auto file : files) file.Delete();
     }
 
+    env_t & GetEnvironment() { return environment; }
 
     /// Build a new module in the World.    
     template <typename T>
