@@ -356,8 +356,10 @@ namespace mabe {
                 const std::string & macro_filename="") {
       config.Read(filename, false);
       auto args = emp::cl::ArgManager(argc, argv);
-      bool config_ok = args.ProcessConfigOptions(config, std::cout, filename, macro_filename);
-      if (!config_ok || args.HasUnknown()) return false;  // If there are leftover args, fail!
+      bool config_continue = args.ProcessConfigOptions(config, std::cout, filename, macro_filename);
+
+      if (!config_continue) exit(0);  // Exit if config is supposed to stop (e.g., --gen)
+      if (args.HasUnknown()) exit(1); // Exit if there were unknown command line args provided.
 
       // Setup World with Config options.
       random.ResetSeed(config.RANDOM_SEED());
@@ -370,7 +372,7 @@ namespace mabe {
     
 
     void PrintStatus() {
-      std::cout << "Environemnt: " << environment.GetName()
+      std::cout << "Environment: " << environment.GetName()
                 << " (class name: " << environment.GetClassName() << ")" << std::endl;
       std::cout << "Organism Types: " << organism_types.size() << std::endl;
       for (auto x : organism_types) { 
