@@ -201,29 +201,29 @@ namespace mabe {
 
     /// Denote that this World will be treated as having synchronous generations.
     /// (Note: this function does not change functionality, just indicates what's happening!)
-    World & MarkSynchronous(bool in=true) { is_synchronous = in; return *this; }
+    void MarkSynchronous(bool in=true) { is_synchronous = in; }
 
     /// Denote that the World will have a spatial structure to the organisms.
     /// (Note: this function does not change functionality, just indicates what's happening!)
-    World & MarkSpaceStructured(bool in=true) { is_space_structured = in; return *this; }
+    void MarkSpaceStructured(bool in=true) { is_space_structured = in; }
 
     /// Denote that the World will have organisms structured based on phenotype.
     /// (Note: this function does not change functionality, just indicates what's happening!)
-    World & MarkPhenoStructured(bool in=true) { is_pheno_structured = in; return *this; }
+    void MarkPhenoStructured(bool in=true) { is_pheno_structured = in; }
 
     /// Index into a world to obtain a const reference to an organism.  Any manipulations to
     /// organisms should go through other functions to be tracked appropriately.
     /// Will trip assert if cell is not occupied.
     const org_t & operator[](size_t id) const {
-      emp_assert(pop[id] != nullptr, id);  // Should not index to a null organism!
+      emp_assert(active_pop[id] != nullptr, id);  // Should not index to a null organism!
       return *(pops[0][id]);
     }
 
     /// Retrieve a reference to the organsim as the specified position.
     /// Same as operator[]; will trip assert if cell is not occupied.
     org_t & GetOrg(size_t id) {
-      emp_assert(id < pop.size());         // Pop must be large enough.
-      emp_assert(pop[id] != nullptr, id);  // Should not index to a null organism!
+      emp_assert(id < active_pop.size());         // Pop must be large enough.
+      emp_assert(active_pop[id] != nullptr, id);  // Should not index to a null organism!
       return *(pops[0][id]);
     }
 
@@ -321,14 +321,20 @@ namespace mabe {
 
   public:
     World(const std::string & _name="World")
-      : WorldBase(_name), environment(), config()
+      : WorldBase(_name), environment(_name), config()
     {
     }
 
     ~World() {
+      // Remove all organisms.
       Clear();
+
+      // Triger the signal to indicate that the world is being destroyed.
       world_destruct_sig.Trigger();
-      ForEachModule( [](emp::Ptr<ModuleBase> x){ x.Delete(); } );
+
+      // Clean up all allocated pointers.
+      for (emp::Ptr<ModuleBase> x : organism_types)  { x.Delete(); }
+      for (emp::Ptr<ModuleBase> x : schemas)         { x.Delete(); }
       for (auto file : files) file.Delete();
     }
 
@@ -362,8 +368,8 @@ namespace mabe {
     
 
     void PrintStatus() {
-      std::cout << "Environemnt: " << environment->GetName()
-                << " (class name: " << environment->GetClassName() << ")" << std::endl;
+      std::cout << "Environemnt: " << environment.GetName()
+                << " (class name: " << environment.GetClassName() << ")" << std::endl;
       std::cout << "Organism Types: " << organism_types.size() << std::endl;
       for (auto x : organism_types) { 
         std::cout << "  " << x->GetName() << " (class name: " << x->GetClassName() << ")" << std::endl;
