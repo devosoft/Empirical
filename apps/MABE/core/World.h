@@ -344,12 +344,10 @@ namespace mabe {
     /// Build a new module in the World.    
     template <typename T>
     T & BuildModule(const std::string name) {
-      using module_t = to_module_t<T>;                   // Determine category type of module.
-      using mvector_t = emp::vector<emp::Ptr<module_t>>; // Determine vector type for category.
-      emp::Ptr<T> new_mod = emp::NewPtr<T>(name);        // Build the new module.
-      std::get<mvector_t>(modules).push_back(new_mod);   // Add new module to appropriate vector.
-      config.AddNameSpace(new_mod->GetConfig(), name);   // Setup this module's config in a namespace.
-      return *new_mod;                                   // Return the final module.
+      emp::Ptr<T> new_mod = emp::NewPtr<T>(name);          // Build the new module.
+      AddModule(new_mod.template Cast<to_module_t<T>>()); // Add new module to appropriate vector.
+      config.AddNameSpace(new_mod->GetConfig(), name);    // Setup module's config in a namespace.
+      return *new_mod;                                    // Return the final module.
     }
 
     bool Config(int argc, char * argv[], const std::string & filename,
