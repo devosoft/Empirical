@@ -50,10 +50,10 @@ namespace mabe {
     static constexpr mabe::ModuleType GetModuleType() { return ModuleType::ORGANISM_TYPE; }
 
     /// Add a new event function for this organism type; wrap the function and store it.
-    virtual bool AddEventFunction(FunctionInfo & info) = 0;
+    // virtual bool AddEventFunction(FunctionInfo & info) = 0;
 
     /// Add a new action function for this organism type; wrap the function and store it.
-    virtual bool AddActionFunction(FunctionInfo & info) = 0;
+    // virtual bool AddActionFunction(FunctionInfo & info) = 0;
 
   };
 
