@@ -18,14 +18,14 @@
 
 int main(int argc, char * argv[]) {
   // Build the world using these types.
-  mabe::World world<mabe::ResourceGrid>("ForageWorld");
+  mabe::World<mabe::ResourceGrid> world("ForageWorld");
 
   using org_t = mabe::OrganismType<mabe::AvidaGP, mabe::LinearGenome>;
   auto & org_type        = world.BuildModule<org_t>("Organisms");
   auto & tourny_schema   = world.BuildModule<mabe::TournamentSelect>("TournamentSelect");
   auto & lineage_tracker = world.BuildModule<mabe::TrackLineage>("LineageTracker");
 
-  (void) org_type; (void) resource_grid; (void) tourny_schema; (void) lineage_tracker;
+  (void) org_type; (void) tourny_schema; (void) lineage_tracker;
 
   // Configure the world using the "forage.cfg" file and command-line overrides.
   world.Config(argc, argv, "forage.cfg");

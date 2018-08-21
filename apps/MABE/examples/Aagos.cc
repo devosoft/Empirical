@@ -16,7 +16,7 @@
 
 int main(int argc, char * argv[]) {
   // Build the world using these types.
-  mabe::World world<mabe::NKLandscape>("AagosWorld");
+  mabe::World<mabe::NKLandscape> world("AagosWorld");
 
   using org_type_t = mabe::OrganismType<mabe::VectorGenome<bool>, mabe::VectorGenome<int>>;
   using org_t = org_type_t::Organism;
