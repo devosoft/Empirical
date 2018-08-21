@@ -3,14 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  BrainBase.h
+ *  @file  BrainTypeBase.h
  *  @brief Base class for all brain types.
  *
  *  Brains are basic forms of agent contollers.
  */
 
-#ifndef MABE_BRAIN_BASE_H
-#define MABE_BRAIN_BASE_H
+#ifndef MABE_BRAIN_TYPE_BASE_H
+#define MABE_BRAIN_TYPE_BASE_H
 
 #include <string>
 
@@ -18,12 +18,12 @@
 
 namespace mabe {
 
-  class BrainBase {
+  class BrainTypeBase {
   private:
     std::string name;
   public:
-    BrainBase() { ; }
-    virtual ~BrainBase() { ; }
+    BrainTypeBase() { ; }
+    virtual ~BrainTypeBase() { ; }
 
     virtual std::string GetClassName() const = 0;
     virtual emp::Config & GetConfig() = 0;

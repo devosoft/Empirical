@@ -12,8 +12,8 @@
  *  information it needs to store in organisms.
  */
 
-#ifndef MABE_GENOME_BASE_H
-#define MABE_GENOME_BASE_H
+#ifndef MABE_GENOME_TYPE_BASE_H
+#define MABE_GENOME_TYPE_BASE_H
 
 #include <string>
 

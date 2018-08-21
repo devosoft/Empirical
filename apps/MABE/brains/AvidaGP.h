@@ -10,11 +10,11 @@
 #ifndef MABE_AVIDA_GP_H
 #define MABE_AVIDA_GP_H
 
-#include "core/BrainBase.h"
+#include "core/BrainTypeBase.h"
 
 namespace mabe {
 
-  class AvidaGP : public BrainBase {
+  class AvidaGP : public BrainTypeBase {
   private:
     EMP_BUILD_CONFIG( AvidaGPConfig,
       GROUP(DEFAULT_GROUP, "Vector Genome Settings"),

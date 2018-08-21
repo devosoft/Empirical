@@ -31,7 +31,7 @@ namespace mabe {
     using data_tup_t = typename genomes_data_t::template apply<std::tuple>;
     using data_fun_t = std::function<typename genomes_data_t::template to_function_t<double>>;
 
-    using brains_t = typename modules_t::template filter<is_brain>;
+    using brains_t = typename modules_t::template filter<is_brain_type>;
     using brains_tup_t  = typename brains_t::template apply<std::tuple>;
     template <typename T> using to_compute = typename T::compute_t;
     using brains_compute_t = typename brains_t::template wrap<to_compute>;
@@ -66,7 +66,7 @@ namespace mabe {
 
       // Loop through all brain types.
       size_t brain_count = 0;
-      emp::TupleIterate(brain_types, [this, &brain_count](BrainBase & brain_type){
+      emp::TupleIterate(brain_types, [this, &brain_count](BrainTypeBase & brain_type){
         brain_type.SetName( emp::to_string("brain", brain_count) );
         brain_count++;
         config.AddNameSpace(brain_type.GetConfig(), brain_type.GetName());
