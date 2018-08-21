@@ -98,15 +98,19 @@ namespace emp {
       /// Convert settings from a configure object to command-line arguments.
       /// Return bool for "should program proceed" (i.e., true=continue, false=exit).
       bool ProcessConfigOptions(Config & config, std::ostream & os,
-				const std::string & cfg_file="",
-				const std::string & macro_file="") {
+                                const std::string & cfg_file="",
+                                const std::string & macro_file="")
+      {
+        // Scan through the config object to generate command line flags for each setting.
         for (auto e : config) {
           auto entry = e.second;
           std::string desc = emp::to_string( entry->GetDescription(),
-                " (type=", entry->GetType(), "; default=", entry->GetDefault(), ')' );
+                                             " (type=", entry->GetType(),
+                                             "; default=", entry->GetDefault(), ')' );
           UseArg(to_string('-', entry->GetName()), config, entry->GetName(), desc);
         }
 
+        // Determine if we're using any special options for comman line flags.
         bool print_help    = UseFlag("--help", "Print help information.");
         bool create_config = cfg_file.size() && UseFlag("--gen", "Generate configuration file.");
         bool const_macros  = macro_file.size() && UseFlag("--make-const", "Generate const version of macros file.");
