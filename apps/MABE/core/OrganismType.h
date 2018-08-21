@@ -41,7 +41,6 @@ namespace mabe {
     brains_tup_t brain_types;
 
     /// The configuration object for organisms is a set of namespaces for its components.
-    // @CAO: Setup these namespaces!
     emp::Config config;
 
     /// Collect the class names of internal modules.
@@ -86,6 +85,10 @@ namespace mabe {
     public:
       template<int ID> auto & GetGenome() { return std::get<ID>(genomes); }
       template<int ID> auto & GetBrain() { return std::get<ID>(brains); }
+      const data_tup_t & GetGenomes() const { return genomes; }
+      const compute_tup_t & GetBrains() const { return brains; }
+      data_tup_t & GetGenomes() { return genomes; }
+      compute_tup_t & GetBrains() { return brains; }
     };
 
     /// Print out the name of this class, including template parameters (for debugging)
@@ -102,6 +105,43 @@ namespace mabe {
 
     template<int ID>
     auto & GetBrainType() { return std::get<ID>(brain_types); }
+
+    constexpr size_t GetNumGenomes() const { return genomes_t::GetSize(); }
+    constexpr size_t GetNumBrains() const { return brains_t::GetSize(); }
+
+    template <typename RETURN, typename... ARGS>
+    bool AddActionFunction(std::function<RETURN(ARGS...)> fun,
+                           size_t action_id, const std::string & name,
+                           const std::string & type, const std::string & desc)
+    {
+      // For the moment, ignore unused arguments.
+      (void) name; (void) type; (void) desc;
+
+      // Make sure we have room for this action.
+      if (action_funs.size() <= action_id) action_funs.resize(action_id+1);
+      emp_assert(action_funs[action_id] == false, "Trying to replace an existing action function.");
+
+      // If this action can be used by a brain, do so!
+      // @CAO Write this.
+
+      // Otherwise, see if this action can be called with the genome.
+      if constexpr ( std::is_same<data_fun_t, RETURN(ARGS...)>() ) {
+        // Build a function that find the genome state of an organisms, feeds it into the input
+        // function, and return the result.
+        auto action_fun = [fun](OrganismBase & org_base) {
+          Organism & org = (Organism &) org_base;
+          return emp::ApplyTuple( fun, org.GetGenomes() );
+        };
+
+        // Store a pointer to this function, converted to a GenericFunction
+        action_funs[action_id] = emp::NewPtr< emp::Function<data_fun_t> >(action_fun);
+
+        return true;
+      }
+
+      // Otherwise we won't use it.
+      return false;
+    }
 
     /// Add a new event function for this organism type; wrap the function and store it.
     // bool AddEventFunction(FunctionInfo & info) override {
