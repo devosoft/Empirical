@@ -109,11 +109,19 @@ namespace emp {
 
         bool print_help    = UseFlag("--help", "Print help information.");
         bool create_config = cfg_file.size() && UseFlag("--gen", "Generate configuration file.");
-        bool const_macros  = macro_file.size() && UseFlag("--const", "Generate const version of macros file.");
+        bool const_macros  = macro_file.size() && UseFlag("--make-const", "Generate const version of macros file.");
 
         if (print_help)    { PrintHelp(os); return false; }
-        if (create_config) { config.Write(cfg_file); return false; }
-        if (const_macros)  { config.WriteMacros(macro_file, true); return false; }
+        if (create_config) { 
+          os << "Generating new config file: " << cfg_file << std::endl;
+          config.Write(cfg_file);
+          return false;
+        }
+        if (const_macros)  {
+          os << "Generating new macros file: " << macro_file << std::endl;
+          config.WriteMacros(macro_file, true);
+          return false;
+        }
 
         return true;
       }
