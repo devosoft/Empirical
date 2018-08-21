@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  GenomeBase.h
+ *  @file  GenomeTypeBase.h
  *  @brief Base class for all genome types.
  *
  *  Genomes are generic ways of encoding info for Brains or other aspects of organisms.
@@ -21,12 +21,12 @@
 
 namespace mabe {
 
-  class GenomeBase {
+  class GenomeTypeBase {
   private:
     std::string name;
   public:
-    GenomeBase() { ; }
-    virtual ~GenomeBase() { ; }
+    GenomeTypeBase() { ; }
+    virtual ~GenomeTypeBase() { ; }
 
     virtual std::string GetClassName() const = 0;
     virtual emp::Config & GetConfig() = 0;

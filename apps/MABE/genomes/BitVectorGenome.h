@@ -12,11 +12,11 @@
 
 #include "tools/BitVector.h"
 
-#include "core/GenomeBase.h"
+#include "core/GenomeTypeBase.h"
 
 namespace mabe {
 
-  class BitVectorGenome : public GenomeBase {
+  class BitVectorGenome : public GenomeTypeBase {
   private:
     EMP_BUILD_CONFIG( BVConfig,
       GROUP(DEFAULT_GROUP, "BitVector Genome Settings"),
@@ -29,7 +29,7 @@ namespace mabe {
     BitVectorGenome() { ; }
 
     std::string GetClassName() const override { return "BitVectorGenome"; }
-    LGConfig & GetConfig() override { return config; }
+    BVConfig & GetConfig() override { return config; }
 
     using data_t = emp::BitVector;
   };

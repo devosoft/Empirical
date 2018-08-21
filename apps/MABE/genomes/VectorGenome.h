@@ -12,12 +12,12 @@
 
 #include "base/vector.h"
 
-#include "core/GenomeBase.h"
+#include "core/GenomeTypeBase.h"
 
 namespace mabe {
 
   template <typename T>
-  class VectorGenome : public GenomeBase {
+  class VectorGenome : public GenomeTypeBase {
   private:
     EMP_BUILD_CONFIG( VGConfig,
       GROUP(DEFAULT_GROUP, "Vector Genome Settings"),

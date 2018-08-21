@@ -24,7 +24,7 @@ namespace mabe {
   private:
     using modules_t = emp::TypePack<Ts...>;
 
-    using genomes_t = typename modules_t::template filter<is_genome>;
+    using genomes_t = typename modules_t::template filter<is_genome_type>;
     using genomes_tup_t = typename genomes_t::template apply<std::tuple>;
     template <typename T> using to_data = typename T::data_t;
     using genomes_data_t = typename genomes_t::template wrap<to_data>;
@@ -58,7 +58,7 @@ namespace mabe {
     OrganismType(const std::string & in_name) : OrganismTypeBase(in_name) { 
       // Loop through all genome types.
       size_t genome_count = 0;
-      emp::TupleIterate(genome_types, [this, &genome_count](GenomeBase & genome_type){
+      emp::TupleIterate(genome_types, [this, &genome_count](GenomeTypeBase & genome_type){
         genome_type.SetName( emp::to_string("genome", genome_count) );
         genome_count++;
         config.AddNameSpace(genome_type.GetConfig(), genome_type.GetName());

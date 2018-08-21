@@ -10,11 +10,11 @@
 #ifndef MABE_LINEAR_GENOME_H
 #define MABE_LINEAR_GENOME_H
 
-#include "core/GenomeBase.h"
+#include "core/GenomeTypeBase.h"
 
 namespace mabe {
 
-  class LinearGenome : public GenomeBase {
+  class LinearGenome : public GenomeTypeBase {
   private:
     EMP_BUILD_CONFIG( LGConfig,
       GROUP(DEFAULT_GROUP, "Linear Genome Settings"),
