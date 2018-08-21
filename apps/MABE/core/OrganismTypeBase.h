@@ -9,8 +9,18 @@
  *  This file details all of the basic functionality that all organisms MUST have, providing
  *  reasonable defaults when such are possible.
  * 
- *  Every organism type must define an internal type 'Organism' that determines the type of each
- *  individual org.
+ *  All organisms must be able to deal with two types of functors:
+ *   ACTIONS are functions that organisms can trigger through their execution or outputs.
+ *   EVENTS are functions that environments will call to indicate input sent to the organisms.
+ * 
+ *  Every derived organism type must:
+ *   1. Define an internal type 'Organism' that determines the type of each individual org.
+ *   2. Implement set of AddActionFunction() member functions that provide functors that this
+ *      organism type can use (or be asked to use), with a name, unique ID, type (as string),
+ *      and description.  Return is a bool indicating success at using.
+ *   3. Implement set of AddEventFunction() member functions that build GenericFunctions to
+ *      call from the environment (with the appropriate args) when an event occurs.
+ * 
  */
 
 #ifndef MABE_ORGANISM_TYPE_BASE_H
@@ -28,19 +38,12 @@ namespace mabe {
 
   class OrganismTypeBase : public ModuleBase {
   protected:
-    /// These are functions that were originally provided by the environment and wrapped by
-    /// this organism type so that it will take an OrganismBase reference as its only argument
-    /// and return a double.  The environment will call these functions when specific events
-    /// are triggered.  Anything more complex than a double should be handled with a callback
-    /// using one of the action functions in the next group.
-    using event_fun_t = std::function<double(OrganismBase &)>;
-    emp::vector<event_fun_t> event_funs;
-
-    /// These are functions that were originally provided by the environment and wrapped by
-    /// this organism type to be callable with a common interface (providing a reference to the
-    /// calling organism).  The only return type allowed is a double; anything more complex
-    /// should be handed with a callback.
-    emp::vector<event_fun_t> action_funs;
+    /// These are functions that were provided by the environment and wrapped by this organism
+    /// type.  It will take an OrganismBase reference along with any event-specifc arguments.
+    /// The environment will call these functions when associated specific events are triggered.
+    using fun_ptr_t = emp::Ptr<emp::GenericFunction>;
+    emp::vector<fun_ptr_t> action_funs;
+    emp::vector<fun_ptr_t> event_funs;
 
   public:
     OrganismTypeBase(const std::string & in_name) : ModuleBase(in_name) { ; }    
@@ -49,11 +52,10 @@ namespace mabe {
 
     static constexpr mabe::ModuleType GetModuleType() { return ModuleType::ORGANISM_TYPE; }
 
-    /// Add a new event function for this organism type; wrap the function and store it.
-    // virtual bool AddEventFunction(FunctionInfo & info) = 0;
-
-    /// Add a new action function for this organism type; wrap the function and store it.
-    // virtual bool AddActionFunction(FunctionInfo & info) = 0;
+    template <typename... Ts>
+    double TriggerEvent(OrganismBase & org, size_t event_id, Ts &&... args) {
+      return event_funs[event_id]->Call<double, Ts...>(org, std::forward<Ts>(args)...);
+    }
 
   };
 
