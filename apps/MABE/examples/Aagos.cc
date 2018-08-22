@@ -21,10 +21,10 @@ int main(int argc, char * argv[]) {
   using org_type_t = mabe::OrganismType<mabe::VectorGenome<bool>, mabe::VectorGenome<int>>;
   using org_t = org_type_t::Organism;
 
-  auto & org_type       = world.BuildModule<org_type_t>("Organisms");
+  auto & org_type = world.AddOrgType<org_type_t>("Organisms");
   org_type.GetGenomeType<1>().SetName("GenePositions");
 
-  auto & tourny_schema  = world.BuildModule<mabe::TournamentSelect>("TournamentSelect");
+  auto & tourny_schema  = world.AddSchema<mabe::TournamentSelect>("TournamentSelect");
 
   auto fit_fun = [&world](mabe::OrganismBase & base_org){
     org_t & org = (org_t &) base_org;

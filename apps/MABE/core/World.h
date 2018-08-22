@@ -116,11 +116,6 @@ namespace mabe {
     /// Trigger signal... in the World destructor.
     emp::Signal<void()> world_destruct_sig;
   
-
-    // ----- Internal helper functions -----
-    void AddModule(emp::Ptr<OrganismTypeBase> pop_ptr) { organism_types.push_back(pop_ptr); }
-    void AddModule(emp::Ptr<SchemaBase> schema_ptr) { schemas.push_back(schema_ptr); }
-
   public:
     WorldBase(const std::string & _name="World")
       : organism_types(), schemas()
@@ -329,13 +324,22 @@ namespace mabe {
 
     env_t & GetEnvironment() { return environment; }
 
-    /// Build a new module in the World.    
+    /// Build a new organism type module in the World.    
     template <typename T>
-    T & BuildModule(const std::string name) {
-      emp::Ptr<T> new_mod = emp::NewPtr<T>(name);         // Build the new module.
-      AddModule(new_mod.template Cast<to_module_t<T>>()); // Add new module to appropriate vector.
-      config.AddNameSpace(new_mod->GetConfig(), name);    // Setup module's config in a namespace.
-      return *new_mod;                                    // Return the final module.
+    T & AddOrgType(const std::string name) {
+      emp::Ptr<T> new_mod = emp::NewPtr<T>(name);       // Build the new module.
+      organism_types.push_back(new_mod);                // Store new module in org type vector.
+      config.AddNameSpace(new_mod->GetConfig(), name);  // Setup module's config in a namespace.
+      return *new_mod;                                  // Return the final module.
+    }
+
+    /// Build a new schema module in the World.    
+    template <typename T>
+    T & AddSchema(const std::string name) {
+      emp::Ptr<T> new_mod = emp::NewPtr<T>(name);       // Build the new module.
+      schemas.push_back(new_mod);                       // Store new module in schema vector.
+      config.AddNameSpace(new_mod->GetConfig(), name);  // Setup module's config in a namespace.
+      return *new_mod;                                  // Return the final module.
     }
 
     bool Config(int argc, char * argv[], const std::string & filename,

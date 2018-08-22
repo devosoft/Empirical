@@ -21,9 +21,9 @@ int main(int argc, char * argv[]) {
   mabe::World<mabe::ResourceGrid> world("ForageWorld");
 
   using org_t = mabe::OrganismType<mabe::AvidaGP, mabe::LinearGenome>;
-  auto & org_type        = world.BuildModule<org_t>("Organisms");
-  auto & tourny_schema   = world.BuildModule<mabe::TournamentSelect>("TournamentSelect");
-  auto & lineage_tracker = world.BuildModule<mabe::TrackLineage>("LineageTracker");
+  auto & org_type        = world.AddOrgType<org_t>("Organisms");
+  auto & tourny_schema   = world.AddSchema<mabe::TournamentSelect>("TournamentSelect");
+  auto & lineage_tracker = world.AddSchema<mabe::TrackLineage>("LineageTracker");
 
   (void) org_type; (void) tourny_schema; (void) lineage_tracker;
 

@@ -21,8 +21,8 @@ int main(int argc, char * argv[]) {
   using org_type_t = mabe::OrganismType<mabe::VectorGenome<bool>>;
   using org_t = org_type_t::Organism;
 
-  world.BuildModule<org_type_t>("Organisms");
-  world.BuildModule<mabe::TournamentSelect>("TournamentSelect");
+  world.AddOrgType<org_type_t>("Organisms");
+  world.AddSchema<mabe::TournamentSelect>("TournamentSelect");
 
   // Configure the world using the "Aagos.cfg" file and command-line overrides.
   world.Config(argc, argv, "NK.cfg");
