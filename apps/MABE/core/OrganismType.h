@@ -24,21 +24,21 @@ namespace mabe {
   private:
     using modules_t = emp::TypePack<Ts...>;
 
-    using genomes_t = typename modules_t::template filter<is_genome_type>;
-    using genomes_tup_t = typename genomes_t::template apply<std::tuple>;
+    using genome_types_t = typename modules_t::template filter<is_genome_type>;
+    using genome_types_tup_t = typename genome_types_t::template apply<std::tuple>;
     template <typename T> using to_data = typename T::data_t;
-    using genomes_data_t = typename genomes_t::template wrap<to_data>;
+    using genomes_data_t = typename genome_types_t::template wrap<to_data>;
     using data_tup_t = typename genomes_data_t::template apply<std::tuple>;
     using data_fun_t = std::function<typename genomes_data_t::template to_function_t<double>>;
 
-    using brains_t = typename modules_t::template filter<is_brain_type>;
-    using brains_tup_t  = typename brains_t::template apply<std::tuple>;
+    using brain_types_t = typename modules_t::template filter<is_brain_type>;
+    using brain_types_tup_t  = typename brain_types_t::template apply<std::tuple>;
     template <typename T> using to_compute = typename T::compute_t;
-    using brains_compute_t = typename brains_t::template wrap<to_compute>;
+    using brains_compute_t = typename brain_types_t::template wrap<to_compute>;
     using compute_tup_t  = typename brains_compute_t::template apply<std::tuple>;
 
-    genomes_tup_t genome_types;
-    brains_tup_t brain_types;
+    genome_types_tup_t genome_types;
+    brain_types_tup_t brain_types;
 
     /// The configuration object for organisms is a set of namespaces for its components.
     emp::Config config;
@@ -106,8 +106,8 @@ namespace mabe {
     template<int ID>
     auto & GetBrainType() { return std::get<ID>(brain_types); }
 
-    constexpr size_t GetNumGenomes() const { return genomes_t::GetSize(); }
-    constexpr size_t GetNumBrains() const { return brains_t::GetSize(); }
+    constexpr size_t GetNumGenomes() const { return genome_types_t::GetSize(); }
+    constexpr size_t GetNumBrains() const { return brain_types_t::GetSize(); }
 
     template <typename RETURN, typename... ARGS>
     bool AddActionFunction(std::function<RETURN(ARGS...)> fun,
