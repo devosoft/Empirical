@@ -41,6 +41,7 @@ namespace mabe {
     using value_type = OrganismBase;      ///< For compatability with vectors.
     using org_ptr_t = emp::Ptr<org_t>;    ///< To restore from base class, org pointers are used.
     using pop_t = emp::vector<org_ptr_t>; ///< Populations are tracked by vectors
+
   protected:
     /// Function type for calculating fitness, typically set by the environment.
     using fun_calc_fitness_t    = std::function<double(OrganismBase&)>;
@@ -306,13 +307,6 @@ namespace mabe {
     env_t environment;    ///< Current environment. 
     config_t config;      ///< Master configuration object.
 
-    void ForEachModule(std::function<void(emp::Ptr<ModuleBase>)> fun) {
-      fun(&environment);
-      for (emp::Ptr<ModuleBase> x : organism_types)  { fun(x); }
-      for (emp::Ptr<ModuleBase> x : schemas)         { fun(x); }
-    }
-
-
   public:
     World(const std::string & _name="World")
       : WorldBase(_name), environment(_name), config()
@@ -338,7 +332,7 @@ namespace mabe {
     /// Build a new module in the World.    
     template <typename T>
     T & BuildModule(const std::string name) {
-      emp::Ptr<T> new_mod = emp::NewPtr<T>(name);          // Build the new module.
+      emp::Ptr<T> new_mod = emp::NewPtr<T>(name);         // Build the new module.
       AddModule(new_mod.template Cast<to_module_t<T>>()); // Add new module to appropriate vector.
       config.AddNameSpace(new_mod->GetConfig(), name);    // Setup module's config in a namespace.
       return *new_mod;                                    // Return the final module.
@@ -357,7 +351,9 @@ namespace mabe {
       random.ResetSeed(config.RANDOM_SEED());
 
       // Now that all of the modules have been configured, allow them to setup the world.
-      ForEachModule( [this](emp::Ptr<ModuleBase> x){ x->Setup(*this); } );
+      environment.Setup(*this);
+      for (emp::Ptr<OrganismTypeBase> x : organism_types) { x->Setup(*this); }
+      for (emp::Ptr<SchemaBase> x : schemas) { x->Setup(*this); }
 
       return true;
     }
