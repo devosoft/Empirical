@@ -48,6 +48,8 @@ namespace mabe {
   public:
     OrganismTypeBase(const std::string & in_name) : ModuleBase(in_name) { ; }    
     virtual ~OrganismTypeBase() {
+      for (auto x : action_funs) x.Delete();
+      for (auto x : event_funs) x.Delete();
     }
 
     static constexpr mabe::ModuleType GetModuleType() { return ModuleType::ORGANISM_TYPE; }
