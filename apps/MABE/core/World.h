@@ -327,10 +327,11 @@ namespace mabe {
     /// Build a new organism type module in the World.    
     template <typename T>
     T & AddOrgType(const std::string name) {
-      emp::Ptr<T> new_mod = emp::NewPtr<T>(name);       // Build the new module.
-      organism_types.push_back(new_mod);                // Store new module in org type vector.
-      config.AddNameSpace(new_mod->GetConfig(), name);  // Setup module's config in a namespace.
-      return *new_mod;                                  // Return the final module.
+      emp::Ptr<T> org_mod = emp::NewPtr<T>(name);       // Build the new module.
+      organism_types.push_back(org_mod);                // Store new module in org type vector.
+      config.AddNameSpace(org_mod->GetConfig(), name);  // Setup module's config in a namespace.
+      environment.LinkOrgType(org_mod);                 // Let environment setup org signals.
+      return *org_mod;                                  // Return the final module.
     }
 
     /// Build a new schema module in the World.    
