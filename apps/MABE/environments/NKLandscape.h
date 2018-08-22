@@ -10,6 +10,8 @@
 #ifndef MABE_NK_LANDSCAPE_H
 #define MABE_NK_LANDSCAPE_H
 
+#include "tools/BitVector.h"
+
 #include "core/EnvironmentBase.h"
 
 namespace mabe {
@@ -30,6 +32,15 @@ namespace mabe {
 
     /// Required accessor for configuration objects.
     NKConfig & GetConfig() override { return config; }
+
+    template <typename T>
+    void LinkOrgType(emp::Ptr<T> org_mod) {
+      // @CAO: Need to adjust to allow BitVector to be a reference!!
+      std::function<double(emp::BitVector)> fit_fun = [](emp::BitVector bv){ return 0.0; };
+      org_mod->template AddActionFunction<double, emp::BitVector>(fit_fun, 0, "Fitness",
+                                                                  "double(const BitVector &)",
+                                                                  "NK Fitness Function.");
+    }
   };
 
 }
