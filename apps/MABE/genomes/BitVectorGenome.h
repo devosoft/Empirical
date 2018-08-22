@@ -31,7 +31,7 @@ namespace mabe {
     std::string GetClassName() const override { return "BitVectorGenome"; }
     BVConfig & GetConfig() override { return config; }
 
-    using data_t = emp::BitVector;
+    using genome_t = emp::BitVector;
   };
 
 }

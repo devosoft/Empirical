@@ -30,7 +30,7 @@ namespace mabe {
     std::string GetClassName() const override { return "AvidaGP"; }
     AvidaGPConfig & GetConfig() override { return config; }
 
-    struct compute_t {
+    struct brain_t {
     };
   };
 

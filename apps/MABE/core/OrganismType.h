@@ -26,16 +26,16 @@ namespace mabe {
 
     using genome_types_t = typename modules_t::template filter<is_genome_type>;
     using genome_types_tup_t = typename genome_types_t::template apply<std::tuple>;
-    template <typename T> using to_data = typename T::data_t;
-    using genomes_data_t = typename genome_types_t::template wrap<to_data>;
-    using data_tup_t = typename genomes_data_t::template apply<std::tuple>;
-    using data_fun_t = std::function<typename genomes_data_t::template to_function_t<double>>;
+    template <typename T> using to_genome_t = typename T::genome_t;
+    using genomes_t = typename genome_types_t::template wrap<to_genome_t>;
+    using genome_tup_t = typename genomes_t::template apply<std::tuple>;
+    using genome_fun_t = std::function<typename genomes_t::template to_function_t<double>>;
 
     using brain_types_t = typename modules_t::template filter<is_brain_type>;
     using brain_types_tup_t  = typename brain_types_t::template apply<std::tuple>;
-    template <typename T> using to_compute = typename T::compute_t;
-    using brains_compute_t = typename brain_types_t::template wrap<to_compute>;
-    using compute_tup_t  = typename brains_compute_t::template apply<std::tuple>;
+    template <typename T> using to_brain_t = typename T::brain_t;
+    using brains_t = typename brain_types_t::template wrap<to_brain_t>;
+    using brain_tup_t  = typename brains_t::template apply<std::tuple>;
 
     genome_types_tup_t genome_types;
     brain_types_tup_t brain_types;
@@ -80,15 +80,15 @@ namespace mabe {
 
     class Organism : public OrganismBase {
     private:
-      data_tup_t genomes;
-      compute_tup_t brains;
+      genome_tup_t genomes;
+      brain_tup_t brains;
     public:
       template<int ID> auto & GetGenome() { return std::get<ID>(genomes); }
       template<int ID> auto & GetBrain() { return std::get<ID>(brains); }
-      const data_tup_t & GetGenomes() const { return genomes; }
-      const compute_tup_t & GetBrains() const { return brains; }
-      data_tup_t & GetGenomes() { return genomes; }
-      compute_tup_t & GetBrains() { return brains; }
+      const genome_tup_t & GetGenomes() const { return genomes; }
+      const brain_tup_t & GetBrains() const { return brains; }
+      genome_tup_t & GetGenomes() { return genomes; }
+      brain_tup_t & GetBrains() { return brains; }
     };
 
     /// Print out the name of this class, including template parameters (for debugging)
@@ -125,7 +125,7 @@ namespace mabe {
       // @CAO Write this.
 
       // Otherwise, see if this action can be called with the genome.
-      if constexpr ( std::is_same<data_fun_t, RETURN(ARGS...)>() ) {
+      if constexpr ( std::is_same<genome_fun_t, RETURN(ARGS...)>() ) {
         // Build a function that find the genome state of an organisms, feeds it into the input
         // function, and return the result.
         auto action_fun = [fun](OrganismBase & org_base) {
@@ -134,7 +134,7 @@ namespace mabe {
         };
 
         // Store a pointer to this function, converted to a GenericFunction
-        action_funs[action_id] = emp::NewPtr< emp::Function<data_fun_t> >(action_fun);
+        action_funs[action_id] = emp::NewPtr< emp::Function<genome_fun_t> >(action_fun);
 
         return true;
       }
@@ -150,8 +150,8 @@ namespace mabe {
     //   // @CAO WRITE THIS!!
 
     //   // If the input wasn't handled by a brain, try out the genome state.
-    //   if (info.fun_ptr->ConvertOK<data_fun_t>()) {
-    //     auto genome_fun = *( info.fun_ptr->template Convert<data_fun_t>() );
+    //   if (info.fun_ptr->ConvertOK<genome_fun_t>()) {
+    //     auto genome_fun = *( info.fun_ptr->template Convert<genome_fun_t>() );
     //     event_fun_t event_fun = [genome_fun](OrganismBase & org){
     //       ApplyTuple(genome_fun, ((Organism&) org).genomes);
     //     };
