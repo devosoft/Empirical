@@ -117,6 +117,8 @@ namespace mabe {
       // For the moment, ignore unused arguments.
       (void) name; (void) type; (void) desc;
 
+      std::cout << "Trying to add function '" << name << "'." << std::endl;
+
       // Make sure we have room for this action.
       if (action_funs.size() <= action_id) action_funs.resize(action_id+1);
       emp_assert(action_funs[action_id] == false, "Trying to replace an existing action function.");
@@ -125,7 +127,7 @@ namespace mabe {
       // @CAO Write this.
 
       // Otherwise, see if this action can be called with the genome.
-      if constexpr ( std::is_same<genome_fun_t, RETURN(ARGS...)>() ) {
+      if constexpr ( std::is_same<genome_fun_t, std::function<RETURN(ARGS...)>>() ) {
         // Build a function that find the genome state of an organisms, feeds it into the input
         // function, and return the result.
         auto action_fun = [fun](OrganismBase & org_base) {
@@ -134,12 +136,15 @@ namespace mabe {
         };
 
         // Store a pointer to this function, converted to a GenericFunction
-        action_funs[action_id] = emp::NewPtr< emp::Function<genome_fun_t> >(action_fun);
+        // auto new_fun = emp::NewPtr< emp::Function<RETURN(ARGS...)> >(action_fun);
+        action_funs[action_id] = new emp::Function<RETURN(OrganismBase &)>(action_fun);
 
+        std::cout << "SUCCESS!" << std::endl;
         return true;
       }
 
       // Otherwise we won't use it.
+      std::cout << "FAILURE!" << std::endl;
       return false;
     }
 
