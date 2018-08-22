@@ -136,8 +136,7 @@ namespace mabe {
         };
 
         // Store a pointer to this function, converted to a GenericFunction
-        // auto new_fun = emp::NewPtr< emp::Function<RETURN(ARGS...)> >(action_fun);
-        action_funs[action_id] = new emp::Function<RETURN(OrganismBase &)>(action_fun);
+        action_funs[action_id] = emp::NewPtr< emp::Function<RETURN(OrganismBase &)>>(action_fun);
 
         std::cout << "SUCCESS!" << std::endl;
         return true;
