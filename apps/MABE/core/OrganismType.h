@@ -22,6 +22,7 @@ namespace mabe {
   template <typename... Ts>
   class OrganismType : public OrganismTypeBase {
   private:
+    using this_t = OrganismType<Ts...>;
     using modules_t = emp::TypePack<Ts...>;
 
     using genome_types_t = typename modules_t::template filter<is_genome_type>;
@@ -83,12 +84,20 @@ namespace mabe {
       genome_tup_t genomes;
       brain_tup_t brains;
     public:
+      Organism(emp::Ptr<this_t> type_ptr) : OrganismBase(type_ptr), genomes(), brains() { ; }
+      Organism(emp::Ptr<this_t> type_ptr, emp::Random & random)
+        : OrganismBase(type_ptr), genomes(random), brains(random) { ; }
+      Organism(const Organism & in_org) = default;
+      Organism(Organism && in_org) = default;
+
       template<int ID> auto & GetGenome() { return std::get<ID>(genomes); }
       template<int ID> auto & GetBrain() { return std::get<ID>(brains); }
       const genome_tup_t & GetGenomes() const { return genomes; }
       const brain_tup_t & GetBrains() const { return brains; }
       genome_tup_t & GetGenomes() { return genomes; }
       brain_tup_t & GetBrains() { return brains; }
+
+      emp::Ptr<OrganismBase> Clone() { return emp::NewPtr<Organism>(*this); }
     };
 
     /// Print out the name of this class, including template parameters (for debugging)
