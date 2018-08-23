@@ -29,6 +29,7 @@
 #include "tools/tuple_utils.h"
 
 #include "types.h"
+#include "OrganismBase.h"
 
 #include "World_structure.h"
 
@@ -50,6 +51,8 @@ namespace mabe {
       VALUE(INIT_SIZE, size_t, 1, "Initial population size for each organism type.")
     )
 
+    base_config_t config;                                    ///< Master configuration object.
+
     emp::vector<emp::Ptr<OrganismTypeBase>> organism_types;  ///< Vector of organism-type modules. 
     emp::vector<emp::Ptr<SchemaBase>> schemas;               ///< Vector of schema modules. 
 
@@ -65,9 +68,9 @@ namespace mabe {
 
 
     // ----- World CONFIG ----
-    bool cache_on;                  ///< Should we be caching fitness values?
-    std::vector<size_t> pop_sizes;  ///< Sizes of population dimensions (eg, 2 vals for grid)
-    emp::TraitSet<OrganismBase> phenotypes;  ///< What phenotypes are we tracking?
+    bool cache_on;                    ///< Should we be caching fitness values?
+    std::vector<size_t> pop_sizes;    ///< Sizes of population dimensions (eg, 2 vals for grid)
+    emp::TraitSet<org_t> phenotypes;  ///< What phenotypes are we tracking?
     emp::vector<emp::Ptr<emp::DataFile>> files;    ///< Output files.
 
     bool is_synchronous;            ///< Does this world have synchronous generations?
@@ -75,9 +78,34 @@ namespace mabe {
     bool is_pheno_structured;       ///< Do we have a phenotypically structured population?
 
     /// Function type for calculating fitness of organisms, typically set by the environment.
-    using fun_calc_fitness_t = std::function<double(OrganismBase&)>;
+    using fun_calc_fitness_t = std::function<double(org_t&)>;
     fun_calc_fitness_t fun_calc_fitness;    
  
+    /// Function type for a mutation operator on an organism.
+    using fun_do_mutations_t = std::function<size_t(org_t&)>;
+    fun_do_mutations_t fun_do_mutations;
+
+    /// Function type for printing an organism's info to an output stream.
+    using fun_print_org_t = std::function<void(org_t&, std::ostream &)>;
+    fun_print_org_t fun_print_org;
+
+    /// Function type for injecting organisms into a world (returns inject position)
+    using fun_find_inject_pos_t = std::function<WorldPosition(org_ptr_t)>;
+    fun_find_inject_pos_t fun_find_inject_pos;
+
+    /// Function type for adding a newly born organism into a world (returns birth position)
+    using fun_find_birth_pos_t  = std::function<WorldPosition(org_ptr_t, WorldPosition)>;
+    fun_find_birth_pos_t fun_find_birth_pos;
+
+    /// Function type for determining picking and killing an organism (returns newly empty position)
+    using fun_kill_org_t = std::function<WorldPosition()>;
+    fun_kill_org_t fun_kill_org;
+
+    /// Function type for identifying a random neighbor "near" specified id.
+    using fun_get_neighbor_t = std::function<WorldPosition(WorldPosition)>;
+    fun_get_neighbor_t fun_get_neighbor;
+
+
     /// Attributes are a dynamic way to track extra characteristics about a world.
     std::map<std::string, std::string> attributes;
 
@@ -90,13 +118,13 @@ namespace mabe {
     emp::Signal<void(size_t)> before_repro_sig;
     
     /// Trigger signal... when offspring organism is built.
-    emp::Signal<void(org_ptr_t,size_t)> offspring_ready_sig;
+    emp::Signal<void(org_t &,size_t)> offspring_ready_sig;
     
     /// Trigger signal... when outside organism is ready to inject.
-    emp::Signal<void(org_ptr_t)> inject_ready_sig;
+    emp::Signal<void(org_t &)> inject_ready_sig;
     
     /// Trigger signal... before placing any organism into target cell.
-    emp::Signal<void(org_ptr_t,size_t)> before_placement_sig;
+    emp::Signal<void(org_t &,size_t)> before_placement_sig;
     
     /// Trigger signal... after any organism is placed into world.
     emp::Signal<void(size_t)> on_placement_sig;
@@ -115,7 +143,7 @@ namespace mabe {
   
   public:
     WorldBase(const std::string & _name="World")
-      : organism_types(), schemas()
+      : config(), organism_types(), schemas()
       , name(_name), update(0), random()
       , pops(), active_pop(pops[0]), next_pop(pops[1]), num_orgs(0)
       , fit_cache(), cache_on(false), pop_sizes(1,0), phenotypes(), files()
@@ -274,6 +302,22 @@ namespace mabe {
     /// Note: This function ignores population structure, so requires you to manage your own structure.
     void RemoveOrgAt(WorldPosition pos);
 
+    /// Inject an organism using the default injection scheme.
+    void Inject(org_ptr_t new_org, size_t copy_count=1);
+    void Inject(org_t & org, size_t copy_count=1) { Inject(org.Clone(), copy_count); }
+
+    /// Inject an organism at a specific position.
+    void InjectAt(org_ptr_t new_org, const WorldPosition pos);
+    void InjectAt(org_t & org, const WorldPosition pos) { InjectAt(org.Clone(), pos); }
+
+    /// Place one or more copies of an offspring into population; return position of last placed.
+    WorldPosition DoBirth(org_ptr_t parent, size_t parent_pos, size_t copy_count=1);
+
+    // Kill off organism at the specified position (same as RemoveOrgAt, but callable externally)
+    void DoDeath(const WorldPosition pos) { RemoveOrgAt(pos); }
+
+
+
     /// Run should be called when an world is all configured and ready to go.  It will initialize the
     /// population (if needed) and run updates until finished producing a return code for main().
     int Run();
@@ -291,16 +335,14 @@ namespace mabe {
   class World : public WorldBase {
   public:
     using env_t = ENV_T;              ///< Specify the environment type for this world.
-    using config_t = base_config_t;   ///< @CAO: For now, just use the base config.
 
   private:
     // ----- World MODULES -----
     env_t environment;    ///< Current environment. 
-    config_t config;      ///< Master configuration object.
 
   public:
     World(const std::string & _name="World")
-      : WorldBase(_name), environment(_name), config()
+      : WorldBase(_name), environment(_name)
     {
       config.AddNameSpace(environment.GetConfig(), name);   // Setup environment config in a namespace.
     }
@@ -381,12 +423,12 @@ namespace mabe {
   // ===                                                       ===
   // =============================================================
 
-  void WorldBase::AddOrgAt(emp::Ptr<OrganismBase> new_org, WorldPosition pos, WorldPosition p_pos) {
+  void WorldBase::AddOrgAt(org_ptr_t new_org, WorldPosition pos, WorldPosition p_pos) {
     emp_assert(new_org);         // The new organism must exist.
     emp_assert(pos.IsValid());   // Position must be legal.
 
     // If new organism is going into the active population, trigger signal before doing so.
-    if (pos.IsActive()) { before_placement_sig.Trigger(new_org, pos.GetIndex()); }
+    if (pos.IsActive()) { before_placement_sig.Trigger(*new_org, pos.GetIndex()); }
 
     // for (Ptr<SystematicsBase<ORG> > s : systematics) {
     //   s->SetNextParent((int) p_pos.GetIndex());
@@ -433,8 +475,49 @@ namespace mabe {
     }
   }
 
+  void WorldBase::Inject(org_ptr_t new_org, size_t copy_count) {
+    for (size_t i = 0; i < copy_count; i++) {
+      inject_ready_sig.Trigger(*new_org);
+      const WorldPosition pos = fun_find_inject_pos(new_org);
+
+      if (pos.IsValid()) AddOrgAt(new_org, pos);  // If placement position is valid, do so!
+      else new_org.Delete();                      // Otherwise delete the organism.
+    }
+  }
+
+  void WorldBase::InjectAt(org_ptr_t new_org, const WorldPosition pos) {
+    emp_assert(pos.IsValid());
+    inject_ready_sig.Trigger(*new_org);
+    AddOrgAt(new_org, pos);
+  }
+
+  // Give birth to (potentially) multiple offspring; return position of last placed.
+  // Triggers 'before repro' signal on parent (once) and 'offspring ready' on each offspring.
+  // Additional signal triggers occur in AddOrgAt.
+  // @CAO: NOTE Parent may die during multi-birth; should delay destruction until after DoBirth.
+  // @CAO: NOTE That this DoBirth assume asexual reproduction; need another version!
+  WorldPosition WorldBase::DoBirth(org_ptr_t parent_ptr, size_t parent_pos, size_t copy_count) {
+    before_repro_sig.Trigger(parent_pos);
+    WorldPosition pos;                                       // Position of each offspring placed.
+    for (size_t i = 0; i < copy_count; i++) {                // Loop through offspring, adding each
+      org_ptr_t new_org = parent_ptr->Clone();               // Offspring is initially clone of parent.
+      offspring_ready_sig.Trigger(*new_org, parent_pos);
+      pos = fun_find_birth_pos(new_org, parent_pos);
+
+      if (pos.IsValid()) AddOrgAt(new_org, pos, parent_pos); // If placement pos is valid, do so!
+      else new_org.Delete();                                 // Otherwise delete the organism.
+    }
+    return pos;
+  }
+
+
   int WorldBase::Run() {
     /// Make sure all OrganismTypes have been initialized
+    for (auto & org_type_ptr : organism_types) {
+      while (org_type_ptr->GetCount() < config.INIT_SIZE()) {
+        org_type_ptr->BuildOrg(random);
+      }
+    }
 
     return 0;
   }
