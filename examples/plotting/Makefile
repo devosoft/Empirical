@@ -9,7 +9,7 @@ CFLAGS_version := -std=c++14
 
 # Emscripten compiler information
 CXX_web := emcc
-CXX_native := clang++
+CXX_native := clang++-6.0
 # CXX_native := g++
 
 OFLAGS_native_opt := $(GLFW_LIBS) -O3 -DNDEBUG
