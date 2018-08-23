@@ -43,20 +43,15 @@ namespace mabe {
     using pop_t = emp::vector<org_ptr_t>; ///< Populations are tracked by vectors
 
   protected:
-    /// Function type for calculating fitness, typically set by the environment.
-    using fun_calc_fitness_t    = std::function<double(OrganismBase&)>;
-
-    using organism_types_t = emp::vector<emp::Ptr<OrganismTypeBase>>; ///< Type for vector of OrganismTypes
-    using schemas_t = emp::vector<emp::Ptr<SchemaBase>>;              ///< Type for vector of Schemas
-
     /// Type of master World config file.
     EMP_BUILD_CONFIG( base_config_t,
       GROUP(DEFAULT_GROUP, "Master World Settings"),
       VALUE(RANDOM_SEED, int, 0, "Seed for main random number generator. Use 0 for based on time."),
+      VALUE(INIT_SIZE, size_t, 1, "Initial population size for each organism type.")
     )
 
-    organism_types_t organism_types;  ///< Vector of organism-type modules. 
-    schemas_t schemas;                ///< Vector of schema modules. 
+    emp::vector<emp::Ptr<OrganismTypeBase>> organism_types;  ///< Vector of organism-type modules. 
+    emp::vector<emp::Ptr<SchemaBase>> schemas;               ///< Vector of schema modules. 
 
     // ----- World STATE -----
     const std::string name;           ///< Unique name for this World (for use in configuration.)
@@ -79,7 +74,9 @@ namespace mabe {
     bool is_space_structured;       ///< Do we have a spatially structured population?
     bool is_pheno_structured;       ///< Do we have a phenotypically structured population?
 
-    fun_calc_fitness_t     fun_calc_fitness;    ///< ...evaluate fitness for provided organism.    
+    /// Function type for calculating fitness of organisms, typically set by the environment.
+    using fun_calc_fitness_t = std::function<double(OrganismBase&)>;
+    fun_calc_fitness_t fun_calc_fitness;    
  
     /// Attributes are a dynamic way to track extra characteristics about a world.
     std::map<std::string, std::string> attributes;
@@ -233,10 +230,6 @@ namespace mabe {
       return *(pops[1][id]);
     }
 
-    int Run() {
-      return 0;
-    }
-
     void Clear() {
       for (size_t pop_id = 0; pop_id < 2; pop_id++) {
         for (size_t i = 0; i < pops[pop_id].size(); i++) RemoveOrgAt(WorldPosition(i,pop_id));
@@ -281,6 +274,9 @@ namespace mabe {
     /// Note: This function ignores population structure, so requires you to manage your own structure.
     void RemoveOrgAt(WorldPosition pos);
 
+    /// Run should be called when an world is all configured and ready to go.  It will initialize the
+    /// population (if needed) and run updates until finished producing a return code for main().
+    int Run();
   };
 
 
@@ -435,6 +431,12 @@ namespace mabe {
       //   s->RemoveNextOrg((int) pos.GetIndex());      // Notify systematics about organism removal
       // }
     }
+  }
+
+  int WorldBase::Run() {
+    /// Make sure all OrganismTypes have been initialized
+
+    return 0;
   }
 }
 
