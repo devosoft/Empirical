@@ -13,12 +13,19 @@
 #ifndef MABE_ORGANISM_BASE_H
 #define MABE_ORGANISM_BASE_H
 
+#include "OrganismTypeBase.h"
+
 namespace mabe {
 
   class OrganismBase {
+  protected:
+    emp::Ptr<OrganismTypeBase> type_ptr;  ///< Pointer to information about this type of organism.
+
   public:
-    OrganismBase() { ; }
-    virtual ~OrganismBase() { ; }
+    OrganismBase(emp::Ptr<OrganismTypeBase> _type_ptr) : type_ptr(_type_ptr) { type_ptr->IncCount(); }
+    virtual ~OrganismBase() { type_ptr->DecCount(); }
+
+    emp::Ptr<OrganismTypeBase> GetTypePtr() const { return type_ptr; }
   };
 
 }
