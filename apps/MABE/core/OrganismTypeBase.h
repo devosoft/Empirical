@@ -36,6 +36,8 @@
 
 namespace mabe {
 
+  class OrganismBase;
+
   class OrganismTypeBase : public ModuleBase {
   protected:
     /// These are functions that were provided by the environment and wrapped by this organism
@@ -45,14 +47,21 @@ namespace mabe {
     emp::vector<fun_ptr_t> action_funs;
     emp::vector<fun_ptr_t> event_funs;
 
+    size_t org_count;  ///< Total number of organisms of this type (not only in population!)
   public:
-    OrganismTypeBase(const std::string & in_name) : ModuleBase(in_name) { ; }    
+    OrganismTypeBase(const std::string & in_name)
+    : ModuleBase(in_name), action_funs(), event_funs(), org_count(0) { ; }    
+
     virtual ~OrganismTypeBase() {
       for (auto x : action_funs) x.Delete();
       for (auto x : event_funs) x.Delete();
     }
 
     static constexpr mabe::ModuleType GetModuleType() { return ModuleType::ORGANISM_TYPE; }
+
+    void IncCount() { org_count++; }
+    void DecCount() { org_count--; }
+    size_t GetCount() const { return org_count; }
 
     template <typename... Ts>
     double TriggerEvent(OrganismBase & org, size_t event_id, Ts &&... args) {
