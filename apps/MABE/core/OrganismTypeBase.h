@@ -20,6 +20,7 @@
  *      and description.  Return is a bool indicating success at using.
  *   3. Implement set of AddEventFunction() member functions that build GenericFunctions to
  *      call from the environment (with the appropriate args) when an event occurs.
+ *   4. Include the function BuildOrg(Random &) to produce a pointer to an individual organism.
  * 
  */
 
@@ -57,11 +58,15 @@ namespace mabe {
       for (auto x : event_funs) x.Delete();
     }
 
+    using org_ptr_t = emp::Ptr<OrganismBase>;
+
     static constexpr mabe::ModuleType GetModuleType() { return ModuleType::ORGANISM_TYPE; }
 
     void IncCount() { org_count++; }
     void DecCount() { org_count--; }
     size_t GetCount() const { return org_count; }
+
+    virtual org_ptr_t BuildOrg(emp::Random &) = 0;
 
     template <typename... Ts>
     double TriggerEvent(OrganismBase & org, size_t event_id, Ts &&... args) {
