@@ -24,6 +24,7 @@ namespace mabe {
   private:
     using this_t = OrganismType<Ts...>;
     using modules_t = emp::TypePack<Ts...>;
+    using org_ptr_t = emp::Ptr<OrganismBase>;
 
     using genome_types_t = typename modules_t::template filter<is_genome_type>;
     using genome_types_tup_t = typename genome_types_t::template apply<std::tuple>;
@@ -85,8 +86,10 @@ namespace mabe {
       brain_tup_t brains;
     public:
       Organism(emp::Ptr<this_t> type_ptr) : OrganismBase(type_ptr), genomes(), brains() { ; }
-      Organism(emp::Ptr<this_t> type_ptr, emp::Random & random)
-        : OrganismBase(type_ptr), genomes(random), brains(random) { ; }
+      Organism(emp::Ptr<this_t> type_ptr, emp::Random & random): OrganismBase(type_ptr), genomes(), brains()
+      {
+        emp::TupleIterate(genomes, [](GenomeBase & genome) { genome.Randomize(); });
+      }
       Organism(const Organism & in_org) = default;
       Organism(Organism && in_org) = default;
 
@@ -99,6 +102,10 @@ namespace mabe {
 
       emp::Ptr<OrganismBase> Clone() { return emp::NewPtr<Organism>(*this); }
     };
+
+    org_ptr_t BuildOrg(emp::Random & random) override {
+      return emp::NewPtr<Organism>(this,random);
+    }
 
     /// Print out the name of this class, including template parameters (for debugging)
     std::string GetClassName() const override {
