@@ -34,6 +34,8 @@ namespace mabe {
     std::string GetClassName() const override { return "VectorGenome"; }
     VGConfig & GetConfig() override { return config; }
 
+    void Randomize(emp::Random & random) override { (void) random; }
+
     using genome_t = emp::vector<T>;
   };
 
