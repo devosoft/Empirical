@@ -86,10 +86,8 @@ namespace mabe {
       brain_tup_t brains;
     public:
       Organism(emp::Ptr<this_t> type_ptr) : OrganismBase(type_ptr), genomes(), brains() { ; }
-      Organism(emp::Ptr<this_t> type_ptr, emp::Random & random): OrganismBase(type_ptr), genomes(), brains()
-      {
-        emp::TupleIterate(genomes, [](GenomeBase & genome) { genome.Randomize(); });
-      }
+      Organism(emp::Ptr<this_t> type_ptr, emp::Random & random)
+       : OrganismBase(type_ptr), genomes(), brains() { type_ptr->Randomize(random, *this); }
       Organism(const Organism & in_org) = default;
       Organism(Organism && in_org) = default;
 
@@ -102,6 +100,12 @@ namespace mabe {
 
       emp::Ptr<OrganismBase> Clone() { return emp::NewPtr<Organism>(*this); }
     };
+
+    void Randomize(emp::Random & random, Organism & org) {
+      emp::TupleIterate(genome_types, org.GetGenomes(), [&random](auto & gtype, auto & genome) {
+        gtype.Randomize(random, genome);
+      });
+    }
 
     org_ptr_t BuildOrg(emp::Random & random) override {
       return emp::NewPtr<Organism>(this,random);
