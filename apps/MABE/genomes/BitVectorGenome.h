@@ -21,26 +21,25 @@ namespace mabe {
   private:
     EMP_BUILD_CONFIG( BVConfig,
       GROUP(DEFAULT_GROUP, "BitVector Genome Settings"),
-      VALUE(DEFAULT_LENGTH, size_t 64, "Default number of bits in a genome"),
+      VALUE(DEFAULT_LENGTH, size_t, 64, "Default number of bits in a genome"),
       VALUE(MIN_LENGTH, size_t, 8, "Minimum number of sites in a genome."),
       VALUE(MAX_LENGTH, size_t, 1024, "Maximum number of sites in a genome.")
     )
 
     BVConfig config;
 
-    emp::BitVector data;
   public:
-    BitVectorGenome() : config(), data() { ; }
+    BitVectorGenome() : config() { ; }
     ~BitVectorGenome() { ; }
 
     std::string GetClassName() const override { return "BitVectorGenome"; }
     BVConfig & GetConfig() override { return config; }
 
-    void Randomize(emp::Random & random) override {
+    using genome_t = emp::BitVector;
+
+    void Randomize(emp::Random & random, genome_t & data) {
       data = emp::RandomBitVector(random, config.DEFAULT_LENGTH());
     }
-
-    using genome_t = emp::BitVector;
   };
 
 }
