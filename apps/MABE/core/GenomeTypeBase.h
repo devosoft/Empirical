@@ -12,7 +12,8 @@
  *  information it needs to store in organisms.  It must also have the following functions:
  *    std::string GetClassName()
  *    emp::Config & GetConfig()
- *    void Randomize(emp::Random &)
+ *    void Randomize(emp::Random & random, genome_t & data)
+ *    void Print(std::ostream & os, genome_t & data) const
  */
 
 #ifndef MABE_GENOME_TYPE_BASE_H
