@@ -80,6 +80,32 @@ namespace emp {
   void TupleIterate(TUPLE_T & tup, const FUN_T & fun) {
     internal::TupleIterate_impl<TUPLE_T, FUN_T, tuple_size<TUPLE_T>(), 0>::Run(tup, fun);
   }
+
+
+  namespace internal {
+    // Recursive case for the tuple.
+    template <typename TUPLE1_T, typename TUPLE2_T, typename FUN_T, size_t TOT, size_t POS>
+    struct TupleIterate2_impl {
+      static void Run(TUPLE1_T & tup1, TUPLE2_T & tup2, const FUN_T & fun) {
+        fun(std::get<POS>(tup1), std::get<POS>(tup2));                                    // Call function!
+        TupleIterate2_impl<TUPLE1_T, TUPLE2_T, FUN_T, TOT, POS+1>::Run(tup1, tup2, fun);  // Recurse!
+      }
+    };
+
+    // End case... we've already hit all elements in the tuple!
+    template <typename TUPLE1_T, typename TUPLE2_T, typename FUN_T, size_t END_POS>
+    struct TupleIterate2_impl<TUPLE1_T, TUPLE2_T, FUN_T, END_POS, END_POS> {
+      static void Run(TUPLE1_T &, TUPLE2_T &, const FUN_T &) { ; }
+    };
+  }
+
+  /// Call a provided function on each pair of elements in two tuples.
+  template <typename TUPLE1_T, typename TUPLE2_T, typename FUN_T>
+  void TupleIterate(TUPLE1_T & tup1, TUPLE2_T & tup2, const FUN_T & fun) {
+    static_assert(tuple_size<TUPLE1_T>() == tuple_size<TUPLE2_T>(),
+                  "TupleIterate must have both tuples be the same size.");
+    internal::TupleIterate2_impl<TUPLE1_T, TUPLE2_T, FUN_T, tuple_size<TUPLE1_T>(), 0>::Run(tup1, tup2, fun);
+  }
 }
 
 #endif
