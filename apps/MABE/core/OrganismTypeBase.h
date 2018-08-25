@@ -58,7 +58,8 @@ namespace mabe {
       for (auto x : event_funs) x.Delete();
     }
 
-    using org_ptr_t = emp::Ptr<OrganismBase>;
+    using org_t = OrganismBase;
+    using org_ptr_t = emp::Ptr<org_t>;
 
     static constexpr mabe::ModuleType GetModuleType() { return ModuleType::ORGANISM_TYPE; }
 
@@ -67,6 +68,7 @@ namespace mabe {
     size_t GetCount() const { return org_count; }
 
     virtual org_ptr_t BuildOrg(emp::Random &) = 0;
+    virtual void Print(std::ostream &, org_t &) = 0;
 
     template <typename... Ts>
     double TriggerEvent(OrganismBase & org, size_t event_id, Ts &&... args) {
