@@ -19,6 +19,7 @@ namespace mabe {
     EMP_BUILD_CONFIG( LGConfig,
       GROUP(DEFAULT_GROUP, "Linear Genome Settings"),
       VALUE(ALPHABET_SIZE, size_t, 256, "Number of possible values in genome."),
+      VALUE(DEFAULT_LENGTH, size_t, 64, "Default number of sites in a genome"),
       VALUE(MIN_LENGTH, size_t, 8, "Minimum number of sites in a genome."),
       VALUE(MAX_LENGTH, size_t, 1024, "Maximum number of sites in a genome.")
     )
@@ -30,9 +31,12 @@ namespace mabe {
     std::string GetClassName() const override { return "LinearGenome"; }
     LGConfig & GetConfig() override { return config; }
 
-    void Randomize(emp::Random & random) override { (void) random; }
-
     using genome_t = emp::vector<unsigned char>;
+
+    void Randomize(emp::Random & random, genome_t & data) {
+      data.resize( config.DEFAULT_LENGTH() );
+      for (auto & x : data) x = (unsigned char) random.GetUInt( config.ALPHABET_SIZE() );
+    }
   };
 
 }
