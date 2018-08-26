@@ -111,6 +111,12 @@ namespace mabe {
       return emp::NewPtr<Organism>(this,random);
     }
 
+    void Print(std::ostream & os, OrganismBase & org) override {
+      emp::TupleIterate(genome_types, ((Organism &) org).GetGenomes(), [&os](auto & gtype, auto & genome) {
+        gtype.Print(os, genome);
+      });
+    }
+
     /// Print out the name of this class, including template parameters (for debugging)
     std::string GetClassName() const override {
       return emp::to_string("OrganismType<", GetModuleClassNames<Ts...>(), ">");
