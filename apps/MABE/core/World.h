@@ -317,6 +317,18 @@ namespace mabe {
     void DoDeath(const WorldPosition pos) { RemoveOrgAt(pos); }
 
 
+    /// Get the id of a random *occupied* cell.
+    size_t GetRandomOrgID() {
+      emp_assert(num_orgs > 0); // Make sure it's possible to find an organism!
+      size_t pos = random.GetUInt(0, active_pop.size());
+      while (active_pop[pos] == nullptr) pos = random.GetUInt(0, active_pop.size());
+      return pos;
+    }
+
+    /// Get an organism from a random occupied cell.
+    org_t & GetRandomOrg() { return *active_pop[GetRandomOrgID()]; }
+
+
 
     /// Run should be called when an world is all configured and ready to go.  It will initialize the
     /// population (if needed) and run updates until finished producing a return code for main().
@@ -414,6 +426,7 @@ namespace mabe {
         std::cout << "  " << x->GetName() << " (class name: " << x->GetClassName() << ")" << std::endl;
       }
     }
+
   };
 
 
@@ -512,10 +525,13 @@ namespace mabe {
 
 
   int WorldBase::Run() {
-    /// Make sure all OrganismTypes have been initialized
+    /// Make sure all OrganismTypes have been initialized with organisms
     for (auto & org_type_ptr : organism_types) {
       while (org_type_ptr->GetCount() < config.INIT_SIZE()) {
-        org_type_ptr->BuildOrg(random);
+        org_ptr_t new_org = org_type_ptr->BuildOrg(random);
+        std::cout << "Org: ";
+        org_type_ptr->Print(std::cout, *new_org);
+        std::cout << std::endl;
       }
     }
 
