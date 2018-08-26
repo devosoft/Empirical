@@ -35,6 +35,31 @@ namespace mabe {
     emp::Config & GetConfig() override { return config; }
 
     void SetFitFun( fit_fun_t in_fun ) { fit_fun = in_fun; }
+
+    void RunTournament(WorldBase & world, size_t t_size, size_t tourny_count=1) {
+      emp::vector<size_t> entries;
+      for (size_t T = 0; T < tourny_count; T++) {
+        entries.resize(0);
+        // Choose organisms for this tournament (with replacement!)
+        for (size_t i=0; i < t_size; i++) entries.push_back( world.GetRandomOrgID() );
+
+        double best_fit = world.CalcFitnessID(entries[0]);
+        size_t best_id = entries[0];
+
+        // Search for a higher fit org in the tournament.
+        for (size_t i = 1; i < t_size; i++) {
+          const double cur_fit = world.CalcFitnessID(entries[i]);
+          if (cur_fit > best_fit) {
+            best_fit = cur_fit;
+            best_id = entries[i];
+          }
+        }
+
+        // Place the highest fitness into the next generation!
+        world.DoBirth( world.GetGenomeAt(best_id), best_id, 1 );
+      }
+    }
+
   };
 
 }
