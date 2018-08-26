@@ -37,6 +37,8 @@ namespace mabe {
       data.resize( config.DEFAULT_LENGTH() );
       for (auto & x : data) x = (unsigned char) random.GetUInt( config.ALPHABET_SIZE() );
     }
+
+    void Print(std::ostream & os, genome_t & data) const { os << "No Print Function Available"; }
   };
 
 }

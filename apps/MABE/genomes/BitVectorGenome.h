@@ -40,6 +40,8 @@ namespace mabe {
     void Randomize(emp::Random & random, genome_t & data) {
       data = emp::RandomBitVector(random, config.DEFAULT_LENGTH());
     }
+
+    void Print(std::ostream & os, genome_t & data) const { os << data; }
   };
 
 }
