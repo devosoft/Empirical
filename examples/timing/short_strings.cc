@@ -20,7 +20,7 @@
 
 constexpr size_t NUM_ENTRIES = 1000000;
 constexpr size_t LONG_STR_SIZE = 40;
-constexpr size_t EVAL_STEPS = 20000000;
+constexpr size_t EVAL_STEPS = 22700000;
 
 std::string ToStringID(int id) { return std::to_string(id); }
 std::string ToLongStringID(int id) {
@@ -78,6 +78,15 @@ int main()
       short_strings[id2] = short_strings[id3] / 2 + 1000;
     }
     return short_strings[id1];
+  });
+
+  TimeFun("Literal Short-string IDs", [&short_strings]() {
+    for (size_t i = 0; i < EVAL_STEPS; i++) {
+      short_strings["42"] += short_strings["100"];
+      short_strings["1000"] -= short_strings["100"];
+      short_strings["100"] = short_strings["1000"] / 2 + 1000;
+    }
+    return short_strings["42"];
   });
 
   TimeFun("Long-string IDs", [&long_strings]() {
