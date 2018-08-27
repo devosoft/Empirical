@@ -17,11 +17,13 @@
 #include <functional>    // For std::function
 #include <string>
 #include <unordered_map>
+#include <vector>
 
-constexpr size_t NUM_ENTRIES = 1000000;
+constexpr size_t NUM_ENTRIES = 10000;
 constexpr size_t LONG_STR_SIZE = 40;
-constexpr size_t EVAL_STEPS = 22700000;
+constexpr size_t EVAL_STEPS = 10000000;
 
+int ToIntID(int id) { return id; }
 std::string ToStringID(int id) { return std::to_string(id); }
 std::string ToLongStringID(int id) {
   std::string out_str = ToStringID(id);
@@ -42,6 +44,19 @@ void TimeFun(const std::string & name, std::function<int()> fun) {
             << " seconds." << std::endl;
 }
 
+template <typename CTYPE, typename ITYPE>
+void RunTest(const std::string & name, CTYPE & container, std::function<ITYPE(int)> index_fun) {
+  TimeFun(name, [&container, &index_fun](){
+    ITYPE id1 = index_fun(42), id2 = index_fun(100), id3 = index_fun(1000);
+    for (size_t i = 0; i < EVAL_STEPS; i++) {
+      container[id1] += container[id2];
+      container[id3] -= container[id2];
+      container[id2] = container[id3] / 2 + 1000;
+    }
+    return container[id1];
+  });
+}
+
 int main()
 {
   // Create the maps.
@@ -49,6 +64,7 @@ int main()
   std::unordered_map<std::string, int> short_strings;
   std::unordered_map<std::string, int> long_strings;
   std::unordered_map<double, int> float_ids;
+  std::vector<int> vector_index(NUM_ENTRIES);
 
   // Fill out the maps.
   for (int i = 0; i < NUM_ENTRIES; i++) {
@@ -56,57 +72,25 @@ int main()
     short_strings[ToStringID(i)] = i;
     long_strings[ToLongStringID(i)] = i;
     float_ids[ToFloatID(i)] = i;
+    vector_index[i] = i;
   }
 
   std::cout << "Starting tests!" << std::endl;
 
-  TimeFun("Numerical IDs", [&int_ids]() {
-    int id1 = 42, id2 = 100, id3 = 1000;
-    for (size_t i = 0; i < EVAL_STEPS; i++) {
-      int_ids[id1] += int_ids[id2];
-      int_ids[id3] -= int_ids[id2];
-      int_ids[id2] = int_ids[id3] / 2 + 1000;
-    }
-    return int_ids[id1];
-  });
+  RunTest<std::unordered_map<int, int>, int>                ("Numerical IDs   ", int_ids, ToIntID);
+  RunTest<std::unordered_map<std::string, int>, std::string>("Short-string IDs", short_strings, ToStringID);
+  RunTest<std::unordered_map<std::string, int>, std::string>("Long-string IDs ", long_strings, ToLongStringID);
+  RunTest<std::unordered_map<double, int>, int>             ("Floating-pnt IDs", float_ids, ToFloatID);
+  RunTest<std::vector<int>, int>                            ("Vector Indexing ", vector_index, ToIntID);
 
-  TimeFun("Short-string IDs", [&short_strings]() {
-    std::string id1 = "42", id2 = "100", id3 = "1000";
-    for (size_t i = 0; i < EVAL_STEPS; i++) {
-      short_strings[id1] += short_strings[id2];
-      short_strings[id3] -= short_strings[id2];
-      short_strings[id2] = short_strings[id3] / 2 + 1000;
-    }
-    return short_strings[id1];
-  });
 
-  TimeFun("Literal Short-string IDs", [&short_strings]() {
+  TimeFun("Literal IDs ", [&short_strings]() {
     for (size_t i = 0; i < EVAL_STEPS; i++) {
       short_strings["42"] += short_strings["100"];
       short_strings["1000"] -= short_strings["100"];
       short_strings["100"] = short_strings["1000"] / 2 + 1000;
     }
     return short_strings["42"];
-  });
-
-  TimeFun("Long-string IDs", [&long_strings]() {
-    std::string id1 = ToLongStringID(42), id2 = ToLongStringID(100), id3 = ToLongStringID(1000);
-    for (size_t i = 0; i < EVAL_STEPS; i++) {
-      long_strings[id1] += long_strings[id2];
-      long_strings[id3] -= long_strings[id2];
-      long_strings[id2] = long_strings[id3] / 2 + 1000;
-    }
-    return long_strings[id1];
-  });
-
-  TimeFun("Float IDs", [&float_ids]() {
-    double id1 = ToFloatID(42), id2 = ToFloatID(100), id3 = ToFloatID(1000);
-    for (size_t i = 0; i < EVAL_STEPS; i++) {
-      float_ids[id1] += float_ids[id2];
-      float_ids[id3] -= float_ids[id2];
-      float_ids[id2] = float_ids[id3] / 2 + 1000;
-    }
-    return float_ids[id1];
   });
 
   TimeFun("Direct Values", []() {
