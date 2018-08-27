@@ -108,4 +108,14 @@ int main()
     }
     return float_ids[id1];
   });
+
+  TimeFun("Direct Values", []() {
+    int val1 = 42, val2 = 100, val3 = 1000;
+    for (size_t i = 0; i < EVAL_STEPS; i++) {
+      val1 += val2;
+      val3 -= val2;
+      val2 = val3 / 2 + 1000;
+    }
+    return val1;
+  });
 }
