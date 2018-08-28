@@ -65,14 +65,14 @@ namespace emp {
     /// Retrieve a variable by its type and unique name.
     template <typename T>
     T & Get(const std::string & name) {
-      return Get(id_map[name]);
+      return Get<T>(id_map[name]);
     }
 
     /// Retrieve a variable by its type and unique name.
     template <typename T>
     const T & Get(const std::string & name) const {
       emp_assert(Has(id_map, name));
-      return Get( id_map.find(name)->second );
+      return Get<T>( id_map.find(name)->second );
     }
 
   };
