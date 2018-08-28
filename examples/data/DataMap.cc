@@ -13,5 +13,13 @@
 
 int main()
 {
+  emp::DataMap<std::string, bool, int, double> dmap;
+
+  dmap.Add("fitness", 0.0);
+  dmap.Add("do_muts", false);
+  dmap.Add<std::string>("name", "MyOrg1");
+  dmap.Add<std::string>("name2", "MyOrg2");
+  dmap.Add<std::string>("name3", "MyOrg3");
+
   std::cout << "Testing!" << std::endl;
 }
