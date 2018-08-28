@@ -18,7 +18,7 @@
 
 #include "../base/assert.h"
 #include "../base/vector.h"
-#include "../tools/map_utils"
+#include "../tools/map_utils.h"
 #include "../tools/string_utils.h"
 
 namespace emp {
@@ -39,15 +39,42 @@ namespace emp {
     DataMap & operator=(const DataMap &) = default;
     DataMap & operator=(DataMap &&) = default;
 
+    /// Add a new variable with a specified type, name and value.
     template <typename T>
-    void AddEntry(const std::string & name, T value) {
+    void Add(const std::string & name, T value) {
       emp_assert(!Has(id_map, name), name);               // Make sure this doesn't already exist.
-      auto & cur_vector = std::get<emp::vector<T>> vecs;  // Retrieve vector of the correct type.
+      auto & cur_vector = std::get<emp::vector<T>>(vecs); // Retrieve vector of the correct type.
       size_t pos = cur_vector.size();                     // Determine position of new entry.
       cur_vector.push_back(value);                        // Add the new value to the vector.
       id_map[name] = pos;                                 // Store the position in the id map.
       type_map[name] = typeid(T).name();                  // Store the type of this entry.
     }
+
+    /// Retrieve a variable by its type and unique id.
+    template <typename T>
+    T & Get(size_t id) {
+      return std::get<emp::vector<T>>(vecs)[id];  // Index into vector of correct type.
+    }
+
+    /// Retrieve a constant variable by its type and unique id.
+    template <typename T>
+    const T & Get(size_t id) const {
+      return std::get<emp::vector<T>>(vecs)[id];  // Index into vector of correct type.
+    }
+
+    /// Retrieve a variable by its type and unique name.
+    template <typename T>
+    T & Get(const std::string & name) {
+      return Get(id_map[name]);
+    }
+
+    /// Retrieve a variable by its type and unique name.
+    template <typename T>
+    const T & Get(const std::string & name) const {
+      emp_assert(Has(id_map, name));
+      return Get( id_map.find(name)->second );
+    }
+
   };
 
 }
