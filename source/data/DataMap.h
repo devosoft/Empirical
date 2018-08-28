@@ -81,6 +81,11 @@ namespace emp {
       emp_assert(Has(id_map, name), name);
       return id_map.find(name)->second;
     }
+
+    const std::string & GetType(const std::string & name) const {
+      emp_assert(Has(id_map, name), name);
+      return type_map.find(name)->second;
+    }
   };
 
 }
