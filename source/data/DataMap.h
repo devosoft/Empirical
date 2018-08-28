@@ -31,7 +31,7 @@ namespace emp {
     std::unordered_map<std::string, std::string> type_map;  ///< Lookup value types by name.
 
   public:
-    DataMap() { ; }
+    DataMap() : vecs(), id_map(), type_map() { ; }
     DataMap(const DataMap &) = default;
     DataMap(DataMap &&) = default;
     ~DataMap() { ; }
@@ -65,16 +65,22 @@ namespace emp {
     /// Retrieve a variable by its type and unique name.
     template <typename T>
     T & Get(const std::string & name) {
+      emp_assert(type_map[name] == typeid(T).name());
       return Get<T>(id_map[name]);
     }
 
     /// Retrieve a variable by its type and unique name.
     template <typename T>
     const T & Get(const std::string & name) const {
-      emp_assert(Has(id_map, name));
+      emp_assert(Has(id_map, name), name);                         // Make sure this name exists
+      emp_assert(type_map.find(name)->second == typeid(T).name()); // Ensure correct type is used.
       return Get<T>( id_map.find(name)->second );
     }
 
+    size_t GetID(const std::string & name) const {
+      emp_assert(Has(id_map, name), name);
+      return id_map.find(name)->second;
+    }
   };
 
 }
