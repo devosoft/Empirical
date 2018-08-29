@@ -53,32 +53,61 @@ namespace emp {
       type_map[name] = typeid(T).name();                  // Store the type of this entry.
     }
 
-    /// Retrieve a variable by its type and unique id.
+    /// Retrieve a default variable by its type and unique id.
     template <typename T>
-    T & Get(size_t id) {
+    T & GetDefault(size_t id) {
       return std::get<emp::vector<T>>(default_blob)[id];  // Index into vector of correct type.
     }
 
-    /// Retrieve a constant variable by its type and unique id.
+    /// Retrieve a variable from a blob by its type and unique id.
+    template <typename T>
+    T & Get(data_blob_t & blob, size_t id) {
+      return std::get<emp::vector<T>>(blob)[id];  // Index into vector of correct type.
+    }
+
+    /// Retrieve a constant default variable by its type and unique id.
     template <typename T>
     const T & Get(size_t id) const {
       return std::get<emp::vector<T>>(default_blob)[id];  // Index into vector of correct type.
     }
 
-    /// Retrieve a variable by its type and unique name.
+    /// Retrieve a constant variable from a blob by its type and unique id.
     template <typename T>
-    T & Get(const std::string & name) {
-      emp_assert(type_map[name] == typeid(T).name());
-      return Get<T>(id_map[name]);
+    const T & Get(const data_blob_t & blob, size_t id) const {
+      return std::get<emp::vector<T>>(blob)[id];  // Index into vector of correct type.
     }
 
-    /// Retrieve a variable by its type and unique name.
+    /// Retrieve a default variable by its type and unique name.
     template <typename T>
-    const T & Get(const std::string & name) const {
+    T & GetDefault(const std::string & name) {
+      emp_assert(type_map[name] == typeid(T).name());
+      return GetDefault<T>(id_map[name]);
+    }
+
+    /// Retrieve a const default variable by its type and unique name.
+    template <typename T>
+    const T & GetDefault(const std::string & name) const {
       emp_assert(Has(id_map, name), name);                         // Make sure this name exists
       emp_assert(type_map.find(name)->second == typeid(T).name()); // Ensure correct type is used.
-      return Get<T>( id_map.find(name)->second );
+      return GetDefault<T>( id_map.find(name)->second );
     }
+
+
+    /// Retrieve a variable from a data blob by its type and unique name.
+    template <typename T>
+    T & Get(data_blob_t & blob, const std::string & name) {
+      emp_assert(type_map[name] == typeid(T).name());
+      return Get<T>(blob, id_map[name]);
+    }
+
+    /// Retrieve a variable from a const data blob by its type and unique name.
+    template <typename T>
+    const T & Get(const data_blob_t & blob, const std::string & name) const {
+      emp_assert(Has(id_map, name), name);                         // Make sure this name exists
+      emp_assert(type_map.find(name)->second == typeid(T).name()); // Ensure correct type is used.
+      return Get<T>( blob, id_map.find(name)->second );
+    }
+
 
     size_t GetID(const std::string & name) const {
       emp_assert(Has(id_map, name), name);
