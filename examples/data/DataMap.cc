@@ -30,5 +30,12 @@ int main()
   std::cout << "Name 2 = " << dmap.Get<std::string>("name2") << std::endl;
   std::cout << "Name 3 = " << dmap.Get<std::string>("name3") << std::endl;
   std::cout << "Name 3 = " << dmap.Get<std::string>(2) << std::endl;
+  std::cout << "Name 3 = " << dmap.Get<std::string>( dmap.GetID("name3") ) << std::endl;
 
+  std::cout << "\nTypes:\n";
+  std::cout << "fitness: " << dmap.GetType("fitness") << std::endl;
+  std::cout << "do_muts: " << dmap.GetType("do_muts") << std::endl;
+  std::cout << "name:    " << dmap.GetType("name") << std::endl;
+  std::cout << "name2:   " << dmap.GetType("name2") << std::endl;
+  std::cout << "name3:   " << dmap.GetType("name3") << std::endl;
 }
