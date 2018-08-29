@@ -25,13 +25,16 @@ namespace emp {
 
   template <typename... Ts>
   class DataMap {
+  public:
+    using data_blob_t = std::tuple<emp::vector<Ts>...>;     ///< Storage type for mapped data.
+
   private:
-    std::tuple<emp::vector<Ts>...> vecs;                    ///< Vector for each type of value stored.
+    data_blob_t default_blob;                               ///< Default values for data.
     std::unordered_map<std::string, size_t> id_map;         ///< Lookup vector positions by name.
     std::unordered_map<std::string, std::string> type_map;  ///< Lookup value types by name.
 
   public:
-    DataMap() : vecs(), id_map(), type_map() { ; }
+    DataMap() : default_blob(), id_map(), type_map() { ; }
     DataMap(const DataMap &) = default;
     DataMap(DataMap &&) = default;
     ~DataMap() { ; }
@@ -43,9 +46,9 @@ namespace emp {
     template <typename T>
     void Add(const std::string & name, T value) {
       emp_assert(!Has(id_map, name), name);               // Make sure this doesn't already exist.
-      auto & cur_vector = std::get<emp::vector<T>>(vecs); // Retrieve vector of the correct type.
-      size_t pos = cur_vector.size();                     // Determine position of new entry.
-      cur_vector.push_back(value);                        // Add the new value to the vector.
+      auto & v = std::get<emp::vector<T>>(default_blob);  // Retrieve vector of the correct type.
+      size_t pos = v.size();                              // Determine position of new entry.
+      v.push_back(value);                                 // Add the new value to the vector.
       id_map[name] = pos;                                 // Store the position in the id map.
       type_map[name] = typeid(T).name();                  // Store the type of this entry.
     }
@@ -53,13 +56,13 @@ namespace emp {
     /// Retrieve a variable by its type and unique id.
     template <typename T>
     T & Get(size_t id) {
-      return std::get<emp::vector<T>>(vecs)[id];  // Index into vector of correct type.
+      return std::get<emp::vector<T>>(default_blob)[id];  // Index into vector of correct type.
     }
 
     /// Retrieve a constant variable by its type and unique id.
     template <typename T>
     const T & Get(size_t id) const {
-      return std::get<emp::vector<T>>(vecs)[id];  // Index into vector of correct type.
+      return std::get<emp::vector<T>>(default_blob)[id];  // Index into vector of correct type.
     }
 
     /// Retrieve a variable by its type and unique name.
