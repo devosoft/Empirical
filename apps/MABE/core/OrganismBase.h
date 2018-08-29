@@ -15,13 +15,19 @@
 #ifndef MABE_ORGANISM_BASE_H
 #define MABE_ORGANISM_BASE_H
 
+#include "data/DataMap.h"
+
 #include "OrganismTypeBase.h"
 
 namespace mabe {
 
+  using OrgDataMap = emp::DataMap<double, std::string>;
+  using OrgDataBlob = OrgDataMap::data_blob_t;
+
   class OrganismBase {
   protected:
     emp::Ptr<OrganismTypeBase> type_ptr;  ///< Pointer to information about this type of organism.
+    OrgDataBlob org_data;
 
   public:
     OrganismBase(emp::Ptr<OrganismTypeBase> _type_ptr) : type_ptr(_type_ptr) { type_ptr->IncCount(); }
