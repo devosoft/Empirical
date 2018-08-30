@@ -72,10 +72,11 @@ namespace mabe {
     std::vector<size_t> pop_sizes;    ///< Sizes of population dimensions (eg, 2 vals for grid)
     emp::TraitSet<org_t> phenotypes;  ///< What phenotypes are we tracking?
     emp::vector<emp::Ptr<emp::DataFile>> files;    ///< Output files.
+    OrgDataMap org_data_map;          ///< Details of how run data is stored in orgnisms.
 
-    bool is_synchronous;            ///< Does this world have synchronous generations?
-    bool is_space_structured;       ///< Do we have a spatially structured population?
-    bool is_pheno_structured;       ///< Do we have a phenotypically structured population?
+    bool is_synchronous;              ///< Does this world have synchronous generations?
+    bool is_space_structured;         ///< Do we have a spatially structured population?
+    bool is_pheno_structured;         ///< Do we have a phenotypically structured population?
 
     /// Function type for calculating fitness of organisms, typically set by the environment.
     using fun_calc_fitness_t = std::function<double(org_t&)>;
@@ -194,6 +195,31 @@ namespace mabe {
       }
       emp_assert(false, "Trying to lookup a file that does not exist.", filename);
       return *(files[0]);
+    }
+
+    template <typename T>
+    void AddOrgData(const std::string & name, T default_val) {
+      org_data_map.Add<T>(name, default_val);
+    }
+
+    template <typename T>
+    T & GetOrgData(org_t & org, const std::string & name) {
+      return org_data_map.Get<T>(org.GetData(), name);
+    }
+
+    template <typename T>
+    const T & GetOrgData(org_t & org, const std::string & name) const {
+      return org_data_map.Get<T>(org.GetData(), name);
+    }
+
+    template <typename T>
+    T & GetOrgData(org_t & org, size_t id) {
+      return org_data_map.Get<T>(org.GetData(), id);
+    }
+
+    template <typename T>
+    const T & GetOrgData(org_t & org, size_t id) const {
+      return org_data_map.Get<T>(org.GetData(), id);
     }
 
     /// Does the specified cell ID have an organism in it?
