@@ -35,6 +35,8 @@ namespace mabe {
     virtual ~OrganismBase() { type_ptr->DecCount(); }
 
     emp::Ptr<OrganismTypeBase> GetTypePtr() const { return type_ptr; }
+    OrgDataBlob & GetData() { return org_data; }
+    const OrgDataBlob & GetData() const { return org_data; }
 
     virtual emp::Ptr<OrganismBase> Clone() = 0;
   };
