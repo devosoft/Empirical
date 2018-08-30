@@ -11,6 +11,9 @@
 #ifndef EMP_VECTOR_UTILS_H
 #define EMP_VECTOR_UTILS_H
 
+#include <numeric>
+#include <set>
+
 #include "../base/vector.h"
 
 namespace emp {
@@ -27,7 +30,7 @@ namespace emp {
   /// Return whether a value exists in a vector.
   template <typename T>
   bool Has(const emp::vector<T> vec, const T & val) {
-    return FindPos(vec, val) >= 0;
+    return FindValue(vec, val) >= 0;
   }
 
   /// Print the contects of a vector.
@@ -107,6 +110,25 @@ namespace emp {
     for (int i = start; i < stop; i++){
       new_vec.push_back(vec[i]);
     }
+    return new_vec;
+  }
+
+  /// Returns a vector containing the numbers from @param N1 to @param N2
+  // from https://stackoverflow.com/questions/13152252/is-there-a-compact-equivalent-to-python-range-in-c-stl
+  template <typename T>
+  emp::vector <T> NRange(T N1, T N2) {
+      emp::vector<T> numbers(N2-N1);
+      std::iota(numbers.begin(), numbers.end(), N1);
+      return numbers;
+  }
+
+  /// Return a new vector containing the same elements as @param v
+  /// with any duplicate elements removed. 
+  /// Not guarunteed to preserve order
+  template <typename T>
+  emp::vector<T> RemoveDuplicates(const emp::vector<T> & v) {
+    std::set<T> temp_set(v.begin(), v.end());
+    emp::vector<T> new_vec(temp_set.begin(), temp_set.end());
     return new_vec;
   }
 

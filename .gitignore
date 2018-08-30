@@ -65,3 +65,9 @@ third-party/doxygen/
 build/
 doc/_build/
 
+empirical_workspace.code-workspace
+tests/muller_data.dat
+tests/test_collection_file.dat
+tests/test_container_file.dat
+tests/test_make_container_file.dat
+tests/test_timing_file.dat

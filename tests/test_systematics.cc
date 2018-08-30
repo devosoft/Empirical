@@ -345,6 +345,8 @@ TEST_CASE("Run world", "[evo]") {
       return num_muts;
     });
 
+  world.SetAutoMutate();
+
   // Setup the fitness function.
   std::function<double(emp::AvidaGP &)> fit_fun =
     [](emp::AvidaGP & org) {

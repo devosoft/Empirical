@@ -17,7 +17,7 @@ TEST_CASE("OEE", "[evo]") {
     emp::Ptr<emp::Systematics<int, int> > sys_ptr;
     sys_ptr.New([](int org){return org;}, true, true, true);
     world.AddSystematics(sys_ptr);
-    world.SetWellMixed(true);
+    world.SetPopStruct_Mixed(true);
 
     emp::OEETracker<int, int> oee(sys_ptr, [](int org){return org;});
     AddOEEFile(world, oee).SetTimingRepeat(10);
