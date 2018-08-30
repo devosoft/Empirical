@@ -33,6 +33,10 @@ namespace mabe {
     /// Required accessor for configuration objects.
     NKConfig & GetConfig() override { return config; }
 
+    void Setup(WorldBase & world) override {
+      world.AddOrgData<double>("fitness", 0.0);
+    }
+
     template <typename T>
     void LinkOrgType(emp::Ptr<T> org_mod) {
       // @CAO: Need to adjust to allow BitVector to be a reference!!
