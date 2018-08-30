@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2018
  *
  *  @file  NK.h
  *  @brief This file provides code to build NK-based algorithms.
@@ -140,6 +140,15 @@ namespace emp {
       }
       return total;
     }
+
+    void SetState(size_t n, size_t state, double in_fit) { landscape[n][state] = in_fit; }
+
+    void RandomizeStates(Random & random, size_t num_states=1) {
+      for (size_t i = 0; i < num_states; i++) {
+        SetState(random.GetUInt(N), random.GetUInt(state_count), random.GetDouble());
+      }
+    }
+
   };
 
   /// The NKLandscapeMemo class is simialar to NKLandscape, but it does not pre-calculate all

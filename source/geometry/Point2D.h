@@ -15,6 +15,8 @@
 #include <cmath>
 #include <iostream>
 
+#include "../tools/math.h"
+
 namespace emp {
 
   template <typename TYPE=double> class Point2D {
@@ -35,6 +37,10 @@ namespace emp {
     const Point2D & operator=(const Point2D & _in) { x = _in.x; y = _in.y; return *this; }
     constexpr bool operator==(const Point2D & _in) const { return (x == _in.x) && (y == _in.y); }
     constexpr bool operator!=(const Point2D & _in) const { return (x != _in.x) || (y != _in.y); }
+
+    // Inequalities have to do with BOTH ponts.
+    constexpr bool operator<=(const Point2D & _in) const { return (x <= _in.x) && (y <= _in.y); }
+    constexpr bool operator>=(const Point2D & _in) const { return (x >= _in.x) && (y >= _in.y); }
 
     constexpr inline TYPE GetX() const { return x; }
     constexpr inline TYPE GetY() const { return y; }
@@ -73,6 +79,7 @@ namespace emp {
     Point2D & ToOrigin() { x = 0; y = 0; return *this; }
     Point2D & NegateX() { x = -x; return *this; }
     Point2D & NegateY() { y = -y; return *this; }
+    Point2D & Mod(const Point2D & limits) { x = emp::Mod(x, limits.x); y = emp::Mod(y, limits.y); return *this; }
 
     Point2D & operator+=(const Point2D & _in) { x += _in.x; y += _in.y; return *this; }
     Point2D & operator-=(const Point2D & _in) { x -= _in.x; y -= _in.y; return *this; }
@@ -100,11 +107,12 @@ namespace emp {
 
 }
 
-// Overload ostream to work with points.
-template <typename TYPE> std::ostream & operator<<(std::ostream & os,
-                                                   const emp::Point2D<TYPE> & point) {
-  return os << "(" << point.GetX() << "," << point.GetY() << ")";
+namespace std {
+  // Overload ostream to work with points.
+  template <typename TYPE> std::ostream & operator<<(std::ostream & os,
+                                                    const emp::Point2D<TYPE> & point) {
+    return os << "(" << point.GetX() << "," << point.GetY() << ")";
+  }
 }
-
 
 #endif

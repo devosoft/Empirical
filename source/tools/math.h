@@ -161,6 +161,7 @@ namespace emp {
   /// A fast method for calculating exponents for int types.
   template <typename TYPE>
   static constexpr TYPE IntPow(TYPE base, TYPE exp) {
+    emp_assert(exp < 65536); // Set a crazy-high limit for exp to identify problems...
     return exp < 1 ? 1 : (base * IntPow(base, exp-1));
   }
 

@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  RawImage.h
  *  @brief Handle the fundamental loading of an image (without Widget tracking)
@@ -15,119 +15,145 @@
 #include <string>
 #include <vector>
 
+#include "../base/Ptr.h"
+#include "../base/vector.h"
+#include "../control/Signal.h"
+#include "../tools/map_utils.h"
+
 #include "emfunctions.h"
 #include "JSWrap.h"
 
 namespace emp {
 
+  namespace internal {
+    /// Detailed information about an image
+    struct ImageInfo {
+      int img_id;                    ///< Unique ID for this image.
+      std::string url;               ///< Full URL of file containing image.
+      mutable bool has_loaded;       ///< Is this image finished loading?
+      mutable bool has_error;        ///< Were there any errors in loading image?
+      Signal<void()> on_load;        ///< Actions for when image is finished loading.
+      Signal<void()> on_error;       ///< Actions for when image has trouble loading.
+
+      ImageInfo(const std::string & _url)
+        : img_id(-1), url(_url), has_loaded(false), has_error(false), on_load(), on_error()
+      {
+        size_t loaded_callback = JSWrapOnce( std::function<void()>(std::bind(&ImageInfo::MarkLoaded, this)) );
+        size_t error_callback = JSWrapOnce( std::function<void()>(std::bind(&ImageInfo::MarkError, this)) );
+
+        img_id = EM_ASM_INT({
+          var url = Pointer_stringify($0);
+          var img_id = emp_i.images.length;
+          emp_i.images[img_id] = new Image();
+          emp_i.images[img_id].src = url;
+
+          emp_i.images[img_id].onload = function() {
+              emp_i.image_load_count += 1;
+              emp.Callback($1);
+          };
+
+          emp_i.images[img_id].onerror = function() {
+              emp_i.image_error_count += 1;
+              emp.Callback($2);
+          };
+
+          return img_id;
+        }, url.c_str(), loaded_callback, error_callback);
+      }
+
+      /// Trigger this image as loaded.
+      void MarkLoaded() {
+        has_loaded = true;  // Mark that load is finished for future use.
+        on_load.Trigger();  // Trigger any other code that needs to be run now.
+        on_load.Clear();    // Now that the load is finished, we don't need to run these again.
+      }
+
+      /// Trigger this image as having an error.
+      void MarkError() {
+        has_error = true;
+        emp::Alert(std::string("Error loading image: ") + url);
+        on_error.Trigger();  // Trigger any other code that needs to be run now.
+        on_error.Clear();    // Now that the load is finished, we don't need to run these again.
+      }
+
+      /// Add a new function to be called when the image finishes loading.
+      void OnLoad(const std::function<void()> & callback_fun) {
+        on_load.AddAction(callback_fun);
+      }
+
+      /// Add a new function to be called if an image load has an error.
+      void OnError(const std::function<void()> & callback_fun) {
+        on_error.AddAction(callback_fun);
+      }
+    };
+
+    class ImageManager {
+    private:
+      emp::vector<Ptr<ImageInfo>> image_info;        ///< Information about each loaded image.
+      std::map<std::string, size_t> image_id_map;    ///< Map of urls to loaded image ids.
+
+    public:
+      ImageManager() : image_info(0), image_id_map() { ; }
+      ~ImageManager() {
+        for (auto ptr : image_info) ptr.Delete();
+      }
+
+      /// Is an image with the provided name currently being managed?
+      bool Has(const std::string & url) { return emp::Has(image_id_map, url); }
+
+      /// Create a new image with the provided name.
+      Ptr<ImageInfo> Add(const std::string & url) {
+        emp_assert(Has(url) == false);
+        size_t img_id = image_info.size();
+        Ptr<ImageInfo> new_info = NewPtr<ImageInfo>(url);
+        image_info.push_back(new_info);
+        image_id_map[url] = img_id;
+        return image_info[img_id];
+      }
+
+      /// Get the info about a specified image (loading it only if needed!)
+      Ptr<ImageInfo> GetInfo(const std::string & url) {
+        if (Has(url)) return image_info[ image_id_map[url] ];
+        return Add(url);
+      }
+    };
+
+  } // End internal namespace
+
   /// Fundamental information about a single image.
   class RawImage {
   private:
-    std::string filename;                             ///< Name of the file image was loaded from.
-    int img_id;                                       ///< Unique ID for this image.
-    mutable bool has_loaded;                          ///< Is this image finished loading?
-    mutable bool has_error;                           ///< Were there any errors in loading image?
-    mutable emp::vector<uint32_t> callbacks_on_load;  ///< Callbacks to be done when image loaded.
-    mutable emp::vector<uint32_t> callbacks_on_error; ///< Callbacks to be done if load error.
+    Ptr<internal::ImageInfo> info;
 
-    uint32_t loaded_callback;                         ///< Internal callback when image loaded.
-    uint32_t error_callback;                          ///< Internal callback when image error.
-  public:
-    RawImage(const std::string & _filename)
-      : filename(_filename), has_loaded(false), has_error(false)
-    {
-      loaded_callback = JSWrapOnce( std::function<void()>(std::bind(&RawImage::MarkLoaded, this)) );
-      error_callback = JSWrapOnce( std::function<void()>(std::bind(&RawImage::MarkError, this)) );
-
-      img_id = EM_ASM_INT({
-        var file = Pointer_stringify($0);
-        var img_id = emp_info.images.length;
-        emp_info.images[img_id] = new Image();
-        emp_info.images[img_id].src = file;
-
-        emp_info.images[img_id].onload = function() {
-            emp_info.image_load_count += 1;
-            emp.Callback($1);
-        };
-
-        emp_info.images[img_id].onerror = function() {
-            emp_info.image_error_count += 1;
-            emp.Callback($2);
-        };
-
-        return img_id;
-      }, filename.c_str(), loaded_callback, error_callback);
-
+    static internal::ImageManager & GetManager() {
+      static internal::ImageManager manager;
+      return manager;
     }
+  public:
+    RawImage(const std::string & url) : info(GetManager().GetInfo(url)) { ; }
+    RawImage(const RawImage &) = default;
     ~RawImage() { ; }
 
-    const std::string & GetFilename() const { return filename; }
-    int GetImgID() const { return img_id; }
-    bool HasLoaded() const { return has_loaded; }
-    bool HasError() const { return has_error; }
+    RawImage & operator=(const RawImage &) = default;
 
-    /// Trigger this image as loaded.
-    void MarkLoaded() {
-      has_loaded = true;
-      for (uint32_t id : callbacks_on_load) empCppCallback(id);
-      callbacks_on_load.resize(0);
-    }
-
-    /// Trigger this image as having an error.
-    void MarkError() {
-      has_error = true;
-      emp::Alert(std::string("Error loading image: ") + filename);
-
-      for (uint32_t id : callbacks_on_error) empCppCallback(id);
-      callbacks_on_error.resize(0);
-    }
+    int GetID() const { return info->img_id; }
+    const std::string & GetURL() const { return info->url; }
+    bool HasLoaded() const { return info->has_loaded; }
+    bool HasError() const { return info->has_error; }
 
     /// Add a new function to be called when the image finishes loading.
-    void AddLoadCallback(const std::function<void()> & callback_fun) {
-      callbacks_on_load.push_back( JSWrapOnce(callback_fun) );
+    void OnLoad(const std::function<void()> & callback_fun) {
+      if (HasLoaded()) callback_fun();
+      else info->on_load.AddAction(callback_fun);
     }
 
     /// Add a new function to be called if an image load has an error.
-    void AddErrorCallback(const std::function<void()> & callback_fun) {
-      callbacks_on_error.push_back( JSWrapOnce(callback_fun) );
+    void OnError(const std::function<void()> & callback_fun) {
+      if (HasError()) callback_fun();
+      else info->on_error.AddAction(callback_fun);
     }
   };
 
-  namespace internal {
-    static std::map<std::string, RawImage *> & RawImageMap() {
-      static std::map<std::string, RawImage *> raw_image_map;
-    }
-  }
-
-  /// Initiate the loading of a new image.
-  RawImage & LoadRawImage(const std::string & filename,
-                          const std::function<void()> & load_callback=NULL,
-                          const std::function<void()> & error_callback=NULL)
-  {
-    auto & raw_image_map = internal::RawImageMap();
-    auto it = raw_image_map.find(filename);
-    RawImage * raw_image;
-    if (it == raw_image_map.end()) {        // New filename
-      raw_image = new RawImage(filename);
-      raw_image_map[filename] = raw_image;
-    }
-    else {                                  // Pre-existing filename
-      raw_image = raw_image_map[filename];
-    }
-
-    if (load_callback) {
-      if (raw_image->HasLoaded()) load_callback();
-      else raw_image->AddLoadCallback(load_callback);
-    }
-
-    if (error_callback) {
-      if (raw_image->HasError()) error_callback();
-      else raw_image->AddErrorCallback(error_callback);
-    }
-
-    return *raw_image;
-  }
-
-};
+}
 
 #endif

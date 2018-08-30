@@ -9,6 +9,8 @@
 #ifndef EMP_GAME_PAYOFF_MATRIX_H
 #define EMP_GAME_PAYOFF_MATRIX_H
 
+#include <unordered_map>
+
 #include "../base/array.h"
 
 namespace emp {

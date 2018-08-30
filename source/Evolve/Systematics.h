@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
+ *  @date 2017-2018
  *
  *  @file  Systematics.h
  *  @brief Track genotypes, species, clades, or lineages of organisms in a world.
@@ -14,7 +14,7 @@
  *  @todo This inheritance system makes adding new systematics-related data tracking kind of a pain.
  *        Over time, this will probably become a maintainability problem. We can probably make the
  *        whole inheritance thing go away through judicious use of signals.
- * @todo This does not currently handle situations where organisms change locations during their 
+ * @todo This does not currently handle situations where organisms change locations during their
  *       lifetimes gracefully.
  */
 
@@ -28,18 +28,18 @@
 #include <map>
 
 #include "../base/Ptr.h"
-#include "../tools/info_theory.h"
-#include "../tools/set_utils.h"
-#include "../tools/map_utils.h"
-#include "../tools/string_utils.h"
-#include "../tools/stats.h"
 #include "../control/Signal.h"
-#include "../data/DataNode.h"
 #include "../data/DataManager.h"
+#include "../data/DataNode.h"
+#include "../tools/info_theory.h"
+#include "../tools/map_utils.h"
+#include "../tools/set_utils.h"
+#include "../tools/stats.h"
+#include "../tools/string_utils.h"
 
 namespace emp {
 
-  /// The systematics manager allows an optional second template type that 
+  /// The systematics manager allows an optional second template type that
   /// can store additional data about each taxon in the phylogeny. Here are
   /// some structs containing common pieces of additional data to track.
   /// Note: You are responsible for filling these in! Adding the template
@@ -52,9 +52,9 @@ namespace emp {
         using has_phen_t = std::false_type;
     }; /// The default - an empty struct
 
-    template <typename PHEN_TYPE> 
+    template <typename PHEN_TYPE>
     struct mut_landscape_info { /// Track information related to the mutational landscape
-      /// Maps a string representing a type of mutation to a count representing 
+      /// Maps a string representing a type of mutation to a count representing
       /// the number of that type of mutation that occured to bring about this taxon.
       using phen_t = PHEN_TYPE;
       using has_phen_t = std::true_type;
@@ -109,21 +109,22 @@ namespace emp {
 
     size_t id;                ///<  ID for this Taxon (Unique within this Systematics)
     const info_t info;        ///<  Details for the organims associated within this taxanomic group.
-    Ptr<this_t> parent; ///<  Pointer to parent group (nullptr if injected)
+    Ptr<this_t> parent;       ///<  Pointer to parent group (nullptr if injected)
     size_t num_orgs;          ///<  How many organisms currently exist of this group?
     size_t tot_orgs;          ///<  How many organisms have ever existed of this group?
     size_t num_offspring;     ///<  How many direct offspring groups exist from this one.
     size_t total_offspring;   ///<  How many total extant offspring taxa exist from this one (i.e. including indirect)
     size_t depth;             ///<  How deep in tree is this node? (Root is 0)
-    double origination_time;     ///<  When did this taxon first appear in the population?
+    double origination_time;  ///<  When did this taxon first appear in the population?
 
-    DATA_STRUCT data;              /// A struct for storing additional information about this taxon
+    DATA_STRUCT data;         ///< A struct for storing additional information about this taxon
 
   public:
     using data_t = DATA_STRUCT;
 
     Taxon(size_t _id, const info_t & _info, Ptr<this_t> _parent=nullptr)
-     : id (_id), info(_info), parent(_parent), num_orgs(0), tot_orgs(0), num_offspring(0), total_offspring(0)
+     : id (_id), info(_info), parent(_parent)
+     , num_orgs(0), tot_orgs(0), num_offspring(0), total_offspring(0)
      , depth(parent ? (parent->depth+1) : 0) { ; }
     // Taxon(const Taxon &) = delete;
     Taxon(const Taxon &) = default; // TODO: Check with Charles about this
@@ -178,7 +179,7 @@ namespace emp {
     }
 
     /// Get total number of offspring directly or indirectly
-    /// descending from this taxon. 
+    /// descending from this taxon.
     int GetTotalOffspring(){ return total_offspring; }
 
     /// Remove an organism from this Taxon (after it dies).
@@ -210,35 +211,40 @@ namespace emp {
     }
   };
 
+
+  /// A base class for Systematics, maintaining information common to all systematics managers
+  /// and providing virtual functaions.
+
   template <typename ORG>
   class SystematicsBase {
-
   protected:
-    bool store_active;     ///< Store all of the currently active taxa?
-    bool store_ancestors;  ///< Store all of the direct ancestors from living taxa?
-    bool store_outside;    ///< Store taxa that are extinct with no living descendants?
-    bool archive;          ///< Set to true if we are supposed to do any archiving of extinct taxa.
-    bool store_position;   ///< Keep a vector mapping  positions to pointers
-    bool track_synchronous;///< Does this systematics manager need to keep track of current and next positions?
+    bool store_active;        ///< Store all of the currently active taxa?
+    bool store_ancestors;     ///< Store all of the direct ancestors from living taxa?
+    bool store_outside;       ///< Store taxa that are extinct with no living descendants?
+    bool archive;             ///< Set to true if we are supposed to do any archiving of extinct taxa.
+    bool store_position;      ///< Keep a vector mapping  positions to pointers
+    bool track_synchronous;   ///< Does this systematics manager need to keep track of current and next positions?
 
     // Stats about active taxa... (totals are across orgs, not taxa)
-    size_t org_count;           ///< How many organisms are currently active?
-    size_t total_depth;         ///< Sum of taxa depths for calculating average.
-    size_t num_roots;           ///< How many distint injected ancestors are currently in population?
+    size_t org_count;         ///< How many organisms are currently active?
+    size_t total_depth;       ///< Sum of taxa depths for calculating average.
+    size_t num_roots;         ///< How many distint injected ancestors are currently in population?
 
-    size_t next_id;             ///< What ID value should the next new taxon have?
+    size_t next_id;           ///< What ID value should the next new taxon have?
     size_t curr_update;
 
     DataManager<double, data::Current, data::Info, data::Range, data::Stats, data::Pull> data_nodes;
 
-    public:
-
+  public:
     SystematicsBase(bool _active=true, bool _anc=true, bool _all=false, bool _pos=true)
       : store_active(_active), store_ancestors(_anc), store_outside(_all)
       , archive(store_ancestors || store_outside), store_position(_pos), track_synchronous(false)
       , org_count(0), total_depth(0), num_roots(0), next_id(0), curr_update(0) { ; }
 
     virtual ~SystematicsBase(){;}
+
+    using data_node_t = DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>;
+    using data_ptr_t = Ptr<data_node_t>;
 
     /// Are we tracking a synchronous population?
     bool GetTrackSynchronous() const {return track_synchronous; }
@@ -288,19 +294,19 @@ namespace emp {
     // Returns a reference so that capturing it in a lambda to call on update
     // is less confusing. It's possible we should change it to be consistent
     // with GetFitnessDataNode, though.
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddDataNode(const std::string & name) {
+    data_ptr_t AddDataNode(const std::string & name) {
       emp_assert(!data_nodes.HasNode(name));
       return &(data_nodes.New(name));
     }
 
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddDataNode(std::function<emp::vector<double>()> pull_set_fun, const std::string & name) {
+    data_ptr_t AddDataNode(std::function<emp::vector<double>()> pull_set_fun, const std::string & name) {
       emp_assert(!data_nodes.HasNode(name));
       auto node = AddDataNode(name);
       node->AddPullSet(pull_set_fun);
       return node;
     }
 
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddDataNode(std::function<double()> pull_fun, const std::string & name) {
+    data_ptr_t AddDataNode(std::function<double()> pull_fun, const std::string & name) {
       emp_assert(!data_nodes.HasNode(name));
       auto node = AddDataNode(name);
       node->AddPull(pull_fun);
@@ -308,17 +314,17 @@ namespace emp {
     }
 
 
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> GetDataNode(const std::string & name) {
+    data_ptr_t GetDataNode(const std::string & name) {
       return &(data_nodes.Get(name));
     }
 
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddEvolutionaryDistinctivenessDataNode(const std::string & name = "evolutionary_distinctiveness") = 0;
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddPairwiseDistanceDataNode(const std::string & name = "pairwise_distance") = 0;
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddPhylogeneticDiversityDataNode(const std::string & name = "phylogenetic_diversity") = 0;
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddDeleteriousStepDataNode(const std::string & name = "deleterious_steps") = 0;
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddVolatilityDataNode(const std::string & name = "volatility") = 0;
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddUniqueTaxaDataNode(const std::string & name = "unique_taxa") = 0;
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddMutationCountDataNode(const std::string & name = "mutation_count", const std::string & mutation = "substitution") = 0;
+    virtual data_ptr_t AddEvolutionaryDistinctivenessDataNode(const std::string & name = "evolutionary_distinctiveness") = 0;
+    virtual data_ptr_t AddPairwiseDistanceDataNode(const std::string & name = "pairwise_distance") = 0;
+    virtual data_ptr_t AddPhylogeneticDiversityDataNode(const std::string & name = "phylogenetic_diversity") = 0;
+    virtual data_ptr_t AddDeleteriousStepDataNode(const std::string & name = "deleterious_steps") = 0;
+    virtual data_ptr_t AddVolatilityDataNode(const std::string & name = "volatility") = 0;
+    virtual data_ptr_t AddUniqueTaxaDataNode(const std::string & name = "unique_taxa") = 0;
+    virtual data_ptr_t AddMutationCountDataNode(const std::string & name = "mutation_count", const std::string & mutation = "substitution") = 0;
 
     virtual size_t GetNumActive() const = 0;
     virtual size_t GetNumAncestors() const = 0;
@@ -353,6 +359,7 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT = emp::datastruct::no_data>
   class Systematics : public SystematicsBase<ORG> {
   private:
+    using parent_t = SystematicsBase<ORG>;
     using taxon_t = Taxon<ORG_INFO, DATA_STRUCT>;
     using hash_t = typename Ptr<taxon_t>::hash_t;
     using fun_calc_info_t = std::function<ORG_INFO(ORG &)>;
@@ -360,55 +367,56 @@ namespace emp {
     fun_calc_info_t calc_info_fun;
     Ptr<taxon_t> next_parent;
 
-    using SystematicsBase<ORG>::store_active;
-    using SystematicsBase<ORG>::store_ancestors;
-    using SystematicsBase<ORG>::store_outside;
-    using SystematicsBase<ORG>::archive;
-    using SystematicsBase<ORG>::store_position;
-    using SystematicsBase<ORG>::track_synchronous;
-    using SystematicsBase<ORG>::org_count;
-    using SystematicsBase<ORG>::total_depth;
-    using SystematicsBase<ORG>::num_roots;
-    using SystematicsBase<ORG>::next_id;
-    using SystematicsBase<ORG>::curr_update;
+    using parent_t::store_active;
+    using parent_t::store_ancestors;
+    using parent_t::store_outside;
+    using parent_t::archive;
+    using parent_t::store_position;
+    using parent_t::track_synchronous;
+    using parent_t::org_count;
+    using parent_t::total_depth;
+    using parent_t::num_roots;
+    using parent_t::next_id;
+    using parent_t::curr_update;
 
-    using SystematicsBase<ORG>::GetNumActive;
-    using SystematicsBase<ORG>::GetNumAncestors;
-    using SystematicsBase<ORG>::GetNumOutside;
-    using SystematicsBase<ORG>::GetTreeSize;
-    using SystematicsBase<ORG>::GetNumTaxa;
-    // using SystematicsBase<ORG>::OnNew;
-    // using SystematicsBase<ORG>::OnPrune;
-    using SystematicsBase<ORG>::GetPhylogeneticDiversity;
-    // using SystematicsBase<ORG>::GetTaxonDistinctiveness;
-    // using SystematicsBase<ORG>::GetEvolutionaryDistinctiveness;
-    using SystematicsBase<ORG>::GetMeanPairwiseDistance;
-    using SystematicsBase<ORG>::GetSumPairwiseDistance;
-    using SystematicsBase<ORG>::GetVariancePairwiseDistance;
-    using SystematicsBase<ORG>::GetPairwiseDistances;
-    // using SystematicsBase<ORG>::GetDistanceToRoot;
-    // using SystematicsBase<ORG>::GetBranchesToRoot;
-    // using SystematicsBase<ORG>::GetMRCA;
-    using SystematicsBase<ORG>::GetMRCADepth;
-    using SystematicsBase<ORG>::AddOrg;
-    using SystematicsBase<ORG>::RemoveOrg;
-    using SystematicsBase<ORG>::RemoveNextOrg;
-    // using SystematicsBase<ORG>::Parent;
-    using SystematicsBase<ORG>::PrintStatus;
-    // using SystematicsBase<ORG>::PrintLineage;
-    using SystematicsBase<ORG>::CalcDiversity;
-    using SystematicsBase<ORG>::Update;
-    using SystematicsBase<ORG>::SetNextParent;
+    using typename parent_t::data_ptr_t;
+    using parent_t::GetNumActive;
+    using parent_t::GetNumAncestors;
+    using parent_t::GetNumOutside;
+    using parent_t::GetTreeSize;
+    using parent_t::GetNumTaxa;
+    // using parent_t::OnNew;
+    // using parent_t::OnPrune;
+    using parent_t::GetPhylogeneticDiversity;
+    // using parent_t::GetTaxonDistinctiveness;
+    // using parent_t::GetEvolutionaryDistinctiveness;
+    using parent_t::GetMeanPairwiseDistance;
+    using parent_t::GetSumPairwiseDistance;
+    using parent_t::GetVariancePairwiseDistance;
+    using parent_t::GetPairwiseDistances;
+    // using parent_t::GetDistanceToRoot;
+    // using parent_t::GetBranchesToRoot;
+    // using parent_t::GetMRCA;
+    using parent_t::GetMRCADepth;
+    using parent_t::AddOrg;
+    using parent_t::RemoveOrg;
+    using parent_t::RemoveNextOrg;
+    // using parent_t::Parent;
+    using parent_t::PrintStatus;
+    // using parent_t::PrintLineage;
+    using parent_t::CalcDiversity;
+    using parent_t::Update;
+    using parent_t::SetNextParent;
 
-    using SystematicsBase<ORG>::GetDataNode;
-    using SystematicsBase<ORG>::AddDataNode;
-    using SystematicsBase<ORG>::AddEvolutionaryDistinctivenessDataNode;
-    using SystematicsBase<ORG>::AddPairwiseDistanceDataNode;
-    using SystematicsBase<ORG>::AddPhylogeneticDiversityDataNode;
-    using SystematicsBase<ORG>::AddDeleteriousStepDataNode;
-    using SystematicsBase<ORG>::AddVolatilityDataNode;
-    using SystematicsBase<ORG>::AddUniqueTaxaDataNode;
-    using SystematicsBase<ORG>::AddMutationCountDataNode;
+    using parent_t::GetDataNode;
+    using parent_t::AddDataNode;
+    using parent_t::AddEvolutionaryDistinctivenessDataNode;
+    using parent_t::AddPairwiseDistanceDataNode;
+    using parent_t::AddPhylogeneticDiversityDataNode;
+    using parent_t::AddDeleteriousStepDataNode;
+    using parent_t::AddVolatilityDataNode;
+    using parent_t::AddUniqueTaxaDataNode;
+    using parent_t::AddMutationCountDataNode;
 
     std::unordered_set< Ptr<taxon_t>, hash_t > active_taxa;   ///< A set of all living taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; ///< A set of all dead, ancestral taxa.
@@ -442,7 +450,7 @@ namespace emp {
      */
 
     Systematics(fun_calc_info_t calc_taxon, bool _active=true, bool _anc=true, bool _all=false, bool _pos=true)
-      : SystematicsBase<ORG>(_active, _anc, _all, _pos)
+      : parent_t(_active, _anc, _all, _pos)
       , calc_info_fun(calc_taxon)
       , active_taxa(), ancestor_taxa(), outside_taxa()
       , mrca(nullptr) { ; }
@@ -460,14 +468,16 @@ namespace emp {
 
     void Update() {
       ++curr_update;
-      std::swap(taxon_locations, next_taxon_locations);
-      next_taxon_locations.resize(0);
+      if (track_synchronous) {
+        std::swap(taxon_locations, next_taxon_locations);
+        next_taxon_locations.resize(0);
+      }
     }
 
     void SetCalcInfoFun(fun_calc_info_t f) {calc_info_fun = f;}
 
     // Currently using raw pointers because of a weird bug in emp::Ptr. Should switch when fixed.
-    std::unordered_set< Ptr<taxon_t>, hash_t >* GetActivePtr() { return &active_taxa; }
+    std::unordered_set< Ptr<taxon_t>, hash_t > * GetActivePtr() { return &active_taxa; }
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetActive() const { return active_taxa; }
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetAncestors() const { return ancestor_taxa; }
 
@@ -507,7 +517,7 @@ namespace emp {
     /// Argument: Pounter to taxon
     SignalKey OnPrune(std::function<void(Ptr<taxon_t>)> & fun) { return on_prune_sig.AddAction(fun); }
 
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> 
+    virtual data_ptr_t
     AddEvolutionaryDistinctivenessDataNode(const std::string & name = "evolutionary_distinctiveness") {
       auto node = AddDataNode(name);
       node->AddPullSet([this](){
@@ -521,7 +531,7 @@ namespace emp {
       return node;
     }
 
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddPairwiseDistanceDataNode(const std::string & name = "pairwise_distances") {
+    virtual data_ptr_t AddPairwiseDistanceDataNode(const std::string & name = "pairwise_distances") {
       auto node = AddDataNode(name);
       node->AddPullSet([this](){
         return GetPairwiseDistances();
@@ -529,7 +539,7 @@ namespace emp {
       return node;
     }
 
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddPhylogeneticDiversityDataNode(const std::string & name = "phylogenetic_diversity") {
+    virtual data_ptr_t AddPhylogeneticDiversityDataNode(const std::string & name = "phylogenetic_diversity") {
       auto node = AddDataNode(name);
       node->AddPull([this](){
         return GetPhylogeneticDiversity();
@@ -538,18 +548,18 @@ namespace emp {
     }
 
 
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> 
+    virtual data_ptr_t
     AddDeleteriousStepDataNode(const std::string & name = "deleterious_steps") {
       return AddDeleteriousStepDataNodeImpl(1, name);
     }
 
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddDeleteriousStepDataNodeImpl(bool decoy, const std::string & name = "deleterious_steps") {
+    data_ptr_t AddDeleteriousStepDataNodeImpl(bool decoy, const std::string & name = "deleterious_steps") {
       emp_assert(false, "Calculating deleterious steps requires suitable DATA_STRUCT");
       return AddDataNode(name);
     }
- 
+
     template <typename T=int>
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>>
+    data_ptr_t
     AddDeleteriousStepDataNodeImpl(typename std::enable_if<DATA_STRUCT::has_fitness_t::value, T>::type decoy, const std::string & name = "deleterious_steps") {
       auto node = AddDataNode(name);
       node->AddPullSet([this](){
@@ -563,18 +573,18 @@ namespace emp {
       return node;
     }
 
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> 
+    virtual data_ptr_t
     AddVolatilityDataNode(const std::string & name = "volatility") {
       return AddVolatilityDataNodeImpl(1, name);
     }
 
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddVolatilityDataNodeImpl(bool decoy, const std::string & name = "volatility") {
+    data_ptr_t AddVolatilityDataNodeImpl(bool decoy, const std::string & name = "volatility") {
       emp_assert(false, "Calculating taxon volatility requires suitable DATA_STRUCT");
       return AddDataNode(name);
     }
- 
+
     template <typename T=int>
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>>
+    data_ptr_t
     AddVolatilityDataNodeImpl(typename std::enable_if<DATA_STRUCT::has_phen_t::value, T>::type decoy, const std::string & name = "volatility") {
       auto node = AddDataNode(name);
       node->AddPullSet([this](){
@@ -588,18 +598,18 @@ namespace emp {
       return node;
     }
 
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> 
+    virtual data_ptr_t
     AddUniqueTaxaDataNode(const std::string & name = "unique_taxa") {
       return AddUniqueTaxaDataNodeImpl(1, name);
     }
 
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddUniqueTaxaDataNodeImpl(bool decoy, const std::string & name = "unique_taxa") {
+    data_ptr_t AddUniqueTaxaDataNodeImpl(bool decoy, const std::string & name = "unique_taxa") {
       emp_assert(false, "Calculating uniqe taxa requires suitable DATA_STRUCT");
       return AddDataNode(name);
     }
- 
+
     template <typename T=int>
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>>
+    data_ptr_t
     AddUniqueTaxaDataNodeImpl(typename std::enable_if<DATA_STRUCT::has_phen_t::value, T>::type decoy, const std::string & name = "unique_taxa") {
       auto node = AddDataNode(name);
       node->AddPullSet([this](){
@@ -613,18 +623,18 @@ namespace emp {
       return node;
     }
 
-    virtual Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> 
+    virtual data_ptr_t
     AddMutationCountDataNode(const std::string & name = "mutation_count", const std::string & mutation = "substitution") {
       return AddMutationCountDataNodeImpl(1, name, mutation);
     }
 
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>> AddMutationCountDataNodeImpl(bool decoy, const std::string & name = "mutation_count", const std::string & mutation = "substitution") {
+    data_ptr_t AddMutationCountDataNodeImpl(bool decoy, const std::string & name = "mutation_count", const std::string & mutation = "substitution") {
       emp_assert(false, "Calculating mutation count requires suitable DATA_STRUCT");
       return AddDataNode(name);
     }
- 
+
     template <typename T=int>
-    Ptr<DataNode<double, data::Current, data::Info, data::Range, data::Stats, data::Pull>>
+    data_ptr_t
     AddMutationCountDataNodeImpl(typename std::enable_if<DATA_STRUCT::has_mutations_t::value, T>::type decoy, const std::string & name = "mutation_count", const std::string & mutation = "substitution") {
       auto node = AddDataNode(name);
       node->AddPullSet([this,mutation](){
@@ -650,10 +660,10 @@ namespace emp {
       return next_taxon_locations[id];
     }
 
-    /** From (Faith 1992, reviewed in Winters et al., 2013), phylogenetic diversity is 
-     *  the sum of edges in the minimal spanning tree connected the taxa you're 
+    /** From (Faith 1992, reviewed in Winters et al., 2013), phylogenetic diversity is
+     *  the sum of edges in the minimal spanning tree connected the taxa you're
      *  calculating diversity of.
-     * 
+     *
      * This calculates phylogenetic diversity for all extant taxa in the tree, assuming
      * all edges from parent to child have a length of one. Possible extensions to this
      * function that might be useful in the future include:
@@ -661,28 +671,28 @@ namespace emp {
      * - Enable calculation of branch lengths by amount of time that elapsed between
      *   origination of parent and origination of offspring
      * - Enable a paleontology compatibility mode where only branching points are calculated
-     */ 
+     */
     int GetPhylogeneticDiversity() const {
       // As shown on page 5 of Faith 1992, when all branch lengths are equal the phylogenetic
       // diversity is the number of internal nodes plus the number of extant taxa - 1.
       return ancestor_taxa.size() + active_taxa.size() - 1;
     }
- 
+
     /** This is a metric of how distinct @param tax is from the rest of the population.
-     * 
+     *
      * (From Vane-Wright et al., 1991; reviewed in Winter et al., 2013)
     */
     double GetTaxonDistinctiveness(Ptr<taxon_t> tax) const {return 1.0/GetDistanceToRoot(tax);}
 
     /** This metric (from Isaac, 2007; reviewd in Winter et al., 2013) measures how
      * distinct @param tax is from the rest of the population, weighted for the amount of
-     * unique evolutionary history that it represents. 
-     * 
+     * unique evolutionary history that it represents.
+     *
      * To quantify length of evolutionary history, this method needs @param time: the current
      * time, in whatever units time is being measured in when taxa are added to the systematics
      * manager. Note that passing a time in the past will produce innacurate results (since we
      * don't know what the state of the tree was at that time).
-     * 
+     *
      * Assumes the tree is all connected. Will return -1 if this assumption isn't met.
     */
     double GetEvolutionaryDistinctiveness(Ptr<taxon_t> tax, double time) const {
@@ -703,14 +713,14 @@ namespace emp {
       Ptr<taxon_t> test_taxon = tax->GetParent();
 
       emp_assert(time != -1 && "Invalid time - are you passing time to rg?", time);
-      emp_assert(time >= tax->GetOriginationTime() 
+      emp_assert(time >= tax->GetOriginationTime()
                  && "GetEvolutionaryDistinctiveness recieved a time that is earlier than the taxon's origination time.");
 
       while (test_taxon) {
 
-        emp_assert(test_taxon->GetOriginationTime() != -1 && 
+        emp_assert(test_taxon->GetOriginationTime() != -1 &&
                   "Invalid time - are you passing time to rg?");
-        
+
         depth += time - test_taxon->GetOriginationTime();
         // std::cout << "Tax: " << test_taxon->GetID() << " depth: " << depth << " time: " << time  << " Orig: " << test_taxon->GetOriginationTime() << " divisor: " << divisor << std::endl;
         time = test_taxon->GetOriginationTime();
@@ -719,7 +729,7 @@ namespace emp {
           // std::cout << (int)(test_taxon == mrca) << " depth: " << depth << " divisor: " << divisor << std::endl;
           total += depth/divisor;
           return total;
-        } else if (test_taxon->GetNumOrgs() > 0) { 
+        } else if (test_taxon->GetNumOrgs() > 0) {
           // If this taxon is still alive we need to update the divisor
           // std::cout << "Alive point" << " depth: " << depth << " divisor: " << divisor << std::endl;
           total += depth/divisor;
@@ -735,7 +745,7 @@ namespace emp {
 
         test_taxon = test_taxon->GetParent();
       }
-    
+
       return -1;
     }
 
@@ -743,11 +753,11 @@ namespace emp {
      * This measurement is also called Average Taxonomic Diversity (Warwick and Clark, 1998)
      * (for demonstration of equivalence see Tucker et al, 2016). This measurment tells
      * you about the amount of distinctness in the community as a whole.
-     * 
+     *
      * @param branch_only only counts distance in terms of nodes that represent a branch
      * between two extant taxa (poentially useful for comparison to biological data, where
      * non-branching nodes generally cannot be inferred).
-     * 
+     *
      * This measurement assumes that the tree is fully connected. Will return -1
      * if this is not the case.
      * */
@@ -758,11 +768,11 @@ namespace emp {
 
     /** Calculates summed pairwise distance between extant taxa. Tucker et al 2017 points
      *  out that this is a measure of phylogenetic richness.
-     * 
+     *
      * @param branch_only only counts distance in terms of nodes that represent a branch
      * between two extant taxa (poentially useful for comparison to biological data, where
      * non-branching nodes generally cannot be inferred).
-     * 
+     *
      * This measurement assumes that the tree is fully connected. Will return -1
      * if this is not the case.
      * */
@@ -773,11 +783,11 @@ namespace emp {
 
     /** Calculates variance of pairwise distance between extant taxa. Tucker et al 2017 points
      *  out that this is a measure of phylogenetic regularity.
-     * 
+     *
      * @param branch_only only counts distance in terms of nodes that represent a branch
      * between two extant taxa (poentially useful for comparison to biological data, where
      * non-branching nodes generally cannot be inferred).
-     * 
+     *
      * This measurement assumes that the tree is fully connected. Will return -1
      * if this is not the case.
      * */
@@ -787,26 +797,26 @@ namespace emp {
     }
 
     /** Calculates a vector of all pairwise distances between extant taxa.
-     * 
+     *
      * @param branch_only only counts distance in terms of nodes that represent a branch
      * between two extant taxa (poentially useful for comparison to biological data, where
      * non-branching nodes generally cannot be inferred).
-     * 
+     *
      * This method assumes that the tree is fully connected. Will return -1
      * if this is not the case.
      * */
-    emp::vector<double> GetPairwiseDistances(bool branch_only=false) const {      
+    emp::vector<double> GetPairwiseDistances(bool branch_only=false) const {
       // The overarching approach here is to start with a bunch of pointers to all
       // extant organisms (since that will include all leaves). Then we trace back up
       // the tree, keeping track of distances. When things meet up, we calculate
       // distances between the nodes on the sides that just met up.
 
       emp::vector<double> dists;
-      
+
       std::map< Ptr<taxon_t>, emp::vector<emp::vector<int>> > curr_pointers;
       std::map< Ptr<taxon_t>, emp::vector<emp::vector<int>> > next_pointers;
 
-      
+
       for (Ptr<taxon_t> tax : active_taxa) {
         curr_pointers[tax] = emp::vector<emp::vector<int>>({{0}});
       }
@@ -825,7 +835,7 @@ namespace emp {
               }
             } else {
               next_pointers[tax.first] = curr_pointers[tax.first];
-            } 
+            }
             continue;
           }
           emp_assert(tax.first->GetNumOff() + int(alive) == tax.second.size(), tax.first->GetNumOff(), alive, to_string(tax.second), tax.second.size());
@@ -834,7 +844,7 @@ namespace emp {
           // between everything that just met.
 
           if (tax.second.size() > 1) {
-       
+
             for (size_t i = 0; i < tax.second.size(); i++ ) {
               for (size_t j = i+1; j < tax.second.size(); j++) {
                 for (int disti : tax.second[i]) {
@@ -846,16 +856,16 @@ namespace emp {
               }
             }
           }
-          // std::cout << "dists " << to_string(dists) << std::endl; 
+          // std::cout << "dists " << to_string(dists) << std::endl;
           // Increment distances and stick them in new vector
-          emp::vector<int> new_dist_vec; 
+          emp::vector<int> new_dist_vec;
           for (auto & vec : tax.second) {
             for (int el : vec) {
               new_dist_vec.push_back(el+1);
             }
           }
 
-          // std::cout << "new_dist_vec " << to_string(new_dist_vec) << std::endl; 
+          // std::cout << "new_dist_vec " << to_string(new_dist_vec) << std::endl;
 
           next_pointers.erase(tax.first);
 
@@ -914,7 +924,7 @@ namespace emp {
       return depth;
     }
 
-    /** Counts the number of branching points leading to multiple extant taxa 
+    /** Counts the number of branching points leading to multiple extant taxa
      * between @param tax and the most-recent common ancestor (or the root of its subtree,
      * if no MRCA exists). This is useful because a lot
      * of stats for phylogenies are designed for phylogenies reconstructed from extant taxa.
@@ -997,9 +1007,9 @@ namespace emp {
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOffspring(Ptr<taxon_t> taxon) {
-    if (!taxon) { num_roots--; return; }               // Offspring was root; remove and return.
-    bool still_active = taxon->RemoveOffspring();      // Taxon still active w/ 1 fewer offspring?
-    if (!still_active) Prune(taxon);                   // If out of offspring, remove from tree.
+    if (!taxon) { num_roots--; return; }             // Offspring was root; remove and return.
+    bool still_active = taxon->RemoveOffspring();    // Taxon still active w/ 1 fewer offspring?
+    if (!still_active) Prune(taxon);                 // If out of offspring, remove from tree.
 
     // If the taxon is still active AND the is the current mrca AND now has only one offspring,
     // clear the MRCA for lazy re-evaluation later.
@@ -1011,10 +1021,10 @@ namespace emp {
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::MarkExtinct(Ptr<taxon_t> taxon) {
     emp_assert(taxon);
     emp_assert(taxon->GetNumOrgs() == 0);
-    
+
     if (taxon->GetParent()) {
       // Update extant descendant count for all ancestors
-      taxon->GetParent()->RemoveTotalOffspring(); 
+      taxon->GetParent()->RemoveTotalOffspring();
     }
 
     if (store_active) active_taxa.erase(taxon);
@@ -1065,7 +1075,7 @@ namespace emp {
   // Add information about a new organism, including its stored info and parent's taxon;
   // Can't return a pointer for the associated taxon because of obnoxious inheritance problems
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> 
+  // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG & org, int pos, int update, bool next) {
     emp_assert(store_position, "Trying to pass position to a systematics manager that can't use it");
     // emp_assert(next_parent, "Adding organism with no parent specified and no next_parent set");
@@ -1076,7 +1086,7 @@ namespace emp {
   // Add information about a new organism, including its stored info and parent's taxon;
   // Can't return a pointer for the associated taxon because of obnoxious inheritance problems
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> 
+  // Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG && org, int pos, int update, bool next) {
     emp_assert(store_position, "Trying to pass position to a systematics manager that can't use it");
     // emp_assert(next_parent, "Adding organism with no parent specified and no next_parent set");
@@ -1087,14 +1097,14 @@ namespace emp {
 
   // Version for if you aren't tracking positions
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> 
+  Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG & org, Ptr<taxon_t> parent, int update, bool next) {
     return AddOrg(org, -1, parent, update, next);
   }
 
   // Version for if you aren't tracking positions
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> 
+  Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG && org, Ptr<taxon_t> parent, int update, bool next) {
     return AddOrg(org, -1, parent, update, next);
   }
@@ -1120,15 +1130,15 @@ namespace emp {
 
     // If this organism needs a new taxon, build it!
     if (!cur_taxon || cur_taxon->GetInfo() != info) {
-      if (!cur_taxon) {                                         // No parent -> NEW tree
-        num_roots++;                                               // ...track extra root.
+      if (!cur_taxon) {                                 // No parent -> NEW tree
+        num_roots++;                                    // ...track extra root.
         mrca = nullptr;                                 // ...nix old common ancestor
-      } 
+      }
 
       cur_taxon = NewPtr<taxon_t>(++next_id, info, parent);  // Build new taxon.
       on_new_sig.Trigger(cur_taxon);
-      if (store_active) active_taxa.insert(cur_taxon);             // Store new taxon.
-      if (parent) parent->AddOffspring();              // Track tree info.
+      if (store_active) active_taxa.insert(cur_taxon);       // Store new taxon.
+      if (parent) parent->AddOffspring();                    // Track tree info.
 
       cur_taxon->SetOriginationTime(update);
     }

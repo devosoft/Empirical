@@ -1,0 +1,210 @@
+This initial attempt at re-writing MABE focused on building worlds from template parameters that
+all plugged together.  Ditching this attempt (perhaps only temporarily) to try for something
+more flexible where all interactions occur through base classes.
+
+Planning notes:
+
+We plan to implement MABE 2.0 using Empirical.
+
+What might this look like?
+
+Our goal is to have a set of components that have a common interface and easily plug together.
+
+In the current version of MABE the types of components are:
+
+* Brains (Controllers? or simply Control Modules, since multiple ones can plug togeter?)
+* Genomes (Representations?)
+* Worlds (Environments?)
+* Archivsts (Listeners? Recorders?)
+* Optimizers (Selection Scheme? Update Schema?)
+
+An organism has zero or more brains and zero or more genomes.
+...this arrangement should be doable with templates to have all of this at compile time.
+Indeed, other components (Worlds especially) could also contribute portions of an organism at compile time;
+Bodies, for example, are NOT currently considered part of the organism because they are provided by the World;
+it seems better to have a single class, if possible, that bundles all organism-related information.
+
+The new version of brains will be able emit signals and can listen for signals of pre-specified types.
+(these are actions and sensors, respectively)
+
+Similarly Worlds can emit signals (events) and listen for signal (responding to actions).
+
+
+What might this look like?  Well, first, we'll build an org:
+
+  using org_t = mabe::Organism<mabe::MarkovBrain, mabe::LinearGenome>;
+
+We should be able to plunk this into any world type.  In Empirical, we would do this with:
+
+  emp::World<org_t> world;
+
+But in that case a World and Environemnt are separate.  What if we stick with that, though?
+As long as environemnts have a fixed API, we could just use:
+
+  world.SetupEnvironment(my_env);
+
+This sertup would automatically build the patch board for the organism and fill it out in
+some reasonable way by default.
+
+Alternatively, if we want to do as much as possible at compile time, we could instead expand
+the world and include the environment right there along with whatever org types we need.
+
+  emp::World<org1_t, org2_t, env_t> world;
+
+The advantage of method 1 is that it makes it easier to setup an environment in code before
+handing it over to the world.  The advantage to method 2 is that it allows the world to be
+able to more deeply examine an environment to, for example, make sure the config object is
+handling it correctly without any extra effort on the part of the library user.
+
+
+The last two components of a MABE run are Archivists and Selection Mechanisms.
+
+In principle, I think Archivists cover everything that doesn't feed back into a run (and
+hance propose a re-name to Listeners), while Selection Mechanisms describe how a run should
+be advanced over time (and not limited to synchronous generations as they are in MABE 1.0),
+thus we could call them Update Schema.
+
+
+As such, there would be four high-level interchangable components in MABE 2.0:
+
+* Organisms (which are built from controllers and genomes, also with a rigid interface)
+* Environments (which can have common sub-parts, such as grids, continuous, etc.)
+* Listeners (such as systematics trackers or other data management techniques)
+* Update Schemas (selection techqniues, mutations, etc; can be applied in sets or bundled)
+
+
+Given all of this, we might setup a MABE run as:
+
+  int main(int argc, char * argv[]) {
+    // Determine the types of everything that you want to use to build the world.
+    using sheep_t = mabe::Organism<mabe::MarkovBrain, mabe::LinearGenome>;
+    using wolf_t = mabe::Organism<mabe::MarkovBrain, mabe::NetworkGenome>;
+    using env_t = mabe::FarmEnvironment;
+    using track_t = mabe::TrackLineage;
+    using select_t = mabe::TournamentSelect;
+
+    // Build the world using these types.  Giving it a config filename plus argv and argc
+    // will allow it to process all configuration inputs.
+    mabe::World<sheep_t, wolf_t, env_t, track_t, select_t> world("farm.cfg", argv, argc);
+
+    // Running world will go for full configured duration; can also manually Update() it.
+    return world.Run();
+  }
+
+
+Since we want existing components to be as easy to manipulate as possible, we want to also
+be able to configure aspects of them in code.
+
+For one, we should be able to access components of World from an object.  A simple way of
+doing this is to store components as tuples and have templated accessors.  In the example
+above, world.GetOrg<0>() could return the sheep prototype, while world.GetOrg<1> would 
+return the wolf prototype.
+
+Any updates to details may be needed to be done before the config object is accessed.  For
+example, configuration groups may need to be named.
+
+As such, if you build a world without any arguments, you can then run config later.
+
+  mabe::World<sheep_t, wolf_t, env_t, track_t, select_t> world;
+  world.NameOrgType<0>("Sheep");
+  world.NameOrgType<1>("Wolves");
+  world.Config("farm.cfg", argv, argc);
+
+Even simpler is if we REQUIRE both names for each component type and for the configuration to occur second.
+Then we would be able to have the names in the world constructor and write:
+
+  mabe::World<sheep_t, wolf_t, env_t, track_t, select_t>
+  world("Sheep", "Wolves", "FarmEnvironment", "LineageTracker", "TournamentSelection");
+  world.Config("farm.cfg", argv, argc);
+
+Knowing this additional information up front will allow us to use scoping in the configuration file.
+
+
+DEFAULTS should all be as reasonable and simple as possible.
+* If an organism has only one brain, it should automatically be used for everything with no extra work.
+  (if there is more than one brain, the programmer should be required to specify how they are hooked up since any
+  default behaviors will be couter-intuitive in some circumstances.)
+* If a World has only one environment, it should trivially be used.  If there is more than one, environments
+  need to be clearly specified.
+
+
+
+======== SUMMARY for MABE 2.0 proposal ========
+
+Four types of components:
+ * ORGANISMS (with tools to easily plug together CONTROL MODULES and GENOMES, but you can build your own)
+ * ENVIRONMENTS (interactive "worlds" -or- optimization problems; tools for continuous, state grid, etc.)
+ * LISTENERS (for data collections, such as summary printing, lineage tracking, population cross sections, etc.)
+ * UPDATE SCHEMA (to control how change occurs over time -- run asynchronously? use tournaments?  Etc)
+
+
+
+Here's what a full file might look like:
+
+  #include "mabe.h"
+  #include "controlers/MarkovBrain.h"
+  #include "genomes/LinearGenome.h"
+  #include "genomes/NetworkGenome.h"
+  #include "environments/FarmEnvironment.h"
+  #include "listeners/TrackLineage.h"
+  #include "schemas/TournamentSelect.h"
+
+  int main(int argc, char * argv[]) {
+    // Determine the types of everything that you want to use to build the world.
+    using sheep_t = mabe::Organism<mabe::MarkovBrain, mabe::LinearGenome>;
+    using wolf_t = mabe::Organism<mabe::MarkovBrain, mabe::NetworkGenome>;
+    using env_t = mabe::FarmEnvironment;
+    using track_t = mabe::TrackLineage;
+    using select_t = mabe::TournamentSelect;
+
+    // Build the world using these types.
+    mabe::World<sheep_t, wolf_t, env_t, track_t, select_t>
+    world("Sheep", "Wolves", "FarmEnvironment", "LineageTracker", "TournamentSelection");
+
+    // Configure the world using the "farm.cfg" file and command-line overrides.
+    world.Config("farm.cfg", argv, argc);
+
+    // Running world will go for full configured duration; can also manually Update() it.
+    return world.Run();
+  }
+
+
+The automatically generated configuration file for this code would look something like:
+
+  namespace Sheep.MarkovBrain
+  set input_nodes 10
+  set hidden_nodes 20
+  set output_nodes 10
+
+  namespace Sheep.Genomes
+  set alphabet_size 2
+  set genome_length 1000
+  set point_mutation_prob 0.001
+  set insertion_prob 0.0001
+  set deletion_prob 0.0001
+
+  namspace Wolves.MakovBrain
+  set input_nodes 50
+  set hidden_nodes 100
+  set output_nodes 10
+
+  namespace Sheep.Genomes
+  set alphabet_size 2
+  set genome_size 1000
+  set genome_branch_factor 3
+  set point_mutation_prob 0.001
+  set connection_prob 0.05
+
+  namespace FarmEnvironment
+  set world_x 500
+  set world_y 500
+  set tree_desnity 0.24
+
+  namespace LineageTracker
+  set archive_mrca 1
+  set snapshot_period 1000
+
+  namespace TournamentSelection
+  set tourny_size 5
+  set tourny_count 1000
+  set num_generations 2000

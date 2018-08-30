@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  Canvas.h
  *  @brief Manage an HTML canvas object.
@@ -32,8 +32,8 @@ namespace web {
       friend Canvas;
 
     protected:
-      size_t width;   ///< pixel width of the canvas.
-      size_t height;  ///< pixel height of the canvas.
+      double width;   ///< pixel width of the canvas.
+      double height;  ///< pixel height of the canvas.
 
       emp::vector<CanvasAction *> actions;
 
@@ -42,9 +42,7 @@ namespace web {
       CanvasInfo & operator=(const CanvasInfo &) = delete;   // No copies of INFO allowed
       virtual ~CanvasInfo() { ClearActions(); }
 
-      std::string TypeName() const override { return "CanvasInfo"; }
-
-      virtual bool IsCanvasInfo() const override { return true; }
+      std::string GetTypeName() const override { return "CanvasInfo"; }
 
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");                                           // Clear the current text.
@@ -100,7 +98,7 @@ namespace web {
 
   public:
     /// Create a new canvas with the specified size and optional HTML identifier.
-    Canvas(size_t w, size_t h, const std::string & in_id="")
+    Canvas(double w, double h, const std::string & in_id="")
       : WidgetFacet(in_id)
     {
       info = new CanvasInfo(in_id);
@@ -110,80 +108,110 @@ namespace web {
 
     /// Link to an existing canvas.
     Canvas(const Canvas & in) : WidgetFacet(in) { ; }
-    Canvas(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsCanvasInfo()); }
+    Canvas(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsCanvas()); }
     Canvas() { ; }
     virtual ~Canvas() { ; }
 
     using INFO_TYPE = CanvasInfo;
 
-    size_t GetWidth() const { return Info()->width; }    ///< Get the pixel width of this Canvas.
-    size_t GetHeight() const { return Info()->height; }  ///< Get the pixel height of this Canvas.
+    double GetWidth() const { return Info()->width; }    ///< Get the pixel width of this Canvas.
+    double GetHeight() const { return Info()->height; }  ///< Get the pixel height of this Canvas.
 
-    void SetWidth(size_t w) { Info()->width=w; }         ///< Set a new width for this Canvas.
-    void SetHeight(size_t h) { Info()->height=h; }       ///< Set a new height for this Canvas.
+    void SetWidth(double w) { Info()->width=w; }         ///< Set a new width for this Canvas.
+    void SetHeight(double h) { Info()->height=h; }       ///< Set a new height for this Canvas.
 
     /// Set Canvas size.
-    void SetSize(size_t w, size_t h) { Info()->width=w; Info()->height=h; }
+    void SetSize(double w, double h) { Info()->width=w; Info()->height=h; }
 
-    /// Add a Circle to this canvas centered at x,y with radius r.  Optional face and line color.
-    Canvas & Circle(double x, double y, double r,
-                    const std::string & fc="", const std::string & lc="", double lw=1.0) {
-      Info()->AddAction( new CanvasCircle(x, y, r, fc, lc, lw) );
+    /// Add a Circle to this canvas; provide constructor for the CanvasCircle with a position and radius
+    /// as well as optional face color, line color, and line width.
+    template <typename... Ts>
+    Canvas & Circle(Point center, double _r, Ts &&... vals) {
+      Info()->AddAction( new CanvasCircle(emp::Circle(center, _r), std::forward<Ts>(vals)...) );
       return *this;
     }
 
-    /// Add a Circle to this canvas centered at point with radius r.  Optional face and line color.
-    Canvas & Circle(Point p, double r, const std::string & fc="", const std::string & lc="", double lw=1.0) {
-      Info()->AddAction( new CanvasCircle(p, r, fc, lc, lw) );
-      return *this;
-    }
-
-    /// Add a Circle specified with a Circle object.  Optional face color and line color.
-    Canvas & Circle(const emp::Circle & circle,
-                    const std::string & fc="", const std::string & lc="", double lw=1.0) {
-      Info()->AddAction( new CanvasCircle(circle, fc, lc, lw) );
+    template <typename... Ts>
+    Canvas & Circle(double _x, double _y, double _r, Ts &&... vals) {
+      Info()->AddAction( new CanvasCircle(emp::Circle(_x, _y, _r), std::forward<Ts>(vals)...) );
       return *this;
     }
 
     /// Add a Rectangle to this canvas at x,y with width w and heigh h.  Optional face color and
     /// line color.
-    Canvas & Rect(double x, double y, double w, double h,
-                  const std::string & fc="", const std::string & lc="") {
-      Info()->AddAction( new CanvasRect(x, y, w, h, fc, lc) );
+    template <typename... Ts>
+    Canvas & Rect(Point corner, double w, double h, Ts &&... vals) {
+      Info()->AddAction( new CanvasRect(corner, w, h, std::forward<Ts>(vals)...) );
+      return *this;
+    }
+
+    template <typename... Ts>
+    Canvas & Rect(double x, double y, double w, double h, Ts &&... vals) {
+      Info()->AddAction( new CanvasRect(x, y, w, h, std::forward<Ts>(vals)...) );
+      return *this;
+    }
+
+    /// Add an Image to this canvas at x,y with width w and heigh h.
+    template <typename... Ts>
+    Canvas & Image(const emp::RawImage & image, Point corner, Ts &&... vals) {
+      Info()->AddAction( new CanvasImage(image, corner, std::forward<Ts>(vals)...) );
+      return *this;
+    }
+
+    template <typename... Ts>
+    Canvas & Image(const emp::RawImage & image, double x, double y, Ts &&... vals) {
+      Info()->AddAction( new CanvasImage(image, x, y, std::forward<Ts>(vals)...) );
+      return *this;
+    }
+
+
+    /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
+    template <typename... Ts>
+    Canvas & Line(double x1, double y1, double x2, double y2, Ts &&... vals) {
+      Info()->AddAction( new CanvasLine(x1, y1, x2, y2, std::forward<Ts>(vals)...) );
+      return *this;
+    }
+
+    template <typename... Ts>
+    Canvas & Line(emp::Point p1, emp::Point p2, Ts &&... vals) {
+      Info()->AddAction( new CanvasLine(p1, p2, std::forward<Ts>(vals)...) );
       return *this;
     }
 
     /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
-    Canvas & Line(double x1, double y1, double x2, double y2, const std::string & lc="", double lw=1.0) {
-      Info()->AddAction( new CanvasLine(x1, y1, x2, y2, lc, lw) );
-      return *this;
-    }
-
-    /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
-    Canvas & Line(emp::Point p1, emp::Point p2, const std::string & lc="", double lw=1.0) {
-      Info()->AddAction( new CanvasLine(p1, p2, lc, lw) );
-      return *this;
-    }
-
-    /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
-    Canvas & MultiLine(emp::Point p1, const emp::vector<emp::Point> & points, const std::string & lc="", double lw=1.0) {
-      Info()->AddAction( new CanvasMultiLine(p1, points, lc, lw) );
+    template <typename... Ts>
+    Canvas & MultiLine(emp::Point p1, const emp::vector<emp::Point> & points, Ts &&... vals) {
+      Info()->AddAction( new CanvasMultiLine(p1, points, std::forward<Ts>(vals)...) );
       return *this;
     }
 
     /// Add a string to this canvas at x,y with specified text.  Optional face color and
     /// line color.
-    Canvas & Text(double x, double y, const std::string text,
-                  const std::string & fc="", const std::string & lc="") {
-      Info()->AddAction( new CanvasText(x, y, text, fc, lc) );
+    template <typename... Ts>
+    Canvas & Text(emp::Point p, Ts &&... vals) {
+      Info()->AddAction( new CanvasText(p, std::forward<Ts>(vals)...) );
+      return *this;
+    }
+
+    template <typename... Ts>
+    Canvas & Text(double x, double y, Ts &&... vals) {
+      Info()->AddAction( new CanvasText(x, y, std::forward<Ts>(vals)...) );
       return *this;
     }
 
     /// Add a string to this canvas centered at x,y with specified text.  Optional face color and
     /// line color.
-    Canvas & CenterText(double x, double y, const std::string text,
-                  const std::string & fc="", const std::string & lc="") {
-      auto * ctext = new CanvasText(x, y, text, fc, lc);
+    template <typename... Ts>
+    Canvas & CenterText(emp::Point p, Ts &&... vals) {
+      auto * ctext = new CanvasText(p, std::forward<Ts>(vals)...);
+      ctext->Center();
+      Info()->AddAction( ctext );
+      return *this;
+    }
+
+    template <typename... Ts>
+    Canvas & CenterText(double x, double y, Ts &&... vals) {
+      auto * ctext = new CanvasText({x, y}, std::forward<Ts>(vals)...);
       ctext->Center();
       Info()->AddAction( ctext );
       return *this;
@@ -223,15 +251,15 @@ namespace web {
     /// Clear everything off of this canvas.
     Canvas & Clear() {
       Info()->ClearActions();
-      Info()->AddAction( new CanvasClearRect(0, 0, GetWidth(), GetHeight()) );
+      Info()->AddAction( new CanvasClearRect({0,0}, GetWidth(), GetHeight()) );
       return *this;
     }
 
     /// Clear to a specific background color.
     Canvas & Clear(const std::string & bg_color) {
       Info()->ClearActions();
-      Info()->AddAction( new CanvasClearRect(0, 0, GetWidth(), GetHeight()) );
-      Info()->AddAction( new CanvasRect(0, 0, GetWidth(), GetHeight(), bg_color, "") );
+      Info()->AddAction( new CanvasClearRect({0,0}, GetWidth(), GetHeight()) );
+      Info()->AddAction( new CanvasRect({0,0}, GetWidth(), GetHeight(), bg_color, "") );
       return *this;
     }
 

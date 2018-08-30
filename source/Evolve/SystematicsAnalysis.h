@@ -2,7 +2,7 @@
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
- * 
+ *
  * This file contains extra analysis tools to use with systematics managers that
  * have non-null DATA_TYPES.
 **/
@@ -30,7 +30,7 @@ namespace emp {
 
         while (taxon) {
             count++;
-            taxon = taxon->GetParent();            
+            taxon = taxon->GetParent();
         }
 
         return count;
@@ -46,7 +46,7 @@ namespace emp {
 
         while (taxon) {
             count += (int)(taxon->GetData().mut_counts[type] > 0);
-            taxon = taxon->GetParent();            
+            taxon = taxon->GetParent();
         }
 
         return count;
@@ -64,7 +64,7 @@ namespace emp {
             for (std::string type : types) {
                 count += (int)(taxon->GetData().mut_counts[type] > 0);
             }
-            taxon = taxon->GetParent();            
+            taxon = taxon->GetParent();
         }
 
         return count;
@@ -78,7 +78,7 @@ namespace emp {
 
         while (taxon) {
             count += taxon->GetData().mut_counts[type];
-            taxon = taxon->GetParent();            
+            taxon = taxon->GetParent();
         }
 
         return count;
@@ -94,7 +94,7 @@ namespace emp {
             for (std::string type : types) {
                 count += taxon->GetData().mut_counts[type];
             }
-            taxon = taxon->GetParent();            
+            taxon = taxon->GetParent();
         }
 
         return count;
@@ -113,8 +113,8 @@ namespace emp {
             if (taxon->GetData().GetFitness() < parent->GetData().GetFitness()) {
                 count++;
             }
-            taxon = parent;            
-            parent = taxon->GetParent();               
+            taxon = parent;
+            parent = taxon->GetParent();
         }
 
         return count;
@@ -131,8 +131,8 @@ namespace emp {
             if (taxon->GetData().phenotype != parent->GetData().phenotype) {
                 count++;
             }
-            taxon = parent;            
-            parent = taxon->GetParent();               
+            taxon = parent;
+            parent = taxon->GetParent();
         }
 
         return count;
@@ -142,7 +142,7 @@ namespace emp {
     /// along @param taxon 's lineage.
     template <typename taxon_t>
     int CountUniquePhenotypes(Ptr<taxon_t> taxon) {
-        int count = 0; 
+        int count = 0;
         std::set<decltype(taxon->GetData().phenotype)> seen;
 
         while (taxon) {
@@ -150,7 +150,7 @@ namespace emp {
                 count++;
                 seen.insert(taxon->GetData().phenotype);
             }
-            taxon = taxon->GetParent();               
+            taxon = taxon->GetParent();
         }
 
         return count;

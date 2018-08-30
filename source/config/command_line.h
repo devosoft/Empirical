@@ -63,7 +63,7 @@ namespace emp {
     }
 
     // Return true/false if a specific argument is present and REMOVE IT.
-    bool use_flag(emp::vector<std::string> & args, const std::string & pattern) {
+    bool use_arg(emp::vector<std::string> & args, const std::string & pattern) {
       const int pos = find_arg(args, pattern);
       if (pos >= 0) args.erase(args.begin()+pos);
       return (pos != -1);

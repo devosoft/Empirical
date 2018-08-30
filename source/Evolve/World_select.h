@@ -17,6 +17,7 @@
 #include "../base/assert.h"
 #include "../base/vector.h"
 #include "../base/macros.h"
+#include "../meta/reflection.h"
 #include "../tools/IndexMap.h"
 #include "../tools/Random.h"
 #include "../tools/vector_utils.h"
@@ -157,7 +158,7 @@ namespace emp {
     emp_assert(fit_funs.size() > 0);
 
     // @CAO: Can probably optimize a bit!
-    
+
     std::map<typename ORG::genome_t, int> genotype_counts;
     emp::vector<emp::vector<size_t>> genotype_lists;
 
@@ -226,7 +227,7 @@ namespace emp {
         next_gens.push_back(cur_gens[0]);
         // std::cout << "Starting max: " << max_fit << to_string(cur_gens) << std::endl;
         for (size_t gen_id : cur_gens) {
-              
+
           const double cur_fit = fitnesses[fit_id][gen_id];
           // std::cout << "gen_id: " << gen_id << "Fit: " << cur_fit << std::endl;
           if (cur_fit > max_fit) {
@@ -243,7 +244,7 @@ namespace emp {
         // Make next_orgs into new cur_orgs; make cur_orgs allocated space for next_orgs.
         std::swap(cur_gens, next_gens);
         next_gens.resize(0);
-        
+
         if (cur_gens.size() == 1) break;  // Stop if we're down to just one organism.
       }
 
@@ -279,7 +280,7 @@ namespace emp {
     // functions.  The best individuals on each supplemental function divide up a resource pool.
     // NOTE: You must turn off the FitnessCache for this function to work properly.
     template<typename ORG>
-    void EcoSelect(World<ORG> & world, const emp::vector<std::function<double(const ORG &)> > & extra_funs,
+    void EcoSelect(World<ORG> & world, const emp::vector<std::function<double(ORG &)> > & extra_funs,
                    const emp::vector<double> & pool_sizes, size_t t_size, size_t tourny_count=1)
     {
       emp_assert(world.GetFitFun(), "Must define a base fitness function");
@@ -304,7 +305,7 @@ namespace emp {
       for (size_t org_id = 0; org_id < world.GetSize(); org_id++) {
         base_fitness[org_id] = world.CalcFitnessID(org_id);
         for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
-          double cur_fit = extra_funs[ex_id](world[org_id]);
+          double cur_fit = extra_funs[ex_id](world.GetOrg(org_id));
           extra_fitnesses[ex_id][org_id] = cur_fit;
           if (cur_fit > max_extra_fit[ex_id]) {
             max_extra_fit[ex_id] = cur_fit;

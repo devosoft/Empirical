@@ -17,6 +17,7 @@
 namespace emp {
   namespace cl {
 
+    /// A simple class to manage command-line arguments that were passed in.
     class ArgManager {
     private:
       emp::vector<std::string> args;
@@ -35,9 +36,9 @@ namespace emp {
       std::string & operator[](size_t i) { return args[i]; }
       const std::string & operator[](size_t i) const { return args[i]; }
 
-      // UseArg takes a name, a variable and an optional description.  If the name exists,
-      // it uses the next argument to change the value of the variable.
-      // Return 1 if found, 0 if not found, and -1 if error (no value provided)
+      /// UseArg takes a name, a variable and an optional description.  If the name exists,
+      /// it uses the next argument to change the value of the variable.
+      /// Return 1 if found, 0 if not found, and -1 if error (no value provided)
       template <typename T>
       int UseArg(const std::string & name, T & var, const std::string & desc="") {
         arg_names.push_back(name);
@@ -45,8 +46,8 @@ namespace emp {
         return use_arg_value(args, name, var);
       }
 
-      // UseArg can also take a config object and a name, and use the argument to set the
-      // config object.
+      /// UseArg can also take a config object and a name, and use the argument to set the
+      /// config object.
       int UseArg(const std::string & name, Config & config, const std::string & cfg_name,
                  const std::string & desc="") {
         arg_names.push_back(name);
@@ -57,14 +58,15 @@ namespace emp {
         return rv;
       }
 
-      // UseFlag take a name and an optional description.  If the name exists, return true,
-      // otherwise return false.
+      /// UseFlag takes a name and an optional description.  If the name exists, return true,
+      /// otherwise return false.
       bool UseFlag(const std::string & name, const std::string & desc="") {
         arg_names.push_back(name);
         arg_descs.push_back(desc);
-        return use_flag(args, name);
+        return use_arg(args, name);
       }
 
+      /// Print information about all known argument types and what they're for; make pretty.
       void PrintHelp(std::ostream & os) const {
         size_t max_name_size = 0;
         for (const auto & name : arg_names) {
@@ -78,21 +80,23 @@ namespace emp {
         }
       }
 
-      // Test Unknown sees if there are any unprocessed arguments, and if so, gives and error.
-      // Return bool for "should program proceed" (i.e., true=continue, false=exit).
-      bool TestUnknown(std::ostream & os=std::cerr) const {
+      /// Test if there are any unprocessed arguments, and if so, output an error.
+      bool HasUnknown(std::ostream & os=std::cerr) const {
         if (args.size() > 1) {
           os << "Unknown args:";
           for (size_t i = 1; i < args.size(); i++) os << " " << args[i];
           os << std::endl;
           PrintHelp(os);
-          return false;
+          return true;
         }
-        return true;
+        return false;
       }
 
-      // ProcessConfigOptions converts settings from a configure object to command-line arguments.
-      // Return bool for "should program proceed" (i.e., true=continue, false=exit).
+      /// Leaving TestUnknown for backward compatability; returns opposite of HasUnknown().
+      bool TestUnknown(std::ostream & os=std::cerr) const { return !HasUnknown(os); }
+
+      /// Convert settings from a configure object to command-line arguments.
+      /// Return bool for "should program proceed" (i.e., true=continue, false=exit).
       bool ProcessConfigOptions(Config & config, std::ostream & os,
 				const std::string & cfg_file="",
 				const std::string & macro_file="") {

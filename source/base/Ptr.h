@@ -148,19 +148,37 @@ namespace emp {
       // Track stats about pointer record.
       size_t total = 0;
       size_t remain = 0;
+      emp::vector<PtrInfo> undeleted_info;
 
       // Scan through live pointers and make sure all have been deleted.
       for (const auto & info : id_info) {
         total++;
         if (info.GetCount()) remain++;
 
-        emp_assert(info.IsActive() == false, info.GetPtr(), info.GetCount(), info.IsActive());
+        if (info.IsActive()) {
+          undeleted_info.push_back(info);
+        }
+      }
+
+      if (undeleted_info.size()) {
+        std::cerr << undeleted_info.size() << " undeleted pointers at end of exectution.\n";
+        for (size_t i = 0; i < undeleted_info.size() && i < 10; ++i) {
+          const auto & info = undeleted_info[i];
+          std::cerr << "  PTR=" << info.GetPtr()
+                    << "  count=" << info.GetCount()
+                    << "  active=" << info.IsActive()
+                    << "  id=" << ptr_id[info.GetPtr()]
+                    << std::endl;
+        }
+        abort();
       }
 
       std::cout << "EMP_TRACK_MEM: No memory leaks found!\n "
-                << total << " pointers found; "
-                << remain << " still exist with a non-null value (but have been properly deleted)"
-                << std::endl;
+                << total << " pointers found; ";
+      if (remain) {
+        std::cout << remain << " still exist with a non-null value (but have been properly deleted)";
+      } else std::cout << "all have been cleaned up fully.";
+      std::cout << std::endl;
     }
 
     /// Treat this class as a singleton with a single Get() method to retrieve it.
@@ -438,10 +456,10 @@ namespace emp {
     void New(T &&... args) {
       Tracker().DecID(id);                            // Remove a pointer to any old memory...
 
-      // ptr = new TYPE(std::forward<T>(args)...); // Special new that uses allocated space.
-      ptr = (TYPE*) malloc (sizeof(TYPE));            // Build a new raw pointer.
-      emp_emscripten_assert(ptr);                     // No exceptions in emscripten; assert alloc!
-      ptr = new (ptr) TYPE(std::forward<T>(args)...); // Special new that uses allocated space.
+      ptr = new TYPE(std::forward<T>(args)...); // Special new that uses allocated space.
+      // ptr = (TYPE*) malloc (sizeof(TYPE));            // Build a new raw pointer.
+      // emp_emscripten_assert(ptr);                     // No exceptions in emscripten; assert alloc!
+      // ptr = new (ptr) TYPE(std::forward<T>(args)...); // Special new that uses allocated space.
 
       if (internal::ptr_debug) std::cout << "Ptr::New() : " << ptr << std::endl;
       id = Tracker().New(ptr);                        // And track it!
@@ -471,8 +489,8 @@ namespace emp {
 
     /// Delete this pointer (must NOT be an array).
     void Delete() {
-      emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
       emp_assert(ptr, "Deleting null Ptr.");
+      emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
       emp_assert(Tracker().IsArrayID(id) == false, id, "Trying to delete array pointer as non-array.");
       if (internal::ptr_debug) std::cout << "Ptr::Delete() : " << ptr << std::endl;
       delete ptr;
@@ -620,7 +638,8 @@ namespace emp {
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
 
       // We should not automatically convert managed pointers to raw pointers; use .Raw()
-      emp_assert(id == UNTRACKED_ID /*, typeid(TYPE).name() */, id);
+      emp_assert(id == UNTRACKED_ID /*, typeid(TYPE).name() */, id,
+                 "Use Raw() to convert to an untracked Ptr");
       return ptr;
     }
 
@@ -787,7 +806,7 @@ namespace emp {
 
     // Stubs for debug-related functions when outside debug mode.
     int DebugGetCount() const { return -1; }
-    bool DebugIsArray() const { return false; }
+    bool DebugIsArray() const { emp_assert(false); return false; }
     size_t DebugGetArrayBytes() const { return 0; }
     bool DebugIsActive() const { return true; }
     bool OK() const { return true; }
@@ -820,10 +839,10 @@ namespace emp {
 
   /// Create a new Ptr of the target type; use the args in the constructor.
   template <typename T, typename... ARGS> Ptr<T> NewPtr(ARGS &&... args) {
-    //auto ptr = new T(std::forward<ARGS>(args)...);
-    auto ptr = (T*) malloc (sizeof(T));         // Build a new raw pointer.
-    emp_assert(ptr);                            // No exceptions in emscripten; assert alloc!
-    new (ptr) T(std::forward<ARGS>(args)...);   // Special new that uses allocated space.
+    auto ptr = new T(std::forward<ARGS>(args)...);
+    // auto ptr = (T*) malloc (sizeof(T));         // Build a new raw pointer.
+    // emp_assert(ptr);                            // No exceptions in emscripten; assert alloc!
+    // new (ptr) T(std::forward<ARGS>(args)...);   // Special new that uses allocated space.
     return Ptr<T>(ptr, true);
   }
 

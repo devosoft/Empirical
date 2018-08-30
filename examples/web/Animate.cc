@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
+//  Copyright (C) Michigan State University, 2015-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include "tools/Random.h"
@@ -18,17 +18,17 @@ private:
 
   emp::Random random;
 
-  size_t cx = 150;
-  size_t cy = 150;
-  size_t cr = 50;
-  size_t can_size = 400;
+  double cx = 150;
+  double cy = 150;
+  double cr = 50;
+  double can_size = 400;
   double poly_rot = 0.0;
 
 public:
-  MyAnimate() : doc("emp_base"), poly(200, 300, "red", "black"), line(5,5, 395,395, "green") {
+  MyAnimate() : doc("emp_base"), poly( 200, 300, "red", "black"), line({5,5}, {395,395}, "green") {
     // How big should each canvas be?
-    const size_t w = can_size;
-    const size_t h = can_size;
+    const double w = can_size;
+    const double h = can_size;
 
     // Draw a simple circle animation on a canvas
     auto mycanvas = doc.AddCanvas(w, h, "can");
@@ -44,8 +44,8 @@ public:
     doc.AddButton([this](){
         ToggleActive();
         auto but = doc.Button("toggle");
-        if (GetActive()) but.Label("Pause");
-        else but.Label("Start");
+        if (GetActive()) but.SetLabel("Pause");
+        else but.SetLabel("Start");
       }, "Start", "toggle");
 
     doc << UI::Text("fps") << "FPS = " << UI::Live( [this](){return 1000.0 / GetStepTime();} ) ;
@@ -60,7 +60,7 @@ public:
 
     // Draw the new circle.
     mycanvas.Clear();
-    mycanvas.Circle(cx, cy, cr, "blue", "purple");
+    mycanvas.Draw(emp::Circle(cx,cy,cr), "blue", "purple");
     if (cx + cr > can_size) mycanvas.Circle(cx-can_size, cy, cr, "blue", "purple");
 
     // Update the polygon position

@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018.
  *
  *  @file  Button.h
  *  @brief Create/control an HTML button and call a specified function when that button is clicked.
@@ -18,13 +18,11 @@
  *  Member functions to set state:
  *    Button & Callback(const std::function<void()> & in_callback)
  *    Button & Label(const std::string & in_label)
- *    Button & Title(const std::string & in_t)
  *    Button & Autofocus(bool in_af)
  *    Button & Disabled(bool in_dis)
  *
  *  Retriving current state:
  *    const std::string & GetLabel() const
- *    const std::string & GetTitle() const
  *    bool HasAutofocus() const
  *    bool IsDisabled() const
  */
@@ -32,7 +30,7 @@
 #ifndef EMP_WEB_BUTTON_H
 #define EMP_WEB_BUTTON_H
 
-
+#include "init.h"
 #include "Widget.h"
 
 namespace emp {
@@ -48,13 +46,8 @@ namespace web {
       friend Button;
     protected:
       std::string label;
-      std::string title;
-
-      bool autofocus;
-
       std::function<void()> callback;
       uint32_t callback_id;
-      std::string onclick_info;
 
       ButtonInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
       ButtonInfo(const ButtonInfo &) = delete;               // No copies of INFO allowed
@@ -63,9 +56,7 @@ namespace web {
         if (callback_id) emp::JSDelete(callback_id);         // Delete callback wrapper.
       }
 
-      std::string TypeName() const override { return "ButtonInfo"; }
-
-      virtual bool IsButtonInfo() const override { return true; }
+      std::string GetTypeName() const override { return "ButtonInfo"; }
 
       void DoCallback() {
         callback();
@@ -73,12 +64,7 @@ namespace web {
       }
 
       virtual void GetHTML(std::stringstream & HTML) override {
-        HTML.str("");                                           // Clear the current text.
-        HTML << "<button";                                      // Start the button tag.
-        if (title != "") HTML << " title=\"" << title << "\"";  // Add a title if there is one.
-        HTML << " id=\"" << id << "\"";                         // Indicate ID.
-        HTML << " onclick=\"" << onclick_info << "\"";          // Indicate action on click.
-        HTML << ">" << label << "</button>";                    // Close and label the button.
+        HTML.str(to_string("<button id=\"", id, "\">", label, "</button>"));
       }
 
       void UpdateCallback(const std::function<void()> & in_cb) {
@@ -87,19 +73,6 @@ namespace web {
 
       void UpdateLabel(const std::string & in_label) {
         label = in_label;
-        if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
-      }
-      void UpdateTitle(const std::string & in_title) {
-        title = in_title;
-        if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
-      }
-      void UpdateAutofocus(bool in_af) {
-        autofocus = in_af;
-        if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
-      }
-      void UpdateDisabled(bool in_dis) {
-        if (in_dis) extras.SetAttr("disabled", "true");
-        else extras.RemoveAttr("disabled");
         if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
       }
 
@@ -127,49 +100,49 @@ namespace web {
       info = new ButtonInfo(in_id);
 
       Info()->label = in_label;
-      Info()->title = "";
-      Info()->autofocus = false;
 
       Info()->callback = in_cb;
       ButtonInfo * b_info = Info();
       Info()->callback_id = JSWrap( std::function<void()>( [b_info](){b_info->DoCallback();} )  );
-      Info()->onclick_info = emp::to_string("emp.Callback(", Info()->callback_id, ")");
+      SetAttr("onclick", emp::to_string("emp.Callback(", Info()->callback_id, ")"));
     }
 
     /// Link to an existing button.
     Button(const Button & in) : WidgetFacet(in) { ; }
-    Button(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsButtonInfo()); }
+    Button(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsButton()); }
     Button() : WidgetFacet("") { info = nullptr; }
     virtual ~Button() { ; }
 
     using INFO_TYPE = ButtonInfo;
 
     /// Set a new callback function to trigger when the button is clicked.
-    Button & Callback(const std::function<void()> & in_cb) {
+    Button & SetCallback(const std::function<void()> & in_cb) {
       Info()->UpdateCallback(in_cb);
       return *this;
     }
 
     /// Set a new label to appear on this Button.
-    Button & Label(const std::string & in_label) { Info()->UpdateLabel(in_label); return *this; }
-
-    /// Create a tooltip for this Button.
-    Button & Title(const std::string & in_t) { Info()->UpdateTitle(in_t); return *this; }
+    Button & SetLabel(const std::string & in_label) { Info()->UpdateLabel(in_label); return *this; }
 
     /// Setup this button to have autofocus (or remove it!)
-    Button & Autofocus(bool in_af=true) { Info()->UpdateAutofocus(in_af); return *this; }
+    Button & SetAutofocus(bool _in=true) { SetAttr("autofocus", ToJSLiteral(_in)); return *this; }
 
     /// Setup this button to be disabled (or re-enable it!)
-    Button & Disabled(bool in_dis=true) { Info()->UpdateDisabled(in_dis); return *this; }
+    Button & SetDisabled(bool _in=true) {
+      if (_in) SetAttr("disabled", "disabled");
+      else {
+        Info()->extras.RemoveAttr("disabled");
+        if (IsActive()) Info()->ReplaceHTML();
+      }
+
+      return *this;
+    }
 
     /// Get the current label on this button.
     const std::string & GetLabel() const { return Info()->label; }
 
-    /// Get the current tooltip on this button.
-    const std::string & GetTitle() const { return Info()->title; }
-
     /// Determine if this button currently has autofocus.
-    bool HasAutofocus() const { return Info()->autofocus; }
+    bool HasAutofocus() const { return GetAttr("autofocus") == "true"; }
 
     /// Determine if this button is currently disabled.
     bool IsDisabled() const { return Info()->extras.HasAttr("disabled"); }

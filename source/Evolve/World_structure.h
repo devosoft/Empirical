@@ -10,9 +10,13 @@
 #ifndef EMP_EVO_WORLD_STRUCTURE_H
 #define EMP_EVO_WORLD_STRUCTURE_H
 
+#include <set>
+
 #include "../base/assert.h"
 #include "../base/vector.h"
+#include "../base/array.h"
 #include "../data/Trait.h"
+#include "../tools/math.h"
 #include "../tools/Random.h"
 #include "../tools/vector_utils.h"
 
@@ -77,7 +81,7 @@ namespace emp {
       }
     }
 
-    T & operator()(WorldPosition pos) { 
+    T & operator()(WorldPosition pos) {
       const size_t pop_id = pos.GetPopID();
       const size_t id = pos.GetIndex();
       return base_t::operator[](pop_id)[id];
@@ -271,7 +275,7 @@ namespace emp {
     emp::vector<double> max_vals;    ///< Largest value found for each trait.
     emp::vector<double> bin_width;   ///< Largest value found for each trait.
 
-    bool is_setup;                          ///< Have we initialized the internal data stucture? 
+    bool is_setup;                          ///< Have we initialized the internal data stucture?
     size_t num_trait_bins;                  ///< How many bins should we use for each trait?
     size_t num_total_bins;                  ///< How many bins are there overall?
     emp::vector<std::set<size_t>> bin_ids;  ///< Which org ids fall into each bin?
@@ -304,7 +308,7 @@ namespace emp {
         }
         if (cur_dist < distance[id2]) {
           distance[id2] = cur_dist;
-          nearest_id[id2] = refresh_id;   
+          nearest_id[id2] = refresh_id;
         }
       }
     }
@@ -421,18 +425,18 @@ namespace emp {
       bool update_chart = false;
       emp::vector<double> cur_vals = traits.EvalValues(world.GetOrg(pos));
       for (size_t i = 0; i < cur_vals.size(); i++) {
-        if (cur_vals[i] <= min_vals[i]) { 
+        if (cur_vals[i] <= min_vals[i]) {
           min_vals[i] = cur_vals[i] - bin_width[i]/2.0;
           update_chart = true;
         }
-        if (cur_vals[i] >= max_vals[i]) { 
+        if (cur_vals[i] >= max_vals[i]) {
           max_vals[i] = cur_vals[i] + bin_width[i]/2.0;
           update_chart = true;
         }
       }
 
       // Until min-dist tracking structure is setup, don't worry about maintaining.
-      if (!is_setup) return;  
+      if (!is_setup) return;
       emp_assert(pos < world.GetSize());
 
       /// Remove org if from the bin we currently have it in.
@@ -470,7 +474,7 @@ namespace emp {
       // These tests only matter BEFORE Setup() is run.
       emp_assert(is_setup || nearest_id.size() == 0);
       emp_assert(is_setup || distance.size() == 0);
- 
+
       // Tests for AFTER Setup() is run.
 
       if (is_setup) {
@@ -498,7 +502,7 @@ namespace emp {
 
   /// This first version will setup a Diverse-Elites world and specify traits to use.
   template <typename ORG>
-  void SetDiverseElites(World<ORG> & world, TraitSet<ORG> traits, size_t world_size) { 
+  void SetDiverseElites(World<ORG> & world, TraitSet<ORG> traits, size_t world_size) {
     world.MarkSynchronous(false);
     world.MarkSpaceStructured(false).MarkPhenoStructured(true);
 

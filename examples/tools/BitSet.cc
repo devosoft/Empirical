@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
+//  Copyright (C) Michigan State University, 2017-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -11,6 +11,7 @@
 #include <unordered_set>
 
 #include "tools/BitSet.h"
+#include "tools/Random.h"
 
 constexpr int set_size = 100000;
 
@@ -77,4 +78,10 @@ int main()
 //   bv2.Resize(9);
 //   std::cout << bv2.Hash() << "  (resized new bv to 9)" << std::endl;
 
+  emp::Random random;
+  std::cout << "Printing random 5-bit BitSets..." << std::endl;
+  for (size_t i = 0; i < 10; i++) {
+    emp::BitSet<5> print_set(random);
+    std::cout << print_set << " : " << print_set.GetUInt(0) << std::endl;
+  }
 }

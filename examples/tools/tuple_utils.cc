@@ -12,6 +12,8 @@
 
 int Sum3(int x, int y, int z) { return x+y+z; }
 
+void PrintTwice(int x) { std::cout << x << x << std::endl; }
+
 int main()
 {
   std::cout << "Ping!" << std::endl;
@@ -35,4 +37,5 @@ int main()
   std::cout << "CombineHash(" << x << "," << y << "," << z << ") = "
       << emp::ApplyTuple(emp::CombineHash<int,int,int>, test_tup) << std::endl;
 
+  emp::TupleIterate(tup, PrintTwice);
 }

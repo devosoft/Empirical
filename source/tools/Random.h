@@ -15,7 +15,6 @@
 #include <climits>
 #include <cmath>
 #include <iterator>
-#include <unistd.h>
 
 #include "../base/assert.h"
 #include "Range.h"
@@ -191,6 +190,16 @@ namespace emp {
     inline uint32_t GetUInt(const T max) {
       emp_assert(max <= (T) _RAND_MBIG, max);  // Precision will be too low past this point...
       return static_cast<uint32_t>(GetDouble() * static_cast<double>(max));
+    }
+
+    /**
+     * Generate a random 32-bit block of bits.
+     *
+     * @return The pseudo random number.
+     **/
+    inline uint32_t GetUInt() {
+      return ( static_cast<uint32_t>(GetDouble() * 65536.0) << 16 )
+             + static_cast<uint32_t>(GetDouble() * 65536.0);
     }
 
     /**

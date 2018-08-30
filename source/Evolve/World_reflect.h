@@ -5,12 +5,12 @@
  *
  *  @file  World_reflect.h
  *  @brief Handle reflection on organisms to setup reasonable defaults in World.
- * 
+ *
  *  @note None of the functions defined here should be called from outside the world object;
  *        as such the comments below are not in Doxygen format and should only be used by
  *        LIBRARY developers working on World.
  */
-  
+
 #ifndef EMP_EVO_WORLD_REFLECT_H
 #define EMP_EVO_WORLD_REFLECT_H
 
@@ -19,12 +19,14 @@
 
 #include "../base/assert.h"
 #include "../meta/reflection.h"
+#include "../tools/Random.h"
 
 namespace emp {
 
   namespace {
 
     // Setup Fitness reflection.
+    // 0. A manually set fitness function will override any of the options below.
     // 1. If an organism has a "GetFitness()" member function, use it!
     // 2. If an organim can be cast to double, use it!
     // 3. Start with a fitness function that throws an assert indicating function must be set.
@@ -56,6 +58,7 @@ namespace emp {
 
   namespace {
     // Setup Mutation function
+    // 0. A manually set mutation function will override any of the below.
     // 1. DoMutations(random)
     // 2. Empty, with assert.
 
@@ -82,6 +85,7 @@ namespace emp {
 
   namespace {
     // Setup Print function
+    // 0. A manually set print function will override any of the below.
     // 1. Org Print()
     // 2. Proper operator<<
     // 3. Assert

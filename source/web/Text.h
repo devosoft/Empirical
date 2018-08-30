@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  Text.h
  *  @brief Specs for the Text widget.
@@ -39,8 +39,7 @@ namespace web {
       TextInfo & operator=(const TextInfo &) = delete;   // No copies of INFO allowed
       virtual ~TextInfo() { ; }
 
-      std::string TypeName() const override { return "TextInfo"; }
-      virtual bool IsTextInfo() const override { return true; }
+      std::string GetTypeName() const override { return "TextInfo"; }
 
       bool AppendOK() const override { return append_ok; }
       void PreventAppend() override { append_ok = false; }
@@ -72,7 +71,7 @@ namespace web {
       info = new TextInfo(in_id);
     }
     Text(const Text & in) : WidgetFacet(in) { ; }
-    Text(const Widget & in) : WidgetFacet(in) { emp_assert(info->IsTextInfo()); }
+    Text(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsText()); }
     ~Text() { ; }
 
     using INFO_TYPE = TextInfo;

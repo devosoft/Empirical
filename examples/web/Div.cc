@@ -49,9 +49,10 @@ int main() {
                << UI::Button(IncVar, "MyButton", "but")
                << UI::Button([](){
                    auto but = doc.Button("but");
-                   but.Disabled(!but.IsDisabled());
+                   but.SetDisabled(!but.IsDisabled());
                  }, "Disable Button");
 
+  doc.Button("but").SetTitle("Testing if button titles do proper hover-over!");
 
 
   doc << "<p>" << UI::Div("new_slate")
@@ -61,7 +62,7 @@ int main() {
     .SetCSS("border-radius", "15px")
       << "Testing out the new slate object with some wide text!";
 
-  doc << "<br>" << UI::Image("motivator.jpg").SetWidth(300).SetOpacity(0.8);
+  doc << "<br>" << UI::Image("images/motivator.jpg").SetWidth(300).SetOpacity(0.8);
 
   myvar = 100;
 

@@ -29,18 +29,19 @@ TEST_CASE("Test Body2d", "[geometry]")
 
   // Start a round of replication for tests
 
-  emp::CircleBody2D & body2 = *(body1.BuildOffspring({3.0, -4.0}));
-
+  emp::Ptr<emp::CircleBody2D> body2 = body1.BuildOffspring({3.0, -4.0});
+  
   // Make sure original organism is linked to offspring.
-  REQUIRE(body1.IsLinked(body2));
-  REQUIRE(body2.IsLinked(body1));
-  REQUIRE(body1.GetLinkDist(body2) == 5.0);
-  REQUIRE(body2.GetLinkDist(body1) == 5.0);
-  REQUIRE(body1.GetTargetLinkDist(body2) == 20.0);
-  REQUIRE(body2.GetTargetLinkDist(body1) == 20.0);
+  REQUIRE(body1.IsLinked(*body2));
+  REQUIRE(body2->IsLinked(body1));
+  REQUIRE(body1.GetLinkDist(*body2) == 5.0);
+  REQUIRE(body2->GetLinkDist(body1) == 5.0);
+  REQUIRE(body1.GetTargetLinkDist(*body2) == 20.0);
+  REQUIRE(body2->GetTargetLinkDist(body1) == 20.0);
 
-  REQUIRE(body1.GetTargetLinkDist(body2) == 20);
-  REQUIRE(body2.GetTargetLinkDist(body1) == 20);
+  REQUIRE(body1.GetTargetLinkDist(*body2) == 20);
+  REQUIRE(body2->GetTargetLinkDist(body1) == 20);
+  body2.Delete();
 }
 
 

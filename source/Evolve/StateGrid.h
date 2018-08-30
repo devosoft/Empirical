@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
+ *  @date 2017-2018.
  *
  *  @file  StateGrid.h
  *  @brief StateGrid maintains a rectilinear grid that agents can traverse.
@@ -244,11 +244,11 @@ namespace emp {
   class StateGridStatus {
   protected:
     struct State {
-      size_t x;         ///< X-coordinate of this agent
-      size_t y;         ///< Y-coordinate of this agent.
-      size_t facing;    ///< 0=UL, 1=Up, 2=UR, 3=Right, 4=DR, 5=Down, 6=DL, 7=Left (+=Clockwise)
+      size_t x;      ///< X-coordinate of this agent
+      size_t y;      ///< Y-coordinate of this agent.
+      int facing;    ///< 0=UL, 1=Up, 2=UR, 3=Right, 4=DR, 5=Down, 6=DL, 7=Left (+=Clockwise)
 
-      State(size_t _x=0, size_t _y=0, size_t _f=1) : x(_x), y(_y), facing(_f) { ; }
+      State(size_t _x=0, size_t _y=0, size_t _f=1) : x(_x), y(_y), facing((int)_f) { ; }
       bool IsAt(size_t _x, size_t _y) const { return x == _x && y == _y; }
     };
 
@@ -283,7 +283,10 @@ namespace emp {
 
     size_t GetX() const { return cur_state.x; }
     size_t GetY() const { return cur_state.y; }
-    size_t GetFacing() const { return cur_state.facing; }
+    size_t GetFacing() const {
+      emp_assert(cur_state.facing >= 0 && cur_state.facing < 8);
+      return (size_t) cur_state.facing;
+    }
 
     bool IsAt(size_t x, size_t y) const { return cur_state.IsAt(x,y); }
     bool WasAt(size_t x, size_t y) const {
@@ -312,7 +315,7 @@ namespace emp {
     StateGridStatus & Set(size_t _x, size_t _y, size_t _f) {
       cur_state.x = _x;
       cur_state.y = _y;
-      cur_state.facing = _f;
+      cur_state.facing = (int) _f;
       UpdateHistory();
       return *this;
     }
@@ -324,7 +327,7 @@ namespace emp {
       UpdateHistory();
       return *this;
     }
-    StateGridStatus & SetFacing(size_t _f) { cur_state.facing = _f; UpdateHistory(); return *this; }
+    StateGridStatus & SetFacing(size_t _f) { cur_state.facing = (int) _f; UpdateHistory(); return *this; }
 
     /// Move in the direction currently faced.
     void Move(const StateGrid & grid, int steps=1) {

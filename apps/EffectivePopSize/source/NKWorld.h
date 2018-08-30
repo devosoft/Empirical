@@ -74,7 +74,7 @@ struct NKWorld : public emp::World<BitOrg> {
         return num_muts;
       };
     SetMutFun( mut_fun );
-    SetMutateBeforeBirth();
+    SetAutoMutate();
 
     SetupFitnessFile();
     SetupPopulationFile();

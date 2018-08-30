@@ -13,6 +13,8 @@
 
 #include <numeric>
 #include <set>
+#include <algorithm>
+#include <functional>
 
 #include "../base/vector.h"
 
@@ -20,20 +22,28 @@ namespace emp {
 
   /// Return the first position of a value in a vector (or -1 if none exists)
   template <typename T>
-  int FindValue(const emp::vector<T> vec, const T & val, size_t start_pos=0) {
-    for (size_t i = start_pos; i < vec.size(); i++) {
-      if (vec[i] == val) return (int) i;
+  int FindValue(const emp::vector<T> & v, const T & val, size_t start_pos=0) {
+    for (size_t i = start_pos; i < v.size(); i++) {
+      if (v[i] == val) return (int) i;
     }
     return -1;
   }
 
-  /// Return whether a value exists in a vector.
+  /// Remove the first value after start_pos with a given value.  Return if removal successful.
+  template <typename T>
+  bool RemoveValue(emp::vector<T> & v, const T & val, size_t start_pos=0) {
+    int pos = FindValue(v, val, start_pos);
+    if (pos == -1) return false;
+    v.erase(v.begin() + pos);
+    return true;
+  }
+
+  /// Return whether a value exists in a vector.s
   template <typename T>
   bool Has(const emp::vector<T> vec, const T & val) {
     return FindValue(vec, val) >= 0;
   }
 
-  /// Print the contects of a vector.
   template <typename T>
   void Print(const emp::vector<T> & v, std::ostream & os=std::cout, const std::string & spacer=" ") {
     for (size_t id = 0; id < v.size(); id++) {

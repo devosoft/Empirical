@@ -20,6 +20,7 @@
 #include "../meta/type_traits.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/string_utils.h"
+#include "../tools/NullStream.h"
 
 #include "DataNode.h"
 
@@ -48,7 +49,13 @@ namespace emp {
   public:
     DataFile(const std::string & in_filename,
              const std::string & b="", const std::string & s=",", const std::string & e="\n")
-      : filename(in_filename), os(new std::ofstream(in_filename)), funs(), keys(), descs()
+      : filename(in_filename), os(
+      #ifdef EMSCRIPTEN
+      new emp::NullStream()
+      #else
+      new std::ofstream(in_filename)
+      #endif
+      ), funs(), keys(), descs()
       , timing_fun([](size_t){return true;})
       , line_begin(b), line_spacer(s), line_end(e) { ; }
     DataFile(std::ostream & in_os,
@@ -144,7 +151,7 @@ namespace emp {
 
     /// If Update is called with an update number, call the full version of update only if the update value
     /// passes the timing function (that is, the timing function returns true).
-    void Update(size_t update) { if (timing_fun(update)) Update(); }
+    virtual void Update(size_t update) { if (timing_fun(update)) Update(); }
 
 
     /// If a function takes an ostream, pass in the correct one.
@@ -248,9 +255,9 @@ namespace emp {
     /// Requires that @param node have the data::Stats or data::FullStats modifier.
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddVariance(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){ 
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
         if (pull) node.PullData();
-        os << node.GetVariance(); 
+        os << node.GetVariance();
         if (reset) node.Reset();
       };
       return Add(in_fun, key, desc);
@@ -260,10 +267,10 @@ namespace emp {
     /// Requires that @param node have the data::Stats or data::FullStats modifier.
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddStandardDeviation(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){ 
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
         if (pull) node.PullData();
-        os << node.GetStandardDeviation(); 
-        if (reset) node.Reset();  
+        os << node.GetStandardDeviation();
+        if (reset) node.Reset();
       };
       return Add(in_fun, key, desc);
     }
@@ -272,10 +279,10 @@ namespace emp {
     /// Requires that @param node have the data::Stats or data::FullStats modifier.
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddSkew(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){ 
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
         if (pull) node.PullData();
-        os << node.GetSkew(); 
-        if (reset) node.Reset();  
+        os << node.GetSkew();
+        if (reset) node.Reset();
       };
       return Add(in_fun, key, desc);
     }
@@ -284,9 +291,9 @@ namespace emp {
     /// Requires that @param node have the data::Stats or data::FullStats modifier.
     template <typename VAL_TYPE, emp::data... MODS>
     size_t AddKurtosis(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){ 
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
         if (pull) node.PullData();
-        os << node.GetKurtosis(); 
+        os << node.GetKurtosis();
         if (reset) node.Reset();
       };
       return Add(in_fun, key, desc);
@@ -306,7 +313,7 @@ namespace emp {
     }
 
 
-    /// Add multiple functions that pull all stats measurements (mean, variance, min, max, 
+    /// Add multiple functions that pull all stats measurements (mean, variance, min, max,
     /// skew, and kurtosis) from the DataNode @param node
     /// Requires that @param node have the data::Stats or data::FullStats modifier.
     /// @param key and @param desc will have the name of the stat appended to the beginning.
@@ -363,7 +370,7 @@ namespace emp {
         using data_t = typename container_t::value_type;
         for (const data_t & d : df->GetCurrentRows()) {
           df->OutputLine(d);
-        }        
+        }
       }
     };
 
@@ -397,12 +404,12 @@ namespace emp {
   ///
   /// Note: CONTAINER type can be a pointer to a container and the
   /// datafile will handle derefeferencing it appropriately.
-  
+
   template <typename CONTAINER>
   class ContainerDataFile : public DataFile {
     protected:
     // The container type cannot be a reference
-    using container_t = typename std::remove_reference<CONTAINER>::type; 
+    using container_t = typename std::remove_reference<CONTAINER>::type;
     using raw_container_t = typename remove_ptr_type<container_t>::type;
     using data_t = typename raw_container_t::value_type;
     using container_fun_t = void(std::ostream &, data_t);
@@ -430,7 +437,7 @@ namespace emp {
     }
 
     /// Print a header containing the name of each column
-    void PrintHeaderKeys() {
+    void PrintHeaderKeys() override {
       *os << line_begin;
       for (size_t i = 0; i < keys.size(); i++) {
         if (i > 0) *os << line_spacer;
@@ -445,7 +452,7 @@ namespace emp {
     }
 
     /// Print a header containing comments describing all of the columns
-    void PrintHeaderComment(const std::string & cstart = "# ") {
+    void PrintHeaderComment(const std::string & cstart = "# ") override {
       for (size_t i = 0; i < keys.size(); i++) {
         *os << cstart << i << ": " << descs[i] << " (" << keys[i] << ")" << std::endl;
       }
@@ -469,7 +476,7 @@ namespace emp {
           if (i > 0 || keys.size() > 0) *os << line_spacer;
           container_funs[i](*os, d);
         }
-      *os << line_end;  
+      *os << line_end;
     }
 
     /// Run all of the functions and print the results as a new line in the file
@@ -481,7 +488,7 @@ namespace emp {
     }
 
     /// Update the file with an additional set of lines.
-    void Update(size_t update) {
+    void Update(size_t update) override {
       if (timing_fun(update)) Update();
     }
 
@@ -509,7 +516,7 @@ namespace emp {
   /// Convenience function for building a container data file.
   /// @param fun is the function to call to update the container
   template <typename CONTAINER>
-  ContainerDataFile<CONTAINER> MakeContainerDataFile(std::function<CONTAINER(void)> fun, 
+  ContainerDataFile<CONTAINER> MakeContainerDataFile(std::function<CONTAINER(void)> fun,
                                                     const std::string & filename,
                                                     const std::string & b="",
                                                     const std::string & s=",",

@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2018
  *
  *  @file  Table.h
  *  @brief Specs for the Table widget.
@@ -124,8 +124,7 @@ namespace web {
       TableInfo & operator=(const TableInfo &) = delete;   // No copies of INFO allowed
       virtual ~TableInfo() { ; }
 
-      std::string TypeName() const override { return "TableInfo"; }
-      virtual bool IsTableInfo() const override { return true; }
+      std::string GetTypeName() const override { return "TableInfo"; }
 
       void Resize(size_t new_rows, size_t new_cols) {
         // Resize preexisting rows if remaining
@@ -520,7 +519,7 @@ namespace web {
 
     /// Get a properly cast version of info.
     internal::TableInfo * Info() { return (internal::TableInfo *) info; }
-    const internal::TableInfo * Info() const { return (internal::TableInfo *) info; }
+    internal::TableInfo * const Info() const { return (internal::TableInfo *) info; }
 
     TableWidget(internal::TableInfo * in_info, size_t _row=0, size_t _col=0)
      : WidgetFacet(in_info), cur_row(_row), cur_col(_col) { ; }
@@ -551,7 +550,7 @@ namespace web {
     TableWidget(const TableWidget & in)
       : WidgetFacet(in), cur_row(in.cur_row), cur_col(in.cur_col) { ; }
     TableWidget(const Widget & in) : WidgetFacet(in), cur_row(0), cur_col(0) {
-      emp_assert(info->IsTableInfo());
+      emp_assert(in.IsTable());
     }
     TableWidget() { ; }
     virtual ~TableWidget() { ; }
@@ -584,12 +583,12 @@ namespace web {
     void ClearCells() { Info()->ClearTableCells(); }
     void ClearCell(size_t r, size_t c) { Info()->ClearCell(r, c); }
 
-    TableCell GetCell(size_t r, size_t c);  ///< Focus on a specifc cell in the table.
-    TableRow GetRow(size_t r);              ///< Focus on a specifc row in the table.
-    TableCol GetCol(size_t c);              ///< Focus on a specifc column in the table.
-    TableRowGroup GetRowGroup(size_t r);    ///< Focus on a specifc group of rows in the table.
-    TableColGroup GetColGroup(size_t c);    ///< Focus on a specifc group of columns in the table.
-    Table GetTable();                       ///< Focus on a the entire table.
+    TableCell GetCell(size_t r, size_t c) const;  ///< Focus on a specifc cell in the table.
+    TableRow GetRow(size_t r) const;              ///< Focus on a specifc row in the table.
+    TableCol GetCol(size_t c) const;              ///< Focus on a specifc column in the table.
+    TableRowGroup GetRowGroup(size_t r) const;    ///< Focus on a specifc group of rows in the table.
+    TableColGroup GetColGroup(size_t c) const;    ///< Focus on a specifc group of columns in the table.
+    Table GetTable() const;                       ///< Focus on a the entire table.
 
     /// Get the TExt widget assoited with the currently active cell.
     web::Text GetTextWidget() { return Info()->GetTextWidget(); }
@@ -603,7 +602,7 @@ namespace web {
     using parent_t::SetCSS;
 
     /// Get a CSS value for the currently active cell.
-    std::string GetCSS(const std::string & setting) override {
+    const std::string & GetCSS(const std::string & setting) const override {
       return Info()->extras.GetStyle(setting);
     }
 
@@ -744,34 +743,34 @@ namespace web {
 
   // Fill out members of Table that require extra classes...
 
-  TableCell TableWidget::GetCell(size_t r, size_t c) {
+  TableCell TableWidget::GetCell(size_t r, size_t c) const {
     emp_assert(Info() != nullptr);
     emp_assert(r < Info()->row_count && c < Info()->col_count,
                r, c, Info()->row_count, Info()->col_count, GetID());
     return TableCell(Info(), r, c);
   }
 
-  TableRow TableWidget::GetRow(size_t r) {
+  TableRow TableWidget::GetRow(size_t r) const {
     emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
     return TableRow(Info(), r);
   }
 
-  TableCol TableWidget::GetCol(size_t c) {
+  TableCol TableWidget::GetCol(size_t c) const {
     emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
     return TableCol(Info(), c);
   }
 
-  TableRowGroup TableWidget::GetRowGroup(size_t r) {
+  TableRowGroup TableWidget::GetRowGroup(size_t r) const {
     emp_assert(r < Info()->row_count, r, Info()->row_count, GetID());
     return TableRowGroup(Info(), r);
   }
 
-  TableColGroup TableWidget::GetColGroup(size_t c) {
+  TableColGroup TableWidget::GetColGroup(size_t c) const {
     emp_assert(c < Info()->col_count, c, Info()->col_count, GetID());
     return TableColGroup(Info(), c);
   }
 
-  Table TableWidget::GetTable() {
+  Table TableWidget::GetTable() const {
     return Table(Info(), cur_row, cur_col);
   }
 

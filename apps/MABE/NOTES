@@ -1,0 +1,34 @@
+In this second version of MABE, we are trying to use simple base clases that can be
+assembled at run time.
+
+Also, renaming Organism into OrganismType since that better describes the classes role
+(and we will have indiviudal organisms as well).
+
+Example code:
+
+  #include "mabe.h"
+  #include "controlers/MarkovBrain.h"
+  #include "genomes/LinearGenome.h"
+  #include "genomes/NetworkGenome.h"
+  #include "environments/FarmEnvironment.h"
+  #include "schemas/TournamentSelect.h"
+  #include "watchers/TrackLineage.h"
+
+  int main(int argc, char * argv[]) {
+    // Determine the types of everything that you want to use to build the world.
+    mabe::OrganismType<mabe::MarkovBrain, mabe::LinearGenome> sheep("Sheep");
+    mabe::OrganismType<mabe::MarkovBrain, mabe::NetworkGenome> wolves("Wolves");
+    mabe::FarmEnvironment farm("FarmEnvironment");
+    mabe::TrackLineage lineage_tracker("LineageTracker");
+    mabe::TournamentSelect tourny_schema("TournamentSelect");
+
+    // Build the world using these types.
+    mabe::World world(sheep, wolves, farm, lineage_tracker, tourny_schema);
+
+    // Configure the world using the "farm.cfg" file and command-line overrides.
+    world.Config("farm.cfg", argv, argc);
+
+    // Running world will go for full configured duration; can also manually Update() it.
+    return world.Run();
+  }
+

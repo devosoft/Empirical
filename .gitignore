@@ -53,6 +53,8 @@ doc/doxygen/
 examples/*/*
 !examples/*/*.cc
 !examples/*/*.h
+!examples/*/*.html
+!examples/*/images
 !examples/*/Makefile
 
 tests/StatsConfig.cfg

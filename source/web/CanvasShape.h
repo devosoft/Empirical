@@ -95,6 +95,10 @@ namespace web {
     double w;  ///< Rectangle widgth.
     double h;  ///< Rectangle height.
   public:
+    CanvasRect(Point _p, double _w, double _h,
+               const std::string & fc="", const std::string & lc="")
+      : CanvasShape(_p, fc, lc), w(_w), h(_h) { ; }
+
     CanvasRect(double _x, double _y, double _w, double _h,
                const std::string & fc="", const std::string & lc="")
       : CanvasShape(_x, _y, fc, lc), w(_w), h(_h) { ; }
@@ -114,8 +118,8 @@ namespace web {
     double w;  ///< Rectangle widgth.
     double h;  ///< Rectangle height.
   public:
-    CanvasClearRect(double _x, double _y, double _w, double _h)
-      : CanvasShape(_x, _y), w(_w), h(_h) { ; }
+    CanvasClearRect(Point _p, double _w, double _h)
+      : CanvasShape(_p), w(_w), h(_h) { ; }
 
     void Apply() {
       EM_ASM_ARGS({
@@ -134,6 +138,8 @@ namespace web {
       : CanvasShape(0, 0, fc, lc) { ; }
     CanvasPolygon(const emp::vector<Point> & p, const std::string & fc="", const std::string & lc="")
       : CanvasShape(0, 0, fc, lc), points(p) { ; }
+    CanvasPolygon(Point _p, const std::string & fc="", const std::string & lc="")
+      : CanvasShape(_p, fc, lc) { ; }
     CanvasPolygon(double _x, double _y, const std::string & fc="", const std::string & lc="")
       : CanvasShape(_x, _y, fc, lc) { ; }
 
@@ -223,9 +229,9 @@ namespace web {
     std::string text;  ///< Specific text to be written.
     bool center;       ///< Should this text be centered (or is anchor on left side)?
   public:
-    CanvasText(double x, double y, const std::string & _text,
+    CanvasText(Point p, const std::string & _text,
                const std::string & fc="", const std::string & lc="")
-      : CanvasShape(x, y, fc, lc), text(_text), center(false) { ; }
+      : CanvasShape(p, fc, lc), text(_text), center(false) { ; }
 
     void Apply() {
       if (center) {

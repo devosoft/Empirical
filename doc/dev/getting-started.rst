@@ -57,11 +57,11 @@ One-time Preparation
 
    Unix users
 
-   a.  Install the python  virtualenv, pip, gcc, and g++, bison, flex
+   a.  Install the python  virtualenv, pip, gcc, and g++, cmake, bison, flex
 
        On recent Debian and Ubuntu this can be done with::
 
-           sudo apt-get install python-virtualenv python-pip gcc g++ git gcovr bison flex
+           sudo apt-get install python-virtualenv python-pip gcc g++ git gcovr cmake bison flex
 
 
        OS X users and others may need to download virtualenv first::

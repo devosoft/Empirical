@@ -74,13 +74,13 @@ namespace emp {
 
     // == Operations that forward to DataNode objects ==
 
-    /** Adds data to a node in the DataManager. 
+    /** Adds data to a node in the DataManager.
      *  @param name is the node to add the data to.
-     *  All subsequent arguments are the data to add to that node, 
+     *  All subsequent arguments are the data to add to that node,
      *  and should be of whatever type all of the nodes in this maanger expect.
-     * 
-     * Example: 
-     * 
+     *
+     * Example:
+     *
      * DataManager<int, data::Current, data::Range> my_data_manager;
      * my_data_manager.Add("my_node_name");
      * my_data_manager.AddData("my_node_name", 1, 2, 3, 4, 5);  */
@@ -93,7 +93,7 @@ namespace emp {
     /** Resets all nodes in this manager. For nodes without the data::Archive
      *  attribute, this clears all of their data except current. For nodes with
      *  the data::Archive attribute, this creates a new vector to start storing
-     *  data, retaining the old one in the archive. */ 
+     *  data, retaining the old one in the archive. */
     void ResetAll() {
       for (auto & x : node_map) x.second->Reset();
     }

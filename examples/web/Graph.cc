@@ -61,9 +61,9 @@ struct Edge {
 
 class GraphDriver : public UI::Animate {
 private:
-  size_t can_w = 500;
-  size_t can_h = 500;
-  size_t node_r = 15;
+  double can_w = 500;
+  double can_h = 500;
+  double node_r = 15;
 
   double node_r_sqr = node_r * node_r;
 
@@ -118,7 +118,7 @@ private:
     emp_assert(to < nodes.size());
     if (from > to) std::swap(from,to);
 
-    edges.erase(edges.begin() + emp::FindPos(edges, Edge(from, to)));
+    edges.erase(edges.begin() + emp::FindValue(edges, Edge(from, to)));
     adj_matrix(from, to) = 0;
     adj_matrix(to, from) = 0;
     // adj_list[from].push_back(to);

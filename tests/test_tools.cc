@@ -4,9 +4,6 @@
 //
 //  Tests for files in the tools/ folder.
 
-#ifndef EMP_TRACK_MEM
-#define EMP_TRACK_MEM
-#endif
 
 #define EMP_DECORATE(X) [X]
 #define EMP_DECORATE_PAIR(X,Y) [X-Y]
@@ -18,6 +15,7 @@
 #include <string>
 #include <deque>
 
+#include "tools/Binomial.h"
 #include "tools/BitMatrix.h"
 #include "tools/BitSet.h"
 #include "tools/BitVector.h"
@@ -42,13 +40,13 @@
 #include "tools/math.h"
 #include "tools/mem_track.h"
 #include "tools/memo_function.h"
+#include "tools/NullStream.h"
 #include "tools/sequence_utils.h"
 // #include "tools/serialize.h"
 #include "tools/set_utils.h"
 #include "tools/stats.h"
 #include "tools/string_utils.h"
 #include "tools/tuple_struct.h"
-#include "tools/unit_tests.h"
 #include "tools/vector_utils.h"
 
 // currently these have no coveage; we include them so we get metrics on them
@@ -67,6 +65,47 @@
     static_assert(A == B, #A " == " #B); \
     REQUIRE(A == B);                     \
   }
+
+
+TEST_CASE("Test Binomial", "[tools]")
+{
+  emp::Random random;
+
+  const double flip_prob = 0.03;
+  const size_t num_flips = 100;
+
+  const size_t num_tests = 100000;
+  const size_t view_count = 10;
+
+  emp::Binomial bi100(flip_prob, num_flips);
+
+  emp::vector<size_t> counts(num_flips+1, 0);
+
+  for (size_t test_id = 0; test_id < num_tests; test_id++) {
+    size_t win_count = 0;
+    for (size_t i = 0; i < num_flips; i++) {
+      if (random.P(0.03)) win_count++;
+    }
+    counts[win_count]++;
+  }
+
+  // Print out the first values in the distribution.
+  for (size_t i = 0; i < view_count; i++) {
+    // std::cout << "bi100[" << i << "] = " << bi100[i]
+    //           << "  test_count = " << counts[i]
+    //           << "\n";
+    REQUIRE(bi100[i] < ((double) counts[i]) / (double) num_tests + 0.02);
+    REQUIRE(bi100[i] > ((double) counts[i]) / (double) num_tests - 0.02);
+  }
+  // std::cout << "Total = " << bi100.GetTotalProb() << std::endl;
+
+  // // Pick some random values...
+  // std::cout << "\nSome random values:";
+  // for (size_t i = 0; i < 100; i++) {
+  //   std::cout << " " << bi100.PickRandom(random);
+  // }
+  // std::cout << std::endl;
+}
 
 // this templating is necessary to force full coverage of templated classes.
 // Since c++ doesn't generate code for templated methods if those methods aren't
@@ -222,31 +261,31 @@ TEST_CASE("Test BitSet timing", "[tools]")
 }
 
 
-// TEST_CASE("Test BitVector", "[tools]")
-// {
-//   emp::BitVector bv10(10);
-//   emp::BitVector bv32(32);
-//   emp::BitVector bv50(50);
-//   emp::BitVector bv64(64);
-//   emp::BitVector bv80(80);
+TEST_CASE("Test BitVector", "[tools]")
+{
+  emp::BitVector bv10(10);
+  emp::BitVector bv32(32);
+  emp::BitVector bv50(50);
+  emp::BitVector bv64(64);
+  emp::BitVector bv80(80);
 
-//   bv80[70] = 1;
-//   emp::BitVector bv80c(bv80);
+  bv80[70] = 1;
+  emp::BitVector bv80c(bv80);
 
-//   bv80 <<= 1;
+  bv80 <<= 1;
 
-//   for (size_t i = 0; i < 75; i += 2) {
-//     emp::BitVector shift_vector = bv80 >> i;
-//     REQUIRE((shift_vector.CountOnes() == 1) == (i <= 71));
-//   }
+  for (size_t i = 0; i < 75; i += 2) {
+    emp::BitVector shift_vector = bv80 >> i;
+    REQUIRE((shift_vector.CountOnes() == 1) == (i <= 71));
+  }
 
-//   bv10 = (bv80 >> 70);
+  bv10 = (bv80 >> 70);
 
-//   // Test arbitrary bit retrieval of UInts
-//   bv80[65] = 1;
-//   REQUIRE(bv80.GetUIntAtBit(64) == 130);
-//   REQUIRE(bv80.GetValueAtBit<5>(64) == 2);
-// }
+  // Test arbitrary bit retrieval of UInts
+  bv80[65] = 1;
+  REQUIRE(bv80.GetUIntAtBit(64) == 130);
+  REQUIRE(bv80.GetValueAtBit<5>(64) == 2);
+}
 
 
 TEST_CASE("Test DFA", "[tools]")
@@ -473,8 +512,8 @@ TEST_CASE("Test graph", "[tools]")
 
 }
 
-// TODO: add asserts
-emp::Random grand;
+// // TODO: add asserts
+// emp::Random grand;
 TEST_CASE("Test Graph utils", "[tools]")
 {
   emp::Random random;
@@ -698,21 +737,26 @@ TEST_CASE("Test mem_track", "[tools]")
   emp::vector<TestClass1 *> test_v;
   TestClass2 class2_mem;
 
+  #ifdef EMP_TRACK_MEM
   REQUIRE(EMP_TRACK_COUNT(TestClass1) == 0);
+  #endif
 
   for (int i = 0; i < 1000; i++) {
     test_v.push_back( new TestClass1 );
   }
 
+  #ifdef EMP_TRACK_MEM
   REQUIRE(EMP_TRACK_COUNT(TestClass1) == 1000);
-
+  #endif
 
   for (size_t i = 500; i < 1000; i++) {
     delete test_v[i];
   }
 
+  #ifdef EMP_TRACK_MEM
   REQUIRE(EMP_TRACK_COUNT(TestClass1) == 500);
   //REQUIRE(EMP_TRACK_STATUS == 0);
+  #endif
 
 }
 
@@ -778,6 +822,16 @@ TEST_CASE("Test NFA", "[tools]")
 }
 
 
+TEST_CASE("Test NullStream", "[tools]")
+{
+  emp::NullStream ns;
+  ns << "abcdefg";
+  ns << std::endl;
+  ns << 123;
+  ns << 123.456;
+  ns.flush();
+}
+
 
 TEST_CASE("Test random", "[tools]")
 {
@@ -799,8 +853,8 @@ TEST_CASE("Test random", "[tools]")
 
   {
     const double expected_mean = (min_value + max_value) / 2.0;
-    const double min_threshold = (expected_mean*0.997);
-    const double max_threshold = (expected_mean*1.004);
+    const double min_threshold = (expected_mean*0.995);
+    const double max_threshold = (expected_mean*1.005);
     double mean_value = total/(double) num_tests;
 
     REQUIRE(mean_value > min_threshold);
@@ -1201,49 +1255,6 @@ TEST_CASE("Test string utils", "[tools]")
 
 
 
-// Build some sample functions that we want called by type.
-std::string tt_result;
-void fun_int_int(int x, int y) { tt_result = emp::to_string(x+y); }
-void fun_int_double(int x, double y) { tt_result = emp::to_string(y * (double) x); }
-void fun_string_int(std::string x, int y) {
-  tt_result = "";
-  for (int i=0; i < y; i++) tt_result += x;
-}
-
-TEST_CASE("Test type tracker (TypeTracker)", "[tools]")
-{
-  using tt_t = emp::TypeTracker<int, std::string, double>;   // Setup the tracker type.
-  tt_t tt;                                                   // Build the tracker.
-
-  // Add some functions.
-  tt.AddFunction(fun_int_int);
-  tt.AddFunction(fun_int_double);
-  tt.AddFunction(fun_string_int);
-
-  emp::TrackedType * tt_int1 = tt.New<int>(1);
-  emp::TrackedType * tt_int2 = tt.New<int>(2);
-  emp::TrackedType * tt_int3 = tt.New<int>(3);
-
-  emp::TrackedType * tt_str  = tt.New<std::string>("FOUR");
-  emp::TrackedType * tt_doub = tt.New<double>(5.5);
-
-  tt.RunFunction(tt_int1, tt_int2);  // An int and another int should add.
-  REQUIRE( tt_result == "3" );
-
-  tt.RunFunction(tt_int3, tt_doub);  // An int and a double should multiply.
-  REQUIRE( tt_result == "16.500000" );
-
-  tt.RunFunction(tt_doub, tt_int2); // A double and an int is unknown; should leave old result.
-  REQUIRE( tt_result == "16.500000" );
-
-  tt.RunFunction(tt_str, tt_int3);    // A string an an int should duplicate the string.
-  REQUIRE( tt_result == "FOURFOURFOUR" );
-
-
-  REQUIRE( (tt_t::GetID<int,std::string,double>()) == (tt_t::GetTrackedID(tt_int1, tt_str, tt_doub)) );
-  REQUIRE( (tt_t::GetComboID<int,std::string,double>()) == (tt_t::GetTrackedComboID(tt_int1, tt_str, tt_doub)) );
-}
-
 TEST_CASE("Test stats", "[tools]") {
   emp::vector<int> vec1({1,2,1,1,2,3});
   double i1 = 1;
@@ -1365,11 +1376,104 @@ TEST_CASE("Test set utils", "[tools]") {
 
 }
 
+std::string tt_result;
+
+// Some functions to print a single type and its value
+void fun_int(int x) { tt_result = emp::to_string("int:", x); }
+void fun_double(double x) { tt_result = emp::to_string("double:", x); }
+void fun_string(std::string x) { tt_result = emp::to_string("string:", x); }
+
+// And some silly ways to combine types.
+void fun_int_int(int x, int y) { tt_result = emp::to_string(x+y); }
+void fun_int_double(int x, double y) { tt_result = emp::to_string(y * (double) x); }
+void fun_string_int(std::string x, int y) {
+  tt_result = "";
+  for (int i=0; i < y; i++) tt_result += x;
+}
+void fun_5ints(int v, int w, int x, int y, int z) {
+  tt_result = emp::to_string(v, '+', w, '+', x, '+', y, '+', z, '=', v+w+x+y+z);
+}
+
+TEST_CASE("Test TypeTracker", "[tools]") {
+  using tt_t = emp::TypeTracker<int, std::string, double>;   // Setup the tracker type.
+  tt_t tt;                                                   // Build the tracker.
+
+  // Add some functions.
+  tt.AddFunction( [](int x){ tt_result = emp::to_string("int:", x); } );
+  tt.AddFunction(fun_double);
+  tt.AddFunction(fun_string);
+  tt.AddFunction(fun_int_int);
+  tt.AddFunction(fun_int_double);
+  tt.AddFunction(fun_string_int);
+  tt.AddFunction(fun_5ints);
+
+  emp::TrackedVar tt_int1 = tt.Convert<int>(1);
+  emp::TrackedVar tt_int2 = tt.Convert<int>(2);
+  emp::TrackedVar tt_int3 = tt.Convert<int>(3);
+
+  emp::TrackedVar tt_str  = tt.Convert<std::string>("FOUR");
+  emp::TrackedVar tt_doub = tt.Convert<double>(5.5);
+
+  tt.RunFunction(tt_int1, tt_int2);  // An int and another int should add.
+  REQUIRE( tt_result == "3" );
+
+  tt.RunFunction(tt_int3, tt_doub);  // An int and a double should multiply.
+  REQUIRE( tt_result == "16.500000" );
+
+  tt.RunFunction(tt_doub, tt_int2); // A double and an int is unknown; should leave old result.
+  REQUIRE( tt_result == "16.500000" );
+
+  tt.RunFunction(tt_str, tt_int3);    // A string an an int should duplicate the string.
+  REQUIRE( tt_result == "FOURFOURFOUR" );
+
+  tt.RunFunction(tt_int1, tt_int2, tt_int3, tt_int2, tt_int1);  // Add five ints!
+  REQUIRE( tt_result == "1+2+3+2+1=9" );
+
+
+  // Load all types into a vector and then experiment with them.
+  emp::vector<emp::TrackedVar> vars;
+  vars.push_back(tt_int1);
+  vars.push_back(tt_int2);
+  vars.push_back(tt_int3);
+  vars.push_back(tt_str);
+  vars.push_back(tt_doub);
+
+  emp::vector<std::string> results = { "int:1", "int:2", "int:3", "string:FOUR", "double:5.5" };
+
+  for (size_t i = 0; i < vars.size(); i++) {
+    tt(vars[i]);
+    REQUIRE(tt_result == results[i]);
+  }
+
+  // Make sure TypeTracker can determine consistant IDs.
+  REQUIRE( (tt_t::GetID<int,std::string,double>()) == (tt_t::GetTrackedID(tt_int1, tt_str, tt_doub)) );
+  REQUIRE( (tt_t::GetComboID<int,std::string,double>()) == (tt_t::GetTrackedComboID(tt_int1, tt_str, tt_doub)) );
+
+  // Make sure a TypeTracker can work with a single type.
+  size_t num_args = 0;
+  emp::TypeTracker<int> tt1;
+  tt1.AddFunction( [&num_args](int){ num_args=1; } );
+  tt1.AddFunction( [&num_args](int,int){ num_args=2; } );
+  tt1.AddFunction( [&num_args](int,int,int){ num_args=3; } );
+
+  tt_int1 = tt1.Convert<int>(1);
+  tt_int2 = tt1.Convert<int>(2);
+  tt_int3 = tt1.Convert<int>(3);
+
+  tt1.RunFunction(tt_int1);
+  REQUIRE(num_args == 1);
+  tt1(tt_int2, tt_int3);
+  REQUIRE(num_args == 2);
+  tt1(tt_int1, tt_int2, tt_int3);
+  REQUIRE(num_args == 3);
+
+}
+
 TEST_CASE("Test vector utils", "[tools]") {
   emp::vector<int> v1({6,2,5,1,3});
   emp::Sort(v1);
   REQUIRE(v1 == emp::vector<int>({1,2,3,5,6}));
-  REQUIRE(emp::FindPos(v1, 3) == 2);
+  REQUIRE(emp::FindValue(v1, 3) == 2);
   REQUIRE(emp::Sum(v1) == 17);
   REQUIRE(emp::Has(v1, 3));
   REQUIRE(!emp::Has(v1, 4));
@@ -1377,9 +1481,9 @@ TEST_CASE("Test vector utils", "[tools]") {
   REQUIRE(emp::Slice(v1,1,3) == emp::vector<int>({2,3}));
 }
 
-DEFINE_ATTR(Foo);
-DEFINE_ATTR(Bar);
-DEFINE_ATTR(Bazz);
+// DEFINE_ATTR(Foo);
+// DEFINE_ATTR(Bar);
+// DEFINE_ATTR(Bazz);
 
 struct ident_t {
   template <typename T>
