@@ -17,6 +17,7 @@
 #include <unordered_map>
 
 #include "../base/assert.h"
+#include "../base/Ptr.h"
 #include "../base/vector.h"
 #include "../tools/map_utils.h"
 #include "../tools/string_utils.h"
@@ -26,7 +27,9 @@ namespace emp {
   template <typename... Ts>
   class DataMap {
   public:
-    using data_blob_t = std::tuple<emp::vector<Ts>...>;     ///< Storage type for mapped data.
+    using this_t = DataMap<Ts...>;
+    using this_ptr_t = emp::Ptr<this_t>;
+    using data_blob_t = std::tuple<this_ptr_t, emp::vector<Ts>...>;
 
   private:
     data_blob_t default_blob;                               ///< Default values for data.
@@ -34,7 +37,9 @@ namespace emp {
     std::unordered_map<std::string, std::string> type_map;  ///< Lookup value types by name.
 
   public:
-    DataMap() : default_blob(), id_map(), type_map() { ; }
+    DataMap() : default_blob(), id_map(), type_map() {
+      std::get<this_ptr_t>(default_blob) = this;
+    }
     DataMap(const DataMap &) = default;
     DataMap(DataMap &&) = default;
     ~DataMap() { ; }
