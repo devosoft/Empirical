@@ -37,6 +37,7 @@ namespace emp {
       data_tuple_t data_blob;
 
     public:
+      DataBlob() : map_ptr(nullptr), data_blob() { ; }
       DataBlob(this_ptr_t _mp, const data_tuple_t & _db) : map_ptr(_mp), data_blob(_db) { ; }
       DataBlob(const DataBlob &) = default;
       DataBlob(DataBlob &&) = default;
@@ -44,22 +45,36 @@ namespace emp {
       DataBlob & operator=(const DataBlob &) = default;
       DataBlob & operator=(DataBlob &&) = default;
 
-      template <typename T> T & Get(size_t id) { return map_ptr->Get(data_blob, id); }
-      template <typename T> const T & Get(size_t id) const { return map_ptr->Get(data_blob, id); }
-      template <typename T> T & Get(const std::string & id) { return map_ptr->Get(data_blob, id); }
-      template <typename T> const T & Get(const std::string & id) const { return map_ptr->Get(data_blob, id); }
+      bool IsActive() { return !map_ptr.IsNull(); }
+
+      template <typename T> T & Get(size_t id) { 
+        emp_assert(!map_ptr.IsNull());
+        return map_ptr->Get(data_blob, id);
+      }
+      template <typename T> const T & Get(size_t id) const { 
+        emp_assert(!map_ptr.IsNull());
+        return map_ptr->Get(data_blob, id);
+      }
+      template <typename T> T & Get(const std::string & id) { 
+        emp_assert(!map_ptr.IsNull());
+        return map_ptr->Get(data_blob, id);
+      }
+      template <typename T> const T & Get(const std::string & id) const { 
+        emp_assert(!map_ptr.IsNull());
+        return map_ptr->Get(data_blob, id);
+      }
 
       const this_t & GetMap() const { return *map_ptr; }
     };
 
 
   private:
-    data_tuple_t default_blob;                               ///< Default values for data.
+    data_tuple_t default_data;                              ///< Default values for data.
     std::unordered_map<std::string, size_t> id_map;         ///< Lookup vector positions by name.
     std::unordered_map<std::string, std::string> type_map;  ///< Lookup value types by name.
 
   public:
-    DataMap() : default_blob(), id_map(), type_map() { ; }
+    DataMap() : default_data(), id_map(), type_map() { ; }
     DataMap(const DataMap &) = default;
     DataMap(DataMap &&) = default;
     ~DataMap() { ; }
@@ -71,19 +86,20 @@ namespace emp {
     template <typename T>
     void Add(const std::string & name, T value) {
       emp_assert(!Has(id_map, name), name);               // Make sure this doesn't already exist.
-      auto & v = std::get<emp::vector<T>>(default_blob);  // Retrieve vector of the correct type.
+      auto & v = std::get<emp::vector<T>>(default_data);  // Retrieve vector of the correct type.
       size_t pos = v.size();                              // Determine position of new entry.
       v.push_back(value);                                 // Add the new value to the vector.
       id_map[name] = pos;                                 // Store the position in the id map.
       type_map[name] = typeid(T).name();                  // Store the type of this entry.
     }
 
-    const data_tuple_t & GetDefaults() const { return default_blob; }
+    const data_tuple_t & GetDefaults() const { return default_data; }
+    DataBlob GetBlob() const { return DataBlob(this, default_data); }
 
     /// Retrieve a default variable by its type and unique id.
     template <typename T>
     T & GetDefault(size_t id) {
-      return std::get<emp::vector<T>>(default_blob)[id];  // Index into vector of correct type.
+      return std::get<emp::vector<T>>(default_data)[id];  // Index into vector of correct type.
     }
 
     /// Retrieve a variable from a blob by its type and unique id.
@@ -95,7 +111,7 @@ namespace emp {
     /// Retrieve a constant default variable by its type and unique id.
     template <typename T>
     const T & Get(size_t id) const {
-      return std::get<emp::vector<T>>(default_blob)[id];  // Index into vector of correct type.
+      return std::get<emp::vector<T>>(default_data)[id];  // Index into vector of correct type.
     }
 
     /// Retrieve a constant variable from a blob by its type and unique id.
