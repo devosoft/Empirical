@@ -29,17 +29,22 @@ namespace emp {
   public:
     using this_t = DataMap<Ts...>;
     using this_ptr_t = emp::Ptr<this_t>;
-    using data_blob_t = std::tuple<this_ptr_t, emp::vector<Ts>...>;
+    using data_tuple_t = std::tuple<emp::vector<Ts>...>;
+
+    class DataBlob {
+    private:
+      data_tuple_t data_blob;
+      this_ptr_t map_ptr;
+    };
+
 
   private:
-    data_blob_t default_blob;                               ///< Default values for data.
+    data_tuple_t default_blob;                               ///< Default values for data.
     std::unordered_map<std::string, size_t> id_map;         ///< Lookup vector positions by name.
     std::unordered_map<std::string, std::string> type_map;  ///< Lookup value types by name.
 
   public:
-    DataMap() : default_blob(), id_map(), type_map() {
-      std::get<this_ptr_t>(default_blob) = this;
-    }
+    DataMap() : default_blob(), id_map(), type_map() { ; }
     DataMap(const DataMap &) = default;
     DataMap(DataMap &&) = default;
     ~DataMap() { ; }
@@ -58,6 +63,8 @@ namespace emp {
       type_map[name] = typeid(T).name();                  // Store the type of this entry.
     }
 
+    const data_tuple_t & GetDefaults() const { return default_blob; }
+
     /// Retrieve a default variable by its type and unique id.
     template <typename T>
     T & GetDefault(size_t id) {
@@ -66,7 +73,7 @@ namespace emp {
 
     /// Retrieve a variable from a blob by its type and unique id.
     template <typename T>
-    T & Get(data_blob_t & blob, size_t id) {
+    T & Get(data_tuple_t & blob, size_t id) {
       return std::get<emp::vector<T>>(blob)[id];  // Index into vector of correct type.
     }
 
@@ -78,7 +85,7 @@ namespace emp {
 
     /// Retrieve a constant variable from a blob by its type and unique id.
     template <typename T>
-    const T & Get(const data_blob_t & blob, size_t id) const {
+    const T & Get(const data_tuple_t & blob, size_t id) const {
       return std::get<emp::vector<T>>(blob)[id];  // Index into vector of correct type.
     }
 
@@ -100,14 +107,14 @@ namespace emp {
 
     /// Retrieve a variable from a data blob by its type and unique name.
     template <typename T>
-    T & Get(data_blob_t & blob, const std::string & name) {
+    T & Get(data_tuple_t & blob, const std::string & name) {
       emp_assert(type_map[name] == typeid(T).name());
       return Get<T>(blob, id_map[name]);
     }
 
     /// Retrieve a variable from a const data blob by its type and unique name.
     template <typename T>
-    const T & Get(const data_blob_t & blob, const std::string & name) const {
+    const T & Get(const data_tuple_t & blob, const std::string & name) const {
       emp_assert(Has(id_map, name), name);                         // Make sure this name exists
       emp_assert(type_map.find(name)->second == typeid(T).name()); // Ensure correct type is used.
       return Get<T>( blob, id_map.find(name)->second );
