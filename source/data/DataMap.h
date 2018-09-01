@@ -33,8 +33,23 @@ namespace emp {
 
     class DataBlob {
     private:
-      data_tuple_t data_blob;
       this_ptr_t map_ptr;
+      data_tuple_t data_blob;
+
+    public:
+      DataBlob(this_ptr_t _mp, const data_tuple_t & _db) : map_ptr(_mp), data_blob(_db) { ; }
+      DataBlob(const DataBlob &) = default;
+      DataBlob(DataBlob &&) = default;
+
+      DataBlob & operator=(const DataBlob &) = default;
+      DataBlob & operator=(DataBlob &&) = default;
+
+      template <typename T> T & Get(size_t id) { return map_ptr->Get(data_blob, id); }
+      template <typename T> const T & Get(size_t id) const { return map_ptr->Get(data_blob, id); }
+      template <typename T> T & Get(const std::string & id) { return map_ptr->Get(data_blob, id); }
+      template <typename T> const T & Get(const std::string & id) const { return map_ptr->Get(data_blob, id); }
+
+      const this_t & GetMap() const { return *map_ptr; }
     };
 
 
