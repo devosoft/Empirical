@@ -57,7 +57,9 @@ namespace mabe {
 
 
   public:
-    OrganismType(const std::string & in_name) : OrganismTypeBase(in_name) { 
+    OrganismType(const std::string & in_name) : OrganismTypeBase(in_name) {
+      static_assert( sizeof...(Ts) > 0, "Must have at least one brain -or- organism.");
+
       // Loop through all genome types.
       size_t genome_count = 0;
       emp::TupleIterate(genome_types, [this, &genome_count](GenomeTypeBase & genome_type){
@@ -134,6 +136,10 @@ namespace mabe {
 
     constexpr size_t GetNumGenomes() const { return genome_types_t::GetSize(); }
     constexpr size_t GetNumBrains() const { return brain_types_t::GetSize(); }
+
+    void Setup(WorldBase & world) override {
+      default_org_data = world.GetOrgDataBlob();
+    }
 
     template <typename RETURN, typename... ARGS>
     bool AddActionFunction(std::function<RETURN(ARGS...)> fun,
