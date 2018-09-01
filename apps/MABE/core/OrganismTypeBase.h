@@ -39,6 +39,9 @@ namespace mabe {
 
   class OrganismBase;
 
+  using OrgDataMap = emp::DataMap<double, std::string>;
+  using OrgDataBlob = OrgDataMap::DataBlob;
+
   class OrganismTypeBase : public ModuleBase {
   protected:
     /// These are functions that were provided by the environment and wrapped by this organism
@@ -47,6 +50,7 @@ namespace mabe {
     using fun_ptr_t = emp::Ptr<emp::GenericFunction>;
     emp::vector<fun_ptr_t> action_funs;
     emp::vector<fun_ptr_t> event_funs;
+    OrgDataBlob default_org_data;
 
     size_t org_count;  ///< Total number of organisms of this type (not only in population!)
   public:
@@ -62,6 +66,7 @@ namespace mabe {
     using org_ptr_t = emp::Ptr<org_t>;
 
     static constexpr mabe::ModuleType GetModuleType() { return ModuleType::ORGANISM_TYPE; }
+    const OrgDataBlob & GetDefaultDataBlob() const { return default_org_data; }
 
     void IncCount() { org_count++; }
     void DecCount() { org_count--; }
