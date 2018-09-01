@@ -222,6 +222,8 @@ namespace mabe {
       return org_data_map.Get<T>(org.GetData(), id);
     }
 
+    OrgDataBlob GetOrgDataBlob() const { return org_data_map.GetBlob(); }
+
     /// Does the specified cell ID have an organism in it?
     bool IsOccupied(WorldPosition pos) const { return pops.IsValid(pos) && pops(pos); }
 
