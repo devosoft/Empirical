@@ -21,16 +21,18 @@
 
 namespace mabe {
 
-  using OrgDataMap = emp::DataMap<double, std::string>;
-  using OrgDataBlob = OrgDataMap::data_blob_t;
-
   class OrganismBase {
   protected:
     emp::Ptr<OrganismTypeBase> type_ptr;  ///< Pointer to information about this type of organism.
     OrgDataBlob org_data;
 
   public:
-    OrganismBase(emp::Ptr<OrganismTypeBase> _type_ptr) : type_ptr(_type_ptr) { type_ptr->IncCount(); }
+    OrganismBase(emp::Ptr<OrganismTypeBase> _type_ptr)
+    : type_ptr(_type_ptr)
+    , org_data(type_ptr->GetDefaultDataBlob())
+    {
+      type_ptr->IncCount();
+    }
     OrganismBase(const OrganismBase & in_org) : type_ptr(in_org.type_ptr) { type_ptr->IncCount(); }
     virtual ~OrganismBase() { type_ptr->DecCount(); }
 
