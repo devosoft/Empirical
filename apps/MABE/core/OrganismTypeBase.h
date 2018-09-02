@@ -39,8 +39,13 @@ namespace mabe {
 
   class OrganismBase;
 
-  using OrgDataMap = emp::DataMap<double, std::string>;
-  using OrgDataBlob = OrgDataMap::DataBlob;
+  using OrgDataTypes = emp::TypePack<double, std::string>;        // Types for org run-time data
+  using OrgDataMap = OrgDataTypes::template apply<emp::DataMap>;  // DataMap to store run-time data
+  using OrgDataBlob = OrgDataMap::DataBlob;                       // Minimal per-org data (no map)
+  template <typename T>
+  using to_org_fun = std::function<T(OrganismBase &)>;            // Org fun to return data type
+  using OrgDataFunTypes = OrgDataTypes::template wrap<to_org_fun>; // Org funs that match data types
+  using OrgDataFunMap = OrgDataFunTypes::template apply<emp::DataMap>;  // Map for data functions.
 
   class OrganismTypeBase : public ModuleBase {
   protected:
