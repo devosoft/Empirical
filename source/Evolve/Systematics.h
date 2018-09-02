@@ -194,7 +194,7 @@ namespace emp {
 
     /// Remove and offspring taxa after its entire sub-tree has died out (pruning)
     bool RemoveOffspring() {
-      emp_assert(num_offspring > 0);
+      emp_assert(num_offspring > 0, num_offspring, id);
       --num_offspring;
 
       // If we are out of BOTH offspring and organisms, this Taxon should deactivate.
@@ -422,6 +422,8 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; ///< A set of all dead, ancestral taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  ///< A set of all dead taxa w/o descendants.
 
+    Ptr<taxon_t> to_be_removed = nullptr;
+
     emp::vector<Ptr<taxon_t> > taxon_locations;
     emp::vector<Ptr<taxon_t> > next_taxon_locations;
 
@@ -439,6 +441,7 @@ namespace emp {
     /// Called when there are no more living members of a taxon.  There may be descendants.
     void MarkExtinct(Ptr<taxon_t> taxon);
 
+    
 
   public:
 
@@ -502,6 +505,7 @@ namespace emp {
         next_parent = nullptr;
       } else {
         emp_assert(pos >= 0, "Invalid parent", pos);
+        emp_assert(taxon_locations[pos], pos);
         next_parent = taxon_locations[pos];
       }
     }
@@ -646,6 +650,11 @@ namespace emp {
       });
 
       return node;
+    }
+
+    bool IsTaxonAt(int id) {
+      emp_assert(id < (int) taxon_locations.size(), "Invalid taxon location", id, taxon_locations.size());
+      return taxon_locations[id];
     }
 
     Ptr<taxon_t> GetTaxonAt(int id) {
@@ -971,6 +980,9 @@ namespace emp {
     bool RemoveOrg(int pos);
     bool RemoveOrg(Ptr<taxon_t> taxon);
 
+    void RemoveOrgAfterRepro(int pos);
+    void RemoveOrgAfterRepro(Ptr<taxon_t> taxon);
+
     /// Remove org from next population (for use with synchronous generations)
     bool RemoveNextOrg(int pos);
     bool RemoveNextOrg(Ptr<taxon_t> taxon);
@@ -1142,7 +1154,7 @@ namespace emp {
 
       cur_taxon->SetOriginationTime(update);
     }
-
+    std::cout << "about to store poisiton" << std::endl;
     if (store_position && pos >= 0) {
       if (next) {
         if (pos >= (int)next_taxon_locations.size()) {
@@ -1151,6 +1163,7 @@ namespace emp {
         next_taxon_locations[pos] = cur_taxon;
 
       } else {
+        std::cout << "THIS SHOULD HAPPEN"<< std::endl;
         if (pos >= (int)taxon_locations.size()) {
           taxon_locations.resize(pos+1);
         }
@@ -1160,14 +1173,35 @@ namespace emp {
 
     cur_taxon->AddOrg();                    // Record the current organism in its taxon.
     total_depth += cur_taxon->GetDepth();   // Track the total depth (for averaging)
+
+    if (to_be_removed) {
+      RemoveOrg(to_be_removed);
+      to_be_removed = nullptr;
+    } 
+
     return cur_taxon;                       // Return the taxon used.
   }
+
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrgAfterRepro(int pos) {
+    emp_assert(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
+    emp_assert(pos < taxon_locations.size(), "Invalid position requested for removal", pos, taxon_locations.size());
+    emp_assert(taxon_locations[pos], pos, "No org at pos");
+    RemoveOrgAfterRepro(taxon_locations[pos]);
+    taxon_locations[pos] = nullptr;
+  }
+  
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrgAfterRepro(Ptr<taxon_t> taxon) {
+    to_be_removed = taxon;
+  }
+
 
   // Remove an instance of an organism; track when it's gone.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrg(int pos) {
     emp_assert(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
-    emp_assert(pos < (int)taxon_locations.size(), "Invalid position requested for removal", pos, taxon_locations.size());
+    emp_assert(pos < taxon_locations.size(), "Invalid position requested for removal", pos, taxon_locations.size());
     bool active = RemoveOrg(taxon_locations[pos]);
     taxon_locations[pos] = nullptr;
     return active;
@@ -1236,25 +1270,26 @@ namespace emp {
        << " store_outside=" << store_outside
        << " archive=" << archive
        << " next_id=" << next_id
+       << " synchronous=" << track_synchronous
        << std::endl;
     os << "Active count:   " << active_taxa.size();
     for (const auto & x : active_taxa) {
       os << " [" << x->GetID() << "|" << x->GetNumOrgs() << "," << x->GetNumOff() << "|"
-         << ((bool) x->GetParent()) << "]";
+         << (x->GetParent() ? emp::to_string(x->GetParent()->GetID()) : "null") << "]";
     }
     os << std::endl;
 
     os << "Ancestor count: " << ancestor_taxa.size();
     for (const auto & x : ancestor_taxa) {
       os << " [" << x->GetID() << "|" << x->GetNumOrgs() << "," << x->GetNumOff() << "|"
-         << ((bool) x->GetParent()) << "]";
+         << (x->GetParent() ? emp::to_string(x->GetParent()->GetID()) : "null") << "]";
     }
     os << std::endl;
 
     os << "Outside count:  " << outside_taxa.size();
     for (const auto & x : outside_taxa) {
       os << " [" << x->GetID() << "|" << x->GetNumOrgs() << "," << x->GetNumOff() << "|"
-         << ((bool) x->GetParent()) << "]";
+         << (x->GetParent() ? emp::to_string(x->GetParent()->GetID()) : "null") << "]";
     }
     os << std::endl;
   }
