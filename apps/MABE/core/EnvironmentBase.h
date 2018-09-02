@@ -49,11 +49,6 @@ namespace mabe {
 
     static constexpr mabe::ModuleType GetModuleType() { return ModuleType::ENVIRONMENT; }
 
-    template <typename T>
-    void LinkOrgType(emp::Ptr<T> org_mod) {
-      (void) org_mod;
-      // Base environment does not communicate with organisms.
-    }
   };
 
 }
