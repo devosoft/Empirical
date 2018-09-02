@@ -72,7 +72,9 @@ namespace mabe {
     std::vector<size_t> pop_sizes;    ///< Sizes of population dimensions (eg, 2 vals for grid)
     emp::TraitSet<org_t> phenotypes;  ///< What phenotypes are we tracking?
     emp::vector<emp::Ptr<emp::DataFile>> files;    ///< Output files.
+
     OrgDataMap org_data_map;          ///< Details of how run data is stored in orgnisms.
+    
 
     bool is_synchronous;              ///< Does this world have synchronous generations?
     bool is_space_structured;         ///< Do we have a spatially structured population?
@@ -197,32 +199,43 @@ namespace mabe {
       return *(files[0]);
     }
 
-    template <typename T>
-    void AddOrgData(const std::string & name, T default_val) {
-      org_data_map.Add<T>(name, default_val);
+    /// Add a new type of organism data to world along with a function to calculate it.
+    template <typename DATA_T, typename FUN_T>
+    void AddOrgData(const std::string & name, DATA_T default_val, FUN_T fun,
+                    const std::string & type_info="", const std::string & desc="") {
+      org_data_map.Add<DATA_T>(name, default_val);
+      (void) fun;
+      (void) type_info;
+      (void) desc;
     }
 
+    /// Retrive organism data by name in a mutable format.
     template <typename T>
     T & GetOrgData(org_t & org, const std::string & name) {
       return org_data_map.Get<T>(org.GetData(), name);
     }
 
+    /// Retrive organism data by name in a const format.
     template <typename T>
     const T & GetOrgData(org_t & org, const std::string & name) const {
       return org_data_map.Get<T>(org.GetData(), name);
     }
 
+    /// Retrive organism data by id number in a mutable format.
     template <typename T>
     T & GetOrgData(org_t & org, size_t id) {
       return org_data_map.Get<T>(org.GetData(), id);
     }
 
+    /// Retrive organism data by id number in a const format.
     template <typename T>
     const T & GetOrgData(org_t & org, size_t id) const {
       return org_data_map.Get<T>(org.GetData(), id);
     }
 
+    /// Retrive a full blob of organism data (for initializing new organisms).
     OrgDataBlob GetOrgDataBlob() const { return org_data_map.GetBlob(); }
+
 
     /// Does the specified cell ID have an organism in it?
     bool IsOccupied(WorldPosition pos) const { return pops.IsValid(pos) && pops(pos); }
@@ -408,7 +421,6 @@ namespace mabe {
       emp::Ptr<T> org_mod = emp::NewPtr<T>(name);       // Build the new module.
       organism_types.push_back(org_mod);                // Store new module in org type vector.
       config.AddNameSpace(org_mod->GetConfig(), name);  // Setup module's config in a namespace.
-      environment.LinkOrgType(org_mod);                 // Let environment setup org signals.
       return *org_mod;                                  // Return the final module.
     }
 
