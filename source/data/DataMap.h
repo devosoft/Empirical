@@ -68,7 +68,7 @@ namespace emp {
     };
 
 
-  private:
+  protected:
     data_tuple_t default_data;                              ///< Default values for data.
     std::unordered_map<std::string, size_t> id_map;         ///< Lookup vector positions by name.
     std::unordered_map<std::string, std::string> type_map;  ///< Lookup value types by name.
