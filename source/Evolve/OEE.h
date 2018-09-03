@@ -20,7 +20,7 @@ namespace emp {
         Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> systematics_manager;
 
         taxa_set_t prev_coal_set;
-        taxa_set_t seen;
+        std::set<ORG_INFO> seen;
 
         fun_calc_complexity_t complexity_fun;
         size_t generation_interval = 10;
@@ -64,36 +64,41 @@ namespace emp {
             double most_complex = 0;
             double diversity = ShannonEntropy(coal_set);
             for (Ptr<taxon_t> tax : coal_set) {
-                std::cout << "Evaluating org id: " << tax->GetID() << "(" <<tax->GetInfo() << ")" << std::endl;
+                // std::cout << "Evaluating org id: " << tax->GetID() << "(" <<tax->GetInfo() << ")" << std::endl;
                 if (!Has(prev_coal_set, tax)) {
                     change++;
-                    std::cout << "Org id: " << tax->GetID() << "(" <<tax->GetInfo() << ") increased change" << std::endl;
+                    // std::cout << "Org id: " << tax->GetID() << "(" <<tax->GetInfo() << ") increased change" << std::endl;
                 }
-                if (!Has(seen, tax)) {
+                if (!Has(seen, tax->GetInfo())) {
                     novelty++;
-                    seen.insert(tax);
-                    std::cout << "Org id: " << tax->GetID() << "(" <<tax->GetInfo() << ") increased novelty" << std::endl;
+                    // std::cout << "seen: ";
+                    // for (int val : seen) {
+                    //     std::cout << val << " ";
+                    // }
+                    // std::cout << std::endl;
+                    seen.insert(tax->GetInfo());
+                    // std::cout << "Org id: " << tax->GetID() << "(" <<tax->GetInfo() << ") increased novelty" << std::endl;
                 }
                 double complexity = complexity_fun(tax);
-                std::cout << "Complexity: " << complexity << std::endl;
+                // std::cout << "Complexity: " << complexity << std::endl;
                 if (complexity > most_complex) {
-                    std::cout << "Org id: " << tax->GetID() << "(" <<tax->GetInfo() << ") increased complextiy " << complexity << std::endl;
+                    // std::cout << "Org id: " << tax->GetID() << "(" <<tax->GetInfo() << ") increased complextiy " << complexity << std::endl;
                     most_complex = complexity;
                 }
             }
-
-            std::cout << change << ' ' << novelty << " " << diversity << " " << most_complex << std::endl;
 
             data_nodes.Get("change").Add(change);
             data_nodes.Get("novelty").Add(novelty);
             data_nodes.Get("diversity").Add(diversity);
             data_nodes.Get("complexity").Add(most_complex);
 
+            // std::cout << change << ' ' << novelty << " " << diversity << " " << most_complex << std::endl;
+
             std::swap(prev_coal_set, coal_set);
         }
 
         taxa_set_t CoalescenceFilter() {
-            // Pretty sure we can replace this with the set intersection of snapshots[generations/resolution] and ancestor_taxa + active_taxa in the lineage tracker 
+
             emp_assert(emp::Mod(generation_interval, resolution) == 0, "Generation interval must be a multiple of resolution", generation_interval, resolution);
             taxa_set_t res;
             if (snapshots.size() <= generation_interval/resolution) {
@@ -109,7 +114,7 @@ namespace emp {
 
             taxa_set_t eval = snapshots[snapshots.size() - generation_interval/resolution - 1];
             res = intersection(ancestors, eval);
-            std::cout << "coal set: " << res.size() << std::endl;
+            // std::cout << "coal set: " << res.size() << std::endl;
             return res;
             // taxa_set_t include_set;
             // for (Ptr<taxon_t> tax : snapshots[0]) {
@@ -121,15 +126,15 @@ namespace emp {
             // return include_set;
         }
 
-        Ptr<taxon_t> GetAncestor(Ptr<taxon_t> t) {
-            for (size_t i = 0; i < generation_interval; i++) {
-                t = t->GetParent();
-                if (!t) {
-                    return nullptr;
-                }
-            }
-            return t;
-        }
+        // Ptr<taxon_t> GetAncestor(Ptr<taxon_t> t) {
+        //     for (size_t i = 0; i < generation_interval; i++) {
+        //         t = t->GetParent();
+        //         if (!t) {
+        //             return nullptr;
+        //         }
+        //     }
+        //     return t;
+        // }
 
         Ptr<DataNode<double, data::Current, data::Info>> GetDataNode(const std::string & name) {
             return &(data_nodes.Get(name));
