@@ -1154,7 +1154,7 @@ namespace emp {
 
       cur_taxon->SetOriginationTime(update);
     }
-    std::cout << "about to store poisiton" << std::endl;
+
     if (store_position && pos >= 0) {
       if (next) {
         if (pos >= (int)next_taxon_locations.size()) {
@@ -1163,7 +1163,6 @@ namespace emp {
         next_taxon_locations[pos] = cur_taxon;
 
       } else {
-        std::cout << "THIS SHOULD HAPPEN"<< std::endl;
         if (pos >= (int)taxon_locations.size()) {
           taxon_locations.resize(pos+1);
         }
