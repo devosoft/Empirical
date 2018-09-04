@@ -5,25 +5,34 @@
 #include "base/vector.h"
 #include "base/Ptr.h"
 #include "tools/set_utils.h"
+#include "tools/vector_utils.h"
+
+#include <deque>
 
 namespace emp {
+
 
     template <typename ORG, typename ORG_INFO, typename DATA_STRUCT=emp::datastruct::no_data>
     class OEETracker {
         private:
         using taxon_t = Taxon<ORG_INFO, DATA_STRUCT>;
         using hash_t = typename Ptr<taxon_t>::hash_t;
-        using taxa_set_t = std::set< Ptr<taxon_t>>;
         using fun_calc_complexity_t = std::function<double(Ptr<taxon_t>)>;
 
-        emp::vector<taxa_set_t> snapshots;
+        struct snapshot_info_t {
+            Ptr<taxon_t> taxon = nullptr; // This is what the systematics manager has
+            int count; // Count of this taxon at time of snapshot
+            // bool operator==(const snapshot_info_t & other) const {return other.taxon == taxon;}
+        };
+
+        std::deque<emp::vector<snapshot_info_t>> snapshots;
         Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> systematics_manager;
 
-        taxa_set_t prev_coal_set;
+        std::unordered_set<Ptr<taxon_t>, hash_t> prev_coal_set;
         std::set<ORG_INFO> seen;
 
         fun_calc_complexity_t complexity_fun;
-        size_t generation_interval = 10;
+        int generation_interval = 10;
         int resolution = 10;
 
         DataManager<double, data::Current, data::Info> data_nodes;
@@ -32,7 +41,7 @@ namespace emp {
         OEETracker(Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> s, fun_calc_complexity_t c) : 
             systematics_manager(s), complexity_fun(c) {
             
-            emp_assert(s->GetStoreOutside(), "OEE tracker only works with systematics manager where store_outside is set to true");
+            // emp_assert(s->GetStoreOutside(), "OEE tracker only works with systematics manager where store_outside is set to true");
 
             data_nodes.New("change");            
             data_nodes.New("novelty");
@@ -41,50 +50,63 @@ namespace emp {
         }
 
         int GetResolution() const {return resolution;}
-        size_t GetGenerationInterval() const {return generation_interval;}
+        int GetGenerationInterval() const {return generation_interval;}
 
         void SetResolution(int r) {resolution = r;}
-        void SetGenerationInterval(size_t g) {generation_interval = g;}
+        void SetGenerationInterval(int g) {generation_interval = g;}
 
         void Update(size_t ud) {
             if (Mod((int)ud, resolution) == 0) {
-                taxa_set_t active;
-                for (auto tax : systematics_manager->GetActive()) {
-                    active.insert(tax);
+                auto & sys_active = systematics_manager->GetActive();
+                emp::vector<snapshot_info_t> active(sys_active.size());
+                int i = 0;
+                for (auto tax : sys_active) {
+                    active[i].taxon = tax;
+                    active[i].count = tax->GetNumOrgs();
+                    i++;
                 }
                 snapshots.push_back(active);
+                if (snapshots.size() > generation_interval/resolution + 1) {
+                    snapshots.pop_front();
+                }
                 CalcStats();
             }
         }
 
         void CalcStats() {
-            taxa_set_t coal_set = CoalescenceFilter();
+            emp::vector<snapshot_info_t> coal_set = CoalescenceFilter();
+            std::unordered_set<Ptr<taxon_t>, hash_t> next_prev_coal_set;
             int change = 0;
             int novelty = 0;
             double most_complex = 0;
-            double diversity = ShannonEntropy(coal_set);
-            for (Ptr<taxon_t> tax : coal_set) {
+            double diversity = 0;
+            if (coal_set.size() > 0) {
+                diversity = Entropy(coal_set, [](snapshot_info_t t){return t.count;});
+            }
+
+            for (snapshot_info_t tax : coal_set) {
                 // std::cout << "Evaluating org id: " << tax->GetID() << "(" <<tax->GetInfo() << ")" << std::endl;
-                if (!Has(prev_coal_set, tax)) {
+                if (!Has(prev_coal_set, tax.taxon)) {
                     change++;
                     // std::cout << "Org id: " << tax->GetID() << "(" <<tax->GetInfo() << ") increased change" << std::endl;
                 }
-                if (!Has(seen, tax->GetInfo())) {
+                if (!Has(seen, tax.taxon->GetInfo())) {
                     novelty++;
                     // std::cout << "seen: ";
                     // for (int val : seen) {
                     //     std::cout << val << " ";
                     // }
                     // std::cout << std::endl;
-                    seen.insert(tax->GetInfo());
+                    seen.insert(tax.taxon->GetInfo());
                     // std::cout << "Org id: " << tax->GetID() << "(" <<tax->GetInfo() << ") increased novelty" << std::endl;
                 }
-                double complexity = complexity_fun(tax);
+                double complexity = complexity_fun(tax.taxon);
                 // std::cout << "Complexity: " << complexity << std::endl;
                 if (complexity > most_complex) {
                     // std::cout << "Org id: " << tax->GetID() << "(" <<tax->GetInfo() << ") increased complextiy " << complexity << std::endl;
                     most_complex = complexity;
                 }
+                next_prev_coal_set.insert(tax.taxon);
             }
 
             data_nodes.Get("change").Add(change);
@@ -94,47 +116,28 @@ namespace emp {
 
             // std::cout << change << ' ' << novelty << " " << diversity << " " << most_complex << std::endl;
 
-            std::swap(prev_coal_set, coal_set);
+            prev_coal_set = next_prev_coal_set;
         }
 
-        taxa_set_t CoalescenceFilter() {
+        emp::vector<snapshot_info_t> CoalescenceFilter() {
 
             emp_assert(emp::Mod(generation_interval, resolution) == 0, "Generation interval must be a multiple of resolution", generation_interval, resolution);
-            taxa_set_t res;
+
+            emp::vector<snapshot_info_t> res;
+
             if (snapshots.size() <= generation_interval/resolution) {
                 return res;
             }
-            taxa_set_t ancestors;
-            for (auto tax : systematics_manager->GetAncestors()) {
-                ancestors.insert(tax);
-            }
-            for (auto tax : systematics_manager->GetActive()) {
-                ancestors.insert(tax);
+
+            for ( snapshot_info_t & t : snapshots.front()) {
+                if (Has(systematics_manager->GetActive(), t.taxon) || Has(systematics_manager->GetAncestors(), t.taxon)) {
+                    res.push_back(t);
+                }
             }
 
-            taxa_set_t eval = snapshots[snapshots.size() - generation_interval/resolution - 1];
-            res = intersection(ancestors, eval);
-            // std::cout << "coal set: " << res.size() << std::endl;
             return res;
-            // taxa_set_t include_set;
-            // for (Ptr<taxon_t> tax : snapshots[0]) {
-            //     Ptr<taxon_t> ancestor = GetAncestor(tax);
-            //     if (ancestor) {
-            //         include_set.insert(ancestor);
-            //     }
-            // }
-            // return include_set;
         }
 
-        // Ptr<taxon_t> GetAncestor(Ptr<taxon_t> t) {
-        //     for (size_t i = 0; i < generation_interval; i++) {
-        //         t = t->GetParent();
-        //         if (!t) {
-        //             return nullptr;
-        //         }
-        //     }
-        //     return t;
-        // }
 
         Ptr<DataNode<double, data::Current, data::Info>> GetDataNode(const std::string & name) {
             return &(data_nodes.Get(name));

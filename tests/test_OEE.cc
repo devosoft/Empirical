@@ -15,7 +15,7 @@ TEST_CASE("OEE", "[evo]") {
     emp::World<int> world(random, "OEEWorld");
 
     emp::Ptr<emp::Systematics<int, int> > sys_ptr;
-    sys_ptr.New([](int org){return org;}, true, true, true);
+    sys_ptr.New([](int org){return org;}, true, true, false);
     // world.AddSystematics(sys_ptr);
     // world.SetPopStruct_Mixed(true);
 
@@ -67,7 +67,7 @@ TEST_CASE("OEE", "[evo]") {
     CHECK(oee.CoalescenceFilter().size() == 3);
     CHECK(oee.GetDataNode("change")->GetCurrent() == 1);
     CHECK(oee.GetDataNode("novelty")->GetCurrent() == 1);
-    CHECK(oee.GetDataNode("diversity")->GetCurrent() == Approx(1.58496));
+    CHECK(oee.GetDataNode("diversity")->GetCurrent() == Approx(1.5853));
     CHECK(oee.GetDataNode("complexity")->GetCurrent() == 4);
 
     // If we change nothing again, change and novelty should drop to 0
@@ -75,7 +75,7 @@ TEST_CASE("OEE", "[evo]") {
     CHECK(oee.CoalescenceFilter().size() == 3);
     CHECK(oee.GetDataNode("change")->GetCurrent() == 0);
     CHECK(oee.GetDataNode("novelty")->GetCurrent() == 0);
-    CHECK(oee.GetDataNode("diversity")->GetCurrent() == Approx(1.58496));
+    CHECK(oee.GetDataNode("diversity")->GetCurrent() == Approx(1.5853));
     CHECK(oee.GetDataNode("complexity")->GetCurrent() == 4);
 
     sys_ptr->SetNextParent(0);
@@ -88,7 +88,7 @@ TEST_CASE("OEE", "[evo]") {
     CHECK(oee.CoalescenceFilter().size() == 3);
     CHECK(oee.GetDataNode("change")->GetCurrent() == 0);
     CHECK(oee.GetDataNode("novelty")->GetCurrent() == 0);
-    CHECK(oee.GetDataNode("diversity")->GetCurrent() == Approx(1.58496));
+    CHECK(oee.GetDataNode("diversity")->GetCurrent() == Approx(1.5853));
     CHECK(oee.GetDataNode("complexity")->GetCurrent() == 4);
 
     sys_ptr->SetNextParent(0);
@@ -102,7 +102,7 @@ TEST_CASE("OEE", "[evo]") {
     CHECK(oee.CoalescenceFilter().size() == 3);
     CHECK(oee.GetDataNode("change")->GetCurrent() == 0);
     CHECK(oee.GetDataNode("novelty")->GetCurrent() == 0);
-    CHECK(oee.GetDataNode("diversity")->GetCurrent() == Approx(1.58496));
+    CHECK(oee.GetDataNode("diversity")->GetCurrent() == Approx(1.5853));
     CHECK(oee.GetDataNode("complexity")->GetCurrent() == 4);
 
     // 10 survives the filter and replaces 1 because 1 is no longer in the
@@ -111,7 +111,7 @@ TEST_CASE("OEE", "[evo]") {
     CHECK(oee.CoalescenceFilter().size() == 3);
     CHECK(oee.GetDataNode("change")->GetCurrent() == 1);
     CHECK(oee.GetDataNode("novelty")->GetCurrent() == 1);
-    CHECK(oee.GetDataNode("diversity")->GetCurrent() == Approx(1.58496));
+    CHECK(oee.GetDataNode("diversity")->GetCurrent() == Approx(1.5853));
     CHECK(oee.GetDataNode("complexity")->GetCurrent() == 10);
 
     sys_ptr->SetNextParent(0);
@@ -134,7 +134,7 @@ TEST_CASE("OEE", "[evo]") {
     CHECK(oee.CoalescenceFilter().size() == 3);
     CHECK(oee.GetDataNode("change")->GetCurrent() == 1);
     CHECK(oee.GetDataNode("novelty")->GetCurrent() == 0);
-    CHECK(oee.GetDataNode("diversity")->GetCurrent() == Approx(1.58496));
+    CHECK(oee.GetDataNode("diversity")->GetCurrent() == Approx(1.5853));
     CHECK(oee.GetDataNode("complexity")->GetCurrent() == 10);
 
 
