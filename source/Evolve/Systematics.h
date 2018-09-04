@@ -160,6 +160,8 @@ namespace emp {
     data_t & GetData() {return data;}
     const data_t & GetData() const {return data;}
 
+    void SetData(data_t d) {data = d;}
+
     double GetOriginationTime() const {return origination_time;}
     void SetOriginationTime(double time) {origination_time = time;}
 
@@ -362,7 +364,7 @@ namespace emp {
     using parent_t = SystematicsBase<ORG>;
     using taxon_t = Taxon<ORG_INFO, DATA_STRUCT>;
     using hash_t = typename Ptr<taxon_t>::hash_t;
-    using fun_calc_info_t = std::function<ORG_INFO(ORG &)>;
+    using fun_calc_info_t = std::function<ORG_INFO(const ORG &)>;
 
     fun_calc_info_t calc_info_fun;
     Ptr<taxon_t> next_parent;
@@ -1154,7 +1156,7 @@ namespace emp {
 
       cur_taxon->SetOriginationTime(update);
     }
-
+    // std::cout << "about to store poisiton" << std::endl;
     if (store_position && pos >= 0) {
       if (next) {
         if (pos >= (int)next_taxon_locations.size()) {

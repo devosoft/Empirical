@@ -11,13 +11,22 @@
 
 namespace emp {
 
+    namespace datastruct {
+        template <typename SKEL_TYPE>
+        struct oee_data : public no_data {
 
-    template <typename ORG, typename ORG_INFO, typename DATA_STRUCT=emp::datastruct::no_data>
+            SKEL_TYPE skeleton = NULL;
+            bool oee_calculated = false;
+        };
+    };
+
+    template <typename ORG, typename ORG_INFO, typename SKEL_TYPE, typename DATA_STRUCT=emp::datastruct::oee_data<SKEL_TYPE>>
     class OEETracker {
         private:
         using taxon_t = Taxon<ORG_INFO, DATA_STRUCT>;
         using hash_t = typename Ptr<taxon_t>::hash_t;
-        using fun_calc_complexity_t = std::function<double(Ptr<taxon_t>)>;
+        using fun_calc_complexity_t = std::function<double(SKEL_TYPE&)>;
+        using fun_calc_data_t = std::function<SKEL_TYPE(const ORG_INFO&)>; // TODO: Allow other skeleton types
 
         struct snapshot_info_t {
             Ptr<taxon_t> taxon = nullptr; // This is what the systematics manager has
@@ -28,18 +37,19 @@ namespace emp {
         std::deque<emp::vector<snapshot_info_t>> snapshots;
         Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> systematics_manager;
 
-        std::unordered_set<Ptr<taxon_t>, hash_t> prev_coal_set;
-        std::set<ORG_INFO> seen;
+        std::unordered_set<SKEL_TYPE> prev_coal_set;
+        std::set<SKEL_TYPE> seen;
 
         fun_calc_complexity_t complexity_fun;
+        fun_calc_data_t skeleton_fun;
         int generation_interval = 10;
         int resolution = 10;
 
         DataManager<double, data::Current, data::Info> data_nodes;
 
         public:
-        OEETracker(Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> s, fun_calc_complexity_t c) : 
-            systematics_manager(s), complexity_fun(c) {
+        OEETracker(Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> s, fun_calc_data_t d, fun_calc_complexity_t c) : 
+            systematics_manager(s), skeleton_fun(d), complexity_fun(c) {
             
             // emp_assert(s->GetStoreOutside(), "OEE tracker only works with systematics manager where store_outside is set to true");
 
@@ -75,7 +85,7 @@ namespace emp {
 
         void CalcStats() {
             emp::vector<snapshot_info_t> coal_set = CoalescenceFilter();
-            std::unordered_set<Ptr<taxon_t>, hash_t> next_prev_coal_set;
+            std::unordered_set<SKEL_TYPE> next_prev_coal_set;
             int change = 0;
             int novelty = 0;
             double most_complex = 0;
@@ -86,27 +96,27 @@ namespace emp {
 
             for (snapshot_info_t tax : coal_set) {
                 // std::cout << "Evaluating org id: " << tax->GetID() << "(" <<tax->GetInfo() << ")" << std::endl;
-                if (!Has(prev_coal_set, tax.taxon)) {
+                if (!Has(prev_coal_set, tax.taxon->GetData().skeleton)) {
                     change++;
                     // std::cout << "Org id: " << tax->GetID() << "(" <<tax->GetInfo() << ") increased change" << std::endl;
                 }
-                if (!Has(seen, tax.taxon->GetInfo())) {
+                if (!Has(seen, tax.taxon->GetData().skeleton)) {
                     novelty++;
                     // std::cout << "seen: ";
                     // for (int val : seen) {
                     //     std::cout << val << " ";
                     // }
                     // std::cout << std::endl;
-                    seen.insert(tax.taxon->GetInfo());
+                    seen.insert(tax.taxon->GetData().skeleton);
                     // std::cout << "Org id: " << tax->GetID() << "(" <<tax->GetInfo() << ") increased novelty" << std::endl;
                 }
-                double complexity = complexity_fun(tax.taxon);
+                double complexity = complexity_fun(tax.taxon->GetData().skeleton);
                 // std::cout << "Complexity: " << complexity << std::endl;
                 if (complexity > most_complex) {
                     // std::cout << "Org id: " << tax->GetID() << "(" <<tax->GetInfo() << ") increased complextiy " << complexity << std::endl;
                     most_complex = complexity;
                 }
-                next_prev_coal_set.insert(tax.taxon);
+                next_prev_coal_set.insert(tax.taxon->GetData().skeleton);
             }
 
             data_nodes.Get("change").Add(change);
@@ -131,6 +141,10 @@ namespace emp {
 
             for ( snapshot_info_t & t : snapshots.front()) {
                 if (Has(systematics_manager->GetActive(), t.taxon) || Has(systematics_manager->GetAncestors(), t.taxon)) {
+                    if (!t.taxon->GetData().oee_calculated) {
+                        t.taxon->GetData().skeleton = skeleton_fun(t.taxon->GetInfo());
+                        t.taxon->GetData().oee_calculated = true;
+                    }
                     res.push_back(t);
                 }
             }

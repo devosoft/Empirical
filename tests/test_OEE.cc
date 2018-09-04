@@ -14,12 +14,12 @@ TEST_CASE("OEE", "[evo]") {
     emp::Random random;
     emp::World<int> world(random, "OEEWorld");
 
-    emp::Ptr<emp::Systematics<int, int> > sys_ptr;
+    emp::Ptr<emp::Systematics<int, int, emp::datastruct::oee_data<int>> > sys_ptr;
     sys_ptr.New([](int org){return org;}, true, true, false);
     // world.AddSystematics(sys_ptr);
     // world.SetPopStruct_Mixed(true);
 
-    emp::OEETracker<int, int> oee(sys_ptr, [](emp::Ptr<emp::Taxon<int>> org){return org->GetInfo();});
+    emp::OEETracker<int, int, int> oee(sys_ptr, [](int org){return org;}, [](int org){return org;});
     oee.SetResolution(1);
     oee.SetGenerationInterval(1);
     // AddOEEFile(world, oee).SetTimingRepeat(10);
