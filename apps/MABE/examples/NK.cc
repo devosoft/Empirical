@@ -7,7 +7,7 @@
  *  @brief A simple NK landscape with no brains in the genomes.
  */
 
-#include "../core/World.h"
+#include "../core/MABE.h"
 #include "../core/OrganismType.h"
 
 #include "genomes/BitVectorGenome.h"
@@ -15,12 +15,10 @@
 #include "schemas/TournamentSelect.h"
 
 int main(int argc, char * argv[]) {
-  // Build the world using these types.
-  mabe::World<mabe::NKLandscape> world("NKWorld");
+  // Build MABE using these types.
+  mabe::MABE<mabe::NKLandscape> world("NKWorld");
 
   using org_type_t = mabe::OrganismType<mabe::BitVectorGenome>;
-  using org_t = org_type_t::Organism;
-
   world.AddOrgType<org_type_t>("Organisms");
   world.AddSchema<mabe::TournamentSelect>("TournamentSelect");
 
