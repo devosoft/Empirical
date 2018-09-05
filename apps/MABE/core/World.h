@@ -224,13 +224,13 @@ namespace mabe {
     /// Retrive organism data by id number in a mutable format.
     template <typename T>
     T & GetOrgData(org_t & org, size_t id) {
-      return org_data_map.Get<T>(org.GetData(), id);
+      return org_data_map.Get<T>(org.GetData().GetTuple(), id);
     }
 
     /// Retrive organism data by id number in a const format.
     template <typename T>
     const T & GetOrgData(org_t & org, size_t id) const {
-      return org_data_map.Get<T>(org.GetData(), id);
+      return org_data_map.Get<T>(org.GetData().GetTuple(), id);
     }
 
     size_t GetOrgDataID(const std::string & name) const {
@@ -238,7 +238,7 @@ namespace mabe {
     }
 
     /// Retrive a full blob of organism data (for initializing new organisms).
-    OrgDataBlob GetOrgDataBlob() const { return org_data_map.GetBlob(); }
+    OrgDataBlob GetOrgDataBlob() const { return org_data_map.MakeBlob(); }
 
 
     /// Does the specified cell ID have an organism in it?
