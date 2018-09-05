@@ -3,16 +3,16 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  World.h
- *  @brief A world management class, putting MABE modles together.
+ *  @file  MABE.h
+ *  @brief A MABE module management class.
  *
- *  A world assembles a set of MABE modules into an evolving population.  It also
+ *  A MABE instance assembles a set of modules into an evolving population.  It also
  *  automatically sets up a configurtion system and uses reasonable default linkages
  *  (that can be easily overridden).
  */
 
-#ifndef MABE_WORLD_H
-#define MABE_WORLD_H
+#ifndef MABE_MABE_H
+#define MABE_MABE_H
 
 #include <iostream>
 #include <string>
@@ -35,8 +35,8 @@
 
 namespace mabe {
 
-  /// A base class for all world types, containing common functionality and all interfaces.
-  class WorldBase {
+  /// A base class for all MABE setup types, containing common functionality and all interfaces.
+  class MABEBase {
   public:
     using org_t = OrganismBase;           ///< Organisms are tracked by base classes.
     using value_type = OrganismBase;      ///< For compatability with vectors.
@@ -44,9 +44,9 @@ namespace mabe {
     using pop_t = emp::vector<org_ptr_t>; ///< Populations are tracked by vectors
 
   protected:
-    /// Type of master World config file.
+    /// Type of master MABE config file.
     EMP_BUILD_CONFIG( base_config_t,
-      GROUP(DEFAULT_GROUP, "Master World Settings"),
+      GROUP(DEFAULT_GROUP, "Master MABE Settings"),
       VALUE(RANDOM_SEED, int, 0, "Seed for main random number generator. Use 0 for based on time."),
       VALUE(INIT_SIZE, size_t, 1, "Initial population size for each organism type.")
     )
@@ -56,8 +56,8 @@ namespace mabe {
     emp::vector<emp::Ptr<OrganismTypeBase>> organism_types;  ///< Vector of organism-type modules. 
     emp::vector<emp::Ptr<SchemaBase>> schemas;               ///< Vector of schema modules. 
 
-    // ----- World STATE -----
-    const std::string name;           ///< Unique name for this World (for use in configuration.)
+    // ----- MABE STATE -----
+    const std::string name;           ///< Unique name for this MABE instance (for use in configuration.)
     size_t update;                    ///< How many times has Update() been called?
     emp::Random random;               ///< Random object to use.
     WorldVector pops;                 ///< Set of active [0] and "next" [1] orgs in population.
@@ -67,7 +67,7 @@ namespace mabe {
     emp::vector<double> fit_cache;    ///< vector size==0 when not caching; uncached values==0.0
 
 
-    // ----- World CONFIG ----
+    // ----- MABE CONFIG ----
     bool cache_on;                    ///< Should we be caching fitness values?
     std::vector<size_t> pop_sizes;    ///< Sizes of population dimensions (eg, 2 vals for grid)
     emp::TraitSet<org_t> phenotypes;  ///< What phenotypes are we tracking?
@@ -76,7 +76,7 @@ namespace mabe {
     OrgDataMap org_data_map;          ///< Details of how run data is stored in orgnisms.
 
 
-    bool is_synchronous;              ///< Does this world have synchronous generations?
+    bool is_synchronous;              ///< Do we have synchronous generations?
     bool is_space_structured;         ///< Do we have a spatially structured population?
     bool is_pheno_structured;         ///< Do we have a phenotypically structured population?
 
@@ -92,11 +92,11 @@ namespace mabe {
     using fun_print_org_t = std::function<void(org_t&, std::ostream &)>;
     fun_print_org_t fun_print_org;
 
-    /// Function type for injecting organisms into a world (returns inject position)
+    /// Function type for injecting organisms (returns inject position)
     using fun_find_inject_pos_t = std::function<WorldPosition(org_ptr_t)>;
     fun_find_inject_pos_t fun_find_inject_pos;
 
-    /// Function type for adding a newly born organism into a world (returns birth position)
+    /// Function type for adding a newly born organism (returns birth position)
     using fun_find_birth_pos_t  = std::function<WorldPosition(org_ptr_t, WorldPosition)>;
     fun_find_birth_pos_t fun_find_birth_pos;
 
@@ -109,13 +109,13 @@ namespace mabe {
     fun_get_neighbor_t fun_get_neighbor;
 
 
-    /// Attributes are a dynamic way to track extra characteristics about a world.
+    /// Attributes are a dynamic way to track extra characteristics about a MABE instance.
     std::map<std::string, std::string> attributes;
 
     // @CAO: Still need to port over systematics!
 
     // == Signals ==
-    emp::SignalControl control;  // Setup the world to control various signals.
+    emp::SignalControl control;  // Setup MABE to control various signals.
     
     /// Trigger signal... before organism gives birth w/parent position.
     emp::Signal<void(size_t)> before_repro_sig;
@@ -129,7 +129,7 @@ namespace mabe {
     /// Trigger signal... before placing any organism into target cell.
     emp::Signal<void(org_t &,size_t)> before_placement_sig;
     
-    /// Trigger signal... after any organism is placed into world.
+    /// Trigger signal... after any organism is placed into MABE.
     emp::Signal<void(size_t)> on_placement_sig;
     
     /// Trigger signal... at the beginning of Update()
@@ -141,11 +141,11 @@ namespace mabe {
     /// Trigger signal... after org positions are swapped
     emp::Signal<void(WorldPosition,WorldPosition)> on_swap_sig;
     
-    /// Trigger signal... in the World destructor.
-    emp::Signal<void()> world_destruct_sig;
+    /// Trigger signal... in the MABE destructor.
+    emp::Signal<void()> MABE_destruct_sig;
   
   public:
-    WorldBase(const std::string & _name="World")
+    MABEBase(const std::string & _name="MABE")
       : config(), organism_types(), schemas()
       , name(_name), update(0), random()
       , pops(), active_pop(pops[0]), next_pop(pops[1]), num_orgs(0)
@@ -161,18 +161,18 @@ namespace mabe {
       , on_update_sig(emp::to_string(name,"::on-update"), control)
       , on_death_sig(emp::to_string(name,"::on-death"), control)
       , on_swap_sig(emp::to_string(name,"::on-swap"), control)
-      , world_destruct_sig(emp::to_string(name,"::wolrd-destruct"), control)
+      , MABE_destruct_sig(emp::to_string(name,"::wolrd-destruct"), control)
     {      
     }
-    virtual ~WorldBase() { ; }
+    virtual ~MABEBase() { ; }
 
-        /// How many organisms can fit in the world?
+    /// How many organisms can fit in the world?
     size_t GetSize() const { return pops[0].size(); }
 
     /// How many organisms are currently in the world?
     size_t GetNumOrgs() const { return num_orgs; }
 
-    /// What update number is the world currently on? (assumes Update() is being used)
+    /// What update number are we currently on? (assumes Update() is being used)
     size_t GetUpdate() const { return update; }
 
     /// How many cells wide is the world? (assumes grids are active.)
@@ -199,7 +199,7 @@ namespace mabe {
       return *(files[0]);
     }
 
-    /// Add a new type of organism data to world along with a function to calculate it.
+    /// Add a new type of organism data to MABE along with a function to calculate it.
     template <typename DATA_T, typename FUN_T>
     void AddOrgData(const std::string & name, DATA_T default_val, FUN_T fun,
                     const std::string & type_info="", const std::string & desc="") {
@@ -259,19 +259,19 @@ namespace mabe {
     /// (i.e., are phenotypically-similar organisms forced to be closer together?)
     bool IsPhenoStructured() const { return is_pheno_structured; }
 
-    /// Denote that this World will be treated as having synchronous generations.
+    /// Denote that we are using synchronous generations.
     /// (Note: this function does not change functionality, just indicates what's happening!)
     void MarkSynchronous(bool in=true) { is_synchronous = in; }
 
-    /// Denote that the World will have a spatial structure to the organisms.
+    /// Denote that we are using a spatial structure for the organisms.
     /// (Note: this function does not change functionality, just indicates what's happening!)
     void MarkSpaceStructured(bool in=true) { is_space_structured = in; }
 
-    /// Denote that the World will have organisms structured based on phenotype.
+    /// Denote that we have organisms structured based on phenotype.
     /// (Note: this function does not change functionality, just indicates what's happening!)
     void MarkPhenoStructured(bool in=true) { is_pheno_structured = in; }
 
-    /// Index into a world to obtain a const reference to an organism.  Any manipulations to
+    /// Index into MABE to obtain a const reference to an organism.  Any manipulations to
     /// organisms should go through other functions to be tracked appropriately.
     /// Will trip assert if cell is not occupied.
     const org_t & operator[](size_t id) const {
@@ -319,21 +319,21 @@ namespace mabe {
       on_swap_sig.Trigger(pos1, pos2);
     }
 
-    /// Change the size of the world.  If the new size is smaller than the old, remove any
+    /// Change the size of the population.  If the new size is smaller than the old, remove any
     /// organisms outside the new range.  If larger, new positions are empty.
     void Resize(size_t new_size) {
       for (size_t i = new_size; i < pops[0].size(); i++) RemoveOrgAt(i); // Remove orgs past new size.
       pops[0].resize(new_size, nullptr);                                 // Default new orgs to null.
     }
 
-    /// Change the size of the world based on width and height.
+    /// Change the size of the population based on width and height.
     void Resize(size_t new_width, size_t new_height) {
       Resize(new_width * new_height);
       pop_sizes.resize(2);
       pop_sizes[0] = new_width; pop_sizes[1] = new_height;
     }
 
-    /// Change the size of the world based on a vector of dimensions.
+    /// Change the size of the population based on a vector of dimensions.
     void Resize(const emp::vector<size_t> & dims) {
       Resize(emp::Product(dims));
       pop_sizes = dims;
@@ -375,7 +375,7 @@ namespace mabe {
 
 
 
-    /// Run should be called when an world is all configured and ready to go.  It will initialize the
+    /// Run should be called when MABE is configured and ready to go.  It will initialize the
     /// population (if needed) and run updates until finished producing a return code for main().
     int Run();
   };
@@ -383,33 +383,33 @@ namespace mabe {
 
   // ============================================
   // ===                                      ===
-  // ===       class World<environment>       ===
+  // ===       class MABE<environment>       ===
   // ===                                      ===
   // ============================================
 
 
   template <typename ENV_T>
-  class World : public WorldBase {
+  class MABE : public MABEBase {
   public:
-    using env_t = ENV_T;              ///< Specify the environment type for this world.
+    using env_t = ENV_T;              ///< Specify the environment type.
 
   private:
-    // ----- World MODULES -----
+    // ----- MABE MODULES -----
     env_t environment;    ///< Current environment. 
 
   public:
-    World(const std::string & _name="World")
-      : WorldBase(_name), environment(_name)
+    MABE(const std::string & _name="MABE")
+      : MABEBase(_name), environment(_name)
     {
       config.AddNameSpace(environment.GetConfig(), name);   // Setup environment config in a namespace.
     }
 
-    ~World() {
+    ~MABE() {
       // Remove all organisms.
       Clear();
 
-      // Triger the signal to indicate that the world is being destroyed.
-      world_destruct_sig.Trigger();
+      // Triger the signal to indicate that MABE is being destroyed.
+      MABE_destruct_sig.Trigger();
 
       // Clean up all allocated pointers.
       for (emp::Ptr<ModuleBase> x : organism_types)  { x.Delete(); }
@@ -419,7 +419,7 @@ namespace mabe {
 
     env_t & GetEnvironment() { return environment; }
 
-    /// Build a new organism type module in the World.    
+    /// Build a new organism type module.    
     template <typename T>
     T & AddOrgType(const std::string name) {
       emp::Ptr<T> org_mod = emp::NewPtr<T>(name);       // Build the new module.
@@ -428,7 +428,7 @@ namespace mabe {
       return *org_mod;                                  // Return the final module.
     }
 
-    /// Build a new schema module in the World.    
+    /// Build a new schema module.    
     template <typename T>
     T & AddSchema(const std::string name) {
       emp::Ptr<T> new_mod = emp::NewPtr<T>(name);       // Build the new module.
@@ -446,10 +446,10 @@ namespace mabe {
       if (!config_continue) exit(0);  // Exit if config is supposed to stop (e.g., --gen)
       if (args.HasUnknown()) exit(1); // Exit if there were unknown command line args provided.
 
-      // Setup World with Config options.
+      // Setup MABE with Config options.
       random.ResetSeed(config.RANDOM_SEED());
 
-      // Now that all of the modules have been configured, allow them to setup the world.
+      // Now that all of the modules have been configured, allow them to setup MABE.
       environment.Setup(*this);
       for (emp::Ptr<OrganismTypeBase> x : organism_types) { x->Setup(*this); }
       for (emp::Ptr<SchemaBase> x : schemas) { x->Setup(*this); }
@@ -480,7 +480,7 @@ namespace mabe {
   // ===                                                       ===
   // =============================================================
 
-  void WorldBase::AddOrgAt(org_ptr_t new_org, WorldPosition pos, WorldPosition p_pos) {
+  void MABEBase::AddOrgAt(org_ptr_t new_org, WorldPosition pos, WorldPosition p_pos) {
     emp_assert(new_org);         // The new organism must exist.
     emp_assert(pos.IsValid());   // Position must be legal.
 
@@ -511,7 +511,7 @@ namespace mabe {
     if (pos.IsActive()) { on_placement_sig.Trigger(pos.GetIndex()); }
   }
 
-  void WorldBase::RemoveOrgAt(WorldPosition pos) {
+  void MABEBase::RemoveOrgAt(WorldPosition pos) {
     size_t id = pos.GetIndex();                       // Identify specific index.
     pop_t & cur_pop = pops[pos.GetPopID()];
     if (id >= cur_pop.size() || !cur_pop[id]) return; // Nothing to remove!
@@ -532,7 +532,7 @@ namespace mabe {
     }
   }
 
-  void WorldBase::Inject(org_ptr_t new_org, size_t copy_count) {
+  void MABEBase::Inject(org_ptr_t new_org, size_t copy_count) {
     for (size_t i = 0; i < copy_count; i++) {
       inject_ready_sig.Trigger(*new_org);
       const WorldPosition pos = fun_find_inject_pos(new_org);
@@ -542,7 +542,7 @@ namespace mabe {
     }
   }
 
-  void WorldBase::InjectAt(org_ptr_t new_org, const WorldPosition pos) {
+  void MABEBase::InjectAt(org_ptr_t new_org, const WorldPosition pos) {
     emp_assert(pos.IsValid());
     inject_ready_sig.Trigger(*new_org);
     AddOrgAt(new_org, pos);
@@ -553,7 +553,7 @@ namespace mabe {
   // Additional signal triggers occur in AddOrgAt.
   // @CAO: NOTE Parent may die during multi-birth; should delay destruction until after DoBirth.
   // @CAO: NOTE That this DoBirth assume asexual reproduction; need another version!
-  WorldPosition WorldBase::DoBirth(org_ptr_t parent_ptr, size_t parent_pos, size_t copy_count) {
+  WorldPosition MABEBase::DoBirth(org_ptr_t parent_ptr, size_t parent_pos, size_t copy_count) {
     before_repro_sig.Trigger(parent_pos);
     WorldPosition pos;                                       // Position of each offspring placed.
     for (size_t i = 0; i < copy_count; i++) {                // Loop through offspring, adding each
@@ -568,7 +568,7 @@ namespace mabe {
   }
 
 
-  int WorldBase::Run() {
+  int MABEBase::Run() {
     /// Make sure all OrganismTypes have been initialized with organisms
     for (auto & org_type_ptr : organism_types) {
       while (org_type_ptr->GetCount() < config.INIT_SIZE()) {
