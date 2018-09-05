@@ -28,7 +28,7 @@ namespace emp {
   class DataMap {
   public:
     using this_t = DataMap<Ts...>;
-    using this_ptr_t = emp::Ptr<this_t>;
+    using this_ptr_t = emp::Ptr<const this_t>;
     using data_tuple_t = std::tuple<emp::vector<Ts>...>;
 
     class DataBlob {
@@ -44,6 +44,8 @@ namespace emp {
 
       DataBlob & operator=(const DataBlob &) = default;
       DataBlob & operator=(DataBlob &&) = default;
+
+      data_tuple_t & GetTuple() { return data_blob; }
 
       bool IsActive() { return !map_ptr.IsNull(); }
 
@@ -99,7 +101,7 @@ namespace emp {
     }
 
     const data_tuple_t & GetDefaults() const { return default_data; }
-    DataBlob GetBlob() const { return DataBlob(this, default_data); }
+    DataBlob MakeBlob() const { return DataBlob(this, default_data); }
 
     /// Retrieve a default variable by its type and unique id.
     template <typename T>
