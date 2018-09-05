@@ -137,8 +137,8 @@ namespace mabe {
     constexpr size_t GetNumGenomes() const { return genome_types_t::GetSize(); }
     constexpr size_t GetNumBrains() const { return brain_types_t::GetSize(); }
 
-    void Setup(WorldBase & world) override {
-      default_org_data = world.GetOrgDataBlob();
+    void Setup(MABEBase & mabe) override {
+      default_org_data = mabe.GetOrgDataBlob();
     }
 
     template <typename RETURN, typename... ARGS>

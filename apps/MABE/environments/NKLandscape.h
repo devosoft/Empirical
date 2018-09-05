@@ -33,7 +33,7 @@ namespace mabe {
     /// Required accessor for configuration objects.
     NKConfig & GetConfig() override { return config; }
 
-    void Setup(WorldBase & world) override {
+    void Setup(MABEBase & world) override {
       // @CAO: We should change this to a BitVector reference when decay is setup for typing.
       std::function<double(emp::BitVector)> fit_fun = [](emp::BitVector bv){ return 0.0; };
       world.AddOrgData<double>("fitness", 0.0, fit_fun,
