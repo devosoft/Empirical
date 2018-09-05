@@ -25,7 +25,7 @@ namespace emp {
         private:
         using taxon_t = Taxon<ORG_INFO, DATA_STRUCT>;
         using hash_t = typename Ptr<taxon_t>::hash_t;
-        using fun_calc_complexity_t = std::function<double(SKEL_TYPE&)>;
+        using fun_calc_complexity_t = std::function<double(const SKEL_TYPE&)>;
         using fun_calc_data_t = std::function<SKEL_TYPE(const ORG_INFO&)>; // TODO: Allow other skeleton types
 
         struct snapshot_info_t {
@@ -38,7 +38,7 @@ namespace emp {
         Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> systematics_manager;
 
         std::unordered_set<SKEL_TYPE> prev_coal_set;
-        std::set<SKEL_TYPE> seen;
+        std::unordered_set<SKEL_TYPE> seen;
 
         fun_calc_complexity_t complexity_fun;
         fun_calc_data_t skeleton_fun;
@@ -68,6 +68,7 @@ namespace emp {
         void Update(size_t ud) {
             if (Mod((int)ud, resolution) == 0) {
                 auto & sys_active = systematics_manager->GetActive();
+
                 emp::vector<snapshot_info_t> active(sys_active.size());
                 int i = 0;
                 for (auto tax : sys_active) {
@@ -84,39 +85,39 @@ namespace emp {
         }
 
         void CalcStats() {
-            emp::vector<snapshot_info_t> coal_set = CoalescenceFilter();
+            std::map<SKEL_TYPE, int> coal_set = CoalescenceFilter();
             std::unordered_set<SKEL_TYPE> next_prev_coal_set;
             int change = 0;
             int novelty = 0;
             double most_complex = 0;
             double diversity = 0;
             if (coal_set.size() > 0) {
-                diversity = Entropy(coal_set, [](snapshot_info_t t){return t.count;});
+                diversity = ShannonEntropy(coal_set);
             }
 
-            for (snapshot_info_t tax : coal_set) {
+            for (auto & tax : coal_set) {
                 // std::cout << "Evaluating org id: " << tax->GetID() << "(" <<tax->GetInfo() << ")" << std::endl;
-                if (!Has(prev_coal_set, tax.taxon->GetData().skeleton)) {
+                if (!Has(prev_coal_set, tax.first)) {
                     change++;
                     // std::cout << "Org id: " << tax->GetID() << "(" <<tax->GetInfo() << ") increased change" << std::endl;
                 }
-                if (!Has(seen, tax.taxon->GetData().skeleton)) {
+                if (!Has(seen, tax.first)) {
                     novelty++;
                     // std::cout << "seen: ";
                     // for (int val : seen) {
                     //     std::cout << val << " ";
                     // }
                     // std::cout << std::endl;
-                    seen.insert(tax.taxon->GetData().skeleton);
+                    seen.insert(tax.first);
                     // std::cout << "Org id: " << tax->GetID() << "(" <<tax->GetInfo() << ") increased novelty" << std::endl;
                 }
-                double complexity = complexity_fun(tax.taxon->GetData().skeleton);
+                double complexity = complexity_fun(tax.first);
                 // std::cout << "Complexity: " << complexity << std::endl;
                 if (complexity > most_complex) {
                     // std::cout << "Org id: " << tax->GetID() << "(" <<tax->GetInfo() << ") increased complextiy " << complexity << std::endl;
                     most_complex = complexity;
                 }
-                next_prev_coal_set.insert(tax.taxon->GetData().skeleton);
+                next_prev_coal_set.insert(tax.first);
             }
 
             data_nodes.Get("change").Add(change);
@@ -129,15 +130,16 @@ namespace emp {
             prev_coal_set = next_prev_coal_set;
         }
 
-        emp::vector<snapshot_info_t> CoalescenceFilter() {
+        std::map<SKEL_TYPE, int> CoalescenceFilter() {
 
             emp_assert(emp::Mod(generation_interval, resolution) == 0, "Generation interval must be a multiple of resolution", generation_interval, resolution);
 
-            emp::vector<snapshot_info_t> res;
+            std::map<SKEL_TYPE, int> res;
 
             if (snapshots.size() <= generation_interval/resolution) {
                 return res;
             }
+
 
             for ( snapshot_info_t & t : snapshots.front()) {
                 if (Has(systematics_manager->GetActive(), t.taxon) || Has(systematics_manager->GetAncestors(), t.taxon)) {
@@ -145,7 +147,11 @@ namespace emp {
                         t.taxon->GetData().skeleton = skeleton_fun(t.taxon->GetInfo());
                         t.taxon->GetData().oee_calculated = true;
                     }
-                    res.push_back(t);
+                    if (Has(res, t.taxon->GetData().skeleton)) {
+                        res[t.taxon->GetData().skeleton] += t.count;
+                    } else {
+                        res[t.taxon->GetData().skeleton] = t.count;
+                    }
                 }
             }
 
@@ -173,9 +179,7 @@ namespace emp {
         for (size_t i = 0; i < org.size(); i++) {
             test_org[i] = null_value;
             double new_fitness = fit_fun(test_org);
-            if (new_fitness >= fitness) {
-                skeleton.push_back(null_value);
-            } else {
+            if (new_fitness < fitness) {
                 skeleton.push_back(org[i]);
             }
             test_org[i] = org[i];
