@@ -74,7 +74,7 @@ namespace mabe {
     emp::vector<emp::Ptr<emp::DataFile>> files;    ///< Output files.
 
     OrgDataMap org_data_map;          ///< Details of how run data is stored in orgnisms.
-    
+
 
     bool is_synchronous;              ///< Does this world have synchronous generations?
     bool is_space_structured;         ///< Do we have a spatially structured population?
@@ -231,6 +231,10 @@ namespace mabe {
     template <typename T>
     const T & GetOrgData(org_t & org, size_t id) const {
       return org_data_map.Get<T>(org.GetData(), id);
+    }
+
+    size_t GetOrgDataID(const std::string & name) const {
+      return org_data_map.GetID(name);
     }
 
     /// Retrive a full blob of organism data (for initializing new organisms).
