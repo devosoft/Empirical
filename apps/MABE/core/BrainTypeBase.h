@@ -7,6 +7,20 @@
  *  @brief Base class for all brain types.
  *
  *  Brains are basic forms of agent contollers.
+ * 
+ *  Each derived brain class much have a brain_t type indicating the information it needs to
+ *  store in organisms.  It must also have the following functions:
+ * 
+ *    std::string GetClassName()
+ *    emp::Config & GetConfig()
+ *    void Print(std::ostream & os, brain_t & brain) const
+ *    void OnBeforeRepro(brain_t & parent_brain)
+ *    void OnOffspringReady(brain_t & offspring_brain, brain_t & parent_brain)
+ *    void OnInjectReady(brain_t & brain)
+ *    void OnBeforePlacement(brain_t & brain)
+ *    void OnPlacement(brain_t & brain)
+ *    void OnOrgDeath(brain_t & brain)
+
  */
 
 #ifndef MABE_BRAIN_TYPE_BASE_H
