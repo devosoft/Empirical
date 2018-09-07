@@ -8,12 +8,19 @@
  *
  *  Genomes are generic ways of encoding info for Brains or other aspects of organisms.
  *
- *  Each derived genome class much have a data_t type indicating a struct with the set of
+ *  Each derived genome class much have a genome_t type indicating a struct with the set of
  *  information it needs to store in organisms.  It must also have the following functions:
+ * 
  *    std::string GetClassName()
  *    emp::Config & GetConfig()
- *    void Randomize(emp::Random & random, genome_t & data)
- *    void Print(std::ostream & os, genome_t & data) const
+ *    void Randomize(emp::Random & random, genome_t & genome)
+ *    void Print(std::ostream & os, genome_t & genome) const
+ *    void OnBeforeRepro(genome_t & parent_genome)
+ *    void OnOffspringReady(genome_t & offspring_genome, genome_t & parent_genome)
+ *    void OnInjectReady(genome_t & genome)
+ *    void OnBeforePlacement(genome_t & genome)
+ *    void OnPlacement(genome_t & genome)
+ *    void OnOrgDeath(genome_t & genome)
  */
 
 #ifndef MABE_GENOME_TYPE_BASE_H
