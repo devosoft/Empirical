@@ -16,7 +16,7 @@
 
 TEST_CASE("Test Systematics", "[evo]")
 {
-  emp::Systematics<int, int> sys([](int & i){return i;}, true, true, true);
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true);
 
   std::cout << "\nAddOrg 25 (id1, no parent)\n";
   auto id1 = sys.AddOrg(25, nullptr, 0);
@@ -136,7 +136,7 @@ TEST_CASE("Test Systematics", "[evo]")
 
 TEST_CASE("Pointer to systematics", "[evo]") {
   emp::Ptr<emp::Systematics<int, int>> sys;
-  sys.New([](int & i){return i;}, true, true, true);
+  sys.New([](const int & i){return i;}, true, true, true);
   sys.Delete();
 }
 
@@ -144,7 +144,7 @@ TEST_CASE("Test Data Struct", "[evo]")
 {
 
   emp::Ptr<emp::Systematics<int, int, emp::datastruct::mut_landscape_info<int> >> sys;
-  sys.New([](int & i){return i;}, true, true, true);
+  sys.New([](const int & i){return i;}, true, true, true);
   auto id1 = sys->AddOrg(1, nullptr);
   id1->GetData().fitness.Add(2);
   id1->GetData().phenotype = 6;
@@ -206,7 +206,7 @@ TEST_CASE("World systematics integration", "[evo]") {
 
   emp::World<emp::vector<int>> world;
   emp::Ptr<systematics_t> sys;
-  sys.New([](emp::vector<int> & v){return v;}, true, true, true);
+  sys.New([](const emp::vector<int> & v){return v;}, true, true, true);
   world.AddSystematics(sys);
 
   world.SetMutFun([](emp::vector<int> & org, emp::Random & r){return 0;});
@@ -279,18 +279,19 @@ TEST_CASE("Run world", "[evo]") {
   world.SetPopStruct_Mixed(true);
 
 
-  std::function<emp::AvidaGP::genome_t(emp::AvidaGP &)> gene_fun =
-    [](emp::AvidaGP & org) {
+  std::function<emp::AvidaGP::genome_t(const emp::AvidaGP &)> gene_fun =
+    [](const emp::AvidaGP & org) {
       return org.GetGenome();
     };
 
-  std::function<emp::vector<double>(emp::AvidaGP &)> phen_fun =
-    [](emp::AvidaGP & org) {
+  std::function<emp::vector<double>(const emp::AvidaGP &)> phen_fun =
+    [](const emp::AvidaGP & org) {
       emp::vector<double> phen;
+      emp::AvidaGP org2 = org;
       for (int i = 0; i < 16; i++) {
-        org.ResetHardware();
-        org.Process(20);
-        phen.push_back(org.GetOutput(i));
+        org2.ResetHardware();
+        org2.Process(20);
+        phen.push_back(org2.GetOutput(i));
       }
       return phen;
     };
@@ -419,4 +420,103 @@ TEST_CASE("Run world", "[evo]") {
   //   std::cout << i << ":" << world[0].GetOutput(i) << "  ";
   // }
   // std::cout << std::endl;
+}
+
+TEST_CASE("Test GetCanopy", "[evo]")
+{
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true);
+
+  auto id1 = sys.AddOrg(1, nullptr, 0);
+  auto id2 = sys.AddOrg(2, id1, 2);
+  auto id3 = sys.AddOrg(3, id1, 3);
+  auto id4 = sys.AddOrg(4, id2, 3);
+
+  sys.RemoveOrg(id1, 3);
+  sys.RemoveOrg(id2, 5);
+
+  auto can_set = sys.GetCanopyExtantRoots(4);
+
+  // Both 3 and 4 were alive at time point 4 so they are the canopy roots
+  CHECK(can_set.size() == 2);
+  CHECK(Has(can_set, id3));
+  CHECK(Has(can_set, id4));
+
+  can_set = sys.GetCanopyExtantRoots(2);
+
+  // Both 3 and 4 were not alive at time point 2, so the canopy roots
+  // will be 1 and 2. 
+  CHECK(can_set.size() == 2);
+  CHECK(Has(can_set, id1));
+  CHECK(Has(can_set, id2));
+
+  sys.RemoveOrg(id3, 7);
+
+  can_set = sys.GetCanopyExtantRoots(2);
+
+  // Only 4 is alive, but it wasn't alive at time point 2. 2 is the
+  // only canopy root because even though 1 is alive, because 4's
+  // lineage diverged from 1 when 2 was born. 
+  CHECK(can_set.size() == 1);
+  CHECK(Has(can_set, id2));
+
+  auto id5 = sys.AddOrg(5, id4, 8);
+  sys.RemoveOrg(id4, 9);
+  auto id6 = sys.AddOrg(6, id5, 10);
+  sys.RemoveOrg(id5, 11);
+
+  can_set = sys.GetCanopyExtantRoots(7);
+  // Should only be 4 
+  CHECK(can_set.size() == 1);
+  CHECK(Has(can_set, id4));
+
+  can_set = sys.GetCanopyExtantRoots(9);
+  // Should only be 5 
+  CHECK(can_set.size() == 1);
+  CHECK(Has(can_set, id5));
+
+
+  auto id7 = sys.AddOrg(7, id6, 12);
+  auto id8 = sys.AddOrg(8, id7, 13);
+  auto id9 = sys.AddOrg(9, id8, 14);
+  auto id10 = sys.AddOrg(10, id9, 15);
+
+  sys.RemoveOrg(id6, 20);
+  sys.RemoveOrg(id7, 20);
+  sys.RemoveOrg(id8, 20);
+  sys.RemoveOrg(id9, 20);
+
+  can_set = sys.GetCanopyExtantRoots(22);
+  // Should only be 10 
+  CHECK(can_set.size() == 1);
+  CHECK(Has(can_set, id10));
+
+  can_set = sys.GetCanopyExtantRoots(14);
+  // Should only be 9, even though others were alive 
+  CHECK(can_set.size() == 1);
+  CHECK(Has(can_set, id9));
+
+  can_set = sys.GetCanopyExtantRoots(13);
+  // Should only be 8, because 9 wasn't born yet
+  CHECK(can_set.size() == 1);
+  CHECK(Has(can_set, id8));
+
+  can_set = sys.GetCanopyExtantRoots(11);
+  CHECK(can_set.size() == 1);
+  CHECK(Has(can_set, id6));
+
+  can_set = sys.GetCanopyExtantRoots(12);
+  CHECK(can_set.size() == 1);
+  CHECK(Has(can_set, id7));
+
+  can_set = sys.GetCanopyExtantRoots(9);
+  CHECK(can_set.size() == 1);
+  CHECK(Has(can_set, id5));
+
+
+  // auto id5 = sys.AddOrg(28, id2, 32);
+  // std::cout << "\nAddOrg 29 (id6; parent id5)\n";
+  // auto id6 = sys.AddOrg(29, id5, 39);
+  // std::cout << "\nAddOrg 30 (id7; parent id1)\n";
+  // auto id7 = sys.AddOrg(30, id1, 6);
+
 }

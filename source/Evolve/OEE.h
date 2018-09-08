@@ -37,7 +37,7 @@ namespace emp {
         std::deque<emp::vector<snapshot_info_t>> snapshots;
         Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> systematics_manager;
 
-        std::unordered_set<SKEL_TYPE> prev_coal_set;
+        std::map<SKEL_TYPE, int> prev_coal_set;
         std::unordered_set<SKEL_TYPE> seen;
 
         fun_calc_complexity_t complexity_fun;
@@ -80,13 +80,13 @@ namespace emp {
                 if (snapshots.size() > generation_interval/resolution + 1) {
                     snapshots.pop_front();
                 }
-                CalcStats();
+                CalcStats(ud);
             }
         }
 
-        void CalcStats() {
-            std::map<SKEL_TYPE, int> coal_set = CoalescenceFilter();
-            std::unordered_set<SKEL_TYPE> next_prev_coal_set;
+        void CalcStats(size_t ud) {
+            std::map<SKEL_TYPE, int> coal_set = CoalescenceFilter(ud);
+            // std::unordered_set<SKEL_TYPE> next_prev_coal_set;
             int change = 0;
             int novelty = 0;
             double most_complex = 0;
@@ -117,7 +117,6 @@ namespace emp {
                     // std::cout << "Org id: " << tax->GetID() << "(" <<tax->GetInfo() << ") increased complextiy " << complexity << std::endl;
                     most_complex = complexity;
                 }
-                next_prev_coal_set.insert(tax.first);
             }
 
             data_nodes.Get("change").Add(change);
@@ -127,10 +126,10 @@ namespace emp {
 
             // std::cout << change << ' ' << novelty << " " << diversity << " " << most_complex << std::endl;
 
-            prev_coal_set = next_prev_coal_set;
+            std::swap(prev_coal_set, coal_set);
         }
 
-        std::map<SKEL_TYPE, int> CoalescenceFilter() {
+        std::map<SKEL_TYPE, int> CoalescenceFilter(size_t ud) {
 
             emp_assert(emp::Mod(generation_interval, resolution) == 0, "Generation interval must be a multiple of resolution", generation_interval, resolution);
 
@@ -140,9 +139,15 @@ namespace emp {
                 return res;
             }
 
-
+            std::set<Ptr<taxon_t>> extant_canopy_roots = systematics_manager->GetCanopyExtantRoots(ud-generation_interval);
+            // std::cout << "exteant canpoy roots: ";
+            // for (auto t : extant_canopy_roots) {
+            //     std::cout << t->GetInfo() << " ";
+            // }
+            // std::cout << std::endl;
             for ( snapshot_info_t & t : snapshots.front()) {
-                if (Has(systematics_manager->GetActive(), t.taxon) || Has(systematics_manager->GetAncestors(), t.taxon)) {
+                if (Has(extant_canopy_roots, t.taxon)) {
+                    // std::cout << t.taxon->GetInfo() << " Survived filter" << std::endl;
                     if (!t.taxon->GetData().oee_calculated) {
                         t.taxon->GetData().skeleton = skeleton_fun(t.taxon->GetInfo());
                         t.taxon->GetData().oee_calculated = true;

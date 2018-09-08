@@ -26,6 +26,7 @@
 #include <set>
 #include <unordered_set>
 #include <map>
+#include <limits>
 
 #include "../base/Ptr.h"
 #include "../control/Signal.h"
@@ -116,6 +117,7 @@ namespace emp {
     size_t total_offspring;   ///<  How many total extant offspring taxa exist from this one (i.e. including indirect)
     size_t depth;             ///<  How deep in tree is this node? (Root is 0)
     double origination_time;  ///<  When did this taxon first appear in the population?
+    double destruction_time;  ///<  When did this taxon leave the population?
 
     DATA_STRUCT data;         ///< A struct for storing additional information about this taxon
 
@@ -125,7 +127,8 @@ namespace emp {
     Taxon(size_t _id, const info_t & _info, Ptr<this_t> _parent=nullptr)
      : id (_id), info(_info), parent(_parent)
      , num_orgs(0), tot_orgs(0), num_offspring(0), total_offspring(0)
-     , depth(parent ? (parent->depth+1) : 0) { ; }
+     , depth(parent ? (parent->depth+1) : 0) 
+     , destruction_time(std::numeric_limits<double>::infinity()) { ; }
     // Taxon(const Taxon &) = delete;
     Taxon(const Taxon &) = default; // TODO: Check with Charles about this
     Taxon(Taxon &&) = default;
@@ -164,6 +167,9 @@ namespace emp {
 
     double GetOriginationTime() const {return origination_time;}
     void SetOriginationTime(double time) {origination_time = time;}
+
+    double GetDestructionTime() const {return destruction_time;}
+    void SetDestructionTime(double time) {destruction_time = time;}
 
     /// Add a new organism to this Taxon.
     void AddOrg() { ++num_orgs; ++tot_orgs; }
@@ -341,8 +347,8 @@ namespace emp {
     virtual int GetMRCADepth() const = 0;
     virtual void AddOrg(ORG && org, int pos, int update, bool next) = 0;
     virtual void AddOrg(ORG & org, int pos, int update, bool next) = 0;
-    virtual bool RemoveOrg(int pos) = 0;
-    virtual bool RemoveNextOrg(int pos) = 0;
+    virtual bool RemoveOrg(int pos, int time=-1) = 0;
+    virtual bool RemoveNextOrg(int pos, int time=-1) = 0;
     virtual void PrintStatus(std::ostream & os) const = 0;
     virtual double CalcDiversity() const = 0;
     virtual void Update() = 0;
@@ -425,6 +431,7 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  ///< A set of all dead taxa w/o descendants.
 
     Ptr<taxon_t> to_be_removed = nullptr;
+    int removal_time = -1;
 
     emp::vector<Ptr<taxon_t> > taxon_locations;
     emp::vector<Ptr<taxon_t> > next_taxon_locations;
@@ -441,7 +448,7 @@ namespace emp {
     void RemoveOffspring(Ptr<taxon_t> taxon);
 
     /// Called when there are no more living members of a taxon.  There may be descendants.
-    void MarkExtinct(Ptr<taxon_t> taxon);
+    void MarkExtinct(Ptr<taxon_t> taxon, int time=-1);
 
     
 
@@ -881,7 +888,7 @@ namespace emp {
           next_pointers.erase(tax.first);
 
           Ptr<taxon_t> test_taxon = tax.first->GetParent();
-          while (test_taxon && test_taxon->GetNumOff() == 1 && test_taxon->GetNumOrgs() < 0) {
+          while (test_taxon && test_taxon->GetNumOff() == 1 && test_taxon->GetNumOrgs() == 0) {
             if (!branch_only) {
               for (size_t i = 0; i < new_dist_vec.size(); i++){
                 new_dist_vec[i]++;
@@ -914,6 +921,35 @@ namespace emp {
       return dists;
 
     }
+
+
+    /** 
+     * Returns a vector containing all taxa from @param time_point that were
+     *  
+     * */
+    std::set<Ptr<taxon_t>> GetCanopyExtantRoots(int time_point = 0) const {
+      // NOTE: This could be made faster by doing something similar to the pairwise distance
+      // function
+
+      std::set< Ptr<taxon_t>> result;
+  // std::cout << "starting " << time_point << std::endl;
+      for (Ptr<taxon_t> tax : active_taxa) {
+          // std::cout << tax->GetInfo() << std::endl;
+        while (tax) {
+          // std::cout << tax->GetInfo() << " " << tax->GetOriginationTime() << " " << tax->GetDestructionTime() << std::endl;
+          if (tax->GetOriginationTime() <= time_point && tax->GetDestructionTime() > time_point ) {
+            result.insert(tax);
+          // std::cout << "inserting " << tax->GetInfo() << std::endl;
+            break;
+          }
+          tax = tax->GetParent();
+        }
+      }
+
+      return result;
+
+    }
+
 
 
     /** Counts the total number of ancestors between @param tax and MRCA, if there is one. If
@@ -979,15 +1015,15 @@ namespace emp {
 
 
     /// Remove an instance of an organism; track when it's gone.
-    bool RemoveOrg(int pos);
-    bool RemoveOrg(Ptr<taxon_t> taxon);
+    bool RemoveOrg(int pos, int time=-1);
+    bool RemoveOrg(Ptr<taxon_t> taxon, int time=-1);
 
-    void RemoveOrgAfterRepro(int pos);
-    void RemoveOrgAfterRepro(Ptr<taxon_t> taxon);
+    void RemoveOrgAfterRepro(int pos, int time=-1);
+    void RemoveOrgAfterRepro(Ptr<taxon_t> taxon, int time=-1);
 
     /// Remove org from next population (for use with synchronous generations)
-    bool RemoveNextOrg(int pos);
-    bool RemoveNextOrg(Ptr<taxon_t> taxon);
+    bool RemoveNextOrg(int pos, int time=-1);
+    bool RemoveNextOrg(Ptr<taxon_t> taxon, int time=-1);
 
     /// Climb up a lineage...
     Ptr<taxon_t> Parent(Ptr<taxon_t> taxon) const;
@@ -1032,7 +1068,7 @@ namespace emp {
 
   // Mark a taxon extinct if there are no more living members.  There may be descendants.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::MarkExtinct(Ptr<taxon_t> taxon) {
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::MarkExtinct(Ptr<taxon_t> taxon, int time) {
     emp_assert(taxon);
     emp_assert(taxon->GetNumOrgs() == 0);
 
@@ -1046,6 +1082,9 @@ namespace emp {
       taxon.Delete();
       return;
     }
+    // std::cout << "About to set destruction time " << time << std::endl;
+    // Only need to track destruction time if we're archiving taxa
+    taxon->SetDestructionTime(time);
 
     if (store_ancestors) ancestor_taxa.insert(taxon);  // Move taxon to ancestors...
     if (taxon->GetNumOff() == 0) Prune(taxon);         // ...and prune from there if needed.
@@ -1176,7 +1215,7 @@ namespace emp {
     total_depth += cur_taxon->GetDepth();   // Track the total depth (for averaging)
 
     if (to_be_removed) {
-      RemoveOrg(to_be_removed);
+      RemoveOrg(to_be_removed, removal_time);
       to_be_removed = nullptr;
     } 
 
@@ -1184,33 +1223,35 @@ namespace emp {
   }
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrgAfterRepro(int pos) {
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrgAfterRepro(int pos, int time) {
     emp_assert(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
     emp_assert(pos < taxon_locations.size(), "Invalid position requested for removal", pos, taxon_locations.size());
     emp_assert(taxon_locations[pos], pos, "No org at pos");
-    RemoveOrgAfterRepro(taxon_locations[pos]);
+    RemoveOrgAfterRepro(taxon_locations[pos], time);
     taxon_locations[pos] = nullptr;
   }
   
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrgAfterRepro(Ptr<taxon_t> taxon) {
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrgAfterRepro(Ptr<taxon_t> taxon, int time) {
     to_be_removed = taxon;
+    // std::cout << "Setting remove time to " << time << std::endl;
+    removal_time = time;
   }
 
 
   // Remove an instance of an organism; track when it's gone.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrg(int pos) {
+  bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrg(int pos, int time) {
     emp_assert(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
     emp_assert(pos < taxon_locations.size(), "Invalid position requested for removal", pos, taxon_locations.size());
-    bool active = RemoveOrg(taxon_locations[pos]);
+    bool active = RemoveOrg(taxon_locations[pos], time);
     taxon_locations[pos] = nullptr;
     return active;
   }
 
   // Remove an instance of an organism; track when it's gone.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrg(Ptr<taxon_t> taxon) {
+  bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrg(Ptr<taxon_t> taxon, int time) {
     emp_assert(taxon);
 
     // Update stats
@@ -1219,26 +1260,26 @@ namespace emp {
 
     // emp_assert(Has(active_taxa, taxon));
     const bool active = taxon->RemoveOrg();
-    if (!active) MarkExtinct(taxon);
+    if (!active) MarkExtinct(taxon, time);
 
     return active;
   }
 
   // Remove an instance of an organism; track when it's gone.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveNextOrg(int pos) {
+  bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveNextOrg(int pos, int time) {
     emp_assert(track_synchronous, "Calling RemoveNextOrg on non-synchronous population. Did you mean to use RemoveOrg?");
     emp_assert(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
     emp_assert(pos < (int)next_taxon_locations.size(), "Invalid position requested for removal", pos, taxon_locations.size());
 
-    bool active = RemoveOrg(next_taxon_locations[pos]);
+    bool active = RemoveOrg(next_taxon_locations[pos], time);
     next_taxon_locations[pos] = nullptr;
     return active;
   }
 
   // Remove an instance of an organism; track when it's gone.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveNextOrg(Ptr<taxon_t> taxon) {
+  bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveNextOrg(Ptr<taxon_t> taxon, int time) {
     emp_assert(track_synchronous, "Calling RemoveNextOrg on non-synchronous population. Did you mean to use RemoveOrg?");
     emp_assert(taxon);
 
@@ -1248,7 +1289,7 @@ namespace emp {
 
     // emp_assert(Has(active_taxa, taxon));
     const bool active = taxon->RemoveOrg();
-    if (!active) MarkExtinct(taxon);
+    if (!active) MarkExtinct(taxon, time);
 
     return active;
   }
