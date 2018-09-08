@@ -92,7 +92,7 @@ namespace emp {
             double most_complex = 0;
             double diversity = 0;
             if (coal_set.size() > 0) {
-                diversity = ShannonEntropy(coal_set);
+                diversity = Entropy(coal_set, [](std::pair<SKEL_TYPE, int> entry){return entry.second;});
             }
 
             for (auto & tax : coal_set) {

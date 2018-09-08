@@ -116,7 +116,7 @@ TEST_CASE("OEE", "[evo]") {
 
     sys_ptr->SetNextParent(0);
     sys_ptr->RemoveOrgAfterRepro(1, 7);
-    sys_ptr->AddOrg(2, 0, 7, false);
+    sys_ptr->AddOrg(2, 1, 7, false);
     sys_ptr->PrintStatus();
 
     // Adding an independent origin of 2 should increase change but not novelty
@@ -137,7 +137,23 @@ TEST_CASE("OEE", "[evo]") {
     CHECK(oee.GetDataNode("diversity")->GetCurrent() == Approx(1.5853));
     CHECK(oee.GetDataNode("complexity")->GetCurrent() == 10);
 
+    sys_ptr->SetNextParent(0);
+    sys_ptr->AddOrg(10, 3, 9, false);
+    sys_ptr->PrintStatus();
 
+    // No effect this time
+    oee.Update(8);
+    CHECK(oee.GetDataNode("change")->GetCurrent() == 0);
+    CHECK(oee.GetDataNode("novelty")->GetCurrent() == 0);
+    CHECK(oee.GetDataNode("diversity")->GetCurrent() == Approx(1.5853));
+    CHECK(oee.GetDataNode("complexity")->GetCurrent() == 10);
+
+    // Now we should see diversity change
+    oee.Update(9);
+    CHECK(oee.GetDataNode("change")->GetCurrent() == 0);
+    CHECK(oee.GetDataNode("novelty")->GetCurrent() == 0);
+    CHECK(oee.GetDataNode("diversity")->GetCurrent() == Approx(1.5));
+    CHECK(oee.GetDataNode("complexity")->GetCurrent() == 10);
 
     sys_ptr.Delete();
 
