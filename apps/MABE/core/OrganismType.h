@@ -8,6 +8,19 @@
  *
  *  Organisms can be made directly -OR- be built using zero or more brains (controllers) and
  *  zero or more genomes.  An OrgaanismType template will automatically handle that assembly.
+ * 
+ *  On various type of operations, OrganismType will forward signals to brains and genomes.
+ *  Specifically, it forwards the following functions:
+ * 
+ *    void Randomize(emp::Random & random, org_t & org)
+ *    void Print(std::ostream & os, org_t & org) const
+ *    void OnBeforeRepro(org_t & parent_org)
+ *    void OnOffspringReady(org_t & parent_org, org_t & offspring_org)
+ *    void OnInjectReady(org_t & org)
+ *    void OnBeforePlacement(org_t & org)
+ *    void OnPlacement(org_t & org)
+ *    void OnOrgDeath(org_t & org)
+
  */
 
 #ifndef MABE_ORGANISM_TYPE_H
