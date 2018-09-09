@@ -4,7 +4,7 @@
  *  @date 2018
  *
  *  @file  Forage.cc
- *  @brief An example of building a MABE world where AvidaGP organisms evovle to forage.
+ *  @brief An example of building a MABE evovler where AvidaGP organisms evovle to forage.
  */
 
 #include "../core/World.h"
@@ -17,23 +17,22 @@
 #include "schemas/TrackLineage.h"
 
 int main(int argc, char * argv[]) {
-  // Build the world using these types.
-  mabe::World<mabe::ResourceGrid> world("ForageWorld");
+  mabe::World<mabe::ResourceGrid> evolver("ForageWorld");
 
   using org_t = mabe::OrganismType<mabe::AvidaGP, mabe::LinearGenome>;
-  auto & org_type        = world.AddOrgType<org_t>("Organisms");
-  auto & tourny_schema   = world.AddSchema<mabe::TournamentSelect>("TournamentSelect");
-  auto & lineage_tracker = world.AddSchema<mabe::TrackLineage>("LineageTracker");
+  auto & org_type        = evolver.AddOrgType<org_t>("Organisms");
+  auto & tourny_schema   = evolver.AddSchema<mabe::TournamentSelect>("TournamentSelect");
+  auto & lineage_tracker = evolver.AddSchema<mabe::TrackLineage>("LineageTracker");
 
   (void) org_type; (void) tourny_schema; (void) lineage_tracker;
 
-  // Configure the world using the "forage.cfg" file and command-line overrides.
-  world.Config(argc, argv, "forage.cfg");
+  // Configure the evolver using the "forage.cfg" file and command-line overrides.
+  evolver.Config(argc, argv, "forage.cfg");
   
   // Get details on how the population is configured.
-  world.PrintStatus();
+  evolver.PrintStatus();
 
-  // Running world will go for full configured duration; can also manually Update() it.
-  return world.Run();
+  // Running evolver will go for full configured duration; can also manually Update() it.
+  return evolver.Run();
 }
 

@@ -4,7 +4,7 @@
  *  @date 2018
  *
  *  @file  Aagos.cc
- *  @brief An example of building a custom MABE world based on NK, but more specialized.
+ *  @brief An example of building a custom MABE evolver based on NK, but more specialized.
  */
 
 #include "../core/World.h"
@@ -15,32 +15,31 @@
 #include "schemas/TournamentSelect.h"
 
 int main(int argc, char * argv[]) {
-  // Build the world using these types.
-  mabe::World<mabe::NKLandscape> world("AagosWorld");
+  mabe::World<mabe::NKLandscape> evolver("AagosWorld");
 
   using org_type_t = mabe::OrganismType<mabe::VectorGenome<bool>, mabe::VectorGenome<int>>;
   using org_t = org_type_t::Organism;
 
-  auto & org_type = world.AddOrgType<org_type_t>("Organisms");
+  auto & org_type = evolver.AddOrgType<org_type_t>("Organisms");
   org_type.GetGenomeType<1>().SetName("GenePositions");
 
-  auto & tourny_schema  = world.AddSchema<mabe::TournamentSelect>("TournamentSelect");
+  auto & tourny_schema  = evolver.AddSchema<mabe::TournamentSelect>("TournamentSelect");
 
-  auto fit_fun = [&world](mabe::OrganismBase & base_org){
+  auto fit_fun = [&evolver](mabe::OrganismBase & base_org){
     org_t & org = (org_t &) base_org;
     (void) org;
-    // @CAO: world.GetEnvironment() ...
+    // @CAO: evolver.GetEnvironment() ...
     return 1.0;
   };
   tourny_schema.SetFitFun(fit_fun);
 
-  // Configure the world using the "Aagos.cfg" file and command-line overrides.
-  world.Config(argc, argv, "Aagos.cfg");
+  // Configure the evolver using the "Aagos.cfg" file and command-line overrides.
+  evolver.Config(argc, argv, "Aagos.cfg");
   
   // Get details on how the population was configured.
-  world.PrintStatus();
+  evolver.PrintStatus();
 
-  // Running world will go for full configured duration; can also manually Update() it.
-  return world.Run();
+  // Running evolver will go for full configured duration; can also manually Update() it.
+  return evolver.Run();
 }
 
