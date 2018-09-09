@@ -13,7 +13,6 @@
  * 
  *  Developer Notes:
  *  - Merge attributes into DataMap
- *  - Change references to positions to be about EvolverIDs instead.
  */
 
 #ifndef MABE_EVOLVER_H
@@ -177,7 +176,7 @@ namespace mabe {
     using fun_find_birth_id_t  = std::function<EvolverID(org_ptr_t, EvolverID)>;
     fun_find_birth_id_t fun_find_birth_id;
 
-    /// Function type for determining picking and killing an organism (returns newly empty position)
+    /// Function type for determining picking and killing an organism (returns newly empty cell id)
     using fun_kill_org_t = std::function<EvolverID()>;
     fun_kill_org_t fun_kill_org;
 
@@ -372,7 +371,7 @@ namespace mabe {
     /// not occupied.
     const org_ptr_t GetOrgPtr(size_t id) const { return pops[0][id]; }
 
-    /// Retrieve a reference to the organsim as the specified position id in the NEXT population.
+    /// Retrieve a reference to the organsim at the specified cell id in the NEXT population.
     /// Will trip assert if cell is not occupied.
     org_t & GetNextOrg(size_t id) {
       emp_assert(id < pops[1].size());         // Next pop must be large enough.
@@ -391,13 +390,13 @@ namespace mabe {
     void Reset() { Clear(); update = 0; }
 
     /// Swap the IDs of two organisms.
-    void Swap(EvolverID pos1, EvolverID pos2) {
-      std::swap(pops(pos1), pops(pos2));
-      on_swap_sig.Trigger(pos1, pos2);
+    void Swap(EvolverID id1, EvolverID id2) {
+      std::swap(pops(id1), pops(id2));
+      on_swap_sig.Trigger(id1, id2);
     }
 
     /// Change the size of the population.  If the new size is smaller than the old, remove any
-    /// organisms outside the new range.  If larger, new positions are empty.
+    /// organisms outside the new range.  If larger, new cells are empty.
     void Resize(size_t new_size) {
       for (size_t i = new_size; i < pops[0].size(); i++) RemoveOrgAt(i); // Remove orgs past new size.
       pops[0].resize(new_size, nullptr);                                 // Default new orgs to null.
@@ -418,33 +417,33 @@ namespace mabe {
 
     /// AddOrgAt is the core function to add organisms to the population (others must go through here)
     /// Note: This function ignores population structure, so requires you to manage your own structure.
-    void AddOrgAt(org_ptr_t new_org, EvolverID pos, EvolverID p_pos=EvolverID());
+    void AddOrgAt(org_ptr_t new_org, EvolverID id, EvolverID p_id=EvolverID());
 
     /// RemoveOrgAt is the core function to remove organisms from the population.
     /// Note: This function ignores population structure, so requires you to manage your own structure.
-    void RemoveOrgAt(EvolverID pos);
+    void RemoveOrgAt(EvolverID id);
 
     /// Inject an organism using the default injection scheme.
     void Inject(org_ptr_t new_org, size_t copy_count=1);
     void Inject(org_t & org, size_t copy_count=1) { Inject(org.Clone(), copy_count); }
 
-    /// Inject an organism at a specific position.
-    void InjectAt(org_ptr_t new_org, const EvolverID pos);
-    void InjectAt(org_t & org, const EvolverID pos) { InjectAt(org.Clone(), pos); }
+    /// Inject an organism at a specific cell id.
+    void InjectAt(org_ptr_t new_org, const EvolverID id);
+    void InjectAt(org_t & org, const EvolverID id) { InjectAt(org.Clone(), id); }
 
-    /// Place one or more copies of an offspring into population; return position of last placed.
-    EvolverID DoBirth(org_ptr_t parent, size_t parent_pos, size_t copy_count=1);
+    /// Place one or more copies of an offspring into population; return id of last placed.
+    EvolverID DoBirth(org_ptr_t parent, size_t parent_id, size_t copy_count=1);
 
-    // Kill off organism at the specified position (same as RemoveOrgAt, but callable externally)
-    void DoDeath(const EvolverID pos) { RemoveOrgAt(pos); }
+    // Kill off organism at the specified ID (same as RemoveOrgAt, but callable externally)
+    void DoDeath(const EvolverID id) { RemoveOrgAt(id); }
 
 
     /// Get the id of a random *occupied* cell.
     size_t GetRandomOrgID() {
       emp_assert(num_orgs > 0); // Make sure it's possible to find an organism!
-      size_t pos = random.GetUInt(0, active_pop.size());
-      while (active_pop[pos] == nullptr) pos = random.GetUInt(0, active_pop.size());
-      return pos;
+      size_t id = random.GetUInt(0, active_pop.size());
+      while (active_pop[id] == nullptr) id = random.GetUInt(0, active_pop.size());
+      return id;
     }
 
     /// Get an organism from a random occupied cell.
@@ -557,54 +556,54 @@ namespace mabe {
   // ===                                                       ===
   // =============================================================
 
-  void EvolverBase::AddOrgAt(org_ptr_t new_org, EvolverID pos, EvolverID p_pos) {
+  void EvolverBase::AddOrgAt(org_ptr_t new_org, EvolverID id, EvolverID p_id) {
     emp_assert(new_org);         // The new organism must exist.
-    emp_assert(pos.IsValid());   // Position must be legal.
+    emp_assert(id.IsValid());   // Position must be legal.
 
     // If new organism is going into the active population, trigger signal before doing so.
-    if (pos.IsActive()) { before_placement_sig.Trigger(*new_org, pos.GetIndex()); }
+    if (id.IsActive()) { before_placement_sig.Trigger(*new_org, id.GetIndex()); }
 
     // for (Ptr<SystematicsBase<ORG> > s : systematics) {
-    //   s->SetNextParent((int) p_pos.GetIndex());
+    //   s->SetNextParent((int) p_id.GetIndex());
     // }
 
-    // Clear out any old organism at this position.
-    RemoveOrgAt(pos);
+    // Clear out any old organism at this cell id.
+    RemoveOrgAt(id);
 
-    pops.MakeValid(pos);                 // Make sure we have room for new organism
-    pops(pos) = new_org;                 // Put org into place.
+    pops.MakeValid(id);                 // Make sure we have room for new organism
+    pops(id) = new_org;                 // Put org into place.
 
     // Track org count
-    if (pos.IsActive()) ++num_orgs;
+    if (id.IsActive()) ++num_orgs;
 
     // Track the new systematics info
     // for (Ptr<SystematicsBase<ORG> > s : systematics) {
-    //   s->AddOrg(*new_org, (int) pos.GetIndex(), (int) update, !pos.IsActive());
+    //   s->AddOrg(*new_org, (int) id.GetIndex(), (int) update, !id.IsActive());
     // }
 
-    // new_org->Setup(pos, random);
+    // new_org->Setup(id, random);
 
     // If new organism is in the active population, trigger associated signal.
-    if (pos.IsActive()) { on_placement_sig.Trigger(pos.GetIndex()); }
+    if (id.IsActive()) { on_placement_sig.Trigger(id.GetIndex()); }
   }
 
-  void EvolverBase::RemoveOrgAt(EvolverID pos) {
-    size_t id = pos.GetIndex();                       // Identify specific index.
-    pop_t & cur_pop = pops[pos.GetPopID()];
-    if (id >= cur_pop.size() || !cur_pop[id]) return; // Nothing to remove!
-    if (pos.IsActive()) on_death_sig.Trigger(id);    // If active, signal that org is about to die.
-    cur_pop[id].Delete();                            // Delete the organism...
-    cur_pop[id] = nullptr;                           // ...and reset the pointer to null
+  void EvolverBase::RemoveOrgAt(EvolverID evo_id) {
+    size_t id = evo_id.GetIndex();                     // Identify specific index.
+    pop_t & cur_pop = pops[evo_id.GetPopID()];
+    if (id >= cur_pop.size() || !cur_pop[id]) return;  // Nothing to remove!
+    if (evo_id.IsActive()) on_death_sig.Trigger(id);   // If active, signal that org is about to die.
+    cur_pop[id].Delete();                              // Delete the organism...
+    cur_pop[id] = nullptr;                             // ...and reset the pointer to null
 
-    if (pos.IsActive()) {
+    if (evo_id.IsActive()) {
       --num_orgs;                                    // Track one fewer organisms in the population
       // if (cache_on) ClearCache(id);                  // Delete any cached info about this organism
       // for (Ptr<SystematicsBase<ORG> > s : systematics) {
-      //   s->RemoveOrg((int) pos.GetIndex());          // Notify systematics about organism removal
+      //   s->RemoveOrg((int) evo_id.GetIndex());          // Notify systematics about organism removal
       // }
     } else {
       // for (Ptr<SystematicsBase<ORG> > s : systematics) {
-      //   s->RemoveNextOrg((int) pos.GetIndex());      // Notify systematics about organism removal
+      //   s->RemoveNextOrg((int) evo_id.GetIndex());      // Notify systematics about organism removal
       // }
     }
   }
@@ -612,36 +611,36 @@ namespace mabe {
   void EvolverBase::Inject(org_ptr_t new_org, size_t copy_count) {
     for (size_t i = 0; i < copy_count; i++) {
       inject_ready_sig.Trigger(*new_org);
-      const EvolverID pos = fun_find_inject_id(new_org);
+      const EvolverID id = fun_find_inject_id(new_org);
 
-      if (pos.IsValid()) AddOrgAt(new_org, pos);  // If placement position is valid, do so!
-      else new_org.Delete();                      // Otherwise delete the organism.
+      if (id.IsValid()) AddOrgAt(new_org, id);  // If placement cell id is valid, do so!
+      else new_org.Delete();                    // Otherwise delete the organism.
     }
   }
 
-  void EvolverBase::InjectAt(org_ptr_t new_org, const EvolverID pos) {
-    emp_assert(pos.IsValid());
+  void EvolverBase::InjectAt(org_ptr_t new_org, const EvolverID id) {
+    emp_assert(id.IsValid());
     inject_ready_sig.Trigger(*new_org);
-    AddOrgAt(new_org, pos);
+    AddOrgAt(new_org, id);
   }
 
-  // Give birth to (potentially) multiple offspring; return position of last placed.
+  // Give birth to (potentially) multiple offspring; return cell id of last placed.
   // Triggers 'before repro' signal on parent (once) and 'offspring ready' on each offspring.
   // Additional signal triggers occur in AddOrgAt.
   // @CAO: NOTE Parent may die during multi-birth; should delay destruction until after DoBirth.
   // @CAO: NOTE That this DoBirth assume asexual reproduction; need another version!
-  EvolverID EvolverBase::DoBirth(org_ptr_t parent_ptr, size_t parent_pos, size_t copy_count) {
-    before_repro_sig.Trigger(parent_pos);
-    EvolverID pos;                                       // Position of each offspring placed.
+  EvolverID EvolverBase::DoBirth(org_ptr_t parent_ptr, size_t parent_id, size_t copy_count) {
+    before_repro_sig.Trigger(parent_id);
+    EvolverID id;                                            // Position of each offspring placed.
     for (size_t i = 0; i < copy_count; i++) {                // Loop through offspring, adding each
       org_ptr_t new_org = parent_ptr->Clone();               // Offspring is initially clone of parent.
-      offspring_ready_sig.Trigger(*new_org, parent_pos);
-      pos = fun_find_birth_id(new_org, parent_pos);
+      offspring_ready_sig.Trigger(*new_org, parent_id);
+      id = fun_find_birth_id(new_org, parent_id);
 
-      if (pos.IsValid()) AddOrgAt(new_org, pos, parent_pos); // If placement pos is valid, do so!
+      if (id.IsValid()) AddOrgAt(new_org, id, parent_id);    // If placement cell id is valid, do so!
       else new_org.Delete();                                 // Otherwise delete the organism.
     }
-    return pos;
+    return id;
   }
 
 
