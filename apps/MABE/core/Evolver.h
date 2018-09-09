@@ -22,6 +22,8 @@
 #include <iostream>
 #include <string>
 
+#include "base/array.h"
+#include "base/assert.h"
 #include "base/Ptr.h"
 #include "base/vector.h"
 #include "config/ArgManager.h"
@@ -29,14 +31,20 @@
 #include "control/Signal.h"
 #include "control/SignalControl.h"
 #include "data/DataFile.h"
+#include "data/Trait.h"
 #include "meta/TypePack.h"
+#include "tools/math.h"
 #include "tools/Random.h"
 #include "tools/tuple_utils.h"
+#include "tools/vector_utils.h"
 
 #include "types.h"
 #include "OrganismBase.h"
 
 namespace mabe {
+
+  template <typename ENV_T> class Evolver;
+
   /// A class to track IDs (and thus vector choice and position) in Evolver.
   /// Note: Organisms may have IDs change during processing, but will remain unique.
 
@@ -65,11 +73,44 @@ namespace mabe {
     EvolverID & MarkInvalid() { index = invalid_id; pop_id = invalid_id; return *this; }
   };
 
-}
 
-#include "World_structure.h"
+  /// A vector that can be indexed with an EvolverID
+  class PopVector : public emp::array<emp::vector< emp::Ptr<mabe::OrganismBase> >, 2> {
+  public:
+    using ptr_t = emp::Ptr<mabe::OrganismBase>;
+    using base_t = emp::array<emp::vector< ptr_t >, 2>;
 
-namespace mabe {
+    /// Test if an id is currently valid.
+    bool IsValid(EvolverID pos) const {
+      const size_t pop_id = pos.GetPopID();
+      const size_t id = pos.GetIndex();
+      emp_assert(pop_id < 2);
+      return id < base_t::operator[](pop_id).size();
+    }
+
+    /// Make sure ID is in vector range; if not expand relevant vector.
+    void MakeValid(EvolverID pos) {
+      emp_assert(pos.IsValid());
+      const size_t pop_id = pos.GetPopID();
+      const size_t id = pos.GetIndex();
+      emp_assert(pop_id < 2);
+      if (id >= base_t::operator[](pop_id).size()) {
+        base_t::operator[](pop_id).resize(id+1);
+      }
+    }
+
+    ptr_t & operator()(EvolverID pos) {
+      const size_t pop_id = pos.GetPopID();
+      const size_t id = pos.GetIndex();
+      return base_t::operator[](pop_id)[id];
+    }
+    const ptr_t & operator()(EvolverID pos) const {
+      const size_t pop_id = pos.GetPopID();
+      const size_t id = pos.GetIndex();
+      return base_t::operator[](pop_id)[id];
+    }
+  };
+
 
   /// A base class for all MABE setup types, containing common functionality and all interfaces.
   class EvolverBase {
@@ -96,7 +137,7 @@ namespace mabe {
     const std::string name;           ///< Unique name for this Evolver instance (for use in configuration.)
     size_t update;                    ///< How many times has Update() been called?
     emp::Random random;               ///< Random object to use.
-    WorldVector pops;                 ///< Set of active [0] and "next" [1] orgs in population.
+    PopVector pops;                   ///< Set of active [0] and "next" [1] orgs in population.
     pop_t & active_pop;               ///< Shortcut to pops[0]
     pop_t & next_pop;                 ///< Shortcut to pops[1]
     size_t num_orgs;                  ///< How many organisms are actually in the population.
