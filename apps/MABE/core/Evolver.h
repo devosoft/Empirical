@@ -81,33 +81,33 @@ namespace mabe {
     using base_t = emp::array<emp::vector< ptr_t >, 2>;
 
     /// Test if an id is currently valid.
-    bool IsValid(EvolverID pos) const {
-      const size_t pop_id = pos.GetPopID();
-      const size_t id = pos.GetIndex();
+    bool IsValid(EvolverID evo_id) const {
+      const size_t pop_id = evo_id.GetPopID();
+      const size_t index = evo_id.GetIndex();
       emp_assert(pop_id < 2);
-      return id < base_t::operator[](pop_id).size();
+      return index < base_t::operator[](pop_id).size();
     }
 
     /// Make sure ID is in vector range; if not expand relevant vector.
-    void MakeValid(EvolverID pos) {
-      emp_assert(pos.IsValid());
-      const size_t pop_id = pos.GetPopID();
-      const size_t id = pos.GetIndex();
+    void MakeValid(EvolverID evo_id) {
+      emp_assert(evo_id.IsValid());
+      const size_t pop_id = evo_id.GetPopID();
+      const size_t index = evo_id.GetIndex();
       emp_assert(pop_id < 2);
-      if (id >= base_t::operator[](pop_id).size()) {
-        base_t::operator[](pop_id).resize(id+1);
+      if (index >= base_t::operator[](pop_id).size()) {
+        base_t::operator[](pop_id).resize(index+1);
       }
     }
 
-    ptr_t & operator()(EvolverID pos) {
-      const size_t pop_id = pos.GetPopID();
-      const size_t id = pos.GetIndex();
-      return base_t::operator[](pop_id)[id];
+    ptr_t & operator()(EvolverID evo_id) {
+      const size_t pop_id = evo_id.GetPopID();
+      const size_t index = evo_id.GetIndex();
+      return base_t::operator[](pop_id)[index];
     }
-    const ptr_t & operator()(EvolverID pos) const {
-      const size_t pop_id = pos.GetPopID();
-      const size_t id = pos.GetIndex();
-      return base_t::operator[](pop_id)[id];
+    const ptr_t & operator()(EvolverID evo_id) const {
+      const size_t pop_id = evo_id.GetPopID();
+      const size_t index = evo_id.GetIndex();
+      return base_t::operator[](pop_id)[index];
     }
   };
 
@@ -169,13 +169,13 @@ namespace mabe {
     using fun_print_org_t = std::function<void(org_t&, std::ostream &)>;
     fun_print_org_t fun_print_org;
 
-    /// Function type for injecting organisms (returns inject position)
-    using fun_find_inject_pos_t = std::function<EvolverID(org_ptr_t)>;
-    fun_find_inject_pos_t fun_find_inject_pos;
+    /// Function type for injecting organisms (returns inject EvolverID)
+    using fun_find_inject_id_t = std::function<EvolverID(org_ptr_t)>;
+    fun_find_inject_id_t fun_find_inject_id;
 
-    /// Function type for adding a newly born organism (returns birth position)
-    using fun_find_birth_pos_t  = std::function<EvolverID(org_ptr_t, EvolverID)>;
-    fun_find_birth_pos_t fun_find_birth_pos;
+    /// Function type for adding a newly born organism (returns birth EvolverID)
+    using fun_find_birth_id_t  = std::function<EvolverID(org_ptr_t, EvolverID)>;
+    fun_find_birth_id_t fun_find_birth_id;
 
     /// Function type for determining picking and killing an organism (returns newly empty position)
     using fun_kill_org_t = std::function<EvolverID()>;
@@ -194,7 +194,7 @@ namespace mabe {
     // == Signals ==
     emp::SignalControl control;  // Setup Evolver to control various signals.
     
-    /// Trigger signal... before organism gives birth w/parent position.
+    /// Trigger signal... before organism gives birth w/parent EvolverID.
     emp::Signal<void(size_t)> before_repro_sig;
     
     /// Trigger signal... when offspring organism is built.
@@ -215,7 +215,7 @@ namespace mabe {
     /// Trigger signal... immediately before any organism dies.
     emp::Signal<void(size_t)> on_death_sig;
     
-    /// Trigger signal... after org positions are swapped
+    /// Trigger signal... if org EvolverIDs are swapped
     emp::Signal<void(EvolverID,EvolverID)> on_swap_sig;
     
     /// Trigger signal... in the Evolver destructor.
@@ -319,7 +319,7 @@ namespace mabe {
 
 
     /// Does the specified cell ID have an organism in it?
-    bool IsOccupied(EvolverID pos) const { return pops.IsValid(pos) && pops(pos); }
+    bool IsOccupied(EvolverID evo_id) const { return pops.IsValid(evo_id) && pops(evo_id); }
 
     /// Are we currently caching fitness values?
     bool IsCacheOn() const { return cache_on; }
@@ -356,7 +356,7 @@ namespace mabe {
       return *(pops[0][id]);
     }
 
-    /// Retrieve a reference to the organsim as the specified position.
+    /// Retrieve a reference to the organsim with the specified id.
     /// Same as operator[]; will trip assert if cell is not occupied.
     org_t & GetOrg(size_t id) {
       emp_assert(id < active_pop.size());         // Pop must be large enough.
@@ -372,7 +372,7 @@ namespace mabe {
     /// not occupied.
     const org_ptr_t GetOrgPtr(size_t id) const { return pops[0][id]; }
 
-    /// Retrieve a reference to the organsim as the specified position in the NEXT population.
+    /// Retrieve a reference to the organsim as the specified position id in the NEXT population.
     /// Will trip assert if cell is not occupied.
     org_t & GetNextOrg(size_t id) {
       emp_assert(id < pops[1].size());         // Next pop must be large enough.
@@ -390,7 +390,7 @@ namespace mabe {
     /// Clear all of the orgs and reset stats.
     void Reset() { Clear(); update = 0; }
 
-    /// Swap the positions of two organisms.
+    /// Swap the IDs of two organisms.
     void Swap(EvolverID pos1, EvolverID pos2) {
       std::swap(pops(pos1), pops(pos2));
       on_swap_sig.Trigger(pos1, pos2);
@@ -612,7 +612,7 @@ namespace mabe {
   void EvolverBase::Inject(org_ptr_t new_org, size_t copy_count) {
     for (size_t i = 0; i < copy_count; i++) {
       inject_ready_sig.Trigger(*new_org);
-      const EvolverID pos = fun_find_inject_pos(new_org);
+      const EvolverID pos = fun_find_inject_id(new_org);
 
       if (pos.IsValid()) AddOrgAt(new_org, pos);  // If placement position is valid, do so!
       else new_org.Delete();                      // Otherwise delete the organism.
@@ -636,7 +636,7 @@ namespace mabe {
     for (size_t i = 0; i < copy_count; i++) {                // Loop through offspring, adding each
       org_ptr_t new_org = parent_ptr->Clone();               // Offspring is initially clone of parent.
       offspring_ready_sig.Trigger(*new_org, parent_pos);
-      pos = fun_find_birth_pos(new_org, parent_pos);
+      pos = fun_find_birth_id(new_org, parent_pos);
 
       if (pos.IsValid()) AddOrgAt(new_org, pos, parent_pos); // If placement pos is valid, do so!
       else new_org.Delete();                                 // Otherwise delete the organism.
