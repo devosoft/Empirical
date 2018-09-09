@@ -36,7 +36,7 @@ namespace mabe {
 
     void SetFitFun( fit_fun_t in_fun ) { fit_fun = in_fun; }
 
-    void RunTournament(MABEBase & world, size_t t_size, size_t tourny_count=1) {
+    void RunTournament(EvolverBase & world, size_t t_size, size_t tourny_count=1) {
       const size_t fitness_id = world.GetOrgDataID("fitness");
 
       emp::vector<size_t> entries;
