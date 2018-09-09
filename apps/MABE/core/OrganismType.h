@@ -150,7 +150,7 @@ namespace mabe {
     constexpr size_t GetNumGenomes() const { return genome_types_t::GetSize(); }
     constexpr size_t GetNumBrains() const { return brain_types_t::GetSize(); }
 
-    void Setup(MABEBase & mabe) override {
+    void Setup(EvolverBase & mabe) override {
       default_org_data = mabe.GetOrgDataBlob();
     }
 

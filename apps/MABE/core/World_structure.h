@@ -24,9 +24,9 @@
 
 namespace mabe {
 
-  template <typename ENV_T> class MABE;
+  template <typename ENV_T> class Evolver;
 
-  /// A class to track positions in MABE.
+  /// A class to track positions in Evolver.
   /// For the moment, the only informaiton beyond index is active (vs. next) population when
   /// using synchronous generations.
   //
