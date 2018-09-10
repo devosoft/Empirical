@@ -1,0 +1,25 @@
+Empower is a scripting language built inside of Empirical to simplify and the use of fast
+run-time interpreting.
+
+To use:
+
+ Build an instance of Empower to setup an interpreted instance.  For the examples below,
+ we will assume the instance is called 'empower'.
+
+ Variables are of type Empower::Var
+ - build with: Empower::Var myvar = empower.NewVar<type>("name", value);
+
+ Variables can always be retrieved by name
+ - Example:  Empower::Var myvar empower.GetVar("name");
+
+ Functions are of type Empower::Fun
+ - build with: auto myfun = empower.NewFun<function sig>("name", functor);
+
+ Call functions as normal, mixing real variables and empower variaables
+ - Example:  auto result = myfun(myvar, 7, myvar2);
+
+ Either functions or variables can be restored using the Restore() function that specifies type.
+ - Example:  int value = myvar.Restore<int>();
+
+ Convert() does a (slower) conversion when you don't know the exact type.
+ - Example:  double value = myvar.Convert<int>();
