@@ -29,6 +29,8 @@ namespace emp {
     using byte_t = unsigned char;
     using memory_t = emp::vector<byte_t>;
 
+    static constexpr size_t undefined_id = (size_t) -1;
+
     /// A MemoryImage is a full set of variable values stored in an Empower instance.
     class MemoryImage {
     private:
@@ -50,7 +52,8 @@ namespace emp {
       size_t info_id;                 ///< Which variable ID is this var associated with?
       emp::Ptr<MemoryImage> mem_ptr;  ///< Which memory image is variable using (by default)
     public:
-      Var() : info_id(0) { ; }
+      Var(size_t _id, MemoryImage & mem) : info_id(_id), mem_ptr(&mem) { ; }
+      Var(const Var &) = default;
     };
 
   protected:
@@ -84,23 +87,43 @@ namespace emp {
     std::map<std::string, size_t> type_map;  ///< Map type names (from typeid) to index in types
 
   public:
-    Empower() : memory() { ; }
+    Empower() : memory(), vars(), types(), var_map(), type_map() { ; }
     ~Empower() { ; }
 
+    /// Convert a type (provided as a template argument) to its index in types vector.
+    /// If type is not already in Empower, add it.
     template <typename T>
-    void AddType() {
+    size_t GetTypeID() {
       using base_t = typename std::decay<T>::type;
 
       // size_t type_hash = typeid(T).hash_code();
       std::string type_name = typeid(base_t).name();
 
       // If this type already exists stop here!
-      if (emp::Has(type_map, type_name)) return;
+      auto type_it = type_map.find(type_name);
+      if (type_it != type_map.end()) return type_it->second;
 
       size_t type_id = types.size();
-      size_T mem_size = sizeof(base_t);
+      size_t mem_size = sizeof(base_t);
       types.emplace_back(type_id, type_name, mem_size);
       type_map[type_name] = type_id;
+
+      return type_id;
+    }
+
+    template <typename T, typename... ARGS>
+    Var NewVar(const std::string & name, ARGS... args) {
+      size_t type_id = GetTypeID<T>();                ///< Get ID for type (create if needed)
+      TypeInfo & type_info = types[type_id];          ///< Create ref to type info for easy access.
+      site_t var_id = vars.size();                    ///< New var details go at end of var vector.
+      size_t mem_start = memory.size();               ///< Start new var at current end of memory.
+      vars.emplace_back(type_id, name, mem_start);    ///< Add this VarInfo to our records.
+      memory.resize(mem_start + type_info.mem_size);  ///< Resize memory to fit new variable.
+
+      /// Construct new variable contents in place, where space was allocated.
+      new (&memory[mem_start]) T(std::forward<ARGS>(args)...);
+
+      return Var(var_id, memory);
     }
   };
 
