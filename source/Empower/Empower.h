@@ -27,14 +27,13 @@ namespace emp {
   class Empower {
   public:
     using byte_t = unsigned char;
-    using memory_t = emp::vector<byte_t>;
 
     static constexpr size_t undefined_id = (size_t) -1;
 
     /// A MemoryImage is a full set of variable values stored in an Empower instance.
     class MemoryImage {
     private:
-      memory_t memory;                 ///< The specific memory values.
+      emp::vector<byte_t> memory;     ///< The specific memory values.
       emp::Ptr<Empower> empower_ptr;   ///< A pointer back to Empower instance this memory uses.
 
     public:
@@ -42,8 +41,13 @@ namespace emp {
       MemoryImage(const MemoryImage &) = default;
       MemoryImage(MemoryImage &&) = default;
 
-      const memory_t & GetMemory() const { return memory; }
+      const emp::vector<byte_t> & GetMemory() const { return memory; }
       const emp::Ptr<Empower> GetEmpowerPtr() const { return empower_ptr; }
+
+      byte_t & operator[](size_t pos) { return memory[pos]; }
+      const byte_t & operator[](size_t pos) const { return memory[pos]; }
+      size_t size() const { return memory.size(); }
+      void resize(size_t new_size) { memory.resize(new_size); }
     };
 
     /// A Var is an internal variable that has a run-time determined type (which is tracked).
@@ -63,6 +67,9 @@ namespace emp {
       size_t type_id;          ///< What type is this variable?
       std::string var_name;    ///< What is the unique name for this variable?
       size_t mem_pos;          ///< Where in memory is this variable stored?
+
+      VarInfo(size_t _id, const std::string & _name, size_t _pos)
+       : type_id(_id), var_name(_name), mem_pos(_pos) { ; }
     };
 
     /// Information about a single type used in Empower.
@@ -79,7 +86,7 @@ namespace emp {
        : type_id(_id), type_name(_name), mem_size(_size) { ; }
     };
 
-    memory_t memory;  /// The default memory image.
+    MemoryImage memory;  /// The default memory image.
     emp::vector<VarInfo> vars;
     emp::vector<TypeInfo> types;
 
@@ -87,7 +94,7 @@ namespace emp {
     std::map<std::string, size_t> type_map;  ///< Map type names (from typeid) to index in types
 
   public:
-    Empower() : memory(), vars(), types(), var_map(), type_map() { ; }
+    Empower() : memory(this), vars(), types(), var_map(), type_map() { ; }
     ~Empower() { ; }
 
     /// Convert a type (provided as a template argument) to its index in types vector.
@@ -115,7 +122,7 @@ namespace emp {
     Var NewVar(const std::string & name, ARGS... args) {
       size_t type_id = GetTypeID<T>();                ///< Get ID for type (create if needed)
       TypeInfo & type_info = types[type_id];          ///< Create ref to type info for easy access.
-      site_t var_id = vars.size();                    ///< New var details go at end of var vector.
+      size_t var_id = vars.size();                    ///< New var details go at end of var vector.
       size_t mem_start = memory.size();               ///< Start new var at current end of memory.
       vars.emplace_back(type_id, name, mem_start);    ///< Add this VarInfo to our records.
       memory.resize(mem_start + type_info.mem_size);  ///< Resize memory to fit new variable.
