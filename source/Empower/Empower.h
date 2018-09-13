@@ -64,7 +64,8 @@ namespace emp {
       T & Restore() {
         // Make sure function is restoring the correct type.
         emp_assert( mem_ptr->GetEmpowerPtr()->vars[info_id].type_id == mem_ptr->GetEmpowerPtr()->GetTypeID<T>() );
-        return *((T*) &(mem_ptr[mem_pos]));
+        MemoryImage & mem_ref = *mem_ptr;
+        return *((T*) &(mem_ref[mem_pos]));
       }
     };
 
@@ -126,17 +127,18 @@ namespace emp {
       return type_id;
     }
 
-    template <typename T, typename... ARGS>
-    Var NewVar(const std::string & name, ARGS... args) {
+    template <typename T>
+    Var NewVar(const std::string & name, const T & value) {
       size_t type_id = GetTypeID<T>();                ///< Get ID for type (create if needed)
       TypeInfo & type_info = types[type_id];          ///< Create ref to type info for easy access.
       size_t var_id = vars.size();                    ///< New var details go at end of var vector.
       size_t mem_start = memory.size();               ///< Start new var at current end of memory.
       vars.emplace_back(type_id, name, mem_start);    ///< Add this VarInfo to our records.
       memory.resize(mem_start + type_info.mem_size);  ///< Resize memory to fit new variable.
+      var_map[name] = var_id;                         ///< Link the name of this variable to id.
 
       /// Construct new variable contents in place, where space was allocated.
-      new (&memory[mem_start]) T(std::forward<ARGS>(args)...);
+      *((T*) (&memory[mem_start])) = value;
 
       return Var(var_id, mem_start, memory);
     }
