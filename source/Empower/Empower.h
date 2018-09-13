@@ -54,10 +54,18 @@ namespace emp {
     class Var {
     private:
       size_t info_id;                 ///< Which variable ID is this var associated with?
+      size_t mem_pos;                 ///< Where is this variable in a memory image?
       emp::Ptr<MemoryImage> mem_ptr;  ///< Which memory image is variable using (by default)
     public:
-      Var(size_t _id, MemoryImage & mem) : info_id(_id), mem_ptr(&mem) { ; }
+      Var(size_t _id, size_t _pos, MemoryImage & mem) : info_id(_id), mem_ptr(&mem) { ; }
       Var(const Var &) = default;
+
+      template <typename T>
+      T & Restore() {
+        // Make sure function is restoring the correct type.
+        emp_assert( mem_ptr->GetEmpowerPtr()->vars[info_id].type_id == mem_ptr->GetEmpowerPtr()->GetTypeID<T>() );
+        return *((T*) &(mem_ptr[mem_pos]));
+      }
     };
 
   protected:
@@ -130,7 +138,7 @@ namespace emp {
       /// Construct new variable contents in place, where space was allocated.
       new (&memory[mem_start]) T(std::forward<ARGS>(args)...);
 
-      return Var(var_id, memory);
+      return Var(var_id, mem_start, memory);
     }
   };
 
