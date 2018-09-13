@@ -13,6 +13,8 @@ int main()
 {
   emp::Empower empower;
 
-  empower.NewVar<int>("test", 5);
+  auto var = empower.NewVar<int>("test", 5);
+  int x = var.Restore<int>();
+  std::cout << "x = " << x << std::endl;
 }
 
