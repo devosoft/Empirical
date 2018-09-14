@@ -21,6 +21,7 @@
 
 #include "../base/Ptr.h"
 #include "../base/vector.h"
+#include "../tools/debug.h"
 
 namespace emp {
 
@@ -42,7 +43,11 @@ namespace emp {
       MemoryImage(MemoryImage &&) = default;
 
       const emp::vector<byte_t> & GetMemory() const { return memory; }
-      const emp::Ptr<Empower> GetEmpowerPtr() const { return empower_ptr; }
+      Empower & GetEmpower() { return *empower_ptr; }
+      const Empower & GetEmpower() const { return *empower_ptr; }
+
+      template <typename T> emp::Ptr<T> GetPtr(size_t pos) { return (T*) (&memory[pos]); }
+      template <typename T> T & GetRef(size_t pos) { return *((T*) (&memory[pos])); }
 
       byte_t & operator[](size_t pos) { return memory[pos]; }
       const byte_t & operator[](size_t pos) const { return memory[pos]; }
@@ -63,9 +68,8 @@ namespace emp {
       template <typename T>
       T & Restore() {
         // Make sure function is restoring the correct type.
-        emp_assert( mem_ptr->GetEmpowerPtr()->vars[info_id].type_id == mem_ptr->GetEmpowerPtr()->GetTypeID<T>() );
-        MemoryImage & mem_ref = *mem_ptr;
-        return *((T*) &(mem_ref[mem_pos]));
+        emp_assert( mem_ptr->GetEmpower().vars[info_id].type_id == mem_ptr->GetEmpower().GetTypeID<T>() );
+        return mem_ptr->GetRef<T>(mem_pos);
       }
     };
 
