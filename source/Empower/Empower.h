@@ -62,11 +62,14 @@ namespace emp {
       size_t mem_pos;                 ///< Where is this variable in a memory image?
       emp::Ptr<MemoryImage> mem_ptr;  ///< Which memory image is variable using (by default)
     public:
-      Var(size_t _id, size_t _pos, MemoryImage & mem) : info_id(_id), mem_ptr(&mem) { ; }
+      Var(size_t _id, size_t _pos, MemoryImage & mem) : info_id(_id), mem_pos(_pos), mem_ptr(&mem) { ; }
       Var(const Var &) = default;
 
       template <typename T>
       T & Restore() {
+        // std::cout << "Running restore on var #" << info_id
+        //           << " at mem position " << mem_pos << std::endl;
+
         // Make sure function is restoring the correct type.
         emp_assert( mem_ptr->GetEmpower().vars[info_id].type_id == mem_ptr->GetEmpower().GetTypeID<T>() );
         return mem_ptr->GetRef<T>(mem_pos);
@@ -142,7 +145,8 @@ namespace emp {
       var_map[name] = var_id;                         ///< Link the name of this variable to id.
 
       /// Construct new variable contents in place, where space was allocated.
-      *((T*) (&memory[mem_start])) = value;
+      // *((T*) (&memory[mem_start])) = value;
+      memory.GetRef<T>(mem_start) = value;
 
       return Var(var_id, mem_start, memory);
     }
