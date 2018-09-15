@@ -10,6 +10,8 @@
  *  run-time interpreting.  Internally, and Empower object will track all of the types used and 
  *  all of the variables declared, ensuring that they interact correctly.
  * 
+ *  Developer Notes:
+ *  - Can have multiple memory spaces in Empower; basically scopes or namespaces.
  */
 
 #ifndef EMP_EMPOWER_H
@@ -145,8 +147,8 @@ namespace emp {
       var_map[name] = var_id;                         ///< Link the name of this variable to id.
 
       /// Construct new variable contents in place, where space was allocated.
-      // *((T*) (&memory[mem_start])) = value;
-      memory.GetRef<T>(mem_start) = value;
+      new (memory.GetPtr<T>(mem_start)) T(value);
+
 
       return Var(var_id, mem_start, memory);
     }
