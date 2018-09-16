@@ -893,6 +893,32 @@ TEST_CASE("Test math", "[tools]")
   REQUIRE(SztMeanUnbiasedDivide((size_t)6,(size_t)3,100) == 2);
   REQUIRE(SztMeanUnbiasedDivide((size_t)7,(size_t)3,100) == 2);
 
+  REQUIRE(emp::Sgn(1) == 1);
+  REQUIRE(emp::Sgn(2) == 1);
+  REQUIRE(emp::Sgn(3) == 1);
+  REQUIRE(emp::Sgn(102) == 1);
+  REQUIRE(emp::Sgn(0) == 0);
+  REQUIRE(emp::Sgn(-1) == -1);
+  REQUIRE(emp::Sgn(-2) == -1);
+  REQUIRE(emp::Sgn(-3) == -1);
+  REQUIRE(emp::Sgn(-102) == -1);
+
+  REQUIRE(emp::Sgn((size_t)1) == 1);
+  REQUIRE(emp::Sgn((size_t)2) == 1);
+  REQUIRE(emp::Sgn((size_t)3) == 1);
+  REQUIRE(emp::Sgn((size_t)102) == 1);
+  REQUIRE(emp::Sgn((size_t)0) == 0);
+
+  REQUIRE(emp::Sgn(1.0) == 1);
+  REQUIRE(emp::Sgn(2.1) == 1);
+  REQUIRE(emp::Sgn(3.0) == 1);
+  REQUIRE(emp::Sgn(102.5) == 1);
+  REQUIRE(emp::Sgn(0.0) == 0);
+  REQUIRE(emp::Sgn(-1.0) == -1);
+  REQUIRE(emp::Sgn(-2.1) == -1);
+  REQUIRE(emp::Sgn(-3.0) == -1);
+  REQUIRE(emp::Sgn(-102.5) == -1);
+
 }
 
 

@@ -38,6 +38,11 @@ namespace emp {
     return (remain < 0.0) ? (remain + mod_val) : remain;
   }
 
+  /// Calculate the sign (i.e., +1, -1, or 0) of a value.
+  template <typename T> inline int Sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+  }
+
   /// Find the absolute value for any variable.
   template <typename T> constexpr T Abs(T in) { return (in > 0) ? in : (-in); }
 
