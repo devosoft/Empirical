@@ -18,6 +18,7 @@
 
 #include "../base/assert.h"
 #include "../meta/reflection.h"
+#include "Random.h"
 #include "const.h"
 
 namespace emp {
@@ -37,8 +38,76 @@ namespace emp {
     return (remain < 0.0) ? (remain + mod_val) : remain;
   }
 
+  /// Calculate the sign (i.e., +1, -1, or 0) of a value.
+  template <typename T> inline int Sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+  }
+
   /// Find the absolute value for any variable.
   template <typename T> constexpr T Abs(T in) { return (in > 0) ? in : (-in); }
+
+  /// Divide one integer by another, rounding towards minus infinity.
+  int inline FloorDivide(int dividend, int divisor) {
+    int q = dividend/divisor;
+    int r = dividend%divisor;
+    if ((r!=0) && ((r<0) != (divisor<0))) --q;
+    return q;
+  }
+
+  /// Default integer division is truncated, not rounded.
+  /// Round the division result instead of truncating it.
+  /// Rounding ties (i.e., result % divisor == 0.5) are rounded up.
+  int inline RoundedDivide(int dividend, int divisor) {
+    //TODO add emp_assert to check for overflow
+    emp_assert(divisor != 0);
+    // adding divisor/2 to dividend
+    // is equivalent to adding 1/2 to the result
+    return FloorDivide(dividend + divisor / 2, divisor);
+  }
+
+  /// Default integer division is truncated, not rounded.
+  /// Round the division result instead of truncating it.
+  /// Rounding ties (i.e., result % divisor == 0.5)
+  /// will be rounded up.
+  size_t inline RoundedDivide(size_t dividend, size_t divisor) {
+    //TODO add emp_assert to check for overflow
+    emp_assert(divisor != 0);
+    // adding divisor/2 to dividend
+    // is equivalent to adding 1/2 to the result
+    return (dividend + divisor / 2) / divisor;
+  }
+
+  /// Regular integer division is truncated, not rounded.
+  /// Round the division result instead of truncating it.
+  /// Rounding ties (i.e., result % divisor == 0.5) are broken
+  /// by coin toss.
+  int inline UnbiasedDivide(int dividend, int divisor, emp::Random& r) {
+    //TODO add emp_assert to check for overflow
+    int res = RoundedDivide(dividend, divisor);
+    // if dividend/divisor % 1 == 0.5...
+    if (Abs(dividend % divisor) * 2 == Abs(divisor)) {
+      // ... by default, the result is rounded up;
+      // with 1/2 probability round down instead
+      res -= r.GetInt(2);
+    }
+    return res;
+  }
+
+  /// Regular integer division is truncated, not rounded.
+  /// Round the division result instead of truncating it.
+  /// Rounding ties (i.e., result % divisor == 0.5) are broken
+  /// by coin toss.
+  inline size_t UnbiasedDivide(size_t dividend, size_t divisor, emp::Random& r) {
+    //TODO add emp_assert to check for overflow
+    size_t res = RoundedDivide(dividend, divisor);
+    // if dividend/divisor % 1 == 0.5...
+    if ((dividend % divisor) * 2 == divisor) {
+      // ... by default, the result is rounded up;
+      // with 1/2 probability round down instead
+      res -= r.GetInt(2);
+    }
+    return res;
+  }
 
   /// Run both min and max on a value to put it into a desired range.
   template <typename TYPE> constexpr TYPE ToRange(const TYPE & value, const TYPE & in_min, const TYPE & in_max) {
@@ -227,7 +296,6 @@ namespace emp {
     }
     return *max_found;
   }
-
 
 }
 
