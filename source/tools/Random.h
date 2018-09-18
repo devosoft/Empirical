@@ -325,40 +325,65 @@ namespace emp {
      * Generate a random variable drawn from a Binomial distribution.
      *
      * This function is exact, but slow.
-     * @see Random::GetRandBinomial
+     * @see Random::GetApproxRandBinomial
+     * @see emp::Binomial in source/tools/Binomial.h
      **/
     inline uint32_t GetFullRandBinomial(const double n, const double p) { // Exact
       emp_assert(p >= 0.0 && p <= 1.0, p);
-      // Actually try n Bernoulli events with probability p
+      emp_assert(n >= 0.0, n);
+      // Actually try n Bernoulli events, each with probability p
       uint32_t k = 0;
       for (uint32_t i = 0; i < n; ++i) if (P(p)) k++;
       return k;
     }
 
+
     /**
      * Generate a random variable drawn from a Binomial distribution.
      *
      * This function is faster than @ref Random::GetFullRandBinomial(), but
-     * uses some approximations.
+     * uses some approximations.  Note that for repeated calculations with
+     * the same n and p, the Binomial class provides a much faster and more
+     * exact interface.
      *
      * @see Random::GetFullRandBinomial
+     * @see emp::Binomial in source/tools/Binomial.h
      **/
-    inline uint32_t GetRandBinomial(const double n, const double p) { // Approx
+    inline uint32_t GetApproxRandBinomial(const double n, const double p) { // Approx
       emp_assert(p >= 0.0 && p <= 1.0, p);
       emp_assert(n >= 0.0, n);
       // Approximate Binomial if appropriate
-      // if np(1-p) is large, use a Normal approx
-      if (n * p * (1 - p) >= _BINOMIAL_TO_NORMAL) {
-        return static_cast<uint32_t>(GetRandNormal(n * p, n * p * (1 - p)) + 0.5);
-      }
-      // elseif n is large, use a Poisson approx
+
+      // if np(1-p) is large, we might be tempted to use a Normal approx, but it is giving poor results.
+      // if (n * p * (1 - p) >= _BINOMIAL_TO_NORMAL) {
+      //   return static_cast<uint32_t>(GetRandNormal(n * p, n * p * (1 - p)) + 0.5);
+      // }
+
+      // If n is large, use a Poisson approx
       if (n >= _BINOMIAL_TO_POISSON) {
         uint32_t k = GetRandPoisson(n, p);
         if (k < UINT_MAX) return k; // if approx worked
       }
+
       // otherwise, actually generate the randBinomial
       return GetFullRandBinomial(n, p);
     }
+
+    /**
+     * By default GetRandBinomial calls the full (non-approximation) version.
+     * 
+     * Note that if approximations are okay, they can create a big speedup
+     * for n > 1000.
+     * 
+     * @see Random::GetFullRandBinomial
+     * @see Random::GetApproxRandBinomial
+     * @see emp::Binomial in source/tools/Binomial.h
+     **/
+
+    inline uint32_t GetRandBinomial(const double n, const double p) {
+      return GetFullRandBinomial(n,p);
+    }
+
   };
 
 
