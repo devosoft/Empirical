@@ -48,7 +48,6 @@ namespace mabe {
     }
 
     static constexpr mabe::ModuleType GetModuleType() { return ModuleType::ENVIRONMENT; }
-
   };
 
 }

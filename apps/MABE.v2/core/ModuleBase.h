@@ -18,9 +18,9 @@
  * 
  *  The author of a new MABE module *may* also choose to override:
  * 
- *    Setup(EvolverBase &)
- *      As modules are created, they will be given the opportunity to modify Evolver settings,
- *      module settings, or attach to Evolver signals, as needed.
+ *    Setup(World &)
+ *      As modules are created, they will be given the opportunity to modify world settings,
+ *      module settings, or attach to world signals, as needed.
  *    
  */
 
@@ -37,8 +37,8 @@ namespace mabe {
     NONE=0, BASE, ENVIRONMENT, ORGANISM_TYPE, SCHEMA, UNKNOWN
   };
 
-  /// Allow modules to know about the eventual existance for the EvolverBase object.
-  class EvolverBase;
+  /// Allow modules to know about the eventual existance for the world object.
+  class World;
 
   /// Base class for all major MABE modules that can receive names.
   class ModuleBase {
@@ -63,9 +63,9 @@ namespace mabe {
     /// (and empty emp::Config can be returned if there really are no config parameters.)
     virtual emp::Config & GetConfig() = 0;
 
-    /// After config is finalized, modules will be provided with an Evolver object.  This function
-    /// should be used to configure Evolver, to configure the module, or link up signals.
-    virtual void Setup(EvolverBase &) { ; }
+    /// After config is finalized, modules will be provided with a World object.  This function
+    /// should be used to configure world, to configure the module, or link up signals.
+    virtual void Setup(World &) { ; }
 
   };
 

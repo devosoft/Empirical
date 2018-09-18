@@ -17,9 +17,9 @@
 #include "meta/TypePack.h"
 #include "tools/GenericFunction.h"
 
-#include "../core/BrainTypeBase.h"
+#include "../core/BrainBase.h"
 #include "../core/EnvironmentBase.h"
-#include "../core/GenomeTypeBase.h"
+#include "../core/GenomeBase.h"
 #include "../core/OrganismBase.h"
 #include "../core/OrganismTypeBase.h"
 #include "../core/SchemaBase.h"
@@ -28,8 +28,8 @@ namespace mabe {
 
   template <typename T> using is_module        = std::is_base_of<ModuleBase, T>;
 
-  template <typename T> using is_genome_type   = std::is_base_of<GenomeTypeBase, T>;
-  template <typename T> using is_brain_type    = std::is_base_of<BrainTypeBase, T>;
+  template <typename T> using is_genome        = std::is_base_of<GenomeBase, T>;
+  template <typename T> using is_brain         = std::is_base_of<BrainBase, T>;
 
   template <typename T> using is_environment   = std::is_base_of<EnvironmentBase, T>;
   template <typename T> using is_organism_type = std::is_base_of<OrganismTypeBase, T>;

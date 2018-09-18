@@ -10,11 +10,11 @@
 #ifndef MABE_AVIDA_GP_H
 #define MABE_AVIDA_GP_H
 
-#include "core/BrainTypeBase.h"
+#include "core/BrainBase.h"
 
 namespace mabe {
 
-  class AvidaGP : public BrainTypeBase {
+  class AvidaGP : public BrainBase {
   private:
     EMP_BUILD_CONFIG( AvidaGPConfig,
       GROUP(DEFAULT_GROUP, "Vector Genome Settings"),
@@ -30,7 +30,7 @@ namespace mabe {
     std::string GetClassName() const override { return "AvidaGP"; }
     AvidaGPConfig & GetConfig() override { return config; }
 
-    struct brain_t {
+    struct compute_t {
     };
   };
 

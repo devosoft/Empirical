@@ -12,17 +12,16 @@
 
 #include "base/vector.h"
 
-#include "core/GenomeTypeBase.h"
+#include "core/GenomeBase.h"
 
 namespace mabe {
 
   template <typename T>
-  class VectorGenome : public GenomeTypeBase {
+  class VectorGenome : public GenomeBase {
   private:
     EMP_BUILD_CONFIG( VGConfig,
       GROUP(DEFAULT_GROUP, "Vector Genome Settings"),
-      VALUE(ALPHABET_SIZE, size_t, 32, "Number of possible values in genome."),
-      VALUE(DEFAULT_LENGTH, size_t, 64, "Default number of sites in a genome"),
+      VALUE(ALPHABET_SIZE, size_t, 2, "Number of possible values in genome."),
       VALUE(MIN_LENGTH, size_t, 1, "Minimum number of sites in a genome."),
       VALUE(MAX_LENGTH, size_t, 1024, "Maximum number of sites in a genome.")
     )
@@ -35,15 +34,7 @@ namespace mabe {
     std::string GetClassName() const override { return "VectorGenome"; }
     VGConfig & GetConfig() override { return config; }
 
-    using genome_t = emp::vector<T>;
-
-    void Randomize(emp::Random & random, genome_t & data) {
-      const size_t genome_size = config.DEFAULT_LENGTH();
-      data.resize(genome_size);
-      for (size_t i = 0; i < genome_size; i++) data[i] = random.GetUInt( config.ALPHABET_SIZE() );
-    }
-
-    void Print(std::ostream & os, genome_t & data) const { os << "No Print Function Available"; }
+    using data_t = emp::vector<T>;
   };
 
 }
