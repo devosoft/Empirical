@@ -105,12 +105,12 @@ namespace mabe {
     MABE_GENOME_TEST_FUN(GetConfig, empty_config, emp::Config);
     MABE_GENOME_TEST_FUN(Randomize, false, bool, emp::Random &);
     MABE_GENOME_TEST_FUN(Print, false, bool);
-    MABE_GENOME_TEST_FUN(OnBeforeRepro, false, bool);              // Genome about to be reproduced.
-    MABE_GENOME_TEST_FUN(OnOffspringReady, false, bool, this_t &); // Genome offspring; arg is parent genome
-    MABE_GENOME_TEST_FUN(OnInjectReady, false, bool);              // Genome about to be injected.
-    MABE_GENOME_TEST_FUN(OnBeforePlacement, false, bool);          // Genome about to be placed
-    MABE_GENOME_TEST_FUN(OnPlacement, false, bool);                // Genome just placed.
-    MABE_GENOME_TEST_FUN(OnOrgDeath, false, bool);                 // Genome about to die.
+    MABE_GENOME_TEST_FUN(OnBeforeRepro, , void);              // Genome about to be reproduced.
+    MABE_GENOME_TEST_FUN(OnOffspringReady, , void, this_t &); // Genome offspring; arg is parent genome
+    MABE_GENOME_TEST_FUN(OnInjectReady, , void);              // Genome about to be injected.
+    MABE_GENOME_TEST_FUN(OnBeforePlacement, , void);          // Genome about to be placed
+    MABE_GENOME_TEST_FUN(OnPlacement, , void);                // Genome just placed.
+    MABE_GENOME_TEST_FUN(OnOrgDeath, , void);                 // Genome about to die.
   };
 
 }
