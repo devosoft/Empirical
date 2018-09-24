@@ -39,6 +39,9 @@
 #define MABE_TYPE_TO_VAL(TYPE) std::declval< TYPE >()
 #define MABE_TYPES_TO_VALS(...) EMP_WRAP_ARGS(MABE_TYPE_TO_VAL, __VA_ARGS__)
 
+#define MABE_TEST_IF_VOID(VAL, ...) EMP_GET_ARG_2( MABE_TEST_IF_VOID__ ## VAL, 0 )
+#define MABE_TEST_IF_VOID__void ~, 1
+
 // Macro to dynamically call a function either in the wrapped type (if it exists)
 // or return the default provided (otherwise).  The first two arguments are the
 // function name and its default return.  The remaining arguments in the ... must
@@ -57,13 +60,26 @@
     static constexpr bool HasFun_ ## NAME() {                                 \
       return emp::test_type<return_t_ ## NAME, GENOME_T>();                   \
     }                                                                         \
-    /* Call the function (if it exists) or return the default (otherwise). */ \
+    /* Call appropriate version of the function.  First determine if there    \
+       is a non-void return type (i.e., do we return th result?) then         \
+       check if we can call the function in the wrapped class (if it          \
+       exists) or should we call/return the default (otherwise).           */ \
     template <typename... Ts>                                                 \
     RETURN_T NAME(Ts &&... args) {                                            \
-      if constexpr (HasFun_ ## NAME()) {                                      \
-        return GENOME_T::NAME( std::forward<Ts>(args)... );                   \
-      }                                                                       \
-      else { return DEFAULT; }                                                \
+      EMP_IF( MABE_TEST_IF_VOID(RETURN_T),                                    \
+        {                                                                     \
+          if constexpr (HasFun_ ## NAME()) {                                  \
+            GENOME_T::NAME( std::forward<Ts>(args)... );                      \
+          }                                                                   \
+          else { DEFAULT; }                                                   \
+        },                                                                    \
+        {                                                                     \
+          if constexpr (HasFun_ ## NAME()) {                                  \
+            return GENOME_T::NAME( std::forward<Ts>(args)... );               \
+          }                                                                   \
+          else { return DEFAULT; }                                            \
+        }                                                                     \
+      )                                                                       \
     }
 
 #define MABE_GENOME_TEST_FUN(NAME, DEFAULT, ...)                                              \
