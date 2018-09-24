@@ -16,6 +16,7 @@ struct TestGenomeB {
 
   std::string GetClassName() const { return "TestGenomeB"; }
   bool Randomize(emp::Random &) { name = "Randomized!"; return true; }
+  void OnBeforeRepro() { name = "BeforeRepro!"; }
 };
 
 
@@ -34,4 +35,7 @@ TEST_CASE("Test GenomeWrapper", "[core]")
   REQUIRE(genB.Randomize(random) == true );
   REQUIRE(genB.name == "Randomized!");
 
+  genA.OnBeforeRepro();
+  genB.OnBeforeRepro();
+  REQUIRE(genB.name == "BeforeRepro!");
 }
