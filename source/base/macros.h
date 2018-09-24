@@ -838,6 +838,15 @@
 #define EMP_REVERSE_ARGS_64(A, ...) EMP_REVERSE_ARGS_63(__VA_ARGS__), A
 /// @endcond
 
+/// Convert a type to an instance of that type by wrapping it in a declval.
+#define EMP_TYPE_TO_VAL(TYPE) std::declval< TYPE >()
+
+/// Convert a set of types to a set of instances by wrapping each of them in declval.
+/// These mock instances of the types can be used in a function call in a decltype.
+#define EMP_TYPES_TO_VALS(...) EMP_WRAP_ARGS(MABE_TYPE_TO_VAL, __VA_ARGS__)
+
+/// Convert a set of types to a set of arguments.  For example EMP_TYPES_TO_ARGS(int, double, bool)
+/// would convert to: int arg1, double arg2, bool arg3
 #define EMP_TYPES_TO_ARGS(...) EMP_ASSEMBLE_MACRO(EMP_TYPES_TO_ARGS_, EMP_REVERSE_ARGS(__VA_ARGS__))
 /// @cond MACROS
 #define EMP_TYPES_TO_ARGS_1(A) A arg1
