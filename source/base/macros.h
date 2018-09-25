@@ -845,7 +845,7 @@
 
 /// Convert a set of types to a set of instances by wrapping each of them in declval.
 /// These mock instances of the types can be used in a function call in a decltype.
-#define EMP_TYPES_TO_VALS(...) EMP_WRAP_ARGS(MABE_TYPE_TO_VAL, __VA_ARGS__)
+#define EMP_TYPES_TO_VALS(...) EMP_WRAP_ARGS(EMP_TYPE_TO_VAL, __VA_ARGS__)
 
 /// Convert a set of types to a set of arguments.  For example EMP_TYPES_TO_ARGS(int, double, bool)
 /// would convert to: int arg1, double arg2, bool arg3
@@ -923,7 +923,6 @@
 /// @cond MACROS
 #define EMP_TEST_IF_VOID__void ~, 1
 /// @endcond
-
 
 
 /// EMP_ASSEMBLE_MACRO takes in a prefix and set of arguments and appends the size of the
