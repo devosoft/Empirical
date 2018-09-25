@@ -47,54 +47,73 @@
 
 #include "meta.h"
 
-#define EMP_BUILD_CONCEPT( NAME, ... )
+#define EMP_BUILD_CONCEPT( NAME, ... )                       \
+  template <typename WRAPPED_T>                              \
+  class ConceptWrapper : public WRAPPED_T {                  \
+    EMP_WRAP_EACH(EMP_BUILD_CONCEPT__PROCESS, __VA_ARGS__)   \
+  };
+
+#define EMP_BUILD_CONCEPT__PROCESS( CMD ) EMP_BUILD_CONCEPT__PROCESS_ ## CMD
+
+#define EMP_BUILD_CONCEPT__PROCESS_REQUIRED_FUN() \
+  protected:
 
 
-// Macro to dynamically call a function either in the wrapped type (if it exists)
-// or return the default provided (otherwise).  The first two arguments are the
-// function name and its default return.  The remaining arguments in the ... must
-// be the return type (required) and all argument types (if any exist)
+/// Macro to dynamically call an OPTIONAL function; it will call the version in the wrapped type
+/// if it exists, or else return the default provided (which can be either a function to call or a
+/// value.  The first two arguments are the function name and its default return.  The remaining
+/// arguments in the ... must be the return type (required) and all argument types (if any exist)
 
-#define MABE_GENOME_TEST_FUN_impl(NAME, DEFAULT, USE_ARGS, RETURN_T, ...)     \
-    /* Determine the return type if we call this function in the base class.  \
-       It should be undefined if the member functon does not exist!        */ \
-    template <typename T>                                                     \
-    using return_t_ ## NAME =                                                 \
-      EMP_IF( USE_ARGS,                                                       \
-        decltype( std::declval<T>().NAME() );,                                \
-        decltype( std::declval<T>().NAME(MABE_TYPES_TO_VALS(__VA_ARGS__)) );  \
-      )                                                                       \
-    /* Test whether function exists, based on SFINAE in using return type. */ \
-    static constexpr bool HasFun_ ## NAME() {                                 \
-      return emp::test_type<return_t_ ## NAME, WRAPPED_T>();                  \
-    }                                                                         \
-    /* Call appropriate version of the function.  First determine if there    \
-       is a non-void return type (i.e., do we return th result?) then         \
-       check if we can call the function in the wrapped class (if it          \
-       exists) or should we call/return the default (otherwise).           */ \
-    template <typename... Ts>                                                 \
-    RETURN_T NAME(Ts &&... args) {                                            \
-      EMP_IF( MABE_TEST_IF_VOID(RETURN_T),                                    \
-        {                                                                     \
-          if constexpr (HasFun_ ## NAME()) {                                  \
-            WRAPPED_T::NAME( std::forward<Ts>(args)... );                     \
-          }                                                                   \
-          else { DEFAULT; }                                                   \
-        },                                                                    \
-        {                                                                     \
-          if constexpr (HasFun_ ## NAME()) {                                  \
-            return WRAPPED_T::NAME( std::forward<Ts>(args)... );              \
-          }                                                                   \
-          else { return DEFAULT; }                                            \
-        }                                                                     \
-      )                                                                       \
+#define EMP_BUILD_CONCEPT__PROCESS_OPTIONAL_FUN(NAME, DEFAULT, ...)                               \
+  EMP_BUILD_CONCEPT__OPTIONAL_impl(NAME, DEFAULT,                                                 \
+                                   EMP_EQU(EMP_COUNT_ARGS(__VA_ARGS__), 1), /* Are there args? */ \
+                                   EMP_GET_ARG(1, __VA_ARGS__),             /* Return type */     \
+                                   EMP_POP_ARG(__VA_ARGS__) )               /* Arg types */
+
+#define EMP_BUILD_CONCEPT__OPTIONAL_impl(NAME, DEFAULT, USE_ARGS, RETURN_T, ...)                  \
+  protected:                                                                                      \
+    /* Determine return type if we try to call this function in the base class.                   \
+       It should be undefined if the member functon does not exist!                           */  \
+    template <typename T>                                                                         \
+    using return_t_ ## NAME =                                                                     \
+      EMP_IF( USE_ARGS,                                                                           \
+        decltype( std::declval<T>().NAME() );,                                                    \
+        decltype( std::declval<T>().NAME(EMP_TYPES_TO_VALS(__VA_ARGS__)) );                       \
+      )                                                                                           \
+  public:                                                                                         \
+    /* Test whether function exists, based on SFINAE in using return type.                    */  \
+    static constexpr bool HasFun_ ## NAME() {                                                     \
+      return emp::test_type<return_t_ ## NAME, WRAPPED_T>();                                      \
+    }                                                                                             \
+    /* Call appropriate version of the function.  First determine if there is a non-void          \
+       return type (i.e., do we return th result?) then check if the function exists in the       \
+       wrapped class or should we call/return the default (otherwise).                        */  \
+    template <typename... Ts>                                                                     \
+    RETURN_T NAME(Ts &&... args) {                                                                \
+      constexpr bool has_fun = HasFun_ ## NAME();                                                 \
+      EMP_IF( EMP_TEST_IF_VOID(RETURN_T),                                                         \
+        { /* void return -> call function, but don't return result. */                            \
+          if constexpr (has_fun) { WRAPPED_T::NAME( std::forward<Ts>(args)... ); }                \
+          else { DEFAULT; }                                                                       \
+        },                                                                                        \
+        { /* non-void return -> make sure to return result. */                                    \
+          if constexpr (has_fun) { return WRAPPED_T::NAME( std::forward<Ts>(args)... ); }         \
+          else { return DEFAULT; }                                                                \
+        }                                                                                         \
+      )                                                                                           \
     }
 
-#define MABE_GENOME_TEST_FUN(NAME, DEFAULT, ...)                                              \
-  MABE_GENOME_TEST_FUN_impl(NAME, DEFAULT,                                                    \
-                            EMP_EQU( EMP_COUNT_ARGS(__VA_ARGS__), 1), /* Are there args? */   \
-                            EMP_GET_ARG(1, __VA_ARGS__),              /* Return type */       \
-                            EMP_POP_ARG(__VA_ARGS__) )                /* Arg types */
+#define EMP_BUILD_CONCEPT__PROCESS_PRIVATE(...)\
+  private:
+
+#define EMP_BUILD_CONCEPT__PROCESS_PUBLIC(...)\
+  public:
+
+#define EMP_BUILD_CONCEPT__PROCESS_PROTECTED(...)\
+  protected:
+
+
+
 
 
 namespace emp {
