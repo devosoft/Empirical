@@ -13,7 +13,7 @@
  *  Use the EMP_BUILD_CONCEPT macro to create a new concept wrapper.  Provide it with the wrapper
  *  name, and all of the rules.  The allowable rule types are:
  *  
- *  REQUIRED_FUN ( FUNCTION_NAME, ERROR_MESSAGE )
+ *  REQUIRED_FUN ( FUNCTION_NAME, ERROR_MESSAGE, RETURN_TYPE, ARG_TYPES... )
  *    Setup a function that is required to be present in the wrapped class.  If it does not
  *    exist there, throw the provided error.
  * 
@@ -50,13 +50,49 @@
 #define EMP_BUILD_CONCEPT( NAME, ... )                       \
   template <typename WRAPPED_T>                              \
   class ConceptWrapper : public WRAPPED_T {                  \
+    using this_t = ConceptWrapper<WRAPPED_T>;                \
     EMP_WRAP_EACH(EMP_BUILD_CONCEPT__PROCESS, __VA_ARGS__)   \
   };
 
 #define EMP_BUILD_CONCEPT__PROCESS( CMD ) EMP_BUILD_CONCEPT__PROCESS_ ## CMD
 
-#define EMP_BUILD_CONCEPT__PROCESS_REQUIRED_FUN() \
-  protected:
+
+#define EMP_BUILD_CONCEPT__PROCESS_REQUIRED_FUN(NAME, ERROR, ...)                                 \
+  EMP_BUILD_CONCEPT__REQUIRED_impl(NAME, ERROR,                                                   \
+                                   EMP_EQU(EMP_COUNT_ARGS(__VA_ARGS__), 1), /* Are there args? */ \
+                                   EMP_GET_ARG(1, __VA_ARGS__),             /* Return type */     \
+                                   EMP_POP_ARG(__VA_ARGS__) )               /* Arg types */
+
+#define EMP_BUILD_CONCEPT__REQUIRED_impl(NAME, ERROR, USE_ARGS, RETURN_T, ...)                    \
+  protected:                                                                                      \
+    /* Determine return type if we try to call this function in the base class.                   \
+       It should be undefined if the member functon does not exist!                           */  \
+    template <typename T>                                                                         \
+    using return_t_ ## NAME =                                                                     \
+      EMP_IF( USE_ARGS,                                                                           \
+        decltype( std::declval<T>().NAME() );,                                                    \
+        decltype( std::declval<T>().NAME(EMP_TYPES_TO_VALS(__VA_ARGS__)) );                       \
+      )                                                                                           \
+  public:                                                                                         \
+    /* Test whether function exists, based on SFINAE in using return type.                    */  \
+    static constexpr bool HasFun_ ## NAME() {                                                     \
+      return emp::test_type<return_t_ ## NAME, WRAPPED_T>();                                      \
+    }                                                                                             \
+    /* Call appropriate version of the function.  First determine if there is a non-void          \
+       return type (i.e., do we return th result?) then check if the function exists in the       \
+       wrapped class or should we call/return the default (otherwise).                        */  \
+    template <typename... Ts>                                                                     \
+    RETURN_T NAME(Ts &&... args) {                                                                \
+      if constexpr (!HasFun_ ## NAME()) static_assert( false, ERROR );                            \
+      else {                                                                                      \
+        EMP_IF( EMP_TEST_IF_VOID(RETURN_T),                                                       \
+          /* void return -> call function, but don't return result. */                            \
+          { WRAPPED_T::NAME( std::forward<Ts>(args)... ); },                                      \
+          /* non-void return -> make sure to return result. */                                    \
+          { return WRAPPED_T::NAME( std::forward<Ts>(args)... ); }                                \
+        )                                                                                         \
+      }                                                                                           \
+    }
 
 
 /// Macro to dynamically call an OPTIONAL function; it will call the version in the wrapped type
@@ -112,35 +148,6 @@
 #define EMP_BUILD_CONCEPT__PROCESS_PROTECTED(...)\
   protected:
 
-
-
-
-
-namespace emp {
-
-  template <typename WRAPPED_T>
-  class ConceptWrapper : public WRAPPED_T {
-  private:
-    using this_t = ConceptWrapper<WRAPPED_T>;
-
-    static emp::Config empty_config;
-
-  public:
-    // Create a set of functions to determine if a memeber exists on WRAPPED_T in the form of
-    // constexpr bool has_fun_X()
-    MABE_GENOME_TEST_FUN(GetClassName, "NoName", std::string);
-    MABE_GENOME_TEST_FUN(GetConfig, empty_config, emp::Config);
-    MABE_GENOME_TEST_FUN(Randomize, false, bool, emp::Random &);
-    MABE_GENOME_TEST_FUN(Print, false, bool);
-    MABE_GENOME_TEST_FUN(OnBeforeRepro, , void);              // Genome about to be reproduced.
-    MABE_GENOME_TEST_FUN(OnOffspringReady, , void, this_t &); // Genome offspring; arg is parent genome
-    MABE_GENOME_TEST_FUN(OnInjectReady, , void);              // Genome about to be injected.
-    MABE_GENOME_TEST_FUN(OnBeforePlacement, , void);          // Genome about to be placed
-    MABE_GENOME_TEST_FUN(OnPlacement, , void);                // Genome just placed.
-    MABE_GENOME_TEST_FUN(OnOrgDeath, , void);                 // Genome about to die.
-  };
-
-}
 
 #endif
 
