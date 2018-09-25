@@ -2,6 +2,7 @@
 #define EMP_OEE_STATS_H
 
 #include "Systematics.h"
+#include "bloom_filter.hpp"
 #include "base/vector.h"
 #include "base/Ptr.h"
 #include "tools/set_utils.h"
@@ -38,7 +39,7 @@ namespace emp {
         Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> systematics_manager;
 
         std::map<SKEL_TYPE, int> prev_coal_set;
-        std::unordered_set<SKEL_TYPE> seen;
+        // std::unordered_set<SKEL_TYPE> seen;
 
         fun_calc_complexity_t complexity_fun;
         fun_calc_data_t skeleton_fun;
@@ -46,9 +47,10 @@ namespace emp {
         int resolution = 10;
 
         DataManager<double, data::Current, data::Info> data_nodes;
+        Ptr<bloom_filter> seen;
 
         public:
-        OEETracker(Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> s, fun_calc_data_t d, fun_calc_complexity_t c) : 
+        OEETracker(Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> s, fun_calc_data_t d, fun_calc_complexity_t c, int bloom_count = 200000) : 
             systematics_manager(s), skeleton_fun(d), complexity_fun(c) {
             
             // emp_assert(s->GetStoreOutside(), "OEE tracker only works with systematics manager where store_outside is set to true");
@@ -57,7 +59,28 @@ namespace emp {
             data_nodes.New("novelty");
             data_nodes.New("diversity");
             data_nodes.New("complexity");
+
+            bloom_parameters parameters;
+
+            // How many elements roughly do we expect to insert?
+            parameters.projected_element_count = bloom_count ;
+
+            // Maximum tolerable false positive probability? (0,1)
+            parameters.false_positive_probability = 0.0001; // 1 in 10000
+
+            if (!parameters)
+            {
+                std::cout << "Error - Invalid set of bloom filter parameters!" << std::endl;
+            }
+
+            parameters.compute_optimal_parameters();
+
+            //Instantiate Bloom Filter
+            seen.New(parameters);
+
         }
+
+        ~OEETracker() {seen.Delete();}
 
         int GetResolution() const {return resolution;}
         int GetGenerationInterval() const {return generation_interval;}
@@ -77,7 +100,7 @@ namespace emp {
                     i++;
                 }
                 snapshots.push_back(active);
-                if (snapshots.size() > generation_interval/resolution + 1) {
+                if ((int)snapshots.size() > generation_interval/resolution + 1) {
                     snapshots.pop_front();
                 }
                 CalcStats(ud);
@@ -101,14 +124,14 @@ namespace emp {
                     change++;
                     // std::cout << "Org id: " << tax->GetID() << "(" <<tax->GetInfo() << ") increased change" << std::endl;
                 }
-                if (!Has(seen, tax.first)) {
+                if (!seen->contains(tax.first)) {
                     novelty++;
                     // std::cout << "seen: ";
                     // for (int val : seen) {
                     //     std::cout << val << " ";
                     // }
                     // std::cout << std::endl;
-                    seen.insert(tax.first);
+                    seen->insert(tax.first);
                     // std::cout << "Org id: " << tax->GetID() << "(" <<tax->GetInfo() << ") increased novelty" << std::endl;
                 }
                 double complexity = complexity_fun(tax.first);
@@ -135,7 +158,7 @@ namespace emp {
 
             std::map<SKEL_TYPE, int> res;
 
-            if (snapshots.size() <= generation_interval/resolution) {
+            if ((int)snapshots.size() <= generation_interval/resolution) {
                 return res;
             }
 
