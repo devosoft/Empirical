@@ -12,7 +12,7 @@
  * 
  *  Use the EMP_BUILD_CONCEPT macro to create a new concept wrapper.  Provide it with the wrapper
  *  name, and all of the rules.  The allowable rule types are:
- * 
+ *  
  *  REQUIRED_FUN ( FUNCTION_NAME, ERROR_MESSAGE )
  *    Setup a function that is required to be present in the wrapped class.  If it does not
  *    exist there, throw the provided error.
@@ -33,6 +33,10 @@
  * 
  * 
  *  @note: Requires C++-17 to function properly!
+ * 
+ *  @todo: Add the ability to rename functions from the base class.
+ *  @todo: Add the ability to list several functions, requiring only one to exist.
+ *         (This can be done by surrounding all names in parens to build a pack)
  */
 
 #ifndef EMP_CONCEPT_WRAPPER_H
@@ -42,6 +46,9 @@
 #include <utility>
 
 #include "meta.h"
+
+#define EMP_BUILD_CONCEPT( NAME, ... )
+
 
 // Macro to dynamically call a function either in the wrapped type (if it exists)
 // or return the default provided (otherwise).  The first two arguments are the
@@ -89,8 +96,6 @@
                             EMP_GET_ARG(1, __VA_ARGS__),              /* Return type */       \
                             EMP_POP_ARG(__VA_ARGS__) )                /* Arg types */
 
-
-#define EMP_BUILD_CONCEPT( NAME, ... )
 
 namespace emp {
 
