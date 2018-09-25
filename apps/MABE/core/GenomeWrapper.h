@@ -29,32 +29,23 @@
 #include <string>
 #include <utility>
 
+#include "base/macros.h"
 #include "config/config.h"
 #include "meta/meta.h"
-
-// Macros to take a variable list of macro arguments and wrap them all in declval.  These mock
-// instances of the types will then be used in a function call in a decltype to determine if
-// that specific type of call is legal.
-
-#define MABE_TYPE_TO_VAL(TYPE) std::declval< TYPE >()
-#define MABE_TYPES_TO_VALS(...) EMP_WRAP_ARGS(MABE_TYPE_TO_VAL, __VA_ARGS__)
-
-#define MABE_TEST_IF_VOID(VAL, ...) EMP_GET_ARG_2( MABE_TEST_IF_VOID__ ## VAL, 0 )
-#define MABE_TEST_IF_VOID__void ~, 1
 
 // Macro to dynamically call a function either in the wrapped type (if it exists)
 // or return the default provided (otherwise).  The first two arguments are the
 // function name and its default return.  The remaining arguments in the ... must
 // be the return type (required) and all argument types (if any exist)
 
-#define MABE_GENOME_TEST_FUN_impl(NAME, DEFAULT, USE_ARGS, RETURN_T, ...)     \
+#define MABE_GENOME_TEST_FUN_impl(NAME, DEFAULT, NO_ARGS, RETURN_T, ...)      \
     /* Determine the return type if we call this function in the base class.  \
        It should be undefined if the member functon does not exist!        */ \
     template <typename T>                                                     \
     using return_t_ ## NAME =                                                 \
-      EMP_IF( USE_ARGS,                                                       \
+      EMP_IF( NO_ARGS,                                                        \
         decltype( std::declval<T>().NAME() );,                                \
-        decltype( std::declval<T>().NAME(MABE_TYPES_TO_VALS(__VA_ARGS__)) );  \
+        decltype( std::declval<T>().NAME(EMP_TYPES_TO_VALS(__VA_ARGS__)) );   \
       )                                                                       \
     /* Test whether function exists, based on SFINAE in using return type. */ \
     static constexpr bool HasFun_ ## NAME() {                                 \
@@ -66,7 +57,7 @@
        exists) or should we call/return the default (otherwise).           */ \
     template <typename... Ts>                                                 \
     RETURN_T NAME(Ts &&... args) {                                            \
-      EMP_IF( MABE_TEST_IF_VOID(RETURN_T),                                    \
+      EMP_IF( EMP_TEST_IF_VOID(RETURN_T),                                     \
         {                                                                     \
           if constexpr (HasFun_ ## NAME()) {                                  \
             GENOME_T::NAME( std::forward<Ts>(args)... );                      \
@@ -102,7 +93,7 @@ namespace mabe {
     // Create a set of functions to determine if a memeber exists on GENOME_T in the form of
     // constexpr bool has_fun_X()
     MABE_GENOME_TEST_FUN(GetClassName, "NoName", std::string);
-    MABE_GENOME_TEST_FUN(GetConfig, empty_config, emp::Config);
+    MABE_GENOME_TEST_FUN(GetConfig, empty_config, auto &);
     MABE_GENOME_TEST_FUN(Randomize, false, bool, emp::Random &);
     MABE_GENOME_TEST_FUN(Print, false, bool);
     MABE_GENOME_TEST_FUN(OnBeforeRepro, , void);              // Genome about to be reproduced.
