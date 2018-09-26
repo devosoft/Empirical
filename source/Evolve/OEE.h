@@ -16,8 +16,8 @@ namespace emp {
         template <typename SKEL_TYPE>
         struct oee_data : public no_data {
 
-            SKEL_TYPE skeleton = NULL;
-            bool oee_calculated = false;
+            Ptr<SKEL_TYPE> skeleton = nullptr;
+            ~oee_data(){if(skeleton){skeleton.Delete();}}
         };
     };
 
@@ -36,6 +36,7 @@ namespace emp {
         };
 
         std::deque<emp::vector<snapshot_info_t>> snapshots;
+        std::deque<int> snapshot_times;
         Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> systematics_manager;
 
         std::map<SKEL_TYPE, int> prev_coal_set;
@@ -88,8 +89,11 @@ namespace emp {
         void SetResolution(int r) {resolution = r;}
         void SetGenerationInterval(int g) {generation_interval = g;}
 
-        void Update(size_t ud) {
-            if (Mod((int)ud, resolution) == 0) {
+        void Update(size_t gen, int ud = -1) {
+            if (Mod((int)gen, resolution) == 0) {
+                if (ud == -1) {
+                    ud = gen;
+                }
                 auto & sys_active = systematics_manager->GetActive();
 
                 emp::vector<snapshot_info_t> active(sys_active.size());
@@ -100,7 +104,10 @@ namespace emp {
                     i++;
                 }
                 snapshots.push_back(active);
+                snapshot_times.push_back(ud);
                 if ((int)snapshots.size() > generation_interval/resolution + 1) {
+                    systematics_manager->RemoveBefore(snapshot_times.front() - 1);
+                    snapshot_times.pop_front();
                     snapshots.pop_front();
                 }
                 CalcStats(ud);
@@ -162,7 +169,7 @@ namespace emp {
                 return res;
             }
 
-            std::set<Ptr<taxon_t>> extant_canopy_roots = systematics_manager->GetCanopyExtantRoots(ud-generation_interval);
+            std::set<Ptr<taxon_t>> extant_canopy_roots = systematics_manager->GetCanopyExtantRoots(snapshot_times.front());
             // std::cout << "exteant canpoy roots: ";
             // for (auto t : extant_canopy_roots) {
             //     std::cout << t->GetInfo() << " ";
@@ -171,14 +178,13 @@ namespace emp {
             for ( snapshot_info_t & t : snapshots.front()) {
                 if (Has(extant_canopy_roots, t.taxon)) {
                     // std::cout << t.taxon->GetInfo() << " Survived filter" << std::endl;
-                    if (!t.taxon->GetData().oee_calculated) {
-                        t.taxon->GetData().skeleton = skeleton_fun(t.taxon->GetInfo());
-                        t.taxon->GetData().oee_calculated = true;
+                    if (!t.taxon->GetData().skeleton) {
+                        t.taxon->GetData().skeleton.New(skeleton_fun(t.taxon->GetInfo()));
                     }
-                    if (Has(res, t.taxon->GetData().skeleton)) {
-                        res[t.taxon->GetData().skeleton] += t.count;
+                    if (Has(res, *(t.taxon->GetData().skeleton))) {
+                        res[*(t.taxon->GetData().skeleton)] += t.count;
                     } else {
-                        res[t.taxon->GetData().skeleton] = t.count;
+                        res[*(t.taxon->GetData().skeleton)] = t.count;
                     }
                 }
             }

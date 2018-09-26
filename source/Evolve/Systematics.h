@@ -147,6 +147,7 @@ namespace emp {
 
     /// Retrieve a pointer to the parent Taxon.
     Ptr<this_t> GetParent() const { return parent; }
+    void NullifyParent() {parent = nullptr;}
 
     /// Get the number of living organisms currently associated with this Taxon.
     size_t GetNumOrgs() const { return num_orgs; }
@@ -993,7 +994,68 @@ namespace emp {
       return depth;
     }
 
+    void RemoveBefore(int ud) {
+      
+      // @ELD: This would be such a nice way to do it
+      // but we can't because we need to notify offspring
+      // when there parents are un-tracked
+      // std::set<Ptr<taxon_t>> to_remove;
+      // for (Ptr<taxon_t> tax : ancestor_taxa) {
+      //   if (tax->GetDestructionTime() < ud) {
+      //     to_remove.insert(tax);
+      //   }
+      // }
 
+      // for (Ptr<taxon_t> tax : to_remove) {
+      //     ancestor_taxa.erase(tax);
+      //     tax.Delete();
+      // }
+
+      std::map<Ptr<taxon_t>, std::set<Ptr<taxon_t>>> to_remove;
+
+      for (Ptr<taxon_t> tax : active_taxa) {
+        Ptr<taxon_t> curr = tax;
+
+        while (curr && !CanRemove(curr->GetParent(), ud)) {
+          curr = curr->GetParent();           
+        }
+
+        if (curr) {
+          Ptr<taxon_t> next = curr->GetParent();
+          while (next) {
+            to_remove[next].insert(curr);
+            curr = next;
+            next = next->GetParent();
+          }
+        }
+      }
+      // std::cout << "About to remove " << to_remove.size() << " orgs" << std::endl;
+      for (std::pair<Ptr<taxon_t>, std::set<Ptr<taxon_t>>> el : to_remove) {
+        emp_assert(el.first->GetDestructionTime() < ud, el.first->GetDestructionTime(), ud);
+        if (el.first->GetNumOff() == el.second.size()) {
+          // Everything is account for
+          for (auto tax : el.second) {
+            tax->NullifyParent();
+          }
+          ancestor_taxa.erase(el.first);
+          el.first.Delete();
+        } 
+      }
+
+    }
+
+    bool CanRemove(Ptr<taxon_t> t, int ud) {
+      if (!t) {
+        return false;
+      }
+      while (t) {
+        if (t->GetNumOrgs() > 0 || t->GetDestructionTime() >= ud) {
+          return false;
+        }
+        t = t->GetParent();
+      }
+      return true;
+    }
 
     /// Request a pointer to the Most-Recent Common Ancestor for the population.
     Ptr<taxon_t> GetMRCA() const;
