@@ -21,11 +21,22 @@ struct MinimalClass {
   void RequiredFun2() { std::cout << "In MinimalClass::RequiredFun2()" << std::endl; }
 };
 
+struct FullClass {
+  void RequiredFun1() { std::cout << "In FullClass::RequiredFun1()" << std::endl; }
+  void RequiredFun2() { std::cout << "In FullClass::RequiredFun2()" << std::endl; }
+  void OptionalFun1() { std::cout << "In FullClass::OptionalFun2()" << std::endl; }
+};
+
 int main() {
-  TestConcept<MinimalClass> test_class;
-  test_class.RequiredFun1();
-  test_class.RequiredFun2();
-  test_class.OptionalFun1();
+  TestConcept<MinimalClass> min_class;
+  min_class.RequiredFun1();
+  min_class.RequiredFun2();
+  min_class.OptionalFun1();
+
+  TestConcept<FullClass> full_class;
+  full_class.RequiredFun1();
+  full_class.RequiredFun2();
+  full_class.OptionalFun1();
 
   std::cout << "Done!" << std::endl;
 }
