@@ -73,8 +73,8 @@
  *    second argument.  This would allow us to, for example, streamline EMP_TYPES_TO_ARGS.
  *
  *  @todo A more generic EMP_WRAP macro that is specified on the fly.  For example:
- *      EMP_WRAP(W,2,4,A,B,a,b,c,d,e,f,g,h,i,j,k,l)
- *    would assume six args in each wrap, A, B, and the rest broken into groups of four. I.e.:
+ *      EMP_FORMAT_WRAP(W,2,4,A,B,a,b,c,d,e,f,g,h,i,j,k,l)
+ *    would always use first two args (A, B), and break the rest into groups of four. I.e.:
  *      W(A,B,a,b,c,d), W(A,B,e,f,g,h), W(A,B,i,j,k,l)
  */
 
@@ -84,6 +84,8 @@
 #include <utility>  // For declval
 
 #include "macro_math.h"
+
+#pragma GCC system_header
 
 /// The below values allow you to have EMP_FAKE_ARG or EMP_FAKE_2ARG as a single argument.
 /// If you prepend it with EMP_CONVERT it will trigger a conversion.  If you prepend anything
@@ -140,9 +142,9 @@
 /// Return the Nth arg that follows
 #define EMP_GET_ARG(N, ...) EMP_GET_ARG_1( EMP_POP_ARGS( EMP_DEC(N), __VA_ARGS__ ) )
 /// @cond MACROS
-#define EMP_GET_ARG_1(...) EMP_GET_ARG_1_IMPL(__VA_ARGS__)
+#define EMP_GET_ARG_1(...) EMP_GET_ARG_1_IMPL(__VA_ARGS__, ~)
 #define EMP_GET_ARG_1_IMPL(A, ...) A
-#define EMP_GET_ARG_2(...) EMP_GET_ARG_2_IMPL(__VA_ARGS__)
+#define EMP_GET_ARG_2(...) EMP_GET_ARG_2_IMPL(__VA_ARGS__, ~)
 #define EMP_GET_ARG_2_IMPL(A, B, ...) B
 /// @endcond
 
