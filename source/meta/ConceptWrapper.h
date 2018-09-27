@@ -48,14 +48,14 @@
 #include "../base/macros.h"
 #include "meta.h"
 
-#define EMP_BUILD_CONCEPT__PROCESS( CMD ) EMP_BUILD_CONCEPT__PROCESS_ ## CMD
-
 #define EMP_BUILD_CONCEPT( CLASS_NAME, ... )                 \
   template <typename WRAPPED_T>                              \
   class CLASS_NAME : public WRAPPED_T {                      \
     using this_t = CLASS_NAME<WRAPPED_T>;                    \
     EMP_WRAP_EACH(EMP_BUILD_CONCEPT__PROCESS, __VA_ARGS__)   \
   }
+
+#define EMP_BUILD_CONCEPT__PROCESS( CMD ) EMP_BUILD_CONCEPT__PROCESS_ ## CMD
 
 #define EMP_BUILD_CONCEPT__PROCESS_REQUIRED_FUN(FUN_NAME, ERROR, ...)                             \
   EMP_BUILD_CONCEPT__REQUIRED_impl(FUN_NAME, ERROR,                                               \
@@ -139,14 +139,9 @@
       )                                                                                           \
     }
 
-#define EMP_BUILD_CONCEPT__PROCESS_PRIVATE(...)\
-  private:
-
-#define EMP_BUILD_CONCEPT__PROCESS_PUBLIC(...)\
-  public:
-
-#define EMP_BUILD_CONCEPT__PROCESS_PROTECTED(...)\
-  protected:
+#define EMP_BUILD_CONCEPT__PROCESS_PRIVATE(...) private: __VA_ARGS__
+#define EMP_BUILD_CONCEPT__PROCESS_PUBLIC(...) public: __VA_ARGS__
+#define EMP_BUILD_CONCEPT__PROCESS_PROTECTED(...) protected: __VA_ARGS__
 
 
 #endif
