@@ -11,7 +11,8 @@
 
 EMP_BUILD_CONCEPT( TestConcept,
                    REQUIRED_FUN(RequiredFun1, "Missing RequiredFun function 1!", void),
-                   REQUIRED_FUN(RequiredFun2, "Missing RequiredFun function 2!", void)
+                   REQUIRED_FUN(RequiredFun2, "Missing RequiredFun function 2!", void),
+                   OPTIONAL_FUN(OptionalFun1, { std::cout << "Default version of OptionalFun1()" << std::endl; }, void)
                  );
 
 
@@ -24,6 +25,7 @@ int main() {
   TestConcept<MinimalClass> test_class;
   test_class.RequiredFun1();
   test_class.RequiredFun2();
+  test_class.OptionalFun1();
 
   std::cout << "Done!" << std::endl;
 }
