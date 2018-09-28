@@ -10,9 +10,10 @@
 #include "../../source/meta/ConceptWrapper.h"
 
 EMP_BUILD_CONCEPT( TestConcept,
+                   PUBLIC( int x=5; ),
                    REQUIRED_FUN(RequiredFun1, "Missing RequiredFun function 1!", void),
                    REQUIRED_FUN(RequiredFun2, "Missing RequiredFun function 2!", void),
-                   OPTIONAL_FUN(OptionalFun1, { std::cout << "Default version of OptionalFun1()" << std::endl; }, void)
+                   OPTIONAL_FUN(OptionalFun1, { std::cout << "Default version of OptionalFun1()" << std::endl; x++; }, void)
                  );
 
 
@@ -38,5 +39,7 @@ int main() {
   full_class.RequiredFun2();
   full_class.OptionalFun1();
 
+  std::cout << "min_class.x = " << min_class.x << std::endl;
+  std::cout << "full_class.x = " << full_class.x << std::endl;
   std::cout << "Done!" << std::endl;
 }
