@@ -48,12 +48,27 @@
 #include "../base/macros.h"
 #include "meta.h"
 
-#define EMP_BUILD_CONCEPT( CLASS_NAME, ... )                 \
-  template <typename WRAPPED_T>                              \
-  class CLASS_NAME : public WRAPPED_T {                      \
-    using this_t = CLASS_NAME<WRAPPED_T>;                    \
-    EMP_WRAP_EACH(EMP_BUILD_CONCEPT__PROCESS, __VA_ARGS__)   \
+#define EMP_BUILD_CONCEPT( CLASS_NAME, ... )                         \
+  /* Build the interface class. */                                   \
+  class CLASS_NAME ## _Base {                                        \
+  public:                                                            \
+    EMP_WRAP_EACH(EMP_BUILD_CONCEPT__BASE, __VA_ARGS__)              \
+  };                                                                 \
+  /* Build the wrapper class. */                                     \
+  template <typename WRAPPED_T>                                      \
+  class CLASS_NAME : public WRAPPED_T, public CLASS_NAME ## _Base {  \
+    using this_t = CLASS_NAME<WRAPPED_T>;                            \
+    EMP_WRAP_EACH(EMP_BUILD_CONCEPT__PROCESS, __VA_ARGS__)           \
   }
+
+#define EMP_BUILD_CONCEPT__BASE( CMD ) EMP_BUILD_CONCEPT_BASE__ ## CMD
+
+#define EMP_BUILD_CONCEPT_BASE__REQUIRED_FUN(NAME, X, RETURN_T, ...) virtual RETURN_T NAME( __VA_ARGS__ ) = 0;
+#define EMP_BUILD_CONCEPT_BASE__OPTIONAL_FUN(NAME, X, RETURN_T, ...) virtual RETURN_T NAME( __VA_ARGS__ ) = 0;
+#define EMP_BUILD_CONCEPT_BASE__PRIVATE(...)
+#define EMP_BUILD_CONCEPT_BASE__PROTECTED(...)
+#define EMP_BUILD_CONCEPT_BASE__PUBLIC(...)
+
 
 #define EMP_BUILD_CONCEPT__PROCESS( CMD ) EMP_BUILD_CONCEPT__PROCESS_ ## CMD
 
