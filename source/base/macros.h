@@ -42,6 +42,7 @@
  *  EMP_WRAP_ARGS(W, ...) Similar to EMP_WRAP_EACH, but puts a COMMA between each arg pair.
  *  EMP_WRAP_ARG_PAIRS(W, ...) Similar to EMP_WRAP_ARGS, but passes pairs of args into W.
  *  EMP_DECLARE_ARGS(...) Turn types into function declare args (e.g., int arg1, char arg2)
+ *  EMP_USE_VARS(N) Create N variables, named arg1, arg2, arg3, etc.
  *
  *  ===== Macro Building =====
  *  EMP_ASSEMBLE_MACRO takes in a prefix and set of arguments and appends the size of the
@@ -921,6 +922,12 @@
 #define EMP_DECLARE_ARGS_62(A, ...) EMP_DECLARE_ARGS_61(__VA_ARGS__), A arg62
 #define EMP_DECLARE_ARGS_63(A, ...) EMP_DECLARE_ARGS_62(__VA_ARGS__), A arg63
 /// @endcond
+
+/// Convert a value into a variable name of that value, to work with EMP_DECLARE_ARGS
+#define EMP_NUM_TO_VAR(N) arg ## N
+
+/// Create N variables that will work with EMP_DECLARE_ARGS, named arg1, arg2, arg3, etc.
+#define EMP_USE_VARS(N) EMP_WRAP_ARGS(EMP_NUM_TO_VAR, EMP_RANGE_TO(N))
 
 /// Functions often need to be wrapped differently if they have a void return type.
 /// This macro will convert to 1 if a void type is passed in, zero otherwise and can
