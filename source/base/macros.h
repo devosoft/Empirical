@@ -41,8 +41,8 @@
  *  EMP_LAYOUT(W, P, ...) Similar to EMP_WRAP_EACH, but puts a P between each arg pair.
  *  EMP_WRAP_ARGS(W, ...) Similar to EMP_WRAP_EACH, but puts a COMMA between each arg pair.
  *  EMP_WRAP_ARG_PAIRS(W, ...) Similar to EMP_WRAP_ARGS, but passes pairs of args into W.
- *  EMP_DECLARE_ARGS(...) Turn types into function declare args (e.g., int arg1, char arg2)
- *  EMP_USE_VARS(N) Create N variables, named arg1, arg2, arg3, etc.
+ *  EMP_DECLARE_VARS(...) Turn types into function declare args (e.g., int arg1, char arg2)
+ *  EMP_NUMS_TO_VARS(N) Create N variables, named arg1, arg2, arg3, etc.
  *
  *  ===== Macro Building =====
  *  EMP_ASSEMBLE_MACRO takes in a prefix and set of arguments and appends the size of the
@@ -70,7 +70,7 @@
  *    default and then have an EMP_REMOVE_COMMAS (or somesuch)
  *
  *  @todo It would be useful to have EMP_WRAP_WITH_ID which passes in the position ID as the
- *    second argument.  This would allow us to, for example, streamline EMP_DECLARE_ARGS.
+ *    second argument.  This would allow us to, for example, streamline EMP_DECLARE_VARS.
  *
  *  @todo A more generic EMP_WRAP macro that is specified on the fly.  For example:
  *      EMP_FORMAT_WRAP(W,2,4,A,B,a,b,c,d,e,f,g,h,i,j,k,l)
@@ -854,80 +854,80 @@
 /// These mock instances of the types can be used in a function call in a decltype.
 #define EMP_TYPES_TO_VALS(...) EMP_WRAP_ARGS(EMP_TYPE_TO_VAL, __VA_ARGS__)
 
-/// Convert a set of types to a set of arguments.  For example EMP_DECLARE_ARGS(int, double, bool)
+/// Convert a set of types to a set of arguments.  For example EMP_DECLARE_VARS(int, double, bool)
 /// would convert to: int arg1, double arg2, bool arg3
-#define EMP_DECLARE_ARGS(...) EMP_ASSEMBLE_MACRO(EMP_DECLARE_ARGS_, EMP_REVERSE_ARGS(__VA_ARGS__))
+#define EMP_DECLARE_VARS(...) EMP_ASSEMBLE_MACRO(EMP_DECLARE_VARS_, EMP_REVERSE_ARGS(__VA_ARGS__))
 /// @cond MACROS
-#define EMP_DECLARE_ARGS_1(A) A arg1
-#define EMP_DECLARE_ARGS_2(A, ...) EMP_DECLARE_ARGS_1(__VA_ARGS__), A arg2
-#define EMP_DECLARE_ARGS_3(A, ...) EMP_DECLARE_ARGS_2(__VA_ARGS__), A arg3
-#define EMP_DECLARE_ARGS_4(A, ...) EMP_DECLARE_ARGS_3(__VA_ARGS__), A arg4
-#define EMP_DECLARE_ARGS_5(A, ...) EMP_DECLARE_ARGS_4(__VA_ARGS__), A arg5
-#define EMP_DECLARE_ARGS_6(A, ...) EMP_DECLARE_ARGS_5(__VA_ARGS__), A arg6
-#define EMP_DECLARE_ARGS_7(A, ...) EMP_DECLARE_ARGS_6(__VA_ARGS__), A arg7
-#define EMP_DECLARE_ARGS_8(A, ...) EMP_DECLARE_ARGS_7(__VA_ARGS__), A arg8
-#define EMP_DECLARE_ARGS_9(A, ...) EMP_DECLARE_ARGS_8(__VA_ARGS__), A arg9
-#define EMP_DECLARE_ARGS_10(A, ...) EMP_DECLARE_ARGS_9(__VA_ARGS__), A arg10
-#define EMP_DECLARE_ARGS_11(A, ...) EMP_DECLARE_ARGS_10(__VA_ARGS__), A arg11
-#define EMP_DECLARE_ARGS_12(A, ...) EMP_DECLARE_ARGS_11(__VA_ARGS__), A arg12
-#define EMP_DECLARE_ARGS_13(A, ...) EMP_DECLARE_ARGS_12(__VA_ARGS__), A arg13
-#define EMP_DECLARE_ARGS_14(A, ...) EMP_DECLARE_ARGS_13(__VA_ARGS__), A arg14
-#define EMP_DECLARE_ARGS_15(A, ...) EMP_DECLARE_ARGS_14(__VA_ARGS__), A arg15
-#define EMP_DECLARE_ARGS_16(A, ...) EMP_DECLARE_ARGS_15(__VA_ARGS__), A arg16
-#define EMP_DECLARE_ARGS_17(A, ...) EMP_DECLARE_ARGS_16(__VA_ARGS__), A arg17
-#define EMP_DECLARE_ARGS_18(A, ...) EMP_DECLARE_ARGS_17(__VA_ARGS__), A arg18
-#define EMP_DECLARE_ARGS_19(A, ...) EMP_DECLARE_ARGS_18(__VA_ARGS__), A arg19
-#define EMP_DECLARE_ARGS_20(A, ...) EMP_DECLARE_ARGS_19(__VA_ARGS__), A arg20
-#define EMP_DECLARE_ARGS_21(A, ...) EMP_DECLARE_ARGS_20(__VA_ARGS__), A arg21
-#define EMP_DECLARE_ARGS_22(A, ...) EMP_DECLARE_ARGS_21(__VA_ARGS__), A arg22
-#define EMP_DECLARE_ARGS_23(A, ...) EMP_DECLARE_ARGS_22(__VA_ARGS__), A arg23
-#define EMP_DECLARE_ARGS_24(A, ...) EMP_DECLARE_ARGS_23(__VA_ARGS__), A arg24
-#define EMP_DECLARE_ARGS_25(A, ...) EMP_DECLARE_ARGS_24(__VA_ARGS__), A arg25
-#define EMP_DECLARE_ARGS_26(A, ...) EMP_DECLARE_ARGS_25(__VA_ARGS__), A arg26
-#define EMP_DECLARE_ARGS_27(A, ...) EMP_DECLARE_ARGS_26(__VA_ARGS__), A arg27
-#define EMP_DECLARE_ARGS_28(A, ...) EMP_DECLARE_ARGS_27(__VA_ARGS__), A arg28
-#define EMP_DECLARE_ARGS_29(A, ...) EMP_DECLARE_ARGS_28(__VA_ARGS__), A arg29
-#define EMP_DECLARE_ARGS_30(A, ...) EMP_DECLARE_ARGS_29(__VA_ARGS__), A arg30
-#define EMP_DECLARE_ARGS_31(A, ...) EMP_DECLARE_ARGS_30(__VA_ARGS__), A arg31
-#define EMP_DECLARE_ARGS_32(A, ...) EMP_DECLARE_ARGS_31(__VA_ARGS__), A arg32
-#define EMP_DECLARE_ARGS_33(A, ...) EMP_DECLARE_ARGS_32(__VA_ARGS__), A arg33
-#define EMP_DECLARE_ARGS_34(A, ...) EMP_DECLARE_ARGS_33(__VA_ARGS__), A arg34
-#define EMP_DECLARE_ARGS_35(A, ...) EMP_DECLARE_ARGS_34(__VA_ARGS__), A arg35
-#define EMP_DECLARE_ARGS_36(A, ...) EMP_DECLARE_ARGS_35(__VA_ARGS__), A arg36
-#define EMP_DECLARE_ARGS_37(A, ...) EMP_DECLARE_ARGS_36(__VA_ARGS__), A arg37
-#define EMP_DECLARE_ARGS_38(A, ...) EMP_DECLARE_ARGS_37(__VA_ARGS__), A arg38
-#define EMP_DECLARE_ARGS_39(A, ...) EMP_DECLARE_ARGS_38(__VA_ARGS__), A arg39
-#define EMP_DECLARE_ARGS_40(A, ...) EMP_DECLARE_ARGS_39(__VA_ARGS__), A arg40
-#define EMP_DECLARE_ARGS_41(A, ...) EMP_DECLARE_ARGS_40(__VA_ARGS__), A arg41
-#define EMP_DECLARE_ARGS_42(A, ...) EMP_DECLARE_ARGS_41(__VA_ARGS__), A arg42
-#define EMP_DECLARE_ARGS_43(A, ...) EMP_DECLARE_ARGS_42(__VA_ARGS__), A arg43
-#define EMP_DECLARE_ARGS_44(A, ...) EMP_DECLARE_ARGS_43(__VA_ARGS__), A arg44
-#define EMP_DECLARE_ARGS_45(A, ...) EMP_DECLARE_ARGS_44(__VA_ARGS__), A arg45
-#define EMP_DECLARE_ARGS_46(A, ...) EMP_DECLARE_ARGS_45(__VA_ARGS__), A arg46
-#define EMP_DECLARE_ARGS_47(A, ...) EMP_DECLARE_ARGS_46(__VA_ARGS__), A arg47
-#define EMP_DECLARE_ARGS_48(A, ...) EMP_DECLARE_ARGS_47(__VA_ARGS__), A arg48
-#define EMP_DECLARE_ARGS_49(A, ...) EMP_DECLARE_ARGS_48(__VA_ARGS__), A arg49
-#define EMP_DECLARE_ARGS_50(A, ...) EMP_DECLARE_ARGS_49(__VA_ARGS__), A arg50
-#define EMP_DECLARE_ARGS_51(A, ...) EMP_DECLARE_ARGS_50(__VA_ARGS__), A arg51
-#define EMP_DECLARE_ARGS_52(A, ...) EMP_DECLARE_ARGS_51(__VA_ARGS__), A arg52
-#define EMP_DECLARE_ARGS_53(A, ...) EMP_DECLARE_ARGS_52(__VA_ARGS__), A arg53
-#define EMP_DECLARE_ARGS_54(A, ...) EMP_DECLARE_ARGS_53(__VA_ARGS__), A arg54
-#define EMP_DECLARE_ARGS_55(A, ...) EMP_DECLARE_ARGS_54(__VA_ARGS__), A arg55
-#define EMP_DECLARE_ARGS_56(A, ...) EMP_DECLARE_ARGS_55(__VA_ARGS__), A arg56
-#define EMP_DECLARE_ARGS_57(A, ...) EMP_DECLARE_ARGS_56(__VA_ARGS__), A arg57
-#define EMP_DECLARE_ARGS_58(A, ...) EMP_DECLARE_ARGS_57(__VA_ARGS__), A arg58
-#define EMP_DECLARE_ARGS_59(A, ...) EMP_DECLARE_ARGS_58(__VA_ARGS__), A arg59
-#define EMP_DECLARE_ARGS_60(A, ...) EMP_DECLARE_ARGS_59(__VA_ARGS__), A arg60
-#define EMP_DECLARE_ARGS_61(A, ...) EMP_DECLARE_ARGS_60(__VA_ARGS__), A arg61
-#define EMP_DECLARE_ARGS_62(A, ...) EMP_DECLARE_ARGS_61(__VA_ARGS__), A arg62
-#define EMP_DECLARE_ARGS_63(A, ...) EMP_DECLARE_ARGS_62(__VA_ARGS__), A arg63
+#define EMP_DECLARE_VARS_1(A) A arg1
+#define EMP_DECLARE_VARS_2(A, ...) EMP_DECLARE_VARS_1(__VA_ARGS__), A arg2
+#define EMP_DECLARE_VARS_3(A, ...) EMP_DECLARE_VARS_2(__VA_ARGS__), A arg3
+#define EMP_DECLARE_VARS_4(A, ...) EMP_DECLARE_VARS_3(__VA_ARGS__), A arg4
+#define EMP_DECLARE_VARS_5(A, ...) EMP_DECLARE_VARS_4(__VA_ARGS__), A arg5
+#define EMP_DECLARE_VARS_6(A, ...) EMP_DECLARE_VARS_5(__VA_ARGS__), A arg6
+#define EMP_DECLARE_VARS_7(A, ...) EMP_DECLARE_VARS_6(__VA_ARGS__), A arg7
+#define EMP_DECLARE_VARS_8(A, ...) EMP_DECLARE_VARS_7(__VA_ARGS__), A arg8
+#define EMP_DECLARE_VARS_9(A, ...) EMP_DECLARE_VARS_8(__VA_ARGS__), A arg9
+#define EMP_DECLARE_VARS_10(A, ...) EMP_DECLARE_VARS_9(__VA_ARGS__), A arg10
+#define EMP_DECLARE_VARS_11(A, ...) EMP_DECLARE_VARS_10(__VA_ARGS__), A arg11
+#define EMP_DECLARE_VARS_12(A, ...) EMP_DECLARE_VARS_11(__VA_ARGS__), A arg12
+#define EMP_DECLARE_VARS_13(A, ...) EMP_DECLARE_VARS_12(__VA_ARGS__), A arg13
+#define EMP_DECLARE_VARS_14(A, ...) EMP_DECLARE_VARS_13(__VA_ARGS__), A arg14
+#define EMP_DECLARE_VARS_15(A, ...) EMP_DECLARE_VARS_14(__VA_ARGS__), A arg15
+#define EMP_DECLARE_VARS_16(A, ...) EMP_DECLARE_VARS_15(__VA_ARGS__), A arg16
+#define EMP_DECLARE_VARS_17(A, ...) EMP_DECLARE_VARS_16(__VA_ARGS__), A arg17
+#define EMP_DECLARE_VARS_18(A, ...) EMP_DECLARE_VARS_17(__VA_ARGS__), A arg18
+#define EMP_DECLARE_VARS_19(A, ...) EMP_DECLARE_VARS_18(__VA_ARGS__), A arg19
+#define EMP_DECLARE_VARS_20(A, ...) EMP_DECLARE_VARS_19(__VA_ARGS__), A arg20
+#define EMP_DECLARE_VARS_21(A, ...) EMP_DECLARE_VARS_20(__VA_ARGS__), A arg21
+#define EMP_DECLARE_VARS_22(A, ...) EMP_DECLARE_VARS_21(__VA_ARGS__), A arg22
+#define EMP_DECLARE_VARS_23(A, ...) EMP_DECLARE_VARS_22(__VA_ARGS__), A arg23
+#define EMP_DECLARE_VARS_24(A, ...) EMP_DECLARE_VARS_23(__VA_ARGS__), A arg24
+#define EMP_DECLARE_VARS_25(A, ...) EMP_DECLARE_VARS_24(__VA_ARGS__), A arg25
+#define EMP_DECLARE_VARS_26(A, ...) EMP_DECLARE_VARS_25(__VA_ARGS__), A arg26
+#define EMP_DECLARE_VARS_27(A, ...) EMP_DECLARE_VARS_26(__VA_ARGS__), A arg27
+#define EMP_DECLARE_VARS_28(A, ...) EMP_DECLARE_VARS_27(__VA_ARGS__), A arg28
+#define EMP_DECLARE_VARS_29(A, ...) EMP_DECLARE_VARS_28(__VA_ARGS__), A arg29
+#define EMP_DECLARE_VARS_30(A, ...) EMP_DECLARE_VARS_29(__VA_ARGS__), A arg30
+#define EMP_DECLARE_VARS_31(A, ...) EMP_DECLARE_VARS_30(__VA_ARGS__), A arg31
+#define EMP_DECLARE_VARS_32(A, ...) EMP_DECLARE_VARS_31(__VA_ARGS__), A arg32
+#define EMP_DECLARE_VARS_33(A, ...) EMP_DECLARE_VARS_32(__VA_ARGS__), A arg33
+#define EMP_DECLARE_VARS_34(A, ...) EMP_DECLARE_VARS_33(__VA_ARGS__), A arg34
+#define EMP_DECLARE_VARS_35(A, ...) EMP_DECLARE_VARS_34(__VA_ARGS__), A arg35
+#define EMP_DECLARE_VARS_36(A, ...) EMP_DECLARE_VARS_35(__VA_ARGS__), A arg36
+#define EMP_DECLARE_VARS_37(A, ...) EMP_DECLARE_VARS_36(__VA_ARGS__), A arg37
+#define EMP_DECLARE_VARS_38(A, ...) EMP_DECLARE_VARS_37(__VA_ARGS__), A arg38
+#define EMP_DECLARE_VARS_39(A, ...) EMP_DECLARE_VARS_38(__VA_ARGS__), A arg39
+#define EMP_DECLARE_VARS_40(A, ...) EMP_DECLARE_VARS_39(__VA_ARGS__), A arg40
+#define EMP_DECLARE_VARS_41(A, ...) EMP_DECLARE_VARS_40(__VA_ARGS__), A arg41
+#define EMP_DECLARE_VARS_42(A, ...) EMP_DECLARE_VARS_41(__VA_ARGS__), A arg42
+#define EMP_DECLARE_VARS_43(A, ...) EMP_DECLARE_VARS_42(__VA_ARGS__), A arg43
+#define EMP_DECLARE_VARS_44(A, ...) EMP_DECLARE_VARS_43(__VA_ARGS__), A arg44
+#define EMP_DECLARE_VARS_45(A, ...) EMP_DECLARE_VARS_44(__VA_ARGS__), A arg45
+#define EMP_DECLARE_VARS_46(A, ...) EMP_DECLARE_VARS_45(__VA_ARGS__), A arg46
+#define EMP_DECLARE_VARS_47(A, ...) EMP_DECLARE_VARS_46(__VA_ARGS__), A arg47
+#define EMP_DECLARE_VARS_48(A, ...) EMP_DECLARE_VARS_47(__VA_ARGS__), A arg48
+#define EMP_DECLARE_VARS_49(A, ...) EMP_DECLARE_VARS_48(__VA_ARGS__), A arg49
+#define EMP_DECLARE_VARS_50(A, ...) EMP_DECLARE_VARS_49(__VA_ARGS__), A arg50
+#define EMP_DECLARE_VARS_51(A, ...) EMP_DECLARE_VARS_50(__VA_ARGS__), A arg51
+#define EMP_DECLARE_VARS_52(A, ...) EMP_DECLARE_VARS_51(__VA_ARGS__), A arg52
+#define EMP_DECLARE_VARS_53(A, ...) EMP_DECLARE_VARS_52(__VA_ARGS__), A arg53
+#define EMP_DECLARE_VARS_54(A, ...) EMP_DECLARE_VARS_53(__VA_ARGS__), A arg54
+#define EMP_DECLARE_VARS_55(A, ...) EMP_DECLARE_VARS_54(__VA_ARGS__), A arg55
+#define EMP_DECLARE_VARS_56(A, ...) EMP_DECLARE_VARS_55(__VA_ARGS__), A arg56
+#define EMP_DECLARE_VARS_57(A, ...) EMP_DECLARE_VARS_56(__VA_ARGS__), A arg57
+#define EMP_DECLARE_VARS_58(A, ...) EMP_DECLARE_VARS_57(__VA_ARGS__), A arg58
+#define EMP_DECLARE_VARS_59(A, ...) EMP_DECLARE_VARS_58(__VA_ARGS__), A arg59
+#define EMP_DECLARE_VARS_60(A, ...) EMP_DECLARE_VARS_59(__VA_ARGS__), A arg60
+#define EMP_DECLARE_VARS_61(A, ...) EMP_DECLARE_VARS_60(__VA_ARGS__), A arg61
+#define EMP_DECLARE_VARS_62(A, ...) EMP_DECLARE_VARS_61(__VA_ARGS__), A arg62
+#define EMP_DECLARE_VARS_63(A, ...) EMP_DECLARE_VARS_62(__VA_ARGS__), A arg63
 /// @endcond
 
-/// Convert a value into a variable name of that value, to work with EMP_DECLARE_ARGS
+/// Convert a value into a variable name of that value, to work with EMP_DECLARE_VARS
 #define EMP_NUM_TO_VAR(N) arg ## N
 
-/// Create N variables that will work with EMP_DECLARE_ARGS, named arg1, arg2, arg3, etc.
-#define EMP_USE_VARS(N) EMP_WRAP_ARGS(EMP_NUM_TO_VAR, EMP_RANGE_TO(N))
+/// Create N variables that will work with EMP_DECLARE_VARS, named arg1, arg2, arg3, etc.
+#define EMP_NUMS_TO_VARS(N) EMP_WRAP_ARGS(EMP_NUM_TO_VAR, EMP_RANGE_TO(N))
 
 /// Functions often need to be wrapped differently if they have a void return type.
 /// This macro will convert to 1 if a void type is passed in, zero otherwise and can
