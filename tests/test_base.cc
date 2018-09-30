@@ -332,7 +332,7 @@ TEST_CASE("Test macros", "[base]")
 
 
   EMP_TEST_MACRO( EMP_REVERSE_ARGS(a,b,c, d), "d, c, b, a" );
-  EMP_TEST_MACRO( EMP_TYPES_TO_ARGS(int, char, bool, std::string),
+  EMP_TEST_MACRO( EMP_DECLARE_ARGS(int, char, bool, std::string),
                   "int arg1, char arg2, bool arg3, std::string arg4" );
 
 
