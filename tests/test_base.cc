@@ -332,8 +332,10 @@ TEST_CASE("Test macros", "[base]")
 
 
   EMP_TEST_MACRO( EMP_REVERSE_ARGS(a,b,c, d), "d, c, b, a" );
-  EMP_TEST_MACRO( EMP_DECLARE_ARGS(int, char, bool, std::string),
+
+  EMP_TEST_MACRO( EMP_DECLARE_VARS(int, char, bool, std::string),
                   "int arg1, char arg2, bool arg3, std::string arg4" );
+  EMP_TEST_MACRO( EMP_NUMS_TO_VARS(4), "arg1 , arg2 , arg3 , arg4" );
 
 
   // Test EMP_STRINGIFY_EACH
