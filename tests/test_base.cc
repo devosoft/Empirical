@@ -265,6 +265,8 @@ TEST_CASE("Test macros", "[base]")
   EMP_TEST_MACRO( EMP_STRINGIFY(EMP_MERGE(ab, c, de, f)), "\"abcdef\"");
   EMP_TEST_MACRO( EMP_STRINGIFY("abcdef"), "\"\\\"abcdef\\\"\"" );
 
+  // Test new range macros.
+  EMP_TEST_MACRO( EMP_RANGE(901, 905), "901 , 902 , 903 , 904 , 905" );
 
   // Test PACK manipulation
   EMP_TEST_MACRO( EMP_PACK_ARGS(a,b,c), "(a,b,c)");
