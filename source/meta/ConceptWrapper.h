@@ -74,17 +74,17 @@
 
 #define EMP_BUILD_CONCEPT__PROCESS_REQUIRED_FUN(FUN_NAME, ERROR, ...)                             \
   EMP_BUILD_CONCEPT__REQUIRED_impl(FUN_NAME, ERROR,                                               \
-                                   EMP_EQU(EMP_COUNT_ARGS(__VA_ARGS__), 1), /* Are there args? */ \
-                                   EMP_GET_ARG(1, __VA_ARGS__),             /* Return type */     \
-                                   EMP_POP_ARG(__VA_ARGS__) )               /* Arg types */
+                                   EMP_DEC(EMP_COUNT_ARGS(__VA_ARGS__)), /* Hoe many args? */     \
+                                   EMP_GET_ARG(1, __VA_ARGS__),          /* Return type */        \
+                                   EMP_POP_ARG(__VA_ARGS__) )            /* Arg types */
 
-#define EMP_BUILD_CONCEPT__REQUIRED_impl(FUN_NAME, ERROR, USE_ARGS, RETURN_T, ...)                \
+#define EMP_BUILD_CONCEPT__REQUIRED_impl(FUN_NAME, ERROR, NUM_ARGS, RETURN_T, ...)                \
   protected:                                                                                      \
     /* Determine return type if we try to call this function in the base class.                   \
        It should be undefined if the member functon does not exist!                           */  \
     template <typename T>                                                                         \
     using return_t_ ## FUN_NAME =                                                                 \
-      EMP_IF( USE_ARGS,                                                                           \
+      EMP_IF( NUM_ARGS,                                                                           \
         decltype( std::declval<T>().FUN_NAME() );,                                                \
         decltype( std::declval<T>().FUN_NAME(EMP_TYPES_TO_VALS(__VA_ARGS__)) );                   \
       )                                                                                           \
@@ -96,15 +96,17 @@
     /* Call appropriate version of the function.  First determine if there is a non-void          \
        return type (i.e., do we return th result?) then check if the function exists in the       \
        wrapped class or should we call/return the default (otherwise).                        */  \
-    template <typename... Ts>                                                                     \
-    RETURN_T FUN_NAME(Ts &&... args) {                                                            \
+    EMP_IF( NUM_ARGS,                                                                             \
+            RETURN_T FUN_NAME( EMP_DECLARE_ARGS(__VA_ARGS__) ),                                   \
+            RETURN_T FUN_NAME( )                                                                  \
+    ) {                                                                                           \
       static_assert( HasFun_ ## FUN_NAME(), ERROR " (Class: " "TBD" ")" );                        \
       if constexpr (HasFun_ ## FUN_NAME()) {                                                      \
         EMP_IF( EMP_TEST_IF_VOID(RETURN_T),                                                       \
           /* void return -> call function, but don't return result. */                            \
-          { WRAPPED_T::FUN_NAME( std::forward<Ts>(args)... ); },                                  \
+          { WRAPPED_T::FUN_NAME( EMP_NUMS_TO_ARGS(NUM_ARGS) ); },                                 \
           /* non-void return -> make sure to return result. */                                    \
-          { return WRAPPED_T::FUN_NAME( std::forward<Ts>(args)... ); }                            \
+          { return WRAPPED_T::FUN_NAME( EMP_NUMS_TO_ARGS(NUM_ARGS) ); }                           \
         )                                                                                         \
       }                                                                                           \
     }
