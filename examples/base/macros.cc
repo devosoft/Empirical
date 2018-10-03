@@ -39,4 +39,12 @@ int main()
 			     EMP_REORDER_ARGS_IMPL( (int test), ((int, a), (bool, b), (std::string, c)) )
 	       ) << std::endl;
 
+
+  // Explore EMP_IF!
+  std::cout << "EMP_IF(0, \"true\", \"false\") = " << EMP_IF(0, "true", "false") << std::endl;
+  std::cout << "EMP_IF(1, \"true\", \"false\") = " << EMP_IF(1, "true", "false") << std::endl;
+  std::cout << "EMP_IF(2, \"true\", \"false\") = " << EMP_IF(2, "true", "false") << std::endl;
+  std::cout << "EMP_IF(three, \"true\", \"false\") = " << EMP_IF(three, "true", "false") << std::endl;
+  std::cout << "EMP_IF( EMP_EQU(4,4), \"true\", \"false\") = " << EMP_IF(EMP_EQU(4,4), "true", "false") << std::endl;
+  std::cout << "EMP_IF( EMP_EQU(5,6), \"true\", \"false\") = " << EMP_IF(EMP_EQU(5,6), "true", "false") << std::endl;
 }
