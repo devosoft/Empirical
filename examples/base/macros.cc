@@ -7,6 +7,12 @@
 #include "meta/reflection.h"
 #include "base/macros.h"
 
+
+#define SHOW_MACRO(...) #__VA_ARGS__ " = " EMP_STRINGIFY( __VA_ARGS__ )
+#define PRINT_MACRO(...) std::cout << #__VA_ARGS__ " = " EMP_STRINGIFY( __VA_ARGS__ ) << std::endl
+
+#define TEST_MARK(X) x ## X ## x
+
 void testing(int a) { std::cout << a << std::endl; }
 void testing(int a, int b) { std::cout << a+b << std::endl; }
 void testing(int a, int b, int c) { std::cout << a+b+c << std::endl; }
@@ -20,6 +26,14 @@ void testing(int a, int b, int c, int d, int e) { std::cout << a+b+c+d+e << std:
 int main()
 {
   std::cout << "Testing." << std::endl;
+
+  std::cout << SHOW_MACRO( TEST_MARK(0) ) << std::endl;
+  PRINT_MACRO( TEST_MARK(1) );
+
+  PRINT_MACRO( EMP_WRAP_ARGS( TEST_MARK, 1, 2, 3, 4 ) );
+
+  PRINT_MACRO( EMP_TYPES_TO_VALS(int,double,std::string) );
+  PRINT_MACRO( EMP_TYPES_TO_VALS( double , double) );
 
   std::cout << EMP_STRINGIFY( EMP_PERMUTE(XYZ) ) << std::endl << std::endl;
   std::cout << EMP_STRINGIFY( EMP_PERMUTE(A,B) ) << std::endl << std::endl;
