@@ -85,22 +85,23 @@
     template <typename T>                                                                         \
     using return_t_ ## FUN_NAME =                                                                 \
       EMP_IF( NUM_ARGS,                                                                           \
-        decltype( std::declval<T>().FUN_NAME() );,                                                \
-        decltype( std::declval<T>().FUN_NAME(EMP_TYPES_TO_VALS(__VA_ARGS__)) );                   \
+        decltype( std::declval<T>().FUN_NAME(EMP_TYPES_TO_VALS(__VA_ARGS__)) );,                  \
+        decltype( std::declval<T>().FUN_NAME() );                                                 \
       )                                                                                           \
   public:                                                                                         \
     /* Test whether function exists, based on SFINAE in using return type.                    */  \
     static constexpr bool HasFun_ ## FUN_NAME() {                                                 \
       return emp::test_type<return_t_ ## FUN_NAME, WRAPPED_T>();                                  \
     }                                                                                             \
+    static constexpr size_t ArgCount_ ## FUN_NAME = NUM_ARGS;                                     \
     /* Call appropriate version of the function.  First determine if there is a non-void          \
        return type (i.e., do we return th result?) then check if the function exists in the       \
        wrapped class or should we call/return the default (otherwise).                        */  \
     EMP_IF( NUM_ARGS,                                                                             \
-            RETURN_T FUN_NAME( EMP_DECLARE_ARGS(__VA_ARGS__) ),                                   \
+            RETURN_T FUN_NAME( EMP_DECLARE_VARS(__VA_ARGS__) ),                                   \
             RETURN_T FUN_NAME( )                                                                  \
     ) {                                                                                           \
-      static_assert( HasFun_ ## FUN_NAME(), ERROR " (Class: " "TBD" ")" );                        \
+      static_assert( HasFun_ ## FUN_NAME(), "\n\n  ** " ERROR " (Class: " "TBD" ") **\n" );       \
       if constexpr (HasFun_ ## FUN_NAME()) {                                                      \
         EMP_IF( EMP_TEST_IF_VOID(RETURN_T),                                                       \
           /* void return -> call function, but don't return result. */                            \
@@ -130,19 +131,20 @@
     template <typename T>                                                                         \
     using return_t_ ## FUN_NAME =                                                                 \
       EMP_IF( NUM_ARGS,                                                                           \
-        decltype( std::declval<T>().FUN_NAME() );,                                                \
-        decltype( std::declval<T>().FUN_NAME(EMP_TYPES_TO_VALS(__VA_ARGS__)) );                   \
+        decltype( std::declval<T>().FUN_NAME(EMP_TYPES_TO_VALS(__VA_ARGS__)) );,                  \
+        decltype( std::declval<T>().FUN_NAME() );                                                 \
       )                                                                                           \
   public:                                                                                         \
     /* Test whether function exists, based on SFINAE in using return type.                    */  \
     static constexpr bool HasFun_ ## FUN_NAME() {                                                 \
       return emp::test_type<return_t_ ## FUN_NAME, WRAPPED_T>();                                  \
     }                                                                                             \
+    static constexpr size_t ArgCount_ ## FUN_NAME = NUM_ARGS;                                     \
     /* Call appropriate version of the function.  First determine if there is a non-void          \
        return type (i.e., do we return th result?) then check if the function exists in the       \
        wrapped class or should we call/return the default (otherwise).                        */  \
     EMP_IF( NUM_ARGS,                                                                             \
-            RETURN_T FUN_NAME( EMP_DECLARE_ARGS(__VA_ARGS__) ),                                   \
+            RETURN_T FUN_NAME( EMP_DECLARE_VARS(__VA_ARGS__) ),                                   \
             RETURN_T FUN_NAME( )                                                                  \
     ) {                                                                                           \
       constexpr bool has_fun = HasFun_ ## FUN_NAME();                                             \
