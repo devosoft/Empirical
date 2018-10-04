@@ -303,33 +303,36 @@
 
 /// @endcond
 
+// Make sure to evaluate macros generated inside of EMP_WRAP_EACH
+#define EMP_WRAP_EACH_EVAL(...) __VA_ARGS__
+
 /// EMP_WRAP_EACH, wraps each argument in the specified macro wrapper.
-#define EMP_WRAP_EACH(W, ...) EMP_CALL_BY_PACKS(EMP_WRAP_EACH_, W, __VA_ARGS__)
+#define EMP_WRAP_EACH(W, ...) EMP_WRAP_EACH_EVAL( EMP_CALL_BY_PACKS(EMP_WRAP_EACH_, W, __VA_ARGS__) )
 /// @cond MACROS
 #define EMP_WRAP_EACH_1(W, A, ...) W(A)
 #define EMP_WRAP_EACH_2(W, A,B,...) EMP_WRAP_EACH_1(W, A, ~) EMP_WRAP_EACH_1(W, B, ~)
 #define EMP_WRAP_EACH_4(W, A,B,...) EMP_WRAP_EACH_2(W, A, B, ~) EMP_WRAP_EACH_2(W, __VA_ARGS__)
 #define EMP_WRAP_EACH_8(W, ...)                                         \
   EMP_WRAP_EACH_4(W, __VA_ARGS__)                                       \
-  EMP_EVAL1( EMP_WRAP_EACH_4 EMP_EMPTY() (W, EMP_POP_ARGS_4(__VA_ARGS__)) )
+  EMP_EVAL_A( EMP_WRAP_EACH_4 EMP_EMPTY() (W, EMP_POP_ARGS_4(__VA_ARGS__)) )
 #define EMP_WRAP_EACH_16(W, ...) \
   EMP_WRAP_EACH_8(W, __VA_ARGS__) \
-  EMP_EVAL2( EMP_WRAP_EACH_8 EMP_EMPTY() (W, EMP_POP_ARGS_8(__VA_ARGS__)) )
+  EMP_EVAL_B( EMP_WRAP_EACH_8 EMP_EMPTY() (W, EMP_POP_ARGS_8(__VA_ARGS__)) )
 #define EMP_WRAP_EACH_32(W, ...) \
   EMP_WRAP_EACH_16(W, __VA_ARGS__) \
-  EMP_EVAL3( EMP_WRAP_EACH_16 EMP_EMPTY() (W, EMP_POP_ARGS_16(__VA_ARGS__)) )
+  EMP_EVAL_C( EMP_WRAP_EACH_16 EMP_EMPTY() (W, EMP_POP_ARGS_16(__VA_ARGS__)) )
 #define EMP_WRAP_EACH_64(W, ...) \
   EMP_WRAP_EACH_32(W, __VA_ARGS__) \
-  EMP_EVAL4( EMP_WRAP_EACH_32 EMP_EMPTY() (W, EMP_POP_ARGS_32(__VA_ARGS__)) )
+  EMP_EVAL_D( EMP_WRAP_EACH_32 EMP_EMPTY() (W, EMP_POP_ARGS_32(__VA_ARGS__)) )
 #define EMP_WRAP_EACH_128(W, ...) \
   EMP_WRAP_EACH_64(W, __VA_ARGS__) \
-  EMP_EVAL5( EMP_WRAP_EACH_64 EMP_EMPTY() (W, EMP_POP_ARGS_64(__VA_ARGS__)) )
+  EMP_EVAL_E( EMP_WRAP_EACH_64 EMP_EMPTY() (W, EMP_POP_ARGS_64(__VA_ARGS__)) )
 #define EMP_WRAP_EACH_256(W, ...) \
   EMP_WRAP_EACH_128(W, __VA_ARGS__) \
-  EMP_EVAL6( EMP_WRAP_EACH_128 EMP_EMPTY() (W, EMP_POP_ARGS_128(__VA_ARGS__)) )
+  EMP_EVAL_F( EMP_WRAP_EACH_128 EMP_EMPTY() (W, EMP_POP_ARGS_128(__VA_ARGS__)) )
 #define EMP_WRAP_EACH_512(W, ...) \
   EMP_WRAP_EACH_256(W, __VA_ARGS__) \
-  EMP_EVAL7( EMP_WRAP_EACH_256 EMP_EMPTY() (W, EMP_POP_ARGS_256(__VA_ARGS__)) )
+  EMP_EVAL_G( EMP_WRAP_EACH_256 EMP_EMPTY() (W, EMP_POP_ARGS_256(__VA_ARGS__)) )
 /// @endcond
 
 /// EMP_WRAP_EACH_1ARG, wraps each argument in the specified macro wrapper, with added first arg.
@@ -342,28 +345,28 @@
                                               EMP_WRAP_EACH_1ARG_2(P, __VA_ARGS__)
 #define EMP_WRAP_EACH_1ARG_8(P, ...)                                                \
   EMP_WRAP_EACH_1ARG_4(P, __VA_ARGS__)                                              \
-  EMP_EVAL1( EMP_WRAP_EACH_1ARG_4 EMP_EMPTY() (P, EMP_POP_ARGS_4(__VA_ARGS__)) )
+  EMP_EVAL_A( EMP_WRAP_EACH_1ARG_4 EMP_EMPTY() (P, EMP_POP_ARGS_4(__VA_ARGS__)) )
 #define EMP_WRAP_EACH_1ARG_16(P, ...)                                               \
   EMP_WRAP_EACH_1ARG_8(P, __VA_ARGS__)                                              \
-  EMP_EVAL2( EMP_WRAP_EACH_1ARG_8 EMP_EMPTY() (P, EMP_POP_ARGS_8(__VA_ARGS__)) )
+  EMP_EVAL_B( EMP_WRAP_EACH_1ARG_8 EMP_EMPTY() (P, EMP_POP_ARGS_8(__VA_ARGS__)) )
 #define EMP_WRAP_EACH_1ARG_32(P, ...)                                               \
   EMP_WRAP_EACH_1ARG_16(P, __VA_ARGS__)                                             \
-  EMP_EVAL3( EMP_WRAP_EACH_1ARG_16 EMP_EMPTY() (P, EMP_POP_ARGS_16(__VA_ARGS__)) )
+  EMP_EVAL_C( EMP_WRAP_EACH_1ARG_16 EMP_EMPTY() (P, EMP_POP_ARGS_16(__VA_ARGS__)) )
 #define EMP_WRAP_EACH_1ARG_64(P, ...)                                               \
   EMP_WRAP_EACH_1ARG_32(P, __VA_ARGS__)                                             \
-  EMP_EVAL4( EMP_WRAP_EACH_1ARG_32 EMP_EMPTY() (P, EMP_POP_ARGS_32(__VA_ARGS__)) )
+  EMP_EVAL_D( EMP_WRAP_EACH_1ARG_32 EMP_EMPTY() (P, EMP_POP_ARGS_32(__VA_ARGS__)) )
 #define EMP_WRAP_EACH_1ARG_128(P, ...)                                              \
   EMP_WRAP_EACH_1ARG_64(P, __VA_ARGS__)                                             \
-  EMP_EVAL5( EMP_WRAP_EACH_1ARG_64 EMP_EMPTY() (P, EMP_POP_ARGS_64(__VA_ARGS__)) )
+  EMP_EVAL_E( EMP_WRAP_EACH_1ARG_64 EMP_EMPTY() (P, EMP_POP_ARGS_64(__VA_ARGS__)) )
 #define EMP_WRAP_EACH_1ARG_256(P, ...)                                              \
   EMP_WRAP_EACH_1ARG_128(P, __VA_ARGS__)                                            \
-  EMP_EVAL6( EMP_WRAP_EACH_1ARG_128 EMP_EMPTY() (P, EMP_POP_ARGS_128(__VA_ARGS__)) )
+  EMP_EVAL_F( EMP_WRAP_EACH_1ARG_128 EMP_EMPTY() (P, EMP_POP_ARGS_128(__VA_ARGS__)) )
 #define EMP_WRAP_EACH_1ARG_512(P, ...)                                              \
   EMP_WRAP_EACH_1ARG_256(P, __VA_ARGS__)                                            \
-  EMP_EVAL7( EMP_WRAP_EACH_1ARG_256 EMP_EMPTY() (P, EMP_POP_ARGS_256(__VA_ARGS__)) )
+  EMP_EVAL_G( EMP_WRAP_EACH_1ARG_256 EMP_EMPTY() (P, EMP_POP_ARGS_256(__VA_ARGS__)) )
 /// @endcond
 
-/// imilar to EMP_WRAP_EACH, but puts a COMMA between each arg pair.
+/// imilar to EMP_WRAP_ARGS, but puts a COMMA between each arg pair.
 #define EMP_WRAP_ARGS(W, ...) EMP_POP_ARGS_1( ~ EMP_CALL_BY_PACKS(EMP_WRAP_ARGS_, W, __VA_ARGS__) )
 /// @cond MACROS
 #define EMP_WRAP_ARGS_1(W, A, ...) , W(A)
@@ -371,25 +374,25 @@
 #define EMP_WRAP_ARGS_4(W, A,B,...) EMP_WRAP_ARGS_2(W, A, B, ~) EMP_WRAP_ARGS_2(W, __VA_ARGS__)
 #define EMP_WRAP_ARGS_8(W, ...)                                         \
   EMP_WRAP_ARGS_4(W, __VA_ARGS__)                                       \
-  EMP_EVAL1( EMP_WRAP_ARGS_4 EMP_EMPTY() (W, EMP_POP_ARGS_4(__VA_ARGS__)) )
+  EMP_EVAL_A( EMP_WRAP_ARGS_4 EMP_EMPTY() (W, EMP_POP_ARGS_4(__VA_ARGS__)) )
 #define EMP_WRAP_ARGS_16(W, ...) \
   EMP_WRAP_ARGS_8(W, __VA_ARGS__) \
-  EMP_EVAL2( EMP_WRAP_ARGS_8 EMP_EMPTY() (W, EMP_POP_ARGS_8(__VA_ARGS__)) )
+  EMP_EVAL_B( EMP_WRAP_ARGS_8 EMP_EMPTY() (W, EMP_POP_ARGS_8(__VA_ARGS__)) )
 #define EMP_WRAP_ARGS_32(W, ...) \
   EMP_WRAP_ARGS_16(W, __VA_ARGS__) \
-  EMP_EVAL3( EMP_WRAP_ARGS_16 EMP_EMPTY() (W, EMP_POP_ARGS_16(__VA_ARGS__)) )
+  EMP_EVAL_C( EMP_WRAP_ARGS_16 EMP_EMPTY() (W, EMP_POP_ARGS_16(__VA_ARGS__)) )
 #define EMP_WRAP_ARGS_64(W, ...) \
   EMP_WRAP_ARGS_32(W, __VA_ARGS__) \
-  EMP_EVAL4( EMP_WRAP_ARGS_32 EMP_EMPTY() (W, EMP_POP_ARGS_32(__VA_ARGS__)) )
+  EMP_EVAL_D( EMP_WRAP_ARGS_32 EMP_EMPTY() (W, EMP_POP_ARGS_32(__VA_ARGS__)) )
 #define EMP_WRAP_ARGS_128(W, ...) \
   EMP_WRAP_ARGS_64(W, __VA_ARGS__) \
-  EMP_EVAL5( EMP_WRAP_ARGS_64 EMP_EMPTY() (W, EMP_POP_ARGS_64(__VA_ARGS__)) )
+  EMP_EVAL_E( EMP_WRAP_ARGS_64 EMP_EMPTY() (W, EMP_POP_ARGS_64(__VA_ARGS__)) )
 #define EMP_WRAP_ARGS_256(W, ...) \
   EMP_WRAP_ARGS_128(W, __VA_ARGS__) \
-  EMP_EVAL6( EMP_WRAP_ARGS_128 EMP_EMPTY() (W, EMP_POP_ARGS_128(__VA_ARGS__)) )
+  EMP_EVAL_F( EMP_WRAP_ARGS_128 EMP_EMPTY() (W, EMP_POP_ARGS_128(__VA_ARGS__)) )
 #define EMP_WRAP_ARGS_512(W, ...) \
   EMP_WRAP_ARGS_256(W, __VA_ARGS__) \
-  EMP_EVAL7( EMP_WRAP_ARGS_256 EMP_EMPTY() (W, EMP_POP_ARGS_256(__VA_ARGS__)) )
+  EMP_EVAL_G( EMP_WRAP_ARGS_256 EMP_EMPTY() (W, EMP_POP_ARGS_256(__VA_ARGS__)) )
 /// @endcond
 
 #define EMP_WRAP_ARGS_1ARG(W, ARG, ...) \
@@ -400,25 +403,25 @@
 #define EMP_WRAP_ARGS_1ARG_4(P, A,B,...) EMP_WRAP_ARGS_1ARG_2(P, A, B, ~) EMP_WRAP_ARGS_1ARG_2(P, __VA_ARGS__)
 #define EMP_WRAP_ARGS_1ARG_8(P, ...)                                         \
   EMP_WRAP_ARGS_1ARG_4(P, __VA_ARGS__)                                       \
-  EMP_EVAL1( EMP_WRAP_ARGS_1ARG_4 EMP_EMPTY() (P, EMP_POP_ARGS_4(__VA_ARGS__)) )
+  EMP_EVAL_A( EMP_WRAP_ARGS_1ARG_4 EMP_EMPTY() (P, EMP_POP_ARGS_4(__VA_ARGS__)) )
 #define EMP_WRAP_ARGS_1ARG_16(P, ...) \
   EMP_WRAP_ARGS_1ARG_8(P, __VA_ARGS__) \
-  EMP_EVAL2( EMP_WRAP_ARGS_1ARG_8 EMP_EMPTY() (P, EMP_POP_ARGS_8(__VA_ARGS__)) )
+  EMP_EVAL_B( EMP_WRAP_ARGS_1ARG_8 EMP_EMPTY() (P, EMP_POP_ARGS_8(__VA_ARGS__)) )
 #define EMP_WRAP_ARGS_1ARG_32(P, ...) \
   EMP_WRAP_ARGS_1ARG_16(P, __VA_ARGS__) \
-  EMP_EVAL3( EMP_WRAP_ARGS_1ARG_16 EMP_EMPTY() (P, EMP_POP_ARGS_16(__VA_ARGS__)) )
+  EMP_EVAL_C( EMP_WRAP_ARGS_1ARG_16 EMP_EMPTY() (P, EMP_POP_ARGS_16(__VA_ARGS__)) )
 #define EMP_WRAP_ARGS_1ARG_64(P, ...) \
   EMP_WRAP_ARGS_1ARG_32(P, __VA_ARGS__) \
-  EMP_EVAL4( EMP_WRAP_ARGS_1ARG_32 EMP_EMPTY() (P, EMP_POP_ARGS_32(__VA_ARGS__)) )
+  EMP_EVAL_D( EMP_WRAP_ARGS_1ARG_32 EMP_EMPTY() (P, EMP_POP_ARGS_32(__VA_ARGS__)) )
 #define EMP_WRAP_ARGS_1ARG_128(P, ...) \
   EMP_WRAP_ARGS_1ARG_64(P, __VA_ARGS__) \
-  EMP_EVAL5( EMP_WRAP_ARGS_1ARG_64 EMP_EMPTY() (P, EMP_POP_ARGS_64(__VA_ARGS__)) )
+  EMP_EVAL_E( EMP_WRAP_ARGS_1ARG_64 EMP_EMPTY() (P, EMP_POP_ARGS_64(__VA_ARGS__)) )
 #define EMP_WRAP_ARGS_1ARG_256(P, ...) \
   EMP_WRAP_ARGS_1ARG_128(P, __VA_ARGS__) \
-  EMP_EVAL6( EMP_WRAP_ARGS_1ARG_128 EMP_EMPTY() (P, EMP_POP_ARGS_128(__VA_ARGS__)) )
+  EMP_EVAL_F( EMP_WRAP_ARGS_1ARG_128 EMP_EMPTY() (P, EMP_POP_ARGS_128(__VA_ARGS__)) )
 #define EMP_WRAP_ARGS_1ARG_512(P, ...) \
   EMP_WRAP_ARGS_1ARG_256(P, __VA_ARGS__) \
-  EMP_EVAL7( EMP_WRAP_ARGS_1ARG_256 EMP_EMPTY() (P, EMP_POP_ARGS_256(__VA_ARGS__)) )
+  EMP_EVAL_G( EMP_WRAP_ARGS_1ARG_256 EMP_EMPTY() (P, EMP_POP_ARGS_256(__VA_ARGS__)) )
 /// @endcond
 
 /// Replace all of the commas in an argument set with something else (including nothing)
@@ -452,13 +455,13 @@
 #define EMP_CROP_ARGS_TO_1(W, A, ...) , A
 #define EMP_CROP_ARGS_TO_2(W, A,B,...) , A , B
 #define EMP_CROP_ARGS_TO_4(W, A,B,...) EMP_CROP_ARGS_TO_2(W, A,B,~) EMP_CROP_ARGS_TO_2(W,__VA_ARGS__)
-#define EMP_CROP_ARGS_TO_8(W, ...) EMP_CROP_ARGS_TO_4(W, __VA_ARGS__) EMP_EVAL1( EMP_CROP_ARGS_TO_4 EMP_EMPTY() (W, EMP_POP_ARGS_4(__VA_ARGS__)) )
-#define EMP_CROP_ARGS_TO_16(W, ...) EMP_CROP_ARGS_TO_8(W, __VA_ARGS__) EMP_EVAL2( EMP_CROP_ARGS_TO_8 EMP_EMPTY() (W, EMP_POP_ARGS_8(__VA_ARGS__)) )
-#define EMP_CROP_ARGS_TO_32(W, ...) EMP_CROP_ARGS_TO_16(W, __VA_ARGS__) EMP_EVAL3( EMP_CROP_ARGS_TO_16 EMP_EMPTY() (W, EMP_POP_ARGS_16(__VA_ARGS__)) )
-#define EMP_CROP_ARGS_TO_64(W, ...) EMP_CROP_ARGS_TO_32(W, __VA_ARGS__) EMP_EVAL4( EMP_CROP_ARGS_TO_32 EMP_EMPTY() (W, EMP_POP_ARGS_32(__VA_ARGS__)) )
-#define EMP_CROP_ARGS_TO_128(W, ...) EMP_CROP_ARGS_TO_64(W, __VA_ARGS__) EMP_EVAL5( EMP_CROP_ARGS_TO_64 EMP_EMPTY() (W, EMP_POP_ARGS_64(__VA_ARGS__)) )
-#define EMP_CROP_ARGS_TO_256(W, ...) EMP_CROP_ARGS_TO_128(W, __VA_ARGS__) EMP_EVAL6( EMP_CROP_ARGS_TO_128 EMP_EMPTY() (W, EMP_POP_ARGS_128(__VA_ARGS__)) )
-#define EMP_CROP_ARGS_TO_512(W, ...) EMP_CROP_ARGS_TO_256(W, __VA_ARGS__) EMP_EVAL7( EMP_CROP_ARGS_TO_256 EMP_EMPTY() (W, EMP_POP_ARGS_256(__VA_ARGS__)) )
+#define EMP_CROP_ARGS_TO_8(W, ...) EMP_CROP_ARGS_TO_4(W, __VA_ARGS__) EMP_EVAL_A( EMP_CROP_ARGS_TO_4 EMP_EMPTY() (W, EMP_POP_ARGS_4(__VA_ARGS__)) )
+#define EMP_CROP_ARGS_TO_16(W, ...) EMP_CROP_ARGS_TO_8(W, __VA_ARGS__) EMP_EVAL_B( EMP_CROP_ARGS_TO_8 EMP_EMPTY() (W, EMP_POP_ARGS_8(__VA_ARGS__)) )
+#define EMP_CROP_ARGS_TO_32(W, ...) EMP_CROP_ARGS_TO_16(W, __VA_ARGS__) EMP_EVAL_C( EMP_CROP_ARGS_TO_16 EMP_EMPTY() (W, EMP_POP_ARGS_16(__VA_ARGS__)) )
+#define EMP_CROP_ARGS_TO_64(W, ...) EMP_CROP_ARGS_TO_32(W, __VA_ARGS__) EMP_EVAL_D( EMP_CROP_ARGS_TO_32 EMP_EMPTY() (W, EMP_POP_ARGS_32(__VA_ARGS__)) )
+#define EMP_CROP_ARGS_TO_128(W, ...) EMP_CROP_ARGS_TO_64(W, __VA_ARGS__) EMP_EVAL_E( EMP_CROP_ARGS_TO_64 EMP_EMPTY() (W, EMP_POP_ARGS_64(__VA_ARGS__)) )
+#define EMP_CROP_ARGS_TO_256(W, ...) EMP_CROP_ARGS_TO_128(W, __VA_ARGS__) EMP_EVAL_F( EMP_CROP_ARGS_TO_128 EMP_EMPTY() (W, EMP_POP_ARGS_128(__VA_ARGS__)) )
+#define EMP_CROP_ARGS_TO_512(W, ...) EMP_CROP_ARGS_TO_256(W, __VA_ARGS__) EMP_EVAL_G( EMP_CROP_ARGS_TO_256 EMP_EMPTY() (W, EMP_POP_ARGS_256(__VA_ARGS__)) )
 /// @endcond
 
 /// Force arguments to a specific number.  If less, pad them; if more crop them.
@@ -927,7 +930,9 @@
 #define EMP_NUM_TO_VAR(N) arg ## N
 
 /// Create N variables that will work with EMP_DECLARE_VARS, named arg1, arg2, arg3, etc.
-#define EMP_NUMS_TO_VARS(N) EMP_WRAP_ARGS(EMP_NUM_TO_VAR, EMP_RANGE_TO(N))
+/// NOTE: If N is zero, converts to empty.
+//#define EMP_NUMS_TO_VARS(N) EMP_WRAP_ARGS(EMP_NUM_TO_VAR, EMP_RANGE_TO(N))
+#define EMP_NUMS_TO_VARS(N) EMP_EVAL EMP_EMPTY() EMP_IF( N, (EMP_WRAP_ARGS(EMP_NUM_TO_VAR, EMP_RANGE_TO(N))), ())
 
 /// Functions often need to be wrapped differently if they have a void return type.
 /// This macro will convert to 1 if a void type is passed in, zero otherwise and can
