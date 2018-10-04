@@ -10,7 +10,7 @@
 #include "base/Ptr.h"
 #include "meta/ConceptWrapper.h"
 
-EMP_BUILD_CONCEPT( TestConcept,
+EMP_BUILD_CONCEPT( TestConcept, TestConcept_Base,
                    PUBLIC( int x=5; ),
                    REQUIRED_FUN(RequiredFun1, "Missing RequiredFun function 1!", void),
                    REQUIRED_FUN(RequiredFun2, "Missing RequiredFun function 2!", void),
