@@ -190,11 +190,11 @@
 #define EMP_PACK_SIZE(PACK) EMP_COUNT_ARGS PACK
 
 // Macros to work on multiple packs at once.
-#define EMP_PACKS_POP_ALL(...) EMP_WRAP_ARGS(EMP_PACK_POP, __VA_ARGS__)
-#define EMP_PACKS_TOP_ALL(...) EMP_WRAP_ARGS(EMP_PACK_TOP, __VA_ARGS__)
-#define EMP_PACKS_PUSH_ALL(NEW, ...) EMP_WRAP_ARGS_1ARG(EMP_PACK_PUSH, NEW, __VA_ARGS__)
-#define EMP_PACKS_PUSH_REAR_ALL(NEW, ...) EMP_WRAP_ARGS_1ARG(EMP_PACK_PUSH_REAR, NEW, __VA_ARGS__)
-#define EMP_PACKS_SIZE_ALL(...) EMP_WRAP_ARGS(EMP_PACK_SIZE, __VA_ARGS__)
+#define EMP_PACKS_POP_ALL(...) EMP_INTERNAL_WRAP_ARGS(EMP_PACK_POP, __VA_ARGS__)
+#define EMP_PACKS_TOP_ALL(...) EMP_INTERNAL_WRAP_ARGS(EMP_PACK_TOP, __VA_ARGS__)
+#define EMP_PACKS_PUSH_ALL(NEW, ...) EMP_INTERNAL_WRAP_ARGS_1ARG(EMP_PACK_PUSH, NEW, __VA_ARGS__)
+#define EMP_PACKS_PUSH_REAR_ALL(NEW, ...) EMP_INTERNAL_WRAP_ARGS_1ARG(EMP_PACK_PUSH_REAR, NEW, __VA_ARGS__)
+#define EMP_PACKS_SIZE_ALL(...) EMP_INTERNAL_WRAP_ARGS(EMP_PACK_SIZE, __VA_ARGS__)
 
 /// Group the arguments that follow into packs of size S.
 #define EMP_ARGS_TO_PACKS(S, ...) \
@@ -303,11 +303,8 @@
 
 /// @endcond
 
-// Make sure to evaluate macros generated inside of EMP_WRAP_EACH
-#define EMP_WRAP_EACH_EVAL(...) __VA_ARGS__
-
 /// EMP_WRAP_EACH, wraps each argument in the specified macro wrapper.
-#define EMP_WRAP_EACH(W, ...) EMP_WRAP_EACH_EVAL( EMP_CALL_BY_PACKS(EMP_WRAP_EACH_, W, __VA_ARGS__) )
+#define EMP_WRAP_EACH(W, ...) EMP_CALL_BY_PACKS(EMP_WRAP_EACH_, W, __VA_ARGS__)
 /// @cond MACROS
 #define EMP_WRAP_EACH_1(W, A, ...) W(A)
 #define EMP_WRAP_EACH_2(W, A,B,...) EMP_WRAP_EACH_1(W, A, ~) EMP_WRAP_EACH_1(W, B, ~)
@@ -424,11 +421,211 @@
   EMP_EVAL_G( EMP_WRAP_ARGS_1ARG_256 EMP_EMPTY() (P, EMP_POP_ARGS_256(__VA_ARGS__)) )
 /// @endcond
 
+
+// @cond MACROS
+
+
+// **********************
+
+// We are going to have a second, internal version of CALL_BY_PACKS so that it can be used
+// when nested by one level.  All internal functions to macros.h will use the internal version.
+
+
+/// EMP_INTERNAL_CALL_BY_PACKS is used to build other macros.  It will call a series of versions of C
+/// based on binary representations so that all args are called, passing F in as the first
+/// parameter.  For example, if C = ABC_ and 13 arguments are passed in, it will call ABC_8,
+/// ABC_4 and ABC_1 on appropriate subsets (prepending F as the first argument of each call)
+///
+/// C is the CALL needed to be made on each element of the parameter pack
+/// F is a FIXED parameter (potentially a pack) sent to all calls.
+#define EMP_INTERNAL_CALL_BY_PACKS(C, F, ...)                                     \
+  EMP_INTERNAL_CALL_BY_PACKS_impl(C, F, EMP_DEC_TO_PACK(EMP_COUNT_ARGS(__VA_ARGS__)), __VA_ARGS__, ~)
+
+/// @cond MACROS
+
+// Internal helpers...
+// P is the pack of call counts the still need to be done
+// A is the number of arguments in P.
+// N is the NEXT call count needed to be done.
+#define EMP_INTERNAL_CALL_BY_PACKS_impl(C, F, P, ...) \
+  EMP_INTERNAL_CALL_BY_PACKS_implB(C, F, EMP_PACK_SIZE(P), EMP_PACK_PUSH_REAR(~, P), __VA_ARGS__)
+#define EMP_INTERNAL_CALL_BY_PACKS_implB(C, F, A, P, ...) EMP_INTERNAL_CALL_BY_PACKS_implC(C, F, A, P, __VA_ARGS__)
+#define EMP_INTERNAL_CALL_BY_PACKS_implC(C, F, A, P, ...) \
+  EMP_INTERNAL_CALL_BY_PACKS_implD(C, EMP_PACK_TOP(P), F, A, EMP_PACK_POP(P), __VA_ARGS__)
+#define EMP_INTERNAL_CALL_BY_PACKS_implD(C, N, F, A, P, ...) EMP_INTERNAL_CALL_BY_PACKS_impl##A(C,N,F,P,__VA_ARGS__)
+
+#define EMP_INTERNAL_CALL_BY_PACKS_impl1(C, N, F, P, ...)        \
+  EMP_INTERNAL_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)
+
+#define EMP_INTERNAL_CALL_BY_PACKS_impl2(C, N, F, P, ...) EMP_INTERNAL_CALL_BY_PACKS_impl2B(C, N, F, P, __VA_ARGS__)
+#define EMP_INTERNAL_CALL_BY_PACKS_impl2B(C, N, F, P, ...)                       \
+  EMP_INTERNAL_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_INTERNAL_CALL_BY_PACKS_impl1(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+
+#define EMP_INTERNAL_CALL_BY_PACKS_impl3(C, N, F, P, ...) EMP_INTERNAL_CALL_BY_PACKS_impl3B(C, N, F, P, __VA_ARGS__)
+#define EMP_INTERNAL_CALL_BY_PACKS_impl3B(C, N, F, P, ...)                       \
+  EMP_INTERNAL_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_INTERNAL_CALL_BY_PACKS_impl2(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+
+#define EMP_INTERNAL_CALL_BY_PACKS_impl4(C, N, F, P, ...) EMP_INTERNAL_CALL_BY_PACKS_impl4B(C, N, F, P, __VA_ARGS__)
+#define EMP_INTERNAL_CALL_BY_PACKS_impl4B(C, N, F, P, ...)                       \
+  EMP_INTERNAL_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_INTERNAL_CALL_BY_PACKS_impl3(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+
+#define EMP_INTERNAL_CALL_BY_PACKS_impl5(C, N, F, P, ...) EMP_INTERNAL_CALL_BY_PACKS_impl5B(C, N, F, P, __VA_ARGS__)
+#define EMP_INTERNAL_CALL_BY_PACKS_impl5B(C, N, F, P, ...)                       \
+  EMP_INTERNAL_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_INTERNAL_CALL_BY_PACKS_impl4(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+
+#define EMP_INTERNAL_CALL_BY_PACKS_impl6(C, N, F, P, ...) EMP_INTERNAL_CALL_BY_PACKS_impl6B(C, N, F, P, __VA_ARGS__)
+#define EMP_INTERNAL_CALL_BY_PACKS_impl6B(C, N, F, P, ...)                       \
+  EMP_INTERNAL_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_INTERNAL_CALL_BY_PACKS_impl5(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+
+#define EMP_INTERNAL_CALL_BY_PACKS_impl7(C, N, F, P, ...) EMP_INTERNAL_CALL_BY_PACKS_impl7B(C, N, F, P, __VA_ARGS__)
+#define EMP_INTERNAL_CALL_BY_PACKS_impl7B(C, N, F, P, ...)                       \
+  EMP_INTERNAL_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_INTERNAL_CALL_BY_PACKS_impl6(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+
+#define EMP_INTERNAL_CALL_BY_PACKS_impl8(C, N, F, P, ...) EMP_INTERNAL_CALL_BY_PACKS_impl8B(C, N, F, P, __VA_ARGS__)
+#define EMP_INTERNAL_CALL_BY_PACKS_impl8B(C, N, F, P, ...)                       \
+  EMP_INTERNAL_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_INTERNAL_CALL_BY_PACKS_impl7(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+
+#define EMP_INTERNAL_CALL_BY_PACKS_impl9(C, N, F, P, ...) EMP_INTERNAL_CALL_BY_PACKS_impl9B(C, N, F, P, __VA_ARGS__)
+#define EMP_INTERNAL_CALL_BY_PACKS_impl9B(C, N, F, P, ...)                       \
+  EMP_INTERNAL_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_INTERNAL_CALL_BY_PACKS_impl8(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+
+#define EMP_INTERNAL_CALL_BY_PACKS_impl10(C, N, F, P, ...) EMP_INTERNAL_CALL_BY_PACKS_impl10B(C, N, F, P, __VA_ARGS__)
+#define EMP_INTERNAL_CALL_BY_PACKS_impl10B(C, N, F, P, ...)                      \
+  EMP_INTERNAL_CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_INTERNAL_CALL_BY_PACKS_impl9(C, EMP_PACK_TOP(P), F, EMP_PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+
+#define EMP_INTERNAL_CALL_BY_PACKS_do_call(C, V, F, ...) C ## V(F, __VA_ARGS__)
+
+#define EMP_INTERNAL_WRAP_EACH(W, ...) EMP_INTERNAL_CALL_BY_PACKS(EMP_INTERNAL_WRAP_EACH_, W, __VA_ARGS__)
+#define EMP_INTERNAL_WRAP_EACH_1(W, A, ...) W(A)
+#define EMP_INTERNAL_WRAP_EACH_2(W, A,B,...) EMP_INTERNAL_WRAP_EACH_1(W, A, ~) EMP_INTERNAL_WRAP_EACH_1(W, B, ~)
+#define EMP_INTERNAL_WRAP_EACH_4(W, A,B,...) EMP_INTERNAL_WRAP_EACH_2(W, A, B, ~) EMP_INTERNAL_WRAP_EACH_2(W, __VA_ARGS__)
+#define EMP_INTERNAL_WRAP_EACH_8(W, ...)                                         \
+  EMP_INTERNAL_WRAP_EACH_4(W, __VA_ARGS__)                                       \
+  EMP_INTERNAL_EVAL1( EMP_INTERNAL_WRAP_EACH_4 EMP_INTERNAL_EMPTY() (W, EMP_POP_ARGS_4(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_EACH_16(W, ...) \
+  EMP_INTERNAL_WRAP_EACH_8(W, __VA_ARGS__) \
+  EMP_INTERNAL_EVAL2( EMP_INTERNAL_WRAP_EACH_8 EMP_INTERNAL_EMPTY() (W, EMP_POP_ARGS_8(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_EACH_32(W, ...) \
+  EMP_INTERNAL_WRAP_EACH_16(W, __VA_ARGS__) \
+  EMP_INTERNAL_EVAL3( EMP_INTERNAL_WRAP_EACH_16 EMP_INTERNAL_EMPTY() (W, EMP_POP_ARGS_16(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_EACH_64(W, ...) \
+  EMP_INTERNAL_WRAP_EACH_32(W, __VA_ARGS__) \
+  EMP_INTERNAL_EVAL4( EMP_INTERNAL_WRAP_EACH_32 EMP_INTERNAL_EMPTY() (W, EMP_POP_ARGS_32(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_EACH_128(W, ...) \
+  EMP_INTERNAL_WRAP_EACH_64(W, __VA_ARGS__) \
+  EMP_INTERNAL_EVAL5( EMP_INTERNAL_WRAP_EACH_64 EMP_INTERNAL_EMPTY() (W, EMP_POP_ARGS_64(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_EACH_256(W, ...) \
+  EMP_INTERNAL_WRAP_EACH_128(W, __VA_ARGS__) \
+  EMP_INTERNAL_EVAL6( EMP_INTERNAL_WRAP_EACH_128 EMP_INTERNAL_EMPTY() (W, EMP_POP_ARGS_128(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_EACH_512(W, ...) \
+  EMP_INTERNAL_WRAP_EACH_256(W, __VA_ARGS__) \
+  EMP_INTERNAL_EVAL7( EMP_INTERNAL_WRAP_EACH_256 EMP_INTERNAL_EMPTY() (W, EMP_POP_ARGS_256(__VA_ARGS__)) )
+
+/// EMP_INTERNAL_WRAP_EACH_1ARG, wraps each argument in the specified macro wrapper, with added first arg.
+#define EMP_INTERNAL_WRAP_EACH_1ARG(W, ARG, ...) EMP_INTERNAL_CALL_BY_PACKS(EMP_INTERNAL_WRAP_EACH_1ARG_, (W, ARG), __VA_ARGS__)
+
+#define EMP_INTERNAL_WRAP_EACH_1ARG_1(P, A, ...) EMP_GET_ARG_1 P (EMP_GET_ARG_2 P, A)
+#define EMP_INTERNAL_WRAP_EACH_1ARG_2(P, A,B,...) EMP_INTERNAL_WRAP_EACH_1ARG_1(P, A, ~)         \
+                                              EMP_INTERNAL_WRAP_EACH_1ARG_1(P, B, ~)
+#define EMP_INTERNAL_WRAP_EACH_1ARG_4(P, A,B,...) EMP_INTERNAL_WRAP_EACH_1ARG_2(P, A, B, ~)      \
+                                              EMP_INTERNAL_WRAP_EACH_1ARG_2(P, __VA_ARGS__)
+#define EMP_INTERNAL_WRAP_EACH_1ARG_8(P, ...)                                                \
+  EMP_INTERNAL_WRAP_EACH_1ARG_4(P, __VA_ARGS__)                                              \
+  EMP_EVAL_A( EMP_INTERNAL_WRAP_EACH_1ARG_4 EMP_EMPTY() (P, EMP_POP_ARGS_4(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_EACH_1ARG_16(P, ...)                                               \
+  EMP_INTERNAL_WRAP_EACH_1ARG_8(P, __VA_ARGS__)                                              \
+  EMP_EVAL_B( EMP_INTERNAL_WRAP_EACH_1ARG_8 EMP_EMPTY() (P, EMP_POP_ARGS_8(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_EACH_1ARG_32(P, ...)                                               \
+  EMP_INTERNAL_WRAP_EACH_1ARG_16(P, __VA_ARGS__)                                             \
+  EMP_EVAL_C( EMP_INTERNAL_WRAP_EACH_1ARG_16 EMP_EMPTY() (P, EMP_POP_ARGS_16(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_EACH_1ARG_64(P, ...)                                               \
+  EMP_INTERNAL_WRAP_EACH_1ARG_32(P, __VA_ARGS__)                                             \
+  EMP_EVAL_D( EMP_INTERNAL_WRAP_EACH_1ARG_32 EMP_EMPTY() (P, EMP_POP_ARGS_32(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_EACH_1ARG_128(P, ...)                                              \
+  EMP_INTERNAL_WRAP_EACH_1ARG_64(P, __VA_ARGS__)                                             \
+  EMP_EVAL_E( EMP_INTERNAL_WRAP_EACH_1ARG_64 EMP_EMPTY() (P, EMP_POP_ARGS_64(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_EACH_1ARG_256(P, ...)                                              \
+  EMP_INTERNAL_WRAP_EACH_1ARG_128(P, __VA_ARGS__)                                            \
+  EMP_EVAL_F( EMP_INTERNAL_WRAP_EACH_1ARG_128 EMP_EMPTY() (P, EMP_POP_ARGS_128(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_EACH_1ARG_512(P, ...)                                              \
+  EMP_INTERNAL_WRAP_EACH_1ARG_256(P, __VA_ARGS__)                                            \
+  EMP_EVAL_G( EMP_INTERNAL_WRAP_EACH_1ARG_256 EMP_EMPTY() (P, EMP_POP_ARGS_256(__VA_ARGS__)) )
+
+
+/// Similar to EMP_INTERNAL_WRAP_ARGS, but puts a COMMA between each arg pair.
+#define EMP_INTERNAL_WRAP_ARGS(W, ...) EMP_POP_ARGS_1( ~ EMP_INTERNAL_CALL_BY_PACKS(EMP_INTERNAL_WRAP_ARGS_, W, __VA_ARGS__) )
+
+#define EMP_INTERNAL_WRAP_ARGS_1(W, A, ...) , W(A)
+#define EMP_INTERNAL_WRAP_ARGS_2(W, A,B,...) EMP_INTERNAL_WRAP_ARGS_1(W, A, ~) EMP_INTERNAL_WRAP_ARGS_1(W, B, ~)
+#define EMP_INTERNAL_WRAP_ARGS_4(W, A,B,...) EMP_INTERNAL_WRAP_ARGS_2(W, A, B, ~) EMP_INTERNAL_WRAP_ARGS_2(W, __VA_ARGS__)
+#define EMP_INTERNAL_WRAP_ARGS_8(W, ...)                                         \
+  EMP_INTERNAL_WRAP_ARGS_4(W, __VA_ARGS__)                                       \
+  EMP_EVAL_A( EMP_INTERNAL_WRAP_ARGS_4 EMP_EMPTY() (W, EMP_POP_ARGS_4(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_ARGS_16(W, ...) \
+  EMP_INTERNAL_WRAP_ARGS_8(W, __VA_ARGS__) \
+  EMP_EVAL_B( EMP_INTERNAL_WRAP_ARGS_8 EMP_EMPTY() (W, EMP_POP_ARGS_8(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_ARGS_32(W, ...) \
+  EMP_INTERNAL_WRAP_ARGS_16(W, __VA_ARGS__) \
+  EMP_EVAL_C( EMP_INTERNAL_WRAP_ARGS_16 EMP_EMPTY() (W, EMP_POP_ARGS_16(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_ARGS_64(W, ...) \
+  EMP_INTERNAL_WRAP_ARGS_32(W, __VA_ARGS__) \
+  EMP_EVAL_D( EMP_INTERNAL_WRAP_ARGS_32 EMP_EMPTY() (W, EMP_POP_ARGS_32(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_ARGS_128(W, ...) \
+  EMP_INTERNAL_WRAP_ARGS_64(W, __VA_ARGS__) \
+  EMP_EVAL_E( EMP_INTERNAL_WRAP_ARGS_64 EMP_EMPTY() (W, EMP_POP_ARGS_64(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_ARGS_256(W, ...) \
+  EMP_INTERNAL_WRAP_ARGS_128(W, __VA_ARGS__) \
+  EMP_EVAL_F( EMP_INTERNAL_WRAP_ARGS_128 EMP_EMPTY() (W, EMP_POP_ARGS_128(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_ARGS_512(W, ...) \
+  EMP_INTERNAL_WRAP_ARGS_256(W, __VA_ARGS__) \
+  EMP_EVAL_G( EMP_INTERNAL_WRAP_ARGS_256 EMP_EMPTY() (W, EMP_POP_ARGS_256(__VA_ARGS__)) )
+
+#define EMP_INTERNAL_WRAP_ARGS_1ARG(W, ARG, ...) \
+  EMP_POP_ARGS_1( ~ EMP_INTERNAL_CALL_BY_PACKS(EMP_INTERNAL_WRAP_ARGS_1ARG_, (W, ARG), __VA_ARGS__) )
+
+#define EMP_INTERNAL_WRAP_ARGS_1ARG_1(P, A, ...) , EMP_GET_ARG_1 P (EMP_GET_ARG_2 P, A)
+#define EMP_INTERNAL_WRAP_ARGS_1ARG_2(P, A,B,...) EMP_INTERNAL_WRAP_ARGS_1ARG_1(P, A, ~) EMP_INTERNAL_WRAP_ARGS_1ARG_1(P, B, ~)
+#define EMP_INTERNAL_WRAP_ARGS_1ARG_4(P, A,B,...) EMP_INTERNAL_WRAP_ARGS_1ARG_2(P, A, B, ~) EMP_INTERNAL_WRAP_ARGS_1ARG_2(P, __VA_ARGS__)
+#define EMP_INTERNAL_WRAP_ARGS_1ARG_8(P, ...)                                         \
+  EMP_INTERNAL_WRAP_ARGS_1ARG_4(P, __VA_ARGS__)                                       \
+  EMP_EVAL_A( EMP_INTERNAL_WRAP_ARGS_1ARG_4 EMP_EMPTY() (P, EMP_POP_ARGS_4(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_ARGS_1ARG_16(P, ...) \
+  EMP_INTERNAL_WRAP_ARGS_1ARG_8(P, __VA_ARGS__) \
+  EMP_EVAL_B( EMP_INTERNAL_WRAP_ARGS_1ARG_8 EMP_EMPTY() (P, EMP_POP_ARGS_8(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_ARGS_1ARG_32(P, ...) \
+  EMP_INTERNAL_WRAP_ARGS_1ARG_16(P, __VA_ARGS__) \
+  EMP_EVAL_C( EMP_INTERNAL_WRAP_ARGS_1ARG_16 EMP_EMPTY() (P, EMP_POP_ARGS_16(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_ARGS_1ARG_64(P, ...) \
+  EMP_INTERNAL_WRAP_ARGS_1ARG_32(P, __VA_ARGS__) \
+  EMP_EVAL_D( EMP_INTERNAL_WRAP_ARGS_1ARG_32 EMP_EMPTY() (P, EMP_POP_ARGS_32(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_ARGS_1ARG_128(P, ...) \
+  EMP_INTERNAL_WRAP_ARGS_1ARG_64(P, __VA_ARGS__) \
+  EMP_EVAL_E( EMP_INTERNAL_WRAP_ARGS_1ARG_64 EMP_EMPTY() (P, EMP_POP_ARGS_64(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_ARGS_1ARG_256(P, ...) \
+  EMP_INTERNAL_WRAP_ARGS_1ARG_128(P, __VA_ARGS__) \
+  EMP_EVAL_F( EMP_INTERNAL_WRAP_ARGS_1ARG_128 EMP_EMPTY() (P, EMP_POP_ARGS_128(__VA_ARGS__)) )
+#define EMP_INTERNAL_WRAP_ARGS_1ARG_512(P, ...) \
+  EMP_INTERNAL_WRAP_ARGS_1ARG_256(P, __VA_ARGS__) \
+  EMP_EVAL_G( EMP_INTERNAL_WRAP_ARGS_1ARG_256 EMP_EMPTY() (P, EMP_POP_ARGS_256(__VA_ARGS__)) )
+/// @endcond
+
+//*********************
+
+
 /// Replace all of the commas in an argument set with something else (including nothing)
 /// @cond MACROS
 #define EMP_REMOVE_COMMAS(...) EMP_REPLACE_COMMAS(,__VA_ARGS__)
 /// @endcond
-#define EMP_REPLACE_COMMAS(X, ...) EMP_GET_ARG_1(__VA_ARGS__) EMP_CALL_BY_PACKS(EMP_REPLACE_COMMAS_, X, EMP_POP_ARGS_1(__VA_ARGS__) )
+#define EMP_REPLACE_COMMAS(X, ...) EMP_GET_ARG_1(__VA_ARGS__) EMP_INTERNAL_CALL_BY_PACKS(EMP_REPLACE_COMMAS_, X, EMP_POP_ARGS_1(__VA_ARGS__) )
 
 /// @cond MACROS
 #define EMP_REPLACE_COMMAS_1(X, A, ...) X A
@@ -450,7 +647,7 @@
 /// @endcond
 
 /// Keep only the first N args (assumes at least N args exist!)
-#define EMP_CROP_ARGS_TO(N, ...) EMP_POP_ARG(~ EMP_CALL_BY_PACKS_impl(EMP_CROP_ARGS_TO_, ~, EMP_DEC_TO_PACK(N), __VA_ARGS__, ~))
+#define EMP_CROP_ARGS_TO(N, ...) EMP_POP_ARG(~ EMP_INTERNAL_CALL_BY_PACKS_impl(EMP_CROP_ARGS_TO_, ~, EMP_DEC_TO_PACK(N), __VA_ARGS__, ~))
 /// @cond MACROS
 #define EMP_CROP_ARGS_TO_1(W, A, ...) , A
 #define EMP_CROP_ARGS_TO_2(W, A,B,...) , A , B
@@ -695,14 +892,15 @@
 /// @cond MACROS
 #define EMP_WRAP_ARGSET_0(W, C, ...)
 #define EMP_WRAP_ARGSET_1(W, C, ...) W( EMP_CROP_ARGS_TO(C, __VA_ARGS__) ), \
-                                                                                                     EMP_MERGE_2( EMP_WRAP_ARGSET_, EMP_SUB_1_ ## C ) (W, C, EMP_CROP_OFF(C, __VA_ARGS__) )
+                                        EMP_MERGE_2( EMP_WRAP_ARGSET_, EMP_SUB_1_ ## C ) \
+                                        (W, C, EMP_CROP_OFF(C, __VA_ARGS__) )
 #define EMP_WRAP_ARGSET_2(W, C, ...) W(A), EMP_WRAP_ARGSET_1(W, C, __VA_ARGS__)
 #define EMP_WRAP_ARGSET_3(W, C, ...) W(A), EMP_WRAP_ARGSET_2(W, C, __VA_ARGS__)
 /// @endcond
 
 /// Individually stringifies each variable passed to it and returns them
 /// with commas in between.
-#define EMP_STRINGIFY_EACH(...) EMP_WRAP_ARGS(EMP_STRINGIFY, __VA_ARGS__)
+#define EMP_STRINGIFY_EACH(...) EMP_INTERNAL_WRAP_ARGS(EMP_STRINGIFY, __VA_ARGS__)
 
 /// Similar to EMP_WRAP_ARGS, but passes pairs of args into W.
 #define EMP_WRAP_ARG_PAIRS(W, ...) EMP_ASSEMBLE_MACRO_1ARG(EMP_WRAP_ARG_PAIRS_, W, __VA_ARGS__)
@@ -855,7 +1053,7 @@
 
 /// Convert a set of types to a set of instances by wrapping each of them in declval.
 /// These mock instances of the types can be used in a function call in a decltype.
-#define EMP_TYPES_TO_VALS(...) EMP_WRAP_ARGS(EMP_TYPE_TO_VAL, __VA_ARGS__)
+#define EMP_TYPES_TO_VALS(...) EMP_INTERNAL_WRAP_ARGS(EMP_TYPE_TO_VAL, __VA_ARGS__)
 
 /// Convert a set of types to a set of arguments.  For example EMP_DECLARE_VARS(int, double, bool)
 /// would convert to: int arg1, double arg2, bool arg3
@@ -931,8 +1129,7 @@
 
 /// Create N variables that will work with EMP_DECLARE_VARS, named arg1, arg2, arg3, etc.
 /// NOTE: If N is zero, converts to empty.
-//#define EMP_NUMS_TO_VARS(N) EMP_WRAP_ARGS(EMP_NUM_TO_VAR, EMP_RANGE_TO(N))
-#define EMP_NUMS_TO_VARS(N) EMP_EVAL EMP_EMPTY() EMP_IF( N, (EMP_WRAP_ARGS(EMP_NUM_TO_VAR, EMP_RANGE_TO(N))), ())
+#define EMP_NUMS_TO_VARS(N) EMP_EVAL EMP_EMPTY() EMP_IF( N, (EMP_INTERNAL_WRAP_ARGS(EMP_NUM_TO_VAR, EMP_RANGE_TO(N))), ())
 
 /// Functions often need to be wrapped differently if they have a void return type.
 /// This macro will convert to 1 if a void type is passed in, zero otherwise and can
