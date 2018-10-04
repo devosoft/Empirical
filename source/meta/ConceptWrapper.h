@@ -48,17 +48,129 @@
 #include "../base/macros.h"
 #include "meta.h"
 
+#define EMP_BC__WRAP_EACH(W, ...) EMP_BC__CALL_BY_PACKS(EMP_BC__WRAP_EACH_, W, __VA_ARGS__)
+#define EMP_BC__WRAP_EACH_1(W, A, ...) W(A)
+#define EMP_BC__WRAP_EACH_2(W, A,B,...) EMP_BC__WRAP_EACH_1(W, A, ~) EMP_BC__WRAP_EACH_1(W, B, ~)
+#define EMP_BC__WRAP_EACH_4(W, A,B,...) EMP_BC__WRAP_EACH_2(W, A, B, ~) EMP_BC__WRAP_EACH_2(W, __VA_ARGS__)
+#define EMP_BC__WRAP_EACH_8(W, ...)                                         \
+  EMP_BC__WRAP_EACH_4(W, __VA_ARGS__)                                       \
+  EMP_BC__EVAL1( EMP_BC__WRAP_EACH_4 EMP_BC__EMPTY() (W, EMP_POP_ARGS_4(__VA_ARGS__)) )
+#define EMP_BC__WRAP_EACH_16(W, ...) \
+  EMP_BC__WRAP_EACH_8(W, __VA_ARGS__) \
+  EMP_BC__EVAL2( EMP_BC__WRAP_EACH_8 EMP_BC__EMPTY() (W, EMP_POP_ARGS_8(__VA_ARGS__)) )
+#define EMP_BC__WRAP_EACH_32(W, ...) \
+  EMP_BC__WRAP_EACH_16(W, __VA_ARGS__) \
+  EMP_BC__EVAL3( EMP_BC__WRAP_EACH_16 EMP_BC__EMPTY() (W, EMP_POP_ARGS_16(__VA_ARGS__)) )
+#define EMP_BC__WRAP_EACH_64(W, ...) \
+  EMP_BC__WRAP_EACH_32(W, __VA_ARGS__) \
+  EMP_BC__EVAL4( EMP_BC__WRAP_EACH_32 EMP_BC__EMPTY() (W, EMP_POP_ARGS_32(__VA_ARGS__)) )
+#define EMP_BC__WRAP_EACH_128(W, ...) \
+  EMP_BC__WRAP_EACH_64(W, __VA_ARGS__) \
+  EMP_BC__EVAL5( EMP_BC__WRAP_EACH_64 EMP_BC__EMPTY() (W, EMP_POP_ARGS_64(__VA_ARGS__)) )
+#define EMP_BC__WRAP_EACH_256(W, ...) \
+  EMP_BC__WRAP_EACH_128(W, __VA_ARGS__) \
+  EMP_BC__EVAL6( EMP_BC__WRAP_EACH_128 EMP_BC__EMPTY() (W, EMP_POP_ARGS_128(__VA_ARGS__)) )
+#define EMP_BC__WRAP_EACH_512(W, ...) \
+  EMP_BC__WRAP_EACH_256(W, __VA_ARGS__) \
+  EMP_BC__EVAL7( EMP_BC__WRAP_EACH_256 EMP_BC__EMPTY() (W, EMP_POP_ARGS_256(__VA_ARGS__)) )
+
+
+/// EMP_BC__CALL_BY_PACKS is used to build other macros.  It will call a series of versions of C
+/// based on binary representations so that all args are called, passing F in as the first
+/// parameter.  For example, if C = ABC_ and 13 arguments are passed in, it will call ABC_8,
+/// ABC_4 and ABC_1 on appropriate subsets (prepending F as the first argument of each call)
+///
+/// C is the CALL needed to be made on each element of the parameter pack
+/// F is a FIXED parameter (potentially a pack) sent to all calls.
+#define EMP_BC__CALL_BY_PACKS(C, F, ...)                                     \
+  EMP_BC__CALL_BY_PACKS_impl(C, F, EMP_DEC_TO_PACK(EMP_COUNT_ARGS(__VA_ARGS__)), __VA_ARGS__, ~)
+
+/// @cond MACROS
+
+// Internal helpers...
+// P is the pack of call counts the still need to be done
+// A is the number of arguments in P.
+// N is the NEXT call count needed to be done.
+#define EMP_BC__CALL_BY_PACKS_impl(C, F, P, ...) \
+  EMP_BC__CALL_BY_PACKS_implB(C, F, EMP_BC__PACK_SIZE(P), EMP_BC__PACK_PUSH_REAR(~, P), __VA_ARGS__)
+#define EMP_BC__CALL_BY_PACKS_implB(C, F, A, P, ...) EMP_BC__CALL_BY_PACKS_implC(C, F, A, P, __VA_ARGS__)
+#define EMP_BC__CALL_BY_PACKS_implC(C, F, A, P, ...) \
+  EMP_BC__CALL_BY_PACKS_implD(C, EMP_BC__PACK_TOP(P), F, A, EMP_BC__PACK_POP(P), __VA_ARGS__)
+#define EMP_BC__CALL_BY_PACKS_implD(C, N, F, A, P, ...) EMP_BC__CALL_BY_PACKS_impl##A(C,N,F,P,__VA_ARGS__)
+
+#define EMP_BC__CALL_BY_PACKS_impl1(C, N, F, P, ...)        \
+  EMP_BC__CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)
+
+#define EMP_BC__CALL_BY_PACKS_impl2(C, N, F, P, ...) EMP_BC__CALL_BY_PACKS_impl2B(C, N, F, P, __VA_ARGS__)
+#define EMP_BC__CALL_BY_PACKS_impl2B(C, N, F, P, ...)                       \
+  EMP_BC__CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_BC__CALL_BY_PACKS_impl1(C, EMP_BC__PACK_TOP(P), F, EMP_BC__PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+
+#define EMP_BC__CALL_BY_PACKS_impl3(C, N, F, P, ...) EMP_BC__CALL_BY_PACKS_impl3B(C, N, F, P, __VA_ARGS__)
+#define EMP_BC__CALL_BY_PACKS_impl3B(C, N, F, P, ...)                       \
+  EMP_BC__CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_BC__CALL_BY_PACKS_impl2(C, EMP_BC__PACK_TOP(P), F, EMP_BC__PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+
+#define EMP_BC__CALL_BY_PACKS_impl4(C, N, F, P, ...) EMP_BC__CALL_BY_PACKS_impl4B(C, N, F, P, __VA_ARGS__)
+#define EMP_BC__CALL_BY_PACKS_impl4B(C, N, F, P, ...)                       \
+  EMP_BC__CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_BC__CALL_BY_PACKS_impl3(C, EMP_BC__PACK_TOP(P), F, EMP_BC__PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+
+#define EMP_BC__CALL_BY_PACKS_impl5(C, N, F, P, ...) EMP_BC__CALL_BY_PACKS_impl5B(C, N, F, P, __VA_ARGS__)
+#define EMP_BC__CALL_BY_PACKS_impl5B(C, N, F, P, ...)                       \
+  EMP_BC__CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_BC__CALL_BY_PACKS_impl4(C, EMP_BC__PACK_TOP(P), F, EMP_BC__PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+
+#define EMP_BC__CALL_BY_PACKS_impl6(C, N, F, P, ...) EMP_BC__CALL_BY_PACKS_impl6B(C, N, F, P, __VA_ARGS__)
+#define EMP_BC__CALL_BY_PACKS_impl6B(C, N, F, P, ...)                       \
+  EMP_BC__CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_BC__CALL_BY_PACKS_impl5(C, EMP_BC__PACK_TOP(P), F, EMP_BC__PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+
+#define EMP_BC__CALL_BY_PACKS_impl7(C, N, F, P, ...) EMP_BC__CALL_BY_PACKS_impl7B(C, N, F, P, __VA_ARGS__)
+#define EMP_BC__CALL_BY_PACKS_impl7B(C, N, F, P, ...)                       \
+  EMP_BC__CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_BC__CALL_BY_PACKS_impl6(C, EMP_BC__PACK_TOP(P), F, EMP_BC__PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+
+#define EMP_BC__CALL_BY_PACKS_impl8(C, N, F, P, ...) EMP_BC__CALL_BY_PACKS_impl8B(C, N, F, P, __VA_ARGS__)
+#define EMP_BC__CALL_BY_PACKS_impl8B(C, N, F, P, ...)                       \
+  EMP_BC__CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_BC__CALL_BY_PACKS_impl7(C, EMP_BC__PACK_TOP(P), F, EMP_BC__PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+
+#define EMP_BC__CALL_BY_PACKS_impl9(C, N, F, P, ...) EMP_BC__CALL_BY_PACKS_impl9B(C, N, F, P, __VA_ARGS__)
+#define EMP_BC__CALL_BY_PACKS_impl9B(C, N, F, P, ...)                       \
+  EMP_BC__CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_BC__CALL_BY_PACKS_impl8(C, EMP_BC__PACK_TOP(P), F, EMP_BC__PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+
+#define EMP_BC__CALL_BY_PACKS_impl10(C, N, F, P, ...) EMP_BC__CALL_BY_PACKS_impl10B(C, N, F, P, __VA_ARGS__)
+#define EMP_BC__CALL_BY_PACKS_impl10B(C, N, F, P, ...)                      \
+  EMP_BC__CALL_BY_PACKS_do_call(C, N, F, __VA_ARGS__)                       \
+  EMP_BC__CALL_BY_PACKS_impl9(C, EMP_BC__PACK_TOP(P), F, EMP_BC__PACK_POP(P), EMP_POP_ARGS_ ## N(__VA_ARGS__) )
+
+#define EMP_BC__CALL_BY_PACKS_do_call(C, V, F, ...) C ## V(F, __VA_ARGS__)
+
+#define EMP_BC__ECHO_ARGS(...) __VA_ARGS__
+#define EMP_BC__PACK_ARGS(...) (__VA_ARGS__)
+#define EMP_BC__UNPACK_ARGS(A) EMP_BC__ECHO_ARGS A
+#define EMP_BC__PACK_POP(PACK) (EMP_POP_ARG PACK)
+#define EMP_BC__PACK_TOP(PACK) EMP_GET_ARG_1 PACK
+#define EMP_BC__PACK_PUSH(NEW, PACK) (NEW,EMP_BC__UNPACK_ARGS(PACK))
+#define EMP_BC__PACK_PUSH_REAR(NEW, PACK) (EMP_BC__UNPACK_ARGS(PACK),NEW)
+#define EMP_BC__PACK_SIZE(PACK) EMP_COUNT_ARGS PACK
+
+
+
+
 #define EMP_BUILD_CONCEPT( CLASS_NAME, ... )                         \
   /* Build the interface class. */                                   \
   class CLASS_NAME ## _Base {                                        \
   public:                                                            \
-    EMP_WRAP_EACH(EMP_BUILD_CONCEPT__BASE, __VA_ARGS__)              \
+    EMP_BC__WRAP_EACH(EMP_BUILD_CONCEPT__BASE, __VA_ARGS__)              \
   };                                                                 \
   /* Build the wrapper class. */                                     \
   template <typename WRAPPED_T>                                      \
   class CLASS_NAME : public WRAPPED_T, public CLASS_NAME ## _Base {  \
     using this_t = CLASS_NAME<WRAPPED_T>;                            \
-    EMP_WRAP_EACH(EMP_BUILD_CONCEPT__PROCESS, __VA_ARGS__)           \
+    EMP_BC__WRAP_EACH(EMP_BUILD_CONCEPT__PROCESS, __VA_ARGS__)           \
   }
 
 #define EMP_BUILD_CONCEPT__BASE( CMD ) EMP_BUILD_CONCEPT_BASE__ ## CMD
@@ -85,7 +197,7 @@
     template <typename T>                                                                         \
     using return_t_ ## FUN_NAME =                                                                 \
       EMP_IF( NUM_ARGS,                                                                           \
-        decltype( std::declval<T>().FUN_NAME(EMP_TYPES_TO_VALS(__VA_ARGS__)) );,                  \
+        decltype( std::declval<T>().FUN_NAME( EMP_TYPES_TO_VALS(__VA_ARGS__) ) );,                \
         decltype( std::declval<T>().FUN_NAME() );                                                 \
       )                                                                                           \
   public:                                                                                         \
