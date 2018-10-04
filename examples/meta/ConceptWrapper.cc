@@ -52,4 +52,23 @@ int main() {
   std::cout << "Done!" << std::endl;
 
   std::vector<emp::Ptr<TestConcept_Base>> tests;
+  tests.push_back( new TestConcept<MinimalClass> );
+  tests.push_back( new TestConcept<MinimalClass> );
+  tests.push_back( new TestConcept<FullClass> );
+  tests.push_back( new TestConcept<MinimalClass> );
+  tests.push_back( new TestConcept<FullClass> );
+  tests.push_back( new TestConcept<FullClass> );
+  tests.push_back( new TestConcept<MinimalClass> );
+
+  std::cout << "\n--- Array Tests ---\n";
+  for (size_t i = 0 ; i < tests.size(); i++) {
+    emp::Ptr<TestConcept_Base> tc_ptr = tests[i];
+    std::cout << "=> " << i << "\n";
+    tc_ptr->RequiredFun1();
+    tc_ptr->RequiredFun2();
+    tc_ptr->OptionalFun1();
+    std::cout << "DoMath1(" << i << "," << 3 << ") = " << tc_ptr->DoMath1(i,3) << "\n";
+    std::cout << "DoMath2(" << i << "," << 3 << ") = " << tc_ptr->DoMath2(i,3) << "\n";
+  }
+  std::cout << std::endl;
 }
