@@ -51,6 +51,8 @@
 
 
 #define EMP_BUILD_CONCEPT( WRAPPER_NAME, BASE_NAME, ... )      \
+  /* Do error-checkig on the inputs! */                        \
+  EMP_WRAP_EACH(EMP_BUILD_CONCEPT__ERROR_CHECK, __VA_ARGS__)   \
   /* Build the interface class. */                             \
   class BASE_NAME {                                            \
   public:                                                      \
@@ -63,14 +65,39 @@
     EMP_WRAP_EACH(EMP_BUILD_CONCEPT__PROCESS, __VA_ARGS__)     \
   }
 
-#define EMP_BUILD_CONCEPT__BASE( CMD ) EMP_BUILD_CONCEPT_BASE__ ## CMD
 
-#define EMP_BUILD_CONCEPT_BASE__REQUIRED_FUN(NAME, X, RETURN_T, ...) virtual RETURN_T NAME( __VA_ARGS__ ) = 0;
-#define EMP_BUILD_CONCEPT_BASE__OPTIONAL_FUN(NAME, X, RETURN_T, ...) virtual RETURN_T NAME( __VA_ARGS__ ) = 0;
-#define EMP_BUILD_CONCEPT_BASE__PRIVATE(...)
-#define EMP_BUILD_CONCEPT_BASE__PROTECTED(...)
-#define EMP_BUILD_CONCEPT_BASE__PUBLIC(...)
+// ********
+// We want to do error checking to minimize confusing errors that come out of the compiler.
 
+// Any legal entry should be made empty.  Complain if anything is left!
+#define EMP_BUILD_CONCEPT__ERROR_CHECK( CMD ) EMP_BUILD_CONCEPT__ERROR_CHECK_impl(EMP_BUILD_CONCEPT__EC_ ## CMD)
+#define EMP_BUILD_CONCEPT__ERROR_CHECK_impl( RESULT ) EMP_BUILD_CONCEPT__CHECK_EMPTY( RESULT )
+        
+#define EMP_BUILD_CONCEPT__EC_REQUIRED_FUN(...)    /* REQUIRED_FUN okay */
+#define EMP_BUILD_CONCEPT__EC_OPTIONAL_FUN(...)    /* OPTIONAL_FUN okay */
+#define EMP_BUILD_CONCEPT__EC_PRIVATE(...)         /* PRIVATE okay */
+#define EMP_BUILD_CONCEPT__EC_PROTECTED(...)       /* PROTECTED okay */
+#define EMP_BUILD_CONCEPT__EC_PUBLIC(...)          /* PUBLIC okay */
+
+#define EMP_BUILD_CONCEPT__CHECK_EMPTY(A)  EMP_GET_ARG_2( EMP_BUILD_CONCEPT__SPACER ## A, \
+          static_assert(false, "\n\n  \033[1;31mInvalid EMP_BUILD_CONCEPT\033[0m; maybe missing comma before:\n    \033[1;32m" #A "\033[0m;\n\n"); )
+#define EMP_BUILD_CONCEPT__SPACER ~, /* EMPTY! */
+
+
+// ********
+// Build the base class for concepts.
+
+#define EMP_BUILD_CONCEPT__BASE( CMD ) EMP_BUILD_CONCEPT__BASE_ ## CMD
+
+#define EMP_BUILD_CONCEPT__BASE_REQUIRED_FUN(NAME, X, RETURN_T, ...) virtual RETURN_T NAME( __VA_ARGS__ ) = 0;
+#define EMP_BUILD_CONCEPT__BASE_OPTIONAL_FUN(NAME, X, RETURN_T, ...) virtual RETURN_T NAME( __VA_ARGS__ ) = 0;
+#define EMP_BUILD_CONCEPT__BASE_PRIVATE(...)
+#define EMP_BUILD_CONCEPT__BASE_PROTECTED(...)
+#define EMP_BUILD_CONCEPT__BASE_PUBLIC(...)
+
+
+// ********
+// Setup the wrapper.
 
 #define EMP_BUILD_CONCEPT__PROCESS( CMD ) EMP_BUILD_CONCEPT__PROCESS_ ## CMD
 
