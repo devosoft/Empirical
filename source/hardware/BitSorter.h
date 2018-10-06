@@ -40,10 +40,12 @@ namespace emp {
       return FindMaxIndex(cur_depth);
     }
 
-    void AddCompare(size_t id1, size_t id2) {
-      emp_assert(id1 < sizeof(bits_t));
-      emp_assert(id2 < sizeof(bits_t));
+    bool AddCompare(size_t id1, size_t id2) {
+      emp_assert(id1 < 8*sizeof(bits_t), id1, sizeof(bits_t));
+      emp_assert(id2 < 8*sizeof(bits_t), id2, sizeof(bits_t));
+      if (id1 == id2) return false;                            // If ids are the same, don't add comparator!
       compare_set.push_back( (1 << id1) + (1 << id2) );
+      return true;
     }
 
     static bits_t RunCompare(bits_t values, bits_t comparator) {
@@ -60,6 +62,16 @@ namespace emp {
     bits_t Sort(bits_t values) const {
       for (bits_t c : compare_set) values = RunCompare(values, c);
       return values;
+    }
+
+    size_t CountSortable(size_t num_bits = 16) const {
+      const bits_t limit = 1 << num_bits;
+      size_t count = 0;
+      for (bits_t vals = 0; vals < limit; vals++) {
+        bits_t svals = Sort(vals);
+        if ( (svals & (svals+1)) == 0) count++;  // Sorted!
+      }
+      return count;
     }
 
     static std::string ToString(bits_t values, size_t num_bits=16) {
