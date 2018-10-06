@@ -31,6 +31,8 @@ int main()
   PRINT_MACRO( TEST_MARK(1) );
 
   PRINT_MACRO( EMP_WRAP_ARGS( TEST_MARK, 1, 2, 3, 4 ) );
+  PRINT_MACRO( EMP_WRAP_EACH( TEST_MARK, 1, 2, 3, 4 ) );
+  PRINT_MACRO( EMP_CALL_BY_PACKS(EMP_WRAP_EACH_, TEST_MARK, 1, 2, 3, 4 ) );
 
   PRINT_MACRO( EMP_TYPES_TO_VALS(int,double,std::string) );
   PRINT_MACRO( EMP_TYPES_TO_VALS( double , double) );
