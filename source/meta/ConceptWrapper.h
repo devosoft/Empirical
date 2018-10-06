@@ -70,8 +70,8 @@
 // We want to do error checking to minimize confusing errors that come out of the compiler.
 
 // Any legal entry should be made empty.  Complain if anything is left!
-#define EMP_BUILD_CONCEPT__ERROR_CHECK( CMD ) EMP_BUILD_CONCEPT__ERROR_CHECK_impl(EMP_BUILD_CONCEPT__EC_ ## CMD)
-#define EMP_BUILD_CONCEPT__ERROR_CHECK_impl( RESULT ) EMP_BUILD_CONCEPT__CHECK_EMPTY( RESULT )
+#define EMP_BUILD_CONCEPT__ERROR_CHECK( CMD ) EMP_BUILD_CONCEPT__ERROR_CHECK_impl(EMP_BUILD_CONCEPT__EC_ ## CMD, CMD)
+#define EMP_BUILD_CONCEPT__ERROR_CHECK_impl( RESULT, CMD ) EMP_BUILD_CONCEPT__CHECK_EMPTY( RESULT, CMD )
         
 #define EMP_BUILD_CONCEPT__EC_REQUIRED_FUN(...)    /* REQUIRED_FUN okay */
 #define EMP_BUILD_CONCEPT__EC_OPTIONAL_FUN(...)    /* OPTIONAL_FUN okay */
@@ -79,9 +79,10 @@
 #define EMP_BUILD_CONCEPT__EC_PROTECTED(...)       /* PROTECTED okay */
 #define EMP_BUILD_CONCEPT__EC_PUBLIC(...)          /* PUBLIC okay */
 
-#define EMP_BUILD_CONCEPT__CHECK_EMPTY(A)  EMP_GET_ARG_2( EMP_BUILD_CONCEPT__SPACER ## A, \
-          static_assert(false, "\n\n  \033[1;31mInvalid EMP_BUILD_CONCEPT\033[0m; maybe missing comma before:\n    \033[1;32m" #A "\033[0m;\n\n"); )
+#define EMP_BUILD_CONCEPT__CHECK_EMPTY(A, CMD)  EMP_GET_ARG_2( EMP_BUILD_CONCEPT__SPACER ## A, \
+          static_assert(false, "\n\n  \033[1;31mInvalid EMP_BUILD_CONCEPT.\033[0m May be invalid command or missing comma in:\n    \033[1;32m" #CMD "\033[0m;\n\n"); )
 #define EMP_BUILD_CONCEPT__SPACER ~, /* EMPTY! */
+#define EMP_BUILD_CONCEPT__ERROR 
 
 
 // ********
