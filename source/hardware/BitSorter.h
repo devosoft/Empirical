@@ -34,10 +34,13 @@ namespace emp {
       for (bits_t c : compare_set) {
         size_t pos1 = pop_bit(c);
         size_t pos2 = find_bit(c);
+        emp_assert(pos1 < num_bits, pos1, num_bits);
+        emp_assert(pos2 < num_bits, pos2, num_bits);
+        emp_assert(pos1 != pos2, pos1, pos2);
         size_t max_depth = std::max(cur_depth[pos1], cur_depth[pos2]);
         cur_depth[pos1] = cur_depth[pos2] = max_depth+1;
       }
-      return FindMaxIndex(cur_depth);
+      return cur_depth[ FindMaxIndex(cur_depth) ];
     }
 
     bool AddCompare(size_t id1, size_t id2) {
