@@ -13,17 +13,32 @@
 #include <string>
 
 #include "../base/vector.h"
+#include "../tools/bitset_utils.h"
+#include "../tools/vector_utils.h"
 
 namespace emp {
 
   class BitSorter {
   private:
-    using bits_t = size_t;            // Type used to represent pairs if posisions.
-    emp::vector<bits_t> compare_set;  // All pairs of positions, in order.
+    using bits_t = uint32_t;            // Type used to represent pairs if posisions.
+    emp::vector<bits_t> compare_set;    // All pairs of positions, in order.
 
   public:
     BitSorter() { ; }
     ~BitSorter() { ; }
+
+    size_t GetSize() const { return compare_set.size(); }
+
+    size_t CalcDepth(size_t num_bits = 16) const {
+      emp::vector<size_t> cur_depth(num_bits, 0);
+      for (bits_t c : compare_set) {
+        size_t pos1 = pop_bit(c);
+        size_t pos2 = find_bit(c);
+        size_t max_depth = std::max(cur_depth[pos1], cur_depth[pos2]);
+        cur_depth[pos1] = cur_depth[pos2] = max_depth+1;
+      }
+      return FindMaxIndex(cur_depth);
+    }
 
     void AddCompare(size_t id1, size_t id2) {
       emp_assert(id1 < sizeof(bits_t));
@@ -42,7 +57,7 @@ namespace emp {
       return values ^ comparator;  // Swap bits!
     }
 
-    bits_t Sort(bits_t values) {
+    bits_t Sort(bits_t values) const {
       for (bits_t c : compare_set) values = RunCompare(values, c);
       return values;
     }
