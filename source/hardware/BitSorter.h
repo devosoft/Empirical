@@ -33,16 +33,16 @@ namespace emp {
 
     static bits_t RunCompare(bits_t values, bits_t comparator) {
       // If bits are the same, no change!
-      if ( (values & comparator == 0)                     // Bits are both 0... no change!
-         || (~values & comparator == 0)                   // Bits are both 1... no change!
-         || (values & comparator < ~values & comparator)  // Bits are already in correct (0 - 1) order!
+      if ( ((values & comparator) == 0)                     // Bits are both 0... no change!
+         || ((~values & comparator) == 0)                   // Bits are both 1... no change!
+         || ((values & comparator) < (~values & comparator))  // Bits are already in correct (0 - 1) order!
          ) {
         return values;
       }
       return values ^ comparator;  // Swap bits!
     }
 
-    bits_t Sort(bits values) {
+    bits_t Sort(bits_t values) {
       for (bits_t c : compare_set) values = RunCompare(values, c);
       return values;
     }
@@ -50,7 +50,7 @@ namespace emp {
     static std::string ToString(bits_t values, size_t num_bits=16) {
       std::string out_str;
       for (size_t id = num_bits; id > 0; id--) {
-        if (values & 1 << (id-1)) out_str += "1"
+        if (values & 1 << (id-1)) out_str += "1";
         else out_str += "0";
       }
       return out_str;
