@@ -25,7 +25,12 @@ namespace emp {
 
   public:
     BitSorter() { ; }
+    BitSorter(const BitSorter &) = default;
+    BitSorter(BitSorter &&) = default;
     ~BitSorter() { ; }
+
+    BitSorter & operator=(const BitSorter &) = default;
+    BitSorter & operator=(BitSorter &&) = default;
 
     size_t GetSize() const { return compare_set.size(); }
 
@@ -48,6 +53,15 @@ namespace emp {
       emp_assert(id2 < 8*sizeof(bits_t), id2, sizeof(bits_t));
       if (id1 == id2) return false;                            // If ids are the same, don't add comparator!
       compare_set.push_back( (1 << id1) + (1 << id2) );
+      return true;
+    }
+
+    bool EditCompare(size_t pos, size_t id1, size_t id2) {
+      emp_assert(pos < compare_set.size());
+      emp_assert(id1 < 8*sizeof(bits_t), id1, sizeof(bits_t));
+      emp_assert(id2 < 8*sizeof(bits_t), id2, sizeof(bits_t));
+      if (id1 == id2) return false;                            // If ids are the same, don't add comparator!
+      compare_set[pos] = (1 << id1) + (1 << id2);
       return true;
     }
 
@@ -84,6 +98,16 @@ namespace emp {
         else out_str += "0";
       }
       return out_str;
+    }
+
+    std::string AsString() const {
+      std::stringstream out;
+      for (bits_t c : compare_set) {
+        size_t pos1 = pop_bit(c);
+        size_t pos2 = find_bit(c);
+        out << "[" << pos1 << "," << pos2 << "]";
+      }
+      return out.str();
     }
   };
 
