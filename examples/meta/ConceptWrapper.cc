@@ -34,6 +34,8 @@ struct FullClass {
   void OptionalFun1() { std::cout << "In FullClass::OptionalFun2()" << std::endl; }
   double DoMath1(double arg1, double arg2) { return std::max(arg1, arg2); }
   double DoMath2(double arg1, double arg2) { return arg1 * arg2; }
+
+  double DoMath3(double arg1, double arg2) { return arg1 + 5 * arg2; }
 };
 
 int main() {
@@ -49,7 +51,7 @@ int main() {
 
   std::cout << "min_class.x = " << min_class.x << std::endl;
   std::cout << "full_class.x = " << full_class.x << std::endl;
-  std::cout << "Done!" << std::endl;
+  std::cout << "full_class.DoMath3(2, 4) = " << full_class.DoMath3(2,4) << std::endl;
 
   std::vector<emp::Ptr<TestConcept_Base>> tests;
   tests.push_back( new TestConcept<MinimalClass> );
@@ -70,5 +72,7 @@ int main() {
     std::cout << "DoMath1(" << i << "," << 3 << ") = " << tc_ptr->DoMath1(i,3) << "\n";
     std::cout << "DoMath2(" << i << "," << 3 << ") = " << tc_ptr->DoMath2(i,3) << "\n";
   }
+
   std::cout << std::endl;
+  std::cout << "Done!" << std::endl;
 }
