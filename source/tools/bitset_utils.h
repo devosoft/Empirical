@@ -63,6 +63,20 @@ namespace emp {
   /// Return the position of the first one bit (in a 32-bit unsigned int)
   inline constexpr size_t find_bit(const uint32_t & val) { return count_bits( (~val) & (val-1) ); }
 
+  /// Return the position of the first one bit AND REMOVE IT (in a 32-bit unsigned int)
+  inline size_t pop_bit(uint32_t & val) {
+    const size_t pos = find_bit(val);
+    val &= ~(1 << pos);
+    return pos;
+  }
+
+  /// Return the position of the first one bit AND REMOVE IT (in a 64-bit unsigned int)
+  inline size_t pop_bit(uint64_t & val) {
+    const size_t pos = find_bit(val);
+    val &= ~(1 << pos);
+    return pos;
+  }
+
   /*
   // Returns the position of the first set (one) bit or a -1 if none exist.
   template <size_t BITS>
