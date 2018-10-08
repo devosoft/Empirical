@@ -898,11 +898,11 @@ namespace emp {
       --num_orgs;                                    // Track one fewer organisms in the population
       if (cache_on) ClearCache(id);                  // Delete any cached info about this organism
       for (Ptr<SystematicsBase<ORG> > s : systematics) {
-        s->RemoveOrg((int) pos.GetIndex());          // Notify systematics about organism removal
+        s->RemoveOrg((int) pos.GetIndex(), update);          // Notify systematics about organism removal
       }
     } else {
       for (Ptr<SystematicsBase<ORG> > s : systematics) {
-        s->RemoveNextOrg((int) pos.GetIndex());      // Notify systematics about organism removal
+        s->RemoveNextOrg((int) pos.GetIndex(), update);      // Notify systematics about organism removal
       }
     }
   }
