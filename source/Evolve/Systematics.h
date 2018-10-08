@@ -1457,47 +1457,47 @@ namespace emp {
     };
     file.AddFun(get_ancestor_list, "ancestor_list", "Ancestor list for this taxon.");
 
-    //  - origin_time: How many organisms currently exist of this group?
+    //  - origin_time: When did this taxon first appear in the population?
     std::function<double()> get_origin_time = [&cur_taxon]() {
       return cur_taxon->GetOriginationTime();
     };
-    file.AddFun(get_origin_time, "origin_time", "How many organisms currently exist of this group?");
+    file.AddFun(get_origin_time, "origin_time", "When did this taxon first appear in the population?");
 
-    //  - destruction_time: How many organisms have ever existed of this group?
+    //  - destruction_time: When did this taxon leave the population?
     std::function<double()> get_destruction_time = [&cur_taxon]() {
       return cur_taxon->GetDestructionTime();
     };
-    file.AddFun(get_destruction_time, "destruction_time", "How many organisms have ever existed of this group?");
+    file.AddFun(get_destruction_time, "destruction_time", "When did this taxon leave the population?");
 
-    //  - num_orgs: How many direct offspring groups exist from this one.
+    //  - num_orgs: How many organisms currently exist of this group?
     std::function<size_t()> get_num_orgs = [&cur_taxon]() {
       return cur_taxon->GetNumOrgs();
     };
-    file.AddFun(get_num_orgs, "num_orgs", "How many direct offspring groups exist from this one.");
+    file.AddFun(get_num_orgs, "num_orgs", "How many organisms currently exist of this group?");
 
-    //  - tot_orgs: How many total extant offspring taxa exist from this one (i.e. including indirect)
+    //  - tot_orgs: How many organisms have ever existed of this group?
     std::function<size_t()> get_tot_orgs = [&cur_taxon]() {
       return cur_taxon->GetTotOrgs();
     };
-    file.AddFun(get_tot_orgs, "tot_orgs", "How many total extant offspring taxa exist from this one (i.e. including indirect)");
+    file.AddFun(get_tot_orgs, "tot_orgs", "How many organisms have ever existed of this group?");
 
-    //  - num_offspring: How deep in tree is this node? (Root is 0)
+    //  - num_offspring: How many direct offspring groups exist from this one.
     std::function<size_t()> get_num_offspring = [&cur_taxon]() {
       return cur_taxon->GetNumOff();
     };
-    file.AddFun(get_num_offspring, "num_offspring", "How deep in tree is this node? (Root is 0)");
+    file.AddFun(get_num_offspring, "num_offspring", "How many direct offspring groups exist from this one.");
 
-    //  - total_offspring: When did this taxon first appear in the population?
+    //  - total_offspring: How many total extant offspring taxa exist from this one (i.e. including indirect)
     std::function<size_t()> get_total_offspring = [&cur_taxon]() {
       return cur_taxon->GetTotalOffspring();
     };
-    file.AddFun(get_total_offspring, "total_offspring", "When did this taxon first appear in the population?");
+    file.AddFun(get_total_offspring, "total_offspring", "How many total extant offspring taxa exist from this one (i.e. including indirect)");
 
-    //  - depth: When did this taxon leave the population?
+    //  - depth: How deep in tree is this node? (Root is 0)
     std::function<size_t()> get_depth = [&cur_taxon]() {
       return cur_taxon->GetDepth();
     };
-    file.AddFun(get_depth, "depth", "When did this taxon leave the population?");
+    file.AddFun(get_depth, "depth", "How deep in tree is this node? (Root is 0)");
 
     // Add user-added functions to file.
     for (size_t i = 0; i < user_snapshot_funs.size(); ++i) {
