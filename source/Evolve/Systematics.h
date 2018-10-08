@@ -30,6 +30,7 @@
 
 #include "../base/Ptr.h"
 #include "../control/Signal.h"
+#include "../data/DataFile.h"
 #include "../data/DataManager.h"
 #include "../data/DataNode.h"
 #include "../tools/info_theory.h"
@@ -427,6 +428,21 @@ namespace emp {
     using parent_t::AddUniqueTaxaDataNode;
     using parent_t::AddMutationCountDataNode;
 
+    struct SnapshotInfo {
+      using snapshot_fun_t = std::function<std::string(const taxon_t &)>;
+      snapshot_fun_t fun;
+      std::string key;
+      std::string desc;
+
+      SnapshotInfo(const snapshot_fun_t & _fun, const std::string & _key, const std::string & _desc="") 
+        : fun(_fun),
+          key(_key),
+          desc(_desc)
+      { ; }
+    };
+
+    emp::vector<SnapshotInfo> user_snapshot_funs;
+
     std::unordered_set< Ptr<taxon_t>, hash_t > active_taxa;   ///< A set of all living taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; ///< A set of all dead, ancestral taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  ///< A set of all dead taxa w/o descendants.
@@ -661,6 +677,16 @@ namespace emp {
 
       return node;
     }
+
+    /// Add a new snapshot function.
+    /// When a snapshot of the systematics is taken, in addition to the default
+    /// set of functions, all user-added snapshot functions are run. Functions
+    /// take a reference to a taxon as input and return the string to be dumped
+    /// in the file at the given key.
+    void AddSnapshotFun(const std::function<std::string(const taxon_t &)> & fun, 
+                        const std::string & key, const std::string & desc="") {
+      user_snapshot_funs.emplace_back(fun, key, desc);
+    } 
 
     bool IsTaxonAt(int id) {
       emp_assert(id < (int) taxon_locations.size(), "Invalid taxon location", id, taxon_locations.size());
@@ -933,7 +959,7 @@ namespace emp {
       // function
 
       std::set< Ptr<taxon_t>> result;
-  // std::cout << "starting " << time_point << std::endl;
+      // std::cout << "starting " << time_point << std::endl;
       for (Ptr<taxon_t> tax : active_taxa) {
           // std::cout << tax->GetInfo() << std::endl;
         while (tax) {
@@ -1095,6 +1121,8 @@ namespace emp {
 
     /// Print whole lineage.
     void PrintLineage(Ptr<taxon_t> taxon, std::ostream & os=std::cout) const;
+
+    void Snapshot(const std::string & file_path) const;
 
     /// Calculate the genetic diversity of the population.
     double CalcDiversity() const;
@@ -1406,6 +1434,105 @@ namespace emp {
       os << taxon->GetInfo() << std::endl;
       taxon = taxon->GetParent();
     }
+  }
+
+  /// Take a snapshot of current state of taxon phylogeny.
+  /// WARNING: Current, this function assumes one parent taxon per-taxon.
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::Snapshot(const std::string & file_path) const {
+    emp::DataFile file(file_path);
+    Ptr<taxon_t> cur_taxon;
+    emp::vector<std::function<std::string()>> wrapped_user_funs;
+    // Add default functions to file.
+    //  - id: systematics ID for taxon
+    std::function<size_t()> get_id = [&cur_taxon]() {
+      return cur_taxon->GetID();
+    };
+    file.AddFun(get_id, "id", "Systematics ID for this taxon.");
+
+    //  - ancestor_list: ancestor list for taxon
+    std::function<std::string()> get_ancestor_list = [&cur_taxon]() -> std::string {
+      if (cur_taxon->GetParent() == nullptr) { return "[NONE]"; } 
+      return "[" + to_string(cur_taxon->GetParent()->GetID()) + "]";
+    };
+    file.AddFun(get_ancestor_list, "ancestor_list", "Ancestor list for this taxon.");
+
+    //  - origin_time: When did this taxon first appear in the population?
+    std::function<double()> get_origin_time = [&cur_taxon]() {
+      return cur_taxon->GetOriginationTime();
+    };
+    file.AddFun(get_origin_time, "origin_time", "When did this taxon first appear in the population?");
+
+    //  - destruction_time: When did this taxon leave the population?
+    std::function<double()> get_destruction_time = [&cur_taxon]() {
+      return cur_taxon->GetDestructionTime();
+    };
+    file.AddFun(get_destruction_time, "destruction_time", "When did this taxon leave the population?");
+
+    //  - num_orgs: How many organisms currently exist of this group?
+    std::function<size_t()> get_num_orgs = [&cur_taxon]() {
+      return cur_taxon->GetNumOrgs();
+    };
+    file.AddFun(get_num_orgs, "num_orgs", "How many organisms currently exist of this group?");
+
+    //  - tot_orgs: How many organisms have ever existed of this group?
+    std::function<size_t()> get_tot_orgs = [&cur_taxon]() {
+      return cur_taxon->GetTotOrgs();
+    };
+    file.AddFun(get_tot_orgs, "tot_orgs", "How many organisms have ever existed of this group?");
+
+    //  - num_offspring: How many direct offspring groups exist from this one.
+    std::function<size_t()> get_num_offspring = [&cur_taxon]() {
+      return cur_taxon->GetNumOff();
+    };
+    file.AddFun(get_num_offspring, "num_offspring", "How many direct offspring groups exist from this one.");
+
+    //  - total_offspring: How many total extant offspring taxa exist from this one (i.e. including indirect)
+    std::function<size_t()> get_total_offspring = [&cur_taxon]() {
+      return cur_taxon->GetTotalOffspring();
+    };
+    file.AddFun(get_total_offspring, "total_offspring", "How many total extant offspring taxa exist from this one (i.e. including indirect)");
+
+    //  - depth: How deep in tree is this node? (Root is 0)
+    std::function<size_t()> get_depth = [&cur_taxon]() {
+      return cur_taxon->GetDepth();
+    };
+    file.AddFun(get_depth, "depth", "How deep in tree is this node? (Root is 0)");
+
+    // Add user-added functions to file.
+    for (size_t i = 0; i < user_snapshot_funs.size(); ++i) {
+      wrapped_user_funs.emplace_back([this, i, &cur_taxon]() -> std::string {
+        return user_snapshot_funs[i].fun(*cur_taxon);
+      });
+    }
+    
+    // Need to add file functions after wrapping to preserve integrity of 
+    // function reference being passed to the data file object.
+    for (size_t i = 0; i < user_snapshot_funs.size(); ++i) {
+      file.AddFun(wrapped_user_funs[i], user_snapshot_funs[i].key, user_snapshot_funs[i].desc);
+    }
+
+    // Output header information.
+    file.PrintHeaderKeys();
+
+    // Update file w/active taxa information
+    for (auto tax : active_taxa) {
+      cur_taxon = tax;
+      file.Update();
+    }
+
+    // Update file w/ancestor taxa information
+    for (auto tax : ancestor_taxa) {
+      cur_taxon = tax;
+      file.Update();
+    }
+
+    // Update file w/outside taxa information
+    for (auto tax : outside_taxa) {
+      cur_taxon = tax;
+      file.Update();
+    }
+
   }
 
   // Calculate the genetic diversity of the population.
