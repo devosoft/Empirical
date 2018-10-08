@@ -65,6 +65,23 @@ namespace emp {
       return true;
     }
 
+    bool InsertCompare(size_t pos, size_t id1, size_t id2) {
+      emp_assert(pos <= compare_set.size());
+      emp_assert(id1 < 8*sizeof(bits_t), id1, sizeof(bits_t));
+      emp_assert(id2 < 8*sizeof(bits_t), id2, sizeof(bits_t));
+      if (id1 == id2) return false;                            // If ids are the same, don't add comparator!
+      compare_set.insert(compare_set.begin() + pos, (1 << id1) + (1 << id2));
+      return true;
+    }
+
+    bool RemoveCompare(size_t pos) {
+      emp_assert(pos < compare_set.size());
+      emp_assert(id1 < 8*sizeof(bits_t), id1, sizeof(bits_t));
+      emp_assert(id2 < 8*sizeof(bits_t), id2, sizeof(bits_t));
+      compare_set.erase(compare_set.begin() + pos);
+      return true;
+    }
+
     static bits_t RunCompare(bits_t values, bits_t comparator) {
       // If bits are the same, no change!
       if ( ((values & comparator) == 0)                     // Bits are both 0... no change!
