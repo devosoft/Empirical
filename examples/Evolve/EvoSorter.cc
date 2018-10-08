@@ -12,13 +12,15 @@
 #include "hardware/BitSorter.h"
 #include "tools/Random.h"
 
-EMP_BUILD_CONFIG( NKConfig,
-  GROUP(DEFAULT, "Default settings for NK model"),
+EMP_BUILD_CONFIG( EvoSortConfig,
+  GROUP(DEFAULT, "Default settings for EvoSorter model"),
   VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
   VALUE(POP_SIZE, uint32_t, 1000, "Number of organisms in the popoulation."),
   VALUE(MAX_GENS, uint32_t, 2000, "How many generations should we process?"),
-  VALUE(MUT_COUNT, uint32_t, 3, "How many bit positions should be randomized?"), ALIAS(NUM_MUTS),
-  VALUE(TEST, std::string, "TestString", "This is a test string.")
+  VALUE(ORG_SIZE, size_t, 100, "Number of comparisons in an organism."),
+  VALUE(MUT_SUB_PROB, double, 0.5, "What is the probability for a comparison to be randomized?"),
+  VALUE(MUT_INS_PROB, double, 0.5, "What is the probability for a comparison to have a new one inserted after?"),
+  VALUE(MUT_DEL_PROB, double, 0.5, "What is the probability for a comparison to be deleted?"),
 )
 
 
@@ -26,23 +28,26 @@ using SorterOrg = emp::BitSorter;
 
 int main(int argc, char* argv[])
 {
-  NKConfig config;
-  config.Read("NK.cfg");
+  EvoSortConfig config;
+  config.Read("EvoSorter.cfg");
 
   auto args = emp::cl::ArgManager(argc, argv);
-  if (args.ProcessConfigOptions(config, std::cout, "NK.cfg", "NK-macros.h") == false) exit(0);
+  if (args.ProcessConfigOptions(config, std::cout, "EvoSorter.cfg", "EvoSorter-macros.h") == false) exit(0);
   if (args.TestUnknown() == false) exit(0);  // If there are leftover args, throw an error.
 
   const uint32_t POP_SIZE = config.POP_SIZE();
   const uint32_t MAX_GENS = config.MAX_GENS();
-  const uint32_t MUT_COUNT = config.MUT_COUNT();
+  const uint32_t ORG_SIZE = config.ORG_SIZE();
+
+  const double MUT_SUB_PROB = config.MUT_SUB_PROB();
+  const double MUT_INS_PROB = config.MUT_INS_PROB();
+  const double MUT_DEL_PROB = config.MUT_DEL_PROB();
 
   emp::Random random(config.SEED());
 
-  // emp::EAWorld<SorterOrg, emp::FitCacheOff> pop(random, "NKWorld");
   emp::World<SorterOrg> pop(random, "SorterWorld");
   pop.SetupFitnessFile().SetTimingRepeat(10);
-  pop.SetupSystematicsFile().SetTimingRepeat(10);
+  // pop.SetupSystematicsFile().SetTimingRepeat(10);
   pop.SetupPopulationFile().SetTimingRepeat(10);
   pop.SetPopStruct_Mixed(true);
   pop.SetCache();
@@ -50,7 +55,7 @@ int main(int argc, char* argv[])
   // Build a random initial population
   for (uint32_t i = 0; i < POP_SIZE; i++) {
     SorterOrg next_org;
-    for (size_t i = 0; i < 60; i++) {
+    for (size_t i = 0; i < ORG_SIZE; i++) {
       next_org.AddCompare(random.GetUInt(16), random.GetUInt(16));
     }
     pop.Inject(next_org);
@@ -58,22 +63,34 @@ int main(int argc, char* argv[])
 
   // Setup the mutation function.
   std::function<size_t(SorterOrg &, emp::Random &)> mut_fun =
-    [MUT_COUNT](SorterOrg & org, emp::Random & random) {
+    [MUT_SUB_PROB,MUT_INS_PROB,MUT_DEL_PROB](SorterOrg & org, emp::Random & random) {
       size_t num_muts = 0;
-      for (uint32_t m = 0; m < MUT_COUNT; m++) {
-        if (random.P(0.5)) {
-          const uint32_t pos = random.GetUInt(org.GetSize());
-          org.EditCompare(pos, random.GetUInt(16), random.GetUInt(16));
-          num_muts++;
-        }
+      // Delete first (so as to not delete something we just changed or added)
+      if (random.P(MUT_DEL_PROB)) {
+        const uint32_t pos = random.GetUInt(org.GetSize());
+        org.RemoveCompare(pos);
+        num_muts++;
       }
+      // Substitute before insert (to not change something just added)
+      if (random.P(MUT_SUB_PROB)) { 
+        const uint32_t pos = random.GetUInt(org.GetSize());
+        org.EditCompare(pos, random.GetUInt(16), random.GetUInt(16));
+        num_muts++;
+      }
+      // Finally, do any insertions.
+      if (random.P(MUT_INS_PROB)) { 
+        const uint32_t pos = random.GetUInt(org.GetSize());
+        org.InsertCompare(pos, random.GetUInt(16), random.GetUInt(16));
+        num_muts++;
+      }
+
       return num_muts;
     };
   pop.SetMutFun( mut_fun );
   pop.SetAutoMutate();
 
-  std::function<double(SorterOrg&)> fit_fun =
-    [](SorterOrg & org){ return org.CountSortable(); };
+  std::function<double(const SorterOrg&)> fit_fun =
+    [](const SorterOrg & org){ return org.CountSortable(); };
   pop.SetFitFun( fit_fun );
 
   std::cout << 0 << " : " << pop[0].AsString() << " : " << fit_fun(pop[0]) << std::endl;
