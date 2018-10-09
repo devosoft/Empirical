@@ -15,7 +15,7 @@
 EMP_BUILD_CONFIG( EvoSortConfig,
   GROUP(DEFAULT, "Default settings for EvoSorter model"),
   VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
-  VALUE(POP_SIZE, uint32_t, 1000, "Number of organisms in the popoulation."),
+  VALUE(POP_SIZE, uint32_t, 200, "Number of organisms in the popoulation."),
   VALUE(MAX_GENS, uint32_t, 2000, "How many generations should we process?"),
   VALUE(ORG_SIZE, size_t, 100, "Number of comparisons in an organism."),
   VALUE(MUT_SUB_PROB, double, 0.5, "What is the probability for a comparison to be randomized?"),
@@ -25,6 +25,11 @@ EMP_BUILD_CONFIG( EvoSortConfig,
 
 
 using SorterOrg = emp::BitSorter;
+
+PrintOrg()
+{
+  
+}
 
 int main(int argc, char* argv[])
 {
@@ -87,13 +92,13 @@ int main(int argc, char* argv[])
       return num_muts;
     };
   pop.SetMutFun( mut_fun );
-  pop.SetAutoMutate();
+  pop.SetAutoMutate(1);
 
   std::function<double(const SorterOrg&)> fit_fun =
-    [](const SorterOrg & org){ return org.CountSortable(); };
+    [](const SorterOrg & org){ return org.CountSortable() * 10 - org.GetSize(); };
   pop.SetFitFun( fit_fun );
 
-  std::cout << 0 << " : " << pop[0].AsString() << " : " << fit_fun(pop[0]) << std::endl;
+  std::cout << 0 << " : " << pop[0].AsString() << " : " << pop[0].CountSortable() << std::endl;
 
   // Loop through updates
   for (uint32_t ud = 0; ud < MAX_GENS; ud++) {
@@ -107,12 +112,12 @@ int main(int argc, char* argv[])
     // Run a tournament for the rest...
     TournamentSelect(pop, 5, POP_SIZE-1);
     pop.Update();
-    std::cout << (ud+1) << " : " << pop[0].AsString() << " : " << fit_fun(pop[0]) << std::endl;
+    std::cout << (ud+1) << " : " << pop[0].AsString() << " : " << pop[0].CountSortable() << std::endl;
   }
 
   // pop.PrintLineage(0);
 
-//  std::cout << MAX_GENS << " : " << pop[0].AsString() << " : " << fit_fun(pop[0]) << std::endl;
+  std::cout << MAX_GENS << " : " << pop[0].AsString() << " : " << pop[0].CountSortable() << std::endl;
 
   // pop.GetSignalControl().PrintNames();
 }
