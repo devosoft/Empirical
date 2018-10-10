@@ -20,8 +20,8 @@ namespace emp {
 
   class BitSorter {
   private:
-    using bits_t = uint32_t;            // Type used to represent pairs if posisions.
-    emp::vector<bits_t> compare_set;    // All pairs of positions, in order.
+    using bits_t = uint32_t;          ///< Type used to represent pairs if posisions as bit masks.
+    emp::vector<bits_t> compare_set;  ///< Comparators, in order (pairs of 1's in bitstring)
 
   public:
     BitSorter() { ; }
@@ -32,8 +32,10 @@ namespace emp {
     BitSorter & operator=(const BitSorter &) = default;
     BitSorter & operator=(BitSorter &&) = default;
 
+    /// How many comparators are in this sorting network.
     size_t GetSize() const { return compare_set.size(); }
 
+    /// If this network is compressed as far as possible, what will its depth be?
     size_t CalcDepth(size_t num_bits = 16) const {
       emp::vector<size_t> cur_depth(num_bits, 0);
       for (bits_t c : compare_set) {
@@ -48,6 +50,7 @@ namespace emp {
       return cur_depth[ FindMaxIndex(cur_depth) ];
     }
 
+    /// Push a new comparator onto the back of the list.
     bool AddCompare(size_t id1, size_t id2) {
       emp_assert(id1 < 8*sizeof(bits_t), id1, sizeof(bits_t));
       emp_assert(id2 < 8*sizeof(bits_t), id2, sizeof(bits_t));
@@ -56,6 +59,7 @@ namespace emp {
       return true;
     }
 
+    /// Change the positions compared in a specified comparator.
     bool EditCompare(size_t pos, size_t id1, size_t id2) {
       emp_assert(pos < compare_set.size());
       emp_assert(id1 < 8*sizeof(bits_t), id1, sizeof(bits_t));
@@ -65,6 +69,7 @@ namespace emp {
       return true;
     }
 
+    /// Insert a new comparator at the specified position.
     bool InsertCompare(size_t pos, size_t id1, size_t id2) {
       emp_assert(pos <= compare_set.size());
       emp_assert(id1 < 8*sizeof(bits_t), id1, sizeof(bits_t));
@@ -74,6 +79,7 @@ namespace emp {
       return true;
     }
 
+    /// Remove the comparator at the specified position.
     bool RemoveCompare(size_t pos) {
       emp_assert(pos < compare_set.size());
       emp_assert(id1 < 8*sizeof(bits_t), id1, sizeof(bits_t));
@@ -82,6 +88,7 @@ namespace emp {
       return true;
     }
 
+    /// Run a specific set of bit values through a single comparator.
     static bits_t RunCompare(bits_t values, bits_t comparator) {
       // If bits are the same, no change!
       if ( ((values & comparator) == 0)                     // Bits are both 0... no change!
@@ -93,21 +100,25 @@ namespace emp {
       return values ^ comparator;  // Swap bits!
     }
 
+    /// Run a specific set of bit values through the series of comparators in this sorting network.
     bits_t Sort(bits_t values) const {
       for (bits_t c : compare_set) values = RunCompare(values, c);
       return values;
     }
 
+    /// Try all possible bit sequences (with the specified number of bits) and count how many this sorting network
+    /// fully sorts.
     size_t CountSortable(size_t num_bits = 16) const {
       const bits_t limit = 1 << num_bits;
       size_t count = 0;
       for (bits_t vals = 0; vals < limit; vals++) {
         bits_t svals = Sort(vals);
-        if ( (svals & (svals+1)) == 0) count++;  // Sorted!
+        if ( (svals & (svals+1)) == 0) count++;  // Sorted!  (a sorted network should have all one bits to the right)
       }
       return count;
     }
 
+    /// Convert a specified set of values to an std::string of 0's and 1's.
     static std::string ToString(bits_t values, size_t num_bits=16) {
       std::string out_str;
       for (size_t id = num_bits; id > 0; id--) {
@@ -117,6 +128,7 @@ namespace emp {
       return out_str;
     }
 
+    /// Describe this sorting network in a string, listing all comparators in order.
     std::string AsString() const {
       std::stringstream out;
       for (bits_t c : compare_set) {
