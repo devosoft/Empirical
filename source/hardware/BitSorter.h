@@ -35,19 +35,26 @@ namespace emp {
     /// How many comparators are in this sorting network.
     size_t GetSize() const { return compare_set.size(); }
 
-    /// If this network is compressed as far as possible, what will its depth be?
-    size_t CalcDepth(size_t num_bits = 16) const {
-      emp::vector<size_t> cur_depth(num_bits, 0);
+    /// If this network is compressed as far as possible, what will the max depth of each position be?
+    void CalcDepth(size_t num_bits, emp::vector<size_t> & depth_vals) const {
+      depth_vals.resize(0);
+      depth_vals.resize(num_bits, 0);
       for (bits_t c : compare_set) {
         size_t pos1 = pop_bit(c);
         size_t pos2 = find_bit(c);
         emp_assert(pos1 < num_bits, pos1, num_bits);
         emp_assert(pos2 < num_bits, pos2, num_bits);
         emp_assert(pos1 != pos2, pos1, pos2);
-        size_t max_depth = std::max(cur_depth[pos1], cur_depth[pos2]);
-        cur_depth[pos1] = cur_depth[pos2] = max_depth+1;
+        size_t max_depth = std::max(depth_vals[pos1], depth_vals[pos2]);
+        depth_vals[pos1] = depth_vals[pos2] = max_depth+1;
       }
-      return cur_depth[ FindMaxIndex(cur_depth) ];
+    }
+
+    /// Return only the highest overall depth of the sorting network.
+    size_t CalcDepth(size_t num_bits = 16) const {
+      emp::vector<size_t> depth_vals;
+      CalcDepth(num_bits, depth_vals);
+      return depth_vals[ FindMaxIndex(depth_vals) ];
     }
 
     /// Push a new comparator onto the back of the list.
