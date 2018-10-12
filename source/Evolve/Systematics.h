@@ -370,7 +370,10 @@ namespace emp {
   class Systematics : public SystematicsBase<ORG> {
   private:
     using parent_t = SystematicsBase<ORG>;
+  public: 
     using taxon_t = Taxon<ORG_INFO, DATA_STRUCT>;
+    using info_t = ORG_INFO;
+  private:
     using hash_t = typename Ptr<taxon_t>::hash_t;
     using fun_calc_info_t = std::function<ORG_INFO(const ORG &)>;
 
@@ -1142,7 +1145,10 @@ namespace emp {
     RemoveOffspring( taxon->GetParent() );           // Notify parent of the pruning.
     if (store_ancestors) ancestor_taxa.erase(taxon); // Clear from ancestors set (if there)
     if (store_outside) outside_taxa.insert(taxon);   // Add to outside set (if tracked)
-    else taxon.Delete();                             //  ...or else get rid of it.
+    else {
+      emp_assert(taxon != mrca);
+      taxon.Delete();                             //  ...or else get rid of it.
+    }
   }
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
@@ -1197,7 +1203,9 @@ namespace emp {
       Ptr<taxon_t> test_taxon = candidate->GetParent();
       while (test_taxon) {
         emp_assert(test_taxon->GetNumOff() >= 1);
-        if (test_taxon->GetNumOff() > 1) candidate = test_taxon;
+        // If the test_taxon is dead, we only want to update candidate when we hit a new branch point
+        // If test_taxon is still alive, though, we always need to update it
+        if (test_taxon->GetNumOff() > 1 || test_taxon->GetNumOrgs() > 0) candidate = test_taxon;
         test_taxon = test_taxon->GetParent();
       }
       mrca = candidate;
@@ -1315,7 +1323,7 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrgAfterRepro(int pos, int time) {
     emp_assert(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
-    emp_assert(pos < taxon_locations.size(), "Invalid position requested for removal", pos, taxon_locations.size());
+    emp_assert(pos < (int) taxon_locations.size(), "Invalid position requested for removal", pos, taxon_locations.size());
     emp_assert(taxon_locations[pos], pos, "No org at pos");
     RemoveOrgAfterRepro(taxon_locations[pos], time);
     taxon_locations[pos] = nullptr;
@@ -1333,7 +1341,7 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   bool Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrg(int pos, int time) {
     emp_assert(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
-    emp_assert(pos < taxon_locations.size(), "Invalid position requested for removal", pos, taxon_locations.size());
+    emp_assert(pos < (int)taxon_locations.size(), "Invalid position requested for removal", pos, taxon_locations.size());
     bool active = RemoveOrg(taxon_locations[pos], time);
     taxon_locations[pos] = nullptr;
     return active;

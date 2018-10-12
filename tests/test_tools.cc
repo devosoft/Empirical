@@ -1251,6 +1251,8 @@ TEST_CASE("Test string utils", "[tools]")
   REQUIRE(cat_full == "ABC123");
   std::array<int, 3> test_arr({{ 4, 2, 5 }});
   REQUIRE(emp::to_string(test_arr) == "[ 4 2 5 ]");
+  REQUIRE(emp::count(emp::to_string(test_arr), ' ') == 4);
+  REQUIRE(emp::join(emp::vector<size_t>({17,18,19}), ",") == "17,18,19");
 }
 
 
@@ -1471,6 +1473,7 @@ TEST_CASE("Test TypeTracker", "[tools]") {
 
 TEST_CASE("Test vector utils", "[tools]") {
   emp::vector<int> v1({6,2,5,1,3});
+  emp::vector<int> v2({7,6,7,1,7});
   emp::Sort(v1);
   REQUIRE(v1 == emp::vector<int>({1,2,3,5,6}));
   REQUIRE(emp::FindValue(v1, 3) == 2);
@@ -1479,6 +1482,8 @@ TEST_CASE("Test vector utils", "[tools]") {
   REQUIRE(!emp::Has(v1, 4));
   REQUIRE(emp::Product(v1) == 180);
   REQUIRE(emp::Slice(v1,1,3) == emp::vector<int>({2,3}));
+  REQUIRE(emp::Count(v1, 2) == 1);
+  REQUIRE(emp::Count(v2, 7) == 3);
 }
 
 // DEFINE_ATTR(Foo);

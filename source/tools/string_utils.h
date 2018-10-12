@@ -17,6 +17,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <algorithm>
 
 #include "../base/vector.h"
 #include "../meta/reflection.h"
@@ -553,7 +554,7 @@ namespace emp {
   }
 
   template <typename T>
-  std::string join(const emp::vector<T> v, std::string join_str) {
+  std::string join(const emp::vector<T> & v, std::string join_str) {
     
     if (v.size() == 0) {
       return "";
@@ -562,12 +563,17 @@ namespace emp {
     } else {
       std::stringstream res;
       res << v[0];
-      for (int i = 1; i < v.size(); i++) {
+      for (size_t i = 1; i < v.size(); i++) {
         res << join_str;
         res << to_string(v[i]);
       }
       return res.str();
     }
+  }
+
+  int count(std::string s, const char val) {
+    // From https://stackoverflow.com/a/3871346/1560599
+    return std::count(s.begin(), s.end(), val);
   }
 
 }
