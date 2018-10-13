@@ -21,6 +21,20 @@
 
 namespace emp {
 
+  namespace internal {
+    /// Get the next unique ID for a type.
+    static size_t GetNextTypeValue() {
+      static size_t next_type_value = 0;
+      return ++next_type_value;
+    }
+  }
+
+  template <typename T>
+  static size_t GetTypeValue() {
+    static const size_t type_value = internal::GetNextTypeValue();
+    return type_value;
+  }
+
   // Generic TypeID structure for when none of the specialty cases trigger.
   template<typename T> struct TypeID {
     template<typename TEST> using TypeIDFilter = decltype(&TEST::TypeID);
