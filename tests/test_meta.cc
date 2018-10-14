@@ -106,6 +106,25 @@ TEST_CASE("Test reflection", "[meta]")
 
 TEST_CASE("Test TypeID", "[meta]")
 {
+  // Test GetTypeValue
+  size_t int_value = emp::GetTypeValue<int>();
+  size_t char_value = emp::GetTypeValue<char>();
+  size_t str_value = emp::GetTypeValue<std::string>();
+  size_t int_value2 = emp::GetTypeValue<int>();
+  size_t bool_value = emp::GetTypeValue<bool>();
+
+  // Make sure that we are generating unique values for types.
+  REQUIRE(int_value != char_value);
+  REQUIRE(int_value != str_value);
+  REQUIRE(int_value != bool_value);
+  REQUIRE(char_value != str_value);
+  REQUIRE(char_value != bool_value);
+  REQUIRE(str_value != bool_value);
+
+  // Make sure that repeated calls for the SAME type do generate the same value.
+  REQUIRE (int_value == int_value2);
+
+  // Check TypeID strings...
   REQUIRE(emp::TypeID<char>::GetName() == "char");
   REQUIRE(emp::TypeID<void>::GetName() == "void");
   REQUIRE(emp::TypeID<int>::GetName() == "int32_t");
