@@ -28,12 +28,12 @@ namespace emp {
 
   public:
     using mapped_type = T;
-    using iterator = val_map_t::iterator;
-    using const_iterator = val_map_t::const_iterator;
-    using local_iterator = val_map_t::local_iterator;
-    using const_local_iterator = val_map_t::const_local_iterator;
-    using size_type = val_map_t::size_type;
-    using difference_type = val_map_t::difference_type;
+    using iterator = typename val_map_t::iterator;
+    using const_iterator = typename val_map_t::const_iterator;
+    using local_iterator = typename val_map_t::local_iterator;
+    using const_local_iterator = typename val_map_t::const_local_iterator;
+    using size_type = typename val_map_t::size_type;
+    using difference_type = typename val_map_t::difference_type;
 
     bool empty() const noexcept { return val_map.empty(); }
     size_t size() const noexcept { return val_map.size(); }
