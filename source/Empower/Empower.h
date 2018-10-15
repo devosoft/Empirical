@@ -23,6 +23,7 @@
 
 #include "../base/Ptr.h"
 #include "../base/vector.h"
+#include "../meta/TypeID.h"
 #include "../tools/debug.h"
 
 namespace emp {
@@ -92,7 +93,7 @@ namespace emp {
 
     /// Information about a single type used in Empower.
     struct TypeInfo {
-      size_t type_id;          ///< Unique ID for this type.
+      size_t type_id;          ///< Unique value for this type.
       std::string type_name;   ///< Name of this type (from std::typeid)
       size_t mem_size;         ///< Bytes needed for this type (from sizeof)
 
@@ -109,7 +110,7 @@ namespace emp {
     emp::vector<TypeInfo> types;
 
     std::map<std::string, size_t> var_map;   ///< Map variable names to index in vars
-    std::map<std::string, size_t> type_map;  ///< Map type names (from typeid) to index in types
+    std::map<size_t, size_t> type_map;       ///< Map type names (from typeid) to index in types
 
   public:
     Empower() : memory(this), vars(), types(), var_map(), type_map() { ; }
@@ -121,17 +122,17 @@ namespace emp {
     size_t GetTypeID() {
       using base_t = typename std::decay<T>::type;
 
-      // size_t type_hash = typeid(T).hash_code();
+      size_t type_hash = GetTypeValue<base_t>();
       std::string type_name = typeid(base_t).name();
 
       // If this type already exists stop here!
-      auto type_it = type_map.find(type_name);
+      auto type_it = type_map.find(type_hash);
       if (type_it != type_map.end()) return type_it->second;
 
       size_t type_id = types.size();
       size_t mem_size = sizeof(base_t);
       types.emplace_back(type_id, type_name, mem_size);
-      type_map[type_name] = type_id;
+      type_map[type_hash] = type_id;
 
       return type_id;
     }
