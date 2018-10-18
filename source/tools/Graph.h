@@ -289,6 +289,9 @@ namespace emp {
       }
     }
 
+    emp::vector<Node> GetNodes(){return nodes;}
+    emp::vector<emp::vector<double> > GetWeights(){return weights;}
+
   };
 }
 
