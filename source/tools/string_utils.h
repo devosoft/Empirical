@@ -554,7 +554,7 @@ namespace emp {
   }
 
   template <typename T>
-  std::string join(const emp::vector<T> & v, std::string join_str) {
+  inline std::string join(const emp::vector<T> & v, std::string join_str) {
     
     if (v.size() == 0) {
       return "";
@@ -571,7 +571,7 @@ namespace emp {
     }
   }
 
-  int count(std::string s, const char val) {
+  inline int count(std::string s, const char val) {
     // From https://stackoverflow.com/a/3871346/1560599
     return std::count(s.begin(), s.end(), val);
   }

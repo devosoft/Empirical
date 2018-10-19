@@ -27,9 +27,10 @@ namespace emp {
     class Node {
     private:
       BitVector edge_set; /// What other node IDs is this one connected to?
+      std::string label;
     public:
-      Node(size_t num_nodes) : edge_set(num_nodes) { ; }
-      Node(const Node & in_node) : edge_set(in_node.edge_set) { ; }
+      Node(size_t num_nodes) : edge_set(num_nodes), label("") { ; }
+      Node(const Node & in_node) : edge_set(in_node.edge_set), label(in_node.label) { ; }
       ~Node() { ; }
 
       /// Set this node to have the same connections as another node.
@@ -64,6 +65,15 @@ namespace emp {
 
       /// Identify how many other nodes from a provided set (a BitVector) this one is connected to.
       size_t GetMaskedDegree(const BitVector & mask) const { return (mask & edge_set).CountOnes(); }
+
+      void SetLabel(std::string lab) {
+        label = lab;
+      }
+
+      std::string GetLabel() {
+        return label;
+      }
+
     };
 
   protected:
@@ -115,6 +125,16 @@ namespace emp {
     size_t GetMaskedDegree(size_t id, const BitVector & mask) const {
       emp_assert(id < nodes.size());
       return nodes[id].GetMaskedDegree(mask);
+    }
+
+    /// Set label of node @param id
+    void SetLabel(size_t id, std::string lab) {
+      nodes[id].SetLabel(lab);
+    }
+
+    /// Get label of node @param id
+    std::string GetLabel(size_t id) {
+      return nodes[id].GetLabel();
     }
 
     /// Determine if a specific edge is included in this graph.

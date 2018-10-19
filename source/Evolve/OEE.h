@@ -211,10 +211,13 @@ namespace emp {
         emp_assert(org.size() > 0, "Empty org passed to skeletonize");
 
         emp::vector<INST_TYPE> skeleton;
-        double fitness = fit_fun(org);
-        ORG_TYPE test_org = ORG_TYPE(org);
+        // Some fitness functions may require the org to be const and smoe may require it to not be
+        // We can let the compiler deducce whetehr ORG_TYPE is const or not.
+        // But the test org really needs to not be const
+        typename std::remove_const<ORG_TYPE>::type test_org = ORG_TYPE(org);
+        double fitness = fit_fun(test_org);
 
-        for (size_t i = 0; i < org.size(); i++) {
+        for (int i = 0; i < (int)org.size(); i++) {
             test_org[i] = null_value;
             double new_fitness = fit_fun(test_org);
             if (new_fitness < fitness) {

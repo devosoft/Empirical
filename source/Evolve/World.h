@@ -382,6 +382,14 @@ namespace emp {
       systematics_labels.erase(label) ;
     }
 
+    template <typename ORG_INFO, typename DATA_STRUCT=emp::datastruct::no_data>
+    Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> AddSystematics(std::function<ORG_INFO(const ORG&)> calc_taxon, bool active=true, bool anc=true, bool all=true, bool pos=true, std::string label="systematics" ) {
+      Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> sys_ptr;
+      sys_ptr.New(calc_taxon, active, anc, all, pos);
+      AddSystematics(sys_ptr, label);
+      return sys_ptr;
+    }
+
     template <typename ORG_INFO, typename DATA_STRUCT>
     void AddSystematics(Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT> > s, std::string label="systematics") {
       if (Has(systematics_labels, label)) {
