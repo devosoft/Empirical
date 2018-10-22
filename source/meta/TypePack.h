@@ -128,7 +128,7 @@ namespace emp {
       using other_tp = typename T::pop;                                  // Isolate remaining types
       constexpr static bool cur_result = test_type<FILTER,cur_t>();      // Run filter of cur type
       using cur_ftp = typename tp_filter1<cur_t, !cur_result>::type;     // Use cur type if true
-      using other_ftp = typename tp_filter<other_tp, FILTER, N-1>::type; // Recurse
+      using other_ftp = typename tp_filter_out<other_tp, FILTER, N-1>::type; // Recurse
       using type = typename cur_ftp::template merge< other_ftp >;        // Merge
     };
 
