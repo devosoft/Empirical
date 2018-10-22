@@ -265,6 +265,16 @@ namespace emp {
     template <template <typename...> class FILTER>
     using find_t = typename internal::tp_filter_t<this_t, FILTER>::first_t;
 
+    template <typename M1>
+    struct type_matcher {
+      template <typename M2>
+      using is_match = std::is_same<M1,M2>;
+    };
+
+    // Remove all instances of a given type.
+    template <typename T>
+    using remove_t = internal::tp_filter_out_t<this_t, type_matcher<T>::template is_match>;
+    
     /// Wrap all types in a specified wrapper template.
     template <template <typename...> class WRAPPER>
     using wrap = internal::tp_wrap_t<this_t, WRAPPER>;
@@ -311,6 +321,7 @@ namespace emp {
     template <template <typename...> class FILTER> using filter = this_t;
     template <template <typename...> class FILTER> using filter_out = this_t;
     template <template <typename...> class FILTER> using find_t = null_t;
+    template <typename T> using remove_t = this_t;
     template <template <typename...> class WRAPPER> using wrap = this_t;
   };
 }
