@@ -178,6 +178,9 @@ TEST_CASE("Test TypePack", "[meta]")
   using test_filtered_out = test_t::filter_out<std::is_integral>;
   REQUIRE(test_filtered_out::GetSize() == 3);
 
+  using test_remove = test_t::remove_t<std::string>;
+  REQUIRE(test_remove::GetSize() == 4);
+
   using test_A = emp::TypePack<HasA, std::string, bool, HasA2, HasA, int>;
   REQUIRE(emp::TypeID<test_A>::GetName() == "emp::TypePack<HasA,std::string,bool,HasA2,HasA,int32_t>");
 
