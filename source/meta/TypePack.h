@@ -271,10 +271,13 @@ namespace emp {
       using is_match = std::is_same<M1,M2>;
     };
 
-    // Remove all instances of a given type.
+    /// Remove all instances of a given type.
     template <typename T>
     using remove_t = internal::tp_filter_out_t<this_t, type_matcher<T>::template is_match>;
-    
+
+    /// Remove all duplicates within a TypePack
+    using make_unique = typename remove_t<first_t>::make_unique::template push_front<first_t>;
+
     /// Wrap all types in a specified wrapper template.
     template <template <typename...> class WRAPPER>
     using wrap = internal::tp_wrap_t<this_t, WRAPPER>;
@@ -322,6 +325,7 @@ namespace emp {
     template <template <typename...> class FILTER> using filter_out = this_t;
     template <template <typename...> class FILTER> using find_t = null_t;
     template <typename T> using remove_t = this_t;
+    using make_unique = this_t;
     template <template <typename...> class WRAPPER> using wrap = this_t;
   };
 }
