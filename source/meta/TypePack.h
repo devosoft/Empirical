@@ -191,6 +191,9 @@ namespace emp {
     /// Return bool indicating if all types in this pack are different from each other.
     constexpr static bool IsUnique() { return has_unique_types<T1,Ts...>(); }
 
+    /// Count how many distinct types are in this pack.
+    constexpr static int CountUnique() { return make_unique::GetSize(); }
+
     /// Get the type associated with a specified position in the pack.
     template <int POS> using get = pack_id<POS, T1, Ts...>;
 
