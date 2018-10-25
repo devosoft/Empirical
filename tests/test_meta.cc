@@ -207,6 +207,15 @@ TEST_CASE("Test TypePack", "[meta]")
   REQUIRE(dup_test_t::make_unique::GetSize() == 5);
   REQUIRE(dup_test_t::Count<int>() == 5);
   REQUIRE(dup_test_t::CountUnique() == 5);
+
+  using link1_t = emp::TypePack<bool, char, int>;
+  using link2_t = emp::TypePack<double, int, size_t>;
+  using merge_t = link1_t::merge<link2_t>;
+  using union_t = link1_t::find_union<link2_t>;
+  REQUIRE(link1_t::GetSize() == 3);
+  REQUIRE(link2_t::GetSize() == 3);
+  REQUIRE(merge_t::GetSize() == 6);
+  REQUIRE(union_t::GetSize() == 5);
 }
 
 TEST_CASE("Test type traits", "[meta]") {
