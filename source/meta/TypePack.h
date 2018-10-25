@@ -43,6 +43,7 @@
  *    shrink<N>          - Pack with ONLY first N types.
  *    resize<N,D>        - Resize pack to N types; if N greater than current size, pad with D.
  *    merge<P>           - Append all of pack P to the end of this pack.
+ *    find_union<P>      - Join this pack to P, keeping only one of each type.
  *    reverse            - Reverse the order of types in this pack.
  *    rotate             - Move the first type in pack to the end.
  *
@@ -236,6 +237,9 @@ namespace emp {
 
     /// Join this TypePack with another TypePack.
     template <typename IN> using merge = typename internal::tp_shift<IN::SIZE, this_t, IN>::type1;
+
+    /// Join this TypePack with another, keeping only one of each type.
+    template <typename IN> using find_union = typename internal::tp_shift<IN::SIZE, this_t, IN>::type1::make_unique;
 
     /// Rearrange types in TypePack into reverse order.
     using reverse = typename pop::reverse::template push_back<T1>;
