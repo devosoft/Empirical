@@ -18,9 +18,17 @@
  *    exist there, throw the provided error.
  * 
  *  OPTIONAL_FUN ( FUNCTION_NAME, DEFAULT_ACTION, RETURN_TYPE, ARG_TYPES... )
- *    Setup a function.  If it exists, call the version in the wrapped class.  If it does not
+ *    Setup a function.  If it exists in the wrapped class, call that version.  If it does not
  *    exist, return the default instead.  The function signature is needed as part of the 
  *    automated testing as to whether the function exists.
+ * 
+ *  REQUIRED_TYPE ( TYPE_NAME, ERROR_MESSAGE )
+ *    Setup a named type that must have been made available from the wrapped class.  IF it does
+ *    not exist there, throw the provided error.
+ * 
+ *  OPTIONAL_TYPE ( TYPE_NAME, DEFAULT_TYPE )
+ *    Setup a named type.  If it exists in the wrapped class, use that version, otherwise set it
+ *    to DEFAULT_TYPE.
  * 
  *  PRIVATE ( CODE )
  *    All code provided will appear in the private portion of the wrapper.
