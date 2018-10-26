@@ -83,6 +83,8 @@
         
 #define EMP_BUILD_CONCEPT__EC_REQUIRED_FUN(...)    /* REQUIRED_FUN okay */
 #define EMP_BUILD_CONCEPT__EC_OPTIONAL_FUN(...)    /* OPTIONAL_FUN okay */
+#define EMP_BUILD_CONCEPT__EC_REQUIRED_TYPE(...)   /* REQUIRED_TYPE okay */
+#define EMP_BUILD_CONCEPT__EC_OPTIONAL_TYPE(...)   /* OPTIONAL_TYPE okay */
 #define EMP_BUILD_CONCEPT__EC_PRIVATE(...)         /* PRIVATE okay */
 #define EMP_BUILD_CONCEPT__EC_PROTECTED(...)       /* PROTECTED okay */
 #define EMP_BUILD_CONCEPT__EC_PUBLIC(...)          /* PUBLIC okay */
@@ -100,6 +102,8 @@
 
 #define EMP_BUILD_CONCEPT__BASE_REQUIRED_FUN(NAME, X, RETURN_T, ...) virtual RETURN_T NAME( __VA_ARGS__ ) = 0;
 #define EMP_BUILD_CONCEPT__BASE_OPTIONAL_FUN(NAME, X, RETURN_T, ...) virtual RETURN_T NAME( __VA_ARGS__ ) = 0;
+#define EMP_BUILD_CONCEPT__BASE_REQUIRED_TYPE(...)
+#define EMP_BUILD_CONCEPT__BASE_OPTIONAL_TYPE(...)
 #define EMP_BUILD_CONCEPT__BASE_PRIVATE(...)
 #define EMP_BUILD_CONCEPT__BASE_PROTECTED(...)
 #define EMP_BUILD_CONCEPT__BASE_PUBLIC(...)
@@ -197,6 +201,20 @@
         }                                                                                         \
       )                                                                                           \
     }
+
+#define EMP_BUILD_CONCEPT__PROCESS_REQUIRED_TYPE(TYPE_NAME, ERROR)                                \
+  protected:                                                                                      \
+    /* Test if a type defines another type.                                                   */  \
+    template <typename T>                                                                         \
+    using has_t_ ## TYPE_NAME = T::TYPE_NAME;                                                     \
+  public:                                                                                         \
+    /* Test whether type exists in the base class, based on SFINAE in using return type.      */  \
+    static constexpr bool HasType_ ## TYPE_NAME() {                                               \
+      constexpr bool result = emp::test_type<has_t_ ## TYPE_NAME, WRAPPED_T>();                   \
+      static_assert( result, "\n\n  ** " ERROR " (Class: " "TBD" ") **\n" );                      \
+      return result;                                                                              \
+    }                                                                                             \
+    using TYPE_NAME = WRAPPED_T::TYPE_NAME;
 
 #define EMP_BUILD_CONCEPT__PROCESS_PRIVATE(...) private: __VA_ARGS__
 #define EMP_BUILD_CONCEPT__PROCESS_PUBLIC(...) public: __VA_ARGS__
