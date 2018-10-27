@@ -32,10 +32,10 @@
  *    get<POS>           - Type at position POS in the pack.
  *    first_t            - Type of first position in the pack.
  *    last_t             - Type of last position in the pack.
- *    select<Ps...>      - Create a new pack with types from selected position.
+ *    select<Ps...>      - Create a new pack with types from selected positions.
  *
  *  Type manipulations:
- *    set<POS, T>        - Change types at position POS to T.
+ *    set<POS, T>        - Change type at position POS to T.
  *    push_front<Ts...>  - Add any number of types Ts to the front of the pack.
  *    push_back<Ts...>   - Add any number of types Ts to the back of the pack.
  *    pop                - Pack with first type missing.
