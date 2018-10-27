@@ -206,7 +206,7 @@
   protected:                                                                                      \
     /* Test if a type defines another type.                                                   */  \
     template <typename T>                                                                         \
-    using has_t_ ## TYPE_NAME = T::TYPE_NAME;                                                     \
+    using has_t_ ## TYPE_NAME = typename T::TYPE_NAME;                                            \
   public:                                                                                         \
     /* Test whether type exists in the base class, based on SFINAE in using return type.      */  \
     static constexpr bool HasType_ ## TYPE_NAME() {                                               \
@@ -214,7 +214,7 @@
       static_assert( result, "\n\n  ** " ERROR " (Class: " "TBD" ") **\n" );                      \
       return result;                                                                              \
     }                                                                                             \
-    using TYPE_NAME = WRAPPED_T::TYPE_NAME;
+    using TYPE_NAME = typename WRAPPED_T::TYPE_NAME;
 
 #define EMP_BUILD_CONCEPT__PROCESS_PRIVATE(...) private: __VA_ARGS__
 #define EMP_BUILD_CONCEPT__PROCESS_PUBLIC(...) public: __VA_ARGS__
