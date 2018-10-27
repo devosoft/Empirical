@@ -16,7 +16,8 @@ EMP_BUILD_CONCEPT( TestConcept, TestConcept_Base,
                    REQUIRED_FUN(RequiredFun2, "Missing RequiredFun function 2!", void),
                    OPTIONAL_FUN(OptionalFun1, { std::cout << "Default version of OptionalFun1()" << std::endl; x++; }, void),
                    REQUIRED_FUN(DoMath1, "Missing required function DoMath1", double, double, double ),
-                   OPTIONAL_FUN(DoMath2, (arg1 + arg2)/2.0, double, double, double )
+                   OPTIONAL_FUN(DoMath2, (arg1 + arg2)/2.0, double, double, double ),
+                   REQUIRED_TYPE(test1_t, "Missing required type test1_t")
                  );
 
 
@@ -26,6 +27,7 @@ struct MinimalClass {
   // No OptionalFun1 function
   double DoMath1(double arg1, double arg2) { return std::min(arg1, arg2); }
   // No Math2 function (it's optional)
+  using test1_t = int;
 };
 
 struct FullClass {
@@ -34,8 +36,8 @@ struct FullClass {
   void OptionalFun1() { std::cout << "In FullClass::OptionalFun2()" << std::endl; }
   double DoMath1(double arg1, double arg2) { return std::max(arg1, arg2); }
   double DoMath2(double arg1, double arg2) { return arg1 * arg2; }
-
   double DoMath3(double arg1, double arg2) { return arg1 + 5 * arg2; }
+  using test1_t = double;
 };
 
 int main() {
