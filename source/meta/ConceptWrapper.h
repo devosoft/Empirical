@@ -55,6 +55,7 @@
 
 #include "../base/macros.h"
 #include "meta.h"
+#include "TypePack.h"
 
 
 
@@ -215,6 +216,18 @@
       return result;                                                                              \
     }                                                                                             \
     using TYPE_NAME = typename WRAPPED_T::TYPE_NAME;
+
+#define EMP_BUILD_CONCEPT__PROCESS_OPTIONAL_TYPE(TYPE_NAME, DEFAULT_T)                            \
+  protected:                                                                                      \
+    /* Test if a type defines another type.                                                   */  \
+    template <typename T>                                                                         \
+    using has_t_ ## TYPE_NAME = typename T::TYPE_NAME;                                            \
+  public:                                                                                         \
+    /* Test whether type exists in the base class, based on SFINAE in using return type.      */  \
+    static constexpr bool HasType_ ## TYPE_NAME() {                                               \
+      return emp::test_type<has_t_ ## TYPE_NAME, WRAPPED_T>();                                    \
+    }                                                                                             \
+    using TYPE_NAME = typename emp::TypePack<WRAPPED_T>::template wrap<has_t_ ## TYPE_NAME>::template push_back<DEFAULT_T>::first_t;
 
 #define EMP_BUILD_CONCEPT__PROCESS_PRIVATE(...) private: __VA_ARGS__
 #define EMP_BUILD_CONCEPT__PROCESS_PUBLIC(...) public: __VA_ARGS__
