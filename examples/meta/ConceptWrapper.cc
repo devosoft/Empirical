@@ -48,11 +48,15 @@ int main() {
   min_class.RequiredFun1();
   min_class.RequiredFun2();
   min_class.OptionalFun1();
+  TestConcept<MinimalClass>::test1_t a = 10;
+  TestConcept<MinimalClass>::test2_t b = 20;
 
   TestConcept<FullClass> full_class;
   full_class.RequiredFun1();
   full_class.RequiredFun2();
   full_class.OptionalFun1();
+  TestConcept<FullClass>::test1_t c = 30.5;
+  TestConcept<FullClass>::test2_t d = "forty";
 
   std::cout << "min_class.x = " << min_class.x << std::endl;
   std::cout << "full_class.x = " << full_class.x << std::endl;
