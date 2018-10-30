@@ -26,10 +26,10 @@ EMP_BUILD_CONFIG( EvoSortConfig,
 
 using SorterOrg = emp::BitSorter;
 
-// PrintOrg()
-// {
-  
-// }
+void PrintOrg(size_t update, const SorterOrg & org)
+{
+  std::cout << (update+1) << " : " << org.AsString() << " : " << org.CountSortable() << std::endl;
+}
 
 int main(int argc, char* argv[])
 {
@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
   emp::vector< std::function<double(const SorterOrg &)> > fit_set(num_fit_funs);
 
 
-  std::cout << 0 << " : " << pop[0].AsString() << " : " << pop[0].CountSortable() << std::endl;
+  PrintOrg(0, pop[0]);
 
   // Loop through updates
   for (uint32_t ud = 0; ud < MAX_GENS; ud++) {
@@ -128,7 +128,8 @@ int main(int argc, char* argv[])
     // Run a tournament for the rest...
     TournamentSelect(pop, 5, POP_SIZE-1);
     pop.Update();
-    std::cout << (ud+1) << " : " << pop[0].AsString() << " : " << pop[0].CountSortable() << std::endl;
+    // std::cout << (ud+1) << " : " << pop[0].AsString() << " : " << pop[0].CountSortable() << std::endl;
+    PrintOrg(ud+1, pop[0]);
   }
 
   // pop.PrintLineage(0);
