@@ -113,6 +113,12 @@ namespace emp {
       return values;
     }
 
+    /// Determine if a particular input bit pattern will be sorted correctly by this network.
+    bool TestSortable(bits_t values) const {
+      const bits_t svals = Sort(values);
+      return (svals & (svals+1)) == 0;
+    }
+
     /// Try all possible bit sequences (with the specified number of bits) and count how many this sorting network
     /// fully sorts.
     size_t CountSortable(size_t num_bits = 16) const {
