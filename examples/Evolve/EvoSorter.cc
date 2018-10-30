@@ -28,7 +28,10 @@ using SorterOrg = emp::BitSorter;
 
 void PrintOrg(size_t update, const SorterOrg & org)
 {
-  std::cout << (update+1) << " : " << org.AsString() << " : " << org.CountSortable() << std::endl;
+  std::cout << (update+1) << " : " << org.AsString()
+            << " : SolveCount=" << org.CountSortable()
+            << "  Size=" << org.GetSize()
+            << std::endl;
 }
 
 int main(int argc, char* argv[])
