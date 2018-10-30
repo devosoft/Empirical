@@ -26,10 +26,10 @@ EMP_BUILD_CONFIG( EvoSortConfig,
 
 using SorterOrg = emp::BitSorter;
 
-PrintOrg()
-{
+// PrintOrg()
+// {
   
-}
+// }
 
 int main(int argc, char* argv[])
 {
@@ -94,9 +94,15 @@ int main(int argc, char* argv[])
   pop.SetMutFun( mut_fun );
   pop.SetAutoMutate(1);
 
+  // Build the main fitness function.
   std::function<double(const SorterOrg&)> fit_fun =
     [](const SorterOrg & org){ return org.CountSortable() * 10 - org.GetSize(); };
   pop.SetFitFun( fit_fun );
+
+  // Setup a place to put the set of fitness functions for lexicase.
+  constexpr size_t num_fit_funs = 100;
+  emp::vector< std::function<double(const SorterOrg &)> > fit_set(num_fit_funs);
+
 
   std::cout << 0 << " : " << pop[0].AsString() << " : " << pop[0].CountSortable() << std::endl;
 
@@ -105,6 +111,16 @@ int main(int argc, char* argv[])
     // Print current state.
     // for (uint32_t i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
     // std::cout << std::endl;
+
+    // Build the lexicase fitness functions (changing each update)
+    for (size_t i = 0; i < num_fit_funs; i++) {
+      // Setup the fitness function.
+      const size_t target_id = random.GetUInt(1<<16);
+      fit_set[i] = [target_id](const SorterOrg & org) {
+        return 0;
+      };
+    }
+
 
     // Keep the best individual.
     emp::EliteSelect(pop, 1, 1);
