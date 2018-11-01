@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
       // Setup the fitness function.
       const size_t target_id = random.GetUInt(1<<16);
       fit_set[i] = [target_id](const SorterOrg & org) {
-        return 0;
+        return (double) org.TestSortable(target_id);
       };
     }
 
@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
 
     // Run a tournament for the rest...
     // TournamentSelect(pop, 5, POP_SIZE-1);
-    emp::LexicaseSelect(pop, fit_set, POP_SIZE-1);
+    emp::LexicaseSelect<emp::BitSorter>(pop, fit_set, POP_SIZE-1);
 
     pop.Update();
     // std::cout << (ud+1) << " : " << pop[0].AsString() << " : " << pop[0].CountSortable() << std::endl;
