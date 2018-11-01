@@ -170,7 +170,7 @@ namespace emp {
     for (size_t fit_id = 0; fit_id < fit_funs.size(); ++fit_id) {
       fitnesses[fit_id].resize(world.GetSize());
       for (size_t org_id : all_orgs) {
-        fitnesses[fit_id][org_id] = fit_funs[fit_id](world.GetOrg(all_orgs[0]));
+        fitnesses[fit_id][org_id] = fit_funs[fit_id](world.GetOrg(all_orgs[org_id]));
       }
     }
 
