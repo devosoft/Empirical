@@ -213,10 +213,10 @@ namespace emp {
 
       // Place a random survivor (all equal) into the next generation!
       emp_assert(cur_orgs.size() > 0, cur_orgs.size(), fit_funs.size(), all_orgs.size());
-      size_t winner = world.GetRandom().GetUInt(cur_orgs.size());
+      size_t win_id = cur_orgs[ world.GetRandom().GetUInt(cur_orgs.size()) ];
 
-      //TriggerOnLexicaseSelect(world, used, winner);
-      world.DoBirth( world.GetGenomeAt(winner), winner );
+      //TriggerOnLexicaseSelect(world, used, win_id);
+      world.DoBirth( world.GetGenomeAt(win_id), win_id );
     }
     // std::cout << "Done with lex" << std::endl;
   }
