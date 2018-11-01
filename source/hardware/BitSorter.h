@@ -89,8 +89,6 @@ namespace emp {
     /// Remove the comparator at the specified position.
     bool RemoveCompare(size_t pos) {
       emp_assert(pos < compare_set.size());
-      emp_assert(id1 < 8*sizeof(bits_t), id1, sizeof(bits_t));
-      emp_assert(id2 < 8*sizeof(bits_t), id2, sizeof(bits_t));
       compare_set.erase(compare_set.begin() + pos);
       return true;
     }
