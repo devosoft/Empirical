@@ -11,7 +11,8 @@
  *  all of the variables declared, ensuring that they interact correctly.
  * 
  *  Developer Notes:
- *  - Can have multiple memory spaces in Empower; basically scopes or namespaces.
+ *  @todo Allow multiple memory spaces in Empower; basically scopes or namespaces.
+ *  @todo Allow nested namespaces to be branched at any level (so outer levels share vars)
  */
 
 #ifndef EMP_EMPOWER_H
@@ -35,15 +36,18 @@ namespace emp {
     static constexpr size_t undefined_id = (size_t) -1;
 
     /// A MemoryImage is a full set of variable values stored in an Empower instance.
+    /// Any number of memory images can be created for a single Empower instance, but
+    /// they must all be the same size and refer to the same set of variables.
     class MemoryImage {
     private:
-      emp::vector<byte_t> memory;     ///< The specific memory values.
+      emp::vector<byte_t> memory;      ///< The specific memory values.
       emp::Ptr<Empower> empower_ptr;   ///< A pointer back to Empower instance this memory uses.
 
     public:
       MemoryImage(emp::Ptr<Empower> _ptr) : memory(), empower_ptr(_ptr) { ; }
       MemoryImage(const MemoryImage &) = default;
       MemoryImage(MemoryImage &&) = default;
+      ~MemoryImage();
 
       const emp::vector<byte_t> & GetMemory() const { return memory; }
       Empower & GetEmpower() { return *empower_ptr; }
@@ -58,28 +62,31 @@ namespace emp {
       void resize(size_t new_size) { memory.resize(new_size); }
     };
 
+
     /// A Var is an internal variable that has a run-time determined type (which is tracked).
     class Var {
     private:
       size_t info_id;                 ///< Which variable ID is this var associated with?
       size_t mem_pos;                 ///< Where is this variable in a memory image?
       emp::Ptr<MemoryImage> mem_ptr;  ///< Which memory image is variable using (by default)
+
     public:
-      Var(size_t _id, size_t _pos, MemoryImage & mem) : info_id(_id), mem_pos(_pos), mem_ptr(&mem) { ; }
+      Var(size_t _id, size_t _pos, MemoryImage & mem)
+	      : info_id(_id), mem_pos(_pos), mem_ptr(&mem) { ; }
       Var(const Var &) = default;
 
       template <typename T>
       T & Restore() {
-        // std::cout << "Running restore on var #" << info_id
-        //           << " at mem position " << mem_pos << std::endl;
-
         // Make sure function is restoring the correct type.
-        emp_assert( mem_ptr->GetEmpower().vars[info_id].type_id == mem_ptr->GetEmpower().GetTypeID<T>() );
+        emp_assert( mem_ptr->GetEmpower().vars[info_id].type_id ==
+		    mem_ptr->GetEmpower().GetTypeID<T>() );
+
+      	// Convertthis memory to a reference that can be returned.
         return mem_ptr->GetRef<T>(mem_pos);
       }
     };
 
-  protected:
+  protected:    
     /// Information about a single Empower variable, including its type, name, and where to
     /// find it in a memory image.
     struct VarInfo {
@@ -91,26 +98,44 @@ namespace emp {
        : type_id(_id), var_name(_name), mem_pos(_pos) { ; }
     };
 
+    using destruct_fun_t = std::function<void(const VarInfo &, MemoryImage &)>;
+
     /// Information about a single type used in Empower.
     struct TypeInfo {
       size_t type_id;          ///< Unique value for this type.
       std::string type_name;   ///< Name of this type (from std::typeid)
-      size_t mem_size;         ///< Bytes needed for this type (from sizeof)
-
+      size_t mem_size;         ///< Bytes needed for this type (from sizeof)      
+      
+      /// Function to run destructor on this type.
+      destruct_fun_t destruct_fun;
+      
       // Core conversion functions for this type.
       std::function<double(Var &)> to_double;      ///< Fun to convert type to double (empty=>none)
       std::function<std::string(Var &)> to_string; ///< Fun to convert type to string (empty=>none)
-
-      TypeInfo(size_t _id, const std::string & _name, size_t _size)
-       : type_id(_id), type_name(_name), mem_size(_size) { ; }
+      
+      TypeInfo(size_t _id, const std::string & _name, size_t _size, destruct_fun_t d_fun)
+	: type_id(_id), type_name(_name), mem_size(_size), destruct_fun(d_fun) { ; }
     };
 
-    MemoryImage memory;  /// The default memory image.
-    emp::vector<VarInfo> vars;
-    emp::vector<TypeInfo> types;
+
+    /// ------ INTERNAL VARIABLES ------
+
+    MemoryImage memory;             ///< The Default memory image.
+    emp::vector<VarInfo> vars;      ///< Information about all vars used.
+    emp::vector<TypeInfo> types;    ///< Information about all types used.
 
     std::map<std::string, size_t> var_map;   ///< Map variable names to index in vars
     std::map<size_t, size_t> type_map;       ///< Map type names (from typeid) to index in types
+
+    /// When deleting a MemoryImage, we must make sure to run the destructors on each
+    /// internal variable contained.
+    void Destruct(MemoryImage & image) {
+      /// Loop through all variables stored in this memory image and destruct each of them.
+      for (const VarInfo & v : vars) {
+        const TypeInfo & type = types[v.type_id];
+      	type.destruct_fun(v, image);
+      }
+    }
 
   public:
     Empower() : memory(this), vars(), types(), var_map(), type_map() { ; }
@@ -131,7 +156,11 @@ namespace emp {
 
       size_t type_id = types.size();
       size_t mem_size = sizeof(base_t);
-      types.emplace_back(type_id, type_name, mem_size);
+      destruct_fun_t destruct_fun = [](const VarInfo & var_info, MemoryImage & mem) {
+	      mem.GetPtr<T>(var_info.mem_pos)->~T();
+      };
+
+      types.emplace_back(type_id, type_name, mem_size, destruct_fun);
       type_map[type_hash] = type_id;
 
       return type_id;
@@ -154,6 +183,9 @@ namespace emp {
       return Var(var_id, mem_start, memory);
     }
   };
+
+    // Define functions from MemoryImage that need to refer back to it functions in Empower.
+    Empower::MemoryImage::~MemoryImage() { empower_ptr->Destruct(*this); }
 
 }
 
