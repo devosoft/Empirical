@@ -1,6 +1,6 @@
 Empower is a scripting language built inside of Empirical to simplify and the use of fast
-run-time interpreting.  Internally, and Empower object will track all of the types used and
-all of the variables declared, ensuring that they interact correctly.
+run-time interpreting, especially for annotating other objects.  Internally, an Empower object
+will track all types used and all variables declared, ensuring that they interact correctly.
 
 Each time a new type is used, it is added to a type map (indexed by their typeid string) and
 assigned a unique ID number.  If relevant, variations on this type can be calculated, such as
@@ -31,7 +31,8 @@ To use:
  Either functions or variables can be restored using the Restore() function that specifies type.
  - Example:  int value = myvar.Restore<int>();
 
- Convert() does a (slower) conversion when you don't know the exact type.
+ Convert() does a (slower) conversion when you don't know the exact type, but do know that
+ it can be converted to the type you want.
  - Example:  double value = myvar.Convert<int>();
 
  Lots of values can be retrieved from an Empower::Var or ::Fun object.  For example:
