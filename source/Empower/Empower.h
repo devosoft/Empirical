@@ -53,8 +53,8 @@ namespace emp {
       Empower & GetEmpower() { return *empower_ptr; }
       const Empower & GetEmpower() const { return *empower_ptr; }
 
-      template <typename T> emp::Ptr<T> GetPtr(size_t pos) { return (T*) (&memory[pos]); }
-      template <typename T> T & GetRef(size_t pos) { return *((T*) (&memory[pos])); }
+      template <typename T> emp::Ptr<T> GetPtr(size_t pos) { return reinterpret_cast<T*>(&memory[pos]); }
+      template <typename T> T & GetRef(size_t pos) { return *(reinterpret_cast<T*>(&memory[pos])); }
 
       byte_t & operator[](size_t pos) { return memory[pos]; }
       const byte_t & operator[](size_t pos) const { return memory[pos]; }
