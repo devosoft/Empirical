@@ -46,7 +46,7 @@ namespace emp {
     public:
       MemoryImage(emp::Ptr<Empower> _ptr) : memory(), empower_ptr(_ptr) { ; }
       MemoryImage(const MemoryImage &) = default;
-      MemoryImage(MemoryImage &&) = default;
+      MemoryImage(MemoryImage &&);
       ~MemoryImage();
 
       const emp::vector<byte_t> & GetMemory() const { return memory; }
@@ -184,8 +184,19 @@ namespace emp {
     }
   };
 
-    // Define functions from MemoryImage that need to refer back to it functions in Empower.
-    Empower::MemoryImage::~MemoryImage() { empower_ptr->Destruct(*this); }
+  // Define move constructor.
+  Empower::MemoryImage::MemoryImage(MemoryImage && image) {
+    memory = std::move(image.memory);   // Move over memory
+    empower_ptr = image.empower_ptr;    // Copy pointer back to empower object.
+    image.empower_ptr = nullptr;        // Make this memory as inactive.
+  }
+
+
+  // Define functions from MemoryImage that need to refer back to it functions in Empower.
+  Empower::MemoryImage::~MemoryImage() {
+    // If memory still active, make sure to destruct it.
+    if (empower_ptr) empower_ptr->Destruct(*this);
+  }
 
 }
 
