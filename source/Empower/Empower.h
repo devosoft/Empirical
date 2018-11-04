@@ -11,6 +11,7 @@
  *  all of the variables declared, ensuring that they interact correctly.
  * 
  *  Developer Notes:
+ *  @todo Setup a template wrapper that adds annotations on to another class using a MemoryImage
  *  @todo Allow multiple memory spaces in Empower; basically scopes or namespaces.
  *  @todo Allow nested namespaces to be branched at any level (so outer levels share vars)
  */
@@ -45,7 +46,7 @@ namespace emp {
 
     public:
       MemoryImage(emp::Ptr<Empower> _ptr) : memory(), empower_ptr(_ptr) { ; }
-      MemoryImage(const MemoryImage &) = default;
+      MemoryImage(const MemoryImage &);
       MemoryImage(MemoryImage &&);
       ~MemoryImage();
 
@@ -53,8 +54,15 @@ namespace emp {
       Empower & GetEmpower() { return *empower_ptr; }
       const Empower & GetEmpower() const { return *empower_ptr; }
 
-      template <typename T> emp::Ptr<T> GetPtr(size_t pos) { return reinterpret_cast<T*>(&memory[pos]); }
-      template <typename T> T & GetRef(size_t pos) { return *(reinterpret_cast<T*>(&memory[pos])); }
+      template <typename T> emp::Ptr<T> GetPtr(size_t pos) {
+        return reinterpret_cast<T*>(&memory[pos]);
+      }
+      template <typename T> T & GetRef(size_t pos) {
+        return *(reinterpret_cast<T*>(&memory[pos]));
+      }
+      template <typename T> const T & GetRef(size_t pos) const {
+        return *(reinterpret_cast<const T*>(&memory[pos]));
+      }
 
       byte_t & operator[](size_t pos) { return memory[pos]; }
       const byte_t & operator[](size_t pos) const { return memory[pos]; }
@@ -98,6 +106,7 @@ namespace emp {
        : type_id(_id), var_name(_name), mem_pos(_pos) { ; }
     };
 
+    using copy_fun_t = std::function<void(const VarInfo &, const MemoryImage &, MemoryImage &)>;
     using destruct_fun_t = std::function<void(const VarInfo &, MemoryImage &)>;
 
     /// Information about a single type used in Empower.
@@ -106,15 +115,16 @@ namespace emp {
       std::string type_name;   ///< Name of this type (from std::typeid)
       size_t mem_size;         ///< Bytes needed for this type (from sizeof)      
       
-      /// Function to run destructor on this type.
-      destruct_fun_t destruct_fun;
+      copy_fun_t copy_fun;          ///< Function to copy var of this type between memory images.
+      destruct_fun_t destruct_fun;  ///< Function to run destructor on var of this type.
       
       // Core conversion functions for this type.
       std::function<double(Var &)> to_double;      ///< Fun to convert type to double (empty=>none)
       std::function<std::string(Var &)> to_string; ///< Fun to convert type to string (empty=>none)
       
-      TypeInfo(size_t _id, const std::string & _name, size_t _size, destruct_fun_t d_fun)
-	: type_id(_id), type_name(_name), mem_size(_size), destruct_fun(d_fun) { ; }
+      TypeInfo(size_t _id, const std::string & _name, size_t _size,
+               const copy_fun_t & c_fun, const destruct_fun_t & d_fun)
+	      : type_id(_id), type_name(_name), mem_size(_size), copy_fun(c_fun), destruct_fun(d_fun) { ; }
     };
 
 
@@ -126,6 +136,15 @@ namespace emp {
 
     std::map<std::string, size_t> var_map;   ///< Map variable names to index in vars
     std::map<size_t, size_t> type_map;       ///< Map type names (from typeid) to index in types
+
+    /// When copying a MemoryImage, we must make sure to properly copy each variable.
+    void Copy(const MemoryImage & from_image, MemoryImage & to_image) {
+      /// Loop through all variables stored in this memory image and copy each of them.
+      for (const VarInfo & v : vars) {
+        const TypeInfo & type = types[v.type_id];
+      	type.copy_fun(v, from_image, to_image);
+      }
+    }
 
     /// When deleting a MemoryImage, we must make sure to run the destructors on each
     /// internal variable contained.
@@ -156,11 +175,15 @@ namespace emp {
 
       size_t type_id = types.size();
       size_t mem_size = sizeof(base_t);
+      copy_fun_t copy_fun = [](const VarInfo & var_info, const MemoryImage & from_image, MemoryImage & to_image) {
+        const size_t mem_pos = var_info.mem_pos;
+        to_image.GetRef<T>(mem_pos) = from_image.GetRef<T>(mem_pos);
+      };
       destruct_fun_t destruct_fun = [](const VarInfo & var_info, MemoryImage & mem) {
 	      mem.GetPtr<T>(var_info.mem_pos)->~T();
       };
 
-      types.emplace_back(type_id, type_name, mem_size, destruct_fun);
+      types.emplace_back(type_id, type_name, mem_size, copy_fun, destruct_fun);
       type_map[type_hash] = type_id;
 
       return type_id;
@@ -183,6 +206,15 @@ namespace emp {
       return Var(var_id, mem_start, memory);
     }
   };
+
+  // Define copy constructor.
+  Empower::MemoryImage::MemoryImage(const MemoryImage & image) {
+    memory.resize(image.memory.size());              // Default to image's memory.
+    empower_ptr = image.empower_ptr;    // Copy pointer back to empower object.
+
+    // Run through all copy constructors.
+    empower_ptr->Copy(image, *this);
+  }
 
   // Define move constructor.
   Empower::MemoryImage::MemoryImage(MemoryImage && image) {
