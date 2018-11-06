@@ -11,6 +11,10 @@
  *  all of the variables declared, ensuring that they interact correctly.
  * 
  *  Developer Notes:
+ *  @todo After a memory image is locked down, we can optimize it by re-ordering variables, etc.
+ *        to group identical types together, or isolate those that are trivially constructable or
+ *        destructable. 
+ *  
  *  @todo Setup a template wrapper that adds annotations on to another class using a MemoryImage
  *  @todo Allow multiple memory spaces in Empower; basically scopes or namespaces.
  *  @todo Allow nested namespaces to be branched at any level (so outer levels share vars)
