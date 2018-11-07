@@ -49,7 +49,7 @@ namespace emp {
       emp::Ptr<Empower> empower_ptr;   ///< A pointer back to Empower instance this memory uses.
 
     public:
-      MemoryImage(emp::Ptr<Empower> _ptr) : memory(), empower_ptr(_ptr) { ; }
+      MemoryImage(emp::Ptr<Empower>);
       MemoryImage(const MemoryImage &);
       MemoryImage(MemoryImage &&);
       ~MemoryImage();
@@ -110,29 +110,38 @@ namespace emp {
        : type_id(_id), var_name(_name), mem_pos(_pos) { ; }
     };
 
+    /// default constructor type
+    using dconstruct_fun_t = std::function<void(const VarInfo &, MemoryImage &)>;
+
+    /// copy constructor function type
     using cconstruct_fun_t = std::function<void(const VarInfo &, const MemoryImage &, MemoryImage &)>;
+
+    /// copy assignment function type
     using copy_fun_t = std::function<void(const VarInfo &, const MemoryImage &, MemoryImage &)>;
+
+    /// destructor function type
     using destruct_fun_t = std::function<void(const VarInfo &, MemoryImage &)>;
 
     /// Information about a single type used in Empower.
     struct TypeInfo {
-      size_t type_id;          ///< Unique value for this type.
+      size_t type_id;          ///< Unique value for this type
       std::string type_name;   ///< Name of this type (from std::typeid)
       size_t mem_size;         ///< Bytes needed for this type (from sizeof)      
       
-      cconstruct_fun_t cconstruct_fun; ///< Function to run copy constructor on var of this type.
-      copy_fun_t copy_fun;             ///< Function to copy var of this type across memory images.
-      destruct_fun_t destruct_fun;     ///< Function to run destructor on var of this type.
+      dconstruct_fun_t dconstruct_fun; ///< Function to fun default constructor on var of this type
+      cconstruct_fun_t cconstruct_fun; ///< Function to run copy constructor on var of this type
+      copy_fun_t copy_fun;             ///< Function to copy var of this type across memory images
+      destruct_fun_t destruct_fun;     ///< Function to run destructor on var of this type
       
       // Core conversion functions for this type.
       std::function<double(Var &)> to_double;      ///< Fun to convert type to double (empty=>none)
       std::function<std::string(Var &)> to_string; ///< Fun to convert type to string (empty=>none)
       
       TypeInfo(size_t _id, const std::string & _name, size_t _size,
-               const cconstruct_fun_t & cc_fun,
+               const dconstruct_fun_t & dc_fun, const cconstruct_fun_t & cc_fun,
                const copy_fun_t & c_fun, const destruct_fun_t & d_fun)
 	      : type_id(_id), type_name(_name), mem_size(_size)
-        , cconstruct_fun(cc_fun)
+        , dconstruct_fun(dc_fun), cconstruct_fun(cc_fun)
         , copy_fun(c_fun), destruct_fun(d_fun) { ; }
     };
 
@@ -145,6 +154,15 @@ namespace emp {
 
     std::map<std::string, size_t> var_map;   ///< Map variable names to index in vars
     std::map<size_t, size_t> type_map;       ///< Map type names (from typeid) to index in types
+
+    /// When we build a new MemoryImage from scratch, we must construct each variable.
+    void DefaultConstruct(MemoryImage & new_image) {
+      /// Loop through all variables stored in this memory image and copy each of them.
+      for (const VarInfo & v : vars) {
+        const TypeInfo & type = types[v.type_id];
+      	type.dconstruct_fun(v, new_image);
+      }
+    }
 
     /// When build a copy of a MemoryImage, we must make sure to properly construct each variable.
     void CopyConstruct(const MemoryImage & from_image, MemoryImage & to_image) {
@@ -194,6 +212,11 @@ namespace emp {
 
       size_t type_id = types.size();
       size_t mem_size = sizeof(base_t);
+      dconstruct_fun_t dconstruct_fun =
+        [](const VarInfo & var_info, MemoryImage & new_image) {
+          const size_t mem_pos = var_info.mem_pos;
+          new (new_image.GetPtr<T>(mem_pos).Raw()) T;
+        };
       cconstruct_fun_t cconstruct_fun =
         [](const VarInfo & var_info, const MemoryImage & from_image, MemoryImage & to_image) {
           const size_t mem_pos = var_info.mem_pos;
@@ -207,7 +230,7 @@ namespace emp {
 	      mem.GetPtr<T>(var_info.mem_pos)->~T();
       };
 
-      types.emplace_back(type_id, type_name, mem_size, cconstruct_fun, copy_fun, destruct_fun);
+      types.emplace_back(type_id, type_name, mem_size, dconstruct_fun, cconstruct_fun, copy_fun, destruct_fun);
       type_map[type_hash] = type_id;
 
       return type_id;
@@ -231,10 +254,19 @@ namespace emp {
     }
   };
 
+  // Define constructor with just empower pointer.
+  Empower::MemoryImage::MemoryImage(emp::Ptr<Empower> in_empower_ptr) {
+    memory.resize(in_empower_ptr->memory.size());  // Default to image's memory.
+    empower_ptr = in_empower_ptr;                  // Save pointer back to empower object.
+
+    // Run through all copy constructors.
+    empower_ptr->DefaultConstruct(*this);
+  }
+
   // Define copy constructor.
   Empower::MemoryImage::MemoryImage(const MemoryImage & image) {
-    memory.resize(image.memory.size());              // Default to image's memory.
-    empower_ptr = image.empower_ptr;    // Copy pointer back to empower object.
+    memory.resize(image.memory.size());   // Default to image's memory.
+    empower_ptr = image.empower_ptr;      // Copy pointer back to empower object.
 
     // Run through all copy constructors.
     empower_ptr->CopyConstruct(image, *this);
