@@ -56,8 +56,8 @@ namespace emp {
       ~MemoryImage();
 
       const emp::vector<byte_t> & GetMemory() const { return memory; }
-      Empower & GetEmpower() { return *empower_ptr; }
-      const Empower & GetEmpower() const { return *empower_ptr; }
+      Empower & GetEmpower() { emp_assert(empower_ptr != nullptr); return *empower_ptr; }
+      const Empower & GetEmpower() const { emp_assert(empower_ptr != nullptr); return *empower_ptr; }
 
       template <typename T> emp::Ptr<T> GetPtr(size_t pos) {
         return reinterpret_cast<T*>(&memory[pos]);
