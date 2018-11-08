@@ -49,6 +49,7 @@ namespace emp {
       emp::Ptr<Empower> empower_ptr;   ///< A pointer back to Empower instance this memory uses.
 
     public:
+      MemoryImage();
       MemoryImage(emp::Ptr<Empower>);
       MemoryImage(const MemoryImage &);
       MemoryImage(MemoryImage &&);
@@ -132,6 +133,7 @@ namespace emp {
       cconstruct_fun_t cconstruct_fun; ///< Function to run copy constructor on var of this type
       copy_fun_t copy_fun;             ///< Function to copy var of this type across memory images
       destruct_fun_t destruct_fun;     ///< Function to run destructor on var of this type
+      /// @todo Also add move function and move constructor?
       
       // Core conversion functions for this type.
       std::function<double(Var &)> to_double;      ///< Fun to convert type to double (empty=>none)
@@ -254,29 +256,33 @@ namespace emp {
     }
   };
 
-  // Define constructor with just empower pointer.
-  Empower::MemoryImage::MemoryImage(emp::Ptr<Empower> in_empower_ptr) {
-    memory.resize(in_empower_ptr->memory.size());  // Default to image's memory.
-    empower_ptr = in_empower_ptr;                  // Save pointer back to empower object.
+  // Define default constructor
+  Empower::MemoryImage::MemoryImage() : memory(), empower_ptr(nullptr) { ; }
 
+  // Define constructor with just empower pointer.
+  Empower::MemoryImage::MemoryImage(emp::Ptr<Empower> in_empower_ptr)
+    : memory(in_empower_ptr->memory.size())   // Default to image's memory.
+    , empower_ptr(in_empower_ptr)             // Save pointer back to empower object.
+  {
     // Run through all copy constructors.
     empower_ptr->DefaultConstruct(*this);
   }
 
   // Define copy constructor.
-  Empower::MemoryImage::MemoryImage(const MemoryImage & image) {
-    memory.resize(image.memory.size());   // Default to image's memory.
-    empower_ptr = image.empower_ptr;      // Copy pointer back to empower object.
-
+  Empower::MemoryImage::MemoryImage(const MemoryImage & image)
+    : memory(image.memory.size())            // Default to image's memory.
+    , empower_ptr(image.empower_ptr)         // Copy pointer back to empower object.
+  {
     // Run through all copy constructors.
     empower_ptr->CopyConstruct(image, *this);
   }
 
   // Define move constructor.
-  Empower::MemoryImage::MemoryImage(MemoryImage && image) {
-    memory = std::move(image.memory);   // Move over memory
-    empower_ptr = image.empower_ptr;    // Copy pointer back to empower object.
-    image.empower_ptr = nullptr;        // Make this memory as inactive.
+  Empower::MemoryImage::MemoryImage(MemoryImage && image)
+    : memory(std::move(image.memory))     // Move over memory
+    , empower_ptr(image.empower_ptr)      // Copy pointer back to empower object.
+  {
+    image.empower_ptr = nullptr;          // Make this memory as inactive.
   }
 
 
