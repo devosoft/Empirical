@@ -150,9 +150,10 @@ namespace emp {
 
     /// ------ INTERNAL VARIABLES ------
 
-    MemoryImage memory;             ///< The Default memory image.
+    //MemoryImage memory;             ///< The Default memory image.
     emp::vector<VarInfo> vars;      ///< Information about all vars used.
     emp::vector<TypeInfo> types;    ///< Information about all types used.
+    size_t memory_size;
 
     std::map<std::string, size_t> var_map;   ///< Map variable names to index in vars
     std::map<size_t, size_t> type_map;       ///< Map type names (from typeid) to index in types
@@ -196,7 +197,7 @@ namespace emp {
     }
 
   public:
-    Empower() : memory(this), vars(), types(), var_map(), type_map() { ; }
+    Empower() : vars(), types(), memory_size(0), var_map(), type_map() { ; }
     ~Empower() { ; }
 
     /// Convert a type (provided as a template argument) to its index in types vector.
@@ -239,19 +240,22 @@ namespace emp {
     }
 
     template <typename T>
+    void DeclareVar(const std::string & name) {
+      size_t type_id = GetTypeID<T>();              ///< Get ID for type (create if needed)
+      TypeInfo & type_info = types[type_id];        ///< Create ref to type info for easy access.
+      size_t var_id = vars.size();                  ///< New var details go at end of var vector.
+      size_t mem_start = memory_size;               ///< Start new var at current end of memory.
+      vars.emplace_back(type_id, name, mem_start);  ///< Add this VarInfo to our records.
+      memory_size += type_info.mem_size;            ///< Resize memory to fit new variable.
+      var_map[name] = var_id;                       ///< Link the name of this variable to id.
+
+      return Var(var_id, mem_start, memory);
+    }
+
+    template <typename T>
     Var NewVar(const std::string & name, const T & value) {
-      size_t type_id = GetTypeID<T>();                ///< Get ID for type (create if needed)
-      TypeInfo & type_info = types[type_id];          ///< Create ref to type info for easy access.
-      size_t var_id = vars.size();                    ///< New var details go at end of var vector.
-      size_t mem_start = memory.size();               ///< Start new var at current end of memory.
-      vars.emplace_back(type_id, name, mem_start);    ///< Add this VarInfo to our records.
-      memory.resize(mem_start + type_info.mem_size);  ///< Resize memory to fit new variable.
-      var_map[name] = var_id;                         ///< Link the name of this variable to id.
-
-      /// Construct new variable contents in place, where space was allocated.
-      new (memory.GetPtr<T>(mem_start)) T(value);
-
-
+      DeclareVar<T>(name);
+      
       return Var(var_id, mem_start, memory);
     }
   };
