@@ -11,6 +11,7 @@
 #define EMP_MEMORY_IMAGE_H
 
 #include "../base/assert.h"
+#include "../base/Ptr.h"
 #include "../base/vector.h"
 
 namespace emp {
@@ -19,6 +20,7 @@ namespace emp {
   /// all of the variables in a scope or in a class.
   class MemoryImage {
   private:
+    using byte_t = unsigned char;
     emp::vector<byte_t> memory;      ///< The specific memory values.
 
   public:
