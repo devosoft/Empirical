@@ -19,28 +19,44 @@
 
 namespace emp {
 
+  class Type {
+    virtual void DefaultConstruct(size_t mem_pos, MemoryImage & mem_image) = 0;
+    virtual void CopyConsturct(size_t mem_pos, const MemoryImage & mem_from, MemoryImage & mem_to) = 0;
+    virtual void CopyAssign(size_t mem_pos, const MemoryImage & mem_from, MemoryImage & mem_to) = 0;
+    virtual void Destruct(size_t mem_pos, MemoryImage & mem_image) {
+  };
+
   /// Information about a single type used in Empower.
-  struct Type {
+  template <typename T>
+  class TypeInfo : public Type {
+  private:
     size_t type_id;          ///< Unique value for this type
     std::string type_name;   ///< Name of this type (from std::typeid)
     size_t mem_size;         ///< Bytes needed for this type (from sizeof)      
-    
-    /// default constructor type
-    using dconstruct_fun_t = std::function<void(size_t mem_pos, MemoryImage &)>;
+  
+  public:
+    TypeInfo() { ; }
 
-    /// copy constructor function type
-    using cconstruct_fun_t = std::function<void(size_t mem_pos, const MemoryImage &, MemoryImage &)>;
+    // Construct an object of type T at a specified MemoryImage position.
+    void DefaultConstruct(size_t mem_pos, MemoryImage & mem_image) {
+      new (mem_image.GetPtr<T>(mem_pos).Raw()) T;
+    }
 
-    /// copy assignment function type
-    using copy_fun_t = std::function<void(size_t mem_pos, const MemoryImage &, MemoryImage &)>;
+    /// Copy constructor for type T at a specified MemoryImage position.
+    void CopyConsturct(size_t mem_pos, const MemoryImage & mem_from, MemoryImage & mem_to) {
+      new (to_image.GetPtr<T>(mem_pos).Raw()) T(from_image.GetRef<T>(mem_pos));
+    }
 
-    /// destructor function type
-    using destruct_fun_t = std::function<void(size_t mem_pos, MemoryImage &)>;
+    /// Copy assignment for type T at a specified MemoryImage position.
+    void CopyAssign(size_t mem_pos, const MemoryImage & mem_from, MemoryImage & mem_to) {
+      to_image.GetRef<T>(mem_pos) = from_image.GetRef<T>(mem_pos);
+    }
 
-    dconstruct_fun_t dconstruct_fun; ///< Function to fun default constructor on var of this type
-    cconstruct_fun_t cconstruct_fun; ///< Function to run copy constructor on var of this type
-    copy_fun_t copy_fun;             ///< Function to copy var of this type across memory images
-    destruct_fun_t destruct_fun;     ///< Function to run destructor on var of this type
+    /// Destructor for type T at a specified MemoryImage position
+    void Destruct(size_t mem_pos, MemoryImage & mem_image) {
+	    mem_image.GetPtr<T>(var_info.mem_pos)->~T();
+    }
+
     /// @todo Also add move function and move constructor?
     
     // Core conversion functions for this type.
@@ -53,6 +69,8 @@ namespace emp {
       : type_id(_id), type_name(_name), mem_size(_size)
       , dconstruct_fun(dc_fun), cconstruct_fun(cc_fun)
       , copy_fun(c_fun), destruct_fun(d_fun) { ; }
+
+    Type() { ; }
   };
 
 }
