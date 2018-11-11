@@ -20,6 +20,14 @@
 namespace emp {
 
   class Type {
+  private:
+    std::string type_name;
+
+  public:
+    Type(const std::string & _name) : type_name(_name) { ; }
+
+    const std::string & GetName() const { return type_name; }
+
     virtual void DefaultConstruct(size_t mem_pos, MemoryImage & mem_image) = 0;
     virtual void CopyConsturct(size_t mem_pos, const MemoryImage & mem_from, MemoryImage & mem_to) = 0;
     virtual void CopyAssign(size_t mem_pos, const MemoryImage & mem_from, MemoryImage & mem_to) = 0;
@@ -35,7 +43,7 @@ namespace emp {
     size_t mem_size;         ///< Bytes needed for this type (from sizeof)      
   
   public:
-    TypeInfo() { ; }
+    TypeInfo() : Type(typeid(base_t).name()) { ; }
 
     // Construct an object of type T at a specified MemoryImage position.
     void DefaultConstruct(size_t mem_pos, MemoryImage & mem_image) {
@@ -57,18 +65,9 @@ namespace emp {
 	    mem_image.GetPtr<T>(var_info.mem_pos)->~T();
     }
 
-    /// @todo Also add move function and move constructor?
-    
-    // Core conversion functions for this type.
-    std::function<double(Var &)> to_double;      ///< Fun to convert type to double (empty=>none)
-    std::function<std::string(Var &)> to_string; ///< Fun to convert type to string (empty=>none)
-    
-    Type(size_t _id, const std::string & _name, size_t _size,
-          const dconstruct_fun_t & dc_fun, const cconstruct_fun_t & cc_fun,
-          const copy_fun_t & c_fun, const destruct_fun_t & d_fun)
-      : type_id(_id), type_name(_name), mem_size(_size)
-      , dconstruct_fun(dc_fun), cconstruct_fun(cc_fun)
-      , copy_fun(c_fun), destruct_fun(d_fun) { ; }
+    /// @todo ADD move function and move constructor?
+    /// @todo ADD:  double ToDouble(size_t mem_pos, MemoryImage & mem_image)
+    /// @todo ADD:  std::string ToString(size_t mem_pos, MemoryImage & mem_image)
 
     Type() { ; }
   };
