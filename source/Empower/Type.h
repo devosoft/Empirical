@@ -21,12 +21,14 @@ namespace emp {
 
   class Type {
   private:
-    std::string type_name;
+    size_t type_id;          ///< Unique value for this type
+    std::string type_name;   ///< Name of this type (from std::typeid)
 
   public:
     Type(const std::string & _name) : type_name(_name) { ; }
 
     const std::string & GetName() const { return type_name; }
+    size_t GetID() const { return type_id; }
 
     virtual void DefaultConstruct(size_t mem_pos, MemoryImage & mem_image) = 0;
     virtual void CopyConsturct(size_t mem_pos, const MemoryImage & mem_from, MemoryImage & mem_to) = 0;
@@ -38,8 +40,6 @@ namespace emp {
   template <typename T>
   class TypeInfo : public Type {
   private:
-    size_t type_id;          ///< Unique value for this type
-    std::string type_name;   ///< Name of this type (from std::typeid)
     size_t mem_size;         ///< Bytes needed for this type (from sizeof)      
   
   public:
@@ -69,7 +69,6 @@ namespace emp {
     /// @todo ADD:  double ToDouble(size_t mem_pos, MemoryImage & mem_image)
     /// @todo ADD:  std::string ToString(size_t mem_pos, MemoryImage & mem_image)
 
-    Type() { ; }
   };
 
 }
