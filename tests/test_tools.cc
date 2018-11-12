@@ -667,6 +667,14 @@ TEST_CASE("Test map_utils", "[tools]")
   REQUIRE( emp::Has(flipped, 'u') == true);      // And the reversed map should have proper info.
   REQUIRE( emp::Has(flipped, 'x') == false);
 
+  // std::cout << emp::to_string(emp::Keys(test_map)) << std::endl;
+
+  REQUIRE( emp::Has(emp::Keys(test_map), 0));
+  REQUIRE( emp::Has(emp::Keys(test_map), 4));
+  REQUIRE( emp::Has(emp::Keys(test_map), 8));
+  REQUIRE( emp::Has(emp::Keys(test_map), 14));
+  REQUIRE( emp::Has(emp::Keys(test_map), 20));
+
   // Testing for bug #123
   std::map<std::string, std::string> test_123;
   test_123["1"] = "1";
@@ -675,6 +683,7 @@ TEST_CASE("Test map_utils", "[tools]")
   REQUIRE( emp::Find(test_123, "0", "nothing") == "nothing" );
   REQUIRE( emp::Find(test_123, "1", "nothing") == "1" );
   REQUIRE( emp::FindRef(test_123, "1", "nothing") == "1" );
+
 }
 
 TEST_CASE("Test math", "[tools]")

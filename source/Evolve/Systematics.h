@@ -379,6 +379,7 @@ namespace emp {
 
     fun_calc_info_t calc_info_fun;
     Ptr<taxon_t> next_parent;
+    Ptr<taxon_t> most_recent;
 
     using parent_t::store_active;
     using parent_t::store_ancestors;
@@ -392,6 +393,8 @@ namespace emp {
     using parent_t::next_id;
     using parent_t::curr_update;
 
+
+  public:
     using typename parent_t::data_ptr_t;
     using parent_t::GetNumActive;
     using parent_t::GetNumAncestors;
@@ -541,6 +544,14 @@ namespace emp {
 
     void SetNextParent(Ptr<taxon_t> p) {
       next_parent = p;
+    }
+
+    Ptr<taxon_t> GetNextParent() {
+      return next_parent;
+    }
+
+    Ptr<taxon_t> GetMostRecent() {
+      return most_recent;
     }
 
     SignalKey OnNew(std::function<void(Ptr<taxon_t>)> & fun) { return on_new_sig.AddAction(fun); }
@@ -762,12 +773,12 @@ namespace emp {
 
       emp_assert(time != -1 && "Invalid time - are you passing time to rg?", time);
       emp_assert(time >= tax->GetOriginationTime()
-                 && "GetEvolutionaryDistinctiveness recieved a time that is earlier than the taxon's origination time.");
+                 && "GetEvolutionaryDistinctiveness recieved a time that is earlier than the taxon's origination time.", tax->GetOriginationTime(), time);
 
       while (test_taxon) {
 
-        emp_assert(test_taxon->GetOriginationTime() != -1 &&
-                  "Invalid time - are you passing time to rg?");
+        // emp_assert(test_taxon->GetOriginationTime() != -1 &&
+        //           "Invalid time - are you passing time to rg?", time);
 
         depth += time - test_taxon->GetOriginationTime();
         // std::cout << "Tax: " << test_taxon->GetID() << " depth: " << depth << " time: " << time  << " Orig: " << test_taxon->GetOriginationTime() << " divisor: " << divisor << std::endl;
@@ -1316,7 +1327,8 @@ namespace emp {
       RemoveOrg(to_be_removed, removal_time);
       to_be_removed = nullptr;
     } 
-
+    
+    most_recent = cur_taxon;
     return cur_taxon;                       // Return the taxon used.
   }
 

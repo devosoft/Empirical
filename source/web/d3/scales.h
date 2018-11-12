@@ -84,7 +84,7 @@ namespace D3 {
       //TODO: make this work for other types
       char * buffer = (char *) EM_ASM_INT({
         result = js.objects[$0]($1);
-        console.log(result);
+        // console.log(result);
         var buffer = Module._malloc(result.length+1);
 	      Module.stringToUTF8(result, buffer, result.length*4+1);
 	      return buffer;
