@@ -26,8 +26,11 @@ namespace emp {
 
   public:
     VarInfo(Type & _type, const std::string & _name, size_t _pos)
-      : type(&_type), var_name(_name), mem_pos(_pos) { ; }
+      : type(_type), var_name(_name), mem_pos(_pos) { ; }
 
+    const Type & GetType() const { return type; }
+    const std::string & GetName() const { return var_name; }
+    size_t GetMemPos() const { return mem_pos; }
   };
 
 
