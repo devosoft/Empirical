@@ -29,6 +29,7 @@ namespace emp {
 
     const std::string & GetName() const { return type_name; }
     size_t GetID() const { return type_id; }
+    virtual size_t GetSize() const = 0;
 
     virtual void DefaultConstruct(size_t mem_pos, MemoryImage & mem_image) = 0;
     virtual void CopyConsturct(size_t mem_pos, const MemoryImage & mem_from, MemoryImage & mem_to) = 0;
@@ -42,8 +43,12 @@ namespace emp {
   private:
     size_t mem_size;         ///< Bytes needed for this type (from sizeof)      
   
+    using base_t = typename std::decay<T>::type;
   public:
     TypeInfo() : Type(typeid(base_t).name()) { ; }
+
+    // How many bytes is this type?
+    size_t GetSize() const { return sizeof(T); };
 
     // Construct an object of type T at a specified MemoryImage position.
     void DefaultConstruct(size_t mem_pos, MemoryImage & mem_image) {
@@ -52,17 +57,17 @@ namespace emp {
 
     /// Copy constructor for type T at a specified MemoryImage position.
     void CopyConsturct(size_t mem_pos, const MemoryImage & mem_from, MemoryImage & mem_to) {
-      new (to_image.GetPtr<T>(mem_pos).Raw()) T(from_image.GetRef<T>(mem_pos));
+      new (mem_to.GetPtr<T>(mem_pos).Raw()) T(mem_from.GetRef<T>(mem_pos));
     }
 
     /// Copy assignment for type T at a specified MemoryImage position.
     void CopyAssign(size_t mem_pos, const MemoryImage & mem_from, MemoryImage & mem_to) {
-      to_image.GetRef<T>(mem_pos) = from_image.GetRef<T>(mem_pos);
+      mem_to.GetRef<T>(mem_pos) = mem_from.GetRef<T>(mem_pos);
     }
 
     /// Destructor for type T at a specified MemoryImage position
     void Destruct(size_t mem_pos, MemoryImage & mem_image) {
-	    mem_image.GetPtr<T>(var_info.mem_pos)->~T();
+	    mem_image.GetPtr<T>(mem_pos)->~T();
     }
 
     /// @todo ADD move function and move constructor?
