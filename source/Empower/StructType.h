@@ -27,6 +27,11 @@ namespace emp {
   public:
     StructType() { ; }
     ~StructType() { ; }
+
+    template <typename T>
+    void AddMemberVar(const std::string & name) {
+      vars.push_back(TYPE, name, pos);
+    }
   };
 
 
