@@ -33,7 +33,7 @@ namespace emp {
     virtual void DefaultConstruct(size_t mem_pos, MemoryImage & mem_image) = 0;
     virtual void CopyConsturct(size_t mem_pos, const MemoryImage & mem_from, MemoryImage & mem_to) = 0;
     virtual void CopyAssign(size_t mem_pos, const MemoryImage & mem_from, MemoryImage & mem_to) = 0;
-    virtual void Destruct(size_t mem_pos, MemoryImage & mem_image) {
+    virtual void Destruct(size_t mem_pos, MemoryImage & mem_image) = 0;
   };
 
   /// Information about a single type used in Empower.
