@@ -9,11 +9,23 @@
 
 #include "../../source/Empower/Type.h"
 
+void PrintType(emp::Type & type) {
+  std::cout << "type '" << type.GetName()
+	    << "' had id " << type.GetID()
+	    << " and size " << type.GetSize()
+	    << std::endl;  
+}
+
 int main()
 {
-  emp::Type * type1 = new emp::TypeInfo<int>;
-  std::cout << "type1 is '" << type1->GetName()
-	    << "' with id " << type1->GetID()
-	    << " and size " << type1->GetSize()
-	    << std::endl;
+  emp::vector<emp::Type *> type_v;
+  type_v.push_back(new emp::TypeInfo<int>);
+  type_v.push_back(new emp::TypeInfo<double>);
+  type_v.push_back(new emp::TypeInfo<std::string>);
+  type_v.push_back(new emp::TypeInfo<bool>);
+  for (auto type_ptr : type_v) {
+    PrintType(*type_ptr);
+  }
+  
+  
 }
