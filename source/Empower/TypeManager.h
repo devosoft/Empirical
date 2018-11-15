@@ -16,7 +16,6 @@
 
 #include "../base/assert.h"
 #include "../base/Ptr.h"
-#include "../meta/TypeID.h"
 
 #include "Type.h"
 
@@ -28,7 +27,10 @@ namespace emp {
 
   public:
     TypeManager() { ; }
-    ~TypeManager() { ; }
+    ~TypeManager() {
+      // Delete all types being managed
+      for (auto & x : type_map) x.second.Delete();
+    }
 
     template <typename T>
     const Type & GetType() {
@@ -41,7 +43,7 @@ namespace emp {
       auto type_it = type_map.find(type_hash);
       if (type_it != type_map.end()) return *(type_it->second);
 
-      Ptr<Type> type_ptr = new TypeInfo<T>;
+      Ptr<Type> type_ptr = emp::NewPtr< TypeInfo<T> >();
       type_map[type_hash] = type_ptr;
 
       return *type_ptr;
