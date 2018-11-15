@@ -14,21 +14,18 @@
 #include <string>
 
 #include "../base/assert.h"
+#include "../meta/TypeID.h"
 
 #include "MemoryImage.h"
 
 namespace emp {
 
   class Type {
-  private:
-    size_t type_id;          ///< Unique value for this type
-    std::string type_name;   ///< Name of this type (from std::typeid)
-
   public:
-    Type(const std::string & _name) : type_name(_name) { ; }
+    Type() { ; }
 
-    const std::string & GetName() const { return type_name; }
-    size_t GetID() const { return type_id; }
+    virtual std::string GetName() const = 0;
+    virtual size_t GetID() const = 0;
     virtual size_t GetSize() const = 0;
 
     virtual void DefaultConstruct(size_t mem_pos, MemoryImage & mem_image) = 0;
@@ -41,14 +38,13 @@ namespace emp {
   template <typename T>
   class TypeInfo : public Type {
   private:
-    size_t mem_size;         ///< Bytes needed for this type (from sizeof)      
-  
     using base_t = typename std::decay<T>::type;
   public:
-    TypeInfo() : Type(typeid(base_t).name()) { ; }
+    TypeInfo() { ; }
 
-    // How many bytes is this type?
-    size_t GetSize() const { return sizeof(T); };
+    std::string GetName() const { return typeid(base_t).name(); }
+    size_t GetID() const { return GetTypeValue<base_t>(); }     ///< Unique ID for this type.
+    size_t GetSize() const { return sizeof(T); };               ///< How many bytes is this type?
 
     // Construct an object of type T at a specified MemoryImage position.
     void DefaultConstruct(size_t mem_pos, MemoryImage & mem_image) {
