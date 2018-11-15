@@ -16,6 +16,7 @@
 
 #include "../base/assert.h"
 #include "../base/Ptr.h"
+#include "../meta/TypeID.h"
 
 #include "Type.h"
 
@@ -41,7 +42,6 @@ namespace emp {
       if (type_it != type_map.end()) return *(type_it->second);
 
       Ptr<Type> type_ptr = new TypeInfo<T>;
-      types.emplace_back(type_ptr);
       type_map[type_hash] = type_ptr;
 
       return *type_ptr;
