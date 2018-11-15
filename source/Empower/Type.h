@@ -23,6 +23,7 @@ namespace emp {
   class Type {
   public:
     Type() { ; }
+    virtual ~Type() { ; }
 
     virtual std::string GetName() const = 0;
     virtual size_t GetID() const = 0;
