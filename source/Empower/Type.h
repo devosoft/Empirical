@@ -33,6 +33,8 @@ namespace emp {
     virtual void CopyConsturct(size_t mem_pos, const MemoryImage & mem_from, MemoryImage & mem_to) = 0;
     virtual void CopyAssign(size_t mem_pos, const MemoryImage & mem_from, MemoryImage & mem_to) = 0;
     virtual void Destruct(size_t mem_pos, MemoryImage & mem_image) = 0;
+
+    template <typename T> bool IsType() const;
   };
 
   /// Information about a single type used in Empower.
@@ -72,6 +74,11 @@ namespace emp {
     /// @todo ADD:  std::string ToString(size_t mem_pos, MemoryImage & mem_image)
 
   };
+
+  template <typename T>
+  bool Type::IsType() const {
+    return dynamic_cast<const TypeInfo<T> *>(this);
+  }
 
 }
 
