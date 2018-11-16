@@ -31,6 +31,10 @@ namespace emp {
     const Type & GetType() const { return type; }
     const std::string & GetName() const { return var_name; }
     size_t GetMemPos() const { return mem_pos; }
+
+    void DefaultConstruct(MemoryImage & memory) const {
+      type.DefaultConstruct(mem_pos, memory);
+    }
   };
 
 
