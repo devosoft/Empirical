@@ -15,7 +15,7 @@
 #include "../base/vector.h"
 
 #include "MemoryImage.h"
-#include "Type.h"
+#include "TypeManager.h"
 #include "VarInfo.h"
 
 namespace emp {
@@ -23,14 +23,15 @@ namespace emp {
   class StructType {
   private:
     emp::vector<VarInfo> vars;
+    TypeManager & type_manager;
 
   public:
-    StructType() { ; }
+    StructType(TypeManager & _tmanager) : type_manager(_tmanager) { ; }
     ~StructType() { ; }
 
     template <typename T>
     void AddMemberVar(const std::string & name) {
-      vars.push_back(TYPE, name, pos);
+      vars.push_back(type_manager.GetType<T>(), name, pos);
     }
   };
 
