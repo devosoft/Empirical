@@ -20,22 +20,23 @@ namespace emp {
 
   class Var {
   private:
-    const Type & type;              ///< What type is this variable?
-    emp::Ptr<MemoryImage> mem_ptr;  ///< Which memory image is variable using (by default)
-    size_t mem_pos;                 ///< Where is this variable in a memory image?
+    const Type & type;       ///< What type is this variable?
+    MemoryImage & memory;    ///< Which memory image is variable using (by default)
+    size_t mem_pos;          ///< Where is this variable in a memory image?
 
   public:
     Var(const Type & _type, MemoryImage & _mem, size_t _pos)
-      : type(_type), mem_ptr(&_mem), mem_pos(_pos) { ; }
+      : type(_type), memory(_mem), mem_pos(_pos) { ; }
     Var(const Var &) = default;
 
+    /// Restore this variable to its orignal type for direct use.
     template <typename T>
     T & Restore() {
       // Make sure function is restoring the correct type.
       emp_assert( type.GetID() == GetTypeID<T>(), "Trying to restore Var to incorrect type." );
 
       // Convert this memory to a reference that can be returned.
-      return mem_ptr->GetRef<T>(mem_pos);
+      return memory.GetRef<T>(mem_pos);
     }
   };
 
