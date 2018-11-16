@@ -24,14 +24,19 @@ namespace emp {
   private:
     emp::vector<VarInfo> vars;
     TypeManager & type_manager;
+    size_t num_bytes;
 
   public:
-    StructType(TypeManager & _tmanager) : type_manager(_tmanager) { ; }
+    StructType(TypeManager & _tmanager) : type_manager(_tmanager), num_bytes(0) { ; }
     ~StructType() { ; }
+
+    size_t GetSize() const { return num_bytes; }
 
     template <typename T>
     void AddMemberVar(const std::string & name) {
-      vars.push_back(type_manager.GetType<T>(), name, pos);
+      const Type & type = type_manager.GetType<T>();
+      vars.push_back(type, name, num_bytes);
+      num_bytes += type.GetSize();
     }
   };
 
