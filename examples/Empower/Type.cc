@@ -14,6 +14,11 @@ void PrintType(emp::Type & type) {
 	    << "' had id " << type.GetID()
 	    << " and size " << type.GetSize()
 	    << std::endl;  
+  std::cout << "   IsType<int> = " << type.IsType<int>()
+	    << "   IsType<double> = " << type.IsType<double>()
+	    << "   IsType<string> = " << type.IsType<std::string>()
+	    << "   IsType<bool> = " << type.IsType<bool>()
+	    << std::endl;  
 }
 
 int main()
@@ -23,9 +28,10 @@ int main()
   type_v.push_back(new emp::TypeInfo<double>);
   type_v.push_back(new emp::TypeInfo<std::string>);
   type_v.push_back(new emp::TypeInfo<bool>);
+  type_v.push_back(new emp::TypeInfo<int>);
+  type_v.push_back(new emp::TypeInfo<double>);
   for (auto type_ptr : type_v) {
     PrintType(*type_ptr);
   }
-  
   
 }
