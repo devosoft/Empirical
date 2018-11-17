@@ -35,6 +35,10 @@ namespace emp {
     void DefaultConstruct(MemoryImage & memory) const {
       type.DefaultConstruct(mem_pos, memory);
     }
+
+    void CopyConstruct(const MemoryImage & from_memory, MemoryImage & to_memory) const {
+      type.CopyConstruct(mem_pos, from_memory, to_memory);
+    }
   };
 
 
