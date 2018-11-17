@@ -25,7 +25,7 @@ namespace emp {
     emp::vector<VarInfo> vars;   ///< Set of member variables declared in this structure.
     TypeManager & type_manager;  ///< TypeManager to track type information in this structure.
     size_t num_bytes;            ///< How big are structs of this type?
-    bool active;                 ///< Have Structs of this type been built?  If so, do not extend.
+    mutable bool active;         ///< Have Structs of this type been built?  If so, do not extend.
 
   public:
     StructType(TypeManager & _tmanager) : type_manager(_tmanager), num_bytes(0), active(false) { ; }
@@ -46,7 +46,14 @@ namespace emp {
     /// Construct a memory image using all default constructors.
     void DefaultConstruct(MemoryImage & memory) const {
       memory.resize(num_bytes);
-      for (auto & x : vars) x.DefaultConstruct(memory);
+      for (const VarInfo & vinfo : vars) vinfo.DefaultConstruct(memory);
+      active = true;
+    }
+
+    /// Construct a memory image using another memory image.
+    void CopyConstruct(const MemoryImage & from_memory, MemoryImage & to_memory) const {
+      to_memory.resize(num_bytes);
+      for (const VarInfo & vinfo : vars) vinfo.CopyConstruct(from_memory, to_memory);
       active = true;
     }
   };
@@ -58,7 +65,10 @@ namespace emp {
     MemoryImage memory;       ///< Raw memory for storing struct information.
   public:
     Struct(const StructType & _type) : type(_type), memory(type.GetSize()) {
-      type.Initialize(memory);
+      type.DefaultConstruct(memory);
+    }
+    Struct(const Struct & _in) : type(_in.type), memory(type.GetSize()) {
+      type.CopyConstruct(_in.memory, memory);
     }
   };
 }
