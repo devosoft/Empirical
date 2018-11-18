@@ -5,10 +5,14 @@
  *
  *  @file  StructType.h
  *  @brief StructType maps variables to a MemoryImage; Struct is an instance of StructType
+ * 
+ *  @todo Immediately before setting a StructType to active, we can optimize variable ordering.
  */
 
 #ifndef EMP_EMPOWER_STRUCT_TYPE_H
 #define EMP_EMPOWER_STRUCT_TYPE_H
+
+#include <unordered_map>
 
 #include "../base/assert.h"
 #include "../base/Ptr.h"
@@ -22,7 +26,8 @@ namespace emp {
 
   class StructType {
   private:
-    emp::vector<VarInfo> vars;   ///< Set of member variables declared in this structure.
+    emp::vector<VarInfo> vars;   ///< Member variables declared in this structure.
+    std::unordered_map<std::string, size_t> name_map;   ///< Lookup table for var names.
     TypeManager & type_manager;  ///< TypeManager to track type information in this structure.
     size_t num_bytes;            ///< How big are structs of this type?
     mutable bool active;         ///< Have Structs of this type been built?  If so, do not extend.
@@ -34,12 +39,20 @@ namespace emp {
     size_t GetSize() const { return num_bytes; }  ///< How many bytes in Structs of this type?
     bool IsActive() const { return active; }      ///< Have any Structs of this type been built?
 
+    /// Look up the ID of a variable based on its name.
+    size_t GetID(const std::string & name) {
+      emp_assert(!Has(name_map, name));
+      return name_map[name];
+    }
+
     /// And a new member variable to structs of this type.
     template <typename T>
     void AddMemberVar(const std::string & name) {
       emp_assert(active == false, "Cannot add member variables to an instantiated struct!");
+      emp_assert(!Has(name_map, name), "All member vars in emp::Struct must be unique!");
       const Type & type = type_manager.GetType<T>();
-      vars.push_back(type, name, num_bytes);
+      name_map[name] = vars.size();
+      vars.emplace_back(type, name, num_bytes);
       num_bytes += type.GetSize();
     }
 
@@ -58,19 +71,6 @@ namespace emp {
     }
   };
 
-  /// An instance of a struct type.
-  class Struct {
-  private:
-    const StructType & type;  ///< What type is this Struct (i.e., what members does it have?)
-    MemoryImage memory;       ///< Raw memory for storing struct information.
-  public:
-    Struct(const StructType & _type) : type(_type), memory(type.GetSize()) {
-      type.DefaultConstruct(memory);
-    }
-    Struct(const Struct & _in) : type(_in.type), memory(type.GetSize()) {
-      type.CopyConstruct(_in.memory, memory);
-    }
-  };
 }
 
 #endif
