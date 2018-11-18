@@ -75,10 +75,26 @@ namespace emp {
 
     /// Construct a memory image using another memory image.
     void CopyConstruct(const MemoryImage & from_memory, MemoryImage & to_memory) const {
+      emp_assert(from_memory.size() == num_bytes);
       to_memory.resize(num_bytes);
       for (const VarInfo & vinfo : vars) vinfo.CopyConstruct(from_memory, to_memory);
       active = true;
     }
+
+    /// Copy a memory image from another memory image.
+    void CopyAssign(const MemoryImage & from_memory, MemoryImage & to_memory) const {
+      emp_assert(from_memory.size() == num_bytes && to_memory.size() == num_bytes);
+      emp_assert(active == true);
+      for (const VarInfo & vinfo : vars) vinfo.CopyAssign(from_memory, to_memory);
+    }
+
+    /// Construct a memory image using all default constructors.
+    void Destruct(MemoryImage & memory) const {
+      emp_assert(memory.size() == num_bytes);
+      emp_assert(active == true);
+      for (const VarInfo & vinfo : vars) vinfo.Destruct(memory);
+    }
+
   };
 
 }
