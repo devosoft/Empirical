@@ -41,15 +41,25 @@ namespace emp {
 
     /// Look up the ID of a variable based on its name.
     size_t GetID(const std::string & name) {
-      emp_assert(!Has(name_map, name));
+      emp_assert(name_map.find(name) != name_map.end());
       return name_map[name];
+    }
+
+    /// Access a VarInfo based on its position ID.
+    const VarInfo & GetVarInfo(size_t id) {
+      return vars[id];
+    }
+
+    /// Access a VarInfo based on its name.
+    const VarInfo & GetVarInfo(const std::string & name) {
+      return GetVarInfo( GetID(name) ); 
     }
 
     /// And a new member variable to structs of this type.
     template <typename T>
     void AddMemberVar(const std::string & name) {
       emp_assert(active == false, "Cannot add member variables to an instantiated struct!");
-      emp_assert(!Has(name_map, name), "All member vars in emp::Struct must be unique!");
+      emp_assert(name_map.find(name) == name_map.end()), "All member vars in emp::Struct must be unique!");
       const Type & type = type_manager.GetType<T>();
       name_map[name] = vars.size();
       vars.emplace_back(type, name, num_bytes);
