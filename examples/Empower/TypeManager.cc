@@ -3,7 +3,7 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  Some examples code for using emp::Empower
+//  Some examples code for using emp::TypeManage
 
 #include <iostream>
 
