@@ -16,6 +16,7 @@
 
 #include "StructType.h"
 #include "VarInfo.h"
+#include "Var.h"
 
 namespace emp {
 
@@ -30,6 +31,22 @@ namespace emp {
     }
     Struct(const Struct & _in) : type(_in.type), memory() {
       type.CopyConstruct(_in.memory, memory);
+    }
+
+    Var GetVar(const std::string & name) {
+      return type.GetVarInfo(name).GetVar(memory);
+    }
+
+    Var GetVar(size_t var_id) {
+      return type.GetVarInfo(var_id).GetVar(memory);
+    }
+
+    Var operator[](const std::string & name) {
+      return type.GetVarInfo(name).GetVar(memory);
+    }
+
+    Var operator[](size_t var_id) {
+      return type.GetVarInfo(var_id).GetVar(memory);
     }
   };
 }
