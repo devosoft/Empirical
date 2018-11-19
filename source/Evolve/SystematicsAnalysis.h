@@ -155,18 +155,14 @@ namespace emp {
     /// along @param taxon 's lineage.
     template <typename taxon_t>
     int CountUniquePhenotypes(Ptr<taxon_t> taxon) {
-        int count = 0;
         std::set<decltype(taxon->GetData().phenotype)> seen;
 
         while (taxon) {
-            if (!Has(seen, taxon->GetData().phenotype)) {
-                count++;
-                seen.insert(taxon->GetData().phenotype);
-            }
+            seen.insert(taxon->GetData().phenotype);
             taxon = taxon->GetParent();
         }
 
-        return count;
+        return seen.size();
     }
 
 };

@@ -1343,6 +1343,10 @@ namespace emp {
   
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrgAfterRepro(Ptr<taxon_t> taxon, int time) {
+    if (to_be_removed != nullptr) {
+      RemoveOrg(to_be_removed, removal_time);
+      to_be_removed = nullptr;
+    }
     to_be_removed = taxon;
     // std::cout << "Setting remove time to " << time << std::endl;
     removal_time = time;
