@@ -29,6 +29,8 @@ namespace emp {
       : type(_type), memory(_mem), mem_pos(_pos) { ; }
     Var(const Var &) = default;
 
+    Var & operator=(const Var &) = default;
+
     /// Restore this variable to its orignal type for direct use.
     template <typename T>
     T & Restore() {
