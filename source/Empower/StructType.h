@@ -40,18 +40,18 @@ namespace emp {
     bool IsActive() const { return active; }      ///< Have any Structs of this type been built?
 
     /// Look up the ID of a variable based on its name.
-    size_t GetID(const std::string & name) {
+    size_t GetID(const std::string & name) const {
       emp_assert(name_map.find(name) != name_map.end());
       return name_map[name];
     }
 
     /// Access a VarInfo based on its position ID.
-    const VarInfo & GetVarInfo(size_t id) {
+    const VarInfo & GetVarInfo(size_t id) const {
       return vars[id];
     }
 
     /// Access a VarInfo based on its name.
-    const VarInfo & GetVarInfo(const std::string & name) {
+    const VarInfo & GetVarInfo(const std::string & name) const {
       return GetVarInfo( GetID(name) ); 
     }
 
