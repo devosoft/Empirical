@@ -21,12 +21,12 @@ namespace emp {
 
   class VarInfo {
   private:
-    Type & type;            ///< What type is this variable?
+    const Type & type;      ///< What type is this variable?
     std::string var_name;   ///< What is the unique name for this variable?
     size_t mem_pos;         ///< Where in memory is this variable stored?
 
   public:
-    VarInfo(Type & _type, const std::string & _name, size_t _pos)
+    VarInfo(const Type & _type, const std::string & _name, size_t _pos)
       : type(_type), var_name(_name), mem_pos(_pos) { ; }
 
     const Type & GetType() const { return type; }
