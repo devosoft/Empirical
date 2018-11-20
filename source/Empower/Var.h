@@ -40,6 +40,12 @@ namespace emp {
       // Convert this memory to a reference that can be returned.
       return memory.GetRef<T>(mem_pos);
     }
+
+    template <typename T>
+    Var & operator=(T && val) {
+      Restore<T>() = val;
+      return *this;
+    }
   };
 
 
