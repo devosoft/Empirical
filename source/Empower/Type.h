@@ -35,6 +35,8 @@ namespace emp {
     virtual void Destruct(size_t mem_pos, MemoryImage & mem_image) const = 0;
 
     template <typename T> bool IsType() const;
+
+    virtual void SetString(size_t mem_pos, MemoryImage & mem_image, const std::string & val) const = 0;
   };
 
   /// Information about a single type used in Empower.
@@ -67,6 +69,13 @@ namespace emp {
     /// Destructor for type T at a specified MemoryImage position
     void Destruct(size_t mem_pos, MemoryImage & mem_image) const {
 	    mem_image.GetPtr<T>(mem_pos)->~T();
+    }
+
+
+    void SetString(size_t mem_pos, MemoryImage & mem_image, const std::string & val) const {
+      if constexpr (std::is_same<T,std::string>()) {
+        mem_image.GetRef<T>(mem_pos) = val;
+      }
     }
 
     /// @todo ADD move function and move constructor?
