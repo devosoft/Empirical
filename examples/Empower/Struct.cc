@@ -7,12 +7,12 @@
 
 #include <iostream>
 
-#include "../../source/Struct.h"
+#include "../../source/Empower/Struct.h"
 
 int main()
 {
   emp::TypeManager type_manager;
-  emp::StructType address_struct;
+  emp::StructType address_struct(type_manager);
   address_struct.AddVar<size_t>("House Number");
   address_struct.AddVar<std::string>("Street");
   address_struct.AddVar<std::string>("City");
