@@ -33,7 +33,8 @@ namespace emp {
     mutable bool active;         ///< Have Structs of this type been built?  If so, do not extend.
 
   public:
-    StructType(TypeManager & _tmanager) : type_manager(_tmanager), num_bytes(0), active(false) { ; }
+    StructType(TypeManager & _tmanager)
+      : vars(), name_map(), type_manager(_tmanager), num_bytes(0), active(false) { ; }
     ~StructType() { ; }
 
     size_t GetSize() const { return num_bytes; }  ///< How many bytes in Structs of this type?

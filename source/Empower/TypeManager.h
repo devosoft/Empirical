@@ -26,7 +26,7 @@ namespace emp {
     std::unordered_map< size_t, emp::Ptr<Type> > type_map;       ///< Map type values to Type objects.
 
   public:
-    TypeManager() { ; }
+    TypeManager() : type_map() { ; }
     ~TypeManager() {
       // Delete all types being managed
       for (auto & x : type_map) x.second.Delete();
