@@ -12,6 +12,7 @@
 
 #include "../base/assert.h"
 #include "../base/Ptr.h"
+#include "../meta/TypeID.h"
 
 #include "MemoryImage.h"
 #include "Type.h"
@@ -35,15 +36,27 @@ namespace emp {
     template <typename T>
     T & Restore() {
       // Make sure function is restoring the correct type.
-      emp_assert( type.GetID() == GetTypeID<T>(), "Trying to restore Var to incorrect type." );
+      emp_assert( type.GetID() == GetTypeValue<T>(), "Trying to restore Var to incorrect type." );
 
       // Convert this memory to a reference that can be returned.
       return memory.GetRef<T>(mem_pos);
     }
 
+    Var & SetString(const std::string & val) {
+      type.SetString(mem_pos, memory, val);
+      return *this;
+    }
+
     template <typename T>
     Var & operator=(T && val) {
-      Restore<T>() = val;
+      using base_t = std::remove_reference< std::remove_cv<T> >;
+      if constexpr (std::is_same<base_t, char *>()) {
+        SetString(val);
+      }
+      else {
+        Restore<T>() = val;
+      }
+      
       return *this;
     }
   };
