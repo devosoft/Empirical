@@ -47,18 +47,39 @@ namespace emp {
       return *this;
     }
 
-    template <typename T>
-    Var & operator=(T && val) {
-      using base_t = std::remove_reference< std::remove_cv<T> >;
-      if constexpr (std::is_same<base_t, char *>()) {
-        SetString(val);
-      }
-      else {
-        Restore<T>() = val;
-      }
-      
+    Var & operator=(const std::string & val) {
+      type.SetString(mem_pos, memory, val);
       return *this;
     }
+
+    Var & operator=(const char * val) {
+      type.SetString(mem_pos, memory, val);
+      return *this;
+    }
+
+    Var & operator=(double val) {
+      // type.SetDouble(mem_pos, memory, val);
+      return *this;
+    }
+
+    template <typename T>
+    Var & operator=(T && val) {
+      Restore<T>() = val;
+      return *this;
+    }
+
+    // template <typename T>
+    // Var & operator=(T && val) {
+    //   using base_t = std::remove_reference< std::remove_cv<T> >;
+    //   if constexpr (std::is_same<base_t, char *>()) {
+    //     SetString(val);
+    //   }
+    //   else {
+    //     Restore<T>() = val;
+    //   }
+
+    //   return *this;
+    // }
   };
 
 
