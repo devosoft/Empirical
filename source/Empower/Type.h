@@ -37,6 +37,8 @@ namespace emp {
     template <typename T> bool IsType() const;
 
     virtual void SetString(size_t mem_pos, MemoryImage & mem_image, const std::string & val) const = 0;
+
+    virtual std::string AsString() const = 0;
   };
 
   /// Information about a single type used in Empower.
@@ -76,6 +78,12 @@ namespace emp {
       if constexpr (std::is_same<T,std::string>()) {
         mem_image.GetRef<T>(mem_pos) = val;
       }
+    }
+
+    std::string AsString() const {
+      std::stringstream ss;
+      ss << mem_image.GetRef<T>(mem_pos);
+      return ss.str();
     }
 
     /// @todo ADD move function and move constructor?
