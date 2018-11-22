@@ -38,7 +38,7 @@ namespace emp {
 
     virtual void SetString(size_t mem_pos, MemoryImage & mem_image, const std::string & val) const = 0;
 
-    virtual std::string AsString() const = 0;
+    virtual std::string AsString(size_t mem_pos, MemoryImage & mem_image) const = 0;
   };
 
   /// Information about a single type used in Empower.
@@ -80,7 +80,7 @@ namespace emp {
       }
     }
 
-    std::string AsString() const {
+    std::string AsString(size_t mem_pos, MemoryImage & mem_image) const {
       std::stringstream ss;
       ss << mem_image.GetRef<T>(mem_pos);
       return ss.str();
