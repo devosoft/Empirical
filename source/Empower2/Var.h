@@ -34,24 +34,55 @@ namespace emp {
 
   template <typename TYPE>
   class VarType : public VarBase {
+  protected:
+    TYPE value;
   public:
+    VarType() { ; }
+    VarType(TYPE & in_val) : value(in_val) { ; }
+
     using var_t = TYPE;
 
     size_t GetTypeID() const override { return GetTypeValue<var_t>(); }    
-    std::string GetTypeName() const override { return typeid(base_t).name(); }
+    std::string GetTypeName() const override { return typeid(var_t).name(); }
+    TYPE & GetValue() { return value; }
+    const TYPE & GetValue() const { return value; }
   };
 
   template <typename TYPE, const char * NAME, auto DEFAULT, const char * DESC>
   class VarInfo : public VarType<TYPE> {
   private:
-    TYPE value;
+    using this_t = VarInfo<TYPE,NAME,DEFAULT,DESC>;
+
   public:
+    VarInfo() { ; }
+    VarInfo(TYPE in_val) : VarType(in_val) { ; }
+    VarInfo & VarInfo(const VarInfo &) = default;
+    VarInfo & VarInfo(VarInfo &&) = default;
+
     Ptr<VarBase> Clone() const override { return NewPtr<this_t>(value); }
 
     std::string GetName() const override { return NAME; }
     std::string GetDesc() const override { return DESC; }
 
     void SetDefault() override { value = DEFAULT; }
+  };
+
+  class Var {
+  private:
+    Ptr<VarBase> var_info;
+  public:
+
+    /// Restore a variable to its (non-const) original value.
+    template <typename T>
+    T & Restore() {
+      return var_info.Cast<VarType<T>>()->GetValue();
+    }
+
+    /// Restore a variable to its (const) original value.
+    template <typename T>
+    const T & Restore() const {
+      return var_info.Cast<VarType<T>>()->GetValue();
+    }
   };
 
 
