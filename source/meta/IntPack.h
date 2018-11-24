@@ -132,6 +132,9 @@ namespace emp {
     template <int V> using remove = typename internal::ip_loop<this_t, IntPack<>, false, 3>::template remove<V>;
     template <typename T> using append = typename internal::ip_concat<this_t,T>::result;
 
+    /// Apply to a specified template with IntPack as template arguments.
+    template <template <int...> class TEMPLATE> using apply = TEMPLATE<V1, Vs...>;
+
     constexpr static bool Has(int V) { return (V==V1) | pop::Has(V); }
     constexpr static int Count(int V) { return pop::Count(V) + (V==V1); }
     constexpr static int GetID(int V) { return (V==V1) ? 0 : (1+pop::GetID(V)); }
