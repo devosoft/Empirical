@@ -19,22 +19,26 @@
 namespace emp {
 
   class VarBase {
-  protected:
-    std::string name;
-    std::string desc;
-
   public:
-    const std::string GetName() const { return name; }
-    const std::string GetDesc() const { return desc; }
+    virtual Ptr<VarBase> Clone() const = 0;
 
-    void SetDefault() = 0;
+    virtual std::string GetName() const = 0;
+    virtual std::string GetDesc() const = 0;
+
+    virtual size_t GetTypeID() const = 0;        ///< Get the unique type ID for this variable
+    virtual std::string GetTypeName() const = 0; ///< Get the (C++ mangled) name for this type
+
+    virtual void SetDefault() = 0;    ///< Restore this variable to its default value.
+
   };
 
   template <typename TYPE>
   class VarType : public VarBase {
   public:
     using var_t = TYPE;
-    
+
+    size_t GetTypeID() const override { return GetTypeValue<var_t>(); }    
+    std::string GetTypeName() const override { return typeid(base_t).name(); }
   };
 
   template <typename TYPE, const char * NAME, auto DEFAULT, const char * DESC>
@@ -42,6 +46,10 @@ namespace emp {
   private:
     TYPE value;
   public:
+    Ptr<VarBase> Clone() const override { return NewPtr<this_t>(value); }
+
+    std::string GetName() const override { return NAME; }
+    std::string GetDesc() const override { return DESC; }
 
     void SetDefault() override { value = DEFAULT; }
   };
