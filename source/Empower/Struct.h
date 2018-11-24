@@ -32,6 +32,9 @@ namespace emp {
     Struct(const Struct & _in) : type(_in.type), memory() {
       type.CopyConstruct(_in.memory, memory);
     }
+    ~Struct() {
+      type.Destruct(memory);
+    }
 
     Var GetVar(const std::string & name) {
       return type.GetVarInfo(name).GetVar(memory);
