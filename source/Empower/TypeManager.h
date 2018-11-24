@@ -47,7 +47,11 @@ namespace emp {
       type_map[type_hash] = type_ptr;
 
       return *type_ptr;
+    }
 
+    static TypeManager & Default() {
+      static TypeManager type_manager;
+      return type_manager;
     }
   };
 
