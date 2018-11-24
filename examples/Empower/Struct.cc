@@ -11,8 +11,7 @@
 
 int main()
 {
-  emp::TypeManager type_manager;
-  emp::StructType address_struct(type_manager);
+  emp::StructType address_struct;
   address_struct.AddVar<size_t>("House Number");
   address_struct.AddVar<std::string>("Street");
   address_struct.AddVar<std::string>("City");
@@ -23,10 +22,14 @@ int main()
   emp::Struct home(address_struct);
   emp::Struct work(address_struct);
 
-  home["House Number"] = 123;
+  home["House Number"] = (size_t) 123;
   home["Street"] = "Alphabet St.";
   home["City"] = "Springfield";
   home["State"] = "OZ";
-  home["Zip Code"] = 0;
+  home["Zip Code"] = (size_t) 0;
   home["Country"] = "Anywhere!";
+
+  // Try Restore()
+  std::cout << "House Number: " << home["House Number"].Restore<size_t>() << std::endl;
+  std::cout << "Street:       " << home["Street"].Restore<std::string>() << std::endl;
 }
