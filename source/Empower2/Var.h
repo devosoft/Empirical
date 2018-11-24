@@ -75,17 +75,35 @@ namespace emp {
   class Var {
   private:
     Ptr<VarBase> var_info;
+
   public:
+    Var() : var_info(nullptr) { ; }
+    Var(const Var & _in) : var_info(_in.var_info->Clone()) { ; }
+    Var(Var && _in) : var_info(_in.var_info) { _in.var_info = nullptr; }
+    ~Var() { if (var_info) var_info.Delete(); }
+
+    Var & operator=(const Var & _in) {
+      var_info = _in.var_info->Clone();
+      return *this;
+    }
+
+    Var & operator=(Var && _in) {
+      var_info = _in.var_info;
+      _in.var_info = nullptr;
+      return *this;
+    }
 
     /// Restore a variable to its (non-const) original value.
     template <typename T>
     T & Restore() {
+      emp_assert(var_info.IsNull() == false);
       return var_info.Cast<VarType<T>>()->GetValue();
     }
 
     /// Restore a variable to its (const) original value.
     template <typename T>
     const T & Restore() const {
+      emp_assert(var_info.IsNull() == false);
       return var_info.Cast<VarType<T>>()->GetValue();
     }
   };
