@@ -72,14 +72,23 @@ namespace emp {
     void SetDefault() override { value = DEFAULT; }
   };
 
+
   class Var {
   private:
     Ptr<VarBase> var_info;
+
+    // MakeVar must be a friend of Var to access its internal constructor.
+    template <typename TYPE, const char * NAME, auto DEFAULT, const char * DESC>
+    friend Var MakeVar();
+
+    /// Private constructor for Var where pointer to info is directly provided.
+    Var(Ptr<VarBase> _vinfo) : var_info(_vinfo) { ; }
 
   public:
     Var() : var_info(nullptr) { ; }
     Var(const Var & _in) : var_info(_in.var_info->Clone()) { ; }
     Var(Var && _in) : var_info(_in.var_info) { _in.var_info = nullptr; }
+
     ~Var() { if (var_info) var_info.Delete(); }
 
     Var & operator=(const Var & _in) {
@@ -108,6 +117,11 @@ namespace emp {
     }
   };
 
+
+  template <typename TYPE, const char * NAME, auto DEFAULT, const char * DESC>
+  Var MakeVar() {
+    return Var( NewPtr< VarInfo<TYPE,NAME,DEFAULT,DESC> >() );
+  }
 
 }
 
