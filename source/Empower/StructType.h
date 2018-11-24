@@ -33,6 +33,9 @@ namespace emp {
     mutable bool active;         ///< Have Structs of this type been built?  If so, do not extend.
 
   public:
+    /// If no type manager is specified, use the default, global type manager.
+    StructType()
+      : vars(), name_map(), type_manager(TypeManager::Default()), num_bytes(0), active(false) { ; }
     StructType(TypeManager & _tmanager)
       : vars(), name_map(), type_manager(_tmanager), num_bytes(0), active(false) { ; }
     ~StructType() { ; }
@@ -94,6 +97,7 @@ namespace emp {
       emp_assert(memory.size() == num_bytes);
       emp_assert(active == true);
       for (const VarInfo & vinfo : vars) vinfo.Destruct(memory);
+      memory.resize(0);
     }
 
   };
