@@ -52,12 +52,17 @@ namespace emp {
   class VarInfo : public VarType<TYPE> {
   private:
     using this_t = VarInfo<TYPE,NAME,DEFAULT,DESC>;
+    using parent_t = VarType<TYPE>;
+    using parent_t::value;
 
   public:
     VarInfo() { ; }
-    VarInfo(TYPE in_val) : VarType(in_val) { ; }
-    VarInfo & VarInfo(const VarInfo &) = default;
-    VarInfo & VarInfo(VarInfo &&) = default;
+    VarInfo(TYPE in_val) : VarType<TYPE>(in_val) { ; }
+    VarInfo(const VarInfo &) = default;
+    VarInfo(VarInfo &&) = default;
+
+    VarInfo & operator=(const VarInfo &) = default;
+    VarInfo & operator=(VarInfo &&) = default;
 
     Ptr<VarBase> Clone() const override { return NewPtr<this_t>(value); }
 
