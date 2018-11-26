@@ -15,7 +15,25 @@
 #include "meta.h"
 #include "IntPack.h"
 
+#define EMP_TEXT_PACKET(MSG) [](){ return MSG; }
+
 namespace emp {
+
+  template <typename T, size_t pos>
+  struct StringPacketToIntPack {
+    static constexpr auto BuildPack(T packet) {
+      constexpr std::string_view text = packet();
+      using recurse_t = decltype( StringPacketToIntPack<T,pos-1>::BuildPack(packet) );
+      return recurse_t::push_back< (int) text[pos-1] >();
+    }
+  };
+
+  template <typename T>
+  struct StringPacketToIntPack<T,0> {
+    static constexpr auto BuildPack(T packet) {
+      return IntPack<>();
+    }
+  };
 
 }
 
