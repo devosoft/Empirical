@@ -16,16 +16,23 @@
 #include "IntPack.h"
 
 #define EMP_TEXT_PACKET(MSG) [](){ return MSG; }
-#define EMP_TEXT_TYPE(MSG) decltype( StringPacketToIntPack( [](){ return MSG } ) )
+#define EMP_TEXT_TYPE(TYPE_NAME, MSG)                               \
+    auto temp = emp::StringPacketToIntPack( [](){ return MSG; } );  \
+    using TYPE_NAME = decltype(temp)
 
 namespace emp {
+
+  constexpr size_t CalcSize(const char * in) {
+    size_t count = 0;
+    while (in[count] != 0) count++;
+    return count;
+  }
 
   template <typename T, size_t pos>
   struct StringPacketToIntPack_impl {
     static constexpr auto BuildPack(T packet) {
-      constexpr std::string_view text = packet();
       using recurse_t = decltype( StringPacketToIntPack_impl<T,pos-1>::BuildPack(packet) );
-      return recurse_t::template push_back< (int) text[pos-1] >();
+      return typename recurse_t::template push_back< (int) (packet()[pos-1]) >();
     }
   };
 
@@ -38,8 +45,7 @@ namespace emp {
 
   template <typename T>
   constexpr auto StringPacketToIntPack(T packet) {
-    constexpr std::string_view text = packet();
-    return emp::StringPacketToIntPack_impl<T,text.size()>::BuildPack(packet);
+    return emp::StringPacketToIntPack_impl<T,CalcSize(packet())>::BuildPack(packet);
   }
 
 }
