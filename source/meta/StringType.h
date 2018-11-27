@@ -12,15 +12,23 @@
 #ifndef EMP_STRING_TYPE_H
 #define EMP_STRING_TYPE_H
 
-#include "meta.h"
 #include "IntPack.h"
+#include "meta.h"
+#include "TypeID.h"
 
 #define EMP_TEXT_PACKET(MSG) [](){ return MSG; }
 #define EMP_TEXT_TYPE(TYPE_NAME, MSG)                                                 \
     auto emp_temp_ ## TYPE_NAME = emp::StringPacketToIntPack( [](){ return MSG; } );  \
     using TYPE_NAME = decltype(emp_temp_ ## TYPE_NAME)
 
-//    using TYPE_NAME = decltype(emp::StringPacketToIntPack( [](){ return MSG; } ))
+// The below is what I'd prefer for the body of EMP_TEXT_TYPE, but lambdas must be evaluated.
+//    decltype(emp::StringPacketToIntPack( [](){ return MSG; } ))
+
+#define EMP_TEXT_HASH(MSG)                                          \
+  [](){                                                             \
+    auto temp = emp::StringPacketToIntPack( [](){ return MSG; } );  \
+    return emp::GetTypeValue<decltype(temp)>();                     \
+  }()
 
 namespace emp {
 
