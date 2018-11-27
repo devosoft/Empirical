@@ -16,9 +16,11 @@
 #include "IntPack.h"
 
 #define EMP_TEXT_PACKET(MSG) [](){ return MSG; }
-#define EMP_TEXT_TYPE(TYPE_NAME, MSG)                               \
-    auto temp = emp::StringPacketToIntPack( [](){ return MSG; } );  \
-    using TYPE_NAME = decltype(temp)
+#define EMP_TEXT_TYPE(TYPE_NAME, MSG)                                                 \
+    auto emp_temp_ ## TYPE_NAME = emp::StringPacketToIntPack( [](){ return MSG; } );  \
+    using TYPE_NAME = decltype(emp_temp_ ## TYPE_NAME)
+
+//    using TYPE_NAME = decltype(emp::StringPacketToIntPack( [](){ return MSG; } ))
 
 namespace emp {
 
