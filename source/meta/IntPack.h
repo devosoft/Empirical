@@ -19,6 +19,7 @@
 #include "meta.h"
 
 #include <iostream>
+#include <string>
 
 namespace emp {
 
@@ -152,6 +153,10 @@ namespace emp {
     constexpr static int Max(int floor) { return floor > pop::Max(V1) ? floor : pop::Max(V1); }
     constexpr static int Max() { return pop::Max(V1); }
 
+    static std::string ToString() {
+      return std::string(1, (char) V1) + pop::ToString();
+    }
+
     static void PrintInts(std::ostream & os=std::cout) {
       os << V1;
       if (GetSize() > 1) os << ',';
@@ -185,6 +190,8 @@ namespace emp {
     constexpr static int Product() { return 1; }
     constexpr static int Min(int cap) { return cap; }
     constexpr static int Max(int floor) { return floor; }
+
+    static std::string ToString() { return ""; }
 
     static void PrintInts(std::ostream & os=std::cout) { ; }
   };
