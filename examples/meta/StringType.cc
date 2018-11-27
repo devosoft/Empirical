@@ -13,4 +13,6 @@
 
 int main()
 {
+  EMP_TEXT_TYPE(test_t, "This is a test!");
+  std::cout << test_t::ToString() << std::endl;
 }
