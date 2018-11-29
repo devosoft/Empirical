@@ -16,22 +16,24 @@
 #include "meta.h"
 #include "TypeID.h"
 
+/// Convert a literal string to an instance of an IntPack
+#define EMP_TEXT_PACK(MSG) emp::StringPacketToIntPack( [](){ return MSG; } )
+
 /// Setup a type determined by a message.
-#define EMP_TEXT_TYPE(TYPE_NAME, MSG)                                                 \
-    auto emp_temp_ ## TYPE_NAME = emp::StringPacketToIntPack( [](){ return MSG; } );  \
+#define EMP_TEXT_TYPE(TYPE_NAME, MSG)                        \
+    auto emp_temp_ ## TYPE_NAME = EMP_TEXT_PACK(MSG);        \
     using TYPE_NAME = decltype(emp_temp_ ## TYPE_NAME)
-// The below is what I'd prefer for the body of EMP_TEXT_TYPE, but lambdas must be evaluated.
+// I'd prefer for the body of EMP_TEXT_TYPE, but lambdas must be evaluated.
 //    decltype(emp::StringPacketToIntPack( [](){ return MSG; } ))
 
-/// Convert a literal string to an instance of an IntPack
-#define EMP_TEXT_PACK(MSG) emp::StringPacketToIntPack( [](){ return MSG; } )();
-
 /// Convert a literal string to a unique value (counting up from 0 with each string)
-#define EMP_TEXT_HASH(MSG)                                          \
-  [](){                                                             \
-    auto temp = emp::StringPacketToIntPack( [](){ return MSG; } );  \
-    return emp::GetTypeValue<decltype(temp)>();                     \
+#define EMP_TEXT_HASH(MSG)                           \
+  [](){                                              \
+    constexpr auto temp = EMP_TEXT_PACK(MSG);        \
+    return emp::GetTypeValue<decltype(temp)>();      \
   }()
+
+//    constexpr auto temp = emp::StringPacketToIntPack( [](){ return MSG; } );  \
 
 namespace emp {
 
