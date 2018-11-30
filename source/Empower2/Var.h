@@ -48,10 +48,10 @@ namespace emp {
     const TYPE & GetValue() const { return value; }
   };
 
-  template <typename TYPE, const char * NAME, auto DEFAULT, const char * DESC>
+  template <typename TYPE, typename NAME, typename DESC>
   class VarInfo : public VarType<TYPE> {
   private:
-    using this_t = VarInfo<TYPE,NAME,DEFAULT,DESC>;
+    using this_t = VarInfo<TYPE,NAME,DESC>;
     using parent_t = VarType<TYPE>;
     using parent_t::value;
 
@@ -66,10 +66,10 @@ namespace emp {
 
     Ptr<VarBase> Clone() const override { return NewPtr<this_t>(value); }
 
-    std::string GetName() const override { return NAME; }
-    std::string GetDesc() const override { return DESC; }
+    std::string GetName() const override { return NAME.AsString(); }
+    std::string GetDesc() const override { return DESC.AsString(); }
 
-    void SetDefault() override { value = DEFAULT; }
+    void SetDefault() override { value = TYPE(); }
   };
 
 
@@ -78,7 +78,7 @@ namespace emp {
     Ptr<VarBase> var_info;
 
     // MakeVar must be a friend of Var to access its internal constructor.
-    template <typename TYPE, const char * NAME, auto DEFAULT, const char * DESC>
+    template <typename TYPE, auto NAME, auto DESC>
     friend Var MakeVar();
 
     /// Private constructor for Var where pointer to info is directly provided.
@@ -118,10 +118,19 @@ namespace emp {
   };
 
 
-  template <typename TYPE, const char * NAME, auto DEFAULT, const char * DESC>
+  template <typename TYPE, typename NAME, typename DESC>
   Var MakeVar() {
     return Var( NewPtr< VarInfo<TYPE,NAME,DEFAULT,DESC> >() );
   }
+
+  // template <typename T>
+  // Var MakeVar(std::string name, std::string desc="") {
+  //   return Var( NewPtr< VarInfo<T>(name, desc) );
+  // }
+  // template <typename T, typename DEFAULT_T>
+  // Var MakeVar(std::string name, std::string desc, DEFAULT_T default_val) {
+  //   return Var( NewPtr< VarInfo<T>(name, desc, default_val) );
+  // }
 
 }
 
