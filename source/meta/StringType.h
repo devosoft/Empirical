@@ -33,11 +33,11 @@
     return emp::GetTypeValue<decltype(temp)>();      \
   }()
 
-//    constexpr auto temp = emp::StringPacketToIntPack( [](){ return MSG; } );  \
+//    constexpr auto temp = emp::StringPacketToIntPack( [](){ return MSG; } );
 
 namespace emp {
 
-  constexpr size_t CalcSize(const char * in) {
+  constexpr size_t CalcStringSize(const char * in) {
     size_t count = 0;
     while (in[count] != 0) count++;
     return count;
@@ -60,7 +60,7 @@ namespace emp {
 
   template <typename T>
   constexpr auto StringPacketToIntPack(T packet) {
-    return emp::StringPacketToIntPack_impl<T,CalcSize(packet())>::BuildPack(packet);
+    return emp::StringPacketToIntPack_impl<T,CalcStringSize(packet())>::BuildPack(packet);
   }
 
 }
