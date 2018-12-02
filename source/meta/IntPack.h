@@ -111,7 +111,7 @@ namespace emp {
       using result = typename ip_sort_impl<ip, IntPack<>>::template sort<ip::Min()>;
     };
     template <> struct ip_sort<IntPack<>> { using result = IntPack<>; };
-  }
+  } // End internal namespace
 
   // Generate an IntPack with a specified range of values.
   template <int START, int END, int STEP=1>
@@ -152,6 +152,11 @@ namespace emp {
     constexpr static int Min() { return pop::Min(V1); }
     constexpr static int Max(int floor) { return floor > pop::Max(V1) ? floor : pop::Max(V1); }
     constexpr static int Max() { return pop::Max(V1); }
+
+    template <typename T>
+    constexpr static auto ApplyIndex(T && container) {
+      return std::make_tuple(container[V1], container[Vs]...);
+    }
 
     static std::string ToString() {
       return std::string(1, (char) V1) + pop::ToString();
