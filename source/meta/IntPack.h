@@ -174,22 +174,36 @@ namespace emp {
     /// Determine if all values in IntPack are different from each other.
     constexpr static bool IsUnique() { return pop::IsUnique() && !pop::Has(V1); }
 
+    /// Add up all values in an IntPack
     constexpr static int Sum() { return V1 + pop::Sum(); }
+
+    /// Multiply together all value in an IntPack
     constexpr static int Product() { return V1 * pop::Product(); }
+
+    /// Find the smallest value in an IntPack, to a maximum of cap.
     constexpr static int Min(int cap) { return cap < pop::Min(V1) ? cap : pop::Min(V1); }
+
+    /// Find the overall smallest value in an IntPack
     constexpr static int Min() { return pop::Min(V1); }
+
+    /// Find the maximum value in an IntPack, to a minimum of floor.
     constexpr static int Max(int floor) { return floor > pop::Max(V1) ? floor : pop::Max(V1); }
+
+    /// Find the overall maximum value in an IntPack.
     constexpr static int Max() { return pop::Max(V1); }
 
+    /// Use each value in an IntPack as an index and return results as a tuple.
     template <typename T>
     constexpr static auto ApplyIndex(T && container) {
       return std::make_tuple(container[V1], container[Vs]...);
     }
 
+    /// Convert all values from an IntPack into a string, treating each as a char.
     static std::string ToString() {
       return std::string(1, (char) V1) + pop::ToString();
     }
 
+    /// Print all values in an IntPack into a stream.
     static void PrintInts(std::ostream & os=std::cout) {
       os << V1;
       if (GetSize() > 1) os << ',';
