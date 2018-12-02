@@ -120,7 +120,11 @@ namespace emp {
   // IntPack with at least one value.
   template <int V1, int... Vs>
   struct IntPack<V1,Vs...> {
+    /// First value in IntPack
     static constexpr int first = V1;
+
+    /// Number of values in IntPack    
+    constexpr static int SIZE = 1+sizeof...(Vs);
 
     using this_t = IntPack<V1,Vs...>;
     using pop = IntPack<Vs...>;
@@ -149,14 +153,25 @@ namespace emp {
     /// Apply to a specified template with IntPack as template arguments.
     template <template <int...> class TEMPLATE> using apply = TEMPLATE<V1, Vs...>;
 
+
+    /// ---=== Member Functions ===---
+
+    /// Return wheter an IntPack contains the value V.
     constexpr static bool Has(int V) { return (V==V1) | pop::Has(V); }
+
+    /// Count the number of occurances of value V in IntPack.
     constexpr static int Count(int V) { return pop::Count(V) + (V==V1); }
+
+    /// Determine the position at which V appears in IntPack.
     constexpr static int GetID(int V) { return (V==V1) ? 0 : (1+pop::GetID(V)); }
 
-    constexpr static int SIZE = 1+sizeof...(Vs);
+    /// Function to retrieve number of elements in IntPack
     constexpr static int GetSize() { return SIZE; }
 
+    /// Determine if there are NO value in an IntPack
     constexpr static bool IsEmpty() { return false; }
+
+    /// Determine if all values in IntPack are different from each other.
     constexpr static bool IsUnique() { return pop::IsUnique() && !pop::Has(V1); }
 
     constexpr static int Sum() { return V1 + pop::Sum(); }
