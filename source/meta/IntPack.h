@@ -125,12 +125,25 @@ namespace emp {
     using this_t = IntPack<V1,Vs...>;
     using pop = IntPack<Vs...>;
 
+    /// Add an int to the front of an IntPack
     template <int V> using push = IntPack<V, V1, Vs...>;
+
+    /// Add an int to the back of an IntPack
     template <int V> using push_back = IntPack<V1, Vs..., V>;
+
+    /// Push V onto front of an IntPack if it does not equal X
     template <int V, int X> using push_if_not = typename internal::ip_push_if_not<V,X,this_t>::result;
+
+    /// Push V onto back of an IntPack if it does not equal X
     template <int V, int X> using push_back_if_not = typename internal::ip_push_if_not<V,X,this_t>::back;
+
+    /// Remove the first time value V appears from an IntPack
     template <int V> using pop_val = typename internal::ip_loop<this_t, IntPack<>, false, 2>::template pop_val<V>;
+
+    /// Remove the all appearances of value V from an IntPack
     template <int V> using remove = typename internal::ip_loop<this_t, IntPack<>, false, 3>::template remove<V>;
+
+    /// Append one whole IntPack to the end of another.
     template <typename T> using append = typename internal::ip_concat<this_t,T>::result;
 
     /// Apply to a specified template with IntPack as template arguments.
