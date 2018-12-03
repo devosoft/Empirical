@@ -37,6 +37,23 @@
 
 namespace emp {
 
+  // Generic form of StringType (actual types will be made using specializations below)
+  template <char... Ts> struct StringType;
+
+  // Template specialization to maintain full information of a non-empty string as a type.
+  template <char C1, char... Cs>
+  struct StringType<C1,Cs...> {
+    static constexpr char FIRST = C1;             ///< Easy access to first character of string.
+    constexpr static int SIZE = 1+sizeof...(Cs);  ///< Easy access to string length.
+  };
+
+  // Empty StringType template specialization
+  template <>
+  struct StringType<> {
+    static constexpr char FIRST = '\0';           ///< Empty string has null as "first" char
+    constexpr static int SIZE = 0;                ///< Empty string as no length
+  };
+
   constexpr size_t CalcStringSize(const char * in) {
     size_t count = 0;
     while (in[count] != 0) count++;
