@@ -33,7 +33,6 @@
     return emp::GetTypeValue<decltype(temp)>();      \
   }()
 
-//    constexpr auto temp = emp::StringPacketToIntPack( [](){ return MSG; } );
 
 namespace emp {
 
@@ -45,6 +44,33 @@ namespace emp {
   struct StringType<C1,Cs...> {
     static constexpr char FIRST = C1;             ///< Easy access to first character of string.
     constexpr static int SIZE = 1+sizeof...(Cs);  ///< Easy access to string length.
+
+    using this_t = StringType<C1,Cs...>;          ///< The type of the current StringType
+    using pop = StringType<Cs...>;                ///< StringType after removing the first char
+    template <int C> using push = StringType<C, C1, Cs...>;       ///< Add char to front of string
+    template <int C> using push_back = StringType<C1, Cs..., C>;  ///< Add char to back of string
+
+    /// Does StringType contains the char C?
+    constexpr static bool Has(char C) { return (C==C1) | pop::Has(C); }
+
+    /// Count the number of occurances of char C in StringType.
+    constexpr static int Count(int C) { return pop::Count(C) + (C==C1); }
+
+    /// Determine the position at which C appears in StringType.
+    constexpr static int GetID(int C) {
+      if (C==C1) return true;
+      if (!Has(C)) return false;
+      return (1+pop::GetID(C));
+    }
+
+    /// Function to retrieve number of elements in StringType
+    constexpr static int GetSize() { return SIZE; }
+
+    /// Determine if there are NO chars in an StringType
+    constexpr static bool IsEmpty() { return false; }
+
+    /// Determine if all chars in StringType are different from each other.
+    constexpr static bool IsUnique() { return pop::IsUnique() && !pop::Has(C1); }
   };
 
   // Empty StringType template specialization
@@ -52,6 +78,29 @@ namespace emp {
   struct StringType<> {
     static constexpr char FIRST = '\0';           ///< Empty string has null as "first" char
     constexpr static int SIZE = 0;                ///< Empty string as no length
+
+    using this_t = StringType<>;                  ///< The type of the current StringType
+    // No pop_t; should give error if used on empty string
+    template <int C> using push = StringType<C>;       ///< Add char to front of string
+    template <int C> using push_back = StringType<C>;  ///< Add char to back of string
+
+    /// Empty StringType does not contain the char C.
+    constexpr static bool Has(char C) { return false; }
+
+    /// Empty StringType has 0 occurances of anything.
+    constexpr static int Count(int C) { return 0; }
+
+    /// Empty StringType always returns ID -1 for failue to find.
+    constexpr static int GetID(int C) { return -1; }
+
+    /// Empty StringType has size 0.
+    constexpr static int GetSize() { return 0; }
+
+    /// Empty StringType is, in fact, empty.
+    constexpr static bool IsEmpty() { return true; }
+
+    /// Empty StringType is always unique.
+    constexpr static bool IsUnique() { return true; }
   };
 
   constexpr size_t CalcStringSize(const char * in) {
