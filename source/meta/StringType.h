@@ -12,19 +12,21 @@
 #ifndef EMP_STRING_TYPE_H
 #define EMP_STRING_TYPE_H
 
-#include "IntPack.h"
+#include <string>
+#include <sstream>
+
 #include "meta.h"
 #include "TypeID.h"
 
-/// Convert a literal string to an instance of an IntPack
-#define EMP_TEXT_PACK(MSG) emp::StringPacketToIntPack( [](){ return MSG; } )
+/// Convert a literal string to an instance of a StringType
+#define EMP_TEXT_PACK(MSG) emp::StringPacketToStringType( [](){ return MSG; } )
 
 /// Setup a type determined by a message.
 #define EMP_TEXT_TYPE(TYPE_NAME, MSG)                        \
     auto emp_temp_ ## TYPE_NAME = EMP_TEXT_PACK(MSG);        \
     using TYPE_NAME = decltype(emp_temp_ ## TYPE_NAME)
 // I'd prefer for the body of EMP_TEXT_TYPE, but lambdas must be evaluated.
-//    decltype(emp::StringPacketToIntPack( [](){ return MSG; } ))
+//    decltype(emp::StringPacketToStringType( [](){ return MSG; } ))
 
 /// Convert a literal string to a unique value (counting up from 0 with each string)
 #define EMP_TEXT_HASH(MSG)                           \
@@ -71,6 +73,14 @@ namespace emp {
 
     /// Determine if all chars in StringType are different from each other.
     constexpr static bool IsUnique() { return pop::IsUnique() && !pop::Has(C1); }
+
+    /// Convert this StringType back to an std::string object (note: NOT constexpr)
+    static std::string ToString() {
+      std::stringstream ss;
+      ss << C1;
+      (ss << ... << Cs);
+      return ss.str();
+    }
   };
 
   // Empty StringType template specialization
@@ -110,23 +120,23 @@ namespace emp {
   }
 
   template <typename T, size_t pos>
-  struct StringPacketToIntPack_impl {
+  struct StringPacketToStringType_impl {
     static constexpr auto BuildPack(T packet) {
-      using recurse_t = decltype( StringPacketToIntPack_impl<T,pos-1>::BuildPack(packet) );
+      using recurse_t = decltype( StringPacketToStringType_impl<T,pos-1>::BuildPack(packet) );
       return typename recurse_t::template push_back< (int) (packet()[pos-1]) >();
     }
   };
 
   template <typename T>
-  struct StringPacketToIntPack_impl<T,0> {
+  struct StringPacketToStringType_impl<T,0> {
     static constexpr auto BuildPack(T packet) {
-      return IntPack<>();
+      return StringType<>();
     }
   };
 
   template <typename T>
-  constexpr auto StringPacketToIntPack(T packet) {
-    return emp::StringPacketToIntPack_impl<T,CalcStringSize(packet())>::BuildPack(packet);
+  constexpr auto StringPacketToStringType(T packet) {
+    return emp::StringPacketToStringType_impl<T,CalcStringSize(packet())>::BuildPack(packet);
   }
 
 }
