@@ -5,6 +5,14 @@
  *
  *  @file  Var.h
  *  @brief A collection of information about a single, instantiated variable in Empower
+ * 
+ * 
+ *  DEVELOPER NOTES
+ *  Pros & Cons vs. Other version of Var being developed
+ *    + MUCH simpler code; most details handled inside the Var class
+ *    + More extensible memory management is possible where all variables are clustered
+ *    - Slightly more overhead since each variable needs to know its type, not just each set of variables.
+ *    - Potentially slower at going through different variables in an org since not all clustered.
  */
 
 #ifndef EMP_VAR_H
