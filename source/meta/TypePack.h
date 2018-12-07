@@ -212,7 +212,7 @@ namespace emp {
       using resize = typename pad<DEFAULT,(N>SIZE)?(N-SIZE):0>::template shrink<N>;
 
     /// Join this TypePack with another TypePack.
-    template <typename IN> using merge = typename internal::tp_shift<IN::SIZE, this_t, IN>::type1;
+    template <typename In> using merge = typename internal::tp_shift<In::SIZE, this_t, In>::type1;
 
     /// Rearrange types in TypePack into reverse order.
     using reverse = typename pop::reverse::template push_back<T1>;
@@ -275,7 +275,7 @@ namespace emp {
     template <typename T, int N=1> using pad = typename internal::tp_pad<this_t,T,N>::type;
     template <int N, typename DEFAULT=null_t> using resize = pad<DEFAULT,N>;
 
-    template <typename IN> using merge = IN;
+    template <typename In> using merge = In;
     using reverse = this_t;
     using rotate = this_t;
 
