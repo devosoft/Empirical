@@ -28,18 +28,19 @@ namespace emp {
 
   class VarBase {
   public:
-    virtual Ptr<VarBase> Clone() const = 0;
+    virtual Ptr<VarBase> Clone() const = 0;      ///< Make a copy of the derived version of this Var.
 
-    virtual std::string GetName() const = 0;
-    virtual std::string GetDesc() const = 0;
+    virtual std::string GetName() const = 0;     ///< Get the name of this variable
+    virtual std::string GetDesc() const = 0;     ///< Get a description of this variable
 
     virtual size_t GetTypeID() const = 0;        ///< Get the unique type ID for this variable
     virtual std::string GetTypeName() const = 0; ///< Get the (C++ mangled) name for this type
 
-    virtual void SetDefault() = 0;    ///< Restore this variable to its default value.
+    virtual void SetDefault() = 0;               ///< Restore this variable to its default value.
 
   };
 
+  /// A version of Var that knows its type.
   template <typename TYPE>
   class VarType : public VarBase {
   protected:
@@ -56,6 +57,7 @@ namespace emp {
     const TYPE & GetValue() const { return value; }
   };
 
+  /// A version of var that knows its name and description.
   template <typename TYPE, typename NAME, typename DESC>
   class VarInfo : public VarType<TYPE> {
   private:
