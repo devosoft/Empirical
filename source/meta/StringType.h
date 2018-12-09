@@ -119,26 +119,17 @@ namespace emp {
     return count;
   }
 
-  template <typename T, size_t pos>
-  struct StringPacketToStringType_impl {
-    static constexpr auto BuildPack(T packet) {
-      using recurse_t = decltype( StringPacketToStringType_impl<T,pos-1>::BuildPack(packet) );
-      return typename recurse_t::template push_back< (int) (packet()[pos-1]) >();
-    }
-  };
 
-  template <typename T>
-  struct StringPacketToStringType_impl<T,0> {
-    static constexpr auto BuildPack(T packet) {
-      return StringType<>();
-    }
-  };
-
-  template <typename T>
+  template <typename T, size_t START=0>
   constexpr auto StringPacketToStringType(T packet) {
-    return emp::StringPacketToStringType_impl<T,CalcStringSize(packet())>::BuildPack(packet);
+    if constexpr (START >= CalcStringSize(packet())) return StringType<>();
+    else {
+      auto recurse_obj = StringPacketToStringType<T,START+1>(packet);
+      using recurse_t = decltype(recurse_obj);
+      using cur_t = typename recurse_t::template push<packet()[START]>;
+      return cur_t();
+    }
   }
-
 }
 
 #endif
