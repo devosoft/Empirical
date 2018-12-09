@@ -60,8 +60,8 @@ namespace emp {
 
     /// Determine the position at which C appears in StringType.
     constexpr static int GetID(int C) {
-      if (C==C1) return true;
-      if (!Has(C)) return false;
+      if (C==C1) return 0;
+      if (!Has(C)) return -1;
       return (1+pop::GetID(C));
     }
 
@@ -124,9 +124,7 @@ namespace emp {
   constexpr auto StringPacketToStringType(T packet) {
     if constexpr (START >= CalcStringSize(packet())) return StringType<>();
     else {
-      auto recurse_obj = StringPacketToStringType<T,START+1>(packet);
-      using recurse_t = decltype(recurse_obj);
-      using cur_t = typename recurse_t::template push<packet()[START]>;
+      using cur_t = typename decltype(StringPacketToStringType<T,START+1>(packet))::template push<packet()[START]>;
       return cur_t();
     }
   }
