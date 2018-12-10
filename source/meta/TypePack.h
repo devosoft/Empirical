@@ -239,7 +239,7 @@ namespace emp {
     template <typename In> using merge = typename internal::tp_shift<In::SIZE, this_t, In>::type1;
 
     /// Join this TypePack with another, keeping only one of each type.
-    template <typename IN> using find_union = typename internal::tp_shift<IN::SIZE, this_t, IN>::type1::make_unique;
+    template <typename In> using find_union = typename internal::tp_shift<In::SIZE, this_t, In>::type1::make_unique;
 
     /// Rearrange types in TypePack into reverse order.
     using reverse = typename pop::reverse::template push_back<T1>;
