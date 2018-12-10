@@ -14,6 +14,9 @@
 #include <sstream>
 #include <string>
 #include <deque>
+#include <algorithm>
+
+#include "data/DataNode.h"
 
 #include "tools/Binomial.h"
 #include "tools/BitMatrix.h"
@@ -711,6 +714,211 @@ TEST_CASE("Test math", "[tools]")
   REQUIRE(emp::Max(5,10) == 10);
   REQUIRE(emp::Max(10,5) == 10);
   REQUIRE(emp::Max(40,30,20,10,45,15,25,35) == 45);
+
+  REQUIRE(emp::FloorDivide(0,4) == 0);
+  REQUIRE(emp::FloorDivide(1,4) == 0);
+  REQUIRE(emp::FloorDivide(2,4) == 0);
+  REQUIRE(emp::FloorDivide(3,4) == 0);
+  REQUIRE(emp::FloorDivide(4,4) == 1);
+  REQUIRE(emp::FloorDivide(6,4) == 1);
+  REQUIRE(emp::FloorDivide(5,3) == 1);
+  REQUIRE(emp::FloorDivide(6,3) == 2);
+  REQUIRE(emp::FloorDivide(7,3) == 2);
+
+  REQUIRE(emp::FloorDivide((size_t)0,(size_t)4) == 0);
+  REQUIRE(emp::FloorDivide((size_t)1,(size_t)4) == 0);
+  REQUIRE(emp::FloorDivide((size_t)2,(size_t)4) == 0);
+  REQUIRE(emp::FloorDivide((size_t)3,(size_t)4) == 0);
+  REQUIRE(emp::FloorDivide((size_t)4,(size_t)4) == 1);
+  REQUIRE(emp::FloorDivide((size_t)6,(size_t)4) == 1);
+  REQUIRE(emp::FloorDivide((size_t)5,(size_t)3) == 1);
+  REQUIRE(emp::FloorDivide((size_t)6,(size_t)3) == 2);
+  REQUIRE(emp::FloorDivide((size_t)7,(size_t)3) == 2);
+
+  REQUIRE(emp::FloorDivide(-1,4) == -1);
+  REQUIRE(emp::FloorDivide(-2,4) == -1);
+  REQUIRE(emp::FloorDivide(-3,4) == -1);
+  REQUIRE(emp::FloorDivide(-4,4) == -1);
+  REQUIRE(emp::FloorDivide(-6,4) == -2);
+  REQUIRE(emp::FloorDivide(-5,3) == -2);
+  REQUIRE(emp::FloorDivide(-6,3) == -2);
+  REQUIRE(emp::FloorDivide(-7,3) == -3);
+
+  REQUIRE(emp::FloorDivide(0,-4) == 0);
+  REQUIRE(emp::FloorDivide(1,-4) == -1);
+  REQUIRE(emp::FloorDivide(2,-4) == -1);
+  REQUIRE(emp::FloorDivide(3,-4) == -1);
+  REQUIRE(emp::FloorDivide(4,-4) == -1);
+  REQUIRE(emp::FloorDivide(6,-4) == -2);
+  REQUIRE(emp::FloorDivide(5,-3) == -2);
+  REQUIRE(emp::FloorDivide(6,-3) == -2);
+  REQUIRE(emp::FloorDivide(7,-3) == -3);
+
+  REQUIRE(emp::FloorDivide(-1,-4) == 0);
+  REQUIRE(emp::FloorDivide(-2,-4) == 0);
+  REQUIRE(emp::FloorDivide(-3,-4) == 0);
+  REQUIRE(emp::FloorDivide(-4,-4) == 1);
+  REQUIRE(emp::FloorDivide(-6,-4) == 1);
+  REQUIRE(emp::FloorDivide(-5,-3) == 1);
+  REQUIRE(emp::FloorDivide(-6,-3) == 2);
+  REQUIRE(emp::FloorDivide(-7,-3) == 2);
+
+  REQUIRE(emp::RoundedDivide(0,4) == 0);
+  REQUIRE(emp::RoundedDivide(1,4) == 0);
+  REQUIRE(emp::RoundedDivide(2,4) == 1);
+  REQUIRE(emp::RoundedDivide(3,4) == 1);
+  REQUIRE(emp::RoundedDivide(4,4) == 1);
+  REQUIRE(emp::RoundedDivide(6,4) == 2);
+  REQUIRE(emp::RoundedDivide(5,3) == 2);
+  REQUIRE(emp::RoundedDivide(6,3) == 2);
+  REQUIRE(emp::RoundedDivide(7,3) == 2);
+
+  REQUIRE(emp::RoundedDivide((size_t)0,(size_t)4) == 0);
+  REQUIRE(emp::RoundedDivide((size_t)1,(size_t)4) == 0);
+  REQUIRE(emp::RoundedDivide((size_t)2,(size_t)4) == 1);
+  REQUIRE(emp::RoundedDivide((size_t)3,(size_t)4) == 1);
+  REQUIRE(emp::RoundedDivide((size_t)4,(size_t)4) == 1);
+  REQUIRE(emp::RoundedDivide((size_t)6,(size_t)4) == 2);
+  REQUIRE(emp::RoundedDivide((size_t)5,(size_t)3) == 2);
+  REQUIRE(emp::RoundedDivide((size_t)6,(size_t)3) == 2);
+  REQUIRE(emp::RoundedDivide((size_t)7,(size_t)3) == 2);
+
+  REQUIRE(emp::RoundedDivide(-1,4) == 0);
+  REQUIRE(emp::RoundedDivide(-2,4) == 0);
+  REQUIRE(emp::RoundedDivide(-3,4) == -1);
+  REQUIRE(emp::RoundedDivide(-4,4) == -1);
+  REQUIRE(emp::RoundedDivide(-6,4) == -1);
+  REQUIRE(emp::RoundedDivide(-5,3) == -2);
+  REQUIRE(emp::RoundedDivide(-6,3) == -2);
+  REQUIRE(emp::RoundedDivide(-7,3) == -2);
+
+  REQUIRE(emp::RoundedDivide(0,-4) == 0);
+  REQUIRE(emp::RoundedDivide(1,-4) == 0);
+  REQUIRE(emp::RoundedDivide(2,-4) == 0);
+  REQUIRE(emp::RoundedDivide(3,-4) == -1);
+  REQUIRE(emp::RoundedDivide(4,-4) == -1);
+  REQUIRE(emp::RoundedDivide(6,-4) == -1);
+  REQUIRE(emp::RoundedDivide(5,-3) == -2);
+  REQUIRE(emp::RoundedDivide(6,-3) == -2);
+  REQUIRE(emp::RoundedDivide(7,-3) == -2);
+
+  REQUIRE(emp::RoundedDivide(-1,-4) == 0);
+  REQUIRE(emp::RoundedDivide(-2,-4) == 1);
+  REQUIRE(emp::RoundedDivide(-3,-4) == 1);
+  REQUIRE(emp::RoundedDivide(-4,-4) == 1);
+  REQUIRE(emp::RoundedDivide(-6,-4) == 2);
+  REQUIRE(emp::RoundedDivide(-5,-3) == 2);
+  REQUIRE(emp::RoundedDivide(-6,-3) == 2);
+  REQUIRE(emp::RoundedDivide(-7,-3) == 2);
+
+  REQUIRE(emp::RoundedDivide((size_t)0,(size_t)4) == 0);
+  REQUIRE(emp::RoundedDivide((size_t)1,(size_t)4) == 0);
+  REQUIRE(emp::RoundedDivide((size_t)2,(size_t)4) == 1);
+  REQUIRE(emp::RoundedDivide((size_t)3,(size_t)4) == 1);
+  REQUIRE(emp::RoundedDivide((size_t)4,(size_t)4) == 1);
+  REQUIRE(emp::RoundedDivide((size_t)6,(size_t)4) == 2);
+  REQUIRE(emp::RoundedDivide((size_t)5,(size_t)3) == 2);
+  REQUIRE(emp::RoundedDivide((size_t)6,(size_t)3) == 2);
+  REQUIRE(emp::RoundedDivide((size_t)7,(size_t)3) == 2);
+
+  auto MeanUnbiasedDivide = [](int dividend, int divisor, size_t rc){
+    emp::Random r = emp::Random(1);
+    emp::DataNode<double, emp::data::Current, emp::data::Range, emp::data::Log> data;
+    for(size_t i=0;i<rc;++i) data.Add(emp::UnbiasedDivide(dividend,divisor,r));
+    return data.GetMean();
+  };
+
+  REQUIRE(MeanUnbiasedDivide(0,4,100) == 0);
+  REQUIRE(MeanUnbiasedDivide(1,4,100) == 0);
+  REQUIRE(MeanUnbiasedDivide(2,4,100) > 0);
+  REQUIRE(MeanUnbiasedDivide(2,4,100) < 1);
+  REQUIRE(MeanUnbiasedDivide(3,4,100) == 1);
+  REQUIRE(MeanUnbiasedDivide(4,4,100) == 1);
+  REQUIRE(MeanUnbiasedDivide(6,4,100) > 1);
+  REQUIRE(MeanUnbiasedDivide(6,4,100) < 2);
+  REQUIRE(MeanUnbiasedDivide(5,3,100) == 2);
+  REQUIRE(MeanUnbiasedDivide(6,3,100) == 2);
+  REQUIRE(MeanUnbiasedDivide(7,3,100) == 2);
+
+  REQUIRE(MeanUnbiasedDivide(-1,4,100) == 0);
+  REQUIRE(MeanUnbiasedDivide(-2,4,100) < 0);
+  REQUIRE(MeanUnbiasedDivide(-2,4,100) > -1);
+  REQUIRE(MeanUnbiasedDivide(-3,4,100) == -1);
+  REQUIRE(MeanUnbiasedDivide(-4,4,100) == -1);
+  REQUIRE(MeanUnbiasedDivide(-6,4,100) < -1);
+  REQUIRE(MeanUnbiasedDivide(-6,4,100) > -2);
+  REQUIRE(MeanUnbiasedDivide(-5,3,100) == -2);
+  REQUIRE(MeanUnbiasedDivide(-6,3,100) == -2);
+  REQUIRE(MeanUnbiasedDivide(-7,3,100) == -2);
+
+  REQUIRE(MeanUnbiasedDivide(0,-4,100) == 0);
+  REQUIRE(MeanUnbiasedDivide(1,-4,100) == 0);
+  REQUIRE(MeanUnbiasedDivide(2,-4,100) < 0);
+  REQUIRE(MeanUnbiasedDivide(2,-4,100) > -1);
+  REQUIRE(MeanUnbiasedDivide(3,-4,100) == -1);
+  REQUIRE(MeanUnbiasedDivide(4,-4,100) == -1);
+  REQUIRE(MeanUnbiasedDivide(6,-4,100) < -1);
+  REQUIRE(MeanUnbiasedDivide(6,-4,100) > -2);
+  REQUIRE(MeanUnbiasedDivide(5,-3,100) == -2);
+  REQUIRE(MeanUnbiasedDivide(6,-3,100) == -2);
+  REQUIRE(MeanUnbiasedDivide(7,-3,100) == -2);
+
+  REQUIRE(MeanUnbiasedDivide(-1,-4,100) == 0);
+  REQUIRE(MeanUnbiasedDivide(-2,-4,100) > 0);
+  REQUIRE(MeanUnbiasedDivide(-2,-4,100) < 1);
+  REQUIRE(MeanUnbiasedDivide(-3,-4,100) == 1);
+  REQUIRE(MeanUnbiasedDivide(-4,-4,100) == 1);
+  REQUIRE(MeanUnbiasedDivide(-6,-4,100) > 1);
+  REQUIRE(MeanUnbiasedDivide(-6,-4,100) < 2);
+  REQUIRE(MeanUnbiasedDivide(-5,-3,100) == 2);
+  REQUIRE(MeanUnbiasedDivide(-6,-3,100) == 2);
+  REQUIRE(MeanUnbiasedDivide(-7,-3,100) == 2);
+
+  auto SztMeanUnbiasedDivide = [](size_t dividend, size_t divisor, size_t rc){
+    emp::Random r = emp::Random(1);
+    emp::DataNode<double, emp::data::Current, emp::data::Range, emp::data::Log> data;
+    for(size_t i=0;i<rc;++i) data.Add(emp::UnbiasedDivide(dividend,divisor,r));
+    return data.GetMean();
+  };
+
+  REQUIRE(SztMeanUnbiasedDivide((size_t)0,(size_t)4,100) == 0);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)1,(size_t)4,100) == 0);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)2,(size_t)4,100) > 0);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)2,(size_t)4,100) < 1);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)3,(size_t)4,100) == 1);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)4,(size_t)4,100) == 1);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)6,(size_t)4,100) > 1);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)6,(size_t)4,100) < 2);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)5,(size_t)3,100) == 2);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)6,(size_t)3,100) == 2);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)7,(size_t)3,100) == 2);
+
+  REQUIRE(emp::Sgn(1) == 1);
+  REQUIRE(emp::Sgn(2) == 1);
+  REQUIRE(emp::Sgn(3) == 1);
+  REQUIRE(emp::Sgn(102) == 1);
+  REQUIRE(emp::Sgn(0) == 0);
+  REQUIRE(emp::Sgn(-1) == -1);
+  REQUIRE(emp::Sgn(-2) == -1);
+  REQUIRE(emp::Sgn(-3) == -1);
+  REQUIRE(emp::Sgn(-102) == -1);
+
+  REQUIRE(emp::Sgn((size_t)1) == 1);
+  REQUIRE(emp::Sgn((size_t)2) == 1);
+  REQUIRE(emp::Sgn((size_t)3) == 1);
+  REQUIRE(emp::Sgn((size_t)102) == 1);
+  REQUIRE(emp::Sgn((size_t)0) == 0);
+
+  REQUIRE(emp::Sgn(1.0) == 1);
+  REQUIRE(emp::Sgn(2.1) == 1);
+  REQUIRE(emp::Sgn(3.0) == 1);
+  REQUIRE(emp::Sgn(102.5) == 1);
+  REQUIRE(emp::Sgn(0.0) == 0);
+  REQUIRE(emp::Sgn(-1.0) == -1);
+  REQUIRE(emp::Sgn(-2.1) == -1);
+  REQUIRE(emp::Sgn(-3.0) == -1);
+  REQUIRE(emp::Sgn(-102.5) == -1);
+
 }
 
 

@@ -72,14 +72,16 @@ namespace emp {
       ~iterator_wrapper() { ; }
 
       // Debug tools to make sure this iterator is okay.
+      static std::string & ErrorCode() { static std::string code="No Errors Found."; return code; }
+
       bool OK(bool begin_ok=true, bool end_ok=true) const {
-        if (v_ptr == nullptr) return false;                // Invalid vector
-        if (v_ptr->revision == 0) return false;            // Vector has been deleted!
-        if (revision != v_ptr->revision) return false;     // Vector has changed memory!
+        if (v_ptr == nullptr) { ErrorCode() = "Invalid Vector! (set to nullptr)"; return false; }
+        if (v_ptr->revision == 0) { ErrorCode() = "Vector deleted! (revision==0)"; return false; }
+        if (revision != v_ptr->revision) { ErrorCode() = "Vector has changed memeory!"; return false; }
         size_t pos = (size_t) (*this - v_ptr->begin());
-        if (pos > v_ptr->size()) return false;             // Iterator out of range.
-        if (!begin_ok && pos == 0) return false;           // Iterator not allowed at beginning.
-        if (!end_ok && pos == v_ptr->size()) return false; // Iterator not allowed at end.
+        if (pos > v_ptr->size()) { ErrorCode() = "Iterator out of range."; return false; }
+        if (!begin_ok && pos == 0) { ErrorCode() = "Iterator not allowed at begin()."; return false; }
+        if (!end_ok && pos == v_ptr->size()) { ErrorCode() = "Iterator not allowed at end()."; return false; }
         return true;
       }
 
@@ -90,43 +92,57 @@ namespace emp {
       operator const ITERATOR_T() const { return *this; }
 
       auto & operator*() {
-        emp_assert(OK(true, false));  // Ensure vector hasn't changed since making iterator.
+        emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
         return wrapped_t::operator*();
       }
       const auto & operator*() const {
-        emp_assert(OK(true, false));  // Ensure vector hasn't changed since making iterator.
+        emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
         return wrapped_t::operator*();
       }
 
       auto operator->() {
-        emp_assert(OK(true, false));  // Ensure vector hasn't changed since making iterator.
+        emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
         return wrapped_t::operator->();
       }
       const auto operator->() const {
-        emp_assert(OK(true, false));  // Ensure vector hasn't changed since making iterator.
+        emp_assert(OK(true, false), ErrorCode());  // Ensure vector hasn't changed since making iterator.
         return wrapped_t::operator->();
       }
 
-      this_t & operator++() { emp_assert(OK(true,false)); wrapped_t::operator++(); return *this; }
-      this_t operator++(int x) { emp_assert(OK(true,false)); return this_t(wrapped_t::operator++(x), v_ptr); }
-      this_t & operator--() { emp_assert(OK(false,true)); wrapped_t::operator--(); return *this; }
-      this_t operator--(int x) { emp_assert(OK(false,true)); return this_t(wrapped_t::operator--(x), v_ptr); }
+      this_t & operator++() { 
+        emp_assert(OK(true,false), ErrorCode());
+        wrapped_t::operator++();
+        return *this;
+      }
+      this_t operator++(int x) { 
+        emp_assert(OK(true,false), ErrorCode());
+        return this_t(wrapped_t::operator++(x), v_ptr);
+      }
+      this_t & operator--() { 
+        emp_assert(OK(false,true), ErrorCode());
+        wrapped_t::operator--();
+        return *this;
+      }
+      this_t operator--(int x) { 
+        emp_assert(OK(false,true), ErrorCode());
+        return this_t(wrapped_t::operator--(x), v_ptr);
+      }
 
-      auto operator+(int in) { emp_assert(OK()); return this_t(wrapped_t::operator+(in), v_ptr); }
-      auto operator-(int in) { emp_assert(OK()); return this_t(wrapped_t::operator-(in), v_ptr); }
-      auto operator-(const this_t & in) { emp_assert(OK()); return ((wrapped_t) *this) - (wrapped_t) in; }
+      auto operator+(int in) { emp_assert(OK(), ErrorCode()); return this_t(wrapped_t::operator+(in), v_ptr); }
+      auto operator-(int in) { emp_assert(OK(), ErrorCode()); return this_t(wrapped_t::operator-(in), v_ptr); }
+      auto operator-(const this_t & in) { emp_assert(OK(), ErrorCode()); return ((wrapped_t) *this) - (wrapped_t) in; }
 
-      this_t & operator+=(int in) { emp_assert(OK()); wrapped_t::operator+=(in); return *this; }
-      this_t & operator-=(int in) { emp_assert(OK()); wrapped_t::operator-=(in); return *this; }
-      auto & operator[](int offset) { emp_assert(OK()); return wrapped_t::operator[](offset); }
+      this_t & operator+=(int in) { emp_assert(OK(), ErrorCode()); wrapped_t::operator+=(in); return *this; }
+      this_t & operator-=(int in) { emp_assert(OK(), ErrorCode()); wrapped_t::operator-=(in); return *this; }
+      auto & operator[](int offset) { emp_assert(OK(), ErrorCode()); return wrapped_t::operator[](offset); }
 
-      //bool operator==(const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator==(in); }
-      //bool operator!=(const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator!=(in); }
+      //bool operator==(const wrapped_t & in) const { emp_assert(OK(), ErrorCode()); return wrapped_t::operator==(in); }
+      //bool operator!=(const wrapped_t & in) const { emp_assert(OK(), ErrorCode()); return wrapped_t::operator!=(in); }
 
-      //bool operator< (const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator< (in); }
-      //bool operator<=(const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator<=(in); }
-      //bool operator> (const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator> (in); }
-      //bool operator>=(const wrapped_t & in) const { emp_assert(OK()); return wrapped_t::operator>=(in); }
+      //bool operator< (const wrapped_t & in) const { emp_assert(OK(), ErrorCode()); return wrapped_t::operator< (in); }
+      //bool operator<=(const wrapped_t & in) const { emp_assert(OK(), ErrorCode()); return wrapped_t::operator<=(in); }
+      //bool operator> (const wrapped_t & in) const { emp_assert(OK(), ErrorCode()); return wrapped_t::operator> (in); }
+      //bool operator>=(const wrapped_t & in) const { emp_assert(OK(), ErrorCode()); return wrapped_t::operator>=(in); }
     };
 
     using iterator = iterator_wrapper< typename stdv_t::iterator >;

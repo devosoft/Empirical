@@ -36,6 +36,7 @@
 #include <string>
 
 #include "../base/vector.h"
+#include "../tools/string_utils.h"
 
 namespace emp {
   namespace cl {
@@ -69,14 +70,14 @@ namespace emp {
       return (pos != -1);
     }
 
-    // Return 1 for arg set to value, 0 for arg not found, and -1 for invalid use.
-    // ...assume arg is a single string.
-    int get_arg_value(emp::vector<std::string> & args, const std::string & pattern, std::string & var) {
-      const int pos = find_arg(args, pattern);
-      if (pos == -1) return 0;                      // Arg not found.
-      if (pos >= (int) args.size() - 1) return -1;  // No room for a value!
-      var = args[(size_t)pos+1];
-      return 1;
+    // Load the value from an argument with the provided pattern into the provided variable.
+    template <typename T>
+    int get_arg_value(emp::vector<std::string> & args, const std::string & pattern, T & var) {
+      const int pos = find_arg(args, pattern);        // Find the pattern in the set of arguments!
+      if (pos == -1) return 0;                        // Arg not found; abort, return 0 (not found)
+      if (pos >= (int) args.size() - 1) return -1;    // No value!  Abort, return -1 (error)
+      var = emp::from_string<T>(args[(size_t)pos+1]); // Store the found value.
+      return 1;                                       // Indicate success!
     }
 
     // ...assume arg is a PAIR of strings.
@@ -87,24 +88,6 @@ namespace emp {
       if (pos >= (int) args.size() - 2) return -1;  // No room for both values!
       var1 = args[(size_t)pos+1];
       var2 = args[(size_t)pos+2];
-      return 1;
-    }
-
-    // ...assume arg is a single int.
-    int get_arg_value(emp::vector<std::string> & args, const std::string & pattern, int & var) {
-      const int pos = find_arg(args, pattern);
-      if (pos == -1) return 0;                      // Arg not found.
-      if (pos >= (int) args.size() - 1) return -1;  // No room for a value!
-      var = stoi(args[(size_t)pos+1]);
-      return 1;
-    }
-
-    // ...assume arg is a single double.
-    int get_arg_value(emp::vector<std::string> & args, const std::string & pattern, double & var) {
-      const int pos = find_arg(args, pattern);
-      if (pos == -1) return 0;                      // Arg not found.
-      if (pos >= (int) args.size() - 1) return -1;  // No room for a value!
-      var = stod(args[(size_t)pos+1]);
       return 1;
     }
 

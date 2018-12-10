@@ -1,5 +1,22 @@
-In this second version of MABE, we are trying to use simple base clases that can be
-assembled at run time.
+In this third version of MABE, we are building wrappers that verify needed
+functionality for modules and fill in optional functionality to streamline its
+use.
+
+BRAINS + GENOMES -> ORGANISMS (or build organisms directly)
+ORGANISM + ENVIRONMENTS -> ORGANISM INTERFACE (to help organisms communicate with environment)
+
+Organism wrappers should automatically loop in the associated OrganismInterface so that the
+user never even needs to know that it exists.
+
+When adding an Organism to a World, must indicate if its a new type of organism so that
+a new OrganismInterface can be built.
+
+When builing an organism template, you must indicate the brain and genome to use (including
+NoBrain or NoGenome), but you can optionally add a third, numerical argument to have different
+versions of that organisms type that can be configured independently.
+
+
+
 
 Also, renaming Organism into OrganismType since that better describes the classes role
 (and we will have indiviudal organisms as well).

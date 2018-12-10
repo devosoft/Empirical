@@ -106,6 +106,25 @@ TEST_CASE("Test reflection", "[meta]")
 
 TEST_CASE("Test TypeID", "[meta]")
 {
+  // Test GetTypeValue
+  size_t int_value = emp::GetTypeValue<int>();
+  size_t char_value = emp::GetTypeValue<char>();
+  size_t str_value = emp::GetTypeValue<std::string>();
+  size_t int_value2 = emp::GetTypeValue<int>();
+  size_t bool_value = emp::GetTypeValue<bool>();
+
+  // Make sure that we are generating unique values for types.
+  REQUIRE(int_value != char_value);
+  REQUIRE(int_value != str_value);
+  REQUIRE(int_value != bool_value);
+  REQUIRE(char_value != str_value);
+  REQUIRE(char_value != bool_value);
+  REQUIRE(str_value != bool_value);
+
+  // Make sure that repeated calls for the SAME type do generate the same value.
+  REQUIRE (int_value == int_value2);
+
+  // Check TypeID strings...
   REQUIRE(emp::TypeID<char>::GetName() == "char");
   REQUIRE(emp::TypeID<void>::GetName() == "void");
   REQUIRE(emp::TypeID<int>::GetName() == "int32_t");
@@ -156,6 +175,12 @@ TEST_CASE("Test TypePack", "[meta]")
   using test_filtered = test_t::filter<std::is_integral>;
   REQUIRE(test_filtered::GetSize() == 2);
 
+  using test_filtered_out = test_t::filter_out<std::is_integral>;
+  REQUIRE(test_filtered_out::GetSize() == 3);
+
+  using test_remove = test_t::remove_t<std::string>;
+  REQUIRE(test_remove::GetSize() == 4);
+
   using test_A = emp::TypePack<HasA, std::string, bool, HasA2, HasA, int>;
   REQUIRE(emp::TypeID<test_A>::GetName() == "emp::TypePack<HasA,std::string,bool,HasA2,HasA,int32_t>");
 
@@ -173,6 +198,24 @@ TEST_CASE("Test TypePack", "[meta]")
 
   using shuffle_t = test_t::select<2,3,4,1,3,3,3,0>;
   REQUIRE(emp::TypeID<shuffle_t>::GetName() == "emp::TypePack<float,bool,double,std::string,bool,bool,bool,int32_t>");
+
+
+  using dup_test_t = emp::TypePack<int, int, double, int, double, std::string, bool, int, char, int>;
+  REQUIRE(dup_test_t::GetSize() == 10);
+  REQUIRE(dup_test_t::remove_t<int>::GetSize() == 5);
+  REQUIRE(dup_test_t::remove_t<double>::GetSize() == 8);
+  REQUIRE(dup_test_t::make_unique::GetSize() == 5);
+  REQUIRE(dup_test_t::Count<int>() == 5);
+  REQUIRE(dup_test_t::CountUnique() == 5);
+
+  using link1_t = emp::TypePack<bool, char, int>;
+  using link2_t = emp::TypePack<double, int, size_t>;
+  using merge_t = link1_t::merge<link2_t>;
+  using union_t = link1_t::find_union<link2_t>;
+  REQUIRE(link1_t::GetSize() == 3);
+  REQUIRE(link2_t::GetSize() == 3);
+  REQUIRE(merge_t::GetSize() == 6);
+  REQUIRE(union_t::GetSize() == 5);
 }
 
 TEST_CASE("Test type traits", "[meta]") {
