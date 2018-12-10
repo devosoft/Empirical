@@ -1,6 +1,7 @@
 TEST_NAMES = alert bitmatrix bitset bitset_utils bitvector cache combos dfa file flex_function graph graph_utils lexer memo_function nfa range regex solvestate tuple_utils unorderedindexmap vector_utils
 
-FLAGS = -std=c++14 -Wall -Wl,--stack,8388608 -ftrack-macro-expansion=0 -Wno-unused-function -I../../source/ -I../../
+#  -Wl,--stack,8388608 -ftrack-macro-expansion=0
+FLAGS = -std=c++14 -Wall -Wno-unused-function -I../../source/ -I../../
 
 default: test
 
