@@ -13,7 +13,11 @@
 *.mp4
 *.csv
 *-bak.cc
-	
+*.dat
+*.exe
+*.wasm
+*.wast
+
 */env/*
 */3nv/*
 

@@ -11,9 +11,9 @@
  */
 void test_matrix(){
 	emp::BitMatrix<2,3> bm;
-	REQUIRE(bm.NumRows() == 3);
-	REQUIRE(bm.NumCols() == 2);
-	REQUIRE(bm.GetSize() == 6);
+	REQUIRE((bm.NumRows() == 3));
+	REQUIRE((bm.NumCols() == 2));
+	REQUIRE((bm.GetSize() == 6));
 }
 
 /**
@@ -21,9 +21,9 @@ void test_matrix(){
  */
 void test_to_id(){
 	emp::BitMatrix<2,3> bm;
-	REQUIRE(bm.ToID(0,2) == 4);
-	REQUIRE(bm.ToID(1,2) == 5);
-	REQUIRE(bm.ToID(1,0) == 1);
+	REQUIRE((bm.ToID(0,2) == 4));
+	REQUIRE((bm.ToID(1,2) == 5));
+	REQUIRE((bm.ToID(1,0) == 1));
 }
 
 /**
@@ -31,12 +31,12 @@ void test_to_id(){
  */
 void test_to_row_col(){
 	emp::BitMatrix<5,5> bm;
-	REQUIRE(bm.ToRow(13) == 2);
-	REQUIRE(bm.ToRow(22) == 4);
-	REQUIRE(bm.ToRow(9) == 1);
-	REQUIRE(bm.ToCol(9) == 4);
-	REQUIRE(bm.ToCol(0) == 0);
-	REQUIRE(bm.ToCol(16) == 1);
+	REQUIRE((bm.ToRow(13) == 2));
+	REQUIRE((bm.ToRow(22) == 4));
+	REQUIRE((bm.ToRow(9) == 1));
+	REQUIRE((bm.ToCol(9) == 4));
+	REQUIRE((bm.ToCol(0) == 0));
+	REQUIRE((bm.ToCol(16) == 1));
 }
 
 /**
@@ -92,13 +92,13 @@ void test_setall_clear(){
 void test_count_find(){
 	emp::BitMatrix<2,3> bm;
 	bm.SetCol(0);
-	REQUIRE(bm.CountOnes() == 3);
+	REQUIRE((bm.CountOnes() == 3));
 	bm.SetRow(2);
-	REQUIRE(bm.CountOnes() == 4);
-	REQUIRE(bm.FindBit() == 0);
+	REQUIRE((bm.CountOnes() == 4));
+	REQUIRE((bm.FindBit() == 0));
 	bm.Unset(0);
 	bm.Unset(2);
-	REQUIRE(bm.FindBit() == 4);
+	REQUIRE((bm.FindBit() == 4));
 }
 
 /**
@@ -113,7 +113,7 @@ void test_shifts_one(){
 	bm = bm.DownShift();
 	REQUIRE(bm.Get(16));
 	REQUIRE(!bm.Get(12));
-	REQUIRE(bm.FindBit() == 6);
+	REQUIRE((bm.FindBit() == 6));
 	
 	emp::BitMatrix<3,3> bm1;
 	bm1.SetCol(2);
@@ -173,7 +173,7 @@ void test_region(){
 	bm.Set(2);
 	bm.Set(5);
 	bm_region = bm.GetRegion(1,1);
-	REQUIRE( bm_region == bm );
+	REQUIRE( (bm_region == bm) );
 }
 
 /**
@@ -210,7 +210,7 @@ void test_print(){
 	bm.SetCol(1);
 	std::stringstream ss;
 	bm.Print(ss);
-	REQUIRE(ss.str() == "010\n010\n010\n");
+	REQUIRE( (ss.str() == "010\n010\n010\n") );
 }
 
 /**
@@ -243,9 +243,9 @@ void test_comparisons(){
 	bm.Set(0);
 	emp::BitMatrix<3,3> bm1;
 	bm1.Set(0);
-	REQUIRE(bm == bm1);
+	REQUIRE( (bm == bm1) );
 	bm1.Set(1);
-	REQUIRE(bm != bm1);
+	REQUIRE( (bm != bm1) );
 }
 
 /**

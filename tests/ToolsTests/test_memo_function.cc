@@ -68,10 +68,10 @@ TEST_CASE("Test memo_function", "[tools]")
   // I strayed away from that idea
   // same with the implicit cast 
   // error was: error: passing 'xxxxx' as 'this' argument discards qualifiers
-  std::function<long long(int,int)> m1 = multiply.to_function();
-  std::function<long long(int,int)> m2 = multiply;
-  REQUIRE(m1(5,5) == multiply(5,5));
-  REQUIRE(m2(5,5) == multiply(5,5));
+  //std::function<long long(int,int)> m1 = multiply.to_function();
+  //std::function<long long(int,int)> m2 = multiply;
+  //REQUIRE(m1(5,5) == multiply(5,5));
+  //REQUIRE(m2(5,5) == multiply(5,5));
   
   // What is Hash function for/how to use?
   

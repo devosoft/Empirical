@@ -13,9 +13,9 @@ TEST_CASE("Test flex_function", "[tools]")
   multiply_two = [](int a, int b){ return a*b; };
   multiply_two.SetDefaults(0,0);
   REQUIRE((bool) multiply_two);
-  REQUIRE(multiply_two() == 0);
-  REQUIRE(multiply_two(5) == 0);
-  REQUIRE(multiply_two(5,5) == 25);
+  REQUIRE((multiply_two() == 0));
+  REQUIRE((multiply_two(5) == 0));
+  REQUIRE((multiply_two(5,5) == 25));
   
   // TODO: test 'template <int ID> void SetDefault(pack_id<ID,ARGS...> & in_default)'
 }

@@ -14,25 +14,25 @@ TEST_CASE("Test Alert", "[tools]")
   
   // basic Alert
   emp::Alert("Whoops! Try again.");
-  REQUIRE( buffer.str() == "Whoops! Try again.\n" );
+  REQUIRE( (buffer.str() == "Whoops! Try again.\n") );
   buffer.clear();
   buffer.str(std::string());
   
   // AlertObj
   emp::AlertObj an_alert("ALERT!",true,true);
-  REQUIRE( buffer.str() == "ALERT!\n");
+  REQUIRE( (buffer.str() == "ALERT!\n") );
   buffer.clear();
   buffer.str(std::string());
   
   an_alert.SetMessage("ALERT x2!");
   an_alert.Trigger();
-  REQUIRE( buffer.str() == "ALERT x2!\n");
+  REQUIRE( (buffer.str() == "ALERT x2!\n") );
   buffer.clear();
   buffer.str(std::string());
   
   an_alert.SetMessage("DESTROYED");
   an_alert.~AlertObj();
-  REQUIRE( buffer.str() == "DESTROYED\n");
+  REQUIRE( (buffer.str() == "DESTROYED\n") );
   buffer.clear();
   buffer.str(std::string());  
   
@@ -42,13 +42,13 @@ TEST_CASE("Test Alert", "[tools]")
   emp::CappedAlert(2,"Hello!");
   emp::CappedAlert(2,"Hello!");
   emp::CappedAlert(2,"Hello!");
-  REQUIRE( buffer.str() == "Hello!\nHello!\n");
+  REQUIRE( (buffer.str() == "Hello!\nHello!\n") );
   buffer.clear();
   buffer.str(std::string());  
   
   // Templated Alert
   emp::Alert(5," is a good number, but ",7," is even better.");
-  REQUIRE( buffer.str() == "5 is a good number, but 7 is even better.\n");
+  REQUIRE( (buffer.str() == "5 is a good number, but 7 is even better.\n") );
   buffer.clear();
   buffer.str(std::string()); 
 }
