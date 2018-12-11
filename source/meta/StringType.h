@@ -6,6 +6,12 @@
  *  @file  StringType.h
  *  @brief A type that maintains compile-time information about a string sequence.
  *
+ *  DEVELOPER NOTES
+ *   Mechanisms to add:
+ *     resize - change the string length to the provided one.
+ *     append - add another string type to the end of this one.
+ *     upcase - change to all capital letters.
+ *     downcase - change to all lowercase.
  */
 
 
