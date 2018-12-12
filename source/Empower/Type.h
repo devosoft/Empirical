@@ -20,6 +20,7 @@
 
 namespace emp {
 
+  /// Base class that all types share, specifying required member functions.
   class Type {
   public:
     Type() { ; }
@@ -49,11 +50,11 @@ namespace emp {
   public:
     TypeInfo() { ; }
 
-    std::string GetName() const { return typeid(base_t).name(); }
-    size_t GetID() const { return GetTypeValue<base_t>(); }     ///< Unique ID for this type.
-    size_t GetSize() const { return sizeof(T); };               ///< How many bytes is this type?
+    std::string GetName() const { return typeid(base_t).name(); } ///< Name of type.
+    size_t GetID() const { return GetTypeValue<base_t>(); }       ///< Unique ID for type.
+    size_t GetSize() const { return sizeof(T); };                 ///< How many bytes in type?
 
-    // Construct an object of type T at a specified MemoryImage position.
+    /// Construct an object of type T at a specified MemoryImage position.
     void DefaultConstruct(size_t mem_pos, MemoryImage & mem_image) const {
       new (mem_image.GetPtr<T>(mem_pos).Raw()) T;
     }
@@ -73,13 +74,15 @@ namespace emp {
 	    mem_image.GetPtr<T>(mem_pos)->~T();
     }
 
-
+    /// Set the variable of the provided type at this memory position to the provided string.
+    //  Developer note: should use a more dynamic from_string.
     void SetString(size_t mem_pos, MemoryImage & mem_image, const std::string & val) const {
       if constexpr (std::is_same<T,std::string>()) {
         mem_image.GetRef<T>(mem_pos) = val;
       }
     }
 
+    /// Dynamically convert the variable at this memory position to a string.
     std::string AsString(size_t mem_pos, MemoryImage & mem_image) const {
       std::stringstream ss;
       ss << mem_image.GetRef<T>(mem_pos);
