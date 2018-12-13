@@ -208,43 +208,43 @@ namespace emp {
     }
   };
 
-  // IntPack with no values.
-  template <> struct IntPack<> {
-    using this_t = IntPack<>;
+  // ValPack with no values.
+  template <> struct ValPack<> {
+    using this_t = ValPack<>;
 
-    template <int V> using push = IntPack<V>;
-    template <int V> using push_back = IntPack<V>;
-    template <int V, int X> using push_if_not = typename internal::ip_push_if_not<V,X,IntPack<>>::result;
-    template <int V, int X> using push_back_if_not = typename internal::ip_push_if_not<V,X,IntPack<>>::back;
-    template <int V> using pop_val = IntPack<>;  // No value to pop!  Faulure?
-    template <int V> using remove = IntPack<>;
+    template <auto V> using push = ValPack<V>;
+    template <auto V> using push_back = ValPack<V>;
+    template <auto V, auto X> using push_if_not = typename internal::vp_push_if_not<V,X,ValPack<>>::result;
+    template <auto V, auto X> using push_back_if_not = typename internal::vp_push_if_not<V,X,ValPack<>>::back;
+    template <auto V> using pop_val = ValPack<>;  // No value to pop!  Faulure?
+    template <auto V> using remove = ValPack<>;
     template <typename T> using append = T;
 
-    constexpr static bool Has(int) { return false; }
-    constexpr static int Count(int) { return 0; }
-    constexpr static int GetID(int V) { return -100000; }
+    constexpr static bool Has(auto) { return false; }
+    constexpr static size_t Count(auto) { return 0; }
+    constexpr static int GetID(auto V) { return -100000; }
 
-    constexpr static int SIZE = 0;
-    constexpr static int GetSize() { return 0; }
+    constexpr static size_t SIZE = 0;
+    constexpr static size_t GetSize() { return 0; }
 
     constexpr static bool IsEmpty() { return true; }
     constexpr static bool IsUnique() { return true; }
 
-    constexpr static int Sum() { return 0; }
-    constexpr static int Product() { return 1; }
-    constexpr static int Min(int cap) { return cap; }
-    constexpr static int Max(int floor) { return floor; }
+    constexpr static double Sum() { return 0.0; }
+    constexpr static double Product() { return 1.0; }
+    constexpr static auto Min(auto cap) { return cap; }
+    constexpr static auto Max(auto floor) { return floor; }
 
     static std::string ToString() { return ""; }
 
-    static void PrintInts(std::ostream & os=std::cout) { ; }
+    static void PrintVals(std::ostream & os=std::cout) { ; }
   };
 
   namespace pack {
-    template <typename T> using reverse = typename internal::ip_reverse<T>::result;
-    template <typename T> using uniq = typename internal::ip_uniq<T>::result;
+    template <typename T> using reverse = typename internal::vp_reverse<T>::result;
+    template <typename T> using uniq = typename internal::vp_uniq<T>::result;
 
-    template <typename T> using sort = typename internal::ip_sort<T>::result;
+    template <typename T> using sort = typename internal::vp_sort<T>::result;
     template <typename T> using Rsort = reverse< sort<T> >;
     template <typename T> using Usort = uniq< sort<T> >;
     template <typename T> using RUsort = reverse< Usort<T> >;
