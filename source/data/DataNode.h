@@ -26,7 +26,7 @@
 
 #include "../base/vector.h"
 #include "../base/assert.h"
-#include "../meta/IntPack.h"
+#include "../meta/ValPack.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/IndexMap.h"
 #include "../tools/string_utils.h"
@@ -62,8 +62,8 @@ namespace emp {
   };
 
 
-  /// A shortcut for converting DataNode mod ID's to IntPacks.
-  template <emp::data... MODS> using ModPack = emp::IntPack<(int) MODS...>;
+  /// A shortcut for converting DataNode mod ID's to ValPacks.
+  template <emp::data... MODS> using ModPack = emp::ValPack<(int) MODS...>;
 
   /// Extra info about data modules that we need to know before actually building this DataNode.
   /// (for now, just REQUISITES for each module.)
@@ -76,7 +76,7 @@ namespace emp {
 
   // A set of structs to collect and merge data module requisites.
   template <emp::data... MODS> struct DataModuleRequisiteAdd { };
-  template <> struct DataModuleRequisiteAdd<> { using type = IntPack<>; };
+  template <> struct DataModuleRequisiteAdd<> { using type = ValPack<>; };
   template <emp::data CUR_MOD, emp::data... MODS> struct DataModuleRequisiteAdd<CUR_MOD, MODS...> {
     using next_type = typename DataModuleRequisiteAdd<MODS...>::type;
     using this_req = typename DataModInfo<CUR_MOD>::reqs;
@@ -630,13 +630,13 @@ namespace emp {
 
   /// Outermost interface to all DataNode modules.
   template <typename VAL_TYPE, int... IMODS>
-  class DataNode_Interface<VAL_TYPE, IntPack<IMODS...>>
+  class DataNode_Interface<VAL_TYPE, ValPack<IMODS...>>
     : public DataNodeModule<VAL_TYPE, (emp::data) IMODS...> {
     using parent_t = DataNodeModule<VAL_TYPE, (emp::data) IMODS...>;
   };
 
   /// A template that will determing requisites, sort, make unique the data mods provided.
-  /// The final, sorted IntPack of the requisites plus originals is in 'sorted'.
+  /// The final, sorted ValPack of the requisites plus originals is in 'sorted'.
   template<emp::data... MODS>
   struct FormatDataMods {
     using reqs = typename DataModuleRequisiteAdd<MODS...>::type;    ///< Identify requisites
