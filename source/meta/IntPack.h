@@ -6,9 +6,6 @@
  *  @file  IntPack.h
  *  @brief A set of integers that can be manipulated at compile time (good for metaprogramming)
  *
- *  These objects are able to measure a specific trait on another object.  They
- *  (will eventually) interface smoothly with DataNodes for data collection.
- *
  *  @todo Shift to ValPack where the type is specified and then the values; specialize as IntPack.
  */
 
