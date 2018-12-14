@@ -71,4 +71,9 @@ int main()
   EMP_PRINT_PACK(emp::pack::Usort<test_t>);
   EMP_PRINT_PACK(emp::pack::Rsort<test_t>);
   EMP_PRINT_PACK(emp::pack::RUsort<test_t>);
+
+  // Try out ValPAck with doubles...
+  using t2 = emp::ValPack<'t','e','s','t','i','n','g','!'>;
+  EMP_PRINT_PACK(t2);
+  std::cout << "As string: " << t2::ToString() << std::endl;
 }
