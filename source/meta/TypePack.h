@@ -60,7 +60,7 @@
  *
  *
  *  Developer notes:
- *    - GetIDPack could return an IntPack of ALL ID's for a type that appears more than once.
+ *    - GetIDPack could return an ValPack of ALL ID's for a type that appears more than once.
  */
 
 #ifndef EMP_TYPE_PACK_H
