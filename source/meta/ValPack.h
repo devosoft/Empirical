@@ -110,7 +110,7 @@ namespace emp {
     template <> struct vp_sort<ValPack<>> { using result = ValPack<>; };
   } // End internal namespace
 
-  // Generate an IntPack with a specified range of values.
+  // Generate a ValPack with a specified range of values.
   template <auto START, auto END, auto STEP=1>
   using ValPackRange = typename internal::vp_range<(START >= END), START, END, STEP>::type;
 
