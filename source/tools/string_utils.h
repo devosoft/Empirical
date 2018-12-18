@@ -17,7 +17,9 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <unordered_set>
 
+#include "../base/Ptr.h"
 #include "../base/vector.h"
 #include "../meta/reflection.h"
 
@@ -552,6 +554,23 @@ namespace emp {
     return vals;
   }
 
+
+  /// A small class for maintaining unique string IDs.
+  class StringID {
+  private:
+    emp::Ptr<const std::string> str_ptr;   /// Pointer to a unique instance of this string.
+
+    static auto & GetStringSet() { 
+      static std::unordered_set< std::string > str_set;
+      return str_set;
+    }
+  public:
+    StringID(const StringID &) = default;
+    StringID(const std::string & in_string) {
+      auto [str_it, success] = GetStringSet().insert(in_string);
+      str_ptr = &(*str_it);
+    }
+  };
 }
 
 #endif
