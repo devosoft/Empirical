@@ -570,6 +570,8 @@ namespace emp {
       auto [str_it, success] = GetStringSet().insert(in_string);
       str_ptr = &(*str_it);
     }
+
+    const std::string & ToString() const { return *str_ptr; }
   };
 }
 
