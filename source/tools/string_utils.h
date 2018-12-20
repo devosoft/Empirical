@@ -571,6 +571,7 @@ namespace emp {
       str_ptr = &(*str_it);
     }
 
+    size_t ToValue() const { return (size_t) str_ptr; }
     const std::string & ToString() const { return *str_ptr; }
   };
 }
