@@ -573,6 +573,19 @@ namespace emp {
 
     size_t ToValue() const { return (size_t) str_ptr; }
     const std::string & ToString() const { return *str_ptr; }
+
+    /// Get a StringID based on a StringType or another type with a 
+    /// static ToString() member function.
+    template <typename T>
+    static StringID Get() {
+      static StringID out(T::ToString());
+      return out;
+    }
+
+    /// Get a StringID based on a string (for completeness; this is the same as the constructor.)
+    static StringID Get(const std::string & str) {
+      return StringID(str);
+    }
   };
 }
 
