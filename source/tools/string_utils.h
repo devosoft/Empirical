@@ -24,6 +24,10 @@
 #include "../meta/reflection.h"
 #include "../meta/StringType.h"
 
+/// Macro to covert a literal string to a unique ID, mostly at compile time.  Specifically,
+/// the string is converted to a unique type at compile time, which is then mapped to a unique
+/// function.  That function is run a run-time, but preserves the id to return so it is
+/// calculated only once.
 #define EMP_STRING_ID(STR)                         \
   [](){                                            \
     constexpr auto temp = EMP_TEXT_PACK(MSG);      \
