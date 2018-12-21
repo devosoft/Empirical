@@ -22,7 +22,13 @@
 #include "../base/Ptr.h"
 #include "../base/vector.h"
 #include "../meta/reflection.h"
+#include "../meta/StringType.h"
 
+#define EMP_STRING_ID(STR)                         \
+  [](){                                            \
+    constexpr auto temp = EMP_TEXT_PACK(MSG);      \
+    return emp::StringID::Get<decltype(temp)>();   \
+  }()
 namespace emp {
 
   /// Return a const reference to an empty string.  This function is useful to implement other
