@@ -19,6 +19,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../../source/tools/string_utils.h"
+
 constexpr size_t NUM_ENTRIES = 10000;
 constexpr size_t LONG_STR_SIZE = 40;
 constexpr size_t EVAL_STEPS = 10000000;
