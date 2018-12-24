@@ -21,6 +21,8 @@
 
 #include "../../source/tools/string_utils.h"
 
+using emp::StringID;
+
 constexpr size_t NUM_ENTRIES = 10000;
 constexpr size_t LONG_STR_SIZE = 40;
 constexpr size_t EVAL_STEPS = 10000000;
@@ -67,14 +69,16 @@ int main()
   std::unordered_map<std::string, int> long_strings;
   std::unordered_map<double, int> float_ids;
   std::vector<int> vector_index(NUM_ENTRIES);
+  std::unordered_map<size_t, int> emp_string_ids;
 
   // Fill out the maps.
-  for (int i = 0; i < NUM_ENTRIES; i++) {
+  for (size_t i = 0; i < NUM_ENTRIES; i++) {
     int_ids[i] = i;
     short_strings[ToStringID(i)] = i;
     long_strings[ToLongStringID(i)] = i;
     float_ids[ToFloatID(i)] = i;
     vector_index[i] = i;
+    emp_string_ids[StringID(ToStringID(i)).ToValue()] = i;
   }
 
   std::cout << "Starting tests!" << std::endl;
@@ -104,4 +108,14 @@ int main()
     }
     return val1;
   });
+
+  TimeFun("Empirical StringIDs     ", [&emp_string_ids]() {
+    for (size_t i = 0; i < EVAL_STEPS; i++) {
+      emp_string_ids[EMP_STRING_ID("42").ToValue()] += emp_string_ids[EMP_STRING_ID("100").ToValue()];
+      emp_string_ids[EMP_STRING_ID("1000").ToValue()] -= emp_string_ids[EMP_STRING_ID("100").ToValue()];
+      emp_string_ids[EMP_STRING_ID("100").ToValue()] = emp_string_ids[EMP_STRING_ID("1000").ToValue()] / 2 + 1000;
+    }
+    return emp_string_ids[EMP_STRING_ID("42").ToValue()];
+  });
+
 }
