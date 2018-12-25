@@ -29,10 +29,10 @@
 /// function.  That function is run a run-time, but preserves the id to return so it is
 /// calculated only once.
 #define EMP_STRING_ID(STR)                         \
-  [](){                                            \
-    constexpr auto temp = EMP_TEXT_PACK(MSG);      \
+  ([](){                                           \
+    constexpr auto temp = EMP_TEXT_PACK(STR);      \
     return emp::StringID::Get<decltype(temp)>();   \
-  }()
+  }())
 namespace emp {
 
   /// Return a const reference to an empty string.  This function is useful to implement other
@@ -578,6 +578,7 @@ namespace emp {
     StringID(const StringID &) = default;
     StringID(const std::string & in_string) {
       auto [str_it, success] = GetStringSet().insert(in_string);
+      (void) success;           // Prevent unused variable error when not in debug mode.
       str_ptr = &(*str_it);
     }
 
