@@ -50,10 +50,10 @@
 
 /// Convert a literal string to a unique value (counting up from 0 with each string)
 #define EMP_TEXT_HASH(MSG)                           \
-  [](){                                              \
+  ([](){                                             \
     constexpr auto temp = EMP_TEXT_PACK(MSG);        \
     return emp::GetTypeValue<decltype(temp)>();      \
-  }()
+  }())
 
 
 namespace emp {
