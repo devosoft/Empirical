@@ -6,6 +6,10 @@
  *  @file StringMap.h
  *  @brief An std::map wrapper that deals smootly with strigns and fast compile-time optimizations.
  *  @note Status: ALPHA
+ * 
+ *  StringMap is setup to be a generic dictionary that can link strings to objects of any other
+ *  desginated type.  It is more powerful than std::map because it will accept strings wrapped in
+ *  the EMP_STRING_ID macro, which is hashed at compile-time instead of run-time.
  */
 
 
@@ -46,7 +50,7 @@ namespace emp {
       str_ptr = &(*str_it);
     }
 
-    size_t ToValue() const { return (size_t) str_ptr; }
+    size_t ToValue() const { return (size_t) str_ptr.Raw(); }
     const std::string & ToString() const { return *str_ptr; }
 
     /// Get a StringID based on a StringType or another type with a 
@@ -65,7 +69,24 @@ namespace emp {
 
 
   /// A class that wraps maps of strings to allow for effective optimizations.
-  
+  template <typename T>
+  class StringMap {
+  private:
+    std::unordered_map<size_t, T> str_map;
+  public:
+    StringMap() = default;
+    StringMap(const StringMap &) = default;
+    StringMap(StringMap &&) = default;
+
+    StringMap & operator=(const StringMap &) = default;
+    StringMap & operator=(StringMap &&) = default;
+
+    size_t size() { return str_map.size(); }
+
+    T & operator[](size_t id) { return str_map[id]; }
+    T & operator[](const StringID & str_id) { return str_map[str_id.ToValue()]; }
+    T & operator[](const std::string & str) { return str_map[StringID(str).ToValue()]; }
+  };
 }
 
 #endif
