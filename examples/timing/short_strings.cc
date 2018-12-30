@@ -19,7 +19,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../../source/tools/string_utils.h"
+#include "../../source/tools/StringMap.h"
 
 using emp::StringID;
 
@@ -109,7 +109,7 @@ int main()
     return val1;
   });
 
-  TimeFun("Empirical StringIDs     ", [&emp_string_ids]() {
+  TimeFun("emp::StringIDs  ", [&emp_string_ids]() {
     for (size_t i = 0; i < EVAL_STEPS; i++) {
       emp_string_ids[EMP_STRING_ID("42").ToValue()] += emp_string_ids[EMP_STRING_ID("100").ToValue()];
       emp_string_ids[EMP_STRING_ID("1000").ToValue()] -= emp_string_ids[EMP_STRING_ID("100").ToValue()];
