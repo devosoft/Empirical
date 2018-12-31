@@ -83,23 +83,7 @@ int main()
 
   std::cout << "Starting tests!" << std::endl;
 
-  RunTest<std::unordered_map<int, int>, int>                ("Numerical IDs   ", int_ids, ToIntID);
-  RunTest<std::unordered_map<std::string, int>, std::string>("Short-string IDs", short_strings, ToStringID);
-  RunTest<std::unordered_map<std::string, int>, std::string>("Long-string IDs ", long_strings, ToLongStringID);
-  RunTest<std::unordered_map<double, int>, double>          ("Floating-pnt IDs", float_ids, ToFloatID);
-  RunTest<std::vector<int>, int>                            ("Vector Indexing ", vector_index, ToIntID);
-
-
-  TimeFun("Literal IDs     ", [&short_strings]() {
-    for (size_t i = 0; i < EVAL_STEPS; i++) {
-      short_strings["42"] += short_strings["100"];
-      short_strings["1000"] -= short_strings["100"];
-      short_strings["100"] = short_strings["1000"] / 2 + 1000;
-    }
-    return short_strings["42"];
-  });
-
-  TimeFun("Direct Values   ", []() {
+  TimeFun("Direct Variables     ", []() {
     int val1 = 42, val2 = 100, val3 = 1000;
     for (size_t i = 0; i < EVAL_STEPS; i++) {
       val1 += val2;
@@ -109,7 +93,24 @@ int main()
     return val1;
   });
 
-  TimeFun("emp::StringIDs  ", [&emp_string_ids]() {
+  RunTest<std::vector<int>, int>                            ("Vector Indexing      ", vector_index, ToIntID);
+
+  RunTest<std::unordered_map<int, int>, int>                ("std::map<int> IDs    ", int_ids, ToIntID);
+  RunTest<std::unordered_map<std::string, int>, std::string>("map of short strings ", short_strings, ToStringID);
+  RunTest<std::unordered_map<std::string, int>, std::string>("map of long string   ", long_strings, ToLongStringID);
+  RunTest<std::unordered_map<double, int>, double>          ("map of doubles       ", float_ids, ToFloatID);
+
+
+  TimeFun("str map w/literal IDs", [&short_strings]() {
+    for (size_t i = 0; i < EVAL_STEPS; i++) {
+      short_strings["42"] += short_strings["100"];
+      short_strings["1000"] -= short_strings["100"];
+      short_strings["100"] = short_strings["1000"] / 2 + 1000;
+    }
+    return short_strings["42"];
+  });
+
+  TimeFun("emp::StringIDs       ", [&emp_string_ids]() {
     for (size_t i = 0; i < EVAL_STEPS; i++) {
       emp_string_ids[EMP_STRING_ID("42").ToValue()] += emp_string_ids[EMP_STRING_ID("100").ToValue()];
       emp_string_ids[EMP_STRING_ID("1000").ToValue()] -= emp_string_ids[EMP_STRING_ID("100").ToValue()];
