@@ -676,6 +676,7 @@ namespace emp {
                                      static_assert(false, "Unknown Config option: " #CMD);, ~)
 #define EMP_CONFIG__ARG_OKAY_VALUE(...) ~,
 #define EMP_CONFIG__ARG_OKAY_CONST(...) ~,
+#define EMP_CONFIG__ARG_OKAY_const(...) ~,
 #define EMP_CONFIG__ARG_OKAY_GROUP(...) ~,
 #define EMP_CONFIG__ARG_OKAY_ALIAS(...) ~,
 #define EMP_CONFIG__ARG_OKAY_ ~,
@@ -686,6 +687,7 @@ namespace emp {
 #define EMP_CONFIG__DECLARE(CMD) EMP_CONFIG__DECLARE_ ## CMD
 #define EMP_CONFIG__DECLARE_VALUE(NAME, TYPE, DEFAULT, DESC) TYPE m_ ## NAME;
 #define EMP_CONFIG__DECLARE_CONST(NAME, TYPE, DEFAULT, DESC)
+#define EMP_CONFIG__DECLARE_const(NAME, TYPE, DEFAULT, DESC)
 #define EMP_CONFIG__DECLARE_GROUP(NAME, DESC)
 #define EMP_CONFIG__DECLARE_ALIAS(NAME)
 #define EMP_CONFIG__DECLARE_
@@ -694,6 +696,7 @@ namespace emp {
 #define EMP_CONFIG__CONSTRUCT(CMD) EMP_CONFIG__CONSTRUCT_ ## CMD
 #define EMP_CONFIG__CONSTRUCT_VALUE(NAME, TYPE, DEFAULT, DESC) , m_ ## NAME(DEFAULT)
 #define EMP_CONFIG__CONSTRUCT_CONST(NAME, TYPE, DEFAULT, DESC)
+#define EMP_CONFIG__CONSTRUCT_const(NAME, TYPE, DEFAULT, DESC)
 #define EMP_CONFIG__CONSTRUCT_GROUP(NAME, DESC)
 #define EMP_CONFIG__CONSTRUCT_ALIAS(NAME)
 #define EMP_CONFIG__CONSTRUCT_
@@ -701,10 +704,13 @@ namespace emp {
 // Macros to initialize internal representation of variables.
 #define EMP_CONFIG__INIT(CMD) EMP_CONFIG__INIT_ ## CMD
 #define EMP_CONFIG__INIT_VALUE(NAME, TYPE, DEFAULT, DESC)                               \
-  var_map[#NAME] = new tConfigEntry<TYPE>(#NAME, #TYPE, #DEFAULT, DESC, m_ ## NAME);  \
+  var_map[#NAME] = new tConfigEntry<TYPE>(#NAME, #TYPE, #DEFAULT, DESC, m_ ## NAME);    \
   GetActiveGroup()->Add(var_map[#NAME]);
 #define EMP_CONFIG__INIT_CONST(NAME, TYPE, VALUE, DESC)                                 \
-  var_map[#NAME] = new tConfigConstEntry<TYPE>(#NAME, #TYPE, #VALUE, DESC, VALUE);    \
+  var_map[#NAME] = new tConfigConstEntry<TYPE>(#NAME, #TYPE, #VALUE, DESC, VALUE);      \
+  GetActiveGroup()->Add(var_map[#NAME]);
+#define EMP_CONFIG__INIT_const(NAME, TYPE, VALUE, DESC)                                 \
+  var_map[#NAME] = new tConfigConstEntry<TYPE>(#NAME, #TYPE, #VALUE, DESC, VALUE);      \
   GetActiveGroup()->Add(var_map[#NAME]);
 #define EMP_CONFIG__INIT_GROUP(NAME, DESC)                                              \
   group_set.push_back(new ConfigGroup(#NAME, DESC));
@@ -727,6 +733,7 @@ namespace emp {
     return VALUE;                                                               \
   }                                                                             \
   bool NAME ## _is_const() const { return true; }
+#define EMP_CONFIG__ACCESS_const(NAME, TYPE, VALUE, DESC) EMP_CONFIG__ACCESS_CONST(NAME, TYPE, VALUE, DESC)
 #define EMP_CONFIG__ACCESS_GROUP(NAME, DESC)
 #define EMP_CONFIG__ACCESS_ALIAS(NAME)
 #define EMP_CONFIG__ACCESS_
