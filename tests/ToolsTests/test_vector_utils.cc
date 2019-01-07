@@ -66,9 +66,17 @@ TEST_CASE("Test vector_utils", "[tools]")
 	REQUIRE(v_d2.at(0) == 20.0);
 	REQUIRE(v_d2.at(1) == 10.0);
 	REQUIRE(v_d2.at(2) == 5.0);
+  
+  // Heapify should change nothing
+  emp::vector<double> v_d3 = emp::Slice(v_d2, 0, 2);
+  emp::Heapify(v_d3);
+  REQUIRE(v_d2.at(0) == 20.0);
+	REQUIRE(v_d2.at(1) == 10.0);
 	
 	// HeapExtract
-	REQUIRE(emp::HeapExtract(v_d2) == 20.0);
+	REQUIRE(emp::HeapExtract(v_d3) == 20.0);
+	REQUIRE(emp::HeapExtract(v_d3) == 10.0);
+	REQUIRE(v_d3.size() == 0);
 	
 	// HeapInsert
 	emp::HeapInsert(v_d2, 35.0);

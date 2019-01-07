@@ -274,6 +274,15 @@ void test_conversions(){
 	REQUIRE(bs.Get(0));
 }
 
+/**
+ * Mask
+ */
+void test_mask(){
+	emp::BitMatrix<5,10> bm;
+  emp::BitSet<50> bs = bm.Mask<0,1,10>();
+  REQUIRE(bs.size() == (5*10));
+}
+
 TEST_CASE("Test BitMatrix", "[tools]")
 {
 	test_matrix();
@@ -294,4 +303,5 @@ TEST_CASE("Test BitMatrix", "[tools]")
 	test_comparisons();
 	test_logic();
 	test_conversions();
+  test_mask();
 }

@@ -19,11 +19,12 @@ TEST_CASE("Test combos", "[tools]")
   for(size_t i=0;i<cid.GetComboSize();i++){
     REQUIRE(cid.GetMaxCombo()[i] == first_max_combo+i);
   }
+  const size_t zero = cid[0];
   
   // stepping through combos
-  REQUIRE((cid.GetCombo()[0] == 0));
-  REQUIRE((cid.GetCombo()[1] == 1));
-  REQUIRE((cid.GetCombo()[2] == 2));
+  REQUIRE((cid[0] == 0));
+  REQUIRE((cid[1] == 1));
+  REQUIRE((cid[2] == 2));
   cid++;
   REQUIRE((cid.GetCombo()[0] == 0));
   REQUIRE((cid.GetCombo()[1] == 1));
