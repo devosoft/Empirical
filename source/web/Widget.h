@@ -286,10 +286,8 @@ namespace web {
       virtual Widget Append(const Font & font) { return ForwardAppend(font); }
 
       // Convert arbitrary inputs to a string and try again!
-      virtual Widget Append(char in_char) { return Append(emp::to_string(in_char)); }
-      virtual Widget Append(double in_num) { return Append(emp::to_string(in_num)); }
-      virtual Widget Append(int in_num) { return Append(emp::to_string(in_num)); }
-      virtual Widget Append(uint32_t in_num) { return Append(emp::to_string(in_num)); }
+      template <typename T>
+      Widget Append(T val) { return Append(emp::to_string(val)); }
 
       // Handle special commands
       virtual Widget Append(const emp::web::internal::WidgetCommand & cmd) {
