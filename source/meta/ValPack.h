@@ -154,13 +154,16 @@ namespace emp {
     /// ---=== Member Functions ===---
 
     /// Return wheter an ValPack contains the value V.
-    constexpr static bool Has(auto V) { return (V==V1) | pop::Has(V); }
+    template <typename T>
+    constexpr static bool Has(T val) { return (val==V1) | pop::Has(val); }
 
     /// Count the number of occurances of value V in ValPack.
-    constexpr static size_t Count(auto V) { return pop::Count(V) + (V==V1); }
+    template <typename T>
+    constexpr static size_t Count(T val) { return pop::Count(val) + (val==V1); }
 
     /// Determine the position at which V appears in ValPack.
-    constexpr static int GetID(auto V) { return (V==V1) ? 0 : (1+pop::GetID(V)); }
+    template <typename T>
+    constexpr static int GetID(T val) { return (val==V1) ? 0 : (1+pop::GetID(val)); }
 
     /// Function to retrieve number of elements in ValPack
     constexpr static size_t GetSize() { return SIZE; }
@@ -178,13 +181,15 @@ namespace emp {
     constexpr static auto Product() { return V1 * pop::Product(); }
 
     /// Find the smallest value in an ValPack, to a maximum of cap.
-    constexpr static auto Min(auto cap) { return cap < pop::Min(V1) ? cap : pop::Min(V1); }
+    template <typename T>
+    constexpr static auto Min(T cap) { return cap < pop::Min(V1) ? cap : pop::Min(V1); }
 
     /// Find the overall smallest value in an ValPack
     constexpr static auto Min() { return pop::Min(V1); }
 
     /// Find the maximum value in an ValPack, to a minimum of floor.
-    constexpr static auto Max(auto floor) { return floor > pop::Max(V1) ? floor : pop::Max(V1); }
+    template <typename T>
+    constexpr static auto Max(T floor) { return floor > pop::Max(V1) ? floor : pop::Max(V1); }
 
     /// Find the overall maximum value in an ValPack.
     constexpr static auto Max() { return pop::Max(V1); }
@@ -220,9 +225,12 @@ namespace emp {
     template <auto V> using remove = ValPack<>;
     template <typename T> using append = T;
 
-    constexpr static bool Has(auto) { return false; }
-    constexpr static size_t Count(auto) { return 0; }
-    constexpr static int GetID(auto V) { return -100000; }
+    template <typename T>
+    constexpr static bool Has(T) { return false; }
+    template <typename T>
+    constexpr static size_t Count(T) { return 0; }
+    template <typename T>
+    constexpr static int GetID(T) { return -100000; }
 
     constexpr static size_t SIZE = 0;
     constexpr static size_t GetSize() { return 0; }
@@ -232,8 +240,10 @@ namespace emp {
 
     constexpr static double Sum() { return 0.0; }
     constexpr static double Product() { return 1.0; }
-    constexpr static auto Min(auto cap) { return cap; }
-    constexpr static auto Max(auto floor) { return floor; }
+    template <typename T>
+    constexpr static auto Min(T cap) { return cap; }
+    template <typename T>
+    constexpr static auto Max(T floor) { return floor; }
 
     static std::string ToString() { return ""; }
 
