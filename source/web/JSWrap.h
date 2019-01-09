@@ -68,45 +68,8 @@ int EMP_GetCBArgCount() { return -1; }
 
 namespace emp {
 
-  /// Helper functions to individually LOAD ARGUMENTS from JS based on expected type.
-  template <int ARG_ID> static void LoadArg(int16_t & arg_var) {
-    arg_var = (int16_t) EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
-  }
-
-  template <int ARG_ID> static void LoadArg(int32_t & arg_var) {
-    arg_var = (int32_t) EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
-  }
-
-  template <int ARG_ID> static void LoadArg(int64_t & arg_var) {
-    arg_var = (int64_t) EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, ARG_ID);
-  }
-
-  template <int ARG_ID> static void LoadArg(uint16_t & arg_var) {
-    arg_var = (uint16_t) EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
-  }
-
-  template <int ARG_ID> static void LoadArg(uint32_t & arg_var) {
-    arg_var = (uint32_t) EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
-  }
-
-  template <int ARG_ID> static void LoadArg(uint64_t & arg_var) {
-    arg_var = (uint64_t) EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, ARG_ID);
-  }
-
-  template <int ARG_ID> static void LoadArg(bool & arg_var) {
-    arg_var = (bool) EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
-  }
-
-  template <int ARG_ID> static void LoadArg(char & arg_var) {
-    arg_var = (char) EM_ASM_INT({ return emp_i.cb_args[$0]; }, ARG_ID);
-  }
-
-  template <int ARG_ID> static void LoadArg(double & arg_var) {
-    arg_var = EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, ARG_ID);
-  }
-
-  template <int ARG_ID> static void LoadArg(float & arg_var) {
-    arg_var = (float) EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, ARG_ID);
+  template <int ARG_ID, typename T> static void LoadArg(T & arg_var) {
+    arg_var = (T) EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, ARG_ID);
   }
 
   template <int ARG_ID> static void LoadArg(std::string & arg_var) {
