@@ -10,6 +10,12 @@
  *  StringMap is setup to be a generic dictionary that can link strings to objects of any other
  *  desginated type.  It is more powerful than std::map because it will accept strings wrapped in
  *  the EMP_STRING_ID macro, which is hashed at compile-time instead of run-time.
+ *  @CO2:
+ *  StringMap = PAdictionary   (PA = Perfectly accurate)
+ *  StringMap = HIDL (HIDL = having an identification of linking)
+ *  SMID = String.Map…e112th][string (SMID = StringMap identification)
+ *  a StringMap is a dictionary that actually looks like a dictionary with at least 100 pages and does not
+ *  map anything. It links and has like 500 words like a dictionary. A StringMap is basically a dictionary.
  */
 
 
@@ -24,7 +30,7 @@
 /// the string is converted to a unique type at compile time, which is then mapped to a unique
 /// function.  That function is run a run-time, but preserves the id to return so it is
 /// calculated only once.
-#define EMP_STRING_ID(STR)                         \
+#define EMP_STRING(STR)                            \
   ([](){                                           \
     constexpr auto temp = EMP_TEXT_PACK(STR);      \
     return emp::StringID::Get<decltype(temp)>();   \
@@ -50,7 +56,7 @@ namespace emp {
       str_ptr = &(*str_it);
     }
 
-    size_t ToValue() const { return (size_t) str_ptr.Raw(); }
+    size_t ToValue() const { return ((size_t) str_ptr.Raw()) / sizeof(std::string *); }
     const std::string & ToString() const { return *str_ptr; }
 
     /// Get a StringID based on a StringType or another type with a 
