@@ -4,7 +4,7 @@ TEST_NAMES = assert base constexpr data evo geometry meta scholar systematics to
 
 FLAGS = -std=c++17 -Wall -Wno-unused-function -I../source/ -I../
 #CXX = clang++
-CXX = g++-8
+CXX = g++
 
 default: test
 

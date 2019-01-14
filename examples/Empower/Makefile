@@ -4,7 +4,7 @@ CFLAGS_version := -std=c++17
 
 # Emscripten compiler information
 CXX_web := emcc
-CXX_native := g++-8
+CXX_native := g++
 #CXX_native := g++
 #CXX_native := clang++
 
