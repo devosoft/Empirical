@@ -6,6 +6,7 @@
 #include "base/vector.h"
 
 #include <sstream>
+#include <map>
 
 TEST_CASE("Test BitVector", "[tools]")
 {
@@ -26,6 +27,14 @@ TEST_CASE("Test BitVector", "[tools]")
 	emp::BitVector bv1(10);
 	bv1 = bv;
 	REQUIRE(bv1.Get(0));
+	emp::BitVector bv20(20);
+	emp::BitVector bv30(30);
+	bv20.Set(1);
+	REQUIRE(bv20.Get(1));
+	bv20 = bv;
+	REQUIRE(!bv20.Get(1));
+	bv20 = bv30;
+	REQUIRE(!bv20.Get(1));
 	
 	// Resize
 	bv1.Set(9);
@@ -41,6 +50,7 @@ TEST_CASE("Test BitVector", "[tools]")
 	bv1.Resize(10);
 	REQUIRE((bv1 == bv));
 	REQUIRE((bv1 >= bv));
+	REQUIRE((bv1 <= bv));
 	bv.Set(1);
 	REQUIRE((bv > bv1));
 	REQUIRE((bv >= bv1));
@@ -140,4 +150,109 @@ TEST_CASE("Test BitVector", "[tools]")
 	REQUIRE((bv3.GetByte(0) == 2));
 	bv3 <<= 4;
 	REQUIRE((bv3.GetByte(0) == 32));
+	
+	// Hash (Maps and sets use hash function?)
+	emp::BitVector bv_a(2);
+	bv_a.Set(0);
+	emp::BitVector bv_b(2);
+	bv_b.Set(0);
+	REQUIRE(bv_a.Hash() == bv_b.Hash());
+	bv_b.Set(0, false);
+	REQUIRE(bv_a.Hash() != bv_b.Hash());
+	bv_b.Set(0, true);
+	
+	// EQU_SELF
+	REQUIRE(bv_a.EQU_SELF(bv_b).all());
+	// bv_a = 01, bv_b = 01, ~(01 ^ 01) = 11
+	REQUIRE(bv_a.GetByte(0) == 3);
+	REQUIRE(bv_b.GetByte(0) == 1);
+	REQUIRE(!(bv_a.EQU_SELF(bv_b).all()));
+	// bv_a = 11, bv_b = 01, ~(11 ^ 01) = 01
+	REQUIRE(bv_a.GetByte(0) == 1);
+	REQUIRE(bv_b.GetByte(0) == 1);
+	
+	// NAND SELF
+	// bv_a = 01, bv_b = 01, ~(01 & 01) = 10
+	REQUIRE(bv_a.NAND_SELF(bv_b) == ~bv_b);
+	REQUIRE(bv_a.GetByte(0) == 2);
+	
+	// NOR SELF
+	// bv_a = 10, bv_b = 01, ~(10 | 01) = 00
+	REQUIRE(bv_a.NOR_SELF(bv_b).none());
+	REQUIRE(bv_a.GetByte(0) == 0);
+	
+	// NOT SELF
+	REQUIRE(bv_a.NOT_SELF() == ~bv_a);
+	REQUIRE(bv_a.all());
+
+	// EQU
+	emp::BitVector bv_c(3);
+	bv_c.SetByte(0,2);
+	emp::BitVector bv_d(3);
+	bv_d.SetByte(0,2);
+	REQUIRE(bv_c.EQU(bv_d).all());
+	REQUIRE(bv_c.GetByte(0) == 2);
+	
+	// NAND
+	REQUIRE(bv_c.NAND(bv_d) == ~bv_c);
+	REQUIRE(bv_c.GetByte(0) == 2);
+	
+	// NOR
+	REQUIRE(bv_c.NOR(bv_d) == ~bv_c);
+	REQUIRE(bv_c.GetByte(0) == 2);
+	
+	// Bit proxy compound assignment operators
+	// AND
+	// bv_c = 010
+	bv_c[0] &= 1;
+	REQUIRE(bv_c[0] == 0);
+	REQUIRE(bv_c[1] == 1);
+	bv_c[1] &= 0;
+	REQUIRE(bv_c[1] == 0);
+	// OR
+	// bv_d = 010
+	bv_d[1] |= 0;
+	REQUIRE(bv_d[1] == 1);
+	bv_d[0] |= 1;
+	REQUIRE(bv_d[0] == 1);
+	bv_d[2] |= 0;
+	REQUIRE(bv_d[2] == 0);
+	// XOR
+	// bv_c = 000
+	bv_c[0] ^= 1;
+	REQUIRE(bv_c[0] == 1);
+	bv_c[0] ^= 1;
+	REQUIRE(bv_c[0] == 0);
+	//PLUS
+	// bv_d = 011
+	bv_d[2] += 1;
+	REQUIRE(bv_d[2] == 1);
+	// MINUS
+	// bv_d = 111
+	bv_d[1] -= 1;
+	REQUIRE(bv_d[1] == 0);
+	// TIMES
+	//bv_d = 101
+	bv_d[2] *= 1;
+	REQUIRE(bv_d[2] == 1);
+	bv_d[0] *= 0;
+	REQUIRE(bv_d[0] == 0);
+	// DIV
+	// bv_c = 000
+	bv_c[0] /= 1;
+	REQUIRE(bv_c[0] == 0);
+	
+	// GetUInt SetUInt
+	emp::BitVector bv_e(5);
+	bv_e.SetUInt(0, 16);
+	REQUIRE(bv_e.GetUInt(0) == 16);
+	
+	// Shift Left
+	emp::BitVector bv_f(128);
+	bv_f.SetAll();
+	REQUIRE(bv_f.all());
+	bv_f <<= 127;
+	REQUIRE(bv_f.count() == 1);
+	bv_f <<= 1;
+	REQUIRE(bv_f.none());
 }

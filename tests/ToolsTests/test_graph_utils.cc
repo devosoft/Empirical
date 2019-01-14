@@ -59,12 +59,69 @@ TEST_CASE("Test graph_utils", "[tools]")
 	REQUIRE(gru.GetEdgeCount() == 14);
 	
 	// build_graph_clique_set - this one confuses me
-	//emp::Graph gcs = build_graph_clique_set(2, 2, random);
-	//gcs.PrintSym();
+	//emp::Graph gcs = build_graph_clique_set(1, 3, random);
+	//gcs.PrintDirected();
+	
+	// build graph dag
+	/// this doesn't really create DAGs right?
+	/// if its supposed to be acyclic, test for that.
+	emp::Graph gd = build_graph_dag(4, 3, random, true);
+	REQUIRE(gd.GetSize() == 4);
+	//REQUIRE(gd.GetEdgeCount() == 3); // edge count never seems to be accurate?
 	
 	
+	double max_wght = 5.0;
+	double min_wght = 1.0;
 	
+	// build weighted graph tree
+	emp::WeightedGraph wgt = build_weighted_graph_tree(4, min_wght, max_wght, random);
+	REQUIRE(wgt.GetSize() == 4);
+	// ensure weights within range
+	for(size_t i=0;i<wgt.GetSize();i++){
+		for(size_t j=0;j<wgt.GetSize();j++){
+			if(wgt.HasEdge(i,j)){
+				double wght = wgt.GetWeight(i,j);
+				REQUIRE((wght < max_wght));
+				REQUIRE((wght >= min_wght));
+			}
+		}
+	}
 	
+	// build weighted graph random
+	emp::WeightedGraph wgr = build_weighted_graph_random(4, 4, min_wght, max_wght, random, true);
+	REQUIRE(wgr.GetSize() == 4);
+	// doesn't ensure edge count is 4?
+	// ensure weights within range
+	for(size_t i=0;i<wgr.GetSize();i++){
+		for(size_t j=0;j<wgr.GetSize();j++){
+			if(wgr.HasEdge(i,j)){
+				double wght = wgr.GetWeight(i,j);
+				REQUIRE((wght < max_wght));
+				REQUIRE((wght >= min_wght));
+			}
+		}
+	}
+	
+	// load graph sym from input stream
+	std::stringstream ss;
+	ss << "4 3\n0 1\n2 3\n0 3\n";
+	emp::Graph load_gs = emp::load_graph_sym(ss);
+	REQUIRE(load_gs.GetSize() == 4);
+	REQUIRE(load_gs.GetEdgeCount() == 6);
+	REQUIRE(load_gs.HasEdge(0,1));
+	REQUIRE(load_gs.HasEdge(2,3));
+	REQUIRE(load_gs.HasEdge(0,3));
+	REQUIRE(!load_gs.HasEdge(1,2));
+	
+	// load graph table from input stream
+	std::stringstream ss2;
+	ss2 << "3 0 1 0 1 0 0 0 0 1";
+	emp::Graph load_gt = emp::load_graph_table(ss2);
+	REQUIRE(load_gt.GetSize() == 3);
+	REQUIRE(load_gt.GetEdgeCount() == 3);
+	REQUIRE(load_gt.HasEdgePair(0,1));
+	REQUIRE(load_gt.HasEdge(2,2));
+	REQUIRE(!load_gt.HasEdge(0,0));
 	
 	
 	
