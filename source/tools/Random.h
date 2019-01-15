@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2018
+ *  @date 2015-2019
  *
  *  @file  Random.h
  *  @brief A versatile and non-patterned pseudo-random-number generator.
@@ -24,14 +24,14 @@ namespace emp {
   ///  A versatile and non-patterned pseudo-random-number generator (Mersenne Twister).
   class Random {
   protected:
-    int seed;           ///< Current random number seed.
-    int original_seed;  ///< Orignal random number seed when object was first created.
-    int inext;          ///< First position in use in internal state.
-    int inextp;         ///< Second position in use in internal state.
-    int ma[56];         ///< Internal state of RNG
+    int seed = 0;          ///< Current random number seed.
+    int original_seed = 0; ///< Orignal random number seed when object was first created.
+    int inext = 0;         ///< First position in use in internal state.
+    int inextp = 0;        ///< Second position in use in internal state.
+    int ma[56];            ///< Internal state of RNG
 
     // Members & functions for stat functions
-    double expRV; // Exponential Random Variable for the randNormal function
+    double expRV = 0.0;    ///< Exponential Random Variable for the randNormal function
 
     // Constants ////////////////////////////////////////////////////////////////
     // Statistical Approximation
@@ -95,7 +95,7 @@ namespace emp {
      * random number generator gets its seed from a combination of the actual system time and
      * the memory position of the random number generator.
      **/
-    Random(const int _seed = -1) : seed(0), original_seed(0), inext(0), inextp(0), expRV(0) {
+    Random(const int _seed = -1) {
       for (int i = 0; i < 56; ++i) ma[i] = 0;
       ResetSeed(_seed);  // Calls init()
     }
