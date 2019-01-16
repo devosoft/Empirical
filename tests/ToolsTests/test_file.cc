@@ -66,11 +66,11 @@ TEST_CASE("Test File", "[tools]")
 	REQUIRE(fp.front() == "This is the next line....");
 	
 	// operator!=
-	REQUIRE(fp2 != fp);
+	REQUIRE( (fp2 != fp) );
 	
 	// operator==
 	fp2 = fp;
-	REQUIRE(fp2 == fp);
+	REQUIRE( (fp2 == fp) );
 	
 	// Write (ostream)
 	std::ostringstream oss;

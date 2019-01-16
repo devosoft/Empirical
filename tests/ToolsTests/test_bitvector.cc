@@ -182,8 +182,7 @@ TEST_CASE("Test BitVector", "[tools]")
 	REQUIRE(bv_a.GetByte(0) == 0);
 	
 	// NOT SELF
-	REQUIRE(bv_a.NOT_SELF() == ~bv_a);
-	REQUIRE(bv_a.all());
+	REQUIRE(bv_a.NOT_SELF().all());
 
 	// EQU
 	emp::BitVector bv_c(3);
