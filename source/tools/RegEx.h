@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2019
  *
  *  @file  RegEx.h
  *  @brief Basic regular expression handler.
@@ -58,11 +58,11 @@ namespace emp {
     using opts_t = BitSet<NUM_SYMBOLS>;
     std::string regex;                         ///< Original string to define this RegEx.
     emp::vector<std::string> notes;            ///< Any warnings or errors would be provided here.
-    bool valid;                                ///< Set to false if regex cannot be processed.
-    size_t pos;                                ///< Position being read in regex.
+    bool valid = true;                         ///< Set to false if regex cannot be processed.
+    size_t pos = 0;                            ///< Position being read in regex.
 
     mutable DFA dfa;                           ///< DFA that this RegEx translates to.
-    mutable bool dfa_ready;                    ///< Is the dfa ready? (or does it need to be generated?)
+    mutable bool dfa_ready = false;            ///< Is the dfa ready? (or does it need to be generated?)
 
     template <typename... T>
     void Error(T &&... args) {
@@ -454,13 +454,11 @@ namespace emp {
 
   public:
     RegEx() = delete;
-    RegEx(const std::string & r)
-    : regex(r), notes(), valid(true), pos(0), dfa(), dfa_ready(false), head() {
+    RegEx(const std::string & r) : regex(r), dfa(), head() {
       Process(ToPtr(&head));
       while(head.Simplify());
     }
-    RegEx(const RegEx & r)
-    : regex(r.regex), notes(), valid(true), pos(0), dfa(), dfa_ready(false), head() {
+    RegEx(const RegEx & r) : regex(r.regex), dfa(), head() {
       Process(ToPtr(&head));
       while(head.Simplify());
     }
