@@ -116,9 +116,26 @@ namespace emp {
     }
 
     /// Get the degree of a specified node.
+    /// For directed graphs, this is the out-degree
     size_t GetDegree(size_t id) const {
       emp_assert(id < nodes.size());
       return nodes[id].GetDegree();
+    }
+
+    /// Get the in-degree (number of incoming edges)
+    /// of the node @param id. 
+    /// This should only be used for directed graphs (for
+    /// undirected graphs, GetDegree() is equivalent and faster) 
+    size_t GetInDegree(size_t id) const {
+      size_t count = 0;
+      for (auto & node : nodes) {
+        // Node is allowed to to have edge to itself so it's
+        // okay that we don't exclude it
+        if (node.HasEdge(id)) {
+          count++;
+        }
+      }
+      return count;
     }
 
     /// Get how many of a set of nodes that a specified node is connected to.

@@ -870,7 +870,7 @@ namespace emp {
     if (pos.IsActive()) { before_placement_sig.Trigger(*new_org, pos.GetIndex()); }
 
     for (Ptr<SystematicsBase<ORG> > s : systematics) {
-      s->SetNextParent((int) p_pos.GetIndex());
+      s->SetNextParent(p_pos);
     }
 
     // Clear out any old organism at this position.

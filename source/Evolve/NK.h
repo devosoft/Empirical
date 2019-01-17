@@ -141,6 +141,20 @@ namespace emp {
       return total;
     }
 
+    /// Get the fitness of a site in a bitstring (pass by value so can be modified.)
+    double GetFitness(size_t n, BitVector genome) const {
+      emp_assert(genome.GetSize() == N, genome.GetSize(), N);
+
+      // Use a double-length genome to easily handle wrap-around.
+      genome.Resize(N*2);
+      genome |= (genome << N);
+
+      size_t mask = emp::MaskLow<size_t>(K+1);
+      const size_t cur_val = (genome >> n).GetUInt(0) & mask;
+	    return GetFitness(n, cur_val);
+    }
+
+
     void SetState(size_t n, size_t state, double in_fit) { landscape[n][state] = in_fit; }
 
     void RandomizeStates(Random & random, size_t num_states=1) {

@@ -60,7 +60,7 @@ namespace emp {
     };
 
     template <typename ORG>
-    void ResourceSelect(World<ORG> & world, const emp::vector< std::function<double(const ORG &)> > & extra_funs,
+    void ResourceSelect(World<ORG> & world, emp::vector< std::function<double(ORG &)> > & extra_funs,
                    emp::vector<emp::Resource> & pools, size_t t_size, size_t tourny_count=1, double frac = .0025, double max_bonus = 5, double cost = 0, bool use_base = true) {
 
        emp_assert(world.GetFitFun(), "Must define a base fitness function");
