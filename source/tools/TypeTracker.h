@@ -110,7 +110,7 @@ namespace emp {
 
   public:
     // Constructors!
-    TypeTracker() : fun_map() { ; }
+    TypeTracker() = default;
     TypeTracker(const TypeTracker &) = default;
     TypeTracker(TypeTracker &&) = default;
     TypeTracker & operator=(const TypeTracker &) = default;
