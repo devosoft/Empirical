@@ -70,6 +70,10 @@ void test_find(){
 	REQUIRE(bs10.FindBit() == 3);
 	bs10.PopBit();				// bs10 = 00 00000000
 	REQUIRE(bs10.PopBit() == -1);
+	bs10.flip(3);
+	bs10.flip(1);
+	REQUIRE(bs10.FindBit(2) == 3);
+	REQUIRE(bs10.FindBit(4) == -1);
 }
 
 /**
@@ -112,6 +116,18 @@ void test_count(){
 	bs12.flip(0,5);
 	REQUIRE(bs12.count() == 7);
 }
+
+/**
+ * Get ones
+ */
+void test_get_ones(){
+	emp::BitSet<5> bs5;
+	bs5.flip(2); // 00100
+	emp::vector<size_t> ones = bs5.GetOnes();
+	REQUIRE(ones.size() == 1);
+	REQUIRE(ones[0] == 2);
+}
+
 
 /**
  * Get and Set bits
@@ -170,6 +186,37 @@ void test_bitwise_and(){
 }
 
 /**
+ * NAND, NOR, EQU & SELF
+ */
+void test_more_comparators(){
+	// NAND
+	emp::BitSet<8> bs8_1;
+	emp::BitSet<8> bs8_2;
+	bs8_1.SetAll();
+	REQUIRE(bs8_1.NAND(bs8_2).All());
+	bs8_2.flip(1);
+	bs8_1.NAND_SELF(bs8_2);
+	REQUIRE(bs8_1.Any());
+	REQUIRE( !(bs8_1.Get(1)) );
+	
+	// NOR
+	bs8_1.SetAll();
+	bs8_2.Clear();
+	REQUIRE(bs8_1.NOR(bs8_2).None());
+	bs8_1.flip(1);
+	bs8_1.NOR_SELF(bs8_2);
+	REQUIRE(bs8_1.Get(1));
+	
+	// EQU
+	bs8_1.Clear();
+	bs8_2.SetAll();
+	REQUIRE( (bs8_1.EQU(bs8_2).None()) );
+	bs8_2.Clear();
+	bs8_2.EQU_SELF(bs8_1);
+	REQUIRE(bs8_2.All());
+}
+
+/**
  * Random bitset
  */
 void test_random(){
@@ -206,8 +253,11 @@ void test_comparators(){
 	REQUIRE(bs10_1 > bs10);
 	bs10.SetAll();
 	REQUIRE(bs10_1 >= bs10);
+	REQUIRE(bs10_1 <= bs10);
 	REQUIRE(bs10_1 == bs10);
 	REQUIRE(!(bs10_1 < bs10));
+	bs10.Clear();
+	REQUIRE( (bs10 < bs10_1) );
 }
 
 /**
@@ -241,19 +291,39 @@ void test_import(){
 }
 
 /**
+ * Join
+ */
+void test_join(){
+	emp::BitSet<4> bs4;
+	bs4.SetAll();
+	emp::BitSet<6> bs6;
+	emp::BitSet<10> joinned_bs = join(bs4, bs6);
+	// Output is 0111100000 ???
+	// not 1111000000 ?
+	std::cout << joinned_bs;
+}
+
+/**
  * Print
  */
 void test_print(){
 	emp::BitSet<8> bs8;
 	bs8.SetAll();
 	bs8.Set(1, false);
+	
 	std::stringstream ss;
 	bs8.Print(ss);
 	REQUIRE(ss.str() == "11111101");
 	ss.str(std::string());
+	
+	ss << bs8;
+	REQUIRE(ss.str() == "11111101");
+	ss.str(std::string());
+	
 	bs8.PrintArray(ss);
 	REQUIRE(ss.str() == "10111111");
 	ss.str(std::string());
+	
 	bs8.Clear();
 	bs8.Set(1, true);
 	bs8.Set(4, true);
@@ -271,14 +341,17 @@ TEST_CASE("Test BitSet", "[tools]")
 	test_byte();
 	test_find();
 	test_count();
+	test_get_ones();
 	test_copy();
 	test_shift();
 	test_comparators();
 	test_bitwise_or();
 	test_bitwise_xor();
 	test_bitwise_and();
+	test_more_comparators();
 	test_random();
 	test_export();
 	test_import();
+	test_join();
 	test_print();
 }
