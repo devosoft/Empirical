@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch.hpp"
 
-#include "tools/Math.h"
+#include "tools/math.h"
 
 #include <sstream>
 #include <iostream>
