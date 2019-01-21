@@ -1,4 +1,4 @@
-TEST_NAMES = alert bitmatrix bitset bitset_utils bitvector cache combos dfa file flex_function graph graph_utils indexmap lexer memo_function nfa random range regex solvestate string_utils tuple_utils unorderedindexmap vector_utils
+TEST_NAMES = alert bitmatrix bitset bitset_utils bitvector cache combos dfa file flex_function functions graph graph_utils indexmap lexer lexer_utils math memo_function nfa random range regex solvestate string_utils tuple_utils unorderedindexmap vector_utils
 
 #  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 FLAGS = -std=c++14 -Wall -Wno-unused-function -I../../source/ -I../../

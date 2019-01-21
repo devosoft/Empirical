@@ -31,10 +31,8 @@ TEST_CASE("Test DFA", "[tools]")
   
   // ASCII values of characters
   size_t a = 97;
-	size_t b = 98;
-	size_t c = 99;
-	size_t d = 100;
-	size_t e = 101;
+  size_t b = 98;
+  size_t c = 99;
   
   // GetTransitions
   emp::array<int, 128> transitions = dfa.GetTransitions(3);
@@ -53,5 +51,11 @@ TEST_CASE("Test DFA", "[tools]")
   // what is the context to this function?
   REQUIRE(dfa.IsActive(state1));
   REQUIRE(dfa.IsActive(state2));
+  
+  // Print
+  std::stringstream ss;
+  dfa.Print(ss);
+  REQUIRE(ss.str() == "Num states = 5\nStop IDs: 3\n 0 -> 'a':4\n 1 -> 'c':0\n 2 -> 'b':1\n 3 -> 'a':2 'c':0 [STOP=1]\n 4 -> 'b':3\n");
+  
   
 }
