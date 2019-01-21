@@ -291,19 +291,6 @@ void test_import(){
 }
 
 /**
- * Join
- */
-void test_join(){
-	emp::BitSet<4> bs4;
-	bs4.SetAll();
-	emp::BitSet<6> bs6;
-	emp::BitSet<10> joinned_bs = join(bs4, bs6);
-	// Output is 0111100000 ???
-	// not 1111000000 ?
-	std::cout << joinned_bs;
-}
-
-/**
  * Print
  */
 void test_print(){
@@ -352,6 +339,5 @@ TEST_CASE("Test BitSet", "[tools]")
 	test_random();
 	test_export();
 	test_import();
-	test_join();
 	test_print();
 }
