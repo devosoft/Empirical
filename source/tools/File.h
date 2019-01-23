@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018
+ *  @date 2018-2019
  *
  *  @file  File.h
  *  @brief The File object maintains a simple, in-memory file.
@@ -229,6 +229,9 @@ namespace emp {
       return *this;
     }
 
+    /// Allow remove comments to also be specified with a single character.
+    File & RemoveComments(char marker) { return RemoveComments(emp::to_string(marker)); }
+
     /// Run a function on each line of a file and return the restults as a vector.
     /// Note: Function is allowed to modify string.
     template <typename T>
@@ -240,12 +243,14 @@ namespace emp {
       return results;
     }
 
+    // Remove the first column from the file, returning it as a vector of strings.
     emp::vector<std::string> ExtractCol(char delim=',') {
       return Process<std::string>( [delim](std::string & line){
         return string_pop(line, delim);
       });
     }
 
+    // Remove the first column from the file, returning it as a vector of a specified type.
     template <typename T>
     emp::vector<T> ExtractColAs(char delim=',') {
       return Process<T>( [delim](std::string & line){
