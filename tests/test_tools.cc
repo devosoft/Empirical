@@ -1045,7 +1045,7 @@ TEST_CASE("Test NullStream", "[tools]")
 
 TEST_CASE("Test random", "[tools]")
 {
-  emp::Random rng;
+  emp::Random rng(1);
 
   // Test GetDouble with the law of large numbers.
   emp::vector<int> val_counts(10);
