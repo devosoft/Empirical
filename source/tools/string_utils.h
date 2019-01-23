@@ -438,6 +438,25 @@ namespace emp {
     return std::string_view(str.c_str() + start, npos);
   }
 
+  /// Provide a string_view on a string from the beginning to a given size.
+  static inline std::string_view view_string_front(const std::string & str, size_t npos) {
+    emp_assert(npos <= str.size());
+    return std::string_view(str.c_str(), npos);
+  }
+
+  /// Provide a string_view on a string from a starting point with a given size.
+  static inline std::string_view view_string_back(const std::string & str, size_t npos) {
+    emp_assert(npos <= str.size());
+    return std::string_view(str.c_str() + str.size() - npos, npos);
+  }
+
+  /// Provide a string_view on a string from a starting point to an ending point.
+  static inline std::string_view view_string_range(const std::string & str, size_t start, size_t end) {
+    emp_assert(start <= end);
+    emp_assert(end <= str.size());
+    return std::string_view(str.c_str() + start, end - start);
+  }
+
   /// Cut up a string based on the provided delimitor; fill them in to the provided vector.
   static inline void slice(const std::string & in_string, emp::vector<std::string> & out_set,
                            char delim='\n') {
