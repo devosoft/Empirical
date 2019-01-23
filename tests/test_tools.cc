@@ -1418,6 +1418,9 @@ TEST_CASE("Test string_utils", "[tools]")
   REQUIRE( emp::view_string(view_test) == "This is my view test!" );
   REQUIRE( emp::view_string(view_test, 5) == "is my view test!" );
   REQUIRE( emp::view_string(view_test, 8, 2) == "my" );
+  REQUIRE( emp::view_string_front(view_test,4) == "This" );
+  REQUIRE( emp::view_string_back(view_test, 5) == "test!" );
+  REQUIRE( emp::view_string_range(view_test, 11, 15) == "view" );
 
 
   auto slices = emp::slice("This is a test of a different version of slice.", ' ');
