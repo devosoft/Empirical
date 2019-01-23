@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
+ *  @date 2016-2019
  *
  *  @file string_utils.h
  *  @brief Simple functions to manipulate strings.
@@ -17,6 +17,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <unordered_set>
 
 #include "../base/Ptr.h"
@@ -419,6 +420,23 @@ namespace emp {
     in_string.resize(pos);
   }
 
+
+  /// Provide a string_view on a given string
+  static inline std::string_view view_string(const std::string & str) {
+    return std::string_view(str);
+  }
+
+  /// Provide a string_view on a string from a given starting point.
+  static inline std::string_view view_string(const std::string & str, size_t start) {
+    emp_assert(start <= str.size());
+    return std::string_view(str.c_str() + start, str.size() - start);
+  }
+
+  /// Provide a string_view on a string from a starting point with a given size.
+  static inline std::string_view view_string(const std::string & str, size_t start, size_t npos) {
+    emp_assert(start + npos <= str.size());
+    return std::string_view(str.c_str() + start, npos);
+  }
 
   /// Cut up a string based on the provided delimitor; fill them in to the provided vector.
   static inline void slice(const std::string & in_string, emp::vector<std::string> & out_set,
