@@ -457,6 +457,12 @@ namespace emp {
     return std::string_view(str.c_str() + start, end - start);
   }
 
+  /// Return a view of the prefix of the input string up to a specified delimeter.
+  /// If the delimeter is not found, return the entire input string.
+  static inline std::string_view view_string_to(const std::string & in_string, const char delim, size_t start_pos=0) {
+    return view_string_range(in_string, start_pos, in_string.find(delim, start_pos));
+  }
+
   /// Cut up a string based on the provided delimitor; fill them in to the provided vector.
   static inline void slice(const std::string & in_string, emp::vector<std::string> & out_set,
                            char delim='\n') {
