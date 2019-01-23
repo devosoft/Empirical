@@ -1317,7 +1317,7 @@ TEST_CASE("Test sequence utils", "[tools]")
 
 
 
-TEST_CASE("Test string utils", "[tools]")
+TEST_CASE("Test string_utils", "[tools]")
 {
 
   // TEST1: lets test our conversion to an escaped string.
@@ -1392,13 +1392,11 @@ TEST_CASE("Test string utils", "[tools]")
   REQUIRE(first_line == "anokaystring.");
 
 
-
   popped_str = emp::string_pop(first_line, "ns");
 
 
   REQUIRE(popped_str == "a");
   REQUIRE(first_line == "okaystring.");
-
 
 
   popped_str = emp::string_pop(first_line, 'y');
@@ -1414,6 +1412,13 @@ TEST_CASE("Test string utils", "[tools]")
 
   emp::compress_whitespace(base_string);
   REQUIRE(base_string == "This is -MY- very best string!!!!");
+
+
+  std::string view_test = "This is my view test!";
+  REQUIRE( emp::view_string(view_test) == "This is my view test!" );
+  REQUIRE( emp::view_string(view_test, 5) == "is my view test!" );
+  REQUIRE( emp::view_string(view_test, 8, 2) == "my" );
+
 
   auto slices = emp::slice("This is a test of a different version of slice.", ' ');
 
