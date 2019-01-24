@@ -12,7 +12,7 @@
 #ifndef EMP_ACTIVATION_HANDLE_H
 #define EMP_ACTIVATION_HANDLE_H
 
-#include <optional>
+#include "base/Ptr.h"
 
 namespace emp {
 
@@ -22,7 +22,7 @@ namespace emp {
 
     private:
       bool active;
-      std::optional<T> obj;
+      T obj;
 
     public:
 
@@ -34,7 +34,7 @@ namespace emp {
         bool active_,
         Args&&... args
       ) : active(active_)
-        , obj(std::make_optional<T>(std::forward<Args>(args)...))
+        , obj(std::forward<Args>(args)...)
       { ; }
       /// construct the handle and its object,
       /// forwarding arguments to make the object in place
@@ -47,7 +47,7 @@ namespace emp {
 
       /// override the dereference operator, returning the obj or nullopt
       /// depending on activation state
-      std::optional<T> operator *() { return active ? obj : std::nullopt; }
+      emp::Ptr<T> operator *() { return active ? &obj : nullptr; }
 
       /// toggle the activation state
       void Toggle() { active = !active; }
