@@ -460,7 +460,10 @@ namespace emp {
   /// Return a view of the prefix of the input string up to a specified delimeter.
   /// If the delimeter is not found, return the entire input string.
   static inline std::string_view view_string_to(const std::string & in_string, const char delim, size_t start_pos=0) {
-    return view_string_range(in_string, start_pos, in_string.find(delim, start_pos));
+    const size_t in_size = in_string.size();
+    size_t end_pos = start_pos;
+    while (end_pos < in_size && in_string[end_pos] != delim) end_pos++;    
+    return view_string_range(in_string, start_pos, end_pos);
   }
 
   /// Cut up a string based on the provided delimitor; fill them in to the provided vector.
@@ -503,11 +506,11 @@ namespace emp {
   /// Create a set of string_views based on the provided delimitor; fill them in to the provided vector.
   static inline void view_slices(const std::string & in_string, emp::vector<std::string_view> & out_set,
                            char delim='\n') {
-    const size_t test_size = in_string.size();
+    const size_t in_size = in_string.size();
     out_set.resize(0);
 
     size_t pos = 0;
-    while (pos < test_size) {
+    while (pos < in_size) {
       out_set.push_back( view_string_to(in_string, delim, pos) );
       pos += out_set.back().size() + 1;
     }
