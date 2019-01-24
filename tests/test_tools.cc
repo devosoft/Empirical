@@ -1424,6 +1424,14 @@ TEST_CASE("Test string_utils", "[tools]")
   REQUIRE( emp::view_string_to(view_test, ' ') == "This" );
   REQUIRE( emp::view_string_to(view_test, ' ', 5) == "is" );
 
+  emp::vector<std::string_view> slice_view = emp::view_slices(view_test, ' ');
+  REQUIRE( slice_view.size() == 5 );
+  REQUIRE( slice_view[0] == "This" );
+  REQUIRE( slice_view[1] == "is" );
+  REQUIRE( slice_view[2] == "my" );
+  REQUIRE( slice_view[3] == "view" );
+  REQUIRE( slice_view[4] == "test!" );
+
 
   auto slices = emp::slice("This is a test of a different version of slice.", ' ');
 
