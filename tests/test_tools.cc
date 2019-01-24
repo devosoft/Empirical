@@ -18,6 +18,7 @@
 
 #include "data/DataNode.h"
 
+#include "tools/ActivationHandle.h"
 #include "tools/Binomial.h"
 #include "tools/BitMatrix.h"
 #include "tools/BitSet.h"
@@ -68,6 +69,77 @@
     static_assert(A == B, #A " == " #B); \
     REQUIRE(A == B);                     \
   }
+
+
+TEST_CASE("Test ActivationHandle", "[tools]")
+{
+
+  auto a = emp::ActivationHandle<int>(false,1);
+  REQUIRE(!*a);
+  a.Toggle();
+  REQUIRE(*a);
+  REQUIRE(**a == 1);
+  a.Set(false);
+  REQUIRE(!*a);
+  a.Set(false);
+  REQUIRE(!*a);
+  a.Toggle();
+  REQUIRE(*a);
+  REQUIRE(**a == 1);
+  a.Set(true);
+  REQUIRE(*a);
+  REQUIRE(**a == 1);
+  a.Set(false);
+  REQUIRE(!*a);
+  a.Set(true);
+  REQUIRE(*a);
+  REQUIRE(**a == 1);
+
+
+  auto b = emp::ActivationHandle<int>(true,2);
+  REQUIRE(*b);
+  REQUIRE(**b == 2);
+  b.Toggle();
+  REQUIRE(!*b);
+  b.Set(true);
+  REQUIRE(*b);
+  REQUIRE(**b == 2);
+  b.Set(true);
+  REQUIRE(*b);
+  REQUIRE(**b == 2);
+  b.Toggle();
+  REQUIRE(!*b);
+  b.Set(false);
+  REQUIRE(!*b);
+  b.Set(true);
+  REQUIRE(*b);
+  REQUIRE(**b == 2);
+  b.Set(false);
+  REQUIRE(!*b);
+
+  auto c = emp::ActivationHandle<int>(3);
+  REQUIRE(*c);
+  REQUIRE(**c == 3);
+  c.Toggle();
+  REQUIRE(!*c);
+  c.Set(true);
+  REQUIRE(*c);
+  REQUIRE(**c == 3);
+  c.Set(true);
+  REQUIRE(*c);
+  REQUIRE(**c == 3);
+  c.Toggle();
+  REQUIRE(!*c);
+  c.Set(false);
+  REQUIRE(!*c);
+  c.Set(true);
+  REQUIRE(*c);
+  REQUIRE(**c == 3);
+  c.Set(false);
+  REQUIRE(!*c);
+
+
+}
 
 
 TEST_CASE("Test Binomial", "[tools]")
