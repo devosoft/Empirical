@@ -500,6 +500,27 @@ namespace emp {
     return result;
   }
 
+  /// Create a set of string_views based on the provided delimitor; fill them in to the provided vector.
+  static inline void view_slices(const std::string & in_string, emp::vector<std::string_view> & out_set,
+                           char delim='\n') {
+    const size_t test_size = in_string.size();
+    out_set.resize(0);
+
+    size_t pos = 0;
+    while (pos < test_size) {
+      out_set.push_back( view_string_to(in_string, delim, pos) );
+      pos += out_set.back().size() + 1;
+    }
+
+  }
+
+  /// Slice a string without passing in result vector (may be less efficient).
+  static inline emp::vector<std::string_view> view_slices(const std::string & in_string, char delim='\n') {
+    emp::vector<std::string_view> result;
+    view_slices(in_string, result, delim);
+    return result;
+  }
+
   /// @cond TEMPLATES
 
   // The next functions are not efficient, but they will take any number of inputs and
