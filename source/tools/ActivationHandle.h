@@ -33,8 +33,8 @@ namespace emp {
       ActivationHandle(
         bool active_,
         Args&&... args
-      ) : active(active_),
-        obj(std::make_optional<T>(std::forward<Args>(args)...))
+      ) : active(active_)
+        , obj(std::make_optional<T>(std::forward<Args>(args)...))
       { ; }
       /// construct the handle and its object,
       /// forwarding arguments to make the object in place
@@ -42,8 +42,7 @@ namespace emp {
       template<typename... Args>
       ActivationHandle(
         Args&&... args
-      ) : active(true),
-        obj(std::make_optional<T>(std::forward<Args>(args)...))
+      ) : ActivationHandle(true, std::forward<Args>(args)...)
       { ; }
 
       /// override the dereference operator, returning the obj or nullopt
