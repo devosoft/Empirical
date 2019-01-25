@@ -243,20 +243,26 @@ namespace emp {
       return results;
     }
 
-    // Remove the first column from the file, returning it as a vector of strings.
+    /// Remove the first column from the file, returning it as a vector of strings.
     emp::vector<std::string> ExtractCol(char delim=',') {
       return Process<std::string>( [delim](std::string & line){
         return string_pop(line, delim);
       });
     }
 
-    // Remove the first column from the file, returning it as a vector of a specified type.
+    /// Remove the first column from the file, returning it as a vector of a specified type.
     template <typename T>
     emp::vector<T> ExtractColAs(char delim=',') {
       return Process<T>( [delim](std::string & line){
         return emp::from_string<T>(string_pop(line, delim));
       });
     }
+
+    /// Convert a row of a file to a vector of string views.
+    emp::vector<std::string_view> SliceRow(size_t row_id, char delim=',') {
+      return view_slices(lines[row_id], delim);
+    }
+
   };
   
 }
