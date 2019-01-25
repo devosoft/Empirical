@@ -259,7 +259,7 @@ namespace emp {
     }
 
     /// Convert a row of a file to a vector of string views.
-    emp::vector<std::string_view> SliceRow(size_t row_id, char delim=',') {
+    emp::vector<std::string_view> ViewRowSlices(size_t row_id, char delim=',') {
       return view_slices(lines[row_id], delim);
     }
 
