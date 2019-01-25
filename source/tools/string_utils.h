@@ -622,6 +622,17 @@ namespace emp {
     return vals;
   }
 
+  /// This function tries to convert a string_view into any other type...  You must
+  /// need to specify the out type as the template argument.
+  template <typename T>
+  inline T from_string(std::string_view str) {
+    std::stringstream ss;
+    ss << str;
+    T out_val;
+    ss >> out_val;
+    return out_val;
+  }
+
 }
 
 #endif
