@@ -263,6 +263,20 @@ namespace emp {
       return view_slices(lines[row_id], delim);
     }
 
+    /// Remove the first row from the file, returning it as a vector of strings.
+    emp::vector<std::string> ExtractRow(char delim=',') {
+      // Identify the data as string_views
+      emp::vector<std::string_view> sv_row = ViewRowSlices(0, delim); 
+
+      // Build the array to return and copy strings into it.
+      emp::vector<std::string> out_row(sv_row.size());
+      for (size_t i=0; i < sv_row.size(); i++) out_row[i] = sv_row[i];
+
+      // Remove the row to be extrated and return the result.
+      lines.erase(begin());
+      return out_row;
+    }
+
   };
   
 }
