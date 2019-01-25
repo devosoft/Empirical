@@ -255,6 +255,10 @@ namespace emp {
       return genome < other.genome;
     }
 
+    bool operator!=(const this_t & other) const {
+      return genome != other.genome;
+    }
+
     /// Reset the entire CPU to a starting state, without a genome.
     void Reset() {
       genome.sequence.resize(0);  // Clear out genome
