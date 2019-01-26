@@ -8,6 +8,7 @@
 #ifndef SELECTION_DATA_H
 #define SELECTION_DATA_H
 
+#include <iostream>
 #include <string>
 
 #include "../../source/base/vector.h"
@@ -23,9 +24,19 @@ public:
   ~SelectionData() { ; }
 
   void Load(const std::string & filename) {
-    emp::File file(filename);   // Load in file data.
-    file.RemoveComments('#');   // Trim off any comments beginning with a '#'
-    file.RemoveWhitespace();    // Remove all spaces and tabs (file should be comma-separated.)
+    emp::File file(filename);              // Load in file data.
+    file.RemoveComments('#');              // Trim off any comments beginning with a '#'
+    file.RemoveWhitespace();               // Remove spaces and tabs (file should be CSV.)
+    fitness_chart = file.ToData<double>(); // Load in fitness data from file.
+  }
+
+  void PrintFitnesses(ostream & os=std::cout) {
+    for (const pop_fit_t & fit_row : fitness_chart) {
+      for (double fit : fit_row) {
+        os << fit << " ";
+      }
+      os << std::endl;
+    }
   }
 };
 
