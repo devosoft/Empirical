@@ -18,23 +18,18 @@ namespace emp {
   namespace cl {
 
     /// A simple class to manage command-line arguments that were passed in.
-    class ArgManager {
+    /// Derived from emp::vector<std::string>, but with added functionality for argument handling.
+    class ArgManager : public emp::vector<std::string> {
     private:
-      emp::vector<std::string> args;
+      using parent_t = emp::vector<std::string>;
       emp::vector<std::string> arg_names;
       emp::vector<std::string> arg_descs;
 
     public:
-      ArgManager() : args(), arg_names(), arg_descs() { ; }
+      ArgManager() : parent_t(), arg_names(), arg_descs() { ; }
       ArgManager(int argc, char* argv[])
-       : args(args_to_strings(argc, argv)), arg_names(), arg_descs() { ; }
+       : parent_t(args_to_strings(argc, argv)), arg_names(), arg_descs() { ; }
       ~ArgManager() { ; }
-
-      size_t size() const { return args.size(); }
-      auto begin() -> decltype(args.begin()) { return args.begin(); }
-      auto end() -> decltype(args.end()) { return args.end(); }
-      std::string & operator[](size_t i) { return args[i]; }
-      const std::string & operator[](size_t i) const { return args[i]; }
 
       /// UseArg takes a name, a variable and an optional description.  If the name exists,
       /// it uses the next argument to change the value of the variable.
@@ -43,7 +38,7 @@ namespace emp {
       int UseArg(const std::string & name, T & var, const std::string & desc="") {
         arg_names.push_back(name);
         arg_descs.push_back(desc);
-        return use_arg_value(args, name, var);
+        return use_arg_value(*this, name, var);
       }
 
       /// UseArg can also take a config object and a name, and use the argument to set the
@@ -53,7 +48,7 @@ namespace emp {
         arg_names.push_back(name);
         arg_descs.push_back(desc);
         std::string var;
-        bool rv = use_arg_value(args, name, var);
+        bool rv = use_arg_value(*this, name, var);
         if (rv==1) config.Set(cfg_name, var);
         return rv;
       }
@@ -63,7 +58,7 @@ namespace emp {
       bool UseFlag(const std::string & name, const std::string & desc="") {
         arg_names.push_back(name);
         arg_descs.push_back(desc);
-        return use_arg(args, name);
+        return use_arg(*this, name);
       }
 
       /// Print information about all known argument types and what they're for; make pretty.
@@ -82,9 +77,9 @@ namespace emp {
 
       /// Test if there are any unprocessed arguments, and if so, output an error.
       bool HasUnknown(std::ostream & os=std::cerr) const {
-        if (args.size() > 1) {
+        if (size() > 1) {
           os << "Unknown args:";
-          for (size_t i = 1; i < args.size(); i++) os << " " << args[i];
+          for (size_t i = 1; i < size(); i++) os << " " << (*this)[i];
           os << std::endl;
           PrintHelp(os);
           return true;
@@ -98,22 +93,34 @@ namespace emp {
       /// Convert settings from a configure object to command-line arguments.
       /// Return bool for "should program proceed" (i.e., true=continue, false=exit).
       bool ProcessConfigOptions(Config & config, std::ostream & os,
-				const std::string & cfg_file="",
-				const std::string & macro_file="") {
+                                const std::string & cfg_file="",
+                                const std::string & macro_file="")
+      {
+        // Scan through the config object to generate command line flags for each setting.
         for (auto e : config) {
           auto entry = e.second;
           std::string desc = emp::to_string( entry->GetDescription(),
-                " (type=", entry->GetType(), "; default=", entry->GetDefault(), ')' );
+                                             " (type=", entry->GetType(),
+                                             "; default=", entry->GetDefault(), ')' );
           UseArg(to_string('-', entry->GetName()), config, entry->GetName(), desc);
         }
 
+        // Determine if we're using any special options for comman line flags.
         bool print_help    = UseFlag("--help", "Print help information.");
         bool create_config = cfg_file.size() && UseFlag("--gen", "Generate configuration file.");
-        bool const_macros  = macro_file.size() && UseFlag("--const", "Generate const version of macros file.");
+        bool const_macros  = macro_file.size() && UseFlag("--make-const", "Generate const version of macros file.");
 
         if (print_help)    { PrintHelp(os); return false; }
-        if (create_config) { config.Write(cfg_file); return false; }
-        if (const_macros)  { config.WriteMacros(macro_file, true); return false; }
+        if (create_config) { 
+          os << "Generating new config file: " << cfg_file << std::endl;
+          config.Write(cfg_file);
+          return false;
+        }
+        if (const_macros)  {
+          os << "Generating new macros file: " << macro_file << std::endl;
+          config.WriteMacros(macro_file, true);
+          return false;
+        }
 
         return true;
       }

@@ -19,6 +19,9 @@
 
 namespace emp {
 
+  // A function that will take any number of argument and do nothing with them.
+  template <typename... Ts> void DoNothing(Ts...) { ; }
+
   // Effectively create a function (via constructor) where all args are computed, then ignored.
   struct run_and_ignore { template <typename... T> run_and_ignore(T&&...) {} };
 

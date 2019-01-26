@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2018
  *
  *  @file macro_math.h
  *  @brief Macros to build a pre-processor calculator system.
@@ -50,29 +50,37 @@
 /// @cond MACROS
 
 #define EMP_EMPTY()
+#define EMP_EMPTY2() EMP_EMPTY()
+#define EMP_EMPTY3() EMP_EMPTY2()
+#define EMP_EMPTY4() EMP_EMPTY3()
+#define EMP_EMPTY5() EMP_EMPTY4()
+#define EMP_EMPTY6() EMP_EMPTY5()
+#define EMP_EMPTY7() EMP_EMPTY6()
+#define EMP_EMPTY8() EMP_EMPTY7()
+#define EMP_EMPTY9() EMP_EMPTY8()
+#define EMP_EMPTY10() EMP_EMPTY9()
 
-// Several versions of eval...  these simply make sure arguments are evaluated before use.
+// Several versions of eval depending on how many levels of evaluation are needed.
 #define EMP_EVAL(...)  __VA_ARGS__
-#define EMP_EVAL1(...)  __VA_ARGS__
-#define EMP_EVAL2(...) __VA_ARGS__
-#define EMP_EVAL3(...) __VA_ARGS__
-#define EMP_EVAL4(...) __VA_ARGS__
-#define EMP_EVAL5(...) __VA_ARGS__
-#define EMP_EVAL6(...) __VA_ARGS__
-#define EMP_EVAL7(...) __VA_ARGS__
-#define EMP_EVAL8(...) __VA_ARGS__
-#define EMP_EVAL9(...) __VA_ARGS__
-#define EMP_EVAL10(...) __VA_ARGS__
-#define EMP_EVAL11(...) __VA_ARGS__
-#define EMP_EVAL12(...) __VA_ARGS__
-#define EMP_EVAL13(...) __VA_ARGS__
-#define EMP_EVAL14(...) __VA_ARGS__
-#define EMP_EVAL15(...) __VA_ARGS__
-#define EMP_EVAL16(...) __VA_ARGS__
-#define EMP_EVAL17(...) __VA_ARGS__
-#define EMP_EVAL18(...) __VA_ARGS__
-#define EMP_EVAL19(...) __VA_ARGS__
-#define EMP_EVAL20(...) __VA_ARGS__
+#define EMP_EVAL2(...) EMP_EVAL(__VA_ARGS__)
+#define EMP_EVAL3(...) EMP_EVAL2(__VA_ARGS__)
+#define EMP_EVAL4(...) EMP_EVAL3(__VA_ARGS__)
+#define EMP_EVAL5(...) EMP_EVAL4(__VA_ARGS__)
+#define EMP_EVAL6(...) EMP_EVAL5(__VA_ARGS__)
+#define EMP_EVAL7(...) EMP_EVAL6(__VA_ARGS__)
+#define EMP_EVAL8(...) EMP_EVAL7(__VA_ARGS__)
+#define EMP_EVAL9(...) EMP_EVAL8(__VA_ARGS__)
+#define EMP_EVAL10(...) EMP_EVAL9(__VA_ARGS__)
+
+// And allowing dynamic nested evals.
+#define EMP_EVAL_A(...)  __VA_ARGS__
+#define EMP_EVAL_B(...)  __VA_ARGS__
+#define EMP_EVAL_C(...)  __VA_ARGS__
+#define EMP_EVAL_D(...)  __VA_ARGS__
+#define EMP_EVAL_E(...)  __VA_ARGS__
+#define EMP_EVAL_F(...)  __VA_ARGS__
+#define EMP_EVAL_G(...)  __VA_ARGS__
+#define EMP_EVAL_H(...)  __VA_ARGS__
 
 /// @endcond
 

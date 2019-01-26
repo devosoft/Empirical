@@ -1,0 +1,43 @@
+Empower is a scripting language built inside of Empirical to simplify and the use of fast
+run-time interpreting, especially for annotating other objects.  Internally, an Empower object
+will track all types used and all variables declared, ensuring that they interact correctly.
+
+Each time a new type is used, it is added to a type map (indexed by their typeid string) and
+assigned a unique ID number.  If relevant, variations on this type can be calculated, such as
+its decayed version, reference version, pointer version, etc.  A type record includes (among
+other thigns) its ID, its type string, its size, a function to convert it to string, and a
+function to convert it to double.
+
+Each time a new variable is created, it is given a unique locatin in the memory image and the
+proper amount of space is stored for it.
+
+To use:
+
+ Build an instance of Empower to setup an interpreted instance.  For the examples below,
+ we will assume the instance is called 'empower'.
+
+ Variables are of type Empower::Var
+ - build with: Empower::Var myvar = empower.NewVar<type>("name", value);
+
+ Variables can always be retrieved by name
+ - Example:  Empower::Var myvar empower.GetVar("name");
+
+ Functions are of type Empower::Fun
+ - build with: auto myfun = empower.NewFun<function sig>("name", functor);
+
+ Call functions as normal, mixing real variables and empower variaables
+ - Example:  auto result = myfun(myvar, 7, myvar2);
+
+ Either functions or variables can be restored using the Restore() function that specifies type.
+ - Example:  int value = myvar.Restore<int>();
+
+ Convert() does a (slower) conversion when you don't know the exact type, but do know that
+ it can be converted to the type you want.
+ - Example:  double value = myvar.Convert<int>();
+
+ Lots of values can be retrieved from an Empower::Var or ::Fun object.  For example:
+  .GetName()  - Returns string
+  .GetType()  - Returns string
+  .GetID()    - Returns unique size_t to identify this variable.
+  .GetMemID() - Returns consistent position in memory images where variable is stored.
+  .GetSize()  - Gets memory size (in bytes) of this variable

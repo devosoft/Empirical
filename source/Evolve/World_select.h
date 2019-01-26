@@ -150,7 +150,86 @@ namespace emp {
   /// @param max_funs The maximum number of fitness functions to use. (use 0 for all; default)
   template<typename ORG>
   void LexicaseSelect(World<ORG> & world,
-                      const emp::vector< std::function<double(ORG &)> > & fit_funs,
+                      const emp::vector< std::function<double(const ORG &)> > & fit_funs,
+                      size_t repro_count=1,
+                      size_t max_funs=0)
+  {
+    emp_assert(world.GetSize() > 0);
+    emp_assert(fit_funs.size() > 0);
+
+    if (!max_funs) max_funs = fit_funs.size();
+
+    // Determine which positions are occupied.
+    emp::vector<size_t> all_orgs(world.GetSize()), cur_orgs, next_orgs;
+    for (size_t org_id = 0; org_id < world.GetSize(); org_id++) all_orgs[org_id] = org_id;
+
+    // Pre-calculate all fitness info.
+    // (@CAO: Technically should only do this if caching is turned on?)
+    // (@CAO: Also, we should only pre-calculate if we think we need it all.  Lazy eval better?)
+    emp::vector< emp::vector<double> > fitnesses(fit_funs.size());
+    for (size_t fit_id = 0; fit_id < fit_funs.size(); ++fit_id) {
+      fitnesses[fit_id].resize(world.GetSize());
+      for (size_t org_id : all_orgs) {
+        fitnesses[fit_id][org_id] = fit_funs[fit_id](world.GetOrg(all_orgs[org_id]));
+      }
+    }
+
+    for (size_t repro = 0; repro < repro_count; ++repro) {
+      // Determine the current ordering of the functions.
+      // (@CAO: This can be more efficient)
+      emp::vector<size_t> order(max_funs);
+      if (max_funs == fit_funs.size()) {
+        order = GetPermutation(world.GetRandom(), fit_funs.size());
+      } else {
+        for (auto & x : order) x = world.GetRandom().GetUInt(fit_funs.size());
+      }
+
+      // Step through the functions in the proper order.
+      cur_orgs = all_orgs;  // Start with all of the organisms.
+      int depth = -1;
+      for (size_t fit_id : order) {
+        depth++;
+
+        double max_fit = fitnesses[fit_id][cur_orgs[0]];
+        next_orgs.push_back(cur_orgs[0]);
+
+        for (size_t org_id : cur_orgs) {
+          const double cur_fit = fitnesses[fit_id][org_id];
+          if (cur_fit > max_fit) {
+            max_fit = cur_fit;             // This is a the NEW maximum fitness for this function
+            next_orgs.resize(0);           // Clear out orgs with former maximum fitness
+            next_orgs.push_back(org_id);   // Add this org as only one with new max fitness
+          }
+          else if (cur_fit == max_fit) {
+            next_orgs.push_back(org_id);   // Same as cur max fitness -- save this org too.
+          }
+        }
+        // Make next_orgs into new cur_orgs; make cur_orgs allocated space for next_orgs.
+        std::swap(cur_orgs, next_orgs);
+        next_orgs.resize(0);
+
+        if (cur_orgs.size() == 1) break;  // Stop if we're down to just one organism.
+      }
+
+      // Place a random survivor (all equal) into the next generation!
+      emp_assert(cur_orgs.size() > 0, cur_orgs.size(), fit_funs.size(), all_orgs.size());
+      size_t win_id = cur_orgs[ world.GetRandom().GetUInt(cur_orgs.size()) ];
+
+      //TriggerOnLexicaseSelect(world, used, win_id);
+      world.DoBirth( world.GetGenomeAt(win_id), win_id );
+    }
+    // std::cout << "Done with lex" << std::endl;
+  }
+
+  /// ==OPTIMIZED LEXICASE== Is the same as regular lexicase, but determines how many unique genotypes there are
+  //  ahead of time and performs each analysis only once.
+  /// @param world The emp::World object with the organisms to be selected.
+  /// @param fit_funs The set of fitness functions to shuffle for each organism reproduced.
+  /// @param repro_count How many rounds of repliction should we do. (default 1)
+  /// @param max_funs The maximum number of fitness functions to use. (use 0 for all; default)
+  template<typename ORG>
+  void OptimizedLexicaseSelect(World<ORG> & world,
+                      const emp::vector< std::function<double(const ORG &)> > & fit_funs,
                       size_t repro_count=1,
                       size_t max_funs=0)
   {
@@ -266,7 +345,7 @@ namespace emp {
       }
       emp_assert(repro_id != -1, repro_id, winner, options);
 
-      // std::cout << depth << "abotu to calc used" <<std::endl;
+      // std::cout << depth << "about to calc used" <<std::endl;
       emp::vector<size_t> used = Slice(order, 0, depth+1);
       // If the world has a OnLexicaseSelect method, call it
       // std::cout << depth << " " << to_string(used) << std::endl;
@@ -276,97 +355,100 @@ namespace emp {
     // std::cout << "Done with lex" << std::endl;
   }
 
-    // EcoSelect works like Tournament Selection, but also uses a vector of supplimentary fitness
-    // functions.  The best individuals on each supplemental function divide up a resource pool.
-    // NOTE: You must turn off the FitnessCache for this function to work properly.
-    template<typename ORG>
-    void EcoSelect(World<ORG> & world, const emp::vector<std::function<double(ORG &)> > & extra_funs,
-                   const emp::vector<double> & pool_sizes, size_t t_size, size_t tourny_count=1)
-    {
-      emp_assert(world.GetFitFun(), "Must define a base fitness function");
-      emp_assert(world.GetSize() > 0);
-      emp_assert(t_size > 0 && t_size <= world.GetSize(), t_size, world.GetSize());
-      // emp_assert(world.IsCacheOn() == false, "Ecologies mean constantly changing fitness!");
 
-      if (world.IsCacheOn()) {
-          world.ClearCache();
-      }
 
-      // Setup info to track fitnesses.
-      emp::vector<double> base_fitness(world.GetSize());
-      emp::vector< emp::vector<double> > extra_fitnesses(extra_funs.size());
-      emp::vector<double> max_extra_fit(extra_funs.size(), 0.0);
-      emp::vector<size_t> max_count(extra_funs.size(), 0);
-      for (size_t i=0; i < extra_funs.size(); i++) {
-        extra_fitnesses[i].resize(world.GetSize());
-      }
 
-      // Collect all fitness info.
-      for (size_t org_id = 0; org_id < world.GetSize(); org_id++) {
-        base_fitness[org_id] = world.CalcFitnessID(org_id);
-        for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
-          double cur_fit = extra_funs[ex_id](world.GetOrg(org_id));
-          extra_fitnesses[ex_id][org_id] = cur_fit;
-          if (cur_fit > max_extra_fit[ex_id]) {
-            max_extra_fit[ex_id] = cur_fit;
-            max_count[ex_id] = 1;
-          }
-          else if (cur_fit == max_extra_fit[ex_id]) {
-            max_count[ex_id]++;
-          }
-        }
-      }
+  // EcoSelect works like Tournament Selection, but also uses a vector of supplimentary fitness
+  // functions.  The best individuals on each supplemental function divide up a resource pool.
+  // NOTE: You must turn off the FitnessCache for this function to work properly.
+  template<typename ORG>
+  void EcoSelect(World<ORG> & world, const emp::vector<std::function<double(ORG &)> > & extra_funs,
+                  const emp::vector<double> & pool_sizes, size_t t_size, size_t tourny_count=1)
+  {
+    emp_assert(world.GetFitFun(), "Must define a base fitness function");
+    emp_assert(world.GetSize() > 0);
+    emp_assert(t_size > 0 && t_size <= world.GetSize(), t_size, world.GetSize());
+    // emp_assert(world.IsCacheOn() == false, "Ecologies mean constantly changing fitness!");
 
-      // Readjust base fitness to reflect extra resources.
+    if (world.IsCacheOn()) {
+        world.ClearCache();
+    }
+
+    // Setup info to track fitnesses.
+    emp::vector<double> base_fitness(world.GetSize());
+    emp::vector< emp::vector<double> > extra_fitnesses(extra_funs.size());
+    emp::vector<double> max_extra_fit(extra_funs.size(), 0.0);
+    emp::vector<size_t> max_count(extra_funs.size(), 0);
+    for (size_t i=0; i < extra_funs.size(); i++) {
+      extra_fitnesses[i].resize(world.GetSize());
+    }
+
+    // Collect all fitness info.
+    for (size_t org_id = 0; org_id < world.GetSize(); org_id++) {
+      base_fitness[org_id] = world.CalcFitnessID(org_id);
       for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
-        if (max_count[ex_id] == 0) continue;  // No one gets this reward...
-
-        // The current bonus is divided up among the organisms that earned it...
-        const double cur_bonus = pool_sizes[ex_id] / max_count[ex_id];
-        // std::cout << "Bonus " << ex_id << " = " << cur_bonus
-        //           << "   max_extra_fit = " << max_extra_fit[ex_id]
-        //           << "   max_count = " << max_count[ex_id]
-        //           << std::endl;
-
-        for (size_t org_id = 0; org_id < world.GetSize(); org_id++) {
-          // If this organism is the best at the current resource, git it the bonus!
-          if (extra_fitnesses[ex_id][org_id] == max_extra_fit[ex_id]) {
-            base_fitness[org_id] += cur_bonus;
-          }
+        double cur_fit = extra_funs[ex_id](world.GetOrg(org_id));
+        extra_fitnesses[ex_id][org_id] = cur_fit;
+        if (cur_fit > max_extra_fit[ex_id]) {
+          max_extra_fit[ex_id] = cur_fit;
+          max_count[ex_id] = 1;
         }
-      }
-
-
-      emp::vector<size_t> entries;
-      for (size_t T = 0; T < tourny_count; T++) {
-        entries.resize(0);
-        for (size_t i=0; i<t_size; i++) entries.push_back( world.GetRandomOrgID() ); // Allows replacement!
-
-        double best_fit = base_fitness[entries[0]];
-        size_t best_id = entries[0];
-
-        // Search for a higher fit org in the tournament.
-        for (size_t i = 1; i < t_size; i++) {
-          const double cur_fit = base_fitness[entries[i]];
-          if (cur_fit > best_fit) {
-            best_fit = cur_fit;
-            best_id = entries[i];
-          }
+        else if (cur_fit == max_extra_fit[ex_id]) {
+          max_count[ex_id]++;
         }
-
-        // Place the highest fitness into the next generation!
-        world.DoBirth( world.GetGenomeAt(best_id), best_id, 1 );
       }
     }
 
-    /// EcoSelect can be provided a single value if all pool sizes are identical.
-    template<typename ORG>
-    void EcoSelect(World<ORG> & world, const emp::vector<typename World<ORG>::fun_calc_fitness_t > & extra_funs,
-                   double pool_sizes, size_t t_size, size_t tourny_count=1)
-    {
-      emp::vector<double> pools(extra_funs.size(), pool_sizes);
-      EcoSelect(world, extra_funs, pools, t_size, tourny_count);
+    // Readjust base fitness to reflect extra resources.
+    for (size_t ex_id = 0; ex_id < extra_funs.size(); ex_id++) {
+      if (max_count[ex_id] == 0) continue;  // No one gets this reward...
+
+      // The current bonus is divided up among the organisms that earned it...
+      const double cur_bonus = pool_sizes[ex_id] / max_count[ex_id];
+      // std::cout << "Bonus " << ex_id << " = " << cur_bonus
+      //           << "   max_extra_fit = " << max_extra_fit[ex_id]
+      //           << "   max_count = " << max_count[ex_id]
+      //           << std::endl;
+
+      for (size_t org_id = 0; org_id < world.GetSize(); org_id++) {
+        // If this organism is the best at the current resource, git it the bonus!
+        if (extra_fitnesses[ex_id][org_id] == max_extra_fit[ex_id]) {
+          base_fitness[org_id] += cur_bonus;
+        }
+      }
     }
+
+
+    emp::vector<size_t> entries;
+    for (size_t T = 0; T < tourny_count; T++) {
+      entries.resize(0);
+      for (size_t i=0; i<t_size; i++) entries.push_back( world.GetRandomOrgID() ); // Allows replacement!
+
+      double best_fit = base_fitness[entries[0]];
+      size_t best_id = entries[0];
+
+      // Search for a higher fit org in the tournament.
+      for (size_t i = 1; i < t_size; i++) {
+        const double cur_fit = base_fitness[entries[i]];
+        if (cur_fit > best_fit) {
+          best_fit = cur_fit;
+          best_id = entries[i];
+        }
+      }
+
+      // Place the highest fitness into the next generation!
+      world.DoBirth( world.GetGenomeAt(best_id), best_id, 1 );
+    }
+  }
+
+  /// EcoSelect can be provided a single value if all pool sizes are identical.
+  template<typename ORG>
+  void EcoSelect(World<ORG> & world, const emp::vector<typename World<ORG>::fun_calc_fitness_t > & extra_funs,
+                  double pool_sizes, size_t t_size, size_t tourny_count=1)
+  {
+    emp::vector<double> pools(extra_funs.size(), pool_sizes);
+    EcoSelect(world, extra_funs, pools, t_size, tourny_count);
+  }
 
 }
 

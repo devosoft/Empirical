@@ -1,0 +1,138 @@
+alert.h
+  Define an Alert function that goes to std::cerr in c++ or to Alert() in Javascript.
+
+Binomial.h
+  A heavy-weight binomial distribution that can quickly generate random values.
+
+BitMatrix.h
+  A COL x ROW matrix of bits and provides easy indexing and manipulation
+
+BitSet.h
+  A drop-in replacement for std::bitset, with additional bit magic features.
+
+bitset_utils.h
+  A set of simple functions to manipulate bitsets.
+
+BitVector.h
+  A drop-in replacement for std::vector<bool>, with additional bitwise logic features.
+
+Cache.h
+  Similar to std::unordered_map, but lookups include a function to generate the result if needed.
+
+combos.h
+  Tools to step through combinations of items.
+
+const.h
+  Commonly used constant values.
+
+debug.h
+  Basic tools for use in developing high-assurance code.
+
+DFA.h
+  A Deterministic Finite Automata simulator.
+
+DynamicString.h
+  A string handler where sections update dynamically based on functions.
+
+File.h
+  The File object maintains a simple, in-memory file.
+
+flex_function.h
+  Based on std::function, but holds default parameter values for calls with fewer args.
+
+functions.h
+  A collection of broadly-useful functions (that don't fit elsewhere)
+
+FunctionSet.h
+  Setup a collection of functions, all with the same signature, that can be run as a group.
+
+GenericFunction.h
+  Based on std::function, but with a common base class.
+
+Graph.h
+  A simple, fast class for managing verticies (nodes) and edges.
+
+graph_utils.h
+  This file provides a number of tools for manipulating graphs.
+
+IndexMap.h
+  A simple class to weight items differently within a container and return the correct index.
+
+Lexer.h
+  A general-purpose, fast lexer.
+
+lexer_utils.h
+  A set of utilities to convert between NFAs and DFAs
+
+map_utils.h
+  A set of simple functions to manipulate maps.
+
+math.h
+  Useful mathematical functions (that are constexpr when possible.)
+
+memo_function.h
+  A function that memorizes previous results to speed up any repeated calls.
+
+mem_track.h
+  A set of macros to track how many instances of specific classes are made.
+
+NFA.h
+  A Non-deterministic Finite Automata simulator
+
+NullStream.h
+  A handy no-operation output stream.
+
+Parser.h
+  A general-purpose, fast parser.
+
+Random.h
+  A versatile and non-patterned pseudo-random-number generator.
+
+random_utils.h
+  Helper functions for emp::Random for common random tasks.
+
+Range.h
+  A simple way to track value ranges
+
+ra_set.h
+  This file defines a Random Access Set template.
+
+RegEx.h
+  Basic regular expression handler.
+
+sequence_utils.h
+  Functions for analyzing with generic sequence types.
+
+serialize.h
+  Tools to save and load data from classes.
+
+serialize_macros.h
+  Macros for simplifying to serialization of objects.
+
+set_utils.h
+  Tools to save and load data from classes.
+
+SolveState.h
+  Used as part of a branching solver to keep track of the current state.
+
+stats.h
+  Functions for calculating various statistics about an ensemble.
+
+string_utils.h
+  Simple functions to manipulate strings.
+
+tuple_utils.h
+  Functions to simplify the use of std::tuple
+
+TypeTracker.h
+  Track class types abstractly to dynamically call correct function overloads.
+
+UnorderedIndexMap.h
+  A simple class to weight items differently within a container and return the correct index.
+
+valsort_map.h
+  This file defines a map that is sorted by value, not key.
+
+vector_utils.h
+  A set of simple functions to manipulate emp::vector
+

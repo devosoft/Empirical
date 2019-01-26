@@ -17,6 +17,8 @@
 
 #include <string>
 
+#include "config/config.h"
+
 namespace mabe {
 
   class GenomeBase {
@@ -27,6 +29,7 @@ namespace mabe {
     virtual ~GenomeBase() { ; }
 
     virtual std::string GetClassName() const = 0;
+    virtual emp::Config & GetConfig() = 0;
 
     const std::string & GetName() { return name; }
     void SetName(const std::string & in_name) { name = in_name; }

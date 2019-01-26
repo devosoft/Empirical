@@ -21,39 +21,42 @@
  *
  *
  *  Member functions include (all of which are constexpr):
- *    Has<T>()          - Return true/false: Is T is part of the pack?
- *    Count<T>()        - Return number of times T is in the pack.
- *    GetID<T>()        - Return first position of T in the pack, (or -1 if none).
- *    GetSize()         - Return total number of types in this pack.
- *    IsEmpty()         - Return true/false: Is this pack empty?
- *    IsUnique()        - Return true/false: are all types in pack are distinct?
+ *    Has<T>()           - Return true/false: Is T is part of the pack?
+ *    Count<T>()         - Return number of times T is in the pack.
+ *    GetID<T>()         - Return first position of T in the pack, (or -1 if none).
+ *    GetSize()          - Return total number of types in this pack.
+ *    IsEmpty()          - Return true/false: Is this pack empty?
+ *    IsUnique()         - Return true/false: are all types in pack are distinct?
  *
  *  Type accessors:
- *    get<POS>          - Type at position POS in the pack.
- *    first_t           - Type of first position in the pack.
- *    last_t            - Type of last position in the pack.
- *    select<Ps...>     - Create a new pack with types from selected position.
+ *    get<POS>           - Type at position POS in the pack.
+ *    first_t            - Type of first position in the pack.
+ *    last_t             - Type of last position in the pack.
+ *    select<Ps...>      - Create a new pack with types from selected positions.
  *
  *  Type manipulations:
- *    set<POS, T>       - Change types at position POS to T.
- *    push_front<Ts...> - Add any number of types Ts to the front of the pack.
- *    push_back<Ts...>  - Add any number of types Ts to the back of the pack.
- *    pop               - Pack with first type missing.
- *    popN<N>           - Pack with first N types missing.
- *    shrink<N>         - Pack with ONLY first N types.
- *    resize<N,D>       - Resize pack to N types; if N greater than current size, pad with D.
- *    merge<P>          - Append all of pack P to the end of this pack.
- *    reverse           - Reverse the order of types in this pack.
- *    rotate            - Move the first type in pack to the end.
+ *    set<POS, T>        - Change type at position POS to T.
+ *    push_front<Ts...>  - Add any number of types Ts to the front of the pack.
+ *    push_back<Ts...>   - Add any number of types Ts to the back of the pack.
+ *    pop                - Pack with first type missing.
+ *    popN<N>            - Pack with first N types missing.
+ *    shrink<N>          - Pack with ONLY first N types.
+ *    resize<N,D>        - Resize pack to N types; if N greater than current size, pad with D.
+ *    merge<P>           - Append all of pack P to the end of this pack.
+ *    find_union<P>      - Join this pack to P, keeping only one of each type.
+ *    reverse            - Reverse the order of types in this pack.
+ *    rotate             - Move the first type in pack to the end.
  *
  *  Applications:
- *    apply<T>          - Take template T and apply these types as its arguments.
- *    to_function_t<T>  - Convert to a function type, with return type T and arg types from pack.
- *    filter<FILTER>    - Keep only those types, T, that can legally form FILTER<T> and does not
- *                        have a FILTER<T>::value == false.
- *    find<FILTER>      - Convert to first type, T, that can legally form FILTER<T> and does not
- *                        have a FILTER<T>::value == false.
- *    wrap<WRAPPER>     - Convert to TypePack where all members are run through WRAPPER
+ *    apply<T>           - Take template T and apply these types as its arguments.
+ *    to_function_t<T>   - Convert to a function type, with return type T and arg types from pack.
+ *    filter<FILTER>     - Keep only those types, T, that can legally form FILTER<T> and does not
+ *                         have a FILTER<T>::value == false.
+ *    filter_out<FILTER> - Remove those types, T, that can legally form FILTER<T> and do not have
+ *                         a FILTER<T>::value == false.
+ *    find<FILTER>       - Convert to first type, T, that can legally form FILTER<T> and does not
+ *                         have a FILTER<T>::value == false.
+ *    wrap<WRAPPER>      - Convert to TypePack where all members are run through WRAPPER
  *
  *
  *  Developer notes:
@@ -112,11 +115,29 @@ namespace emp {
       using other_ftp = typename tp_filter<other_tp, FILTER, N-1>::type; // Recurse
       using type = typename cur_ftp::template merge< other_ftp >;        // Merge
     };
+
     template <typename T, template <typename...> class FILTER>
       struct tp_filter<T,FILTER,0> { using type = TypePack<>; };
 
     template <typename T, template <typename...> class FILTER>
       using tp_filter_t = typename tp_filter<T,FILTER,T::SIZE>::type;
+
+    /// Remove types from a TypePack that DO satisfy a filter.
+    template <typename T, template <typename...> class FILTER, int N>
+    struct tp_filter_out {
+      using cur_t = typename T::first_t;                                 // Isolate the first type
+      using other_tp = typename T::pop;                                  // Isolate remaining types
+      constexpr static bool cur_result = test_type<FILTER,cur_t>();      // Run filter of cur type
+      using cur_ftp = typename tp_filter1<cur_t, !cur_result>::type;     // Use cur type if true
+      using other_ftp = typename tp_filter_out<other_tp, FILTER, N-1>::type; // Recurse
+      using type = typename cur_ftp::template merge< other_ftp >;        // Merge
+    };
+
+    template <typename T, template <typename...> class FILTER>
+      struct tp_filter_out<T,FILTER,0> { using type = TypePack<>; };
+
+    template <typename T, template <typename...> class FILTER>
+      using tp_filter_out_t = typename tp_filter_out<T,FILTER,T::SIZE>::type;
 
     // Wrappers create a TypePack with the wrapped element if the filter is true, empty if false.
     template <typename T, template <typename...> class W, bool> struct tp_wrap1
@@ -171,6 +192,9 @@ namespace emp {
     /// Return bool indicating if all types in this pack are different from each other.
     constexpr static bool IsUnique() { return has_unique_types<T1,Ts...>(); }
 
+    /// Count how many distinct types are in this pack.
+    constexpr static int CountUnique() { return make_unique::GetSize(); }
+
     /// Get the type associated with a specified position in the pack.
     template <int POS> using get = pack_id<POS, T1, Ts...>;
 
@@ -214,6 +238,9 @@ namespace emp {
     /// Join this TypePack with another TypePack.
     template <typename IN> using merge = typename internal::tp_shift<IN::SIZE, this_t, IN>::type1;
 
+    /// Join this TypePack with another, keeping only one of each type.
+    template <typename IN> using find_union = typename internal::tp_shift<IN::SIZE, this_t, IN>::type1::make_unique;
+
     /// Rearrange types in TypePack into reverse order.
     using reverse = typename pop::reverse::template push_back<T1>;
 
@@ -237,9 +264,26 @@ namespace emp {
     template <template <typename...> class FILTER>
     using filter = internal::tp_filter_t<this_t, FILTER>;
 
+    /// Remove all types that DO pass a filter.  Return as new TypePack.
+    template <template <typename...> class FILTER>
+    using filter_out = internal::tp_filter_out_t<this_t, FILTER>;
+
     /// Return the first type that satisfies a filter.
     template <template <typename...> class FILTER>
     using find_t = typename internal::tp_filter_t<this_t, FILTER>::first_t;
+
+    template <typename M1>
+    struct type_matcher {
+      template <typename M2>
+      using is_match = std::is_same<M1,M2>;
+    };
+
+    /// Remove all instances of a given type.
+    template <typename T>
+    using remove_t = internal::tp_filter_out_t<this_t, type_matcher<T>::template is_match>;
+
+    /// Remove all duplicates within a TypePack
+    using make_unique = typename remove_t<first_t>::make_unique::template push_front<first_t>;
 
     /// Wrap all types in a specified wrapper template.
     template <template <typename...> class WRAPPER>
@@ -285,7 +329,10 @@ namespace emp {
 
     // There's nothing to filter, so return this_t (TypePack<>) or null_t
     template <template <typename...> class FILTER> using filter = this_t;
+    template <template <typename...> class FILTER> using filter_out = this_t;
     template <template <typename...> class FILTER> using find_t = null_t;
+    template <typename T> using remove_t = this_t;
+    using make_unique = this_t;
     template <template <typename...> class WRAPPER> using wrap = this_t;
   };
 }
