@@ -46,4 +46,12 @@ int main()
   std::cout << "\nAfter a row is extracted as size_t:" << std::endl;
   spreadsheet.Write(std::cout);
   std::cout << "Extracted row: " << emp::to_string(second_row) << std::endl;
+
+
+  spreadsheet.Append("1000,1001,1002,1003");
+  auto full_data = spreadsheet.ToData<size_t>();
+  std::cout << "\nAfter all remaining data is extracted as size_t:" << std::endl;
+  spreadsheet.Write(std::cout);
+  std::cout << "Extracted data: " << emp::to_string(full_data) << std::endl;
+
 }
