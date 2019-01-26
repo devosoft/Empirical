@@ -39,6 +39,8 @@
 #include "../tools/stats.h"
 #include "../tools/string_utils.h"
 
+#include "World_structure.h"
+
 namespace emp {
 
   /// The systematics manager allows an optional second template type that
@@ -355,7 +357,7 @@ namespace emp {
     virtual double CalcDiversity() const = 0;
     virtual void Update() = 0;
     virtual void SetNextParent(int pos) = 0;
-
+    virtual void SetNextParent(WorldPosition & pos) = 0;
   };
 
   /// @brief A tool to track phylogenetic relationships among organisms.
@@ -530,6 +532,15 @@ namespace emp {
 
     /// How many taxa are stored in total?
     size_t GetNumTaxa() const { return GetTreeSize() + GetNumOutside(); }
+
+    void SetNextParent(WorldPosition & pos) {
+      emp_assert(pos.IsActive() || !pos.IsValid());
+      if (!pos.IsValid()) {
+        next_parent = nullptr;
+      } else {
+        next_parent = taxon_locations[pos.GetIndex()];
+      }
+    }
 
     void SetNextParent(int pos) {
       emp_assert(pos < (int)taxon_locations.size(), "Invalid parent", pos, taxon_locations.size());
