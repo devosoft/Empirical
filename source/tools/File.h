@@ -292,6 +292,22 @@ namespace emp {
       return out_row;
     }
 
+    template <typename T>
+    emp::vector< emp::vector<T> > ToData(char delim=',') {
+      emp::vector< emp::vector<T> > out_data(lines.size());
+
+      emp::vector<std::string_view> sv_row;
+      for (size_t row_id = 0; row_id < lines.size(); row_id++) {
+        view_slices(lines[row_id], sv_row, delim);
+        out_data[row_id].resize(sv_row.size());
+        for (size_t i=0; i < sv_row.size(); i++) {
+          out_data[row_id][i] = from_string<T>(sv_row[i]);
+        }
+      }
+
+      return out_data;
+    }
+
   };
   
 }
