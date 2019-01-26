@@ -41,4 +41,9 @@ int main()
   std::cout << "\nAfter a row is extracted:" << std::endl;
   spreadsheet.Write(std::cout);
   std::cout << "Extracted row: " << emp::to_string(first_row) << std::endl;
+
+  emp::vector<std::size_t> second_row = spreadsheet.ExtractRowAs<size_t>();
+  std::cout << "\nAfter a row is extracted as size_t:" << std::endl;
+  spreadsheet.Write(std::cout);
+  std::cout << "Extracted row: " << emp::to_string(second_row) << std::endl;
 }
