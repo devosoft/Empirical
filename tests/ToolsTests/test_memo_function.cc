@@ -9,6 +9,11 @@
 
 TEST_CASE("Test memo_function", "[tools]")
 {
+    
+  /**
+   * One arguments 
+   */
+  
   // memo_function<R(ARG)>()
   emp::memo_function<uint64_t(int)> factorial(
   [&factorial](int N) {
@@ -43,6 +48,11 @@ TEST_CASE("Test memo_function", "[tools]")
   different = [](int N){ return N*100000; };
   REQUIRE( different(5) == 500000 );
   
+  
+  /**
+   * Many arguments 
+   */
+  
   // memo_function<R(A1,A2,EXTRA...)>()
   emp::memo_function<long long(int,int)> multiply(
     [](int a, int b){ return a*b; });
@@ -75,30 +85,40 @@ TEST_CASE("Test memo_function", "[tools]")
   
   // What is Hash function for/how to use?
   
+  /**
+   * No arguments 
+   */
+  
   // memo_function<R>()
-  emp::memo_function<double()> returnsfive ([](){ return (double)5.0; });
+  emp::memo_function<double()> returnsFive ([](){ return (double)5.0; });
   
   // bool Erase Clear Has size
-  REQUIRE( (bool) returnsfive );
-  REQUIRE( returnsfive.size() == 0 );
-  REQUIRE( returnsfive() == 5.0 );
-  REQUIRE( returnsfive.size() == 1 );
-  REQUIRE( returnsfive.Has() );
-  returnsfive.Clear();
-  REQUIRE( returnsfive.size() == 0 );
-  REQUIRE( !returnsfive.Has() );
-  REQUIRE( returnsfive() == 5.0 );
-  returnsfive.Erase();
-  REQUIRE( returnsfive.size() == 0 );
+  REQUIRE( (bool) returnsFive );
+  REQUIRE( returnsFive.size() == 0 );
+  REQUIRE( returnsFive() == 5.0 );
+  REQUIRE( returnsFive.size() == 1 );
+  REQUIRE( returnsFive.Has() );
+  returnsFive.Clear();
+  REQUIRE( returnsFive.size() == 0 );
+  REQUIRE( !returnsFive.Has() );
+  REQUIRE( returnsFive() == 5.0 );
+  returnsFive.Erase();
+  REQUIRE( returnsFive.size() == 0 );
   
   // conversions to std::function
-  std::function<double()> f1 = returnsfive.to_function();
-  std::function<double()> f2 = returnsfive;
-  REQUIRE(f1() == returnsfive());
-  REQUIRE(f2() == returnsfive());
+  std::function<double()> f1 = returnsFive.to_function();
+  std::function<double()> f2 = returnsFive;
+  REQUIRE(f1() == returnsFive());
+  REQUIRE(f2() == returnsFive());
   
   // more constructors!
-  emp::memo_function<double()> returnsfour;
-  returnsfour = [](){ return (double)4.0; };
-  REQUIRE(returnsfour() == 4.0);
+  emp::memo_function<double()> returnsFour;
+  returnsFour = [](){ return (double)4.0; };
+  REQUIRE(returnsFour() == 4.0);
+  
+  emp::memo_function<double()> alsoReturnsFour(std::move(returnsFour));
+  REQUIRE(alsoReturnsFour() == 4.0);
+  
+  // assignment operators
+  emp::memo_function<double()> aMemoFunction;
 }
