@@ -586,7 +586,7 @@ namespace emp {
       return node;
     }
 
-    virtual data_ptr_t AddPairwiseDistanceDataNode(const std::string & name = "pairwise_distances") {
+    virtual data_ptr_t AddPairwiseDistanceDataNode(const std::string & name = "pairwise_distance") {
       auto node = AddDataNode(name);
       node->AddPullSet([this](){
         return GetPairwiseDistances();

@@ -43,7 +43,7 @@ namespace emp {
 
         file.AddFun(get_update, "update", "Update");
         file.AddStats(*sys->GetDataNode("evolutionary_distinctiveness") , "evolutionary_distinctiveness", "evolutionary distinctiveness for a single update", true, true);
-        file.AddStats(*sys->GetDataNode("pairwise_distances"), "pairwise_distance", "pairwise distance for a single update", true, true);
+        file.AddStats(*sys->GetDataNode("pairwise_distance"), "pairwise_distance", "pairwise distance for a single update", true, true);
         file.AddCurrent(*sys->GetDataNode("phylogenetic_diversity"), "current_phylogenetic_diversity", "current phylogenetic_diversity", true, true);
         file.PrintHeaderKeys();
         return file;
