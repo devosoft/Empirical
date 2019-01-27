@@ -86,7 +86,7 @@ namespace emp {
      * my_data_manager.AddData("my_node_name", 1, 2, 3, 4, 5);  */
     template <typename... Ts>
     void AddData(const std::string & name, Ts... extra) {
-      emp_assert(Has(node_map, name), name, Keys(node_map));
+      emp_assert(Has(node_map, name), name, emp::to_string(Keys(node_map)));
       node_map[name]->Add(extra...);
     }
 
