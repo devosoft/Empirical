@@ -75,7 +75,21 @@
 
 TEST_CASE("Test Binomial", "[tools]")
 {
-  emp::Random random;
+  // test over a consistent but random set of seeds
+  emp::Random s_rng(2);
+  emp::vector<int> seeds(100);
+  std::generate(seeds.begin(),seeds.end(),[&s_rng](){
+    // value copied from _RAND_MBIG
+    return s_rng.GetInt(1000000000);
+  });
+  REQUIRE(
+    std::unordered_set<int>(seeds.begin(), seeds.end()).size()
+      == seeds.size()
+  );
+  for(int s : seeds) {
+
+  REQUIRE(s > 0);
+  emp::Random random(s);
 
   const double flip_prob = 0.03;
   const size_t num_flips = 100;
@@ -111,6 +125,7 @@ TEST_CASE("Test Binomial", "[tools]")
   //   std::cout << " " << bi100.PickRandom(random);
   // }
   // std::cout << std::endl;
+  }
 }
 
 // this templating is necessary to force full coverage of templated classes.
@@ -522,7 +537,7 @@ TEST_CASE("Test graph", "[tools]")
 // emp::Random grand;
 TEST_CASE("Test Graph utils", "[tools]")
 {
-  emp::Random random;
+  emp::Random random(1);
   // emp::Graph graph( emp::build_graph_tree(20, random) );
   // emp::Graph graph( emp::build_graph_random(20, 40, random) );
   emp::Graph graph( emp::build_graph_grid(5, 4, random) );
@@ -1114,7 +1129,21 @@ TEST_CASE("Test NullStream", "[tools]")
 
 TEST_CASE("Test random", "[tools]")
 {
-  emp::Random rng;
+  // test over a consistent but random set of seeds
+  emp::Random s_rng(1);
+  emp::vector<int> seeds(500);
+  std::generate(seeds.begin(),seeds.end(),[&s_rng](){
+    // value copied from _RAND_MBIG
+    return s_rng.GetInt(1000000000);
+  });
+  REQUIRE(
+    std::unordered_set<int>(seeds.begin(), seeds.end()).size()
+      == seeds.size()
+  );
+  for(int s : seeds) {
+
+  REQUIRE(s > 0);
+  emp::Random rng(s);
 
   // Test GetDouble with the law of large numbers.
   emp::vector<int> val_counts(10);
@@ -1177,6 +1206,7 @@ TEST_CASE("Test random", "[tools]")
   emp::vector<size_t> choices = Choose(rng,100,10);
 
   REQUIRE(choices.size() == 10);
+  }
 }
 
 
