@@ -17,6 +17,8 @@
 #include <tuple>
 #include <utility>
 
+#include "tools/hash_utils.h"
+
 namespace emp {
 
   // A function that will take any number of argument and do nothing with them.
@@ -212,8 +214,8 @@ namespace emp {
   template<typename T1, typename T2, typename... EXTRA>
   std::size_t CombineHash(const T1 & x1, const T2 & x2, const EXTRA &... x_extra) {
     const std::size_t hash2 = CombineHash(x2, x_extra...);
-    //return std::hash<T1>()(x1) + 0x9e3779b9 + (hash2 << 19) + (hash2 >> 13);
-    return Hash<T1>(x1) + 0x9e3779b9 + (hash2 << 19) + (hash2 >> 13);
+
+    return combine_hash(Hash<T1>(x1), hash2);
   }
 
 
