@@ -25,7 +25,7 @@ namespace emp {
 
       double dist = 0;
       for (size_t i = 0; i < p1.size(); ++i) {
-          dist += emp::Pow(p1[i] - p2[i], 2);
+          dist += pow(p1[i] - p2[i], 2);
       }
 
       return sqrt(dist);

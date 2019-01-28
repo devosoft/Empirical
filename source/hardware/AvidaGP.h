@@ -298,8 +298,10 @@ namespace emp {
     // Accessors
     Ptr<const inst_lib_t> GetInstLib() const { return genome.inst_lib; }
     inst_t GetInst(size_t pos) const { return genome.sequence[pos]; }
+    inst_t& operator[](size_t pos) {return genome.sequence[pos]; } // Alias for compatability with tools
     const genome_t & GetGenome() const { return genome; }
     const size_t GetSize() const { return genome.sequence.size(); }
+    const size_t size() const { return GetSize(); } // Alias for compatability with tools
     double GetReg(size_t id) const { return regs[id]; }
     double GetInput(int id) const { return Find(inputs, id, 0.0); }
     const std::unordered_map<int,double> & GetInputs() const { return inputs; }
@@ -571,5 +573,13 @@ namespace emp {
   };
 }
 
+namespace std {
+
+  /// operator<< to work with ostream (must be in std to work)
+  inline std::ostream & operator<<(std::ostream & out, const emp::AvidaGP & org) {
+    org.PrintGenome(out);
+    return out;
+  }
+}
 
 #endif
