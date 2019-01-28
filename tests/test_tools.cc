@@ -1121,7 +1121,7 @@ TEST_CASE("Test random", "[tools]")
   total = 0.0;
   for (size_t i = 0; i < num_tests; i++) {
     const uint64_t cur_value = rng.GetUInt64();
-    total += cur_value;
+    total += cur_value/(double)num_tests;
     uint64_draws.push_back(cur_value);
   }
 
@@ -1129,7 +1129,7 @@ TEST_CASE("Test random", "[tools]")
   const double expected_mean = ((double)std::numeric_limits<uint64_t>::max())/2.0;
   const double min_threshold = (expected_mean*0.995);
   const double max_threshold = (expected_mean*1.005);
-  double mean_value = total/(double) num_tests;
+  double mean_value = total; // values were divided by num_tests when added
 
   REQUIRE(mean_value > min_threshold);
   REQUIRE(mean_value < max_threshold);
