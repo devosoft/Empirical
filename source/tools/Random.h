@@ -203,6 +203,16 @@ namespace emp {
     }
 
     /**
+     * Generate a random 64-bit block of bits.
+     *
+     * @return The pseudo random number.
+     **/
+    inline uint64_t GetUInt64() {
+      return ( static_cast<uint64_t>(GetUInt()) << 32)
+             + static_cast<uint64_t>(GetUInt());
+    }
+
+    /**
      * Generate an uint64_t.
      *
      * @return The pseudo random number.
@@ -371,10 +381,10 @@ namespace emp {
 
     /**
      * By default GetRandBinomial calls the full (non-approximation) version.
-     * 
+     *
      * Note that if approximations are okay, they can create a big speedup
      * for n > 1000.
-     * 
+     *
      * @see Random::GetFullRandBinomial
      * @see Random::GetApproxRandBinomial
      * @see emp::Binomial in source/tools/Binomial.h
