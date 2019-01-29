@@ -19,12 +19,19 @@
 class SelectionData {
 private:
   using pop_fit_t = emp::vector<double>;  ///< Type for individual fitnesses for a single function.
+  emp::vector< pop_fit_t > org_chart;     ///< Chart of all fitnesses for each organism.
   emp::vector< pop_fit_t > fitness_chart; ///< Chart of all fitnesses for each function.
 
 public:
   SelectionData() = default;
   SelectionData(const std::string & filename) { Load(filename); }
   ~SelectionData() { ; }
+
+  size_t GetNumCriteria() const { return fitness_chart.size(); }
+  size_t GetNumOrgs() const { return fitness_chart.size() ? fitness_chart[0].size() : 0; }
+
+  const pop_fit_t & GetOrgData(size_t org_id) const { return org_chart[org_id]; }
+  const pop_fit_t & GetFitData(size_t criterion_id=0) const { return fitness_chart[criterion_id]; }
 
   /// Load a file with fitness data.
   /// * File is structed as a CSV using '#' for comments.
@@ -37,7 +44,8 @@ public:
     file.RemoveEmpty();                    // Remove any line that used to have comments and are now empty.
     auto headers = file.ExtractRow();      // Load in the column headers in the first row.
     file.RemoveWhitespace();               // Remove all remaining spaces and tabs.
-    fitness_chart = emp::Transpose(file.ToData<double>()); // Load in fitness data from file.
+    org_chart = file.ToData<double>();     // Load in fitness data for each organism from file.
+    fitness_chart = emp::Transpose(org_chart); // Organize data based on fitnesses rather than organisms.
   }
 
   void PrintFitnesses(std::ostream & os=std::cout) {
