@@ -34,10 +34,12 @@ namespace emp {
   protected:
     using fun_t = void(std::ostream &);
     using time_fun_t = std::function<bool(size_t)>;
+    using pre_fun_t = std::function<void()>;
 
     std::string filename;            ///< Name of the file that we are printing to (if one exists)
     std::ostream * os;               ///< Stream to print to.
     FunctionSet<fun_t> funs;         ///< Set of functions to call, one per column in the file.
+    FunctionSet<void()> pre_funs; ///< Set of functions to call before calculating data.
     emp::vector<std::string> keys;   ///< Keywords associated with each column.
     emp::vector<std::string> descs;  ///< Full description for each column.
     time_fun_t timing_fun;           ///< Function to determine updates to print on (default: all)
@@ -55,12 +57,12 @@ namespace emp {
       #else
       new std::ofstream(in_filename)
       #endif
-      ), funs(), keys(), descs()
+      ), funs(), pre_funs(), keys(), descs()
       , timing_fun([](size_t){return true;})
       , line_begin(b), line_spacer(s), line_end(e) { ; }
     DataFile(std::ostream & in_os,
              const std::string & b="", const std::string & s=",", const std::string & e="\n")
-      : filename(), os(&in_os), funs(), keys(), descs(), timing_fun([](size_t){return true;})
+      : filename(), os(&in_os), funs(), pre_funs(), keys(), descs(), timing_fun([](size_t){return true;})
       , line_begin(b), line_spacer(s), line_end(e) { ; }
 
     DataFile(const DataFile &) = default;
@@ -140,6 +142,7 @@ namespace emp {
 
     /// Run all of the functions and print the results as a new line in the file
     virtual void Update() {
+      pre_funs.Run();
       *os << line_begin;
       for (size_t i = 0; i < funs.size(); i++) {
         if (i > 0) *os << line_spacer;
@@ -153,6 +156,10 @@ namespace emp {
     /// passes the timing function (that is, the timing function returns true).
     virtual void Update(size_t update) { if (timing_fun(update)) Update(); }
 
+
+    void AddPreFun(pre_fun_t fun) {
+      pre_funs.Add(fun);
+    }
 
     /// If a function takes an ostream, pass in the correct one.
     /// Generic function for adding a column to the DataFile. In practice, you probably

@@ -39,6 +39,7 @@
 #include "../tools/stats.h"
 #include "../tools/string_utils.h"
 
+#include "SystematicsAnalysis.h"
 #include "World_structure.h"
 
 namespace emp {
@@ -55,6 +56,21 @@ namespace emp {
         using has_mutations_t = std::false_type;
         using has_phen_t = std::false_type;
     }; /// The default - an empty struct
+
+    struct fitness {
+        using has_fitness_t = std::true_type;
+        using has_mutations_t = std::false_type;
+        using has_phen_t = std::false_type;
+
+        DataNode<double, data::Current, data::Range> fitness; /// This taxon's fitness (for assessing deleterious mutational steps)
+        void RecordFitness(double fit) {
+          fitness.Add(fit);
+        }
+
+        const double GetFitness() const {
+          return fitness.GetMean();
+        }
+    };
 
     template <typename PHEN_TYPE>
     struct mut_landscape_info { /// Track information related to the mutational landscape
@@ -377,7 +393,7 @@ namespace emp {
     using info_t = ORG_INFO;
   private:
     using hash_t = typename Ptr<taxon_t>::hash_t;
-    using fun_calc_info_t = std::function<ORG_INFO(const ORG &)>;
+    using fun_calc_info_t = std::function<ORG_INFO(ORG &)>;
 
     fun_calc_info_t calc_info_fun;
     Ptr<taxon_t> next_parent;
@@ -461,7 +477,7 @@ namespace emp {
     emp::vector<Ptr<taxon_t> > taxon_locations;
     emp::vector<Ptr<taxon_t> > next_taxon_locations;
 
-    Signal<void(Ptr<taxon_t>)> on_new_sig; ///< Trigger when any organism is pruned from tree
+    Signal<void(Ptr<taxon_t>, ORG & org)> on_new_sig; ///< Trigger when any organism is pruned from tree
     Signal<void(Ptr<taxon_t>)> on_prune_sig; ///< Trigger when any organism is pruned from tree
 
     mutable Ptr<taxon_t> mrca;  ///< Most recent common ancestor in the population.
@@ -565,7 +581,7 @@ namespace emp {
       return most_recent;
     }
 
-    SignalKey OnNew(std::function<void(Ptr<taxon_t>)> & fun) { return on_new_sig.AddAction(fun); }
+    SignalKey OnNew(std::function<void(Ptr<taxon_t>, ORG & org)> & fun) { return on_new_sig.AddAction(fun); }
 
     /// Privide a function for Systematics to call each time a taxon is about to be pruned.
     /// Trigger:  Taxon is about to be killed
@@ -1309,7 +1325,7 @@ namespace emp {
       }
 
       cur_taxon = NewPtr<taxon_t>(++next_id, info, parent);  // Build new taxon.
-      on_new_sig.Trigger(cur_taxon);
+      on_new_sig.Trigger(cur_taxon, org);
       if (store_active) active_taxa.insert(cur_taxon);       // Store new taxon.
       if (parent) parent->AddOffspring();                    // Track tree info.
 
