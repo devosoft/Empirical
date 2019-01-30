@@ -1705,6 +1705,15 @@ TEST_CASE("Test vector utils", "[tools]") {
   REQUIRE(!emp::Has(v1, 4));
   REQUIRE(emp::Product(v1) == 180);
   REQUIRE(emp::Slice(v1,1,3) == emp::vector<int>({2,3}));
+
+  // Test handling vector-of-vectors.
+  using vv_int_t = emp::vector< emp::vector< int > >;
+  vv_int_t vv = {{1,2,3},{4,5,6},{7,8,9}};
+  vv_int_t vv2 = emp::Transpose(vv);
+  REQUIRE(vv[0][2] == 3);
+  REQUIRE(vv[1][0] == 4);
+  REQUIRE(vv2[0][2] == 7);
+  REQUIRE(vv2[1][0] == 2);
 }
 
 // DEFINE_ATTR(Foo);
