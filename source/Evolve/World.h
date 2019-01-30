@@ -323,11 +323,11 @@ namespace emp {
     /// @CAO: Technically, we should set this up with any number of coordinates.
     ORG & GetOrg(size_t x, size_t y) { return GetOrg(x+y*GetWidth()); }
 
-    /// Retrive a pointer to the contents of a speciefied cell; will be nullptr if the cell is
+    /// Retrive a pointer to the contents of a specified cell; will be nullptr if the cell is
     /// not occupied.
     const Ptr<ORG> GetOrgPtr(size_t id) const { return pop[id]; }
 
-    /// Retrieve a reference to the organsim as the specified position in the NEXT population.
+    /// Retrieve a reference to the organism at the specified position in the NEXT population.
     /// Will trip assert if cell is not occupied.
     ORG & GetNextOrg(size_t id) {
       emp_assert(id < pops[1].size());         // Next pop must be large enough.
