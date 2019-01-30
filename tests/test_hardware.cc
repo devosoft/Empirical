@@ -111,6 +111,16 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h')", "[hardware]")
     else { hw1.QueueEvent(event); }
   });
 
+  hw1.ResetProgram();
+  hw2.ResetProgram();
+
+  REQUIRE(hw1.GetProgram().GetSize() == 0);
+  REQUIRE(hw2.GetProgram().GetSize() == 0);
+
+  REQUIRE(hw1.GetTrait(TRAIT_IDX__ID) == 1);
+  REQUIRE(hw1.GetTrait(128) == -0.5);
+  REQUIRE(hw2.GetTrait(TRAIT_IDX__ID) == 2);
+
   // Do a hard reset
   hw1.Reset();
   hw2.Reset();
@@ -196,6 +206,12 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h')", "[hardware]")
       }
       prog2.PushFunction(new_fun);
     }
+
+    hw1.SetTrait(TRAIT_IDX__ID, 1);
+    hw1.ResetProgram();
+    REQUIRE(hw1.GetProgram().GetSize() == 0);
+    REQUIRE(hw1.GetTrait(TRAIT_IDX__ID) == 1);
+
     // Hard reset
     hw1.Reset();
     hw2.Reset();
