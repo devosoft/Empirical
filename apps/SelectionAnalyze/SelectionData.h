@@ -23,8 +23,10 @@ private:
   emp::vector< pop_fit_t > org_chart;     ///< Chart of all fitnesses for each organism.
   emp::vector< pop_fit_t > fitness_chart; ///< Chart of all fitnesses for each function.
 
-  emp::BitVector is_dominated;            ///< Is each org guaranteed to have a chance?
-  emp::BitVector is_active;               ///< Non-dominated AND not a duplicate.
+  emp::BitVector is_dominated;            ///< Is org guaranteed to have a chance?
+  emp::BitVector is_active;               ///< Is org non-dominated AND not a duplicate.
+
+  emp::BitVector is_discrim;              ///< Is criterium discrimanatory.
 
   struct OrgInfo {
     emp::vector< size_t > dup_ids;
@@ -35,8 +37,10 @@ private:
   void Reset() {
     is_dominated.Resize(GetNumOrgs());
     is_active.Resize(GetNumOrgs());
+    is_discrim.Resize(GetNumCriteria());
     is_dominated.Clear();
     is_active.SetAll();
+    is_discrim.SetAll();
   }
 public:
   SelectionData() { Reset(); }
@@ -68,7 +72,7 @@ public:
     org_info.resize(org_chart.size());     // Track info for all organisms.
   }
 
-  void PrintOrgFitnesses(std::ostream & os=std::cout) {
+  void PrintOrgs(std::ostream & os=std::cout) {
     const size_t num_orgs = GetNumOrgs();
     const size_t num_fits = GetNumCriteria();
     for (size_t org_id = 0; org_id < num_orgs; org_id++) {
@@ -78,6 +82,19 @@ public:
       }
       if (is_dominated[org_id]) os << "  DOMINATED";
       else if (is_active[org_id] == false) os << "  DUPLICATE";
+      os << std::endl;
+    }
+  }
+
+  void PrintCriteria(std::ostream & os=std::cout) {
+    const size_t num_orgs = GetNumOrgs();
+    const size_t num_fits = GetNumCriteria();
+    for (size_t fit_id = 0; fit_id < num_fits; fit_id++) {
+      const emp::vector<double> & crit = fitness_chart[fit_id];
+      for (double fit : crit) {
+        os << fit << " ";
+      }
+      if (is_discrim[fit_id] == false) os << "  NON-DISCIMINATORY";
       os << std::endl;
     }
   }
@@ -134,6 +151,22 @@ public:
           is_dominated[org1_id] = true;
         }
       }
+    }
+
+    // Now, let's remove any criteria that are not discriminatory among organisms.
+    for (size_t fit_id = 0; fit_id < num_fits; fit_id++) {
+      auto fits = fitness_chart[fit_id];
+      int org_id = is_active.FindBit();
+      const double value = fits[org_id];  // If any active orgs are not this value, this criterion IS discriminatory.
+
+      bool discrim = false;
+      while ((org_id = is_active.FindBit(org_id+1)) != -1) {
+        if (fits[org_id] != value) {
+          discrim = true;
+          break;
+        }
+      }
+      if (!discrim) is_discrim[fit_id] = false;
     }
 
   }
