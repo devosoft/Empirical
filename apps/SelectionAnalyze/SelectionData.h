@@ -9,6 +9,7 @@
 #define SELECTION_DATA_H
 
 #include <iostream>
+#include <map>
 #include <ostream>
 #include <string>
 
@@ -41,6 +42,34 @@ private:
     is_dominated.Clear();
     is_active.SetAll();
     is_discrim.SetAll();
+  }
+
+  /// Helper function to convert a set of org fitnesses to ranks.
+  void CriterionToRanks(size_t fit_id) {
+    pop_fit_t & fits = fitness_chart[fit_id]; // Get the set of fitness values.
+    double min_fit = emp::FindMin(fits);
+
+    // Build a map that we will use to convert fitnesses to rank categories
+    std::map<double, size_t> fit_map;
+
+    // Shift all fitnesses so min_fit is 1.0; set all non-active orgs to have a fitness of zero.
+    for (size_t org_id = 0; org_id < fits.size(); org_id++) {
+      if (is_active[org_id]) fits[org_id] = fits[org_id] - min_fit + 1.0;
+      else fits[org_id] = 0.0;
+      fit_map[fits[org_id]] = 0; // Make sure all fitnesses have an entry in the fitness map.
+    }
+    fit_map[0] = 0; // Make sure 0 is in the fitness map.
+
+    // Loop through the fitness map assigning new fitness values.
+    size_t new_fit = 0;
+    for (auto & x : fit_map) x.second = new_fit++;
+
+    // Make sure that the maximum fitness is always the number of organisms.
+    double max_fit = emp::FindMax(fits);
+    fit_map[max_fit] = fits.size();
+
+    // Now, update all of the fitness values appropriately.
+    for (double & fit : fits) fit = (double) fit_map[fit];
   }
 public:
   SelectionData() { Reset(); }
@@ -155,7 +184,9 @@ public:
 
     // Now, let's remove any criteria that are not discriminatory among organisms.
     for (size_t fit_id = 0; fit_id < num_fits; fit_id++) {
+      CriterionToRanks(fit_id);           // Convert this criterion so that it uses only ranks.
       auto fits = fitness_chart[fit_id];
+
       int org_id = is_active.FindBit();
       const double value = fits[org_id];  // If any active orgs are not this value, this criterion IS discriminatory.
 
