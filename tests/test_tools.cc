@@ -26,6 +26,7 @@
 #include "tools/DynamicString.h"
 #include "tools/FunctionSet.h"
 #include "tools/Graph.h"
+#include "tools/IndexMap.h"
 #include "tools/Lexer.h"
 #include "tools/NFA.h"
 #include "tools/RegEx.h"
@@ -546,6 +547,91 @@ TEST_CASE("Test Graph utils", "[tools]")
   //TODO: moar asserts
 }*/
 
+
+// TODO: add moar asserts
+TEST_CASE("Test IndexMap", "[tools]")
+{
+  emp::IndexMap imap(8);
+  imap[0] = 1.0;
+  imap[1] = 1.0;
+  imap[2] = 1.0;
+  imap[3] = 1.0;
+  imap[4] = 2.0;
+  imap[5] = 2.0;
+  imap[6] = 0.0;
+  imap[7] = 8.0;
+  
+  REQUIRE(imap.GetSize() == 8);
+  REQUIRE(imap.GetWeight() == 16.0);
+  REQUIRE(imap.GetWeight(2) == 1.0);
+  REQUIRE(imap.GetWeight(5) == 2.0);
+  REQUIRE(imap.GetWeight(7) == 8.0);
+  REQUIRE(imap[5] == 2.0);
+  REQUIRE(imap.GetProb(4) == 0.125);
+  REQUIRE(imap.GetProb(7) == 0.5);
+  REQUIRE(imap.Index(7.1) == 5);
+
+  // Add a new element to the end of the map that takes up half of the weight.
+  imap.PushBack(16.0);
+
+  REQUIRE(imap.GetSize() == 9);
+  REQUIRE(imap.GetWeight() == 32.0);
+  REQUIRE(imap.GetWeight(2) == 1.0);
+  REQUIRE(imap.GetWeight(5) == 2.0);
+  REQUIRE(imap.GetWeight(7) == 8.0);
+  REQUIRE(imap.GetWeight(8) == 16.0);
+  REQUIRE(imap[5] == 2.0);
+  REQUIRE(imap.GetProb(7) == 0.25);
+  REQUIRE(imap.Index(7.1) == 5);
+  REQUIRE(imap.Index(17.1) == 8);
+
+  emp::IndexMap imap_bak(imap);
+  imap.AdjustAll(10.0);
+
+  REQUIRE(imap.GetSize() == 9);
+  REQUIRE(imap.GetWeight() == 90.0);
+  REQUIRE(imap.GetWeight(2) == 10.0);
+  REQUIRE(imap.GetWeight(8) == 10.0);
+  REQUIRE(imap[5] == 10.0);
+  REQUIRE(imap.Index(7.1) == 0);
+  REQUIRE(imap.Index(75.0) == 7);
+
+  // Did the backup copy work correctly?
+  REQUIRE(imap_bak.GetSize() == 9);
+  REQUIRE(imap_bak.GetWeight() == 32.0);
+  REQUIRE(imap_bak.GetWeight(2) == 1.0);
+  REQUIRE(imap_bak.GetWeight(5) == 2.0);
+  REQUIRE(imap_bak.GetWeight(7) == 8.0);
+  REQUIRE(imap_bak.GetWeight(8) == 16.0);
+  REQUIRE(imap_bak[5] == 2.0);
+  REQUIRE(imap_bak.GetProb(7) == 0.25);
+  REQUIRE(imap_bak.Index(7.1) == 5);
+  REQUIRE(imap_bak.Index(17.1) == 8);
+
+  // Can we add on values from one index map to another?
+  imap += imap_bak;
+
+  REQUIRE(imap.GetSize() == 9);
+  REQUIRE(imap.GetWeight() == 122.0);
+  REQUIRE(imap.GetWeight(2) == 11.0);
+  REQUIRE(imap.GetWeight(5) == 12.0);
+  REQUIRE(imap.GetWeight(7) == 18.0);
+  REQUIRE(imap.GetWeight(8) == 26.0);
+  REQUIRE(imap[5] == 12.0);
+  REQUIRE(imap.Index(7.1) == 0);
+  REQUIRE(imap.Index(90.0) == 7);
+
+  // And subtraction?
+  imap -= imap_bak;
+
+  REQUIRE(imap.GetSize() == 9);
+  REQUIRE(imap.GetWeight() == 90.0);
+  REQUIRE(imap.GetWeight(2) == 10.0);
+  REQUIRE(imap.GetWeight(8) == 10.0);
+  REQUIRE(imap[5] == 10.0);
+  REQUIRE(imap.Index(7.1) == 0);
+  REQUIRE(imap.Index(75.0) == 7);
+}
 
 TEST_CASE("Test info_theory", "[tools]")
 {
