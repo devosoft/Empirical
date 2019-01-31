@@ -211,6 +211,8 @@ public:
 
     // Any criterion where all fitness values are 0 or max is non-discriminatory.
     for (size_t fit_id = 0; fit_id < fitness_chart.size(); fit_id++) {
+      if (is_discrim[fit_id] == false) continue; // Already non-discriminatory.
+
       bool discrim = false;
       size_t max_fit = GetNumOrgs();
       for (double fit : fitness_chart[fit_id]) {
@@ -228,6 +230,30 @@ public:
     return progress;
   }
 
+  // Remove any organisms that do not win (or tie for win) on ANY criteria.
+  size_t AnalyzeDominance_RemoveHopelessOrgs() {
+    size_t progress = 0;
+
+    size_t max_fit = GetNumOrgs();
+
+    for (size_t org_id = 0; org_id < GetNumOrgs(); org_id++) {
+      bool can_dom = false;
+      for (size_t fit_id = 0; fit_id < GetNumCriteria(); fit_id++) {
+        if (is_discrim[fit_id] && fitness_chart[fit_id][org_id] == max_fit) {
+          can_dom = true;
+          break;
+        }
+      }
+      if (can_dom == false) {
+        is_active[org_id] = false;
+        is_dominated[org_id] = true;
+        progress++;
+      }
+    }
+
+    return progress;
+  }
+
   void AnalyzeDominance() {
     Reset();
 
@@ -236,8 +262,16 @@ public:
 
     size_t progress = 0;
 
+    // Compare all orgs to find direct domination.
     progress += AnalyzeDominance_CompareOrgs();
+
+    // Remove criteria that cannot discriminate among orgs.
     progress += AnalyzeDominance_RemoveNonDiscriminatory();
+
+    // Remove orgs that cannot win on any criteria.
+    progress += AnalyzeDominance_RemoveHopelessOrgs();
+
+    // Remove duplicate criteria (that perform identically to others)
   }
 };
 
