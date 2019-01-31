@@ -38,6 +38,7 @@ private:
   };
 
   emp::vector< OrgInfo > org_info;
+  emp::vector< CriterionInfo > fit_info;
 
   void Reset() {
     is_dominated.Resize(GetNumOrgs());
@@ -112,11 +113,11 @@ public:
     org_chart = file.ToData<double>();     // Load in fitness data for each organism from file.
     fitness_chart = emp::Transpose(org_chart); // Organize data based on fitnesses rather than organisms.
     org_info.resize(org_chart.size());     // Track info for all organisms.
+    fit_info.resize(fitness_chart.size()); // Track info for all criteria.
   }
 
   void PrintOrgs(std::ostream & os=std::cout) {
     const size_t num_orgs = GetNumOrgs();
-    const size_t num_fits = GetNumCriteria();
     for (size_t org_id = 0; org_id < num_orgs; org_id++) {
       const emp::vector<double> & org = org_chart[org_id];
       for (double fit : org) {
@@ -129,7 +130,6 @@ public:
   }
 
   void PrintCriteria(std::ostream & os=std::cout) {
-    const size_t num_orgs = GetNumOrgs();
     const size_t num_fits = GetNumCriteria();
     for (size_t fit_id = 0; fit_id < num_fits; fit_id++) {
       const emp::vector<double> & crit = fitness_chart[fit_id];
@@ -254,11 +254,32 @@ public:
     return progress;
   }
 
+  size_t AnalyzeDominance_RemoveDuplicateCriteria() {
+    size_t progress = 0;
+
+    // Make sure criteria are in rank form for easy comparison.
+    CriteriaToRanks();
+
+    for (size_t fit_id1 = 0; fit_id1 < fitness_chart.size(); fit_id1++) {
+      if (is_discrim[fit_id1] == false) continue; // This criterion has already been eliminated.
+
+      for (size_t fit_id2 = fit_id1+1; fit_id2 < fitness_chart.size(); fit_id2++) {
+        if (is_discrim[fit_id2] == false) continue; // This criterion has already been eliminated.
+
+        // If we perfectly duplicate another criterion, mark it as a duplicate and deactivate it.
+        if (fitness_chart[fit_id1] == fitness_chart[fit_id2]) {
+          fit_info[fit_id1].dup_ids.push_back(fit_id2);
+          is_discrim[fit_id2] = false;
+          progress++;
+        }
+      }
+    }
+
+    return progress;
+  }
+
   void AnalyzeDominance() {
     Reset();
-
-    const size_t num_orgs = GetNumOrgs();
-    const size_t num_fits = GetNumCriteria();
 
     size_t progress = 0;
 
@@ -272,6 +293,7 @@ public:
     progress += AnalyzeDominance_RemoveHopelessOrgs();
 
     // Remove duplicate criteria (that perform identically to others)
+    progress += AnalyzeDominance_RemoveDuplicateCriteria();
   }
 };
 
