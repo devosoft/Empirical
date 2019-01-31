@@ -33,6 +33,10 @@ private:
     emp::vector< size_t > dup_ids;
   };
 
+  struct CriterionInfo {
+    emp::vector< size_t > dup_ids;
+  };
+
   emp::vector< OrgInfo > org_info;
 
   void Reset() {
@@ -45,6 +49,7 @@ private:
   }
 
   /// Helper function to convert a set of org fitnesses to ranks.
+  /// Sets inactive orgs to zero, min fitness to 1, and max fitness to num orgs (others count up from 1)
   void CriterionToRanks(size_t fit_id) {
     pop_fit_t & fits = fitness_chart[fit_id]; // Get the set of fitness values.
     double min_fit = emp::FindMin(fits);
@@ -71,6 +76,14 @@ private:
     // Now, update all of the fitness values appropriately.
     for (double & fit : fits) fit = (double) fit_map[fit];
   }
+
+  // Convert ALL criteria to be rank-based.
+  void CriteriaToRanks() {
+    for (size_t fit_id = 0; fit_id < fitness_chart.size(); fit_id++) {
+      CriterionToRanks(fit_id);           // Convert this criterion so that it uses only ranks.
+    }
+  }
+
 public:
   SelectionData() { Reset(); }
   SelectionData(const std::string & filename) {
@@ -128,16 +141,16 @@ public:
     }
   }
 
-  void AnalyzeDominance() {
-    Reset();
-
+  // Loop through all pairs of active organisms.  If any are dominated, remove them.
+  // Return how much progress we made on reducing the number of organisms being considered.
+  size_t AnalyzeDominance_CompareOrgs() {
     const size_t num_orgs = GetNumOrgs();
     const size_t num_fits = GetNumCriteria();
+    size_t progress = 0;
 
     for (size_t org1_id = 0; org1_id < num_orgs; org1_id++) {
-      if (is_active[org1_id] == false) {
-        continue;                  // This org has already been dominated.
-      }
+      if (is_active[org1_id] == false) continue;     // This org has already been dominated.
+
       const emp::vector<double> & org1 = org_chart[org1_id];
 
       // Track anything that org1 dominates or duplicates
@@ -166,40 +179,65 @@ public:
           // This is a duplicate, so mark and remove org2 from additional consideration.
           org_info[org1_id].dup_ids.push_back(org2_id);
           is_active[org2_id] = false;
+          progress++;
         }
 
         else if (maybe_dom1 == true && maybe_dom2 == false) {
           // Org 1 dominates org 2.  Mark org2 as dominated and inactive.
           is_active[org2_id] = false;
           is_dominated[org2_id] = true;
+          progress++;
         }
 
         else if (maybe_dom2 == true && maybe_dom1 == false) {
           // Org 2 dominates org 1.  Mark org1 as dominated and inactive.
           is_active[org1_id] = false;
           is_dominated[org1_id] = true;
+          progress++;
         }
       }
     }
 
-    // Now, let's remove any criteria that are not discriminatory among organisms.
-    for (size_t fit_id = 0; fit_id < num_fits; fit_id++) {
-      CriterionToRanks(fit_id);           // Convert this criterion so that it uses only ranks.
-      auto fits = fitness_chart[fit_id];
+    return progress;
+  }
 
-      int org_id = is_active.FindBit();
-      const double value = fits[org_id];  // If any active orgs are not this value, this criterion IS discriminatory.
+  // Remove any criteria that are not discriminatory among viable organisms.
+  size_t AnalyzeDominance_RemoveNonDiscriminatory() {
+    size_t progress = 0;
 
+    // Convert the fitness chart to use ranks instead of input values.
+    // All non-active organisms should have ranks of zero.
+    CriteriaToRanks();
+
+    // Any criterion where all fitness values are 0 or max is non-discriminatory.
+    for (size_t fit_id = 0; fit_id < fitness_chart.size(); fit_id++) {
       bool discrim = false;
-      while ((org_id = is_active.FindBit(org_id+1)) != -1) {
-        if (fits[org_id] != value) {
+      size_t max_fit = GetNumOrgs();
+      for (double fit : fitness_chart[fit_id]) {
+        if (fit != 0 && fit != max_fit) {
           discrim = true;
           break;
         }
       }
-      if (!discrim) is_discrim[fit_id] = false;
+      if (!discrim) {
+        is_discrim[fit_id] = false;
+        progress++;
+      }
     }
 
+    return progress;
+  }
+
+  void AnalyzeDominance() {
+    Reset();
+
+    const size_t num_orgs = GetNumOrgs();
+    const size_t num_fits = GetNumCriteria();
+
+    size_t progress = 0;
+
+    progress += AnalyzeDominance_CompareOrgs();
+    progress += AnalyzeDominance_RemoveNonDiscriminatory();
   }
 };
 
