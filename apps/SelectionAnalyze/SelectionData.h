@@ -69,58 +69,78 @@ public:
   }
 
   void PrintFitnesses(std::ostream & os=std::cout) {
-    for (const pop_fit_t & fit_row : fitness_chart) {
-      for (double fit : fit_row) {
+    const size_t num_orgs = GetNumOrgs();
+    const size_t num_fits = GetNumCriteria();
+    for (size_t org_id = 0; org_id < num_orgs; org_id++) {
+      const emp::vector<double> & org = org_chart[org_id];
+      for (double fit : org) {
         os << fit << " ";
       }
+      if (is_dominated[org_id]) os << "  DOMINATED";
+      else if (is_active[org_id] == false) os << "  DUPLICATE";
       os << std::endl;
     }
   }
 
+//#define NOTE(X) std::cout << X << std::endl
 
   void AnalyzeDominance() {
     Reset();
+
     const size_t num_orgs = GetNumOrgs();
     const size_t num_fits = GetNumCriteria();
 
     for (size_t org1_id = 0; org1_id < num_orgs; org1_id++) {
-      if (is_active[org1_id] == false) continue;                  // This org has already been dominated.
+//      NOTE("ORG1 = " << org1_id);
+      if (is_active[org1_id] == false) {
+//        NOTE("..SKIPPING -- org already deactivated");
+        continue;                  // This org has already been dominated.
+      }
       const emp::vector<double> & org1 = org_chart[org1_id];
 
       // Track anything that org1 dominates or duplicates
       for (size_t org2_id = org1_id+1; org2_id < num_orgs; org2_id++) {
+//        NOTE("  ORG2 = " << org2_id);
         const emp::vector<double> & org2 = org_chart[org2_id];
 
         bool maybe_dom1 = true;
         bool maybe_dom2 = true;
         for (size_t fit_id = 0; fit_id < num_fits; fit_id++) {
           if (org1[fit_id] < org2[fit_id]) {
+//            NOTE("    org1 < org2 on fit ID " << fit_id);
             maybe_dom1 = false;
             if (maybe_dom2 == false) break;
           }
           if (org1[fit_id] > org2[fit_id]){
+//            NOTE("    org1 > org2 on fit ID " << fit_id);
             maybe_dom2 = false;            
             if (maybe_dom1 == false) break;
           }
         }
 
-        // Both TRUE => DUPLICATE
-        // Both FALSE => No dominance
+//        NOTE("    result = " << maybe_dom1 << " " << maybe_dom2);
+
+        // Both TRUE                                 => DUPLICATE
+        // Both FALSE                                => No dominance
         // maybe_dom1 == true && maybe_dom2 == false => ORG1 dominates        
         // maybe_dom1 == false && maybe_dom2 == true => ORG2 dominates        
 
         if (maybe_dom1 == true && maybe_dom2 == true) {
+//          NOTE("    RESULT: Marking org2 as a duplicate!");
           // This is a duplicate, so mark and remove org2 from additional consideration.
           org_info[org1_id].dup_ids.push_back(org2_id);
           is_active[org2_id] = false;
         }
 
-        if (maybe_dom1 == true && maybe_dom2 == false) {
+        else if (maybe_dom1 == true && maybe_dom2 == false) {
+//          NOTE("    RESULT: Marking org2 as dominated!");
           // Org 1 dominates org 2.  Mark org2 as dominated and inactive.
           is_active[org2_id] = false;
           is_dominated[org2_id] = true;
         }
-        if (maybe_dom2 == true && maybe_dom1 == false) {
+
+        else if (maybe_dom2 == true && maybe_dom1 == false) {
+//          NOTE("    RESULT: Marking org1 as dominated!");
           // Org 2 dominates org 1.  Mark org1 as dominated and inactive.
           is_active[org1_id] = false;
           is_dominated[org1_id] = true;
