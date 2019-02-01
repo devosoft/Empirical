@@ -141,6 +141,19 @@ public:
     }
   }
 
+  void PrintNewCriteria(std::ostream & os=std::cout) {
+    const size_t num_fits = GetNumCriteria();
+    for (size_t fit_id = 0; fit_id < num_fits; fit_id++) {
+      if (is_discrim[fit_id] == false) continue;
+      const emp::vector<double> & crit = fitness_chart[fit_id];
+      for (size_t org_id = 0; org_id < crit.size(); org_id++) {
+        if (is_active[org_id] == false) continue;
+        os << crit[org_id] << " ";
+      }
+      os << std::endl;
+    }
+  }
+
   // Loop through all pairs of active organisms.  If any are dominated, remove them.
   // Return how much progress we made on reducing the number of organisms being considered.
   size_t AnalyzeDominance_CompareOrgs() {
@@ -155,6 +168,7 @@ public:
 
       // Track anything that org1 dominates or duplicates
       for (size_t org2_id = org1_id+1; org2_id < num_orgs; org2_id++) {
+        if (is_active[org2_id] == false) continue;     // This org has already been dominated.
         const emp::vector<double> & org2 = org_chart[org2_id];
 
         bool maybe_dom1 = true;
@@ -237,6 +251,7 @@ public:
     size_t max_fit = GetNumOrgs();
 
     for (size_t org_id = 0; org_id < GetNumOrgs(); org_id++) {
+      if (is_active[org_id] == false) continue;     // This org has already been removed.
       bool can_dom = false;
       for (size_t fit_id = 0; fit_id < GetNumCriteria(); fit_id++) {
         if (is_discrim[fit_id] && fitness_chart[fit_id][org_id] == max_fit) {
@@ -281,19 +296,29 @@ public:
   void AnalyzeDominance() {
     Reset();
 
-    size_t progress = 0;
+    size_t progress = 1;
 
-    // Compare all orgs to find direct domination.
-    progress += AnalyzeDominance_CompareOrgs();
+    while (progress) {
+      progress = 0;
+      std::cout << "Start = " << progress << std::endl;
 
-    // Remove criteria that cannot discriminate among orgs.
-    progress += AnalyzeDominance_RemoveNonDiscriminatory();
+      // Compare all orgs to find direct domination.
+      progress += AnalyzeDominance_CompareOrgs();
+      std::cout << "After CompareOrgs = " << progress << std::endl;
 
-    // Remove orgs that cannot win on any criteria.
-    progress += AnalyzeDominance_RemoveHopelessOrgs();
+      // Remove criteria that cannot discriminate among orgs.
+      progress += AnalyzeDominance_RemoveNonDiscriminatory();
+      std::cout << "After RemoveNonDiscriminatory = " << progress << std::endl;
 
-    // Remove duplicate criteria (that perform identically to others)
-    progress += AnalyzeDominance_RemoveDuplicateCriteria();
+      // Remove orgs that cannot win on any criteria.
+      progress += AnalyzeDominance_RemoveHopelessOrgs();
+      std::cout << "After RemoveHopelessOrgs = " << progress << std::endl;
+
+      // Remove duplicate criteria (that perform identically to others)
+      progress += AnalyzeDominance_RemoveDuplicateCriteria();
+      std::cout << "After RemoveDuplicateCriteria = " << progress << std::endl;
+
+    }
   }
 };
 
