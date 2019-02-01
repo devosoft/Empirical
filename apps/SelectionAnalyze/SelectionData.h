@@ -30,11 +30,18 @@ private:
   emp::BitVector is_discrim;              ///< Is criterium discrimanatory.
 
   struct OrgInfo {
-    emp::vector< size_t > dup_ids;
+    emp::vector< size_t > dup_ids;  // What OTHER ids are lumped in with this one?
+    double select_prob = 0.0;       // What is the probability of this group being picked?
+
+    size_t GetSize() { return 1 + dup_ids.size(); }
+    double GetWeight() { return 1.0 + dup_ids.size(); }
   };
 
   struct CriterionInfo {
     emp::vector< size_t > dup_ids;
+
+    size_t GetSize() { return 1 + dup_ids.size(); }
+    double GetWeight() { return 1.0 + dup_ids.size(); }
   };
 
   emp::vector< OrgInfo > org_info;
@@ -319,6 +326,58 @@ public:
       std::cout << "After RemoveDuplicateCriteria = " << progress << std::endl;
 
     }
+  }
+
+  /// Calculate the remaining probabilities for a given starting prob and
+  /// current orgs and criteria.
+  void CalcLexicaseProbs(double cur_prob, const emp::BitVector & orgs, const emp::BitVector & fits) {
+    // If we're down to only one org type, assign the full probability to it.
+    if (orgs.CountOnes() == 1) {
+      int id = orgs.FindBit();
+      emp_assert(id != -1);
+      org_info[(size_t) id].select_prob += cur_prob;
+      return;
+    }
+
+    const size_t num_orgs = GetNumOrgs();
+    const double total_fit_weight = (double) GetNumCriteria();
+
+    // Loop through all criteria to run next.
+    emp::BitVector next_orgs = orgs;
+    emp::BitVector next_fits = fits;
+    int fit_id = fits.FindBit();
+    while (fit_id != -1) {
+      double weight = fit_info[(size_t) fit_id].GetWeight();
+      next_fits.Set((size_t) fit_id, false);  // Turn off this criterion so it can't be run again.
+
+      // Trim down to just the orgs that make it past this criterion.
+      next_orgs.Clear();
+      int org_id = orgs.FindBit();
+      double best_fit = 0.0;
+      while (org_id != -1) {
+        const double cur_fit = fitness_chart[(size_t) fit_id][(size_t)org_id];
+        if (cur_fit > best_fit) {
+          best_fit = cur_fit;
+          next_orgs.Clear();
+        }
+        if (cur_fit == best_fit) {
+          next_orgs.Set((size_t) org_id);
+        }
+        org_id = orgs.FindBit(org_id+1);
+      }
+
+      CalcLexicaseProbs(cur_prob * weight / total_fit_weight, next_orgs, next_fits);
+      next_fits.Set((size_t) fit_id, true);   // Turn back on this criterion for next loop.
+      fit_id = fits.FindBit(fit_id+1);
+    }
+  }
+
+  // Calculate the probabilities of each organism being selected in lexicase...
+  void CalcLexicaseProbs() {
+    // Initialize all probs to 0.0; update below as each case is analyzed.
+    for (OrgInfo & org : org_info) org.select_prob = 0.0;
+
+    CalcLexicaseProbs(1.0, is_active, is_discrim);
   }
 };
 
