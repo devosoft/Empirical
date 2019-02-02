@@ -29,6 +29,9 @@ private:
 
   emp::BitVector is_discrim;              ///< Is criterium discrimanatory.
 
+  double total_prob;                      ///< How much probability has been calculated?
+  double last_print_prob;                 ///< How much probability had acrued at last print?
+
   struct OrgInfo {
     emp::vector< size_t > dup_ids;  // What OTHER ids are lumped in with this one?
     double select_prob = 0.0;       // What is the probability of this group being picked?
@@ -130,6 +133,7 @@ public:
       for (double fit : org) {
         os << fit << " ";
       }
+      std::cout << " (prob = " << org_info[org_id].select_prob << ")";
       if (is_dominated[org_id]) os << "  DOMINATED";
       else if (is_active[org_id] == false) os << "  DUPLICATE";
       os << std::endl;
@@ -336,16 +340,25 @@ public:
       int id = orgs.FindBit();
       emp_assert(id != -1);
       org_info[(size_t) id].select_prob += cur_prob;
+      total_prob += cur_prob;
+      if (total_prob >= last_print_prob + 0.001) {
+        std::cout << "Processed: " << total_prob << std::endl;
+        last_print_prob = total_prob;
+      }
       return;
     }
 
-    const size_t num_orgs = GetNumOrgs();
-    const double total_fit_weight = (double) GetNumCriteria();
+    double total_fit_weight = 0.0;
+    int fit_id = fits.FindBit();
+    while (fit_id != -1) {
+      total_fit_weight += fit_info[(size_t) fit_id].GetWeight();
+      fit_id = fits.FindBit(fit_id+1);
+    }
 
     // Loop through all criteria to run next.
     emp::BitVector next_orgs = orgs;
     emp::BitVector next_fits = fits;
-    int fit_id = fits.FindBit();
+    fit_id = fits.FindBit();
     while (fit_id != -1) {
       double weight = fit_info[(size_t) fit_id].GetWeight();
       next_fits.Set((size_t) fit_id, false);  // Turn off this criterion so it can't be run again.
@@ -374,6 +387,9 @@ public:
 
   // Calculate the probabilities of each organism being selected in lexicase...
   void CalcLexicaseProbs() {
+    total_prob = 0.0;
+    last_print_prob = 0.0;
+
     // Initialize all probs to 0.0; update below as each case is analyzed.
     for (OrgInfo & org : org_info) org.select_prob = 0.0;
 
