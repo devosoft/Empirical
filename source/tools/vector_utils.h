@@ -84,6 +84,13 @@ namespace emp {
     return FindIndex(v, [](v_type a, v_type b){ return a > b; });
   }
 
+  /// Find the minimum value in a vector.
+  template <typename T>
+  T FindMin(const emp::vector<T> & v) { return v[ FindMinIndex(v) ]; }
+
+  /// Find the maximum value in a vector.
+  template <typename T>
+  T FindMax(const emp::vector<T> & v) { return v[ FindMaxIndex(v) ]; }
 
   /// Sum up the contents of a vector.
   template <typename T>
