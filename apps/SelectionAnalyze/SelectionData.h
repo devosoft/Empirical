@@ -438,6 +438,7 @@ public:
       fit_id = fits.FindBit(fit_id+1);
     }
 
+    prob_cache[orgs] = out_probs;
     return out_probs;
   }
 
