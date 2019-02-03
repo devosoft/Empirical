@@ -19,12 +19,17 @@ int main(int argc, char* argv[])
     std::cout << "Warning: No criteria data found." << std::endl;
   }
 
-  data.AnalyzeDominance();
+  data.AnalyzeLexicase();
+  data.CalcLexicaseProbs();
+
   std::cout << "By organism (" << data.GetNumOrgs() << "):" << std::endl;
   data.PrintOrgs();
   std::cout << std::endl;
   std::cout << "By criterion (" << data.GetNumCriteria() << "):" << std::endl;
   data.PrintCriteria();
+
+  std::cout << std::endl;
+  data.PrintNewCriteria();
 
   // emp::vector< double > fit_data = data.GetFitData(0);
   // emp::IndexMap fit_map(num_orgs);
