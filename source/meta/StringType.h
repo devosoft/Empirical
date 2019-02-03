@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018
+ *  @date 2018-2019
  *
  *  @file  StringType.h
  *  @brief A type that maintains compile-time information about a string sequence.
@@ -69,8 +69,8 @@ namespace emp {
 
     using this_t = StringType<C1,Cs...>;          ///< The type of the current StringType
     using pop = StringType<Cs...>;                ///< StringType after removing the first char
-    template <int C> using push = StringType<C, C1, Cs...>;       ///< Add char to front of string
-    template <int C> using push_back = StringType<C1, Cs..., C>;  ///< Add char to back of string
+    template <char C> using push = StringType<C, C1, Cs...>;       ///< Add char to front of string
+    template <char C> using push_back = StringType<C1, Cs..., C>;  ///< Add char to back of string
 
     /// Does StringType contains the char C?
     constexpr static bool Has(char C) { return (C==C1) | pop::Has(C); }
@@ -111,8 +111,8 @@ namespace emp {
 
     using this_t = StringType<>;                  ///< The type of the current StringType
     // No pop_t; should give error if used on empty string
-    template <int C> using push = StringType<C>;       ///< Add char to front of string
-    template <int C> using push_back = StringType<C>;  ///< Add char to back of string
+    template <char C> using push = StringType<C>;       ///< Add char to front of string
+    template <char C> using push_back = StringType<C>;  ///< Add char to back of string
 
     /// Empty StringType does not contain the char C.
     constexpr static bool Has(char C) { return false; }
