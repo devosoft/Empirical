@@ -11,7 +11,6 @@
 *.out
 *.debug
 *.mp4
-*.csv
 *-bak.cc
 	
 */env/*
@@ -20,6 +19,9 @@
 .DS_Store
 a.out
 a.out.js
+fitness.csv
+population.csv
+systematics.csv
 
 incoming/
 tmp/
@@ -62,6 +64,7 @@ examples/*/*
 !examples/*/Makefile
 examples/timing/short_strings.html
 
+tests/*.csv
 tests/StatsConfig.cfg
 tests/web/*.js
 tests/web/package.json
