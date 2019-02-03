@@ -387,15 +387,14 @@ public:
   /// Calculate the remaining probabilities for a given starting prob and
   /// current orgs and criteria.
   emp::vector<double> CalcLexicaseProbs(const emp::BitVector & orgs, const emp::BitVector & fits) {
-    emp::vector<double> out_probs(orgs.GetSize(), 0.0);
+    // Look up this set of organisms in the cache.
+    emp::vector<double> out_probs = prob_cache[orgs];
 
-    // If we're down to only one org type, assign the full probability to it.
-    if (orgs.CountOnes() == 1) {
-      int id = orgs.FindBit();
-      emp_assert(id != -1);
-      out_probs[(size_t) id] = 1.0;
-      return out_probs;
-    }
+    // If out_probs has already been set, return the result!
+    if (out_probs.size()) return out_probs;
+
+    // We haven't cached out_probs, so calculate it now.
+    out_probs.resize(orgs.GetSize(), 0.0);
 
     // Calculate the total weight of all the criteria to determine the fraction associated with each.
     double total_fit_weight = 0.0;
