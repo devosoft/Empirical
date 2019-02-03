@@ -12,6 +12,7 @@
 #include <map>
 #include <ostream>
 #include <string>
+#include <unordered_map>
 
 #include "../../source/base/vector.h"
 #include "../../source/tools/BitVector.h"
@@ -24,13 +25,13 @@ private:
   emp::vector< pop_fit_t > org_chart;     ///< Chart of all fitnesses for each organism.
   emp::vector< pop_fit_t > fitness_chart; ///< Chart of all fitnesses for each function.
 
+  /// Cache the probabilities for subsets of populations.
+  std::unordered_map<emp::BitVector, emp::vector<double>> prob_cache;
+
   emp::BitVector is_dominated;            ///< Is org guaranteed to have a chance?
   emp::BitVector is_active;               ///< Is org non-dominated AND not a duplicate.
 
   emp::BitVector is_discrim;              ///< Is criterium discrimanatory.
-
-  double total_prob;                      ///< How much probability has been calculated?
-  double last_print_prob;                 ///< How much probability had acrued at last print?
 
   struct OrgInfo {
     emp::vector< size_t > dup_ids;  // What OTHER ids are lumped in with this one?
@@ -51,6 +52,7 @@ private:
   emp::vector< CriterionInfo > fit_info;
 
   void Reset() {
+    prob_cache.clear();
     is_dominated.Resize(GetNumOrgs());
     is_active.Resize(GetNumOrgs());
     is_discrim.Resize(GetNumCriteria());
@@ -342,11 +344,6 @@ public:
       int id = orgs.FindBit();
       emp_assert(id != -1);
       org_info[(size_t) id].select_prob += cur_prob;
-      total_prob += cur_prob;
-      if (total_prob >= last_print_prob + 0.001) {
-        std::cout << "Processed: " << total_prob << std::endl;
-        last_print_prob = total_prob;
-      }
       return;
     }
 
@@ -447,8 +444,16 @@ public:
 
   // Calculate the probabilities of each organism being selected in lexicase...
   void CalcLexicaseProbs() {
-    total_prob = 0.0;
-    last_print_prob = 0.0;
+    // Setup all singleton populations in the cache.
+    emp::BitVector base_orgs(org_info.size());
+    std::vector<double> base_probs(org_info.size(), 0.0);
+    for (size_t org_id = 0; org_id < org_info.size(); org_id++) {
+      base_orgs.Set(org_id, true);
+      base_probs[org_id] = 1.0;
+      prob_cache[base_orgs] = base_probs;
+      base_orgs.Set(org_id, false);
+      base_probs[org_id] = 0.0;
+    }
 
     // Initialize all probs to 0.0; update below as each case is analyzed.
     for (OrgInfo & org : org_info) org.select_prob = 0.0;
