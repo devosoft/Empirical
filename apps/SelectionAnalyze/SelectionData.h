@@ -57,6 +57,10 @@ private:
     is_dominated.Clear();
     is_active.SetAll();
     is_discrim.SetAll();
+    org_info.resize(0);
+    org_info.resize(GetNumOrgs());
+    fit_info.resize(0);
+    fit_info.resize(GetNumOrgs());
   }
 
   /// Helper function to convert a set of org fitnesses to ranks.
@@ -167,7 +171,7 @@ public:
 
   // Loop through all pairs of active organisms.  If any are dominated, remove them.
   // Return how much progress we made on reducing the number of organisms being considered.
-  size_t AnalyzeDominance_CompareOrgs() {
+  size_t AnalyzeLexicase_CompareOrgs() {
     const size_t num_orgs = GetNumOrgs();
     const size_t num_fits = GetNumCriteria();
     size_t progress = 0;
@@ -227,7 +231,7 @@ public:
   }
 
   // Remove any criteria that are not discriminatory among viable organisms.
-  size_t AnalyzeDominance_RemoveNonDiscriminatory() {
+  size_t AnalyzeLexicase_RemoveNonDiscriminatory() {
     size_t progress = 0;
 
     // Convert the fitness chart to use ranks instead of input values.
@@ -256,7 +260,7 @@ public:
   }
 
   // Remove any organisms that do not win (or tie for win) on ANY criteria.
-  size_t AnalyzeDominance_RemoveHopelessOrgs() {
+  size_t AnalyzeLexicase_RemoveHopelessOrgs() {
     size_t progress = 0;
 
     size_t max_fit = GetNumOrgs();
@@ -280,7 +284,7 @@ public:
     return progress;
   }
 
-  size_t AnalyzeDominance_RemoveDuplicateCriteria() {
+  size_t AnalyzeLexicase_RemoveDuplicateCriteria() {
     size_t progress = 0;
 
     // Make sure criteria are in rank form for easy comparison.
@@ -304,31 +308,29 @@ public:
     return progress;
   }
 
-  void AnalyzeDominance() {
+  void AnalyzeLexicase() {
     Reset();
 
     size_t progress = 1;
 
     while (progress) {
       progress = 0;
-      std::cout << "Start = " << progress << std::endl;
 
       // Compare all orgs to find direct domination.
-      progress += AnalyzeDominance_CompareOrgs();
+      progress += AnalyzeLexicase_CompareOrgs();
       std::cout << "After CompareOrgs = " << progress << std::endl;
 
       // Remove criteria that cannot discriminate among orgs.
-      progress += AnalyzeDominance_RemoveNonDiscriminatory();
+      progress += AnalyzeLexicase_RemoveNonDiscriminatory();
       std::cout << "After RemoveNonDiscriminatory = " << progress << std::endl;
 
       // Remove orgs that cannot win on any criteria.
-      progress += AnalyzeDominance_RemoveHopelessOrgs();
+      progress += AnalyzeLexicase_RemoveHopelessOrgs();
       std::cout << "After RemoveHopelessOrgs = " << progress << std::endl;
 
       // Remove duplicate criteria (that perform identically to others)
-      progress += AnalyzeDominance_RemoveDuplicateCriteria();
+      progress += AnalyzeLexicase_RemoveDuplicateCriteria();
       std::cout << "After RemoveDuplicateCriteria = " << progress << std::endl;
-
     }
   }
 
