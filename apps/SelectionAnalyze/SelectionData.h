@@ -34,18 +34,18 @@ private:
   emp::BitVector is_discrim;              ///< Is criterium discrimanatory.
 
   struct OrgInfo {
-    emp::vector< size_t > dup_ids;  // What OTHER ids are lumped in with this one?
-    double select_prob = 0.0;       // What is the probability of this group being picked?
+    emp::vector< size_t > dup_ids = {};   ///< What OTHER ids are lumped in with this one?
+    double select_prob = 0.0;             ///< What is the probability of this group being picked?
 
     size_t GetSize() { return 1 + dup_ids.size(); }
-    double GetWeight() { return 1.0 + dup_ids.size(); }
+    double GetWeight() { return 1.0 + (double) dup_ids.size(); }
   };
 
   struct CriterionInfo {
-    emp::vector< size_t > dup_ids;
+    emp::vector< size_t > dup_ids = {};
 
     size_t GetSize() { return 1 + dup_ids.size(); }
-    double GetWeight() { return 1.0 + dup_ids.size(); }
+    double GetWeight() { return 1.0 + (double) dup_ids.size(); }
   };
 
   emp::vector< OrgInfo > org_info;
@@ -102,9 +102,12 @@ private:
   }
 
 public:
-  SelectionData() { Reset(); }
-  SelectionData(const std::string & filename) {
-    Reset();
+  SelectionData()
+    : org_chart(), fitness_chart(), prob_cache()
+    , is_dominated(), is_active(), is_discrim()
+    , org_info(), fit_info()
+  { Reset(); }
+  SelectionData(const std::string & filename) : SelectionData() {
     Load(filename);
   }
   ~SelectionData() { ; }
@@ -245,7 +248,7 @@ public:
       if (is_discrim[fit_id] == false) continue; // Already non-discriminatory.
 
       bool discrim = false;
-      size_t max_fit = GetNumOrgs();
+      double max_fit = (double) GetNumOrgs();
       for (double fit : fitness_chart[fit_id]) {
         if (fit != 0 && fit != max_fit) {
           discrim = true;
@@ -265,7 +268,7 @@ public:
   size_t AnalyzeLexicase_RemoveHopelessOrgs() {
     size_t progress = 0;
 
-    size_t max_fit = GetNumOrgs();
+    double max_fit = (double) GetNumOrgs();
 
     for (size_t org_id = 0; org_id < GetNumOrgs(); org_id++) {
       if (is_active[org_id] == false) continue;     // This org has already been removed.
