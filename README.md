@@ -4,7 +4,7 @@ is simple to incorporate into existing projects.
 
 [![Build Status](https://travis-ci.org/devosoft/Empirical.svg?branch=master)](https://travis-ci.org/devosoft/Empirical) [![Documentation Status](https://readthedocs.org/projects/empirical/badge/?version=latest)](https://empirical.readthedocs.io/en/latest/?badge=latest)
 
-See the doc/QuickStartGuides/ folder to start using the library.
+See our [Quick Start Guides](https://empirical.readthedocs.io/en/latest/QuickStartGuides) to start using the library.
 
 Tools in Empirical include:
 * Web-enabled elements to facilitate compiling to JavaScript and with a full web interfaces,
