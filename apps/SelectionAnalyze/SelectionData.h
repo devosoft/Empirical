@@ -370,11 +370,9 @@ public:
     int fit_id = fits.FindBit();
     while (fit_id != -1) {
       double weight = fit_info[(size_t) fit_id].GetWeight();
-      total_fit_weight += weight;
       next_fits.Set((size_t) fit_id, false);  // Turn off this criterion so it can't be run again.
 
       // Trim down to just the orgs that make it past this criterion.
-      next_orgs.Clear();
       double best_fit = 0.0;
       int org_id = orgs.FindBit();
       while (org_id != -1) {
@@ -388,6 +386,14 @@ public:
         }
         org_id = orgs.FindBit(org_id+1);
       }
+
+      // If this criterion made no progress, abandon it as non-discriminatory.
+      if (next_orgs == orgs) {
+        fit_id = fits.FindBit(fit_id+1);
+        continue;
+      }
+
+      total_fit_weight += weight;
 
       // Recursively call on the next population.
       const auto next_probs = CalcLexicaseProbs(next_orgs, next_fits);
