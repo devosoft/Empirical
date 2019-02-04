@@ -12,7 +12,7 @@ Tools in Empirical include:
 * Debug tools to facilitate audited memory management; these tools are turned off outside of
   debug mode allowing the full speed of raw pointers and normal standard library components.
 * A wide range of Helper tools to streamline common scientific computing tasks such as
-  configuration, data mangement, mathematical manipulations, etc.
+  configuration, data management, mathematical manipulations, etc.
   All of these are designed to be  easy-to-use and efficient.
 * A powerful set of evolution tools for building Artificial Life or Evolutionary Computation
   software.

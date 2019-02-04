@@ -6,11 +6,11 @@ Empirical vectors and arrays
 
 Empirical contains of intelligent versions of STL vectors and arrays
 that will warn you if you make common errors, but otherwise behave
-identically to the STL version. Most importantly, they will detect 
+identically to the STL version. Most importantly, they will detect
 attempts to index to out-of-bounds locations
-and throw an error. These features are critical for writing code that 
-will be compiled to Javascript with Emscripten, because Valgrind 
-doesn't run on Javascript. They also save a lot of debugging time 
+and throw an error. These features are critical for writing code that
+will be compiled to Javascript with Emscripten, because Valgrind
+doesn't run on Javascript. They also save a lot of debugging time
 when writing native C++ code.
 
 "But wait," you might say, "surely all of these additional checks slow
@@ -46,10 +46,10 @@ emp::array Example
 Empirical asserts
 -----------------
 
-These asserts function similarly to normal asserts, with a few important 
+These asserts function similarly to normal asserts, with a few important
 additional features:
    - If compiled with Emscripten they will provide pop-up alerts when run in a web browser.
-   - emp_assert can take additional arguments. If the assert is triggered, 
+   - emp_assert can take additional arguments. If the assert is triggered,
      those extra arguments will be evaluated and printed.
    - if NDEBUG -or- EMP_NDEBUG is defined, the expression in emp_assert() is not evaluated.
    - if EMP_TDEBUG is defined, emp_assert() goes into test mode and records failures, but
