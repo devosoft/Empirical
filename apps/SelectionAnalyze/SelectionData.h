@@ -341,54 +341,6 @@ public:
 
   /// Calculate the remaining probabilities for a given starting prob and
   /// current orgs and criteria.
-  void CalcLexicaseProbs(double cur_prob, const emp::BitVector & orgs, const emp::BitVector & fits) {
-    // If we're down to only one org type, assign the full probability to it.
-    if (orgs.CountOnes() == 1) {
-      int id = orgs.FindBit();
-      emp_assert(id != -1);
-      org_info[(size_t) id].select_prob += cur_prob;
-      return;
-    }
-
-    double total_fit_weight = 0.0;
-    int fit_id = fits.FindBit();
-    while (fit_id != -1) {
-      total_fit_weight += fit_info[(size_t) fit_id].GetWeight();
-      fit_id = fits.FindBit(fit_id+1);
-    }
-
-    // Loop through all criteria to run next.
-    emp::BitVector next_orgs = orgs;
-    emp::BitVector next_fits = fits;
-    fit_id = fits.FindBit();
-    while (fit_id != -1) {
-      double weight = fit_info[(size_t) fit_id].GetWeight();
-      next_fits.Set((size_t) fit_id, false);  // Turn off this criterion so it can't be run again.
-
-      // Trim down to just the orgs that make it past this criterion.
-      next_orgs.Clear();
-      int org_id = orgs.FindBit();
-      double best_fit = 0.0;
-      while (org_id != -1) {
-        const double cur_fit = fitness_chart[(size_t) fit_id][(size_t)org_id];
-        if (cur_fit > best_fit) {
-          best_fit = cur_fit;
-          next_orgs.Clear();
-        }
-        if (cur_fit == best_fit) {
-          next_orgs.Set((size_t) org_id);
-        }
-        org_id = orgs.FindBit(org_id+1);
-      }
-
-      CalcLexicaseProbs(cur_prob * weight / total_fit_weight, next_orgs, next_fits);
-      next_fits.Set((size_t) fit_id, true);   // Turn back on this criterion for next loop.
-      fit_id = fits.FindBit(fit_id+1);
-    }
-  }
-
-  /// Calculate the remaining probabilities for a given starting prob and
-  /// current orgs and criteria.
   emp::vector<double> CalcLexicaseProbs(const emp::BitVector & orgs, const emp::BitVector & fits) {
     // Look up this set of organisms in the cache.
     emp::vector<double> out_probs = prob_cache[orgs];
@@ -399,28 +351,19 @@ public:
     // We haven't cached out_probs, so calculate it now.
     out_probs.resize(orgs.GetSize(), 0.0);
 
-    // Calculate the total weight of all the criteria to determine the fraction associated with each.
-    double total_fit_weight = 0.0;
-    int fit_id = fits.FindBit();
-    while (fit_id != -1) {
-      total_fit_weight += fit_info[(size_t) fit_id].GetWeight();
-      fit_id = fits.FindBit(fit_id+1);
-    }
-
     // Loop through all criteria to run next.
     emp::BitVector next_orgs = orgs;
     emp::BitVector next_fits = fits;
-    fit_id = fits.FindBit();
+    double total_fit_weight = 0.0;
+    int fit_id = fits.FindBit();
     while (fit_id != -1) {
-      double weight = fit_info[(size_t) fit_id].GetWeight();
-      double scale = weight / total_fit_weight;
+      double fit_weight = fit_info[(size_t) fit_id].GetWeight();
       next_fits.Set((size_t) fit_id, false);  // Turn off this criterion so it can't be run again.
 
       // Trim down to just the orgs that make it past this criterion.
-      next_orgs.Clear();
-      int org_id = orgs.FindBit();
-      double best_fit = 0.0;
-      while (org_id != -1) {
+      int org_id = orgs.FindBit(); // Start with te first org available.
+      double best_fit = 0.0;       // best_fit=0 forces next_orgs to clear before being filled.
+      while (org_id != -1) {       // Loop through all orgs
         const double cur_fit = fitness_chart[(size_t) fit_id][(size_t)org_id];
         if (cur_fit > best_fit) {
           best_fit = cur_fit;
@@ -429,17 +372,28 @@ public:
         if (cur_fit == best_fit) {
           next_orgs.Set((size_t) org_id);
         }
-        org_id = orgs.FindBit(org_id+1);
+        org_id = orgs.FindBit(org_id+1);   // Move on to the next org still being considered.
       }
+
+      // If we have not trimmed down the orgs at all, continue to the next criterion.
+      if (next_orgs == orgs) continue;
 
       // Recursively call on the next population.
       const auto next_probs = CalcLexicaseProbs(next_orgs, next_fits);
       for (size_t i = 0; i < out_probs.size(); i++) {
-        out_probs[i] += scale * next_probs[i];
+        out_probs[i] += fit_weight * next_probs[i];
       }
-      next_fits.Set((size_t) fit_id, true);   // Turn back on this criterion for next loop.
-      fit_id = fits.FindBit(fit_id+1);
+
+      total_fit_weight += fit_weight; // Track the total weight of criteria we used!
+
+      // Turn back on this criterion for next loop.
+      // Note: if we didn't get here, criterion is non-discriminatory, so leave it off.
+      next_fits.Set((size_t) fit_id, true);   
+      fit_id = fits.FindBit(fit_id+1);        // Find the next fitness to consider.
     }
+
+    // Normalize the criteria before locking them in.
+    for (double & prob : out_probs) prob /= total_fit_weight;
 
     prob_cache[orgs] = out_probs;
     return out_probs;
