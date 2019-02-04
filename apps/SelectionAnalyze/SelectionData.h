@@ -174,6 +174,16 @@ public:
     }
   }
 
+  void PrintSelectProbs(std::ostream & os=std::cout) {
+    double total = 0.0;
+    for (size_t i = 0; i < GetNumOrgs(); i++) {
+      os << org_info[i].select_prob << " ";
+      total += org_info[i].select_prob;
+    }
+    os << std::endl;
+    os << "total = " << total << std::endl;
+  }
+
   // Loop through all pairs of active organisms.  If any are dominated, remove them.
   // Return how much progress we made on reducing the number of organisms being considered.
   size_t AnalyzeLexicase_CompareOrgs() {
@@ -351,19 +361,23 @@ public:
     // We haven't cached out_probs, so calculate it now.
     out_probs.resize(orgs.GetSize(), 0.0);
 
+    // Calculate the total weight of all the criteria to determine the fraction associated with each.
+    double total_fit_weight = 0.0;
+
     // Loop through all criteria to run next.
     emp::BitVector next_orgs = orgs;
     emp::BitVector next_fits = fits;
-    double total_fit_weight = 0.0;
     int fit_id = fits.FindBit();
     while (fit_id != -1) {
-      double fit_weight = fit_info[(size_t) fit_id].GetWeight();
+      double weight = fit_info[(size_t) fit_id].GetWeight();
+      total_fit_weight += weight;
       next_fits.Set((size_t) fit_id, false);  // Turn off this criterion so it can't be run again.
 
       // Trim down to just the orgs that make it past this criterion.
-      int org_id = orgs.FindBit(); // Start with te first org available.
-      double best_fit = 0.0;       // best_fit=0 forces next_orgs to clear before being filled.
-      while (org_id != -1) {       // Loop through all orgs
+      next_orgs.Clear();
+      double best_fit = 0.0;
+      int org_id = orgs.FindBit();
+      while (org_id != -1) {
         const double cur_fit = fitness_chart[(size_t) fit_id][(size_t)org_id];
         if (cur_fit > best_fit) {
           best_fit = cur_fit;
@@ -372,28 +386,19 @@ public:
         if (cur_fit == best_fit) {
           next_orgs.Set((size_t) org_id);
         }
-        org_id = orgs.FindBit(org_id+1);   // Move on to the next org still being considered.
+        org_id = orgs.FindBit(org_id+1);
       }
-
-      // If we have not trimmed down the orgs at all, continue to the next criterion.
-      if (next_orgs == orgs) continue;
 
       // Recursively call on the next population.
       const auto next_probs = CalcLexicaseProbs(next_orgs, next_fits);
       for (size_t i = 0; i < out_probs.size(); i++) {
-        out_probs[i] += fit_weight * next_probs[i];
+        out_probs[i] += weight * next_probs[i];
       }
-
-      total_fit_weight += fit_weight; // Track the total weight of criteria we used!
-
-      // Turn back on this criterion for next loop.
-      // Note: if we didn't get here, criterion is non-discriminatory, so leave it off.
-      next_fits.Set((size_t) fit_id, true);   
-      fit_id = fits.FindBit(fit_id+1);        // Find the next fitness to consider.
+      next_fits.Set((size_t) fit_id, true);   // Turn back on this criterion for next loop.
+      fit_id = fits.FindBit(fit_id+1);
     }
 
-    // Normalize the criteria before locking them in.
-    for (double & prob : out_probs) prob /= total_fit_weight;
+    emp::Scale(out_probs, 1.0 / total_fit_weight);
 
     prob_cache[orgs] = out_probs;
     return out_probs;
@@ -411,9 +416,6 @@ public:
       base_orgs.Set(org_id, false);
       base_probs[org_id] = 0.0;
     }
-
-    // Initialize all probs to 0.0; update below as each case is analyzed.
-    for (OrgInfo & org : org_info) org.select_prob = 0.0;
 
     // CalcLexicaseProbs(1.0, is_active, is_discrim);
     auto results = CalcLexicaseProbs(is_active, is_discrim);
