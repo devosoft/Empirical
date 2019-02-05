@@ -351,9 +351,9 @@ public:
 
   /// Calculate the remaining probabilities for a given starting prob and
   /// current orgs and criteria.
-  emp::vector<double> CalcLexicaseProbs(const emp::BitVector & orgs, const emp::BitVector & fits) {
+  const emp::vector<double> & CalcLexicaseProbs(const emp::BitVector & orgs, const emp::BitVector & fits) {
     // Look up this set of organisms in the cache.
-    emp::vector<double> out_probs = prob_cache[orgs];
+    emp::vector<double> & out_probs = prob_cache[orgs];
 
     // If out_probs has already been set, return the result!
     if (out_probs.size()) return out_probs;
@@ -396,7 +396,7 @@ public:
       total_fit_weight += weight;
 
       // Recursively call on the next population.
-      const auto next_probs = CalcLexicaseProbs(next_orgs, next_fits);
+      const auto & next_probs = CalcLexicaseProbs(next_orgs, next_fits);
       for (size_t i = 0; i < out_probs.size(); i++) {
         out_probs[i] += weight * next_probs[i];
       }
@@ -405,8 +405,6 @@ public:
     }
 
     emp::Scale(out_probs, 1.0 / total_fit_weight);
-
-    prob_cache[orgs] = out_probs;
     return out_probs;
   }
 
