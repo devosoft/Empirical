@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "../../config/config.h"
+#include "../../source/config/config.h"
 
 #include "config_setup.h"
 

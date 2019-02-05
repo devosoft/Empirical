@@ -14,7 +14,15 @@
 #include <sstream>
 #include <string>
 #include <deque>
+#include <algorithm>
+#include <limits>
+#include <numeric>
+#include <climits>
+#include <unordered_set>
 
+#include "data/DataNode.h"
+
+#include "tools/Binomial.h"
 #include "tools/BitMatrix.h"
 #include "tools/BitSet.h"
 #include "tools/BitVector.h"
@@ -32,6 +40,7 @@
 #include "tools/flex_function.h"
 #include "tools/functions.h"
 #include "tools/graph_utils.h"
+#include "tools/hash_utils.h"
 //#include "tools/grid.h"
 #include "tools/info_theory.h"
 #include "tools/lexer_utils.h"
@@ -46,7 +55,6 @@
 #include "tools/stats.h"
 #include "tools/string_utils.h"
 #include "tools/tuple_struct.h"
-#include "tools/unit_tests.h"
 #include "tools/vector_utils.h"
 
 // currently these have no coveage; we include them so we get metrics on them
@@ -65,6 +73,47 @@
     static_assert(A == B, #A " == " #B); \
     REQUIRE(A == B);                     \
   }
+
+
+TEST_CASE("Test Binomial", "[tools]")
+{
+  emp::Random random;
+
+  const double flip_prob = 0.03;
+  const size_t num_flips = 100;
+
+  const size_t num_tests = 100000;
+  const size_t view_count = 10;
+
+  emp::Binomial bi100(flip_prob, num_flips);
+
+  emp::vector<size_t> counts(num_flips+1, 0);
+
+  for (size_t test_id = 0; test_id < num_tests; test_id++) {
+    size_t win_count = 0;
+    for (size_t i = 0; i < num_flips; i++) {
+      if (random.P(0.03)) win_count++;
+    }
+    counts[win_count]++;
+  }
+
+  // Print out the first values in the distribution.
+  for (size_t i = 0; i < view_count; i++) {
+    // std::cout << "bi100[" << i << "] = " << bi100[i]
+    //           << "  test_count = " << counts[i]
+    //           << "\n";
+    REQUIRE(bi100[i] < ((double) counts[i]) / (double) num_tests + 0.02);
+    REQUIRE(bi100[i] > ((double) counts[i]) / (double) num_tests - 0.02);
+  }
+  // std::cout << "Total = " << bi100.GetTotalProb() << std::endl;
+
+  // // Pick some random values...
+  // std::cout << "\nSome random values:";
+  // for (size_t i = 0; i < 100; i++) {
+  //   std::cout << " " << bi100.PickRandom(random);
+  // }
+  // std::cout << std::endl;
+}
 
 // this templating is necessary to force full coverage of templated classes.
 // Since c++ doesn't generate code for templated methods if those methods aren't
@@ -220,31 +269,31 @@ TEST_CASE("Test BitSet timing", "[tools]")
 }
 
 
-// TEST_CASE("Test BitVector", "[tools]")
-// {
-//   emp::BitVector bv10(10);
-//   emp::BitVector bv32(32);
-//   emp::BitVector bv50(50);
-//   emp::BitVector bv64(64);
-//   emp::BitVector bv80(80);
+TEST_CASE("Test BitVector", "[tools]")
+{
+  emp::BitVector bv10(10);
+  emp::BitVector bv32(32);
+  emp::BitVector bv50(50);
+  emp::BitVector bv64(64);
+  emp::BitVector bv80(80);
 
-//   bv80[70] = 1;
-//   emp::BitVector bv80c(bv80);
+  bv80[70] = 1;
+  emp::BitVector bv80c(bv80);
 
-//   bv80 <<= 1;
+  bv80 <<= 1;
 
-//   for (size_t i = 0; i < 75; i += 2) {
-//     emp::BitVector shift_vector = bv80 >> i;
-//     REQUIRE((shift_vector.CountOnes() == 1) == (i <= 71));
-//   }
+  for (size_t i = 0; i < 75; i += 2) {
+    emp::BitVector shift_vector = bv80 >> i;
+    REQUIRE((shift_vector.CountOnes() == 1) == (i <= 71));
+  }
 
-//   bv10 = (bv80 >> 70);
+  bv10 = (bv80 >> 70);
 
-//   // Test arbitrary bit retrieval of UInts
-//   bv80[65] = 1;
-//   REQUIRE(bv80.GetUIntAtBit(64) == 130);
-//   REQUIRE(bv80.GetValueAtBit<5>(64) == 2);
-// }
+  // Test arbitrary bit retrieval of UInts
+  bv80[65] = 1;
+  REQUIRE(bv80.GetUIntAtBit(64) == 130);
+  REQUIRE(bv80.GetValueAtBit<5>(64) == 2);
+}
 
 
 TEST_CASE("Test DFA", "[tools]")
@@ -483,6 +532,74 @@ TEST_CASE("Test Graph utils", "[tools]")
   // graph.PrintSym();
 }
 
+// // TODO: add asserts
+// emp::Random grand;
+TEST_CASE("Test hash_utils", "[tools]")
+{
+
+  REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)0) == (uint64_t)0);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)1) == (uint64_t)1);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)1, (uint32_t)0) == (uint64_t)2);
+  REQUIRE(emp::szudzik_hash((uint32_t)1, (uint32_t)1) == (uint64_t)3);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)2) == (uint64_t)4);
+  REQUIRE(emp::szudzik_hash((uint32_t)1, (uint32_t)2) == (uint64_t)5);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)2, (uint32_t)0) == (uint64_t)6);
+  REQUIRE(emp::szudzik_hash((uint32_t)2, (uint32_t)1) == (uint64_t)7);
+  REQUIRE(emp::szudzik_hash((uint32_t)2, (uint32_t)2) == (uint64_t)8);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)3) == (uint64_t)9);
+  REQUIRE(emp::szudzik_hash((uint32_t)1, (uint32_t)3) == (uint64_t)10);
+  REQUIRE(emp::szudzik_hash((uint32_t)2, (uint32_t)3) == (uint64_t)11);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)3, (uint32_t)0) == (uint64_t)12);
+  REQUIRE(emp::szudzik_hash((uint32_t)3, (uint32_t)1) == (uint64_t)13);
+  REQUIRE(emp::szudzik_hash((uint32_t)3, (uint32_t)2) == (uint64_t)14);
+  REQUIRE(emp::szudzik_hash((uint32_t)3, (uint32_t)3) == (uint64_t)15);
+
+
+  REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)0) == (uint64_t)0);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)1) == (uint64_t)1);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)1, (uint32_t)0) == (uint64_t)2);
+  REQUIRE(emp::szudzik_hash((uint32_t)1, (uint32_t)1) == (uint64_t)3);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)2) == (uint64_t)4);
+  REQUIRE(emp::szudzik_hash((uint32_t)1, (uint32_t)2) == (uint64_t)5);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)2, (uint32_t)0) == (uint64_t)6);
+  REQUIRE(emp::szudzik_hash((uint32_t)2, (uint32_t)1) == (uint64_t)7);
+  REQUIRE(emp::szudzik_hash((uint32_t)2, (uint32_t)2) == (uint64_t)8);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)3) == (uint64_t)9);
+  REQUIRE(emp::szudzik_hash((uint32_t)1, (uint32_t)3) == (uint64_t)10);
+  REQUIRE(emp::szudzik_hash((uint32_t)2, (uint32_t)3) == (uint64_t)11);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)3, (uint32_t)0) == (uint64_t)12);
+  REQUIRE(emp::szudzik_hash((uint32_t)3, (uint32_t)1) == (uint64_t)13);
+  REQUIRE(emp::szudzik_hash((uint32_t)3, (uint32_t)2) == (uint64_t)14);
+  REQUIRE(emp::szudzik_hash((uint32_t)3, (uint32_t)3) == (uint64_t)15);
+
+  emp::vector<uint64_t> hash_vec;
+
+  for(uint32_t i = 0; i < 10; ++i) {
+    for(uint32_t j = 0; j < 10; ++j) {
+      for(uint32_t s : { 0, 100, 100000 }) {
+        hash_vec.push_back(emp::szudzik_hash(s+i,s+j));
+      }
+    }
+  }
+
+  std::unordered_set<uint64_t> hash_set(hash_vec.begin(), hash_vec.end());
+
+  REQUIRE(hash_vec.size() == hash_set.size());
+
+}
+
 
 /*TEST_CASE("Test grid", "[tools]")
 {
@@ -670,6 +787,211 @@ TEST_CASE("Test math", "[tools]")
   REQUIRE(emp::Max(5,10) == 10);
   REQUIRE(emp::Max(10,5) == 10);
   REQUIRE(emp::Max(40,30,20,10,45,15,25,35) == 45);
+
+  REQUIRE(emp::FloorDivide(0,4) == 0);
+  REQUIRE(emp::FloorDivide(1,4) == 0);
+  REQUIRE(emp::FloorDivide(2,4) == 0);
+  REQUIRE(emp::FloorDivide(3,4) == 0);
+  REQUIRE(emp::FloorDivide(4,4) == 1);
+  REQUIRE(emp::FloorDivide(6,4) == 1);
+  REQUIRE(emp::FloorDivide(5,3) == 1);
+  REQUIRE(emp::FloorDivide(6,3) == 2);
+  REQUIRE(emp::FloorDivide(7,3) == 2);
+
+  REQUIRE(emp::FloorDivide((size_t)0,(size_t)4) == 0);
+  REQUIRE(emp::FloorDivide((size_t)1,(size_t)4) == 0);
+  REQUIRE(emp::FloorDivide((size_t)2,(size_t)4) == 0);
+  REQUIRE(emp::FloorDivide((size_t)3,(size_t)4) == 0);
+  REQUIRE(emp::FloorDivide((size_t)4,(size_t)4) == 1);
+  REQUIRE(emp::FloorDivide((size_t)6,(size_t)4) == 1);
+  REQUIRE(emp::FloorDivide((size_t)5,(size_t)3) == 1);
+  REQUIRE(emp::FloorDivide((size_t)6,(size_t)3) == 2);
+  REQUIRE(emp::FloorDivide((size_t)7,(size_t)3) == 2);
+
+  REQUIRE(emp::FloorDivide(-1,4) == -1);
+  REQUIRE(emp::FloorDivide(-2,4) == -1);
+  REQUIRE(emp::FloorDivide(-3,4) == -1);
+  REQUIRE(emp::FloorDivide(-4,4) == -1);
+  REQUIRE(emp::FloorDivide(-6,4) == -2);
+  REQUIRE(emp::FloorDivide(-5,3) == -2);
+  REQUIRE(emp::FloorDivide(-6,3) == -2);
+  REQUIRE(emp::FloorDivide(-7,3) == -3);
+
+  REQUIRE(emp::FloorDivide(0,-4) == 0);
+  REQUIRE(emp::FloorDivide(1,-4) == -1);
+  REQUIRE(emp::FloorDivide(2,-4) == -1);
+  REQUIRE(emp::FloorDivide(3,-4) == -1);
+  REQUIRE(emp::FloorDivide(4,-4) == -1);
+  REQUIRE(emp::FloorDivide(6,-4) == -2);
+  REQUIRE(emp::FloorDivide(5,-3) == -2);
+  REQUIRE(emp::FloorDivide(6,-3) == -2);
+  REQUIRE(emp::FloorDivide(7,-3) == -3);
+
+  REQUIRE(emp::FloorDivide(-1,-4) == 0);
+  REQUIRE(emp::FloorDivide(-2,-4) == 0);
+  REQUIRE(emp::FloorDivide(-3,-4) == 0);
+  REQUIRE(emp::FloorDivide(-4,-4) == 1);
+  REQUIRE(emp::FloorDivide(-6,-4) == 1);
+  REQUIRE(emp::FloorDivide(-5,-3) == 1);
+  REQUIRE(emp::FloorDivide(-6,-3) == 2);
+  REQUIRE(emp::FloorDivide(-7,-3) == 2);
+
+  REQUIRE(emp::RoundedDivide(0,4) == 0);
+  REQUIRE(emp::RoundedDivide(1,4) == 0);
+  REQUIRE(emp::RoundedDivide(2,4) == 1);
+  REQUIRE(emp::RoundedDivide(3,4) == 1);
+  REQUIRE(emp::RoundedDivide(4,4) == 1);
+  REQUIRE(emp::RoundedDivide(6,4) == 2);
+  REQUIRE(emp::RoundedDivide(5,3) == 2);
+  REQUIRE(emp::RoundedDivide(6,3) == 2);
+  REQUIRE(emp::RoundedDivide(7,3) == 2);
+
+  REQUIRE(emp::RoundedDivide((size_t)0,(size_t)4) == 0);
+  REQUIRE(emp::RoundedDivide((size_t)1,(size_t)4) == 0);
+  REQUIRE(emp::RoundedDivide((size_t)2,(size_t)4) == 1);
+  REQUIRE(emp::RoundedDivide((size_t)3,(size_t)4) == 1);
+  REQUIRE(emp::RoundedDivide((size_t)4,(size_t)4) == 1);
+  REQUIRE(emp::RoundedDivide((size_t)6,(size_t)4) == 2);
+  REQUIRE(emp::RoundedDivide((size_t)5,(size_t)3) == 2);
+  REQUIRE(emp::RoundedDivide((size_t)6,(size_t)3) == 2);
+  REQUIRE(emp::RoundedDivide((size_t)7,(size_t)3) == 2);
+
+  REQUIRE(emp::RoundedDivide(-1,4) == 0);
+  REQUIRE(emp::RoundedDivide(-2,4) == 0);
+  REQUIRE(emp::RoundedDivide(-3,4) == -1);
+  REQUIRE(emp::RoundedDivide(-4,4) == -1);
+  REQUIRE(emp::RoundedDivide(-6,4) == -1);
+  REQUIRE(emp::RoundedDivide(-5,3) == -2);
+  REQUIRE(emp::RoundedDivide(-6,3) == -2);
+  REQUIRE(emp::RoundedDivide(-7,3) == -2);
+
+  REQUIRE(emp::RoundedDivide(0,-4) == 0);
+  REQUIRE(emp::RoundedDivide(1,-4) == 0);
+  REQUIRE(emp::RoundedDivide(2,-4) == 0);
+  REQUIRE(emp::RoundedDivide(3,-4) == -1);
+  REQUIRE(emp::RoundedDivide(4,-4) == -1);
+  REQUIRE(emp::RoundedDivide(6,-4) == -1);
+  REQUIRE(emp::RoundedDivide(5,-3) == -2);
+  REQUIRE(emp::RoundedDivide(6,-3) == -2);
+  REQUIRE(emp::RoundedDivide(7,-3) == -2);
+
+  REQUIRE(emp::RoundedDivide(-1,-4) == 0);
+  REQUIRE(emp::RoundedDivide(-2,-4) == 1);
+  REQUIRE(emp::RoundedDivide(-3,-4) == 1);
+  REQUIRE(emp::RoundedDivide(-4,-4) == 1);
+  REQUIRE(emp::RoundedDivide(-6,-4) == 2);
+  REQUIRE(emp::RoundedDivide(-5,-3) == 2);
+  REQUIRE(emp::RoundedDivide(-6,-3) == 2);
+  REQUIRE(emp::RoundedDivide(-7,-3) == 2);
+
+  REQUIRE(emp::RoundedDivide((size_t)0,(size_t)4) == 0);
+  REQUIRE(emp::RoundedDivide((size_t)1,(size_t)4) == 0);
+  REQUIRE(emp::RoundedDivide((size_t)2,(size_t)4) == 1);
+  REQUIRE(emp::RoundedDivide((size_t)3,(size_t)4) == 1);
+  REQUIRE(emp::RoundedDivide((size_t)4,(size_t)4) == 1);
+  REQUIRE(emp::RoundedDivide((size_t)6,(size_t)4) == 2);
+  REQUIRE(emp::RoundedDivide((size_t)5,(size_t)3) == 2);
+  REQUIRE(emp::RoundedDivide((size_t)6,(size_t)3) == 2);
+  REQUIRE(emp::RoundedDivide((size_t)7,(size_t)3) == 2);
+
+  auto MeanUnbiasedDivide = [](int dividend, int divisor, size_t rc){
+    emp::Random r = emp::Random(1);
+    emp::DataNode<double, emp::data::Current, emp::data::Range, emp::data::Log> data;
+    for(size_t i=0;i<rc;++i) data.Add(emp::UnbiasedDivide(dividend,divisor,r));
+    return data.GetMean();
+  };
+
+  REQUIRE(MeanUnbiasedDivide(0,4,100) == 0);
+  REQUIRE(MeanUnbiasedDivide(1,4,100) == 0);
+  REQUIRE(MeanUnbiasedDivide(2,4,100) > 0);
+  REQUIRE(MeanUnbiasedDivide(2,4,100) < 1);
+  REQUIRE(MeanUnbiasedDivide(3,4,100) == 1);
+  REQUIRE(MeanUnbiasedDivide(4,4,100) == 1);
+  REQUIRE(MeanUnbiasedDivide(6,4,100) > 1);
+  REQUIRE(MeanUnbiasedDivide(6,4,100) < 2);
+  REQUIRE(MeanUnbiasedDivide(5,3,100) == 2);
+  REQUIRE(MeanUnbiasedDivide(6,3,100) == 2);
+  REQUIRE(MeanUnbiasedDivide(7,3,100) == 2);
+
+  REQUIRE(MeanUnbiasedDivide(-1,4,100) == 0);
+  REQUIRE(MeanUnbiasedDivide(-2,4,100) < 0);
+  REQUIRE(MeanUnbiasedDivide(-2,4,100) > -1);
+  REQUIRE(MeanUnbiasedDivide(-3,4,100) == -1);
+  REQUIRE(MeanUnbiasedDivide(-4,4,100) == -1);
+  REQUIRE(MeanUnbiasedDivide(-6,4,100) < -1);
+  REQUIRE(MeanUnbiasedDivide(-6,4,100) > -2);
+  REQUIRE(MeanUnbiasedDivide(-5,3,100) == -2);
+  REQUIRE(MeanUnbiasedDivide(-6,3,100) == -2);
+  REQUIRE(MeanUnbiasedDivide(-7,3,100) == -2);
+
+  REQUIRE(MeanUnbiasedDivide(0,-4,100) == 0);
+  REQUIRE(MeanUnbiasedDivide(1,-4,100) == 0);
+  REQUIRE(MeanUnbiasedDivide(2,-4,100) < 0);
+  REQUIRE(MeanUnbiasedDivide(2,-4,100) > -1);
+  REQUIRE(MeanUnbiasedDivide(3,-4,100) == -1);
+  REQUIRE(MeanUnbiasedDivide(4,-4,100) == -1);
+  REQUIRE(MeanUnbiasedDivide(6,-4,100) < -1);
+  REQUIRE(MeanUnbiasedDivide(6,-4,100) > -2);
+  REQUIRE(MeanUnbiasedDivide(5,-3,100) == -2);
+  REQUIRE(MeanUnbiasedDivide(6,-3,100) == -2);
+  REQUIRE(MeanUnbiasedDivide(7,-3,100) == -2);
+
+  REQUIRE(MeanUnbiasedDivide(-1,-4,100) == 0);
+  REQUIRE(MeanUnbiasedDivide(-2,-4,100) > 0);
+  REQUIRE(MeanUnbiasedDivide(-2,-4,100) < 1);
+  REQUIRE(MeanUnbiasedDivide(-3,-4,100) == 1);
+  REQUIRE(MeanUnbiasedDivide(-4,-4,100) == 1);
+  REQUIRE(MeanUnbiasedDivide(-6,-4,100) > 1);
+  REQUIRE(MeanUnbiasedDivide(-6,-4,100) < 2);
+  REQUIRE(MeanUnbiasedDivide(-5,-3,100) == 2);
+  REQUIRE(MeanUnbiasedDivide(-6,-3,100) == 2);
+  REQUIRE(MeanUnbiasedDivide(-7,-3,100) == 2);
+
+  auto SztMeanUnbiasedDivide = [](size_t dividend, size_t divisor, size_t rc){
+    emp::Random r = emp::Random(1);
+    emp::DataNode<double, emp::data::Current, emp::data::Range, emp::data::Log> data;
+    for(size_t i=0;i<rc;++i) data.Add(emp::UnbiasedDivide(dividend,divisor,r));
+    return data.GetMean();
+  };
+
+  REQUIRE(SztMeanUnbiasedDivide((size_t)0,(size_t)4,100) == 0);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)1,(size_t)4,100) == 0);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)2,(size_t)4,100) > 0);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)2,(size_t)4,100) < 1);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)3,(size_t)4,100) == 1);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)4,(size_t)4,100) == 1);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)6,(size_t)4,100) > 1);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)6,(size_t)4,100) < 2);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)5,(size_t)3,100) == 2);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)6,(size_t)3,100) == 2);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)7,(size_t)3,100) == 2);
+
+  REQUIRE(emp::Sgn(1) == 1);
+  REQUIRE(emp::Sgn(2) == 1);
+  REQUIRE(emp::Sgn(3) == 1);
+  REQUIRE(emp::Sgn(102) == 1);
+  REQUIRE(emp::Sgn(0) == 0);
+  REQUIRE(emp::Sgn(-1) == -1);
+  REQUIRE(emp::Sgn(-2) == -1);
+  REQUIRE(emp::Sgn(-3) == -1);
+  REQUIRE(emp::Sgn(-102) == -1);
+
+  REQUIRE(emp::Sgn((size_t)1) == 1);
+  REQUIRE(emp::Sgn((size_t)2) == 1);
+  REQUIRE(emp::Sgn((size_t)3) == 1);
+  REQUIRE(emp::Sgn((size_t)102) == 1);
+  REQUIRE(emp::Sgn((size_t)0) == 0);
+
+  REQUIRE(emp::Sgn(1.0) == 1);
+  REQUIRE(emp::Sgn(2.1) == 1);
+  REQUIRE(emp::Sgn(3.0) == 1);
+  REQUIRE(emp::Sgn(102.5) == 1);
+  REQUIRE(emp::Sgn(0.0) == 0);
+  REQUIRE(emp::Sgn(-1.0) == -1);
+  REQUIRE(emp::Sgn(-2.1) == -1);
+  REQUIRE(emp::Sgn(-3.0) == -1);
+  REQUIRE(emp::Sgn(-102.5) == -1);
+
 }
 
 
@@ -838,6 +1160,57 @@ TEST_CASE("Test random", "[tools]")
 
     REQUIRE(mean_value > min_threshold);
     REQUIRE(mean_value < max_threshold);
+  }
+
+  // Test GetUInt()
+  emp::vector<uint32_t> uint32_draws;
+  total = 0.0;
+  for (size_t i = 0; i < num_tests; i++) {
+    const uint32_t cur_value = rng.GetUInt();
+    total += cur_value;
+    uint32_draws.push_back(cur_value);
+  }
+
+  {
+  const double expected_mean = ((double)std::numeric_limits<uint32_t>::max())/2.0;
+  const double min_threshold = (expected_mean*0.995);
+  const double max_threshold = (expected_mean*1.005);
+  double mean_value = total/(double) num_tests;
+
+  REQUIRE(mean_value > min_threshold);
+  REQUIRE(mean_value < max_threshold);
+  // ensure that all bits are set at least once and unset at least once
+  REQUIRE(std::numeric_limits<uint32_t>::max() == std::accumulate(uint32_draws.begin(),uint32_draws.end(),(uint32_t)0,
+    [](uint32_t accumulator, uint32_t val){ return accumulator | val; })
+  );
+  REQUIRE(std::numeric_limits<uint32_t>::max() == std::accumulate(uint32_draws.begin(),uint32_draws.end(),(uint32_t)0,
+    [](uint32_t accumulator, uint32_t val){ return accumulator | (~val); })
+  );
+  }
+  // Test GetUInt64
+  emp::vector<uint64_t> uint64_draws;
+  total = 0.0;
+  for (size_t i = 0; i < num_tests; i++) {
+    const uint64_t cur_value = rng.GetUInt64();
+    total += cur_value/(double)num_tests;
+    uint64_draws.push_back(cur_value);
+  }
+
+  {
+  const double expected_mean = ((double)std::numeric_limits<uint64_t>::max())/2.0;
+  const double min_threshold = (expected_mean*0.995);
+  const double max_threshold = (expected_mean*1.005);
+  double mean_value = total; // values were divided by num_tests when added
+
+  REQUIRE(mean_value > min_threshold);
+  REQUIRE(mean_value < max_threshold);
+  // ensure that all bits are set at least once and unset at least once
+  REQUIRE(std::numeric_limits<uint64_t>::max() == std::accumulate(uint64_draws.begin(),uint64_draws.end(),(uint64_t)0,
+    [](uint64_t accumulator, uint64_t val){ return accumulator | val; })
+  );
+  REQUIRE(std::numeric_limits<uint64_t>::max() == std::accumulate(uint64_draws.begin(),uint64_draws.end(),(uint64_t)0,
+    [](uint64_t accumulator, uint64_t val){ return accumulator | (~val); })
+  );
   }
 
   // Test P
@@ -1214,49 +1587,6 @@ TEST_CASE("Test string utils", "[tools]")
 
 
 
-// Build some sample functions that we want called by type.
-std::string tt_result;
-void fun_int_int(int x, int y) { tt_result = emp::to_string(x+y); }
-void fun_int_double(int x, double y) { tt_result = emp::to_string(y * (double) x); }
-void fun_string_int(std::string x, int y) {
-  tt_result = "";
-  for (int i=0; i < y; i++) tt_result += x;
-}
-
-TEST_CASE("Test type tracker (TypeTracker)", "[tools]")
-{
-  using tt_t = emp::TypeTracker<int, std::string, double>;   // Setup the tracker type.
-  tt_t tt;                                                   // Build the tracker.
-
-  // Add some functions.
-  tt.AddFunction(fun_int_int);
-  tt.AddFunction(fun_int_double);
-  tt.AddFunction(fun_string_int);
-
-  emp::TrackedType * tt_int1 = tt.New<int>(1);
-  emp::TrackedType * tt_int2 = tt.New<int>(2);
-  emp::TrackedType * tt_int3 = tt.New<int>(3);
-
-  emp::TrackedType * tt_str  = tt.New<std::string>("FOUR");
-  emp::TrackedType * tt_doub = tt.New<double>(5.5);
-
-  tt.RunFunction(tt_int1, tt_int2);  // An int and another int should add.
-  REQUIRE( tt_result == "3" );
-
-  tt.RunFunction(tt_int3, tt_doub);  // An int and a double should multiply.
-  REQUIRE( tt_result == "16.500000" );
-
-  tt.RunFunction(tt_doub, tt_int2); // A double and an int is unknown; should leave old result.
-  REQUIRE( tt_result == "16.500000" );
-
-  tt.RunFunction(tt_str, tt_int3);    // A string an an int should duplicate the string.
-  REQUIRE( tt_result == "FOURFOURFOUR" );
-
-
-  REQUIRE( (tt_t::GetID<int,std::string,double>()) == (tt_t::GetTrackedID(tt_int1, tt_str, tt_doub)) );
-  REQUIRE( (tt_t::GetComboID<int,std::string,double>()) == (tt_t::GetTrackedComboID(tt_int1, tt_str, tt_doub)) );
-}
-
 TEST_CASE("Test stats", "[tools]") {
   emp::vector<int> vec1({1,2,1,1,2,3});
   double i1 = 1;
@@ -1375,6 +1705,99 @@ TEST_CASE("Test set utils", "[tools]") {
   comp_set.insert(3);
   REQUIRE(emp::symmetric_difference(v1, s1) == comp_set);
   REQUIRE(emp::symmetric_difference(s1, v1) == comp_set);
+
+}
+
+std::string tt_result;
+
+// Some functions to print a single type and its value
+void fun_int(int x) { tt_result = emp::to_string("int:", x); }
+void fun_double(double x) { tt_result = emp::to_string("double:", x); }
+void fun_string(std::string x) { tt_result = emp::to_string("string:", x); }
+
+// And some silly ways to combine types.
+void fun_int_int(int x, int y) { tt_result = emp::to_string(x+y); }
+void fun_int_double(int x, double y) { tt_result = emp::to_string(y * (double) x); }
+void fun_string_int(std::string x, int y) {
+  tt_result = "";
+  for (int i=0; i < y; i++) tt_result += x;
+}
+void fun_5ints(int v, int w, int x, int y, int z) {
+  tt_result = emp::to_string(v, '+', w, '+', x, '+', y, '+', z, '=', v+w+x+y+z);
+}
+
+TEST_CASE("Test TypeTracker", "[tools]") {
+  using tt_t = emp::TypeTracker<int, std::string, double>;   // Setup the tracker type.
+  tt_t tt;                                                   // Build the tracker.
+
+  // Add some functions.
+  tt.AddFunction( [](int x){ tt_result = emp::to_string("int:", x); } );
+  tt.AddFunction(fun_double);
+  tt.AddFunction(fun_string);
+  tt.AddFunction(fun_int_int);
+  tt.AddFunction(fun_int_double);
+  tt.AddFunction(fun_string_int);
+  tt.AddFunction(fun_5ints);
+
+  emp::TrackedVar tt_int1 = tt.Convert<int>(1);
+  emp::TrackedVar tt_int2 = tt.Convert<int>(2);
+  emp::TrackedVar tt_int3 = tt.Convert<int>(3);
+
+  emp::TrackedVar tt_str  = tt.Convert<std::string>("FOUR");
+  emp::TrackedVar tt_doub = tt.Convert<double>(5.5);
+
+  tt.RunFunction(tt_int1, tt_int2);  // An int and another int should add.
+  REQUIRE( tt_result == "3" );
+
+  tt.RunFunction(tt_int3, tt_doub);  // An int and a double should multiply.
+  REQUIRE( tt_result == "16.500000" );
+
+  tt.RunFunction(tt_doub, tt_int2); // A double and an int is unknown; should leave old result.
+  REQUIRE( tt_result == "16.500000" );
+
+  tt.RunFunction(tt_str, tt_int3);    // A string an an int should duplicate the string.
+  REQUIRE( tt_result == "FOURFOURFOUR" );
+
+  tt.RunFunction(tt_int1, tt_int2, tt_int3, tt_int2, tt_int1);  // Add five ints!
+  REQUIRE( tt_result == "1+2+3+2+1=9" );
+
+
+  // Load all types into a vector and then experiment with them.
+  emp::vector<emp::TrackedVar> vars;
+  vars.push_back(tt_int1);
+  vars.push_back(tt_int2);
+  vars.push_back(tt_int3);
+  vars.push_back(tt_str);
+  vars.push_back(tt_doub);
+
+  emp::vector<std::string> results = { "int:1", "int:2", "int:3", "string:FOUR", "double:5.5" };
+
+  for (size_t i = 0; i < vars.size(); i++) {
+    tt(vars[i]);
+    REQUIRE(tt_result == results[i]);
+  }
+
+  // Make sure TypeTracker can determine consistant IDs.
+  REQUIRE( (tt_t::GetID<int,std::string,double>()) == (tt_t::GetTrackedID(tt_int1, tt_str, tt_doub)) );
+  REQUIRE( (tt_t::GetComboID<int,std::string,double>()) == (tt_t::GetTrackedComboID(tt_int1, tt_str, tt_doub)) );
+
+  // Make sure a TypeTracker can work with a single type.
+  size_t num_args = 0;
+  emp::TypeTracker<int> tt1;
+  tt1.AddFunction( [&num_args](int){ num_args=1; } );
+  tt1.AddFunction( [&num_args](int,int){ num_args=2; } );
+  tt1.AddFunction( [&num_args](int,int,int){ num_args=3; } );
+
+  tt_int1 = tt1.Convert<int>(1);
+  tt_int2 = tt1.Convert<int>(2);
+  tt_int3 = tt1.Convert<int>(3);
+
+  tt1.RunFunction(tt_int1);
+  REQUIRE(num_args == 1);
+  tt1(tt_int2, tt_int3);
+  REQUIRE(num_args == 2);
+  tt1(tt_int1, tt_int2, tt_int3);
+  REQUIRE(num_args == 3);
 
 }
 

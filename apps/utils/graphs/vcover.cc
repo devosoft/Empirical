@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -136,10 +136,10 @@ int main(int argc, char* argv[])
 {
   // Use some emp tools to check which args were set on the command line.
   emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
-  verbose = emp::cl::use_flag(args, "-v");
-  debug = emp::cl::use_flag(args, "-d");
-  bool off_by_1 = emp::cl::use_flag(args, "-1");   // Are nodes numbered 1 to N instead of 0 to N-1?
-  bool load_table = emp::cl::use_flag(args, "-t"); // Do we want to load the full adj matrix?
+  verbose = emp::cl::use_arg(args, "-v");
+  debug = emp::cl::use_arg(args, "-d");
+  bool off_by_1 = emp::cl::use_arg(args, "-1");   // Are nodes numbered 1 to N instead of 0 to N-1?
+  bool load_table = emp::cl::use_arg(args, "-t"); // Do we want to load the full adj matrix?
 
   graph = (load_table) ? emp::load_graph_table(std::cin) : emp::load_graph_sym(std::cin, off_by_1);
 

@@ -129,6 +129,8 @@ namespace emp {
       return *this;
     }
     Angle & RotateDegrees(double degrees) {
+      if (degrees < 0.0) degrees += 360.0;
+      emp_assert(degrees >= 0.0);  // Don't modify by less than -360 (@CAO Fix?)
       angle += (uint32_t) (degrees * ANGLE_CAP / 360.0);
       return *this;
     }

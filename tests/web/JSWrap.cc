@@ -1,11 +1,11 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2015-2017.
+//  Copyright (C) Michigan State University, 2015-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include <functional>
 
+#include "../../tests2/unit_tests.h"
 #include "base/assert.h"
-#include "tools/unit_tests.h"
 #include "web/init.h"
 #include "web/JSWrap.h"
 
@@ -91,7 +91,7 @@ int main() {
   emp::Initialize();
   bool verbose = true;
   int x = 10;
-  auto lambda = [&verbose, x](){EMP_TEST_VALUE(x, "10");};
+  auto lambda = [&verbose, x](){EMP_TEST_VALUE(x, 10);};
 
   std::function<int(int)> TestFun11 = [](int i){return i*i;};
 
@@ -129,7 +129,7 @@ int main() {
 
   EMP_TEST_VALUE(EM_ASM_DOUBLE({
       return emp.Callback($0);
-  }, fun_id5), "10000.1");
+  }, fun_id5), 10000.1);
 
 
   EM_ASM_ARGS({
@@ -170,7 +170,7 @@ int main() {
 
   EMP_TEST_VALUE(EM_ASM_INT_V({
     return emp.TestName11(5);
-  }), "25");
+  }), 25);
 
   EM_ASM({
     ret = emp.TestName12({val:5, word:"hi", val2:6.3});

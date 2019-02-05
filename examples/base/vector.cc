@@ -48,4 +48,11 @@ int main()
   std::cout << "After inserting four values in place of 30: " << std::endl; 
   for (auto x : v) { std::cout << x << ' '; }
   std::cout << std::endl;
+
+  // Try looking through these BACKWARDS for ptinting.
+  std::cout << "\nPrinting in reverse!\n";
+  for (emp::vector<int>::reverse_iterator it = v.rbegin(); it < v.rend(); it++) {
+    std::cout << *it << " ";
+  }
+  std::cout << std::endl;
 }
