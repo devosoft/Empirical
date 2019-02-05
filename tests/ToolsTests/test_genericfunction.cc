@@ -17,8 +17,8 @@ TEST_CASE("Test GenericFunction", "[tools]")
 	REQUIRE(aFunction.CallOK<double>(2.0, 2.0));
 	REQUIRE(!aFunction.CallOK<double>(5, "string"));
 	
-	REQUIRE(aFunction.CallTypeOK<double, double, double>());
-	REQUIRE(!aFunction.CallTypeOK<double, std::string, int>());
+	REQUIRE( (aFunction.CallTypeOK<double, double, double>()) );
+	REQUIRE( !(aFunction.CallTypeOK<double, std::string, int>()) );
 	
-	REQUIRE(aFunction.ConvertOK<double(double,double)>());
+	REQUIRE( (aFunction.ConvertOK<double(double,double)>()) );
 }
