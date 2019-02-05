@@ -358,24 +358,22 @@ public:
     // If out_probs has already been set, return the result!
     if (out_probs.size()) return out_probs;
 
-    // We haven't cached out_probs, so calculate it now.
+    // We haven't cached out_probs, so calculate it now; inititalize all probs to zero.
     out_probs.resize(orgs.GetSize(), 0.0);
 
-    // Calculate the total weight of all the criteria to determine the fraction associated with each.
+    // Track the total weight of all the criteria to determine the fraction associated with each.
     double total_fit_weight = 0.0;
 
-    // Loop through all criteria to run next.
+    // Loop through all criteria that we can run next.
     emp::BitVector next_orgs = orgs;
     emp::BitVector next_fits = fits;
-    int fit_id = fits.FindBit();
-    while (fit_id != -1) {
+    for (int fit_id = fits.FindBit(); fit_id != -1; fit_id = fits.FindBit(fit_id+1)) {
       double weight = fit_info[(size_t) fit_id].GetWeight();
       next_fits.Set((size_t) fit_id, false);  // Turn off this criterion so it can't be run again.
 
       // Trim down to just the orgs that make it past this criterion.
       double best_fit = 0.0;
-      int org_id = orgs.FindBit();
-      while (org_id != -1) {
+      for (int org_id = orgs.FindBit(); org_id != -1; org_id = orgs.FindBit(org_id+1)) {
         const double cur_fit = fitness_chart[(size_t) fit_id][(size_t)org_id];
         if (cur_fit > best_fit) {
           best_fit = cur_fit;
@@ -384,24 +382,19 @@ public:
         if (cur_fit == best_fit) {
           next_orgs.Set((size_t) org_id);
         }
-        org_id = orgs.FindBit(org_id+1);
       }
 
       // If this criterion made no progress, abandon it as non-discriminatory.
-      if (next_orgs == orgs) {
-        fit_id = fits.FindBit(fit_id+1);
-        continue;
-      }
+      if (next_orgs == orgs) continue;
 
       total_fit_weight += weight;
 
       // Recursively call on the next population.
       const auto & next_probs = CalcLexicaseProbs(next_orgs, next_fits);
-      for (size_t i = 0; i < out_probs.size(); i++) {
-        out_probs[i] += weight * next_probs[i];
+      for (size_t org_id = 0; org_id < out_probs.size(); org_id++) {
+        out_probs[org_id] += weight * next_probs[org_id];
       }
       next_fits.Set((size_t) fit_id, true);   // Turn back on this criterion for next loop.
-      fit_id = fits.FindBit(fit_id+1);
     }
 
     emp::Scale(out_probs, 1.0 / total_fit_weight);
