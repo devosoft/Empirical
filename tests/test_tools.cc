@@ -75,18 +75,8 @@
 
 TEST_CASE("Test Binomial", "[tools]")
 {
-  // test over a consistent but random set of seeds
-  emp::Random s_rng(2);
-  emp::vector<int> seeds(100);
-  std::generate(seeds.begin(),seeds.end(),[&s_rng](){
-    // value copied from _RAND_MBIG
-    return s_rng.GetInt(1000000000);
-  });
-  REQUIRE(
-    std::unordered_set<int>(seeds.begin(), seeds.end()).size()
-      == seeds.size()
-  );
-  for(int s : seeds) {
+  // test over a consistent set of seeds
+  for (int s = 1; s <= 200; ++s) {
 
   REQUIRE(s > 0);
   emp::Random random(s);
@@ -1129,18 +1119,8 @@ TEST_CASE("Test NullStream", "[tools]")
 
 TEST_CASE("Test random", "[tools]")
 {
-  // test over a consistent but random set of seeds
-  emp::Random s_rng(1);
-  emp::vector<int> seeds(500);
-  std::generate(seeds.begin(),seeds.end(),[&s_rng](){
-    // value copied from _RAND_MBIG
-    return s_rng.GetInt(1000000000);
-  });
-  REQUIRE(
-    std::unordered_set<int>(seeds.begin(), seeds.end()).size()
-      == seeds.size()
-  );
-  for(int s : seeds) {
+  // test over a consistent set of seeds
+  for(int s = 1; s < 200; ++s) {
 
   REQUIRE(s > 0);
   emp::Random rng(s);
