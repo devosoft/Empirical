@@ -40,9 +40,9 @@ namespace emp {
 
   /// Generate a string to describe a JS color out of RGB values.
   std::string ColorRGB(int r, int g, int b) {
-    emp_assert(r >= 0 && r < 255);
-    emp_assert(g >= 0 && g < 255);
-    emp_assert(b >= 0 && b < 255);
+    emp_assert(r >= 0 && r <= 255);
+    emp_assert(g >= 0 && g <= 255);
+    emp_assert(b >= 0 && b <= 255);
     std::stringstream ss;
     ss << '#' << std::setw(2) << std::setfill('0') << std::hex << r
        << std::setw(2) << std::setfill('0') << std::hex << g
@@ -52,9 +52,10 @@ namespace emp {
 
   /// Generate a string to describe a JS color with an alpha channel.
   std::string ColorRGB(int r, int g, int b, double a) {
-    emp_assert(r >= 0 && r < 255);
-    emp_assert(g >= 0 && g < 255);
-    emp_assert(b >= 0 && b < 255);
+    emp_assert(r >= 0 && r <= 255);
+    emp_assert(g >= 0 && g <= 255);
+    emp_assert(b >= 0 && b <= 255);
+    emp_assert(a >= 0 && a <= 1.0);
     std::stringstream ss;
     ss << "rgba(" << r << ',' << g << ',' << b << ',' << a << ')';
     return ss.str();
@@ -64,9 +65,9 @@ namespace emp {
   std::string ColorHSV(double h, double s, double v) {
     // adapted from https://gist.github.com/kuathadianto/200148f53616cbd226d993b400214a7f
 
-    emp_assert( h >= 0.0 && h < 360.0);
-    emp_assert( s >= 0.0 && s < 1.0);
-    emp_assert( v >= 0.0 && v < 1.0);
+    emp_assert( h >= 0.0 && h <= 360.0);
+    emp_assert( s >= 0.0 && s <= 1.0);
+    emp_assert( v >= 0.0 && v <= 1.0);
 
   	double c = s * v;
   	double x = c * (1 - std::abs(std::fmod(h / 60.0, 2) - 1));
