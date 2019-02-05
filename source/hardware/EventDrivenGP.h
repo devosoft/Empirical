@@ -722,6 +722,13 @@ namespace emp {
       program.Clear();
     }
 
+    /// clear program, this also requires resetting hardware
+    void ResetProgram() {
+      emp_assert(!is_executing);
+      ResetHardware();
+      program.Clear();
+    }
+
     /// Reset only hardware, not program.
     /// Not allowed to reset hardware during execution.
     void ResetHardware() {
