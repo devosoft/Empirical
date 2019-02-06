@@ -31,6 +31,7 @@ cover-test-%: test_%.cc
 test: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 	cd ToolsTests && make test
+	cd BaseTests && make test
 
 # Test optimized version without debug features
 opt: FLAGS := -std=c++14 -DNDEBUG -O3 -Wno-unused-function -I../source/ -I../ 
@@ -56,6 +57,7 @@ coverage_conversion:
 test-coverage: FLAGS := -std=c++14 -g -Wall -Wno-unused-function -I../coverage_source/ -I../ -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 -fprofile-instr-generate -fcoverage-mapping -fno-inline -fno-elide-constructors -O0 
 test-coverage: coverage_conversion test-prep $(addprefix cover-test-, $(TEST_NAMES))
 	       cd ToolsTests && make test-coverage
+		   cd BaseTests && make test-coverage
 	       rm -r ../coverage_source
 
 clean:

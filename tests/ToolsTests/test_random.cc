@@ -29,4 +29,10 @@ TEST_CASE("Test Random", "[tools]")
 	int r_i = rnd.GetInt(emp::Range<int>(-5,5));
 	REQUIRE(r_i >= -5);
 	REQUIRE(r_i < 5);
+	
+	// Get UInt64
+	uint64_t ui64 = rnd.GetUInt64(100);
+	REQUIRE(ui64 < 100);
+	ui64 = rnd.GetUInt64(100000000000);
+	REQUIRE(ui64 < 100000000000);
 }
