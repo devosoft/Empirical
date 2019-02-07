@@ -4,7 +4,7 @@
 //
 //  Calculate probabilities for selection using Roulette Selection (easy!)
 
-#include "../../source/config/command_line.h"
+#include "config/command_line.h"
 
 #include "SelectionData.h"
 
@@ -30,6 +30,9 @@ int main(int argc, char* argv[])
 
   std::cout << std::endl;
   data.PrintNewCriteria();
+  
+  std::cout << std::endl;
+  data.PrintSelectProbs();
 
   // emp::vector< double > fit_data = data.GetFitData(0);
   // emp::IndexMap fit_map(num_orgs);
