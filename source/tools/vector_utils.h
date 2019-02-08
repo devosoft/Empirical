@@ -114,6 +114,12 @@ namespace emp {
     std::sort(v.begin(), v.end(), std::forward<Ts>(args)...);
   }
 
+  /// Scale all elements of a vector by the same value.
+  template <typename T>
+  void Scale(emp::vector<T> & v, T scale) {
+    for (T & x : v) x *= scale;
+  }
+
   /// Returns a vector containing a chunk of elements from @param vec
   /// starting at @param start and going up to but not including @param stop.
   template <typename T>
