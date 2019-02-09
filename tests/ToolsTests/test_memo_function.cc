@@ -1,3 +1,8 @@
+/**
+ * doing any sort of copying of memo_functions seems to give my terminal a
+ * stack overflow error (using mingw on windows 10)
+ */
+
 #define CATCH_CONFIG_MAIN
 
 #include "third-party/Catch/single_include/catch.hpp"
@@ -44,15 +49,34 @@ TEST_CASE("Test memo_function", "[tools]")
   REQUIRE(fn(5) == factorial(5));
   
   // another constructor
-  emp::memo_function<uint64_t(int)> different;
-  different = [](int N){ return N*100000; };
-  REQUIRE( different(5) == 500000 );
+  emp::memo_function<uint64_t(int)> empf0;
+  empf0 = [](int N){ return N*100000; };
+  REQUIRE( empf0(5) == 500000 );
   
+  // move constructor
+  uint64_t result = empf0(12);
+  emp::memo_function<uint64_t(int)> empf(std::move(empf0));
+  REQUIRE( empf(12) == result );
+  
+  // Set new std::function
+  std::function<uint64_t(int)> stdf = [](int N){ return N/100; };
+  empf = stdf;
+  REQUIRE( empf(100) == 1 );
+  
+  // Move a memo function
+  emp::memo_function<uint64_t(int)> empf1;
+  empf1 = std::move(empf);
+  REQUIRE( empf1(5000) == 50 );
+  
+  // Move a std::function
+  std::function<char(int)> stdf2 = [](int N){ return (char)(N+96); };
+  emp::memo_function<char(int)> empf2;
+  empf2 = std::move(stdf2);
+  REQUIRE( empf2(1) == 'a' );
   
   /**
    * Many arguments 
    */
-  
   // memo_function<R(A1,A2,EXTRA...)>()
   emp::memo_function<long long(int,int)> multiply(
     [](int a, int b){ return a*b; });
@@ -73,22 +97,37 @@ TEST_CASE("Test memo_function", "[tools]")
   
   // conversions to std::function type
   // COMMENT: to_function is const, but has issues with calling other functions
-  // that are not const. Removing the const makes it compile. Adding const to
-  // other functions is probably more ideal, but it was more than just one so
-  // I strayed away from that idea
-  // same with the implicit cast 
+  // that are not const. Removing the const makes it compile, probably not ideal
+  // solution, same with the implicit cast 
   // error was: error: passing 'xxxxx' as 'this' argument discards qualifiers
   //std::function<long long(int,int)> m1 = multiply.to_function();
   //std::function<long long(int,int)> m2 = multiply;
   //REQUIRE(m1(5,5) == multiply(5,5));
   //REQUIRE(m2(5,5) == multiply(5,5));
   
+  emp::memo_function<std::string(std::string, std::string)> addWords;
+  addWords = [](std::string a, std::string b){ return a+" "+b; };
+  REQUIRE(addWords("Once", "upon") == "Once upon");
+  
+  emp::memo_function<std::string(std::string, std::string)> addWords1(std::move(addWords));
+  REQUIRE(addWords1("A","house") == "A house");
+  
+  //emp::memo_function<std::string(std::string, std::string)> copyAddWords(addWords1);
+  //REQUIRE(copyAddWords("Twelve","cars") == "Twelve cars");
+  
+  emp::memo_function<std::string(std::string, std::string)> addWords2;
+  addWords2 = std::move(addWords1);
+  REQUIRE(addWords2("Yellow", "chair") == "Yellow chair");
+  
+  std::function<std::string(std::string, std::string)> stdCreateSentence = [](std::string a, std::string b){ a[0] = toupper(a[0]); return a+" "+b+"."; };
+  emp::memo_function<std::string(std::string, std::string)> createSentence;
+  createSentence = std::move(stdCreateSentence);
+  REQUIRE(createSentence("he","is") == "He is.");
   // What is Hash function for/how to use?
   
   /**
    * No arguments 
    */
-  
   // memo_function<R>()
   emp::memo_function<double()> returnsFive ([](){ return (double)5.0; });
   
