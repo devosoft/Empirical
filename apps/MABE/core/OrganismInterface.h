@@ -23,6 +23,7 @@ namespace mabe {
 
 
   /// The OrganismInterface template knows the organism type an environment that need to be linked.
+  /// Both ORG_T and ENV_T should be the wrapped types to ensure all components (or defaults) are in place.
   template <typename ORG_T, typename ENV_T>
   class OrganismInterface : public OrganismInterfaceBase {
   protected:
