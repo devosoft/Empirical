@@ -13,7 +13,7 @@ int main()
 {
   SelectionData data("example.dat");
   std::cout << "Fitnesses:" << std::endl;
-  data.PrintFitnesses();
+  data.PrintCriteria();
 
   const size_t num_criteria = data.GetNumCriteria();
   const size_t num_orgs = data.GetNumOrgs();

@@ -186,7 +186,7 @@ public:
 
   // Loop through all pairs of active organisms.  If any are dominated, remove them.
   // Return how much progress we made on reducing the number of organisms being considered.
-  size_t AnalyzeLexicase_CompareOrgs() {
+  size_t AnalyzeLexicase_RemoveDominated() {
     const size_t num_orgs = GetNumOrgs();
     const size_t num_fits = GetNumCriteria();
     size_t progress = 0;
@@ -332,7 +332,7 @@ public:
       progress = 0;
 
       // Compare all orgs to find direct domination.
-      progress += AnalyzeLexicase_CompareOrgs();
+      progress += AnalyzeLexicase_RemoveDominated();
       std::cout << "After CompareOrgs = " << progress << std::endl;
 
       // Remove criteria that cannot discriminate among orgs.
