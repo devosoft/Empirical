@@ -1122,7 +1122,7 @@ TEST_CASE("Test NullStream", "[tools]")
 TEST_CASE("Test random", "[tools]")
 {
   // test over a consistent set of seeds
-  for(int s = 1; s < 200; ++s) {
+  for(int s = 1; s < 102; ++s) {
 
   REQUIRE(s > 0);
   emp::Random rng(s);
