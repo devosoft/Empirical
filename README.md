@@ -4,7 +4,7 @@ is simple to incorporate into existing projects.
 
 [![Build Status](https://travis-ci.org/devosoft/Empirical.svg?branch=master)](https://travis-ci.org/devosoft/Empirical) [![Documentation Status](https://readthedocs.org/projects/empirical/badge/?version=latest)](https://empirical.readthedocs.io/en/latest/?badge=latest)
 
-See the doc/QuickStartGuides/ folder to start using the library.
+See our [Quick Start Guides](https://empirical.readthedocs.io/en/latest/QuickStartGuides) to start using the library.
 
 Tools in Empirical include:
 * Web-enabled elements to facilitate compiling to JavaScript and with a full web interfaces,
@@ -12,7 +12,7 @@ Tools in Empirical include:
 * Debug tools to facilitate audited memory management; these tools are turned off outside of
   debug mode allowing the full speed of raw pointers and normal standard library components.
 * A wide range of Helper tools to streamline common scientific computing tasks such as
-  configuration, data mangement, mathematical manipulations, etc.
+  configuration, data management, mathematical manipulations, etc.
   All of these are designed to be  easy-to-use and efficient.
 * A powerful set of evolution tools for building Artificial Life or Evolutionary Computation
   software.
