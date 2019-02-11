@@ -13,7 +13,7 @@ compiler.  The project goal is to improve the accessibility and reproducibility
 of the computational research.
 
 Emprical is a C++ project though it uses Python for development
-infrastructure. 
+infrastructure.
 
 The developer documentation is for contributing to the Emscripten project and
 the user documentation is for those wanting to incorporate the Emscripten
@@ -25,6 +25,7 @@ Contents:
    :caption: Using Empirical
    :maxdepth: 2
 
+   QuickStartGuides/index
    library/base/base
    library/data/data
    library/web/web
