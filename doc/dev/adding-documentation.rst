@@ -1,7 +1,7 @@
 Empirical Documentation Documentation
 =====================================
 
-This is a quick primer on how to document things within Empirical. 
+This is a quick primer on how to document things within Empirical.
 
 Empirical makes use of the Sphinx documentation system based off of XML information gathered from
 Doxygen via a plugin named Breathe. This means that Doxygen will automatically build documentation
@@ -30,7 +30,7 @@ kind of comment::
                 */
                 void somefunc(sometype param)
                 {
-                
+
                 }
 
                 // this is a comment that doxygen will ignore
@@ -44,7 +44,7 @@ considered documentation::
 
                 /// this line will be ignored
                 int somefunc() { return 5;}
-                
+
                 ///
                 /// This line will be included
                 ///

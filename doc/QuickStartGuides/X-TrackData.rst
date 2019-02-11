@@ -19,7 +19,7 @@ in public:
 	file.AddVar(update, "update", "Update); //Update will be the first column
 	file.AddMean(node, "mean_intval", "Average org int val"); //Mean of my interaction value will be calculated and put in the second column automagically
 	file.AddHistBin(node, 0, "Hist_-1", "Count for hist bin -1"); //Histograms need every bin set up, most others don't need anything else
-	file.Add... 
+	file.Add...
 	//Current options for Add: (Found in source/data/DataFile.h) Add, AddFun, AddVar, AddCurrent, AddMean, AddTotal, AddMin, AddMax, AddHistBin, AddInferiority
 	file.PrintHeaderKeys();
 }

@@ -15,7 +15,7 @@ We use C++11 features throughout the project and currently that is the
 de-facto standard version to use.
 
 All code should be in header files for ease of inclusion into Emscripten
-projects. 
+projects.
 
 Files that define a single class should be named after that class. Files that
 define sets of functions or multiple classes should have an all-lowercase name
@@ -46,7 +46,7 @@ below are for consistency.
 Guidelines based on Emscripten Limitations
 -------------------------------------------
 
- - Try to avoid use of 64-bit integers (that is, the "long long" type). 
+ - Try to avoid use of 64-bit integers (that is, the "long long" type).
    Emscripten has to emulate these and they can cause a notable slowdown.
 
  - Do not rely on exceptions when possible. Emscripten is slow at dealing with
@@ -57,7 +57,7 @@ Guidelines based on Emscripten Limitations
    Emscripten does have experimental support of pthreads.
 
  - Obviously, do not use any architecture-specific tricks, such as assuming
-   endianness, doing unaligned reads or writes, directly accessing registers, 
+   endianness, doing unaligned reads or writes, directly accessing registers,
    etc.
 
 Please see the `Emscripten doc page
