@@ -32,7 +32,7 @@ TEST_CASE("Test Systematics", "[evo]")
   auto id6 = sys.AddOrg(29, id5, 39);
   std::cout << "\nAddOrg 30 (id7; parent id1)\n";
   auto id7 = sys.AddOrg(30, id1, 6);
-  
+
 
   std::cout << "\nRemoveOrg (id2)\n";
   sys.RemoveOrg(id1);
@@ -148,16 +148,16 @@ TEST_CASE("Test Data Struct", "[evo]")
   auto id1 = sys->AddOrg(1, nullptr);
   id1->GetData().fitness.Add(2);
   id1->GetData().phenotype = 6;
-  
+
   auto id2 = sys->AddOrg(2, id1);
   id2->GetData().mut_counts["substitution"] = 2;
   id2->GetData().fitness.Add(1);
   id2->GetData().phenotype = 6;
   REQUIRE(id2->GetData().mut_counts["substitution"] == 2);
-  
+
   auto id3 = sys->AddOrg(3, id1);
   id3->GetData().mut_counts["substitution"] = 5;
-  id3->GetData().fitness.Add(0);  
+  id3->GetData().fitness.Add(0);
   id3->GetData().phenotype = 6;
 
   auto id4 = sys->AddOrg(4, id2);
@@ -179,12 +179,12 @@ TEST_CASE("Test Data Struct", "[evo]")
   REQUIRE(CountMuts(id3) == 5);
   REQUIRE(CountDeleteriousSteps(id3) == 1);
   REQUIRE(CountPhenotypeChanges(id3) == 0);
-  REQUIRE(CountUniquePhenotypes(id3) == 1);  
+  REQUIRE(CountUniquePhenotypes(id3) == 1);
 
   REQUIRE(CountMuts(id5) == 4);
   REQUIRE(CountDeleteriousSteps(id5) == 2);
   REQUIRE(CountPhenotypeChanges(id5) == 2);
-  REQUIRE(CountUniquePhenotypes(id5) == 2);  
+  REQUIRE(CountUniquePhenotypes(id5) == 2);
 
   sys.Delete();
 
@@ -198,8 +198,8 @@ TEST_CASE("World systematics integration", "[evo]") {
   // };
 
   using systematics_t = emp::Systematics<
-      emp::vector<int>, 
-      emp::vector<int>, 
+      emp::vector<int>,
+      emp::vector<int>,
       emp::datastruct::mut_landscape_info< int >
     >;
 
@@ -274,7 +274,7 @@ TEST_CASE("Run world", "[evo]") {
   using gene_systematics_t = emp::Systematics<org_t, org_t::genome_t, data_t>;
   using phen_systematics_t = emp::Systematics<org_t, emp::vector<double>, data_t>;
 
-  emp::Random random;
+  emp::Random random(1);
   emp::World<org_t> world(random, "AvidaWorld");
   world.SetPopStruct_Mixed(true);
 
@@ -335,7 +335,7 @@ TEST_CASE("Run world", "[evo]") {
 
   // Setup the mutation function.
   world.SetMutFun( [&world, &on_mutate_sig](emp::AvidaGP & org, emp::Random & random) {
-     
+
       uint32_t num_muts = random.GetUInt(4);  // 0 to 3 mutations.
       for (uint32_t m = 0; m < num_muts; m++) {
         const uint32_t pos = random.GetUInt(20);
