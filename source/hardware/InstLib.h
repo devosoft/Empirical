@@ -64,8 +64,8 @@ namespace emp {
 
   public:
     InstLib() : inst_lib(), inst_funs(), name_map(), arg_map() { ; }  ///< Default Constructor
-    InstLib(const InstLib &) = default;                               ///< Copy Constructor
-    InstLib(InstLib &&) = default;                                    ///< Move Constructor
+    InstLib(const InstLib &) = delete;                               ///< Copy Constructor
+    InstLib(InstLib &&) = delete;                                    ///< Move Constructor
     ~InstLib() { ; }                                                  ///< Destructor
 
     InstLib & operator=(const InstLib &) = default;                   ///< Copy Operator
