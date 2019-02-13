@@ -285,16 +285,22 @@ namespace web {
       virtual Widget Append(Widget info) { return ForwardAppend(info); }
       virtual Widget Append(const Font & font) { return ForwardAppend(font); }
 
-      // Convert arbitrary inputs to a string and try again!
-      template <typename T>
-      Widget Append(T val) { return Append(emp::to_string(val)); }
-
       // Handle special commands
       virtual Widget Append(const emp::web::internal::WidgetCommand & cmd) {
         if (cmd.Trigger(*this)) return Widget(this);
         return ForwardAppend(cmd);  // Otherwise pass the Close to parent!
       }
 
+      // Convert arbitrary inputs to a string or string function and try again!
+      template <typename T>
+      Widget Append(const T & val) {
+        if constexpr ( std::is_invocable<T>() ) {
+          std::function<std::string()> fun_val( val );
+          return Append(fun_val);
+        } else {
+          return Append(emp::to_string(val));
+        }
+      }
 
       // If an Append doesn't work with current class, forward it to the parent.
       template <typename FWD_TYPE>
