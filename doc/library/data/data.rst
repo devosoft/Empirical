@@ -22,7 +22,7 @@ DataNodes of any type. This is useful in cases where you have a collection
 of different types of DataNodes and want to operate on them without casting.
 
 The DataFile class provides an interface for recording data at regular
-intervals. This data can come from DataNodes, the return of a specified function, 
+intervals. This data can come from DataNodes, the return of a specified function,
 or the contents of a specified variable. DataFiles are useful for collecting
 data over the course of a computational experiment.
 

@@ -15,6 +15,10 @@
 #include <string>
 #include <deque>
 #include <algorithm>
+#include <limits>
+#include <numeric>
+#include <climits>
+#include <unordered_set>
 
 #include "data/DataNode.h"
 
@@ -37,6 +41,7 @@
 #include "tools/flex_function.h"
 #include "tools/functions.h"
 #include "tools/graph_utils.h"
+#include "tools/hash_utils.h"
 //#include "tools/grid.h"
 #include "tools/info_theory.h"
 #include "tools/lexer_utils.h"
@@ -73,7 +78,11 @@
 
 TEST_CASE("Test Binomial", "[tools]")
 {
-  emp::Random random;
+  // test over a consistent set of seeds
+  for (int s = 1; s <= 200; ++s) {
+
+  REQUIRE(s > 0);
+  emp::Random random(s);
 
   const double flip_prob = 0.03;
   const size_t num_flips = 100;
@@ -109,6 +118,7 @@ TEST_CASE("Test Binomial", "[tools]")
   //   std::cout << " " << bi100.PickRandom(random);
   // }
   // std::cout << std::endl;
+  }
 }
 
 // this templating is necessary to force full coverage of templated classes.
@@ -520,12 +530,80 @@ TEST_CASE("Test graph", "[tools]")
 // emp::Random grand;
 TEST_CASE("Test Graph utils", "[tools]")
 {
-  emp::Random random;
+  emp::Random random(1);
   // emp::Graph graph( emp::build_graph_tree(20, random) );
   // emp::Graph graph( emp::build_graph_random(20, 40, random) );
   emp::Graph graph( emp::build_graph_grid(5, 4, random) );
 
   // graph.PrintSym();
+}
+
+// // TODO: add asserts
+// emp::Random grand;
+TEST_CASE("Test hash_utils", "[tools]")
+{
+
+  REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)0) == (uint64_t)0);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)1) == (uint64_t)1);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)1, (uint32_t)0) == (uint64_t)2);
+  REQUIRE(emp::szudzik_hash((uint32_t)1, (uint32_t)1) == (uint64_t)3);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)2) == (uint64_t)4);
+  REQUIRE(emp::szudzik_hash((uint32_t)1, (uint32_t)2) == (uint64_t)5);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)2, (uint32_t)0) == (uint64_t)6);
+  REQUIRE(emp::szudzik_hash((uint32_t)2, (uint32_t)1) == (uint64_t)7);
+  REQUIRE(emp::szudzik_hash((uint32_t)2, (uint32_t)2) == (uint64_t)8);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)3) == (uint64_t)9);
+  REQUIRE(emp::szudzik_hash((uint32_t)1, (uint32_t)3) == (uint64_t)10);
+  REQUIRE(emp::szudzik_hash((uint32_t)2, (uint32_t)3) == (uint64_t)11);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)3, (uint32_t)0) == (uint64_t)12);
+  REQUIRE(emp::szudzik_hash((uint32_t)3, (uint32_t)1) == (uint64_t)13);
+  REQUIRE(emp::szudzik_hash((uint32_t)3, (uint32_t)2) == (uint64_t)14);
+  REQUIRE(emp::szudzik_hash((uint32_t)3, (uint32_t)3) == (uint64_t)15);
+
+
+  REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)0) == (uint64_t)0);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)1) == (uint64_t)1);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)1, (uint32_t)0) == (uint64_t)2);
+  REQUIRE(emp::szudzik_hash((uint32_t)1, (uint32_t)1) == (uint64_t)3);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)2) == (uint64_t)4);
+  REQUIRE(emp::szudzik_hash((uint32_t)1, (uint32_t)2) == (uint64_t)5);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)2, (uint32_t)0) == (uint64_t)6);
+  REQUIRE(emp::szudzik_hash((uint32_t)2, (uint32_t)1) == (uint64_t)7);
+  REQUIRE(emp::szudzik_hash((uint32_t)2, (uint32_t)2) == (uint64_t)8);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)3) == (uint64_t)9);
+  REQUIRE(emp::szudzik_hash((uint32_t)1, (uint32_t)3) == (uint64_t)10);
+  REQUIRE(emp::szudzik_hash((uint32_t)2, (uint32_t)3) == (uint64_t)11);
+
+  REQUIRE(emp::szudzik_hash((uint32_t)3, (uint32_t)0) == (uint64_t)12);
+  REQUIRE(emp::szudzik_hash((uint32_t)3, (uint32_t)1) == (uint64_t)13);
+  REQUIRE(emp::szudzik_hash((uint32_t)3, (uint32_t)2) == (uint64_t)14);
+  REQUIRE(emp::szudzik_hash((uint32_t)3, (uint32_t)3) == (uint64_t)15);
+
+  emp::vector<uint64_t> hash_vec;
+
+  for(uint32_t i = 0; i < 10; ++i) {
+    for(uint32_t j = 0; j < 10; ++j) {
+      for(uint32_t s : { 0, 100, 100000 }) {
+        hash_vec.push_back(emp::szudzik_hash(s+i,s+j));
+      }
+    }
+  }
+
+  std::unordered_set<uint64_t> hash_set(hash_vec.begin(), hash_vec.end());
+
+  REQUIRE(hash_vec.size() == hash_set.size());
+
 }
 
 
@@ -1129,7 +1207,11 @@ TEST_CASE("Test NullStream", "[tools]")
 
 TEST_CASE("Test random", "[tools]")
 {
-  emp::Random rng;
+  // test over a consistent set of seeds
+  for(int s = 1; s < 102; ++s) {
+
+  REQUIRE(s > 0);
+  emp::Random rng(s);
 
   // Test GetDouble with the law of large numbers.
   emp::vector<int> val_counts(10);
@@ -1175,6 +1257,57 @@ TEST_CASE("Test random", "[tools]")
     REQUIRE(mean_value < max_threshold);
   }
 
+  // Test GetUInt()
+  emp::vector<uint32_t> uint32_draws;
+  total = 0.0;
+  for (size_t i = 0; i < num_tests; i++) {
+    const uint32_t cur_value = rng.GetUInt();
+    total += cur_value;
+    uint32_draws.push_back(cur_value);
+  }
+
+  {
+  const double expected_mean = ((double)std::numeric_limits<uint32_t>::max())/2.0;
+  const double min_threshold = (expected_mean*0.995);
+  const double max_threshold = (expected_mean*1.005);
+  double mean_value = total/(double) num_tests;
+
+  REQUIRE(mean_value > min_threshold);
+  REQUIRE(mean_value < max_threshold);
+  // ensure that all bits are set at least once and unset at least once
+  REQUIRE(std::numeric_limits<uint32_t>::max() == std::accumulate(uint32_draws.begin(),uint32_draws.end(),(uint32_t)0,
+    [](uint32_t accumulator, uint32_t val){ return accumulator | val; })
+  );
+  REQUIRE(std::numeric_limits<uint32_t>::max() == std::accumulate(uint32_draws.begin(),uint32_draws.end(),(uint32_t)0,
+    [](uint32_t accumulator, uint32_t val){ return accumulator | (~val); })
+  );
+  }
+  // Test GetUInt64
+  emp::vector<uint64_t> uint64_draws;
+  total = 0.0;
+  for (size_t i = 0; i < num_tests; i++) {
+    const uint64_t cur_value = rng.GetUInt64();
+    total += cur_value/(double)num_tests;
+    uint64_draws.push_back(cur_value);
+  }
+
+  {
+  const double expected_mean = ((double)std::numeric_limits<uint64_t>::max())/2.0;
+  const double min_threshold = (expected_mean*0.995);
+  const double max_threshold = (expected_mean*1.005);
+  double mean_value = total; // values were divided by num_tests when added
+
+  REQUIRE(mean_value > min_threshold);
+  REQUIRE(mean_value < max_threshold);
+  // ensure that all bits are set at least once and unset at least once
+  REQUIRE(std::numeric_limits<uint64_t>::max() == std::accumulate(uint64_draws.begin(),uint64_draws.end(),(uint64_t)0,
+    [](uint64_t accumulator, uint64_t val){ return accumulator | val; })
+  );
+  REQUIRE(std::numeric_limits<uint64_t>::max() == std::accumulate(uint64_draws.begin(),uint64_draws.end(),(uint64_t)0,
+    [](uint64_t accumulator, uint64_t val){ return accumulator | (~val); })
+  );
+  }
+
   // Test P
   double flip_prob = 0.56789;
   int hit_count = 0;
@@ -1192,6 +1325,7 @@ TEST_CASE("Test random", "[tools]")
   emp::vector<size_t> choices = Choose(rng,100,10);
 
   REQUIRE(choices.size() == 10);
+  }
 }
 
 

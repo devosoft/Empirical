@@ -1,3 +1,6 @@
+Using the Project Template
+==========================
+
 Goals of the project template
 - Simple web interface
 - Easy toggle

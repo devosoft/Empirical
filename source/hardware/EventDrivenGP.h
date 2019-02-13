@@ -32,8 +32,8 @@ namespace emp {
 
   /**
    *  @brief A linear GP (inspired by AvidaGP) virtual hardware CPU that supports an event-driven programming paradigm.
-   *  @note The terminology used throughout this class is out of date. EventDrivenGP will eventually change to 'SignalGP', 
-    *       and our terminology will be updated throughout. 
+   *  @note The terminology used throughout this class is out of date. EventDrivenGP will eventually change to 'SignalGP',
+    *       and our terminology will be updated throughout.
    *  @details
    *  The EventDrivenGP virtual hardware runs programs where each program is a set of named functions.
    *  Function names are mutable bit strings, or affinities, and each function consists of a sequence
@@ -95,13 +95,13 @@ namespace emp {
    *      * Each event type has a registered event handler that gets called to handle a dispatched
    *        event.
    */
-  template<size_t AFFINITY_WIDTH>
+  template<size_t AFFINITY_WIDTH, typename TRAIT_TYPE=double>
   class EventDrivenGP_AW {
   public:
     /// Maximum number of instruction arguments. Currently hardcoded. At some point, will make flexible.
     static constexpr size_t MAX_INST_ARGS = 3;
 
-    using EventDrivenGP_t = EventDrivenGP_AW<AFFINITY_WIDTH>;  //< Resolved type for this templated class.
+    using EventDrivenGP_t = EventDrivenGP_AW<AFFINITY_WIDTH, TRAIT_TYPE>;  //< Resolved type for this templated class.
     using mem_key_t = int;                                     //< Hardware memory map key type.
     using mem_val_t = double;                                  //< Hardware memory map value type.
     using memory_t = std::unordered_map<mem_key_t, mem_val_t>; //< Hardware memory map type.
@@ -618,7 +618,7 @@ namespace emp {
     program_t program;                    //< Hardware's associated program (set of functions).
     memory_t shared_mem;                  //< Hardware's shared memory map. All cores have access to the same shared memory.
     std::deque<event_t> event_queue;      //< Hardware's event queue. Where events go to be handled (in order of reception).
-    emp::vector<double> traits;           //< Generic traits vector. Whatever uses the hardware must define/keep track of what traits mean.
+    emp::vector<TRAIT_TYPE> traits;           //< Generic traits vector. Whatever uses the hardware must define/keep track of what traits mean.
     size_t errors;                        //< Errors committed by hardware while executing. (e.g. divide by 0, etc.)
     size_t max_cores;                     //< Maximum number of parallel execution stacks that can be spawned. Increasing this value drastically slows things down.
     size_t max_call_depth;                //< Maximum depth of calls per execution stack.
@@ -722,6 +722,13 @@ namespace emp {
       program.Clear();
     }
 
+    /// clear program, this also requires resetting hardware
+    void ResetProgram() {
+      emp_assert(!is_executing);
+      ResetHardware();
+      program.Clear();
+    }
+
     /// Reset only hardware, not program.
     /// Not allowed to reset hardware during execution.
     void ResetHardware() {
@@ -807,7 +814,7 @@ namespace emp {
     }
 
     /// Get a particular trait given its ID.
-    double GetTrait(size_t id) const { emp_assert(id < traits.size()); return traits[id]; }
+    TRAIT_TYPE GetTrait(size_t id) const { emp_assert(id < traits.size()); return traits[id]; }
 
     /// Get current number of errors committed by this hardware.
     size_t GetNumErrors() const { return errors; }
@@ -830,7 +837,7 @@ namespace emp {
     bool IsStochasticFunCall() const { return stochastic_fun_call; }
 
     /// Get all hardware cores.
-    /// NOTE: use responsibly! 
+    /// NOTE: use responsibly!
     emp::vector<exec_stk_t> & GetCores() { return cores; }
 
     /// Get the currently executing core ID. If hardware is not in the middle of an execution cycle
@@ -949,7 +956,7 @@ namespace emp {
 
     /// Set trait in traints vector given by id to value given by val.
     /// Will resize traits vector if given id is greater than current traits vector size.
-    void SetTrait(size_t id, double val) {
+    void SetTrait(size_t id, TRAIT_TYPE val) {
       if (id >= traits.size()) traits.resize(id+1, 0.0);
       traits[id] = val;
     }
@@ -969,7 +976,7 @@ namespace emp {
     }
 
     /// Push a trait onto end of traits vector.
-    void PushTrait(double val) { traits.emplace_back(val); }
+    void PushTrait(TRAIT_TYPE val) { traits.emplace_back(val); }
 
     /// Shortcut to this hardware object's program's SetInst function of the same signature.
     void SetInst(size_t fID, size_t pos, const inst_t & inst) {
@@ -1610,7 +1617,7 @@ namespace emp {
     /// Default instruction: Fork
     /// Number of instruction arguments: 0
     /// Description: Self-signal. Fork a new thread, using tag-based referencing to determine the appropriate
-    ///              function to call on the new thread. 
+    ///              function to call on the new thread.
     static void Inst_Fork(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       hw.SpawnCore(inst.affinity, hw.GetMinBindThresh(), state.local_mem, false);
@@ -1618,9 +1625,9 @@ namespace emp {
 
     /// Default instruction: Terminate
     /// Number of instruction arguments: 0
-    /// Description: Terminate the thread that executes this instruction. 
-    /// WARNING: This instruction does not respect any 'main' function calls. 
-    ///          *Any* thread where this is called is terminated. 
+    /// Description: Terminate the thread that executes this instruction.
+    /// WARNING: This instruction does not respect any 'main' function calls.
+    ///          *Any* thread where this is called is terminated.
     static void Inst_Terminate(EventDrivenGP_t & hw, const inst_t & inst) {
       // Pop all the call states from current core.
       exec_stk_t & core = hw.GetCurCore();

@@ -1,6 +1,6 @@
 # Project-specific settings
 PROJECT := project_name
-EMP_DIR := ../../Empirical/source
+EMP_DIR := ../../../Empirical/source
 
 # Flags to use regardless of compiler
 CFLAGS_all := -Wall -Wno-unused-function -std=c++17 -I$(EMP_DIR)/

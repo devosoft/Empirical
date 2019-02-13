@@ -5,7 +5,7 @@ Contents:
 
 .. toctree::
    :maxdepth: 1
-   
+
    base/base
    data/data
    web/web
