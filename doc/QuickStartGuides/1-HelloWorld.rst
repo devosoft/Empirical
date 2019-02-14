@@ -106,8 +106,8 @@ Here's how to get that taken care of.
 
   git clone https://github.com/emscripten-core/emsdk.git
   cd emsdk
-  ./emsdk install emscpripten v1.37.1
-  ./emsdk activate emscpripten v1.37.1
+  ./emsdk install emscripten-1.37.17
+  ./emsdk activate emscripten-1.37.17
   ./emsdk install clang-e1.37.1-64bit
   ./emsdk activate clang-e1.37.1-64bit
 
@@ -123,7 +123,7 @@ You only need to do this once per terminal session (e.g., the first time you wan
 Compile & Run: Web Browser
 --------------------------
 
-Assuming your working directory is still :code:`Empirical/examples/ProjectTemplate` and you have loaded up emscripten (e.g., :code:`source source ./emsdk_env.sh`), compiling for web is a snap!
+Assuming your working directory is still :code:`Empirical/examples/ProjectTemplate` and you have loaded up emscripten (e.g., :code:`source ./emsdk_env.sh`), compiling for web is a snap!
 
 Let's take a look at what we want to compile first, though.
 
@@ -190,7 +190,15 @@ at your command line.
 If it starts up, then great!
 Just leave it running for now.
 
-If you don't have :code:`python3` installed, a step-by-step guide for your operating system is probably only a quick web search away.
+If you only have Python 2 installed, try running
+
+.. code-block:: bash
+
+  python -m SimpleHTTPServer
+
+at your command line.
+
+If you don't have any Python installed, a step-by-step guide for your operating system is probably only a quick web search away.
 Alternatively, go ahead and use your web serving tool of choice.
 
 Pop open your favorite browser and point the address bar to `http://localhost:8000/web/project_name.html`_.
