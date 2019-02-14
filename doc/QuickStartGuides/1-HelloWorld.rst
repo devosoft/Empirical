@@ -94,22 +94,18 @@ If you're a new user, you (probably) don't have this set up so we'll walk you th
 .. _emscripten LLVM-to-Web Compiler: https://emscripten.org
 
 We aim for Empirical to track the current release of emscripten.
-However, as of February 2019, we've fallen a bit behind due to some breaking changes in recent emscripten releases.
-(See, e.g., `Empirical Issue #197`_).
-While we're working on bringing Empirical up-to-date with the latest emscripten, you'll need to work with emscripten version :code:`v1.37.1` in order to compile Empirical's web tools.
+As of mid-February 2019, Empirical is compatible with emscripten's contemporary release, version :code:`v1.38.27`.
+Your best bet for compiling with Empirical is to install the latest version of emscripten.
+However, if you run into roadblocks later on and think it might be because of breaking changes in emscripten that Empirical hasn't tracked, let us know by posting on `our issue tracker`_!
 
-.. _Empirical Issue #197: https://github.com/devosoft/Empirical/issues/197
-
-Here's how to get that taken care of.
+.. _our issue tracker: https://github.com/devosoft/Empirical/issues
 
 .. code-block:: bash
 
   git clone https://github.com/emscripten-core/emsdk.git
   cd emsdk
-  ./emsdk install emscripten-1.37.17
-  ./emsdk activate emscripten-1.37.17
-  ./emsdk install clang-e1.37.1-64bit
-  ./emsdk activate clang-e1.37.1-64bit
+  ./emsdk install latest
+  ./emsdk activate latest
 
 When you want to use the emscripten compiler, you'll want to hop over to the :code:`emsdk` directory and run
 
