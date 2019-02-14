@@ -291,16 +291,25 @@ namespace web {
         return ForwardAppend(cmd);  // Otherwise pass the Close to parent!
       }
 
-      // Convert arbitrary inputs to a string or string function and try again!
+      // If overloaded versions of Append don't resolve properly, collect everything else
+      // with this generic version and try to collect more information about it.
       template <typename T>
       Widget Append(const T & val) {
+        // First, test if we are working with a Widget command.
         if constexpr ( std::is_base_of<WidgetCommand,T>() ) {
           const WidgetCommand & cmd = val;
           return Append(cmd);
-        } else if constexpr ( std::is_invocable<T>() ) {
+        }
+        
+        // Next, test if this if an invoable function
+        // @CAO: We should make sure it returns a string when called with no arguments.
+        else if constexpr ( std::is_invocable<T>() ) {
           std::function<std::string()> fun_val( val );
           return Append(fun_val);
-        } else {
+        }
+        
+        // Anything else we should just try to convert to a string, and used that.
+        else {
           return Append(emp::to_string(val));
         }
       }
