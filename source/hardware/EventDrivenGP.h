@@ -1659,6 +1659,14 @@ namespace emp {
       hw.TriggerEvent("Message", inst.affinity, state.output_mem, {"send"});
     }
 
+    /// Non-default instruction: RngDouble
+    /// Number of arguments: 1
+    /// Description: Draw a value between 0 and 1 from the onboard RNG and store it in Local[Arg1]
+    static void Inst_RngDouble(EventDrivenGP_t & hw, const inst_t & inst) {
+      State & state = hw.GetCurState();
+      state.SetLocal(inst.args[0], hw.GetRandom().GetDouble());
+    }
+    
     /// Get a pointer to const default instruction library. Will only construct the default instruction library once.
     static Ptr<const InstLib<EventDrivenGP_t>> DefaultInstLib() {
       static inst_lib_t inst_lib;
