@@ -1,5 +1,5 @@
 # Flags to use regardless of compiler
-CFLAGS_all := -std=c++17 -Wall -Wno-unused-function -I../../source/
+CFLAGS_all := -std=c++17 -Wall -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments -I../../source/
 
 # Emscripten compiler information
 CXX_web := emcc
@@ -54,7 +54,7 @@ debug-%: $*.cc
 	$(CXX_native) $(CFLAGS_native) $< -o $@
 
 clean:
-	rm -f debug-* $(JS_TARGETS) *.js.map *.js.mem *~ source/*.o source/*/*.o
+	rm -f debug-* $(JS_TARGETS) *.js.map *.js.mem *.wasm *.wasm.map *.wast *~ source/*.o source/*/*.o
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
