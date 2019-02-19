@@ -659,7 +659,7 @@ namespace emp {
       SpawnCore(0, memory_t(), true);
     }
 
-    EventDrivenGP_AW(inst_lib_t & _ilib, event_lib_t & _elib, Ptr<Random> rnd=nullptr)
+    EventDrivenGP_AW(const inst_lib_t & _ilib, const event_lib_t & _elib, Ptr<Random> rnd=nullptr)
       : EventDrivenGP_AW(&_ilib, &_elib, rnd) { ; }
 
     EventDrivenGP_AW(Ptr<const event_lib_t> _elib, Ptr<Random> rnd=nullptr)
