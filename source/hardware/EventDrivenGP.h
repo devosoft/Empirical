@@ -21,7 +21,7 @@
 
 // Developer Notes:
 //  * Program struct's PrintProgram prints program in a maximally readable format. However, this format
-//    is not currently acceptable for input into EventDrivenGP's Load function.
+//    is not currently acceptable for input into As Load function.
 //    * Will remedy this by adding another PrintProgram function to print in a format acceptable by EventDrivenGP's
 //      Load function. This PrintProgram will be less readable, but will more fully describe the program (it won't hide anything).
 //  * @amlalejini - TODO:
@@ -659,7 +659,7 @@ namespace emp {
       SpawnCore(0, memory_t(), true);
     }
 
-    EventDrivenGP_AW(inst_lib_t & _ilib, event_lib_t & _elib, Ptr<Random> rnd=nullptr)
+    EventDrivenGP_AW(const inst_lib_t & _ilib, const event_lib_t & _elib, Ptr<Random> rnd=nullptr)
       : EventDrivenGP_AW(&_ilib, &_elib, rnd) { ; }
 
     EventDrivenGP_AW(Ptr<const event_lib_t> _elib, Ptr<Random> rnd=nullptr)
