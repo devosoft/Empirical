@@ -31,18 +31,7 @@ TEST_CASE("Test Ptr", "[base]")
 	emp::Ptr<int> arr1ptr(arr1, 5, false);
 	REQUIRE(!arr1ptr.IsNull());
 	
-	int arr2[5] = {1, 2, 3, 4, 5};
-	const emp::Ptr<int> arr2constptr(arr2, 5, true);
-	REQUIRE( (*arr2constptr) == 1 );
-	
-	REQUIRE( arr2constptr != arr1ptr );
-	REQUIRE( arr2constptr >= arr2constptr);
-	REQUIRE( arr2constptr <= arr2constptr);
-	REQUIRE( arr2constptr >= arr2 );
-	REQUIRE( arr2constptr <= arr2 );
-	
-	// can't delete array because it discards qualifiers
-	//arr2constptr.DeleteArray();
+	// attempts to delete const array fails, error: "discards qualifiers"
 	
 	arr1ptr.NewArray(10);
 	REQUIRE(arr1ptr.DebugGetArrayBytes() == (10 * sizeof(int)));
@@ -51,6 +40,20 @@ TEST_CASE("Test Ptr", "[base]")
 	
 	tracker.MarkDeleted(arr1ID);
 	REQUIRE(!tracker.IsActiveID(arr1ID));
+	size_t arr1ptrID = tracker.GetCurID(arr1ptr);
+	tracker.MarkDeleted(arr1ptrID);
+	tracker.MarkDeleted(tracker.GetCurID(arr));
+	
+	int num = 123;
+	int* num_ptr = &num;
+	emp::Ptr<int> numPtr(num_ptr);
+	emp::Ptr<int> numPtr2(num_ptr);
+	REQUIRE( numPtr == num_ptr );
+	REQUIRE( numPtr >= num_ptr );
+	REQUIRE( numPtr <= num_ptr );
+	REQUIRE( !(numPtr != numPtr2) );
+	REQUIRE( numPtr >= numPtr2 );
+	REQUIRE( numPtr <= numPtr2 );
 }
 
 #endif // EMP_TRACK_MEM
