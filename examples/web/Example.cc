@@ -8,7 +8,17 @@ namespace UI = emp::web;
 
 UI::Document doc("emp_base");
 
+int x;
+
 int main()
 {
-  doc << "<h1>Hello World!</h1>";
+  doc << "<h1>Button test!</h1>";
+
+  x = 10;
+
+  doc << "x = " << UI::Live(x) << "<br>";
+
+  x = 20;
+
+  doc << UI::Button([](){x++; doc.Redraw();}, "Inc", "inc_but");
 }
