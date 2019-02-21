@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2018
+ *  @date 2015-2019.
  *
  *  @file  Widget.h
  *  @brief Widgets maintain individual components on a web page and link to Elements
@@ -295,6 +295,12 @@ namespace web {
       // with this generic version and try to collect more information about it.
       template <typename T>
       Widget Append(const T & val) {
+        // First, test if we are working with a Widget command.
+        if constexpr ( std::is_base_of<Widget,T>() ) {
+          const Widget widget = val;
+          return Append(widget);
+        }
+        
         // First, test if we are working with a Widget command.
         if constexpr ( std::is_base_of<WidgetCommand,T>() ) {
           const WidgetCommand & cmd = val;
