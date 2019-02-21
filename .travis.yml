@@ -39,6 +39,8 @@ addons:
 services:
   - xvfb
 before_script:
+- g++ --version
+- clang++ --version
 - git fetch origin master:refs/remotes/origin/master
 - npm install source-map
 - make install-test-dependencies
