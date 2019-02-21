@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include "web/web.h"
@@ -10,7 +10,7 @@ UI::Document doc("emp_base");
 
 int x;
 
-int main()
+int emp_main()
 {
   doc << "<h1>Button test!</h1>";
 
@@ -21,4 +21,6 @@ int main()
   x = 20;
 
   doc << UI::Button([](){x++; doc.Redraw();}, "Inc", "inc_but");
+
+  doc.Redraw();
 }
