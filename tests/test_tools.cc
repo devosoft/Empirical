@@ -30,6 +30,7 @@
 #include "tools/DynamicString.h"
 #include "tools/FunctionSet.h"
 #include "tools/Graph.h"
+#include "tools/IndexMap.h"
 #include "tools/Lexer.h"
 #include "tools/NFA.h"
 #include "tools/RegEx.h"
@@ -624,6 +625,91 @@ TEST_CASE("Test hash_utils", "[tools]")
   //TODO: moar asserts
 }*/
 
+
+// TODO: add moar asserts
+TEST_CASE("Test IndexMap", "[tools]")
+{
+  emp::IndexMap imap(8);
+  imap[0] = 1.0;
+  imap[1] = 1.0;
+  imap[2] = 1.0;
+  imap[3] = 1.0;
+  imap[4] = 2.0;
+  imap[5] = 2.0;
+  imap[6] = 0.0;
+  imap[7] = 8.0;
+  
+  REQUIRE(imap.GetSize() == 8);
+  REQUIRE(imap.GetWeight() == 16.0);
+  REQUIRE(imap.GetWeight(2) == 1.0);
+  REQUIRE(imap.GetWeight(5) == 2.0);
+  REQUIRE(imap.GetWeight(7) == 8.0);
+  REQUIRE(imap[5] == 2.0);
+  REQUIRE(imap.GetProb(4) == 0.125);
+  REQUIRE(imap.GetProb(7) == 0.5);
+  REQUIRE(imap.Index(7.1) == 5);
+
+  // Add a new element to the end of the map that takes up half of the weight.
+  imap.PushBack(16.0);
+
+  REQUIRE(imap.GetSize() == 9);
+  REQUIRE(imap.GetWeight() == 32.0);
+  REQUIRE(imap.GetWeight(2) == 1.0);
+  REQUIRE(imap.GetWeight(5) == 2.0);
+  REQUIRE(imap.GetWeight(7) == 8.0);
+  REQUIRE(imap.GetWeight(8) == 16.0);
+  REQUIRE(imap[5] == 2.0);
+  REQUIRE(imap.GetProb(7) == 0.25);
+  REQUIRE(imap.Index(7.1) == 5);
+  REQUIRE(imap.Index(17.1) == 8);
+
+  emp::IndexMap imap_bak(imap);
+  imap.AdjustAll(10.0);
+
+  REQUIRE(imap.GetSize() == 9);
+  REQUIRE(imap.GetWeight() == 90.0);
+  REQUIRE(imap.GetWeight(2) == 10.0);
+  REQUIRE(imap.GetWeight(8) == 10.0);
+  REQUIRE(imap[5] == 10.0);
+  REQUIRE(imap.Index(7.1) == 0);
+  REQUIRE(imap.Index(75.0) == 7);
+
+  // Did the backup copy work correctly?
+  REQUIRE(imap_bak.GetSize() == 9);
+  REQUIRE(imap_bak.GetWeight() == 32.0);
+  REQUIRE(imap_bak.GetWeight(2) == 1.0);
+  REQUIRE(imap_bak.GetWeight(5) == 2.0);
+  REQUIRE(imap_bak.GetWeight(7) == 8.0);
+  REQUIRE(imap_bak.GetWeight(8) == 16.0);
+  REQUIRE(imap_bak[5] == 2.0);
+  REQUIRE(imap_bak.GetProb(7) == 0.25);
+  REQUIRE(imap_bak.Index(7.1) == 5);
+  REQUIRE(imap_bak.Index(17.1) == 8);
+
+  // Can we add on values from one index map to another?
+  imap += imap_bak;
+
+  REQUIRE(imap.GetSize() == 9);
+  REQUIRE(imap.GetWeight() == 122.0);
+  REQUIRE(imap.GetWeight(2) == 11.0);
+  REQUIRE(imap.GetWeight(5) == 12.0);
+  REQUIRE(imap.GetWeight(7) == 18.0);
+  REQUIRE(imap.GetWeight(8) == 26.0);
+  REQUIRE(imap[5] == 12.0);
+  REQUIRE(imap.Index(7.1) == 0);
+  REQUIRE(imap.Index(90.0) == 7);
+
+  // And subtraction?
+  imap -= imap_bak;
+
+  REQUIRE(imap.GetSize() == 9);
+  REQUIRE(imap.GetWeight() == 90.0);
+  REQUIRE(imap.GetWeight(2) == 10.0);
+  REQUIRE(imap.GetWeight(8) == 10.0);
+  REQUIRE(imap[5] == 10.0);
+  REQUIRE(imap.Index(7.1) == 0);
+  REQUIRE(imap.Index(75.0) == 7);
+}
 
 TEST_CASE("Test info_theory", "[tools]")
 {
@@ -1451,7 +1537,7 @@ TEST_CASE("Test sequence utils", "[tools]")
 
 
 
-TEST_CASE("Test string utils", "[tools]")
+TEST_CASE("Test string_utils", "[tools]")
 {
 
   // TEST1: lets test our conversion to an escaped string.
@@ -1526,13 +1612,11 @@ TEST_CASE("Test string utils", "[tools]")
   REQUIRE(first_line == "anokaystring.");
 
 
-
   popped_str = emp::string_pop(first_line, "ns");
 
 
   REQUIRE(popped_str == "a");
   REQUIRE(first_line == "okaystring.");
-
 
 
   popped_str = emp::string_pop(first_line, 'y');
@@ -1548,6 +1632,26 @@ TEST_CASE("Test string utils", "[tools]")
 
   emp::compress_whitespace(base_string);
   REQUIRE(base_string == "This is -MY- very best string!!!!");
+
+
+  std::string view_test = "This is my view test!";
+  REQUIRE( emp::view_string(view_test) == "This is my view test!" );
+  REQUIRE( emp::view_string(view_test, 5) == "is my view test!" );
+  REQUIRE( emp::view_string(view_test, 8, 2) == "my" );
+  REQUIRE( emp::view_string_front(view_test,4) == "This" );
+  REQUIRE( emp::view_string_back(view_test, 5) == "test!" );
+  REQUIRE( emp::view_string_range(view_test, 11, 15) == "view" );
+  REQUIRE( emp::view_string_to(view_test, ' ') == "This" );
+  REQUIRE( emp::view_string_to(view_test, ' ', 5) == "is" );
+
+  emp::vector<std::string_view> slice_view = emp::view_slices(view_test, ' ');
+  REQUIRE( slice_view.size() == 5 );
+  REQUIRE( slice_view[0] == "This" );
+  REQUIRE( slice_view[1] == "is" );
+  REQUIRE( slice_view[2] == "my" );
+  REQUIRE( slice_view[3] == "view" );
+  REQUIRE( slice_view[4] == "test!" );
+
 
   auto slices = emp::slice("This is a test of a different version of slice.", ' ');
 
@@ -1821,6 +1925,15 @@ TEST_CASE("Test vector utils", "[tools]") {
   REQUIRE(!emp::Has(v1, 4));
   REQUIRE(emp::Product(v1) == 180);
   REQUIRE(emp::Slice(v1,1,3) == emp::vector<int>({2,3}));
+
+  // Test handling vector-of-vectors.
+  using vv_int_t = emp::vector< emp::vector< int > >;
+  vv_int_t vv = {{1,2,3},{4,5,6},{7,8,9}};
+  vv_int_t vv2 = emp::Transpose(vv);
+  REQUIRE(vv[0][2] == 3);
+  REQUIRE(vv[1][0] == 4);
+  REQUIRE(vv2[0][2] == 7);
+  REQUIRE(vv2[1][0] == 2);
 }
 
 // DEFINE_ATTR(Foo);

@@ -38,6 +38,7 @@
 namespace mabe {
 
   EMP_BUILD_CONCEPT( GenomeWrapper, GenomeBase,
+    // WRAPPED_T needs to be able to be returned in response to a request event.
     OPTIONAL_FUN(GetClassName, "Unnamed Genome", std::string),
     OPTIONAL_FUN(GetConfig, emp::GetEmptyConfig(), emp::Config &),
     OPTIONAL_FUN(Randomize, false, bool, emp::Random &),

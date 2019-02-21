@@ -10,6 +10,15 @@
  *  run-time interpreting.  Internally, and Empower object will track all of the types used and 
  *  all of the variables declared, ensuring that they interact correctly.
  * 
+ *  MemoryImage  Values associated with a structured set of variables.
+ *  Type         Details about a type, including a set of functions for how to manipulate it.
+ *  Var          An instance of a specific variable, with associated data in a memory image.
+ *  VarInfo      Information about a variable (type, position, etc) across instances of a struct.
+ * 
+ *  Struct       An agregate type, consisting of a mapping of names to VarInfo
+ *  Object       A pairing of a Struct with a Memory image of actual variables
+ *  Scope        A sinle-instance Object that can have new variables added dynamically
+ * 
  *  Developer Notes:
  *  @todo After a memory image is locked down, we can optimize it by re-ordering variables, etc.
  *        to group identical types together, or isolate those that are trivially constructable or
@@ -40,9 +49,8 @@ namespace emp {
 
     static constexpr size_t undefined_id = (size_t) -1;
 
-    /// A MemoryImage is a full set of variable values stored in an Empower instance.
-    /// Any number of memory images can be created for a single Empower instance, but
-    /// they must all be the same size and refer to the same set of variables.
+    /// A MemoryImage is a full set of variable values, linked together.  They can represent
+    /// all of the variables in a scope or in a class.
     class MemoryImage {
     private:
       emp::vector<byte_t> memory;      ///< The specific memory values.
@@ -56,8 +64,8 @@ namespace emp {
       ~MemoryImage();
 
       const emp::vector<byte_t> & GetMemory() const { return memory; }
-      Empower & GetEmpower() { return *empower_ptr; }
-      const Empower & GetEmpower() const { return *empower_ptr; }
+      Empower & GetEmpower() { emp_assert(empower_ptr != nullptr); return *empower_ptr; }
+      const Empower & GetEmpower() const { emp_assert(empower_ptr != nullptr); return *empower_ptr; }
 
       template <typename T> emp::Ptr<T> GetPtr(size_t pos) {
         return reinterpret_cast<T*>(&memory[pos]);
@@ -124,7 +132,7 @@ namespace emp {
     using destruct_fun_t = std::function<void(const VarInfo &, MemoryImage &)>;
 
     /// Information about a single type used in Empower.
-    struct TypeInfo {
+    struct Type {
       size_t type_id;          ///< Unique value for this type
       std::string type_name;   ///< Name of this type (from std::typeid)
       size_t mem_size;         ///< Bytes needed for this type (from sizeof)      
@@ -139,9 +147,9 @@ namespace emp {
       std::function<double(Var &)> to_double;      ///< Fun to convert type to double (empty=>none)
       std::function<std::string(Var &)> to_string; ///< Fun to convert type to string (empty=>none)
       
-      TypeInfo(size_t _id, const std::string & _name, size_t _size,
-               const dconstruct_fun_t & dc_fun, const cconstruct_fun_t & cc_fun,
-               const copy_fun_t & c_fun, const destruct_fun_t & d_fun)
+      Type(size_t _id, const std::string & _name, size_t _size,
+           const dconstruct_fun_t & dc_fun, const cconstruct_fun_t & cc_fun,
+           const copy_fun_t & c_fun, const destruct_fun_t & d_fun)
 	      : type_id(_id), type_name(_name), mem_size(_size)
         , dconstruct_fun(dc_fun), cconstruct_fun(cc_fun)
         , copy_fun(c_fun), destruct_fun(d_fun) { ; }
@@ -150,9 +158,10 @@ namespace emp {
 
     /// ------ INTERNAL VARIABLES ------
 
-    MemoryImage memory;             ///< The Default memory image.
-    emp::vector<VarInfo> vars;      ///< Information about all vars used.
-    emp::vector<TypeInfo> types;    ///< Information about all types used.
+    //MemoryImage memory;          ///< The Default memory image.
+    emp::vector<VarInfo> vars;   ///< Information about all vars used.
+    emp::vector<Type> types;     ///< Information about all types used.
+    size_t memory_size;
 
     std::map<std::string, size_t> var_map;   ///< Map variable names to index in vars
     std::map<size_t, size_t> type_map;       ///< Map type names (from typeid) to index in types
@@ -161,7 +170,7 @@ namespace emp {
     void DefaultConstruct(MemoryImage & new_image) {
       /// Loop through all variables stored in this memory image and copy each of them.
       for (const VarInfo & v : vars) {
-        const TypeInfo & type = types[v.type_id];
+        const Type & type = types[v.type_id];
       	type.dconstruct_fun(v, new_image);
       }
     }
@@ -170,7 +179,7 @@ namespace emp {
     void CopyConstruct(const MemoryImage & from_image, MemoryImage & to_image) {
       /// Loop through all variables stored in this memory image and copy each of them.
       for (const VarInfo & v : vars) {
-        const TypeInfo & type = types[v.type_id];
+        const Type & type = types[v.type_id];
       	type.cconstruct_fun(v, from_image, to_image);
       }
     }
@@ -180,7 +189,7 @@ namespace emp {
     void Copy(const MemoryImage & from_image, MemoryImage & to_image) {
       /// Loop through all variables stored in this memory image and copy each of them.
       for (const VarInfo & v : vars) {
-        const TypeInfo & type = types[v.type_id];
+        const Type & type = types[v.type_id];
       	type.copy_fun(v, from_image, to_image);
       }
     }
@@ -190,13 +199,13 @@ namespace emp {
     void Destruct(MemoryImage & image) {
       /// Loop through all variables stored in this memory image and destruct each of them.
       for (const VarInfo & v : vars) {
-        const TypeInfo & type = types[v.type_id];
+        const Type & type = types[v.type_id];
       	type.destruct_fun(v, image);
       }
     }
 
   public:
-    Empower() : memory(this), vars(), types(), var_map(), type_map() { ; }
+    Empower() : vars(), types(), memory_size(0), var_map(), type_map() { ; }
     ~Empower() { ; }
 
     /// Convert a type (provided as a template argument) to its index in types vector.
@@ -239,18 +248,21 @@ namespace emp {
     }
 
     template <typename T>
+    void DeclareVar(const std::string & name) {
+      size_t type_id = GetTypeID<T>();              ///< Get ID for type (create if needed)
+      Type & type_info = types[type_id];        ///< Create ref to type info for easy access.
+      size_t var_id = vars.size();                  ///< New var details go at end of var vector.
+      size_t mem_start = memory_size;               ///< Start new var at current end of memory.
+      vars.emplace_back(type_id, name, mem_start);  ///< Add this VarInfo to our records.
+      memory_size += type_info.mem_size;            ///< Resize memory to fit new variable.
+      var_map[name] = var_id;                       ///< Link the name of this variable to id.
+
+      return Var(var_id, mem_start, memory);
+    }
+
+    template <typename T>
     Var NewVar(const std::string & name, const T & value) {
-      size_t type_id = GetTypeID<T>();                ///< Get ID for type (create if needed)
-      TypeInfo & type_info = types[type_id];          ///< Create ref to type info for easy access.
-      size_t var_id = vars.size();                    ///< New var details go at end of var vector.
-      size_t mem_start = memory.size();               ///< Start new var at current end of memory.
-      vars.emplace_back(type_id, name, mem_start);    ///< Add this VarInfo to our records.
-      memory.resize(mem_start + type_info.mem_size);  ///< Resize memory to fit new variable.
-      var_map[name] = var_id;                         ///< Link the name of this variable to id.
-
-      /// Construct new variable contents in place, where space was allocated.
-      new (memory.GetPtr<T>(mem_start)) T(value);
-
+      DeclareVar<T>(name);
 
       return Var(var_id, mem_start, memory);
     }

@@ -11,7 +11,6 @@
 *.out
 *.debug
 *.mp4
-*.csv
 *-bak.cc
 	
 */env/*
@@ -20,6 +19,9 @@
 .DS_Store
 a.out
 a.out.js
+fitness.csv
+population.csv
+systematics.csv
 
 incoming/
 tmp/
@@ -28,11 +30,15 @@ tmp/
 
 apps/Avida/Avida
 apps/Avida/web/Avida.js
+apps/MABE/examples/NK
 apps/NK.bak/
 apps/NK/NK
 apps/NK/web/NK.js
+apps/OEE-Breaker/OEE-Breaker
+apps/OpenWorld/OpenWorld
 apps/SpatialCoop2017/SimplePDWorld
 apps/SpatialCoop2017/web/SimplePDWorld.js
+apps/StateGrid/StateGrid
 apps/Sudoku/Sudoku.js
 apps/utils/graphs/web/MSS.js
 apps/NK/helloworld.cpp
@@ -56,7 +62,9 @@ examples/*/*
 !examples/*/*.html
 !examples/*/images
 !examples/*/Makefile
+examples/timing/short_strings.html
 
+tests/*.csv
 tests/StatsConfig.cfg
 tests/web/*.js
 tests/web/package.json

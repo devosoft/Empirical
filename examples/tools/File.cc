@@ -21,8 +21,8 @@ int main()
 
   std::cout << "\nTrying out spreadsheet.  Initial:" << std::endl;
   emp::File spreadsheet;
-  spreadsheet.Append("1,2,3");
-  spreadsheet.Append("14,25,36");
+  spreadsheet.Append("1,2,3,4");
+  spreadsheet.Append("14,25,36,47");
   spreadsheet.Append("104,205,306,407,508");
 
   spreadsheet.Write(std::cout);
@@ -36,5 +36,22 @@ int main()
   std::cout << "\nAfter another column is extracted as size_t:" << std::endl;
   spreadsheet.Write(std::cout);
   std::cout << "Extracted column: " << emp::to_string(second_col) << std::endl;
-  
+
+  emp::vector<std::string> first_row = spreadsheet.ExtractRow();
+  std::cout << "\nAfter a row is extracted:" << std::endl;
+  spreadsheet.Write(std::cout);
+  std::cout << "Extracted row: " << emp::to_string(first_row) << std::endl;
+
+  emp::vector<std::size_t> second_row = spreadsheet.ExtractRowAs<size_t>();
+  std::cout << "\nAfter a row is extracted as size_t:" << std::endl;
+  spreadsheet.Write(std::cout);
+  std::cout << "Extracted row: " << emp::to_string(second_row) << std::endl;
+
+
+  spreadsheet.Append("1000,1001,1002,1003");
+  auto full_data = spreadsheet.ToData<size_t>();
+  std::cout << "\nAfter all remaining data is extracted as size_t:" << std::endl;
+  spreadsheet.Write(std::cout);
+  std::cout << "Extracted data: " << emp::to_string(full_data) << std::endl;
+
 }

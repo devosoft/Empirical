@@ -9,6 +9,7 @@
  *
  *  @todo Convert to a template that acts as a glorified vector, simplifying random selection?
  *  @todo Should operator[] index by element count or by weight?
+ *  @todo Make Raw*() function private.
  */
 
 #ifndef EMP_INDEX_MAP_H
@@ -139,8 +140,12 @@ namespace emp {
       }
     }
 
+    /// Added a new value to the end of the index map.
+    void PushBack(double new_value) { Resize(num_items+1, new_value); }
+
     size_t size() const { return num_items; }           ///< Standard library compatibility
     void resize(size_t new_size) { Resize(new_size); }  ///< Standard library compatibility
+    void push_back(double new_value) { Resize(num_items+1, new_value); } ///< Standard library compatibility
 
     /// Reset all item weights to zero.
     void Clear() {

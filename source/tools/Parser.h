@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2019
  *
  *  @file  Parser.h
  *  @brief A general-purpose, fast parser.
@@ -35,17 +35,15 @@ namespace emp {
 
   /// A single symbol in a grammer including the patterns that generate it.
   struct ParseSymbol {
-    std::string name;                 ///< Unique name for this parse symbol.
+    std::string name = "";            ///< Unique name for this parse symbol.
     emp::vector< size_t > rule_ids;   ///< Which rules apply to this symbol?
-    size_t id;                        ///< What is the unique ID of this symbol?
+    size_t id = 0;                    ///< What is the unique ID of this symbol?
 
-    emp::BitVector first;             ///< What tokens can begin this symbol?
-    emp::BitVector follow;            ///< What tokens can come after this symbol?
-    bool nullable;                    ///< Can this symbol be converted to nothing?
+    emp::BitVector first = Lexer::MaxTokenID();  ///< What tokens can begin this symbol?
+    emp::BitVector follow = Lexer::MaxTokenID(); ///< What tokens can come after this symbol?
+    bool nullable = false;                       ///< Can this symbol be converted to nothing?
 
-    ParseSymbol()
-     : name(), rule_ids(), id(0)
-     , first(Lexer::MaxTokenID()), follow(Lexer::MaxTokenID()), nullable(false) { ; }
+    ParseSymbol() = default;
   };
 
   /// A rule for how parsing should work.
@@ -59,11 +57,11 @@ namespace emp {
   /// Full information about a parser, including a lexer, symbols, and rules.
   class Parser {
   private:
-    Lexer & lexer;                     ///< Default input lexer.
-    emp::vector<ParseSymbol> symbols;  ///< Set of symbols that make up this grammar.
-    emp::vector<ParseRule> rules;      ///< Set of rules that make up the parser.
-    size_t cur_symbol_id;              ///< Which id should the next new symbol get?
-    int active_pos;                    ///< Which symbol pos is active?
+    Lexer & lexer;                       ///< Default input lexer.
+    emp::vector<ParseSymbol> symbols;    ///< Set of symbols that make up this grammar.
+    emp::vector<ParseRule> rules;        ///< Set of rules that make up the parser.
+    size_t cur_symbol_id;                ///< Which id should the next new symbol get?
+    int active_pos = 0;                  ///< Which symbol pos is active?
 
     void BuildRule(emp::vector<size_t> & new_pattern) { ; }
     template <typename T, typename... EXTRAS>
@@ -97,9 +95,7 @@ namespace emp {
     }
 
   public:
-    Parser(Lexer & in_lexer)
-    : lexer(in_lexer), symbols(), rules()
-    , cur_symbol_id(in_lexer.MaxTokenID()), active_pos(0) { ; }
+    Parser(Lexer & in_lexer) : lexer(in_lexer), cur_symbol_id(in_lexer.MaxTokenID()) { ; }
     ~Parser() { ; }
 
     Lexer & GetLexer() { return lexer; }

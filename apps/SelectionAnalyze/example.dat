@@ -1,0 +1,8 @@
+# Each row is an organism;
+# Each column is a selection criterion (e.g., the results of a fitness function
+fitness A,fitness B,fitness C,always fail,always pass
+1, 0, 1, 0, 1
+0, 1, 0, 0, 1
+0, 0, 1, 0, 1
+2, 0, 0, 0, 1
+0, 1, 0, 0, 1

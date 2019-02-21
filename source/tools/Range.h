@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
+ *  @date 2016-2019
  *
  *  @file  Range.h
  *  @brief A simple way to track value ranges
@@ -22,11 +22,11 @@ namespace emp {
   template <typename T>
   class Range {
   private:
-    T lower;  ///< Beginning of range, inclusive.
-    T upper;  ///< End of range, inclusive.
+    T lower = std::numeric_limits<T>::min();  ///< Beginning of range, inclusive.
+    T upper = std::numeric_limits<T>::max();  ///< End of range, inclusive.
 
   public:
-    Range() : lower(std::numeric_limits<T>::min()), upper(std::numeric_limits<T>::max()) { ; }
+    Range() = default;
     Range(T _l, T _u) : lower(_l), upper(_u) { emp_assert(_l < _u); }
 
     T GetLower() const { return lower; }

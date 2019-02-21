@@ -84,6 +84,13 @@ namespace emp {
     return FindIndex(v, [](v_type a, v_type b){ return a > b; });
   }
 
+  /// Find the minimum value in a vector.
+  template <typename T>
+  T FindMin(const emp::vector<T> & v) { return v[ FindMinIndex(v) ]; }
+
+  /// Find the maximum value in a vector.
+  template <typename T>
+  T FindMax(const emp::vector<T> & v) { return v[ FindMaxIndex(v) ]; }
 
   /// Sum up the contents of a vector.
   template <typename T>
@@ -107,6 +114,12 @@ namespace emp {
     std::sort(v.begin(), v.end(), std::forward<Ts>(args)...);
   }
 
+  /// Scale all elements of a vector by the same value.
+  template <typename T>
+  void Scale(emp::vector<T> & v, T scale) {
+    for (T & x : v) x *= scale;
+  }
+
   /// Returns a vector containing a chunk of elements from @param vec
   /// starting at @param start and going up to but not including @param stop.
   template <typename T>
@@ -120,6 +133,32 @@ namespace emp {
       new_vec.push_back(vec[i]);
     }
     return new_vec;
+  }
+
+  /// Swap the order of a vector of vectors.  That is, swap rows and columns.
+  /// NOTE: All rows must be the same size or smaller than those above for this to work.
+  template <typename T>
+  emp::vector< emp::vector< T > > Transpose( const emp::vector< emp::vector< T > > & in_vv ) {
+    // If the input vector-of-vectors (in_vv) is empty, return it since inversion is trivial.
+    if (in_vv.size() == 0) return in_vv;
+
+    // Setup the new vector to have a number of rows equal to number of cols in original.
+    emp::vector< emp::vector< T > > out_vv(in_vv[0].size());
+
+    // Assuming a rectangular matrix, reserve enough space to fit each row!
+    for (auto & row : out_vv) row.reserve(in_vv.size());
+
+    // Copy over all of the data!
+    for (size_t i = 0; i < in_vv.size(); i++) {
+      emp_assert(i == 0 || in_vv[i].size() <= in_vv[i-1].size(),
+                 "Cannot invert a matrix with increasing row length.",
+                 i, in_vv[i].size(), in_vv[i-1].size());
+      for (size_t j = 0; j < in_vv[i].size(); j++) {
+        out_vv[j].push_back( in_vv[i][j] );
+      }
+    }
+
+    return out_vv;
   }
 
   /// Tree manipulation in vectors.

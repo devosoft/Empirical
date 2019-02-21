@@ -19,6 +19,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../../source/tools/StringMap.h"
+
+using emp::StringID;
+
 constexpr size_t NUM_ENTRIES = 10000;
 constexpr size_t LONG_STR_SIZE = 40;
 constexpr size_t EVAL_STEPS = 10000000;
@@ -65,26 +69,43 @@ int main()
   std::unordered_map<std::string, int> long_strings;
   std::unordered_map<double, int> float_ids;
   std::vector<int> vector_index(NUM_ENTRIES);
+  std::unordered_map<size_t, int> emp_string_ids;
+  emp::StringMap<int> string_map;
+  emp::StringMap<int> string_map_pp;
 
   // Fill out the maps.
-  for (int i = 0; i < NUM_ENTRIES; i++) {
+  for (size_t i = 0; i < NUM_ENTRIES; i++) {
     int_ids[i] = i;
     short_strings[ToStringID(i)] = i;
     long_strings[ToLongStringID(i)] = i;
     float_ids[ToFloatID(i)] = i;
     vector_index[i] = i;
+    emp_string_ids[StringID(ToStringID(i)).ToValue()] = i;
+    string_map[ToStringID(i)] = i;
+    string_map_pp[ToStringID(i)] = i;
   }
 
   std::cout << "Starting tests!" << std::endl;
 
-  RunTest<std::unordered_map<int, int>, int>                ("Numerical IDs   ", int_ids, ToIntID);
-  RunTest<std::unordered_map<std::string, int>, std::string>("Short-string IDs", short_strings, ToStringID);
-  RunTest<std::unordered_map<std::string, int>, std::string>("Long-string IDs ", long_strings, ToLongStringID);
-  RunTest<std::unordered_map<double, int>, double>          ("Floating-pnt IDs", float_ids, ToFloatID);
-  RunTest<std::vector<int>, int>                            ("Vector Indexing ", vector_index, ToIntID);
+  TimeFun("Direct Variables      ", []() {
+    int val1 = 42, val2 = 100, val3 = 1000;
+    for (size_t i = 0; i < EVAL_STEPS; i++) {
+      val1 += val2;
+      val3 -= val2;
+      val2 = val3 / 2 + 1000;
+    }
+    return val1;
+  });
+
+  RunTest<std::vector<int>, int>                            ("Vector Indexing       ", vector_index, ToIntID);
+
+  RunTest<std::unordered_map<int, int>, int>                ("std::map<int> IDs     ", int_ids, ToIntID);
+  RunTest<std::unordered_map<std::string, int>, std::string>("map of short strings  ", short_strings, ToStringID);
+  RunTest<std::unordered_map<std::string, int>, std::string>("map of long string    ", long_strings, ToLongStringID);
+  RunTest<std::unordered_map<double, int>, double>          ("map of doubles        ", float_ids, ToFloatID);
 
 
-  TimeFun("Literal IDs     ", [&short_strings]() {
+  TimeFun("str map w/literal IDs ", [&short_strings]() {
     for (size_t i = 0; i < EVAL_STEPS; i++) {
       short_strings["42"] += short_strings["100"];
       short_strings["1000"] -= short_strings["100"];
@@ -93,13 +114,30 @@ int main()
     return short_strings["42"];
   });
 
-  TimeFun("Direct Values   ", []() {
-    int val1 = 42, val2 = 100, val3 = 1000;
+  TimeFun("emp::StringIDs        ", [&emp_string_ids]() {
     for (size_t i = 0; i < EVAL_STEPS; i++) {
-      val1 += val2;
-      val3 -= val2;
-      val2 = val3 / 2 + 1000;
+      emp_string_ids[EMP_STRING_ID("42").ToValue()] += emp_string_ids[EMP_STRING_ID("100").ToValue()];
+      emp_string_ids[EMP_STRING_ID("1000").ToValue()] -= emp_string_ids[EMP_STRING_ID("100").ToValue()];
+      emp_string_ids[EMP_STRING_ID("100").ToValue()] = emp_string_ids[EMP_STRING_ID("1000").ToValue()] / 2 + 1000;
     }
-    return val1;
+    return emp_string_ids[EMP_STRING_ID("42").ToValue()];
+  });
+
+  TimeFun("emp::StringMap        ", [&string_map]() {
+    for (size_t i = 0; i < EVAL_STEPS; i++) {
+      string_map["42"] += string_map["100"];
+      string_map["1000"] -= string_map["100"];
+      string_map["100"] = string_map["1000"] / 2 + 1000;
+    }
+    return string_map["42"];
+  });
+
+  TimeFun("emp::StringMap PreProc", [&string_map]() {
+    for (size_t i = 0; i < EVAL_STEPS; i++) {
+      string_map[EMP_STRING_ID("42")] += string_map[EMP_STRING_ID("100")];
+      string_map[EMP_STRING_ID("1000")] -= string_map[EMP_STRING_ID("100")];
+      string_map[EMP_STRING_ID("100")] = string_map[EMP_STRING_ID("1000")] / 2 + 1000;
+    }
+    return string_map[EMP_STRING_ID("42")];
   });
 }

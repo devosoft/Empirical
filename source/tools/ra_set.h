@@ -30,7 +30,7 @@ namespace emp {
     emp::vector<T> vals;        ///< A vector of all values contained.
 
   public:
-    ra_set() : id_map(), vals() { }
+    ra_set() = default;
     ra_set(const ra_set &) = default;
     ra_set(ra_set &&) = default;
     ra_set<T> & operator=(const ra_set &) = default;

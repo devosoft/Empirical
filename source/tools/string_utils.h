@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
+ *  @date 2016-2019
  *
  *  @file string_utils.h
  *  @brief Simple functions to manipulate strings.
@@ -17,9 +17,13 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <string_view>
+#include <unordered_set>
 
+#include "../base/Ptr.h"
 #include "../base/vector.h"
 #include "../meta/reflection.h"
+#include "../meta/StringType.h"
 
 namespace emp {
 
@@ -417,6 +421,51 @@ namespace emp {
   }
 
 
+  /// Provide a string_view on a given string
+  static inline std::string_view view_string(const std::string & str) {
+    return std::string_view(str);
+  }
+
+  /// Provide a string_view on a string from a given starting point.
+  static inline std::string_view view_string(const std::string & str, size_t start) {
+    emp_assert(start <= str.size());
+    return std::string_view(str.c_str() + start, str.size() - start);
+  }
+
+  /// Provide a string_view on a string from a starting point with a given size.
+  static inline std::string_view view_string(const std::string & str, size_t start, size_t npos) {
+    emp_assert(start + npos <= str.size());
+    return std::string_view(str.c_str() + start, npos);
+  }
+
+  /// Provide a string_view on a string from the beginning to a given size.
+  static inline std::string_view view_string_front(const std::string & str, size_t npos) {
+    emp_assert(npos <= str.size());
+    return std::string_view(str.c_str(), npos);
+  }
+
+  /// Provide a string_view on a string from a starting point with a given size.
+  static inline std::string_view view_string_back(const std::string & str, size_t npos) {
+    emp_assert(npos <= str.size());
+    return std::string_view(str.c_str() + str.size() - npos, npos);
+  }
+
+  /// Provide a string_view on a string from a starting point to an ending point.
+  static inline std::string_view view_string_range(const std::string & str, size_t start, size_t end) {
+    emp_assert(start <= end);
+    emp_assert(end <= str.size());
+    return std::string_view(str.c_str() + start, end - start);
+  }
+
+  /// Return a view of the prefix of the input string up to a specified delimeter.
+  /// If the delimeter is not found, return the entire input string.
+  static inline std::string_view view_string_to(const std::string & in_string, const char delim, size_t start_pos=0) {
+    const size_t in_size = in_string.size();
+    size_t end_pos = start_pos;
+    while (end_pos < in_size && in_string[end_pos] != delim) end_pos++;    
+    return view_string_range(in_string, start_pos, end_pos);
+  }
+
   /// Cut up a string based on the provided delimitor; fill them in to the provided vector.
   static inline void slice(const std::string & in_string, emp::vector<std::string> & out_set,
                            char delim='\n') {
@@ -451,6 +500,27 @@ namespace emp {
   static inline emp::vector<std::string> slice(const std::string & in_string, char delim='\n') {
     emp::vector<std::string> result;
     slice(in_string, result, delim);
+    return result;
+  }
+
+  /// Create a set of string_views based on the provided delimitor; fill them in to the provided vector.
+  static inline void view_slices(const std::string & in_string, emp::vector<std::string_view> & out_set,
+                           char delim='\n') {
+    const size_t in_size = in_string.size();
+    out_set.resize(0);
+
+    size_t pos = 0;
+    while (pos < in_size) {
+      out_set.push_back( view_string_to(in_string, delim, pos) );
+      pos += out_set.back().size() + 1;
+    }
+
+  }
+
+  /// Slice a string without passing in result vector (may be less efficient).
+  static inline emp::vector<std::string_view> view_slices(const std::string & in_string, char delim='\n') {
+    emp::vector<std::string_view> result;
+    view_slices(in_string, result, delim);
     return result;
   }
 
@@ -550,6 +620,17 @@ namespace emp {
       vals[i] = from_string<T>(string_v[i]);
     }
     return vals;
+  }
+
+  /// This function tries to convert a string_view into any other type...  You must
+  /// need to specify the out type as the template argument.
+  template <typename T>
+  inline T from_string(std::string_view str) {
+    std::stringstream ss;
+    ss << str;
+    T out_val;
+    ss >> out_val;
+    return out_val;
   }
 
 }

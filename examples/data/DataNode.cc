@@ -19,7 +19,7 @@ int main()
   data.Add(27, 28, 29);
 
   std::cout << "Requisites!!! ";
-  emp::DataModuleRequisiteAdd<emp::data::Current, emp::data::Archive, emp::data::Stats, emp::data::FullRange>::type::PrintInts();
+  emp::DataModuleRequisiteAdd<emp::data::Current, emp::data::Archive, emp::data::Stats, emp::data::FullRange>::type::PrintVals();
   std::cout << std::endl;
 
   std::cout << "=> Added 27, 28, and 29" << std::endl;
