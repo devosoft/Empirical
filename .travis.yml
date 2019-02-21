@@ -13,13 +13,12 @@ notifications:
 
 compiler:
 - g++-8
-- clang++-6.0
+- clang++
 - emcc
 python:
 - '3.5'
 install:
 - if [ "$CXX" = "g++" ]; then export CXX="g++-8" CC="gcc-8"; fi
-- if [ "$CXX" = "clang++" ]; then export CXX="clang++-6.0" CC="clang-6.0"; fi
 
 - export python="/usr/bin/python"
 addons:
@@ -27,10 +26,8 @@ addons:
     sources:
     - kalakris-cmake
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-trusty-6.0
     packages:
     - g++-8
-    - clang-6.0
     - cmake
     - build-essential
     - bison
@@ -52,16 +49,12 @@ script: make test
 jobs:
   include:
   - stage: test
-    compiler: clang++-6.0
-    install:
-    - if [ "$CXX" = "clang++" ]; then export CXX="clang++-6.0" CC="clang-6.0"; fi
+    compiler: clang++
     addons:
       apt:
         sources:
         - kalakris-cmake
-        - llvm-toolchain-trusty-6.0
         packages:
-        - clang-6.0
         - cmake
         - build-essential
         - bison
@@ -75,17 +68,11 @@ jobs:
     script: make doc
   - stage: test
     compiler: clang++
-    install:
-    - if [ "$CXX" = "clang++" ]; then export CXX="clang++-6.0" CC="clang-6.0"; fi
     addons:
       apt:
         sources:
         - ubuntu-toolchain-r-test
-        - llvm-toolchain-trusty-6.0
         packages:
-        - clang-6.0
-        - libclang-6.0-dev
-        - llvm-6.0
         - g++-8
         - build-essential
         - tar
