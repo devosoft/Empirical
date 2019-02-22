@@ -1,5 +1,5 @@
 # Flags to use regardless of compiler
-CFLAGS_all := -Wall -Wno-unused-function -std=c++14 -I../../source/
+CFLAGS_all := -Wall -Wno-unused-function -std=c++17 -I../../source/
 
 # Emscripten compiler information
 CXX_web := emcc
