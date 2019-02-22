@@ -60,7 +60,7 @@ jobs:
     - sudo apt-add-repository "deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-7 main"
     - sudo apt-get update -qq
     install: 
-    - sudo apt-get install -qq g++-8 cmake build-essential python-virtualenv python-pip nodejs tar gzip libclang-7.0-dev llvm-7.0 clang-7.0
+    - sudo apt-get install -qq g++-8 cmake build-essential python-virtualenv python-pip nodejs tar gzip libclang-7-dev llvm-7 clang-7
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
     before_script:
     - git fetch origin master:refs/remotes/origin/master
