@@ -57,6 +57,7 @@ jobs:
     compiler: clang++
     before_install:
     - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+    - sudo add-apt-repository -y ppa:llvm-toolchain-xenial-7
     - sudo apt-get update -qq
     install: 
     - sudo apt-get install -qq g++-8 cmake build-essential python-virtualenv python-pip nodejs tar gzip libclang-7.0-dev llvm-7.0 clang-7.0
