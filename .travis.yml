@@ -24,7 +24,6 @@ install:
 addons:
   apt:
     sources:
-    - kalakris-cmake
     - ubuntu-toolchain-r-test
     packages:
     - g++-8
@@ -39,6 +38,8 @@ addons:
 services:
   - xvfb
 before_script:
+- g++ --version
+- clang++ --version
 - git fetch origin master:refs/remotes/origin/master
 - npm install source-map
 - make install-test-dependencies
