@@ -22,17 +22,17 @@ before_install:
 - sudo apt-get update -qq
 
 install: 
-- sudo apt-get install -qq g++-8 cmake build-essential bison python-virtualenv python-pip nodejs tar gzip
+- sudo apt-get install -qq g++-8 cmake build-essential python-virtualenv python-pip nodejs tar gzip
 - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
 - export python="/usr/bin/python"
-services:
-  - xvfb
-before_script:
-- ${CXX} --version
 - git fetch origin master:refs/remotes/origin/master
 - npm install source-map
 - make install-test-dependencies
 - . ./third-party/emsdk_portable_repo/emsdk_portable/emsdk_env.sh
+services:
+  - xvfb
+before_script:
+- ${CXX} --version
 script: make test
 
 jobs:
@@ -55,16 +55,12 @@ jobs:
     script: make doc
   - stage: test
     compiler: clang++
-    addons:
-      apt:
-        sources:
-        - ubuntu-toolchain-r-test
-        - llvm-toolchain-xenial-7
-        packages:
-        - g++-8
-        - build-essential
-        - tar
-        - gzip
+    before_install:
+    - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+    - sudo apt-get update -qq
+    install: 
+    - sudo apt-get install -qq g++-8 cmake build-essential python-virtualenv python-pip nodejs tar gzip libclang-7.0-dev llvm-7.0 clang-7.0
+    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
     before_script:
     - git fetch origin master:refs/remotes/origin/master
     - make install-test-dependencies
