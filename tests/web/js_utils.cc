@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) {
 
   //Test passing arrays to C++
   //Test ints
-  EM_ASM({emp_i.__outgoing_array = [5, 1, 3]});
+  EM_ASM({emp_i.__outgoing_array = ([5, 1, 3])});
   emp::array<int, 3> test_arr_1;
   emp::pass_array_to_cpp(test_arr_1);
   EMP_TEST_VALUE(test_arr_1[0], 5);
@@ -113,7 +113,7 @@ int main(int argc, char* argv[]) {
   EMP_TEST_VALUE(test_arr_1[2], 3);
 
   //Test floats
-  EM_ASM({emp_i.__outgoing_array = [5.2, 1.5, 3.1]});
+  EM_ASM({emp_i.__outgoing_array = ([5.2, 1.5, 3.1])});
   emp::array<float, 3> test_arr_2;
   emp::pass_array_to_cpp(test_arr_2);
   EMP_TEST_VALUE(test_arr_2[0], 5.2);
@@ -121,7 +121,7 @@ int main(int argc, char* argv[]) {
   EMP_TEST_VALUE(test_arr_2[2], 3.1);
 
   //Test doubles
-  EM_ASM({emp_i.__outgoing_array = [5.2, 1.5, 3.1]});
+  EM_ASM({emp_i.__outgoing_array = ([5.2, 1.5, 3.1])});
   emp::array<double, 3> test_arr_3;
   emp::pass_array_to_cpp(test_arr_3);
   EMP_TEST_VALUE(test_arr_3[0], 5.2);
@@ -129,7 +129,7 @@ int main(int argc, char* argv[]) {
   EMP_TEST_VALUE(test_arr_3[2], 3.1);
 
   //Test doubles in vector
-  EM_ASM({emp_i.__outgoing_array = [5.3, 1.6, 3.2]});
+  EM_ASM({emp_i.__outgoing_array = ([5.3, 1.6, 3.2])});
   emp::vector<double> test_vec;
   emp::pass_vector_to_cpp(test_vec);
   EMP_TEST_VALUE(test_vec[0], 5.3);
@@ -137,7 +137,7 @@ int main(int argc, char* argv[]) {
   EMP_TEST_VALUE(test_vec[2], 3.2);
 
   //Test chars
-  EM_ASM({emp_i.__outgoing_array = ["h", "i", "!"]});
+  EM_ASM({emp_i.__outgoing_array = (["h", "i", "!"])});
   emp::array<char, 3> test_arr_4;
   emp::pass_array_to_cpp(test_arr_4);
   EMP_TEST_VALUE(test_arr_4[0], 'h');
@@ -151,7 +151,7 @@ int main(int argc, char* argv[]) {
 
 
   //Test std::strings
-  EM_ASM({emp_i.__outgoing_array = ["jello", "world", "!!"]});
+  EM_ASM({emp_i.__outgoing_array = (["jello", "world", "!!"])});
   emp::array<std::string, 3> test_arr_5;
   emp::pass_array_to_cpp(test_arr_5);
   EMP_TEST_VALUE(test_arr_5[0], "jello");
@@ -164,7 +164,7 @@ int main(int argc, char* argv[]) {
   EMP_TEST_VALUE(test_vec_5[2], "!!");
 
   //Test nested arrays
-  EM_ASM({emp_i.__outgoing_array = [[4,5], [3,1], [7,8]]});
+  EM_ASM({emp_i.__outgoing_array = ([[4,5], [3,1], [7,8]])});
   emp::array<emp::array<int, 2>, 3> test_arr_6;
   emp::pass_array_to_cpp(test_arr_6);
   EMP_TEST_VALUE(test_arr_6[0][0], 4);
@@ -174,7 +174,7 @@ int main(int argc, char* argv[]) {
   EMP_TEST_VALUE(test_arr_6[2][0], 7);
   EMP_TEST_VALUE(test_arr_6[2][1], 8);
 
-  EM_ASM({emp_i.__outgoing_array = [[4,5], [3,1], [7,8]]});
+  EM_ASM({emp_i.__outgoing_array = ([[4,5], [3,1], [7,8]])});
   emp::vector<emp::vector<int> > test_vec_6;
   emp::pass_vector_to_cpp(test_vec_6);
   EMP_TEST_VALUE(test_vec_6[0][0], 4);
@@ -185,9 +185,9 @@ int main(int argc, char* argv[]) {
   EMP_TEST_VALUE(test_vec_6[2][1], 8);
 
   //Test more deeply nested arrays
-  EM_ASM({emp_i.__outgoing_array = [[["Sooo", "many"], ["strings", "here"]],
+  EM_ASM({emp_i.__outgoing_array = ([[["Sooo", "many"], ["strings", "here"]],
 				  [["and", "they're"], ["all", "nested"]],
-				  [["in", "this"], ["nested", "array!"]]];});
+				  [["in", "this"], ["nested", "array!"]]]);});
   emp::array<emp::array<emp::array<std::string, 2>, 2>, 3> test_arr_7;
   emp::pass_array_to_cpp(test_arr_7);
   EMP_TEST_VALUE(test_arr_7[0][0][0], "Sooo");
