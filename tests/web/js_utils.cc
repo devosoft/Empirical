@@ -65,11 +65,13 @@ int main(int argc, char* argv[]) {
 		 EM_ASM_INT_V({return emp_i.__incoming_array[4];})
 		 , 6);
 
+  // @CAO: Note that the code below leaks memeory because the malloc's memory is never freed.
   emp::pass_array_to_javascript(string_vec);
   EMP_TEST_VALUE(
 		 emp::to_string( (char *) EM_ASM_INT_V({
-		       var buffer = Module._malloc(emp_i.__incoming_array[1].length*2);
-		       writeStringToMemory(emp_i.__incoming_array[1], buffer);
+           var alloc_size = emp_i.__incoming_array[1].length*2;
+		       var buffer = Module._malloc(alloc_size);
+		       stringToUTF8(emp_i.__incoming_array[1], buffer, alloc_size);
 		       return buffer;
 		     }) ),
 		 "vector");
@@ -87,11 +89,13 @@ int main(int argc, char* argv[]) {
 		 EM_ASM_DOUBLE_V({return emp_i.__incoming_array[1].val2;})
 		 , 11.2);
 
+  // @CAO: Note that the code below leaks memeory because the malloc's memory is never freed.
   emp::pass_array_to_javascript(string_arr);
   EMP_TEST_VALUE(
 		 emp::to_string( (char *) EM_ASM_INT_V({
-		       var buffer = Module._malloc(emp_i.__incoming_array[0][3].length*2);
-		       writeStringToMemory(emp_i.__incoming_array[0][3], buffer);
+           var alloc_size = emp_i.__incoming_array[0][3].length*2;
+		       var buffer = Module._malloc(alloc_size);
+		       stringToUTF8(emp_i.__incoming_array[0][3], buffer, alloc_size);
 		       return buffer;
 		     }) ),
 		 "in");
