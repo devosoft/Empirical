@@ -24,7 +24,7 @@ struct JSDataObject {
 int main(int argc, char* argv[]) {
   //emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
   //const bool verbose = emp::cl::use_arg(args, "-v");
-  bool verbose = true;
+  [[maybe_unused]] bool verbose = true;
 
   emp::Initialize();
 
@@ -120,9 +120,9 @@ int main(int argc, char* argv[]) {
   EM_ASM({emp_i.__outgoing_array = ([5.2, 1.5, 3.1])});
   emp::array<float, 3> test_arr_2;
   emp::pass_array_to_cpp(test_arr_2);
-  EMP_TEST_VALUE(test_arr_2[0], 5.2);
+  EMP_TEST_VALUE(emp::to_string(test_arr_2[0]), emp::to_string(5.2));
   EMP_TEST_VALUE(test_arr_2[1], 1.5);
-  EMP_TEST_VALUE(test_arr_2[2], 3.1);
+  EMP_TEST_VALUE(emp::to_string(test_arr_2[2]), emp::to_string(3.1));
 
   //Test doubles
   EM_ASM({emp_i.__outgoing_array = ([5.2, 1.5, 3.1])});
