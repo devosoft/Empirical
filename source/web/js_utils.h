@@ -404,10 +404,11 @@ namespace emp {
     char * buffer = (char *) EM_ASM_INT_V({
     	// Since we're treating each char as it's own string, each one
     	// will be null-termianted. So we malloc length*2 addresses.
-    	var buffer = Module._malloc(emp_i.__outgoing_array.length*2);
+      var new_length = emp_i.__outgoing_array.length*2;
+    	var buffer = Module._malloc(new_length);
 
     	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-    	  writeStringToMemory(emp_i.__outgoing_array[i], buffer+(i*2));
+    	  stringToUTF8(emp_i.__outgoing_array[i], buffer+(i*2),2);
     	}
 
     	return buffer;
@@ -431,7 +432,7 @@ namespace emp {
     	var buffer = Module._malloc(emp_i.__outgoing_array.length*2);
 
     	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-    	  writeStringToMemory(emp_i.__outgoing_array[i], buffer+(i*2));
+    	  stringToUTF8(emp_i.__outgoing_array[i], buffer+(i*2),2);
     	}
 
     	return buffer;
@@ -461,9 +462,11 @@ namespace emp {
 
     	// Track place in memory to write too
     	var cumulative_size = 0;
+      var cur_length = 0;
     	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-    	  writeStringToMemory(emp_i.__outgoing_array[i], buffer + (cumulative_size));
-    	    cumulative_size += emp_i.__outgoing_array[i].length + 1;
+        cur_length = emp_i.__outgoing_array[i].length + 1;
+    	  stringToUTF8(emp_i.__outgoing_array[i], buffer + (cumulative_size), cur_length);
+    	  cumulative_size += cur_length;
     	}
 
     	return buffer;
@@ -494,9 +497,11 @@ namespace emp {
 
     	// Track place in memory to write too
     	var cumulative_size = 0;
+      var cur_length = 0;
     	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-    	  writeStringToMemory(emp_i.__outgoing_array[i], buffer + (cumulative_size));
-    	  cumulative_size += emp_i.__outgoing_array[i].length + 1;
+        cur_length = emp_i.__outgoing_array[i].length + 1;
+    	  stringToUTF8(emp_i.__outgoing_array[i], buffer + (cumulative_size), cur_length);
+    	  cumulative_size += cur_length;
     	}
 
     	return buffer;
