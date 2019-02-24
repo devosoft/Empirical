@@ -48,12 +48,12 @@ TEST_CASE("Test Ptr", "[base]")
 	int* num_ptr = &num;
 	emp::Ptr<int> numPtr(num_ptr);
 	emp::Ptr<int> numPtr2(num_ptr);
-	REQUIRE( numPtr == num_ptr );
-	REQUIRE( numPtr >= num_ptr );
-	REQUIRE( numPtr <= num_ptr );
-	REQUIRE( !(numPtr != numPtr2) );
-	REQUIRE( numPtr >= numPtr2 );
-	REQUIRE( numPtr <= numPtr2 );
+	REQUIRE( numPtr.operator==(num_ptr) );
+	REQUIRE( numPtr.operator>=(num_ptr) );
+	REQUIRE( numPtr.operator<=(num_ptr) );
+	REQUIRE( !(numPtr.operator!=(numPtr2)) );
+	REQUIRE( numPtr.operator>=(numPtr2) );
+	REQUIRE( numPtr.operator<=(numPtr2) );
 }
 
 #endif // EMP_TRACK_MEM
