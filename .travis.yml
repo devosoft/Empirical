@@ -28,7 +28,7 @@ install:
 - git fetch origin master:refs/remotes/origin/master
 - npm install source-map
 - make install-test-dependencies
-- if [ "${TRAVIS_COMPILER}" = "emcc" ]; then export CXX=emcc; fi
+- if [ "${TRAVIS_COMPILER}" = "emcc" ]; then export CXX=emcc; . third-party/emsdk/emsdk_env.sh; fi
 services:
   - xvfb
 before_script:
