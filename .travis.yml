@@ -33,7 +33,8 @@ services:
   - xvfb
 before_script:
 - ${CXX} --version
-script: make test
+script: 
+- make test CXX=${CXX}
 
 jobs:
   include:
