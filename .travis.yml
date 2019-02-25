@@ -34,7 +34,7 @@ services:
 before_script:
 - ${CXX} --version
 script: 
-- make test CXX=${CXX}
+- make test
 
 jobs:
   include:
