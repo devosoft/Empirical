@@ -263,6 +263,27 @@ namespace web {
       return *this;
     }
 
+    /// Download a PNG image of a canvas.
+    void DownloadPNG() { DownloadPNG(Info()->id + ".png"); }
+
+    /// Download a PNG image of a canvas.
+    void DownloadPNG(const std::string & fname) {
+
+      const std::string ext = ".png";
+      emscripten_run_script(
+        (
+          std::string()
+          + "download(document.getElementById('"
+          + Info()->id
+          + "').toDataURL('img/png'), '"
+          + fname
+          + (fname.rfind(ext, fname.length()) == std::string::npos ? ext : "")
+          + "', 'img/png');"
+        ).c_str()
+      );
+
+    }
+
   };
 
 
