@@ -1,3 +1,11 @@
+# TODO:
+# * Remove "-Wno-unused-function" ; right now it's required because static library functions
+#    are expected to be called at some point.
+# * Remove "-Wno-gnu-zero-variadic-macro-arguments" ; right now it's in there because the
+#    EM_ASM macro seems to require extra arguments...
+# * Remove "-s WASM=0" ; right now some canvas example files don't seem to work in
+#    WebAssembly.
+
 # Flags to use regardless of compiler
 CFLAGS_all := -std=c++17 -Wall -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments -I../../source/
 
