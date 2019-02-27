@@ -43,6 +43,7 @@
 #include <array>
 #include <functional>
 #include <tuple>
+#include <type_traits>
 
 #include "../meta/meta.h"
 
@@ -68,8 +69,25 @@ int EMP_GetCBArgCount() { return -1; }
 
 namespace emp {
 
-  template <int ARG_ID, typename T> static void LoadArg(T & arg_var) {
-    arg_var = (T) EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, ARG_ID);
+  template <typename JSON_TYPE, int ARG_ID, int FIELD>
+  struct LoadTuple;
+
+  /// This needs to go before LoadTuple is defined, in case there are nested tuple structs
+  template <int ARG_ID, typename T> static 
+  void LoadArg(T & arg_var) {
+    if constexpr ( is_introspective_tuple<T>() ) {
+      using JSON_TYPE = T;
+      //std::cout << "Loading ARGNID: " << ARG_ID << std::endl;
+      EM_ASM_ARGS({
+        emp_i.object_queue = [];
+        emp_i.curr_obj = emp_i.cb_args[$0];
+      }, ARG_ID);
+      LoadTuple<JSON_TYPE, ARG_ID, JSON_TYPE::n_fields> load_tuple = LoadTuple<JSON_TYPE, ARG_ID, JSON_TYPE::n_fields>();
+      load_tuple.LoadJSDataArg(arg_var);
+    }
+    else {
+      arg_var = (T) EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, ARG_ID);
+    }
   }
 
   template <int ARG_ID> static void LoadArg(std::string & arg_var) {
@@ -161,10 +179,6 @@ namespace emp {
     arg_var = tmp_var;   // Free memory here?
   }
 
-  template <typename JSON_TYPE, int ARG_ID, int FIELD>
-  struct LoadTuple;
-
-  /// This needs to go before LoadTuple is defined, in case there are nested tuple structs
   template <int ARG_ID, typename JSON_TYPE> static
   typename std::enable_if<JSON_TYPE::n_fields != -1, void>::type
   LoadArg(JSON_TYPE & arg_var, std::string var) {
@@ -195,18 +209,6 @@ namespace emp {
     }
   };
 
-
-  template <int ARG_ID, typename JSON_TYPE> static
-  typename std::enable_if<JSON_TYPE::n_fields != -1, void>::type
-  LoadArg(JSON_TYPE & arg_var) {
-    //std::cout << "Loading ARGNID: " << ARG_ID << std::endl;
-    EM_ASM_ARGS({
-      emp_i.object_queue = [];
-      emp_i.curr_obj = emp_i.cb_args[$0];
-    }, ARG_ID);
-    LoadTuple<JSON_TYPE, ARG_ID, JSON_TYPE::n_fields> load_tuple = LoadTuple<JSON_TYPE, ARG_ID, JSON_TYPE::n_fields>();
-    load_tuple.LoadJSDataArg(arg_var);
-  }
 
   // ----- StoreReturn -----
   // Helper functions to individually store return values to JS

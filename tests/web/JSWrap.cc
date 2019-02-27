@@ -89,9 +89,9 @@ DoubleNestedJSDataObject TestFun13(DoubleNestedJSDataObject d) {
 int main() {
 
   emp::Initialize();
-  bool verbose = true;
+  [[maybe_unused]] bool verbose = true;
   int x = 10;
-  auto lambda = [&verbose, x](){EMP_TEST_VALUE(x, 10);};
+  auto lambda = [x](){EMP_TEST_VALUE(x, 10);};
 
   std::function<int(int)> TestFun11 = [](int i){return i*i;};
 
