@@ -37,7 +37,7 @@
 #include "canvas_utils.h"
 #include "color_map.h"
 
-// Create an optional alternative to main, emp_main, that is only available after a document 
+// Create an optional alternative to main, emp_main, that is only available after a document
 // has loaded and is ready.
 #ifdef EMPIRICAL
 
