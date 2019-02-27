@@ -151,7 +151,7 @@ TEST_CASE("Test BitVector", "[tools]")
 	bv3 <<= 4;
 	REQUIRE((bv3.GetByte(0) == 32));
 	
-	// Hash (Maps and sets use hash function?)
+	// Hash
 	emp::BitVector bv_a(2);
 	bv_a.Set(0);
 	emp::BitVector bv_b(2);

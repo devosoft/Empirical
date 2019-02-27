@@ -220,12 +220,11 @@ void test_more_comparators(){
  * Random bitset
  */
 void test_random(){
-	// idk how to test random other than just calling it
 	emp::Random rndm;
 	emp::BitSet<8> bs8(rndm);
 	bs8.Randomize(rndm, 1);
 	REQUIRE(bs8.all());
-	bs8.Randomize(rndm, 0); // doesn't work here, after first randomize call
+	bs8.Randomize(rndm, 0);
 	REQUIRE(bs8.none());
 }
 
@@ -270,7 +269,7 @@ void test_export(){
 	emp::BitSet<10> bs10 = bs8.Export<10>();
 	REQUIRE(bs10.size() == 10);
 	REQUIRE(bs10.GetByte(0) == 255);
-	REQUIRE(bs10.GetByte(1) == 0); // nope
+	REQUIRE(bs10.GetByte(1) == 0);
 }
 
 /**

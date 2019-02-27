@@ -137,7 +137,8 @@ TEST_CASE("Test File", "[tools]")
 	REQUIRE(fp3.back() == "int x = 13;");
 	
 	// Process
-	//emp::vector<std::string> v = fp2.Process([](std::string& s)-> std::string { return (s+"2");});
+	std::function<std::string(std::string&)> fun = [](std::string& s)-> std::string { return (s+"2");};
+	emp::vector<std::string> v = fp2.Process(fun);
 	
 	// ExtractCol
 	fp3 >> line; //clear fp3

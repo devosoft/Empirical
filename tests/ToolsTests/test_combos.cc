@@ -51,7 +51,7 @@ TEST_CASE("Test combos", "[tools]")
   REQUIRE(cid.GetCombo()[0] == 0);
   REQUIRE(cid.GetCombo()[1] == 1);
   
-  // inverse combo 2 3 4 5 6 7 8 9 ( everythinig not in cur combo )
+  // inverse combo 2 3 4 5 6 7 8 9 ( everything not in cur combo )
   int first_inverse = 2;
   for(size_t i=0;i<8;i++){
     REQUIRE(cid.GetInverseCombo()[i] == first_inverse + i);

@@ -78,8 +78,6 @@ TEST_CASE("Test Graph", "[tools]")
 	REQUIRE(graph.HasEdge(12,13));
 	
 	// Print
-	/// comment: was initially confused by printing of graph
-	/// prints out size and edge count, then series of edges, each on a newline
 	std::stringstream ss;
 	g2.AddEdge(1,0);
 	REQUIRE(g2.HasEdgePair(0,1));
