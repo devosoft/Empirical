@@ -15,16 +15,15 @@ TEST_CASE("Test vector", "[base]")
 		sum += *it;
 	}
 	REQUIRE(sum == "abc");
+	
+	/// This throws an error...
+	// because it's a reverse iterator?
+	//sum += *vec.rend();
+	//REQUIRE(sum == "abca");
 
 	auto itr = vec.emplace(vec.begin()+1, "1");
 	REQUIRE(*itr == "1");
 	REQUIRE(*(itr-1) == "a");
-	
-	/// This throws an error...
-	/*for(auto it=vec.rbegin(); it!=vec.rend(); it++){
-		sum += *it;
-	}
-	REQUIRE(sum == "abccba");*/
 	
 	emp::vector<bool> bvec;
 	bvec.resize(1);
