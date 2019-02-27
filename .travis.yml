@@ -14,7 +14,7 @@ notifications:
 compiler:
 - g++
 - clang++
-- emcc
+#- emcc
 python:
 - '3.5'
 before_install:
