@@ -1,17 +1,19 @@
 *~
-*.map
-*.o
+*.debug
+*.dSYM
 *.gcov
 *.js.mem
+*.map
+*.mp4
+*.o
+*.out
 *.pyc
 *.swp
 *.swo
-*.dSYM
-*tmp.*
-*.out
-*.debug
-*.mp4
+*.wasm
+*.wast
 *-bak.cc
+*tmp.*
 	
 */env/*
 */3nv/*

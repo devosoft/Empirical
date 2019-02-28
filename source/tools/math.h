@@ -104,7 +104,7 @@ namespace emp {
     if ((dividend % divisor) * 2 == divisor) {
       // ... by default, the result is rounded up;
       // with 1/2 probability round down instead
-      res -= r.GetInt(2);
+      res -= r.GetUInt(2);
     }
     return res;
   }

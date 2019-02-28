@@ -100,9 +100,9 @@ namespace emp {
   		bs = x;
   	}
 
-    int r = (rs + m) * 255;
-    int g = (gs + m) * 255;
-    int b = (bs + m) * 255;
+    int r = (int) ((rs + m) * 255);
+    int g = (int) ((gs + m) * 255);
+    int b = (int) ((bs + m) * 255);
 
     return ColorRGB(r, g, b);
   }
