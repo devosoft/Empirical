@@ -1,13 +1,15 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
+ *  @date 2016-2019.
  *
  *  @file vector.h
  *  @brief A drop-in wrapper for std::vector; adds on bounds checking in debug mode.
  *  @note Status: BETA
  *
- *  This class is a drop-in wrapper for std::vector, adding on bounds checking.
+ *  This class is a drop-in wrapper for std::vector, adding on bounds checking, both for the
+ *  indexing operator and for the use of iterators (ensure that iterators do not outlive the
+ *  version of vector for which it was created.)
  *  If EMP_NDEBUG is set then it reverts back to std::vector.
  *
  *  @todo Debug code: member functions that take iterators should also take emp iterators that verify
