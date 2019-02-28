@@ -35,6 +35,11 @@ How to best change a CSS class?
 -= Fixes =-
 Make JSWrap more flexible for different types of functions that can get passed into it.
 
+-= Principles =-
+Make sure to use (where possible) constexpr, noexcept, override
+Functions that take a vector of arbitrary type should take any type that defines operator[]
+
+
 -= Improvements =-
 Allow default UI::Style overall and for each object type.
 -Create a UI::StyleGroup that elements can be added to and altered as one (use proper CSS class?)
@@ -84,6 +89,12 @@ Fix how sectors are handled in surfaces to be more dynamic based on sizes of org
 * Geometry
 * Reflection
 * string_utils
+
+
+-= Debugging / Warning tools =-
+* Alternate version os functions with the wrong number of arguments and a static assert.
+  E.g., Has(T) with one argument and an assert indicating it needs two.
+
 
 
 -= Librarys to consider wrapping =-

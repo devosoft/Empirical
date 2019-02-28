@@ -1,5 +1,5 @@
 sudo: required
-dist: trusty
+dist: xenial
 language: cpp
 
 notifications:
@@ -12,56 +12,37 @@ notifications:
     - secure: UC8Bsb6n2WAnKdUwzGo/QwDEhSyKbJFUZCVYem11o8JpXz/PB/vLTNIt/0xhbkoAwGMivAH6i6AeLx4HhMShnt5iWq1GK5Toh+uScp1BqT3M4XnoQbmiuhKKeFJhcoFaASGIoylURXAd65fVaojSul0Lx/pztkYzNQ1FUvcwtpA/guxJ9TE5M2Vmp81T5h74InJCW8eh30UJUlWkHdChK4RxnBgDic9vmn6/DGMWBIdGDbceF3PtOHQUk3E363LFDF6Ij0rOx5oXCm0YsSblvNRxFR9MOVX2YAKPy+dM5Kx0IRlIH+yYG9heH207+cfDg4LP7PiV0eCPh5gw8s7FHr89/fM8Mubh6X+l6Wbjla4waAdMhfSdI1vGxxq5uYTEtpfzsaNNQpfMnxe4eLEpdw3FgUA6xUdSS00dkBG1RoLTtqYSGCfEkKBwzmwwbEU77SYCKu+cjtjgBJSiwC0+Dxje4Y3tb5gDLCKbDArbPWiaqaqVPtRtUbSSP7qIt9e1DaAbcJO2nun+G8y1EdHoUNWbCVqZ/70l33Oo4ssm4d38xuAqFcKv1PH+7zv8Yql4uZIDBJz8G8aVvHMlBfrKRghDakWBrKX9rFbNen5IxuV/vMF051tHc0CWlO3HQjphH5ST1/eNjywGl107VLP9HzkZzqDBKcxcSGMLi7QC7F0=
 
 compiler:
-- g++-5
-- clang++-5.0
-- emcc
+- g++
+- clang++
+#- emcc
 python:
 - '3.5'
-install:
-- if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
-- if [ "$CXX" = "clang++" ]; then export CXX="clang++-5.0" CC="clang-5.0"; fi
+before_install:
+- sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+- sudo apt-get update -qq
 
+install: 
+- sudo apt-get install -qq g++-8 cmake build-essential python-virtualenv python-pip nodejs tar gzip
+- sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
 - export python="/usr/bin/python"
-addons:
-  apt:
-    sources:
-    - kalakris-cmake
-    - ubuntu-toolchain-r-test
-    - llvm-toolchain-trusty-5.0
-    packages:
-    - g++-5
-    - clang-5.0
-    - cmake
-    - build-essential
-    - bison
-    - python-virtualenv
-    - python-pip
-    - nodejs
-    - tar
-    - gzip
-before_script:
-- export DISPLAY=:99.0
-- sh -e /etc/init.d/xvfb start
-- sleep 3 # give xvfb some time to start
 - git fetch origin master:refs/remotes/origin/master
 - npm install source-map
 - make install-test-dependencies
-- . ./third-party/emsdk_portable_repo/emsdk_portable/emsdk_env.sh
-script: make test
+- if [ "${TRAVIS_COMPILER}" = "emcc" ]; then export CXX=emcc; . third-party/emsdk/emsdk_env.sh; fi
+services:
+  - xvfb
+before_script:
+- ${CXX} --version
+script: 
+- make test CXX=${CXX}
 
 jobs:
   include:
   - stage: test
-    compiler: clang++-5.0
-    install:
-    - if [ "$CXX" = "clang++" ]; then export CXX="clang++-5.0" CC="clang-5.0"; fi
+    compiler: clang++
     addons:
       apt:
-        sources:
-        - kalakris-cmake
-        - llvm-toolchain-trusty-5.0
         packages:
-        - clang-5.0
         - cmake
         - build-essential
         - bison
@@ -75,25 +56,19 @@ jobs:
     script: make doc
   - stage: test
     compiler: clang++
-    install:
-    - if [ "$CXX" = "clang++" ]; then export CXX="clang++-5.0" CC="clang-5.0"; fi
-    addons:
-      apt:
-        sources:
-        - ubuntu-toolchain-r-test
-        - llvm-toolchain-trusty-5.0
-        packages:
-        - clang-5.0
-        - libclang-5.0-dev
-        - llvm-5.0
-        - g++-5
-        - build-essential
-        - tar
-        - gzip
+    before_install:
+    - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+    - wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+    - sudo apt-add-repository "deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-7 main"
+    - sudo apt-get update -qq
+    install: 
+    - sudo apt-get install -qq g++-8 
+    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
+    - sudo apt-get install cmake build-essential python-virtualenv python-pip nodejs tar gzip libclang-7-dev llvm-7 clang-7 libstdc++-7-dev # might have to happen after we update g++
     before_script:
     - git fetch origin master:refs/remotes/origin/master
     - make install-test-dependencies
     - make install-coverage-dependencies
-    script: make coverage
+    script: make coverage CXX=${CXX}
     after_success: 
       - curl -s https://codecov.io/bash | bash

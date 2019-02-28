@@ -800,7 +800,7 @@ protected:
     return "black";
   };
 
-  std::function<std::string(NODE, int)> color_fun_link = [this](NODE d, int i){
+  std::function<std::string(NODE, int)> color_fun_link = [](NODE d, int i){
     return "black";
   };
 
