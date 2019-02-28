@@ -18,7 +18,7 @@ Tools in Empirical include:
 * A powerful set of evolution tools for building Artificial Life or Evolutionary Computation
   software.
 * A signal-action system that allows for efficient customization of tools, and flexible
-  software that can easily facilitate plug-in functionality..
+  software that can easily facilitate plug-in functionality.
 
 See https://empirical.readthedocs.io/en/latest for more detailed documentation
 on the available source files.
