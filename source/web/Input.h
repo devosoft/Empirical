@@ -173,7 +173,7 @@ namespace web {
       Info()->callback = in_cb;
       InputInfo * b_info = Info();
       Info()->callback_id = JSWrap( std::function<void(std::string)>( [b_info](std::string new_val){b_info->DoChange(new_val);} )  );
-      Info()->onchange_info = emp::to_string("emp.Callback(", Info()->callback_id, ", this.value)");
+      Info()->onchange_info = emp::to_string("emp.Callback(", Info()->callback_id, ", ('checked' in this) ? this.checked.toString() : this.value);");
     }
 
     /// Link to an existing Input.
