@@ -530,7 +530,7 @@ namespace emp {
       }
 
       /// Print out a single instruction with its arguments.
-      void PrintInst(const inst_t & inst, std::ostream & os=std::cout) {
+      void PrintInst(const inst_t & inst, std::ostream & os=std::cout) const {
         os << inst_lib->GetName(inst.id);
         if (inst_lib->HasProperty(inst.id, "affinity")) {
           os << ' '; inst.affinity.Print(os);
@@ -542,7 +542,7 @@ namespace emp {
       }
 
       /// Fully print out a single instruction with its arguments/affinity.
-      void PrintInstFull(const inst_t & inst, std::ostream & os=std::cout) {
+      void PrintInstFull(const inst_t & inst, std::ostream & os=std::cout) const {
         os << inst_lib->GetName(inst.id);
         os << '['; inst.affinity.Print(os); os << ']';
         os << '(';
@@ -553,7 +553,7 @@ namespace emp {
       }
 
       /// Print out entire program.
-      void PrintProgram(std::ostream & os=std::cout) {
+      void PrintProgram(std::ostream & os=std::cout) const {
         for (size_t fID = 0; fID < GetSize(); fID++) {
           // Print out function name (affinity).
           os << "Fn-" << fID << " ";
@@ -579,7 +579,7 @@ namespace emp {
       }
 
       /// Print out entire program.
-      void PrintProgramFull(std::ostream & os=std::cout) {
+      void PrintProgramFull(std::ostream & os=std::cout) const {
         for (size_t fID = 0; fID < GetSize(); fID++) {
           // Print out function name (affinity).
           os << "Fn-";
@@ -659,7 +659,7 @@ namespace emp {
       SpawnCore(0, memory_t(), true);
     }
 
-    EventDrivenGP_AW(inst_lib_t & _ilib, event_lib_t & _elib, Ptr<Random> rnd=nullptr)
+    EventDrivenGP_AW(const inst_lib_t & _ilib, const event_lib_t & _elib, Ptr<Random> rnd=nullptr)
       : EventDrivenGP_AW(&_ilib, &_elib, rnd) { ; }
 
     EventDrivenGP_AW(Ptr<const event_lib_t> _elib, Ptr<Random> rnd=nullptr)
@@ -1659,6 +1659,14 @@ namespace emp {
       hw.TriggerEvent("Message", inst.affinity, state.output_mem, {"send"});
     }
 
+    /// Non-default instruction: RngDouble
+    /// Number of arguments: 1
+    /// Description: Draw a value between 0 and 1 from the onboard RNG and store it in Local[Arg1]
+    static void Inst_RngDouble(EventDrivenGP_t & hw, const inst_t & inst) {
+      State & state = hw.GetCurState();
+      state.SetLocal(inst.args[0], hw.GetRandom().GetDouble());
+    }
+    
     /// Get a pointer to const default instruction library. Will only construct the default instruction library once.
     static Ptr<const InstLib<EventDrivenGP_t>> DefaultInstLib() {
       static inst_lib_t inst_lib;
