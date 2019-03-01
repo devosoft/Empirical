@@ -147,7 +147,7 @@ namespace web {
         }
       });
     }
-    
+
     CanvasAction * Clone() const { return new CanvasImage(*this); }
   };
 

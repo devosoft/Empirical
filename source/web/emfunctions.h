@@ -104,8 +104,8 @@ namespace emp {
     return html.str();
   }
 
-    /// Get the value of @param attribute in the element with @param id as its id. 
-    inline std::string GetElementAttribute(const std::string & id, const std::string & attribute) { 
+    /// Get the value of @param attribute in the element with @param id as its id.
+    inline std::string GetElementAttribute(const std::string & id, const std::string & attribute) {
       char * buffer = (char * )EM_ASM_INT({
         var text = document.getElementById(UTF8ToString($0))[UTF8ToString($1)];
         var buffer = Module._malloc(text.length+1);

@@ -73,7 +73,7 @@ namespace emp {
   struct LoadTuple;
 
   /// This needs to go before LoadTuple is defined, in case there are nested tuple structs
-  template <int ARG_ID, typename T> static 
+  template <int ARG_ID, typename T> static
   void LoadArg(T & arg_var) {
     if constexpr ( is_introspective_tuple<T>() ) {
       using JSON_TYPE = T;
