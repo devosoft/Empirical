@@ -530,7 +530,7 @@ namespace emp {
       }
 
       /// Print out a single instruction with its arguments.
-      void PrintInst(const inst_t & inst, std::ostream & os=std::cout) {
+      void PrintInst(const inst_t & inst, std::ostream & os=std::cout) const {
         os << inst_lib->GetName(inst.id);
         if (inst_lib->HasProperty(inst.id, "affinity")) {
           os << ' '; inst.affinity.Print(os);
@@ -542,7 +542,7 @@ namespace emp {
       }
 
       /// Fully print out a single instruction with its arguments/affinity.
-      void PrintInstFull(const inst_t & inst, std::ostream & os=std::cout) {
+      void PrintInstFull(const inst_t & inst, std::ostream & os=std::cout) const {
         os << inst_lib->GetName(inst.id);
         os << '['; inst.affinity.Print(os); os << ']';
         os << '(';
@@ -553,7 +553,7 @@ namespace emp {
       }
 
       /// Print out entire program.
-      void PrintProgram(std::ostream & os=std::cout) {
+      void PrintProgram(std::ostream & os=std::cout) const {
         for (size_t fID = 0; fID < GetSize(); fID++) {
           // Print out function name (affinity).
           os << "Fn-" << fID << " ";
@@ -579,7 +579,7 @@ namespace emp {
       }
 
       /// Print out entire program.
-      void PrintProgramFull(std::ostream & os=std::cout) {
+      void PrintProgramFull(std::ostream & os=std::cout) const {
         for (size_t fID = 0; fID < GetSize(); fID++) {
           // Print out function name (affinity).
           os << "Fn-";
@@ -659,7 +659,7 @@ namespace emp {
       SpawnCore(0, memory_t(), true);
     }
 
-    EventDrivenGP_AW(inst_lib_t & _ilib, event_lib_t & _elib, Ptr<Random> rnd=nullptr)
+    EventDrivenGP_AW(const inst_lib_t & _ilib, const event_lib_t & _elib, Ptr<Random> rnd=nullptr)
       : EventDrivenGP_AW(&_ilib, &_elib, rnd) { ; }
 
     EventDrivenGP_AW(Ptr<const event_lib_t> _elib, Ptr<Random> rnd=nullptr)
