@@ -345,8 +345,8 @@ namespace web {
 
         // Now do the replacement.
         EM_ASM_ARGS({
-            var widget_id = Pointer_stringify($0);
-            var out_html = Pointer_stringify($1);
+            var widget_id = UTF8ToString($0);
+            var out_html = UTF8ToString($1);
             $('#' + widget_id).replaceWith(out_html);
           }, id.c_str(), ss.str().c_str());
 
@@ -436,7 +436,7 @@ namespace web {
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
     return EM_ASM_DOUBLE({
-      var id = Pointer_stringify($0);
+      var id = UTF8ToString($0);
       var rect = $('#' + id).position();
       if (rect === undefined) return -1.0;
       return rect.left;
@@ -447,7 +447,7 @@ namespace web {
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
     return EM_ASM_DOUBLE({
-      var id = Pointer_stringify($0);
+      var id = UTF8ToString($0);
       var rect = $('#' + id).position();
       if (rect === undefined) return -1.0;
       return rect.top;
@@ -458,7 +458,7 @@ namespace web {
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
     return EM_ASM_DOUBLE({
-      var id = Pointer_stringify($0);
+      var id = UTF8ToString($0);
       return $('#' + id).width();
     }, GetID().c_str());
   }
@@ -466,7 +466,7 @@ namespace web {
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
     return EM_ASM_DOUBLE({
-      var id = Pointer_stringify($0);
+      var id = UTF8ToString($0);
       return $('#' + id).height();
     }, GetID().c_str());
   }
@@ -474,7 +474,7 @@ namespace web {
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
     return EM_ASM_DOUBLE({
-      var id = Pointer_stringify($0);
+      var id = UTF8ToString($0);
       return $('#' + id).innerWidth();
     }, GetID().c_str());
   }
@@ -482,7 +482,7 @@ namespace web {
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
     return EM_ASM_DOUBLE({
-      var id = Pointer_stringify($0);
+      var id = UTF8ToString($0);
       return $('#' + id).innerHeight();
     }, GetID().c_str());
   }
@@ -490,7 +490,7 @@ namespace web {
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
     return EM_ASM_DOUBLE({
-      var id = Pointer_stringify($0);
+      var id = UTF8ToString($0);
       return $('#' + id).outerWidth();
     }, GetID().c_str());
   }
@@ -498,7 +498,7 @@ namespace web {
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
     return EM_ASM_DOUBLE({
-      var id = Pointer_stringify($0);
+      var id = UTF8ToString($0);
       return $('#' + id).outerHeight();
     }, GetID().c_str());
   }

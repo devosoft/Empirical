@@ -135,7 +135,7 @@ namespace D3 {
     /// "Data: " followed by the value of d, rounded to two decimal points.
     ToolTip(std::string func) {
       EM_ASM_ARGS({
-        var in_string = Pointer_stringify($1);
+        var in_string = UTF8ToString($1);
         if (typeof window["d3"][in_string] === "function"){
           in_string = window["d3"][in_string];
         } else if (typeof window["emp"][in_string] === "function"){
@@ -163,7 +163,7 @@ namespace D3 {
 
     void SetHtml(std::string func) {
       EM_ASM_ARGS({
-        var in_string = Pointer_stringify($1);
+        var in_string = UTF8ToString($1);
         if (typeof window["d3"][in_string] === "function"){
           in_string = window["d3"][in_string];
         } else if (typeof window["emp"][in_string] === "function"){
@@ -192,7 +192,7 @@ namespace D3 {
   public:
       FormatFunction(std::string format = "") {
         EM_ASM_ARGS({
-          js.objects[$1] = d3.format(Pointer_stringify($0));
+          js.objects[$1] = d3.format(UTF8ToString($0));
         }, format.c_str(), this->id);
       }
 
@@ -221,17 +221,17 @@ namespace D3 {
     JSFunction() {;}
     JSFunction(std::string name) {
       int fail = EM_ASM_INT({
-        var fn = window["d3"][Pointer_stringify($2)];
+        var fn = window["d3"][UTF8ToString($2)];
         if (typeof fn === "function") {
           js.objects[$0] = fn;
           return 0;
         } else {
-          var fn = window["emp"][Pointer_stringify($2)];
+          var fn = window["emp"][UTF8ToString($2)];
           if (typeof fn === "function") {
             js.objects[$0] = fn;
             return 0;
           } else {
-            var fn = window[Pointer_stringify($2)];
+            var fn = window[UTF8ToString($2)];
             if (typeof fn === "function") {
               js.objects[$0] = fn;
               return 0;

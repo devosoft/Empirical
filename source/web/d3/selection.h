@@ -48,7 +48,7 @@ namespace D3 {
         int new_id = NextD3ID();
 
         EM_ASM_ARGS({
-  	      var new_selection = js.objects[$0].select(Pointer_stringify($1));
+  	      var new_selection = js.objects[$0].select(UTF8ToString($1));
   	      js.objects[$2] = new_selection;
         }, this->id, selector.c_str(), new_id);
 
@@ -62,7 +62,7 @@ namespace D3 {
 
         EM_ASM_ARGS({
         //   console.log($0, js.objects[$0]);
-  	      var new_selection = js.objects[$0].selectAll(Pointer_stringify($1));
+  	      var new_selection = js.objects[$0].selectAll(UTF8ToString($1));
           js.objects[$2] = new_selection;
         }, this->id, selector.c_str(), new_id);
 
@@ -79,7 +79,7 @@ namespace D3 {
       // TODO: Allow arguments
       DERIVED& Call(std::string function){
         EM_ASM_ARGS({
-          var func_string = Pointer_stringify($1);
+          var func_string = UTF8ToString($1);
           if (typeof window[func_string] === "function") {
             func_string = window[func_string];
           } else if (typeof window["emp"][func_string] === "function") {
@@ -219,7 +219,7 @@ namespace D3 {
       typename std::enable_if<std::is_fundamental<T>::value, DERIVED&>::type
       SetAttr(std::string name, T value) {
 
-        EM_ASM_ARGS({js.objects[$0].attr(Pointer_stringify($1), $2)},
+        EM_ASM_ARGS({js.objects[$0].attr(UTF8ToString($1), $2)},
     		  this->id, name.c_str(), value);
         return *(static_cast<DERIVED *>(this));
       }
@@ -235,7 +235,7 @@ namespace D3 {
         uint32_t fun_id = emp::JSWrap(value, "", false);
 
         EM_ASM_ARGS({
-          js.objects[$0].attr(Pointer_stringify($1), function(d, i, k) {
+          js.objects[$0].attr(UTF8ToString($1), function(d, i, k) {
                                                         return emp.Callback($2, d, i, k);
                                                       });
         }, this->id, name.c_str(), fun_id);
@@ -262,7 +262,7 @@ namespace D3 {
         emp::pass_array_to_javascript(value);
 
         EM_ASM_ARGS({
-    	    js.objects[$0].attr(Pointer_stringify($1), emp_i.__incoming_array);
+    	    js.objects[$0].attr(UTF8ToString($1), emp_i.__incoming_array);
         }, this->id, name.c_str());
 
         return *(static_cast<DERIVED *>(this));
@@ -284,7 +284,7 @@ namespace D3 {
       DERIVED& SetStyle(std::string name, std::string value, bool priority=false){
         if (priority){
     	    EM_ASM_ARGS({
-            var func_string = Pointer_stringify($2);
+            var func_string = UTF8ToString($2);
     	    if (typeof window[func_string] === "function") {
               func_string = window[func_string];
             }
@@ -293,7 +293,7 @@ namespace D3 {
                 func_string = window[name][func_string];
               }
             }
-    	    js.objects[$0].style(Pointer_stringify($1), in_string, "important");
+    	    js.objects[$0].style(UTF8ToString($1), in_string, "important");
     	    }, this->id, name.c_str(), value.c_str());
         } else {
     	    D3_CALLBACK_METHOD_2_ARGS(style, name.c_str(), value.c_str())
@@ -308,7 +308,7 @@ namespace D3 {
       DERIVED& SetStyle(std::string name, const char* value, bool priority=false){
         if (priority){
     	    EM_ASM_ARGS({
-    	      var func_string = Pointer_stringify($2);
+    	      var func_string = UTF8ToString($2);
     	      if (typeof window[func_string] === "function") {
                 func_string = window[func_string];
               }
@@ -317,7 +317,7 @@ namespace D3 {
                   func_string = window[name][func_string];
                 }
               };
-    	      js.objects[$0].style(Pointer_stringify($1), in_string, "important");
+    	      js.objects[$0].style(UTF8ToString($1), in_string, "important");
     	    }, this->id, name.c_str(), value);
         } else {
     	    D3_CALLBACK_METHOD_2_ARGS(style, name.c_str(), value)
@@ -340,11 +340,11 @@ namespace D3 {
       typename std::enable_if<std::is_fundamental<T>::value, DERIVED&>::type
       SetStyle(std::string name, T value, bool priority=false){
         if (priority){
-    	    EM_ASM_ARGS({js.objects[$0].style(Pointer_stringify($1), $2, "important")},
+    	    EM_ASM_ARGS({js.objects[$0].style(UTF8ToString($1), $2, "important")},
               this->id, name.c_str(), value);
           }
         else {
-    	    EM_ASM_ARGS({js.objects[$0].style(Pointer_stringify($1), $2)},
+    	    EM_ASM_ARGS({js.objects[$0].style(UTF8ToString($1), $2)},
               this->id, name.c_str(), value);
         }
         return *(static_cast<DERIVED *>(this));
@@ -424,7 +424,7 @@ namespace D3 {
       /// Get the value of this object's [name] attribute when it's a string
       std::string GetAttrString(std::string name) const {
         char * buffer = (char *)EM_ASM_INT({
-  	      var text = js.objects[$0].attr(Pointer_stringify($1));
+  	      var text = js.objects[$0].attr(UTF8ToString($1));
   	      var buffer = Module._malloc(text.length+1);
   	      Module.writeStringToMemory(text, buffer);
   	      return buffer;
@@ -438,21 +438,21 @@ namespace D3 {
       /// Get the value of this object's [name] attribute when it's an int
       int GetAttrInt(std::string name) const {
         return EM_ASM_INT({
-  	      return js.objects[$0].attr(Pointer_stringify($1));
+  	      return js.objects[$0].attr(UTF8ToString($1));
         }, this->id, name.c_str());
       }
 
       /// Get the value of this object's [name] attribute when it's a double
       double GetAttrDouble(std::string name) const {
         return EM_ASM_DOUBLE({
-  	      return js.objects[$0].attr(Pointer_stringify($1));
+  	      return js.objects[$0].attr(UTF8ToString($1));
         }, this->id, name.c_str());
       }
 
       /// Get the value of this object's [name] style when it's a string
       std::string GetStyleString(std::string name) const {
         char * buffer = (char *)EM_ASM_INT({
-  	      var text = js.objects[$0].style(Pointer_stringify($1));
+  	      var text = js.objects[$0].style(UTF8ToString($1));
   	      var buffer = Module._malloc(text.length+1);
   	      Module.writeStringToMemory(text, buffer);
   	      return buffer;
@@ -466,14 +466,14 @@ namespace D3 {
       /// Get the value of this object's [name] style when it's an int
       int GetStyleInt(std::string name) const {
         return EM_ASM_INT({
-  	      return js.objects[$0].style(Pointer_stringify($1));
+  	      return js.objects[$0].style(UTF8ToString($1));
         }, this->id, name.c_str());
       }
 
       /// Get the value of this object's [name] style when it's a double
       double GetStyleDouble(std::string name) const {
         return EM_ASM_DOUBLE({
-  	      return js.objects[$0].style(Pointer_stringify($1));
+  	      return js.objects[$0].style(UTF8ToString($1));
         }, this->id, name.c_str());
       }
 
@@ -571,7 +571,7 @@ namespace D3 {
     Transition NewTransition(std::string name="") const {
       int new_id = NextD3ID();
       EM_ASM_ARGS({
- 	    var transition = js.objects[$0].transition(Pointer_stringify($1));
+ 	    var transition = js.objects[$0].transition(UTF8ToString($1));
 	    js.objects[$2] = transition;
     }, this->id, name.c_str(), new_id);
 
@@ -601,7 +601,7 @@ namespace D3 {
 
       // Check that the listener is valid
       emp_assert(EM_ASM_INT({
-        var func_string = Pointer_stringify($0);
+        var func_string = UTF8ToString($0);
         if (func_string == "null") {
           return true;
         }
@@ -620,7 +620,7 @@ namespace D3 {
       int new_id = NextD3ID();
 
       EM_ASM_ARGS({
-	    var func_string = Pointer_stringify($2);
+	    var func_string = UTF8ToString($2);
         if (typeof window[func_string] === "function") {
           func_string = window[func_string];
         }
@@ -631,10 +631,10 @@ namespace D3 {
         }
 
 	    if (typeof func_string === "function") {
-	      js.objects[$0].on(Pointer_stringify($1),
+	      js.objects[$0].on(UTF8ToString($1),
 		  func_string,$3);
 	    } else {
-	      js.objects[$0].on(Pointer_stringify($1), null);
+	      js.objects[$0].on(UTF8ToString($1), null);
 	    }
 
       }, this->id, type.c_str(), listener.c_str(), capture, new_id);
@@ -653,7 +653,7 @@ namespace D3 {
       int new_id = NextD3ID();
 
       EM_ASM_ARGS({
-	      js.objects[$0].on(Pointer_stringify($1),
+	      js.objects[$0].on(UTF8ToString($1),
 		  function(d, i){
 		     js.objects[$4] = d3.select(this);
 		     emp.Callback($2, d, i, $4);}, $3);
@@ -679,8 +679,8 @@ namespace D3 {
     // std::string verison
     Transition& SetProperty(std::string name, std::string value){
       EM_ASM_ARGS({
-        var arg1 = Pointer_stringify($1);				                              	\
-        var func_string = Pointer_stringify($2);
+        var arg1 = UTF8ToString($1);				                              	\
+        var func_string = UTF8ToString($2);
         if (typeof window[func_string] === "function") {
           func_string = window[func_string];
         }
@@ -701,8 +701,8 @@ namespace D3 {
     // Const char * version so raw strings work
     Transition& SetProperty(std::string name, const char* value){
       EM_ASM_ARGS({
-        var arg1 = Pointer_stringify($1);				                              	\
-        var func_string = Pointer_stringify($2);
+        var arg1 = UTF8ToString($1);				                              	\
+        var func_string = UTF8ToString($2);
         if (typeof window[func_string] === "function") {
           func_string = window[func_string];
         }
@@ -724,7 +724,7 @@ namespace D3 {
     SetProperty(std::string name, T value){
       EM_ASM_ARGS({
           js.objects[$0].each("end", function() {
-            d3.select(this).property(Pointer_stringify($1), $2);
+            d3.select(this).property(UTF8ToString($1), $2);
           });
       }, this->id, name.c_str());
       return *this;
@@ -739,7 +739,7 @@ namespace D3 {
       uint32_t fun_id = emp::JSWrap(value, "", false);
       EM_ASM_ARGS({
         js.objects[$0].each("end", function(){
-                d3.select(this).property(Pointer_stringify($1),
+                d3.select(this).property(UTF8ToString($1),
                                           function(d, i, j) {
                                             return emp.Callback($2, d, i, j);
                                         });
@@ -755,7 +755,7 @@ namespace D3 {
     /// specified function on the element's bound data
     Transition& SetHtml(std::string value){
       EM_ASM_ARGS({
-        var func_string = Pointer_stringify($1);
+        var func_string = UTF8ToString($1);
         if (typeof window[func_string] === "function") {
           func_string = window[func_string];
         }
@@ -796,7 +796,7 @@ namespace D3 {
     Transition& SetClassed(std::string classname, bool value) {
       EM_ASM_ARGS({
         js.objects[$0].each("end", function(){
-            d3.select(this).classed(Pointer_stringify($1), $2);
+            d3.select(this).classed(UTF8ToString($1), $2);
         });
       }, this->id, classname.c_str(), value);
       return *this;
@@ -811,7 +811,7 @@ namespace D3 {
       uint32_t fun_id = emp::JSWrap(func, "", false);
       EM_ASM_ARGS({
         js.objects[$0].each("end", function(){
-                  d3.select(this).classed(Pointer_stringify($1),
+                  d3.select(this).classed(UTF8ToString($1),
                                             function(d, i, j) {
                                               return emp.Callback($2, d, i, j);
                                           });
@@ -825,7 +825,7 @@ namespace D3 {
     // Version that allows strings containing function names but warns on other strings
     Transition& SetClassed(std::string classname, std::string value){
       emp_assert(EM_ASM_INT({
-        var func_string = Pointer_stringify($0);
+        var func_string = UTF8ToString($0);
         if (typeof window[func_string] === "function") {
           func_string = window[func_string];
         }
@@ -838,8 +838,8 @@ namespace D3 {
       }, value.c_str()) && "String passed to SetClassed is not a Javascript function", value);
 
       EM_ASM_ARGS({
-        var arg1 = Pointer_stringify($1);				                              	\
-        var func_string = Pointer_stringify($2);
+        var arg1 = UTF8ToString($1);				                              	\
+        var func_string = UTF8ToString($2);
         if (typeof window[func_string] === "function") {
           func_string = window[func_string];
         }
@@ -895,7 +895,7 @@ namespace D3 {
     /// Get the value of this object's [name] property when its a string
     std::string GetPropertyString(std::string name) const {
       char * buffer = (char *)EM_ASM_INT({
-        var text = d3.select(js.objects[$0]).property(Pointer_stringify($1));
+        var text = d3.select(js.objects[$0]).property(UTF8ToString($1));
         var buffer = Module._malloc(text.length+1);
         Module.writeStringToMemory(text, buffer);
         return buffer;
@@ -909,14 +909,14 @@ namespace D3 {
     /// Get the value of this object's [name] property when it's an int
     int GetPropertyInt(std::string name) const {
       return EM_ASM_INT({
-        return d3.select(js.objects[$0]).property(Pointer_stringify($1));
+        return d3.select(js.objects[$0]).property(UTF8ToString($1));
       }, this->id, name.c_str());
     }
 
     /// Get the value of this object's [name] property when it's a double
     double GetPropertyDouble(std::string name) const {
       return EM_ASM_DOUBLE({
-        return d3.select(js.objects[$0]).property(Pointer_stringify($1));
+        return d3.select(js.objects[$0]).property(UTF8ToString($1));
       }, this->id, name.c_str());
     }
 
@@ -969,12 +969,12 @@ namespace D3 {
     Selection(std::string selector, bool all = false) {
       if (all){
         EM_ASM_ARGS({
-  	      js.objects[$0] = d3.selectAll(Pointer_stringify($1));
+  	      js.objects[$0] = d3.selectAll(UTF8ToString($1));
         }, this->id, selector.c_str());
       }
       else {
         EM_ASM_ARGS({
-  	      js.objects[$0] = d3.select(Pointer_stringify($1));
+  	      js.objects[$0] = d3.select(UTF8ToString($1));
         }, this->id, selector.c_str());
       }
     };
@@ -1011,7 +1011,7 @@ namespace D3 {
       EM_ASM_ARGS({
         //We could make this slightly prettier with macros, but would
         //add an extra comparison
-	    var in_string = Pointer_stringify($1);
+	    var in_string = UTF8ToString($1);
 	    var fn = window["emp"][in_string];
 	    if (typeof fn === "function"){
 	      var update_sel = js.objects[$0].data(js.objects[$2], fn);
@@ -1085,7 +1085,7 @@ namespace D3 {
       emp::pass_array_to_javascript(values);
 
   	  EM_ASM_ARGS({
-	    var in_string = Pointer_stringify($1);
+	    var in_string = UTF8ToString($1);
 	    var fn = window["emp"][in_string];
 	    if (typeof fn === "function"){
 	      var update_sel = js.objects[$0].data(emp_i.__incoming_array, fn);
@@ -1150,7 +1150,7 @@ namespace D3 {
 
       EM_ASM_ARGS({
 	    var append_selection = js.objects[$0].enter()
-                               .append(Pointer_stringify($1));
+                               .append(UTF8ToString($1));
 	    js.objects[$2] = append_selection;
       }, this->id, type.c_str(), new_id);
 
@@ -1166,13 +1166,13 @@ namespace D3 {
 
       if (before.c_str()){
 	    EM_ASM_ARGS({
-	      var new_sel = js.objects[$0].enter().insert(Pointer_stringify($1),
-						  Pointer_stringify($2));
+	      var new_sel = js.objects[$0].enter().insert(UTF8ToString($1),
+						  UTF8ToString($2));
 	      js.objects[$3] = new_sel;
         }, this->id, name.c_str(), before.c_str(), new_id);
       } else {
 	    EM_ASM_ARGS({
-	      var new_sel = js.objects[$0].enter().insert(Pointer_stringify($1));
+	      var new_sel = js.objects[$0].enter().insert(UTF8ToString($1));
 	      js.objects[$2] = new_sel;
         }, this->id, name.c_str(), new_id);
       }
@@ -1272,7 +1272,7 @@ namespace D3 {
     template <typename T>
     typename std::enable_if<std::is_fundamental<T>::value, Selection&>::type
     SetProperty(std::string name, T value){
-      EM_ASM_ARGS({js.objects[$0].property(Pointer_stringify($1),
+      EM_ASM_ARGS({js.objects[$0].property(UTF8ToString($1),
 					   $2)}, this->id, name.c_str());
       return *this;
     }
@@ -1312,7 +1312,7 @@ namespace D3 {
     // Value can also be a function that takes bound data and returns a bool
     Selection& SetClassed(std::string classname, bool value) {
       EM_ASM_ARGS({
-        js.objects[$0].classed(Pointer_stringify($1), $2);
+        js.objects[$0].classed(UTF8ToString($1), $2);
       }, this->id, classname.c_str(), value);
       return *this;
     }
@@ -1330,7 +1330,7 @@ namespace D3 {
     // Version that allows strings containing function names but warns on other strings
     Selection& SetClassed(std::string classname, std::string value){
       emp_assert(EM_ASM_INT({
-        var func_string = Pointer_stringify($0);
+        var func_string = UTF8ToString($0);
         if (typeof window[func_string] === "function") {
           func_string = window[func_string];
         }
@@ -1384,7 +1384,7 @@ namespace D3 {
     /// Get the value of this object's [name] property when its a string
     std::string GetPropertyString(std::string name) const {
       char * buffer = (char *)EM_ASM_INT({
-	    var text = js.objects[$0].property(Pointer_stringify($1));
+	    var text = js.objects[$0].property(UTF8ToString($1));
 	    var buffer = Module._malloc(text.length+1);
 	    Module.writeStringToMemory(text, buffer);
 	    return buffer;
@@ -1398,14 +1398,14 @@ namespace D3 {
     /// Get the value of this object's [name] property when it's an int
     int GetPropertyInt(std::string name) const {
       return EM_ASM_INT({
-	    return js.objects[$0].property(Pointer_stringify($1));
+	    return js.objects[$0].property(UTF8ToString($1));
       }, this->id, name.c_str());
     }
 
     /// Get the value of this object's [name] property when it's a double
     double GetPropertyDouble(std::string name) const {
       return EM_ASM_DOUBLE({
-	    return js.objects[$0].property(Pointer_stringify($1));
+	    return js.objects[$0].property(UTF8ToString($1));
       }, this->id, name.c_str());
     }
 
@@ -1418,7 +1418,7 @@ namespace D3 {
       int new_id = NextD3ID();
 
       EM_ASM_ARGS({
-	    var new_selection = js.objects[$0].append(Pointer_stringify($1));
+	    var new_selection = js.objects[$0].append(UTF8ToString($1));
 	    js.objects[$2] = new_selection;
       }, this->id, name.c_str(), new_id);
       return Selection(new_id);
@@ -1434,13 +1434,13 @@ namespace D3 {
 
       if (before.c_str()){
 	    EM_ASM_ARGS({
-	      var new_sel = js.objects[$0].insert(Pointer_stringify($1),
-						  Pointer_stringify($2));
+	      var new_sel = js.objects[$0].insert(UTF8ToString($1),
+						  UTF8ToString($2));
 	      js.objects[$3] = new_sel;
         }, this->id, name.c_str(), before.c_str(), new_id);
       } else {
   	    EM_ASM_ARGS({
-	      var new_sel = js.objects[$0].insert(Pointer_stringify($1));
+	      var new_sel = js.objects[$0].insert(UTF8ToString($1));
 	      js.objects[$2] = new_sel;
         }, this->id, name.c_str(), new_id);
       }
@@ -1452,7 +1452,7 @@ namespace D3 {
     Transition MakeTransition(std::string name=""){
       int new_id = NextD3ID();
       EM_ASM_ARGS({
- 	    var transition = js.objects[$0].transition(Pointer_stringify($1));
+ 	    var transition = js.objects[$0].transition(UTF8ToString($1));
 	    js.objects[$2] = transition;
       }, this->id, name.c_str(), new_id);
 
@@ -1473,7 +1473,7 @@ namespace D3 {
     /// Interrupt the transition with the name [name] on the current selection
     Selection& Interrupt(std::string name=""){
       EM_ASM_ARGS({
-	    js.objects[$0].interrupt(Pointer_stringify($1));
+	    js.objects[$0].interrupt(UTF8ToString($1));
  	  }, this->id, name.c_str());
       return *this;
     }
@@ -1534,7 +1534,7 @@ namespace D3 {
 
       // Check that the listener is valid
       emp_assert(EM_ASM_INT({
-        var func_string = Pointer_stringify($0);
+        var func_string = UTF8ToString($0);
         if (func_string == "null") {
           return true;
         }
@@ -1553,7 +1553,7 @@ namespace D3 {
       int new_id = NextD3ID();
 
       EM_ASM_ARGS({
-	    var func_string = Pointer_stringify($2);
+	    var func_string = UTF8ToString($2);
         if (typeof window[func_string] === "function") {
           func_string = window[func_string];
         }
@@ -1564,13 +1564,13 @@ namespace D3 {
         }
 
 	    if (typeof func_string === "function") {
-	      js.objects[$0].on(Pointer_stringify($1),
+	      js.objects[$0].on(UTF8ToString($1),
 		  function(d, i){
 		     js.objects[$4] = d3.select(this);
 		     func_string(d, i, $4);},
           $3);
 	    } else {
-	      js.objects[$0].on(Pointer_stringify($1), null);
+	      js.objects[$0].on(UTF8ToString($1), null);
 	    }
 
       }, this->id, type.c_str(), listener.c_str(), capture, new_id);
@@ -1589,7 +1589,7 @@ namespace D3 {
       int new_id = NextD3ID();
 
       EM_ASM_ARGS({
-	      js.objects[$0].on(Pointer_stringify($1),
+	      js.objects[$0].on(UTF8ToString($1),
 		  function(){
 		     js.objects[$4] = d3.select(this);
 		     emp.Callback($2, d, i, $4);}, $3);
