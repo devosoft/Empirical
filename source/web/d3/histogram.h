@@ -54,7 +54,7 @@ namespace D3 {
 
         Histogram& SetThresholds(std::string threshold_generator) {
             EM_ASM_ARGS({
-                js.objects[$0].thresholds(Pointer_stringify($1));
+                js.objects[$0].thresholds(UTF8ToString($1));
             }, this->id, threshold_generator.c_str());
             return (*this);
         }

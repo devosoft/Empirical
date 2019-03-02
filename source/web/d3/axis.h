@@ -88,13 +88,13 @@ namespace D3 {
         var axis_range = js.objects[$0].scale().range();
 	    js.objects[$3] = js.objects[$1].append("g");
 
-        js.objects[$3].append("g").attr("id", Pointer_stringify($2))
+        js.objects[$3].append("g").attr("id", UTF8ToString($2))
                                   .call(js.objects[$0]);
 
         var canvas_width = js.objects[$1].attr("width");
         var canvas_height = js.objects[$1].attr("height");
 
-        var orient = Pointer_stringify($6);
+        var orient = UTF8ToString($6);
         var dy = "2.5em";
         var x_divisor = 2.0;
         var text_orient = 0;
@@ -114,8 +114,8 @@ namespace D3 {
           js.objects[$3].attr("transform", "translate("+(canvas_width-60)+",0)");
         }
 
-        if (Pointer_stringify($5) != "") {
-          dy = Pointer_stringify($5);
+        if (UTF8ToString($5) != "") {
+          dy = UTF8ToString($5);
         }
 
         var label_x = axis_range[0]+(axis_range[1]-axis_range[0])/x_divisor;
@@ -124,11 +124,11 @@ namespace D3 {
         }
 
         js.objects[$3].append("text")
-             .attr("id", Pointer_stringify($2)+"_label")
+             .attr("id", UTF8ToString($2)+"_label")
              .attr("transform", "rotate("+text_orient+")")
              .attr("x", label_x)
              .attr("dy", dy).style("text-anchor", "middle")
-             .text(Pointer_stringify($4));
+             .text(UTF8ToString($4));
       }, this->id, selection.GetID(), dom_id.c_str(), group.GetID(), label.c_str(),
       label_offset.c_str(), orientation.c_str());
       return *this;
@@ -230,7 +230,7 @@ namespace D3 {
     /// [the rules for d3.format()](https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format)
     Axis& SetTickFormat(std::string format) {
       EM_ASM_ARGS({
-        js.objects[$0].tickFormat(d3.format(Pointer_stringify($1)));
+        js.objects[$0].tickFormat(d3.format(UTF8ToString($1)));
       }, this->id, format.c_str());
       return *this;
     }
