@@ -144,7 +144,7 @@ namespace emp {
     ss << "Assert Error (In " << filename << " line " << line << "): " << expr << '\n';
     assert_print(ss, std::forward<EXTRA>(extra)...);
     if (emp::TripAssert() <= 3) {
-      EM_ASM_ARGS({ msg = Pointer_stringify($0); alert(msg); }, ss.str().c_str());
+      EM_ASM_ARGS({ msg = UTF8ToString($0); alert(msg); }, ss.str().c_str());
     }
 
     // Print the current state of the stack.

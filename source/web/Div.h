@@ -142,8 +142,8 @@ namespace web {
         if (state == Widget::ACTIVE) {
           // Create a span tag to anchor the new widget.
           EM_ASM_ARGS({
-              parent_id = Pointer_stringify($0);
-              child_id = Pointer_stringify($1);
+              parent_id = UTF8ToString($0);
+              child_id = UTF8ToString($1);
               $('#' + parent_id).append('<span id="' + child_id + '"></span>');
             }, id.c_str(), in.GetID().c_str());
 
@@ -226,7 +226,7 @@ namespace web {
 
         if (scroll_top >= 0.0) {
           EM_ASM_ARGS({
-              var div_id = Pointer_stringify($0);
+              var div_id = UTF8ToString($0);
               var div_obj = document.getElementById(div_id);
               if (div_obj == null) alert(div_id);
               // alert('id=' + div_id + '  top=' + $1 +
@@ -241,7 +241,7 @@ namespace web {
     // if (scroll_frac < 0.0) scroll_frac = 0.0;
 
     // EM_ASM_ARGS({
-    //     var code = Pointer_stringify($0);
+    //     var code = UTF8ToString($0);
     //     var code_obj = document.getElementById("code");
     //     code_obj.innerHTML = code;
     //     code_obj.scrollTop = $1 * code_obj.scrollHeight;

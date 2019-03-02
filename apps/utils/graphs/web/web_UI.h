@@ -19,7 +19,7 @@ public:
        << "<tr><th>Line</th><th>Instruction</th><th>Arg 1</th><th>Arg 2</th><th>Arg 3</th></tr>";
 
     EM_ASM_ARGS({
-        var code = Pointer_stringify($0);
+        var code = UTF8ToString($0);
         var code_obj = document.getElementById("code");
         code_obj.innerHTML = code;
     }, ss.str().c_str());

@@ -84,7 +84,7 @@ namespace web {
       // Find the current object only once.
 #ifdef EMSCRIPTEN
       EM_ASM_ARGS({
-          var id = Pointer_stringify($0);
+          var id = UTF8ToString($0);
           emp_i.cur_obj = $( '#' + id );
         }, widget_id.c_str());
 #endif
@@ -92,7 +92,7 @@ namespace web {
       for (auto event_pair : listeners) {
 #ifdef EMSCRIPTEN
         EM_ASM_ARGS({
-          var name = Pointer_stringify($0);
+          var name = UTF8ToString($0);
           emp_i.cur_obj.on( name, function(evt) { emp.Callback($1, evt); } );
         }, event_pair.first.c_str(), event_pair.second);
 #else
@@ -109,8 +109,8 @@ namespace web {
                       size_t fun_id) {
 #ifdef EMSCRIPTEN
         EM_ASM_ARGS({
-          var id = Pointer_stringify($0);
-          var name = Pointer_stringify($1);
+          var id = UTF8ToString($0);
+          var name = UTF8ToString($1);
           $( '#' + id ).on( name, function(evt) { emp.Callback($2, evt); } );
         }, widget_id.c_str(), event_name.c_str(), fun_id);
 #else

@@ -239,8 +239,8 @@ namespace web {
         EM_ASM({ emp_i.ctx.textBaseline = "middle"; });
       }
       EM_ASM_ARGS({
-        emp_i.ctx.fillStyle = Pointer_stringify($3);
-        var text = Pointer_stringify($2);
+        emp_i.ctx.fillStyle = UTF8ToString($3);
+        var text = UTF8ToString($2);
         emp_i.ctx.fillText(text,$0,$1);
       }, p.GetX(), p.GetY(), text.c_str(), fill_color.c_str());
     }
