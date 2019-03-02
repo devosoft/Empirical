@@ -210,8 +210,8 @@ namespace web {
           // Create a span tag to anchor the new widget.
           std::string cell_id = emp::to_string(id, '_', r, '_', c);
           EM_ASM_ARGS({
-              parent_id = Pointer_stringify($0);
-              child_id = Pointer_stringify($1);
+              parent_id = UTF8ToString($0);
+              child_id = UTF8ToString($1);
               $('#' + parent_id).append('<span id="' + child_id + '"></span>');
             }, cell_id.c_str(), in.GetID().c_str());
 

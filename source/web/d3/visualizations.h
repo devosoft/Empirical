@@ -142,7 +142,7 @@ public:
   }
 
   void CallDrawCallback() {
-    EM_ASM_ARGS({window["emp"][Pointer_stringify($0)]()}, draw_data_callback.c_str());
+    EM_ASM_ARGS({window["emp"][UTF8ToString($0)]()}, draw_data_callback.c_str());
   }
 
   /*
@@ -479,7 +479,7 @@ public:
     return_x = [func](DATA_TYPE d){
       emp::StoreReturn(d);
       return EM_ASM_DOUBLE({
-        var func_string = Pointer_stringify($0);
+        var func_string = UTF8ToString($0);
         if (typeof window[func_string] === function) {
           func_string = window[func_string];
         } else if (typeof window["emp"][func_string] === function) {
@@ -517,7 +517,7 @@ public:
     return_y = [func](DATA_TYPE d){
       emp::StoreReturn(d);
       return EM_ASM_DOUBLE({
-        var func_string = Pointer_stringify($0);
+        var func_string = UTF8ToString($0);
         if (typeof window[func_string] === function) {
           func_string = window[func_string];
         } else if (typeof window["emp"][func_string] === function) {
@@ -540,19 +540,19 @@ public:
 
     // Adjust axes
     x_min = std::min(EM_ASM_DOUBLE({
-        return d3.min(js.objects[$0], window["emp"][Pointer_stringify($1)+"return_x"]);
+        return d3.min(js.objects[$0], window["emp"][UTF8ToString($1)+"return_x"]);
     }, dataset->GetID(), this->GetID().c_str()), x_min);
 
     x_max = std::max(EM_ASM_DOUBLE({
-        return d3.max(js.objects[$0], window["emp"][Pointer_stringify($1)+"return_x"]);
+        return d3.max(js.objects[$0], window["emp"][UTF8ToString($1)+"return_x"]);
     }, dataset->GetID(), this->GetID().c_str()), x_max);
 
     y_min = std::min(EM_ASM_DOUBLE({
-        return d3.min(js.objects[$0], window["emp"][Pointer_stringify($1)+"return_y"]);
+        return d3.min(js.objects[$0], window["emp"][UTF8ToString($1)+"return_y"]);
     }, dataset->GetID(), this->GetID().c_str()), y_min);
 
     y_max = std::max(EM_ASM_DOUBLE({
-        return d3.max(js.objects[$0], window["emp"][Pointer_stringify($1)+"return_y"]);
+        return d3.max(js.objects[$0], window["emp"][UTF8ToString($1)+"return_y"]);
     }, dataset->GetID(), this->GetID().c_str()), y_max);
 
     y_scale->SetDomain(y_max, y_min);
@@ -688,8 +688,8 @@ public:
       var s = js.objects[$0].selectAll(".line-seg").data([circle_data]);
       js.objects[$3] = s.exit();
       js.objects[$2].ease(d3.easeLinear).duration(300).selectAll(".data-point")
-                    .attr("cy", emp[Pointer_stringify($4)+"y"])
-                    .attr("cx", emp[Pointer_stringify($4)+"x"]);
+                    .attr("cy", emp[UTF8ToString($4)+"y"])
+                    .attr("cx", emp[UTF8ToString($4)+"x"]);
       t = s.transition(js.objects[$2]).duration(300).attrTween("d", pathTween).ease(d3.easeLinear);
       t.attr("d", js.objects[$1]);
       js.objects[$3]

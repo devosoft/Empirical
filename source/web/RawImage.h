@@ -42,7 +42,7 @@ namespace emp {
         size_t error_callback = JSWrapOnce( std::function<void()>(std::bind(&ImageInfo::MarkError, this)) );
 
         img_id = EM_ASM_INT({
-          var url = Pointer_stringify($0);
+          var url = UTF8ToString($0);
           var img_id = emp_i.images.length;
           emp_i.images[img_id] = new Image();
           emp_i.images[img_id].src = url;
