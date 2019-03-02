@@ -133,7 +133,7 @@ namespace D3 {
     IdentityScale& SetTickFormat(int count, std::string format) {
       //TODO: format is technically optional, but what is the point of this
       //function without it?
-      EM_ASM_ARGS({js.objects[$0].tick($1, Pointer_stringify($2));},
+      EM_ASM_ARGS({js.objects[$0].tick($1, UTF8ToString($2));},
 		  this->id, count, format.c_str());
       return *this;
     }

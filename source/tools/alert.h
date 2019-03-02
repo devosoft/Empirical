@@ -21,7 +21,7 @@
 
 namespace emp {
 #ifdef EMSCRIPTEN
-  void Alert(const std::string & msg) { EM_ASM_ARGS({ msg = Pointer_stringify($0); alert(msg); }, msg.c_str()); }
+  void Alert(const std::string & msg) { EM_ASM_ARGS({ msg = UTF8ToString($0); alert(msg); }, msg.c_str()); }
 #else
   /// Send msg to cerr if in C++, or show msg in an alert box if compiled to Javascript
   /// Input can be any number of arguments of any types as long as the can be converted to

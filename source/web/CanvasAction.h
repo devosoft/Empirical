@@ -37,7 +37,7 @@ namespace web {
     void Fill(const std::string & style="") {
       if (style != "") {
         EM_ASM_ARGS({
-            emp_i.ctx.fillStyle = Pointer_stringify($0);
+            emp_i.ctx.fillStyle = UTF8ToString($0);
           }, style.c_str());
       }
       EM_ASM({ emp_i.ctx.fill(); });
@@ -47,7 +47,7 @@ namespace web {
     void Stroke(const std::string & style="") {
       if (style != "") {
         EM_ASM_ARGS({
-            emp_i.ctx.strokeStyle = Pointer_stringify($0);
+            emp_i.ctx.strokeStyle = UTF8ToString($0);
           }, style.c_str());
       }
       EM_ASM({ emp_i.ctx.stroke(); });
@@ -80,7 +80,7 @@ namespace web {
 
     void Apply() {
       EM_ASM_ARGS({
-        var color = Pointer_stringify($0);
+        var color = UTF8ToString($0);
         emp_i.ctx.strokeStyle = color;
       }, color.c_str());
     }
@@ -112,7 +112,7 @@ namespace web {
 
     void Apply() {
       EM_ASM_ARGS({
-        emp_i.ctx.font = Pointer_stringify($0);
+        emp_i.ctx.font = UTF8ToString($0);
       }, font.c_str());
     }
     CanvasAction * Clone() const { return new CanvasFont(*this); }
@@ -147,7 +147,7 @@ namespace web {
         }
       });
     }
-    
+
     CanvasAction * Clone() const { return new CanvasImage(*this); }
   };
 
