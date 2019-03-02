@@ -94,22 +94,18 @@ If you're a new user, you (probably) don't have this set up so we'll walk you th
 .. _emscripten LLVM-to-Web Compiler: https://emscripten.org
 
 We aim for Empirical to track the current release of emscripten.
-However, as of February 2019, we've fallen a bit behind due to some breaking changes in recent emscripten releases.
-(See, e.g., `Empirical Issue #197`_).
-While we're working on bringing Empirical up-to-date with the latest emscripten, you'll need to work with emscripten version :code:`v1.37.1` in order to compile Empirical's web tools.
+As of mid-February 2019, Empirical is compatible with emscripten's contemporary release, version :code:`v1.38.27`.
+Your best bet for compiling with Empirical is to install the latest version of emscripten.
+However, if you run into roadblocks later on and think it might be because of breaking changes in emscripten that Empirical hasn't tracked, let us know by posting on `our issue tracker`_!
 
-.. _Empirical Issue #197: https://github.com/devosoft/Empirical/issues/197
-
-Here's how to get that taken care of.
+.. _our issue tracker: https://github.com/devosoft/Empirical/issues
 
 .. code-block:: bash
 
   git clone https://github.com/emscripten-core/emsdk.git
   cd emsdk
-  ./emsdk install emscpripten v1.37.1
-  ./emsdk activate emscpripten v1.37.1
-  ./emsdk install clang-e1.37.1-64bit
-  ./emsdk activate clang-e1.37.1-64bit
+  ./emsdk install latest
+  ./emsdk activate latest
 
 When you want to use the emscripten compiler, you'll want to hop over to the :code:`emsdk` directory and run
 
@@ -123,7 +119,7 @@ You only need to do this once per terminal session (e.g., the first time you wan
 Compile & Run: Web Browser
 --------------------------
 
-Assuming your working directory is still :code:`Empirical/examples/ProjectTemplate` and you have loaded up emscripten (e.g., :code:`source source ./emsdk_env.sh`), compiling for web is a snap!
+Assuming your working directory is still :code:`Empirical/examples/ProjectTemplate` and you have loaded up emscripten (e.g., :code:`source ./emsdk_env.sh`), compiling for web is a snap!
 
 Let's take a look at what we want to compile first, though.
 
@@ -190,7 +186,15 @@ at your command line.
 If it starts up, then great!
 Just leave it running for now.
 
-If you don't have :code:`python3` installed, a step-by-step guide for your operating system is probably only a quick web search away.
+If you only have Python 2 installed, try running
+
+.. code-block:: bash
+
+  python -m SimpleHTTPServer
+
+at your command line.
+
+If you don't have any Python installed, a step-by-step guide for your operating system is probably only a quick web search away.
 Alternatively, go ahead and use your web serving tool of choice.
 
 Pop open your favorite browser and point the address bar to `http://localhost:8000/web/project_name.html`_.
