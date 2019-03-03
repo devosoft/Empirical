@@ -12,11 +12,11 @@ emphasis on being able to build web interfaces using Mozilla's Emscripten
 compiler.  The project goal is to improve the accessibility and reproducibility
 of the computational research.
 
-Emprical is a C++ project though it uses Python for development
+Empirical is a C++ project though it uses Python for development
 infrastructure.
 
-The developer documentation is for contributing to the Emscripten project and
-the user documentation is for those wanting to incorporate the Emscripten
+The developer documentation is for contributing to the Empirical project and
+the user documentation is for those wanting to incorporate the Empirical
 library into their own projects.
 
 Contents:
