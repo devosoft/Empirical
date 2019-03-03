@@ -4,7 +4,7 @@
 Empirical -- A library of tools for scientific software development
 ###################################################################
 
-:Authors: Charles Ofria, Emily Dolson, Alex Lalejini, Jacob Fenton
+:Authors: Charles Ofria, Emily Dolson, Alex Lalejini, Jacob Fenton, Matthew Andres Moreno
 :GitHub: https://github.com/devosoft/Empirical
 
 Empirical is a library of tools for scientific software development with an
