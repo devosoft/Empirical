@@ -25,6 +25,7 @@ Contents:
    :caption: Using Empirical
    :maxdepth: 2
 
+   BuiltWithEmpiricalGallery/index
    QuickStartGuides/index
    library/base/base
    library/data/data
