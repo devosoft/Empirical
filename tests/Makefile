@@ -32,6 +32,7 @@ test: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 	cd ToolsTests && make test
 	cd BaseTests && make test
+	cd EvoTests && make test
 
 # Test optimized version without debug features
 opt: FLAGS := -std=c++14 -DNDEBUG -O3 -Wno-unused-function -I../source/ -I../ 
