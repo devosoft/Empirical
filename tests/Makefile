@@ -59,6 +59,7 @@ test-coverage: FLAGS := -std=c++14 -g -Wall -Wno-unused-function -I../coverage_s
 test-coverage: coverage_conversion test-prep $(addprefix cover-test-, $(TEST_NAMES))
 	       cd ToolsTests && make test-coverage
 		   cd BaseTests && make test-coverage
+		   cd EvoTests && make test-coverage
 	       rm -r ../coverage_source
 
 clean:
