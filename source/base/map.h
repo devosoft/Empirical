@@ -29,6 +29,30 @@ namespace emp {
 
 namespace emp {
 
+  template < class Key, class T, class... Ts >
+  class map : public std::map<Key, T, Ts...> {
+  private:
+    using this_t = emp::map<Key,T,Ts....>;
+    using base_t = std::map<Key,T,Ts....>;
+
+  public:
+    using key_type = KEY;
+    using mapped_type = T;
+    using value_type = std::pair<const key_type,mapped_type>;
+    using key_compare = base_t::key_compare;
+    using value_compare = base_t::value_compare;
+    using allocator_type = base_t::allocator_type;
+    using reference = base_t::reference;
+    using const_reference = base_t::const_reference;
+    using pointer = base_t::pointer;
+    using const_pointer = base_t::const_pointer;
+    using iterator = base_t::iterator;
+    using const_iterator = base_t::const_iterator;
+    using reverse_iterator = base_t::reverse_iterator;
+    using const_reverse_iterator = base_t::const_reverse_iterator;
+    using difference_type = base_t::difference_type;
+    using size_type = base_t::size_type;
+  }
 
 }
 
