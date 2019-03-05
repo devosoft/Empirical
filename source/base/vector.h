@@ -80,8 +80,22 @@ namespace emp {
         if (v_ptr == nullptr) { ErrorCode() = "Invalid Vector! (set to nullptr)"; return false; }
         if (v_ptr->revision == 0) { ErrorCode() = "Vector deleted! (revision==0)"; return false; }
         if (revision != v_ptr->revision) { ErrorCode() = "Vector has changed memeory!"; return false; }
-        size_t pos = (size_t) (*this - v_ptr->begin());
-        if (pos > v_ptr->size()) { ErrorCode() = "Iterator out of range."; return false; }
+        int64_t pos = 0;
+        if constexpr (std::is_same<ITERATOR_T, typename stdv_t::reverse_iterator>() ||
+                      std::is_same<ITERATOR_T, typename stdv_t::const_reverse_iterator>()) {
+          pos = std::distance(*((ITERATOR_T *) this), ((stdv_t *) v_ptr)->rend()) - 1;
+        }
+        else {
+          pos = std::distance(((stdv_t *) v_ptr)->begin(), *((ITERATOR_T *) this));
+        }
+        if (pos < 0 || pos > v_ptr->size()) {
+          ErrorCode() = "Iterator out of range.";
+          ErrorCode() += " size=";
+          ErrorCode() += std::to_string(v_ptr->size());
+          ErrorCode() += "  pos=";
+          ErrorCode() += std::to_string(pos);
+          return false;
+        }
         if (!begin_ok && pos == 0) { ErrorCode() = "Iterator not allowed at begin()."; return false; }
         if (!end_ok && pos == v_ptr->size()) { ErrorCode() = "Iterator not allowed at end()."; return false; }
         return true;
