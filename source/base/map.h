@@ -17,6 +17,11 @@
 #ifndef EMP_MAP_H
 #define EMP_MAP_H
 
+#include <initializer_list>
+#include <map>
+
+#include "assert.h"
+
 // If debug is turned out, translate back to std::map
 #ifdef EMP_NDEBUG
 
@@ -32,27 +37,42 @@ namespace emp {
   template < class Key, class T, class... Ts >
   class map : public std::map<Key, T, Ts...> {
   private:
-    using this_t = emp::map<Key,T,Ts....>;
-    using base_t = std::map<Key,T,Ts....>;
+    using this_t = emp::map<Key,T,Ts...>;
+    using base_t = std::map<Key,T,Ts...>;
 
   public:
-    using key_type = KEY;
+    using key_type = Key;
     using mapped_type = T;
     using value_type = std::pair<const key_type,mapped_type>;
-    using key_compare = base_t::key_compare;
-    using value_compare = base_t::value_compare;
-    using allocator_type = base_t::allocator_type;
-    using reference = base_t::reference;
-    using const_reference = base_t::const_reference;
-    using pointer = base_t::pointer;
-    using const_pointer = base_t::const_pointer;
-    using iterator = base_t::iterator;
-    using const_iterator = base_t::const_iterator;
-    using reverse_iterator = base_t::reverse_iterator;
-    using const_reverse_iterator = base_t::const_reverse_iterator;
-    using difference_type = base_t::difference_type;
-    using size_type = base_t::size_type;
-  }
+    using key_compare = typename base_t::key_compare;
+    using value_compare = typename base_t::value_compare;
+    using allocator_type = typename base_t::allocator_type;
+    using reference = typename base_t::reference;
+    using const_reference = typename base_t::const_reference;
+    using pointer = typename base_t::pointer;
+    using const_pointer = typename base_t::const_pointer;
+    using iterator = typename base_t::iterator;
+    using const_iterator = typename base_t::const_iterator;
+    using reverse_iterator = typename base_t::reverse_iterator;
+    using const_reverse_iterator = typename base_t::const_reverse_iterator;
+    using difference_type = typename base_t::difference_type;
+    using size_type = typename base_t::size_type;
+
+    explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
+      : base_t(comp, alloc) { }
+    explicit map (const allocator_type& alloc) : base_t(alloc) { }
+    template <class InputIterator>
+    map (InputIterator first, InputIterator last,
+         const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
+      : base_t(first, last, comp, alloc) { }
+    map (const map& x) : base_t(x) { }
+    map (const map& x, const allocator_type& alloc) : base_t(x, alloc) { }
+    map (map && x) : base_t(std::move(x)) { }
+    map (map && x, const allocator_type& alloc) : base_t(std::move(x), alloc) { }
+    map (std::initializer_list<value_type> il, const key_compare& comp = key_compare(),
+         const allocator_type& alloc = allocator_type())
+      : base_t(il, comp, alloc) { }
+  };
 
 }
 
