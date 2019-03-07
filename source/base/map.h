@@ -60,6 +60,12 @@ namespace emp {
       template <typename R_T> T & operator<<=(R_T && _in) { return value <<= std::forward<R_T>(_in); }
       template <typename R_T> T & operator>>=(R_T && _in) { return value >>= std::forward<R_T>(_in); }
 
+      // Setup increment, decrement
+      auto & operator++() { return ++value; }
+      auto & operator--() { return --value; }
+      auto operator++(int) { return value++; }
+      auto operator--(int) { return value--; }
+
       // Setup basic arithmatic
       auto operator+() { return +value; }
       auto operator-() { return -value; }
@@ -79,9 +85,27 @@ namespace emp {
       template <typename R_T> auto operator && (const R_T & r) { return value && r; }
       template <typename R_T> auto operator || (const R_T & r) { return value || r; }
 
-      operator T&() { return value; }
-      T* operator &() { return &value; }
+      // Setup comparison operators
+      template <typename R_T> bool operator == (const R_T & r) { return value == r; }
+      template <typename R_T> bool operator != (const R_T & r) { return value != r; }
+      template <typename R_T> bool operator <  (const R_T & r) { return value < r; }
+      template <typename R_T> bool operator <= (const R_T & r) { return value <= r; }
+      template <typename R_T> bool operator >  (const R_T & r) { return value > r; }
+      template <typename R_T> bool operator >= (const R_T & r) { return value >= r; }
 
+      // Setup member access
+      template <typename R_T> auto & operator [] (const R_T & r) { return value[r]; }
+      auto & operator * () { return *value; }
+      auto operator & () { return &value; }
+      auto operator -> () { return value; }
+      template <typename R_T> auto & operator ->* (const R_T & r) { return value->*r; }
+
+      // Setup remaining misc operators.
+      template <typename... R_Ts> auto operator () (R_Ts &&... rs) { return value( std::forward<R_Ts>(rs)... ); }
+      template <typename R_T> auto operator , (const R_T & r) { return value , r; }
+
+      // Dynamic casting to internal type.
+      operator T&() { return value; }
     };
 
   public:
