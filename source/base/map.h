@@ -47,15 +47,37 @@ namespace emp {
     public:
       Proxy(T & in_value) : value(in_value) { }
 
-      template <typename ASSIGN_T>
-      T & operator=(ASSIGN_T && _in) { return value = std::forward<ASSIGN_T>(_in); }
+      // Setup assignment operators
+      template <typename R_T> T & operator=(R_T && _in) { return value = std::forward<R_T>(_in); }
+      template <typename R_T> T & operator+=(R_T && _in) { return value += std::forward<R_T>(_in); }
+      template <typename R_T> T & operator-=(R_T && _in) { return value -= std::forward<R_T>(_in); }
+      template <typename R_T> T & operator*=(R_T && _in) { return value *= std::forward<R_T>(_in); }
+      template <typename R_T> T & operator/=(R_T && _in) { return value /= std::forward<R_T>(_in); }
+      template <typename R_T> T & operator%=(R_T && _in) { return value %= std::forward<R_T>(_in); }
+      template <typename R_T> T & operator&=(R_T && _in) { return value &= std::forward<R_T>(_in); }
+      template <typename R_T> T & operator|=(R_T && _in) { return value |= std::forward<R_T>(_in); }
+      template <typename R_T> T & operator^=(R_T && _in) { return value ^= std::forward<R_T>(_in); }
+      template <typename R_T> T & operator<<=(R_T && _in) { return value <<= std::forward<R_T>(_in); }
+      template <typename R_T> T & operator>>=(R_T && _in) { return value >>= std::forward<R_T>(_in); }
 
-      // Make sure basic match can be done with proxies.
+      // Setup basic arithmatic
+      auto operator+() { return +value; }
+      auto operator-() { return -value; }
+      auto operator!() { return !value; }
+      auto operator~() { return ~value; }
       template <typename R_T> auto operator + (const R_T & r) { return value + r; }
       template <typename R_T> auto operator - (const R_T & r) { return value - r; }
       template <typename R_T> auto operator * (const R_T & r) { return value * r; }
       template <typename R_T> auto operator / (const R_T & r) { return value / r; }
       template <typename R_T> auto operator % (const R_T & r) { return value % r; }
+
+      template <typename R_T> auto operator & (const R_T & r) { return value & r; }
+      template <typename R_T> auto operator | (const R_T & r) { return value | r; }
+      template <typename R_T> auto operator ^ (const R_T & r) { return value ^ r; }
+      template <typename R_T> auto operator << (const R_T & r) { return value << r; }
+      template <typename R_T> auto operator >> (const R_T & r) { return value >> r; }
+      template <typename R_T> auto operator && (const R_T & r) { return value && r; }
+      template <typename R_T> auto operator || (const R_T & r) { return value || r; }
 
       operator T&() { return value; }
       T* operator &() { return &value; }
