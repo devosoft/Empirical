@@ -48,7 +48,14 @@ namespace emp {
       Proxy(T & in_value) : value(in_value) { }
 
       template <typename ASSIGN_T>
-      T & operator=(ASSIGN_T && _in) { value = std::forward<ASSIGN_T>(_in); }
+      T & operator=(ASSIGN_T && _in) { return value = std::forward<ASSIGN_T>(_in); }
+
+      // Make sure basic match can be done with proxies.
+      template <typename R_T> auto operator + (const R_T & r) { return value + r; }
+      template <typename R_T> auto operator - (const R_T & r) { return value - r; }
+      template <typename R_T> auto operator * (const R_T & r) { return value * r; }
+      template <typename R_T> auto operator / (const R_T & r) { return value / r; }
+      template <typename R_T> auto operator % (const R_T & r) { return value % r; }
 
       operator T&() { return value; }
       T* operator &() { return &value; }
@@ -88,8 +95,8 @@ namespace emp {
          const allocator_type& alloc = allocator_type())
       : base_t(il, comp, alloc) { }
 
-    Proxy & operator[] (const Key & k) { return Proxy(base_t::operator[](k)); };
-    Proxy & operator[] (Key && k) { return Proxy(base_t::operator[]( std::forward<Key>(k) )); };
+    Proxy operator[] (const Key & k) { return Proxy(base_t::operator[](k)); };
+    Proxy operator[] (Key && k) { return Proxy(base_t::operator[]( std::forward<Key>(k) )); };
   };
 
 }
