@@ -40,6 +40,21 @@ namespace emp {
     using this_t = emp::map<Key,T,Ts...>;
     using base_t = std::map<Key,T,Ts...>;
 
+    // The Proxy class is returned in the place of a mapped type to track usage.
+    class Proxy {
+    private:
+      T & value;
+    public:
+      Proxy(T & in_value) : value(in_value) { }
+
+      template <typename ASSIGN_T>
+      T & operator=(ASSIGN_T && _in) { value = std::forward<ASSIGN_T>(_in); }
+
+      operator T&() { return value; }
+      T* operator &() { return &value; }
+
+    };
+
   public:
     using key_type = Key;
     using mapped_type = T;
@@ -72,6 +87,9 @@ namespace emp {
     map (std::initializer_list<value_type> il, const key_compare& comp = key_compare(),
          const allocator_type& alloc = allocator_type())
       : base_t(il, comp, alloc) { }
+
+    Proxy & operator[] (const Key & k) { return Proxy(base_t::operator[](k)); };
+    Proxy & operator[] (Key && k) { return Proxy(base_t::operator[]( std::forward<Key>(k) )); };
   };
 
 }
