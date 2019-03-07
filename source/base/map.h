@@ -34,79 +34,81 @@ namespace emp {
 
 namespace emp {
 
+  // The MapProxy class is returned in the place of a mapped type to track usage.
+  template <typename T>
+  class MapProxy {
+  private:
+    T & value;
+  public:
+    MapProxy(T & in_value) : value(in_value) { }
+
+    // Setup assignment operators
+    template <typename R_T> T & operator=(R_T && _in) { return value = std::forward<R_T>(_in); }
+    template <typename R_T> T & operator+=(R_T && _in) { return value += std::forward<R_T>(_in); }
+    template <typename R_T> T & operator-=(R_T && _in) { return value -= std::forward<R_T>(_in); }
+    template <typename R_T> T & operator*=(R_T && _in) { return value *= std::forward<R_T>(_in); }
+    template <typename R_T> T & operator/=(R_T && _in) { return value /= std::forward<R_T>(_in); }
+    template <typename R_T> T & operator%=(R_T && _in) { return value %= std::forward<R_T>(_in); }
+    template <typename R_T> T & operator&=(R_T && _in) { return value &= std::forward<R_T>(_in); }
+    template <typename R_T> T & operator|=(R_T && _in) { return value |= std::forward<R_T>(_in); }
+    template <typename R_T> T & operator^=(R_T && _in) { return value ^= std::forward<R_T>(_in); }
+    template <typename R_T> T & operator<<=(R_T && _in) { return value <<= std::forward<R_T>(_in); }
+    template <typename R_T> T & operator>>=(R_T && _in) { return value >>= std::forward<R_T>(_in); }
+
+    // Setup increment, decrement
+    auto & operator++() { return ++value; }
+    auto & operator--() { return --value; }
+    auto operator++(int) { return value++; }
+    auto operator--(int) { return value--; }
+
+    // Setup basic arithmatic
+    auto operator+() { return +value; }
+    auto operator-() { return -value; }
+    auto operator!() { return !value; }
+    auto operator~() { return ~value; }
+    template <typename R_T> auto operator + (const R_T & r) { return value + r; }
+    template <typename R_T> auto operator - (const R_T & r) { return value - r; }
+    template <typename R_T> auto operator * (const R_T & r) { return value * r; }
+    template <typename R_T> auto operator / (const R_T & r) { return value / r; }
+    template <typename R_T> auto operator % (const R_T & r) { return value % r; }
+
+    template <typename R_T> auto operator & (const R_T & r) { return value & r; }
+    template <typename R_T> auto operator | (const R_T & r) { return value | r; }
+    template <typename R_T> auto operator ^ (const R_T & r) { return value ^ r; }
+    template <typename R_T> auto operator << (const R_T & r) { return value << r; }
+    template <typename R_T> auto operator >> (const R_T & r) { return value >> r; }
+    template <typename R_T> auto operator && (const R_T & r) { return value && r; }
+    template <typename R_T> auto operator || (const R_T & r) { return value || r; }
+
+    // Setup comparison operators
+    template <typename R_T> bool operator == (const R_T & r) { return value == r; }
+    template <typename R_T> bool operator != (const R_T & r) { return value != r; }
+    template <typename R_T> bool operator <  (const R_T & r) { return value < r; }
+    template <typename R_T> bool operator <= (const R_T & r) { return value <= r; }
+    template <typename R_T> bool operator >  (const R_T & r) { return value > r; }
+    template <typename R_T> bool operator >= (const R_T & r) { return value >= r; }
+
+    // Setup member access
+    template <typename R_T> auto & operator [] (const R_T & r) { return value[r]; }
+    auto & operator * () { return *value; }
+    auto operator & () { return &value; }
+    auto operator -> () { return value; }
+    template <typename R_T> auto & operator ->* (const R_T & r) { return value->*r; }
+
+    // Setup remaining misc operators.
+    template <typename... R_Ts> auto operator () (R_Ts &&... rs) { return value( std::forward<R_Ts>(rs)... ); }
+    template <typename R_T> auto operator , (const R_T & r) { return value , r; }
+
+    // Dynamic casting to internal type.
+    operator T&() { return value; }
+  };
+
+
   template < class Key, class T, class... Ts >
   class map : public std::map<Key, T, Ts...> {
   private:
     using this_t = emp::map<Key,T,Ts...>;
     using base_t = std::map<Key,T,Ts...>;
-
-    // The Proxy class is returned in the place of a mapped type to track usage.
-    class Proxy {
-    private:
-      T & value;
-    public:
-      Proxy(T & in_value) : value(in_value) { }
-
-      // Setup assignment operators
-      template <typename R_T> T & operator=(R_T && _in) { return value = std::forward<R_T>(_in); }
-      template <typename R_T> T & operator+=(R_T && _in) { return value += std::forward<R_T>(_in); }
-      template <typename R_T> T & operator-=(R_T && _in) { return value -= std::forward<R_T>(_in); }
-      template <typename R_T> T & operator*=(R_T && _in) { return value *= std::forward<R_T>(_in); }
-      template <typename R_T> T & operator/=(R_T && _in) { return value /= std::forward<R_T>(_in); }
-      template <typename R_T> T & operator%=(R_T && _in) { return value %= std::forward<R_T>(_in); }
-      template <typename R_T> T & operator&=(R_T && _in) { return value &= std::forward<R_T>(_in); }
-      template <typename R_T> T & operator|=(R_T && _in) { return value |= std::forward<R_T>(_in); }
-      template <typename R_T> T & operator^=(R_T && _in) { return value ^= std::forward<R_T>(_in); }
-      template <typename R_T> T & operator<<=(R_T && _in) { return value <<= std::forward<R_T>(_in); }
-      template <typename R_T> T & operator>>=(R_T && _in) { return value >>= std::forward<R_T>(_in); }
-
-      // Setup increment, decrement
-      auto & operator++() { return ++value; }
-      auto & operator--() { return --value; }
-      auto operator++(int) { return value++; }
-      auto operator--(int) { return value--; }
-
-      // Setup basic arithmatic
-      auto operator+() { return +value; }
-      auto operator-() { return -value; }
-      auto operator!() { return !value; }
-      auto operator~() { return ~value; }
-      template <typename R_T> auto operator + (const R_T & r) { return value + r; }
-      template <typename R_T> auto operator - (const R_T & r) { return value - r; }
-      template <typename R_T> auto operator * (const R_T & r) { return value * r; }
-      template <typename R_T> auto operator / (const R_T & r) { return value / r; }
-      template <typename R_T> auto operator % (const R_T & r) { return value % r; }
-
-      template <typename R_T> auto operator & (const R_T & r) { return value & r; }
-      template <typename R_T> auto operator | (const R_T & r) { return value | r; }
-      template <typename R_T> auto operator ^ (const R_T & r) { return value ^ r; }
-      template <typename R_T> auto operator << (const R_T & r) { return value << r; }
-      template <typename R_T> auto operator >> (const R_T & r) { return value >> r; }
-      template <typename R_T> auto operator && (const R_T & r) { return value && r; }
-      template <typename R_T> auto operator || (const R_T & r) { return value || r; }
-
-      // Setup comparison operators
-      template <typename R_T> bool operator == (const R_T & r) { return value == r; }
-      template <typename R_T> bool operator != (const R_T & r) { return value != r; }
-      template <typename R_T> bool operator <  (const R_T & r) { return value < r; }
-      template <typename R_T> bool operator <= (const R_T & r) { return value <= r; }
-      template <typename R_T> bool operator >  (const R_T & r) { return value > r; }
-      template <typename R_T> bool operator >= (const R_T & r) { return value >= r; }
-
-      // Setup member access
-      template <typename R_T> auto & operator [] (const R_T & r) { return value[r]; }
-      auto & operator * () { return *value; }
-      auto operator & () { return &value; }
-      auto operator -> () { return value; }
-      template <typename R_T> auto & operator ->* (const R_T & r) { return value->*r; }
-
-      // Setup remaining misc operators.
-      template <typename... R_Ts> auto operator () (R_Ts &&... rs) { return value( std::forward<R_Ts>(rs)... ); }
-      template <typename R_T> auto operator , (const R_T & r) { return value , r; }
-
-      // Dynamic casting to internal type.
-      operator T&() { return value; }
-    };
 
   public:
     using key_type = Key;
@@ -141,10 +143,23 @@ namespace emp {
          const allocator_type& alloc = allocator_type())
       : base_t(il, comp, alloc) { }
 
-    Proxy operator[] (const Key & k) { return Proxy(base_t::operator[](k)); };
-    Proxy operator[] (Key && k) { return Proxy(base_t::operator[]( std::forward<Key>(k) )); };
+    MapProxy<T> operator[] (const Key & k) { return MapProxy<T>(base_t::operator[](k)); };
+    MapProxy<T> operator[] (Key && k) { return MapProxy<T>(base_t::operator[]( std::forward<Key>(k) )); };
   };
 
+}
+
+// A crude, generic printing function for emp::MapProxy.
+template <typename T>
+std::ostream & operator<<(std::ostream & out, const typename emp::MapProxy<T> & p) {
+  out << (T&) p;
+  return out;
+}
+
+template <typename T>
+std::istream & operator>>(std::istream & is, typename emp::MapProxy<T> & p) {
+  is >> ((T&)p);
+  return is;
 }
 
 #endif
