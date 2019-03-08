@@ -436,7 +436,7 @@ namespace emp {
     void Write(std::ostream & out) const {
       // @CAO Start by printing some file header information?
 
-      // Next print each group and it's information.
+      // Next print each group and its information.
       for (auto it = group_set.begin(); it != group_set.end(); it++) {
         (*it)->Write(out);
       }
