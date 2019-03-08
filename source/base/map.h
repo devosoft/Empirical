@@ -111,6 +111,15 @@ namespace emp {
     operator T&() { return value; }
   };
 
+  /// A type trait to determine if a class is a MapProxy
+  template <typename> struct is_MapProxy : public std::false_type { };
+
+  template <typename T>
+  struct is_MapProxy<MapProxy<T>> : public std::true_type { };
+
+  // Build externaly binary operators with MapProxy as the second argument.
+  template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
+  auto operator + (T1 v1, const MapProxy<T2> & v2) { return v1 + v2.GetValue(); }
 
   template < class Key, class T, class... Ts >
   class map : public std::map<Key, T, Ts...> {
