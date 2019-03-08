@@ -35,6 +35,11 @@ namespace emp {
 namespace emp {
 
   // The MapProxy class is returned in the place of a mapped type to track usage.
+  // @CAO: Note that ideally we should have two proxy classes; one for when the wrapped type is a
+  //       class itself and we can derive from it (thus, perhaps, keeping member functions working?)
+  //       and the other being when it is a base type (and there are no member functions).
+  //       Fundamentally this problem comes from the fact that we cannot overload the . operator,
+  //       and thus cannot get it working directly for the Proxy class.
   template <typename T>
   class MapProxy {
   private:
