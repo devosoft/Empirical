@@ -47,6 +47,9 @@ namespace emp {
   public:
     MapProxy(T & in_value) : value(in_value) { }
 
+    T & GetValue() { return value; }
+    const T & GetValue() const { return value; }
+
     // Setup assignment operators
     template <typename R_T> T & operator=(R_T && _in) { return value = std::forward<R_T>(_in); }
     template <typename R_T> T & operator+=(R_T && _in) { return value += std::forward<R_T>(_in); }
@@ -114,6 +117,7 @@ namespace emp {
   private:
     using this_t = emp::map<Key,T,Ts...>;
     using base_t = std::map<Key,T,Ts...>;
+    using proxy_t = MapProxy<std::decay_t<T>>;
 
   public:
     using key_type = Key;
@@ -148,8 +152,8 @@ namespace emp {
          const allocator_type& alloc = allocator_type())
       : base_t(il, comp, alloc) { }
 
-    MapProxy<T> operator[] (const Key & k) { return MapProxy<T>(base_t::operator[](k)); };
-    MapProxy<T> operator[] (Key && k) { return MapProxy<T>(base_t::operator[]( std::forward<Key>(k) )); };
+    proxy_t operator[] (const Key & k) { return proxy_t(base_t::operator[](k)); };
+    proxy_t operator[] (Key && k) { return proxy_t(base_t::operator[]( std::forward<Key>(k) )); };
   };
 
 }
@@ -157,13 +161,13 @@ namespace emp {
 // A crude, generic printing function for emp::MapProxy.
 template <typename T>
 std::ostream & operator<<(std::ostream & out, const typename emp::MapProxy<T> & p) {
-  out << (T&) p;
+  out << p.GetValue();
   return out;
 }
 
 template <typename T>
 std::istream & operator>>(std::istream & is, typename emp::MapProxy<T> & p) {
-  is >> ((T&)p);
+  is >> p.GetValue();
   return is;
 }
 
