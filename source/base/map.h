@@ -47,8 +47,8 @@ namespace emp {
   public:
     MapProxy(T & in_value) : value(in_value) { }
 
-    T & GetValue() { return value; }
-    const T & GetValue() const { return value; }
+    T & emp_GetValue() { return value; }
+    const T & emp_GetValue() const { return value; }
 
     // Setup assignment operators
     template <typename R_T> T & operator=(R_T && _in) { return value = std::forward<R_T>(_in); }
@@ -119,7 +119,43 @@ namespace emp {
 
   // Build externaly binary operators with MapProxy as the second argument.
   template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
-  auto operator + (T1 v1, const MapProxy<T2> & v2) { return v1 + v2.GetValue(); }
+  auto operator + (T1 v1, const MapProxy<T2> & v2) { return v1 + v2.emp_GetValue(); }
+  template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
+  auto operator - (T1 v1, const MapProxy<T2> & v2) { return v1 - v2.emp_GetValue(); }
+  template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
+  auto operator * (T1 v1, const MapProxy<T2> & v2) { return v1 * v2.emp_GetValue(); }
+  template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
+  auto operator / (T1 v1, const MapProxy<T2> & v2) { return v1 / v2.emp_GetValue(); }
+  template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
+  auto operator % (T1 v1, const MapProxy<T2> & v2) { return v1 % v2.emp_GetValue(); }
+  template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
+  auto operator & (T1 v1, const MapProxy<T2> & v2) { return v1 & v2.emp_GetValue(); }
+  template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
+  auto operator | (T1 v1, const MapProxy<T2> & v2) { return v1 | v2.emp_GetValue(); }
+  template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
+  auto operator ^ (T1 v1, const MapProxy<T2> & v2) { return v1 ^ v2.emp_GetValue(); }
+  template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
+  auto operator << (T1 v1, const MapProxy<T2> & v2) { return v1 << v2.emp_GetValue(); }
+  template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
+  auto operator >> (T1 v1, const MapProxy<T2> & v2) { return v1 >> v2.emp_GetValue(); }
+  template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
+  auto operator && (T1 v1, const MapProxy<T2> & v2) { return v1 && v2.emp_GetValue(); }
+  template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
+  auto operator || (T1 v1, const MapProxy<T2> & v2) { return v1 || v2.emp_GetValue(); }
+  template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
+  auto operator == (T1 v1, const MapProxy<T2> & v2) { return v1 == v2.emp_GetValue(); }
+  template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
+  auto operator != (T1 v1, const MapProxy<T2> & v2) { return v1 != v2.emp_GetValue(); }
+  template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
+  auto operator <  (T1 v1, const MapProxy<T2> & v2) { return v1 < v2.emp_GetValue(); }
+  template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
+  auto operator <= (T1 v1, const MapProxy<T2> & v2) { return v1 <= v2.emp_GetValue(); }
+  template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
+  auto operator >  (T1 v1, const MapProxy<T2> & v2) { return v1 > v2.emp_GetValue(); }
+  template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
+  auto operator >= (T1 v1, const MapProxy<T2> & v2) { return v1 >= v2.emp_GetValue(); }
+  template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
+  auto operator , (T1 v1, const MapProxy<T2> & v2) { return v1 , v2.emp_GetValue(); }
 
   template < class Key, class T, class... Ts >
   class map : public std::map<Key, T, Ts...> {
@@ -170,13 +206,13 @@ namespace emp {
 // A crude, generic printing function for emp::MapProxy.
 template <typename T>
 std::ostream & operator<<(std::ostream & out, const typename emp::MapProxy<T> & p) {
-  out << p.GetValue();
+  out << p.emp_GetValue();
   return out;
 }
 
 template <typename T>
 std::istream & operator>>(std::istream & is, typename emp::MapProxy<T> & p) {
-  is >> p.GetValue();
+  is >> p.emp_GetValue();
   return is;
 }
 
