@@ -44,68 +44,72 @@ namespace emp {
   class MapProxy {
   private:
     T & value;
+    bool is_new;  ///< Was this index just created and not yet set?
   public:
-    MapProxy(T & in_value) : value(in_value) { }
+    MapProxy(T & in_value, bool in_new) : value(in_value), is_new(in_new) { }
 
     T & emp_GetValue() { return value; }
     const T & emp_GetValue() const { return value; }
+    bool emp_IsNew() const { return is_new; }
 
-    // Setup assignment operators
-    template <typename R_T> T & operator=(R_T && _in) { return value = std::forward<R_T>(_in); }
-    template <typename R_T> T & operator+=(R_T && _in) { return value += std::forward<R_T>(_in); }
-    template <typename R_T> T & operator-=(R_T && _in) { return value -= std::forward<R_T>(_in); }
-    template <typename R_T> T & operator*=(R_T && _in) { return value *= std::forward<R_T>(_in); }
-    template <typename R_T> T & operator/=(R_T && _in) { return value /= std::forward<R_T>(_in); }
-    template <typename R_T> T & operator%=(R_T && _in) { return value %= std::forward<R_T>(_in); }
-    template <typename R_T> T & operator&=(R_T && _in) { return value &= std::forward<R_T>(_in); }
-    template <typename R_T> T & operator|=(R_T && _in) { return value |= std::forward<R_T>(_in); }
-    template <typename R_T> T & operator^=(R_T && _in) { return value ^= std::forward<R_T>(_in); }
-    template <typename R_T> T & operator<<=(R_T && _in) { return value <<= std::forward<R_T>(_in); }
-    template <typename R_T> T & operator>>=(R_T && _in) { return value >>= std::forward<R_T>(_in); }
+    // A regular assignment is allowed with the creation of a new map value.
+    template <typename R_T> T & operator=(R_T && _in) { is_new = false; return value = std::forward<R_T>(_in); }
+
+    // Setup other assignment operators
+    template <typename R_T> T & operator+=(R_T && _in) { emp_assert(!is_new); return value += std::forward<R_T>(_in); }
+    template <typename R_T> T & operator-=(R_T && _in) { emp_assert(!is_new); return value -= std::forward<R_T>(_in); }
+    template <typename R_T> T & operator*=(R_T && _in) { emp_assert(!is_new); return value *= std::forward<R_T>(_in); }
+    template <typename R_T> T & operator/=(R_T && _in) { emp_assert(!is_new); return value /= std::forward<R_T>(_in); }
+    template <typename R_T> T & operator%=(R_T && _in) { emp_assert(!is_new); return value %= std::forward<R_T>(_in); }
+    template <typename R_T> T & operator&=(R_T && _in) { emp_assert(!is_new); return value &= std::forward<R_T>(_in); }
+    template <typename R_T> T & operator|=(R_T && _in) { emp_assert(!is_new); return value |= std::forward<R_T>(_in); }
+    template <typename R_T> T & operator^=(R_T && _in) { emp_assert(!is_new); return value ^= std::forward<R_T>(_in); }
+    template <typename R_T> T & operator<<=(R_T && _in) { emp_assert(!is_new); return value <<= std::forward<R_T>(_in); }
+    template <typename R_T> T & operator>>=(R_T && _in) { emp_assert(!is_new); return value >>= std::forward<R_T>(_in); }
 
     // Setup increment, decrement
-    auto & operator++() { return ++value; }
-    auto & operator--() { return --value; }
-    auto operator++(int) { return value++; }
-    auto operator--(int) { return value--; }
+    auto & operator++() { emp_assert(!is_new); return ++value; }
+    auto & operator--() { emp_assert(!is_new); return --value; }
+    auto operator++(int) { emp_assert(!is_new); return value++; }
+    auto operator--(int) { emp_assert(!is_new); return value--; }
 
     // Setup basic arithmatic
-    auto operator+() { return +value; }
-    auto operator-() { return -value; }
-    auto operator!() { return !value; }
-    auto operator~() { return ~value; }
-    template <typename R_T> auto operator + (const R_T & r) { return value + r; }
-    template <typename R_T> auto operator - (const R_T & r) { return value - r; }
-    template <typename R_T> auto operator * (const R_T & r) { return value * r; }
-    template <typename R_T> auto operator / (const R_T & r) { return value / r; }
-    template <typename R_T> auto operator % (const R_T & r) { return value % r; }
+    auto operator+() { emp_assert(!is_new); return +value; }
+    auto operator-() { emp_assert(!is_new); return -value; }
+    auto operator!() { emp_assert(!is_new); return !value; }
+    auto operator~() { emp_assert(!is_new); return ~value; }
+    template <typename R_T> auto operator + (const R_T & r) { emp_assert(!is_new); return value + r; }
+    template <typename R_T> auto operator - (const R_T & r) { emp_assert(!is_new); return value - r; }
+    template <typename R_T> auto operator * (const R_T & r) { emp_assert(!is_new); return value * r; }
+    template <typename R_T> auto operator / (const R_T & r) { emp_assert(!is_new); return value / r; }
+    template <typename R_T> auto operator % (const R_T & r) { emp_assert(!is_new); return value % r; }
 
-    template <typename R_T> auto operator & (const R_T & r) { return value & r; }
-    template <typename R_T> auto operator | (const R_T & r) { return value | r; }
-    template <typename R_T> auto operator ^ (const R_T & r) { return value ^ r; }
-    template <typename R_T> auto operator << (const R_T & r) { return value << r; }
-    template <typename R_T> auto operator >> (const R_T & r) { return value >> r; }
-    template <typename R_T> auto operator && (const R_T & r) { return value && r; }
-    template <typename R_T> auto operator || (const R_T & r) { return value || r; }
+    template <typename R_T> auto operator & (const R_T & r) { emp_assert(!is_new); return value & r; }
+    template <typename R_T> auto operator | (const R_T & r) { emp_assert(!is_new); return value | r; }
+    template <typename R_T> auto operator ^ (const R_T & r) { emp_assert(!is_new); return value ^ r; }
+    template <typename R_T> auto operator << (const R_T & r) { emp_assert(!is_new); return value << r; }
+    template <typename R_T> auto operator >> (const R_T & r) { emp_assert(!is_new); return value >> r; }
+    template <typename R_T> auto operator && (const R_T & r) { emp_assert(!is_new); return value && r; }
+    template <typename R_T> auto operator || (const R_T & r) { emp_assert(!is_new); return value || r; }
 
     // Setup comparison operators
-    template <typename R_T> bool operator == (const R_T & r) { return value == r; }
-    template <typename R_T> bool operator != (const R_T & r) { return value != r; }
-    template <typename R_T> bool operator <  (const R_T & r) { return value < r; }
-    template <typename R_T> bool operator <= (const R_T & r) { return value <= r; }
-    template <typename R_T> bool operator >  (const R_T & r) { return value > r; }
-    template <typename R_T> bool operator >= (const R_T & r) { return value >= r; }
+    template <typename R_T> bool operator == (const R_T & r) { emp_assert(!is_new); return value == r; }
+    template <typename R_T> bool operator != (const R_T & r) { emp_assert(!is_new); return value != r; }
+    template <typename R_T> bool operator <  (const R_T & r) { emp_assert(!is_new); return value < r; }
+    template <typename R_T> bool operator <= (const R_T & r) { emp_assert(!is_new); return value <= r; }
+    template <typename R_T> bool operator >  (const R_T & r) { emp_assert(!is_new); return value > r; }
+    template <typename R_T> bool operator >= (const R_T & r) { emp_assert(!is_new); return value >= r; }
 
     // Setup member access
-    template <typename R_T> auto & operator [] (const R_T & r) { return value[r]; }
-    auto & operator * () { return *value; }
-    auto operator & () { return &value; }
-    auto operator -> () { return value; }
-    template <typename R_T> auto & operator ->* (const R_T & r) { return value->*r; }
+    template <typename R_T> auto & operator [] (const R_T & r) { emp_assert(!is_new); return value[r]; }
+    auto & operator * () { emp_assert(!is_new); return *value; }
+    auto operator & () { emp_assert(!is_new); return &value; }
+    auto operator -> () { emp_assert(!is_new); return value; }
+    template <typename R_T> auto & operator ->* (const R_T & r) { emp_assert(!is_new); return value->*r; }
 
     // Setup remaining misc operators.
-    template <typename... R_Ts> auto operator () (R_Ts &&... rs) { return value( std::forward<R_Ts>(rs)... ); }
-    template <typename R_T> auto operator , (const R_T & r) { return value , r; }
+    template <typename... R_Ts> auto operator () (R_Ts &&... rs) { emp_assert(!is_new); return value( std::forward<R_Ts>(rs)... ); }
+    template <typename R_T> auto operator , (const R_T & r) { emp_assert(!is_new); return value , r; }
 
     // Dynamic casting to internal type.
     operator T&() { return value; }
