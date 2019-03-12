@@ -33,15 +33,44 @@ TEST_CASE("Test World structure", "[Evolve]")
 	world1.Reset();
 	REQUIRE(world1.GetNumOrgs() == 0);
 	
-	emp::World<double> world2;
+	world1.SetPopStruct_Grow(true);
+	world1.InjectAt(6, 3);
+	REQUIRE(world1.GetNumOrgs() == 1);
+	world1.DoBirth(5, 3);
+	REQUIRE(world1.GetNumOrgs() == 1);
+	REQUIRE(world1.GetNextOrg(0) == 5);
+	world1.Update();
+	REQUIRE(world1.GetNumOrgs() == 1);
+	REQUIRE(world1.GetOrg(0) == 5);
+	
+	world1.SetAddInjectFun([](emp::Ptr<int> new_org){ return 6; });
+	world1.Inject(9);
+	REQUIRE(world1.GetOrg(6) == 9);
+	world1.Inject(7);
+	REQUIRE(world1.GetOrg(6) == 7);
+	
+	world1.SetAddBirthFun([](emp::Ptr<int> new_org, emp::WorldPosition parent_pos){ return 4;});
+	world1.DoBirth(11, 6);
+	REQUIRE(world1.GetOrg(4) == 11);
+	
+	world1.SetKillOrgFun([&world1](){world1.DoDeath(4); return 4;});
+	REQUIRE(world1.GetNumOrgs() == 3);
+	world1.DoDeath();
+	REQUIRE(world1.GetNumOrgs() == 2);
+	
+	world1.clear();
+	REQUIRE(world1.GetNumOrgs() == 0);
+	REQUIRE(world1.size() == 0);
+	
+	emp::World<double> world2("World 2");
 	world2.SetPopStruct_Grid(3, 5, true);
 	REQUIRE(world2.GetWidth() == 3);
 	REQUIRE(world2.GetHeight() == 5);
 	REQUIRE(world2.IsSynchronous());
 	world2.MarkSynchronous(false);
 	REQUIRE(world2.IsSynchronous() == false);
-	// Get Attribute throws assert error "Has(attributes, name)"
-	//REQUIRE(world2.GetAttribute("PopStruct") == "Grid");
+	world2.MarkSynchronous();
+	REQUIRE(world2.GetAttribute("PopStruct") == "Grid");
 	
 	// AHhhhhhhhhh
 	world2.InjectAt(6.1, 0);
@@ -75,6 +104,50 @@ TEST_CASE("Test World structure", "[Evolve]")
 	//std::cout << world2.GetSystematics() << std::endl;
 	//REQUIRE(world2.GetSystematics("sys1") == w2_sys1);
 	
+	emp::World<double> world3;
+	REQUIRE(world3.GetNumOrgs() == 0);
+	emp::Random rnd(1);
+	world3.SetRandom(rnd);
+	// Figure out how to use InjectRandomOrg
+	//world3.InjectRandomOrg(8.2);
+	//REQUIRE(world3.GetNumOrgs() == 1);
+	
+	world3.InjectAt(6.5, 0);
+	world3.SetCache();
+	REQUIRE(world3.IsCacheOn());
+	REQUIRE(world3.CalcFitnessID(0) == 6.5);
+	
+	//world3.CalcFitnessAll();
+	std::function<long long unsigned int(double&, emp::Random&)> mutfun = [](double &o, emp::Random& r){ o=o*2; return 1;};
+	world3.SetMutFun(mutfun);
+	world3.DoMutationsID(0);
+	REQUIRE(world3[0] == 13);
+	
+	world3.InjectAt(3.1, 1);
+	world3.InjectAt(8.0, 2);
+	world3.DoMutations();
+	REQUIRE(world3[0] == 26.0);
+	REQUIRE(world3[1] == 6.2);
+	REQUIRE(world3[2] == 16.0);
+	
+	size_t randomID = world3.GetRandomCellID(0, 3);
+	bool inRange = ( (randomID < 3) && (randomID >= 0) );
+	REQUIRE( inRange );
+	
+	world3.DoDeath(2);
+	world3.DoDeath(1);
+	REQUIRE(world3.GetRandomOrg() == 26.0);
+	
+	emp::vector<size_t> validIDs = world3.GetValidOrgIDs();
+	REQUIRE(validIDs.size() == 1);
+	REQUIRE(validIDs[0] == 0);
+	
+	emp::vector<size_t> emptyIDs = world3.GetEmptyPopIDs();
+	REQUIRE(emptyIDs.size() == (world3.GetSize() - 1) );
+	
+	
+	// signals?
 	// Inject into maybe a full world? try to get else statement coverage
-	// InjectRandomOrg
+	// phenotype
+
 }

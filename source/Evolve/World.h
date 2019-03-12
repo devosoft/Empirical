@@ -632,7 +632,7 @@ namespace emp {
     bool HasAttribute(const std::string & name) const { return Has(attributes, name); }
 
     /// Get the value for an attribute that you know exists.
-    std::string GetAttribute(const std::string) const {
+    std::string GetAttribute(const std::string name) const {
       emp_assert( Has(attributes, name) );
       return Find(attributes, name, "UNKNOWN");
     }
