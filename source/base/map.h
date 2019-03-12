@@ -201,8 +201,10 @@ namespace emp {
          const allocator_type& alloc = allocator_type())
       : base_t(il, comp, alloc) { }
 
-    proxy_t operator[] (const Key & k) { return proxy_t(base_t::operator[](k)); };
-    proxy_t operator[] (Key && k) { return proxy_t(base_t::operator[]( std::forward<Key>(k) )); };
+    proxy_t operator[] (const Key & k) {
+      const bool is_init = (this->find(k) != this->end());
+      return proxy_t(base_t::operator[](k), is_init);
+    }
   };
 
 }
