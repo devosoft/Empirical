@@ -192,7 +192,7 @@ namespace emp {
 
       void Add(ConfigEntry * new_entry) { entry_set.push_back(new_entry); }
 
-      void Write(std::ostream & out) {
+      void Write(std::ostream & out) const {
         // Print header information with the group name.
         out << "### " << name << " ###" << std::endl;
         // Print group description.
@@ -234,7 +234,7 @@ namespace emp {
         out << std::endl; // Skip a line after each group.
       }
 
-      void WriteMacros(std::ostream & out, bool as_const) {
+      void WriteMacros(std::ostream & out, bool as_const) const {
         // Print header information to register group.
         out << "  GROUP(" << name << ", \"" << desc << "\"),\n";
 
@@ -433,10 +433,10 @@ namespace emp {
     }
 
     // Generate a text representation (typically a file) for the state of Config
-    void Write(std::ostream & out) {
+    void Write(std::ostream & out) const {
       // @CAO Start by printing some file header information?
 
-      // Next print each group and it's information.
+      // Next print each group and its information.
       for (auto it = group_set.begin(); it != group_set.end(); it++) {
         (*it)->Write(out);
       }
@@ -451,14 +451,14 @@ namespace emp {
     }
 
     // If a string is passed into Write, treat it as a filename.
-    void Write(std::string filename) {
+    void Write(std::string filename) const {
       std::ofstream out(filename);
       Write(out);
       out.close();
     }
 
     // Generate a text representation (typically a file) for the state of Config
-    void WriteMacros(std::ostream & out, bool as_const=false) {
+    void WriteMacros(std::ostream & out, bool as_const=false) const {
       out << "/////////////////////////////////////////////////////////////////////////////////\n"
           << "//  This is an auto-generated file that defines a set of configuration options.\n"
           << "//\n"
@@ -497,7 +497,7 @@ namespace emp {
     }
 
     // If a string is passed into Write, treat it as a filename.
-    void WriteMacros(std::string filename, bool as_const=false) {
+    void WriteMacros(std::string filename, bool as_const=false) const {
       std::ofstream out(filename);
       WriteMacros(out, as_const);
       out.close();

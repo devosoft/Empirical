@@ -86,7 +86,7 @@ namespace web {
       // Find the current object only once.
 #ifdef EMSCRIPTEN
       EM_ASM_ARGS({
-          var id = Pointer_stringify($0);
+          var id = UTF8ToString($0);
           emp_i.cur_obj = $( '#' + id );
         }, widget_id.c_str());
 #endif
@@ -95,8 +95,8 @@ namespace web {
         if (attr_pair.second == "") continue; // Ignore empty entries.
 #ifdef EMSCRIPTEN
         EM_ASM_ARGS({
-            var name = Pointer_stringify($0);
-            var value = Pointer_stringify($1);
+            var name = UTF8ToString($0);
+            var value = UTF8ToString($1);
             emp_i.cur_obj.attr( name, value);
           }, attr_pair.first.c_str(), attr_pair.second.c_str());
 #else
@@ -112,9 +112,9 @@ namespace web {
 
 #ifdef EMSCRIPTEN
       EM_ASM_ARGS({
-          var id = Pointer_stringify($0);
-          var setting = Pointer_stringify($1);
-          var value = Pointer_stringify($2);
+          var id = UTF8ToString($0);
+          var setting = UTF8ToString($1);
+          var value = UTF8ToString($2);
           $( '#' + id ).attr( setting, value);
         }, widget_id.c_str(), setting.c_str(), settings[setting].c_str());
 #else
@@ -128,9 +128,9 @@ namespace web {
                       const std::string & value) {
 #ifdef EMSCRIPTEN
       EM_ASM_ARGS({
-          var id = Pointer_stringify($0);
-          var setting = Pointer_stringify($1);
-          var value = Pointer_stringify($2);
+          var id = UTF8ToString($0);
+          var setting = UTF8ToString($1);
+          var value = UTF8ToString($2);
           $( '#' + id ).attr( setting, value);
         }, widget_id.c_str(), setting.c_str(), value.c_str());
 #else

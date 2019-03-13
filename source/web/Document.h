@@ -29,6 +29,7 @@
 #include "Div.h"
 #include "FileInput.h"
 #include "Image.h"
+#include "Input.h"
 #include "Selector.h"
 #include "Table.h"
 #include "Text.h"
@@ -37,7 +38,7 @@
 #include "canvas_utils.h"
 #include "color_map.h"
 
-// Create an optional alternative to main, emp_main, that is only available after a document 
+// Create an optional alternative to main, emp_main, that is only available after a document
 // has loaded and is ready.
 #ifdef EMPIRICAL
 
@@ -113,6 +114,7 @@ namespace web {
     web::Button Button (const std::string & in_id) { return web::Button(Find(in_id)); }
     web::Canvas Canvas (const std::string & in_id) { return web::Canvas(Find(in_id)); }
     web::FileInput FileInput (const std::string & in_id) { return web::FileInput(Find(in_id)); }
+    web::Input Input (const std::string & in_id) { return web::Input(Find(in_id)); }
     web::Image Image (const std::string & in_id) { return web::Image(Find(in_id)); }
     web::Selector Selector (const std::string & in_id) { return web::Selector(Find(in_id)); }
     web::Div Div (const std::string & in_id) { return web::Div(Find(in_id)); }

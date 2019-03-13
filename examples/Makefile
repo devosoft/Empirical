@@ -7,7 +7,7 @@ default:
 	$(MAKE) -C hardware/
 	$(MAKE) -C meta/
 	$(MAKE) -C tools/
-	$(MAKE) -C web/
+	#$(MAKE) -C web/
 
 clean:
 	$(MAKE) clean -C base/
@@ -29,4 +29,4 @@ debug:
 	$(MAKE) debug -C hardware/
 	$(MAKE) debug -C meta/
 	$(MAKE) debug -C tools/
-	$(MAKE) debug -C web/
+	#$(MAKE) debug -C web/
