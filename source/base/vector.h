@@ -83,12 +83,14 @@ namespace emp {
         int64_t pos = 0;
         if constexpr (std::is_same<ITERATOR_T, typename stdv_t::reverse_iterator>() ||
                       std::is_same<ITERATOR_T, typename stdv_t::const_reverse_iterator>()) {
-          pos = std::distance(*((ITERATOR_T *) this), ((stdv_t *) v_ptr)->rend()) - 1;
+          // pos = std::distance(*((ITERATOR_T *) this), ((stdv_t *) v_ptr)->rend()) - 1;
+          pos = ((stdv_t *) v_ptr)->rend() - *((ITERATOR_T *) this) - 1;
         }
         else {
-          pos = std::distance(((stdv_t *) v_ptr)->begin(), *((ITERATOR_T *) this));
+          // pos = std::distance(((stdv_t *) v_ptr)->begin(), *((ITERATOR_T *) this));
+          pos = *((ITERATOR_T *) this) - ((stdv_t *) v_ptr)->begin();
         }
-        if (pos < 0 || pos > v_ptr->size()) {
+        if (pos < 0 || ((size_t) pos) > v_ptr->size()) {
           ErrorCode() = "Iterator out of range.";
           ErrorCode() += " size=";
           ErrorCode() += std::to_string(v_ptr->size());
@@ -97,7 +99,7 @@ namespace emp {
           return false;
         }
         if (!begin_ok && pos == 0) { ErrorCode() = "Iterator not allowed at begin()."; return false; }
-        if (!end_ok && pos == v_ptr->size()) { ErrorCode() = "Iterator not allowed at end()."; return false; }
+        if (!end_ok && ((size_t) pos) == v_ptr->size()) { ErrorCode() = "Iterator not allowed at end()."; return false; }
         return true;
       }
 
