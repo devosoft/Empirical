@@ -70,9 +70,9 @@ TEST_CASE("Test World structure", "[Evolve]")
 	world2.MarkSynchronous(false);
 	REQUIRE(world2.IsSynchronous() == false);
 	world2.MarkSynchronous();
+	REQUIRE(world2.HasAttribute("PopStruct"));
 	REQUIRE(world2.GetAttribute("PopStruct") == "Grid");
 	
-	// AHhhhhhhhhh
 	world2.InjectAt(6.1, 0);
 	world2.InjectAt(3.5, 3);
 	world2.InjectAt(0.9, 6);
@@ -104,7 +104,7 @@ TEST_CASE("Test World structure", "[Evolve]")
 	//std::cout << world2.GetSystematics() << std::endl;
 	//REQUIRE(world2.GetSystematics("sys1") == w2_sys1);
 	
-	emp::World<double> world3;
+	emp::World<double> world3("World3");
 	REQUIRE(world3.GetNumOrgs() == 0);
 	emp::Random rnd(1);
 	world3.SetRandom(rnd);
@@ -116,6 +116,7 @@ TEST_CASE("Test World structure", "[Evolve]")
 	world3.SetCache();
 	REQUIRE(world3.IsCacheOn());
 	REQUIRE(world3.CalcFitnessID(0) == 6.5);
+	world3.ClearCache();
 	
 	//world3.CalcFitnessAll();
 	std::function<long long unsigned int(double&, emp::Random&)> mutfun = [](double &o, emp::Random& r){ o=o*2; return 1;};
@@ -145,9 +146,43 @@ TEST_CASE("Test World structure", "[Evolve]")
 	emp::vector<size_t> emptyIDs = world3.GetEmptyPopIDs();
 	REQUIRE(emptyIDs.size() == (world3.GetSize() - 1) );
 	
+	world3.SetAutoMutate();
+	world3.SetAddBirthFun([](emp::Ptr<double> new_org, emp::WorldPosition parent_pos){ return parent_pos.GetIndex()+1;});
+	world3.DoBirth(1.8, 0);
+	// 3.6 because mutate function (defined above) doubles the org
+	// SetAutoMutate means the org will mutate before being placed in the world
+	REQUIRE(world3[1] == 3.6);
+	
+	world3.SetAutoMutate(3);
+	world3.InjectAt(4.5, 2);
+	REQUIRE(world3[2] == 4.5);
+	world3.InjectAt(3.3, 3);
+	REQUIRE(world3[3] == 6.6);
+	
+	emp::World<double> world4;
+	REQUIRE(world4.size() == 0);
+	world4.resize(10);
+	REQUIRE(world4.size() == 10);
+	REQUIRE( (world4.begin() == world4.end()) );
+	
+	// discards qualifiers because  world_iterator::bool() is const but calls MakeValid
+	// REQUIRE(world4.begin());
+	
+	world4.InjectAt(2.3, 0);
+	REQUIRE( *world4.begin() == 2.3 );
+	
+	world4.SetGetNeighborFun([](emp::WorldPosition pos){ return emp::WorldPosition(pos.GetIndex()+1); });
+	REQUIRE(world4.GetRandomNeighborPos(0).GetIndex() == 1);
+	
+	REQUIRE(world4.GetPhenotypes().GetSize() == 0);
+	std::function<double(double&)> func = [](double& o){ return ((int)o % 2 == 0) ?  o*2.0 : o*0.5; };
+	world4.AddPhenotype("trait1", func);
+	REQUIRE(world4.GetPhenotypes().GetSize() == 1);
+	REQUIRE(world4.GetPhenotypes().Find("trait1") == 0);
 	
 	// signals?
 	// Inject into maybe a full world? try to get else statement coverage
-	// phenotype
+	// Add/Get DataNode
+	// Resize #3
 
 }
