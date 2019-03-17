@@ -103,7 +103,7 @@ namespace emp {
   class TraitSet {
   public:
     using target_t = TARGET_T;
-    using trait_t = Trait<target_t>;
+    using trait_t = BaseTrait<target_t>;
 
   protected:
     emp::vector<emp::Ptr<trait_t>> traits;
