@@ -83,19 +83,6 @@ namespace emp {
 
 }
 
-// A crude, generic printing function for emp::MapProxy.
-template <typename T>
-std::ostream & operator<<(std::ostream & out, const typename emp::MapProxy<T> & p) {
-  out << p.emp_GetValue();
-  return out;
-}
-
-template <typename T>
-std::istream & operator>>(std::istream & is, typename emp::MapProxy<T> & p) {
-  is >> p.emp_GetValue();
-  return is;
-}
-
 #endif
 
 

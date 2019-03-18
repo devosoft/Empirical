@@ -140,7 +140,19 @@ namespace emp {
   template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
   auto operator , (T1 v1, const MapProxy<T2> & v2) { return v1 , v2.emp_GetValue(); }
 
+}
 
+// A crude, generic printing function for emp::MapProxy.
+template <typename T>
+std::ostream & operator<<(std::ostream & out, const typename emp::MapProxy<T> & p) {
+  out << p.emp_GetValue();
+  return out;
+}
+
+template <typename T>
+std::istream & operator>>(std::istream & is, typename emp::MapProxy<T> & p) {
+  is >> p.emp_GetValue();
+  return is;
 }
 
 #endif
