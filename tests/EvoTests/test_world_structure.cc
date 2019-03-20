@@ -1,4 +1,5 @@
 #define CATCH_CONFIG_MAIN
+#define EMP_TDEBUG
 
 #include "third-party/Catch/single_include/catch.hpp"
 
@@ -24,10 +25,15 @@ TEST_CASE("Test World structure", "[Evolve]")
 	world.DoBirth(40, 1);
 	REQUIRE(world[1] == 40);
 	REQUIRE(world.GetNumOrgs() == 3);
+	world.InjectAt(43, 0);
+	REQUIRE(world[0] == 43);
+	REQUIRE(world.GetNumOrgs() == 3);
+	world.DoDeath();
+	REQUIRE(world.GetNumOrgs() == 2);
 	
 	SetPools(world, 2, 2, true);
 	REQUIRE(world.GetSize() == 4);
-	REQUIRE(world.GetNumOrgs() == 3);
+	REQUIRE(world.GetNumOrgs() == 2);
 	REQUIRE(world.IsSynchronous());
 	REQUIRE(world.IsSpaceStructured());
 	REQUIRE(world.GetAttribute("PopStruct") == "Pools");
@@ -41,12 +47,66 @@ TEST_CASE("Test World structure", "[Evolve]")
 	ts1.AddTrait(">50", fun);
 	std::function<double(int&)> fun2 = [](int& o){ return (o % 2 == 0) ? 0.0 : 1.0;};
 	ts1.AddTrait("IsOdd", fun2);
-	emp::vector<size_t> ts1_counts{ 1, 2 };
+	emp::vector<size_t> ts1_counts{ 1, 1 };
 	SetMapElites(world1, ts1, ts1_counts);
-	REQUIRE(world1.GetSize() == 2);
+	REQUIRE(world1.GetAttribute("PopStruct") == "MapElites");
+	REQUIRE(world1.GetSize() == 1);
 	REQUIRE(world1.IsSynchronous() == false);
 	REQUIRE(world1.IsSpaceStructured() == false);
 	world1.Inject(5);
 	REQUIRE(world1[0] == 5);
 	REQUIRE(world1.GetNumOrgs() == 1);
+	world1.DoBirth(51,0);
+	REQUIRE(world1[0] == 51);
+	world1.DoBirth(7,0);
+	REQUIRE(world1[0] == 51);
+	world1.DoDeath();
+	REQUIRE(world1.GetNumOrgs() == 0);
+	
+	#ifdef EMP_TDEBUG
+	REQUIRE(world1.GetRandomNeighborPos(0).GetIndex() == 0);
+	#endif
+	
+	emp::World<int> world2;
+	world2.Resize(10);
+	REQUIRE(world2.GetSize() == 10);
+	SetMapElites(world2, ts1);
+	REQUIRE(world2.GetAttribute("PopStruct") == "MapElites");
+	REQUIRE(world2.GetSize() == 9);
+	
+	emp::World<int> world3;
+	world3.Resize(10);
+	REQUIRE(world3.GetSize() == 10);
+	emp::TraitSet<int> ts2;
+	ts2.AddTrait("IsOdd", fun2);
+	SetMapElites(world3, ts2);
+	REQUIRE(world3.GetAttribute("PopStruct") == "MapElites");
+	REQUIRE(world3.GetSize() == 10);
+	
+	emp::World<int> world4;
+	world4.Resize(5);
+	world4.AddPhenotype(">50", fun);
+	SetMapElites(world4);
+	REQUIRE(world4.GetAttribute("PopStruct") == "MapElites");
+	REQUIRE(world4.GetSize() == 5);
+	
+	emp::World<int> world5;
+	world5.InjectAt(11, 0);
+	world5.AddPhenotype("IsOdd", fun2);
+	SetDiverseElites(world5, 1);
+	REQUIRE(world5.GetAttribute("PopStruct") == "DiverseElites");
+	REQUIRE(world5.GetSize() == 1);
+	REQUIRE(world5.IsSynchronous() == false);
+	REQUIRE(world5.IsSpaceStructured() == false);
+	
+	#ifdef EMP_TDEBUG
+	REQUIRE(world5.GetRandomNeighborPos(0).GetIndex() == 0);
+	#endif
+	
+	// Giving errors!!
+	//world5.DoDeath();
+	//world5.Inject(1);
+	//REQUIRE(world5[0] == 1);
+	//world5.DoBirth(52, 0);
+	//REQUIRE(world5[0] == 52);
 }
