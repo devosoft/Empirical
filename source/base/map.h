@@ -4,7 +4,7 @@
  *  @date 2019
  *
  *  @file map.h
- *  @brief A drop-in wrapper for std::map; makes sure we create vars on access.
+ *  @brief A drop-in wrapper for std::map and std:multimap; makes sure we create vars on access.
  *  @note Status: ALPHA
  *
  *  This class is a drop-in wrapper for std::map, adding on debbing where the indexing operator
@@ -29,6 +29,11 @@
 // Seemlessly translate emp::map to std::map
 namespace emp {
   template <typename... Ts> using map = std::map<Ts...>;
+}
+
+// Seemlessly translate emp::multimap to std::multimap
+namespace emp {
+  template <typename... Ts> using multimap = std::multimap<Ts...>;
 }
 
 #else // #EMP_NDEBUG *not* set, so debug is ON.
