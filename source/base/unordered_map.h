@@ -45,8 +45,8 @@ namespace emp {
     using key_type = Key;
     using mapped_type = T;
     using value_type = std::pair<const key_type,mapped_type>;
-    using key_compare = typename base_t::key_compare;
-    using value_compare = typename base_t::value_compare;
+    using hasher = typename base_t::hasher;
+    using key_equal = typename base_t::key_equal;
     using allocator_type = typename base_t::allocator_type;
     using reference = typename base_t::reference;
     using const_reference = typename base_t::const_reference;
@@ -54,8 +54,8 @@ namespace emp {
     using const_pointer = typename base_t::const_pointer;
     using iterator = typename base_t::iterator;
     using const_iterator = typename base_t::const_iterator;
-    using reverse_iterator = typename base_t::reverse_iterator;
-    using const_reverse_iterator = typename base_t::const_reverse_iterator;
+    using local_iterator = typename base_t::local_iterator;
+    using const_local_iterator = typename base_t::const_local_iterator;
     using difference_type = typename base_t::difference_type;
     using size_type = typename base_t::size_type;
 
@@ -70,7 +70,7 @@ namespace emp {
     unordered_map (const unordered_map& x, const allocator_type& alloc) : base_t(x, alloc) { }
     unordered_map (unordered_map && x) : base_t(std::move(x)) { }
     unordered_map (unordered_map && x, const allocator_type& alloc) : base_t(std::move(x), alloc) { }
-    map (std::initializer_list<value_type> il, const key_compare& comp = key_compare(),
+    unordered_map (std::initializer_list<value_type> il, const key_compare& comp = key_compare(),
          const allocator_type& alloc = allocator_type())
       : base_t(il, comp, alloc) { }
 
@@ -91,8 +91,8 @@ namespace emp {
     using key_type = Key;
     using mapped_type = T;
     using value_type = std::pair<const key_type,mapped_type>;
-    using key_compare = typename base_t::key_compare;
-    using value_compare = typename base_t::value_compare;
+    using hasher = typename base_t::hasher;
+    using key_equal = typename base_t::key_equal;
     using allocator_type = typename base_t::allocator_type;
     using reference = typename base_t::reference;
     using const_reference = typename base_t::const_reference;
@@ -100,8 +100,8 @@ namespace emp {
     using const_pointer = typename base_t::const_pointer;
     using iterator = typename base_t::iterator;
     using const_iterator = typename base_t::const_iterator;
-    using reverse_iterator = typename base_t::reverse_iterator;
-    using const_reverse_iterator = typename base_t::const_reverse_iterator;
+    using local_iterator = typename base_t::local_iterator;
+    using const_local_iterator = typename base_t::const_local_iterator;
     using difference_type = typename base_t::difference_type;
     using size_type = typename base_t::size_type;
 
