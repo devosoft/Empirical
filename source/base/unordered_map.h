@@ -59,20 +59,57 @@ namespace emp {
     using difference_type = typename base_t::difference_type;
     using size_type = typename base_t::size_type;
 
-    explicit unordered_map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
-      : base_t(comp, alloc) { }
-    explicit unordered_map (const allocator_type& alloc) : base_t(alloc) { }
+    unordered_map() = default;
+    explicit unordered_map ( size_type n,
+                             const hasher& hf = hasher(),
+                             const key_equal& eql = key_equal(),
+                             const allocator_type& alloc = allocator_type() )
+      : base_t (n, hf, eql, alloc) { }
+    explicit unordered_map ( const allocator_type& alloc ) : base_t (alloc) { }
+    unordered_map ( size_type n, const allocator_type& alloc ) : base_t (n, alloc) { }
+    unordered_map ( size_type n, const hasher& hf, const allocator_type& alloc ) : base_t (n, hf, alloc)  { }
+
     template <class InputIterator>
-    unordered_map (InputIterator first, InputIterator last,
-         const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
-      : base_t(first, last, comp, alloc) { }
-    unordered_map (const unordered_map& x) : base_t(x) { }
-    unordered_map (const unordered_map& x, const allocator_type& alloc) : base_t(x, alloc) { }
-    unordered_map (unordered_map && x) : base_t(std::move(x)) { }
-    unordered_map (unordered_map && x, const allocator_type& alloc) : base_t(std::move(x), alloc) { }
-    unordered_map (std::initializer_list<value_type> il, const key_compare& comp = key_compare(),
-         const allocator_type& alloc = allocator_type())
-      : base_t(il, comp, alloc) { }
+    unordered_map ( InputIterator first, InputIterator last) : base_t(first, last) { }
+    template <class InputIterator>
+    unordered_map ( InputIterator first, InputIterator last, size_type n,
+                    const hasher& hf = hasher(),
+                    const key_equal& eql = key_equal(),
+                    const allocator_type& alloc = allocator_type() )
+      : base_t (first, last, n, hf, eql, alloc) { }
+
+    template <class InputIterator>
+    unordered_map ( InputIterator first, InputIterator last,
+                    size_type n, const allocator_type& alloc )
+      : base_t (first, last, n, alloc) { }
+
+    template <class InputIterator>
+    unordered_map ( InputIterator first, InputIterator last,
+                    size_type n, const hasher& hf, const allocator_type& alloc )
+      : base_t (first, last, n, hf, alloc) { }
+
+    unordered_map ( const unordered_map & ump ) : base_t(ump) { }
+    unordered_map ( const unordered_map & ump, const allocator_type & alloc ) : base_t(ump, alloc) { }
+
+    unordered_map ( unordered_map && ump ) : base_t(ump) { }
+    unordered_map ( unordered_map && ump, const allocator_type & alloc ) : base_t(ump, alloc) { }
+
+    unordered_map ( std::initializer_list<value_type> il ) : base_t(il) { }
+
+    unordered_map ( std::initializer_list<value_type> il,
+                    size_type n,
+                    const hasher& hf = hasher(),
+                    const key_equal& eql = key_equal(),
+                    const allocator_type& alloc = allocator_type() )
+      : base_t(il, n, hf, eql, alloc) { }
+
+    unordered_map ( std::initializer_list<value_type> il,
+                    size_type n, const allocator_type& alloc )
+      : base_t(il, n, alloc) { }
+    unordered_map ( std::initializer_list<value_type> il,
+                    size_type n, const hasher& hf, const allocator_type& alloc )
+      : base_t(il, n ,hf, alloc) { }
+
 
     proxy_t operator[] (const Key & k) {
       const bool is_init = (this->find(k) != this->end());
@@ -105,20 +142,56 @@ namespace emp {
     using difference_type = typename base_t::difference_type;
     using size_type = typename base_t::size_type;
 
-    explicit unordered_multimap (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
-      : base_t(comp, alloc) { }
-    explicit unordered_multimap (const allocator_type& alloc) : base_t(alloc) { }
+    unordered_multimap() = default;
+    explicit unordered_multimap ( size_type n,
+                             const hasher& hf = hasher(),
+                             const key_equal& eql = key_equal(),
+                             const allocator_type& alloc = allocator_type() )
+      : base_t (n, hf, eql, alloc) { }
+    explicit unordered_multimap ( const allocator_type& alloc ) : base_t (alloc) { }
+    unordered_multimap ( size_type n, const allocator_type& alloc ) : base_t (n, alloc) { }
+    unordered_multimap ( size_type n, const hasher& hf, const allocator_type& alloc ) : base_t (n, hf, alloc)  { }
+
     template <class InputIterator>
-    unordered_multimap (InputIterator first, InputIterator last,
-         const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
-      : base_t(first, last, comp, alloc) { }
-    unordered_multimap (const unordered_multimap& x) : base_t(x) { }
-    unordered_multimap (const unordered_multimap& x, const allocator_type& alloc) : base_t(x, alloc) { }
-    unordered_multimap (unordered_multimap && x) : base_t(std::move(x)) { }
-    unordered_multimap (unordered_multimap && x, const allocator_type& alloc) : base_t(std::move(x), alloc) { }
-    unordered_multimap (std::initializer_list<value_type> il, const key_compare& comp = key_compare(),
-         const allocator_type& alloc = allocator_type())
-      : base_t(il, comp, alloc) { }
+    unordered_multimap ( InputIterator first, InputIterator last) : base_t(first, last) { }
+    template <class InputIterator>
+    unordered_multimap ( InputIterator first, InputIterator last, size_type n,
+                    const hasher& hf = hasher(),
+                    const key_equal& eql = key_equal(),
+                    const allocator_type& alloc = allocator_type() )
+      : base_t (first, last, n, hf, eql, alloc) { }
+
+    template <class InputIterator>
+    unordered_multimap ( InputIterator first, InputIterator last,
+                    size_type n, const allocator_type& alloc )
+      : base_t (first, last, n, alloc) { }
+
+    template <class InputIterator>
+    unordered_multimap ( InputIterator first, InputIterator last,
+                    size_type n, const hasher& hf, const allocator_type& alloc )
+      : base_t (first, last, n, hf, alloc) { }
+
+    unordered_multimap ( const unordered_multimap & ump ) : base_t(ump) { }
+    unordered_multimap ( const unordered_multimap & ump, const allocator_type & alloc ) : base_t(ump, alloc) { }
+
+    unordered_multimap ( unordered_multimap && ump ) : base_t(ump) { }
+    unordered_multimap ( unordered_multimap && ump, const allocator_type & alloc ) : base_t(ump, alloc) { }
+
+    unordered_multimap ( std::initializer_list<value_type> il ) : base_t(il) { }
+
+    unordered_multimap ( std::initializer_list<value_type> il,
+                    size_type n,
+                    const hasher& hf = hasher(),
+                    const key_equal& eql = key_equal(),
+                    const allocator_type& alloc = allocator_type() )
+      : base_t(il, n, hf, eql, alloc) { }
+
+    unordered_multimap ( std::initializer_list<value_type> il,
+                    size_type n, const allocator_type& alloc )
+      : base_t(il, n, alloc) { }
+    unordered_multimap ( std::initializer_list<value_type> il,
+                    size_type n, const hasher& hf, const allocator_type& alloc )
+      : base_t(il, n ,hf, alloc) { }
 
     proxy_t operator[] (const Key & k) {
       const bool is_init = (this->find(k) != this->end());
