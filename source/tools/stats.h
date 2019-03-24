@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2019
  *
  *  @file stats.h
  *  @brief Functions for calculating various statistics about an ensemble.
@@ -13,7 +13,6 @@
 #define EMP_STATS_H
 
 #include <type_traits>
-#include <map>
 #include <unordered_map>
 #include <cmath>
 #include <vector>
@@ -21,6 +20,7 @@
 #include <unordered_set>
 #include <functional>
 
+#include "../base/map.h"
 #include "../base/vector.h"
 #include "../meta/type_traits.h"
 #include "math.h"
@@ -62,7 +62,7 @@ namespace emp {
   ShannonEntropy(C & elements) {
 
     // Count number of each value present
-    std::map<typename C::value_type, int> counts;
+    emp::map<typename C::value_type, int> counts;
     for (auto element : elements) {
       if (counts.find(element) != counts.end()) {
 	       counts[element]++;
@@ -88,7 +88,7 @@ namespace emp {
     //   std::cout<< "In se" << std::endl;
     using pointed_at = typename emp::remove_ptr_type<typename C::value_type>::type;
     // Count number of each value present
-    std::map<pointed_at, int> counts;
+    emp::map<pointed_at, int> counts;
     for (auto element : elements) {
       if (counts.find(*element) != counts.end()) {
         counts[*element]++;
