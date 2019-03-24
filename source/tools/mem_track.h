@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2019
  *
  *  @file  mem_track.h
  *  @brief A set of macros to track how many instances of specific classes are made.
@@ -33,10 +33,10 @@
 #endif
 
 
-#include <map>
 #include <string>
 #include <sstream>
 
+#include "../base/map.h"
 #include "alert.h"
 
 #ifdef EMP_NO_MEM_CHECK
@@ -57,9 +57,9 @@ namespace emp {
 
   namespace internal {
 
-    static std::map<std::string,int> & TrackMem_GetMap() {
-      static std::map<std::string,int> * track_mem_class_map = nullptr;
-      if (!track_mem_class_map) track_mem_class_map = new std::map<std::string,int>;
+    static emp::map<std::string,int> & TrackMem_GetMap() {
+      static emp::map<std::string,int> * track_mem_class_map = nullptr;
+      if (!track_mem_class_map) track_mem_class_map = new emp::map<std::string,int>;
       return *track_mem_class_map;
     }
 
