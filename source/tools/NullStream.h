@@ -28,7 +28,7 @@ namespace emp {
     public:
       NullStream() : std::ostream(&m_sb) { ; }
     private:
-      NullBuffer m_sb;
+      NullBuffer m_sb{};
   };
 
 }
