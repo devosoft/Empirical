@@ -91,7 +91,8 @@ namespace emp {
     template <typename R_T> auto operator , (const R_T & r) { emp_assert(is_init); return value , r; }
 
     // Dynamic casting to internal type.
-    operator T&() { emp_assert(is_init); return value; }
+    operator T&() { return value; } // Note that a non-const reference doesn't need var to be initialized yet.
+    operator const T&() const { emp_assert(is_init); return value; }
   };
 
   /// A type trait to determine if a class is a MapProxy
