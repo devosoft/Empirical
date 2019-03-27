@@ -53,41 +53,46 @@ namespace emp {
     auto operator--(int) { return emp_GetValue()--; }
 
     // Setup basic arithmatic
-    auto operator+() { return +emp_GetValue(); }
-    auto operator-() { return -emp_GetValue(); }
-    auto operator!() { return !emp_GetValue(); }
-    auto operator~() { return ~emp_GetValue(); }
-    template <typename R_T> auto operator + (const R_T & r) { return emp_GetValue() + r; }
-    template <typename R_T> auto operator - (const R_T & r) { return emp_GetValue() - r; }
-    template <typename R_T> auto operator * (const R_T & r) { return emp_GetValue() * r; }
-    template <typename R_T> auto operator / (const R_T & r) { return emp_GetValue() / r; }
-    template <typename R_T> auto operator % (const R_T & r) { return emp_GetValue() % r; }
+    auto operator+() const { return +emp_GetValue(); }
+    auto operator-() const { return -emp_GetValue(); }
+    auto operator!() const { return !emp_GetValue(); }
+    auto operator~() const { return ~emp_GetValue(); }
+    template <typename R_T> auto operator + (const R_T & r) const { return emp_GetValue() + r; }
+    template <typename R_T> auto operator - (const R_T & r) const { return emp_GetValue() - r; }
+    template <typename R_T> auto operator * (const R_T & r) const { return emp_GetValue() * r; }
+    template <typename R_T> auto operator / (const R_T & r) const { return emp_GetValue() / r; }
+    template <typename R_T> auto operator % (const R_T & r) const { return emp_GetValue() % r; }
 
-    template <typename R_T> auto operator & (const R_T & r) { return emp_GetValue() & r; }
-    template <typename R_T> auto operator | (const R_T & r) { return emp_GetValue() | r; }
-    template <typename R_T> auto operator ^ (const R_T & r) { return emp_GetValue() ^ r; }
-    template <typename R_T> auto operator << (const R_T & r) { return emp_GetValue() << r; }
-    template <typename R_T> auto operator >> (const R_T & r) { return emp_GetValue() >> r; }
-    template <typename R_T> auto operator && (const R_T & r) { return emp_GetValue() && r; }
-    template <typename R_T> auto operator || (const R_T & r) { return emp_GetValue() || r; }
+    template <typename R_T> auto operator & (const R_T & r) const { return emp_GetValue() & r; }
+    template <typename R_T> auto operator | (const R_T & r) const { return emp_GetValue() | r; }
+    template <typename R_T> auto operator ^ (const R_T & r) const { return emp_GetValue() ^ r; }
+    template <typename R_T> auto operator << (const R_T & r) const { return emp_GetValue() << r; }
+    template <typename R_T> auto operator >> (const R_T & r) const { return emp_GetValue() >> r; }
+    template <typename R_T> auto operator && (const R_T & r) const { return emp_GetValue() && r; }
+    template <typename R_T> auto operator || (const R_T & r) const { return emp_GetValue() || r; }
 
     // Setup comparison operators
-    template <typename R_T> bool operator == (const R_T & r) { return emp_GetValue() == r; }
-    template <typename R_T> bool operator != (const R_T & r) { return emp_GetValue() != r; }
-    template <typename R_T> bool operator <  (const R_T & r) { return emp_GetValue() < r; }
-    template <typename R_T> bool operator <= (const R_T & r) { return emp_GetValue() <= r; }
-    template <typename R_T> bool operator >  (const R_T & r) { return emp_GetValue() > r; }
-    template <typename R_T> bool operator >= (const R_T & r) { return emp_GetValue() >= r; }
+    template <typename R_T> bool operator == (const R_T & r) const { return emp_GetValue() == r; }
+    template <typename R_T> bool operator != (const R_T & r) const { return emp_GetValue() != r; }
+    template <typename R_T> bool operator <  (const R_T & r) const { return emp_GetValue() < r; }
+    template <typename R_T> bool operator <= (const R_T & r) const { return emp_GetValue() <= r; }
+    template <typename R_T> bool operator >  (const R_T & r) const { return emp_GetValue() > r; }
+    template <typename R_T> bool operator >= (const R_T & r) const { return emp_GetValue() >= r; }
 
     // Setup member access
     template <typename R_T> auto & operator [] (const R_T & r) { emp_assert(is_init); return value[r]; }
+    template <typename R_T> const auto & operator [] const (const R_T & r) { emp_assert(is_init); return value[r]; }
     auto & operator * () { emp_assert(is_init); return *value; }
+    const auto & operator * () const { emp_assert(is_init); return *value; }
     auto operator & () { emp_assert(is_init); return &value; }
     auto operator -> () { emp_assert(is_init); return value; }
     template <typename R_T> auto & operator ->* (const R_T & r) { emp_assert(is_init); return value->*r; }
 
     // Setup remaining misc operators.
     template <typename... R_Ts> auto operator () (R_Ts &&... rs) { emp_assert(is_init); return value( std::forward<R_Ts>(rs)... ); }
+    template <typename... R_Ts> auto operator () (R_Ts &&... rs) const {
+      emp_assert(is_init); return value( std::forward<R_Ts>(rs)... );
+    }
     template <typename R_T> auto operator , (const R_T & r) { emp_assert(is_init); return value , r; }
 
     // Dynamic casting to internal type.
@@ -95,11 +100,13 @@ namespace emp {
     operator const T&() const { emp_assert(is_init); return value; }
   };
 
+
   /// A type trait to determine if a class is a MapProxy
   template <typename> struct is_MapProxy : public std::false_type { };
 
   template <typename T>
   struct is_MapProxy<MapProxy<T>> : public std::true_type { };
+
 
   // Build externaly binary operators with MapProxy as the second argument.
   template <typename T1, typename T2, typename std::enable_if<is_MapProxy<T1>() == false>::type* = nullptr>
