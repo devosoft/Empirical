@@ -30,15 +30,17 @@ TEST_CASE("Test World structure", "[Evolve]")
 	REQUIRE(world.GetNumOrgs() == 3);
 	world.DoDeath();
 	REQUIRE(world.GetNumOrgs() == 2);
+	world.Inject(48);	
+	REQUIRE(world.GetNumOrgs() == 3);
 	
 	SetPools(world, 2, 2, true);
 	REQUIRE(world.GetSize() == 4);
-	REQUIRE(world.GetNumOrgs() == 2);
+	REQUIRE(world.GetNumOrgs() == 3);
 	REQUIRE(world.IsSynchronous());
 	REQUIRE(world.IsSpaceStructured());
 	REQUIRE(world.GetAttribute("PopStruct") == "Pools");
 	world.DoBirth(42, 2);
-	REQUIRE(world[2] == 25);
+	REQUIRE(world[2] != 42);
 	REQUIRE(world.GetNextOrg(2) == 42);
 	
 	emp::World<int> world1;
@@ -103,10 +105,33 @@ TEST_CASE("Test World structure", "[Evolve]")
 	REQUIRE(world5.GetRandomNeighborPos(0).GetIndex() == 0);
 	#endif
 	
-	// Giving errors!!
-	//world5.DoDeath();
-	//world5.Inject(1);
-	//REQUIRE(world5[0] == 1);
-	//world5.DoBirth(52, 0);
-	//REQUIRE(world5[0] == 52);
+	emp::World<int> world6;
+	world6.InjectAt(4, 0);
+	world6.InjectAt(7, 1);
+	world6.InjectAt(9, 2);
+	REQUIRE(world6.GetSize() == 3);
+	emp::World_MinDistInfo<int> w6_distInfo(world6, ts2);
+	REQUIRE(w6_distInfo.CalcDist(0, 1) == 1.0);
+	REQUIRE(w6_distInfo.CalcDist(1, 2) == 0.0); // both odd
+	REQUIRE(w6_distInfo.is_setup == false);
+	w6_distInfo.Setup();
+	REQUIRE(w6_distInfo.is_setup);
+	REQUIRE(w6_distInfo.distance.size() == world6.GetSize());
+	REQUIRE(w6_distInfo.CalcBin(0) == 2); // why 2?
+	REQUIRE(w6_distInfo.bin_ids[2].size() == 3);
+	REQUIRE(w6_distInfo.bin_ids[0].size() == 0);
+	REQUIRE(w6_distInfo.bin_ids[1].size() == 0);
+	REQUIRE(w6_distInfo.nearest_id[0] == 1);
+	REQUIRE(w6_distInfo.distance[0] == 1.0);
+	
+	REQUIRE(w6_distInfo.distance.size() == 3);
+	REQUIRE(w6_distInfo.OK());
+	world6.InjectAt(11, 0);
+	REQUIRE(w6_distInfo.distance[0] == 1.0);
+	w6_distInfo.Update(0);
+	REQUIRE(w6_distInfo.distance[0] == 0.0);
+	REQUIRE(w6_distInfo.distance.size() == 3);
+	
+	w6_distInfo.Clear();
+	REQUIRE(w6_distInfo.distance.size() == 0);
 }
