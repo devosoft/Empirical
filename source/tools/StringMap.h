@@ -38,6 +38,11 @@
   }())
 
 
+/// Macro to build a fake member function for StringMap that can only be passed a literal
+/// string that will be converted at compile time.
+// #define CTGet(STR)
+
+
 namespace emp {
 
   /// A small class for maintaining unique string IDs.
@@ -93,6 +98,9 @@ namespace emp {
     T & operator[](size_t id) { return str_map[id]; }
     T & operator[](const StringID & str_id) { return str_map[str_id.ToValue()]; }
     T & operator[](const std::string & str) { return str_map[StringID(str).ToValue()]; }
+    const T & operator[](size_t id) const { return str_map[id]; }
+    const T & operator[](const StringID & str_id) const { return str_map[str_id.ToValue()]; }
+    const T & operator[](const std::string & str) const { return str_map[StringID(str).ToValue()]; }
   };
 }
 
