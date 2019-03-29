@@ -16,13 +16,16 @@ OFLAGS_web_braces := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_
 CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../source/web/library_emp.js --js-library ../../source/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' -s WASM=0
 
 default: all
-all: JSWrap.js js_utils.js test_visualizations.js color_map
+all: GetUrlParams.js JSWrap.js js_utils.js test_visualizations.js color_map
 
 color_map: color_map.cc
 	g++ $(CFLAGS_all) color_map.cc -o color_map
 
 JSWrap.js: JSWrap.cc
 	$(CXX_web) $(CFLAGS_web) JSWrap.cc -o JSWrap.js
+
+GetUrlParams.js: GetUrlParams.cc
+	$(CXX_web) $(CFLAGS_web) GetUrlParams.cc -o GetUrlParams.js
 
 js_utils.js: js_utils.cc
 	$(CXX_web) $(CFLAGS_web) js_utils.cc -o js_utils.js
