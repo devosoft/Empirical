@@ -81,7 +81,7 @@ namespace emp {
 
     // Setup member access
     template <typename R_T> auto & operator [] (const R_T & r) { emp_assert(is_init); return value[r]; }
-    template <typename R_T> const auto & operator [] const (const R_T & r) { emp_assert(is_init); return value[r]; }
+    template <typename R_T> const auto & operator [] (const R_T & r) const { emp_assert(is_init); return value[r]; }
     auto & operator * () { emp_assert(is_init); return *value; }
     const auto & operator * () const { emp_assert(is_init); return *value; }
     auto operator & () { emp_assert(is_init); return &value; }
