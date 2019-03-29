@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include <string>
 
+#include "JSWrap.h"
 #include "js_utils.h"
 
 namespace emp {
