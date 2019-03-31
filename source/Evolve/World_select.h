@@ -237,8 +237,8 @@ namespace emp {
     emp_assert(fit_funs.size() > 0);
 
     // @CAO: Can probably optimize a bit!
-
-    std::map<typename ORG::genome_t, int> genotype_counts;
+	
+    std::map<typename decltype(World<ORG>())::genome_t, int> genotype_counts;
     emp::vector<emp::vector<size_t>> genotype_lists;
 
     // Find all orgs with same genotype - we can dramatically reduce

@@ -42,9 +42,8 @@ TEST_CASE("Test World select", "[Evolve]")
 	world.Inject(7);
 	world.Inject(9);
 	
-	//emp::OptimizedLexicaseSelect(world, listOfFunctions);
-	//REQUIRE(world.GetNumOrgs() == 4);
-	//world.Update();
-	//REQUIRE(world.GetNumOrgs() == 1);
-	//REQUIRE(world[0] == 5);
+	emp::OptimizedLexicaseSelect(world, listOfFunctions);
+	REQUIRE(world.GetNumOrgs() == 4);
+	world.Update();
+	REQUIRE(world.GetNumOrgs() == 1);
 }
