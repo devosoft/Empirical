@@ -7,20 +7,26 @@
  *  @brief A template wrapper that will either enforce functionality or provide default functions.
  *
  *  Starting in future versions of C++, a concept is a set of requirements for a class to be used
- *  in a template.  This wrapper around a class can either REQUIRE functions to be present in the
- *  internal class, or provide DEFAULT functionality when functions are missing.
+ *  in a template.  This wrapper around a class is slightly more powerful than that.  It can
+ *  either REQUIRE or marks as OPTIONAL specific member functions, variables or types for a
+ *  wrapped class.  REQUIRE-d members must be available in the internal class.  OPTIONAL members
+ *  are giving a default that will be used for classes where that member is missing.
  * 
  *  Use the EMP_BUILD_CONCEPT macro to create a new concept wrapper.  Provide it with the wrapper
  *  name, and all of the rules.  The allowable rule types are:
  *  
  *  REQUIRED_FUN ( FUNCTION_NAME, ERROR_MESSAGE, RETURN_TYPE, ARG_TYPES... )
- *    Setup a function that is required to be present in the wrapped class.  If it does not
+ *    Setup a member function that is required to be in the wrapped class.  If it does not
  *    exist there, throw the provided error.
  * 
  *  OPTIONAL_FUN ( FUNCTION_NAME, DEFAULT_ACTION, RETURN_TYPE, ARG_TYPES... )
- *    Setup a function.  If it exists in the wrapped class, call that version.  If it does not
- *    exist, return the default instead.  The function signature is needed as part of the 
- *    automated testing as to whether the function exists.
+ *    Setup a member function.  If it already exists in the wrapped class, redirect to that
+ *    version when called.  If it does not already exist, perform the default action instead.
+ *    The function signature is needed to automate testing if the member function exists.
+ * 
+ *  REQUIRED_VAR ( VAR_NAME, ERROR_MESSAGE, TYPE )
+ * 
+ *  OPTIONAL_VAR ( VAR_NAME, DEFAULT_VALUE, TYPE )
  * 
  *  REQUIRED_TYPE ( TYPE_NAME, ERROR_MESSAGE )
  *    Setup a named type that must have been made available from the wrapped class.  IF it does
