@@ -16,12 +16,14 @@
  *  name, and all of the rules.  The allowable rule types are:
  *  
  *  REQUIRED_FUN ( FUNCTION_NAME, ERROR_MESSAGE, RETURN_TYPE, ARG_TYPES... )
- *    Setup a member function that is required to be in the wrapped class.  If it does not
- *    exist there, throw the provided error.
+ *    Setup a member function called FUNCTION_NAME that is required to already be defined in the
+ *    wrapped class.  If it does not exist there, trigger the ERROR_MESSAGE during compilation.
+ *    The function signature is needed to automate testing if the member function exists.
  * 
  *  OPTIONAL_FUN ( FUNCTION_NAME, DEFAULT_ACTION, RETURN_TYPE, ARG_TYPES... )
- *    Setup a member function.  If it already exists in the wrapped class, redirect to that
- *    version when called.  If it does not already exist, perform the default action instead.
+ *    Setup a member function called FUNCTION_NAME.  If it already exists in the wrapped class,
+ *    redirect to that version when called.  If it does not already exist, perform the
+ *    DEFAULT_ACTION instead (using arg1, arg2, etc as the arguments).
  *    The function signature is needed to automate testing if the member function exists.
  * 
  *  REQUIRED_VAR ( VAR_NAME, ERROR_MESSAGE, TYPE )
@@ -29,21 +31,24 @@
  *  OPTIONAL_VAR ( VAR_NAME, DEFAULT_VALUE, TYPE )
  * 
  *  REQUIRED_TYPE ( TYPE_NAME, ERROR_MESSAGE )
- *    Setup a named type that must have been made available from the wrapped class.  IF it does
- *    not exist there, throw the provided error.
+ *    Setup a member type called TYPE_NAME that is required to be defined in the wrapped class.
+ *    If it does not exist there, trigger the ERROR_MESSAGE during compilation.
  * 
  *  OPTIONAL_TYPE ( TYPE_NAME, DEFAULT_TYPE )
- *    Setup a named type.  If it exists in the wrapped class, use that version, otherwise set it
- *    to DEFAULT_TYPE.
+ *    Setup a member type called TYPE_NAME.  If it already exists in the wrapped class, use that
+ *    version.  Otherwise set it to DEFAULT_TYPE provided.
  * 
  *  PRIVATE ( CODE )
- *    All code provided will appear in the private portion of the wrapper.
+ *    All code provided will appear in the private portion of the wrapper.  Any identifiers
+ *    defined in this code will shadow public defined in the class being wrapped.
  * 
  *  PROTECTED ( CODE )
- *    All code provided will appear in the protected portion of the wrapper.
+ *    All code provided will appear in the protected portion of the wrapper.  Any identifiers
+ *    defined in this code will shadow public defined in the class being wrapped.
  *  
  *  PUBLIC ( CODE )
- *    All code provided will appear in the public portion of the wrapper.
+ *    All code provided will appear in the public portion of the wrapper.  Any identifiers
+ *    defined in this code will shadow public defined in the class being wrapped.
  * 
  * 
  *  @note: Requires C++-17 to function properly!
