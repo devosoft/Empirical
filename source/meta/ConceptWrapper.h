@@ -13,7 +13,8 @@
  *  are giving a default that will be used for classes where that member is missing.
  * 
  *  Use the EMP_BUILD_CONCEPT macro to create a new concept wrapper.  Provide it with the wrapper
- *  name, and all of the rules.  The allowable rule types are:
+ *  name, and all of the rules.  Note that since we are setting up an interface here, all of the
+ *  members below are public unless otherwise stated.  The allowable rule types are:
  *  
  *  REQUIRED_FUN ( FUNCTION_NAME, ERROR_MESSAGE, RETURN_TYPE, ARG_TYPES... )
  *    Setup a member function called FUNCTION_NAME that is required to already be defined in the
@@ -25,10 +26,6 @@
  *    redirect to that version when called.  If it does not already exist, perform the
  *    DEFAULT_ACTION instead (using arg1, arg2, etc as the arguments).
  *    The function signature is needed to automate testing if the member function exists.
- * 
- *  REQUIRED_VAR ( VAR_NAME, ERROR_MESSAGE, TYPE )
- * 
- *  OPTIONAL_VAR ( VAR_NAME, DEFAULT_VALUE, TYPE )
  * 
  *  REQUIRED_TYPE ( TYPE_NAME, ERROR_MESSAGE )
  *    Setup a member type called TYPE_NAME that is required to be defined in the wrapped class.
@@ -56,6 +53,19 @@
  *  @todo: Add the ability to rename functions from the base class.
  *  @todo: Add the ability to list several functions, requiring only one to exist.
  *         (This can be done by surrounding all names in parens to build a pack)
+ *
+ *
+ *  Currently not implementing vars (to encourage accessor-based interface), but it would look like:
+ *
+ *  REQUIRED_VAR ( VAR_NAME, ERROR_MESSAGE, TYPE )
+ *    Setup a member variable called VAR_NAME that is required to already be declared in the
+ *    wrapped class.  If it does not exist there, trigger the ERROR_MESSAGE during compilation.
+ * 
+ *  OPTIONAL_VAR ( VAR_NAME, DEFAULT_VALUE, TYPE )
+ *    Setup a member variable called VAR_NAME.  If it already exists in the wrapped class, use
+ *    that version.  If it does not already exist, create it with the provided TYPE and set it to
+ *    the DEFAULT_VALUE prodided.
+ * 
  */
 
 #ifndef EMP_CONCEPT_WRAPPER_H
@@ -86,7 +96,7 @@
   }
 
 
-// ********
+// ***************************************************************************
 // We want to do error checking to minimize confusing errors that come out of the compiler.
 
 // Any legal entry should be made empty.  Complain if anything is left!
@@ -107,13 +117,16 @@
 #define EMP_BUILD_CONCEPT__ERROR 
 
 
-// ********
+// ***************************************************************************
 // Build the base class for concepts.
 
 #define EMP_BUILD_CONCEPT__BASE( CMD ) EMP_BUILD_CONCEPT__BASE_ ## CMD
 
+// Required and optional functions should have a virtual version declared in the base class.
 #define EMP_BUILD_CONCEPT__BASE_REQUIRED_FUN(NAME, X, RETURN_T, ...) virtual RETURN_T NAME( __VA_ARGS__ ) = 0;
 #define EMP_BUILD_CONCEPT__BASE_OPTIONAL_FUN(NAME, X, RETURN_T, ...) virtual RETURN_T NAME( __VA_ARGS__ ) = 0;
+
+// Other types don't need any modification of the base class (empty macros prevent compiler errors)
 #define EMP_BUILD_CONCEPT__BASE_REQUIRED_TYPE(...)
 #define EMP_BUILD_CONCEPT__BASE_OPTIONAL_TYPE(...)
 #define EMP_BUILD_CONCEPT__BASE_PRIVATE(...)
@@ -121,7 +134,7 @@
 #define EMP_BUILD_CONCEPT__BASE_PUBLIC(...)
 
 
-// ********
+// ***************************************************************************
 // Setup the wrapper.
 
 #define EMP_BUILD_CONCEPT__PROCESS( CMD ) EMP_BUILD_CONCEPT__PROCESS_ ## CMD
