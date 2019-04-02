@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018
+ *  @date 2018-2019.
  *
  *  @file  ConceptWrapper.h
  *  @brief A template wrapper that will either enforce functionality or provide default functions.
@@ -46,6 +46,19 @@
  *  PUBLIC ( CODE )
  *    All code provided will appear in the public portion of the wrapper.  Any identifiers
  *    defined in this code will shadow public defined in the class being wrapped.
+ * 
+ * 
+ *  ----------------
+ *  DEVELOPER NOTES:
+ *    Internally, the base class declares all required and optional functions a pure virtual.
+ * 
+ *    The wrapper is a templated class that takes in the wrapped class and inherits from BOTH
+ *    the base class and the wrapped class.
+ * 
+ *    When a function is called in the base class, it automatically redirects to the derived
+ *    class (via normal virtual functionality), which will then either redirect the call to the
+ *    wrapped class or (if optional and not implemented in the wrapped class) executes the default
+ *    code.
  * 
  * 
  *  @note: Requires C++-17 to function properly!
