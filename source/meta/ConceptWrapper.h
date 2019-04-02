@@ -27,13 +27,15 @@
  *    DEFAULT_ACTION instead (using arg1, arg2, etc as the arguments).
  *    The function signature is needed to automate testing if the member function exists.
  * 
- *  REQUIRED_TEMPLATE_FUN ( FUNCTION_NAME, TYPE_OPTIONS, ERROR_MESSAGE )
+ *  REQUIRED_TEMPLATE_FUN ( FUNCTION_NAME, TYPE_OPTIONS, RETURN_TYPE, ERROR_MESSAGE )
  *    Setup a *templated* member function called FUNCTION_NAME that takes a single template 
  *    parameter; all possible template types must be listed in parentheses as TYPE_OPTIONS.
- *    The wrapped class must already define a templated function by the correct name or else the
- *    ERROR_MESSAGE will be triggered *at runtime*.
+ *    The wrapped class must already define a templated function by the correct name and with the
+ *    correct RETURN_TYPE or else the ERROR_MESSAGE will be triggered *at runtime*.
  *    Example:
  *      REQUIRED_TEMPLATE_FUN ( CountValues, (int, char, double), "Missing templated CountValues!" );
+ *    This will allow CountValues to be correctly redirected if called with any of the three
+ *    specified types as its one parameter.
  * 
  *  REQUIRED_TYPE ( TYPE_NAME, ERROR_MESSAGE )
  *    Setup a member type called TYPE_NAME that is required to be defined in the wrapped class.
@@ -124,13 +126,14 @@
 #define EMP_BUILD_CONCEPT__ERROR_CHECK( CMD ) EMP_BUILD_CONCEPT__ERROR_CHECK_impl(EMP_BUILD_CONCEPT__EC_ ## CMD, CMD)
 #define EMP_BUILD_CONCEPT__ERROR_CHECK_impl( RESULT, CMD ) EMP_BUILD_CONCEPT__CHECK_EMPTY( RESULT, CMD )
         
-#define EMP_BUILD_CONCEPT__EC_REQUIRED_FUN(...)    /* REQUIRED_FUN okay */
-#define EMP_BUILD_CONCEPT__EC_OPTIONAL_FUN(...)    /* OPTIONAL_FUN okay */
-#define EMP_BUILD_CONCEPT__EC_REQUIRED_TYPE(...)   /* REQUIRED_TYPE okay */
-#define EMP_BUILD_CONCEPT__EC_OPTIONAL_TYPE(...)   /* OPTIONAL_TYPE okay */
-#define EMP_BUILD_CONCEPT__EC_PRIVATE(...)         /* PRIVATE okay */
-#define EMP_BUILD_CONCEPT__EC_PROTECTED(...)       /* PROTECTED okay */
-#define EMP_BUILD_CONCEPT__EC_PUBLIC(...)          /* PUBLIC okay */
+#define EMP_BUILD_CONCEPT__EC_REQUIRED_FUN(...)           /* REQUIRED_FUN okay */
+#define EMP_BUILD_CONCEPT__EC_OPTIONAL_FUN(...)           /* OPTIONAL_FUN okay */
+#define EMP_BUILD_CONCEPT__EC_REQUIRED_TEMPLATE_FUN(...)  /* REQUIRED_TEMPLATE_FUN okay */
+#define EMP_BUILD_CONCEPT__EC_REQUIRED_TYPE(...)          /* REQUIRED_TYPE okay */
+#define EMP_BUILD_CONCEPT__EC_OPTIONAL_TYPE(...)          /* OPTIONAL_TYPE okay */
+#define EMP_BUILD_CONCEPT__EC_PRIVATE(...)                /* PRIVATE okay */
+#define EMP_BUILD_CONCEPT__EC_PROTECTED(...)              /* PROTECTED okay */
+#define EMP_BUILD_CONCEPT__EC_PUBLIC(...)                 /* PUBLIC okay */
 
 #define EMP_BUILD_CONCEPT__CHECK_EMPTY(A, CMD)  EMP_GET_ARG_2( EMP_BUILD_CONCEPT__SPACER ## A, \
           static_assert(false, "\n\n  \033[1;31mInvalid EMP_BUILD_CONCEPT.\033[0m May be invalid command or missing comma in:\n    \033[1;32m" #CMD "\033[0m;\n\n"); )
@@ -147,6 +150,29 @@
 #define EMP_BUILD_CONCEPT__BASE_REQUIRED_FUN(NAME, X, RETURN_T, ...) virtual RETURN_T NAME( __VA_ARGS__ ) = 0;
 #define EMP_BUILD_CONCEPT__BASE_OPTIONAL_FUN(NAME, X, RETURN_T, ...) virtual RETURN_T NAME( __VA_ARGS__ ) = 0;
 
+// Since you cannot have virtual tempalated functions, we need to do a bit of work in the bast class.
+#define EMP_BUILD_CONCEPT__BASE_REQUIRED_TEMPLATE_FUN(NAME, TYPE_OPTIONS, RETURN_T)      \
+  using EMP_template_types__ ## NAME = EMP_BUILD_TYPE_PACK ## TYPE_OPTIONS;              \
+  const size_t EMP_derived_type_id__ ## NAME;  /* Unique id for derived class type. */   \
+  /* Setup a connector that will manage functions of a specified type. */                \
+  template <typename T>                                                                  \
+  auto EMP_derived_connector__ ## NAME( T && arg ) {                                     \
+    static auto & Get(size_t obj_type_id) {                                              \
+      static emp::map< obj_type_id, std::function<RETURN_T(T)> > fun_map;                \
+      return fun_map[obj_type_id];                                                       \
+    }                                                                                    \
+  }                                                                                      \
+  /* Build the actual function that we need to redirect a call to a derived type. */     \
+  template <typename T>                                                                  \
+  auto NAME( T && arg ) {                                                                \
+    const size_t this_type_id = EMP_derived_type_id__ ## NAME;                           \
+    auto & target_fun = EMP_derived_connector__ ## NAME<T>::Get(this_type_id);           \
+    return target_fun( this, std::forward<T>(arg) );                                     \
+  }
+
+/////    constexpr size_t arg_type_id = EMP_template_types__ ## NAME :: GetID<T>();
+
+
 // Other types don't need any modification of the base class (empty macros prevent compiler errors)
 #define EMP_BUILD_CONCEPT__BASE_REQUIRED_TYPE(...)
 #define EMP_BUILD_CONCEPT__BASE_OPTIONAL_TYPE(...)
@@ -161,12 +187,12 @@
 #define EMP_BUILD_CONCEPT__PROCESS( CMD ) EMP_BUILD_CONCEPT__PROCESS_ ## CMD
 
 #define EMP_BUILD_CONCEPT__PROCESS_REQUIRED_FUN(FUN_NAME, ERROR, ...)                             \
-  EMP_BUILD_CONCEPT__REQUIRED_impl(FUN_NAME, ERROR,                                               \
-                                   EMP_DEC(EMP_COUNT_ARGS(__VA_ARGS__)), /* How many args? */     \
-                                   EMP_GET_ARG(1, __VA_ARGS__),          /* Return type */        \
-                                   EMP_POP_ARG(__VA_ARGS__) )            /* Arg types */
+  EMP_BUILD_CONCEPT__REQUIRED_FUN_impl(FUN_NAME, ERROR,                                           \
+                                       EMP_DEC(EMP_COUNT_ARGS(__VA_ARGS__)), /* How many args? */ \
+                                       EMP_GET_ARG(1, __VA_ARGS__),          /* Return type */    \
+                                       EMP_POP_ARG(__VA_ARGS__) )            /* Arg types */
 
-#define EMP_BUILD_CONCEPT__REQUIRED_impl(FUN_NAME, ERROR, NUM_ARGS, RETURN_T, ...)                \
+#define EMP_BUILD_CONCEPT__REQUIRED_FUN_impl(FUN_NAME, ERROR, NUM_ARGS, RETURN_T, ...)            \
   protected:                                                                                      \
     /* Determine return type if we try to call this function in the base class.                   \
        It should be undefined if the member functon does not exist!                           */  \
