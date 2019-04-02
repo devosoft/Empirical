@@ -27,6 +27,14 @@
  *    DEFAULT_ACTION instead (using arg1, arg2, etc as the arguments).
  *    The function signature is needed to automate testing if the member function exists.
  * 
+ *  REQUIRED_TEMPLATE_FUN ( FUNCTION_NAME, TYPE_OPTIONS, ERROR_MESSAGE )
+ *    Setup a *templated* member function called FUNCTION_NAME that takes a single template 
+ *    parameter; all possible template types must be listed in parentheses as TYPE_OPTIONS.
+ *    The wrapped class must already define a templated function by the correct name or else the
+ *    ERROR_MESSAGE will be triggered *at runtime*.
+ *    Example:
+ *      REQUIRED_TEMPLATE_FUN ( CountValues, (int, char, double), "Missing templated CountValues!" );
+ * 
  *  REQUIRED_TYPE ( TYPE_NAME, ERROR_MESSAGE )
  *    Setup a member type called TYPE_NAME that is required to be defined in the wrapped class.
  *    If it does not exist there, trigger the ERROR_MESSAGE during compilation.
