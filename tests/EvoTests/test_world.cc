@@ -41,6 +41,9 @@ TEST_CASE("Test World", "[Evolve]")
 	world1.Update();
 	REQUIRE(world1.GetNumOrgs() == 1);
 	REQUIRE(world1.GetOrg(0) == 5);
+	world1.RemoveOrgAt(0);
+	REQUIRE(world1.GetNumOrgs() == 0);
+	world1.InjectAt(5, 0);
 	
 	world1.SetAddInjectFun([](emp::Ptr<int> new_org){ return 6; });
 	world1.Inject(9);
@@ -62,15 +65,26 @@ TEST_CASE("Test World", "[Evolve]")
 	REQUIRE(world1.size() == 0);
 	
 	emp::World<double> world2("World 2");
-	world2.SetPopStruct_Grid(3, 5, true);
-	REQUIRE(world2.GetWidth() == 3);
-	REQUIRE(world2.GetHeight() == 5);
+	world2.SetPopStruct_Grid(1, 1, true);
+	REQUIRE(world2.GetWidth() == 1);
+	REQUIRE(world2.GetHeight() == 1);
+	world2.Inject(3.0);
+	REQUIRE(world2.GetNumOrgs() == 1);
+	world2.DoBirth(2.5, 0);
+	world2.DoDeath();
+	REQUIRE(world2.GetNumOrgs() == 0);
+	world2.Update();
+	REQUIRE(world2.GetNumOrgs() == 1);
+	REQUIRE(world2[0] == 2.5);
+	world2.DoDeath();
+	
 	REQUIRE(world2.IsSynchronous());
 	world2.MarkSynchronous(false);
 	REQUIRE(world2.IsSynchronous() == false);
 	world2.MarkSynchronous();
 	REQUIRE(world2.HasAttribute("PopStruct"));
 	REQUIRE(world2.GetAttribute("PopStruct") == "Grid");
+	world2.SetPopStruct_Grid(3, 5, true);
 	
 	world2.InjectAt(6.1, 0);
 	world2.InjectAt(3.5, 3);
@@ -179,9 +193,45 @@ TEST_CASE("Test World", "[Evolve]")
 	REQUIRE(world4.GetPhenotypes().GetSize() == 1);
 	//REQUIRE(world4.GetPhenotypes().Find("trait1") == 0);
 	
-	// signals?
 	// Inject into maybe a full world? try to get else statement coverage
 	// Add/Get DataNode
 	// Resize #3
-
+	// GetFile
+	// Systematics (broke?)
+	
+	// Signals
+	emp::World<double> world5;
+	world5.Resize(5);
+	world5.InjectAt(3.5, 0);
+	const emp::SignalControl sglc = world5.GetSignalControl();
+	REQUIRE(sglc.GetNumSignals() == 9);
+	REQUIRE(sglc.GetNumActions() == 0);
+	
+	std::function<void(size_t)> obr = [&world5](size_t w) mutable { world5.InjectAt(5.0, w); };
+	world5.OnBeforeRepro(obr);
+	world5.SetAddBirthFun([](emp::Ptr<double> o, emp::WorldPosition p){ return p.GetIndex()+1; });
+	world5.DoBirth(6.7, 0);
+	REQUIRE(world5[0] == 5.0);
+	REQUIRE(world5[1] == 6.7);
+	REQUIRE(world5.GetNumOrgs() == 2);
+	
+	std::function<void(size_t)> ood = [&world5](size_t w) mutable { world5.InjectAt(9.9, (w+1)%world5.size()); };
+	world5.OnOrgDeath(ood);
+	world5.RemoveOrgAt(1);
+	REQUIRE(world5[2] == 9.9);
+	REQUIRE(world5.GetNumOrgs() == 2);
+	
+	std::function<void(emp::WorldPosition, emp::WorldPosition)> oso = [&world5](emp::WorldPosition o1, emp::WorldPosition o2) mutable { world5.InjectAt(world5[o2.GetIndex()], (o1.GetIndex()+1)%world5.size()); };
+	world5.OnSwapOrgs(oso);
+	world5.Swap(0, 2);
+	REQUIRE(world5[1] == 5.0);
+	REQUIRE(world5[2] == 5.0);
+	REQUIRE(world5[0] == 9.9);
+	
+	std::function<void(double&)> oir = [&world5](double& o) mutable { o = 1.0; };
+	world5.OnInjectReady(oir);
+	world5.InjectAt(33.0, 3);
+	REQUIRE(world5[3] == 1.0);
 }
+
+

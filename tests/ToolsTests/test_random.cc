@@ -35,4 +35,15 @@ TEST_CASE("Test Random", "[tools]")
 	REQUIRE(ui64 < 100);
 	ui64 = rnd.GetUInt64(100000000000);
 	REQUIRE(ui64 < 100000000000);
+	
+	// Values are consistent when random seeded with 5
+	double rndNormal = rnd.GetRandNormal(5.0, 0.1);
+	REQUIRE( abs(rndNormal - 4.7872776323) < 0.1 );
+	
+	REQUIRE(rnd.GetRandPoisson(1.0, 0.9) == 1.0);
+	REQUIRE(rnd.GetApproxRandBinomial(3000, 0.1) == 314);
+	REQUIRE(rnd.GetApproxRandBinomial(10, 0.3) == 4);
+	
+	emp::RandomStdAdaptor randomStd(rnd);
+	REQUIRE(randomStd(4) == 3);
 }
