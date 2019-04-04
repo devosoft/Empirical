@@ -33,7 +33,7 @@ Put in a PR or raise an issue to have *your* project featured!
 
   - a phylogeny color-coded by each individual's position in the world, demonstrating the spatial dynamics of an evolving population
 
-.. _`Choose Your Words!`: https://devosoft.github.io/dynamic-word/dynamic-word
+.. _`Choose Your Words!`: https://devosoft.github.io/dynamic-word/
 .. __: https://github.com/devosoft/dynamic-word
 .. _`circle replicators with simple physics example`: https://lalejini.com/my_empirical_examples/simple_physics_example/web/example.html
 .. __: https://github.com/amlalejini/my_empirical_examples/tree/master/simple_physics_example
