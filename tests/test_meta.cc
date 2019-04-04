@@ -216,6 +216,12 @@ TEST_CASE("Test TypePack", "[meta]")
   REQUIRE(link2_t::GetSize() == 3);
   REQUIRE(merge_t::GetSize() == 6);
   REQUIRE(union_t::GetSize() == 5);
+
+  // Make sure the type trait works...
+  REQUIRE(emp::is_TypePack<test_t>() == true);
+  REQUIRE(emp::is_TypePack<union_t>() == true);
+  REQUIRE(emp::is_TypePack<int>() == false);
+  REQUIRE(emp::is_TypePack<std::vector<int>>() == false);
 }
 
 TEST_CASE("Test type traits", "[meta]") {
