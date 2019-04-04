@@ -3,7 +3,8 @@ Built With Empirical Gallery
 
 This listing showcases web tools built using Empirical.
 Put in a PR or raise an issue to have *your* project featured!
-- `Choose Your Words!` `[source]`_
+
+- `Choose Your Words!`_ `[source]`__
 
   - A pedagogical example of dynamic programming.
 
