@@ -20,7 +20,11 @@ Put in a PR or raise an issue to have *your* project featured!
 - `ecology of evolutionary computation`_ `[source]`__
 
   - interactive exploration of interaction networks in evolutionary computation under different selection schemes
-  
+
+- `Evoke`_ `[source]`__
+
+  - evolving cells in a 2D physics environment that can link together like Snowflake Yeast
+
 - `kmeans clustering example`_ `[source]`__
   
   - interactive kmeans clustering demonstration
@@ -37,6 +41,8 @@ Put in a PR or raise an issue to have *your* project featured!
 .. __: https://github.com/mmore500/dishtiny
 .. _`ecology of evolutionary computation`: https://emilydolson.github.io/ecology_of_evolutionary_computation/web/interaction_networks.html
 .. __: https://github.com/emilydolson/ecology_of_evolutionary_computation
+.. _`Evoke`: https://devosoft.github.io/Evoke
+.. __: https://github.com/devosoft/Evoke
 .. _`kmeans clustering example`: https://lalejini.com/my_empirical_examples/KMeansClusteringExample/web/kmeans_clustering.html
 .. __: https://github.com/amlalejini/my_empirical_examples/tree/master/KMeansClusteringExample
 .. _`spatial lineage visualization`: https://emilydolson.github.io/visualizations/spatial_lineage/LineageViz.html
