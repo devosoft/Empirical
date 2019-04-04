@@ -337,4 +337,7 @@ namespace emp {
   };
 }
 
+/// Macro for building a TypePack from a set of types.
+#define EMP_BUILD_TYPE_PACK(...) emp::TypePack<__VA_ARGS__>
+
 #endif
