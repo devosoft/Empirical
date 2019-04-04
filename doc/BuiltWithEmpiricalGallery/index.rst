@@ -3,6 +3,9 @@ Built With Empirical Gallery
 
 This listing showcases web tools built using Empirical.
 Put in a PR or raise an issue to have *your* project featured!
+- `Choose Your Words!` `[source]`_
+
+  - A pedagogical example of dynamic programming.
 
 - `circle replicators with simple physics example`_ `[source]`__
 
@@ -25,7 +28,8 @@ Put in a PR or raise an issue to have *your* project featured!
 
   - a phylogeny color-coded by each individual's position in the world, demonstrating the spatial dynamics of an evolving population
 
-
+.. _`Choose Your Words!`: https://devosoft.github.io/dynamic-word/dynamic-word
+.. __: https://github.com/devosoft/dynamic-word
 .. _`circle replicators with simple physics example`: https://lalejini.com/my_empirical_examples/simple_physics_example/web/example.html
 .. __: https://github.com/amlalejini/my_empirical_examples/tree/master/simple_physics_example
 .. _`dishtiny web viewer`: https://mmore500.github.io/dishtiny
