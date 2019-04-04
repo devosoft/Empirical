@@ -27,7 +27,7 @@
  *    DEFAULT_ACTION instead (using arg1, arg2, etc as the arguments).
  *    The function signature is needed to automate testing if the member function exists.
  * 
- *  REQUIRED_TEMPLATE_FUN ( FUNCTION_NAME, TYPE_OPTIONS, RETURN_TYPE, ERROR_MESSAGE )
+ *  REQUIRED_TEMPLATE_FUN ( FUNCTION_NAME, TYPE_OPTIONS, RETURN_TYPE )
  *    Setup a *templated* member function called FUNCTION_NAME that takes a single template 
  *    parameter; all possible template types must be listed in parentheses as TYPE_OPTIONS.
  *    The wrapped class must already define a templated function by the correct name and with the
@@ -272,6 +272,37 @@
           else { return DEFAULT; }                                                                \
         }                                                                                         \
       )                                                                                           \
+    }
+
+#define EMP_BUILD_CONCEPT__PROCESS_REQUIRED_TEMPLATE_FUN(FUN_NAME, TYPE_OPTIONS, RETURN_T)        \
+  protected:                                                                                      \
+    /* Determine return type if we try to call this function in the base class.                   \
+       It should be undefined if the member functon does not exist!                           */  \
+    template <typename WRAPPED_T, typename ARG_T>                                                 \
+    using return_t_ ## FUN_NAME =                                                                 \
+      decltype( std::declval<WRAPPED_T>().FUN_NAME( std::declval<ARG_T>() ) );                    \
+  public:                                                                                         \
+    /* Test whether function exists, based on SFINAE in using return type.                    */  \
+    static constexpr bool HasFun_ ## FUN_NAME() {                                                 \
+      return emp::test_type<return_t_ ## FUN_NAME, WRAPPED_T>();                                  \
+    }                                                                                             \
+    static constexpr size_t ArgCount_ ## FUN_NAME = NUM_ARGS;                                     \
+    /* Call appropriate version of the function.  First determine if there is a non-void          \
+       return type (i.e., do we return th result?) then check if the function exists in the       \
+       wrapped class or should we call/return the default (otherwise).                        */  \
+    EMP_IF( NUM_ARGS,                                                                             \
+            RETURN_T FUN_NAME( EMP_DECLARE_VARS(__VA_ARGS__) ),                                   \
+            RETURN_T FUN_NAME( )                                                                  \
+    ) {                                                                                           \
+      static_assert( HasFun_ ## FUN_NAME(), "\n\n  ** " ERROR " (Class: " "TBD" ") **\n" );       \
+      if constexpr (HasFun_ ## FUN_NAME()) {                                                      \
+        EMP_IF( EMP_TEST_IF_VOID(RETURN_T),                                                       \
+          /* void return -> call function, but don't return result. */                            \
+          { WRAPPED_T::FUN_NAME( EMP_NUMS_TO_VARS(NUM_ARGS) ); },                                 \
+          /* non-void return -> make sure to return result. */                                    \
+          { return WRAPPED_T::FUN_NAME( EMP_NUMS_TO_VARS(NUM_ARGS) ); }                           \
+        )                                                                                         \
+      }                                                                                           \
     }
 
 #define EMP_BUILD_CONCEPT__PROCESS_REQUIRED_TYPE(TYPE_NAME, ERROR)                                \
