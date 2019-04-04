@@ -27,13 +27,13 @@
  *    DEFAULT_ACTION instead (using arg1, arg2, etc as the arguments).
  *    The function signature is needed to automate testing if the member function exists.
  * 
- *  REQUIRED_TEMPLATE_FUN ( FUNCTION_NAME, TYPE_OPTIONS, RETURN_TYPE )
- *    Setup a *templated* member function called FUNCTION_NAME that takes a single template 
- *    parameter; all possible template types must be listed in parentheses as TYPE_OPTIONS.
- *    The wrapped class must already define a templated function by the correct name and with the
- *    correct RETURN_TYPE or else the ERROR_MESSAGE will be triggered *at runtime*.
+ *  REQUIRED_OVERLOAD_FUN ( FUNCTION_NAME, TYPE_OPTIONS, RETURN_TYPE )
+ *    Setup a set of overloaded member functions called FUNCTION_NAME that each take a single 
+ *    argument; TYPE_OPTIONS must be an emp::TypePAck that includes all possible aregument types.
+ *    The wrapped class must already define the full set of overloaded functions by the correct
+ *    name and with the correct RETURN_TYPE or else the ERROR_MESSAGE will be triggered.
  *    Example:
- *      REQUIRED_TEMPLATE_FUN ( CountValues, (int, char, double), "Missing templated CountValues!" );
+ *      REQUIRED_OVERLOAD_FUN ( CountValues, (int, char, double), "Missing templated CountValues!" );
  *    This will allow CountValues to be correctly redirected if called with any of the three
  *    specified types as its one parameter.
  * 
@@ -128,7 +128,7 @@
         
 #define EMP_BUILD_CONCEPT__EC_REQUIRED_FUN(...)           /* REQUIRED_FUN okay */
 #define EMP_BUILD_CONCEPT__EC_OPTIONAL_FUN(...)           /* OPTIONAL_FUN okay */
-#define EMP_BUILD_CONCEPT__EC_REQUIRED_TEMPLATE_FUN(...)  /* REQUIRED_TEMPLATE_FUN okay */
+#define EMP_BUILD_CONCEPT__EC_REQUIRED_OVERLOAD_FUN(...)  /* REQUIRED_OVERLOAD_FUN okay */
 #define EMP_BUILD_CONCEPT__EC_REQUIRED_TYPE(...)          /* REQUIRED_TYPE okay */
 #define EMP_BUILD_CONCEPT__EC_OPTIONAL_TYPE(...)          /* OPTIONAL_TYPE okay */
 #define EMP_BUILD_CONCEPT__EC_PRIVATE(...)                /* PRIVATE okay */
@@ -151,7 +151,7 @@
 #define EMP_BUILD_CONCEPT__BASE_OPTIONAL_FUN(NAME, X, RETURN_T, ...) virtual RETURN_T NAME( __VA_ARGS__ ) = 0;
 
 // Since you cannot have virtual tempalated functions, we need to do a bit of work in the bast class.
-#define EMP_BUILD_CONCEPT__BASE_REQUIRED_TEMPLATE_FUN(NAME, TYPE_OPTIONS, RETURN_T)      \
+#define EMP_BUILD_CONCEPT__BASE_REQUIRED_OVERLOAD_FUN(NAME, TYPE_OPTIONS, RETURN_T)      \
   using EMP_template_types__ ## NAME = EMP_BUILD_TYPE_PACK ## TYPE_OPTIONS;              \
   const size_t EMP_derived_type_id__ ## NAME;  /* Unique id for derived class type. */   \
   /* Setup a connector that will manage functions of a specified type. */                \
@@ -274,7 +274,7 @@
       )                                                                                           \
     }
 
-#define EMP_BUILD_CONCEPT__PROCESS_REQUIRED_TEMPLATE_FUN(FUN_NAME, TYPE_OPTIONS, RETURN_T)        \
+#define EMP_BUILD_CONCEPT__PROCESS_REQUIRED_OVERLOAD_FUN(FUN_NAME, TYPE_OPTIONS, RETURN_T)        \
   protected:                                                                                      \
     /* Determine return type if we try to call this function in the base class.                   \
        It should be undefined if the member functon does not exist!                           */  \
