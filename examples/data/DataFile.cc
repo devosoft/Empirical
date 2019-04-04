@@ -38,7 +38,7 @@ int main()
 
   double frac = 0.0;
   for (size_t i = 0; i < 10; i++) {
-    test_int += i;
+    test_int += (int)i;
     data_fracs.Add(frac += 0.01);
     data_squares.Add((int)(i*i));
     data_cubes.Add(i*i*i);

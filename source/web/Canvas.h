@@ -273,7 +273,7 @@ namespace web {
       emscripten_run_script(
         (
           std::string()
-          + "download(document.getElementById('"
+          + "emp.download(document.getElementById('"
           + Info()->id
           + "').toDataURL('img/png'), '"
           + fname

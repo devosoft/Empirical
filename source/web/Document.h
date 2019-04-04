@@ -29,6 +29,7 @@
 #include "Div.h"
 #include "FileInput.h"
 #include "Image.h"
+#include "Input.h"
 #include "Selector.h"
 #include "Table.h"
 #include "Text.h"
