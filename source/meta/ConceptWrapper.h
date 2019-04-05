@@ -27,13 +27,16 @@
  *    DEFAULT_ACTION instead (using arg1, arg2, etc as the arguments).
  *    The function signature is needed to automate testing if the member function exists.
  * 
- *  REQUIRED_OVERLOAD_FUN ( FUNCTION_NAME, TYPE_OPTIONS, RETURN_TYPE )
- *    Setup a set of overloaded member functions called FUNCTION_NAME that each take a single 
- *    argument; TYPE_OPTIONS must be an emp::TypePAck that includes all possible aregument types.
- *    The wrapped class must already define the full set of overloaded functions by the correct
- *    name and with the correct RETURN_TYPE or else the ERROR_MESSAGE will be triggered.
+ *  REQUIRED_OVERLOAD_FUN ( FUNCTION_NAME, ERROR_MESSAGE, RETURN_TYPE, ARG1_TYPES, OTHER_ARGS... )
+ *    Setup a set of overloaded member functions called FUNCTION_NAME that varies the first 
+ *    parameter (and may have additional paramters with fixed types.  ARG1_TYPES must be an
+ *    emp::TypePack that includes the full set of types to be used for the first parameter.
+ *    Zero or more additional parameters may be included in OTHER_ARGS.  The wrapped class must
+ *    already define the full set of overloaded functions by the correct name and with the correct
+ *    RETURN_TYPE or else the ERROR_MESSAGE will be triggered.
  *    Example:
- *      REQUIRED_OVERLOAD_FUN ( CountValues, (int, char, double), "Missing templated CountValues!" );
+ *      REQUIRED_OVERLOAD_FUN ( CountValues, "Missing templated CountValues!",
+ *                              int, emp::TypePack<int, char, double> );
  *    This will allow CountValues to be correctly redirected if called with any of the three
  *    specified types as its one parameter.
  * 
@@ -152,7 +155,8 @@
 
 // Since you cannot have virtual tempalated functions, we need to do a bit of work in the bast class.
 #define EMP_BUILD_CONCEPT__BASE_REQUIRED_OVERLOAD_FUN(NAME, TYPE_OPTIONS, RETURN_T)      \
-  using EMP_template_types__ ## NAME = EMP_BUILD_TYPE_PACK ## TYPE_OPTIONS;              \
+  static_assert(emp::is_TypePack<TYPE_OPTIONS>() == true,                                \
+      "Use TypeTrait for call types to require overloaded function in ConceptWrapper."); \
   const size_t EMP_derived_type_id__ ## NAME;  /* Unique id for derived class type. */   \
   /* Setup a connector that will manage functions of a specified type. */                \
   template <typename T>                                                                  \
