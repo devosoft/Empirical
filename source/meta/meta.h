@@ -30,6 +30,9 @@ namespace emp {
   template <typename T1, typename T2, typename... Ts> using second_type = T2;
   template <typename T1, typename T2, typename T3, typename... Ts> using third_type = T3;
 
+  // Create a set of type to use as a placeholder for a real type.
+  template <int> struct PlaceholderType;
+
   // Index into a template parameter pack to grab a specific type.
   namespace internal {
     template <size_t ID, typename T, typename... Ts>
