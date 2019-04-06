@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
   emp::Lexer lexer;
   lexer.AddToken("ID", "[a-zA-Z0-9.]+");         // Identifiers, tokens, and numbers (including dots)
   lexer.AddToken("Whitespace", "[ \t\n\r]+");    // Any form of whitespace.
-  lexer.AddToken("String", "\"[^\"]*\"");        // Literal strings.
+  lexer.AddToken("String", "\\\"[^\"]*\\\"");    // Literal strings.
   lexer.AddToken("Other", ".");                  // Symbols
 
   lexer.Print();
