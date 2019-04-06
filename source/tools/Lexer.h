@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2019.
  *
  *  @file  Lexer.h
  *  @brief A general-purpose, fast lexer.
@@ -184,6 +184,18 @@ namespace emp {
       for (const auto & t : token_set) t.Print(os);
       if (generate_lexer) Generate();               // Do we need to regenerate the lexer?
       lexer_dfa.Print(os);                          // Table driven lexer implementation.
+    }
+
+    /// Try out the lexer on a string and demonstrate how it's tokenized.
+    void DebugString(std::string test_string) {
+      std::stringstream ss;
+      ss << test_string;
+
+      emp::Token token = 1;
+      while (token > 0) {
+        token = Process(ss);
+        std::cout << GetTokenName(token) << " : \"" << token.lexeme << "\"" << std::endl;
+      }
     }
   };
 
