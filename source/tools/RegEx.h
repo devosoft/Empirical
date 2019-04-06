@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2019
+ *  @date 2016-2019.
  *
  *  @file  RegEx.h
  *  @brief Basic regular expression handler.
@@ -16,11 +16,12 @@
  *   '?'          - previous is optional
  *   '.'          - Match any character except \n
  *
- *  Pluse the following group contents (and change may translation rules)
+ *  Plus the following group contents (and change may translation rules)
  *   '(' and ')'  - group contents
  *   '"'          - Ignore special characters in contents (quotes still need to be escaped)
  *   '[' and ']'  - character set -- choose ONE character
- *                  ^ as first char negates contents ; - indicates range UNLESS first or last.
+ *                  '^' as first char negates contents
+ *                  '-' indicates range UNLESS first or last.
  *
  *  Additional overloads for functions in lexer_utils.h:
  *
