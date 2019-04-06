@@ -1,0 +1,30 @@
+// This is an example file of what an Empirical concept might look like
+
+concept Vehicle {
+  public:               // Everything in this section is copied verbatum.
+    DataMap data_map;   // Add a data map to all Vehicles.
+
+  functions:            // All functions go here.
+    // If a function is optional, it should indicate the default behavior.
+    bool CanFly() { return false; }  
+
+    // If a function is required, it should include a REQUIRE with an error message.
+    double MaxSpeed() { REQUIRE("MaxSpeed() is required for all vehicles!"); }
+    
+  types:
+    // If a type is optional, it should include a default setting.
+    using wheel_type = void;
+
+    // If a type is required, it should be set to REQUIRE with an error message.
+    using fuel_type = REQUIRE("All vehicles must specify their fuel type.");
+
+  functions:
+    // A single function parameter can be marked OVERLOAD.  This parameter must
+    // be a TypeSet, which will be exploded to create many versions of the function.
+    double SetPart( OVERLOAD(part_types), size_t part_id );
+}
+
+
+// DEVELOPER NOTES:
+// * Ideally, we should be able to have a full C++ parser.  For the moment, we're going
+//   to specify sections (public, protected, private, types, and functions)
