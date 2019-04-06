@@ -10,8 +10,25 @@
 
 #include <iostream>
 
-#include "../source/config/ArgManager.h"
+#include "../source/tools/File.h"
+#include "../source/tools/Lexer.h"
 
 int main(int argc, char *argv[])
 {
+  if (argc != 2) {
+    std::cout << "Format: " << argv[0] << " [input file]" << std::endl;
+    exit(0);
+  }
+
+  emp::Lexer lexer;
+  lexer.AddToken("ID", "[a-zA-Z0-9.]+");         // Identifiers, tokens, and numbers (including dots)
+  lexer.AddToken("Whitespace", "[ \t\n\r]+");    // Any form of whitespace.
+  lexer.AddToken("String", "\"[^\"]*\"");        // Literal strings.
+  lexer.AddToken("Other", ".");                  // Symbols
+
+  lexer.Print();
+  std::cout << std::endl;
+
+  lexer.DebugString("This is    a \"test\".");
+  // emp::File file(argv[1]);
 }
