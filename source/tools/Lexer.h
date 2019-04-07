@@ -5,7 +5,11 @@
  *
  *  @file  Lexer.h
  *  @brief A general-purpose, fast lexer.
- *  @note Status: BETA
+ *  @note Status: ALPHA
+ * 
+ *  @todo Fix how token IDs are handled.  Right now they count down from 255 and it's not easy to find the
+ *        TokenInfo for a particular ID.  It's also not easy to convert a single character to an appropriate
+ *        token.
  */
 
 #ifndef EMP_LEXER_H
@@ -114,6 +118,14 @@ namespace emp {
       return "Unknown";
     }
 
+    /// Get the name associated with a token type (you provide the ID)
+    bool GetDiscard(size_t id) const {
+      for (const auto & t : token_set) {
+        if (t.id == id) return t.discard;
+      }
+      return false;
+    }
+
     /// Get the full information about a token (you provide the name)
     TokenInfo GetTokenInfo(const std::string & name) const {
       for (const auto & t : token_set) {
@@ -183,13 +195,13 @@ namespace emp {
       emp::vector<Token> out_tokens;
       emp::Token token = Process(is);
       while (token > 0) {
-        out_tokens.push_back(token);
+        if (GetDiscard(token) == false) out_tokens.push_back(token);
         token = Process(is);
       }
       return out_tokens;
     }
 
-    emp::vector<Token> Tokenize(std::string & str) {
+    emp::vector<Token> Tokenize(const std::string & str) {
       std::stringstream ss;
       ss << str;
       return Tokenize(ss);
