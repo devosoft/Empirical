@@ -18,9 +18,11 @@
 #include <map>
 #include <string>
 
+#include "../base/map.h"
 #include "../base/vector.h"
 
 #include "lexer_utils.h"
+#include "map_utils.h"
 #include "RegEx.h"
 
 namespace emp {
@@ -30,12 +32,12 @@ namespace emp {
     std::string name;    ///< Name of this token type.
     std::string desc;    ///< More detailed description of this token type.
     RegEx regex;         ///< Pattern to describe token type.
-    size_t id;           ///< Unique id for token.
+    int id;              ///< Unique id for token.
     bool save_lexeme;    ///< Preserve the lexeme for this token?
     bool save_token;     ///< Keep token at all? (Whitespace and comments are often discarded).
 
-    TokenInfo(const std::string & _name, const std::string & _regex, size_t _id,
-              bool _save_l=true, bool _save_t=true, std::string _desc="")
+    TokenInfo(const std::string & _name, const std::string & _regex, int _id,
+              bool _save_l=true, bool _save_t=true, const std::string & _desc="")
       : name(_name), desc(_desc), regex(_regex), id(_id), save_lexeme(_save_l), save_token(_save_t) { ; }
     TokenInfo(const TokenInfo &) = default;
     TokenInfo(TokenInfo &&) = default;
@@ -73,80 +75,72 @@ namespace emp {
 
   /// A lexer with a set of token types (and associated regular expressions)
   class Lexer {
-  public:
-    static const size_t MAX_TOKEN_ID = 256;      // How many token IDs are possible?
-    static const size_t ERROR_ID = MAX_TOKEN_ID; // Code for unknown token ID.
-    static inline bool TokenOK(size_t id) { return id < MAX_TOKEN_ID; }
-
   private:
-    emp::vector<TokenInfo> token_set;     ///< List of all active tokens.
-    size_t cur_token_id;                  ///< Which ID should the next new token get?
-    mutable bool generate_lexer;          ///< Do we need to regenerate the lexer?
-    mutable DFA lexer_dfa;                ///< Table driven lexer implementation.
-    std::string lexeme;                   ///< Current state of lexeme being generated.
+    static constexpr int USER_START = 128;  ///< Start of user-defined IDs.
+    static constexpr int ERROR_ID = -1;     ///< Code for unknown token ID.
+
+    emp::vector<TokenInfo> token_set;       ///< List of all active tokens.
+    emp::map<std::string, int> token_map;   ///< Map of token names to id.
+    int cur_token_id = USER_START;          ///< Which ID should the next new token get?
+    mutable bool generate_lexer = false;    ///< Do we need to regenerate the lexer?
+    mutable DFA lexer_dfa;                  ///< Table driven lexer implementation.
+    std::string lexeme;                     ///< Current state of lexeme being generated.
+
+    const TokenInfo ERROR_TOKEN{"", "", ERROR_ID, true, true, "Unable to parse input!"};
 
   public:
-    Lexer()
-      : token_set(), cur_token_id(MAX_TOKEN_ID), generate_lexer(false), lexer_dfa(), lexeme() { }
+    Lexer() { ; }
     ~Lexer() { ; }
 
     /// How many types of tokens can be identified in this Lexer?
     size_t GetNumTokens() const { return token_set.size(); }
 
-    /// Add a new token, specified by a name and the regex used to identify it.
-    size_t AddToken(const std::string & in_name, const std::string & in_regex,
-                    bool save_lexeme=true, bool save_token=true) {
-      --cur_token_id;
-      generate_lexer = true;
-      token_set.emplace_back( in_name, in_regex, cur_token_id, save_lexeme, save_token );
-      return cur_token_id;
-    }
+    bool TokenOK(int id) const { return id >= 0 && id < cur_token_id; }
 
-    /// How many total token types are allowed in this lexer?
-    constexpr static size_t MaxTokenID() { return MAX_TOKEN_ID; }
+    /// Add a new token, specified by a name and the regex used to identify it.
+    int AddToken(const std::string & name, const std::string & regex,
+                    bool save_lexeme=true, bool save_token=true, const std::string & desc="") {
+      int id = cur_token_id++;                // Grab the next available token id.
+      generate_lexer = true;                  // Indicate the the lexer DFA needs to be rebuilt.
+      token_set.emplace_back( name, regex, id, save_lexeme, save_token, desc );
+      token_map[name] = id;
+      return id;
+    }
 
     /// Get the ID associated with a token type (you provide the token name)
-    size_t GetTokenID(const std::string & name) const {
-      for (const auto & t : token_set) {
-        if (t.name == name) return t.id;
-      }
-      return ERROR_ID;
+    int GetTokenID(const std::string & name) const {
+      int default_id = ERROR_ID;
+      if (name.size() == 1) default_id = (int) name[0];
+      return emp::Find(token_map, name, default_id);
+    }
+
+    /// Get the full information about a token (you provide the id)
+    const TokenInfo & GetTokenInfo(int id) const {
+      if (id < USER_START || id >= cur_token_id) return ERROR_TOKEN;
+      return token_set[(size_t)(id - USER_START)];
     }
 
     /// Get the name associated with a token type (you provide the ID)
-    std::string GetTokenName(size_t id) const {
-      if (id >= MAX_TOKEN_ID) return "Error";
+    std::string GetTokenName(int id) const {
+      if (id < 0 || id >= cur_token_id) return emp::to_string("Error (", id, "/", cur_token_id, ")");
       if (id == 0) return "EOF";
       if (id < 128) return emp::to_escaped_string((char) id);  // Individual characters.
-      for (const auto & t : token_set) {
-        if (t.id == id) return t.name;
-      }
-      return "Unknown";
+      return GetTokenInfo(id).name;
     }
 
-    /// Get the name associated with a token type (you provide the ID)
-    bool GetSaveToken(size_t id) const {
-      for (const auto & t : token_set) {
-        if (t.id == id) return t.save_token;
-      }
-      return false;
-    }
-
-    /// Get the full information about a token (you provide the name)
-    TokenInfo GetTokenInfo(const std::string & name) const {
-      for (const auto & t : token_set) {
-        if (t.name == name) return t;
-      }
-      return TokenInfo("", "", ERROR_ID);
+    /// Identify if a token should be saved.
+    bool GetSaveToken(int id) const {
+      if (id < USER_START || id >= cur_token_id) return true;
+      return GetTokenInfo(id).save_token;
     }
 
     /// Create the NFA that will identify the current set of tokens in a sequence.
     void Generate() const {
       NFA lexer_nfa;
       for (const auto & t : token_set) {
-        lexer_nfa.Merge( to_NFA(t.regex, t.id) );
+        lexer_nfa.Merge( to_NFA(t.regex, (uint8_t) t.id) );
       }
-      generate_lexer = false; // We just generated it!  Don't again unless another change is made.
+      generate_lexer = false; // We just generated it!  Don't again until another change is made.
       lexer_dfa = to_DFA(lexer_nfa);
     }
 
@@ -185,7 +179,7 @@ namespace emp {
         return { ERROR_ID, lexeme };
       }
 
-      return { (size_t) best_stop, lexeme };
+      return { best_stop, lexeme };
     }
 
     /// Shortcut to process a string rather than a stream.
