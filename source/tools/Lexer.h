@@ -75,7 +75,7 @@ namespace emp {
     static inline bool TokenOK(size_t id) { return id < MAX_TOKEN_ID; }
 
     Lexer()
-    : token_set(), cur_token_id(MAX_TOKEN_ID), generate_lexer(false), lexer_dfa(), lexeme() { }
+      : token_set(), cur_token_id(MAX_TOKEN_ID), generate_lexer(false), lexer_dfa(), lexeme() { }
     ~Lexer() { ; }
 
     /// How many types of tokens can be identified in this Lexer?
@@ -174,6 +174,22 @@ namespace emp {
       auto out_val = Process(ss);
       in_str = ss.str();
       return out_val;
+    }
+
+    emp::vector<Token> Tokenize(std::istream & is) {
+      emp::vector<Token> out_tokens;
+      emp::Token token = Process(is);
+      while (token > 0) {
+        out_tokens.push_back(token);
+        token = Process(is);
+      }
+      return out_tokens;
+    }
+
+    emp::vector<Token> Tokenize(std::string & str) {
+      std::stringstream ss;
+      ss << str;
+      return Tokenize(ss);
     }
 
     /// Get the lexeme associated with the last token identified.
