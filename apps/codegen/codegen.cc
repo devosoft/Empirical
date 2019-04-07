@@ -22,11 +22,11 @@ private:
 
 public:
   CodeGen(std::string in_filename) : filename(in_filename) {
-    lexer.AddToken("ID", "[a-zA-Z0-9.]+", true, false);         // Identifiers, tokens, and numbers (including dots)
-    lexer.AddToken("Whitespace", "[ \t\n\r]+", false, true);    // Any form of whitespace.
-    lexer.AddToken("Comment", "//.*", true, true);              // Any '//'-style comment.
-    lexer.AddToken("String", "\\\"[^\"]*\\\"", true, false);    // Literal strings.
-    lexer.AddToken("Other", ".", true, false);                  // Symbols
+    lexer.AddToken("ID", "[a-zA-Z0-9.]+", true, true);          // Identifiers, tokens, and numbers (including dots)
+    lexer.AddToken("Whitespace", "[ \t\n\r]+", false, false);   // Any form of whitespace.
+    lexer.AddToken("Comment", "//.*", true, false);             // Any '//'-style comment.
+    lexer.AddToken("String", "\\\"[^\"]*\\\"", true, true);     // Literal strings.
+    lexer.AddToken("Other", ".", true, true);                   // Symbols
 
     std::ifstream file(filename);
     tokens = lexer.Tokenize(file);
