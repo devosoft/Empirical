@@ -151,6 +151,7 @@ namespace emp {
       Ptr<re_base> pop() { auto out = nodes.back(); nodes.pop_back(); return out; }
       size_t GetSize() const override { return nodes.size(); }
       Ptr<re_parent> AsParent() override { return ToPtr(this); }
+
       bool Simplify() override {
         bool m=false;
         for (auto & x : nodes) {
@@ -456,11 +457,11 @@ namespace emp {
   public:
     RegEx() = delete;
     RegEx(const std::string & r) : regex(r), dfa(), head() {
-      Process(ToPtr(&head));
+      if (regex.size()) Process(ToPtr(&head));
       while(head.Simplify());
     }
     RegEx(const RegEx & r) : regex(r.regex), dfa(), head() {
-      Process(ToPtr(&head));
+      if (regex.size()) Process(ToPtr(&head));
       while(head.Simplify());
     }
     ~RegEx() { ; }
