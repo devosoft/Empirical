@@ -154,19 +154,13 @@
 #define EMP_BUILD_CONCEPT__BASE_OPTIONAL_FUN(NAME, X, RETURN_T, ...) virtual RETURN_T NAME( __VA_ARGS__ ) = 0;
 
 // Since you cannot have virtual tempalated functions, we need to do a bit of work in the bast class.
-#define EMP_BUILD_CONCEPT__BASE_REQUIRED_OVERLOAD_FUN(NAME, TYPE_OPTIONS, RETURN_T)      \
+// ARGS are: FUNCTION_NAME, ERROR_MESSAGE, RETURN_TYPE, ARG1_TYPES, OTHER_ARGS...
+#define EMP_BUILD_CONCEPT__BASE_REQUIRED_OVERLOAD_FUN(NAME, X, RETURN_TYPE, ...)         \
   static_assert(emp::is_TypePack<TYPE_OPTIONS>() == true,                                \
       "Use TypeTrait for call types to require overloaded function in ConceptWrapper."); \
-  const size_t EMP_derived_type_id__ ## NAME;  /* Unique id for derived class type. */   \
-  /* Setup a connector that will manage functions of a specified type. */                \
-  template <typename T>                                                                  \
-  auto EMP_derived_connector__ ## NAME( T && arg ) {                                     \
-    static auto & Get(size_t obj_type_id) {                                              \
-      static emp::map< obj_type_id, std::function<RETURN_T(T)> > fun_map;                \
-      return fun_map[obj_type_id];                                                       \
-    }                                                                                    \
-  }                                                                                      \
-  /* Build the actual function that we need to redirect a call to a derived type. */     \
+  using NAME ## __overloads_t = EMP_GET_ARG(1, __VA_ARGS__);                             \
+  using NAME ## __padded_t = NAME ## __overloads_t;                             \
+  /* Build the actual functions that we need to redirect a call to a derived type. */    \  
   template <typename T>                                                                  \
   auto NAME( T && arg ) {                                                                \
     const size_t this_type_id = EMP_derived_type_id__ ## NAME;                           \
@@ -278,7 +272,8 @@
       )                                                                                           \
     }
 
-#define EMP_BUILD_CONCEPT__PROCESS_REQUIRED_OVERLOAD_FUN(FUN_NAME, TYPE_OPTIONS, RETURN_T)        \
+// ARGS are: FUNCTION_NAME, ERROR_MESSAGE, RETURN_TYPE, ARG1_TYPES, OTHER_ARGS...
+#define EMP_BUILD_CONCEPT__PROCESS_REQUIRED_OVERLOAD_FUN(FUN_NAME, ERROR_MESSAGE, RETURN_T, ...)  \
   protected:                                                                                      \
     /* Determine return type if we try to call this function in the base class.                   \
        It should be undefined if the member functon does not exist!                           */  \
