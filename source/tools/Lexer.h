@@ -55,15 +55,17 @@ namespace emp {
 
   /// Information about a token instance from an input stream.
   struct Token {
-    size_t token_id;     ///< Which type of token is this?
-    std::string lexeme;  ///< The specific sequence matched by this token.
+    int token_id;     ///< Which type of token is this?
+    std::string lexeme;  ///< Sequence matched by this token (or empty if not saved)
 
-    Token(size_t id, const std::string & str="") : token_id(id), lexeme(str) { ; }
+    Token(int id, const std::string & str="") : token_id(id), lexeme(str) { ; }
     Token(const Token &) = default;
+    Token(Token &&) = default;
     Token & operator=(const Token &) = default;
+    Token & operator=(Token &&) = default;
 
-    /// Token will automatically convert to its ID if used as an unsigned int.
-    operator size_t() { return token_id; }
+    /// Token will automatically convert to its ID if used as an int.
+    operator int() { return token_id; }
 
     /// Token will automatically convert to its matched sequence (lexeme) is used as a string.
     operator const std::string &() { return lexeme; }
