@@ -25,19 +25,22 @@
 
 namespace emp {
 
-  /// Information about an individual token type to be processed within a Lexer.
+  /// Information about an individual TYPE of token to be processed within a Lexer.
   struct TokenInfo {
     std::string name;    ///< Name of this token type.
+    std::string desc;    ///< More detailed description of this token type.
     RegEx regex;         ///< Pattern to describe token type.
     size_t id;           ///< Unique id for token.
-    bool save_lexeme;    ///< Should we preserve the lexeme for this token?
-    bool discard;        ///< Should we elimininate this token after it is identified.
+    bool save_lexeme;    ///< Preserve the lexeme for this token?
+    bool save_token;     ///< Keep token at all? (Whitespace and comments are often discarded).
 
     TokenInfo(const std::string & _name, const std::string & _regex, size_t _id,
-              bool _save=true, bool _discard=false)
-      : name(_name), regex(_regex), id(_id), save_lexeme(_save), discard(_discard) { ; }
+              bool _save_l=true, bool _save_t=true, std::string _desc="")
+      : name(_name), desc(_desc), regex(_regex), id(_id), save_lexeme(_save_l), save_token(_save_t) { ; }
     TokenInfo(const TokenInfo &) = default;
+    TokenInfo(TokenInfo &&) = default;
     TokenInfo & operator=(const TokenInfo &) = default;
+    TokenInfo & operator=(TokenInfo &&) = default;
 
     /// Print out the status of this token (for debugging)
     void Print(std::ostream & os=std::cout) const {
@@ -45,7 +48,7 @@ namespace emp {
          << "  RegEx:" << regex.AsString()
          << "  ID:" << id
          << "  save_lexeme:" << save_lexeme
-         << "  discard:" << discard
+         << "  save_token:" << save_token
          << std::endl;
     }
   };
@@ -68,6 +71,11 @@ namespace emp {
 
   /// A lexer with a set of token types (and associated regular expressions)
   class Lexer {
+  public:
+    static const size_t MAX_TOKEN_ID = 256;      // How many token IDs are possible?
+    static const size_t ERROR_ID = MAX_TOKEN_ID; // Code for unknown token ID.
+    static inline bool TokenOK(size_t id) { return id < MAX_TOKEN_ID; }
+
   private:
     emp::vector<TokenInfo> token_set;     ///< List of all active tokens.
     size_t cur_token_id;                  ///< Which ID should the next new token get?
@@ -76,10 +84,6 @@ namespace emp {
     std::string lexeme;                   ///< Current state of lexeme being generated.
 
   public:
-    static const size_t MAX_TOKEN_ID = 256;      // How many token IDs are possible?
-    static const size_t ERROR_ID = MAX_TOKEN_ID; // Code for unknown token ID.
-    static inline bool TokenOK(size_t id) { return id < MAX_TOKEN_ID; }
-
     Lexer()
       : token_set(), cur_token_id(MAX_TOKEN_ID), generate_lexer(false), lexer_dfa(), lexeme() { }
     ~Lexer() { ; }
@@ -89,10 +93,10 @@ namespace emp {
 
     /// Add a new token, specified by a name and the regex used to identify it.
     size_t AddToken(const std::string & in_name, const std::string & in_regex,
-                    bool save_lexeme=true, bool discard=false) {
+                    bool save_lexeme=true, bool save_token=true) {
       --cur_token_id;
       generate_lexer = true;
-      token_set.emplace_back( in_name, in_regex, cur_token_id, save_lexeme, discard );
+      token_set.emplace_back( in_name, in_regex, cur_token_id, save_lexeme, save_token );
       return cur_token_id;
     }
 
@@ -119,9 +123,9 @@ namespace emp {
     }
 
     /// Get the name associated with a token type (you provide the ID)
-    bool GetDiscard(size_t id) const {
+    bool GetSaveToken(size_t id) const {
       for (const auto & t : token_set) {
-        if (t.id == id) return t.discard;
+        if (t.id == id) return t.save_token;
       }
       return false;
     }
@@ -195,7 +199,7 @@ namespace emp {
       emp::vector<Token> out_tokens;
       emp::Token token = Process(is);
       while (token > 0) {
-        if (GetDiscard(token) == false) out_tokens.push_back(token);
+        if (GetSaveToken(token)) out_tokens.push_back(token);
         token = Process(is);
       }
       return out_tokens;
