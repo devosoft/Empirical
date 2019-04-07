@@ -22,10 +22,11 @@ private:
 
 public:
   CodeGen(std::string in_filename) : filename(in_filename) {
-    lexer.AddToken("ID", "[a-zA-Z0-9.]+");         // Identifiers, tokens, and numbers (including dots)
-    lexer.AddToken("Whitespace", "[ \t\n\r]+");    // Any form of whitespace.
-    lexer.AddToken("String", "\\\"[^\"]*\\\"");    // Literal strings.
-    lexer.AddToken("Other", ".");                  // Symbols
+    lexer.AddToken("ID", "[a-zA-Z0-9.]+", true, false);         // Identifiers, tokens, and numbers (including dots)
+    lexer.AddToken("Whitespace", "[ \t\n\r]+", false, true);    // Any form of whitespace.
+    lexer.AddToken("Comment", "//.*", true, true);             // Any '//'-style comment.
+    lexer.AddToken("String", "\\\"[^\"]*\\\"", true, false);    // Literal strings.
+    lexer.AddToken("Other", ".", true, false);                  // Symbols
 
     std::ifstream file(filename);
     tokens = lexer.Tokenize(file);
@@ -33,7 +34,12 @@ public:
   }
 
   void PrintLexerState() { lexer.Print(); }
-  void TestLexer() { lexer.DebugString("This is    a \"test\"."); }
+
+  void PrintTokens() {
+    for (auto token : tokens) {
+      std::cout << lexer.GetTokenName(token) << " : \"" << token.lexeme << "\"" << std::endl;
+    }
+  }
 };
 
 int main(int argc, char *argv[])
@@ -46,5 +52,5 @@ int main(int argc, char *argv[])
   CodeGen codegen(argv[1]);
   codegen.PrintLexerState();
   std::cout << std::endl;
-  codegen.TestLexer();
+  codegen.PrintTokens();
 }
