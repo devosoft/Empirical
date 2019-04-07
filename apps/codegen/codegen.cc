@@ -8,10 +8,33 @@
  *  @note Status: PLANNING
  */
 
+#include <fstream>
 #include <iostream>
+#include <string>
 
-#include "../source/tools/File.h"
-#include "../source/tools/Lexer.h"
+#include "../../source/tools/Lexer.h"
+
+class CodeGen {
+private:
+  std::string filename;
+  emp::Lexer lexer;
+  emp::vector<emp::Token> tokens;
+
+public:
+  CodeGen(std::string in_filename) : filename(in_filename) {
+    lexer.AddToken("ID", "[a-zA-Z0-9.]+");         // Identifiers, tokens, and numbers (including dots)
+    lexer.AddToken("Whitespace", "[ \t\n\r]+");    // Any form of whitespace.
+    lexer.AddToken("String", "\\\"[^\"]*\\\"");    // Literal strings.
+    lexer.AddToken("Other", ".");                  // Symbols
+
+    std::ifstream file(filename);
+    tokens = lexer.Tokenize(file);
+    file.close();
+  }
+
+  void PrintLexerState() { lexer.Print(); }
+  void TestLexer() { lexer.DebugString("This is    a \"test\"."); }
+};
 
 int main(int argc, char *argv[])
 {
@@ -20,15 +43,8 @@ int main(int argc, char *argv[])
     exit(0);
   }
 
-  emp::Lexer lexer;
-  lexer.AddToken("ID", "[a-zA-Z0-9.]+");         // Identifiers, tokens, and numbers (including dots)
-  lexer.AddToken("Whitespace", "[ \t\n\r]+");    // Any form of whitespace.
-  lexer.AddToken("String", "\\\"[^\"]*\\\"");    // Literal strings.
-  lexer.AddToken("Other", ".");                  // Symbols
-
-  lexer.Print();
+  CodeGen codegen(argv[1]);
+  codegen.PrintLexerState();
   std::cout << std::endl;
-
-  lexer.DebugString("This is    a \"test\".");
-  // emp::File file(argv[1]);
+  codegen.TestLexer();
 }
