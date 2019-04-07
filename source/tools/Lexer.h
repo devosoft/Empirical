@@ -27,10 +27,11 @@ namespace emp {
     RegEx regex;         ///< Pattern to describe token type.
     size_t id;           ///< Unique id for token.
     bool save_lexeme;    ///< Should we preserve the lexeme for this token?
+    bool discard;        ///< Should we elimininate this token after it is identified.
 
-    // TokenInfo() : name(""), regex(""), id(-1), save_lexeme(false) { ; }
-    TokenInfo(const std::string & n, const std::string & r, size_t i, bool s=false)
-      : name(n), regex(r), id(i), save_lexeme(s) { ; }
+    TokenInfo(const std::string & _name, const std::string & _regex, size_t _id,
+              bool _save=true, bool _discard=false)
+      : name(_name), regex(_regex), id(_id), save_lexeme(_save), discard(_discard) { ; }
     TokenInfo(const TokenInfo &) = default;
     TokenInfo & operator=(const TokenInfo &) = default;
 
@@ -40,6 +41,7 @@ namespace emp {
          << "  RegEx:" << regex.AsString()
          << "  ID:" << id
          << "  save_lexeme:" << save_lexeme
+         << "  discard:" << discard
          << std::endl;
     }
   };
@@ -82,10 +84,11 @@ namespace emp {
     size_t GetNumTokens() const { return token_set.size(); }
 
     /// Add a new token, specified by a name and the regex used to identify it.
-    size_t AddToken(const std::string & in_name, const std::string & in_regex) {
+    size_t AddToken(const std::string & in_name, const std::string & in_regex,
+                    bool save_lexeme=true, bool discard=false) {
       --cur_token_id;
       generate_lexer = true;
-      token_set.emplace_back( in_name, in_regex, cur_token_id );
+      token_set.emplace_back( in_name, in_regex, cur_token_id, save_lexeme, discard );
       return cur_token_id;
     }
 
