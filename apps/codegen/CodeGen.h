@@ -6,6 +6,29 @@
  *  @file  CodeGen.h
  *  @brief A system to generate dynamic concept code for C++17.
  *  @note Status: PLANNING
+ *
+ *  NOTES:
+ *   - TYPE_OR_EXPRESSION: Collect everything until you hit an unmatched close-mark: ')', ']', '}', or '>'
+ *   - STATEMENT: Collect everything until you hit a ';' outside of parens.
+ *   - STATEMENT_LIST: (nothing)
+ *                   | STATEMENT STATEMENT_LIST
+ * 
+ *   - TYPE: ID TYPE_END
+ *   - TYPE_END: (nothing)
+ *             | "::" TYPE
+ *             | "<" TYPE_OR_EXPRESSION ">" TYPE_END
+ *   - DECLARE: TYPE ID
+ *   - FUNCTION: DECLARE '(' PARAMS ')'
+ *   - PARAMS: (nothing)
+ *           | PARAM_LIST
+ *   - PARAM_LIST: PARAM
+ *               | PARAM ',' PARAM_LIST
+ *   - PARAM: DECLARE
+ *          | OVERLOAD '(' ID ')'
+ *   - MEMBER: DECLARE ';'
+ *           | FUNCTION BLOCK
+ *           | "using" ID '=' TYPE ';'
+ *           | "using" ID '=' "REQUIRE" '(' STRING ')' ';'
  */
 
 #include <fstream>
