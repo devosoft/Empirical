@@ -20,19 +20,47 @@ private:
   emp::Lexer lexer;
   emp::vector<emp::Token> tokens;
 
+  int token_id = -1;
+  int token_number = -1;
+  int token_string = -1;
+  int token_other = -1;
+
 public:
   CodeGen(std::string in_filename) : filename(in_filename) {
-    lexer.AddToken("ID", "[a-zA-Z0-9.]+", true, true);          // Identifiers, tokens, and numbers (including dots)
     lexer.AddToken("Whitespace", "[ \t\n\r]+", false, false);   // Any form of whitespace.
     lexer.AddToken("Comment", "//.*", true, false);             // Any '//'-style comment.
-    lexer.AddToken("String", "\\\"[^\"]*\\\"", true, true);     // Literal strings.
-    lexer.AddToken("Other", ".", true, true);                   // Symbols
+    token_id = lexer.AddToken("ID", "[a-zA-Z_][a-zA-Z0-9_]+", true, true);     // Identifiers
+    token_number = lexer.AddToken("Number", "[0-9]+(.[0-9]+)?", true, true);   // Literal numbers.
+    token_string = lexer.AddToken("String", "\\\"[^\"]*\\\"", true, true);     // Literal strings.
+    token_other = lexer.AddToken("Other", ".", true, true);                    // Symbols
 
     std::ifstream file(filename);
     tokens = lexer.Tokenize(file);
     file.close();
   }
 
+  // Process the tokens starting from the outer-most scope.
+  size_t ProcessTop(size_t pos=0) {
+    if (tokens[pos] != token_id) {
+      std::cerr << "Statements in outer scope must being with an identifier or keyword.  Aborting."
+                << std::endl;
+      exit(1);
+    }
+
+    if (tokens[pos].lexeme == "concept") {
+      return ProcessConcept(pos + 1);
+    }
+    else {
+      std::cerr << "Unknown keyword '" << tokens[pos].lexeme << "'.  Aborting." << std::endl;
+      exit(1);
+    }
+  }
+
+  // We know we are in a concept definition.  Collect appropriate information.
+  size_t ProcessConcept(size_t pos) {
+    return pos;
+  }
+  
   void PrintLexerState() { lexer.Print(); }
 
   void PrintTokens() {
