@@ -6,10 +6,6 @@
  *  @file  Lexer.h
  *  @brief A general-purpose, fast lexer.
  *  @note Status: ALPHA
- * 
- *  @todo Fix how token IDs are handled.  Right now they count down from 255 and it's not easy to find the
- *        TokenInfo for a particular ID.  It's also not easy to convert a single character to an appropriate
- *        token.
  */
 
 #ifndef EMP_LEXER_H
@@ -57,7 +53,7 @@ namespace emp {
 
   /// Information about a token instance from an input stream.
   struct Token {
-    int token_id;     ///< Which type of token is this?
+    int token_id;        ///< Which type of token is this?
     std::string lexeme;  ///< Sequence matched by this token (or empty if not saved)
 
     Token(int id, const std::string & str="") : token_id(id), lexeme(str) { ; }
@@ -76,12 +72,12 @@ namespace emp {
   /// A lexer with a set of token types (and associated regular expressions)
   class Lexer {
   private:
-    static constexpr int USER_START = 128;  ///< Start of user-defined IDs.
+    static constexpr int MAX_ID = 255;      ///< IDs count down so that first ones have priority.
     static constexpr int ERROR_ID = -1;     ///< Code for unknown token ID.
 
     emp::vector<TokenInfo> token_set;       ///< List of all active tokens.
     emp::map<std::string, int> token_map;   ///< Map of token names to id.
-    int cur_token_id = USER_START;          ///< Which ID should the next new token get?
+    int cur_token_id = MAX_ID;              ///< Which ID should the next new token get?
     mutable bool generate_lexer = false;    ///< Do we need to regenerate the lexer?
     mutable DFA lexer_dfa;                  ///< Table driven lexer implementation.
     std::string lexeme;                     ///< Current state of lexeme being generated.
@@ -98,9 +94,10 @@ namespace emp {
     bool TokenOK(int id) const { return id >= 0 && id < cur_token_id; }
 
     /// Add a new token, specified by a name and the regex used to identify it.
+    /// Note that token idea count down with highest IDs having priority.
     int AddToken(const std::string & name, const std::string & regex,
                     bool save_lexeme=true, bool save_token=true, const std::string & desc="") {
-      int id = cur_token_id++;                // Grab the next available token id.
+      int id = cur_token_id--;                // Grab the next available token id.
       generate_lexer = true;                  // Indicate the the lexer DFA needs to be rebuilt.
       token_set.emplace_back( name, regex, id, save_lexeme, save_token, desc );
       token_map[name] = id;
@@ -116,21 +113,22 @@ namespace emp {
 
     /// Get the full information about a token (you provide the id)
     const TokenInfo & GetTokenInfo(int id) const {
-      if (id < USER_START || id >= cur_token_id) return ERROR_TOKEN;
-      return token_set[(size_t)(id - USER_START)];
+      if (id > MAX_ID || id <= cur_token_id) return ERROR_TOKEN;
+      return token_set[(size_t)(MAX_ID - id)];
     }
 
     /// Get the name associated with a token type (you provide the ID)
-    std::string GetTokenName(int id) const {
-      if (id < 0 || id >= cur_token_id) return emp::to_string("Error (", id, "/", cur_token_id, ")");
-      if (id == 0) return "EOF";
+    std::string GetTokenName(int id) const {      
+      if (id < 0) return emp::to_string("Error (", id, ")");   // Negative tokens specify errors.
+      if (id == 0) return "EOF";                               // Token zero is end-of-file.
       if (id < 128) return emp::to_escaped_string((char) id);  // Individual characters.
-      return GetTokenInfo(id).name;
+      if (id <= cur_token_id) return emp::to_string("Error (", id, ")"); // Invalid token range!
+      return GetTokenInfo(id).name;                            // User-defined tokens.
     }
 
     /// Identify if a token should be saved.
     bool GetSaveToken(int id) const {
-      if (id < USER_START || id >= cur_token_id) return true;
+      if (id > MAX_ID || id <= cur_token_id) return true;
       return GetTokenInfo(id).save_token;
     }
 
