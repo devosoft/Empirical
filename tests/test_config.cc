@@ -8,6 +8,8 @@
 #include <iostream>
 
 #include "base/assert.h"
+#include "base/vector.h"
+#include "config/ArgManager.h"
 #include "config/command_line.h"
 #include "config/config.h"
 #include "config/config_setup.h"
@@ -26,4 +28,14 @@ TEST_CASE("Test config", "[config]"){
   std::cout << "Random seed = " << config.RANDOM_SEED() << std::endl;
 
   REQUIRE(config.RANDOM_SEED() == 123);
+
+  emp::vector<std::string> arguments = {"--dir", "/some_path"};
+
+  std::vector<char*> argv;
+  for (const auto& arg : arguments) argv.push_back((char*)arg.data());
+
+  argv.push_back(nullptr);
+
+  emp::cl::ArgManager am(argv.size() - 1, argv.data());
+
 }
