@@ -27,14 +27,18 @@ private:
 
 public:
   CodeGen(std::string in_filename) : filename(in_filename) {
-    token_other = lexer.AddToken("Other", ".", true, true);                  // Symbols
+    // Whitespace and comments should always be dismissed (top priority)
+    lexer.AddToken("Whitespace", "[ \t\n\r]+", false, false);                // Any form of whitespace.
+    lexer.AddToken("Comment", "//.*", true, false);                          // Any '//'-style comment.
+
+    // Meaningful tokens have next priority.
     token_id = lexer.AddToken("ID", "[a-zA-Z_][a-zA-Z0-9_]+", true, true);   // Identifiers
     token_number = lexer.AddToken("Number", "[0-9]+(.[0-9]+)?", true, true); // Literal numbers.
     token_string = lexer.AddToken("String", "\\\"[^\"]*\\\"", true, true);   // Literal strings.
 
-    // And tokens to dismiss.
-    lexer.AddToken("Whitespace", "[ \t\n\r]+", false, false);                // Any form of whitespace.
-    lexer.AddToken("Comment", "//.*", true, false);                          // Any '//'-style comment.
+    // Other tokens should have least priority.
+    token_other = lexer.AddToken("Other", ".", true, true);                  // Symbols
+
 
     std::ifstream file(filename);
     tokens = lexer.Tokenize(file);
