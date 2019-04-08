@@ -3,7 +3,7 @@
 
 #include "third-party/Catch/single_include/catch.hpp"
 
-#include "Evolve/Systematics.h"
+#include "Evolve/SystematicsAnalysis.h"
 
 #include <sstream>
 #include <iostream>
@@ -85,4 +85,34 @@ TEST_CASE("Test Systematics", "[Evolve]")
 	REQUIRE(emp::assert_last_fail);
 	emp::assert_clear();
 	#endif
+	
+	// Analysis
+	using my_taxon = emp::Taxon<std::string, emp::datastruct::mut_landscape_info<double>>;
+	//emp::Systematics<double, std::string, emp::datastruct::mut_landscape_info> sys2(calc_taxon)
+	my_taxon taxon1(1, "medium");
+	emp::Ptr<my_taxon> ptr1 = &taxon1;
+	REQUIRE(emp::LineageLength(ptr1) == 1);
+	my_taxon taxon2(1, "medium", ptr1);
+	emp::Ptr<my_taxon> ptr2 = &taxon2;
+	REQUIRE(emp::LineageLength(ptr1) == 1);
+	REQUIRE(emp::LineageLength(ptr2) == 2);
+	std::unordered_map<std::string, int> muts;
+	muts["short"] = 12;
+	muts["tall"] = 3;
+	taxon2.GetData().RecordMutation(muts);
+	REQUIRE(taxon2.GetData().mut_counts.size() == 2);
+	REQUIRE(taxon2.GetData().mut_counts["tall"] == 3);
+	
+	emp::vector<std::string> types;
+	types.push_back("tall");
+	types.push_back("short");
+	REQUIRE(emp::CountMuts(ptr2, types) == 15);
+	REQUIRE(emp::CountMutSteps(ptr2, types) == 2);
+	REQUIRE(emp::CountMutSteps(ptr2, "short") == 1);
+	muts["short"] = 4;
+	taxon1.GetData().RecordMutation(muts);
+	REQUIRE(emp::CountMuts(ptr1, "short") == 4);
+	REQUIRE(emp::CountMuts(ptr2, "short") == 16);
+	REQUIRE(emp::CountMutSteps(ptr1, "short") == 1);
+	REQUIRE(emp::CountMutSteps(ptr2, "short") == 2);
 }
