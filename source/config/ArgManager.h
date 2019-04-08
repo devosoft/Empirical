@@ -111,7 +111,7 @@ namespace emp {
         bool const_macros  = macro_file.size() && UseFlag("--make-const", "Generate const version of macros file.");
 
         if (print_help)    { PrintHelp(os); return false; }
-        if (create_config) { 
+        if (create_config) {
           os << "Generating new config file: " << cfg_file << std::endl;
           config.Write(cfg_file);
           return false;
