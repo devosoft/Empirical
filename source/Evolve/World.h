@@ -1360,7 +1360,7 @@ namespace emp {
   template<typename ORG>
   void World<ORG>::Print(std::ostream & os, const std::string & empty, const std::string & spacer) {
     for (Ptr<ORG> org : pop) {
-      if (org) os << fun_print_org(*org, os);
+      if (org) fun_print_org(*org, os);
       else os << empty;
       os << spacer;
     }

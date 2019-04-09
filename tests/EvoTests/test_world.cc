@@ -200,7 +200,7 @@ TEST_CASE("Test World", "[Evolve]")
 	// GetFile
 	// Systematics (broke?)
 	
-	// Signals
+	// Signals - having issues with clang++ test coverage
 	/*emp::World<double> world5;
 	world5.Resize(5);
 	world5.InjectAt(3.5, 0);
@@ -234,4 +234,36 @@ TEST_CASE("Test World", "[Evolve]")
 	world5.InjectAt(33.0, 3);
 	REQUIRE(world5[3] == 1.0);
 	*/
+	
+	emp::World<double> world6;
+	world6.resize(5);
+	world6.InjectAt(5.0, 0);
+	world6.InjectAt(10.0, 1);
+	world6.InjectAt(15.0, 2);
+	world6.InjectAt(20.0, 3);
+	world6.InjectAt(25.0, 4);
+	emp::World_iterator<emp::World<double>> w_it = world6.begin();
+	emp::World_iterator<emp::World<double>> w_it1 = world6.begin();
+	REQUIRE(*w_it == 5.0);
+	++w_it;
+	REQUIRE(*w_it == 10.0);
+	--w_it;
+	REQUIRE(*w_it == 5.0);
+	++w_it;
+	++w_it;
+	++w_it;
+	w_it1 = w_it;
+	REQUIRE(*w_it1 == 20.0);
+	--w_it;
+	REQUIRE( (w_it < w_it1) );
+	REQUIRE( (w_it <= w_it1) );
+	REQUIRE( (w_it1 > w_it) );
+	REQUIRE( (w_it1 >= w_it) );
+	REQUIRE( (w_it1 != w_it) );
+	++w_it;
+	REQUIRE( (w_it == w_it1) );
+	REQUIRE( (w_it <= w_it1) );
+	REQUIRE( (w_it >= w_it1) );
+	REQUIRE( (w_it.begin() == world6.begin()) );
+	REQUIRE( (w_it.end() == world6.end()) );
 }

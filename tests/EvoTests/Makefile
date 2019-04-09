@@ -1,4 +1,4 @@
-TEST_NAMES = world world_structure world_select nk systematics
+TEST_NAMES = world world_structure world_select nk systematics world_reflect
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 FLAGS = -std=c++14 -Wall -Wno-unused-function -I../../source/ -I../../
