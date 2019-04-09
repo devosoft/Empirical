@@ -10,8 +10,9 @@
  *  NOTES:
  *   - TYPE_OR_EXPRESSION: Collect everything until you hit an unmatched close-mark: ')', ']', '}', or '>'
  *   - STATEMENT: Collect everything until you hit a ';' outside of parens.
- *   - STATEMENT_LIST: (nothing)
+ *   - STATEMENT_LIST: (nothing)                  (an unmatched close-mark next requires this option)
  *                   | STATEMENT STATEMENT_LIST
+ *   - BLOCK: '{' STATEMENT_LIST '}'
  * 
  *   - TYPE: ID TYPE_END
  *   - TYPE_END: (nothing)
@@ -35,6 +36,7 @@
 #include <iostream>
 #include <string>
 
+#include "../../source/base/Ptr.h"
 #include "../../source/tools/Lexer.h"
 
 class CodeGen {
@@ -47,6 +49,25 @@ private:
   int token_number = -1;
   int token_string = -1;
   int token_other = -1;
+
+  // All AST Nodes have a common base class.
+  struct AST_Node {
+    emp::vector<emp::Ptr<AST_Node>> children;
+    ~AST_Node() { for (auto x : children) x.Delete(); }
+    void AddChild(emp::Ptr<AST_Node> node_ptr) { children.push_back(node_ptr); }
+  };
+
+  // Misc. Code that should just be echoed back out.
+  struct AST_Code : AST_Node {
+    std::string code;
+  };
+
+  // Full concept information.
+  struct AST_Concept : AST_Node {
+    
+  };
+
+  AST_Node ast_root;
 
 public:
   CodeGen(std::string in_filename) : filename(in_filename) {
@@ -70,23 +91,28 @@ public:
 
   // Process the tokens starting from the outer-most scope.
   size_t ProcessTop(size_t pos=0) {
-    if (tokens[pos] != token_id) {
-      std::cerr << "Statements in outer scope must being with an identifier or keyword.  Aborting."
-                << std::endl;
-      exit(1);
-    }
+    while (pos < tokens.size()) {
+      if (tokens[pos] != token_id) {
+        std::cerr << "Statements in outer scope must being with an identifier or keyword.  Aborting."
+                  << std::endl;
+        exit(1);
+      }
 
-    if (tokens[pos].lexeme == "concept") {
-      return ProcessConcept(pos + 1);
+      if (tokens[pos].lexeme == "concept") {
+        auto node_ptr = NewPtr<AST_Concept>();
+        ast_root.AddChild(node_ptr);
+        pos = ProcessConcept(pos + 1, *node_ptr);
+      }
+      else {
+        std::cerr << "Unknown keyword '" << tokens[pos].lexeme << "'.  Aborting." << std::endl;
+        exit(1);
+      }
     }
-    else {
-      std::cerr << "Unknown keyword '" << tokens[pos].lexeme << "'.  Aborting." << std::endl;
-      exit(1);
-    }
+    return pos;
   }
 
   // We know we are in a concept definition.  Collect appropriate information.
-  size_t ProcessConcept(size_t pos) {
+  size_t ProcessConcept(size_t pos, AST_Concept & concept) {
     return pos;
   }
   
