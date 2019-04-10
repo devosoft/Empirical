@@ -101,6 +101,22 @@ private:
     exit(1);
   }
 
+  void RequireID(int pos, const std::string & error_msg) {
+    if (!IsID(pos)) { Error(error_msg, pos); }
+  }
+  void RequireNumber(int pos, const std::string & error_msg) {
+    if (!IsNumber(pos)) { Error(error_msg, pos); }
+  }
+  void RequireString(int pos, const std::string & error_msg) {
+    if (!IsString(pos)) { Error(error_msg, pos); }
+  }
+  void RequireChar(char req_char, int pos, const std::string & error_msg) {
+    if (AsChar(pos) != req_char) { Error(error_msg, pos); }
+  }
+  void RequireLexeme(const std::string & req_str, int pos, const std::string & error_msg) {
+    if (!HasToken(pos) || tokens[pos].lexeme != req_str) { Error(error_msg, pos); }
+  }
+
 public:
   CodeGen(std::string in_filename) : filename(in_filename) {
     // Whitespace and comments should always be dismissed (top priority)
@@ -124,15 +140,14 @@ public:
   // Process the tokens starting from the outer-most scope.
   size_t ProcessTop(size_t pos=0) {
     while (pos < tokens.size()) {
-      if (tokens[pos] != token_identifier) {
-        Error( "Statements in outer scope must begi with an identifier or keyword." );
-      }
+      RequireID(pos, "Statements in outer scope must begi with an identifier or keyword.");
 
       if (tokens[pos].lexeme == "concept") {
         auto node_ptr = emp::NewPtr<AST_Concept>();
         ast_root.AddChild(node_ptr);
         pos = ProcessConcept(pos + 1, *node_ptr);
       }
+      // @CAO: Technically we can have a whole list of special keywords, but for now its just "concept".
       else {
         Error( emp::to_string("Unknown keyword '", tokens[pos].lexeme, "'.  Aborting."), pos )
       }
@@ -143,34 +158,25 @@ public:
   // We know we are in a concept definition.  Collect appropriate information.
   size_t ProcessConcept(size_t pos, AST_Concept & concept) {
     // A concept must begin with its name.
-    if (IsID(pos) == false) {
-      Error( "Concept declaration must be followed by name identifier.", pos );
-    }
+    RequireID(pos, "Concept declaration must be followed by name identifier.");
     concept.name = tokens[pos++].lexeme;
 
     // Next, must be a colon...
-    char next_ch = AsChar(pos);
-    if (next_ch != ':') {
-      Error( "Concept names must be followed by a colon (':').", pos );
-    }
+    RequireChar(':', pos, "Concept names must be followed by a colon (':').");
     pos++;
 
     // And then a base-class name.
-    if (IsID(pos) == false) {
-      Error( "Concept declaration must include name of base class.", pos );
-    }
+    RequireID(pos, "Concept declaration must include name of base class.");
     concept.base_name = tokens[pos++].lexeme;
 
     // Next, must be an open brace...
-    next_ch = AsChar(pos);
-    if (next_ch != '{') {
-      Error( "Concepts must be defined in braces ('{' and '}').", pos );
-    }
+    RequireChar('{', pos, "Concepts must be defined in braces ('{' and '}').");
     pos++;
 
     // Loop through the full definition of concept, incorporating each entry.
     while ( AsChar(pos) != '{' ) {
-
+      // Entries can be a "using" statement, a function definition, or a variable definition.
+      RequireID(pos, "Concept members can be either functions, variables, or using-statements.")
     }
 
     return pos;
