@@ -142,7 +142,6 @@ namespace emp {
     return new_vec;
   }
 
-<<<<<<< HEAD
   /// Swap the order of a vector of vectors.  That is, swap rows and columns.
   /// NOTE: All rows must be the same size or smaller than those above for this to work.
   template <typename T>
@@ -167,7 +166,6 @@ namespace emp {
     }
 
     return out_vv;
-=======
   /// Returns a vector containing the numbers from @param N1 to @param N2
   // from https://stackoverflow.com/questions/13152252/is-there-a-compact-equivalent-to-python-range-in-c-stl
   template <typename T>
@@ -185,7 +183,6 @@ namespace emp {
     std::set<T> temp_set(v.begin(), v.end());
     emp::vector<T> new_vec(temp_set.begin(), temp_set.end());
     return new_vec;
->>>>>>> ecology_paper_2019
   }
 
   /// Tree manipulation in vectors.

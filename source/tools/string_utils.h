@@ -17,12 +17,9 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-<<<<<<< HEAD
 #include <string_view>
 #include <unordered_set>
-=======
 #include <algorithm>
->>>>>>> ecology_paper_2019
 
 #include "../base/Ptr.h"
 #include "../base/vector.h"
@@ -626,7 +623,6 @@ namespace emp {
     return vals;
   }
 
-<<<<<<< HEAD
   /// This function tries to convert a string_view into any other type...  You must
   /// need to specify the out type as the template argument.
   template <typename T>
@@ -636,7 +632,7 @@ namespace emp {
     T out_val;
     ss >> out_val;
     return out_val;
-=======
+    
   template <typename T>
   inline std::string join(const emp::vector<T> & v, std::string join_str) {
     
@@ -658,7 +654,6 @@ namespace emp {
   inline int count(std::string s, const char val) {
     // From https://stackoverflow.com/a/3871346/1560599
     return std::count(s.begin(), s.end(), val);
->>>>>>> ecology_paper_2019
   }
 
 }
