@@ -62,9 +62,23 @@ private:
     std::string code;
   };
 
+  struct AST_Block : AST_Node {
+    // Children are a series of statements.
+  };
+
+  struct AST_Using : AST_Node {
+    std::string type_name;
+    std::string type_value;
+  };
+
+  struct AST_VarDeclare : AST_Node {
+    std::string var_name;
+    // Child is an AST_Code expression.
+  };
+
   // Full concept information.
   struct AST_Concept : AST_Node {
-    
+    // Children a Using, Variable Declaration, or Function Declaration
   };
 
   AST_Node ast_root;
