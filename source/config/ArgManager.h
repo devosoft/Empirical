@@ -19,7 +19,8 @@ namespace emp {
 
     /// A simple class to manage command-line arguments that were passed in.
     /// Derived from emp::vector<std::string>, but with added functionality for argument handling.
-    class ArgManager {
+    class [[deprecated("emp::cl::ArgManager has been replaced by"
+      "emp::ArgManager, which has API updates")]] ArgManager {
     private:
       emp::vector<std::string> unprocessed;
 
