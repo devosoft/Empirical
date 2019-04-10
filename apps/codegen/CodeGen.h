@@ -78,10 +78,23 @@ private:
 
   // Full concept information.
   struct AST_Concept : AST_Node {
+    std::string name;
+    std::string base_name;
     // Children a Using, Variable Declaration, or Function Declaration
   };
 
   AST_Node ast_root;
+
+
+  // Helper functions
+  bool HasToken(int pos) { return (pos >= 0) && (pos < tokens.size()); }
+  bool IsID(int pos) { HasToken(pos) && tokens[pos].token_id == token_id; }
+  bool IsNumber(int pos) { HasToken(pos) && tokens[pos].token_id == token_number; }
+  bool IsString(int pos) { HasToken(pos) && tokens[pos].token_id == token_string; }
+  char AsChar(int pos) {
+    if (HasToken(pos) && tokens[pos].token_id == token_other) return tokens[pos].lexeme[0];
+    return 0;
+  }
 
 public:
   CodeGen(std::string in_filename) : filename(in_filename) {
@@ -127,6 +140,20 @@ public:
 
   // We know we are in a concept definition.  Collect appropriate information.
   size_t ProcessConcept(size_t pos, AST_Concept & concept) {
+    // A concept must begin with its name.
+    if (IsID(pos) == false) {
+      std::cout << "Concept declaration must be followed by name identifier." << std::endl;
+      exit(1);
+    }
+    concept.name = tokens[pos++].lexeme;
+
+    // Next, must be a colon...
+    char next_ch = AsChar(pos);
+    if (next_ch != ':') {
+      std::cout << "Concept names must be followed by a colon (':')." << std::endl;
+      exit(1);
+    }
+
     return pos;
   }
   
