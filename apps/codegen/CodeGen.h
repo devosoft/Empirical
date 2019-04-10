@@ -45,7 +45,7 @@ private:
   emp::Lexer lexer;
   emp::vector<emp::Token> tokens;
 
-  int token_id = -1;
+  int token_identifier = -1;
   int token_number = -1;
   int token_string = -1;
   int token_other = -1;
@@ -87,11 +87,11 @@ private:
 
 
   // Helper functions
-  bool HasToken(int pos) { return (pos >= 0) && (pos < tokens.size()); }
-  bool IsID(int pos) { return HasToken(pos) && tokens[pos].token_id == token_id; }
-  bool IsNumber(int pos) { return HasToken(pos) && tokens[pos].token_id == token_number; }
-  bool IsString(int pos) { return HasToken(pos) && tokens[pos].token_id == token_string; }
-  char AsChar(int pos) {
+  bool HasToken(int pos) const { return (pos >= 0) && (pos < tokens.size()); }
+  bool IsID(int pos) const { return HasToken(pos) && tokens[pos].token_id == token_identifier; }
+  bool IsNumber(int pos) const { return HasToken(pos) && tokens[pos].token_id == token_number; }
+  bool IsString(int pos) const { return HasToken(pos) && tokens[pos].token_id == token_string; }
+  char AsChar(int pos) const {
     if (HasToken(pos) && tokens[pos].token_id == token_other) return tokens[pos].lexeme[0];
     return 0;
   }
@@ -108,7 +108,7 @@ public:
     lexer.AddToken("Comment", "//.*", true, false);                          // Any '//'-style comment.
 
     // Meaningful tokens have next priority.
-    token_id = lexer.AddToken("ID", "[a-zA-Z_][a-zA-Z0-9_]+", true, true);   // Identifiers
+    token_identifier = lexer.AddToken("ID", "[a-zA-Z_][a-zA-Z0-9_]+", true, true);   // Identifiers
     token_number = lexer.AddToken("Number", "[0-9]+(.[0-9]+)?", true, true); // Literal numbers.
     token_string = lexer.AddToken("String", "\\\"[^\"]*\\\"", true, true);   // Literal strings.
 
@@ -124,7 +124,7 @@ public:
   // Process the tokens starting from the outer-most scope.
   size_t ProcessTop(size_t pos=0) {
     while (pos < tokens.size()) {
-      if (tokens[pos] != token_id) {
+      if (tokens[pos] != token_identifier) {
         Error( "Statements in outer scope must begi with an identifier or keyword." );
       }
 
@@ -134,8 +134,7 @@ public:
         pos = ProcessConcept(pos + 1, *node_ptr);
       }
       else {
-        std::cerr << "Unknown keyword '" << tokens[pos].lexeme << "'.  Aborting." << std::endl;
-        exit(1);
+        Error( emp::to_string("Unknown keyword '", tokens[pos].lexeme, "'.  Aborting."), pos )
       }
     }
     return pos;
