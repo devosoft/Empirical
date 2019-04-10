@@ -88,12 +88,17 @@ private:
 
   // Helper functions
   bool HasToken(int pos) { return (pos >= 0) && (pos < tokens.size()); }
-  bool IsID(int pos) { HasToken(pos) && tokens[pos].token_id == token_id; }
-  bool IsNumber(int pos) { HasToken(pos) && tokens[pos].token_id == token_number; }
-  bool IsString(int pos) { HasToken(pos) && tokens[pos].token_id == token_string; }
+  bool IsID(int pos) { return HasToken(pos) && tokens[pos].token_id == token_id; }
+  bool IsNumber(int pos) { return HasToken(pos) && tokens[pos].token_id == token_number; }
+  bool IsString(int pos) { return HasToken(pos) && tokens[pos].token_id == token_string; }
   char AsChar(int pos) {
     if (HasToken(pos) && tokens[pos].token_id == token_other) return tokens[pos].lexeme[0];
     return 0;
+  }
+
+  void Error(const std::string & msg, int pos = -1) {
+    std::cout << "Error: " << msg << "\nAborting." << std::endl;
+    exit(1);
   }
 
 public:
@@ -120,13 +125,11 @@ public:
   size_t ProcessTop(size_t pos=0) {
     while (pos < tokens.size()) {
       if (tokens[pos] != token_id) {
-        std::cerr << "Statements in outer scope must being with an identifier or keyword.  Aborting."
-                  << std::endl;
-        exit(1);
+        Error( "Statements in outer scope must begi with an identifier or keyword." );
       }
 
       if (tokens[pos].lexeme == "concept") {
-        auto node_ptr = NewPtr<AST_Concept>();
+        auto node_ptr = emp::NewPtr<AST_Concept>();
         ast_root.AddChild(node_ptr);
         pos = ProcessConcept(pos + 1, *node_ptr);
       }
@@ -142,16 +145,33 @@ public:
   size_t ProcessConcept(size_t pos, AST_Concept & concept) {
     // A concept must begin with its name.
     if (IsID(pos) == false) {
-      std::cout << "Concept declaration must be followed by name identifier." << std::endl;
-      exit(1);
+      Error( "Concept declaration must be followed by name identifier.", pos );
     }
     concept.name = tokens[pos++].lexeme;
 
     // Next, must be a colon...
     char next_ch = AsChar(pos);
     if (next_ch != ':') {
-      std::cout << "Concept names must be followed by a colon (':')." << std::endl;
-      exit(1);
+      Error( "Concept names must be followed by a colon (':').", pos );
+    }
+    pos++;
+
+    // And then a base-class name.
+    if (IsID(pos) == false) {
+      Error( "Concept declaration must include name of base class.", pos );
+    }
+    concept.base_name = tokens[pos++].lexeme;
+
+    // Next, must be an open brace...
+    next_ch = AsChar(pos);
+    if (next_ch != '{') {
+      Error( "Concepts must be defined in braces ('{' and '}').", pos );
+    }
+    pos++;
+
+    // Loop through the full definition of concept, incorporating each entry.
+    while ( AsChar(pos) != '{' ) {
+
     }
 
     return pos;
