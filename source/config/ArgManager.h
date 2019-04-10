@@ -20,17 +20,17 @@ namespace emp {
     /// A simple class to manage command-line arguments that were passed in.
     /// Derived from emp::vector<std::string>, but with added functionality for argument handling.
     class [[deprecated("emp::cl::ArgManager has been replaced by"
-      "emp::ArgManager, which has API updates")]] ArgManager {
+      "emp::ArgManager, which has API updates")]]
+      ArgManager : public emp::vector<std::string> {
     private:
-      emp::vector<std::string> unprocessed;
-
+      using parent_t = emp::vector<std::string>;
       emp::vector<std::string> arg_names;
       emp::vector<std::string> arg_descs;
 
     public:
-      ArgManager() : arg_names(), arg_descs() { ; }
+      ArgManager() : parent_t(), arg_names(), arg_descs() { ; }
       ArgManager(int argc, char* argv[])
-       : unprocessed(args_to_strings(argc, argv)), arg_names(), arg_descs() { ; }
+       : parent_t(args_to_strings(argc, argv)), arg_names(), arg_descs() { ; }
       ~ArgManager() { ; }
 
       /// UseArg takes a name, a variable and an optional description.  If the name exists,
@@ -40,7 +40,7 @@ namespace emp {
       int UseArg(const std::string & name, T & var, const std::string & desc="") {
         arg_names.push_back(name);
         arg_descs.push_back(desc);
-        return use_arg_value(unprocessed, name, var);
+        return use_arg_value(*this, name, var);
       }
 
       /// UseArg can also take a config object and a name, and use the argument to set the
@@ -50,7 +50,7 @@ namespace emp {
         arg_names.push_back(name);
         arg_descs.push_back(desc);
         std::string var;
-        bool rv = use_arg_value(unprocessed, name, var);
+        bool rv = use_arg_value(*this, name, var);
         if (rv==1) config.Set(cfg_name, var);
         return rv;
       }
@@ -60,7 +60,7 @@ namespace emp {
       bool UseFlag(const std::string & name, const std::string & desc="") {
         arg_names.push_back(name);
         arg_descs.push_back(desc);
-        return use_arg(unprocessed, name);
+        return use_arg(*this, name);
       }
 
       /// Print information about all known argument types and what they're for; make pretty.
@@ -79,9 +79,9 @@ namespace emp {
 
       /// Test if there are any unprocessed arguments, and if so, output an error.
       bool HasUnknown(std::ostream & os=std::cerr) const {
-        if (unprocessed.size() > 1) {
+        if (size() > 1) {
           os << "Unknown args:";
-          for (size_t i = 1; i < unprocessed.size(); i++) os << " " << unprocessed[i];
+          for (size_t i = 1; i < size(); i++) os << " " << (*this)[i];
           os << std::endl;
           PrintHelp(os);
           return true;
