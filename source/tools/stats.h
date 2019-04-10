@@ -63,7 +63,7 @@ namespace emp {
 
     // Count number of each value present
     std::map<typename C::value_type, int> counts;
-    for (auto element : elements) {
+    for (auto & element : elements) {
       if (counts.find(element) != counts.end()) {
 	       counts[element]++;
       } else {
@@ -73,7 +73,7 @@ namespace emp {
 
     // Shannon entropy calculation
     double result = 0;
-    for (auto element : counts) {
+    for (auto & element : counts) {
       double p = double(element.second)/elements.size();
       result +=  p * Log2(p);
     }
@@ -84,12 +84,12 @@ namespace emp {
   /// Calculate Shannon Entropy of the members of the container when those members are pointers
   template <typename C>
   typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value, double>::type
-  ShannonEntropy(C & elements) {
+  ShannonEntropy(const C & elements) {
     //   std::cout<< "In se" << std::endl;
     using pointed_at = typename emp::remove_ptr_type<typename C::value_type>::type;
     // Count number of each value present
     std::map<pointed_at, int> counts;
-    for (auto element : elements) {
+    for (auto & element : elements) {
       if (counts.find(*element) != counts.end()) {
         counts[*element]++;
       } else {
@@ -99,7 +99,7 @@ namespace emp {
     }
     // Shannon entropy calculation
     double result = 0;
-    for (auto element : counts) {
+    for (auto & element : counts) {
       double p = double(element.second)/elements.size();
       result +=  p * log2(p);
     }

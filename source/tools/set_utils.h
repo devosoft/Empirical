@@ -93,7 +93,7 @@ namespace emp {
 
   /// Compute the set intersection of @param s1 and @param s2 (elements that are in both S1 and S2)
   template <typename T>
-  std::set<T> intersection(std::set<T> s1, std::set<T> s2) {
+  std::set<T> intersection(std::set<T> & s1, std::set<T> & s2) {
     std::set<T> result;
     std::set_intersection(s1.begin(), s1.end(), s2.begin(), s2.end(),
                         std::inserter(result, result.end()));
@@ -114,7 +114,7 @@ namespace emp {
 
   /// Compute the set intersection of @param s1 and @param s2 (elements that are in both S1 and S2)
   template <typename T>
-  std::set<T> intersection(std::set<T> s1, emp::vector<T> s2) {
+  std::set<T> intersection(std::set<T> & s1, emp::vector<T> s2) {
     std::sort(s2.begin(), s2.end()); // set_intersection expects sorted things
 
     std::set<T> result;
@@ -125,7 +125,7 @@ namespace emp {
 
   /// Compute the set intersection of @param s1 and @param s2 (elements that are in both S1 and S2)
   template <typename T>
-  std::set<T> intersection(emp::vector<T> s1, std::set<T> s2) {
+  std::set<T> intersection(emp::vector<T> s1, std::set<T> & s2) {
     std::sort(s1.begin(), s1.end()); // set_intersection expects sorted things
 
     std::set<T> result;
@@ -136,7 +136,7 @@ namespace emp {
 
   /// Compute the set union of @param s1 and @param s2 (elements that are in either S1 or S2)
   template <typename T>
-  std::set<T> set_union(std::set<T> s1, std::set<T> s2) {
+  std::set<T> set_union(std::set<T> & s1, std::set<T> & s2) {
     std::set<T> result;
     std::set_union(s1.begin(), s1.end(), s2.begin(), s2.end(),
                         std::inserter(result, result.end()));
@@ -157,7 +157,7 @@ namespace emp {
 
   /// Compute the set union of @param s1 and @param s2 (elements that are in either S1 or S2)
   template <typename T>
-  std::set<T> set_union(std::set<T> s1, emp::vector<T> s2) {
+  std::set<T> set_union(std::set<T> & s1, emp::vector<T> s2) {
     std::sort(s2.begin(), s2.end()); // set_union expects sorted things
 
     std::set<T> result;
@@ -168,7 +168,7 @@ namespace emp {
 
   /// Compute the set union of @param s1 and @param s2 (elements that are in either S1 or S2)
   template <typename T>
-  std::set<T> set_union(emp::vector<T> s1, std::set<T> s2) {
+  std::set<T> set_union(emp::vector<T> s1, std::set<T> & s2) {
     std::sort(s1.begin(), s1.end()); // set_union expects sorted things
 
     std::set<T> result;
@@ -179,7 +179,7 @@ namespace emp {
 
  /// Compute the set symmetric_difference of @param s1 and @param s2 (elements that are in either S1 or S2 but not both)
   template <typename T>
-  std::set<T> symmetric_difference(std::set<T> s1, std::set<T> s2) {
+  std::set<T> symmetric_difference(std::set<T> & s1, std::set<T> & s2) {
     std::set<T> result;
     std::set_symmetric_difference(s1.begin(), s1.end(), s2.begin(), s2.end(),
                         std::inserter(result, result.end()));
@@ -200,7 +200,7 @@ namespace emp {
 
   /// Compute the set symmetric_difference of @param s1 and @param s2 (elements that are in either S1 or S2 but not both)
   template <typename T>
-  std::set<T> symmetric_difference(std::set<T> s1, emp::vector<T> s2) {
+  std::set<T> symmetric_difference(std::set<T> & s1, emp::vector<T> s2) {
     std::sort(s2.begin(), s2.end()); // set_symmetric_difference expects sorted things
 
     std::set<T> result;
@@ -211,7 +211,7 @@ namespace emp {
 
   /// Compute the set symmetric_difference of @param s1 and @param s2 (elements that are in either S1 or S2 but not both)
   template <typename T>
-  std::set<T> symmetric_difference(emp::vector<T> s1, std::set<T> s2) {
+  std::set<T> symmetric_difference(emp::vector<T> s1, std::set<T> & s2) {
     std::sort(s1.begin(), s1.end()); // set_symmetric_difference expects sorted things
 
     std::set<T> result;

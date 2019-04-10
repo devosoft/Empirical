@@ -382,6 +382,14 @@ namespace emp {
       systematics_labels.erase(label) ;
     }
 
+    template <typename ORG_INFO, typename DATA_STRUCT=emp::datastruct::no_data>
+    Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> AddSystematics(std::function<ORG_INFO(const ORG&)> calc_taxon, bool active=true, bool anc=true, bool all=true, bool pos=true, std::string label="systematics" ) {
+      Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT>> sys_ptr;
+      sys_ptr.New(calc_taxon, active, anc, all, pos);
+      AddSystematics(sys_ptr, label);
+      return sys_ptr;
+    }
+
     template <typename ORG_INFO, typename DATA_STRUCT>
     void AddSystematics(Ptr<Systematics<ORG, ORG_INFO, DATA_STRUCT> > s, std::string label="systematics") {
       if (Has(systematics_labels, label)) {
@@ -868,7 +876,7 @@ namespace emp {
     if (pos.IsActive()) { before_placement_sig.Trigger(*new_org, pos.GetIndex()); }
 
     for (Ptr<SystematicsBase<ORG> > s : systematics) {
-      s->SetNextParent((int) p_pos.GetIndex());
+      s->SetNextParent(p_pos);
     }
 
     // Clear out any old organism at this position.
@@ -882,7 +890,7 @@ namespace emp {
 
     // Track the new systematics info
     for (Ptr<SystematicsBase<ORG> > s : systematics) {
-      s->AddOrg(*new_org, (int) pos.GetIndex(), (int) update, !pos.IsActive());
+      s->AddOrg(*new_org, pos, (int) update);
     }
 
     SetupOrg(*new_org, pos, *random_ptr);
@@ -903,14 +911,12 @@ namespace emp {
     if (pos.IsActive()) {
       --num_orgs;                                    // Track one fewer organisms in the population
       if (cache_on) ClearCache(id);                  // Delete any cached info about this organism
-      for (Ptr<SystematicsBase<ORG> > s : systematics) {
-        s->RemoveOrg((int) pos.GetIndex());          // Notify systematics about organism removal
-      }
-    } else {
-      for (Ptr<SystematicsBase<ORG> > s : systematics) {
-        s->RemoveNextOrg((int) pos.GetIndex());      // Notify systematics about organism removal
-      }
+    } 
+
+    for (Ptr<SystematicsBase<ORG> > s : systematics) {
+      s->RemoveOrg(pos, update);          // Notify systematics about organism removal
     }
+
   }
 
   template<typename ORG>

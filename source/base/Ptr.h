@@ -37,8 +37,8 @@ namespace emp {
 
     static bool ptr_debug = false;
   }
-  void SetPtrDebug(bool _d = true) { internal::ptr_debug = _d; }
-  bool GetPtrDebug() { return internal::ptr_debug; }
+  inline void SetPtrDebug(bool _d = true) { internal::ptr_debug = _d; }
+  inline bool GetPtrDebug() { return internal::ptr_debug; }
 
   enum class PtrStatus { DELETED=0, ACTIVE, ARRAY };
 

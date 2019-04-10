@@ -46,7 +46,9 @@ namespace emp {
   double Entropy(const CONTAINER & objs, WEIGHT_FUN fun, double total=0.0) {
     // If we don't know the total, calculate it.
     if (total == 0.0) for (auto & o : objs) total += (double) fun(o);
-    emp_assert(total > 0.0);
+    if (total == 0) {
+      return 0;
+    }
 
     double entropy = 0.0;
     for (auto & o : objs) {

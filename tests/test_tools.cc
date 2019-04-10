@@ -834,6 +834,14 @@ TEST_CASE("Test map_utils", "[tools]")
   REQUIRE( emp::Has(flipped, 'u') == true);      // And the reversed map should have proper info.
   REQUIRE( emp::Has(flipped, 'x') == false);
 
+  // std::cout << emp::to_string(emp::Keys(test_map)) << std::endl;
+
+  REQUIRE( emp::Has(emp::Keys(test_map), 0));
+  REQUIRE( emp::Has(emp::Keys(test_map), 4));
+  REQUIRE( emp::Has(emp::Keys(test_map), 8));
+  REQUIRE( emp::Has(emp::Keys(test_map), 14));
+  REQUIRE( emp::Has(emp::Keys(test_map), 20));
+
   // Testing for bug #123
   std::map<std::string, std::string> test_123;
   test_123["1"] = "1";
@@ -842,6 +850,7 @@ TEST_CASE("Test map_utils", "[tools]")
   REQUIRE( emp::Find(test_123, "0", "nothing") == "nothing" );
   REQUIRE( emp::Find(test_123, "1", "nothing") == "1" );
   REQUIRE( emp::FindRef(test_123, "1", "nothing") == "1" );
+
 }
 
 TEST_CASE("Test math", "[tools]")
@@ -1697,6 +1706,8 @@ TEST_CASE("Test string_utils", "[tools]")
   REQUIRE(cat_full == "ABC123");
   std::array<int, 3> test_arr({{ 4, 2, 5 }});
   REQUIRE(emp::to_string(test_arr) == "[ 4 2 5 ]");
+  REQUIRE(emp::count(emp::to_string(test_arr), ' ') == 4);
+  REQUIRE(emp::join(emp::vector<size_t>({17,18,19}), ",") == "17,18,19");
 }
 
 
@@ -1917,6 +1928,7 @@ TEST_CASE("Test TypeTracker", "[tools]") {
 
 TEST_CASE("Test vector utils", "[tools]") {
   emp::vector<int> v1({6,2,5,1,3});
+  emp::vector<int> v2({7,6,7,1,7});
   emp::Sort(v1);
   REQUIRE(v1 == emp::vector<int>({1,2,3,5,6}));
   REQUIRE(emp::FindValue(v1, 3) == 2);
@@ -1925,6 +1937,8 @@ TEST_CASE("Test vector utils", "[tools]") {
   REQUIRE(!emp::Has(v1, 4));
   REQUIRE(emp::Product(v1) == 180);
   REQUIRE(emp::Slice(v1,1,3) == emp::vector<int>({2,3}));
+  REQUIRE(emp::Count(v1, 2) == 1);
+  REQUIRE(emp::Count(v2, 7) == 3);
 
   // Test handling vector-of-vectors.
   using vv_int_t = emp::vector< emp::vector< int > >;

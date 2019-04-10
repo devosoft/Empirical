@@ -297,6 +297,15 @@ namespace emp {
     return *max_found;
   }
 
+  inline constexpr int Factorial(int i) {
+    int result = 1;
+    while (i > 0) {
+      result *= i;
+      i--;
+    }
+    return result;
+  }
+
 }
 
 #endif

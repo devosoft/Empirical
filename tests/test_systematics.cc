@@ -16,7 +16,7 @@
 
 TEST_CASE("Test Systematics", "[evo]")
 {
-  emp::Systematics<int, int> sys([](int & i){return i;}, true, true, true);
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true);
 
   std::cout << "\nAddOrg 25 (id1, no parent)\n";
   auto id1 = sys.AddOrg(25, nullptr, 0);
@@ -134,9 +134,131 @@ TEST_CASE("Test Systematics", "[evo]")
   sys.PrintStatus();
 }
 
+// TEST_CASE("Test not tracking ancestors", "[evo]")
+// {
+//   emp::Systematics<int, int> sys([](const int & i){return i;}, true, false, false, false);
+
+//   std::cout << "\nAddOrg 25 (id1, no parent)\n";
+//   auto id1 = sys.AddOrg(25, nullptr, 0);
+//   std::cout << "\nAddOrg -10 (id2; parent id1)\n";
+//   auto id2 = sys.AddOrg(-10, id1, 6);
+//   std::cout << "\nAddOrg 26 (id3; parent id1)\n";
+//   auto id3 = sys.AddOrg(26, id1, 10);
+//   std::cout << "\nAddOrg 27 (id4; parent id2)\n";
+//   auto id4 = sys.AddOrg(27, id2, 25);
+//   std::cout << "\nAddOrg 28 (id5; parent id2)\n";
+//   auto id5 = sys.AddOrg(28, id2, 32);
+//   std::cout << "\nAddOrg 29 (id6; parent id5)\n";
+//   auto id6 = sys.AddOrg(29, id5, 39);
+//   std::cout << "\nAddOrg 30 (id7; parent id1)\n";
+//   auto id7 = sys.AddOrg(30, id1, 6);
+  
+
+//   std::cout << "\nRemoveOrg (id2)\n";
+//   sys.RemoveOrg(id1);
+//   sys.RemoveOrg(id2);
+
+//   double mpd = sys.GetMeanPairwiseDistance();
+//   std::cout << "MPD: " << mpd <<std::endl;
+//   // REQUIRE(mpd == Approx(2.8));
+
+//   std::cout << "\nAddOrg 31 (id8; parent id7)\n";
+//   auto id8 = sys.AddOrg(31, id7, 11);
+//   std::cout << "\nAddOrg 32 (id9; parent id8)\n";
+//   auto id9 = sys.AddOrg(32, id8, 19);
+
+
+//   // REQUIRE(sys.GetEvolutionaryDistinctiveness(id3, 10) == 10);
+//   // REQUIRE(sys.GetEvolutionaryDistinctiveness(id4, 25) == 21);
+//   // REQUIRE(sys.GetEvolutionaryDistinctiveness(id5, 32) == 15);
+//   // REQUIRE(sys.GetEvolutionaryDistinctiveness(id6, 39) == 22);
+//   // REQUIRE(sys.GetEvolutionaryDistinctiveness(id6, 45) == 28);
+//   // REQUIRE(sys.GetEvolutionaryDistinctiveness(id9, 19) == 12.5);
+
+//   std::cout << "\nAddOrg 33 (id10; parent id8)\n";
+//   auto id10 = sys.AddOrg(33, id8, 19);
+
+//   sys.RemoveOrg(id7);
+//   sys.RemoveOrg(id8);
+
+//   // REQUIRE(sys.GetEvolutionaryDistinctiveness(id9, 19) == 13.5);
+//   // REQUIRE(sys.GetEvolutionaryDistinctiveness(id10, 19) == 13.5);
+
+//   sys.RemoveOrg(id10);
+
+//   // REQUIRE(sys.GetEvolutionaryDistinctiveness(id9, 19) == 19);
+
+
+//   std::cout << "\nAddOrg 34 (id11; parent id9)\n";
+//   auto id11 = sys.AddOrg(34, id9, 22);
+//   std::cout << "\nAddOrg 35 (id12; parent id10)\n";
+//   auto id12 = sys.AddOrg(35, id11, 23);
+
+//   sys.RemoveOrg(id9);
+
+//   // REQUIRE(sys.GetEvolutionaryDistinctiveness(id11, 26) == 13);
+//   // REQUIRE(sys.GetEvolutionaryDistinctiveness(id12, 26) == 15);
+
+//   std::cout << "\nAddOrg 36 (id13; parent id12)\n";
+//   auto id13 = sys.AddOrg(36, id12, 27);
+//   std::cout << "\nAddOrg 37 (id14; parent id13)\n";
+//   auto id14 = sys.AddOrg(37, id13, 30);
+
+//   sys.RemoveOrg(id13);
+
+//   // REQUIRE(sys.GetEvolutionaryDistinctiveness(id14, 33) == Approx(17.833333));
+
+//   std::cout << "\nAddOrg 38 (id15; parent id14)\n";
+//   auto id15 = sys.AddOrg(38, id14, 33);
+
+//   sys.RemoveOrg(id14);
+
+//   // REQUIRE(sys.GetEvolutionaryDistinctiveness(id15, 33) == Approx(17.833333));
+
+//   std::cout << "\nAddOrg 39 (id16; parent id11)\n";
+//   auto id16 = sys.AddOrg(39, id11, 35);
+//   std::cout << "\nAddOrg 40 (id17; parent id11)\n";
+//   auto id17 = sys.AddOrg(40, id11, 35);
+
+//   // REQUIRE(sys.GetEvolutionaryDistinctiveness(id16, 35) == Approx(17.4));
+//   // REQUIRE(sys.GetEvolutionaryDistinctiveness(id17, 35) == Approx(17.4));
+
+//   std::cout << "\nAddOrg 41 (id18; parent id17)\n";
+//   auto id18 = sys.AddOrg(41, id17, 36);
+
+//   // REQUIRE(sys.GetEvolutionaryDistinctiveness(id18, 37) == Approx(12.1666667));
+
+//   // REQUIRE(sys.GetTaxonDistinctiveness(id18) == Approx(1.0/6.0));
+//   // REQUIRE(sys.GetBranchesToRoot(id18) == 1);
+//   // REQUIRE(sys.GetDistanceToRoot(id18) == 6);
+
+//   std::cout << "\nAddOrg 42 (id19; parent id17)\n";
+//   auto id19 = sys.AddOrg(42, id17, 37);
+//   REQUIRE(id17->GetTotalOffspring() > 0);
+//   // REQUIRE(sys.GetBranchesToRoot(id19) == 2);
+//   // REQUIRE(sys.GetDistanceToRoot(id19) == 6);
+//   // REQUIRE(sys.GetTaxonDistinctiveness(id19) == Approx(1.0/6.0));
+
+//   // REQUIRE(sys.GetTaxonDistinctiveness(id15) == Approx(1.0/8.0));
+//   // REQUIRE(sys.GetBranchesToRoot(id15) == 1);
+//   // REQUIRE(sys.GetDistanceToRoot(id15) == 8);
+//   // REQUIRE(sys.GetPhylogeneticDiversity() == 17);
+//   // REQUIRE(sys.GetAveDepth() == Approx(4.272727));
+
+//   std::cout << "id1 = " << id1 << std::endl;
+//   std::cout << "id2 = " << id2 << std::endl;
+//   std::cout << "id3 = " << id3 << std::endl;
+//   std::cout << "id4 = " << id4 << std::endl;
+
+//   std::cout << "\nLineage:\n";
+//   sys.PrintLineage(id4);
+//   sys.PrintStatus();
+// }
+
+
 TEST_CASE("Pointer to systematics", "[evo]") {
   emp::Ptr<emp::Systematics<int, int>> sys;
-  sys.New([](int & i){return i;}, true, true, true);
+  sys.New([](const int & i){return i;}, true, true, true);
   sys.Delete();
 }
 
@@ -144,7 +266,7 @@ TEST_CASE("Test Data Struct", "[evo]")
 {
 
   emp::Ptr<emp::Systematics<int, int, emp::datastruct::mut_landscape_info<int> >> sys;
-  sys.New([](int & i){return i;}, true, true, true);
+  sys.New([](const int & i){return i;}, true, true, true);
   auto id1 = sys->AddOrg(1, nullptr);
   id1->GetData().fitness.Add(2);
   id1->GetData().phenotype = 6;
@@ -206,7 +328,7 @@ TEST_CASE("World systematics integration", "[evo]") {
 
   emp::World<emp::vector<int>> world;
   emp::Ptr<systematics_t> sys;
-  sys.New([](emp::vector<int> & v){return v;}, true, true, true);
+  sys.New([](const emp::vector<int> & v){return v;}, true, true, true);
   world.AddSystematics(sys);
 
   world.SetMutFun([](emp::vector<int> & org, emp::Random & r){return 0;});
@@ -279,18 +401,19 @@ TEST_CASE("Run world", "[evo]") {
   world.SetPopStruct_Mixed(true);
 
 
-  std::function<emp::AvidaGP::genome_t(emp::AvidaGP &)> gene_fun =
-    [](emp::AvidaGP & org) {
+  std::function<emp::AvidaGP::genome_t(const emp::AvidaGP &)> gene_fun =
+    [](const emp::AvidaGP & org) {
       return org.GetGenome();
     };
 
-  std::function<emp::vector<double>(emp::AvidaGP &)> phen_fun =
-    [](emp::AvidaGP & org) {
+  std::function<emp::vector<double>(const emp::AvidaGP &)> phen_fun =
+    [](const emp::AvidaGP & org) {
       emp::vector<double> phen;
+      emp::AvidaGP org2 = org;
       for (int i = 0; i < 16; i++) {
-        org.ResetHardware();
-        org.Process(20);
-        phen.push_back(org.GetOutput(i));
+        org2.ResetHardware();
+        org2.Process(20);
+        phen.push_back(org2.GetOutput(i));
       }
       return phen;
     };
@@ -344,6 +467,8 @@ TEST_CASE("Run world", "[evo]") {
       on_mutate_sig.Trigger({{"substitution",num_muts}});
       return num_muts;
     });
+
+  world.SetAutoMutate();
 
   // Setup the fitness function.
   std::function<double(emp::AvidaGP &)> fit_fun =
@@ -417,4 +542,105 @@ TEST_CASE("Run world", "[evo]") {
   //   std::cout << i << ":" << world[0].GetOutput(i) << "  ";
   // }
   // std::cout << std::endl;
+}
+
+
+
+TEST_CASE("Test GetCanopy", "[evo]")
+{
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true);
+
+  auto id1 = sys.AddOrg(1, nullptr, 0);
+  auto id2 = sys.AddOrg(2, id1, 2);
+  auto id3 = sys.AddOrg(3, id1, 3);
+  auto id4 = sys.AddOrg(4, id2, 3);
+
+  sys.RemoveOrg(id1, 3);
+  sys.RemoveOrg(id2, 5);
+
+  auto can_set = sys.GetCanopyExtantRoots(4);
+
+  // Both 3 and 4 were alive at time point 4 so they are the canopy roots
+  CHECK(can_set.size() == 2);
+  CHECK(Has(can_set, id3));
+  CHECK(Has(can_set, id4));
+
+  can_set = sys.GetCanopyExtantRoots(2);
+
+  // Both 3 and 4 were not alive at time point 2, so the canopy roots
+  // will be 1 and 2. 
+  CHECK(can_set.size() == 2);
+  CHECK(Has(can_set, id1));
+  CHECK(Has(can_set, id2));
+
+  sys.RemoveOrg(id3, 7);
+
+  can_set = sys.GetCanopyExtantRoots(2);
+
+  // Only 4 is alive, but it wasn't alive at time point 2. 2 is the
+  // only canopy root because even though 1 is alive, because 4's
+  // lineage diverged from 1 when 2 was born. 
+  CHECK(can_set.size() == 1);
+  CHECK(Has(can_set, id2));
+
+  auto id5 = sys.AddOrg(5, id4, 8);
+  sys.RemoveOrg(id4, 9);
+  auto id6 = sys.AddOrg(6, id5, 10);
+  sys.RemoveOrg(id5, 11);
+
+  can_set = sys.GetCanopyExtantRoots(7);
+  // Should only be 4 
+  CHECK(can_set.size() == 1);
+  CHECK(Has(can_set, id4));
+
+  can_set = sys.GetCanopyExtantRoots(9);
+  // Should only be 5 
+  CHECK(can_set.size() == 1);
+  CHECK(Has(can_set, id5));
+
+
+  auto id7 = sys.AddOrg(7, id6, 12);
+  auto id8 = sys.AddOrg(8, id7, 13);
+  auto id9 = sys.AddOrg(9, id8, 14);
+  auto id10 = sys.AddOrg(10, id9, 15);
+
+  sys.RemoveOrg(id6, 20);
+  sys.RemoveOrg(id7, 20);
+  sys.RemoveOrg(id8, 20);
+  sys.RemoveOrg(id9, 20);
+
+  can_set = sys.GetCanopyExtantRoots(22);
+  // Should only be 10 
+  CHECK(can_set.size() == 1);
+  CHECK(Has(can_set, id10));
+
+  can_set = sys.GetCanopyExtantRoots(14);
+  // Should only be 9, even though others were alive 
+  CHECK(can_set.size() == 1);
+  CHECK(Has(can_set, id9));
+
+  can_set = sys.GetCanopyExtantRoots(13);
+  // Should only be 8, because 9 wasn't born yet
+  CHECK(can_set.size() == 1);
+  CHECK(Has(can_set, id8));
+
+  can_set = sys.GetCanopyExtantRoots(11);
+  CHECK(can_set.size() == 1);
+  CHECK(Has(can_set, id6));
+
+  can_set = sys.GetCanopyExtantRoots(12);
+  CHECK(can_set.size() == 1);
+  CHECK(Has(can_set, id7));
+
+  can_set = sys.GetCanopyExtantRoots(9);
+  CHECK(can_set.size() == 1);
+  CHECK(Has(can_set, id5));
+
+
+  // auto id5 = sys.AddOrg(28, id2, 32);
+  // std::cout << "\nAddOrg 29 (id6; parent id5)\n";
+  // auto id6 = sys.AddOrg(29, id5, 39);
+  // std::cout << "\nAddOrg 30 (id7; parent id1)\n";
+  // auto id7 = sys.AddOrg(30, id1, 6);
+
 }

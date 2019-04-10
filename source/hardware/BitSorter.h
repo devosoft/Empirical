@@ -19,8 +19,10 @@
 namespace emp {
 
   class BitSorter {
-  private:
-    using bits_t = uint32_t;          ///< Type used to represent pairs if posisions as bit masks.
+  public:
+    using bits_t = uint32_t;          ///< Type used to represent pairs if posisions as bit masks. 
+  protected:
+
     emp::vector<bits_t> compare_set;  ///< Comparators, in order (pairs of 1's in bitstring)
 
   public:
@@ -32,8 +34,36 @@ namespace emp {
     BitSorter & operator=(const BitSorter &) = default;
     BitSorter & operator=(BitSorter &&) = default;
 
+    bool operator!=(const BitSorter & other) const {
+      return compare_set != other.compare_set;
+    }
+
+    bool operator<(const BitSorter & other) const {
+      return compare_set < other.compare_set;
+    }
+
+
     /// How many comparators are in this sorting network.
     size_t GetSize() const { return compare_set.size(); }
+    size_t size() const { return GetSize(); }
+
+    std::pair<size_t, size_t> GetComparator(size_t idx) {
+      emp_assert(idx < compare_set.size(), idx, compare_set.size());
+      bits_t curr = compare_set[idx];
+      bits_t pos1 = pop_bit(curr);
+      bits_t pos2 = find_bit(curr);
+      return std::make_pair(pos1, pos2);
+    }
+    bits_t & operator[](size_t idx) {
+      return compare_set[idx];
+    }
+    bits_t GetBits(size_t idx) {
+      return compare_set[idx];
+    }
+
+    void Clear() {
+      compare_set.clear();
+    }
 
     /// If this network is compressed as far as possible, what will the max depth of each position be?
     void CalcDepth(size_t num_bits, emp::vector<size_t> & depth_vals) const {
@@ -151,6 +181,15 @@ namespace emp {
     }
   };
 
+}
+
+namespace std {
+
+  /// operator<< to work with ostream (must be in std to work)
+  inline std::ostream & operator<<(std::ostream & out, const emp::BitSorter & bitsort) {
+    out << bitsort.AsString();
+    return out;
+  }
 }
 
 #endif

@@ -60,8 +60,8 @@ namespace emp {
     };
 
     template <typename ORG>
-    void ResourceSelect(World<ORG> & world, const emp::vector< std::function<double(const ORG &)> > & extra_funs,
-                   emp::vector<emp::Resource> & pools, size_t t_size, size_t tourny_count=1, double frac = .0025, double max_bonus = 5, double cost = 0, bool use_base = true) {
+    void ResourceSelect(World<ORG> & world, emp::vector< std::function<double(ORG &)> > & extra_funs,
+                   emp::vector<emp::Resource> & pools, size_t t_size, size_t tourny_count=1, double frac = .0025, double max_bonus = 5, double cost = 0, bool use_base = true, double min_score = 0) {
 
        emp_assert(world.GetFitFun(), "Must define a base fitness function");
        emp_assert(world.GetSize() > 0);
@@ -98,7 +98,7 @@ namespace emp {
            cur_fit = emp::Pow(cur_fit, 2.0);
             //    if (org_id==0) {std::cout << "Allele: " << world[org_id][ex_id] <<" Curr fit: " << extra_funs[ex_id](world[org_id]) << " Curr fit squared: " << cur_fit << " Amount: " << pools[ex_id].GetAmount() << " Frac: " << frac;}
             cur_fit *= frac*(pools[ex_id].GetAmount()-cost);
-            if (cur_fit > 0) {
+            if (cur_fit > min_score) {
                 cur_fit -= cost;
             } else {
                 cur_fit = 0;
