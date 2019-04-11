@@ -89,7 +89,7 @@ private:
   };
 
   struct AST_ConceptVariable : AST_Node {
-    std::string type_name;
+    std::string var_type;
     std::string var_name;
     std::string default_code;
   };
@@ -150,12 +150,36 @@ public:
     // Other tokens should have least priority.
     token_other = lexer.AddToken("Other", ".", true, true);                  // Symbols
 
-
     std::ifstream file(filename);
     tokens = lexer.Tokenize(file);
     file.close();
   }
 
+  // Collect all tokens used to describe a type.
+  size_t ProcessType(size_t pos, std::string & type_name) {
+    // @CAO Write This!
+    return pos;
+  }
+
+  // Collect a line of code, ending with a semi-colon OR mis-matched brace.
+  size_t ProcessLine(size_t pos, std::string & line) {
+    // @CAO Write This!
+    return pos;
+  }
+
+  // Collect multiple lines of code, ending only with a mis-matched brace.
+  size_t ProcessCode(size_t pos, std::string & code) {
+    // @CAO Write This!
+    return pos;
+  }
+
+  // Collect a series of identifiers, separated by spaces.
+  size_t ProcessIDList(size_t pos, emp::vector<std::string> & ids) {
+    // @CAO Write This!
+    return pos;
+  }
+
+ 
   // Process the tokens starting from the outer-most scope.
   size_t ProcessTop(size_t pos=0) {
     while (pos < tokens.size()) {
@@ -193,7 +217,7 @@ public:
     pos++;
 
     // Loop through the full definition of concept, incorporating each entry.
-    while ( AsChar(pos) != '{' ) {
+    while ( AsChar(pos) != '}' ) {
       // Entries can be a "using" statement, a function definition, or a variable definition.
       RequireID(pos, "Concept members can be either functions, variables, or using-statements.");
 
@@ -207,7 +231,7 @@ public:
 
         RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
 
-        pos = GetCodeLine(pos, node_using->default_code);   // Determine code being assigned to.
+        pos = ProcessLine(pos, node_using->default_code);   // Determine code being assigned to.
       } else {
         // Start with a type...
         std::string type_name;
@@ -222,12 +246,12 @@ public:
           pos++;  // Move past paren.
 
           // Setup an AST Node for a function definition.
-          auto node_function = emp::NewPtr<AST_ConceptUsing>();
+          auto node_function = emp::NewPtr<AST_ConceptFunction>();
           node_function->return_type = type_name;
           node_function->fun_name = identifier;
           concept.AddChild(node_function);                       // Save this function node in the concept.
 
-          pos = ProcessArgs(pos, node_function->args);           // Read the args for this function.
+          pos = ProcessLine(pos, node_function->args);           // Read the args for this function.
 
           RequireChar(')', pos++, "Function arguments must end with a close-parenthesis (')')");
 
@@ -240,10 +264,24 @@ public:
           RequireChar('{', pos++, "Function body must end with close brace ('}')");
 
         } else {                                                 // ----- VARIABLE!! -----
+          auto node_var = emp::NewPtr<AST_ConceptVariable>();
+          node_var->var_type = type_name;
+          node_var->var_name = identifier;
+
+          if (AsChar(pos) == ';') {  // Does the variable declaration end here?
+            pos++;
+          }
+          else {                     // ...or is there a default value for this variable?
+            // Determine code being assigned from.
+            pos = ProcessLine(pos, node_var->default_code);
+          }
 
         }
       }
     }
+
+    pos++;  // Skip closing brace.
+    RequireChar(';', pos++, "Concept definitions must end in a semi-colon.");
 
     return pos;
   }
