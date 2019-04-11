@@ -58,19 +58,22 @@ namespace emp {
 
       for(size_t i = 0; i < args.size(); ++i) {
 
-        if( counts.count(deflagged[i]) ) {
+        if( !counts.count(deflagged[i]) ) {
 
           size_t j = i;
           while( j < args.size() && !counts.count(deflagged[j]) ) ++j;
 
           packs.insert(
             {
-              deflagged[i],
-              emp::vector<std::string>(args.begin()+i+1,args.begin()+j+1)
+              "_positional",
+              emp::vector<std::string>(
+                std::next(std::begin(args), i),
+                std::next(std::begin(args), j)
+              )
             }
           );
 
-          i = j;
+          i = j-1;
 
         } else {
 
@@ -80,22 +83,20 @@ namespace emp {
           const auto r_spec = counts.equal_range(deflagged[i]);
           const size_t n_spec = std::distance(r_spec.first, r_spec.second);
 
-          size_t n;
-
-          if (n_spec) {
-            auto it = r_spec.first;
-            std::advance(it, n_proc % n_spec);
-            n = it->second;
-          } else {
-            n = 0;
-          }
+          size_t n = n_spec ?
+            std::next(r_spec.first, n_proc % n_spec)->second : 0;
 
           packs.insert(
             {
-              args[i],
-              emp::vector<std::string>(args.begin()+i+1,args.begin()+i+n+1)
+              deflagged[i],
+              emp::vector<std::string>(
+                std::next(std::begin(args), i+1),
+                std::next(std::begin(args), std::min(i+n+1,args.size()))
+              )
             }
           );
+
+          i += n;
 
         }
 
@@ -135,6 +136,18 @@ namespace emp {
       }
 
       return res;
+
+    }
+
+    void Print(std::ostream & os) const {
+
+      for(const auto it : packs ) {
+        os << it.first << ":";
+        for(const auto v : it.second ) {
+          os << " " << v;
+        }
+        os << std::endl;
+      }
 
     }
 
@@ -178,7 +191,7 @@ namespace emp {
       if (packs.size() > 1) {
         os << "Unused arg packs:" << std::endl;
         for(const auto & p : packs) {
-          os << " -" << p.first;
+          os << " " << p.first;
           for(const auto & v : p.second) {
             os << " " << v;
           }
