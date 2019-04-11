@@ -95,9 +95,10 @@ private:
   };
 
   struct AST_ConceptFunction : AST_Node {
-    std::string type_name;
+    std::string return_type;
     std::string fun_name;
     std::string args;
+    emp::vector<std::string> attributes;     // const, noexcept, etc.
     std::string default_code;
   };
 
@@ -196,16 +197,20 @@ public:
       // Entries can be a "using" statement, a function definition, or a variable definition.
       RequireID(pos, "Concept members can be either functions, variables, or using-statements.");
 
-      std::string type_name;
-      std::string default_code;
       if (tokens[pos].lexeme == "using") {              // ----- USING!! -----
-        pos++;
+        pos++;  // Move past "using"
         RequireID(pos, "A 'using' command must first specify the new type name.");
-        pos = ProcessType(pos, type_name);
+
+        auto node_using = emp::NewPtr<AST_ConceptUsing>();  // Setup an AST node for a using statement.       
+        concept.AddChild(node_using);                       // Save this node in the concept.
+        pos = ProcessType(pos, node_using->type_name);      // Determine new type name being defined.
+
         RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
-        pos = GetCodeLine(pos, default_code);
+
+        pos = GetCodeLine(pos, node_using->default_code);   // Determine code being assigned to.
       } else {
         // Start with a type...
+        std::string type_name;
         pos = ProcessType(pos, type_name);
 
         // Then an identifier.
@@ -213,9 +218,28 @@ public:
         std::string identifier = tokens[pos++].lexeme;
 
         // If and open-paren follows the identifier, we are defining a function, otherwise it's a variable.
-        if (AsChar(pos) == '(') {                      // ----- FUNCTION!! -----
+        if (AsChar(pos) == '(') {                                // ----- FUNCTION!! -----
+          pos++;  // Move past paren.
 
-        } else {                                       // ----- VARIABLE!! -----
+          // Setup an AST Node for a function definition.
+          auto node_function = emp::NewPtr<AST_ConceptUsing>();
+          node_function->return_type = type_name;
+          node_function->fun_name = identifier;
+          concept.AddChild(node_function);                       // Save this function node in the concept.
+
+          pos = ProcessArgs(pos, node_function->args);           // Read the args for this function.
+
+          RequireChar(')', pos++, "Function arguments must end with a close-parenthesis (')')");
+
+          pos = ProcessIDList(pos, node_function->attributes);   // Read in each of the function attributes, if any.
+
+          RequireChar('{', pos++, "Function body must begin with open brace ('{')");
+
+          pos = ProcessCode(pos, node_function->default_code);  // Read the default function body.
+
+          RequireChar('{', pos++, "Function body must end with close brace ('}')");
+
+        } else {                                                 // ----- VARIABLE!! -----
 
         }
       }
