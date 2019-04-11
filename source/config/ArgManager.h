@@ -8,20 +8,212 @@
 #ifndef EMP_CL_ARG_MANAGER_H
 #define EMP_CL_ARG_MANAGER_H
 
+#include <algorithm>
 #include <string>
 #include <vector>
+#include <map>
+#include <iterator>
 
 #include "command_line.h"
 #include "config.h"
 
 namespace emp {
+
+  /// A simple class to manage command-line arguments that were passed in.
+
+  class ArgManager {
+
+  private:
+    std::multimap<std::string, emp::vector<std::string>> packs;
+    std::multimap<std::string, size_t> counts;
+    std::multimap<std::string, std::string> descs;
+
+  public:
+    // Convert input arguments to a vector of strings for easier processing.
+    static emp::vector<std::string> args_to_strings(int argc, char* argv[]) {
+      emp::vector<std::string> args;
+      for (size_t i = 0; i < (size_t) argc; i++) {
+        args.push_back(argv[i]);
+      }
+      return args;
+    }
+
+    ArgManager(
+      int argc,
+      char* argv[],
+      std::multimap<std::string, size_t> counts = std::multimap<std::string, size_t>(),
+      std::multimap<std::string, std::string> descs = std::multimap<std::string, std::string>()
+    ) : ArgManager(ArgManager::args_to_strings(argc, argv), counts, descs) { ; }
+
+    ArgManager(
+      const emp::vector<std::string> args,
+      const std::multimap<std::string, size_t> counts_ = std::multimap<std::string, size_t>(),
+      const std::multimap<std::string, std::string> descs_  = std::multimap<std::string, std::string>()
+    ) : counts(counts_), descs(descs_) {
+
+      emp::vector<std::string> deflagged = args;
+      for(auto & val : deflagged) {
+        val.erase(0, val.find_first_not_of('-'));
+      }
+
+      for(size_t i = 0; i < args.size(); ++i) {
+
+        if( counts.count(deflagged[i]) ) {
+
+          size_t j = i;
+          while( j < args.size() && !counts.count(deflagged[j]) ) ++j;
+
+          packs.insert(
+            {
+              deflagged[i],
+              emp::vector<std::string>(args.begin()+i+1,args.begin()+j+1)
+            }
+          );
+
+          i = j;
+
+        } else {
+
+          const auto r_proc = packs.equal_range(deflagged[i]);
+          const size_t n_proc = std::distance(r_proc.first, r_proc.second);
+
+          const auto r_spec = counts.equal_range(deflagged[i]);
+          const size_t n_spec = std::distance(r_spec.first, r_spec.second);
+
+          size_t n;
+
+          if (n_spec) {
+            auto it = r_spec.first;
+            std::advance(it, n_proc % n_spec);
+            n = it->second;
+          } else {
+            n = 0;
+          }
+
+          packs.insert(
+            {
+              args[i],
+              emp::vector<std::string>(args.begin()+i+1,args.begin()+i+n+1)
+            }
+          );
+
+        }
+
+      }
+    }
+
+    ArgManager(
+      std::multimap<std::string, emp::vector<std::string>> packs_,
+      const std::multimap<std::string, size_t> counts_ = std::multimap<std::string, size_t>(),
+      const std::multimap<std::string, std::string> descs_  = std::multimap<std::string, std::string>()
+    ) : packs(packs_), counts(counts_) { ; }
+
+    ~ArgManager() { ; }
+
+    /// UseArg consumes an argument pack accessed by a certain name.
+    std::optional<emp::vector<std::string>> UseArg(
+      const std::string & name,
+      std::optional<size_t> req_size=std::nullopt
+    ) {
+      auto res = packs.count(name) && (
+          !req_size || *req_size == packs.lower_bound(name)->second.size()
+        ) ? std::make_optional(packs.lower_bound(name)->second)
+        : std::nullopt;
+      if (res) packs.erase(packs.lower_bound(name));
+
+      return res;
+    }
+
+    /// ViewArg returns all argument packs under a certain name.
+    emp::vector<emp::vector<std::string>> ViewArg(const std::string & name) {
+
+      emp::vector<emp::vector<std::string>> res;
+
+      const auto range = packs.equal_range(name);
+      for (auto it = range.first; it != range.second; ++it) {
+        res.push_back(it->second);
+      }
+
+      return res;
+
+    }
+
+    /// Print information about all known argument types and what they're for; make pretty.
+    void PrintHelp(std::ostream & os) const {
+
+      for( auto name_it = descs.begin();
+           name_it !=  descs.end();
+           name_it = descs.upper_bound(name_it->first)
+      ) {
+        auto d_range = descs.equal_range(name_it->first);
+        auto c_range = counts.equal_range(name_it->first);
+
+        auto d_it = d_range.first;
+        auto c_it = c_range.first;
+
+        while (d_it != d_range.second && c_it != c_range.second) {
+
+          if(d_it == d_range.second) d_it = d_range.first;
+          if(c_it == c_range.second) c_it = c_range.first;
+
+          os << "-"
+             << name_it->first
+             << ( c_range.first != c_range.second
+                  ? emp::to_string(" [", c_it->second, "]") : ""
+                )
+             << std::endl
+             << "   | "
+             << (d_range.first != d_range.second ? d_it->second : "")
+             << std::endl;
+
+          if (d_range.first != d_range.second) ++d_it;
+          if (c_range.first != c_range.second) ++c_it;
+
+        }
+      }
+    }
+
+    /// Test if there are any unused arguments, and if so, output an error.
+    bool HasUnused(std::ostream & os=std::cerr) const {
+      if (packs.size() > 1) {
+        os << "Unused arg packs:" << std::endl;
+        for(const auto & p : packs) {
+          os << " -" << p.first;
+          for(const auto & v : p.second) {
+            os << " " << v;
+          }
+          os << std::endl;
+        }
+        PrintHelp(os);
+        return true;
+      }
+      return false;
+    }
+
+    /// Convert settings from a configure object to command-line arguments.
+    /// Return bool for "should program proceed" (i.e., true=continue, false=exit).
+    void ApplyConfigOptions(Config & config) {
+
+      // Scan through the config object to generate command line flags for each setting.
+      for (auto e : config) {
+
+        const auto entry = e.second;
+
+        const auto res = UseArg(entry->GetName(), std::make_optional(1));
+
+        if (res) config.Set(entry->GetName(), (*res)[0]);
+
+      }
+
+    }
+
+  };
+
   namespace cl {
 
     /// A simple class to manage command-line arguments that were passed in.
     /// Derived from emp::vector<std::string>, but with added functionality for argument handling.
-    class [[deprecated("emp::cl::ArgManager has been replaced by"
-      "emp::ArgManager, which has API updates")]]
-      ArgManager : public emp::vector<std::string> {
+    class ArgManager : public emp::vector<std::string> {
     private:
       using parent_t = emp::vector<std::string>;
       emp::vector<std::string> arg_names;

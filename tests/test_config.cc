@@ -36,6 +36,29 @@ TEST_CASE("Test config", "[config]"){
 
   argv.push_back(nullptr);
 
+  {
   emp::cl::ArgManager am(argv.size() - 1, argv.data());
+  }
+
+  {
+  emp::ArgManager am(argv.size() - 1, argv.data());
+  }
+
+  {
+  emp::ArgManager am(
+    argv.size() - 1,
+    argv.data(),
+    config.ArgCounts()
+  );
+  }
+
+  {
+  emp::ArgManager am(
+    argv.size() - 1,
+    argv.data(),
+    config.ArgCounts(),
+    config.ArgDescriptions()
+  );
+  }
 
 }
