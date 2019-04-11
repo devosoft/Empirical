@@ -132,12 +132,13 @@ TEST_CASE("Test config", "[config]"){
     REQUIRE(*am.UseArg("help") == (emp::vector<std::string>) {} );
     REQUIRE(!am.UseArg("help"));
 
-    emp::vector<std::string> res = {"-a", "b"};
-    REQUIRE(res == *am.UseArg("duo"));
+    REQUIRE(*am.UseArg("duo") == ((emp::vector<std::string>) {"-a", "b"}));
     REQUIRE(!am.UseArg("duo"));
 
-    res = (emp::vector<std::string>) {"pos1", "pos2"};
-    REQUIRE(*am.UseArg("_positional") == res);
+    REQUIRE(
+      *am.UseArg("_positional")
+      == ((emp::vector<std::string>) {"pos1", "pos2"})
+    );
     REQUIRE(*am.UseArg("_positional") == (emp::vector<std::string>) {"pos3"} );
     REQUIRE(*am.UseArg("_positional") == (emp::vector<std::string>) {"pos4"} );
     REQUIRE(!am.UseArg("_positional"));
