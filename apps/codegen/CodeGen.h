@@ -80,7 +80,25 @@ private:
   struct AST_Concept : AST_Node {
     std::string name;
     std::string base_name;
-    // Children a Using, Variable Declaration, or Function Declaration
+    // Children are Using, Variable Declaration, or Function Declaration
+  };
+
+  struct AST_ConceptUsing : AST_Node {
+    std::string type_name;
+    std::string default_code;
+  };
+
+  struct AST_ConceptVariable : AST_Node {
+    std::string type_name;
+    std::string var_name;
+    std::string default_code;
+  };
+
+  struct AST_ConceptFunction : AST_Node {
+    std::string type_name;
+    std::string fun_name;
+    std::string args;
+    std::string default_code;
   };
 
   AST_Node ast_root;
@@ -149,7 +167,7 @@ public:
       }
       // @CAO: Technically we can have a whole list of special keywords, but for now its just "concept".
       else {
-        Error( emp::to_string("Unknown keyword '", tokens[pos].lexeme, "'.  Aborting."), pos )
+        Error( emp::to_string("Unknown keyword '", tokens[pos].lexeme, "'.  Aborting."), pos );
       }
     }
     return pos;
@@ -176,7 +194,31 @@ public:
     // Loop through the full definition of concept, incorporating each entry.
     while ( AsChar(pos) != '{' ) {
       // Entries can be a "using" statement, a function definition, or a variable definition.
-      RequireID(pos, "Concept members can be either functions, variables, or using-statements.")
+      RequireID(pos, "Concept members can be either functions, variables, or using-statements.");
+
+      std::string type_name;
+      std::string default_code;
+      if (tokens[pos].lexeme == "using") {              // ----- USING!! -----
+        pos++;
+        RequireID(pos, "A 'using' command must first specify the new type name.");
+        pos = ProcessType(pos, type_name);
+        RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
+        pos = GetCodeLine(pos, default_code);
+      } else {
+        // Start with a type...
+        pos = ProcessType(pos, type_name);
+
+        // Then an identifier.
+        RequireID(pos, "Functions and variables in concept definition must provide identifier after type name.");
+        std::string identifier = tokens[pos++].lexeme;
+
+        // If and open-paren follows the identifier, we are defining a function, otherwise it's a variable.
+        if (AsChar(pos) == '(') {                      // ----- FUNCTION!! -----
+
+        } else {                                       // ----- VARIABLE!! -----
+
+        }
+      }
     }
 
     return pos;
