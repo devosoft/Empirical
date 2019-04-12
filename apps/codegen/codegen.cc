@@ -23,4 +23,6 @@ int main(int argc, char *argv[])
   codegen.PrintLexerState();
   std::cout << std::endl;
   codegen.PrintTokens();
+
+  codegen.ProcessTop();
 }
