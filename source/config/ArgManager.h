@@ -14,6 +14,8 @@
 #include <map>
 #include <iterator>
 
+#include "base/Ptr.h"
+#include "base/vector.h"
 #include "command_line.h"
 #include "config.h"
 
@@ -36,6 +38,24 @@ namespace emp {
         args.push_back(argv[i]);
       }
       return args;
+    }
+
+    // Make counts specification for builtin commands
+    static std::multimap<std::string, size_t> MakeBuiltinCounts() {
+      return {
+        {"help", 0},
+        {"gen", 1},
+        {"make-const", 1}
+      };
+    }
+
+    // Make desc specification for builtin commands
+    static std::multimap<std::string, std::string> MakeBuiltinDescs() {
+      return {
+        {"help", "Print help information."},
+        {"gen", "Generate configuration file."},
+        {"make-const", "Generate const version of macros file."}
+      };
     }
 
     ArgManager(
@@ -139,7 +159,40 @@ namespace emp {
 
     }
 
-    void Print(std::ostream & os) const {
+    // Process builtin commands.
+    /// Return bool for "should program proceed" (i.e., true=continue, false=exit).
+    bool ProcessBuiltin(
+      const emp::Ptr<const Config> config=nullptr,
+      std::ostream & os=std::cout
+    ) {
+
+      if (UseArg("help")) {
+        PrintHelp(os);
+        return false;
+      }
+
+      bool proceed = true;
+
+      if (const auto res = UseArg("gen", 1); res && config) {
+        const std::string cfg_file = res->front();
+        os << "Generating new config file: " << cfg_file << std::endl;
+        config->Write(cfg_file);
+        proceed = false;
+      }
+
+      if (const auto res = UseArg("make-const", 1); res && config)  {
+        const std::string macro_file = res->front();
+        os << "Generating new macros file: " << macro_file << std::endl;
+        config->WriteMacros(macro_file, true);
+        proceed = false;
+      }
+
+      return proceed;
+
+    }
+
+    /// Print the current state of the ArgManager.
+    void Print(std::ostream & os=std::cout) const {
 
       for(const auto it : packs ) {
         os << it.first << ":";
@@ -152,7 +205,7 @@ namespace emp {
     }
 
     /// Print information about all known argument types and what they're for; make pretty.
-    void PrintHelp(std::ostream & os) const {
+    void PrintHelp(std::ostream & os=std::cout) const {
 
       for( auto name_it = descs.begin();
            name_it !=  descs.end();

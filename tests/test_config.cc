@@ -98,18 +98,18 @@ TEST_CASE("Test config", "[config]"){
 
     argv.push_back(nullptr);
 
-    auto counts = config.ArgCounts();
+    auto counts = emp::ArgManager::MakeBuiltinCounts();
+    counts.merge(config.ArgCounts());
     counts.merge( (std::multimap<std::string,size_t>) {
       {"dir", 1},
-      {"help", 0},
       {"duo", 2},
       {"nope", 0}
     });
 
-    auto descs = config.ArgDescriptions();
+    auto descs = emp::ArgManager::MakeBuiltinDescs();
+    descs.merge(config.ArgDescriptions());
     descs.merge( (std::multimap<std::string,std::string>) {
       {"dir", "some information 'n stuff"},
-      {"help", "I need somebody!"},
       {"duo", "two things"},
       {"nope", "not here"}
     });
@@ -129,8 +129,9 @@ TEST_CASE("Test config", "[config]"){
     REQUIRE(*am.UseArg("dir") == (emp::vector<std::string>) {"/other_path"} );
     REQUIRE(!am.UseArg("dir"));
 
-    REQUIRE(*am.UseArg("help") == (emp::vector<std::string>) {} );
+    REQUIRE(!am.ProcessBuiltin());
     REQUIRE(!am.UseArg("help"));
+    REQUIRE(am.ProcessBuiltin(&config));
 
     REQUIRE(*am.UseArg("duo") == ((emp::vector<std::string>) {"-a", "b"}));
     REQUIRE(!am.UseArg("duo"));
