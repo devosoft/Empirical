@@ -197,6 +197,12 @@ public:
     if (AsLexeme(pos) == "&") pos++;
     if (AsLexeme(pos) == "*") pos++;
 
+    // Collect all of the lexemes
+    type_name.resize(0);
+    for (size_t i = start_pos; i < pos; i++) {
+      type_name += tokens[i].lexeme;
+    }
+
     return pos;
   }
 
