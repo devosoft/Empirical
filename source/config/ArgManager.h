@@ -86,15 +86,15 @@ namespace emp {
           size_t n = n_spec ?
             std::next(r_spec.first, n_proc % n_spec)->second : 0;
 
-          packs.insert(
-            {
-              deflagged[i],
-              emp::vector<std::string>(
-                std::next(std::begin(args), i+1),
-                std::next(std::begin(args), std::min(i+n+1,args.size()))
-              )
-            }
-          );
+          if (i+n+1 <= args.size()) packs.insert(
+              {
+                deflagged[i],
+                emp::vector<std::string>(
+                  std::next(std::begin(args), i+1),
+                  std::next(std::begin(args), i+n+1)
+                )
+              }
+            );
 
           i += n;
 
