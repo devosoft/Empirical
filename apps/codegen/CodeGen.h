@@ -119,6 +119,16 @@ private:
     return HasToken(pos) ? tokens[pos].lexeme : emp::empty_string();
   }
 
+  std::string ConcatLexemes(size_t start_pos, size_t end_pos) {
+    emp_assert(start_pos <= end_pos);
+    emp_assert(end_pos <= tokens.size());
+    std::stringstream ss;    
+    for (size_t i = start_pos; i < end_pos; i++) {
+      ss << tokens[i].lexeme;
+    }
+    return ss.str();
+  }
+
   void Error(const std::string & msg, int pos = -1) {
     std::cout << "Error (token " << pos << "): " << msg << "\nAborting." << std::endl;
     exit(1);
@@ -161,7 +171,36 @@ public:
 
   // Collect a line of code, ending with a semi-colon OR mis-matched brace.
   size_t ProcessLine(size_t pos, std::string & line, bool match_angle_bracket=false) {
-    // @CAO Write This!
+    std::vector<char> open_symbols;
+    while (pos < tokens.size()) {
+      char cur_char = AsChar(pos);
+      switch (cur_char) {
+        case '<':
+          if (match_angle_bracket == false) break;
+          [[fallthrough]]
+        case '(':
+        case '[':
+        case '{':
+          open_symbols.push_back(cur_char);
+          break;
+        case '>':
+          if (match_angle_bracket == false) break;
+          [[fallthrough]]
+        case ')':
+        case ']':
+        case '}':
+          if (open_symbols.size()) {
+            // @CAO should check to make sure this is a CORRECT match...
+            open_symbols.pop_back();
+            break;
+          }
+          [[fallthrough]]
+        case ';':
+        return pos;
+      }
+
+      pos++;  // Move on to the next symbol.
+    }
     return pos;
   }
 
@@ -198,10 +237,7 @@ public:
     if (AsLexeme(pos) == "*") pos++;
 
     // Collect all of the lexemes
-    type_name.resize(0);
-    for (size_t i = start_pos; i < pos; i++) {
-      type_name += tokens[i].lexeme;
-    }
+    type_name = ConcatLexemes(start_pos, pos);
 
     return pos;
   }
