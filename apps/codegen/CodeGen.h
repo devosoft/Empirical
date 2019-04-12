@@ -44,6 +44,7 @@ private:
   std::string filename;
   emp::Lexer lexer;
   emp::vector<emp::Token> tokens;
+  bool debug = false;
 
   int token_identifier = -1;
   int token_number = -1;
@@ -114,9 +115,12 @@ private:
     if (HasToken(pos) && tokens[pos].token_id == token_other) return tokens[pos].lexeme[0];
     return 0;
   }
+  const std::string & AsLexeme(int pos) const {
+    return HasToken(pos) ? tokens[pos].lexeme : emp::empty_string();
+  }
 
   void Error(const std::string & msg, int pos = -1) {
-    std::cout << "Error: " << msg << "\nAborting." << std::endl;
+    std::cout << "Error (token " << pos << "): " << msg << "\nAborting." << std::endl;
     exit(1);
   }
 
@@ -133,7 +137,7 @@ private:
     if (AsChar(pos) != req_char) { Error(error_msg, pos); }
   }
   void RequireLexeme(const std::string & req_str, int pos, const std::string & error_msg) {
-    if (!HasToken(pos) || tokens[pos].lexeme != req_str) { Error(error_msg, pos); }
+    if (AsLexeme(pos) != req_str) { Error(error_msg, pos); }
   }
 
 public:
@@ -148,22 +152,51 @@ public:
     token_string = lexer.AddToken("String", "\\\"[^\"]*\\\"", true, true);   // Literal strings.
 
     // Other tokens should have least priority.
-    token_other = lexer.AddToken("Other", ".", true, true);                  // Symbols
+    token_other = lexer.AddToken("Other", ".|\"::\"", true, true);           // Symbols
 
     std::ifstream file(filename);
     tokens = lexer.Tokenize(file);
     file.close();
   }
 
-  // Collect all tokens used to describe a type.
-  size_t ProcessType(size_t pos, std::string & type_name) {
+  // Collect a line of code, ending with a semi-colon OR mis-matched brace.
+  size_t ProcessLine(size_t pos, std::string & line, bool match_angle_bracket=false) {
     // @CAO Write This!
     return pos;
   }
 
-  // Collect a line of code, ending with a semi-colon OR mis-matched brace.
-  size_t ProcessLine(size_t pos, std::string & line) {
-    // @CAO Write This!
+  // Collect all tokens used to describe a type.
+  size_t ProcessType(size_t pos, std::string & type_name) {
+    const size_t start_pos = pos;
+    // A type may start with a const.
+    if (AsLexeme(pos) == "const") pos++;
+
+    // Figure out the identifier (with possible "::" requiring another id)
+    bool need_id = true;
+    while (need_id) {
+      if (AsLexeme(pos) == "typename") pos++;  // May specify a typename is next.
+      if (AsLexeme(pos) == "template") pos++;  // May specify a template is next.
+
+      RequireID(pos, emp::to_string("Expecting type, but found '", tokens[pos].lexeme, "'."));
+      pos++;
+      need_id = false;
+
+      // In case this is a template, we need to evaluate parameters.
+      if (AsLexeme(pos) == "<") {
+        pos = ProcessLine(pos+1, type_name, true);
+        RequireChar('>', pos, "Templates must end in a close angle bracket.");
+      }
+
+      if (AsLexeme(pos) == "::") {
+        pos++;
+        need_id = true;
+      }
+    }
+
+    // Type may end in a symbol...
+    if (AsLexeme(pos) == "&") pos++;
+    if (AsLexeme(pos) == "*") pos++;
+
     return pos;
   }
 
