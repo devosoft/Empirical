@@ -171,9 +171,11 @@ public:
 
   // Collect a line of code, ending with a semi-colon OR mis-matched brace.
   size_t ProcessLine(size_t pos, std::string & line, bool match_angle_bracket=false) {
+    const size_t start_pos = pos;
     std::vector<char> open_symbols;
-    while (pos < tokens.size()) {
-      char cur_char = AsChar(pos);
+    bool finished = false;
+    while (!finished && pos < tokens.size()) {
+      char cur_char = AsChar(pos++);
       switch (cur_char) {
         case '<':
           if (match_angle_bracket == false) break;
@@ -181,7 +183,7 @@ public:
         case '(':
         case '[':
         case '{':
-          open_symbols.push_back(cur_char);
+          open_symbols.push_back(cur_char);  // Store this open bracket to be matched later.
           break;
         case '>':
           if (match_angle_bracket == false) break;
@@ -194,13 +196,16 @@ public:
             open_symbols.pop_back();
             break;
           }
-          [[fallthrough]]
+          pos--;              // Leave close bracket to still be processed.
+          [[fallthrough]]     // Unmatched close bracket should count as an end condition.
         case ';':
-        return pos;
+          finished = true;
+          break;
       }
-
-      pos++;  // Move on to the next symbol.
     }
+
+    line = ConcatLexemes(start_pos, pos);
+
     return pos;
   }
 
