@@ -169,14 +169,20 @@ public:
     file.close();
   }
 
-  // Collect a line of code, ending with a semi-colon OR mis-matched brace.
-  size_t ProcessLine(size_t pos, std::string & line, bool match_angle_bracket=false) {
+  // Collect a line of code, ending with a semi-colon OR mis-matched bracket.
+  // Always stops at a mis-matched ')' '}' or ']'
+  // If match_angle_bracket is set, will also stop at a mis-matched '>'
+  // If multi_line is set, will NOT stop with a ';'
+  size_t ProcessCode(size_t pos, std::string & line, bool match_angle_bracket=false, bool multi_line=false) {
     const size_t start_pos = pos;
     std::vector<char> open_symbols;
     bool finished = false;
     while (!finished && pos < tokens.size()) {
       char cur_char = AsChar(pos++);
       switch (cur_char) {
+        case ';':
+          if (multi_line == false) finished = true;
+          break;
         case '<':
           if (match_angle_bracket == false) break;
           [[fallthrough]]
@@ -197,8 +203,6 @@ public:
             break;
           }
           pos--;              // Leave close bracket to still be processed.
-          [[fallthrough]]     // Unmatched close bracket should count as an end condition.
-        case ';':
           finished = true;
           break;
       }
@@ -227,7 +231,7 @@ public:
 
       // In case this is a template, we need to evaluate parameters.
       if (AsLexeme(pos) == "<") {
-        pos = ProcessLine(pos+1, type_name, true);
+        pos = ProcessCode(pos+1, type_name, true);
         RequireChar('>', pos, "Templates must end in a close angle bracket.");
       }
 
@@ -244,12 +248,6 @@ public:
     // Collect all of the lexemes
     type_name = ConcatLexemes(start_pos, pos);
 
-    return pos;
-  }
-
-  // Collect multiple lines of code, ending only with a mis-matched brace.
-  size_t ProcessCode(size_t pos, std::string & code) {
-    // @CAO Write This!
     return pos;
   }
 
@@ -311,7 +309,7 @@ public:
 
         RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
 
-        pos = ProcessLine(pos, node_using->default_code);   // Determine code being assigned to.
+        pos = ProcessCode(pos, node_using->default_code);   // Determine code being assigned to.
       } else {
         // Start with a type...
         std::string type_name;
@@ -331,7 +329,7 @@ public:
           node_function->fun_name = identifier;
           concept.AddChild(node_function);                       // Save this function node in the concept.
 
-          pos = ProcessLine(pos, node_function->args);           // Read the args for this function.
+          pos = ProcessCode(pos, node_function->args);           // Read the args for this function.
 
           RequireChar(')', pos++, "Function arguments must end with a close-parenthesis (')')");
 
@@ -339,9 +337,11 @@ public:
 
           RequireChar('{', pos++, "Function body must begin with open brace ('{')");
 
-          pos = ProcessCode(pos, node_function->default_code);  // Read the default function body.
+          pos = ProcessCode(pos, node_function->default_code, false, true);  // Read the default function body.
 
-          RequireChar('{', pos++, "Function body must end with close brace ('}')");
+          RequireChar('{', pos++,
+                      emp::to_string("Function body must end with close brace ('}') not '",
+                                     AsLexeme(pos-1), "'."));
 
         } else {                                                 // ----- VARIABLE!! -----
           auto node_var = emp::NewPtr<AST_ConceptVariable>();
@@ -353,7 +353,7 @@ public:
           }
           else {                     // ...or is there a default value for this variable?
             // Determine code being assigned from.
-            pos = ProcessLine(pos, node_var->default_code);
+            pos = ProcessCode(pos, node_var->default_code);
           }
 
         }
@@ -369,8 +369,14 @@ public:
   void PrintLexerState() { lexer.Print(); }
 
   void PrintTokens() {
-    for (auto token : tokens) {
-      std::cout << lexer.GetTokenName(token) << " : \"" << token.lexeme << "\"" << std::endl;
+    for (size_t pos = 0; pos < tokens.size(); pos++) {
+      std::cout << pos << ": "
+                << lexer.GetTokenName(tokens[pos])
+                << " : \"" << AsLexeme(pos) << "\""
+                << std::endl;
     }
+    // for (auto token : tokens) {
+    //   std::cout << lexer.GetTokenName(token) << " : \"" << token.lexeme << "\"" << std::endl;
+    // }
   }
 };
