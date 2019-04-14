@@ -226,6 +226,13 @@ namespace emp {
         std::cout << GetTokenName(token) << " : \"" << token.lexeme << "\"" << std::endl;
       }
     }
+
+    void DebugToken(int token_id) const {
+      const auto & token = GetTokenInfo(token_id);
+      std::cout << "Debugging token " << token.id << ": '" << token.name << "'.\n"
+                << "  Desc: " << token.desc << "\n";
+      token.regex.PrintDebug();
+    }
   };
 
 
