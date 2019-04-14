@@ -34,6 +34,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <set>
 #include <string>
 
 #include "../../source/base/Ptr.h"
@@ -99,8 +100,14 @@ private:
     std::string return_type;
     std::string fun_name;
     std::string args;
-    emp::vector<std::string> attributes;     // const, noexcept, etc.
+    std::set<std::string> attributes;     // const, noexcept, etc.
     std::string default_code;
+
+    std::string AttributeString() {
+      std::string out_str;
+      for (auto & x : attributes) out_str += x;
+      return out_str;
+    }
   };
 
   AST_Node ast_root;
@@ -132,6 +139,11 @@ private:
   void Error(const std::string & msg, int pos = -1) {
     std::cout << "Error (token " << pos << "): " << msg << "\nAborting." << std::endl;
     exit(1);
+  }
+
+  template <typename... Ts>
+  void Debug(Ts... args) {
+    if (debug) std::cout << "DEBUG: " << emp::to_string(args...) << std::endl;
   }
 
   void RequireID(int pos, const std::string & error_msg) {
@@ -202,6 +214,7 @@ public:
             open_symbols.pop_back();
             break;
           }
+          // We will only make it here is this is an unmatched bracket.
           pos--;              // Leave close bracket to still be processed.
           finished = true;
           break;
@@ -252,8 +265,11 @@ public:
   }
 
   // Collect a series of identifiers, separated by spaces.
-  size_t ProcessIDList(size_t pos, emp::vector<std::string> & ids) {
-    // @CAO Write This!
+  size_t ProcessIDList(size_t pos, std::set<std::string> & ids) {
+    while (IsID(pos)) {
+      ids.insert(AsLexeme(pos));
+      pos++;
+    }
     return pos;
   }
 
@@ -290,6 +306,8 @@ public:
     RequireID(pos, "Concept declaration must include name of base class.");
     concept.base_name = tokens[pos++].lexeme;
 
+    Debug("Defining concept '", concept.name, "' with base class '", concept.base_name, "'.");
+
     // Next, must be an open brace...
     RequireChar('{', pos, "Concepts must be defined in braces ('{' and '}').");
     pos++;
@@ -307,9 +325,13 @@ public:
         concept.AddChild(node_using);                       // Save this node in the concept.
         pos = ProcessType(pos, node_using->type_name);      // Determine new type name being defined.
 
+        Debug("...adding a type '", node_using->type_name, "'.");
+
         RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
 
         pos = ProcessCode(pos, node_using->default_code);   // Determine code being assigned to.
+
+        Debug("   value: ", node_using->default_code);
       } else {
         // Start with a type...
         std::string type_name;
@@ -329,19 +351,25 @@ public:
           node_function->fun_name = identifier;
           concept.AddChild(node_function);                       // Save this function node in the concept.
 
+
           pos = ProcessCode(pos, node_function->args);           // Read the args for this function.
 
           RequireChar(')', pos++, "Function arguments must end with a close-parenthesis (')')");
 
+          Debug("...adding a function '", type_name, " ", identifier, "(", node_function->args, ")'");
+
           pos = ProcessIDList(pos, node_function->attributes);   // Read in each of the function attributes, if any.
+
+          Debug("   with attributes: ", node_function->AttributeString());
 
           RequireChar('{', pos++, "Function body must begin with open brace ('{')");
 
           pos = ProcessCode(pos, node_function->default_code, false, true);  // Read the default function body.
 
-          RequireChar('{', pos++,
-                      emp::to_string("Function body must end with close brace ('}') not '",
-                                     AsLexeme(pos-1), "'."));
+          Debug("   and code: ", node_function->default_code);
+
+          RequireChar('}', pos++, emp::to_string("Function body must end with close brace ('}') not '",
+                                                 AsLexeme(pos-1), "'."));
 
         } else {                                                 // ----- VARIABLE!! -----
           auto node_var = emp::NewPtr<AST_ConceptVariable>();
@@ -379,4 +407,7 @@ public:
     //   std::cout << lexer.GetTokenName(token) << " : \"" << token.lexeme << "\"" << std::endl;
     // }
   }
+
+  void SetDebug(bool in_debug=true) { debug = in_debug; }
+
 };
