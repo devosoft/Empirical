@@ -18,8 +18,12 @@
  *   - TYPE_END: (nothing)
  *             | "::" TYPE
  *             | "<" TYPE_OR_EXPRESSION ">" TYPE_END
+ *             | '&'
+ *             | '*'
  *   - DECLARE: TYPE ID
- *   - FUNCTION: DECLARE '(' PARAMS ')'
+ *   - FUNCTION: DECLARE '(' PARAMS ')' BLOCK
+ *             | DECLARE '(' PARAMS ')' '=' "required" ';'
+ *             | DECLARE '(' PARAMS ')' '=' "default" ';'
  *   - PARAMS: (nothing)
  *           | PARAM_LIST
  *   - PARAM_LIST: PARAM
@@ -27,9 +31,9 @@
  *   - PARAM: DECLARE
  *          | OVERLOAD '(' ID ')'
  *   - MEMBER: DECLARE ';'
- *           | FUNCTION BLOCK
+ *           | FUNCTION
  *           | "using" ID '=' TYPE ';'
- *           | "using" ID '=' "REQUIRE" '(' STRING ')' ';'
+ *           | "using" ID '=' "required" ';'
  */
 
 #include <fstream>
@@ -139,7 +143,7 @@ private:
     return ss.str();
   }
 
-  void Error(const std::string & msg, int pos = -1) {
+  void Error(int pos, const std::string & msg) {
     std::cout << "Error (token " << pos << "): " << msg << "\nAborting." << std::endl;
     exit(1);
   }
@@ -150,26 +154,31 @@ private:
   }
 
   void RequireID(int pos, const std::string & error_msg) {
-    if (!IsID(pos)) { Error(error_msg, pos); }
+    if (!IsID(pos)) { Error(pos, error_msg); }
   }
   void RequireNumber(int pos, const std::string & error_msg) {
-    if (!IsNumber(pos)) { Error(error_msg, pos); }
+    if (!IsNumber(pos)) { Error(pos, error_msg); }
   }
   void RequireString(int pos, const std::string & error_msg) {
-    if (!IsString(pos)) { Error(error_msg, pos); }
+    if (!IsString(pos)) { Error(pos, error_msg); }
   }
   void RequireChar(char req_char, int pos, const std::string & error_msg) {
-    if (AsChar(pos) != req_char) { Error(error_msg, pos); }
+    if (AsChar(pos) != req_char) { Error(pos, error_msg); }
   }
   void RequireLexeme(const std::string & req_str, int pos, const std::string & error_msg) {
-    if (AsLexeme(pos) != req_str) { Error(error_msg, pos); }
+    if (AsLexeme(pos) != req_str) { Error(pos, error_msg); }
   }
 
 public:
   CodeGen(std::string in_filename) : filename(in_filename) {
     // Whitespace and comments should always be dismissed (top priority)
     lexer.AddToken("Whitespace", "[ \t\n\r]+", false, false);                // Any form of whitespace.
-    lexer.AddToken("Comment", "//.*", true, false);                          // Any '//'-style comment.
+    lexer.AddToken("Comment", "//.*", true, false);                          // Any "//"-style comment.
+    lexer.AddToken("Comment2", "/[*]([^*]|([*]+[^*/]))*[*]+/", true, false);   // Any "/* ... */"-style comment.
+    // int tmp = lexer.AddToken("Comment2", "/[*]([^*]|([*][^/]))*[*]+/", true, false);   // Any "/* ... */"-style comment.
+    // int tmp = lexer.AddToken("Comment2", "/[*]([^*]|([*]+[^*/]))*[*]+/", true, false);   // Any "/* ... */"-style comment.
+    // lexer.DebugToken(tmp);
+    // exit(0);
 
     // Meaningful tokens have next priority.
     token_identifier = lexer.AddToken("ID", "[a-zA-Z_][a-zA-Z0-9_]+", true, true);   // Identifiers
@@ -280,7 +289,8 @@ public:
   // Process the tokens starting from the outer-most scope.
   size_t ProcessTop(size_t pos=0) {
     while (pos < tokens.size()) {
-      RequireID(pos, "Statements in outer scope must begi with an identifier or keyword.");
+      RequireID(pos, emp::to_string("Statements in outer scope must begin with an identifier or keyword.  (Found: ",
+                     AsLexeme(pos), ")."));
 
       if (tokens[pos].lexeme == "concept") {
         auto node_ptr = emp::NewPtr<AST_Concept>();
@@ -289,7 +299,7 @@ public:
       }
       // @CAO: Technically we can have a whole list of special keywords, but for now its just "concept".
       else {
-        Error( emp::to_string("Unknown keyword '", tokens[pos].lexeme, "'.  Aborting."), pos );
+        Error( pos, emp::to_string("Unknown keyword '", tokens[pos].lexeme, "'.  Aborting.") );
       }
     }
     return pos;
@@ -372,7 +382,7 @@ public:
             std::string fun_assign = AsLexeme(pos++);
             if (fun_assign == "required") node_function->is_required = true;
             else if (fun_assign == "default") node_function->is_default = true;
-            else Error("Functions can only be set to 'required' or 'default'", pos);
+            else Error(pos, "Functions can only be set to 'required' or 'default'");
             RequireChar(';', pos++, emp::to_string(fun_assign, "functions must end in a semi-colon."));
           }
           else if (fun_char == '{') {  // Function is defined in place.
@@ -384,7 +394,7 @@ public:
                                                   AsLexeme(pos-1), "'."));
           }
           else {
-            Error("Function body must begin with open brace or assignment ('{' or '=')", pos-1);
+            Error(pos-1, "Function body must begin with open brace or assignment ('{' or '=')");
           }
 
         } else {                                                 // ----- VARIABLE!! -----
