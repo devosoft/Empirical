@@ -102,6 +102,8 @@ private:
     std::string args;
     std::set<std::string> attributes;     // const, noexcept, etc.
     std::string default_code;
+    bool is_required = false;
+    bool is_default = false;
 
     std::string AttributeString() {
       std::string out_str;
@@ -131,6 +133,7 @@ private:
     emp_assert(end_pos <= tokens.size());
     std::stringstream ss;    
     for (size_t i = start_pos; i < end_pos; i++) {
+      if (i > start_pos) ss << " ";
       ss << tokens[i].lexeme;
     }
     return ss.str();
@@ -362,14 +365,27 @@ public:
 
           Debug("   with attributes: ", node_function->AttributeString());
 
-          RequireChar('{', pos++, "Function body must begin with open brace ('{')");
+          char fun_char = AsChar(pos++);
 
-          pos = ProcessCode(pos, node_function->default_code, false, true);  // Read the default function body.
+          if (fun_char == '=') {  // Function is "= default;" or "= required;"
+            RequireID(pos, "Function must be assigned to 'required' or 'default'");
+            std::string fun_assign = AsLexeme(pos++);
+            if (fun_assign == "required") node_function->is_required = true;
+            else if (fun_assign == "default") node_function->is_default = true;
+            else Error("Functions can only be set to 'required' or 'default'", pos);
+            RequireChar(';', pos++, emp::to_string(fun_assign, "functions must end in a semi-colon."));
+          }
+          else if (fun_char == '{') {  // Function is defined in place.
+            pos = ProcessCode(pos, node_function->default_code, false, true);  // Read the default function body.
 
-          Debug("   and code: ", node_function->default_code);
+            Debug("   and code: ", node_function->default_code);
 
-          RequireChar('}', pos++, emp::to_string("Function body must end with close brace ('}') not '",
-                                                 AsLexeme(pos-1), "'."));
+            RequireChar('}', pos++, emp::to_string("Function body must end with close brace ('}') not '",
+                                                  AsLexeme(pos-1), "'."));
+          }
+          else {
+            Error("Function body must begin with open brace or assignment ('{' or '=')", pos-1);
+          }
 
         } else {                                                 // ----- VARIABLE!! -----
           auto node_var = emp::NewPtr<AST_ConceptVariable>();
