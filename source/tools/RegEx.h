@@ -173,7 +173,12 @@ namespace emp {
     /// Representation of a series of components...
     struct re_block : public re_parent {   // Series of re's
       void Print(std::ostream & os) const override {
-        os << "BLOCK["; for (auto x : nodes) x->Print(os); os << "]";
+        os << "BLOCK[";
+        for (size_t i = 0; i < nodes.size(); i++) {
+          if (i > 0) os << " ";
+          nodes[i]->Print(os);
+        }
+        os << "]";
       }
       Ptr<re_block> AsBlock() override { return ToPtr(this); }
       bool Simplify() override {
@@ -232,6 +237,7 @@ namespace emp {
       void Print(std::ostream & os) const override {
         os << "|[";
         nodes[0]->Print(os);
+        os << ",";
         nodes[1]->Print(os);
         os << "]";
       }
@@ -494,17 +500,17 @@ namespace emp {
     }
 
     /// For debugging: print the internal representation of the regex.
-    void PrintInternal() { head.Print(std::cout); std::cout << std::endl; }
+    void PrintInternal() const { head.Print(std::cout); std::cout << std::endl; }
 
     /// For debugging: print any internal notes generated about this regex.
-    void PrintNotes() {
+    void PrintNotes() const {
       for (const std::string & n : notes) {
         std::cout << n << std::endl;
       }
     }
 
     /// Print general debuging information about this regex.
-    void PrintDebug() {
+    void PrintDebug() const {
       if (notes.size()) {
         std::cout << "NOTES:" << std::endl;
         PrintNotes();
