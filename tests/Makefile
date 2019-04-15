@@ -33,6 +33,7 @@ test: test-prep $(addprefix test-, $(TEST_NAMES))
 	cd ToolsTests && make test
 	cd BaseTests && make test
 	cd EvoTests && make test
+	cd HardwareTests && make test
 
 # Test optimized version without debug features
 opt: FLAGS := -std=c++14 -DNDEBUG -O3 -Wno-unused-function -I../source/ -I../ 
@@ -60,6 +61,7 @@ test-coverage: coverage_conversion test-prep $(addprefix cover-test-, $(TEST_NAM
 	       cd ToolsTests && make test-coverage
 		   cd BaseTests && make test-coverage
 		   cd EvoTests && make test-coverage
+		   cd HardwareTests && make test-coverage
 	       rm -r ../coverage_source
 
 clean:
