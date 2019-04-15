@@ -192,6 +192,7 @@ namespace emp {
             nodes[i] = new_node;
             modify = true;
           }
+
           // If two neighboring nodes are strings, merge them.
           if (i > 0 && nodes[i]->AsString() && nodes[i-1]->AsString()) {
             nodes[i-1]->AsString()->str += nodes[i]->AsString()->str;
@@ -253,10 +254,12 @@ namespace emp {
       void Print(std::ostream & os) const override { os << "*["; nodes[0]->Print(os); os << "]"; }
 
       virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+        const size_t origin = nfa.AddNewState();
         const size_t target = nfa.AddNewState();
-        nodes[0]->AddToNFA(nfa, start, target);
-        nfa.AddFreeTransition(target, start);
-        nfa.AddFreeTransition(start, stop);
+        nodes[0]->AddToNFA(nfa, origin, target);
+        nfa.AddFreeTransition(start, origin);
+        nfa.AddFreeTransition(target, origin);
+        nfa.AddFreeTransition(origin, stop);
       }
     };
 
@@ -265,10 +268,12 @@ namespace emp {
       re_plus(Ptr<re_base> c) { push(c); }
       void Print(std::ostream & os) const override { os << "+["; nodes[0]->Print(os); os << "]"; }
       virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+        const size_t origin = nfa.AddNewState();
         const size_t target = nfa.AddNewState();
-        nodes[0]->AddToNFA(nfa, start, target);
-        // From the target, can either go back to start and repeat, or straight to stop.
-        nfa.AddFreeTransition(target, start);
+        nodes[0]->AddToNFA(nfa, origin, target);
+        // From the target, can either go back to origin and repeat, or straight to stop.
+        nfa.AddFreeTransition(start, origin);
+        nfa.AddFreeTransition(target, origin);
         nfa.AddFreeTransition(target, stop);
       }
     };
