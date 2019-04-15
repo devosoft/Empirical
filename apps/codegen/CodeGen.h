@@ -58,7 +58,7 @@ private:
 
   /// All AST Nodes have a common base class.
   struct AST_Node {
-    virtual void PrintEcho(std::ostream &) const = 0;
+    virtual void PrintEcho(std::ostream &, std::string prefix="") const = 0;
   };
 
   /// AST Node for a new scope level.
@@ -67,8 +67,8 @@ private:
     ~AST_Scope() { for (auto x : children) x.Delete(); }
     void AddChild(emp::Ptr<AST_Node> node_ptr) { children.push_back(node_ptr); }
 
-    void PrintEcho(std::ostream & os) const override {
-      for (auto x : children) { x->PrintEcho(os); }
+    void PrintEcho(std::ostream & os, std::string prefix="") const override {
+      for (auto x : children) { x->PrintEcho(os, prefix); }
     }
   };
 
@@ -77,8 +77,8 @@ private:
     std::string type_name;
     std::string type_value;
 
-    void PrintEcho(std::ostream & os) const override {
-      os << "using " << type_name << " = " << type_value << "\n";
+    void PrintEcho(std::ostream & os, std::string prefix="") const override {
+      os << prefix << "using " << type_name << " = " << type_value << "\n";
     }
   };
 
@@ -88,10 +88,10 @@ private:
     std::string base_name;
     // Children are Using, Variable Declaration, or Function Declaration
 
-    void PrintEcho(std::ostream & os) const override {
-      os << "concept " << name << " : " << base_name << " {\n";
-      AST_Scope::PrintEcho(os);
-      os << "};\n";
+    void PrintEcho(std::ostream & os, std::string prefix="") const override {
+      os << prefix << "concept " << name << " : " << base_name << " {\n";
+      AST_Scope::PrintEcho(os, prefix+"  ");
+      os << prefix << "};\n";
     }
   };
 
@@ -101,8 +101,8 @@ private:
     std::string var_name;
     std::string default_code;
 
-    void PrintEcho(std::ostream & os) const override {
-      os << var_type << " " << var_name << " " << default_code << "\n";
+    void PrintEcho(std::ostream & os, std::string prefix="") const override {
+      os << prefix << var_type << " " << var_name << " " << default_code << "\n";
     }
   };
 
@@ -122,18 +122,18 @@ private:
       return out_str;
     }
 
-    void PrintEcho(std::ostream & os) const override {
-      os << return_type << " " << fun_name << "(" << args << ") " << AttributeString();
+    void PrintEcho(std::ostream & os, std::string prefix="") const override {
+      os << prefix << return_type << " " << fun_name << "(" << args << ") " << AttributeString();
       if (is_required) os << " = required;\n";
       else if (is_default) os << " = default;\n";
-      else os << "{\n" << default_code << "\n}\n";
+      else os << prefix << "{\n" << prefix << "  " << default_code << "\n" << prefix << "}\n";
     }
   };
 
   /// AST Node for type definition inside of a concept.
   struct AST_ConceptUsing : AST_Using {
-    void PrintEcho(std::ostream & os) const override {
-      os << "using " << type_name << " = " << type_value << "\n";
+    void PrintEcho(std::ostream & os, std::string prefix="") const override {
+      os << prefix << "using " << type_name << " = " << type_value << "\n";
     }
   };
 
