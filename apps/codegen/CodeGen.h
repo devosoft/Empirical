@@ -172,22 +172,17 @@ private:
 public:
   CodeGen(std::string in_filename) : filename(in_filename) {
     // Whitespace and comments should always be dismissed (top priority)
-    lexer.AddToken("Whitespace", "[ \t\n\r]+", false, false);                // Any form of whitespace.
-    lexer.AddToken("Comment", "//.*", true, false);                          // Any "//"-style comment.
-    lexer.AddToken("Comment2", "/[*]([^*]|([*]+[^*/]))*[*]+/", true, false);   // Any "/* ... */"-style comment.
-
-    // int tmp = lexer.AddToken("Comment2", "/[*]([^*]|([*]+[^*/]))*[*]+/", true, false);   // Any "/* ... */"-style comment.
-    // int tmp = lexer.AddToken("Comment2", "(0+0)*", true, false);   // Any "/* ... */"-style comment.
-    // lexer.DebugToken(tmp);
-    // exit(0);
+    lexer.IgnoreToken("Whitespace", "[ \t\n\r]+");
+    lexer.IgnoreToken("//-Comments", "//.*");
+    lexer.IgnoreToken("/*...*/-Comments", "/[*]([^*]|([*]+[^*/]))*[*]+/");
 
     // Meaningful tokens have next priority.
-    token_identifier = lexer.AddToken("ID", "[a-zA-Z_][a-zA-Z0-9_]+", true, true);   // Identifiers
-    token_number = lexer.AddToken("Number", "[0-9]+(.[0-9]+)?", true, true); // Literal numbers.
-    token_string = lexer.AddToken("String", "\\\"[^\"]*\\\"", true, true);   // Literal strings.
+    token_identifier = lexer.AddToken("Identifier", "[a-zA-Z_][a-zA-Z0-9_]+");
+    token_number = lexer.AddToken("Literal Number", "[0-9]+(.[0-9]+)?");
+    token_string = lexer.AddToken("Literal String", "\\\"[^\"]*\\\"");
 
-    // Other tokens should have least priority.
-    token_other = lexer.AddToken("Other", ".|\"::\"", true, true);           // Symbols
+    // Symbol tokens should have least priority.
+    token_other = lexer.AddToken("Symbol", ".|\"::\"");
 
     std::ifstream file(filename);
     tokens = lexer.Tokenize(file);
