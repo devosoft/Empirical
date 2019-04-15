@@ -56,35 +56,57 @@ private:
   int token_string = -1;
   int token_other = -1;
 
-  // All AST Nodes have a common base class.
+  /// All AST Nodes have a common base class.
   struct AST_Node {
+    virtual void PrintEcho(std::ostream &) const = 0;
   };
 
+  /// AST Node for a new scope level.
   struct AST_Scope : AST_Node{
     emp::vector<emp::Ptr<AST_Node>> children;
     ~AST_Scope() { for (auto x : children) x.Delete(); }
     void AddChild(emp::Ptr<AST_Node> node_ptr) { children.push_back(node_ptr); }
+
+    void PrintEcho(std::ostream & os) const override {
+      for (auto x : children) { x->PrintEcho(os); }
+    }
   };
 
-  // Outer level using statement...
+  /// AST Node for outer level using statement...
   struct AST_Using : AST_Node {
     std::string type_name;
     std::string type_value;
+
+    void PrintEcho(std::ostream & os) const override {
+      os << "using " << type_name << " = " << type_value << "\n";
+    }
   };
 
-  // Full concept information.
+  /// AST Node for concept information.
   struct AST_Concept : AST_Scope {
     std::string name;
     std::string base_name;
     // Children are Using, Variable Declaration, or Function Declaration
+
+    void PrintEcho(std::ostream & os) const override {
+      os << "concept " << name << " : " << base_name << " {\n";
+      AST_Scope::PrintEcho(os);
+      os << "};\n";
+    }
   };
 
+  /// AST Node for variable defined inside of a concept.
   struct AST_ConceptVariable : AST_Node {
     std::string var_type;
     std::string var_name;
     std::string default_code;
+
+    void PrintEcho(std::ostream & os) const override {
+      os << var_type << " " << var_name << " " << default_code << "\n";
+    }
   };
 
+  /// AST Node for function defined inside of a concept.
   struct AST_ConceptFunction : AST_Node {
     std::string return_type;
     std::string fun_name;
@@ -94,10 +116,24 @@ private:
     bool is_required = false;
     bool is_default = false;
 
-    std::string AttributeString() {
+    std::string AttributeString() const {
       std::string out_str;
-      for (auto & x : attributes) out_str += x;
+      for (const auto & x : attributes) out_str += x;
       return out_str;
+    }
+
+    void PrintEcho(std::ostream & os) const override {
+      os << return_type << " " << fun_name << "(" << args << ") " << AttributeString();
+      if (is_required) os << " = required;\n";
+      else if (is_default) os << " = default;\n";
+      else os << "{\n" << default_code << "\n}\n";
+    }
+  };
+
+  /// AST Node for type definition inside of a concept.
+  struct AST_ConceptUsing : AST_Using {
+    void PrintEcho(std::ostream & os) const override {
+      os << "using " << type_name << " = " << type_value << "\n";
     }
   };
 
@@ -172,6 +208,11 @@ public:
     std::ifstream file(filename);
     tokens = lexer.Tokenize(file);
     file.close();
+  }
+
+  /// Print out the original state of the code.
+  void PrintEcho(std::ostream & os) const {
+    ast_root.PrintEcho(os);
   }
 
   // Collect a line of code, ending with a semi-colon OR mis-matched bracket.
@@ -315,7 +356,7 @@ public:
         pos++;  // Move past "using"
         RequireID(pos, "A 'using' command must first specify the new type name.");
 
-        auto node_using = emp::NewPtr<AST_Using>();  // Setup an AST node for a using statement.       
+        auto node_using = emp::NewPtr<AST_ConceptUsing>();  // Setup an AST node for a using statement.       
         concept.AddChild(node_using);                       // Save this node in the concept.
         pos = ProcessType(pos, node_using->type_name);      // Determine new type name being defined.
 
