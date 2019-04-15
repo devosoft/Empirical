@@ -175,8 +175,9 @@ public:
     lexer.AddToken("Whitespace", "[ \t\n\r]+", false, false);                // Any form of whitespace.
     lexer.AddToken("Comment", "//.*", true, false);                          // Any "//"-style comment.
     lexer.AddToken("Comment2", "/[*]([^*]|([*]+[^*/]))*[*]+/", true, false);   // Any "/* ... */"-style comment.
-    // int tmp = lexer.AddToken("Comment2", "/[*]([^*]|([*][^/]))*[*]+/", true, false);   // Any "/* ... */"-style comment.
+
     // int tmp = lexer.AddToken("Comment2", "/[*]([^*]|([*]+[^*/]))*[*]+/", true, false);   // Any "/* ... */"-style comment.
+    // int tmp = lexer.AddToken("Comment2", "(0+0)*", true, false);   // Any "/* ... */"-style comment.
     // lexer.DebugToken(tmp);
     // exit(0);
 
@@ -429,9 +430,6 @@ public:
                 << " : \"" << AsLexeme(pos) << "\""
                 << std::endl;
     }
-    // for (auto token : tokens) {
-    //   std::cout << lexer.GetTokenName(token) << " : \"" << token.lexeme << "\"" << std::endl;
-    // }
   }
 
   void SetDebug(bool in_debug=true) { debug = in_debug; }
