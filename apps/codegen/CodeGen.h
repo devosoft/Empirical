@@ -58,40 +58,25 @@ private:
 
   // All AST Nodes have a common base class.
   struct AST_Node {
+  };
+
+  struct AST_Scope : AST_Node{
     emp::vector<emp::Ptr<AST_Node>> children;
-    ~AST_Node() { for (auto x : children) x.Delete(); }
+    ~AST_Scope() { for (auto x : children) x.Delete(); }
     void AddChild(emp::Ptr<AST_Node> node_ptr) { children.push_back(node_ptr); }
   };
 
-  // Misc. Code that should just be echoed back out.
-  struct AST_Code : AST_Node {
-    std::string code;
-  };
-
-  struct AST_Block : AST_Node {
-    // Children are a series of statements.
-  };
-
+  // Outer level using statement...
   struct AST_Using : AST_Node {
     std::string type_name;
     std::string type_value;
   };
 
-  struct AST_VarDeclare : AST_Node {
-    std::string var_name;
-    // Child is an AST_Code expression.
-  };
-
   // Full concept information.
-  struct AST_Concept : AST_Node {
+  struct AST_Concept : AST_Scope {
     std::string name;
     std::string base_name;
     // Children are Using, Variable Declaration, or Function Declaration
-  };
-
-  struct AST_ConceptUsing : AST_Node {
-    std::string type_name;
-    std::string default_code;
   };
 
   struct AST_ConceptVariable : AST_Node {
@@ -116,7 +101,7 @@ private:
     }
   };
 
-  AST_Node ast_root;
+  AST_Scope ast_root;
 
 
   // Helper functions
@@ -330,7 +315,7 @@ public:
         pos++;  // Move past "using"
         RequireID(pos, "A 'using' command must first specify the new type name.");
 
-        auto node_using = emp::NewPtr<AST_ConceptUsing>();  // Setup an AST node for a using statement.       
+        auto node_using = emp::NewPtr<AST_Using>();  // Setup an AST node for a using statement.       
         concept.AddChild(node_using);                       // Save this node in the concept.
         pos = ProcessType(pos, node_using->type_name);      // Determine new type name being defined.
 
@@ -338,9 +323,9 @@ public:
 
         RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
 
-        pos = ProcessCode(pos, node_using->default_code);   // Determine code being assigned to.
+        pos = ProcessCode(pos, node_using->type_value);   // Determine code being assigned to.
 
-        Debug("   value: ", node_using->default_code);
+        Debug("   value: ", node_using->type_value);
       } else {
         // Start with a type...
         std::string type_name;
