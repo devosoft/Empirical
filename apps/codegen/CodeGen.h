@@ -60,6 +60,7 @@ private:
   struct AST_Node {
     /// Echo the original code passed into each class.
     virtual void PrintEcho(std::ostream &, std::string prefix="") const = 0;
+    virtual void PrintOutput(std::ostream &, std::string prefix="") const = 0;
   };
 
   /// AST Node for a new scope level.
@@ -68,8 +69,14 @@ private:
     ~AST_Scope() { for (auto x : children) x.Delete(); }
     void AddChild(emp::Ptr<AST_Node> node_ptr) { children.push_back(node_ptr); }
 
+    /// Scope should run echo on each of its children.
     void PrintEcho(std::ostream & os, std::string prefix="") const override {
       for (auto x : children) { x->PrintEcho(os, prefix); }
+    }
+
+    /// Scope should run output on each of its children.
+    void PrintOutput(std::ostream & os, std::string prefix="") const override {
+      for (auto x : children) { x->PrintOutput(os, prefix); }
     }
   };
 
@@ -81,6 +88,18 @@ private:
     void PrintEcho(std::ostream & os, std::string prefix="") const override {
       os << prefix << "using " << type_name << " = " << type_value << "\n";
     }
+
+    /// Output for a using should be identical to the input.
+    void PrintOutput(std::ostream & os, std::string prefix="") const override {
+      os << prefix << "using " << type_name << " = " << type_value << "\n";
+    }
+  };
+
+  /// A ConceptNode has extra functionality for building both a base class and a template wrapper.
+  struct AST_ConceptNode : AST_Node {
+    void PrintOutput(std::ostream &, std::string="") const override { ; } // No general output needed.
+    virtual void PrintBaseOutput(std::ostream &, std::string prefix="") const = 0;
+    virtual void PrintWrapperOutput(std::ostream &, std::string prefix="") const = 0;
   };
 
   /// AST Node for concept information.
@@ -94,10 +113,28 @@ private:
       AST_Scope::PrintEcho(os, prefix+"  ");
       os << prefix << "};\n";
     }
+
+    void PrintOutput(std::ostream & os, std::string prefix="") const override {
+      os << prefix << "/// Base class for concept wrapper " << name << "<>.\n"
+         << prefix << "class " << base_name << " {\n"
+         << prefix << "public:\n";
+      for (emp::Ptr<AST_Node> x : children) {
+        x.Cast<AST_ConceptNode>()->PrintBaseOutput(os, prefix + "  ");
+      }
+      os << prefix << "};\n\n"
+         << prefix << "/// Concept wrapper (base class is " << base_name << ")\n"
+         << prefix << "template <typename WRAPPED_T>\n"
+         << prefix << "class " << name << " : WRAPPED_T, " << base_name << " {\n"
+         << prefix << "  using this_t = " << name << "<WRAPPED_T>;\n\n";
+      for (emp::Ptr<AST_Node> x : children) {
+        x.Cast<AST_ConceptNode>()->PrintWrapperOutput(os, prefix + "  ");
+      }
+      os << prefix << "};\n\n";
+    }
   };
 
   /// AST Node for variable defined inside of a concept.
-  struct AST_ConceptVariable : AST_Node {
+  struct AST_ConceptVariable : AST_ConceptNode {
     std::string var_type;
     std::string var_name;
     std::string default_code;
@@ -105,10 +142,18 @@ private:
     void PrintEcho(std::ostream & os, std::string prefix="") const override {
       os << prefix << var_type << " " << var_name << " " << default_code << "\n";
     }
+
+    void PrintBaseOutput(std::ostream & os, std::string prefix="") const override {
+      // os << prefix << "\n";
+    }
+
+    void PrintWrapperOutput(std::ostream & os, std::string prefix="") const override {
+      // os << prefix << "\n";
+    }
   };
 
   /// AST Node for function defined inside of a concept.
-  struct AST_ConceptFunction : AST_Node {
+  struct AST_ConceptFunction : AST_ConceptNode {
     std::string return_type;
     std::string fun_name;
     std::string args;
@@ -129,12 +174,53 @@ private:
       else if (is_default) os << " = default;\n";
       else os << prefix << "{\n" << prefix << "  " << default_code << "\n" << prefix << "}\n";
     }
+
+    void PrintBaseOutput(std::ostream & os, std::string prefix="") const override {
+      os << prefix << return_type << " " << fun_name << "(" << args << ") " << AttributeString() << " = 0;\n";
+    }
+    
+    void PrintWrapperOutput(std::ostream & os, std::string prefix="") const override {
+      os << prefix << "// Determine the return type for this function.\n"
+         << prefix << "template <typename T>\n"
+         << prefix << "using return_t_" << fun_name
+                   << " = decltype( std::declval<T>()." << fun_name
+                   << "( EMP_TYPES_TO_VALS(__VA_ARGS__) ) );\n";
+
+      os << prefix << "// Compile-time test if this function exists in wrapped class.\n"
+         << prefix << "static constexpr bool HasFun_" << fun_name << "(){\n"
+         << prefix << "  return emp::test_type<return_t_" << fun_name << ", WRAPPED_T>();\n"
+         << prefix << "}\n";
+
+      os << prefix << "// Call the function, redirecting as needed.\n"
+         << prefix << return_type << " " << fun_name << "(" << args << ") "
+                   << AttributeString() << " {\n"
+         << prefix << "  " << "static_assert( HasFun_" << fun_name
+                   << "(), \"\\n\\n  ** Error: concept instance missing required function "
+                   << fun_name << " **\\n\";"
+         << prefix << "if constexpr (HasFun_" << fun_name << "()) {\n"
+         << prefix << "  ";
+      if (return_type != "void") os << "return ";
+      os << "WRAPPED_T::" << fun_name << "( [[CONVERT ARGS]] );\n"
+         << prefix << "}\n";
+
+    }
   };
 
   /// AST Node for type definition inside of a concept.
-  struct AST_ConceptUsing : AST_Using {
+  struct AST_ConceptUsing : AST_ConceptNode {
+    std::string type_name;
+    std::string type_value;
+
     void PrintEcho(std::ostream & os, std::string prefix="") const override {
       os << prefix << "using " << type_name << " = " << type_value << "\n";
+    }
+
+    void PrintBaseOutput(std::ostream & os, std::string prefix="") const override {
+      // os << prefix << "\n";
+    }
+    
+    void PrintWrapperOutput(std::ostream & os, std::string prefix="") const override {
+      // os << prefix << "\n";
     }
   };
 
@@ -214,6 +300,11 @@ public:
   /// Print out the original state of the code.
   void PrintEcho(std::ostream & os) const {
     ast_root.PrintEcho(os);
+  }
+
+  /// Print out the original state of the code.
+  void PrintOutput(std::ostream & os) const {
+    ast_root.PrintOutput(os);
   }
 
   /// Collect a line of code, ending with a semi-colon OR mis-matched bracket.
