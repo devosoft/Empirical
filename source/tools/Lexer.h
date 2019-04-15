@@ -94,12 +94,21 @@ namespace emp {
     bool TokenOK(int id) const { return id >= 0 && id < cur_token_id; }
 
     /// Add a new token, specified by a name and the regex used to identify it.
-    /// Note that token idea count down with highest IDs having priority.
+    /// Note that token ids count down with highest IDs having priority.
     int AddToken(const std::string & name, const std::string & regex,
                     bool save_lexeme=true, bool save_token=true, const std::string & desc="") {
       int id = cur_token_id--;                // Grab the next available token id.
       generate_lexer = true;                  // Indicate the the lexer DFA needs to be rebuilt.
       token_set.emplace_back( name, regex, id, save_lexeme, save_token, desc );
+      token_map[name] = id;
+      return id;
+    }
+
+    /// Add a token to ignore, specified by a name and the regex used to identify it.
+    int IgnoreToken(const std::string & name, const std::string & regex, const std::string & desc="") {
+      int id = cur_token_id--;                // Grab the next available token id.
+      generate_lexer = true;                  // Indicate the the lexer DFA needs to be rebuilt.
+      token_set.emplace_back( name, regex, id, false, false, desc );
       token_map[name] = id;
       return id;
     }
