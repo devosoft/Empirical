@@ -46,18 +46,19 @@
 
 class CodeGen {
 private:
-  std::string filename;
-  emp::Lexer lexer;
-  emp::vector<emp::Token> tokens;
-  bool debug = false;
+  std::string filename;             ///< Source for for code to generate.
+  emp::Lexer lexer;                 ///< Lexer to process input code.
+  emp::vector<emp::Token> tokens;   ///< Tokenized version of input file.
+  bool debug = false;               ///< Should we print full debug information?
 
-  int token_identifier = -1;
-  int token_number = -1;
-  int token_string = -1;
-  int token_other = -1;
+  int token_identifier = -1;        ///< Token id for identifiers.
+  int token_number = -1;            ///< Token id for literal numbers.
+  int token_string = -1;            ///< Token id for literal strings.
+  int token_symbol = -1;            ///< Token id for other symbols.
 
   /// All AST Nodes have a common base class.
   struct AST_Node {
+    /// Echo the original code passed into each class.
     virtual void PrintEcho(std::ostream &, std::string prefix="") const = 0;
   };
 
@@ -146,7 +147,7 @@ private:
   bool IsNumber(int pos) const { return HasToken(pos) && tokens[pos].token_id == token_number; }
   bool IsString(int pos) const { return HasToken(pos) && tokens[pos].token_id == token_string; }
   char AsChar(int pos) const {
-    if (HasToken(pos) && tokens[pos].token_id == token_other) return tokens[pos].lexeme[0];
+    if (HasToken(pos) && tokens[pos].token_id == token_symbol) return tokens[pos].lexeme[0];
     return 0;
   }
   const std::string & AsLexeme(int pos) const {
@@ -203,7 +204,7 @@ public:
     token_string = lexer.AddToken("Literal String", "\\\"[^\"]*\\\"");
 
     // Symbol tokens should have least priority.
-    token_other = lexer.AddToken("Symbol", ".|\"::\"");
+    token_symbol = lexer.AddToken("Symbol", ".|\"::\"");
 
     std::ifstream file(filename);
     tokens = lexer.Tokenize(file);
@@ -215,10 +216,10 @@ public:
     ast_root.PrintEcho(os);
   }
 
-  // Collect a line of code, ending with a semi-colon OR mis-matched bracket.
-  // Always stops at a mis-matched ')' '}' or ']'
-  // If match_angle_bracket is set, will also stop at a mis-matched '>'
-  // If multi_line is set, will NOT stop with a ';'
+  /// Collect a line of code, ending with a semi-colon OR mis-matched bracket.
+  /// Always stops at a mis-matched ')' '}' or ']'
+  /// If match_angle_bracket is set, will also stop at a mis-matched '>'
+  /// If multi_line is set, will NOT stop with a ';'
   size_t ProcessCode(size_t pos, std::string & line, bool match_angle_bracket=false, bool multi_line=false) {
     const size_t start_pos = pos;
     std::vector<char> open_symbols;
@@ -260,7 +261,7 @@ public:
     return pos;
   }
 
-  // Collect all tokens used to describe a type.
+  /// Collect all tokens used to describe a type.
   size_t ProcessType(size_t pos, std::string & type_name) {
     const size_t start_pos = pos;
     // A type may start with a const.
@@ -298,7 +299,7 @@ public:
     return pos;
   }
 
-  // Collect a series of identifiers, separated by spaces.
+  /// Collect a series of identifiers, separated by spaces.
   size_t ProcessIDList(size_t pos, std::set<std::string> & ids) {
     while (IsID(pos)) {
       ids.insert(AsLexeme(pos));
@@ -308,7 +309,7 @@ public:
   }
 
  
-  // Process the tokens starting from the outer-most scope.
+  /// Process the tokens starting from the outer-most scope.
   size_t ProcessTop(size_t pos=0) {
     while (pos < tokens.size()) {
       RequireID(pos, emp::to_string("Statements in outer scope must begin with an identifier or keyword.  (Found: ",
@@ -327,7 +328,7 @@ public:
     return pos;
   }
 
-  // We know we are in a concept definition.  Collect appropriate information.
+  /// We know we are in a concept definition.  Collect appropriate information.
   size_t ProcessConcept(size_t pos, AST_Concept & concept) {
     // A concept must begin with its name.
     RequireID(pos, "Concept declaration must be followed by name identifier.");
@@ -442,8 +443,10 @@ public:
     return pos;
   }
   
+  /// Print the state of the lexer used for code generation.
   void PrintLexerState() { lexer.Print(); }
 
+  /// Print the set of tokens loaded in from the input file.
   void PrintTokens() {
     for (size_t pos = 0; pos < tokens.size(); pos++) {
       std::cout << pos << ": "
@@ -453,6 +456,7 @@ public:
     }
   }
 
+  /// Setup debug mode (with verbose printing).
   void SetDebug(bool in_debug=true) { debug = in_debug; }
 
 };
