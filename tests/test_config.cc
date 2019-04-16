@@ -79,6 +79,7 @@ TEST_CASE("Test config", "[config]"){
 
   }
 
+  // more complicated test
   {
 
     emp::vector<std::string> arguments = {
@@ -91,6 +92,9 @@ TEST_CASE("Test config", "[config]"){
       "-help",
       "pos3",
       "--duo",
+      "b",
+      "--duo",
+      "-a",
       "b",
       "--duo",
       "a",
@@ -133,11 +137,45 @@ TEST_CASE("Test config", "[config]"){
 
     REQUIRE(
       *am.UseArg("_positional")
-      == ((emp::vector<std::string>) {"pos1", "pos2", "pos3", "pos4"})
+      == ((emp::vector<std::string>) {"pos1", "pos2", "pos3", "b", "pos4"})
     );
     REQUIRE(!am.UseArg("_positional"));
 
+    REQUIRE(
+      am.ViewArg("_unknown")
+      == (emp::vector<emp::vector<std::string>>) {{"-a"}}
+    );
+
+    REQUIRE(
+      am.ViewArg("duo")
+      == ((emp::vector<emp::vector<std::string>>) {{"b"},{},{"a","b"}})
+    );
+
+    REQUIRE(am.ViewArg("nope") == (emp::vector<emp::vector<std::string>>) {});
+    REQUIRE(
+      am.ViewArg("extra_nope")
+      == (emp::vector<emp::vector<std::string>>) {}
+    );
+    REQUIRE(!am.UseArg("nope"));
+    REQUIRE(!am.UseArg("extra_nope"));
+
     REQUIRE(am.HasUnused());
+  }
+
+  // when no spec is provided
+  {
+
+    emp::vector<std::string> arguments = {"--dir", "/some_path"};
+
+    std::vector<char*> argv;
+    for (const auto& arg : arguments) argv.push_back((char*)arg.data());
+
+    argv.push_back(nullptr);
+
+    emp::ArgManager am(argv.size() - 1, argv.data());
+
+    REQUIRE(am.HasUnused());
+
   }
 
 }
