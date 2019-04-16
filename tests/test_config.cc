@@ -30,6 +30,7 @@ TEST_CASE("Test config", "[config]"){
 
   REQUIRE(config.RANDOM_SEED() == 123);
 
+  // old ArgManager in cl namespace
   {
 
     emp::vector<std::string> arguments = {"--dir", "/some_path"};
@@ -41,18 +42,7 @@ TEST_CASE("Test config", "[config]"){
 
     emp::cl::ArgManager am(argv.size() - 1, argv.data());
 
-  }
-
-  {
-
-    emp::vector<std::string> arguments = {"--dir", "/some_path"};
-
-    std::vector<char*> argv;
-    for (const auto& arg : arguments) argv.push_back((char*)arg.data());
-
-    argv.push_back(nullptr);
-
-    emp::ArgManager am(argv.size() - 1, argv.data());
+    REQUIRE(am.HasUnknown());
 
   }
 
