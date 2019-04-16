@@ -116,15 +116,25 @@ namespace emp {
       // if word is a valid command or alias for a command,
       // return the deflagged, dealiased command
       // otherwise, it's a positional command
-      auto parse_alias = [deflagged, args, alias_map](size_t i) {
+      auto parse_alias = [deflagged, args, alias_map, specs](size_t i) {
         return alias_map.count(deflagged[i]) ?
-          alias_map.find(deflagged[i])->second : "_positional";
+          alias_map.find(deflagged[i])->second : (
+            alias_map.count("_positional")
+            && (
+              deflagged[i] == args[i]
+              || specs.find("_positional")->second.gobble_flags
+            )
+            ? "_positional" : "_unknown"
+          );
       };
 
       for(size_t i = 0; i < args.size(); ++i) {
 
-        // e.g., if "_positional" hasn't been registered in spec
-        if ( !specs.count(parse_alias(i)) ) {
+        const std::string & command = parse_alias(i);
+
+        // if command is unknown
+        //and user hasn't provided a spec for unknown commands
+        if (command == "_unknown" && !specs.count("_unknown")) {
           res.insert({
               "_unknown",
               { args[i] }
@@ -132,22 +142,7 @@ namespace emp {
           continue;
         }
 
-        const std::string & command = specs.find(parse_alias(i))->first;
         const ArgSpec & spec = specs.find(parse_alias(i))->second;
-
-        // handle unknown flags
-        if (
-          command == "_positional"
-          && deflagged[i] != args[i]
-          && !spec.gobble_flags
-        ) {
-          res.insert({
-              "_unknown",
-              { args[i] }
-          });
-          continue;
-        }
-
 
         // fast forward to grab all the args for this argpack
         size_t j;
@@ -167,7 +162,10 @@ namespace emp {
           {
             command,
             emp::vector<std::string>(
-              std::next(std::begin(args), command == "_positional" ? i : i+1),
+              std::next(
+                std::begin(args),
+                command == "_positional" || command == "_unknown" ? i : i+1
+              ),
               j+1 < args.size() ? std::next(std::begin(args), j+1) : std::end(args)
             )
           }
