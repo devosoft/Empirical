@@ -59,8 +59,8 @@ private:
   /// All AST Nodes have a common base class.
   struct AST_Node {
     /// Echo the original code passed into each class.
-    virtual void PrintEcho(std::ostream &, std::string prefix="") const = 0;
-    virtual void PrintOutput(std::ostream &, std::string prefix="") const = 0;
+    virtual void PrintEcho(std::ostream &, const std::string & prefix) const = 0;
+    virtual void PrintOutput(std::ostream &, const std::string & prefix) const = 0;
   };
 
   /// AST Node for a new scope level.
@@ -70,12 +70,12 @@ private:
     void AddChild(emp::Ptr<AST_Node> node_ptr) { children.push_back(node_ptr); }
 
     /// Scope should run echo on each of its children.
-    void PrintEcho(std::ostream & os, std::string prefix="") const override {
+    void PrintEcho(std::ostream & os, const std::string & prefix) const override {
       for (auto x : children) { x->PrintEcho(os, prefix); }
     }
 
     /// Scope should run output on each of its children.
-    void PrintOutput(std::ostream & os, std::string prefix="") const override {
+    void PrintOutput(std::ostream & os, const std::string & prefix) const override {
       for (auto x : children) { x->PrintOutput(os, prefix); }
     }
   };
@@ -85,12 +85,12 @@ private:
     std::string type_name;
     std::string type_value;
 
-    void PrintEcho(std::ostream & os, std::string prefix="") const override {
+    void PrintEcho(std::ostream & os, const std::string & prefix) const override {
       os << prefix << "using " << type_name << " = " << type_value << "\n";
     }
 
     /// Output for a using should be identical to the input.
-    void PrintOutput(std::ostream & os, std::string prefix="") const override {
+    void PrintOutput(std::ostream & os, const std::string & prefix) const override {
       os << prefix << "using " << type_name << " = " << type_value << "\n";
     }
   };
@@ -138,7 +138,7 @@ private:
     emp::vector<ConceptTypedef> typedefs;
 
 
-    void PrintEcho(std::ostream & os, std::string prefix="") const override {
+    void PrintEcho(std::ostream & os, const std::string & prefix) const override {
       // Open the concept
       os << prefix << "concept " << name << " : " << base_name << " {\n";
 
@@ -165,7 +165,7 @@ private:
       os << prefix << "};\n";
     }
 
-    void PrintOutput(std::ostream & os, std::string prefix="") const override {
+    void PrintOutput(std::ostream & os, const std::string & prefix) const override {
       os << prefix << "/// Base class for concept wrapper " << name << "<>.\n"
          << prefix << "class " << base_name << " {\n"
          << prefix << "public:\n";
@@ -294,12 +294,12 @@ public:
 
   /// Print out the original state of the code.
   void PrintEcho(std::ostream & os) const {
-    ast_root.PrintEcho(os);
+    ast_root.PrintEcho(os, "");
   }
 
   /// Print out the original state of the code.
   void PrintOutput(std::ostream & os) const {
-    ast_root.PrintOutput(os);
+    ast_root.PrintOutput(os, "");
   }
 
   /// Collect a line of code, ending with a semi-colon OR mis-matched bracket.
