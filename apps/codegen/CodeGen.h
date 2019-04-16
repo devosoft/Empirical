@@ -95,65 +95,15 @@ private:
     }
   };
 
-  /// A ConceptNode has extra functionality for building both a base class and a template wrapper.
-  struct AST_ConceptNode : AST_Node {
-    void PrintOutput(std::ostream &, std::string="") const override { ; } // No general output needed.
-    virtual void PrintBaseOutput(std::ostream &, std::string prefix="") const = 0;
-    virtual void PrintWrapperOutput(std::ostream &, std::string prefix="") const = 0;
-  };
-
-  /// AST Node for concept information.
-  struct AST_Concept : AST_Scope {
-    std::string name;
-    std::string base_name;
-    // Children are Using, Variable Declaration, or Function Declaration
-
-    void PrintEcho(std::ostream & os, std::string prefix="") const override {
-      os << prefix << "concept " << name << " : " << base_name << " {\n";
-      AST_Scope::PrintEcho(os, prefix+"  ");
-      os << prefix << "};\n";
-    }
-
-    void PrintOutput(std::ostream & os, std::string prefix="") const override {
-      os << prefix << "/// Base class for concept wrapper " << name << "<>.\n"
-         << prefix << "class " << base_name << " {\n"
-         << prefix << "public:\n";
-      for (emp::Ptr<AST_Node> x : children) {
-        x.Cast<AST_ConceptNode>()->PrintBaseOutput(os, prefix + "  ");
-      }
-      os << prefix << "};\n\n"
-         << prefix << "/// Concept wrapper (base class is " << base_name << ")\n"
-         << prefix << "template <typename WRAPPED_T>\n"
-         << prefix << "class " << name << " : WRAPPED_T, " << base_name << " {\n"
-         << prefix << "  using this_t = " << name << "<WRAPPED_T>;\n\n";
-      for (emp::Ptr<AST_Node> x : children) {
-        x.Cast<AST_ConceptNode>()->PrintWrapperOutput(os, prefix + "  ");
-      }
-      os << prefix << "};\n\n";
-    }
-  };
-
   /// AST Node for variable defined inside of a concept.
-  struct AST_ConceptVariable : AST_ConceptNode {
+  struct ConceptVariable {
     std::string var_type;
     std::string var_name;
     std::string default_code;
-
-    void PrintEcho(std::ostream & os, std::string prefix="") const override {
-      os << prefix << var_type << " " << var_name << " " << default_code << "\n";
-    }
-
-    void PrintBaseOutput(std::ostream & os, std::string prefix="") const override {
-      // os << prefix << "\n";
-    }
-
-    void PrintWrapperOutput(std::ostream & os, std::string prefix="") const override {
-      // os << prefix << "\n";
-    }
   };
 
   /// AST Node for function defined inside of a concept.
-  struct AST_ConceptFunction : AST_ConceptNode {
+  struct ConceptFunction {
     std::string return_type;
     std::string fun_name;
     std::string args;
@@ -168,61 +118,106 @@ private:
       return out_str;
     }
 
-    void PrintEcho(std::ostream & os, std::string prefix="") const override {
-      os << prefix << return_type << " " << fun_name << "(" << args << ") " << AttributeString();
-      if (is_required) os << " = required;\n";
-      else if (is_default) os << " = default;\n";
-      else os << prefix << "{\n" << prefix << "  " << default_code << "\n" << prefix << "}\n";
-    }
-
-    void PrintBaseOutput(std::ostream & os, std::string prefix="") const override {
-      os << prefix << return_type << " " << fun_name << "(" << args << ") " << AttributeString() << " = 0;\n";
-    }
-    
-    void PrintWrapperOutput(std::ostream & os, std::string prefix="") const override {
-      os << prefix << "// Determine the return type for this function.\n"
-         << prefix << "template <typename T>\n"
-         << prefix << "using return_t_" << fun_name
-                   << " = decltype( std::declval<T>()." << fun_name
-                   << "( EMP_TYPES_TO_VALS(__VA_ARGS__) ) );\n";
-
-      os << prefix << "// Compile-time test if this function exists in wrapped class.\n"
-         << prefix << "static constexpr bool HasFun_" << fun_name << "(){\n"
-         << prefix << "  return emp::test_type<return_t_" << fun_name << ", WRAPPED_T>();\n"
-         << prefix << "}\n";
-
-      os << prefix << "// Call the function, redirecting as needed.\n"
-         << prefix << return_type << " " << fun_name << "(" << args << ") "
-                   << AttributeString() << " {\n"
-         << prefix << "  " << "static_assert( HasFun_" << fun_name
-                   << "(), \"\\n\\n  ** Error: concept instance missing required function "
-                   << fun_name << " **\\n\";"
-         << prefix << "if constexpr (HasFun_" << fun_name << "()) {\n"
-         << prefix << "  ";
-      if (return_type != "void") os << "return ";
-      os << "WRAPPED_T::" << fun_name << "( [[CONVERT ARGS]] );\n"
-         << prefix << "}\n";
-
-    }
   };
 
   /// AST Node for type definition inside of a concept.
-  struct AST_ConceptUsing : AST_ConceptNode {
+  struct ConceptTypedef {
     std::string type_name;
     std::string type_value;
+  };
+
+
+  /// AST Node for concept information.
+  struct AST_Concept : AST_Node {
+
+    std::string name;
+    std::string base_name;
+
+    emp::vector<ConceptVariable> variables;
+    emp::vector<ConceptFunction> functions;
+    emp::vector<ConceptTypedef> typedefs;
+
 
     void PrintEcho(std::ostream & os, std::string prefix="") const override {
-      os << prefix << "using " << type_name << " = " << type_value << "\n";
+      // Open the concept
+      os << prefix << "concept " << name << " : " << base_name << " {\n";
+
+      // Print info for all typedefs
+      for (auto & t : typedefs) {
+        os << prefix << "  using " << t.type_name << " = " << t.type_value << "\n";
+      }
+
+      // Print info for all variables...
+      for (auto & v : variables) {
+        os << prefix << "  " << v.var_type << " " << v.var_name << " = " << v.default_code << "\n";
+      }
+
+      // Print info for all functions...
+      for (auto & f : functions) {
+        os << prefix << "  " << f.return_type << " " << f.fun_name << "(" << f.args << ") "
+           << f.AttributeString();
+        if (f.is_required) os << " = required;\n";
+        else if (f.is_default) os << " = default;\n";
+        else os << " {\n" << prefix << "    " << f.default_code << "\n" << prefix << "  }\n";
+      }
+
+      // Close the concept
+      os << prefix << "};\n";
     }
 
-    void PrintBaseOutput(std::ostream & os, std::string prefix="") const override {
-      // os << prefix << "\n";
-    }
-    
-    void PrintWrapperOutput(std::ostream & os, std::string prefix="") const override {
-      // os << prefix << "\n";
+    void PrintOutput(std::ostream & os, std::string prefix="") const override {
+      os << prefix << "/// Base class for concept wrapper " << name << "<>.\n"
+         << prefix << "class " << base_name << " {\n"
+         << prefix << "public:\n";
+
+      // Print all of the BASE CLASS details.
+      for (auto & f : functions) {
+        os << prefix << "  " << f.return_type << " " << f.fun_name << "(" << f.args << ") "
+           << f.AttributeString() << " = 0;\n";
+      }
+
+      os << prefix << "};\n\n";
+
+      // Print all of the TEMPLATE WRAPPER details.
+      os << prefix << "/// Concept wrapper (base class is " << base_name << ")\n"
+         << prefix << "template <typename WRAPPED_T>\n"
+         << prefix << "class " << name << " : WRAPPED_T, " << base_name << " {\n"
+         << prefix << "  using this_t = " << name << "<WRAPPED_T>;\n\n";
+
+      for (auto & v : variables) {
+        os << prefix << "  " << v.var_type << " " << v.var_name << " = " << v.default_code << "\n";
+      }
+
+      for (auto & f : functions) {
+        os << prefix << "// Determine the return type for this function.\n"
+           << prefix << "template <typename T>\n"
+           << prefix << "using return_t_" << f.fun_name
+                     << " = decltype( std::declval<T>()." << f.fun_name
+                     << "( EMP_TYPES_TO_VALS(__VA_ARGS__) ) );\n";
+
+        os << prefix << "// Compile-time test if this function exists in wrapped class.\n"
+           << prefix << "static constexpr bool HasFun_" << f.fun_name << "(){\n"
+           << prefix << "  return emp::test_type<return_t_" << f.fun_name << ", WRAPPED_T>();\n"
+           << prefix << "}\n";
+
+        os << prefix << "// Call the function, redirecting as needed.\n"
+           << prefix << f.return_type << " " << f.fun_name << "(" << f.args << ") "
+                     << f.AttributeString() << " {\n"
+           << prefix << "  " << "static_assert( HasFun_" << f.fun_name
+                     << "(), \"\\n\\n  ** Error: concept instance missing required function "
+                     << f.fun_name << " **\\n\";"
+           << prefix << "if constexpr (HasFun_" << f.fun_name << "()) {\n"
+           << prefix << "  ";
+        if (f.return_type != "void") os << "return ";
+        os << "WRAPPED_T::" << f.fun_name << "( [[CONVERT ARGS]] );\n"
+          << prefix << "}\n";
+      }
+
+
+      os << prefix << "};\n\n";
     }
   };
+
 
   AST_Scope ast_root;
 
@@ -448,18 +443,20 @@ public:
         pos++;  // Move past "using"
         RequireID(pos, "A 'using' command must first specify the new type name.");
 
-        auto node_using = emp::NewPtr<AST_ConceptUsing>();  // Setup an AST node for a using statement.       
-        concept.AddChild(node_using);                       // Save this node in the concept.
-        pos = ProcessType(pos, node_using->type_name);      // Determine new type name being defined.
+        ConceptTypedef new_typedef;
+        pos = ProcessType(pos, new_typedef.type_name);      // Determine new type name being defined.
 
-        Debug("...adding a type '", node_using->type_name, "'.");
+        Debug("...adding a type '", new_typedef.type_name, "'.");
 
         RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
 
-        pos = ProcessCode(pos, node_using->type_value);   // Determine code being assigned to.
+        pos = ProcessCode(pos, new_typedef.type_value);   // Determine code being assigned to.
 
-        Debug("   value: ", node_using->type_value);
-      } else {
+        Debug("   value: ", new_typedef.type_value);
+
+        concept.typedefs.push_back(new_typedef);
+      }
+      else {
         // Start with a type...
         std::string type_name;
         pos = ProcessType(pos, type_name);
@@ -473,36 +470,34 @@ public:
           pos++;  // Move past paren.
 
           // Setup an AST Node for a function definition.
-          auto node_function = emp::NewPtr<AST_ConceptFunction>();
-          node_function->return_type = type_name;
-          node_function->fun_name = identifier;
-          concept.AddChild(node_function);                       // Save this function node in the concept.
+          ConceptFunction new_function;
+          new_function.return_type = type_name;
+          new_function.fun_name = identifier;
 
-
-          pos = ProcessCode(pos, node_function->args);           // Read the args for this function.
+          pos = ProcessCode(pos, new_function.args);           // Read the args for this function.
 
           RequireChar(')', pos++, "Function arguments must end with a close-parenthesis (')')");
 
-          Debug("...adding a function '", type_name, " ", identifier, "(", node_function->args, ")'");
+          Debug("...adding a function '", type_name, " ", identifier, "(", new_function.args, ")'");
 
-          pos = ProcessIDList(pos, node_function->attributes);   // Read in each of the function attributes, if any.
+          pos = ProcessIDList(pos, new_function.attributes);   // Read in each of the function attributes, if any.
 
-          Debug("   with attributes: ", node_function->AttributeString());
+          Debug("   with attributes: ", new_function.AttributeString());
 
           char fun_char = AsChar(pos++);
 
           if (fun_char == '=') {  // Function is "= default;" or "= required;"
             RequireID(pos, "Function must be assigned to 'required' or 'default'");
             std::string fun_assign = AsLexeme(pos++);
-            if (fun_assign == "required") node_function->is_required = true;
-            else if (fun_assign == "default") node_function->is_default = true;
+            if (fun_assign == "required") new_function.is_required = true;
+            else if (fun_assign == "default") new_function.is_default = true;
             else Error(pos, "Functions can only be set to 'required' or 'default'");
             RequireChar(';', pos++, emp::to_string(fun_assign, "functions must end in a semi-colon."));
           }
           else if (fun_char == '{') {  // Function is defined in place.
-            pos = ProcessCode(pos, node_function->default_code, false, true);  // Read the default function body.
+            pos = ProcessCode(pos, new_function.default_code, false, true);  // Read the default function body.
 
-            Debug("   and code: ", node_function->default_code);
+            Debug("   and code: ", new_function.default_code);
 
             RequireChar('}', pos++, emp::to_string("Function body must end with close brace ('}') not '",
                                                   AsLexeme(pos-1), "'."));
@@ -511,18 +506,22 @@ public:
             Error(pos-1, "Function body must begin with open brace or assignment ('{' or '=')");
           }
 
+          concept.functions.push_back(new_function);
+
         } else {                                                 // ----- VARIABLE!! -----
-          auto node_var = emp::NewPtr<AST_ConceptVariable>();
-          node_var->var_type = type_name;
-          node_var->var_name = identifier;
+          ConceptVariable new_var;
+          new_var.var_type = type_name;
+          new_var.var_name = identifier;
 
           if (AsChar(pos) == ';') {  // Does the variable declaration end here?
             pos++;
           }
           else {                     // ...or is there a default value for this variable?
             // Determine code being assigned from.
-            pos = ProcessCode(pos, node_var->default_code);
+            pos = ProcessCode(pos, new_var.default_code);
           }
+
+          concept.variables.push_back(new_var);
 
         }
       }
