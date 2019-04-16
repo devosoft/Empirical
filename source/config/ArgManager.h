@@ -385,7 +385,7 @@ namespace emp {
 
     /// Test if there are any unused arguments, and if so, output an error.
     bool HasUnused(std::ostream & os=std::cerr) const {
-      if (packs.size() > 1) {
+      if (packs.size()) {
         Print(os);
         PrintHelp(os);
         return true;
