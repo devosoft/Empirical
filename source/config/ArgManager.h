@@ -123,12 +123,8 @@ namespace emp {
 
       for(size_t i = 0; i < args.size(); ++i) {
 
-        if (!specs.count(parse_alias(i))) continue;
-
-        const std::string & command = specs.find(parse_alias(i))->first;
-        const ArgSpec & command_spec = specs.find(parse_alias(i))->second;
-
-        if (command == "_positional" && deflagged[i] != args[i]) {
+        // e.g., if "_positional" hasn't been registered in spec
+        if ( !specs.count(parse_alias(i)) ) {
           res.insert({
               "_unknown",
               { args[i] }
@@ -136,14 +132,31 @@ namespace emp {
           continue;
         }
 
+        const std::string & command = specs.find(parse_alias(i))->first;
+        const ArgSpec & spec = specs.find(parse_alias(i))->second;
+
+        // handle unknown flags
+        if (
+          command == "_positional"
+          && deflagged[i] != args[i]
+          && !spec.gobble_flags
+        ) {
+          res.insert({
+              "_unknown",
+              { args[i] }
+          });
+          continue;
+        }
+
+
         // fast forward to grab all the args for this argpack
         size_t j;
         for (
           j = i;
           j < args.size()
-          && j - i < command_spec.quota
+          && j - i < spec.quota
           && (
-            command_spec.gobble_flags
+            spec.gobble_flags
             || ! (j + 1 < args.size())
             || deflagged[j+1] == args[j+1]
           );
