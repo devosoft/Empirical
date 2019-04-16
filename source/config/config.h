@@ -453,36 +453,6 @@ namespace emp {
       }
     }
 
-    /// for use with ArgManager
-    std::multimap<std::string, size_t> ArgCounts() const {
-
-      std::multimap<std::string, size_t> res;
-
-      for (const auto e : var_map) {
-        const auto entry = e.second;
-        res.insert( {entry->GetName(), 1} );
-      }
-
-      return res;
-    }
-
-    std::multimap<std::string, std::string> ArgDescriptions() const {
-
-      std::multimap<std::string, std::string> res;
-
-      for (const auto e : var_map) {
-        const auto entry = e.second;
-        const std::string desc = emp::to_string(
-          entry->GetDescription(),
-          " (type=", entry->GetType(),
-          "; default=", entry->GetDefault(), ')'
-        );
-        res.insert( {entry->GetName(), desc} );
-      }
-
-      return res;
-    }
-
     // If a string is passed into Write, treat it as a filename.
     void Write(std::string filename) const {
       std::ofstream out(filename);

@@ -13,6 +13,9 @@
 #include <vector>
 #include <map>
 #include <iterator>
+#include <set>
+#include <limits>
+#include <numeric>
 
 #include "base/Ptr.h"
 #include "base/vector.h"
@@ -21,14 +24,39 @@
 
 namespace emp {
 
-  /// A simple class to manage command-line arguments that were passed in.
+  /// TODO: add functors and value or
+  struct ArgSpec {
 
+    const size_t quota;
+    const std::string description;
+    const std::unordered_set<std::string> aliases;
+    const bool enforce_quota;
+    const bool gobble_flags;
+    const bool flatten;
+
+    ArgSpec(
+      const size_t quota_=0,
+      const std::string description_="No description provided.",
+      const std::unordered_set<std::string> aliases_=std::unordered_set<std::string>(),
+      const bool enforce_quota_=true,
+      const bool gobble_flags_=false,
+      const bool flatten_=false
+    ) : quota(quota_),
+        description(description_),
+        aliases(aliases_),
+        enforce_quota(enforce_quota_),
+        gobble_flags(gobble_flags_),
+        flatten(flatten_)
+    { ; }
+
+  };
+
+  /// TODO
   class ArgManager {
 
   private:
     std::multimap<std::string, emp::vector<std::string>> packs;
-    std::multimap<std::string, size_t> counts;
-    std::multimap<std::string, std::string> descs;
+    const std::unordered_map<std::string, ArgSpec> specs;
 
   public:
     // Convert input arguments to a vector of strings for easier processing.
@@ -40,109 +68,229 @@ namespace emp {
       return args;
     }
 
-    // Make counts specification for builtin commands
-    static std::multimap<std::string, size_t> MakeBuiltinCounts() {
-      return {
-        {"help", 0},
-        {"gen", 1},
-        {"make-const", 1}
+    static std::multimap<std::string, emp::vector<std::string>> parse(
+      const emp::vector<std::string> args,
+      const std::unordered_map<std::string, ArgSpec> & specs = std::unordered_map<std::string, ArgSpec>()
+    ) {
+
+      auto res = std::multimap<std::string, emp::vector<std::string>>();
+
+      const auto alias_map = std::accumulate(
+        std::begin(specs),
+        std::end(specs),
+        std::unordered_map<std::string, std::string>(),
+        [](
+          std::unordered_map<std::string, std::string> l,
+          const std::pair<std::string, ArgSpec> & r
+        ){
+          l.insert({r.first, r.first});
+          for(const auto & p : r.second.aliases) l.insert({p, r.first});
+          return l;
+        }
+      );
+
+      // check for duplicate aliases
+      const bool check = alias_map.size() == std::accumulate(
+        std::begin(specs),
+        std::end(specs),
+        specs.size(),
+        [](
+          const size_t l,
+          const std::pair<std::string, ArgSpec> & r
+        ){
+          return l + r.second.aliases.size();
+        }
+      );
+
+      emp_assert(check, "duplicate aliases detected");
+
+      // lookup table with leading dashes stripped
+      const emp::vector<std::string> deflagged = [args](){
+        auto res = args;
+        for (auto & val : res) {
+          val.erase(0, val.find_first_not_of('-'));
+        }
+        return res;
+      }();
+
+      // if word is a valid command or alias for a command,
+      // return the deflagged, dealiased command
+      // otherwise, it's a positional command
+      auto parse_alias = [deflagged, args, alias_map](size_t i) {
+        return alias_map.count(deflagged[i]) ?
+          alias_map.find(deflagged[i])->second : "_positional";
       };
+
+      for(size_t i = 0; i < args.size(); ++i) {
+
+        if (!specs.count(parse_alias(i))) continue;
+
+        const std::string & command = specs.find(parse_alias(i))->first;
+        const ArgSpec & command_spec = specs.find(parse_alias(i))->second;
+
+        if (command == "_positional" && deflagged[i] != args[i]) {
+          res.insert({
+              "_unknown",
+              { args[i] }
+          });
+          continue;
+        }
+
+        // fast forward to grab all the args for this argpack
+        size_t j;
+        for (
+          j = i;
+          j < args.size()
+          && j - i < command_spec.quota
+          && (
+            command_spec.gobble_flags
+            || ! (j + 1 < args.size())
+            || deflagged[j+1] == args[j+1]
+          );
+          ++j
+        );
+
+        res.insert(
+          {
+            command,
+            emp::vector<std::string>(
+              std::next(std::begin(args), command == "_positional" ? i : i+1),
+              j+1 < args.size() ? std::next(std::begin(args), j+1) : std::end(args)
+            )
+          }
+        );
+
+        i = j;
+
+      }
+
+      return res;
+
     }
 
-    // Make desc specification for builtin commands
-    static std::multimap<std::string, std::string> MakeBuiltinDescs() {
-      return {
-        {"help", "Print help information."},
-        {"gen", "Generate configuration file."},
-        {"make-const", "Generate const version of macros file."}
-      };
+    /// Make specs for builtin commands
+    static std::unordered_map<std::string, ArgSpec> make_builtin_specs(
+      const emp::Ptr<const Config> config=nullptr
+    ) {
+
+      std::unordered_map<std::string, ArgSpec> res({
+        {"_positional", ArgSpec(
+          std::numeric_limits<size_t>::max(),
+          "Positional arguments.",
+          {},
+          false,
+          false,
+          true
+        )},
+        {"help", ArgSpec(0, "Print help information.", {"h"})},
+        {"gen", ArgSpec(1, "Generate configuration file.")},
+        {"make-const", ArgSpec(1, "Generate const version of macros file.")}
+      });
+
+      for (const auto & e : *config) {
+        const auto & entry = e.second;
+        res.insert({
+          entry->GetName(),
+          ArgSpec(
+            1,
+            emp::to_string(
+              entry->GetDescription(),
+              " (type=", entry->GetType(),
+              "; default=", entry->GetDefault(), ')'
+            )
+          )
+        });
+      }
+
+      return res;
+    }
+
+    // create best-effort specifications for unspecified Args
+    static std::unordered_map<std::string, ArgSpec> retrofit_specs(
+      const std::multimap<std::string, emp::vector<std::string>> & packs
+    ) {
+
+      std::unordered_map<std::string, ArgSpec> res;
+
+      for (const auto & [n, p] : packs) {
+        if (!res.count(n)) {
+          res.insert({
+            n,
+            ArgSpec(
+              0,
+              "Retrofitted.",
+              {},
+              false
+            )
+          });
+        }
+      }
+
+      return res;
+
     }
 
     ArgManager(
       int argc,
       char* argv[],
-      std::multimap<std::string, size_t> counts = std::multimap<std::string, size_t>(),
-      std::multimap<std::string, std::string> descs = std::multimap<std::string, std::string>()
-    ) : ArgManager(ArgManager::args_to_strings(argc, argv), counts, descs) { ; }
+      const std::unordered_map<std::string, ArgSpec> & specs_ = std::unordered_map<std::string, ArgSpec>()
+    ) : ArgManager(
+      ArgManager::args_to_strings(argc, argv),
+      specs_
+    ) { ; }
 
     ArgManager(
       const emp::vector<std::string> args,
-      const std::multimap<std::string, size_t> counts_ = std::multimap<std::string, size_t>(),
-      const std::multimap<std::string, std::string> descs_  = std::multimap<std::string, std::string>()
-    ) : counts(counts_), descs(descs_) {
-
-      emp::vector<std::string> deflagged = args;
-      for(auto & val : deflagged) {
-        val.erase(0, val.find_first_not_of('-'));
-      }
-
-      for(size_t i = 0; i < args.size(); ++i) {
-
-        if( !counts.count(deflagged[i]) ) {
-
-          size_t j = i;
-          while( j < args.size() && !counts.count(deflagged[j]) ) ++j;
-
-          packs.insert(
-            {
-              "_positional",
-              emp::vector<std::string>(
-                std::next(std::begin(args), i),
-                std::next(std::begin(args), j)
-              )
-            }
-          );
-
-          i = j-1;
-
-        } else {
-
-          const auto r_proc = packs.equal_range(deflagged[i]);
-          const size_t n_proc = std::distance(r_proc.first, r_proc.second);
-
-          const auto r_spec = counts.equal_range(deflagged[i]);
-          const size_t n_spec = std::distance(r_spec.first, r_spec.second);
-
-          size_t n = n_spec ?
-            std::next(r_spec.first, n_proc % n_spec)->second : 0;
-
-          if (i+n+1 <= args.size()) packs.insert(
-              {
-                deflagged[i],
-                emp::vector<std::string>(
-                  std::next(std::begin(args), i+1),
-                  std::next(std::begin(args), i+n+1)
-                )
-              }
-            );
-
-          i += n;
-
-        }
-
-      }
-    }
+      const std::unordered_map<std::string, ArgSpec> & specs_ = std::unordered_map<std::string, ArgSpec>()
+    ) : ArgManager(
+      ArgManager::parse(args, specs_),
+      specs_
+    ) { ; }
 
     ArgManager(
-      std::multimap<std::string, emp::vector<std::string>> packs_,
-      const std::multimap<std::string, size_t> counts_ = std::multimap<std::string, size_t>(),
-      const std::multimap<std::string, std::string> descs_  = std::multimap<std::string, std::string>()
-    ) : packs(packs_), counts(counts_) { ; }
+      const std::multimap<std::string, emp::vector<std::string>> & packs_,
+      const std::unordered_map<std::string, ArgSpec> & specs_ = std::unordered_map<std::string, ArgSpec>()
+    ) : packs(packs_), specs(specs_.size() ? specs_ : retrofit_specs(packs_)) {
+
+      // flatten args that should be flattened
+      for (auto & [n, s] : specs) {
+        if (s.flatten && packs.count(n)) {
+          emp::vector<std::string> flat = std::accumulate(
+            packs.equal_range(n).first,
+            packs.equal_range(n).second,
+            emp::vector<std::string>(),
+            [](
+              emp::vector<std::string> l,
+              const std::pair<std::string, emp::vector<std::string>> & r
+            ){
+              l.insert(std::end(l), std::begin(r.second), std::end(r.second));
+              return l;
+            }
+          );
+          packs.erase(packs.equal_range(n).first, packs.equal_range(n).second);
+          packs.insert({n, flat});
+        }
+      }
+    }
 
     ~ArgManager() { ; }
 
     /// UseArg consumes an argument pack accessed by a certain name.
-    std::optional<emp::vector<std::string>> UseArg(
-      const std::string & name,
-      std::optional<size_t> req_size=std::nullopt
-    ) {
-      auto res = packs.count(name) && (
-          !req_size || *req_size == packs.lower_bound(name)->second.size()
-        ) ? std::make_optional(packs.lower_bound(name)->second)
-        : std::nullopt;
+    std::optional<emp::vector<std::string>> UseArg(const std::string & name) {
+
+      if (!specs.count(name) || !packs.count(name)) return std::nullopt;
+
+      const auto & cur_spec = specs.find(name)->second;
+      const auto & cur_pack = packs.lower_bound(name)->second;
+
+      const auto res = (
+        !cur_spec.enforce_quota || cur_spec.quota == cur_pack.size()
+      ) ? std::make_optional(cur_pack) : std::nullopt;
+
       if (res) packs.erase(packs.lower_bound(name));
 
       return res;
+
     }
 
     /// ViewArg returns all argument packs under a certain name.
@@ -173,14 +321,14 @@ namespace emp {
 
       bool proceed = true;
 
-      if (const auto res = UseArg("gen", 1); res && config) {
+      if (const auto res = UseArg("gen"); res && config) {
         const std::string cfg_file = res->front();
         os << "Generating new config file: " << cfg_file << std::endl;
         config->Write(cfg_file);
         proceed = false;
       }
 
-      if (const auto res = UseArg("make-const", 1); res && config)  {
+      if (const auto res = UseArg("make-const"); res && config)  {
         const std::string macro_file = res->front();
         os << "Generating new macros file: " << macro_file << std::endl;
         config->WriteMacros(macro_file, true);
@@ -194,9 +342,9 @@ namespace emp {
     /// Print the current state of the ArgManager.
     void Print(std::ostream & os=std::cout) const {
 
-      for(const auto it : packs ) {
+      for(const auto & it : packs ) {
         os << it.first << ":";
-        for(const auto v : it.second ) {
+        for(const auto & v : it.second ) {
           os << " " << v;
         }
         os << std::endl;
@@ -204,52 +352,28 @@ namespace emp {
 
     }
 
-    /// Print information about all known argument types and what they're for; make pretty.
-    void PrintHelp(std::ostream & os=std::cout) const {
+    /// Print information about all known argument types and what they're for;
+    /// make pretty.
+    void PrintHelp(std::ostream & os=std::cerr) const {
 
-      for( auto name_it = descs.begin();
-           name_it !=  descs.end();
-           name_it = descs.upper_bound(name_it->first)
-      ) {
-        auto d_range = descs.equal_range(name_it->first);
-        auto c_range = counts.equal_range(name_it->first);
+      for (const auto & [n, s] : specs) {
+        os << "-"
+           << n;
+        for (const auto & a : s.aliases) os << " -" << a;
+        os << " [" << ( (!s.enforce_quota) ? "<=" : "=" ) << s.quota << "]";
+        os << std::endl
+           << "   | "
+           << s.description
+           << std::endl;
 
-        auto d_it = d_range.first;
-        auto c_it = c_range.first;
-
-        while (d_it != d_range.second && c_it != c_range.second) {
-
-          if(d_it == d_range.second) d_it = d_range.first;
-          if(c_it == c_range.second) c_it = c_range.first;
-
-          os << "-"
-             << name_it->first
-             << ( c_range.first != c_range.second
-                  ? emp::to_string(" [", c_it->second, "]") : ""
-                )
-             << std::endl
-             << "   | "
-             << (d_range.first != d_range.second ? d_it->second : "")
-             << std::endl;
-
-          if (d_range.first != d_range.second) ++d_it;
-          if (c_range.first != c_range.second) ++c_it;
-
-        }
       }
+
     }
 
     /// Test if there are any unused arguments, and if so, output an error.
     bool HasUnused(std::ostream & os=std::cerr) const {
       if (packs.size() > 1) {
-        os << "Unused arg packs:" << std::endl;
-        for(const auto & p : packs) {
-          os << " " << p.first;
-          for(const auto & v : p.second) {
-            os << " " << v;
-          }
-          os << std::endl;
-        }
+        Print(os);
         PrintHelp(os);
         return true;
       }
@@ -265,7 +389,7 @@ namespace emp {
 
         const auto entry = e.second;
 
-        const auto res = UseArg(entry->GetName(), std::make_optional(1));
+        const auto res = UseArg(entry->GetName());
 
         if (res) config.Set(entry->GetName(), (*res)[0]);
 
