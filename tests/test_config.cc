@@ -46,6 +46,7 @@ TEST_CASE("Test config", "[config]"){
 
   }
 
+  // minimal test
   {
 
     emp::vector<std::string> arguments = {"--dir", "/some_path"};
@@ -61,11 +62,20 @@ TEST_CASE("Test config", "[config]"){
       { {"dir", emp::ArgSpec(1)} }
     );
 
-    // emp::ArgManager am(
-    //   argv.size() - 1,
-    //   argv.data(),
-    //   specs
-    // );
+    emp::ArgManager am(
+      argv.size() - 1,
+      argv.data(),
+      specs
+    );
+
+    am.Print(std::cout);
+
+    REQUIRE(am.HasUnused());
+
+    REQUIRE(*am.UseArg("dir") == (emp::vector<std::string>) {"/some_path"} );
+    REQUIRE(!am.UseArg("dir"));
+
+    REQUIRE(!am.HasUnused());
 
   }
 
