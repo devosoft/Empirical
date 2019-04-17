@@ -2,7 +2,8 @@
 //  Copyright (C) Michigan State University, 2016.
 //  Released under the MIT Software license; see doc/LICENSE
 //
-//  A simple ArgManager tool for sythesizing command-line arguments and config files.
+//  A simple ArgManager tool for sythesizing command-line arguments,
+//  URL query params, arguments and config files.
 
 
 #ifndef EMP_CL_ARG_MANAGER_H
@@ -25,14 +26,29 @@
 
 namespace emp {
 
-  /// TODO
+  /// A helper struct for ArgManager that specifies a single argument type.
+  /// Note that the primary argument name is specified as the keys of the specs
+  /// map constructor argument for ArgManager.
+  /// * quota: how many words after the flag should be absorbed into the
+  ///   argument pack?
+  /// * aliases: what set of alternate flag names should trigger this argument? ///   (specify without - prepended)
+  /// * callbaack: provide a callback function to process the argument
+  /// * enforce_quota: if the quota of words following the flag is not
+  ///   satisfied, should the argument pack refuse to be dispensed from UseArg
+  ///   and instead be retained so it can be detected by HasUnused?
+  /// * gobble_flags: should the argument pack accept flag words
+  ///   (words that begin with -) instead of curtailing the argument pack
+  ///   before the first encountered flag word.
+  /// * flatten: should all argument packs collected for this key be
+  ///   consolidated into a single argument pack?
+  ///   (e.g., a single list of words instead of a list of lists of words).
   struct ArgSpec {
 
     const size_t quota;
     const std::string description;
     const std::unordered_set<std::string> aliases;
     const std::function<void(std::optional<emp::vector<std::string>>)> callback;
-    const bool enforce_quota; // quota is enforced for UseArg, not setup
+    const bool enforce_quota; // quota is enforced at access, not setup
     const bool gobble_flags;
     const bool flatten;
 
@@ -55,11 +71,15 @@ namespace emp {
 
   };
 
-  /// TODO
+  /// Manager for command line arguments and URL query params.
   class ArgManager {
 
   private:
+
+    // the actual data collected
     std::multimap<std::string, emp::vector<std::string>> packs;
+
+    // the specification for how to collect and dispense the data
     const std::unordered_map<std::string, ArgSpec> specs;
 
   public:
@@ -72,6 +92,8 @@ namespace emp {
       return args;
     }
 
+    // Use argument specifications to convert command line arguments
+    // to argument packs.
     static std::multimap<std::string, emp::vector<std::string>> parse(
       const emp::vector<std::string> args,
       const std::unordered_map<std::string, ArgSpec> & specs = std::unordered_map<std::string, ArgSpec>()
@@ -137,7 +159,7 @@ namespace emp {
         const std::string & command = parse_alias(i);
 
         // if command is unknown
-        //and user hasn't provided a spec for unknown commands
+        // and user hasn't provided an ArgSpec for unknown commands
         if (command == "_unknown" && !specs.count("_unknown")) {
           res.insert({
               "_unknown",
@@ -148,7 +170,7 @@ namespace emp {
 
         const ArgSpec & spec = specs.find(parse_alias(i))->second;
 
-        // fast forward to grab all the args for this argpack
+        // fast forward to grab all the words for this argument pack
         size_t j;
         for (
           j = i;
@@ -162,6 +184,7 @@ namespace emp {
           ++j
         );
 
+        // store the argument pack
         res.insert(
           {
             command,
@@ -183,7 +206,7 @@ namespace emp {
 
     }
 
-    /// Make specs for builtin commands
+    /// Make specs for builtin commands, including any config adjustment args.
     static std::unordered_map<std::string, ArgSpec> make_builtin_specs(
       const emp::Ptr<const Config> config=nullptr
     ) {
@@ -210,7 +233,6 @@ namespace emp {
               std::exit(EXIT_FAILURE);
             }
           },
-          false,
           false
         )},
         {"help", ArgSpec(0, "Print help information.", {"h"})},
@@ -258,8 +280,11 @@ namespace emp {
       }
 
       return res;
+
     }
 
+    /// Constructor for raw command line arguments.
+    /// This constructor is first in the constructor daisy chain.
     ArgManager(
       int argc,
       char* argv[],
@@ -269,6 +294,8 @@ namespace emp {
       specs_
     ) { ; }
 
+    // Constructor for command line arguments converted to vector of string.
+    /// This constructor is second in the constructor daisy chain.
     ArgManager(
       const emp::vector<std::string> args,
       const std::unordered_map<std::string, ArgSpec> & specs_ = make_builtin_specs()
@@ -277,12 +304,15 @@ namespace emp {
       specs_
     ) { ; }
 
+    /// Constructor that bypasses command line argument parsing where argument
+    /// packs are provided directly, e.g., for use with URL query params.
+    /// This constructor is last in the constructor daisy chain.
     ArgManager(
       const std::multimap<std::string, emp::vector<std::string>> & packs_,
       const std::unordered_map<std::string, ArgSpec> & specs_ = make_builtin_specs()
     ) : packs(packs_), specs(specs_) {
 
-      // flatten args that should be flattened
+      // flatten any argument packs with flatten specified
       for (auto & [n, s] : specs) {
         if (s.flatten && packs.count(n)) {
           emp::vector<std::string> flat = std::accumulate(
@@ -305,7 +335,10 @@ namespace emp {
 
     ~ArgManager() { ; }
 
-    /// CallbackArg consumes an argument pack accessed by a certain name.
+    /// Trigger the callback (if specified) for an argument,
+    /// consuming an argument pack if available and callback present.
+    /// If no argpack is available, the callback is triggered with nullopt.
+    /// Return true if an argument pack was consumed, otherwise false.
     bool CallbackArg(const std::string & name) {
 
       if (specs.count(name) && specs.find(name)->second.callback) {
@@ -318,7 +351,8 @@ namespace emp {
 
     }
 
-    /// TODO doc and test
+    /// Trigger all arguments with callbacks until all pertinent argument
+    /// packs are consumed.
     void UseCallbacks() {
 
       for (const auto &[name, spec]: specs) {
@@ -354,7 +388,8 @@ namespace emp {
 
     }
 
-    /// ViewArg returns all argument packs under a certain name.
+    /// ViewArg provides, but doesn't comsume,
+    /// all argument packs under a certain name.
     emp::vector<emp::vector<std::string>> ViewArg(const std::string & name) {
 
       emp::vector<emp::vector<std::string>> res;
@@ -368,7 +403,7 @@ namespace emp {
 
     }
 
-    // Process builtin commands.
+    /// Process builtin commands.
     /// Return bool for "should program proceed" (i.e., true=continue, false=exit).
     bool ProcessBuiltin(
       const emp::Ptr<Config> config=nullptr,
@@ -416,7 +451,8 @@ namespace emp {
 
     }
 
-    /// Print the current state of the ArgManager.
+    /// Print the current state of the ArgManager;
+    /// provide diagnostic hints about argument packs remaining.
     void PrintDiagnostic(std::ostream & os=std::cout) const {
 
       for (const auto & [name, vals] : packs) {
@@ -466,7 +502,9 @@ namespace emp {
 
     }
 
-    /// Test if there are any unused arguments, and if so, output an error.
+    /// Test if there are any unused argument packs,
+    /// and if so, output an error message.
+    /// Returns true if there are any unused argument packs, false otherwise.
     bool HasUnused(std::ostream & os=std::cerr) const {
       if (packs.size()) {
         PrintDiagnostic(os);
