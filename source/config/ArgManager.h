@@ -208,7 +208,7 @@ namespace emp {
 
     /// Make specs for builtin commands, including any config adjustment args.
     static std::unordered_map<std::string, ArgSpec> make_builtin_specs(
-      const emp::Ptr<const Config> config=nullptr
+      const emp::Ptr<Config> config=nullptr
     ) {
 
       std::unordered_map<std::string, ArgSpec> res({
@@ -273,7 +273,13 @@ namespace emp {
                 entry->GetDescription(),
                 " (type=", entry->GetType(),
                 "; default=", entry->GetDefault(), ')'
-              )
+              ),
+              {},
+              [config, entry](std::optional<emp::vector<std::string>> res){
+                if (res && config) {
+                  config->Set(entry->GetName(), res->front());
+                }
+              }
             )
           });
         }
