@@ -16,6 +16,7 @@
 #include <set>
 #include <limits>
 #include <numeric>
+#include <cstdlib>
 
 #include "base/Ptr.h"
 #include "base/vector.h"
@@ -24,13 +25,14 @@
 
 namespace emp {
 
-  /// TODO: add functors and value or
+  /// TODO
   struct ArgSpec {
 
     const size_t quota;
     const std::string description;
     const std::unordered_set<std::string> aliases;
-    const bool enforce_quota;
+    const std::function<void(std::optional<emp::vector<std::string>>)> callback;
+    const bool enforce_quota; // quota is enforced for UseArg, not setup
     const bool gobble_flags;
     const bool flatten;
 
@@ -38,12 +40,14 @@ namespace emp {
       const size_t quota_=0,
       const std::string description_="No description provided.",
       const std::unordered_set<std::string> aliases_=std::unordered_set<std::string>(),
+      const std::function<void(std::optional<emp::vector<std::string>>)> callback_=nullptr,
       const bool enforce_quota_=true,
       const bool gobble_flags_=false,
       const bool flatten_=false
     ) : quota(quota_),
         description(description_),
         aliases(aliases_),
+        callback(callback_),
         enforce_quota(enforce_quota_),
         gobble_flags(gobble_flags_),
         flatten(flatten_)
@@ -189,6 +193,7 @@ namespace emp {
           std::numeric_limits<size_t>::max(),
           "Positional arguments.",
           {},
+          nullptr,
           false,
           false,
           true
@@ -197,12 +202,42 @@ namespace emp {
           std::numeric_limits<size_t>::max(),
           "Unknown arguments.",
           {},
+          [](std::optional<emp::vector<std::string>> res){
+            if (res) {
+              std::cerr << "UNKNOWN | _unknown:";
+              for(const auto & v : *res) std::cerr << " " << v;
+              std::cerr << std::endl;
+              std::exit(EXIT_FAILURE);
+            }
+          },
           false,
           false
         )},
         {"help", ArgSpec(0, "Print help information.", {"h"})},
-        {"gen", ArgSpec(1, "Generate configuration file.")},
-        {"make-const", ArgSpec(1, "Generate const version of macros file.")}
+        {"gen", ArgSpec(
+          1,
+          "Generate configuration file.",
+          {},
+          [config](std::optional<emp::vector<std::string>> res){
+            if (res && config) {
+              const std::string cfg_file = res->front();
+              std::cout << "Generating new config file: " << cfg_file << std::endl;
+              config->Write(cfg_file);
+            }
+          }
+        )},
+        {"make-const", ArgSpec(
+          1,
+          "Generate const version of macros file.",
+          {},
+          [config](std::optional<emp::vector<std::string>> res){
+            if (res && config) {
+              const std::string macro_file = res->front();
+              std::cout << "Generating new macros file: " << macro_file << std::endl;
+              config->WriteMacros(macro_file, true);
+            }
+          }
+        )}
       });
 
       for (const auto & e : *config) {
