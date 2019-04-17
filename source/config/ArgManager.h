@@ -240,19 +240,21 @@ namespace emp {
         )}
       });
 
-      for (const auto & e : *config) {
-        const auto & entry = e.second;
-        res.insert({
-          entry->GetName(),
-          ArgSpec(
-            1,
-            emp::to_string(
-              entry->GetDescription(),
-              " (type=", entry->GetType(),
-              "; default=", entry->GetDefault(), ')'
+      if (config) {
+        for (const auto & e : *config) {
+          const auto & entry = e.second;
+          res.insert({
+            entry->GetName(),
+            ArgSpec(
+              1,
+              emp::to_string(
+                entry->GetDescription(),
+                " (type=", entry->GetType(),
+                "; default=", entry->GetDefault(), ')'
+              )
             )
-          )
-        });
+          });
+        }
       }
 
       return res;
