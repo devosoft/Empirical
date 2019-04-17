@@ -374,15 +374,23 @@ namespace emp {
     /// make pretty.
     void PrintHelp(std::ostream & os=std::cerr) const {
 
-      for (const auto & [n, s] : specs) {
-        os << "-"
-           << n;
-        for (const auto & a : s.aliases) os << " -" << a;
-        os << " [" << ( (!s.enforce_quota) ? "<=" : "=" ) << s.quota << "]";
+      os << "Usage:" << std::endl;
+      // print arguments in alphabetical order
+      for (
+        const auto & [name, spec]
+        : std::map<std::string,ArgSpec>(std::begin(specs), std::end(specs))
+      ) {
+        if (name != "_unknown" && name != "_positional") os << "-";
+        os << name;
+        for (const auto & alias : spec.aliases) os << " -" << alias;
+        os << " [ quota "
+          << ( (!spec.enforce_quota) ? "<=" : "=" ) << " "
+          << spec.quota
+          << " ]";
         os << std::endl
-           << "   | "
-           << s.description
-           << std::endl;
+          << "   | "
+          << spec.description
+          << std::endl;
 
       }
 
