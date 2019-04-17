@@ -17,6 +17,7 @@
 
 TEST_CASE("Test config", "[config]"){
 
+  // test config class template
   {
 
     MyConfig config;
@@ -234,7 +235,7 @@ TEST_CASE("Test config", "[config]"){
 
   }
 
-  // more complicated test
+  // test callbacks
   {
 
     MyConfig config;
