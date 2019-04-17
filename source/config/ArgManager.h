@@ -465,7 +465,6 @@ namespace emp {
     }
 
     /// Convert settings from a configure object to command-line arguments.
-    /// Return bool for "should program proceed" (i.e., true=continue, false=exit).
     void ApplyConfigOptions(Config & config) {
 
       // Scan through the config object to generate command line flags for each setting.
