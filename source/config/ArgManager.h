@@ -343,6 +343,12 @@ namespace emp {
         return false;
       }
 
+      if (const auto res = ViewArg("_unknown"); res.size()) {
+        PrintDiagnostic(os);
+        PrintHelp(os);
+        return false;
+      }
+
       bool proceed = true;
 
       if (const auto res = UseArg("gen"); res && config) {
