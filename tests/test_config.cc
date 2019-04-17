@@ -234,4 +234,64 @@ TEST_CASE("Test config", "[config]"){
 
   }
 
+  // more complicated test
+  {
+
+    MyConfig config;
+
+    emp::vector<std::string> arguments = {
+      "-RANDOM_SEED",
+      "32",
+      "-no_callback",
+      "--unknown"
+    };
+
+    std::vector<char*> argv;
+    for (const auto& arg : arguments) argv.push_back((char*)arg.data());
+
+    argv.push_back(nullptr);
+
+    auto specs = emp::ArgManager::make_builtin_specs(&config);
+
+    bool test = false;
+
+    specs.merge(std::unordered_map<std::string,emp::ArgSpec>{
+      {"no_callback", emp::ArgSpec(0, "no callback here!")},
+      {"not_present", emp::ArgSpec(
+        0,
+        "blah",
+        {},
+        [&test](std::optional<emp::vector<std::string>> res){
+          if (!res) test = true;
+        }
+      )}
+    });
+
+    specs.erase("_unknown");
+
+    emp::ArgManager am(
+      argv.size() - 1,
+      argv.data(),
+      specs
+    );
+
+    REQUIRE(am.HasUnused());
+
+    REQUIRE(config.RANDOM_SEED() == 0);
+    REQUIRE(!test);
+    am.UseCallbacks();
+    REQUIRE(config.RANDOM_SEED() == 32);
+    REQUIRE(config.RANDOM_SEED() == 32);
+    REQUIRE(!am.UseArg("RANDOM_SEED"));
+    REQUIRE(test);
+
+    REQUIRE(*am.UseArg("_unknown") == (emp::vector<std::string>) {"--unknown"});
+
+    REQUIRE(*am.UseArg("no_callback") == (emp::vector<std::string>) {});
+
+    REQUIRE(!am.HasUnused());
+
+  }
+
+
 }
