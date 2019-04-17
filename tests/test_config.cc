@@ -68,8 +68,6 @@ TEST_CASE("Test config", "[config]"){
       specs
     );
 
-    am.Print(std::cout);
-
     REQUIRE(am.HasUnused());
 
     REQUIRE(*am.UseArg("dir") == (emp::vector<std::string>) {"/some_path"} );
@@ -125,7 +123,7 @@ TEST_CASE("Test config", "[config]"){
       specs
     );
 
-    am.Print(std::cout);
+    am.PrintDiagnostic(std::cout);
 
     REQUIRE(am.HasUnused());
 
@@ -135,7 +133,6 @@ TEST_CASE("Test config", "[config]"){
 
     REQUIRE(!am.ProcessBuiltin());
     REQUIRE(!am.UseArg("help"));
-    REQUIRE(am.ProcessBuiltin(&config));
 
     REQUIRE(!am.UseArg("duo"));
 
@@ -145,14 +142,18 @@ TEST_CASE("Test config", "[config]"){
     );
     REQUIRE(!am.UseArg("_positional"));
 
+    REQUIRE(!am.ProcessBuiltin(&config));
     REQUIRE(
-      am.ViewArg("_unknown")
-      == ((emp::vector<emp::vector<std::string>>) {
-        {"-unspecified", "unspec", "unspec"},
-        {"-unspecified"},
-        {"-a", "b"}
-      })
+      *am.UseArg("_unknown")
+      == ((emp::vector<std::string>) {"-unspecified", "unspec", "unspec"})
     );
+    REQUIRE(
+      *am.UseArg("_unknown")
+      == (emp::vector<std::string>) {"-unspecified"}
+    );
+    REQUIRE(*am.UseArg("_unknown") == ((emp::vector<std::string>) {"-a", "b"}));
+    REQUIRE(!am.UseArg("_unknown"));
+    REQUIRE(am.ProcessBuiltin(&config));
 
     REQUIRE(
       am.ViewArg("duo")
