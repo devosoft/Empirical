@@ -333,11 +333,22 @@ namespace emp {
     }
 
     /// Print the current state of the ArgManager.
-    void Print(std::ostream & os=std::cout) const {
+    void PrintDiagnostic(std::ostream & os=std::cout) const {
 
-      for(const auto & it : packs ) {
-        os << it.first << ":";
-        for(const auto & v : it.second ) {
+      for (const auto & [name, vals] : packs) {
+        if (name == "_unknown") {
+          os << "UNKNOWN | ";
+        } else if (
+          specs.count(name)
+          && specs.find(name)->second.enforce_quota
+          && specs.find(name)->second.quota != vals.size()
+        ) {
+          os << "UNMET QUOTA | ";
+        } else {
+          os << "UNUSED | ";
+        }
+        os << name << ":";
+        for (const auto & v : vals) {
           os << " " << v;
         }
         os << std::endl;
@@ -374,7 +385,7 @@ namespace emp {
     /// Test if there are any unused arguments, and if so, output an error.
     bool HasUnused(std::ostream & os=std::cerr) const {
       if (packs.size()) {
-        Print(os);
+        PrintDiagnostic(os);
         PrintHelp(os);
         return true;
       }
