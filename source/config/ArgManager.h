@@ -223,31 +223,6 @@ namespace emp {
       return res;
     }
 
-    // create best-effort specifications for unspecified Args
-    static std::unordered_map<std::string, ArgSpec> retrofit_specs(
-      const std::multimap<std::string, emp::vector<std::string>> & packs
-    ) {
-
-      std::unordered_map<std::string, ArgSpec> res;
-
-      for (const auto & [n, p] : packs) {
-        if (!res.count(n)) {
-          res.insert({
-            n,
-            ArgSpec(
-              0,
-              "Retrofitted.",
-              {},
-              false
-            )
-          });
-        }
-      }
-
-      return res;
-
-    }
-
     ArgManager(
       int argc,
       char* argv[],
@@ -268,7 +243,7 @@ namespace emp {
     ArgManager(
       const std::multimap<std::string, emp::vector<std::string>> & packs_,
       const std::unordered_map<std::string, ArgSpec> & specs_ = std::unordered_map<std::string, ArgSpec>()
-    ) : packs(packs_), specs(specs_.size() ? specs_ : retrofit_specs(packs_)) {
+    ) : packs(packs_), specs(specs_) {
 
       // flatten args that should be flattened
       for (auto & [n, s] : specs) {
