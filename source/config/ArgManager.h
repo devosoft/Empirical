@@ -263,7 +263,7 @@ namespace emp {
     ArgManager(
       int argc,
       char* argv[],
-      const std::unordered_map<std::string, ArgSpec> & specs_ = std::unordered_map<std::string, ArgSpec>()
+      const std::unordered_map<std::string, ArgSpec> & specs_ = make_builtin_specs()
     ) : ArgManager(
       ArgManager::args_to_strings(argc, argv),
       specs_
@@ -271,7 +271,7 @@ namespace emp {
 
     ArgManager(
       const emp::vector<std::string> args,
-      const std::unordered_map<std::string, ArgSpec> & specs_ = std::unordered_map<std::string, ArgSpec>()
+      const std::unordered_map<std::string, ArgSpec> & specs_ = make_builtin_specs()
     ) : ArgManager(
       ArgManager::parse(args, specs_),
       specs_
@@ -279,7 +279,7 @@ namespace emp {
 
     ArgManager(
       const std::multimap<std::string, emp::vector<std::string>> & packs_,
-      const std::unordered_map<std::string, ArgSpec> & specs_ = std::unordered_map<std::string, ArgSpec>()
+      const std::unordered_map<std::string, ArgSpec> & specs_ = make_builtin_specs()
     ) : packs(packs_), specs(specs_) {
 
       // flatten args that should be flattened

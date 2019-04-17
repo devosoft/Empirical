@@ -171,10 +171,10 @@ TEST_CASE("Test config", "[config]"){
     REQUIRE(am.HasUnused());
   }
 
-  // when no spec is provided
+  // when no spec is provided (e.g., default builtins are used)
   {
 
-    emp::vector<std::string> arguments = {"--dir", "/some_path"};
+    emp::vector<std::string> arguments = {"--dir", "/some_path", "-unk", "-h"};
 
     std::vector<char*> argv;
     for (const auto& arg : arguments) argv.push_back((char*)arg.data());
@@ -183,12 +183,42 @@ TEST_CASE("Test config", "[config]"){
 
     emp::ArgManager am(argv.size() - 1, argv.data());
 
+    am.PrintDiagnostic(std::cout);
+    REQUIRE(
+      *am.UseArg("_unknown")
+      == ((emp::vector<std::string>) {"--dir", "/some_path"})
+    );
+    REQUIRE(*am.UseArg("_unknown") == (emp::vector<std::string>) {"-unk"});
+
+    REQUIRE(am.UseArg("help") == (emp::vector<std::string>) {});
+
+    REQUIRE(!am.HasUnused());
+
+  }
+
+  // when empty spec is provided
+  {
+
+    emp::vector<std::string> arguments = {"--dir", "/some", "-h"};
+
+    std::vector<char*> argv;
+    for (const auto& arg : arguments) argv.push_back((char*)arg.data());
+
+    argv.push_back(nullptr);
+
+    emp::ArgManager am(
+      argv.size() - 1,
+      argv.data(),
+      std::unordered_map<std::string, emp::ArgSpec>()
+    );
+
     REQUIRE(am.HasUnused());
 
-    REQUIRE(
-      am.ViewArg("_unknown")
-      == ((emp::vector<emp::vector<std::string>>) {{"--dir"}, {"/some_path"}})
-    );
+    REQUIRE(*am.UseArg("_unknown") == (emp::vector<std::string>) {"--dir"});
+    REQUIRE(*am.UseArg("_unknown") == (emp::vector<std::string>) {"/some"});
+    REQUIRE(*am.UseArg("_unknown") == (emp::vector<std::string>) {"-h"});
+
+    REQUIRE(!am.HasUnused());
 
   }
 
