@@ -268,17 +268,48 @@ namespace emp {
 
     ~ArgManager() { ; }
 
+    /// CallbackArg consumes an argument pack accessed by a certain name.
+    bool CallbackArg(const std::string & name) {
+
+      if (specs.count(name) && specs.find(name)->second.callback) {
+        const auto res = UseArg(name);
+        specs.find(name)->second.callback(res);
+        return (bool) res;
+      }
+
+      return false;
+
+    }
+
+    /// TODO doc and test
+    void UseCallbacks() {
+
+      for (const auto &[name, spec]: specs) {
+        while (CallbackArg(name));
+      }
+
+    }
+
     /// UseArg consumes an argument pack accessed by a certain name.
     std::optional<emp::vector<std::string>> UseArg(const std::string & name) {
 
-      if (!specs.count(name) || !packs.count(name)) return std::nullopt;
+      const auto res = [this, name]()
+        -> std::optional<emp::vector<std::string>> {
 
-      const auto & cur_spec = specs.find(name)->second;
-      const auto & cur_pack = packs.lower_bound(name)->second;
+        if (!packs.count(name)) return std::nullopt;
 
-      const auto res = (
-        !cur_spec.enforce_quota || cur_spec.quota == cur_pack.size()
-      ) ? std::make_optional(cur_pack) : std::nullopt;
+        const auto & pack = packs.lower_bound(name)->second;
+
+        if (specs.count(name)) {
+          const auto & spec = specs.find(name)->second;
+          return (
+            !spec.enforce_quota || spec.quota == pack.size()
+          ) ? std::make_optional(pack) : std::nullopt;
+        } else {
+          return std::make_optional(pack);
+        }
+
+      }();
 
       if (res) packs.erase(packs.lower_bound(name));
 
