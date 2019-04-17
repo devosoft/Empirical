@@ -179,38 +179,42 @@ private:
       os << prefix << "};\n\n";
 
       // Print all of the TEMPLATE WRAPPER details.
-      os << prefix << "/// Concept wrapper (base class is " << base_name << ")\n"
+      os << prefix << "/// === Concept wrapper (base class is " << base_name << ") ===\n"
          << prefix << "template <typename WRAPPED_T>\n"
          << prefix << "class " << name << " : WRAPPED_T, " << base_name << " {\n"
          << prefix << "  using this_t = " << name << "<WRAPPED_T>;\n\n";
 
+      os << prefix << "  ----- VARIABLES -----\n";
       for (auto & v : variables) {
-        os << prefix << "  " << v.var_type << " " << v.var_name << " = " << v.default_code << "\n";
+        os << prefix << "  " << v.var_type << " " << v.var_name;
+        if (v.default_code.size() > 0) os << " = " << v.default_code << "\n";
+        else os << "\n";
       }
 
+      os << prefix << "\n  ----- FUNCTIONS -----\n";
       for (auto & f : functions) {
-        os << prefix << "// Determine the return type for this function.\n"
-           << prefix << "template <typename T>\n"
-           << prefix << "using return_t_" << f.fun_name
+        os << prefix << "  // Determine the return type for this function.\n"
+           << prefix << "  template <typename T>\n"
+           << prefix << "  using return_t_" << f.fun_name
                      << " = decltype( std::declval<T>()." << f.fun_name
                      << "( EMP_TYPES_TO_VALS(__VA_ARGS__) ) );\n";
 
-        os << prefix << "// Compile-time test if this function exists in wrapped class.\n"
-           << prefix << "static constexpr bool HasFun_" << f.fun_name << "(){\n"
-           << prefix << "  return emp::test_type<return_t_" << f.fun_name << ", WRAPPED_T>();\n"
-           << prefix << "}\n";
+        os << prefix << "  // Compile-time test if this function exists in wrapped class.\n"
+           << prefix << "  static constexpr bool HasFun_" << f.fun_name << "(){\n"
+           << prefix << "    return emp::test_type<return_t_" << f.fun_name << ", WRAPPED_T>();\n"
+           << prefix << "  }\n";
 
-        os << prefix << "// Call the function, redirecting as needed.\n"
-           << prefix << f.return_type << " " << f.fun_name << "(" << f.args << ") "
+        os << prefix << "  // Call the function, redirecting as needed.\n"
+           << prefix << "  " << f.return_type << " " << f.fun_name << "(" << f.args << ") "
                      << f.AttributeString() << " {\n"
-           << prefix << "  " << "static_assert( HasFun_" << f.fun_name
+           << prefix << "    " << "static_assert( HasFun_" << f.fun_name
                      << "(), \"\\n\\n  ** Error: concept instance missing required function "
                      << f.fun_name << " **\\n\";"
-           << prefix << "if constexpr (HasFun_" << f.fun_name << "()) {\n"
-           << prefix << "  ";
+           << prefix << "  if constexpr (HasFun_" << f.fun_name << "()) {\n"
+           << prefix << "    ";
         if (f.return_type != "void") os << "return ";
         os << "WRAPPED_T::" << f.fun_name << "( [[CONVERT ARGS]] );\n"
-          << prefix << "}\n";
+          << prefix << "  }\n";
       }
 
 
