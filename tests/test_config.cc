@@ -16,19 +16,24 @@
 #include "config/config_setup.h"
 
 TEST_CASE("Test config", "[config]"){
-  MyConfig config;
-  config.Read("config/test.cfg");
 
-  std::cout << "Random seed = " << config.RANDOM_SEED() << std::endl;
+  {
 
-  REQUIRE(config.RANDOM_SEED() == 333);
-  REQUIRE(config.TEST_STRING() == "default");
+    MyConfig config;
+    config.Read("config/test.cfg");
 
-  config.RANDOM_SEED(123);
+    std::cout << "Random seed = " << config.RANDOM_SEED() << std::endl;
 
-  std::cout << "Random seed = " << config.RANDOM_SEED() << std::endl;
+    REQUIRE(config.RANDOM_SEED() == 333);
+    REQUIRE(config.TEST_STRING() == "default");
 
-  REQUIRE(config.RANDOM_SEED() == 123);
+    config.RANDOM_SEED(123);
+
+    std::cout << "Random seed = " << config.RANDOM_SEED() << std::endl;
+
+    REQUIRE(config.RANDOM_SEED() == 123);
+
+  }
 
   // old ArgManager in cl namespace
   {
@@ -56,7 +61,7 @@ TEST_CASE("Test config", "[config]"){
 
     argv.push_back(nullptr);
 
-    auto specs = emp::ArgManager::make_builtin_specs(&config);
+    auto specs = emp::ArgManager::make_builtin_specs();
     specs.merge(
       (std::unordered_map<std::string,emp::ArgSpec>)
       { {"dir", emp::ArgSpec(1)} }
@@ -80,10 +85,14 @@ TEST_CASE("Test config", "[config]"){
   // more complicated test
   {
 
+    MyConfig config;
+
     emp::vector<std::string> arguments = {
       "-unspecified",
       "unspec",
       "unspec",
+      "-RANDOM_SEED",
+      "32",
       "--dir",
       "/some_path",
       "-d",
@@ -131,7 +140,7 @@ TEST_CASE("Test config", "[config]"){
     REQUIRE(*am.UseArg("dir") == (emp::vector<std::string>) {"/other_path"} );
     REQUIRE(!am.UseArg("dir"));
 
-    REQUIRE(!am.ProcessBuiltin());
+    REQUIRE(!am.ProcessBuiltin(&config));
     REQUIRE(!am.UseArg("help"));
 
     REQUIRE(!am.UseArg("duo"));
@@ -153,7 +162,10 @@ TEST_CASE("Test config", "[config]"){
     );
     REQUIRE(*am.UseArg("_unknown") == ((emp::vector<std::string>) {"-a", "b"}));
     REQUIRE(!am.UseArg("_unknown"));
+
+    REQUIRE(config.RANDOM_SEED() == 0);
     REQUIRE(am.ProcessBuiltin(&config));
+    REQUIRE(config.RANDOM_SEED() == 32);
 
     REQUIRE(
       am.ViewArg("duo")

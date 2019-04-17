@@ -371,7 +371,7 @@ namespace emp {
     // Process builtin commands.
     /// Return bool for "should program proceed" (i.e., true=continue, false=exit).
     bool ProcessBuiltin(
-      const emp::Ptr<const Config> config=nullptr,
+      const emp::Ptr<Config> config=nullptr,
       std::ostream & os=std::cout
     ) {
 
@@ -387,6 +387,16 @@ namespace emp {
       }
 
       bool proceed = true;
+
+      // Apply config arguments to Config object.
+      if (config) {
+        for (auto e : *config) {
+          const auto entry = e.second;
+          if (const auto res = UseArg(entry->GetName()); res) {
+            config->Set(entry->GetName(), res->front());
+          }
+        }
+      }
 
       if (const auto res = UseArg("gen"); res && config) {
         const std::string cfg_file = res->front();
@@ -464,22 +474,6 @@ namespace emp {
         return true;
       }
       return false;
-    }
-
-    /// Convert settings from a configure object to command-line arguments.
-    void ApplyConfigOptions(Config & config) {
-
-      // Scan through the config object to generate command line flags for each setting.
-      for (auto e : config) {
-
-        const auto entry = e.second;
-
-        const auto res = UseArg(entry->GetName());
-
-        if (res) config.Set(entry->GetName(), (*res)[0]);
-
-      }
-
     }
 
   };
