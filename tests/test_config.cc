@@ -83,12 +83,16 @@ TEST_CASE("Test config", "[config]"){
   {
 
     emp::vector<std::string> arguments = {
+      "-unspecified",
+      "unspec",
+      "unspec",
       "--dir",
       "/some_path",
       "-d",
       "/other_path",
       "pos1",
       "pos2",
+      "-unspecified",
       "-help",
       "pos3",
       "--duo",
@@ -137,13 +141,17 @@ TEST_CASE("Test config", "[config]"){
 
     REQUIRE(
       *am.UseArg("_positional")
-      == ((emp::vector<std::string>) {"pos1", "pos2", "pos3", "b", "pos4"})
+      == ((emp::vector<std::string>) {"pos1", "pos2", "pos3", "pos4"})
     );
     REQUIRE(!am.UseArg("_positional"));
 
     REQUIRE(
       am.ViewArg("_unknown")
-      == (emp::vector<emp::vector<std::string>>) {{"-a"}}
+      == ((emp::vector<emp::vector<std::string>>) {
+        {"-unspecified", "unspec", "unspec"},
+        {"-unspecified"},
+        {"-a", "b"}
+      })
     );
 
     REQUIRE(
@@ -175,6 +183,11 @@ TEST_CASE("Test config", "[config]"){
     emp::ArgManager am(argv.size() - 1, argv.data());
 
     REQUIRE(am.HasUnused());
+
+    REQUIRE(
+      am.ViewArg("_unknown")
+      == ((emp::vector<emp::vector<std::string>>) {{"--dir"}, {"/some_path"}})
+    );
 
   }
 

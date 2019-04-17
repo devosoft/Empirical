@@ -193,6 +193,13 @@ namespace emp {
           false,
           true
         )},
+        {"_unknown", ArgSpec(
+          std::numeric_limits<size_t>::max(),
+          "Unknown arguments.",
+          {},
+          false,
+          false
+        )},
         {"help", ArgSpec(0, "Print help information.", {"h"})},
         {"gen", ArgSpec(1, "Generate configuration file.")},
         {"make-const", ArgSpec(1, "Generate const version of macros file.")}
