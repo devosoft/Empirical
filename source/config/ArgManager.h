@@ -18,6 +18,7 @@
 #include <limits>
 #include <numeric>
 #include <cstdlib>
+#include <optional>
 
 #include "base/Ptr.h"
 #include "base/vector.h"

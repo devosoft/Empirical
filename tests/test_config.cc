@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <map>
+#include <optional>
 
 #include "base/assert.h"
 #include "base/vector.h"
