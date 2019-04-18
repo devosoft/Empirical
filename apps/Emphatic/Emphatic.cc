@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-#include "CodeGen.h"
+#include "Emphatic.h"
 
 int main(int argc, char *argv[])
 {
@@ -19,10 +19,13 @@ int main(int argc, char *argv[])
     exit(0);
   }
 
-  CodeGen codegen(argv[1]);
-  codegen.PrintLexerState();
-  std::cout << std::endl;
+  Emphatic codegen(argv[1]);
+  // codegen.PrintLexerState();
+  // std::cout << std::endl;
   codegen.PrintTokens();
 
+  codegen.SetDebug();
   codegen.ProcessTop();
+
+  codegen.PrintOutput(std::cout);
 }

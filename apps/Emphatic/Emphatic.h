@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019
  *
- *  @file  CodeGen.h
+ *  @file  Emphatic.h
  *  @brief A system to generate dynamic concept code for C++17.
  *  @note Status: PLANNING
  *
@@ -44,7 +44,7 @@
 #include "../../source/base/Ptr.h"
 #include "../../source/tools/Lexer.h"
 
-class CodeGen {
+class Emphatic {
 private:
   std::string filename;             ///< Source for for code to generate.
   emp::Lexer lexer;                 ///< Lexer to process input code.
@@ -296,7 +296,7 @@ private:
   }
 
 public:
-  CodeGen(std::string in_filename) : filename(in_filename) {
+  Emphatic(std::string in_filename) : filename(in_filename) {
     // Whitespace and comments should always be dismissed (top priority)
     lexer.IgnoreToken("Whitespace", "[ \t\n\r]+");
     lexer.IgnoreToken("//-Comments", "//.*");
