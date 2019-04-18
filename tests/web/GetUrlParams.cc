@@ -20,10 +20,13 @@ int main() {
     global.location = Object();
     global.location.search = (
       "test1=val1" +
+      "&test4" +
       "&test2=val1" +
       "&test3=1+23" +
       "&test1=val2+val3" +
-      "&test4"
+      "&_positional=p1+p2" +
+      "&_positional=p3" +
+      "&bad+bad=gone"
     );
   });
 
@@ -42,6 +45,13 @@ int main() {
 
   emp_assert(*am.UseArg("test4") == emp::vector<std::string>());
   emp_assert(!am.UseArg("test4"));
+
+  emp_assert(
+    *am.UseArg("_positional") == emp::vector<std::string>({"p1","p2","p3"})
+  );
+  emp_assert(!am.UseArg("_positional"));
+
+  emp_assert(!am.UseArg("bad bad"));
 
   std::cout << "Success!" << std::endl;
 
