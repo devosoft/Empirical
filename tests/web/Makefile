@@ -34,7 +34,7 @@ test_visualizations.js: test_visualizations.cc
 	$(CXX_web) $(CFLAGS_web) test_visualizations.cc -o test_visualizations.js
 
 clean:
-	rm -f JSWrap.js js_utils.js test_visualizations.js *.js.map *.js.mem *~ color_map
+	rm -f GetUrlParams.js JSWrap.js js_utils.js test_visualizations.js *.js.map *.js.mem *~ color_map
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
