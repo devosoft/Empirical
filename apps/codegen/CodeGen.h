@@ -106,7 +106,8 @@ private:
   struct ConceptFunction {
     std::string return_type;
     std::string fun_name;
-    std::string args;
+    struct Param { std::string type; std::string name; };
+    emp::vector<Param> params;
     std::set<std::string> attributes;     // const, noexcept, etc.
     std::string default_code;
     bool is_required = false;
@@ -114,7 +115,19 @@ private:
 
     std::string AttributeString() const {
       std::string out_str;
-      for (const auto & x : attributes) out_str += x;
+      for (const auto & x : attributes) {
+        out_str += " ";
+        out_str += x;
+      }
+      return out_str;
+    }
+
+    std::string ParamString() const {
+      std::string out_str;
+      for (size_t i = 0; i < params.size(); i++) {
+        if (i) out_str += ", ";
+        out_str += emp::to_string(params[i].type, " ", params[i].name);
+      }
       return out_str;
     }
 
@@ -154,7 +167,7 @@ private:
 
       // Print info for all functions...
       for (auto & f : functions) {
-        os << prefix << "  " << f.return_type << " " << f.fun_name << "(" << f.args << ") "
+        os << prefix << "  " << f.return_type << " " << f.fun_name << "(" << f.ParamString() << ") "
            << f.AttributeString();
         if (f.is_required) os << " = required;\n";
         else if (f.is_default) os << " = default;\n";
@@ -172,7 +185,7 @@ private:
 
       // Print all of the BASE CLASS details.
       for (auto & f : functions) {
-        os << prefix << "  " << f.return_type << " " << f.fun_name << "(" << f.args << ") "
+        os << prefix << "  " << f.return_type << " " << f.fun_name << "(" << f.ParamString() << ") "
            << f.AttributeString() << " = 0;\n";
       }
 
@@ -192,6 +205,7 @@ private:
       }
 
       os << prefix << "\n  ----- FUNCTIONS -----\n";
+      os << prefix << "protected:\n";
       os << prefix << "  // FIRST: Determine the return type for each function.\n";
       for (auto & f : functions) {
         os << prefix << "  template <typename T>"
@@ -201,15 +215,16 @@ private:
       }
 
       os << prefix << "\n  // SECOND: Determine if each function exists in wrapped class.\n";
+      os << prefix << "public:\n";
       for (auto & f : functions) {
-        os << prefix << "  static constexpr bool HasFun_" << f.fun_name << "(){\n"
+        os << prefix << "  static constexpr bool HasFun_" << f.fun_name << "() {\n"
            << prefix << "    return emp::test_type<return_t_" << f.fun_name << ", WRAPPED_T>();\n"
            << prefix << "  }\n";
       }
 
       os << prefix << "\n  // THIRD: Call the functions, redirecting as needed\n";
       for (auto & f : functions) {
-        os << prefix << "  " << f.return_type << " " << f.fun_name << "(" << f.args << ") "
+        os << prefix << "  " << f.return_type << " " << f.fun_name << "(" << f.ParamString() << ") "
                      << f.AttributeString() << " {\n"
            << prefix << "    " << "static_assert( HasFun_" << f.fun_name
                      << "(), \"\\n\\n  ** Error: concept instance missing required function "
@@ -393,6 +408,29 @@ public:
     return pos;
   }
 
+  /// Collect all of the parameter definitions for a function.
+  size_t ProcessParams(size_t pos, emp::vector<ConceptFunction::Param> & params) {
+    while (AsChar(pos) != ')') {
+      // If this isn't the first parameter, make sure we have a comma to separate them.
+      if (params.size()) {
+        RequireChar(',', "Parameters must be separated by commas.");
+      }
+
+      // Start with a type...
+      std::string type_name;
+      pos = ProcessType(pos, type_name);
+
+      // If an identifier is specified for this parameter, grab it.
+      if (IsID(pos)) {
+        std::string identifier = tokens[pos++].lexeme;
+      }
+
+      params.emplacs_back(type_name, identifier);
+    }
+
+    return pos;    
+  }
+
   /// Collect a series of identifiers, separated by spaces.
   size_t ProcessIDList(size_t pos, std::set<std::string> & ids) {
     while (IsID(pos)) {
@@ -474,7 +512,7 @@ public:
         std::string identifier = tokens[pos++].lexeme;
 
         // If and open-paren follows the identifier, we are defining a function, otherwise it's a variable.
-        if (AsChar(pos) == '(') {                                // ----- FUNCTION!! -----
+        if (AsChar(pos) == '(') {                              // ----- FUNCTION!! -----
           pos++;  // Move past paren.
 
           // Setup an AST Node for a function definition.
@@ -482,11 +520,11 @@ public:
           new_function.return_type = type_name;
           new_function.fun_name = identifier;
 
-          pos = ProcessCode(pos, new_function.args);           // Read the args for this function.
+          pos = ProcessParams(pos, new_function.params);       // Read the parameters for this function.
 
           RequireChar(')', pos++, "Function arguments must end with a close-parenthesis (')')");
 
-          Debug("...adding a function '", type_name, " ", identifier, "(", new_function.args, ")'");
+          Debug("...adding a function '", type_name, " ", identifier, "(", new_function.ParamString(), ")'");
 
           pos = ProcessIDList(pos, new_function.attributes);   // Read in each of the function attributes, if any.
 
