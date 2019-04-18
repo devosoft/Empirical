@@ -29,9 +29,14 @@ namespace web {
       emp_i.__outgoing_array = Array.from(
         params.entries()
       ).map(
+        p => p[0].replace(" ", "").length == 0
+          ?  ["_illegal", "_empty" + " " + p[1]] : p
+      ).map(
         p => p[0].includes(" ") ? ["_illegal", p[0] + " " + p[1]] : p
       ).map(
-        p => [p[0]].concat(p[1].split(" ")).filter(w => w.length > 0)
+        p => [p[0]].concat(p[1].split(" "))
+      ).map(
+        p => p.filter(w => w.length > 0)
       );
     });
 

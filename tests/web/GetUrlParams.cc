@@ -16,25 +16,35 @@ int main() {
 
   emp::Initialize();
 
+  //TODO ++
   EM_ASM({
     global.location = Object();
     global.location.search = (
       "test1=val1" +
       "&test4" +
-      "&test2=val1" +
+      "&test2=++val1" +
       "&test3=1+23" +
+      "&=bad" +
+      "&=" +
+      "&+=" +
+      "&=+" +
+      "&+=+" +
       "&test1=val2+val3" +
-      "&_positional=p1+p2" +
-      "&_positional=p3" +
-      "&bad+bad=gone"
+      "&_positional=p1++p2" +
+      "&_positional=p3+" +
+      "&bad+bad=illegal" +
+      "&bad++bad=illegal" +
+      "&+bad=illegal" +
+      "&bad+=illegal"
     );
   });
 
   emp::ArgManager am(emp::web::GetUrlParams());
 
+  am.PrintDiagnostic();
 
   emp_assert(*am.UseArg("test1") == emp::vector<std::string>({"val1"}));
-  emp_assert(*am.UseArg("test1") ==  emp::vector<std::string>({"val2","val3"}));
+  emp_assert(*am.UseArg("test1") == emp::vector<std::string>({"val2","val3"}));
   emp_assert(!am.UseArg("test1"));
 
   emp_assert(*am.UseArg("test2") == emp::vector<std::string>({"val1"}));
@@ -52,7 +62,31 @@ int main() {
   emp_assert(!am.UseArg("_positional"));
 
   emp_assert(
-    *am.UseArg("_illegal") == emp::vector<std::string>({"bad","bad","gone"})
+    *am.UseArg("_illegal") == emp::vector<std::string>({"_empty", "bad"})
+  );
+  emp_assert(
+    *am.UseArg("_illegal") == emp::vector<std::string>({"_empty"})
+  );
+  emp_assert(
+    *am.UseArg("_illegal") == emp::vector<std::string>({"_empty"})
+  );
+  emp_assert(
+    *am.UseArg("_illegal") == emp::vector<std::string>({"_empty"})
+  );
+  emp_assert(
+    *am.UseArg("_illegal") == emp::vector<std::string>({"_empty"})
+  );
+  emp_assert(
+    *am.UseArg("_illegal") == emp::vector<std::string>({"bad","bad","illegal"})
+  );
+  emp_assert(
+    *am.UseArg("_illegal") == emp::vector<std::string>({"bad","bad","illegal"})
+  );
+  emp_assert(
+    *am.UseArg("_illegal") == emp::vector<std::string>({"bad","illegal"})
+  );
+  emp_assert(
+    *am.UseArg("_illegal") == emp::vector<std::string>({"bad","illegal"})
   );
   emp_assert(!am.UseArg("_illegal"));
 
