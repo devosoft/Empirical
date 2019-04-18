@@ -389,7 +389,7 @@ public:
       // In case this is a template, we need to evaluate parameters.
       if (AsLexeme(pos) == "<") {
         pos = ProcessCode(pos+1, type_name, true);
-        RequireChar('>', pos, "Templates must end in a close angle bracket.");
+        RequireChar('>', pos++, "Templates must end in a close angle bracket.");
       }
 
       if (AsLexeme(pos) == "::") {
@@ -413,7 +413,7 @@ public:
     while (AsChar(pos) != ')') {
       // If this isn't the first parameter, make sure we have a comma to separate them.
       if (params.size()) {
-        RequireChar(',', "Parameters must be separated by commas.");
+        RequireChar(',', pos++, "Parameters must be separated by commas.");
       }
 
       // Start with a type...
@@ -421,11 +421,10 @@ public:
       pos = ProcessType(pos, type_name);
 
       // If an identifier is specified for this parameter, grab it.
-      if (IsID(pos)) {
-        std::string identifier = tokens[pos++].lexeme;
-      }
+      std::string identifier = IsID(pos) ? tokens[pos++].lexeme : "";
 
-      params.emplacs_back(type_name, identifier);
+      ConceptFunction::Param new_param{type_name, identifier};
+      params.emplace_back(new_param);
     }
 
     return pos;    
