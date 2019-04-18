@@ -192,20 +192,24 @@ private:
       }
 
       os << prefix << "\n  ----- FUNCTIONS -----\n";
+      os << prefix << "  // FIRST: Determine the return type for each function.\n";
       for (auto & f : functions) {
-        os << prefix << "  // Determine the return type for this function.\n"
-           << prefix << "  template <typename T>\n"
-           << prefix << "  using return_t_" << f.fun_name
+        os << prefix << "  template <typename T>"
+                     << "  using return_t_" << f.fun_name
                      << " = decltype( std::declval<T>()." << f.fun_name
                      << "( EMP_TYPES_TO_VALS(__VA_ARGS__) ) );\n";
+      }
 
-        os << prefix << "  // Compile-time test if this function exists in wrapped class.\n"
-           << prefix << "  static constexpr bool HasFun_" << f.fun_name << "(){\n"
+      os << prefix << "\n  // SECOND: Determine if each function exists in wrapped class.\n";
+      for (auto & f : functions) {
+        os << prefix << "  static constexpr bool HasFun_" << f.fun_name << "(){\n"
            << prefix << "    return emp::test_type<return_t_" << f.fun_name << ", WRAPPED_T>();\n"
            << prefix << "  }\n";
+      }
 
-        os << prefix << "  // Call the function, redirecting as needed.\n"
-           << prefix << "  " << f.return_type << " " << f.fun_name << "(" << f.args << ") "
+      os << prefix << "\n  // THIRD: Call the functions, redirecting as needed\n";
+      for (auto & f : functions) {
+        os << prefix << "  " << f.return_type << " " << f.fun_name << "(" << f.args << ") "
                      << f.AttributeString() << " {\n"
            << prefix << "    " << "static_assert( HasFun_" << f.fun_name
                      << "(), \"\\n\\n  ** Error: concept instance missing required function "
