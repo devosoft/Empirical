@@ -10,6 +10,7 @@
 
 #include "base/assert.h"
 #include "web/UrlParams.h"
+#include "config/ArgManager.h"
 
 int main() {
 
@@ -17,14 +18,31 @@ int main() {
 
   EM_ASM({
     global.location = Object();
-    global.location.search = "test1=result&test2=result&test3=123&test1=nope";
+    global.location.search = (
+      "test1=val1" +
+      "&test2=val1" +
+      "&test3=1+23" +
+      "&test1=val2+val3" +
+      "&test4"
+    );
   });
 
-  const auto params = emp::web::GetUrlParams();
-  emp_assert(params.find("test1")->second == "result");
-  emp_assert(params.find("test2")->second == "result");
-  emp_assert(params.find("test3")->second == "123");
-  emp_assert(params.find("nope") == params.end());
+  emp::ArgManager am(emp::web::GetUrlParams());
+
+
+  emp_assert(*am.UseArg("test1") == emp::vector<std::string>({"val1"}));
+  emp_assert(*am.UseArg("test1") ==  emp::vector<std::string>({"val2","val3"}));
+  emp_assert(!am.UseArg("test1"));
+
+  emp_assert(*am.UseArg("test2") == emp::vector<std::string>({"val1"}));
+  emp_assert(!am.UseArg("test2"));
+
+  emp_assert(am.UseArg("test3") == emp::vector<std::string>({"1","23"}));
+  emp_assert(!am.UseArg("test3"));
+
+  emp_assert(*am.UseArg("test4") == emp::vector<std::string>());
+  emp_assert(!am.UseArg("test4"));
+
   std::cout << "Success!" << std::endl;
-  
+
 }

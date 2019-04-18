@@ -11,7 +11,7 @@
 #ifndef EMP_WEB_UrlParams_H
 #define EMP_WEB_UrlParams_H
 
-#include <unordered_map>
+#include <map>
 #include <string>
 
 #include "JSWrap.h"
@@ -20,22 +20,34 @@
 namespace emp {
 namespace web {
 
-  std::unordered_map<std::string, std::string> GetUrlParams() {
+  std::multimap<std::string, emp::vector<std::string>> GetUrlParams() {
 
     emp::vector<emp::vector<std::string>> incoming;
 
     EM_ASM({
       const params = new URLSearchParams(location.search);
-      emp_i.__outgoing_array = [... params.keys()].map(
-        function(x) { return [x, params.get(x)]; }
+      emp_i.__outgoing_array = Array.from(
+        params.entries()
+      ).filter(
+        p => !p[0].includes(" ")
+      ).map(
+        p => [p[0]].concat(p[1].split(" ")).filter(w => w.length > 0)
       );
     });
 
     emp::pass_vector_to_cpp(incoming);
 
-    std::unordered_map<std::string, std::string> res;
+    std::multimap<std::string, emp::vector<std::string>> res;
 
-    for (const auto & pair : incoming) res[pair[0]] = pair[1];
+    for (const auto & pack : incoming) {
+      res.insert({
+        pack.front(),
+        emp::vector<std::string>(
+          std::next(std::begin(pack)),
+          std::end(pack)
+        )
+      });
+    }
 
     return res;
 
