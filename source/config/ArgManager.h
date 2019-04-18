@@ -117,19 +117,19 @@ namespace emp {
       );
 
       // check for duplicate aliases
-      const bool check = alias_map.size() == std::accumulate(
-        std::begin(specs),
-        std::end(specs),
-        specs.size(),
-        [](
-          const size_t l,
-          const std::pair<std::string, ArgSpec> & r
-        ){
-          return l + r.second.aliases.size();
-        }
-      );
-
-      emp_assert(check, "duplicate aliases detected");
+      emp_assert([&](){
+        return alias_map.size() == std::accumulate(
+          std::begin(specs),
+          std::end(specs),
+          specs.size(),
+          [](
+            const size_t l,
+            const std::pair<std::string, ArgSpec> & r
+          ){
+            return l + r.second.aliases.size();
+          }
+        );
+      }(), "duplicate aliases detected");
 
       // lookup table with leading dashes stripped
       const emp::vector<std::string> deflagged = [args](){
