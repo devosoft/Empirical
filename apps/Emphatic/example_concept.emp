@@ -1,8 +1,11 @@
-// This is an example file of what an Empirical concept might look like
-// Note: Currently, only // comments are working.
-
-// The concept below will define a Vehicle wrapper template that will add the VehicleBase
-// base class on to any wrapped type.
+/*****
+ *
+ *  This is an example file of what an Empirical concept might look like.
+ *
+ *  The concept below will define a Vehicle wrapper template that will add the VehicleBase
+ *  base class on to any wrapped type.
+ *
+ *****/
 
 concept Vehicle : VehicleBase {
     // Any variables declared here are added to the base concept; they shadow any variables
@@ -18,9 +21,9 @@ concept Vehicle : VehicleBase {
     // If a function is required, it should include a REQUIRE with an error message.
     double SetSpeed(double speed) = required;
     
-    // A single function parameter can be marked OVERLOAD.  This parameter must
+    // A single function parameter can be marked overload.  This parameter must
     // be a TypeSet, which will be exploded to create many versions of the function.
-    double SetPart( OVERLOAD(part_types), size_t part_id ) = required;
+    double SetPart( overload<part_types> part, size_t part_id ) = required;
 
     // Types are only available in the wrapped class (not the base class) and can be required or
     // optional in the class being wrapped.
@@ -29,5 +32,5 @@ concept Vehicle : VehicleBase {
     using wheel_type = void;
 
     // If a type is required, it should be set to REQUIRE with an error message.
-    using fuel_type = REQUIRE("All vehicles must specify their fuel type.");
+    using fuel_type = required;
 };
