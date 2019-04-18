@@ -51,7 +51,10 @@ int main() {
   );
   emp_assert(!am.UseArg("_positional"));
 
-  emp_assert(!am.UseArg("bad bad"));
+  emp_assert(
+    *am.UseArg("_illegal") == emp::vector<std::string>({"bad","bad","gone"})
+  );
+  emp_assert(!am.UseArg("_illegal"));
 
   std::cout << "Success!" << std::endl;
 

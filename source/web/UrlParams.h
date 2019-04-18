@@ -28,8 +28,8 @@ namespace web {
       const params = new URLSearchParams(location.search);
       emp_i.__outgoing_array = Array.from(
         params.entries()
-      ).filter(
-        p => !p[0].includes(" ")
+      ).map(
+        p => p[0].includes(" ") ? ["_illegal", p[0] + " " + p[1]] : p
       ).map(
         p => [p[0]].concat(p[1].split(" ")).filter(w => w.length > 0)
       );
