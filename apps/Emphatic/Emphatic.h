@@ -5,7 +5,7 @@
  *
  *  @file  Emphatic.h
  *  @brief A system to generate dynamic concept code for C++17.
- *  @note Status: PLANNING
+ *  @note Status: ALPHA
  *
  *  NOTES:
  *   - TYPE_OR_EXPRESSION: Collect everything until you hit an unmatched close-mark: ')', ']', '}', or '>'
@@ -41,20 +41,15 @@
 #include <set>
 #include <string>
 
+#include "EmphaticLexer.h"
 #include "../../source/base/Ptr.h"
-#include "../../source/tools/Lexer.h"
 
 class Emphatic {
 private:
   std::string filename;             ///< Source for for code to generate.
-  emp::Lexer lexer;                 ///< Lexer to process input code.
+  EmphaticLexer lexer;              ///< Lexer to process input code.
   emp::vector<emp::Token> tokens;   ///< Tokenized version of input file.
   bool debug = false;               ///< Should we print full debug information?
-
-  int token_identifier = -1;        ///< Token id for identifiers.
-  int token_number = -1;            ///< Token id for literal numbers.
-  int token_string = -1;            ///< Token id for literal strings.
-  int token_symbol = -1;            ///< Token id for other symbols.
 
   /// All AST Nodes have a common base class.
   struct AST_Node {
@@ -255,12 +250,11 @@ private:
 
   // Helper functions
   bool HasToken(int pos) const { return (pos >= 0) && (pos < tokens.size()); }
-  bool IsID(int pos) const { return HasToken(pos) && tokens[pos].token_id == token_identifier; }
-  bool IsNumber(int pos) const { return HasToken(pos) && tokens[pos].token_id == token_number; }
-  bool IsString(int pos) const { return HasToken(pos) && tokens[pos].token_id == token_string; }
+  bool IsID(int pos) const { return HasToken(pos) && lexer.IsID(tokens[pos]); }
+  bool IsNumber(int pos) const { return HasToken(pos) && lexer.IsNumber(tokens[pos]); }
+  bool IsString(int pos) const { return HasToken(pos) && lexer.IsString(tokens[pos]); }
   char AsChar(int pos) const {
-    if (HasToken(pos) && tokens[pos].token_id == token_symbol) return tokens[pos].lexeme[0];
-    return 0;
+    return (HasToken(pos) && lexer.IsSymbol(tokens[pos])) ? tokens[pos].lexeme[0] : 0;
   }
   const std::string & AsLexeme(int pos) const {
     return HasToken(pos) ? tokens[pos].lexeme : emp::empty_string();
@@ -305,19 +299,6 @@ private:
 
 public:
   Emphatic(std::string in_filename) : filename(in_filename) {
-    // Whitespace and comments should always be dismissed (top priority)
-    lexer.IgnoreToken("Whitespace", "[ \t\n\r]+");
-    lexer.IgnoreToken("//-Comments", "//.*");
-    lexer.IgnoreToken("/*...*/-Comments", "/[*]([^*]|([*]+[^*/]))*[*]+/");
-
-    // Meaningful tokens have next priority.
-    token_identifier = lexer.AddToken("Identifier", "[a-zA-Z_][a-zA-Z0-9_]+");
-    token_number = lexer.AddToken("Literal Number", "[0-9]+(.[0-9]+)?");
-    token_string = lexer.AddToken("Literal String", "\\\"[^\"]*\\\"");
-
-    // Symbol tokens should have least priority.
-    token_symbol = lexer.AddToken("Symbol", ".|\"::\"");
-
     std::ifstream file(filename);
     tokens = lexer.Tokenize(file);
     file.close();
