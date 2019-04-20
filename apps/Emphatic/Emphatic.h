@@ -131,6 +131,14 @@ private:
       return out_str;
     }
 
+    std::string ArgString() const {
+      std::string out_str;
+      for (size_t i = 0; i < params.size(); i++) {
+        if (i) out_str += ", ";
+        out_str += params[i].name;
+      }
+      return out_str;
+    }
   };
 
   /// AST Node for type definition inside of a concept.
@@ -211,7 +219,7 @@ private:
         os << prefix << "  template <typename T>"
                      << "  using return_t_" << f.fun_name
                      << " = decltype( std::declval<T>()." << f.fun_name
-                     << "( EMP_TYPES_TO_VALS(__VA_ARGS__) ) );\n";
+                     << "( " << f.ParamString() << " );\n";
       }
 
       os << prefix << "\n  // SECOND: Determine if each function exists in wrapped class.\n";
@@ -232,7 +240,7 @@ private:
            << prefix << "  if constexpr (HasFun_" << f.fun_name << "()) {\n"
            << prefix << "    ";
         if (f.return_type != "void") os << "return ";
-        os << "WRAPPED_T::" << f.fun_name << "( [[CONVERT ARGS]] );\n"
+        os << "WRAPPED_T::" << f.fun_name << "( " << f.ArgString() << " );\n"
           << prefix << "  }\n";
       }
 
