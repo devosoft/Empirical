@@ -15,6 +15,7 @@ private:
   int token_number = -1;            ///< Token id for literal numbers.
   int token_string = -1;            ///< Token id for literal strings.
   int token_symbol = -1;            ///< Token id for other symbols.
+  int token_pp = -1;                ///< Token id for pre-processor commands.
 
 public:
   EmphaticLexer() {
@@ -30,10 +31,14 @@ public:
 
     // Symbol tokens should have least priority.
     token_symbol = AddToken("Symbol", ".|\"::\"");
+
+    // Pre-processor tokens should just get echoed.
+    token_pp = AddToken("Pre-Processor", "#(.|\"\\\\\\n\")+");
   }
 
   bool IsID(const emp::Token token) const { return token.token_id == token_identifier; }
   bool IsNumber(const emp::Token token) const { return token.token_id == token_number; }
   bool IsString(const emp::Token token) const { return token.token_id == token_string; }
   bool IsSymbol(const emp::Token token) const { return token.token_id == token_symbol; }
+  bool IsPP(const emp::Token token) const { return token.token_id == token_pp; }
 };
