@@ -19,7 +19,7 @@
   };
 
   /// AST Node for a new scope level.
-  struct AST_Scope : AST_Node{
+  struct AST_Scope : AST_Node {
     emp::vector<emp::Ptr<AST_Node>> children;
     ~AST_Scope() { for (auto x : children) x.Delete(); }
     void AddChild(emp::Ptr<AST_Node> node_ptr) { children.push_back(node_ptr); }
@@ -33,6 +33,10 @@
     void PrintOutput(std::ostream & os, const std::string & prefix) const override {
       for (auto x : children) { x->PrintOutput(os, prefix); }
     }
+  };
+
+  struct AST_Namespace : public AST_Scope {
+    std::string name;
   };
 
   /// AST Node for outer level using statement...
