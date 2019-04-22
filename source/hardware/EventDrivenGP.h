@@ -1292,7 +1292,7 @@ namespace emp {
       os << "[" << event_lib->GetName(event.id) << ","; event.affinity.Print(os); os << ",(";
       for (const auto & mem : event.msg) std::cout << "{" << mem.first << ":" << mem.second << "}";
       os << "),(Properties:";
-      for (const auto & property : event.properties) std::cout << " " << property;
+      for (const auto & property : event.properties) os << " " << property;
       os << ")]";
     }
 
