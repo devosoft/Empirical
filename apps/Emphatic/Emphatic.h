@@ -241,14 +241,27 @@ public:
       RequireID(pos, emp::to_string("Statements in outer scope must begin with an identifier or keyword.  (Found: ",
                      AsLexeme(pos), ")."));
 
-      if (tokens[pos].lexeme == "concept") {
+      std::string cur_lexeme = AsLexeme(pos++);
+      if (cur_lexeme == "concept") {
         auto node_ptr = emp::NewPtr<AST_Concept>();
         ast_root.AddChild(node_ptr);
-        pos = ProcessConcept(pos + 1, *node_ptr);
+        pos = ProcessConcept(pos, *node_ptr);
       }
-      // @CAO: Technically we can have a whole list of special keywords, but for now its just "concept".
+      else if (cur_lexeme == "struct" || cur_lexeme == "class") {
+        RequireChar('{', pos++, emp::to_string("A ", cur_lexeme, " must be defined in braces ('{' and '}')."));
+        std::string body;
+        pos = ProcessCode(pos, body, false, true);
+        RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
+        RequireChar(';', pos++, emp::to_string("A ", cur_lexeme, " must end with a semi-colon (';')."));
+      }
+      else if (cur_lexeme == "namespace") {
+        RequireChar('{', pos++, emp::to_string("A ", cur_lexeme, " must be defined in braces ('{' and '}')."));
+        std::string body;
+        pos = ProcessCode(pos, body, false, true);
+        RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
+      }
       else {
-        Error( pos, emp::to_string("Unknown keyword '", tokens[pos].lexeme, "'.  Aborting.") );
+        Error( pos-1, emp::to_string("Unknown keyword '", cur_lexeme, "'.  Aborting.") );
       }
     }
     return pos;
@@ -261,8 +274,7 @@ public:
     concept.name = tokens[pos++].lexeme;
 
     // Next, must be a colon...
-    RequireChar(':', pos, "Concept names must be followed by a colon (':').");
-    pos++;
+    RequireChar(':', pos++, "Concept names must be followed by a colon (':').");
 
     // And then a base-class name.
     RequireID(pos, "Concept declaration must include name of base class.");
@@ -271,8 +283,7 @@ public:
     Debug("Defining concept '", concept.name, "' with base class '", concept.base_name, "'.");
 
     // Next, must be an open brace...
-    RequireChar('{', pos, "Concepts must be defined in braces ('{' and '}').");
-    pos++;
+    RequireChar('{', pos++, "Concepts must be defined in braces ('{' and '}').");
 
     // Loop through the full definition of concept, incorporating each entry.
     while ( AsChar(pos) != '}' ) {
