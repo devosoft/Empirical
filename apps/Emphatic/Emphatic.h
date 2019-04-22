@@ -236,7 +236,7 @@ public:
 
  
   /// Process the tokens starting from the outer-most scope.
-  size_t ProcessTop(size_t pos=0) {
+  size_t ProcessTop(size_t pos, AST_Scope & cur_scope ) {
     while (pos < tokens.size()) {
       RequireID(pos, emp::to_string("Statements in outer scope must begin with an identifier or keyword.  (Found: ",
                      AsLexeme(pos), ")."));
@@ -244,7 +244,7 @@ public:
       std::string cur_lexeme = AsLexeme(pos++);
       if (cur_lexeme == "concept") {
         auto node_ptr = emp::NewPtr<AST_Concept>();
-        ast_root.AddChild(node_ptr);
+        cur_scope.AddChild(node_ptr);
         pos = ProcessConcept(pos, *node_ptr);
       }
       else if (cur_lexeme == "struct" || cur_lexeme == "class") {
@@ -255,9 +255,14 @@ public:
         RequireChar(';', pos++, emp::to_string("A ", cur_lexeme, " must end with a semi-colon (';')."));
       }
       else if (cur_lexeme == "namespace") {
+        auto node_ptr = emp::NewPtr<AST_Namespace>();
+        cur_scope.AddChild(node_ptr);
+
+        // If a name is provided for this namespace, store it.
+        if (IsID(pos)) node_ptr->name = AsLexeme(pos++);
+
         RequireChar('{', pos++, emp::to_string("A ", cur_lexeme, " must be defined in braces ('{' and '}')."));
-        std::string body;
-        pos = ProcessCode(pos, body, false, true);
+        pos = ProcessTop(pos, *node_ptr);
         RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
       }
       else {
@@ -384,6 +389,10 @@ public:
     return pos;
   }
   
+  void Process() {
+    ProcessTop(0, ast_root);
+  }
+
   /// Print the state of the lexer used for code generation.
   void PrintLexerState() { lexer.Print(); }
 
