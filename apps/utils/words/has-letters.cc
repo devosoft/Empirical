@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
 {
   emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
 
-  if (args.size() > 4) {
+  if (args.size() < 2 || args.size() > 4) {
     std::cerr << "Format: " << args[0] << " [letters] {input file} {output file}."
 	      << std::endl;
     exit(1);
