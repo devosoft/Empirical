@@ -64,11 +64,12 @@ TEST_CASE("Test config", "[config]"){
     argv.push_back(nullptr);
 
     auto specs = emp::ArgManager::make_builtin_specs();
-    specs.merge(
-      (std::unordered_map<std::string,emp::ArgSpec>)
-      { {"dir", emp::ArgSpec(1)} }
-    );
+    specs["dir"] = emp::ArgSpec(1);
 
+    // Alternatively, we could merge in additional specifications from another unordered map:
+    // std::unordered_map<std::string,emp::ArgSpec> additional_specs{"dir", emp::ArgSpec(1)};
+    // specs.merge(additional_specs);
+    
     emp::ArgManager am(
       argv.size() - 1,
       argv.data(),
