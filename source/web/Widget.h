@@ -572,6 +572,12 @@ namespace web {
         info->extras.style.DoSet(setting, value);
         if (IsActive()) Style::Apply(info->id, setting, value);
       }
+
+      virtual void DoCSS(const std::string & clss) {
+        info->extras.style.AddClass(clss);
+        if (IsActive()) Style::ApplyClass(info->id, clss);
+      }
+
       /// Attr-related options may be overridden in derived classes that have multiple attributes.
       /// By default DoAttr will track the new information and apply it (if active) to the widget.
       virtual void DoAttr(const std::string & setting, const std::string & value) {
@@ -625,9 +631,13 @@ namespace web {
       /// Allow multiple CSS settings to be provided as a single object.
       /// (still go through DoCSS given need for virtual re-routing.)
       return_t & SetCSS(const Style & in_style) {
+
         emp_assert(info != nullptr);
         for (const auto & s : in_style.GetMap()) {
           DoCSS(s.first, s.second);
+        }
+        for (const auto & s : in_style.GetClasses()) {
+          DoCSS(s);
         }
         return (return_t &) *this;
       }

@@ -19,6 +19,7 @@
 #include "../tools/string_utils.h"
 
 #include <map>
+#include <set>
 #include <string>
 
 namespace emp {
@@ -29,6 +30,7 @@ namespace web {
   class Style {
   private:
     std::map<std::string, std::string> settings;  ///< CSS Setting values being tracked.
+    std::set<std::string> classes;  ///< CSS classes
 
   public:
     Style() { ; }
@@ -39,6 +41,14 @@ namespace web {
 
     /// Return a count of the number of settings that have been set.
     size_t GetSize() const { return settings.size(); }
+    /// Return a count of the number of classes that have been added.
+    size_t GetNClasses() const { return classes.size(); }
+
+   Style & AddClass(const std::string & in_clss) {
+      classes.insert(in_clss);
+      return *this;
+    }
+
 
     Style & DoSet(const std::string & in_set, const std::string & in_val) {
       settings[in_set] = in_val;
@@ -72,18 +82,29 @@ namespace web {
       return settings;
     }
 
-    /// Remove all setting values.
-    void Clear() { settings.clear(); }
+    const std::set<std::string> & GetClasses() const {
+      return classes;
+    }
+
+
+    /// Remove all setting values and all classes.
+    void Clear() { settings.clear(); classes.clear(); }
 
     /// Remove a specific setting value.
     void Remove(const std::string & setting) {
       settings.erase(setting);
     }
 
+    /// Remove a specific class
+    void RemoveClass(const std::string & clss) {
+      classes.erase(clss);
+    }
+
     /// Apply ALL of the style settings to a specified widget.
     void Apply(const std::string & widget_id) {
+
       // Stop immediately if nothing to set.
-      if (settings.size() == 0) return;
+      if (settings.size() == 0 && classes.size() == 0) return;
 
       // Find the current object only once.
 #ifdef EMSCRIPTEN
@@ -106,6 +127,20 @@ namespace web {
                   << "' to '" << css_pair.second << "'.";
 #endif
       }
+
+      for (std::string clss : classes) {
+
+#ifdef EMSCRIPTEN
+        EM_ASM_ARGS({
+            var name = UTF8ToString($0);
+            emp_i.cur_obj.addClass( name);
+          }, clss.c_str());
+#else
+        std::cout << "Adding class to '" << widget_id << "': '" << clss;
+#endif
+        
+      }
+
     }
 
     /// Apply only a SPECIFIC style setting from the setting library.
@@ -138,6 +173,31 @@ namespace web {
 #else
       std::cout << "Setting '" << widget_id << "' attribute '" << setting
                 << "' to '" << value << "'.";
+#endif
+    }
+
+    static void ApplyClass(const std::string & widget_id, const std::string & clss){
+
+#ifdef EMSCRIPTEN
+      EM_ASM_ARGS({
+          var id = UTF8ToString($0);
+          var name = UTF8ToString($1);
+          $( '#' + id ).addClass( name);
+        }, widget_id.c_str(), clss.c_str());
+#else
+      std::cout << "Adding class to '" << widget_id << "': '" << clss;
+#endif
+    }
+
+    static void ApplyRemoveClass(const std::string & widget_id, const std::string & clss){
+#ifdef EMSCRIPTEN
+      EM_ASM_ARGS({
+          var id = UTF8ToString($0);
+          var name = UTF8ToString($1);
+          $( '#' + id ).removeClass( name);
+        }, widget_id.c_str(), clss.c_str());
+#else
+      std::cout << "Adding class to '" << widget_id << "': '" << clss;
 #endif
     }
 

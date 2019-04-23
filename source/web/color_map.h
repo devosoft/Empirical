@@ -30,9 +30,9 @@ namespace emp {
 
   /// Generate a string to describe a JS color out of HSL values.
   std::string ColorHSL(double h, double s, double l) {
-    emp_assert(h >= 0 && h <= 360);
-    emp_assert(s >= 0 && s <= 100);
-    emp_assert(l >= 0 && l <= 100);
+    emp_assert(h >= 0 && h <= 360, h);
+    emp_assert(s >= 0 && s <= 100, s);
+    emp_assert(l >= 0 && l <= 100, l);
     std::stringstream ss;
     ss << "hsl(" <<  h << ',' << s << "%," <<  l << "%)";
     return ss.str();
