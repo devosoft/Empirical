@@ -166,10 +166,6 @@ namespace emp {
     }
 
     return out_vv;
-<<<<<<< HEAD
-=======
-
->>>>>>> 5ae6826bcbaa2732618ed1257014b949f613da50
   }
   
   /// Returns a vector containing the numbers from @param N1 to @param N2
