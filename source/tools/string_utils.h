@@ -632,7 +632,8 @@ namespace emp {
     T out_val;
     ss >> out_val;
     return out_val;
-    
+  }
+  
   template <typename T>
   inline std::string join(const emp::vector<T> & v, std::string join_str) {
     
@@ -656,6 +657,6 @@ namespace emp {
     return std::count(s.begin(), s.end(), val);
   }
 
-}
+  }
 
 #endif
