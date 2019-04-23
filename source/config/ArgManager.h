@@ -362,7 +362,7 @@ namespace emp {
     /// packs are consumed.
     void UseCallbacks() {
 
-      for (const auto &[name, [[maybe_unused]] spec]: specs) {
+      for (const auto &[name, spec]: specs) {
         while (CallbackArg(name));
       }
 
