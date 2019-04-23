@@ -50,6 +50,7 @@ TEST_CASE("Test Event Driven GP", "[Hardware]")
 	REQUIRE(ss.str() == "");
 	ss.str(std::string());
 	
+	// Pushing a function with an instruction
 	emp::EventDrivenGP::Function fx;
 	fx.PushInst(inst);
 	gp.PushFunction(fx);
@@ -61,6 +62,7 @@ TEST_CASE("Test Event Driven GP", "[Hardware]")
 	REQUIRE(savedProgram == "Fn-00000000:\n  Inc[00000000](1,0,0)\n\n");
 	ss.str(std::string());
 	
+	// More instructions
 	emp::EventDrivenGP::Instruction i_dec(1, 1); // decrement id = 1, dec arg 0 = 1
 	gp.SetInst(0, 0, i_dec); // do same but just with inst params
 	REQUIRE(gp.GetFunction(0)[0] == i_dec);
@@ -68,6 +70,7 @@ TEST_CASE("Test Event Driven GP", "[Hardware]")
 	REQUIRE(ss.str() == "Dec 1");
 	ss.str(std::string());
 	
+	// Testing states and SingleProcess
 	emp::EventDrivenGP::Instruction i_not(2, 0); // not id = 2, not arg 0 = 0
 	gp.PushInst(i_not); // will be pushed onto the end of the last function
 	REQUIRE(gp.GetFunction(0).GetSize() == 2);
@@ -83,6 +86,7 @@ TEST_CASE("Test Event Driven GP", "[Hardware]")
 	REQUIRE(ss.str() == "Shared memory: \nTraits: []\nErrors: 0\nEvent queue: \nCore 0(CID=0):\n  Call stack (2):\n    --TOP--\n    Inst ptr: 2 (NONE)\n    Func ptr: 0\n    Input memory: \n    Local memory: {0:1}{1:-1}\n    Output memory: \n    ---\n    Inst ptr: 0 (Dec 1)\n    Func ptr: 0\n    Input memory: \n    Local memory: \n    Output memory: \n    ---\n");
 	ss.str(std::string());
 	
+	// Testing default mem value
 	REQUIRE(gp.GetCurState().GetLocal(1) == -1.0);
 	gp.ProcessInst(inst); // will increment local mem 1
 	REQUIRE(gp.GetCurState().GetLocal(1) == 0.0);
@@ -94,9 +98,11 @@ TEST_CASE("Test Event Driven GP", "[Hardware]")
 	gp.ProcessInst(inst);
 	REQUIRE(gp.GetCurState().GetLocal(2) == 6.0);
 	
+	// New Random
 	gp.NewRandom(150);
 	(gp.GetRandom().GetSeed() == 150);
 	
+	// Events
 	emp::EventDrivenGP::Event ev(0); // event 0 in event lib is message
 	ev.properties.insert("add");
 	gp.TriggerEvent(ev);
@@ -107,6 +113,7 @@ TEST_CASE("Test Event Driven GP", "[Hardware]")
 	REQUIRE(ss.str() == "[Message,00000000,(),(Properties: add)]");
 	ss.str(std::string());
 	
+	// Traits
 	gp.SetTrait(0, 2.0);
 	REQUIRE(gp.GetTrait(0) == 2.0);
 	gp.IncTrait(0, 5.0);
@@ -119,22 +126,24 @@ TEST_CASE("Test Event Driven GP", "[Hardware]")
 	REQUIRE(ss.str() == "[6, 3]");
 	ss.str(std::string());
 	
+	// Loading a program
 	gp.PrintProgramFull(ss);
 	REQUIRE(ss.str() == "Fn-00000000:\n  Dec[00000000](1,0,0)\n  Not[00000000](0,0,0)\n\n");
 	ss.str(std::string());
 	ss << savedProgram;
 	gp.GetProgram().Load(ss);
 	ss.str(std::string());
-	
 	std::stringstream os;
 	gp.GetProgram().PrintProgramFull(os);
 	REQUIRE(os.str() == savedProgram);
 	os.str(std::string());
 	REQUIRE(gp.GetProgram().GetSize() == 1);
 	
+	// Max cores
 	gp.SetMaxCores(6);
 	REQUIRE(gp.GetMaxCores() == 6);
 	
+	// StochasticFunCall
 	gp.SetStochasticFunCall(false);
 	REQUIRE(gp.IsStochasticFunCall() == false);
 }
