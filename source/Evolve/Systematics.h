@@ -257,6 +257,7 @@ namespace emp {
     size_t org_count;         ///< How many organisms are currently active?
     size_t total_depth;       ///< Sum of taxa depths for calculating average.
     size_t num_roots;         ///< How many distint injected ancestors are currently in population?
+    int max_depth;            ///< Depth of deepest taxon. -1 means needs to be recalculated
 
     size_t next_id;           ///< What ID value should the next new taxon have?
     size_t curr_update;
@@ -267,7 +268,7 @@ namespace emp {
     SystematicsBase(bool _active=true, bool _anc=true, bool _all=false, bool _pos=true)
       : store_active(_active), store_ancestors(_anc), store_outside(_all)
       , archive(store_ancestors || store_outside), store_position(_pos), track_synchronous(false)
-      , org_count(0), total_depth(0), num_roots(0), next_id(0), curr_update(0) { ; }
+      , org_count(0), total_depth(0), num_roots(0), max_depth(0), next_id(0), curr_update(0) { ; }
 
     virtual ~SystematicsBase(){;}
 
@@ -359,6 +360,7 @@ namespace emp {
     virtual size_t GetNumOutside() const = 0;
     virtual size_t GetTreeSize() const = 0;
     virtual size_t GetNumTaxa() const = 0;
+    virtual int GetMaxDepth() = 0;
     virtual int GetPhylogeneticDiversity() const = 0;
     virtual double GetMeanPairwiseDistance(bool branch_only) const = 0;
     virtual double GetSumPairwiseDistance(bool branch_only) const = 0;
@@ -410,6 +412,7 @@ namespace emp {
     using parent_t::num_roots;
     using parent_t::next_id;
     using parent_t::curr_update;
+    using parent_t::max_depth;
 
 
   public:
@@ -451,6 +454,7 @@ namespace emp {
     using parent_t::AddVolatilityDataNode;
     using parent_t::AddUniqueTaxaDataNode;
     using parent_t::AddMutationCountDataNode;
+    using parent_t::GetMaxDepth;
 
     struct SnapshotInfo {
       using snapshot_fun_t = std::function<std::string(const taxon_t &)>;
@@ -548,6 +552,20 @@ namespace emp {
 
     /// How many taxa are stored in total?
     size_t GetNumTaxa() const { return GetTreeSize() + GetNumOutside(); }
+
+    int GetMaxDepth() {
+      if (max_depth != -1) {
+        return max_depth;
+      }
+      
+      for (auto tax : active_taxa) {
+        int depth = tax->GetDepth();
+        if (depth > max_depth) {
+          max_depth = depth;
+        }
+      }
+      return max_depth;
+    }
 
     void SetNextParent(WorldPosition & pos) {
       emp_assert(pos.IsActive() || !pos.IsValid());
@@ -1206,6 +1224,11 @@ namespace emp {
     emp_assert(taxon);
     emp_assert(taxon->GetNumOrgs() == 0);
 
+    if (max_depth == taxon->GetDepth()) {
+      // We no longer know the max depth
+      max_depth = -1;
+    }
+
     if (taxon->GetParent()) {
       // Update extant descendant count for all ancestors
       taxon->GetParent()->RemoveTotalOffspring();
@@ -1325,6 +1348,9 @@ namespace emp {
       }
 
       cur_taxon = NewPtr<taxon_t>(++next_id, info, parent);  // Build new taxon.
+      if (max_depth != -1 && cur_taxon->GetDepth() > max_depth) {
+        max_depth = cur_taxon->GetDepth();
+      }
       on_new_sig.Trigger(cur_taxon, org);
       if (store_active) active_taxa.insert(cur_taxon);       // Store new taxon.
       if (parent) parent->AddOffspring();                    // Track tree info.
