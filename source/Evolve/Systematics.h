@@ -1224,7 +1224,7 @@ namespace emp {
     emp_assert(taxon);
     emp_assert(taxon->GetNumOrgs() == 0);
 
-    if (max_depth == taxon->GetDepth()) {
+    if (max_depth == (int)taxon->GetDepth()) {
       // We no longer know the max depth
       max_depth = -1;
     }
@@ -1318,7 +1318,9 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>
   Systematics<ORG, ORG_INFO, DATA_STRUCT>::AddOrg(ORG && org, Ptr<taxon_t> parent, int update) {
-    return AddOrg(org, -1, parent, update);
+    emp_assert(!store_position && 
+              "Trying to add org to position-tracking systematics manager without position. Either specify a valid position or turn of position tracking for systematic manager.", store_position);
+    return AddOrg(org, WorldPosition::invalid_id, parent, update);
   }
 
   // Add information about a new organism, including its stored info and parent's taxon;
@@ -1348,7 +1350,7 @@ namespace emp {
       }
 
       cur_taxon = NewPtr<taxon_t>(++next_id, info, parent);  // Build new taxon.
-      if (max_depth != -1 && cur_taxon->GetDepth() > max_depth) {
+      if (max_depth != -1 && (int)cur_taxon->GetDepth() > max_depth) {
         max_depth = cur_taxon->GetDepth();
       }
       on_new_sig.Trigger(cur_taxon, org);

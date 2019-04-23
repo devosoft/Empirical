@@ -16,7 +16,7 @@
 
 TEST_CASE("Test Systematics", "[evo]")
 {
-  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true);
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
 
   std::cout << "\nAddOrg 25 (id1, no parent)\n";
   auto id1 = sys.AddOrg(25, nullptr, 0);
@@ -266,7 +266,7 @@ TEST_CASE("Test Data Struct", "[evo]")
 {
 
   emp::Ptr<emp::Systematics<int, int, emp::datastruct::mut_landscape_info<int> >> sys;
-  sys.New([](const int & i){return i;}, true, true, true);
+  sys.New([](const int & i){return i;}, true, true, true, false);
   auto id1 = sys->AddOrg(1, nullptr);
   id1->GetData().fitness.Add(2);
   id1->GetData().phenotype = 6;
@@ -548,7 +548,7 @@ TEST_CASE("Run world", "[evo]") {
 
 TEST_CASE("Test GetCanopy", "[evo]")
 {
-  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true);
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
 
   auto id1 = sys.AddOrg(1, nullptr, 0);
   auto id2 = sys.AddOrg(2, id1, 2);
