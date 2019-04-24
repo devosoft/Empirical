@@ -69,7 +69,10 @@ TEST_CASE("Test config", "[config]"){
     // Alternatively, we could merge in additional specifications from another unordered map:
     // std::unordered_map<std::string,emp::ArgSpec> additional_specs{"dir", emp::ArgSpec(1)};
     // specs.merge(additional_specs);
-    
+
+    // Another alternative, we can construct the key-value pair using emplace.
+    // specs.try_emplace("dir", 1);
+
     emp::ArgManager am(
       argv.size() - 1,
       argv.data(),
@@ -122,12 +125,13 @@ TEST_CASE("Test config", "[config]"){
     argv.push_back(nullptr);
 
     auto specs = emp::ArgManager::make_builtin_specs(&config);
-
-    specs.merge(std::unordered_map<std::string,emp::ArgSpec>{
-      {"dir", emp::ArgSpec(1, "some information 'n stuff", {"d"})},
-      {"duo", emp::ArgSpec(2, "two things")},
-      {"nope", emp::ArgSpec(0, "not here")}
-    });
+    specs["dir"] = emp::ArgSpec(
+      1,
+      "some information 'n stuff",
+      std::unordered_set<std::string>{"d"}
+    );
+    specs["duo"] = emp::ArgSpec(2, "two things");
+    specs["nope"] = emp::ArgSpec(0, "not here");
 
     emp::ArgManager am(
       argv.size() - 1,

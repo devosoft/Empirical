@@ -45,13 +45,13 @@ namespace emp {
   ///   (e.g., a single list of words instead of a list of lists of words).
   struct ArgSpec {
 
-    const size_t quota;
-    const std::string description;
-    const std::unordered_set<std::string> aliases;
-    const std::function<void(std::optional<emp::vector<std::string>>)> callback;
-    const bool enforce_quota; // quota is enforced at access, not setup
-    const bool gobble_flags;
-    const bool flatten;
+    size_t most_quota;
+    size_t least_quota;
+    std::string description;
+    std::unordered_set<std::string> aliases;
+    std::function<void(std::optional<emp::vector<std::string>>)> callback;
+    bool gobble_flags;
+    bool flatten;
 
     ArgSpec(
       const size_t quota_=0,
