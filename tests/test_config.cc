@@ -15,6 +15,7 @@
 #include "config/command_line.h"
 #include "config/config.h"
 #include "config/config_setup.h"
+#include "config/config_web_interface.h"
 
 TEST_CASE("Test config", "[config]"){
 
@@ -307,4 +308,9 @@ TEST_CASE("Test config", "[config]"){
   }
 
 
+}
+
+TEST_CASE("Test ui", "[config]") {
+  MyConfig config;
+  emp::ConfigWebUI ui(config);
 }

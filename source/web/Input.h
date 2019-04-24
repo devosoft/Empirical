@@ -124,7 +124,7 @@ namespace web {
 
             function modifyInputs() {
                 
-                var input_el = document.getElementById(Pointer_stringify($0));
+                var input_el = document.getElementById(UTF8ToString($0));
                 input_el.addEventListener("input", modifyOffset);
                 // the following taken from http://stackoverflow.com/questions/2856513/trigger-onchange-event-manually
                 if ("fireEvent" in input_el) {
@@ -234,7 +234,7 @@ namespace web {
       Info()->callback = in_cb;
       InputInfo * b_info = Info();
       Info()->callback_id = JSWrap( std::function<void(std::string)>( [b_info](std::string new_val){b_info->DoChange(new_val);} )  );
-      Info()->onchange_info = emp::to_string("emp.Callback(", Info()->callback_id, ", ('checked' in this) ? this.checked.toString() : this.value);");
+      Info()->onchange_info = emp::to_string("emp.Callback(", Info()->callback_id, ", (this.type == 'checkbox') ? this.checked.toString() : this.value);");
     }
 
     /// Link to an existing Input.
