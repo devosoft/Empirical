@@ -526,7 +526,7 @@ namespace emp {
         if (spec.least_quota == spec.most_quota) {
           os << " [ quota = " << spec.most_quota << " ]";
         } else {
-          os << " [ " << spec.least_quota << "<= quota <= "
+          os << " [ " << spec.least_quota << " <= quota <= "
             << spec.most_quota << " ]";
         }
         os << std::endl
