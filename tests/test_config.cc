@@ -116,7 +116,11 @@ TEST_CASE("Test config", "[config]"){
       "--duo",
       "a",
       "b",
-      "pos4"
+      "pos4",
+      "--", // in POSIX, -- means treat subsequent words as literals
+      "--duo",
+      "-a",
+      "b"
     };
 
     std::vector<char*> argv;
@@ -154,7 +158,9 @@ TEST_CASE("Test config", "[config]"){
 
     REQUIRE(
       *am.UseArg("_positional")
-      == ((emp::vector<std::string>) {"pos1", "pos2", "pos3", "pos4"})
+      == ((emp::vector<std::string>) {
+        "pos1", "pos2", "pos3", "pos4", "--duo", "-a", "b"
+      })
     );
     REQUIRE(!am.UseArg("_positional"));
 

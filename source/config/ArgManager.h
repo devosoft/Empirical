@@ -113,7 +113,7 @@ namespace emp {
     // Use argument specifications to convert command line arguments
     // to argument packs.
     static std::multimap<std::string, emp::vector<std::string>> parse(
-      const emp::vector<std::string> args,
+      emp::vector<std::string> args,
       const std::unordered_map<std::string, ArgSpec> & specs = std::unordered_map<std::string, ArgSpec>()
     ) {
 
@@ -149,10 +149,20 @@ namespace emp {
       }(), "duplicate aliases detected");
 
       // lookup table with leading dashes stripped
-      const emp::vector<std::string> deflagged = [args](){
+      const emp::vector<std::string> deflagged = [&args](){
         auto res = args;
-        for (auto & val : res) {
-          val.erase(0, val.find_first_not_of('-'));
+        for (size_t i = 0; i < args.size(); ++i) {
+          const size_t dash_stop = args[i].find_first_not_of('-');
+          if (dash_stop < args[i].size()) {
+            res[i].erase(0, dash_stop);
+          } else if (args[i].size() == 2) {
+            // in POSIX, -- means treat subsequent words as literals
+            // so we remove the -- and stop deflagging subsequent words
+            res.erase(std::next(std::begin(res),i));
+            args.erase(std::next(std::begin(args),i));
+            break;
+          }
+          // -, ---, ----, etc. left in place and treated as non-flags
         }
         return res;
       }();
