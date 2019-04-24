@@ -424,7 +424,7 @@ namespace emp {
 
     /// ViewArg provides, but doesn't comsume,
     /// all argument packs under a certain name.
-    emp::vector<emp::vector<std::string>> ViewArg(const std::string & name) {
+    emp::vector<emp::vector<std::string>> ViewArg(const std::string & name) const {
 
       emp::vector<emp::vector<std::string>> res;
 
