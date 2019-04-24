@@ -68,12 +68,12 @@ namespace emp {
 
             void Setup(const std::string & id_prefix = "settings_") {
                 for (auto group : config.group_set) {
-                    std::cout << "GROUP: " << group->GetName() << std::endl;
+                    // std::cout << "GROUP: " << group->GetName() << std::endl;
                     std::string group_name = group->GetName();
                     group_divs[group_name] = web::Div(id_prefix + group_name);
 
                     for (size_t i = 0; i < group->GetSize(); i++) {
-                        std::cout << group->GetEntry(i)->GetType() << std::endl;
+                        // std::cout << group->GetEntry(i)->GetType() << std::endl;
                         std::string name = group->GetEntry(i)->GetName();
                         std::string type = group->GetEntry(i)->GetType();
                         std::string value = group->GetEntry(i)->GetValue();
@@ -81,9 +81,9 @@ namespace emp {
                         if (Has(numeric_types, type)) {
                             input_map[name] = emp::web::Input(
                                 [this, name](std::string val){
-                                                              std::cout << name << " " << val << " " <<config.Get(name) << std::endl;
+                                                            //   std::cout << name << " " << val << " " <<config.Get(name) << std::endl;
                                                               config.Set(name, val);
-                                                              std::cout << config.Get(name) << std::endl;
+                                                            //   std::cout << config.Get(name) << std::endl;
                                                               on_change_fun(val);},
                                 "range", format_label_fun(name), name + "_input_slider"
                             );
