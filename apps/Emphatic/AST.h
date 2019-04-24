@@ -37,6 +37,20 @@
 
   struct AST_Namespace : public AST_Scope {
     std::string name;
+
+    /// Scope should run echo on each of its children.
+    void PrintEcho(std::ostream & os, const std::string & prefix) const override {
+      os << prefix << "namespace" << " " << name << "{\n";
+      for (auto x : children) { x->PrintEcho(os, prefix+"  "); }
+      os << prefix << "}\n";      
+    }
+
+    /// Scope should run output on each of its children.
+    void PrintOutput(std::ostream & os, const std::string & prefix) const override {
+      os << prefix << "namespace" << " " << name << "{\n";
+      for (auto x : children) { x->PrintOutput(os, prefix); }
+      os << prefix << "}\n";      
+    }
   };
 
   /// AST Node for outer level using statement...
