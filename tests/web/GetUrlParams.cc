@@ -16,7 +16,6 @@ int main() {
 
   emp::Initialize();
 
-  //TODO ++
   EM_ASM({
     global.location = Object();
     global.location.search = (
