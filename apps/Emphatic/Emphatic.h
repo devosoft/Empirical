@@ -268,6 +268,14 @@ public:
         pos = ProcessTop(pos, *node_ptr);
         RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
       }
+      else if (cur_lexeme == "using") {
+        RequireID(pos, "A 'using' command must first specify the new type name.");
+        auto node_ptr = emp::NewPtr<AST_Using>();
+        cur_scope.AddChild(node_ptr);
+        pos = ProcessType(pos, node_ptr->type_name);      // Determine new type name being defined.
+        RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
+        pos = ProcessCode(pos, node_ptr->type_value);   // Determine code being assigned to.
+      }
       // @CAO: Still need to deal with "template", "using", variables and functions.
       else {
         Error( pos-1, emp::to_string("Unknown keyword '", cur_lexeme, "'.  Aborting.") );
