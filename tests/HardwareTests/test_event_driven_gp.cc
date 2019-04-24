@@ -58,7 +58,7 @@ TEST_CASE("Test Event Driven GP", "[Hardware]")
 	REQUIRE(c_prgm.GetSize() == 0);
 	REQUIRE(gp.GetFunction(0) == fx);
 	gp.PrintProgramFull(ss);
-	std::string savedProgram = ss.str();
+	std::string savedProgram = ss.str();	// save program for loading later
 	REQUIRE(savedProgram == "Fn-00000000:\n  Inc[00000000](1,0,0)\n\n");
 	ss.str(std::string());
 	
@@ -92,6 +92,7 @@ TEST_CASE("Test Event Driven GP", "[Hardware]")
 	REQUIRE(gp.GetCurState().GetLocal(1) == 0.0);
 	REQUIRE(gp.GetDefaultMemValue() == 0.0);
 	gp.SetDefaultMemValue(5.0);
+	REQUIRE(gp.GetDefaultMemValue() == 5.0);
 	gp.ProcessInst(inst);
 	REQUIRE(gp.GetCurState().GetLocal(1) == 1.0);
 	inst.Set(0, 2);
@@ -139,6 +140,42 @@ TEST_CASE("Test Event Driven GP", "[Hardware]")
 	os.str(std::string());
 	REQUIRE(gp.GetProgram().GetSize() == 1);
 	
+	// Resetting the current state
+	gp.GetCurState().Reset();
+	for(size_t i=0;i<3;i++)
+	{
+		REQUIRE(gp.GetCurState().GetLocal(i) == gp.GetCurState().GetDefaultMemValue());
+		REQUIRE(gp.GetCurState().GetLocalMemory()[i] == 0.0);
+		REQUIRE(gp.GetCurState().GetInput(i) == gp.GetCurState().GetDefaultMemValue());
+		REQUIRE(gp.GetCurState().GetInputMemory()[i] == 0.0);
+		REQUIRE(gp.GetCurState().GetOutput(i) == gp.GetCurState().GetDefaultMemValue());
+		REQUIRE(gp.GetCurState().GetOutputMemory()[i] == 0.0);
+		REQUIRE(gp.GetCurState().AccessInput(i) == 0.0);
+		REQUIRE(gp.GetCurState().AccessOutput(i) == 0.0);
+		REQUIRE(gp.GetCurState().AccessLocal(i) == 0.0);
+	}
+	
+	// Set/Push Inst
+	REQUIRE(gp.GetFunction(0)[0].affinity == inst.affinity);
+	REQUIRE(gp.GetFunction(0)[0].id == inst.id);
+	gp.SetInst(0, 0, 1, 1);
+	REQUIRE(gp.GetFunction(0)[0].affinity == inst.affinity);
+	REQUIRE(gp.GetFunction(0)[0].id == 1);
+	gp.PushInst(0, 0);
+	REQUIRE(gp.GetFunction(0).GetSize() == 2);
+	REQUIRE(gp.GetFunction(0)[1].id == 0);
+	std::stringstream ss1;
+	gp.PrintProgram(ss1);
+	REQUIRE(ss1.str() == "Fn-0 00000000:\n  Dec 1\n  Inc 0\n\n");
+	ss1.str(std::string());
+	
+	// Set Program
+	REQUIRE(gp.GetProgram().GetSize() == 1);
+	gp.SetProgram(c_prgm);
+	REQUIRE(gp.GetProgram().GetSize() == 0);
+	gp.SetShared(0, 2.5);
+	REQUIRE(gp.GetShared(0) == 2.5);
+	
 	// Max cores
 	gp.SetMaxCores(6);
 	REQUIRE(gp.GetMaxCores() == 6);
@@ -146,4 +183,11 @@ TEST_CASE("Test Event Driven GP", "[Hardware]")
 	// StochasticFunCall
 	gp.SetStochasticFunCall(false);
 	REQUIRE(gp.IsStochasticFunCall() == false);
+	
+	// Copy constructor
+	emp::EventDrivenGP gp2(gp);
+	REQUIRE(gp2.GetMaxCores() == 6);
+	REQUIRE(gp2.IsStochasticFunCall() == false);
+	REQUIRE(gp2.GetDefaultMemValue() == 5.0);
+	REQUIRE(gp2.GetSharedMem()[0] == 2.5);
 }
