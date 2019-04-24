@@ -237,7 +237,7 @@ public:
  
   /// Process the tokens starting from the outer-most scope.
   size_t ProcessTop(size_t pos, AST_Scope & cur_scope ) {
-    while (pos < tokens.size()) {
+    while (pos < tokens.size() && AsChar(pos) != '}') {
       RequireID(pos, emp::to_string("Statements in outer scope must begin with an identifier or keyword.  (Found: ",
                      AsLexeme(pos), ")."));
 
@@ -265,6 +265,7 @@ public:
         pos = ProcessTop(pos, *node_ptr);
         RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
       }
+      // @CAO: Still need to deal with "template", "using", variables and functions.
       else {
         Error( pos-1, emp::to_string("Unknown keyword '", cur_lexeme, "'.  Aborting.") );
       }
