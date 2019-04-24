@@ -30,13 +30,12 @@ namespace emp {
   /// A helper struct for ArgManager that specifies a single argument type.
   /// Note that the primary argument name is specified as the keys of the specs
   /// map constructor argument for ArgManager.
-  /// * quota: how many words after the flag should be absorbed into the
-  ///   argument pack?
+  /// * most_quota: at most how many words after the flag should be packed into
+  ///   the argument pack? (enforced during parsing and on UseArg request)
+  /// * least_quota: at least how many words after the flag should be packed
+  ///   into the argument pack? (enforced on UseArg request)
   /// * aliases: what set of alternate flag names should trigger this argument? ///   (specify without - prepended)
   /// * callbaack: provide a callback function to process the argument
-  /// * enforce_quota: if the quota of words following the flag is not
-  ///   satisfied, should the argument pack refuse to be dispensed from UseArg
-  ///   and instead be retained so it can be detected by HasUnused?
   /// * gobble_flags: should the argument pack accept flag words
   ///   (words that begin with -) instead of curtailing the argument pack
   ///   before the first encountered flag word.
@@ -58,14 +57,32 @@ namespace emp {
       const std::string description_="No description provided.",
       const std::unordered_set<std::string> aliases_=std::unordered_set<std::string>(),
       const std::function<void(std::optional<emp::vector<std::string>>)> callback_=nullptr,
-      const bool enforce_quota_=true,
       const bool gobble_flags_=false,
       const bool flatten_=false
-    ) : quota(quota_),
+    ) : ArgSpec(
+          quota_,
+          quota_,
+          description_,
+          aliases_,
+          callback_,
+          gobble_flags_,
+          flatten_
+        )
+    { ; }
+
+    ArgSpec(
+      const size_t most_quota_,
+      const size_t least_quota_,
+      const std::string description_="No description provided.",
+      const std::unordered_set<std::string> aliases_=std::unordered_set<std::string>(),
+      const std::function<void(std::optional<emp::vector<std::string>>)> callback_=nullptr,
+      const bool gobble_flags_=false,
+      const bool flatten_=false
+    ) : most_quota(most_quota_),
+        least_quota(least_quota_),
         description(description_),
         aliases(aliases_),
         callback(callback_),
-        enforce_quota(enforce_quota_),
         gobble_flags(gobble_flags_),
         flatten(flatten_)
     { ; }
@@ -176,7 +193,7 @@ namespace emp {
         for (
           j = i;
           j < args.size()
-          && j - i < spec.quota
+          && j - i < spec.most_quota
           && (
             spec.gobble_flags
             || ! (j + 1 < args.size())
@@ -215,15 +232,16 @@ namespace emp {
       std::unordered_map<std::string, ArgSpec> res({
         {"_positional", ArgSpec(
           std::numeric_limits<size_t>::max(),
+          1,
           "Positional arguments.",
           {},
           nullptr,
-          false,
           false,
           true
         )},
         {"_unknown", ArgSpec(
           std::numeric_limits<size_t>::max(),
+          1,
           "Unknown arguments.",
           {},
           [](std::optional<emp::vector<std::string>> res){
@@ -233,8 +251,7 @@ namespace emp {
               std::cerr << std::endl;
               std::exit(EXIT_FAILURE);
             }
-          },
-          false
+          }
         )},
         {"help", ArgSpec(0, "Print help information.", {"h"})},
         {"gen", ArgSpec(
@@ -381,7 +398,7 @@ namespace emp {
         if (specs.count(name)) {
           const auto & spec = specs.find(name)->second;
           return (
-            !spec.enforce_quota || spec.quota == pack.size()
+            spec.least_quota <= pack.size() && pack.size() <= spec.most_quota
           ) ? std::make_optional(pack) : std::nullopt;
         } else {
           return std::make_optional(pack);
@@ -462,20 +479,20 @@ namespace emp {
     /// provide diagnostic hints about argument packs remaining.
     void PrintDiagnostic(std::ostream & os=std::cout) const {
 
-      for (const auto & [name, vals] : packs) {
+      for (const auto & [name, pack] : packs) {
         if (name == "_unknown") {
           os << "UNKNOWN | ";
         } else if (
           specs.count(name)
-          && specs.find(name)->second.enforce_quota
-          && specs.find(name)->second.quota != vals.size()
+          && specs.find(name)->second.least_quota <= pack.size()
+          && specs.find(name)->second.most_quota >= pack.size()
         ) {
           os << "UNMET QUOTA | ";
         } else {
           os << "UNUSED | ";
         }
         os << name << ":";
-        for (const auto & v : vals) {
+        for (const auto & v : pack) {
           os << " " << v;
         }
         os << std::endl;
@@ -496,10 +513,12 @@ namespace emp {
         if (name != "_unknown" && name != "_positional") os << "-";
         os << name;
         for (const auto & alias : spec.aliases) os << " -" << alias;
-        os << " [ quota "
-          << ( (!spec.enforce_quota) ? "<=" : "=" ) << " "
-          << spec.quota
-          << " ]";
+        if (spec.least_quota == spec.most_quota) {
+          os << " [ quota = " << spec.most_quota << " ]";
+        } else {
+          os << " [ " << spec.least_quota << "<= quota <= "
+            << spec.most_quota << " ]";
+        }
         os << std::endl
           << "   | "
           << spec.description
