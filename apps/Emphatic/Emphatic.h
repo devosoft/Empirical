@@ -248,9 +248,12 @@ public:
         pos = ProcessConcept(pos, *node_ptr);
       }
       else if (cur_lexeme == "struct" || cur_lexeme == "class") {
+        auto node_ptr = emp::NewPtr<AST_Class>();
+        cur_scope.AddChild(node_ptr);
+        node_ptr->type = cur_lexeme;
+        if (IsID(pos)) node_ptr->name = AsLexeme(pos++);
         RequireChar('{', pos++, emp::to_string("A ", cur_lexeme, " must be defined in braces ('{' and '}')."));
-        std::string body;
-        pos = ProcessCode(pos, body, false, true);
+        pos = ProcessCode(pos, node_ptr->body, false, true);
         RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
         RequireChar(';', pos++, emp::to_string("A ", cur_lexeme, " must end with a semi-colon (';')."));
       }
