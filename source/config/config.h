@@ -382,6 +382,9 @@ namespace emp {
     auto begin() -> decltype(var_map.begin()) { return var_map.begin(); }
     auto end() -> decltype(var_map.end()) { return var_map.end(); }
 
+    auto begin() const -> const decltype(var_map.begin()) { return var_map.begin(); }
+    auto end() const -> const decltype(var_map.end()) { return var_map.end(); }
+
     Config & SetExpandOK(bool ok=true) { expand_ok = ok; return *this; }
 
     bool Has(const std::string & setting_name) const {
