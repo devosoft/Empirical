@@ -24,6 +24,14 @@
     ~AST_Scope() { for (auto x : children) x.Delete(); }
     void AddChild(emp::Ptr<AST_Node> node_ptr) { children.push_back(node_ptr); }
 
+    /// Create a new child (of a specified type) in this scope.
+    template <typename T>
+    T & NewChild() {
+      auto node_ptr = emp::NewPtr<T>();  ///< Build the new AST node.
+      children.push_back(node_ptr);      ///< Save it as a child in the current scope.
+      return *node_ptr;                  ///< Return a reference to the new child.
+    }
+
     /// Scope should run echo on each of its children.
     void PrintEcho(std::ostream & os, const std::string & prefix) const override {
       for (auto x : children) { x->PrintEcho(os, prefix); }
