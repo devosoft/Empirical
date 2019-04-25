@@ -189,6 +189,7 @@ namespace emp {
 
       size_t GetSize() const { return entry_set.size(); }
       std::string GetName() const {return name;}
+      std::string GetDesc() const {return desc;}
       ConfigEntry * GetEntry(size_t id) { return entry_set[id]; }
       ConfigEntry * GetLastEntry() { emp_assert(GetSize() > 0); return entry_set.back(); }
 

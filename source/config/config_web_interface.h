@@ -76,7 +76,7 @@ namespace emp {
                     // std::cout << "GROUP: " << group->GetName() << std::endl;
                     std::string group_name = group->GetName();
                     group_divs[group_name] = web::Div(id_prefix + group_name);
-
+                    group_divs[group_name] << "<h3 style='text-align: center'>" << group->GetDesc() << "</h3>";                                        
                     for (size_t i = 0; i < group->GetSize(); i++) {
                         // std::cout << group->GetEntry(i)->GetType() << std::endl;
                         std::string name = group->GetEntry(i)->GetName();
