@@ -243,40 +243,36 @@ public:
 
       std::string cur_lexeme = AsLexeme(pos++);
       if (cur_lexeme == "concept") {
-        auto node_ptr = emp::NewPtr<AST_Concept>();
-        cur_scope.AddChild(node_ptr);
-        pos = ProcessConcept(pos, *node_ptr);
+        AST_Concept & new_node = cur_scope.NewChild<AST_Concept>();
+        pos = ProcessConcept(pos, new_node);
       }
       else if (cur_lexeme == "struct" || cur_lexeme == "class") {
-        auto node_ptr = emp::NewPtr<AST_Class>();
-        cur_scope.AddChild(node_ptr);
-        node_ptr->type = cur_lexeme;
-        if (IsID(pos)) node_ptr->name = AsLexeme(pos++);
+        AST_Class & new_class = cur_scope.NewChild<AST_Class>();
+        new_class.type = cur_lexeme;
+        if (IsID(pos)) new_class.name = AsLexeme(pos++);
         RequireChar('{', pos++, emp::to_string("A ", cur_lexeme, " must be defined in braces ('{' and '}')."));
-        pos = ProcessCode(pos, node_ptr->body, false, true);
+        pos = ProcessCode(pos, new_class.body, false, true);
         RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
         RequireChar(';', pos++, emp::to_string("A ", cur_lexeme, " must end with a semi-colon (';')."));
       }
       else if (cur_lexeme == "namespace") {
-        auto node_ptr = emp::NewPtr<AST_Namespace>();
-        cur_scope.AddChild(node_ptr);
+        auto & new_ns = cur_scope.NewChild<AST_Namespace>();
 
         // If a name is provided for this namespace, store it.
-        if (IsID(pos)) node_ptr->name = AsLexeme(pos++);
+        if (IsID(pos)) new_ns.name = AsLexeme(pos++);
 
         RequireChar('{', pos++, emp::to_string("A ", cur_lexeme, " must be defined in braces ('{' and '}')."));
-        pos = ProcessTop(pos, *node_ptr);
+        pos = ProcessTop(pos, new_ns);
         RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
       }
       else if (cur_lexeme == "using") {
         RequireID(pos, "A 'using' command must first specify the new type name.");
-        auto node_ptr = emp::NewPtr<AST_Using>();
-        cur_scope.AddChild(node_ptr);
-        pos = ProcessType(pos, node_ptr->type_name);      // Determine new type name being defined.
+        auto & new_using = cur_scope.NewChild<AST_Using>();
+        pos = ProcessType(pos, new_using.type_name);      // Determine new type name being defined.
         RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
-        pos = ProcessCode(pos, node_ptr->type_value);   // Determine code being assigned to.
+        pos = ProcessCode(pos, new_using.type_value);   // Determine code being assigned to.
       }
-      // @CAO: Still need to deal with "template", "using", variables and functions.
+      // @CAO: Still need to deal with "template", variables and functions.
       else {
         Error( pos-1, emp::to_string("Unknown keyword '", cur_lexeme, "'.  Aborting.") );
       }
