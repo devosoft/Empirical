@@ -17,6 +17,7 @@ namespace emp {
             inline static std::set<std::string> numeric_types = {"int", "double", "float", "uint32_t", "uint64_t", "size_t"};
             Config & config;
             web::Div settings_div;
+            std::set<std::string> exclude;
             std::map<std::string, web::Div> group_divs;
             std::map<std::string, web::Input> input_map;
             std::function<void(const std::string & val)> on_change_fun = [](const std::string & val){;};
@@ -66,6 +67,10 @@ namespace emp {
                 // Otherwise val is 0 and we have nothing to go on                
             }
 
+            void ExcludeConfig(std::string setting) {
+                exclude.insert(setting);
+            } 
+
             void Setup(const std::string & id_prefix = "settings_") {
                 for (auto group : config.group_set) {
                     // std::cout << "GROUP: " << group->GetName() << std::endl;
@@ -75,6 +80,9 @@ namespace emp {
                     for (size_t i = 0; i < group->GetSize(); i++) {
                         // std::cout << group->GetEntry(i)->GetType() << std::endl;
                         std::string name = group->GetEntry(i)->GetName();
+                        if (Has(exclude, name)) {
+                            continue;
+                        }
                         std::string type = group->GetEntry(i)->GetType();
                         std::string value = group->GetEntry(i)->GetValue();
 
