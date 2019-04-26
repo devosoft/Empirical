@@ -53,8 +53,7 @@ private:
 
   AST_Scope ast_root;
 
-
-  // Helper functions
+  // -- Helper functions --
   bool HasToken(int pos) const { return (pos >= 0) && (pos < tokens.size()); }
   bool IsID(int pos) const { return HasToken(pos) && lexer.IsID(tokens[pos]); }
   bool IsNumber(int pos) const { return HasToken(pos) && lexer.IsNumber(tokens[pos]); }
@@ -204,7 +203,7 @@ public:
   }
 
   /// Collect all of the parameter definitions for a function.
-  size_t ProcessParams(size_t pos, emp::vector<ConceptFunction::Param> & params) {
+  size_t ProcessParams(size_t pos, emp::vector<ParamInfo> & params) {
     while (AsChar(pos) != ')') {
       // If this isn't the first parameter, make sure we have a comma to separate them.
       if (params.size()) {
@@ -218,7 +217,7 @@ public:
       // If an identifier is specified for this parameter, grab it.
       std::string identifier = IsID(pos) ? tokens[pos++].lexeme : "";
 
-      ConceptFunction::Param new_param{type_name, identifier};
+      ParamInfo new_param{type_name, identifier};
       params.emplace_back(new_param);
     }
 
@@ -234,7 +233,17 @@ public:
     return pos;
   }
 
- 
+  /// Collect information about a template; if there is no template, leave the string empty.
+  size_t ProcessTemplate(size_t pos, std::string & template_string, bool is_optional=true) {
+    if (AsLexeme(pos) == "template") return pos;
+    template_string += AsLexeme(pos++);
+    RequireChar('<', pos++, "Templates must begin with a '<'");
+    template_string += " <";
+    // @CAO Must collect parameters..
+    RequireChar('>', pos++, "Templates must end with a '>'");
+    template_string += ">";
+  }
+
   /// Process the tokens starting from the outer-most scope.
   size_t ProcessTop(size_t pos, AST_Scope & cur_scope ) {
     while (pos < tokens.size() && AsChar(pos) != '}') {
@@ -308,7 +317,7 @@ public:
         pos++;  // Move past "using"
         RequireID(pos, "A 'using' command must first specify the new type name.");
 
-        ConceptTypedef new_typedef;
+        TypedefInfo new_typedef;
         pos = ProcessType(pos, new_typedef.type_name);      // Determine new type name being defined.
 
         Debug("...adding a type '", new_typedef.type_name, "'.");
@@ -335,7 +344,7 @@ public:
           pos++;  // Move past paren.
 
           // Setup an AST Node for a function definition.
-          ConceptFunction new_function;
+          FunctionInfo new_function;
           new_function.return_type = type_name;
           new_function.fun_name = identifier;
 
@@ -374,7 +383,7 @@ public:
           concept.functions.push_back(new_function);
 
         } else {                                                 // ----- VARIABLE!! -----
-          ConceptVariable new_var;
+          VariableInfo new_var;
           new_var.var_type = type_name;
           new_var.var_name = identifier;
 
