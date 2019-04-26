@@ -22,7 +22,6 @@
   struct AST_Scope : AST_Node {
     emp::vector<emp::Ptr<AST_Node>> children;
     ~AST_Scope() { for (auto x : children) x.Delete(); }
-    void AddChild(emp::Ptr<AST_Node> node_ptr) { children.push_back(node_ptr); }
 
     /// Create a new child (of a specified type) in this scope.
     template <typename T>

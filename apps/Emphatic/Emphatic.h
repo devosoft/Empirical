@@ -272,7 +272,8 @@ public:
         RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
         pos = ProcessCode(pos, new_using.type_value);   // Determine code being assigned to.
       }
-      // @CAO: Still need to deal with "template", variables and functions.
+      // @CAO: Still need to deal with "template", variables and functions, enums, template specializations
+      ///      and empty lines (';').
       else {
         Error( pos-1, emp::to_string("Unknown keyword '", cur_lexeme, "'.  Aborting.") );
       }

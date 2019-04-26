@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
   codegen.PrintTokens();
 
   codegen.SetDebug();
-  codegen.ProcessTop();
+  codegen.Process();
 
   codegen.PrintOutput(std::cout);
 }
