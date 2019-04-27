@@ -189,7 +189,10 @@ namespace emp {
           );
       };
 
-      for(size_t i = 0; i < args.size(); ++i) {
+      if (!args.size()) return res;
+      res.insert({"_command", {args[0]}});
+
+      for(size_t i = 1; i < args.size(); ++i) {
 
         const std::string & command = parse_alias(i);
 
@@ -267,6 +270,13 @@ namespace emp {
               std::exit(EXIT_FAILURE);
             }
           }
+        )},
+        {"_command", ArgSpec(
+          1,
+          1,
+          "Command name.",
+          {},
+          [](std::optional<emp::vector<std::string>> res){ /*no-op*/ }
         )},
         {"help", ArgSpec(0, "Print help information.", {"h"})},
         {"gen", ArgSpec(
@@ -448,6 +458,8 @@ namespace emp {
       const emp::Ptr<Config> config=nullptr,
       std::ostream & os=std::cout
     ) {
+
+      UseArg("_command");
 
       if (UseArg("help")) {
         PrintHelp(os);
