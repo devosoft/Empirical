@@ -26,28 +26,31 @@ struct VariableInfo {
 
 /// AST Node for function defined inside of a concept.
 struct FunctionInfo {
-  std::string return_type;
-  std::string fun_name;
-  emp::vector<ParamInfo> params;
-  std::set<std::string> attributes;     // const, noexcept, etc.
-  std::string default_code;
-  bool is_required = false;
-  bool is_default = false;
+  std::string return_type;              ///< Text of the return type of this function.
+  std::string fun_name;                 ///< Simple name of this function.
+  emp::vector<ParamInfo> params;        ///< Full set of function parameters
+  std::set<std::string> attributes;     ///< const, noexcept, etc.
+  std::string default_code;             ///< Function body.
+  std::string special_value;            ///< "default", "delete", or "required" (for concepts)
 
-  std::string AttributeString() const {
-    std::string out_str;
-    for (const auto & x : attributes) {
-      out_str += " ";
-      out_str += x;
-    }
-    return out_str;
-  }
+  bool IsRequired() const { return special_value == "required"; }
+  bool IsDefault() const { return special_value == "default"; }
+  bool IsDeleted() const { return special_value == "delete"; }
 
   std::string ParamString() const {
     std::string out_str;
     for (size_t i = 0; i < params.size(); i++) {
       if (i) out_str += ", ";
       out_str += emp::to_string(params[i].type, " ", params[i].name);
+    }
+    return out_str;
+  }
+
+  std::string AttributeString() const {
+    std::string out_str;
+    for (const auto & x : attributes) {
+      out_str += " ";
+      out_str += x;
     }
     return out_str;
   }
@@ -185,8 +188,8 @@ struct AST_Concept : AST_Node {
     for (auto & f : functions) {
       os << prefix << "  " << f.return_type << " " << f.fun_name << "(" << f.ParamString() << ") "
           << f.AttributeString();
-      if (f.is_required) os << " = required;\n";
-      else if (f.is_default) os << " = default;\n";
+      if (f.IsRequired()) os << " = required;\n";
+      else if (f.IsDefault()) os << " = default;\n";
       else os << " {\n" << prefix << "    " << f.default_code << "\n" << prefix << "  }\n";
     }
 
