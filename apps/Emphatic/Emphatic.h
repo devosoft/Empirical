@@ -234,7 +234,7 @@ public:
   }
 
   /// Collect information about a template; if there is no template, leave the string empty.
-  size_t ProcessTemplate(size_t pos, std::string & template_string, bool is_optional=true) {
+  size_t ProcessTemplate(size_t pos, std::string & template_string) {
     if (AsLexeme(pos) == "template") return pos;
     template_string += AsLexeme(pos++);
     RequireChar('<', pos++, "Templates must begin with a '<'");
@@ -363,8 +363,7 @@ public:
           if (fun_char == '=') {  // Function is "= default;" or "= required;"
             RequireID(pos, "Function must be assigned to 'required' or 'default'");
             std::string fun_assign = AsLexeme(pos++);
-            if (fun_assign == "required") new_function.is_required = true;
-            else if (fun_assign == "default") new_function.is_default = true;
+            if (fun_assign == "required" || fun_assign == "default") new_function.special_value = fun_assign;
             else Error(pos, "Functions can only be set to 'required' or 'default'");
             RequireChar(';', pos++, emp::to_string(fun_assign, "functions must end in a semi-colon."));
           }
