@@ -102,20 +102,35 @@ struct AST_Scope : AST_Node {
   }
 };
 
+/// AST Node for arbitrary code (these shouldn't be needed when parsing techniques improve)
+struct AST_Code : public AST_Node {
+  std::string code;
+
+  /// Scope should run echo on each of its children.
+  void PrintEcho(std::ostream & os, const std::string & prefix) const override {
+    os << code;
+  }
+
+  /// Scope should run output on each of its children.
+  void PrintOutput(std::ostream & os, const std::string & prefix) const override {
+    os << code;
+  }
+};
+
 struct AST_Namespace : public AST_Scope {
   std::string name;
 
   /// Scope should run echo on each of its children.
   void PrintEcho(std::ostream & os, const std::string & prefix) const override {
-    os << prefix << "namespace" << " " << name << "{\n";
+    os << prefix << "namespace" << " " << name << " {\n";
     for (auto x : children) { x->PrintEcho(os, prefix+"  "); }
     os << prefix << "}\n";      
   }
 
   /// Scope should run output on each of its children.
   void PrintOutput(std::ostream & os, const std::string & prefix) const override {
-    os << prefix << "namespace" << " " << name << "{\n";
-    for (auto x : children) { x->PrintOutput(os, prefix); }
+    os << prefix << "namespace" << " " << name << " {\n";
+    for (auto x : children) { x->PrintOutput(os, prefix+"  "); }
     os << prefix << "}\n";      
   }
 };
@@ -227,14 +242,15 @@ struct AST_Concept : AST_Node {
     os << prefix << "protected:\n";
     os << prefix << "  // FIRST: Determine the return type for each function.\n";
     for (auto & f : functions) {
-      os << prefix << "  template <typename T>"
-                    << "  using return_t_" << f.fun_name
-                    << " = decltype( std::declval<T>()." << f.fun_name
-                    << "( " << f.ParamString() << " );\n";
+      os << prefix << "  template <typename T>\n";
+      os << prefix << "  using return_t_" << f.fun_name
+                   << " = decltype( std::declval<T>()." << f.fun_name
+                   << "( " << f.ParamString() << " );\n";
     }
 
-    os << prefix << "\n  // SECOND: Determine if each function exists in wrapped class.\n";
+    os << "\n";  // Skip a line.
     os << prefix << "public:\n";
+    os << prefix << "  // SECOND: Determine if each function exists in wrapped class.\n";
     for (auto & f : functions) {
       os << prefix << "  static constexpr bool HasFun_" << f.fun_name << "() {\n"
           << prefix << "    return emp::test_type<return_t_" << f.fun_name << ", WRAPPED_T>();\n"
@@ -247,11 +263,12 @@ struct AST_Concept : AST_Node {
                     << f.AttributeString() << " {\n"
           << prefix << "    " << "static_assert( HasFun_" << f.fun_name
                     << "(), \"\\n\\n  ** Error: concept instance missing required function "
-                    << f.fun_name << " **\\n\";"
-          << prefix << "  if constexpr (HasFun_" << f.fun_name << "()) {\n"
-          << prefix << "    ";
+                    << f.fun_name << " **\\n\");\n"
+          << prefix << "    if constexpr (HasFun_" << f.fun_name << "()) {\n"
+          << prefix << "      ";
       if (f.return_type != "void") os << "return ";
       os << "WRAPPED_T::" << f.fun_name << "( " << f.ArgString() << " );\n"
+        << prefix << "    }\n"
         << prefix << "  }\n";
     }
 
