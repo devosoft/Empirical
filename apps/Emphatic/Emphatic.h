@@ -58,6 +58,7 @@ private:
   bool IsID(int pos) const { return HasToken(pos) && lexer.IsID(tokens[pos]); }
   bool IsNumber(int pos) const { return HasToken(pos) && lexer.IsNumber(tokens[pos]); }
   bool IsString(int pos) const { return HasToken(pos) && lexer.IsString(tokens[pos]); }
+  bool IsPP(int pos) const { return HasToken(pos) && lexer.IsPP(tokens[pos]); }
   char AsChar(int pos) const {
     return (HasToken(pos) && lexer.IsSymbol(tokens[pos])) ? tokens[pos].lexeme[0] : 0;
   }
@@ -247,6 +248,14 @@ public:
   /// Process the tokens starting from the outer-most scope.
   size_t ProcessTop(size_t pos, AST_Scope & cur_scope ) {
     while (pos < tokens.size() && AsChar(pos) != '}') {
+      // If this line is a pre-processor statement, just hook it in to print back out and keep going.
+      if (IsPP(pos)) {
+        AST_Code & new_node = cur_scope.NewChild<AST_Code>();
+        new_node.code = AsLexeme(pos++);
+        continue;
+      }
+
+      // Anything other than a lexeme has to begin with a keyword or identifier.
       RequireID(pos, emp::to_string("Statements in outer scope must begin with an identifier or keyword.  (Found: ",
                      AsLexeme(pos), ")."));
 
