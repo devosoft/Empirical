@@ -108,6 +108,19 @@ struct AST_Code : public AST_Node {
 
   /// Scope should run echo on each of its children.
   void PrintEcho(std::ostream & os, const std::string & prefix) const override {
+    os << prefix << code;
+  }
+
+  /// Scope should run output on each of its children.
+  void PrintOutput(std::ostream & os, const std::string & prefix) const override {
+    os << prefix << code;
+  }
+};
+
+/// AST Node for Pre-processor code. (These should probably be dealt with in a first pass)
+struct AST_PP : public AST_Code {
+  /// Scope should run echo on each of its children.
+  void PrintEcho(std::ostream & os, const std::string & prefix) const override {
     os << code;
   }
 
