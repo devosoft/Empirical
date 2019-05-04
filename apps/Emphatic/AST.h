@@ -73,6 +73,7 @@ struct TypedefInfo {
 
 /// All AST Nodes have a common base class.
 struct AST_Node {
+  virtual ~AST_Node() { ; }
   /// Echo the original code passed into each class.
   virtual void PrintEcho(std::ostream &, const std::string & prefix) const = 0;
   virtual void PrintOutput(std::ostream &, const std::string & prefix) const = 0;
