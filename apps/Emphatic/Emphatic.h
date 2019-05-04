@@ -250,8 +250,8 @@ public:
     while (pos < tokens.size() && AsChar(pos) != '}') {
       // If this line is a pre-processor statement, just hook it in to print back out and keep going.
       if (IsPP(pos)) {
-        AST_Code & new_node = cur_scope.NewChild<AST_Code>();
-        new_node.code = AsLexeme(pos++);
+        AST_PP & new_node = cur_scope.NewChild<AST_PP>();
+        new_node.code = emp::to_string( AsLexeme(pos++), '\n');
         continue;
       }
 
