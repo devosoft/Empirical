@@ -54,7 +54,7 @@ private:
   AST_Scope ast_root;
 
   // -- Helper functions --
-  bool HasToken(int pos) const { return (pos >= 0) && (pos < tokens.size()); }
+  bool HasToken(int pos) const { return (pos >= 0) && (pos < (int) tokens.size()); }
   bool IsID(int pos) const { return HasToken(pos) && lexer.IsID(tokens[pos]); }
   bool IsNumber(int pos) const { return HasToken(pos) && lexer.IsNumber(tokens[pos]); }
   bool IsString(int pos) const { return HasToken(pos) && lexer.IsString(tokens[pos]); }
@@ -381,8 +381,9 @@ public:
 
             Debug("   and code: ", new_function.default_code);
 
-            RequireChar('}', pos++, emp::to_string("Function body must end with close brace ('}') not '",
-                                                  AsLexeme(pos-1), "'."));
+            RequireChar('}', pos, emp::to_string("Function body must end with close brace ('}') not '",
+                                                  AsLexeme(pos), "'."));
+            pos++;
           }
           else {
             Error(pos-1, "Function body must begin with open brace or assignment ('{' or '=')");
