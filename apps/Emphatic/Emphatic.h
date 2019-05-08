@@ -341,30 +341,20 @@ public:
       }
       else {
         // Start with a type...
-        std::string type_name;
-        pos = ProcessType(pos, type_name);
+        pos = ProcessType(pos, new_element.type);
 
         // Then an identifier.
         RequireID(pos, "Functions and variables in concept definition must provide identifier after type name.");
-        std::string identifier = tokens[pos++].lexeme;
+        new_element.name = tokens[pos++].lexeme;
 
         // If and open-paren follows the identifier, we are defining a function, otherwise it's a variable.
         if (AsChar(pos) == '(') {                              // ----- FUNCTION!! -----
           pos++;  // Move past paren.
 
-          // Setup an AST Node for a function definition.
-          new_element.type = type_name;
-          new_element.name = identifier;
-
           pos = ProcessParams(pos, new_element.params);       // Read the parameters for this function.
 
           RequireChar(')', pos++, "Function arguments must end with a close-parenthesis (')')");
-
-          Debug("...adding a function '", type_name, " ", identifier, "(", new_element.ParamString(), ")'");
-
           pos = ProcessIDList(pos, new_element.attributes);   // Read in each of the function attributes, if any.
-
-          Debug("   with attributes: ", new_element.AttributeString());
 
           char fun_char = AsChar(pos++);
 
@@ -391,13 +381,8 @@ public:
           concept.functions.push_back(new_element);
 
         } else {                                                 // ----- VARIABLE!! -----
-          new_element.type = type_name;
-          new_element.name = identifier;
-
-          if (AsChar(pos) == ';') {  // Does the variable declaration end here?
-            pos++;
-          }
-          else {                     // ...or is there a default value for this variable?
+          if (AsChar(pos) == ';') { pos++; } // Does the variable declaration end here?
+          else {                             // ...or is there a default value for this variable?
             // Determine code being assigned from.
             pos = ProcessCode(pos, new_element.default_code);
           }
