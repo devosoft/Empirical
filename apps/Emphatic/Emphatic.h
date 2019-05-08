@@ -353,7 +353,7 @@ public:
           pos++;  // Move past paren.
 
           // Setup an AST Node for a function definition.
-          FunctionInfo new_function;
+          ElementInfo new_function;
           new_function.type = type_name;
           new_function.name = identifier;
 
@@ -392,7 +392,7 @@ public:
           concept.functions.push_back(new_function);
 
         } else {                                                 // ----- VARIABLE!! -----
-          VariableInfo new_var;
+          ElementInfo new_var;
           new_var.type = type_name;
           new_var.name = identifier;
 
