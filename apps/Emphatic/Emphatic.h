@@ -286,9 +286,9 @@ public:
       else if (cur_lexeme == "using") {
         RequireID(pos, "A 'using' command must first specify the new type name.");
         auto & new_using = cur_scope.NewChild<AST_Using>();
-        pos = ProcessType(pos, new_using.type_name);      // Determine new type name being defined.
+        pos = ProcessType(pos, new_using.name);      // Determine new type name being defined.
         RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
-        pos = ProcessCode(pos, new_using.type_value);   // Determine code being assigned to.
+        pos = ProcessCode(pos, new_using.type);   // Determine code being assigned to.
       }
       // @CAO: Still need to deal with "template", variables and functions, enums, template specializations
       ///      and empty lines (';').
@@ -326,16 +326,16 @@ public:
         pos++;  // Move past "using"
         RequireID(pos, "A 'using' command must first specify the new type name.");
 
-        TypedefInfo new_typedef;
-        pos = ProcessType(pos, new_typedef.type_name);      // Determine new type name being defined.
+        ElementInfo new_typedef;
+        pos = ProcessType(pos, new_typedef.name);      // Determine new type name being defined.
 
-        Debug("...adding a type '", new_typedef.type_name, "'.");
+        Debug("...adding a type '", new_typedef.type, "'.");
 
         RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
 
-        pos = ProcessCode(pos, new_typedef.type_value);   // Determine code being assigned to.
+        pos = ProcessCode(pos, new_typedef.type);   // Determine code being assigned to.
 
-        Debug("   value: ", new_typedef.type_value);
+        Debug("   value: ", new_typedef.type);
 
         concept.typedefs.push_back(new_typedef);
       }
