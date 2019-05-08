@@ -245,6 +245,12 @@ public:
     template_string += ">";
   }
 
+  /// Collect information about an element (function, variable, or typedef) definition.
+  size_t ProcessElement(size_t pos, ElementInfo & info) {
+    // @CAO TODO
+    return pos;
+  }
+
   /// Process the tokens starting from the outer-most scope.
   size_t ProcessTop(size_t pos, AST_Scope & cur_scope ) {
     while (pos < tokens.size() && AsChar(pos) != '}') {
@@ -322,22 +328,16 @@ public:
       // Entries can be a "using" statement, a function definition, or a variable definition.
       RequireID(pos, "Concept members can be either functions, variables, or using-statements.");
 
+      ElementInfo new_element;
+
       if (tokens[pos].lexeme == "using") {              // ----- USING!! -----
         pos++;  // Move past "using"
         RequireID(pos, "A 'using' command must first specify the new type name.");
 
-        ElementInfo new_typedef;
-        pos = ProcessType(pos, new_typedef.name);      // Determine new type name being defined.
-
-        Debug("...adding a type '", new_typedef.type, "'.");
-
+        pos = ProcessType(pos, new_element.name);      // Determine new type name being defined.
         RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
-
-        pos = ProcessCode(pos, new_typedef.type);   // Determine code being assigned to.
-
-        Debug("   value: ", new_typedef.type);
-
-        concept.typedefs.push_back(new_typedef);
+        pos = ProcessCode(pos, new_element.type);      // Determine code being assigned to.
+        concept.typedefs.push_back(new_element);
       }
       else {
         // Start with a type...
@@ -353,33 +353,32 @@ public:
           pos++;  // Move past paren.
 
           // Setup an AST Node for a function definition.
-          ElementInfo new_function;
-          new_function.type = type_name;
-          new_function.name = identifier;
+          new_element.type = type_name;
+          new_element.name = identifier;
 
-          pos = ProcessParams(pos, new_function.params);       // Read the parameters for this function.
+          pos = ProcessParams(pos, new_element.params);       // Read the parameters for this function.
 
           RequireChar(')', pos++, "Function arguments must end with a close-parenthesis (')')");
 
-          Debug("...adding a function '", type_name, " ", identifier, "(", new_function.ParamString(), ")'");
+          Debug("...adding a function '", type_name, " ", identifier, "(", new_element.ParamString(), ")'");
 
-          pos = ProcessIDList(pos, new_function.attributes);   // Read in each of the function attributes, if any.
+          pos = ProcessIDList(pos, new_element.attributes);   // Read in each of the function attributes, if any.
 
-          Debug("   with attributes: ", new_function.AttributeString());
+          Debug("   with attributes: ", new_element.AttributeString());
 
           char fun_char = AsChar(pos++);
 
           if (fun_char == '=') {  // Function is "= default;" or "= required;"
             RequireID(pos, "Function must be assigned to 'required' or 'default'");
             std::string fun_assign = AsLexeme(pos++);
-            if (fun_assign == "required" || fun_assign == "default") new_function.special_value = fun_assign;
+            if (fun_assign == "required" || fun_assign == "default") new_element.special_value = fun_assign;
             else Error(pos, "Functions can only be set to 'required' or 'default'");
             RequireChar(';', pos++, emp::to_string(fun_assign, "functions must end in a semi-colon."));
           }
           else if (fun_char == '{') {  // Function is defined in place.
-            pos = ProcessCode(pos, new_function.default_code, false, true);  // Read the default function body.
+            pos = ProcessCode(pos, new_element.default_code, false, true);  // Read the default function body.
 
-            Debug("   and code: ", new_function.default_code);
+            Debug("   and code: ", new_element.default_code);
 
             RequireChar('}', pos, emp::to_string("Function body must end with close brace ('}') not '",
                                                   AsLexeme(pos), "'."));
@@ -389,22 +388,21 @@ public:
             Error(pos-1, "Function body must begin with open brace or assignment ('{' or '=')");
           }
 
-          concept.functions.push_back(new_function);
+          concept.functions.push_back(new_element);
 
         } else {                                                 // ----- VARIABLE!! -----
-          ElementInfo new_var;
-          new_var.type = type_name;
-          new_var.name = identifier;
+          new_element.type = type_name;
+          new_element.name = identifier;
 
           if (AsChar(pos) == ';') {  // Does the variable declaration end here?
             pos++;
           }
           else {                     // ...or is there a default value for this variable?
             // Determine code being assigned from.
-            pos = ProcessCode(pos, new_var.default_code);
+            pos = ProcessCode(pos, new_element.default_code);
           }
 
-          concept.variables.push_back(new_var);
+          concept.variables.push_back(new_element);
 
         }
       }
