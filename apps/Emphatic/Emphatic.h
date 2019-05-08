@@ -124,7 +124,7 @@ public:
   /// Always stops at a mis-matched ')' '}' or ']'
   /// If match_angle_bracket is set, will also stop at a mis-matched '>'
   /// If multi_line is set, will NOT stop with a ';'
-  size_t ProcessCode(size_t pos, std::string & line, bool match_angle_bracket=false, bool multi_line=false) {
+  std::string ProcessCode(size_t & pos, bool match_angle_bracket=false, bool multi_line=false) {
     const size_t start_pos = pos;
     std::vector<char> open_symbols;
     bool finished = false;
@@ -160,9 +160,7 @@ public:
       }
     }
 
-    line = ConcatLexemes(start_pos, pos);
-
-    return pos;
+    return ConcatLexemes(start_pos, pos);
   }
 
   /// Collect all tokens used to describe a type.
@@ -183,7 +181,7 @@ public:
 
       // In case this is a template, we need to evaluate parameters.
       if (AsLexeme(pos) == "<") {
-        pos = ProcessCode(pos+1, type_name, true);
+        type_name = ProcessCode(++pos, true);
         RequireChar('>', pos++, "Templates must end in a close angle bracket.");
       }
 
@@ -275,7 +273,7 @@ public:
         new_class.type = cur_lexeme;
         if (IsID(pos)) new_class.name = AsLexeme(pos++);
         RequireChar('{', pos++, emp::to_string("A ", cur_lexeme, " must be defined in braces ('{' and '}')."));
-        pos = ProcessCode(pos, new_class.body, false, true);
+        new_class.body = ProcessCode(pos, false, true);
         RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
         RequireChar(';', pos++, emp::to_string("A ", cur_lexeme, " must end with a semi-colon (';')."));
       }
@@ -294,7 +292,7 @@ public:
         auto & new_using = cur_scope.NewChild<AST_Using>();
         pos = ProcessType(pos, new_using.name);      // Determine new type name being defined.
         RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
-        pos = ProcessCode(pos, new_using.type);   // Determine code being assigned to.
+        new_using.type = ProcessCode(pos);   // Determine code being assigned to.
       }
       // @CAO: Still need to deal with "template", variables and functions, enums, template specializations
       ///      and empty lines (';').
@@ -336,7 +334,7 @@ public:
 
         pos = ProcessType(pos, new_element.name);      // Determine new type name being defined.
         RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
-        pos = ProcessCode(pos, new_element.type);      // Determine code being assigned to.
+        new_element.type = ProcessCode(pos);      // Determine code being assigned to.
         concept.typedefs.push_back(new_element);
       }
       else {
@@ -366,7 +364,7 @@ public:
             RequireChar(';', pos++, emp::to_string(fun_assign, "functions must end in a semi-colon."));
           }
           else if (fun_char == '{') {  // Function is defined in place.
-            pos = ProcessCode(pos, new_element.default_code, false, true);  // Read the default function body.
+            new_element.default_code = ProcessCode(pos, false, true);  // Read the default function body.
 
             Debug("   and code: ", new_element.default_code);
 
@@ -384,7 +382,7 @@ public:
           if (AsChar(pos) == ';') { pos++; } // Does the variable declaration end here?
           else {                             // ...or is there a default value for this variable?
             // Determine code being assigned from.
-            pos = ProcessCode(pos, new_element.default_code);
+            new_element.default_code = ProcessCode(pos);
           }
 
           concept.variables.push_back(new_element);
