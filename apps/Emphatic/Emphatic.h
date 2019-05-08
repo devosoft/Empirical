@@ -222,33 +222,35 @@ public:
   }
 
   /// Collect a series of identifiers, separated by spaces.
-  size_t ProcessIDList(size_t pos, std::set<std::string> & ids) {
+  std::set<std::string> ProcessIDList(size_t & pos) {
+    std::set<std::string> ids;
     while (IsID(pos)) {
       ids.insert(AsLexeme(pos));
       pos++;
     }
-    return pos;
+    return ids;
   }
 
   /// Collect information about a template; if there is no template, leave the string empty.
-  size_t ProcessTemplate(size_t pos, std::string & template_string) {
-    if (AsLexeme(pos) == "template") return pos;
-    template_string += AsLexeme(pos++);
+  std::string ProcessTemplate(size_t & pos) {
+    size_t start_pos = pos;
+    if (AsLexeme(pos) != "template") return "";
+    pos++;
     RequireChar('<', pos++, "Templates must begin with a '<'");
-    template_string += " <";
     // @CAO Must collect parameters..
     RequireChar('>', pos++, "Templates must end with a '>'");
-    template_string += ">";
+    return ConcatLexemes(start_pos, pos);
   }
 
   /// Collect information about an element (function, variable, or typedef) definition.
-  size_t ProcessElement(size_t pos, ElementInfo & info) {
+  ElementInfo ProcessElement(size_t & pos) {
+    ElementInfo info;
     // @CAO TODO
-    return pos;
+    return info;
   }
 
   /// Process the tokens starting from the outer-most scope.
-  size_t ProcessTop(size_t pos, AST_Scope & cur_scope ) {
+  void ProcessTop(size_t & pos, AST_Scope & cur_scope ) {
     while (pos < tokens.size() && AsChar(pos) != '}') {
       // If this line is a pre-processor statement, just hook it in to print back out and keep going.
       if (IsPP(pos)) {
@@ -263,8 +265,7 @@ public:
 
       std::string cur_lexeme = AsLexeme(pos++);
       if (cur_lexeme == "concept") {
-        AST_Concept & new_node = cur_scope.NewChild<AST_Concept>();
-        pos = ProcessConcept(pos, new_node);
+        ProcessConcept(pos, cur_scope);
       }
       else if (cur_lexeme == "struct" || cur_lexeme == "class") {
         AST_Class & new_class = cur_scope.NewChild<AST_Class>();
@@ -282,7 +283,7 @@ public:
         if (IsID(pos)) new_ns.name = AsLexeme(pos++);
 
         RequireChar('{', pos++, emp::to_string("A ", cur_lexeme, " must be defined in braces ('{' and '}')."));
-        pos = ProcessTop(pos, new_ns);
+        ProcessTop(pos, new_ns);
         RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
       }
       else if (cur_lexeme == "using") {
@@ -298,11 +299,12 @@ public:
         Error( pos-1, emp::to_string("Unknown keyword '", cur_lexeme, "'.  Aborting.") );
       }
     }
-    return pos;
   }
 
   /// We know we are in a concept definition.  Collect appropriate information.
-  size_t ProcessConcept(size_t pos, AST_Concept & concept) {
+  AST_Concept & ProcessConcept(size_t & pos, AST_Scope & cur_scope) {
+    AST_Concept & concept = cur_scope.NewChild<AST_Concept>();
+
     // A concept must begin with its name.
     RequireID(pos, "Concept declaration must be followed by name identifier.");
     concept.name = tokens[pos++].lexeme;
@@ -350,7 +352,7 @@ public:
           new_element.params = ProcessParams(pos);       // Read the parameters for this function.
 
           RequireChar(')', pos++, "Function arguments must end with a close-parenthesis (')')");
-          pos = ProcessIDList(pos, new_element.attributes);   // Read in each of the function attributes, if any.
+          new_element.attributes = ProcessIDList(pos);   // Read in each of the function attributes, if any.
 
           char fun_char = AsChar(pos++);
 
@@ -392,11 +394,12 @@ public:
     pos++;  // Skip closing brace.
     RequireChar(';', pos++, "Concept definitions must end in a semi-colon.");
 
-    return pos;
+    return concept;
   }
   
   void Process() {
-    ProcessTop(0, ast_root);
+    size_t pos;
+    ProcessTop(pos, ast_root);
   }
 
   /// Print the state of the lexer used for code generation.
