@@ -17,21 +17,14 @@ struct ParamInfo {
   std::string name;
 };
 
-/// AST Node for variable defined inside of a concept.
-struct VariableInfo {
-  std::string type;
-  std::string name;
-  std::string default_code;
-};
-
-/// AST Node for function defined inside of a concept.
-struct FunctionInfo {
-  std::string type;              ///< Text of the return type of this function.
-  std::string name;                 ///< Simple name of this function.
-  emp::vector<ParamInfo> params;        ///< Full set of function parameters
-  std::set<std::string> attributes;     ///< const, noexcept, etc.
-  std::string default_code;             ///< Function body.
-  std::string special_value;            ///< "default", "delete", or "required" (for concepts)
+/// Info for a variable or function
+struct ElementInfo {
+  std::string type;                   ///< Type of variable or return type of this function.
+  std::string name;                   ///< Element name.
+  emp::vector<ParamInfo> params;      ///< Full set of function parameters
+  std::set<std::string> attributes;   ///< const, noexcept, etc.
+  std::string default_code;           ///< Variable initialization or function body.
+  std::string special_value;          ///< "default", "delete", or "required" (for concepts)
 
   bool IsRequired() const { return special_value == "required"; }
   bool IsDefault() const { return special_value == "default"; }
@@ -194,8 +187,8 @@ struct AST_Concept : AST_Node {
   std::string name;
   std::string base_name;
 
-  emp::vector<VariableInfo> variables;
-  emp::vector<FunctionInfo> functions;
+  emp::vector<ElementInfo> variables;
+  emp::vector<ElementInfo> functions;
   emp::vector<TypedefInfo> typedefs;
 
 
