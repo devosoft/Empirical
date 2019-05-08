@@ -354,8 +354,8 @@ public:
 
           // Setup an AST Node for a function definition.
           FunctionInfo new_function;
-          new_function.return_type = type_name;
-          new_function.fun_name = identifier;
+          new_function.type = type_name;
+          new_function.name = identifier;
 
           pos = ProcessParams(pos, new_function.params);       // Read the parameters for this function.
 
@@ -393,8 +393,8 @@ public:
 
         } else {                                                 // ----- VARIABLE!! -----
           VariableInfo new_var;
-          new_var.var_type = type_name;
-          new_var.var_name = identifier;
+          new_var.type = type_name;
+          new_var.name = identifier;
 
           if (AsChar(pos) == ';') {  // Does the variable declaration end here?
             pos++;
