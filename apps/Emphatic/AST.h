@@ -19,15 +19,15 @@ struct ParamInfo {
 
 /// AST Node for variable defined inside of a concept.
 struct VariableInfo {
-  std::string var_type;
-  std::string var_name;
+  std::string type;
+  std::string name;
   std::string default_code;
 };
 
 /// AST Node for function defined inside of a concept.
 struct FunctionInfo {
-  std::string return_type;              ///< Text of the return type of this function.
-  std::string fun_name;                 ///< Simple name of this function.
+  std::string type;              ///< Text of the return type of this function.
+  std::string name;                 ///< Simple name of this function.
   emp::vector<ParamInfo> params;        ///< Full set of function parameters
   std::set<std::string> attributes;     ///< const, noexcept, etc.
   std::string default_code;             ///< Function body.
@@ -210,12 +210,12 @@ struct AST_Concept : AST_Node {
 
     // Print info for all variables...
     for (auto & v : variables) {
-      os << prefix << "  " << v.var_type << " " << v.var_name << " = " << v.default_code << "\n";
+      os << prefix << "  " << v.type << " " << v.name << " = " << v.default_code << "\n";
     }
 
     // Print info for all functions...
     for (auto & f : functions) {
-      os << prefix << "  " << f.return_type << " " << f.fun_name << "(" << f.ParamString() << ") "
+      os << prefix << "  " << f.type << " " << f.name << "(" << f.ParamString() << ") "
           << f.AttributeString();
       if (f.IsRequired()) os << " = required;\n";
       else if (f.IsDefault()) os << " = default;\n";
@@ -233,7 +233,7 @@ struct AST_Concept : AST_Node {
 
     // Print all of the BASE CLASS details.
     for (auto & f : functions) {
-      os << prefix << "  " << f.return_type << " " << f.fun_name << "(" << f.ParamString() << ") "
+      os << prefix << "  " << f.type << " " << f.name << "(" << f.ParamString() << ") "
           << f.AttributeString() << " = 0;\n";
     }
 
@@ -247,7 +247,7 @@ struct AST_Concept : AST_Node {
 
     os << prefix << "  ----- VARIABLES -----\n";
     for (auto & v : variables) {
-      os << prefix << "  " << v.var_type << " " << v.var_name;
+      os << prefix << "  " << v.type << " " << v.name;
       if (v.default_code.size() > 0) os << " = " << v.default_code << "\n";
       else os << "\n";
     }
@@ -257,8 +257,8 @@ struct AST_Concept : AST_Node {
     os << prefix << "  // FIRST: Determine the return type for each function.\n";
     for (auto & f : functions) {
       os << prefix << "  template <typename T>\n";
-      os << prefix << "  using return_t_" << f.fun_name
-                   << " = decltype( std::declval<T>()." << f.fun_name
+      os << prefix << "  using return_t_" << f.name
+                   << " = decltype( std::declval<T>()." << f.name
                    << "( " << f.ParamString() << " );\n";
     }
 
@@ -266,22 +266,22 @@ struct AST_Concept : AST_Node {
     os << prefix << "public:\n";
     os << prefix << "  // SECOND: Determine if each function exists in wrapped class.\n";
     for (auto & f : functions) {
-      os << prefix << "  static constexpr bool HasFun_" << f.fun_name << "() {\n"
-          << prefix << "    return emp::test_type<return_t_" << f.fun_name << ", WRAPPED_T>();\n"
+      os << prefix << "  static constexpr bool HasFun_" << f.name << "() {\n"
+          << prefix << "    return emp::test_type<return_t_" << f.name << ", WRAPPED_T>();\n"
           << prefix << "  }\n";
     }
 
     os << prefix << "\n  // THIRD: Call the functions, redirecting as needed\n";
     for (auto & f : functions) {
-      os << prefix << "  " << f.return_type << " " << f.fun_name << "(" << f.ParamString() << ") "
+      os << prefix << "  " << f.type << " " << f.name << "(" << f.ParamString() << ") "
                     << f.AttributeString() << " {\n"
-          << prefix << "    " << "static_assert( HasFun_" << f.fun_name
+          << prefix << "    " << "static_assert( HasFun_" << f.name
                     << "(), \"\\n\\n  ** Error: concept instance missing required function "
-                    << f.fun_name << " **\\n\");\n"
-          << prefix << "    if constexpr (HasFun_" << f.fun_name << "()) {\n"
+                    << f.name << " **\\n\");\n"
+          << prefix << "    if constexpr (HasFun_" << f.name << "()) {\n"
           << prefix << "      ";
-      if (f.return_type != "void") os << "return ";
-      os << "WRAPPED_T::" << f.fun_name << "( " << f.ArgString() << " );\n"
+      if (f.type != "void") os << "return ";
+      os << "WRAPPED_T::" << f.name << "( " << f.ArgString() << " );\n"
         << prefix << "    }\n"
         << prefix << "  }\n";
     }
