@@ -164,7 +164,7 @@ public:
   }
 
   /// Collect all tokens used to describe a type.
-  size_t ProcessType(size_t pos, std::string & type_name) {
+  std::string ProcessType(size_t & pos) {
     const size_t start_pos = pos;
     // A type may start with a const.
     if (AsLexeme(pos) == "const") pos++;
@@ -181,7 +181,7 @@ public:
 
       // In case this is a template, we need to evaluate parameters.
       if (AsLexeme(pos) == "<") {
-        type_name = ProcessCode(++pos, true);
+        ProcessCode(++pos, true);
         RequireChar('>', pos++, "Templates must end in a close angle bracket.");
       }
 
@@ -196,13 +196,13 @@ public:
     if (AsLexeme(pos) == "*") pos++;
 
     // Collect all of the lexemes
-    type_name = ConcatLexemes(start_pos, pos);
-
-    return pos;
+    return ConcatLexemes(start_pos, pos);
   }
 
   /// Collect all of the parameter definitions for a function.
-  size_t ProcessParams(size_t pos, emp::vector<ParamInfo> & params) {
+  emp::vector<ParamInfo> ProcessParams(size_t & pos) {
+    emp::vector<ParamInfo> params;
+
     while (AsChar(pos) != ')') {
       // If this isn't the first parameter, make sure we have a comma to separate them.
       if (params.size()) {
@@ -210,17 +210,15 @@ public:
       }
 
       // Start with a type...
-      std::string type_name;
-      pos = ProcessType(pos, type_name);
+      std::string type_name = ProcessType(pos);
 
       // If an identifier is specified for this parameter, grab it.
       std::string identifier = IsID(pos) ? tokens[pos++].lexeme : "";
 
-      ParamInfo new_param{type_name, identifier};
-      params.emplace_back(new_param);
+      params.emplace_back(ParamInfo{type_name, identifier});
     }
 
-    return pos;    
+    return params;
   }
 
   /// Collect a series of identifiers, separated by spaces.
@@ -290,7 +288,7 @@ public:
       else if (cur_lexeme == "using") {
         RequireID(pos, "A 'using' command must first specify the new type name.");
         auto & new_using = cur_scope.NewChild<AST_Using>();
-        pos = ProcessType(pos, new_using.name);      // Determine new type name being defined.
+        new_using.name = ProcessType(pos);    // Determine new type name being defined.
         RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
         new_using.type = ProcessCode(pos);   // Determine code being assigned to.
       }
@@ -332,14 +330,14 @@ public:
         pos++;  // Move past "using"
         RequireID(pos, "A 'using' command must first specify the new type name.");
 
-        pos = ProcessType(pos, new_element.name);      // Determine new type name being defined.
+        new_element.name = ProcessType(pos);      // Determine new type name being defined.
         RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
         new_element.type = ProcessCode(pos);      // Determine code being assigned to.
         concept.typedefs.push_back(new_element);
       }
       else {
         // Start with a type...
-        pos = ProcessType(pos, new_element.type);
+        new_element.type = ProcessType(pos);
 
         // Then an identifier.
         RequireID(pos, "Functions and variables in concept definition must provide identifier after type name.");
@@ -349,7 +347,7 @@ public:
         if (AsChar(pos) == '(') {                              // ----- FUNCTION!! -----
           pos++;  // Move past paren.
 
-          pos = ProcessParams(pos, new_element.params);       // Read the parameters for this function.
+          new_element.params = ProcessParams(pos);       // Read the parameters for this function.
 
           RequireChar(')', pos++, "Function arguments must end with a close-parenthesis (')')");
           pos = ProcessIDList(pos, new_element.attributes);   // Read in each of the function attributes, if any.
