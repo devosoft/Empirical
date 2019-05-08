@@ -1,25 +1,26 @@
 PROJECT := Emphatic
+FILES := AST.h Emphatic.cc Emphatic.h EmphaticLexer.h 
 EMP_DIR := ../../source
 
 # Compiler type and flags
 CXX := g++
 CFLAGS_base := -Wall -Wno-unused-function -std=c++17 -I$(EMP_DIR)/
 CFLAGS_debug := -g $(CFLAGS_base)
-CFLAGS := -O3 -DNDEBUG $(CFLAGS_base)
+CFLAGS_release := -O3 -DNDEBUG $(CFLAGS_base)
 
-default: $(PROJECT)
-all: $(PROJECT)
+default: release
+all: release
 
 # If in debug mode, swap out the optimization flags to be debug flags.
-debug:	CFLAGS := $(CFLAGS_debug)
-debug:	$(PROJECT)
+debug:	$(FILES)
+				$(CXX) $(CFLAGS_debug) $(PROJECT).cc -o $(PROJECT)
 
-$(PROJECT):	$(PROJECT).cc
-	$(CXX) $(CFLAGS) $(PROJECT).cc -o $(PROJECT)
-	@echo $(PROJECT) Compiled.
+release: $(FILES)
+				$(CXX) $(CFLAGS_release) $(PROJECT).cc -o $(PROJECT)
+
 
 clean:
-	rm -f $(PROJECT) *~
+	rm -rf $(PROJECT) $(PROJECT).dSYM/ *~
 
 # Debugging information
 print-%: ; @echo '$(subst ','\'',$*=$($*))'
