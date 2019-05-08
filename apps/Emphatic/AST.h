@@ -19,7 +19,7 @@ struct ParamInfo {
 
 /// Info for a variable or function
 struct ElementInfo {
-  std::string type;                   ///< Type of variable or return type of this function.
+  std::string type;                   ///< Type of variable, return type of function, or assigned type of using.
   std::string name;                   ///< Element name.
   emp::vector<ParamInfo> params;      ///< Full set of function parameters
   std::set<std::string> attributes;   ///< const, noexcept, etc.
@@ -56,12 +56,6 @@ struct ElementInfo {
     }
     return out_str;
   }
-};
-
-/// AST Node for type definition inside of a concept.
-struct TypedefInfo {
-  std::string type_name;
-  std::string type_value;
 };
 
 /// All AST Nodes have a common base class.
@@ -168,16 +162,16 @@ struct AST_Class : public AST_Node {
 
 /// AST Node for outer level using statement...
 struct AST_Using : AST_Node {
-  std::string type_name;
-  std::string type_value;
+  std::string name;
+  std::string type;
 
   void PrintEcho(std::ostream & os, const std::string & prefix) const override {
-    os << prefix << "using " << type_name << " = " << type_value << "\n";
+    os << prefix << "using " << name << " = " << type << "\n";
   }
 
   /// Output for a using should be identical to the input.
   void PrintOutput(std::ostream & os, const std::string & prefix) const override {
-    os << prefix << "using " << type_name << " = " << type_value << "\n";
+    os << prefix << "using " << name << " = " << type << "\n";
   }
 };
 
@@ -189,7 +183,7 @@ struct AST_Concept : AST_Node {
 
   emp::vector<ElementInfo> variables;
   emp::vector<ElementInfo> functions;
-  emp::vector<TypedefInfo> typedefs;
+  emp::vector<ElementInfo> typedefs;
 
 
   void PrintEcho(std::ostream & os, const std::string & prefix) const override {
@@ -198,7 +192,7 @@ struct AST_Concept : AST_Node {
 
     // Print info for all typedefs
     for (auto & t : typedefs) {
-      os << prefix << "  using " << t.type_name << " = " << t.type_value << "\n";
+      os << prefix << "  using " << t.name << " = " << t.type << "\n";
     }
 
     // Print info for all variables...
