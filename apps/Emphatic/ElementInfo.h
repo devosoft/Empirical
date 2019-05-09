@@ -31,9 +31,17 @@ struct ElementInfo {
   std::string default_code;           ///< Variable initialization or function body.
   std::string special_value;          ///< "default", "delete", or "required" (for concepts)
 
+  bool IsTypedef() const { return element_type == TYPEDEF; }
+  bool IsVariable() const { return element_type == VARIABLE; }
+  bool IsFunction() const { return element_type == FUNCTION; }
+
   bool IsRequired() const { return special_value == "required"; }
   bool IsDefault() const { return special_value == "default"; }
   bool IsDeleted() const { return special_value == "delete"; }
+
+  void SetTypedef() { element_type = TYPEDEF; }
+  void SetVariable() { element_type = VARIABLE; }
+  void SetFunction() { element_type = FUNCTION; }
 
   std::string ParamString() const {
     std::string out_str;
