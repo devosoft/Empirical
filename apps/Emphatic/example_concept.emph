@@ -7,6 +7,8 @@
  *
  *****/
 
+#include "Testfile.h"
+
 namespace test {
   concept Vehicle : VehicleBase {
     // Any variables declared here are added to the base concept; they shadow any variables
