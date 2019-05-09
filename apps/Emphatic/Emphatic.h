@@ -66,7 +66,7 @@ private:
     return HasToken(pos) ? tokens[pos].lexeme : emp::empty_string();
   }
 
-  std::string ConcatLexemes(size_t start_pos, size_t end_pos) {
+  std::string ConcatLexemes(size_t start_pos, size_t end_pos) const {
     emp_assert(start_pos <= end_pos);
     emp_assert(end_pos <= tokens.size());
     std::stringstream ss;    
@@ -77,7 +77,7 @@ private:
     return ss.str();
   }
 
-  void Error(int pos, const std::string & msg) {
+  void Error(int pos, const std::string & msg) const {
     std::cout << "Error (token " << pos << "): " << msg << "\nAborting." << std::endl;
     exit(1);
   }
@@ -87,19 +87,19 @@ private:
     if (debug) std::cout << "DEBUG: " << emp::to_string(args...) << std::endl;
   }
 
-  void RequireID(int pos, const std::string & error_msg) {
+  void RequireID(int pos, const std::string & error_msg) const {
     if (!IsID(pos)) { Error(pos, error_msg); }
   }
-  void RequireNumber(int pos, const std::string & error_msg) {
+  void RequireNumber(int pos, const std::string & error_msg) const {
     if (!IsNumber(pos)) { Error(pos, error_msg); }
   }
-  void RequireString(int pos, const std::string & error_msg) {
+  void RequireString(int pos, const std::string & error_msg) const {
     if (!IsString(pos)) { Error(pos, error_msg); }
   }
-  void RequireChar(char req_char, int pos, const std::string & error_msg) {
+  void RequireChar(char req_char, int pos, const std::string & error_msg) const {
     if (AsChar(pos) != req_char) { Error(pos, error_msg); }
   }
-  void RequireLexeme(const std::string & req_str, int pos, const std::string & error_msg) {
+  void RequireLexeme(const std::string & req_str, int pos, const std::string & error_msg) const {
     if (AsLexeme(pos) != req_str) { Error(pos, error_msg); }
   }
 
@@ -125,7 +125,7 @@ public:
   /// Always stops at a mis-matched ')' '}' or ']'
   /// If match_angle_bracket is set, will also stop at a mis-matched '>'
   /// If multi_line is set, will NOT stop with a ';'
-  std::string ProcessCode(size_t & pos, bool match_angle_bracket=false, bool multi_line=false) {
+  std::string ProcessCode(size_t & pos, bool match_angle_bracket=false, bool multi_line=false) const {
     const size_t start_pos = pos;
     std::vector<char> open_symbols;
     bool finished = false;
@@ -165,7 +165,7 @@ public:
   }
 
   /// Collect all tokens used to describe a type.
-  std::string ProcessType(size_t & pos) {
+  std::string ProcessType(size_t & pos) const {
     const size_t start_pos = pos;
     // A type may start with a const.
     while (AsLexeme(pos) == "const" ||
@@ -203,7 +203,7 @@ public:
   }
 
   /// Collect all of the parameter definitions for a function.
-  emp::vector<ParamInfo> ProcessParams(size_t & pos) {
+  emp::vector<ParamInfo> ProcessParams(size_t & pos) const {
     emp::vector<ParamInfo> params;
 
     while (AsChar(pos) != ')') {
@@ -225,7 +225,7 @@ public:
   }
 
   /// Collect a series of identifiers, separated by spaces.
-  std::set<std::string> ProcessIDList(size_t & pos) {
+  std::set<std::string> ProcessIDList(size_t & pos) const {
     std::set<std::string> ids;
     while (IsID(pos)) {
       ids.insert(AsLexeme(pos));
@@ -235,7 +235,7 @@ public:
   }
 
   /// Collect information about a template; if there is no template, leave the string empty.
-  std::string ProcessTemplate(size_t & pos) {
+  std::string ProcessTemplate(size_t & pos) const {
     size_t start_pos = pos;
     if (AsLexeme(pos) != "template") return "";
     pos++;
@@ -245,7 +245,7 @@ public:
     return ConcatLexemes(start_pos, pos);
   }
 
-  ElementInfo ProcessElement(size_t & pos) {
+  ElementInfo ProcessElement(size_t & pos) const {
     // Entries can be a "using" statement, a function definition, or a variable definition.
     RequireID(pos, "Elements can be either functions, variables, or using-statements.");
 
@@ -316,7 +316,7 @@ public:
   }
 
   /// Process the tokens starting from the outer-most scope.
-  void ProcessTop(size_t & pos, AST_Scope & cur_scope ) {
+  void ProcessTop(size_t & pos, AST_Scope & cur_scope ) const {
     while (pos < tokens.size() && AsChar(pos) != '}') {
       // If this line is a pre-processor statement, just hook it in to print back out and keep going.
       if (IsPP(pos)) {
@@ -368,7 +368,7 @@ public:
   }
 
   /// We know we are in a concept definition.  Collect appropriate information.
-  AST_Concept & ProcessConcept(size_t & pos, AST_Scope & cur_scope) {
+  AST_Concept & ProcessConcept(size_t & pos, AST_Scope & cur_scope) const {
     AST_Concept & concept = cur_scope.NewChild<AST_Concept>();
 
     // A concept must begin with its name.
@@ -414,7 +414,7 @@ public:
   void PrintLexerState() { lexer.Print(); }
 
   /// Print the set of tokens loaded in from the input file.
-  void PrintTokens() {
+  void PrintTokens() const {
     for (size_t pos = 0; pos < tokens.size(); pos++) {
       std::cout << pos << ": "
                 << lexer.GetTokenName(tokens[pos])
