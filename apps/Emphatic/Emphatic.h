@@ -83,7 +83,7 @@ private:
   }
 
   template <typename... Ts>
-  void Debug(Ts... args) {
+  void Debug(Ts... args) const {
     if (debug) std::cout << "DEBUG: " << emp::to_string(args...) << std::endl;
   }
 
@@ -117,6 +117,7 @@ public:
 
   /// Print out the original state of the code.
   void PrintOutput(std::ostream & os) const {
+    Debug("Printing Output:");    
     ast_root.PrintOutput(os, "");
   }
 
@@ -167,7 +168,9 @@ public:
   std::string ProcessType(size_t & pos) {
     const size_t start_pos = pos;
     // A type may start with a const.
-    if (AsLexeme(pos) == "const") pos++;
+    while (AsLexeme(pos) == "const" ||
+           AsLexeme(pos) == "constexpr" ||
+           AsLexeme(pos) == "mutable") pos++;
 
     // Figure out the identifier (with possible "::" requiring another id)
     bool need_id = true;
@@ -242,11 +245,74 @@ public:
     return ConcatLexemes(start_pos, pos);
   }
 
-  /// Collect information about an element (function, variable, or typedef) definition.
   ElementInfo ProcessElement(size_t & pos) {
-    ElementInfo info;
-    // @CAO TODO
-    return info;
+    // Entries can be a "using" statement, a function definition, or a variable definition.
+    RequireID(pos, "Elements can be either functions, variables, or using-statements.");
+
+    ElementInfo new_element;
+
+    if (tokens[pos].lexeme == "using") {              // ----- USING!! -----
+      pos++;  // Move past "using"
+      RequireID(pos, "A 'using' command must first specify the new type name.");
+
+      new_element.name = ProcessType(pos);      // Determine new type name being defined.
+      RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
+      new_element.type = ProcessCode(pos);      // Determine code being assigned to.
+      new_element.SetTypedef();
+    }
+    else {
+      // Start with a type...
+      new_element.type = ProcessType(pos);
+
+      // Then an identifier.
+      RequireID(pos, "Functions and variables in concept definition must provide identifier after type name.");
+      new_element.name = tokens[pos++].lexeme;
+
+      // If and open-paren follows the identifier, we are defining a function, otherwise it's a variable.
+      if (AsChar(pos) == '(') {                              // ----- FUNCTION!! -----
+        pos++;  // Move past paren.
+
+        new_element.params = ProcessParams(pos);       // Read the parameters for this function.
+
+        RequireChar(')', pos++, "Function arguments must end with a close-parenthesis (')')");
+        new_element.attributes = ProcessIDList(pos);   // Read in each of the function attributes, if any.
+
+        char fun_char = AsChar(pos++);
+
+        if (fun_char == '=') {  // Function is "= default;" or "= required;"
+          RequireID(pos, "Function must be assigned to 'required' or 'default'");
+          std::string fun_assign = AsLexeme(pos++);
+          if (fun_assign == "required" || fun_assign == "default") new_element.special_value = fun_assign;
+          else Error(pos, "Functions can only be set to 'required' or 'default'");
+          RequireChar(';', pos++, emp::to_string(fun_assign, "functions must end in a semi-colon."));
+        }
+        else if (fun_char == '{') {  // Function is defined in place.
+          new_element.default_code = ProcessCode(pos, false, true);  // Read the default function body.
+
+          Debug("   and code: ", new_element.default_code);
+
+          RequireChar('}', pos, emp::to_string("Function body must end with close brace ('}') not '",
+                                                AsLexeme(pos), "'."));
+          pos++;
+        }
+        else {
+          Error(pos-1, "Function body must begin with open brace or assignment ('{' or '=')");
+        }
+
+        new_element.SetFunction();
+
+      } else {                                                 // ----- VARIABLE!! -----
+        if (AsChar(pos) == ';') { pos++; } // Does the variable declaration end here?
+        else {                             // ...or is there a default value for this variable?
+          // Determine code being assigned from.
+          new_element.default_code = ProcessCode(pos);
+        }
+
+        new_element.SetVariable();
+      }
+    }
+
+    return new_element;
   }
 
   /// Process the tokens starting from the outer-most scope.
@@ -324,71 +390,13 @@ public:
     // Loop through the full definition of concept, incorporating each entry.
     while ( AsChar(pos) != '}' ) {
       // Entries can be a "using" statement, a function definition, or a variable definition.
-      RequireID(pos, "Concept members can be either functions, variables, or using-statements.");
 
-      ElementInfo new_element;
+      ElementInfo info = ProcessElement(pos);
 
-      if (tokens[pos].lexeme == "using") {              // ----- USING!! -----
-        pos++;  // Move past "using"
-        RequireID(pos, "A 'using' command must first specify the new type name.");
-
-        new_element.name = ProcessType(pos);      // Determine new type name being defined.
-        RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
-        new_element.type = ProcessCode(pos);      // Determine code being assigned to.
-        concept.typedefs.push_back(new_element);
-      }
-      else {
-        // Start with a type...
-        new_element.type = ProcessType(pos);
-
-        // Then an identifier.
-        RequireID(pos, "Functions and variables in concept definition must provide identifier after type name.");
-        new_element.name = tokens[pos++].lexeme;
-
-        // If and open-paren follows the identifier, we are defining a function, otherwise it's a variable.
-        if (AsChar(pos) == '(') {                              // ----- FUNCTION!! -----
-          pos++;  // Move past paren.
-
-          new_element.params = ProcessParams(pos);       // Read the parameters for this function.
-
-          RequireChar(')', pos++, "Function arguments must end with a close-parenthesis (')')");
-          new_element.attributes = ProcessIDList(pos);   // Read in each of the function attributes, if any.
-
-          char fun_char = AsChar(pos++);
-
-          if (fun_char == '=') {  // Function is "= default;" or "= required;"
-            RequireID(pos, "Function must be assigned to 'required' or 'default'");
-            std::string fun_assign = AsLexeme(pos++);
-            if (fun_assign == "required" || fun_assign == "default") new_element.special_value = fun_assign;
-            else Error(pos, "Functions can only be set to 'required' or 'default'");
-            RequireChar(';', pos++, emp::to_string(fun_assign, "functions must end in a semi-colon."));
-          }
-          else if (fun_char == '{') {  // Function is defined in place.
-            new_element.default_code = ProcessCode(pos, false, true);  // Read the default function body.
-
-            Debug("   and code: ", new_element.default_code);
-
-            RequireChar('}', pos, emp::to_string("Function body must end with close brace ('}') not '",
-                                                  AsLexeme(pos), "'."));
-            pos++;
-          }
-          else {
-            Error(pos-1, "Function body must begin with open brace or assignment ('{' or '=')");
-          }
-
-          concept.functions.push_back(new_element);
-
-        } else {                                                 // ----- VARIABLE!! -----
-          if (AsChar(pos) == ';') { pos++; } // Does the variable declaration end here?
-          else {                             // ...or is there a default value for this variable?
-            // Determine code being assigned from.
-            new_element.default_code = ProcessCode(pos);
-          }
-
-          concept.variables.push_back(new_element);
-
-        }
-      }
+      // Insert the element into the correct vector.
+      if (info.IsTypedef()) concept.typedefs.push_back(info);
+      else if (info.IsFunction()) concept.functions.push_back(info);
+      else if (info.IsVariable()) concept.variables.push_back(info);
     }
 
     pos++;  // Skip closing brace.
