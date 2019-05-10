@@ -143,21 +143,17 @@ struct AST_Concept : AST_Node {
 
     // Print info for all typedefs
     for (auto & t : typedefs) {
-      os << prefix << "  using " << t.name << " = " << t.type << "\n";
+      t.PrintEcho(os, prefix+"  ");
     }
 
     // Print info for all variables...
     for (auto & v : variables) {
-      os << prefix << "  " << v.type << " " << v.name << " = " << v.default_code << "\n";
+      v.PrintEcho(os, prefix+"  ");
     }
 
     // Print info for all functions...
     for (auto & f : functions) {
-      os << prefix << "  " << f.type << " " << f.name << "(" << f.ParamString() << ") "
-          << f.AttributeString();
-      if (f.IsRequired()) os << " = required;\n";
-      else if (f.IsDefault()) os << " = default;\n";
-      else os << " {\n" << prefix << "    " << f.default_code << "\n" << prefix << "  }\n";
+      f.PrintEcho(os, prefix+"  ");
     }
 
     // Close the concept
