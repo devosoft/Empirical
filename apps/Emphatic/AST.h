@@ -132,28 +132,17 @@ struct AST_Concept : AST_Node {
   std::string name;
   std::string base_name;
 
-  emp::vector<ElementInfo> variables;
-  emp::vector<ElementInfo> functions;
-  emp::vector<ElementInfo> typedefs;
+  emp::vector<ElementInfo> members;
 
 
   void PrintEcho(std::ostream & os, const std::string & prefix) const override {
     // Open the concept
     os << prefix << "concept " << name << " : " << base_name << " {\n";
 
-    // Print info for all typedefs
-    for (auto & t : typedefs) {
-      t.PrintEcho(os, prefix+"  ");
-    }
-
-    // Print info for all variables...
-    for (auto & v : variables) {
-      v.PrintEcho(os, prefix+"  ");
-    }
-
-    // Print info for all functions...
-    for (auto & f : functions) {
-      f.PrintEcho(os, prefix+"  ");
+    // Print info for all members
+    for (auto & m : members) {
+      m.PrintEcho(os, prefix+"  ");
+      os << "\n";
     }
 
     // Close the concept
@@ -166,8 +155,9 @@ struct AST_Concept : AST_Node {
         << prefix << "public:\n";
 
     // Print all of the BASE CLASS details.
-    for (auto & f : functions) {
-      f.PrintOuputBase(os, prefix+"  ");
+    for (auto & m : members) {
+      m.PrintConceptBase(os, prefix+"  ");
+      os << "\n";
     }
 
     os << prefix << "};\n\n";
@@ -178,17 +168,10 @@ struct AST_Concept : AST_Node {
         << prefix << "class " << name << " : WRAPPED_T, " << base_name << " {\n"
         << prefix << "  using this_t = " << name << "<WRAPPED_T>;\n\n";
 
-    // Print info for all typedefs
-    for (auto & t : typedefs) {
-      t.PrintOutputDerived(os, prefix+"  ");
-    }
-
-    for (auto & v : variables) {
-      v.PrintOutputDerived(os, prefix+"  ");
-    }
-
-    for (auto & f : functions) {
-      f.PrintOutputDerived(os, prefix+"  ");
+    // Print concept info for all derived members
+    for (auto & m : members) {
+      m.PrintConceptDerived(os, prefix+"  ");
+      os << "\n";
     }
 
     os << prefix << "};\n\n";
