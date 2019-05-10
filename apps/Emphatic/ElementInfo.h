@@ -43,7 +43,9 @@ struct ElementInfo {
   void SetVariable() { element_type = VARIABLE; }
   void SetFunction() { element_type = FUNCTION; }
 
+  /// List out all of the parameters for this function.
   std::string ParamString() const {
+    emp_assert(IsFunction());
     std::string out_str;
     for (size_t i = 0; i < params.size(); i++) {
       if (i) out_str += ", ";
@@ -52,7 +54,9 @@ struct ElementInfo {
     return out_str;
   }
 
+  /// List out all attributes for this function.
   std::string AttributeString() const {
+    emp_assert(IsFunction());
     std::string out_str;
     for (const auto & x : attributes) {
       out_str += " ";
@@ -61,12 +65,32 @@ struct ElementInfo {
     return out_str;
   }
 
+  /// Convert the inputs to a function to arguments to another function.
   std::string ArgString() const {
+    emp_assert(IsFunction());
     std::string out_str;
     for (size_t i = 0; i < params.size(); i++) {
       if (i) out_str += ", ";
       out_str += params[i].name;
     }
     return out_str;
+  }
+
+  /// Print this element as the Emphatic C++ string that would have generated it.
+  void PrintEcho(std::ostream & os, const std::string & prefix) const {
+    if (IsTypedef()) {
+      os << prefix << "using " << name << " = " << type << "\n";
+    }
+    else if (IsVariable()) {
+      os << prefix << type << " " << name;
+      if (default_code.size()) os << " = " << default_code << "\n";
+      else os << ";\n";
+    }
+    else if (IsFunction()) {
+      os << prefix << type << " " << name << "(" << ParamString() << ") " << AttributeString();
+      if (IsRequired()) os << " = required;\n";
+      else if (IsDefault()) os << " = default;\n";
+      else os << " {\n" << prefix << "  " << default_code << "\n" << prefix << "}\n";
+    }
   }
 };
