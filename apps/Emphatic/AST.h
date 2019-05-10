@@ -167,8 +167,7 @@ struct AST_Concept : AST_Node {
 
     // Print all of the BASE CLASS details.
     for (auto & f : functions) {
-      os << prefix << "  " << f.type << " " << f.name << "(" << f.ParamString() << ") "
-          << f.AttributeString() << " = 0;\n";
+      f.PrintOuputBase(os, prefix+"  ");
     }
 
     os << prefix << "};\n\n";
@@ -179,47 +178,18 @@ struct AST_Concept : AST_Node {
         << prefix << "class " << name << " : WRAPPED_T, " << base_name << " {\n"
         << prefix << "  using this_t = " << name << "<WRAPPED_T>;\n\n";
 
-    os << prefix << "  ----- VARIABLES -----\n";
+    // Print info for all typedefs
+    for (auto & t : typedefs) {
+      t.PrintOutputDerived(os, prefix+"  ");
+    }
+
     for (auto & v : variables) {
-      os << prefix << "  " << v.type << " " << v.name;
-      if (v.default_code.size() > 0) os << " = " << v.default_code << "\n";
-      else os << "\n";
+      v.PrintOutputDerived(os, prefix+"  ");
     }
 
-    os << prefix << "\n  ----- FUNCTIONS -----\n";
-    os << prefix << "protected:\n";
-    os << prefix << "  // FIRST: Determine the return type for each function.\n";
     for (auto & f : functions) {
-      os << prefix << "  template <typename T>\n";
-      os << prefix << "  using return_t_" << f.name
-                   << " = decltype( std::declval<T>()." << f.name
-                   << "( " << f.ParamString() << " );\n";
+      f.PrintOutputDerived(os, prefix+"  ");
     }
-
-    os << "\n";  // Skip a line.
-    os << prefix << "public:\n";
-    os << prefix << "  // SECOND: Determine if each function exists in wrapped class.\n";
-    for (auto & f : functions) {
-      os << prefix << "  static constexpr bool HasFun_" << f.name << "() {\n"
-          << prefix << "    return emp::test_type<return_t_" << f.name << ", WRAPPED_T>();\n"
-          << prefix << "  }\n";
-    }
-
-    os << prefix << "\n  // THIRD: Call the functions, redirecting as needed\n";
-    for (auto & f : functions) {
-      os << prefix << "  " << f.type << " " << f.name << "(" << f.ParamString() << ") "
-                    << f.AttributeString() << " {\n"
-          << prefix << "    " << "static_assert( HasFun_" << f.name
-                    << "(), \"\\n\\n  ** Error: concept instance missing required function "
-                    << f.name << " **\\n\");\n"
-          << prefix << "    if constexpr (HasFun_" << f.name << "()) {\n"
-          << prefix << "      ";
-      if (f.type != "void") os << "return ";
-      os << "WRAPPED_T::" << f.name << "( " << f.ArgString() << " );\n"
-        << prefix << "    }\n"
-        << prefix << "  }\n";
-    }
-
 
     os << prefix << "};\n\n";
   }
