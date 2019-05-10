@@ -63,10 +63,10 @@ namespace emp {
     Token & operator=(Token &&) = default;
 
     /// Token will automatically convert to its ID if used as an int.
-    operator int() { return token_id; }
+    operator int() const { return token_id; }
 
     /// Token will automatically convert to its matched sequence (lexeme) is used as a string.
-    operator const std::string &() { return lexeme; }
+    operator const std::string &() const { return lexeme; }
   };
 
   /// A lexer with a set of token types (and associated regular expressions)
