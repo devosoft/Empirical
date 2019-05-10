@@ -76,7 +76,7 @@ struct ElementInfo {
     return out_str;
   }
 
-  /// Print this element as the Emphatic C++ string that would have generated it.
+  /// Print this element as the Emphatic C++ code that would have generated it.
   void PrintEcho(std::ostream & os, const std::string & prefix) const {
     if (IsTypedef()) {
       os << prefix << "using " << name << " = " << type << "\n";
@@ -93,4 +93,51 @@ struct ElementInfo {
       else os << " {\n" << prefix << "  " << default_code << "\n" << prefix << "}\n";
     }
   }
-};
+
+  /// Print this element as the converted C++ code for the base class.
+  void PrintOuputBase(std::ostream & os, const std::string & prefix) const {
+    // Note: Typedefs and variables do not need to be represented in the base class.
+    if (IsFunction()) {
+      os << prefix << type << " " << name << "(" << ParamString() << ") "
+         << AttributeString() << " = 0;\n";
+    }
+  }
+
+  /// Print this element as the converted C++ code for the derived class that does reflection.
+  void PrintOutputDerived(std::ostream & os, const std::string & prefix) const {
+    if (IsTypedef()) {
+      os << prefix << "using " << name << " = " << type << "\n";
+    }
+    else if (IsVariable()) {
+      os << prefix << type << " " << name;
+      if (default_code.size()) os << " = " << default_code << "\n";
+      else os << ";\n";
+    }
+    else if (IsFunction()) {
+      // os << prefix << type << " " << name << "(" << ParamString() << ") " << AttributeString();
+      // if (IsRequired()) os << " = required;\n";
+      // else if (IsDefault()) os << " = default;\n";
+      // else os << " {\n" << prefix << "  " << default_code << "\n" << prefix << "}\n";
+
+      os << prefix << "  template <typename T>\n"
+         << prefix << "  using return_t_" << name
+                   << " = decltype( std::declval<T>()." << name
+                   << "( " << ParamString() << " );\n";
+
+      os << prefix << "  static constexpr bool HasFun_" << name << "() {\n"
+         << prefix << "    return emp::test_type<return_t_" << name << ", WRAPPED_T>();\n"
+         << prefix << "  }\n";
+
+      os << prefix << "  " << type << " " << name << "(" << ParamString() << ") "
+                   << AttributeString() << " {\n"
+         << prefix << "    " << "static_assert( HasFun_" << name
+                   << "(), \"\\n\\n  ** Error: concept instance missing required function "
+                   << name << " **\\n\");\n"
+         << prefix << "    if constexpr (HasFun_" << name << "()) {\n"
+         << prefix << "      ";
+      if (type != "void") os << "return ";
+      os << "WRAPPED_T::" << name << "( " << ArgString() << " );\n"
+         << prefix << "    }\n"
+         << prefix << "  }\n";
+    }
+  }};
