@@ -111,8 +111,15 @@ public:
   }
 
   /// Print out the original state of the code.
-  void PrintEcho(std::ostream & os) const {
-    ast_root.PrintEcho(os, "");
+  void PrintEcho(std::string filename) const {
+    if (filename == "") {
+      ast_root.PrintEcho(std::cout, "");
+    }
+    else {
+      std::ofstream ofile(filename);
+      ast_root.PrintEcho(ofile, "");
+      ofile.close();
+    }
   }
 
   /// Print out the original state of the code.
