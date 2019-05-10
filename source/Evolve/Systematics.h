@@ -1079,6 +1079,37 @@ namespace emp {
       return depth;
     }
 
+    /** Calculate Sackin Index of this tree (Sackin, 1972; reviewed in Shao, 1990).
+     * Measures tree balance
+    */
+    int SackinIndex() const {
+      int sackin = 0;
+
+      for (auto taxon : active_taxa) {
+        sackin += GetBranchesToRoot(taxon);
+      }
+
+      return sackin;
+    }
+
+    /** Calculate Colless Index of this tree (Colless, 1982; reviewed in Shao, 1990).
+     * Measures tree balance. The standard Colless index only works for bifurcating trees,
+     * so this will be a Colless-like Index, as suggested in 
+     * "Sound Colless-like balance indices for multifurcating trees" (Mir, 2018, PLoS One)
+    */
+    // int CollessIndex() const {
+    //   GetMRCA();
+
+    //   for (auto taxon : active_taxa) {
+    //     while (taxon) {
+
+
+    //       taxon = taxon->GetParent();
+    //     }
+    //   }
+
+    // }
+
     void RemoveBefore(int ud) {
       
       // @ELD: This would be such a nice way to do it
@@ -1597,7 +1628,6 @@ namespace emp {
   double Systematics<ORG, ORG_INFO, DATA_STRUCT>::CalcDiversity() const {
     return emp::Entropy(active_taxa, [](Ptr<taxon_t> x){ return x->GetNumOrgs(); }, (double) org_count);
   }
-
 }
 
 #endif
