@@ -36,7 +36,11 @@ namespace emp {
                 if (val > 0 && val < 1) {
                     // This is a common range for numbers to be in
                     input.Min(0);   
-                    input.Max(1);
+                    if (val > .1) {
+                        input.Max(1);
+                    } else {
+                        input.Max(val * 100);
+                    }
                     input.Step(val/10.0);      
                 } else if (val > 0) {
                     // Assume this is a positive number
