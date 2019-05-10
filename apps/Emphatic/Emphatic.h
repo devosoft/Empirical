@@ -117,7 +117,6 @@ public:
 
   /// Print out the original state of the code.
   void PrintOutput(std::ostream & os) const {
-    Debug("Printing Output:");    
     ast_root.PrintOutput(os, "");
   }
 
@@ -288,9 +287,6 @@ public:
         }
         else if (fun_char == '{') {  // Function is defined in place.
           new_element.default_code = ProcessCode(pos, false, true);  // Read the default function body.
-
-          Debug("   and code: ", new_element.default_code);
-
           RequireChar('}', pos, emp::to_string("Function body must end with close brace ('}') not '",
                                                 AsLexeme(pos), "'."));
           pos++;
@@ -317,6 +313,7 @@ public:
 
   /// Process the tokens starting from the outer-most scope.
   void ProcessTop(size_t & pos, AST_Scope & cur_scope ) const {
+    emp_assert(pos <= tokens.size(), pos, tokens.size());
     while (pos < tokens.size() && AsChar(pos) != '}') {
       // If this line is a pre-processor statement, just hook it in to print back out and keep going.
       if (IsPP(pos)) {
@@ -382,8 +379,6 @@ public:
     RequireID(pos, "Concept declaration must include name of base class.");
     concept.base_name = tokens[pos++].lexeme;
 
-    Debug("Defining concept '", concept.name, "' with base class '", concept.base_name, "'.");
-
     // Next, must be an open brace...
     RequireChar('{', pos++, "Concepts must be defined in braces ('{' and '}').");
 
@@ -406,7 +401,7 @@ public:
   }
   
   void Process() {
-    size_t pos;
+    size_t pos=0;
     ProcessTop(pos, ast_root);
   }
 
