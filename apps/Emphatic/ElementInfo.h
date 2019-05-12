@@ -95,7 +95,7 @@ struct ElementInfo {
   }
 
   /// Print this element as the converted C++ code for the base class.
-  void PrintOuputBase(std::ostream & os, const std::string & prefix) const {
+  void PrintConceptBase(std::ostream & os, const std::string & prefix) const {
     // Note: Typedefs and variables do not need to be represented in the base class.
     if (IsFunction()) {
       os << prefix << type << " " << name << "(" << ParamString() << ") "
@@ -104,7 +104,7 @@ struct ElementInfo {
   }
 
   /// Print this element as the converted C++ code for the derived class that does reflection.
-  void PrintOutputDerived(std::ostream & os, const std::string & prefix) const {
+  void PrintConceptDerived(std::ostream & os, const std::string & prefix) const {
     if (IsTypedef()) {
       os << prefix << "using " << name << " = " << type << "\n";
     }
