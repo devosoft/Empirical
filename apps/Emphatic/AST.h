@@ -112,17 +112,16 @@ struct AST_Class : public AST_Node {
 };
 
 /// AST Node for outer level using statement...
-struct AST_Using : AST_Node {
-  std::string name;
-  std::string type;
+struct AST_Element : AST_Node {
+  ElementInfo info;
 
   void PrintEcho(std::ostream & os, const std::string & prefix) const override {
-    os << prefix << "using " << name << " = " << type << "\n";
+    info.PrintEcho(os, prefix);
   }
 
   /// Output for a using should be identical to the input.
   void PrintOutput(std::ostream & os, const std::string & prefix) const override {
-    os << prefix << "using " << name << " = " << type << "\n";
+    info.PrintEcho(os, prefix);
   }
 };
 
