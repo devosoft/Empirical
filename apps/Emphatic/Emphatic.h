@@ -398,14 +398,8 @@ public:
 
     // Loop through the full definition of concept, incorporating each entry.
     while ( AsChar(pos) != '}' ) {
-      // Entries can be a "using" statement, a function definition, or a variable definition.
-
-      ElementInfo info = ProcessElement(pos);
-
-      // Insert the element into the correct vector.
-      if (info.IsTypedef()) concept.typedefs.push_back(info);
-      else if (info.IsFunction()) concept.functions.push_back(info);
-      else if (info.IsVariable()) concept.variables.push_back(info);
+      // While we are processing a concept, process member elements and put them in the vector.
+      concept.members.push_back( ProcessElement(pos) );
     }
 
     pos++;  // Skip closing brace.
