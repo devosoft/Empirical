@@ -77,30 +77,36 @@ private:
     return ss.str();
   }
 
-  void Error(int pos, const std::string & msg) const {
-    std::cout << "Error (token " << pos << "): " << msg << "\nAborting." << std::endl;
+  template <typename... Ts>
+  void Error(int pos, Ts... args) const {
+    std::cout << "Error (token " << pos << "): " << emp::to_string(std::forward<Ts>(args)...) << "\nAborting." << std::endl;
     exit(1);
   }
 
   template <typename... Ts>
   void Debug(Ts... args) const {
-    if (debug) std::cout << "DEBUG: " << emp::to_string(args...) << std::endl;
+    if (debug) std::cout << "DEBUG: " << emp::to_string(std::forward<Ts>(args)...) << std::endl;
   }
 
-  void RequireID(int pos, const std::string & error_msg) const {
-    if (!IsID(pos)) { Error(pos, error_msg); }
+  template <typename... Ts>
+  void RequireID(int pos, Ts... args) const {
+    if (!IsID(pos)) { Error(pos, std::forward<Ts>(args)...); }
   }
-  void RequireNumber(int pos, const std::string & error_msg) const {
-    if (!IsNumber(pos)) { Error(pos, error_msg); }
+  template <typename... Ts>
+  void RequireNumber(int pos, Ts... args) const {
+    if (!IsNumber(pos)) { Error(pos, std::forward<Ts>(args)...); }
   }
-  void RequireString(int pos, const std::string & error_msg) const {
-    if (!IsString(pos)) { Error(pos, error_msg); }
+  template <typename... Ts>
+  void RequireString(int pos, Ts... args) const {
+    if (!IsString(pos)) { Error(pos, std::forward<Ts>(args)...); }
   }
-  void RequireChar(char req_char, int pos, const std::string & error_msg) const {
-    if (AsChar(pos) != req_char) { Error(pos, error_msg); }
+  template <typename... Ts>
+  void RequireChar(char req_char, int pos, Ts... args) const {
+    if (AsChar(pos) != req_char) { Error(pos, std::forward<Ts>(args)...); }
   }
-  void RequireLexeme(const std::string & req_str, int pos, const std::string & error_msg) const {
-    if (AsLexeme(pos) != req_str) { Error(pos, error_msg); }
+  template <typename... Ts>
+  void RequireLexeme(const std::string & req_str, int pos, Ts... args) const {
+    if (AsLexeme(pos) != req_str) { Error(pos, std::forward<Ts>(args)...); }
   }
 
 public:
@@ -278,7 +284,7 @@ public:
       new_element.type = ProcessType(pos);
 
       // Then an identifier.
-      RequireID(pos, "Functions and variables in concept definition must provide identifier after type name.");
+      RequireID(pos, "Expected identifier after type name.");
       new_element.name = tokens[pos++].lexeme;
 
       // If and open-paren follows the identifier, we are defining a function, otherwise it's a variable.
@@ -363,17 +369,19 @@ public:
         ProcessTop(pos, new_ns);
         RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
       }
-      else if (cur_lexeme == "using") {
-        RequireID(pos, "A 'using' command must first specify the new type name.");
-        auto & new_using = cur_scope.NewChild<AST_Using>();
-        new_using.name = ProcessType(pos);    // Determine new type name being defined.
-        RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
-        new_using.type = ProcessCode(pos);   // Determine code being assigned to.
-      }
+      // else if (cur_lexeme == "using") {
+      //   RequireID(pos, "A 'using' command must first specify the new type name.");
+      //   auto & new_using = cur_scope.NewChild<AST_Using>();
+      //   new_using.name = ProcessType(pos);    // Determine new type name being defined.
+      //   RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
+      //   new_using.type = ProcessCode(pos);   // Determine code being assigned to.
+      // }
       // @CAO: Still need to deal with "template", variables and functions, enums, template specializations
       ///      and empty lines (';').
-      else {
-        Error( pos-1, emp::to_string("Unknown keyword '", cur_lexeme, "'.  Aborting.") );
+      else { // Must be a regular element (function, variable, using)
+        auto & new_node = cur_scope.NewChild<AST_Element>();
+        new_node.info = ProcessElement(pos);
+        // Error( pos-1, emp::to_string("Unknown keyword '", cur_lexeme, "'.  Aborting.") );
       }
     }
   }
