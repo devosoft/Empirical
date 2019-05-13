@@ -96,7 +96,7 @@ struct AST_Class : public AST_Node {
 
   /// Scope should run echo on each of its children.
   void PrintEcho(std::ostream & os, const std::string & prefix) const override {
-    os << prefix << type << " " << name << "{\n" << body << "};\n";
+    os << prefix << type << " " << name << "{\n" << prefix << "  " << body << "};\n";
     // os << prefix << type << " " << name << "{\n";
     // for (auto x : children) { x->PrintEcho(os, prefix+"  "); }
     // os << prefix << "};\n";      
@@ -104,7 +104,7 @@ struct AST_Class : public AST_Node {
 
   /// Scope should run output on each of its children.
   void PrintOutput(std::ostream & os, const std::string & prefix) const override {
-    os << prefix << type << " " << name << "{\n" << body << "};\n";
+    os << prefix << type << " " << name << "{\n" << prefix << "  " << body << "};\n";
     // os << prefix << "namespace" << " " << name << "{\n";
     // for (auto x : children) { x->PrintOutput(os, prefix); }
     // os << prefix << "};\n";      
