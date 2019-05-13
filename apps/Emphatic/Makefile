@@ -22,5 +22,9 @@ $(PROJECT): $(FILES)
 clean:
 	rm -rf $(PROJECT) $(PROJECT).dSYM/ *~
 
+test:
+	./Emphatic examples/ConceptTest.empcc examples/ConceptTest.cc
+	$(CXX) $(CFLAGS_debug) examples/ConceptTest.cc -o examples/ConceptTest
+
 # Debugging information
 print-%: ; @echo '$(subst ','\'',$*=$($*))'
