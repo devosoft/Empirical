@@ -130,6 +130,7 @@ namespace emp {
     size_t id;                ///<  ID for this Taxon (Unique within this Systematics)
     const info_t info;        ///<  Details for the organims associated within this taxanomic group.
     Ptr<this_t> parent;       ///<  Pointer to parent group (nullptr if injected)
+    std::set<Ptr<this_t> > offspring; ///< Pointers to all immediate offspring taxa
     size_t num_orgs;          ///<  How many organisms currently exist of this group?
     size_t tot_orgs;          ///<  How many organisms have ever existed of this group?
     size_t num_offspring;     ///<  How many direct offspring groups exist from this one.
@@ -183,6 +184,8 @@ namespace emp {
     data_t & GetData() {return data;}
     const data_t & GetData() const {return data;}
 
+    std::set<Ptr<this_t> > GetOffspring() {return offspring;}
+
     void SetData(data_t d) {data = d;}
 
     double GetOriginationTime() const {return origination_time;}
@@ -195,7 +198,11 @@ namespace emp {
     void AddOrg() { ++num_orgs; ++tot_orgs; }
 
     /// Add a new offspring Taxon to this one.
-    void AddOffspring() { ++num_offspring; AddTotalOffspring();}
+    void AddOffspring(Ptr<this_t> offspring_tax) { 
+      ++num_offspring; 
+      offspring.insert(offspring_tax); 
+      AddTotalOffspring();
+    }
 
     /// Recursively increment total offspring count for this and all ancestors
     // Should this be protected or private or something?
@@ -221,9 +228,10 @@ namespace emp {
     }
 
     /// Remove and offspring taxa after its entire sub-tree has died out (pruning)
-    bool RemoveOffspring() {
+    bool RemoveOffspring(Ptr<this_t> offspring_tax) {
       emp_assert(num_offspring > 0, num_offspring, id);
       --num_offspring;
+      offspring.erase(offspring_tax);
 
       // If we are out of BOTH offspring and organisms, this Taxon should deactivate.
       return num_orgs || num_offspring;
@@ -490,7 +498,7 @@ namespace emp {
     void Prune(Ptr<taxon_t> taxon);
 
     /// Called when an offspring taxa has been deleted.
-    void RemoveOffspring(Ptr<taxon_t> taxon);
+    void RemoveOffspring(Ptr<taxon_t> offspring, Ptr<taxon_t> taxon);
 
     /// Called when there are no more living members of a taxon.  There may be descendants.
     void MarkExtinct(Ptr<taxon_t> taxon, int time=-1);
@@ -1092,23 +1100,164 @@ namespace emp {
       return sackin;
     }
 
+
+    // Graph ToGraph() const {
+
+    //   std::map<Ptr<taxon_t>, int> ids;
+    //   int next_id = 0;
+
+    //   for (Ptr<taxon_t> tax : active_taxa) {
+    //     ids[tax] = next_id;
+    //     next_id++;
+    //   }
+
+    //   for (Ptr<taxon_t> tax : ancestor_taxa) {
+    //     ids[tax] = next_id;
+    //     next_id++;
+    //   }
+
+    //   for (Ptr<taxon_t> tax : outside_taxa) {
+    //     ids[tax] = next_id;
+    //     next_id++;
+    //   }
+
+    //   Graph g(next_id);
+
+    //   for (Ptr<taxon_t> tax : active_taxa) {
+    //     if (tax->GetParent()) {
+    //       g.AddEdge(ids[tax->GetParent()], ids[tax]);
+    //     }
+    //   }
+
+    //   for (Ptr<taxon_t> tax : ancestor_taxa) {
+    //     if (tax->GetParent()) {
+    //       g.AddEdge(ids[tax->GetParent()], ids[tax]);
+    //     }
+    //   }
+
+    //   for (Ptr<taxon_t> tax : outside_taxa) {
+    //     if (tax->GetParent()) {
+    //       g.AddEdge(ids[tax->GetParent()], ids[tax]);
+    //     }
+    //   }
+
+    //   return g;
+    // }
+
+    // Graph ToMinimalGraph() const {
+    //   std::map<Ptr<taxon_t>, int> ids;
+    //   int next_id = 0;
+
+    //   for (Ptr<taxon_t> tax : active_taxa) {
+    //     if (tax->GetNumOff() == 1) {
+    //       continue;
+    //     }
+    //     ids[tax] = next_id;
+    //     next_id++;
+    //   }
+
+    //   for (Ptr<taxon_t> tax : ancestor_taxa) {
+    //     if (tax->GetNumOff() == 1) {
+    //       continue;
+    //     }
+    //     ids[tax] = next_id;
+    //     next_id++;
+    //   }
+
+    //   for (Ptr<taxon_t> tax : outside_taxa) {
+    //     if (tax->GetNumOff() == 1) {
+    //       continue;
+    //     }
+    //     ids[tax] = next_id;
+    //     next_id++;
+    //   }
+
+    //   Graph g(next_id);
+
+    //   for (Ptr<taxon_t> tax : active_taxa) {
+    //     if (tax->GetNumOff() == 1) {
+    //       continue;
+    //     }
+
+    //     Ptr<taxon_t> parent = tax->GetParent();
+    //     while (parent) {
+    //       if (parent->GetNumOff() == 1) {
+    //         parent = parent->GetParent();
+    //       } else {
+    //         g.AddEdge(ids[parent], ids[tax]);
+    //       }
+    //     }
+    //   }
+
+    //   for (Ptr<taxon_t> tax : ancestor_taxa) {
+    //     if (tax->GetNumOff() == 1) {
+    //       continue;
+    //     }
+
+    //     Ptr<taxon_t> parent = tax->GetParent();
+    //     while (parent) {
+    //       if (parent->GetNumOff() == 1) {
+    //         parent = parent->GetParent();
+    //       } else {
+    //         g.AddEdge(ids[parent], ids[tax]);
+    //       }
+    //     }
+    //   }
+
+    //   for (Ptr<taxon_t> tax : outside_taxa) {
+    //     if (tax->GetNumOff() == 1) {
+    //       continue;
+    //     }
+
+    //     Ptr<taxon_t> parent = tax->GetParent();
+    //     while (parent) {
+    //       if (parent->GetNumOff() == 1) {
+    //         parent = parent->GetParent();
+    //       } else {
+    //         g.AddEdge(ids[parent], ids[tax]);
+    //       }
+    //     }
+    //   }
+
+    //   return g;
+    // }
+
+    double ResursiveCollessStep(Ptr<taxon_t> curr) {
+      while (curr->GetNumOff() == 1) {
+        curr = *(curr->GetOffspring().begin());
+      }
+
+      if (curr->GetNumOff() == 0) {
+        return 0;
+      }
+
+      double total = 0;
+      emp::vector<double> ns;
+
+      for (Ptr<taxon_t> off : curr->GetOffspring()) {
+        ns.push_back(log(off->GetTotalOffspring() + 2.71828182845904));
+        total += RecursiveCollessStep(off);
+      }
+
+      double med = Median(ns);
+      double sum_diffs = 0;
+      for (double n : ns) {
+        sum_diffs += abs(n-med);
+      }
+
+      return total + Mean(sum_diffs);
+    }
+
     /** Calculate Colless Index of this tree (Colless, 1982; reviewed in Shao, 1990).
      * Measures tree balance. The standard Colless index only works for bifurcating trees,
      * so this will be a Colless-like Index, as suggested in 
      * "Sound Colless-like balance indices for multifurcating trees" (Mir, 2018, PLoS One)
     */
-    // int CollessIndex() const {
-    //   GetMRCA();
+    double CollessLikeIndex() const {
+      GetMRCA();
 
-    //   for (auto taxon : active_taxa) {
-    //     while (taxon) {
-
-
-    //       taxon = taxon->GetParent();
-    //     }
-    //   }
-
-    // }
+      return RecursiveCollessStep(mrca);
+    }
 
     void RemoveBefore(int ud) {
       
@@ -1229,7 +1378,7 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::Prune(Ptr<taxon_t> taxon) {
     on_prune_sig.Trigger(taxon);
-    RemoveOffspring( taxon->GetParent() );           // Notify parent of the pruning.
+    RemoveOffspring( taxon, taxon->GetParent() );           // Notify parent of the pruning.
     if (store_ancestors) ancestor_taxa.erase(taxon); // Clear from ancestors set (if there)
     if (store_outside) outside_taxa.insert(taxon);   // Add to outside set (if tracked)
     else {
@@ -1239,9 +1388,9 @@ namespace emp {
   }
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOffspring(Ptr<taxon_t> taxon) {
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOffspring(Ptr<taxon_t> offspring, Ptr<taxon_t> taxon) {
     if (!taxon) { num_roots--; return; }             // Offspring was root; remove and return.
-    bool still_active = taxon->RemoveOffspring();    // Taxon still active w/ 1 fewer offspring?
+    bool still_active = taxon->RemoveOffspring(offspring);    // Taxon still active w/ 1 fewer offspring?
     if (!still_active) Prune(taxon);                 // If out of offspring, remove from tree.
 
     // If the taxon is still active AND the is the current mrca AND now has only one offspring,
@@ -1386,7 +1535,7 @@ namespace emp {
       }
       on_new_sig.Trigger(cur_taxon, org);
       if (store_active) active_taxa.insert(cur_taxon);       // Store new taxon.
-      if (parent) parent->AddOffspring();                    // Track tree info.
+      if (parent) parent->AddOffspring(cur_taxon);                    // Track tree info.
 
       cur_taxon->SetOriginationTime(update);
     }

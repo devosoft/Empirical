@@ -100,6 +100,8 @@ namespace emp {
       return edge_count;
     }
 
+    Node GetNode(int i) {return nodes[i];}
+
     /// Change the number of vertices in this graph.
     void Resize(size_t new_size) {
       nodes.resize(new_size, new_size);

@@ -144,6 +144,17 @@ namespace emp {
     return (double)Sum(elements)/elements.size();
   }
 
+  template <typename C>
+  emp::sfinae_decoy<double, typename C::value_type> 
+  Median(C elements) {
+    Sort(elements);
+    if (elements.size() % 2 == 1) {
+      return elements[elements.size() / 2 + 1];
+    } else {
+      return (elements[elements.size() / 2] + elements[elements.size() / 2 + 1])/2.0;
+    }
+  }
+
   /// Calculate the standard deviation of the values in a container
   /// If values are pointers, they will be automatically de-referenced
   /// Values must be numeric.
