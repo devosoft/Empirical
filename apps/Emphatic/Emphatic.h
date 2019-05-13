@@ -270,7 +270,7 @@ public:
 
     ElementInfo new_element;
 
-    if (tokens[pos].lexeme == "using") {              // ----- USING!! -----
+    if (AsLexeme(pos) == "using") {              // ----- USING!! -----
       pos++;  // Move past "using"
       RequireID(pos, "A 'using' command must first specify the new type name.");
 
@@ -284,7 +284,7 @@ public:
       new_element.type = ProcessType(pos);
 
       // Then an identifier.
-      RequireID(pos, "Expected identifier after type name.");
+      RequireID(pos, "Expected identifier after type name (", new_element.type, "), but found '", AsLexeme(pos), "'.");
       new_element.name = tokens[pos++].lexeme;
 
       // If and open-paren follows the identifier, we are defining a function, otherwise it's a variable.
@@ -369,16 +369,10 @@ public:
         ProcessTop(pos, new_ns);
         RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
       }
-      // else if (cur_lexeme == "using") {
-      //   RequireID(pos, "A 'using' command must first specify the new type name.");
-      //   auto & new_using = cur_scope.NewChild<AST_Using>();
-      //   new_using.name = ProcessType(pos);    // Determine new type name being defined.
-      //   RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
-      //   new_using.type = ProcessCode(pos);   // Determine code being assigned to.
-      // }
       // @CAO: Still need to deal with "template", variables and functions, enums, template specializations
       ///      and empty lines (';').
       else { // Must be a regular element (function, variable, using)
+        pos--; // Backup since the first ID should be the type name.
         auto & new_node = cur_scope.NewChild<AST_Element>();
         new_node.info = ProcessElement(pos);
         // Error( pos-1, emp::to_string("Unknown keyword '", cur_lexeme, "'.  Aborting.") );
