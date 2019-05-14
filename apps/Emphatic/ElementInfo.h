@@ -54,6 +54,17 @@ struct ElementInfo {
     return out_str;
   }
 
+  /// Create fake values for the parameters for this function.
+  std::string DeclvalArgString() const {
+    emp_assert(IsFunction());
+    std::string out_str;
+    for (size_t i = 0; i < params.size(); i++) {
+      if (i) out_str += ", ";
+      out_str += emp::to_string("std::declval<", params[i].type, ">()");
+    }
+    return out_str;
+  }
+
   /// List out all attributes for this function.
   std::string AttributeString() const {
     emp_assert(IsFunction());
@@ -122,9 +133,9 @@ struct ElementInfo {
       os << prefix << "  template <typename T>\n"
          << prefix << "  using return_t_" << name
                    << " = decltype( std::declval<T>()." << name
-                   << "( " << ParamString() << " );\n";
+                   << "( " << DeclvalArgString() << " ) );\n";
 
-      os << prefix << "  static constexpr bool HasFun_" << name << "() const {\n"
+      os << prefix << "  static constexpr bool HasFun_" << name << "() {\n"
          << prefix << "    return emp::test_type<return_t_" << name << ", WRAPPED_T>();\n"
          << prefix << "  }\n";
 
