@@ -227,11 +227,15 @@ namespace emp {
       return num_orgs;
     }
 
+    void RemoveFromOffspring(Ptr<this_t> offspring_tax) {
+      offspring.erase(offspring_tax);
+    }
+
     /// Remove and offspring taxa after its entire sub-tree has died out (pruning)
     bool RemoveOffspring(Ptr<this_t> offspring_tax) {
       emp_assert(num_offspring > 0, num_offspring, id);
       --num_offspring;
-      offspring.erase(offspring_tax);
+      RemoveFromOffspring(offspring_tax);
 
       // If we are out of BOTH offspring and organisms, this Taxon should deactivate.
       return num_orgs || num_offspring;
@@ -1242,10 +1246,10 @@ namespace emp {
       double med = Median(ns);
       double sum_diffs = 0;
       for (double n : ns) {
-        sum_diffs += abs(n-med);
+        sum_diffs += std::abs(n-med);
       }
 
-      return total + Mean(sum_diffs);
+      return total + sum_diffs/ns.size();
     }
 
     /** Calculate Colless Index of this tree (Colless, 1982; reviewed in Shao, 1990).
@@ -1258,6 +1262,8 @@ namespace emp {
 
       return RecursiveCollessStep(mrca);
     }
+
+    
 
     void RemoveBefore(int ud) {
       
@@ -1416,6 +1422,10 @@ namespace emp {
 
     if (store_active) active_taxa.erase(taxon);
     if (!archive) {   // If we don't archive taxa, delete them.
+      for (Ptr<taxon_t> off_tax : taxon->GetOffspring()) {
+        off_tax->NullifyParent();
+      }
+
       taxon.Delete();
       return;
     }
@@ -1423,7 +1433,9 @@ namespace emp {
     // Only need to track destruction time if we're archiving taxa
     taxon->SetDestructionTime(time);
 
-    if (store_ancestors) ancestor_taxa.insert(taxon);  // Move taxon to ancestors...
+    if (store_ancestors) {
+      ancestor_taxa.insert(taxon);  // Move taxon to ancestors...
+    } 
     if (taxon->GetNumOff() == 0) Prune(taxon);         // ...and prune from there if needed.
   }
 
