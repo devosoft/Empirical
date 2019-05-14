@@ -98,7 +98,7 @@ struct ElementInfo {
   void PrintConceptBase(std::ostream & os, const std::string & prefix) const {
     // Note: Typedefs and variables do not need to be represented in the base class.
     if (IsFunction()) {
-      os << prefix << type << " " << name << "(" << ParamString() << ") "
+      os << prefix << "virtual " << type << " " << name << "(" << ParamString() << ") "
          << AttributeString() << " = 0;\n";
     }
   }
@@ -124,7 +124,7 @@ struct ElementInfo {
                    << " = decltype( std::declval<T>()." << name
                    << "( " << ParamString() << " );\n";
 
-      os << prefix << "  static constexpr bool HasFun_" << name << "() {\n"
+      os << prefix << "  static constexpr bool HasFun_" << name << "() const {\n"
          << prefix << "    return emp::test_type<return_t_" << name << ", WRAPPED_T>();\n"
          << prefix << "  }\n";
 
