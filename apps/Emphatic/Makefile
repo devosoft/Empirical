@@ -22,7 +22,7 @@ $(PROJECT): $(FILES)
 clean:
 	rm -rf $(PROJECT) $(PROJECT).dSYM/ *~
 
-test:
+test: debug
 	./Emphatic examples/ConceptTest.empcc examples/ConceptTest.cc
 	$(CXX) $(CFLAGS_debug) examples/ConceptTest.cc -o examples/ConceptTest
 
