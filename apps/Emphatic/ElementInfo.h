@@ -130,25 +130,41 @@ struct ElementInfo {
       // else if (IsDefault()) os << " = default;\n";
       // else os << " {\n" << prefix << "  " << default_code << "\n" << prefix << "}\n";
 
+      // Build return-type checker.
       os << prefix << "  template <typename T>\n"
          << prefix << "  using return_t_" << name
                    << " = decltype( std::declval<T>()." << name
                    << "( " << DeclvalArgString() << " ) );\n";
 
+      // Build constexpr HasFun_* to determine if function exists.
       os << prefix << "  static constexpr bool HasFun_" << name << "() {\n"
          << prefix << "    return emp::test_type<return_t_" << name << ", WRAPPED_T>();\n"
          << prefix << "  }\n";
 
+      // Build function to call.
       os << prefix << "  " << type << " " << name << "(" << ParamString() << ") "
-                   << AttributeString() << " {\n"
-         << prefix << "    " << "static_assert( HasFun_" << name
-                   << "(), \"\\n\\n  ** Error: concept instance missing required function "
-                   << name << " **\\n\");\n"
-         << prefix << "    if constexpr (HasFun_" << name << "()) {\n"
-         << prefix << "      ";
-      if (type != "void") os << "return ";
-      os << "WRAPPED_T::" << name << "( " << ArgString() << " );\n"
-         << prefix << "    }\n"
-         << prefix << "  }\n";
+                   << AttributeString() << " {\n";
+
+      // If this is a required function, put static assert to ensure it's there before calling.
+      if (IsRequired()) {
+        os << prefix << "    " << "static_assert( HasFun_" << name
+                     << "(), \"\\n\\n  ** Error: concept instance missing required function '"
+                     << name << "' **\\n\");\n";
+        if (type != "void") os << "return ";
+        os << "WRAPPED_T::" << name << "( " << ArgString() << " );\n";
+      }
+
+      // ...otherwise call the correct version, depending on if it's there.
+      else {
+        os << prefix << "    if constexpr (HasFun_" << name << "()) {\n"
+          << prefix << "      ";
+        if (type != "void") os << "return ";
+        os << "WRAPPED_T::" << name << "( " << ArgString() << " );\n"
+           << prefix << "    }\n"
+           << prefix << "    else {\n"
+           << prefix << "      " << default_code << "\n"
+           << prefix << "    }\n";
+      }
+      os << prefix << "  }\n";
     }
   }};
