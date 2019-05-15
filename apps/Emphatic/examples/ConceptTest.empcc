@@ -8,7 +8,6 @@
 #include <iostream>
 
 #include "base/Ptr.h"
-#include "meta/ConceptWrapper.h"
 
 concept TestConcept : TestConcept_Base {
   int x=5;
