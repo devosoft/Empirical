@@ -118,13 +118,13 @@ struct ElementInfo {
   void PrintConceptDerived(std::ostream & os, const std::string & prefix) const {
     if (IsTypedef()) {
       // Build type collector.
-      os << prefix << "  template <typename T> using member_t_" << name
+      os << prefix << "template <typename T> using member_t_" << name
          << " = typename T::" << name << ";\n";
 
       // Build constexpr HasFun_* to determine if function exists.
-      os << prefix << "  static constexpr bool HasType_" << name << "() {\n"
-         << prefix << "    return emp::test_type<member_t_" << name << ", WRAPPED_T>();\n"
-         << prefix << "  }\n";
+      os << prefix << "static constexpr bool HasType_" << name << "() {\n"
+         << prefix << "  return emp::test_type<member_t_" << name << ", WRAPPED_T>();\n"
+         << prefix << "}\n";
 
       // Setup a static assert to ensure required types are present.
       if (IsRequired()) {
@@ -137,51 +137,51 @@ struct ElementInfo {
         // Use a typepack with a filter to identify whether we have a wrapped class with
         // the appropriate type defined or do we need to use the default.
         os << prefix << "using " << name << " = "
-                     << "typename emp::TypePack<WRAPPED_T>::template wrap<has_t_"
+                     << "typename emp::TypePack<WRAPPED_T>::template wrap<member_t_"
                      << name << ">::template push_back<" << default_code << ">::first_t;\n";
       }
     }
     else if (IsVariable()) {
       os << prefix << type << " " << name;
-      if (default_code.size()) os << " = " << default_code << "\n";
+      if (default_code.size()) os << " " << default_code << "\n";
       else os << ";\n";
     }
     else if (IsFunction()) {
       // Build return-type checker.
-      os << prefix << "  template <typename T>\n"
-         << prefix << "  using return_t_" << name
+      os << prefix << "template <typename T>\n"
+         << prefix << "using return_t_" << name
                    << " = decltype( std::declval<T>()." << name
                    << "( " << DeclvalArgString() << " ) );\n";
 
       // Build constexpr HasFun_* to determine if function exists.
-      os << prefix << "  static constexpr bool HasFun_" << name << "() {\n"
-         << prefix << "    return emp::test_type<return_t_" << name << ", WRAPPED_T>();\n"
-         << prefix << "  }\n";
+      os << prefix << "static constexpr bool HasFun_" << name << "() {\n"
+         << prefix << "  return emp::test_type<return_t_" << name << ", WRAPPED_T>();\n"
+         << prefix << "}\n";
 
       // Build function to call.
-      os << prefix << "  " << type << " " << name << "(" << ParamString() << ") "
+      os << prefix << type << " " << name << "(" << ParamString() << ") "
                    << AttributeString() << " {\n";
 
       // If this is a required function, put static assert to ensure it's there before calling.
       if (IsRequired()) {
-        os << prefix << "    " << "static_assert( HasFun_" << name
+        os << prefix << "  " << "static_assert( HasFun_" << name
                      << "(), \"\\n\\n  ** Error: concept instance missing required function '"
                      << name << "' **\\n\");\n";
-        if (type != "void") os << "return ";
+        if (type != "void") os << prefix << "return ";
         os << "WRAPPED_T::" << name << "( " << ArgString() << " );\n";
       }
 
       // ...otherwise call the correct version, depending on if it's there.
       else {
-        os << prefix << "    if constexpr (HasFun_" << name << "()) {\n"
-          << prefix << "      ";
+        os << prefix << "  if constexpr (HasFun_" << name << "()) {\n"
+           << prefix << "    ";
         if (type != "void") os << "return ";
         os << "WRAPPED_T::" << name << "( " << ArgString() << " );\n"
-           << prefix << "    }\n"
-           << prefix << "    else {\n"
-           << prefix << "      " << default_code << "\n"
-           << prefix << "    }\n";
+           << prefix << "  }\n"
+           << prefix << "  else {\n"
+           << prefix << "    " << default_code << "\n"
+           << prefix << "  }\n";
       }
-      os << prefix << "  }\n";
+      os << prefix << "}\n";
     }
   }};
