@@ -128,17 +128,21 @@ public:
     }
   }
 
-  /// Print out the original state of the code.
+  /// Print out the converted C++ code.
+  void PrintOutput(std::ostream & os) const {
+    ast_root.PrintOutput(os, "");
+  }
+
   void PrintOutput(std::string filename) const {
     if (filename == "") {
-      ast_root.PrintOutput(std::cout, "");
-    }
-    else {
+      PrintOutput(std::cout);
+    } else {
       std::ofstream ofile(filename);
-      ast_root.PrintOutput(ofile, "");
+      PrintOutput(ofile);
       ofile.close();
     }
   }
+
 
   /// Collect a line of code, ending with a semi-colon OR mis-matched bracket.
   /// Always stops at a mis-matched ')' '}' or ']'
