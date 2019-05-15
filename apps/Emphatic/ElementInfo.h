@@ -117,7 +117,29 @@ struct ElementInfo {
   /// Print this element as the converted C++ code for the derived class that does reflection.
   void PrintConceptDerived(std::ostream & os, const std::string & prefix) const {
     if (IsTypedef()) {
-      os << prefix << "using " << name << " = " << type << "\n";
+      // Build type collector.
+      os << prefix << "  template <typename T> using member_t_" << name
+         << " = typename T::" << name << ";\n";
+
+      // Build constexpr HasFun_* to determine if function exists.
+      os << prefix << "  static constexpr bool HasType_" << name << "() {\n"
+         << prefix << "    return emp::test_type<member_t_" << name << ", WRAPPED_T>();\n"
+         << prefix << "  }\n";
+
+      // Setup a static assert to ensure required types are present.
+      if (IsRequired()) {
+        os << prefix << "  " << "static_assert( HasType_" << name
+                     << "(), \"\\n\\n  ** Error: concept instance missing required type '"
+                     << name << "' **\\n\");\n";
+        os << prefix << "using " << name << " = typename WRAPPED_T::" << type << "\n";
+      }
+      else {
+        // Use a typepack with a filter to identify whether we have a wrapped class with
+        // the appropriate type defined or do we need to use the default.
+        os << prefix << "using " << name << " = "
+                     << "typename emp::TypePack<WRAPPED_T>::template wrap<has_t_"
+                     << name << ">::template push_back<" << default_code << ">::first_t;\n";
+      }
     }
     else if (IsVariable()) {
       os << prefix << type << " " << name;
@@ -125,11 +147,6 @@ struct ElementInfo {
       else os << ";\n";
     }
     else if (IsFunction()) {
-      // os << prefix << type << " " << name << "(" << ParamString() << ") " << AttributeString();
-      // if (IsRequired()) os << " = required;\n";
-      // else if (IsDefault()) os << " = default;\n";
-      // else os << " {\n" << prefix << "  " << default_code << "\n" << prefix << "}\n";
-
       // Build return-type checker.
       os << prefix << "  template <typename T>\n"
          << prefix << "  using return_t_" << name
