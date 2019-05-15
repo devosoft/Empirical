@@ -14,7 +14,7 @@
 
 int main(int argc, char *argv[])
 {
-  if (argc != 2) {
+  if (argc < 2 || argc > 3) {
     std::cout << "Format: " << argv[0] << " [input file]" << std::endl;
     exit(0);
   }
@@ -27,5 +27,9 @@ int main(int argc, char *argv[])
   codegen.SetDebug();
   codegen.Process();
 
-  codegen.PrintOutput(std::cout);
+  std::string out_filename = "";
+  if (argc > 2) out_filename = argv[2];
+
+  //codegen.PrintEcho(out_filename);
+  codegen.PrintOutput(out_filename);
 }
