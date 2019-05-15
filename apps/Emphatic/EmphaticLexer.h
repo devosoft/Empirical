@@ -30,7 +30,7 @@ public:
     token_string = AddToken("Literal String", "\\\"[^\"]*\\\"");
 
     // Symbol tokens should have least priority.
-    token_symbol = AddToken("Symbol", ".|\"::\"|\"==\"|\"!=\"|\"<=\"|\">=\"|\"->\"|\"&&\"|\"||\"|\"<<\"|\">>\"");
+    token_symbol = AddToken("Symbol", ".|\"::\"|\"==\"|\"!=\"|\"<=\"|\">=\"|\"->\"|\"&&\"|\"||\"|\"<<\"|\">>\"|\"++\"|\"--\"");
 
     // Pre-processor tokens should just get echoed.
     token_pp = AddToken("Pre-Processor", "#(.|\"\\\\\\n\")+");
