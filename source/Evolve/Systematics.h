@@ -1230,7 +1230,7 @@ namespace emp {
     //   return g;
     // }
 
-    double ResursiveCollessStep(Ptr<taxon_t> curr) {
+    double RecursiveCollessStep(Ptr<taxon_t> curr) const {
       while (curr->GetNumOff() == 1) {
         curr = *(curr->GetOffspring().begin());
       }
@@ -1243,16 +1243,21 @@ namespace emp {
       emp::vector<double> ns;
 
       for (Ptr<taxon_t> off : curr->GetOffspring()) {
-        ns.push_back(log(off->GetTotalOffspring() + 2.71828182845904));
+        std::cout << "Recursing on ID: " << off->GetID() << " Offspring: " << off->GetTotalOffspring() << std::endl;
+        ns.push_back(log(off->GetTotalOffspring() + (int)(off->GetNumOrgs()>0)+ 2.71828182845904));
         total += RecursiveCollessStep(off);
       }
 
+      std::cout << "Evaluating: " << curr->GetID() << std::endl;
+
       double med = Median(ns);
       double sum_diffs = 0;
+      std::cout << "Median: " << med << std::endl;
       for (double n : ns) {
+        std::cout << n << std::endl;
         sum_diffs += std::abs(n-med);
       }
-
+      std::cout << "Sumdiffs: " << sum_diffs << " n: " << ns.size() << " average: " << sum_diffs/ns.size() << std::endl;
       return total + sum_diffs/ns.size();
     }
 

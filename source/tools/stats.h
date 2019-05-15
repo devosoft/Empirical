@@ -149,9 +149,9 @@ namespace emp {
   Median(C elements) {
     Sort(elements);
     if (elements.size() % 2 == 1) {
-      return elements[elements.size() / 2 + 1];
+      return elements[elements.size() / 2];
     } else {
-      return (elements[elements.size() / 2] + elements[elements.size() / 2 + 1])/2.0;
+      return (elements[elements.size() / 2 - 1] + elements[elements.size() / 2])/2.0;
     }
   }
 

@@ -820,7 +820,7 @@ TEST_CASE("Tree balance", "[evo]") {
   tree1.RemoveOrg(tree1org6);
   tree1.RemoveOrg(tree1org9);
 
-  REQUIRE(tree1.SackinIndex() == 16);
+  CHECK(tree1.SackinIndex() == 16);
 
   emp::Systematics<int, int> tree2([](const int & i){return i;}, true, true, false, false);
 
@@ -842,5 +842,127 @@ TEST_CASE("Tree balance", "[evo]") {
   tree2.RemoveOrg(tree2org7);
   tree2.RemoveOrg(tree2org9);
 
-  REQUIRE(tree2.SackinIndex() == 16);
+  CHECK(tree2.SackinIndex() == 16);
+
+  emp::Systematics<int, int> tree3([](const int & i){return i;}, true, true, false, false);
+
+  auto tree3org1 = tree3.AddOrg(1, nullptr);
+  auto tree3org2 = tree3.AddOrg(2, tree3org1);
+  auto tree3org3 = tree3.AddOrg(3, tree3org2);
+  auto tree3org4 = tree3.AddOrg(4, tree3org2);
+  auto tree3org5 = tree3.AddOrg(5, tree3org4);
+  auto tree3org6 = tree3.AddOrg(6, tree3org4);
+  auto tree3org7 = tree3.AddOrg(7, tree3org6);
+  auto tree3org8 = tree3.AddOrg(8, tree3org6);
+  auto tree3org9 = tree3.AddOrg(9, tree3org1);
+  auto tree3org10 = tree3.AddOrg(10, tree3org9);
+  auto tree3org11 = tree3.AddOrg(11, tree3org9);
+
+  tree3.RemoveOrg(tree3org1);
+  tree3.RemoveOrg(tree3org2);
+  tree3.RemoveOrg(tree3org4);
+  tree3.RemoveOrg(tree3org6);
+  tree3.RemoveOrg(tree3org9);
+
+  CHECK(tree3.SackinIndex() == 17);
+
+  emp::Systematics<int, int> tree29([](const int & i){return i;}, true, true, false, false);
+
+  auto tree29org1 = tree29.AddOrg(1, nullptr);
+  auto tree29org2 = tree29.AddOrg(2, tree29org1);
+  auto tree29org3 = tree29.AddOrg(3, tree29org1);
+  auto tree29org4 = tree29.AddOrg(4, tree29org3);
+  auto tree29org5 = tree29.AddOrg(5, tree29org3);
+  auto tree29org6 = tree29.AddOrg(6, tree29org3);
+  auto tree29org7 = tree29.AddOrg(7, tree29org3);
+  auto tree29org8 = tree29.AddOrg(8, tree29org3);
+
+  tree29.RemoveOrg(tree29org1);
+  tree29.RemoveOrg(tree29org3);
+
+  CHECK(tree29.SackinIndex() == 11);
+
+  emp::Systematics<int, int> tree30([](const int & i){return i;}, true, true, false, false);
+
+  auto tree30org1 = tree30.AddOrg(1, nullptr);
+  auto tree30org2 = tree30.AddOrg(2, tree30org1);
+  auto tree30org3 = tree30.AddOrg(3, tree30org1);
+  auto tree30org4 = tree30.AddOrg(4, tree30org1);
+  auto tree30org5 = tree30.AddOrg(5, tree30org4);
+  auto tree30org6 = tree30.AddOrg(6, tree30org4);
+  auto tree30org7 = tree30.AddOrg(7, tree30org4);
+  auto tree30org8 = tree30.AddOrg(8, tree30org4);
+
+  tree30.RemoveOrg(tree30org1);
+  tree30.RemoveOrg(tree30org4);
+
+  CHECK(tree30.SackinIndex() == 10);
+
+  emp::Systematics<int, int> tree31([](const int & i){return i;}, true, true, false, false);
+
+  auto tree31org1 = tree31.AddOrg(1, nullptr);
+  auto tree31org2 = tree31.AddOrg(2, tree31org1);
+  auto tree31org3 = tree31.AddOrg(3, tree31org1);
+  auto tree31org4 = tree31.AddOrg(4, tree31org1);
+  auto tree31org5 = tree31.AddOrg(5, tree31org1);
+  auto tree31org6 = tree31.AddOrg(6, tree31org5);
+  auto tree31org7 = tree31.AddOrg(7, tree31org5);
+  auto tree31org8 = tree31.AddOrg(8, tree31org5);
+
+  tree31.RemoveOrg(tree31org1);
+  tree31.RemoveOrg(tree31org5);
+
+  CHECK(tree31.SackinIndex() == 9);
+
+  emp::Systematics<int, int> tree32([](const int & i){return i;}, true, true, false, false);
+
+  auto tree32org1 = tree32.AddOrg(1, nullptr);
+  auto tree32org2 = tree32.AddOrg(2, tree32org1);
+  auto tree32org3 = tree32.AddOrg(3, tree32org1);
+  auto tree32org4 = tree32.AddOrg(4, tree32org1);
+  auto tree32org5 = tree32.AddOrg(5, tree32org1);
+  auto tree32org6 = tree32.AddOrg(6, tree32org1);
+  auto tree32org7 = tree32.AddOrg(7, tree32org6);
+  auto tree32org8 = tree32.AddOrg(8, tree32org6);
+
+  tree32.RemoveOrg(tree32org1);
+  tree32.RemoveOrg(tree32org6);
+
+  CHECK(tree32.SackinIndex() == 8);
+
+  emp::Systematics<int, int> tree33([](const int & i){return i;}, true, true, false, false);
+
+  auto tree33org1 = tree33.AddOrg(1, nullptr);
+  auto tree33org2 = tree33.AddOrg(2, tree33org1);
+  auto tree33org3 = tree33.AddOrg(3, tree33org1);
+  auto tree33org4 = tree33.AddOrg(4, tree33org1);
+  auto tree33org5 = tree33.AddOrg(5, tree33org1);
+  auto tree33org6 = tree33.AddOrg(6, tree33org1);
+  auto tree33org7 = tree33.AddOrg(7, tree33org1);
+
+  tree33.RemoveOrg(tree33org1);
+  CHECK(tree33.SackinIndex() == 6);
+
+  // From CollessLike metric paper
+  emp::Systematics<int, int> treecl([](const int & i){return i;}, true, true, false, false);  
+  auto treeclorg1 = treecl.AddOrg(1, nullptr);
+  auto treeclorg2 = treecl.AddOrg(2, treeclorg1);
+  auto treeclorg3 = treecl.AddOrg(3, treeclorg1);
+  auto treeclorg4 = treecl.AddOrg(4, treeclorg2);
+  auto treeclorg5 = treecl.AddOrg(5, treeclorg2);
+  auto treeclorg6 = treecl.AddOrg(6, treeclorg2);
+  auto treeclorg7 = treecl.AddOrg(7, treeclorg2);
+  auto treeclorg8 = treecl.AddOrg(8, treeclorg2);
+  auto treeclorg9 = treecl.AddOrg(9, treeclorg3);
+  auto treeclorg10 = treecl.AddOrg(10, treeclorg3);
+  auto treeclorg11 = treecl.AddOrg(11, treeclorg10);
+  auto treeclorg12 = treecl.AddOrg(12, treeclorg10);
+
+  treecl.RemoveOrg(treeclorg1);
+  treecl.RemoveOrg(treeclorg2);
+  treecl.RemoveOrg(treeclorg3);
+  treecl.RemoveOrg(treeclorg10);
+
+  CHECK(treecl.SackinIndex() == 18);
+  CHECK(treecl.CollessLikeIndex() == Approx(1.746));
 }
