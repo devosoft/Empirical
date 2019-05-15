@@ -90,7 +90,7 @@ struct ElementInfo {
   /// Print this element as the Emphatic C++ code that would have generated it.
   void PrintEcho(std::ostream & os, const std::string & prefix) const {
     if (IsTypedef()) {
-      os << prefix << "using " << name << " = " << type << "\n";
+      os << prefix << "using " << name << " = " << default_code << "\n";
     }
     else if (IsVariable()) {
       os << prefix << type << " " << name;
@@ -131,7 +131,7 @@ struct ElementInfo {
         os << prefix << "  " << "static_assert( HasType_" << name
                      << "(), \"\\n\\n  ** Error: concept instance missing required type '"
                      << name << "' **\\n\");\n";
-        os << prefix << "using " << name << " = typename WRAPPED_T::" << type << "\n";
+        os << prefix << "using " << name << " = typename WRAPPED_T::" << name << ";\n";
       }
       else {
         // Use a typepack with a filter to identify whether we have a wrapped class with
