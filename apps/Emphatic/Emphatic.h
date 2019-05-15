@@ -282,11 +282,21 @@ public:
 
     if (AsLexeme(pos) == "using") {              // ----- USING!! -----
       pos++;  // Move past "using"
-      RequireID(pos, "A 'using' command must first specify the new type name.");
+      RequireID(pos, "A 'using' command must first specify the name of the type being defined.");
 
-      new_element.name = ProcessType(pos);      // Determine new type name being defined.
+      new_element.name = AsLexeme(pos++);               // NAme of new type.
       RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
-      new_element.type = ProcessCode(pos);      // Determine code being assigned to.
+
+      // Identify if this type is required in the base class
+      if (AsLexeme(pos) == "required") {
+        new_element.special_value = AsLexeme(pos++);
+      }
+      // Otherwise, save the default type.
+      else {
+        new_element.default_code = ProcessType(pos);      // Determine code being assigned to.
+      }
+ 
+      RequireChar(';', pos++, "A using statement must end in a semi-colon.");
       new_element.SetTypedef();
     }
     else {
