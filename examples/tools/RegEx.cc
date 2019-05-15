@@ -107,4 +107,11 @@ int main()
   // Test string identification
   emp::RegEx re5("\\\"[^\"]*\\\"");
   re5.PrintDebug();
+
+  // Test combinations of + and *
+  std::cout << "------------\n";
+  emp::RegEx re6("(0+0)*");
+  re6.PrintDebug();
+  auto NFA6 = emp::to_NFA(re6);
+  NFA6.Print();
 }
