@@ -164,7 +164,8 @@ struct AST_Concept : AST_Node {
     // Print all of the TEMPLATE WRAPPER details.
     os << prefix << "/// === Concept wrapper (base class is " << base_name << ") ===\n"
         << prefix << "template <typename WRAPPED_T>\n"
-        << prefix << "class " << name << " : WRAPPED_T, " << base_name << " {\n"
+        << prefix << "class " << name << " : public WRAPPED_T, public " << base_name << " {\n"
+        << prefix << "public:\n"
         << prefix << "  using this_t = " << name << "<WRAPPED_T>;\n\n";
 
     // Print concept info for all derived members
