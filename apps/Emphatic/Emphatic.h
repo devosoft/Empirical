@@ -130,6 +130,12 @@ public:
 
   /// Print out the converted C++ code.
   void PrintOutput(std::ostream & os) const {
+    os << "/****************************************\n"
+       << " *  This is an auto-generated file.\n"
+       << " ****************************************/\n"
+       << "\n"
+       << "#include \"meta/TypePack.h\""
+       << "\n";
     ast_root.PrintOutput(os, "");
   }
 
