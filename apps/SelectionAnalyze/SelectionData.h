@@ -127,7 +127,8 @@ public:
     emp::File file(filename);              // Load in file data.
     file.RemoveComments('#');              // Trim off any comments beginning with a '#'
     file.RemoveEmpty();                    // Remove any line that used to have comments and are now empty.
-    auto headers = file.ExtractRow();      // Load in the column headers in the first row.
+    auto col_headers = file.ExtractRow();  // Load in the column headers in the first row.
+    auto row_headers = file.ExtractCol();  // Load in the row headers in the first row.
     file.RemoveWhitespace();               // Remove all remaining spaces and tabs.
     org_chart = file.ToData<double>();     // Load in fitness data for each organism from file.
     fitness_chart = emp::Transpose(org_chart); // Organize data based on fitnesses rather than organisms.
@@ -333,19 +334,19 @@ public:
 
       // Compare all orgs to find direct domination.
       progress += AnalyzeLexicase_RemoveDominated();
-      std::cout << "After CompareOrgs = " << progress << std::endl;
+      std::cout << "After CompareOrgs, progress count = " << progress << std::endl;
 
       // Remove criteria that cannot discriminate among orgs.
       progress += AnalyzeLexicase_RemoveNonDiscriminatory();
-      std::cout << "After RemoveNonDiscriminatory = " << progress << std::endl;
+      std::cout << "After RemoveNonDiscriminatory, progress count = " << progress << std::endl;
 
       // Remove orgs that cannot win on any criteria.
       progress += AnalyzeLexicase_RemoveHopelessOrgs();
-      std::cout << "After RemoveHopelessOrgs = " << progress << std::endl;
+      std::cout << "After RemoveHopelessOrgs, progress count = " << progress << std::endl;
 
       // Remove duplicate criteria (that perform identically to others)
       progress += AnalyzeLexicase_RemoveDuplicateCriteria();
-      std::cout << "After RemoveDuplicateCriteria = " << progress << std::endl;
+      std::cout << "After RemoveDuplicateCriteria, progress count = " << progress << std::endl;
     }
   }
 
