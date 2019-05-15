@@ -129,9 +129,131 @@ TEST_CASE("Test Systematics", "[evo]")
   std::cout << "id3 = " << id3 << std::endl;
   std::cout << "id4 = " << id4 << std::endl;
 
-  std::cout << "\nLineage:\n";
-  sys.PrintLineage(id4);
+  std::stringstream result;
+
+  sys.PrintLineage(id4, result);
   sys.PrintStatus();
+
+  REQUIRE(result.str() == "Lineage:\n27\n-10\n25\n");
+
+  CHECK(sys.GetStoreActive() == 1);
+  CHECK(sys.GetStoreAncestors() == 1);
+  CHECK(sys.GetStoreOutside() == 1);
+  CHECK(sys.GetArchive() == 1);
+  CHECK(sys.GetTrackSynchronous() == 0);
+  CHECK(sys.GetNextID() == 19);
+  CHECK(sys.GetNumActive() == 11);
+  CHECK(sys.GetNumAncestors() == 7);
+  CHECK(sys.GetNumOutside() == 1);
+
+  auto ancestors = sys.GetAncestors();
+  emp::vector<emp::Ptr<emp::Taxon<int>>> ancestor_vec(ancestors.begin(), ancestors.end());
+  emp::Sort(ancestor_vec, [](emp::Ptr<emp::Taxon<int>> & a, emp::Ptr<emp::Taxon<int>> & b){
+    return a->GetID() < b->GetID();
+  });
+
+  CHECK(ancestor_vec[0]->GetID() == 1);
+  CHECK(ancestor_vec[0]->GetNumOrgs() == 0);
+  CHECK(ancestor_vec[0]->GetNumOff() == 3);
+  CHECK(ancestor_vec[0]->GetParent() == nullptr);
+
+  CHECK(ancestor_vec[1]->GetID() == 2);
+  CHECK(ancestor_vec[1]->GetNumOrgs() == 0);
+  CHECK(ancestor_vec[1]->GetNumOff() == 2);
+  CHECK(ancestor_vec[1]->GetParent()->GetID() == 1);
+
+  CHECK(ancestor_vec[2]->GetID() == 7);
+  CHECK(ancestor_vec[2]->GetNumOrgs() == 0);
+  CHECK(ancestor_vec[2]->GetNumOff() == 1);
+  CHECK(ancestor_vec[2]->GetParent()->GetID() == 1);
+
+  CHECK(ancestor_vec[3]->GetID() == 8);
+  CHECK(ancestor_vec[3]->GetNumOrgs() == 0);
+  CHECK(ancestor_vec[3]->GetNumOff() == 1);
+  CHECK(ancestor_vec[3]->GetParent()->GetID() == 7);
+
+  CHECK(ancestor_vec[4]->GetID() == 9);
+  CHECK(ancestor_vec[4]->GetNumOrgs() == 0);
+  CHECK(ancestor_vec[4]->GetNumOff() == 1);
+  CHECK(ancestor_vec[4]->GetParent()->GetID() == 8);
+
+  CHECK(ancestor_vec[5]->GetID() == 13);
+  CHECK(ancestor_vec[5]->GetNumOrgs() == 0);
+  CHECK(ancestor_vec[5]->GetNumOff() == 1);
+  CHECK(ancestor_vec[5]->GetParent()->GetID() == 12);
+
+  CHECK(ancestor_vec[6]->GetID() == 14);
+  CHECK(ancestor_vec[6]->GetNumOrgs() == 0);
+  CHECK(ancestor_vec[6]->GetNumOff() == 1);
+  CHECK(ancestor_vec[6]->GetParent()->GetID() == 13);
+
+  auto outside_taxon = *(sys.GetOutside().begin());
+  CHECK(outside_taxon->GetID() == 10);
+  CHECK(outside_taxon->GetNumOrgs() == 0);
+  CHECK(outside_taxon->GetNumOff() == 0);
+  CHECK(outside_taxon->GetParent()->GetID() == 8);
+
+  auto active = sys.GetActive();
+  emp::vector<emp::Ptr<emp::Taxon<int>>> active_vec(active.begin(), active.end());
+  emp::Sort(active_vec, [](emp::Ptr<emp::Taxon<int>> & a, emp::Ptr<emp::Taxon<int>> & b){
+    return a->GetID() < b->GetID();
+  });
+
+  CHECK(active_vec[0]->GetID() == 3);
+  CHECK(active_vec[0]->GetNumOrgs() == 1);
+  CHECK(active_vec[0]->GetNumOff() == 0);
+  CHECK(active_vec[0]->GetParent()->GetID() == 1);
+
+  CHECK(active_vec[1]->GetID() == 4);
+  CHECK(active_vec[1]->GetNumOrgs() == 1);
+  CHECK(active_vec[1]->GetNumOff() == 0);
+  CHECK(active_vec[1]->GetParent()->GetID() == 2);
+
+  CHECK(active_vec[2]->GetID() == 5);
+  CHECK(active_vec[2]->GetNumOrgs() == 1);
+  CHECK(active_vec[2]->GetNumOff() == 1);
+  CHECK(active_vec[2]->GetParent()->GetID() == 2);
+
+  CHECK(active_vec[3]->GetID() == 6);
+  CHECK(active_vec[3]->GetNumOrgs() == 1);
+  CHECK(active_vec[3]->GetNumOff() == 0);
+  CHECK(active_vec[3]->GetParent()->GetID() == 5);
+
+  CHECK(active_vec[4]->GetID() == 11);
+  CHECK(active_vec[4]->GetNumOrgs() == 1);
+  CHECK(active_vec[4]->GetNumOff() == 3);
+  CHECK(active_vec[4]->GetParent()->GetID() == 9);
+
+  CHECK(active_vec[5]->GetID() == 12);
+  CHECK(active_vec[5]->GetNumOrgs() == 1);
+  CHECK(active_vec[5]->GetNumOff() == 1);
+  CHECK(active_vec[5]->GetParent()->GetID() == 11);
+
+  CHECK(active_vec[6]->GetID() == 15);
+  CHECK(active_vec[6]->GetNumOrgs() == 1);
+  CHECK(active_vec[6]->GetNumOff() == 0);
+  CHECK(active_vec[6]->GetParent()->GetID() == 14);
+
+  CHECK(active_vec[7]->GetID() == 16);
+  CHECK(active_vec[7]->GetNumOrgs() == 1);
+  CHECK(active_vec[7]->GetNumOff() == 0);
+  CHECK(active_vec[7]->GetParent()->GetID() == 11);
+
+  CHECK(active_vec[8]->GetID() == 17);
+  CHECK(active_vec[8]->GetNumOrgs() == 1);
+  CHECK(active_vec[8]->GetNumOff() == 2);
+  CHECK(active_vec[8]->GetParent()->GetID() == 11);
+
+  CHECK(active_vec[9]->GetID() == 18);
+  CHECK(active_vec[9]->GetNumOrgs() == 1);
+  CHECK(active_vec[9]->GetNumOff() == 0);
+  CHECK(active_vec[9]->GetParent()->GetID() == 17);
+
+  CHECK(active_vec[10]->GetID() == 19);
+  CHECK(active_vec[10]->GetNumOrgs() == 1);
+  CHECK(active_vec[10]->GetNumOff() == 0);
+  CHECK(active_vec[10]->GetParent()->GetID() == 17);
+
 }
 
 TEST_CASE("Test not tracking ancestors", "[evo]")
@@ -208,9 +330,83 @@ TEST_CASE("Test not tracking ancestors", "[evo]")
   std::cout << "id3 = " << id3 << std::endl;
   std::cout << "id4 = " << id4 << std::endl;
 
-  std::cout << "\nLineage:\n";
-  sys.PrintLineage(id4);
+  std::stringstream result;
+
+  sys.PrintLineage(id4, result);
   sys.PrintStatus();
+  CHECK(result.str() == "Lineage:\n27\n");
+
+  CHECK(sys.GetStoreActive() == 1);
+  CHECK(sys.GetStoreAncestors() == 0);
+  CHECK(sys.GetStoreOutside() == 0);
+  CHECK(sys.GetArchive() == 0);
+  CHECK(sys.GetTrackSynchronous() == 0);
+  CHECK(sys.GetNextID() == 19);
+  CHECK(sys.GetNumActive() == 11);
+  CHECK(sys.GetNumAncestors() == 0);
+  CHECK(sys.GetNumOutside() == 0);
+
+  auto active = sys.GetActive();
+  emp::vector<emp::Ptr<emp::Taxon<int>>> active_vec(active.begin(), active.end());
+  emp::Sort(active_vec, [](emp::Ptr<emp::Taxon<int>> & a, emp::Ptr<emp::Taxon<int>> & b){
+    return a->GetID() < b->GetID();
+  });
+
+  CHECK(active_vec[0]->GetID() == 3);
+  CHECK(active_vec[0]->GetNumOrgs() == 1);
+  CHECK(active_vec[0]->GetNumOff() == 0);
+  CHECK(active_vec[0]->GetParent() == nullptr);
+
+  CHECK(active_vec[1]->GetID() == 4);
+  CHECK(active_vec[1]->GetNumOrgs() == 1);
+  CHECK(active_vec[1]->GetNumOff() == 0);
+  CHECK(active_vec[1]->GetParent() == nullptr);
+
+  CHECK(active_vec[2]->GetID() == 5);
+  CHECK(active_vec[2]->GetNumOrgs() == 1);
+  CHECK(active_vec[2]->GetNumOff() == 1);
+  CHECK(active_vec[2]->GetParent() == nullptr);
+
+  CHECK(active_vec[3]->GetID() == 6);
+  CHECK(active_vec[3]->GetNumOrgs() == 1);
+  CHECK(active_vec[3]->GetNumOff() == 0);
+  CHECK(active_vec[3]->GetParent()->GetID() == 5);
+
+  CHECK(active_vec[4]->GetID() == 11);
+  CHECK(active_vec[4]->GetNumOrgs() == 1);
+  CHECK(active_vec[4]->GetNumOff() == 3);
+  CHECK(active_vec[4]->GetParent() == nullptr);
+
+  CHECK(active_vec[5]->GetID() == 12);
+  CHECK(active_vec[5]->GetNumOrgs() == 1);
+  CHECK(active_vec[5]->GetNumOff() == 1);
+  CHECK(active_vec[5]->GetParent()->GetID() == 11);
+
+  CHECK(active_vec[6]->GetID() == 15);
+  CHECK(active_vec[6]->GetNumOrgs() == 1);
+  CHECK(active_vec[6]->GetNumOff() == 0);
+  CHECK(active_vec[6]->GetParent() == nullptr);
+
+  CHECK(active_vec[7]->GetID() == 16);
+  CHECK(active_vec[7]->GetNumOrgs() == 1);
+  CHECK(active_vec[7]->GetNumOff() == 0);
+  CHECK(active_vec[7]->GetParent()->GetID() == 11);
+
+  CHECK(active_vec[8]->GetID() == 17);
+  CHECK(active_vec[8]->GetNumOrgs() == 1);
+  CHECK(active_vec[8]->GetNumOff() == 2);
+  CHECK(active_vec[8]->GetParent()->GetID() == 11);
+
+  CHECK(active_vec[9]->GetID() == 18);
+  CHECK(active_vec[9]->GetNumOrgs() == 1);
+  CHECK(active_vec[9]->GetNumOff() == 0);
+  CHECK(active_vec[9]->GetParent()->GetID() == 17);
+
+  CHECK(active_vec[10]->GetID() == 19);
+  CHECK(active_vec[10]->GetNumOrgs() == 1);
+  CHECK(active_vec[10]->GetNumOff() == 0);
+  CHECK(active_vec[10]->GetParent()->GetID() == 17);
+
 }
 
 
@@ -233,7 +429,7 @@ TEST_CASE("Test Data Struct", "[evo]")
   id2->GetData().mut_counts["substitution"] = 2;
   id2->GetData().fitness.Add(1);
   id2->GetData().phenotype = 6;
-  REQUIRE(id2->GetData().mut_counts["substitution"] == 2);
+  CHECK(id2->GetData().mut_counts["substitution"] == 2);
 
   auto id3 = sys->AddOrg(3, id1);
   id3->GetData().mut_counts["substitution"] = 5;
@@ -251,20 +447,20 @@ TEST_CASE("Test Data Struct", "[evo]")
   id5->GetData().phenotype = 6;
 
 
-  REQUIRE(CountMuts(id4) == 3);
-  REQUIRE(CountDeleteriousSteps(id4) == 1);
-  REQUIRE(CountPhenotypeChanges(id4) == 1);
-  REQUIRE(CountUniquePhenotypes(id4) == 2);
+  CHECK(CountMuts(id4) == 3);
+  CHECK(CountDeleteriousSteps(id4) == 1);
+  CHECK(CountPhenotypeChanges(id4) == 1);
+  CHECK(CountUniquePhenotypes(id4) == 2);
 
-  REQUIRE(CountMuts(id3) == 5);
-  REQUIRE(CountDeleteriousSteps(id3) == 1);
-  REQUIRE(CountPhenotypeChanges(id3) == 0);
-  REQUIRE(CountUniquePhenotypes(id3) == 1);
+  CHECK(CountMuts(id3) == 5);
+  CHECK(CountDeleteriousSteps(id3) == 1);
+  CHECK(CountPhenotypeChanges(id3) == 0);
+  CHECK(CountUniquePhenotypes(id3) == 1);
 
-  REQUIRE(CountMuts(id5) == 4);
-  REQUIRE(CountDeleteriousSteps(id5) == 2);
-  REQUIRE(CountPhenotypeChanges(id5) == 2);
-  REQUIRE(CountUniquePhenotypes(id5) == 2);
+  CHECK(CountMuts(id5) == 4);
+  CHECK(CountDeleteriousSteps(id5) == 2);
+  CHECK(CountPhenotypeChanges(id5) == 2);
+  CHECK(CountUniquePhenotypes(id5) == 2);
 
   sys.Delete();
 
@@ -601,4 +797,50 @@ TEST_CASE("Test GetCanopy", "[evo]")
   // std::cout << "\nAddOrg 30 (id7; parent id1)\n";
   // auto id7 = sys.AddOrg(30, id1, 6);
 
+}
+
+// Tests from Shao 1990 tree balance paper
+TEST_CASE("Tree balance", "[evo]") {
+  emp::Systematics<int, int> tree1([](const int & i){return i;}, true, true, false, false);
+
+  auto tree1org1 = tree1.AddOrg(1, nullptr);
+  auto tree1org2 = tree1.AddOrg(2, tree1org1);
+  auto tree1org3 = tree1.AddOrg(3, tree1org2);
+  auto tree1org4 = tree1.AddOrg(4, tree1org3);
+  auto tree1org5 = tree1.AddOrg(5, tree1org3);
+  auto tree1org6 = tree1.AddOrg(6, tree1org2);
+  auto tree1org7 = tree1.AddOrg(7, tree1org6);
+  auto tree1org8 = tree1.AddOrg(8, tree1org6);
+  auto tree1org9 = tree1.AddOrg(9, tree1org1);
+  auto tree1org10 = tree1.AddOrg(10, tree1org9);
+  auto tree1org11 = tree1.AddOrg(11, tree1org9);
+  tree1.RemoveOrg(tree1org1);
+  tree1.RemoveOrg(tree1org2);
+  tree1.RemoveOrg(tree1org3);
+  tree1.RemoveOrg(tree1org6);
+  tree1.RemoveOrg(tree1org9);
+
+  REQUIRE(tree1.SackinIndex() == 16);
+
+  emp::Systematics<int, int> tree2([](const int & i){return i;}, true, true, false, false);
+
+  auto tree2org1 = tree2.AddOrg(1, nullptr);
+  auto tree2org2 = tree2.AddOrg(2, tree2org1);
+  auto tree2org3 = tree2.AddOrg(3, tree2org2);
+  auto tree2org4 = tree2.AddOrg(4, tree2org3);
+  auto tree2org5 = tree2.AddOrg(5, tree2org3);
+  auto tree2org6 = tree2.AddOrg(6, tree2org2);
+  auto tree2org7 = tree2.AddOrg(7, tree2org1);
+  auto tree2org8 = tree2.AddOrg(8, tree2org7);
+  auto tree2org9 = tree2.AddOrg(9, tree2org7);
+  auto tree2org10 = tree2.AddOrg(10, tree2org9);
+  auto tree2org11 = tree2.AddOrg(11, tree2org9);
+
+  tree2.RemoveOrg(tree2org1);
+  tree2.RemoveOrg(tree2org2);
+  tree2.RemoveOrg(tree2org3);
+  tree2.RemoveOrg(tree2org7);
+  tree2.RemoveOrg(tree2org9);
+
+  REQUIRE(tree2.SackinIndex() == 16);
 }

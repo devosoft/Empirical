@@ -311,6 +311,9 @@ namespace emp {
     /// How many independent trees are being tracked?
     size_t GetNumRoots() const { return num_roots; }
 
+    /// What ID will the next taxon have?
+    size_t GetNextID() const {return next_id;}
+
     /// What is the average phylogenetic depth of organisms in the population?
     double GetAveDepth() const { return ((double) total_depth) / (double) org_count; }
 
@@ -549,7 +552,8 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > * GetActivePtr() { return &active_taxa; }
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetActive() const { return active_taxa; }
     const std::unordered_set< Ptr<taxon_t>, hash_t > & GetAncestors() const { return ancestor_taxa; }
-
+    const std::unordered_set< Ptr<taxon_t>, hash_t > & GetOutside() const { return outside_taxa; }
+  
     /// How many taxa are still active in the population?
     size_t GetNumActive() const { return active_taxa.size(); }
 
@@ -1098,7 +1102,7 @@ namespace emp {
       int sackin = 0;
 
       for (auto taxon : active_taxa) {
-        sackin += GetBranchesToRoot(taxon);
+        sackin += GetBranchesToRoot(taxon) + 1; // Sackin index counts root as branch
       }
 
       return sackin;
