@@ -107,8 +107,9 @@ public:
     , is_dominated(), is_active(), is_discrim()
     , org_info(), fit_info()
   { Reset(); }
-  SelectionData(const std::string & filename) : SelectionData() {
-    Load(filename);
+  SelectionData(const std::string & filename, bool use_row_headings=true, bool use_col_headings=true)
+    : SelectionData() {
+    Load(filename, use_row_headings, use_col_headings);
   }
   ~SelectionData() { ; }
 
@@ -123,12 +124,12 @@ public:
   /// * First row is column headings
   /// * Additional ROWS represent organisms
   /// * COLS represent selection criteria (e.g. fitness function results)
-  void Load(const std::string & filename) {
+  void Load(const std::string & filename, bool use_row_headings=true, bool use_col_headings=true) {
     emp::File file(filename);              // Load in file data.
     file.RemoveComments('#');              // Trim off any comments beginning with a '#'
     file.RemoveEmpty();                    // Remove any line that used to have comments and are now empty.
-    auto col_headers = file.ExtractRow();  // Load in the column headers in the first row.
-    auto row_headers = file.ExtractCol();  // Load in the row headers in the first row.
+    if (use_col_headings) file.ExtractRow();  // Load in the column headers in the first row.
+    if (use_row_headings) file.ExtractCol();  // Load in the row headers in the first row.
     file.RemoveWhitespace();               // Remove all remaining spaces and tabs.
     org_chart = file.ToData<double>();     // Load in fitness data for each organism from file.
     fitness_chart = emp::Transpose(org_chart); // Organize data based on fitnesses rather than organisms.
