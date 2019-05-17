@@ -543,6 +543,9 @@ namespace emp {
     /// Count the number of ones in the BitVector.
     size_t CountOnes() const { return CountOnes_Mixed(); }
 
+    /// Count the number of zeros in the BitVector.
+    size_t CountZeros() const { return GetSize() - CountOnes(); }
+
     /// Return the position of the first one; return -1 if no ones in vector.
     int FindBit() const {
       const size_t NUM_FIELDS = NumFields();
