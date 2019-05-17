@@ -17,6 +17,7 @@
 #include "../../source/base/vector.h"
 #include "../../source/tools/BitVector.h"
 #include "../../source/tools/File.h"
+#include "../../source/tools/random_utils.h"
 #include "../../source/tools/vector_utils.h"
 
 class SelectionData {
@@ -54,10 +55,10 @@ private:
   void Reset() {
     prob_cache.clear();
     is_dominated.Resize(GetNumOrgs());
-    is_active.Resize(GetNumOrgs());
-    is_discrim.Resize(GetNumCriteria());
     is_dominated.Clear();
+    is_active.Resize(GetNumOrgs());
     is_active.SetAll();
+    is_discrim.Resize(GetNumCriteria());
     is_discrim.SetAll();
     org_info.resize(0);
     org_info.resize(GetNumOrgs());
@@ -111,7 +112,12 @@ public:
     : SelectionData() {
     Load(filename, use_row_headings, use_col_headings);
   }
+  SelectionData(const SelectionData &) = default;
+  SelectionData(SelectionData &&) = default;
   ~SelectionData() { ; }
+
+  SelectionData & operator=(const SelectionData &) = default;
+  SelectionData & operator=(SelectionData &&) = default;
 
   size_t GetNumCriteria() const { return fitness_chart.size(); }
   size_t GetNumOrgs() const { return org_chart.size(); }
@@ -176,18 +182,19 @@ public:
     }
   }
 
-  void PrintSelectProbs(std::ostream & os=std::cout, bool sort_output=false) {
-    // double total = 0.0;
+  emp::vector<double> GetSelectProbs(std::ostream & os=std::cout, bool sort_output=false) {
     emp::vector<double> probs(GetNumOrgs());
     for (size_t i = 0; i < GetNumOrgs(); i++) {
       probs[i] = org_info[i].select_prob;
-      // os << org_info[i].select_prob << " ";
-      // total += org_info[i].select_prob;
     }
     if (sort_output) std::sort(probs.rbegin(), probs.rend());
+    return probs;
+  }
+
+  void PrintSelectProbs(std::ostream & os=std::cout, bool sort_output=false) {
+    emp::vector<double> probs = GetSelectProbs(os, sort_output);
     for (double x : probs) os << x << " ";
     os << std::endl;
-    // os << "total prob = " << total << std::endl;
   }
 
   // Loop through all pairs of active organisms.  If any are dominated, remove them.
@@ -210,6 +217,7 @@ public:
         bool maybe_dom1 = true;
         bool maybe_dom2 = true;
         for (size_t fit_id = 0; fit_id < num_fits; fit_id++) {
+          if (is_dominated[fit_id]) continue;    // Ignore functions that have already been removed.
           if (org1[fit_id] < org2[fit_id]) {
             maybe_dom1 = false;
             if (maybe_dom2 == false) break;
@@ -265,7 +273,9 @@ public:
 
       bool discrim = false;
       double max_fit = (double) GetNumOrgs();
-      for (double fit : fitness_chart[fit_id]) {
+      for (size_t org_id = 0; org_id < GetNumOrgs(); org_id++) {
+        if (!is_active[org_id]) continue;             // Only consider on active organisms.
+        double fit = fitness_chart[fit_id][org_id];   // Get fitness for this organism.
         if (fit != 0 && fit != max_fit) {
           discrim = true;
           break;
@@ -282,6 +292,9 @@ public:
 
   // Remove any organisms that do not win (or tie for win) on ANY criteria.
   size_t AnalyzeLexicase_RemoveHopelessOrgs() {
+    // If there are no fitness functions left, skip this step.
+    if (is_discrim.None()) return 0;
+
     size_t progress = 0;
 
     double max_fit = (double) GetNumOrgs();
@@ -329,43 +342,66 @@ public:
     return progress;
   }
 
-  void AnalyzeLexicase() {
-    Reset();
+  void AnalyzeLexicase(bool reset_orgs=true) {
+    if (reset_orgs) Reset();
 
     size_t progress = 1;
 
     while (progress) {
       progress = 0;
 
+      emp_assert(is_active.Any());
+
       // Compare all orgs to find direct domination.
       progress += AnalyzeLexicase_RemoveDominated();
       std::cout << "After CompareOrgs, progress count = " << progress << std::endl;
+
+      emp_assert(is_active.Any());
 
       // Remove criteria that cannot discriminate among orgs.
       progress += AnalyzeLexicase_RemoveNonDiscriminatory();
       std::cout << "After RemoveNonDiscriminatory, progress count = " << progress << std::endl;
 
+      emp_assert(is_active.Any());
+
       // Remove orgs that cannot win on any criteria.
       progress += AnalyzeLexicase_RemoveHopelessOrgs();
       std::cout << "After RemoveHopelessOrgs, progress count = " << progress << std::endl;
 
+      emp_assert(is_active.Any());
+
       // Remove duplicate criteria (that perform identically to others)
       progress += AnalyzeLexicase_RemoveDuplicateCriteria();
       std::cout << "After RemoveDuplicateCriteria, progress count = " << progress << std::endl;
+
+      emp_assert(is_active.Any());
     }
   }
 
   /// Calculate the remaining probabilities for a given starting prob and
   /// current orgs and criteria.
   const emp::vector<double> & CalcLexicaseProbs(const emp::BitVector & orgs, const emp::BitVector & fits) {
-    // Look up this set of organisms in the cache.
-    emp::vector<double> & out_probs = prob_cache[orgs];
+    emp_assert(orgs.Any());  // Must have at lease one organism still in the mix!
 
-    // If out_probs has already been set, return the result!
+    // Look up this set of organisms in the cache and return if found.  Keep a referece to the probailties
+    // so that it will be automatically updated in the cache for next time we need it.
+    emp::vector<double> & out_probs = prob_cache[orgs];
     if (out_probs.size()) return out_probs;
 
     // We haven't cached out_probs, so calculate it now; inititalize all probs to zero.
     out_probs.resize(orgs.GetSize(), 0.0);
+
+    // If there are no fitness functions left, all organisms have an equal chance.
+    if (fits.None()) {
+      double total_org_weight = 0.0;
+      for (int org_id = orgs.FindBit(); org_id != -1; org_id = orgs.FindBit(org_id+1)) {
+        total_org_weight += org_info[org_id].GetWeight();
+      }
+      for (int org_id = orgs.FindBit(); org_id != -1; org_id = orgs.FindBit(org_id+1)) {
+        out_probs[org_id] = org_info[org_id].GetWeight() / total_org_weight;
+      }
+      return out_probs;
+    }
 
     // Track the total weight of all the criteria to determine the fraction associated with each.
     double total_fit_weight = 0.0;
@@ -409,13 +445,20 @@ public:
 
   // Calculate the probabilities of each organism being selected in lexicase...
   void CalcLexicaseProbs() {
+    emp_assert(is_active.Any());
+
     // Setup all singleton populations in the cache.
     emp::BitVector base_orgs(org_info.size());
     std::vector<double> base_probs(org_info.size(), 0.0);
     for (size_t org_id = 0; org_id < org_info.size(); org_id++) {
+      // Build a BitVector with just this organism.
       base_orgs.Set(org_id, true);
       base_probs[org_id] = 1.0;
+
+      // Store it in the cache.
       prob_cache[base_orgs] = base_probs;
+
+      // Clean up bit vector and probs for next round.
       base_orgs.Set(org_id, false);
       base_probs[org_id] = 0.0;
     }
@@ -425,6 +468,44 @@ public:
     for (size_t org_id = 0; org_id < org_info.size(); org_id++) {
       org_info[org_id].select_prob = results[org_id];
     }
+  }
+
+  void SampleOrgs(size_t num_keep, emp::Random & random) {
+    emp_assert(num_keep <= GetNumOrgs());
+    size_t num_remove = GetNumOrgs() - num_keep;
+    auto remove_ids = emp::Choose(random, GetNumOrgs(), num_remove);
+    for (size_t id : remove_ids) is_active[id] = false;
+  }
+
+  void SampleCriteria(size_t num_keep, emp::Random & random) {
+    emp_assert(num_keep <= GetNumCriteria());
+    size_t num_remove = GetNumCriteria() - num_keep;
+    auto remove_ids = emp::Choose(random, GetNumCriteria(), num_remove);
+    for (size_t id : remove_ids) is_discrim[id] = false;
+  }
+
+  emp::vector<double> CalcSubsampleLexicaseProbs(size_t sample_size, size_t num_tests, emp::Random & random) {
+    emp::vector<double> total_probs(GetNumOrgs(), 0.0);
+    emp::vector<double> cur_probs;
+    for (size_t test_id = 0; test_id < num_tests; test_id++) {
+      Reset();
+      SampleOrgs(sample_size, random);
+      emp_assert(is_active.Any());
+      emp_assert(is_discrim.Any());
+      AnalyzeLexicase(false);      // Run an analysis, but do not reset the population (to keep sample).
+      emp_assert(is_active.Any());
+      CalcLexicaseProbs();
+      cur_probs = GetSelectProbs();
+      for (size_t i = 0; i < GetNumOrgs(); i++) {
+        std::cout << cur_probs[i] << " ";
+        total_probs[i] += cur_probs[i];
+      }
+      std::cout << std::endl << std::endl;
+    }
+
+    // Convert the totals into an average and return the vector.
+    for (double & x : total_probs) x /= (double) num_tests;
+    return total_probs;
   }
 };
 
