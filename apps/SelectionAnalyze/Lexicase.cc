@@ -15,6 +15,7 @@ int main(int argc, char* argv[])
   specs["no_row_headings"] = emp::ArgSpec(0, "Turn off headings on each row.");
   specs["no_col_headings"] = emp::ArgSpec(0, "Turn off headings on each column.");
   specs["no_headings"] = emp::ArgSpec(0, "Turn off all headings.");
+  specs["sort"] = emp::ArgSpec(0, "Sort the output data (rather than keeping org position)");
 
   emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
 
@@ -26,6 +27,7 @@ int main(int argc, char* argv[])
   if (am.UseArg("no_headings")) {
     use_row_headings = use_col_headings = false;
   }
+  bool sort_output = (bool) am.UseArg("sort");
 
   std::string command = argv[0];
   std::vector<std::string> filenames = *am.UseArg("_positional");
@@ -53,8 +55,13 @@ int main(int argc, char* argv[])
   std::cout << std::endl;
   data.PrintNewCriteria();
   
-  std::cout << std::endl;
-  data.PrintSelectProbs();
+  if (filenames.size() >= 2) {
+    std::ofstream out_file(filenames[2]);
+    data.PrintSelectProbs(out_file, sort_output);  
+  } else {
+    std::cout << std::endl;
+    data.PrintSelectProbs(std::cout, sort_output);
+  }
 
   // emp::vector< double > fit_data = data.GetFitData(0);
   // emp::IndexMap fit_map(num_orgs);
