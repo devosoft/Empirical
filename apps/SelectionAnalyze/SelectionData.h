@@ -176,14 +176,18 @@ public:
     }
   }
 
-  void PrintSelectProbs(std::ostream & os=std::cout) {
-    double total = 0.0;
+  void PrintSelectProbs(std::ostream & os=std::cout, bool sort_output=false) {
+    // double total = 0.0;
+    emp::vector<double> probs(GetNumOrgs());
     for (size_t i = 0; i < GetNumOrgs(); i++) {
-      os << org_info[i].select_prob << " ";
-      total += org_info[i].select_prob;
+      probs[i] = org_info[i].select_prob;
+      // os << org_info[i].select_prob << " ";
+      // total += org_info[i].select_prob;
     }
+    if (sort_output) std::sort(probs.rbegin(), probs.rend());
+    for (double x : probs) os << x << " ";
     os << std::endl;
-    os << "total = " << total << std::endl;
+    // os << "total prob = " << total << std::endl;
   }
 
   // Loop through all pairs of active organisms.  If any are dominated, remove them.
