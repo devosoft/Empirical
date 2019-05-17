@@ -293,6 +293,15 @@ namespace emp {
       return *this;
     }
 
+    template <typename T>
+    operator emp::vector<T>() {
+      emp::vector<T> out(GetSize());
+      for (size_t i = 0; i < GetSize(); i++) {
+        out[i] = (T) Get(i);
+      }
+      return out;
+    }
+
     /// Resize this BitVector to have the specified number of bits.
     BitVector & Resize(size_t new_bits) {
       const size_t old_num_fields = NumFields();
