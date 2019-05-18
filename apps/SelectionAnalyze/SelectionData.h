@@ -193,7 +193,10 @@ public:
 
   void PrintSelectProbs(std::ostream & os=std::cout, bool sort_output=false) {
     emp::vector<double> probs = GetSelectProbs(os, sort_output);
-    for (double x : probs) os << x << " ";
+    for (size_t i = 0; i < probs.size(); i++) {
+      if (i) os << ',';
+      os << probs[i];
+    }
     os << std::endl;
   }
 
