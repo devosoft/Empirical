@@ -345,6 +345,10 @@ public:
   void AnalyzeLexicase(bool reset_orgs=true) {
     if (reset_orgs) Reset();
 
+    std::cout << "Starting AnalyzeLexicase." << std::endl;
+    std::cout << "Before org count: " << is_active.CountOnes() << std::endl;
+    std::cout << "Before criteria count: " << is_discrim.CountOnes() << std::endl;
+
     size_t progress = 1;
 
     while (progress) {
@@ -376,6 +380,9 @@ public:
 
       emp_assert(is_active.Any());
     }
+
+    std::cout << "After org count: " << is_active.CountOnes() << std::endl;
+    std::cout << "After criteria count: " << is_discrim.CountOnes() << std::endl;
   }
 
   /// Calculate the remaining probabilities for a given starting prob and
@@ -390,18 +397,6 @@ public:
 
     // We haven't cached out_probs, so calculate it now; inititalize all probs to zero.
     out_probs.resize(orgs.GetSize(), 0.0);
-
-    // If there are no fitness functions left, all organisms have an equal chance.
-    if (fits.None()) {
-      double total_org_weight = 0.0;
-      for (int org_id = orgs.FindBit(); org_id != -1; org_id = orgs.FindBit(org_id+1)) {
-        total_org_weight += org_info[org_id].GetWeight();
-      }
-      for (int org_id = orgs.FindBit(); org_id != -1; org_id = orgs.FindBit(org_id+1)) {
-        out_probs[org_id] = org_info[org_id].GetWeight() / total_org_weight;
-      }
-      return out_probs;
-    }
 
     // Track the total weight of all the criteria to determine the fraction associated with each.
     double total_fit_weight = 0.0;
@@ -437,6 +432,18 @@ public:
         out_probs[org_id] += weight * next_probs[org_id];
       }
       next_fits.Set((size_t) fit_id, true);   // Turn back on this criterion for next loop.
+    }
+
+    // If there are no fitness functions left, all organisms have an equal chance.
+    if (total_fit_weight == 0.0) {
+      double total_org_weight = 0.0;
+      for (int org_id = orgs.FindBit(); org_id != -1; org_id = orgs.FindBit(org_id+1)) {
+        total_org_weight += org_info[org_id].GetWeight();
+      }
+      for (int org_id = orgs.FindBit(); org_id != -1; org_id = orgs.FindBit(org_id+1)) {
+        out_probs[org_id] = ((double) org_info[org_id].GetWeight()) / total_org_weight;
+      }
+      return out_probs;
     }
 
     emp::Scale(out_probs, 1.0 / total_fit_weight);
@@ -484,12 +491,15 @@ public:
     for (size_t id : remove_ids) is_discrim[id] = false;
   }
 
-  emp::vector<double> CalcSubsampleLexicaseProbs(size_t sample_size, size_t num_tests, emp::Random & random) {
+  emp::vector<double> CalcSubsampleLexicaseProbs(size_t orgs_used, size_t fits_used,
+                                                 size_t num_tests, emp::Random & random) {
     emp::vector<double> total_probs(GetNumOrgs(), 0.0);
     emp::vector<double> cur_probs;
     for (size_t test_id = 0; test_id < num_tests; test_id++) {
+      std::cout << "Running test #" << test_id << std::endl;
       Reset();
-      SampleOrgs(sample_size, random);
+      SampleOrgs(orgs_used, random);
+      SampleCriteria(fits_used, random);
       emp_assert(is_active.Any());
       emp_assert(is_discrim.Any());
       AnalyzeLexicase(false);      // Run an analysis, but do not reset the population (to keep sample).
@@ -497,10 +507,10 @@ public:
       CalcLexicaseProbs();
       cur_probs = GetSelectProbs();
       for (size_t i = 0; i < GetNumOrgs(); i++) {
-        std::cout << cur_probs[i] << " ";
+      //  std::cout << cur_probs[i] << " ";
         total_probs[i] += cur_probs[i];
       }
-      std::cout << std::endl << std::endl;
+      // std::cout << std::endl << std::endl;
     }
 
     // Convert the totals into an average and return the vector.
