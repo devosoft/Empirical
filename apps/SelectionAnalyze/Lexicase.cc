@@ -46,6 +46,13 @@ int main(int argc, char* argv[])
     std::cout << "Warning: No criteria data found." << std::endl;
   }
 
+  std::ofstream out_file;
+  if (filenames.size() > 2) {
+    std::cout << "Opening output file: " << filenames[2] << std::endl;
+    out_file.open(filenames[2]);
+  }
+  std::ostream & out_stream = (filenames.size() > 2) ? out_file : std::cout;
+
   if (!sample) {
     data.AnalyzeLexicase();
     data.CalcLexicaseProbs();
@@ -59,13 +66,7 @@ int main(int argc, char* argv[])
     std::cout << std::endl;
     data.PrintNewCriteria();
     
-    if (filenames.size() >= 2) {
-      std::ofstream out_file(filenames[2]);
-      data.PrintSelectProbs(out_file, sort_output);  
-    } else {
-      std::cout << std::endl;
-      data.PrintSelectProbs(std::cout, sort_output);
-    }
+    data.PrintSelectProbs(out_stream, sort_output);  
   }
 
   else {
@@ -76,11 +77,13 @@ int main(int argc, char* argv[])
     emp::Random random;
     auto result = data.CalcSubsampleLexicaseProbs(sample_pop, sample_fits, num_trials, random);
     double total = 0.0;
-    for (double x : result) {
-      std::cout << x << " ";
-      total += x;
+    for (size_t i = 0; i < result.size(); i++) {
+      if (i) out_stream << ',';
+      out_stream << result[i];
+      total += result[i];
     }
-    std::cout << std::endl << "Total prob = " << total << std::endl;
+    out_stream << std::endl;
+    std::cout << "Total prob = " << total << std::endl;
   }
   // emp::vector< double > fit_data = data.GetFitData(0);
   // emp::IndexMap fit_map(num_orgs);
