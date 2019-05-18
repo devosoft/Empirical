@@ -6,6 +6,7 @@
 
 #include "config/command_line.h"
 #include "config/ArgManager.h"
+#include "tools/Random.h"
 
 #include "SelectionData.h"
 
@@ -15,6 +16,7 @@ int main(int argc, char* argv[])
   specs["no_row_headings"] = emp::ArgSpec(0, "Turn off headings on each row.");
   specs["no_col_headings"] = emp::ArgSpec(0, "Turn off headings on each column.");
   specs["no_headings"] = emp::ArgSpec(0, "Turn off all headings.");
+  specs["sample"] = emp::ArgSpec(3, "Sample reduced orgs & criteria.  Args: [num_orgs] [num_critera] [num_trials]");
   specs["sort"] = emp::ArgSpec(0, "Sort the output data (rather than keeping org position)");
 
   emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
@@ -27,6 +29,7 @@ int main(int argc, char* argv[])
   if (am.UseArg("no_headings")) {
     use_row_headings = use_col_headings = false;
   }
+  auto sample = am.UseArg("sample");
   bool sort_output = (bool) am.UseArg("sort");
 
   std::string command = argv[0];
@@ -43,26 +46,42 @@ int main(int argc, char* argv[])
     std::cout << "Warning: No criteria data found." << std::endl;
   }
 
-  data.AnalyzeLexicase();
-  data.CalcLexicaseProbs();
+  if (!sample) {
+    data.AnalyzeLexicase();
+    data.CalcLexicaseProbs();
 
-  std::cout << "By organism (" << data.GetNumOrgs() << "):" << std::endl;
-  data.PrintOrgs();
-  std::cout << std::endl;
-  std::cout << "By criterion (" << data.GetNumCriteria() << "):" << std::endl;
-  data.PrintCriteria();
-
-  std::cout << std::endl;
-  data.PrintNewCriteria();
-  
-  if (filenames.size() >= 2) {
-    std::ofstream out_file(filenames[2]);
-    data.PrintSelectProbs(out_file, sort_output);  
-  } else {
+    std::cout << "By organism (" << data.GetNumOrgs() << "):" << std::endl;
+    data.PrintOrgs();
     std::cout << std::endl;
-    data.PrintSelectProbs(std::cout, sort_output);
+    std::cout << "By criterion (" << data.GetNumCriteria() << "):" << std::endl;
+    data.PrintCriteria();
+
+    std::cout << std::endl;
+    data.PrintNewCriteria();
+    
+    if (filenames.size() >= 2) {
+      std::ofstream out_file(filenames[2]);
+      data.PrintSelectProbs(out_file, sort_output);  
+    } else {
+      std::cout << std::endl;
+      data.PrintSelectProbs(std::cout, sort_output);
+    }
   }
 
+  else {
+    size_t sample_pop = emp::from_string<size_t>((*sample)[0]);
+    size_t sample_fits = emp::from_string<size_t>((*sample)[1]);
+    size_t num_trials = emp::from_string<size_t>((*sample)[2]);
+
+    emp::Random random;
+    auto result = data.CalcSubsampleLexicaseProbs(sample_pop, sample_fits, num_trials, random);
+    double total = 0.0;
+    for (double x : result) {
+      std::cout << x << " ";
+      total += x;
+    }
+    std::cout << std::endl << "Total prob = " << total << std::endl;
+  }
   // emp::vector< double > fit_data = data.GetFitData(0);
   // emp::IndexMap fit_map(num_orgs);
   // for (size_t i = 0; i < num_orgs; i++) {
