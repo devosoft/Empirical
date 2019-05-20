@@ -1244,7 +1244,7 @@ namespace emp {
 
       for (Ptr<taxon_t> off : curr->GetOffspring()) {
         std::cout << "Recursing on ID: " << off->GetID() << " Offspring: " << off->GetTotalOffspring() << std::endl;
-        ns.push_back(log(off->GetTotalOffspring() + (int)(off->GetNumOrgs()>0)+ 2.71828182845904));
+        ns.push_back(log(off->GetTotalOffspring() + (int)(off->GetNumOrgs()>0)+ exp(1)));
         total += RecursiveCollessStep(off);
       }
 
