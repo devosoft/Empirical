@@ -203,7 +203,6 @@ TEST_CASE("World systematics integration", "[evo]") {
       emp::datastruct::mut_landscape_info< int >
     >;
 
-
   emp::World<emp::vector<int>> world;
   emp::Ptr<systematics_t> sys;
   sys.New([](emp::vector<int> & v){return v;}, true, true, true);
@@ -235,7 +234,7 @@ TEST_CASE("World systematics integration", "[evo]") {
 
 template <typename WORLD_TYPE>
 emp::DataFile AddDominantFile(WORLD_TYPE & world){
-  using mut_count_t = std::unordered_map<std::string, int>;
+  using mut_count_t [[maybe_unused]] = std::unordered_map<std::string, int>;
   using data_t = emp::datastruct::mut_landscape_info<emp::vector<double>>;
   using org_t = emp::AvidaGP;
   using systematics_t = emp::Systematics<org_t, org_t, data_t>;
