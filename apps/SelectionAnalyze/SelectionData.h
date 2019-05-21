@@ -139,18 +139,18 @@ public:
   /// * Additional ROWS represent organisms
   /// * COLS represent selection criteria (e.g. fitness function results)
   void Load(const std::string & filename, bool use_row_headings=true, bool use_col_headings=true) {
-    emp::File file(filename);              // Load in file data.
-    file.RemoveComments('#');              // Trim off any comments beginning with a '#'
-    file.RemoveEmpty();                    // Remove any line that used to have comments and are now empty.
-    if (use_col_headings) file.ExtractRow();  // Load in the column headers in the first row.
-    if (use_row_headings) file.ExtractCol();  // Load in the row headers in the first row.
-    file.RemoveWhitespace();               // Remove all remaining spaces and tabs.
-    org_chart = file.ToData<double>();     // Load in fitness data for each organism from file.
-    fitness_chart = emp::Transpose(org_chart); // Organize data based on fitnesses rather than organisms.
+    emp::File file(filename);                  // Load in file data.
+    file.RemoveComments('#');                  // Trim off any comments beginning with a '#'
+    file.RemoveEmpty();                        // Remove empty lines that used to have comments.
+    if (use_col_headings) file.ExtractRow();   // Load in the column headers in the first row.
+    if (use_row_headings) file.ExtractCol();   // Load in the row headers in the first row.
+    file.RemoveWhitespace();                   // Remove all remaining spaces and tabs.
+    org_chart = file.ToData<double>();         // Load fitness data for each organism from file.
+    fitness_chart = emp::Transpose(org_chart); // Also organize data based on fitnesses.
     orig_org_chart = org_chart;
     orig_fitness_chart = fitness_chart;
-    org_info.resize(org_chart.size());     // Track info for all organisms.
-    fit_info.resize(fitness_chart.size()); // Track info for all criteria.
+    org_info.resize(org_chart.size());         // Track info for all organisms.
+    fit_info.resize(fitness_chart.size());     // Track info for all criteria.
   }
 
   void PrintOrgs(std::ostream & os=std::cout) {
@@ -376,7 +376,9 @@ public:
       progress += AnalyzeLexicase_RemoveDominated();
       if (verbose) {
         std::cout << "After RemoveDominated, progress count = " << progress
-                  << ";  active count = " << is_active.CountOnes() << std::endl;
+                  << ";  active count = " << is_active.CountOnes()
+                  << ";  criteria count = " << is_discrim.CountOnes()
+                  << std::endl;
       }
 
       emp_assert(is_active.Any());
@@ -385,7 +387,9 @@ public:
       progress += AnalyzeLexicase_RemoveNonDiscriminatory();
       if (verbose) {
         std::cout << "After RemoveNonDiscriminatory, progress count = " << progress
-                  << ";  active count = " << is_active.CountOnes() << std::endl;
+                  << ";  active count = " << is_active.CountOnes()
+                  << ";  criteria count = " << is_discrim.CountOnes()
+                  << std::endl;
       }
 
       emp_assert(is_active.Any());
@@ -394,7 +398,9 @@ public:
       progress += AnalyzeLexicase_RemoveHopelessOrgs();
       if (verbose) {
         std::cout << "After RemoveHopelessOrgs, progress count = " << progress
-                  << ";  active count = " << is_active.CountOnes() << std::endl;
+                  << ";  active count = " << is_active.CountOnes()
+                  << ";  criteria count = " << is_discrim.CountOnes()
+                  << std::endl;
       }
 
       emp_assert(is_active.Any());
@@ -403,7 +409,9 @@ public:
       progress += AnalyzeLexicase_RemoveDuplicateCriteria();
       if (verbose) {
         std::cout << "After RemoveDuplicateCriteria, progress count = " << progress
-                  << ";  active count = " << is_active.CountOnes() << std::endl;
+                  << ";  active count = " << is_active.CountOnes()
+                  << ";  criteria count = " << is_discrim.CountOnes()
+                  << std::endl;
       }
 
       emp_assert(is_active.Any());
@@ -533,6 +541,7 @@ public:
       Reset();
       SampleOrgs(orgs_used, random);
       SampleCriteria(fits_used, random);
+      if (verbose) std::cout << "End-subsample, orgs=" << is_active << " ; fits=" << is_discrim << std::endl;
       emp_assert(is_active.Any());
       emp_assert(is_discrim.Any());
       AnalyzeLexicase(false);      // Run an analysis, but do not reset the population (to keep sample).
