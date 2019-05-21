@@ -1248,23 +1248,23 @@ namespace emp {
       }
 
       for (Ptr<taxon_t> off : curr->GetOffspring()) {
-        std::cout << "Recursing on ID: " << off->GetID() << " Offspring: " << off->GetTotalOffspring() << std::endl;
+        // std::cout << "Recursing on ID: " << off->GetID() << " Offspring: " << off->GetTotalOffspring() << std::endl;
 
         CollessStruct new_result = RecursiveCollessStep(off);
         result.ns.push_back(Sum(new_result.ns) + log(off->GetOffspring().size() + exp(1)));
         result.total += new_result.total;
       }
 
-      std::cout << "Evaluating: " << curr->GetID() << std::endl;
+      // std::cout << "Evaluating: " << curr->GetID() << std::endl;
 
       double med = Median(result.ns);
       double sum_diffs = 0;
-      std::cout << "Median: " << med << std::endl;
+      // std::cout << "Median: " << med << std::endl;
       for (double n : result.ns) {
         std::cout << n << std::endl;
         sum_diffs += std::abs(n-med);
       }
-      std::cout << "Sumdiffs: " << sum_diffs << " n: " << result.ns.size() << " average: " << sum_diffs/result.ns.size() << std::endl;
+      // std::cout << "Sumdiffs: " << sum_diffs << " n: " << result.ns.size() << " average: " << sum_diffs/result.ns.size() << std::endl;
       result.total += sum_diffs/result.ns.size();
       return result;
     }
