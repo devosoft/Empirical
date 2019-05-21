@@ -507,7 +507,14 @@ public:
     // CalcLexicaseProbs(1.0, is_active, is_discrim);
     auto results = CalcLexicaseProbs(is_active, is_discrim);
     for (size_t org_id = 0; org_id < org_info.size(); org_id++) {
-      org_info[org_id].select_prob = results[org_id];
+      // Determine probability for each organism duplicated in this entry.
+      const double each_prob = results[org_id] / org_info[org_id].GetWeight();
+
+      // Assign probability to both this org and its duplicates.
+      org_info[org_id].select_prob += each_prob;
+      for (size_t dup_id : org_info[org_id].dup_ids) {
+        org_info[dup_id].select_prob += each_prob;
+      }
     }
   }
 
