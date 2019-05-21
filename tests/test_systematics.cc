@@ -964,5 +964,5 @@ TEST_CASE("Tree balance", "[evo]") {
   treecl.RemoveOrg(treeclorg10);
 
   CHECK(treecl.SackinIndex() == 18);
-  CHECK(treecl.CollessLikeIndex() == Approx(1.746));
+  CHECK(treecl.CollessLikeIndex() == Approx(1.746074));
 }

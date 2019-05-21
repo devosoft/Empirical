@@ -1230,35 +1230,43 @@ namespace emp {
     //   return g;
     // }
 
-    double RecursiveCollessStep(Ptr<taxon_t> curr) const {
+    struct CollessStruct {
+      double total = 0;
+      emp::vector<double> ns;
+    };
+
+    CollessStruct RecursiveCollessStep(Ptr<taxon_t> curr) const {
+      CollessStruct result;
+      
       while (curr->GetNumOff() == 1) {
         curr = *(curr->GetOffspring().begin());
       }
 
       if (curr->GetNumOff() == 0) {
-        return 0;
+        result.ns.push_back(0); // Node itself is calculated at level above
+        return result;
       }
-
-      double total = 0;
-      emp::vector<double> ns;
 
       for (Ptr<taxon_t> off : curr->GetOffspring()) {
         std::cout << "Recursing on ID: " << off->GetID() << " Offspring: " << off->GetTotalOffspring() << std::endl;
-        ns.push_back(log(off->GetTotalOffspring() + (int)(off->GetNumOrgs()>0)+ exp(1)));
-        total += RecursiveCollessStep(off);
+
+        CollessStruct new_result = RecursiveCollessStep(off);
+        result.ns.push_back(Sum(new_result.ns) + log(off->GetOffspring().size() + exp(1)));
+        result.total += new_result.total;
       }
 
       std::cout << "Evaluating: " << curr->GetID() << std::endl;
 
-      double med = Median(ns);
+      double med = Median(result.ns);
       double sum_diffs = 0;
       std::cout << "Median: " << med << std::endl;
-      for (double n : ns) {
+      for (double n : result.ns) {
         std::cout << n << std::endl;
         sum_diffs += std::abs(n-med);
       }
-      std::cout << "Sumdiffs: " << sum_diffs << " n: " << ns.size() << " average: " << sum_diffs/ns.size() << std::endl;
-      return total + sum_diffs/ns.size();
+      std::cout << "Sumdiffs: " << sum_diffs << " n: " << result.ns.size() << " average: " << sum_diffs/result.ns.size() << std::endl;
+      result.total += sum_diffs/result.ns.size();
+      return result;
     }
 
     /** Calculate Colless Index of this tree (Colless, 1982; reviewed in Shao, 1990).
@@ -1269,7 +1277,7 @@ namespace emp {
     double CollessLikeIndex() const {
       GetMRCA();
 
-      return RecursiveCollessStep(mrca);
+      return RecursiveCollessStep(mrca).total;
     }
 
     
