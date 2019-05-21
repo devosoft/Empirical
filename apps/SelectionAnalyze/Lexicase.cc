@@ -18,6 +18,7 @@ int main(int argc, char* argv[])
   specs["no_headings"] = emp::ArgSpec(0, "Turn off all headings.");
   specs["sample"] = emp::ArgSpec(3, "Sample reduced orgs & criteria.  Args: [num_orgs] [num_critera] [num_trials]");
   specs["sort"] = emp::ArgSpec(0, "Sort the output data (rather than keeping org position)");
+  specs["verbose"] = emp::ArgSpec(0, "Print out lots of extra details about process.");
 
   emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
 
@@ -31,6 +32,7 @@ int main(int argc, char* argv[])
   }
   auto sample = am.UseArg("sample");
   bool sort_output = (bool) am.UseArg("sort");
+  bool verbose = (bool) am.UseArg("verbose");
 
   std::string command = argv[0];
   std::vector<std::string> filenames = *am.UseArg("_positional");
@@ -41,6 +43,7 @@ int main(int argc, char* argv[])
   }
 
   SelectionData data(filenames[1], use_row_headings, use_col_headings);
+  if (verbose) data.SetVerbose();
 
   if (data.GetNumCriteria() == 0) {
     std::cout << "Warning: No criteria data found." << std::endl;
