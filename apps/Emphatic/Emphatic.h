@@ -129,22 +129,31 @@ public:
   }
 
   /// Print out the converted C++ code.
-  void PrintOutput(std::ostream & os) const {
-    os << "/****************************************\n"
-       << " *  This is an auto-generated file.\n"
-       << " ****************************************/\n"
+  void PrintOutput(std::ostream & os, const std::string & input_filename="") const {
+    os << "/********************************************************************************\n"
+       << " *  This file was auto-generated from '" << input_filename << ".\n"
+       << " *\n"
+       << " *    ____          _   _       _     _____    _   _   _ \n"
+       << " *   |  _ \\   _    | \\ | | ___ | |_  | ____|__| ( ) |_| |\n"
+       << " *   | | | |/   \\  |  \\| |/   \\| __| |  _| / _` | | __| |\n"
+       << " *   | |_| | ( ) | | |\\  | ( ) | |_  | |__| (_| | | |_|_|\n"
+       << " *   |____/ \\___/  |_| \\_|\\___/ \\__| |_____\\__,_|_|\\__(_)\n"
+       << " *\n"
+       << " *  If you need to make changes to the contents of this file, please go back and\n"
+       << " *  modify the original source file (" << input_filename << ") as needed.\n"
+       << " ********************************************************************************/\n"
        << "\n"
        << "#include \"meta/TypePack.h\""
        << "\n";
     ast_root.PrintOutput(os, "");
   }
 
-  void PrintOutput(std::string filename) const {
-    if (filename == "") {
-      PrintOutput(std::cout);
+  void PrintOutput(const std::string & filename, const std::string & input_filename="") const {
+    if (filename == "" || filename == "-") {
+      PrintOutput(std::cout, input_filename);
     } else {
       std::ofstream ofile(filename);
-      PrintOutput(ofile);
+      PrintOutput(ofile, input_filename);
       ofile.close();
     }
   }
@@ -166,7 +175,7 @@ public:
           break;
         case '<':
           if (match_angle_bracket == false) break;
-          [[fallthrough]]
+          [[fallthrough]];
         case '(':
         case '[':
         case '{':
@@ -174,7 +183,7 @@ public:
           break;
         case '>':
           if (match_angle_bracket == false) break;
-          [[fallthrough]]
+          [[fallthrough]];
         case ')':
         case ']':
         case '}':
