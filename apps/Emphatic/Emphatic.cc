@@ -20,8 +20,6 @@ int main(int argc, char *argv[])
   }
 
   Emphatic codegen(argv[1]);
-  // codegen.PrintLexerState();
-  // std::cout << std::endl;
   codegen.PrintTokens();
 
   codegen.SetDebug();
@@ -30,6 +28,5 @@ int main(int argc, char *argv[])
   std::string out_filename = "";
   if (argc > 2) out_filename = argv[2];
 
-  //codegen.PrintEcho(out_filename);
-  codegen.PrintOutput(out_filename);
+  codegen.PrintOutput(out_filename, argv[1]);
 }
