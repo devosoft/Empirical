@@ -20,10 +20,8 @@ int main(int argc, char* argv[])
   specs["sort"] = emp::ArgSpec(0, "Sort the output data (rather than keeping org position)");
   specs["verbose"] = emp::ArgSpec(0, "Print out lots of extra details about process.");
 
-  emp::vector<std::string> args = emp::cl::args_to_strings(argc, argv);
-
   emp::ArgManager am(argc, argv, specs);
-  am.PrintDiagnostic(std::cout);
+  if (am.ProcessBuiltin() == false) exit(0);
 
   bool use_row_headings = !am.UseArg("no_row_headings");
   bool use_col_headings = !am.UseArg("no_col_headings");
