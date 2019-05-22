@@ -32,6 +32,7 @@
 #include "tools/Graph.h"
 #include "tools/IndexMap.h"
 #include "tools/Lexer.h"
+#include "tools/MatchBin.h"
 #include "tools/NFA.h"
 #include "tools/RegEx.h"
 #include "tools/Random.h"
@@ -638,7 +639,7 @@ TEST_CASE("Test IndexMap", "[tools]")
   imap[5] = 2.0;
   imap[6] = 0.0;
   imap[7] = 8.0;
-  
+
   REQUIRE(imap.GetSize() == 8);
   REQUIRE(imap.GetWeight() == 16.0);
   REQUIRE(imap.GetWeight(2) == 1.0);
@@ -843,6 +844,40 @@ TEST_CASE("Test map_utils", "[tools]")
   REQUIRE( emp::Find(test_123, "1", "nothing") == "1" );
   REQUIRE( emp::FindRef(test_123, "1", "nothing") == "1" );
 }
+
+TEST_CASE("Test MatchBin", "[tools]")
+{
+
+  emp::MatchBin<std::string, int> bin(
+    [](int a, int b) -> double { return -std::abs(a - b); },
+    emp::ThreshSelector(-5.0)
+  );
+
+  REQUIRE( bin.Get(bin.Put("hi", 1)) == "hi" );
+  REQUIRE( bin.Get(bin.Put("bonjour", 6)) == "bonjour" );
+  REQUIRE( bin.Get(bin.Put("yo", -4)) == "yo" );
+  REQUIRE( bin.Get(bin.Put("konichiwa", -6)) == "konichiwa" );
+  REQUIRE( bin.Get(bin.Put("salut", 0)) == "salut" );
+
+  REQUIRE( bin.Size() == 5 );
+
+  REQUIRE( bin.Get(bin.Match(0, 0)) == emp::vector<std::string>{} );
+  REQUIRE( bin.Get(bin.Match(0, 1)) == emp::vector<std::string>{"salut"} );
+  REQUIRE(
+    bin.Get(bin.Match(0, 2)) == (emp::vector<std::string>{"salut", "hi"})
+  );
+  REQUIRE(
+    bin.Get(bin.Match(0, 3)) == (emp::vector<std::string>{"salut", "hi", "yo"})
+  );
+  REQUIRE(
+    bin.Get(bin.Match(0, 4)) == (emp::vector<std::string>{"salut", "hi", "yo"})
+  );
+
+  REQUIRE( bin.Get(bin.Match(15, 8)) == emp::vector<std::string>{} );
+  REQUIRE( bin.Get(bin.Match(10, 2)) == emp::vector<std::string>{"bonjour"} );
+
+}
+
 
 TEST_CASE("Test math", "[tools]")
 {
