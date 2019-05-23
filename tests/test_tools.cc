@@ -850,14 +850,17 @@ TEST_CASE("Test MatchBin", "[tools]")
   {
   emp::MatchBin<std::string, int> bin(
     [](int a, int b) -> double { return std::abs(a - b); },
-    emp::ThreshSelector(5.0)
+    emp::ThreshSelector(7.0)
   );
 
-  REQUIRE( bin.GetVal(bin.Put("hi", 1)) == "hi" );
+  const size_t hi = bin.Put("hi", 1);
+  REQUIRE( bin.GetVal(hi) == "hi" );
+  const size_t salut = bin.Put("salut", 0);
+  REQUIRE( bin.GetVal(salut) == "salut" );
+
   REQUIRE( bin.GetVal(bin.Put("bonjour", 6)) == "bonjour" );
   REQUIRE( bin.GetVal(bin.Put("yo", -4)) == "yo" );
   REQUIRE( bin.GetVal(bin.Put("konichiwa", -6)) == "konichiwa" );
-  REQUIRE( bin.GetVal(bin.Put("salut", 0)) == "salut" );
 
   REQUIRE( bin.Size() == 5 );
 
@@ -887,6 +890,15 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   REQUIRE( bin.GetVals(bin.Match(10, 2)) == emp::vector<std::string>{"bonjour"} );
   REQUIRE( bin.GetTags(bin.Match(10, 2)) == (emp::vector<int>{6}) );
+
+  bin.SetRegulator(hi, 0.1);
+  REQUIRE( bin.GetVals(bin.Match(0, 1)) == emp::vector<std::string>{"hi"} );
+  REQUIRE( bin.GetTags(bin.Match(0, 1)) == emp::vector<int>{1} );
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 2)) == (emp::vector<std::string>{"hi", "salut"})
+  );
+  REQUIRE( bin.GetTags(bin.Match(0, 2)) == (emp::vector<int>{1, 0}) );
+
   }
 
   {
@@ -896,17 +908,34 @@ TEST_CASE("Test MatchBin", "[tools]")
     emp::RouletteSelector(rand)
   );
 
-  REQUIRE( bin.GetVal(bin.Put("hi", 1)) == "hi" );
-  REQUIRE( bin.GetVal(bin.Put("salut", 0)) == "salut" );
+  const size_t hi = bin.Put("hi", 1);
+  REQUIRE( bin.GetVal(hi) == "hi" );
+  const size_t salut = bin.Put("salut", 0);
+  REQUIRE( bin.GetVal(salut) == "salut" );
 
   REQUIRE( bin.Size() == 2 );
 
   REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{} );
   REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<int>{} );
 
-  const auto res = bin.GetVals(bin.Match(0, 100000));
-  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 50000 );
+  auto res = bin.GetVals(bin.Match(0, 100000));
+  const size_t count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( count > 50000 );
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.AdjRegulator(salut, 1000000.0);
+  bin.SetRegulator(hi, 0.5);
+  res = bin.GetVals(bin.Match(0, 100000));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 50000 );
+
+  bin.SetRegulator(salut, 0.5);
+  bin.SetRegulator(hi, 2.0);
+  res = bin.GetVals(bin.Match(0, 100000));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+
   }
 
 }

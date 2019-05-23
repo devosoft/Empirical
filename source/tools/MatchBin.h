@@ -16,6 +16,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <functional>
+#include <algorithm>
 
 #include "../base/assert.h"
 #include "../base/vector.h"
@@ -55,7 +56,7 @@ namespace emp {
 
   selector_t RouletteSelector(
     emp::Random &random,
-    const double skew=0.05
+    const double skew=0.1
   ){
 
     emp_assert(skew > 0.0);
@@ -118,7 +119,9 @@ namespace emp {
       }
 
       std::unordered_map<size_t, double> scores;
-      for (auto uid : uids) scores[uid] = matches[tags[uid]] + regulators[uid];
+      for (auto uid : uids) {
+        scores[uid] = matches[tags[uid]] * regulators[uid] + regulators[uid];
+      }
 
       return selector(uids, scores, n);
     }
@@ -137,15 +140,19 @@ namespace emp {
       uids.clear();
     }
 
-    void AdjRegulator(size_t uid, double amt) { regulators.at(uid) += amt; }
+    void AdjRegulator(size_t uid, double amt) {
+      regulators[uid] = std::max(0.0, regulators.at(uid));
+    }
 
-    void SetRegulator(size_t uid, double amt) { regulators.at(uid) = amt; }
+    void SetRegulator(size_t uid, double amt) {
+      emp_assert(amt >= 0.0);
+      regulators.at(uid) = amt;
+    }
 
     size_t Put(const Val & v, const Tag & t) {
-      size_t orig = uid_stepper;
       while(values.find(++uid_stepper) != values.end());
       values[uid_stepper] = v;
-      regulators[uid_stepper] = 0.0;
+      regulators[uid_stepper] = 1.0;
       tags[uid_stepper] = t;
       uids.push_back(uid_stepper);
       return uid_stepper;
