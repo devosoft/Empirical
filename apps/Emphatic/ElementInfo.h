@@ -29,13 +29,13 @@ struct ElementInfo {
   emp::vector<ParamInfo> params;      ///< Full set of function parameters
   std::set<std::string> attributes;   ///< const, noexcept, etc.
   std::string default_code;           ///< Variable initialization or function body.
-  std::string special_value;          ///< "default", "delete", or "required" (for concepts)
+  std::string special_value;          ///< "default", "delete", or "0" (required for concepts)
 
   bool IsTypedef() const { return element_type == TYPEDEF; }
   bool IsVariable() const { return element_type == VARIABLE; }
   bool IsFunction() const { return element_type == FUNCTION; }
 
-  bool IsRequired() const { return special_value == "required"; }
+  bool IsRequired() const { return special_value == "0"; }
   bool IsDefault() const { return special_value == "default"; }
   bool IsDeleted() const { return special_value == "delete"; }
 
@@ -99,7 +99,7 @@ struct ElementInfo {
     }
     else if (IsFunction()) {
       os << prefix << type << " " << name << "(" << ParamString() << ") " << AttributeString();
-      if (IsRequired()) os << " = required;\n";
+      if (IsRequired()) os << " = 0;\n";
       else if (IsDefault()) os << " = default;\n";
       else os << " {\n" << prefix << "  " << default_code << "\n" << prefix << "}\n";
     }
