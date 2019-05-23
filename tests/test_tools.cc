@@ -923,7 +923,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE( count > 50000 );
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
 
-  bin.AdjRegulator(salut, 1000000.0);
+  bin.AdjRegulator(salut, 10.0);
   bin.SetRegulator(hi, 0.5);
   res = bin.GetVals(bin.Match(0, 100000));
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );

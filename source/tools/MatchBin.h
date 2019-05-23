@@ -142,7 +142,7 @@ namespace emp {
     }
 
     void AdjRegulator(size_t uid, double amt) {
-      regulators[uid] = std::max(0.0, regulators.at(uid));
+      regulators[uid] = std::max(0.0, regulators.at(uid) + amt);
     }
 
     void SetRegulator(size_t uid, double amt) {
