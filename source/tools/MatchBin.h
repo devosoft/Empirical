@@ -54,10 +54,13 @@ namespace emp {
 
 
   selector_t RouletteSelector(
-    emp::Random &random
+    emp::Random &random,
+    const double skew=0.05
   ){
 
-    return [&random](
+    emp_assert(skew > 0.0);
+
+    return [&random, skew](
         emp::vector<size_t>& uids,
         std::unordered_map<size_t, double>& scores,
         size_t n
@@ -65,7 +68,8 @@ namespace emp {
 
         IndexMap match_index(uids.size());
         for (size_t i = 0; i < uids.size(); ++i) {
-          match_index.Adjust(i, scores[uids[i]]);
+          emp_assert(scores[uids[i]] >= 0);
+          match_index.Adjust(i, 1.0 / ( skew + scores[uids[i]] ));
         }
 
         emp::vector<size_t> res;

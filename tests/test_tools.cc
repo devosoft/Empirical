@@ -847,7 +847,7 @@ TEST_CASE("Test map_utils", "[tools]")
 
 TEST_CASE("Test MatchBin", "[tools]")
 {
-
+  {
   emp::MatchBin<std::string, int> bin(
     [](int a, int b) -> double { return std::abs(a - b); },
     emp::ThreshSelector(5.0)
@@ -887,6 +887,27 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   REQUIRE( bin.GetVals(bin.Match(10, 2)) == emp::vector<std::string>{"bonjour"} );
   REQUIRE( bin.GetTags(bin.Match(10, 2)) == (emp::vector<int>{6}) );
+  }
+
+  {
+  emp::Random rand(1);
+  emp::MatchBin<std::string, int> bin(
+    [](int a, int b) -> double { return std::abs(a - b); },
+    emp::RouletteSelector(rand)
+  );
+
+  REQUIRE( bin.GetVal(bin.Put("hi", 1)) == "hi" );
+  REQUIRE( bin.GetVal(bin.Put("salut", 0)) == "salut" );
+
+  REQUIRE( bin.Size() == 2 );
+
+  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{} );
+  REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<int>{} );
+
+  const auto res = bin.GetVals(bin.Match(0, 100000));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 50000 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+  }
 
 }
 
