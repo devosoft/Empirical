@@ -22,7 +22,7 @@
  *             | '*'
  *   - DECLARE: TYPE ID
  *   - FUNCTION: DECLARE '(' PARAMS ')' BLOCK
- *             | DECLARE '(' PARAMS ')' '=' "required" ';'
+ *             | DECLARE '(' PARAMS ')' '=' "0" ';'
  *             | DECLARE '(' PARAMS ')' '=' "default" ';'
  *   - PARAMS: (nothing)
  *           | PARAM_LIST
@@ -33,7 +33,7 @@
  *   - MEMBER: DECLARE ';'
  *           | FUNCTION
  *           | "using" ID '=' TYPE ';'
- *           | "using" ID '=' "required" ';'
+ *           | "using" ID '=' "0" ';'
  */
 
 #include <fstream>
@@ -297,7 +297,7 @@ public:
       RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
 
       // Identify if this type is required in the base class
-      if (AsLexeme(pos) == "required") {
+      if (AsLexeme(pos) == "0") {
         new_element.special_value = AsLexeme(pos++);
       }
       // Otherwise, save the default type.
@@ -327,11 +327,10 @@ public:
 
         char fun_char = AsChar(pos++);
 
-        if (fun_char == '=') {  // Function is "= default;" or "= required;"
-          RequireID(pos, "Function must be assigned to 'required' or 'default'");
+        if (fun_char == '=') {  // Function is "= default;" or "= 0;"
           std::string fun_assign = AsLexeme(pos++);
-          if (fun_assign == "required" || fun_assign == "default") new_element.special_value = fun_assign;
-          else Error(pos, "Functions can only be set to 'required' or 'default'");
+          if (fun_assign == "0" || fun_assign == "default") new_element.special_value = fun_assign;
+          else Error(pos, "Functions can only be set to '0' (if required) or 'default'");
           RequireChar(';', pos++, emp::to_string(fun_assign, "functions must end in a semi-colon."));
         }
         else if (fun_char == '{') {  // Function is defined in place.
