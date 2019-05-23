@@ -147,17 +147,32 @@ namespace emp {
       return uid_stepper;
     }
 
-    Val & Get(const size_t uid) {
+    Val & GetVal(const size_t uid) {
       return values.at(uid);
     }
 
-    emp::vector<Val> Get(const emp::vector<size_t> & uids) {
+    Tag & GetTag(const size_t uid) {
+      return tags.at(uid);
+    }
+
+    emp::vector<Val> GetVals(const emp::vector<size_t> & uids) {
       emp::vector<Val> res;
       std::transform(
         uids.begin(),
         uids.end(),
         std::back_inserter(res),
-        [this](size_t uid) -> Val { return Get(uid); }
+        [this](size_t uid) -> Val { return GetVal(uid); }
+      );
+      return res;
+    }
+
+    emp::vector<Tag> GetTags(const emp::vector<size_t> & uids) {
+      emp::vector<Tag> res;
+      std::transform(
+        uids.begin(),
+        uids.end(),
+        std::back_inserter(res),
+        [this](size_t uid) -> Tag { return GetTag(uid); }
       );
       return res;
     }

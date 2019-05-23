@@ -853,28 +853,40 @@ TEST_CASE("Test MatchBin", "[tools]")
     emp::ThreshSelector(5.0)
   );
 
-  REQUIRE( bin.Get(bin.Put("hi", 1)) == "hi" );
-  REQUIRE( bin.Get(bin.Put("bonjour", 6)) == "bonjour" );
-  REQUIRE( bin.Get(bin.Put("yo", -4)) == "yo" );
-  REQUIRE( bin.Get(bin.Put("konichiwa", -6)) == "konichiwa" );
-  REQUIRE( bin.Get(bin.Put("salut", 0)) == "salut" );
+  REQUIRE( bin.GetVal(bin.Put("hi", 1)) == "hi" );
+  REQUIRE( bin.GetVal(bin.Put("bonjour", 6)) == "bonjour" );
+  REQUIRE( bin.GetVal(bin.Put("yo", -4)) == "yo" );
+  REQUIRE( bin.GetVal(bin.Put("konichiwa", -6)) == "konichiwa" );
+  REQUIRE( bin.GetVal(bin.Put("salut", 0)) == "salut" );
 
   REQUIRE( bin.Size() == 5 );
 
-  REQUIRE( bin.Get(bin.Match(0, 0)) == emp::vector<std::string>{} );
-  REQUIRE( bin.Get(bin.Match(0, 1)) == emp::vector<std::string>{"salut"} );
-  REQUIRE(
-    bin.Get(bin.Match(0, 2)) == (emp::vector<std::string>{"salut", "hi"})
-  );
-  REQUIRE(
-    bin.Get(bin.Match(0, 3)) == (emp::vector<std::string>{"salut", "hi", "yo"})
-  );
-  REQUIRE(
-    bin.Get(bin.Match(0, 4)) == (emp::vector<std::string>{"salut", "hi", "yo"})
-  );
+  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{} );
+  REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<int>{} );
 
-  REQUIRE( bin.Get(bin.Match(15, 8)) == emp::vector<std::string>{} );
-  REQUIRE( bin.Get(bin.Match(10, 2)) == emp::vector<std::string>{"bonjour"} );
+  REQUIRE( bin.GetVals(bin.Match(0, 1)) == emp::vector<std::string>{"salut"} );
+  REQUIRE( bin.GetTags(bin.Match(0, 1)) == emp::vector<int>{0} );
+
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 2)) == (emp::vector<std::string>{"salut", "hi"})
+  );
+  REQUIRE( bin.GetTags(bin.Match(0, 2)) == (emp::vector<int>{0, 1}) );
+
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 3)) == (emp::vector<std::string>{"salut", "hi", "yo"})
+  );
+  REQUIRE( bin.GetTags(bin.Match(0, 3)) == (emp::vector<int>{0, 1, -4}) );
+
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 4)) == (emp::vector<std::string>{"salut", "hi", "yo"})
+  );
+  REQUIRE( bin.GetTags(bin.Match(0, 4)) == (emp::vector<int>{0, 1, -4}) );
+
+  REQUIRE( bin.GetVals(bin.Match(15, 8)) == emp::vector<std::string>{} );
+  REQUIRE( bin.GetTags(bin.Match(15, 8)) == (emp::vector<int>{}) );
+
+  REQUIRE( bin.GetVals(bin.Match(10, 2)) == emp::vector<std::string>{"bonjour"} );
+  REQUIRE( bin.GetTags(bin.Match(10, 2)) == (emp::vector<int>{6}) );
 
 }
 
