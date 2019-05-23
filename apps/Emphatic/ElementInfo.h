@@ -5,6 +5,10 @@
  *
  *  @file  ElementInfo.h
  *  @brief Information about C++ elements (variables, functions, typedefs, etc) that are loaded in.
+ * 
+ *  Developer notes:
+ *  * We may want to put just a pointer to a variable in the base class so that the real version
+ *    can bew in either the derived class OR the class being wrapped.
  **/
 
 #include <string>
@@ -107,8 +111,16 @@ struct ElementInfo {
 
   /// Print this element as the converted C++ code for the base class.
   void PrintConceptBase(std::ostream & os, const std::string & prefix) const {
-    // Note: Typedefs and variables do not need to be represented in the base class.
-    if (IsFunction()) {
+    // Note: Typedefs do not need to be represented in the base class.
+    // Variables should have all of their code placed in the base class.
+    if (IsVariable()) {
+      os << prefix << type << " " << name;
+      if (default_code.size()) os << " " << default_code << "\n";
+      else os << ";\n";
+    }
+    // Functions should just have a pure-virtual declaration in the base class so
+    // that the correct version can be called in the derived class.
+    else if (IsFunction()) {
       os << prefix << "virtual " << type << " " << name << "(" << ParamString() << ") "
          << AttributeString() << " = 0;\n";
     }
@@ -141,11 +153,8 @@ struct ElementInfo {
                      << name << ">::template push_back<" << default_code << ">::first_t;\n";
       }
     }
-    else if (IsVariable()) {
-      os << prefix << type << " " << name;
-      if (default_code.size()) os << " " << default_code << "\n";
-      else os << ";\n";
-    }
+    // If this is a variable, all code should be in base class.
+    // If this is a function, print out dynamic code to determine which version should be called.
     else if (IsFunction()) {
       // Build return-type checker.
       os << prefix << "template <typename T>\n"
