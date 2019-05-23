@@ -17,6 +17,7 @@
 #include <unordered_set>
 #include <functional>
 #include <algorithm>
+#include <stdexcept>
 
 #include "../base/assert.h"
 #include "../base/vector.h"
@@ -150,7 +151,14 @@ namespace emp {
     }
 
     size_t Put(const Val & v, const Tag & t) {
-      while(values.find(++uid_stepper) != values.end());
+
+      const size_t orig = uid_stepper;
+      while(values.find(++uid_stepper) != values.end()) {
+        // if container is full
+        // i.e., wrapped around because all uids already allocated
+        if (uid_stepper == orig) throw std::runtime_error("container full");
+      }
+
       values[uid_stepper] = v;
       regulators[uid_stepper] = 1.0;
       tags[uid_stepper] = t;
