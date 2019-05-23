@@ -1405,7 +1405,9 @@ namespace emp {
     if (store_ancestors) ancestor_taxa.erase(taxon); // Clear from ancestors set (if there)
     if (store_outside) outside_taxa.insert(taxon);   // Add to outside set (if tracked)
     else {
-      emp_assert(taxon != mrca);
+      if (taxon == mrca) {
+        mrca = nullptr;
+      }
       taxon.Delete();                             //  ...or else get rid of it.
     }
   }
