@@ -849,8 +849,8 @@ TEST_CASE("Test MatchBin", "[tools]")
 {
 
   emp::MatchBin<std::string, int> bin(
-    [](int a, int b) -> double { return -std::abs(a - b); },
-    emp::ThreshSelector(-5.0)
+    [](int a, int b) -> double { return std::abs(a - b); },
+    emp::ThreshSelector(5.0)
   );
 
   REQUIRE( bin.Get(bin.Put("hi", 1)) == "hi" );

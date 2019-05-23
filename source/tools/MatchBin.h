@@ -40,12 +40,12 @@ namespace emp {
           uids.begin(),
           uids.end(),
           [&scores](size_t const &a, size_t const &b) {
-            return scores.at(a) > scores.at(b);
+            return scores.at(a) < scores.at(b);
           }
         );
 
         size_t i = 0;
-        while(i < uids.size() && i < n && scores.at(uids[i]) > thresh) ++i;
+        while(i < uids.size() && i < n && scores.at(uids[i]) < thresh) ++i;
 
         return emp::vector<size_t>(uids.begin(), uids.begin()+i);
 
@@ -138,6 +138,7 @@ namespace emp {
     void SetRegulator(size_t uid, double amt) { regulators.at(uid) = amt; }
 
     size_t Put(const Val & v, const Tag & t) {
+      size_t orig = uid_stepper;
       while(values.find(++uid_stepper) != values.end());
       values[uid_stepper] = v;
       regulators[uid_stepper] = 0.0;
