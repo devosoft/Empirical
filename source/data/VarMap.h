@@ -23,18 +23,53 @@
 namespace emp {
 
   class VarMap {
-
+  private:
     struct VarBase {
-      std::string name;
+      std::string name;                              ///< Name of this variable.
+
+      VarBase(const std::string & in_name) : name(in_name) { ; }
     };
 
     template <typename T>
     struct VarInfo : public VarBase {
-      T value;
+      T value;                                       ///< Current value of this variable.
+
+      VarInfo(const std::string & name, T && in_value)
+      : VarBase(name)
+      , value( std::forward<T>(in_value) )
+      { ; }
     };
 
-    emp::vector<emp::Ptr<VarBase>> vars;
-    emp::unordered_map<std::string, size_t> id_map;
+    emp::vector<emp::Ptr<VarBase>> vars;             ///< Vector of all current variables.
+    emp::unordered_map<std::string, size_t> id_map;  ///< Map of names to vector positions.
+
+  public:
+    VarMap() { ; }
+
+    const std::string & GetName(size_t id) const { return vars[id].name; }
+    size_t GetID(const std::string & name) const { return Find(id_map, name, (size_t) -1); }
+
+    template <typename T>
+    size_t Add(const std::string & name, T && value) {
+      const size_t id = vars.size();
+      emp::Ptr<VarInfo<T>> new_ptr = NewPtr<VarInfo<T>>( name, std::forward<T>(value) );
+      vars.push_back(new_ptr);
+      id_map[name] = id;
+      return id;
+    }
+
+    template <typename T>
+    T & Get(size_t id) {
+      emp::Ptr<VarInfo<T>> ptr = vars[id].Cast<VarInfo<T>>();
+      return ptr->value;
+    }
+
+    template <typename T>
+    T & Get(const std::string & name) {
+      emp_assert( emp::Has(id_map, name) );
+      const size_t id = id_map[name];
+      return Get<T>(id);
+    }
   };
 
 }
