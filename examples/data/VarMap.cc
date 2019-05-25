@@ -22,7 +22,7 @@ int main()
   vmap.Add<std::string>("name3", "MyOrg3");
 
   vmap.Get<std::string>("name") = "FirstOrg";
-  vmap.Get<std::string>(1) = "Org TWO!";
+  vmap.Get<std::string>(3) = "Org TWO!";
   vmap.Get<std::string>("name3") = "Test Output!";
   vmap.Get<double>("fitness") = 1000000.1;
 
