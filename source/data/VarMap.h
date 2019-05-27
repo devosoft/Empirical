@@ -62,6 +62,26 @@ namespace emp {
       return id;
     }
 
+    size_t AddString(const std::string & name, const std::string & value) {
+      return Add<std::string>(name, value);
+    }
+
+    size_t AddInt(const std::string & name, int value) {
+      return Add<int>(name, value);
+    }
+
+    size_t AddDouble(const std::string & name, double value) {
+      return Add<double>(name, value);
+    }
+
+    size_t AddChar(const std::string & name, char value) {
+      return Add<char>(name, value);
+    }
+
+    size_t AddBool(const std::string & name, bool value) {
+      return Add<bool>(name, value);
+    }
+
     template <typename T>
     T & Get(size_t id) {
       emp_assert(id < vars.size());
