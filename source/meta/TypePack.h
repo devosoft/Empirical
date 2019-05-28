@@ -335,6 +335,13 @@ namespace emp {
     using make_unique = this_t;
     template <template <typename...> class WRAPPER> using wrap = this_t;
   };
+
+  /// A type trait to determine if a template that we are looking at is some kind of type pack.
+  template <typename T> struct is_TypePack : std::false_type {};
+  template <typename... Ts> struct is_TypePack<emp::TypePack<Ts...>> : std::true_type {};
 }
+
+/// Macro for building a TypePack from a set of types.
+#define EMP_BUILD_TYPE_PACK(...) emp::TypePack<__VA_ARGS__>
 
 #endif

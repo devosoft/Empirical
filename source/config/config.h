@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
+ *  @date 2016-2019.
  *
  *  @file  config.h
  *  @brief Maintains a set of configuration options.
@@ -37,16 +37,15 @@
 #ifndef EMP_CONFIG_H
 #define EMP_CONFIG_H
 
-
-#include <map>
-#include <ostream>
 #include <fstream>
 #include <functional>
+#include <ostream>
 #include <string>
 #include <sstream>
 #include <unordered_set>
 
 #include "../base/errors.h"
+#include "../base/unordered_map.h"
 #include "../base/vector.h"
 #include "../tools/functions.h"
 #include "../tools/map_utils.h"
@@ -341,23 +340,23 @@ namespace emp {
 
     // === Protected member variables ===
     emp::vector<std::string> class_names;           // Names in class heiarchy.
-    std::map<std::string, ConfigEntry *> var_map;   // All variables across groups.
+    emp::unordered_map<std::string, ConfigEntry *> var_map;   // All variables across groups.
     std::string version_id;                         // Unique version ID to ensure synced config.
     emp::vector<ConfigGroup *> group_set;           // All of the config groups.
     std::stringstream warnings;                     // Aggrigate warnings for combined display.
     int delay_warnings;                             // Count of delays to collect warnings for printing.
-    std::map<std::string, std::string> alias_map;   // Map all aliases to original name.
+    emp::unordered_map<std::string, std::string> alias_map;   // Map all aliases to original name.
 
     // Map namespaces to the appropriate config object.
-    std::map<std::string, Config *> namespace_map;
+    emp::unordered_map<std::string, Config *> namespace_map;
 
     // Map new type names to the manager that handles them.
-    std::map<std::string, ConfigManager_Base *> type_manager_map;
+    emp::unordered_map<std::string, ConfigManager_Base *> type_manager_map;
 
     // Build a map of extra input commands to the function that they should call if triggered.
-    std::map<std::string, std::function<bool(std::string)> > command_map;
-    std::map<std::string, std::function<bool(std::string)> > new_map;
-    std::map<std::string, std::function<bool(std::string)> > use_map;
+    emp::unordered_map<std::string, std::function<bool(std::string)> > command_map;
+    emp::unordered_map<std::string, std::function<bool(std::string)> > new_map;
+    emp::unordered_map<std::string, std::function<bool(std::string)> > use_map;
 
     // Instructions on how config should behave.
     bool expand_ok;          // Should we expand variables in the config file.

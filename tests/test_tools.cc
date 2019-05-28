@@ -735,21 +735,21 @@ TEST_CASE("Test lexer_utils", "[tools]")
 
   emp::RegEx re2f("[de]*f[de]*f[de]*");
   // emp::RegEx re2f("([de]*)f([de]*)f([de]*)");
-emp::NFA nfa2f = to_NFA(re2f);
-emp::DFA dfa2f = to_DFA(nfa2f);
-REQUIRE( nfa2f.GetSize() == 12 );
-REQUIRE( dfa2f.GetSize() == 3 );
+  emp::NFA nfa2f = to_NFA(re2f);
+  emp::DFA dfa2f = to_DFA(nfa2f);
+  REQUIRE( nfa2f.GetSize() == 15 );
+  REQUIRE( dfa2f.GetSize() == 4 );
 
   int state;
-  state = dfa2f.Next(0, "a");        REQUIRE(state == -1); REQUIRE(dfa2f.IsStop(state) == false);
-  state = dfa2f.Next(0, "d");        REQUIRE(state == 0); REQUIRE(dfa2f.IsStop(state) == false);
-  state = dfa2f.Next(0, "defdef");   REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
-  state = dfa2f.Next(0, "fedfed");   REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
-  state = dfa2f.Next(0, "ffed");     REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
-  state = dfa2f.Next(0, "edffed");   REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
-  state = dfa2f.Next(0, "edffedf");  REQUIRE(state == -1); REQUIRE(dfa2f.IsStop(state) == false);
-  state = dfa2f.Next(0, "defed");    REQUIRE(state == 1); REQUIRE(dfa2f.IsStop(state) == false);
-  state = dfa2f.Next(0, "ff");       REQUIRE(state == 2); REQUIRE(dfa2f.IsStop(state) == true);
+  state = dfa2f.Next(0, "a");        REQUIRE(dfa2f.IsStop(state) == false);
+  state = dfa2f.Next(0, "d");        REQUIRE(dfa2f.IsStop(state) == false);
+  state = dfa2f.Next(0, "defdef");   REQUIRE(dfa2f.IsStop(state) == true);
+  state = dfa2f.Next(0, "fedfed");   REQUIRE(dfa2f.IsStop(state) == true);
+  state = dfa2f.Next(0, "ffed");     REQUIRE(dfa2f.IsStop(state) == true);
+  state = dfa2f.Next(0, "edffed");   REQUIRE(dfa2f.IsStop(state) == true);
+  state = dfa2f.Next(0, "edffedf");  REQUIRE(dfa2f.IsStop(state) == false);
+  state = dfa2f.Next(0, "defed");    REQUIRE(dfa2f.IsStop(state) == false);
+  state = dfa2f.Next(0, "ff");       REQUIRE(dfa2f.IsStop(state) == true);
 
   emp::RegEx re_lower("[a-z]+");
   emp::RegEx re_upper("[A-Z]+");

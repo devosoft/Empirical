@@ -1,0 +1,40 @@
+/*****
+ *
+ *  This is an example file of what an Empirical concept might look like.
+ *
+ *  The concept below will define a Vehicle wrapper template that will add the VehicleBase
+ *  base class on to any wrapped type.
+ *
+ *****/
+
+#include "Testfile.h"
+
+namespace test {
+  concept Vehicle : VehicleBase {
+    // Any variables declared here are added to the base concept; they shadow any variables
+    // in the wrapped class.
+    DataMap data_map;   // Add a data map to all Vehicles.
+
+    // Any functions have a virtual version placed in the base class, and will call the correct
+    // derived version.  Functions can be made either optional or required.
+
+    // If a function is optional, it should indicate the default behavior.
+    bool CanFly() const { return false; }  
+
+    // If a function is required, it should include a REQUIRE with an error message.
+    double SetSpeed(double speed) = required;
+    
+    // A single function parameter can be marked overload.  This parameter must
+    // be a TypeSet, which will be exploded to create many versions of the function.
+    double SetPart( overload<part_types> part, size_t part_id ) = required;
+
+    // Types are only available in the wrapped class (not the base class) and can be required or
+    // optional in the class being wrapped.
+
+    // If a type is optional, it should include a default setting.
+    using wheel_type = void;
+
+    // If a type is required, it should be set to REQUIRE with an error message.
+    using fuel_type = required;
+  };
+}

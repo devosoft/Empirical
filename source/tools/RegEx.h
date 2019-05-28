@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2019
+ *  @date 2016-2019.
  *
  *  @file  RegEx.h
  *  @brief Basic regular expression handler.
@@ -16,11 +16,12 @@
  *   '?'          - previous is optional
  *   '.'          - Match any character except \n
  *
- *  Pluse the following group contents (and change may translation rules)
+ *  Plus the following group contents (and change may translation rules)
  *   '(' and ')'  - group contents
  *   '"'          - Ignore special characters in contents (quotes still need to be escaped)
  *   '[' and ']'  - character set -- choose ONE character
- *                  ^ as first char negates contents ; - indicates range UNLESS first or last.
+ *                  '^' as first char negates contents
+ *                  '-' indicates range UNLESS first or last.
  *
  *  Additional overloads for functions in lexer_utils.h:
  *
@@ -150,6 +151,7 @@ namespace emp {
       Ptr<re_base> pop() { auto out = nodes.back(); nodes.pop_back(); return out; }
       size_t GetSize() const override { return nodes.size(); }
       Ptr<re_parent> AsParent() override { return ToPtr(this); }
+
       bool Simplify() override {
         bool m=false;
         for (auto & x : nodes) {
@@ -171,7 +173,12 @@ namespace emp {
     /// Representation of a series of components...
     struct re_block : public re_parent {   // Series of re's
       void Print(std::ostream & os) const override {
-        os << "BLOCK["; for (auto x : nodes) x->Print(os); os << "]";
+        os << "BLOCK[";
+        for (size_t i = 0; i < nodes.size(); i++) {
+          if (i > 0) os << " ";
+          nodes[i]->Print(os);
+        }
+        os << "]";
       }
       Ptr<re_block> AsBlock() override { return ToPtr(this); }
       bool Simplify() override {
@@ -185,6 +192,7 @@ namespace emp {
             nodes[i] = new_node;
             modify = true;
           }
+
           // If two neighboring nodes are strings, merge them.
           if (i > 0 && nodes[i]->AsString() && nodes[i-1]->AsString()) {
             nodes[i-1]->AsString()->str += nodes[i]->AsString()->str;
@@ -230,6 +238,7 @@ namespace emp {
       void Print(std::ostream & os) const override {
         os << "|[";
         nodes[0]->Print(os);
+        os << ",";
         nodes[1]->Print(os);
         os << "]";
       }
@@ -245,10 +254,12 @@ namespace emp {
       void Print(std::ostream & os) const override { os << "*["; nodes[0]->Print(os); os << "]"; }
 
       virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+        const size_t origin = nfa.AddNewState();
         const size_t target = nfa.AddNewState();
-        nodes[0]->AddToNFA(nfa, start, target);
-        nfa.AddFreeTransition(target, start);
-        nfa.AddFreeTransition(start, stop);
+        nodes[0]->AddToNFA(nfa, origin, target);
+        nfa.AddFreeTransition(start, origin);
+        nfa.AddFreeTransition(target, origin);
+        nfa.AddFreeTransition(origin, stop);
       }
     };
 
@@ -257,10 +268,12 @@ namespace emp {
       re_plus(Ptr<re_base> c) { push(c); }
       void Print(std::ostream & os) const override { os << "+["; nodes[0]->Print(os); os << "]"; }
       virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+        const size_t origin = nfa.AddNewState();
         const size_t target = nfa.AddNewState();
-        nodes[0]->AddToNFA(nfa, start, target);
-        // From the target, can either go back to start and repeat, or straight to stop.
-        nfa.AddFreeTransition(target, start);
+        nodes[0]->AddToNFA(nfa, origin, target);
+        // From the target, can either go back to origin and repeat, or straight to stop.
+        nfa.AddFreeTransition(start, origin);
+        nfa.AddFreeTransition(target, origin);
         nfa.AddFreeTransition(target, stop);
       }
     };
@@ -455,11 +468,11 @@ namespace emp {
   public:
     RegEx() = delete;
     RegEx(const std::string & r) : regex(r), dfa(), head() {
-      Process(ToPtr(&head));
+      if (regex.size()) Process(ToPtr(&head));
       while(head.Simplify());
     }
     RegEx(const RegEx & r) : regex(r.regex), dfa(), head() {
-      Process(ToPtr(&head));
+      if (regex.size()) Process(ToPtr(&head));
       while(head.Simplify());
     }
     ~RegEx() { ; }
@@ -492,17 +505,17 @@ namespace emp {
     }
 
     /// For debugging: print the internal representation of the regex.
-    void PrintInternal() { head.Print(std::cout); std::cout << std::endl; }
+    void PrintInternal() const { head.Print(std::cout); std::cout << std::endl; }
 
     /// For debugging: print any internal notes generated about this regex.
-    void PrintNotes() {
+    void PrintNotes() const {
       for (const std::string & n : notes) {
         std::cout << n << std::endl;
       }
     }
 
     /// Print general debuging information about this regex.
-    void PrintDebug() {
+    void PrintDebug() const {
       if (notes.size()) {
         std::cout << "NOTES:" << std::endl;
         PrintNotes();

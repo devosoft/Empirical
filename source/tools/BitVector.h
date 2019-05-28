@@ -293,6 +293,15 @@ namespace emp {
       return *this;
     }
 
+    template <typename T>
+    operator emp::vector<T>() {
+      emp::vector<T> out(GetSize());
+      for (size_t i = 0; i < GetSize(); i++) {
+        out[i] = (T) Get(i);
+      }
+      return out;
+    }
+
     /// Resize this BitVector to have the specified number of bits.
     BitVector & Resize(size_t new_bits) {
       const size_t old_num_fields = NumFields();
@@ -542,6 +551,9 @@ namespace emp {
 
     /// Count the number of ones in the BitVector.
     size_t CountOnes() const { return CountOnes_Mixed(); }
+
+    /// Count the number of zeros in the BitVector.
+    size_t CountZeros() const { return GetSize() - CountOnes(); }
 
     /// Return the position of the first one; return -1 if no ones in vector.
     int FindBit() const {

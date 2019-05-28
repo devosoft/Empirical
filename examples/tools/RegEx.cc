@@ -73,6 +73,7 @@ int main()
   emp_assert(re2.Test("#aaaabc") == true);
   emp_assert(re2.Test("#abcabc") == true);
   emp_assert(re2.Test("#abcabcd") == false);
+  emp_assert(re2.Test("#abcnabcdabc") == false);
 
   emp::RegEx re3("xx(y|(z*)?)+xx");
   emp_assert(re3.Test("xxxx") == true);
@@ -94,4 +95,23 @@ int main()
 
   std::string test_str2 = "\"1234\", \"5678\"";
   emp_assert(re_STRING_LIT.Test(test_str2) == false);
+
+  // Test exclusion ranges.
+  emp::RegEx re4("[^a-z]+");
+  re4.PrintDebug();
+  emp_assert(re4.Test("ABC") == true);
+  emp_assert(re4.Test("abd") == false);
+  emp_assert(re4.Test("ABCdef") == false);
+  emp_assert(re4.Test("ADRGAFSAF235245@#$@#%") == true);
+
+  // Test string identification
+  emp::RegEx re5("\\\"[^\"]*\\\"");
+  re5.PrintDebug();
+
+  // Test combinations of + and *
+  std::cout << "------------\n";
+  emp::RegEx re6("(0+0)*");
+  re6.PrintDebug();
+  auto NFA6 = emp::to_NFA(re6);
+  NFA6.Print();
 }

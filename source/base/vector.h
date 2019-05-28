@@ -326,19 +326,18 @@ namespace emp {
     }
   };
 
-}
+  // A crude, generic printing function for vectors.
+  template <typename T, typename... Ts>
+  std::ostream & operator<<(std::ostream & out, const emp::vector<T,Ts...> & v) {
+    for (const T & x : v) out << x << " ";
+    return out;
+  }
 
-// A crude, generic printing function for vectors.
-template <typename T, typename... Ts>
-std::ostream & operator<<(std::ostream & out, const emp::vector<T,Ts...> & v) {
-  for (const T & x : v) out << x << " ";
-  return out;
-}
-
-template <typename T, typename... Ts>
-std::istream & operator>>(std::istream & is, emp::vector<T,Ts...> & v) {
-  for (T & x : v) is >> x;
-  return is;
+  template <typename T, typename... Ts>
+  std::istream & operator>>(std::istream & is, emp::vector<T,Ts...> & v) {
+    for (T & x : v) is >> x;
+    return is;
+  }
 }
 
 #endif

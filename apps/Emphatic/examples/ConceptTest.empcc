@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2018.
+//  Copyright (C) Michigan State University, 2019.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -8,19 +8,17 @@
 #include <iostream>
 
 #include "base/Ptr.h"
-#include "meta/ConceptWrapper.h"
 
-EMP_BUILD_CONCEPT( TestConcept, TestConcept_Base,
-                   PUBLIC( int x=5; ),
-                   REQUIRED_FUN(RequiredFun1, "Missing RequiredFun function 1!", void),
-                   REQUIRED_FUN(RequiredFun2, "Missing RequiredFun function 2!", void),
-                   OPTIONAL_FUN(OptionalFun1, { std::cout << "Default version of OptionalFun1()" << std::endl; x++; }, void),
-                   REQUIRED_FUN(DoMath1, "Missing required function DoMath1", double, double, double ),
-                   OPTIONAL_FUN(DoMath2, (arg1 + arg2)/2.0, double, double, double ),
-                   REQUIRED_TYPE(test1_t, "Missing required type test1_t"),
-                   OPTIONAL_TYPE(test2_t, int)
-                 );
-
+concept TestConcept : TestConcept_Base {
+  int x=5;
+  void RequiredFun1() = required;
+  void RequiredFun2() = required;
+  void OptionalFun1() { std::cout << "Default version of OptionalFun1()" << std::endl; x++; }
+  double DoMath1(double x, double y) = required;
+  double DoMath2(double x, double y) { return (x + y)/2.0; }
+  using test1_t = required;
+  using test2_t = int;
+};
 
 struct MinimalClass {
   void RequiredFun1() { std::cout << "In MinimalClass::RequiredFun1()" << std::endl; }

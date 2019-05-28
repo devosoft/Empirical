@@ -32,6 +32,9 @@ tmp/
 
 apps/Avida/Avida
 apps/Avida/web/Avida.js
+apps/Emphatic/Emphatic
+apps/Emphatic/examples/ConceptTest
+apps/Emphatic/examples/ConceptTest.cc
 apps/MABE/examples/NK
 apps/NK.bak/
 apps/NK/NK
