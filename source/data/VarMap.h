@@ -96,6 +96,35 @@ namespace emp {
       const size_t id = id_map[name];
       return Get<T>(id);
     }
+
+    template <typename T>
+    const T & Get(size_t id) const {
+      emp_assert(id < vars.size());
+      emp_assert(vars[id].type_value = emp::GetTypeValue<T>());
+      emp::Ptr<VarInfo<T>> ptr = vars[id].Cast<VarInfo<T>>();
+      return ptr->value;
+    }
+
+    template <typename T>
+    const T & Get(const std::string & name) const {
+      emp_assert( emp::Has(id_map, name) );
+      const size_t id = emp::Find(id_map, name, (size_t) -1);
+      return Get<T>(id);
+    }
+
+    // Accessors    
+    std::string & GetString(const std::string & name) { return Get<std::string>(name); }
+    int & GetInt(const std::string & name) { return Get<int>(name); }
+    double & GetDouble(const std::string & name) { return Get<double>(name); }
+    char & GetChar(const std::string & name) { return Get<char>(name); }
+    bool & GetBool(const std::string & name) { return Get<bool>(name); }
+
+    // Const accessors
+    const std::string & GetString(const std::string & name) const { return Get<std::string>(name); }
+    int GetInt(const std::string & name) const { return Get<int>(name); }
+    double GetDouble(const std::string & name) const { return Get<double>(name); }
+    char GetChar(const std::string & name) const { return Get<char>(name); }
+    bool GetBool(const std::string & name) const { return Get<bool>(name); }
   };
 
 }
