@@ -31,16 +31,21 @@ namespace emp {
 
       VarBase(const std::string & in_name, size_t in_type_value)
       : name(in_name), type_value(in_type_value) { ; }
+      virtual ~VarBase() { ; }
+
+      virtual emp::Ptr<VarBase> Clone() const = 0;
     };
 
     template <typename T>
     struct VarInfo : public VarBase {
       T value;                                       ///< Current value of this variable.
 
-      VarInfo(const std::string & name, T && in_value)
+      VarInfo(const std::string & name, const T & in_value)
       : VarBase(name, GetTypeValue<T>())
-      , value( std::forward<T>(in_value) )
+      , value( in_value )
       { ; }
+
+      emp::Ptr<VarBase> Clone() const { return emp::NewPtr< VarInfo<T> >(name, value); }
     };
 
     emp::vector<emp::Ptr<VarBase>> vars;             ///< Vector of all current variables.
@@ -48,15 +53,26 @@ namespace emp {
 
   public:
     VarMap() { ; }
+    VarMap(const VarMap & _in) : vars(_in.vars.size()), id_map(_in.id_map) {
+      // Copy over each of the var infos into the correct position of the new vector.
+      for (size_t i = 0; i < vars.size(); i++) {
+        vars[i] = _in.vars[i]->Clone();
+      }
+    }
+    VarMap(VarMap &&) = default;  // Default behavior will move all pointers over to the new VarMap.
+    ~VarMap() {
+      // Delete all of the variable info.
+      for (auto x : vars) x.Delete();
+    }
 
     const std::string & GetName(size_t id) const { return vars[id]->name; }
     size_t GetID(const std::string & name) const { return Find(id_map, name, (size_t) -1); }
 
     template <typename T>
-    size_t Add(const std::string & name, T && value) {
+    size_t Add(const std::string & name, const T & value) {
       emp_assert( emp::Has(id_map, name) == false );
       const size_t id = vars.size();
-      emp::Ptr<VarInfo<T>> new_ptr = NewPtr<VarInfo<T>>( name, std::forward<T>(value) );
+      emp::Ptr<VarInfo<T>> new_ptr = NewPtr<VarInfo<T>>( name, value );
       vars.push_back(new_ptr);
       id_map[name] = id;
       return id;
@@ -101,7 +117,7 @@ namespace emp {
     const T & Get(size_t id) const {
       emp_assert(id < vars.size());
       emp_assert(vars[id].type_value = emp::GetTypeValue<T>());
-      emp::Ptr<VarInfo<T>> ptr = vars[id].Cast<VarInfo<T>>();
+      emp::Ptr<const VarInfo<T>> ptr = vars[id].Cast<const VarInfo<T>>();
       return ptr->value;
     }
 
