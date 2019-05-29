@@ -26,6 +26,8 @@
 #include "math.h"
 #include "Random.h"
 
+
+
 namespace emp {
 
   ///  A fixed-sized (but arbitrarily large) array of bits, and optimizes operations on those bits
@@ -339,6 +341,12 @@ namespace emp {
       for (auto & i : bit_set) i = ~0U;
       if (LAST_BIT > 0) { bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT); }
     }
+    
+    /// Overload ostream operator to return Print.
+    friend std::ostream& operator<<(std::ostream &out, const BitSet& bs){
+      bs.Print(out);
+      return out;
+    }
 
     /// Print all bits to the provided output stream.
     void Print(std::ostream & out=std::cout) const {
@@ -610,11 +618,28 @@ namespace emp {
 
 }
 
-template <size_t NUM_BITS> std::ostream & operator<<(std::ostream & out, const emp::BitSet<NUM_BITS> & _bit_set) {
-  _bit_set.Print(out);
-  return out;
-}
+/// For hashing BitSets
+namespace std
+{
 
+    // algorithm from boost: http://www.boost.org/doc/libs/1_61_0/doc/html/hash/reference.html#boost.hash_combine
+    constexpr inline std::size_t hash_combine(std::size_t hash1, std::size_t hash2) {
+        return hash1 ^ (hash2 * 0x9e3779b9 + (hash1 << 6) + (hash1 >> 2));
+    }
+    template <size_t N>
+    struct hash<emp::BitSet<N>>
+    {
+        size_t operator()( const emp::BitSet<N>& bs ) const
+        {
+           static const uint32_t NUM_BYTES = 1 + ((bs.GetSize() - 1) >> 3);
+           size_t result = bs.GetByte(0);
+           for (unsigned int i = 1; i < NUM_BYTES; ++i){
+                result = hash_combine(result, bs.GetByte(i));
+           }
+           return result;
+        }
+    };
+}
 
 
 #endif

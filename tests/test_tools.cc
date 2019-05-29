@@ -920,7 +920,7 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   auto res = bin.GetVals(bin.Match(0, 100000));
   const size_t count = std::count(std::begin(res), std::end(res), "salut");
-  REQUIRE( count > 50000 );
+  REQUIRE( count > 50000);
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
 
   bin.AdjRegulator(salut, 10.0);
@@ -935,9 +935,101 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
 
-
   }
+  {
+                
+  emp::MatchBin<std::string, emp::BitSet<32>> bitBin(
+      [](emp::BitSet<32> a, emp::BitSet<32> b){return (a^b).CountOnes();},
+      emp::ThreshSelector(3)
+  );
+        
+  emp::BitSet<32> bs3;
+  bs3.SetUInt(0,3); // 0000 0011
 
+  const size_t three = bitBin.Put("three", bs3);
+  REQUIRE( bitBin.GetVal(three) == "three");
+
+  emp::BitSet<32> bs1;
+  bs1.SetUInt(0,1); // 0000 0001
+
+  const size_t one = bitBin.Put("one", bs1);
+  REQUIRE( bitBin.GetVal(one) == "one");
+ 
+  emp::BitSet<32> bs11; 
+  bs11.SetUInt(0,11); //0000 1011
+	
+  REQUIRE(bitBin.GetVal(bitBin.Put("eleven", bs11)) == "eleven");
+	
+  emp::BitSet<32> bs0;//0000 0000
+   
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs0, 0)) == emp::vector<std::string>{});
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs0, 0)) == emp::vector<emp::BitSet<32>>{});
+
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs0, 1)) == emp::vector<std::string>{"one"});
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs0, 1)) == emp::vector<emp::BitSet<32>>{bs1});
+
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs11, 2)) == (emp::vector<std::string>{"eleven", "three"}));
+ REQUIRE(bitBin.GetTags(bitBin.Match(bs11, 2)) == (emp::vector<emp::BitSet<32>>{bs11, bs3}));
+
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs3, 5)) == (emp::vector<std::string> {"three","eleven","one"}));
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs3, 5)) == (emp::vector<emp::BitSet<32>> {bs3, bs11, bs1}));
+
+  REQUIRE (bitBin.Size() == 3);
+
+  bitBin.SetRegulator(one, .1); //1 0 1 2 --> .2 .1 .2 .3
+
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs3, 5)) == (emp::vector<std::string> {"one","three","eleven"}));
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs3, 5)) == (emp::vector<emp::BitSet<32>> {bs1, bs3, bs11}));
+
+  bitBin.SetRegulator(one, 1);
+  bitBin.SetRegulator(three, 4); // 2 1 0 1 --> 12 8 4 8
+
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs3, 5)) == (emp::vector<std::string> {"one","eleven"}));
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs3, 5)) == (emp::vector<emp::BitSet<32>> {bs1, bs11}));
+
+  } 
+
+  {
+  emp::Random rand(1);
+  emp::MatchBin<std::string, emp::BitSet<32>> bitBin(
+    [](emp::BitSet<32> a, emp::BitSet<32> b){ return (a^b).CountOnes();},
+    emp::RouletteSelector(rand)
+  );
+
+  emp::BitSet<32> bs2;
+  bs2.SetUInt(0, 2);//0000 0010
+  const size_t elementary = bitBin.Put("elementary", bs2);
+  REQUIRE(bitBin.GetVal(elementary) == "elementary");
+
+  emp::BitSet<32> bs6;
+  bs6.SetUInt(0,6);//0000 0110
+  const size_t fedora = bitBin.Put("fedora", bs6);
+  REQUIRE(bitBin.GetVal(fedora) == "fedora");
+
+  REQUIRE(bitBin.Size() == 2);
+
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs2, 0)) == emp::vector<std::string>{});
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs2, 0)) == emp::vector<emp::BitSet<32>>{});
+
+  auto res = bitBin.GetVals(bitBin.Match(bs2, 100000));
+  const size_t count = std::count(std::begin(res), std::end(res), "elementary");
+  REQUIRE(count > 50000);
+  REQUIRE (std::count(std::begin(res), std::end(res), "fedora") > 0);
+
+  bitBin.AdjRegulator(elementary, 10);
+  bitBin.SetRegulator(fedora, 0.5);
+  res = bitBin.GetVals(bitBin.Match(bs2, 100000));
+
+  REQUIRE(std::count(std::begin(res), std::end(res), "elementary") > 0);
+  REQUIRE(std::count(std::begin(res), std::end(res), "fedora") > 50000);
+
+  bitBin.SetRegulator(elementary, 0.5);
+  bitBin.SetRegulator(fedora, 2.0);
+  res = bitBin.GetVals(bitBin.Match(bs2, 100000));
+
+  REQUIRE( std::count(std::begin(res), std::end(res), "elementary") > count);
+  REQUIRE( std::count(std::begin(res), std::end(res), "fedora") >  0);	
+  }
 }
 
 
