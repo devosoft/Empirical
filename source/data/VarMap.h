@@ -27,13 +27,12 @@ namespace emp {
   private:
     struct VarBase {
       std::string name;                              ///< Name of this variable.
-      size_t type_value;                             ///< Unique ID for the underlying type.
 
-      VarBase(const std::string & in_name, size_t in_type_value)
-      : name(in_name), type_value(in_type_value) { ; }
+      VarBase(const std::string & in_name) : name(in_name) { ; }
       virtual ~VarBase() { ; }
 
       virtual emp::Ptr<VarBase> Clone() const = 0;
+      virtual size_t GetTypeValue() const = 0;
     };
 
     template <typename T>
@@ -41,11 +40,12 @@ namespace emp {
       T value;                                       ///< Current value of this variable.
 
       VarInfo(const std::string & name, const T & in_value)
-      : VarBase(name, GetTypeValue<T>())
+      : VarBase(name)
       , value( in_value )
       { ; }
 
-      emp::Ptr<VarBase> Clone() const { return emp::NewPtr< VarInfo<T> >(name, value); }
+      emp::Ptr<VarBase> Clone() const override { return emp::NewPtr< VarInfo<T> >(name, value); }
+      size_t GetTypeValue() const override { return emp::GetTypeValue<T>(); };
     };
 
     emp::vector<emp::Ptr<VarBase>> vars;             ///< Vector of all current variables.
@@ -101,7 +101,7 @@ namespace emp {
     template <typename T>
     T & Get(size_t id) {
       emp_assert(id < vars.size());
-      emp_assert(vars[id].type_value = emp::GetTypeValue<T>());
+      emp_assert(vars[id].GetTypeValue() = emp::GetTypeValue<T>());
       emp::Ptr<VarInfo<T>> ptr = vars[id].Cast<VarInfo<T>>();
       return ptr->value;
     }
@@ -116,7 +116,7 @@ namespace emp {
     template <typename T>
     const T & Get(size_t id) const {
       emp_assert(id < vars.size());
-      emp_assert(vars[id].type_value = emp::GetTypeValue<T>());
+      emp_assert(vars[id].GetTypeValue() = emp::GetTypeValue<T>());
       emp::Ptr<const VarInfo<T>> ptr = vars[id].Cast<const VarInfo<T>>();
       return ptr->value;
     }
