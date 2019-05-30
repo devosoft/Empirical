@@ -40,7 +40,7 @@ TEST_CASE("Test config", "[config]"){
   // old ArgManager in cl namespace
   {
 
-    emp::vector<std::string> arguments = {"--dir", "/some_path"};
+    emp::vector<std::string> arguments = {"command", "--dir", "/some_path"};
 
     std::vector<char*> argv;
     for (const auto& arg : arguments) argv.push_back((char*)arg.data());
@@ -56,7 +56,7 @@ TEST_CASE("Test config", "[config]"){
   // minimal test
   {
 
-    emp::vector<std::string> arguments = {"--dir", "/some_path"};
+    emp::vector<std::string> arguments = {"command", "--dir", "/some_path"};
 
     std::vector<char*> argv;
     for (const auto& arg : arguments) argv.push_back((char*)arg.data());
@@ -84,6 +84,9 @@ TEST_CASE("Test config", "[config]"){
     REQUIRE(*am.UseArg("dir") == (emp::vector<std::string>) {"/some_path"} );
     REQUIRE(!am.UseArg("dir"));
 
+    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"command"} );
+    REQUIRE(!am.UseArg("_command"));
+
     REQUIRE(!am.HasUnused());
 
   }
@@ -94,6 +97,7 @@ TEST_CASE("Test config", "[config]"){
     MyConfig config;
 
     emp::vector<std::string> arguments = {
+      "./command",
       "-unspecified",
       "unspec",
       "unspec",
@@ -151,8 +155,11 @@ TEST_CASE("Test config", "[config]"){
     REQUIRE(*am.UseArg("dir") == (emp::vector<std::string>) {"/other_path"} );
     REQUIRE(!am.UseArg("dir"));
 
+    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"./command"});
+
     REQUIRE(!am.ProcessBuiltin(&config));
     REQUIRE(!am.UseArg("help"));
+    REQUIRE(!am.UseArg("_command"));
 
     REQUIRE(!am.UseArg("duo"));
 
@@ -199,7 +206,9 @@ TEST_CASE("Test config", "[config]"){
   // when no spec is provided (e.g., default builtins are used)
   {
 
-    emp::vector<std::string> arguments = {"--dir", "/some_path", "-unk", "-h"};
+    emp::vector<std::string> arguments = {
+      "command", "--dir", "/some_path", "-unk", "-h"
+    };
 
     std::vector<char*> argv;
     for (const auto& arg : arguments) argv.push_back((char*)arg.data());
@@ -217,6 +226,9 @@ TEST_CASE("Test config", "[config]"){
 
     REQUIRE(am.UseArg("help") == (emp::vector<std::string>) {});
 
+    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"command"});
+    REQUIRE(!am.UseArg("_command"));
+
     REQUIRE(!am.HasUnused());
 
   }
@@ -224,7 +236,7 @@ TEST_CASE("Test config", "[config]"){
   // when empty spec is provided
   {
 
-    emp::vector<std::string> arguments = {"--dir", "/some", "-h"};
+    emp::vector<std::string> arguments = {"command", "--dir", "/some", "-h"};
 
     std::vector<char*> argv;
     for (const auto& arg : arguments) argv.push_back((char*)arg.data());
@@ -239,6 +251,7 @@ TEST_CASE("Test config", "[config]"){
 
     REQUIRE(am.HasUnused());
 
+    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"command"});
     REQUIRE(*am.UseArg("_unknown") == (emp::vector<std::string>) {"--dir"});
     REQUIRE(*am.UseArg("_unknown") == (emp::vector<std::string>) {"/some"});
     REQUIRE(*am.UseArg("_unknown") == (emp::vector<std::string>) {"-h"});
@@ -253,6 +266,7 @@ TEST_CASE("Test config", "[config]"){
     MyConfig config;
 
     emp::vector<std::string> arguments = {
+      "command",
       "-RANDOM_SEED",
       "32",
       "-no_callback",
