@@ -40,19 +40,34 @@ namespace emp {
         size_t n
       ){
 
-        std::sort(
-          uids.begin(),
-          uids.end(),
-          [&scores](size_t const &a, size_t const &b) {
-            return scores.at(a) < scores.at(b);
+        unsigned int i = 0;
+        if (n < log2(uids.size())){
+          //Perform a bounded selection sort to find the first n results
+          while (i < n){ 
+            int minIndex = -1;
+            for(int j = i; j < uids.size(); ++j){
+              if (minIndex == -1 || scores.at(uids[j]) < scores.at(uids[minIndex])){
+                if (scores.at(uids[j]) < thresh){
+                  minIndex = j;
+                }
+              }
+            }
+            if(minIndex == -1) break;
+            std::swap(uids.at(i),uids.at(minIndex));
+            ++i;
           }
-        );
-
-        size_t i = 0;
-        while(i < uids.size() && i < n && scores.at(uids[i]) < thresh) ++i;
-
+        }
+        else{
+          std::sort(
+            uids.begin(),
+            uids.end(),
+            [&scores](size_t const &a, size_t const &b) {
+              return scores.at(a) < scores.at(b);
+            }
+          );
+          while(i < uids.size() && i < n && scores.at(uids[i]) < thresh) ++i;   
+        }
         return emp::vector<size_t>(uids.begin(), uids.begin()+i);
-
       };
   }
 
