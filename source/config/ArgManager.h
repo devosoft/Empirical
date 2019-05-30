@@ -174,7 +174,7 @@ namespace emp {
         return res;
       }();
 
-      // if word is a valid command or alias for a command,
+      // If word is a valid command or alias for a command,
       // return the deflagged, dealiased command
       // otherwise, it's a positional command
       auto parse_alias = [deflagged, args, alias_map, specs](size_t i) {
