@@ -32,6 +32,13 @@ int main()
   std::cout << "Name 3 = " << vmap.Get<std::string>(4) << std::endl;
   std::cout << "Name 3 = " << vmap.Get<std::string>( vmap.GetID("name3") ) << std::endl;
 
+  // Try modifying variable references in VarMap.
+
+  int x = 5;
+  vmap.Add<int &>("test_int", x);
+  vmap.Get<int &>("test_int") += 10;
+  std::cout << "x = " << x << std::endl;
+
 //   std::cout << "\nTypes:\n";
 //   std::cout << "fitness: " << vmap.GetType("fitness") << std::endl;
 //   std::cout << "do_muts: " << vmap.GetType("do_muts") << std::endl;
