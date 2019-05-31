@@ -2,7 +2,7 @@
 //  Copyright (C) Michigan State University, 2019.
 //  Released under the MIT Software license; see doc/LICENSE
 //
-//  Calculate probabilities for selection using Roulette Selection (easy!)
+//  Calculate probabilities for selection using Lexicase Selection
 
 #include "config/command_line.h"
 #include "config/ArgManager.h"
