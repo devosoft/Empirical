@@ -28,8 +28,8 @@ public:
     // Meaningful tokens have next priority.
     token_identifier = AddToken("Identifier", "[a-zA-Z_][a-zA-Z0-9_]*");
     token_number = AddToken("Literal Number", "[0-9]+(.[0-9]+)?");
-    token_string = AddToken("Literal String", "\\\"[^\"]*\\\"");
-    token_char = AddToken("Literal Character", "'[^']+'");  // C++ will throw errors for bad usage.
+    token_string = AddToken("Literal String", "\\\"([^\"\\\\]|\\\\.)*\\\"");
+    token_char = AddToken("Literal Character", "'([^'\n\\\\]|\\\\.)+'");  // C++ will throw errors for bad usage.
 
     // Symbol tokens should have least priority.
     token_symbol = AddToken("Symbol", ".|\"::\"|\"==\"|\"!=\"|\"<=\"|\">=\"|\"->\"|\"&&\"|\"||\"|\"<<\"|\">>\"|\"++\"|\"--\"");
