@@ -339,6 +339,9 @@ public:
                                                 AsLexeme(pos), "'."));
           pos++;
         }
+        else if (fun_char == ';') { // Function is declared, but not defined here.
+          new_element.special_value = "declare";
+        }
         else {
           Error(pos-1, "Function body must begin with open brace or assignment ('{' or '=')");
         }
