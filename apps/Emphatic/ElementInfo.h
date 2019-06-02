@@ -33,7 +33,7 @@ struct ElementInfo {
   emp::vector<ParamInfo> params;      ///< Full set of function parameters
   std::set<std::string> attributes;   ///< const, noexcept, etc.
   std::string default_code;           ///< Variable initialization or function body.
-  std::string special_value;          ///< "default", "delete", or "0" (required for concepts)
+  std::string special_value;          ///< "default", "delete", or "0" (required), etc.
 
   bool IsTypedef() const { return element_type == TYPEDEF; }
   bool IsVariable() const { return element_type == VARIABLE; }
@@ -42,6 +42,7 @@ struct ElementInfo {
   bool IsRequired() const { return special_value == "0"; }
   bool IsDefault() const { return special_value == "default"; }
   bool IsDeleted() const { return special_value == "delete"; }
+  bool IsDeclaration() const { return special_value == "declare"; }
 
   void SetTypedef() { element_type = TYPEDEF; }
   void SetVariable() { element_type = VARIABLE; }
@@ -105,6 +106,7 @@ struct ElementInfo {
       os << prefix << type << " " << name << "(" << ParamString() << ") " << AttributeString();
       if (IsRequired()) os << " = 0;\n";
       else if (IsDefault()) os << " = default;\n";
+      else if (IsDeclaration()) os << ";\n";
       else os << " {\n" << prefix << "  " << default_code << "\n" << prefix << "}\n";
     }
   }
@@ -176,7 +178,8 @@ struct ElementInfo {
         os << prefix << "  " << "static_assert( HasFun_" << name
                      << "(), \"\\n\\n  ** Error: concept instance missing required function '"
                      << name << "' **\\n\");\n";
-        if (type != "void") os << prefix << "return ";
+        os << prefix << "  ";
+        if (type != "void") os << "return ";
         os << "WRAPPED_T::" << name << "( " << ArgString() << " );\n";
       }
 
