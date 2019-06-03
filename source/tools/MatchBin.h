@@ -25,86 +25,77 @@
 
 namespace emp {
 
-  using selector_t = std::function<
-    emp::vector<size_t>
-    (emp::vector<size_t>&, std::unordered_map<size_t, double>&, size_t)
-  >;
+  template<size_t width>
+  struct HammingDistance{
+    static double Metric(BitSet<width> a, BitSet<width> b){return (a^b).CountOnes();}
+  };
 
-  /// Factory function that generates an exact match-order selector function
-  /// configured to filter out matches below a minimum-match threshold.
-  selector_t ThreshSelector(double thresh){
+  struct Difference{
+    static double Metric(int a, int b){ return (double)abs(a-b);}
+  };
 
-    return [thresh](
-        emp::vector<size_t>& uids,
-        std::unordered_map<size_t, double>& scores,
-        size_t n
-      ){
-
-        unsigned int i = 0;
-        if (n < log2(uids.size())){
-          //Perform a bounded selection sort to find the first n results
-          while (i < n){ 
-            int minIndex = -1;
-            for(int j = i; j < uids.size(); ++j){
-              if (minIndex == -1 || scores.at(uids[j]) < scores.at(uids[minIndex])){
-                if (scores.at(uids[j]) < thresh){
-                  minIndex = j;
-                }
+  template<int numerator, int denominator>
+  struct ThreshSelector{
+    static emp::vector<size_t> Select(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n){
+        
+      double thresh = (double)numerator / (double)denominator;
+      unsigned int i = 0;
+      if (n < log2(uids.size())){
+        //Perform a bounded selection sort to find the first n results
+        while (i < n){ 
+          int minIndex = -1;
+          for(size_t j = i; j < uids.size(); ++j){
+            if (minIndex == -1 || scores.at(uids[j]) < scores.at(uids[minIndex])){
+              if (scores.at(uids[j]) < thresh){
+                minIndex = j;
               }
             }
-            if(minIndex == -1) break;
-            std::swap(uids.at(i),uids.at(minIndex));
-            ++i;
           }
+          if(minIndex == -1) break;
+          std::swap(uids.at(i),uids.at(minIndex));
+          ++i;
         }
-        else{
-          std::sort(
-            uids.begin(),
-            uids.end(),
-            [&scores](size_t const &a, size_t const &b) {
-              return scores.at(a) < scores.at(b);
-            }
-          );
-          while(i < uids.size() && i < n && scores.at(uids[i]) < thresh) ++i;   
-        }
-        return emp::vector<size_t>(uids.begin(), uids.begin()+i);
-      };
-  }
-
+      }
+      else{
+        std::sort(
+          uids.begin(),
+          uids.end(),
+          [&scores](size_t const &a, size_t const &b) {
+            return scores.at(a) < scores.at(b);
+          }
+        );
+        while(i < uids.size() && i < n && scores.at(uids[i]) < thresh) ++i;   
+      }
+      return emp::vector<size_t>(uids.begin(), uids.begin()+i);
+    }
+  };
+  
   /// Factory function that generates a selector function that chooses
   /// probabilisticly based on match quality with replacement.
-  selector_t RouletteSelector(
-    emp::Random &random,
-    const double skew=0.1
-  ){
+  struct RouletteSelector{
+    static emp::vector<size_t> Select(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n){
+      emp::Random random(1);
+      const double skew = 0.1;
 
-    emp_assert(skew > 0.0);
+      IndexMap match_index(uids.size());
+      for (size_t i = 0; i < uids.size(); ++i) {
+        emp_assert(scores[uids[i]] >= 0);
+        match_index.Adjust(i, 1.0 / ( skew + scores[uids[i]] ));
+      }
 
-    return [&random, skew](
-        emp::vector<size_t>& uids,
-        std::unordered_map<size_t, double>& scores,
-        size_t n
-      ){
+      emp::vector<size_t> res;
+      res.reserve(n);
 
-        IndexMap match_index(uids.size());
-        for (size_t i = 0; i < uids.size(); ++i) {
-          emp_assert(scores[uids[i]] >= 0);
-          match_index.Adjust(i, 1.0 / ( skew + scores[uids[i]] ));
-        }
+      for (size_t j = 0; j < n; ++j) {
+        const double match_pos = random.GetDouble(match_index.GetWeight());
+        const size_t idx = match_index.Index(match_pos);
+        res.push_back(uids[idx]);
+      }
 
-        emp::vector<size_t> res;
-        res.reserve(n);
+      return res;
+    }
 
-        for (size_t j = 0; j < n; ++j) {
-          const double match_pos = random.GetDouble(match_index.GetWeight());
-          const size_t idx = match_index.Index(match_pos);
-          res.push_back(uids[idx]);
-        }
-
-        return res;
-
-      };
-  }
+  };
 
   /// A data container that allows lookup by tag similarity. It can be templated
   /// on different tag types and is configurable on construction for (1) the
@@ -116,11 +107,11 @@ namespace emp {
   /// This unique identifier can be used to view or edit the stored items and
   /// their corresponding tags. Tag-based lookups return a list of matched
   /// unique identifiers.
-  template <typename Val, typename Tag> class MatchBin {
+  template <typename Val, typename Tag, typename Metric, typename Selector> class MatchBin {
   private:
 
-    const std::function<double(Tag, Tag)> metric;
-    const selector_t selector;
+    //const std::function<double(Tag, Tag)> metric;
+    //const selector_t selector;
 
     std::unordered_map<size_t, Val> values;
     std::unordered_map<size_t, double> regulators;
@@ -130,13 +121,7 @@ namespace emp {
     size_t uid_stepper;
 
   public:
-
-    MatchBin (
-      const std::function<double(Tag, Tag)> metric_,
-      const selector_t selector_ = ThreshSelector(0.0)
-    ) : metric(metric_)
-    , selector(selector_)
-    , uid_stepper(0) { ; }
+    MatchBin ():uid_stepper(0) { }
 
     /// Compare a query tag to all stored tags using the distance metric
     /// function and return a vector of unique IDs chosen by the selector
@@ -147,7 +132,7 @@ namespace emp {
       std::unordered_map<Tag, double> matches;
       for (const auto &[uid, tag] : tags) {
         if (matches.find(tag) == matches.end()) {
-          matches[tag] = metric(query, tag);
+          matches[tag] = Metric::Metric(query, tag);
         }
       }
 
@@ -157,7 +142,7 @@ namespace emp {
         scores[uid] = matches[tags[uid]] * regulators[uid] + regulators[uid];
       }
 
-      return selector(uids, scores, n);
+      return Selector::Select(uids, scores, n);
     }
 
     /// Put an item and associated tag in the container. Returns the uid for
