@@ -18,27 +18,47 @@
 #include <functional>
 #include <algorithm>
 #include <stdexcept>
+#include <limits>
 
 #include "../base/assert.h"
 #include "../base/vector.h"
 #include "../tools/IndexMap.h"
 
 namespace emp {
-
+  /// Metric for MatchBin stored in the struct so we can template on it
+  /// Returns the number of bits not in common between two BitSets
   template<size_t width>
   struct HammingDistance{
-    static double Metric(BitSet<width> a, BitSet<width> b){return (a^b).CountOnes();}
+    //static double Metric(BitSet<width> a, BitSet<width> b){return (double)(a^b).CountOnes();}
+    double operator()(const BitSet<width>& a, const BitSet<width>& b) const{
+      return (double)(a^b).CountOnes();
+    }
   };
 
+  /// Metric gives the absolute difference between two integers
   struct Difference{
-    static double Metric(int a, int b){ return (double)abs(a-b);}
+    double operator()(const int a, const int b) const {
+      return (double)abs(a-b);
+    }
   };
 
-  template<int numerator, int denominator>
+  /// Metric give
+  template<int max_value = 1000>
+  struct Push{
+    double operator()(const size_t a, const size_t b) const {
+      size_t difference = ((max_value + 1) + b - a) % (max_value+1);
+      return (double)(difference % (max_value+1));
+
+    }
+  };
+
+  /// Selector for MatchBin stored in the struct so we cn template on it
+  /// returns sorted matches that are inside the given threshold 
+  template<typename ratio>
   struct ThreshSelector{
-    static emp::vector<size_t> Select(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n){
+    emp::vector<size_t> operator()(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n){
         
-      double thresh = (double)numerator / (double)denominator;
+      double thresh = ratio::num / ratio::den;
       unsigned int i = 0;
       if (n < log2(uids.size())){
         //Perform a bounded selection sort to find the first n results
@@ -70,10 +90,9 @@ namespace emp {
     }
   };
   
-  /// Factory function that generates a selector function that chooses
-  /// probabilisticly based on match quality with replacement.
+  /// Selector chooses probabilistically based on match quality with replacement.
   struct RouletteSelector{
-    static emp::vector<size_t> Select(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n){
+    emp::vector<size_t> operator()(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n){
       emp::Random random(1);
       const double skew = 0.1;
 
@@ -109,17 +128,14 @@ namespace emp {
   /// unique identifiers.
   template <typename Val, typename Tag, typename Metric, typename Selector> class MatchBin {
   private:
-
-    //const std::function<double(Tag, Tag)> metric;
-    //const selector_t selector;
-
     std::unordered_map<size_t, Val> values;
     std::unordered_map<size_t, double> regulators;
     std::unordered_map<size_t, Tag> tags;
     emp::vector<size_t> uids;
-
     size_t uid_stepper;
-
+    Metric metric;
+    Selector select;
+  
   public:
     MatchBin ():uid_stepper(0) { }
 
@@ -132,7 +148,7 @@ namespace emp {
       std::unordered_map<Tag, double> matches;
       for (const auto &[uid, tag] : tags) {
         if (matches.find(tag) == matches.end()) {
-          matches[tag] = Metric::Metric(query, tag);
+          matches[tag] = metric(query, tag);
         }
       }
 
@@ -142,7 +158,7 @@ namespace emp {
         scores[uid] = matches[tags[uid]] * regulators[uid] + regulators[uid];
       }
 
-      return Selector::Select(uids, scores, n);
+      return select(uids, scores, n);
     }
 
     /// Put an item and associated tag in the container. Returns the uid for

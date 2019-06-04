@@ -19,6 +19,7 @@
 #include <numeric>
 #include <climits>
 #include <unordered_set>
+#include <ratio>
 
 #include "data/DataNode.h"
 
@@ -543,7 +544,7 @@ TEST_CASE("Test Graph utils", "[tools]")
 // emp::Random grand;
 TEST_CASE("Test hash_utils", "[tools]")
 {
-
+  {
   REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)0) == (uint64_t)0);
 
   REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)1) == (uint64_t)1);
@@ -604,7 +605,21 @@ TEST_CASE("Test hash_utils", "[tools]")
   std::unordered_set<uint64_t> hash_set(hash_vec.begin(), hash_vec.end());
 
   REQUIRE(hash_vec.size() == hash_set.size());
+  }
+  {
+  REQUIRE(emp::hash_combine((size_t) 0, (size_t) 0) == (size_t) 0); 
+  REQUIRE(emp::hash_combine((size_t) 0, (size_t) 1) == (size_t) 2654435769); 
+  REQUIRE(emp::hash_combine((size_t) 0, (size_t) 2) == (size_t) 5308871538); 
+  REQUIRE(emp::hash_combine((size_t) 1, (size_t) 0) == (size_t) 65); 
+  REQUIRE(emp::hash_combine((size_t) 2, (size_t) 0) == (size_t) 130);
 
+  REQUIRE(emp::hash_combine((size_t) 1, (size_t) 1) == (size_t) 2654435832); 
+  REQUIRE(emp::hash_combine((size_t) 2, (size_t) 2) == (size_t) 5308871664); 
+  REQUIRE(emp::hash_combine((size_t) 3, (size_t) 3) == (size_t) 7963307496); 
+  
+  REQUIRE(emp::hash_combine((size_t) 1, (size_t) 3) == (size_t) 7963307370); 
+  REQUIRE(emp::hash_combine((size_t) 3, (size_t) 1) == (size_t) 2654435962); 
+  }
 }
 
 
@@ -852,7 +867,7 @@ TEST_CASE("Test MatchBin", "[tools]")
     std::string,
     int,
     emp::Difference,
-    emp::ThreshSelector<7,1>
+    emp::ThreshSelector<std::ratio<7,1>>
       > bin;
 
   const size_t hi = bin.Put("hi", 1);
@@ -945,7 +960,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   std::string, 
   emp::BitSet<32>,
   emp::HammingDistance<32>,
-  emp::ThreshSelector<3, 1>
+  emp::ThreshSelector<std::ratio<3, 1>>
     > bitBin;
 
   emp::BitSet<32> bs3;
@@ -1036,6 +1051,102 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE( std::count(std::begin(res), std::end(res), "elementary") > count);
   REQUIRE( std::count(std::begin(res), std::end(res), "fedora") >  0);
       
+  }
+
+  {
+  const int max_value = 1000;
+  emp::MatchBin<
+    std::string,
+    size_t,
+    emp::Push<1000>,
+    emp::ThreshSelector<std::ratio<max_value,1>>
+      > bin;
+
+  const size_t hi = bin.Put("hi", 1);
+  REQUIRE( bin.GetVal(hi) == "hi" );
+  const size_t salut = bin.Put("salut", 0);
+  REQUIRE( bin.GetVal(salut) == "salut" );
+
+  REQUIRE( bin.GetVal(bin.Put("bonjour", 6)) == "bonjour" );
+  REQUIRE( bin.GetVal(bin.Put("yo", 10)) == "yo" );
+  REQUIRE( bin.GetVal(bin.Put("konichiwa", max_value)) == "konichiwa" );
+
+  REQUIRE( bin.Size() == 5 );
+
+  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{} );
+  REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<size_t>{} );
+
+  REQUIRE( bin.GetVals(bin.Match(0, 1)) == emp::vector<std::string>{"salut"} );
+  REQUIRE( bin.GetTags(bin.Match(0, 1)) == emp::vector<size_t>{0} );
+
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 2)) == (emp::vector<std::string>{"salut", "hi"})
+  );
+  REQUIRE( bin.GetTags(bin.Match(0, 2)) == (emp::vector<size_t>{0, 1}) );
+
+  REQUIRE(
+    bin.GetVals(bin.Match(7, 3)) == (emp::vector<std::string>{"yo", "konichiwa", "salut"})
+  );
+  REQUIRE( bin.GetTags(bin.Match(7, 3)) == (emp::vector<size_t>{10, max_value, 0}) );
+
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 4)) == (emp::vector<std::string>{"salut", "hi", "bonjour", "yo"})
+  );
+  REQUIRE( bin.GetTags(bin.Match(0, 4)) == (emp::vector<size_t>{0, 1, 6, 10}) );
+
+  REQUIRE( bin.GetVals(bin.Match(15, 8)) == (emp::vector<std::string>{"konichiwa", "salut", "hi", "bonjour", "yo"}) );
+  REQUIRE( bin.GetTags(bin.Match(15, 8)) == (emp::vector<size_t>{max_value, 0, 1, 6, 10}) );
+
+  REQUIRE( bin.GetVals(bin.Match(10, 2)) == (emp::vector<std::string>{"yo", "konichiwa"}) );
+  REQUIRE( bin.GetTags(bin.Match(10, 2)) == (emp::vector<size_t>{10, max_value}) );
+
+  bin.SetRegulator(hi, 5.0);
+  REQUIRE( bin.GetVals(bin.Match(1, 1)) == emp::vector<std::string>{"hi"} );
+  REQUIRE( bin.GetTags(bin.Match(1, 1)) == emp::vector<size_t>{1} );
+
+  bin.SetRegulator(hi, 7.0);
+  REQUIRE(
+    bin.GetVals(bin.Match(1, 1)) == (emp::vector<std::string>{"bonjour"})
+  );
+  REQUIRE( bin.GetTags(bin.Match(1, 1)) == (emp::vector<size_t>{6}) );
+
+  }
+
+  {
+  emp::MatchBin<
+    std::string,
+    int,
+    emp::Difference,
+    emp::RouletteSelector
+      >bin;
+
+  const size_t hi = bin.Put("hi", 1);
+  REQUIRE( bin.GetVal(hi) == "hi" );
+  const size_t salut = bin.Put("salut", 0);
+  REQUIRE( bin.GetVal(salut) == "salut" );
+
+  REQUIRE( bin.Size() == 2 );
+
+  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{} );
+  REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<int>{} );
+
+  auto res = bin.GetVals(bin.Match(0, 100000));
+  const size_t count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( count > 50000);
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.AdjRegulator(salut, 10.0);
+  bin.SetRegulator(hi, 0.5);
+  res = bin.GetVals(bin.Match(0, 100000));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 50000 );
+
+  bin.SetRegulator(salut, 0.5);
+  bin.SetRegulator(hi, 2.0);
+  res = bin.GetVals(bin.Match(0, 100000));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
   }
 
 }

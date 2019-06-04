@@ -25,6 +25,7 @@
 #include "functions.h"
 #include "math.h"
 #include "Random.h"
+#include "hash_utils.h"
 
 
 
@@ -621,7 +622,6 @@ namespace emp {
 /// For hashing BitSets
 namespace std
 {
-
     // algorithm from boost: http://www.boost.org/doc/libs/1_61_0/doc/html/hash/reference.html#boost.hash_combine
     constexpr inline std::size_t hash_combine(std::size_t hash1, std::size_t hash2) {
         return hash1 ^ (hash2 * 0x9e3779b9 + (hash1 << 6) + (hash1 >> 2));
@@ -634,7 +634,7 @@ namespace std
            static const uint32_t NUM_BYTES = 1 + ((bs.GetSize() - 1) >> 3);
            size_t result = bs.GetByte(0);
            for (unsigned int i = 1; i < NUM_BYTES; ++i){
-                result = hash_combine(result, bs.GetByte(i));
+                result = emp::hash_combine(result, bs.GetByte(i));
            }
            return result;
         }
