@@ -44,4 +44,11 @@ int main()
   emp::Print(v);  std::cout << std::endl;
   int found_pos = emp::FindEval(v, [](int x){ return (x>=7 && x <=9); });
   std::cout << "First position found: " << found_pos << std::endl;
+  found_pos = emp::FindEval(v, [](int x){ return (x>=7 && x <=9); }, found_pos+1);
+  std::cout << "Next position found: " << found_pos << std::endl;
+  found_pos = emp::FindEval(v, [](int x){ return (x>=7 && x <=9); }, found_pos+1);
+  std::cout << "Next position found: " << found_pos << std::endl;
+  found_pos = emp::FindEval(v, [](int x){ return (x>=7 && x <=9); }, found_pos+1);
+  std::cout << "Next position found: " << found_pos << std::endl;
+
 }
