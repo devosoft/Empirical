@@ -372,10 +372,12 @@ public:
 
   /// Process the tokens starting from the outer-most scope.
   void ProcessTop(size_t & pos, AST_Scope & cur_scope ) const {
+    Debug("Processing new scope");
     emp_assert(pos <= tokens.size(), pos, tokens.size());
     while (pos < tokens.size() && AsChar(pos) != '}') {
       // If this line is a pre-processor statement, just hook it in to print back out and keep going.
       if (IsPP(pos)) {
+        Debug ("...Processing Pre-Processor command.");
         AST_PP & new_node = cur_scope.NewChild<AST_PP>();
         new_node.name = emp::string_get(AsLexeme(pos), " \t");
         new_node.code = emp::to_string( AsLexeme(pos++), '\n');
@@ -391,33 +393,42 @@ public:
         ProcessConcept(pos, cur_scope);
       }
       else if (cur_lexeme == "struct" || cur_lexeme == "class") {
+        Debug("...Defining a new ", cur_lexeme);
         AST_Class & new_class = cur_scope.NewChild<AST_Class>();
         new_class.type = cur_lexeme;
         if (IsID(pos)) new_class.name = AsLexeme(pos++);
+        Debug("...Using name of new ", cur_lexeme, ": ", new_class.name);
         RequireChar('{', pos++, emp::to_string("A ", cur_lexeme, " must be defined in braces ('{' and '}')."));
         new_class.body = ProcessCode(pos, false, true);
         RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
         RequireChar(';', pos++, emp::to_string("A ", cur_lexeme, " must end with a semi-colon (';')."));
+        Debug("...Finished defining a new ", cur_lexeme, " named ", new_class.name);
       }
       else if (cur_lexeme == "namespace") {
         auto & new_ns = cur_scope.NewChild<AST_Namespace>();
 
         // If a name is provided for this namespace, store it.
         if (IsID(pos)) new_ns.name = AsLexeme(pos++);
+        Debug("...Defining a new ", cur_lexeme, " called ", new_ns.name);
 
         RequireChar('{', pos++, emp::to_string("A ", cur_lexeme, " must be defined in braces ('{' and '}')."));
         ProcessTop(pos, new_ns);
         RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
+
+        Debug("...Finished defining ", cur_lexeme, " called ", new_ns.name);
       }
       // @CAO: Still need to deal with "template", variables and functions, enums, template specializations
       ///      and empty lines (';').
-      else { // Must be a regular element (function, variable, using)
+      else { // Must be a regular element (function, variable, using)        
         pos--; // Backup since the first ID should be the type name.
+        Debug("...not defining concept, class, or namespace, so must be a regular element.");
         auto & new_node = cur_scope.NewChild<AST_Element>();
         new_node.info = ProcessElement(pos);
         // Error( pos-1, emp::to_string("Unknown keyword '", cur_lexeme, "'.  Aborting.") );
+        Debug("...Finished defining regular element.");
       }
     }
+    Debug("Finished processing scope");
   }
 
   /// We know we are in a concept definition.  Collect appropriate information.
@@ -427,6 +438,8 @@ public:
     // A concept must begin with its name.
     RequireID(pos, "Concept declaration must be followed by name identifier.");
     concept.name = tokens[pos++].lexeme;
+
+    Debug("...Processing concept: ", concept.name);
 
     // Next, must be a colon...
     RequireChar(':', pos++, "Concept names must be followed by a colon (':') and then a base class name.");
@@ -439,7 +452,9 @@ public:
     if (emp::Ptr<AST_Node> base_node = cur_scope.GetChild(concept.base_name);
         base_node) {
       Require(base_node->IsClass(), pos-1, "Identifer for concept base class cannot be used by a non-class.");
+      Debug("...Using pre-defined base clase for concept: ", base_node->name);
       base_node.Cast<AST_Class>()->concepts.push_back(&concept);
+      concept.base_predefined = true;
     }
 
     // Next, must be an open brace...
@@ -447,12 +462,15 @@ public:
 
     // Loop through the full definition of concept, incorporating each entry.
     while ( AsChar(pos) != '}' ) {
+      Debug("...Reading in concept member...");
       // While we are processing a concept, process member elements and put them in the vector.
       concept.members.push_back( ProcessElement(pos) );
     }
 
     pos++;  // Skip closing brace.
     RequireChar(';', pos++, "Concept definitions must end in a semi-colon.");
+
+    Debug("...Finished processing concept: ", concept.name);
 
     return concept;
   }
