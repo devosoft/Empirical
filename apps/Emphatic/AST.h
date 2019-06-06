@@ -126,7 +126,8 @@ struct AST_Element : AST_Node {
 
 /// AST Node for concept information.
 struct AST_Concept : AST_Node {
-  std::string base_name;
+  std::string base_name = "";    ///< What is the name of the base class that will part of this template.
+  bool base_predefined = false;  ///< Have other aspects of the base class already been defined?
 
   emp::vector<ElementInfo> members;
 
@@ -146,17 +147,20 @@ struct AST_Concept : AST_Node {
   }
 
   void PrintOutput(std::ostream & os, const std::string & prefix) const override {
-    os << prefix << "/// Base class for concept wrapper " << name << "<>.\n"
-        << prefix << "class " << base_name << " {\n"
-        << prefix << "public:\n";
+    // If the base class hasn't previously been defined, do so here.
+    if (base_predefined == false) {
+      os << prefix << "/// Base class for concept wrapper " << name << "<>.\n"
+          << prefix << "class " << base_name << " {\n"
+          << prefix << "public:\n";
 
-    // Print all of the BASE CLASS details.
-    for (auto & m : members) {
-      m.PrintConceptBase(os, prefix+"  ");
-      os << "\n";
+      // Print all of the BASE CLASS details.
+      for (auto & m : members) {
+        m.PrintConceptBase(os, prefix+"  ");
+        os << "\n";
+      }
+
+      os << prefix << "};\n\n";
     }
-
-    os << prefix << "};\n\n";
 
     // Print all of the TEMPLATE WRAPPER details.
     os << prefix << "/// === Concept wrapper (base class is " << base_name << ") ===\n"
@@ -194,7 +198,23 @@ struct AST_Class : public AST_Node {
 
   /// Scope should run output on each of its children.
   void PrintOutput(std::ostream & os, const std::string & prefix) const override {
-    os << prefix << type << " " << name << "{\n" << prefix << "  " << body << "};\n";
+    // Do the basic definition of this class.
+    os << prefix << type << " " << name << "{\n";
+    os << prefix << "  " << body << "\n";
+
+    // If this class is being used as a base clase for any concepts, include the concept code here.
+    if (concepts.size()) os << prefix << "public:\n";
+
+    for (auto concept : concepts) {
+      // Print all of the BASE CLASS details for each concept.
+      for (auto & m : concept->members) {
+        m.PrintConceptBase(os, prefix+"  ");
+        os << "\n";
+      }
+    }
+    
+
+    os << prefix << "};\n";
     // os << prefix << "namespace" << " " << name << "{\n";
     // for (auto x : children) { x->PrintOutput(os, prefix); }
     // os << prefix << "};\n";      
