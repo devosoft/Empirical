@@ -11,10 +11,20 @@
 
 /// All AST Nodes have a common base class.
 struct AST_Node {
+  std::string name = "";  ///< All nodes should have a name (to match their identifier) for easy lookup later.
+
   virtual ~AST_Node() { ; }
   /// Echo the original code passed into each class.
   virtual void PrintEcho(std::ostream &, const std::string & prefix) const = 0;
   virtual void PrintOutput(std::ostream &, const std::string & prefix) const = 0;
+
+  virtual bool IsScope() const { return false; }
+  virtual bool IsCode() const { return false; }
+  virtual bool IsPP() const { return false; }
+  virtual bool IsNamespace() const { return false; }
+  virtual bool IsClass() const { return false; }
+  virtual bool IsElement() const { return false; }
+  virtual bool IsConcept() const { return false; }
 };
 
 /// AST Node for a new scope level.
@@ -32,13 +42,20 @@ struct AST_Scope : AST_Node {
 
   /// Scope should run echo on each of its children.
   void PrintEcho(std::ostream & os, const std::string & prefix) const override {
-    for (auto x : children) { x->PrintEcho(os, prefix); }
+    for (auto node : children) { node->PrintEcho(os, prefix); }
   }
 
   /// Scope should run output on each of its children.
   void PrintOutput(std::ostream & os, const std::string & prefix) const override {
-    for (auto x : children) { x->PrintOutput(os, prefix); }
+    for (auto node : children) { node->PrintOutput(os, prefix); }
   }
+
+  emp::Ptr<AST_Node> GetChild(const std::string & node_name) const {
+    for (auto node : children) { if (node->name == node_name) return node; }
+    return nullptr;
+  }
+
+  bool IsScope() const { return true; }
 };
 
 /// AST Node for arbitrary code (these shouldn't be needed when parsing techniques improve)
@@ -54,6 +71,8 @@ struct AST_Code : public AST_Node {
   void PrintOutput(std::ostream & os, const std::string & prefix) const override {
     os << prefix << code;
   }
+
+  bool IsCode() const { return true; }
 };
 
 /// AST Node for Pre-processor code. (These should probably be dealt with in a first pass)
@@ -67,11 +86,11 @@ struct AST_PP : public AST_Code {
   void PrintOutput(std::ostream & os, const std::string & prefix) const override {
     os << code;
   }
+
+  bool IsPP() const { return true; }
 };
 
 struct AST_Namespace : public AST_Scope {
-  std::string name;
-
   /// Scope should run echo on each of its children.
   void PrintEcho(std::ostream & os, const std::string & prefix) const override {
     os << prefix << "namespace" << " " << name << " {\n";
@@ -85,30 +104,8 @@ struct AST_Namespace : public AST_Scope {
     for (auto x : children) { x->PrintOutput(os, prefix+"  "); }
     os << prefix << "}\n";      
   }
-};
 
-/// This AST node handles a class or struct definition.
-/// @todo: Ideally this node should process the contents to allow concepts in classes.
-struct AST_Class : public AST_Node {
-  std::string type = "class";
-  std::string name = "";
-  std::string body = "";
-
-  /// Scope should run echo on each of its children.
-  void PrintEcho(std::ostream & os, const std::string & prefix) const override {
-    os << prefix << type << " " << name << "{\n" << prefix << "  " << body << "};\n";
-    // os << prefix << type << " " << name << "{\n";
-    // for (auto x : children) { x->PrintEcho(os, prefix+"  "); }
-    // os << prefix << "};\n";      
-  }
-
-  /// Scope should run output on each of its children.
-  void PrintOutput(std::ostream & os, const std::string & prefix) const override {
-    os << prefix << type << " " << name << "{\n" << prefix << "  " << body << "};\n";
-    // os << prefix << "namespace" << " " << name << "{\n";
-    // for (auto x : children) { x->PrintOutput(os, prefix); }
-    // os << prefix << "};\n";      
-  }
+  bool IsNamespace() const { return true; }
 };
 
 /// AST Node for outer level using statement...
@@ -123,12 +120,12 @@ struct AST_Element : AST_Node {
   void PrintOutput(std::ostream & os, const std::string & prefix) const override {
     info.PrintEcho(os, prefix);
   }
+
+  bool IsElement() const { return true; }
 };
 
 /// AST Node for concept information.
 struct AST_Concept : AST_Node {
-
-  std::string name;
   std::string base_name;
 
   emp::vector<ElementInfo> members;
@@ -176,4 +173,32 @@ struct AST_Concept : AST_Node {
 
     os << prefix << "};\n\n";
   }
+
+  bool IsConcept() const { return true; }
+};
+
+/// This AST node handles a class or struct definition.
+/// @todo: Ideally this node should process the contents to allow concepts in classes.
+struct AST_Class : public AST_Node {
+  std::string type = "class";
+  std::string body = "";
+  emp::vector<emp::Ptr<AST_Concept>> concepts; ///< Which concepts does this class need to be base for?
+
+  /// Scope should run echo on each of its children.
+  void PrintEcho(std::ostream & os, const std::string & prefix) const override {
+    os << prefix << type << " " << name << "{\n" << prefix << "  " << body << "};\n";
+    // os << prefix << type << " " << name << "{\n";
+    // for (auto x : children) { x->PrintEcho(os, prefix+"  "); }
+    // os << prefix << "};\n";      
+  }
+
+  /// Scope should run output on each of its children.
+  void PrintOutput(std::ostream & os, const std::string & prefix) const override {
+    os << prefix << type << " " << name << "{\n" << prefix << "  " << body << "};\n";
+    // os << prefix << "namespace" << " " << name << "{\n";
+    // for (auto x : children) { x->PrintOutput(os, prefix); }
+    // os << prefix << "};\n";      
+  }
+
+  bool IsClass() const { return true; }
 };
