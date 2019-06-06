@@ -238,6 +238,22 @@ TEST_CASE("Test BitSet", "[tools]")
   bs80[65] = 1;
   REQUIRE(bs80.GetUIntAtBit(64) == 130);
   REQUIRE(bs80.GetValueAtBit<5>(64) == 2);
+
+  emp::BitSet<96> bs;
+
+  REQUIRE (bs.LongestSegmentOnes() == 0);
+  bs.SetUInt(2, 1);
+  REQUIRE (bs.LongestSegmentOnes() == 1);
+  bs.SetUInt(1, 3);
+  REQUIRE (bs.LongestSegmentOnes() == 2);
+  bs.SetUInt(0, 7);
+  REQUIRE (bs.LongestSegmentOnes() == 3);
+
+  bs.SetUInt(0, pow((uint32_t)2,(uint32_t)32)-1);
+  bs.SetUInt(1, pow((uint32_t)2,(uint32_t)32)-2);
+  bs.SetUInt(2, pow((uint32_t)2,(uint32_t)32)-4);
+  REQUIRE (bs.LongestSegmentOnes() == 32);
+
 }
 
 
@@ -1147,6 +1163,103 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
 
+  }
+  {
+  emp::MatchBin<
+  std::string, 
+  emp::BitSet<8>,
+  emp::DowningStreak<8>,
+  emp::ThreshSelector<std::ratio<4, 1>>
+    > bitBin;
+
+  emp::BitSet<8> bs1;
+  bs1.SetUInt(0,1); // 0000 0001
+
+  const size_t one = bitBin.Put("one", bs1);
+  REQUIRE( bitBin.GetVal(one) == "one");
+
+  emp::BitSet<8> bs128;
+  bs128.SetUInt(0,128); // 1000 000
+
+  const size_t oneTwoEight = bitBin.Put("one-two-eight", bs128);
+  REQUIRE( bitBin.GetVal(oneTwoEight) == "one-two-eight");
+
+  emp::BitSet<8> bs127; 
+  bs127.SetUInt(0,127); //0111 1111
+
+  REQUIRE(bitBin.GetVal(bitBin.Put("one-two-seven", bs127)) == "one-two-seven");
+
+  emp::BitSet<8> bs15;
+  bs15.SetUInt(0,15); //0000 1111
+
+  REQUIRE(bitBin.GetVal(bitBin.Put("fifteen", bs15)) == "fifteen");
+  
+  emp::BitSet<8> bs2;//0000 0010
+  bs2.SetUInt(0,2);
+
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs2, 0)) == emp::vector<std::string>{});
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs2, 0)) == emp::vector<emp::BitSet<8>>{});
+
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs2, 1)) == emp::vector<std::string>{"one"});
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs2, 1)) == emp::vector<emp::BitSet<8>>{bs1});
+
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs128, 2)) == (emp::vector<std::string>{"one-two-eight", "one"}));
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs128, 2)) == (emp::vector<emp::BitSet<8>>{bs128, bs1}));
+
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs127, 5)) == (emp::vector<std::string> {"one-two-seven", "fifteen","one","one-two-eight"}));
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs127, 5)) == (emp::vector<emp::BitSet<8>> {bs127, bs15, bs1, bs128}));
+
+  REQUIRE (bitBin.Size() == 4);
+
+  bitBin.SetRegulator(one, .1); //1 0 1 2 --> .2 .1 .2 .3
+
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs128, 2)) == (emp::vector<std::string> {"one","one-two-eight"}));
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs128, 2)) == (emp::vector<emp::BitSet<8>> {bs1,bs128}));
+
+  bitBin.SetRegulator(one, 2);
+
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs128, 5)) == (emp::vector<std::string> {"one-two-eight","fifteen","one-two-seven","one"}));
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs128, 5)) == (emp::vector<emp::BitSet<8>> {bs128, bs15, bs127, bs1}));
+
+  }
+   
+  {
+
+  emp::MatchBin<
+  std::string, 
+  emp::BitSet<64>,
+  emp::DowningStreak<64>,
+  emp::ThreshSelector<std::ratio<4, 1>>
+    > bitBin64;
+
+  size_t two = 2;
+
+  emp::BitSet<64> bs7;
+  bs7.SetUInt(1, pow(two, (size_t)18) + pow(two, (size_t)19) + pow(two, (size_t)20));
+
+  const size_t id_seven = bitBin64.Put("seven", bs7);
+  REQUIRE( bitBin64.GetVal(id_seven) == "seven");
+
+  emp::BitSet<64> bs1;
+  bs1.SetUInt(1, pow(two, (size_t)16) + pow(two, (size_t)17) + pow(two, (size_t)18)); 
+
+  const size_t id_one  = bitBin64.Put("one", bs1);
+  REQUIRE( bitBin64.GetVal(id_one) == "one");
+
+  emp::BitSet<64> bs9;
+  bs9.SetUInt(1, pow(two, (size_t)15) + pow(two, (size_t)16) + pow(two, (size_t)17)); 
+
+  const size_t id_nine  = bitBin64.Put("nine", bs9);
+  REQUIRE( bitBin64.GetVal(id_nine) == "nine");
+
+  REQUIRE (bitBin64.Size() == 3);
+
+  REQUIRE(bitBin64.GetVals(bitBin64.Match(bs1, 0)) == emp::vector<std::string>{});
+  REQUIRE(bitBin64.GetTags(bitBin64.Match(bs1, 0)) == emp::vector<emp::BitSet<64>>{});
+  
+  REQUIRE(bitBin64.GetVals(bitBin64.Match(bs9, 5)) == (emp::vector<std::string> {"nine","one","seven"}));
+  REQUIRE(bitBin64.GetTags(bitBin64.Match(bs9, 5)) == (emp::vector<emp::BitSet<64>> {bs9, bs1, bs7}));
+  
   }
 
 }

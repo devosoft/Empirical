@@ -29,7 +29,6 @@ namespace emp {
   /// Returns the number of bits not in common between two BitSets
   template<size_t width>
   struct HammingDistance{
-    //static double Metric(BitSet<width> a, BitSet<width> b){return (double)(a^b).CountOnes();}
     double operator()(const BitSet<width>& a, const BitSet<width>& b) const{
       return (double)(a^b).CountOnes();
     }
@@ -42,13 +41,32 @@ namespace emp {
     }
   };
 
-  /// Metric give
+  /// Metric gives the matchings by the closest tag on or above itself. (Wraps)
   template<int max_value = 1000>
   struct Push{
     double operator()(const size_t a, const size_t b) const {
       size_t difference = ((max_value + 1) + b - a) % (max_value+1);
       return (double)(difference % (max_value+1));
+    }
+  };
 
+  // Matches based on the longest segment of equal and uneqal bits in two bitsets
+  template<size_t width>
+  struct DowningStreak{//TODO The regulator may be a little bias for this.
+    double operator()(const emp::BitSet<width>& a, const emp::BitSet<width>& b){
+      auto bs = a^b;
+      size_t same = (~bs).LongestSegmentOnes();
+      size_t different = bs.LongestSegmentOnes();
+      double ps = ProbabilityKBitSequence(same);
+      double pd = ProbabilityKBitSequence(different);
+
+      // A result nearing 1 is a better match but the threshold picks lower first.
+      // So we must subtract from 1.0 to get the inverse.
+      return 1.0 - (pd / (ps + pd));
+    }
+
+    inline double ProbabilityKBitSequence(size_t k){
+      return (width - k + 1) / pow(2, k);
     }
   };
 
@@ -157,7 +175,6 @@ namespace emp {
       for (auto uid : uids) {
         scores[uid] = matches[tags[uid]] * regulators[uid] + regulators[uid];
       }
-
       return select(uids, scores, n);
     }
 

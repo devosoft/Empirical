@@ -429,6 +429,18 @@ namespace emp {
       return out_set;
     }
 
+    /// Finds the length of the longest segment of ones.
+    size_t LongestSegmentOnes() {
+      size_t length = 0;
+      BitSet out_set(*this);
+      while(out_set.Any()){
+        out_set.AND_SELF(out_set<<1);
+        ++length;
+      }
+      return length;
+    }
+
+
     /// Perform a Boolean NOT on this BitSet and return the result.
     BitSet NOT() const {
       BitSet out_set(*this);
