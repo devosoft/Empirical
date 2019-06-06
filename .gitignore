@@ -81,6 +81,7 @@ tests/web/node_modules/
 tests/test_file.dat
 
 third-party/doxygen/
+third-party/emsdk/
 build/
 doc/_build/
 
