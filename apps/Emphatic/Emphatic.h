@@ -34,6 +34,10 @@
  *           | FUNCTION
  *           | "using" ID '=' TYPE ';'
  *           | "using" ID '=' "0" ';'
+ *
+ * @todo: If a concept base class is already defined, concept should just add to it.
+ * @todo: For all concepts and classes we should create a static data structure for reflection.
+ * @todo: Classes should automatically have EMPStore() and EMPLoad() created for serialization.
  */
 
 #include <fstream>
@@ -88,6 +92,10 @@ private:
     if (debug) std::cout << "DEBUG: " << emp::to_string(std::forward<Ts>(args)...) << std::endl;
   }
 
+  template <typename... Ts>
+  void Require(bool result, int pos, Ts... args) const {
+    if (!result) { Error(pos, std::forward<Ts>(args)...); }
+  }
   template <typename... Ts>
   void RequireID(int pos, Ts... args) const {
     if (!IsID(pos)) { Error(pos, std::forward<Ts>(args)...); }
@@ -369,6 +377,7 @@ public:
       // If this line is a pre-processor statement, just hook it in to print back out and keep going.
       if (IsPP(pos)) {
         AST_PP & new_node = cur_scope.NewChild<AST_PP>();
+        new_node.name = emp::string_get(AsLexeme(pos), " \t");
         new_node.code = emp::to_string( AsLexeme(pos++), '\n');
         continue;
       }
@@ -420,11 +429,18 @@ public:
     concept.name = tokens[pos++].lexeme;
 
     // Next, must be a colon...
-    RequireChar(':', pos++, "Concept names must be followed by a colon (':').");
+    RequireChar(':', pos++, "Concept names must be followed by a colon (':') and then a base class name.");
 
     // And then a base-class name.
     RequireID(pos, "Concept declaration must include name of base class.");
     concept.base_name = tokens[pos++].lexeme;
+
+    // If this base class has already been defined, add on to it.
+    if (emp::Ptr<AST_Node> base_node = cur_scope.GetChild(concept.base_name);
+        base_node) {
+      Require(base_node->IsClass(), pos-1, "Identifer for concept base class cannot be used by a non-class.");
+      base_node.Cast<AST_Class>()->concepts.push_back(&concept);
+    }
 
     // Next, must be an open brace...
     RequireChar('{', pos++, "Concepts must be defined in braces ('{' and '}').");
