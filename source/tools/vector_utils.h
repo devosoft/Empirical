@@ -51,6 +51,15 @@ namespace emp {
     }
   }
 
+  /// Find the first index where the provided function returns true; return -1 otherwise.
+  template <typename T, typename FUN>
+  int FindEval(const emp::vector<T> & v, const FUN & fun) {
+    for (size_t i = 0; i < v.size(); i++) {
+      if (fun(v[i])) return (int) i;
+    }
+    return -1;
+  }
+
   /// Find the index with the "optimal" value (picks first in cases of a tie).
   /// @param v Any object allowing indexing (e.g. vector, array, etc.)
   /// @param fun Comparison function; returns true if the first value os more optimal than second.
