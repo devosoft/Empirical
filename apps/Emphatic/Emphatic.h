@@ -170,17 +170,19 @@ public:
   /// Collect a line of code, ending with a semi-colon OR mis-matched bracket.
   /// Always stops at a mis-matched ')' '}' or ']'
   /// If match_angle_bracket is set, will also stop at a mis-matched '>'
-  /// If multi_line is set, will NOT stop with a ';'
-  std::string ProcessCode(size_t & pos, bool match_angle_bracket=false, bool multi_line=false) const {
+  /// The match_char defaults to a ';', but can be changed to '\0' for multi-line or other options.
+  /// By default the stop character is kept in the output string, but can be overridden.
+  std::string ProcessCode(size_t & pos, bool match_angle_bracket=false, char stop_char=';', bool keep_stop=true) const {
     const size_t start_pos = pos;
     std::vector<char> open_symbols;
     bool finished = false;
     while (!finished && pos < tokens.size()) {
       char cur_char = AsChar(pos++);
+      if (cur_char == stop_char) { 
+        if (!keep_stop) pos--;
+        break;
+      }
       switch (cur_char) {
-        case ';':
-          if (multi_line == false) finished = true;
-          break;
         case '<':
           if (match_angle_bracket == false) break;
           [[fallthrough]];
@@ -342,7 +344,7 @@ public:
           RequireChar(';', pos++, emp::to_string(fun_assign, "functions must end in a semi-colon."));
         }
         else if (fun_char == '{') {  // Function is defined in place.
-          new_element.default_code = ProcessCode(pos, false, true);  // Read the default function body.
+          new_element.default_code = ProcessCode(pos, false, '\0');  // Read the default function body.
           RequireChar('}', pos, emp::to_string("Function body must end with close brace ('}') not '",
                                                 AsLexeme(pos), "'."));
           pos++;
@@ -398,8 +400,12 @@ public:
         new_class.type = cur_lexeme;
         if (IsID(pos)) new_class.name = AsLexeme(pos++);
         Debug("...Using name of new ", cur_lexeme, ": ", new_class.name);
+        // Is there a base class?
+        if (AsChar(pos) == ':') {
+          new_class.base_info = ProcessCode(pos, false, '{', false);
+        }
         RequireChar('{', pos++, emp::to_string("A ", cur_lexeme, " must be defined in braces ('{' and '}')."));
-        new_class.body = ProcessCode(pos, false, true);
+        new_class.body = ProcessCode(pos, false, '\0');
         RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
         RequireChar(';', pos++, emp::to_string("A ", cur_lexeme, " must end with a semi-colon (';')."));
         Debug("...Finished defining a new ", cur_lexeme, " named ", new_class.name);
