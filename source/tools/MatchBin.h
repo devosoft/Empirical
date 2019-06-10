@@ -69,7 +69,20 @@ namespace emp {
       return (width - k + 1) / pow(2, k);
     }
   };
+  
+  template<size_t width>
+    struct DowningInteger{
+      double operator()(const emp::BitSet<width>& a, const emp::BitSet<width>& b){
+        emp::BitSet<width> bitDifference = ( a > b ? a - b : b - a);
+        unsigned int bytes = 1 + ((width - 1) >> 3);
+        double result = 0;
+        for (unsigned int i = 0; i < bytes; ++i){
+         result += bitDifference.GetUInt(i) * pow(2, 32 * i);
+        }
 
+      return result;
+      }
+    };
   /// Selector for MatchBin stored in the struct so we cn template on it
   /// returns sorted matches that are inside the given threshold 
   template<typename ratio>

@@ -1262,6 +1262,63 @@ TEST_CASE("Test MatchBin", "[tools]")
   
   }
 
+  {
+  emp::MatchBin<
+  std::string, 
+  emp::BitSet<8>,
+  emp::DowningInteger<8>,
+  emp::ThreshSelector<std::ratio<40, 1>>
+    > bitBin;
+
+  emp::BitSet<8> bs1;
+  bs1.SetUInt(0,1); // 0000 0001
+
+  const size_t one = bitBin.Put("one", bs1);
+
+  emp::BitSet<8> bs128;
+  bs128.SetUInt(0,128); // 1000 000
+
+  const size_t oneTwoEight = bitBin.Put("one-two-eight", bs128);
+
+  emp::BitSet<8> bs127; 
+  bs127.SetUInt(0,127); //0111 1111
+
+  const size_t onetwoseven = bitBin.Put("one-two-seven", bs127);
+
+  emp::BitSet<8> bs15;
+  bs15.SetUInt(0,15); //0000 1111
+
+  const size_t fifteen = bitBin.Put("fifteen", bs15);
+  
+  emp::BitSet<8> bs2;//0000 0010
+  bs2.SetUInt(0,2);
+
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs2, 0)) == emp::vector<std::string>{});
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs2, 0)) == emp::vector<emp::BitSet<8>>{});
+
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs2, 1)) == emp::vector<std::string>{"one"});
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs2, 1)) == emp::vector<emp::BitSet<8>>{bs1});
+
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs128, 2)) == (emp::vector<std::string>{"one-two-eight", "one-two-seven"}));
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs128, 2)) == (emp::vector<emp::BitSet<8>>{bs128, bs127}));
+
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs127, 5)) == (emp::vector<std::string> {"one-two-seven", "one-two-eight"}));
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs127, 5)) == (emp::vector<emp::BitSet<8>> {bs127, bs128}));
+
+  REQUIRE (bitBin.Size() == 4);
+
+  bitBin.SetRegulator(one, .001);
+
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs128, 2)) == (emp::vector<std::string> {"one","one-two-eight"}));
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs128, 2)) == (emp::vector<emp::BitSet<8>> {bs1,bs128}));
+
+  bitBin.SetRegulator(one, 8);
+
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs2, 5)) == (emp::vector<std::string> {"fifteen", "one"}));
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs2, 5)) == (emp::vector<emp::BitSet<8>> {bs15, bs1}));
+
+  }
+
 }
 
 

@@ -656,10 +656,10 @@ namespace emp {
     const BitSet & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
     /// Operator plus...
-    BitSet operator+(const BitSet & ar2) { return ADD(ar2); }
+    BitSet operator+(const BitSet & ar2) const { return ADD(ar2); }
 
     /// Operator minus...
-    BitSet operator-(const BitSet & ar2) { return SUB(ar2); }
+    BitSet operator-(const BitSet & ar2) const { return SUB(ar2); }
 
     /// Compound operator plus...
     const BitSet & operator+=(const BitSet & ar2) { return ADD_SELF(ar2); }
