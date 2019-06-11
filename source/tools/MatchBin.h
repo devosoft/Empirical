@@ -74,10 +74,10 @@ namespace emp {
     struct DowningInteger{
       double operator()(const emp::BitSet<width>& a, const emp::BitSet<width>& b){
         emp::BitSet<width> bitDifference = ( a > b ? a - b : b - a);
-        unsigned int bytes = 1 + ((width - 1) >> 3);
+        unsigned int fields = bitDifference.GetFields();
         double result = 0;
-        for (unsigned int i = 0; i < bytes; ++i){
-         result += bitDifference.GetUInt(i) * pow(2, 32 * i);
+        for (unsigned int i = 0; i < fields; ++i){
+          result += bitDifference.GetUInt(i) * pow(2, 32 * i);
         }
 
       return result;

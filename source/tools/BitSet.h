@@ -233,6 +233,9 @@ namespace emp {
     /// How many bits are in this BitSet?
     constexpr static size_t GetSize() { return NUM_BITS; }
 
+    /// How many fields are in this BitSet?
+    constexpr static size_t GetFields() { return NUM_FIELDS; }
+
     /// Retrieve the bit as a specified index.
     bool Get(size_t index) const {
       emp_assert(index >= 0 && index < NUM_BITS);
