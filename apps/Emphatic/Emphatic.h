@@ -400,13 +400,18 @@ public:
         new_class.type = cur_lexeme;
         if (IsID(pos)) new_class.name = AsLexeme(pos++);
         Debug("...Using name of new ", cur_lexeme, ": ", new_class.name);
-        // Is there a base class?
-        if (AsChar(pos) == ':') {
-          new_class.base_info = ProcessCode(pos, false, '{', false);
+
+        // If this is not just a declaration, load definition.
+        if (AsChar(pos) != ';') {
+          // Is there a base class?
+          if (AsChar(pos) == ':') {
+            new_class.base_info = ProcessCode(pos, false, '{', false);
+          }
+          RequireChar('{', pos++, emp::to_string("A ", cur_lexeme, " must be defined in braces ('{' and '}')."));
+          new_class.body = ProcessCode(pos, false, -1);
+          RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
         }
-        RequireChar('{', pos++, emp::to_string("A ", cur_lexeme, " must be defined in braces ('{' and '}')."));
-        new_class.body = ProcessCode(pos, false, -1);
-        RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
+
         RequireChar(';', pos++, emp::to_string("A ", cur_lexeme, " must end with a semi-colon (';')."));
         Debug("...Finished defining a new ", cur_lexeme, " named ", new_class.name);
       }
