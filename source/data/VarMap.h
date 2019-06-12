@@ -67,6 +67,7 @@ namespace emp {
 
     const std::string & GetName(size_t id) const { return vars[id]->name; }
     size_t GetID(const std::string & name) const { return Find(id_map, name, (size_t) -1); }
+    bool Has(const std::string & name) const { return emp::Has(id_map, name); }
 
     template <typename T>
     size_t Add(const std::string & name, const T & value) {
@@ -141,6 +142,21 @@ namespace emp {
     double GetDouble(const std::string & name) const { return Get<double>(name); }
     char GetChar(const std::string & name) const { return Get<char>(name); }
     bool GetBool(const std::string & name) const { return Get<bool>(name); }
+
+    template <typename T>
+    void Set(size_t id, const T & value) {
+      emp_assert(id < vars.size());
+      emp_assert(vars[id].GetTypeValue() = emp::GetTypeValue<T>());
+      emp::Ptr<VarInfo<T>> ptr = vars[id].Cast<VarInfo<T>>();
+      ptr->value = value;
+    }
+
+    template <typename T>
+    void Set(const std::string & name, const T & value) {
+      if (auto it = id_map.find(name); it != id_map.end()) { Set(it->second, value); }
+      else Add(name, value);
+    }
+
   };
 
 }
