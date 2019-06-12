@@ -75,8 +75,9 @@ private:
     emp_assert(end_pos <= tokens.size());
     std::stringstream ss;    
     for (size_t i = start_pos; i < end_pos; i++) {
-      if (i > start_pos) ss << " ";
+      if (i > start_pos && tokens[i].lexeme != ":") ss << " ";  // No space with labels.
       ss << tokens[i].lexeme;
+      if (tokens[i].lexeme == ";") ss << " "; // Extra space after semi-colons for now...
     }
     return ss.str();
   }
