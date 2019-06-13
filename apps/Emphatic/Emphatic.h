@@ -304,16 +304,16 @@ public:
       pos++;  // Move past "using"
       RequireID(pos, "A 'using' command must first specify the name of the type being defined.");
 
-      new_element.name = AsLexeme(pos++);               // NAme of new type.
+      new_element.SetName(AsLexeme(pos++));               // Name of new type.
       RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
 
       // Identify if this type is required in the base class
       if (AsLexeme(pos) == "0") {
-        new_element.special_value = AsLexeme(pos++);
+        new_element.AddSpecial(AsLexeme(pos++));
       }
       // Otherwise, save the default type.
       else {
-        new_element.default_code = ProcessType(pos);      // Determine code being assigned to.
+        new_element.SetDefaultCode(ProcessType(pos));    // Determine code being assigned to.
       }
  
       RequireChar(';', pos++, "A using statement must end in a semi-colon.");
@@ -321,37 +321,38 @@ public:
     }
     else {
       // Start with a type...
-      new_element.type = ProcessType(pos);
+      new_element.SetType(ProcessType(pos));
 
       // Then an identifier.
-      RequireID(pos, "Expected identifier after type name (", new_element.type, "), but found '", AsLexeme(pos), "'.");
-      new_element.name = tokens[pos++].lexeme;
+      RequireID(pos, "Expected identifier after type name (", new_element.GetType(),
+                     "), but found '", AsLexeme(pos), "'.");
+      new_element.SetName(tokens[pos++].lexeme);
 
       // If and open-paren follows the identifier, we are defining a function, otherwise it's a variable.
       if (AsChar(pos) == '(') {                              // ----- FUNCTION!! -----
         pos++;  // Move past paren.
 
-        new_element.params = ProcessParams(pos);       // Read the parameters for this function.
+        new_element.SetParams(ProcessParams(pos));       // Read the parameters for this function.
 
         RequireChar(')', pos++, "Function arguments must end with a close-parenthesis (')')");
-        new_element.attributes = ProcessIDList(pos);   // Read in each of the function attributes, if any.
+        new_element.SetAttributes(ProcessIDList(pos));   // Read in each of the function attributes, if any.
 
         char fun_char = AsChar(pos++);
 
         if (fun_char == '=') {  // Function is "= default;" or "= 0;"
           std::string fun_assign = AsLexeme(pos++);
-          if (fun_assign == "0" || fun_assign == "default") new_element.special_value = fun_assign;
+          if (fun_assign == "0" || fun_assign == "default") new_element.AddSpecial(fun_assign);
           else Error(pos, "Functions can only be set to '0' (if required) or 'default'");
           RequireChar(';', pos++, emp::to_string(fun_assign, "functions must end in a semi-colon."));
         }
         else if (fun_char == '{') {  // Function is defined in place.
-          new_element.default_code = ProcessCode(pos, false, -1);  // Read the default function body.
+          new_element.SetDefaultCode(ProcessCode(pos, false, -1));  // Read the default function body.
           RequireChar('}', pos, emp::to_string("Function body must end with close brace ('}') not '",
                                                 AsLexeme(pos), "'."));
           pos++;
         }
         else if (fun_char == ';') { // Function is declared, but not defined here.
-          new_element.special_value = "declare";
+          new_element.AddSpecial("declare");
         }
         else {
           Error(pos-1, "Function body must begin with open brace or assignment ('{' or '=')");
@@ -363,7 +364,7 @@ public:
         if (AsChar(pos) == ';') { pos++; } // Does the variable declaration end here?
         else {                             // ...or is there a default value for this variable?
           // Determine code being assigned from.
-          new_element.default_code = ProcessCode(pos);
+          new_element.SetDefaultCode(ProcessCode(pos));
         }
 
         new_element.SetVariable();
