@@ -186,14 +186,18 @@ struct AST_Concept : AST_Node {
 struct AST_Class : public AST_Node {
   std::string type = "class";
   std::string base_info = "";
-  std::string body = "";
+  std::string body = "[[declaration]]";
   emp::vector<emp::Ptr<AST_Concept>> concepts; ///< Which concepts does this class need to be base for?
 
   /// Scope should run echo on each of its children.
   void PrintEcho(std::ostream & os, const std::string & prefix) const override {
-    os << prefix << type << " " << name << base_info << "{\n"
-       << prefix << "  " << body << "\n"
-       << prefix << "};\n";
+    if (body == "[[declaration]]") {
+      os << prefix << type << " " << name << ";\n";
+    } else {
+      os << prefix << type << " " << name << base_info << "{\n"
+         << prefix << "  " << body << "\n"
+         << prefix << "};\n";
+    }
     // os << prefix << type << " " << name << "{\n";
     // for (auto x : children) { x->PrintEcho(os, prefix+"  "); }
     // os << prefix << "};\n";      
@@ -201,25 +205,31 @@ struct AST_Class : public AST_Node {
 
   /// Scope should run output on each of its children.
   void PrintOutput(std::ostream & os, const std::string & prefix) const override {
-    // Do the basic definition of this class.
-    os << prefix << type << " " << name << base_info << "{\n";
-    os << prefix << "  " << body << "\n";
-
-    // If this class is being used as a base clase for any concepts, include the concept code here.
-    if (concepts.size()) os << prefix << "public:\n";
-
-    for (auto concept : concepts) {
-      // Print all of the BASE CLASS details for each concept.
-      for (auto & m : concept->members) {
-        m.PrintConceptBase(os, prefix+"  ");
-        os << "\n";
-      }
+    if (body == "[[declaration]]") {  // This is just a declaration...
+      os << prefix << type << " " << name << ";\n";
     }
 
-    os << prefix << "};\n";
-    // os << prefix << "namespace" << " " << name << "{\n";
-    // for (auto x : children) { x->PrintOutput(os, prefix); }
-    // os << prefix << "};\n";      
+    else {
+      // Do the basic definition of this class.
+      os << prefix << type << " " << name << base_info << "{\n";
+      os << prefix << "  " << body << "\n";
+
+      // If this class is being used as a base clase for any concepts, include the concept code here.
+      if (concepts.size()) os << prefix << "public:\n";
+
+      for (auto concept : concepts) {
+        // Print all of the BASE CLASS details for each concept.
+        for (auto & m : concept->members) {
+          m.PrintConceptBase(os, prefix+"  ");
+          os << "\n";
+        }
+      }
+
+      os << prefix << "};\n";
+      // os << prefix << "namespace" << " " << name << "{\n";
+      // for (auto x : children) { x->PrintOutput(os, prefix); }
+      // os << prefix << "};\n";      
+    }
   }
 
   bool IsClass() const { return true; }
