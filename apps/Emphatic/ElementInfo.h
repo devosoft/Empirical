@@ -49,7 +49,9 @@ public:
   bool IsDefault() const { return emp::Has(special_values, "default"); }
   bool IsDeleted() const { return emp::Has(special_values, "delete"); }
   bool IsDeclaration() const { return emp::Has(special_values, "declare"); }
-  bool IsOverride() const { return emp::Has(special_values, "override"); }
+
+  bool IsConst() const { return emp::Has(attributes, "const"); }
+  bool IsOverride() const { return emp::Has(attributes, "override"); }
 
   void SetTypedef() { element_type = TYPEDEF; }
   void SetVariable() { element_type = VARIABLE; }
@@ -102,6 +104,18 @@ public:
     return out_str;
   }
 
+  /// List out all attributes for this function for a concept (which captures some keywords).
+  std::string ConceptAttributeString() const {
+    emp_assert(IsFunction());
+    std::string out_str;
+    for (const auto & x : attributes) {
+      if (x == "override") continue;  // Overrides will be used elsewhere.
+      out_str += " ";
+      out_str += x;
+    }
+    return out_str;
+  }
+
   /// Convert the inputs to a function to arguments to another function.
   std::string ArgString() const {
     emp_assert(IsFunction());
@@ -145,7 +159,7 @@ public:
     // that the correct version can be called in the derived class.
     else if (IsFunction()) {
       os << prefix << "virtual " << type << " " << name << "(" << ParamString() << ") "
-         << AttributeString() << " = 0;\n";
+         << ConceptAttributeString() << " = 0;\n";
     }
   }
 
@@ -192,7 +206,7 @@ public:
 
       // Build function to call.
       os << prefix << type << " " << name << "(" << ParamString() << ") "
-                   << AttributeString() << " {\n";
+                   << ConceptAttributeString() << " {\n";
 
       // If this is a required function, put static assert to ensure it's there before calling.
       if (IsRequired()) {
@@ -202,6 +216,11 @@ public:
         os << prefix << "  ";
         if (type != "void") os << "return ";
         os << "WRAPPED_T::" << name << "( " << ArgString() << " );\n";
+      }
+
+      // If this function was markedoverride, we need to always call the provided version.
+      else if (IsOverride()) {
+        os << prefix << "  " << default_code << "\n";
       }
 
       // ...otherwise call the correct version, depending on if it's there.
