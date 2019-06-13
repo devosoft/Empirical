@@ -62,6 +62,9 @@ namespace emp {
     /// Compatibility with size()
     size_t size() const { return lines.size(); }
 
+    /// Return entire text of the file
+    emp::vector<std::string> GetAllLines() {return lines;}
+
     /// Index into a specific line in this file.
     std::string & operator[](size_t pos) { return lines[pos]; }
 
