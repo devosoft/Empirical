@@ -153,7 +153,8 @@ struct AST_Concept : AST_Node {
     if (base_predefined == false) {
       os << prefix << "/// Base class for concept wrapper " << name << "<>.\n"
           << prefix << "class " << base_name << " {\n"
-          << prefix << "public:\n";
+          << prefix << "public:\n"
+          << prefix << "  virtual ~" << base_name << "() { ; }\n";
 
       // Print all of the BASE CLASS details.
       for (auto & m : members) {
@@ -168,8 +169,11 @@ struct AST_Concept : AST_Node {
     os << prefix << "/// === Concept wrapper (base class is " << base_name << ") ===\n"
         << prefix << "template <typename WRAPPED_T>\n"
         << prefix << "class " << name << " : public WRAPPED_T, public " << base_name << " {\n"
-        << prefix << "public:\n"
-        << prefix << "  using this_t = " << name << "<WRAPPED_T>;\n\n";
+        << prefix << "public:\n"        
+        << prefix << "  using this_t = " << name << "<WRAPPED_T>;\n"
+        << prefix << "  using wrapped_t = WRAPPED_T;\n"
+        << prefix << "  template <typename... ARGS>\n"
+        << prefix << "  " << name << "(ARGS... args) : WRAPPED_T(std::forward<ARGS>(args)...) {;}\n\n";
 
     // Print concept info for all derived members
     for (auto & m : members) {
@@ -220,6 +224,7 @@ struct AST_Class : public AST_Node {
       if (concepts.size()) os << prefix << "public:\n";
 
       // Setup virtual destructor.
+      // @CAO: This should probably not be here?  Only in concepts.
       os << prefix << "virtual ~" << name << "() { ; }\n";
 
       for (auto concept : concepts) {
