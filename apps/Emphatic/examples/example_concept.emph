@@ -16,17 +16,17 @@ namespace test {
     DataMap data_map;   // Add a data map to all Vehicles.
 
     // Any functions have a virtual version placed in the base class, and will call the correct
-    // derived version.  Functions can be made either optional or required.
+    // derived version.  Functions can be made either optional or required (=0).
 
     // If a function is optional, it should indicate the default behavior.
     bool CanFly() const { return false; }  
 
-    // If a function is required, it should include a REQUIRE with an error message.
-    double SetSpeed(double speed) = required;
+    // If a function is required, it should be set to zero.
+    double SetSpeed(double speed) = 0;
     
     // A single function parameter can be marked overload.  This parameter must
     // be a TypeSet, which will be exploded to create many versions of the function.
-    double SetPart( overload<part_types> part, size_t part_id ) = required;
+    double SetPart( overload<part_types> part, size_t part_id ) = 0;
 
     // Types are only available in the wrapped class (not the base class) and can be required or
     // optional in the class being wrapped.
@@ -35,6 +35,6 @@ namespace test {
     using wheel_type = void;
 
     // If a type is required, it should be set to REQUIRE with an error message.
-    using fuel_type = required;
+    using fuel_type = 0;
   };
 }

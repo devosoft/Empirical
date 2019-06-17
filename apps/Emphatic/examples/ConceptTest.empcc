@@ -11,12 +11,12 @@
 
 concept TestConcept : TestConcept_Base {
   int x=5;
-  void RequiredFun1() = required;
-  void RequiredFun2() = required;
+  void RequiredFun1() = 0;
+  void RequiredFun2() = 0;
   void OptionalFun1() { std::cout << "Default version of OptionalFun1()" << std::endl; x++; }
-  double DoMath1(double x, double y) = required;
+  double DoMath1(double x, double y) = 0;
   double DoMath2(double x, double y) { return (x + y)/2.0; }
-  using test1_t = required;
+  using test1_t = 0;
   using test2_t = int;
 };
 

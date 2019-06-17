@@ -33,6 +33,10 @@ Put in a PR or raise an issue to have *your* project featured!
 
   - a phylogeny color-coded by each individual's position in the world, demonstrating the spatial dynamics of an evolving population
 
+- `Model of cancer evolution on an oxygen gradient`_ `[source]`__
+  
+  - A companion model to a series of wet lab experiments on cancer evolution in spatially heterogenous environments
+
 .. _`Choose Your Words!`: https://devosoft.github.io/dynamic-word/
 .. __: https://github.com/devosoft/dynamic-word
 .. _`circle replicators with simple physics example`: https://lalejini.com/my_empirical_examples/simple_physics_example/web/example.html
@@ -47,3 +51,5 @@ Put in a PR or raise an issue to have *your* project featured!
 .. __: https://github.com/amlalejini/my_empirical_examples/tree/master/KMeansClusteringExample
 .. _`spatial lineage visualization`: https://emilydolson.github.io/visualizations/spatial_lineage/LineageViz.html
 .. __: https://github.com/emilydolson/visualizations/
+.. _`Model of cancer evolution on an oxygen gradient`: http://emilydolson.github.io/memic_model/web/memic_model.html
+.. __: https://github.com/emilydolson/memic_model/

@@ -4,8 +4,8 @@
  *  @date 2018
  *
  *  @file  DataMap.h
- *  @brief DataMaps track arbitrary data by name (slow) or id (faster).
- *
+ *  @brief Track arbitrary data by name (slow) or id (faster), from a pre-specified set of types.
+ *  @note Status: ALPHA
  */
 
 #ifndef EMP_DATA_MAP_H

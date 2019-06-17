@@ -133,6 +133,30 @@ public:
 
   void SetVerbose(bool v=true) { verbose = v; }
 
+  // Remove all fitnesses except for the one specified.
+  bool SetFitnessID(size_t fit_id) {
+    if (fit_id >= fitness_chart.size()) return false;  // Illegal fitness ID chosen.
+    if (fitness_chart.size() == 1) return true;        // Only column, nothing to do.
+
+    // If we are not working with the first fitness ID, copy to position 0.
+    if (fit_id > 0) {
+      for (size_t org_id = 0; org_id < org_chart.size(); org_id++) {
+        org_chart[org_id][0] = org_chart[org_id][fit_id];
+      }
+      fitness_chart[0] = fitness_chart[fit_id];
+    }
+
+    // Eliminate all other traits.
+    for (size_t org_id = 0; org_id < org_chart.size(); org_id++) org_chart[0].resize(1);
+    fitness_chart.resize(1);
+
+    // Since this alteration is being done by the user, mark the new versions as "original".
+    orig_org_chart = org_chart;
+    orig_fitness_chart = fitness_chart;
+
+    return true;
+  }
+
   /// Load a file with fitness data.
   /// * File is structed as a CSV using '#' for comments.
   /// * First row is column headings
