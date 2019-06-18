@@ -58,7 +58,6 @@ namespace emp {
   /// Matches based on the longest segment of equal and uneqal bits in two bitsets
   template<size_t Width>
   struct DowningStreak {
-    // TODO The regulator may be a little bias for this.
     double operator()(const emp::BitSet<Width>& a, const emp::BitSet<Width>& b) {
       const auto bs = a^b;
       const size_t same = (~bs).LongestSegmentOnes();
@@ -66,9 +65,12 @@ namespace emp {
       const double ps = ProbabilityKBitSequence(same);
       const double pd = ProbabilityKBitSequence(different);
 
-      // A result nearing 1 is a better match but the threshold picks lower first.
-      // So we must subtract from 1.0 to get the inverse.
-      return 1.0 - (pd / (ps + pd));
+      const double match = (pd / (ps + pd));
+      // Note: here, close match score > poor match score
+      // However, we're computing distance where smaller means closer match.
+      // Note also: 0.0 < match < 1.0
+      // So, we subtract match score from 1.0 to get a distance.
+      return 1.0 - match;
     }
 
     inline double ProbabilityKBitSequence(size_t k) {
