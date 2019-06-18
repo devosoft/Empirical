@@ -94,6 +94,18 @@ namespace emp {
 
   };
 
+  // compares member variables of lhs and rhs, ignoring callback functions
+  // useful for tests
+  bool operator==(const ArgSpec& lhs, const ArgSpec& rhs) {
+    if (lhs.most_quota == rhs.most_quota && lhs.least_quota == rhs.least_quota &&
+      lhs.description == rhs.description && lhs.aliases == rhs.aliases && 
+      lhs.gobble_flags == rhs.gobble_flags && lhs.flatten == rhs.flatten) {
+        return true;
+    } else {
+      return false;
+    }
+  }
+
   /// Manager for command line arguments and URL query params.
   class ArgManager {
   public:
@@ -554,6 +566,33 @@ namespace emp {
       }
 
     }
+     
+    // Argspecs with a string including flags separated by '|' are turned
+    // into one argspec with a list of aliases
+    // example input: specs[“—help|-h”] = ArgSpec a with a.aliases = {}
+    // example output: specs[“—help”] = ArgSpecs b with b.aliases = {“-h”}
+    static spec_map_t DealiasSpecs(spec_map_t inSpecsMap) {
+      spec_map_t outSpecs;
+
+      //convert each Argspec
+      for (auto iSpec : inSpecsMap) {
+        std::string flags = iSpec.first;
+        std::vector <std::string> aliases = slice(flags, '|');
+        std::string mainFlag = aliases[0];
+        aliases.erase(aliases.begin());
+
+        //set aliases
+        ArgSpec oSpec = iSpec.second;
+        for(auto iAlias : aliases) {
+          oSpec.aliases.insert(iAlias);
+        }
+
+        outSpecs.emplace(mainFlag, oSpec);
+      }
+
+      return outSpecs;
+    }
+
 
     /// Test if there are any unused argument packs,
     /// and if so, output an error message.
