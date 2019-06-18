@@ -103,7 +103,7 @@ namespace emp {
     emp::vector<size_t> operator()(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n){
 
       size_t back = 0;
-      const double thresh = ThreshRatio::num / ThreshRatio::den;
+      const double thresh = ((double) ThreshRatio::num) / ThreshRatio::den;
 
       if (n < log2(uids.size())) {
 
