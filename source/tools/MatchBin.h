@@ -46,6 +46,7 @@ namespace emp {
 
   /// Metric gives the matchings by the closest tag on or above itself.
   /// Wraps on Max.
+  /// Adapted from Spector, Lee, et al. "Tag-based modules in genetic programming." Proceedings of the 13th annual conference on Genetic and evolutionary computation. ACM, 2011.
   template<size_t Max=1000>
   struct Push {
     // TODO rename this struct more descriptively
@@ -56,6 +57,7 @@ namespace emp {
   };
 
   /// Matches based on the longest segment of equal and uneqal bits in two bitsets
+  /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
   template<size_t Width>
   struct DowningStreak {
     double operator()(const emp::BitSet<Width>& a, const emp::BitSet<Width>& b) {
@@ -80,6 +82,7 @@ namespace emp {
 
   /// Metric gives the absolute value of the difference between the integer
   /// representations of the BitSets.
+  /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
   template<size_t Width>
     struct DowningInteger {
       double operator()(const emp::BitSet<Width>& a, const emp::BitSet<Width>& b) {
