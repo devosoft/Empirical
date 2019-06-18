@@ -5,6 +5,10 @@
  *
  *  @file  ElementInfo.h
  *  @brief Information about C++ elements (variables, functions, typedefs, etc) that are loaded in.
+ * 
+ *  Developer notes:
+ *  * We may want to put just a pointer to a variable in the base class so that the real version
+ *    can bew in either the derived class OR the class being wrapped.
  **/
 
 #include <string>
@@ -29,15 +33,16 @@ struct ElementInfo {
   emp::vector<ParamInfo> params;      ///< Full set of function parameters
   std::set<std::string> attributes;   ///< const, noexcept, etc.
   std::string default_code;           ///< Variable initialization or function body.
-  std::string special_value;          ///< "default", "delete", or "required" (for concepts)
+  std::string special_value;          ///< "default", "delete", or "0" (required), etc.
 
   bool IsTypedef() const { return element_type == TYPEDEF; }
   bool IsVariable() const { return element_type == VARIABLE; }
   bool IsFunction() const { return element_type == FUNCTION; }
 
-  bool IsRequired() const { return special_value == "required"; }
+  bool IsRequired() const { return special_value == "0"; }
   bool IsDefault() const { return special_value == "default"; }
   bool IsDeleted() const { return special_value == "delete"; }
+  bool IsDeclaration() const { return special_value == "declare"; }
 
   void SetTypedef() { element_type = TYPEDEF; }
   void SetVariable() { element_type = VARIABLE; }
@@ -99,16 +104,25 @@ struct ElementInfo {
     }
     else if (IsFunction()) {
       os << prefix << type << " " << name << "(" << ParamString() << ") " << AttributeString();
-      if (IsRequired()) os << " = required;\n";
+      if (IsRequired()) os << " = 0;\n";
       else if (IsDefault()) os << " = default;\n";
+      else if (IsDeclaration()) os << ";\n";
       else os << " {\n" << prefix << "  " << default_code << "\n" << prefix << "}\n";
     }
   }
 
   /// Print this element as the converted C++ code for the base class.
   void PrintConceptBase(std::ostream & os, const std::string & prefix) const {
-    // Note: Typedefs and variables do not need to be represented in the base class.
-    if (IsFunction()) {
+    // Note: Typedefs do not need to be represented in the base class.
+    // Variables should have all of their code placed in the base class.
+    if (IsVariable()) {
+      os << prefix << type << " " << name;
+      if (default_code.size()) os << " " << default_code << "\n";
+      else os << ";\n";
+    }
+    // Functions should just have a pure-virtual declaration in the base class so
+    // that the correct version can be called in the derived class.
+    else if (IsFunction()) {
       os << prefix << "virtual " << type << " " << name << "(" << ParamString() << ") "
          << AttributeString() << " = 0;\n";
     }
@@ -141,11 +155,8 @@ struct ElementInfo {
                      << name << ">::template push_back<" << default_code << ">::first_t;\n";
       }
     }
-    else if (IsVariable()) {
-      os << prefix << type << " " << name;
-      if (default_code.size()) os << " " << default_code << "\n";
-      else os << ";\n";
-    }
+    // If this is a variable, all code should be in base class.
+    // If this is a function, print out dynamic code to determine which version should be called.
     else if (IsFunction()) {
       // Build return-type checker.
       os << prefix << "template <typename T>\n"
@@ -167,7 +178,8 @@ struct ElementInfo {
         os << prefix << "  " << "static_assert( HasFun_" << name
                      << "(), \"\\n\\n  ** Error: concept instance missing required function '"
                      << name << "' **\\n\");\n";
-        if (type != "void") os << prefix << "return ";
+        os << prefix << "  ";
+        if (type != "void") os << "return ";
         os << "WRAPPED_T::" << name << "( " << ArgString() << " );\n";
       }
 

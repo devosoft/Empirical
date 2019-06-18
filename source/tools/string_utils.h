@@ -310,7 +310,7 @@ namespace emp {
 
   /// Return a prefix of the input string (up to a specified delimeter), but do not modify it.
   /// If the delimeter is not found, return the entire input string.
-  inline std::string string_get(const std::string & in_string, const char delim, size_t start_pos=0) {
+  inline std::string string_get(const std::string & in_string, const char delim=' ', size_t start_pos=0) {
     return string_get_range(in_string, start_pos, in_string.find(delim, start_pos));
   }
 
