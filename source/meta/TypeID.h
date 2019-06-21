@@ -22,108 +22,128 @@
 namespace emp {
 
   namespace internal {
+    struct TypeID_Info {
+      std::string name;
+      TypeID_Info(const std::string & in_name) : name(in_name) { ; }
+    };
+
+    static emp::vector<TypeID_Info> & GetTypeID_Info_vector() {
+      static emp::vector<TypeID_Info> info_vec({{"Unknown Type"}});
+      return info_vec;
+    }
+
     /// Get the next unique ID for a type.
-    static size_t GetNextTypeValue() {
-      static size_t next_type_value = 0;
-      return ++next_type_value;
+    static size_t GetNextTypeValue(const std::string & name) {
+      GetTypeID_Info_vector().push_back(name);
+      return GetTypeID_Info_vector().size() - 1;
     }
   }
 
+  struct TypeID {
+    size_t id;
+
+    TypeID(size_t _id) : id(_id) { ; }
+    TypeID(const TypeID &) = default;
+    ~TypeID() { ; }
+    TypeID & operator=(const TypeID &) = default;
+
+    operator size_t() const noexcept { return id; }
+    bool operator==(TypeID in) const { return id == in.id; }
+    bool operator!=(TypeID in) const { return id != in.id; }
+
+    const std::string & GetName() const { return internal::GetTypeID_Info_vector()[id].name; }
+    void SetName(const std::string & in_name) { internal::GetTypeID_Info_vector()[id].name = in_name; }
+  };
+
   template <typename T>
-  static size_t GetTypeValue() {
-    static const size_t type_value = internal::GetNextTypeValue();
+  static TypeID GetTypeID() {
+    static const size_t type_value = internal::GetNextTypeValue(typeid(T).name());
     return type_value;
   }
 
-  // Generic TypeID structure for when none of the specialty cases trigger.
-  template<typename T> struct TypeID {
-    template<typename TEST> using TypeIDFilter = decltype(&TEST::TypeID);
-    struct UnknownID { static std::string TypeID() { return "Unknown"; } };
-    static std::string GetName() {
-      using print_t = typename TypePack<T,UnknownID>::template find_t<TypeIDFilter>;
-      return print_t::TypeID();
-    }
-  };
+  /// Setup a bunch of standard type names to be more readable.
+  void SetupTypeNames() {
+    // Built-in types.
+    GetTypeID<void>().SetName("void");
 
-  // Built-in types.
-  template<> struct TypeID<void> { static std::string GetName() { return "void"; } };
+    GetTypeID<bool>().SetName("bool");
+    GetTypeID<double>().SetName("double");
+    GetTypeID<float>().SetName("float");
 
-  template<> struct TypeID<bool> { static std::string GetName() { return "bool"; } };
-  template<> struct TypeID<double> { static std::string GetName() { return "double"; } };
-  template<> struct TypeID<float> { static std::string GetName() { return "float"; } };
+    GetTypeID<char>().SetName("char");
+    GetTypeID<char16_t>().SetName("char16_t");
+    GetTypeID<char32_t>().SetName("char32_t");
 
-  template<> struct TypeID<char> { static std::string GetName() { return "char"; } };
-  template<> struct TypeID<char16_t> { static std::string GetName() { return "char16_t"; } };
-  template<> struct TypeID<char32_t> { static std::string GetName() { return "char32_t"; } };
+    GetTypeID<int8_t>().SetName("int8_t");
+    GetTypeID<int16_t>().SetName("int16_t");
+    GetTypeID<int32_t>().SetName("int32_t");
+    GetTypeID<int64_t>().SetName("int64_t");
+    GetTypeID<uint8_t>().SetName( "uint8_t");
+    GetTypeID<uint16_t>().SetName("uint16_t");
+    GetTypeID<uint32_t>().SetName("uint32_t");
+    GetTypeID<uint64_t>().SetName("uint64_t");
 
-  template<> struct TypeID<int8_t>  { static std::string GetName() { return "int8_t"; } };
-  template<> struct TypeID<int16_t> { static std::string GetName() { return "int16_t"; } };
-  template<> struct TypeID<int32_t> { static std::string GetName() { return "int32_t"; } };
-  template<> struct TypeID<int64_t> { static std::string GetName() { return "int64_t"; } };
-  template<> struct TypeID<uint8_t>  { static std::string GetName() { return "uint8_t"; } };
-  template<> struct TypeID<uint16_t> { static std::string GetName() { return "uint16_t"; } };
-  template<> struct TypeID<uint32_t> { static std::string GetName() { return "uint32_t"; } };
-  template<> struct TypeID<uint64_t> { static std::string GetName() { return "uint64_t"; } };
+    // Standard library types.
+    GetTypeID<std::string>().SetName("std::string");
 
-  // Check for type attributes...
-  template<typename T> struct TypeID<T*> {
-    static std::string GetName() { return TypeID<T>::GetName() + '*'; }
-  };
+    // @CAO -- we can actually establish these links when building types...
+    // // Check for type attributes...
+    // template<typename T> struct TypeID<T*> {
+    //   static std::string GetName() { return TypeID<T>::GetName() + '*'; }
+    // };
 
-  // Tools for using TypePack
-  template<typename T, typename... Ts> struct TypeID<emp::TypePack<T,Ts...>> {
-    static std::string GetTypes() {
-      std::string out = TypeID<T>::GetName();
-      if (sizeof...(Ts) > 0) out += ",";
-      out += TypeID<emp::TypePack<Ts...>>::GetTypes();
-      return out;
-    }
-	  static std::string GetName() {
-      std::string out = "emp::TypePack<";
-	    out += GetTypes();
-	    out += ">";
-	    return out;
-    }
-  };
-  template<> struct TypeID< emp::TypePack<> > {
-    static std::string GetTypes() { return ""; }
-    static std::string GetName() { return "emp::TypePack<>"; }
-  };
+    // // Tools for using TypePack
+    // template<typename T, typename... Ts> struct TypeID<emp::TypePack<T,Ts...>> {
+    //   static std::string GetTypes() {
+    //     std::string out = TypeID<T>::GetName();
+    //     if (sizeof...(Ts) > 0) out += ",";
+    //     out += TypeID<emp::TypePack<Ts...>>::GetTypes();
+    //     return out;
+    //   }
+    //   static std::string GetName() {
+    //     std::string out = "emp::TypePack<";
+    //     out += GetTypes();
+    //     out += ">";
+    //     return out;
+    //   }
+    // };
+    // template<> struct TypeID< emp::TypePack<> > {
+    //   static std::string GetTypes() { return ""; }
+    //   static std::string GetName() { return "emp::TypePack<>"; }
+    // };
 
-  // Generic TemplateID structure for when none of the specialty cases trigger.
-  template <typename T> struct TemplateID {
-    static std::string GetName() { return "UnknownTemplate"; }
-  };
+    // // Generic TemplateID structure for when none of the specialty cases trigger.
+    // template <typename T> struct TemplateID {
+    //   static std::string GetName() { return "UnknownTemplate"; }
+    // };
 
-  template<template <typename...> class TEMPLATE, typename... Ts>
-  struct TypeID<TEMPLATE<Ts...>> {
-    static std::string GetName() {
-      return TemplateID<TEMPLATE<Ts...>>::GetName()
-            + '<' + TypeID<emp::TypePack<Ts...>>::GetTypes() + '>';
-    }
-  };
+    // template<template <typename...> class TEMPLATE, typename... Ts>
+    // struct TypeID<TEMPLATE<Ts...>> {
+    //   static std::string GetName() {
+    //     return TemplateID<TEMPLATE<Ts...>>::GetName()
+    //           + '<' + TypeID<emp::TypePack<Ts...>>::GetTypes() + '>';
+    //   }
+    // };
+  }
 }
 
+// namespace emp{
 
-namespace emp{
 
-  // Standard library types.
-  template<> struct TypeID<std::string> { static std::string GetName() { return "std::string"; } };
+//   // Standard library templates.
+//   //  template <typename... Ts> struct TemplateID<std::array<Ts...>> { static std::string GetName() { return "array"; } };
 
-  // Standard library templates.
-  //  template <typename... Ts> struct TemplateID<std::array<Ts...>> { static std::string GetName() { return "array"; } };
+//   template<typename T, typename... Ts> struct TypeID< emp::vector<T,Ts...> > {
+//     static std::string GetName() {
+//       using simple_vt = emp::vector<T>;
+//       using full_vt = emp::vector<T,Ts...>;
+//       if (std::is_same<simple_vt,full_vt>::value) {
+//         return "emp::vector<" + TypeID<T>::GetName() + ">";
+//       }
+//       return "emp::vector<" + TypeID<TypePack<T,Ts...>>::GetTypes() + ">";
+//     }
+//   };
 
-  template<typename T, typename... Ts> struct TypeID< emp::vector<T,Ts...> > {
-    static std::string GetName() {
-      using simple_vt = emp::vector<T>;
-      using full_vt = emp::vector<T,Ts...>;
-      if (std::is_same<simple_vt,full_vt>::value) {
-        return "emp::vector<" + TypeID<T>::GetName() + ">";
-      }
-      return "emp::vector<" + TypeID<TypePack<T,Ts...>>::GetTypes() + ">";
-    }
-  };
-
-}
+//}
 
 #endif
