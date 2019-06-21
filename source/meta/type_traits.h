@@ -20,12 +20,13 @@
 namespace emp {
 
   // Customized type traits
-  template <typename T> struct is_ptr_type           { enum { value = false }; };
-  template <typename T> struct is_ptr_type<T*>       { enum { value = true }; };
-  template <typename T> struct is_ptr_type<T* const> { enum { value = true }; };
-  template <typename T> struct is_ptr_type<Ptr<T>>   { enum { value = true }; };
+  template <typename T> struct is_ptr_type : public std::false_type { };
+  template <typename T> struct is_ptr_type<T*> : public std::true_type { };
+  template <typename T> struct is_ptr_type<T* const> : public std::true_type { };
+  template <typename T> struct is_ptr_type<Ptr<T>> : public std::true_type { };
   template <typename T>
   constexpr bool is_ptr_type_v(const T&) { return is_ptr_type<T>::value; }
+  template <typename T> using is_pointer = is_ptr_type<T>;
 
   template <typename T> struct remove_ptr_type         { using type = T; };
   template <typename T> struct remove_ptr_type<T*>     { using type = T; };
