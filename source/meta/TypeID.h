@@ -24,18 +24,27 @@
 
 namespace emp {
 
-  namespace internal {
-    struct TypeID_Info {
-      std::string name;
-
-      TypeID_Info(const std::string & in_name) : name(in_name) { ; }
-    };
-  }
-
   struct TypeID {
-    using info_t = emp::Ptr<internal::TypeID_Info>;
+    struct Info {
+      std::string name;
+      bool is_array = false;
+      bool is_class = false;
+      bool is_pointer = false;
+      bool is_object = false;
+      bool is_reference = false;
+      bool is_const = false;
+      bool is_volatile = false;
+      bool is_trivial = false;
+      bool in_empty = false;
+      bool is_abstract = false;
+
+      Info(const std::string & in_name) : name(in_name) { ; }
+    };
+
+    using info_t = emp::Ptr<TypeID::Info>;
     info_t info_ptr;
 
+    TypeID() : info_ptr(nullptr) { ; }
     TypeID(info_t _info) : info_ptr(_info) { ; }
     TypeID(const TypeID &) = default;
     ~TypeID() { ; }
@@ -45,13 +54,18 @@ namespace emp {
     bool operator==(TypeID in) const { return info_ptr == in.info_ptr; }
     bool operator!=(TypeID in) const { return info_ptr != in.info_ptr; }
 
-    const std::string & GetName() const { return info_ptr->name; }
-    void SetName(const std::string & in_name) { info_ptr->name = in_name; }
+    static const std::string & GetUnknownName() {
+      static std::string name = "[unknown type]";
+      return name;
+    }
+    const std::string & GetName() const { return (info_ptr) ? info_ptr->name : GetUnknownName(); }
+    void SetName(const std::string & in_name) { emp_assert(info_ptr); info_ptr->name = in_name; }
+
   };
 
   template <typename T>
   static TypeID GetTypeID() {
-    static internal::TypeID_Info info(typeid(T).name());  // Create static info so that it is persistent.
+    static TypeID::Info info(typeid(T).name());  // Create static info so that it is persistent.
     return TypeID(&info);
   }
 
