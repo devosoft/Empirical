@@ -27,6 +27,7 @@ namespace emp {
   struct TypeID {
     struct Info {
       std::string name;
+      bool init = false;           ///< Has this info been initialized yet?
       bool is_array = false;
       bool is_class = false;
       bool is_pointer = false;
@@ -35,7 +36,7 @@ namespace emp {
       bool is_const = false;
       bool is_volatile = false;
       bool is_trivial = false;
-      bool in_empty = false;
+      bool is_empty = false;
       bool is_abstract = false;
 
       Info(const std::string & in_name) : name(in_name) { ; }
@@ -61,11 +62,37 @@ namespace emp {
     const std::string & GetName() const { return (info_ptr) ? info_ptr->name : GetUnknownName(); }
     void SetName(const std::string & in_name) { emp_assert(info_ptr); info_ptr->name = in_name; }
 
+    bool IsInitialized() { return (info_ptr) ? info_ptr->init : true; }
+    void SetInitialized(bool _in=true) { info_ptr->init = _in; }
+
+    bool IsArray() { return (info_ptr) ? info_ptr->is_array : false; }
+    bool IsClass() { return (info_ptr) ? info_ptr->is_class : false; }
+    bool IsPointer() { return (info_ptr) ? info_ptr->is_pointer : false; }
+    bool IsObject() { return (info_ptr) ? info_ptr->is_object : false; }
+    bool IsReference() { return (info_ptr) ? info_ptr->is_reference : false; }
+    bool IsConst() { return (info_ptr) ? info_ptr->is_const : false; }
+    bool IsVolatile() { return (info_ptr) ? info_ptr->is_volatile : false; }
+    bool IsTrivial() { return (info_ptr) ? info_ptr->is_trivial : false; }
+    bool IsEmpty() { return (info_ptr) ? info_ptr->is_empty : false; }
+    bool IsAbstract() { return (info_ptr) ? info_ptr->is_abstract : false; }
+
   };
 
   template <typename T>
   static TypeID GetTypeID() {
     static TypeID::Info info(typeid(T).name());  // Create static info so that it is persistent.
+    if (info.init == false) {
+      info.is_array = std::is_array<T>();
+      info.is_class = std::is_class<T>();
+      info.is_pointer = emp::is_pointer<T>(); // std::is_pointer<T>();
+      info.is_object = std::is_object<T>();
+      info.is_reference = std::is_reference<T>();
+      info.is_const = std::is_const<T>();
+      info.is_volatile = std::is_volatile<T>();
+      info.is_trivial = std::is_trivial<T>();
+      info.is_empty = std::is_empty<T>();
+      info.is_abstract = std::is_abstract<T>();
+    }
     return TypeID(&info);
   }
 
