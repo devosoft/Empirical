@@ -20,9 +20,9 @@ int main(int argc, char *argv[])
   }
 
   Emphatic codegen(argv[1]);
-  //codegen.PrintTokens();
+  codegen.PrintTokens();
 
-  // codegen.SetDebug();
+  codegen.SetDebug();
   codegen.Process();
 
   std::string out_filename = "";
