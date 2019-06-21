@@ -15,7 +15,10 @@
 #include <sstream>
 #include <string>
 
+#include "../base/Ptr.h"
 #include "../base/vector.h"
+
+#include "type_traits.h"
 #include "TypePack.h"
 
 
@@ -24,41 +27,32 @@ namespace emp {
   namespace internal {
     struct TypeID_Info {
       std::string name;
+
       TypeID_Info(const std::string & in_name) : name(in_name) { ; }
     };
-
-    static emp::vector<TypeID_Info> & GetTypeID_Info_vector() {
-      static emp::vector<TypeID_Info> info_vec({{"Unknown Type"}});
-      return info_vec;
-    }
-
-    /// Get the next unique ID for a type.
-    static size_t GetNextTypeValue(const std::string & name) {
-      GetTypeID_Info_vector().push_back(name);
-      return GetTypeID_Info_vector().size() - 1;
-    }
   }
 
   struct TypeID {
-    size_t id;
+    using info_t = emp::Ptr<internal::TypeID_Info>;
+    info_t info_ptr;
 
-    TypeID(size_t _id) : id(_id) { ; }
+    TypeID(info_t _info) : info_ptr(_info) { ; }
     TypeID(const TypeID &) = default;
     ~TypeID() { ; }
     TypeID & operator=(const TypeID &) = default;
 
-    operator size_t() const noexcept { return id; }
-    bool operator==(TypeID in) const { return id == in.id; }
-    bool operator!=(TypeID in) const { return id != in.id; }
+    operator size_t() const noexcept { return (size_t) info_ptr.Raw(); }
+    bool operator==(TypeID in) const { return info_ptr == in.info_ptr; }
+    bool operator!=(TypeID in) const { return info_ptr != in.info_ptr; }
 
-    const std::string & GetName() const { return internal::GetTypeID_Info_vector()[id].name; }
-    void SetName(const std::string & in_name) { internal::GetTypeID_Info_vector()[id].name = in_name; }
+    const std::string & GetName() const { return info_ptr->name; }
+    void SetName(const std::string & in_name) { info_ptr->name = in_name; }
   };
 
   template <typename T>
   static TypeID GetTypeID() {
-    static const size_t type_value = internal::GetNextTypeValue(typeid(T).name());
-    return type_value;
+    static internal::TypeID_Info info(typeid(T).name());  // Create static info so that it is persistent.
+    return TypeID(&info);
   }
 
   /// Setup a bunch of standard type names to be more readable.
