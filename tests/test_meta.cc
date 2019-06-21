@@ -129,6 +129,28 @@ TEST_CASE("Test TypeID", "[meta]")
   REQUIRE(emp::GetTypeID<int>().GetName() == "int32_t");
   REQUIRE(emp::GetTypeID<std::string>().GetName() == "std::string");
 
+  // Check on qualities.
+  REQUIRE(emp::GetTypeID<int>().IsConst() == false);
+  REQUIRE(emp::GetTypeID<const int>().IsConst() == true);
+
+  REQUIRE(emp::GetTypeID<char>().IsClass() == false);
+  REQUIRE(emp::GetTypeID<std::string>().IsClass() == true);
+  REQUIRE(emp::GetTypeID<HasA>().IsClass() == true);
+
+  REQUIRE(emp::GetTypeID<char>().IsReference() == false);
+  REQUIRE(emp::GetTypeID<char*>().IsReference() == false);
+  REQUIRE(emp::GetTypeID<char&>().IsReference() == true);
+  REQUIRE(emp::GetTypeID<emp::Ptr<char>>().IsReference() == false);
+
+  REQUIRE(emp::GetTypeID<char>().IsPointer() == false);
+  REQUIRE(emp::GetTypeID<char*>().IsPointer() == true);
+  REQUIRE(emp::GetTypeID<char&>().IsPointer() == false);
+  REQUIRE(emp::GetTypeID<emp::Ptr<char>>().IsPointer() == true);
+
+    // bool IsArray() { return (info_ptr) ? info_ptr->is_array : false; }
+    // bool IsAbstract() { return (info_ptr) ? info_ptr->is_abstract : false; }
+
+ 
   //REQUIRE((emp::GetTypeID<emp::array<double,7>>().GetName()) == ("emp::array<double,7>"));
   //REQUIRE(emp::GetTypeID<emp::vector<double>>().GetName() == "emp::vector<double>");
 
@@ -189,13 +211,13 @@ TEST_CASE("Test TypePack", "[meta]")
   using test_print = test_exist::set<1,int>;
   REQUIRE(test_print::Count<int>() == 1);
 
-  using wrap_v_t = test_t::wrap<emp::vector>;
+  // using wrap_v_t = test_t::wrap<emp::vector>;
   // REQUIRE(emp::GetTypeID<wrap_v_t>().GetName() == "emp::TypePack<emp::vector<int32_t>,emp::vector<std::string>,emp::vector<float>,emp::vector<bool>,emp::vector<double>>");
 
-  using wrap_A_t = test_A::wrap<MemberA>;
+  // using wrap_A_t = test_A::wrap<MemberA>;
   // REQUIRE(emp::GetTypeID<wrap_A_t>().GetName() == "emp::TypePack<int32_t,char,int32_t>");
 
-  using shuffle_t = test_t::select<2,3,4,1,3,3,3,0>;
+  // using shuffle_t = test_t::select<2,3,4,1,3,3,3,0>;
   // REQUIRE(emp::GetTypeID<shuffle_t>().GetName() == "emp::TypePack<float,bool,double,std::string,bool,bool,bool,int32_t>");
 
 
