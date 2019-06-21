@@ -32,7 +32,7 @@ namespace emp {
       virtual ~VarBase() { ; }
 
       virtual emp::Ptr<VarBase> Clone() const = 0;
-      virtual size_t GetTypeValue() const = 0;
+      virtual TypeID GetTypeID() const = 0;
     };
 
     template <typename T>
@@ -45,7 +45,7 @@ namespace emp {
       { ; }
 
       emp::Ptr<VarBase> Clone() const override { return emp::NewPtr< VarInfo<T> >(name, value); }
-      size_t GetTypeValue() const override { return emp::GetTypeValue<T>(); };
+      TypeID GetTypeID() const override { return emp::GetTypeID<T>(); };
     };
 
     emp::vector<emp::Ptr<VarBase>> vars;             ///< Vector of all current variables.
@@ -102,7 +102,7 @@ namespace emp {
     template <typename T>
     T & Get(size_t id) {
       emp_assert(id < vars.size());
-      emp_assert(vars[id].GetTypeValue() = emp::GetTypeValue<T>());
+      emp_assert(vars[id].GetTypeID() = emp::GetTypeID<T>());
       emp::Ptr<VarInfo<T>> ptr = vars[id].Cast<VarInfo<T>>();
       return ptr->value;
     }
@@ -117,7 +117,7 @@ namespace emp {
     template <typename T>
     const T & Get(size_t id) const {
       emp_assert(id < vars.size());
-      emp_assert(vars[id].GetTypeValue() = emp::GetTypeValue<T>());
+      emp_assert(vars[id].GetTypeID() = emp::GetTypeID<T>());
       emp::Ptr<const VarInfo<T>> ptr = vars[id].Cast<const VarInfo<T>>();
       return ptr->value;
     }
@@ -146,7 +146,7 @@ namespace emp {
     template <typename T>
     void Set(size_t id, const T & value) {
       emp_assert(id < vars.size());
-      emp_assert(vars[id].GetTypeValue() = emp::GetTypeValue<T>());
+      emp_assert(vars[id].GetTypeID() = emp::GetTypeID<T>());
       emp::Ptr<VarInfo<T>> ptr = vars[id].Cast<VarInfo<T>>();
       ptr->value = value;
     }
