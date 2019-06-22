@@ -26,8 +26,8 @@ namespace emp {
 
   struct TypeID {
     struct Info {
-      std::string name;
-      bool init = false;           ///< Has this info been initialized yet?
+      bool init = false;                     ///< Has this info been initialized yet?
+      std::string name = "[unknown type]";   ///< Unique (ideally human-readable) type name
       bool is_array = false;
       bool is_class = false;
       bool is_pointer = false;
@@ -39,55 +39,64 @@ namespace emp {
       bool is_empty = false;
       bool is_abstract = false;
 
-      size_t decay_id;
+      size_t decay_id = 0;
 
+      Info() { ; }
       Info(const std::string & in_name) : name(in_name) { ; }
+      Info(const Info&) = default;
     };
 
     using info_t = emp::Ptr<TypeID::Info>;
     info_t info_ptr;
 
-    TypeID() : info_ptr(nullptr) { ; }
+    static info_t GetUnknownInfoPtr() { static Info info; return &info; }
+
+    TypeID() : info_ptr(GetUnknownInfoPtr()) { ; }
     TypeID(info_t _info) : info_ptr(_info) { ; }
-    TypeID(size_t id) : info_ptr((info_t) id) { ; }
+    TypeID(size_t id) : info_ptr((TypeID::Info *) id) { ; }
     TypeID(const TypeID &) = default;
     ~TypeID() { ; }
     TypeID & operator=(const TypeID &) = default;
 
-    operator size_t() const noexcept { return (size_t) info_ptr.Raw(); }
-    operator bool() const noexcept { return (bool) info_ptr; }
+    operator size_t() const noexcept { return (info_ptr->init) ? (size_t) info_ptr.Raw() : 0; }
+    operator bool() const noexcept { return info_ptr->init; }
     bool operator==(TypeID in) const { return info_ptr == in.info_ptr; }
     bool operator!=(TypeID in) const { return info_ptr != in.info_ptr; }
 
-    static const std::string & GetUnknownName() {
-      static std::string name = "[unknown type]";
-      return name;
-    }
-    const std::string & GetName() const { return (info_ptr) ? info_ptr->name : GetUnknownName(); }
+    const std::string & GetName() const { return info_ptr->name; }
     void SetName(const std::string & in_name) { emp_assert(info_ptr); info_ptr->name = in_name; }
 
-    bool IsInitialized() const { return (info_ptr) ? info_ptr->init : true; }
+    bool IsInitialized() const { return info_ptr->init ; }
     void SetInitialized(bool _in=true) { info_ptr->init = _in; }
 
-    bool IsArray() const { return (info_ptr) ? info_ptr->is_array : false; }
-    bool IsClass() const { return (info_ptr) ? info_ptr->is_class : false; }
-    bool IsPointer() const { return (info_ptr) ? info_ptr->is_pointer : false; }
-    bool IsObject() const { return (info_ptr) ? info_ptr->is_object : false; }
-    bool IsReference() const { return (info_ptr) ? info_ptr->is_reference : false; }
-    bool IsConst() const { return (info_ptr) ? info_ptr->is_const : false; }
-    bool IsVolatile() const { return (info_ptr) ? info_ptr->is_volatile : false; }
-    bool IsTrivial() const { return (info_ptr) ? info_ptr->is_trivial : false; }
-    bool IsEmpty() const { return (info_ptr) ? info_ptr->is_empty : false; }
-    bool IsAbstract() const { return (info_ptr) ? info_ptr->is_abstract : false; }
+    bool IsArray() const { return info_ptr->is_array ; }
+    bool IsClass() const { return info_ptr->is_class ; }
+    bool IsPointer() const { return info_ptr->is_pointer ; }
+    bool IsObject() const { return info_ptr->is_object ; }
+    bool IsReference() const { return info_ptr->is_reference ; }
+    bool IsConst() const { return info_ptr->is_const ; }
+    bool IsVolatile() const { return info_ptr->is_volatile ; }
+    bool IsTrivial() const { return info_ptr->is_trivial ; }
+    bool IsEmpty() const { return info_ptr->is_empty ; }
+    bool IsAbstract() const { return info_ptr->is_abstract ; }
 
-    TypeID GetDecayType() const { return decay_id; }
+    TypeID GetDecayType() const { return info_ptr->decay_id; }
   };
+
+  template <typename T> TypeID::Info BuildInfo();
 
   template <typename T>
   static TypeID GetTypeID() {
-    static TypeID::Info info(typeid(T).name());  // Create static info so that it is persistent.
+    static TypeID::Info info = BuildInfo<T>();  // Create static info so that it is persistent.
+    return TypeID(&info);
+  }
+
+  template <typename T>
+  static TypeID::Info BuildInfo() {
+    static TypeID::Info info;
     if (info.init == false) {
       info.init = true;
+      info.name = typeid(T).name();
       info.is_array = std::is_array<T>();
       info.is_class = std::is_class<T>();
       info.is_pointer = emp::is_pointer<T>(); // std::is_pointer<T>();
@@ -99,9 +108,12 @@ namespace emp {
       info.is_empty = std::is_empty<T>();
       info.is_abstract = std::is_abstract<T>();
 
-      info.decay_id = GetTypeID< std::decay<T> >();
+      using decay_t = std::decay_t<T>;
+      if constexpr (std::is_same<T, decay_t>()) info.decay_id = (size_t) &info;
+      else info.decay_id = GetTypeID< decay_t >();
     }
-    return TypeID(&info);
+    
+    return info;
   }
 
   /// Setup a bunch of standard type names to be more readable.
