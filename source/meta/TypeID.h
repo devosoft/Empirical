@@ -39,6 +39,8 @@ namespace emp {
       bool is_empty = false;
       bool is_abstract = false;
 
+      size_t decay_id;
+
       Info(const std::string & in_name) : name(in_name) { ; }
     };
 
@@ -47,11 +49,13 @@ namespace emp {
 
     TypeID() : info_ptr(nullptr) { ; }
     TypeID(info_t _info) : info_ptr(_info) { ; }
+    TypeID(size_t id) : info_ptr((info_t) id) { ; }
     TypeID(const TypeID &) = default;
     ~TypeID() { ; }
     TypeID & operator=(const TypeID &) = default;
 
     operator size_t() const noexcept { return (size_t) info_ptr.Raw(); }
+    operator bool() const noexcept { return (bool) info_ptr; }
     bool operator==(TypeID in) const { return info_ptr == in.info_ptr; }
     bool operator!=(TypeID in) const { return info_ptr != in.info_ptr; }
 
@@ -62,26 +66,28 @@ namespace emp {
     const std::string & GetName() const { return (info_ptr) ? info_ptr->name : GetUnknownName(); }
     void SetName(const std::string & in_name) { emp_assert(info_ptr); info_ptr->name = in_name; }
 
-    bool IsInitialized() { return (info_ptr) ? info_ptr->init : true; }
+    bool IsInitialized() const { return (info_ptr) ? info_ptr->init : true; }
     void SetInitialized(bool _in=true) { info_ptr->init = _in; }
 
-    bool IsArray() { return (info_ptr) ? info_ptr->is_array : false; }
-    bool IsClass() { return (info_ptr) ? info_ptr->is_class : false; }
-    bool IsPointer() { return (info_ptr) ? info_ptr->is_pointer : false; }
-    bool IsObject() { return (info_ptr) ? info_ptr->is_object : false; }
-    bool IsReference() { return (info_ptr) ? info_ptr->is_reference : false; }
-    bool IsConst() { return (info_ptr) ? info_ptr->is_const : false; }
-    bool IsVolatile() { return (info_ptr) ? info_ptr->is_volatile : false; }
-    bool IsTrivial() { return (info_ptr) ? info_ptr->is_trivial : false; }
-    bool IsEmpty() { return (info_ptr) ? info_ptr->is_empty : false; }
-    bool IsAbstract() { return (info_ptr) ? info_ptr->is_abstract : false; }
+    bool IsArray() const { return (info_ptr) ? info_ptr->is_array : false; }
+    bool IsClass() const { return (info_ptr) ? info_ptr->is_class : false; }
+    bool IsPointer() const { return (info_ptr) ? info_ptr->is_pointer : false; }
+    bool IsObject() const { return (info_ptr) ? info_ptr->is_object : false; }
+    bool IsReference() const { return (info_ptr) ? info_ptr->is_reference : false; }
+    bool IsConst() const { return (info_ptr) ? info_ptr->is_const : false; }
+    bool IsVolatile() const { return (info_ptr) ? info_ptr->is_volatile : false; }
+    bool IsTrivial() const { return (info_ptr) ? info_ptr->is_trivial : false; }
+    bool IsEmpty() const { return (info_ptr) ? info_ptr->is_empty : false; }
+    bool IsAbstract() const { return (info_ptr) ? info_ptr->is_abstract : false; }
 
+    TypeID GetDecayType() const { return decay_id; }
   };
 
   template <typename T>
   static TypeID GetTypeID() {
     static TypeID::Info info(typeid(T).name());  // Create static info so that it is persistent.
     if (info.init == false) {
+      info.init = true;
       info.is_array = std::is_array<T>();
       info.is_class = std::is_class<T>();
       info.is_pointer = emp::is_pointer<T>(); // std::is_pointer<T>();
@@ -92,6 +98,8 @@ namespace emp {
       info.is_trivial = std::is_trivial<T>();
       info.is_empty = std::is_empty<T>();
       info.is_abstract = std::is_abstract<T>();
+
+      info.decay_id = GetTypeID< std::decay<T> >();
     }
     return TypeID(&info);
   }
