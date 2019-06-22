@@ -19,7 +19,7 @@
 
 namespace emp {
 
-  // Customized type traits
+  // Customized type traits; for the moment, make sure that emp::Ptr is handled correctly.
   template <typename T> struct is_ptr_type : public std::false_type { };
   template <typename T> struct is_ptr_type<T*> : public std::true_type { };
   template <typename T> struct is_ptr_type<T* const> : public std::true_type { };
@@ -33,6 +33,7 @@ namespace emp {
   template <typename T> struct remove_ptr_type<Ptr<T>> { using type = T; };
   template <typename T>
   using remove_ptr_type_t = typename remove_ptr_type<T>::type;
+  template <typename T> using remove_pointer = remove_ptr_type<T>;
   // @CAO: Make sure we are dealing with const and volitile pointers correctly.
 
   // Can we convert the first pointer into the second?
