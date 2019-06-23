@@ -33,7 +33,7 @@ namespace emp {
   template <typename T> struct remove_ptr_type<Ptr<T>> { using type = T; };
   template <typename T>
   using remove_ptr_type_t = typename remove_ptr_type<T>::type;
-  template <typename T> using remove_pointer = remove_ptr_type<T>;
+  template <typename T> using remove_pointer_t = remove_ptr_type_t<T>;
   // @CAO: Make sure we are dealing with const and volitile pointers correctly.
 
   // Can we convert the first pointer into the second?
