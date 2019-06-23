@@ -28,18 +28,23 @@ namespace emp {
     struct Info {
       bool init = false;                     ///< Has this info been initialized yet?
       std::string name = "[unknown type]";   ///< Unique (ideally human-readable) type name
+      bool is_abstract = false;
       bool is_array = false;
       bool is_class = false;
-      bool is_pointer = false;
-      bool is_object = false;
-      bool is_reference = false;
       bool is_const = false;
-      bool is_volatile = false;
-      bool is_trivial = false;
       bool is_empty = false;
-      bool is_abstract = false;
+      bool is_object = false;
+      bool is_pointer = false;
+      bool is_reference = false;
+      bool is_trivial = false;
+      bool is_volatile = false;
 
       size_t decay_id = 0;
+      size_t remove_const_id = 0;
+      size_t remove_cv_id = 0;
+      size_t remove_ptr_id = 0;
+      size_t remove_ref_id = 0;
+      size_t remove_volatile_id = 0;
 
       Info() { ; }
       Info(const std::string & in_name) : name(in_name) { ; }
@@ -69,16 +74,16 @@ namespace emp {
     bool IsInitialized() const { return info_ptr->init ; }
     void SetInitialized(bool _in=true) { info_ptr->init = _in; }
 
+    bool IsAbstract() const { return info_ptr->is_abstract ; }
     bool IsArray() const { return info_ptr->is_array ; }
     bool IsClass() const { return info_ptr->is_class ; }
-    bool IsPointer() const { return info_ptr->is_pointer ; }
-    bool IsObject() const { return info_ptr->is_object ; }
-    bool IsReference() const { return info_ptr->is_reference ; }
     bool IsConst() const { return info_ptr->is_const ; }
-    bool IsVolatile() const { return info_ptr->is_volatile ; }
-    bool IsTrivial() const { return info_ptr->is_trivial ; }
     bool IsEmpty() const { return info_ptr->is_empty ; }
-    bool IsAbstract() const { return info_ptr->is_abstract ; }
+    bool IsObject() const { return info_ptr->is_object ; }
+    bool IsPointer() const { return info_ptr->is_pointer ; }
+    bool IsReference() const { return info_ptr->is_reference ; }
+    bool IsTrivial() const { return info_ptr->is_trivial ; }
+    bool IsVolatile() const { return info_ptr->is_volatile ; }
 
     TypeID GetDecayType() const { return info_ptr->decay_id; }
   };
@@ -97,20 +102,42 @@ namespace emp {
     if (info.init == false) {
       info.init = true;
       info.name = typeid(T).name();
+      info.is_abstract = std::is_abstract<T>();
       info.is_array = std::is_array<T>();
       info.is_class = std::is_class<T>();
-      info.is_pointer = emp::is_pointer<T>(); // std::is_pointer<T>();
-      info.is_object = std::is_object<T>();
-      info.is_reference = std::is_reference<T>();
       info.is_const = std::is_const<T>();
-      info.is_volatile = std::is_volatile<T>();
-      info.is_trivial = std::is_trivial<T>();
       info.is_empty = std::is_empty<T>();
-      info.is_abstract = std::is_abstract<T>();
+      info.is_object = std::is_object<T>();
+      info.is_pointer = emp::is_pointer<T>(); // Not std::is_pointer<T>() to deal with emp::Ptr.
+      info.is_reference = std::is_reference<T>();
+      info.is_trivial = std::is_trivial<T>();
+      info.is_volatile = std::is_volatile<T>();
 
       using decay_t = std::decay_t<T>;
       if constexpr (std::is_same<T, decay_t>()) info.decay_id = (size_t) &info;
       else info.decay_id = GetTypeID< decay_t >();
+
+      using remove_const_t = std::remove_const_t<T>;
+      if constexpr (std::is_same<T, remove_const_t>()) info.remove_const_id = (size_t) &info;
+      else info.remove_const_id = GetTypeID< remove_const_t >();
+
+      using remove_cv_t = std::remove_cv_t<T>;
+      if constexpr (std::is_same<T, remove_cv_t>()) info.remove_cv_id = (size_t) &info;
+      else info.remove_cv_id = GetTypeID< remove_cv_t >();
+
+      using remove_ptr_t = emp::remove_pointer_t<T>;
+      if constexpr (std::is_same<T, remove_ptr_t>()) info.remove_ptr_id = (size_t) &info;
+      else info.remove_ptr_id = GetTypeID< remove_ptr_t >();
+
+      using remove_ref_t = std::remove_reference_t<T>;
+      if constexpr (std::is_same<T, remove_ref_t>()) info.remove_ref_id = (size_t) &info;
+      else info.remove_ref_id = GetTypeID< remove_ref_t >();
+
+      using remove_volatile_t = std::remove_volatile_t<T>;
+      if constexpr (std::is_same<T, remove_volatile_t>()) info.remove_volatile_id = (size_t) &info;
+      else info.remove_volatile_id = GetTypeID< remove_volatile_t >();
+
+
     }
     
     return info;
