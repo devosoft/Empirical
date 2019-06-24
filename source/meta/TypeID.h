@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016=2019.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  TypeID provides an easy way to convert types to strings.
@@ -23,6 +23,8 @@
 
 
 namespace emp {
+
+  using namespace std::string_literals;
 
   struct TypeID {
     struct Info {
@@ -85,7 +87,12 @@ namespace emp {
     bool IsTrivial() const { return info_ptr->is_trivial ; }
     bool IsVolatile() const { return info_ptr->is_volatile ; }
 
-    TypeID GetDecayType() const { return info_ptr->decay_id; }
+    TypeID GetDecayTypeID() const { return info_ptr->decay_id; }
+    TypeID GetRemoveConstTypeID() const { return info_ptr->remove_const_id; }
+    TypeID GetRemoveCVTypeID() const { return info_ptr->remove_cv_id; }
+    TypeID GetRemovePointerTypeID() const { return info_ptr->remove_ptr_id; }
+    TypeID GetRemoveReferenceTypeID() const { return info_ptr->remove_ref_id; }
+    TypeID GetRemoveVolatileTypeID() const { return info_ptr->remove_volatile_id; }
   };
 
   template <typename T> TypeID::Info BuildInfo();
@@ -100,6 +107,8 @@ namespace emp {
   static TypeID::Info BuildInfo() {
     static TypeID::Info info;
     if (info.init == false) {
+      TypeID type_id(&info);
+
       info.init = true;
       info.name = typeid(T).name();
       info.is_abstract = std::is_abstract<T>();
@@ -137,7 +146,19 @@ namespace emp {
       if constexpr (std::is_same<T, remove_volatile_t>()) info.remove_volatile_id = (size_t) &info;
       else info.remove_volatile_id = GetTypeID< remove_volatile_t >();
 
-
+      // Now, fix the name if we can be more precise about it.
+      if (info.is_const) {
+        info.name = "const "s + type_id.GetRemoveConstTypeID().GetName();
+      }
+      else if (info.is_volatile) {
+        info.name = "volatile "s + type_id.GetRemoveVolatileTypeID().GetName();
+      }
+      else if (info.is_pointer) {
+        info.name = type_id.GetRemovePointerTypeID().GetName() + '*';
+      }
+      else if (info.is_reference) {
+        info.name = type_id.GetRemoveReferenceTypeID().GetName() + '&';
+      }
     }
     
     return info;
@@ -160,6 +181,7 @@ namespace emp {
     GetTypeID<int16_t>().SetName("int16_t");
     GetTypeID<int32_t>().SetName("int32_t");
     GetTypeID<int64_t>().SetName("int64_t");
+
     GetTypeID<uint8_t>().SetName( "uint8_t");
     GetTypeID<uint16_t>().SetName("uint16_t");
     GetTypeID<uint32_t>().SetName("uint32_t");
