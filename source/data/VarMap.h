@@ -79,25 +79,14 @@ namespace emp {
       return id;
     }
 
+    // Type-specific add functions.
     size_t AddString(const std::string & name, const std::string & value) {
       return Add<std::string>(name, value);
     }
-
-    size_t AddInt(const std::string & name, int value) {
-      return Add<int>(name, value);
-    }
-
-    size_t AddDouble(const std::string & name, double value) {
-      return Add<double>(name, value);
-    }
-
-    size_t AddChar(const std::string & name, char value) {
-      return Add<char>(name, value);
-    }
-
-    size_t AddBool(const std::string & name, bool value) {
-      return Add<bool>(name, value);
-    }
+    size_t AddInt(const std::string & name, int value)       { return Add<int>(name, value); }
+    size_t AddDouble(const std::string & name, double value) { return Add<double>(name, value); }
+    size_t AddChar(const std::string & name, char value)     { return Add<char>(name, value); }
+    size_t AddBool(const std::string & name, bool value)     { return Add<bool>(name, value); }
 
     template <typename T>
     T & Get(size_t id) {
@@ -129,14 +118,17 @@ namespace emp {
       return Get<T>(id);
     }
 
-    // Accessors    
+    TypeID GetType(size_t id) const { return vars[id]->GetTypeID(); }
+    TypeID GetType(std::string name) const { return GetType(GetID(name)); }
+
+    // Type-specific Accessors    
     std::string & GetString(const std::string & name) { return Get<std::string>(name); }
     int & GetInt(const std::string & name) { return Get<int>(name); }
     double & GetDouble(const std::string & name) { return Get<double>(name); }
     char & GetChar(const std::string & name) { return Get<char>(name); }
     bool & GetBool(const std::string & name) { return Get<bool>(name); }
 
-    // Const accessors
+    // Type-specific const accessors
     const std::string & GetString(const std::string & name) const { return Get<std::string>(name); }
     int GetInt(const std::string & name) const { return Get<int>(name); }
     double GetDouble(const std::string & name) const { return Get<double>(name); }
