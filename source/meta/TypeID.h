@@ -70,6 +70,7 @@ namespace emp {
     bool operator==(TypeID in) const { return info_ptr == in.info_ptr; }
     bool operator!=(TypeID in) const { return info_ptr != in.info_ptr; }
 
+    size_t GetID() const { return (size_t) info_ptr.Raw(); }
     const std::string & GetName() const { return info_ptr->name; }
     void SetName(const std::string & in_name) { emp_assert(info_ptr); info_ptr->name = in_name; }
 
@@ -97,10 +98,17 @@ namespace emp {
 
   template <typename T> TypeID::Info BuildInfo();
 
+  /// Retrieve the correct TypeID for a given type.
   template <typename T>
   static TypeID GetTypeID() {
     static TypeID::Info info = BuildInfo<T>();  // Create static info so that it is persistent.
     return TypeID(&info);
+  }
+
+  /// Retrieve a vector of TypeIDs for a pack of types passed in.
+  template <typename... Ts>
+  emp::vector<TypeID> GetTypeIDs() {
+    return emp::vector<TypeID>{GetTypeID<Ts>()...};
   }
 
   template <typename T>
