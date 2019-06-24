@@ -156,6 +156,13 @@ TEST_CASE("Test TypeID", "[meta]")
 
   REQUIRE(emp::GetTypeID<char*>().GetName() == "char*");
   REQUIRE(emp::GetTypeID<const int>().GetName() == "const int32_t");
+
+  emp::vector<emp::TypeID> type_ids = emp::GetTypeIDs<int, char, int, std::string>();
+  REQUIRE(type_ids.size() == 4);
+  REQUIRE(type_ids[0].GetID() == type_ids[2].GetID());
+  REQUIRE(type_ids[0].GetID() == int_value);
+  REQUIRE(type_ids[1].GetID() == char_value);
+  REQUIRE(type_ids[3].GetID() == str_value);
 }
 
 TEST_CASE("Test TypePack", "[meta]")
