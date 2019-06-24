@@ -72,7 +72,7 @@ namespace emp {
   ///   2. If the organism type can be cast to double, use it!
   ///   3. Start with a fitness function that throws an assert indicating function must be set.
   ///
-  ///  MUTATIONS: The mutation function deteramines a main source of variation for most evolving
+  ///  MUTATIONS: The mutation function determines a main source of variation for most evolving
   ///             systems.
   ///   0. If you set the mutation function using SetMutFun(), it will have priority.
   ///   1. Or DoMutations(random) member function.
