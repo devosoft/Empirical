@@ -719,7 +719,7 @@ namespace emp {
     void Reset() {
       emp_assert(!is_executing);
       ResetHardware();
-      traits.clear();
+      traits = Trait();
       program.Clear();
     }
 
