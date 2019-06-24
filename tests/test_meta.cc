@@ -154,8 +154,8 @@ TEST_CASE("Test TypeID", "[meta]")
   //REQUIRE((emp::GetTypeID<emp::array<double,7>>().GetName()) == ("emp::array<double,7>"));
   //REQUIRE(emp::GetTypeID<emp::vector<double>>().GetName() == "emp::vector<double>");
 
-  //REQUIRE(emp::GetTypeID<char*>().GetName() == "char*");
-
+  REQUIRE(emp::GetTypeID<char*>().GetName() == "char*");
+  REQUIRE(emp::GetTypeID<const int>().GetName() == "const int32_t");
 }
 
 TEST_CASE("Test TypePack", "[meta]")
