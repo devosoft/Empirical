@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016=2019.
+//  Copyright (C) Michigan State University, 2016-2019.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  TypeID provides an easy way to convert types to strings.
@@ -26,6 +26,7 @@ namespace emp {
 
   using namespace std::string_literals;
 
+  /// Basic TypeID data structure.
   struct TypeID {
     struct Info {
       bool init = false;                     ///< Has this info been initialized yet?
@@ -70,8 +71,13 @@ namespace emp {
     bool operator==(TypeID in) const { return info_ptr == in.info_ptr; }
     bool operator!=(TypeID in) const { return info_ptr != in.info_ptr; }
 
+    /// Get a unique numerical ID for this TypeID object.
     size_t GetID() const { return (size_t) info_ptr.Raw(); }
+
+    /// Get the name generated for this TypeID (ideally unique)
     const std::string & GetName() const { return info_ptr->name; }
+
+    /// Update the name for ALL instances of this TypeID.
     void SetName(const std::string & in_name) { emp_assert(info_ptr); info_ptr->name = in_name; }
 
     bool IsInitialized() const { return info_ptr->init ; }
@@ -111,6 +117,7 @@ namespace emp {
     return emp::vector<TypeID>{GetTypeID<Ts>()...};
   }
 
+  /// Build the information for a single TypeID.
   template <typename T>
   static TypeID::Info BuildInfo() {
     static TypeID::Info info;
