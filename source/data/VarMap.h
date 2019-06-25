@@ -91,7 +91,7 @@ namespace emp {
     template <typename T>
     T & Get(size_t id) {
       emp_assert(id < vars.size());
-      emp_assert(vars[id].GetTypeID() = emp::GetTypeID<T>());
+      emp_assert(vars[id]->GetTypeID() = emp::GetTypeID<T>());
       emp::Ptr<VarInfo<T>> ptr = vars[id].Cast<VarInfo<T>>();
       return ptr->value;
     }
@@ -106,7 +106,7 @@ namespace emp {
     template <typename T>
     const T & Get(size_t id) const {
       emp_assert(id < vars.size());
-      emp_assert(vars[id].GetTypeID() = emp::GetTypeID<T>());
+      emp_assert(vars[id]->GetTypeID() = emp::GetTypeID<T>());
       emp::Ptr<const VarInfo<T>> ptr = vars[id].Cast<const VarInfo<T>>();
       return ptr->value;
     }
@@ -138,7 +138,7 @@ namespace emp {
     template <typename T>
     void Set(size_t id, const T & value) {
       emp_assert(id < vars.size());
-      emp_assert(vars[id].GetTypeID() = emp::GetTypeID<T>());
+      emp_assert(vars[id]->GetTypeID() = emp::GetTypeID<T>());
       emp::Ptr<VarInfo<T>> ptr = vars[id].Cast<VarInfo<T>>();
       ptr->value = value;
     }
