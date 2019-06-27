@@ -102,7 +102,7 @@ namespace emp {
     TypeID GetRemoveVolatileTypeID() const { return info_ptr->remove_volatile_id; }
   };
 
-  template <typename T> TypeID::Info BuildInfo();
+  template <typename T> static TypeID::Info BuildInfo();
 
   /// Retrieve the correct TypeID for a given type.
   template <typename T>
