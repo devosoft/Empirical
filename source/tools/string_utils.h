@@ -20,6 +20,7 @@
 #include <string_view>
 #include <unordered_set>
 
+#include "../base/array.h"
 #include "../base/Ptr.h"
 #include "../base/vector.h"
 #include "../meta/reflection.h"
@@ -527,59 +528,84 @@ namespace emp {
   /// @cond TEMPLATES
 
   // The next functions are not efficient, but they will take any number of inputs and
-  // dynamically convert them all into a single, concatanated strings or stringstreams.
+  // dynamically convert them all into a single, concatanated string.
+
+  /// Setup emp::ToString declarations for built-in types.
+  template <typename T, size_t N> inline std::string ToString(const emp::array<T,N> & container);
+  template <typename... Ts> inline std::string ToString(const emp::vector<Ts...> & container);
+
+
+  /// Setup emp::to_string to work on containers.
+  // template <typename T>
+  // inline typename emp::decoy_t<std::string, typename T::value_type> ToString(T container) {
+  //   std::stringstream ss;
+  //   ss << "[ ";
+  //   for (const auto & el : container) {
+  //     ss << to_string(el);
+  //     ss << " ";
+  //   }
+  //   ss << "]";
+  //   return ss.str();
+  // }
+
 
   namespace internal {
-    inline void append_sstream(std::stringstream & ss) { (void) ss; }
-
-    template <typename TYPE, typename... OTHER_TYPES>
-    static void append_sstream(std::stringstream & ss, TYPE value, OTHER_TYPES... other_values) {
-      ss << value;
-      append_sstream(ss, other_values...);
-    }
-
-    // Give mutliple implmentations of to_string_impl... if we can append quickly, do so!!
-    template <typename T1, typename T2, typename... EXTRA_TYPES>
-    inline std::string to_string_impl(int, T1 val1, T2 val2, EXTRA_TYPES... extra_values) {
-      std::stringstream ss;
-      append_sstream(ss, val1, val2, extra_values...);
-      return ss.str();
-    }
-
-    // If std::to_string knows how to handle the case use it!
+    // If the item passed in has a ToString(), always use it.
     template <typename T>
-    inline auto to_string_impl(bool, T val) -> decltype(std::to_string(val))
-    { return std::to_string(val); }
-
-    // If there's another single POD entry, we can convert it manually and pass the result back.
-    inline std::string to_string_impl(bool, const std::string & s) { return s; }
-    inline std::string to_string_impl(bool, char c) { return std::string(1,c); }
-    inline std::string to_string_impl(bool, unsigned char c) { return std::string(1,(char)c); }
-    inline std::string to_string_impl(bool, char* str) { return std::string(str); }
-
-    // Operate on std::containers
-    template <typename T>
-    inline typename emp::sfinae_decoy<std::string, typename T::value_type>
-    to_string_impl(bool, T container) {
-      std::stringstream ss;
-      ss << "[ ";
-      for (const auto & el : container) {
-        ss << to_string_impl(true, el);
-        ss << " ";
-      }
-      ss << "]";
-      return ss.str();
+    decltype(std::declval<T>().ToString()) to_stream_item(const T & in, bool) {
+      return in.ToString();
     }
+
+    // Otherwise, if emp::ToString(x) is defined for x, use it.
+    template <typename T>
+    auto to_stream_item(const T & in, int) -> decltype(emp::ToString(in)) {
+      return emp::ToString(in);
+    }
+
+    // If neither works, just assume stream operator will handle things...
+    // @CAO: Technically we can detect this to give a more informative error...
+    template <typename T> const T & to_stream_item(const T & in, ...) { return in; }
+
   }
 
   /// @endcond
 
-  /// This function does its very best to convert everything it's to a string. Takes any number
-  /// of arguments and returns a single string containing all of them concatenated. Objects can be
-  /// any normal (POD) data type, container, or anything that can be passed into a stringstream.
-  template <typename... ALL_TYPES>
-  inline std::string to_string(ALL_TYPES &&... all_values) {
-    return internal::to_string_impl(true, std::forward<ALL_TYPES>(all_values)...);
+
+  /// This function does its very best to convert anything it gets to a string. Takes any number
+  /// of arguments and returns a single string containing all of them concatenated.  Any objects
+  /// that can go through a stringstream, have a ToString() memember functon, or are defined to
+  /// be passed into emp::ToString(x) will work correctly.
+  template <typename... Ts>
+  inline std::string to_string(const Ts &... values) {
+    std::stringstream ss;
+    (ss << ... << internal::to_stream_item(values, true));
+    return ss.str();
+  }
+
+  /// Setup emp::ToString to work on arrays.
+  template <typename T, size_t N>
+  inline std::string ToString(const emp::array<T,N> & container) {
+    std::stringstream ss;
+    ss << "[ ";
+    for (const auto & el : container) {
+      ss << to_string(el);
+      ss << " ";
+    }
+    ss << "]";
+    return ss.str();
+  }
+
+  /// Setup emp::ToString to work on vectors.
+  template <typename... Ts>
+  inline std::string ToString(const emp::vector<Ts...> & container) {
+    std::stringstream ss;
+    ss << "[ ";
+    for (const auto & el : container) {
+      ss << to_string(el);
+      ss << " ";
+    }
+    ss << "]";
+    return ss.str();
   }
 
   /// This function tries to convert a string into any type you're looking for...  You just
