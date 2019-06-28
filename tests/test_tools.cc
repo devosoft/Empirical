@@ -1680,9 +1680,11 @@ TEST_CASE("Test string_utils", "[tools]")
   REQUIRE(emp::to_string((size_t) 11) == "11");
   REQUIRE(emp::to_string((long) 12) == "12");
   REQUIRE(emp::to_string((unsigned long) 13) == "13");
-  REQUIRE(emp::to_string((float) 14.0) == "14.000000");
-  REQUIRE(emp::to_string((double) 15.0) == "15.000000");
-  REQUIRE(emp::to_string(16.0) == "16.000000");
+  REQUIRE(emp::to_string((float) 14.0) == "14");
+  REQUIRE(emp::to_string((float) 14.1) == "14.1");
+  REQUIRE(emp::to_string((float) 14.1234) == "14.1234");
+  REQUIRE(emp::to_string((double) 15.0) == "15");
+  REQUIRE(emp::to_string(16.0) == "16");
   REQUIRE(emp::to_string(emp::vector<size_t>({17,18,19})) == "[ 17 18 19 ]");
   REQUIRE(emp::to_string((char) 32) == " ");
   REQUIRE(emp::to_string((unsigned char) 33) == "!");
@@ -1695,7 +1697,7 @@ TEST_CASE("Test string_utils", "[tools]")
   std::string cat_full = emp::to_string(cat_a, cat_b, cat_c, cat_d);
 
   REQUIRE(cat_full == "ABC123");
-  std::array<int, 3> test_arr({{ 4, 2, 5 }});
+  emp::array<int, 3> test_arr({{ 4, 2, 5 }});
   REQUIRE(emp::to_string(test_arr) == "[ 4 2 5 ]");
 }
 
@@ -1864,10 +1866,10 @@ TEST_CASE("Test TypeTracker", "[tools]") {
   REQUIRE( tt_result == "3" );
 
   tt.RunFunction(tt_int3, tt_doub);  // An int and a double should multiply.
-  REQUIRE( tt_result == "16.500000" );
+  REQUIRE( tt_result == "16.5" );
 
   tt.RunFunction(tt_doub, tt_int2); // A double and an int is unknown; should leave old result.
-  REQUIRE( tt_result == "16.500000" );
+  REQUIRE( tt_result == "16.5" );
 
   tt.RunFunction(tt_str, tt_int3);    // A string an an int should duplicate the string.
   REQUIRE( tt_result == "FOURFOURFOUR" );
