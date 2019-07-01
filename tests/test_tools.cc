@@ -935,12 +935,15 @@ TEST_CASE("Test MatchBin", "[tools]")
   }
 
   {
+
+  emp::Random rand(1);
+
   emp::MatchBin<
     std::string,
     int,
     emp::AbsDiffMetric,
     emp::RouletteSelector
-      >bin;
+      >bin(rand);
 
   const size_t hi = bin.Put("hi", 1);
   REQUIRE( bin.GetVal(hi) == "hi" );
@@ -1026,12 +1029,15 @@ TEST_CASE("Test MatchBin", "[tools]")
   }
 
   {
+
+  emp::Random rand(1);
+
   emp::MatchBin<
     std::string,
     emp::BitSet<32>,
     emp::HammingMetric<32>,
     emp::RouletteSelector
-      >bitBin;
+      >bitBin(rand);
 
   emp::BitSet<32> bs2;
   bs2.SetUInt(0, 2);//0000 0010
@@ -1129,12 +1135,15 @@ TEST_CASE("Test MatchBin", "[tools]")
   }
 
   {
+
+  emp::Random rand(1);
+
   emp::MatchBin<
     std::string,
     int,
     emp::AbsDiffMetric,
     emp::RouletteSelector
-      >bin;
+      >bin(rand);
 
   const size_t hi = bin.Put("hi", 1);
   REQUIRE( bin.GetVal(hi) == "hi" );

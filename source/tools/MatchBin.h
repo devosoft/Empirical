@@ -143,8 +143,14 @@ namespace emp {
 
   /// Selector chooses probabilistically based on match quality with replacement.
   struct RouletteSelector {
+
+    emp::Random & rand;
+
+    RouletteSelector(emp::Random & rand_)
+    : rand(rand_)
+    { ; }
+
     emp::vector<size_t> operator()(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n) {
-      emp::Random random(1); // TODO make this a data member of the struct
       const double skew = 0.1; // TODO template on this
 
       IndexMap match_index(uids.size());
@@ -157,7 +163,7 @@ namespace emp {
       res.reserve(n);
 
       for (size_t j = 0; j < n; ++j) {
-        const double match_pos = random.GetDouble(match_index.GetWeight());
+        const double match_pos = rand.GetDouble(match_index.GetWeight());
         const size_t idx = match_index.Index(match_pos);
         res.push_back(uids[idx]);
       }
@@ -188,7 +194,12 @@ namespace emp {
     Selector select;
 
   public:
-    MatchBin ():uid_stepper(0) { }
+    MatchBin() : uid_stepper(0) { ; }
+
+    MatchBin(emp::Random & rand)
+    : uid_stepper(0)
+    , select(rand)
+    { ; }
 
     /// Compare a query tag to all stored tags using the distance metric
     /// function and return a vector of unique IDs chosen by the selector
