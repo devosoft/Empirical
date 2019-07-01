@@ -32,14 +32,22 @@ namespace emp {
   /// Returns the number of bits not in common between two BitSets
   template<size_t Width>
   struct HammingMetric {
-    double operator()(const BitSet<Width>& a, const BitSet<Width>& b) const{
+
+    using tag_t = emp::BitSet<Width>;
+    using query_t = emp::BitSet<Width>;
+
+    double operator()(const query_t& a, const tag_t& b) const{
       return (double)(a^b).CountOnes();
     }
   };
 
   /// Metric gives the absolute difference between two integers
   struct AbsDiffMetric {
-    double operator()(const int a, const int b) const {
+
+    using tag_t = int;
+    using query_t = int;
+
+    double operator()(const query_t& a, const tag_t& b) const {
       return (double)abs(a-b);
     }
   };
@@ -49,7 +57,11 @@ namespace emp {
   /// Adapted from Spector, Lee, et al. "Tag-based modules in genetic programming." Proceedings of the 13th annual conference on Genetic and evolutionary computation. ACM, 2011.
   template<size_t Max=1000>
   struct NextUpMetric {
-    double operator()(const size_t a, const size_t b) const {
+
+    using tag_t = size_t;
+    using query_t = size_t;
+
+    double operator()(const query_t& a, const tag_t& b) const {
       const size_t difference = ((Max + 1) + b - a) % (Max + 1);
       return (double)(difference % (Max + 1));
     }
@@ -59,7 +71,11 @@ namespace emp {
   /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
   template<size_t Width>
   struct StreakMetric {
-    double operator()(const emp::BitSet<Width>& a, const emp::BitSet<Width>& b) const {
+
+    using tag_t = emp::BitSet<Width>;
+    using query_t = emp::BitSet<Width>;
+
+    double operator()(const query_t& a, const tag_t& b) const {
       const emp::BitSet<Width> bs = a^b;
       const size_t same = (~bs).LongestSegmentOnes();
       const size_t different = bs.LongestSegmentOnes();
@@ -83,13 +99,18 @@ namespace emp {
   /// representations of the BitSets.
   /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
   template<size_t Width>
-    struct AbsIntDiffMetric {
-      double operator()(const emp::BitSet<Width>& a, const emp::BitSet<Width>& b) {
-        emp::BitSet<Width> bitDifference = ( a > b ? a - b : b - a);
-        static_assert(Width <= 32);
-        return bitDifference.GetUInt(0);
-      }
-    };
+  struct AbsIntDiffMetric {
+
+    using tag_t = emp::BitSet<Width>;
+    using query_t = emp::BitSet<Width>;
+
+    double operator()(const query_t& a, const tag_t& b) {
+      emp::BitSet<Width> bitDifference = ( a > b ? a - b : b - a);
+      static_assert(Width <= 32);
+      return bitDifference.GetUInt(0);
+    }
+  };
+
   /// Returns matches within the threshold ThreshRatio sorted by match quality.
   template<typename ThreshRatio>
   struct RankedSelector {
@@ -181,11 +202,16 @@ namespace emp {
   /// This unique identifier can be used to view or edit the stored items and
   /// their corresponding tags. Tag-based lookups return a list of matched
   /// unique identifiers.
-  template <typename Val, typename Tag, typename Metric, typename Selector> class MatchBin {
+  template <typename Val, typename Metric, typename Selector> class MatchBin {
+
+  public:
+    using tag_t = typename Metric::tag_t;
+    using query_t = typename Metric::query_t;
+
   private:
     std::unordered_map<size_t, Val> values;
     std::unordered_map<size_t, double> regulators;
-    std::unordered_map<size_t, Tag> tags;
+    std::unordered_map<size_t, tag_t> tags;
     emp::vector<size_t> uids;
     size_t uid_stepper;
     Metric metric;
@@ -202,10 +228,10 @@ namespace emp {
     /// Compare a query tag to all stored tags using the distance metric
     /// function and return a vector of unique IDs chosen by the selector
     /// function.
-    emp::vector<size_t> Match(const Tag & query, size_t n=1) {
+    emp::vector<size_t> Match(const query_t & query, size_t n=1) {
 
       // compute distance between query and all stored tags
-      std::unordered_map<Tag, double> matches;
+      std::unordered_map<tag_t, double> matches;
       for (const auto &[uid, tag] : tags) {
         if (matches.find(tag) == matches.end()) {
           matches[tag] = metric(query, tag);
@@ -222,7 +248,7 @@ namespace emp {
 
     /// Put an item and associated tag in the container. Returns the uid for
     /// that entry.
-    size_t Put(const Val & v, const Tag & t) {
+    size_t Put(const Val & v, const tag_t & t) {
 
       const size_t orig = uid_stepper;
       while(values.find(++uid_stepper) != values.end()) {
@@ -261,7 +287,7 @@ namespace emp {
     }
 
     /// Access a reference to a single stored tag by uid.
-    Tag & GetTag(const size_t uid) {
+    tag_t & GetTag(const size_t uid) {
       return tags.at(uid);
     }
 
@@ -278,13 +304,13 @@ namespace emp {
     }
 
     /// Generate a vector of tags corresponding to a vector of uids.
-    emp::vector<Tag> GetTags(const emp::vector<size_t> & uids) {
-      emp::vector<Tag> res;
+    emp::vector<tag_t> GetTags(const emp::vector<size_t> & uids) {
+      emp::vector<tag_t> res;
       std::transform(
         uids.begin(),
         uids.end(),
         std::back_inserter(res),
-        [this](size_t uid) -> Tag { return GetTag(uid); }
+        [this](size_t uid) -> tag_t { return GetTag(uid); }
       );
       return res;
     }
