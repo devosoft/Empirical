@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <limits>
+#include <ratio>
 #include <math.h>
 
 #include "../base/assert.h"
@@ -94,7 +95,6 @@ namespace emp {
       return result;
       }
     };
-
   /// Returns matches within the threshold ThreshRatio sorted by match quality.
   template<typename ThreshRatio>
   struct RankedSelector {
@@ -143,6 +143,7 @@ namespace emp {
   };
 
   /// Selector chooses probabilistically based on match quality with replacement.
+  template<typename RouletteRatio = std::ratio<1, 10>>
   struct RouletteSelector {
 
     emp::Random & rand;
@@ -152,7 +153,8 @@ namespace emp {
     { ; }
 
     emp::vector<size_t> operator()(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n) {
-      const double skew = 0.1; // TODO template on this
+
+      const double skew = RouletteRatio::num / RouletteRatio::den;
 
       IndexMap match_index(uids.size());
       for (size_t i = 0; i < uids.size(); ++i) {
