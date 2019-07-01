@@ -623,18 +623,18 @@ TEST_CASE("Test hash_utils", "[tools]")
   REQUIRE(hash_vec.size() == hash_set.size());
   }
   {
-  REQUIRE(emp::hash_combine((size_t) 0, (size_t) 0) == (size_t) 0); 
-  REQUIRE(emp::hash_combine((size_t) 0, (size_t) 1) == (size_t) 2654435769); 
-  REQUIRE(emp::hash_combine((size_t) 0, (size_t) 2) == (size_t) 5308871538); 
-  REQUIRE(emp::hash_combine((size_t) 1, (size_t) 0) == (size_t) 65); 
+  REQUIRE(emp::hash_combine((size_t) 0, (size_t) 0) == (size_t) 0);
+  REQUIRE(emp::hash_combine((size_t) 0, (size_t) 1) == (size_t) 2654435769);
+  REQUIRE(emp::hash_combine((size_t) 0, (size_t) 2) == (size_t) 5308871538);
+  REQUIRE(emp::hash_combine((size_t) 1, (size_t) 0) == (size_t) 65);
   REQUIRE(emp::hash_combine((size_t) 2, (size_t) 0) == (size_t) 130);
 
-  REQUIRE(emp::hash_combine((size_t) 1, (size_t) 1) == (size_t) 2654435832); 
-  REQUIRE(emp::hash_combine((size_t) 2, (size_t) 2) == (size_t) 5308871664); 
-  REQUIRE(emp::hash_combine((size_t) 3, (size_t) 3) == (size_t) 7963307496); 
-  
-  REQUIRE(emp::hash_combine((size_t) 1, (size_t) 3) == (size_t) 7963307370); 
-  REQUIRE(emp::hash_combine((size_t) 3, (size_t) 1) == (size_t) 2654435962); 
+  REQUIRE(emp::hash_combine((size_t) 1, (size_t) 1) == (size_t) 2654435832);
+  REQUIRE(emp::hash_combine((size_t) 2, (size_t) 2) == (size_t) 5308871664);
+  REQUIRE(emp::hash_combine((size_t) 3, (size_t) 3) == (size_t) 7963307496);
+
+  REQUIRE(emp::hash_combine((size_t) 1, (size_t) 3) == (size_t) 7963307370);
+  REQUIRE(emp::hash_combine((size_t) 3, (size_t) 1) == (size_t) 2654435962);
   }
 }
 
@@ -973,7 +973,7 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   {
   emp::MatchBin<
-  std::string, 
+  std::string,
   emp::BitSet<32>,
   emp::HammingMetric<32>,
   emp::RankedSelector<std::ratio<3, 1>>
@@ -991,7 +991,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   const size_t one = bitBin.Put("one", bs1);
   REQUIRE( bitBin.GetVal(one) == "one");
 
-  emp::BitSet<32> bs11; 
+  emp::BitSet<32> bs11;
   bs11.SetUInt(0,11); //0000 1011
 
   REQUIRE(bitBin.GetVal(bitBin.Put("eleven", bs11)) == "eleven");
@@ -1066,7 +1066,7 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   REQUIRE( std::count(std::begin(res), std::end(res), "elementary") > count);
   REQUIRE( std::count(std::begin(res), std::end(res), "fedora") >  0);
-      
+
   }
 
   {
@@ -1166,7 +1166,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   }
   {
   emp::MatchBin<
-  std::string, 
+  std::string,
   emp::BitSet<8>,
   emp::StreakMetric<8>,
   emp::RankedSelector<std::ratio<4, 1>>
@@ -1184,7 +1184,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   const size_t oneTwoEight = bitBin.Put("one-two-eight", bs128);
   REQUIRE( bitBin.GetVal(oneTwoEight) == "one-two-eight");
 
-  emp::BitSet<8> bs127; 
+  emp::BitSet<8> bs127;
   bs127.SetUInt(0,127); //0111 1111
 
   REQUIRE(bitBin.GetVal(bitBin.Put("one-two-seven", bs127)) == "one-two-seven");
@@ -1193,7 +1193,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   bs15.SetUInt(0,15); //0000 1111
 
   REQUIRE(bitBin.GetVal(bitBin.Put("fifteen", bs15)) == "fifteen");
-  
+
   emp::BitSet<8> bs2;//0000 0010
   bs2.SetUInt(0,2);
 
@@ -1222,11 +1222,11 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(bitBin.GetTags(bitBin.Match(bs128, 5)) == (emp::vector<emp::BitSet<8>> {bs128, bs15, bs127, bs1}));
 
   }
-   
+
   {
 
   emp::MatchBin<
-  std::string, 
+  std::string,
   emp::BitSet<64>,
   emp::StreakMetric<64>,
   emp::RankedSelector<std::ratio<4, 1>>
@@ -1241,13 +1241,13 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE( bitBin64.GetVal(id_seven) == "seven");
 
   emp::BitSet<64> bs1;
-  bs1.SetUInt(1, pow(two, (size_t)16) + pow(two, (size_t)17) + pow(two, (size_t)18)); 
+  bs1.SetUInt(1, pow(two, (size_t)16) + pow(two, (size_t)17) + pow(two, (size_t)18));
 
   const size_t id_one  = bitBin64.Put("one", bs1);
   REQUIRE( bitBin64.GetVal(id_one) == "one");
 
   emp::BitSet<64> bs9;
-  bs9.SetUInt(1, pow(two, (size_t)15) + pow(two, (size_t)16) + pow(two, (size_t)17)); 
+  bs9.SetUInt(1, pow(two, (size_t)15) + pow(two, (size_t)16) + pow(two, (size_t)17));
 
   const size_t id_nine  = bitBin64.Put("nine", bs9);
   REQUIRE( bitBin64.GetVal(id_nine) == "nine");
@@ -1256,15 +1256,15 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   REQUIRE(bitBin64.GetVals(bitBin64.Match(bs1, 0)) == emp::vector<std::string>{});
   REQUIRE(bitBin64.GetTags(bitBin64.Match(bs1, 0)) == emp::vector<emp::BitSet<64>>{});
-  
+
   REQUIRE(bitBin64.GetVals(bitBin64.Match(bs9, 5)) == (emp::vector<std::string> {"nine","one","seven"}));
   REQUIRE(bitBin64.GetTags(bitBin64.Match(bs9, 5)) == (emp::vector<emp::BitSet<64>> {bs9, bs1, bs7}));
-  
+
   }
 
   {
   emp::MatchBin<
-  std::string, 
+  std::string,
   emp::BitSet<8>,
   emp::AbsIntDiffMetric<8>,
   emp::RankedSelector<std::ratio<40, 1>>
@@ -1280,7 +1280,7 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   bitBin.Put("one-two-eight", bs128);
 
-  emp::BitSet<8> bs127; 
+  emp::BitSet<8> bs127;
   bs127.SetUInt(0,127); //0111 1111
 
   bitBin.Put("one-two-seven", bs127);
@@ -1289,7 +1289,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   bs15.SetUInt(0,15); //0000 1111
 
   bitBin.Put("fifteen", bs15);
-  
+
   emp::BitSet<8> bs2;//0000 0010
   bs2.SetUInt(0,2);
 
