@@ -939,7 +939,7 @@ TEST_CASE("Test MatchBin", "[tools]")
     std::string,
     int,
     emp::Difference,
-    emp::RouletteSelector
+    emp::RouletteSelector<std::ratio<1,10>>
       >bin;
 
   const size_t hi = bin.Put("hi", 1);
@@ -1030,7 +1030,7 @@ TEST_CASE("Test MatchBin", "[tools]")
     std::string,
     emp::BitSet<32>,
     emp::HammingDistance<32>,
-    emp::RouletteSelector
+    emp::RouletteSelector<std::ratio<1,10>>
       >bitBin;
 
   emp::BitSet<32> bs2;
@@ -1133,7 +1133,7 @@ TEST_CASE("Test MatchBin", "[tools]")
     std::string,
     int,
     emp::Difference,
-    emp::RouletteSelector
+    emp::RouletteSelector<std::ratio<1,10>>
       >bin;
 
   const size_t hi = bin.Put("hi", 1);

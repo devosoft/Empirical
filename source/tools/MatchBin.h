@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <limits>
+#include <ratio>
 
 #include "../base/assert.h"
 #include "../base/vector.h"
@@ -85,11 +86,11 @@ namespace emp {
     };
   /// Selector for MatchBin stored in the struct so we cn template on it
   /// returns sorted matches that are inside the given threshold 
-  template<typename ratio>
+  template<typename Ratio>
   struct ThreshSelector{
     emp::vector<size_t> operator()(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n){
         
-      double thresh = ratio::num / ratio::den;
+      double thresh = Ratio::num / Ratio::den;
       unsigned int i = 0;
       if (n < log2(uids.size())){
         //Perform a bounded selection sort to find the first n results
@@ -122,10 +123,11 @@ namespace emp {
   };
   
   /// Selector chooses probabilistically based on match quality with replacement.
+  template<typename Ratio = std::ratio<1, 10>>
   struct RouletteSelector{
     emp::vector<size_t> operator()(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n){
       emp::Random random(1);
-      const double skew = 0.1;
+      double skew = Ratio::num / Ratio::den;
 
       IndexMap match_index(uids.size());
       for (size_t i = 0; i < uids.size(); ++i) {
