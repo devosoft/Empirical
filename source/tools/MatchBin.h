@@ -214,15 +214,16 @@ namespace emp {
     std::unordered_map<size_t, tag_t> tags;
     emp::vector<size_t> uids;
     size_t uid_stepper;
-    Metric metric;
-    Selector select;
 
   public:
+    Metric metric;
+    Selector selector;
+
     MatchBin() : uid_stepper(0) { ; }
 
     MatchBin(emp::Random & rand)
     : uid_stepper(0)
-    , select(rand)
+    , selector(rand)
     { ; }
 
     /// Compare a query tag to all stored tags using the distance metric
@@ -243,7 +244,7 @@ namespace emp {
       for (auto uid : uids) {
         scores[uid] = matches[tags[uid]] * regulators[uid] + regulators[uid];
       }
-      return select(uids, scores, n);
+      return selector(uids, scores, n);
     }
 
     /// Put an item and associated tag in the container. Returns the uid for
