@@ -342,7 +342,7 @@ namespace emp {
       for (auto & i : bit_set) i = ~0U;
       if (LAST_BIT > 0) { bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT); }
     }
-    
+
     /// Overload ostream operator to return Print.
     friend std::ostream& operator<<(std::ostream &out, const BitSet& bs){
       bs.Print(out);
@@ -560,7 +560,7 @@ namespace emp {
     BitSet ADD(const BitSet & set2) const{
       BitSet out_set(*this);
       bool carry = false;
-      const uint32_t MAX_INT = pow(2, (NUM_BITS > 32 ? 32 : NUM_BITS)) - 1; 
+      const uint32_t MAX_INT = pow(2, (NUM_BITS > 32 ? 32 : NUM_BITS)) - 1;
       for (size_t i = 0; i < NUM_FIELDS; i++){
         size_t sum = (size_t)bit_set[i] + (size_t)set2.bit_set[i] + carry;
         carry = false;
@@ -576,7 +576,7 @@ namespace emp {
     /// Addition of two Bitsets. Wraps back to 0 if it overflows. returns this object.
     BitSet & ADD_SELF(const BitSet & set2) {
       bool carry = false;
-      const uint32_t MAX_INT = pow(2, (NUM_BITS > 32 ? 32 : NUM_BITS)) - 1; 
+      const uint32_t MAX_INT = pow(2, (NUM_BITS > 32 ? 32 : NUM_BITS)) - 1;
       for (size_t i = 0; i < NUM_FIELDS; i++){
         size_t sum = (size_t)bit_set[i] + (size_t)set2.bit_set[i] + carry;
         carry = false;
@@ -589,11 +589,11 @@ namespace emp {
       return *this;
     }
 
-    ///Subtraction of two Bitsets. Wraps to 2^min(num_bits, 32) if it underflows. returns result. 
+    ///Subtraction of two Bitsets. Wraps to 2^min(num_bits, 32) if it underflows. returns result.
     BitSet SUB(const BitSet & set2) const{
       BitSet out_set(*this);
       bool carry = false;
-      const size_t MAX_INT = pow(2, (NUM_BITS > 32 ? 32 : NUM_BITS)) -1; 
+      const size_t MAX_INT = pow(2, (NUM_BITS > 32 ? 32 : NUM_BITS)) -1;
       for(size_t i = 0; i < NUM_FIELDS; i++){
         size_t subtrahend = (size_t)set2.bit_set[i] + carry;
         uint32_t diff = (bit_set[i] - subtrahend) % (MAX_INT+1);
@@ -606,10 +606,10 @@ namespace emp {
       return out_set;
     }
 
-    ///Subtraction of two Bitsets. Wraps to 2^min(num_bits, 32) if it underflows. returns this object. 
+    ///Subtraction of two Bitsets. Wraps to 2^min(num_bits, 32) if it underflows. returns this object.
     BitSet & SUB_SELF(const BitSet & set2){
       bool carry = false;
-      const size_t MAX_INT = pow(2, (NUM_BITS > 32 ? 32 : NUM_BITS)) - 1; 
+      const size_t MAX_INT = pow(2, (NUM_BITS > 32 ? 32 : NUM_BITS)) - 1;
       for(size_t i = 0; i < NUM_FIELDS; i++){
         size_t subtrahend = (size_t)set2.bit_set[i] + carry;
         uint32_t diff = (bit_set[i] - subtrahend) % (MAX_INT+1);
