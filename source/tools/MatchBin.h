@@ -20,6 +20,7 @@
 #include <stdexcept>
 #include <limits>
 #include <ratio>
+#include <math.h>
 
 #include "../base/assert.h"
 #include "../base/vector.h"
@@ -27,19 +28,17 @@
 
 namespace emp {
 
-  // TODO rename all metric structs to have Metric at the end of the name
-
   /// Metric for MatchBin stored in the struct so we can template on it
   /// Returns the number of bits not in common between two BitSets
   template<size_t Width>
-  struct HammingDistance {
+  struct HammingMetric {
     double operator()(const BitSet<Width>& a, const BitSet<Width>& b) const{
       return (double)(a^b).CountOnes();
     }
   };
 
   /// Metric gives the absolute difference between two integers
-  struct Difference {
+  struct AbsDiffMetric {
     double operator()(const int a, const int b) const {
       return (double)abs(a-b);
     }
@@ -49,8 +48,7 @@ namespace emp {
   /// Wraps on Max.
   /// Adapted from Spector, Lee, et al. "Tag-based modules in genetic programming." Proceedings of the 13th annual conference on Genetic and evolutionary computation. ACM, 2011.
   template<size_t Max=1000>
-  struct Push {
-    // TODO rename this struct more descriptively
+  struct NextUpMetric {
     double operator()(const size_t a, const size_t b) const {
       const size_t difference = ((Max + 1) + b - a) % (Max + 1);
       return (double)(difference % (Max + 1));
@@ -60,9 +58,9 @@ namespace emp {
   /// Matches based on the longest segment of equal and uneqal bits in two bitsets
   /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
   template<size_t Width>
-  struct DowningStreak {
-    double operator()(const emp::BitSet<Width>& a, const emp::BitSet<Width>& b) {
-      auto bs = a^b;
+  struct StreakMetric {
+    double operator()(const emp::BitSet<Width>& a, const emp::BitSet<Width>& b) const {
+      const emp::BitSet<Width> bs = a^b;
       const size_t same = (~bs).LongestSegmentOnes();
       const size_t different = bs.LongestSegmentOnes();
       const double ps = ProbabilityKBitSequence(same);
@@ -76,8 +74,8 @@ namespace emp {
       return 1.0 - match;
     }
 
-    inline double ProbabilityKBitSequence(size_t k) {
-      return (Width - k + 1) / pow(2, k);
+    inline double ProbabilityKBitSequence(size_t k) const {
+      return (Width - k + 1) / std::pow(2, k);
     }
   };
 
@@ -85,7 +83,7 @@ namespace emp {
   /// representations of the BitSets.
   /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
   template<size_t Width>
-    struct DowningInteger {
+    struct AbsIntDiffMetric {
       double operator()(const emp::BitSet<Width>& a, const emp::BitSet<Width>& b) {
         emp::BitSet<Width> bitDifference = ( a > b ? a - b : b - a);
         static_assert(Width <= 32);
@@ -94,13 +92,13 @@ namespace emp {
     };
   /// Returns matches within the threshold ThreshRatio sorted by match quality.
   template<typename ThreshRatio>
-  struct ThreshSelector {
+  struct RankedSelector {
     emp::vector<size_t> operator()(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n){
 
       size_t back = 0;
       const double thresh = ((double) ThreshRatio::num) / ThreshRatio::den;
 
-      if (n < log2(uids.size())) {
+      if (n < std::log2(uids.size())) {
 
         // Perform a bounded selection sort to find the first n results
         for (; back < n; ++back) {
@@ -141,10 +139,17 @@ namespace emp {
 
   /// Selector chooses probabilistically based on match quality with replacement.
   template<typename RouletteRatio = std::ratio<1, 10>>
-  struct RouletteSelector{
-    emp::vector<size_t> operator()(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n){
+  struct RouletteSelector {
+
+    emp::Random & rand;
+
+    RouletteSelector(emp::Random & rand_)
+    : rand(rand_)
+    { ; }
+
+    emp::vector<size_t> operator()(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n) {
+
       const double skew = RouletteRatio::num / RouletteRatio::den;
-      emp::Random random(1); // TODO make this a data member of the struct
 
       IndexMap match_index(uids.size());
       for (size_t i = 0; i < uids.size(); ++i) {
@@ -156,7 +161,7 @@ namespace emp {
       res.reserve(n);
 
       for (size_t j = 0; j < n; ++j) {
-        const double match_pos = random.GetDouble(match_index.GetWeight());
+        const double match_pos = rand.GetDouble(match_index.GetWeight());
         const size_t idx = match_index.Index(match_pos);
         res.push_back(uids[idx]);
       }
@@ -187,7 +192,12 @@ namespace emp {
     Selector select;
 
   public:
-    MatchBin ():uid_stepper(0) { }
+    MatchBin() : uid_stepper(0) { ; }
+
+    MatchBin(emp::Random & rand)
+    : uid_stepper(0)
+    , select(rand)
+    { ; }
 
     /// Compare a query tag to all stored tags using the distance metric
     /// function and return a vector of unique IDs chosen by the selector
