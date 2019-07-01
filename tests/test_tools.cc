@@ -882,8 +882,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     int,
-    emp::Difference,
-    emp::ThreshSelector<std::ratio<7,1>>
+    emp::AbsDiffMetric,
+    emp::RankedSelector<std::ratio<7,1>>
       > bin;
 
   const size_t hi = bin.Put("hi", 1);
@@ -935,12 +935,15 @@ TEST_CASE("Test MatchBin", "[tools]")
   }
 
   {
+
+  emp::Random rand(1);
+
   emp::MatchBin<
     std::string,
     int,
-    emp::Difference,
+    emp::AbsDiffMetric,
     emp::RouletteSelector<std::ratio<1,10>>
-      >bin;
+      >bin(rand);
 
   const size_t hi = bin.Put("hi", 1);
   REQUIRE( bin.GetVal(hi) == "hi" );
@@ -975,8 +978,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
   std::string,
   emp::BitSet<32>,
-  emp::HammingDistance<32>,
-  emp::ThreshSelector<std::ratio<3, 1>>
+  emp::HammingMetric<32>,
+  emp::RankedSelector<std::ratio<3, 1>>
     > bitBin;
 
   emp::BitSet<32> bs3;
@@ -1026,12 +1029,15 @@ TEST_CASE("Test MatchBin", "[tools]")
   }
 
   {
+
+  emp::Random rand(1);
+
   emp::MatchBin<
     std::string,
     emp::BitSet<32>,
-    emp::HammingDistance<32>,
+    emp::HammingMetric<32>,
     emp::RouletteSelector<std::ratio<1,10>>
-      >bitBin;
+      >bitBin(rand);
 
   emp::BitSet<32> bs2;
   bs2.SetUInt(0, 2);//0000 0010
@@ -1074,8 +1080,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     size_t,
-    emp::Push<1000>,
-    emp::ThreshSelector<std::ratio<max_value,1>>
+    emp::NextUpMetric<1000>,
+    emp::RankedSelector<std::ratio<max_value,1>>
       > bin;
 
   const size_t hi = bin.Put("hi", 1);
@@ -1129,12 +1135,15 @@ TEST_CASE("Test MatchBin", "[tools]")
   }
 
   {
+
+  emp::Random rand(1);
+
   emp::MatchBin<
     std::string,
     int,
-    emp::Difference,
+    emp::AbsDiffMetric,
     emp::RouletteSelector<std::ratio<1,10>>
-      >bin;
+      >bin(rand);
 
   const size_t hi = bin.Put("hi", 1);
   REQUIRE( bin.GetVal(hi) == "hi" );
@@ -1168,8 +1177,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
   std::string,
   emp::BitSet<8>,
-  emp::DowningStreak<8>,
-  emp::ThreshSelector<std::ratio<4, 1>>
+  emp::StreakMetric<8>,
+  emp::RankedSelector<std::ratio<4, 1>>
     > bitBin;
 
   emp::BitSet<8> bs1;
@@ -1228,8 +1237,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
   std::string,
   emp::BitSet<64>,
-  emp::DowningStreak<64>,
-  emp::ThreshSelector<std::ratio<4, 1>>
+  emp::StreakMetric<64>,
+  emp::RankedSelector<std::ratio<4, 1>>
     > bitBin64;
 
   size_t two = 2;
@@ -1266,8 +1275,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
   std::string,
   emp::BitSet<8>,
-  emp::DowningInteger<8>,
-  emp::ThreshSelector<std::ratio<40, 1>>
+  emp::AbsIntDiffMetric<8>,
+  emp::RankedSelector<std::ratio<40, 1>>
     > bitBin;
 
   emp::BitSet<8> bs1;

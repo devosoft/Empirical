@@ -430,7 +430,7 @@ namespace emp {
     }
 
     /// Finds the length of the longest segment of ones.
-    size_t LongestSegmentOnes() {
+    size_t LongestSegmentOnes() const {
       size_t length = 0;
       BitSet out_set(*this);
       while(out_set.Any()){
