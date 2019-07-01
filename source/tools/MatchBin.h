@@ -59,8 +59,8 @@ namespace emp {
   /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
   template<size_t Width>
   struct StreakMetric {
-    double operator()(const emp::BitSet<Width>& a, const emp::BitSet<Width>& b) {
-      const auto bs = a^b;
+    double operator()(const emp::BitSet<Width>& a, const emp::BitSet<Width>& b) const {
+      const emp::BitSet<Width> bs = a^b;
       const size_t same = (~bs).LongestSegmentOnes();
       const size_t different = bs.LongestSegmentOnes();
       const double ps = ProbabilityKBitSequence(same);
@@ -74,7 +74,7 @@ namespace emp {
       return 1.0 - match;
     }
 
-    inline double ProbabilityKBitSequence(size_t k) {
+    inline double ProbabilityKBitSequence(size_t k) const {
       return (Width - k + 1) / std::pow(2, k);
     }
   };
