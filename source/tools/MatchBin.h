@@ -111,9 +111,20 @@ namespace emp {
     }
   };
 
+
+  struct Selector {
+
+    virtual ~Selector() {};
+    virtual emp::vector<size_t> operator()(
+      emp::vector<size_t>& uids,
+      std::unordered_map<size_t, double>& scores,
+      size_t n
+    ) = 0;
+  };
+
   /// Returns matches within the threshold ThreshRatio sorted by match quality.
   template<typename ThreshRatio>
-  struct RankedSelector {
+  struct RankedSelector : public Selector {
     emp::vector<size_t> operator()(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n){
 
       size_t back = 0;
@@ -160,7 +171,7 @@ namespace emp {
 
   /// Selector chooses probabilistically based on match quality with replacement.
   template<typename RouletteRatio = std::ratio<1, 10>>
-  struct RouletteSelector {
+  struct RouletteSelector : public Selector {
 
     emp::Random & rand;
 
@@ -188,6 +199,27 @@ namespace emp {
       }
 
       return res;
+    }
+
+  };
+
+  struct DynamicSelector : public Selector {
+
+    emp::vector<emp::Ptr<Selector>> selectors;
+
+    size_t mode{0};
+
+    emp::vector<size_t> operator()(
+      emp::vector<size_t>& uids,
+      std::unordered_map<size_t, double>& scores,
+      size_t n
+    ) {
+      emp_assert(mode < selectors.size());
+      return (*selectors[mode])(uids, scores, n);
+    }
+
+    ~DynamicSelector() {
+      for (auto &ptr : selectors) ptr.Delete();
     }
 
   };
