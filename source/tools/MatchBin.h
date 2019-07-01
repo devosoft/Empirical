@@ -31,14 +31,14 @@ namespace emp {
   /// Metric for MatchBin stored in the struct so we can template on it
   /// Returns the number of bits not in common between two BitSets
   template<size_t Width>
-  struct HammingDistance {
+  struct HammingMetric {
     double operator()(const BitSet<Width>& a, const BitSet<Width>& b) const{
       return (double)(a^b).CountOnes();
     }
   };
 
   /// Metric gives the absolute difference between two integers
-  struct Difference {
+  struct AbsDiffMetric {
     double operator()(const int a, const int b) const {
       return (double)abs(a-b);
     }
@@ -48,8 +48,7 @@ namespace emp {
   /// Wraps on Max.
   /// Adapted from Spector, Lee, et al. "Tag-based modules in genetic programming." Proceedings of the 13th annual conference on Genetic and evolutionary computation. ACM, 2011.
   template<size_t Max=1000>
-  struct Push {
-    // TODO rename this struct more descriptively
+  struct NextUpMetric {
     double operator()(const size_t a, const size_t b) const {
       const size_t difference = ((Max + 1) + b - a) % (Max + 1);
       return (double)(difference % (Max + 1));
@@ -59,7 +58,7 @@ namespace emp {
   /// Matches based on the longest segment of equal and uneqal bits in two bitsets
   /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
   template<size_t Width>
-  struct DowningStreak {
+  struct StreakMetric {
     double operator()(const emp::BitSet<Width>& a, const emp::BitSet<Width>& b) {
       const auto bs = a^b;
       const size_t same = (~bs).LongestSegmentOnes();
@@ -84,7 +83,7 @@ namespace emp {
   /// representations of the BitSets.
   /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
   template<size_t Width>
-    struct DowningInteger {
+    struct AbsIntDiffMetric {
       double operator()(const emp::BitSet<Width>& a, const emp::BitSet<Width>& b) {
         emp::BitSet<Width> bitDifference = ( a > b ? a - b : b - a);
         size_t fields = bitDifference.GetFields();
@@ -99,7 +98,7 @@ namespace emp {
 
   /// Returns matches within the threshold ThreshRatio sorted by match quality.
   template<typename ThreshRatio>
-  struct ThreshSelector {
+  struct RankedSelector {
     emp::vector<size_t> operator()(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n){
 
       size_t back = 0;
