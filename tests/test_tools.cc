@@ -1278,17 +1278,17 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::BitSet<8> bs128;
   bs128.SetUInt(0,128); // 1000 000
 
-  const size_t oneTwoEight = bitBin.Put("one-two-eight", bs128);
+  bitBin.Put("one-two-eight", bs128);
 
   emp::BitSet<8> bs127; 
   bs127.SetUInt(0,127); //0111 1111
 
-  const size_t onetwoseven = bitBin.Put("one-two-seven", bs127);
+  bitBin.Put("one-two-seven", bs127);
 
   emp::BitSet<8> bs15;
   bs15.SetUInt(0,15); //0000 1111
 
-  const size_t fifteen = bitBin.Put("fifteen", bs15);
+  bitBin.Put("fifteen", bs15);
   
   emp::BitSet<8> bs2;//0000 0010
   bs2.SetUInt(0,2);

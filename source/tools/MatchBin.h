@@ -26,108 +26,130 @@
 #include "../tools/IndexMap.h"
 
 namespace emp {
+
+  // TODO rename all metric structs to have Metric at the end of the name
+
   /// Metric for MatchBin stored in the struct so we can template on it
   /// Returns the number of bits not in common between two BitSets
-  template<size_t width>
-  struct HammingDistance{
-    double operator()(const BitSet<width>& a, const BitSet<width>& b) const{
+  template<size_t Width>
+  struct HammingDistance {
+    double operator()(const BitSet<Width>& a, const BitSet<Width>& b) const{
       return (double)(a^b).CountOnes();
     }
   };
 
   /// Metric gives the absolute difference between two integers
-  struct Difference{
+  struct Difference {
     double operator()(const int a, const int b) const {
       return (double)abs(a-b);
     }
   };
 
-  /// Metric gives the matchings by the closest tag on or above itself. (Wraps)
-  template<int max_value = 1000>
-  struct Push{
+  /// Metric gives the matchings by the closest tag on or above itself.
+  /// Wraps on Max.
+  /// Adapted from Spector, Lee, et al. "Tag-based modules in genetic programming." Proceedings of the 13th annual conference on Genetic and evolutionary computation. ACM, 2011.
+  template<size_t Max=1000>
+  struct Push {
+    // TODO rename this struct more descriptively
     double operator()(const size_t a, const size_t b) const {
-      size_t difference = ((max_value + 1) + b - a) % (max_value+1);
-      return (double)(difference % (max_value+1));
+      const size_t difference = ((Max + 1) + b - a) % (Max + 1);
+      return (double)(difference % (Max + 1));
     }
   };
 
-  // Matches based on the longest segment of equal and uneqal bits in two bitsets
-  template<size_t width>
-  struct DowningStreak{//TODO The regulator may be a little bias for this.
-    double operator()(const emp::BitSet<width>& a, const emp::BitSet<width>& b){
-      auto bs = a^b;
-      size_t same = (~bs).LongestSegmentOnes();
-      size_t different = bs.LongestSegmentOnes();
-      double ps = ProbabilityKBitSequence(same);
-      double pd = ProbabilityKBitSequence(different);
+  /// Matches based on the longest segment of equal and uneqal bits in two bitsets
+  /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
+  template<size_t Width>
+  struct DowningStreak {
+    double operator()(const emp::BitSet<Width>& a, const emp::BitSet<Width>& b) {
+      const auto bs = a^b;
+      const size_t same = (~bs).LongestSegmentOnes();
+      const size_t different = bs.LongestSegmentOnes();
+      const double ps = ProbabilityKBitSequence(same);
+      const double pd = ProbabilityKBitSequence(different);
 
-      // A result nearing 1 is a better match but the threshold picks lower first.
-      // So we must subtract from 1.0 to get the inverse.
-      return 1.0 - (pd / (ps + pd));
+      const double match = (pd / (ps + pd));
+      // Note: here, close match score > poor match score
+      // However, we're computing distance where smaller means closer match.
+      // Note also: 0.0 < match < 1.0
+      // So, we subtract match score from 1.0 to get a distance.
+      return 1.0 - match;
     }
 
-    inline double ProbabilityKBitSequence(size_t k){
-      return (width - k + 1) / pow(2, k);
+    inline double ProbabilityKBitSequence(size_t k) {
+      return (Width - k + 1) / pow(2, k);
     }
   };
-  
-  template<size_t width>
-    struct DowningInteger{
-      double operator()(const emp::BitSet<width>& a, const emp::BitSet<width>& b){
-        emp::BitSet<width> bitDifference = ( a > b ? a - b : b - a);
-        unsigned int fields = bitDifference.GetFields();
+
+  /// Metric gives the absolute value of the difference between the integer
+  /// representations of the BitSets.
+  /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
+  template<size_t Width>
+    struct DowningInteger {
+      double operator()(const emp::BitSet<Width>& a, const emp::BitSet<Width>& b) {
+        emp::BitSet<Width> bitDifference = ( a > b ? a - b : b - a);
+        size_t fields = bitDifference.GetFields();
         double result = 0;
-        for (unsigned int i = 0; i < fields; ++i){
+        for (size_t i = 0; i < fields; ++i){
           result += bitDifference.GetUInt(i) * pow(2, 32 * i);
         }
 
       return result;
       }
     };
-  /// Selector for MatchBin stored in the struct so we cn template on it
-  /// returns sorted matches that are inside the given threshold 
-  template<typename Ratio>
-  struct ThreshSelector{
+  /// Returns matches within the threshold ThreshRatio sorted by match quality.
+  template<typename ThreshRatio>
+  struct ThreshSelector {
     emp::vector<size_t> operator()(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n){
-        
-      double thresh = Ratio::num / Ratio::den;
-      unsigned int i = 0;
-      if (n < log2(uids.size())){
-        //Perform a bounded selection sort to find the first n results
-        while (i < n){ 
+
+      size_t back = 0;
+      const double thresh = ((double) ThreshRatio::num) / ThreshRatio::den;
+
+      if (n < log2(uids.size())) {
+
+        // Perform a bounded selection sort to find the first n results
+        for (; back < n; ++back) {
           int minIndex = -1;
-          for(size_t j = i; j < uids.size(); ++j){
-            if (minIndex == -1 || scores.at(uids[j]) < scores.at(uids[minIndex])){
-              if (scores.at(uids[j]) < thresh){
-                minIndex = j;
-              }
+          for (size_t j = back; j < uids.size(); ++j) {
+            if (
+              (minIndex == -1 || scores.at(uids[j]) < scores.at(uids[minIndex]))
+              && (scores.at(uids[j]) < thresh)
+            ) {
+              minIndex = j;
             }
           }
-          if(minIndex == -1) break;
-          std::swap(uids.at(i),uids.at(minIndex));
-          ++i;
+          if (minIndex == -1) break;
+          std::swap(uids.at(back),uids.at(minIndex));
         }
-      }
-      else{
+
+      } else {
+
         std::sort(
           uids.begin(),
           uids.end(),
-          [&scores](size_t const &a, size_t const &b) {
+          [&scores](const size_t &a, const size_t &b) {
             return scores.at(a) < scores.at(b);
           }
         );
-        while(i < uids.size() && i < n && scores.at(uids[i]) < thresh) ++i;   
+
+        while (
+          back < uids.size()
+          && back < n
+          && scores.at(uids[back]) < thresh
+        ) ++back;
+
       }
-      return emp::vector<size_t>(uids.begin(), uids.begin()+i);
+
+      return emp::vector<size_t>(uids.begin(), uids.begin() + back);
     }
   };
-  
+
   /// Selector chooses probabilistically based on match quality with replacement.
-  template<typename Ratio = std::ratio<1, 10>>
+  template<typename RouletteRatio = std::ratio<1, 10>>
   struct RouletteSelector{
     emp::vector<size_t> operator()(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n){
-      emp::Random random(1);
-      double skew = Ratio::num / Ratio::den;
+      const double skew = RouletteRatio::num / RouletteRatio::den;
+      emp::Random random(1); // TODO make this a data member of the struct
 
       IndexMap match_index(uids.size());
       for (size_t i = 0; i < uids.size(); ++i) {
@@ -168,7 +190,7 @@ namespace emp {
     size_t uid_stepper;
     Metric metric;
     Selector select;
-  
+
   public:
     MatchBin ():uid_stepper(0) { }
 
