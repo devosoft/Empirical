@@ -26,8 +26,6 @@
 
 namespace emp {
 
-  // TODO rename all metric structs to have Metric at the end of the name
-
   /// Metric for MatchBin stored in the struct so we can template on it
   /// Returns the number of bits not in common between two BitSets
   template<size_t Width>
