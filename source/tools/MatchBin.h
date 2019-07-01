@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <limits>
+#include <math.h>
 
 #include "../base/assert.h"
 #include "../base/vector.h"
@@ -73,7 +74,7 @@ namespace emp {
     }
 
     inline double ProbabilityKBitSequence(size_t k) {
-      return (Width - k + 1) / pow(2, k);
+      return (Width - k + 1) / std::pow(2, k);
     }
   };
 
@@ -87,7 +88,7 @@ namespace emp {
         size_t fields = bitDifference.GetFields();
         double result = 0;
         for (size_t i = 0; i < fields; ++i){
-          result += bitDifference.GetUInt(i) * pow(2, 32 * i);
+          result += bitDifference.GetUInt(i) * std::pow(2, 32 * i);
         }
 
       return result;
@@ -102,7 +103,7 @@ namespace emp {
       size_t back = 0;
       const double thresh = ((double) ThreshRatio::num) / ThreshRatio::den;
 
-      if (n < log2(uids.size())) {
+      if (n < std::log2(uids.size())) {
 
         // Perform a bounded selection sort to find the first n results
         for (; back < n; ++back) {
