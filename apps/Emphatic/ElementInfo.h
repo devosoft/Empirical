@@ -11,6 +11,7 @@
 
 #include "../../source/base/Ptr.h"
 #include "../../source/base/vector.h"
+#include "../../source/tools/set_utils.h"
 #include "../../source/tools/string_utils.h"
 
 /// Parameter in a function or template definition
@@ -20,28 +21,51 @@ struct ParamInfo {
 };
 
 /// Info for a variable or function
-struct ElementInfo {
+class ElementInfo {
+private:
   enum ElementType { NONE=0, TYPEDEF, VARIABLE, FUNCTION };
   ElementType element_type = NONE;    ///< What type of element are we describing?
 
-  std::string type;                   ///< Type of variable, return type of function, or assigned type of using.
-  std::string name;                   ///< Element name.
-  emp::vector<ParamInfo> params;      ///< Full set of function parameters
-  std::set<std::string> attributes;   ///< const, noexcept, etc.
-  std::string default_code;           ///< Variable initialization or function body.
-  std::string special_value;          ///< "default", "delete", or "required" (for concepts)
+  std::string type;                     ///< Type of variable, return type of function, or assigned type of using.
+  std::string name;                     ///< Element name.
+  emp::vector<ParamInfo> params;        ///< Full set of function parameters
+  std::set<std::string> attributes;     ///< const, noexcept, etc.  "override" is special for concepts.
+  std::string default_code;             ///< Variable initialization or function body.
+  std::set<std::string> special_values; ///< "default", "delete", or "0" (required), etc.
 
+public:
   bool IsTypedef() const { return element_type == TYPEDEF; }
   bool IsVariable() const { return element_type == VARIABLE; }
   bool IsFunction() const { return element_type == FUNCTION; }
 
-  bool IsRequired() const { return special_value == "required"; }
-  bool IsDefault() const { return special_value == "default"; }
-  bool IsDeleted() const { return special_value == "delete"; }
+  const std::string & GetType() const { return type; }
+  const std::string & GetName() const { return name; }
+
+  bool IsRequired() const { return emp::Has(special_values, "0"); }
+  bool IsDefault() const { return emp::Has(special_values, "default"); }
+  bool IsDeleted() const { return emp::Has(special_values, "delete"); }
+  bool IsDeclaration() const { return emp::Has(special_values, "declare"); }
+
+  bool IsConst() const { return emp::Has(attributes, "const"); }
+  bool IsOverride() const { return emp::Has(attributes, "override"); }
 
   void SetTypedef() { element_type = TYPEDEF; }
   void SetVariable() { element_type = VARIABLE; }
   void SetFunction() { element_type = FUNCTION; }
+
+  void SetType(const std::string & in_type) { type = in_type; }
+  void SetName(const std::string & in_name) { name = in_name; }
+  void AddParam(const std::string & ptype, const std::string & pname) {
+    params.emplace_back(ParamInfo{ptype, pname});
+  }
+  void SetParams(const emp::vector<ParamInfo> & in_params) { params = in_params; }
+
+  void AddAttribute(const std::string & at) { attributes.insert(at); }
+  void SetAttributes(const std::set<std::string> & in_ats) { attributes = in_ats; }
+
+  void SetDefaultCode(const std::string & in_code) { default_code = in_code; }
+
+  void AddSpecial(const std::string & special) { special_values.insert(special); }
 
   /// List out all of the parameters for this function.
   std::string ParamString() const {
@@ -70,6 +94,18 @@ struct ElementInfo {
     emp_assert(IsFunction());
     std::string out_str;
     for (const auto & x : attributes) {
+      out_str += " ";
+      out_str += x;
+    }
+    return out_str;
+  }
+
+  /// List out all attributes for this function for a concept (which captures some keywords).
+  std::string ConceptAttributeString() const {
+    emp_assert(IsFunction());
+    std::string out_str;
+    for (const auto & x : attributes) {
+      if (x == "override") continue;  // Overrides will be used elsewhere.
       out_str += " ";
       out_str += x;
     }
@@ -110,7 +146,7 @@ struct ElementInfo {
     // Note: Typedefs and variables do not need to be represented in the base class.
     if (IsFunction()) {
       os << prefix << "virtual " << type << " " << name << "(" << ParamString() << ") "
-         << AttributeString() << " = 0;\n";
+         << ConceptAttributeString() << " = 0;\n";
     }
   }
 
@@ -160,7 +196,7 @@ struct ElementInfo {
 
       // Build function to call.
       os << prefix << type << " " << name << "(" << ParamString() << ") "
-                   << AttributeString() << " {\n";
+                   << ConceptAttributeString() << " {\n";
 
       // If this is a required function, put static assert to ensure it's there before calling.
       if (IsRequired()) {
@@ -169,6 +205,11 @@ struct ElementInfo {
                      << name << "' **\\n\");\n";
         if (type != "void") os << prefix << "return ";
         os << "WRAPPED_T::" << name << "( " << ArgString() << " );\n";
+      }
+
+      // If this function was markedoverride, we need to always call the provided version.
+      else if (IsOverride()) {
+        os << prefix << "  " << default_code << "\n";
       }
 
       // ...otherwise call the correct version, depending on if it's there.

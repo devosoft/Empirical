@@ -19,19 +19,21 @@
 
 namespace emp {
 
-  // Customized type traits
-  template <typename T> struct is_ptr_type           { enum { value = false }; };
-  template <typename T> struct is_ptr_type<T*>       { enum { value = true }; };
-  template <typename T> struct is_ptr_type<T* const> { enum { value = true }; };
-  template <typename T> struct is_ptr_type<Ptr<T>>   { enum { value = true }; };
+  // Customized type traits; for the moment, make sure that emp::Ptr is handled correctly.
+  template <typename T> struct is_ptr_type : public std::false_type { };
+  template <typename T> struct is_ptr_type<T*> : public std::true_type { };
+  template <typename T> struct is_ptr_type<T* const> : public std::true_type { };
+  template <typename T> struct is_ptr_type<Ptr<T>> : public std::true_type { };
   template <typename T>
   constexpr bool is_ptr_type_v(const T&) { return is_ptr_type<T>::value; }
+  template <typename T> using is_pointer = is_ptr_type<T>;
 
   template <typename T> struct remove_ptr_type         { using type = T; };
   template <typename T> struct remove_ptr_type<T*>     { using type = T; };
   template <typename T> struct remove_ptr_type<Ptr<T>> { using type = T; };
   template <typename T>
   using remove_ptr_type_t = typename remove_ptr_type<T>::type;
+  template <typename T> using remove_pointer_t = remove_ptr_type_t<T>;
   // @CAO: Make sure we are dealing with const and volitile pointers correctly.
 
   // Can we convert the first pointer into the second?

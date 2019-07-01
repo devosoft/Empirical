@@ -20,8 +20,6 @@ int main(int argc, char *argv[])
   }
 
   Emphatic codegen(argv[1]);
-  // codegen.PrintLexerState();
-  // std::cout << std::endl;
   codegen.PrintTokens();
 
   codegen.SetDebug();
