@@ -62,7 +62,7 @@ namespace emp {
   template<size_t Width>
   struct DowningStreak {
     double operator()(const emp::BitSet<Width>& a, const emp::BitSet<Width>& b) {
-      const auto bs = a^b;
+      auto bs = a^b;
       const size_t same = (~bs).LongestSegmentOnes();
       const size_t different = bs.LongestSegmentOnes();
       const double ps = ProbabilityKBitSequence(same);
@@ -88,13 +88,8 @@ namespace emp {
     struct DowningInteger {
       double operator()(const emp::BitSet<Width>& a, const emp::BitSet<Width>& b) {
         emp::BitSet<Width> bitDifference = ( a > b ? a - b : b - a);
-        size_t fields = bitDifference.GetFields();
-        double result = 0;
-        for (size_t i = 0; i < fields; ++i){
-          result += bitDifference.GetUInt(i) * pow(2, 32 * i);
-        }
-
-      return result;
+        static_assert(Width <= 32);
+        return bitDifference.GetUInt(0);
       }
     };
   /// Returns matches within the threshold ThreshRatio sorted by match quality.
