@@ -882,7 +882,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::AbsDiffMetric,
-    emp::RankedSelector<std::ratio<7,1>>
+    emp::RankedSelector<std::ratio<699,100>>
   > bin;
 
   const size_t hi = bin.Put("hi", 1);
@@ -931,6 +931,81 @@ TEST_CASE("Test MatchBin", "[tools]")
   );
   REQUIRE( bin.GetTags(bin.Match(0, 2)) == (emp::vector<int>{1, 0}) );
 
+  bin.Delete(hi);
+  REQUIRE( bin.GetVals(bin.Match(0, 1)) == emp::vector<std::string>{"salut"} );
+  REQUIRE( bin.GetTags(bin.Match(0, 1)) == emp::vector<int>{0} );
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 2)) == (emp::vector<std::string>{"salut", "yo"})
+  );
+  REQUIRE( bin.GetTags(bin.Match(0, 2)) == (emp::vector<int>{0, -4}) );
+
+  bin.Put("hi", 1);
+  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{} );
+  REQUIRE( bin.GetVals(bin.Match(0, 1)) == emp::vector<std::string>{"salut"} );
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 2)) == (emp::vector<std::string>{"salut", "hi"})
+  );
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 3)) == (emp::vector<std::string>{"salut", "hi", "yo"})
+  );
+
+
+  }
+
+  // test infinite thresh
+  {
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::RankedSelector<>
+  > bin;
+
+  const size_t hi = bin.Put("hi", 1);
+  REQUIRE( bin.GetVal(hi) == "hi" );
+  const size_t salut = bin.Put("salut", 0);
+  REQUIRE( bin.GetVal(salut) == "salut" );
+  const size_t bonjour = bin.Put("bonjour", std::numeric_limits<int>::max());
+  REQUIRE(bin.GetVal(bonjour) == "bonjour");
+
+  REQUIRE( bin.Size() == 3 );
+
+  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{} );
+  REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<int>{} );
+
+  REQUIRE( bin.GetVals(bin.Match(0, 1)) == emp::vector<std::string>{"salut"} );
+  REQUIRE( bin.GetTags(bin.Match(0, 1)) == emp::vector<int>{0} );
+
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 2)) == (emp::vector<std::string>{"salut", "hi"})
+  );
+  REQUIRE( bin.GetTags(bin.Match(0, 2)) == (emp::vector<int>{0, 1}) );
+
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 3)) == (emp::vector<std::string>{"salut", "hi", "bonjour"})
+  );
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 4)) == (emp::vector<std::string>{"salut", "hi", "bonjour"})
+  );
+
+  bin.SetRegulator(bonjour, std::numeric_limits<double>::infinity());
+  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{} );
+  REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<int>{} );
+
+  REQUIRE( bin.GetVals(bin.Match(0, 1)) == emp::vector<std::string>{"salut"} );
+  REQUIRE( bin.GetTags(bin.Match(0, 1)) == emp::vector<int>{0} );
+
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 2)) == (emp::vector<std::string>{"salut", "hi"})
+  );
+  REQUIRE( bin.GetTags(bin.Match(0, 2)) == (emp::vector<int>{0, 1}) );
+
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 3)) == (emp::vector<std::string>{"salut", "hi", "bonjour"})
+  );
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 4)) == (emp::vector<std::string>{"salut", "hi", "bonjour"})
+  );
+
   }
 
   {
@@ -940,7 +1015,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::AbsDiffMetric,
-    emp::RouletteSelector<std::ratio<1,10>>
+    emp::RouletteSelector<>
   >bin(rand);
 
   const size_t hi = bin.Put("hi", 1);
@@ -972,6 +1047,144 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   }
 
+
+  //test roulette selector with threshold
+  {
+
+  emp::Random rand(1);
+
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::RouletteSelector<std::ratio<10,1>>
+  >bin(rand);
+
+  const size_t hi = bin.Put("hi", 1);
+  REQUIRE( bin.GetVal(hi) == "hi" );
+  const size_t yo = bin.Put("yo", 20);
+  REQUIRE( bin.GetVal(yo) == "yo" );
+  const size_t salut = bin.Put("salut", 0);
+  REQUIRE( bin.GetVal(salut) == "salut" );
+
+  REQUIRE( bin.Size() == 3 );
+
+  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{} );
+  REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<int>{} );
+
+  auto res = bin.GetVals(bin.Match(0, 100000));
+  const size_t count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( count > 50000);
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "yo") == 0 );
+
+  bin.AdjRegulator(salut, 4.0);
+  bin.SetRegulator(hi, 0.5);
+  res = bin.GetVals(bin.Match(0, 100000));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 50000 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "yo") == 0 );
+
+  bin.SetRegulator(salut, 0.5);
+  bin.SetRegulator(hi, 2.0);
+  res = bin.GetVals(bin.Match(0, 100000));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "yo") == 0 );
+
+  bin.SetRegulator(yo, 0.0);
+  res = bin.GetVals(bin.Match(0, 100000));
+  REQUIRE( std::count(std::begin(res), std::end(res), "yo") > 0 );
+
+  bin.SetRegulator(salut, 20.0);
+  bin.SetRegulator(hi, 20.0);
+  res = bin.GetVals(bin.Match(0, 100000));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") == 0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") == 0 );
+
+  }
+
+  // test RouletteSelector skew
+  {
+
+  emp::Random rand(1);
+
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::RouletteSelector<std::ratio<-1,1>,std::ratio<1000,1>>
+  >bin_softskew(rand);
+
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::RouletteSelector<std::ratio<-1,1>,std::ratio<1,1000>>
+  >bin_hardskew(rand);
+
+  const size_t hi1 = bin_softskew.Put("hi", 1);
+  REQUIRE( bin_softskew.GetVal(hi1) == "hi" );
+  const size_t salut1 = bin_softskew.Put("salut", 0);
+  REQUIRE( bin_softskew.GetVal(salut1) == "salut" );
+
+  REQUIRE( bin_softskew.Size() == 2 );
+
+  const size_t hi2 = bin_hardskew.Put("hi", 1);
+  REQUIRE( bin_hardskew.GetVal(hi2) == "hi" );
+  const size_t salut2 = bin_hardskew.Put("salut", 0);
+  REQUIRE( bin_hardskew.GetVal(salut2) == "salut" );
+
+  REQUIRE( bin_hardskew.Size() == 2 );
+
+  REQUIRE(
+    bin_hardskew.GetVals(bin_hardskew.Match(0, 0)) == emp::vector<std::string>{}
+  );
+  REQUIRE(
+    bin_hardskew.GetTags(bin_hardskew.Match(0, 0)) == emp::vector<int>{}
+  );
+
+  REQUIRE(
+    bin_softskew.GetVals(bin_softskew.Match(0, 0)) == emp::vector<std::string>{}
+  );
+  REQUIRE(
+    bin_softskew.GetTags(bin_softskew.Match(0, 0)) == emp::vector<int>{}
+  );
+
+
+  auto res_softskew = bin_softskew.GetVals(bin_softskew.Match(0, 100000));
+  const size_t count_soft = std::count(
+    std::begin(res_softskew), std::end(res_softskew), "salut"
+  );
+  REQUIRE(count_soft > 45000);
+  REQUIRE(
+    std::count(std::begin(res_softskew), std::end(res_softskew), "hi") > 40000
+  );
+
+  auto res_hardskew = bin_hardskew.GetVals(bin_hardskew.Match(0, 100000));
+  const size_t count_hard = std::count(
+    std::begin(res_hardskew), std::end(res_hardskew), "salut"
+  );
+  REQUIRE( count_hard > 90000);
+  REQUIRE( count_hard > count_soft);
+
+  bin_softskew.AdjRegulator(salut1, 4.0);
+  bin_softskew.SetRegulator(hi1, 0.5);
+  res_softskew = bin_softskew.GetVals(bin_softskew.Match(0, 100000));
+  REQUIRE(
+    std::count(std::begin(res_softskew), std::end(res_softskew), "salut") > 45000
+  );
+  REQUIRE(
+    std::count(std::begin(res_softskew), std::end(res_softskew), "hi") > 45000
+  );
+
+  bin_hardskew.AdjRegulator(salut2, 4.0);
+  bin_hardskew.SetRegulator(hi2, 0.5);
+  res_hardskew = bin_hardskew.GetVals(bin_hardskew.Match(0, 100000));
+  REQUIRE(
+    std::count(std::begin(res_hardskew), std::end(res_hardskew), "hi") > 90000
+  );
+
+  }
+
+  // test DynamicSelector
   {
   emp::MatchBin<
     std::string,
@@ -982,20 +1195,22 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::Random rand(1);
 
   bin.selector.selectors.push_back(
-    emp::NewPtr<emp::RankedSelector<std::ratio<7,1>>>()
+    emp::NewPtr<emp::RankedSelector<std::ratio<699,100>>>()
   );
   bin.selector.selectors.push_back(
-    emp::NewPtr<emp::RouletteSelector<std::ratio<1,10>>>(rand)
+    emp::NewPtr<emp::RouletteSelector<>>(rand)
   );
 
   const size_t hi = bin.Put("hi", 1);
   REQUIRE( bin.GetVal(hi) == "hi" );
   const size_t salut = bin.Put("salut", 0);
   REQUIRE( bin.GetVal(salut) == "salut" );
-
-  REQUIRE( bin.GetVal(bin.Put("bonjour", 6)) == "bonjour" );
-  REQUIRE( bin.GetVal(bin.Put("yo", -4)) == "yo" );
-  REQUIRE( bin.GetVal(bin.Put("konichiwa", -6)) == "konichiwa" );
+  const size_t bonjour = bin.Put("bonjour", 6);
+  REQUIRE( bin.GetVal(bonjour) == "bonjour" );
+  const size_t yo = bin.Put("yo", -4);
+  REQUIRE( bin.GetVal(yo) == "yo" );
+  const size_t konichiwa = bin.Put("konichiwa", -6);
+  REQUIRE( bin.GetVal(konichiwa) == "konichiwa" );
 
   REQUIRE( bin.Size() == 5 );
 
@@ -1037,6 +1252,9 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   bin.selector.mode = 1;
   bin.SetRegulator(hi, 1.0);
+  bin.SetRegulator(bonjour, 1000.0);
+  bin.SetRegulator(yo, 1000.0);
+  bin.SetRegulator(konichiwa, 1000.0);
 
   REQUIRE( bin.GetVal(hi) == "hi" );
   REQUIRE( bin.GetVal(salut) == "salut" );
@@ -1123,7 +1341,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::HammingMetric<32>,
-    emp::RouletteSelector<std::ratio<1,10>>
+    emp::RouletteSelector<>
   >bitBin(rand);
 
   emp::BitSet<32> bs2;
@@ -1227,7 +1445,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::AbsDiffMetric,
-    emp::RouletteSelector<std::ratio<1,10>>
+    emp::RouletteSelector<>
   >bin(rand);
 
   const size_t hi = bin.Put("hi", 1);
