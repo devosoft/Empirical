@@ -181,6 +181,15 @@ namespace emp {
   };
 
   /// Selector chooses probabilistically based on match quality with replacement.
+  /// ThreshRatio: what is the raw maximum score to even be considered to match
+  /// SkewRatio: how much more heavily should the best matches be weighted
+  /// in terms of match probability; must be greater than 0
+  /// (close to zero: very heavily, large: mostly even weighting)
+  /// MaxBaselineRatio: maximum score that all scores will be normalized to
+  /// baseline = min(min_score, MaxBaselineRatio)
+  /// normalized_score = score - baseline
+  /// ...
+  ///  overall, p_match ~ 1 / (skew + score - baseline)
   template<
     typename ThreshRatio = std::ratio<-1, 1>,// we treat neg numerator as +infty
     typename SkewRatio = std::ratio<1, 10>,
