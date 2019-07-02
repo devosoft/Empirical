@@ -1184,6 +1184,102 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   }
 
+  // test RouletteSelector MaxBaselineRatio
+  {
+
+  emp::Random rand(1);
+
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::RouletteSelector<
+      std::ratio<-1,1>,
+      std::ratio<1,10>,
+      std::ratio<0,1>
+    >
+  >bin_lobase(rand);
+
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::RouletteSelector<
+      std::ratio<-1,1>,
+      std::ratio<1,10>,
+      std::ratio<-1,1>
+    >
+  >bin_hibase(rand);
+
+  const size_t hi1 = bin_lobase.Put("hi", 1);
+  REQUIRE( bin_lobase.GetVal(hi1) == "hi" );
+  const size_t salut1 = bin_lobase.Put("salut", 0);
+  REQUIRE( bin_lobase.GetVal(salut1) == "salut" );
+
+  REQUIRE( bin_lobase.Size() == 2 );
+
+  const size_t hi2 = bin_hibase.Put("hi", 1);
+  REQUIRE( bin_hibase.GetVal(hi2) == "hi" );
+  const size_t salut2 = bin_hibase.Put("salut", 0);
+  REQUIRE( bin_hibase.GetVal(salut2) == "salut" );
+
+  REQUIRE( bin_hibase.Size() == 2 );
+
+  REQUIRE(
+    bin_hibase.GetVals(bin_hibase.Match(0, 0)) == emp::vector<std::string>{}
+  );
+  REQUIRE(
+    bin_hibase.GetTags(bin_hibase.Match(0, 0)) == emp::vector<int>{}
+  );
+
+  REQUIRE(
+    bin_lobase.GetVals(bin_lobase.Match(0, 0)) == emp::vector<std::string>{}
+  );
+  REQUIRE(
+    bin_lobase.GetTags(bin_lobase.Match(0, 0)) == emp::vector<int>{}
+  );
+
+
+  auto res_lobase = bin_lobase.GetVals(bin_lobase.Match(0, 100000));
+  const size_t count_lobase = std::count(
+    std::begin(res_lobase), std::end(res_lobase), "salut"
+  );
+  REQUIRE(count_lobase < 70000);
+  REQUIRE(
+    std::count(std::begin(res_lobase), std::end(res_lobase), "hi") > 30000
+  );
+
+  auto res_hibase = bin_hibase.GetVals(bin_hibase.Match(0, 100000));
+  const size_t count_hibase = std::count(
+    std::begin(res_hibase), std::end(res_hibase), "salut"
+  );
+  REQUIRE( count_hibase > 90000);
+  REQUIRE( count_hibase > count_lobase);
+
+  bin_lobase.AdjRegulator(salut1, 9.0);
+  bin_lobase.SetRegulator(hi1, 5.0);
+  res_lobase = bin_lobase.GetVals(bin_lobase.Match(0, 100000));
+  REQUIRE(
+    std::count(std::begin(res_lobase), std::end(res_lobase), "salut") > 45000
+  );
+  REQUIRE(
+    std::count(std::begin(res_lobase), std::end(res_lobase), "hi") > 45000
+  );
+
+  bin_hibase.AdjRegulator(salut2, 4.0);
+  bin_hibase.SetRegulator(hi2, 2.0);
+  res_hibase = bin_hibase.GetVals(bin_hibase.Match(0, 100000));
+  REQUIRE(
+    std::count(std::begin(res_hibase), std::end(res_hibase), "hi") > 90000
+  );
+
+  bin_lobase.AdjRegulator(hi1, -5.0);
+  bin_lobase.SetRegulator(salut1, 1.2);
+  res_lobase = bin_lobase.GetVals(bin_lobase.Match(0, 100000));
+  REQUIRE(
+    std::count(std::begin(res_lobase), std::end(res_lobase), "hi") > 90000
+  );
+
+  }
+
   // test DynamicSelector
   {
   emp::MatchBin<

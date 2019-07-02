@@ -183,7 +183,8 @@ namespace emp {
   /// Selector chooses probabilistically based on match quality with replacement.
   template<
     typename ThreshRatio = std::ratio<-1, 1>,// we treat neg numerator as +infty
-    typename SkewRatio = std::ratio<1, 10>
+    typename SkewRatio = std::ratio<1, 10>,
+    typename MaxBaselineRatio = std::ratio<1, 1>// treat neg numerator as +infty
   >
   struct RouletteSelector : public Selector {
 
@@ -209,6 +210,13 @@ namespace emp {
         : ((double) ThreshRatio::num) / ThreshRatio::den
       );
 
+      // treat any negative numerator as positive infinity
+      const double max_baseline = (
+        MaxBaselineRatio::num < 0
+        ? std::numeric_limits<double>::infinity()
+        : ((double) MaxBaselineRatio::num) / MaxBaselineRatio::den
+      );
+
       // partition by thresh
       size_t partition = 0;
       double min_score = std::numeric_limits<double>::infinity();
@@ -220,12 +228,13 @@ namespace emp {
         }
       }
 
-      // skew relative to strongest match less than or equal to 1
+      // skew relative to strongest match less than or equal to max_baseline
       // to take into account regulation...
-      // (without upregulation, the best possible match score is 1.0)
-      const double baseline = std::min(min_score, 1.0);
+      // (the default value of max_baseline is 1.0 because without
+      // upregulation, the best possible match score is 1.0)
+      const double baseline = std::min(min_score, max_baseline);
       emp_assert(baseline >= 0);
-      emp_assert(baseline <= 1.0);
+      emp_assert(baseline <= max_baseline);
 
       IndexMap match_index(partition);
 
