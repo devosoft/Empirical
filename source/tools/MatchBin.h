@@ -112,6 +112,7 @@ namespace emp {
   };
 
 
+  /// Abstract base class for selectors
   struct Selector {
 
     virtual ~Selector() {};
