@@ -239,13 +239,14 @@ namespace emp {
   public:
     using tag_t = typename Metric::tag_t;
     using query_t = typename Metric::query_t;
+    using uid_t = size_t;
 
   private:
-    std::unordered_map<size_t, Val> values;
-    std::unordered_map<size_t, double> regulators;
-    std::unordered_map<size_t, tag_t> tags;
-    emp::vector<size_t> uids;
-    size_t uid_stepper;
+    std::unordered_map<uid_t, Val> values;
+    std::unordered_map<uid_t, double> regulators;
+    std::unordered_map<uid_t, tag_t> tags;
+    emp::vector<uid_t> uids;
+    uid_t uid_stepper;
 
   public:
     Metric metric;
@@ -261,7 +262,7 @@ namespace emp {
     /// Compare a query tag to all stored tags using the distance metric
     /// function and return a vector of unique IDs chosen by the selector
     /// function.
-    emp::vector<size_t> Match(const query_t & query, size_t n=1) {
+    emp::vector<uid_t> Match(const query_t & query, size_t n=1) {
 
       // compute distance between query and all stored tags
       std::unordered_map<tag_t, double> matches;
@@ -272,7 +273,7 @@ namespace emp {
       }
 
       // apply regulation to generate match scores
-      std::unordered_map<size_t, double> scores;
+      std::unordered_map<uid_t, double> scores;
       for (auto uid : uids) {
         scores[uid] = matches[tags[uid]] * regulators[uid] + regulators[uid];
       }
@@ -281,9 +282,9 @@ namespace emp {
 
     /// Put an item and associated tag in the container. Returns the uid for
     /// that entry.
-    size_t Put(const Val & v, const tag_t & t) {
+    uid_t Put(const Val & v, const tag_t & t) {
 
-      const size_t orig = uid_stepper;
+      const uid_t orig = uid_stepper;
       while(values.find(++uid_stepper) != values.end()) {
         // if container is full
         // i.e., wrapped around because all uids already allocated
@@ -299,7 +300,7 @@ namespace emp {
 
 
     /// Delete an item and its associated tag.
-    void Delete(size_t uid) {
+    void Delete(const uid_t uid) {
       values.erase(uid);
       regulators.erase(uid);
       tags.erase(uid);
@@ -315,35 +316,35 @@ namespace emp {
     }
 
     /// Access a reference single stored value by uid.
-    Val & GetVal(const size_t uid) {
+    Val & GetVal(const uid_t uid) {
       return values.at(uid);
     }
 
     /// Access a reference to a single stored tag by uid.
-    tag_t & GetTag(const size_t uid) {
+    tag_t & GetTag(const uid_t uid) {
       return tags.at(uid);
     }
 
     /// Generate a vector of values corresponding to a vector of uids.
-    emp::vector<Val> GetVals(const emp::vector<size_t> & uids) {
+    emp::vector<Val> GetVals(const emp::vector<uid_t> & uids) {
       emp::vector<Val> res;
       std::transform(
         uids.begin(),
         uids.end(),
         std::back_inserter(res),
-        [this](size_t uid) -> Val { return GetVal(uid); }
+        [this](uid_t uid) -> Val { return GetVal(uid); }
       );
       return res;
     }
 
     /// Generate a vector of tags corresponding to a vector of uids.
-    emp::vector<tag_t> GetTags(const emp::vector<size_t> & uids) {
+    emp::vector<tag_t> GetTags(const emp::vector<uid_t> & uids) {
       emp::vector<tag_t> res;
       std::transform(
         uids.begin(),
         uids.end(),
         std::back_inserter(res),
-        [this](size_t uid) -> tag_t { return GetTag(uid); }
+        [this](uid_t uid) -> tag_t { return GetTag(uid); }
       );
       return res;
     }
@@ -355,7 +356,7 @@ namespace emp {
 
     /// Add an amount to an item's regulator value. Positive amounts
     /// downregulate the item and negative amounts upregulate it.
-    void AdjRegulator(size_t uid, double amt) {
+    void AdjRegulator(uid_t uid, double amt) {
       regulators[uid] = std::max(0.0, regulators.at(uid) + amt);
     }
 
@@ -363,7 +364,7 @@ namespace emp {
     /// equal to zero. A value between zero and one upregulates the item, a
     /// value of exactly one is neutral, and a value greater than one
     /// upregulates the item.
-    void SetRegulator(size_t uid, double amt) {
+    void SetRegulator(uid_t uid, double amt) {
       emp_assert(amt >= 0.0);
       regulators.at(uid) = amt;
     }
