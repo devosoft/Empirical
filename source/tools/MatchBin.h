@@ -221,7 +221,8 @@ namespace emp {
       }
 
       // skew relative to strongest match less than or equal to 1
-      // (to take into account upregulation)
+      // to take into account regulation...
+      // (without upregulation, the best possible match score is 1.0)
       const double baseline = std::min(min_score, 1.0);
       emp_assert(baseline >= 0);
       emp_assert(baseline <= 1.0);
