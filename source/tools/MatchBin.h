@@ -180,7 +180,10 @@ namespace emp {
   };
 
   /// Selector chooses probabilistically based on match quality with replacement.
-  template<typename RouletteRatio = std::ratio<1, 10>>
+  template<
+    typename ThreshRatio = std::ratio<-1, 1>,// we treat neg numerator as +infty
+    typename SkewRatio = std::ratio<1, 10>
+  >
   struct RouletteSelector : public Selector {
 
     emp::Random & rand;
@@ -189,14 +192,44 @@ namespace emp {
     : rand(rand_)
     { ; }
 
-    emp::vector<size_t> operator()(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n) {
+    emp::vector<size_t> operator()(
+      emp::vector<size_t>& uids,
+      std::unordered_map<size_t, double>& scores,
+      size_t n
+    ) {
 
-      const double skew = RouletteRatio::num / RouletteRatio::den;
+      const double skew = ((double) SkewRatio::num / SkewRatio::den);
+      emp_assert(skew > 0);
 
-      IndexMap match_index(uids.size());
+      // treat any negative numerator as positive infinity
+      const double thresh = (
+        ThreshRatio::num <= 0
+        ? std::numeric_limits<double>::infinity()
+        : ((double) ThreshRatio::num) / ThreshRatio::den
+      );
+
+      // partition by thresh
+      size_t partition = 0;
+      double min_score = std::numeric_limits<double>::infinity();
       for (size_t i = 0; i < uids.size(); ++i) {
         emp_assert(scores[uids[i]] >= 0);
-        match_index.Adjust(i, 1.0 / ( skew + scores[uids[i]] ));
+        min_score = std::min(min_score, scores[uids[i]]);
+        if (scores[uids[i]] <= thresh) {
+          std::swap(uids[i], uids[partition++]);
+        }
+      }
+
+      // skew relative to strongest match less than or equal to 1
+      // (to take into account upregulation)
+      const double baseline = std::min(min_score, 1.0);
+      emp_assert(baseline >= 0);
+      emp_assert(baseline <= 1.0);
+
+      IndexMap match_index(partition);
+
+      for (size_t p = 0; p < partition; ++p) {
+        emp_assert(scores[uids[p]] - baseline >= 0);
+        match_index.Adjust(p, 1.0 / ( skew + scores[uids[p]] - baseline ));
       }
 
       emp::vector<size_t> res;
