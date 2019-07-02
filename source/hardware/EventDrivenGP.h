@@ -631,7 +631,7 @@ namespace emp {
     std::deque<size_t> pending_cores;     //< Queue of core IDs pending activation.
     size_t exec_core_id;                  //< core ID of the currently executing core.
     bool is_executing;                    //< True when mid-execution of all cores. (On every CPU cycle: execute all cores).
-    trait_printer_t TraitPrinter = [](std::ostream&, Trait){};
+    trait_printer_t fun_trait_print = [](std::ostream&, Trait){};
 
     // TODO: disallow configuration of hardware while executing. (and any other functions that could sent things into a bad state)
 
@@ -1296,11 +1296,11 @@ namespace emp {
 
     /// Print hardware traits using given output stream (default = std::cout).
     void PrintTraits(std::ostream & os=std::cout) {
-      TraitPrinter(os, traits);
+      fun_trait_print(os, traits);
     }
     
-    void SetTraitPrinter(trait_printer_t t){
-      TraitPrinter = t;
+    void SetTraitPrintFun(const trait_printer_t& t){
+      fun_trait_print = t;
     }
 
     /// Print out entire program using given output stream (default = std::cout).
