@@ -25,6 +25,7 @@
 #include "../base/assert.h"
 #include "../base/vector.h"
 #include "../tools/IndexMap.h"
+#include "../tools/BitSet.h"
 
 namespace emp {
 
