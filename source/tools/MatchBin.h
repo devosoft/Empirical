@@ -123,12 +123,22 @@ namespace emp {
   };
 
   /// Returns matches within the threshold ThreshRatio sorted by match quality.
-  template<typename ThreshRatio>
+  template<typename ThreshRatio = std::ratio<-1,1>> // neg numerator means +infy
   struct RankedSelector : public Selector {
-    emp::vector<size_t> operator()(emp::vector<size_t>& uids, std::unordered_map<size_t, double>& scores, size_t n){
+    emp::vector<size_t> operator()(
+      emp::vector<size_t>& uids,
+      std::unordered_map<size_t, double>& scores,
+      size_t n
+    ){
 
       size_t back = 0;
-      const double thresh = ((double) ThreshRatio::num) / ThreshRatio::den;
+
+      // treat any negative numerator as positive infinity
+      const double thresh = (
+        ThreshRatio::num <= 0
+        ? std::numeric_limits<double>::infinity()
+        : ((double) ThreshRatio::num) / ThreshRatio::den
+      );
 
       if (n < std::log2(uids.size())) {
 
@@ -138,7 +148,7 @@ namespace emp {
           for (size_t j = back; j < uids.size(); ++j) {
             if (
               (minIndex == -1 || scores.at(uids[j]) < scores.at(uids[minIndex]))
-              && (scores.at(uids[j]) < thresh)
+              && (scores.at(uids[j]) <= thresh)
             ) {
               minIndex = j;
             }
@@ -160,7 +170,7 @@ namespace emp {
         while (
           back < uids.size()
           && back < n
-          && scores.at(uids[back]) < thresh
+          && scores.at(uids[back]) <= thresh
         ) ++back;
 
       }
