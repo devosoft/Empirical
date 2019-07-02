@@ -48,7 +48,7 @@ namespace emp {
     using query_t = int;
 
     double operator()(const query_t& a, const tag_t& b) const {
-      return (double)abs(a-b);
+      return (double)std::abs(a-b);
     }
   };
 
