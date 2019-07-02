@@ -136,7 +136,7 @@ namespace emp {
 
       // treat any negative numerator as positive infinity
       const double thresh = (
-        ThreshRatio::num <= 0
+        ThreshRatio::num < 0
         ? std::numeric_limits<double>::infinity()
         : ((double) ThreshRatio::num) / ThreshRatio::den
       );
@@ -204,7 +204,7 @@ namespace emp {
 
       // treat any negative numerator as positive infinity
       const double thresh = (
-        ThreshRatio::num <= 0
+        ThreshRatio::num < 0
         ? std::numeric_limits<double>::infinity()
         : ((double) ThreshRatio::num) / ThreshRatio::den
       );
