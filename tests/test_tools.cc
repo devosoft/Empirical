@@ -49,6 +49,7 @@
 #include "tools/lexer_utils.h"
 #include "tools/map_utils.h"
 #include "tools/math.h"
+#include "tools/matchbin_utils.h"
 #include "tools/mem_track.h"
 #include "tools/memo_function.h"
 #include "tools/NullStream.h"
