@@ -159,8 +159,6 @@ namespace emp {
         const int field_shift = (shift_size / 32) % NUM_FIELDS;
         const int bit_overflow = 32 - bit_shift;
 
-        // std::cout << field_shift << " " << bit_shift << std::endl;
-
         std::rotate(
           std::rbegin(bit_set),
           std::rbegin(bit_set)+field_shift,
