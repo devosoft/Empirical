@@ -656,8 +656,8 @@ namespace emp {
       return *this;
     }
 
-    /// Positive shifts go left and negative go right (0 does nothing); return result.
-    // TODO this is backwards
+    /// Positive shifts go right and negative shifts go left (0 does nothing);
+    /// return result.
     BitSet SHIFT(const int shift_size) const {
       BitSet out_set(*this);
       if (shift_size > 0) out_set.ShiftRight((uint32_t) shift_size);
@@ -665,7 +665,8 @@ namespace emp {
       return out_set;
     }
 
-    /// Positive shifts go left and negative go right; store result here, and return this object.
+    /// Positive shifts go right and negative shifts go left (0 does nothing);
+    /// store result here, and return this object.
     BitSet & SHIFT_SELF(const int shift_size) {
       if (shift_size > 0) ShiftRight((uint32_t) shift_size);
       else if (shift_size < 0) ShiftLeft((uint32_t) -shift_size);
