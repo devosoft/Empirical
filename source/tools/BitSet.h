@@ -672,7 +672,8 @@ namespace emp {
       return *this;
     }
 
-    /// Positive rotates go left and negative go right (0 does nothing); return result.
+    /// Positive rotates go left and negative rotates go left (0 does nothing);
+    /// return result.
     BitSet ROTATE(const int rotate_size) const {
       BitSet out_set(*this);
       if (rotate_size > 0) out_set.RotateRight((uint32_t) rotate_size);
@@ -680,7 +681,8 @@ namespace emp {
       return out_set;
     }
 
-    /// Positive shifts go left and negative go right; store result here, and return this object.
+    /// Positive rotates go right and negative rotates go left (0 does nothing);
+    /// store result here, and return this object.
     BitSet & ROTATE_SELF(const int rotate_size) {
       if (rotate_size > 0) RotateRight((uint32_t) rotate_size);
       else if (rotate_size < 0) RotateLeft((uint32_t) -rotate_size);
