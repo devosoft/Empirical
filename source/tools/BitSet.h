@@ -237,13 +237,13 @@ namespace emp {
         );
 
         // if necessary, shift filler bits out of the middle
-        // if(LAST_BIT) {
-        //   const int filler_idx = field_shift;
-        //   for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
-        //     bit_set[i-1] |= bit_set[i] << LAST_BIT;
-        //     bit_set[i] >>= (32 - LAST_BIT);
-        //   }
-        // }
+        if constexpr (LAST_BIT) {
+          const int filler_idx = NUM_FIELDS - 1 - field_shift;
+          for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
+            bit_set[i-1] |= bit_set[i] << LAST_BIT;
+            bit_set[i] >>= (32 - LAST_BIT);
+          }
+        }
 
         // account for bit_shift
         if (bit_shift) {
@@ -251,7 +251,7 @@ namespace emp {
           const uint32_t keystone = bit_set[0] >> (32 - LAST_BIT);
           bit_set[NUM_FIELDS-1] |= bit_set[0] << LAST_BIT;
 
-          for (size_t i = 0; i < (NUM_FIELDS - 1 - field_shift); ++i) {
+          for (size_t i = 0; i < NUM_FIELDS - 1; ++i) {
             bit_set[i] >>= bit_shift;
             bit_set[i] |= (bit_set[i+1] << bit_overflow);
           }
