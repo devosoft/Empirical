@@ -177,10 +177,11 @@ namespace emp {
         // account for bit_shift
         if (bit_shift) {
 
-          // remember, we know NUM_FIELDS > 1
-          const uint32_t keystone = (
+          const uint32_t keystone = LAST_BIT ? (
             (bit_set[NUM_FIELDS - 1] << (32 - LAST_BIT))
             | (bit_set[NUM_FIELDS - 2] >> LAST_BIT)
+          ) : (
+            bit_set[NUM_FIELDS - 1]
           );
 
           for (int i = NUM_FIELDS - 1; i > 0; --i) {
@@ -246,8 +247,15 @@ namespace emp {
         // account for bit_shift
         if (bit_shift) {
 
-          const uint32_t keystone = bit_set[0] >> (32 - LAST_BIT);
-          bit_set[NUM_FIELDS-1] |= bit_set[0] << LAST_BIT;
+          const uint32_t keystone = LAST_BIT ? (
+            bit_set[0] >> (32 - LAST_BIT)
+          ) : (
+            bit_set[0]
+          );
+
+          if constexpr (LAST_BIT) {
+            bit_set[NUM_FIELDS-1] |= bit_set[0] << LAST_BIT;
+          }
 
           for (size_t i = 0; i < NUM_FIELDS - 1; ++i) {
             bit_set[i] >>= bit_shift;
