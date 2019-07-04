@@ -168,7 +168,7 @@ namespace emp {
         );
 
         // if necessary, shift filler bits out of the middle
-        if(LAST_BIT) {
+        if constexpr (LAST_BIT) {
           const int filler_idx = (NUM_FIELDS - 1 + field_shift) % NUM_FIELDS;
           for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
             bit_set[i-1] |= bit_set[i] << LAST_BIT;
