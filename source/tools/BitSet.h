@@ -375,7 +375,7 @@ namespace emp {
     }
 
     /// Set the bit as a specified index.
-    void Set(size_t index, bool value) {
+    void Set(size_t index, bool value=true) {
       emp_assert(index < NUM_BITS);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
