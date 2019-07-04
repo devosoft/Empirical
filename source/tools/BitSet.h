@@ -138,8 +138,8 @@ namespace emp {
     }
 
     /// Helper: call ROTATE with positive number instead
-    void RotateLeft(const uint32_t shift_size) {
-
+    void RotateLeft(const uint32_t shift_size_raw) {
+      const uint32_t shift_size = shift_size_raw % NUM_BITS;
       const int bit_shift = shift_size % 32;
 
       // special case: for exactly one uint32_t, try to go low level
@@ -154,53 +154,62 @@ namespace emp {
         c &= mask;
         n = (n<<c) | (n>>( (-(c+32-NUM_BITS))&mask ));
 
-        return;
+      } else {
+
+        const int field_shift = (shift_size / 32) % NUM_FIELDS;
+        const int bit_overflow = 32 - bit_shift;
+
+        // std::cout << field_shift << " " << bit_shift << std::endl;
+
+        std::rotate(
+          std::rbegin(bit_set),
+          std::rbegin(bit_set)+field_shift,
+          std::rend(bit_set)
+        );
+
+        // if necessary, shift filler bits out of the middle
+        if(LAST_BIT) {
+          const int filler_idx = (NUM_FIELDS - 1 + field_shift) % NUM_FIELDS;
+          for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
+            bit_set[i-1] |= bit_set[i] << LAST_BIT;
+            bit_set[i] >>= (32 - LAST_BIT);
+          }
+        }
+
+        // account for bit_shift
+        if (bit_shift) {
+
+          const uint32_t keystone = bit_set[NUM_FIELDS - 1];
+
+          for (int i = NUM_FIELDS - 1; i > 0; --i) {
+            bit_set[i] <<= bit_shift;
+            bit_set[i] |= (bit_set[i-1] >> bit_overflow);
+          }
+          // Handle final field
+          bit_set[0] <<= bit_shift;
+          bit_set[0] |= keystone >> ( (bit_overflow + LAST_BIT) % 32 );
+
+        }
+
       }
 
-      const int field_shift = (shift_size / 32) % NUM_FIELDS;
-      const int bit_overflow = 32 - bit_shift;
-
-      // std::cout << field_shift << " " << bit_shift << std::endl;
-
-      std::rotate(
-        std::rbegin(bit_set),
-        std::rbegin(bit_set)+field_shift,
-        std::rend(bit_set)
-      );
-
-      // if necessary, shift filler bits out of the middle
-      if(LAST_BIT) {
-        const int filler_idx = (NUM_FIELDS - 1 + field_shift) % NUM_FIELDS;
-        for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
-          bit_set[i-1] |= bit_set[i] << LAST_BIT;
-          bit_set[i] >>= (32 - LAST_BIT);
-        }
-      }
-
-      // account for bit_shift
-      if (bit_shift) {
-
-        const uint32_t keystone = bit_set[NUM_FIELDS - 1];
-
-        for (int i = NUM_FIELDS - 1; i > 0; --i) {
-          bit_set[i] <<= bit_shift;
-          bit_set[i] |= (bit_set[i-1] >> bit_overflow);
-        }
-        // Handle final field
-        bit_set[0] <<= bit_shift;
-        bit_set[0] |= keystone >> ( (bit_overflow + LAST_BIT) % 32 );
-
+      // Mask out any bits that have left-shifted away
+      if constexpr (LAST_BIT) {
+        bit_set[NUM_FIELDS - 1] &= (1U << LAST_BIT) - 1U;
       }
 
     }
 
 
     /// Helper for calling ROTATE with negative number
-    void RotateRight(const uint32_t shift_size) {
+    void RotateRight(const uint32_t shift_size_raw) {
+
+      const uint32_t shift_size = shift_size_raw % NUM_BITS;
+      const int bit_shift = shift_size % 32;
 
       // special case: for exactly one uint32_t, try to go low level
       // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
-      if constexpr (NUM_BITS == 32) {
+      if constexpr (NUM_FIELDS == 1) {
         uint32_t & n = bit_set[0];
         uint32_t c = shift_size;
 
@@ -208,29 +217,47 @@ namespace emp {
 
         // assert ( (c<=mask) &&"rotate by type width or more");
         c &= mask;
-        n = (n>>c) | (n<<( (-c)&mask ));
-        return;
+        n = (n>>c) | (n<<( (-c+(NUM_BITS%32))&mask ));
+
+      } else {
+
+        emp_assert(shift_size > 0);
+        const uint32_t field_shift = (shift_size / 32) % NUM_FIELDS;
+        const uint32_t bit_overflow = 32 - bit_shift;
+
+        // account for field_shift
+        std::rotate(
+          std::begin(bit_set),
+          std::begin(bit_set)+field_shift,
+          std::end(bit_set)
+        );
+
+        // if necessary, shift filler bits out of the middle
+        // if(LAST_BIT) {
+        //   const int filler_idx = field_shift;
+        //   for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
+        //     bit_set[i-1] |= bit_set[i] << LAST_BIT;
+        //     bit_set[i] >>= (32 - LAST_BIT);
+        //   }
+        // }
+
+        // account for bit_shift
+        if (bit_shift) {
+
+          const uint32_t keystone = bit_set[0];
+
+          for (size_t i = 0; i < (NUM_FIELDS - 1 - field_shift); ++i) {
+            bit_set[i] >>= bit_shift;
+            bit_set[i] |= (bit_set[i+1] << bit_overflow);
+          }
+          bit_set[NUM_FIELDS - 1] >>= bit_shift;
+          bit_set[NUM_FIELDS - 1] |= keystone << ((bit_overflow + LAST_BIT) % 32);
+        }
       }
 
-      emp_assert(shift_size > 0);
-      const uint32_t field_shift = (shift_size / 32) % NUM_FIELDS;
-      const uint32_t bit_shift = shift_size % 32;
-      const uint32_t bit_overflow = 32 - bit_shift;
-
-      // account for field_shift
-      std::rotate(
-        std::begin(bit_set),
-        std::begin(bit_set)+field_shift,
-        std::end(bit_set)
-      );
-
-      // account for bit_shift
-      if (bit_shift) {
-        for (size_t i = 0; i < (NUM_FIELDS - 1 - field_shift); ++i) {
-          bit_set[i] >>= bit_shift;
-          bit_set[i] |= (bit_set[i+1] << bit_overflow);
-        }
-        bit_set[NUM_FIELDS - 1 - field_shift] >>= bit_shift;
+      // Mask out any bits that have left-shifted away
+      if constexpr (LAST_BIT) {
+        bit_set[NUM_FIELDS - 1] &= (1U << LAST_BIT) - 1U;
       }
 
     }
@@ -620,6 +647,7 @@ namespace emp {
     }
 
     /// Positive shifts go left and negative go right (0 does nothing); return result.
+    // TODO this is backwards
     BitSet SHIFT(const int shift_size) const {
       BitSet out_set(*this);
       if (shift_size > 0) out_set.ShiftRight((uint32_t) shift_size);
