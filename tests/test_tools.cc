@@ -205,6 +205,7 @@ template class emp::BitSet<5>;
 TEST_CASE("Test BitSet", "[tools]")
 {
   emp::BitSet<10> bs10;
+  emp::BitSet<25> bs25;
   emp::BitSet<32> bs32;
   emp::BitSet<50> bs50;
   emp::BitSet<64> bs64;
@@ -237,7 +238,81 @@ TEST_CASE("Test BitSet", "[tools]")
   REQUIRE(bs80.GetUIntAtBit(64) == 130);
   REQUIRE(bs80.GetValueAtBit<5>(64) == 2);
 
+  // tests for ROTATE
+  // ... with one set bit
+  bs10.Clear(); bs10.Set(0);
+  bs25.Clear(); bs25.Set(0);
+  bs32.Clear(); bs32.Set(0);
+  bs50.Clear(); bs50.Set(0);
+  bs64.Clear(); bs64.Set(0);
+  bs80.Clear(); bs80.Set(0);
+
+  for (int rot = -100; rot < 101; ++rot) {
+
+    REQUIRE( bs10.CountOnes() == bs10.ROTATE(rot).CountOnes() );
+    REQUIRE( bs25.CountOnes() == bs25.ROTATE(rot).CountOnes() );
+    REQUIRE( bs32.CountOnes() == bs32.ROTATE(rot).CountOnes() );
+    REQUIRE( bs50.CountOnes() == bs50.ROTATE(rot).CountOnes() );
+    REQUIRE( bs64.CountOnes() == bs64.ROTATE(rot).CountOnes() );
+    REQUIRE( bs80.CountOnes() == bs80.ROTATE(rot).CountOnes() );
+
+    if (rot % 10) REQUIRE( bs10 != bs10.ROTATE(rot) );
+    else REQUIRE( bs10 == bs10.ROTATE(rot) );
+
+    if (rot % 25) REQUIRE( bs25 != bs25.ROTATE(rot) );
+    else REQUIRE( bs25 == bs25.ROTATE(rot) );
+
+    if (rot % 32) REQUIRE( bs32 != bs32.ROTATE(rot) );
+    else REQUIRE( bs32 == bs32.ROTATE(rot) );
+
+    if (rot % 50) REQUIRE( bs50 != bs50.ROTATE(rot) );
+    else REQUIRE( bs50 == bs50.ROTATE(rot) );
+
+    if (rot % 64) REQUIRE( bs64 != bs64.ROTATE(rot) );
+    else REQUIRE( bs64 == bs64.ROTATE(rot) );
+
+    if (rot % 80) REQUIRE( bs80 != bs80.ROTATE(rot) );
+    else REQUIRE( bs80 == bs80.ROTATE(rot) );
+
+  }
+
+  // ... with random set bits
   emp::Random rand(1);
+  // no bs10 because there's a reasonable chance
+  // of breaking the test's assumption of nonsymmetry
+  bs25.Randomize(rand);
+  bs32.Randomize(rand);
+  bs50.Randomize(rand);
+  bs64.Randomize(rand);
+  bs80.Randomize(rand);
+
+  for (int rot = -100; rot < 101; ++rot) {
+
+    REQUIRE( bs25.CountOnes() == bs25.ROTATE(rot).CountOnes() );
+    REQUIRE( bs32.CountOnes() == bs32.ROTATE(rot).CountOnes() );
+    REQUIRE( bs50.CountOnes() == bs50.ROTATE(rot).CountOnes() );
+    REQUIRE( bs64.CountOnes() == bs64.ROTATE(rot).CountOnes() );
+    REQUIRE( bs80.CountOnes() == bs80.ROTATE(rot).CountOnes() );
+
+    if (rot % 25) REQUIRE( bs25 != bs25.ROTATE(rot) );
+    else REQUIRE( bs25 == bs25.ROTATE(rot) );
+
+    if (rot % 32) REQUIRE( bs32 != bs32.ROTATE(rot) );
+    else REQUIRE( bs32 == bs32.ROTATE(rot) );
+
+    if (rot % 50) REQUIRE( bs50 != bs50.ROTATE(rot) );
+    else REQUIRE( bs50 == bs50.ROTATE(rot) );
+
+    if (rot % 64) REQUIRE( bs64 != bs64.ROTATE(rot) );
+    else REQUIRE( bs64 == bs64.ROTATE(rot) );
+
+    if (rot % 80) REQUIRE( bs80 != bs80.ROTATE(rot) );
+    else REQUIRE( bs80 == bs80.ROTATE(rot) );
+
+  }
+
+
+  // tests for ROTATE_SELF
 
   {
     emp::BitSet<1> bs(rand);
