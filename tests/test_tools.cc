@@ -236,6 +236,191 @@ TEST_CASE("Test BitSet", "[tools]")
   bs80[65] = 1;
   REQUIRE(bs80.GetUIntAtBit(64) == 130);
   REQUIRE(bs80.GetValueAtBit<5>(64) == 2);
+
+  emp::Random rand(1);
+
+  {
+    emp::BitSet<1> bs(rand);
+    const emp::BitSet<1> bs_orig(bs);
+    const size_t num_ones = bs.CountOnes();
+
+    for (int i = -1 - 1; i <= 1 + 1; ++i) {
+      for (size_t rep = 0; rep < 1; ++ rep) {
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == num_ones);
+      }
+      REQUIRE(bs == bs_orig);
+    }
+  }
+
+  {
+    emp::BitSet<2> bs(rand);
+    const emp::BitSet<2> bs_orig(bs);
+    const size_t num_ones = bs.CountOnes();
+
+    for (int i = -2 - 1; i <= 2 + 1; ++i) {
+      for (size_t rep = 0; rep < 2; ++ rep) {
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == num_ones);
+      }
+      REQUIRE(bs == bs_orig);
+    }
+  }
+
+  {
+    emp::BitSet<3> bs(rand);
+    const emp::BitSet<3> bs_orig(bs);
+    const size_t num_ones = bs.CountOnes();
+
+    for (int i = -3 - 1; i <= 3 + 1; ++i) {
+      for (size_t rep = 0; rep < 3; ++ rep) {
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == num_ones);
+      }
+      REQUIRE(bs == bs_orig);
+    }
+  }
+
+  {
+    emp::BitSet<10> bs(rand);
+    const emp::BitSet<10> bs_orig(bs);
+    const size_t num_ones = bs.CountOnes();
+
+    for (int i = -10 - 1; i <= 10 + 1; ++i) {
+      for (size_t rep = 0; rep < 10; ++ rep) {
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == num_ones);
+      }
+      REQUIRE(bs == bs_orig);
+    }
+  }
+
+  {
+    emp::BitSet<32> bs(rand);
+    const emp::BitSet<32> bs_orig(bs);
+    const size_t num_ones = bs.CountOnes();
+
+    for (int i = -32 - 1; i <= 32 + 1; ++i) {
+      for (size_t rep = 0; rep < 32; ++ rep) {
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == num_ones);
+      }
+      REQUIRE(bs == bs_orig);
+    }
+  }
+
+  {
+    emp::BitSet<33> bs(rand);
+    const emp::BitSet<33> bs_orig(bs);
+    const size_t num_ones = bs.CountOnes();
+
+    for (int i = -33 - 1; i <= 33 + 1; ++i) {
+      for (size_t rep = 0; rep < 33; ++ rep) {
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == num_ones);
+      }
+      REQUIRE(bs == bs_orig);
+    }
+  }
+
+  {
+    emp::BitSet<50> bs(rand);
+    const emp::BitSet<50> bs_orig(bs);
+    const size_t num_ones = bs.CountOnes();
+
+    for (int i = -50 - 1; i <= 50 + 1; ++i) {
+      for (size_t rep = 0; rep < 50; ++ rep) {
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == num_ones);
+      }
+      REQUIRE(bs == bs_orig);
+    }
+  }
+
+  {
+    emp::BitSet<63> bs(rand);
+    const emp::BitSet<63> bs_orig(bs);
+    const size_t num_ones = bs.CountOnes();
+
+    for (int i = -63 - 1; i <= 63 + 1; ++i) {
+      for (size_t rep = 0; rep < 63; ++ rep) {
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == num_ones);
+      }
+      REQUIRE(bs == bs_orig);
+    }
+  }
+
+  {
+    emp::BitSet<64> bs(rand);
+    const emp::BitSet<64> bs_orig(bs);
+    const size_t num_ones = bs.CountOnes();
+
+    for (int i = -64 - 1; i <= 64 + 1; ++i) {
+      for (size_t rep = 0; rep < 64; ++ rep) {
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == num_ones);
+      }
+      REQUIRE(bs == bs_orig);
+    }
+  }
+
+  {
+    emp::BitSet<70> bs(rand);
+    const emp::BitSet<70> bs_orig(bs);
+    const size_t num_ones = bs.CountOnes();
+
+    for (int i = -70 - 1; i <= 70 + 1; ++i) {
+      for (size_t rep = 0; rep < 70; ++ rep) {
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == num_ones);
+      }
+      REQUIRE(bs == bs_orig);
+    }
+  }
+
+  {
+    emp::BitSet<96> bs(rand);
+    const emp::BitSet<96> bs_orig(bs);
+    const size_t num_ones = bs.CountOnes();
+
+    for (int i = -96 - 1; i <= 96 + 1; ++i) {
+      for (size_t rep = 0; rep < 96; ++ rep) {
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == num_ones);
+      }
+      REQUIRE(bs == bs_orig);
+    }
+  }
+
+  {
+    emp::BitSet<100> bs(rand);
+    const emp::BitSet<100> bs_orig(bs);
+    const size_t num_ones = bs.CountOnes();
+
+    for (int i = -100 - 1; i <= 100 + 1; ++i) {
+      for (size_t rep = 0; rep < 100; ++ rep) {
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == num_ones);
+      }
+      REQUIRE(bs == bs_orig);
+    }
+  }
+
+  {
+    emp::BitSet<160> bs(rand);
+    const emp::BitSet<160> bs_orig(bs);
+    const size_t num_ones = bs.CountOnes();
+
+    for (int i = -160 - 1; i <= 160 + 1; ++i) {
+      for (size_t rep = 0; rep < 160; ++ rep) {
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == num_ones);
+      }
+      REQUIRE(bs == bs_orig);
+    }
+  }
+
 }
 
 
