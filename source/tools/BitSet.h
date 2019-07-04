@@ -166,7 +166,7 @@ namespace emp {
         );
 
         // if necessary, shift filler bits out of the middle
-        if constexpr (LAST_BIT) {
+        if constexpr ((bool)LAST_BIT) {
           const int filler_idx = (NUM_FIELDS - 1 + field_shift) % NUM_FIELDS;
           for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
             bit_set[i-1] |= bit_set[i] << LAST_BIT;
@@ -197,7 +197,7 @@ namespace emp {
       }
 
       // Mask out any bits that have left-shifted away
-      if constexpr (LAST_BIT) {
+      if constexpr ((bool)LAST_BIT) {
         bit_set[NUM_FIELDS - 1] &= (1U << LAST_BIT) - 1U;
       }
 
@@ -235,7 +235,7 @@ namespace emp {
         );
 
         // if necessary, shift filler bits out of the middle
-        if constexpr (LAST_BIT) {
+        if constexpr ((bool)LAST_BIT) {
           const int filler_idx = NUM_FIELDS - 1 - field_shift;
           for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
             bit_set[i-1] |= bit_set[i] << LAST_BIT;
@@ -252,7 +252,7 @@ namespace emp {
             bit_set[0]
           );
 
-          if constexpr (LAST_BIT) {
+          if constexpr ((bool)LAST_BIT) {
             bit_set[NUM_FIELDS-1] |= bit_set[0] << LAST_BIT;
           }
 
@@ -266,7 +266,7 @@ namespace emp {
       }
 
       // Mask out any bits that have left-shifted away
-      if constexpr (LAST_BIT) {
+      if constexpr ((bool)LAST_BIT) {
         bit_set[NUM_FIELDS - 1] &= (1U << LAST_BIT) - 1U;
       }
 
