@@ -224,7 +224,6 @@ namespace emp {
 
       } else {
 
-        emp_assert(shift_size > 0);
         const uint32_t field_shift = (shift_size / 32) % NUM_FIELDS;
         const uint32_t bit_overflow = 32 - bit_shift;
 
