@@ -248,14 +248,15 @@ namespace emp {
         // account for bit_shift
         if (bit_shift) {
 
-          const uint32_t keystone = bit_set[0];
+          const uint32_t keystone = bit_set[0] >> (32 - LAST_BIT);
+          bit_set[NUM_FIELDS-1] |= bit_set[0] << LAST_BIT;
 
           for (size_t i = 0; i < (NUM_FIELDS - 1 - field_shift); ++i) {
             bit_set[i] >>= bit_shift;
             bit_set[i] |= (bit_set[i+1] << bit_overflow);
           }
           bit_set[NUM_FIELDS - 1] >>= bit_shift;
-          bit_set[NUM_FIELDS - 1] |= keystone << ((bit_overflow + LAST_BIT) % 32);
+          bit_set[NUM_FIELDS - 1] |= keystone << bit_overflow;
         }
       }
 
