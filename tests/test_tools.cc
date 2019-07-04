@@ -823,7 +823,7 @@ TEST_CASE("Test IndexMap", "[tools]")
   imap[5] = 2.0;
   imap[6] = 0.0;
   imap[7] = 8.0;
-  
+
   REQUIRE(imap.GetSize() == 8);
   REQUIRE(imap.GetWeight() == 16.0);
   REQUIRE(imap.GetWeight(2) == 1.0);
