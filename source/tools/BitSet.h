@@ -772,7 +772,7 @@ namespace emp {
 
       // mask out filler bits
       if constexpr ((bool)LAST_BIT) {
-        bit_set[NUM_FIELDS - 1] &= (1U << LAST_BIT) - 1U;
+        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       }
 
       return *this;
@@ -824,7 +824,7 @@ namespace emp {
 
       // mask out filler bits
       if constexpr ((bool)LAST_BIT) {
-        bit_set[NUM_FIELDS - 1] &= (1U << LAST_BIT) - 1U;
+        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       }
 
       return *this;
