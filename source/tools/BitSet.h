@@ -85,6 +85,10 @@ namespace emp {
 
     /// Helper: call SHIFT with positive number instead
     void ShiftLeft(const uint32_t shift_size) {
+      if (shift_size > NUM_BITS) {
+        Clear();
+        return;
+      }
       const int field_shift = shift_size / 32;
       const int bit_shift = shift_size % 32;
       const int bit_overflow = 32 - bit_shift;
@@ -114,7 +118,11 @@ namespace emp {
 
     /// Helper for calling SHIFT with negative number
     void ShiftRight(const uint32_t shift_size) {
-      emp_assert(shift_size > 0);
+      if (!shift_size) return;
+      if (shift_size > NUM_BITS) {
+        Clear();
+        return;
+      }
       const uint32_t field_shift = shift_size / 32;
       const uint32_t bit_shift = shift_size % 32;
       const uint32_t bit_overflow = 32 - bit_shift;
