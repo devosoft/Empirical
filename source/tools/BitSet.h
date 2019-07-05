@@ -145,7 +145,7 @@ namespace emp {
       }
     }
 
-    /// Helper: call ROTATE with positive number instead
+    /// Helper: call ROTATE with negative number instead
     void RotateLeft(const uint32_t shift_size_raw) {
       const uint32_t shift_size = shift_size_raw % NUM_BITS;
 
@@ -225,7 +225,7 @@ namespace emp {
     }
 
 
-    /// Helper for calling ROTATE with negative number
+    /// Helper for calling ROTATE with positive number
     void RotateRight(const uint32_t shift_size_raw) {
 
       const uint32_t shift_size = shift_size_raw % NUM_BITS;
