@@ -140,7 +140,6 @@ namespace emp {
     /// Helper: call ROTATE with positive number instead
     void RotateLeft(const uint32_t shift_size_raw) {
       const uint32_t shift_size = shift_size_raw % NUM_BITS;
-      const int bit_shift = shift_size % 32;
 
       // special case: for exactly one uint32_t, try to go low level
       // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
@@ -156,7 +155,20 @@ namespace emp {
 
       } else {
 
-        const int field_shift = (shift_size / 32) % NUM_FIELDS;
+        // note that we already modded shift_size by NUM_BITS
+        // so there's no need to mod by FIELD_SIZE here
+        const int field_shift = LAST_BIT ? (
+          (shift_size + 32 - LAST_BIT) / 32
+        ) : (
+          shift_size / 32
+        );
+        // if we field shift, we need to shift bits by (32 - LAST_BIT) more
+        // to account for the filler that gets pulled out of the middle
+        const int bit_shift = LAST_BIT && field_shift ? (
+          (shift_size + 32 - LAST_BIT) % 32
+        ) : (
+          shift_size % 32
+        );
         const int bit_overflow = 32 - bit_shift;
 
         std::rotate(
