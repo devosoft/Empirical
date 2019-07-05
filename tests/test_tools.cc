@@ -246,6 +246,56 @@ struct MultiTester {
       }
     }
 
+    for (int j = 0; j < width; ++j) {
+      const int i = -1;
+      bs.Clear(); bs.Set(j);
+      bs.L_ROTATE_SELF();
+      REQUIRE(bs.CountOnes() == 1);
+      REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+      bs.SetAll(); bs.Set(j, false);
+      bs.L_ROTATE_SELF();
+      REQUIRE(bs.CountOnes() == width-1);
+      REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+
+      bs.Randomize(rand); bs.Set(j);
+      const size_t c1 = bs.CountOnes();
+      bs.L_ROTATE_SELF();
+      REQUIRE(bs.CountOnes() == c1);
+      REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+      bs.Randomize(rand); bs.Set(j, false);
+      const size_t c2 = bs.CountOnes();
+      bs.L_ROTATE_SELF();
+      REQUIRE(bs.CountOnes() == c2);
+      REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+    }
+
+    for (int j = 0; j < width; ++j) {
+      const int i = 1;
+      bs.Clear(); bs.Set(j);
+      bs.R_ROTATE_SELF();
+      REQUIRE(bs.CountOnes() == 1);
+      REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+      bs.SetAll(); bs.Set(j, false);
+      bs.R_ROTATE_SELF();
+      REQUIRE(bs.CountOnes() == width-1);
+      REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+
+      bs.Randomize(rand); bs.Set(j);
+      const size_t c1 = bs.CountOnes();
+      bs.R_ROTATE_SELF();
+      REQUIRE(bs.CountOnes() == c1);
+      REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+      bs.Randomize(rand); bs.Set(j, false);
+      const size_t c2 = bs.CountOnes();
+      bs.R_ROTATE_SELF();
+      REQUIRE(bs.CountOnes() == c2);
+      REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+    }
+
     // recurse
     MultiTester<I+1,N>::test();
   }
