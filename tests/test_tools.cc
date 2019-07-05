@@ -550,7 +550,6 @@ TEST_CASE("Test BitSet", "[tools]")
     for (int i = -65 - 1; i <= 65 + 1; ++i) {
       bs.Clear(); bs.Set(0);
       bs.ROTATE_SELF(i);
-      std::cout << i << std::endl;
       REQUIRE(bs.CountOnes() == 1);
       REQUIRE(bs.Get(emp::Mod(-i,65)));
     }
