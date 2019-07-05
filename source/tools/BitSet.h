@@ -409,7 +409,7 @@ namespace emp {
       return (bit_set[field_id] & (((field_t)1U) << pos_id)) != 0;
     }
 
-    /// Set the bit as a specified index.
+    /// Set the bit at a specified index.
     void Set(size_t index, bool value=true) {
       emp_assert(index < NUM_BITS);
       const size_t field_id = FieldID(index);
