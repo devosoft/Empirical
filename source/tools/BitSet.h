@@ -241,7 +241,7 @@ namespace emp {
 
         // assert ( (c<=mask) &&"rotate by type width or more");
         c &= mask;
-        n = (n>>c) | (n<<( (-c+(NUM_BITS%32))&mask ));
+        n = (n>>c) | (n<<( (NUM_BITS-c)&mask ));
 
       } else {
 
