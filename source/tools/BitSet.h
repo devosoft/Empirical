@@ -171,6 +171,7 @@ namespace emp {
         );
         const int bit_overflow = 32 - bit_shift;
 
+        // if rotating more than field capacity, we need to rotate fields
         std::rotate(
           std::rbegin(bit_set),
           std::rbegin(bit_set)+field_shift,
@@ -239,7 +240,7 @@ namespace emp {
         const uint32_t field_shift = (shift_size / 32) % NUM_FIELDS;
         const uint32_t bit_overflow = 32 - bit_shift;
 
-        // account for field_shift
+        // if rotating more than field capacity, we need to rotate fields
         std::rotate(
           std::begin(bit_set),
           std::begin(bit_set)+field_shift,
