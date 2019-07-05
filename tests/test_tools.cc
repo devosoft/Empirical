@@ -315,11 +315,13 @@ TEST_CASE("Test BitSet", "[tools]")
   // tests for ROTATE_SELF
 
   {
-    emp::BitSet<1> bs(rand);
-    const emp::BitSet<1> bs_orig(bs);
+    const int width = 1;
+
+    emp::BitSet<width> bs(rand);
+    const emp::BitSet<width> bs_orig(bs);
     const size_t num_ones = bs.CountOnes();
 
-    for (int i = -1 - 1; i <= 1 + 1; ++i) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
       for (size_t rep = 0; rep < 1; ++ rep) {
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == num_ones);
@@ -327,423 +329,451 @@ TEST_CASE("Test BitSet", "[tools]")
       REQUIRE(bs == bs_orig);
     }
 
-    for (int i = -1 - 1; i <= 1 + 1; ++i) {
-      for (int j = 0; j < 1; ++j) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (int j = 0; j < width; ++j) {
         bs.Clear(); bs.Set(j);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == 1);
-        REQUIRE(bs.Get(emp::Mod(j-i,1)));
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
 
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
-        REQUIRE(bs.CountOnes() == 1-1);
-        REQUIRE(!bs.Get(emp::Mod(j-i,1)));
+        REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
   }
 
   {
-    emp::BitSet<2> bs(rand);
-    const emp::BitSet<2> bs_orig(bs);
+    const int width = 2;
+
+    emp::BitSet<width> bs(rand);
+    const emp::BitSet<width> bs_orig(bs);
     const size_t num_ones = bs.CountOnes();
 
-    for (int i = -2 - 1; i <= 2 + 1; ++i) {
-      for (size_t rep = 0; rep < 2; ++ rep) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (size_t rep = 0; rep < width; ++ rep) {
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == num_ones);
       }
       REQUIRE(bs == bs_orig);
     }
 
-    for (int i = -2 - 1; i <= 2 + 1; ++i) {
-      for (int j = 0; j < 2; ++j) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (int j = 0; j < width; ++j) {
         bs.Clear(); bs.Set(j);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == 1);
-        REQUIRE(bs.Get(emp::Mod(j-i,2)));
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
 
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
-        REQUIRE(bs.CountOnes() == 2-1);
-        REQUIRE(!bs.Get(emp::Mod(j-i,2)));
+        REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
   }
 
   {
-    emp::BitSet<3> bs(rand);
-    const emp::BitSet<3> bs_orig(bs);
+    const int width = 3;
+
+    emp::BitSet<width> bs(rand);
+    const emp::BitSet<width> bs_orig(bs);
     const size_t num_ones = bs.CountOnes();
 
-    for (int i = -3 - 1; i <= 3 + 1; ++i) {
-      for (size_t rep = 0; rep < 3; ++ rep) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (size_t rep = 0; rep < width; ++ rep) {
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == num_ones);
       }
       REQUIRE(bs == bs_orig);
     }
 
-    for (int i = -3 - 1; i <= 3 + 1; ++i) {
-      for (int j = 0; j < 3; ++j) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (int j = 0; j < width; ++j) {
         bs.Clear(); bs.Set(j);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == 1);
-        REQUIRE(bs.Get(emp::Mod(j-i,3)));
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
 
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
-        REQUIRE(bs.CountOnes() == 3-1);
-        REQUIRE(!bs.Get(emp::Mod(j-i,3)));
+        REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
   }
 
   {
-    emp::BitSet<10> bs(rand);
-    const emp::BitSet<10> bs_orig(bs);
+    const int width = 10;
+
+    emp::BitSet<width> bs(rand);
+    const emp::BitSet<width> bs_orig(bs);
     const size_t num_ones = bs.CountOnes();
 
-    for (int i = -10 - 1; i <= 10 + 1; ++i) {
-      for (size_t rep = 0; rep < 10; ++ rep) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (size_t rep = 0; rep < width; ++ rep) {
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == num_ones);
       }
       REQUIRE(bs == bs_orig);
     }
 
-    for (int i = -10 - 1; i <= 10 + 1; ++i) {
-      for (int j = 0; j < 10; ++j) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (int j = 0; j < width; ++j) {
         bs.Clear(); bs.Set(j);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == 1);
-        REQUIRE(bs.Get(emp::Mod(j-i,10)));
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
 
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
-        REQUIRE(bs.CountOnes() == 10-1);
-        REQUIRE(!bs.Get(emp::Mod(j-i,10)));
+        REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
   }
 
   {
-    emp::BitSet<31> bs(rand);
-    const emp::BitSet<31> bs_orig(bs);
+    const int width = 31;
+
+    emp::BitSet<width> bs(rand);
+    const emp::BitSet<width> bs_orig(bs);
     const size_t num_ones = bs.CountOnes();
 
-    for (int i = -31 - 1; i <= 31 + 1; ++i) {
-      for (size_t rep = 0; rep < 31; ++ rep) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (size_t rep = 0; rep < width; ++ rep) {
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == num_ones);
       }
       REQUIRE(bs == bs_orig);
     }
 
-    for (int i = -31 - 1; i <= 31 + 1; ++i) {
-      for (int j = 0; j < 31; ++j) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (int j = 0; j < width; ++j) {
         bs.Clear(); bs.Set(j);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == 1);
-        REQUIRE(bs.Get(emp::Mod(j-i,31)));
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
 
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
-        REQUIRE(bs.CountOnes() == 31-1);
-        REQUIRE(!bs.Get(emp::Mod(j-i,31)));
+        REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
   }
 
   {
-    emp::BitSet<32> bs(rand);
-    const emp::BitSet<32> bs_orig(bs);
+    const int width = 32;
+
+    emp::BitSet<width> bs(rand);
+    const emp::BitSet<width> bs_orig(bs);
     const size_t num_ones = bs.CountOnes();
 
-    for (int i = -32 - 1; i <= 32 + 1; ++i) {
-      for (size_t rep = 0; rep < 32; ++ rep) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (size_t rep = 0; rep < width; ++ rep) {
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == num_ones);
       }
       REQUIRE(bs == bs_orig);
     }
 
-    for (int i = -32 - 1; i <= 32 + 1; ++i) {
-      for (int j = 0; j < 32; ++j) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (int j = 0; j < width; ++j) {
         bs.Clear(); bs.Set(j);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == 1);
-        REQUIRE(bs.Get(emp::Mod(j-i,32)));
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
 
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
-        REQUIRE(bs.CountOnes() == 32-1);
-        REQUIRE(!bs.Get(emp::Mod(j-i,32)));
+        REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
   }
 
   {
-    emp::BitSet<33> bs(rand);
-    const emp::BitSet<33> bs_orig(bs);
+    const int width = 33;
+
+    emp::BitSet<width> bs(rand);
+    const emp::BitSet<width> bs_orig(bs);
     const size_t num_ones = bs.CountOnes();
 
-    for (int i = -33 - 1; i <= 33 + 1; ++i) {
-      for (size_t rep = 0; rep < 33; ++ rep) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (size_t rep = 0; rep < width; ++ rep) {
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == num_ones);
       }
       REQUIRE(bs == bs_orig);
     }
 
-    for (int i = -33 - 1; i <= 33 + 1; ++i) {
-      for (int j = 0; j < 33; ++j) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (int j = 0; j < width; ++j) {
         bs.Clear(); bs.Set(j);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == 1);
-        REQUIRE(bs.Get(emp::Mod(j-i,33)));
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
 
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
-        REQUIRE(bs.CountOnes() == 33-1);
-        REQUIRE(!bs.Get(emp::Mod(j-i,33)));
+        REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
   }
 
   {
-    emp::BitSet<50> bs(rand);
-    const emp::BitSet<50> bs_orig(bs);
+    const int width = 50;
+
+    emp::BitSet<width> bs(rand);
+    const emp::BitSet<width> bs_orig(bs);
     const size_t num_ones = bs.CountOnes();
 
-    for (int i = -50 - 1; i <= 50 + 1; ++i) {
-      for (size_t rep = 0; rep < 50; ++ rep) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (size_t rep = 0; rep < width; ++ rep) {
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == num_ones);
       }
       REQUIRE(bs == bs_orig);
     }
 
-    for (int i = -50 - 1; i <= 50 + 1; ++i) {
-      for (int j = 0; j < 50; ++j) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (int j = 0; j < width; ++j) {
         bs.Clear(); bs.Set(j);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == 1);
-        REQUIRE(bs.Get(emp::Mod(j-i,50)));
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
 
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
-        REQUIRE(bs.CountOnes() == 50-1);
-        REQUIRE(!bs.Get(emp::Mod(j-i,50)));
+        REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
   }
 
   {
-    emp::BitSet<63> bs(rand);
-    const emp::BitSet<63> bs_orig(bs);
+    const int width = 63;
+
+    emp::BitSet<width> bs(rand);
+    const emp::BitSet<width> bs_orig(bs);
     const size_t num_ones = bs.CountOnes();
 
-    for (int i = -63 - 1; i <= 63 + 1; ++i) {
-      for (size_t rep = 0; rep < 63; ++ rep) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (size_t rep = 0; rep < width; ++ rep) {
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == num_ones);
       }
       REQUIRE(bs == bs_orig);
     }
 
-    for (int i = -63 - 1; i <= 63 + 1; ++i) {
-      for (int j = 0; j < 63; ++j) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (int j = 0; j < width; ++j) {
         bs.Clear(); bs.Set(j);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == 1);
-        REQUIRE(bs.Get(emp::Mod(j-i,63)));
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
 
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
-        REQUIRE(bs.CountOnes() == 63-1);
-        REQUIRE(!bs.Get(emp::Mod(j-i,63)));
+        REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
   }
 
   {
-    emp::BitSet<64> bs(rand);
-    const emp::BitSet<64> bs_orig(bs);
+    const int width = 64;
+
+    emp::BitSet<width> bs(rand);
+    const emp::BitSet<width> bs_orig(bs);
     const size_t num_ones = bs.CountOnes();
 
-    for (int i = -64 - 1; i <= 64 + 1; ++i) {
-      for (size_t rep = 0; rep < 64; ++ rep) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (size_t rep = 0; rep < width; ++ rep) {
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == num_ones);
       }
       REQUIRE(bs == bs_orig);
     }
 
-    for (int i = -64 - 1; i <= 64 + 1; ++i) {
-      for (int j = 0; j < 64; ++j) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (int j = 0; j < width; ++j) {
         bs.Clear(); bs.Set(j);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == 1);
-        REQUIRE(bs.Get(emp::Mod(j-i,64)));
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
 
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
-        REQUIRE(bs.CountOnes() == 64-1);
-        REQUIRE(!bs.Get(emp::Mod(j-i,64)));
+        REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
   }
 
   {
-    emp::BitSet<65> bs(rand);
-    const emp::BitSet<65> bs_orig(bs);
+    const int width = 65;
+
+    emp::BitSet<width> bs(rand);
+    const emp::BitSet<width> bs_orig(bs);
     const size_t num_ones = bs.CountOnes();
 
-    for (int i = -65 - 1; i <= 65 + 1; ++i) {
-      for (size_t rep = 0; rep < 65; ++ rep) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (size_t rep = 0; rep < width; ++ rep) {
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == num_ones);
       }
       REQUIRE(bs == bs_orig);
     }
 
-    for (int i = -65 - 1; i <= 65 + 1; ++i) {
-      for (int j = 0; j < 65; ++j) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (int j = 0; j < width; ++j) {
         bs.Clear(); bs.Set(j);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == 1);
-        REQUIRE(bs.Get(emp::Mod(j-i,65)));
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
 
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
-        REQUIRE(bs.CountOnes() == 65-1);
-        REQUIRE(!bs.Get(emp::Mod(j-i,65)));
+        REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
   }
 
   {
-    emp::BitSet<70> bs(rand);
-    const emp::BitSet<70> bs_orig(bs);
+    const int width = 70;
+
+    emp::BitSet<width> bs(rand);
+    const emp::BitSet<width> bs_orig(bs);
     const size_t num_ones = bs.CountOnes();
 
-    for (int i = -70 - 1; i <= 70 + 1; ++i) {
-      for (size_t rep = 0; rep < 70; ++ rep) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (size_t rep = 0; rep < width; ++ rep) {
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == num_ones);
       }
       REQUIRE(bs == bs_orig);
     }
 
-    for (int i = -70 - 1; i <= 70 + 1; ++i) {
-      for (int j = 0; j < 70; ++j) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (int j = 0; j < width; ++j) {
         bs.Clear(); bs.Set(j);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == 1);
-        REQUIRE(bs.Get(emp::Mod(j-i,70)));
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
 
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
-        REQUIRE(bs.CountOnes() == 70-1);
-        REQUIRE(!bs.Get(emp::Mod(j-i,70)));
+        REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
   }
 
   {
-    emp::BitSet<96> bs(rand);
-    const emp::BitSet<96> bs_orig(bs);
+    const int width = 96;
+
+    emp::BitSet<width> bs(rand);
+    const emp::BitSet<width> bs_orig(bs);
     const size_t num_ones = bs.CountOnes();
 
-    for (int i = -96 - 1; i <= 96 + 1; ++i) {
-      for (size_t rep = 0; rep < 96; ++ rep) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (size_t rep = 0; rep < width; ++ rep) {
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == num_ones);
       }
       REQUIRE(bs == bs_orig);
     }
 
-    for (int i = -96 - 1; i <= 96 + 1; ++i) {
-      for (int j = 0; j < 96; ++j) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (int j = 0; j < width; ++j) {
         bs.Clear(); bs.Set(j);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == 1);
-        REQUIRE(bs.Get(emp::Mod(j-i,96)));
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
 
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
-        REQUIRE(bs.CountOnes() == 96-1);
-        REQUIRE(!bs.Get(emp::Mod(j-i,96)));
+        REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
   }
 
   {
-    emp::BitSet<100> bs(rand);
-    const emp::BitSet<100> bs_orig(bs);
+    const int width = 100;
+
+    emp::BitSet<width> bs(rand);
+    const emp::BitSet<width> bs_orig(bs);
     const size_t num_ones = bs.CountOnes();
 
-    for (int i = -100 - 1; i <= 100 + 1; ++i) {
-      for (size_t rep = 0; rep < 100; ++ rep) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (size_t rep = 0; rep < width; ++ rep) {
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == num_ones);
       }
       REQUIRE(bs == bs_orig);
     }
 
-    for (int i = -100 - 1; i <= 100 + 1; ++i) {
-      for (int j = 0; j < 100; ++j) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (int j = 0; j < width; ++j) {
         bs.Clear(); bs.Set(j);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == 1);
-        REQUIRE(bs.Get(emp::Mod(j-i,100)));
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
 
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
-        REQUIRE(bs.CountOnes() == 100-1);
-        REQUIRE(!bs.Get(emp::Mod(j-i,100)));
+        REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
   }
 
   {
-    emp::BitSet<160> bs(rand);
-    const emp::BitSet<160> bs_orig(bs);
+    const int width = 160;
+
+    emp::BitSet<width> bs(rand);
+    const emp::BitSet<width> bs_orig(bs);
     const size_t num_ones = bs.CountOnes();
 
-    for (int i = -160 - 1; i <= 160 + 1; ++i) {
-      for (size_t rep = 0; rep < 160; ++ rep) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (size_t rep = 0; rep < width; ++ rep) {
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == num_ones);
       }
       REQUIRE(bs == bs_orig);
     }
 
-    for (int i = -160 - 1; i <= 160 + 1; ++i) {
-      for (int j = 0; j < 160; ++j) {
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (int j = 0; j < width; ++j) {
         bs.Clear(); bs.Set(j);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == 1);
-        REQUIRE(bs.Get(emp::Mod(j-i,160)));
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
 
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
-        REQUIRE(bs.CountOnes() == 160-1);
-        REQUIRE(!bs.Get(emp::Mod(j-i,160)));
+        REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
