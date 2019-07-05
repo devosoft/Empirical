@@ -711,6 +711,108 @@ namespace emp {
       return *this;
     }
 
+    /// Specialized implementation to rotate left by one bit
+    BitSet & L_ROTATE_SELF() {
+
+      if constexpr (NUM_BITS == 1) return *this;
+
+      const int bit_shift = 1;
+
+      // special case: for exactly one uint32_t, try to go low level
+      // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
+      if constexpr (NUM_FIELDS == 1) {
+        uint32_t & n = bit_set[0];
+        uint32_t c = bit_shift;
+
+        // assumes width is a power of 2.
+        const unsigned int mask = (CHAR_BIT*sizeof(n) - 1);
+
+        c &= mask;
+        n = (n<<c) | (n>>( (-(c+32-NUM_BITS))&mask ));
+
+      } else {
+
+        const int bit_overflow = 32 - bit_shift;
+
+
+        const uint32_t keystone = LAST_BIT ? (
+          (bit_set[NUM_FIELDS - 1] << (32 - LAST_BIT))
+          | (bit_set[NUM_FIELDS - 2] >> LAST_BIT)
+        ) : (
+          bit_set[NUM_FIELDS - 1]
+        );
+
+        for (int i = NUM_FIELDS - 1; i > 0; --i) {
+          bit_set[i] <<= bit_shift;
+          bit_set[i] |= (bit_set[i-1] >> bit_overflow);
+        }
+        // Handle final field
+        bit_set[0] <<= bit_shift;
+        bit_set[0] |= keystone >> bit_overflow;
+
+      }
+
+      // mask out filler bits
+      if constexpr ((bool)LAST_BIT) {
+        bit_set[NUM_FIELDS - 1] &= (1U << LAST_BIT) - 1U;
+      }
+
+      return *this;
+    }
+
+
+    /// Specialized implementation to rotate right by one bit
+    BitSet & R_ROTATE_SELF() {
+
+      if constexpr (NUM_BITS == 1) return *this;
+
+      const int bit_shift = 1;
+
+      // special case: for exactly one uint32_t, try to go low level
+      // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
+      if constexpr (NUM_FIELDS == 1) {
+        uint32_t & n = bit_set[0];
+        uint32_t c = bit_shift;
+
+        //bitset_utils mask tools
+
+        const unsigned int mask = (CHAR_BIT*sizeof(n) - 1);
+
+        // assert ( (c<=mask) &&"rotate by type width or more");
+        c &= mask;
+        n = (n>>c) | (n<<( (NUM_BITS-c)&mask ));
+
+      } else {
+
+        const uint32_t bit_overflow = 32 - bit_shift;
+
+        const uint32_t keystone = LAST_BIT ? (
+          bit_set[0] >> (32 - LAST_BIT)
+        ) : (
+          bit_set[0]
+        );
+
+        if constexpr ((bool)LAST_BIT) {
+          bit_set[NUM_FIELDS-1] |= bit_set[0] << LAST_BIT;
+        }
+
+        for (size_t i = 0; i < NUM_FIELDS - 1; ++i) {
+          bit_set[i] >>= bit_shift;
+          bit_set[i] |= (bit_set[i+1] << bit_overflow);
+        }
+        bit_set[NUM_FIELDS - 1] >>= bit_shift;
+        bit_set[NUM_FIELDS - 1] |= keystone << bit_overflow;
+      }
+
+      // mask out filler bits
+      if constexpr ((bool)LAST_BIT) {
+        bit_set[NUM_FIELDS - 1] &= (1U << LAST_BIT) - 1U;
+      }
+
+      return *this;
+
+    }
+
     /// Operator bitwise NOT...
     BitSet operator~() const { return NOT(); }
 
