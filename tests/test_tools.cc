@@ -340,6 +340,18 @@ TEST_CASE("Test BitSet", "[tools]")
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == width-1);
         REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j);
+        const size_t c1 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c1);
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j, false);
+        const size_t c2 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c2);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
@@ -370,6 +382,18 @@ TEST_CASE("Test BitSet", "[tools]")
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j);
+        const size_t c1 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c1);
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j, false);
+        const size_t c2 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c2);
         REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
@@ -402,6 +426,18 @@ TEST_CASE("Test BitSet", "[tools]")
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == width-1);
         REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j);
+        const size_t c1 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c1);
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j, false);
+        const size_t c2 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c2);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
@@ -432,6 +468,18 @@ TEST_CASE("Test BitSet", "[tools]")
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j);
+        const size_t c1 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c1);
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j, false);
+        const size_t c2 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c2);
         REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
@@ -464,6 +512,18 @@ TEST_CASE("Test BitSet", "[tools]")
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == width-1);
         REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j);
+        const size_t c1 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c1);
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j, false);
+        const size_t c2 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c2);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
@@ -494,6 +554,18 @@ TEST_CASE("Test BitSet", "[tools]")
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j);
+        const size_t c1 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c1);
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j, false);
+        const size_t c2 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c2);
         REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
@@ -526,6 +598,18 @@ TEST_CASE("Test BitSet", "[tools]")
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == width-1);
         REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j);
+        const size_t c1 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c1);
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j, false);
+        const size_t c2 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c2);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
@@ -556,6 +640,18 @@ TEST_CASE("Test BitSet", "[tools]")
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j);
+        const size_t c1 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c1);
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j, false);
+        const size_t c2 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c2);
         REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
@@ -588,6 +684,18 @@ TEST_CASE("Test BitSet", "[tools]")
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == width-1);
         REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j);
+        const size_t c1 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c1);
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j, false);
+        const size_t c2 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c2);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
@@ -618,6 +726,18 @@ TEST_CASE("Test BitSet", "[tools]")
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j);
+        const size_t c1 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c1);
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j, false);
+        const size_t c2 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c2);
         REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
@@ -650,6 +770,18 @@ TEST_CASE("Test BitSet", "[tools]")
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == width-1);
         REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j);
+        const size_t c1 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c1);
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j, false);
+        const size_t c2 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c2);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
@@ -680,6 +812,18 @@ TEST_CASE("Test BitSet", "[tools]")
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j);
+        const size_t c1 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c1);
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j, false);
+        const size_t c2 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c2);
         REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
@@ -712,6 +856,18 @@ TEST_CASE("Test BitSet", "[tools]")
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == width-1);
         REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j);
+        const size_t c1 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c1);
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j, false);
+        const size_t c2 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c2);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
@@ -743,6 +899,18 @@ TEST_CASE("Test BitSet", "[tools]")
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == width-1);
         REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j);
+        const size_t c1 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c1);
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j, false);
+        const size_t c2 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c2);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
 
@@ -773,6 +941,18 @@ TEST_CASE("Test BitSet", "[tools]")
         bs.SetAll(); bs.Set(j, false);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j);
+        const size_t c1 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c1);
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j, false);
+        const size_t c2 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c2);
         REQUIRE(!bs.Get(emp::Mod(j-i,width)));
       }
     }
