@@ -732,19 +732,19 @@ namespace emp {
 
       if constexpr (NUM_BITS == 1) return *this;
 
-      const int bit_shift = 1;
+      constexpr int bit_shift = 1;
 
       // special case: for exactly one field_t, try to go low level
       // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
       if constexpr (NUM_FIELDS == 1) {
-        field_t & n = bit_set[0];
-        field_t c = bit_shift;
 
+        field_t & n = bit_set[0];
         // mask necessary to suprress shift count overflow warnings
         constexpr field_t mask = MaskLow<field_t>(FIELD_LOG2);
-
-        c &= mask;
-        n = (n<<c) | (n>>( (-(c+FIELD_BITS-NUM_BITS))&mask ));
+        n = (
+          (n << bit_shift)
+          | (n >> ((-(bit_shift+FIELD_BITS-NUM_BITS)) & mask))
+        );
 
       } else {
 
@@ -782,19 +782,14 @@ namespace emp {
 
       if constexpr (NUM_BITS == 1) return *this;
 
-      const int bit_shift = 1;
+      constexpr int bit_shift = 1;
 
       // special case: for exactly one field_t, try to go low level
       // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
       if constexpr (NUM_FIELDS == 1) {
+
         field_t & n = bit_set[0];
-        field_t c = bit_shift;
-
-        // mask necessary to suprress shift count overflow warnings
-        constexpr field_t mask = MaskLow<field_t>(FIELD_LOG2);
-
-        c &= mask;
-        n = (n>>c) | (n<<( (NUM_BITS-c)&mask ));
+        n = (n >> bit_shift) | (n << (NUM_BITS - bit_shift));
 
       } else {
 
