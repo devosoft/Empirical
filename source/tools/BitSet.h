@@ -453,22 +453,22 @@ namespace emp {
       const size_t field_id = Byte2Field(index);
       const size_t pos_id = Byte2FieldPos(index);
       const field_t val_uint = value;
-      bit_set[field_id] = (bit_set[field_id] & ~(((uint64_t)255U) << pos_id)) | (val_uint << pos_id);
+      bit_set[field_id] = (bit_set[field_id] & ~(((field_t)255U) << pos_id)) | (val_uint << pos_id);
     }
 
-    /// Get the 32-bit unsigned int; index in in 32-bit jumps (i.e., this is a field ID not bit id)
+    /// Get the field_t unsigned int; index in in field_t-bit jumps (i.e., this is a field ID not bit id)
     field_t GetUInt(size_t index) const {
       emp_assert(index < NUM_FIELDS);
       return bit_set[index];
     }
 
-    /// Set the 32-bit unsigned int; index in in 32-bit jumps (i.e., this is a field ID not bit id)
+    /// Set the field_t unsigned int; index in in field_t-bit jumps (i.e., this is a field ID not bit id)
     void SetUInt(size_t index, field_t value) {
       emp_assert(index < NUM_FIELDS);
       bit_set[index] = value;
     }
 
-    /// Get the full 32-bit unsigned int starting from the bit at a specified index.
+    /// Get the full field_t unsigned int starting from the bit at a specified index.
     field_t GetUIntAtBit(size_t index) {
       emp_assert(index < NUM_BITS);
       const size_t field_id = FieldID(index);
@@ -478,11 +478,11 @@ namespace emp {
         ((field_id+1 < NUM_FIELDS) ? bit_set[field_id+1] << (FIELD_BITS-pos_id) : 0);
     }
 
-    /// Get OUT_BITS bits starting from the bit at a specified index (max 32)
+    /// Get OUT_BITS bits starting from the bit at a specified index (max FIELD_BITS)
     template <size_t OUT_BITS>
-    uint32_t GetValueAtBit(size_t index) {
+    field_t GetValueAtBit(size_t index) {
       static_assert(OUT_BITS <= FIELD_BITS, "Requesting too many bits to fit in a UInt");
-      return GetUIntAtBit(index) & MaskLow<uint32_t>(OUT_BITS);
+      return GetUIntAtBit(index) & MaskLow<field_t>(OUT_BITS);
     }
 
     /// Return true if ANY bits in the BitSet are one, else return false.
