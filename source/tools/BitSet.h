@@ -17,7 +17,6 @@
 #define EMP_BIT_SET_H
 
 #include <iostream>
-#include <limits.h>   // for CHAR_BIT
 
 #include "../base/assert.h"
 #include "../base/vector.h"
@@ -168,8 +167,8 @@ namespace emp {
         field_t & n = bit_set[0];
         field_t c = shift_size;
 
-        // assumes width is a power of 2.
-        const field_t mask = MaskLow<field_t>(FIELD_LOG2);
+        // mask necessary to suprress shift count overflow warnings
+        constexpr field_t mask = MaskLow<field_t>(FIELD_LOG2);
 
         c &= mask;
         n = (n<<c) | (n>>( (-(c+FIELD_BITS-NUM_BITS))&mask ));
@@ -250,10 +249,9 @@ namespace emp {
         field_t & n = bit_set[0];
         field_t c = shift_size;
 
+        // mask necessary to suprress shift count overflow warnings
+        constexpr field_t mask = MaskLow<field_t>(FIELD_LOG2);
 
-        const unsigned int mask = (CHAR_BIT*sizeof(n) - 1);
-
-        // assert ( (c<=mask) &&"rotate by type width or more");
         c &= mask;
         n = (n>>c) | (n<<( (NUM_BITS-c)&mask ));
 
@@ -742,8 +740,8 @@ namespace emp {
         field_t & n = bit_set[0];
         field_t c = bit_shift;
 
-        // assumes width is a power of 2.
-        const unsigned int mask = (CHAR_BIT*sizeof(n) - 1);
+        // mask necessary to suprress shift count overflow warnings
+        constexpr field_t mask = MaskLow<field_t>(FIELD_LOG2);
 
         c &= mask;
         n = (n<<c) | (n>>( (-(c+FIELD_BITS-NUM_BITS))&mask ));
@@ -792,11 +790,9 @@ namespace emp {
         field_t & n = bit_set[0];
         field_t c = bit_shift;
 
-        //bitset_utils mask tools
+        // mask necessary to suprress shift count overflow warnings
+        constexpr field_t mask = MaskLow<field_t>(FIELD_LOG2);
 
-        const unsigned int mask = (CHAR_BIT*sizeof(n) - 1);
-
-        // assert ( (c<=mask) &&"rotate by type width or more");
         c &= mask;
         n = (n>>c) | (n<<( (NUM_BITS-c)&mask ));
 
