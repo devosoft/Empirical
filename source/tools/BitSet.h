@@ -229,7 +229,7 @@ namespace emp {
 
       }
 
-      // Mask out any bits that have left-shifted away
+      // Mask out filler bits
       if constexpr ((bool)LAST_BIT) {
         bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       }
@@ -298,7 +298,7 @@ namespace emp {
         }
       }
 
-      // Mask out any bits that have left-shifted away
+      // Mask out filler bits
       if constexpr ((bool)LAST_BIT) {
         bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       }
