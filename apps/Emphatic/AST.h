@@ -103,6 +103,22 @@ struct AST_Class : public AST_Node {
     // for (auto x : children) { x->PrintEcho(os, prefix+"  "); }
     // os << prefix << "};\n";
   }
+};
+
+/// This AST node handles a class or struct definition.
+/// @todo: Ideally this node should process the contents to allow concepts in classes.
+struct AST_Class : public AST_Node {
+  std::string type = "class";
+  std::string name = "";
+  std::string body = "";
+
+  /// Scope should run echo on each of its children.
+  void PrintEcho(std::ostream & os, const std::string & prefix) const override {
+    os << prefix << type << " " << name << "{\n" << prefix << "  " << body << "};\n";
+    // os << prefix << type << " " << name << "{\n";
+    // for (auto x : children) { x->PrintEcho(os, prefix+"  "); }
+    // os << prefix << "};\n";
+  }
 
   /// Scope should run output on each of its children.
   void PrintOutput(std::ostream & os, const std::string & prefix) const override {
@@ -151,20 +167,14 @@ struct AST_Concept : AST_Node {
   }
 
   void PrintOutput(std::ostream & os, const std::string & prefix) const override {
-    // If the base class hasn't previously been defined, do so here.
-    if (base_predefined == false) {
-      os << prefix << "/// Base class for concept wrapper " << name << "<>.\n"
-          << prefix << "class " << base_name << " {\n"
-          << prefix << "public:\n"
-          << prefix << "  virtual ~" << base_name << "() { ; }\n";
+    os << prefix << "/// Base class for concept wrapper " << name << "<>.\n"
+        << prefix << "class " << base_name << " {\n"
+        << prefix << "public:\n";
 
-      // Print all of the BASE CLASS details.
-      for (auto & m : members) {
-        m.PrintConceptBase(os, prefix+"  ");
-        os << "\n";
-      }
-
-      os << prefix << "};\n\n";
+    // Print all of the BASE CLASS details.
+    for (auto & m : members) {
+      m.PrintConceptBase(os, prefix+"  ");
+      os << "\n";
     }
 
     os << prefix << "};\n\n";
@@ -187,64 +197,4 @@ struct AST_Concept : AST_Node {
 
     os << prefix << "};\n\n";
   }
-
-  bool IsConcept() const { return true; }
-};
-
-/// This AST node handles a class or struct definition.
-/// @todo: Ideally this node should process the contents to allow concepts in classes.
-struct AST_Class : public AST_Node {
-  std::string type = "class";
-  std::string base_info = "";
-  std::string body = "[[declaration]]";
-  emp::vector<emp::Ptr<AST_Concept>> concepts; ///< Which concepts does this class need to be base for?
-
-  /// Scope should run echo on each of its children.
-  void PrintEcho(std::ostream & os, const std::string & prefix) const override {
-    if (body == "[[declaration]]") {
-      os << prefix << type << " " << name << ";\n";
-    } else {
-      os << prefix << type << " " << name << base_info << "{\n"
-         << prefix << "  " << body << "\n"
-         << prefix << "};\n";
-    }
-    // os << prefix << type << " " << name << "{\n";
-    // for (auto x : children) { x->PrintEcho(os, prefix+"  "); }
-    // os << prefix << "};\n";
-  }
-
-  /// Scope should run output on each of its children.
-  void PrintOutput(std::ostream & os, const std::string & prefix) const override {
-    if (body == "[[declaration]]") {  // This is just a declaration...
-      os << prefix << type << " " << name << ";\n";
-    }
-
-    else {
-      // Do the basic definition of this class.
-      os << prefix << type << " " << name << base_info << "{\n";
-      os << prefix << "  " << body << "\n";
-
-      // If this class is being used as a base clase for any concepts, include the concept code here.
-      if (concepts.size()) os << prefix << "public:\n";
-
-      // Setup virtual destructor.
-  // @CAO: This should probably not be here?  Only in concepts.
-      os << prefix << "virtual ~" << name << "() { ; }\n";
-
-      for (auto concept : concepts) {
-        // Print all of the BASE CLASS details for each concept.
-        for (auto & m : concept->members) {
-          m.PrintConceptBase(os, prefix+"  ");
-          os << "\n";
-        }
-      }
-
-      os << prefix << "};\n";
-      // os << prefix << "namespace" << " " << name << "{\n";
-      // for (auto x : children) { x->PrintOutput(os, prefix); }
-      // os << prefix << "};\n";
-    }
-  }
-
-  bool IsClass() const { return true; }
 };

@@ -291,8 +291,8 @@ public:
       RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
 
       // Identify if this type is required in the base class
-      if (AsLexeme(pos) == "0") {
-        new_element.AddSpecial(AsLexeme(pos++));
+      if (AsLexeme(pos) == "required") {
+        new_element.special_value = AsLexeme(pos++);
       }
       // Otherwise, save the default type.
       else {
@@ -325,8 +325,8 @@ public:
         if (fun_char == '=') {  // Function is "= default;" or "= required;"
           RequireID(pos, "Function must be assigned to 'required' or 'default'");
           std::string fun_assign = AsLexeme(pos++);
-          if (fun_assign == "0" || fun_assign == "default") new_element.AddSpecial(fun_assign);
-          else Error(pos, "Functions can only be set to '0' (if required) or 'default'");
+          if (fun_assign == "required" || fun_assign == "default") new_element.special_value = fun_assign;
+          else Error(pos, "Functions can only be set to 'required' or 'default'");
           RequireChar(';', pos++, emp::to_string(fun_assign, "functions must end in a semi-colon."));
         }
         else if (fun_char == '{') {  // Function is defined in place.
@@ -334,9 +334,6 @@ public:
           RequireChar('}', pos, emp::to_string("Function body must end with close brace ('}') not '",
                                                 AsLexeme(pos), "'."));
           pos++;
-        }
-        else if (fun_char == ';') { // Function is declared, but not defined here.
-          new_element.AddSpecial("declare");
         }
         else {
           Error(pos-1, "Function body must begin with open brace or assignment ('{' or '=')");
@@ -381,19 +378,9 @@ public:
         AST_Class & new_class = cur_scope.NewChild<AST_Class>();
         new_class.type = cur_lexeme;
         if (IsID(pos)) new_class.name = AsLexeme(pos++);
-        Debug("...Using name of new ", cur_lexeme, ": ", new_class.name);
-
-        // If this is not just a declaration, load definition.
-        if (AsChar(pos) != ';') {
-          // Is there a base class?
-          if (AsChar(pos) == ':') {
-            new_class.base_info = ProcessCode(pos, false, '{', false);
-          }
-          RequireChar('{', pos++, emp::to_string("A ", cur_lexeme, " must be defined in braces ('{' and '}')."));
-          new_class.body = ProcessCode(pos, false, -1);
-          RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
-        }
-
+        RequireChar('{', pos++, emp::to_string("A ", cur_lexeme, " must be defined in braces ('{' and '}')."));
+        new_class.body = ProcessCode(pos, false, true);
+        RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
         RequireChar(';', pos++, emp::to_string("A ", cur_lexeme, " must end with a semi-colon (';')."));
       }
       else if (cur_lexeme == "namespace") {

@@ -26,28 +26,21 @@ private:
   enum ElementType { NONE=0, TYPEDEF, VARIABLE, FUNCTION };
   ElementType element_type = NONE;    ///< What type of element are we describing?
 
-  std::string type;                     ///< Type of variable, return type of function, or assigned type of using.
-  std::string name;                     ///< Element name.
-  emp::vector<ParamInfo> params;        ///< Full set of function parameters
-  std::set<std::string> attributes;     ///< const, noexcept, etc.  "override" is special for concepts.
-  std::string default_code;             ///< Variable initialization or function body.
-  std::set<std::string> special_values; ///< "default", "delete", or "0" (required), etc.
+  std::string type;                   ///< Type of variable, return type of function, or assigned type of using.
+  std::string name;                   ///< Element name.
+  emp::vector<ParamInfo> params;      ///< Full set of function parameters
+  std::set<std::string> attributes;   ///< const, noexcept, etc.
+  std::string default_code;           ///< Variable initialization or function body.
+  std::string special_value;          ///< "default", "delete", or "required" (for concepts)
 
 public:
   bool IsTypedef() const { return element_type == TYPEDEF; }
   bool IsVariable() const { return element_type == VARIABLE; }
   bool IsFunction() const { return element_type == FUNCTION; }
 
-  const std::string & GetType() const { return type; }
-  const std::string & GetName() const { return name; }
-
-  bool IsRequired() const { return emp::Has(special_values, "0"); }
-  bool IsDefault() const { return emp::Has(special_values, "default"); }
-  bool IsDeleted() const { return emp::Has(special_values, "delete"); }
-  bool IsDeclaration() const { return emp::Has(special_values, "declare"); }
-
-  bool IsConst() const { return emp::Has(attributes, "const"); }
-  bool IsOverride() const { return emp::Has(attributes, "override"); }
+  bool IsRequired() const { return special_value == "required"; }
+  bool IsDefault() const { return special_value == "default"; }
+  bool IsDeleted() const { return special_value == "delete"; }
 
   void SetTypedef() { element_type = TYPEDEF; }
   void SetVariable() { element_type = VARIABLE; }
