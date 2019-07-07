@@ -202,10 +202,78 @@ TEST_CASE("Test BitMatrix", "[tools]")
 
 // for BitSet ROTATE_SELF
 // adapted from spraetor.github.io/2015/12/26/compile-time-loops.html
-template <int I, int N>
-struct MultiTester {
+template <size_t N>
+struct MultiTester2 {
+
+  template <size_t I>
   static void test() {
-    const int width = I;
+
+    emp::Random rand(1);
+
+    constexpr int W = N - 2;
+    emp::BitSet<W> bs;
+
+    for (int j = 0; j < W; ++j) {
+      bs.Clear(); bs.Set(j);
+      bs.template ROTL_SELF<I>();
+      REQUIRE(bs.CountOnes() == 1);
+      REQUIRE(bs.Get(emp::Mod(j+I,W)));
+
+      bs.SetAll(); bs.Set(j, false);
+      bs.template ROTL_SELF<I>();
+      REQUIRE(bs.CountOnes() == W-1);
+      REQUIRE(!bs.Get(emp::Mod(j+I,W)));
+
+      bs.Randomize(rand); bs.Set(j);
+      const size_t c1 = bs.CountOnes();
+      bs.template ROTL_SELF<I>();
+      REQUIRE(bs.CountOnes() == c1);
+      REQUIRE(bs.Get(emp::Mod(j+I,W)));
+
+      bs.Randomize(rand); bs.Set(j, false);
+      const size_t c2 = bs.CountOnes();
+      bs.template ROTL_SELF<I>();
+      REQUIRE(bs.CountOnes() == c2);
+      REQUIRE(!bs.Get(emp::Mod(j+I,W)));
+
+      bs.Clear(); bs.Set(j);
+      bs.template ROTR_SELF<I>();
+      REQUIRE(bs.CountOnes() == 1);
+      REQUIRE(bs.Get(emp::Mod(j-I,W)));
+
+      bs.SetAll(); bs.Set(j, false);
+      bs.template ROTR_SELF<I>();
+      REQUIRE(bs.CountOnes() == W-1);
+      REQUIRE(!bs.Get(emp::Mod(j-I,W)));
+
+      bs.Randomize(rand); bs.Set(j);
+      const size_t c3 = bs.CountOnes();
+      bs.template ROTR_SELF<I>();
+      REQUIRE(bs.CountOnes() == c3);
+      REQUIRE(bs.Get(emp::Mod(j-I,W)));
+
+      bs.Randomize(rand); bs.Set(j, false);
+      const size_t c4 = bs.CountOnes();
+      bs.template ROTR_SELF<I>();
+      REQUIRE(bs.CountOnes() == c4);
+      REQUIRE(!bs.Get(emp::Mod(j-I,W)));
+    }
+
+    if constexpr (I < N) {
+      // recurse
+      MultiTester2<N>::test<I+1>();
+    }
+  }
+
+};
+
+template <int N>
+struct MultiTester {
+
+  template <int I>
+  static void test() {
+
+    constexpr int width = I;
 
     emp::Random rand(1);
     emp::BitSet<width> bs(rand);
@@ -246,64 +314,16 @@ struct MultiTester {
       }
     }
 
-    for (int j = 0; j < width; ++j) {
-      const int i = -1;
-      bs.Clear(); bs.Set(j);
-      bs.L_ROTATE_SELF();
-      REQUIRE(bs.CountOnes() == 1);
-      REQUIRE(bs.Get(emp::Mod(j-i,width)));
+      // test templated rotates
+      MultiTester2<I+2>::template test<0>();
 
-      bs.SetAll(); bs.Set(j, false);
-      bs.L_ROTATE_SELF();
-      REQUIRE(bs.CountOnes() == width-1);
-      REQUIRE(!bs.Get(emp::Mod(j-i,width)));
-
-      bs.Randomize(rand); bs.Set(j);
-      const size_t c1 = bs.CountOnes();
-      bs.L_ROTATE_SELF();
-      REQUIRE(bs.CountOnes() == c1);
-      REQUIRE(bs.Get(emp::Mod(j-i,width)));
-
-      bs.Randomize(rand); bs.Set(j, false);
-      const size_t c2 = bs.CountOnes();
-      bs.L_ROTATE_SELF();
-      REQUIRE(bs.CountOnes() == c2);
-      REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+    if constexpr (I < N) {
+      // recurse
+      MultiTester<N>::test<I+1>();
     }
-
-    for (int j = 0; j < width; ++j) {
-      const int i = 1;
-      bs.Clear(); bs.Set(j);
-      bs.R_ROTATE_SELF();
-      REQUIRE(bs.CountOnes() == 1);
-      REQUIRE(bs.Get(emp::Mod(j-i,width)));
-
-      bs.SetAll(); bs.Set(j, false);
-      bs.R_ROTATE_SELF();
-      REQUIRE(bs.CountOnes() == width-1);
-      REQUIRE(!bs.Get(emp::Mod(j-i,width)));
-
-      bs.Randomize(rand); bs.Set(j);
-      const size_t c1 = bs.CountOnes();
-      bs.R_ROTATE_SELF();
-      REQUIRE(bs.CountOnes() == c1);
-      REQUIRE(bs.Get(emp::Mod(j-i,width)));
-
-      bs.Randomize(rand); bs.Set(j, false);
-      const size_t c2 = bs.CountOnes();
-      bs.R_ROTATE_SELF();
-      REQUIRE(bs.CountOnes() == c2);
-      REQUIRE(!bs.Get(emp::Mod(j-i,width)));
-    }
-
-    // recurse
-    MultiTester<I+1,N>::test();
   }
-};
 
-// base case
-template <int N>
-struct MultiTester<N,N> { static void test() {} };
+};
 
 template class emp::BitSet<5>;
 TEST_CASE("Test BitSet", "[tools]")
@@ -416,8 +436,13 @@ TEST_CASE("Test BitSet", "[tools]")
   }
 
   // tests for ROTATE_SELF
-  MultiTester<1,100>::test();
-  MultiTester<160,161>::test();
+  MultiTester<2>::test<1>();
+  MultiTester<18>::test<17>();
+  MultiTester<34>::test<31>();
+  MultiTester<51>::test<50>();
+  MultiTester<66>::test<63>();
+  MultiTester<96>::test<93>();
+  MultiTester<161>::test<160>();
 
 }
 

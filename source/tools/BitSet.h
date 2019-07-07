@@ -733,44 +733,78 @@ namespace emp {
       return *this;
     }
 
-    /// Specialized implementation to rotate left by one bit
-    BitSet & L_ROTATE_SELF() {
-
-      if constexpr (NUM_BITS == 1) return *this;
-
-      constexpr int bit_shift = 1;
+    /// Helper: call ROTATE with negative number instead
+    template<size_t shift_size_raw>
+    BitSet & ROTL_SELF() {
+      constexpr field_t shift_size = shift_size_raw % NUM_BITS;
 
       // special case: for exactly one field_t, try to go low level
       // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
       if constexpr (NUM_FIELDS == 1) {
-
         field_t & n = bit_set[0];
+        field_t c = shift_size;
+
         // mask necessary to suprress shift count overflow warnings
         constexpr field_t mask = MaskLow<field_t>(FIELD_LOG2);
-        n = (
-          (n << bit_shift)
-          | (n >> ((-(bit_shift+FIELD_BITS-NUM_BITS)) & mask))
-        );
+
+        c &= mask;
+        n = (n<<c) | (n>>( (-(c+FIELD_BITS-NUM_BITS))&mask ));
 
       } else {
 
-        const int bit_overflow = FIELD_BITS - bit_shift;
-
-
-        const field_t keystone = LAST_BIT ? (
-          (bit_set[NUM_FIELDS - 1] << (FIELD_BITS - LAST_BIT))
-          | (bit_set[NUM_FIELDS - 2] >> LAST_BIT)
+        // note that we already modded shift_size by NUM_BITS
+        // so there's no need to mod by FIELD_SIZE here
+        constexpr int field_shift = LAST_BIT ? (
+          (shift_size + FIELD_BITS - LAST_BIT) / FIELD_BITS
         ) : (
-          bit_set[NUM_FIELDS - 1]
+          shift_size / FIELD_BITS
         );
+        // if we field shift, we need to shift bits by (FIELD_BITS - LAST_BIT)
+        // more to account for the filler that gets pulled out of the middle
+        constexpr int bit_shift = LAST_BIT && field_shift ? (
+          (shift_size + FIELD_BITS - LAST_BIT) % FIELD_BITS
+        ) : (
+          shift_size % FIELD_BITS
+        );
+        constexpr int bit_overflow = FIELD_BITS - bit_shift;
 
-        for (int i = NUM_FIELDS - 1; i > 0; --i) {
-          bit_set[i] <<= bit_shift;
-          bit_set[i] |= (bit_set[i-1] >> bit_overflow);
+        // if rotating more than field capacity, we need to rotate fields
+        if constexpr ((bool)field_shift) {
+          std::rotate(
+            std::rbegin(bit_set),
+            std::rbegin(bit_set)+field_shift,
+            std::rend(bit_set)
+          );
         }
-        // Handle final field
-        bit_set[0] <<= bit_shift;
-        bit_set[0] |= keystone >> bit_overflow;
+
+        // if necessary, shift filler bits out of the middle
+        if constexpr ((bool)LAST_BIT) {
+          const int filler_idx = (NUM_FIELDS - 1 + field_shift) % NUM_FIELDS;
+          for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
+            bit_set[i-1] |= bit_set[i] << LAST_BIT;
+            bit_set[i] >>= (FIELD_BITS - LAST_BIT);
+          }
+        }
+
+        // account for bit_shift
+        if (bit_shift) {
+
+          const field_t keystone = LAST_BIT ? (
+            (bit_set[NUM_FIELDS - 1] << (FIELD_BITS - LAST_BIT))
+            | (bit_set[NUM_FIELDS - 2] >> LAST_BIT)
+          ) : (
+            bit_set[NUM_FIELDS - 1]
+          );
+
+          for (int i = NUM_FIELDS - 1; i > 0; --i) {
+            bit_set[i] <<= bit_shift;
+            bit_set[i] |= (bit_set[i-1] >> bit_overflow);
+          }
+          // Handle final field
+          bit_set[0] <<= bit_shift;
+          bit_set[0] |= keystone >> bit_overflow;
+
+        }
 
       }
 
@@ -780,43 +814,72 @@ namespace emp {
       }
 
       return *this;
+
     }
 
 
-    /// Specialized implementation to rotate right by one bit
-    BitSet & R_ROTATE_SELF() {
+    /// Helper for calling ROTATE with positive number
+    template<size_t shift_size_raw>
+    BitSet & ROTR_SELF() {
 
-      if constexpr (NUM_BITS == 1) return *this;
-
-      constexpr int bit_shift = 1;
+      constexpr field_t shift_size = shift_size_raw % NUM_BITS;
+      constexpr int bit_shift = shift_size % FIELD_BITS;
 
       // special case: for exactly one field_t, try to go low level
       // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
       if constexpr (NUM_FIELDS == 1) {
-
         field_t & n = bit_set[0];
-        n = (n >> bit_shift) | (n << (NUM_BITS - bit_shift));
+        field_t c = shift_size;
+
+        // mask necessary to suprress shift count overflow warnings
+        constexpr field_t mask = MaskLow<field_t>(FIELD_LOG2);
+
+        c &= mask;
+        n = (n>>c) | (n<<( (NUM_BITS-c)&mask ));
 
       } else {
 
-        const field_t bit_overflow = FIELD_BITS - bit_shift;
+        constexpr field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
+        constexpr field_t bit_overflow = FIELD_BITS - bit_shift;
 
-        const field_t keystone = LAST_BIT ? (
-          bit_set[0] >> (FIELD_BITS - LAST_BIT)
-        ) : (
-          bit_set[0]
-        );
+        // if rotating more than field capacity, we need to rotate fields
+        if constexpr ((bool)field_shift) {
+          std::rotate(
+            std::begin(bit_set),
+            std::begin(bit_set)+field_shift,
+            std::end(bit_set)
+          );
+        }
 
+        // if necessary, shift filler bits out of the middle
         if constexpr ((bool)LAST_BIT) {
-          bit_set[NUM_FIELDS-1] |= bit_set[0] << LAST_BIT;
+          constexpr int filler_idx = NUM_FIELDS - 1 - field_shift;
+          for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
+            bit_set[i-1] |= bit_set[i] << LAST_BIT;
+            bit_set[i] >>= (FIELD_BITS - LAST_BIT);
+          }
         }
 
-        for (size_t i = 0; i < NUM_FIELDS - 1; ++i) {
-          bit_set[i] >>= bit_shift;
-          bit_set[i] |= (bit_set[i+1] << bit_overflow);
+        // account for bit_shift
+        if (bit_shift) {
+
+          const field_t keystone = LAST_BIT ? (
+            bit_set[0] >> (FIELD_BITS - LAST_BIT)
+          ) : (
+            bit_set[0]
+          );
+
+          if constexpr ((bool)LAST_BIT) {
+            bit_set[NUM_FIELDS-1] |= bit_set[0] << LAST_BIT;
+          }
+
+          for (size_t i = 0; i < NUM_FIELDS - 1; ++i) {
+            bit_set[i] >>= bit_shift;
+            bit_set[i] |= (bit_set[i+1] << bit_overflow);
+          }
+          bit_set[NUM_FIELDS - 1] >>= bit_shift;
+          bit_set[NUM_FIELDS - 1] |= keystone << bit_overflow;
         }
-        bit_set[NUM_FIELDS - 1] >>= bit_shift;
-        bit_set[NUM_FIELDS - 1] |= keystone << bit_overflow;
       }
 
       // mask out filler bits
