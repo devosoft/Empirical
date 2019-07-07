@@ -241,7 +241,6 @@ namespace emp {
     void RotateRight(const field_t shift_size_raw) {
 
       const field_t shift_size = shift_size_raw % NUM_BITS;
-      const int bit_shift = shift_size % FIELD_BITS;
 
       // special case: for exactly one field_t, try to go low level
       // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
@@ -258,6 +257,7 @@ namespace emp {
       } else {
 
         const field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
+        const int bit_shift = shift_size % FIELD_BITS;
         const field_t bit_overflow = FIELD_BITS - bit_shift;
 
         // if rotating more than field capacity, we need to rotate fields
@@ -823,7 +823,6 @@ namespace emp {
     BitSet & ROTR_SELF() {
 
       constexpr field_t shift_size = shift_size_raw % NUM_BITS;
-      constexpr int bit_shift = shift_size % FIELD_BITS;
 
       // special case: for exactly one field_t, try to go low level
       // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
@@ -840,6 +839,7 @@ namespace emp {
       } else {
 
         constexpr field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
+        constexpr int bit_shift = shift_size % FIELD_BITS;
         constexpr field_t bit_overflow = FIELD_BITS - bit_shift;
 
         // if rotating more than field capacity, we need to rotate fields
