@@ -5,6 +5,10 @@
  *
  *  @file  ElementInfo.h
  *  @brief Information about C++ elements (variables, functions, typedefs, etc) that are loaded in.
+ * 
+ *  Developer notes:
+ *  * We may want to put just a pointer to a variable in the base class so that the real version
+ *    can bew in either the derived class OR the class being wrapped.
  **/
 
 #include <string>
@@ -26,21 +30,28 @@ private:
   enum ElementType { NONE=0, TYPEDEF, VARIABLE, FUNCTION };
   ElementType element_type = NONE;    ///< What type of element are we describing?
 
-  std::string type;                   ///< Type of variable, return type of function, or assigned type of using.
-  std::string name;                   ///< Element name.
-  emp::vector<ParamInfo> params;      ///< Full set of function parameters
-  std::set<std::string> attributes;   ///< const, noexcept, etc.
-  std::string default_code;           ///< Variable initialization or function body.
-  std::string special_value;          ///< "default", "delete", or "required" (for concepts)
+  std::string type;                     ///< Type of variable, return type of function, or assigned type of using.
+  std::string name;                     ///< Element name.
+  emp::vector<ParamInfo> params;        ///< Full set of function parameters
+  std::set<std::string> attributes;     ///< const, noexcept, etc.  "override" is special for concepts.
+  std::string default_code;             ///< Variable initialization or function body.
+  std::set<std::string> special_values; ///< "default", "delete", or "0" (required), etc.
 
 public:
   bool IsTypedef() const { return element_type == TYPEDEF; }
   bool IsVariable() const { return element_type == VARIABLE; }
   bool IsFunction() const { return element_type == FUNCTION; }
 
-  bool IsRequired() const { return special_value == "required"; }
-  bool IsDefault() const { return special_value == "default"; }
-  bool IsDeleted() const { return special_value == "delete"; }
+  const std::string & GetType() const { return type; }
+  const std::string & GetName() const { return name; }
+
+  bool IsRequired() const { return emp::Has(special_values, "0"); }
+  bool IsDefault() const { return emp::Has(special_values, "default"); }
+  bool IsDeleted() const { return emp::Has(special_values, "delete"); }
+  bool IsDeclaration() const { return emp::Has(special_values, "declare"); }
+
+  bool IsConst() const { return emp::Has(attributes, "const"); }
+  bool IsOverride() const { return emp::Has(attributes, "override"); }
 
   void SetTypedef() { element_type = TYPEDEF; }
   void SetVariable() { element_type = VARIABLE; }
@@ -128,16 +139,25 @@ public:
     }
     else if (IsFunction()) {
       os << prefix << type << " " << name << "(" << ParamString() << ") " << AttributeString();
-      if (IsRequired()) os << " = required;\n";
+      if (IsRequired()) os << " = 0;\n";
       else if (IsDefault()) os << " = default;\n";
+      else if (IsDeclaration()) os << ";\n";
       else os << " {\n" << prefix << "  " << default_code << "\n" << prefix << "}\n";
     }
   }
 
   /// Print this element as the converted C++ code for the base class.
   void PrintConceptBase(std::ostream & os, const std::string & prefix) const {
-    // Note: Typedefs and variables do not need to be represented in the base class.
-    if (IsFunction()) {
+    // Note: Typedefs do not need to be represented in the base class.
+    // Variables should have all of their code placed in the base class.
+    if (IsVariable()) {
+      os << prefix << type << " " << name;
+      if (default_code.size()) os << " " << default_code << "\n";
+      else os << ";\n";
+    }
+    // Functions should just have a pure-virtual declaration in the base class so
+    // that the correct version can be called in the derived class.
+    else if (IsFunction()) {
       os << prefix << "virtual " << type << " " << name << "(" << ParamString() << ") "
          << ConceptAttributeString() << " = 0;\n";
     }
@@ -170,11 +190,8 @@ public:
                      << name << ">::template push_back<" << default_code << ">::first_t;\n";
       }
     }
-    else if (IsVariable()) {
-      os << prefix << type << " " << name;
-      if (default_code.size()) os << " " << default_code << "\n";
-      else os << ";\n";
-    }
+    // If this is a variable, all code should be in base class.
+    // If this is a function, print out dynamic code to determine which version should be called.
     else if (IsFunction()) {
       // Build return-type checker.
       os << prefix << "template <typename T>\n"
@@ -196,7 +213,8 @@ public:
         os << prefix << "  " << "static_assert( HasFun_" << name
                      << "(), \"\\n\\n  ** Error: concept instance missing required function '"
                      << name << "' **\\n\");\n";
-        if (type != "void") os << prefix << "return ";
+        os << prefix << "  ";
+        if (type != "void") os << "return ";
         os << "WRAPPED_T::" << name << "( " << ArgString() << " );\n";
       }
 

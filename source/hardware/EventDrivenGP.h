@@ -95,13 +95,13 @@ namespace emp {
    *      * Each event type has a registered event handler that gets called to handle a dispatched
    *        event.
    */
-  template<size_t AFFINITY_WIDTH, typename Trait = emp::vector<double>>
+  template<size_t AFFINITY_WIDTH, typename TRAIT_TYPE=double>
   class EventDrivenGP_AW {
   public:
     /// Maximum number of instruction arguments. Currently hardcoded. At some point, will make flexible.
     static constexpr size_t MAX_INST_ARGS = 3;
 
-    using EventDrivenGP_t = EventDrivenGP_AW<AFFINITY_WIDTH, Trait>;  //< Resolved type for this templated class.
+    using EventDrivenGP_t = EventDrivenGP_AW<AFFINITY_WIDTH, TRAIT_TYPE>;  //< Resolved type for this templated class.
     using mem_key_t = int;                                     //< Hardware memory map key type.
     using mem_val_t = double;                                  //< Hardware memory map value type.
     using memory_t = std::unordered_map<mem_key_t, mem_val_t>; //< Hardware memory map type.
@@ -610,7 +610,7 @@ namespace emp {
     using exec_stk_t = emp::vector<State>;  //< Execution Stack/Core type alias.
     /// Event handler function type alias.
     using fun_event_handler_t = std::function<void(EventDrivenGP_t &, const event_t &)>;
-    using trait_printer_t = std::function<void(std::ostream& os, Trait t)>;
+
   protected:
     Ptr<const event_lib_t> event_lib;     //< Pointer to const event library associated with this hardware.
     Ptr<Random> random_ptr;               //< Pointer to random object to use.
@@ -618,7 +618,7 @@ namespace emp {
     program_t program;                    //< Hardware's associated program (set of functions).
     memory_t shared_mem;                  //< Hardware's shared memory map. All cores have access to the same shared memory.
     std::deque<event_t> event_queue;      //< Hardware's event queue. Where events go to be handled (in order of reception).
-    Trait traits;                         //< Generic traits vector. Whatever uses the hardware must define/keep track of what traits mean.
+    emp::vector<TRAIT_TYPE> traits;           //< Generic traits vector. Whatever uses the hardware must define/keep track of what traits mean.
     size_t errors;                        //< Errors committed by hardware while executing. (e.g. divide by 0, etc.)
     size_t max_cores;                     //< Maximum number of parallel execution stacks that can be spawned. Increasing this value drastically slows things down.
     size_t max_call_depth;                //< Maximum depth of calls per execution stack.
@@ -631,7 +631,6 @@ namespace emp {
     std::deque<size_t> pending_cores;     //< Queue of core IDs pending activation.
     size_t exec_core_id;                  //< core ID of the currently executing core.
     bool is_executing;                    //< True when mid-execution of all cores. (On every CPU cycle: execute all cores).
-    trait_printer_t TraitPrinter = [](std::ostream&, Trait){};
 
     // TODO: disallow configuration of hardware while executing. (and any other functions that could sent things into a bad state)
 
@@ -814,11 +813,8 @@ namespace emp {
       return program[fID].inst_seq[pos];
     }
 
-    /// Get the stored trait in hardware's program.
-    Trait& GetTrait() { return traits; }
-    
-    /// Get the stored trait in hardware's program.
-    const Trait& GetTrait() const { return traits; }
+    /// Get a particular trait given its ID.
+    TRAIT_TYPE GetTrait(size_t id) const { emp_assert(id < traits.size()); return traits[id]; }
 
     /// Get current number of errors committed by this hardware.
     size_t GetNumErrors() const { return errors; }
@@ -958,11 +954,29 @@ namespace emp {
     /// that are equidistant from caller/event affinity.
     void SetStochasticFunCall(bool val) { stochastic_fun_call = val; }
 
-    /// Set trait in traits vector given by id to value given by val.
+    /// Set trait in traints vector given by id to value given by val.
     /// Will resize traits vector if given id is greater than current traits vector size.
-    void SetTrait(Trait t) {
-      traits = t;
+    void SetTrait(size_t id, TRAIT_TYPE val) {
+      if (id >= traits.size()) traits.resize(id+1, 0.0);
+      traits[id] = val;
     }
+
+    /// Utility function to increment trait id by value given by inc.
+    /// Will resize traits vector if given id is greater than current traits vector size.
+    void IncTrait(size_t id, double inc=1.0) {
+      if (id >= traits.size()) traits.resize(id+1, 0.0);
+      traits[id] += inc;
+    }
+
+    /// Utility function to decrement trait id by value given by dec.
+    /// Will resize traits vector if given id is greater than current traits vector size.
+    void DecTrait(size_t id, double dec=1.0) {
+      if (id >= traits.size()) traits.resize(id+1, 0.0);
+      traits[id] -= dec;
+    }
+
+    /// Push a trait onto end of traits vector.
+    void PushTrait(TRAIT_TYPE val) { traits.emplace_back(val); }
 
     /// Shortcut to this hardware object's program's SetInst function of the same signature.
     void SetInst(size_t fID, size_t pos, const inst_t & inst) {
@@ -1296,11 +1310,11 @@ namespace emp {
 
     /// Print hardware traits using given output stream (default = std::cout).
     void PrintTraits(std::ostream & os=std::cout) {
-      TraitPrinter(os, traits);
-    }
-    
-    void SetTraitPrinter(trait_printer_t t){
-      TraitPrinter = t;
+      if (traits.size() == 0) { os << "[]"; return; }
+      os << "[";
+      for (size_t i = 0; i < traits.size() - 1; ++i) {
+        os << traits[i] << ", ";
+      } os << traits[traits.size() - 1] << "]";
     }
 
     /// Print out entire program using given output stream (default = std::cout).

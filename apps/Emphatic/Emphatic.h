@@ -13,7 +13,7 @@
  *   - STATEMENT_LIST: (nothing)                  (an unmatched close-mark next requires this option)
  *                   | STATEMENT STATEMENT_LIST
  *   - BLOCK: '{' STATEMENT_LIST '}'
- *
+ * 
  *   - TYPE: ID TYPE_END
  *   - TYPE_END: (nothing)
  *             | "::" TYPE
@@ -22,7 +22,7 @@
  *             | '*'
  *   - DECLARE: TYPE ID
  *   - FUNCTION: DECLARE '(' PARAMS ')' BLOCK
- *             | DECLARE '(' PARAMS ')' '=' "required" ';'
+ *             | DECLARE '(' PARAMS ')' '=' "0" ';'
  *             | DECLARE '(' PARAMS ')' '=' "default" ';'
  *   - PARAMS: (nothing)
  *           | PARAM_LIST
@@ -33,7 +33,11 @@
  *   - MEMBER: DECLARE ';'
  *           | FUNCTION
  *           | "using" ID '=' TYPE ';'
- *           | "using" ID '=' "required" ';'
+ *           | "using" ID '=' "0" ';'
+ *
+ * @todo: If a concept base class is already defined, concept should just add to it.
+ * @todo: For all concepts and classes we should create a static data structure for reflection.
+ * @todo: Classes should automatically have EMPStore() and EMPLoad() created for serialization.
  */
 
 #include <fstream>
@@ -69,7 +73,7 @@ private:
   std::string ConcatLexemes(size_t start_pos, size_t end_pos) const {
     emp_assert(start_pos <= end_pos);
     emp_assert(end_pos <= tokens.size());
-    std::stringstream ss;
+    std::stringstream ss;    
     for (size_t i = start_pos; i < end_pos; i++) {
       if (i > start_pos && tokens[i].lexeme != ":") ss << " ";  // No space with labels.
       ss << tokens[i].lexeme;
@@ -89,6 +93,10 @@ private:
     if (debug) std::cout << "DEBUG: " << emp::to_string(std::forward<Ts>(args)...) << std::endl;
   }
 
+  template <typename... Ts>
+  void Require(bool result, int pos, Ts... args) const {
+    if (!result) { Error(pos, std::forward<Ts>(args)...); }
+  }
   template <typename... Ts>
   void RequireID(int pos, Ts... args) const {
     if (!IsID(pos)) { Error(pos, std::forward<Ts>(args)...); }
@@ -130,22 +138,31 @@ public:
   }
 
   /// Print out the converted C++ code.
-  void PrintOutput(std::ostream & os) const {
-    os << "/****************************************\n"
-       << " *  This is an auto-generated file.\n"
-       << " ****************************************/\n"
+  void PrintOutput(std::ostream & os, const std::string & input_filename="") const {
+    os << "/********************************************************************************\n"
+       << " *  This file was auto-generated from '" << input_filename << ".\n"
+       << " *\n"
+       << " *    ____          _   _       _     _____    _   _   _ \n"
+       << " *   |  _ \\   _    | \\ | | ___ | |_  | ____|__| ( ) |_| |\n"
+       << " *   | | | |/   \\  |  \\| |/   \\| __| |  _| / _` | | __| |\n"
+       << " *   | |_| | ( ) | | |\\  | ( ) | |_  | |__| (_| | | |_|_|\n"
+       << " *   |____/ \\___/  |_| \\_|\\___/ \\__| |_____\\__,_|_|\\__(_)\n"
+       << " *\n"
+       << " *  If you need to make changes to the contents of this file, please go back and\n"
+       << " *  modify the original source file (" << input_filename << ") as needed.\n"
+       << " ********************************************************************************/\n"
        << "\n"
        << "#include \"meta/TypePack.h\""
        << "\n";
     ast_root.PrintOutput(os, "");
   }
 
-  void PrintOutput(std::string filename) const {
-    if (filename == "") {
-      PrintOutput(std::cout);
+  void PrintOutput(const std::string & filename, const std::string & input_filename="") const {
+    if (filename == "" || filename == "-") {
+      PrintOutput(std::cout, input_filename);
     } else {
       std::ofstream ofile(filename);
-      PrintOutput(ofile);
+      PrintOutput(ofile, input_filename);
       ofile.close();
     }
   }
@@ -162,14 +179,14 @@ public:
     bool finished = false;
     while (!finished && pos < tokens.size()) {
       char cur_char = AsChar(pos++);
-      if (cur_char == stop_char) {
+      if (cur_char == stop_char) { 
         if (!keep_stop) pos--;
         break;
       }
       switch (cur_char) {
         case '<':
           if (match_angle_bracket == false) break;
-          [[fallthrough]]
+          [[fallthrough]];
         case '(':
         case '[':
         case '{':
@@ -177,7 +194,7 @@ public:
           break;
         case '>':
           if (match_angle_bracket == false) break;
-          [[fallthrough]]
+          [[fallthrough]];
         case ')':
         case ']':
         case '}':
@@ -291,14 +308,14 @@ public:
       RequireChar('=', pos++, "A using statement must provide an equals ('=') to assign the type.");
 
       // Identify if this type is required in the base class
-      if (AsLexeme(pos) == "required") {
-        new_element.special_value = AsLexeme(pos++);
+      if (AsLexeme(pos) == "0") {
+        new_element.AddSpecial(AsLexeme(pos++));
       }
       // Otherwise, save the default type.
       else {
         new_element.SetDefaultCode(ProcessType(pos));    // Determine code being assigned to.
       }
-
+ 
       RequireChar(';', pos++, "A using statement must end in a semi-colon.");
       new_element.SetTypedef();
     }
@@ -322,11 +339,10 @@ public:
 
         char fun_char = AsChar(pos++);
 
-        if (fun_char == '=') {  // Function is "= default;" or "= required;"
-          RequireID(pos, "Function must be assigned to 'required' or 'default'");
+        if (fun_char == '=') {  // Function is "= default;" or "= 0;"
           std::string fun_assign = AsLexeme(pos++);
-          if (fun_assign == "required" || fun_assign == "default") new_element.special_value = fun_assign;
-          else Error(pos, "Functions can only be set to 'required' or 'default'");
+          if (fun_assign == "0" || fun_assign == "default") new_element.AddSpecial(fun_assign);
+          else Error(pos, "Functions can only be set to '0' (if required) or 'default'");
           RequireChar(';', pos++, emp::to_string(fun_assign, "functions must end in a semi-colon."));
         }
         else if (fun_char == '{') {  // Function is defined in place.
@@ -334,6 +350,9 @@ public:
           RequireChar('}', pos, emp::to_string("Function body must end with close brace ('}') not '",
                                                 AsLexeme(pos), "'."));
           pos++;
+        }
+        else if (fun_char == ';') { // Function is declared, but not defined here.
+          new_element.AddSpecial("declare");
         }
         else {
           Error(pos-1, "Function body must begin with open brace or assignment ('{' or '=')");
@@ -357,11 +376,14 @@ public:
 
   /// Process the tokens starting from the outer-most scope.
   void ProcessTop(size_t & pos, AST_Scope & cur_scope ) const {
+    Debug("Processing new scope");
     emp_assert(pos <= tokens.size(), pos, tokens.size());
     while (pos < tokens.size() && AsChar(pos) != '}') {
       // If this line is a pre-processor statement, just hook it in to print back out and keep going.
       if (IsPP(pos)) {
+        Debug ("...Processing Pre-Processor command.");
         AST_PP & new_node = cur_scope.NewChild<AST_PP>();
+        new_node.name = emp::string_get(AsLexeme(pos), " \t");
         new_node.code = emp::to_string( AsLexeme(pos++), '\n');
         continue;
       }
@@ -375,33 +397,51 @@ public:
         ProcessConcept(pos, cur_scope);
       }
       else if (cur_lexeme == "struct" || cur_lexeme == "class") {
+        Debug("...Defining a new ", cur_lexeme);
         AST_Class & new_class = cur_scope.NewChild<AST_Class>();
         new_class.type = cur_lexeme;
         if (IsID(pos)) new_class.name = AsLexeme(pos++);
-        RequireChar('{', pos++, emp::to_string("A ", cur_lexeme, " must be defined in braces ('{' and '}')."));
-        new_class.body = ProcessCode(pos, false, true);
-        RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
+        Debug("...Using name of new ", cur_lexeme, ": ", new_class.name);
+
+        // If this is not just a declaration, load definition.
+        if (AsChar(pos) != ';') {
+          // Is there a base class?
+          if (AsChar(pos) == ':') {
+            new_class.base_info = ProcessCode(pos, false, '{', false);
+          }
+          RequireChar('{', pos++, emp::to_string("A ", cur_lexeme, " must be defined in braces ('{' and '}')."));
+          new_class.body = ProcessCode(pos, false, -1);
+          RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
+        }
+
         RequireChar(';', pos++, emp::to_string("A ", cur_lexeme, " must end with a semi-colon (';')."));
+        Debug("...Finished defining a new ", cur_lexeme, " named ", new_class.name);
       }
       else if (cur_lexeme == "namespace") {
         auto & new_ns = cur_scope.NewChild<AST_Namespace>();
 
         // If a name is provided for this namespace, store it.
         if (IsID(pos)) new_ns.name = AsLexeme(pos++);
+        Debug("...Defining a new ", cur_lexeme, " called ", new_ns.name);
 
         RequireChar('{', pos++, emp::to_string("A ", cur_lexeme, " must be defined in braces ('{' and '}')."));
         ProcessTop(pos, new_ns);
         RequireChar('}', pos++, emp::to_string("The end of a ", cur_lexeme, " must have a close brace ('}')."));
+
+        Debug("...Finished defining ", cur_lexeme, " called ", new_ns.name);
       }
       // @CAO: Still need to deal with "template", variables and functions, enums, template specializations
       ///      and empty lines (';').
-      else { // Must be a regular element (function, variable, using)
+      else { // Must be a regular element (function, variable, using)        
         pos--; // Backup since the first ID should be the type name.
+        Debug("...not defining concept, class, or namespace, so must be a regular element.");
         auto & new_node = cur_scope.NewChild<AST_Element>();
         new_node.info = ProcessElement(pos);
         // Error( pos-1, emp::to_string("Unknown keyword '", cur_lexeme, "'.  Aborting.") );
+        Debug("...Finished defining regular element.");
       }
     }
+    Debug("Finished processing scope");
   }
 
   /// We know we are in a concept definition.  Collect appropriate information.
@@ -412,18 +452,30 @@ public:
     RequireID(pos, "Concept declaration must be followed by name identifier.");
     concept.name = tokens[pos++].lexeme;
 
+    Debug("...Processing concept: ", concept.name);
+
     // Next, must be a colon...
-    RequireChar(':', pos++, "Concept names must be followed by a colon (':').");
+    RequireChar(':', pos++, "Concept names must be followed by a colon (':') and then a base class name.");
 
     // And then a base-class name.
     RequireID(pos, "Concept declaration must include name of base class.");
     concept.base_name = tokens[pos++].lexeme;
+
+    // If this base class has already been defined, add on to it.
+    if (emp::Ptr<AST_Node> base_node = cur_scope.GetChild(concept.base_name);
+        base_node) {
+      Require(base_node->IsClass(), pos-1, "Identifer for concept base class cannot be used by a non-class.");
+      Debug("...Using pre-defined base clase for concept: ", base_node->name);
+      base_node.Cast<AST_Class>()->concepts.push_back(&concept);
+      concept.base_predefined = true;
+    }
 
     // Next, must be an open brace...
     RequireChar('{', pos++, "Concepts must be defined in braces ('{' and '}').");
 
     // Loop through the full definition of concept, incorporating each entry.
     while ( AsChar(pos) != '}' ) {
+      Debug("...Reading in concept member...");
       // While we are processing a concept, process member elements and put them in the vector.
       concept.members.push_back( ProcessElement(pos) );
     }
@@ -431,9 +483,11 @@ public:
     pos++;  // Skip closing brace.
     RequireChar(';', pos++, "Concept definitions must end in a semi-colon.");
 
+    Debug("...Finished processing concept: ", concept.name);
+
     return concept;
   }
-
+  
   void Process() {
     size_t pos=0;
     ProcessTop(pos, ast_root);

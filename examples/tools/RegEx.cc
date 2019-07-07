@@ -109,9 +109,16 @@ int main()
   re5.PrintDebug();
 
   // Test combinations of + and *
-  std::cout << "------------\n";
+  std::cout << "------------ RE6\n";
   emp::RegEx re6("(0+0)*");
   re6.PrintDebug();
   auto NFA6 = emp::to_NFA(re6);
   NFA6.Print();
+
+  // Test string identification.
+  std::cout << "------------ RE7\n";
+  emp::RegEx re7("\\\"([^\"\\\\]|\\\\.)*\\\"");
+  re7.PrintDebug();
+  auto NFA7 = emp::to_NFA(re7);
+  NFA7.Print();
 }
