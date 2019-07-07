@@ -2,7 +2,7 @@ GCOV_FLAGS := -o0 -g --coverage
 
 TEST_NAMES := assert base constexpr data evo geometry meta scholar systematics tools games hardware
 
-FLAGS := -std=c++17 -Wall -Wno-unused-function -I../source/ -I../ -DCI=$(CI)
+FLAGS := -std=c++17 -Wall -Wno-unused-function -I../source/ -I../
 #CXX = clang++
 CXX := g++
 
@@ -32,7 +32,7 @@ test: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
 # Test optimized version without debug features
-opt: FLAGS := -std=c++17 -DNDEBUG -O3 -Wno-unused-function -I../source/ -I../
+opt: FLAGS := -std=c++17 -DNDEBUG -O3 -Wno-unused-function -DCI=$(CI) -I../source/ -I../
 opt: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
