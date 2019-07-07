@@ -441,7 +441,7 @@ TEST_CASE("Test BitSet", "[tools]")
 
   }
 
-  // tests for ROTATE_SELF
+  // tests for ROTATE_SELF, ROTR_SELF, ROTL_SELF
   MultiTester<2>::test<1>();
   MultiTester<18>::test<17>();
   MultiTester<34>::test<31>();
