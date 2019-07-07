@@ -259,7 +259,7 @@ struct MultiTester2 {
       REQUIRE(!bs.Get(emp::Mod(j-I,W)));
     }
 
-    if constexpr (I < N) {
+    if constexpr (I+1 < N) {
       // recurse
       MultiTester2<N>::test<I+1>();
     }
@@ -320,7 +320,7 @@ struct MultiTester {
       MultiTester2<I+2>::template test<0>();
     }
 
-    if constexpr (I < N) {
+    if constexpr (I+1 < N) {
       // recurse
       MultiTester<N>::test<I+1>();
     }
