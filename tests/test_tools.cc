@@ -320,9 +320,12 @@ struct MultiTester {
       MultiTester2<I+2>::template test<0>();
     }
 
-    if constexpr (I+1 < N) {
+    if constexpr (I+1 < N && N < 200) {
       // recurse
       MultiTester<N>::test<I+1>();
+    } else if constexpr (I+1 < N ) {
+      // recurse
+      MultiTester<N>::test<I+63>();
     }
   }
 
