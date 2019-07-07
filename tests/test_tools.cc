@@ -442,13 +442,13 @@ TEST_CASE("Test BitSet", "[tools]")
   }
 
   // tests for ROTATE_SELF, ROTR_SELF, ROTL_SELF
-  MultiTester<2>::test<1>();
-  MultiTester<18>::test<17>();
-  MultiTester<34>::test<31>();
-  MultiTester<51>::test<50>();
-  MultiTester<66>::test<63>();
-  MultiTester<96>::test<93>();
-  MultiTester<161>::test<160>();
+  // MultiTester<2>::test<1>();
+  // MultiTester<18>::test<17>();
+  // MultiTester<34>::test<31>();
+  // MultiTester<51>::test<50>();
+  // MultiTester<66>::test<63>();
+  // MultiTester<96>::test<93>();
+  // MultiTester<161>::test<160>();
   // MultiTester<2050>::test<2048>();
 
 }
