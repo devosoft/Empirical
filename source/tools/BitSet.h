@@ -493,13 +493,13 @@ namespace emp {
     }
 
     /// Get the field_t unsigned int; index in in field_t-bit jumps (i.e., this is a field ID not bit id)
-    field_t GetUInt(size_t index) const {
+    [[deprecated]] field_t GetUInt(size_t index) const {
       emp_assert(index < NUM_FIELDS);
       return bit_set[index];
     }
 
     /// Set the field_t unsigned int; index in in field_t-bit jumps (i.e., this is a field ID not bit id)
-    void SetUInt(size_t index, field_t value) {
+    [[deprecated]] void SetUInt(size_t index, field_t value) {
       emp_assert(index < NUM_FIELDS);
       bit_set[index] = value;
     }
@@ -516,7 +516,7 @@ namespace emp {
 
     /// Get OUT_BITS bits starting from the bit at a specified index (max FIELD_BITS)
     template <size_t OUT_BITS>
-    field_t GetValueAtBit(size_t index) {
+    [[deprecated]] field_t GetValueAtBit(size_t index) {
       static_assert(OUT_BITS <= FIELD_BITS, "Requesting too many bits to fit in a UInt");
       return GetUIntAtBit(index) & MaskLow<field_t>(OUT_BITS);
     }
