@@ -109,7 +109,7 @@ namespace emp {
     }
 
     /// Helper: call SHIFT with positive number instead
-    void ShiftLeft(const field_t shift_size) {
+    void ShiftLeft(const size_t shift_size) {
       if (shift_size > NUM_BITS) {
         Clear();
         return;
@@ -142,7 +142,7 @@ namespace emp {
 
 
     /// Helper for calling SHIFT with negative number
-    void ShiftRight(const field_t shift_size) {
+    void ShiftRight(const size_t shift_size) {
       if (!shift_size) return;
       if (shift_size > NUM_BITS) {
         Clear();
@@ -171,7 +171,7 @@ namespace emp {
     }
 
     /// Helper: call ROTATE with negative number instead
-    void RotateLeft(const field_t shift_size_raw) {
+    void RotateLeft(const size_t shift_size_raw) {
       const field_t shift_size = shift_size_raw % NUM_BITS;
 
       // use different approaches based on BitSet size
@@ -259,7 +259,7 @@ namespace emp {
 
 
     /// Helper for calling ROTATE with positive number
-    void RotateRight(const field_t shift_size_raw) {
+    void RotateRight(const size_t shift_size_raw) {
 
       const field_t shift_size = shift_size_raw % NUM_BITS;
 
