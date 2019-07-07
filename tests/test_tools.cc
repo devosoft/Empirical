@@ -449,7 +449,7 @@ TEST_CASE("Test BitSet", "[tools]")
   MultiTester<66>::test<63>();
   MultiTester<96>::test<93>();
   MultiTester<161>::test<160>();
-  MultiTester<2050>::test<2048>();
+  // MultiTester<2050>::test<2048>();
 
 }
 
