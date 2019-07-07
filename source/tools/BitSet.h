@@ -29,16 +29,29 @@
 
 namespace emp {
 
+  /// SFINAE helper to determine field_t for BitSet
+  template <size_t NUM_BITS> struct FieldHelper {
+#ifdef EMSCRIPTEN
+    ///< Field sizes are 32 bits in Emscripten (max directly handled)
+    using field_t = uint32_t;
+#else
+    ///< Field sizes are 64 bits in native, unless NUM_BITS == 32
+    using field_t = uint64_t;
+#endif
+  };
+
+  template <> struct FieldHelper<32> {
+    // if NUM_BITS == 32, use uint32_t
+    using field_t = uint32_t;
+  };
+
   ///  A fixed-sized (but arbitrarily large) array of bits, and optimizes operations on those bits
   ///  to be as fast as possible.
   template <size_t NUM_BITS> class BitSet {
   private:
 
-#ifdef EMSCRIPTEN
-    using field_t = uint32_t;  ///< Field sizes are 32 bits in Emscripten (max directly handled)
-#else
-    using field_t = uint64_t;  ///< Field sizes are 64 bits in native.
-#endif
+    ///< field size is 64 for native (except NUM_BITS == 32), 32 for emscripten
+    using field_t = typename FieldHelper<NUM_BITS>::field_t;
 
     static constexpr field_t FIELD_BITS = sizeof(field_t)*8; ///< How many bits are in a field?
 
