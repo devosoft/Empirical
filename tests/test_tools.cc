@@ -289,7 +289,8 @@ struct MultiTester {
     }
 
     for (int i = -width - 1; i <= width + 1; ++i) {
-      for (int j = 0; j < width; ++j) {
+      // for large widths, just do one starting position
+      for (int j = 0; j < (width < 200 ? width : 1); ++j) {
         bs.Clear(); bs.Set(j);
         bs.ROTATE_SELF(i);
         REQUIRE(bs.CountOnes() == 1);
@@ -314,8 +315,10 @@ struct MultiTester {
       }
     }
 
-      // test templated rotates
+    if constexpr (N < 200) {
+      // test templated rotates (only for small N)
       MultiTester2<I+2>::template test<0>();
+    }
 
     if constexpr (I < N) {
       // recurse
@@ -443,6 +446,7 @@ TEST_CASE("Test BitSet", "[tools]")
   MultiTester<66>::test<63>();
   MultiTester<96>::test<93>();
   MultiTester<161>::test<160>();
+  MultiTester<2050>::test<2048>();
 
 }
 

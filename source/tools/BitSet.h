@@ -174,9 +174,10 @@ namespace emp {
     void RotateLeft(const field_t shift_size_raw) {
       const field_t shift_size = shift_size_raw % NUM_BITS;
 
-      // special case: for exactly one field_T, try to go low level
-      // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
+      // use different approaches based on BitSet size
       if constexpr (NUM_FIELDS == 1) {
+        // special case: for exactly one field_T, try to go low level
+        // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
         field_t & n = bit_set[0];
         field_t c = shift_size;
 
@@ -186,7 +187,14 @@ namespace emp {
         c &= mask;
         n = (n<<c) | (n>>( (-(c+FIELD_BITS-NUM_BITS))&mask ));
 
+      } else if (NUM_FIELDS < 32) {
+        // for small BitSets, shifting L/R and ORing is faster
+        emp::BitSet<NUM_BITS> dup(*this);
+        dup.ShiftLeft(shift_size);
+        ShiftRight(NUM_BITS - shift_size);
+        OR_SELF(dup);
       } else {
+        // for big BitSets, manual rotating is fater
 
         // note that we already modded shift_size by NUM_BITS
         // so there's no need to mod by FIELD_SIZE here
@@ -255,9 +263,11 @@ namespace emp {
 
       const field_t shift_size = shift_size_raw % NUM_BITS;
 
-      // special case: for exactly one field_t, try to go low level
-      // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
+      // use different approaches based on BitSet size
       if constexpr (NUM_FIELDS == 1) {
+        // special case: for exactly one field_t, try to go low level
+        // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
+
         field_t & n = bit_set[0];
         field_t c = shift_size;
 
@@ -267,7 +277,14 @@ namespace emp {
         c &= mask;
         n = (n>>c) | (n<<( (NUM_BITS-c)&mask ));
 
+      } else if (NUM_FIELDS < 32) {
+        // for small BitSets, shifting L/R and ORing is faster
+        emp::BitSet<NUM_BITS> dup(*this);
+        dup.ShiftRight(shift_size);
+        ShiftLeft(NUM_BITS - shift_size);
+        OR_SELF(dup);
       } else {
+        // for big BitSets, manual rotating is fater
 
         const field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
         const int bit_shift = shift_size % FIELD_BITS;
