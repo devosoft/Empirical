@@ -507,20 +507,36 @@ namespace emp {
     }
 
     /// Get the full field_t unsigned int starting from the bit at a specified index.
-    field_t GetUIntAtBit(size_t index) {
+    uint32_t GetUIntAtBit(size_t index) {
       emp_assert(index < NUM_BITS);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
-      if (pos_id == 0) return bit_set[field_id];
-      return (bit_set[field_id] >> pos_id) |
-        ((field_id+1 < NUM_FIELDS) ? bit_set[field_id+1] << (FIELD_BITS-pos_id) : 0);
+
+      if constexpr (FIELD_BITS == 32) {
+        if (pos_id == 0) return bit_set[field_id];
+        else return (bit_set[field_id] >> pos_id) |
+          ((field_id+1 < NUM_FIELDS) ? bit_set[field_id+1] << (FIELD_BITS-pos_id) : 0);
+      } else if (FIELD_BITS == 64) {
+        if (pos_id == 0) return (
+          (uint32_t) (bit_set[field_id] & MaskLow<uint64_t>(32))
+        );
+        else return (
+          (uint32_t)(
+            ((bit_set[field_id] >> pos_id) | ((field_id+1 < NUM_FIELDS) ? bit_set[field_id+1] << (FIELD_BITS-pos_id) : 0))
+            & MaskLow<uint64_t>(32)
+          )
+        );
+      } else {
+        emp_assert(false, "Using an unknown number of bits.");
+      }
+
     }
 
-    /// Get OUT_BITS bits starting from the bit at a specified index (max FIELD_BITS)
+    /// Get OUT_BITS bits starting from the bit at a specified index (max 32)
     template <size_t OUT_BITS>
-    [[deprecated]] field_t GetValueAtBit(size_t index) {
-      static_assert(OUT_BITS <= FIELD_BITS, "Requesting too many bits to fit in a UInt");
-      return GetUIntAtBit(index) & MaskLow<field_t>(OUT_BITS);
+    uint32_t GetValueAtBit(size_t index) {
+      static_assert(OUT_BITS <= 32, "Requesting too many bits to fit in a UInt");
+      return GetUIntAtBit(index) & MaskLow<uint64_t>(OUT_BITS);
     }
 
     /// Return true if ANY bits in the BitSet are one, else return false.
