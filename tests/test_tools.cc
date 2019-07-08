@@ -342,26 +342,63 @@ TEST_CASE("Test BitSet", "[tools]")
   emp::BitSet<80> bs80;
 
   bs80[70] = 1;
-  emp::BitSet<80> bs80c(bs80);
   bs80 <<= 1;
+  emp::BitSet<80> bs80c(bs80);
 
   for (size_t i = 0; i < 75; i++) {
     emp::BitSet<80> shift_set = bs80 >> i;
     REQUIRE((shift_set.CountOnes() == 1) == (i <= 71));
   }
 
+  bs80.Clear();
+
   REQUIRE(bs10[2] == false);
   bs10.flip(2);
   REQUIRE(bs10[2] == true);
 
+  REQUIRE(bs32[2] == false);
+  bs32.flip(2);
+  REQUIRE(bs32[2] == true);
+
+  REQUIRE(bs80[2] == false);
+  bs80.flip(2);
+  REQUIRE(bs80[2] == true);
+
   for (size_t i = 3; i < 8; i++) {REQUIRE(bs10[i] == false);}
   bs10.flip(3, 8);
   for (size_t i = 3; i < 8; i++) {REQUIRE(bs10[i] == true);}
+  REQUIRE(bs10[8] == false);
 
-  // Test importing....
-  bs10.Import(bs80 >> 70);
+  for (size_t i = 3; i < 8; i++) {REQUIRE(bs32[i] == false);}
+  bs32.flip(3, 8);
+  for (size_t i = 3; i < 8; i++) {REQUIRE(bs32[i] == true);}
+  REQUIRE(bs32[8] == false);
 
-  REQUIRE(bs10.GetUInt(0) == 2);
+  for (size_t i = 3; i < 8; i++) {REQUIRE(bs80[i] == false);}
+  bs80.flip(3, 8);
+  for (size_t i = 3; i < 8; i++) {REQUIRE(bs80[i] == true);}
+  REQUIRE(bs80[8] == false);
+
+  bs80[70] = 1;
+
+  REQUIRE(bs10.GetUInt(0) == 252);
+  REQUIRE(bs10.GetUInt32(0) == 252);
+  REQUIRE(bs10.GetUInt64(0) == 252);
+
+  REQUIRE(bs32.GetUInt(0) == 252);
+  REQUIRE(bs32.GetUInt32(0) == 252);
+  REQUIRE(bs32.GetUInt64(0) == 252);
+
+  REQUIRE(bs80.GetUInt(0) == 252);
+  REQUIRE(bs80.GetUInt(1) == 0);
+  REQUIRE(bs80.GetUInt(2) == 64);
+  REQUIRE(bs80.GetUInt32(0) == 252);
+  REQUIRE(bs80.GetUInt32(1) == 0);
+  REQUIRE(bs80.GetUInt32(2) == 64);
+  REQUIRE(bs80.GetUInt64(0) == 252);
+  REQUIRE(bs80.GetUInt64(1) == 64);
+
+  bs80 = bs80c;
 
   // Test arbitrary bit retrieval of UInts
   bs80[65] = 1;

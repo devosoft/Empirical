@@ -492,18 +492,69 @@ namespace emp {
       bit_set[field_id] = (bit_set[field_id] & ~(((field_t)255U) << pos_id)) | (val_uint << pos_id);
     }
 
-    /// Get the field_t unsigned int; index in in field_t-bit jumps (i.e., this is a field ID not bit id)
-    /// This method is deprecated because its behavior depends on field_t
-    [[deprecated]] field_t GetUInt(size_t index) const {
-      emp_assert(index < NUM_FIELDS);
-      return bit_set[index];
+    /// Get the field_t unsigned int; index in in 32-bit jumps
+    /// (i.e., this is a field ID not bit id)
+    uint32_t GetUInt(size_t index) const { return GetUInt32(index); }
+
+    /// Set the field_t unsigned int; index in in 32-bit jumps
+    /// (i.e., this is a field ID not bit id)
+    void SetUInt(size_t index, uint32_t value) { SetUInt32(index, value); }
+
+    /// Get the field_t unsigned int; index in in field_t-bit jumps
+    /// (i.e., this is a field ID not bit id)
+    uint32_t GetUInt32(size_t index) const {
+      emp_assert(index * 32 < NUM_FIELDS * FIELD_BITS);
+      return ((uint32_t*) bit_set)[index];
     }
 
-    /// Set the field_t unsigned int; index in in field_t-bit jumps (i.e., this is a field ID not bit id)
-    /// This method is deprecated because its behavior depends on field_t
-    [[deprecated]] void SetUInt(size_t index, field_t value) {
-      emp_assert(index < NUM_FIELDS);
-      bit_set[index] = value;
+    /// Set the field_t unsigned int; index in in 32-bit jumps
+    /// (i.e., this is a field ID not bit id)
+    void SetUInt32(size_t index, uint32_t value) {
+      emp_assert(index * 32 < NUM_FIELDS * FIELD_BITS);
+      ((uint32_t*) bit_set)[index] = value;
+
+      // Mask out filler bits if necessary
+      if constexpr ((bool)LAST_BIT) {
+        // we only need to do this
+        // if (index * 64 == (NUM_FIELDS - 1) * FIELD_BITS)
+        // but just doing it always is probably faster
+        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      }
+
+    }
+
+    /// Get the field_t unsigned int; index in in 64-bit jumps
+    /// (i.e., this is a field ID not bit id)
+    uint64_t GetUInt64(size_t index) const {
+      emp_assert(index * 64 < NUM_FIELDS * FIELD_BITS);
+
+      if constexpr (FIELD_BITS == 32 && NUM_FIELDS % 2) {
+        if (index * 2 == NUM_FIELDS - 1 ) return bit_set[NUM_FIELDS - 1];
+      }
+
+      return ((uint64_t*) bit_set)[index];
+    }
+
+    /// Set the field_t unsigned int; index in in 64-bit jumps
+    /// (i.e., this is a field ID not bit id)
+    void SetUInt64(size_t index, uint64_t value) {
+      emp_assert(index * 64 < NUM_FIELDS * FIELD_BITS);
+
+      if constexpr (FIELD_BITS == 32 && NUM_FIELDS % 2) {
+        if (index * 2 == NUM_FIELDS - 1 ) {
+          bit_set[NUM_FIELDS - 1] = (uint32_t) value;
+        }
+      }
+
+      // Mask out filler bits if necessary
+      if constexpr ((bool)LAST_BIT) {
+        // we only need to do this
+        // if (index * 64 == (NUM_FIELDS - 1) * FIELD_BITS)
+        // but just doing it always is probably faster
+        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      }
+
+      ((uint64_t*) bit_set)[index] = value;
     }
 
     /// Get the full field_t unsigned int starting from the bit at a specified index.
