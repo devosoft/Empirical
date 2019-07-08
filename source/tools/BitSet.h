@@ -493,12 +493,14 @@ namespace emp {
     }
 
     /// Get the field_t unsigned int; index in in field_t-bit jumps (i.e., this is a field ID not bit id)
+    /// This method is deprecated because its behavior depends on field_t
     [[deprecated]] field_t GetUInt(size_t index) const {
       emp_assert(index < NUM_FIELDS);
       return bit_set[index];
     }
 
     /// Set the field_t unsigned int; index in in field_t-bit jumps (i.e., this is a field ID not bit id)
+    /// This method is deprecated because its behavior depends on field_t
     [[deprecated]] void SetUInt(size_t index, field_t value) {
       emp_assert(index < NUM_FIELDS);
       bit_set[index] = value;
