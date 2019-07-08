@@ -557,29 +557,26 @@ namespace emp {
       ((uint64_t*) bit_set)[index] = value;
     }
 
-    /// Get the full field_t unsigned int starting from the bit at a specified index.
-    uint32_t GetUIntAtBit(size_t index) {
-      emp_assert(index < NUM_BITS);
-      const size_t field_id = FieldID(index);
-      const size_t pos_id = FieldPos(index);
+    /// Get the full uint32_t unsigned int starting from the bit at a specified index.
+    uint32_t GetUIntAtBit(size_t index) { return GetUInt32AtBit(index); }
 
-      if constexpr (FIELD_BITS == 32) {
-        if (pos_id == 0) return bit_set[field_id];
-        else return (bit_set[field_id] >> pos_id) |
-          ((field_id+1 < NUM_FIELDS) ? bit_set[field_id+1] << (FIELD_BITS-pos_id) : 0);
-      } else if (FIELD_BITS == 64) {
-        if (pos_id == 0) return (
-          (uint32_t) (bit_set[field_id] & MaskLow<uint64_t>(32))
-        );
-        else return (
-          (uint32_t)(
-            ((bit_set[field_id] >> pos_id) | ((field_id+1 < NUM_FIELDS) ? bit_set[field_id+1] << (FIELD_BITS-pos_id) : 0))
-            & MaskLow<uint64_t>(32)
-          )
-        );
-      } else {
-        emp_assert(false, "Using an unknown number of bits.");
-      }
+    /// Get the full uint32_t unsigned int starting from the bit at a specified index.
+    uint32_t GetUInt32AtBit(size_t index) {
+      emp_assert(index < NUM_BITS);
+
+      uint32_t *cast_set = (uint32_t *) bit_set;
+      const size_t field_id = index / 32;
+      const size_t pos_id = index % 32;
+
+      if (pos_id == 0) return cast_set[field_id];
+      else return (
+        (cast_set[field_id] >> pos_id) |
+        (
+          (field_id+1 < NUM_FIELDS)
+          ? cast_set[field_id+1] << (FIELD_BITS-pos_id)
+          : 0
+        )
+      );
 
     }
 
