@@ -1011,65 +1011,64 @@ namespace emp {
     /// Addition of two Bitsets. Wraps back to 0 if it overflows. returns result.
     BitSet ADD(const BitSet & set2) const{
       BitSet out_set(*this);
-      bool carry = false;
-      const uint32_t MAX_INT = pow(2, (NUM_BITS > 32 ? 32 : NUM_BITS)) - 1;
-      for (size_t i = 0; i < NUM_FIELDS; i++){
-        size_t sum = (size_t)bit_set[i] + (size_t)set2.bit_set[i] + carry;
-        carry = false;
-        if (sum > MAX_INT){
-          carry = true;
-          sum%= ((size_t)MAX_INT) + 1;
-        }
-        out_set.bit_set[i] = sum;
-      }
-      return out_set;
+      return out_set.ADD_SELF(set2);
     }
 
     /// Addition of two Bitsets. Wraps back to 0 if it overflows. returns this object.
     BitSet & ADD_SELF(const BitSet & set2) {
+      uint32_t *self_cast_set = (uint32_t*) bit_set;
+      const uint32_t *other_cast_set =  (const uint32_t*) set2.bit_set;
+
       bool carry = false;
-      const uint32_t MAX_INT = pow(2, (NUM_BITS > 32 ? 32 : NUM_BITS)) - 1;
-      for (size_t i = 0; i < NUM_FIELDS; i++){
-        size_t sum = (size_t)bit_set[i] + (size_t)set2.bit_set[i] + carry;
+      const uint32_t MAX_INT = emp::IntPow(
+        2UL,
+        (NUM_BITS > 32 ? 32 : NUM_BITS)
+      ) - 1;
+
+      for (size_t i = 0; i < (NUM_FIELDS * FIELD_BITS)/32; ++i){
+        uint64_t sum = (
+          (uint64_t)self_cast_set[i] + (uint64_t)other_cast_set[i] + carry
+        );
         carry = false;
         if (sum > MAX_INT){
           carry = true;
-          sum%= ((size_t)MAX_INT) + 1;
+          sum%= ((uint64_t)MAX_INT) + 1;
         }
-        bit_set[i] = sum;
+        self_cast_set[i] = sum;
       }
       return *this;
     }
 
-    ///Subtraction of two Bitsets. Wraps to 2^min(num_bits, 32) if it underflows. returns result.
+    ///Subtraction of two Bitsets.
+    /// Wraps to 2^min(num_bits, 32) if it underflows.
+    /// Returns result.
     BitSet SUB(const BitSet & set2) const{
       BitSet out_set(*this);
-      bool carry = false;
-      const size_t MAX_INT = pow(2, (NUM_BITS > 32 ? 32 : NUM_BITS)) -1;
-      for(size_t i = 0; i < NUM_FIELDS; i++){
-        size_t subtrahend = (size_t)set2.bit_set[i] + carry;
-        uint32_t diff = (bit_set[i] - subtrahend) % (MAX_INT+1);
-        carry = false;
-        if (bit_set[i] < subtrahend){
-          carry = true;
-        }
-        out_set.bit_set[i] = diff;
-      }
-      return out_set;
+      return out_set.SUB_SELF(set2);
     }
 
-    ///Subtraction of two Bitsets. Wraps to 2^min(num_bits, 32) if it underflows. returns this object.
+    /// Subtraction of two Bitsets.
+    /// Wraps to 2^min(num_bits, 32) if it underflows.
+    /// Returns this object.
     BitSet & SUB_SELF(const BitSet & set2){
+      uint32_t *self_cast_set = (uint32_t*) bit_set;
+      const uint32_t *other_cast_set =  (const uint32_t*) set2.bit_set;
+
       bool carry = false;
-      const size_t MAX_INT = pow(2, (NUM_BITS > 32 ? 32 : NUM_BITS)) - 1;
-      for(size_t i = 0; i < NUM_FIELDS; i++){
-        size_t subtrahend = (size_t)set2.bit_set[i] + carry;
-        uint32_t diff = (bit_set[i] - subtrahend) % (MAX_INT+1);
+
+      const uint64_t MAX_INT = emp::IntPow(
+        (uint64_t) 2,
+        (NUM_BITS > 32 ? 32 : NUM_BITS)
+      ) - 1;
+
+      for(size_t i = 0; i < (NUM_FIELDS * FIELD_BITS)/32; ++i){
+        uint64_t subtrahend = (uint64_t)other_cast_set[i] + carry;
+        uint32_t diff = (self_cast_set[i] - subtrahend) % (MAX_INT+1);
         carry = false;
-        if (bit_set[i] < subtrahend){
+        if (self_cast_set[i] < subtrahend){
           carry = true;
         }
-        bit_set[i] = diff;
+        self_cast_set[i] = diff;
       }
       return *this;
     }
