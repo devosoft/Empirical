@@ -40,7 +40,7 @@ namespace emp {
     static constexpr double max_dist = Width;
 
     double operator()(const query_t& a, const tag_t& b) const{
-      return (double)(a^b).CountOnes();
+      return (double)(a^b).CountOnes() / max_dist;
     }
   };
 
@@ -53,7 +53,8 @@ namespace emp {
     static constexpr double max_dist = std::numeric_limits<int>::max();
 
     double operator()(const query_t& a, const tag_t& b) const {
-      return (double)std::abs(a-b);
+
+      return (double)std::abs(a-b) / max_dist;
     }
   };
 
@@ -70,7 +71,7 @@ namespace emp {
 
     double operator()(const query_t& a, const tag_t& b) const {
       const size_t difference = ((Max + 1) + b - a) % (Max + 1);
-      return (double)(difference % (Max + 1));
+      return (double)(difference % (Max + 1)) / max_dist;
     }
   };
 
@@ -118,7 +119,7 @@ namespace emp {
     double operator()(const query_t& a, const tag_t& b) {
       emp::BitSet<Width> bitDifference = ( a > b ? a - b : b - a);
       static_assert(Width <= 32);
-      return bitDifference.GetUInt(0);
+      return bitDifference.GetUInt(0)/max_dist;
     }
   };
 
@@ -148,11 +149,11 @@ namespace emp {
       const double thresh = (
         ThreshRatio::num < 0
         ? std::numeric_limits<double>::infinity()
-        : ((double) ThreshRatio::num) / ThreshRatio::den
+        : ((double) ThreshRatio::num) / ((double)ThreshRatio::den)
       );
 
-      if (n < std::log2(uids.size())) {
 
+      if (n < std::log2(uids.size())) {
         // Perform a bounded selection sort to find the first n results
         for (; back < n; ++back) {
           int minIndex = -1;
