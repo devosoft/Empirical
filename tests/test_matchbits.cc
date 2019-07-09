@@ -17,7 +17,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE (bs0.GetUInt(0) == 4294967295);
   REQUIRE ((bs0+bs1).GetUInt(0) == 0);
   REQUIRE ((bs0+bs0).GetUInt(0) == 4294967294);
-  
+
   emp::BitSet<8> bs2;
   bs2.SetUInt(0,pow(2, 8)-1);
   emp::BitSet<8> bs3;
@@ -45,7 +45,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   bs0 = bs0 - bs1;
   REQUIRE (bs0.GetUInt(0) == 0);
   REQUIRE ((bs0-bs1).GetUInt(0) == pow((size_t)2, (size_t)32)-1);
-  
+
   emp::BitSet<8> bs2;
   bs2.SetUInt(0, 1);
   emp::BitSet<8> bs3;
