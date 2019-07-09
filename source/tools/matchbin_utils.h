@@ -38,6 +38,7 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
 
     static constexpr double max_dist = Width;
+    static constexpr size_t width = Width;
 
     double operator()(const query_t& a, const tag_t& b) const{
       return (double)(a^b).CountOnes() / max_dist;
@@ -68,6 +69,7 @@ namespace emp {
     using query_t = size_t;
 
     static constexpr double max_dist = Max;
+    static constexpr size_t width = sizeof(size_t) * 8;
 
     double operator()(const query_t& a, const tag_t& b) const {
       const size_t difference = ((Max + 1) + b - a) % (Max + 1);
@@ -84,6 +86,7 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
 
     static constexpr double max_dist = 1.0;
+    static constexpr size_t width = Width;
 
     double operator()(const query_t& a, const tag_t& b) const {
       const emp::BitSet<Width> bs = a^b;
@@ -115,6 +118,7 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
 
     static constexpr double max_dist = std::pow(2, Width);
+    static constexpr size_t width = Width;
 
     double operator()(const query_t& a, const tag_t& b) {
       emp::BitSet<Width> bitDifference = ( a > b ? a - b : b - a);
