@@ -127,6 +127,47 @@ namespace emp {
     }
   };
 
+  template<typename Metric>
+  struct SlideMod {
+
+    using tag_t = typename Metric::tag_t;
+    using query_t = typename Metric::query_t;
+
+    static constexpr double max_dist = Metric::max_dist;
+    static constexpr size_t width = Metric::width;
+
+    Metric metric;
+
+    double operator()(query_t& a, const tag_t& b) {
+
+      emp_assert(&a != &b);
+
+      double best = 1.0;
+
+      for(size_t i = 0; i < Metric::width; ++ i) {
+        best = std::min(metric(a, b), best);
+        a.template ROTL_SELF<1>();
+      }
+
+      return best;
+    }
+  };
+
+  template<typename Metric>
+  struct AntiMod {
+
+    using tag_t = typename Metric::tag_t;
+    using query_t = typename Metric::query_t;
+
+    static constexpr double max_dist = Metric::max_dist;
+    static constexpr size_t width = Metric::width;
+
+    Metric metric;
+
+    double operator()(const query_t& a, const tag_t& b) { return 1.0 - metric(a,b); }
+
+  };
+
   /// Abstract base class for selectors
   struct Selector {
 

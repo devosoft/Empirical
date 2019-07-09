@@ -4,7 +4,9 @@
 #include <string>
 #include "tools/BitSet.h"
 #include "tools/MatchBin.h"
+#include "tools/matchbin_utils.h"
 #include <ratio>
+#include <limits>
 
 TEST_CASE("Test MatchBin", "[tools]")
 {
@@ -74,6 +76,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(bs4.GetUInt(1) == pow((size_t)2, (size_t)32)-1);
   }
 
+  // test list initializer
   {
     emp::BitSet<3> bs_empty{0,0,0};
     emp::BitSet<3> bs_first{1,0,0};
@@ -84,6 +87,156 @@ TEST_CASE("Test MatchBin", "[tools]")
     REQUIRE(bs_first.CountOnes() == 1);
     REQUIRE(bs_last.CountOnes() == 1);
     REQUIRE(bs_full.CountOnes() == 3);
+
+  }
+
+  // test SlideMod
+  {
+    emp::BitSet<3> bs_000{0,0,0};
+    emp::BitSet<3> bs_100{1,0,0};
+    emp::BitSet<3> bs_010{0,1,0};
+    emp::BitSet<3> bs_001{0,0,1};
+    emp::BitSet<3> bs_111{1,1,1};
+
+    emp::SlideMod<emp::StreakMetric<3>> slide_streak;
+    emp::SlideMod<emp::HammingMetric<3>> slide_hamming;
+    emp::StreakMetric<3> streak;
+
+    emp::BitSet<3> dup(bs_010);
+    slide_streak(bs_010, bs_000);
+    REQUIRE(bs_010 == dup);
+
+    // slide takes a reference and rotates the BitSet around
+    // (and back into place) so we need to make a copy if we have
+    // equivalent left and right operands to operator()
+    REQUIRE(
+      slide_streak(bs_100, dup=bs_100)
+      ==
+      slide_streak(bs_100, bs_010)
+    );
+
+    REQUIRE(
+      streak(bs_100, bs_100)
+      ==
+      slide_streak(bs_100, bs_010)
+    );
+
+    REQUIRE(
+      slide_streak(bs_000, bs_111)
+      >
+      slide_streak(bs_100, bs_000)
+    );
+
+    REQUIRE(
+      slide_streak(bs_000, bs_111)
+      >
+      streak(bs_100, bs_000)
+    );
+
+    REQUIRE(
+      slide_hamming(bs_100, dup=bs_100)
+      ==
+      slide_hamming(bs_100, bs_010)
+    );
+
+  }
+
+  // test AntiMod
+  {
+    emp::BitSet<3> bs_000{0,0,0};
+    emp::BitSet<3> bs_100{1,0,0};
+    emp::BitSet<3> bs_010{0,1,0};
+    emp::BitSet<3> bs_001{0,0,1};
+    emp::BitSet<3> bs_011{0,1,1};
+    emp::BitSet<3> bs_111{1,1,1};
+
+    emp::AntiMod<emp::StreakMetric<3>> anti_streak;
+    emp::StreakMetric<3> streak;
+    emp::AntiMod<emp::HammingMetric<3>> anti_hamming;
+    emp::HammingMetric<3> hamming;
+
+
+    // anti should be equivalent to 0 matching with 1 and vice versa
+    // instead of 0 matching with 0 and 1 matching with 1
+    REQUIRE(
+      anti_streak(bs_000, bs_111)
+      ==
+      streak(bs_111, bs_111)
+    );
+
+    REQUIRE(
+      anti_streak(bs_011, bs_000)
+      ==
+      streak(bs_011, bs_111)
+    );
+
+    REQUIRE(
+      anti_hamming(bs_000, bs_111)
+      -
+      hamming(bs_111, bs_111)
+      <= std::numeric_limits<double>::epsilon()
+      // instead of doing == because of floating imprecision
+    );
+
+    REQUIRE(
+      anti_hamming(bs_011, bs_000)
+      -
+      hamming(bs_011, bs_111)
+      <= std::numeric_limits<double>::epsilon()
+      // instead of doing == because of floating imprecision
+    );
+
+  }
+
+  // text AntiMod x SlideMod
+  {
+    emp::BitSet<3> bs_000{0,0,0};
+    emp::BitSet<3> bs_100{1,0,0};
+    emp::BitSet<3> bs_010{0,1,0};
+    emp::BitSet<3> bs_001{0,0,1};
+    emp::BitSet<3> bs_011{0,1,1};
+    emp::BitSet<3> bs_111{1,1,1};
+
+    emp::BitSet<3> dup;
+
+    emp::SlideMod<emp::StreakMetric<3>> slide_streak;
+    emp::SlideMod<emp::AntiMod<emp::StreakMetric<3>>> slide_anti_streak;
+    emp::SlideMod<emp::HammingMetric<3>> slide_hamming;
+    emp::SlideMod<emp::AntiMod<emp::HammingMetric<3>>> slide_anti_hamming;
+
+    // anti should be equivalent to 0 matching with 1 and vice versa
+    // instead of 0 matching with 0 and 1 matching with 1
+
+    REQUIRE(
+      slide_streak(bs_000, bs_111)
+      ==
+      slide_anti_streak(dup=bs_111, bs_111)
+    );
+    // slide takes a reference and rotates the BitSet around
+    // (and back into place) so we need to make a copy if we have
+    // equivalent left and right operands to operator()
+
+    REQUIRE(
+      slide_streak(bs_011, bs_000)
+      ==
+      slide_anti_streak(bs_011, bs_111)
+    );
+
+    REQUIRE(
+      slide_hamming(bs_000, bs_111)
+      -
+      slide_anti_hamming(dup=bs_111, bs_111)
+      <= std::numeric_limits<double>::epsilon()
+      // instead of doing == because of floating imprecision
+    );
+
+    REQUIRE(
+      slide_hamming(bs_011, bs_000)
+      -
+      slide_anti_hamming(bs_011, bs_111)
+      <= std::numeric_limits<double>::epsilon()
+      // instead of doing == because of floating imprecision
+    );
 
   }
 }
