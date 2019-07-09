@@ -17,6 +17,7 @@
 #define EMP_BIT_SET_H
 
 #include <iostream>
+#include <initializer_list>
 
 #include "../base/assert.h"
 #include "../base/vector.h"
@@ -350,6 +351,21 @@ namespace emp {
 
     /// Constructor to generate a random BitSet with provided prob of 1's.
     BitSet(Random & random, const double p1) { Clear(); Randomize(random, p1); }
+
+    /// Constructor to fill in a bit set from a vector.
+    template <typename T>
+    BitSet(const std::initializer_list<T> l) {
+
+      Clear();
+
+      size_t idx = 0;
+      for (auto i = std::begin(l); i != std::end(l); ++i) {
+        emp_assert(idx < NUM_BITS);
+        Set(idx, *i);
+        ++idx;
+      }
+
+    }
 
     /// Destructor.
     ~BitSet() = default;

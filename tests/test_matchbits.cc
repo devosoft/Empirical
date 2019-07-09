@@ -73,4 +73,17 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(bs4.GetUInt(0) == pow((size_t)2, (size_t)32)-2);
   REQUIRE(bs4.GetUInt(1) == pow((size_t)2, (size_t)32)-1);
   }
+
+  {
+    emp::BitSet<3> bs_empty{0,0,0};
+    emp::BitSet<3> bs_first{1,0,0};
+    emp::BitSet<3> bs_last{0,0,1};
+    emp::BitSet<3> bs_full{1,1,1};
+
+    REQUIRE(bs_empty.CountOnes() == 0);
+    REQUIRE(bs_first.CountOnes() == 1);
+    REQUIRE(bs_last.CountOnes() == 1);
+    REQUIRE(bs_full.CountOnes() == 3);
+
+  }
 }
