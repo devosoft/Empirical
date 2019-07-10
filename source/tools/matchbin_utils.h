@@ -23,6 +23,7 @@
 #include <math.h>
 
 #include "../base/assert.h"
+#include "../base/array.h"
 #include "../base/vector.h"
 #include "../tools/IndexMap.h"
 #include "../tools/BitSet.h"
@@ -165,6 +166,26 @@ namespace emp {
     Metric metric;
 
     double operator()(const query_t& a, const tag_t& b) { return 1.0 - metric(a,b); }
+
+  };
+
+  template<typename Metric, size_t Dim>
+  struct DimMod {
+
+    using tag_t = emp::array<typename Metric::tag_t, Dim>;
+    using query_t = emp::array<typename Metric::query_t, Dim>;
+
+    static constexpr size_t width = Dim * Metric::width;
+
+    Metric metric;
+
+    double operator()(query_t& a, const tag_t& b) {
+
+      double res = 0.0;
+      for (size_t d = 0; d < Dim; ++d) res += metric(a[d], b[d]);
+
+      return res / (double)Dim;
+    }
 
   };
 
