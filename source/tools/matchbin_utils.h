@@ -118,7 +118,7 @@ namespace emp {
     using tag_t = emp::BitSet<Width>;
     using query_t = emp::BitSet<Width>;
 
-    static constexpr double max_dist = std::pow(2, Width);
+    static constexpr double max_dist = emp::BitSet<Width>::MaxDouble();
     static constexpr size_t width = Width;
 
     double operator()(const query_t& a, const tag_t& b) {
