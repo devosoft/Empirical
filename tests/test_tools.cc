@@ -1151,7 +1151,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::AbsDiffMetric,
-    emp::RankedSelector<std::ratio<214748364700+599,214748364700>> 
+    emp::RankedSelector<std::ratio<214748364700+599,214748364700>>
   > bin;
 
   const size_t hi = bin.Put("hi", 1);
