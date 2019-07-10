@@ -20,6 +20,7 @@
 
 #include "../base/assert.h"
 #include "../base/vector.h"
+#include "../base/Ptr.h"
 
 #include "bitset_utils.h"
 #include "functions.h"
@@ -28,20 +29,45 @@
 
 namespace emp {
 
+  /// SFINAE helper to determine field_t for BitSet
+  template <size_t NUM_BITS> struct FieldHelper {
+#ifdef EMSCRIPTEN
+    ///< Field sizes are 32 bits in Emscripten (max directly handled)
+    using field_t = uint32_t;
+#else
+    ///< Field sizes are 64 bits in native, unless NUM_BITS == 32
+    using field_t = uint64_t;
+#endif
+  };
+
+  template <> struct FieldHelper<32> {
+    // if NUM_BITS == 32, use uint32_t
+    using field_t = uint32_t;
+  };
+
   ///  A fixed-sized (but arbitrarily large) array of bits, and optimizes operations on those bits
   ///  to be as fast as possible.
   template <size_t NUM_BITS> class BitSet {
   private:
-    /// Fields hold bits in groups of 32 (as uint32_t); how many feilds do we need?
-    static const uint32_t NUM_FIELDS = 1 + ((NUM_BITS - 1) >> 5);
+
+    ///< field size is 64 for native (except NUM_BITS == 32), 32 for emscripten
+    using field_t = typename FieldHelper<NUM_BITS>::field_t;
+
+    static constexpr field_t FIELD_BITS = sizeof(field_t)*8; ///< How many bits are in a field?
+
+    static constexpr field_t FIELD_LOG2 = emp::Log2(FIELD_BITS);
+
+    /// Fields hold bits in groups of 32 or 64 (as uint32_t or uint64_t);
+    /// how many fields do we need?
+    static constexpr field_t NUM_FIELDS = (1 + ((NUM_BITS - 1) / FIELD_BITS));
 
     /// End position of the stored bits in the last field; 0 if perfect fit.
-    static const uint32_t LAST_BIT = NUM_BITS & 31;
+    static constexpr field_t LAST_BIT = NUM_BITS & (FIELD_BITS - 1);
 
     /// How many total bytes are needed to represent these bits? (rounded up to full bytes)
-    static const uint32_t NUM_BYTES = 1 + ((NUM_BITS - 1) >> 3);
+    static const field_t NUM_BYTES = 1 + ((NUM_BITS - 1) >> 3);
 
-    uint32_t bit_set[NUM_FIELDS];  ///< Fields to hold the actual bits for this BitSet.
+    field_t bit_set[NUM_FIELDS];  ///< Fields to hold the actual bits for this BitSet.
 
     /// BitProxy lets us use operator[] on with BitSet as an lvalue.
     class BitProxy {
@@ -70,23 +96,27 @@ namespace emp {
     friend class BitProxy;
 
     inline static size_t FieldID(const size_t index) {
-      emp_assert((index >> 5) < NUM_FIELDS);
-      return index >> 5;
+      emp_assert((index >> FIELD_LOG2) < NUM_FIELDS);
+      return index >> FIELD_LOG2;
     }
-    inline static size_t FieldPos(const size_t index) { return index & 31; }
+    inline static size_t FieldPos(const size_t index) { return index & (FIELD_BITS - 1); }
 
     inline static size_t Byte2Field(const size_t index) { return index/4; }
     inline static size_t Byte2FieldPos(const size_t index) { return (index & 3) << 3; }
 
-    inline void Copy(const uint32_t in_set[NUM_FIELDS]) {
+    inline void Copy(const field_t in_set[NUM_FIELDS]) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
     }
 
     /// Helper: call SHIFT with positive number instead
-    void ShiftLeft(const uint32_t shift_size) {
-      const int field_shift = shift_size / 32;
-      const int bit_shift = shift_size % 32;
-      const int bit_overflow = 32 - bit_shift;
+    void ShiftLeft(const size_t shift_size) {
+      if (shift_size > NUM_BITS) {
+        Clear();
+        return;
+      }
+      const int field_shift = shift_size / FIELD_BITS;
+      const int bit_shift = shift_size % FIELD_BITS;
+      const int bit_overflow = FIELD_BITS - bit_shift;
 
       // Loop through each field, from L to R, and update it.
       if (field_shift) {
@@ -107,16 +137,20 @@ namespace emp {
       }
 
       // Mask out any bits that have left-shifted away
-      if (LAST_BIT) { bit_set[NUM_FIELDS - 1] &= (1U << LAST_BIT) - 1U; }
+      if (LAST_BIT) { bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT); }
     }
 
 
     /// Helper for calling SHIFT with negative number
-    void ShiftRight(const uint32_t shift_size) {
-      emp_assert(shift_size > 0);
-      const uint32_t field_shift = shift_size / 32;
-      const uint32_t bit_shift = shift_size % 32;
-      const uint32_t bit_overflow = 32 - bit_shift;
+    void ShiftRight(const size_t shift_size) {
+      if (!shift_size) return;
+      if (shift_size > NUM_BITS) {
+        Clear();
+        return;
+      }
+      const field_t field_shift = shift_size / FIELD_BITS;
+      const field_t bit_shift = shift_size % FIELD_BITS;
+      const field_t bit_overflow = FIELD_BITS - bit_shift;
 
       // account for field_shift
       if (field_shift) {
@@ -134,6 +168,171 @@ namespace emp {
         }
         bit_set[NUM_FIELDS - 1 - field_shift] >>= bit_shift;
       }
+    }
+
+    /// Helper: call ROTATE with negative number instead
+    void RotateLeft(const size_t shift_size_raw) {
+      const field_t shift_size = shift_size_raw % NUM_BITS;
+
+      // use different approaches based on BitSet size
+      if constexpr (NUM_FIELDS == 1) {
+        // special case: for exactly one field_T, try to go low level
+        // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
+        field_t & n = bit_set[0];
+        field_t c = shift_size;
+
+        // mask necessary to suprress shift count overflow warnings
+        constexpr field_t mask = MaskLow<field_t>(FIELD_LOG2);
+
+        c &= mask;
+        n = (n<<c) | (n>>( (-(c+FIELD_BITS-NUM_BITS))&mask ));
+
+      } else if (NUM_FIELDS < 32) {
+        // for small BitSets, shifting L/R and ORing is faster
+        emp::BitSet<NUM_BITS> dup(*this);
+        dup.ShiftLeft(shift_size);
+        ShiftRight(NUM_BITS - shift_size);
+        OR_SELF(dup);
+      } else {
+        // for big BitSets, manual rotating is fater
+
+        // note that we already modded shift_size by NUM_BITS
+        // so there's no need to mod by FIELD_SIZE here
+        const int field_shift = LAST_BIT ? (
+          (shift_size + FIELD_BITS - LAST_BIT) / FIELD_BITS
+        ) : (
+          shift_size / FIELD_BITS
+        );
+        // if we field shift, we need to shift bits by (FIELD_BITS - LAST_BIT)
+        // more to account for the filler that gets pulled out of the middle
+        const int bit_shift = LAST_BIT && field_shift ? (
+          (shift_size + FIELD_BITS - LAST_BIT) % FIELD_BITS
+        ) : (
+          shift_size % FIELD_BITS
+        );
+        const int bit_overflow = FIELD_BITS - bit_shift;
+
+        // if rotating more than field capacity, we need to rotate fields
+        std::rotate(
+          std::rbegin(bit_set),
+          std::rbegin(bit_set)+field_shift,
+          std::rend(bit_set)
+        );
+
+        // if necessary, shift filler bits out of the middle
+        if constexpr ((bool)LAST_BIT) {
+          const int filler_idx = (NUM_FIELDS - 1 + field_shift) % NUM_FIELDS;
+          for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
+            bit_set[i-1] |= bit_set[i] << LAST_BIT;
+            bit_set[i] >>= (FIELD_BITS - LAST_BIT);
+          }
+        }
+
+        // account for bit_shift
+        if (bit_shift) {
+
+          const field_t keystone = LAST_BIT ? (
+            (bit_set[NUM_FIELDS - 1] << (FIELD_BITS - LAST_BIT))
+            | (bit_set[NUM_FIELDS - 2] >> LAST_BIT)
+          ) : (
+            bit_set[NUM_FIELDS - 1]
+          );
+
+          for (int i = NUM_FIELDS - 1; i > 0; --i) {
+            bit_set[i] <<= bit_shift;
+            bit_set[i] |= (bit_set[i-1] >> bit_overflow);
+          }
+          // Handle final field
+          bit_set[0] <<= bit_shift;
+          bit_set[0] |= keystone >> bit_overflow;
+
+        }
+
+      }
+
+      // Mask out filler bits
+      if constexpr ((bool)LAST_BIT) {
+        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      }
+
+    }
+
+
+    /// Helper for calling ROTATE with positive number
+    void RotateRight(const size_t shift_size_raw) {
+
+      const field_t shift_size = shift_size_raw % NUM_BITS;
+
+      // use different approaches based on BitSet size
+      if constexpr (NUM_FIELDS == 1) {
+        // special case: for exactly one field_t, try to go low level
+        // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
+
+        field_t & n = bit_set[0];
+        field_t c = shift_size;
+
+        // mask necessary to suprress shift count overflow warnings
+        constexpr field_t mask = MaskLow<field_t>(FIELD_LOG2);
+
+        c &= mask;
+        n = (n>>c) | (n<<( (NUM_BITS-c)&mask ));
+
+      } else if (NUM_FIELDS < 32) {
+        // for small BitSets, shifting L/R and ORing is faster
+        emp::BitSet<NUM_BITS> dup(*this);
+        dup.ShiftRight(shift_size);
+        ShiftLeft(NUM_BITS - shift_size);
+        OR_SELF(dup);
+      } else {
+        // for big BitSets, manual rotating is fater
+
+        const field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
+        const int bit_shift = shift_size % FIELD_BITS;
+        const field_t bit_overflow = FIELD_BITS - bit_shift;
+
+        // if rotating more than field capacity, we need to rotate fields
+        std::rotate(
+          std::begin(bit_set),
+          std::begin(bit_set)+field_shift,
+          std::end(bit_set)
+        );
+
+        // if necessary, shift filler bits out of the middle
+        if constexpr ((bool)LAST_BIT) {
+          const int filler_idx = NUM_FIELDS - 1 - field_shift;
+          for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
+            bit_set[i-1] |= bit_set[i] << LAST_BIT;
+            bit_set[i] >>= (FIELD_BITS - LAST_BIT);
+          }
+        }
+
+        // account for bit_shift
+        if (bit_shift) {
+
+          const field_t keystone = LAST_BIT ? (
+            bit_set[0] >> (FIELD_BITS - LAST_BIT)
+          ) : (
+            bit_set[0]
+          );
+
+          if constexpr ((bool)LAST_BIT) {
+            bit_set[NUM_FIELDS-1] |= bit_set[0] << LAST_BIT;
+          }
+
+          for (size_t i = 0; i < NUM_FIELDS - 1; ++i) {
+            bit_set[i] >>= bit_shift;
+            bit_set[i] |= (bit_set[i+1] << bit_overflow);
+          }
+          bit_set[NUM_FIELDS - 1] >>= bit_shift;
+          bit_set[NUM_FIELDS - 1] |= keystone << bit_overflow;
+        }
+      }
+
+      // Mask out filler bits
+      if constexpr ((bool)LAST_BIT) {
+        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      }
+
     }
 
   public:
@@ -161,8 +360,14 @@ namespace emp {
     /// Set all bits randomly, with a 50% probability of being a 0 or 1.
     void Randomize(Random & random) {
       // Randomize all fields, then mask off bits in the last field if not complete.
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = random.GetUInt();
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT);
+      if constexpr (FIELD_BITS == 64) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = random.GetUInt64();
+      } else if (FIELD_BITS == 32) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = random.GetUInt();
+      } else {
+        emp_assert(false, "FIELD_BITS should be 32 or 64");
+      }
+      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
     }
 
     /// Set all bits randomly, with a given probability of being a 1.
@@ -174,7 +379,7 @@ namespace emp {
     /// Assign from a BitSet of a different size.
     template <size_t NUM_BITS2>
     BitSet & Import(const BitSet<NUM_BITS2> & in_set) {
-      static const size_t NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> 5);
+      static const size_t NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> FIELD_LOG2);
       static const size_t MIN_FIELDS = (NUM_FIELDS < NUM_FIELDS2) ? NUM_FIELDS : NUM_FIELDS2;
       for (size_t i = 0; i < MIN_FIELDS; i++) bit_set[i] = in_set.GetUInt(i);  // Copy avail fields
       for (size_t i = MIN_FIELDS; i < NUM_FIELDS; i++) bit_set[i] = 0;         // Zero extra fields
@@ -184,7 +389,7 @@ namespace emp {
     /// Convert to a Bitset of a different size.
     template <size_t NUM_BITS2>
     BitSet<NUM_BITS2> Export() const {
-      static const size_t NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> 5);
+      static const size_t NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> FIELD_LOG2);
       static const size_t MIN_FIELDS = (NUM_FIELDS < NUM_FIELDS2) ? NUM_FIELDS : NUM_FIELDS2;
       BitSet<NUM_BITS2> out_bits;
       for (size_t i = 0; i < MIN_FIELDS; i++) out_bits.SetUInt(i, bit_set[i]);  // Copy avail fields
@@ -235,15 +440,15 @@ namespace emp {
       emp_assert(index >= 0 && index < NUM_BITS);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
-      return (bit_set[field_id] & (1 << pos_id)) != 0;
+      return (bit_set[field_id] & (((field_t)1U) << pos_id)) != 0;
     }
 
-    /// Set the bit as a specified index.
-    void Set(size_t index, bool value) {
+    /// Set the bit at a specified index.
+    void Set(size_t index, bool value=true) {
       emp_assert(index < NUM_BITS);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
-      const uint32_t pos_mask = 1 << pos_id;
+      const field_t pos_mask = ((field_t)1U) << pos_id;
 
       if (value) bit_set[field_id] |= pos_mask;
       else       bit_set[field_id] &= ~pos_mask;
@@ -257,7 +462,7 @@ namespace emp {
       emp_assert(index >= 0 && index < NUM_BITS);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
-      (bit_set[field_id] ^= (1 << pos_id));
+      (bit_set[field_id] ^= (((field_t)1U) << pos_id));
       return *this;
     }
 
@@ -283,37 +488,103 @@ namespace emp {
       emp_assert(index < NUM_BYTES);
       const size_t field_id = Byte2Field(index);
       const size_t pos_id = Byte2FieldPos(index);
-      const uint32_t val_uint = value;
-      bit_set[field_id] = (bit_set[field_id] & ~(255U << pos_id)) | (val_uint << pos_id);
+      const field_t val_uint = value;
+      bit_set[field_id] = (bit_set[field_id] & ~(((field_t)255U) << pos_id)) | (val_uint << pos_id);
     }
 
-    /// Get the 32-bit unsigned int; index in in 32-bit jumps (i.e., this is a field ID not bit id)
-    uint32_t GetUInt(size_t index) const {
-      emp_assert(index < NUM_FIELDS);
-      return bit_set[index];
+    /// Get the field_t unsigned int; index in in 32-bit jumps
+    /// (i.e., this is a field ID not bit id)
+    uint32_t GetUInt(size_t index) const { return GetUInt32(index); }
+
+    /// Set the field_t unsigned int; index in in 32-bit jumps
+    /// (i.e., this is a field ID not bit id)
+    void SetUInt(size_t index, uint32_t value) { SetUInt32(index, value); }
+
+    /// Get the field_t unsigned int; index in in field_t-bit jumps
+    /// (i.e., this is a field ID not bit id)
+    uint32_t GetUInt32(size_t index) const {
+      emp_assert(index * 32 < NUM_FIELDS * FIELD_BITS);
+      return ((uint32_t*) bit_set)[index];
     }
 
-    /// Set the 32-bit unsigned int; index in in 32-bit jumps (i.e., this is a field ID not bit id)
-    void SetUInt(size_t index, uint32_t value) {
-      emp_assert(index < NUM_FIELDS);
-      bit_set[index] = value;
+    /// Set the field_t unsigned int; index in in 32-bit jumps
+    /// (i.e., this is a field ID not bit id)
+    void SetUInt32(size_t index, uint32_t value) {
+      emp_assert(index * 32 < NUM_FIELDS * FIELD_BITS);
+      ((uint32_t*) bit_set)[index] = value;
+
+      // Mask out filler bits if necessary
+      if constexpr ((bool)LAST_BIT) {
+        // we only need to do this
+        // if (index * 64 == (NUM_FIELDS - 1) * FIELD_BITS)
+        // but just doing it always is probably faster
+        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      }
+
     }
 
-    /// Get the full 32-bit unsigned int starting from the bit at a specified index.
-    uint32_t GetUIntAtBit(size_t index) {
+    /// Get the field_t unsigned int; index in in 64-bit jumps
+    /// (i.e., this is a field ID not bit id)
+    uint64_t GetUInt64(size_t index) const {
+      emp_assert(index * 64 < NUM_FIELDS * FIELD_BITS);
+
+      if constexpr (FIELD_BITS == 32 && NUM_FIELDS % 2) {
+        if (index * 2 == NUM_FIELDS - 1 ) return bit_set[NUM_FIELDS - 1];
+      }
+
+      return ((uint64_t*) bit_set)[index];
+    }
+
+    /// Set the field_t unsigned int; index in in 64-bit jumps
+    /// (i.e., this is a field ID not bit id)
+    void SetUInt64(size_t index, uint64_t value) {
+      emp_assert(index * 64 < NUM_FIELDS * FIELD_BITS);
+
+      if constexpr (FIELD_BITS == 32 && NUM_FIELDS % 2) {
+        if (index * 2 == NUM_FIELDS - 1 ) {
+          bit_set[NUM_FIELDS - 1] = (uint32_t) value;
+        }
+      }
+
+      // Mask out filler bits if necessary
+      if constexpr ((bool)LAST_BIT) {
+        // we only need to do this
+        // if (index * 64 == (NUM_FIELDS - 1) * FIELD_BITS)
+        // but just doing it always is probably faster
+        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      }
+
+      ((uint64_t*) bit_set)[index] = value;
+    }
+
+    /// Get the full uint32_t unsigned int starting from the bit at a specified index.
+    uint32_t GetUIntAtBit(size_t index) { return GetUInt32AtBit(index); }
+
+    /// Get the full uint32_t unsigned int starting from the bit at a specified index.
+    uint32_t GetUInt32AtBit(size_t index) {
       emp_assert(index < NUM_BITS);
-      const size_t field_id = FieldID(index);
-      const size_t pos_id = FieldPos(index);
-      if (pos_id == 0) return bit_set[field_id];
-      return (bit_set[field_id] >> pos_id) |
-        ((field_id+1 < NUM_FIELDS) ? bit_set[field_id+1] << (32-pos_id) : 0);
+
+      uint32_t *cast_set = (uint32_t *) bit_set;
+      const size_t field_id = index / 32;
+      const size_t pos_id = index % 32;
+
+      if (pos_id == 0) return cast_set[field_id];
+      else return (
+        (cast_set[field_id] >> pos_id) |
+        (
+          (field_id+1 < NUM_FIELDS)
+          ? cast_set[field_id+1] << (FIELD_BITS-pos_id)
+          : 0
+        )
+      );
+
     }
 
     /// Get OUT_BITS bits starting from the bit at a specified index (max 32)
     template <size_t OUT_BITS>
     uint32_t GetValueAtBit(size_t index) {
       static_assert(OUT_BITS <= 32, "Requesting too many bits to fit in a UInt");
-      return GetUIntAtBit(index) & MaskLow<uint32_t>(OUT_BITS);
+      return GetUIntAtBit(index) & MaskLow<uint64_t>(OUT_BITS);
     }
 
     /// Return true if ANY bits in the BitSet are one, else return false.
@@ -332,12 +603,14 @@ namespace emp {
     BitProxy operator[](size_t index) { return BitProxy(*this, index); }
 
     /// Set all bits to zero.
-    void Clear() { for (auto & i : bit_set) i = 0U; }
+    void Clear() { for (auto & i : bit_set) i = (field_t)0U; }
 
     /// Set all bits to one.
     void SetAll() {
-      for (auto & i : bit_set) i = ~0U;
-      if (LAST_BIT > 0) { bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT); }
+      for (auto & i : bit_set) i = ~((field_t)0U);
+      if (LAST_BIT) {
+        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      }
     }
 
     /// Print all bits to the provided output stream.
@@ -369,8 +642,10 @@ namespace emp {
 
     /// Count 1's in semi-parallel; fastest for even 0's & 1's
     size_t CountOnes_Mixed() const {
+      const uint32_t *uint_bit_set = (const uint32_t*) bit_set;
       size_t bit_count = 0;
-      for (const auto v : bit_set) {
+      for (size_t i = 0; i < NUM_FIELDS * sizeof(field_t)/4; ++i) {
+        const uint32_t v = uint_bit_set[i];
         const uint32_t t1 = v - ((v >> 1) & 0x55555555);
         const uint32_t t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
         bit_count += (((t2 + (t2 >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
@@ -385,7 +660,7 @@ namespace emp {
     int FindBit() const {
       size_t field_id = 0;
       while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
-      return (field_id < NUM_FIELDS) ? (int) (find_bit(bit_set[field_id]) + (field_id << 5)) : -1;
+      return (field_id < NUM_FIELDS) ? (int) (find_bit(bit_set[field_id]) + (field_id << FIELD_LOG2)) : -1;
     }
 
     /// Return index of first one in sequence (or -1 if no ones); change this position to zero.
@@ -396,7 +671,7 @@ namespace emp {
 
       const int pos_found = (int) find_bit(bit_set[field_id]);
       bit_set[field_id] &= ~(1U << pos_found);
-      return pos_found + (int)(field_id << 5);
+      return pos_found + (int)(field_id << FIELD_LOG2);
     }
 
     /// Return index of first one in sequence AFTER start_pos (or -1 if no ones)
@@ -424,7 +699,7 @@ namespace emp {
     BitSet NOT() const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~bit_set[i];
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT);
+      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       return out_set;
     }
 
@@ -446,7 +721,7 @@ namespace emp {
     BitSet NAND(const BitSet & set2) const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT);
+      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       return out_set;
     }
 
@@ -454,7 +729,7 @@ namespace emp {
     BitSet NOR(const BitSet & set2) const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT);
+      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       return out_set;
     }
 
@@ -469,7 +744,7 @@ namespace emp {
     BitSet EQU(const BitSet & set2) const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT);
+      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       return out_set;
     }
 
@@ -477,7 +752,7 @@ namespace emp {
     /// Perform a Boolean NOT on this BitSet, store result here, and return this object.
     BitSet & NOT_SELF() {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT);
+      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       return *this;
     }
 
@@ -496,14 +771,14 @@ namespace emp {
     /// Perform a Boolean NAND with a second BitSet, store result here, and return this object.
     BitSet & NAND_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT);
+      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       return *this;
     }
 
     /// Perform a Boolean NOR with a second BitSet, store result here, and return this object.
     BitSet & NOR_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT);
+      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       return *this;
     }
 
@@ -516,23 +791,200 @@ namespace emp {
     /// Perform a Boolean EQU with a second BitSet, store result here, and return this object.
     BitSet & EQU_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<uint32_t>(LAST_BIT);
+      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       return *this;
     }
 
-    /// Positive shifts go left and negative go right (0 does nothing); return result.
+    /// Positive shifts go right and negative shifts go left (0 does nothing);
+    /// return result.
     BitSet SHIFT(const int shift_size) const {
       BitSet out_set(*this);
-      if (shift_size > 0) out_set.ShiftRight((uint32_t) shift_size);
-      else if (shift_size < 0) out_set.ShiftLeft((uint32_t) (-shift_size));
+      if (shift_size > 0) out_set.ShiftRight((field_t) shift_size);
+      else if (shift_size < 0) out_set.ShiftLeft((field_t) (-shift_size));
       return out_set;
     }
 
-    /// Positive shifts go left and negative go right; store result here, and return this object.
+    /// Positive shifts go right and negative shifts go left (0 does nothing);
+    /// store result here, and return this object.
     BitSet & SHIFT_SELF(const int shift_size) {
-      if (shift_size > 0) ShiftRight((uint32_t) shift_size);
-      else if (shift_size < 0) ShiftLeft((uint32_t) -shift_size);
+      if (shift_size > 0) ShiftRight((field_t) shift_size);
+      else if (shift_size < 0) ShiftLeft((field_t) -shift_size);
       return *this;
+    }
+
+    /// Positive rotates go left and negative rotates go left (0 does nothing);
+    /// return result.
+    BitSet ROTATE(const int rotate_size) const {
+      BitSet out_set(*this);
+      if (rotate_size > 0) out_set.RotateRight((field_t) rotate_size);
+      else if (rotate_size < 0) out_set.RotateLeft((field_t) (-rotate_size));
+      return out_set;
+    }
+
+    /// Positive rotates go right and negative rotates go left (0 does nothing);
+    /// store result here, and return this object.
+    BitSet & ROTATE_SELF(const int rotate_size) {
+      if (rotate_size > 0) RotateRight((field_t) rotate_size);
+      else if (rotate_size < 0) RotateLeft((field_t) -rotate_size);
+      return *this;
+    }
+
+    /// Helper: call ROTATE with negative number instead
+    template<size_t shift_size_raw>
+    BitSet & ROTL_SELF() {
+      constexpr field_t shift_size = shift_size_raw % NUM_BITS;
+
+      // special case: for exactly one field_t, try to go low level
+      // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
+      if constexpr (NUM_FIELDS == 1) {
+        field_t & n = bit_set[0];
+        field_t c = shift_size;
+
+        // mask necessary to suprress shift count overflow warnings
+        constexpr field_t mask = MaskLow<field_t>(FIELD_LOG2);
+
+        c &= mask;
+        n = (n<<c) | (n>>( (-(c+FIELD_BITS-NUM_BITS))&mask ));
+
+      } else {
+
+        // note that we already modded shift_size by NUM_BITS
+        // so there's no need to mod by FIELD_SIZE here
+        constexpr int field_shift = LAST_BIT ? (
+          (shift_size + FIELD_BITS - LAST_BIT) / FIELD_BITS
+        ) : (
+          shift_size / FIELD_BITS
+        );
+        // if we field shift, we need to shift bits by (FIELD_BITS - LAST_BIT)
+        // more to account for the filler that gets pulled out of the middle
+        constexpr int bit_shift = LAST_BIT && field_shift ? (
+          (shift_size + FIELD_BITS - LAST_BIT) % FIELD_BITS
+        ) : (
+          shift_size % FIELD_BITS
+        );
+        constexpr int bit_overflow = FIELD_BITS - bit_shift;
+
+        // if rotating more than field capacity, we need to rotate fields
+        if constexpr ((bool)field_shift) {
+          std::rotate(
+            std::rbegin(bit_set),
+            std::rbegin(bit_set)+field_shift,
+            std::rend(bit_set)
+          );
+        }
+
+        // if necessary, shift filler bits out of the middle
+        if constexpr ((bool)LAST_BIT) {
+          const int filler_idx = (NUM_FIELDS - 1 + field_shift) % NUM_FIELDS;
+          for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
+            bit_set[i-1] |= bit_set[i] << LAST_BIT;
+            bit_set[i] >>= (FIELD_BITS - LAST_BIT);
+          }
+        }
+
+        // account for bit_shift
+        if (bit_shift) {
+
+          const field_t keystone = LAST_BIT ? (
+            (bit_set[NUM_FIELDS - 1] << (FIELD_BITS - LAST_BIT))
+            | (bit_set[NUM_FIELDS - 2] >> LAST_BIT)
+          ) : (
+            bit_set[NUM_FIELDS - 1]
+          );
+
+          for (int i = NUM_FIELDS - 1; i > 0; --i) {
+            bit_set[i] <<= bit_shift;
+            bit_set[i] |= (bit_set[i-1] >> bit_overflow);
+          }
+          // Handle final field
+          bit_set[0] <<= bit_shift;
+          bit_set[0] |= keystone >> bit_overflow;
+
+        }
+
+      }
+
+      // mask out filler bits
+      if constexpr ((bool)LAST_BIT) {
+        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      }
+
+      return *this;
+
+    }
+
+
+    /// Helper for calling ROTATE with positive number
+    template<size_t shift_size_raw>
+    BitSet & ROTR_SELF() {
+
+      constexpr field_t shift_size = shift_size_raw % NUM_BITS;
+
+      // special case: for exactly one field_t, try to go low level
+      // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
+      if constexpr (NUM_FIELDS == 1) {
+        field_t & n = bit_set[0];
+        field_t c = shift_size;
+
+        // mask necessary to suprress shift count overflow warnings
+        constexpr field_t mask = MaskLow<field_t>(FIELD_LOG2);
+
+        c &= mask;
+        n = (n>>c) | (n<<( (NUM_BITS-c)&mask ));
+
+      } else {
+
+        constexpr field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
+        constexpr int bit_shift = shift_size % FIELD_BITS;
+        constexpr field_t bit_overflow = FIELD_BITS - bit_shift;
+
+        // if rotating more than field capacity, we need to rotate fields
+        if constexpr ((bool)field_shift) {
+          std::rotate(
+            std::begin(bit_set),
+            std::begin(bit_set)+field_shift,
+            std::end(bit_set)
+          );
+        }
+
+        // if necessary, shift filler bits out of the middle
+        if constexpr ((bool)LAST_BIT) {
+          constexpr int filler_idx = NUM_FIELDS - 1 - field_shift;
+          for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
+            bit_set[i-1] |= bit_set[i] << LAST_BIT;
+            bit_set[i] >>= (FIELD_BITS - LAST_BIT);
+          }
+        }
+
+        // account for bit_shift
+        if (bit_shift) {
+
+          const field_t keystone = LAST_BIT ? (
+            bit_set[0] >> (FIELD_BITS - LAST_BIT)
+          ) : (
+            bit_set[0]
+          );
+
+          if constexpr ((bool)LAST_BIT) {
+            bit_set[NUM_FIELDS-1] |= bit_set[0] << LAST_BIT;
+          }
+
+          for (size_t i = 0; i < NUM_FIELDS - 1; ++i) {
+            bit_set[i] >>= bit_shift;
+            bit_set[i] |= (bit_set[i+1] << bit_overflow);
+          }
+          bit_set[NUM_FIELDS - 1] >>= bit_shift;
+          bit_set[NUM_FIELDS - 1] |= keystone << bit_overflow;
+        }
+      }
+
+      // mask out filler bits
+      if constexpr ((bool)LAST_BIT) {
+        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      }
+
+      return *this;
+
     }
 
     /// Operator bitwise NOT...
