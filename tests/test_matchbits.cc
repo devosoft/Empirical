@@ -246,6 +246,7 @@ TEST_CASE("Test MatchBin", "[tools]")
 
     emp::BitSet<3> bs0{0,0,0};
     REQUIRE(bs0.GetDouble() == 0.0);
+    REQUIRE(bs0.MaxDouble() == 7.0);
 
     emp::BitSet<3> bs1{0,0,1};
     REQUIRE(bs1.GetDouble() == 1.0);
@@ -262,19 +263,23 @@ TEST_CASE("Test MatchBin", "[tools]")
     emp::BitSet<32> bs5;
     bs5.SetUInt(0, 1789156UL);
     REQUIRE(bs5.GetDouble() == 1789156ULL);
+    REQUIRE(bs5.MaxDouble() == 4294967295.0);
 
     emp::BitSet<64> bs6;
     bs6.SetUInt64(0, 1789156816848ULL);
     REQUIRE(bs6.GetDouble() == 1789156816848ULL);
+    REQUIRE(bs6.MaxDouble() == 18446744073709551615.0);
 
     emp::BitSet<65> bs7;
     bs7.SetUInt64(0, 1789156816848ULL);
     bs7.Set(64);
     REQUIRE(bs7.GetDouble() == 1789156816848.0 + emp::Pow2(64.0));
+    REQUIRE(bs7.MaxDouble() == 36893488147419103231.0);
 
     emp::BitSet<1027> bs8;
     bs8.Set(1026);
     REQUIRE(std::isinf(bs8.GetDouble()));
+    REQUIRE(std::isinf(bs8.MaxDouble()));
 
   }
 

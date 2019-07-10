@@ -615,6 +615,9 @@ namespace emp {
       return res;
     }
 
+    /// What is the maximum value this BitSet could contain, as a double?
+    static constexpr double MaxDouble() { return emp::Pow2(NUM_BITS) - 1.0; }
+
     /// Return true if ANY bits in the BitSet are one, else return false.
     bool Any() const { for (auto i : bit_set) if (i) return true; return false; }
 
