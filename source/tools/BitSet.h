@@ -606,6 +606,15 @@ namespace emp {
       return GetUIntAtBit(index) & MaskLow<uint64_t>(OUT_BITS);
     }
 
+    /// Get the unsigned numeric value represented by the BitSet as a double
+    double GetDouble() const {
+      double res = 0.0;
+      for (size_t i = 0; i < NUM_FIELDS; ++i) {
+        res += bit_set[i] * emp::Pow2(i * FIELD_BITS);
+      }
+      return res;
+    }
+
     /// Return true if ANY bits in the BitSet are one, else return false.
     bool Any() const { for (auto i : bit_set) if (i) return true; return false; }
 
