@@ -359,7 +359,7 @@ namespace emp {
       Clear();
 
       size_t idx = 0;
-      for (auto i = std::begin(l); i != std::end(l); ++i) {
+      for (auto i = std::rbegin(l); i != std::rend(l); ++i) {
         emp_assert(idx < NUM_BITS);
         Set(idx, *i);
         ++idx;
