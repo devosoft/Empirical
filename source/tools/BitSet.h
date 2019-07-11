@@ -1048,22 +1048,22 @@ namespace emp {
       const uint32_t *other_cast_set =  (const uint32_t*) set2.bit_set;
 
       bool carry = false;
-      const uint32_t MAX_INT = emp::IntPow(
-        2UL,
-        (NUM_BITS > 32 ? 32 : NUM_BITS)
-      ) - 1;
 
-      for (size_t i = 0; i < (NUM_BITS+31)/32; ++i){
+      for (size_t i = 0; i < NUM_BITS/32; ++i) {
         uint64_t sum = (
           (uint64_t)(self_cast_set[i]) + (uint64_t)(other_cast_set[i]) + carry
         );
-        carry = false;
-        if (sum > MAX_INT){
-          carry = true;
-          sum%= ((uint64_t)MAX_INT) + 1;
-        }
-        self_cast_set[i] = sum;
+        carry = sum >= emp::IntPow((uint64_t) 2, (uint64_t) 32);
+        self_cast_set[i] = sum % emp::IntPow((uint64_t) 2, (uint64_t) 32);
       }
+
+      if constexpr (NUM_BITS%32) {
+        self_cast_set[NUM_BITS/32] = (
+          (uint64_t)(self_cast_set[NUM_BITS/32])
+          + (uint64_t)(other_cast_set[NUM_BITS/32]) + carry
+        ) % emp::IntPow((uint64_t) 2, (uint64_t) NUM_BITS%32);
+      }
+
       return *this;
     }
 
@@ -1084,22 +1084,21 @@ namespace emp {
 
       bool carry = false;
 
-      const uint64_t MAX_INT = emp::IntPow(
-        (uint64_t) 2,
-        (NUM_BITS > 32 ? 32 : NUM_BITS)
-      ) - 1;
-
-      for(size_t i = 0; i < (NUM_BITS+31)/32; ++i){
+      for (size_t i = 0; i < NUM_BITS/32; ++i) {
         uint64_t subtrahend = (uint64_t)(other_cast_set[i]) + carry;
-        uint32_t diff = (
-          ((uint64_t)(self_cast_set[i]) - subtrahend) % (MAX_INT+1)
-        );
-        carry = false;
-        if (self_cast_set[i] < subtrahend){
-          carry = true;
-        }
-        self_cast_set[i] = diff;
+        carry = self_cast_set[i] < subtrahend;
+        self_cast_set[i] = (
+          ((uint64_t)(self_cast_set[i]) - subtrahend)
+        ) % emp::IntPow((uint64_t) 2, (uint64_t) 32);
+     }
+
+      if constexpr (NUM_BITS%32) {
+        uint64_t subtrahend = (uint64_t)(other_cast_set[NUM_BITS/32]) + carry;
+        self_cast_set[NUM_BITS/32] = (
+          (uint64_t)(self_cast_set[NUM_BITS/32]) - subtrahend
+        ) % emp::IntPow((uint64_t) 2, (uint64_t) NUM_BITS%32);
       }
+
       return *this;
     }
 
