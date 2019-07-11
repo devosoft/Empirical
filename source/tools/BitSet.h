@@ -1053,9 +1053,9 @@ namespace emp {
         (NUM_BITS > 32 ? 32 : NUM_BITS)
       ) - 1;
 
-      for (size_t i = 0; i < (NUM_FIELDS * FIELD_BITS)/32; ++i){
+      for (size_t i = 0; i < (NUM_BITS+31)/32; ++i){
         uint64_t sum = (
-          (uint64_t)self_cast_set[i] + (uint64_t)other_cast_set[i] + carry
+          (uint64_t)(self_cast_set[i]) + (uint64_t)(other_cast_set[i]) + carry
         );
         carry = false;
         if (sum > MAX_INT){
@@ -1067,7 +1067,7 @@ namespace emp {
       return *this;
     }
 
-    ///Subtraction of two Bitsets.
+    /// Subtraction of two Bitsets.
     /// Wraps to 2^min(num_bits, 32) if it underflows.
     /// Returns result.
     BitSet SUB(const BitSet & set2) const{
@@ -1089,9 +1089,11 @@ namespace emp {
         (NUM_BITS > 32 ? 32 : NUM_BITS)
       ) - 1;
 
-      for(size_t i = 0; i < (NUM_FIELDS * FIELD_BITS)/32; ++i){
-        uint64_t subtrahend = (uint64_t)other_cast_set[i] + carry;
-        uint32_t diff = (self_cast_set[i] - subtrahend) % (MAX_INT+1);
+      for(size_t i = 0; i < (NUM_BITS+31)/32; ++i){
+        uint64_t subtrahend = (uint64_t)(other_cast_set[i]) + carry;
+        uint32_t diff = (
+          ((uint64_t)(self_cast_set[i]) - subtrahend) % (MAX_INT+1)
+        );
         carry = false;
         if (self_cast_set[i] < subtrahend){
           carry = true;
