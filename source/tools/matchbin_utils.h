@@ -20,7 +20,6 @@
 #include <stdexcept>
 #include <limits>
 #include <ratio>
-#include <math.h>
 #include <string>
 
 #include "../base/assert.h"
