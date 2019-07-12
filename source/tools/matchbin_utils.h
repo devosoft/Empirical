@@ -38,11 +38,10 @@ namespace emp {
     using tag_t = emp::BitSet<Width>;
     using query_t = emp::BitSet<Width>;
 
-    static constexpr double max_dist = Width;
     static constexpr size_t width = Width;
 
     double operator()(const query_t& a, const tag_t& b) const{
-      return (double)(a^b).CountOnes() / max_dist;
+      return (double)(a^b).CountOnes() / Width;
     }
   };
 
@@ -52,11 +51,9 @@ namespace emp {
     using tag_t = int;
     using query_t = int;
 
-    static constexpr double max_dist = std::numeric_limits<int>::max();
-
     double operator()(const query_t& a, const tag_t& b) const {
 
-      return (double)std::abs(a-b) / max_dist;
+      return (double)std::abs(a-b) / std::numeric_limits<int>::max();
     }
   };
 
@@ -69,12 +66,11 @@ namespace emp {
     using tag_t = size_t;
     using query_t = size_t;
 
-    static constexpr double max_dist = Max;
     static constexpr size_t width = sizeof(size_t) * 8;
 
     double operator()(const query_t& a, const tag_t& b) const {
       const size_t difference = ((Max + 1) + b - a) % (Max + 1);
-      return (double)(difference % (Max + 1)) / max_dist;
+      return (double)(difference % (Max + 1)) / Max;
     }
   };
 
@@ -86,11 +82,10 @@ namespace emp {
     using tag_t = emp::BitSet<Width>;
     using query_t = emp::BitSet<Width>;
 
-    static constexpr double max_dist = emp::BitSet<Width>::MaxDouble();
     static constexpr size_t width = Width;
 
     double operator()(const query_t& a, const tag_t& b) const {
-      return (b - a).GetDouble() / max_dist;
+      return (b - a).GetDouble() / emp::BitSet<Width>::MaxDouble();
     }
 
   };
@@ -102,10 +97,10 @@ namespace emp {
     using tag_t = emp::BitSet<Width>;
     using query_t = emp::BitSet<Width>;
 
-    static constexpr double max_dist = emp::BitSet<Width>::MaxDouble() + 1.0;
     static constexpr size_t width = Width;
 
     double operator()(const query_t& a, const tag_t& b) const {
+      constexpr double max_dist = emp::BitSet<Width>::MaxDouble() + 1.0;
       return (b >= a ? (b - a).GetDouble() : max_dist) / max_dist;
     }
 
@@ -121,12 +116,12 @@ namespace emp {
     using tag_t = emp::BitSet<Width>;
     using query_t = emp::BitSet<Width>;
 
-    static constexpr double max_dist = (
-      (emp::BitSet<Width>::MaxDouble() + 1.0) / 2.0
-    );
     static constexpr size_t width = Width;
 
     double operator()(const query_t& a, const tag_t& b) {
+      constexpr double max_dist = (
+        (emp::BitSet<Width>::MaxDouble() + 1.0) / 2.0
+      );
       return std::min(a - b, b - a).GetDouble() / max_dist;
     }
 
@@ -141,11 +136,12 @@ namespace emp {
     using tag_t = emp::BitSet<Width>;
     using query_t = emp::BitSet<Width>;
 
-    static constexpr double max_dist = emp::BitSet<Width>::MaxDouble();
     static constexpr size_t width = Width;
 
     double operator()(const query_t& a, const tag_t& b) {
-      return (a > b ? a - b : b - a).GetDouble() / max_dist;
+      return (
+        a > b ? a - b : b - a
+      ).GetDouble() /  emp::BitSet<Width>::MaxDouble();
     }
 
   };
@@ -158,7 +154,6 @@ namespace emp {
     using tag_t = emp::BitSet<Width>;
     using query_t = emp::BitSet<Width>;
 
-    static constexpr double max_dist = 1.0;
     static constexpr size_t width = Width;
 
     double operator()(const query_t& a, const tag_t& b) const {
@@ -187,7 +182,6 @@ namespace emp {
     using tag_t = typename Metric::tag_t;
     using query_t = typename Metric::query_t;
 
-    static constexpr double max_dist = Metric::max_dist;
     static constexpr size_t width = Metric::width;
 
     Metric metric;
@@ -213,7 +207,6 @@ namespace emp {
     using tag_t = typename Metric::tag_t;
     using query_t = typename Metric::query_t;
 
-    static constexpr double max_dist = Metric::max_dist;
     static constexpr size_t width = Metric::width;
 
     Metric metric;
