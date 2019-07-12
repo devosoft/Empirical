@@ -1,11 +1,11 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2019
  *
  *  @file  memo_function.h
  *  @brief A function that memorizes previous results to speed up any repeated calls.
- *  @note Status: BETA (though new functions are added frequently)
+ *  @note Status: BETA
  */
 
 #ifndef EMP_MEMO_FUNCTIONS_H
@@ -25,7 +25,8 @@ namespace emp {
   /// a function signature.)
   template <class T> class memo_function;    // Not defined.
 
-  // Single argument functions don't need a tuple...
+  /// The simplest form of a memoized function with a single argument that is used as the cache
+  /// key (no need for more complex caching).
   template <class R, class ARG>
   class memo_function<R(ARG)> {
   public:
@@ -92,14 +93,14 @@ namespace emp {
       return [this](const ARG & arg){ return operator()(arg); };
     }
 
-    /// Convert a memo_function to a regular std::function for function calls.
+    /// More explicit conversion of a memo_function to a regular std::function for function calls.
     std::function<R(ARG)> to_function() {
       return [this](const ARG & arg){ return operator()(arg); };
     }
   };
 
-  // Specialization for when we have more than one argument...  we need to convert inputs
-  // to a tuple to make this work.
+  /// Memoize functions for when we have more than one argument...  we need to convert inputs
+  /// to a tuple to make this work.
   template <class R, class A1, class A2, class... EXTRA>
   class memo_function<R(A1,A2,EXTRA...)> {
   public:
@@ -163,7 +164,8 @@ namespace emp {
     }
   };
 
-  // Single argument functions don't need a tuple...
+  /// Zero argument functions are trivial (since they need to cache only a single value),
+  /// but should still work.
   template <class R>
   class memo_function<R()> {
   public:
