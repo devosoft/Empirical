@@ -78,6 +78,78 @@ namespace emp {
     }
   };
 
+  /// BitSet-based implementation of NextUpMetric.
+  /// Adapted from Spector, Lee, et al. "Tag-based modules in genetic programming." Proceedings of the 13th annual conference on Genetic and evolutionary computation. ACM, 2011.
+  template<size_t Width>
+  struct AsymmetricWrapMetric {
+
+    using tag_t = emp::BitSet<Width>;
+    using query_t = emp::BitSet<Width>;
+
+    static constexpr double max_dist = emp::BitSet<Width>::MaxDouble();
+    static constexpr size_t width = Width;
+
+    double operator()(const query_t& a, const tag_t& b) const {
+      return (b - a).GetDouble() / max_dist;
+    }
+
+  };
+
+  /// BitSet-based implementation of NextUpMetric without wrapping.
+  template<size_t Width>
+  struct AsymmetricNoWrapMetric {
+
+    using tag_t = emp::BitSet<Width>;
+    using query_t = emp::BitSet<Width>;
+
+    static constexpr double max_dist = emp::BitSet<Width>::MaxDouble() + 1.0;
+    static constexpr size_t width = Width;
+
+    double operator()(const query_t& a, const tag_t& b) const {
+      return (b >= a ? (b - a).GetDouble() : max_dist) / max_dist;
+    }
+
+  };
+
+  /// Metric gives the absolute value of the difference between the integer
+  /// representations of the BitSets with wrap from zero to the maximum value
+  /// the BitSet can represent.
+  /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
+  template<size_t Width>
+  struct SymmetricWrapMetric {
+
+    using tag_t = emp::BitSet<Width>;
+    using query_t = emp::BitSet<Width>;
+
+    static constexpr double max_dist = (
+      (emp::BitSet<Width>::MaxDouble() + 1.0) / 2.0
+    );
+    static constexpr size_t width = Width;
+
+    double operator()(const query_t& a, const tag_t& b) {
+      return std::min(a - b, b - a).GetDouble() / max_dist;
+    }
+
+  };
+
+  /// Metric gives the absolute value of the difference between the integer
+  /// representations of the BitSets.
+  /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
+  template<size_t Width>
+  struct SymmetricNoWrapMetric {
+
+    using tag_t = emp::BitSet<Width>;
+    using query_t = emp::BitSet<Width>;
+
+    static constexpr double max_dist = emp::BitSet<Width>::MaxDouble();
+    static constexpr size_t width = Width;
+
+    double operator()(const query_t& a, const tag_t& b) {
+      return (a > b ? a - b : b - a).GetDouble() / max_dist;
+    }
+
+  };
+
   /// Matches based on the longest segment of equal and uneqal bits in two bitsets
   /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
   template<size_t Width>
@@ -106,25 +178,6 @@ namespace emp {
 
     inline double ProbabilityKBitSequence(size_t k) const {
       return (Width - k + 1) / std::pow(2, k);
-    }
-  };
-
-  /// Metric gives the absolute value of the difference between the integer
-  /// representations of the BitSets.
-  /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
-  template<size_t Width>
-  struct AbsIntDiffMetric {
-
-    using tag_t = emp::BitSet<Width>;
-    using query_t = emp::BitSet<Width>;
-
-    static constexpr double max_dist = emp::BitSet<Width>::MaxDouble();
-    static constexpr size_t width = Width;
-
-    double operator()(const query_t& a, const tag_t& b) {
-      emp::BitSet<Width> bitDifference = ( a > b ? a - b : b - a);
-      static_assert(Width <= 32);
-      return bitDifference.GetUInt(0)/max_dist;
     }
   };
 

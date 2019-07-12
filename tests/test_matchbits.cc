@@ -367,6 +367,241 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   }
 
+  // test SymmetricWrapMetric
+  {
 
+    const double norm = 8.0;
+    const emp::BitSet<4> bs_0{0,0,0,0};
+    const emp::BitSet<4> bs_1{0,0,0,1};
+    const emp::BitSet<4> bs_7{0,1,1,1};
+    const emp::BitSet<4> bs_8{1,0,0,0};
+    const emp::BitSet<4> bs_11{1,0,1,1};
+    const emp::BitSet<4> bs_15{1,1,1,1};
+
+    emp::SymmetricWrapMetric<4> metric;
+
+    REQUIRE(metric(bs_0, bs_1) == 1.0/norm);
+    REQUIRE(metric(bs_1, bs_0) == 1.0/norm);
+
+    REQUIRE(metric(bs_0, bs_7) == 7.0/norm);
+    REQUIRE(metric(bs_7, bs_0) == 7.0/norm);
+
+    REQUIRE(metric(bs_0, bs_8) == 8.0/norm);
+    REQUIRE(metric(bs_8, bs_0) == 8.0/norm);
+
+    REQUIRE(metric(bs_0, bs_11) == 5.0/norm);
+    REQUIRE(metric(bs_11, bs_0) == 5.0/norm);
+
+    REQUIRE(metric(bs_0, bs_15) == 1.0/norm);
+    REQUIRE(metric(bs_15, bs_0) == 1.0/norm);
+
+    REQUIRE(metric(bs_1, bs_7) == 6.0/norm);
+    REQUIRE(metric(bs_7, bs_1) == 6.0/norm);
+
+    REQUIRE(metric(bs_1, bs_8) == 7.0/norm);
+    REQUIRE(metric(bs_8, bs_1) == 7.0/norm);
+
+    REQUIRE(metric(bs_1, bs_11) == 6.0/norm);
+    REQUIRE(metric(bs_11, bs_1) == 6.0/norm);
+
+    REQUIRE(metric(bs_1, bs_15) == 2.0/norm);
+    REQUIRE(metric(bs_15, bs_1) == 2.0/norm);
+
+    REQUIRE(metric(bs_7, bs_8) == 1.0/norm);
+    REQUIRE(metric(bs_8, bs_7) == 1.0/norm);
+
+    REQUIRE(metric(bs_7, bs_11) == 4.0/norm);
+    REQUIRE(metric(bs_11, bs_7) == 4.0/norm);
+
+    REQUIRE(metric(bs_7, bs_15) == 8.0/norm);
+    REQUIRE(metric(bs_15, bs_7) == 8.0/norm);
+
+    REQUIRE(metric(bs_8, bs_11) == 3.0/norm);
+    REQUIRE(metric(bs_11, bs_8) == 3.0/norm);
+
+    REQUIRE(metric(bs_8, bs_15) == 7.0/norm);
+    REQUIRE(metric(bs_15, bs_8) == 7.0/norm);
+
+    REQUIRE(metric(bs_11, bs_15) == 4.0/norm);
+    REQUIRE(metric(bs_15, bs_11) == 4.0/norm);
+
+  }
+
+  // test SymmetricNoWrapMetric
+  {
+    const double norm = 15.0;
+    const emp::BitSet<4> bs_0{0,0,0,0};
+    const emp::BitSet<4> bs_1{0,0,0,1};
+    const emp::BitSet<4> bs_7{0,1,1,1};
+    const emp::BitSet<4> bs_8{1,0,0,0};
+    const emp::BitSet<4> bs_11{1,0,1,1};
+    const emp::BitSet<4> bs_15{1,1,1,1};
+
+    emp::SymmetricNoWrapMetric<4> metric;
+
+    REQUIRE(metric(bs_0, bs_1) == 1.0/norm);
+    REQUIRE(metric(bs_1, bs_0) == 1.0/norm);
+
+    REQUIRE(metric(bs_0, bs_7) == 7.0/norm);
+    REQUIRE(metric(bs_7, bs_0) == 7.0/norm);
+
+    REQUIRE(metric(bs_0, bs_8) == 8.0/norm);
+    REQUIRE(metric(bs_8, bs_0) == 8.0/norm);
+
+    REQUIRE(metric(bs_0, bs_11) == 11.0/norm);
+    REQUIRE(metric(bs_11, bs_0) == 11.0/norm);
+
+    REQUIRE(metric(bs_0, bs_15) == 15.0/norm);
+    REQUIRE(metric(bs_15, bs_0) == 15.0/norm);
+
+    REQUIRE(metric(bs_1, bs_7) == 6.0/norm);
+    REQUIRE(metric(bs_7, bs_1) == 6.0/norm);
+
+    REQUIRE(metric(bs_1, bs_8) == 7.0/norm);
+    REQUIRE(metric(bs_8, bs_1) == 7.0/norm);
+
+    REQUIRE(metric(bs_1, bs_11) == 10.0/norm);
+    REQUIRE(metric(bs_11, bs_1) == 10.0/norm);
+
+    REQUIRE(metric(bs_1, bs_15) == 14.0/norm);
+    REQUIRE(metric(bs_15, bs_1) == 14.0/norm);
+
+    REQUIRE(metric(bs_7, bs_8) == 1.0/norm);
+    REQUIRE(metric(bs_8, bs_7) == 1.0/norm);
+
+    REQUIRE(metric(bs_7, bs_11) == 4.0/norm);
+    REQUIRE(metric(bs_11, bs_7) == 4.0/norm);
+
+    REQUIRE(metric(bs_7, bs_15) == 8.0/norm);
+    REQUIRE(metric(bs_15, bs_7) == 8.0/norm);
+
+    REQUIRE(metric(bs_8, bs_11) == 3.0/norm);
+    REQUIRE(metric(bs_11, bs_8) == 3.0/norm);
+
+    REQUIRE(metric(bs_8, bs_15) == 7.0/norm);
+    REQUIRE(metric(bs_15, bs_8) == 7.0/norm);
+
+    REQUIRE(metric(bs_11, bs_15) == 4.0/norm);
+    REQUIRE(metric(bs_15, bs_11) == 4.0/norm);
+
+  }
+
+  // test AsymmetricWrapMetric
+  {
+    const double norm = 15.0;
+    const emp::BitSet<4> bs_0{0,0,0,0};
+    const emp::BitSet<4> bs_1{0,0,0,1};
+    const emp::BitSet<4> bs_7{0,1,1,1};
+    const emp::BitSet<4> bs_8{1,0,0,0};
+    const emp::BitSet<4> bs_11{1,0,1,1};
+    const emp::BitSet<4> bs_15{1,1,1,1};
+
+    emp::AsymmetricWrapMetric<4> metric;
+
+    REQUIRE(metric(bs_0, bs_1) == 1.0/norm);
+    REQUIRE(metric(bs_1, bs_0) == 15.0/norm);
+
+    REQUIRE(metric(bs_0, bs_7) == 7.0/norm);
+    REQUIRE(metric(bs_7, bs_0) == 9.0/norm);
+
+    REQUIRE(metric(bs_0, bs_8) == 8.0/norm);
+    REQUIRE(metric(bs_8, bs_0) == 8.0/norm);
+
+    REQUIRE(metric(bs_0, bs_11) == 11.0/norm);
+    REQUIRE(metric(bs_11, bs_0) == 5.0/norm);
+
+    REQUIRE(metric(bs_0, bs_15) == 15.0/norm);
+    REQUIRE(metric(bs_15, bs_0) == 1.0/norm);
+
+    REQUIRE(metric(bs_1, bs_7) == 6.0/norm);
+    REQUIRE(metric(bs_7, bs_1) == 10.0/norm);
+
+    REQUIRE(metric(bs_1, bs_8) == 7.0/norm);
+    REQUIRE(metric(bs_8, bs_1) == 9.0/norm);
+
+    REQUIRE(metric(bs_1, bs_11) == 10.0/norm);
+    REQUIRE(metric(bs_11, bs_1) == 6.0/norm);
+
+    REQUIRE(metric(bs_1, bs_15) == 14.0/norm);
+    REQUIRE(metric(bs_15, bs_1) == 2.0/norm);
+
+    REQUIRE(metric(bs_7, bs_8) == 1.0/norm);
+    REQUIRE(metric(bs_8, bs_7) == 15.0/norm);
+
+    REQUIRE(metric(bs_7, bs_11) == 4.0/norm);
+    REQUIRE(metric(bs_11, bs_7) == 12.0/norm);
+
+    REQUIRE(metric(bs_7, bs_15) == 8.0/norm);
+    REQUIRE(metric(bs_15, bs_7) == 8.0/norm);
+
+    REQUIRE(metric(bs_8, bs_11) == 3.0/norm);
+    REQUIRE(metric(bs_11, bs_8) == 13.0/norm);
+
+    REQUIRE(metric(bs_8, bs_15) == 7.0/norm);
+    REQUIRE(metric(bs_15, bs_8) == 9.0/norm);
+
+    REQUIRE(metric(bs_11, bs_15) == 4.0/norm);
+    REQUIRE(metric(bs_15, bs_11) == 12.0/norm);
+
+  }
+
+  // test AsymmetricNoWrapMetric
+  {
+    const double norm = 16.0;
+    const emp::BitSet<4> bs_0{0,0,0,0};
+    const emp::BitSet<4> bs_1{0,0,0,1};
+    const emp::BitSet<4> bs_7{0,1,1,1};
+    const emp::BitSet<4> bs_8{1,0,0,0};
+    const emp::BitSet<4> bs_11{1,0,1,1};
+    const emp::BitSet<4> bs_15{1,1,1,1};
+
+    emp::AsymmetricNoWrapMetric<4> metric;
+
+    REQUIRE(metric(bs_0, bs_1) == 1.0/norm);
+    REQUIRE(metric(bs_1, bs_0) == 16.0/norm);
+
+    REQUIRE(metric(bs_0, bs_7) == 7.0/norm);
+    REQUIRE(metric(bs_7, bs_0) == 16.0/norm);
+
+    REQUIRE(metric(bs_0, bs_8) == 8.0/norm);
+    REQUIRE(metric(bs_8, bs_0) == 16.0/norm);
+
+    REQUIRE(metric(bs_0, bs_11) == 11.0/norm);
+    REQUIRE(metric(bs_11, bs_0) == 16.0/norm);
+
+    REQUIRE(metric(bs_0, bs_15) == 15.0/norm);
+    REQUIRE(metric(bs_15, bs_0) == 16.0/norm);
+
+    REQUIRE(metric(bs_1, bs_7) == 6.0/norm);
+    REQUIRE(metric(bs_7, bs_1) == 16.0/norm);
+
+    REQUIRE(metric(bs_1, bs_8) == 7.0/norm);
+    REQUIRE(metric(bs_8, bs_1) == 16.0/norm);
+
+    REQUIRE(metric(bs_1, bs_11) == 10.0/norm);
+    REQUIRE(metric(bs_11, bs_1) == 16.0/norm);
+
+    REQUIRE(metric(bs_1, bs_15) == 14.0/norm);
+    REQUIRE(metric(bs_15, bs_1) == 16.0/norm);
+
+    REQUIRE(metric(bs_7, bs_8) == 1.0/norm);
+    REQUIRE(metric(bs_8, bs_7) == 16.0/norm);
+
+    REQUIRE(metric(bs_7, bs_11) == 4.0/norm);
+    REQUIRE(metric(bs_11, bs_7) == 16.0/norm);
+
+    REQUIRE(metric(bs_7, bs_15) == 8.0/norm);
+    REQUIRE(metric(bs_15, bs_7) == 16.0/norm);
+
+    REQUIRE(metric(bs_8, bs_11) == 3.0/norm);
+    REQUIRE(metric(bs_11, bs_8) == 16.0/norm);
+
+    REQUIRE(metric(bs_8, bs_15) == 7.0/norm);
+    REQUIRE(metric(bs_15, bs_8) == 16.0/norm);
+
+    REQUIRE(metric(bs_11, bs_15) == 4.0/norm);
+    REQUIRE(metric(bs_15, bs_11) == 16.0/norm);
+
+  }
 
 }

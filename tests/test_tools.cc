@@ -1949,7 +1949,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   {
   emp::MatchBin<
     std::string,
-    emp::AbsIntDiffMetric<8>,
+    emp::SymmetricNoWrapMetric<8>,
     emp::RankedSelector<std::ratio<256 + 40, 256>>
   > bitBin;
 
