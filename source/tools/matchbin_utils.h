@@ -21,12 +21,14 @@
 #include <limits>
 #include <ratio>
 #include <math.h>
+#include <string>
 
 #include "../base/assert.h"
 #include "../base/array.h"
 #include "../base/vector.h"
 #include "../tools/IndexMap.h"
 #include "../tools/BitSet.h"
+#include "../tools/string_utils.h"
 
 namespace emp {
 
@@ -39,6 +41,9 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
 
     static constexpr size_t width = Width;
+    static const inline std::string name = (
+      emp::to_string(width) + "-bit Hamming Metric"
+    );
 
     double operator()(const query_t& a, const tag_t& b) const{
       return (double)(a^b).CountOnes() / Width;
@@ -50,6 +55,8 @@ namespace emp {
 
     using tag_t = int;
     using query_t = int;
+
+    static const inline std::string name = "Absolute Integer Difference Metric";
 
     double operator()(const query_t& a, const tag_t& b) const {
 
@@ -67,6 +74,7 @@ namespace emp {
     using query_t = size_t;
 
     static constexpr size_t width = sizeof(size_t) * 8;
+    static const inline std::string name = "Next Up Metric";
 
     double operator()(const query_t& a, const tag_t& b) const {
       const size_t difference = ((Max + 1) + b - a) % (Max + 1);
@@ -83,6 +91,9 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
 
     static constexpr size_t width = Width;
+    static const inline std::string name = (
+      emp::to_string(width) + "-bit Asymmetric Wrap Metric"
+    );
 
     double operator()(const query_t& a, const tag_t& b) const {
       return (b - a).GetDouble() / emp::BitSet<Width>::MaxDouble();
@@ -98,6 +109,9 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
 
     static constexpr size_t width = Width;
+    static const inline std::string name = (
+      emp::to_string(width) + "-bit Asymmetric No-Wrap Metric"
+    );
 
     double operator()(const query_t& a, const tag_t& b) const {
       constexpr double max_dist = emp::BitSet<Width>::MaxDouble() + 1.0;
@@ -117,6 +131,9 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
 
     static constexpr size_t width = Width;
+    static const inline std::string name = (
+      emp::to_string(width) + "-bit Symmetric Wrap Metric"
+    );
 
     double operator()(const query_t& a, const tag_t& b) {
       constexpr double max_dist = (
@@ -137,6 +154,9 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
 
     static constexpr size_t width = Width;
+    static const inline std::string name = (
+      emp::to_string(width) + "-bit Symmetric No-Wrap Metric"
+    );
 
     double operator()(const query_t& a, const tag_t& b) {
       return (
@@ -155,6 +175,9 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
 
     static constexpr size_t width = Width;
+    static const inline std::string name = (
+      emp::to_string(width) + "-bit Streak Metric"
+    );
 
     double operator()(const query_t& a, const tag_t& b) const {
       const emp::BitSet<Width> bs = a^b;
@@ -183,6 +206,7 @@ namespace emp {
     using query_t = typename Metric::query_t;
 
     static constexpr size_t width = Metric::width;
+    static const inline std::string name = "Sliding " + Metric::name;
 
     Metric metric;
 
@@ -208,6 +232,7 @@ namespace emp {
     using query_t = typename Metric::query_t;
 
     static constexpr size_t width = Metric::width;
+    static const inline std::string name = "Inverse " + Metric::name;
 
     Metric metric;
 
@@ -222,6 +247,9 @@ namespace emp {
     using query_t = emp::array<typename Metric::query_t, Dim>;
 
     static constexpr size_t width = Dim * Metric::width;
+    static const inline std::string name = (
+      emp::to_string(Dim) + "-Dimensional " + Metric::name
+    );
 
     Metric metric;
 
