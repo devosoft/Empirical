@@ -55,6 +55,7 @@ namespace emp {
     using tag_t = int;
     using query_t = int;
 
+    static constexpr size_t width = sizeof(int) * 8;
     static const inline std::string name = "Absolute Integer Difference Metric";
 
     double operator()(const query_t& a, const tag_t& b) const {
