@@ -1057,7 +1057,7 @@ namespace emp {
         self_cast_set[i] = sum % emp::IntPow((uint64_t) 2, (uint64_t) 32);
       }
 
-      if constexpr (NUM_BITS%32) {
+      if constexpr ((bool) NUM_BITS%32) {
         self_cast_set[NUM_BITS/32] = (
           (uint64_t)(self_cast_set[NUM_BITS/32])
           + (uint64_t)(other_cast_set[NUM_BITS/32]) + carry
@@ -1092,7 +1092,7 @@ namespace emp {
         ) % emp::IntPow((uint64_t) 2, (uint64_t) 32);
      }
 
-      if constexpr (NUM_BITS%32) {
+      if constexpr ((bool) NUM_BITS%32) {
         uint64_t subtrahend = (uint64_t)(other_cast_set[NUM_BITS/32]) + carry;
         self_cast_set[NUM_BITS/32] = (
           (uint64_t)(self_cast_set[NUM_BITS/32]) - subtrahend
