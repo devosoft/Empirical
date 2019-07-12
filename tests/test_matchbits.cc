@@ -78,6 +78,74 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(bs4.GetUInt(1) == pow((size_t)2, (size_t)32)-1);
   }
 
+  // test addition and subtraction with multiple fields
+  {
+
+    emp::BitSet<65> bs1;
+    emp::BitSet<65> bs2;
+
+    /* PART 1 */
+    bs1.Clear();
+    bs2.Clear();
+
+    bs1.Set(64); // 10000...
+    bs2.Set(0);  // ...00001
+
+    for(size_t i = 0; i < 64; ++i) REQUIRE((bs1 - bs2).Get(i));
+    REQUIRE(!(bs1 - bs2).Get(64));
+
+    bs1 -= bs2;
+
+    for(size_t i = 0; i < 64; ++i) {
+      REQUIRE(bs1.Get(i));
+    }
+    REQUIRE(!bs1.Get(64));
+
+    /* PART 2 */
+    bs1.Clear();
+    bs2.Clear();
+
+    bs2.Set(0);  // ...00001
+
+    for(size_t i = 0; i < 65; ++i) REQUIRE((bs1 - bs2).Get(i));
+
+    bs1 -= bs2;
+
+    for(size_t i = 0; i < 65; ++i) REQUIRE(bs1.Get(i));
+
+    /* PART 3 */
+    bs1.Clear();
+    bs2.Clear();
+
+    for(size_t i = 0; i < 65; ++i) bs1.Set(i); // 11111...11111
+    bs2.Set(0);  // ...00001
+
+    for(size_t i = 0; i < 65; ++i) REQUIRE(!(bs1 + bs2).Get(i));
+    for(size_t i = 0; i < 65; ++i) REQUIRE(!(bs2 + bs1).Get(i));
+
+    bs1 += bs2;
+
+    for(size_t i = 0; i < 65; ++i) REQUIRE(!bs1.Get(i));
+
+    /* PART 4 */
+    bs1.Clear();
+    bs2.Clear();
+
+    for(size_t i = 0; i < 64; ++i) bs1.Set(i); // 01111...11111
+    bs2.Set(0);  // ...00001
+
+    for(size_t i = 0; i < 64; ++i) REQUIRE(!(bs1 + bs2).Get(i));
+    REQUIRE((bs1 + bs2).Get(64));
+    for(size_t i = 0; i < 64; ++i) REQUIRE(!(bs2 + bs1).Get(i));
+    REQUIRE((bs2 + bs1).Get(64));
+
+    bs1 += bs2;
+
+    for(size_t i = 0; i < 64; ++i) REQUIRE(!bs1.Get(i));
+    REQUIRE((bs2 + bs1).Get(64));
+
+  }
+
   // test list initializer
   {
     emp::BitSet<3> bs_empty{0,0,0};
