@@ -31,34 +31,49 @@
 
 namespace emp {
 
+  /// Abstract base class for metrics
+  template<typename Query, typename Tag>
+  struct BaseMetric {
+
+    virtual ~BaseMetric() {};
+    virtual double operator()(const Query& a, const Tag& b) const = 0;
+    virtual size_t width() const = 0;
+    virtual std::string name() const = 0;
+
+  };
+
   /// Metric for MatchBin stored in the struct so we can template on it
   /// Returns the number of bits not in common between two BitSets
   template<size_t Width>
-  struct HammingMetric {
+  struct HammingMetric: public BaseMetric<emp::BitSet<Width>, emp::BitSet<Width>> {
 
-    using tag_t = emp::BitSet<Width>;
     using query_t = emp::BitSet<Width>;
+    using tag_t = emp::BitSet<Width>;
 
-    static constexpr size_t width = Width;
-    static const inline std::string name = (
-      emp::to_string(width) + "-bit Hamming Metric"
-    );
+    size_t width() const override { return Width; }
 
-    double operator()(const query_t& a, const tag_t& b) const{
+    std::string name() const override {
+      return emp::to_string(Width) + "-bit Hamming Metric";
+    }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
       return (double)(a^b).CountOnes() / Width;
     }
   };
 
   /// Metric gives the absolute difference between two integers
-  struct AbsDiffMetric {
+  struct AbsDiffMetric : public BaseMetric<int, int> {
 
-    using tag_t = int;
     using query_t = int;
+    using tag_t = int;
 
-    static constexpr size_t width = sizeof(int) * 8;
-    static const inline std::string name = "Absolute Integer Difference Metric";
+    size_t width() const override { return sizeof(int) * 8; }
 
-    double operator()(const query_t& a, const tag_t& b) const {
+    std::string name() const override {
+      return "Absolute Integer Difference Metric";
+    }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
 
       return (double)std::abs(a-b) / std::numeric_limits<int>::max();
     }
@@ -68,15 +83,16 @@ namespace emp {
   /// Wraps on Max.
   /// Adapted from Spector, Lee, et al. "Tag-based modules in genetic programming." Proceedings of the 13th annual conference on Genetic and evolutionary computation. ACM, 2011.
   template<size_t Max=1000>
-  struct NextUpMetric {
+  struct NextUpMetric : public BaseMetric<size_t, size_t> {
 
-    using tag_t = size_t;
     using query_t = size_t;
+    using tag_t = size_t;
 
-    static constexpr size_t width = sizeof(size_t) * 8;
-    static const inline std::string name = "Next Up Metric";
+    size_t width() const override { return sizeof(size_t) * 8; }
 
-    double operator()(const query_t& a, const tag_t& b) const {
+    std::string name() const override { return "Next Up Metric"; }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
       const size_t difference = ((Max + 1) + b - a) % (Max + 1);
       return (double)(difference % (Max + 1)) / Max;
     }
@@ -85,17 +101,18 @@ namespace emp {
   /// BitSet-based implementation of NextUpMetric.
   /// Adapted from Spector, Lee, et al. "Tag-based modules in genetic programming." Proceedings of the 13th annual conference on Genetic and evolutionary computation. ACM, 2011.
   template<size_t Width>
-  struct AsymmetricWrapMetric {
+  struct AsymmetricWrapMetric : public BaseMetric<emp::BitSet<Width>, emp::BitSet<Width>> {
 
-    using tag_t = emp::BitSet<Width>;
     using query_t = emp::BitSet<Width>;
+    using tag_t = emp::BitSet<Width>;
 
-    static constexpr size_t width = Width;
-    static const inline std::string name = (
-      emp::to_string(width) + "-bit Asymmetric Wrap Metric"
-    );
+    size_t width() const override { return Width; }
 
-    double operator()(const query_t& a, const tag_t& b) const {
+    std::string name() const override {
+      return emp::to_string(Width) + "-bit Asymmetric Wrap Metric";
+    }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
       return (b - a).GetDouble() / emp::BitSet<Width>::MaxDouble();
     }
 
@@ -103,17 +120,18 @@ namespace emp {
 
   /// BitSet-based implementation of NextUpMetric without wrapping.
   template<size_t Width>
-  struct AsymmetricNoWrapMetric {
+  struct AsymmetricNoWrapMetric : public BaseMetric<emp::BitSet<Width>, emp::BitSet<Width>> {
 
-    using tag_t = emp::BitSet<Width>;
     using query_t = emp::BitSet<Width>;
+    using tag_t = emp::BitSet<Width>;
 
-    static constexpr size_t width = Width;
-    static const inline std::string name = (
-      emp::to_string(width) + "-bit Asymmetric No-Wrap Metric"
-    );
+    size_t width() const override { return Width; }
 
-    double operator()(const query_t& a, const tag_t& b) const {
+    std::string name() const override {
+      return emp::to_string(Width) + "-bit Asymmetric No-Wrap Metric";
+    }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
       constexpr double max_dist = emp::BitSet<Width>::MaxDouble() + 1.0;
       return (b >= a ? (b - a).GetDouble() : max_dist) / max_dist;
     }
@@ -125,17 +143,18 @@ namespace emp {
   /// the BitSet can represent.
   /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
   template<size_t Width>
-  struct SymmetricWrapMetric {
+  struct SymmetricWrapMetric : public BaseMetric<emp::BitSet<Width>, emp::BitSet<Width>> {
 
-    using tag_t = emp::BitSet<Width>;
     using query_t = emp::BitSet<Width>;
+    using tag_t = emp::BitSet<Width>;
 
-    static constexpr size_t width = Width;
-    static const inline std::string name = (
-      emp::to_string(width) + "-bit Symmetric Wrap Metric"
-    );
+    size_t width() const override { return Width; }
 
-    double operator()(const query_t& a, const tag_t& b) {
+    std::string name() const override {
+      return emp::to_string(Width) + "-bit Symmetric Wrap Metric";
+    }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
       constexpr double max_dist = (
         (emp::BitSet<Width>::MaxDouble() + 1.0) / 2.0
       );
@@ -148,17 +167,18 @@ namespace emp {
   /// representations of the BitSets.
   /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
   template<size_t Width>
-  struct SymmetricNoWrapMetric {
+  struct SymmetricNoWrapMetric : public BaseMetric<emp::BitSet<Width>, emp::BitSet<Width>> {
 
-    using tag_t = emp::BitSet<Width>;
     using query_t = emp::BitSet<Width>;
+    using tag_t = emp::BitSet<Width>;
 
-    static constexpr size_t width = Width;
-    static const inline std::string name = (
-      emp::to_string(width) + "-bit Symmetric No-Wrap Metric"
-    );
+    size_t width() const override { return Width; }
 
-    double operator()(const query_t& a, const tag_t& b) {
+    std::string name() const override {
+      return emp::to_string(Width) + "-bit Symmetric No-Wrap Metric";
+    }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
       return (
         a > b ? a - b : b - a
       ).GetDouble() /  emp::BitSet<Width>::MaxDouble();
@@ -169,17 +189,18 @@ namespace emp {
   /// Matches based on the longest segment of equal and uneqal bits in two bitsets
   /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
   template<size_t Width>
-  struct StreakMetric {
+  struct StreakMetric : public BaseMetric<emp::BitSet<Width>, emp::BitSet<Width>> {
 
-    using tag_t = emp::BitSet<Width>;
     using query_t = emp::BitSet<Width>;
+    using tag_t = emp::BitSet<Width>;
 
-    static constexpr size_t width = Width;
-    static const inline std::string name = (
-      emp::to_string(width) + "-bit Streak Metric"
-    );
+    size_t width() const override { return Width; }
 
-    double operator()(const query_t& a, const tag_t& b) const {
+    std::string name() const override {
+      return emp::to_string(Width) + "-bit Streak Metric";
+    }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
       const emp::BitSet<Width> bs = a^b;
       const size_t same = (~bs).LongestSegmentOnes();
       const size_t different = bs.LongestSegmentOnes();
@@ -200,23 +221,22 @@ namespace emp {
   };
 
   template<typename Metric>
-  struct SlideMod {
+  struct SlideMod : public Metric {
 
-    using tag_t = typename Metric::tag_t;
     using query_t = typename Metric::query_t;
-
-    static constexpr size_t width = Metric::width;
-    static const inline std::string name = "Sliding " + Metric::name;
+    using tag_t = typename Metric::tag_t;
 
     Metric metric;
 
-    double operator()(const query_t& a, const tag_t& b) {
+    std::string name() const override { return "Sliding " + metric.name(); }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
 
       query_t dup(a);
 
       double best = 1.0;
 
-      for(size_t i = 0; i < Metric::width; ++ i) {
+      for(size_t i = 0; i < metric.width(); ++ i) {
         best = std::min(metric(dup, b), best);
         dup.template ROTL_SELF<1>();
       }
@@ -226,34 +246,36 @@ namespace emp {
   };
 
   template<typename Metric>
-  struct AntiMod {
+  struct AntiMod : public Metric {
 
-    using tag_t = typename Metric::tag_t;
     using query_t = typename Metric::query_t;
-
-    static constexpr size_t width = Metric::width;
-    static const inline std::string name = "Inverse " + Metric::name;
+    using tag_t = typename Metric::tag_t;
 
     Metric metric;
 
-    double operator()(const query_t& a, const tag_t& b) { return 1.0 - metric(a,b); }
+    std::string name() const override { return "Inverse " + metric.name(); }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+      return 1.0 - metric(a,b);
+    }
 
   };
 
   template<typename Metric, size_t Dim>
-  struct DimMod {
+  struct DimMod : public BaseMetric<emp::array<typename Metric::query_t, Dim>, emp::array<typename Metric::tag_t, Dim>> {
 
-    using tag_t = emp::array<typename Metric::tag_t, Dim>;
     using query_t = emp::array<typename Metric::query_t, Dim>;
-
-    static constexpr size_t width = Dim * Metric::width;
-    static const inline std::string name = (
-      emp::to_string(Dim) + "-Dimensional " + Metric::name
-    );
+    using tag_t = emp::array<typename Metric::tag_t, Dim>;
 
     Metric metric;
 
-    double operator()(const query_t& a, const tag_t& b) {
+    size_t width() const override { return Dim * metric.width(); }
+
+    std::string name() const override {
+      return emp::to_string(Dim) + "-Dimensional " + metric.name();
+    }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
 
       double res = 0.0;
       for (size_t d = 0; d < Dim; ++d) res += metric(a[d], b[d]);

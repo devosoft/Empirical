@@ -2346,16 +2346,16 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::SlideMod<emp::HammingMetric<32>> slide_hamming;
 
   emp::DimMod<emp::StreakMetric<32>, 1> d_streak1;
-  REQUIRE(d_streak1.width == streak.width);
+  REQUIRE(d_streak1.width() == streak.width());
 
   emp::DimMod<emp::AntiMod<emp::StreakMetric<32>>, 1> d_anti_streak1;
-  REQUIRE(d_anti_streak1.width == anti_streak.width);
+  REQUIRE(d_anti_streak1.width() == anti_streak.width());
 
   emp::DimMod<emp::HammingMetric<32>, 1> d_hamming1;
-  REQUIRE(d_hamming1.width == hamming.width);
+  REQUIRE(d_hamming1.width() == hamming.width());
 
   emp::DimMod<emp::SlideMod<emp::HammingMetric<32>>, 1> d_slide_hamming1;
-  REQUIRE(d_slide_hamming1.width == slide_hamming.width);
+  REQUIRE(d_slide_hamming1.width() == slide_hamming.width());
 
   REQUIRE(streak(a1[0], b1[0]) == d_streak1(a1, b1));
   REQUIRE(anti_streak(a1[0], b1[0]) == d_anti_streak1(a1, b1));
@@ -2374,16 +2374,16 @@ TEST_CASE("Test MatchBin", "[tools]")
   };
 
   emp::DimMod<emp::StreakMetric<32>, 3> d_streak3;
-  REQUIRE(d_streak3.width == streak.width * 3);
+  REQUIRE(d_streak3.width() == streak.width() * 3);
 
   emp::DimMod<emp::AntiMod<emp::StreakMetric<32>>, 3> d_anti_streak3;
-  REQUIRE(d_anti_streak3.width == anti_streak.width * 3);
+  REQUIRE(d_anti_streak3.width() == anti_streak.width() * 3);
 
   emp::DimMod<emp::HammingMetric<32>, 3> d_hamming3;
-  REQUIRE(d_hamming3.width == hamming.width * 3);
+  REQUIRE(d_hamming3.width() == hamming.width() * 3);
 
   emp::DimMod<emp::SlideMod<emp::HammingMetric<32>>, 3> d_slide_hamming3;
-  REQUIRE(d_slide_hamming3.width == slide_hamming.width * 3);
+  REQUIRE(d_slide_hamming3.width() == slide_hamming.width() * 3);
 
 
   REQUIRE(
