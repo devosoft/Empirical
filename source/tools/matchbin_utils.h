@@ -287,6 +287,42 @@ namespace emp {
 
   };
 
+  template<typename Metric, size_t Dim>
+  struct FlatDimMod
+    : public BaseMetric<
+      emp::BitSet<Dim * Metric::query_t::GetSize()>,
+      emp::BitSet<Dim * Metric::tag_t::GetSize()>
+    >
+  {
+
+    using query_t = emp::BitSet<Dim * Metric::query_t::GetSize()>;
+    using tag_t = emp::BitSet<Dim * Metric::tag_t::GetSize()>;
+
+    DimMod<Metric, Dim> metric;
+
+    size_t width() const override { return metric.width(); }
+
+    size_t dim() const { return metric.dim(); }
+
+    std::string name() const override { return metric.name(); }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+
+      emp::vector<typename Metric::query_t> va(Dim);
+      emp::vector<typename Metric::tag_t> vb(Dim);
+
+      for (size_t i = 0; i < width(); ++i) {
+        // this can be done faster
+        va[i/Metric::query_t::GetSize()][i%Metric::query_t::GetSize()] = a[i];
+        vb[i/Metric::tag_t::GetSize()][i%Metric::tag_t::GetSize()] = b[i];
+      }
+
+      return metric(va, vb);
+
+    }
+
+  };
+
   /// Abstract base class for selectors
   struct Selector {
 

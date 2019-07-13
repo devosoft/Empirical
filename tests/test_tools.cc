@@ -2413,6 +2413,96 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   }
 
+  // test FlatDimMod
+  {
+  emp::Random rand(1);
+
+  emp::BitSet<32> a1(rand);
+
+  emp::BitSet<32> b1(rand);
+
+  emp::StreakMetric<32> streak;
+  emp::AntiMod<emp::StreakMetric<32>> anti_streak;
+  emp::HammingMetric<32> hamming;
+  emp::SlideMod<emp::HammingMetric<32>> slide_hamming;
+
+  emp::FlatDimMod<emp::StreakMetric<32>, 1> d_streak1;
+  REQUIRE(d_streak1.width() == streak.width());
+
+  emp::FlatDimMod<emp::AntiMod<emp::StreakMetric<32>>, 1> d_anti_streak1;
+  REQUIRE(d_anti_streak1.width() == anti_streak.width());
+
+  emp::FlatDimMod<emp::HammingMetric<32>, 1> d_hamming1;
+  REQUIRE(d_hamming1.width() == hamming.width());
+
+  emp::FlatDimMod<emp::SlideMod<emp::HammingMetric<32>>, 1> d_slide_hamming1;
+  REQUIRE(d_slide_hamming1.width() == slide_hamming.width());
+
+  REQUIRE(streak(a1, b1) == d_streak1(a1, b1));
+  REQUIRE(anti_streak(a1, b1) == d_anti_streak1(a1, b1));
+  REQUIRE(hamming(a1, b1) == d_hamming1(a1, b1));
+  REQUIRE(slide_hamming(a1, b1) == d_slide_hamming1(a1, b1));
+
+  emp::vector<emp::BitSet<32>> a3 = {
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand)
+  };
+
+  emp::vector<emp::BitSet<32>> b3 = {
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand)
+  };
+
+  emp::BitSet<96> flat_a3;
+  emp::BitSet<96> flat_b3;
+
+  for (size_t i = 0; i < 96; ++i) {
+    flat_a3[i] = a3[i/32][i%32];
+    flat_b3[i] = b3[i/32][i%32];
+  }
+
+  emp::FlatDimMod<emp::StreakMetric<32>, 3> d_streak3;
+  REQUIRE(d_streak3.width() == streak.width() * 3);
+
+  emp::FlatDimMod<emp::AntiMod<emp::StreakMetric<32>>, 3> d_anti_streak3;
+  REQUIRE(d_anti_streak3.width() == anti_streak.width() * 3);
+
+  emp::FlatDimMod<emp::HammingMetric<32>, 3> d_hamming3;
+  REQUIRE(d_hamming3.width() == hamming.width() * 3);
+
+  emp::FlatDimMod<emp::SlideMod<emp::HammingMetric<32>>, 3> d_slide_hamming3;
+  REQUIRE(d_slide_hamming3.width() == slide_hamming.width() * 3);
+
+
+  REQUIRE(
+    streak(a3[0], b3[0]) + streak(a3[1], b3[1]) + streak(a3[2], b3[2])
+    -
+    d_streak3(flat_a3,flat_b3) * 3.0
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    anti_streak(a3[0], b3[0]) + anti_streak(a3[1], b3[1]) + anti_streak(a3[2], b3[2])
+    -
+    d_anti_streak3(flat_a3,flat_b3)  * 3.0
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    hamming(a3[0], b3[0]) + hamming(a3[1], b3[1]) + hamming(a3[2], b3[2])
+    -
+    d_hamming3(flat_a3,flat_b3)  * 3.0
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    slide_hamming(a3[0], b3[0]) + slide_hamming(a3[1], b3[1]) + slide_hamming(a3[2], b3[2])
+    -
+    d_slide_hamming3(flat_a3,flat_b3)  * 3.0
+    <= std::numeric_limits<double>::epsilon()
+  );
+
+  }
+
   // test SymmetricWrapMetric
   {
   const double norm = 8.0;
