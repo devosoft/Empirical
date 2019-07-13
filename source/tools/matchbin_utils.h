@@ -210,15 +210,15 @@ namespace emp {
 
     Metric metric;
 
-    double operator()(query_t& a, const tag_t& b) {
+    double operator()(const query_t& a, const tag_t& b) {
 
-      emp_assert(&a != &b);
+      query_t dup(a);
 
       double best = 1.0;
 
       for(size_t i = 0; i < Metric::width; ++ i) {
-        best = std::min(metric(a, b), best);
-        a.template ROTL_SELF<1>();
+        best = std::min(metric(dup, b), best);
+        dup.template ROTL_SELF<1>();
       }
 
       return best;
@@ -253,7 +253,7 @@ namespace emp {
 
     Metric metric;
 
-    double operator()(query_t& a, const tag_t& b) {
+    double operator()(const query_t& a, const tag_t& b) {
 
       double res = 0.0;
       for (size_t d = 0; d < Dim; ++d) res += metric(a[d], b[d]);

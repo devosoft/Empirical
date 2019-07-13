@@ -2205,15 +2205,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::SlideMod<emp::HammingMetric<3>> slide_hamming;
   emp::StreakMetric<3> streak;
 
-  emp::BitSet<3> dup(bs_010);
-  slide_streak(bs_010, bs_000);
-  REQUIRE(bs_010 == dup);
-
-  // slide takes a reference and rotates the BitSet around
-  // (and back into place) so we need to make a copy if we have
-  // equivalent left and right operands to operator()
   REQUIRE(
-    slide_streak(bs_100, dup=bs_100)
+    slide_streak(bs_100, bs_100)
     ==
     slide_streak(bs_100, bs_010)
   );
@@ -2237,7 +2230,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   );
 
   REQUIRE(
-    slide_hamming(bs_100, dup=bs_100)
+    slide_hamming(bs_100, bs_100)
     ==
     slide_hamming(bs_100, bs_010)
   );
@@ -2299,8 +2292,6 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::BitSet<3> bs_011{0,1,1};
   emp::BitSet<3> bs_111{1,1,1};
 
-  emp::BitSet<3> dup;
-
   emp::SlideMod<emp::StreakMetric<3>> slide_streak;
   emp::SlideMod<emp::AntiMod<emp::StreakMetric<3>>> slide_anti_streak;
   emp::SlideMod<emp::HammingMetric<3>> slide_hamming;
@@ -2312,11 +2303,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(
     slide_streak(bs_000, bs_111)
     ==
-    slide_anti_streak(dup=bs_111, bs_111)
+    slide_anti_streak(bs_111, bs_111)
   );
-  // slide takes a reference and rotates the BitSet around
-  // (and back into place) so we need to make a copy if we have
-  // equivalent left and right operands to operator()
 
   REQUIRE(
     slide_streak(bs_011, bs_000)
@@ -2327,7 +2315,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(
     slide_hamming(bs_000, bs_111)
     -
-    slide_anti_hamming(dup=bs_111, bs_111)
+    slide_anti_hamming(bs_111, bs_111)
     <= std::numeric_limits<double>::epsilon()
     // instead of doing == because of floating imprecision
   );
