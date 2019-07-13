@@ -262,10 +262,10 @@ namespace emp {
   };
 
   template<typename Metric, size_t Dim>
-  struct DimMod : public BaseMetric<emp::vector<typename Metric::query_t>, emp::vector<typename Metric::tag_t>> {
+  struct DimMod : public BaseMetric<emp::array<typename Metric::query_t, Dim>, emp::array<typename Metric::tag_t, Dim>> {
 
-    using query_t = emp::vector<typename Metric::query_t>;
-    using tag_t = emp::vector<typename Metric::tag_t>;
+    using query_t = emp::array<typename Metric::query_t, Dim>;
+    using tag_t = emp::array<typename Metric::tag_t, Dim>;
 
     Metric metric;
 
@@ -308,8 +308,8 @@ namespace emp {
 
     double operator()(const query_t& a, const tag_t& b) const override {
 
-      emp::vector<typename Metric::query_t> va(Dim);
-      emp::vector<typename Metric::tag_t> vb(Dim);
+      emp::array<typename Metric::query_t, Dim> va;
+      emp::array<typename Metric::tag_t, Dim> vb;
 
       for (size_t i = 0; i < width(); ++i) {
         // this can be done faster
