@@ -271,6 +271,8 @@ namespace emp {
 
     size_t width() const override { return Dim * metric.width(); }
 
+    size_t dim() const { return Dim; }
+
     std::string name() const override {
       return emp::to_string(Dim) + "-Dimensional " + metric.name();
     }
