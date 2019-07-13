@@ -2333,10 +2333,10 @@ TEST_CASE("Test MatchBin", "[tools]")
   {
   emp::Random rand(1);
 
-  emp::array<emp::BitSet<32>,1> a1 = {
+  emp::vector<emp::BitSet<32>> a1 = {
     emp::BitSet<32>(rand)
   };
-  emp::array<emp::BitSet<32>,1> b1 = {
+  emp::vector<emp::BitSet<32>> b1 = {
     emp::BitSet<32>(rand)
   };
 
@@ -2362,12 +2362,12 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(hamming(a1[0], b1[0]) == d_hamming1(a1, b1));
   REQUIRE(slide_hamming(a1[0], b1[0]) == d_slide_hamming1(a1, b1));
 
-  emp::array<emp::BitSet<32>,3> a3 = {
+  emp::vector<emp::BitSet<32>> a3 = {
     emp::BitSet<32>(rand),
     emp::BitSet<32>(rand),
     emp::BitSet<32>(rand)
   };
-  emp::array<emp::BitSet<32>,3> b3 = {
+  emp::vector<emp::BitSet<32>> b3 = {
     emp::BitSet<32>(rand),
     emp::BitSet<32>(rand),
     emp::BitSet<32>(rand)
