@@ -347,7 +347,7 @@ namespace emp {
     BitSet(const BitSet & in_set) { Copy(in_set.bit_set); }
 
     /// Constructor to generate a random BitSet (with equal prob of 0 or 1).
-    BitSet(Random & random) { Randomize(random); }
+    BitSet(Random & random) { Clear(); Randomize(random); }
 
     /// Constructor to generate a random BitSet with provided prob of 1's.
     BitSet(Random & random, const double p1) { Clear(); Randomize(random, p1); }
