@@ -295,7 +295,7 @@ namespace emp {
   };
 
   template<typename Metric, size_t Dim>
-  struct MaxDimMod
+  struct MinDimMod
     : public BaseMetric<
       std::array<typename Metric::query_t, Dim>,
       std::array<typename Metric::tag_t, Dim>
@@ -312,7 +312,7 @@ namespace emp {
     size_t dim() const { return Dim; }
 
     std::string name() const override {
-      return emp::to_string(Dim) + "-Dimensional Maximum " + metric.name();
+      return emp::to_string(Dim) + "-Dimensional Minimum " + metric.name();
     }
 
     double operator()(const query_t& a, const tag_t& b) const override {
