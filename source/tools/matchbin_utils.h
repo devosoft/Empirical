@@ -21,6 +21,8 @@
 #include <limits>
 #include <ratio>
 #include <string>
+#include <tuple>
+#include <array>
 
 #include "../base/assert.h"
 #include "../base/array.h"
@@ -262,10 +264,15 @@ namespace emp {
   };
 
   template<typename Metric, size_t Dim>
-  struct DimMod : public BaseMetric<emp::array<typename Metric::query_t, Dim>, emp::array<typename Metric::tag_t, Dim>> {
+  struct MeanDimMod
+    : public BaseMetric<
+      std::array<typename Metric::query_t, Dim>,
+      std::array<typename Metric::tag_t, Dim>
+    >
+  {
 
-    using query_t = emp::array<typename Metric::query_t, Dim>;
-    using tag_t = emp::array<typename Metric::tag_t, Dim>;
+    using query_t = std::array<typename Metric::query_t, Dim>;
+    using tag_t = std::array<typename Metric::tag_t, Dim>;
 
     Metric metric;
 
@@ -274,7 +281,7 @@ namespace emp {
     size_t dim() const { return Dim; }
 
     std::string name() const override {
-      return emp::to_string(Dim) + "-Dimensional " + metric.name();
+      return emp::to_string(Dim) + "-Dimensional Mean " + metric.name();
     }
 
     double operator()(const query_t& a, const tag_t& b) const override {
@@ -288,17 +295,60 @@ namespace emp {
   };
 
   template<typename Metric, size_t Dim>
-  struct FlatDimMod
+  struct MaxDimMod
     : public BaseMetric<
-      emp::BitSet<Dim * Metric::query_t::GetSize()>,
-      emp::BitSet<Dim * Metric::tag_t::GetSize()>
+      std::array<typename Metric::query_t, Dim>,
+      std::array<typename Metric::tag_t, Dim>
     >
   {
 
-    using query_t = emp::BitSet<Dim * Metric::query_t::GetSize()>;
-    using tag_t = emp::BitSet<Dim * Metric::tag_t::GetSize()>;
+    using query_t = std::array<typename Metric::query_t, Dim>;
+    using tag_t = std::array<typename Metric::tag_t, Dim>;
 
-    DimMod<Metric, Dim> metric;
+    Metric metric;
+
+    size_t width() const override { return Dim * metric.width(); }
+
+    size_t dim() const { return Dim; }
+
+    std::string name() const override {
+      return emp::to_string(Dim) + "-Dimensional Maximum " + metric.name();
+    }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+
+      double res = 1.0;
+      for (size_t d = 0; d < Dim; ++d) res = std::min(res, metric(a[d], b[d]));
+
+      return res;
+    }
+
+  };
+
+  template<typename DimMetric>
+  struct FlatMod
+    : public BaseMetric<
+      emp::BitSet<
+        std::tuple_size<typename DimMetric::query_t>::value
+        * DimMetric::query_t::value_type::GetSize()
+      >,
+      emp::BitSet<
+        std::tuple_size<typename DimMetric::tag_t>::value
+        * DimMetric::tag_t::value_type::GetSize()
+      >
+    >
+  {
+
+    using query_t = emp::BitSet<
+      std::tuple_size<typename DimMetric::query_t>::value
+      * DimMetric::query_t::value_type::GetSize()
+    >;
+    using tag_t = emp::BitSet<
+      std::tuple_size<typename DimMetric::query_t>::value
+      * DimMetric::tag_t::value_type::GetSize()
+    >;
+
+    DimMetric metric;
 
     size_t width() const override { return metric.width(); }
 
@@ -308,13 +358,20 @@ namespace emp {
 
     double operator()(const query_t& a, const tag_t& b) const override {
 
-      emp::array<typename Metric::query_t, Dim> va;
-      emp::array<typename Metric::tag_t, Dim> vb;
+      typename DimMetric::query_t va;
+      typename DimMetric::tag_t vb;
 
-      for (size_t i = 0; i < width(); ++i) {
-        // this can be done faster
-        va[i/Metric::query_t::GetSize()][i%Metric::query_t::GetSize()] = a[i];
-        vb[i/Metric::tag_t::GetSize()][i%Metric::tag_t::GetSize()] = b[i];
+      constexpr size_t bs_width = DimMetric::query_t::value_type::GetSize();
+
+      if constexpr (std::tuple_size<typename DimMetric::query_t>::value == 1) {
+        va[0] = a;
+        vb[0] = b;
+      } else {
+        for (size_t i = 0; i < width(); ++i) {
+          // this can be done faster
+          va[i/bs_width][i%bs_width] = a[i];
+          vb[i/bs_width][i%bs_width] = b[i];
+        }
       }
 
       return metric(va, vb);

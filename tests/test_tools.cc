@@ -2329,7 +2329,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   );
   }
 
-  // test DimMod
+  // test MeanDimMod
   {
   emp::Random rand(1);
 
@@ -2345,16 +2345,16 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::HammingMetric<32> hamming;
   emp::SlideMod<emp::HammingMetric<32>> slide_hamming;
 
-  emp::DimMod<emp::StreakMetric<32>, 1> d_streak1;
+  emp::MeanDimMod<emp::StreakMetric<32>, 1> d_streak1;
   REQUIRE(d_streak1.width() == streak.width());
 
-  emp::DimMod<emp::AntiMod<emp::StreakMetric<32>>, 1> d_anti_streak1;
+  emp::MeanDimMod<emp::AntiMod<emp::StreakMetric<32>>, 1> d_anti_streak1;
   REQUIRE(d_anti_streak1.width() == anti_streak.width());
 
-  emp::DimMod<emp::HammingMetric<32>, 1> d_hamming1;
+  emp::MeanDimMod<emp::HammingMetric<32>, 1> d_hamming1;
   REQUIRE(d_hamming1.width() == hamming.width());
 
-  emp::DimMod<emp::SlideMod<emp::HammingMetric<32>>, 1> d_slide_hamming1;
+  emp::MeanDimMod<emp::SlideMod<emp::HammingMetric<32>>, 1> d_slide_hamming1;
   REQUIRE(d_slide_hamming1.width() == slide_hamming.width());
 
   REQUIRE(streak(a1[0], b1[0]) == d_streak1(a1, b1));
@@ -2373,16 +2373,16 @@ TEST_CASE("Test MatchBin", "[tools]")
     emp::BitSet<32>(rand)
   };
 
-  emp::DimMod<emp::StreakMetric<32>, 3> d_streak3;
+  emp::MeanDimMod<emp::StreakMetric<32>, 3> d_streak3;
   REQUIRE(d_streak3.width() == streak.width() * 3);
 
-  emp::DimMod<emp::AntiMod<emp::StreakMetric<32>>, 3> d_anti_streak3;
+  emp::MeanDimMod<emp::AntiMod<emp::StreakMetric<32>>, 3> d_anti_streak3;
   REQUIRE(d_anti_streak3.width() == anti_streak.width() * 3);
 
-  emp::DimMod<emp::HammingMetric<32>, 3> d_hamming3;
+  emp::MeanDimMod<emp::HammingMetric<32>, 3> d_hamming3;
   REQUIRE(d_hamming3.width() == hamming.width() * 3);
 
-  emp::DimMod<emp::SlideMod<emp::HammingMetric<32>>, 3> d_slide_hamming3;
+  emp::MeanDimMod<emp::SlideMod<emp::HammingMetric<32>>, 3> d_slide_hamming3;
   REQUIRE(d_slide_hamming3.width() == slide_hamming.width() * 3);
 
 
@@ -2413,7 +2413,91 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   }
 
-  // test FlatDimMod
+  // test MaxDimMod
+  {
+  emp::Random rand(1);
+
+  emp::array<emp::BitSet<32>, 1> a1 = {
+    emp::BitSet<32>(rand)
+  };
+  emp::array<emp::BitSet<32>, 1> b1 = {
+    emp::BitSet<32>(rand)
+  };
+
+  emp::StreakMetric<32> streak;
+  emp::AntiMod<emp::StreakMetric<32>> anti_streak;
+  emp::HammingMetric<32> hamming;
+  emp::SlideMod<emp::HammingMetric<32>> slide_hamming;
+
+  emp::MaxDimMod<emp::StreakMetric<32>, 1> d_streak1;
+  REQUIRE(d_streak1.width() == streak.width());
+
+  emp::MaxDimMod<emp::AntiMod<emp::StreakMetric<32>>, 1> d_anti_streak1;
+  REQUIRE(d_anti_streak1.width() == anti_streak.width());
+
+  emp::MaxDimMod<emp::HammingMetric<32>, 1> d_hamming1;
+  REQUIRE(d_hamming1.width() == hamming.width());
+
+  emp::MaxDimMod<emp::SlideMod<emp::HammingMetric<32>>, 1> d_slide_hamming1;
+  REQUIRE(d_slide_hamming1.width() == slide_hamming.width());
+
+  REQUIRE(streak(a1[0], b1[0]) == d_streak1(a1, b1));
+  REQUIRE(anti_streak(a1[0], b1[0]) == d_anti_streak1(a1, b1));
+  REQUIRE(hamming(a1[0], b1[0]) == d_hamming1(a1, b1));
+  REQUIRE(slide_hamming(a1[0], b1[0]) == d_slide_hamming1(a1, b1));
+
+  emp::array<emp::BitSet<32>, 3> a3 = {
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand)
+  };
+  emp::array<emp::BitSet<32>, 3> b3 = {
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand)
+  };
+
+  emp::MaxDimMod<emp::StreakMetric<32>, 3> d_streak3;
+  REQUIRE(d_streak3.width() == streak.width() * 3);
+
+  emp::MaxDimMod<emp::AntiMod<emp::StreakMetric<32>>, 3> d_anti_streak3;
+  REQUIRE(d_anti_streak3.width() == anti_streak.width() * 3);
+
+  emp::MaxDimMod<emp::HammingMetric<32>, 3> d_hamming3;
+  REQUIRE(d_hamming3.width() == hamming.width() * 3);
+
+  emp::MaxDimMod<emp::SlideMod<emp::HammingMetric<32>>, 3> d_slide_hamming3;
+  REQUIRE(d_slide_hamming3.width() == slide_hamming.width() * 3);
+
+
+  REQUIRE(
+    std::max({streak(a3[0], b3[0]), streak(a3[1], b3[1]), streak(a3[2], b3[2])})
+    -
+    d_streak3(a3,b3)
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    std::max({anti_streak(a3[0], b3[0]), anti_streak(a3[1], b3[1]), anti_streak(a3[2], b3[2])})
+    -
+    d_anti_streak3(a3,b3)
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    std::max({hamming(a3[0], b3[0]), hamming(a3[1], b3[1]), hamming(a3[2], b3[2])})
+    -
+    d_hamming3(a3,b3)
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    std::max({slide_hamming(a3[0], b3[0]), slide_hamming(a3[1], b3[1]), slide_hamming(a3[2], b3[2])})
+    -
+    d_slide_hamming3(a3,b3)
+    <= std::numeric_limits<double>::epsilon()
+  );
+
+  }
+
+  // test FlatMod x MeanDimMod
   {
   emp::Random rand(1);
 
@@ -2426,16 +2510,40 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::HammingMetric<32> hamming;
   emp::SlideMod<emp::HammingMetric<32>> slide_hamming;
 
-  emp::FlatDimMod<emp::StreakMetric<32>, 1> d_streak1;
+  emp::FlatMod<
+    emp::MeanDimMod<
+      emp::StreakMetric<32>,
+      1
+    >
+  > d_streak1;
   REQUIRE(d_streak1.width() == streak.width());
 
-  emp::FlatDimMod<emp::AntiMod<emp::StreakMetric<32>>, 1> d_anti_streak1;
+  emp::FlatMod<
+    emp::MeanDimMod<
+      emp::AntiMod<
+        typename emp::StreakMetric<32>
+      >,
+      1
+    >
+  > d_anti_streak1;
   REQUIRE(d_anti_streak1.width() == anti_streak.width());
 
-  emp::FlatDimMod<emp::HammingMetric<32>, 1> d_hamming1;
+  emp::FlatMod<
+    emp::MeanDimMod<
+      typename emp::HammingMetric<32>,
+      1
+    >
+  > d_hamming1;
   REQUIRE(d_hamming1.width() == hamming.width());
 
-  emp::FlatDimMod<emp::SlideMod<emp::HammingMetric<32>>, 1> d_slide_hamming1;
+  emp::FlatMod<
+    emp::MeanDimMod<
+      emp::SlideMod<
+        typename emp::HammingMetric<32>
+      >,
+      1
+    >
+  > d_slide_hamming1;
   REQUIRE(d_slide_hamming1.width() == slide_hamming.width());
 
   REQUIRE(streak(a1, b1) == d_streak1(a1, b1));
@@ -2463,16 +2571,40 @@ TEST_CASE("Test MatchBin", "[tools]")
     flat_b3[i] = b3[i/32][i%32];
   }
 
-  emp::FlatDimMod<emp::StreakMetric<32>, 3> d_streak3;
+  emp::FlatMod<
+    emp::MeanDimMod<
+      emp::StreakMetric<32>,
+      3
+    >
+  > d_streak3;
   REQUIRE(d_streak3.width() == streak.width() * 3);
 
-  emp::FlatDimMod<emp::AntiMod<emp::StreakMetric<32>>, 3> d_anti_streak3;
+  emp::FlatMod<
+    emp::MeanDimMod<
+      emp::AntiMod<
+        emp::StreakMetric<32>
+      >,
+      3
+    >
+  > d_anti_streak3;
   REQUIRE(d_anti_streak3.width() == anti_streak.width() * 3);
 
-  emp::FlatDimMod<emp::HammingMetric<32>, 3> d_hamming3;
+  emp::FlatMod<
+    emp::MeanDimMod<
+      emp::HammingMetric<32>,
+      3
+    >
+  > d_hamming3;
   REQUIRE(d_hamming3.width() == hamming.width() * 3);
 
-  emp::FlatDimMod<emp::SlideMod<emp::HammingMetric<32>>, 3> d_slide_hamming3;
+  emp::FlatMod<
+    emp::MeanDimMod<
+      emp::SlideMod<
+        emp::HammingMetric<32>
+      >,
+      3
+    >
+  > d_slide_hamming3;
   REQUIRE(d_slide_hamming3.width() == slide_hamming.width() * 3);
 
 
@@ -2498,6 +2630,144 @@ TEST_CASE("Test MatchBin", "[tools]")
     slide_hamming(a3[0], b3[0]) + slide_hamming(a3[1], b3[1]) + slide_hamming(a3[2], b3[2])
     -
     d_slide_hamming3(flat_a3,flat_b3)  * 3.0
+    <= std::numeric_limits<double>::epsilon()
+  );
+
+  }
+
+  // test FlatMod x MaxDimMod
+  {
+  emp::Random rand(1);
+
+  emp::BitSet<32> a1(rand);
+
+  emp::BitSet<32> b1(rand);
+
+  emp::StreakMetric<32> streak;
+  emp::AntiMod<emp::StreakMetric<32>> anti_streak;
+  emp::HammingMetric<32> hamming;
+  emp::SlideMod<emp::HammingMetric<32>> slide_hamming;
+
+  emp::FlatMod<
+    emp::MaxDimMod<
+      emp::StreakMetric<32>,
+      1
+    >
+  > d_streak1;
+  REQUIRE(d_streak1.width() == streak.width());
+
+  emp::FlatMod<
+    emp::MaxDimMod<
+      emp::AntiMod<
+        typename emp::StreakMetric<32>
+      >,
+      1
+    >
+  > d_anti_streak1;
+  REQUIRE(d_anti_streak1.width() == anti_streak.width());
+
+  emp::FlatMod<
+    emp::MaxDimMod<
+      typename emp::HammingMetric<32>,
+      1
+    >
+  > d_hamming1;
+  REQUIRE(d_hamming1.width() == hamming.width());
+
+  emp::FlatMod<
+    emp::MaxDimMod<
+      emp::SlideMod<
+        typename emp::HammingMetric<32>
+      >,
+      1
+    >
+  > d_slide_hamming1;
+  REQUIRE(d_slide_hamming1.width() == slide_hamming.width());
+
+  REQUIRE(streak(a1, b1) == d_streak1(a1, b1));
+  REQUIRE(anti_streak(a1, b1) == d_anti_streak1(a1, b1));
+  REQUIRE(hamming(a1, b1) == d_hamming1(a1, b1));
+  REQUIRE(slide_hamming(a1, b1) == d_slide_hamming1(a1, b1));
+
+  emp::array<emp::BitSet<32>, 3> a3 = {
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand)
+  };
+
+  emp::array<emp::BitSet<32>, 3> b3 = {
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand)
+  };
+
+  emp::BitSet<96> flat_a3;
+  emp::BitSet<96> flat_b3;
+
+  for (size_t i = 0; i < 96; ++i) {
+    flat_a3[i] = a3[i/32][i%32];
+    flat_b3[i] = b3[i/32][i%32];
+  }
+
+  emp::FlatMod<
+    emp::MaxDimMod<
+      emp::StreakMetric<32>,
+      3
+    >
+  > d_streak3;
+  REQUIRE(d_streak3.width() == streak.width() * 3);
+
+  emp::FlatMod<
+    emp::MaxDimMod<
+      emp::AntiMod<
+        emp::StreakMetric<32>
+      >,
+      3
+    >
+  > d_anti_streak3;
+  REQUIRE(d_anti_streak3.width() == anti_streak.width() * 3);
+
+  emp::FlatMod<
+    emp::MaxDimMod<
+      emp::HammingMetric<32>,
+      3
+    >
+  > d_hamming3;
+  REQUIRE(d_hamming3.width() == hamming.width() * 3);
+
+  emp::FlatMod<
+    emp::MaxDimMod<
+      emp::SlideMod<
+        emp::HammingMetric<32>
+      >,
+      3
+    >
+  > d_slide_hamming3;
+  REQUIRE(d_slide_hamming3.width() == slide_hamming.width() * 3);
+
+
+  REQUIRE(
+    std::max({streak(a3[0], b3[0]), streak(a3[1], b3[1]), streak(a3[2], b3[2])})
+    -
+    d_streak3(flat_a3,flat_b3)
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    std::max({anti_streak(a3[0], b3[0]), anti_streak(a3[1], b3[1]), anti_streak(a3[2], b3[2])})
+    -
+    d_anti_streak3(flat_a3,flat_b3)
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    std::max({hamming(a3[0], b3[0]), hamming(a3[1], b3[1]), hamming(a3[2], b3[2])})
+    -
+    d_hamming3(flat_a3,flat_b3)
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    std::max({slide_hamming(a3[0], b3[0]), slide_hamming(a3[1], b3[1]), slide_hamming(a3[2], b3[2])})
+    -
+    d_slide_hamming3(flat_a3,flat_b3)
     <= std::numeric_limits<double>::epsilon()
   );
 
