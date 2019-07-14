@@ -1036,39 +1036,51 @@ namespace emp {
 
     }
 
-    /// Addition of two Bitsets. Wraps back to 0 if it overflows. returns result.
+    /// Addition of two Bitsets.
+    /// Wraps if it overflows.
+    /// Returns result.
     BitSet ADD(const BitSet & set2) const{
       BitSet out_set(*this);
       return out_set.ADD_SELF(set2);
     }
 
-    /// Addition of two Bitsets. Wraps back to 0 if it overflows. returns this object.
+    /// Addition of two Bitsets.
+    /// Wraps if it overflows.
+    /// Returns this object.
     BitSet & ADD_SELF(const BitSet & set2) {
-      uint32_t *self_cast_set = (uint32_t*) bit_set;
-      const uint32_t *other_cast_set =  (const uint32_t*) set2.bit_set;
+      uint32_t *self_cast_set = reinterpret_cast<uint32_t*>(bit_set);
+      const uint32_t *other_cast_set =  reinterpret_cast<const uint32_t*>(
+        set2.bit_set
+      );
 
       bool carry = false;
 
       for (size_t i = 0; i < NUM_BITS/32; ++i) {
         uint64_t sum = (
-          (uint64_t)(self_cast_set[i]) + (uint64_t)(other_cast_set[i]) + carry
+          static_cast<uint64_t>(self_cast_set[i])
+          + static_cast<uint64_t>(other_cast_set[i])
+          + static_cast<uint64_t>(carry)
         );
-        carry = sum >= emp::IntPow((uint64_t) 2, (uint64_t) 32);
-        self_cast_set[i] = sum % emp::IntPow((uint64_t) 2, (uint64_t) 32);
+        carry = sum >= emp::IntPow(
+          static_cast<uint64_t>(2),
+          static_cast<uint64_t>(32)
+        );
+        self_cast_set[i] = static_cast<uint32_t>(sum);
       }
 
-      if constexpr ((bool) (NUM_BITS%32)) {
-        self_cast_set[NUM_BITS/32] = (
-          (uint64_t)(self_cast_set[NUM_BITS/32])
-          + (uint64_t)(other_cast_set[NUM_BITS/32]) + carry
-        ) % emp::IntPow((uint64_t) 2, (uint64_t) NUM_BITS%32);
+      if constexpr (static_cast<bool>(NUM_BITS%32)) {
+        self_cast_set[NUM_BITS/32] = static_cast<uint32_t>(
+          static_cast<uint64_t>(self_cast_set[NUM_BITS/32])
+          + static_cast<uint64_t>(other_cast_set[NUM_BITS/32])
+          + static_cast<uint64_t>(carry)
+        ) & emp::MaskLow<uint32_t>(NUM_BITS%32);
       }
 
       return *this;
     }
 
     /// Subtraction of two Bitsets.
-    /// Wraps to 2^min(num_bits, 32) if it underflows.
+    /// Wraps around if it underflows.
     /// Returns result.
     BitSet SUB(const BitSet & set2) const{
       BitSet out_set(*this);
@@ -1076,27 +1088,35 @@ namespace emp {
     }
 
     /// Subtraction of two Bitsets.
-    /// Wraps to 2^min(num_bits, 32) if it underflows.
+    /// Wraps if it underflows.
     /// Returns this object.
     BitSet & SUB_SELF(const BitSet & set2){
-      uint32_t *self_cast_set = (uint32_t*) bit_set;
-      const uint32_t *other_cast_set =  (const uint32_t*) set2.bit_set;
+      uint32_t *self_cast_set = reinterpret_cast<uint32_t*>(bit_set);
+      const uint32_t *other_cast_set = reinterpret_cast<const uint32_t*>(
+        set2.bit_set
+      );
 
       bool carry = false;
 
       for (size_t i = 0; i < NUM_BITS/32; ++i) {
-        uint64_t subtrahend = (uint64_t)(other_cast_set[i]) + carry;
-        carry = self_cast_set[i] < subtrahend;
-        self_cast_set[i] = (
-          ((uint64_t)(self_cast_set[i]) - subtrahend)
-        ) % emp::IntPow((uint64_t) 2, (uint64_t) 32);
+        uint64_t subtrahend = (
+          static_cast<uint64_t>(other_cast_set[i])
+          + static_cast<uint64_t>(carry)
+        );
+        carry = static_cast<uint64_t>(self_cast_set[i]) < subtrahend;
+        self_cast_set[i] = static_cast<uint32_t>(
+          static_cast<uint64_t>(self_cast_set[i]) - subtrahend
+        );
      }
 
-      if constexpr ((bool) (NUM_BITS%32)) {
-        uint64_t subtrahend = (uint64_t)(other_cast_set[NUM_BITS/32]) + carry;
-        self_cast_set[NUM_BITS/32] = (
-          (uint64_t)(self_cast_set[NUM_BITS/32]) - subtrahend
-        ) % emp::IntPow((uint64_t) 2, (uint64_t) NUM_BITS%32);
+      if constexpr (static_cast<bool>(NUM_BITS%32)) {
+        uint64_t subtrahend = (
+          static_cast<uint64_t>(other_cast_set[NUM_BITS/32])
+          + static_cast<uint64_t>(carry)
+        );
+        self_cast_set[NUM_BITS/32] = static_cast<uint32_t>(
+          static_cast<uint64_t>(self_cast_set[NUM_BITS/32]) - subtrahend
+        ) & emp::MaskLow<uint32_t>(NUM_BITS%32);
       }
 
       return *this;
