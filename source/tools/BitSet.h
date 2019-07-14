@@ -18,8 +18,6 @@
 
 #include <iostream>
 #include <initializer_list>
-#include <bitset>
-#include <limits>
 
 #include "../base/assert.h"
 #include "../base/vector.h"
@@ -1050,43 +1048,24 @@ namespace emp {
     /// Wraps if it overflows.
     /// Returns this object.
     BitSet & ADD_SELF(const BitSet & set2) {
-      uint32_t *self_cast_set = reinterpret_cast<uint32_t*>(bit_set);
-      const uint32_t *other_cast_set =  reinterpret_cast<const uint32_t*>(
-        set2.bit_set
-      );
-
       bool carry = false;
 
-      for (size_t i = 0; i < NUM_BITS/32; ++i) {
-        uint64_t sum = (
-          static_cast<uint64_t>(self_cast_set[i])
-          + static_cast<uint64_t>(other_cast_set[i])
-          + static_cast<uint64_t>(carry)
-        );
-        carry = (
-          sum > static_cast<uint64_t>(std::numeric_limits<uint32_t>::max())
-        );
-        self_cast_set[i] = static_cast<uint32_t>(
-          sum & emp::MaskLow<uint64_t>(32)
-        );  //TODO this mask shouldn't be necessary
+      for (size_t i = 0; i < NUM_BITS/FIELD_BITS; ++i) {
+        field_t addend = set2.bit_set[i] + static_cast<field_t>(carry);
+        carry = set2.bit_set[i] > addend;
 
-        //TODO these print statements shouldn't be necessary for gcc -O2 or -O3
-        std::cout << "SUM: " << std::bitset<64>(sum) << std::endl;
-        std::cout << "RES: " << std::bitset<64>(
-          sum & emp::MaskLow<uint64_t>(32)
-        ) << std::endl;
-        std::cout << "RES: " << std::bitset<32>(
-          static_cast<uint32_t>(sum & emp::MaskLow<uint64_t>(32))
-        ) << std::endl;
+        field_t sum = bit_set[i] + addend;
+        carry |= bit_set[i] > sum;
 
+        bit_set[i] = sum;
       }
 
-      if constexpr (static_cast<bool>(NUM_BITS%32)) {
-        self_cast_set[NUM_BITS/32] = static_cast<uint32_t>(
-          static_cast<uint64_t>(self_cast_set[NUM_BITS/32])
-          + static_cast<uint64_t>(other_cast_set[NUM_BITS/32])
-          + static_cast<uint64_t>(carry)
-        ) & emp::MaskLow<uint32_t>(NUM_BITS%32);
+      if constexpr (static_cast<bool>(LAST_BIT)) {
+        bit_set[NUM_BITS/FIELD_BITS] = (
+          bit_set[NUM_BITS/FIELD_BITS]
+          + set2.bit_set[NUM_BITS/FIELD_BITS]
+          + static_cast<field_t>(carry)
+        ) & emp::MaskLow<field_t>(LAST_BIT);
       }
 
       return *this;
@@ -1104,43 +1083,22 @@ namespace emp {
     /// Wraps if it underflows.
     /// Returns this object.
     BitSet & SUB_SELF(const BitSet & set2){
-      uint32_t *self_cast_set = reinterpret_cast<uint32_t*>(bit_set);
-      const uint32_t *other_cast_set = reinterpret_cast<const uint32_t*>(
-        set2.bit_set
-      );
 
       bool carry = false;
 
-      for (size_t i = 0; i < NUM_BITS/32; ++i) {
-        uint64_t subtrahend = (
-          static_cast<uint64_t>(other_cast_set[i])
-          + static_cast<uint64_t>(carry)
-        );
-        carry = static_cast<uint64_t>(self_cast_set[i]) < subtrahend;
-        self_cast_set[i] = static_cast<uint32_t>(
-          (static_cast<uint64_t>(self_cast_set[i]) - subtrahend)
-          & emp::MaskLow<uint64_t>(32)  //TODO this mask shouldn't be necessary
-        );
-
-        //TODO these print statements shouldn't be necessary for gcc -O2 or -O3
-        std::cout << "STH: " << std::bitset<64>(subtrahend) << std::endl;
-        std::cout << "RES: " << (
-          std::bitset<64>(static_cast<uint64_t>(self_cast_set[i]) - subtrahend)
-        ) << std::endl;
-        std::cout << "RES: " << std::bitset<32>(
-          static_cast<uint32_t>(static_cast<uint64_t>(self_cast_set[i]) - subtrahend)
-        ) << std::endl;
-
+      for (size_t i = 0; i < NUM_BITS/FIELD_BITS; ++i) {
+        field_t subtrahend = set2.bit_set[i] + static_cast<field_t>(carry);
+        carry = set2.bit_set[i] > subtrahend;
+        carry |= bit_set[i] < subtrahend;
+        bit_set[i] -= subtrahend;
      }
 
-      if constexpr (static_cast<bool>(NUM_BITS%32)) {
-        uint64_t subtrahend = (
-          static_cast<uint64_t>(other_cast_set[NUM_BITS/32])
-          + static_cast<uint64_t>(carry)
-        );
-        self_cast_set[NUM_BITS/32] = static_cast<uint32_t>(
-          static_cast<uint64_t>(self_cast_set[NUM_BITS/32]) - subtrahend
-        ) & emp::MaskLow<uint32_t>(NUM_BITS%32);
+      if constexpr (static_cast<bool>(LAST_BIT)) {
+        bit_set[NUM_BITS/FIELD_BITS] = (
+          bit_set[NUM_BITS/FIELD_BITS]
+          - set2.bit_set[NUM_BITS/FIELD_BITS]
+          - static_cast<field_t>(carry)
+        ) & emp::MaskLow<field_t>(LAST_BIT);
       }
 
       return *this;
