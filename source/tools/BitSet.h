@@ -18,6 +18,8 @@
 
 #include <iostream>
 #include <initializer_list>
+#include <bitset>
+#include <limits>
 
 #include "../base/assert.h"
 #include "../base/vector.h"
@@ -1061,11 +1063,22 @@ namespace emp {
           + static_cast<uint64_t>(other_cast_set[i])
           + static_cast<uint64_t>(carry)
         );
-        carry = sum >= emp::IntPow(
-          static_cast<uint64_t>(2),
-          static_cast<uint64_t>(32)
+        carry = (
+          sum > static_cast<uint64_t>(std::numeric_limits<uint32_t>::max())
         );
-        self_cast_set[i] = static_cast<uint32_t>(sum);
+        self_cast_set[i] = static_cast<uint32_t>(
+          sum & emp::MaskLow<uint64_t>(32)
+        );  //TODO this mask shouldn't be necessary
+
+        //TODO these print statements shouldn't be necessary for gcc -O2 or -O3
+        std::cout << "SUM: " << std::bitset<64>(sum) << std::endl;
+        std::cout << "RES: " << std::bitset<64>(
+          sum & emp::MaskLow<uint64_t>(32)
+        ) << std::endl;
+        std::cout << "RES: " << std::bitset<32>(
+          static_cast<uint32_t>(sum & emp::MaskLow<uint64_t>(32))
+        ) << std::endl;
+
       }
 
       if constexpr (static_cast<bool>(NUM_BITS%32)) {
@@ -1105,8 +1118,19 @@ namespace emp {
         );
         carry = static_cast<uint64_t>(self_cast_set[i]) < subtrahend;
         self_cast_set[i] = static_cast<uint32_t>(
-          static_cast<uint64_t>(self_cast_set[i]) - subtrahend
+          (static_cast<uint64_t>(self_cast_set[i]) - subtrahend)
+          & emp::MaskLow<uint64_t>(32)  //TODO this mask shouldn't be necessary
         );
+
+        //TODO these print statements shouldn't be necessary for gcc -O2 or -O3
+        std::cout << "STH: " << std::bitset<64>(subtrahend) << std::endl;
+        std::cout << "RES: " << (
+          std::bitset<64>(static_cast<uint64_t>(self_cast_set[i]) - subtrahend)
+        ) << std::endl;
+        std::cout << "RES: " << std::bitset<32>(
+          static_cast<uint32_t>(static_cast<uint64_t>(self_cast_set[i]) - subtrahend)
+        ) << std::endl;
+
      }
 
       if constexpr (static_cast<bool>(NUM_BITS%32)) {
