@@ -379,14 +379,15 @@ namespace emp {
     /// Set all bits randomly, with a 50% probability of being a 0 or 1.
     void Randomize(Random & random) {
       // Randomize all fields, then mask off bits in the last field if not complete.
-      if constexpr (FIELD_BITS == 64) {
-        for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = random.GetUInt64();
-      } else if (FIELD_BITS == 32) {
-        for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = random.GetUInt();
-      } else {
-        emp_assert(false, "FIELD_BITS should be 32 or 64");
+      uint32_t* cast_set = reinterpret_cast<uint32_t*>(bit_set);
+
+      for(size_t i = 0; i < NUM_BITS/32; ++i) cast_set[i] = random.GetUInt();
+
+      if constexpr (static_cast<bool>(NUM_BITS%32)) {
+        cast_set[NUM_BITS/32] = random.GetUInt();
+        cast_set[NUM_BITS/32] &= MaskLow<field_t>(NUM_BITS%32);
       }
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+
     }
 
     /// Set all bits randomly, with a given probability of being a 1.
