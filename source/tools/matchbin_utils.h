@@ -381,9 +381,9 @@ namespace emp {
   };
 
   /// Abstract base class for selectors
-  struct Selector {
+  struct SelectorBase {
 
-    virtual ~Selector() {};
+    virtual ~SelectorBase() {};
     virtual emp::vector<size_t> operator()(
       emp::vector<size_t>& uids,
       std::unordered_map<size_t, double>& scores,
@@ -393,7 +393,7 @@ namespace emp {
 
   /// Returns matches within the threshold ThreshRatio sorted by match quality.
   template<typename ThreshRatio = std::ratio<-1,1>> // neg numerator means +infy
-  struct RankedSelector : public Selector {
+  struct RankedSelector : public SelectorBase {
     emp::vector<size_t> operator()(
       emp::vector<size_t>& uids,
       std::unordered_map<size_t, double>& scores,
@@ -463,7 +463,7 @@ namespace emp {
     typename SkewRatio = std::ratio<1, 10>,
     typename MaxBaselineRatio = std::ratio<1, 1>// treat neg numerator as +infty
   >
-  struct RouletteSelector : public Selector {
+  struct RouletteSelector : public SelectorBase {
 
     emp::Random & rand;
 
@@ -534,9 +534,9 @@ namespace emp {
 
 };
 
-struct DynamicSelector : public Selector {
+struct DynamicSelector : public SelectorBase {
 
-  emp::vector<emp::Ptr<Selector>> selectors;
+  emp::vector<emp::Ptr<SelectorBase>> selectors;
 
   size_t mode{0};
 
