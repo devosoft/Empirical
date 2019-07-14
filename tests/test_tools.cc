@@ -341,7 +341,7 @@ TEST_CASE("Test BitSet", "[tools]")
   // test BitSet addition
   {
   emp::BitSet<32> bs0;
-  bs0.SetUInt(0, pow((size_t)2, (size_t)32)-2);
+  bs0.SetUInt(0, std::numeric_limits<uint32_t>::max() - 1);
   emp::BitSet<32> bs1;
   bs1.SetUInt(0,1);
   bs0+=bs1;
@@ -350,14 +350,14 @@ TEST_CASE("Test BitSet", "[tools]")
   REQUIRE ((bs0+bs0).GetUInt(0) == 4294967294);
 
   emp::BitSet<8> bs2;
-  bs2.SetUInt(0,pow(2, 8)-1);
+  bs2.SetUInt(0, emp::IntPow(2UL, 8UL)-1);
   emp::BitSet<8> bs3;
   bs3.SetUInt(0, 1);
   REQUIRE((bs2+bs3).GetUInt(0) == 0);
 
   emp::BitSet<64> bs4;
-  bs4.SetUInt(0, pow((size_t)2, (size_t)32)-2);
-  bs4.SetUInt(1, pow((size_t)2, (size_t)32)-1);
+  bs4.SetUInt(0, std::numeric_limits<uint32_t>::max()-1);
+  bs4.SetUInt(1, std::numeric_limits<uint32_t>::max());
   emp::BitSet<64> bs5;
   bs5.SetUInt(0, 1);
   bs4+=bs5;
@@ -376,7 +376,7 @@ TEST_CASE("Test BitSet", "[tools]")
   bs1.SetUInt(0, 1);
   bs0 = bs0 - bs1;
   REQUIRE (bs0.GetUInt(0) == 0);
-  REQUIRE ((bs0-bs1).GetUInt(0) == pow((size_t)2, (size_t)32)-1);
+  REQUIRE ((bs0-bs1).GetUInt(0) == std::numeric_limits<uint32_t>::max());
 
   emp::BitSet<8> bs2;
   bs2.SetUInt(0, 1);
@@ -385,7 +385,7 @@ TEST_CASE("Test BitSet", "[tools]")
 
   bs2-=bs3;
   REQUIRE (bs2.GetUInt(0) == 0);
-  REQUIRE((bs2-bs3).GetUInt(0) == pow(2,8)-1);
+  REQUIRE((bs2-bs3).GetUInt(0) == emp::IntPow(2UL,8UL)-1);
 
   emp::BitSet<64> bs4;
   bs4.SetUInt(0, 1);
@@ -399,11 +399,11 @@ TEST_CASE("Test BitSet", "[tools]")
   REQUIRE(bs4.GetUInt(1) == 0);
 
   bs4-=bs5;
-  REQUIRE(bs4.GetUInt(0) == pow((size_t)2, (size_t)32)-1);
-  REQUIRE(bs4.GetUInt(1) == pow((size_t)2, (size_t)32)-1);
+  REQUIRE(bs4.GetUInt(0) == std::numeric_limits<uint32_t>::max());
+  REQUIRE(bs4.GetUInt(1) == std::numeric_limits<uint32_t>::max());
   bs4 = bs4 - bs5;
-  REQUIRE(bs4.GetUInt(0) == pow((size_t)2, (size_t)32)-2);
-  REQUIRE(bs4.GetUInt(1) == pow((size_t)2, (size_t)32)-1);
+  REQUIRE(bs4.GetUInt(0) == std::numeric_limits<uint32_t>::max() - 1);
+  REQUIRE(bs4.GetUInt(1) == std::numeric_limits<uint32_t>::max());
   }
 
   // test addition and subtraction with multiple fields
@@ -608,9 +608,9 @@ TEST_CASE("Test BitSet", "[tools]")
   bs.SetUInt(0, 7);
   REQUIRE (bs.LongestSegmentOnes() == 3);
 
-  bs.SetUInt(0, pow((uint32_t)2,(uint32_t)32)-1);
-  bs.SetUInt(1, pow((uint32_t)2,(uint32_t)32)-2);
-  bs.SetUInt(2, pow((uint32_t)2,(uint32_t)32)-4);
+  bs.SetUInt(0, std::numeric_limits<uint32_t>::max());
+  bs.SetUInt(1, std::numeric_limits<uint32_t>::max() - 1);
+  bs.SetUInt(2, std::numeric_limits<uint32_t>::max() - 3);
   REQUIRE (bs.LongestSegmentOnes() == 32);
 
   // tests for ROTATE
@@ -2094,22 +2094,29 @@ TEST_CASE("Test MatchBin", "[tools]")
     emp::RankedSelector<std::ratio<1+1, 1>>
   > bitBin64;
 
-  size_t two = 2;
-
   emp::BitSet<64> bs7;
-  bs7.SetUInt(1, pow(two, (size_t)18) + pow(two, (size_t)19) + pow(two, (size_t)20));
+  bs7.SetUInt(
+    1,
+    emp::IntPow(2UL, 18UL) + emp::IntPow(2UL, 19UL) + emp::IntPow(2UL, 20UL)
+  );
 
   const size_t id_seven = bitBin64.Put("seven", bs7);
   REQUIRE( bitBin64.GetVal(id_seven) == "seven");
 
   emp::BitSet<64> bs1;
-  bs1.SetUInt(1, pow(two, (size_t)16) + pow(two, (size_t)17) + pow(two, (size_t)18));
+  bs1.SetUInt(
+    1,
+    emp::IntPow(2UL, 16UL) + emp::IntPow(2UL, 17UL) + emp::IntPow(2UL, 18UL)
+  );
 
   const size_t id_one  = bitBin64.Put("one", bs1);
   REQUIRE( bitBin64.GetVal(id_one) == "one");
 
   emp::BitSet<64> bs9;
-  bs9.SetUInt(1, pow(two, (size_t)15) + pow(two, (size_t)16) + pow(two, (size_t)17));
+  bs9.SetUInt(
+    1,
+    emp::IntPow(2UL, 15UL) + emp::IntPow(2UL, 16UL) + emp::IntPow(2UL, 17UL)
+  );
 
   const size_t id_nine  = bitBin64.Put("nine", bs9);
   REQUIRE( bitBin64.GetVal(id_nine) == "nine");
