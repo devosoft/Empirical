@@ -688,8 +688,8 @@ namespace emp {
 
     /// Set all bits to one.
     void SetAll() {
-      for (auto & i : bit_set) i = ~((field_t)0U);
-      if (LAST_BIT) {
+      std::memset(bit_set, 255, sizeof(bit_set));;
+      if constexpr (static_cast<bool>(LAST_BIT)) {
         bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       }
     }
