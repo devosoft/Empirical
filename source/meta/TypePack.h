@@ -9,7 +9,7 @@
  *  TypePacks are static structues that provide a large set of mechanisms to access and adjust
  *  the included types.
  *
- *  To create a typepack, just pass in zero or more types into the TypePack templete.
+ *  To create a typepack, just pass in zero or more types into the TypePack template.
  *
  *    using my_pack = emp::TypePack<int, std::string, double>;
  *
