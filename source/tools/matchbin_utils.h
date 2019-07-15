@@ -358,23 +358,15 @@ namespace emp {
 
     double operator()(const query_t& a, const tag_t& b) const override {
 
-      typename DimMetric::query_t va;
-      typename DimMetric::tag_t vb;
+      typename DimMetric::query_t arr_a;
+      typename DimMetric::tag_t arr_b;
 
-      constexpr size_t bs_width = DimMetric::query_t::value_type::GetSize();
-
-      if constexpr (std::tuple_size<typename DimMetric::query_t>::value == 1) {
-        va[0] = a;
-        vb[0] = b;
-      } else {
-        for (size_t i = 0; i < width(); ++i) {
-          // this can be done faster
-          va[i/bs_width][i%bs_width] = a[i];
-          vb[i/bs_width][i%bs_width] = b[i];
-        }
+      for (size_t d = 0; d < dim(); ++d) {
+        arr_a[d].Import(a, d * DimMetric::query_t::value_type::GetSize());
+        arr_b[d].Import(b, d * DimMetric::tag_t::value_type::GetSize());
       }
 
-      return metric(va, vb);
+      return metric(arr_a, arr_b);
 
     }
 
