@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <initializer_list>
+#include <cstring>
 
 #include "../base/assert.h"
 #include "../base/vector.h"
@@ -52,6 +53,10 @@ namespace emp {
   ///  A fixed-sized (but arbitrarily large) array of bits, and optimizes operations on those bits
   ///  to be as fast as possible.
   template <size_t NUM_BITS> class BitSet {
+
+  // make all templated instantiations friends with each other
+  template<size_t FRIEND_BITS> friend class BitSet;
+
   private:
 
     ///< field size is 64 for native (except NUM_BITS == 32), 32 for emscripten
@@ -114,11 +119,15 @@ namespace emp {
 
     /// Helper: call SHIFT with positive number instead
     void ShiftLeft(const size_t shift_size) {
-      if (shift_size > NUM_BITS) {
+
+      const int field_shift = shift_size / FIELD_BITS;
+
+      // only clear and return if we are field_shift-ing
+      // for consistency with ShiftRight
+      if (field_shift && shift_size > NUM_BITS) {
         Clear();
         return;
       }
-      const int field_shift = shift_size / FIELD_BITS;
       const int bit_shift = shift_size % FIELD_BITS;
       const int bit_overflow = FIELD_BITS - bit_shift;
 
@@ -148,11 +157,16 @@ namespace emp {
     /// Helper for calling SHIFT with negative number
     void ShiftRight(const size_t shift_size) {
       if (!shift_size) return;
-      if (shift_size > NUM_BITS) {
+
+      const field_t field_shift = shift_size / FIELD_BITS;
+
+      // only clear and return if we are field_shif-ing
+      // we want to be able to always shift by up to a byte
+      // so that Import and Export work
+      if (field_shift && shift_size > NUM_BITS) {
         Clear();
         return;
       }
-      const field_t field_shift = shift_size / FIELD_BITS;
       const field_t bit_shift = shift_size % FIELD_BITS;
       const field_t bit_overflow = FIELD_BITS - bit_shift;
 
@@ -347,7 +361,7 @@ namespace emp {
     BitSet(const BitSet & in_set) { Copy(in_set.bit_set); }
 
     /// Constructor to generate a random BitSet (with equal prob of 0 or 1).
-    BitSet(Random & random) { Randomize(random); }
+    BitSet(Random & random) { Clear(); Randomize(random); }
 
     /// Constructor to generate a random BitSet with provided prob of 1's.
     BitSet(Random & random, const double p1) { Clear(); Randomize(random, p1); }
@@ -379,14 +393,15 @@ namespace emp {
     /// Set all bits randomly, with a 50% probability of being a 0 or 1.
     void Randomize(Random & random) {
       // Randomize all fields, then mask off bits in the last field if not complete.
-      if constexpr (FIELD_BITS == 64) {
-        for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = random.GetUInt64();
-      } else if (FIELD_BITS == 32) {
-        for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = random.GetUInt();
-      } else {
-        emp_assert(false, "FIELD_BITS should be 32 or 64");
+      uint32_t* cast_set = reinterpret_cast<uint32_t*>(bit_set);
+
+      for(size_t i = 0; i < NUM_BITS/32; ++i) cast_set[i] = random.GetUInt();
+
+      if constexpr (static_cast<bool>(NUM_BITS%32)) {
+        cast_set[NUM_BITS/32] = random.GetUInt();
+        cast_set[NUM_BITS/32] &= MaskLow<field_t>(NUM_BITS%32);
       }
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+
     }
 
     /// Set all bits randomly, with a given probability of being a 1.
@@ -396,23 +411,60 @@ namespace emp {
     }
 
     /// Assign from a BitSet of a different size.
-    template <size_t NUM_BITS2>
-    BitSet & Import(const BitSet<NUM_BITS2> & in_set) {
-      static const size_t NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> FIELD_LOG2);
-      static const size_t MIN_FIELDS = (NUM_FIELDS < NUM_FIELDS2) ? NUM_FIELDS : NUM_FIELDS2;
-      for (size_t i = 0; i < MIN_FIELDS; i++) bit_set[i] = in_set.GetUInt(i);  // Copy avail fields
-      for (size_t i = MIN_FIELDS; i < NUM_FIELDS; i++) bit_set[i] = 0;         // Zero extra fields
+    template <size_t FROM_BITS>
+    BitSet & Import(
+      const BitSet<FROM_BITS> & from_set,
+      const size_t from_bit=0
+    ) {
+
+      if constexpr (FROM_BITS == NUM_BITS) emp_assert(&from_set != this);
+
+      emp_assert(from_bit < FROM_BITS);
+
+      if (FROM_BITS - from_bit < NUM_BITS) Clear();
+
+      const size_t DEST_BYTES = (NUM_BITS + 7)/8;
+      const size_t FROM_BYTES = (FROM_BITS + 7)/8 - from_bit/8;
+
+      const size_t COPY_BYTES = std::min(DEST_BYTES, FROM_BYTES);
+
+      std::memcpy(
+        bit_set,
+        reinterpret_cast<const uint8_t*>(from_set.bit_set) + from_bit/8,
+        COPY_BYTES
+      );
+
+      if (from_bit%8) {
+
+        this->ShiftRight(from_bit%8);
+
+        if (FROM_BYTES > COPY_BYTES) {
+          reinterpret_cast<uint8_t*>(bit_set)[COPY_BYTES-1] |= (
+            reinterpret_cast<const uint8_t*>(
+              from_set.bit_set
+            )[from_bit/8 + COPY_BYTES]
+            << (8 - from_bit%8)
+          );
+        }
+
+      }
+
+      // mask out filler bits
+      if constexpr (static_cast<bool>(LAST_BIT)) {
+        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      }
+
       return *this;
+
     }
 
     /// Convert to a Bitset of a different size.
-    template <size_t NUM_BITS2>
-    BitSet<NUM_BITS2> Export() const {
-      static const size_t NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> FIELD_LOG2);
-      static const size_t MIN_FIELDS = (NUM_FIELDS < NUM_FIELDS2) ? NUM_FIELDS : NUM_FIELDS2;
-      BitSet<NUM_BITS2> out_bits;
-      for (size_t i = 0; i < MIN_FIELDS; i++) out_bits.SetUInt(i, bit_set[i]);  // Copy avail fields
-      for (size_t i = MIN_FIELDS; i < NUM_FIELDS; i++) out_bits.SetUInt(i, 0);  // Zero extra fields
+    template <size_t FROM_BITS>
+    BitSet<FROM_BITS> Export(size_t start_bit=0) const {
+
+      BitSet<FROM_BITS> out_bits;
+      out_bits.Import(*this, start_bit);
+
       return out_bits;
     }
 
@@ -1036,39 +1088,43 @@ namespace emp {
 
     }
 
-    /// Addition of two Bitsets. Wraps back to 0 if it overflows. returns result.
+    /// Addition of two Bitsets.
+    /// Wraps if it overflows.
+    /// Returns result.
     BitSet ADD(const BitSet & set2) const{
       BitSet out_set(*this);
       return out_set.ADD_SELF(set2);
     }
 
-    /// Addition of two Bitsets. Wraps back to 0 if it overflows. returns this object.
+    /// Addition of two Bitsets.
+    /// Wraps if it overflows.
+    /// Returns this object.
     BitSet & ADD_SELF(const BitSet & set2) {
-      uint32_t *self_cast_set = (uint32_t*) bit_set;
-      const uint32_t *other_cast_set =  (const uint32_t*) set2.bit_set;
-
       bool carry = false;
-      const uint32_t MAX_INT = emp::IntPow(
-        2UL,
-        (NUM_BITS > 32 ? 32 : NUM_BITS)
-      ) - 1;
 
-      for (size_t i = 0; i < (NUM_FIELDS * FIELD_BITS)/32; ++i){
-        uint64_t sum = (
-          (uint64_t)self_cast_set[i] + (uint64_t)other_cast_set[i] + carry
-        );
-        carry = false;
-        if (sum > MAX_INT){
-          carry = true;
-          sum%= ((uint64_t)MAX_INT) + 1;
-        }
-        self_cast_set[i] = sum;
+      for (size_t i = 0; i < NUM_BITS/FIELD_BITS; ++i) {
+        field_t addend = set2.bit_set[i] + static_cast<field_t>(carry);
+        carry = set2.bit_set[i] > addend;
+
+        field_t sum = bit_set[i] + addend;
+        carry |= bit_set[i] > sum;
+
+        bit_set[i] = sum;
       }
+
+      if constexpr (static_cast<bool>(LAST_BIT)) {
+        bit_set[NUM_BITS/FIELD_BITS] = (
+          bit_set[NUM_BITS/FIELD_BITS]
+          + set2.bit_set[NUM_BITS/FIELD_BITS]
+          + static_cast<field_t>(carry)
+        ) & emp::MaskLow<field_t>(LAST_BIT);
+      }
+
       return *this;
     }
 
-    ///Subtraction of two Bitsets.
-    /// Wraps to 2^min(num_bits, 32) if it underflows.
+    /// Subtraction of two Bitsets.
+    /// Wraps around if it underflows.
     /// Returns result.
     BitSet SUB(const BitSet & set2) const{
       BitSet out_set(*this);
@@ -1076,28 +1132,27 @@ namespace emp {
     }
 
     /// Subtraction of two Bitsets.
-    /// Wraps to 2^min(num_bits, 32) if it underflows.
+    /// Wraps if it underflows.
     /// Returns this object.
     BitSet & SUB_SELF(const BitSet & set2){
-      uint32_t *self_cast_set = (uint32_t*) bit_set;
-      const uint32_t *other_cast_set =  (const uint32_t*) set2.bit_set;
 
       bool carry = false;
 
-      const uint64_t MAX_INT = emp::IntPow(
-        (uint64_t) 2,
-        (NUM_BITS > 32 ? 32 : NUM_BITS)
-      ) - 1;
+      for (size_t i = 0; i < NUM_BITS/FIELD_BITS; ++i) {
+        field_t subtrahend = set2.bit_set[i] + static_cast<field_t>(carry);
+        carry = set2.bit_set[i] > subtrahend;
+        carry |= bit_set[i] < subtrahend;
+        bit_set[i] -= subtrahend;
+     }
 
-      for(size_t i = 0; i < (NUM_FIELDS * FIELD_BITS)/32; ++i){
-        uint64_t subtrahend = (uint64_t)other_cast_set[i] + carry;
-        uint32_t diff = (self_cast_set[i] - subtrahend) % (MAX_INT+1);
-        carry = false;
-        if (self_cast_set[i] < subtrahend){
-          carry = true;
-        }
-        self_cast_set[i] = diff;
+      if constexpr (static_cast<bool>(LAST_BIT)) {
+        bit_set[NUM_BITS/FIELD_BITS] = (
+          bit_set[NUM_BITS/FIELD_BITS]
+          - set2.bit_set[NUM_BITS/FIELD_BITS]
+          - static_cast<field_t>(carry)
+        ) & emp::MaskLow<field_t>(LAST_BIT);
       }
+
       return *this;
     }
 

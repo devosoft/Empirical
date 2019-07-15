@@ -203,6 +203,70 @@ TEST_CASE("Test BitMatrix", "[tools]")
 */
 }
 
+// For BitSet Import/Export
+template <size_t SOURCE_BITS, size_t DEST_BITS>
+struct ImportExportTester {
+
+  static void test() {
+
+    emp::Random rand(1);
+
+    // using default parameter
+    emp::BitSet<SOURCE_BITS> source(rand);
+    emp::BitSet<DEST_BITS> dest(rand);
+
+    dest.template Import(source);
+
+    for(size_t i = 0; i < std::min(source.GetSize(), dest.GetSize()); ++i) {
+      REQUIRE(source.Get(i) == dest.Get(i));
+    }
+    for(size_t i = source.GetSize(); i < dest.GetSize(); ++i) {
+      REQUIRE(dest.Get(i) == 0);
+    }
+
+    dest.Clear();
+    dest = source.template Export<dest.GetSize()>();
+
+    for(size_t i = 0; i < std::min(source.GetSize(), dest.GetSize()); ++i) {
+      REQUIRE(source.Get(i) == dest.Get(i));
+    }
+    for(size_t i = source.GetSize(); i < dest.GetSize(); ++i) {
+      REQUIRE(dest.Get(i) == 0);
+    }
+
+    // using all from_bit's
+    source.Randomize(rand);
+    dest.Randomize(rand);
+
+    for(size_t from_bit = 0; from_bit < source.GetSize(); ++from_bit) {
+      // std::cout << "---------" << std::endl;
+      // std::cout << source << std::endl;
+      dest.template Import(source, from_bit);
+      // std::cout << "=========" << std::endl;
+      // std::cout << from_bit << std::endl;
+      // std::cout << source << std::endl;
+      // std::cout << dest << std::endl;
+      for(size_t i = 0; i < std::min(source.GetSize() - from_bit, dest.GetSize()); ++i) {
+        REQUIRE(source.Get(i+from_bit) == dest.Get(i));
+      }
+      for(size_t i = source.GetSize() - from_bit; i < dest.GetSize(); ++i) {
+        REQUIRE(dest.Get(i) == 0);
+      }
+
+      dest.Clear();
+      dest = source.template Export<dest.GetSize()>(from_bit);
+
+      for(size_t i = 0; i < std::min(source.GetSize() - from_bit, dest.GetSize()); ++i) {
+        REQUIRE(source.Get(i+from_bit) == dest.Get(i));
+      }
+      for(size_t i = source.GetSize() - from_bit; i < dest.GetSize(); ++i) {
+        REQUIRE(dest.Get(i) == 0);
+      }
+
+    }
+  }
+};
+
 // for BitSet ROTATE_SELF
 // adapted from spraetor.github.io/2015/12/26/compile-time-loops.html
 template <size_t N>
@@ -337,6 +401,360 @@ struct MultiTester {
 template class emp::BitSet<5>;
 TEST_CASE("Test BitSet", "[tools]")
 {
+
+  // test BitSet addition
+  {
+  emp::BitSet<32> bs0;
+  bs0.SetUInt(0, std::numeric_limits<uint32_t>::max() - 1);
+  emp::BitSet<32> bs1;
+  bs1.SetUInt(0,1);
+  bs0+=bs1;
+  REQUIRE (bs0.GetUInt(0) == 4294967295);
+  REQUIRE ((bs0+bs1).GetUInt(0) == 0);
+  REQUIRE ((bs0+bs0).GetUInt(0) == 4294967294);
+
+  emp::BitSet<8> bs2;
+  bs2.SetUInt(0, emp::IntPow(2UL, 8UL)-1);
+  emp::BitSet<8> bs3;
+  bs3.SetUInt(0, 1);
+  REQUIRE((bs2+bs3).GetUInt(0) == 0);
+
+  emp::BitSet<64> bs4;
+  bs4.SetUInt(0, std::numeric_limits<uint32_t>::max()-1);
+  bs4.SetUInt(1, std::numeric_limits<uint32_t>::max());
+  emp::BitSet<64> bs5;
+  bs5.SetUInt(0, 1);
+  bs4+=bs5;
+  REQUIRE(bs4.GetUInt(0) == pow((size_t)2, (size_t)32)-1);
+  REQUIRE(bs4.GetUInt(1) == pow((size_t)2, (size_t)32)-1);
+  bs4+=bs5;
+  REQUIRE(bs4.GetUInt(0) == 0);
+  REQUIRE(bs4.GetUInt(1) == 0);
+  }
+
+  // test BitSet subtraction
+  {
+  emp::BitSet<32> bs0;
+  bs0.SetUInt(0, 1);
+  emp::BitSet<32> bs1;
+  bs1.SetUInt(0, 1);
+  bs0 = bs0 - bs1;
+  REQUIRE (bs0.GetUInt(0) == 0);
+  REQUIRE ((bs0-bs1).GetUInt(0) == std::numeric_limits<uint32_t>::max());
+
+  emp::BitSet<8> bs2;
+  bs2.SetUInt(0, 1);
+  emp::BitSet<8> bs3;
+  bs3.SetUInt(0, 1);
+
+  bs2-=bs3;
+  REQUIRE (bs2.GetUInt(0) == 0);
+  REQUIRE((bs2-bs3).GetUInt(0) == emp::IntPow(2UL,8UL)-1);
+
+  emp::BitSet<64> bs4;
+  bs4.SetUInt(0, 1);
+  bs4.SetUInt(1, 0);
+
+  emp::BitSet<64> bs5;
+  bs5.SetUInt(0, 1);
+
+  bs4-=bs5;
+  REQUIRE(bs4.GetUInt(0) == 0);
+  REQUIRE(bs4.GetUInt(1) == 0);
+
+  bs4-=bs5;
+  REQUIRE(bs4.GetUInt(0) == std::numeric_limits<uint32_t>::max());
+  REQUIRE(bs4.GetUInt(1) == std::numeric_limits<uint32_t>::max());
+  bs4 = bs4 - bs5;
+  REQUIRE(bs4.GetUInt(0) == std::numeric_limits<uint32_t>::max() - 1);
+  REQUIRE(bs4.GetUInt(1) == std::numeric_limits<uint32_t>::max());
+  }
+
+  // test addition and subtraction with multiple fields
+  {
+  emp::BitSet<65> bs1;
+  emp::BitSet<65> bs2;
+
+  /* PART 1 */
+  bs1.Clear();
+  bs2.Clear();
+
+  bs1.Set(64); // 10000...
+  bs2.Set(0);  // ...00001
+
+  for(size_t i = 0; i < 64; ++i) REQUIRE((bs1 - bs2).Get(i));
+  REQUIRE(!(bs1 - bs2).Get(64));
+
+  bs1 -= bs2;
+
+  for(size_t i = 0; i < 64; ++i) {
+    REQUIRE(bs1.Get(i));
+  }
+  REQUIRE(!bs1.Get(64));
+
+  /* PART 2 */
+  bs1.Clear();
+  bs2.Clear();
+
+  bs2.Set(0);  // ...00001
+
+  for(size_t i = 0; i < 65; ++i) REQUIRE((bs1 - bs2).Get(i));
+
+  bs1 -= bs2;
+
+  for(size_t i = 0; i < 65; ++i) REQUIRE(bs1.Get(i));
+
+  /* PART 3 */
+  bs1.Clear();
+  bs2.Clear();
+
+  for(size_t i = 0; i < 65; ++i) bs1.Set(i); // 11111...11111
+  bs2.Set(0);  // ...00001
+
+  for(size_t i = 0; i < 65; ++i) REQUIRE(!(bs1 + bs2).Get(i));
+  for(size_t i = 0; i < 65; ++i) REQUIRE(!(bs2 + bs1).Get(i));
+
+  bs1 += bs2;
+
+  for(size_t i = 0; i < 65; ++i) REQUIRE(!bs1.Get(i));
+
+  /* PART 4 */
+  bs1.Clear();
+  bs2.Clear();
+
+  for(size_t i = 0; i < 64; ++i) bs1.Set(i); // 01111...11111
+  bs2.Set(0);  // ...00001
+
+  for(size_t i = 0; i < 64; ++i) REQUIRE(!(bs1 + bs2).Get(i));
+  REQUIRE((bs1 + bs2).Get(64));
+  for(size_t i = 0; i < 64; ++i) REQUIRE(!(bs2 + bs1).Get(i));
+  REQUIRE((bs2 + bs1).Get(64));
+
+  bs1 += bs2;
+
+  for(size_t i = 0; i < 64; ++i) REQUIRE(!bs1.Get(i));
+  REQUIRE((bs2 + bs1).Get(64));
+  }
+
+  // test GetDouble() and MaxDouble()
+  {
+  emp::BitSet<3> bs0{0,0,0};
+  REQUIRE(bs0.GetDouble() == 0.0);
+  REQUIRE(bs0.MaxDouble() == 7.0);
+
+  emp::BitSet<3> bs1{0,0,1};
+  REQUIRE(bs1.GetDouble() == 1.0);
+
+  emp::BitSet<3> bs2{0,1,1};
+  REQUIRE(bs2.GetDouble() == 3.0);
+
+  emp::BitSet<3> bs3{1,1,1};
+  REQUIRE(bs3.GetDouble() == 7.0);
+
+  emp::BitSet<3> bs4{1,1,0};
+  REQUIRE(bs4.GetDouble() == 6.0);
+
+  emp::BitSet<32> bs5;
+  bs5.SetUInt(0, 1789156UL);
+  REQUIRE(bs5.GetDouble() == 1789156ULL);
+  REQUIRE(bs5.MaxDouble() == 4294967295.0);
+
+  emp::BitSet<64> bs6;
+  bs6.SetUInt64(0, 1789156816848ULL);
+  REQUIRE(bs6.GetDouble() == 1789156816848ULL);
+  REQUIRE(bs6.MaxDouble() == 18446744073709551615.0);
+
+  emp::BitSet<65> bs7;
+  bs7.SetUInt64(0, 1789156816848ULL);
+  bs7.Set(64);
+  REQUIRE(bs7.GetDouble() == 1789156816848.0 + emp::Pow2(64.0));
+  REQUIRE(bs7.MaxDouble() == 36893488147419103231.0);
+
+  emp::BitSet<1027> bs8;
+  bs8.Set(1026);
+  REQUIRE(std::isinf(bs8.GetDouble()));
+  REQUIRE(std::isinf(bs8.MaxDouble()));
+  }
+
+  // test list initializer
+  {
+  emp::BitSet<3> bs_empty{0,0,0};
+  emp::BitSet<3> bs_first{1,0,0};
+  emp::BitSet<3> bs_last{0,0,1};
+  emp::BitSet<3> bs_full{1,1,1};
+
+  REQUIRE(bs_empty.CountOnes() == 0);
+  REQUIRE(bs_first.CountOnes() == 1);
+  REQUIRE(bs_last.CountOnes() == 1);
+  REQUIRE(bs_full.CountOnes() == 3);
+  }
+
+  // test Import and Export
+  {
+
+    emp::Random rand(1);
+
+    emp::BitSet<32> orig(rand);
+
+    emp::array<emp::BitSet<32>, 1> d1;
+    emp::array<emp::BitSet<16>, 2> d2;
+    emp::array<emp::BitSet<8>, 4> d4;
+    emp::array<emp::BitSet<4>, 8> d8;
+    emp::array<emp::BitSet<2>, 16> d16;
+    emp::array<emp::BitSet<1>, 32> d32;
+
+    // Import
+
+    d1[0].Import(orig, 0);
+    for(size_t i = 0; i < 2; ++i) d2[i].Import(orig, i * 16);
+    for(size_t i = 0; i < 4; ++i) d4[i].Import(orig, i * 8);
+    for(size_t i = 0; i < 8; ++i) d8[i].Import(orig, i * 4);
+    for(size_t i = 0; i < 16; ++i) d16[i].Import(orig, i * 2);
+    for(size_t i = 0; i < 32; ++i) d32[i].Import(orig, i * 1);
+
+    for (size_t i = 0; i < 32; ++i) {
+      REQUIRE(orig[i] == d1[i/32][i%32]);
+      REQUIRE(orig[i] == d2[i/16][i%16]);
+      REQUIRE(orig[i] == d4[i/8][i%8]);
+      REQUIRE(orig[i] == d8[i/4][i%4]);
+      REQUIRE(orig[i] == d16[i/2][i%2]);
+      REQUIRE(orig[i] == d32[i/1][i%1]);
+    }
+
+    // Export
+
+    d1[0] = orig.Export<32>(0);
+    for(size_t i = 0; i < 2; ++i) d2[i] = orig.Export<16>(i * 16);
+    for(size_t i = 0; i < 4; ++i) d4[i] = orig.Export<8>(i * 8);
+    for(size_t i = 0; i < 8; ++i) d8[i] = orig.Export<4>(i * 4);
+    for(size_t i = 0; i < 16; ++i) d16[i] = orig.Export<2>(i * 2);
+    for(size_t i = 0; i < 32; ++i) d32[i] = orig.Export<1>(i * 1);
+
+    for (size_t i = 0; i < 32; ++i) {
+      REQUIRE(orig[i] == d1[i/32][i%32]);
+      REQUIRE(orig[i] == d2[i/16][i%16]);
+      REQUIRE(orig[i] == d4[i/8][i%8]);
+      REQUIRE(orig[i] == d8[i/4][i%4]);
+      REQUIRE(orig[i] == d16[i/2][i%2]);
+      REQUIRE(orig[i] == d32[i/1][i%1]);
+    }
+
+    // now test some funky imports and exports
+    // interesting container sizes:
+    // 1, 17, 29, 32, 33, 64, 65, 95, 128, 129
+
+    ImportExportTester<1,1>::test();
+    ImportExportTester<1,17>::test();
+    ImportExportTester<1,29>::test();
+    ImportExportTester<1,32>::test();
+    ImportExportTester<1,33>::test();
+    ImportExportTester<1,64>::test();
+    ImportExportTester<1,65>::test();
+    ImportExportTester<1,96>::test();
+    ImportExportTester<1,128>::test();
+    ImportExportTester<1,129>::test();
+
+    ImportExportTester<17,1>::test();
+    ImportExportTester<17,17>::test();
+    ImportExportTester<17,29>::test();
+    ImportExportTester<17,32>::test();
+    ImportExportTester<17,33>::test();
+    ImportExportTester<17,64>::test();
+    ImportExportTester<17,65>::test();
+    ImportExportTester<17,96>::test();
+    ImportExportTester<17,128>::test();
+    ImportExportTester<17,129>::test();
+
+    ImportExportTester<29,1>::test();
+    ImportExportTester<29,17>::test();
+    ImportExportTester<29,29>::test();
+    ImportExportTester<29,32>::test();
+    ImportExportTester<29,33>::test();
+    ImportExportTester<29,64>::test();
+    ImportExportTester<29,65>::test();
+    ImportExportTester<29,96>::test();
+    ImportExportTester<29,128>::test();
+    ImportExportTester<29,129>::test();
+
+    ImportExportTester<32,1>::test();
+    ImportExportTester<32,17>::test();
+    ImportExportTester<32,29>::test();
+    ImportExportTester<32,32>::test();
+    ImportExportTester<32,33>::test();
+    ImportExportTester<32,64>::test();
+    ImportExportTester<32,65>::test();
+    ImportExportTester<32,96>::test();
+    ImportExportTester<32,128>::test();
+    ImportExportTester<32,129>::test();
+
+    ImportExportTester<33,1>::test();
+    ImportExportTester<33,17>::test();
+    ImportExportTester<33,29>::test();
+    ImportExportTester<33,32>::test();
+    ImportExportTester<33,33>::test();
+    ImportExportTester<33,64>::test();
+    ImportExportTester<33,65>::test();
+    ImportExportTester<33,96>::test();
+    ImportExportTester<33,128>::test();
+    ImportExportTester<33,129>::test();
+
+    ImportExportTester<64,1>::test();
+    ImportExportTester<64,17>::test();
+    ImportExportTester<64,29>::test();
+    ImportExportTester<64,32>::test();
+    ImportExportTester<64,33>::test();
+    ImportExportTester<64,64>::test();
+    ImportExportTester<64,65>::test();
+    ImportExportTester<64,96>::test();
+    ImportExportTester<64,128>::test();
+    ImportExportTester<64,129>::test();
+
+    ImportExportTester<65,1>::test();
+    ImportExportTester<65,17>::test();
+    ImportExportTester<65,29>::test();
+    ImportExportTester<65,32>::test();
+    ImportExportTester<65,33>::test();
+    ImportExportTester<65,64>::test();
+    ImportExportTester<65,65>::test();
+    ImportExportTester<65,96>::test();
+    ImportExportTester<65,128>::test();
+    ImportExportTester<65,129>::test();
+
+    ImportExportTester<96,1>::test();
+    ImportExportTester<96,17>::test();
+    ImportExportTester<96,29>::test();
+    ImportExportTester<96,32>::test();
+    ImportExportTester<96,33>::test();
+    ImportExportTester<96,64>::test();
+    ImportExportTester<96,65>::test();
+    ImportExportTester<96,96>::test();
+    ImportExportTester<96,128>::test();
+    ImportExportTester<96,129>::test();
+
+    ImportExportTester<128,1>::test();
+    ImportExportTester<128,17>::test();
+    ImportExportTester<128,29>::test();
+    ImportExportTester<128,32>::test();
+    ImportExportTester<128,33>::test();
+    ImportExportTester<128,64>::test();
+    ImportExportTester<128,65>::test();
+    ImportExportTester<128,96>::test();
+    ImportExportTester<128,128>::test();
+    ImportExportTester<128,129>::test();
+
+    ImportExportTester<129,1>::test();
+    ImportExportTester<129,17>::test();
+    ImportExportTester<129,29>::test();
+    ImportExportTester<129,32>::test();
+    ImportExportTester<129,33>::test();
+    ImportExportTester<129,64>::test();
+    ImportExportTester<129,65>::test();
+    ImportExportTester<129,96>::test();
+    ImportExportTester<129,128>::test();
+    ImportExportTester<129,129>::test();
+
+  }
+
   emp::BitSet<10> bs10;
   emp::BitSet<25> bs25;
   emp::BitSet<32> bs32;
@@ -418,9 +836,9 @@ TEST_CASE("Test BitSet", "[tools]")
   bs.SetUInt(0, 7);
   REQUIRE (bs.LongestSegmentOnes() == 3);
 
-  bs.SetUInt(0, pow((uint32_t)2,(uint32_t)32)-1);
-  bs.SetUInt(1, pow((uint32_t)2,(uint32_t)32)-2);
-  bs.SetUInt(2, pow((uint32_t)2,(uint32_t)32)-4);
+  bs.SetUInt(0, std::numeric_limits<uint32_t>::max());
+  bs.SetUInt(1, std::numeric_limits<uint32_t>::max() - 1);
+  bs.SetUInt(2, std::numeric_limits<uint32_t>::max() - 3);
   REQUIRE (bs.LongestSegmentOnes() == 32);
 
   // tests for ROTATE
@@ -1151,7 +1569,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::AbsDiffMetric,
-    emp::RankedSelector<std::ratio<214748364700+599,214748364700>> 
+    emp::RankedSelector<std::ratio<214748364700+599,214748364700>>
   > bin;
 
   const size_t hi = bin.Put("hi", 1);
@@ -1547,6 +1965,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   }
 
   // test DynamicSelector
+  /*
   {
   emp::MatchBin<
     std::string,
@@ -1642,6 +2061,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
 
   }
+  */
 
   {
   emp::MatchBin<
@@ -1904,22 +2324,29 @@ TEST_CASE("Test MatchBin", "[tools]")
     emp::RankedSelector<std::ratio<1+1, 1>>
   > bitBin64;
 
-  size_t two = 2;
-
   emp::BitSet<64> bs7;
-  bs7.SetUInt(1, pow(two, (size_t)18) + pow(two, (size_t)19) + pow(two, (size_t)20));
+  bs7.SetUInt(
+    1,
+    emp::IntPow(2UL, 18UL) + emp::IntPow(2UL, 19UL) + emp::IntPow(2UL, 20UL)
+  );
 
   const size_t id_seven = bitBin64.Put("seven", bs7);
   REQUIRE( bitBin64.GetVal(id_seven) == "seven");
 
   emp::BitSet<64> bs1;
-  bs1.SetUInt(1, pow(two, (size_t)16) + pow(two, (size_t)17) + pow(two, (size_t)18));
+  bs1.SetUInt(
+    1,
+    emp::IntPow(2UL, 16UL) + emp::IntPow(2UL, 17UL) + emp::IntPow(2UL, 18UL)
+  );
 
   const size_t id_one  = bitBin64.Put("one", bs1);
   REQUIRE( bitBin64.GetVal(id_one) == "one");
 
   emp::BitSet<64> bs9;
-  bs9.SetUInt(1, pow(two, (size_t)15) + pow(two, (size_t)16) + pow(two, (size_t)17));
+  bs9.SetUInt(
+    1,
+    emp::IntPow(2UL, 15UL) + emp::IntPow(2UL, 16UL) + emp::IntPow(2UL, 17UL)
+  );
 
   const size_t id_nine  = bitBin64.Put("nine", bs9);
   REQUIRE( bitBin64.GetVal(id_nine) == "nine");
@@ -1934,10 +2361,22 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   }
 
+  // CI + 0 evaluates to false
+  // if CI is defined but has no value
+  // or if CI is not defined
+#if (CI + 0)
+  // turn these tests off for Travis because they seem to
+  // overwhelm available resources
+  // here's the warning that Travis gives us
+  /*
+  In function ‘void ____C_A_T_C_H____T_E_S_T____561()’:
+  cc1plus: warning: ‘void* __builtin_memmove(void*, const void*, long unsigned int)’ specified size 18446744073709551608 exceeds maximum object size 9223372036854775807 [-Wstringop-overflow=]
+  */
+#else
   {
   emp::MatchBin<
     std::string,
-    emp::AbsIntDiffMetric<8>,
+    emp::SymmetricNoWrapMetric<8>,
     emp::RankedSelector<std::ratio<256 + 40, 256>>
   > bitBin;
 
@@ -1988,6 +2427,819 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(bitBin.GetVals(bitBin.Match(bs2, 5)) == (emp::vector<std::string> {"fifteen", "one"}));
   REQUIRE(bitBin.GetTags(bitBin.Match(bs2, 5)) == (emp::vector<emp::BitSet<8>> {bs15, bs1}));
 
+  }
+#endif
+
+  // test SlideMod
+  {
+  emp::BitSet<3> bs_000{0,0,0};
+  emp::BitSet<3> bs_100{1,0,0};
+  emp::BitSet<3> bs_010{0,1,0};
+  emp::BitSet<3> bs_001{0,0,1};
+  emp::BitSet<3> bs_111{1,1,1};
+
+  emp::SlideMod<emp::StreakMetric<3>> slide_streak;
+  emp::SlideMod<emp::HammingMetric<3>> slide_hamming;
+  emp::StreakMetric<3> streak;
+
+  REQUIRE(
+    slide_streak(bs_100, bs_100)
+    ==
+    slide_streak(bs_100, bs_010)
+  );
+
+  REQUIRE(
+    streak(bs_100, bs_100)
+    ==
+    slide_streak(bs_100, bs_010)
+  );
+
+  REQUIRE(
+    slide_streak(bs_000, bs_111)
+    >
+    slide_streak(bs_100, bs_000)
+  );
+
+  REQUIRE(
+    slide_streak(bs_000, bs_111)
+    >
+    streak(bs_100, bs_000)
+  );
+
+  REQUIRE(
+    slide_hamming(bs_100, bs_100)
+    ==
+    slide_hamming(bs_100, bs_010)
+  );
+  }
+
+  // test AntiMod
+  {
+  emp::BitSet<3> bs_000{0,0,0};
+  emp::BitSet<3> bs_100{1,0,0};
+  emp::BitSet<3> bs_010{0,1,0};
+  emp::BitSet<3> bs_001{0,0,1};
+  emp::BitSet<3> bs_011{0,1,1};
+  emp::BitSet<3> bs_111{1,1,1};
+
+  emp::AntiMod<emp::StreakMetric<3>> anti_streak;
+  emp::StreakMetric<3> streak;
+  emp::AntiMod<emp::HammingMetric<3>> anti_hamming;
+  emp::HammingMetric<3> hamming;
+
+
+  // anti should be equivalent to 0 matching with 1 and vice versa
+  // instead of 0 matching with 0 and 1 matching with 1
+  REQUIRE(
+    anti_streak(bs_000, bs_111)
+    ==
+    streak(bs_111, bs_111)
+  );
+
+  REQUIRE(
+    anti_streak(bs_011, bs_000)
+    ==
+    streak(bs_011, bs_111)
+  );
+
+  REQUIRE(
+    anti_hamming(bs_000, bs_111)
+    -
+    hamming(bs_111, bs_111)
+    <= std::numeric_limits<double>::epsilon()
+    // instead of doing == because of floating imprecision
+  );
+
+  REQUIRE(
+    anti_hamming(bs_011, bs_000)
+    -
+    hamming(bs_011, bs_111)
+    <= std::numeric_limits<double>::epsilon()
+    // instead of doing == because of floating imprecision
+  );
+
+  }
+
+  // text AntiMod x SlideMod
+  {
+  emp::BitSet<3> bs_000{0,0,0};
+  emp::BitSet<3> bs_100{1,0,0};
+  emp::BitSet<3> bs_010{0,1,0};
+  emp::BitSet<3> bs_001{0,0,1};
+  emp::BitSet<3> bs_011{0,1,1};
+  emp::BitSet<3> bs_111{1,1,1};
+
+  emp::SlideMod<emp::StreakMetric<3>> slide_streak;
+  emp::SlideMod<emp::AntiMod<emp::StreakMetric<3>>> slide_anti_streak;
+  emp::SlideMod<emp::HammingMetric<3>> slide_hamming;
+  emp::SlideMod<emp::AntiMod<emp::HammingMetric<3>>> slide_anti_hamming;
+
+  // anti should be equivalent to 0 matching with 1 and vice versa
+  // instead of 0 matching with 0 and 1 matching with 1
+
+  REQUIRE(
+    slide_streak(bs_000, bs_111)
+    ==
+    slide_anti_streak(bs_111, bs_111)
+  );
+
+  REQUIRE(
+    slide_streak(bs_011, bs_000)
+    ==
+    slide_anti_streak(bs_011, bs_111)
+  );
+
+  REQUIRE(
+    slide_hamming(bs_000, bs_111)
+    -
+    slide_anti_hamming(bs_111, bs_111)
+    <= std::numeric_limits<double>::epsilon()
+    // instead of doing == because of floating imprecision
+  );
+
+  REQUIRE(
+    slide_hamming(bs_011, bs_000)
+    -
+    slide_anti_hamming(bs_011, bs_111)
+    <= std::numeric_limits<double>::epsilon()
+    // instead of doing == because of floating imprecision
+  );
+  }
+
+  // test MeanDimMod
+  {
+  emp::Random rand(1);
+
+  emp::array<emp::BitSet<32>, 1> a1 = {
+    emp::BitSet<32>(rand)
+  };
+  emp::array<emp::BitSet<32>, 1> b1 = {
+    emp::BitSet<32>(rand)
+  };
+
+  emp::StreakMetric<32> streak;
+  emp::AntiMod<emp::StreakMetric<32>> anti_streak;
+  emp::HammingMetric<32> hamming;
+  emp::SlideMod<emp::HammingMetric<32>> slide_hamming;
+
+  emp::MeanDimMod<emp::StreakMetric<32>, 1> d_streak1;
+  REQUIRE(d_streak1.width() == streak.width());
+
+  emp::MeanDimMod<emp::AntiMod<emp::StreakMetric<32>>, 1> d_anti_streak1;
+  REQUIRE(d_anti_streak1.width() == anti_streak.width());
+
+  emp::MeanDimMod<emp::HammingMetric<32>, 1> d_hamming1;
+  REQUIRE(d_hamming1.width() == hamming.width());
+
+  emp::MeanDimMod<emp::SlideMod<emp::HammingMetric<32>>, 1> d_slide_hamming1;
+  REQUIRE(d_slide_hamming1.width() == slide_hamming.width());
+
+  REQUIRE(streak(a1[0], b1[0]) == d_streak1(a1, b1));
+  REQUIRE(anti_streak(a1[0], b1[0]) == d_anti_streak1(a1, b1));
+  REQUIRE(hamming(a1[0], b1[0]) == d_hamming1(a1, b1));
+  REQUIRE(slide_hamming(a1[0], b1[0]) == d_slide_hamming1(a1, b1));
+
+  emp::array<emp::BitSet<32>, 3> a3 = {
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand)
+  };
+  emp::array<emp::BitSet<32>, 3> b3 = {
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand)
+  };
+
+  emp::MeanDimMod<emp::StreakMetric<32>, 3> d_streak3;
+  REQUIRE(d_streak3.width() == streak.width() * 3);
+
+  emp::MeanDimMod<emp::AntiMod<emp::StreakMetric<32>>, 3> d_anti_streak3;
+  REQUIRE(d_anti_streak3.width() == anti_streak.width() * 3);
+
+  emp::MeanDimMod<emp::HammingMetric<32>, 3> d_hamming3;
+  REQUIRE(d_hamming3.width() == hamming.width() * 3);
+
+  emp::MeanDimMod<emp::SlideMod<emp::HammingMetric<32>>, 3> d_slide_hamming3;
+  REQUIRE(d_slide_hamming3.width() == slide_hamming.width() * 3);
+
+
+  REQUIRE(
+    streak(a3[0], b3[0]) + streak(a3[1], b3[1]) + streak(a3[2], b3[2])
+    -
+    d_streak3(a3,b3) * 3.0
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    anti_streak(a3[0], b3[0]) + anti_streak(a3[1], b3[1]) + anti_streak(a3[2], b3[2])
+    -
+    d_anti_streak3(a3,b3)  * 3.0
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    hamming(a3[0], b3[0]) + hamming(a3[1], b3[1]) + hamming(a3[2], b3[2])
+    -
+    d_hamming3(a3,b3)  * 3.0
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    slide_hamming(a3[0], b3[0]) + slide_hamming(a3[1], b3[1]) + slide_hamming(a3[2], b3[2])
+    -
+    d_slide_hamming3(a3,b3)  * 3.0
+    <= std::numeric_limits<double>::epsilon()
+  );
+
+  }
+
+  // test MinDimMod
+  {
+  emp::Random rand(1);
+
+  emp::array<emp::BitSet<32>, 1> a1 = {
+    emp::BitSet<32>(rand)
+  };
+  emp::array<emp::BitSet<32>, 1> b1 = {
+    emp::BitSet<32>(rand)
+  };
+
+  emp::StreakMetric<32> streak;
+  emp::AntiMod<emp::StreakMetric<32>> anti_streak;
+  emp::HammingMetric<32> hamming;
+  emp::SlideMod<emp::HammingMetric<32>> slide_hamming;
+
+  emp::MinDimMod<emp::StreakMetric<32>, 1> d_streak1;
+  REQUIRE(d_streak1.width() == streak.width());
+
+  emp::MinDimMod<emp::AntiMod<emp::StreakMetric<32>>, 1> d_anti_streak1;
+  REQUIRE(d_anti_streak1.width() == anti_streak.width());
+
+  emp::MinDimMod<emp::HammingMetric<32>, 1> d_hamming1;
+  REQUIRE(d_hamming1.width() == hamming.width());
+
+  emp::MinDimMod<emp::SlideMod<emp::HammingMetric<32>>, 1> d_slide_hamming1;
+  REQUIRE(d_slide_hamming1.width() == slide_hamming.width());
+
+  REQUIRE(streak(a1[0], b1[0]) == d_streak1(a1, b1));
+  REQUIRE(anti_streak(a1[0], b1[0]) == d_anti_streak1(a1, b1));
+  REQUIRE(hamming(a1[0], b1[0]) == d_hamming1(a1, b1));
+  REQUIRE(slide_hamming(a1[0], b1[0]) == d_slide_hamming1(a1, b1));
+
+  emp::array<emp::BitSet<32>, 3> a3 = {
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand)
+  };
+  emp::array<emp::BitSet<32>, 3> b3 = {
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand)
+  };
+
+  emp::MinDimMod<emp::StreakMetric<32>, 3> d_streak3;
+  REQUIRE(d_streak3.width() == streak.width() * 3);
+
+  emp::MinDimMod<emp::AntiMod<emp::StreakMetric<32>>, 3> d_anti_streak3;
+  REQUIRE(d_anti_streak3.width() == anti_streak.width() * 3);
+
+  emp::MinDimMod<emp::HammingMetric<32>, 3> d_hamming3;
+  REQUIRE(d_hamming3.width() == hamming.width() * 3);
+
+  emp::MinDimMod<emp::SlideMod<emp::HammingMetric<32>>, 3> d_slide_hamming3;
+  REQUIRE(d_slide_hamming3.width() == slide_hamming.width() * 3);
+
+
+  REQUIRE(
+    std::min({streak(a3[0], b3[0]), streak(a3[1], b3[1]), streak(a3[2], b3[2])})
+    -
+    d_streak3(a3,b3)
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    std::min({anti_streak(a3[0], b3[0]), anti_streak(a3[1], b3[1]), anti_streak(a3[2], b3[2])})
+    -
+    d_anti_streak3(a3,b3)
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    std::min({hamming(a3[0], b3[0]), hamming(a3[1], b3[1]), hamming(a3[2], b3[2])})
+    -
+    d_hamming3(a3,b3)
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    std::min({slide_hamming(a3[0], b3[0]), slide_hamming(a3[1], b3[1]), slide_hamming(a3[2], b3[2])})
+    -
+    d_slide_hamming3(a3,b3)
+    <= std::numeric_limits<double>::epsilon()
+  );
+
+  }
+
+  // test FlatMod x MeanDimMod
+  {
+  emp::Random rand(1);
+
+  emp::BitSet<32> a1(rand);
+
+  emp::BitSet<32> b1(rand);
+
+  emp::StreakMetric<32> streak;
+  emp::AntiMod<emp::StreakMetric<32>> anti_streak;
+  emp::HammingMetric<32> hamming;
+  emp::SlideMod<emp::HammingMetric<32>> slide_hamming;
+
+  emp::FlatMod<
+    emp::MeanDimMod<
+      emp::StreakMetric<32>,
+      1
+    >
+  > d_streak1;
+  REQUIRE(d_streak1.width() == streak.width());
+
+  emp::FlatMod<
+    emp::MeanDimMod<
+      emp::AntiMod<
+        typename emp::StreakMetric<32>
+      >,
+      1
+    >
+  > d_anti_streak1;
+  REQUIRE(d_anti_streak1.width() == anti_streak.width());
+
+  emp::FlatMod<
+    emp::MeanDimMod<
+      typename emp::HammingMetric<32>,
+      1
+    >
+  > d_hamming1;
+  REQUIRE(d_hamming1.width() == hamming.width());
+
+  emp::FlatMod<
+    emp::MeanDimMod<
+      emp::SlideMod<
+        typename emp::HammingMetric<32>
+      >,
+      1
+    >
+  > d_slide_hamming1;
+  REQUIRE(d_slide_hamming1.width() == slide_hamming.width());
+
+  REQUIRE(streak(a1, b1) == d_streak1(a1, b1));
+  REQUIRE(anti_streak(a1, b1) == d_anti_streak1(a1, b1));
+  REQUIRE(hamming(a1, b1) == d_hamming1(a1, b1));
+  REQUIRE(slide_hamming(a1, b1) == d_slide_hamming1(a1, b1));
+
+  emp::array<emp::BitSet<32>, 3> a3 = {
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand)
+  };
+
+  emp::array<emp::BitSet<32>, 3> b3 = {
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand)
+  };
+
+  emp::BitSet<96> flat_a3;
+  emp::BitSet<96> flat_b3;
+
+  for (size_t i = 0; i < 96; ++i) {
+    flat_a3[i] = a3[i/32][i%32];
+    flat_b3[i] = b3[i/32][i%32];
+  }
+
+  emp::FlatMod<
+    emp::MeanDimMod<
+      emp::StreakMetric<32>,
+      3
+    >
+  > d_streak3;
+  REQUIRE(d_streak3.width() == streak.width() * 3);
+
+  emp::FlatMod<
+    emp::MeanDimMod<
+      emp::AntiMod<
+        emp::StreakMetric<32>
+      >,
+      3
+    >
+  > d_anti_streak3;
+  REQUIRE(d_anti_streak3.width() == anti_streak.width() * 3);
+
+  emp::FlatMod<
+    emp::MeanDimMod<
+      emp::HammingMetric<32>,
+      3
+    >
+  > d_hamming3;
+  REQUIRE(d_hamming3.width() == hamming.width() * 3);
+
+  emp::FlatMod<
+    emp::MeanDimMod<
+      emp::SlideMod<
+        emp::HammingMetric<32>
+      >,
+      3
+    >
+  > d_slide_hamming3;
+  REQUIRE(d_slide_hamming3.width() == slide_hamming.width() * 3);
+
+
+  REQUIRE(
+    streak(a3[0], b3[0]) + streak(a3[1], b3[1]) + streak(a3[2], b3[2])
+    -
+    d_streak3(flat_a3,flat_b3) * 3.0
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    anti_streak(a3[0], b3[0]) + anti_streak(a3[1], b3[1]) + anti_streak(a3[2], b3[2])
+    -
+    d_anti_streak3(flat_a3,flat_b3)  * 3.0
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    hamming(a3[0], b3[0]) + hamming(a3[1], b3[1]) + hamming(a3[2], b3[2])
+    -
+    d_hamming3(flat_a3,flat_b3)  * 3.0
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    slide_hamming(a3[0], b3[0]) + slide_hamming(a3[1], b3[1]) + slide_hamming(a3[2], b3[2])
+    -
+    d_slide_hamming3(flat_a3,flat_b3)  * 3.0
+    <= std::numeric_limits<double>::epsilon()
+  );
+
+  }
+
+  // test FlatMod x MinDimMod
+  {
+  emp::Random rand(1);
+
+  emp::BitSet<32> a1(rand);
+
+  emp::BitSet<32> b1(rand);
+
+  emp::StreakMetric<32> streak;
+  emp::AntiMod<emp::StreakMetric<32>> anti_streak;
+  emp::HammingMetric<32> hamming;
+  emp::SlideMod<emp::HammingMetric<32>> slide_hamming;
+
+  emp::FlatMod<
+    emp::MinDimMod<
+      emp::StreakMetric<32>,
+      1
+    >
+  > d_streak1;
+  REQUIRE(d_streak1.width() == streak.width());
+
+  emp::FlatMod<
+    emp::MinDimMod<
+      emp::AntiMod<
+        typename emp::StreakMetric<32>
+      >,
+      1
+    >
+  > d_anti_streak1;
+  REQUIRE(d_anti_streak1.width() == anti_streak.width());
+
+  emp::FlatMod<
+    emp::MinDimMod<
+      typename emp::HammingMetric<32>,
+      1
+    >
+  > d_hamming1;
+  REQUIRE(d_hamming1.width() == hamming.width());
+
+  emp::FlatMod<
+    emp::MinDimMod<
+      emp::SlideMod<
+        typename emp::HammingMetric<32>
+      >,
+      1
+    >
+  > d_slide_hamming1;
+  REQUIRE(d_slide_hamming1.width() == slide_hamming.width());
+
+  REQUIRE(streak(a1, b1) == d_streak1(a1, b1));
+  REQUIRE(anti_streak(a1, b1) == d_anti_streak1(a1, b1));
+  REQUIRE(hamming(a1, b1) == d_hamming1(a1, b1));
+  REQUIRE(slide_hamming(a1, b1) == d_slide_hamming1(a1, b1));
+
+  emp::array<emp::BitSet<32>, 3> a3 = {
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand)
+  };
+
+  emp::array<emp::BitSet<32>, 3> b3 = {
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand),
+    emp::BitSet<32>(rand)
+  };
+
+  emp::BitSet<96> flat_a3;
+  emp::BitSet<96> flat_b3;
+
+  for (size_t i = 0; i < 96; ++i) {
+    flat_a3[i] = a3[i/32][i%32];
+    flat_b3[i] = b3[i/32][i%32];
+  }
+
+  emp::FlatMod<
+    emp::MinDimMod<
+      emp::StreakMetric<32>,
+      3
+    >
+  > d_streak3;
+  REQUIRE(d_streak3.width() == streak.width() * 3);
+
+  emp::FlatMod<
+    emp::MinDimMod<
+      emp::AntiMod<
+        emp::StreakMetric<32>
+      >,
+      3
+    >
+  > d_anti_streak3;
+  REQUIRE(d_anti_streak3.width() == anti_streak.width() * 3);
+
+  emp::FlatMod<
+    emp::MinDimMod<
+      emp::HammingMetric<32>,
+      3
+    >
+  > d_hamming3;
+  REQUIRE(d_hamming3.width() == hamming.width() * 3);
+
+  emp::FlatMod<
+    emp::MinDimMod<
+      emp::SlideMod<
+        emp::HammingMetric<32>
+      >,
+      3
+    >
+  > d_slide_hamming3;
+  REQUIRE(d_slide_hamming3.width() == slide_hamming.width() * 3);
+
+
+  REQUIRE(
+    std::min({streak(a3[0], b3[0]), streak(a3[1], b3[1]), streak(a3[2], b3[2])})
+    -
+    d_streak3(flat_a3,flat_b3)
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    std::min({anti_streak(a3[0], b3[0]), anti_streak(a3[1], b3[1]), anti_streak(a3[2], b3[2])})
+    -
+    d_anti_streak3(flat_a3,flat_b3)
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    std::min({hamming(a3[0], b3[0]), hamming(a3[1], b3[1]), hamming(a3[2], b3[2])})
+    -
+    d_hamming3(flat_a3,flat_b3)
+    <= std::numeric_limits<double>::epsilon()
+  );
+  REQUIRE(
+    std::min({slide_hamming(a3[0], b3[0]), slide_hamming(a3[1], b3[1]), slide_hamming(a3[2], b3[2])})
+    -
+    d_slide_hamming3(flat_a3,flat_b3)
+    <= std::numeric_limits<double>::epsilon()
+  );
+
+  }
+
+  // test SymmetricWrapMetric
+  {
+  const double norm = 8.0;
+  const emp::BitSet<4> bs_0{0,0,0,0};
+  const emp::BitSet<4> bs_1{0,0,0,1};
+  const emp::BitSet<4> bs_7{0,1,1,1};
+  const emp::BitSet<4> bs_8{1,0,0,0};
+  const emp::BitSet<4> bs_11{1,0,1,1};
+  const emp::BitSet<4> bs_15{1,1,1,1};
+
+  emp::SymmetricWrapMetric<4> metric;
+
+  REQUIRE(metric(bs_0, bs_1) == 1.0/norm);
+  REQUIRE(metric(bs_1, bs_0) == 1.0/norm);
+
+  REQUIRE(metric(bs_0, bs_7) == 7.0/norm);
+  REQUIRE(metric(bs_7, bs_0) == 7.0/norm);
+
+  REQUIRE(metric(bs_0, bs_8) == 8.0/norm);
+  REQUIRE(metric(bs_8, bs_0) == 8.0/norm);
+
+  REQUIRE(metric(bs_0, bs_11) == 5.0/norm);
+  REQUIRE(metric(bs_11, bs_0) == 5.0/norm);
+
+  REQUIRE(metric(bs_0, bs_15) == 1.0/norm);
+  REQUIRE(metric(bs_15, bs_0) == 1.0/norm);
+
+  REQUIRE(metric(bs_1, bs_7) == 6.0/norm);
+  REQUIRE(metric(bs_7, bs_1) == 6.0/norm);
+
+  REQUIRE(metric(bs_1, bs_8) == 7.0/norm);
+  REQUIRE(metric(bs_8, bs_1) == 7.0/norm);
+
+  REQUIRE(metric(bs_1, bs_11) == 6.0/norm);
+  REQUIRE(metric(bs_11, bs_1) == 6.0/norm);
+
+  REQUIRE(metric(bs_1, bs_15) == 2.0/norm);
+  REQUIRE(metric(bs_15, bs_1) == 2.0/norm);
+
+  REQUIRE(metric(bs_7, bs_8) == 1.0/norm);
+  REQUIRE(metric(bs_8, bs_7) == 1.0/norm);
+
+  REQUIRE(metric(bs_7, bs_11) == 4.0/norm);
+  REQUIRE(metric(bs_11, bs_7) == 4.0/norm);
+
+  REQUIRE(metric(bs_7, bs_15) == 8.0/norm);
+  REQUIRE(metric(bs_15, bs_7) == 8.0/norm);
+
+  REQUIRE(metric(bs_8, bs_11) == 3.0/norm);
+  REQUIRE(metric(bs_11, bs_8) == 3.0/norm);
+
+  REQUIRE(metric(bs_8, bs_15) == 7.0/norm);
+  REQUIRE(metric(bs_15, bs_8) == 7.0/norm);
+
+  REQUIRE(metric(bs_11, bs_15) == 4.0/norm);
+  REQUIRE(metric(bs_15, bs_11) == 4.0/norm);
+  }
+
+  // test SymmetricNoWrapMetric
+  {
+  const double norm = 15.0;
+  const emp::BitSet<4> bs_0{0,0,0,0};
+  const emp::BitSet<4> bs_1{0,0,0,1};
+  const emp::BitSet<4> bs_7{0,1,1,1};
+  const emp::BitSet<4> bs_8{1,0,0,0};
+  const emp::BitSet<4> bs_11{1,0,1,1};
+  const emp::BitSet<4> bs_15{1,1,1,1};
+
+  emp::SymmetricNoWrapMetric<4> metric;
+
+  REQUIRE(metric(bs_0, bs_1) == 1.0/norm);
+  REQUIRE(metric(bs_1, bs_0) == 1.0/norm);
+
+  REQUIRE(metric(bs_0, bs_7) == 7.0/norm);
+  REQUIRE(metric(bs_7, bs_0) == 7.0/norm);
+
+  REQUIRE(metric(bs_0, bs_8) == 8.0/norm);
+  REQUIRE(metric(bs_8, bs_0) == 8.0/norm);
+
+  REQUIRE(metric(bs_0, bs_11) == 11.0/norm);
+  REQUIRE(metric(bs_11, bs_0) == 11.0/norm);
+
+  REQUIRE(metric(bs_0, bs_15) == 15.0/norm);
+  REQUIRE(metric(bs_15, bs_0) == 15.0/norm);
+
+  REQUIRE(metric(bs_1, bs_7) == 6.0/norm);
+  REQUIRE(metric(bs_7, bs_1) == 6.0/norm);
+
+  REQUIRE(metric(bs_1, bs_8) == 7.0/norm);
+  REQUIRE(metric(bs_8, bs_1) == 7.0/norm);
+
+  REQUIRE(metric(bs_1, bs_11) == 10.0/norm);
+  REQUIRE(metric(bs_11, bs_1) == 10.0/norm);
+
+  REQUIRE(metric(bs_1, bs_15) == 14.0/norm);
+  REQUIRE(metric(bs_15, bs_1) == 14.0/norm);
+
+  REQUIRE(metric(bs_7, bs_8) == 1.0/norm);
+  REQUIRE(metric(bs_8, bs_7) == 1.0/norm);
+
+  REQUIRE(metric(bs_7, bs_11) == 4.0/norm);
+  REQUIRE(metric(bs_11, bs_7) == 4.0/norm);
+
+  REQUIRE(metric(bs_7, bs_15) == 8.0/norm);
+  REQUIRE(metric(bs_15, bs_7) == 8.0/norm);
+
+  REQUIRE(metric(bs_8, bs_11) == 3.0/norm);
+  REQUIRE(metric(bs_11, bs_8) == 3.0/norm);
+
+  REQUIRE(metric(bs_8, bs_15) == 7.0/norm);
+  REQUIRE(metric(bs_15, bs_8) == 7.0/norm);
+
+  REQUIRE(metric(bs_11, bs_15) == 4.0/norm);
+  REQUIRE(metric(bs_15, bs_11) == 4.0/norm);
+  }
+
+  // test AsymmetricWrapMetric
+  {
+  const double norm = 15.0;
+  const emp::BitSet<4> bs_0{0,0,0,0};
+  const emp::BitSet<4> bs_1{0,0,0,1};
+  const emp::BitSet<4> bs_7{0,1,1,1};
+  const emp::BitSet<4> bs_8{1,0,0,0};
+  const emp::BitSet<4> bs_11{1,0,1,1};
+  const emp::BitSet<4> bs_15{1,1,1,1};
+
+  emp::AsymmetricWrapMetric<4> metric;
+
+  REQUIRE(metric(bs_0, bs_1) == 1.0/norm);
+  REQUIRE(metric(bs_1, bs_0) == 15.0/norm);
+
+  REQUIRE(metric(bs_0, bs_7) == 7.0/norm);
+  REQUIRE(metric(bs_7, bs_0) == 9.0/norm);
+
+  REQUIRE(metric(bs_0, bs_8) == 8.0/norm);
+  REQUIRE(metric(bs_8, bs_0) == 8.0/norm);
+
+  REQUIRE(metric(bs_0, bs_11) == 11.0/norm);
+  REQUIRE(metric(bs_11, bs_0) == 5.0/norm);
+
+  REQUIRE(metric(bs_0, bs_15) == 15.0/norm);
+  REQUIRE(metric(bs_15, bs_0) == 1.0/norm);
+
+  REQUIRE(metric(bs_1, bs_7) == 6.0/norm);
+  REQUIRE(metric(bs_7, bs_1) == 10.0/norm);
+
+  REQUIRE(metric(bs_1, bs_8) == 7.0/norm);
+  REQUIRE(metric(bs_8, bs_1) == 9.0/norm);
+
+  REQUIRE(metric(bs_1, bs_11) == 10.0/norm);
+  REQUIRE(metric(bs_11, bs_1) == 6.0/norm);
+
+  REQUIRE(metric(bs_1, bs_15) == 14.0/norm);
+  REQUIRE(metric(bs_15, bs_1) == 2.0/norm);
+
+  REQUIRE(metric(bs_7, bs_8) == 1.0/norm);
+  REQUIRE(metric(bs_8, bs_7) == 15.0/norm);
+
+  REQUIRE(metric(bs_7, bs_11) == 4.0/norm);
+  REQUIRE(metric(bs_11, bs_7) == 12.0/norm);
+
+  REQUIRE(metric(bs_7, bs_15) == 8.0/norm);
+  REQUIRE(metric(bs_15, bs_7) == 8.0/norm);
+
+  REQUIRE(metric(bs_8, bs_11) == 3.0/norm);
+  REQUIRE(metric(bs_11, bs_8) == 13.0/norm);
+
+  REQUIRE(metric(bs_8, bs_15) == 7.0/norm);
+  REQUIRE(metric(bs_15, bs_8) == 9.0/norm);
+
+  REQUIRE(metric(bs_11, bs_15) == 4.0/norm);
+  REQUIRE(metric(bs_15, bs_11) == 12.0/norm);
+  }
+
+  // test AsymmetricNoWrapMetric
+  {
+  const double norm = 16.0;
+  const emp::BitSet<4> bs_0{0,0,0,0};
+  const emp::BitSet<4> bs_1{0,0,0,1};
+  const emp::BitSet<4> bs_7{0,1,1,1};
+  const emp::BitSet<4> bs_8{1,0,0,0};
+  const emp::BitSet<4> bs_11{1,0,1,1};
+  const emp::BitSet<4> bs_15{1,1,1,1};
+
+  emp::AsymmetricNoWrapMetric<4> metric;
+
+  REQUIRE(metric(bs_0, bs_1) == 1.0/norm);
+  REQUIRE(metric(bs_1, bs_0) == 16.0/norm);
+
+  REQUIRE(metric(bs_0, bs_7) == 7.0/norm);
+  REQUIRE(metric(bs_7, bs_0) == 16.0/norm);
+
+  REQUIRE(metric(bs_0, bs_8) == 8.0/norm);
+  REQUIRE(metric(bs_8, bs_0) == 16.0/norm);
+
+  REQUIRE(metric(bs_0, bs_11) == 11.0/norm);
+  REQUIRE(metric(bs_11, bs_0) == 16.0/norm);
+
+  REQUIRE(metric(bs_0, bs_15) == 15.0/norm);
+  REQUIRE(metric(bs_15, bs_0) == 16.0/norm);
+
+  REQUIRE(metric(bs_1, bs_7) == 6.0/norm);
+  REQUIRE(metric(bs_7, bs_1) == 16.0/norm);
+
+  REQUIRE(metric(bs_1, bs_8) == 7.0/norm);
+  REQUIRE(metric(bs_8, bs_1) == 16.0/norm);
+
+  REQUIRE(metric(bs_1, bs_11) == 10.0/norm);
+  REQUIRE(metric(bs_11, bs_1) == 16.0/norm);
+
+  REQUIRE(metric(bs_1, bs_15) == 14.0/norm);
+  REQUIRE(metric(bs_15, bs_1) == 16.0/norm);
+
+  REQUIRE(metric(bs_7, bs_8) == 1.0/norm);
+  REQUIRE(metric(bs_8, bs_7) == 16.0/norm);
+
+  REQUIRE(metric(bs_7, bs_11) == 4.0/norm);
+  REQUIRE(metric(bs_11, bs_7) == 16.0/norm);
+
+  REQUIRE(metric(bs_7, bs_15) == 8.0/norm);
+  REQUIRE(metric(bs_15, bs_7) == 16.0/norm);
+
+  REQUIRE(metric(bs_8, bs_11) == 3.0/norm);
+  REQUIRE(metric(bs_11, bs_8) == 16.0/norm);
+
+  REQUIRE(metric(bs_8, bs_15) == 7.0/norm);
+  REQUIRE(metric(bs_15, bs_8) == 16.0/norm);
+
+  REQUIRE(metric(bs_11, bs_15) == 4.0/norm);
+  REQUIRE(metric(bs_15, bs_11) == 16.0/norm);
   }
 
 }
