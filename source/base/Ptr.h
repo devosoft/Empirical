@@ -519,13 +519,19 @@ namespace emp {
 
     /// Copy assignment
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) {
-      if (internal::ptr_debug) std::cout << "copy assignment" << std::endl;
+      if (internal::ptr_debug) {
+        std::cout << "copy assignment from id " << _in.id << " to id " << id
+                  << std::endl;
+      }
       emp_assert(Tracker().IsDeleted(_in.id) == false, _in.id, "Do not copy deleted pointers.");
-      if (id != _in.id) {        // Assignments only need to happen if ptrs are different.
+      if (ptr != _in.ptr) {        // Assignments only need to happen if ptrs are different.
+        if (internal::ptr_debug) std::cout << "...pointers differ -- copying!" << std::endl;
         Tracker().DecID(id);
         ptr = _in.ptr;
         id = _in.id;
         Tracker().IncID(id);
+      } else {
+        if (internal::ptr_debug) std::cout << "...pointers same -- no copying!" << std::endl;
       }
       return *this;
     }
