@@ -120,14 +120,12 @@ namespace emp {
     /// Helper: call SHIFT with positive number instead
     void ShiftLeft(const size_t shift_size) {
 
-      const int field_shift = shift_size / FIELD_BITS;
-
-      // only clear and return if we are field_shift-ing
-      // for consistency with ShiftRight
-      if (field_shift && shift_size > NUM_BITS) {
+      if (shift_size > NUM_BITS) {
         Clear();
         return;
       }
+
+      const int field_shift = shift_size / FIELD_BITS;
       const int bit_shift = shift_size % FIELD_BITS;
       const int bit_overflow = FIELD_BITS - bit_shift;
 
