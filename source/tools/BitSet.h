@@ -447,6 +447,11 @@ namespace emp {
           );
         }
 
+        // mask out filler bits
+        if constexpr (static_cast<bool>(LAST_BIT)) {
+          bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+        }
+
       }
 
       return *this;
