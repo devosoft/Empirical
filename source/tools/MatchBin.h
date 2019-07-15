@@ -68,7 +68,6 @@ namespace emp {
     /// function and return a vector of unique IDs chosen by the selector
     /// function.
     emp::vector<uid_t> Match(const query_t & query, size_t n=1) {
-
       // compute distance between query and all stored tags
       std::unordered_map<tag_t, double> matches;
       for (const auto &[uid, tag] : tags) {
@@ -82,13 +81,14 @@ namespace emp {
       for (auto uid : uids) {
         scores[uid] = matches[tags[uid]] * regulators[uid] + regulators[uid];
       }
+      
       return selector(uids, scores, n);
     }
 
     /// Put an item and associated tag in the container. Returns the uid for
     /// that entry.
     uid_t Put(const Val & v, const tag_t & t) {
-
+      selector.ClearCache();
       const uid_t orig = uid_stepper;
       while(values.find(++uid_stepper) != values.end()) {
         // if container is full
@@ -106,6 +106,7 @@ namespace emp {
 
     /// Delete an item and its associated tag.
     void Delete(const uid_t uid) {
+      selector.ClearCache();
       values.erase(uid);
       regulators.erase(uid);
       tags.erase(uid);
@@ -114,6 +115,7 @@ namespace emp {
 
     /// Clear all items and tags.
     void Clear() {
+      selector.ClearCache();
       values.clear();
       regulators.clear();
       tags.clear();
@@ -125,9 +127,15 @@ namespace emp {
       return values.at(uid);
     }
 
-    /// Access a reference to a single stored tag by uid.
-    tag_t & GetTag(const uid_t uid) {
+    /// Access a const reference to a single stored tag by uid.
+    const tag_t & GetTag(const uid_t uid) {
       return tags.at(uid);
+    }
+
+    /// Change the tag at a given uid and clear the cache.
+    void SetTag(const uid_t uid, tag_t tag){
+      selector.ClearCache();
+      tags.at(uid) = tag;
     }
 
     /// Generate a vector of values corresponding to a vector of uids.
@@ -163,6 +171,7 @@ namespace emp {
     /// downregulate the item and negative amounts upregulate it.
     void AdjRegulator(uid_t uid, double amt) {
       regulators[uid] = std::max(0.0, regulators.at(uid) + amt);
+      selector.ClearCache();
     }
 
     /// Set an item's regulator value. Provided value must be greater than or
@@ -172,6 +181,7 @@ namespace emp {
     void SetRegulator(uid_t uid, double amt) {
       emp_assert(amt >= 0.0);
       regulators.at(uid) = amt;
+      selector.ClearCache();
     }
 
   };

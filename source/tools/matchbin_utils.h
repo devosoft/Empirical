@@ -169,14 +169,14 @@ namespace emp {
   };
 
   /// Abstract base class for selectors
+  template<typename CacheType>
   struct Selector {
-
     virtual ~Selector() {};
-    virtual emp::vector<size_t> operator()(
-      emp::vector<size_t>& uids,
-      std::unordered_map<size_t, double>& scores,
-      size_t n
+    void ClearCache() = 0;
+    virtual CacheType operator()(
     ) = 0;
+
+    
   };
 
   /// Returns matches within the threshold ThreshRatio sorted by match quality.
