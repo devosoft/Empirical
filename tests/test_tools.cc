@@ -203,6 +203,70 @@ TEST_CASE("Test BitMatrix", "[tools]")
 */
 }
 
+// For BitSet Import/Export
+template <size_t SOURCE_BITS, size_t DEST_BITS>
+struct ImportExportTester {
+
+  static void test() {
+
+    emp::Random rand(1);
+
+    // using default parameter
+    emp::BitSet<SOURCE_BITS> source(rand);
+    emp::BitSet<DEST_BITS> dest(rand);
+
+    dest.template Import(source);
+
+    for(size_t i = 0; i < std::min(source.GetSize(), dest.GetSize()); ++i) {
+      REQUIRE(source.Get(i) == dest.Get(i));
+    }
+    for(size_t i = source.GetSize(); i < dest.GetSize(); ++i) {
+      REQUIRE(dest.Get(i) == 0);
+    }
+
+    dest.Clear();
+    dest = source.template Export<dest.GetSize()>();
+
+    for(size_t i = 0; i < std::min(source.GetSize(), dest.GetSize()); ++i) {
+      REQUIRE(source.Get(i) == dest.Get(i));
+    }
+    for(size_t i = source.GetSize(); i < dest.GetSize(); ++i) {
+      REQUIRE(dest.Get(i) == 0);
+    }
+
+    // using all from_bit's
+    source.Randomize(rand);
+    dest.Randomize(rand);
+
+    for(size_t from_bit = 0; from_bit < source.GetSize(); ++from_bit) {
+      // std::cout << "---------" << std::endl;
+      // std::cout << source << std::endl;
+      dest.template Import(source, from_bit);
+      // std::cout << "=========" << std::endl;
+      // std::cout << from_bit << std::endl;
+      // std::cout << source << std::endl;
+      // std::cout << dest << std::endl;
+      for(size_t i = 0; i < std::min(source.GetSize() - from_bit, dest.GetSize()); ++i) {
+        REQUIRE(source.Get(i+from_bit) == dest.Get(i));
+      }
+      for(size_t i = source.GetSize() - from_bit; i < dest.GetSize(); ++i) {
+        REQUIRE(dest.Get(i) == 0);
+      }
+
+      dest.Clear();
+      dest = source.template Export<dest.GetSize()>(from_bit);
+
+      for(size_t i = 0; i < std::min(source.GetSize() - from_bit, dest.GetSize()); ++i) {
+        REQUIRE(source.Get(i+from_bit) == dest.Get(i));
+      }
+      for(size_t i = source.GetSize() - from_bit; i < dest.GetSize(); ++i) {
+        REQUIRE(dest.Get(i) == 0);
+      }
+
+    }
+  }
+};
+
 // for BitSet ROTATE_SELF
 // adapted from spraetor.github.io/2015/12/26/compile-time-loops.html
 template <size_t N>
@@ -525,7 +589,171 @@ TEST_CASE("Test BitSet", "[tools]")
   REQUIRE(bs_full.CountOnes() == 3);
   }
 
+  // test Import and Export
+  {
 
+    emp::Random rand(1);
+
+    emp::BitSet<32> orig(rand);
+
+    emp::array<emp::BitSet<32>, 1> d1;
+    emp::array<emp::BitSet<16>, 2> d2;
+    emp::array<emp::BitSet<8>, 4> d4;
+    emp::array<emp::BitSet<4>, 8> d8;
+    emp::array<emp::BitSet<2>, 16> d16;
+    emp::array<emp::BitSet<1>, 32> d32;
+
+    // Import
+
+    d1[0].Import(orig, 0);
+    for(size_t i = 0; i < 2; ++i) d2[i].Import(orig, i * 16);
+    for(size_t i = 0; i < 4; ++i) d4[i].Import(orig, i * 8);
+    for(size_t i = 0; i < 8; ++i) d8[i].Import(orig, i * 4);
+    for(size_t i = 0; i < 16; ++i) d16[i].Import(orig, i * 2);
+    for(size_t i = 0; i < 32; ++i) d32[i].Import(orig, i * 1);
+
+    for (size_t i = 0; i < 32; ++i) {
+      REQUIRE(orig[i] == d1[i/32][i%32]);
+      REQUIRE(orig[i] == d2[i/16][i%16]);
+      REQUIRE(orig[i] == d4[i/8][i%8]);
+      REQUIRE(orig[i] == d8[i/4][i%4]);
+      REQUIRE(orig[i] == d16[i/2][i%2]);
+      REQUIRE(orig[i] == d32[i/1][i%1]);
+    }
+
+    // Export
+
+    d1[0] = orig.Export<32>(0);
+    for(size_t i = 0; i < 2; ++i) d2[i] = orig.Export<16>(i * 16);
+    for(size_t i = 0; i < 4; ++i) d4[i] = orig.Export<8>(i * 8);
+    for(size_t i = 0; i < 8; ++i) d8[i] = orig.Export<4>(i * 4);
+    for(size_t i = 0; i < 16; ++i) d16[i] = orig.Export<2>(i * 2);
+    for(size_t i = 0; i < 32; ++i) d32[i] = orig.Export<1>(i * 1);
+
+    for (size_t i = 0; i < 32; ++i) {
+      REQUIRE(orig[i] == d1[i/32][i%32]);
+      REQUIRE(orig[i] == d2[i/16][i%16]);
+      REQUIRE(orig[i] == d4[i/8][i%8]);
+      REQUIRE(orig[i] == d8[i/4][i%4]);
+      REQUIRE(orig[i] == d16[i/2][i%2]);
+      REQUIRE(orig[i] == d32[i/1][i%1]);
+    }
+
+    // now test some funky imports and exports
+    // interesting container sizes:
+    // 1, 17, 29, 32, 33, 64, 65, 95, 128, 129
+
+    ImportExportTester<1,1>::test();
+    ImportExportTester<1,17>::test();
+    ImportExportTester<1,29>::test();
+    ImportExportTester<1,32>::test();
+    ImportExportTester<1,33>::test();
+    ImportExportTester<1,64>::test();
+    ImportExportTester<1,65>::test();
+    ImportExportTester<1,96>::test();
+    ImportExportTester<1,128>::test();
+    ImportExportTester<1,129>::test();
+
+    ImportExportTester<17,1>::test();
+    ImportExportTester<17,17>::test();
+    ImportExportTester<17,29>::test();
+    ImportExportTester<17,32>::test();
+    ImportExportTester<17,33>::test();
+    ImportExportTester<17,64>::test();
+    ImportExportTester<17,65>::test();
+    ImportExportTester<17,96>::test();
+    ImportExportTester<17,128>::test();
+    ImportExportTester<17,129>::test();
+
+    ImportExportTester<29,1>::test();
+    ImportExportTester<29,17>::test();
+    ImportExportTester<29,29>::test();
+    ImportExportTester<29,32>::test();
+    ImportExportTester<29,33>::test();
+    ImportExportTester<29,64>::test();
+    ImportExportTester<29,65>::test();
+    ImportExportTester<29,96>::test();
+    ImportExportTester<29,128>::test();
+    ImportExportTester<29,129>::test();
+
+    ImportExportTester<32,1>::test();
+    ImportExportTester<32,17>::test();
+    ImportExportTester<32,29>::test();
+    ImportExportTester<32,32>::test();
+    ImportExportTester<32,33>::test();
+    ImportExportTester<32,64>::test();
+    ImportExportTester<32,65>::test();
+    ImportExportTester<32,96>::test();
+    ImportExportTester<32,128>::test();
+    ImportExportTester<32,129>::test();
+
+    ImportExportTester<33,1>::test();
+    ImportExportTester<33,17>::test();
+    ImportExportTester<33,29>::test();
+    ImportExportTester<33,32>::test();
+    ImportExportTester<33,33>::test();
+    ImportExportTester<33,64>::test();
+    ImportExportTester<33,65>::test();
+    ImportExportTester<33,96>::test();
+    ImportExportTester<33,128>::test();
+    ImportExportTester<33,129>::test();
+
+    ImportExportTester<64,1>::test();
+    ImportExportTester<64,17>::test();
+    ImportExportTester<64,29>::test();
+    ImportExportTester<64,32>::test();
+    ImportExportTester<64,33>::test();
+    ImportExportTester<64,64>::test();
+    ImportExportTester<64,65>::test();
+    ImportExportTester<64,96>::test();
+    ImportExportTester<64,128>::test();
+    ImportExportTester<64,129>::test();
+
+    ImportExportTester<65,1>::test();
+    ImportExportTester<65,17>::test();
+    ImportExportTester<65,29>::test();
+    ImportExportTester<65,32>::test();
+    ImportExportTester<65,33>::test();
+    ImportExportTester<65,64>::test();
+    ImportExportTester<65,65>::test();
+    ImportExportTester<65,96>::test();
+    ImportExportTester<65,128>::test();
+    ImportExportTester<65,129>::test();
+
+    ImportExportTester<96,1>::test();
+    ImportExportTester<96,17>::test();
+    ImportExportTester<96,29>::test();
+    ImportExportTester<96,32>::test();
+    ImportExportTester<96,33>::test();
+    ImportExportTester<96,64>::test();
+    ImportExportTester<96,65>::test();
+    ImportExportTester<96,96>::test();
+    ImportExportTester<96,128>::test();
+    ImportExportTester<96,129>::test();
+
+    ImportExportTester<128,1>::test();
+    ImportExportTester<128,17>::test();
+    ImportExportTester<128,29>::test();
+    ImportExportTester<128,32>::test();
+    ImportExportTester<128,33>::test();
+    ImportExportTester<128,64>::test();
+    ImportExportTester<128,65>::test();
+    ImportExportTester<128,96>::test();
+    ImportExportTester<128,128>::test();
+    ImportExportTester<128,129>::test();
+
+    ImportExportTester<129,1>::test();
+    ImportExportTester<129,17>::test();
+    ImportExportTester<129,29>::test();
+    ImportExportTester<129,32>::test();
+    ImportExportTester<129,33>::test();
+    ImportExportTester<129,64>::test();
+    ImportExportTester<129,65>::test();
+    ImportExportTester<129,96>::test();
+    ImportExportTester<129,128>::test();
+    ImportExportTester<129,129>::test();
+
+  }
 
   emp::BitSet<10> bs10;
   emp::BitSet<25> bs25;

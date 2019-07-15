@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <initializer_list>
+#include <cstring>
 
 #include "../base/assert.h"
 #include "../base/vector.h"
@@ -52,6 +53,10 @@ namespace emp {
   ///  A fixed-sized (but arbitrarily large) array of bits, and optimizes operations on those bits
   ///  to be as fast as possible.
   template <size_t NUM_BITS> class BitSet {
+
+  // make all templated instantiations friends with each other
+  template<size_t FRIEND_BITS> friend class BitSet;
+
   private:
 
     ///< field size is 64 for native (except NUM_BITS == 32), 32 for emscripten
@@ -114,11 +119,15 @@ namespace emp {
 
     /// Helper: call SHIFT with positive number instead
     void ShiftLeft(const size_t shift_size) {
-      if (shift_size > NUM_BITS) {
+
+      const int field_shift = shift_size / FIELD_BITS;
+
+      // only clear and return if we are field_shift-ing
+      // for consistency with ShiftRight
+      if (field_shift && shift_size > NUM_BITS) {
         Clear();
         return;
       }
-      const int field_shift = shift_size / FIELD_BITS;
       const int bit_shift = shift_size % FIELD_BITS;
       const int bit_overflow = FIELD_BITS - bit_shift;
 
@@ -148,11 +157,16 @@ namespace emp {
     /// Helper for calling SHIFT with negative number
     void ShiftRight(const size_t shift_size) {
       if (!shift_size) return;
-      if (shift_size > NUM_BITS) {
+
+      const field_t field_shift = shift_size / FIELD_BITS;
+
+      // only clear and return if we are field_shif-ing
+      // we want to be able to always shift by up to a byte
+      // so that Import and Export work
+      if (field_shift && shift_size > NUM_BITS) {
         Clear();
         return;
       }
-      const field_t field_shift = shift_size / FIELD_BITS;
       const field_t bit_shift = shift_size % FIELD_BITS;
       const field_t bit_overflow = FIELD_BITS - bit_shift;
 
@@ -397,23 +411,55 @@ namespace emp {
     }
 
     /// Assign from a BitSet of a different size.
-    template <size_t NUM_BITS2>
-    BitSet & Import(const BitSet<NUM_BITS2> & in_set) {
-      static const size_t NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> FIELD_LOG2);
-      static const size_t MIN_FIELDS = (NUM_FIELDS < NUM_FIELDS2) ? NUM_FIELDS : NUM_FIELDS2;
-      for (size_t i = 0; i < MIN_FIELDS; i++) bit_set[i] = in_set.GetUInt(i);  // Copy avail fields
-      for (size_t i = MIN_FIELDS; i < NUM_FIELDS; i++) bit_set[i] = 0;         // Zero extra fields
+    template <size_t FROM_BITS>
+    BitSet & Import(
+      const BitSet<FROM_BITS> & from_set,
+      const size_t from_bit=0
+    ) {
+
+      if constexpr (FROM_BITS == NUM_BITS) emp_assert(&from_set != this);
+
+      emp_assert(from_bit < FROM_BITS);
+
+      if (FROM_BITS - from_bit < NUM_BITS) Clear();
+
+      const size_t DEST_BYTES = (NUM_BITS + 7)/8;
+      const size_t FROM_BYTES = (FROM_BITS + 7)/8 - from_bit/8;
+
+      const size_t COPY_BYTES = std::min(DEST_BYTES, FROM_BYTES);
+
+      std::memcpy(
+        bit_set,
+        reinterpret_cast<const uint8_t*>(from_set.bit_set) + from_bit/8,
+        COPY_BYTES
+      );
+
+      if (from_bit%8) {
+
+        this->ShiftRight(from_bit%8);
+
+        if (FROM_BYTES > COPY_BYTES) {
+          reinterpret_cast<uint8_t*>(bit_set)[COPY_BYTES-1] |= (
+            reinterpret_cast<const uint8_t*>(
+              from_set.bit_set
+            )[from_bit/8 + COPY_BYTES]
+            << (8 - from_bit%8)
+          );
+        }
+
+      }
+
       return *this;
+
     }
 
     /// Convert to a Bitset of a different size.
-    template <size_t NUM_BITS2>
-    BitSet<NUM_BITS2> Export() const {
-      static const size_t NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> FIELD_LOG2);
-      static const size_t MIN_FIELDS = (NUM_FIELDS < NUM_FIELDS2) ? NUM_FIELDS : NUM_FIELDS2;
-      BitSet<NUM_BITS2> out_bits;
-      for (size_t i = 0; i < MIN_FIELDS; i++) out_bits.SetUInt(i, bit_set[i]);  // Copy avail fields
-      for (size_t i = MIN_FIELDS; i < NUM_FIELDS; i++) out_bits.SetUInt(i, 0);  // Zero extra fields
+    template <size_t FROM_BITS>
+    BitSet<FROM_BITS> Export(size_t start_bit=0) const {
+
+      BitSet<FROM_BITS> out_bits;
+      out_bits.Import(*this, start_bit);
+
       return out_bits;
     }
 
