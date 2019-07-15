@@ -114,7 +114,7 @@ namespace emp {
     inline static size_t Byte2FieldPos(const size_t index) { return (index & 3) << 3; }
 
     inline void Copy(const field_t in_set[NUM_FIELDS]) {
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
+      std::memcpy(bit_set, in_set, sizeof(bit_set));
     }
 
     /// Helper: call SHIFT with positive number instead
@@ -686,7 +686,7 @@ namespace emp {
     BitProxy operator[](size_t index) { return BitProxy(*this, index); }
 
     /// Set all bits to zero.
-    void Clear() { for (auto & i : bit_set) i = (field_t)0U; }
+    void Clear() { std::memset(bit_set, 0, sizeof(bit_set)); }
 
     /// Set all bits to one.
     void SetAll() {
