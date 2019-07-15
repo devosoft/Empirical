@@ -26,6 +26,7 @@
 #include "../base/vector.h"
 #include "../tools/IndexMap.h"
 #include "../tools/BitSet.h"
+#include "../tools/matchbin_utils.h"
 
 namespace emp {
 
@@ -50,8 +51,11 @@ namespace emp {
     std::unordered_map<uid_t, Val> values;
     std::unordered_map<uid_t, double> regulators;
     std::unordered_map<uid_t, tag_t> tags;
+    std::unordered_map<query_t, typename Selector::cache_state_type_t> cache;
     emp::vector<uid_t> uids;
     uid_t uid_stepper;
+    static constexpr bool cacheEnabled = std::is_base_of<CacheStateBase, typename Selector::cache_state_type_t>::value;
+    bool cacheOn = cacheEnabled;
 
   public:
     Metric metric;
@@ -68,6 +72,15 @@ namespace emp {
     /// function and return a vector of unique IDs chosen by the selector
     /// function.
     emp::vector<uid_t> Match(const query_t & query, size_t n=1) {
+      if constexpr(cacheEnabled){
+        if (cacheOn){
+          if (cache.find(query) != cache.end()){
+            std::optional<emp::vector<uid_t>> res = cache[query].InterpretSelf(n);
+            if (res != std::nullopt){ return res.value(); }
+          }
+        }
+      }
+
       // compute distance between query and all stored tags
       std::unordered_map<tag_t, double> matches;
       for (const auto &[uid, tag] : tags) {
@@ -82,13 +95,22 @@ namespace emp {
         scores[uid] = matches[tags[uid]] * regulators[uid] + regulators[uid];
       }
       
-      return selector(uids, scores, n);
+      typename Selector::cache_state_type_t cacheResult = selector(uids, scores, n);
+      if constexpr(cacheEnabled){
+        if (cacheOn){
+          cache[query] = cacheResult;
+        }
+        return cacheResult.InterpretSelf(n).value();
+      }
+      else{
+        return cacheResult;
+      }
     }
 
     /// Put an item and associated tag in the container. Returns the uid for
     /// that entry.
     uid_t Put(const Val & v, const tag_t & t) {
-      selector.ClearCache();
+      ClearCache();
       const uid_t orig = uid_stepper;
       while(values.find(++uid_stepper) != values.end()) {
         // if container is full
@@ -106,7 +128,7 @@ namespace emp {
 
     /// Delete an item and its associated tag.
     void Delete(const uid_t uid) {
-      selector.ClearCache();
+      ClearCache();
       values.erase(uid);
       regulators.erase(uid);
       tags.erase(uid);
@@ -115,11 +137,23 @@ namespace emp {
 
     /// Clear all items and tags.
     void Clear() {
-      selector.ClearCache();
+      ClearCache();
       values.clear();
       regulators.clear();
       tags.clear();
       uids.clear();
+    }
+
+    void ClearCache() {
+      if constexpr(cacheEnabled){
+        cache.clear();
+      }
+    }
+
+    void SetCacheOn(const bool state = true){
+      emp_assert(cacheEnabled);
+      cacheOn = state;
+      ClearCache();
     }
 
     /// Access a reference single stored value by uid.
@@ -171,7 +205,7 @@ namespace emp {
     /// downregulate the item and negative amounts upregulate it.
     void AdjRegulator(uid_t uid, double amt) {
       regulators[uid] = std::max(0.0, regulators.at(uid) + amt);
-      selector.ClearCache();
+      ClearCache();
     }
 
     /// Set an item's regulator value. Provided value must be greater than or
@@ -181,7 +215,7 @@ namespace emp {
     void SetRegulator(uid_t uid, double amt) {
       emp_assert(amt >= 0.0);
       regulators.at(uid) = amt;
-      selector.ClearCache();
+      ClearCache();
     }
 
   };
