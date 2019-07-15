@@ -729,10 +729,10 @@ namespace emp {
 
     /// Count 1's in semi-parallel; fastest for even 0's & 1's
     size_t CountOnes_Mixed() const {
-      const uint32_t *uint_bit_set = (const uint32_t*) bit_set;
+      const uint32_t* cast_set = reinterpret_cast<const uint32_t*>(bit_set);
       size_t bit_count = 0;
-      for (size_t i = 0; i < NUM_FIELDS * sizeof(field_t)/4; ++i) {
-        const uint32_t v = uint_bit_set[i];
+      for (size_t i = 0; i < sizeof(bit_set) / 4; ++i) {
+        const uint32_t v = cast_set[i];
         const uint32_t t1 = v - ((v >> 1) & 0x55555555);
         const uint32_t t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
         bit_count += (((t2 + (t2 >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
