@@ -51,9 +51,11 @@ namespace emp {
     std::unordered_map<uid_t, Val> values;
     std::unordered_map<uid_t, double> regulators;
     std::unordered_map<uid_t, tag_t> tags;
-    std::unordered_map<query_t, typename Selector::cache_state_type_t> cache;
     emp::vector<uid_t> uids;
     uid_t uid_stepper;
+
+  protected:
+    std::unordered_map<query_t, typename Selector::cache_state_type_t> cache;
     static constexpr bool cacheEnabled = std::is_base_of<CacheStateBase, typename Selector::cache_state_type_t>::value;
     bool cacheOn = cacheEnabled;
 
@@ -168,7 +170,7 @@ namespace emp {
 
     /// Change the tag at a given uid and clear the cache.
     void SetTag(const uid_t uid, tag_t tag){
-      selector.ClearCache();
+      ClearCache();
       tags.at(uid) = tag;
     }
 

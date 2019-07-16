@@ -3241,7 +3241,84 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(metric(bs_11, bs_15) == 4.0/norm);
   REQUIRE(metric(bs_15, bs_11) == 16.0/norm);
   }
+  {
+  // Cache Testing
+  struct DummySelector: public emp::RankedSelector<std::ratio<2,1>>{
+    size_t opCount = 0;
 
+    emp::RankedCacheState operator()(
+      emp::vector<size_t>& uids,
+      std::unordered_map<size_t, double>& scores,
+      size_t n
+    ){
+      opCount+=1;
+      return emp::RankedSelector<std::ratio<2,1>>::operator()(uids, scores, n);
+    }
+  };
+  
+  class MatchBinTest : public emp::MatchBin<emp::BitSet<32>, emp::HammingMetric<32>, DummySelector>{
+  public:
+    size_t GetCacheSize(){ return cache.size(); }
+    size_t GetSelectCount(){ return selector.opCount; } 
+  };
+
+
+  MatchBinTest bin;
+  emp::Random rand(1);
+  std::vector<size_t> ids;
+
+  for(unsigned int i = 0; i < 1000; ++i){
+    emp::BitSet<32> bs;
+    bs.SetUInt32(0, i);
+    ids.push_back(bin.Put(bs,bs));
+  }
+  
+  REQUIRE( bin.GetCacheSize() == 0);
+  REQUIRE( bin.GetSelectCount() == 0);
+  emp::vector<size_t> uncached = bin.Match(emp::BitSet<32>(), 10);// first match caches
+  emp::vector<size_t> cached = bin.Match(emp::BitSet<32>(), 10);// second already cached
+  REQUIRE( bin.GetCacheSize() == 1);
+  REQUIRE( bin.GetSelectCount() == 1);
+  REQUIRE( cached == uncached );
+  bin.SetCacheOn(false);
+  REQUIRE(bin.GetCacheSize() == 0 );
+  bin.Match(emp::BitSet<32>(),10);//second cache
+  bin.Match(emp::BitSet<32>(),10);//third cache
+  REQUIRE(bin.GetCacheSize() == 0 );
+  REQUIRE(bin.GetSelectCount() == 3);
+
+  bin.SetCacheOn();
+  REQUIRE(bin.GetCacheSize() == 0 );
+  
+  
+  for(unsigned int i = 0; i < 1000; ++i){
+    emp::BitSet<32> bs;
+    bs.SetUInt32(0, i);
+    
+    uncached = bin.Match(bs, 3);
+    REQUIRE(bin.GetCacheSize() == i + 1);
+    REQUIRE(bin.GetSelectCount() == 3 + i + 1);
+      
+    cached = bin.Match(bs, 3);
+    REQUIRE(bin.GetCacheSize() == i + 1); //shouldnt change
+    REQUIRE(bin.GetSelectCount() == 3 + i + 1); //shouldnt change
+
+    REQUIRE(cached == uncached);
+  }
+
+  emp::BitSet<32> bs;
+  bs.SetUInt32(0,1001);
+  bin.SetTag(ids[0], bs);
+  REQUIRE(bin.GetCacheSize() == 0);
+
+  bin.Match(emp::BitSet<32>(), 3);
+  REQUIRE(bin.GetCacheSize() == 1);
+  REQUIRE(bin.GetSelectCount() == 1000 + 3 + 1);
+
+  bin.Match(emp::BitSet<32>(), 4); //Asking for more than last time so we recache.
+  REQUIRE(bin.GetCacheSize() == 1); //replace the current one so same size.
+  REQUIRE(bin.GetSelectCount() == 1000 + 3 + 2);
+  }
 }
 
 
