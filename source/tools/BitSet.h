@@ -654,7 +654,7 @@ namespace emp {
     template <size_t OUT_BITS>
     uint32_t GetValueAtBit(size_t index) {
       static_assert(OUT_BITS <= 32, "Requesting too many bits to fit in a UInt");
-      return GetUIntAtBit(index) & MaskLow<uint64_t>(OUT_BITS);
+      return GetUIntAtBit(index) & MaskLow<uint32_t>(OUT_BITS);
     }
 
     /// Get the unsigned numeric value represented by the BitSet as a double
