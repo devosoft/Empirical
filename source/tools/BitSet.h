@@ -114,20 +114,18 @@ namespace emp {
     inline static size_t Byte2FieldPos(const size_t index) { return (index & 3) << 3; }
 
     inline void Copy(const field_t in_set[NUM_FIELDS]) {
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
+      std::memcpy(bit_set, in_set, sizeof(bit_set));
     }
 
     /// Helper: call SHIFT with positive number instead
     void ShiftLeft(const size_t shift_size) {
 
-      const int field_shift = shift_size / FIELD_BITS;
-
-      // only clear and return if we are field_shift-ing
-      // for consistency with ShiftRight
-      if (field_shift && shift_size > NUM_BITS) {
+      if (shift_size > NUM_BITS) {
         Clear();
         return;
       }
+
+      const int field_shift = shift_size / FIELD_BITS;
       const int bit_shift = shift_size % FIELD_BITS;
       const int bit_overflow = FIELD_BITS - bit_shift;
 
@@ -686,12 +684,12 @@ namespace emp {
     BitProxy operator[](size_t index) { return BitProxy(*this, index); }
 
     /// Set all bits to zero.
-    void Clear() { for (auto & i : bit_set) i = (field_t)0U; }
+    void Clear() { std::memset(bit_set, 0, sizeof(bit_set)); }
 
     /// Set all bits to one.
     void SetAll() {
-      for (auto & i : bit_set) i = ~((field_t)0U);
-      if (LAST_BIT) {
+      std::memset(bit_set, 255, sizeof(bit_set));;
+      if constexpr (static_cast<bool>(LAST_BIT)) {
         bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       }
     }
@@ -731,10 +729,10 @@ namespace emp {
 
     /// Count 1's in semi-parallel; fastest for even 0's & 1's
     size_t CountOnes_Mixed() const {
-      const uint32_t *uint_bit_set = (const uint32_t*) bit_set;
+      const uint32_t* cast_set = reinterpret_cast<const uint32_t*>(bit_set);
       size_t bit_count = 0;
-      for (size_t i = 0; i < NUM_FIELDS * sizeof(field_t)/4; ++i) {
-        const uint32_t v = uint_bit_set[i];
+      for (size_t i = 0; i < sizeof(bit_set) / 4; ++i) {
+        const uint32_t v = cast_set[i];
         const uint32_t t1 = v - ((v >> 1) & 0x55555555);
         const uint32_t t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
         bit_count += (((t2 + (t2 >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
