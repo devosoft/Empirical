@@ -19,6 +19,7 @@
 #include <iostream>
 #include <initializer_list>
 #include <cstring>
+#include <bitset>
 
 #include "../base/assert.h"
 #include "../base/vector.h"
@@ -729,14 +730,51 @@ namespace emp {
 
     /// Count 1's in semi-parallel; fastest for even 0's & 1's
     size_t CountOnes_Mixed() const {
-      const uint32_t* cast_set = reinterpret_cast<const uint32_t*>(bit_set);
+
       size_t bit_count = 0;
-      for (size_t i = 0; i < sizeof(bit_set) / 4; ++i) {
-        const uint32_t v = cast_set[i];
-        const uint32_t t1 = v - ((v >> 1) & 0x55555555);
-        const uint32_t t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
-        bit_count += (((t2 + (t2 >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
+      for (size_t f = 0; f < NUM_FIELDS; ++f) {
+
+        if constexpr (FIELD_BITS == 64) {
+#ifdef __GNUC__
+          bit_count += __builtin_popcountll(bit_set[f]);
+#elif defined __clang__
+          std::bitset<FIELD_BITS> std_bs(bit_set[f]);
+          bit_count += std_bs.count();
+#else
+          // adapted from https://en.wikipedia.org/wiki/Hamming_weight
+          uint64_t x = bit_set[f];
+          // put count of each 2 bits into those 2 bits
+          x -= (x >> 1) & 0x5555555555555555;
+          // put count of each 4 bits into those 4 bits
+          x = (x & 0x3333333333333333) + ((x >> 2) & 0x3333333333333333);
+          //put count of each 8 bits into those 8 bits
+          x = (x + (x >> 4)) & 0x0f0f0f0f0f0f0f0f;
+          // returns left 8 bits of x + (x<<8) + (x<<16) + (x<<24) + ...
+          bit_count += (x * 0x0101010101010101) >> 56;
+#endif
+
+        } else if constexpr (FIELD_BITS == 32) {
+//#ifdef __GNUC__
+          // __builtin_popcount() is somehow slower, so don't use it
+          //bit_count += __builtin_popcount(bit_set[f]);
+#ifdef __clang__
+          std::bitset<FIELD_BITS> std_bs(bit_set[f]);
+          bit_count += std_bs.count();
+#else
+          /// adapted from http://graphics.stanford.edu/~seander/bithacks.html
+          const uint32_t v = bit_set[f];
+          const uint32_t t1 = v - ((v >> 1) & 0x55555555);
+          const uint32_t t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
+          bit_count += (((t2 + (t2 >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
+#endif
+
+        } else {
+          // fall back to using std::bitset count
+          std::bitset<FIELD_BITS> std_bs(bit_set[f]);
+          bit_count += std_bs.count();
+        }
       }
+
       return bit_count;
     }
 
