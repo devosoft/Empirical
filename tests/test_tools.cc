@@ -3255,11 +3255,11 @@ TEST_CASE("Test MatchBin", "[tools]")
       return emp::RankedSelector<std::ratio<2,1>>::operator()(uids, scores, n);
     }
   };
-  
+
   class MatchBinTest : public emp::MatchBin<emp::BitSet<32>, emp::HammingMetric<32>, DummySelector>{
   public:
     size_t GetCacheSize(){ return cache.size(); }
-    size_t GetSelectCount(){ return selector.opCount; } 
+    size_t GetSelectCount(){ return selector.opCount; }
   };
 
 
@@ -3272,7 +3272,7 @@ TEST_CASE("Test MatchBin", "[tools]")
     bs.SetUInt32(0, i);
     ids.push_back(bin.Put(bs,bs));
   }
-  
+
   REQUIRE( bin.GetCacheSize() == 0);
   REQUIRE( bin.GetSelectCount() == 0);
   emp::vector<size_t> uncached = bin.Match(emp::BitSet<32>(), 10);// first match caches
@@ -3289,16 +3289,16 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   bin.SetCacheOn();
   REQUIRE(bin.GetCacheSize() == 0 );
-  
-  
+
+
   for(unsigned int i = 0; i < 1000; ++i){
     emp::BitSet<32> bs;
     bs.SetUInt32(0, i);
-    
+
     uncached = bin.Match(bs, 3);
     REQUIRE(bin.GetCacheSize() == i + 1);
     REQUIRE(bin.GetSelectCount() == 3 + i + 1);
-      
+
     cached = bin.Match(bs, 3);
     REQUIRE(bin.GetCacheSize() == i + 1); //shouldnt change
     REQUIRE(bin.GetSelectCount() == 3 + i + 1); //shouldnt change
