@@ -14,6 +14,7 @@
 #include <ctime>
 #include <climits>
 #include <cmath>
+#include <cstring>
 #include <iterator>
 
 #include "../base/assert.h"
@@ -211,6 +212,56 @@ namespace emp {
       return ( static_cast<uint64_t>(GetUInt()) << 32)
              + static_cast<uint64_t>(GetUInt());
     }
+
+    /**
+     * Generate a random 64-bit block of bits.
+     * Use a fast, non-backwards compatible approach.
+     *
+     * @return The pseudo random number.
+     **/
+    inline uint64_t GetUInt64Fast() {
+      uint64_t res;
+      RandFill<sizeof(res)>(reinterpret_cast<unsigned char*>(&res));
+      return res;
+    }
+
+    /**
+     * Randomize a contiguous segment of memory.
+     **/
+    inline void RandFill(unsigned char* dest, const size_t num_bytes) {
+
+      for (size_t byte = 0; byte + 3 < num_bytes; byte += 3) {
+        // only the first 3 bytes are randomized
+        uint32_t rnd = (GetDouble() * 16777216.0);
+        std::memcpy(dest+byte, &rnd, 3);
+      }
+
+      if (num_bytes%3) {
+        uint32_t rnd = (GetDouble() * 16777216.0);
+        std::memcpy(dest+num_bytes-num_bytes%3, &rnd, num_bytes%3);
+      }
+
+    }
+
+    /**
+     * Randomize a contiguous segment of memory.
+     **/
+    template<size_t num_bytes>
+    inline void RandFill(unsigned char* dest) {
+
+      for (size_t byte = 0; byte + 3 < num_bytes; byte += 3) {
+        // only the first 3 bytes are randomized
+        uint32_t rnd = (GetDouble() * 16777216.0);
+        std::memcpy(dest+byte, &rnd, 3);
+      }
+
+      if constexpr (static_cast<bool>(num_bytes % 3)) {
+        uint32_t rnd = (GetDouble() * 16777216.0);
+        std::memcpy(dest+num_bytes-num_bytes%3, &rnd, num_bytes%3);
+      }
+
+    }
+
 
     /**
      * Generate an uint64_t.

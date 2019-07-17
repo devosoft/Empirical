@@ -914,18 +914,6 @@ TEST_CASE("Test BitSet", "[tools]")
 
   }
 
-  // CI + 0 evaluates to false
-  // if CI is defined but has no value
-  // or if CI is not defined
-#if (CI + 0)
-  // turn these tests off for Travis because they seem to
-  // overwhelm available resources
-  // here's the warning that Travis gives us
-  /*
-  In function ‘void ____C_A_T_C_H____T_E_S_T____493()’:
-  cc1plus: warning: ‘void* __builtin_memmove(void*, const void*, long unsigned int)’ specified size 18446744073709551608 exceeds maximum object size 9223372036854775807 [-Wstringop-overflow=]
-  */
-#else
   // tests for ROTATE_SELF, ROTR_SELF, ROTL_SELF
   MultiTester<2>::test<1>();
   MultiTester<18>::test<17>();
@@ -935,7 +923,6 @@ TEST_CASE("Test BitSet", "[tools]")
   MultiTester<96>::test<93>();
   MultiTester<161>::test<160>();
   MultiTester<2050>::test<2048>();
-#endif
 
 }
 
@@ -2361,18 +2348,6 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   }
 
-  // CI + 0 evaluates to false
-  // if CI is defined but has no value
-  // or if CI is not defined
-#if (CI + 0)
-  // turn these tests off for Travis because they seem to
-  // overwhelm available resources
-  // here's the warning that Travis gives us
-  /*
-  In function ‘void ____C_A_T_C_H____T_E_S_T____561()’:
-  cc1plus: warning: ‘void* __builtin_memmove(void*, const void*, long unsigned int)’ specified size 18446744073709551608 exceeds maximum object size 9223372036854775807 [-Wstringop-overflow=]
-  */
-#else
   {
   emp::MatchBin<
     std::string,
@@ -2428,7 +2403,6 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(bitBin.GetTags(bitBin.Match(bs2, 5)) == (emp::vector<emp::BitSet<8>> {bs15, bs1}));
 
   }
-#endif
 
   // test SlideMod
   {
@@ -3255,11 +3229,11 @@ TEST_CASE("Test MatchBin", "[tools]")
       return emp::RankedSelector<std::ratio<2,1>>::operator()(uids, scores, n);
     }
   };
-  
+
   class MatchBinTest : public emp::MatchBin<emp::BitSet<32>, emp::HammingMetric<32>, DummySelector>{
   public:
     size_t GetCacheSize(){ return cache.size(); }
-    size_t GetSelectCount(){ return selector.opCount; } 
+    size_t GetSelectCount(){ return selector.opCount; }
   };
 
 
@@ -3272,7 +3246,7 @@ TEST_CASE("Test MatchBin", "[tools]")
     bs.SetUInt32(0, i);
     ids.push_back(bin.Put(bs,bs));
   }
-  
+
   REQUIRE( bin.GetCacheSize() == 0);
   REQUIRE( bin.GetSelectCount() == 0);
   emp::vector<size_t> uncached = bin.Match(emp::BitSet<32>(), 10);// first match caches
@@ -3289,16 +3263,16 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   bin.SetCacheOn();
   REQUIRE(bin.GetCacheSize() == 0 );
-  
-  
+
+
   for(unsigned int i = 0; i < 1000; ++i){
     emp::BitSet<32> bs;
     bs.SetUInt32(0, i);
-    
+
     uncached = bin.Match(bs, 3);
     REQUIRE(bin.GetCacheSize() == i + 1);
     REQUIRE(bin.GetSelectCount() == 3 + i + 1);
-      
+
     cached = bin.Match(bs, 3);
     REQUIRE(bin.GetCacheSize() == i + 1); //shouldnt change
     REQUIRE(bin.GetSelectCount() == 3 + i + 1); //shouldnt change
@@ -3696,7 +3670,7 @@ TEST_CASE("Test random", "[tools]")
   emp::vector<int> val_counts(10);
   for (size_t i = 0; i < val_counts.size(); i++) val_counts[i] = 0;
 
-  const size_t num_tests = 100000;
+  const size_t num_tests = 150000;
   const double min_value = 2.5;
   const double max_value = 8.7;
   double total = 0.0;
@@ -3761,28 +3735,102 @@ TEST_CASE("Test random", "[tools]")
     [](uint32_t accumulator, uint32_t val){ return accumulator | (~val); })
   );
   }
+
+  // Test RandFill()
+  uint32_t randfill_draws[num_tests];
+  rng.RandFill(
+    reinterpret_cast<unsigned char*>(randfill_draws),
+    sizeof(randfill_draws)
+  );
+
+  total = 0.0;
+  for (size_t i = 0; i < num_tests; i++) {
+    total += randfill_draws[i];
+  }
+
+  {
+  const double expected_mean = ((double)std::numeric_limits<uint32_t>::max())/2.0;
+  const double min_threshold = (expected_mean*0.995);
+  const double max_threshold = (expected_mean*1.005);
+  double mean_value = total/(double) num_tests;
+
+  REQUIRE(mean_value > min_threshold);
+  REQUIRE(mean_value < max_threshold);
+  // ensure that all bits are set at least once and unset at least once
+  REQUIRE(std::numeric_limits<uint32_t>::max() == std::accumulate(
+    std::begin(randfill_draws),
+    std::end(randfill_draws),
+    (uint32_t)0,
+    [](uint32_t accumulator, uint32_t val){ return accumulator | val; }
+  ));
+  REQUIRE(std::numeric_limits<uint32_t>::max() == std::accumulate(
+    std::begin(randfill_draws),
+    std::end(randfill_draws),
+    (uint32_t)0,
+    [](uint32_t accumulator, uint32_t val){ return accumulator | (~val); }
+  ));
+  }
+
   // Test GetUInt64
   emp::vector<uint64_t> uint64_draws;
   total = 0.0;
+  double total2 = 0.0;
   for (size_t i = 0; i < num_tests; i++) {
     const uint64_t cur_value = rng.GetUInt64();
-    total += cur_value/(double)num_tests;
+    total += static_cast<uint32_t>(cur_value);
+    total2 += cur_value >> 32;
     uint64_draws.push_back(cur_value);
   }
 
   {
-  const double expected_mean = ((double)std::numeric_limits<uint64_t>::max())/2.0;
+  const double expected_mean = ((double)std::numeric_limits<uint32_t>::max())/2.0;
   const double min_threshold = (expected_mean*0.995);
   const double max_threshold = (expected_mean*1.005);
-  double mean_value = total; // values were divided by num_tests when added
+  double mean_value = total/(double)num_tests; // values were divided by num_tests when added
 
   REQUIRE(mean_value > min_threshold);
   REQUIRE(mean_value < max_threshold);
+  double mean_value2 = total2/(double)num_tests; // values were divided by num_tests when added
+
+  REQUIRE(mean_value2 > min_threshold);
+  REQUIRE(mean_value2 < max_threshold);
   // ensure that all bits are set at least once and unset at least once
   REQUIRE(std::numeric_limits<uint64_t>::max() == std::accumulate(uint64_draws.begin(),uint64_draws.end(),(uint64_t)0,
     [](uint64_t accumulator, uint64_t val){ return accumulator | val; })
   );
   REQUIRE(std::numeric_limits<uint64_t>::max() == std::accumulate(uint64_draws.begin(),uint64_draws.end(),(uint64_t)0,
+    [](uint64_t accumulator, uint64_t val){ return accumulator | (~val); })
+  );
+  }
+
+  // Test GetUInt64Fast
+  emp::vector<uint64_t> uint64fast_draws;
+  total = 0.0;
+  total2 = 0.0;
+  for (size_t i = 0; i < num_tests; i++) {
+    const uint64_t cur_value = rng.GetUInt64Fast();
+    total += static_cast<uint32_t>(cur_value);
+    total2 += cur_value >> 32;
+    uint64fast_draws.push_back(cur_value);
+  }
+
+  {
+  const double expected_mean = ((double)std::numeric_limits<uint32_t>::max())/2.0;
+  const double min_threshold = (expected_mean*0.995);
+  const double max_threshold = (expected_mean*1.005);
+  double mean_value = total / (double)num_tests;
+
+  REQUIRE(mean_value > min_threshold);
+  REQUIRE(mean_value < max_threshold);
+  double mean_value2 = total2 / (double)num_tests;
+
+  REQUIRE(mean_value2 > min_threshold);
+  REQUIRE(mean_value2 < max_threshold);
+  // ensure that all bits are set at least once and unset at least once
+  REQUIRE(std::numeric_limits<uint64_t>::max() == std::accumulate(uint64fast_draws.begin(),uint64fast_draws.end(),(uint64_t)0,
+    [](uint64_t accumulator, uint64_t val){ return accumulator | val; })
+  );
+  REQUIRE(std::numeric_limits<uint64_t>::max() == std::accumulate(uint64fast_draws.begin(),uint64fast_draws.end(),(uint64_t)0,
     [](uint64_t accumulator, uint64_t val){ return accumulator | (~val); })
   );
   }
