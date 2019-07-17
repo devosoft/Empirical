@@ -39,8 +39,10 @@ namespace emp {
 
     virtual ~BaseMetric() {};
     virtual double operator()(const Query& a, const Tag& b) const = 0;
+    virtual size_t dim() const = 0;
     virtual size_t width() const = 0;
     virtual std::string name() const = 0;
+    virtual std::string base() const = 0;
 
   };
 
@@ -52,11 +54,15 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
     using tag_t = emp::BitSet<Width>;
 
+    size_t dim() const override { return 1; }
+
     size_t width() const override { return Width; }
 
     std::string name() const override {
-      return emp::to_string(Width) + "-bit Hamming Metric";
+      return emp::to_string(Width) + "-bit " + base();
     }
+
+    std::string base() const override { return "Hamming Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
       return (double)(a^b).CountOnes() / Width;
@@ -69,11 +75,15 @@ namespace emp {
     using query_t = int;
     using tag_t = int;
 
+    size_t dim() const override { return 1; }
+
     size_t width() const override { return sizeof(int) * 8; }
 
     std::string name() const override {
       return "Absolute Integer Difference Metric";
     }
+
+    std::string base() const override { return name(); }
 
     double operator()(const query_t& a, const tag_t& b) const override {
 
@@ -90,9 +100,13 @@ namespace emp {
     using query_t = size_t;
     using tag_t = size_t;
 
+    size_t dim() const override { return 1; }
+
     size_t width() const override { return sizeof(size_t) * 8; }
 
     std::string name() const override { return "Next Up Metric"; }
+
+    std::string base() const override { return name(); }
 
     double operator()(const query_t& a, const tag_t& b) const override {
       const size_t difference = ((Max + 1) + b - a) % (Max + 1);
@@ -108,11 +122,15 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
     using tag_t = emp::BitSet<Width>;
 
+    size_t dim() const override { return 1; }
+
     size_t width() const override { return Width; }
 
     std::string name() const override {
-      return emp::to_string(Width) + "-bit Asymmetric Wrap Metric";
+      return emp::to_string(Width) + "-bit " + base();
     }
+
+    std::string base() const override { return "Asymmetric Wrap Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
       return (b - a).GetDouble() / emp::BitSet<Width>::MaxDouble();
@@ -127,11 +145,15 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
     using tag_t = emp::BitSet<Width>;
 
+    size_t dim() const override { return 1; }
+
     size_t width() const override { return Width; }
 
     std::string name() const override {
-      return emp::to_string(Width) + "-bit Asymmetric No-Wrap Metric";
+      return emp::to_string(Width) + "-bit " + base();
     }
+
+    std::string base() const override { return "Asymmetric No-Wrap Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
       constexpr double max_dist = emp::BitSet<Width>::MaxDouble() + 1.0;
@@ -150,11 +172,15 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
     using tag_t = emp::BitSet<Width>;
 
+    size_t dim() const override { return 1; }
+
     size_t width() const override { return Width; }
 
     std::string name() const override {
-      return emp::to_string(Width) + "-bit Symmetric Wrap Metric";
+      return emp::to_string(Width) + "-bit " + base();
     }
+
+    std::string base() const override { return "Symmetric Wrap Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
       constexpr double max_dist = (
@@ -174,11 +200,15 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
     using tag_t = emp::BitSet<Width>;
 
+    size_t dim() const override { return 1; }
+
     size_t width() const override { return Width; }
 
     std::string name() const override {
-      return emp::to_string(Width) + "-bit Symmetric No-Wrap Metric";
+      return emp::to_string(Width) + "-bit " + base();
     }
+
+    std::string base() const override { return "Symmetric No-Wrap Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
       return (
@@ -196,11 +226,15 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
     using tag_t = emp::BitSet<Width>;
 
+    size_t dim() const override { return 1; }
+
     size_t width() const override { return Width; }
 
     std::string name() const override {
-      return emp::to_string(Width) + "-bit Streak Metric";
+      return emp::to_string(Width) + "-bit " + base();
     }
+
+    std::string base() const override { return "Streak Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
       const emp::BitSet<Width> bs = a^b;
@@ -284,6 +318,8 @@ namespace emp {
       return emp::to_string(Dim) + "-Dimensional Mean " + metric.name();
     }
 
+    std::string base() const override { return metric.base(); }
+
     double operator()(const query_t& a, const tag_t& b) const override {
 
       double res = 0.0;
@@ -314,6 +350,8 @@ namespace emp {
     std::string name() const override {
       return emp::to_string(Dim) + "-Dimensional Minimum " + metric.name();
     }
+
+    std::string base() const override { return metric.base(); }
 
     double operator()(const query_t& a, const tag_t& b) const override {
 
@@ -355,6 +393,8 @@ namespace emp {
     size_t dim() const { return metric.dim(); }
 
     std::string name() const override { return metric.name(); }
+
+    std::string base() const override { return metric.base(); }
 
     double operator()(const query_t& a, const tag_t& b) const override {
 
