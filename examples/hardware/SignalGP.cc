@@ -22,7 +22,7 @@ constexpr size_t HW_MAX_CALL_DEPTH = 128;   // Maximum number of calls that can 
 constexpr double HW_MIN_SIM_THRESH = 0.0;   // Minimum similarity threshold required for a referring tag to match with a referrent. 
 
 // A few useful aliases: 
-using hardware_t = emp::EventDrivenGP_AW<16>;  // SignalGP hardware with 16-bit tags.
+using hardware_t = emp::EventDrivenGP_AW<16, emp::vector<double>>;  // SignalGP hardware with 16-bit tags.
                                                //   - Note that the SignalGP (emp::EventDrivenGP_AW) class 
                                                //     is templated off of tag size (see hardware aliases above). 
 using inst_lib_t = emp::InstLib<hardware_t>;   // Instruction library 
@@ -39,6 +39,7 @@ void Inst_RollD20(hardware_t & hw, const inst_t & inst) {
   const size_t roll_val = hw.GetRandom().GetUInt(1, 21); // Generate a random number between (inclusive) 1 and 20. 
   state.SetLocal(inst.args[0], roll_val); // Set local working memory to value of die roll. 
 }
+
 
 int main() {
   // This example code is for the EventDrivenGP class. However, in the next iteration of EventDrivenGP, we will 
@@ -78,12 +79,28 @@ int main() {
   hw16_2.SetMinBindThresh(HW_MIN_SIM_THRESH);
   hw16_2.SetMaxCores(HW_MAX_THREADS);
   hw16_2.SetMaxCallDepth(HW_MAX_CALL_DEPTH);  
-  
+
+  // Create a way for the hardware to print our traits.
+  auto trait_printer = [](std::ostream& os, emp::vector<double> traits){
+      os << "[";
+      if (traits.size()){
+        for (unsigned int i = 0; i < traits.size() - 1; ++i){
+          os << traits.at(i) << ", ";
+        } os << traits[traits.size()-1];
+      }
+      os << "]";
+    };
+  hw16_1.SetTraitPrinter(trait_printer);
+  hw16_2.SetTraitPrinter(trait_printer);
+
+
   // - We'll setup a hardware trait that will help us identify which hardware is which. 
   const size_t TRAIT_IDX__ID = 0;
-  hw16_1.SetTrait(TRAIT_IDX__ID, 1);
-  hw16_2.SetTrait(TRAIT_IDX__ID, 2);
+
+  hw16_1.GetTrait().push_back(1);
+  hw16_2.GetTrait().push_back(2);
   
+  hw16_1.GetTrait().push_back(4);
   // -------------------------------------
   // --- Setting up an instruction set ---
   // Here's a list of all of the instructions with default implementations in the SignalGP class:
@@ -153,7 +170,7 @@ int main() {
   // Wait, wait! We're not done with the Msg event. So far, we've specified its name and a handler. 
   // We still need to specify what happens when a hardware triggers the event.
   event_lib.RegisterDispatchFun("Msg", [&hw16_1, &hw16_2](hardware_t & hw, const event_t & event){
-    const size_t senderID = (size_t)hw.GetTrait(TRAIT_IDX__ID); // Who is sending/triggering (dispatching) this message?
+    const size_t senderID = (size_t)hw.GetTrait()[TRAIT_IDX__ID]; // Who is sending/triggering (dispatching) this message?
     if (senderID == 1) { hw16_2.QueueEvent(event); } 
     else { hw16_1.QueueEvent(event); }
   });
