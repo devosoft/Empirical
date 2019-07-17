@@ -375,7 +375,7 @@ namespace emp {
 
   struct CacheStateBase{
     CacheStateBase() = default;
-    virtual std::optional<emp::vector<size_t>> InterpretSelf(size_t n) = 0;
+    virtual std::optional<emp::vector<size_t>> operator()(size_t n) = 0;
   };
 
   struct RouletteCacheState : public CacheStateBase{
@@ -385,7 +385,7 @@ namespace emp {
       , uids(ids)
       , rand(r){}
     
-    std::optional<emp::vector<size_t>> InterpretSelf(size_t n){
+    std::optional<emp::vector<size_t>> operator()(size_t n){
       emp::vector<size_t> res;
       res.reserve(n);
 
@@ -407,7 +407,7 @@ namespace emp {
     RankedCacheState() = default;
     RankedCacheState(emp::vector<size_t> ids, size_t n): uids(ids), requestSize(n){}
 
-    std::optional<emp::vector<size_t>> InterpretSelf(size_t n){
+    std::optional<emp::vector<size_t>> operator()(size_t n){
       if (n > requestSize){ return std::nullopt; }
       if (n >= uids.size()){ return uids; }
       return emp::vector<size_t>(uids.begin(), uids.begin()+n);

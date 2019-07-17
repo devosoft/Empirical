@@ -631,3 +631,41 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: SignalGPMutator struct", "
   mutator.ApplyMutations(nop_prog, random);
   REQUIRE(nop_prog.GetSize() == mutator.GetProgMinFuncCnt());
 }
+
+TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: SignalGP MatchBin Cache", "[hardware]") {
+  using hardware_t = emp::EventDrivenGP_AW<16>;
+  using inst_lib_t = emp::InstLib<hardware_t>;   // Instruction library
+  using event_lib_t = emp::EventLib<hardware_t>; // Event library
+  
+  class Hardware : public hardware_t {
+    public:
+    Hardware(emp::Ptr<const inst_lib_t> _ilib, emp::Ptr<const event_lib_t> _elib, emp::Ptr<emp::Random> rnd=nullptr)
+    : EventDrivenGP_AW<16>(_ilib, _elib, rnd){}
+    bool GetIsMatchBinCacheDirty(){return is_matchbin_cache_dirty;}
+  };
+  constexpr size_t RANDOM_SEED = 1;
+
+  emp::Random random(RANDOM_SEED);
+  inst_lib_t inst_lib;
+  event_lib_t event_lib;
+  inst_lib.AddInst("Inc", hardware_t::Inst_Inc, 1, "Increment value in local memory Arg1");
+  inst_lib.AddInst("Dec", hardware_t::Inst_Dec, 1, "Decrement value in local memory Arg1");
+  
+  // Let's make two SignalGP virtual hardwares: 2 with 16-bit tags
+  Hardware hw1(&inst_lib, &event_lib, &random);
+
+  // Add handcoded program to hw1.
+  hw1.PushFunction();
+  hw1.GetProgram()[0].affinity.SetAll();
+  hw1.PushInst("Inc", 0);
+
+  hw1.PushFunction();                        // Tag will be all zeros
+  hw1.PushInst("Dec", 0);
+
+  REQUIRE(!hw1.GetIsMatchBinCacheDirty());
+  hw1.SetProgram(hw1.GetProgram());
+  REQUIRE(hw1.GetIsMatchBinCacheDirty());
+  hw1.CallFunction(emp::BitSet<16>(), 0.5);
+  REQUIRE(!hw1.GetIsMatchBinCacheDirty());
+
+}

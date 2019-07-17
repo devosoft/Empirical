@@ -77,7 +77,7 @@ namespace emp {
       if constexpr(cacheEnabled){
         if (cacheOn){
           if (cache.find(query) != cache.end()){
-            std::optional<emp::vector<uid_t>> res = cache[query].InterpretSelf(n);
+            std::optional<emp::vector<uid_t>> res = cache[query](n);
             if (res != std::nullopt){ return res.value(); }
           }
         }
@@ -102,7 +102,7 @@ namespace emp {
         if (cacheOn){
           cache[query] = cacheResult;
         }
-        return cacheResult.InterpretSelf(n).value();
+        return cacheResult(n).value();
       }
       else{
         return cacheResult;

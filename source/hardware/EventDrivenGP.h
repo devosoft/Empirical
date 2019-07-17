@@ -361,12 +361,16 @@ namespace emp {
 
       Ptr<const inst_lib_t> inst_lib;  //< Pointer to const instruction library associated with this program.
       program_t program;               //< Sequence of functions that make up this program.
+      std::function<void()> fun_clear_matchbin_cache = [](){};
 
       Program(Ptr<const inst_lib_t> _ilib, const program_t & _prgm=program_t())
       : inst_lib(_ilib), program(_prgm) { ; }
       Program(const Program &) = default;
 
-      void Clear() { program.clear(); }
+      void Clear() { 
+        program.clear();
+        fun_clear_matchbin_cache();
+      }
 
       Function & operator[](size_t id) { return program[id]; }
       const Function & operator[](size_t id) const { return program[id]; }
@@ -395,11 +399,22 @@ namespace emp {
       }
       bool ValidFunction(size_t fID) const { return fID < program.size(); }
 
-      [[deprecated]] void SetProgram(const program_t & _program) { program = _program; }
+      void SetProgram(const program_t & _program) { 
+        program = _program; 
+        fun_clear_matchbin_cache();
+      }
 
-      void PushFunction(const Function & _function) { program.emplace_back(_function); }
+      void SetMatchBinClearCacheFun(const std::function<void()>& mb_clear_cache_fun){
+        fun_clear_matchbin_cache = mb_clear_cache_fun;
+      }
+
+      void PushFunction(const Function & _function) { 
+        program.emplace_back(_function); 
+        fun_clear_matchbin_cache();
+      }
       void PushFunction(const affinity_t & _aff=affinity_t(), const inst_seq_t & _seq=inst_seq_t()) {
         program.emplace_back(_aff, _seq);
+        fun_clear_matchbin_cache(); 
       }
       /// Push new instruction to program.
       /// If no function pointer is provided and no functions exist yet, add new function to
@@ -413,6 +428,7 @@ namespace emp {
         else if (fID < 0 || fID >= (int)program.size()) { fp = program.size() - 1; }
         else fp = (size_t)fID;
         program[fp].PushInst(id, a0, a1, a2, aff);
+        fun_clear_matchbin_cache(); 
       }
 
       /// Push new instruction to program.
@@ -428,6 +444,7 @@ namespace emp {
         else if (fID < 0 || fID >= (int)program.size()) { fp = program.size() - 1; }
         else fp = (size_t)fID;
         program[fp].PushInst(id, a0, a1, a2, aff);
+        fun_clear_matchbin_cache(); 
       }
 
       /// Push new instruction to program.
@@ -440,17 +457,20 @@ namespace emp {
         else if (fID < 0 || fID >= (int)program.size()) { fp = program.size() - 1; }
         else fp = (size_t)fID;
         program[fp].PushInst(inst);
+        fun_clear_matchbin_cache(); 
       }
 
       void SetInst(size_t fID, size_t pos, size_t id, arg_t a0=0, arg_t a1=0, arg_t a2=0,
                    const affinity_t & aff=affinity_t()) {
         emp_assert(ValidPosition(fID, pos));
         program[fID].SetInst(pos, id, a0, a1, a2, aff);
+        fun_clear_matchbin_cache();
       }
 
       void SetInst(size_t fID, size_t pos, const inst_t & inst) {
         emp_assert(ValidPosition(fID, pos));
         program[fID].SetInst(pos, inst);
+        fun_clear_matchbin_cache();
       }
 
       /// Load entire program from input stream.
@@ -635,8 +655,8 @@ namespace emp {
     size_t exec_core_id;                  //< core ID of the currently executing core.
     bool is_executing;                    //< True when mid-execution of all cores. (On every CPU cycle: execute all cores).
     MATCHBIN_TYPE matchBin;
-    bool isMatchBinCacheDirty;
-
+    bool is_matchbin_cache_dirty;
+    std::function<void()> fun_clear_matchbin_cache = [this](){this->ResetMatchBin();};
     // TODO: disallow configuration of hardware while executing. (and any other functions that could sent things into a bad state)
 
   public:
@@ -653,15 +673,19 @@ namespace emp {
         default_mem_value(DEFAULT_MEM_VALUE), min_bind_thresh(DEFAULT_MIN_BIND_THRESH),
         stochastic_fun_call(true),
         cores(max_cores), active_cores(), inactive_cores(max_cores), pending_cores(),
-        exec_core_id(0), is_executing(false), isMatchBinCacheDirty(true)
+        exec_core_id(0), is_executing(false), is_matchbin_cache_dirty(true)
     {
       // If no random provided, create one.
       if (!rnd) NewRandom();
+      // Give the program our matchbin clear cache callback.
+      program.SetMatchBinClearCacheFun(fun_clear_matchbin_cache);
+      
       // Add all available cores to inactive.
       for (size_t i = 0; i < inactive_cores.size(); ++i)
         inactive_cores[i] = (inactive_cores.size() - 1) - i;
       // Spin up main core (will spin up on function ID = 0).
       SpawnCore(0, memory_t(), true);
+
     }
 
     EventDrivenGP_AW(const inst_lib_t & _ilib, const event_lib_t & _elib, Ptr<Random> rnd=nullptr)
@@ -687,12 +711,13 @@ namespace emp {
         active_cores(in.active_cores), inactive_cores(in.inactive_cores),
         pending_cores(in.pending_cores),
         exec_core_id(in.exec_core_id), is_executing(in.is_executing), 
-        isMatchBinCacheDirty(in.isMatchBinCacheDirty)
+        is_matchbin_cache_dirty(in.is_matchbin_cache_dirty)
     {
       in.random_ptr = nullptr;
       in.random_owner = false;
       in.event_lib = nullptr;
       in.program.inst_lib = nullptr;
+      program.SetMatchBinClearCacheFun(fun_clear_matchbin_cache);
     }
 
     EventDrivenGP_AW(const EventDrivenGP_t & in)
@@ -709,10 +734,11 @@ namespace emp {
         active_cores(in.active_cores), inactive_cores(in.inactive_cores),
         pending_cores(in.pending_cores),
         exec_core_id(in.exec_core_id), is_executing(in.is_executing), 
-        isMatchBinCacheDirty(in.isMatchBinCacheDirty)
+        is_matchbin_cache_dirty(in.is_matchbin_cache_dirty)
     {
       if (in.random_owner) NewRandom();
       else random_ptr = in.random_ptr;
+      program.SetMatchBinClearCacheFun(fun_clear_matchbin_cache);
     }
 
     ~EventDrivenGP_AW() {
@@ -752,6 +778,7 @@ namespace emp {
       exec_core_id = (size_t)-1;
       errors = 0;
       is_executing = false;
+      is_matchbin_cache_dirty = true;
     }
 
     /// Spawn core with function that has best match to provided affinity. Do nothing if no
@@ -1001,7 +1028,8 @@ namespace emp {
     /// Set program for this hardware object.
     void SetProgram(const program_t & _program) { 
       program = _program; 
-      isMatchBinCacheDirty = true;
+      program.SetMatchBinClearCacheFun(fun_clear_matchbin_cache);
+      is_matchbin_cache_dirty = true;
     }
 
     /// Shortcut to this hardware object's program's PushFunction operation of the same signature.
@@ -1126,14 +1154,18 @@ namespace emp {
 
     /// Find best matching functions (by ID) given affinity.
     emp::vector<size_t> FindBestFuncMatch(const affinity_t & affinity, double threshold) {
-      if(isMatchBinCacheDirty){
-        matchBin.Clear();
-        isMatchBinCacheDirty = false;
-        for (size_t i = 0; i < program.GetSize(); ++i){
-          matchBin.Put(i, program[i].affinity);
-        }
+      if(is_matchbin_cache_dirty){
+        ResetMatchBin();
       }
       return matchBin.GetVals(matchBin.Match(affinity, program.GetSize()));
+    }
+
+    void ResetMatchBin(){
+      matchBin.Clear();
+      is_matchbin_cache_dirty = false;
+      for (size_t i = 0; i < program.GetSize(); ++i){
+        matchBin.Put(i, program[i].affinity);
+      }
     }
 
     /// Call function with best affinity match above threshold.
