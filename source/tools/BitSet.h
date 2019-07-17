@@ -360,7 +360,7 @@ namespace emp {
     BitSet(const BitSet & in_set) { Copy(in_set.bit_set); }
 
     /// Constructor to generate a random BitSet (with equal prob of 0 or 1).
-    BitSet(Random & random) { Clear(); Randomize(random); }
+    BitSet(Random & random) { Randomize(random); }
 
     /// Constructor to generate a random BitSet with provided prob of 1's.
     BitSet(Random & random, const double p1) { Clear(); Randomize(random, p1); }
@@ -392,13 +392,13 @@ namespace emp {
     /// Set all bits randomly, with a 50% probability of being a 0 or 1.
     void Randomize(Random & random) {
       // Randomize all fields, then mask off bits in the last field if not complete.
-      uint32_t* cast_set = reinterpret_cast<uint32_t*>(bit_set);
 
-      for(size_t i = 0; i < NUM_BITS/32; ++i) cast_set[i] = random.GetUInt();
+      random.RandFill<(NUM_BITS+7)/8>(
+        reinterpret_cast<unsigned char*>(bit_set)
+      );
 
-      if constexpr (static_cast<bool>(NUM_BITS%32)) {
-        cast_set[NUM_BITS/32] = random.GetUInt();
-        cast_set[NUM_BITS/32] &= MaskLow<field_t>(NUM_BITS%32);
+      if constexpr (static_cast<bool>(LAST_BIT)) {
+        bit_set[NUM_FIELDS-1] &= MaskLow<field_t>(NUM_BITS%32);
       }
 
     }
@@ -429,7 +429,7 @@ namespace emp {
 
       std::memcpy(
         bit_set,
-        reinterpret_cast<const uint8_t*>(from_set.bit_set) + from_bit/8,
+        reinterpret_cast<const unsigned char*>(from_set.bit_set) + from_bit/8,
         COPY_BYTES
       );
 
@@ -438,8 +438,8 @@ namespace emp {
         this->ShiftRight(from_bit%8);
 
         if (FROM_BYTES > COPY_BYTES) {
-          reinterpret_cast<uint8_t*>(bit_set)[COPY_BYTES-1] |= (
-            reinterpret_cast<const uint8_t*>(
+          reinterpret_cast<unsigned char*>(bit_set)[COPY_BYTES-1] |= (
+            reinterpret_cast<const unsigned char*>(
               from_set.bit_set
             )[from_bit/8 + COPY_BYTES]
             << (8 - from_bit%8)
@@ -562,31 +562,47 @@ namespace emp {
       bit_set[field_id] = (bit_set[field_id] & ~(((field_t)255U) << pos_id)) | (val_uint << pos_id);
     }
 
+    /// Get the unsigned int; index in in 32-bit jumps
+    /// (i.e., this is a field ID not bit id)
+    uint32_t GetUInt(const size_t index) const { return GetUInt32(index); }
+
+    /// Set the unsigned int; index in in 32-bit jumps
+    /// (i.e., this is a field ID not bit id)
+    void SetUInt(const size_t index, const uint32_t value) {
+      SetUInt32(index, value);
+    }
+
     /// Get the field_t unsigned int; index in in 32-bit jumps
     /// (i.e., this is a field ID not bit id)
-    uint32_t GetUInt(size_t index) const { return GetUInt32(index); }
+    uint32_t GetUInt32(const size_t index) const {
+      emp_assert(index * 32 < NUM_BITS);
 
-    /// Set the field_t unsigned int; index in in 32-bit jumps
-    /// (i.e., this is a field ID not bit id)
-    void SetUInt(size_t index, uint32_t value) { SetUInt32(index, value); }
+      uint32_t res;
 
-    /// Get the field_t unsigned int; index in in field_t-bit jumps
-    /// (i.e., this is a field ID not bit id)
-    uint32_t GetUInt32(size_t index) const {
-      emp_assert(index * 32 < NUM_FIELDS * FIELD_BITS);
-      return ((uint32_t*) bit_set)[index];
+      std::memcpy(
+        &res,
+        reinterpret_cast<const unsigned char*>(bit_set) + index * (32/8),
+        sizeof(res)
+      );
+
+      return res;
     }
 
     /// Set the field_t unsigned int; index in in 32-bit jumps
     /// (i.e., this is a field ID not bit id)
-    void SetUInt32(size_t index, uint32_t value) {
-      emp_assert(index * 32 < NUM_FIELDS * FIELD_BITS);
-      ((uint32_t*) bit_set)[index] = value;
+    void SetUInt32(const size_t index, const uint32_t value) {
+      emp_assert(index * 32 < NUM_BITS);
+
+      std::memcpy(
+        reinterpret_cast<unsigned char*>(bit_set) + index * (32/8),
+        &value,
+        sizeof(value)
+      );
 
       // Mask out filler bits if necessary
-      if constexpr ((bool)LAST_BIT) {
+      if constexpr (static_cast<bool>(LAST_BIT)) {
         // we only need to do this
-        // if (index * 64 == (NUM_FIELDS - 1) * FIELD_BITS)
+        // if (index * 32 == (NUM_FIELDS - 1) * FIELD_BITS)
         // but just doing it always is probably faster
         bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       }
@@ -595,64 +611,91 @@ namespace emp {
 
     /// Get the field_t unsigned int; index in in 64-bit jumps
     /// (i.e., this is a field ID not bit id)
-    uint64_t GetUInt64(size_t index) const {
-      emp_assert(index * 64 < NUM_FIELDS * FIELD_BITS);
+    uint64_t GetUInt64(const size_t index) const {
+      emp_assert(index * 64 < NUM_BITS);
 
-      if constexpr (FIELD_BITS == 32 && NUM_FIELDS % 2) {
-        if (index * 2 == NUM_FIELDS - 1 ) return bit_set[NUM_FIELDS - 1];
+      uint64_t res;
+
+      if constexpr (FIELD_BITS == 64) {
+        res = bit_set[index];
+      } else if constexpr (FIELD_BITS == 32 && (NUM_FIELDS % 2 == 0)) {
+        std::memcpy(
+          &res,
+          reinterpret_cast<const unsigned char*>(bit_set) + index * (64/8),
+          sizeof(res)
+        );
+      } else if constexpr (FIELD_BITS == 32 && NUM_FIELDS == 1) {
+        std::memcpy(
+          &res,
+          reinterpret_cast<const unsigned char*>(bit_set),
+          32/8
+        );
+      } else {
+        std::memcpy(
+          &res,
+          reinterpret_cast<const unsigned char*>(bit_set) + index * (64/8),
+          std::min(64, NUM_FIELDS * FIELD_BITS - 64 * index)/8
+        );
       }
 
-      return ((uint64_t*) bit_set)[index];
+      return res;
+
     }
 
     /// Set the field_t unsigned int; index in in 64-bit jumps
     /// (i.e., this is a field ID not bit id)
-    void SetUInt64(size_t index, uint64_t value) {
-      emp_assert(index * 64 < NUM_FIELDS * FIELD_BITS);
+    void SetUInt64(const size_t index, const uint64_t value) {
+      emp_assert(index * 64 < NUM_BITS);
 
-      if constexpr (FIELD_BITS == 32 && NUM_FIELDS % 2) {
-        if (index * 2 == NUM_FIELDS - 1 ) {
-          bit_set[NUM_FIELDS - 1] = (uint32_t) value;
-        }
+      if constexpr (FIELD_BITS == 64) {
+        bit_set[index] = value;
+      } else if constexpr (FIELD_BITS == 32 && (NUM_FIELDS % 2 == 0)) {
+        std::memcpy(
+          reinterpret_cast<unsigned char*>(bit_set) + index * (64/8),
+          &value,
+          sizeof(value)
+        );
+      } else if constexpr (FIELD_BITS == 32 && NUM_FIELDS == 1) {
+        std::memcpy(
+          reinterpret_cast<unsigned char*>(bit_set),
+          &value,
+          32/8
+        );
+      } else {
+        std::memcpy(
+          reinterpret_cast<unsigned char*>(bit_set) + index * (64/8),
+          &value,
+          std::min(64, NUM_FIELDS * FIELD_BITS - 64 * index)/8
+        );
       }
 
       // Mask out filler bits if necessary
-      if constexpr ((bool)LAST_BIT) {
+      if constexpr (static_cast<bool>(LAST_BIT)) {
         // we only need to do this
         // if (index * 64 == (NUM_FIELDS - 1) * FIELD_BITS)
         // but just doing it always is probably faster
         bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       }
 
-      ((uint64_t*) bit_set)[index] = value;
     }
 
     /// Get the full uint32_t unsigned int starting from the bit at a specified index.
-    uint32_t GetUIntAtBit(size_t index) { return GetUInt32AtBit(index); }
+    uint32_t GetUIntAtBit(const size_t index) { return GetUInt32AtBit(index); }
 
     /// Get the full uint32_t unsigned int starting from the bit at a specified index.
-    uint32_t GetUInt32AtBit(size_t index) {
+    uint32_t GetUInt32AtBit(const size_t index) {
       emp_assert(index < NUM_BITS);
 
-      uint32_t *cast_set = (uint32_t *) bit_set;
-      const size_t field_id = index / 32;
-      const size_t pos_id = index % 32;
+      BitSet<32> res;
+      res.Import(*this, index);
 
-      if (pos_id == 0) return cast_set[field_id];
-      else return (
-        (cast_set[field_id] >> pos_id) |
-        (
-          (field_id+1 < NUM_FIELDS)
-          ? cast_set[field_id+1] << (FIELD_BITS-pos_id)
-          : 0
-        )
-      );
+      return res.GetUInt32(0);
 
     }
 
     /// Get OUT_BITS bits starting from the bit at a specified index (max 32)
     template <size_t OUT_BITS>
-    uint32_t GetValueAtBit(size_t index) {
+    uint32_t GetValueAtBit(const size_t index) {
       static_assert(OUT_BITS <= 32, "Requesting too many bits to fit in a UInt");
       return GetUIntAtBit(index) & MaskLow<uint32_t>(OUT_BITS);
     }
