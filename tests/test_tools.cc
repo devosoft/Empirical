@@ -3696,7 +3696,7 @@ TEST_CASE("Test random", "[tools]")
   emp::vector<int> val_counts(10);
   for (size_t i = 0; i < val_counts.size(); i++) val_counts[i] = 0;
 
-  const size_t num_tests = 100000;
+  const size_t num_tests = 150000;
   const double min_value = 2.5;
   const double max_value = 8.7;
   double total = 0.0;
@@ -3761,28 +3761,102 @@ TEST_CASE("Test random", "[tools]")
     [](uint32_t accumulator, uint32_t val){ return accumulator | (~val); })
   );
   }
+
+  // Test RandFill()
+  uint32_t randfill_draws[num_tests];
+  rng.RandFill(
+    reinterpret_cast<unsigned char*>(randfill_draws),
+    sizeof(randfill_draws)
+  );
+
+  total = 0.0;
+  for (size_t i = 0; i < num_tests; i++) {
+    total += randfill_draws[i];
+  }
+
+  {
+  const double expected_mean = ((double)std::numeric_limits<uint32_t>::max())/2.0;
+  const double min_threshold = (expected_mean*0.995);
+  const double max_threshold = (expected_mean*1.005);
+  double mean_value = total/(double) num_tests;
+
+  REQUIRE(mean_value > min_threshold);
+  REQUIRE(mean_value < max_threshold);
+  // ensure that all bits are set at least once and unset at least once
+  REQUIRE(std::numeric_limits<uint32_t>::max() == std::accumulate(
+    std::begin(randfill_draws),
+    std::end(randfill_draws),
+    (uint32_t)0,
+    [](uint32_t accumulator, uint32_t val){ return accumulator | val; }
+  ));
+  REQUIRE(std::numeric_limits<uint32_t>::max() == std::accumulate(
+    std::begin(randfill_draws),
+    std::end(randfill_draws),
+    (uint32_t)0,
+    [](uint32_t accumulator, uint32_t val){ return accumulator | (~val); }
+  ));
+  }
+
   // Test GetUInt64
   emp::vector<uint64_t> uint64_draws;
   total = 0.0;
+  double total2 = 0.0;
   for (size_t i = 0; i < num_tests; i++) {
     const uint64_t cur_value = rng.GetUInt64();
-    total += cur_value/(double)num_tests;
+    total += static_cast<uint32_t>(cur_value);
+    total2 += cur_value >> 32;
     uint64_draws.push_back(cur_value);
   }
 
   {
-  const double expected_mean = ((double)std::numeric_limits<uint64_t>::max())/2.0;
+  const double expected_mean = ((double)std::numeric_limits<uint32_t>::max())/2.0;
   const double min_threshold = (expected_mean*0.995);
   const double max_threshold = (expected_mean*1.005);
-  double mean_value = total; // values were divided by num_tests when added
+  double mean_value = total/(double)num_tests; // values were divided by num_tests when added
 
   REQUIRE(mean_value > min_threshold);
   REQUIRE(mean_value < max_threshold);
+  double mean_value2 = total2/(double)num_tests; // values were divided by num_tests when added
+
+  REQUIRE(mean_value2 > min_threshold);
+  REQUIRE(mean_value2 < max_threshold);
   // ensure that all bits are set at least once and unset at least once
   REQUIRE(std::numeric_limits<uint64_t>::max() == std::accumulate(uint64_draws.begin(),uint64_draws.end(),(uint64_t)0,
     [](uint64_t accumulator, uint64_t val){ return accumulator | val; })
   );
   REQUIRE(std::numeric_limits<uint64_t>::max() == std::accumulate(uint64_draws.begin(),uint64_draws.end(),(uint64_t)0,
+    [](uint64_t accumulator, uint64_t val){ return accumulator | (~val); })
+  );
+  }
+
+  // Test GetUInt64Fast
+  emp::vector<uint64_t> uint64fast_draws;
+  total = 0.0;
+  total2 = 0.0;
+  for (size_t i = 0; i < num_tests; i++) {
+    const uint64_t cur_value = rng.GetUInt64Fast();
+    total += static_cast<uint32_t>(cur_value);
+    total2 += cur_value >> 32;
+    uint64fast_draws.push_back(cur_value);
+  }
+
+  {
+  const double expected_mean = ((double)std::numeric_limits<uint32_t>::max())/2.0;
+  const double min_threshold = (expected_mean*0.995);
+  const double max_threshold = (expected_mean*1.005);
+  double mean_value = total / (double)num_tests;
+
+  REQUIRE(mean_value > min_threshold);
+  REQUIRE(mean_value < max_threshold);
+  double mean_value2 = total2 / (double)num_tests;
+
+  REQUIRE(mean_value2 > min_threshold);
+  REQUIRE(mean_value2 < max_threshold);
+  // ensure that all bits are set at least once and unset at least once
+  REQUIRE(std::numeric_limits<uint64_t>::max() == std::accumulate(uint64fast_draws.begin(),uint64fast_draws.end(),(uint64_t)0,
+    [](uint64_t accumulator, uint64_t val){ return accumulator | val; })
+  );
+  REQUIRE(std::numeric_limits<uint64_t>::max() == std::accumulate(uint64fast_draws.begin(),uint64fast_draws.end(),(uint64_t)0,
     [](uint64_t accumulator, uint64_t val){ return accumulator | (~val); })
   );
   }
