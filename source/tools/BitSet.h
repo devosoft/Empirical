@@ -614,7 +614,7 @@ namespace emp {
     uint64_t GetUInt64(const size_t index) const {
       emp_assert(index * 64 < NUM_BITS);
 
-      uint64_t res;
+      uint64_t res = 0;
 
       if constexpr (FIELD_BITS == 64) {
         res = bit_set[index];
