@@ -13,6 +13,7 @@
 #include "../tools/map_utils.h"
 #include "../tools/string_utils.h"
 #include "../tools/Random.h"
+#include "../tools/MatchBin.h"
 #include "../base/vector.h"
 #include "../base/Ptr.h"
 #include "../base/array.h"
@@ -95,7 +96,9 @@ namespace emp {
    *      * Each event type has a registered event handler that gets called to handle a dispatched
    *        event.
    */
-  template<size_t AFFINITY_WIDTH, typename TRAIT_TYPE=double>
+  template<size_t AFFINITY_WIDTH, typename TRAIT_TYPE=double
+    , typename MATCHBIN_TYPE=emp::MatchBin<size_t, emp::HammingMetric<16>, emp::RankedSelector<std::ratio<16+8, 16>>>
+    >
   class EventDrivenGP_AW {
   public:
     /// Maximum number of instruction arguments. Currently hardcoded. At some point, will make flexible.
@@ -392,7 +395,7 @@ namespace emp {
       }
       bool ValidFunction(size_t fID) const { return fID < program.size(); }
 
-      void SetProgram(const program_t & _program) { program = _program; }
+      [[deprecated]] void SetProgram(const program_t & _program) { program = _program; }
 
       void PushFunction(const Function & _function) { program.emplace_back(_function); }
       void PushFunction(const affinity_t & _aff=affinity_t(), const inst_seq_t & _seq=inst_seq_t()) {
@@ -631,6 +634,8 @@ namespace emp {
     std::deque<size_t> pending_cores;     //< Queue of core IDs pending activation.
     size_t exec_core_id;                  //< core ID of the currently executing core.
     bool is_executing;                    //< True when mid-execution of all cores. (On every CPU cycle: execute all cores).
+    MATCHBIN_TYPE matchBin;
+    bool isMatchBinCacheDirty;
 
     // TODO: disallow configuration of hardware while executing. (and any other functions that could sent things into a bad state)
 
@@ -648,7 +653,7 @@ namespace emp {
         default_mem_value(DEFAULT_MEM_VALUE), min_bind_thresh(DEFAULT_MIN_BIND_THRESH),
         stochastic_fun_call(true),
         cores(max_cores), active_cores(), inactive_cores(max_cores), pending_cores(),
-        exec_core_id(0), is_executing(false)
+        exec_core_id(0), is_executing(false), isMatchBinCacheDirty(true)
     {
       // If no random provided, create one.
       if (!rnd) NewRandom();
@@ -681,7 +686,8 @@ namespace emp {
         cores(in.cores),
         active_cores(in.active_cores), inactive_cores(in.inactive_cores),
         pending_cores(in.pending_cores),
-        exec_core_id(in.exec_core_id), is_executing(in.is_executing)
+        exec_core_id(in.exec_core_id), is_executing(in.is_executing), 
+        isMatchBinCacheDirty(in.isMatchBinCacheDirty)
     {
       in.random_ptr = nullptr;
       in.random_owner = false;
@@ -702,7 +708,8 @@ namespace emp {
         cores(in.cores),
         active_cores(in.active_cores), inactive_cores(in.inactive_cores),
         pending_cores(in.pending_cores),
-        exec_core_id(in.exec_core_id), is_executing(in.is_executing)
+        exec_core_id(in.exec_core_id), is_executing(in.is_executing), 
+        isMatchBinCacheDirty(in.isMatchBinCacheDirty)
     {
       if (in.random_owner) NewRandom();
       else random_ptr = in.random_ptr;
@@ -992,7 +999,10 @@ namespace emp {
     }
 
     /// Set program for this hardware object.
-    void SetProgram(const program_t & _program) { program = _program; }
+    void SetProgram(const program_t & _program) { 
+      program = _program; 
+      isMatchBinCacheDirty = true;
+    }
 
     /// Shortcut to this hardware object's program's PushFunction operation of the same signature.
     void PushFunction(const Function & _function) { program.PushFunction(_function); }
@@ -1116,17 +1126,14 @@ namespace emp {
 
     /// Find best matching functions (by ID) given affinity.
     emp::vector<size_t> FindBestFuncMatch(const affinity_t & affinity, double threshold) {
-      emp::vector<size_t> best_matches;
-      for (size_t i=0; i < program.GetSize(); ++i) {
-        double bind = SimpleMatchCoeff(program[i].affinity, affinity);
-        if (bind == threshold) best_matches.push_back(i);
-        else if (bind > threshold) {
-          best_matches.resize(1);
-          best_matches[0] = i;
-          threshold = bind;
+      if(isMatchBinCacheDirty){
+        matchBin.Clear();
+        isMatchBinCacheDirty = false;
+        for (size_t i = 0; i < program.GetSize(); ++i){
+          matchBin.Put(i, program[i].affinity);
         }
       }
-      return best_matches;
+      return matchBin.GetVals(matchBin.Match(affinity, program.GetSize()));
     }
 
     /// Call function with best affinity match above threshold.

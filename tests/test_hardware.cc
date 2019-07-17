@@ -22,7 +22,7 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h')", "[hardware]")
 
   // A few constants
   constexpr size_t RANDOM_SEED = 1;
-  constexpr double HW_MIN_SIM_THRESH = 0.0;
+  constexpr double HW_MIN_SIM_THRESH = 0.5;
   constexpr size_t HW_MAX_THREADS = 32;
   constexpr size_t HW_MAX_CALL_DEPTH = 128;
 
