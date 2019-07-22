@@ -300,6 +300,7 @@ namespace emp {
         mutator_type.last_mut_cnt = mutator_type.mutator(p, r);
         mut_cnt += mutator_type.last_mut_cnt;
       }
+      if (mut_cnt) { p.fun_clear_matchbin_cache(); } 
       return mut_cnt;
     }
 
