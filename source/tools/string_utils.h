@@ -225,6 +225,41 @@ namespace emp {
     return false;
   }
 
+  /// Convert a literal string representation to an actual string.
+  static inline std::string from_literal_string(const std::string & value) {
+    emp_assert(is_literal_string(value));
+    // Given the assert, we can assume the string DOES contain a literal representation,
+    // and we just need to convert it.
+
+    std::string out_string;
+    out_string.reserve(value.size()-2);  // Make a guess on final size.
+
+    for (size_t pos = 1; pos < value.size() - 1; pos++) {
+      // If we don't have an escaped character, just move it over.
+      if (value[pos] != '\\') {
+        out_string.push_back(value[pos]);
+        continue;
+      }
+
+      // If we do have an escape character, convert it.
+      pos++;
+
+      switch (value[pos]) {
+        case 'n': out_string.push_back('\n'); break;   // Newline
+        case 'r': out_string.push_back('\r'); break;   // Return
+        case 't': out_string.push_back('\t'); break;   // Tab
+        case '0': out_string.push_back('\0'); break;   // Empty (character 0)
+        case '\\': out_string.push_back('\\'); break;  // Backslash
+        case '\'': out_string.push_back('\''); break;  // Single quote
+        default:
+          emp_assert(false, "unknown escape char used; probably need to update converter!");
+      }
+    }
+
+    return out_string;
+  }
+
+
   /// Convert a string to all uppercase.
   static inline std::string to_upper(std::string value) {
     constexpr int char_shift = 'a' - 'A';
