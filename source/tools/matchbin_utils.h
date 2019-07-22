@@ -422,11 +422,10 @@ namespace emp {
 
   struct RouletteCacheState : public CacheStateBase{
     RouletteCacheState() = default;
-    RouletteCacheState(emp::IndexMap& im, emp::vector<size_t>& ids, emp::Random& r) 
+    RouletteCacheState(emp::IndexMap& im, emp::vector<size_t>& ids, emp::Random& r)
       : indexMap(im)
       , uids(ids)
       , rand(r){}
-    
     std::optional<emp::vector<size_t>> operator()(size_t n){
       emp::vector<size_t> res;
       res.reserve(n);
@@ -445,7 +444,7 @@ namespace emp {
   };
 
   struct RankedCacheState: public CacheStateBase{
-    
+
     RankedCacheState() = default;
     RankedCacheState(emp::vector<size_t> ids, size_t n): uids(ids), requestSize(n){}
 
@@ -473,7 +472,7 @@ namespace emp {
   /// Returns matches within the threshold ThreshRatio sorted by match quality.
   template<typename ThreshRatio = std::ratio<-1,1>> // neg numerator means +infy
   struct RankedSelector : public SelectorBase<RankedCacheState> {
-    
+
     using cache_state_type_t = RankedCacheState;
 
     RankedCacheState operator()(
