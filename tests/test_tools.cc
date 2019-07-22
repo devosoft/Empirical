@@ -3323,7 +3323,7 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   class MatchBinTest : public emp::MatchBin<emp::BitSet<32>, emp::HammingMetric<32>, DummySelector>{
   public:
-    size_t GetCacheSize(){ return cache.size(); }
+    size_t GetCacheSize(){ return binCache.size(); }
     size_t GetSelectCount(){ return selector.opCount; }
   };
 
