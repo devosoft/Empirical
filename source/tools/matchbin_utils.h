@@ -30,6 +30,7 @@
 #include "../tools/IndexMap.h"
 #include "../tools/BitSet.h"
 #include "../tools/string_utils.h"
+#include "../tools/hash_utils.h"
 
 namespace emp {
 
@@ -67,6 +68,35 @@ namespace emp {
     double operator()(const query_t& a, const tag_t& b) const override {
       return (double)(a^b).CountOnes() / Width;
     }
+  };
+
+  /// Generate an arbitrary, but consistent, match score between 0 and 1
+  template<size_t Width>
+  struct HashMetric: public BaseMetric<emp::BitSet<Width>, emp::BitSet<Width>> {
+
+    using query_t = emp::BitSet<Width>;
+    using tag_t = emp::BitSet<Width>;
+
+    size_t dim() const override { return 1; }
+
+    size_t width() const override { return Width; }
+
+    std::string name() const override {
+      return emp::to_string(Width) + "-bit " + base();
+    }
+
+    std::string base() const override { return "Hash Metric"; }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+      std::hash<query_t> qhasher;
+      std::hash<tag_t> thasher;
+
+      return static_cast<double>(emp::hash_combine(
+        qhasher(a),
+        thasher(b)
+      )) / std::numeric_limits<size_t>::max();
+    }
+
   };
 
   /// Metric gives the absolute difference between two integers
