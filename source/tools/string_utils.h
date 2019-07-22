@@ -170,7 +170,25 @@ namespace emp {
   /// (i.e., 'A', ';', or '\n')
   static inline char from_literal_char(const std::string & value) {
     emp_assert(is_literal_char(value));
-    return 'x';
+    // Given the assert, we can assume the string DOES contain a literal representation,
+    // and we just need to convert it.
+
+    if (value.size() == 3) return value[1];
+    if (value.size() == 4) {
+      switch (value[2]) {
+        case 'n': return '\n';   // Newline
+        case 'r': return '\r';   // Return
+        case 't': return '\t';   // Tab
+        case '0': return '\0';   // Empty (character 0)
+        case '\\': return '\\';  // Backslash
+        case '\'': return '\'';  // Single quote
+      }
+    }
+
+    // @CAO: Need to add special types of numerical escapes here (e.g., ascii codes!)
+
+    // Problem!
+    return '0';
   }
 
   /// Convert a string to all uppercase.
