@@ -80,10 +80,12 @@ namespace emp {
     size_t width() const override { return sizeof(int) * 8; }
 
     std::string name() const override {
-      return "Absolute Integer Difference Metric";
+      return base();
     }
 
-    std::string base() const override { return name(); }
+    std::string base() const override {
+      return "Absolute Integer Difference Metric";
+    }
 
     double operator()(const query_t& a, const tag_t& b) const override {
 
@@ -104,9 +106,9 @@ namespace emp {
 
     size_t width() const override { return sizeof(size_t) * 8; }
 
-    std::string name() const override { return "Next Up Metric"; }
+    std::string name() const override { return base(); }
 
-    std::string base() const override { return name(); }
+    std::string base() const override { return "Next Up Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
       const size_t difference = ((Max + 1) + b - a) % (Max + 1);
