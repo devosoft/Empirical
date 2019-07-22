@@ -124,6 +124,55 @@ namespace emp {
     return ss.str();
   }
 
+  /// Test if an input string is properly formated as a literal character.
+  static inline char is_literal_char(const std::string & value) {
+    // A literal string must beging with a single quote, contain a representation of a single
+    // character, and end with a single quote.
+    if (value.size() < 3) return false;
+    if (value[0] != '\'' || value.back() != '\'') return false;
+
+    // If there's only a single character in the quotes, it's USUALLY legal.
+    if (value.size() == 3) {
+      switch (value[1]) {
+        case '\'':         // Can't be a single quote (must be escaped!)
+        case '\\':         // Can't be a backslash (must be followed by something!)
+          return false;
+        default:
+          return true;
+      }
+    }
+
+    // If there are more characters, must be an escape sequence.
+    if (value.size() == 4) {
+      if (value[1] != '\\') return false;
+
+      // Identify legal escape sequences.
+      // @CAO Need more here!
+      switch (value[2]) {
+        case 'n':   // Newline
+        case 'r':   // Return
+        case 't':   // Tab
+        case '0':   // Empty (character 0)
+        case '\\':  // Backslash
+        case '\'':  // Single quote
+          return true;
+        default:
+          return false;
+      }
+    }
+
+    // @CAO: Need to add special types of numerical escapes here (e.g., ascii codes!)
+
+    return false;
+  }
+
+  /// Convert a literal character representation to an actual string.
+  /// (i.e., 'A', ';', or '\n')
+  static inline char from_literal_char(const std::string & value) {
+    emp_assert(is_literal_char(value));
+    return 'x';
+  }
+
   /// Convert a string to all uppercase.
   static inline std::string to_upper(std::string value) {
     constexpr int char_shift = 'a' - 'A';
@@ -533,21 +582,6 @@ namespace emp {
   /// Setup emp::ToString declarations for built-in types.
   template <typename T, size_t N> inline std::string ToString(const emp::array<T,N> & container);
   template <typename... Ts> inline std::string ToString(const emp::vector<Ts...> & container);
-
-
-  /// Setup emp::to_string to work on containers.
-  // template <typename T>
-  // inline typename emp::decoy_t<std::string, typename T::value_type> ToString(T container) {
-  //   std::stringstream ss;
-  //   ss << "[ ";
-  //   for (const auto & el : container) {
-  //     ss << to_string(el);
-  //     ss << " ";
-  //   }
-  //   ss << "]";
-  //   return ss.str();
-  // }
-
 
   namespace internal {
     // If the item passed in has a ToString(), always use it.
