@@ -126,7 +126,7 @@ namespace emp {
 
   /// Test if an input string is properly formated as a literal character.
   static inline char is_literal_char(const std::string & value) {
-    // A literal string must beging with a single quote, contain a representation of a single
+    // A literal char must beging with a single quote, contain a representation of a single
     // character, and end with a single quote.
     if (value.size() < 3) return false;
     if (value[0] != '\'' || value.back() != '\'') return false;
@@ -189,6 +189,40 @@ namespace emp {
 
     // Problem!
     return '0';
+  }
+
+  /// Test if an input string is properly formated as a literal string.
+  static inline char is_literal_string(const std::string & value) {
+    // A literal string must begin and end with a double quote and contain only valid characters.
+    if (value.size() < 2) return false;
+    if (value[0] != '"' || value.back() != '"') return false;
+
+    // Are all of the characters valid?
+    for (size_t pos = 1; pos < value.size() - 1; pos++) {
+      if (value[pos] == '"') return false;  // Cannot have a raw double-quote in the middle.
+      if (value[pos] == '\\') {
+        if (pos == value.size()-2) return false;  // Backslash must have char to escape.
+
+        // Move to the next char and make sure it's legal to be escaped.
+        // @CAO Expand on options!
+        pos++;
+        switch (value[pos]) {
+          case 'n':   // Newline
+          case 'r':   // Return
+          case 't':   // Tab
+          case '0':   // Empty (character 0)
+          case '\\':  // Backslash
+          case '\'':  // Single quote
+            continue;
+          default:
+            return false;
+        }
+      }
+    }
+
+    // @CAO: Need to check special types of numerical escapes (e.g., ascii codes!)
+
+    return false;
   }
 
   /// Convert a string to all uppercase.
