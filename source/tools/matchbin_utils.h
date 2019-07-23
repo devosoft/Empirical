@@ -445,7 +445,9 @@ namespace emp {
   struct RankedCacheState: public CacheStateBase{
     
     RankedCacheState() = default;
-    RankedCacheState(emp::vector<size_t> ids, size_t n): uids(ids), requestSize(n){}
+    RankedCacheState(emp::vector<size_t>::iterator begin, size_t back, size_t n): 
+        uids(emp::vector<size_t>(begin, begin + back))
+      , requestSize(n){}
 
     std::optional<emp::vector<size_t>> operator()(size_t n){
       if (n > requestSize){ return std::nullopt; }
@@ -503,7 +505,7 @@ namespace emp {
             }
           }
           if (minIndex == -1) break;
-          std::swap(uids.at(back),uids.at(minIndex));
+          std::swap(uids.at(back), uids.at(minIndex));
         }
 
       } else {
@@ -524,7 +526,7 @@ namespace emp {
 
       }
 
-      return RankedCacheState(emp::vector<size_t>(uids.begin(), uids.begin() + back), n);
+      return RankedCacheState(uids.begin(), back, n);
     }
 
   };

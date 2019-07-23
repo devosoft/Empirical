@@ -428,7 +428,6 @@ namespace emp {
         else if (fID < 0 || fID >= (int)program.size()) { fp = program.size() - 1; }
         else fp = (size_t)fID;
         program[fp].PushInst(id, a0, a1, a2, aff);
-        fun_clear_matchbin_cache(); 
       }
 
       /// Push new instruction to program.
@@ -444,7 +443,6 @@ namespace emp {
         else if (fID < 0 || fID >= (int)program.size()) { fp = program.size() - 1; }
         else fp = (size_t)fID;
         program[fp].PushInst(id, a0, a1, a2, aff);
-        fun_clear_matchbin_cache(); 
       }
 
       /// Push new instruction to program.
@@ -457,20 +455,17 @@ namespace emp {
         else if (fID < 0 || fID >= (int)program.size()) { fp = program.size() - 1; }
         else fp = (size_t)fID;
         program[fp].PushInst(inst);
-        fun_clear_matchbin_cache(); 
       }
 
       void SetInst(size_t fID, size_t pos, size_t id, arg_t a0=0, arg_t a1=0, arg_t a2=0,
                    const affinity_t & aff=affinity_t()) {
         emp_assert(ValidPosition(fID, pos));
         program[fID].SetInst(pos, id, a0, a1, a2, aff);
-        fun_clear_matchbin_cache();
       }
 
       void SetInst(size_t fID, size_t pos, const inst_t & inst) {
         emp_assert(ValidPosition(fID, pos));
         program[fID].SetInst(pos, inst);
-        fun_clear_matchbin_cache();
       }
 
       /// Load entire program from input stream.
@@ -780,7 +775,6 @@ namespace emp {
       exec_core_id = (size_t)-1;
       errors = 0;
       is_executing = false;
-      is_matchbin_cache_dirty = true;
     }
 
     /// Spawn core with function that has best match to provided affinity. Do nothing if no
@@ -1144,7 +1138,7 @@ namespace emp {
       if(is_matchbin_cache_dirty){
         ResetMatchBin();
       }
-      return matchBin.GetVals(matchBin.Match(affinity, program.GetSize()));
+      return matchBin.GetVals(matchBin.Match(affinity, 1));
     }
 
     void ResetMatchBin(){

@@ -55,8 +55,8 @@ namespace emp {
     uid_t uid_stepper;
 
   protected:
-    std::unordered_map<query_t, typename Selector::cache_state_type_t> binCache;
-    static constexpr bool cacheEnabled = false;//std::is_base_of<CacheStateBase, typename Selector::cache_state_type_t>::value;
+    std::unordered_map<query_t, typename Selector::cache_state_type_t> cache;
+    static constexpr bool cacheEnabled = std::is_base_of<CacheStateBase, typename Selector::cache_state_type_t>::value;
     bool cacheOn = cacheEnabled;
 
   public:
@@ -76,13 +76,12 @@ namespace emp {
     emp::vector<uid_t> Match(const query_t & query, size_t n=1) {
       if constexpr(cacheEnabled){
         if (cacheOn){
-          if (binCache.find(query) != binCache.end()){
-            std::optional<emp::vector<uid_t>> res = binCache[query](n);
+          if (cache.find(query) != cache.end()){
+            std::optional<emp::vector<uid_t>> res = cache[query](n);
             if (res != std::nullopt){ return res.value(); }
           }
         }
       }
-
       // compute distance between query and all stored tags
       std::unordered_map<tag_t, double> matches;
       for (const auto &[uid, tag] : tags) {
@@ -100,7 +99,7 @@ namespace emp {
       typename Selector::cache_state_type_t cacheResult = selector(uids, scores, n);
       if constexpr(cacheEnabled){
         if (cacheOn){
-          binCache[query] = cacheResult;
+          cache[query] = cacheResult;
         }
         return cacheResult(n).value();
       }
@@ -148,7 +147,7 @@ namespace emp {
 
     void ClearCache() {
       if constexpr(cacheEnabled){
-        binCache.clear();
+        cache.clear();
       }
     }
 
