@@ -2404,6 +2404,97 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   }
 
+// test HashMetric
+
+  {
+
+  const size_t N_SAMPLES = 1000000;
+  const size_t N_BINS = 10;
+
+  emp::HashMetric<32> metric;
+
+  emp::BitSet<32> query;
+  emp::BitSet<32> tag;
+
+  emp::DataNode<double, emp::data::Range, emp::data::Histogram> scores;
+  scores.SetupBins(0.0, 1.0, 10);
+
+  emp::Random rand(2);
+
+  // test with sequential numbers
+  for(size_t i = 0; i < N_SAMPLES; ++i) {
+    query.SetUInt(0, i);
+    tag.SetUInt(0, i);
+    scores.Add(
+      metric(query, tag)
+    );
+  }
+
+  REQUIRE(scores.GetMean() - 0.5 < 0.01);
+  REQUIRE(scores.GetMin() < 0.01);
+  REQUIRE(scores.GetMax() > 0.01);
+  for (auto & c : scores.GetHistCounts()) {
+    REQUIRE(c > N_SAMPLES / N_BINS - 20000);
+    REQUIRE(c < N_SAMPLES / N_BINS + 20000);
+  }
+
+  // test with sequential numbers
+  scores.Reset();
+  for(size_t i = 0; i < N_SAMPLES; ++i) {
+    query.SetUInt(0, 0);
+    tag.SetUInt(0, i);
+    scores.Add(
+      metric(query, tag)
+    );
+  }
+
+  REQUIRE(scores.GetMean() - 0.5 < 0.01);
+  REQUIRE(scores.GetMin() < 0.01);
+  REQUIRE(scores.GetMax() > 0.01);
+  for (auto & c : scores.GetHistCounts()) {
+    REQUIRE(c > N_SAMPLES / N_BINS - 20000);
+    REQUIRE(c < N_SAMPLES / N_BINS + 20000);
+  }
+
+  // test with random numbers
+  scores.Reset();
+  for(size_t i = 0; i < N_SAMPLES; ++i) {
+    query.Randomize(rand);
+    tag.Randomize(rand);
+    scores.Add(
+      metric(query, tag)
+    );
+  }
+
+  REQUIRE(scores.GetMean() - 0.5 < 0.01);
+  REQUIRE(scores.GetMin() < 0.01);
+  REQUIRE(scores.GetMax() > 0.01);
+  for (auto & c : scores.GetHistCounts()) {
+    REQUIRE(c > N_SAMPLES / N_BINS - 20000);
+    REQUIRE(c < N_SAMPLES / N_BINS + 20000);
+  }
+
+  // test with weighted random numbers
+  scores.Reset();
+  for(size_t i = 0; i < N_SAMPLES; ++i) {
+    query.Randomize(rand, 0.75);
+    tag.Randomize(rand, 0.75);
+    scores.Add(
+      metric(query, tag)
+    );
+  }
+
+  REQUIRE(scores.GetMean() - 0.5 < 0.01);
+  REQUIRE(scores.GetMin() < 0.01);
+  REQUIRE(scores.GetMax() > 0.01);
+  for (auto & c : scores.GetHistCounts()) {
+    REQUIRE(c > N_SAMPLES / N_BINS - 20000);
+    REQUIRE(c < N_SAMPLES / N_BINS + 20000);
+  }
+
+  }
+
+
   // test SlideMod
   {
   emp::BitSet<3> bs_000{0,0,0};
@@ -3232,7 +3323,7 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   class MatchBinTest : public emp::MatchBin<emp::BitSet<32>, emp::HammingMetric<32>, DummySelector>{
   public:
-    size_t GetCacheSize(){ return cache.size(); }
+    size_t GetCacheSize(){ return binCache.size(); }
     size_t GetSelectCount(){ return selector.opCount; }
   };
 

@@ -30,6 +30,7 @@
 #include "../tools/IndexMap.h"
 #include "../tools/BitSet.h"
 #include "../tools/string_utils.h"
+#include "../tools/hash_utils.h"
 
 namespace emp {
 
@@ -69,6 +70,35 @@ namespace emp {
     }
   };
 
+  /// Generate an arbitrary, but consistent, match score between 0 and 1
+  template<size_t Width>
+  struct HashMetric: public BaseMetric<emp::BitSet<Width>, emp::BitSet<Width>> {
+
+    using query_t = emp::BitSet<Width>;
+    using tag_t = emp::BitSet<Width>;
+
+    size_t dim() const override { return 1; }
+
+    size_t width() const override { return Width; }
+
+    std::string name() const override {
+      return emp::to_string(Width) + "-bit " + base();
+    }
+
+    std::string base() const override { return "Hash Metric"; }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+      std::hash<query_t> qhasher;
+      std::hash<tag_t> thasher;
+
+      return static_cast<double>(emp::hash_combine(
+        qhasher(a),
+        thasher(b)
+      )) / std::numeric_limits<size_t>::max();
+    }
+
+  };
+
   /// Metric gives the absolute difference between two integers
   struct AbsDiffMetric : public BaseMetric<int, int> {
 
@@ -80,10 +110,12 @@ namespace emp {
     size_t width() const override { return sizeof(int) * 8; }
 
     std::string name() const override {
-      return "Absolute Integer Difference Metric";
+      return base();
     }
 
-    std::string base() const override { return name(); }
+    std::string base() const override {
+      return "Absolute Integer Difference Metric";
+    }
 
     double operator()(const query_t& a, const tag_t& b) const override {
 
@@ -104,9 +136,9 @@ namespace emp {
 
     size_t width() const override { return sizeof(size_t) * 8; }
 
-    std::string name() const override { return "Next Up Metric"; }
+    std::string name() const override { return base(); }
 
-    std::string base() const override { return name(); }
+    std::string base() const override { return "Next Up Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
       const size_t difference = ((Max + 1) + b - a) % (Max + 1);
@@ -420,11 +452,10 @@ namespace emp {
 
   struct RouletteCacheState : public CacheStateBase{
     RouletteCacheState() = default;
-    RouletteCacheState(emp::IndexMap& im, emp::vector<size_t>& ids, emp::Random& r) 
+    RouletteCacheState(emp::IndexMap& im, emp::vector<size_t>& ids, emp::Random& r)
       : indexMap(im)
       , uids(ids)
       , rand(r){}
-    
     std::optional<emp::vector<size_t>> operator()(size_t n){
       emp::vector<size_t> res;
       res.reserve(n);
@@ -443,7 +474,7 @@ namespace emp {
   };
 
   struct RankedCacheState: public CacheStateBase{
-    
+
     RankedCacheState() = default;
     RankedCacheState(emp::vector<size_t>::iterator begin, size_t back, size_t n): 
         uids(emp::vector<size_t>(begin, begin + back))
@@ -473,7 +504,7 @@ namespace emp {
   /// Returns matches within the threshold ThreshRatio sorted by match quality.
   template<typename ThreshRatio = std::ratio<-1,1>> // neg numerator means +infy
   struct RankedSelector : public SelectorBase<RankedCacheState> {
-    
+
     using cache_state_type_t = RankedCacheState;
 
     RankedCacheState operator()(
