@@ -163,7 +163,8 @@ namespace emp {
 
     // @CAO: Need to add special types of numerical escapes here (e.g., ascii codes!)
 
-    return false;
+    // If we made it here without a problem, it must be correct!
+    return true;
   }
 
   /// Convert a literal character representation to an actual string.
@@ -222,7 +223,8 @@ namespace emp {
 
     // @CAO: Need to check special types of numerical escapes (e.g., ascii codes!)
 
-    return false;
+    // If we made it here without a problem, it must be correct!
+    return true;
   }
 
   /// Convert a literal string representation to an actual string.
