@@ -344,7 +344,7 @@ namespace emp {
 
     size_t width() const override { return Dim * metric.width(); }
 
-    size_t dim() const { return Dim; }
+    size_t dim() const override { return Dim; }
 
     std::string name() const override {
       return emp::to_string(Dim) + "-Dimensional Mean " + metric.name();
@@ -377,7 +377,7 @@ namespace emp {
 
     size_t width() const override { return Dim * metric.width(); }
 
-    size_t dim() const { return Dim; }
+    size_t dim() const override { return Dim; }
 
     std::string name() const override {
       return emp::to_string(Dim) + "-Dimensional Minimum " + metric.name();
@@ -422,7 +422,7 @@ namespace emp {
 
     size_t width() const override { return metric.width(); }
 
-    size_t dim() const { return metric.dim(); }
+    size_t dim() const override { return metric.dim(); }
 
     std::string name() const override { return metric.name(); }
 
