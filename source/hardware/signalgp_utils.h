@@ -90,11 +90,14 @@ namespace emp {
   /// @param inst_lib - Instruction library used to generate the instruction (instruction will be valid within instruction library)
   /// @param min_arg_val - Mininum value for an instruction argument.
   /// @param max_arg_val - Maximum value for an instruction argument.
-  template<size_t TAG_WIDTH, typename TRAIT_TYPE=double>
-  typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE>::Instruction GenRandSignalGPInst(emp::Random & rnd, const emp::InstLib<EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE>> & inst_lib, int min_arg_val=0, int max_arg_val=15) {
+  template<size_t TAG_WIDTH
+    , typename TRAIT_TYPE=double
+    , typename MATCHBIN_TYPE=emp::MatchBin<size_t, emp::HammingMetric<TAG_WIDTH>, emp::RankedSelector<std::ratio<16+8,16>>>
+    >
+  typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>::Instruction GenRandSignalGPInst(emp::Random & rnd, const emp::InstLib<EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>> & inst_lib, int min_arg_val=0, int max_arg_val=15) {
     emp_assert(inst_lib.GetSize() > 0, "Instruction library must have at least one instruction definition before being used to generate a random instruction.");
     emp_assert(min_arg_val < max_arg_val, "Minimum argument value must be less than maximum argument value to generate a number between the two.");
-    using inst_t = typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE>::Instruction;
+    using inst_t = typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>::Instruction;
     using tag_t = BitSet<TAG_WIDTH>;
     return inst_t(rnd.GetUInt(inst_lib.GetSize()),
                   rnd.GetInt(min_arg_val, max_arg_val+1),
@@ -110,12 +113,15 @@ namespace emp {
   /// @param max_inst_cnt - Maximum number of instructions in generated function.
   /// @param min_arg_val - Mininum value for an instruction argument.
   /// @param max_arg_val - Maximum value for an instruction argument.
-  template<size_t TAG_WIDTH, typename TRAIT_TYPE=double>
-  typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE>::Function GenRandSignalGPFunction(emp::Random & rnd, const emp::InstLib<EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE>> & inst_lib,
+  template<size_t TAG_WIDTH
+    , typename TRAIT_TYPE=double
+    , typename MATCHBIN_TYPE=emp::MatchBin<size_t, emp::HammingMetric<TAG_WIDTH>, emp::RankedSelector<std::ratio<16+8,16>>>
+    >
+  typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>::Function GenRandSignalGPFunction(emp::Random & rnd, const emp::InstLib<EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>> & inst_lib,
                                                                             size_t min_inst_cnt=1, size_t max_inst_cnt=32,
                                                                             int min_arg_val=0, int max_arg_val=15) {
     emp_assert(inst_lib.GetSize() > 0, "Instruction library must have at least one instruction definition before being used to generate a random instruction.");
-    using fun_t = typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE>::Function;
+    using fun_t = typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>::Function;
     size_t inst_cnt = rnd.GetUInt(min_inst_cnt, max_inst_cnt+1);
     fun_t new_fun(emp::GenRandSignalGPTag<TAG_WIDTH>(rnd));
     for (size_t i = 0; i < inst_cnt; ++i) new_fun.PushInst(emp::GenRandSignalGPInst(rnd, inst_lib, min_arg_val, max_arg_val));
@@ -131,13 +137,16 @@ namespace emp {
   /// @param max_inst_cnt - Maximum number of instructions per function.
   /// @param min_arg_val - Mininum value for an instruction argument.
   /// @param max_arg_val - Maximum value for an instruction argument.
-  template<size_t TAG_WIDTH, typename TRAIT_TYPE=double>
-  typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE>::Program GenRandSignalGPProgram(emp::Random & rnd, const emp::InstLib<EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE>> & inst_lib,
+  template<size_t TAG_WIDTH
+    , typename TRAIT_TYPE=double
+    , typename MATCHBIN_TYPE=emp::MatchBin<size_t, emp::HammingMetric<TAG_WIDTH>, emp::RankedSelector<std::ratio<16+8,16>>>
+    >
+  typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>::Program GenRandSignalGPProgram(emp::Random & rnd, const emp::InstLib<EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>> & inst_lib,
                                                                        size_t min_func_cnt=1, size_t max_func_cnt=16,
                                                                        size_t min_fun_len=1, size_t max_fun_len=32,
                                                                        int min_arg_val=0, int max_arg_val=15) {
     emp_assert(inst_lib.GetSize() > 0, "Instruction library must have at least one instruction definition before being used to generate a random instruction.");
-    using program_t = typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE>::Program;
+    using program_t = typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>::Program;
     program_t program(&inst_lib);
     size_t fun_cnt = rnd.GetUInt(min_func_cnt, max_func_cnt+1);
     for (size_t f = 0; f < fun_cnt; ++f)
@@ -167,12 +176,16 @@ namespace emp {
   ///   - Instruction-argument substitutions (applied per-argument)
   /// NOTE: could use some feedback on this!
   ///  - Not loving the inconsistency between rates and constraints at the moment.
-  template<size_t TAG_WIDTH, typename TRAIT_TYPE=double>
+  template<
+    size_t TAG_WIDTH
+    , typename TRAIT_TYPE=double
+    , typename MATCHBIN_TYPE=emp::MatchBin<size_t, emp::HammingMetric<TAG_WIDTH>, emp::RankedSelector<std::ratio<16+8,16>>>
+    >
   class SignalGPMutator {
   public:
     // Generally useful aliases
     // - Hardware aliases
-    using hardware_t = EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE>;     ///< SignalGP hardware type
+    using hardware_t = EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>;     ///< SignalGP hardware type
     using program_t = typename hardware_t::program_t;   ///< SignalGP program type
     using tag_t = typename hardware_t::affinity_t;      ///< SignalGP tag type
     using inst_lib_t = typename hardware_t::inst_lib_t; ///< SignalGP instruction library type
@@ -688,6 +701,8 @@ namespace emp {
     }
   };
 
+  template<typename Hardware> 
+  class SignalGPMutatorFacade : public SignalGPMutator<Hardware::affinity_width, typename Hardware::trait_t, typename Hardware::matchbin_t> { } ;
 }
 
 #endif

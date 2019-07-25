@@ -504,6 +504,8 @@ namespace emp {
   /// Returns matches within the threshold ThreshRatio sorted by match quality.
   template<typename ThreshRatio = std::ratio<-1,1>> // neg numerator means +infy
   struct RankedSelector : public SelectorBase<RankedCacheState> {
+    
+    RankedSelector(emp::Random&){ ; }
 
     using cache_state_type_t = RankedCacheState;
 

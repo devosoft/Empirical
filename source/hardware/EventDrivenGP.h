@@ -104,7 +104,9 @@ namespace emp {
     /// Maximum number of instruction arguments. Currently hardcoded. At some point, will make flexible.
     static constexpr size_t MAX_INST_ARGS = 3;
 
-    using EventDrivenGP_t = EventDrivenGP_AW<AFFINITY_WIDTH, TRAIT_TYPE>;  //< Resolved type for this templated class.
+    static constexpr size_t affinity_width = AFFINITY_WIDTH;
+
+    using EventDrivenGP_t = EventDrivenGP_AW<AFFINITY_WIDTH, TRAIT_TYPE, MATCHBIN_TYPE>;  //< Resolved type for this templated class.
     using mem_key_t = int;                                     //< Hardware memory map key type.
     using mem_val_t = double;                                  //< Hardware memory map value type.
     using memory_t = std::unordered_map<mem_key_t, mem_val_t>; //< Hardware memory map type.
@@ -112,6 +114,8 @@ namespace emp {
     using arg_set_t = emp::array<arg_t, MAX_INST_ARGS>;        //< Instruction argument set type.
     using affinity_t = BitSet<AFFINITY_WIDTH>;                 //< Affinity type alias.
     using properties_t = std::unordered_set<std::string>;      //< Event/Instruction properties type.
+    using trait_t = TRAIT_TYPE;
+    using matchbin_t = MATCHBIN_TYPE;
 
     // A few default values. WARNING: I have no actual reason to believe these are the best defaults.
     static constexpr size_t DEFAULT_MAX_CORES = 8;
@@ -670,7 +674,7 @@ namespace emp {
         default_mem_value(DEFAULT_MEM_VALUE), min_bind_thresh(DEFAULT_MIN_BIND_THRESH),
         stochastic_fun_call(true),
         cores(max_cores), active_cores(), inactive_cores(max_cores), pending_cores(),
-        exec_core_id(0), is_executing(false), is_matchbin_cache_dirty(true)
+        exec_core_id(0), is_executing(false), matchBin(MATCHBIN_TYPE(*rnd)), is_matchbin_cache_dirty(true)
     {
       // If no random provided, create one.
       if (!rnd) NewRandom();
@@ -708,7 +712,7 @@ namespace emp {
         active_cores(in.active_cores), inactive_cores(in.inactive_cores),
         pending_cores(in.pending_cores),
         exec_core_id(in.exec_core_id), is_executing(in.is_executing), 
-        is_matchbin_cache_dirty(in.is_matchbin_cache_dirty)
+        matchBin(in.matchBin), is_matchbin_cache_dirty(in.is_matchbin_cache_dirty)
     {
       in.random_ptr = nullptr;
       in.random_owner = false;
@@ -731,7 +735,7 @@ namespace emp {
         active_cores(in.active_cores), inactive_cores(in.inactive_cores),
         pending_cores(in.pending_cores),
         exec_core_id(in.exec_core_id), is_executing(in.is_executing), 
-        is_matchbin_cache_dirty(in.is_matchbin_cache_dirty)
+        matchBin(in.matchBin), is_matchbin_cache_dirty(in.is_matchbin_cache_dirty)
     {
       if (in.random_owner) NewRandom();
       else random_ptr = in.random_ptr;
