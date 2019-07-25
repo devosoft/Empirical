@@ -409,6 +409,34 @@ namespace emp {
       for (size_t i = 0; i < NUM_BITS; i++) Set(i, random.P(p1));
     }
 
+    /// Mutate bits, return number of mutations performed.
+    size_t Mutate(
+      Random & random,
+      const double bit_redraw_per_bit = 0.01,
+      const double bitweight = 0.5
+    ) {
+
+      // @mmore500
+      // can this be sped up by drawing #muts from a binomial distribution
+      // and then choosing #muts indices to flip?
+      // to get a speedup,
+      // we would probably have to make a lookup table for the binomial
+      // distribution because we can't approximate until n > 1000
+      // (i.e., using IndexMap)
+
+      size_t res = 0;
+      for (size_t i = 0; i < NUM_BITS; ++i) {
+        if (random.P(bit_redraw_per_bit)) {
+          const bool flip = (random.P(bitweight) != Get(i));
+          res += flip;
+          if (flip) Toggle(i);
+        }
+      }
+
+    return res;
+
+  }
+
     /// Assign from a BitSet of a different size.
     template <size_t FROM_BITS>
     BitSet & Import(
