@@ -421,6 +421,16 @@ namespace emp {
     in_string.resize(pos);
   }
 
+  static std::string slugify(const std::string & in_string) {
+    //TODO handle complicated unicode strings
+    std::string res = to_lower(in_string);
+    remove_punctuation(res);
+    compress_whitespace(res);
+    std::transform(res.begin(), res.end(), res.begin(), [](char ch) {
+      return ch == ' ' ? '-' : ch;
+    });
+    return res;
+  }
 
   /// Provide a string_view on a given string
   static inline std::string_view view_string(const std::string & str) {

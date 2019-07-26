@@ -4211,6 +4211,11 @@ TEST_CASE("Test string_utils", "[tools]")
 
   std::string base_string = "This is an okay string.\n  \tThis\nis   -MY-    very best string!!!!   ";
 
+  REQUIRE(
+    emp::slugify(base_string)
+    == "this-is-an-okay-string-this-is-my-very-best-string"
+  );
+
   std::string first_line = emp::string_pop_line(base_string);
 
   REQUIRE(first_line == "This is an okay string.");
