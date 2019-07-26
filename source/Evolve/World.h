@@ -1017,17 +1017,28 @@ namespace emp {
       return WorldPosition(GetRandomCellID());
     };
 
-    // neighbors are in 9-sized neighborhood.
+    // neighbors are in 8-sized neighborhood.
     fun_get_neighbor = [this](WorldPosition pos) {
+
       emp_assert(random_ptr);
       emp_assert(pop_sizes.size() == 2);
+
       const size_t size_x = pop_sizes[0];
       const size_t size_y = pop_sizes[1];
       const size_t id = pos.GetIndex();
-      const int offset = random_ptr->GetInt(9);
+
+      // fancy footwork to exclude self (4) from consideration
+      const int offset = (random_ptr->GetInt(8) * 5) % 9;
       const int rand_x = (int) (id%size_x) + offset%3 - 1;
       const int rand_y = (int) (id/size_x) + offset/3 - 1;
-      const auto neighbor_id = emp::Mod(rand_x, (int) size_x) + emp::Mod(rand_y, (int) size_y) * (int)size_x;
+
+      const auto neighbor_id = (
+        emp::Mod(rand_x, (int) size_x)
+        + emp::Mod(rand_y, (int) size_y) * (int)size_x
+      );
+
+      emp_assert((int)pos.GetIndex() != neighbor_id);
+
       return pos.SetIndex(neighbor_id);
     };
 
