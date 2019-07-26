@@ -428,7 +428,7 @@ namespace emp {
       OnBeforePlacement( [this,test_fun](ORG & org, size_t pos){ if (test_fun(pos)) DoMutationsOrg(org); } );
     }
 
-    /// Setup the population to automatically test for and trigger mutations IF the organism is being 
+    /// Setup the population to automatically test for and trigger mutations IF the organism is being
     /// placed in a cell after a designated ID.
     void SetAutoMutate(size_t first_pos) {
       SetAutoMutate( [first_pos](size_t pos){ return pos >= first_pos; } );
