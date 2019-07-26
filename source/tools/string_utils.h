@@ -473,7 +473,7 @@ namespace emp {
   static inline std::string_view view_string_to(const std::string & in_string, const char delim, size_t start_pos=0) {
     const size_t in_size = in_string.size();
     size_t end_pos = start_pos;
-    while (end_pos < in_size && in_string[end_pos] != delim) end_pos++;    
+    while (end_pos < in_size && in_string[end_pos] != delim) end_pos++;
     return view_string_range(in_string, start_pos, end_pos);
   }
 
