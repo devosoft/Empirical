@@ -4322,6 +4322,41 @@ TEST_CASE("Test string_utils", "[tools]")
   REQUIRE(cat_full == "ABC123");
   emp::array<int, 3> test_arr({{ 4, 2, 5 }});
   REQUIRE(emp::to_string(test_arr) == "[ 4 2 5 ]");
+
+  // tests adapted from https://stackoverflow.com/questions/5288396/c-ostream-out-manipulation/5289170#5289170
+  std::string els[] = { "aap", "noot", "mies" };
+
+  typedef emp::vector<std::string> strings;
+
+  REQUIRE( ""  == emp::join_on(strings(), "") );
+  REQUIRE( "" == emp::join_on(strings(), "bla") );
+  REQUIRE( "aap" == emp::join_on(strings(els, els + 1), "") );
+  REQUIRE( "aap" == emp::join_on(strings(els, els + 1), "#") );
+  REQUIRE( "aap" == emp::join_on(strings(els, els + 1), "##") );
+  REQUIRE( "aapnoot" == emp::join_on(strings(els, els + 2), "") );
+  REQUIRE( "aap#noot" == emp::join_on(strings(els, els + 2), "#") );
+  REQUIRE( "aap##noot" == emp::join_on(strings(els, els + 2), "##") );
+  REQUIRE( "aapnootmies" == emp::join_on(strings(els, els + 3), "") );
+  REQUIRE( "aap#noot#mies" == emp::join_on(strings(els, els + 3), "#") );
+  REQUIRE( "aap##noot##mies" == emp::join_on(strings(els, els + 3), "##") );
+  REQUIRE( "aap  noot  mies" == emp::join_on(strings(els, els + 3), "  ") );
+  REQUIRE( "aapnootmies" == emp::join_on(strings(els, els + 3), "\0"));
+  REQUIRE(
+    "aapnootmies"
+    ==
+    emp::join_on(strings(els, els + 3), std::string("\0" , 1).c_str())
+  );
+  REQUIRE(
+    "aapnootmies"
+    ==
+    emp::join_on(strings(els, els + 3), std::string("\0+", 2).c_str())
+  );
+  REQUIRE(
+    "aap+noot+mies"
+    ==
+    emp::join_on(strings(els, els + 3), std::string("+\0", 2).c_str())
+  );
+
 }
 
 

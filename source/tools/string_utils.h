@@ -19,6 +19,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_set>
+#include <iterator>
 
 #include "../base/array.h"
 #include "../base/Ptr.h"
@@ -557,6 +558,27 @@ namespace emp {
   //   ss << "]";
   //   return ss.str();
   // }
+
+  /// Join a container of strings with a delimiter.
+  /// Adapted fromhttps://stackoverflow.com/questions/5288396/c-ostream-out-manipulation/5289170#5289170
+  template <typename Range, typename Value = typename Range::value_type>
+  std::string join_on(
+    Range const& elements,
+    const char *const delimiter
+  ) {
+    std::ostringstream os;
+    auto b = std::begin(elements), e = std::end(elements);
+
+    if (b != e) {
+        std::copy(b, std::prev(e), std::ostream_iterator<Value>(os, delimiter));
+        b = std::prev(e);
+    }
+    if (b != e) {
+        os << *b;
+    }
+
+    return os.str();
+  }
 
 
   namespace internal {
