@@ -20,6 +20,7 @@
 #include <string_view>
 #include <unordered_set>
 #include <iterator>
+#include <limits>
 
 #include "../base/array.h"
 #include "../base/Ptr.h"
@@ -479,14 +480,18 @@ namespace emp {
   }
 
   /// Cut up a string based on the provided delimitor; fill them in to the provided vector.
-  static inline void slice(const std::string & in_string, emp::vector<std::string> & out_set,
-                           char delim='\n') {
+  static inline void slice(
+    const std::string & in_string,
+    emp::vector<std::string> & out_set,
+    const char delim='\n',
+    const size_t max_split=std::numeric_limits<size_t>::max()
+  ) {
     const size_t test_size = in_string.size();
 
     // Count produced strings
     size_t out_count = 0;
     size_t pos = 0;
-    while (pos < test_size) {
+    while (pos < test_size && out_count <= max_split) {
       while (pos < test_size && in_string[pos] != delim) pos++;
       pos++; // Skip over deliminator
       out_count++;  // Increment for each delim plus once at the end (so once if no delims).
@@ -498,7 +503,10 @@ namespace emp {
     size_t string_id = 0;
     while (pos < test_size) {
       out_set[string_id] = "";
-      while (pos < test_size && in_string[pos] != delim) {
+      while (
+        pos < test_size
+        && (in_string[pos] != delim || string_id == out_count - 1)
+      ) {
         out_set[string_id] += in_string[pos];
         pos++;
       }
@@ -509,9 +517,13 @@ namespace emp {
   }
 
   /// Slice a string without passing in result vector (may be less efficient).
-  static inline emp::vector<std::string> slice(const std::string & in_string, char delim='\n') {
+  static inline emp::vector<std::string> slice(
+    const std::string & in_string,
+    const char delim='\n',
+    const size_t max_split=std::numeric_limits<size_t>::max()
+  ) {
     emp::vector<std::string> result;
-    slice(in_string, result, delim);
+    slice(in_string, result, delim, max_split);
     return result;
   }
 

@@ -4276,10 +4276,47 @@ TEST_CASE("Test string_utils", "[tools]")
   REQUIRE( slice_view[4] == "test!" );
 
 
-  auto slices = emp::slice("This is a test of a different version of slice.", ' ');
-
+  auto slices = emp::slice(
+    "This is a test of a different version of slice.",
+    ' '
+  );
   REQUIRE(slices.size() == 10);
   REQUIRE(slices[8] == "of");
+
+  slices = emp::slice(
+    "This is a test of a different version of slice.",
+    ' ',
+    101
+  );
+  REQUIRE(slices.size() == 10);
+  REQUIRE(slices[8] == "of");
+
+  slices = emp::slice(
+    "This is a test.",
+    ' ',
+    0
+  );
+  REQUIRE(slices.size() == 1);
+  REQUIRE(slices[0] == "This is a test.");
+
+  slices = emp::slice(
+    "This is a test.",
+    ' ',
+    1
+  );
+  REQUIRE(slices.size() == 2);
+  REQUIRE(slices[0] == "This");
+  REQUIRE(slices[1] == "is a test.");
+
+  slices = emp::slice(
+    "This is a test.",
+    ' ',
+    2
+  );
+  REQUIRE(slices.size() == 3);
+  REQUIRE(slices[0] == "This");
+  REQUIRE(slices[1] == "is");
+  REQUIRE(slices[2] == "a test.");
 
   // Try other ways of using slice().
   emp::slice(base_string, slices, 's');
