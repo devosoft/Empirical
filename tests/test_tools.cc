@@ -46,6 +46,7 @@
 #include "tools/hash_utils.h"
 //#include "tools/grid.h"
 #include "tools/info_theory.h"
+#include "tools/keyname_utils.h"
 #include "tools/lexer_utils.h"
 #include "tools/map_utils.h"
 #include "tools/math.h"
@@ -924,6 +925,94 @@ TEST_CASE("Test BitSet", "[tools]")
   MultiTester<161>::test<160>();
   MultiTester<2050>::test<2048>();
 
+  // tests for Mutate
+  {
+    emp::Random rando(1);
+    emp::BitSet<25> bs_25;
+    emp::BitSet<32> bs_32;
+    emp::BitSet<50> bs_50;
+    emp::BitSet<64> bs_64;
+    emp::BitSet<80> bs_80;
+
+    for (size_t i = 0; i < 2000; ++i) {
+      bs_25.Mutate(rando, 0.0);
+      REQUIRE(!bs_25.CountOnes());
+
+      bs_32.Mutate(rando, 0.0);
+      REQUIRE(!bs_32.CountOnes());
+
+      bs_50.Mutate(rando, 0.0);
+      REQUIRE(!bs_50.CountOnes());
+
+      bs_64.Mutate(rando, 0.0);
+      REQUIRE(!bs_64.CountOnes());
+
+      bs_80.Mutate(rando, 0.0);
+      REQUIRE(!bs_80.CountOnes());
+    }
+
+
+    bs_25.Mutate(rando, 0.75);
+    REQUIRE( bs_25.CountOnes() > 1);
+
+    bs_32.Mutate(rando, 0.75);
+    REQUIRE( bs_32.CountOnes() > 1);
+
+    bs_50.Mutate(rando, 0.75);
+    REQUIRE( bs_50.CountOnes() > 1);
+
+    bs_64.Mutate(rando, 0.75);
+    REQUIRE( bs_64.CountOnes() > 1);
+
+    bs_80.Mutate(rando, 0.75);
+    REQUIRE( bs_80.CountOnes() > 1);
+
+    bs_25.Clear();
+    bs_32.Clear();
+    bs_50.Clear();
+    bs_64.Clear();
+    bs_80.Clear();
+
+    for (size_t i = 1; i < 5000; ++i) {
+      bs_25.Mutate(rando, 0.001, 0.80);
+      REQUIRE(bs_25.CountOnes() < i);
+
+      bs_32.Mutate(rando, 0.001, 0.80);
+      REQUIRE(bs_32.CountOnes() < i);
+
+      bs_50.Mutate(rando, 0.001, 0.80);
+      REQUIRE(bs_50.CountOnes() < i);
+
+      bs_64.Mutate(rando, 0.001, 0.80);
+      REQUIRE(bs_64.CountOnes() < i);
+
+      bs_80.Mutate(rando, 0.001, 0.80);
+      REQUIRE(bs_80.CountOnes() < i);
+    }
+
+    REQUIRE(bs_25.CountOnes() > bs_25.size()/2);
+    REQUIRE(bs_32.CountOnes() > bs_32.size()/2);
+    REQUIRE(bs_50.CountOnes() > bs_50.size()/2);
+    REQUIRE(bs_64.CountOnes() > bs_64.size()/2);
+    REQUIRE(bs_80.CountOnes() > bs_80.size()/2);
+
+    for (size_t i = 0; i < 10; ++i) {
+      bs_25.Mutate(rando, 1.0, 0.2);
+      REQUIRE(bs_25.CountOnes() < bs_25.size()/2);
+
+      bs_32.Mutate(rando, 1.0, 0.2);
+      REQUIRE(bs_32.CountOnes() < bs_32.size()/2);
+
+      bs_50.Mutate(rando, 1.0, 0.2);
+      REQUIRE(bs_50.CountOnes() < bs_50.size()/2);
+
+      bs_64.Mutate(rando, 1.0, 0.2);
+      REQUIRE(bs_64.CountOnes() < bs_64.size()/2);
+
+      bs_80.Mutate(rando, 1.0, 0.2);
+      REQUIRE(bs_80.CountOnes() < bs_80.size()/2);
+    }
+  }
 }
 
 
@@ -1483,6 +1572,165 @@ TEST_CASE("Test lexer_utils", "[tools]")
   REQUIRE( dfa_all.Next(0, "ABC-DEF") == -1 );
 }
 
+TEST_CASE("Test keyname_utils", "[tools]")
+{
+
+  // test unpack
+
+  emp::keyname::unpack_t goal{
+      {"seed", "100"},
+      {"foobar", "20"},
+      {"_hash", "asdf"},
+      {"ext", ".txt"}
+  };
+
+  std::string name;
+
+  name = "seed=100+foobar=20+_hash=asdf+ext=.txt";
+  goal["_"] = name;
+  REQUIRE( emp::keyname::unpack(name) == goal );
+
+
+  // reorderings
+  name = "foobar=20+seed=100+_hash=asdf+ext=.txt";
+  goal["_"] = name;
+  REQUIRE( emp::keyname::unpack(name) == goal );
+
+
+  name = "_hash=asdf+foobar=20+seed=100+ext=.txt";
+  goal["_"] = name;
+  REQUIRE( emp::keyname::unpack(name) == goal );
+
+
+  // should ignore path
+  name = "path/seed=100+foobar=20+_hash=asdf+ext=.txt";
+  goal["_"] = name;
+  REQUIRE( emp::keyname::unpack(name) == goal );
+
+
+  name = "~/more=path/+blah/seed=100+foobar=20+_hash=asdf+ext=.txt";
+  goal["_"] = name;
+  REQUIRE( emp::keyname::unpack(name) == goal );
+
+
+  name = "just/a/regular/file.pdf";
+  REQUIRE( emp::keyname::unpack(name) == (emp::keyname::unpack_t{
+    {"file.pdf", ""},
+    {"_", "just/a/regular/file.pdf"}
+  }));
+
+  name = "key/with/no+=value/file+ext=.pdf";
+  REQUIRE( emp::keyname::unpack(name) == (emp::keyname::unpack_t{
+    {"file", ""},
+    {"ext", ".pdf"},
+    {"_", "key/with/no+=value/file+ext=.pdf"}
+  }));
+
+  name = "multiple/=s/file=biz=blah+ext=.pdf";
+  REQUIRE( emp::keyname::unpack(name) == (emp::keyname::unpack_t{
+    {"file", "biz=blah"},
+    {"ext", ".pdf"},
+    {"_", "multiple/=s/file=biz=blah+ext=.pdf"}
+  }));
+
+  // test pack
+  // reorderings
+  REQUIRE( (emp::keyname::pack({
+     {"seed", "100"},
+     {"foobar", "20"},
+     {"_hash", "asdf"},
+     {"ext", ".txt"}
+    })) == "foobar=20+seed=100+_hash=asdf+ext=.txt"
+   );
+
+  REQUIRE( (emp::keyname::pack({
+      {"_hash", "asdf"},
+      {"seed", "100"},
+      {"foobar", "20"},
+      {"ext", ".txt"}
+   })) == "foobar=20+seed=100+_hash=asdf+ext=.txt"
+  );
+
+  REQUIRE( (emp::keyname::pack({
+      {"_hash", "asdf"},
+      {"foobar", "20"},
+      {"ext", ".txt"},
+      {"seed", "100"}
+   })) == "foobar=20+seed=100+_hash=asdf+ext=.txt"
+  );
+
+  // different values
+  REQUIRE( (emp::keyname::pack({
+      {"seed", "100"},
+      {"foobar", "blip"},
+      {"_hash", "asdf"},
+      {"ext", ".txt"}
+   })) == "foobar=blip+seed=100+_hash=asdf+ext=.txt"
+  );
+
+  REQUIRE( (emp::keyname::pack({
+      {"seed", "a100"},
+      {"foobar", "blip"},
+      {"_hash", "asdf"},
+      {"ext", ".txt"}
+   })) == "foobar=blip+seed=a100+_hash=asdf+ext=.txt"
+  );
+
+  REQUIRE( (emp::keyname::pack({
+      {"aseed", "a100"},
+      {"foobar", "blip"},
+      {"_hash", "asdf"},
+      {"ext", ".txt"}
+   })) == "aseed=a100+foobar=blip+_hash=asdf+ext=.txt"
+  );
+
+  // should ignore "_" key
+  REQUIRE( (emp::keyname::pack({
+      {"seed", "100"},
+      {"foobar", "20"},
+      {"_hash", "asdf"},
+      {"ext", ".txt"},
+      {"_", "foobar=20+seed=100+_hash=asdf+ext=.txt"}
+   })) == "foobar=20+seed=100+_hash=asdf+ext=.txt"
+  );
+
+  REQUIRE( (emp::keyname::pack({
+      {"seed", "100"},
+      {"foobar", "20"},
+      {"_hash", "asdf"},
+      {"ext", ".txt"},
+      {"_", "path/seed=100+foobar=20+_hash=asdf+ext=.txt"}
+   })) == "foobar=20+seed=100+_hash=asdf+ext=.txt"
+  );
+
+  REQUIRE( (emp::keyname::pack({
+      {"seed", "100"},
+      {"foobar", "20"},
+      {"_hash", "asdf"},
+      {"ext", ".txt"},
+      {"_", "~/more=path/+blah/seed=100+foobar=20+_hash=asdf+ext=.txt"}
+   })) == "foobar=20+seed=100+_hash=asdf+ext=.txt"
+  );
+
+  REQUIRE( (emp::keyname::pack({
+      {"seed", "100"},
+      {"foobar", "20"},
+      {"_hash", "asdf"},
+      {"ext", ".txt"},
+      {"_", "\"whatever+=/\""}
+   })) == "foobar=20+seed=100+_hash=asdf+ext=.txt"
+  );
+
+  // missing extension
+  REQUIRE( (emp::keyname::pack({
+      {"_hash", "asdf"},
+      {"foobar", "20"},
+      {"seed", "100"}
+   })) == "foobar=20+seed=100+_hash=asdf"
+  );
+
+
+}
 
 TEST_CASE("Test Lexer", "[tools]")
 {
@@ -4211,6 +4459,11 @@ TEST_CASE("Test string_utils", "[tools]")
 
   std::string base_string = "This is an okay string.\n  \tThis\nis   -MY-    very best string!!!!   ";
 
+  REQUIRE(
+    emp::slugify(base_string)
+    == "this-is-an-okay-string-this-is-my-very-best-string"
+  );
+
   std::string first_line = emp::string_pop_line(base_string);
 
   REQUIRE(first_line == "This is an okay string.");
@@ -4271,10 +4524,47 @@ TEST_CASE("Test string_utils", "[tools]")
   REQUIRE( slice_view[4] == "test!" );
 
 
-  auto slices = emp::slice("This is a test of a different version of slice.", ' ');
-
+  auto slices = emp::slice(
+    "This is a test of a different version of slice.",
+    ' '
+  );
   REQUIRE(slices.size() == 10);
   REQUIRE(slices[8] == "of");
+
+  slices = emp::slice(
+    "This is a test of a different version of slice.",
+    ' ',
+    101
+  );
+  REQUIRE(slices.size() == 10);
+  REQUIRE(slices[8] == "of");
+
+  slices = emp::slice(
+    "This is a test.",
+    ' ',
+    0
+  );
+  REQUIRE(slices.size() == 1);
+  REQUIRE(slices[0] == "This is a test.");
+
+  slices = emp::slice(
+    "This is a test.",
+    ' ',
+    1
+  );
+  REQUIRE(slices.size() == 2);
+  REQUIRE(slices[0] == "This");
+  REQUIRE(slices[1] == "is a test.");
+
+  slices = emp::slice(
+    "This is a test.",
+    ' ',
+    2
+  );
+  REQUIRE(slices.size() == 3);
+  REQUIRE(slices[0] == "This");
+  REQUIRE(slices[1] == "is");
+  REQUIRE(slices[2] == "a test.");
 
   // Try other ways of using slice().
   emp::slice(base_string, slices, 's');
@@ -4317,6 +4607,41 @@ TEST_CASE("Test string_utils", "[tools]")
   REQUIRE(cat_full == "ABC123");
   emp::array<int, 3> test_arr({{ 4, 2, 5 }});
   REQUIRE(emp::to_string(test_arr) == "[ 4 2 5 ]");
+
+  // tests adapted from https://stackoverflow.com/questions/5288396/c-ostream-out-manipulation/5289170#5289170
+  std::string els[] = { "aap", "noot", "mies" };
+
+  typedef emp::vector<std::string> strings;
+
+  REQUIRE( ""  == emp::join_on(strings(), "") );
+  REQUIRE( "" == emp::join_on(strings(), "bla") );
+  REQUIRE( "aap" == emp::join_on(strings(els, els + 1), "") );
+  REQUIRE( "aap" == emp::join_on(strings(els, els + 1), "#") );
+  REQUIRE( "aap" == emp::join_on(strings(els, els + 1), "##") );
+  REQUIRE( "aapnoot" == emp::join_on(strings(els, els + 2), "") );
+  REQUIRE( "aap#noot" == emp::join_on(strings(els, els + 2), "#") );
+  REQUIRE( "aap##noot" == emp::join_on(strings(els, els + 2), "##") );
+  REQUIRE( "aapnootmies" == emp::join_on(strings(els, els + 3), "") );
+  REQUIRE( "aap#noot#mies" == emp::join_on(strings(els, els + 3), "#") );
+  REQUIRE( "aap##noot##mies" == emp::join_on(strings(els, els + 3), "##") );
+  REQUIRE( "aap  noot  mies" == emp::join_on(strings(els, els + 3), "  ") );
+  REQUIRE( "aapnootmies" == emp::join_on(strings(els, els + 3), "\0"));
+  REQUIRE(
+    "aapnootmies"
+    ==
+    emp::join_on(strings(els, els + 3), std::string("\0" , 1).c_str())
+  );
+  REQUIRE(
+    "aapnootmies"
+    ==
+    emp::join_on(strings(els, els + 3), std::string("\0+", 2).c_str())
+  );
+  REQUIRE(
+    "aap+noot+mies"
+    ==
+    emp::join_on(strings(els, els + 3), std::string("+\0", 2).c_str())
+  );
+
 }
 
 

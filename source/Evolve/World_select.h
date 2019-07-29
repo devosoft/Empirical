@@ -93,7 +93,9 @@ namespace emp {
     for (size_t T = 0; T < tourny_count; T++) {
       entries.resize(0);
       // Choose organisms for this tournament (with replacement!)
-      for (size_t i=0; i < t_size; i++) entries.push_back( world.GetRandomOrgID() );
+      for (size_t i=0; i < t_size; i++) entries.push_back(
+        world.GetRandomOrgID()
+      );
 
       double best_fit = world.CalcFitnessID(entries[0]);
       size_t best_id = entries[0];
