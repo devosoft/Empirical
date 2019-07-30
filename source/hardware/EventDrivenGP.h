@@ -1696,33 +1696,31 @@ namespace emp {
     }
 
     /// Non-default instruction: SetRegulator
-    /// Number of arguments: 2
+    /// Number of arguments: 1
     /// Description: Sets the regulator of a tag in the matchbin.
     static void Inst_SetRegulator(EventDrivenGP_t & hw, const inst_t & inst){
       State & state = hw.GetCurState();
-      double id = state.GetLocal(inst.args[0]);
-      double regulator = state.GetLocal(inst.args[1]);
-      try{
-        hw.GetMatchBin().SetRegulator(id, regulator);
-      } 
-      catch (...){
-        ++hw.errors;
+      emp::vector<size_t> best_fun = hw.GetMatchBin().Match(hw.GetProgram()[state.GetFP()][state.GetIP()].affinity, 1);
+      if (best_fun.size() == 0){ return; }
+      double regulator = state.GetLocal(inst.args[0]);
+      if(regulator < 0){
+        regulator = std::max(regulator, std::numeric_limits<double>::min());
+        regulator /= std::numeric_limits<double>::min();
+      }else{
+        regulator += 1.0;
       }
+      hw.GetMatchBin().SetRegulator(best_fun[0], regulator);
     }
 
     /// Non-default instruction: AdjRegulator
-    /// Number of arguments: 2
+    /// Number of arguments: 1
     /// Description: adjusts the regulator of a tag in the matchbin.
     static void Inst_AdjRegulator(EventDrivenGP_t & hw, const inst_t & inst){
       State & state = hw.GetCurState();
-      double id = state.GetLocal(inst.args[0]);
-      double regulator = state.GetLocal(inst.args[1]);
-      try{
-        hw.GetMatchBin().AdjRegulator(id, regulator);
-      } 
-      catch (...){
-        ++hw.errors;  
-      }
+      emp::vector<size_t> best_fun = hw.GetMatchBin().Match(hw.GetProgram()[state.GetFP()][state.GetIP()].affinity, 1);
+      if (best_fun.size() == 0){ return; }
+      double regulator = state.GetLocal(inst.args[0]);
+      hw.GetMatchBin().AdjRegulator(best_fun[0], regulator);
     }
     
     /// Get a pointer to const default instruction library. Will only construct the default instruction library once.
