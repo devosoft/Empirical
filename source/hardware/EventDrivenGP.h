@@ -1145,6 +1145,10 @@ namespace emp {
       return matchBin.GetVals(matchBin.Match(affinity, 1));
     }
 
+    MATCHBIN_TYPE& GetMatchBin(){
+      return matchBin;
+    }
+
     void ResetMatchBin(){
       matchBin.Clear();
       is_matchbin_cache_dirty = false;
@@ -1689,6 +1693,36 @@ namespace emp {
     static void Inst_RngDouble(EventDrivenGP_t & hw, const inst_t & inst) {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[0], hw.GetRandom().GetDouble());
+    }
+
+    /// Non-default instruction: SetRegulator
+    /// Number of arguments: 2
+    /// Description: Sets the regulator of a tag in the matchbin.
+    static void Inst_SetRegulator(EventDrivenGP_t & hw, const inst_t & inst){
+      State & state = hw.GetCurState();
+      double id = state.GetLocal(inst.args[0]);
+      double regulator = state.GetLocal(inst.args[1]);
+      try{
+        hw.GetMatchBin().SetRegulator(id, regulator);
+      } 
+      catch (...){
+        ++hw.errors;
+      }
+    }
+
+    /// Non-default instruction: AdjRegulator
+    /// Number of arguments: 2
+    /// Description: adjusts the regulator of a tag in the matchbin.
+    static void Inst_AdjRegulator(EventDrivenGP_t & hw, const inst_t & inst){
+      State & state = hw.GetCurState();
+      double id = state.GetLocal(inst.args[0]);
+      double regulator = state.GetLocal(inst.args[1]);
+      try{
+        hw.GetMatchBin().AdjRegulator(id, regulator);
+      } 
+      catch (...){
+        ++hw.errors;  
+      }
     }
     
     /// Get a pointer to const default instruction library. Will only construct the default instruction library once.
