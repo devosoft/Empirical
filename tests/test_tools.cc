@@ -1797,6 +1797,7 @@ TEST_CASE("Test map_utils", "[tools]")
 TEST_CASE("Test matchbin_utils", "[tools]")
 {
 
+  // test PowMod, LogMod
   {
   emp::HammingMetric<4> baseline;
 
@@ -1845,6 +1846,7 @@ TEST_CASE("Test matchbin_utils", "[tools]")
   REQUIRE( stretch_log({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
   }
 
+  // more tests for PowMod, LogMod
   {
 
   emp::PowMod<emp::HashMetric<32>, std::ratio<5>> squish_pow;
@@ -1876,6 +1878,94 @@ TEST_CASE("Test matchbin_utils", "[tools]")
 
     REQUIRE(stretch_log(a,b) >= 0.0);
     REQUIRE(stretch_log(a,b) <= 1.0);
+  }
+
+  }
+
+  // test EuclideanDimMod
+  {
+  emp::Random rand(1);
+
+  emp::BitSet<32> a1(rand);
+  emp::BitSet<32> b1(rand);
+
+  emp::HammingMetric<32> hamming;
+
+  emp::FlatMod<
+    emp::MeanDimMod<
+      typename emp::HammingMetric<32>,
+      1
+    >
+  > d_hamming1;
+  REQUIRE(d_hamming1.width() == hamming.width());
+
+  REQUIRE(hamming(a1, b1) == d_hamming1(a1, b1));
+  }
+
+  // test EuclideanDimMod
+  {
+  emp::Random rand(1);
+
+  emp::BitSet<32> a1(rand);
+  emp::BitSet<32> b1(rand);
+
+  emp::HammingMetric<32> hamming;
+
+  emp::FlatMod<
+    emp::MeanDimMod<
+      typename emp::HammingMetric<32>,
+      1
+    >
+  > d_hamming1;
+  REQUIRE(d_hamming1.width() == hamming.width());
+
+  REQUIRE(hamming(a1, b1) == d_hamming1(a1, b1));
+  }
+
+  // more tests for EuclideanDimMod
+  {
+    emp::HammingMetric<4> hamming;
+
+    emp::FlatMod<
+      emp::EuclideanDimMod<
+        typename emp::HammingMetric<2>,
+        2
+      >
+    > d_hamming2;
+    REQUIRE(d_hamming2.width() == hamming.width());
+
+    REQUIRE(d_hamming2({0,0,0,0}, {0,0,0,0}) == 0.0);
+
+    REQUIRE(d_hamming2({0,0,1,1}, {0,0,0,0}) == std::sqrt(0.5));
+    REQUIRE(d_hamming2({0,0,0,0}, {1,1,0,0}) == std::sqrt(0.5));
+    REQUIRE(d_hamming2({0,0,1,1}, {1,1,1,1}) == std::sqrt(0.5));
+    REQUIRE(d_hamming2({1,1,1,1}, {0,0,1,1}) == std::sqrt(0.5));
+
+    REQUIRE(d_hamming2({0,0,1,1}, {0,1,1,0}) == 0.5);
+    REQUIRE(d_hamming2({0,0,1,1}, {0,1,1,0}) == 0.5);
+    REQUIRE(d_hamming2({0,0,0,0}, {0,1,1,0}) == 0.5);
+    REQUIRE(d_hamming2({0,1,1,1}, {1,1,1,0}) == 0.5);
+
+    REQUIRE(d_hamming2({0,0,0,0}, {1,1,1,1}) == 1.0);
+    REQUIRE(d_hamming2({1,1,1,1}, {0,0,0,0}) == 1.0);
+  }
+
+  // more tests for EuclideanDimMod
+  {
+
+    emp::FlatMod<
+      emp::MeanDimMod<
+        typename emp::HammingMetric<8>,
+        4
+      >
+    > metric;
+
+  emp::Random rand(1);
+  for (size_t rep = 0; rep < 1000; ++rep) {
+    emp::BitSet<32> a(rand);
+    emp::BitSet<32> b(rand);
+    REQUIRE(metric(a,b) >= 0.0);
+    REQUIRE(metric(a,b) <= 1.0);
   }
 
   }
