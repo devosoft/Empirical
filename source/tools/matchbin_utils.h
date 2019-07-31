@@ -542,7 +542,7 @@ namespace emp {
   struct RankedCacheState: public CacheStateBase{
 
     RankedCacheState() = default;
-    RankedCacheState(emp::vector<size_t>::iterator begin, size_t back, size_t n): 
+    RankedCacheState(emp::vector<size_t>::iterator begin, size_t back, size_t n):
         uids(emp::vector<size_t>(begin, begin + back))
       , requestSize(n){}
 
@@ -570,7 +570,7 @@ namespace emp {
   /// Returns matches within the threshold ThreshRatio sorted by match quality.
   template<typename ThreshRatio = std::ratio<-1,1>> // neg numerator means +infy
   struct RankedSelector : public SelectorBase<RankedCacheState> {
-    
+
     RankedSelector(emp::Random&){ ; }
 
     using cache_state_type_t = RankedCacheState;
