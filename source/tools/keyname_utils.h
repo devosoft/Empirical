@@ -18,7 +18,11 @@
 #include <unordered_map>
 #include <map>
 #include <string>
+#ifndef EMSCRIPTEN
 #include <filesystem>
+#else
+#include <experimental/filesystem>
+#endif
 #include <array>
 
 #include "../base/assert.h"
@@ -51,7 +55,7 @@ namespace emp::keyname {
         std::cend(map),
         std::back_inserter(res),
         [](const std::pair<std::string, std::string> & pair){
-          std::array arr{pair.first, pair.second};
+          std::array<std::string, 2> arr{pair.first, pair.second};
           emp_assert([&arr](){ // check for illegal characters
             for (const char c : {'=', '+'}) {
               for (const auto &s : arr) {
@@ -74,7 +78,11 @@ namespace emp::keyname {
     unpack_t res;
 
     const auto kv_strs = emp::slice(
+#ifndef EMSCRIPTEN
       std::filesystem::path(filename).filename(), // get basename
+#else
+      std::experimental::filesystem::path(filename).filename(), // get basename
+#endif
       '+'
     );
 
