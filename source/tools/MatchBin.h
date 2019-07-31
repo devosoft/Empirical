@@ -30,6 +30,34 @@
 
 namespace emp {
 
+  /// Abstract base class for MatchBin
+  template<typename Val, typename Query, typename Tag>
+  class BaseMatchBin {
+
+  public:
+    using query_t = Query;
+    using tag_t = Tag;
+    using uid_t = size_t;
+
+    virtual ~BaseMatchBin() {};
+    virtual emp::vector<uid_t> Match(const query_t & query, size_t n=1) = 0;
+    virtual uid_t Put(const Val & v, const tag_t & t) = 0;
+    virtual void Delete(const uid_t uid) = 0;
+    virtual void Clear() = 0;
+    virtual void ClearCache() = 0;
+    virtual void SetCacheOn(const bool state = true) = 0;
+    virtual Val & GetVal(const uid_t uid) = 0;
+    virtual const tag_t & GetTag(const uid_t uid) = 0;
+    virtual void SetTag(const uid_t uid, tag_t tag) = 0;
+    virtual emp::vector<Val> GetVals(const emp::vector<uid_t> & uids) = 0;
+    virtual emp::vector<tag_t> GetTags(const emp::vector<uid_t> & uids) = 0;
+    virtual size_t Size() = 0;
+    virtual void AdjRegulator(uid_t uid, double amt) = 0;
+    virtual void SetRegulator(uid_t uid, double amt) = 0;
+
+  };
+
+
   /// A data container that allows lookup by tag similarity. It can be templated
   /// on different tag types and is configurable on construction for (1) the
   /// distance metric used to compute similarity between tags and (2) the
@@ -40,12 +68,20 @@ namespace emp {
   /// This unique identifier can be used to view or edit the stored items and
   /// their corresponding tags. Tag-based lookups return a list of matched
   /// unique identifiers.
-  template <typename Val, typename Metric, typename Selector> class MatchBin {
+  template <typename Val, typename Metric, typename Selector>
+  class MatchBin
+  : public BaseMatchBin<Val, typename Metric::query_t, typename Metric::tag_t> {
+
+  using base_t = BaseMatchBin<
+    Val,
+    typename Metric::query_t,
+    typename Metric::tag_t
+  >;
 
   public:
-    using tag_t = typename Metric::tag_t;
-    using query_t = typename Metric::query_t;
-    using uid_t = size_t;
+    using query_t = typename base_t::query_t;
+    using tag_t = typename base_t::tag_t;
+    using uid_t = typename base_t::uid_t;
 
   private:
     std::unordered_map<uid_t, Val> values;
@@ -73,7 +109,7 @@ namespace emp {
     /// Compare a query tag to all stored tags using the distance metric
     /// function and return a vector of unique IDs chosen by the selector
     /// function.
-    emp::vector<uid_t> Match(const query_t & query, size_t n=1) {
+    emp::vector<uid_t> Match(const query_t & query, size_t n=1) override {
       if constexpr(cacheEnabled){
         if (cacheOn){
           if (cache.find(query) != cache.end()){
@@ -110,7 +146,7 @@ namespace emp {
 
     /// Put an item and associated tag in the container. Returns the uid for
     /// that entry.
-    uid_t Put(const Val & v, const tag_t & t) {
+    uid_t Put(const Val & v, const tag_t & t) override {
       ClearCache();
       const uid_t orig = uid_stepper;
       while(values.find(++uid_stepper) != values.end()) {
@@ -128,7 +164,7 @@ namespace emp {
 
 
     /// Delete an item and its associated tag.
-    void Delete(const uid_t uid) {
+    void Delete(const uid_t uid) override {
       ClearCache();
       values.erase(uid);
       regulators.erase(uid);
@@ -137,7 +173,7 @@ namespace emp {
     }
 
     /// Clear all items and tags.
-    void Clear() {
+    void Clear() override {
       ClearCache();
       values.clear();
       regulators.clear();
@@ -145,36 +181,36 @@ namespace emp {
       uids.clear();
     }
 
-    void ClearCache() {
+    void ClearCache() override {
       if constexpr(cacheEnabled){
         cache.clear();
       }
     }
 
-    void SetCacheOn(const bool state = true){
+    void SetCacheOn(const bool state = true) override {
       emp_assert(cacheEnabled);
       cacheOn = state;
       ClearCache();
     }
 
     /// Access a reference single stored value by uid.
-    Val & GetVal(const uid_t uid) {
+    Val & GetVal(const uid_t uid) override {
       return values.at(uid);
     }
 
     /// Access a const reference to a single stored tag by uid.
-    const tag_t & GetTag(const uid_t uid) {
+    const tag_t & GetTag(const uid_t uid) override {
       return tags.at(uid);
     }
 
     /// Change the tag at a given uid and clear the cache.
-    void SetTag(const uid_t uid, tag_t tag){
+    void SetTag(const uid_t uid, tag_t tag) override {
       ClearCache();
       tags.at(uid) = tag;
     }
 
     /// Generate a vector of values corresponding to a vector of uids.
-    emp::vector<Val> GetVals(const emp::vector<uid_t> & uids) {
+    emp::vector<Val> GetVals(const emp::vector<uid_t> & uids) override {
       emp::vector<Val> res;
       std::transform(
         uids.begin(),
@@ -186,7 +222,7 @@ namespace emp {
     }
 
     /// Generate a vector of tags corresponding to a vector of uids.
-    emp::vector<tag_t> GetTags(const emp::vector<uid_t> & uids) {
+    emp::vector<tag_t> GetTags(const emp::vector<uid_t> & uids) override {
       emp::vector<tag_t> res;
       std::transform(
         uids.begin(),
@@ -198,13 +234,13 @@ namespace emp {
     }
 
     /// Get the number of items stored in the container.
-    size_t Size() {
+    size_t Size() override {
       return values.size();
     }
 
     /// Add an amount to an item's regulator value. Positive amounts
     /// downregulate the item and negative amounts upregulate it.
-    void AdjRegulator(uid_t uid, double amt) {
+    void AdjRegulator(uid_t uid, double amt) override {
       regulators[uid] = std::max(0.0, regulators.at(uid) + amt);
       ClearCache();
     }
@@ -213,7 +249,7 @@ namespace emp {
     /// equal to zero. A value between zero and one upregulates the item, a
     /// value of exactly one is neutral, and a value greater than one
     /// upregulates the item.
-    void SetRegulator(uid_t uid, double amt) {
+    void SetRegulator(uid_t uid, double amt) override {
       emp_assert(amt >= 0.0);
       regulators.at(uid) = amt;
       ClearCache();
