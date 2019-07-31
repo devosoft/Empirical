@@ -131,7 +131,7 @@ namespace emp {
       for (auto uid : uids) {
         scores[uid] = matches[tags[uid]] * regulators[uid] + regulators[uid];
       }
-      
+
       typename Selector::cache_state_type_t cacheResult = selector(uids, scores, n);
       if constexpr(cacheEnabled){
         if (cacheOn){
