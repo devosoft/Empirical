@@ -27,6 +27,7 @@
 #include "../base/assert.h"
 #include "../base/array.h"
 #include "../base/vector.h"
+#include "../tools/math.h"
 #include "../tools/IndexMap.h"
 #include "../tools/BitSet.h"
 #include "../tools/string_utils.h"
@@ -325,6 +326,71 @@ namespace emp {
 
     double operator()(const query_t& a, const tag_t& b) const override {
       return 1.0 - metric(a,b);
+    }
+
+  };
+
+  // Root greater than one squishes probability distribution to the center
+  // Root less than one flattens out probability distribution
+  // Root must be positive
+  template <typename Metric, typename Root>
+  struct PowMod : public Metric {
+
+    using query_t = typename Metric::query_t;
+    using tag_t = typename Metric::query_t;
+
+    Metric metric;
+
+    std::string name() const override {
+      return (
+        emp::to_string(Root::num) + "/" + emp::to_string(Root::den)
+        + " Power " + metric.name()
+      );
+    }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+      constexpr double exp = static_cast<double>(Root::num) / Root::den;
+      emp_assert(exp > 0);
+      if constexpr (exp == 1.0) return metric(a,b);
+
+      const double base = -1.0 + 2.0 * metric(a,b);
+      return 0.5 * (1.0 + std::copysign(std::pow(std::abs(base), exp), base));
+    }
+
+  };
+
+  // Base less than one squishes probability distribution to the center
+  // Base greater than one flattens out probability distribution
+  // Base must be positive
+  template <typename Metric, typename Base>
+  struct LogMod : public Metric {
+
+    using query_t = typename Metric::query_t;
+    using tag_t = typename Metric::query_t;
+
+    Metric metric;
+
+    std::string name() const override {
+      return (
+        emp::to_string(Base::num) + "/" + emp::to_string(Base::den)
+        + " Logarithm " + metric.name()
+      );
+    }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+      constexpr double base = static_cast<double>(Base::num) / Base::den;
+      emp_assert(base > 0);
+      if constexpr (base == 1.0) return metric(a,b);
+
+
+      const double raw = metric(a,b) - 0.5;
+      const double antilog = (
+        (2 - base)
+        + 2 * (base - 1) * (std::abs(raw) + 0.5)
+      );
+      return 0.5 * (
+        1.0 + std::copysign(emp::Log(antilog, base), raw)
+      );
     }
 
   };

@@ -1794,6 +1794,94 @@ TEST_CASE("Test map_utils", "[tools]")
   REQUIRE( emp::FindRef(test_123, "1", "nothing") == "1" );
 }
 
+TEST_CASE("Test matchbin_utils", "[tools]")
+{
+
+  {
+  emp::HammingMetric<4> baseline;
+
+  emp::PowMod<emp::HammingMetric<4>, std::ratio<3>> squish_pow;
+  emp::PowMod<emp::HammingMetric<4>, std::ratio<1>> same_pow;
+  emp::PowMod<emp::HammingMetric<4>, std::ratio<1,3>> stretch_pow;
+
+  emp::LogMod<emp::HammingMetric<4>, std::ratio<1,3>> squish_log;
+  emp::LogMod<emp::HammingMetric<4>, std::ratio<1>> same_log;
+  emp::LogMod<emp::HammingMetric<4>, std::ratio<3>> stretch_log;
+
+  REQUIRE( squish_pow({0,0,0,0},{0,0,0,0}) == baseline({0,0,0,0},{0,0,0,0}) );
+  REQUIRE( squish_pow({0,0,0,0},{0,0,0,1}) > baseline({0,0,0,0},{0,0,0,1}) );
+  REQUIRE( squish_pow({0,0,0,0},{0,0,1,1}) == baseline({0,0,0,0},{0,0,1,1}) );
+  REQUIRE( squish_pow({0,0,0,0},{0,1,1,1}) < baseline({0,0,0,0},{0,1,1,1}) );
+  REQUIRE( squish_pow({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
+
+  REQUIRE( same_pow({0,0,0,0},{0,0,0,0}) == baseline({0,0,0,0},{0,0,0,0}) );
+  REQUIRE( same_pow({0,0,0,0},{0,0,0,1}) == baseline({0,0,0,0},{0,0,0,1}) );
+  REQUIRE( same_pow({0,0,0,0},{0,0,1,1}) == baseline({0,0,0,0},{0,0,1,1}) );
+  REQUIRE( same_pow({0,0,0,0},{0,1,1,1}) == baseline({0,0,0,0},{0,1,1,1}) );
+  REQUIRE( same_pow({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
+
+  REQUIRE( stretch_pow({0,0,0,0},{0,0,0,0}) == baseline({0,0,0,0},{0,0,0,0}) );
+  REQUIRE( stretch_pow({0,0,0,0},{0,0,0,1}) < baseline({0,0,0,0},{0,0,0,1}) );
+  REQUIRE( stretch_pow({0,0,0,0},{0,0,1,1}) == baseline({0,0,0,0},{0,0,1,1}) );
+  REQUIRE( stretch_pow({0,0,0,0},{0,1,1,1}) > baseline({0,0,0,0},{0,1,1,1}) );
+  REQUIRE( stretch_pow({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
+
+  REQUIRE( squish_log({0,0,0,0},{0,0,0,0}) == baseline({0,0,0,0},{0,0,0,0}) );
+  REQUIRE( squish_log({0,0,0,0},{0,0,0,1}) > baseline({0,0,0,0},{0,0,0,1}) );
+  REQUIRE( squish_log({0,0,0,0},{0,0,1,1}) == baseline({0,0,0,0},{0,0,1,1}) );
+  REQUIRE( squish_log({0,0,0,0},{0,1,1,1}) < baseline({0,0,0,0},{0,1,1,1}) );
+  REQUIRE( squish_log({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
+
+  REQUIRE( same_log({0,0,0,0},{0,0,0,0}) == baseline({0,0,0,0},{0,0,0,0}) );
+  REQUIRE( same_log({0,0,0,0},{0,0,0,1}) == baseline({0,0,0,0},{0,0,0,1}) );
+  REQUIRE( same_log({0,0,0,0},{0,0,1,1}) == baseline({0,0,0,0},{0,0,1,1}) );
+  REQUIRE( same_log({0,0,0,0},{0,1,1,1}) == baseline({0,0,0,0},{0,1,1,1}) );
+  REQUIRE( same_log({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
+
+  REQUIRE( stretch_log({0,0,0,0},{0,0,0,0}) == baseline({0,0,0,0},{0,0,0,0}) );
+  REQUIRE( stretch_log({0,0,0,0},{0,0,0,1}) < baseline({0,0,0,0},{0,0,0,1}) );
+  REQUIRE( stretch_log({0,0,0,0},{0,0,1,1}) == baseline({0,0,0,0},{0,0,1,1}) );
+  REQUIRE( stretch_log({0,0,0,0},{0,1,1,1}) > baseline({0,0,0,0},{0,1,1,1}) );
+  REQUIRE( stretch_log({0,0,0,0},{1,1,1,1}) == baseline({0,0,0,0},{1,1,1,1}) );
+  }
+
+  {
+
+  emp::PowMod<emp::HashMetric<32>, std::ratio<5>> squish_pow;
+  emp::PowMod<emp::HashMetric<32>, std::ratio<1>> same_pow;
+  emp::PowMod<emp::HashMetric<32>, std::ratio<1,5>> stretch_pow;
+
+  emp::LogMod<emp::HashMetric<32>, std::ratio<1,5>> squish_log;
+  emp::LogMod<emp::HashMetric<32>, std::ratio<1>> same_log;
+  emp::LogMod<emp::HashMetric<32>, std::ratio<5>> stretch_log;
+
+  emp::Random rand(1);
+  for (size_t rep = 0; rep < 1000; ++rep) {
+    emp::BitSet<32> a(rand);
+    emp::BitSet<32> b(rand);
+    REQUIRE(squish_pow(a,b) >= 0.0);
+    REQUIRE(squish_pow(a,b) <= 1.0);
+
+    REQUIRE(same_pow(a,b) >= 0.0);
+    REQUIRE(same_pow(a,b) <= 1.0);
+
+    REQUIRE(stretch_pow(a,b) >= 0.0);
+    REQUIRE(stretch_pow(a,b) <= 1.0);
+
+    REQUIRE(squish_log(a,b) >= 0.0);
+    REQUIRE(squish_log(a,b) <= 1.0);
+
+    REQUIRE(same_log(a,b) >= 0.0);
+    REQUIRE(same_log(a,b) <= 1.0);
+
+    REQUIRE(stretch_log(a,b) >= 0.0);
+    REQUIRE(stretch_log(a,b) <= 1.0);
+  }
+
+  }
+
+}
+
 TEST_CASE("Test MatchBin", "[tools]")
 {
   {
