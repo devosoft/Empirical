@@ -559,6 +559,10 @@ namespace emp {
       , uids(ids)
       , rand(r){}
     std::optional<emp::vector<size_t>> operator()(size_t n){
+      // don't perform a lookup into an empty IndexMap, that's a segfault
+      // double braces: an empty vector inside an optional
+      if (!indexMap.GetSize()) return {{}};
+
       emp::vector<size_t> res;
       res.reserve(n);
 
