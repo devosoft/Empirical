@@ -42,6 +42,7 @@ namespace emp {
     virtual ~BaseMatchBin() {};
     virtual emp::vector<uid_t> Match(const query_t & query, size_t n=1) = 0;
     virtual uid_t Put(const Val & v, const tag_t & t) = 0;
+    virtual uid_t Set(const Val & v, const tag_t & t, const uid_t uid) = 0;
     virtual void Delete(const uid_t uid) = 0;
     virtual void Clear() = 0;
     virtual void ClearCache() = 0;
@@ -147,13 +148,22 @@ namespace emp {
     /// Put an item and associated tag in the container. Returns the uid for
     /// that entry.
     uid_t Put(const Val & v, const tag_t & t) override {
-      ClearCache();
       const uid_t orig = uid_stepper;
       while(values.find(++uid_stepper) != values.end()) {
         // if container is full
         // i.e., wrapped around because all uids already allocated
         if (uid_stepper == orig) throw std::runtime_error("container full");
       }
+      return Set(v, t, uid_stepper);
+    }
+
+    /// Put with a manually-chosen UID.
+    /// (Caller is responsible for ensuring UID is unique
+    /// or calling Delete beforehand.)
+    uid_t Set(const Val & v, const tag_t & t, const uid_t uid) override {
+      emp_assert(values.find(uid) == values.end());
+
+      ClearCache();
 
       values[uid_stepper] = v;
       regulators[uid_stepper] = 1.0;
