@@ -206,16 +206,19 @@ namespace emp {
 
     /// Access a reference single stored value by uid.
     Val & GetVal(const uid_t uid) override {
+      emp_assert(values.find(uid) != values.end());
       return values.at(uid);
     }
 
     /// Access a const reference to a single stored tag by uid.
     const tag_t & GetTag(const uid_t uid) override {
+      emp_assert(tags.find(uid) != tags.end());
       return tags.at(uid);
     }
 
     /// Change the tag at a given uid and clear the cache.
     void SetTag(const uid_t uid, tag_t tag) override {
+      emp_assert(tags.find(uid) != tags.end());
       ClearCache();
       tags.at(uid) = tag;
     }
@@ -252,6 +255,8 @@ namespace emp {
     /// Add an amount to an item's regulator value. Positive amounts
     /// downregulate the item and negative amounts upregulate it.
     void AdjRegulator(const uid_t uid, const double amt) override {
+      emp_assert(regulators.find(uid) != regulators.end());
+
       const double prev = regulators.at(uid);
       const double nxt = std::max(0.0, prev + amt);
 
