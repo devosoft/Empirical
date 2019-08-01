@@ -371,7 +371,7 @@ namespace emp {
       : inst_lib(_ilib), program(_prgm) { ; }
       Program(const Program &) = default;
 
-      void Clear() { 
+      void Clear() {
         program.clear();
         fun_clear_matchbin_cache();
       }
@@ -403,8 +403,8 @@ namespace emp {
       }
       bool ValidFunction(size_t fID) const { return fID < program.size(); }
 
-      void SetProgram(const program_t & _program) { 
-        program = _program; 
+      void SetProgram(const program_t & _program) {
+        program = _program;
         fun_clear_matchbin_cache();
       }
 
@@ -412,13 +412,13 @@ namespace emp {
         fun_clear_matchbin_cache = mb_clear_cache_fun;
       }
 
-      void PushFunction(const Function & _function) { 
-        program.emplace_back(_function); 
+      void PushFunction(const Function & _function) {
+        program.emplace_back(_function);
         fun_clear_matchbin_cache();
       }
       void PushFunction(const affinity_t & _aff=affinity_t(), const inst_seq_t & _seq=inst_seq_t()) {
         program.emplace_back(_aff, _seq);
-        fun_clear_matchbin_cache(); 
+        fun_clear_matchbin_cache();
       }
       /// Push new instruction to program.
       /// If no function pointer is provided and no functions exist yet, add new function to
@@ -657,7 +657,7 @@ namespace emp {
     bool is_matchbin_cache_dirty;
     std::function<void()> fun_clear_matchbin_cache = [this](){this->ResetMatchBin();};
     trait_printer_t fun_trait_print = [](std::ostream&, TRAIT_TYPE){};
-    
+
     // TODO: disallow configuration of hardware while executing. (and any other functions that could sent things into a bad state)
 
   public:
@@ -680,7 +680,7 @@ namespace emp {
       if (!rnd) NewRandom();
       // Give the program our matchbin clear cache callback.
       program.SetMatchBinClearCacheFun(fun_clear_matchbin_cache);
-      
+
       // Add all available cores to inactive.
       for (size_t i = 0; i < inactive_cores.size(); ++i)
         inactive_cores[i] = (inactive_cores.size() - 1) - i;
@@ -711,7 +711,7 @@ namespace emp {
         cores(in.cores),
         active_cores(in.active_cores), inactive_cores(in.inactive_cores),
         pending_cores(in.pending_cores),
-        exec_core_id(in.exec_core_id), is_executing(in.is_executing), 
+        exec_core_id(in.exec_core_id), is_executing(in.is_executing),
         matchBin(in.matchBin), is_matchbin_cache_dirty(in.is_matchbin_cache_dirty)
     {
       in.random_ptr = nullptr;
@@ -734,7 +734,7 @@ namespace emp {
         cores(in.cores),
         active_cores(in.active_cores), inactive_cores(in.inactive_cores),
         pending_cores(in.pending_cores),
-        exec_core_id(in.exec_core_id), is_executing(in.is_executing), 
+        exec_core_id(in.exec_core_id), is_executing(in.is_executing),
         matchBin(in.matchBin), is_matchbin_cache_dirty(in.is_matchbin_cache_dirty)
     {
       if (in.random_owner) NewRandom();
@@ -849,7 +849,7 @@ namespace emp {
 
     /// Get the stored trait in hardware's program.
     TRAIT_TYPE& GetTrait() { return traits; }
-    
+
     /// Get the stored trait in hardware's program.
     const TRAIT_TYPE& GetTrait() const { return traits; }
 
@@ -1011,8 +1011,8 @@ namespace emp {
     }
 
     /// Set program for this hardware object.
-    void SetProgram(const program_t & _program) { 
-      program = _program; 
+    void SetProgram(const program_t & _program) {
+      program = _program;
       program.SetMatchBinClearCacheFun(fun_clear_matchbin_cache);
       is_matchbin_cache_dirty = true;
     }
@@ -1340,7 +1340,7 @@ namespace emp {
     void PrintTraits(std::ostream & os=std::cout) {
       fun_trait_print(os, traits);
     }
-    
+
     void SetTraitPrintFun(const trait_printer_t& t){
       fun_trait_print = t;
     }
@@ -1702,6 +1702,7 @@ namespace emp {
       State & state = hw.GetCurState();
       emp::vector<size_t> best_fun = hw.GetMatchBin().Match(hw.GetProgram()[state.GetFP()][state.GetIP()].affinity, 1);
       if (best_fun.size() == 0){ return; }
+
       double regulator = state.GetLocal(inst.args[0]);
       if(regulator < 0){
         regulator = std::max(regulator, std::numeric_limits<double>::min());
