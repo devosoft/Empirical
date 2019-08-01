@@ -567,7 +567,12 @@ namespace emp {
       res.reserve(n);
 
       for (size_t j = 0; j < n; ++j) {
-        const double match_pos = rand.GetDouble(indexMap.GetWeight());
+        // if there's only one item in the IndexMap, don't do a random draw
+        const double match_pos = (
+          indexMap.GetSize() == 1
+          ? 0
+          : rand.GetDouble(indexMap.GetWeight())
+        );
         const size_t idx = indexMap.Index(match_pos);
         res.push_back(uids[idx]);
       }
