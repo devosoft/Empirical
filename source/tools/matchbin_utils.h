@@ -798,6 +798,129 @@ namespace emp {
     }
 
 };
+
+  /// Selector chooses probabilistically based on match quality with replacement using exponentially.
+  /// ThreshRatio: what is the minimum probability of matching
+  /// to even be considered for a match
+  /// BRatio, CRatio, ZRatio: p_match ~ b ^ (c * normalized_score) ^ z
+  /// MaxBaselineRatio: maximum score that all scores will be normalized to
+  /// baseline = min(min_score, MaxBaselineRatio)
+  /// normalized_score = score - baseline
+  template<
+    typename ThreshRatio = std::ratio<13, 10>,// treat neg numerator as +infty
+    typename BRatio = std::ratio<1, 100>,
+    typename CRatio = std::ratio<4, 1>,
+    typename ZRatio = std::ratio<4, 1>,
+    typename MaxBaselineRatio = std::ratio<5, 4>// treat neg numerator as +infty
+  >
+  struct ExpRouletteSelector : public SelectorBase<RouletteCacheState> {
+
+    using cache_state_type_t = RouletteCacheState;
+
+    emp::Random & rand;
+
+    ExpRouletteSelector(emp::Random & rand_)
+    : rand(rand_)
+    { ; }
+
+    std::string name() const override {
+      return emp::to_string(
+        "Exponential Roulette Selector (",
+        "ThreshRatio: ",
+        ThreshRatio::num,
+        "/",
+        ThreshRatio::den,
+        ", ",
+        "BRatio: ",
+        BRatio::num,
+        "/",
+        BRatio::den,
+        ", ",
+        "CRatio: ",
+        CRatio::num,
+        "/",
+        CRatio::den,
+        ", ",
+        "ZRatio: ",
+        ZRatio::num,
+        "/",
+        ZRatio::den,
+        ", ",
+        "MaxBaselineRatio: ",
+        MaxBaselineRatio::num,
+        "/",
+        MaxBaselineRatio::den,
+        ")"
+      );
+    }
+
+    RouletteCacheState operator()(
+      emp::vector<size_t>& uids,
+      std::unordered_map<size_t, double>& scores,
+      size_t n
+    ) override {
+
+      const double b = (static_cast<double>(BRatio::num) / BRatio::den);
+      emp_assert(b > 0 && b < 1);
+
+      const double c = (static_cast<double>(CRatio::num) / CRatio::den);
+      emp_assert(c > 0);
+
+      const double z = (static_cast<double>(ZRatio::num) / ZRatio::den);
+      emp_assert(z > 0);
+
+      // treat any negative numerator as positive infinity
+      const double thresh = (
+        ThreshRatio::num < 0
+        ? std::numeric_limits<double>::infinity()
+        : static_cast<double>(ThreshRatio::num) / ThreshRatio::den
+      );
+
+      // treat any negative numerator as positive infinity
+      const double max_baseline = (
+        MaxBaselineRatio::num < 0
+        ? std::numeric_limits<double>::infinity()
+        : static_cast<double>(MaxBaselineRatio::num) / MaxBaselineRatio::den
+      );
+
+      // partition by thresh
+      size_t partition = 0;
+      double min_score = std::numeric_limits<double>::infinity();
+      for (size_t i = 0; i < uids.size(); ++i) {
+        emp_assert(scores[uids[i]] >= 0);
+        min_score = std::min(min_score, scores[uids[i]]);
+        if (scores[uids[i]] <= thresh) {
+          std::swap(uids[i], uids[partition++]);
+        }
+      }
+
+      // skew relative to strongest match less than or equal to max_baseline
+      // to take into account regulation...
+      // (the default value of max_baseline is 1.0 because without
+      // upregulation, the best possible match score is 1.0)
+      const double baseline = std::min(min_score, max_baseline);
+      emp_assert(baseline >= 0);
+      emp_assert(baseline <= max_baseline);
+
+      IndexMap match_index(partition);
+
+      for (size_t p = 0; p < partition; ++p) {
+        emp_assert(scores[uids[p]] - baseline >= 0);
+        match_index.Adjust(
+          p,
+          std::pow(
+            b,
+            std::pow(c * (scores[uids[p]] - baseline), z)
+          )
+        );
+      }
+
+      return RouletteCacheState(match_index, uids, rand);
+
+    }
+
+};
+
 /*
 struct DynamicSelector : public SelectorBase<emp::vector<size_t>>{
 
