@@ -1172,7 +1172,7 @@ namespace emp {
       size_t fID;
       emp::vector<size_t> best_matches(FindBestFuncMatch(affinity, threshold));
       if (best_matches.empty()) return;
-      if (best_matches.size() == 1.0) fID = best_matches[0];
+      if (best_matches.size() == 1) fID = best_matches[0];
       else if (stochastic_fun_call) fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
       else fID = best_matches[0];
       CallFunction(fID);
