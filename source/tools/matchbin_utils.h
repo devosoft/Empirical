@@ -558,7 +558,7 @@ namespace emp {
       : indexMap(im)
       , uids(ids)
       , rand(r){}
-    std::optional<emp::vector<size_t>> operator()(size_t n){
+    std::optional<emp::vector<size_t>> operator()(size_t n) override {
       // don't perform a lookup into an empty IndexMap, that's a segfault
       // double braces: an empty vector inside an optional
       if (!indexMap.GetSize()) return {{}};
@@ -584,14 +584,14 @@ namespace emp {
     emp::Random rand;
   };
 
-  struct RankedCacheState: public CacheStateBase{
+  struct RankedCacheState: public CacheStateBase {
 
     RankedCacheState() = default;
     RankedCacheState(emp::vector<size_t>::iterator begin, size_t back, size_t n):
         uids(emp::vector<size_t>(begin, begin + back))
       , requestSize(n){}
 
-    std::optional<emp::vector<size_t>> operator()(size_t n){
+    std::optional<emp::vector<size_t>> operator()(size_t n) override {
       if (n > requestSize){ return std::nullopt; }
       if (n >= uids.size()){ return uids; }
       return emp::vector<size_t>(uids.begin(), uids.begin()+n);
@@ -624,7 +624,7 @@ namespace emp {
       emp::vector<size_t>& uids,
       std::unordered_map<size_t, double>& scores,
       size_t n
-    ){
+    ) override {
 
       size_t back = 0;
 
@@ -704,7 +704,7 @@ namespace emp {
       emp::vector<size_t>& uids,
       std::unordered_map<size_t, double>& scores,
       size_t n
-    ) {
+    ) override {
 
       const double skew = ((double) SkewRatio::num / SkewRatio::den);
       emp_assert(skew > 0);
