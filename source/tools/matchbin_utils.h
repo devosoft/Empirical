@@ -610,6 +610,7 @@ namespace emp {
         std::unordered_map<size_t, double>& scores,
         size_t n
         ) = 0;
+    virtual std::string name() const = 0;
   };
 
   /// Returns matches within the threshold ThreshRatio sorted by match quality.
@@ -619,6 +620,17 @@ namespace emp {
     RankedSelector(emp::Random&){ ; }
 
     using cache_state_type_t = RankedCacheState;
+
+    std::string name() const override {
+      return emp::to_string(
+        "Ranked Selector (",
+        "ThreshRatio: ",
+        ThreshRatio::num,
+        "/",
+        ThreshRatio::den,
+        ")"
+      );
+    }
 
     RankedCacheState operator()(
       emp::vector<size_t>& uids,
@@ -699,6 +711,27 @@ namespace emp {
     RouletteSelector(emp::Random & rand_)
     : rand(rand_)
     { ; }
+
+    std::string name() const override {
+      return emp::to_string(
+        "Roulette Selector (",
+        "ThreshRatio: ",
+        ThreshRatio::num,
+        "/",
+        ThreshRatio::den,
+        ", ",
+        "SkewRatio: ",
+        SkewRatio::num,
+        "/",
+        SkewRatio::den,
+        ", ",
+        "MaxBaselineRatio: ",
+        MaxBaselineRatio::num,
+        "/",
+        MaxBaselineRatio::den,
+        ")"
+      );
+    }
 
     RouletteCacheState operator()(
       emp::vector<size_t>& uids,

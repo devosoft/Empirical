@@ -56,6 +56,7 @@ namespace emp {
     virtual void AdjRegulator(uid_t uid, double amt) = 0;
     virtual void SetRegulator(uid_t uid, double amt) = 0;
     virtual double ViewRegulator(const uid_t uid) const = 0;
+    virtual std::string name() const = 0;
 
   };
 
@@ -284,6 +285,16 @@ namespace emp {
       emp_assert(regulators.find(uid) != regulators.end());
 
       return regulators.at(uid);
+    }
+
+    std::string name() const override {
+      return emp::to_string(
+        "Selector: ",
+        selector.name(),
+        " / ",
+        "Metric: ",
+        metric.name()
+      );
     }
 
   };
