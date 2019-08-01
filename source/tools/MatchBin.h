@@ -240,19 +240,27 @@ namespace emp {
 
     /// Add an amount to an item's regulator value. Positive amounts
     /// downregulate the item and negative amounts upregulate it.
-    void AdjRegulator(uid_t uid, double amt) override {
-      regulators[uid] = std::max(0.0, regulators.at(uid) + amt);
-      ClearCache();
+    void AdjRegulator(const uid_t uid, const double amt) override {
+      const double prev = regulators.at(uid);
+      const double nxt = std::max(0.0, prev + amt);
+
+      if (prev != nxt) ClearCache();
+
+      regulators.at(uid) = nxt;
+
     }
 
     /// Set an item's regulator value. Provided value must be greater than or
     /// equal to zero. A value between zero and one upregulates the item, a
     /// value of exactly one is neutral, and a value greater than one
     /// upregulates the item.
-    void SetRegulator(uid_t uid, double amt) override {
+    void SetRegulator(const uid_t uid, const double amt) override {
       emp_assert(amt >= 0.0);
+
+      if (regulators.at(uid) != amt) ClearCache();
+
       regulators.at(uid) = amt;
-      ClearCache();
+
     }
 
   };
