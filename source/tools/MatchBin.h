@@ -55,6 +55,7 @@ namespace emp {
     virtual size_t Size() = 0;
     virtual void AdjRegulator(uid_t uid, double amt) = 0;
     virtual void SetRegulator(uid_t uid, double amt) = 0;
+    virtual double ViewRegulator(const uid_t uid) const = 0;
 
   };
 
@@ -265,12 +266,19 @@ namespace emp {
     /// value of exactly one is neutral, and a value greater than one
     /// upregulates the item.
     void SetRegulator(const uid_t uid, const double amt) override {
+      emp_assert(regulators.find(uid) != regulators.end());
       emp_assert(amt >= 0.0);
 
       if (regulators.at(uid) != amt) ClearCache();
 
       regulators.at(uid) = amt;
+    }
 
+    /// View an item's regulator value.
+    double ViewRegulator(const uid_t uid) const override {
+      emp_assert(regulators.find(uid) != regulators.end());
+
+      return regulators.at(uid);
     }
 
   };
