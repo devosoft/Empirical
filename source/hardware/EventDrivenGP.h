@@ -674,8 +674,13 @@ namespace emp {
         default_mem_value(DEFAULT_MEM_VALUE), min_bind_thresh(DEFAULT_MIN_BIND_THRESH),
         stochastic_fun_call(true),
         cores(max_cores), active_cores(), inactive_cores(max_cores), pending_cores(),
-        exec_core_id(0), is_executing(false), matchBin(MATCHBIN_TYPE(*rnd)), is_matchbin_cache_dirty(true)
+        exec_core_id(0), is_executing(false),
+        //TODO this leaks like a faucet
+        matchBin(MATCHBIN_TYPE(rnd ? *rnd : *emp::NewPtr<emp::Random>())),
+        is_matchbin_cache_dirty(true)
     {
+      // passing in a Random nullptr causes memory leak
+      emp_assert(rnd);
       // If no random provided, create one.
       if (!rnd) NewRandom();
       // Give the program our matchbin clear cache callback.
