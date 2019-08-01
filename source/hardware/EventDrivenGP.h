@@ -1142,7 +1142,9 @@ namespace emp {
       if(is_matchbin_cache_dirty){
         ResetMatchBin();
       }
-      return matchBin.GetVals(matchBin.Match(affinity, 1));
+      // no need to transform to values because we're using
+      // matchbin uids equivalent to function uids
+      return matchBin.Match(affinity, 1);
     }
 
     MATCHBIN_TYPE& GetMatchBin(){
@@ -1153,7 +1155,7 @@ namespace emp {
       matchBin.Clear();
       is_matchbin_cache_dirty = false;
       for (size_t i = 0; i < program.GetSize(); ++i){
-        matchBin.Put(i, program[i].affinity);
+        matchBin.Set(i, program[i].affinity, i);
       }
     }
 
