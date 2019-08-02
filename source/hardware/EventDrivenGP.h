@@ -1708,7 +1708,7 @@ namespace emp {
     static void Inst_SetRegulator(EventDrivenGP_t & hw, const inst_t & inst){
       const State & state = hw.GetCurState();
       emp::vector<size_t> best_fun = hw.GetMatchBin().Match(
-        hw.GetProgram()[state.GetFP()][state.GetIP()].affinity,
+        inst.affinity,
         1
       );
 
@@ -1746,7 +1746,7 @@ namespace emp {
     static void Inst_AdjRegulator(EventDrivenGP_t & hw, const inst_t & inst){
       const State & state = hw.GetCurState();
       emp::vector<size_t> best_fun = hw.GetMatchBin().Match(
-        hw.GetProgram()[state.GetFP()][state.GetIP()].affinity,
+        inst.affinity,
         1
       );
       if (!best_fun.size()) return;
@@ -1798,7 +1798,7 @@ namespace emp {
     static void Inst_SenseRegulator(EventDrivenGP_t & hw, const inst_t & inst){
       State & state = hw.GetCurState();
       emp::vector<size_t> best_fun = hw.GetMatchBin().Match(
-        hw.GetProgram()[state.GetFP()][state.GetIP()].affinity,
+        inst.affinity,
         1
       );
       if (best_fun.size() == 1){
@@ -1830,8 +1830,7 @@ namespace emp {
       constexpr double min = static_cast<double>(MaxRatio::num) / MaxRatio::den;
 
       State & state = hw.GetCurState();
-      const auto & tag =
-        hw.GetProgram()[state.GetFP()][state.GetIP()].affinity;
+      const auto & tag = inst.affinity;
 
       std::hash<affinity_t> hasher;
 
