@@ -1706,7 +1706,7 @@ namespace emp {
     /// Number of arguments: 1
     /// Description: Sets the regulator of a tag in the matchbin.
     static void Inst_SetRegulator(EventDrivenGP_t & hw, const inst_t & inst){
-      State & state = hw.GetCurState();
+      const State & state = hw.GetCurState();
       emp::vector<size_t> best_fun = hw.GetMatchBin().Match(
         hw.GetProgram()[state.GetFP()][state.GetIP()].affinity,
         1
@@ -1728,7 +1728,7 @@ namespace emp {
     /// Number of arguments: 1
     /// Description: Sets the regulator of the currently executing function.
     static void Inst_SetOwnRegulator(EventDrivenGP_t & hw, const inst_t & inst){
-      State & state = hw.GetCurState();
+      const State & state = hw.GetCurState();
       double regulator = state.GetLocal(inst.args[0]);
       if(regulator < 0){
         regulator = std::max(regulator, std::numeric_limits<double>::min());
