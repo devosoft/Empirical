@@ -1740,30 +1740,55 @@ namespace emp {
     }
 
     /// Non-default instruction: AdjRegulator
-    /// Number of arguments: 1
-    /// Description: adjusts the regulator of a tag in the matchbin.
+    /// Number of arguments: 2
+    /// Description: adjusts the regulator of a tag in the matchbin
+    /// towards a target.
     static void Inst_AdjRegulator(EventDrivenGP_t & hw, const inst_t & inst){
-      State & state = hw.GetCurState();
+      const State & state = hw.GetCurState();
       emp::vector<size_t> best_fun = hw.GetMatchBin().Match(
         hw.GetProgram()[state.GetFP()][state.GetIP()].affinity,
         1
       );
-      if (best_fun.size() == 1){
-        hw.GetMatchBin().AdjRegulator(
-          best_fun[0],
-          state.GetLocal(inst.args[0])
-        );
+      if (!best_fun.size()) return;
+
+      double target = state.GetLocal(inst.args[0]);
+      if(target < 0) {
+        target = std::max(target, std::numeric_limits<double>::min());
+        target /= std::numeric_limits<double>::min();
+      } else {
+        target += 1.0;
       }
+
+      const double budge = emp::Mod(state.GetLocal(inst.args[1])+0.2, 1.0);
+      const double cur = hw.GetMatchBin().ViewRegulator(state.GetFP());
+
+      hw.GetMatchBin().SetRegulator(
+        best_fun[0],
+        target * budge + cur * (1 - budge)
+      );
     }
 
     /// Non-default instruction: AdjOwnRegulator
-    /// Number of arguments: 1
-    /// Description: adjusts the regulator of a tag in the matchbin.
+    /// Number of arguments: 2
+    /// Description: adjusts the regulator of a tag in the matchbin
+    /// towards a target.
     static void Inst_AdjOwnRegulator(EventDrivenGP_t & hw, const inst_t & inst){
-      State & state = hw.GetCurState();
-      hw.GetMatchBin().AdjRegulator(
+      const State & state = hw.GetCurState();
+
+      double target = state.GetLocal(inst.args[0]);
+      if(target < 0) {
+        target = std::max(target, std::numeric_limits<double>::min());
+        target /= std::numeric_limits<double>::min();
+      } else {
+        target += 1.0;
+      }
+
+      const double budge = emp::Mod(state.GetLocal(inst.args[1])+0.2, 1.0);
+      const double cur = hw.GetMatchBin().ViewRegulator(state.GetFP());
+
+      hw.GetMatchBin().SetRegulator(
         state.GetFP(),
-        state.GetLocal(inst.args[0])
+        target * budge + cur * (1 - budge)
       );
     }
 
