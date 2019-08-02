@@ -1736,7 +1736,7 @@ namespace emp {
       }else{
         regulator += 1.0;
       }
-      hw.GetMatchBin().SetOwnRegulator(state.GetFP(), regulator);
+      hw.GetMatchBin().SetRegulator(state.GetFP(), regulator);
     }
 
     /// Non-default instruction: AdjRegulator
