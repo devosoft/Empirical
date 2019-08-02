@@ -1820,6 +1820,31 @@ namespace emp {
       );
     }
 
+    /// Non-default instruction: Terminal
+    /// Number of arguments: 1
+    /// Description: writes a genetically-encoded value into a register.
+    template<typename MaxRatio=std::ratio<1>, typename MinRatio=std::ratio<0>>
+    static void Inst_Terminal(EventDrivenGP_t & hw, const inst_t & inst) {
+
+      constexpr double max = static_cast<double>(MaxRatio::num) / MaxRatio::den;
+      constexpr double min = static_cast<double>(MaxRatio::num) / MaxRatio::den;
+
+      State & state = hw.GetCurState();
+      const auto & tag =
+        hw.GetProgram()[state.GetFP()][state.GetIP()].affinity;
+
+      std::hash<affinity_t> hasher;
+
+      const double val = (
+        static_cast<double>(hasher(tag)) /
+        std::numeric_limits<size_t>::max()
+      ) * (max - min) - min;
+
+      state.SetLocal(inst.args[0], val);
+
+    }
+
+
     /// Get a pointer to const default instruction library. Will only construct the default instruction library once.
     static Ptr<const InstLib<EventDrivenGP_t>> DefaultInstLib() {
       static inst_lib_t inst_lib;
