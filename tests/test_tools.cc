@@ -1975,6 +1975,7 @@ TEST_CASE("Test matchbin_utils", "[tools]")
 TEST_CASE("Test MatchBin", "[tools]")
 {
   {
+    emp::Random rand(1);
   // We care about numbers less than 6 (<=5.99) away from what we're matching.
   // The AbsDiffMetric will normalize our result to distance / Max_Int.
   // We multiply both sides by 100 to get rid of floats for std::ratio
@@ -1983,7 +1984,7 @@ TEST_CASE("Test MatchBin", "[tools]")
     std::string,
     emp::AbsDiffMetric,
     emp::RankedSelector<std::ratio<214748364700+599,214748364700>>
-  > bin;
+  > bin(rand);
 
   const size_t hi = bin.Put("hi", 1);
   REQUIRE( bin.GetVal(hi) == "hi" );
@@ -2054,11 +2055,13 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   // test infinite thresh
   {
+  emp::Random rand(1);
+
   emp::MatchBin<
     std::string,
     emp::AbsDiffMetric,
     emp::RankedSelector<>
-  > bin;
+  > bin(rand);
 
   const size_t hi = bin.Put("hi", 1);
   REQUIRE( bin.GetVal(hi) == "hi" );
@@ -2477,11 +2480,12 @@ TEST_CASE("Test MatchBin", "[tools]")
   */
 
   {
+  emp::Random rand(1);
   emp::MatchBin<
     std::string,
     emp::HammingMetric<32>,
     emp::RankedSelector<std::ratio<32 + 3, 32>>
-  > bitBin;
+  > bitBin(rand);
 
   emp::BitSet<32> bs3;
   bs3.SetUInt(0,3); // 0000 0011
@@ -2576,12 +2580,13 @@ TEST_CASE("Test MatchBin", "[tools]")
   }
 
   {
+  emp::Random rand(1);
   const int max_value = 1000;
   emp::MatchBin<
     std::string,
     emp::NextUpMetric<1000>,
     emp::RankedSelector<std::ratio<max_value + max_value,max_value>>
-  > bin;
+  > bin(rand);
 
   const size_t hi = bin.Put("hi", 1);
   REQUIRE( bin.GetVal(hi) == "hi" );
@@ -2672,11 +2677,12 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   }
   {
+  emp::Random rand(1);
   emp::MatchBin<
     std::string,
     emp::StreakMetric<8>,
     emp::RankedSelector<std::ratio<1+1, 1>>
-  > bitBin;
+  > bitBin(rand);
 
   emp::BitSet<8> bs1;
   bs1.SetUInt(0,1); // 0000 0001
@@ -2730,12 +2736,12 @@ TEST_CASE("Test MatchBin", "[tools]")
   }
 
   {
-
+  emp::Random rand(1);
   emp::MatchBin<
     std::string,
     emp::StreakMetric<64>,
     emp::RankedSelector<std::ratio<1+1, 1>>
-  > bitBin64;
+  > bitBin64(rand);
 
   emp::BitSet<64> bs7;
   bs7.SetUInt(
@@ -2775,11 +2781,12 @@ TEST_CASE("Test MatchBin", "[tools]")
   }
 
   {
+  emp::Random rand(1);
   emp::MatchBin<
     std::string,
     emp::SymmetricNoWrapMetric<8>,
     emp::RankedSelector<std::ratio<256 + 40, 256>>
-  > bitBin;
+  > bitBin(rand);
 
   emp::BitSet<8> bs1;
   bs1.SetUInt(0,1); // 0000 0001
@@ -3735,6 +3742,9 @@ TEST_CASE("Test MatchBin", "[tools]")
   {
   // Cache Testing
   struct DummySelector: public emp::RankedSelector<std::ratio<2,1>>{
+
+    DummySelector(emp::Random &rand) : emp::RankedSelector<std::ratio<2,1>>(rand) { ; }
+
     size_t opCount = 0;
 
     emp::RankedCacheState operator()(
@@ -3749,13 +3759,14 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   class MatchBinTest : public emp::MatchBin<emp::BitSet<32>, emp::HammingMetric<32>, DummySelector>{
   public:
+    MatchBinTest(emp::Random & rand) : emp::MatchBin<emp::BitSet<32>, emp::HammingMetric<32>, DummySelector>(rand) { ; }
+
     size_t GetCacheSize(){ return cache.size(); }
     size_t GetSelectCount(){ return selector.opCount; }
   };
 
-
-  MatchBinTest bin;
   emp::Random rand(1);
+  MatchBinTest bin(rand);
   std::vector<size_t> ids;
 
   for(unsigned int i = 0; i < 1000; ++i){
