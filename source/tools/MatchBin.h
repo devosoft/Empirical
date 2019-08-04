@@ -167,11 +167,11 @@ namespace emp {
 
       ClearCache();
 
-      values[uid_stepper] = v;
-      regulators[uid_stepper] = 1.0;
-      tags[uid_stepper] = t;
-      uids.push_back(uid_stepper);
-      return uid_stepper;
+      values[uid] = v;
+      regulators[uid] = 1.0;
+      tags[uid] = t;
+      uids.push_back(uid);
+      return uid;
     }
 
 
