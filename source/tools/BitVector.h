@@ -232,12 +232,18 @@ namespace emp {
     /// Copy constructor of existing bit field.
     BitVector(const BitVector & in_set) : num_bits(in_set.num_bits), bit_set(nullptr) {
       #ifdef EMP_TRACK_MEM
-      emp_assert(in_set.bit_set.IsNull() || in_set.bit_set.DebugIsArray(), in_set.bit_set.IsNull(), in_set.bit_set.DebugIsArray());
+      emp_assert(in_set.bit_set.IsNull() || in_set.bit_set.DebugIsArray());
       emp_assert(in_set.bit_set.OK());
       #endif
 
-      if (num_bits) bit_set = NewArrayPtr<field_t>(NumFields());
-      RawCopy(in_set.bit_set);
+      // There is only something to copy if there are a non-zero number of bits!
+      if (num_bits) {
+        #ifdef EMP_TRACK_MEM
+        emp_assert(!in_set.bit_set.IsNull() && in_set.bit_set.DebugIsArray(), in_set.bit_set.IsNull(), in_set.bit_set.DebugIsArray());
+        #endif
+        bit_set = NewArrayPtr<field_t>(NumFields());
+        RawCopy(in_set.bit_set);
+      }
     }
 
     /// Move constructor of existing bit field.
