@@ -170,6 +170,9 @@ namespace emp {
                     << "  id=" << ptr_id[info.GetPtr()]
                     << std::endl;
         }
+        if (undeleted_info.size() > 10) {
+          std::cerr << "  ..." << std::endl;
+        }
         abort();
       }
 
