@@ -48,16 +48,17 @@ namespace emp {
     virtual void ClearCache() = 0;
     virtual void SetCacheOn(const bool state = true) = 0;
     virtual Val & GetVal(const uid_t uid) = 0;
-    virtual const tag_t & GetTag(const uid_t uid) = 0;
+    virtual const tag_t & GetTag(const uid_t uid) const = 0;
     virtual void SetTag(const uid_t uid, tag_t tag) = 0;
     virtual emp::vector<Val> GetVals(const emp::vector<uid_t> & uids) = 0;
     virtual emp::vector<tag_t> GetTags(const emp::vector<uid_t> & uids) = 0;
-    virtual size_t Size() = 0;
+    virtual size_t Size() const = 0;
     virtual void AdjRegulator(uid_t uid, double amt) = 0;
     virtual void SetRegulator(uid_t uid, double amt) = 0;
     virtual double ViewRegulator(const uid_t uid) const = 0;
+    virtual void ImprintRegulators(const BaseMatchBin & target) = 0;
     virtual std::string name() const = 0;
-
+    virtual const emp::vector<uid_t>& ViewUIDs() const = 0;
   };
 
 
@@ -212,7 +213,7 @@ namespace emp {
     }
 
     /// Access a const reference to a single stored tag by uid.
-    const tag_t & GetTag(const uid_t uid) override {
+    const tag_t & GetTag(const uid_t uid) const override {
       emp_assert(tags.find(uid) != tags.end());
       return tags.at(uid);
     }
@@ -249,7 +250,7 @@ namespace emp {
     }
 
     /// Get the number of items stored in the container.
-    size_t Size() override {
+    size_t Size() const override {
       return values.size();
     }
 
@@ -287,6 +288,46 @@ namespace emp {
       return regulators.at(uid);
     }
 
+    /// View the UIDs currently associated with the MatchBin.
+    void ImprintRegulators(
+      const BaseMatchBin<Val, query_t, tag_t> & target
+    ) override {
+
+      for (uid_t uid : uids) {
+
+        std::unordered_map<uid_t, double> scores;
+        std::transform(
+          std::cbegin(target.ViewUIDs()),
+          std::cend(target.ViewUIDs()),
+          std::inserter(scores, std::begin(scores)),
+          [&](size_t target_uid){
+            return std::pair{
+              target_uid,
+              metric(target.GetTag(target_uid), GetTag(uid))
+            };
+          }
+        );
+        SetRegulator(
+          uid,
+          target.ViewRegulator(
+            std::min_element(
+              std::cbegin(scores),
+              std::cend(scores),
+              [](const auto& l, const auto& r ){ return l.second < r.second; }
+            )->first
+          )
+        );
+
+      }
+
+    }
+
+    /// View UIDs associated with this MatchBin
+    const emp::vector<uid_t>& ViewUIDs() const override {
+      return uids;
+    }
+
+    /// TODO
     std::string name() const override {
       return emp::to_string(
         "Selector: ",
