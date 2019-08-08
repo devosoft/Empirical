@@ -55,12 +55,15 @@ namespace web {
       std::string curr_val ="";
 
       bool autofocus;
+      bool callback_tripped;
 
       std::function<void(std::string)> callback;
       uint32_t callback_id;
       std::string onchange_info;
 
-      InputInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
+      InputInfo(const std::string & in_id="")
+      : internal::WidgetInfo(in_id)
+      , callback_tripped(false) { ; }
       InputInfo(const InputInfo &) = delete;               // No copies of INFO allowed
       InputInfo & operator=(const InputInfo &) = delete;   // No copies of INFO allowed
       virtual ~InputInfo() {
@@ -82,6 +85,7 @@ namespace web {
       }
 
       void DoChange(std::string new_val) {
+        callback_tripped = true;
         curr_val = new_val;
         callback(curr_val);
         UpdateDependants();
@@ -117,10 +121,12 @@ namespace web {
       }
       void UpdateValue(const std::string & in_value) {
         value = in_value;
+        if (!callback_tripped) DoChange(in_value);
         if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
       }
       void UpdateValue(const double & in_value) {
         value = to_string(in_value);
+        if (!callback_tripped) DoChange(value);
         if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
       }
       void UpdateStep(const std::string & in_step) {
