@@ -58,10 +58,11 @@ namespace web {
       bool text_append;                               ///< Can we append to a current text widget?
       std::map<std::string, Widget> widget_dict;      ///< By-name lookup for descendent widgets
       std::map<std::string, web::Animate *> anim_map; ///< Streamline creation of Animate objects.
+      std::string tag; ///< Jury rig this class for non-div duty
 
-      DivInfo(const std::string & in_id="")
+      DivInfo(const std::string & in_id="", const std::string & in_tag="div")
         : internal::WidgetInfo(in_id), scroll_top(0.0), append_ok(true), text_append(false)
-        , widget_dict(), anim_map()
+        , widget_dict(), anim_map(), tag(in_tag)
       {
         emp::Initialize();
       }
@@ -72,6 +73,12 @@ namespace web {
       }
 
       std::string GetTypeName() const override { return "DivInfo"; }
+
+      void DoSetTag(const std::string & tag_name) {
+        tag = tag_name;
+        if (state == Widget::ACTIVE) ReplaceHTML();
+      }
+
 
       bool IsRegistered(const std::string & test_name) const {
         return (widget_dict.find(test_name) != widget_dict.end());
@@ -207,11 +214,11 @@ namespace web {
         HTML.str("");       // Clear the current text.
 
         // Loop through all children and build a span element for each to replace.
-        HTML << "<div id=\'" << id << "\'>"; // Tag to envelope Div
+        HTML << "<" << tag << " id=\'" << id << "\'>"; // Tag to envelop Div
         for (Widget & w : m_children) {
           HTML << "<span id=\'" << w.GetID() << "'></span>";  // Span element for current widget.
         }
-        HTML << "</div>";
+        HTML << "</" << tag << ">";
       }
 
 
@@ -264,9 +271,10 @@ namespace web {
     const internal::DivInfo * Info() const { return (internal::DivInfo *) info; }
 
   public:
-    Div(const std::string & in_name) : WidgetFacet(in_name) {
+    Div(const std::string & in_name, const std::string & in_tag="div")
+    : WidgetFacet(in_name) {
       // When a name is provided, create an associated Widget info.
-      info = new internal::DivInfo(in_name);
+      info = new internal::DivInfo(in_name, in_tag);
     }
     Div(const Div & in) : WidgetFacet(in) { ; }
     Div(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsDiv()); }
@@ -280,6 +288,12 @@ namespace web {
 
     /// Set the scroll position.
     Div & ScrollTop(double in_top) { Info()->scroll_top = in_top; return *this; }
+
+    /// Set the html tag.
+    Div & SetTag(const std::string & in_tag) {
+      Info()->DoSetTag(in_tag);
+      return *this;
+    }
 
     /// Clear the contents of this div.
     void Clear() { if (info) Info()->Clear(); }
