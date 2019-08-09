@@ -245,10 +245,22 @@ namespace emp {
     return false;
   }
 
+  /// Determine if there are only digits in a string.
+  inline bool is_digits(const std::string & test_str) {
+    for (char c : test_str) if (!is_digit(c)) return false;
+    return true;
+  }
+
   /// Determine if there are any letters or digits anywhere in a string.
   inline bool has_alphanumeric(const std::string & test_str) {
     for (char c : test_str) if (is_alphanumeric(c)) return true;
     return false;
+  }
+
+  /// Determine if there are any letters or digits anywhere in a string.
+  inline bool is_alphanumeric(const std::string & test_str) {
+    for (char c : test_str) if (!is_alphanumeric(c)) return false;
+    return true;
   }
 
   /// Determine if there are any letters, digit, or underscores anywhere in a string.
