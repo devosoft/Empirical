@@ -1156,6 +1156,10 @@ namespace emp {
       return matchBin;
     }
 
+    const MATCHBIN_TYPE& GetMatchBin() const {
+      return matchBin;
+    }
+
     void ResetMatchBin(){
       matchBin.Clear();
       is_matchbin_cache_dirty = false;
