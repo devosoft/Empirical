@@ -561,7 +561,7 @@ namespace emp {
     std::optional<emp::vector<size_t>> operator()(size_t n) override {
       // don't perform a lookup into an empty IndexMap, that's a segfault
       // double braces: an empty vector inside an optional
-      if (!indexMap.GetSize()) return {{}};
+      if (!indexMap.GetSize()) return std::optional{emp::vector<size_t>{}};
 
       emp::vector<size_t> res;
       res.reserve(n);
