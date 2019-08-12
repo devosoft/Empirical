@@ -66,7 +66,7 @@ namespace web {
     const DocuExtrasInfo * Info() const { return (DocuExtrasInfo *) info; }
 
     /// Apply all HTML details associated with this widget.
-    void Apply() { Info()->extras.Apply(Info()->id); std::cout << "apply" << Info()->id << std::endl; }
+    void Apply() { Info()->extras.Apply(Info()->id); }
 
   public:
     DocuExtras(const std::string & in_name) : Widget(in_name) {
