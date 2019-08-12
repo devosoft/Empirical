@@ -44,7 +44,18 @@ bool compareFiles(const std::string& p1, const std::string& p2) {
 TEST_CASE("Test DataRange", "[data]") {
     emp::DataNode<int, emp::data::Current, emp::data::Range, emp::data::Pull, emp::data::Log> data;
 
-    data.Add(27, 28, 29);
+    data.Add(27);
+    REQUIRE(data.GetCurrent() == 27);
+    REQUIRE(data.GetTotal() == 27);
+    REQUIRE(data.GetMean() == 27);
+    REQUIRE(data.GetMin() == 27);
+    REQUIRE(data.GetMax() == 27);
+    REQUIRE(data.GetMedian() == 27);
+    REQUIRE(data.GetPercentile(0) == 27);
+    REQUIRE(data.GetPercentile(25) == 27);
+    REQUIRE(data.GetPercentile(100) == 27);
+
+    data.Add(29,28);
 
     // std::cout << "=> Added 27, 28, and 29" << std::endl;
     // std::cout << "Current = " << data.GetCurrent() << std::endl;
@@ -53,11 +64,15 @@ TEST_CASE("Test DataRange", "[data]") {
     // std::cout << "Min     = " << data.GetMin() << std::endl;
     // std::cout << "Max     = " << data.GetMax() << std::endl;
 
-    REQUIRE(data.GetCurrent() == 29);
+    REQUIRE(data.GetCurrent() == 28);
     REQUIRE(data.GetTotal() == 84);
     REQUIRE(data.GetMean() == 28);
     REQUIRE(data.GetMin() == 27);
     REQUIRE(data.GetMax() == 29);
+    REQUIRE(data.GetMedian() == 28);
+    REQUIRE(data.GetPercentile(0) == 27);
+    REQUIRE(data.GetPercentile(25) == 27.5);
+    REQUIRE(data.GetPercentile(100) == 29);
 
     data.Add(32);
     // std::cout << "\n=> Added 32" << std::endl;
@@ -72,6 +87,10 @@ TEST_CASE("Test DataRange", "[data]") {
     REQUIRE(data.GetMean() == 29);
     REQUIRE(data.GetMin() == 27);
     REQUIRE(data.GetMax() == 32);
+    REQUIRE(data.GetMedian() == 28.5);
+    REQUIRE(data.GetPercentile(0) == 27);
+    REQUIRE(data.GetPercentile(25) == 27.75);
+    REQUIRE(data.GetPercentile(100) == 32);
 
 
     data.Reset();
@@ -87,6 +106,10 @@ TEST_CASE("Test DataRange", "[data]") {
     REQUIRE(std::isnan(data.GetMean()));
     REQUIRE(data.GetMin() == 0);
     REQUIRE(data.GetMax() == 0);
+    REQUIRE(std::isnan(data.GetMedian()));
+    REQUIRE(std::isnan(data.GetPercentile(0)));
+    REQUIRE(std::isnan(data.GetPercentile(25)));
+    REQUIRE(std::isnan(data.GetPercentile(100)));
 
     data.Add(100,200,300,400,500);
     // std::cout << "\nAdded 100,200,300,400,500" << std::endl;
@@ -101,6 +124,10 @@ TEST_CASE("Test DataRange", "[data]") {
     REQUIRE(data.GetMean() == 300);
     REQUIRE(data.GetMin() == 100);
     REQUIRE(data.GetMax() == 500);
+    REQUIRE(data.GetMedian() == 300);
+    REQUIRE(data.GetPercentile(0) == 100);
+    REQUIRE(data.GetPercentile(25) == 200);
+    REQUIRE(data.GetPercentile(100) == 500);
 
     data.AddPull([](){return -800;});
     data.PullData();
@@ -116,6 +143,10 @@ TEST_CASE("Test DataRange", "[data]") {
     REQUIRE(data.GetMean() == Approx(116.6667));
     REQUIRE(data.GetMin() == -800);
     REQUIRE(data.GetMax() == 500);
+    REQUIRE(data.GetMedian() == 250);
+    REQUIRE(data.GetPercentile(0) == -800);
+    REQUIRE(data.GetPercentile(25) == 125);
+    REQUIRE(data.GetPercentile(100) == 500);
 
     data.AddPullSet([](){return emp::vector<int>({1600,0,0});});
     data.PullData(); // Remember that this also runs the function that returns -800
@@ -131,6 +162,10 @@ TEST_CASE("Test DataRange", "[data]") {
     REQUIRE(data.GetMean() == 150);
     REQUIRE(data.GetMin() == -800);
     REQUIRE(data.GetMax() == 1600);
+    REQUIRE(data.GetMedian() == 150);
+    REQUIRE(data.GetPercentile(0) == -800);
+    REQUIRE(data.GetPercentile(25) == 0);
+    REQUIRE(data.GetPercentile(100) == 1600);
 
     // std::cout << std::endl;
     // data.PrintDebug();
