@@ -656,7 +656,7 @@ namespace emp {
     MATCHBIN_TYPE matchBin;
     bool is_matchbin_cache_dirty;
     std::function<void()> fun_clear_matchbin_cache = [this](){this->ResetMatchBin();};
-    trait_printer_t fun_trait_print = [](std::ostream&, TRAIT_TYPE){};
+    trait_printer_t fun_trait_print = [](std::ostream& os, TRAIT_TYPE){os << "UNCONFIGURED TRAIT PRINT FUNCTION\n";};
 
     // TODO: disallow configuration of hardware while executing. (and any other functions that could sent things into a bad state)
 
@@ -717,7 +717,8 @@ namespace emp {
         active_cores(in.active_cores), inactive_cores(in.inactive_cores),
         pending_cores(in.pending_cores),
         exec_core_id(in.exec_core_id), is_executing(in.is_executing),
-        matchBin(in.matchBin), is_matchbin_cache_dirty(in.is_matchbin_cache_dirty)
+        matchBin(in.matchBin), is_matchbin_cache_dirty(in.is_matchbin_cache_dirty),
+        fun_trait_print(in.fun_trait_print)
     {
       in.random_ptr = nullptr;
       in.random_owner = false;
@@ -740,7 +741,8 @@ namespace emp {
         active_cores(in.active_cores), inactive_cores(in.inactive_cores),
         pending_cores(in.pending_cores),
         exec_core_id(in.exec_core_id), is_executing(in.is_executing),
-        matchBin(in.matchBin), is_matchbin_cache_dirty(in.is_matchbin_cache_dirty)
+        matchBin(in.matchBin), is_matchbin_cache_dirty(in.is_matchbin_cache_dirty),
+        fun_trait_print(in.fun_trait_print)
     {
       if (in.random_owner) NewRandom();
       else random_ptr = in.random_ptr;
