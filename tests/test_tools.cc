@@ -403,6 +403,213 @@ template class emp::BitSet<5>;
 TEST_CASE("Test BitSet", "[tools]")
 {
 
+  // test BitSet reverse
+  {
+
+    REQUIRE(emp::BitSet<1>{0}.REVERSE_SELF() == emp::BitSet<1>{0});
+    REQUIRE(emp::BitSet<1>{0}.REVERSE_SELF().CountOnes() == 0);
+    REQUIRE(emp::BitSet<1>{1}.REVERSE_SELF() == emp::BitSet<1>{1});
+    REQUIRE(emp::BitSet<1>{1}.REVERSE_SELF().CountOnes() == 1);
+
+    REQUIRE(
+      (emp::BitSet<2>{1,1}.REVERSE_SELF())
+      ==
+      (emp::BitSet<2>{1,1})
+    );
+    REQUIRE((emp::BitSet<2>{1,1}.REVERSE_SELF().CountOnes()) == 2);
+    REQUIRE(
+      (emp::BitSet<2>{0,1}.REVERSE_SELF())
+      ==
+      (emp::BitSet<2>{1,0})
+    );
+    REQUIRE((emp::BitSet<2>{0,1}.REVERSE_SELF().CountOnes()) == 1);
+    REQUIRE(
+      (emp::BitSet<2>{0,0}.REVERSE_SELF())
+      ==
+      (emp::BitSet<2>{0,0})
+    );
+    REQUIRE((emp::BitSet<2>{0,0}.REVERSE_SELF().CountOnes()) == 0);
+
+    REQUIRE(
+      (emp::BitSet<7>{1,1,0,0,0,0,1}.REVERSE_SELF())
+      ==
+      (emp::BitSet<7>{1,0,0,0,0,1,1})
+    );
+    REQUIRE((emp::BitSet<7>{1,1,0,0,0,0,1}.REVERSE_SELF().CountOnes()) == 3);
+    REQUIRE(
+      (emp::BitSet<7>{1,0,1,0,1,0,1}.REVERSE_SELF())
+      ==
+      (emp::BitSet<7>{1,0,1,0,1,0,1})
+    );
+    REQUIRE((emp::BitSet<7>{1,0,1,0,1,0,1}.REVERSE_SELF().CountOnes()) == 4);
+    REQUIRE(
+      (emp::BitSet<7>{1,1,1,1,1,0,1}.REVERSE_SELF())
+      ==
+      (emp::BitSet<7>{1,0,1,1,1,1,1})
+    );
+    REQUIRE((emp::BitSet<7>{1,1,1,1,1,0,1}.REVERSE_SELF().CountOnes()) == 6);
+
+    REQUIRE(
+      (emp::BitSet<8>{1,1,0,0,0,0,1,0}.REVERSE_SELF())
+      ==
+      (emp::BitSet<8>{0,1,0,0,0,0,1,1})
+    );
+    REQUIRE((emp::BitSet<8>{1,1,0,0,0,0,1,0}.REVERSE_SELF().CountOnes()) == 3);
+    REQUIRE(
+      (emp::BitSet<8>{1,0,1,0,1,0,1,0}.REVERSE_SELF())
+      ==
+      (emp::BitSet<8>{0,1,0,1,0,1,0,1})
+    );
+    REQUIRE((emp::BitSet<8>{0,1,0,1,0,1,0,1}.REVERSE_SELF().CountOnes()) == 4);
+    REQUIRE(
+      (emp::BitSet<8>{1,1,1,1,1,0,1,0}.REVERSE_SELF())
+      ==
+      (emp::BitSet<8>{0,1,0,1,1,1,1,1})
+    );
+    REQUIRE((emp::BitSet<8>{1,1,1,1,1,0,1,0}.REVERSE_SELF().CountOnes()) == 6);
+
+    REQUIRE(
+      (emp::BitSet<9>{1,1,0,0,0,0,1,0,0}.REVERSE_SELF())
+      ==
+      (emp::BitSet<9>{0,0,1,0,0,0,0,1,1})
+    );
+    REQUIRE(
+      (emp::BitSet<9>{1,1,0,0,0,0,1,0,0}.REVERSE_SELF().CountOnes())
+      ==
+      3
+    );
+    REQUIRE(
+      (emp::BitSet<9>{1,0,1,0,1,0,1,0,0}.REVERSE_SELF())
+      ==
+      (emp::BitSet<9>{0,0,1,0,1,0,1,0,1})
+    );
+    REQUIRE(
+      (emp::BitSet<9>{0,0,1,0,1,0,1,0,1}.REVERSE_SELF().CountOnes())
+      ==
+      4
+    );
+    REQUIRE(
+      (emp::BitSet<9>{1,1,1,1,1,0,1,0,0}.REVERSE_SELF())
+      ==
+      (emp::BitSet<9>{0,0,1,0,1,1,1,1,1})
+    );
+    REQUIRE(
+      (emp::BitSet<9>{1,1,1,1,1,0,1,0,0}.REVERSE_SELF().CountOnes())
+      ==
+      6
+    );
+
+    emp::Random rand(1);
+    for (size_t rep = 0; rep < 100; ++rep) {
+      emp::BitSet<15> bs(rand);
+      bs[0] = 0;
+      bs[15-1] = 1;
+      REQUIRE(bs.REVERSE() != bs);
+      REQUIRE(bs.REVERSE().REVERSE() == bs);
+      REQUIRE(bs.REVERSE().CountOnes() == bs.CountOnes());
+    }
+
+    for (size_t rep = 0; rep < 100; ++rep) {
+      emp::BitSet<16> bs(rand);
+      bs[0] = 0;
+      bs[16-1] = 1;
+      REQUIRE(bs.REVERSE() != bs);
+      REQUIRE(bs.REVERSE().REVERSE() == bs);
+      REQUIRE(bs.REVERSE().CountOnes() == bs.CountOnes());
+    }
+
+    for (size_t rep = 0; rep < 100; ++rep) {
+      emp::BitSet<17> bs(rand);
+      bs[0] = 0;
+      bs[17-1] = 1;
+      REQUIRE(bs.REVERSE() != bs);
+      REQUIRE(bs.REVERSE().REVERSE() == bs);
+      REQUIRE(bs.REVERSE().CountOnes() == bs.CountOnes());
+    }
+
+    for (size_t rep = 0; rep < 100; ++rep) {
+      emp::BitSet<31> bs(rand);
+      bs[0] = 0;
+      bs[31-1] = 1;
+      REQUIRE(bs.REVERSE() != bs);
+      REQUIRE(bs.REVERSE().REVERSE() == bs);
+      REQUIRE(bs.REVERSE().CountOnes() == bs.CountOnes());
+    }
+
+    for (size_t rep = 0; rep < 100; ++rep) {
+      emp::BitSet<32> bs(rand);
+      bs[0] = 0;
+      bs[32-1] = 1;
+      REQUIRE(bs.REVERSE() != bs);
+      REQUIRE(bs.REVERSE().REVERSE() == bs);
+      REQUIRE(bs.REVERSE().CountOnes() == bs.CountOnes());
+    }
+
+    for (size_t rep = 0; rep < 100; ++rep) {
+      emp::BitSet<33> bs(rand);
+      bs[0] = 0;
+      bs[33-1] = 1;
+      REQUIRE(bs.REVERSE() != bs);
+      REQUIRE(bs.REVERSE().REVERSE() == bs);
+      REQUIRE(bs.REVERSE().CountOnes() == bs.CountOnes());
+    }
+
+    for (size_t rep = 0; rep < 100; ++rep) {
+      emp::BitSet<63> bs(rand);
+      bs[0] = 0;
+      bs[63-1] = 1;
+      REQUIRE(bs.REVERSE() != bs);
+      REQUIRE(bs.REVERSE().REVERSE() == bs);
+      REQUIRE(bs.REVERSE().CountOnes() == bs.CountOnes());
+    }
+
+    for (size_t rep = 0; rep < 100; ++rep) {
+      emp::BitSet<64> bs(rand);
+      bs[0] = 0;
+      bs[64-1] = 1;
+      REQUIRE(bs.REVERSE() != bs);
+      REQUIRE(bs.REVERSE().REVERSE() == bs);
+      REQUIRE(bs.REVERSE().CountOnes() == bs.CountOnes());
+    }
+
+    for (size_t rep = 0; rep < 100; ++rep) {
+      emp::BitSet<65> bs(rand);
+      bs[0] = 0;
+      bs[65-1] = 1;
+      REQUIRE(bs.REVERSE() != bs);
+      REQUIRE(bs.REVERSE().REVERSE() == bs);
+      REQUIRE(bs.REVERSE().CountOnes() == bs.CountOnes());
+    }
+
+    for (size_t rep = 0; rep < 100; ++rep) {
+      emp::BitSet<127> bs(rand);
+      bs[0] = 0;
+      bs[127-1] = 1;
+      REQUIRE(bs.REVERSE() != bs);
+      REQUIRE(bs.REVERSE().REVERSE() == bs);
+      REQUIRE(bs.REVERSE().CountOnes() == bs.CountOnes());
+    }
+
+    for (size_t rep = 0; rep < 100; ++rep) {
+      emp::BitSet<128> bs(rand);
+      bs[0] = 0;
+      bs[128-1] = 1;
+      REQUIRE(bs.REVERSE() != bs);
+      REQUIRE(bs.REVERSE().REVERSE() == bs);
+      REQUIRE(bs.REVERSE().CountOnes() == bs.CountOnes());
+    }
+
+    for (size_t rep = 0; rep < 100; ++rep) {
+      emp::BitSet<129> bs(rand);
+      bs[0] = 0;
+      bs[129-1] = 1;
+      REQUIRE(bs.REVERSE() != bs);
+      REQUIRE(bs.REVERSE().REVERSE() == bs);
+      REQUIRE(bs.REVERSE().CountOnes() == bs.CountOnes());
+    }
+
+  }
+
   // test BitSet addition
   {
   emp::BitSet<32> bs0;

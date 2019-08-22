@@ -315,6 +315,30 @@ namespace emp {
   };
 
   template<typename Metric>
+  struct HardStartMod : public Metric {
+
+    using query_t = typename Metric::query_t;
+    using tag_t = typename Metric::tag_t;
+
+    Metric metric;
+
+    std::string name() const override { return "Hard Started " + metric.name(); }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+
+      const double res = metric(a, b);
+
+      if (a[0] == b[0]) {
+        return res;
+      } else {
+        return 1.0;
+      }
+
+    }
+
+  };
+
+  template<typename Metric>
   struct AntiMod : public Metric {
 
     using query_t = typename Metric::query_t;

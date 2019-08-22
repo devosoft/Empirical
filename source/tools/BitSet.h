@@ -1020,6 +1020,38 @@ namespace emp {
       return *this;
     }
 
+    /// Reverse the order of bits in the bitset
+    BitSet & REVERSE_SELF() {
+
+      // reverse bytes
+      std::reverse(
+        reinterpret_cast<unsigned char *>(bit_set),
+        reinterpret_cast<unsigned char *>(bit_set) + NUM_BYTES
+      );
+
+      // reverse each byte
+      // adapted from https://stackoverflow.com/questions/2602823/in-c-c-whats-the-simplest-way-to-reverse-the-order-of-bits-in-a-byte
+      for (size_t i = 0; i < NUM_BYTES; ++i) {
+        unsigned char & b = reinterpret_cast<unsigned char *>(bit_set)[i];
+        b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+        b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+        b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+      }
+
+      // shift out filler bits
+      if constexpr ((8-NUM_BITS%8)%8) this->ShiftRight((8-NUM_BITS%8)%8);
+
+      return *this;
+
+    }
+
+    /// Reverse order of bits in the bitset.
+    BitSet REVERSE() const {
+      BitSet out_set(*this);
+      return out_set.REVERSE_SELF();
+    }
+
+
     /// Positive rotates go left and negative rotates go left (0 does nothing);
     /// return result.
     BitSet ROTATE(const int rotate_size) const {
