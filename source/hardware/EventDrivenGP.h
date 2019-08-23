@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <deque>
 #include <utility>
+#include <algorithm>
 #include "InstLib.h"
 #include "EventLib.h"
 #include "../tools/BitSet.h"
@@ -795,7 +796,7 @@ namespace emp {
     void SpawnCore(const affinity_t & affinity, double threshold, const memory_t & input_mem=memory_t(), bool is_main=false) {
       if (!inactive_cores.size()) return; // If there are no unclaimed cores, just return.
       size_t fID;
-      emp::vector<size_t> best_matches(FindBestFuncMatch(affinity, threshold));
+      emp::vector<size_t> best_matches(FindBestFuncMatch(affinity, 1, threshold));
       if (best_matches.empty()) return;
       if (best_matches.size() == 1.0) fID = best_matches[0];
       else if (stochastic_fun_call) fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
@@ -1145,13 +1146,13 @@ namespace emp {
     }
 
     /// Find best matching functions (by ID) given affinity.
-    emp::vector<size_t> FindBestFuncMatch(const affinity_t & affinity, double threshold) {
+    emp::vector<size_t> FindBestFuncMatch(const affinity_t & affinity, size_t amount, double threshold) { //TODO threshold not necessary after addition of matchbin.
       if(is_matchbin_cache_dirty){
         ResetMatchBin();
       }
       // no need to transform to values because we're using
       // matchbin uids equivalent to function uids
-      return matchBin.Match(affinity, 1);
+      return matchBin.Match(affinity, amount);
     }
 
     MATCHBIN_TYPE& GetMatchBin(){
@@ -1176,7 +1177,7 @@ namespace emp {
       // Are we at max call depth? -- If so, call fails.
       if (GetCurCore().size() >= max_call_depth) return;
       size_t fID;
-      emp::vector<size_t> best_matches(FindBestFuncMatch(affinity, threshold));
+      emp::vector<size_t> best_matches(FindBestFuncMatch(affinity, 1, threshold));
       if (best_matches.empty()) return;
       if (best_matches.size() == 1) fID = best_matches[0];
       else if (stochastic_fun_call) fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
@@ -1399,11 +1400,30 @@ namespace emp {
           // IP, FP, local mem, input mem, output mem
           const State & state = core[k];
           os << "    Inst ptr: " << state.inst_ptr << " (";
-          if (ValidPosition(state.func_ptr, state.inst_ptr))
-            PrintInst(GetInst(state.func_ptr, state.inst_ptr), os);
+          if (ValidPosition(state.func_ptr, state.inst_ptr)){
+            inst_t inst = GetInst(state.func_ptr, state.inst_ptr);
+            PrintInst(inst, os);
+            os << ")"<<"\n";
+            emp::vector<std::string> additional_state_info{"Call","Fork","SetRegulator","AdjRegulator"};
+            if (std::find(additional_state_info.begin(), additional_state_info.end(), GetInstLib()->GetName(inst.id)) != additional_state_info.end()){
+              std::unordered_map<size_t, double> probabilities;
+              for(unsigned int i = 0; i < 100; ++i){
+                emp::vector<size_t> matches = FindBestFuncMatch(inst.affinity, 1, 0.5);
+                if(matches.size() == 1){
+                  if(probabilities.find(matches[0])==probabilities.end()){probabilities[matches[0]] = 0;}
+                  ++probabilities[matches[0]];
+                }
+              }
+              emp::vector<std::pair<double, size_t>>best_matches;
+              for(auto &[id, prob] : probabilities){best_matches.emplace_back(prob, id);}
+              std::sort(best_matches.begin(), best_matches.end());
+              std::reverse(best_matches.begin(), best_matches.end());
+              for(auto &[prob, id] : best_matches){os <<"      Fn-"<< id << ": " << prob <<"%\n";}
+            }
+          }
+             
           else
-            os << "NONE";
-          os << ")" << "\n";
+            os << "NONE"<<")"<<"\n";
           os << "    Func ptr: " << state.func_ptr << "\n";
           os << "    Input memory: ";
           for (auto mem : state.input_mem) os << "{" << mem.first << ":" << mem.second << "}";
