@@ -90,8 +90,8 @@ int main() {
       }
       os << "]";
     };
-  hw16_1.SetTraitPrinter(trait_printer);
-  hw16_2.SetTraitPrinter(trait_printer);
+  hw16_1.SetTraitPrintFun(trait_printer);
+  hw16_2.SetTraitPrintFun(trait_printer);
 
 
   // - We'll setup a hardware trait that will help us identify which hardware is which. 
@@ -101,6 +101,7 @@ int main() {
   hw16_2.GetTrait().push_back(2);
   
   hw16_1.GetTrait().push_back(4);
+  hw16_1.PrintTraits();
   // -------------------------------------
   // --- Setting up an instruction set ---
   // Here's a list of all of the instructions with default implementations in the SignalGP class:
