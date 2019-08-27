@@ -33,7 +33,7 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h')", "[hardware]")
   // Let's make two SignalGP virtual hardwares: 2 with 16-bit tags
   hardware_t hw1(&inst_lib, &event_lib, &random);
   hardware_t hw2(&inst_lib, &event_lib, &random);
-  
+
   // Configure the hardware.
   hw1.SetMinBindThresh(HW_MIN_SIM_THRESH);
   hw1.SetMaxCores(HW_MAX_THREADS);
@@ -59,7 +59,7 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h')", "[hardware]")
   REQUIRE(hw1.GetTrait()[TRAIT_IDX__ID] == 1);
   REQUIRE(hw1.GetTrait()[128] == -0.5);
   REQUIRE(hw2.GetTrait()[TRAIT_IDX__ID] == 2);
-  
+
   // Grab all of the default instructions.
   inst_lib.AddInst("Inc", hardware_t::Inst_Inc, 1, "Increment value in local memory Arg1");
   REQUIRE(inst_lib.GetSize() == 1);
@@ -189,7 +189,7 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h')", "[hardware]")
       }
       prog1.PushFunction(new_fun);
     }
-    
+
     // Generate program for hardware 2
     hardware_t::Program prog2(&inst_lib);
     fcnt = random.GetUInt(min_fun_cnt, max_fun_cnt+1);
@@ -209,14 +209,14 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h')", "[hardware]")
       }
       prog2.PushFunction(new_fun);
     }
-    
+
     hw1.GetTrait().resize(1);
     hw1.GetTrait()[TRAIT_IDX__ID] = 1;
     hw1.ResetProgram();
     REQUIRE(hw1.GetProgram().GetSize() == 0);
     REQUIRE(hw1.GetTrait()[TRAIT_IDX__ID] == 1);
 
-    
+
     // Hard reset
     hw1.Reset();
     hw2.Reset();
@@ -233,7 +233,7 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h')", "[hardware]")
       hw2.SingleProcess();
     }
   }
-  
+
 }
 
 TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPTag", "[hardware]") {
@@ -643,7 +643,7 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: SignalGP MatchBin Cache", 
   using hardware_t = emp::EventDrivenGP_AW<16>;
   using inst_lib_t = emp::InstLib<hardware_t>;   // Instruction library
   using event_lib_t = emp::EventLib<hardware_t>; // Event library
-  
+
   class Hardware : public hardware_t {
     public:
     Hardware(emp::Ptr<const inst_lib_t> _ilib, emp::Ptr<const event_lib_t> _elib, emp::Ptr<emp::Random> rnd=nullptr)
@@ -657,7 +657,7 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: SignalGP MatchBin Cache", 
   event_lib_t event_lib;
   inst_lib.AddInst("Inc", hardware_t::Inst_Inc, 1, "Increment value in local memory Arg1");
   inst_lib.AddInst("Dec", hardware_t::Inst_Dec, 1, "Decrement value in local memory Arg1");
-  
+
   // Let's make two SignalGP virtual hardwares: 2 with 16-bit tags
   Hardware hw1(&inst_lib, &event_lib, &random);
 
