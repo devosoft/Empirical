@@ -1858,11 +1858,8 @@ namespace emp {
       State & state = hw.GetCurState();
       const auto & tag = inst.affinity;
 
-      std::hash<affinity_t> hasher;
-
       const double val = (
-        static_cast<double>(hasher(tag)) /
-        std::numeric_limits<size_t>::max()
+        tag.GetDouble() / tag.MaxDouble()
       ) * (max - min) - min;
 
       state.SetLocal(inst.args[0], val);
