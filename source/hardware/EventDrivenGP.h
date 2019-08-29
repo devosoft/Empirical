@@ -1786,7 +1786,7 @@ namespace emp {
       }
 
       const double budge = emp::Mod(state.GetLocal(inst.args[1])+0.2, 1.0);
-      const double cur = hw.GetMatchBin().ViewRegulator(state.GetFP());
+      const double cur = hw.GetMatchBin().ViewRegulator(best_fun[0]);
 
       hw.GetMatchBin().SetRegulator(
         best_fun[0],
