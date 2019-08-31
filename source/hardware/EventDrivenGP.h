@@ -1733,7 +1733,7 @@ namespace emp {
     /// Description: Sets the regulator of a tag in the matchbin.
     static void Inst_SetRegulator(EventDrivenGP_t & hw, const inst_t & inst){
       const State & state = hw.GetCurState();
-      emp::vector<size_t> best_fun = hw.GetMatchBin().Match(
+      emp::vector<size_t> best_fun = hw.GetMatchBin().MatchRaw(
         inst.affinity,
         1
       );
@@ -1771,7 +1771,7 @@ namespace emp {
     /// towards a target.
     static void Inst_AdjRegulator(EventDrivenGP_t & hw, const inst_t & inst){
       const State & state = hw.GetCurState();
-      emp::vector<size_t> best_fun = hw.GetMatchBin().Match(
+      emp::vector<size_t> best_fun = hw.GetMatchBin().MatchRaw(
         inst.affinity,
         1
       );
@@ -1823,7 +1823,7 @@ namespace emp {
     /// Description: senses the value of the regulator of another function.
     static void Inst_SenseRegulator(EventDrivenGP_t & hw, const inst_t & inst){
       State & state = hw.GetCurState();
-      emp::vector<size_t> best_fun = hw.GetMatchBin().Match(
+      emp::vector<size_t> best_fun = hw.GetMatchBin().MatchRaw(
         inst.affinity,
         1
       );

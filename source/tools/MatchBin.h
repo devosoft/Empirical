@@ -41,6 +41,7 @@ namespace emp {
 
     virtual ~BaseMatchBin() {};
     virtual emp::vector<uid_t> Match(const query_t & query, size_t n=1) = 0;
+    virtual emp::vector<uid_t> MatchRaw(const query_t & query, size_t n=1) = 0;
     virtual uid_t Put(const Val & v, const tag_t & t) = 0;
     virtual uid_t Set(const Val & v, const tag_t & t, const uid_t uid) = 0;
     virtual void Delete(const uid_t uid) = 0;
@@ -96,6 +97,10 @@ namespace emp {
 
   protected:
     std::unordered_map<query_t, typename Selector::cache_state_type_t> cache;
+    std::unordered_map<
+      query_t,
+      typename Selector::cache_state_type_t
+    > cache_raw;
     static constexpr bool cacheEnabled = std::is_base_of<CacheStateBase, typename Selector::cache_state_type_t>::value;
     bool cacheOn = cacheEnabled;
 
@@ -140,6 +145,44 @@ namespace emp {
       if constexpr(cacheEnabled){
         if (cacheOn){
           cache[query] = cacheResult;
+        }
+        return cacheResult(n).value();
+      }
+      else{
+        return cacheResult(n).value();
+      }
+    }
+
+    /// Compare a query tag to all stored tags using the distance metric
+    /// function and return a vector of unique IDs chosen by the selector
+    /// function. Ignore regulators.
+    emp::vector<uid_t> MatchRaw(const query_t & query, size_t n=1) override {
+      if constexpr(cacheEnabled){
+        if (cacheOn){
+          if (cache_raw.find(query) != cache_raw.end()){
+            std::optional<emp::vector<uid_t>> res = cache_raw[query](n);
+            if (res != std::nullopt){ return res.value(); }
+          }
+        }
+      }
+      // compute distance between query and all stored tags
+      std::unordered_map<tag_t, double> matches;
+      for (const auto &[uid, tag] : tags) {
+        if (matches.find(tag) == matches.end()) {
+          matches[tag] = metric(query, tag);
+        }
+      }
+
+      // apply regulation to generate match scores
+      std::unordered_map<uid_t, double> scores;
+      for (auto uid : uids) {
+        scores[uid] = matches[tags[uid]];
+      }
+
+      typename Selector::cache_state_type_t cacheResult = selector(uids, scores, n);
+      if constexpr(cacheEnabled){
+        if (cacheOn){
+          cache_raw[query] = cacheResult;
         }
         return cacheResult(n).value();
       }
@@ -197,6 +240,7 @@ namespace emp {
     void ClearCache() override {
       if constexpr(cacheEnabled){
         cache.clear();
+        cache_raw.clear();
       }
     }
 
