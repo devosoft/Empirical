@@ -561,6 +561,42 @@ namespace emp {
 
   };
 
+  template<typename Metric, size_t Dim>
+  struct HarmonicDimMod
+    : public BaseMetric<
+      std::array<typename Metric::query_t, Dim>,
+      std::array<typename Metric::tag_t, Dim>
+    >
+  {
+
+    using query_t = std::array<typename Metric::query_t, Dim>;
+    using tag_t = std::array<typename Metric::tag_t, Dim>;
+
+    Metric metric;
+
+    size_t width() const override { return Dim * metric.width(); }
+
+    size_t dim() const override { return Dim; }
+
+    std::string name() const override {
+      return emp::to_string(Dim) + "-Dimensional Harmonic " + metric.name();
+    }
+
+    std::string base() const override { return metric.base(); }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+
+      double res = 0.0;
+
+      for (size_t d = 0; d < Dim; ++d) {
+        res += 1 / metric(a[d], b[d]);
+      }
+
+      return static_cast<double>(Dim) / res;
+    }
+
+  };
+
   template<typename DimMetric>
   struct FlatMod
     : public BaseMetric<
