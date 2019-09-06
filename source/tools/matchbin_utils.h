@@ -24,6 +24,8 @@
 #include <tuple>
 #include <array>
 
+#include "tools/Binomial.h"
+
 #include "../base/assert.h"
 #include "../base/array.h"
 #include "../base/vector.h"
@@ -249,6 +251,44 @@ namespace emp {
       ).GetDouble() /  emp::BitSet<Width>::MaxDouble();
     }
 
+  };
+
+  /// Matches based on the number of bits in common between the two bitsets.
+  /// Normalized so that each match score represents the cumulative probability
+  /// of an as-good or better match.
+  template<size_t Width>
+  struct HammingCumuMetric : public BaseMetric<emp::BitSet<Width>, emp::BitSet<Width>> {
+
+    emp::vector<double> cumulative;
+
+    HammingCumuMetric() {
+      double cumsum = 0.0;
+      static emp::Binomial bino(0.5, Width);
+      while (cumulative.size() <= Width) {
+        cumsum += bino[cumulative.size()];
+        cumulative.push_back(cumsum);
+      }
+    }
+
+
+    using query_t = emp::BitSet<Width>;
+    using tag_t = emp::BitSet<Width>;
+
+    size_t dim() const override { return 1; }
+
+    size_t width() const override { return Width; }
+
+    std::string name() const override {
+      return emp::to_string(Width) + "-bit " + base();
+    }
+
+    std::string base() const override { return "Cumulative Hamming Metric"; }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+
+      return cumulative[(a^b).CountOnes()];
+
+    }
   };
 
   /// Matches based on the longest segment of equal and uneqal bits in two bitsets
