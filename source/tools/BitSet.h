@@ -30,6 +30,7 @@
 #include "math.h"
 #include "Random.h"
 #include "hash_utils.h"
+#include "random_utils.h"
 
 
 
@@ -409,31 +410,22 @@ namespace emp {
       for (size_t i = 0; i < NUM_BITS; i++) Set(i, random.P(p1));
     }
 
-    /// Mutate bits, return number of mutations performed.
-    size_t Mutate(
-      Random & random,
-      const double bit_redraw_per_bit = 0.01,
-      const double bitweight = 0.5
-    ) {
+  /// Mutate bits, return how many mutations were performed
+  size_t Mutate(
+    Random & random,
+    const size_t num_muts, // hint: use tools/Binomial.h with this part
+    const size_t min_idx=0 // draw this from a distribution to make some
+                           // bits more volatile than others
+  ) {
+    emp_assert(min_idx <= NUM_BITS);
+    emp_assert(num_muts < NUM_BITS - min_idx);
 
-      // @mmore500
-      // can this be sped up by drawing #muts from a binomial distribution
-      // and then choosing #muts indices to flip?
-      // to get a speedup,
-      // we would probably have to make a lookup table for the binomial
-      // distribution because we can't approximate until n > 1000
-      // (i.e., using IndexMap)
+    std::vector<size_t> res;
+    Choose(random, NUM_BITS - min_idx, num_muts, res);
 
-      size_t res = 0;
-      for (size_t i = 0; i < NUM_BITS; ++i) {
-        if (random.P(bit_redraw_per_bit)) {
-          const bool flip = (random.P(bitweight) != Get(i));
-          res += flip;
-          if (flip) Toggle(i);
-        }
-      }
+    for (size_t idx : res) Toggle(idx + min_idx);
 
-    return res;
+    return num_muts;
 
   }
 
