@@ -626,7 +626,6 @@ TEST_CASE("Test BitSet", "[tools]")
   emp::BitSet<8> bs3;
   bs3.SetUInt(0, 1);
   REQUIRE((bs2+bs3).GetUInt(0) == 0);
-
   emp::BitSet<64> bs4;
   bs4.SetUInt(0, std::numeric_limits<uint32_t>::max()-1);
   bs4.SetUInt(1, std::numeric_limits<uint32_t>::max());
