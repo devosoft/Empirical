@@ -1140,38 +1140,36 @@ TEST_CASE("Test BitSet", "[tools]")
     emp::BitSet<64> bs_64;
     emp::BitSet<80> bs_80;
 
-    for (size_t i = 0; i < 2000; ++i) {
-      bs_25.Mutate(rando, 0.0);
-      REQUIRE(!bs_25.CountOnes());
+    bs_25.Mutate(rando, 0);
+    REQUIRE(!bs_25.CountOnes());
 
-      bs_32.Mutate(rando, 0.0);
-      REQUIRE(!bs_32.CountOnes());
+    bs_32.Mutate(rando, 0);
+    REQUIRE(!bs_32.CountOnes());
 
-      bs_50.Mutate(rando, 0.0);
-      REQUIRE(!bs_50.CountOnes());
+    bs_50.Mutate(rando, 0);
+    REQUIRE(!bs_50.CountOnes());
 
-      bs_64.Mutate(rando, 0.0);
-      REQUIRE(!bs_64.CountOnes());
+    bs_64.Mutate(rando, 0);
+    REQUIRE(!bs_64.CountOnes());
 
-      bs_80.Mutate(rando, 0.0);
-      REQUIRE(!bs_80.CountOnes());
-    }
+    bs_80.Mutate(rando, 0);
+    REQUIRE(!bs_80.CountOnes());
 
 
-    bs_25.Mutate(rando, 0.75);
-    REQUIRE( bs_25.CountOnes() > 1);
+    bs_25.Mutate(rando, 1);
+    REQUIRE( bs_25.CountOnes() == 1);
 
-    bs_32.Mutate(rando, 0.75);
-    REQUIRE( bs_32.CountOnes() > 1);
+    bs_32.Mutate(rando, 1);
+    REQUIRE( bs_32.CountOnes() == 1);
 
-    bs_50.Mutate(rando, 0.75);
-    REQUIRE( bs_50.CountOnes() > 1);
+    bs_50.Mutate(rando, 1);
+    REQUIRE( bs_50.CountOnes() == 1);
 
-    bs_64.Mutate(rando, 0.75);
-    REQUIRE( bs_64.CountOnes() > 1);
+    bs_64.Mutate(rando, 1);
+    REQUIRE( bs_64.CountOnes() == 1);
 
-    bs_80.Mutate(rando, 0.75);
-    REQUIRE( bs_80.CountOnes() > 1);
+    bs_80.Mutate(rando, 1);
+    REQUIRE( bs_80.CountOnes() == 1);
 
     bs_25.Clear();
     bs_32.Clear();
@@ -1180,43 +1178,53 @@ TEST_CASE("Test BitSet", "[tools]")
     bs_80.Clear();
 
     for (size_t i = 1; i < 5000; ++i) {
-      bs_25.Mutate(rando, 0.001, 0.80);
-      REQUIRE(bs_25.CountOnes() < i);
+      bs_25.Mutate(rando, 1);
+      REQUIRE(bs_25.CountOnes() <= i);
 
-      bs_32.Mutate(rando, 0.001, 0.80);
-      REQUIRE(bs_32.CountOnes() < i);
+      bs_32.Mutate(rando, 1);
+      REQUIRE(bs_32.CountOnes() <= i);
 
-      bs_50.Mutate(rando, 0.001, 0.80);
-      REQUIRE(bs_50.CountOnes() < i);
+      bs_50.Mutate(rando, 1);
+      REQUIRE(bs_50.CountOnes() <= i);
 
-      bs_64.Mutate(rando, 0.001, 0.80);
-      REQUIRE(bs_64.CountOnes() < i);
+      bs_64.Mutate(rando, 1);
+      REQUIRE(bs_64.CountOnes() <= i);
 
-      bs_80.Mutate(rando, 0.001, 0.80);
-      REQUIRE(bs_80.CountOnes() < i);
+      bs_80.Mutate(rando, 1);
+      REQUIRE(bs_80.CountOnes() <= i);
     }
 
-    REQUIRE(bs_25.CountOnes() > bs_25.size()/2);
-    REQUIRE(bs_32.CountOnes() > bs_32.size()/2);
-    REQUIRE(bs_50.CountOnes() > bs_50.size()/2);
-    REQUIRE(bs_64.CountOnes() > bs_64.size()/2);
-    REQUIRE(bs_80.CountOnes() > bs_80.size()/2);
+    REQUIRE(bs_25.CountOnes() > bs_25.size()/4);
+    REQUIRE(bs_25.CountOnes() < 3*bs_25.size()/4);
+    REQUIRE(bs_32.CountOnes() > bs_32.size()/4);
+    REQUIRE(bs_32.CountOnes() < 3*bs_32.size()/4);
+    REQUIRE(bs_50.CountOnes() > bs_50.size()/4);
+    REQUIRE(bs_50.CountOnes() < 3*bs_50.size()/4);
+    REQUIRE(bs_64.CountOnes() > bs_64.size()/4);
+    REQUIRE(bs_64.CountOnes() < 3*bs_64.size()/4);
+    REQUIRE(bs_80.CountOnes() > bs_80.size()/4);
+    REQUIRE(bs_80.CountOnes() < 3*bs_80.size()/4);
 
     for (size_t i = 0; i < 10; ++i) {
-      bs_25.Mutate(rando, 1.0, 0.2);
-      REQUIRE(bs_25.CountOnes() < bs_25.size()/2);
+      bs_25.Mutate(rando, bs_25.size());
+      REQUIRE(bs_25.CountOnes() > bs_25.size()/4);
+      REQUIRE(bs_25.CountOnes() < 3*bs_25.size()/4);
 
-      bs_32.Mutate(rando, 1.0, 0.2);
-      REQUIRE(bs_32.CountOnes() < bs_32.size()/2);
+      bs_32.Mutate(rando, bs_32.size());
+      REQUIRE(bs_32.CountOnes() > bs_32.size()/4);
+      REQUIRE(bs_32.CountOnes() < 3*bs_32.size()/4);
 
-      bs_50.Mutate(rando, 1.0, 0.2);
-      REQUIRE(bs_50.CountOnes() < bs_50.size()/2);
+      bs_50.Mutate(rando, bs_50.size());
+      REQUIRE(bs_50.CountOnes() > bs_50.size()/4);
+      REQUIRE(bs_50.CountOnes() < 3*bs_50.size()/4);
 
-      bs_64.Mutate(rando, 1.0, 0.2);
-      REQUIRE(bs_64.CountOnes() < bs_64.size()/2);
+      bs_64.Mutate(rando, bs_64.size());
+      REQUIRE(bs_64.CountOnes() > bs_64.size()/4);
+      REQUIRE(bs_64.CountOnes() < 3*bs_64.size()/4);
 
-      bs_80.Mutate(rando, 1.0, 0.2);
-      REQUIRE(bs_80.CountOnes() < bs_80.size()/2);
+      bs_80.Mutate(rando, bs_80.size());
+      REQUIRE(bs_80.CountOnes() > bs_80.size()/4);
+      REQUIRE(bs_80.CountOnes() < 3*bs_80.size()/4);
     }
   }
 }
