@@ -418,7 +418,7 @@ namespace emp {
                            // bits more volatile than others
   ) {
     emp_assert(min_idx <= NUM_BITS);
-    emp_assert(num_muts < NUM_BITS - min_idx);
+    emp_assert(num_muts <= NUM_BITS - min_idx);
 
     std::vector<size_t> res;
     Choose(random, NUM_BITS - min_idx, num_muts, res);
