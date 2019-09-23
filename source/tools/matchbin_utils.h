@@ -740,34 +740,21 @@ namespace emp {
       size_t n
     ) override {
 
-      size_t back = 0;
-
       // treat any negative numerator as positive infinity
       const double thresh = (
         ThreshRatio::num < 0
         ? std::numeric_limits<double>::infinity()
         : ((double) ThreshRatio::num) / ((double)ThreshRatio::den)
       );
-
-
       if (n < std::log2(uids.size())) {
-        // Perform a bounded selection sort to find the first n results
-        for (; back < n; ++back) {
-          int minIndex = -1;
-          for (size_t j = back; j < uids.size(); ++j) {
-            if (
-              (minIndex == -1 || scores.at(uids[j]) < scores.at(uids[minIndex]))
-              && (scores.at(uids[j]) <= thresh)
-            ) {
-              minIndex = j;
-            }
-          }
-          if (minIndex == -1) break;
-          std::swap(uids.at(back), uids.at(minIndex));
-        }
+        // Perform a bounded partial sort to find the first n results
+        std::partial_sort(uids.begin(), 
+            uids.begin() + n, 
+            uids.end(), 
+            [&scores](const size_t &a, const size_t &b){return scores.at(a) < scores.at(b);}
+            );
 
       } else {
-
         std::sort(
           uids.begin(),
           uids.end(),
@@ -776,14 +763,17 @@ namespace emp {
           }
         );
 
+      }
+      
+      size_t back = 0;
         while (
           back < uids.size()
           && back < n
           && scores.at(uids[back]) <= thresh
         ) ++back;
 
-      }
 
+      std::cout<< back << " | " <<n << "\n___________\n";
       return RankedCacheState(uids.begin(), back, n);
     }
 
