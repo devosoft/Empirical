@@ -748,9 +748,9 @@ namespace emp {
       );
       if (n < std::log2(uids.size())) {
         // Perform a bounded partial sort to find the first n results
-        std::partial_sort(uids.begin(), 
-            uids.begin() + n, 
-            uids.end(), 
+        std::partial_sort(uids.begin(),
+            uids.begin() + n,
+            uids.end(),
             [&scores](const size_t &a, const size_t &b){return scores.at(a) < scores.at(b);}
             );
 
@@ -764,7 +764,7 @@ namespace emp {
         );
 
       }
-      
+
       size_t back = 0;
         while (
           back < uids.size()
@@ -773,7 +773,6 @@ namespace emp {
         ) ++back;
 
 
-      std::cout<< back << " | " <<n << "\n___________\n";
       return RankedCacheState(uids.begin(), back, n);
     }
 
