@@ -1729,7 +1729,7 @@ namespace emp {
     }
 
     /// Non-default instruction: SetRegulator
-    /// Number of arguments: 1
+    /// Number of arguments: 2
     /// Description: Sets the regulator of a tag in the matchbin.
     static void Inst_SetRegulator(EventDrivenGP_t & hw, const inst_t & inst){
       const State & state = hw.GetCurState();
@@ -1748,10 +1748,14 @@ namespace emp {
         regulator += 1.0;
       }
       hw.GetMatchBin().SetRegulator(best_fun[0], regulator);
+
+      const size_t dur = 2 + state.GetLocal(inst.args[1]);
+      hw.GetMatchBin().GetVal(best_fun[0]) = dur;
+
     }
 
     /// Non-default instruction: SetOwnRegulator
-    /// Number of arguments: 1
+    /// Number of arguments: 2
     /// Description: Sets the regulator of the currently executing function.
     static void Inst_SetOwnRegulator(EventDrivenGP_t & hw, const inst_t & inst){
       const State & state = hw.GetCurState();
@@ -1763,10 +1767,14 @@ namespace emp {
         regulator += 1.0;
       }
       hw.GetMatchBin().SetRegulator(state.GetFP(), regulator);
+
+      const size_t dur = 2 + state.GetLocal(inst.args[1]);
+      hw.GetMatchBin().GetVal(state.GetFP()) = dur;
+
     }
 
     /// Non-default instruction: AdjRegulator
-    /// Number of arguments: 2
+    /// Number of arguments: 3
     /// Description: adjusts the regulator of a tag in the matchbin
     /// towards a target.
     static void Inst_AdjRegulator(EventDrivenGP_t & hw, const inst_t & inst){
@@ -1792,10 +1800,14 @@ namespace emp {
         best_fun[0],
         target * budge + cur * (1 - budge)
       );
+
+      const size_t dur = 2 + state.GetLocal(inst.args[2]);
+      hw.GetMatchBin().GetVal(best_fun[0]) = dur;
+
     }
 
     /// Non-default instruction: AdjOwnRegulator
-    /// Number of arguments: 2
+    /// Number of arguments: 3
     /// Description: adjusts the regulator of a tag in the matchbin
     /// towards a target.
     static void Inst_AdjOwnRegulator(EventDrivenGP_t & hw, const inst_t & inst){
@@ -1816,7 +1828,29 @@ namespace emp {
         state.GetFP(),
         target * budge + cur * (1 - budge)
       );
+
+      const size_t dur = 2 + state.GetLocal(inst.args[2]);
+      hw.GetMatchBin().GetVal(state.GetFP()) = dur;
+
     }
+
+    /// Non-default instruction: ExtRegulator
+    /// Number of arguments: 1
+    /// Description: extends the decay counter of a
+    /// regulator of a tag in the matchbin.
+    static void Inst_ExtRegulator(EventDrivenGP_t & hw, const inst_t & inst){
+      const State & state = hw.GetCurState();
+      emp::vector<size_t> best_fun = hw.GetMatchBin().MatchRaw(
+        inst.affinity,
+        1
+      );
+      if (!best_fun.size()) return;
+
+      const size_t dur = 1 + state.GetLocal(inst.args[0]);
+      hw.GetMatchBin().GetVal(best_fun[0]) += dur;
+
+    }
+
 
     /// Non-default instruction: SenseRegulator
     /// Number of arguments: 1
