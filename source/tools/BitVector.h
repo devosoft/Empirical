@@ -29,6 +29,7 @@
 #include "functions.h"
 #include "math.h"
 
+
 namespace emp {
 
   /// @brief A drop-in replacement for std::vector<bool>, but with extra bitwise logic features.
@@ -542,79 +543,47 @@ namespace emp {
       return bit_count;
     }
    size_t CountOnes_Mixed() const {
-        const field_t NUM_FIELDS = (1 + ((num_bits - 1) / FIELD_BITS));
-//      Ptr<const uint32_t> uint_bit_set = bit_set.Cast<const uint32_t>();
+      const field_t NUM_FIELDS = (1 + ((num_bits - 1) / FIELD_BITS));
       size_t bit_count = 0;
       for (size_t i = 0; i < NUM_FIELDS; i++) {
         
         if constexpr (FIELD_BITS == 64) {
-          
+#ifdef __SSE4_2__          
           bit_count += _mm_popcnt_u64(bit_set[i]); // needs CPU with SSE4.2
-
-
-/*#ifdef __GNUC__
-        // we are using CPP
-        bit_count += __builtin_popcountll(bit_set[i]);
-
-#elif defined __clang__
-        std::bitset<FIELD_BITS> std_bs(bit_set[i]);
-        bit_count += std_bs.count();
 #else
-        // fallback
-        // adapted from https://en.wikipedia.org/wiki/Hamming_weight
-        uint64_t x = bit_set[i];
-        // put count of each 2 bits into those 2 bits
-        x -= (x >> 1) & 0x5555555555555555;
-        // put count of each 4 bits into those 4 bits
-        x = (x & 0x3333333333333333) + ((x >> 2) & 0x3333333333333333);
-        //put count of each 8 bits into those 8 bits
-        x = (x + (x >> 4)) & 0x0f0f0f0f0f0f0f0f;
-        // returns left 8 bits of x + (x<<8) + (x<<16) + (x<<24) + ...
-        bit_count += (x * 0x0101010101010101) >> 56;
+          // TODO: use non-reused code
+
+          // adapted from https://en.wikipedia.org/wiki/Hamming_weight
+          uint64_t x = bit_set[i];
+          // put count of each 2 bits into those 2 bits
+          x -= (x >> 1) & 0x5555555555555555;
+          // put count of each 4 bits into those 4 bits
+          x = (x & 0x3333333333333333) + ((x >> 2) & 0x3333333333333333);
+          //put count of each 8 bits into those 8 bits
+          x = (x + (x >> 4)) & 0x0f0f0f0f0f0f0f0f;
+          // returns left 8 bits of x + (x<<8) + (x<<16) + (x<<24) + ...
+          bit_count += (x * 0x0101010101010101) >> 56;
 #endif
-*/
+
         } else if constexpr (FIELD_BITS == 32) {
-
+#ifdef __SSE4_2__     
           bit_count += _mm_popcnt_u32(bit_set[i]);
-/*
-#ifdef __clang__
-
-          std::bitset<FIELD_BITS> std_bs(bit_set[i]);
-          bit_count += std_bs.count();
 #else
+          // TODO: use non-reused code
+
           /// adapted from http://graphics.stanford.edu/~seander/bithacks.html
           const uint32_t v = bit_set[i];
           const uint32_t t1 = v - ((v >> 1) & 0x55555555);
           const uint32_t t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
           bit_count += (((t2 + (t2 >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
 #endif
-*/
-        } else {
-          // fallback to std:bitset
 
-//          std::bitset<FIELD_BITS> std_bs(bit_set[i]);
-//          bit_count += std_bs.count();
+        } else {
+          // TODO: fallback to std::vector?
         }
 
       }
-      // TODO: fix invisible of-by-one error
       return bit_count;
-
-
-
-
-
-/*
-
-      for (size_t i = 0; i < NUM_FIELDS; i++) {
-        const uint32_t v = uint_bit_set[i];
-        const uint32_t t1 = v - ((v >> 1) & 0x55555555);
-        const uint32_t t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
-        bit_count += (((t2 + (t2 >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
-      }
-      return bit_count;
-
-*/
     }
 
     /// Count the number of ones in the BitVector.
