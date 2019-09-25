@@ -649,6 +649,7 @@ namespace emp {
 
   struct CacheStateBase{
     CacheStateBase() = default;
+    virtual ~CacheStateBase() {};
     virtual std::optional<emp::vector<size_t>> operator()(size_t n) = 0;
   };
 
