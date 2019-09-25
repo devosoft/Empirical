@@ -1031,7 +1031,9 @@ namespace emp {
       }
 
       // shift out filler bits
-      if constexpr ((8-NUM_BITS%8)%8) this->ShiftRight((8-NUM_BITS%8)%8);
+      if constexpr (static_cast<bool>((8-NUM_BITS%8)%8)) {
+        this->ShiftRight((8-NUM_BITS%8)%8);
+      }
 
       return *this;
 
