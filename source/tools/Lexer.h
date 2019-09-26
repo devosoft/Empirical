@@ -211,8 +211,11 @@ namespace emp {
     /// Turn an input stream of text into a vector of tokens.
     emp::vector<Token> Tokenize(std::istream & is) {
       emp::vector<Token> out_tokens;
+      size_t cur_line = 1;
       emp::Token token = Process(is);
       while (token > 0) {
+        token.line_id = cur_line;
+        cur_line += emp::count(token.lexeme, '\n');
         if (GetSaveToken(token)) out_tokens.push_back(token);
         token = Process(is);
       }
