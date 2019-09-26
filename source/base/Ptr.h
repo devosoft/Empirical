@@ -787,6 +787,10 @@ namespace emp {
     TYPE * operator->() { return ptr; }
     TYPE * const operator->() const { return ptr; }
 
+    // Should implement operator->* to follow a pointer to a member function.
+    // For an example, see:
+    //  https://stackoverflow.com/questions/27634036/overloading-operator-in-c
+
     // Indexing into array
     TYPE & operator[](size_t pos) { return ptr[pos]; }
     const TYPE & operator[](size_t pos) const { return ptr[pos]; }
