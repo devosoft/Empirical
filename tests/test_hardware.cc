@@ -94,7 +94,12 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h')", "[hardware]")
   inst_lib.AddInst("Fork", hardware_t::Inst_Fork, 0, "Fork a new thread. Local memory contents of callee are loaded into forked thread's input memory.");
   inst_lib.AddInst("Terminate", hardware_t::Inst_Terminate, 0, "Kill current thread.");
   inst_lib.AddInst("RngDouble", hardware_t::Inst_RngDouble, 1, "Draw a double between 0 and 1 from onboard RNG.");
-  inst_lib.AddInst("Terminal", hardware_t::Inst_Terminal, 1, "Output an arbitrary but consistent value between 0 and 1.");
+  inst_lib.AddInst(
+    "Terminal",
+    hardware_t::template Inst_Terminal<>,
+    1,
+    "Output an arbitrary but consistent value between 0 and 1."
+  );
 
   // Add a simple MsgFriend instruction to facilitate communication between hw1 and hw2.
   inst_lib.AddInst("MsgFriend", [](hardware_t & hw, const inst_t & inst) {
