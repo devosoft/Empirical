@@ -12,13 +12,13 @@ test-prep:
 	mkdir -p temp
 
 test-%: test_%.cc
-	$(CXX) $(FLAGS) $< -o $@.out
+	$(CXX) $(FLAGS) $< -lstdc++fs -o $@.out
 	#echo "running $@.out"
 	# execute test
 	./$@.out
 
 cover-test-%: test_%.cc
-	$(CXX) $(FLAGS) $< -o $@.out
+	$(CXX) $(FLAGS) $< -lstdc++fs -o $@.out
 	#echo "running $@.out"
 	# execute test
 	./$@.out
