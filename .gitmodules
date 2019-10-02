@@ -6,4 +6,4 @@
 	url = https://github.com/emilydolson/force-cover.git
 [submodule "third-party/cereal"]
 	path = third-party/cereal
-	url = git@github.com:mmore500/cereal
+	url = https://github.com/mmore500/cereal.git
