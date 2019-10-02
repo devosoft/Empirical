@@ -12,6 +12,7 @@
 #include "third-party/Catch/single_include/catch.hpp"
 
 #include <sstream>
+#include <fstream>
 #include <string>
 #include <deque>
 #include <algorithm>
@@ -20,6 +21,9 @@
 #include <climits>
 #include <unordered_set>
 #include <ratio>
+
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
 
 #include "data/DataNode.h"
 
@@ -1227,6 +1231,128 @@ TEST_CASE("Test BitSet", "[tools]")
       REQUIRE(bs_80.CountOnes() < 3*bs_80.size()/4);
     }
   }
+
+  // serialize / deserialize
+  {
+
+    // set up
+    emp::Random rand(1);
+    emp::BitSet<10> bs10(rand);
+    emp::BitSet<25> bs25(rand);
+    emp::BitSet<32> bs32(rand);
+    emp::BitSet<50> bs50(rand);
+    emp::BitSet<64> bs64(rand);
+    emp::BitSet<80> bs80(rand);
+
+    emp::BitSet<10> bs10_deser;
+    emp::BitSet<25> bs25_deser;
+    emp::BitSet<32> bs32_deser;
+    emp::BitSet<50> bs50_deser;
+    emp::BitSet<64> bs64_deser;
+    emp::BitSet<80> bs80_deser;
+
+    std::stringstream ss;
+
+    {
+      // Create an output archive
+      cereal::BinaryOutputArchive oarchive(ss);
+
+      // Write the data to the archive
+      oarchive(
+        bs10,
+        bs25,
+        bs32,
+        bs50,
+        bs64,
+        bs80
+      );
+
+    } // archive goes out of scope, ensuring all contents are flushed
+
+    {
+      cereal::BinaryInputArchive iarchive(ss); // Create an input archive
+
+       // Read the data from the archive
+       iarchive(
+        bs10_deser,
+        bs25_deser,
+        bs32_deser,
+        bs50_deser,
+        bs64_deser,
+        bs80_deser
+      );
+
+    }
+
+    REQUIRE(bs10 == bs10_deser);
+    REQUIRE(bs25 == bs25_deser);
+    REQUIRE(bs32 == bs32_deser);
+    REQUIRE(bs50 == bs50_deser);
+    REQUIRE(bs64 == bs64_deser);
+    REQUIRE(bs80 == bs80_deser);
+
+  }
+
+  {
+
+    // set up
+    emp::Random rand(1);
+    emp::BitSet<10> bs10(rand);
+    emp::BitSet<25> bs25(rand);
+    emp::BitSet<32> bs32(rand);
+    emp::BitSet<50> bs50(rand);
+    emp::BitSet<64> bs64(rand);
+    emp::BitSet<80> bs80(rand);
+
+    emp::BitSet<10> bs10_deser;
+    emp::BitSet<25> bs25_deser;
+    emp::BitSet<32> bs32_deser;
+    emp::BitSet<50> bs50_deser;
+    emp::BitSet<64> bs64_deser;
+    emp::BitSet<80> bs80_deser;
+
+    std::stringstream ss;
+
+    {
+      // Create an output archive
+      cereal::JSONOutputArchive oarchive(ss);
+
+      // Write the data to the archive
+      oarchive(
+        bs10,
+        bs25,
+        bs32,
+        bs50,
+        bs64,
+        bs80
+      );
+
+    } // archive goes out of scope, ensuring all contents are flushed
+
+    {
+      cereal::JSONInputArchive iarchive(ss); // Create an input archive
+
+       // Read the data from the archive
+       iarchive(
+        bs10_deser,
+        bs25_deser,
+        bs32_deser,
+        bs50_deser,
+        bs64_deser,
+        bs80_deser
+      );
+
+    }
+
+    REQUIRE(bs10 == bs10_deser);
+    REQUIRE(bs25 == bs25_deser);
+    REQUIRE(bs32 == bs32_deser);
+    REQUIRE(bs50 == bs50_deser);
+    REQUIRE(bs64 == bs64_deser);
+    REQUIRE(bs80 == bs80_deser);
+
+  }
+
 }
 
 
@@ -4035,6 +4161,85 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(bin.GetCacheSize() == 1); //replace the current one so same size.
   REQUIRE(bin.GetSelectCount() == 1000 + 3 + 2);
   }
+
+  // serialization / deserialization
+  {
+  // set up
+  emp::Random rand(1);
+  std::stringstream ss;
+
+  {
+    // Create an output archive
+    cereal::JSONOutputArchive oarchive(ss);
+
+    emp::MatchBin<
+      std::string,
+      emp::AbsDiffMetric,
+      emp::RouletteSelector<>
+    > bin(rand);
+
+    const size_t hi = bin.Put("hi", 1);
+    REQUIRE( bin.GetVal(hi) == "hi" );
+    const size_t salut = bin.Put("salut", 0);
+    REQUIRE( bin.GetVal(salut) == "salut" );
+
+    REQUIRE( bin.GetVal(bin.Put("bonjour", 6)) == "bonjour" );
+    REQUIRE( bin.GetVal(bin.Put("yo", -4)) == "yo" );
+    REQUIRE( bin.GetVal(bin.Put("konichiwa", -6)) == "konichiwa" );
+
+    // Write the data to the archive
+    oarchive(bin.GetState());
+
+  } // archive goes out of scope, ensuring all contents are flushed
+
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::RankedSelector<std::ratio<214748364700+599,214748364700>>
+  > bin(rand);
+
+  {
+    cereal::JSONInputArchive iarchive(ss); // Create an input archive
+
+    // Read the data from the archive
+    decltype(bin)::state_t state;
+    iarchive(state);
+    bin.SetState(state);
+
+  }
+
+  REQUIRE( bin.Size() == 5 );
+
+  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{} );
+  REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<int>{} );
+
+  REQUIRE( bin.GetVals(bin.Match(0, 1)) == emp::vector<std::string>{"salut"} );
+  REQUIRE( bin.GetTags(bin.Match(0, 1)) == emp::vector<int>{0} );
+
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 2)) == (emp::vector<std::string>{"salut", "hi"})
+  );
+  REQUIRE( bin.GetTags(bin.Match(0, 2)) == (emp::vector<int>{0, 1}) );
+
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 3)) == (emp::vector<std::string>{"salut", "hi", "yo"})
+  );
+  REQUIRE( bin.GetTags(bin.Match(0, 3)) == (emp::vector<int>{0, 1, -4}) );
+
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 4)) == (emp::vector<std::string>{"salut", "hi", "yo"})
+  );
+  REQUIRE( bin.GetTags(bin.Match(0, 4)) == (emp::vector<int>{0, 1, -4}) );
+
+  REQUIRE( bin.GetVals(bin.Match(15, 8)) == emp::vector<std::string>{} );
+  REQUIRE( bin.GetTags(bin.Match(15, 8)) == (emp::vector<int>{}) );
+
+  REQUIRE( bin.GetVals(bin.Match(10, 2)) == emp::vector<std::string>{"bonjour"} );
+  REQUIRE( bin.GetTags(bin.Match(10, 2)) == (emp::vector<int>{6}) );
+
+
+}
+
 }
 
 

@@ -1357,6 +1357,13 @@ namespace emp {
 
     /// Function to allow drop-in replacement with std::bitset.
     inline BitSet & flip(size_t start, size_t end) { return Toggle(start, end); }
+
+    template <class Archive>
+    void serialize( Archive & ar )
+    {
+      ar( bit_set );
+    }
+
   };
 
   template <size_t NUM_BITS1, size_t NUM_BITS2>
