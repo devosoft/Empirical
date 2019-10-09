@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <nmmintrin.h> // testing smth out
+#include <bitset>
 
 #include "../base/assert.h"
 #include "../base/Ptr.h"
@@ -28,6 +29,7 @@
 #include "bitset_utils.h"
 #include "functions.h"
 #include "math.h"
+
 
 
 namespace emp {
@@ -542,7 +544,8 @@ namespace emp {
       }
       return bit_count;
     }
-   size_t CountOnes_Mixed() const {
+    // TODO: see https://arxiv.org/pdf/1611.07612.pdf for faster pop counts
+    size_t CountOnes_Mixed() const {
       const field_t NUM_FIELDS = (1 + ((num_bits - 1) / FIELD_BITS));
       size_t bit_count = 0;
       for (size_t i = 0; i < NUM_FIELDS; i++) {
@@ -551,8 +554,6 @@ namespace emp {
 #ifdef __SSE4_2__          
           bit_count += _mm_popcnt_u64(bit_set[i]); // needs CPU with SSE4.2
 #else
-          // TODO: use non-reused code
-
           // adapted from https://en.wikipedia.org/wiki/Hamming_weight
           uint64_t x = bit_set[i];
           // put count of each 2 bits into those 2 bits
@@ -569,8 +570,6 @@ namespace emp {
 #ifdef __SSE4_2__     
           bit_count += _mm_popcnt_u32(bit_set[i]);
 #else
-          // TODO: use non-reused code
-
           /// adapted from http://graphics.stanford.edu/~seander/bithacks.html
           const uint32_t v = bit_set[i];
           const uint32_t t1 = v - ((v >> 1) & 0x55555555);
@@ -579,7 +578,9 @@ namespace emp {
 #endif
 
         } else {
-          // TODO: fallback to std::vector?
+          // fall back to STL
+          std::bitset<FIELD_BITS> std_bs(bit_set[i]);
+          bit_count += std_bs.count();
         }
 
       }
