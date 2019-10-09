@@ -85,7 +85,7 @@ files at lower levels.
 | Level | Folders
 | ----  | ----
 | 0 |  base/
-| 1 |  meta/
-| 2 |  tools/
+| 1 |  tools/
+| 2 |  meta/
 | 3 |  config/  control/  data/  games/  geometry/  hardware/  scholar/
 | 4 |  Evolve/ (data, control)  web/ (config, control)

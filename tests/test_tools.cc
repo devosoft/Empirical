@@ -808,6 +808,67 @@ TEST_CASE("Test Graph utils", "[tools]")
 TEST_CASE("Test hash_utils", "[tools]")
 {
 
+  // combine_hash
+  emp::vector<size_t> v1 = {0,0,0,1,1,1};
+  emp::vector<size_t> v2 = {1,1,1,42,53,101,1,0,0,0,};
+  emp::vector<size_t> v3 = {42,42,42,1,1,1};
+  emp::vector<size_t> v4 = {11};
+
+  emp::Random r(1);
+  size_t target_len = 25;
+  while (v1.size() < target_len) { v1.push_back(r.GetUInt()); }
+  while (v2.size() < target_len) { v2.push_back(r.GetUInt()); }
+  while (v3.size() < target_len) { v3.push_back(r.GetUInt()); }
+  while (v4.size() < target_len) { v4.push_back(r.GetUInt()); }
+
+  emp::vector<size_t> h1, h2, h3, h4;
+  h1.push_back(0);
+  for (size_t v : v1) h1.push_back(emp::combine_hash(v,h1.back()));
+  h1.erase(h1.begin());
+  h2.push_back(1);
+  for (size_t v : v2) h2.push_back(emp::combine_hash(v,h2.back()));
+  h2.erase(h2.begin());
+  h3.push_back(1);
+  for (size_t v : v3) h3.push_back(emp::combine_hash(v,h3.back()));
+  h3.erase(h3.begin());
+  h4.push_back(1);
+  for (size_t v : v4) h4.push_back(emp::combine_hash(v,h4.back()));
+  h4.erase(h4.begin());
+
+  auto s1 = std::unordered_set<size_t>(h1.begin(),h1.end());
+  REQUIRE(s1.size() == target_len);
+  auto s2 = std::unordered_set<size_t>(h2.begin(),h2.end());
+  REQUIRE(s2.size() == target_len);
+  auto s3 = std::unordered_set<size_t>(h3.begin(),h3.end());
+  REQUIRE(s3.size() == target_len);
+  auto s4 = std::unordered_set<size_t>(h4.begin(),h4.end());
+  REQUIRE(s4.size() == target_len);
+
+  auto vs1 = std::unordered_set<size_t>(v1.begin(),v1.end());
+  auto vs2 = std::unordered_set<size_t>(v2.begin(),v2.end());
+  auto vs3 = std::unordered_set<size_t>(v3.begin(),v3.end());
+  auto vs4 = std::unordered_set<size_t>(v4.begin(),v4.end());
+
+  s1.insert(vs1.begin(),vs1.end());
+  s2.insert(vs2.begin(),vs2.end());
+  s3.insert(vs3.begin(),vs3.end());
+  s4.insert(vs4.begin(),vs4.end());
+
+  REQUIRE(s1.size() == target_len + vs1.size());
+  REQUIRE(s2.size() == target_len + vs2.size());
+  REQUIRE(s3.size() == target_len + vs3.size());
+  REQUIRE(s4.size() == target_len + vs4.size());
+
+  s1.insert(s2.begin(),s2.end());
+  s1.insert(s3.begin(),s3.end());
+  s1.insert(s4.begin(),s4.end());
+  vs1.insert(vs2.begin(), vs2.end());
+  vs1.insert(vs3.begin(), vs3.end());
+  vs1.insert(vs4.begin(), vs4.end());
+
+  REQUIRE(s1.size() == 4*target_len + vs1.size());
+
+  // szudzik_hash
   REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)0) == (uint64_t)0);
 
   REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)1) == (uint64_t)1);

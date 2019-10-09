@@ -15,6 +15,14 @@
 
 namespace emp {
 
+  /// mixin: the additional value to mix in to the hash soup
+  /// acc: the accumulated value
+  /// RE implementation see, e.g.,
+  /// https://www.boost.org/doc/libs/1_35_0/doc/html/boost/hash_combine_id241013.html
+  size_t combine_hash(size_t mixin, size_t acc) {
+    return mixin + 0x9e3779b9 + (acc << 19) + (acc >> 13);
+  }
+
   /// generate a unique long from a pair of ints
   uint64_t szudzik_hash(uint32_t a_, uint32_t b_)
   {
