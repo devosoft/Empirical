@@ -2855,8 +2855,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(bitBin.GetVals(bitBin.Match(bs11, 2)) == (emp::vector<std::string>{"eleven", "three"}));
   REQUIRE(bitBin.GetTags(bitBin.Match(bs11, 2)) == (emp::vector<emp::BitSet<32>>{bs11, bs3}));
 
-  REQUIRE(bitBin.GetVals(bitBin.Match(bs3, 5)) == (emp::vector<std::string> {"three","eleven","one"}));
-  REQUIRE(bitBin.GetTags(bitBin.Match(bs3, 5)) == (emp::vector<emp::BitSet<32>> {bs3, bs11, bs1}));
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs3, 5)) == (emp::vector<std::string> {"three","one","eleven"}));
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs3, 5)) == (emp::vector<emp::BitSet<32>> {bs3, bs1, bs11}));
 
   REQUIRE (bitBin.Size() == 3);
 
@@ -2868,8 +2868,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   bitBin.SetRegulator(one, 1);
   bitBin.SetRegulator(three, 4); // 2 1 0 1 --> 12 8 4 8
 
-  REQUIRE(bitBin.GetVals(bitBin.Match(bs3, 5)) == (emp::vector<std::string> {"one","eleven"}));
-  REQUIRE(bitBin.GetTags(bitBin.Match(bs3, 5)) == (emp::vector<emp::BitSet<32>> {bs1, bs11}));
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs3, 5)) == (emp::vector<std::string> {"eleven", "one"}));
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs3, 5)) == (emp::vector<emp::BitSet<32>> {bs11, bs1}));
 
   }
 
