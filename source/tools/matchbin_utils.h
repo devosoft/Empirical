@@ -709,8 +709,8 @@ namespace emp {
   struct SelectorBase{
     virtual ~SelectorBase() {};
     virtual CacheType operator()(
-        emp::vector<size_t>& uids,
-        std::unordered_map<size_t, double>& scores,
+        const emp::vector<size_t>& uids,
+        const std::unordered_map<size_t, double>& scores,
         size_t n
         ) = 0;
     virtual std::string name() const = 0;
@@ -736,10 +736,12 @@ namespace emp {
     }
 
     RankedCacheState operator()(
-      emp::vector<size_t>& uids,
-      std::unordered_map<size_t, double>& scores,
+      const emp::vector<size_t>& uids_,
+      const std::unordered_map<size_t, double>& scores,
       size_t n
     ) override {
+
+      emp::vector<size_t> uids(uids_);
 
       // treat any negative numerator as positive infinity
       const double thresh = (
@@ -826,10 +828,12 @@ namespace emp {
     }
 
     RouletteCacheState operator()(
-      emp::vector<size_t>& uids,
-      std::unordered_map<size_t, double>& scores,
+      const emp::vector<size_t>& uids_,
+      const std::unordered_map<size_t, double>& scores,
       size_t n
     ) override {
+
+      emp::vector<size_t> uids(uids_);
 
       const double skew = ((double) SkewRatio::num / SkewRatio::den);
       emp_assert(skew > 0);
@@ -852,9 +856,9 @@ namespace emp {
       size_t partition = 0;
       double min_score = std::numeric_limits<double>::infinity();
       for (size_t i = 0; i < uids.size(); ++i) {
-        emp_assert(scores[uids[i]] >= 0);
-        min_score = std::min(min_score, scores[uids[i]]);
-        if (scores[uids[i]] <= thresh) {
+        emp_assert(scores.at(uids[i]) >= 0);
+        min_score = std::min(min_score, scores.at(uids[i]));
+        if (scores.at(uids[i]) <= thresh) {
           std::swap(uids[i], uids[partition++]);
         }
       }
@@ -870,8 +874,8 @@ namespace emp {
       IndexMap match_index(partition);
 
       for (size_t p = 0; p < partition; ++p) {
-        emp_assert(scores[uids[p]] - baseline >= 0);
-        match_index.Adjust(p, 1.0 / ( skew + scores[uids[p]] - baseline ));
+        emp_assert(scores.at(uids[p]) - baseline >= 0);
+        match_index.Adjust(p, 1.0 / ( skew + scores.at(uids[p]) - baseline ));
       }
 
       return RouletteCacheState(match_index, uids, rand);
@@ -947,10 +951,12 @@ namespace emp {
     }
 
     RouletteCacheState operator()(
-      emp::vector<size_t>& uids,
-      std::unordered_map<size_t, double>& scores,
+      const emp::vector<size_t>& uids_,
+      const std::unordered_map<size_t, double>& scores,
       size_t n
     ) override {
+
+      emp::vector<size_t> uids(uids_);
 
       const double b = (static_cast<double>(BRatio::num) / BRatio::den);
       emp_assert(b > 0 && b < 1);
@@ -979,9 +985,9 @@ namespace emp {
       size_t partition = 0;
       double min_score = std::numeric_limits<double>::infinity();
       for (size_t i = 0; i < uids.size(); ++i) {
-        emp_assert(scores[uids[i]] >= 0);
-        min_score = std::min(min_score, scores[uids[i]]);
-        if (scores[uids[i]] <= thresh) {
+        emp_assert(scores.at(uids[i]) >= 0);
+        min_score = std::min(min_score, scores.at(uids[i]));
+        if (scores.at(uids[i]) <= thresh) {
           std::swap(uids[i], uids[partition++]);
         }
       }
@@ -997,12 +1003,12 @@ namespace emp {
       IndexMap match_index(partition);
 
       for (size_t p = 0; p < partition; ++p) {
-        emp_assert(scores[uids[p]] - baseline >= 0);
+        emp_assert(scores.at(uids[p]) - baseline >= 0);
         match_index.Adjust(
           p,
           std::pow(
             b,
-            std::pow(c * (scores[uids[p]] - baseline), z)
+            std::pow(c * (scores.at(uids[p]) - baseline), z)
           )
         );
       }
@@ -1022,8 +1028,8 @@ struct DynamicSelector : public SelectorBase<emp::vector<size_t>>{
   size_t mode{0};
 
   emp::vector<size_t> operator()(
-    emp::vector<size_t>& uids,
-    std::unordered_map<size_t, double>& scores,
+    const emp::vector<size_t>& uids,
+    const std::unordered_map<size_t, double>& scores,
     size_t n
   ) {
     emp_assert(mode < selectors.size());
