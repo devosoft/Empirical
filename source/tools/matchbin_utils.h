@@ -749,24 +749,17 @@ namespace emp {
         ? std::numeric_limits<double>::infinity()
         : ((double) ThreshRatio::num) / ((double)ThreshRatio::den)
       );
-      if (n < std::log2(uids.size())) {
-        // Perform a bounded partial sort to find the first n results
-        std::partial_sort(uids.begin(),
-            uids.begin() + n,
-            uids.end(),
-            [&scores](const size_t &a, const size_t &b){return scores.at(a) < scores.at(b);}
-            );
 
-      } else {
-        std::sort(
-          uids.begin(),
-          uids.end(),
-          [&scores](const size_t &a, const size_t &b) {
-            return scores.at(a) < scores.at(b);
-          }
-        );
+      // Perform a bounded partial sort to find the first n results
+      std::partial_sort(
+        uids.begin(),
+        uids.begin() + std::min(n, uids.size()),
+        uids.end(),
+        [&scores](const size_t &a, const size_t &b){
+          return scores.at(a) < scores.at(b);
+        }
+      );
 
-      }
 
       size_t back = 0;
         while (
