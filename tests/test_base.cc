@@ -435,12 +435,18 @@ TEST_CASE("Test Ptr", "[base]")
   // Test casting to unsigned char
   emp::Ptr<uint32_t> ptr5;
   ptr5.New();
-  *ptr5 = 1;
+  *ptr5 = 1+1024;
 
-  unsigned char value;
-  value = ptr5.Cast<unsigned char>();
-  REQUIRE(value == 1);
+  REQUIRE(*ptr5.Cast<unsigned char>() == 1);
   ptr5.Delete();
+
+  // Test casting to const unsigned char
+  emp::Ptr<uint32_t> ptr6;
+  ptr6.New();
+  *ptr6 = 6+1024;
+
+  REQUIRE(*ptr6.Cast<const unsigned char>() == 6);
+  ptr6.Delete();
 
 
   // std::cout << ptr_set[0]->DebugGetCount() << std::endl;
