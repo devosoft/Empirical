@@ -432,6 +432,16 @@ TEST_CASE("Test Ptr", "[base]")
   int a_val = *(ptr_a);
   REQUIRE(a_val == 9);
 
+  // Test casting to unsigned char
+  emp::Ptr<uint32_t> ptr5;
+  ptr5.New();
+  *ptr5 = 1;
+
+  unsigned char value;
+  value = ptr5.Cast<unsigned char>();
+  REQUIRE(value == 1);
+  ptr5.Delete();
+
 
   // std::cout << ptr_set[0]->DebugGetCount() << std::endl;
 
