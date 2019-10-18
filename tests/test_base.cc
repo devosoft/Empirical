@@ -452,7 +452,7 @@ TEST_CASE("Test Ptr", "[base]")
   emp::Ptr<uint32_t> ptr7;
   ptr7.New();
   *ptr7 = 6+1024;
-  const emp::Ptr<const unsigned char> ptr8 = ptr7.Cast<const unsigned char>()
+  const emp::Ptr<const unsigned char> ptr8 = ptr7.Cast<const unsigned char>();
   REQUIRE(*ptr8 == 6);
   ptr7.Delete();
 
