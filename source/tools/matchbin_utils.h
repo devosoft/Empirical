@@ -974,17 +974,18 @@ namespace emp {
         : static_cast<double>(MaxBaselineRatio::num) / MaxBaselineRatio::den
       );
 
-      // partition by thresh
-      size_t partition = 0;
-      double min_score = std::numeric_limits<double>::infinity();
-      for (size_t i = 0; i < uids.size(); ++i) {
-        emp_assert(scores.at(uids[i]) >= 0);
-        min_score = std::min(min_score, scores.at(uids[i]));
-        if (scores.at(uids[i]) <= thresh) {
-          std::swap(uids[i], uids[partition++]);
-        }
-      }
+      double min_score = scores.at(
+          std::min_element(
+            uids.begin(), 
+            uids.end(), 
+            [&scores](size_t a, size_t b){return scores.at(a)<scores.at(b);}
+            )
+          );
+      size_t partition = std::partition(uids.begin(), uids.end(), [thresh](size_t uid){emp_assert(uid>=0); return uid <= thresh;});
+      
+    
 
+      
       // skew relative to strongest match less than or equal to max_baseline
       // to take into account regulation...
       // (the default value of max_baseline is 1.0 because without
