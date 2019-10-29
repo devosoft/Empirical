@@ -22,6 +22,15 @@ namespace emp {
   inline double ToDouble<std::string>(const std::string & in) {
     return std::stod(in);
   }
+
+  template <typename T>
+  inline T FromDouble(double in) { return (T) in; }
+
+  template <>
+  inline std::string FromDouble<std::string>(double in) {
+    return std::to_string(in);
+  }
+
 }
 
 #endif
