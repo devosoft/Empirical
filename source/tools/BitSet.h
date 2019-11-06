@@ -800,8 +800,7 @@ namespace emp {
           // this is due to using a dedicated instuction that runs in 1 clock cycle.
           std::bitset<FIELD_BITS> std_bs(bit_set[f]);
           bit_count += std_bs.count();
-        }
-      }
+       }
 
       return bit_count;
     }
