@@ -551,9 +551,8 @@ namespace emp {
           // when compiling with -O3 and -msse4.2, this is the fastest population count method.
           std::bitset<FIELD_BITS> std_bs(bit_set[i]);
           bit_count += std_bs.count();
-        }
+       }
 
-      }
       return bit_count;
     }
 
