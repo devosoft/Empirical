@@ -19,7 +19,6 @@
 #define EMP_BIT_VECTOR_H
 
 #include <iostream>
-#include <nmmintrin.h> // testing smth out
 #include <bitset>
 
 #include "../base/assert.h"
@@ -549,36 +548,7 @@ namespace emp {
       const field_t NUM_FIELDS = (1 + ((num_bits - 1) / FIELD_BITS));
       size_t bit_count = 0;
       for (size_t i = 0; i < NUM_FIELDS; i++) {
-        
-        if constexpr (FIELD_BITS == 64) {
-#ifdef __SSE4_2__          
-          bit_count += _mm_popcnt_u64(bit_set[i]); // needs CPU with SSE4.2
-#else
-          // adapted from https://en.wikipedia.org/wiki/Hamming_weight
-          uint64_t x = bit_set[i];
-          // put count of each 2 bits into those 2 bits
-          x -= (x >> 1) & 0x5555555555555555;
-          // put count of each 4 bits into those 4 bits
-          x = (x & 0x3333333333333333) + ((x >> 2) & 0x3333333333333333);
-          //put count of each 8 bits into those 8 bits
-          x = (x + (x >> 4)) & 0x0f0f0f0f0f0f0f0f;
-          // returns left 8 bits of x + (x<<8) + (x<<16) + (x<<24) + ...
-          bit_count += (x * 0x0101010101010101) >> 56;
-#endif
-
-        } else if constexpr (FIELD_BITS == 32) {
-#ifdef __SSE4_2__     
-          bit_count += _mm_popcnt_u32(bit_set[i]);
-#else
-          /// adapted from http://graphics.stanford.edu/~seander/bithacks.html
-          const uint32_t v = bit_set[i];
-          const uint32_t t1 = v - ((v >> 1) & 0x55555555);
-          const uint32_t t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
-          bit_count += (((t2 + (t2 >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
-#endif
-
-        } else {
-          // fall back to STL
+          // when compiling with -O3 and -msse4.2, this is the fastest population count method.
           std::bitset<FIELD_BITS> std_bs(bit_set[i]);
           bit_count += std_bs.count();
         }
