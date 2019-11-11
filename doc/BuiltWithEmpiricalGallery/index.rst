@@ -53,3 +53,5 @@ Put in a PR or raise an issue to have *your* project featured!
 .. __: https://github.com/emilydolson/visualizations/
 .. _`Model of cancer evolution on an oxygen gradient`: http://emilydolson.github.io/memic_model/web/memic_model.html
 .. __: https://github.com/emilydolson/memic_model/
+.. _`Model of killing a population with mutational meltdown`: https://emilydolson.github.io/genomic_stability_model/web/genomic_stability_model.html
+.. __: https://github.com/emilydolson/genomic_stability_model/
