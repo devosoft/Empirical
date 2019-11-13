@@ -32,7 +32,7 @@ test: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
 # Test optimized version without debug features
-opt: FLAGS := -std=c++17 -DNDEBUG -O3 -Wno-unused-function -I../source/ -I../
+opt: FLAGS := -std=c++17 -DNDEBUG -O3 -Wno-unused-function -DCI=$(CI) -I../source/ -I../
 opt: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 

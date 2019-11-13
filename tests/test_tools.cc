@@ -200,42 +200,307 @@ TEST_CASE("Test BitMatrix", "[tools]")
 */
 }
 
+// for BitSet ROTATE_SELF
+// adapted from spraetor.github.io/2015/12/26/compile-time-loops.html
+template <size_t N>
+struct MultiTester2 {
+
+  template <size_t I>
+  static void test() {
+
+    emp::Random rand(1);
+
+    constexpr int W = N - 2;
+    emp::BitSet<W> bs;
+
+    for (int j = 0; j < W; ++j) {
+      bs.Clear(); bs.Set(j);
+      bs.template ROTL_SELF<I>();
+      REQUIRE(bs.CountOnes() == 1);
+      REQUIRE(bs.Get(emp::Mod(j+I,W)));
+
+      bs.SetAll(); bs.Set(j, false);
+      bs.template ROTL_SELF<I>();
+      REQUIRE(bs.CountOnes() == W-1);
+      REQUIRE(!bs.Get(emp::Mod(j+I,W)));
+
+      bs.Randomize(rand); bs.Set(j);
+      const size_t c1 = bs.CountOnes();
+      bs.template ROTL_SELF<I>();
+      REQUIRE(bs.CountOnes() == c1);
+      REQUIRE(bs.Get(emp::Mod(j+I,W)));
+
+      bs.Randomize(rand); bs.Set(j, false);
+      const size_t c2 = bs.CountOnes();
+      bs.template ROTL_SELF<I>();
+      REQUIRE(bs.CountOnes() == c2);
+      REQUIRE(!bs.Get(emp::Mod(j+I,W)));
+
+      bs.Clear(); bs.Set(j);
+      bs.template ROTR_SELF<I>();
+      REQUIRE(bs.CountOnes() == 1);
+      REQUIRE(bs.Get(emp::Mod(j-I,W)));
+
+      bs.SetAll(); bs.Set(j, false);
+      bs.template ROTR_SELF<I>();
+      REQUIRE(bs.CountOnes() == W-1);
+      REQUIRE(!bs.Get(emp::Mod(j-I,W)));
+
+      bs.Randomize(rand); bs.Set(j);
+      const size_t c3 = bs.CountOnes();
+      bs.template ROTR_SELF<I>();
+      REQUIRE(bs.CountOnes() == c3);
+      REQUIRE(bs.Get(emp::Mod(j-I,W)));
+
+      bs.Randomize(rand); bs.Set(j, false);
+      const size_t c4 = bs.CountOnes();
+      bs.template ROTR_SELF<I>();
+      REQUIRE(bs.CountOnes() == c4);
+      REQUIRE(!bs.Get(emp::Mod(j-I,W)));
+    }
+
+    if constexpr (I+1 < N) {
+      // recurse
+      MultiTester2<N>::test<I+1>();
+    }
+  }
+
+};
+
+template <int N>
+struct MultiTester {
+
+  template <int I>
+  static void test() {
+
+    constexpr int width = I;
+
+    emp::Random rand(1);
+    emp::BitSet<width> bs(rand);
+    const emp::BitSet<width> bs_orig(bs);
+    const size_t num_ones = bs.CountOnes();
+
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      for (size_t rep = 0; rep < width; ++ rep) {
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == num_ones);
+      }
+      REQUIRE(bs == bs_orig);
+    }
+
+    for (int i = -width - 1; i <= width + 1; ++i) {
+      // for large widths, just do one starting position
+      for (int j = 0; j < (width < 200 ? width : 1); ++j) {
+        bs.Clear(); bs.Set(j);
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == 1);
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+        bs.SetAll(); bs.Set(j, false);
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == width-1);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j);
+        const size_t c1 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c1);
+        REQUIRE(bs.Get(emp::Mod(j-i,width)));
+
+        bs.Randomize(rand); bs.Set(j, false);
+        const size_t c2 = bs.CountOnes();
+        bs.ROTATE_SELF(i);
+        REQUIRE(bs.CountOnes() == c2);
+        REQUIRE(!bs.Get(emp::Mod(j-i,width)));
+      }
+    }
+
+    if constexpr (N < 200) {
+      // test templated rotates (only for small N)
+      MultiTester2<I+2>::template test<0>();
+    }
+
+    if constexpr (I+1 < N && N < 200) {
+      // recurse
+      MultiTester<N>::test<I+1>();
+    } else if constexpr (I+1 < N ) {
+      // recurse
+      MultiTester<N>::test<I+63>();
+    }
+  }
+
+};
 
 template class emp::BitSet<5>;
 TEST_CASE("Test BitSet", "[tools]")
 {
   emp::BitSet<10> bs10;
+  emp::BitSet<25> bs25;
   emp::BitSet<32> bs32;
   emp::BitSet<50> bs50;
   emp::BitSet<64> bs64;
   emp::BitSet<80> bs80;
 
   bs80[70] = 1;
-  emp::BitSet<80> bs80c(bs80);
   bs80 <<= 1;
+  emp::BitSet<80> bs80c(bs80);
 
   for (size_t i = 0; i < 75; i++) {
     emp::BitSet<80> shift_set = bs80 >> i;
     REQUIRE((shift_set.CountOnes() == 1) == (i <= 71));
   }
 
+  bs80.Clear();
+
   REQUIRE(bs10[2] == false);
   bs10.flip(2);
   REQUIRE(bs10[2] == true);
 
+  REQUIRE(bs32[2] == false);
+  bs32.flip(2);
+  REQUIRE(bs32[2] == true);
+
+  REQUIRE(bs80[2] == false);
+  bs80.flip(2);
+  REQUIRE(bs80[2] == true);
+
   for (size_t i = 3; i < 8; i++) {REQUIRE(bs10[i] == false);}
   bs10.flip(3, 8);
   for (size_t i = 3; i < 8; i++) {REQUIRE(bs10[i] == true);}
+  REQUIRE(bs10[8] == false);
 
-  // Test importing....
-  bs10.Import(bs80 >> 70);
+  for (size_t i = 3; i < 8; i++) {REQUIRE(bs32[i] == false);}
+  bs32.flip(3, 8);
+  for (size_t i = 3; i < 8; i++) {REQUIRE(bs32[i] == true);}
+  REQUIRE(bs32[8] == false);
 
-  REQUIRE(bs10.GetUInt(0) == 2);
+  for (size_t i = 3; i < 8; i++) {REQUIRE(bs80[i] == false);}
+  bs80.flip(3, 8);
+  for (size_t i = 3; i < 8; i++) {REQUIRE(bs80[i] == true);}
+  REQUIRE(bs80[8] == false);
+
+  bs80[70] = 1;
+
+  REQUIRE(bs10.GetUInt(0) == 252);
+  REQUIRE(bs10.GetUInt32(0) == 252);
+  REQUIRE(bs10.GetUInt64(0) == 252);
+
+  REQUIRE(bs32.GetUInt(0) == 252);
+  REQUIRE(bs32.GetUInt32(0) == 252);
+  REQUIRE(bs32.GetUInt64(0) == 252);
+
+  REQUIRE(bs80.GetUInt(0) == 252);
+  REQUIRE(bs80.GetUInt(1) == 0);
+  REQUIRE(bs80.GetUInt(2) == 64);
+  REQUIRE(bs80.GetUInt32(0) == 252);
+  REQUIRE(bs80.GetUInt32(1) == 0);
+  REQUIRE(bs80.GetUInt32(2) == 64);
+  REQUIRE(bs80.GetUInt64(0) == 252);
+  REQUIRE(bs80.GetUInt64(1) == 64);
+
+  bs80 = bs80c;
 
   // Test arbitrary bit retrieval of UInts
   bs80[65] = 1;
   REQUIRE(bs80.GetUIntAtBit(64) == 130);
   REQUIRE(bs80.GetValueAtBit<5>(64) == 2);
+
+  // tests for ROTATE
+  // ... with one set bit
+  bs10.Clear(); bs10.Set(0);
+  bs25.Clear(); bs25.Set(0);
+  bs32.Clear(); bs32.Set(0);
+  bs50.Clear(); bs50.Set(0);
+  bs64.Clear(); bs64.Set(0);
+  bs80.Clear(); bs80.Set(0);
+
+  for (int rot = -100; rot < 101; ++rot) {
+
+    REQUIRE( bs10.CountOnes() == bs10.ROTATE(rot).CountOnes() );
+    REQUIRE( bs25.CountOnes() == bs25.ROTATE(rot).CountOnes() );
+    REQUIRE( bs32.CountOnes() == bs32.ROTATE(rot).CountOnes() );
+    REQUIRE( bs50.CountOnes() == bs50.ROTATE(rot).CountOnes() );
+    REQUIRE( bs64.CountOnes() == bs64.ROTATE(rot).CountOnes() );
+    REQUIRE( bs80.CountOnes() == bs80.ROTATE(rot).CountOnes() );
+
+    if (rot % 10) REQUIRE( bs10 != bs10.ROTATE(rot) );
+    else REQUIRE( bs10 == bs10.ROTATE(rot) );
+
+    if (rot % 25) REQUIRE( bs25 != bs25.ROTATE(rot) );
+    else REQUIRE( bs25 == bs25.ROTATE(rot) );
+
+    if (rot % 32) REQUIRE( bs32 != bs32.ROTATE(rot) );
+    else REQUIRE( bs32 == bs32.ROTATE(rot) );
+
+    if (rot % 50) REQUIRE( bs50 != bs50.ROTATE(rot) );
+    else REQUIRE( bs50 == bs50.ROTATE(rot) );
+
+    if (rot % 64) REQUIRE( bs64 != bs64.ROTATE(rot) );
+    else REQUIRE( bs64 == bs64.ROTATE(rot) );
+
+    if (rot % 80) REQUIRE( bs80 != bs80.ROTATE(rot) );
+    else REQUIRE( bs80 == bs80.ROTATE(rot) );
+
+  }
+
+  // ... with random set bits
+  emp::Random rand(1);
+  // no bs10 because there's a reasonable chance
+  // of breaking the test's assumption of nonsymmetry
+  bs25.Randomize(rand);
+  bs32.Randomize(rand);
+  bs50.Randomize(rand);
+  bs64.Randomize(rand);
+  bs80.Randomize(rand);
+
+  for (int rot = -100; rot < 101; ++rot) {
+
+    REQUIRE( bs25.CountOnes() == bs25.ROTATE(rot).CountOnes() );
+    REQUIRE( bs32.CountOnes() == bs32.ROTATE(rot).CountOnes() );
+    REQUIRE( bs50.CountOnes() == bs50.ROTATE(rot).CountOnes() );
+    REQUIRE( bs64.CountOnes() == bs64.ROTATE(rot).CountOnes() );
+    REQUIRE( bs80.CountOnes() == bs80.ROTATE(rot).CountOnes() );
+
+    if (rot % 25) REQUIRE( bs25 != bs25.ROTATE(rot) );
+    else REQUIRE( bs25 == bs25.ROTATE(rot) );
+
+    if (rot % 32) REQUIRE( bs32 != bs32.ROTATE(rot) );
+    else REQUIRE( bs32 == bs32.ROTATE(rot) );
+
+    if (rot % 50) REQUIRE( bs50 != bs50.ROTATE(rot) );
+    else REQUIRE( bs50 == bs50.ROTATE(rot) );
+
+    if (rot % 64) REQUIRE( bs64 != bs64.ROTATE(rot) );
+    else REQUIRE( bs64 == bs64.ROTATE(rot) );
+
+    if (rot % 80) REQUIRE( bs80 != bs80.ROTATE(rot) );
+    else REQUIRE( bs80 == bs80.ROTATE(rot) );
+
+  }
+
+  // CI + 0 evaluates to false
+  // if CI is defined but has no value
+  // or if CI is not defined
+#if (CI + 0)
+  // turn these tests off for Travis because they seem to
+  // overwhelm available resources
+  // here's the warning that Travis gives us
+  /*
+  In function ‘void ____C_A_T_C_H____T_E_S_T____493()’:
+  cc1plus: warning: ‘void* __builtin_memmove(void*, const void*, long unsigned int)’ specified size 18446744073709551608 exceeds maximum object size 9223372036854775807 [-Wstringop-overflow=]
+  */
+#else
+  // tests for ROTATE_SELF, ROTR_SELF, ROTL_SELF
+  MultiTester<2>::test<1>();
+  MultiTester<18>::test<17>();
+  MultiTester<34>::test<31>();
+  MultiTester<51>::test<50>();
+  MultiTester<66>::test<63>();
+  MultiTester<96>::test<93>();
+  MultiTester<161>::test<160>();
+  MultiTester<2050>::test<2048>();
+#endif
+
 }
 
 
@@ -638,7 +903,7 @@ TEST_CASE("Test IndexMap", "[tools]")
   imap[5] = 2.0;
   imap[6] = 0.0;
   imap[7] = 8.0;
-  
+
   REQUIRE(imap.GetSize() == 8);
   REQUIRE(imap.GetWeight() == 16.0);
   REQUIRE(imap.GetWeight(2) == 1.0);
@@ -1680,9 +1945,11 @@ TEST_CASE("Test string_utils", "[tools]")
   REQUIRE(emp::to_string((size_t) 11) == "11");
   REQUIRE(emp::to_string((long) 12) == "12");
   REQUIRE(emp::to_string((unsigned long) 13) == "13");
-  REQUIRE(emp::to_string((float) 14.0) == "14.000000");
-  REQUIRE(emp::to_string((double) 15.0) == "15.000000");
-  REQUIRE(emp::to_string(16.0) == "16.000000");
+  REQUIRE(emp::to_string((float) 14.0) == "14");
+  REQUIRE(emp::to_string((float) 14.1) == "14.1");
+  REQUIRE(emp::to_string((float) 14.1234) == "14.1234");
+  REQUIRE(emp::to_string((double) 15.0) == "15");
+  REQUIRE(emp::to_string(16.0) == "16");
   REQUIRE(emp::to_string(emp::vector<size_t>({17,18,19})) == "[ 17 18 19 ]");
   REQUIRE(emp::to_string((char) 32) == " ");
   REQUIRE(emp::to_string((unsigned char) 33) == "!");
@@ -1695,7 +1962,7 @@ TEST_CASE("Test string_utils", "[tools]")
   std::string cat_full = emp::to_string(cat_a, cat_b, cat_c, cat_d);
 
   REQUIRE(cat_full == "ABC123");
-  std::array<int, 3> test_arr({{ 4, 2, 5 }});
+  emp::array<int, 3> test_arr({{ 4, 2, 5 }});
   REQUIRE(emp::to_string(test_arr) == "[ 4 2 5 ]");
 }
 
@@ -1864,10 +2131,10 @@ TEST_CASE("Test TypeTracker", "[tools]") {
   REQUIRE( tt_result == "3" );
 
   tt.RunFunction(tt_int3, tt_doub);  // An int and a double should multiply.
-  REQUIRE( tt_result == "16.500000" );
+  REQUIRE( tt_result == "16.5" );
 
   tt.RunFunction(tt_doub, tt_int2); // A double and an int is unknown; should leave old result.
-  REQUIRE( tt_result == "16.500000" );
+  REQUIRE( tt_result == "16.5" );
 
   tt.RunFunction(tt_str, tt_int3);    // A string an an int should duplicate the string.
   REQUIRE( tt_result == "FOURFOURFOUR" );

@@ -95,6 +95,11 @@ namespace emp {
     }
     template <typename R_T> auto operator , (const R_T & r) { emp_assert(is_init); return value , r; }
 
+    // Reflect over some common functionality for working with pointers.
+    bool IsNull() const { return value.IsNull(); }
+    void Delete() { value.Delete(); }
+    void DeleteArray() { value.DeleteArray(); }
+
     // Dynamic casting to internal type.
     operator T&() { return value; } // Note that a non-const reference doesn't need var to be initialized yet.
     operator const T&() const { emp_assert(is_init); return value; }

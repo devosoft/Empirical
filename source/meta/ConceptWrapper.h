@@ -160,7 +160,7 @@
       "Use TypeTrait for call types to require overloaded function in ConceptWrapper."); \
   using NAME ## __overloads_t = EMP_GET_ARG(1, __VA_ARGS__);                             \
   using NAME ## __padded_t = NAME ## __overloads_t;                             \
-  /* Build the actual functions that we need to redirect a call to a derived type. */    \  
+  /* Build the actual functions that we need to redirect a call to a derived type. */    \
   template <typename T>                                                                  \
   auto NAME( T && arg ) {                                                                \
     const size_t this_type_id = EMP_derived_type_id__ ## NAME;                           \

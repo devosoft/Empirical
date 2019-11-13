@@ -52,7 +52,7 @@
 #define EMP_TEXT_HASH(MSG)                           \
   ([](){                                             \
     constexpr auto temp = EMP_TEXT_PACK(MSG);        \
-    return emp::GetTypeValue<decltype(temp)>();      \
+    return emp::GetTypeID<decltype(temp)>().GetID(); \
   }())
 
 

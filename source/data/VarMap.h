@@ -32,7 +32,8 @@ namespace emp {
       virtual ~VarBase() { ; }
 
       virtual emp::Ptr<VarBase> Clone() const = 0;
-      virtual size_t GetTypeValue() const = 0;
+      virtual TypeID GetTypeID() const = 0;
+      virtual std::string ToString() const = 0;
     };
 
     template <typename T>
@@ -45,7 +46,8 @@ namespace emp {
       { ; }
 
       emp::Ptr<VarBase> Clone() const override { return emp::NewPtr< VarInfo<T> >(name, value); }
-      size_t GetTypeValue() const override { return emp::GetTypeValue<T>(); };
+      TypeID GetTypeID() const override { return emp::GetTypeID<T>(); };
+      std::string ToString() const override { return emp::to_string(value); }
     };
 
     emp::vector<emp::Ptr<VarBase>> vars;             ///< Vector of all current variables.
@@ -67,6 +69,7 @@ namespace emp {
 
     const std::string & GetName(size_t id) const { return vars[id]->name; }
     size_t GetID(const std::string & name) const { return Find(id_map, name, (size_t) -1); }
+    bool Has(const std::string & name) const { return emp::Has(id_map, name); }
 
     template <typename T>
     size_t Add(const std::string & name, const T & value) {
@@ -78,30 +81,19 @@ namespace emp {
       return id;
     }
 
+    // Type-specific add functions.
     size_t AddString(const std::string & name, const std::string & value) {
       return Add<std::string>(name, value);
     }
-
-    size_t AddInt(const std::string & name, int value) {
-      return Add<int>(name, value);
-    }
-
-    size_t AddDouble(const std::string & name, double value) {
-      return Add<double>(name, value);
-    }
-
-    size_t AddChar(const std::string & name, char value) {
-      return Add<char>(name, value);
-    }
-
-    size_t AddBool(const std::string & name, bool value) {
-      return Add<bool>(name, value);
-    }
+    size_t AddInt(const std::string & name, int value)       { return Add<int>(name, value); }
+    size_t AddDouble(const std::string & name, double value) { return Add<double>(name, value); }
+    size_t AddChar(const std::string & name, char value)     { return Add<char>(name, value); }
+    size_t AddBool(const std::string & name, bool value)     { return Add<bool>(name, value); }
 
     template <typename T>
     T & Get(size_t id) {
       emp_assert(id < vars.size());
-      emp_assert(vars[id].GetTypeValue() = emp::GetTypeValue<T>());
+      emp_assert(vars[id]->GetTypeID() = emp::GetTypeID<T>());
       emp::Ptr<VarInfo<T>> ptr = vars[id].Cast<VarInfo<T>>();
       return ptr->value;
     }
@@ -116,7 +108,7 @@ namespace emp {
     template <typename T>
     const T & Get(size_t id) const {
       emp_assert(id < vars.size());
-      emp_assert(vars[id].GetTypeValue() = emp::GetTypeValue<T>());
+      emp_assert(vars[id]->GetTypeID() = emp::GetTypeID<T>());
       emp::Ptr<const VarInfo<T>> ptr = vars[id].Cast<const VarInfo<T>>();
       return ptr->value;
     }
@@ -128,19 +120,37 @@ namespace emp {
       return Get<T>(id);
     }
 
-    // Accessors    
+    TypeID GetType(size_t id) const { return vars[id]->GetTypeID(); }
+    TypeID GetType(std::string name) const { return GetType(GetID(name)); }
+
+    // Type-specific Accessors    
     std::string & GetString(const std::string & name) { return Get<std::string>(name); }
     int & GetInt(const std::string & name) { return Get<int>(name); }
     double & GetDouble(const std::string & name) { return Get<double>(name); }
     char & GetChar(const std::string & name) { return Get<char>(name); }
     bool & GetBool(const std::string & name) { return Get<bool>(name); }
 
-    // Const accessors
+    // Type-specific const accessors
     const std::string & GetString(const std::string & name) const { return Get<std::string>(name); }
     int GetInt(const std::string & name) const { return Get<int>(name); }
     double GetDouble(const std::string & name) const { return Get<double>(name); }
     char GetChar(const std::string & name) const { return Get<char>(name); }
     bool GetBool(const std::string & name) const { return Get<bool>(name); }
+
+    template <typename T>
+    void Set(size_t id, const T & value) {
+      emp_assert(id < vars.size());
+      emp_assert(vars[id]->GetTypeID() = emp::GetTypeID<T>());
+      emp::Ptr<VarInfo<T>> ptr = vars[id].Cast<VarInfo<T>>();
+      ptr->value = value;
+    }
+
+    template <typename T>
+    void Set(const std::string & name, const T & value) {
+      if (auto it = id_map.find(name); it != id_map.end()) { Set(it->second, value); }
+      else Add(name, value);
+    }
+
   };
 
 }
