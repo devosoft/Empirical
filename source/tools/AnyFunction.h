@@ -91,43 +91,49 @@ namespace emp {
     ~AnyFunction() { if (fun) fun.Delete(); }
 
     void Clear() { if (fun) fun.Delete(); fun = nullptr; }
-    size_t NumArgs() const { return fun ? fun.NumArgs() : 0; }
+    size_t NumArgs() const { return fun ? fun->NumArgs() : 0; }
 
     operator bool() { return (bool) fun; }
 
     /// Call this function with specific types; must be correct!
     template <typename RETURN, typename... Ts>
     auto Call(Ts &&... args) {
+      emp_assert(fun);
       return fun->Call<RETURN, Ts...>( std::forward<Ts>(args)... );
     }
 
     /// Test if a function call will succeed before trying it.
     template <typename RETURN, typename... Ts>
     bool CallOK(Ts &&... args) {
+      if (!fun) return false;
       return fun->CallOK<RETURN, Ts...>( std::forward<Ts>(args)... );
     }
 
     /// Test if a function call will succeed before trying it, based only on types.
     template <typename RETURN, typename... Ts>
     bool CallTypeOK() {
+      if (!fun) return false;
       return fun->CallTypeOK<RETURN, Ts...>( );
     }
 
     /// A generic form of the function call operator; use arg types to determine derived form.
     template <typename RETURN, typename... Ts>
     auto operator()(Ts &&... args) {
+      emp_assert(fun);
       return fun->Call<RETURN, Ts...>( std::forward<Ts>(args)... );
     }
 
     /// Convert this BaseFunction into a derived emp::Function
     template <typename T>
     auto Convert() {
+      emp_assert(fun);
       return fun->Convert<T>();
     }
 
     /// Determine if this BaseFunction can be converted into a derived emp::Function
     template <typename T>
     bool ConvertOK() {
+      if (!fun) return false;
       return fun->ConvertOK();
     }
   };
