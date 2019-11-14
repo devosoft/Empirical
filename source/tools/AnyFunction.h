@@ -17,6 +17,7 @@
 #include <functional>
 #include "../base/assert.h"
 #include "../base/Ptr.h"
+#include "../meta/type_traits.h"
 
 namespace emp {
 
@@ -63,11 +64,11 @@ namespace emp {
     fun_t fun;  ///< The std::function to be called.
   public:
     /// Forward all args to std::function constructor...
-    template <typename... Ts>
-    DerivedFunction(Ts &&... args) : fun(std::forward<Ts>(args)...) { ; }
+    template <typename T>
+    DerivedFunction(T in_fun) : fun(in_fun) { ; }
 
     // How many arguments does this function have?
-    size_t NumArgs() const override { return sizeof...(PARAMS); };
+    size_t NumArgs() const override { return sizeof...(PARAMS); }
 
     /// Forward all args to std::function call.
     template <typename... Ts>
@@ -79,7 +80,7 @@ namespace emp {
 
     /// Get the std::function to be called.
     const fun_t & GetFunction() const { return fun; }
-  };
+  };  
 
 
   /// AnyFunction manages the function pointers to be dynamically handled.
@@ -87,14 +88,23 @@ namespace emp {
   private:
     emp::Ptr<BaseFunction> fun = nullptr;
 
+    /// Helper to build a proper derived function.
+    template <typename T>
+    auto MakePtr( T in_fun ) {
+      // We are going to wrap type in std::function later; remove it for now.
+      using fun_t = remove_std_function_t<T>;
+
+      // Build the derived function to hold here.
+      fun = emp::NewPtr<DerivedFunction<fun_t>>( in_fun );
+    }
   public:
     // By default, build an empty function.
     AnyFunction() { ; }
 
-    /// If arguments are provided, set the function.
-    template <typename T, typename... Ts>
-    AnyFunction(T && arg1, Ts &&... args) {
-      fun = emp::NewPtr<DerivedFunction<T,Ts...>>( std::forward<T>(arg1), std::forward<Ts>(args)... );
+    /// If an argument is provided, set the function.
+    template <typename T>
+    AnyFunction(T in_fun) {
+      MakePtr<T>( in_fun );
     }
 
     ~AnyFunction() { if (fun) fun.Delete(); }
@@ -104,10 +114,10 @@ namespace emp {
 
     operator bool() { return (bool) fun; }
 
-    template <typename... Ts>
-    void Set( Ts &&... args ) {
+    template <typename T>
+    void Set( std::function<T> in_fun ) {
       if (fun) fun.Delete();
-      fun = emp::NewPtr<DerivedFunction<Ts...>>( std::forward<Ts>(args)... );
+      MakePtr<std::function<T>>( in_fun );
     }
 
     /// Call this function with specific types; must be correct!
@@ -132,7 +142,7 @@ namespace emp {
     }
 
     /// A generic form of the function call operator; use arg types to determine derived form.
-    template <typename RETURN, typename... Ts>
+    template <typename RETURN=void, typename... Ts>
     auto operator()(Ts &&... args) {
       emp_assert(fun);
       return fun->Call<RETURN, Ts...>( std::forward<Ts>(args)... );
