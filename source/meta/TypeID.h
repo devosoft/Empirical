@@ -6,8 +6,10 @@
 //
 //
 //  Developer notes:
-//  * Fill out remaining standard library classes (as possible)
-//  * Default to type_traits typeid rather than Unknown
+//  * Fill out defaults for remaining standard library classes (as possible)
+//  * If a class has a static TypeID_GetName() defined, use that for the name.
+//  * If a type is a template, give access to parameter types.
+//  * If a type is a function, give access to parameter types.
 
 #ifndef EMP_TYPE_ID_H
 #define EMP_TYPE_ID_H
