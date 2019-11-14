@@ -86,8 +86,17 @@ namespace emp {
   class AnyFunction {
   private:
     emp::Ptr<BaseFunction> fun = nullptr;
+
   public:
+    // By default, build an empty function.
     AnyFunction() { ; }
+
+    /// If arguments are provided, set the function.
+    template <typename T, typename... Ts>
+    AnyFunction(T && arg1, Ts &&... args) {
+      fun = emp::NewPtr<DerivedFunction<T,Ts...>>( std::forward<T>(arg1), std::forward<Ts>(args)... );
+    }
+
     ~AnyFunction() { if (fun) fun.Delete(); }
 
     void Clear() { if (fun) fun.Delete(); fun = nullptr; }
@@ -95,8 +104,14 @@ namespace emp {
 
     operator bool() { return (bool) fun; }
 
+    template <typename... Ts>
+    void Set( Ts &&... args ) {
+      if (fun) fun.Delete();
+      fun = emp::NewPtr<DerivedFunction<Ts...>>( std::forward<Ts>(args)... );
+    }
+
     /// Call this function with specific types; must be correct!
-    template <typename RETURN, typename... Ts>
+    template <typename RETURN=void, typename... Ts>
     auto Call(Ts &&... args) {
       emp_assert(fun);
       return fun->Call<RETURN, Ts...>( std::forward<Ts>(args)... );
@@ -134,7 +149,7 @@ namespace emp {
     template <typename T>
     bool ConvertOK() {
       if (!fun) return false;
-      return fun->ConvertOK();
+      return fun->ConvertOK<T>();
     }
   };
 
