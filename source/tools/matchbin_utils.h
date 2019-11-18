@@ -709,8 +709,8 @@ namespace emp {
   struct SelectorBase{
     virtual ~SelectorBase() {};
     virtual CacheType operator()(
-        emp::vector<size_t>& uids,
-        std::unordered_map<size_t, double>& scores,
+        const emp::vector<size_t>& uids,
+        const std::unordered_map<size_t, double>& scores,
         size_t n
         ) = 0;
     virtual std::string name() const = 0;
@@ -736,10 +736,12 @@ namespace emp {
     }
 
     RankedCacheState operator()(
-      emp::vector<size_t>& uids,
-      std::unordered_map<size_t, double>& scores,
+      const emp::vector<size_t>& uids_,
+      const std::unordered_map<size_t, double>& scores,
       size_t n
     ) override {
+
+      emp::vector<size_t> uids(uids_);
 
       // treat any negative numerator as positive infinity
       const double thresh = (
@@ -747,24 +749,17 @@ namespace emp {
         ? std::numeric_limits<double>::infinity()
         : ((double) ThreshRatio::num) / ((double)ThreshRatio::den)
       );
-      if (n < std::log2(uids.size())) {
-        // Perform a bounded partial sort to find the first n results
-        std::partial_sort(uids.begin(),
-            uids.begin() + n,
-            uids.end(),
-            [&scores](const size_t &a, const size_t &b){return scores.at(a) < scores.at(b);}
-            );
 
-      } else {
-        std::sort(
-          uids.begin(),
-          uids.end(),
-          [&scores](const size_t &a, const size_t &b) {
-            return scores.at(a) < scores.at(b);
-          }
-        );
+      // Perform a bounded partial sort to find the first n results
+      std::partial_sort(
+        uids.begin(),
+        uids.begin() + std::min(n, uids.size()),
+        uids.end(),
+        [&scores](const size_t &a, const size_t &b){
+          return scores.at(a) < scores.at(b);
+        }
+      );
 
-      }
 
       size_t back = 0;
         while (
@@ -826,10 +821,12 @@ namespace emp {
     }
 
     RouletteCacheState operator()(
-      emp::vector<size_t>& uids,
-      std::unordered_map<size_t, double>& scores,
+      const emp::vector<size_t>& uids_,
+      const std::unordered_map<size_t, double>& scores,
       size_t n
     ) override {
+
+      emp::vector<size_t> uids(uids_);
 
       const double skew = ((double) SkewRatio::num / SkewRatio::den);
       emp_assert(skew > 0);
@@ -852,9 +849,9 @@ namespace emp {
       size_t partition = 0;
       double min_score = std::numeric_limits<double>::infinity();
       for (size_t i = 0; i < uids.size(); ++i) {
-        emp_assert(scores[uids[i]] >= 0);
-        min_score = std::min(min_score, scores[uids[i]]);
-        if (scores[uids[i]] <= thresh) {
+        emp_assert(scores.at(uids[i]) >= 0);
+        min_score = std::min(min_score, scores.at(uids[i]));
+        if (scores.at(uids[i]) <= thresh) {
           std::swap(uids[i], uids[partition++]);
         }
       }
@@ -870,8 +867,8 @@ namespace emp {
       IndexMap match_index(partition);
 
       for (size_t p = 0; p < partition; ++p) {
-        emp_assert(scores[uids[p]] - baseline >= 0);
-        match_index.Adjust(p, 1.0 / ( skew + scores[uids[p]] - baseline ));
+        emp_assert(scores.at(uids[p]) - baseline >= 0);
+        match_index.Adjust(p, 1.0 / ( skew + scores.at(uids[p]) - baseline ));
       }
 
       return RouletteCacheState(match_index, uids, rand);
@@ -947,10 +944,12 @@ namespace emp {
     }
 
     RouletteCacheState operator()(
-      emp::vector<size_t>& uids,
-      std::unordered_map<size_t, double>& scores,
+      const emp::vector<size_t>& uids_,
+      const std::unordered_map<size_t, double>& scores,
       size_t n
     ) override {
+
+      emp::vector<size_t> uids(uids_);
 
       const double b = (static_cast<double>(BRatio::num) / BRatio::den);
       emp_assert(b > 0 && b < 1);
@@ -975,17 +974,18 @@ namespace emp {
         : static_cast<double>(MaxBaselineRatio::num) / MaxBaselineRatio::den
       );
 
-      // partition by thresh
-      size_t partition = 0;
-      double min_score = std::numeric_limits<double>::infinity();
-      for (size_t i = 0; i < uids.size(); ++i) {
-        emp_assert(scores[uids[i]] >= 0);
-        min_score = std::min(min_score, scores[uids[i]]);
-        if (scores[uids[i]] <= thresh) {
-          std::swap(uids[i], uids[partition++]);
-        }
-      }
+      double min_score = scores.at(
+          std::min_element(
+            uids.begin(), 
+            uids.end(), 
+            [&scores](size_t a, size_t b){return scores.at(a)<scores.at(b);}
+            )
+          );
+      size_t partition = std::partition(uids.begin(), uids.end(), [thresh](size_t uid){emp_assert(uid>=0); return uid <= thresh;});
+      
+    
 
+      
       // skew relative to strongest match less than or equal to max_baseline
       // to take into account regulation...
       // (the default value of max_baseline is 1.0 because without
@@ -997,12 +997,12 @@ namespace emp {
       IndexMap match_index(partition);
 
       for (size_t p = 0; p < partition; ++p) {
-        emp_assert(scores[uids[p]] - baseline >= 0);
+        emp_assert(scores.at(uids[p]) - baseline >= 0);
         match_index.Adjust(
           p,
           std::pow(
             b,
-            std::pow(c * (scores[uids[p]] - baseline), z)
+            std::pow(c * (scores.at(uids[p]) - baseline), z)
           )
         );
       }
@@ -1022,8 +1022,8 @@ struct DynamicSelector : public SelectorBase<emp::vector<size_t>>{
   size_t mode{0};
 
   emp::vector<size_t> operator()(
-    emp::vector<size_t>& uids,
-    std::unordered_map<size_t, double>& scores,
+    const emp::vector<size_t>& uids,
+    const std::unordered_map<size_t, double>& scores,
     size_t n
   ) {
     emp_assert(mode < selectors.size());

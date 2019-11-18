@@ -885,6 +885,10 @@ namespace emp {
     /// NOTE: use responsibly!
     emp::vector<exec_stk_t> & GetCores() { return cores; }
 
+    /// Get all hardware cores.
+    /// NOTE: use responsibly!
+    const emp::vector<exec_stk_t> & GetCores() const { return cores; }
+
     /// Get the currently executing core ID. If hardware is not in the middle of an execution cycle
     /// (the SingleProcess function), this will return the first core ID in active_cores, which will
     /// typically be the core on which main is running.
