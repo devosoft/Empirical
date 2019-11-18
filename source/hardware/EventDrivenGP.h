@@ -1421,7 +1421,7 @@ namespace emp {
               for(auto &[prob, id] : best_matches){os <<"      Fn-"<< id << ": " << prob <<"%\n";}
             }
           }
-             
+
           else
             os << "NONE"<<")"<<"\n";
           os << "    Func ptr: " << state.func_ptr << "\n";
@@ -1887,7 +1887,7 @@ namespace emp {
     static void Inst_Terminal(EventDrivenGP_t & hw, const inst_t & inst) {
 
       constexpr double max = static_cast<double>(MaxRatio::num) / MaxRatio::den;
-      constexpr double min = static_cast<double>(MaxRatio::num) / MaxRatio::den;
+      constexpr double min = static_cast<double>(MinRatio::num) / MinRatio::den;
 
       State & state = hw.GetCurState();
       const auto & tag = inst.affinity;
