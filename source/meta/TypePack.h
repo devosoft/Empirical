@@ -76,7 +76,7 @@ namespace emp {
   // Create a null type for padding.
   struct null_t {};
 
-  // Anonymous helpers for TypePack
+  // Private helpers for TypePack
   namespace internal {
     // Create add N copies of the same type to the end of a TypePack.
     template <typename START, typename T, int N>
@@ -159,6 +159,39 @@ namespace emp {
 
     template <typename T, template <typename...> class W>
       using tp_wrap_t = typename tp_wrap<T,W,T::SIZE>::type;
+
+    // Tools to build all combinations of types from a TypePack
+    template <size_t size,
+              typename ALL_OPTIONS,
+              typename CUR_OPTIONS,
+              typename CUR_MULTI=emp::TypePack<emp::TypePack<>>>
+    struct all_combos {
+      using next_type = typename CUR_OPTIONS::first_t;
+      using next_options = typename CUR_OPTIONS::pop;
+      template <typename T>
+      using push_wrap = typename T::template push_back<next_type>;
+      using pushed_types = typename CUR_MULTI::template wrap<push_wrap>;
+
+      using next_results = typename all_combos<size, ALL_OPTIONS, next_options, CUR_MULTI>::result_t;
+
+      using cur_result_t = typename pushed_types::template merge<next_results::result_t>;
+
+      using result_t = typename all_combos<size-1, ALL_OPTIONS, ALL_OPTIONS, cur_result_t>::result_t;
+    };
+
+    // When we are out of options return an empty pack.
+    template <size_t size,
+              typename ALL_OPTIONS,
+              typename CUR_MULTI>
+    struct all_combos<size, ALL_OPTIONS, emp::TypePack<>, CUR_MULTI> {
+      using result_t = emp::TypePack<>;
+    };
+
+    // If we are out of combinations, just return the current answer.
+    template <typename ALL_OPTIONS, typename CUR_MULTI>
+    struct all_combos<0,ALL_OPTIONS,ALL_OPTIONS,CUR_MULTI> {
+      using result_t = CUR_MULTI;
+    };
   }
 
   template <typename T, int N>
@@ -235,7 +268,7 @@ namespace emp {
     template <int N, typename DEFAULT=null_t>
       using resize = typename pad<DEFAULT,(N>SIZE)?(N-SIZE):0>::template shrink<N>;
 
-    /// Join this TypePack with another TypePack.
+    /// Join this TypePack with another TypePack (append)
     template <typename IN> using merge = typename internal::tp_shift<IN::SIZE, this_t, IN>::type1;
 
     /// Join this TypePack with another, keeping only one of each type.
