@@ -134,7 +134,8 @@ namespace emp {
   };
 
   /// Retrieve a vector of TypeIDs for a TypePack of types passed in.
-  template <typename T> emp::vector<TypeID> GetTypePackIDs() {
+  template <typename T>
+  emp::vector<TypeID> GetTypePackIDs() {
     return TypePackIDs_impl<T>::GetIDs();
   }
 
@@ -197,7 +198,15 @@ namespace emp {
       else if (info.is_reference) {
         info.name = type_id.GetRemoveReferenceTypeID().GetName() + '&';
       }
-
+      else if (info.is_TypePack) {
+        emp::vector<TypeID> ids = GetTypePackIDs<T>();
+        info.name = "TypePack<";
+        for (size_t i = 0; i < ids.size(); i++) {
+          if (i) info.name += ",";
+          info.name += ids[i].GetName();
+        }
+        info.name += ">";
+      }
     }
     
     return info;
