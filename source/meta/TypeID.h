@@ -119,6 +119,21 @@ namespace emp {
     return emp::vector<TypeID>{GetTypeID<Ts>()...};
   }
 
+  template <typename T>
+  struct TypePackIDs_impl {
+    static emp::vector<TypeID> GetIDs();
+  };
+
+  template <typename... Ts>
+  struct TypePackIDs_impl<TypePack<Ts...>> {
+    static emp::vector<TypeID> GetIDs() { return GetTypeIDs<Ts...>(); }
+  };
+
+  /// Retrieve a vector of TypeIDs for a TypePack of types passed in.
+  template <typename T> emp::vector<TypeID> GetTypePackIDs() {
+    return TypePackIDs_impl<T>::GetIDs();
+  }
+
   /// Build the information for a single TypeID.
   template <typename T>
   static TypeID::Info BuildInfo() {
@@ -176,6 +191,7 @@ namespace emp {
       else if (info.is_reference) {
         info.name = type_id.GetRemoveReferenceTypeID().GetName() + '&';
       }
+
     }
     
     return info;
