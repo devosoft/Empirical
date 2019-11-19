@@ -44,6 +44,8 @@ namespace emp {
       bool is_trivial = false;
       bool is_volatile = false;
 
+      bool is_TypePack = false;
+
       size_t decay_id = 0;
       size_t remove_const_id = 0;
       size_t remove_cv_id = 0;
@@ -95,6 +97,8 @@ namespace emp {
     bool IsReference() const { return info_ptr->is_reference ; }
     bool IsTrivial() const { return info_ptr->is_trivial ; }
     bool IsVolatile() const { return info_ptr->is_volatile ; }
+
+    bool IsTypePack() const { return info_ptr->is_TypePack ; }
 
     TypeID GetDecayTypeID() const { return info_ptr->decay_id; }
     TypeID GetRemoveConstTypeID() const { return info_ptr->remove_const_id; }
@@ -153,6 +157,8 @@ namespace emp {
       info.is_reference = std::is_reference<T>();
       info.is_trivial = std::is_trivial<T>();
       info.is_volatile = std::is_volatile<T>();
+
+      info.is_TypePack = emp::is_TypePack<T>();
 
       using decay_t = std::decay_t<T>;
       if constexpr (std::is_same<T, decay_t>()) info.decay_id = (size_t) &info;
