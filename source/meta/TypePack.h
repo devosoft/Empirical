@@ -174,7 +174,7 @@ namespace emp {
 
       using next_results = typename all_combos<size, ALL_OPTIONS, next_options, CUR_MULTI>::result_t;
 
-      using cur_result_t = typename pushed_types::template merge<next_results::result_t>;
+      using cur_result_t = typename pushed_types::template merge<next_results>;
 
       using result_t = typename all_combos<size-1, ALL_OPTIONS, ALL_OPTIONS, cur_result_t>::result_t;
     };
@@ -321,6 +321,10 @@ namespace emp {
     /// Wrap all types in a specified wrapper template.
     template <template <typename...> class WRAPPER>
     using wrap = internal::tp_wrap_t<this_t, WRAPPER>;
+
+    /// Figure out all of the combinations of types possible.
+    template <size_t COMBO_SIZE>
+    using make_combos = typename internal::all_combos<COMBO_SIZE,this_t,this_t>::result_t;
   };
 
   // Specialized TypePack with no types.
