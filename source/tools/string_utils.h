@@ -36,6 +36,11 @@ namespace emp {
     return empty;
   }
 
+  /// Count the number of times a specific character appears in a string
+  /// (a clean shortcut to std::count)
+  static inline size_t count(const std::string & str, char c) {
+    return std::count(str.begin(), str.end(), c);
+  }
 
   /// Convert a single chararcter to one that uses a proper escape sequence (in a string) if needed.
   static inline std::string to_escaped_string(char value) {
