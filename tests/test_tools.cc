@@ -2314,6 +2314,91 @@ TEST_CASE("Test matchbin_utils", "[tools]")
 
 TEST_CASE("Test MatchBin", "[tools]")
 {
+
+  // test baseline default N (1)
+  {
+  emp::Random rand(1);
+
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::RouletteSelector<>
+  >bin_rts(rand);
+
+  bin_rts.Put("hi", 0);
+  bin_rts.Put("salut", 0);
+  REQUIRE(bin_rts.Match(0).size() == 1);
+
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::ExpRouletteSelector<>
+  >bin_xrs(rand);
+
+  bin_xrs.Put("hi", 0);
+  bin_xrs.Put("salut", 0);
+  REQUIRE(bin_xrs.Match(0).size() == 1);
+
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::RankedSelector<>
+  >bin_rks(rand);
+
+  bin_rks.Put("hi", 0);
+  bin_rks.Put("salut", 0);
+  REQUIRE(bin_rks.Match(0).size() == 1);
+
+  }
+
+  // test setting different default N
+  {
+  emp::Random rand(1);
+
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::RouletteSelector<
+      std::ratio<-1,1>,
+      std::ratio<1000,1>,
+      std::ratio<1, 1>,
+      2
+    >
+  >bin_rts(rand);
+
+  bin_rts.Put("hi", 0);
+  bin_rts.Put("salut", 0);
+  REQUIRE(bin_rts.Match(0).size() == 2);
+
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::ExpRouletteSelector<
+      std::ratio<13, 10>,
+      std::ratio<1, 100>,
+      std::ratio<4, 1>,
+      std::ratio<4, 1>,
+      std::ratio<5, 4>,
+      2
+    >
+  >bin_xrs(rand);
+
+  bin_xrs.Put("hi", 0);
+  bin_xrs.Put("salut", 0);
+  REQUIRE(bin_xrs.Match(0).size() == 2);
+
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::RankedSelector<std::ratio<-1,1>, 2>
+  >bin_rks(rand);
+
+  bin_rks.Put("hi", 0);
+  bin_rks.Put("salut", 0);
+  REQUIRE(bin_rks.Match(0).size() == 2);
+
+  }
+
   {
     emp::Random rand(1);
   // We care about numbers less than 6 (<=5.99) away from what we're matching.
@@ -2323,7 +2408,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::AbsDiffMetric,
-    emp::RankedSelector<std::ratio<214748364700+599,214748364700>>
+    emp::RankedSelector<std::ratio<214748364700+599,214748364700>, 2>
   > bin(rand);
 
   const size_t hi = bin.Put("hi", 1);
@@ -2337,8 +2422,11 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   REQUIRE( bin.Size() == 5 );
 
-  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{} );
-  REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<int>{} );
+  // 0 = use Selector default n of 2
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 0)) == (emp::vector<std::string>{"salut", "hi"})
+  );
+  REQUIRE( bin.GetTags(bin.Match(0, 0)) == (emp::vector<int>{0, 1}) );
 
   REQUIRE( bin.GetVals(bin.Match(0, 1)) == emp::vector<std::string>{"salut"} );
   REQUIRE( bin.GetTags(bin.Match(0, 1)) == emp::vector<int>{0} );
@@ -2381,7 +2469,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE( bin.GetTags(bin.Match(0, 2)) == (emp::vector<int>{0, -4}) );
 
   bin.Put("hi", 1);
-  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{} );
+  // 0 = use Selector default, which is 1
+  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{"salut"} );
   REQUIRE( bin.GetVals(bin.Match(0, 1)) == emp::vector<std::string>{"salut"} );
   REQUIRE(
     bin.GetVals(bin.Match(0, 2)) == (emp::vector<std::string>{"salut", "hi"})
@@ -2412,8 +2501,9 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   REQUIRE( bin.Size() == 3 );
 
-  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{} );
-  REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<int>{} );
+  // 0 = use Selector default, which is 1
+  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{"salut"} );
+  REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<int>{0} );
 
   REQUIRE( bin.GetVals(bin.Match(0, 1)) == emp::vector<std::string>{"salut"} );
   REQUIRE( bin.GetTags(bin.Match(0, 1)) == emp::vector<int>{0} );
@@ -2431,8 +2521,9 @@ TEST_CASE("Test MatchBin", "[tools]")
   );
 
   bin.SetRegulator(bonjour, std::numeric_limits<double>::infinity());
-  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{} );
-  REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<int>{} );
+  // 0 = use Selector default, which is 1
+  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{"salut"} );
+  REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<int>{0} );
 
   REQUIRE( bin.GetVals(bin.Match(0, 1)) == emp::vector<std::string>{"salut"} );
   REQUIRE( bin.GetTags(bin.Match(0, 1)) == emp::vector<int>{0} );
@@ -2467,9 +2558,6 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE( bin.GetVal(salut) == "salut" );
 
   REQUIRE( bin.Size() == 2 );
-
-  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{} );
-  REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<int>{} );
 
   auto res = bin.GetVals(bin.Match(0, 100000));
   const size_t count = std::count(std::begin(res), std::end(res), "salut");
@@ -2509,8 +2597,6 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE( bin.GetVal(salut) == "salut" );
 
   REQUIRE( bin.Size() == 3 );
-  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{} );
-  REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<int>{} );
 
   auto res = bin.GetVals(bin.Match(0, 100000));
   const size_t count = std::count(std::begin(res), std::end(res), "salut");
@@ -2573,20 +2659,6 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE( bin_hardskew.GetVal(salut2) == "salut" );
 
   REQUIRE( bin_hardskew.Size() == 2 );
-
-  REQUIRE(
-    bin_hardskew.GetVals(bin_hardskew.Match(0, 0)) == emp::vector<std::string>{}
-  );
-  REQUIRE(
-    bin_hardskew.GetTags(bin_hardskew.Match(0, 0)) == emp::vector<int>{}
-  );
-
-  REQUIRE(
-    bin_softskew.GetVals(bin_softskew.Match(0, 0)) == emp::vector<std::string>{}
-  );
-  REQUIRE(
-    bin_softskew.GetTags(bin_softskew.Match(0, 0)) == emp::vector<int>{}
-  );
 
 
   auto res_softskew = bin_softskew.GetVals(bin_softskew.Match(0, 100000));
@@ -2662,21 +2734,6 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE( bin_hibase.GetVal(salut2) == "salut" );
 
   REQUIRE( bin_hibase.Size() == 2 );
-
-  REQUIRE(
-    bin_hibase.GetVals(bin_hibase.Match(0, 0)) == emp::vector<std::string>{}
-  );
-  REQUIRE(
-    bin_hibase.GetTags(bin_hibase.Match(0, 0)) == emp::vector<int>{}
-  );
-
-  REQUIRE(
-    bin_lobase.GetVals(bin_lobase.Match(0, 0)) == emp::vector<std::string>{}
-  );
-  REQUIRE(
-    bin_lobase.GetTags(bin_lobase.Match(0, 0)) == emp::vector<int>{}
-  );
-
 
   auto res_lobase = bin_lobase.GetVals(bin_lobase.Match(0, 100000));
   const size_t count_lobase = std::count(
