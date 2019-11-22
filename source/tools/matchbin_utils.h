@@ -655,12 +655,28 @@ namespace emp {
   };
 
   struct RouletteCacheState : public CacheStateBase{
+
+    emp::IndexMap indexMap;
+    emp::vector<size_t> uids;
+    emp::Random rand;
+    size_t default_n;
+
     RouletteCacheState() = default;
-    RouletteCacheState(emp::IndexMap& im, emp::vector<size_t>& ids, emp::Random& r)
-      : indexMap(im)
+    RouletteCacheState(
+      emp::IndexMap& im,
+      emp::vector<size_t>& ids,
+      emp::Random& r,
+      const size_t default_n_
+    ) : indexMap(im)
       , uids(ids)
-      , rand(r){}
+      , rand(r)
+      , default_n(default_n_)
+    { ; }
+
     std::optional<emp::vector<size_t>> operator()(size_t n) override {
+
+      if (n == 0) n = default_n;
+
       // don't perform a lookup into an empty IndexMap, that's a segfault
       // double braces: an empty vector inside an optional
       if (!indexMap.GetSize()) return std::optional<emp::vector<size_t>>{
@@ -683,26 +699,32 @@ namespace emp {
       return res;
     }
 
-    emp::IndexMap indexMap;
-    emp::vector<size_t> uids;
-    emp::Random rand;
   };
 
   struct RankedCacheState: public CacheStateBase {
 
+    emp::vector<size_t> uids;
+    size_t requestSize;
+    size_t default_n;
+
     RankedCacheState() = default;
-    RankedCacheState(emp::vector<size_t>::iterator begin, size_t back, size_t n):
-        uids(emp::vector<size_t>(begin, begin + back))
-      , requestSize(n){}
+    RankedCacheState(
+      emp::vector<size_t>::iterator begin,
+      size_t back,
+      size_t n,
+      size_t default_n_
+    ) : uids(emp::vector<size_t>(begin, begin + back))
+      , requestSize(n)
+      , default_n(default_n_)
+    { ; }
 
     std::optional<emp::vector<size_t>> operator()(size_t n) override {
+      if (n == 0) n = default_n;
       if (n > requestSize){ return std::nullopt; }
       if (n >= uids.size()){ return uids; }
       return emp::vector<size_t>(uids.begin(), uids.begin()+n);
     }
 
-    emp::vector<size_t> uids;
-    size_t requestSize;
   };
 
   /// Abstract base class for selectors
@@ -718,7 +740,10 @@ namespace emp {
   };
 
   /// Returns matches within the threshold ThreshRatio sorted by match quality.
-  template<typename ThreshRatio = std::ratio<-1,1>> // neg numerator means +infy
+  template<
+    typename ThreshRatio = std::ratio<-1,1>, // neg numerator means +infy
+    size_t DefaultN = 1
+  >
   struct RankedSelector : public SelectorBase<RankedCacheState> {
 
     RankedSelector(emp::Random&){ ; }
@@ -732,6 +757,9 @@ namespace emp {
         ThreshRatio::num,
         "/",
         ThreshRatio::den,
+        ", "
+        "DefaultN: ",
+        DefaultN,
         ")"
       );
     }
@@ -741,6 +769,8 @@ namespace emp {
       const std::unordered_map<size_t, double>& scores,
       size_t n
     ) override {
+
+      if (n == 0) n = DefaultN;
 
       emp::vector<size_t> uids(uids_);
 
@@ -770,7 +800,7 @@ namespace emp {
         ) ++back;
 
 
-      return RankedCacheState(uids.begin(), back, n);
+      return RankedCacheState(uids.begin(), back, n, DefaultN);
     }
 
   };
@@ -788,7 +818,8 @@ namespace emp {
   template<
     typename ThreshRatio = std::ratio<-1, 1>,// we treat neg numerator as +infty
     typename SkewRatio = std::ratio<1, 10>,
-    typename MaxBaselineRatio = std::ratio<1, 1>// treat neg numerator as +infty
+    typename MaxBaselineRatio = std::ratio<1, 1>,//treat neg numerator as +infty
+    size_t DefaultN = 1
   >
   struct RouletteSelector : public SelectorBase<RouletteCacheState> {
 
@@ -817,6 +848,9 @@ namespace emp {
         MaxBaselineRatio::num,
         "/",
         MaxBaselineRatio::den,
+        ", ",
+        "DefaultN: ",
+        DefaultN,
         ")"
       );
     }
@@ -826,6 +860,8 @@ namespace emp {
       const std::unordered_map<size_t, double>& scores,
       size_t n
     ) override {
+
+      if (n == 0) n = DefaultN;
 
       emp::vector<size_t> uids(uids_);
 
@@ -872,7 +908,7 @@ namespace emp {
         match_index.Adjust(p, 1.0 / ( skew + scores.at(uids[p]) - baseline ));
       }
 
-      return RouletteCacheState(match_index, uids, rand);
+      return RouletteCacheState(match_index, uids, rand, DefaultN);
 
       /*
       emp::vector<size_t> res;
@@ -901,7 +937,8 @@ namespace emp {
     typename BRatio = std::ratio<1, 100>,
     typename CRatio = std::ratio<4, 1>,
     typename ZRatio = std::ratio<4, 1>,
-    typename MaxBaselineRatio = std::ratio<5, 4>// treat neg numerator as +infty
+    typename MaxBaselineRatio = std::ratio<5, 4>,//treat neg numerator as +infty
+    size_t DefaultN = 1
   >
   struct ExpRouletteSelector : public SelectorBase<RouletteCacheState> {
 
@@ -940,6 +977,9 @@ namespace emp {
         MaxBaselineRatio::num,
         "/",
         MaxBaselineRatio::den,
+        ", ",
+        "DefaultN: ",
+        DefaultN,
         ")"
       );
     }
@@ -949,6 +989,8 @@ namespace emp {
       const std::unordered_map<size_t, double>& scores,
       size_t n
     ) override {
+
+      if (n == 0) n = DefaultN;
 
       emp::vector<size_t> uids(uids_);
 
@@ -1054,6 +1096,7 @@ struct RegulatorBase {
   virtual double View() const = 0;
   virtual double operator()(double raw_score) const = 0;
   virtual std::string name() const = 0;
+
 };
 
 

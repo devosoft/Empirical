@@ -796,7 +796,7 @@ namespace emp {
     void SpawnCore(const affinity_t & affinity, double threshold, const memory_t & input_mem=memory_t(), bool is_main=false) {
       if (!inactive_cores.size()) return; // If there are no unclaimed cores, just return.
       size_t fID;
-      emp::vector<size_t> best_matches(FindBestFuncMatch(affinity, 1, threshold));
+      emp::vector<size_t> best_matches{FindBestFuncMatch(affinity)};
       if (best_matches.empty()) return;
       if (best_matches.size() == 1.0) fID = best_matches[0];
       else if (stochastic_fun_call) fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
@@ -1150,13 +1150,16 @@ namespace emp {
     }
 
     /// Find best matching functions (by ID) given affinity.
-    emp::vector<size_t> FindBestFuncMatch(const affinity_t & affinity, size_t amount, double threshold) { //TODO threshold not necessary after addition of matchbin.
+    emp::vector<size_t> FindBestFuncMatch(
+      const affinity_t & affinity,
+      size_t n=0 // default: delegate responsibility to MatchBin Selector
+    ) {
       if(is_matchbin_cache_dirty){
         ResetMatchBin();
       }
       // no need to transform to values because we're using
       // matchbin uids equivalent to function uids
-      return matchBin.Match(affinity, amount);
+      return matchBin.Match(affinity, n);
     }
 
     MATCHBIN_TYPE& GetMatchBin(){
@@ -1181,7 +1184,7 @@ namespace emp {
       // Are we at max call depth? -- If so, call fails.
       if (GetCurCore().size() >= max_call_depth) return;
       size_t fID;
-      emp::vector<size_t> best_matches(FindBestFuncMatch(affinity, 1, threshold));
+      emp::vector<size_t> best_matches{FindBestFuncMatch(affinity)};
       if (best_matches.empty()) return;
       if (best_matches.size() == 1) fID = best_matches[0];
       else if (stochastic_fun_call) fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
@@ -1412,7 +1415,7 @@ namespace emp {
             if (std::find(additional_state_info.begin(), additional_state_info.end(), GetInstLib()->GetName(inst.id)) != additional_state_info.end()){
               std::unordered_map<size_t, double> probabilities;
               for(unsigned int i = 0; i < 100; ++i){
-                emp::vector<size_t> matches = FindBestFuncMatch(inst.affinity, 1, 0.5);
+                emp::vector<size_t> matches = FindBestFuncMatch(inst.affinity);
                 if(matches.size() == 1){
                   if(probabilities.find(matches[0])==probabilities.end()){probabilities[matches[0]] = 0;}
                   ++probabilities[matches[0]];
