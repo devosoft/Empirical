@@ -34,14 +34,14 @@
 namespace emp {
 
   /// Internal state packet for MatchBin
-  template<typename Val, typename Tag>
+  template<typename Val, typename Tag, typename Regulator>
   struct MatchBinState {
 
     using tag_t = Tag;
     using uid_t = size_t;
 
     std::unordered_map<uid_t, Val> values;
-    std::unordered_map<uid_t, double> regulators;
+    std::unordered_map<uid_t, Regulator> regulators;
     std::unordered_map<uid_t, tag_t> tags;
     emp::vector<uid_t> uids;
 
@@ -59,7 +59,7 @@ namespace emp {
   };
 
   /// Abstract base class for MatchBin
-  template<typename Val, typename Query, typename Tag>
+  template<typename Val, typename Query, typename Tag, typename Regulator>
   class BaseMatchBin {
 
   public:
@@ -82,9 +82,22 @@ namespace emp {
     virtual emp::vector<Val> GetVals(const emp::vector<uid_t> & uids) = 0;
     virtual emp::vector<tag_t> GetTags(const emp::vector<uid_t> & uids) = 0;
     virtual size_t Size() const = 0;
-    virtual void AdjRegulator(uid_t uid, double amt) = 0;
-    virtual void SetRegulator(uid_t uid, double amt) = 0;
-    virtual double ViewRegulator(const uid_t uid) const = 0;
+    virtual void AdjRegulator(
+      uid_t uid,
+      const typename Regulator::adj_t & amt
+    ) = 0;
+    virtual void SetRegulator(
+      uid_t uid,
+      const typename Regulator::set_t & set
+    ) = 0;
+    virtual void SetRegulator(
+      uid_t uid,
+      const Regulator & set
+    ) = 0;
+    virtual Regulator & GetRegulator(const uid_t uid) = 0;
+    virtual const typename Regulator::view_t ViewRegulator(
+      const uid_t uid
+    ) const = 0;
     virtual void ImprintRegulators(const BaseMatchBin & target) = 0;
     virtual std::string name() const = 0;
     virtual const emp::vector<uid_t>& ViewUIDs() const = 0;
@@ -101,21 +114,32 @@ namespace emp {
   /// This unique identifier can be used to view or edit the stored items and
   /// their corresponding tags. Tag-based lookups return a list of matched
   /// unique identifiers.
-  template <typename Val, typename Metric, typename Selector>
+  template <
+    typename Val,
+    typename Metric,
+    typename Selector,
+    typename Regulator=LinearRegulator
+  >
   class MatchBin
-  : public BaseMatchBin<Val, typename Metric::query_t, typename Metric::tag_t> {
+  : public BaseMatchBin<
+    Val,
+    typename Metric::query_t,
+    typename Metric::tag_t,
+    Regulator
+  > {
 
   using base_t = BaseMatchBin<
     Val,
     typename Metric::query_t,
-    typename Metric::tag_t
+    typename Metric::tag_t,
+    Regulator
   >;
 
   public:
     using query_t = typename base_t::query_t;
     using tag_t = typename base_t::tag_t;
     using uid_t = typename base_t::uid_t;
-    using state_t = MatchBinState<Val, tag_t>;
+    using state_t = MatchBinState<Val, tag_t, Regulator>;
 
   protected:
     state_t state;
@@ -164,7 +188,7 @@ namespace emp {
       // apply regulation to generate match scores
       std::unordered_map<uid_t, double> scores;
       for (auto uid : state.uids) {
-        scores[uid] = matches[state.tags[uid]] * state.regulators[uid] + state.regulators[uid];
+        scores[uid] = state.regulators[uid](matches[state.tags[uid]]);
       }
 
       typename Selector::cache_state_type_t cacheResult = selector(state.uids, scores, n);
@@ -238,7 +262,7 @@ namespace emp {
       ClearCache();
 
       state.values[uid] = v;
-      state.regulators[uid] = 1.0;
+      state.regulators.insert({{uid},{}});
       state.tags[uid] = t;
       state.uids.push_back(uid);
       return uid;
@@ -324,35 +348,52 @@ namespace emp {
       return state.values.size();
     }
 
-    /// Add an amount to an item's regulator value. Positive amounts
-    /// downregulate the item and negative amounts upregulate it.
-    void AdjRegulator(const uid_t uid, const double amt) override {
+    /// Adjust an item's regulator value.
+    void AdjRegulator(
+      const uid_t uid,
+      const typename Regulator::adj_t & amt
+    ) override {
       emp_assert(state.regulators.find(uid) != state.regulators.end());
 
-      const double prev = state.regulators.at(uid);
-      const double nxt = std::max(0.0, prev + amt);
-
-      if (prev != nxt) ClearCache();
-
-      state.regulators.at(uid) = nxt;
+      if (state.regulators.at(uid).Adj(amt)) ClearCache();
 
     }
 
-    /// Set an item's regulator value. Provided value must be greater than or
-    /// equal to zero. A value between zero and one upregulates the item, a
-    /// value of exactly one is neutral, and a value greater than one
-    /// upregulates the item.
-    void SetRegulator(const uid_t uid, const double amt) override {
+    /// Set an item's regulator value.
+    void SetRegulator(
+      const uid_t uid,
+      const typename Regulator::set_t & set
+    ) override {
       emp_assert(state.regulators.find(uid) != state.regulators.end());
-      emp_assert(amt >= 0.0);
 
-      if (state.regulators.at(uid) != amt) ClearCache();
+      if (state.regulators.at(uid).Set(set)) ClearCache();
 
-      state.regulators.at(uid) = amt;
+    }
+
+    /// Set an item's regulator value.
+    void SetRegulator(
+      const uid_t uid,
+      const Regulator & set
+    ) override {
+      emp_assert(state.regulators.find(uid) != state.regulators.end());
+
+      if (
+        set != std::exchange(state.regulators.at(uid), set)
+      ) ClearCache();
+
     }
 
     /// View an item's regulator value.
-    double ViewRegulator(const uid_t uid) const override {
+    const typename Regulator::view_t ViewRegulator(
+      const uid_t uid
+    ) const override {
+      emp_assert(state.regulators.find(uid) != state.regulators.end());
+
+      return state.regulators.at(uid).View();
+    }
+
+    /// Get a regulator.
+    Regulator & GetRegulator(const uid_t uid) override {
       emp_assert(state.regulators.find(uid) != state.regulators.end());
 
       return state.regulators.at(uid);
@@ -360,7 +401,7 @@ namespace emp {
 
     /// View the UIDs currently associated with the MatchBin.
     void ImprintRegulators(
-      const BaseMatchBin<Val, query_t, tag_t> & target
+      const BaseMatchBin<Val, query_t, tag_t, Regulator> & target
     ) override {
 
       for (uid_t uid : state.uids) {
@@ -399,12 +440,16 @@ namespace emp {
 
     /// Get selector, metric name
     std::string name() const override {
+      Regulator reg{};
       return emp::to_string(
         "Selector: ",
         selector.name(),
         " / ",
         "Metric: ",
-        metric.name()
+        metric.name(),
+        " / ",
+        "Regulator: ",
+        reg.name()
       );
     }
 
