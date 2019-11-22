@@ -977,16 +977,16 @@ namespace emp {
 
       double min_score = scores.at(
           std::min_element(
-            uids.begin(), 
-            uids.end(), 
+            uids.begin(),
+            uids.end(),
             [&scores](size_t a, size_t b){return scores.at(a)<scores.at(b);}
             )
           );
       size_t partition = std::partition(uids.begin(), uids.end(), [thresh](size_t uid){emp_assert(uid>=0); return uid <= thresh;});
-      
-    
 
-      
+
+
+
       // skew relative to strongest match less than or equal to max_baseline
       // to take into account regulation...
       // (the default value of max_baseline is 1.0 because without
