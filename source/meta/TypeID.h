@@ -123,20 +123,21 @@ namespace emp {
     return emp::vector<TypeID>{GetTypeID<Ts>()...};
   }
 
-  template <typename T>
-  struct TypePackIDs_impl {
-    static emp::vector<TypeID> GetIDs();
-  };
+  namespace internal {
+    // Unimplemented base class -- TypePackIDs are meaningless for non-TypePack classes.
+    template <typename T> struct TypePackIDs_impl { };
 
-  template <typename... Ts>
-  struct TypePackIDs_impl<TypePack<Ts...>> {
-    static emp::vector<TypeID> GetIDs() { return GetTypeIDs<Ts...>(); }
-  };
+    // Decompose a TypePack and provide a vector of the individual TypeIDs.
+    template <typename... Ts>
+    struct TypePackIDs_impl<TypePack<Ts...>> {
+      static emp::vector<TypeID> GetIDs() { return GetTypeIDs<Ts...>(); }
+    };
+  }
 
   /// Retrieve a vector of TypeIDs for a TypePack of types passed in.
   template <typename T>
   emp::vector<TypeID> GetTypePackIDs() {
-    return TypePackIDs_impl<T>::GetIDs();
+    return internal::TypePackIDs_impl<T>::GetIDs();
   }
 
   /// Build the information for a single TypeID.
@@ -198,7 +199,7 @@ namespace emp {
       else if (info.is_reference) {
         info.name = type_id.GetRemoveReferenceTypeID().GetName() + '&';
       }
-      else if (info.is_TypePack) {
+      else if constexpr (emp::is_TypePack<T>()) {
         emp::vector<TypeID> ids = GetTypePackIDs<T>();
         info.name = "TypePack<";
         for (size_t i = 0; i < ids.size(); i++) {
