@@ -882,16 +882,22 @@ namespace emp {
         : ((double) MaxBaselineRatio::num) / MaxBaselineRatio::den
       );
 
-      // partition by thresh
-      size_t partition = 0;
-      double min_score = std::numeric_limits<double>::infinity();
-      for (size_t i = 0; i < uids.size(); ++i) {
-        emp_assert(scores.at(uids[i]) >= 0);
-        min_score = std::min(min_score, scores.at(uids[i]));
-        if (scores.at(uids[i]) <= thresh) {
-          std::swap(uids[i], uids[partition++]);
+      double min_score = std::min_element(
+        std::begin(scores),
+        std::end(scores),
+        [](const auto & a, const auto & b){
+          return a.second < b.second;
         }
-      }
+      )->second;
+
+      size_t partition = std::distance(
+        std::begin(uids),
+        std::partition(
+          std::begin(uids),
+          std::end(uids),
+          [&scores, thresh](size_t uid){ return scores.at(uid) <= thresh; }
+        )
+      );
 
       // skew relative to strongest match less than or equal to max_baseline
       // to take into account regulation...
