@@ -1023,17 +1023,22 @@ namespace emp {
         : static_cast<double>(MaxBaselineRatio::num) / MaxBaselineRatio::den
       );
 
-      double min_score = scores.at(
-          std::min_element(
-            uids.begin(),
-            uids.end(),
-            [&scores](size_t a, size_t b){return scores.at(a)<scores.at(b);}
-            )
-          );
-      size_t partition = std::partition(uids.begin(), uids.end(), [thresh](size_t uid){emp_assert(uid>=0); return uid <= thresh;});
+      double min_score = std::min_element(
+        std::begin(scores),
+        std::end(scores),
+        [](const auto & a, const auto & b){
+          return a.second < b.second;
+        }
+      )->second;
 
-
-
+      size_t partition = std::distance(
+        std::begin(uids),
+        std::partition(
+          std::begin(uids),
+          std::end(uids),
+          [&scores, thresh](size_t uid){ return scores.at(uid) <= thresh; }
+        )
+      );
 
       // skew relative to strongest match less than or equal to max_baseline
       // to take into account regulation...
