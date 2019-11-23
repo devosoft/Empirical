@@ -1061,7 +1061,7 @@ namespace emp {
         );
       }
 
-      return RouletteCacheState(match_index, uids, rand);
+      return RouletteCacheState(match_index, uids, rand, DefaultN);
 
     }
 
