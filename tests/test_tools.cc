@@ -2469,8 +2469,10 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE( bin.GetTags(bin.Match(0, 2)) == (emp::vector<int>{0, -4}) );
 
   bin.Put("hi", 1);
-  // 0 = use Selector default, which is 1
-  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{"salut"} );
+  // 0 = use Selector default of 2
+  REQUIRE(
+    bin.GetVals(bin.Match(0, 0)) == (emp::vector<std::string>{"salut", "hi"})
+  );
   REQUIRE( bin.GetVals(bin.Match(0, 1)) == emp::vector<std::string>{"salut"} );
   REQUIRE(
     bin.GetVals(bin.Match(0, 2)) == (emp::vector<std::string>{"salut", "hi"})
@@ -2903,8 +2905,9 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   emp::BitSet<32> bs0;//0000 0000
 
-  REQUIRE(bitBin.GetVals(bitBin.Match(bs0, 0)) == emp::vector<std::string>{});
-  REQUIRE(bitBin.GetTags(bitBin.Match(bs0, 0)) == emp::vector<emp::BitSet<32>>{});
+  // rely on MatchBin default, which is 1
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs0, 0)) == emp::vector<std::string>{"one"});
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs0, 0)) == emp::vector<emp::BitSet<32>>{bs1});
 
   REQUIRE(bitBin.GetVals(bitBin.Match(bs0, 1)) == emp::vector<std::string>{"one"});
   REQUIRE(bitBin.GetTags(bitBin.Match(bs0, 1)) == emp::vector<emp::BitSet<32>>{bs1});
@@ -2952,9 +2955,6 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   REQUIRE(bitBin.Size() == 2);
 
-  REQUIRE(bitBin.GetVals(bitBin.Match(bs2, 0)) == emp::vector<std::string>{});
-  REQUIRE(bitBin.GetTags(bitBin.Match(bs2, 0)) == emp::vector<emp::BitSet<32>>{});
-
   auto res = bitBin.GetVals(bitBin.Match(bs2, 100000));
   const size_t count = std::count(std::begin(res), std::end(res), "elementary");
   REQUIRE(count > 50000);
@@ -2996,8 +2996,9 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   REQUIRE( bin.Size() == 5 );
 
-  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{} );
-  REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<size_t>{} );
+  // 0 = use Selector default, which is 1
+  REQUIRE( bin.GetVals(bin.Match(0, 1)) == emp::vector<std::string>{"salut"} );
+  REQUIRE( bin.GetTags(bin.Match(0, 1)) == emp::vector<size_t>{0} );
 
   REQUIRE( bin.GetVals(bin.Match(0, 1)) == emp::vector<std::string>{"salut"} );
   REQUIRE( bin.GetTags(bin.Match(0, 1)) == emp::vector<size_t>{0} );
@@ -3052,9 +3053,6 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   REQUIRE( bin.Size() == 2 );
 
-  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{} );
-  REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<int>{} );
-
   auto res = bin.GetVals(bin.Match(0, 100000));
   const size_t count = std::count(std::begin(res), std::end(res), "salut");
   REQUIRE( count > 50000);
@@ -3106,8 +3104,9 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::BitSet<8> bs2;//0000 0010
   bs2.SetUInt(0,2);
 
-  REQUIRE(bitBin.GetVals(bitBin.Match(bs2, 0)) == emp::vector<std::string>{});
-  REQUIRE(bitBin.GetTags(bitBin.Match(bs2, 0)) == emp::vector<emp::BitSet<8>>{});
+  // 0 = use Selector default, which is 1
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs2, 1)) == emp::vector<std::string>{"one"});
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs2, 1)) == emp::vector<emp::BitSet<8>>{bs1});
 
   REQUIRE(bitBin.GetVals(bitBin.Match(bs2, 1)) == emp::vector<std::string>{"one"});
   REQUIRE(bitBin.GetTags(bitBin.Match(bs2, 1)) == emp::vector<emp::BitSet<8>>{bs1});
@@ -3169,8 +3168,9 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   REQUIRE (bitBin64.Size() == 3);
 
-  REQUIRE(bitBin64.GetVals(bitBin64.Match(bs1, 0)) == emp::vector<std::string>{});
-  REQUIRE(bitBin64.GetTags(bitBin64.Match(bs1, 0)) == emp::vector<emp::BitSet<64>>{});
+  // 0 = use Selector default, which is 1
+  REQUIRE(bitBin64.GetVals(bitBin64.Match(bs9, 0)) == (emp::vector<std::string> {"nine"}));
+  REQUIRE(bitBin64.GetTags(bitBin64.Match(bs9, 0)) == (emp::vector<emp::BitSet<64>> {bs9}));
 
   REQUIRE(bitBin64.GetVals(bitBin64.Match(bs9, 5)) == (emp::vector<std::string> {"nine","one","seven"}));
   REQUIRE(bitBin64.GetTags(bitBin64.Match(bs9, 5)) == (emp::vector<emp::BitSet<64>> {bs9, bs1, bs7}));
@@ -3208,8 +3208,9 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::BitSet<8> bs2;//0000 0010
   bs2.SetUInt(0,2);
 
-  REQUIRE(bitBin.GetVals(bitBin.Match(bs2, 0)) == emp::vector<std::string>{});
-  REQUIRE(bitBin.GetTags(bitBin.Match(bs2, 0)) == emp::vector<emp::BitSet<8>>{});
+  // 0 = use Selector default, which is 1
+  REQUIRE(bitBin.GetVals(bitBin.Match(bs2, 0)) == emp::vector<std::string>{"one"});
+  REQUIRE(bitBin.GetTags(bitBin.Match(bs2, 0)) == emp::vector<emp::BitSet<8>>{bs1});
 
   REQUIRE(bitBin.GetVals(bitBin.Match(bs2, 1)) == emp::vector<std::string>{"one"});
   REQUIRE(bitBin.GetTags(bitBin.Match(bs2, 1)) == emp::vector<emp::BitSet<8>>{bs1});
@@ -4267,8 +4268,9 @@ TEST_CASE("Test MatchBin", "[tools]")
 
   REQUIRE( bin.Size() == 5 );
 
-  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{} );
-  REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<int>{} );
+  // 0 = use Selector default, which is 1
+  REQUIRE( bin.GetVals(bin.Match(0, 0)) == emp::vector<std::string>{"salut"} );
+  REQUIRE( bin.GetTags(bin.Match(0, 0)) == emp::vector<int>{0} );
 
   REQUIRE( bin.GetVals(bin.Match(0, 1)) == emp::vector<std::string>{"salut"} );
   REQUIRE( bin.GetTags(bin.Match(0, 1)) == emp::vector<int>{0} );
