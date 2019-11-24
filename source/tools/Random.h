@@ -199,9 +199,8 @@ namespace emp {
      * @return The pseudo random number.
      **/
     inline uint32_t GetUInt() {
-      uint32_t res;
-      RandFill(reinterpret_cast<unsigned char*>(&res), sizeof(res));
-      return res;
+      return ( static_cast<uint32_t>(GetDouble() * 65536.0) << 16 )
+             + static_cast<uint32_t>(GetDouble() * 65536.0);
     }
 
     /**
@@ -210,15 +209,27 @@ namespace emp {
      * @return The pseudo random number.
      **/
     inline uint64_t GetUInt64() {
-      uint64_t res;
-      RandFill(reinterpret_cast<unsigned char*>(&res), sizeof(res));
-      return res;
+      // @MAM profiled,
+      // this is faster than using RandFill
+      // https://gist.github.com/mmore500/8747e456b949b5b18b3ee85dd9b4444d
+      return ( static_cast<uint64_t>(GetUInt()) << 32 )
+             + static_cast<uint64_t>(GetUInt());
     }
 
     /**
      * Randomize a contiguous segment of memory.
      **/
-    inline void RandFill(unsigned char* dest, const size_t num_bytes) {
+    inline void RandFillOld(unsigned char* dest, const size_t num_bytes) {
+
+      // go three bytes at a time because we only get
+      // _RAND_MBIG (not quite four bytes) of entropy
+      // from the generator
+
+      // @MAM profiled,
+      // sampling raw bytes and rejecting the region of integer space
+      // that would introduce bias is faster than rescaling using double
+      // multiplication
+      // https://gist.github.com/mmore500/46f3dee11734a8668d60f180cf5d0590
 
       const uint32_t accept_thresh = (
         _RAND_MBIG - _RAND_MBIG % 16777216 /* 2^(3*8) */
@@ -230,7 +241,6 @@ namespace emp {
           rnd = Get();
           if (rnd < accept_thresh) break;
         }
-        // only the first 3 bytes are randomized
         std::memcpy(dest+byte, &rnd, 3);
       }
 
