@@ -16,78 +16,27 @@
 #include <cmath>
 #include <cstring>
 #include <iterator>
+#include <random>
 
 #include "../base/assert.h"
 #include "Range.h"
 
 namespace emp {
 
-  ///  A versatile and non-patterned pseudo-random-number generator (Mersenne Twister).
+  ///  A versatile and non-patterned pseudo-random-number generator
+  /// (Mersenne Twister).
   class Random {
   protected:
     int seed = 0;          ///< Current random number seed.
     int original_seed = 0; ///< Orignal random number seed when object was first created.
-    int inext = 0;         ///< First position in use in internal state.
-    int inextp = 0;        ///< Second position in use in internal state.
-    int ma[56];            ///< Internal state of RNG
-
-    // Members & functions for stat functions
     double expRV = 0.0;    ///< Exponential Random Variable for the randNormal function
+
+    std::mt19937 generator;
 
     // Constants ////////////////////////////////////////////////////////////////
     // Statistical Approximation
     static const int32_t _BINOMIAL_TO_NORMAL = 50;     // if < n*p*(1-p)
     static const int32_t _BINOMIAL_TO_POISSON = 1000;  // if < n && !Normal approx Engine
-
-    // Engine
-    static const int32_t _RAND_MBIG = 1000000000;
-    static const int32_t _RAND_MSEED = 161803398;
-
-    // Internal functions
-
-    // Setup, called on initialization and seed reset.
-    void init()
-    {
-      // Clear variables
-      for (int i = 0; i < 56; ++i) ma[i] = 0;
-
-      int32_t mj = (_RAND_MSEED - seed) % _RAND_MBIG;
-      ma[55] = mj;
-      int32_t mk = 1;
-
-      for (int32_t i = 1; i < 55; ++i) {
-        int32_t ii = (21 * i) % 55;
-        ma[ii] = mk;
-        mk = mj - mk;
-        if (mk < 0) mk += _RAND_MBIG;
-        mj = ma[ii];
-      }
-
-      for (int32_t k = 0; k < 4; ++k) {
-        for (int32_t j = 1; j < 55; ++j) {
-          ma[j] -= ma[1 + (j + 30) % 55];
-          if (ma[j] < 0) ma[j] += _RAND_MBIG;
-        }
-      }
-
-      inext = 0;
-      inextp = 31;
-
-      // Setup variables used by Statistical Distribution functions
-      expRV = -log(Random::Get() / (double) _RAND_MBIG);
-    }
-
-    // Basic Random number
-    // Returns a random number [0,_RAND_MBIG)
-    int32_t Get() {
-      if (++inext == 56) inext = 0;
-      if (++inextp == 56) inextp = 0;
-      int mj = ma[inext] - ma[inextp];
-      if (mj < 0) mj += _RAND_MBIG;
-      ma[inext] = mj;
-
-      return mj;
-    }
 
   public:
     /**
@@ -97,8 +46,7 @@ namespace emp {
      * the memory position of the random number generator.
      **/
     Random(const int _seed = -1) {
-      for (int i = 0; i < 56; ++i) ma[i] = 0;
-      ResetSeed(_seed);  // Calls init()
+      ResetSeed(_seed);
     }
 
     ~Random() { ; }
@@ -120,6 +68,7 @@ namespace emp {
      * @param new_seed The seed for the new sequence.
      * A negative seed means that the random number generator gets its
      * seed from the actual system time and the process ID.
+     * @TODO allow seed sequence
      **/
     inline void ResetSeed(const int _seed) {
       original_seed = _seed;
@@ -133,20 +82,22 @@ namespace emp {
       }
 
       if (seed < 0) seed *= -1;
-      seed %= _RAND_MSEED;
 
-      init();
+      generator.seed(seed);
     }
 
 
-    // Random Number Generation /////////////////////////////////////////////////
+    // Random Number Generation ////////////////////////////////////////////////
 
     /**
      * Generate a double between 0.0 and 1.0
      *
      * @return The pseudo random number.
      **/
-    inline double GetDouble() { return Get() / (double) _RAND_MBIG; }
+    std::uniform_real_distribution<> dist_Double{0, 1};
+    inline double GetDouble() {
+      return dist_Double(generator);
+    }
 
     /**
      * Generate a double between 0 and a given number.
@@ -155,7 +106,6 @@ namespace emp {
      * @param max The upper bound for the random numbers (will never be returned).
      **/
     inline double GetDouble(const double max) {
-      // emp_assert(max <= (double) _RAND_MBIG, max, (double) _RAND_MBIG);  // Precision will be too low past this point...
       return GetDouble() * max;
     }
 
@@ -167,7 +117,6 @@ namespace emp {
      * @param max The upper bound for the random numbers (will never be returned).
      **/
     inline double GetDouble(const double min, const double max) {
-      emp_assert((max-min) <= (double) _RAND_MBIG, min, max);  // Precision will be too low past this point...
       return GetDouble() * (max - min) + min;
     }
 
@@ -189,8 +138,7 @@ namespace emp {
      **/
     template <typename T>
     inline uint32_t GetUInt(const T max) {
-      emp_assert(max <= (T) _RAND_MBIG, max);  // Precision will be too low past this point...
-      return static_cast<uint32_t>(GetDouble() * static_cast<double>(max));
+      return GetDouble() * static_cast<double>(max);
     }
 
     /**
@@ -198,10 +146,9 @@ namespace emp {
      *
      * @return The pseudo random number.
      **/
+    std::uniform_int_distribution<uint32_t> dist_UInt;
     inline uint32_t GetUInt() {
-      uint32_t res;
-      RandFill(reinterpret_cast<unsigned char*>(&res), sizeof(res));
-      return res;
+      return dist_UInt(generator);
     }
 
     /**
@@ -209,10 +156,9 @@ namespace emp {
      *
      * @return The pseudo random number.
      **/
+    std::uniform_int_distribution<uint64_t> dist_UInt64;
     inline uint64_t GetUInt64() {
-      uint64_t res;
-      RandFill(reinterpret_cast<unsigned char*>(&res), sizeof(res));
-      return res;
+      return dist_UInt64(generator);
     }
 
     /**
@@ -220,27 +166,22 @@ namespace emp {
      **/
     inline void RandFill(unsigned char* dest, const size_t num_bytes) {
 
-      const uint32_t accept_thresh = (
-        _RAND_MBIG - _RAND_MBIG % 16777216
-      );
-
-      for (size_t byte = 0; byte + 3 < num_bytes; byte += 3) {
-        uint32_t rnd;
-        while (true) {
-          rnd = Get();
-          if (rnd < accept_thresh) break;
-        }
-        // only the first 3 bytes are randomized
-        std::memcpy(dest+byte, &rnd, 3);
+      for (
+        size_t byte = 0;
+        byte + sizeof(uint32_t) < num_bytes;
+        byte += sizeof(uint32_t)
+      ) {
+        uint32_t rnd = GetUInt();
+        std::memcpy(dest + byte, &rnd, sizeof(uint32_t));
       }
 
-      if (num_bytes%3) {
-        uint32_t rnd;
-        while (true) {
-          rnd = Get();
-          if (rnd < accept_thresh) break;
-        }
-        std::memcpy(dest+num_bytes-num_bytes%3, &rnd, num_bytes%3);
+      if (num_bytes % sizeof(uint32_t)) {
+        uint32_t rnd = GetUInt();
+        std::memcpy(
+          dest + num_bytes - num_bytes % sizeof(uint32_t),
+          &rnd,
+          num_bytes % sizeof(uint32_t)
+        );
       }
 
     }
@@ -254,12 +195,8 @@ namespace emp {
      **/
     template <typename T>
     inline uint64_t GetUInt64(const T max) {
-      if (max <= (T) _RAND_MBIG) return (uint64_t) GetUInt(max);  // Don't need extra precision.
-      const double max2 = ((double) max) / (double) _RAND_MBIG;
-      emp_assert(max2 <= (T) _RAND_MBIG, max);  // Precision will be too low past this point...
-
-      return static_cast<uint64_t>(GetDouble() * static_cast<double>(max))
-           + static_cast<uint64_t>(GetDouble() * static_cast<double>(max2) * _RAND_MBIG);
+      std::uniform_int_distribution<uint64_t> dist_UInt64(max);
+      return dist_UInt64(generator);
     }
 
 
@@ -272,7 +209,10 @@ namespace emp {
      **/
     template <typename T1, typename T2>
     inline uint32_t GetUInt(const T1 min, const T2 max) {
-      return GetUInt<uint32_t>((uint32_t) max - (uint32_t) min) + (uint32_t) min;
+      return GetUInt(
+        static_cast<uint32_t>(min),
+        static_cast<uint32_t>(max)
+      );
     }
 
     /**
@@ -293,9 +233,15 @@ namespace emp {
      * @param min The lower bound for the random numbers.
      * @param max The upper bound for the random numbers (will never be returned).
      **/
-    inline int GetInt(const int max) { return static_cast<int>(GetUInt((uint32_t) max)); }
-    inline int GetInt(const int min, const int max) { return GetInt(max - min) + min; }
-    inline int GetInt(const Range<int> range) { return GetInt(range.GetLower(), range.GetUpper()); }
+    inline int GetInt(const int max) {
+      return static_cast<int>(GetUInt(static_cast<uint32_t>(max)));
+    }
+    inline int GetInt(const int min, const int max) {
+      return GetInt(max - min) + min;
+    }
+    inline int GetInt(const Range<int> range) {
+      return GetInt(range.GetLower(), range.GetUpper());
+    }
 
 
     // Random Event Generation //////////////////////////////////////////////////
@@ -304,11 +250,11 @@ namespace emp {
     /// @param p The probability of the result being "true".
     inline bool P(const double p) {
       emp_assert(p >= 0.0 && p <= 1.0, p);
-      return (Get() < (p * _RAND_MBIG));
+      return GetDouble() < p;
     }
 
 
-    // Statistical functions ////////////////////////////////////////////////////
+    // Statistical functions ///////////////////////////////////////////////////
 
     // Distributions //
 
