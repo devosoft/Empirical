@@ -199,8 +199,9 @@ namespace emp {
      * @return The pseudo random number.
      **/
     inline uint32_t GetUInt() {
-      return ( static_cast<uint32_t>(GetDouble() * 65536.0) << 16 )
-             + static_cast<uint32_t>(GetDouble() * 65536.0);
+      uint32_t res;
+      RandFill(reinterpret_cast<unsigned char*>(&res), sizeof(res));
+      return res;
     }
 
     /**
@@ -209,19 +210,8 @@ namespace emp {
      * @return The pseudo random number.
      **/
     inline uint64_t GetUInt64() {
-      return ( static_cast<uint64_t>(GetUInt()) << 32)
-             + static_cast<uint64_t>(GetUInt());
-    }
-
-    /**
-     * Generate a random 64-bit block of bits.
-     * Use a fast, non-backwards compatible approach.
-     *
-     * @return The pseudo random number.
-     **/
-    inline uint64_t GetUInt64Fast() {
       uint64_t res;
-      RandFill<sizeof(res)>(reinterpret_cast<unsigned char*>(&res));
+      RandFill(reinterpret_cast<unsigned char*>(&res), sizeof(res));
       return res;
     }
 
@@ -230,14 +220,26 @@ namespace emp {
      **/
     inline void RandFill(unsigned char* dest, const size_t num_bytes) {
 
+      const uint32_t accept_thresh = (
+        _RAND_MBIG - _RAND_MBIG % 16777216
+      );
+
       for (size_t byte = 0; byte + 3 < num_bytes; byte += 3) {
+        uint32_t rnd;
+        while (true) {
+          rnd = Get();
+          if (rnd < accept_thresh) break;
+        }
         // only the first 3 bytes are randomized
-        uint32_t rnd = (GetDouble() * 16777216.0);
         std::memcpy(dest+byte, &rnd, 3);
       }
 
       if (num_bytes%3) {
-        uint32_t rnd = (GetDouble() * 16777216.0);
+        uint32_t rnd;
+        while (true) {
+          rnd = Get();
+          if (rnd < accept_thresh) break;
+        }
         std::memcpy(dest+num_bytes-num_bytes%3, &rnd, num_bytes%3);
       }
 
