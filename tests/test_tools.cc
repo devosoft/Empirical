@@ -4667,37 +4667,13 @@ TEST_CASE("Test NullStream", "[tools]")
 TEST_CASE("Test random", "[tools]")
 {
 
-  std::unordered_map<std::string, size_t> n_fails;
+  std::unordered_map<std::string, std::pair<size_t, size_t>> n_fails;
 
   // test over a consistent set of seeds
   for(int s = 1; s < 251; ++s) {
 
   REQUIRE(s > 0); // tests should be replicable
   emp::Random rng(s);
-
-  // Test GetDouble with the law of large numbers.
-  emp::vector<int> val_counts(10);
-  for (size_t i = 0; i < val_counts.size(); i++) val_counts[i] = 0;
-
-  const size_t num_tests = 100000;
-  const double min_value = 2.5;
-  const double max_value = 8.7;
-  double total = 0.0;
-  for (size_t i = 0; i < num_tests; i++) {
-    const double cur_value = rng.GetDouble(min_value, max_value);
-    total += cur_value;
-    val_counts[(size_t) cur_value]++;
-  }
-
-  {
-    const double expected_mean = (min_value + max_value) / 2.0;
-    const double min_threshold = (expected_mean*0.995);
-    const double max_threshold = (expected_mean*1.005);
-    double mean_value = total/(double) num_tests;
-
-    REQUIRE(mean_value > min_threshold);
-    REQUIRE(mean_value < max_threshold);
-  }
 
   // HERE'S THE MATH
   // Var(Unif) = 1/12 (1 - 0)^2 = 1/12
@@ -4708,27 +4684,48 @@ TEST_CASE("Test random", "[tools]")
   // 0.005 / 0.0009128709291752767 = 5.4 standard deviations
   // from WolframAlpha, 6.664E-8 of observations outside 5.4 standard deviations
   // with 500 reps fail rate is 1 - (1 - 1E-8) ^ 500 = 5E-6
+  const size_t num_tests = 100000;
+  const double error_thresh = 0.005;
+  const double min_value = 2.5;
+  const double max_value = 8.7;
 
-  // Test GetInt
-  for (size_t i = 0; i < val_counts.size(); i++) val_counts[i] = 0;
-  total = 0.0;
+  double total = 0.0;
 
   for (size_t i = 0; i < num_tests; i++) {
-    const size_t cur_value = rng.GetInt(min_value, max_value);
+    const double cur_value = (
+      (rng.GetDouble(min_value, max_value) - min_value)
+      / (max_value - min_value)
+    );
     total += cur_value;
-    val_counts[cur_value]++;
   }
 
   {
-    const double expected_mean = (double) (
-      ((int) min_value) + ((int) max_value) - 1
+    const double expected_mean = 0.5;
+    const double min_threshold = (expected_mean-error_thresh);
+    const double max_threshold = (expected_mean+error_thresh);
+    double mean_value = total/(double) num_tests;
+
+    REQUIRE(mean_value > min_threshold);
+    REQUIRE(mean_value < max_threshold);
+  }
+
+  // Test GetInt
+  total = 0.0;
+  for (size_t i = 0; i < num_tests; i++) {
+    const size_t cur_value = rng.GetInt(min_value, max_value);
+    total += cur_value;
+  }
+
+  {
+    const double expected_mean = static_cast<double>(
+      static_cast<int>(min_value) + static_cast<int>(max_value) - 1
     ) / 2.0;
     const double min_threshold = (expected_mean*0.995);
     const double max_threshold = (expected_mean*1.005);
     double mean_value = total/(double) num_tests;
 
-    n_fails["GetInt"] += !(mean_value > min_threshold);
-    n_fails["GetInt"] += !(mean_value < max_threshold);
+    n_fails["GetInt"].first += !(mean_value > min_threshold);
+    n_fails["GetInt"].second += !(mean_value < max_threshold);
   }
 
   // Test GetUInt()
@@ -4744,12 +4741,13 @@ TEST_CASE("Test random", "[tools]")
 
   {
   const double expected_mean = 0.5;
-  const double min_threshold = (expected_mean*0.995);
-  const double max_threshold = (expected_mean*1.005);
+  const double min_threshold = expected_mean-error_thresh;
+  const double max_threshold = expected_mean+error_thresh;
   const double mean_value = total / static_cast<double>(num_tests);
+  // std::cout << mean_value * 1000 << std::endl;
 
-  n_fails["GetUInt"] += !(mean_value > min_threshold);
-  n_fails["GetUInt"] += !(mean_value < max_threshold);
+  n_fails["GetUInt"].first += !(mean_value > min_threshold);
+  n_fails["GetUInt"].second += !(mean_value < max_threshold);
   // ensure that all bits are set at least once and unset at least once
   REQUIRE(std::numeric_limits<uint32_t>::max() == std::accumulate(
       std::begin(uint32_draws),
@@ -4784,12 +4782,12 @@ TEST_CASE("Test random", "[tools]")
 
   {
   const double expected_mean = 0.5;
-  const double min_threshold = (expected_mean*0.995);
-  const double max_threshold = (expected_mean*1.005);
+  const double min_threshold = expected_mean-error_thresh;
+  const double max_threshold = expected_mean+error_thresh;
   double mean_value = total / static_cast<double>(num_tests);
 
-  n_fails["RandFill"] += !(mean_value > min_threshold);
-  n_fails["RandFill"] += !(mean_value < max_threshold);
+  n_fails["RandFill"].first += !(mean_value > min_threshold);
+  n_fails["RandFill"].second += !(mean_value < max_threshold);
   // ensure that all bits are set at least once and unset at least once
   REQUIRE(std::numeric_limits<uint32_t>::max() == std::accumulate(
       std::begin(randfill_draws),
@@ -4829,16 +4827,16 @@ TEST_CASE("Test random", "[tools]")
 
   {
   const double expected_mean = 0.5;
-  const double min_threshold = (expected_mean*0.995);
-  const double max_threshold = (expected_mean*1.005);
+  const double min_threshold = expected_mean-error_thresh;
+  const double max_threshold = expected_mean+error_thresh;
 
   const double mean_value = total / static_cast<double>(num_tests);
-  n_fails["GetUInt64"] += !(mean_value > min_threshold);
-  n_fails["GetUInt64"] += !(mean_value < max_threshold);
+  n_fails["GetUInt64"].first += !(mean_value > min_threshold);
+  n_fails["GetUInt64"].second += !(mean_value < max_threshold);
 
   const double mean_value2 = total2 / static_cast<double>(num_tests);
-  n_fails["GetUInt64"] += !(mean_value2 > min_threshold);
-  n_fails["GetUInt64"] += !(mean_value2 < max_threshold);
+  n_fails["GetUInt64"].first += !(mean_value2 > min_threshold);
+  n_fails["GetUInt64"].second += !(mean_value2 < max_threshold);
 
   // ensure that all bits are set at least once and unset at least once
   REQUIRE(std::numeric_limits<uint64_t>::max() == std::accumulate(
@@ -4879,9 +4877,10 @@ TEST_CASE("Test random", "[tools]")
   }
 
   for (const auto & [k, v] : n_fails) {
-    std::cout << k << " " << v << std::endl;
-    REQUIRE(v < 10); // TODO
+    // std::cout << k << ": " << v.first << ", " << v.second << std::endl;
+    REQUIRE(v.first + v.second == 0);
   }
+}
 }
 
 
