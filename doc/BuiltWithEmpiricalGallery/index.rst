@@ -37,6 +37,11 @@ Put in a PR or raise an issue to have *your* project featured!
   
   - A companion model to a series of wet lab experiments on cancer evolution in spatially heterogenous environments
 
+- `Model of evolution with varying genomic instability`_ `[source]`__
+  
+  - This model was built in a day during the 2019 [IMO workshop](http://psoc.moffitt.org/education/psoc-annual-workshop/) to identify the parameter ranges under which it might be possible to treat cancer by altering genomic stability.
+
+
 .. _`Choose Your Words!`: https://devosoft.github.io/dynamic-word/
 .. __: https://github.com/devosoft/dynamic-word
 .. _`circle replicators with simple physics example`: https://lalejini.com/my_empirical_examples/simple_physics_example/web/example.html
@@ -53,3 +58,5 @@ Put in a PR or raise an issue to have *your* project featured!
 .. __: https://github.com/emilydolson/visualizations/
 .. _`Model of cancer evolution on an oxygen gradient`: http://emilydolson.github.io/memic_model/web/memic_model.html
 .. __: https://github.com/emilydolson/memic_model/
+.. _`Model of evolution with varying genomic instability`: https://emilydolson.github.io/genomic_stability_model/web/genomic_stability_model.html
+.. __: https://github.com/emilydolson/genomic_stability_model/

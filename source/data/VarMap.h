@@ -33,6 +33,7 @@ namespace emp {
 
       virtual emp::Ptr<VarBase> Clone() const = 0;
       virtual TypeID GetTypeID() const = 0;
+      virtual std::string ToString() const = 0;
     };
 
     template <typename T>
@@ -46,6 +47,7 @@ namespace emp {
 
       emp::Ptr<VarBase> Clone() const override { return emp::NewPtr< VarInfo<T> >(name, value); }
       TypeID GetTypeID() const override { return emp::GetTypeID<T>(); };
+      std::string ToString() const override { return emp::to_string(value); }
     };
 
     emp::vector<emp::Ptr<VarBase>> vars;             ///< Vector of all current variables.
