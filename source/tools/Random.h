@@ -219,7 +219,7 @@ namespace emp {
     /**
      * Randomize a contiguous segment of memory.
      **/
-    inline void RandFillOld(unsigned char* dest, const size_t num_bytes) {
+    inline void RandFill(unsigned char* dest, const size_t num_bytes) {
 
       // go three bytes at a time because we only get
       // _RAND_MBIG (not quite four bytes) of entropy
