@@ -221,7 +221,7 @@ namespace emp {
     inline void RandFill(unsigned char* dest, const size_t num_bytes) {
 
       const uint32_t accept_thresh = (
-        _RAND_MBIG - _RAND_MBIG % 16777216
+        _RAND_MBIG - _RAND_MBIG % 16777216 /* 2^(3*8) */
       );
 
       for (size_t byte = 0; byte + 3 < num_bytes; byte += 3) {
