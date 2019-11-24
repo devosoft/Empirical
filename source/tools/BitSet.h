@@ -394,8 +394,9 @@ namespace emp {
     void Randomize(Random & random) {
       // Randomize all fields, then mask off bits in the last field if not complete.
 
-      random.RandFill<(NUM_BITS+7)/8>(
-        reinterpret_cast<unsigned char*>(bit_set)
+      random.RandFill(
+        reinterpret_cast<unsigned char*>(bit_set),
+        (NUM_BITS+7)/8
       );
 
       if constexpr (static_cast<bool>(LAST_BIT)) {
