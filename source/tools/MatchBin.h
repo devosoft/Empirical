@@ -68,8 +68,8 @@ namespace emp {
     using uid_t = size_t;
 
     virtual ~BaseMatchBin() {};
-    virtual emp::vector<uid_t> Match(const query_t & query, size_t n=1) = 0;
-    virtual emp::vector<uid_t> MatchRaw(const query_t & query, size_t n=1) = 0;
+    virtual emp::vector<uid_t> Match(const query_t & query, size_t n=0) = 0;
+    virtual emp::vector<uid_t> MatchRaw(const query_t & query, size_t n=0) = 0;
     virtual uid_t Put(const Val & v, const tag_t & t) = 0;
     virtual uid_t Set(const Val & v, const tag_t & t, const uid_t uid) = 0;
     virtual void Delete(const uid_t uid) = 0;
@@ -168,7 +168,9 @@ namespace emp {
     /// Compare a query tag to all stored tags using the distance metric
     /// function and return a vector of unique IDs chosen by the selector
     /// function.
-    emp::vector<uid_t> Match(const query_t & query, size_t n=1) override {
+    /// Calling with n = 0 means delegate choice for how many values to return
+    /// to the Selector.
+    emp::vector<uid_t> Match(const query_t & query, size_t n=0) override {
       if constexpr(cacheEnabled){
         if (cacheOn){
           if (cache.find(query) != cache.end()){
