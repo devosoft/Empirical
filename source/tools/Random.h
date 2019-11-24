@@ -244,26 +244,6 @@ namespace emp {
     }
 
     /**
-     * Randomize a contiguous segment of memory.
-     **/
-    template<size_t num_bytes>
-    inline void RandFill(unsigned char* dest) {
-
-      for (size_t byte = 0; byte + 3 < num_bytes; byte += 3) {
-        // only the first 3 bytes are randomized
-        uint32_t rnd = (GetDouble() * 16777216.0);
-        std::memcpy(dest+byte, &rnd, 3);
-      }
-
-      if constexpr (static_cast<bool>(num_bytes % 3)) {
-        uint32_t rnd = (GetDouble() * 16777216.0);
-        std::memcpy(dest+num_bytes-num_bytes%3, &rnd, num_bytes%3);
-      }
-
-    }
-
-
-    /**
      * Generate an uint64_t.
      *
      * @return The pseudo random number.
