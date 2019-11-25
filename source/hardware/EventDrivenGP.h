@@ -7,6 +7,7 @@
 #include <deque>
 #include <utility>
 #include <algorithm>
+#include <ratio>
 #include "InstLib.h"
 #include "EventLib.h"
 #include "../tools/BitSet.h"
