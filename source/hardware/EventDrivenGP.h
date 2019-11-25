@@ -1150,16 +1150,15 @@ namespace emp {
     }
 
     /// Find best matching functions (by ID) given affinity.
-    emp::vector<size_t> FindBestFuncMatch(
-      const affinity_t & affinity,
-      size_t n=0 // default: delegate responsibility to MatchBin Selector
-    ) {
+    emp::vector<size_t> FindBestFuncMatch(const affinity_t & affinity) {
       if(is_matchbin_cache_dirty){
         ResetMatchBin();
       }
       // no need to transform to values because we're using
       // matchbin uids equivalent to function uids
-      return matchBin.Match(affinity, n);
+      // also, we've delegated responsibility RE: the number of matches to
+      // return to the MatchBin Selector
+      return matchBin.Match(affinity);
     }
 
     MATCHBIN_TYPE& GetMatchBin(){
