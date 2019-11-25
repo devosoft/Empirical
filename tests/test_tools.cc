@@ -4881,7 +4881,6 @@ TEST_CASE("Test random", "[tools]")
     REQUIRE(v.first + v.second == 0);
   }
 }
-}
 
 
 TEST_CASE("Test regular expressions (RegEx)", "[tools]")
