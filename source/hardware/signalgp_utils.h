@@ -313,7 +313,6 @@ namespace emp {
         mutator_type.last_mut_cnt = mutator_type.mutator(p, r);
         mut_cnt += mutator_type.last_mut_cnt;
       }
-      if (mut_cnt) { p.fun_clear_matchbin_cache(); } 
       return mut_cnt;
     }
 
@@ -491,9 +490,7 @@ namespace emp {
         if (rnd.P(FUNC_DEL__PER_FUNC()) &&
             program.GetSize() > GetProgMinFuncCnt())
           {
-            expected_prog_len -= program[(size_t)fID].GetSize();
-            program[(size_t)fID] = program[program.GetSize() - 1];
-            program.program.resize(program.GetSize() - 1);
+            program.DeleteFunction(fID);
             ++mut_cnt;
             fID -= 1;
             continue;
@@ -509,13 +506,14 @@ namespace emp {
       size_t mut_cnt = 0;
       // Perform function tag mutations!
       for (size_t fID = 0; fID < program.GetSize(); ++fID) {
-        tag_t & tag = program[fID].GetAffinity();
+        tag_t tag = program[fID].GetAffinity();
         for (size_t i = 0; i < tag.GetSize(); ++i) {
           if (rnd.P(TAG_BIT_FLIP__PER_BIT())) {
             tag.Toggle(i);
             ++mut_cnt;
           }
         }
+        program[fID].SetAffinity(tag);
       }
       return mut_cnt;
     }
@@ -701,7 +699,7 @@ namespace emp {
     }
   };
 
-  template<typename Hardware> 
+  template<typename Hardware>
   class SignalGPMutatorFacade : public SignalGPMutator<Hardware::affinity_width, typename Hardware::trait_t, typename Hardware::matchbin_t> { } ;
 }
 

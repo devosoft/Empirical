@@ -316,12 +316,40 @@ namespace emp {
     /// Each function has an associated:
     ///   * affinity: Function affinity. Analogous to the function's name.
     ///   * inst_seq: Instruction sequence. Sequence of instructions that make up the function.
-    struct Function {
+    class Function {
+
+    private:
       affinity_t affinity;          //< Function affinity. Analogous to the function's name.
+
+    public:
       inst_seq_t inst_seq;          //< Instruction sequence. Sequence of instructions that make up the function.
 
-      Function(const affinity_t & _aff=affinity_t(), const inst_seq_t & _seq=inst_seq_t())
-        : affinity(_aff), inst_seq(_seq) { ; }
+    private:
+      std::function<void()> fun_matchbin_refresh;          //< Callback to refresh matchbin.
+
+    public:
+      Function(
+        const affinity_t & _aff=affinity_t(),
+        const inst_seq_t & _seq=inst_seq_t(),
+        std::function<void()> _fun_matchbin_refresh=[](){}
+      ) : affinity(_aff)
+      , inst_seq(_seq)
+      , fun_matchbin_refresh(_fun_matchbin_refresh)
+      { ; }
+
+      Function& operator=(const Function& other) {
+
+        if (this != &other) {
+          // don't copy over fun_matchbin_refresh
+          // if we're copying into an object (i.e., one already in a program)
+          // we want to keep the current callback
+          this->affinity = other.affinity;
+          this->inst_seq = other.inst_seq;
+          fun_matchbin_refresh();
+        }
+
+        return *this;
+      }
 
       inst_t & operator[](size_t id) { return inst_seq[id]; }
       const inst_t & operator[](size_t id) const { return inst_seq[id]; }
@@ -329,6 +357,7 @@ namespace emp {
       bool operator==(const Function & in) const {
         return inst_seq == in.inst_seq && affinity == in.affinity;
       }
+
       bool operator!=(const Function & in) const { return !(*this == in); }
 
       bool operator<(const Function & other) const {
@@ -337,7 +366,20 @@ namespace emp {
 
       size_t GetSize() const { return inst_seq.size(); }
 
-      affinity_t & GetAffinity() { return affinity; }
+      /// If this function is loaded onto hardware, we need to refresh the
+      /// MatchBin whenever we make certain changes here
+      void SetMatchBinRefreshFun(std::function<void()> fun) {
+        fun_matchbin_refresh = fun;
+      }
+
+      const affinity_t & GetAffinity() { return affinity; }
+
+      void SetAffinity(const affinity_t & aff) {
+        if (affinity != aff) {
+          affinity = aff;
+          fun_matchbin_refresh();
+         }
+      }
 
       void PushInst(size_t id, arg_t a0, arg_t a1, arg_t a2, const affinity_t & aff) {
         inst_seq.emplace_back(id, a0, a1, a2, aff);
@@ -362,20 +404,27 @@ namespace emp {
     /// Function names are bit strings (stored as a BitSet).
     /// Programs require an associated instruction library to give meaning to the instructions that make up
     /// their functions.
-    struct Program {
+    class Program {
+
+    protected:
       using program_t = emp::vector<Function>;  //< Convenient type alias for sequence of functions.
 
       Ptr<const inst_lib_t> inst_lib;  //< Pointer to const instruction library associated with this program.
       program_t program;               //< Sequence of functions that make up this program.
-      std::function<void()> fun_clear_matchbin_cache = [](){};
+      std::function<void()> fun_matchbin_refresh;
 
-      Program(Ptr<const inst_lib_t> _ilib, const program_t & _prgm=program_t())
-      : inst_lib(_ilib), program(_prgm) { ; }
+    public:
+      Program(
+        Ptr<const inst_lib_t> _ilib,
+        const program_t & _prgm=program_t()
+      ) : inst_lib(_ilib)
+      , program(_prgm)
+      , fun_matchbin_refresh([](){})
+      { ; }
       Program(const Program &) = default;
 
       void Clear() {
         program.clear();
-        fun_clear_matchbin_cache();
       }
 
       Function & operator[](size_t id) { return program[id]; }
@@ -405,22 +454,38 @@ namespace emp {
       }
       bool ValidFunction(size_t fID) const { return fID < program.size(); }
 
-      void SetProgram(const program_t & _program) {
-        program = _program;
-        fun_clear_matchbin_cache();
+      /// If this program is loaded onto hardware, we need to refresh the
+      /// MatchBin whenever we make certain changes here
+      void SetMatchBinRefreshFun(std::function<void()> fun) {
+        fun_matchbin_refresh = fun;
       }
 
-      void SetMatchBinClearCacheFun(const std::function<void()>& mb_clear_cache_fun){
-        fun_clear_matchbin_cache = mb_clear_cache_fun;
+      void SetProgram(const program_t & _program) {
+        program = _program;
+        fun_matchbin_refresh();
       }
 
       void PushFunction(const Function & _function) {
         program.emplace_back(_function);
-        fun_clear_matchbin_cache();
+        program.back().SetMatchBinRefreshFun(
+          [this](){ this->fun_matchbin_refresh(); }
+        );
+        fun_matchbin_refresh();
       }
+
+      void DeleteFunction(const size_t fID) {
+        program[fID] = program[GetSize() - 1];
+        program.pop_back();
+        fun_matchbin_refresh();
+      }
+
       void PushFunction(const affinity_t & _aff=affinity_t(), const inst_seq_t & _seq=inst_seq_t()) {
-        program.emplace_back(_aff, _seq);
-        fun_clear_matchbin_cache();
+        program.emplace_back(
+          _aff,
+          _seq,
+          [this](){ this->fun_matchbin_refresh(); }
+        );
+        fun_matchbin_refresh();
       }
       /// Push new instruction to program.
       /// If no function pointer is provided and no functions exist yet, add new function to
@@ -634,7 +699,7 @@ namespace emp {
     using exec_stk_t = emp::vector<State>;  //< Execution Stack/Core type alias.
     /// Event handler function type alias.
     using fun_event_handler_t = std::function<void(EventDrivenGP_t &, const event_t &)>;
-    using trait_printer_t = std::function<void(std::ostream& os, TRAIT_TYPE t)>;
+    using trait_printer_t = std::function<void(std::ostream& os, TRAIT_T t)>;
   protected:
     Ptr<const event_lib_t> event_lib;     //< Pointer to const event library associated with this hardware.
     Ptr<Random> random_ptr;               //< Pointer to random object to use.
@@ -642,7 +707,7 @@ namespace emp {
     program_t program;                    //< Hardware's associated program (set of functions).
     memory_t shared_mem;                  //< Hardware's shared memory map. All cores have access to the same shared memory.
     std::deque<event_t> event_queue;      //< Hardware's event queue. Where events go to be handled (in order of reception).
-    TRAIT_TYPE traits;                    //< Generic traits vector. Whatever uses the hardware must define/keep track of what traits mean.
+    TRAIT_T traits;                    //< Generic traits vector. Whatever uses the hardware must define/keep track of what traits mean.
     size_t errors;                        //< Errors committed by hardware while executing. (e.g. divide by 0, etc.)
     size_t max_cores;                     //< Maximum number of parallel execution stacks that can be spawned. Increasing this value drastically slows things down.
     size_t max_call_depth;                //< Maximum depth of calls per execution stack.
@@ -655,10 +720,8 @@ namespace emp {
     std::deque<size_t> pending_cores;     //< Queue of core IDs pending activation.
     size_t exec_core_id;                  //< core ID of the currently executing core.
     bool is_executing;                    //< True when mid-execution of all cores. (On every CPU cycle: execute all cores).
-    MATCHBIN_TYPE matchBin;
-    bool is_matchbin_cache_dirty;
-    std::function<void()> fun_clear_matchbin_cache = [this](){this->ResetMatchBin();};
-    trait_printer_t fun_trait_print = [](std::ostream& os, TRAIT_TYPE){os << "UNCONFIGURED TRAIT PRINT FUNCTION\n";};
+    MATCHBIN_T matchBin;
+    trait_printer_t fun_trait_print = [](std::ostream& os, TRAIT_T){os << "UNCONFIGURED TRAIT PRINT FUNCTION\n";};
 
     // TODO: disallow configuration of hardware while executing. (and any other functions that could sent things into a bad state)
 
@@ -667,7 +730,9 @@ namespace emp {
     /// post-construction.
     EventDrivenGP_AW(Ptr<const inst_lib_t> _ilib, Ptr<const event_lib_t> _elib, Ptr<Random> rnd=nullptr)
       : event_lib(_elib),
-        random_ptr(rnd), random_owner(false),
+        // if no random pointer provided, create one
+        random_ptr(rnd ? rnd : emp::NewPtr<Random>(-1)),
+        random_owner(!rnd),
         program(_ilib),
         shared_mem(),
         event_queue(),
@@ -677,16 +742,10 @@ namespace emp {
         stochastic_fun_call(true),
         cores(max_cores), active_cores(), inactive_cores(max_cores), pending_cores(),
         exec_core_id(0), is_executing(false),
-        //TODO this leaks like a faucet
-        matchBin(MATCHBIN_TYPE(rnd ? *rnd : *emp::NewPtr<emp::Random>())),
-        is_matchbin_cache_dirty(true)
+        matchBin(*random_ptr)
     {
-      // passing in a Random nullptr causes memory leak
-      emp_assert(rnd);
-      // If no random provided, create one.
-      if (!rnd) NewRandom();
       // Give the program our matchbin clear cache callback.
-      program.SetMatchBinClearCacheFun(fun_clear_matchbin_cache);
+      program.SetMatchBinRefreshFun( [this](){ this->RefreshMatchBin(); } );
 
       // Add all available cores to inactive.
       for (size_t i = 0; i < inactive_cores.size(); ++i)
@@ -719,14 +778,13 @@ namespace emp {
         active_cores(in.active_cores), inactive_cores(in.inactive_cores),
         pending_cores(in.pending_cores),
         exec_core_id(in.exec_core_id), is_executing(in.is_executing),
-        matchBin(in.matchBin), is_matchbin_cache_dirty(in.is_matchbin_cache_dirty),
         fun_trait_print(in.fun_trait_print)
     {
       in.random_ptr = nullptr;
       in.random_owner = false;
       in.event_lib = nullptr;
       in.program.inst_lib = nullptr;
-      program.SetMatchBinClearCacheFun(fun_clear_matchbin_cache);
+      program.SetMatchBinRefreshFun( [this](){ this->RefreshMatchBin(); } );
     }
 
     EventDrivenGP_AW(const EventDrivenGP_t & in)
@@ -743,12 +801,11 @@ namespace emp {
         active_cores(in.active_cores), inactive_cores(in.inactive_cores),
         pending_cores(in.pending_cores),
         exec_core_id(in.exec_core_id), is_executing(in.is_executing),
-        matchBin(in.matchBin), is_matchbin_cache_dirty(in.is_matchbin_cache_dirty),
         fun_trait_print(in.fun_trait_print)
     {
       if (in.random_owner) NewRandom();
       else random_ptr = in.random_ptr;
-      program.SetMatchBinClearCacheFun(fun_clear_matchbin_cache);
+      program.SetMatchBinRefreshFun( [this](){ this->RefreshMatchBin(); } );
     }
 
     ~EventDrivenGP_AW() {
@@ -761,7 +818,7 @@ namespace emp {
     void Reset() {
       emp_assert(!is_executing);
       ResetHardware();
-      traits = TRAIT_TYPE();
+      traits = TRAIT_T();
       program.Clear();
     }
 
@@ -857,10 +914,10 @@ namespace emp {
     }
 
     /// Get the stored trait in hardware's program.
-    TRAIT_TYPE& GetTrait() { return traits; }
+    TRAIT_T& GetTrait() { return traits; }
 
     /// Get the stored trait in hardware's program.
-    const TRAIT_TYPE& GetTrait() const { return traits; }
+    const TRAIT_T& GetTrait() const { return traits; }
 
     /// Get current number of errors committed by this hardware.
     size_t GetNumErrors() const { return errors; }
@@ -1006,7 +1063,7 @@ namespace emp {
 
     /// Set trait in traits vector given by id to value given by val.
     /// Will resize traits vector if given id is greater than current traits vector size.
-    void SetTrait(TRAIT_TYPE t) {
+    void SetTrait(TRAIT_T t) {
       traits = t;
     }
 
@@ -1026,8 +1083,8 @@ namespace emp {
     /// Set program for this hardware object.
     void SetProgram(const program_t & _program) {
       program = _program;
-      program.SetMatchBinClearCacheFun(fun_clear_matchbin_cache);
-      is_matchbin_cache_dirty = true;
+      program.SetMatchBinRefreshFun( [this](){ this->RefreshMatchBin(); } );
+      RefreshMatchBin();
     }
 
     /// Shortcut to this hardware object's program's PushFunction operation of the same signature.
@@ -1094,7 +1151,7 @@ namespace emp {
     /// This is not guaranteed to return a valid IP. At worst, it'll return an IP == function.inst_seq.size().
     size_t FindEndOfBlock(size_t fp, size_t ip) {
       emp_assert(ValidFunction(fp));
-      Ptr<const inst_lib_t> inst_lib = program.inst_lib;
+      Ptr<const inst_lib_t> inst_lib = program.GetInstLib();
       int depth_counter = 1;
       while (true) {
         if (!ValidPosition(fp, ip)) break;
@@ -1152,9 +1209,6 @@ namespace emp {
 
     /// Find best matching functions (by ID) given affinity.
     emp::vector<size_t> FindBestFuncMatch(const affinity_t & affinity) {
-      if(is_matchbin_cache_dirty){
-        ResetMatchBin();
-      }
       // no need to transform to values because we're using
       // matchbin uids equivalent to function uids
       // also, we've delegated responsibility RE: the number of matches to
@@ -1162,19 +1216,18 @@ namespace emp {
       return matchBin.Match(affinity);
     }
 
-    MATCHBIN_TYPE& GetMatchBin(){
+    MATCHBIN_T& GetMatchBin(){
       return matchBin;
     }
 
-    const MATCHBIN_TYPE& GetMatchBin() const {
+    const MATCHBIN_T& GetMatchBin() const {
       return matchBin;
     }
 
-    void ResetMatchBin(){
+    void RefreshMatchBin(){
       matchBin.Clear();
-      is_matchbin_cache_dirty = false;
-      for (size_t i = 0; i < program.GetSize(); ++i){
-        matchBin.Set(i, program[i].affinity, i);
+      for (size_t i = 0; i < program.GetSize(); ++i) {
+        matchBin.Set(i, program[i].GetAffinity(), i);
       }
     }
 
@@ -1314,7 +1367,7 @@ namespace emp {
           // First, advance the instruction pointer by 1. This may invalidate the IP, but that's okay.
           cur_state.inst_ptr += 1;
           // Run instruction @ fp, ip.
-          program.inst_lib->ProcessInst(*this, program[fp].inst_seq[ip]);
+          program.GetInstLib()->ProcessInst(*this, program[fp].inst_seq[ip]);
         }
         // After processing, is the core still active?
         if (GetCurCore().empty()) {
