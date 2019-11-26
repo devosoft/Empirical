@@ -98,8 +98,8 @@ namespace emp {
    *      * Each event type has a registered event handler that gets called to handle a dispatched
    *        event.
    */
-  template<size_t AFFINITY_WIDTH, typename TRAIT_TYPE=emp::vector<double>
-    , typename MATCHBIN_TYPE=emp::MatchBin<size_t, emp::HammingMetric<16>, emp::RankedSelector<std::ratio<16+8, 16>>>
+  template<size_t AFFINITY_WIDTH, typename TRAIT_T=emp::vector<double>
+    , typename MATCHBIN_T=emp::MatchBin<size_t, emp::HammingMetric<16>, emp::RankedSelector<std::ratio<16+8, 16>>>
     >
   class EventDrivenGP_AW {
   public:
@@ -108,7 +108,7 @@ namespace emp {
 
     static constexpr size_t affinity_width = AFFINITY_WIDTH;
 
-    using EventDrivenGP_t = EventDrivenGP_AW<AFFINITY_WIDTH, TRAIT_TYPE, MATCHBIN_TYPE>;  //< Resolved type for this templated class.
+    using EventDrivenGP_t = EventDrivenGP_AW<AFFINITY_WIDTH, TRAIT_T, MATCHBIN_T>;  //< Resolved type for this templated class.
     using mem_key_t = int;                                     //< Hardware memory map key type.
     using mem_val_t = double;                                  //< Hardware memory map value type.
     using memory_t = std::unordered_map<mem_key_t, mem_val_t>; //< Hardware memory map type.
@@ -116,8 +116,8 @@ namespace emp {
     using arg_set_t = emp::array<arg_t, MAX_INST_ARGS>;        //< Instruction argument set type.
     using affinity_t = BitSet<AFFINITY_WIDTH>;                 //< Affinity type alias.
     using properties_t = std::unordered_set<std::string>;      //< Event/Instruction properties type.
-    using trait_t = TRAIT_TYPE;
-    using matchbin_t = MATCHBIN_TYPE;
+    using trait_t = TRAIT_T;
+    using matchbin_t = MATCHBIN_T;
 
     // A few default values. WARNING: I have no actual reason to believe these are the best defaults.
     static constexpr size_t DEFAULT_MAX_CORES = 8;
