@@ -9,3 +9,4 @@ do
     mv $filename.temp $filename
 
 done
+cat ../coverage_source/hardware/EventDrivenGP.h
