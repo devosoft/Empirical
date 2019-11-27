@@ -64,7 +64,7 @@ jobs:
     install:
     - sudo apt-get install -qq g++-8
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
-    - sudo apt-get install cmake build-essential python-virtualenv python-pip nodejs tar gzip libclang-7-dev llvm-7 clang-7 libstdc++-7-dev # might have to happen after we update g++
+    - sudo apt-get install cmake build-essential python-virtualenv python-pip nodejs tar gzip libclang-7-dev llvm-7 clang-7 libstdc++-7-dev gdb # might have to happen after we update g++
     before_script:
     - git fetch origin master:refs/remotes/origin/master
     - make install-test-dependencies
