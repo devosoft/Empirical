@@ -170,7 +170,8 @@ namespace emp {
       constexpr double thresh = (
         ThreshRatio::num < 0
         ? std::numeric_limits<double>::infinity()
-        : ((double) ThreshRatio::num) / ((double)ThreshRatio::den)
+        : static_cast<double>(ThreshRatio::num)
+          / static_cast<double>(ThreshRatio::den)
       );
 
       // Perform a bounded partial sort to find the first n results
@@ -385,13 +386,19 @@ namespace emp {
 
       emp::vector<size_t> uids(uids_);
 
-      constexpr double b = (static_cast<double>(BRatio::num) / BRatio::den);
+      constexpr double b = (
+        static_cast<double>(BRatio::num) / static_cast<double>(BRatio::den)
+      );
       emp_assert(b > 0 && b < 1);
 
-      constexpr double c = (static_cast<double>(CRatio::num) / CRatio::den);
+      constexpr double c = (
+        static_cast<double>(CRatio::num) / static_cast<double>(CRatio::den)
+      );
       emp_assert(c > 0);
 
-      constexpr double z = (static_cast<double>(ZRatio::num) / ZRatio::den);
+      constexpr double z = (
+        static_cast<double>(ZRatio::num) / static_cast<double>(ZRatio::den)
+      );
       emp_assert(z > 0);
 
       // treat any negative numerator as positive infinity
