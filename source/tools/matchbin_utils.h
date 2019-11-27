@@ -460,6 +460,164 @@ namespace emp {
 
   };
 
+  namespace internal {
+
+    // accessory to UnifMod
+    template <typename Metric, size_t Samples>
+    class EstimatedLookupTable {
+
+      using query_t = typename Metric::query_t;
+      using tag_t = typename Metric::query_t;
+
+      Metric metric;
+
+      // pairs of (raw, uniformified)
+      emp::vector<std::pair<double, double>> table;
+
+    public:
+      EstimatedLookupTable() {
+        emp::Random rand(1);
+
+        emp::vector<double> raw;
+        emp::vector<double> uniformified;
+
+        // true for all metrics
+        raw.push_back(0.0);
+        uniformified.push_back(0.0);
+
+        // add data
+        for (size_t i = 0; i < Samples; ++i) {
+          raw.push_back(metric(query_t(rand), tag_t(rand)));
+          uniformified.push_back(
+            // {a} -> {0.5}
+            // {a,b} -> {0.333, 0.667}
+            // {a,b,c} -> {0.25, 0.5, 0.75}
+            // etc.
+            static_cast<double>(i+1)/static_cast<double>(Samples+1)
+          );
+        }
+
+        // true for all metrics
+        raw.push_back(1.0);
+        uniformified.push_back(1.0);
+
+        std::sort(std::begin(raw), std::end(raw));
+
+        // zip together
+        emp::vector<std::pair<double, double>> observations;
+        std::transform(
+          std::begin(raw), std::end(raw),
+          std::begin(uniformified),
+          std::back_inserter(observations),
+          [](double r, double u){ return std::pair{r, u}; }
+        );
+
+        // keep only most extreme duplicate observations
+        // e.g., if three or more keep bookend two
+        for (
+          auto front = std::begin(observations);
+          front != std::end(observations);
+          front = std::upper_bound(
+            front,
+            std::end(observations),
+            *front,
+            [](const auto &a, const auto &b){ return a.first < b.first; }
+          )
+        ) {
+
+          const auto back = std::upper_bound(
+            front,
+            std::end(observations),
+            *front,
+            [](const auto &a, const auto &b){ return a.first < b.first; }
+          );
+          table.push_back(*front);
+          if (
+            front != std::prev(back)
+          ) table.push_back(*std::prev(back));
+
+        }
+
+      }
+
+      // lookup a raw score to get a uniformified
+      double operator()(const double raw) const {
+
+        emp_assert(raw >= 0.0 && raw <= 1.0);
+
+        // handle edge cases
+        if (raw == 0.0 || raw == 1.0) return raw;
+
+        // goal: get two exact bookends if we have EXACTLY the raw value
+        // stored in the table
+        // otherwise, get the less than and greater than value
+
+        // Returns an iterator pointing to the first element in the range
+        // [first, last) that is not less than (i.e. greater or equal to)
+        // value, or last if no such element is found.
+        auto tail = std::lower_bound(
+          std::begin(table),
+          std::end(table),
+          // lexographic comparison with operator<
+          // find the first element that is greater or equal to
+          std::pair{raw, std::nan("")},
+          [](const auto &a, const auto &b){ return a.first < b.first; }
+        );
+
+        // if we have a good bookend situation
+        if (
+          tail->first == raw
+          && std::next(tail) != std::end(table)
+          && tail->first == std::next(tail)->first
+        ) ++tail;
+
+        // we handled edge cases above and added (0.0, 0.0)
+        // so tail won't ever be std::begin(table)
+        emp_assert(std::begin(table) != tail);
+        const auto head = std::prev(tail);
+
+        // linear interpolation time
+        const double raw_frac = (tail->first == head->first) ? 0.5 : (
+          (raw - head->first)
+          / (tail->first - head->first)
+        );
+        return raw_frac * (tail->second - head->second) + head->second;
+
+      }
+
+    };
+
+  }
+
+  /// Reshape metric's probability distribution to be approximately uniform.
+  /// Sample from the original distribution to create a percentile map,
+  /// and then, at runtime, put raw matches through the percentile map to
+  /// approximate a uniform distribution.
+  template <typename Metric, size_t Samples=1000000>
+  struct UnifMod : public Metric {
+
+    using query_t = typename Metric::query_t;
+    using tag_t = typename Metric::query_t;
+
+    Metric metric;
+
+    const static inline internal::EstimatedLookupTable<
+      Metric,
+      Samples
+    > lookup{};
+
+    std::string name() const override {
+      return emp::to_string("Uniformified ", metric.name());
+    }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+
+      return lookup(metric(a, b));
+
+    }
+
+  };
+
   template<typename Metric, size_t Dim>
   struct MeanDimMod
     : public BaseMetric<
