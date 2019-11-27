@@ -58,8 +58,9 @@ namespace web {
       bool text_append;                               ///< Can we append to a current text widget?
       std::map<std::string, Widget> widget_dict;      ///< By-name lookup for descendent widgets
       std::map<std::string, web::Animate *> anim_map; ///< Streamline creation of Animate objects.
-      std::string tag; ///< Jury rig this class for non-div duty
+      std::string tag; ///< Jury rig this class for non-div duty (i.e., footer, header, p, etc.)
 
+      /// @param in_tag sets the html tag for used this object (i.e., div, footer, header, p, etc.)
       DivInfo(const std::string & in_id="", const std::string & in_tag="div")
         : internal::WidgetInfo(in_id), scroll_top(0.0), append_ok(true), text_append(false)
         , widget_dict(), anim_map(), tag(in_tag)
@@ -74,6 +75,7 @@ namespace web {
 
       std::string GetTypeName() const override { return "DivInfo"; }
 
+       /// Set the html tag for used this object (i.e., div, footer, header, p, etc.)
       void DoSetTag(const std::string & tag_name) {
         tag = tag_name;
         if (state == Widget::ACTIVE) ReplaceHTML();

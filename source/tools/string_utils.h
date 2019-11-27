@@ -578,6 +578,7 @@ namespace emp {
     in_string.resize(pos);
   }
 
+  /// Make a string safe(r) 
   static std::string slugify(const std::string & in_string) {
     //TODO handle complicated unicode strings
     std::string res = to_lower(in_string);
@@ -634,7 +635,11 @@ namespace emp {
     return view_string_range(in_string, start_pos, end_pos);
   }
 
-  /// Cut up a string based on the provided delimitor; fill them in to the provided vector.
+  /// Cut up a string based on the provided delimiter; fill them in to the provided vector.
+  /// @in_string operand
+  /// @out_set destination
+  /// @delim delimiter to split on
+  /// @max_split defines the maximum number of splits
   static inline void slice(
     const std::string & in_string,
     emp::vector<std::string> & out_set,
@@ -672,6 +677,9 @@ namespace emp {
   }
 
   /// Slice a string without passing in result vector (may be less efficient).
+  /// @in_string operand
+  /// @delim delimiter to split on
+  /// @max_split defines the maximum number of splits
   static inline emp::vector<std::string> slice(
     const std::string & in_string,
     const char delim='\n',
