@@ -38,13 +38,13 @@
 
 namespace emp {
 
-  struct CacheStateBase{
+  struct CacheStateBase {
     CacheStateBase() = default;
     virtual ~CacheStateBase() {};
     virtual std::optional<emp::vector<size_t>> operator()(size_t n) = 0;
   };
 
-  struct RouletteCacheState : public CacheStateBase{
+  struct RouletteCacheState : public CacheStateBase {
 
     emp::IndexMap indexMap;
     emp::vector<size_t> uids;
@@ -69,14 +69,14 @@ namespace emp {
 
       // don't perform a lookup into an empty IndexMap, that's a segfault
       // double braces: an empty vector inside an optional
-      if (!indexMap.GetSize()) return std::optional<emp::vector<size_t>>{
-        emp::vector<size_t>{}
-      };
+      if (indexMap.GetSize() == 0) {
+        return std::optional<emp::vector<size_t>>{emp::vector<size_t>{}};
+      }
 
       emp::vector<size_t> res;
       res.reserve(n);
 
-      for (size_t j = 0; j < n; ++j) {
+      for (size_t i = 0; i < n; ++i) {
         // if there's only one item in the IndexMap, don't do a random draw
         const double match_pos = (
           indexMap.GetSize() == 1
@@ -110,8 +110,10 @@ namespace emp {
 
     std::optional<emp::vector<size_t>> operator()(size_t n) override {
       if (n == 0) n = default_n;
-      if (n > requestSize){ return std::nullopt; }
-      if (n >= uids.size()){ return uids; }
+
+      if (n > requestSize) return std::nullopt;
+      if (n >= uids.size()) return uids;
+
       return emp::vector<size_t>(uids.begin(), uids.begin()+n);
     }
 
@@ -119,7 +121,7 @@ namespace emp {
 
   /// Abstract base class for selectors
   template<typename CacheType>
-  struct SelectorBase{
+  struct SelectorBase {
     virtual ~SelectorBase() {};
     virtual CacheType operator()(
         const emp::vector<size_t>& uids,
@@ -183,11 +185,11 @@ namespace emp {
 
 
       size_t back = 0;
-        while (
-          back < uids.size()
-          && back < n
-          && scores.at(uids[back]) <= thresh
-        ) ++back;
+      while (
+        back < uids.size()
+        && back < n
+        && scores.at(uids[back]) <= thresh
+      ) ++back;
 
 
       return RankedCacheState(uids.begin(), back, n, DefaultN);
@@ -255,21 +257,25 @@ namespace emp {
 
       emp::vector<size_t> uids(uids_);
 
-      const double skew = ((double) SkewRatio::num / SkewRatio::den);
+      const double skew = (
+        static_cast<double>(SkewRatio::num)/static_cast<double>(SkewRatio::den)
+      );
       emp_assert(skew > 0);
 
       // treat any negative numerator as positive infinity
       const double thresh = (
         ThreshRatio::num < 0
         ? std::numeric_limits<double>::infinity()
-        : ((double) ThreshRatio::num) / ThreshRatio::den
+        : static_cast<double>(ThreshRatio::num)
+          / static_cast<double>(ThreshRatio::den)
       );
 
       // treat any negative numerator as positive infinity
       const double max_baseline = (
         MaxBaselineRatio::num < 0
         ? std::numeric_limits<double>::infinity()
-        : ((double) MaxBaselineRatio::num) / MaxBaselineRatio::den
+        : static_cast<double>(MaxBaselineRatio::num)
+          / static_cast<double>(MaxBaselineRatio::den)
       );
 
       double min_score = std::min_element(
@@ -306,17 +312,6 @@ namespace emp {
 
       return RouletteCacheState(match_index, uids, rand, DefaultN);
 
-      /*
-      emp::vector<size_t> res;
-      res.reserve(n);
-
-      for (size_t j = 0; j < n; ++j) {
-        const double match_pos = rand.GetDouble(match_index.GetWeight());
-        const size_t idx = match_index.Index(match_pos);
-        res.push_back(uids[idx]);
-      }
-
-      return res;*/
     }
 
   };
@@ -403,14 +398,16 @@ namespace emp {
       const double thresh = (
         ThreshRatio::num < 0
         ? std::numeric_limits<double>::infinity()
-        : static_cast<double>(ThreshRatio::num) / ThreshRatio::den
+        : static_cast<double>(ThreshRatio::num)
+          / static_cast<double>(ThreshRatio::den)
       );
 
       // treat any negative numerator as positive infinity
       const double max_baseline = (
         MaxBaselineRatio::num < 0
         ? std::numeric_limits<double>::infinity()
-        : static_cast<double>(MaxBaselineRatio::num) / MaxBaselineRatio::den
+        : static_cast<double>(MaxBaselineRatio::num)
+          / static_cast<double>(MaxBaselineRatio::den)
       );
 
       double min_score = std::min_element(
@@ -456,30 +453,6 @@ namespace emp {
     }
 
   };
-
-/*
-struct DynamicSelector : public SelectorBase<emp::vector<size_t>>{
-
-  using cache_state_type_t = emp::vector<size_t>;
-
-  emp::vector<emp::Ptr<SelectorBase>> selectors;
-  size_t mode{0};
-
-  emp::vector<size_t> operator()(
-    const emp::vector<size_t>& uids,
-    const std::unordered_map<size_t, double>& scores,
-    size_t n
-  ) {
-    emp_assert(mode < selectors.size());
-    return (*selectors[mode])(uids, scores, n);
-  }
-
-  ~DynamicSelector() {
-    for (auto &ptr : selectors) ptr.Delete();
-  }
-
-};
-*/
 
 }
 
