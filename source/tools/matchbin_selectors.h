@@ -167,7 +167,7 @@ namespace emp {
       emp::vector<size_t> uids(uids_);
 
       // treat any negative numerator as positive infinity
-      const double thresh = (
+      constexpr double thresh = (
         ThreshRatio::num < 0
         ? std::numeric_limits<double>::infinity()
         : ((double) ThreshRatio::num) / ((double)ThreshRatio::den)
@@ -257,13 +257,13 @@ namespace emp {
 
       emp::vector<size_t> uids(uids_);
 
-      const double skew = (
+      constexpr double skew = (
         static_cast<double>(SkewRatio::num)/static_cast<double>(SkewRatio::den)
       );
       emp_assert(skew > 0);
 
       // treat any negative numerator as positive infinity
-      const double thresh = (
+      constexpr double thresh = (
         ThreshRatio::num < 0
         ? std::numeric_limits<double>::infinity()
         : static_cast<double>(ThreshRatio::num)
@@ -271,7 +271,7 @@ namespace emp {
       );
 
       // treat any negative numerator as positive infinity
-      const double max_baseline = (
+      constexpr double max_baseline = (
         MaxBaselineRatio::num < 0
         ? std::numeric_limits<double>::infinity()
         : static_cast<double>(MaxBaselineRatio::num)
@@ -385,17 +385,17 @@ namespace emp {
 
       emp::vector<size_t> uids(uids_);
 
-      const double b = (static_cast<double>(BRatio::num) / BRatio::den);
+      constexpr double b = (static_cast<double>(BRatio::num) / BRatio::den);
       emp_assert(b > 0 && b < 1);
 
-      const double c = (static_cast<double>(CRatio::num) / CRatio::den);
+      constexpr double c = (static_cast<double>(CRatio::num) / CRatio::den);
       emp_assert(c > 0);
 
-      const double z = (static_cast<double>(ZRatio::num) / ZRatio::den);
+      constexpr double z = (static_cast<double>(ZRatio::num) / ZRatio::den);
       emp_assert(z > 0);
 
       // treat any negative numerator as positive infinity
-      const double thresh = (
+      constexpr double thresh = (
         ThreshRatio::num < 0
         ? std::numeric_limits<double>::infinity()
         : static_cast<double>(ThreshRatio::num)
@@ -403,7 +403,7 @@ namespace emp {
       );
 
       // treat any negative numerator as positive infinity
-      const double max_baseline = (
+      constexpr double max_baseline = (
         MaxBaselineRatio::num < 0
         ? std::numeric_limits<double>::infinity()
         : static_cast<double>(MaxBaselineRatio::num)
