@@ -2136,6 +2136,204 @@ TEST_CASE("Test map_utils", "[tools]")
 
 TEST_CASE("Test matchbin_utils", "[tools]")
 {
+  // test SieveSelector with auto adjust
+  {
+  emp::Random rand(1);
+  emp::MatchBin<
+    std::string,
+    emp::NextUpMetric<>,
+    emp::SieveSelector<>
+  > bin(rand);
+
+  bin.Put("one", 1);
+
+  bin.Put("two-two-seven", 227);
+
+  bin.Put("nine-two-eight", 928);
+
+  bin.Put("fifteen", 15);
+
+  bin.Put("one-fifteen", 115);
+
+  const size_t nrep = 1000;
+
+  std::unordered_map<std::string, size_t> res;
+  for (size_t rep = 0; rep < nrep; ++rep) {
+
+    const auto matches = bin.GetVals(bin.Match(2));
+    REQUIRE(matches.size() >= 2);
+
+    std::unordered_set<std::string> uniques;
+
+    for (const auto & val : matches) {
+      ++res[val];
+      uniques.insert(val);
+    }
+
+    REQUIRE(uniques.size() == matches.size());
+
+  }
+
+  REQUIRE(res["one"] == 0);
+  REQUIRE(res["two-two-seven"] > 0);
+  REQUIRE(res["two-two-seven"] < nrep);
+  REQUIRE(res["nine-two-eight"] == 0);
+  REQUIRE(res["one-fifteen"] == nrep);
+  REQUIRE(res["fifteen"] == nrep);
+
+  bin.Put(emp::to_string(0), 0);
+  for (size_t i = 0; i < 45; ++i) {
+    bin.Put(emp::to_string(i*10), i*10);
+  }
+
+  res.clear();
+
+  for (size_t rep = 0; rep < nrep; ++rep) {
+    for (const auto & val : bin.GetVals(bin.Match(2))) {
+      ++res[val];
+    }
+  }
+
+  REQUIRE(res["one"] == 0);
+  REQUIRE(res["two-two-seven"] == 0);
+  REQUIRE(res["nine-two-eight"] == 0);
+  REQUIRE(res["one-fifteen"] > 0);
+  REQUIRE(res["one-fifteen"] < nrep);
+  REQUIRE(res["fifteen"] == nrep);
+  }
+
+  // test SieveSelector with no stochastic
+  {
+  emp::Random rand(1);
+  emp::MatchBin<
+    std::string,
+    emp::NextUpMetric<>,
+    emp::SieveSelector<std::ratio<0,1>>
+  > bin(rand);
+
+  bin.Put("one", 1);
+
+  bin.Put("two-two-seven", 227);
+
+  bin.Put("nine-two-eight", 928);
+
+  bin.Put("fifteen", 15);
+
+  bin.Put("one-fifteen", 115);
+
+  const size_t nrep = 1000;
+
+  std::unordered_map<std::string, size_t> res;
+  for (size_t rep = 0; rep < nrep; ++rep) {
+
+    const auto matches = bin.GetVals(bin.Match(2));
+    REQUIRE(matches.size() >= 2);
+
+    std::unordered_set<std::string> uniques;
+
+    for (const auto & val : matches) {
+      ++res[val];
+      uniques.insert(val);
+    }
+
+    REQUIRE(uniques.size() == matches.size());
+
+  }
+
+  REQUIRE(res["one"] == 0);
+  REQUIRE(res["two-two-seven"] == 0);
+  REQUIRE(res["nine-two-eight"] == 0);
+  REQUIRE(res["one-fifteen"] == nrep);
+  REQUIRE(res["fifteen"] == nrep);
+
+  bin.Put(emp::to_string(0), 0);
+  for (size_t i = 0; i < 45; ++i) {
+    bin.Put(emp::to_string(i*10), i*10);
+  }
+
+  res.clear();
+
+  for (size_t rep = 0; rep < nrep; ++rep) {
+    for (const auto & val : bin.GetVals(bin.Match(2))) {
+      ++res[val];
+    }
+  }
+
+  REQUIRE(res["one"] == 0);
+  REQUIRE(res["two-two-seven"] == 0);
+  REQUIRE(res["nine-two-eight"] == 0);
+  REQUIRE(res["one-fifteen"] == 0);
+  REQUIRE(res["fifteen"] == nrep);
+  }
+
+  // test SieveSelector with no auto adjust
+  {
+  emp::Random rand(1);
+  emp::MatchBin<
+    std::string,
+    emp::NextUpMetric<>,
+    emp::SieveSelector<
+      std::ratio<1, 10>,
+      std::ratio<1, 5>
+    >
+  > bin(rand);
+
+  bin.Put("one", 1);
+
+  bin.Put("two-two-seven", 227);
+
+  bin.Put("nine-two-eight", 928);
+
+  bin.Put("fifteen", 15);
+
+  bin.Put("one-fifteen", 115);
+
+  const size_t nrep = 1000;
+
+  std::unordered_map<std::string, size_t> res;
+  for (size_t rep = 0; rep < nrep; ++rep) {
+
+    const auto matches = bin.GetVals(bin.Match(2));
+    REQUIRE(matches.size() >= 2);
+
+    std::unordered_set<std::string> uniques;
+
+    for (const auto & val : matches) {
+      ++res[val];
+      uniques.insert(val);
+    }
+
+    REQUIRE(uniques.size() == matches.size());
+
+  }
+
+  REQUIRE(res["one"] == 0);
+  REQUIRE(res["two-two-seven"] > 0);
+  REQUIRE(res["two-two-seven"] < nrep);
+  REQUIRE(res["nine-two-eight"] == 0);
+  REQUIRE(res["one-fifteen"] == nrep);
+  REQUIRE(res["fifteen"] == nrep);
+
+  bin.Put(emp::to_string(0), 0);
+  for (size_t i = 0; i < 45; ++i) {
+    bin.Put(emp::to_string(i*10), i*10);
+  }
+
+  res.clear();
+
+  for (size_t rep = 0; rep < nrep; ++rep) {
+    for (const auto & val : bin.GetVals(bin.Match(2))) {
+      ++res[val];
+    }
+  }
+
+  REQUIRE(res["one"] == 0);
+  REQUIRE(res["two-two-seven"] > 0);
+  REQUIRE(res["two-two-seven"] < nrep);
+  REQUIRE(res["nine-two-eight"] == 0);
+  REQUIRE(res["one-fifteen"] == nrep);
+  REQUIRE(res["fifteen"] == nrep);
+  }
 
   // test PowMod, LogMod
   {

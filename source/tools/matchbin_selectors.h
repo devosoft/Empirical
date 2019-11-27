@@ -91,6 +91,46 @@ namespace emp {
 
   };
 
+  struct SieveCacheState : public CacheStateBase {
+
+    emp::vector<size_t> uids;
+    emp::vector<double> probs;
+    emp::Random rand;
+    size_t default_n;
+
+    SieveCacheState() = default;
+    SieveCacheState(
+      emp::vector<size_t>::iterator uids_begin,
+      emp::vector<size_t>::iterator uids_end,
+      const emp::vector<double> & probs_,
+      emp::Random& r,
+      const size_t default_n_
+    ) : uids(uids_begin, uids_end)
+      , probs(probs_)
+      , rand(r)
+      , default_n(default_n_)
+    { emp_assert(uids.size() == probs.size()); }
+
+    std::optional<emp::vector<size_t>> operator()(size_t n) override {
+
+      if (n == 0) n = default_n;
+
+      emp::vector<size_t> res;
+
+      for (size_t i = 0; i < uids.size() && res.size() < n; ++i) {
+
+        if (probs[i] == 1.0 || rand.GetDouble() < probs[i]) {
+          res.push_back(uids[i]);
+        }
+
+      }
+
+      return res;
+
+    }
+
+  };
+
   struct RankedCacheState: public CacheStateBase {
 
     emp::vector<size_t> uids;
@@ -456,6 +496,143 @@ namespace emp {
       }
 
       return RouletteCacheState(match_index, uids, rand, DefaultN);
+
+    }
+
+  };
+
+
+  /// Selector treats each element of the MatchBin independently.
+  /// As match distance increases, each element passes through
+  /// a regime where selection is guaranteed, a regime where selection is
+  /// stochastic, and then a regime where non-selection is guaranteed.
+  template<
+    // how far past LockInRatio should support stochastic matching?
+    // positive = raw score distance
+    // negative = fraction of LockInRatio
+    // zero = no stochastic element
+    typename StochasticRatio = std::ratio<1, 10>,
+    // beyond what threshold should matches be guaranteed?
+    // positive = raw score between 0.0 and 1.0
+    // negative = expected number of lockins based on MatchBin size
+    //            assuming score uniform distribution
+    typename LockInRatio = std::ratio<-1, 1>,
+    size_t DefaultN = std::numeric_limits<size_t>::max()
+  >
+  struct SieveSelector : public SelectorBase<SieveCacheState> {
+
+    using cache_state_type_t = SieveCacheState;
+
+    emp::Random & rand;
+
+    SieveSelector(emp::Random & rand_)
+    : rand(rand_)
+    { ; }
+
+    std::string name() const override {
+      return emp::to_string(
+        "Sieve Selector (",
+        "LockInRatio: ",
+        LockInRatio::num,
+        "/",
+        LockInRatio::den,
+        ", ",
+        "StochasticRatio: ",
+        StochasticRatio::num,
+        "/",
+        StochasticRatio::den,
+        "DefaultN: ",
+        DefaultN,
+        ")"
+      );
+    }
+
+    SieveCacheState operator()(
+      const emp::vector<size_t>& uids_,
+      const std::unordered_map<size_t, double>& scores,
+      size_t n
+    ) override {
+
+      if (n == 0) n = DefaultN;
+
+      emp::vector<size_t> uids(uids_);
+
+      // if n is too small, the Selector probably isn't being used correctly
+      // or the wrong Selector is probably being used
+      emp_assert(n >= uids.size());
+
+      constexpr double lock_in_raw = (
+        static_cast<double>(LockInRatio::num)
+          / static_cast<double>(LockInRatio::den)
+      );
+
+      const double lock_in = lock_in_raw < 0.0 ? (
+        (-1.0 * lock_in_raw) / static_cast<double>(uids.size())
+      ) : lock_in_raw;
+
+      // treat any negative numerator as positive infinity
+      const double stochastic_raw = (
+        static_cast<double>(StochasticRatio::num)
+          / static_cast<double>(StochasticRatio::den)
+      );
+
+      const double stochastic = stochastic_raw < 0.0 ? (
+        (-1.0 * stochastic_raw) * lock_in
+      ) : stochastic_raw;
+
+      const double baseline = std::min_element(
+        std::begin(scores),
+        std::end(scores),
+        [](const auto & a, const auto & b){
+          return a.second < b.second;
+        }
+      )->second;
+
+      const double norm = std::max_element(
+        std::begin(scores),
+        std::end(scores),
+        [](const auto & a, const auto & b){
+          return a.second < b.second;
+        }
+      )->second - baseline + 1e-9;
+
+      const auto partition = std::partition(
+        std::begin(uids),
+        std::end(uids),
+        [&scores, lock_in, stochastic, baseline, norm](size_t uid){
+          return (scores.at(uid) - baseline) / norm < lock_in + stochastic;
+        }
+      );
+
+      emp::vector<double> probabilities;
+      std::transform(
+        std::begin(uids),
+        partition,
+        std::back_inserter(probabilities),
+        [&scores, lock_in, stochastic, baseline, norm](size_t uid){
+          // goal:
+          // RAW SCORE:    0.0 ... lock_in ... lock_in + stochastic ... 1.0
+          // INTERMEDIATE: 0.0 ... 0.0 ... -> ... 1.0 ...           ... 1.0
+          // RESULT:       1.0 ... 1.0 ... -> ... 0.0 ...           ... 0.0
+
+          const double raw_score = (scores.at(uid) - baseline) / norm;
+          const double intermediate = stochastic ? std::max(
+            0.0,
+            (raw_score - lock_in) / stochastic
+          ) : 0.0;
+          const double res = 1.0 - intermediate;
+          emp_assert(0.0 <= res && 1.0 >= res);
+          return res;
+        }
+      );
+
+      return SieveCacheState(
+        std::begin(uids),
+        partition,
+        probabilities,
+        rand,
+        DefaultN
+      );
 
     }
 
