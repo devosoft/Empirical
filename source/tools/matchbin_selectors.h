@@ -279,7 +279,7 @@ namespace emp {
           / static_cast<double>(MaxBaselineRatio::den)
       );
 
-      double min_score = std::min_element(
+      const double min_score = std::min_element(
         std::begin(scores),
         std::end(scores),
         [](const auto & a, const auto & b){
@@ -287,7 +287,7 @@ namespace emp {
         }
       )->second;
 
-      size_t partition = std::distance(
+      const size_t partition = std::distance(
         std::begin(uids),
         std::partition(
           std::begin(uids),
@@ -417,7 +417,7 @@ namespace emp {
           / static_cast<double>(MaxBaselineRatio::den)
       );
 
-      double min_score = std::min_element(
+      const double min_score = std::min_element(
         std::begin(scores),
         std::end(scores),
         [](const auto & a, const auto & b){
@@ -425,7 +425,7 @@ namespace emp {
         }
       )->second;
 
-      size_t partition = std::distance(
+      const size_t partition = std::distance(
         std::begin(uids),
         std::partition(
           std::begin(uids),
