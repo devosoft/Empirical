@@ -474,9 +474,20 @@ namespace emp {
       }
 
       void DeleteFunction(const size_t fID) {
-        program[fID] = program[GetSize() - 1];
-        program.pop_back();
+        emp_assert(fID < GetSize());
+
+        // adapted from https://stackoverflow.com/questions/34994311/stdvectorerase-vs-swap-and-pop
+        if (GetSize() > 1) {
+          std::iter_swap(
+            std::next(std::begin(program), fID),
+            std::prev(std::end(program))
+          );
+          program.pop_back();
+        } else {
+          program.clear();
+        }
         fun_matchbin_refresh();
+
       }
 
       void PushFunction(const affinity_t & _aff=affinity_t(), const inst_seq_t & _seq=inst_seq_t()) {
