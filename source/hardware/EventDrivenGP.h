@@ -372,7 +372,7 @@ namespace emp {
         fun_matchbin_refresh = fun;
       }
 
-      const affinity_t & GetAffinity() { return affinity; }
+      const affinity_t & GetAffinity() const { return affinity; }
 
       void SetAffinity(const affinity_t & aff) {
         if (affinity != aff) {
@@ -672,7 +672,7 @@ namespace emp {
         for (size_t fID = 0; fID < GetSize(); fID++) {
           // Print out function name (affinity).
           os << "Fn-";
-          program[fID].affinity.Print(os);
+          program[fID].GetAffinity().Print(os);
           os << ":\n";
           int depth = 0;
           for (size_t i = 0; i < program[fID].GetSize(); i++) {

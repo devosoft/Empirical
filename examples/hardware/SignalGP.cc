@@ -181,7 +181,9 @@ int main() {
   // SignalGP programs are sets of functions where each function is a sequence of instructions.
   // Setup hardware 1's program:
   hw16_1.PushFunction();
-  hw16_1.GetProgram()[0].affinity.SetAll(); // Tag will be all ones
+  auto aff = hw16_1.GetProgram()[0].GetAffinity();
+  aff.SetAll(); // Tag will be all ones
+  hw16_1.GetProgram()[0].SetAffinity(aff);
   hw16_1.PushInst("RollD20", 0);
   hw16_1.PushInst("MsgFriend", 0, 0, 0, hardware_t::affinity_t());
 
@@ -245,7 +247,9 @@ int main() {
 
     for (size_t fID = 0; fID < fcnt; ++fID) {
       hardware_t::Function new_fun;
-      new_fun.affinity.Randomize(random);
+      auto aff2 = new_fun.GetAffinity();
+      aff2.Randomize(random);
+      new_fun.SetAffinity(aff2);
 
       size_t icnt = random.GetUInt(min_fun_len, max_fun_len);
 
