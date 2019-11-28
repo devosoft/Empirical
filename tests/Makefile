@@ -19,7 +19,6 @@ test-%: test_%.cc
 
 cover-test-%: test_%.cc
 	$(CXX) $(FLAGS) $< -lstdc++fs -o $@.out
-	gdb -batch -ex "catch throw" -ex "run" -ex "bt" $@.out 2>&1
 	#echo "running $@.out"
 	# execute test
 	./$@.out
