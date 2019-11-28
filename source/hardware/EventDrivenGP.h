@@ -467,9 +467,7 @@ namespace emp {
 
       void PushFunction(const Function & _function) {
         program.emplace_back(_function);
-        program.back().SetMatchBinRefreshFun(
-          [this](){ this->fun_matchbin_refresh(); }
-        );
+        program.back().SetMatchBinRefreshFun(fun_matchbin_refresh);
         fun_matchbin_refresh();
       }
 
@@ -494,7 +492,7 @@ namespace emp {
         program.emplace_back(
           _aff,
           _seq,
-          [this](){ this->fun_matchbin_refresh(); }
+          fun_matchbin_refresh
         );
         fun_matchbin_refresh();
       }
