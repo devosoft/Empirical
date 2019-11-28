@@ -48,7 +48,7 @@ namespace emp {
 
     virtual ~RegulatorBase() {};
     virtual bool Set(const set_t & set) = 0;
-    virtual bool Adj(const adj_t & set) = 0;
+    virtual bool Adj(const adj_t & adj) = 0;
     virtual view_t View() const = 0;
     virtual double operator()(double raw_score) const = 0;
     virtual std::string name() const = 0;
