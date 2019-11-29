@@ -1877,7 +1877,7 @@ namespace emp {
           goal * budge + cur * (1 - budge)
         );
         hw.GetMatchBin().DecayRegulator(
-          goal,
+          target,
           -state.GetLocal(inst.args[2]) // 0 is a no-op
         );
 
@@ -1902,7 +1902,7 @@ namespace emp {
 
       hw.GetMatchBin().SetRegulator(
         target,
-        target * budge + cur * (1 - budge)
+        goal * budge + cur * (1 - budge)
       );
       hw.GetMatchBin().DecayRegulator(
         target,
