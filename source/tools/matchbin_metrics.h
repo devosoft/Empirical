@@ -72,6 +72,7 @@ namespace emp {
     double operator()(const query_t& a, const tag_t& b) const override {
       return (double)(a^b).CountOnes() / Width;
     }
+
   };
 
   /// Generate an arbitrary, but consistent, match score between 0 and 1
@@ -125,6 +126,7 @@ namespace emp {
 
       return (double)std::abs(a-b) / std::numeric_limits<int>::max();
     }
+
   };
 
   /// Metric gives the matchings by the closest tag on or above itself.
@@ -146,8 +148,9 @@ namespace emp {
 
     double operator()(const query_t& a, const tag_t& b) const override {
       const size_t difference = ((Max + 1) + b - a) % (Max + 1);
-      return (double)(difference % (Max + 1)) / Max;
+      return static_cast<double>(difference % (Max + 1)) / Max;
     }
+
   };
 
   /// BitSet-based implementation of NextUpMetric.
@@ -290,6 +293,7 @@ namespace emp {
       return cumulative[(a^b).CountOnes()];
 
     }
+
   };
 
   /// Matches based on the longest segment of equal and uneqal bits in two bitsets
@@ -328,6 +332,7 @@ namespace emp {
     inline double ProbabilityKBitSequence(size_t k) const {
       return (Width - k + 1) / std::pow(2, k);
     }
+
   };
 
   template<typename Metric>
@@ -346,13 +351,14 @@ namespace emp {
 
       double best = 1.0;
 
-      for(size_t i = 0; i < metric.width(); ++ i) {
+      for (size_t i = 0; i < metric.width(); ++ i) {
         best = std::min(metric(dup, b), best);
         dup.template ROTL_SELF<1>();
       }
 
       return best;
     }
+
   };
 
   template<typename Metric>
@@ -611,9 +617,7 @@ namespace emp {
     }
 
     double operator()(const query_t& a, const tag_t& b) const override {
-
       return lookup(metric(a, b));
-
     }
 
   };
