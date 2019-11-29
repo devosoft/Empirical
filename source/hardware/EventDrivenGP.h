@@ -668,7 +668,7 @@ namespace emp {
         for (size_t fID = 0; fID < GetSize(); fID++) {
           // Print out function name (affinity).
           os << "Fn-" << fID << " ";
-          program[fID].affinity.Print(os);
+          program[fID].GetAffinity().Print(os);
           os << ":\n";
           int depth = 0;
           for (size_t i = 0; i < program[fID].GetSize(); i++) {
