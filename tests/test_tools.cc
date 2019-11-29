@@ -2143,7 +2143,7 @@ TEST_CASE("Test matchbin_utils", "[tools]")
     std::string,
     emp::NextUpMetric<>,
     emp::SieveSelector<>,
-    emp::LegacyRegulator
+    emp::WeakCountdownRegulator<>
   > bin(rand);
 
   bin.Put("one", 1);
@@ -2210,7 +2210,7 @@ TEST_CASE("Test matchbin_utils", "[tools]")
     std::string,
     emp::NextUpMetric<>,
     emp::SieveSelector<std::ratio<0,1>>,
-    emp::LegacyRegulator
+    emp::WeakCountdownRegulator<>
   > bin(rand);
 
   bin.Put("one", 1);
@@ -2278,7 +2278,7 @@ TEST_CASE("Test matchbin_utils", "[tools]")
       std::ratio<1, 10>,
       std::ratio<1, 5>
     >,
-    emp::LegacyRegulator
+    emp::WeakCountdownRegulator<>
   > bin(rand);
 
   bin.Put("one", 1);

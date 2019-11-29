@@ -547,6 +547,7 @@ namespace emp {
       );
     }
 
+    // scores (post-regulation) are assumed to be between 0 and 1
     SieveCacheState operator()(
       const emp::vector<size_t>& uids_,
       const std::unordered_map<size_t, double>& scores,
@@ -580,27 +581,11 @@ namespace emp {
         (-1.0 * stochastic_raw) * lock_in
       ) : stochastic_raw;
 
-      const double baseline = std::min_element(
-        std::begin(scores),
-        std::end(scores),
-        [](const auto & a, const auto & b){
-          return a.second < b.second;
-        }
-      )->second;
-
-      const double norm = std::max_element(
-        std::begin(scores),
-        std::end(scores),
-        [](const auto & a, const auto & b){
-          return a.second < b.second;
-        }
-      )->second - baseline + 1e-9;
-
       const auto partition = std::partition(
         std::begin(uids),
         std::end(uids),
-        [&scores, lock_in, stochastic, baseline, norm](size_t uid){
-          return (scores.at(uid) - baseline) / norm < lock_in + stochastic;
+        [&scores, lock_in, stochastic](size_t uid){
+          return scores.at(uid) < lock_in + stochastic;
         }
       );
 
@@ -609,13 +594,13 @@ namespace emp {
         std::begin(uids),
         partition,
         std::back_inserter(probabilities),
-        [&scores, lock_in, stochastic, baseline, norm](size_t uid){
+        [&scores, lock_in, stochastic](size_t uid){
           // goal:
           // RAW SCORE:    0.0 ... lock_in ... lock_in + stochastic ... 1.0
           // INTERMEDIATE: 0.0 ... 0.0 ... -> ... 1.0 ...           ... 1.0
           // RESULT:       1.0 ... 1.0 ... -> ... 0.0 ...           ... 0.0
 
-          const double raw_score = (scores.at(uid) - baseline) / norm;
+          const double raw_score = scores.at(uid);
           const double intermediate = stochastic ? std::max(
             0.0,
             (raw_score - lock_in) / stochastic
