@@ -90,11 +90,22 @@ namespace emp {
   /// @param inst_lib - Instruction library used to generate the instruction (instruction will be valid within instruction library)
   /// @param min_arg_val - Mininum value for an instruction argument.
   /// @param max_arg_val - Maximum value for an instruction argument.
-  template<size_t TAG_WIDTH
-    , typename TRAIT_T=double
-    , typename MATCHBIN_T=emp::MatchBin<size_t, emp::HammingMetric<TAG_WIDTH>, emp::RankedSelector<std::ratio<16+8,16>>>
+  template<
+    size_t TAG_WIDTH,
+    typename TRAIT_T=double,
+    typename MATCHBIN_T=emp::MatchBin<
+      size_t,
+      emp::HammingMetric<TAG_WIDTH>,
+      emp::RankedSelector<std::ratio<1,2>>,
+      emp::WeakCountdownRegulator<>
     >
-  typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>::Instruction GenRandSignalGPInst(emp::Random & rnd, const emp::InstLib<EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>> & inst_lib, int min_arg_val=0, int max_arg_val=15) {
+  > typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>::Instruction
+  GenRandSignalGPInst(
+    emp::Random & rnd,
+    const emp::InstLib<EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>> & inst_lib,
+    int min_arg_val=0,
+    int max_arg_val=15
+  ) {
     emp_assert(inst_lib.GetSize() > 0, "Instruction library must have at least one instruction definition before being used to generate a random instruction.");
     emp_assert(min_arg_val < max_arg_val, "Minimum argument value must be less than maximum argument value to generate a number between the two.");
     using inst_t = typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>::Instruction;
@@ -113,14 +124,30 @@ namespace emp {
   /// @param max_inst_cnt - Maximum number of instructions in generated function.
   /// @param min_arg_val - Mininum value for an instruction argument.
   /// @param max_arg_val - Maximum value for an instruction argument.
-  template<size_t TAG_WIDTH
-    , typename TRAIT_T=double
-    , typename MATCHBIN_T=emp::MatchBin<size_t, emp::HammingMetric<TAG_WIDTH>, emp::RankedSelector<std::ratio<16+8,16>>>
+  template<
+    size_t TAG_WIDTH,
+    typename TRAIT_T=double,
+    typename MATCHBIN_T=emp::MatchBin<
+      size_t,
+      emp::HammingMetric<TAG_WIDTH>,
+      emp::RankedSelector<std::ratio<1,2>>,
+      emp::WeakCountdownRegulator<>
     >
-  typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>::Function GenRandSignalGPFunction(emp::Random & rnd, const emp::InstLib<EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>> & inst_lib,
-                                                                            size_t min_inst_cnt=1, size_t max_inst_cnt=32,
-                                                                            int min_arg_val=0, int max_arg_val=15) {
-    emp_assert(inst_lib.GetSize() > 0, "Instruction library must have at least one instruction definition before being used to generate a random instruction.");
+  > typename EventDrivenGP_AW<TAG_WIDTH, TRAIT_T, MATCHBIN_T>::Function
+  GenRandSignalGPFunction(
+    emp::Random & rnd,
+    const emp::InstLib<
+      EventDrivenGP_AW<TAG_WIDTH, TRAIT_T, MATCHBIN_T>
+    > & inst_lib,
+    size_t min_inst_cnt=1,
+    size_t max_inst_cnt=32,
+    int min_arg_val=0,
+    int max_arg_val=15
+  ) {
+    emp_assert(
+      inst_lib.GetSize() > 0,
+      "Instruction library must have at least one instruction definition before being used to generate a random instruction."
+    );
     using fun_t = typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>::Function;
     size_t inst_cnt = rnd.GetUInt(min_inst_cnt, max_inst_cnt+1);
     fun_t new_fun(emp::GenRandSignalGPTag<TAG_WIDTH>(rnd));
@@ -137,15 +164,32 @@ namespace emp {
   /// @param max_inst_cnt - Maximum number of instructions per function.
   /// @param min_arg_val - Mininum value for an instruction argument.
   /// @param max_arg_val - Maximum value for an instruction argument.
-  template<size_t TAG_WIDTH
-    , typename TRAIT_T=double
-    , typename MATCHBIN_T=emp::MatchBin<size_t, emp::HammingMetric<TAG_WIDTH>, emp::RankedSelector<std::ratio<16+8,16>>>
+  template<
+    size_t TAG_WIDTH,
+    typename TRAIT_T=double,
+    typename MATCHBIN_T=emp::MatchBin<
+      size_t,
+      emp::HammingMetric<TAG_WIDTH>,
+      emp::RankedSelector<std::ratio<1,2>>,
+      emp::WeakCountdownRegulator<>
     >
-  typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>::Program GenRandSignalGPProgram(emp::Random & rnd, const emp::InstLib<EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>> & inst_lib,
-                                                                       size_t min_func_cnt=1, size_t max_func_cnt=16,
-                                                                       size_t min_fun_len=1, size_t max_fun_len=32,
-                                                                       int min_arg_val=0, int max_arg_val=15) {
-    emp_assert(inst_lib.GetSize() > 0, "Instruction library must have at least one instruction definition before being used to generate a random instruction.");
+  > typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>::Program
+  GenRandSignalGPProgram(
+    emp::Random & rnd,
+    const emp::InstLib<
+      EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>
+    > & inst_lib,
+    size_t min_func_cnt=1,
+    size_t max_func_cnt=16,
+    size_t min_fun_len=1,
+    size_t max_fun_len=32,
+    int min_arg_val=0,
+    int max_arg_val=15
+  ) {
+    emp_assert(
+      inst_lib.GetSize() > 0,
+      "Instruction library must have at least one instruction definition before being used to generate a random instruction."
+    );
     using program_t = typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>::Program;
     program_t program(&inst_lib);
     size_t fun_cnt = rnd.GetUInt(min_func_cnt, max_func_cnt+1);
@@ -177,11 +221,15 @@ namespace emp {
   /// NOTE: could use some feedback on this!
   ///  - Not loving the inconsistency between rates and constraints at the moment.
   template<
-    size_t TAG_WIDTH
-    , typename TRAIT_T=double
-    , typename MATCHBIN_T=emp::MatchBin<size_t, emp::HammingMetric<TAG_WIDTH>, emp::RankedSelector<std::ratio<16+8,16>>>
+    size_t TAG_WIDTH,
+    typename TRAIT_T=double,
+    typename MATCHBIN_T=emp::MatchBin<
+      size_t,
+      emp::HammingMetric<TAG_WIDTH>,
+      emp::RankedSelector<std::ratio<1,2>>,
+      emp::WeakCountdownRegulator<>
     >
-  class SignalGPMutator {
+  > class SignalGPMutator {
   public:
     // Generally useful aliases
     // - Hardware aliases

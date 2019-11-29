@@ -82,16 +82,20 @@ namespace emp {
     virtual emp::vector<Val> GetVals(const emp::vector<uid_t> & uids) = 0;
     virtual emp::vector<tag_t> GetTags(const emp::vector<uid_t> & uids) = 0;
     virtual size_t Size() const = 0;
+    virtual void DecayRegulator(
+      const uid_t uid,
+      const int steps
+    ) = 0;
     virtual void AdjRegulator(
-      uid_t uid,
+      const uid_t uid,
       const typename Regulator::adj_t & amt
     ) = 0;
     virtual void SetRegulator(
-      uid_t uid,
+      const uid_t uid,
       const typename Regulator::set_t & set
     ) = 0;
     virtual void SetRegulator(
-      uid_t uid,
+      const uid_t uid,
       const Regulator & set
     ) = 0;
     virtual Regulator & GetRegulator(const uid_t uid) = 0;
@@ -118,7 +122,7 @@ namespace emp {
     typename Val,
     typename Metric,
     typename Selector,
-    typename Regulator=LinearRegulator
+    typename Regulator
   >
   class MatchBin
   : public BaseMatchBin<
@@ -399,6 +403,16 @@ namespace emp {
       emp_assert(state.regulators.find(uid) != state.regulators.end());
 
       return state.regulators.at(uid);
+    }
+
+    /// Apply decay to a regulator.
+    void DecayRegulator(const uid_t uid, const int steps) override {
+      emp_assert(state.regulators.find(uid) != state.regulators.end());
+
+      if (
+        state.regulators.at(uid).Decay(steps)
+      ) ClearCache();
+
     }
 
     /// View the UIDs currently associated with the MatchBin.

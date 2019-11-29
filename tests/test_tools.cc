@@ -2142,7 +2142,8 @@ TEST_CASE("Test matchbin_utils", "[tools]")
   emp::MatchBin<
     std::string,
     emp::NextUpMetric<>,
-    emp::SieveSelector<>
+    emp::SieveSelector<>,
+    emp::LegacyRegulator
   > bin(rand);
 
   bin.Put("one", 1);
@@ -2208,7 +2209,8 @@ TEST_CASE("Test matchbin_utils", "[tools]")
   emp::MatchBin<
     std::string,
     emp::NextUpMetric<>,
-    emp::SieveSelector<std::ratio<0,1>>
+    emp::SieveSelector<std::ratio<0,1>>,
+    emp::LegacyRegulator
   > bin(rand);
 
   bin.Put("one", 1);
@@ -2275,7 +2277,8 @@ TEST_CASE("Test matchbin_utils", "[tools]")
     emp::SieveSelector<
       std::ratio<1, 10>,
       std::ratio<1, 5>
-    >
+    >,
+    emp::LegacyRegulator
   > bin(rand);
 
   bin.Put("one", 1);
@@ -2577,6 +2580,78 @@ TEST_CASE("Test matchbin_utils", "[tools]")
 
   }
 
+  // tests for WeakCountdownRegulator
+  {
+
+  emp::Random rand(1);
+
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::RouletteSelector<>,
+    emp::WeakCountdownRegulator<>
+  >bin(rand);
+
+  const size_t hi = bin.Put("hi", std::numeric_limits<int>::max()/5);
+  REQUIRE( bin.GetVal(hi) == "hi" );
+  const size_t salut = bin.Put("salut", 0);
+  REQUIRE( bin.GetVal(salut) == "salut" );
+
+  REQUIRE( bin.Size() == 2 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+
+  auto res = bin.GetVals(bin.Match(0, 100000));
+  const size_t count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( count > 50000);
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.AdjRegulator(salut, 2.0); // downregulate
+  bin.SetRegulator(hi, -2.0); // upregulate
+  REQUIRE( bin.ViewRegulator(salut) == 2.0 );
+  REQUIRE( bin.ViewRegulator(hi) == -2.0 );
+
+  res = bin.GetVals(bin.Match(0, 100000));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 50000 );
+
+  bin.SetRegulator(salut, -1.0); // upregulate
+  bin.SetRegulator(hi, 1.0); // downregulate
+  REQUIRE( bin.ViewRegulator(salut) == -1.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 1.0 );
+  res = bin.GetVals(bin.Match(0, 100000));
+  const size_t hi_count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( hi_count > count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.DecayRegulator(salut, -2);
+  REQUIRE( bin.ViewRegulator(salut) == -1.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 1.0 );
+
+  res = bin.GetVals(bin.Match(0, 100000));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.DecayRegulator(salut, 1);
+  bin.DecayRegulator(hi, 0);
+  REQUIRE( bin.ViewRegulator(salut) == -1.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 1.0 );
+
+  res = bin.GetVals(bin.Match(0, 100000));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.DecayRegulator(salut, 500);
+  bin.DecayRegulator(hi, 1);
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 50000 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") < hi_count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  }
+
+
 }
 
 TEST_CASE("Test MatchBin", "[tools]")
@@ -2589,7 +2664,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::AbsDiffMetric,
-    emp::RouletteSelector<>
+    emp::RouletteSelector<>,
+    emp::LegacyRegulator
   >bin_rts(rand);
 
   bin_rts.Put("hi", 0);
@@ -2599,7 +2675,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::AbsDiffMetric,
-    emp::ExpRouletteSelector<>
+    emp::ExpRouletteSelector<>,
+    emp::LegacyRegulator
   >bin_xrs(rand);
 
   bin_xrs.Put("hi", 0);
@@ -2609,7 +2686,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::AbsDiffMetric,
-    emp::RankedSelector<>
+    emp::RankedSelector<>,
+    emp::LegacyRegulator
   >bin_rks(rand);
 
   bin_rks.Put("hi", 0);
@@ -2630,7 +2708,8 @@ TEST_CASE("Test MatchBin", "[tools]")
       std::ratio<1000,1>,
       std::ratio<1, 1>,
       2
-    >
+    >,
+    emp::LegacyRegulator
   >bin_rts(rand);
 
   bin_rts.Put("hi", 0);
@@ -2647,7 +2726,8 @@ TEST_CASE("Test MatchBin", "[tools]")
       std::ratio<4, 1>,
       std::ratio<5, 4>,
       2
-    >
+    >,
+    emp::LegacyRegulator
   >bin_xrs(rand);
 
   bin_xrs.Put("hi", 0);
@@ -2657,7 +2737,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::AbsDiffMetric,
-    emp::RankedSelector<std::ratio<-1,1>, 2>
+    emp::RankedSelector<std::ratio<-1,1>, 2>,
+    emp::LegacyRegulator
   >bin_rks(rand);
 
   bin_rks.Put("hi", 0);
@@ -2675,7 +2756,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::AbsDiffMetric,
-    emp::RankedSelector<std::ratio<214748364700+599,214748364700>, 2>
+    emp::RankedSelector<std::ratio<214748364700+599,214748364700>, 2>,
+    emp::LegacyRegulator
   > bin(rand);
 
   const size_t hi = bin.Put("hi", 1);
@@ -2758,7 +2840,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::AbsDiffMetric,
-    emp::RankedSelector<>
+    emp::RankedSelector<>,
+    emp::LegacyRegulator
   > bin(rand);
 
   const size_t hi = bin.Put("hi", 1);
@@ -2818,7 +2901,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::AbsDiffMetric,
-    emp::RouletteSelector<>
+    emp::RouletteSelector<>,
+    emp::LegacyRegulator
   >bin(rand);
 
   const size_t hi = bin.Put("hi", std::numeric_limits<int>::max()-1);
@@ -2855,7 +2939,10 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::AbsDiffMetric,
-    emp::RouletteSelector<std::ratio<(size_t)std::numeric_limits<int>::max()+1000000, std::numeric_limits<int>::max()>>
+    emp::RouletteSelector<
+      std::ratio<(size_t)std::numeric_limits<int>::max()+1000000, std::numeric_limits<int>::max()>
+    >,
+    emp::LegacyRegulator
   >bin(rand);
 
   const size_t hi = bin.Put("hi", 1000000);
@@ -2906,13 +2993,15 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::AbsDiffMetric,
-    emp::RouletteSelector<std::ratio<-1,1>,std::ratio<1000,1>>
+    emp::RouletteSelector<std::ratio<-1,1>,std::ratio<1000,1>>,
+    emp::LegacyRegulator
   >bin_softskew(rand);
 
   emp::MatchBin<
     std::string,
     emp::AbsDiffMetric,
-    emp::RouletteSelector<std::ratio<-1,1>,std::ratio<1,1000>>
+    emp::RouletteSelector<std::ratio<-1,1>,std::ratio<1,1000>>,
+    emp::LegacyRegulator
   >bin_hardskew(rand);
 
   const size_t hi1 = bin_softskew.Put("hi", 100000000);
@@ -2977,7 +3066,8 @@ TEST_CASE("Test MatchBin", "[tools]")
       std::ratio<-1,1>,
       std::ratio<1,10>,
       std::ratio<0,1>
-    >
+    >,
+    emp::LegacyRegulator
   >bin_lobase(rand);
 
   emp::MatchBin<
@@ -2987,7 +3077,8 @@ TEST_CASE("Test MatchBin", "[tools]")
       std::ratio<-1,1>,
       std::ratio<1,10>,
       std::ratio<-1,1>
-    >
+    >,
+    emp::LegacyRegulator
   >bin_hibase(rand);
 
   const size_t hi1 = bin_lobase.Put("hi", std::numeric_limits<int>::max());
@@ -3051,7 +3142,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::HammingMetric<32>,
-    emp::RankedSelector<std::ratio<32 + 3, 32>>
+    emp::RankedSelector<std::ratio<32 + 3, 32>>,
+    emp::LegacyRegulator
   > bitBin(rand);
 
   emp::BitSet<32> bs3;
@@ -3108,7 +3200,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::HammingMetric<32>,
-    emp::RouletteSelector<>
+    emp::RouletteSelector<>,
+    emp::LegacyRegulator
   >bitBin(rand);
 
   emp::BitSet<32> bs2;
@@ -3150,7 +3243,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::NextUpMetric<1000>,
-    emp::RankedSelector<std::ratio<max_value + max_value,max_value>>
+    emp::RankedSelector<std::ratio<max_value + max_value,max_value>>,
+    emp::LegacyRegulator
   > bin(rand);
 
   const size_t hi = bin.Put("hi", 1);
@@ -3211,7 +3305,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::AbsDiffMetric,
-    emp::RouletteSelector<>
+    emp::RouletteSelector<>,
+    emp::LegacyRegulator
   >bin(rand);
 
   const size_t hi = bin.Put("hi", 100000000);
@@ -3244,7 +3339,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::StreakMetric<8>,
-    emp::RankedSelector<std::ratio<1+1, 1>>
+    emp::RankedSelector<std::ratio<1+1, 1>>,
+    emp::LegacyRegulator
   > bitBin(rand);
 
   emp::BitSet<8> bs1;
@@ -3304,7 +3400,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::StreakMetric<64>,
-    emp::RankedSelector<std::ratio<1+1, 1>>
+    emp::RankedSelector<std::ratio<1+1, 1>>,
+    emp::LegacyRegulator
   > bitBin64(rand);
 
   emp::BitSet<64> bs7;
@@ -3350,7 +3447,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::SymmetricNoWrapMetric<8>,
-    emp::RankedSelector<std::ratio<256 + 40, 256>>
+    emp::RankedSelector<std::ratio<256 + 40, 256>>,
+    emp::LegacyRegulator
   > bitBin(rand);
 
   emp::BitSet<8> bs1;
@@ -4323,9 +4421,15 @@ TEST_CASE("Test MatchBin", "[tools]")
     }
   };
 
-  class MatchBinTest : public emp::MatchBin<emp::BitSet<32>, emp::HammingMetric<32>, DummySelector>{
+  using parent_t = emp::MatchBin<
+    emp::BitSet<32>,
+    emp::HammingMetric<32>,
+    DummySelector,
+    emp::LegacyRegulator
+  >;
+  class MatchBinTest : public parent_t {
   public:
-    MatchBinTest(emp::Random & rand) : emp::MatchBin<emp::BitSet<32>, emp::HammingMetric<32>, DummySelector>(rand) { ; }
+    MatchBinTest(emp::Random & rand) : parent_t(rand) { ; }
 
     size_t GetCacheSize(){ return cache.size(); }
     size_t GetSelectCount(){ return selector.opCount; }
@@ -4401,7 +4505,8 @@ TEST_CASE("Test MatchBin", "[tools]")
     emp::MatchBin<
       std::string,
       emp::AbsDiffMetric,
-      emp::RouletteSelector<>
+      emp::RouletteSelector<>,
+      emp::LegacyRegulator
     > bin(rand);
 
     const size_t hi = bin.Put("hi", 1);
@@ -4421,7 +4526,8 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::MatchBin<
     std::string,
     emp::AbsDiffMetric,
-    emp::RankedSelector<std::ratio<214748364700+599,214748364700>>
+    emp::RankedSelector<std::ratio<214748364700+599,214748364700>>,
+    emp::LegacyRegulator
   > bin(rand);
 
   {

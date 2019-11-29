@@ -49,6 +49,7 @@ namespace emp {
     virtual ~RegulatorBase() {};
     virtual bool Set(const set_t & set) = 0;
     virtual bool Adj(const adj_t & adj) = 0;
+    virtual bool Decay(const int steps) = 0;
     virtual view_t View() const = 0;
     virtual double operator()(double raw_score) const = 0;
     virtual std::string name() const = 0;
@@ -56,7 +57,9 @@ namespace emp {
   };
 
 
-  struct LinearRegulator : RegulatorBase<double, double, double> {
+  /// Don't use this regulator.
+  /// It's here so tests don't break.
+  struct LegacyRegulator : RegulatorBase<double, double, double> {
 
     // >1.0 downregulated
     // 1.0 neutral
@@ -64,14 +67,12 @@ namespace emp {
     // must be >=0.0
     double state;
 
-    LinearRegulator() : state(1.0) {}
+    LegacyRegulator() : state(1.0) {}
 
     /// Apply regulation to a raw match score.
     double operator()(const double raw_score) const override {
       return state * raw_score + state;
     }
-
-    //TODO should we adopt a convention that's consistent across regulators?
 
     /// A value between zero and one upregulates the item,
     /// a value of exactly one is neutral,
@@ -94,16 +95,23 @@ namespace emp {
       return amt != 0.0;
     }
 
+    /// No-op decay.
+    /// Return whether MatchBin should be updated (never).
+    bool Decay(const int steps) override {
+      std::ignore = steps;
+      return false;
+    }
+
     /// Return a double representing the state of the regulator.
     double View() const override {
       return state;
     }
 
     std::string name() const override {
-      return "Linear Regulator";
+      return "Legacy Regulator";
     }
 
-    bool operator!=(const LinearRegulator & other) const {
+    bool operator!=(const LegacyRegulator & other) const {
       return state != other.state;
     }
 
@@ -112,6 +120,99 @@ namespace emp {
     {
       ar(
         CEREAL_NVP(state)
+      );
+    }
+
+  };
+
+  template <typename Slope=std::ratio<1,10>>
+  struct WeakCountdownRegulator : RegulatorBase<double, double, double> {
+
+    static constexpr double slope = (
+      static_cast<double>(Slope::num) / static_cast<double>(Slope::den)
+    );
+
+    // positive = downregulated
+    // negative = upregulated
+    double state;
+    // state | add to match score
+    // +inf  | +1.0
+    // ...   | ...
+    // 1.0   | ~ +slope
+    // 0.0   | neutral
+    // -1.0  | ~ -slope
+    // ...   | ...
+    // -inf  | -1.0
+
+    // countdown timer to reseting state
+    size_t timer;
+
+    WeakCountdownRegulator() : state(0.0), timer(0) {}
+
+    /// Apply regulation to a raw match score.
+    double operator()(const double raw_score) const override {
+      return std::clamp(
+        std::tanh(slope * state) + raw_score,
+        0.0,
+        1.0
+      );
+    }
+
+    /// A positive value downregulates the item,
+    /// a value of zero is neutral,
+    /// and a negative value upregulates the item.
+    bool Set(const double & set) override {
+      timer = 1;
+
+      // return whether regulator value changed
+      // (i.e., we need to purge the cache)
+      return std::exchange(state, set) != set;
+    }
+
+    /// A negative value upregulates the item,
+    /// a value of exactly zero is neutral
+    /// and a postive value downregulates the item.
+    bool Adj(const double & amt) override {
+      timer = 1;
+
+      state += amt;
+
+      // return whether regulator value changed
+      // (i.e., we need to purge the cache)
+      return amt != 0.0;
+    }
+
+    /// Timer decay.
+    /// Return whether MatchBin should be updated
+    bool Decay(const int steps) override {
+      if (steps < 0) {
+        // if reverse decay is requested
+        timer += -steps;
+      } else {
+        // if forward decay is requested
+        timer -= std::min(timer, static_cast<size_t>(steps));
+      }
+
+      return timer == 0 ? (
+        std::exchange(state, 0.0) != 0.0
+      ) : false;
+    }
+
+    /// Return a double representing the state of the regulator.
+    double View() const override { return state; }
+
+    std::string name() const override { return "Weak Timer Regulator"; }
+
+    bool operator!=(const WeakCountdownRegulator & other) const {
+      return state != other.state || timer != other.timer;
+    }
+
+    template <class Archive>
+    void serialize( Archive & ar )
+    {
+      ar(
+        CEREAL_NVP(state),
+        CEREAL_NVP(timer)
       );
     }
 
