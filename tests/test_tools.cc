@@ -4431,7 +4431,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   public:
     MatchBinTest(emp::Random & rand) : parent_t(rand) { ; }
 
-    size_t GetCacheSize(){ return cache.size(); }
+    size_t GetCacheSize(){ return cache_regulated.size(); }
     size_t GetSelectCount(){ return selector.opCount; }
   };
 
@@ -4452,14 +4452,14 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE( bin.GetCacheSize() == 1);
   REQUIRE( bin.GetSelectCount() == 1);
   REQUIRE( cached == uncached );
-  bin.SetCacheOn(false);
+  bin.DeactivateCaching();
   REQUIRE(bin.GetCacheSize() == 0 );
   bin.Match(emp::BitSet<32>(),10);//second cache
   bin.Match(emp::BitSet<32>(),10);//third cache
   REQUIRE(bin.GetCacheSize() == 0 );
   REQUIRE(bin.GetSelectCount() == 3);
 
-  bin.SetCacheOn();
+  bin.ActivateCaching();
   REQUIRE(bin.GetCacheSize() == 0 );
 
 

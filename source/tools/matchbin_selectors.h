@@ -154,7 +154,10 @@ namespace emp {
       if (n > requestSize) return std::nullopt;
       if (n >= uids.size()) return uids;
 
-      return emp::vector<size_t>(uids.begin(), uids.begin()+n);
+      return emp::vector<size_t>(
+        std::begin(uids),
+        std::begin(uids) + n
+      );
     }
 
   };
@@ -216,9 +219,9 @@ namespace emp {
 
       // Perform a bounded partial sort to find the first n results
       std::partial_sort(
-        uids.begin(),
-        uids.begin() + std::min(n, uids.size()),
-        uids.end(),
+        std::begin(uids),
+        std::begin(uids) + std::min(n, uids.size()),
+        std::end(uids),
         [&scores](const size_t &a, const size_t &b){
           return scores.at(a) < scores.at(b);
         }
@@ -233,7 +236,7 @@ namespace emp {
       ) ++back;
 
 
-      return RankedCacheState(uids.begin(), back, n, DefaultN);
+      return RankedCacheState(std::begin(uids), back, n, DefaultN);
     }
 
   };

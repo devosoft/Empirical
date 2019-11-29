@@ -50,7 +50,7 @@ namespace emp {
     virtual bool Set(const set_t & set) = 0;
     virtual bool Adj(const adj_t & adj) = 0;
     virtual bool Decay(const int steps) = 0;
-    virtual view_t View() const = 0;
+    virtual const view_t & View() const = 0;
     virtual double operator()(double raw_score) const = 0;
     virtual std::string name() const = 0;
 
@@ -103,7 +103,7 @@ namespace emp {
     }
 
     /// Return a double representing the state of the regulator.
-    double View() const override {
+    const double & View() const override {
       return state;
     }
 
@@ -199,7 +199,7 @@ namespace emp {
     }
 
     /// Return a double representing the state of the regulator.
-    double View() const override { return state; }
+    const double & View() const override { return state; }
 
     std::string name() const override { return "Weak Timer Regulator"; }
 

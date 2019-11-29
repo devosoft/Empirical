@@ -531,7 +531,6 @@ namespace emp {
     /// Deletions occur at a per-function rate specified by the "FUNC_DEL__PER_FUNC" parameter value.
     size_t DefaultMutator_FuncDel(program_t & program, emp::Random & rnd) {
       size_t mut_cnt = 0;
-      size_t expected_prog_len = program.GetInstCnt();
       // Perform function deletions!
       for (int fID = 0; fID < (int) program.GetSize(); ++fID) {
         // Should we delete this function?

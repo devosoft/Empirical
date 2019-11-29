@@ -429,6 +429,13 @@ namespace emp {
       { ; }
       Program(const Program &) = default;
 
+      auto begin() { return std::begin(program); }
+      auto end() { return std::end(program); }
+
+      auto cbegin() const { return std::cbegin(program); }
+      auto cend() const { return std::cend(program); }
+
+
       void Clear() {
         program.clear();
       }
