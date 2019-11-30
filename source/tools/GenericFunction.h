@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018
+ *  @date 2017-2019
  *
  *  @file  GenericFunction.h
  *  @brief Based on std::function, but with a common base class.
@@ -30,6 +30,8 @@ namespace emp {
   protected:
   public:
     virtual ~GenericFunction() { ; }
+
+    virtual size_t NumArgs() const = 0;
 
     /// A generic form of the function call operator; use arg types to determine derived form.
     template <typename RETURN, typename... Ts> auto Call(Ts &&... args);
@@ -66,6 +68,9 @@ namespace emp {
     template <typename... Ts>
     Function(Ts &&... args) : fun(std::forward<Ts>(args)...) { ; }
 
+    // How many arguments does this function have?
+    size_t NumArgs() const override { return sizeof...(PARAMS); };
+
     /// Forward all args to std::function call.
     template <typename... Ts>
     RETURN Call(Ts &&... args) { return fun(std::forward<Ts>(args)...); }
@@ -77,6 +82,9 @@ namespace emp {
     /// Get the std::function to be called.
     const fun_t & GetFunction() const { return fun; }
   };
+
+  /////////////////////////////////////
+  //  Member function implementaions.
 
   template <typename RETURN, typename... Ts>
   auto GenericFunction::Call(Ts &&... args) {

@@ -6,8 +6,10 @@
 //
 //
 //  Developer notes:
-//  * Fill out remaining standard library classes (as possible)
-//  * Default to type_traits typeid rather than Unknown
+//  * Fill out defaults for remaining standard library classes (as possible)
+//  * If a class has a static TypeID_GetName() defined, use that for the name.
+//  * If a type is a template, give access to parameter types.
+//  * If a type is a function, give access to parameter types.
 
 #ifndef EMP_TYPE_ID_H
 #define EMP_TYPE_ID_H
@@ -41,6 +43,8 @@ namespace emp {
       bool is_reference = false;
       bool is_trivial = false;
       bool is_volatile = false;
+
+      bool is_TypePack = false;
 
       size_t decay_id = 0;
       size_t remove_const_id = 0;
@@ -94,6 +98,8 @@ namespace emp {
     bool IsTrivial() const { return info_ptr->is_trivial ; }
     bool IsVolatile() const { return info_ptr->is_volatile ; }
 
+    bool IsTypePack() const { return info_ptr->is_TypePack ; }
+
     TypeID GetDecayTypeID() const { return info_ptr->decay_id; }
     TypeID GetRemoveConstTypeID() const { return info_ptr->remove_const_id; }
     TypeID GetRemoveCVTypeID() const { return info_ptr->remove_cv_id; }
@@ -117,6 +123,23 @@ namespace emp {
     return emp::vector<TypeID>{GetTypeID<Ts>()...};
   }
 
+  namespace internal {
+    // Unimplemented base class -- TypePackIDs are meaningless for non-TypePack classes.
+    template <typename T> struct TypePackIDs_impl { };
+
+    // Decompose a TypePack and provide a vector of the individual TypeIDs.
+    template <typename... Ts>
+    struct TypePackIDs_impl<TypePack<Ts...>> {
+      static emp::vector<TypeID> GetIDs() { return GetTypeIDs<Ts...>(); }
+    };
+  }
+
+  /// Retrieve a vector of TypeIDs for a TypePack of types passed in.
+  template <typename T>
+  emp::vector<TypeID> GetTypePackIDs() {
+    return internal::TypePackIDs_impl<T>::GetIDs();
+  }
+
   /// Build the information for a single TypeID.
   template <typename T>
   static TypeID::Info BuildInfo() {
@@ -136,6 +159,8 @@ namespace emp {
       info.is_reference = std::is_reference<T>();
       info.is_trivial = std::is_trivial<T>();
       info.is_volatile = std::is_volatile<T>();
+
+      info.is_TypePack = emp::is_TypePack<T>();
 
       using decay_t = std::decay_t<T>;
       if constexpr (std::is_same<T, decay_t>()) info.decay_id = (size_t) &info;
@@ -173,6 +198,15 @@ namespace emp {
       }
       else if (info.is_reference) {
         info.name = type_id.GetRemoveReferenceTypeID().GetName() + '&';
+      }
+      else if constexpr (emp::is_TypePack<T>()) {
+        emp::vector<TypeID> ids = GetTypePackIDs<T>();
+        info.name = "TypePack<";
+        for (size_t i = 0; i < ids.size(); i++) {
+          if (i) info.name += ",";
+          info.name += ids[i].GetName();
+        }
+        info.name += ">";
       }
     }
     

@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2019.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -12,6 +12,8 @@
 #include "meta/TypeID.h"
 #include "meta/TypePack.h"
 
+#define DEBUG_PRINT(X) std::cout << #X << " : " << emp::GetTypeID<X>().GetName() << std::endl
+
 int Sum4(int a, int b, int c, int d) { return a+b+c+d; }
 
 struct HasA { static int A; static std::string TypeID() { return "HasA"; } };
@@ -20,6 +22,8 @@ template <typename T> using MemberA = decltype(T::A);
 
 int main()
 {
+  emp::SetupTypeNames();
+
   using test_t = emp::TypePack<int, std::string, float, bool, double>;
 
   std::cout << "test_t = " << emp::GetTypeID<test_t>().GetName() << std::endl;
@@ -87,4 +91,18 @@ int main()
   std::cout << std::endl;
   using shuffle_t = test_t::select<2,3,4,1,3,3,3,0>;
   std::cout << "Shuffle with test_t::select<>:" << emp::GetTypeID<shuffle_t>().GetName() << std::endl;
+
+  using tp_size_3_t = emp::TypePack<int, double, bool>;
+  std::cout << "\nTesting combos; tp_size_3_t has " << tp_size_3_t::SIZE << " types: "
+	    << emp::GetTypeID<tp_size_3_t>().GetName() << "\n"
+	    << "Combo size three has " << tp_size_3_t::make_combos<3>::SIZE << " triples:"
+	    << emp::GetTypeID<tp_size_3_t::make_combos<3>>().GetName() << "\n";
+
+  using tmp_t = emp::internal::all_combos<3,tp_size_3_t,tp_size_3_t>;
+  DEBUG_PRINT(tmp_t::next_combos);
+  DEBUG_PRINT(tmp_t::cur_type);
+  DEBUG_PRINT(tmp_t::next_options);
+  DEBUG_PRINT(tmp_t::pushed_types);
+  DEBUG_PRINT(tmp_t::other_results);
+  DEBUG_PRINT(tmp_t::result_t);
 }
