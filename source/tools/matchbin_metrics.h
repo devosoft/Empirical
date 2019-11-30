@@ -381,12 +381,7 @@ namespace emp {
 
     inline double ProbabilityKBitSequence(size_t k) const {
       // Bad Math
-      // ... at least clamp it
-      return std::clamp(
-        static_cast<double>(Width - k + 1) / std::pow(2, k),
-        0.0,
-        1.0
-      );
+      return static_cast<double>(Width - k + 1) / std::pow(2, k);
     }
 
   };
