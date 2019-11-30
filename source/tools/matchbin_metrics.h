@@ -24,6 +24,7 @@
 #include <tuple>
 #include <array>
 #include <utility>
+#include <queue>
 
 #include "tools/Binomial.h"
 
@@ -35,6 +36,7 @@
 #include "../tools/BitSet.h"
 #include "../tools/string_utils.h"
 #include "../tools/hash_utils.h"
+#include "../tools/tuple_utils.h"
 
 namespace emp {
 
@@ -331,6 +333,41 @@ namespace emp {
 
     inline double ProbabilityKBitSequence(size_t k) const {
       return (Width - k + 1) / std::pow(2, k);
+    }
+
+  };
+
+  template<typename Metric, size_t MaxCapacity=100000>
+  struct CacheMod : public Metric {
+
+    using query_t = typename Metric::query_t;
+    using tag_t = typename Metric::tag_t;
+
+    Metric metric;
+    static inline std::unordered_map<
+      std::tuple<query_t, tag_t>,
+      double,
+      emp::TupleHash<query_t, tag_t>
+    > cache;
+    static inline std::queue<std::tuple<query_t, tag_t>> purge_queue;
+
+    std::string name() const override { return metric.name(); }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+
+      if (cache.find({a, b}) == std::end(cache)) {
+        // make space if needed
+        if (cache.size() >= MaxCapacity) {
+          cache.erase(purge_queue.front());
+          purge_queue.pop();
+        }
+
+        cache[{a, b}] = metric(a, b);
+        purge_queue.push({a, b});
+      }
+
+      return cache.at({a, b});
+
     }
 
   };

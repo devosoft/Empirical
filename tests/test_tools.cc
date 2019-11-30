@@ -2423,6 +2423,74 @@ TEST_CASE("Test matchbin_utils", "[tools]")
 
   }
 
+  // test CacheMod
+  // test PowMod, LogMod
+  {
+  emp::HammingMetric<4> baseline;
+
+  emp::PowMod<emp::HammingMetric<4>, std::ratio<3>> squish;
+
+  emp::CacheMod<emp::PowMod<
+    emp::HammingMetric<4>,
+    std::ratio<3>
+  >> cache_squish;
+
+  emp::CacheMod<emp::PowMod<
+    emp::HammingMetric<4>,
+    std::ratio<3>
+  >, 2> small_cache_squish;
+
+  // put in cache
+  REQUIRE( squish({0,0,0,0},{0,0,0,0}) == cache_squish({0,0,0,0},{0,0,0,0}) );
+  REQUIRE( squish({0,0,0,0},{0,0,0,1}) == cache_squish({0,0,0,0},{0,0,0,1}) );
+  REQUIRE( squish({0,0,0,0},{0,0,1,1}) == cache_squish({0,0,0,0},{0,0,1,1}) );
+  REQUIRE( squish({0,0,0,0},{0,1,1,1}) == cache_squish({0,0,0,0},{0,1,1,1}) );
+  REQUIRE( squish({0,0,0,0},{1,1,1,1}) == cache_squish({0,0,0,0},{1,1,1,1}) );
+
+  // hit cache
+  REQUIRE( squish({0,0,0,0},{0,0,0,0}) == cache_squish({0,0,0,0},{0,0,0,0}) );
+  REQUIRE( squish({0,0,0,0},{0,0,0,1}) == cache_squish({0,0,0,0},{0,0,0,1}) );
+  REQUIRE( squish({0,0,0,0},{0,0,1,1}) == cache_squish({0,0,0,0},{0,0,1,1}) );
+  REQUIRE( squish({0,0,0,0},{0,1,1,1}) == cache_squish({0,0,0,0},{0,1,1,1}) );
+  REQUIRE( squish({0,0,0,0},{1,1,1,1}) == cache_squish({0,0,0,0},{1,1,1,1}) );
+
+  // put in cache
+  REQUIRE(
+    squish({0,0,0,0},{0,0,0,0}) == small_cache_squish({0,0,0,0},{0,0,0,0})
+  );
+  REQUIRE(
+    squish({0,0,0,0},{0,0,0,1}) == small_cache_squish({0,0,0,0},{0,0,0,1})
+  );
+  REQUIRE(
+    squish({0,0,0,0},{0,0,1,1}) == small_cache_squish({0,0,0,0},{0,0,1,1})
+  );
+  REQUIRE(
+    squish({0,0,0,0},{0,1,1,1}) == small_cache_squish({0,0,0,0},{0,1,1,1})
+  );
+  REQUIRE(
+    squish({0,0,0,0},{1,1,1,1}) == small_cache_squish({0,0,0,0},{1,1,1,1})
+  );
+
+  // hit cache
+  REQUIRE(
+    squish({0,0,0,0},{0,0,0,0}) == small_cache_squish({0,0,0,0},{0,0,0,0})
+  );
+  REQUIRE(
+    squish({0,0,0,0},{0,0,0,1}) == small_cache_squish({0,0,0,0},{0,0,0,1})
+  );
+  REQUIRE(
+    squish({0,0,0,0},{0,0,1,1}) == small_cache_squish({0,0,0,0},{0,0,1,1})
+  );
+  REQUIRE(
+    squish({0,0,0,0},{0,1,1,1}) == small_cache_squish({0,0,0,0},{0,1,1,1})
+  );
+  REQUIRE(
+    squish({0,0,0,0},{1,1,1,1}) == small_cache_squish({0,0,0,0},{1,1,1,1})
+  );
+
+  }
+
+
   // test UnifMod
   {
 
