@@ -2136,6 +2136,112 @@ TEST_CASE("Test map_utils", "[tools]")
 
 TEST_CASE("Test matchbin_utils", "[tools]")
 {
+
+  // test ExactStreakDistribution
+  {
+    emp::ExactStreakDistribution<4> dist;
+
+    REQUIRE( dist.StreakProbability(2,2) == 0.25 );
+    REQUIRE( dist.StreakProbability(2,3) == 0.375 );
+    REQUIRE( dist.StreakProbability(2,4) == 8.0/16.0 );
+
+    REQUIRE( dist.StreakProbability(0) == 16.0/16.0 );
+    REQUIRE( dist.StreakProbability(1) == 15.0/16.0 );
+    REQUIRE( dist.StreakProbability(2) == 8.0/16.0 );
+    REQUIRE( dist.StreakProbability(3) == 3.0/16.0 );
+    REQUIRE( dist.StreakProbability(4) == 1.0/16.0 );
+
+  }
+
+  // test ApproxSingleStreakMetric
+  {
+
+    emp::ApproxSingleStreakMetric<4> metric;
+
+    REQUIRE( metric({0,0,0,0},{0,0,0,0}) < metric({0,0,0,0},{1,0,0,0}) );
+    REQUIRE( metric({0,0,0,0},{0,0,0,1}) < metric({0,0,0,0},{0,1,0,0}) );
+    // REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,1}) );
+    REQUIRE( metric({0,0,0,0},{1,1,0,1}) == 1.0 ); // in lieu
+    REQUIRE( metric({0,0,0,0},{1,1,1,1}) == 1.0 ); // in lieu
+    REQUIRE( metric({0,0,0,0},{1,1,0,0}) < metric({0,0,0,0},{1,1,0,1}) );
+    // REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,0}) );
+    REQUIRE( metric({0,0,0,0},{1,1,0,1}) == 1.0 ); // in lieu
+    REQUIRE( metric({0,0,0,0},{1,1,1,0}) == 1.0 ); // in lieu
+    REQUIRE( metric({0,0,0,0},{0,0,1,1}) == metric({0,0,0,0},{0,0,1,0}) );
+
+    emp::Random rand(1);
+    for (size_t i = 0; i < 1000; ++i) {
+      emp::BitSet<4> a(rand);
+      emp::BitSet<4> b(rand);
+      REQUIRE(metric(a,b) <= 1.0);
+      REQUIRE(metric(a,b) >= 0.0);
+    }
+
+  }
+
+  // test ApproxDualStreakMetric
+  emp::ExactDualStreakMetric<4> metric;
+
+  REQUIRE( metric({0,0,0,0},{0,0,0,0}) < metric({0,0,0,0},{1,0,0,0}) );
+  REQUIRE( metric({0,0,0,0},{0,0,0,1}) < metric({0,0,0,0},{0,1,0,0}) );
+  REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,1}) );
+  REQUIRE( metric({0,0,0,0},{1,1,0,0}) < metric({0,0,0,0},{1,1,0,1}) );
+  REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,0}) );
+  REQUIRE( metric({0,0,0,0},{0,0,1,1}) > metric({0,0,0,0},{0,0,1,0}) );
+
+  emp::Random rand(1);
+  for (size_t i = 0; i < 1000; ++i) {
+    emp::BitSet<4> a(rand);
+    emp::BitSet<4> b(rand);
+    REQUIRE(metric(a,b) <= 1.0);
+    REQUIRE(metric(a,b) >= 0.0);
+  }
+
+
+  // test ExactSingleStreakMetric
+  {
+
+    emp::ExactSingleStreakMetric<4> metric;
+
+    REQUIRE( metric({0,0,0,0},{0,0,0,0}) < metric({0,0,0,0},{1,0,0,0}) );
+    REQUIRE( metric({0,0,0,0},{0,0,0,1}) < metric({0,0,0,0},{0,1,0,0}) );
+    REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,1}) );
+    REQUIRE( metric({0,0,0,0},{1,1,0,0}) < metric({0,0,0,0},{1,1,0,1}) );
+    REQUIRE( metric({0,0,0,0},{1,1,0,1}) == metric({0,0,0,0},{1,1,1,0}) );
+    REQUIRE( metric({0,0,0,0},{0,0,1,1}) == metric({0,0,0,0},{0,0,1,0}) );
+
+    emp::Random rand(1);
+    for (size_t i = 0; i < 1000; ++i) {
+      emp::BitSet<4> a(rand);
+      emp::BitSet<4> b(rand);
+      REQUIRE(metric(a,b) <= 1.0);
+      REQUIRE(metric(a,b) >= 0.0);
+    }
+
+  }
+
+  // test ExactDualStreakMetric
+  {
+
+    emp::ExactDualStreakMetric<4> metric;
+
+    REQUIRE( metric({0,0,0,0},{0,0,0,0}) < metric({0,0,0,0},{1,0,0,0}) );
+    REQUIRE( metric({0,0,0,0},{0,0,0,1}) < metric({0,0,0,0},{0,1,0,0}) );
+    REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,1}) );
+    REQUIRE( metric({0,0,0,0},{1,1,0,0}) < metric({0,0,0,0},{1,1,0,1}) );
+    REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,0}) );
+    REQUIRE( metric({0,0,0,0},{0,0,1,1}) > metric({0,0,0,0},{0,0,1,0}) );
+
+    emp::Random rand(1);
+    for (size_t i = 0; i < 1000; ++i) {
+      emp::BitSet<4> a(rand);
+      emp::BitSet<4> b(rand);
+      REQUIRE(metric(a,b) <= 1.0);
+      REQUIRE(metric(a,b) >= 0.0);
+    }
+
+  }
+
   // test SieveSelector with auto adjust
   {
   emp::Random rand(1);
@@ -3456,11 +3562,6 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(bitBin.GetVals(bitBin.Match(bs128, 2)) == (emp::vector<std::string> {"one","one-two-eight"}));
   REQUIRE(bitBin.GetTags(bitBin.Match(bs128, 2)) == (emp::vector<emp::BitSet<8>> {bs1,bs128}));
 
-  bitBin.SetRegulator(one, 1.977);
-
-  REQUIRE(bitBin.GetVals(bitBin.Match(bs128, 5)) == (emp::vector<std::string> {"one-two-eight","fifteen","one-two-seven","one"}));
-  REQUIRE(bitBin.GetTags(bitBin.Match(bs128, 5)) == (emp::vector<emp::BitSet<8>> {bs128, bs15, bs127, bs1}));
-
   }
 
   {
@@ -3722,14 +3823,18 @@ TEST_CASE("Test MatchBin", "[tools]")
   // instead of 0 matching with 0 and 1 matching with 1
   REQUIRE(
     anti_streak(bs_000, bs_111)
-    ==
+    -
     streak(bs_111, bs_111)
+    <= std::numeric_limits<double>::epsilon()
+    // instead of doing == because of floating imprecision
   );
 
   REQUIRE(
     anti_streak(bs_011, bs_000)
-    ==
+    -
     streak(bs_011, bs_111)
+    <= std::numeric_limits<double>::epsilon()
+    // instead of doing == because of floating imprecision
   );
 
   REQUIRE(

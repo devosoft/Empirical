@@ -298,10 +298,15 @@ namespace emp {
 
   };
 
-  /// Matches based on the longest segment of equal and uneqal bits in two bitsets
+  /// Matches based on longest streaks of equal bits in two bitsets.
+  /// This implementation uses Incorrect Math from Downing's Intelligence
+  /// Emerging.
   /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
   template<size_t Width>
-  struct StreakMetric : public BaseMetric<emp::BitSet<Width>, emp::BitSet<Width>> {
+  struct ApproxSingleStreakMetric : public BaseMetric<
+    emp::BitSet<Width>,
+    emp::BitSet<Width>
+  > {
 
     using query_t = emp::BitSet<Width>;
     using tag_t = emp::BitSet<Width>;
@@ -314,7 +319,50 @@ namespace emp {
       return emp::to_string(Width) + "-bit " + base();
     }
 
-    std::string base() const override { return "Streak Metric"; }
+    std::string base() const override { return "Approx Dual Streak Metric"; }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+      const emp::BitSet<Width> bs = a^b;
+      const size_t same = (~bs).LongestSegmentOnes();
+      const double ps = ProbabilityKBitSequence(same);
+
+      return ps;
+    }
+
+    inline double ProbabilityKBitSequence(size_t k) const {
+      // Bad Math
+      // ... at least clamp it
+      return std::clamp(
+        static_cast<double>(Width - k + 1) / std::pow(2, k),
+        0.0,
+        1.0
+      );
+    }
+
+  };
+
+  /// Matches based on longest streaks of equal and unequal bits in two bitsets.
+  /// This implementation uses Incorrect Math from Downing's Intelligence
+  /// Emerging.
+  /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
+  template<size_t Width>
+  struct ApproxDualStreakMetric : public BaseMetric<
+    emp::BitSet<Width>,
+    emp::BitSet<Width>
+  > {
+
+    using query_t = emp::BitSet<Width>;
+    using tag_t = emp::BitSet<Width>;
+
+    size_t dim() const override { return 1; }
+
+    size_t width() const override { return Width; }
+
+    std::string name() const override {
+      return emp::to_string(Width) + "-bit " + base();
+    }
+
+    std::string base() const override { return "Approx Dual Streak Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
       const emp::BitSet<Width> bs = a^b;
@@ -332,10 +380,159 @@ namespace emp {
     }
 
     inline double ProbabilityKBitSequence(size_t k) const {
-      return (Width - k + 1) / std::pow(2, k);
+      // Bad Math
+      // ... at least clamp it
+      return std::clamp(
+        static_cast<double>(Width - k + 1) / std::pow(2, k),
+        0.0,
+        1.0
+      );
     }
 
   };
+
+  /// Compute the probability of K or more heads in a row out of N flips.
+  /// Adapted from https://www.askamathematician.com/2010/07/q-whats-the-chance-of-getting-a-run-of-k-successes-in-n-bernoulli-trials-why-use-approximations-when-the-exact-answer-is-known/
+  /// Helper class for exact streak metrics
+  template<size_t N>
+  struct ExactStreakDistribution {
+
+    std::unordered_map<
+      std::tuple<size_t, size_t>, /* (min_heads, num_coins) */
+      double,
+      emp::TupleHash<size_t, size_t>
+    > computed;
+
+    ExactStreakDistribution() {
+      // prep the cache
+      for (size_t min_heads = 0; min_heads <= N; ++min_heads) {
+        StreakProbability(min_heads);
+      }
+    }
+
+    double StreakProbability(
+      const size_t min_heads,
+      const size_t num_coins=N
+    ) {
+
+      // check the cache
+      if (computed.find({min_heads, num_coins}) != std::end(computed)) {
+        return computed.at({min_heads, num_coins});
+      }
+
+      // edge cases for recursion
+      if (min_heads > num_coins || num_coins <= 0) return 0.0;
+
+      constexpr double head_prob = 0.5;
+
+      double res = emp::Pow(head_prob, static_cast<double>(min_heads));
+      for (size_t first_tail = 0; first_tail < min_heads; ++first_tail) {
+        res += (
+          emp::Pow(head_prob, static_cast<double>(first_tail))
+          * (1.0 - head_prob)
+          * StreakProbability(
+            min_heads,
+            num_coins - first_tail - 1
+          )
+        );
+      }
+
+      // cache result
+      computed[{min_heads, num_coins}] = res;
+
+      emp_assert(res >= 0.0 && res <= 1.0);
+
+      return res;
+
+    }
+
+  };
+
+  /// Matches based on longest streaks of equal and unequal bits in two bitsets.
+  /// This implementation uses Corect Math adapted from
+  /// https://www.askamathematician.com/2010/07/q-whats-the-chance-of-getting-a-run-of-k-successes-in-n-bernoulli-trials-why-use-approximations-when-the-exact-answer-is-known/
+  /// This metric is NOT uniformly distributed.
+  /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
+  template<size_t Width>
+  struct ExactDualStreakMetric : public BaseMetric<
+    emp::BitSet<Width>,
+    emp::BitSet<Width>
+  > {
+
+    using query_t = emp::BitSet<Width>;
+    using tag_t = emp::BitSet<Width>;
+
+    inline static ExactStreakDistribution<Width> distn;
+
+    size_t dim() const override { return 1; }
+
+    size_t width() const override { return Width; }
+
+    std::string name() const override {
+      return emp::to_string(Width) + "-bit " + base();
+    }
+
+    std::string base() const override { return "Exact Dual Streak Metric"; }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+      const emp::BitSet<Width> bs = a^b;
+      const size_t same = (~bs).LongestSegmentOnes();
+      const size_t different = bs.LongestSegmentOnes();
+      const double ps = distn.StreakProbability(same);;
+      const double pd = distn.StreakProbability(different);
+
+      const double match = pd / (ps + pd);
+      // Note: here, close match score > poor match score
+      // However, we're computing distance where smaller means closer match.
+      // Note also: 0.0 < match < 1.0
+      // So, we subtract match score from 1.0 to get a distance.
+      return 1.0 - match;
+    }
+
+  };
+
+  /// Matches based on longest streak of equal bits in two bitsets.
+  /// This implementation uses Corect Math adapted from
+  /// https://www.askamathematician.com/2010/07/q-whats-the-chance-of-getting-a-run-of-k-successes-in-n-bernoulli-trials-why-use-approximations-when-the-exact-answer-is-known/
+  /// This metric is uniformly distributed.
+  /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
+  template<size_t Width>
+  struct ExactSingleStreakMetric : public BaseMetric<
+    emp::BitSet<Width>,
+    emp::BitSet<Width>
+  > {
+
+    using query_t = emp::BitSet<Width>;
+    using tag_t = emp::BitSet<Width>;
+
+    inline static ExactStreakDistribution<Width> distn;
+
+    size_t dim() const override { return 1; }
+
+    size_t width() const override { return Width; }
+
+    std::string name() const override {
+      return emp::to_string(Width) + "-bit " + base();
+    }
+
+    std::string base() const override { return "Streak Metric"; }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+      const size_t same = (a.EQU(b)).LongestSegmentOnes();
+      // sampling from probabilty distribution
+      // and then viewing location in cumulative probability distribution
+      // gives us a uniform result
+      const double p_same = distn.StreakProbability(same);
+
+      return p_same;
+    }
+
+  };
+
+  /// Matches based on longest streaks of equal and unequal bits in two bitsets.
+  /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
+  template<size_t Width>
+  using StreakMetric = ApproxDualStreakMetric<Width>;
 
   template<typename Metric, size_t MaxCapacity=100000>
   struct CacheMod : public Metric {
