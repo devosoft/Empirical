@@ -371,7 +371,7 @@ namespace emp {
       const double ps = ProbabilityKBitSequence(same);
       const double pd = ProbabilityKBitSequence(different);
 
-      const double match = (pd / (ps + pd));
+      const double match = pd / (ps + pd);
       // Note: here, close match score > poor match score
       // However, we're computing distance where smaller means closer match.
       // Note also: 0.0 < match < 1.0
