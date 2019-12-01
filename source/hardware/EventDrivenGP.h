@@ -105,7 +105,7 @@ namespace emp {
       size_t,
       emp::HammingMetric<AFFINITY_WIDTH>,
       emp::RankedSelector<std::ratio<1,2>>,
-      emp::WeakCountdownRegulator<>
+      emp::MultiplicativeCountdownRegulator<>
     >
   > class EventDrivenGP_AW {
   public:

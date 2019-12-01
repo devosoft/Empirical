@@ -126,7 +126,7 @@ namespace emp {
   };
 
   template <typename Slope=std::ratio<1,10>>
-  struct WeakCountdownRegulator : RegulatorBase<double, double, double> {
+  struct AdditiveCountdownRegulator : RegulatorBase<double, double, double> {
 
     static constexpr double slope = (
       static_cast<double>(Slope::num) / static_cast<double>(Slope::den)
@@ -136,26 +136,32 @@ namespace emp {
     // negative = upregulated
     double state;
     // state | add to match score
-    // +inf  | +1.0
+    // +inf  | += 1.0
     // ...   | ...
-    // 1.0   | ~ +slope
+    // 1.0   | += ~slope
     // 0.0   | neutral
-    // -1.0  | ~ -slope
+    // -1.0  | -= slope
     // ...   | ...
-    // -inf  | -1.0
+    // -inf  | -= 1.0
 
     // countdown timer to reseting state
     size_t timer;
 
-    WeakCountdownRegulator() : state(0.0), timer(0) {}
+    AdditiveCountdownRegulator() : state(0.0), timer(0) {}
 
     /// Apply regulation to a raw match score.
+    /// Returns a value between 0.0 and 1.0
     double operator()(const double raw_score) const override {
-      return std::clamp(
+      const double res = std::clamp(
         std::tanh(slope * state) + raw_score,
         0.0,
         1.0
       );
+      emp_assert(state <= 0 || res > raw_score);
+      emp_assert(state >= 0 || res < raw_score);
+      emp_assert(res >= 0.0 && res <= 1.0);
+      return res;
+
     }
 
     /// A positive value downregulates the item,
@@ -201,9 +207,124 @@ namespace emp {
     /// Return a double representing the state of the regulator.
     const double & View() const override { return state; }
 
-    std::string name() const override { return "Weak Timer Regulator"; }
+    std::string name() const override {
+      return "Additive Countdown Regulator";
+    }
 
-    bool operator!=(const WeakCountdownRegulator & other) const {
+    bool operator!=(const AdditiveCountdownRegulator & other) const {
+      return state != other.state || timer != other.timer;
+    }
+
+    template <class Archive>
+    void serialize( Archive & ar )
+    {
+      ar(
+        CEREAL_NVP(state),
+        CEREAL_NVP(timer)
+      );
+    }
+
+  };
+
+  template <typename Slope=std::ratio<1,10>>
+  struct MultiplicativeCountdownRegulator : RegulatorBase<double, double, double> {
+
+    static constexpr double slope = (
+      static_cast<double>(Slope::num) / static_cast<double>(Slope::den)
+    );
+
+    // positive = downregulated
+    // negative = upregulated
+    double state;
+    // state | add to match score
+    // +inf  | += 1.0 * (1.0 - score)
+    // ...   | ...
+    // 1.0   | += ~slope * (1.0 - score)
+    // 0.0   | neutral
+    // -1.0  | -= ~slope * score
+    // ...   | ...
+    // -inf  | -= 1.0 * score
+
+    // which is equivalent to
+    // state | add to match score
+    // +inf  | += 1.0 * (1.0 - score)
+    // ...   | ...
+    // 1.0   | += ~slope * (1.0 - score)
+    // 0.0   | neutral
+    // -1.0  | += ~slope * -score
+    // ...   | ...
+    // -inf  | += 1.0 * -score
+
+    // countdown timer to reseting state
+    size_t timer;
+
+    MultiplicativeCountdownRegulator() : state(0.0), timer(0) {}
+
+    /// Apply regulation to a raw match score.
+    /// Returns a value between 0 and 1.
+    double operator()(const double raw_score) const override {
+      const double res = (
+        raw_score
+        + std::tanh(slope * state) * (
+          state < 0
+          ? raw_score
+          : 1.0 - raw_score
+        )
+      );
+      emp_assert(state <= 0 || res > raw_score);
+      emp_assert(state >= 0 || res < raw_score);
+      emp_assert(res >= 0.0 && res <= 1.0);
+      return res;
+    }
+
+    /// A positive value downregulates the item,
+    /// a value of zero is neutral,
+    /// and a negative value upregulates the item.
+    bool Set(const double & set) override {
+      timer = 1;
+
+      // return whether regulator value changed
+      // (i.e., we need to purge the cache)
+      return std::exchange(state, set) != set;
+    }
+
+    /// A negative value upregulates the item,
+    /// a value of exactly zero is neutral
+    /// and a postive value downregulates the item.
+    bool Adj(const double & amt) override {
+      timer = 1;
+
+      state += amt;
+
+      // return whether regulator value changed
+      // (i.e., we need to purge the cache)
+      return amt != 0.0;
+    }
+
+    /// Timer decay.
+    /// Return whether MatchBin should be updated
+    bool Decay(const int steps) override {
+      if (steps < 0) {
+        // if reverse decay is requested
+        timer += -steps;
+      } else {
+        // if forward decay is requested
+        timer -= std::min(timer, static_cast<size_t>(steps));
+      }
+
+      return timer == 0 ? (
+        std::exchange(state, 0.0) != 0.0
+      ) : false;
+    }
+
+    /// Return a double representing the state of the regulator.
+    const double & View() const override { return state; }
+
+    std::string name() const override {
+      return "Multiplicative Countdown Regulator";
+    }
+
+    bool operator!=(const MultiplicativeCountdownRegulator & other) const {
       return state != other.state || timer != other.timer;
     }
 

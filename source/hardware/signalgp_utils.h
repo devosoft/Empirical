@@ -97,7 +97,7 @@ namespace emp {
       size_t,
       emp::HammingMetric<TAG_WIDTH>,
       emp::RankedSelector<std::ratio<1,2>>,
-      emp::WeakCountdownRegulator<>
+      emp::MultiplicativeCountdownRegulator<>
     >
   > typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>::Instruction
   GenRandSignalGPInst(
@@ -131,7 +131,7 @@ namespace emp {
       size_t,
       emp::HammingMetric<TAG_WIDTH>,
       emp::RankedSelector<std::ratio<1,2>>,
-      emp::WeakCountdownRegulator<>
+      emp::MultiplicativeCountdownRegulator<>
     >
   > typename EventDrivenGP_AW<TAG_WIDTH, TRAIT_T, MATCHBIN_T>::Function
   GenRandSignalGPFunction(
@@ -171,7 +171,7 @@ namespace emp {
       size_t,
       emp::HammingMetric<TAG_WIDTH>,
       emp::RankedSelector<std::ratio<1,2>>,
-      emp::WeakCountdownRegulator<>
+      emp::MultiplicativeCountdownRegulator<>
     >
   > typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>::Program
   GenRandSignalGPProgram(
@@ -227,7 +227,7 @@ namespace emp {
       size_t,
       emp::HammingMetric<TAG_WIDTH>,
       emp::RankedSelector<std::ratio<1,2>>,
-      emp::WeakCountdownRegulator<>
+      emp::MultiplicativeCountdownRegulator<>
     >
   > class SignalGPMutator {
   public:

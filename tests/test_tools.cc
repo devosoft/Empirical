@@ -2249,7 +2249,7 @@ TEST_CASE("Test matchbin_utils", "[tools]")
     std::string,
     emp::NextUpMetric<>,
     emp::SieveSelector<>,
-    emp::WeakCountdownRegulator<>
+    emp::AdditiveCountdownRegulator<>
   > bin(rand);
 
   bin.Put("one", 1);
@@ -2316,7 +2316,7 @@ TEST_CASE("Test matchbin_utils", "[tools]")
     std::string,
     emp::NextUpMetric<>,
     emp::SieveSelector<std::ratio<0,1>>,
-    emp::WeakCountdownRegulator<>
+    emp::AdditiveCountdownRegulator<>
   > bin(rand);
 
   bin.Put("one", 1);
@@ -2384,7 +2384,7 @@ TEST_CASE("Test matchbin_utils", "[tools]")
       std::ratio<1, 10>,
       std::ratio<1, 5>
     >,
-    emp::WeakCountdownRegulator<>
+    emp::AdditiveCountdownRegulator<>
   > bin(rand);
 
   bin.Put("one", 1);
@@ -2754,7 +2754,7 @@ TEST_CASE("Test matchbin_utils", "[tools]")
 
   }
 
-  // tests for WeakCountdownRegulator
+  // tests for AdditiveCountdownRegulator
   {
 
   emp::Random rand(1);
@@ -2763,37 +2763,54 @@ TEST_CASE("Test matchbin_utils", "[tools]")
     std::string,
     emp::AbsDiffMetric,
     emp::RouletteSelector<>,
-    emp::WeakCountdownRegulator<>
+    emp::AdditiveCountdownRegulator<>
   >bin(rand);
+
+  const size_t ndraws = 100000;
 
   const size_t hi = bin.Put("hi", std::numeric_limits<int>::max()/5);
   REQUIRE( bin.GetVal(hi) == "hi" );
-  const size_t salut = bin.Put("salut", 0);
+  const size_t salut = bin.Put("salut", std::numeric_limits<int>::max()/100);
   REQUIRE( bin.GetVal(salut) == "salut" );
 
   REQUIRE( bin.Size() == 2 );
   REQUIRE( bin.ViewRegulator(hi) == 0.0 );
   REQUIRE( bin.ViewRegulator(salut) == 0.0 );
 
-  auto res = bin.GetVals(bin.Match(0, 100000));
+  auto res = bin.GetVals(bin.Match(0, ndraws));
   const size_t count = std::count(std::begin(res), std::end(res), "salut");
-  REQUIRE( count > 50000);
+  REQUIRE( count > ndraws/2);
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
 
-  bin.AdjRegulator(salut, 2.0); // downregulate
+  bin.AdjRegulator(salut, 20.0); // downregulate
+  REQUIRE( bin.ViewRegulator(salut) == 20.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
+
+  bin.AdjRegulator(hi, -20.0); // upregulate
+  bin.AdjRegulator(salut, -20.0); // upregulate
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == -20.0 );
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
+
+  bin.SetRegulator(salut, 2.0); // downregulate
   bin.SetRegulator(hi, -2.0); // upregulate
   REQUIRE( bin.ViewRegulator(salut) == 2.0 );
   REQUIRE( bin.ViewRegulator(hi) == -2.0 );
 
-  res = bin.GetVals(bin.Match(0, 100000));
+  res = bin.GetVals(bin.Match(0, ndraws));
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
-  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 50000 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
 
   bin.SetRegulator(salut, -1.0); // upregulate
   bin.SetRegulator(hi, 1.0); // downregulate
   REQUIRE( bin.ViewRegulator(salut) == -1.0 );
   REQUIRE( bin.ViewRegulator(hi) == 1.0 );
-  res = bin.GetVals(bin.Match(0, 100000));
+  res = bin.GetVals(bin.Match(0, ndraws));
   const size_t hi_count = std::count(std::begin(res), std::end(res), "salut");
   REQUIRE( hi_count > count );
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
@@ -2802,7 +2819,7 @@ TEST_CASE("Test matchbin_utils", "[tools]")
   REQUIRE( bin.ViewRegulator(salut) == -1.0 );
   REQUIRE( bin.ViewRegulator(hi) == 1.0 );
 
-  res = bin.GetVals(bin.Match(0, 100000));
+  res = bin.GetVals(bin.Match(0, ndraws));
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
 
@@ -2811,7 +2828,7 @@ TEST_CASE("Test matchbin_utils", "[tools]")
   REQUIRE( bin.ViewRegulator(salut) == -1.0 );
   REQUIRE( bin.ViewRegulator(hi) == 1.0 );
 
-  res = bin.GetVals(bin.Match(0, 100000));
+  res = bin.GetVals(bin.Match(0, ndraws));
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
 
@@ -2819,7 +2836,91 @@ TEST_CASE("Test matchbin_utils", "[tools]")
   bin.DecayRegulator(hi, 1);
   REQUIRE( bin.ViewRegulator(salut) == 0.0 );
   REQUIRE( bin.ViewRegulator(hi) == 0.0 );
-  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 50000 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > ndraws/2 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") < hi_count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  }
+
+  // tests for MultiplicativeCountdownRegulator
+  {
+
+  emp::Random rand(1);
+
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::RouletteSelector<>,
+    emp::MultiplicativeCountdownRegulator<>
+  >bin(rand);
+
+  const size_t ndraws = 1000000;
+
+  const size_t hi = bin.Put("hi", std::numeric_limits<int>::max()/2);
+  REQUIRE( bin.GetVal(hi) == "hi" );
+  const size_t salut = bin.Put("salut", std::numeric_limits<int>::max()/10);
+  REQUIRE( bin.GetVal(salut) == "salut" );
+
+  REQUIRE( bin.Size() == 2 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+
+  auto res = bin.GetVals(bin.Match(0, ndraws));
+  const size_t count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( count > ndraws/2);
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.AdjRegulator(salut, 20.0); // downregulate
+  REQUIRE( bin.ViewRegulator(salut) == 20.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
+
+  bin.AdjRegulator(hi, -20.0); // upregulate
+  bin.AdjRegulator(salut, -20.0); // restore
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == -20.0 );
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
+
+  bin.SetRegulator(salut, 5.0); // downregulate
+  bin.SetRegulator(hi, -5.0); // upregulate
+  REQUIRE( bin.ViewRegulator(salut) == 5.0 );
+  REQUIRE( bin.ViewRegulator(hi) == -5.0 );
+
+  bin.SetRegulator(salut, -1.0); // upregulate
+  bin.SetRegulator(hi, 1.0); // downregulate
+  REQUIRE( bin.ViewRegulator(salut) == -1.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 1.0 );
+  res = bin.GetVals(bin.Match(0, ndraws));
+  const size_t hi_count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( hi_count > count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.DecayRegulator(salut, -2);
+  REQUIRE( bin.ViewRegulator(salut) == -1.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 1.0 );
+
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.DecayRegulator(salut, 1);
+  bin.DecayRegulator(hi, 0);
+  REQUIRE( bin.ViewRegulator(salut) == -1.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 1.0 );
+
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.DecayRegulator(salut, 500);
+  bin.DecayRegulator(hi, 1);
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > ndraws/2 );
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") < hi_count );
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
 
