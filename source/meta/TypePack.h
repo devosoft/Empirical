@@ -76,7 +76,7 @@ namespace emp {
   // Create a null type for padding.
   struct null_t {};
 
-  // Anonymous helpers for TypePack
+  // Private helpers for TypePack
   namespace internal {
     // Create add N copies of the same type to the end of a TypePack.
     template <typename START, typename T, int N>
@@ -159,6 +159,42 @@ namespace emp {
 
     template <typename T, template <typename...> class W>
       using tp_wrap_t = typename tp_wrap<T,W,T::SIZE>::type;
+
+    // Tools to build all combinations of types from a TypePack
+    template <size_t size,
+              typename ALL_OPTIONS,
+              typename CUR_OPTIONS>
+    struct all_combos {
+      // Determine combinations for one level smaller.
+      using next_combos = typename all_combos<size-1, ALL_OPTIONS, ALL_OPTIONS>::result_t;
+
+      using cur_type = typename CUR_OPTIONS::first_t;
+      using next_options = typename CUR_OPTIONS::pop;
+      template <typename T>
+      using push_wrap = typename T::template push_back<cur_type>;
+
+      // pushed_types is the set of currently-built types with the FIRST option added on.
+      using pushed_types = typename next_combos::template wrap<push_wrap>;
+
+      // other_results is the set of currently built types with the OTHER options added on.
+      using other_results = typename all_combos<size, ALL_OPTIONS, next_options>::result_t;
+
+      // cur_result_t is the merger of pushed_type and other types (i.e., ALL types added on)
+      using result_t = typename pushed_types::template merge<other_results>;
+    };
+
+    // When we are out of options return an empty pack.
+    template <size_t size,
+              typename ALL_OPTIONS>
+    struct all_combos<size, ALL_OPTIONS, emp::TypePack<>> {
+      using result_t = emp::TypePack<>;
+    };
+
+    // If we are out of combinations, just return the current answer.
+    template <typename ALL_OPTIONS>
+    struct all_combos<0,ALL_OPTIONS,ALL_OPTIONS> {
+      using result_t = emp::TypePack<emp::TypePack<>>;
+    };
   }
 
   template <typename T, int N>
@@ -235,7 +271,7 @@ namespace emp {
     template <int N, typename DEFAULT=null_t>
       using resize = typename pad<DEFAULT,(N>SIZE)?(N-SIZE):0>::template shrink<N>;
 
-    /// Join this TypePack with another TypePack.
+    /// Join this TypePack with another TypePack (append)
     template <typename IN> using merge = typename internal::tp_shift<IN::SIZE, this_t, IN>::type1;
 
     /// Join this TypePack with another, keeping only one of each type.
@@ -288,6 +324,10 @@ namespace emp {
     /// Wrap all types in a specified wrapper template.
     template <template <typename...> class WRAPPER>
     using wrap = internal::tp_wrap_t<this_t, WRAPPER>;
+
+    /// Figure out all of the combinations of types possible.
+    template <size_t COMBO_SIZE>
+    using make_combos = typename internal::all_combos<COMBO_SIZE,this_t,this_t>::result_t;
   };
 
   // Specialized TypePack with no types.

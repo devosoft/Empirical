@@ -1,15 +1,19 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2019.
  *
  *  @file  BitVector.h
  *  @brief A drop-in replacement for std::vector<bool>, with additional bitwise logic features.
  *  @note Status: RELEASE
  *
+ *  @todo Do small BitVector optimization.  Currently we have number of bits (8 bytes) and a
+ *        pointer to the memory for the bitset (another 8 bytes), but we could use those 16 bytes
+ *        as 1 byte of size info followed by 15 bytes of bitset (120 bits!)
+ *  @todo For BitVectors larger than 120 bits, we can use a factory to preserve bit info.
  *  @todo Implement append(), resize()...
  *  @todo Implement techniques to push bits (we have pop)
- *  @todo Implement techniques to insert of remove bits from middle.
+ *  @todo Implement techniques to insert or remove bits from middle.
  *
  *  @note This class is 15-20% slower than emp::BitSet, but more flexible & run-time configurable.
  */

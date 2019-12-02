@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
+ *  @date 2016-2019.
  *
  *  @file  type_traits.h
  *  @brief Extensions on the standard library type traits to handle Empirical classes (such as Ptr).
@@ -19,8 +19,17 @@
 
 namespace emp {
 
+  /// Determine if a type passed in is an std::function type (vs a lambda or a raw function)
+  template <typename> struct is_std_function : std::false_type { };
+  template <typename... Ts> struct is_std_function<std::function<Ts...>> : std::true_type { };
+
+  /// Convert std::function to base function type.
+  template <typename T> struct remove_std_function_type { using type = T; };
+  template <typename T> struct remove_std_function_type<std::function<T>> { using type = T; };
+  template <typename T> using remove_std_function_t = typename remove_std_function_type<T>::type;
+
   // Customized type traits; for the moment, make sure that emp::Ptr is handled correctly.
-  template <typename T> struct is_ptr_type : public std::false_type { };
+  template <typename> struct is_ptr_type : public std::false_type { };
   template <typename T> struct is_ptr_type<T*> : public std::true_type { };
   template <typename T> struct is_ptr_type<T* const> : public std::true_type { };
   template <typename T> struct is_ptr_type<Ptr<T>> : public std::true_type { };
