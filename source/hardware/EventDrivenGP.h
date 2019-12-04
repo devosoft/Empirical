@@ -475,6 +475,7 @@ namespace emp {
 
       void SetProgram(const program_t & _program) {
         program = _program;
+        for (auto & f : program) f.SetMatchBinRefreshFun(fun_matchbin_refresh);
         fun_matchbin_refresh();
       }
 
