@@ -23,6 +23,7 @@
 #define EMP_BIT_VECTOR_H
 
 #include <iostream>
+#include <bitset>
 
 #include "../base/assert.h"
 #include "../base/Ptr.h"
@@ -31,6 +32,8 @@
 #include "bitset_utils.h"
 #include "functions.h"
 #include "math.h"
+
+
 
 namespace emp {
 
@@ -544,18 +547,16 @@ namespace emp {
       }
       return bit_count;
     }
-
-    /// Count 1's in semi-parallel; fastest for even 0's & 1's
+    // TODO: see https://arxiv.org/pdf/1611.07612.pdf for faster pop counts
     size_t CountOnes_Mixed() const {
-      const size_t NUM_FIELDS = NumFields() * sizeof(field_t)/4;
-      Ptr<const uint32_t> uint_bit_set = bit_set.Cast<const uint32_t>();
+      const field_t NUM_FIELDS = (1 + ((num_bits - 1) / FIELD_BITS));
       size_t bit_count = 0;
       for (size_t i = 0; i < NUM_FIELDS; i++) {
-        const uint32_t v = uint_bit_set[i];
-        const uint32_t t1 = v - ((v >> 1) & 0x55555555);
-        const uint32_t t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
-        bit_count += (((t2 + (t2 >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
-      }
+          // when compiling with -O3 and -msse4.2, this is the fastest population count method.
+          std::bitset<FIELD_BITS> std_bs(bit_set[i]);
+          bit_count += std_bs.count();
+       }
+
       return bit_count;
     }
 
