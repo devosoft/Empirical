@@ -274,13 +274,12 @@ namespace web {
     const internal::DivInfo * Info() const { return (internal::DivInfo *) info; }
 
   public:
-    Div(const std::string & in_name) : WidgetFacet(in_name) {
+    Div(const std::string & in_name="") : WidgetFacet(in_name) {
       // When a name is provided, create an associated Widget info.
       info = new internal::DivInfo(in_name);
     }
     Div(const Div & in) : WidgetFacet(in) { ; }
     Div(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsDiv()); }
-    Div() { ; }
     ~Div() { ; }
 
     using INFO_TYPE = internal::DivInfo;
