@@ -5229,11 +5229,11 @@ TEST_CASE("Test random", "[tools]")
   // by central limit theorem,
   // Std(mean) =  Std(observation) / sqrt(num observs)
   // Std(mean) = 0.28867513459481287 / sqrt(100000) = 0.0009128709291752767
-  // 0.005 / 0.0009128709291752767 = 5.4 standard deviations
-  // from WolframAlpha, 6.664E-8 of observations outside 5.4 standard deviations
+  // 0.0035 / 0.0009128709291752767 = 4 standard deviations
+  // from WolframAlpha, 6.334×10^-5 observations outside 5.4 standard deviations
   // with 500 reps fail rate is 1 - (1 - 1E-8) ^ 500 = 5E-6
   const size_t num_tests = 100000;
-  const double error_thresh = 0.005;
+  const double error_thresh = 0.0035;
   const double min_value = 2.5;
   const double max_value = 8.7;
 
