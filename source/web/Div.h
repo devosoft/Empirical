@@ -45,12 +45,13 @@ namespace web {
   class Selector;
   class Div;
   class Table;
+  class Element;
 
   namespace internal {
 
     class TableInfo;
     class DivInfo : public internal::WidgetInfo {
-      friend Div; friend TableInfo;
+      friend Element; friend Div; friend TableInfo;
     protected:
       double scroll_top;                              ///< Where should div scroll to? (0.0 to 1.0)
       emp::vector<Widget> m_children;                 ///< Widgets contained in this one.
@@ -273,13 +274,13 @@ namespace web {
     const internal::DivInfo * Info() const { return (internal::DivInfo *) info; }
 
   public:
-    Div(const std::string & in_name="", const std::string & in_tag="div")
-    : WidgetFacet(in_name) {
+    Div(const std::string & in_name) : WidgetFacet(in_name) {
       // When a name is provided, create an associated Widget info.
-      info = new internal::DivInfo(in_name, in_tag);
+      info = new internal::DivInfo(in_name);
     }
     Div(const Div & in) : WidgetFacet(in) { ; }
     Div(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsDiv()); }
+    Div() { ; }
     ~Div() { ; }
 
     using INFO_TYPE = internal::DivInfo;
@@ -289,12 +290,6 @@ namespace web {
 
     /// Set the scroll position.
     Div & ScrollTop(double in_top) { Info()->scroll_top = in_top; return *this; }
-
-    /// Set the html tag.
-    Div & SetTag(const std::string & in_tag) {
-      Info()->DoSetTag(in_tag);
-      return *this;
-    }
 
     /// Clear the contents of this div.
     void Clear() { if (info) Info()->Clear(); }
