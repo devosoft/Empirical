@@ -269,7 +269,7 @@ namespace web {
   /// A widget to track a div in an HTML file, and all of its contents.
   class Div : public internal::WidgetFacet<Div> {
   protected:
-    // Get a properly cast version of indo.
+    // Get a properly cast version of info.
     internal::DivInfo * Info() { return (internal::DivInfo *) info; }
     const internal::DivInfo * Info() const { return (internal::DivInfo *) info; }
 
