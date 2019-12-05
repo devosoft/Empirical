@@ -271,8 +271,8 @@ namespace emp {
           : 1.0 - raw_score
         )
       );
-      emp_assert(state <= 0 || res > raw_score);
-      emp_assert(state >= 0 || res < raw_score);
+      emp_assert(state <= 0 || res >= raw_score);
+      emp_assert(state >= 0 || res <= raw_score);
       emp_assert(res >= 0.0 && res <= 1.0);
       return res;
     }
