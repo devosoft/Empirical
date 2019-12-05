@@ -2833,7 +2833,7 @@ TEST_CASE("Test matchbin_utils", "[tools]")
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
 
   bin.DecayRegulator(salut, 500);
-  bin.DecayRegulator(hi, 1);
+  bin.DecayRegulators();
   REQUIRE( bin.ViewRegulator(salut) == 0.0 );
   REQUIRE( bin.ViewRegulator(hi) == 0.0 );
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") > ndraws/2 );

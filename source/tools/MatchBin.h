@@ -87,6 +87,7 @@ namespace emp {
       const uid_t uid,
       const int steps
     ) = 0;
+    virtual void DecayRegulators(const int steps=1) = 0;
     virtual void AdjRegulator(
       const uid_t uid,
       const typename Regulator::adj_t & amt
@@ -479,6 +480,13 @@ namespace emp {
         state.regulators.at(uid).Decay(steps)
       ) ClearRegulatedCache();
 
+    }
+
+    /// Apply decay to all regulators.
+    void DecayRegulators(const int steps=1) override {
+      for (auto & [uid, regulator] : state.regulators) {
+        if ( regulator.Decay(steps) ) ClearRegulatedCache();
+      }
     }
 
     /// Set up regulators to match target MatchBin
