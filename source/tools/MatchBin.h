@@ -22,9 +22,6 @@
 #include <ratio>
 #include <math.h>
 
-#include <cereal/types/unordered_map.hpp>
-#include <cereal/types/vector.hpp>
-
 #include "../base/assert.h"
 #include "../base/vector.h"
 #include "../tools/IndexMap.h"
@@ -45,6 +42,7 @@ namespace emp {
     std::unordered_map<uid_t, tag_t> tags;
     emp::vector<uid_t> uids;
 
+    #ifdef CEREAL_NVP
     template <class Archive>
     void serialize( Archive & ar )
     {
@@ -55,7 +53,7 @@ namespace emp {
         CEREAL_NVP(uids)
       );
     }
-
+    #endif
   };
 
   /// Abstract base class for MatchBin

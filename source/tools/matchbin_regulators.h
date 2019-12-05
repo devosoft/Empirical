@@ -115,6 +115,7 @@ namespace emp {
       return state != other.state;
     }
 
+    #ifdef CEREAL_NVP
     template <class Archive>
     void serialize( Archive & ar )
     {
@@ -122,6 +123,7 @@ namespace emp {
         CEREAL_NVP(state)
       );
     }
+    #endif
 
   };
 
@@ -215,6 +217,7 @@ namespace emp {
       return state != other.state || timer != other.timer;
     }
 
+    #ifdef CEREAL_NVP
     template <class Archive>
     void serialize( Archive & ar )
     {
@@ -223,6 +226,7 @@ namespace emp {
         CEREAL_NVP(timer)
       );
     }
+    #endif
 
   };
 
@@ -328,6 +332,7 @@ namespace emp {
       return state != other.state || timer != other.timer;
     }
 
+    #ifdef CEREAL_NVP
     template <class Archive>
     void serialize( Archive & ar )
     {
@@ -336,6 +341,7 @@ namespace emp {
         CEREAL_NVP(timer)
       );
     }
+    #endif
 
   };
 
