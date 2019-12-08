@@ -47,9 +47,9 @@ namespace emp {
   struct RouletteCacheState : public CacheStateBase {
 
     emp::IndexMap indexMap;
-    emp::vector<size_t> uids;
+    const emp::vector<size_t> uids;
     emp::Random &rand;
-    size_t default_n;
+    const size_t default_n;
 
     RouletteCacheState(
       emp::IndexMap& im,
@@ -92,10 +92,10 @@ namespace emp {
 
   struct SieveCacheState : public CacheStateBase {
 
-    emp::vector<size_t> uids;
-    emp::vector<double> probs;
+    const emp::vector<size_t> uids;
+    const emp::vector<double> probs;
     emp::Random &rand;
-    size_t default_n;
+    const size_t default_n;
 
     SieveCacheState(
       emp::vector<size_t>::iterator uids_begin,
@@ -140,8 +140,7 @@ namespace emp {
     tracker_t & tracker;
     emp::vector<size_t> uids;
     emp::vector<double> depo_impacts;
-    emp::Random rand;
-    size_t default_n;
+    const size_t default_n;
 
     // TODO thresh by uid
     // have Selector store a uid to double map
@@ -188,9 +187,9 @@ namespace emp {
 
   struct RankedCacheState: public CacheStateBase {
 
-    emp::vector<size_t> uids;
-    size_t requestSize;
-    size_t default_n;
+    const emp::vector<size_t> uids;
+    const size_t requestSize;
+    const size_t default_n;
 
     RankedCacheState(
       emp::vector<size_t>::iterator begin,
