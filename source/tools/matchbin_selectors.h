@@ -129,6 +129,23 @@ namespace emp {
 
   };
 
+  namespace internal {
+    template<typename T>
+    struct ViewOnce {
+      std::optional<T> val;
+
+      void Set(const T set) {
+        val = set;
+      }
+
+      T View() {
+        emp_assert(val.has_value());
+        return *std::exchange(val, std::nullopt);
+      }
+
+    };
+  }
+
   struct DePoCacheState : public CacheStateBase {
 
     using tracker_t = std::unordered_map<
@@ -137,6 +154,8 @@ namespace emp {
     >;
 
     const double depo_thresh;
+    const double popo_setting;
+    internal::ViewOnce<double> & depo_strength;
     tracker_t & tracker;
     emp::vector<size_t> uids;
     emp::vector<double> depo_impacts;
@@ -148,12 +167,16 @@ namespace emp {
 
     DePoCacheState(
       const double depo_thresh_,
+      const double popo_setting_,
+      internal::ViewOnce<double> & depo_strength_,
       tracker_t & tracker_,
       emp::vector<size_t>::iterator uids_begin,
       emp::vector<size_t>::iterator uids_end,
       const emp::vector<double> & depo_impacts_,
       const size_t default_n_
     ) : depo_thresh(depo_thresh_)
+      , popo_setting(popo_setting_)
+      , depo_strength(depo_strength_)
       , tracker(tracker_)
       , uids(uids_begin, uids_end)
       , depo_impacts(depo_impacts_)
@@ -166,13 +189,16 @@ namespace emp {
 
       emp::vector<size_t> res;
 
+      const double strength = depo_strength.View();
+
       for (size_t i = 0; i < uids.size() && res.size() < n; ++i) {
 
         // if we haven't passed the threshold...
         if (tracker[uids[i]] < depo_thresh) {
-          tracker[uids[i]] += depo_impacts[i];
+          tracker[uids[i]] += depo_impacts[i] * strength;
           // if we just passed the threshold...
           if (tracker[uids[i]] >= depo_thresh) {
+            tracker[uids[i]] = popo_setting;
             res.push_back(uids[i]);
           }
         }
@@ -679,23 +705,6 @@ namespace emp {
 
   };
 
-  namespace internal {
-    template<typename T>
-    struct ViewOnce {
-      std::optional<T> val;
-
-      void Set(const T set) {
-        val = set;
-      }
-
-      T View() {
-        emp_assert(val.has_value());
-        return *std::exchange(val, std::nullopt);
-      }
-
-    };
-  }
-
   /// Selector treats each element of the MatchBin independently.
   /// As match distance increases, each element passes through
   /// a regime where selection is guaranteed, a regime where selection is
@@ -782,38 +791,36 @@ namespace emp {
         std::begin(uids),
         std::end(uids),
         [&scores, lock_in](size_t uid){
-          return scores.at(uid) < lock_in;
+          return scores.at(uid) < 2*lock_in;
         }
       );
 
-      const double strength = cur_depo_amt.View();
       emp::vector<double> depo_impacts;
       std::transform(
         std::begin(uids),
         partition,
         std::back_inserter(depo_impacts),
-        [&scores, lock_in, strength](size_t uid){
+        [&scores, lock_in](size_t uid){
           // goal:
-          // RAW SCORE:    0.0 ...   lock_in ... 1.0
-          // INTERMEDIATE: 0.0 ...   1.0     ... 1.0
-          // RESULT:       1.0 ...   0.0     ... 0.0
-          // FINAL: cur_depo_amt ... 0.0     ... 0.0
+          // RAW SCORE:    0.0 ...   lock_in ... 2*lock_in ... 1.0
+          // INTERMEDIATE: 0.0 ...   0.0     ... 1.0       ... 1.0
+          // RESULT:       1.0 ...   1.0     ... 0.0       ... 0.0
 
           const double raw_score = scores.at(uid);
-          const double intermediate = (
-            lock_in
-            ? raw_score / lock_in
-            : 0.0
-          );
+          const double intermediate = lock_in ? std::max(
+            0.0,
+            (raw_score - lock_in) / lock_in
+          ) : 0.0;
           const double res = 1.0 - intermediate;
           emp_assert(0.0 <= res && 1.0 >= res);
-          const double final = res * strength;
-          return final;
+          return res;
         }
       );
 
       return DePoCacheState(
         de_po_thresh,
+        -de_po_thresh,
+        cur_depo_amt,
         depo_tracker,
         std::begin(uids),
         partition,
