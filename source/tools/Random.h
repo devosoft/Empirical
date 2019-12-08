@@ -36,12 +36,12 @@ namespace emp {
 
     // Constants ////////////////////////////////////////////////////////////////
     // Statistical Approximation
-    constexpr int32_t _BINOMIAL_TO_NORMAL = 50;     // if < n*p*(1-p)
-    constexpr int32_t _BINOMIAL_TO_POISSON = 1000;  // if < n && !Normal approx Engine
+    static const int32_t _BINOMIAL_TO_NORMAL = 50;     // if < n*p*(1-p)
+    static const int32_t _BINOMIAL_TO_POISSON = 1000;  // if < n && !Normal approx Engine
 
     // Engine
-    constexpr int32_t _RAND_MBIG = 1000000000;
-    constexpr int32_t _RAND_MSEED = 161803398;
+    static const int32_t _RAND_MBIG = 1000000000;
+    static const int32_t _RAND_MSEED = 161803398;
 
     // Internal functions
 
