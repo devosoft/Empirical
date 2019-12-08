@@ -110,9 +110,9 @@ namespace emp {
   > class EventDrivenGP_AW {
   public:
     /// Maximum number of instruction arguments. Currently hardcoded. At some point, will make flexible.
-    static constexpr size_t MAX_INST_ARGS = 3;
+    constexpr size_t MAX_INST_ARGS = 3;
 
-    static constexpr size_t affinity_width = AFFINITY_WIDTH;
+    constexpr size_t affinity_width = AFFINITY_WIDTH;
 
     using EventDrivenGP_t = EventDrivenGP_AW<AFFINITY_WIDTH, TRAIT_T, MATCHBIN_T>;  //< Resolved type for this templated class.
     using mem_key_t = int;                                     //< Hardware memory map key type.
@@ -126,10 +126,10 @@ namespace emp {
     using matchbin_t = MATCHBIN_T;
 
     // A few default values. WARNING: I have no actual reason to believe these are the best defaults.
-    static constexpr size_t DEFAULT_MAX_CORES = 8;
-    static constexpr size_t DEFAULT_MAX_CALL_DEPTH = 128;
-    static constexpr mem_val_t DEFAULT_MEM_VALUE = 0.0;
-    static constexpr double DEFAULT_MIN_BIND_THRESH = 0.5;
+    constexpr size_t DEFAULT_MAX_CORES = 8;
+    constexpr size_t DEFAULT_MAX_CALL_DEPTH = 128;
+    constexpr mem_val_t DEFAULT_MEM_VALUE = 0.0;
+    constexpr double DEFAULT_MIN_BIND_THRESH = 0.5;
 
     /// Struct to represent an instance of an Event.
     /// Events have an associated ID, affinity, message, and set of properties.
