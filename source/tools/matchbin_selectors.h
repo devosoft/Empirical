@@ -48,10 +48,9 @@ namespace emp {
 
     emp::IndexMap indexMap;
     emp::vector<size_t> uids;
-    emp::Random rand;
+    emp::Random &rand;
     size_t default_n;
 
-    RouletteCacheState() = default;
     RouletteCacheState(
       emp::IndexMap& im,
       emp::vector<size_t>& ids,
@@ -95,10 +94,9 @@ namespace emp {
 
     emp::vector<size_t> uids;
     emp::vector<double> probs;
-    emp::Random rand;
+    emp::Random &rand;
     size_t default_n;
 
-    SieveCacheState() = default;
     SieveCacheState(
       emp::vector<size_t>::iterator uids_begin,
       emp::vector<size_t>::iterator uids_end,
@@ -137,7 +135,6 @@ namespace emp {
     size_t requestSize;
     size_t default_n;
 
-    RankedCacheState() = default;
     RankedCacheState(
       emp::vector<size_t>::iterator begin,
       size_t back,

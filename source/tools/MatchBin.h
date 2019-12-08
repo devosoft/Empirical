@@ -228,7 +228,11 @@ namespace emp {
 
       // maybe save result into cache
       if constexpr (cache_available) {
-        if (caching_activated) cache_regulated[query] = cacheResult;
+        if (caching_activated) cache_regulated.emplace(
+          std::piecewise_construct,
+          std::forward_as_tuple(query),
+          std::forward_as_tuple(cacheResult)
+        );
       }
 
       return cacheResult(n).value();
@@ -269,7 +273,11 @@ namespace emp {
 
       // maybe save result into cache
       if constexpr (cache_available) {
-        if (caching_activated) cache_raw[query] = cacheResult;
+        if (caching_activated) cache_raw.emplace(
+          std::piecewise_construct,
+          std::forward_as_tuple(query),
+          std::forward_as_tuple(cacheResult)
+        );
       }
 
       return cacheResult(n).value();
