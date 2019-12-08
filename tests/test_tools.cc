@@ -2139,6 +2139,80 @@ TEST_CASE("Test map_utils", "[tools]")
 TEST_CASE("Test matchbin_utils", "[tools]")
 {
 
+  // tests for DePoSelector
+  {
+
+  emp::Random rand(1);
+
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::DePoSelector<std::ratio<1, 5>>,
+    emp::AdditiveCountdownRegulator<>
+  >bin(rand);
+
+  const size_t hi = bin.Put("hi", std::numeric_limits<int>::max()/2);
+  REQUIRE( bin.GetVal(hi) == "hi" );
+  const size_t salut = bin.Put("salut", std::numeric_limits<int>::max()/10);
+  REQUIRE( bin.GetVal(salut) == "salut" );
+
+  REQUIRE( bin.Size() == 2 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+
+  // first try, we should get salut and no effect on hi
+  bin.GetSelector().SetCurDePoAmt(1.0);
+  auto res = bin.GetVals(bin.Match(0));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") == 1 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") == 0 );
+
+  // before decay, we already got salut so we should get nothing
+  bin.GetSelector().SetCurDePoAmt(1.0);
+  res = bin.GetVals(bin.Match(0));
+  REQUIRE(res.size() == 0);
+
+  // after decay we should get what we got before
+  bin.GetSelector().Decay();
+  bin.GetSelector().SetCurDePoAmt(1.0);
+  res = bin.GetVals(bin.Match(0));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") == 1 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") == 0 );
+
+  // with low depo amt it should take multiple pings to get a result
+  bin.GetSelector().Decay();
+
+  // ping 1
+  bin.GetSelector().SetCurDePoAmt(0.4);
+  res = bin.GetVals(bin.Match(0));
+  REQUIRE(res.size() == 0);
+  // ping 2
+  bin.GetSelector().SetCurDePoAmt(0.4);
+  res = bin.GetVals(bin.Match(0));
+  REQUIRE(res.size() == 0);
+  // ping 3
+  bin.GetSelector().SetCurDePoAmt(0.4);
+  res = bin.GetVals(bin.Match(0));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") == 1 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") == 0 );
+
+  // with poor match it should take multiple pings to get a result
+  bin.GetSelector().Decay();
+
+  // ping 1
+  bin.GetSelector().SetCurDePoAmt(1.0);
+  res = bin.GetVals(bin.Match(std::numeric_limits<int>::max()/4));
+  REQUIRE(res.size() == 1);
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") == 1 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") == 0 );
+  // ping 2
+  bin.GetSelector().SetCurDePoAmt(1.0);
+  res = bin.GetVals(bin.Match(std::numeric_limits<int>::max()/4));
+  REQUIRE(res.size() == 1);
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") == 0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") == 1 );
+
+  }
+
   // test ExactStreakDistribution
   {
     emp::ExactStreakDistribution<4> dist;
