@@ -190,6 +190,8 @@ namespace emp {
     , selector(rand)
     { ; }
 
+    Selector & GetSelector() { return selector; }
+
     /// Compare a query tag to all stored tags using the distance metric
     /// function and return a vector of unique IDs chosen by the selector
     /// function.

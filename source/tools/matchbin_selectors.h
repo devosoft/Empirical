@@ -129,6 +129,63 @@ namespace emp {
 
   };
 
+  struct DePoCacheState : public CacheStateBase {
+
+    using tracker_t = std::unordered_map<
+      size_t, // uids
+      double  // depolarizations
+    >;
+
+    const double depo_thresh;
+    tracker_t & tracker;
+    emp::vector<size_t> uids;
+    emp::vector<double> depo_impacts;
+    emp::Random rand;
+    size_t default_n;
+
+    // TODO thresh by uid
+    // have Selector store a uid to double map
+    // that instructions set directly
+
+    DePoCacheState(
+      const double depo_thresh_,
+      tracker_t & tracker_,
+      emp::vector<size_t>::iterator uids_begin,
+      emp::vector<size_t>::iterator uids_end,
+      const emp::vector<double> & depo_impacts_,
+      const size_t default_n_
+    ) : depo_thresh(depo_thresh_)
+      , tracker(tracker_)
+      , uids(uids_begin, uids_end)
+      , depo_impacts(depo_impacts_)
+      , default_n(default_n_)
+    { emp_assert(uids.size() == depo_impacts.size()); }
+
+    std::optional<emp::vector<size_t>> operator()(size_t n) override {
+
+      if (n == 0) n = default_n;
+
+      emp::vector<size_t> res;
+
+      for (size_t i = 0; i < uids.size() && res.size() < n; ++i) {
+
+        // if we haven't passed the threshold...
+        if (tracker[uids[i]] < depo_thresh) {
+          tracker[uids[i]] += depo_impacts[i];
+          // if we just passed the threshold...
+          if (tracker[uids[i]] >= depo_thresh) {
+            res.push_back(uids[i]);
+          }
+        }
+
+      }
+
+      return res;
+
+    }
+
+  };
+
   struct RankedCacheState: public CacheStateBase {
 
     emp::vector<size_t> uids;
@@ -616,6 +673,152 @@ namespace emp {
         partition,
         probabilities,
         rand,
+        DefaultN
+      );
+
+    }
+
+  };
+
+  namespace internal {
+    template<typename T>
+    struct ViewOnce {
+      std::optional<T> val;
+
+      void Set(const T set) {
+        val = set;
+      }
+
+      T View() {
+        emp_assert(val.has_value());
+        return *std::exchange(val, std::nullopt);
+      }
+
+    };
+  }
+
+  /// Selector treats each element of the MatchBin independently.
+  /// As match distance increases, each element passes through
+  /// a regime where selection is guaranteed, a regime where selection is
+  /// stochastic, and then a regime where non-selection is guaranteed.
+  template<
+    // beyond what threshold should matches be guaranteed?
+    // positive = raw score between 0.0 and 1.0
+    // negative = expected number of lockins based on MatchBin size
+    //            assuming score uniform distribution
+    typename LockInRatio = std::ratio<-1, 1>,
+    // what should the base depolarization threshold be?
+    typename DePoThreshRatio = std::ratio<1, 1>,
+    size_t DefaultN = std::numeric_limits<size_t>::max()
+  >
+  struct DePoSelector : public SelectorBase<DePoCacheState> {
+
+    using cache_state_type_t = DePoCacheState;
+
+    using tracker_t = std::unordered_map<
+      size_t, // uids
+      double  // depolarizations
+    >;
+
+    tracker_t depo_tracker;
+
+    internal::ViewOnce<double> cur_depo_amt;
+
+    DePoSelector(emp::Random & rand_) { ; }
+    DePoSelector() { ; }
+
+    std::string name() const override {
+      return emp::to_string(
+        "DePo Selector (",
+        "LockInRatio: ",
+        LockInRatio::num,
+        "/",
+        LockInRatio::den,
+        ", ",
+        "DePoThreshRatio: ",
+        DePoThreshRatio::num,
+        "/",
+        DePoThreshRatio::den,
+        "DefaultN: ",
+        DefaultN,
+        ")"
+      );
+    }
+
+    void SetCurDePoAmt(const double set) { cur_depo_amt.Set(set); }
+
+    void Decay() { depo_tracker.clear(); }
+
+    // scores (post-regulation) are assumed to be between 0 and 1
+    DePoCacheState operator()(
+      const emp::vector<size_t>& uids_,
+      const std::unordered_map<size_t, double>& scores,
+      size_t n
+    ) override {
+
+      if (n == 0) n = DefaultN;
+
+      emp::vector<size_t> uids(uids_);
+
+      // if n is too small, the Selector probably isn't being used correctly
+      // or the wrong Selector is probably being used
+      emp_assert(n >= uids.size());
+
+      constexpr double lock_in_raw = (
+        static_cast<double>(LockInRatio::num)
+          / static_cast<double>(LockInRatio::den)
+      );
+
+      const double lock_in = lock_in_raw < 0.0 ? (
+        (-1.0 * lock_in_raw) / static_cast<double>(uids.size())
+      ) : lock_in_raw;
+
+      // treat any negative numerator as positive infinity
+      const double de_po_thresh = (
+        static_cast<double>(DePoThreshRatio::num)
+          / static_cast<double>(DePoThreshRatio::den)
+      );
+
+      const auto partition = std::partition(
+        std::begin(uids),
+        std::end(uids),
+        [&scores, lock_in](size_t uid){
+          return scores.at(uid) < lock_in;
+        }
+      );
+
+      const double strength = cur_depo_amt.View();
+      emp::vector<double> depo_impacts;
+      std::transform(
+        std::begin(uids),
+        partition,
+        std::back_inserter(depo_impacts),
+        [&scores, lock_in, strength](size_t uid){
+          // goal:
+          // RAW SCORE:    0.0 ...   lock_in ... 1.0
+          // INTERMEDIATE: 0.0 ...   1.0     ... 1.0
+          // RESULT:       1.0 ...   0.0     ... 0.0
+          // FINAL: cur_depo_amt ... 0.0     ... 0.0
+
+          const double raw_score = scores.at(uid);
+          const double intermediate = (
+            lock_in
+            ? raw_score / lock_in
+            : 0.0
+          );
+          const double res = 1.0 - intermediate;
+          emp_assert(0.0 <= res && 1.0 >= res);
+          const double final = res * strength;
+          return final;
+        }
+      );
+
+      return DePoCacheState(
+        de_po_thresh,
+        depo_tracker,
+        std::begin(uids),
+        partition,
+        depo_impacts,
         DefaultN
       );
 
