@@ -1105,6 +1105,7 @@ namespace emp {
 
     /// Set program for this hardware object.
     void SetProgram(const program_t & _program) {
+      ResetProgram();
       program = _program;
       program.SetMatchBinRefreshFun( [this](){ this->RefreshMatchBin(); } );
       RefreshMatchBin();
