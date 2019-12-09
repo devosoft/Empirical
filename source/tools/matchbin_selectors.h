@@ -623,6 +623,7 @@ namespace emp {
         StochasticRatio::num,
         "/",
         StochasticRatio::den,
+        ", ",
         "DefaultN: ",
         DefaultN,
         ")"
@@ -747,6 +748,7 @@ namespace emp {
         DePoThreshRatio::num,
         "/",
         DePoThreshRatio::den,
+        ", ",
         "DefaultN: ",
         DefaultN,
         ")"
