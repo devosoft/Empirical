@@ -928,7 +928,24 @@ namespace emp {
     };
 
     // Neighbors are anywhere in the same population.
-    fun_get_neighbor = [this](WorldPosition pos) { return pos.SetIndex(GetRandomCellID()); };
+    // Exclude self.
+    fun_get_neighbor = [this](WorldPosition pos) {
+      emp_assert(
+        pop.size() > 1,
+        "Getting neighbor requires poplation at least 2."
+      );
+      const size_t draw = GetRandom().GetUInt(pop.size() - 1);
+
+      // suppose pop of 6, pos is 3
+      // 0 1 2 3 4    (draw)
+      // 0 1 2 X 4 5  (available positions)
+      // map 0 to 4 and wrap around
+      const size_t res = (draw + pos.GetIndex() + 1) % pop.size();
+
+      emp_assert(res != pos.GetIndex());
+
+      return pos.SetIndex(res);
+    };
 
     // Kill random organisms and move end into vacant position to keep pop compact.
     fun_kill_org = [this](){
