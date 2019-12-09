@@ -737,6 +737,10 @@ namespace emp {
   template <typename T, emp::data... MODS>
   using DataLog = DataNode<T, data::Current, data::Info, data::Log, MODS...>;
 
+  /** A node that combines the qualities of DataMonitor and DataLog.*/
+  template <typename T, emp::data... MODS>
+  using DataAuditor = DataNode<T, data::Current, data::Info, data::Log, data::Current, data::Info, data::Range, data::Stats, MODS...>;
+
   /** A node that stores all data it recieves in an archive (vector of vectors). The inner
    * vectors are groups of data that were recieved between resets. This node also keeps
    * a record of the min, max, count, and total of each vector, so you don't have to
