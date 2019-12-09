@@ -153,7 +153,7 @@ namespace emp {
     bool is_pheno_structured;       ///< Do we have a phenotypically structured population?
 
     /// Potential data nodes -- these should be activated only if in use.
-    DataManager<double, data::Current, data::Info, data::Range, data::Stats> data_nodes;
+    DataManager<double, data::Current, data::Info, data::Log, data::Current, data::Info, data::Range, data::Stats> data_nodes;
 
     // Configurable functions.                       Function to...
     fun_calc_fitness_t     fun_calc_fitness;    ///< ...evaluate fitness for provided organism.
@@ -454,9 +454,9 @@ namespace emp {
     /// Access a data node that tracks fitness information in the population.  The fitness will not
     /// be collected until the first Update() after this function is initially called, signaling
     /// the need for this information.
-    Ptr<DataMonitor<double>> GetFitnessDataNode() {
+    Ptr<DataAuditor<double>> GetFitnessDataNode() {
       if (!data_nodes.HasNode("fitness")) {
-        DataMonitor<double> & node = data_nodes.New("fitness");
+        DataAuditor<double> & node = data_nodes.New("fitness");
 
         // Collect fitnesses each update...
         OnUpdate([this, &node](size_t){
@@ -473,12 +473,12 @@ namespace emp {
     // Returns a reference so that capturing it in a lambda to call on update
     // is less confusing. It's possible we should change it to be consistent
     // with GetFitnessDataNode, though.
-    Ptr<DataMonitor<double>> AddDataNode(const std::string & name) {
+    Ptr<DataAuditor<double>> AddDataNode(const std::string & name) {
       emp_assert(!data_nodes.HasNode(name));
       return &(data_nodes.New(name));
     }
 
-    Ptr<DataMonitor<double>> GetDataNode(const std::string & name) {
+    Ptr<DataAuditor<double>> GetDataNode(const std::string & name) {
       return &(data_nodes.Get(name));
     }
 
@@ -1094,6 +1094,9 @@ namespace emp {
     file.AddVar(update, "update", "Update");
     file.AddMean(*node, "mean_fitness", "Average organism fitness in current population.");
     file.AddMin(*node, "min_fitness", "Minimum organism fitness in current population.");
+    file.AddPercentile(*node, 25.0, "lower_quartile_fitness", "Lower quartile organism fitness in current population.");
+    file.AddMedian(*node, "median_fitness", "Median organism fitness in current population.");
+    file.AddPercentile(*node, 75.0, "upper_quartile_fitness", "Upper quartile organism fitness in current population.");
     file.AddMax(*node, "max_fitness", "Maximum organism fitness in current population.");
     file.AddInferiority(*node, "inferiority", "Average fitness / maximum fitness in current population.");
     if (print_header) file.PrintHeaderKeys();
