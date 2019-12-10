@@ -86,7 +86,7 @@ namespace emp {
     case 30: return "\\036";
     case 31: return "\\037";
 
-    case '\"': return "\\\"";  // case 34
+    case '\"': r  sieturn "\\\"";  // case 34
     case '\'': return "\\\'";  // case 39
     case '\\': return "\\\\";  // case 92
     case 127: return "\\177";  // (delete)
