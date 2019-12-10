@@ -1,0 +1,16 @@
+As of now, I don't __think__ we need anything else besides overflow.
+
+http://www.cplusplus.com/reference/streambuf/streambuf/sputc/
+http://www.cplusplus.com/reference/streambuf/streambuf/overflow/
+
+
+Picture of the 6 internal pointers
+https://en.cppreference.com/w/cpp/io/basic_streambuf
+
+
+
+Example of custom streambuf. However, I no longer believe we'll be needing EOF like in the below example, or most online SO examples. We're simply going to extend our c string and copy over.
+https://artofcode.wordpress.com/2010/12/12/deriving-from-stdstreambuf/
+
+Example2:
+https://gcc.gnu.org/onlinedocs/libstdc++/manual/streambufs.html
