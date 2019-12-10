@@ -160,7 +160,7 @@ namespace emp {
 
       const field_t field_shift = shift_size / FIELD_BITS;
 
-      // only clear and return if we are field_shif-ing
+      // only clear and return if we are field_shift-ing
       // we want to be able to always shift by up to a byte
       // so that Import and Export work
       if (field_shift && shift_size > NUM_BITS) {
