@@ -19,6 +19,8 @@
 #include <string>
 #include <string_view>
 #include <unordered_set>
+#include <iterator>
+#include <limits>
 
 #include "../base/array.h"
 #include "../base/Ptr.h"
@@ -386,10 +388,22 @@ namespace emp {
     return false;
   }
 
+  /// Determine if there are only digits in a string.
+  inline bool is_digits(const std::string & test_str) {
+    for (char c : test_str) if (!is_digit(c)) return false;
+    return true;
+  }
+
   /// Determine if there are any letters or digits anywhere in a string.
   inline bool has_alphanumeric(const std::string & test_str) {
     for (char c : test_str) if (is_alphanumeric(c)) return true;
     return false;
+  }
+
+  /// Determine if there are any letters or digits anywhere in a string.
+  inline bool is_alphanumeric(const std::string & test_str) {
+    for (char c : test_str) if (!is_alphanumeric(c)) return false;
+    return true;
   }
 
   /// Determine if there are any letters, digit, or underscores anywhere in a string.
@@ -564,6 +578,17 @@ namespace emp {
     in_string.resize(pos);
   }
 
+  /// Make a string safe(r) 
+  static std::string slugify(const std::string & in_string) {
+    //TODO handle complicated unicode strings
+    std::string res = to_lower(in_string);
+    remove_punctuation(res);
+    compress_whitespace(res);
+    std::transform(res.begin(), res.end(), res.begin(), [](char ch) {
+      return ch == ' ' ? '-' : ch;
+    });
+    return res;
+  }
 
   /// Provide a string_view on a given string
   static inline std::string_view view_string(const std::string & str) {
@@ -606,19 +631,27 @@ namespace emp {
   static inline std::string_view view_string_to(const std::string & in_string, const char delim, size_t start_pos=0) {
     const size_t in_size = in_string.size();
     size_t end_pos = start_pos;
-    while (end_pos < in_size && in_string[end_pos] != delim) end_pos++;    
+    while (end_pos < in_size && in_string[end_pos] != delim) end_pos++;
     return view_string_range(in_string, start_pos, end_pos);
   }
 
-  /// Cut up a string based on the provided delimitor; fill them in to the provided vector.
-  static inline void slice(const std::string & in_string, emp::vector<std::string> & out_set,
-                           char delim='\n') {
+  /// Cut up a string based on the provided delimiter; fill them in to the provided vector.
+  /// @in_string operand
+  /// @out_set destination
+  /// @delim delimiter to split on
+  /// @max_split defines the maximum number of splits
+  static inline void slice(
+    const std::string & in_string,
+    emp::vector<std::string> & out_set,
+    const char delim='\n',
+    const size_t max_split=std::numeric_limits<size_t>::max()
+  ) {
     const size_t test_size = in_string.size();
 
     // Count produced strings
     size_t out_count = 0;
     size_t pos = 0;
-    while (pos < test_size) {
+    while (pos < test_size && out_count <= max_split) {
       while (pos < test_size && in_string[pos] != delim) pos++;
       pos++; // Skip over deliminator
       out_count++;  // Increment for each delim plus once at the end (so once if no delims).
@@ -630,7 +663,10 @@ namespace emp {
     size_t string_id = 0;
     while (pos < test_size) {
       out_set[string_id] = "";
-      while (pos < test_size && in_string[pos] != delim) {
+      while (
+        pos < test_size
+        && (in_string[pos] != delim || string_id == out_count - 1)
+      ) {
         out_set[string_id] += in_string[pos];
         pos++;
       }
@@ -641,9 +677,16 @@ namespace emp {
   }
 
   /// Slice a string without passing in result vector (may be less efficient).
-  static inline emp::vector<std::string> slice(const std::string & in_string, char delim='\n') {
+  /// @in_string operand
+  /// @delim delimiter to split on
+  /// @max_split defines the maximum number of splits
+  static inline emp::vector<std::string> slice(
+    const std::string & in_string,
+    const char delim='\n',
+    const size_t max_split=std::numeric_limits<size_t>::max()
+  ) {
     emp::vector<std::string> result;
-    slice(in_string, result, delim);
+    slice(in_string, result, delim, max_split);
     return result;
   }
 
@@ -676,6 +719,28 @@ namespace emp {
   /// Setup emp::ToString declarations for built-in types.
   template <typename T, size_t N> inline std::string ToString(const emp::array<T,N> & container);
   template <typename... Ts> inline std::string ToString(const emp::vector<Ts...> & container);
+
+  /// Join a container of strings with a delimiter.
+  /// Adapted fromhttps://stackoverflow.com/questions/5288396/c-ostream-out-manipulation/5289170#5289170
+  template <typename Range, typename Value = typename Range::value_type>
+  std::string join_on(
+    Range const& elements,
+    const char *const delimiter
+  ) {
+    std::ostringstream os;
+    auto b = std::begin(elements), e = std::end(elements);
+
+    if (b != e) {
+        std::copy(b, std::prev(e), std::ostream_iterator<Value>(os, delimiter));
+        b = std::prev(e);
+    }
+    if (b != e) {
+        os << *b;
+    }
+
+    return os.str();
+  }
+
 
   namespace internal {
     // If the item passed in has a ToString(), always use it.

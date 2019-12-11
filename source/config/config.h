@@ -381,6 +381,10 @@ namespace emp {
     auto begin() -> decltype(var_map.begin()) { return var_map.begin(); }
     auto end() -> decltype(var_map.end()) { return var_map.end(); }
 
+    const ConfigEntry * operator[](const std::string & name) const { return var_map.at(name); }
+    auto cbegin() -> decltype(var_map.cbegin()) { return var_map.cbegin(); }
+    auto cend() -> decltype(var_map.cend()) { return var_map.cend(); }
+
     auto begin() const -> const decltype(var_map.begin()) { return var_map.begin(); }
     auto end() const -> const decltype(var_map.end()) { return var_map.end(); }
 
