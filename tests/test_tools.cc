@@ -33,7 +33,7 @@
 #include "tools/BitMatrix.h"
 #include "tools/BitSet.h"
 #include "tools/BitVector.h"
-#include "tools/ContiguousStreamBuf.h"
+#include "tools/ContiguousStream.h"
 #include "tools/DFA.h"
 #include "tools/DynamicString.h"
 #include "tools/FunctionSet.h"
@@ -1453,12 +1453,9 @@ TEST_CASE("Test ContiguousStreamBuf", "[tools]")
   emp::Random rand(1);
 
   std::stringstream ss;
-  emp::ContiguousStreamBuf cs1;
-  emp::ContiguousStreamBuf cs2(1);
-  emp::ContiguousStreamBuf cs3(0);
-  std::ostream out1(&cs1);
-  std::ostream out2(&cs2);
-  std::ostream out3(&cs3);
+  emp::ContiguousStream cs1;
+  emp::ContiguousStream cs2(1);
+  emp::ContiguousStream cs3(0);
 
   std::string temp;
 
@@ -1494,9 +1491,9 @@ TEST_CASE("Test ContiguousStreamBuf", "[tools]")
 
     // Put in some letters
     ss << "Hello_World";
-    out1 << "Hello_World";
-    out2 << "Hello_World";
-    out3 << "Hello_World";
+    cs1 << "Hello_World";
+    cs2 << "Hello_World";
+    cs3 << "Hello_World";
     temp = ss.str();
 
     REQUIRE((
@@ -1528,9 +1525,9 @@ TEST_CASE("Test ContiguousStreamBuf", "[tools]")
 
     // Make sure flush doesn't break it
     ss << "Will it flush?" << std::flush << "beep";
-    out1 << "Will it flush?" << std::flush << "beep";
-    out2 << "Will it flush?" << std::flush << "beep";
-    out3 << "Will it flush?" << std::flush << "beep";
+    cs1 << "Will it flush?" << std::flush << "beep";
+    cs2 << "Will it flush?" << std::flush << "beep";
+    cs3 << "Will it flush?" << std::flush << "beep";
     temp = ss.str();
 
     REQUIRE((
@@ -1564,9 +1561,9 @@ TEST_CASE("Test ContiguousStreamBuf", "[tools]")
     for (size_t i = 0; i < 100; ++i) {
       const auto draw = rand.GetUInt();
       ss << draw;
-      out1 << draw;
-      out2 << draw;
-      out3 << draw;
+      cs1 << draw;
+      cs2 << draw;
+      cs3 << draw;
     }
     temp = ss.str();
 

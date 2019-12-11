@@ -3,9 +3,8 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019
  *
- *  @file  ContiguousStreamBuf.h
- *  @brief Useful for backing an ostream where data is stored in contiguous
- *         memory.
+ *  @file  ContiguousStream.h
+ *  @brief Useful for streaming data to contiguous memory.
  *  @note Status: RELEASE
  */
 
@@ -15,7 +14,9 @@
 
 namespace emp {
 
-  class ContiguousStreamBuf : public std::streambuf {
+
+  // Buffers data into contiguous memory, backs ContiguousStream
+  class ContiguousBuffer : public std::streambuf {
 
   // profiling result compared to stringstream
   // http://quick-bench.com/LJR58W5q8Eld2nLg9kuQn_Mmwms
@@ -40,7 +41,7 @@ namespace emp {
     using const_iterator = emp::vector<char>::const_iterator;
 
     /// @param init_size num bytes to reserve initially
-    ContiguousStreamBuf(const size_t init_size=1024)
+    ContiguousBuffer(const size_t init_size=1024)
     : buffer(
       std::max(static_cast<size_t>(1), init_size) // 0 init size breaks!
     )
@@ -115,6 +116,45 @@ namespace emp {
       return c;
 
     }
+
+  };
+
+  // Streams data to contiguous memory, backed by ContiguousBuffer
+  class ContiguousStream : public std::ostream {
+
+  private:
+
+    ContiguousBuffer buffer;
+
+  public:
+
+    using const_iterator = ContiguousBuffer::const_iterator;
+
+    ContiguousStream(const size_t init_size=1024)
+    : std::ostream(&buffer)
+      , buffer(
+        std::max(static_cast<size_t>(1), init_size) // 0 init size breaks!
+      )
+    { ; }
+
+    /// Reset stream pointers while retaining underlying memory allocation.
+    void Reset() { buffer.Reset(); }
+
+    /// Return a pointer to contiguous memory storing streamed data.
+    inline const char* GetData() const { return buffer.GetData(); }
+
+    /// Number of bytes currently stored.
+    inline size_t GetSize() const { return buffer.GetSize(); }
+
+    /// Copy stored data into an ostream.
+    /// Useful for degugging.
+    void Print(std::ostream & os=std::cout) const { buffer.Print(os); }
+
+    /// Begin iterator on stored data
+    inline const_iterator cbegin() const { return buffer.cbegin(); }
+
+    /// End iterator on stored data
+    inline const_iterator cend() const { return buffer.cend(); }
 
   };
 

@@ -1,25 +1,24 @@
 #include <ostream>
 
-#include "tools/ContiguousStreamBuf.h"
+#include "tools/ContiguousStream.h"
 
 int main() {
 
-  emp::ContiguousStreamBuf cs;
-  std::ostream out(&cs);
+  emp::ContiguousStream cs;
 
   // Send 12 letters: 11 + \n.
-  out << "Hello_World";
+  cs << "Hello_World";
   cs.Print();
   std::cout << std::endl;
 
   // Overflow the buffer
-  out << "calloVerflow" << std::endl;
+  cs << "calloVerflow" << std::endl;
   cs.Print();
   std::cout << std::endl;
 
   // Overflow the buffer
   for (size_t i = 0; i < 5; ++i) {
-    out << "jsad;kfjsa;lkdfja;ksdjfksajdkjfjjjjasdf Verflow" << std::endl;
+    cs << "jsad;kfjsa;lkdfja;ksdjfksajdkjfjjjjasdf Verflow" << std::endl;
   }
   cs.Print();
   std::cout << std::endl;
@@ -29,7 +28,7 @@ int main() {
   cs.Print();
   std::cout << std::endl;
 
-  out << "Hello_World";
+  cs << "Hello_World";
   cs.Print();
   std::cout << std::endl;
 
