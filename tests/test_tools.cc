@@ -26,6 +26,7 @@
 #include "tools/BitMatrix.h"
 #include "tools/BitSet.h"
 #include "tools/BitVector.h"
+#include "tools/ContiguousStreamBuf.h"
 #include "tools/DFA.h"
 #include "tools/DynamicString.h"
 #include "tools/FunctionSet.h"
@@ -591,6 +592,132 @@ TEST_CASE("Test DFA", "[tools]")
   REQUIRE(dfa.Next(0, "aa") == 2);
   REQUIRE(dfa.Next(0, "aaa") == 0);
   REQUIRE(dfa.Next(0, "b")  == 3);
+}
+
+TEST_CASE("Test ContiguousStreamBuf", "[tools]")
+{
+  emp::Random rand(1);
+
+  std::stringstream ss;
+  emp::ContiguousStreamBuf cs1;
+  emp::ContiguousStreamBuf cs2(1);
+  emp::ContiguousStreamBuf cs3(0);
+  std::ostream out1(&cs1);
+  std::ostream out2(&cs2);
+  std::ostream out3(&cs3);
+
+  std::string temp;
+
+  for (size_t i = 0; i < 3; ++i) {
+    temp = ss.str();
+
+    REQUIRE((
+      std::equal(
+        std::begin(temp),
+        std::end(temp),
+        cs1.cbegin()
+      )
+    ));
+    REQUIRE( temp.size() == cs1.GetSize() );
+
+    REQUIRE((
+      std::equal(
+        std::begin(temp),
+        std::end(temp),
+        cs2.cbegin()
+      )
+    ));
+    REQUIRE( temp.size() == cs2.GetSize() );
+
+    REQUIRE((
+      std::equal(
+        std::begin(temp),
+        std::end(temp),
+        cs3.cbegin()
+      )
+    ));
+    REQUIRE( temp.size() == cs3.GetSize() );
+
+    // Put in some letters
+    ss << "Hello_World";
+    out1 << "Hello_World";
+    out2 << "Hello_World";
+    out3 << "Hello_World";
+    temp = ss.str();
+
+    REQUIRE((
+      std::equal(
+        std::begin(temp),
+        std::end(temp),
+        cs1.cbegin()
+      )
+    ));
+    REQUIRE( temp.size() == cs1.GetSize() );
+
+    REQUIRE((
+      std::equal(
+        std::begin(temp),
+        std::end(temp),
+        cs2.cbegin()
+      )
+    ));
+    REQUIRE( temp.size() == cs2.GetSize() );
+
+    REQUIRE((
+      std::equal(
+        std::begin(temp),
+        std::end(temp),
+        cs3.cbegin()
+      )
+    ));
+    REQUIRE( temp.size() == cs3.GetSize() );
+
+    // Put in random data
+    for (size_t i = 0; i < 100; ++i) {
+      const auto draw = rand.GetUInt();
+      ss << draw;
+      out1 << draw;
+      out2 << draw;
+      out3 << draw;
+    }
+    temp = ss.str();
+
+    REQUIRE((
+      std::equal(
+        std::begin(temp),
+        std::end(temp),
+        cs1.cbegin()
+      )
+    ));
+    REQUIRE( temp.size() == cs1.GetSize() );
+
+    REQUIRE((
+      std::equal(
+        std::begin(temp),
+        std::end(temp),
+        cs2.cbegin()
+      )
+    ));
+    REQUIRE( temp.size() == cs2.GetSize() );
+
+    REQUIRE((
+      std::equal(
+        std::begin(temp),
+        std::end(temp),
+        cs3.cbegin()
+      )
+    ));
+    REQUIRE( temp.size() == cs3.GetSize() );
+
+    // Make sure reset works!
+    cs1.Reset();
+    cs2.Reset();
+    cs3.Reset();
+    ss.str("");
+    ss.clear();
+
+  }
+
 }
 
 TEST_CASE("Test DynamicString", "[tools]")
