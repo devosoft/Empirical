@@ -4,70 +4,101 @@
 #include <cstring>
 
 
-class ContiguousStreamBuf : public std::streambuf{ 
-public:
-  ContiguousStreamBuf(size_t s = 16){
-    size = s;
-    buffer = new char[size];
-    //Initiailize the 3 streambuf pointers to point at the beg/end
-    //the cur pointer points at beg too.
-    this->setp(buffer, buffer+size);
-  }
-
-  virtual ~ContiguousStreamBuf(){
-    delete[] buffer;
-  }
-
-  char* c_str(){
-    return buffer;
-  }
+class ContiguousStreamBuf : public std::streambuf {
 
 private:
-  char* buffer;
-  size_t size; //capacity of the array. doubles when overflow.
 
+  std::vector<char> buffer;
+
+public:
+
+  ContiguousStreamBuf(const size_t init_size=4) {
+    buffer.reserve(init_size);
+    // DON'T initiailize streambuf pointers with setp
+    // because it breaks overflow (why?)
+  }
+
+  void Reset() {
+    this->setp(
+      GetData(),
+      GetData() + GetCapacity()
+    );
+  }
+
+  inline char* GetData() { return buffer.data(); }
+
+  inline const char* GetData() const { return buffer.data(); }
+
+  inline size_t GetSize() const {
+    return std::distance<const char*>(
+      GetData(),
+      this->pptr()
+    );
+  }
+
+  inline size_t GetCapacity() const { return buffer.capacity(); }
+
+  void Print(std::ostream & os=std::cout) const {
+    for (size_t i = 0; i < GetSize(); ++i) {
+      os << buffer.data()[i];
+    }
+  }
 
   // Called by sputc when we run out of space in buffer
-  virtual int_type overflow (int_type c){
-    //allocate a c str twice the size
-    char* new_buffer = new char[size*2];
-    // copy everything over. (I've been ignoring null terminators)
-    // May need to check that everything I've done is safe.
-    strcpy(new_buffer, buffer);
+  int_type overflow(int_type c) override {
 
-    //delete original buffer
-    delete[] buffer;
+    // double the buffer's capacity
+    const size_t prev_capacity = GetCapacity();
+    buffer.resize(prev_capacity * 2);
 
-    //update the new capacity
-    size*=2; 
+    // update the 3 streambuf pointers to point to the fresh write area
+    this->setp(
+      GetData() + prev_capacity, // pbase & pptr
+      GetData() + GetCapacity() // epptr
+    );
 
-    //Update the 3 streambuf pointers to point to the new array.
-    this->setp(buffer, buffer+size);
-    this->pubseekoff(std::strlen(buffer), std::ios_base::beg);
-
-
-     //add the character that originally overflowed.
+    // add the character that originally overflowed.
     *(this->pptr()) = c;
     pbump(1);
 
-   return c;
+    return c;
+
   }
 
 };
 
 
-int main(){
+int main() {
+
   ContiguousStreamBuf cs;
   std::ostream out(&cs);
-  //Send 12 letters: 11 + \n.
+
+  // Send 12 letters: 11 + \n.
   out << "Hello_World";
-  std::cout << cs.c_str() << std::endl;
+  cs.Print();
   std::cout << std::endl;
-  //Overflow the buffer
-  out << "calloVerflow"<<std::endl;
-  std::cout << cs.c_str() << std::endl;
 
-  std::cout<< "Unfortunately there's something wrong with the output. I may have misunderstood pubseekoff?";
+  // Overflow the buffer
+  out << "calloVerflow" << std::endl;
+  cs.Print();
+  std::cout << std::endl;
+
+  // Overflow the buffer
+  for (size_t i = 0; i < 5; ++i) {
+    out << "jsad;kfjsa;lkdfja;ksdjfksajdkjfjjjjasdf Verflow" << std::endl;
+  }
+  cs.Print();
+  std::cout << std::endl;
+
+  std::cout << "Reset" << std::endl;
+  cs.Reset();
+  cs.Print();
+  std::cout << std::endl;
+
+  out << "Hello_World";
+  cs.Print();
+  std::cout << std::endl;
+
   return 0;
-}
 
+}
