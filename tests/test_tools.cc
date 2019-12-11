@@ -672,6 +672,40 @@ TEST_CASE("Test ContiguousStreamBuf", "[tools]")
     ));
     REQUIRE( temp.size() == cs3.GetSize() );
 
+    // Make sure flush doesn't break it
+    ss << "Will it flush?" << std::flush << "beep";
+    out1 << "Will it flush?" << std::flush << "beep";
+    out2 << "Will it flush?" << std::flush << "beep";
+    out3 << "Will it flush?" << std::flush << "beep";
+    temp = ss.str();
+
+    REQUIRE((
+      std::equal(
+        std::begin(temp),
+        std::end(temp),
+        cs1.cbegin()
+      )
+    ));
+    REQUIRE( temp.size() == cs1.GetSize() );
+
+    REQUIRE((
+      std::equal(
+        std::begin(temp),
+        std::end(temp),
+        cs2.cbegin()
+      )
+    ));
+    REQUIRE( temp.size() == cs2.GetSize() );
+
+    REQUIRE((
+      std::equal(
+        std::begin(temp),
+        std::end(temp),
+        cs3.cbegin()
+      )
+    ));
+    REQUIRE( temp.size() == cs3.GetSize() );
+
     // Put in random data
     for (size_t i = 0; i < 100; ++i) {
       const auto draw = rand.GetUInt();
