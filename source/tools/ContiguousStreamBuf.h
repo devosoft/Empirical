@@ -72,9 +72,12 @@ namespace emp {
       }
     }
 
+    /// Begin iterator on stored data
     inline const_iterator cbegin() const {
       return std::cbegin(buffer);
     }
+
+    /// End iterator on stored data
     inline const_iterator cend() const {
       return std::cend(buffer);
     }
