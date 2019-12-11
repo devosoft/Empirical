@@ -14,6 +14,7 @@
 #include <ctime>
 #include <climits>
 #include <cmath>
+#include <cstring>
 #include <iterator>
 
 #include "../base/assert.h"
@@ -208,8 +209,50 @@ namespace emp {
      * @return The pseudo random number.
      **/
     inline uint64_t GetUInt64() {
-      return ( static_cast<uint64_t>(GetUInt()) << 32)
+      // @MAM profiled,
+      // this is faster than using RandFill
+      // https://gist.github.com/mmore500/8747e456b949b5b18b3ee85dd9b4444d
+      return ( static_cast<uint64_t>(GetUInt()) << 32 )
              + static_cast<uint64_t>(GetUInt());
+    }
+
+    /**
+     * Randomize a contiguous segment of memory.
+     **/
+    inline void RandFill(unsigned char* dest, const size_t num_bytes) {
+
+      // go three bytes at a time because we only get
+      // _RAND_MBIG (not quite four bytes) of entropy
+      // from the generator
+
+      // @MAM profiled,
+      // sampling raw bytes and rejecting the region of integer space
+      // that would introduce bias is faster than rescaling using double
+      // multiplication
+      // https://gist.github.com/mmore500/46f3dee11734a8668d60f180cf5d0590
+
+      const uint32_t accept_thresh = (
+        _RAND_MBIG - _RAND_MBIG % 16777216 /* 2^(3*8) */
+      );
+
+      for (size_t byte = 0; byte + 3 < num_bytes; byte += 3) {
+        uint32_t rnd;
+        while (true) {
+          rnd = Get();
+          if (rnd < accept_thresh) break;
+        }
+        std::memcpy(dest+byte, &rnd, 3);
+      }
+
+      if (num_bytes%3) {
+        uint32_t rnd;
+        while (true) {
+          rnd = Get();
+          if (rnd < accept_thresh) break;
+        }
+        std::memcpy(dest+num_bytes-num_bytes%3, &rnd, num_bytes%3);
+      }
+
     }
 
     /**

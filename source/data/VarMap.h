@@ -123,7 +123,7 @@ namespace emp {
     TypeID GetType(size_t id) const { return vars[id]->GetTypeID(); }
     TypeID GetType(std::string name) const { return GetType(GetID(name)); }
 
-    // Type-specific Accessors    
+    // Type-specific Accessors
     std::string & GetString(const std::string & name) { return Get<std::string>(name); }
     int & GetInt(const std::string & name) { return Get<int>(name); }
     double & GetDouble(const std::string & name) { return Get<double>(name); }
