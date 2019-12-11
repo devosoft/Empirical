@@ -28,6 +28,9 @@ namespace emp {
   // https://en.cppreference.com/w/cpp/io/basic_streambuf
   // https://gcc.gnu.org/onlinedocs/libstdc++/manual/streambufs.html
 
+  // TODO: back with an uninitialized vector?
+  // (e.g., http://andreoffringa.org/p/uvector/uvector.h)
+
   private:
 
     emp::vector<char> buffer;
