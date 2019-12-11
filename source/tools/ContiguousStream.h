@@ -29,16 +29,30 @@ namespace emp {
   // https://en.cppreference.com/w/cpp/io/basic_streambuf
   // https://gcc.gnu.org/onlinedocs/libstdc++/manual/streambufs.html
 
-  // TODO: back with an uninitialized vector?
-  // (e.g., http://andreoffringa.org/p/uvector/uvector.h)
-
   private:
 
-    emp::vector<char> buffer;
+    // idea: we want an uninitialized vector like
+    // http://andreoffringa.org/p/uvector/uvector.h
+    // but want to do less work to get it,
+    // so just make a vector of these instead!
+    // profiling result: http://quick-bench.com/GB8SEE5N2I_Q4qcYUl7UjvTg-OY
+    struct uninitialized_char {
+
+
+      char val;
+
+      // necessary to prevent zero-initialization of val
+      uninitialized_char() { ; }
+
+      operator char() const { return val; }
+
+    };
+
+    emp::vector<uninitialized_char> buffer;
 
   public:
 
-    using const_iterator = emp::vector<char>::const_iterator;
+    using const_iterator = emp::vector<uninitialized_char>::const_iterator;
 
     /// @param init_size num bytes to reserve initially
     ContiguousBuffer(const size_t init_size=1024)
@@ -58,7 +72,11 @@ namespace emp {
     }
 
     /// Return a pointer to contiguous memory storing streamed data.
-    inline const char* GetData() const { return buffer.data(); }
+    inline const char* GetData() const {
+      // this is NOT undefined behavior
+      // https://en.cppreference.com/w/cpp/language/reinterpret_cast
+      return reinterpret_cast<const char*>(buffer.data());
+    }
 
     /// Number of bytes currently stored.
     inline size_t GetSize() const {
@@ -88,10 +106,12 @@ namespace emp {
 
   private:
 
-    // return a pointer to contiguous memory data was streamed to
-    // (necessary to play nice with annoying safeguards
-    // against casting char * -> const char *)
-    inline char* GetData() { return buffer.data(); }
+    // return a mutable pointer to contiguous memory data was streamed to
+    inline char* GetData() {
+      // https://en.cppreference.com/w/cpp/language/reinterpret_cast
+      // this is NOT undefined behavior
+      return reinterpret_cast<char*>(buffer.data());
+    }
 
     /// return buffer's capacity, in bytes
     inline size_t GetCapacity() const { return buffer.capacity(); }
