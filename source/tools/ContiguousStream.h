@@ -99,9 +99,9 @@ namespace emp {
     // sputc calls this when we run out of space in buffer.
     int_type overflow(int_type c) override {
 
-      // double the buffer's capacity
+      // increase the buffer's capacity
       const size_t prev_capacity = GetCapacity();
-      buffer.resize(prev_capacity * 2);
+      buffer.resize(prev_capacity * 1.5); // approx golden ratio
 
       // update the 3 streambuf pointers to point to the fresh write area
       this->setp(
