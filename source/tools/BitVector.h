@@ -260,6 +260,11 @@ namespace emp {
       in_set.bit_set = nullptr;
     }
 
+    /// Copy, but with a resize.
+    BitVector(const BitVector & in_set, size_t new_size) : BitVector(in_set) {
+      if (num_bits != new_size) Resize(new_size);
+    }
+
     /// Destructor
     ~BitVector() {
       if (bit_set) {        // A move constructor can make bit_set == nullptr
