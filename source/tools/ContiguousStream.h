@@ -19,9 +19,8 @@ namespace emp {
   class ContiguousBuffer : public std::streambuf {
 
   // profiling result compared to stringstream
-  // http://quick-bench.com/LJR58W5q8Eld2nLg9kuQn_Mmwms
-  // http://quick-bench.com/1Lt52EaVZp5t-27_Xy4etLI953w
-  // http://quick-bench.com/fykiP0O-AZljZ6ldtpRc4H3y8U0
+  // http://quick-bench.com/3isiMMHuy81XFn3p1YAk9oaI1mk
+  // http://quick-bench.com/a6GS0hx4ZZj-IsM48BpZF1TzEAw
 
   // helpful links curated by @nateriz
   // http://www.cplusplus.com/reference/streambuf/streambuf/sputc/
