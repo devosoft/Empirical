@@ -17,6 +17,9 @@
 #define EMP_BIT_SET_H
 
 #include <iostream>
+#include <initializer_list>
+#include <cstring>
+#include <bitset>
 
 #include "../base/assert.h"
 #include "../base/vector.h"
@@ -26,6 +29,10 @@
 #include "functions.h"
 #include "math.h"
 #include "Random.h"
+#include "hash_utils.h"
+#include "random_utils.h"
+
+
 
 namespace emp {
 
@@ -48,6 +55,10 @@ namespace emp {
   ///  A fixed-sized (but arbitrarily large) array of bits, and optimizes operations on those bits
   ///  to be as fast as possible.
   template <size_t NUM_BITS> class BitSet {
+
+  // make all templated instantiations friends with each other
+  template<size_t FRIEND_BITS> friend class BitSet;
+
   private:
 
     ///< field size is 64 for native (except NUM_BITS == 32), 32 for emscripten
@@ -105,15 +116,17 @@ namespace emp {
     inline static size_t Byte2FieldPos(const size_t index) { return (index & 3) << 3; }
 
     inline void Copy(const field_t in_set[NUM_FIELDS]) {
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
+      std::memcpy(bit_set, in_set, sizeof(bit_set));
     }
 
     /// Helper: call SHIFT with positive number instead
     void ShiftLeft(const size_t shift_size) {
+
       if (shift_size > NUM_BITS) {
         Clear();
         return;
       }
+
       const int field_shift = shift_size / FIELD_BITS;
       const int bit_shift = shift_size % FIELD_BITS;
       const int bit_overflow = FIELD_BITS - bit_shift;
@@ -144,11 +157,16 @@ namespace emp {
     /// Helper for calling SHIFT with negative number
     void ShiftRight(const size_t shift_size) {
       if (!shift_size) return;
-      if (shift_size > NUM_BITS) {
+
+      const field_t field_shift = shift_size / FIELD_BITS;
+
+      // only clear and return if we are field_shift-ing
+      // we want to be able to always shift by up to a byte
+      // so that Import and Export work
+      if (field_shift && shift_size > NUM_BITS) {
         Clear();
         return;
       }
-      const field_t field_shift = shift_size / FIELD_BITS;
       const field_t bit_shift = shift_size % FIELD_BITS;
       const field_t bit_overflow = FIELD_BITS - bit_shift;
 
@@ -348,6 +366,21 @@ namespace emp {
     /// Constructor to generate a random BitSet with provided prob of 1's.
     BitSet(Random & random, const double p1) { Clear(); Randomize(random, p1); }
 
+    /// Constructor to fill in a bit set from a vector.
+    template <typename T>
+    BitSet(const std::initializer_list<T> l) {
+
+      Clear();
+
+      size_t idx = 0;
+      for (auto i = std::rbegin(l); i != std::rend(l); ++i) {
+        emp_assert(idx < NUM_BITS);
+        Set(idx, *i);
+        ++idx;
+      }
+
+    }
+
     /// Destructor.
     ~BitSet() = default;
 
@@ -360,14 +393,16 @@ namespace emp {
     /// Set all bits randomly, with a 50% probability of being a 0 or 1.
     void Randomize(Random & random) {
       // Randomize all fields, then mask off bits in the last field if not complete.
-      if constexpr (FIELD_BITS == 64) {
-        for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = random.GetUInt64();
-      } else if (FIELD_BITS == 32) {
-        for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = random.GetUInt();
-      } else {
-        emp_assert(false, "FIELD_BITS should be 32 or 64");
+
+      random.RandFill(
+        reinterpret_cast<unsigned char*>(bit_set),
+        (NUM_BITS+7)/8
+      );
+
+      if constexpr (static_cast<bool>(LAST_BIT)) {
+        bit_set[NUM_FIELDS-1] &= MaskLow<field_t>(NUM_BITS%32);
       }
-      if (LAST_BIT > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+
     }
 
     /// Set all bits randomly, with a given probability of being a 1.
@@ -376,24 +411,80 @@ namespace emp {
       for (size_t i = 0; i < NUM_BITS; i++) Set(i, random.P(p1));
     }
 
+  /// Mutate bits, return how many mutations were performed
+  size_t Mutate(
+    Random & random,
+    const size_t num_muts, // hint: use tools/Binomial.h with this part
+    const size_t min_idx=0 // draw this from a distribution to make some
+                           // bits more volatile than others
+  ) {
+    emp_assert(min_idx <= NUM_BITS);
+    emp_assert(num_muts <= NUM_BITS - min_idx);
+
+    std::vector<size_t> res;
+    Choose(random, NUM_BITS - min_idx, num_muts, res);
+
+    for (size_t idx : res) Toggle(idx + min_idx);
+
+    return num_muts;
+
+  }
+
     /// Assign from a BitSet of a different size.
-    template <size_t NUM_BITS2>
-    BitSet & Import(const BitSet<NUM_BITS2> & in_set) {
-      static const size_t NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> FIELD_LOG2);
-      static const size_t MIN_FIELDS = (NUM_FIELDS < NUM_FIELDS2) ? NUM_FIELDS : NUM_FIELDS2;
-      for (size_t i = 0; i < MIN_FIELDS; i++) bit_set[i] = in_set.GetUInt(i);  // Copy avail fields
-      for (size_t i = MIN_FIELDS; i < NUM_FIELDS; i++) bit_set[i] = 0;         // Zero extra fields
+    template <size_t FROM_BITS>
+    BitSet & Import(
+      const BitSet<FROM_BITS> & from_set,
+      const size_t from_bit=0
+    ) {
+
+      if constexpr (FROM_BITS == NUM_BITS) emp_assert(&from_set != this);
+
+      emp_assert(from_bit < FROM_BITS);
+
+      if (FROM_BITS - from_bit < NUM_BITS) Clear();
+
+      const size_t DEST_BYTES = (NUM_BITS + 7)/8;
+      const size_t FROM_BYTES = (FROM_BITS + 7)/8 - from_bit/8;
+
+      const size_t COPY_BYTES = std::min(DEST_BYTES, FROM_BYTES);
+
+      std::memcpy(
+        bit_set,
+        reinterpret_cast<const unsigned char*>(from_set.bit_set) + from_bit/8,
+        COPY_BYTES
+      );
+
+      if (from_bit%8) {
+
+        this->ShiftRight(from_bit%8);
+
+        if (FROM_BYTES > COPY_BYTES) {
+          reinterpret_cast<unsigned char*>(bit_set)[COPY_BYTES-1] |= (
+            reinterpret_cast<const unsigned char*>(
+              from_set.bit_set
+            )[from_bit/8 + COPY_BYTES]
+            << (8 - from_bit%8)
+          );
+        }
+
+      }
+
+      // mask out filler bits
+      if constexpr (static_cast<bool>(LAST_BIT)) {
+        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      }
+
       return *this;
+
     }
 
     /// Convert to a Bitset of a different size.
-    template <size_t NUM_BITS2>
-    BitSet<NUM_BITS2> Export() const {
-      static const size_t NUM_FIELDS2 = 1 + ((NUM_BITS2 - 1) >> FIELD_LOG2);
-      static const size_t MIN_FIELDS = (NUM_FIELDS < NUM_FIELDS2) ? NUM_FIELDS : NUM_FIELDS2;
-      BitSet<NUM_BITS2> out_bits;
-      for (size_t i = 0; i < MIN_FIELDS; i++) out_bits.SetUInt(i, bit_set[i]);  // Copy avail fields
-      for (size_t i = MIN_FIELDS; i < NUM_FIELDS; i++) out_bits.SetUInt(i, 0);  // Zero extra fields
+    template <size_t FROM_BITS>
+    BitSet<FROM_BITS> Export(size_t start_bit=0) const {
+
+      BitSet<FROM_BITS> out_bits;
+      out_bits.Import(*this, start_bit);
+
       return out_bits;
     }
 
@@ -492,31 +583,47 @@ namespace emp {
       bit_set[field_id] = (bit_set[field_id] & ~(((field_t)255U) << pos_id)) | (val_uint << pos_id);
     }
 
+    /// Get the unsigned int; index in in 32-bit jumps
+    /// (i.e., this is a field ID not bit id)
+    uint32_t GetUInt(const size_t index) const { return GetUInt32(index); }
+
+    /// Set the unsigned int; index in in 32-bit jumps
+    /// (i.e., this is a field ID not bit id)
+    void SetUInt(const size_t index, const uint32_t value) {
+      SetUInt32(index, value);
+    }
+
     /// Get the field_t unsigned int; index in in 32-bit jumps
     /// (i.e., this is a field ID not bit id)
-    uint32_t GetUInt(size_t index) const { return GetUInt32(index); }
+    uint32_t GetUInt32(const size_t index) const {
+      emp_assert(index * 32 < NUM_BITS);
 
-    /// Set the field_t unsigned int; index in in 32-bit jumps
-    /// (i.e., this is a field ID not bit id)
-    void SetUInt(size_t index, uint32_t value) { SetUInt32(index, value); }
+      uint32_t res;
 
-    /// Get the field_t unsigned int; index in in field_t-bit jumps
-    /// (i.e., this is a field ID not bit id)
-    uint32_t GetUInt32(size_t index) const {
-      emp_assert(index * 32 < NUM_FIELDS * FIELD_BITS);
-      return ((uint32_t*) bit_set)[index];
+      std::memcpy(
+        &res,
+        reinterpret_cast<const unsigned char*>(bit_set) + index * (32/8),
+        sizeof(res)
+      );
+
+      return res;
     }
 
     /// Set the field_t unsigned int; index in in 32-bit jumps
     /// (i.e., this is a field ID not bit id)
-    void SetUInt32(size_t index, uint32_t value) {
-      emp_assert(index * 32 < NUM_FIELDS * FIELD_BITS);
-      ((uint32_t*) bit_set)[index] = value;
+    void SetUInt32(const size_t index, const uint32_t value) {
+      emp_assert(index * 32 < NUM_BITS);
+
+      std::memcpy(
+        reinterpret_cast<unsigned char*>(bit_set) + index * (32/8),
+        &value,
+        sizeof(value)
+      );
 
       // Mask out filler bits if necessary
-      if constexpr ((bool)LAST_BIT) {
+      if constexpr (static_cast<bool>(LAST_BIT)) {
         // we only need to do this
-        // if (index * 64 == (NUM_FIELDS - 1) * FIELD_BITS)
+        // if (index * 32 == (NUM_FIELDS - 1) * FIELD_BITS)
         // but just doing it always is probably faster
         bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       }
@@ -525,67 +632,106 @@ namespace emp {
 
     /// Get the field_t unsigned int; index in in 64-bit jumps
     /// (i.e., this is a field ID not bit id)
-    uint64_t GetUInt64(size_t index) const {
-      emp_assert(index * 64 < NUM_FIELDS * FIELD_BITS);
+    uint64_t GetUInt64(const size_t index) const {
+      emp_assert(index * 64 < NUM_BITS);
 
-      if constexpr (FIELD_BITS == 32 && NUM_FIELDS % 2) {
-        if (index * 2 == NUM_FIELDS - 1 ) return bit_set[NUM_FIELDS - 1];
+      uint64_t res = 0;
+
+      if constexpr (FIELD_BITS == 64) {
+        res = bit_set[index];
+      } else if constexpr (FIELD_BITS == 32 && (NUM_FIELDS % 2 == 0)) {
+        std::memcpy(
+          &res,
+          reinterpret_cast<const unsigned char*>(bit_set) + index * (64/8),
+          sizeof(res)
+        );
+      } else if constexpr (FIELD_BITS == 32 && NUM_FIELDS == 1) {
+        std::memcpy(
+          &res,
+          reinterpret_cast<const unsigned char*>(bit_set),
+          32/8
+        );
+      } else {
+        std::memcpy(
+          &res,
+          reinterpret_cast<const unsigned char*>(bit_set) + index * (64/8),
+          std::min(64, NUM_FIELDS * FIELD_BITS - 64 * index)/8
+        );
       }
 
-      return ((uint64_t*) bit_set)[index];
+      return res;
+
     }
 
     /// Set the field_t unsigned int; index in in 64-bit jumps
     /// (i.e., this is a field ID not bit id)
-    void SetUInt64(size_t index, uint64_t value) {
-      emp_assert(index * 64 < NUM_FIELDS * FIELD_BITS);
+    void SetUInt64(const size_t index, const uint64_t value) {
+      emp_assert(index * 64 < NUM_BITS);
 
-      if constexpr (FIELD_BITS == 32 && NUM_FIELDS % 2) {
-        if (index * 2 == NUM_FIELDS - 1 ) {
-          bit_set[NUM_FIELDS - 1] = (uint32_t) value;
-        }
+      if constexpr (FIELD_BITS == 64) {
+        bit_set[index] = value;
+      } else if constexpr (FIELD_BITS == 32 && (NUM_FIELDS % 2 == 0)) {
+        std::memcpy(
+          reinterpret_cast<unsigned char*>(bit_set) + index * (64/8),
+          &value,
+          sizeof(value)
+        );
+      } else if constexpr (FIELD_BITS == 32 && NUM_FIELDS == 1) {
+        std::memcpy(
+          reinterpret_cast<unsigned char*>(bit_set),
+          &value,
+          32/8
+        );
+      } else {
+        std::memcpy(
+          reinterpret_cast<unsigned char*>(bit_set) + index * (64/8),
+          &value,
+          std::min(64, NUM_FIELDS * FIELD_BITS - 64 * index)/8
+        );
       }
 
       // Mask out filler bits if necessary
-      if constexpr ((bool)LAST_BIT) {
+      if constexpr (static_cast<bool>(LAST_BIT)) {
         // we only need to do this
         // if (index * 64 == (NUM_FIELDS - 1) * FIELD_BITS)
         // but just doing it always is probably faster
         bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       }
 
-      ((uint64_t*) bit_set)[index] = value;
     }
 
     /// Get the full uint32_t unsigned int starting from the bit at a specified index.
-    uint32_t GetUIntAtBit(size_t index) { return GetUInt32AtBit(index); }
+    uint32_t GetUIntAtBit(const size_t index) { return GetUInt32AtBit(index); }
 
     /// Get the full uint32_t unsigned int starting from the bit at a specified index.
-    uint32_t GetUInt32AtBit(size_t index) {
+    uint32_t GetUInt32AtBit(const size_t index) {
       emp_assert(index < NUM_BITS);
 
-      uint32_t *cast_set = (uint32_t *) bit_set;
-      const size_t field_id = index / 32;
-      const size_t pos_id = index % 32;
+      BitSet<32> res;
+      res.Import(*this, index);
 
-      if (pos_id == 0) return cast_set[field_id];
-      else return (
-        (cast_set[field_id] >> pos_id) |
-        (
-          (field_id+1 < NUM_FIELDS)
-          ? cast_set[field_id+1] << (FIELD_BITS-pos_id)
-          : 0
-        )
-      );
+      return res.GetUInt32(0);
 
     }
 
     /// Get OUT_BITS bits starting from the bit at a specified index (max 32)
     template <size_t OUT_BITS>
-    uint32_t GetValueAtBit(size_t index) {
+    uint32_t GetValueAtBit(const size_t index) {
       static_assert(OUT_BITS <= 32, "Requesting too many bits to fit in a UInt");
-      return GetUIntAtBit(index) & MaskLow<uint64_t>(OUT_BITS);
+      return GetUIntAtBit(index) & MaskLow<uint32_t>(OUT_BITS);
     }
+
+    /// Get the unsigned numeric value represented by the BitSet as a double
+    double GetDouble() const {
+      double res = 0.0;
+      for (size_t i = 0; i < NUM_FIELDS; ++i) {
+        res += bit_set[i] * emp::Pow2(i * FIELD_BITS);
+      }
+      return res;
+    }
+
+    /// What is the maximum value this BitSet could contain, as a double?
+    static constexpr double MaxDouble() { return emp::Pow2(NUM_BITS) - 1.0; }
 
     /// Return true if ANY bits in the BitSet are one, else return false.
     bool Any() const { for (auto i : bit_set) if (i) return true; return false; }
@@ -603,14 +749,20 @@ namespace emp {
     BitProxy operator[](size_t index) { return BitProxy(*this, index); }
 
     /// Set all bits to zero.
-    void Clear() { for (auto & i : bit_set) i = (field_t)0U; }
+    void Clear() { std::memset(bit_set, 0, sizeof(bit_set)); }
 
     /// Set all bits to one.
     void SetAll() {
-      for (auto & i : bit_set) i = ~((field_t)0U);
-      if (LAST_BIT) {
+      std::memset(bit_set, 255, sizeof(bit_set));;
+      if constexpr (static_cast<bool>(LAST_BIT)) {
         bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
       }
+    }
+
+    /// Overload ostream operator to return Print.
+    friend std::ostream& operator<<(std::ostream &out, const BitSet& bs){
+      bs.Print(out);
+      return out;
     }
 
     /// Print all bits to the provided output stream.
@@ -642,14 +794,15 @@ namespace emp {
 
     /// Count 1's in semi-parallel; fastest for even 0's & 1's
     size_t CountOnes_Mixed() const {
-      const uint32_t *uint_bit_set = (const uint32_t*) bit_set;
+
       size_t bit_count = 0;
-      for (size_t i = 0; i < NUM_FIELDS * sizeof(field_t)/4; ++i) {
-        const uint32_t v = uint_bit_set[i];
-        const uint32_t t1 = v - ((v >> 1) & 0x55555555);
-        const uint32_t t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
-        bit_count += (((t2 + (t2 >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
-      }
+      for (size_t f = 0; f < NUM_FIELDS; ++f) {
+          // when compiling with -O3 and -msse4.2, this is the fastest population count method.
+          // this is due to using a dedicated instuction that runs in 1 clock cycle.
+          std::bitset<FIELD_BITS> std_bs(bit_set[f]);
+          bit_count += std_bs.count();
+       }
+
       return bit_count;
     }
 
@@ -694,6 +847,18 @@ namespace emp {
       }
       return out_set;
     }
+
+    /// Finds the length of the longest segment of ones.
+    size_t LongestSegmentOnes() const {
+      size_t length = 0;
+      BitSet out_set(*this);
+      while(out_set.Any()){
+        out_set.AND_SELF(out_set<<1);
+        ++length;
+      }
+      return length;
+    }
+
 
     /// Perform a Boolean NOT on this BitSet and return the result.
     BitSet NOT() const {
@@ -811,6 +976,40 @@ namespace emp {
       else if (shift_size < 0) ShiftLeft((field_t) -shift_size);
       return *this;
     }
+
+    /// Reverse the order of bits in the bitset
+    BitSet & REVERSE_SELF() {
+
+      // reverse bytes
+      std::reverse(
+        reinterpret_cast<unsigned char *>(bit_set),
+        reinterpret_cast<unsigned char *>(bit_set) + NUM_BYTES
+      );
+
+      // reverse each byte
+      // adapted from https://stackoverflow.com/questions/2602823/in-c-c-whats-the-simplest-way-to-reverse-the-order-of-bits-in-a-byte
+      for (size_t i = 0; i < NUM_BYTES; ++i) {
+        unsigned char & b = reinterpret_cast<unsigned char *>(bit_set)[i];
+        b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+        b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+        b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+      }
+
+      // shift out filler bits
+      if constexpr (static_cast<bool>((8-NUM_BITS%8)%8)) {
+        this->ShiftRight((8-NUM_BITS%8)%8);
+      }
+
+      return *this;
+
+    }
+
+    /// Reverse order of bits in the bitset.
+    BitSet REVERSE() const {
+      BitSet out_set(*this);
+      return out_set.REVERSE_SELF();
+    }
+
 
     /// Positive rotates go left and negative rotates go left (0 does nothing);
     /// return result.
@@ -987,6 +1186,74 @@ namespace emp {
 
     }
 
+    /// Addition of two Bitsets.
+    /// Wraps if it overflows.
+    /// Returns result.
+    BitSet ADD(const BitSet & set2) const{
+      BitSet out_set(*this);
+      return out_set.ADD_SELF(set2);
+    }
+
+    /// Addition of two Bitsets.
+    /// Wraps if it overflows.
+    /// Returns this object.
+    BitSet & ADD_SELF(const BitSet & set2) {
+      bool carry = false;
+
+      for (size_t i = 0; i < NUM_BITS/FIELD_BITS; ++i) {
+        field_t addend = set2.bit_set[i] + static_cast<field_t>(carry);
+        carry = set2.bit_set[i] > addend;
+
+        field_t sum = bit_set[i] + addend;
+        carry |= bit_set[i] > sum;
+
+        bit_set[i] = sum;
+      }
+
+      if constexpr (static_cast<bool>(LAST_BIT)) {
+        bit_set[NUM_BITS/FIELD_BITS] = (
+          bit_set[NUM_BITS/FIELD_BITS]
+          + set2.bit_set[NUM_BITS/FIELD_BITS]
+          + static_cast<field_t>(carry)
+        ) & emp::MaskLow<field_t>(LAST_BIT);
+      }
+
+      return *this;
+    }
+
+    /// Subtraction of two Bitsets.
+    /// Wraps around if it underflows.
+    /// Returns result.
+    BitSet SUB(const BitSet & set2) const{
+      BitSet out_set(*this);
+      return out_set.SUB_SELF(set2);
+    }
+
+    /// Subtraction of two Bitsets.
+    /// Wraps if it underflows.
+    /// Returns this object.
+    BitSet & SUB_SELF(const BitSet & set2){
+
+      bool carry = false;
+
+      for (size_t i = 0; i < NUM_BITS/FIELD_BITS; ++i) {
+        field_t subtrahend = set2.bit_set[i] + static_cast<field_t>(carry);
+        carry = set2.bit_set[i] > subtrahend;
+        carry |= bit_set[i] < subtrahend;
+        bit_set[i] -= subtrahend;
+     }
+
+      if constexpr (static_cast<bool>(LAST_BIT)) {
+        bit_set[NUM_BITS/FIELD_BITS] = (
+          bit_set[NUM_BITS/FIELD_BITS]
+          - set2.bit_set[NUM_BITS/FIELD_BITS]
+          - static_cast<field_t>(carry)
+        ) & emp::MaskLow<field_t>(LAST_BIT);
+      }
+
+      return *this;
+    }
+
     /// Operator bitwise NOT...
     BitSet operator~() const { return NOT(); }
 
@@ -1020,6 +1287,18 @@ namespace emp {
     /// Compound operator shift right...
     const BitSet & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
+    /// Operator plus...
+    BitSet operator+(const BitSet & ar2) const { return ADD(ar2); }
+
+    /// Operator minus...
+    BitSet operator-(const BitSet & ar2) const { return SUB(ar2); }
+
+    /// Compound operator plus...
+    const BitSet & operator+=(const BitSet & ar2) { return ADD_SELF(ar2); }
+
+    /// Compoount operator minus...
+    const BitSet & operator-=(const BitSet & ar2) { return SUB_SELF(ar2); }
+
     /// Function to allow drop-in replacement with std::bitset.
     constexpr static size_t size() { return NUM_BITS; }
 
@@ -1043,6 +1322,13 @@ namespace emp {
 
     /// Function to allow drop-in replacement with std::bitset.
     inline BitSet & flip(size_t start, size_t end) { return Toggle(start, end); }
+
+    template <class Archive>
+    void serialize( Archive & ar )
+    {
+      ar( bit_set );
+    }
+
   };
 
   template <size_t NUM_BITS1, size_t NUM_BITS2>
@@ -1062,11 +1348,23 @@ namespace emp {
 
 }
 
-template <size_t NUM_BITS> std::ostream & operator<<(std::ostream & out, const emp::BitSet<NUM_BITS> & _bit_set) {
-  _bit_set.Print(out);
-  return out;
+/// For hashing BitSets
+namespace std
+{
+    template <size_t N>
+    struct hash<emp::BitSet<N>>
+    {
+        size_t operator()( const emp::BitSet<N>& bs ) const
+        {
+           static const uint32_t NUM_BYTES = 1 + ((bs.GetSize() - 1) >> 3);
+           size_t result = bs.GetByte(0);
+           for (unsigned int i = 1; i < NUM_BYTES; ++i){
+                result = emp::hash_combine(result, bs.GetByte(i));
+           }
+           return result;
+        }
+    };
 }
-
 
 
 #endif

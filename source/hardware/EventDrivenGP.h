@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <deque>
 #include <utility>
+#include <algorithm>
+#include <ratio>
 #include "InstLib.h"
 #include "EventLib.h"
 #include "../tools/BitSet.h"
@@ -13,6 +15,7 @@
 #include "../tools/map_utils.h"
 #include "../tools/string_utils.h"
 #include "../tools/Random.h"
+#include "../tools/MatchBin.h"
 #include "../base/vector.h"
 #include "../base/Ptr.h"
 #include "../base/array.h"
@@ -95,13 +98,23 @@ namespace emp {
    *      * Each event type has a registered event handler that gets called to handle a dispatched
    *        event.
    */
-  template<size_t AFFINITY_WIDTH, typename TRAIT_TYPE=double>
-  class EventDrivenGP_AW {
+  template<
+    size_t AFFINITY_WIDTH,
+    typename TRAIT_T=emp::vector<double>,
+    typename MATCHBIN_T=emp::MatchBin<
+      size_t,
+      emp::HammingMetric<AFFINITY_WIDTH>,
+      emp::RankedSelector<std::ratio<1,2>>,
+      emp::MultiplicativeCountdownRegulator<>
+    >
+  > class EventDrivenGP_AW {
   public:
     /// Maximum number of instruction arguments. Currently hardcoded. At some point, will make flexible.
     static constexpr size_t MAX_INST_ARGS = 3;
 
-    using EventDrivenGP_t = EventDrivenGP_AW<AFFINITY_WIDTH, TRAIT_TYPE>;  //< Resolved type for this templated class.
+    static constexpr size_t affinity_width = AFFINITY_WIDTH;
+
+    using EventDrivenGP_t = EventDrivenGP_AW<AFFINITY_WIDTH, TRAIT_T, MATCHBIN_T>;  //< Resolved type for this templated class.
     using mem_key_t = int;                                     //< Hardware memory map key type.
     using mem_val_t = double;                                  //< Hardware memory map value type.
     using memory_t = std::unordered_map<mem_key_t, mem_val_t>; //< Hardware memory map type.
@@ -109,6 +122,8 @@ namespace emp {
     using arg_set_t = emp::array<arg_t, MAX_INST_ARGS>;        //< Instruction argument set type.
     using affinity_t = BitSet<AFFINITY_WIDTH>;                 //< Affinity type alias.
     using properties_t = std::unordered_set<std::string>;      //< Event/Instruction properties type.
+    using trait_t = TRAIT_T;
+    using matchbin_t = MATCHBIN_T;
 
     // A few default values. WARNING: I have no actual reason to believe these are the best defaults.
     static constexpr size_t DEFAULT_MAX_CORES = 8;
@@ -307,12 +322,40 @@ namespace emp {
     /// Each function has an associated:
     ///   * affinity: Function affinity. Analogous to the function's name.
     ///   * inst_seq: Instruction sequence. Sequence of instructions that make up the function.
-    struct Function {
+    class Function {
+
+    private:
       affinity_t affinity;          //< Function affinity. Analogous to the function's name.
+
+    public:
       inst_seq_t inst_seq;          //< Instruction sequence. Sequence of instructions that make up the function.
 
-      Function(const affinity_t & _aff=affinity_t(), const inst_seq_t & _seq=inst_seq_t())
-        : affinity(_aff), inst_seq(_seq) { ; }
+    private:
+      std::function<void()> fun_matchbin_refresh;          //< Callback to refresh matchbin.
+
+    public:
+      Function(
+        const affinity_t & _aff=affinity_t(),
+        const inst_seq_t & _seq=inst_seq_t(),
+        std::function<void()> _fun_matchbin_refresh=[](){}
+      ) : affinity(_aff)
+      , inst_seq(_seq)
+      , fun_matchbin_refresh(_fun_matchbin_refresh)
+      { ; }
+
+      Function& operator=(const Function& other) {
+
+        if (this != &other) {
+          // don't copy over fun_matchbin_refresh
+          // if we're copying into an object (i.e., one already in a program)
+          // we want to keep the current callback
+          this->affinity = other.affinity;
+          this->inst_seq = other.inst_seq;
+          fun_matchbin_refresh();
+        }
+
+        return *this;
+      }
 
       inst_t & operator[](size_t id) { return inst_seq[id]; }
       const inst_t & operator[](size_t id) const { return inst_seq[id]; }
@@ -320,6 +363,7 @@ namespace emp {
       bool operator==(const Function & in) const {
         return inst_seq == in.inst_seq && affinity == in.affinity;
       }
+
       bool operator!=(const Function & in) const { return !(*this == in); }
 
       bool operator<(const Function & other) const {
@@ -328,7 +372,20 @@ namespace emp {
 
       size_t GetSize() const { return inst_seq.size(); }
 
-      affinity_t & GetAffinity() { return affinity; }
+      /// If this function is loaded onto hardware, we need to refresh the
+      /// MatchBin whenever we make certain changes here
+      void SetMatchBinRefreshFun(std::function<void()> fun) {
+        fun_matchbin_refresh = fun;
+      }
+
+      const affinity_t & GetAffinity() const { return affinity; }
+
+      void SetAffinity(const affinity_t & aff) {
+        if (affinity != aff) {
+          affinity = aff;
+          fun_matchbin_refresh();
+         }
+      }
 
       void PushInst(size_t id, arg_t a0, arg_t a1, arg_t a2, const affinity_t & aff) {
         inst_seq.emplace_back(id, a0, a1, a2, aff);
@@ -353,17 +410,35 @@ namespace emp {
     /// Function names are bit strings (stored as a BitSet).
     /// Programs require an associated instruction library to give meaning to the instructions that make up
     /// their functions.
-    struct Program {
+    class Program {
+
+    protected:
       using program_t = emp::vector<Function>;  //< Convenient type alias for sequence of functions.
 
       Ptr<const inst_lib_t> inst_lib;  //< Pointer to const instruction library associated with this program.
       program_t program;               //< Sequence of functions that make up this program.
+      std::function<void()> fun_matchbin_refresh;
 
-      Program(Ptr<const inst_lib_t> _ilib, const program_t & _prgm=program_t())
-      : inst_lib(_ilib), program(_prgm) { ; }
+    public:
+      Program(
+        Ptr<const inst_lib_t> _ilib,
+        const program_t & _prgm=program_t()
+      ) : inst_lib(_ilib)
+      , program(_prgm)
+      , fun_matchbin_refresh([](){})
+      { ; }
       Program(const Program &) = default;
 
-      void Clear() { program.clear(); }
+      auto begin() { return std::begin(program); }
+      auto end() { return std::end(program); }
+
+      auto cbegin() const { return std::cbegin(program); }
+      auto cend() const { return std::cend(program); }
+
+
+      void Clear() {
+        program.clear();
+      }
 
       Function & operator[](size_t id) { return program[id]; }
       const Function & operator[](size_t id) const { return program[id]; }
@@ -392,11 +467,48 @@ namespace emp {
       }
       bool ValidFunction(size_t fID) const { return fID < program.size(); }
 
-      void SetProgram(const program_t & _program) { program = _program; }
+      /// If this program is loaded onto hardware, we need to refresh the
+      /// MatchBin whenever we make certain changes here
+      void SetMatchBinRefreshFun(std::function<void()> fun) {
+        fun_matchbin_refresh = fun;
+      }
 
-      void PushFunction(const Function & _function) { program.emplace_back(_function); }
+      void SetProgram(const program_t & _program) {
+        program = _program;
+        for (auto & f : program) f.SetMatchBinRefreshFun(fun_matchbin_refresh);
+        fun_matchbin_refresh();
+      }
+
+      void PushFunction(const Function & _function) {
+        program.emplace_back(_function);
+        program.back().SetMatchBinRefreshFun(fun_matchbin_refresh);
+        fun_matchbin_refresh();
+      }
+
+      void DeleteFunction(const size_t fID) {
+        emp_assert(fID < GetSize());
+
+        // adapted from https://stackoverflow.com/questions/34994311/stdvectorerase-vs-swap-and-pop
+        if (GetSize() > 1) {
+          std::iter_swap(
+            std::next(std::begin(program), fID),
+            std::prev(std::end(program))
+          );
+          program.pop_back();
+        } else {
+          program.clear();
+        }
+        fun_matchbin_refresh();
+
+      }
+
       void PushFunction(const affinity_t & _aff=affinity_t(), const inst_seq_t & _seq=inst_seq_t()) {
-        program.emplace_back(_aff, _seq);
+        program.emplace_back(
+          _aff,
+          _seq,
+          fun_matchbin_refresh
+        );
+        fun_matchbin_refresh();
       }
       /// Push new instruction to program.
       /// If no function pointer is provided and no functions exist yet, add new function to
@@ -557,7 +669,7 @@ namespace emp {
         for (size_t fID = 0; fID < GetSize(); fID++) {
           // Print out function name (affinity).
           os << "Fn-" << fID << " ";
-          program[fID].affinity.Print(os);
+          program[fID].GetAffinity().Print(os);
           os << ":\n";
           int depth = 0;
           for (size_t i = 0; i < program[fID].GetSize(); i++) {
@@ -583,7 +695,7 @@ namespace emp {
         for (size_t fID = 0; fID < GetSize(); fID++) {
           // Print out function name (affinity).
           os << "Fn-";
-          program[fID].affinity.Print(os);
+          program[fID].GetAffinity().Print(os);
           os << ":\n";
           int depth = 0;
           for (size_t i = 0; i < program[fID].GetSize(); i++) {
@@ -610,7 +722,7 @@ namespace emp {
     using exec_stk_t = emp::vector<State>;  //< Execution Stack/Core type alias.
     /// Event handler function type alias.
     using fun_event_handler_t = std::function<void(EventDrivenGP_t &, const event_t &)>;
-
+    using trait_printer_t = std::function<void(std::ostream& os, TRAIT_T t)>;
   protected:
     Ptr<const event_lib_t> event_lib;     //< Pointer to const event library associated with this hardware.
     Ptr<Random> random_ptr;               //< Pointer to random object to use.
@@ -618,7 +730,7 @@ namespace emp {
     program_t program;                    //< Hardware's associated program (set of functions).
     memory_t shared_mem;                  //< Hardware's shared memory map. All cores have access to the same shared memory.
     std::deque<event_t> event_queue;      //< Hardware's event queue. Where events go to be handled (in order of reception).
-    emp::vector<TRAIT_TYPE> traits;           //< Generic traits vector. Whatever uses the hardware must define/keep track of what traits mean.
+    TRAIT_T traits;                    //< Generic traits vector. Whatever uses the hardware must define/keep track of what traits mean.
     size_t errors;                        //< Errors committed by hardware while executing. (e.g. divide by 0, etc.)
     size_t max_cores;                     //< Maximum number of parallel execution stacks that can be spawned. Increasing this value drastically slows things down.
     size_t max_call_depth;                //< Maximum depth of calls per execution stack.
@@ -631,6 +743,8 @@ namespace emp {
     std::deque<size_t> pending_cores;     //< Queue of core IDs pending activation.
     size_t exec_core_id;                  //< core ID of the currently executing core.
     bool is_executing;                    //< True when mid-execution of all cores. (On every CPU cycle: execute all cores).
+    MATCHBIN_T matchBin;
+    trait_printer_t fun_trait_print = [](std::ostream& os, TRAIT_T){os << "UNCONFIGURED TRAIT PRINT FUNCTION\n";};
 
     // TODO: disallow configuration of hardware while executing. (and any other functions that could sent things into a bad state)
 
@@ -639,7 +753,9 @@ namespace emp {
     /// post-construction.
     EventDrivenGP_AW(Ptr<const inst_lib_t> _ilib, Ptr<const event_lib_t> _elib, Ptr<Random> rnd=nullptr)
       : event_lib(_elib),
-        random_ptr(rnd), random_owner(false),
+        // if no random pointer provided, create one
+        random_ptr(rnd ? rnd : emp::NewPtr<Random>(-1)),
+        random_owner(!rnd),
         program(_ilib),
         shared_mem(),
         event_queue(),
@@ -648,15 +764,18 @@ namespace emp {
         default_mem_value(DEFAULT_MEM_VALUE), min_bind_thresh(DEFAULT_MIN_BIND_THRESH),
         stochastic_fun_call(true),
         cores(max_cores), active_cores(), inactive_cores(max_cores), pending_cores(),
-        exec_core_id(0), is_executing(false)
+        exec_core_id(0), is_executing(false),
+        matchBin(*random_ptr)
     {
-      // If no random provided, create one.
-      if (!rnd) NewRandom();
+      // Give the program our matchbin clear cache callback.
+      program.SetMatchBinRefreshFun( [this](){ this->RefreshMatchBin(); } );
+
       // Add all available cores to inactive.
       for (size_t i = 0; i < inactive_cores.size(); ++i)
         inactive_cores[i] = (inactive_cores.size() - 1) - i;
       // Spin up main core (will spin up on function ID = 0).
       SpawnCore(0, memory_t(), true);
+
     }
 
     EventDrivenGP_AW(const inst_lib_t & _ilib, const event_lib_t & _elib, Ptr<Random> rnd=nullptr)
@@ -681,12 +800,14 @@ namespace emp {
         cores(in.cores),
         active_cores(in.active_cores), inactive_cores(in.inactive_cores),
         pending_cores(in.pending_cores),
-        exec_core_id(in.exec_core_id), is_executing(in.is_executing)
+        exec_core_id(in.exec_core_id), is_executing(in.is_executing),
+        fun_trait_print(in.fun_trait_print)
     {
       in.random_ptr = nullptr;
       in.random_owner = false;
       in.event_lib = nullptr;
       in.program.inst_lib = nullptr;
+      program.SetMatchBinRefreshFun( [this](){ this->RefreshMatchBin(); } );
     }
 
     EventDrivenGP_AW(const EventDrivenGP_t & in)
@@ -702,10 +823,12 @@ namespace emp {
         cores(in.cores),
         active_cores(in.active_cores), inactive_cores(in.inactive_cores),
         pending_cores(in.pending_cores),
-        exec_core_id(in.exec_core_id), is_executing(in.is_executing)
+        exec_core_id(in.exec_core_id), is_executing(in.is_executing),
+        fun_trait_print(in.fun_trait_print)
     {
       if (in.random_owner) NewRandom();
       else random_ptr = in.random_ptr;
+      program.SetMatchBinRefreshFun( [this](){ this->RefreshMatchBin(); } );
     }
 
     ~EventDrivenGP_AW() {
@@ -718,7 +841,7 @@ namespace emp {
     void Reset() {
       emp_assert(!is_executing);
       ResetHardware();
-      traits.clear();
+      traits = TRAIT_T();
       program.Clear();
     }
 
@@ -754,7 +877,7 @@ namespace emp {
     void SpawnCore(const affinity_t & affinity, double threshold, const memory_t & input_mem=memory_t(), bool is_main=false) {
       if (!inactive_cores.size()) return; // If there are no unclaimed cores, just return.
       size_t fID;
-      emp::vector<size_t> best_matches(FindBestFuncMatch(affinity, threshold));
+      emp::vector<size_t> best_matches{FindBestFuncMatch(affinity)};
       if (best_matches.empty()) return;
       if (best_matches.size() == 1.0) fID = best_matches[0];
       else if (stochastic_fun_call) fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
@@ -813,8 +936,11 @@ namespace emp {
       return program[fID].inst_seq[pos];
     }
 
-    /// Get a particular trait given its ID.
-    TRAIT_TYPE GetTrait(size_t id) const { emp_assert(id < traits.size()); return traits[id]; }
+    /// Get the stored trait in hardware's program.
+    TRAIT_T& GetTrait() { return traits; }
+
+    /// Get the stored trait in hardware's program.
+    const TRAIT_T& GetTrait() const { return traits; }
 
     /// Get current number of errors committed by this hardware.
     size_t GetNumErrors() const { return errors; }
@@ -839,6 +965,10 @@ namespace emp {
     /// Get all hardware cores.
     /// NOTE: use responsibly!
     emp::vector<exec_stk_t> & GetCores() { return cores; }
+
+    /// Get all hardware cores.
+    /// NOTE: use responsibly!
+    const emp::vector<exec_stk_t> & GetCores() const { return cores; }
 
     /// Get the currently executing core ID. If hardware is not in the middle of an execution cycle
     /// (the SingleProcess function), this will return the first core ID in active_cores, which will
@@ -954,29 +1084,11 @@ namespace emp {
     /// that are equidistant from caller/event affinity.
     void SetStochasticFunCall(bool val) { stochastic_fun_call = val; }
 
-    /// Set trait in traints vector given by id to value given by val.
+    /// Set trait in traits vector given by id to value given by val.
     /// Will resize traits vector if given id is greater than current traits vector size.
-    void SetTrait(size_t id, TRAIT_TYPE val) {
-      if (id >= traits.size()) traits.resize(id+1, 0.0);
-      traits[id] = val;
+    void SetTrait(TRAIT_T t) {
+      traits = t;
     }
-
-    /// Utility function to increment trait id by value given by inc.
-    /// Will resize traits vector if given id is greater than current traits vector size.
-    void IncTrait(size_t id, double inc=1.0) {
-      if (id >= traits.size()) traits.resize(id+1, 0.0);
-      traits[id] += inc;
-    }
-
-    /// Utility function to decrement trait id by value given by dec.
-    /// Will resize traits vector if given id is greater than current traits vector size.
-    void DecTrait(size_t id, double dec=1.0) {
-      if (id >= traits.size()) traits.resize(id+1, 0.0);
-      traits[id] -= dec;
-    }
-
-    /// Push a trait onto end of traits vector.
-    void PushTrait(TRAIT_TYPE val) { traits.emplace_back(val); }
 
     /// Shortcut to this hardware object's program's SetInst function of the same signature.
     void SetInst(size_t fID, size_t pos, const inst_t & inst) {
@@ -992,7 +1104,11 @@ namespace emp {
     }
 
     /// Set program for this hardware object.
-    void SetProgram(const program_t & _program) { program = _program; }
+    void SetProgram(const program_t & _program) {
+      program = _program;
+      program.SetMatchBinRefreshFun( [this](){ this->RefreshMatchBin(); } );
+      RefreshMatchBin();
+    }
 
     /// Shortcut to this hardware object's program's PushFunction operation of the same signature.
     void PushFunction(const Function & _function) { program.PushFunction(_function); }
@@ -1058,7 +1174,7 @@ namespace emp {
     /// This is not guaranteed to return a valid IP. At worst, it'll return an IP == function.inst_seq.size().
     size_t FindEndOfBlock(size_t fp, size_t ip) {
       emp_assert(ValidFunction(fp));
-      Ptr<const inst_lib_t> inst_lib = program.inst_lib;
+      Ptr<const inst_lib_t> inst_lib = program.GetInstLib();
       int depth_counter = 1;
       while (true) {
         if (!ValidPosition(fp, ip)) break;
@@ -1115,18 +1231,27 @@ namespace emp {
     }
 
     /// Find best matching functions (by ID) given affinity.
-    emp::vector<size_t> FindBestFuncMatch(const affinity_t & affinity, double threshold) {
-      emp::vector<size_t> best_matches;
-      for (size_t i=0; i < program.GetSize(); ++i) {
-        double bind = SimpleMatchCoeff(program[i].affinity, affinity);
-        if (bind == threshold) best_matches.push_back(i);
-        else if (bind > threshold) {
-          best_matches.resize(1);
-          best_matches[0] = i;
-          threshold = bind;
-        }
+    emp::vector<size_t> FindBestFuncMatch(const affinity_t & affinity) {
+      // no need to transform to values because we're using
+      // matchbin uids equivalent to function uids
+      // also, we've delegated responsibility RE: the number of matches to
+      // return to the MatchBin Selector
+      return matchBin.Match(affinity);
+    }
+
+    MATCHBIN_T& GetMatchBin(){
+      return matchBin;
+    }
+
+    const MATCHBIN_T& GetMatchBin() const {
+      return matchBin;
+    }
+
+    void RefreshMatchBin(){
+      matchBin.Clear();
+      for (size_t i = 0; i < program.GetSize(); ++i) {
+        matchBin.Set(i, program[i].GetAffinity(), i);
       }
-      return best_matches;
     }
 
     /// Call function with best affinity match above threshold.
@@ -1135,9 +1260,9 @@ namespace emp {
       // Are we at max call depth? -- If so, call fails.
       if (GetCurCore().size() >= max_call_depth) return;
       size_t fID;
-      emp::vector<size_t> best_matches(FindBestFuncMatch(affinity, threshold));
+      emp::vector<size_t> best_matches{FindBestFuncMatch(affinity)};
       if (best_matches.empty()) return;
-      if (best_matches.size() == 1.0) fID = best_matches[0];
+      if (best_matches.size() == 1) fID = best_matches[0];
       else if (stochastic_fun_call) fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
       else fID = best_matches[0];
       CallFunction(fID);
@@ -1265,7 +1390,7 @@ namespace emp {
           // First, advance the instruction pointer by 1. This may invalidate the IP, but that's okay.
           cur_state.inst_ptr += 1;
           // Run instruction @ fp, ip.
-          program.inst_lib->ProcessInst(*this, program[fp].inst_seq[ip]);
+          program.GetInstLib()->ProcessInst(*this, program[fp].inst_seq[ip]);
         }
         // After processing, is the core still active?
         if (GetCurCore().empty()) {
@@ -1310,11 +1435,11 @@ namespace emp {
 
     /// Print hardware traits using given output stream (default = std::cout).
     void PrintTraits(std::ostream & os=std::cout) {
-      if (traits.size() == 0) { os << "[]"; return; }
-      os << "[";
-      for (size_t i = 0; i < traits.size() - 1; ++i) {
-        os << traits[i] << ", ";
-      } os << traits[traits.size() - 1] << "]";
+      fun_trait_print(os, traits);
+    }
+
+    void SetTraitPrintFun(const trait_printer_t& t){
+      fun_trait_print = t;
     }
 
     /// Print out entire program using given output stream (default = std::cout).
@@ -1358,11 +1483,30 @@ namespace emp {
           // IP, FP, local mem, input mem, output mem
           const State & state = core[k];
           os << "    Inst ptr: " << state.inst_ptr << " (";
-          if (ValidPosition(state.func_ptr, state.inst_ptr))
-            PrintInst(GetInst(state.func_ptr, state.inst_ptr), os);
+          if (ValidPosition(state.func_ptr, state.inst_ptr)){
+            inst_t inst = GetInst(state.func_ptr, state.inst_ptr);
+            PrintInst(inst, os);
+            os << ")"<<"\n";
+            emp::vector<std::string> additional_state_info{"Call","Fork","SetRegulator","AdjRegulator"};
+            if (std::find(additional_state_info.begin(), additional_state_info.end(), GetInstLib()->GetName(inst.id)) != additional_state_info.end()){
+              std::unordered_map<size_t, double> probabilities;
+              for(unsigned int i = 0; i < 100; ++i){
+                emp::vector<size_t> matches = FindBestFuncMatch(inst.affinity);
+                if(matches.size() == 1){
+                  if(probabilities.find(matches[0])==probabilities.end()){probabilities[matches[0]] = 0;}
+                  ++probabilities[matches[0]];
+                }
+              }
+              emp::vector<std::pair<double, size_t>>best_matches;
+              for(auto &[id, prob] : probabilities){best_matches.emplace_back(prob, id);}
+              std::sort(best_matches.begin(), best_matches.end());
+              std::reverse(best_matches.begin(), best_matches.end());
+              for(auto &[prob, id] : best_matches){os <<"      Fn-"<< id << ": " << prob <<"%\n";}
+            }
+          }
+
           else
-            os << "NONE";
-          os << ")" << "\n";
+            os << "NONE"<<")"<<"\n";
           os << "    Func ptr: " << state.func_ptr << "\n";
           os << "    Input memory: ";
           for (auto mem : state.input_mem) os << "{" << mem.first << ":" << mem.second << "}";
@@ -1666,7 +1810,198 @@ namespace emp {
       State & state = hw.GetCurState();
       state.SetLocal(inst.args[0], hw.GetRandom().GetDouble());
     }
-    
+
+    /// Non-default instruction: SetRegulator
+    /// Number of arguments: 2
+    /// Description: Sets the regulator of a tag in the matchbin.
+    static void Inst_SetRegulator(EventDrivenGP_t & hw, const inst_t & inst){
+      const State & state = hw.GetCurState();
+
+      const emp::vector<size_t> targets = hw.GetMatchBin().MatchRaw(
+        inst.affinity
+      );
+
+      for (const auto & target : targets) {
+        hw.GetMatchBin().SetRegulator(
+          target,
+          state.GetLocal(inst.args[0])
+        );
+        hw.GetMatchBin().DecayRegulator(
+          target,
+          -state.GetLocal(inst.args[1]) // 0 is a no-op
+        );
+      }
+
+    }
+
+    /// Non-default instruction: SetOwnRegulator
+    /// Number of arguments: 2
+    /// Description: Sets the regulator of the currently executing function.
+    static void Inst_SetOwnRegulator(EventDrivenGP_t & hw, const inst_t & inst){
+      const State & state = hw.GetCurState();
+
+      const size_t target = state.GetFP();
+
+      hw.GetMatchBin().SetRegulator(
+        target,
+        state.GetLocal(inst.args[0])
+      );
+      hw.GetMatchBin().DecayRegulator(
+        target,
+        -state.GetLocal(inst.args[1]) // 0 is a no-op
+      );
+
+    }
+
+    /// Non-default instruction: AdjRegulator
+    /// Number of arguments: 3
+    /// Description: adjusts the regulator of a tag in the matchbin
+    /// towards a goal.
+    static void Inst_AdjRegulator(EventDrivenGP_t & hw, const inst_t & inst){
+      const State & state = hw.GetCurState();
+
+      const double goal = state.GetLocal(inst.args[0]);
+      const double budge = emp::Mod(
+        state.GetLocal(inst.args[1]) + 1.0,
+        5.0
+      ) / 5.0;
+
+      const emp::vector<size_t> targets = hw.GetMatchBin().MatchRaw(
+        inst.affinity
+      );
+      for (const auto & target : targets) {
+
+        const double cur = hw.GetMatchBin().ViewRegulator(target);
+
+        hw.GetMatchBin().SetRegulator(
+          target,
+          goal * budge + cur * (1 - budge)
+        );
+        hw.GetMatchBin().DecayRegulator(
+          target,
+          -state.GetLocal(inst.args[2]) // 0 is a no-op
+        );
+
+      }
+
+    }
+
+    /// Non-default instruction: AdjOwnRegulator
+    /// Number of arguments: 3
+    /// Description: adjusts the regulator of a tag in the matchbin
+    /// towards a target.
+    static void Inst_AdjOwnRegulator(EventDrivenGP_t & hw, const inst_t & inst){
+      const State & state = hw.GetCurState();
+
+      const size_t target = state.GetFP();
+      const double goal = state.GetLocal(inst.args[0]);
+      const double budge = emp::Mod(
+        state.GetLocal(inst.args[1]) + 1.0,
+        5.0
+      ) / 5.0;
+      const double cur = hw.GetMatchBin().ViewRegulator(target);
+
+      hw.GetMatchBin().SetRegulator(
+        target,
+        goal * budge + cur * (1 - budge)
+      );
+      hw.GetMatchBin().DecayRegulator(
+        target,
+        -state.GetLocal(inst.args[2]) // 0 is a no-op
+      );
+
+    }
+
+    /// Non-default instruction: ExtRegulator
+    /// Number of arguments: 1
+    /// Description: extends the decay counter of a
+    /// regulator of a tag in the matchbin.
+    static void Inst_ExtRegulator(EventDrivenGP_t & hw, const inst_t & inst){
+      const State & state = hw.GetCurState();
+
+      const emp::vector<size_t> targets = hw.GetMatchBin().MatchRaw(
+        inst.affinity
+      );
+
+      for (const auto & target : targets) {
+        hw.GetMatchBin().DecayRegulator(
+          target,
+          -state.GetLocal(inst.args[1]) // 0 is a no-op
+        );
+      }
+
+    }
+
+
+    /// Non-default instruction: ExtOwnRegulator
+    /// Number of arguments: 1
+    /// Description: extends the decay counter of a
+    /// regulator of a tag in the matchbin.
+    static void Inst_ExtOwnRegulator(EventDrivenGP_t & hw, const inst_t & inst){
+      const State & state = hw.GetCurState();
+
+      const size_t target = state.GetFP();
+
+      hw.GetMatchBin().DecayRegulator(
+        target,
+        -state.GetLocal(inst.args[1]) // 0 is a no-op
+      );
+
+    }
+
+
+    /// Non-default instruction: SenseRegulator
+    /// Number of arguments: 1
+    /// Description: senses the value of the regulator of another function.
+    static void Inst_SenseRegulator(EventDrivenGP_t & hw, const inst_t & inst){
+      State & state = hw.GetCurState();
+      const emp::vector<size_t> targets = hw.GetMatchBin().MatchRaw(
+        inst.affinity
+      );
+      if (targets.size() == 1){
+        state.SetLocal(
+          inst.args[0],
+          hw.GetMatchBin().ViewRegulator(targets[0])
+        );
+      }
+    }
+
+    /// Non-default instruction: SenseOwnRegulator
+    /// Number of arguments: 1
+    /// Description: senses the value of the regulator the current function.
+    static void Inst_SenseOwnRegulator(
+      EventDrivenGP_t & hw,
+      const inst_t & inst
+    ){
+      State & state = hw.GetCurState();
+      const size_t target = state.GetFP();
+      state.SetLocal(
+        inst.args[0],
+        hw.GetMatchBin().ViewRegulator(target)
+      );
+    }
+
+    /// Non-default instruction: Terminal
+    /// Number of arguments: 1
+    /// Description: writes a genetically-encoded value into a register.
+    template<typename MaxRatio=std::ratio<1>, typename MinRatio=std::ratio<0>>
+    static void Inst_Terminal(EventDrivenGP_t & hw, const inst_t & inst) {
+
+      constexpr double max = static_cast<double>(MaxRatio::num) / MaxRatio::den;
+      constexpr double min = static_cast<double>(MinRatio::num) / MinRatio::den;
+
+      State & state = hw.GetCurState();
+      const auto & tag = inst.affinity;
+
+      const double val = (
+        tag.GetDouble() / tag.MaxDouble()
+      ) * (max - min) - min;
+
+      state.SetLocal(inst.args[0], val);
+
+    }
+
+
     /// Get a pointer to const default instruction library. Will only construct the default instruction library once.
     static Ptr<const InstLib<EventDrivenGP_t>> DefaultInstLib() {
       static inst_lib_t inst_lib;
