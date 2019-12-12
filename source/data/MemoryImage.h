@@ -45,7 +45,6 @@ namespace emp {
     byte_t & operator[](size_t pos) { return memory[pos]; }
     const byte_t & operator[](size_t pos) const { return memory[pos]; }
     size_t size() const { return memory.size(); }
-    void resize(size_t new_size) { memory.resize(new_size); }
   };
 
   template <unsigned int SIZE>
@@ -55,6 +54,15 @@ namespace emp {
 
   public:
     ~MemoryArray() { }
+  };
+
+  class MemoryVector : MemoryImage< emp::array<std::byte, SIZE> > {
+  protected:
+
+  public:
+    ~MemoryVector() { }
+
+    void resize(size_t new_size) { memory.resize(new_size); }
   };
 
 }
