@@ -5,6 +5,9 @@
  *
  *  @file  MemoryImage.h
  *  @brief A series of bytes that can store a collection of arbitrary objects.
+ * 
+ *  There MemoryImage forms a base class that maintains a series of bytes.  The derived class can
+ *  either have those bytes as a dynamic size (MemoryVector) or static size (MemoryArray).
  */
 
 #ifndef EMP_MEMORY_IMAGE_H
@@ -79,18 +82,33 @@ namespace emp {
   public:
     ~MemoryArray() { }
 
+    template <typename T, typename... ARGS>
+    size_t AddObject(ARGS &&... args) {
+      const size_t obj_pos = free_pos;
+      free_pos += sizeof(T);
+      Construct<T>(obj_pos, std::forward<ARGS>(args)...);
+      return obj_pos;
+    }
   };
 
   class MemoryVector : MemoryImage< emp::vector<std::byte> > {
   protected:
 
   public:
-    MemoryVector(size_t num_bytes) {
+    MemoryVector(size_t num_bytes=0) {
       memory.resize(num_bytes);
     }
     ~MemoryVector() { }
 
     void resize(size_t new_size) { memory.resize(new_size); }
+
+    template <typename T, typename... ARGS>
+    size_t AddObject(ARGS &&... args) {
+      const size_t obj_pos = memory.size();
+      memory.resize(obj_pos + sizeof(T));
+      Construct<T>(obj_pos, std::forward<ARGS>(args)...);
+      return obj_pos;
+    }
   };
 
 }
