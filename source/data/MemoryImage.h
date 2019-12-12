@@ -4,7 +4,7 @@
  *  @date 2018-2019.
  *
  *  @file  MemoryImage.h
- *  @brief A collection of arbitrary objects stored in a chunk of memory.
+ *  @brief A series of bytes that can store a collection of arbitrary objects.
  */
 
 #ifndef EMP_MEMORY_IMAGE_H
@@ -21,7 +21,7 @@ namespace emp {
   /// all of the variables in a scope or in a class.
   template <typename MEM_T>
   class MemoryImage {
-  private:
+  protected:
     using byte_t = unsigned char;
     MEM_T memory;      ///< The specific memory values.
 
@@ -46,6 +46,15 @@ namespace emp {
     const byte_t & operator[](size_t pos) const { return memory[pos]; }
     size_t size() const { return memory.size(); }
     void resize(size_t new_size) { memory.resize(new_size); }
+  };
+
+  template <unsigned int SIZE>
+  class MemoryArray : MemoryImage< emp::array<std::byte, SIZE> > {
+  protected:
+    unsigned int free_pos = 0;
+
+  public:
+    ~MemoryArray() { }
   };
 
 }
