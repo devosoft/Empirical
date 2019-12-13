@@ -1,11 +1,16 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018
+ *  @date 2018-2019.
  *
- *  @file  DataMap.h
- *  @brief Track arbitrary data by name (slow) or id (faster), from a pre-specified set of types.
+ *  @file  DataMap2.h
+ *  @brief Track arbitrary data by name (slow) or id (faster).
  *  @note Status: ALPHA
+ *
+ *  A DataMap links to a provided memory image to maintain arbitrary object types.
+ *  There are two derived types:
+ *    DataArray is fast, but requires size to be provided at compile time.
+ *    DataVector is slower, but has a dynamic memory size.
  */
 
 #ifndef EMP_DATA_MAP_H
@@ -16,72 +21,35 @@
 #include <typeinfo>
 #include <unordered_map>
 
+#include "MemoryImage.h"
+
 #include "../base/assert.h"
 #include "../base/Ptr.h"
-#include "../base/vector.h"
+#include "../meta/TypeID.h"
 #include "../tools/map_utils.h"
 #include "../tools/string_utils.h"
 
 namespace emp {
 
-  template <typename... Ts>
+  template <typename IMAGE_T>
   class DataMap {
   public:
-    using this_t = DataMap<Ts...>;
-    using this_ptr_t = emp::Ptr<const this_t>;
-    using data_tuple_t = std::tuple<emp::vector<Ts>...>;
-
-    class DataBlob {
-    private:
-      this_ptr_t map_ptr;
-      data_tuple_t data_blob;
-
-    public:
-      DataBlob() : map_ptr(nullptr), data_blob() { ; }
-      DataBlob(this_ptr_t _mp, const data_tuple_t & _db) : map_ptr(_mp), data_blob(_db) { ; }
-      DataBlob(const DataBlob &) = default;
-      DataBlob(DataBlob &&) = default;
-
-      DataBlob & operator=(const DataBlob &) = default;
-      DataBlob & operator=(DataBlob &&) = default;
-
-      data_tuple_t & GetTuple() { return data_blob; }
-
-      bool IsActive() { return !map_ptr.IsNull(); }
-
-      template <typename T> T & Get(size_t id) { 
-        emp_assert(!map_ptr.IsNull());
-        return map_ptr->Get(data_blob, id);
-      }
-      template <typename T> const T & Get(size_t id) const { 
-        emp_assert(!map_ptr.IsNull());
-        return map_ptr->Get(data_blob, id);
-      }
-      template <typename T> T & Get(const std::string & id) { 
-        emp_assert(!map_ptr.IsNull());
-        return map_ptr->Get(data_blob, id);
-      }
-      template <typename T> const T & Get(const std::string & id) const { 
-        emp_assert(!map_ptr.IsNull());
-        return map_ptr->Get(data_blob, id);
-      }
-
-      const this_t & GetMap() const { return *map_ptr; }
-    };
+    using this_t = DataMap<IMAGE_T>;
 
     struct SettingInfo {
-      std::string type;   // Type name as converted to string by typeid()
-      std::string desc;   // Full description of this setting.
-      std::string notes;  // Any additional notes about this setting.
+      emp::TypeID type;   ///< Type name as converted to string by typeid()
+      std::string name;   ///< Name of this setting.
+      std::string desc;   ///< Full description of this setting.
+      std::string notes;  ///< Any additional notes about this setting.
     };
 
   protected:
-    data_tuple_t default_data;                                ///< Default values for data.
+    IMAGE_T prototype_image;                                  ///< Memory image for these data.
     std::unordered_map<std::string, size_t> id_map;           ///< Lookup vector positions by name.
     std::unordered_map<std::string, SettingInfo> setting_map; ///< Lookup setting info by name.
 
   public:
-    DataMap() : default_data(), id_map(), setting_map() { ; }
+    DataMap() { ; }
     DataMap(const DataMap &) = default;
     DataMap(DataMap &&) = default;
     ~DataMap() { ; }
