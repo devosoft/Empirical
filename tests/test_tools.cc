@@ -2912,6 +2912,8 @@ TEST_CASE("Test matchbin_utils", "[tools]")
   bin.DecayRegulators();
   REQUIRE( bin.ViewRegulator(salut) == 0.0 );
   REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+
+  res = bin.GetVals(bin.Match(0, ndraws));
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") > ndraws/2 );
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") < hi_count );
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
@@ -2996,6 +2998,8 @@ TEST_CASE("Test matchbin_utils", "[tools]")
   bin.DecayRegulator(hi, 1);
   REQUIRE( bin.ViewRegulator(salut) == 0.0 );
   REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+
+  res = bin.GetVals(bin.Match(0, ndraws));
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") > ndraws/2 );
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") < hi_count );
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
