@@ -56,6 +56,51 @@ namespace emp {
 
   };
 
+  /// This regulator does nothing!
+  /// Useful for control experiments.
+  struct NoopRegulator : RegulatorBase<double, double, double> {
+
+    constexpr static double state = 0.0;
+
+    /// Apply regulation to a raw match score.
+    double operator()(const double raw_score) const override {
+      return raw_score;
+    }
+
+    /// No-op set.
+    /// Return whether MatchBin should be updated (never).
+    bool Set(const double & set) override {
+      std::ignore = set;
+      return false;
+    }
+
+    /// No-op adjustment.
+    /// Return whether MatchBin should be updated (never).
+    bool Adj(const double & amt) override {
+      std::ignore = amt;
+      return false;
+    }
+
+    /// No-op decay.
+    /// Return whether MatchBin should be updated (never).
+    bool Decay(const int steps) override {
+      std::ignore = steps;
+      return false;
+    }
+
+    /// Return a default value.
+    const double & View() const override { return state; }
+
+    std::string name() const override { return "No-op Regulator"; }
+
+    bool operator!=(const NoopRegulator & other) const { return false; }
+
+    #ifdef CEREAL_NVP
+    template <class Archive>
+    void serialize( Archive & ar ){ std::ignore = ar; }
+    #endif
+
+  };
 
   /// Don't use this regulator.
   /// It's here so tests don't break.
