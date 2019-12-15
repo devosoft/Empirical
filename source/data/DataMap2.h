@@ -44,87 +44,71 @@ namespace emp {
     };
 
   protected:
-    IMAGE_T prototype_image;                                  ///< Memory image for these data.
-    std::unordered_map<std::string, size_t> id_map;           ///< Lookup vector positions by name.
-    std::unordered_map<std::string, SettingInfo> setting_map; ///< Lookup setting info by name.
+    IMAGE_T default_image;                                ///< Memory image for these data.
+    std::unordered_map<std::string, size_t> id_map;       ///< Lookup vector positions by name.
+    std::unordered_map<size_t, SettingInfo> setting_map;  ///< Lookup setting info by id.
 
   public:
     DataMap() { ; }
-    DataMap(const DataMap &) = default;
+    // DataMap(const DataMap &) = default;
     DataMap(DataMap &&) = default;
     ~DataMap() { ; }
 
-    DataMap & operator=(const DataMap &) = default;
+    // DataMap & operator=(const DataMap &) = default;
     DataMap & operator=(DataMap &&) = default;
 
     /// Add a new variable with a specified type, name and value.
     template <typename T>
-    void Add(const std::string & name, T value) {
+    void Add(const std::String & name,
+	     T default_value,
+	     const std::string & desc="",
+	     const std::string & notes="") {
       emp_assert(!Has(id_map, name), name);               // Make sure this doesn't already exist.
-      auto & v = std::get<emp::vector<T>>(default_data);  // Retrieve vector of the correct type.
-      size_t pos = v.size();                              // Determine position of new entry.
-      v.push_back(value);                                 // Add the new value to the vector.
-      id_map[name] = pos;                                 // Store the position in the id map.
-      setting_map[name].type = typeid(T).name();          // Store the type of this entry.
+
+      // Setup the default version of this object and save its position.
+      size_t pos = default_image.AddObject<T>(default_value);
+
+      // Store the position in the id map.
+      id_map[name] = pos;
+
+      // Store all of the other settings for this object.
+      setting_map[pos] = { emp::GetTypeID<T>(), name, desc, notes };
     }
 
-    const data_tuple_t & GetDefaults() const { return default_data; }
-    DataBlob MakeBlob() const { return DataBlob(this, default_data); }
+    const auto & GetDefaultImage() const { return default_image; }
 
-    /// Retrieve a default variable by its type and unique id.
+    /// Retrieve a default variable by its type and position.
     template <typename T>
-    T & GetDefault(size_t id) {
-      return std::get<emp::vector<T>>(default_data)[id];  // Index into vector of correct type.
+    T & GetDefault(size_t pos) {
+      emp_assert(emp::Has(setting_map, pos) && seting_map[pos].type == emp::GetTypeID<T>());
+      default_image.GetRef<T>(pos);
     }
 
-    /// Retrieve a variable from a blob by its type and unique id.
+    /// Retrieve a variable from an image by its type and position.
+    template <typename T, typename IN_IMAGE_T>
+    T & Get(IN_IMAGE_T & image, size_t pos) {
+      emp_assert(emp::Has(setting_map, pos) && seting_map[pos].type == emp::GetTypeID<T>());
+      image.GetRef<T>(pos);
+    }
+
+    // -- Constant versions of above two Get fuctions... --
+
+    /// Retrieve a const default variable by its type and position.
     template <typename T>
-    T & Get(data_tuple_t & blob, size_t id) {
-      return std::get<emp::vector<T>>(blob)[id];  // Index into vector of correct type.
+    const T & GetDefault(size_t pos) const {
+      emp_assert(emp::Has(setting_map, pos) && seting_map[pos].type == emp::GetTypeID<T>());
+      default_image.GetRef<T>(pos);
     }
 
-    /// Retrieve a constant default variable by its type and unique id.
-    template <typename T>
-    const T & Get(size_t id) const {
-      return std::get<emp::vector<T>>(default_data)[id];  // Index into vector of correct type.
-    }
-
-    /// Retrieve a constant variable from a blob by its type and unique id.
-    template <typename T>
-    const T & Get(const data_tuple_t & blob, size_t id) const {
-      return std::get<emp::vector<T>>(blob)[id];  // Index into vector of correct type.
-    }
-
-    /// Retrieve a default variable by its type and unique name.
-    template <typename T>
-    T & GetDefault(const std::string & name) {
-      emp_assert(setting_map[name].type == typeid(T).name());
-      return GetDefault<T>(id_map[name]);
-    }
-
-    /// Retrieve a const default variable by its type and unique name.
-    template <typename T>
-    const T & GetDefault(const std::string & name) const {
-      emp_assert(Has(id_map, name), name);                         // Make sure this name exists
-      emp_assert(setting_map.find(name)->second.type == typeid(T).name()); // Ensure correct type is used.
-      return GetDefault<T>( id_map.find(name)->second );
+    /// Retrieve a const variable from an image by its type and position.
+    template <typename T, typename IN_IMAGE_T>
+    const T & Get(IN_IMAGE_T & image, size_t pos) const {
+      emp_assert(emp::Has(setting_map, pos) && seting_map[pos].type == emp::GetTypeID<T>());
+      image.GetRef<T>(pos);
     }
 
 
-    /// Retrieve a variable from a data blob by its type and unique name.
-    template <typename T>
-    T & Get(data_tuple_t & blob, const std::string & name) {
-      emp_assert(setting_map[name].type == typeid(T).name());
-      return Get<T>(blob, id_map[name]);
-    }
 
-    /// Retrieve a variable from a const data blob by its type and unique name.
-    template <typename T>
-    const T & Get(const data_tuple_t & blob, const std::string & name) const {
-      emp_assert(Has(id_map, name), name);                         // Make sure this name exists
-      emp_assert(setting_map.find(name)->second.type == typeid(T).name()); // Ensure correct type is used.
-      return Get<T>( blob, id_map.find(name)->second );
-    }
 
 
     size_t GetID(const std::string & name) const {
