@@ -108,17 +108,50 @@ namespace emp {
     }
 
 
+    // == Retrivals by name instead of by ID (slower!) ==
+
+
+    /// Retrieve a default variable by its type and position.
+    template <typename T>
+    T & GetDefault(& std::string & name) {
+      emp_assert(emp::Has(id_map, name));
+      default_image.GetRef<T>(id_map[name]);
+    }
+
+    /// Retrieve a variable from an image by its type and position.
+    template <typename T, typename IN_IMAGE_T>
+    T & Get(IN_IMAGE_T & image, & std::string & name) {
+      emp_assert(emp::Has(id_map, name));
+      image.GetRef<T>(id_map[name]);
+    }
+
+    // -- Constant versions of above two Get fuctions... --
+
+    /// Retrieve a const default variable by its type and position.
+    template <typename T>
+    const T & GetDefault(& std::string & name) const {
+      emp_assert(emp::Has(id_map, name));
+      default_image.GetRef<T>(id_map[name]);
+    }
+
+    /// Retrieve a const variable from an image by its type and position.
+    template <typename T, typename IN_IMAGE_T>
+    const T & Get(IN_IMAGE_T & image, & std::string & name) const {
+      emp_assert(emp::Has(id_map, name));
+      image.GetRef<T>(id_map[name]);
+    }
+
 
 
 
     size_t GetID(const std::string & name) const {
       emp_assert(Has(id_map, name), name);
-      return id_map.find(name)->second;
+      return id_map[name];
     }
 
-    const std::string & GetType(const std::string & name) const {
+    emp::TypeID GetType(const std::string & name) const {
       emp_assert(Has(id_map, name), name);
-      return setting_map.find(name)->second.type;
+      return setting_map[id_map[name]].type;
     }
   };
 
