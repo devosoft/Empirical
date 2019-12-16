@@ -95,6 +95,21 @@ namespace emp {
       Construct<T>(obj_pos, std::forward<ARGS>(args)...);
       return obj_pos;
     }
+
+    /// Copy provided memory from another MemoryArray
+    template <unsigned int IN_SIZE>
+    void RawCopy(MemoryArray<IN_SIZE> & in_image) {
+      emp_assert(in_image.free_pos <= SIZE, SIZE, in_image.free_pos, IN_SIZE);
+      std::mem_copy(&memory, &in_image.memory, in_image.free_pos);
+      free_pos = in_image.free_pos;
+    }
+
+    /// Copy provided memory from another type of MemoryImage (it may be slower...)
+    void RawCopy(MemoryImage & in_image) {
+      emp_assert(in_image.size() <= SIZE, SIZE, in_image.size());
+      for (size_t i = 0; i < in_image.size(); i++) memory[i] = in_image.memory[i];
+      free_pos = in_image.size();
+    }
   };
 
   class MemoryVector : MemoryImage< emp::vector<std::byte> > {
