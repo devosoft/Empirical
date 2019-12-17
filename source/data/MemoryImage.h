@@ -55,8 +55,6 @@ namespace emp {
 
     byte_t & operator[](size_t pos) { return memory[pos]; }
     const byte_t & operator[](size_t pos) const { return memory[pos]; }
-    size_t size() const { return memory.size(); }
-    size_t GetSize() const { return memory.size(); }
 
     /// Build a new object of the provided type at the memory position indicated.
     template <typename T, typename... ARGS>
@@ -87,6 +85,9 @@ namespace emp {
   public:
     ~MemoryArray() { }
 
+    size_t size() const { return free_pos; }
+    size_t GetSize() const { return free_pos; }
+
     /// Add a new object to this memory, just after allocated space.
     template <typename T, typename... ARGS>
     size_t AddObject(ARGS &&... args) {
@@ -99,6 +100,7 @@ namespace emp {
     /// Copy provided memory from another MemoryArray
     template <unsigned int IN_SIZE>
     void RawCopy(MemoryArray<IN_SIZE> & in_image) {
+      emp_assert(free_pos == 0, free_pos, "Must clean up memory image before a RawCopy into it.");
       emp_assert(in_image.free_pos <= SIZE, SIZE, in_image.free_pos, IN_SIZE);
       std::mem_copy(&memory, &in_image.memory, in_image.free_pos);
       free_pos = in_image.free_pos;
@@ -106,6 +108,7 @@ namespace emp {
 
     /// Copy provided memory from another type of MemoryImage (it may be slower...)
     void RawCopy(MemoryImage & in_image) {
+      emp_assert(free_pos == 0, free_pos, "Must clean up memory image before a RawCopy into it.");
       emp_assert(in_image.size() <= SIZE, SIZE, in_image.size());
       for (size_t i = 0; i < in_image.size(); i++) memory[i] = in_image.memory[i];
       free_pos = in_image.size();
@@ -121,6 +124,8 @@ namespace emp {
     }
     ~MemoryVector() { }
 
+    size_t size() const { return memory.size(); }
+    size_t GetSize() const { return memory.size(); }
     void resize(size_t new_size) { memory.resize(new_size); }
 
     /// Increase the size of this memory to add a new object inside it.
@@ -130,6 +135,19 @@ namespace emp {
       memory.resize(obj_pos + sizeof(T));
       Construct<T>(obj_pos, std::forward<ARGS>(args)...);
       return obj_pos;
+    }
+
+    /// Copy provided memory from another MemoryVector
+    void RawCopy(MemoryVector & in_image) {
+      emp_assert(memory.size() == 0, memory.size(), "Must clean up memory image before a RawCopy into it.");
+      memory = in_image.memory;
+    }
+
+    /// Copy provided memory from another MemoryImage (it may be slower...)
+    void RawCopy(MemoryImage & in_image) {
+      emp_assert(memory.size() == 0, memory.size(), "Must clean up memory image before a RawCopy into it.");
+      memory.resize(in_image.size())
+      for (size_t i = 0; i < size(); i++) memory[i] = in_image.memory[i];
     }
   };
 
