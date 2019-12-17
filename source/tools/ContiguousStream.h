@@ -113,7 +113,7 @@ namespace emp {
     }
 
     /// return buffer's capacity, in bytes
-    inline size_t GetCapacity() const { return buffer.capacity(); }
+    inline size_t GetCapacity() const { return buffer.size(); }
 
     // sputc calls this when we run out of space in buffer.
     int_type overflow(int_type c) override {
