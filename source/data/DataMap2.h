@@ -143,7 +143,6 @@ namespace emp {
 
 
 
-
     size_t GetID(const std::string & name) const {
       emp_assert(Has(id_map, name), name);
       return id_map[name];
@@ -153,6 +152,28 @@ namespace emp {
       emp_assert(Has(id_map, name), name);
       return setting_map[id_map[name]].type;
     }
+
+    /// Manipulations of images
+
+    template <typename IN_IMAGE_T>
+    void ClearImage(IN_IMAGE_T & image) {
+      // @CAO: Run destructor on contents of image.
+      image.resize(0);
+    }
+
+    template <typename IN_IMAGE_T>
+    void Initialize(IN_IMAGE_T & image) {
+      image.RawCopy(default_image);
+      // @CAO: Now do any constructors that need to be run!
+    }
+
+    template <typename IMAGE1_T, typename IMAGE2_T>
+    void CopyImage(IMAGE1_T & from_image, IMAGE2_T to_image) {
+      to_image.RawCopy(from_image);
+      // @CAO: Now do any copy constructors that need to be run!
+    }
+
+
   };
 
 }
