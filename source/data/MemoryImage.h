@@ -87,6 +87,10 @@ namespace emp {
 
     size_t size() const { return free_pos; }
     size_t GetSize() const { return free_pos; }
+    void resize(size_t new_size) {
+      emp_assert(free_pos <= SIZE, free_pos, SIZE);
+      free_pos = new_size;
+    }
 
     /// Add a new object to this memory, just after allocated space.
     template <typename T, typename... ARGS>
@@ -146,7 +150,7 @@ namespace emp {
     /// Copy provided memory from another MemoryImage (it may be slower...)
     void RawCopy(MemoryImage & in_image) {
       emp_assert(memory.size() == 0, memory.size(), "Must clean up memory image before a RawCopy into it.");
-      memory.resize(in_image.size())
+      memory.resize(in_image.size());
       for (size_t i = 0; i < size(); i++) memory[i] = in_image.memory[i];
     }
   };
