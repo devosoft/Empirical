@@ -13,6 +13,9 @@
 #ifndef EMP_MEMORY_IMAGE_H
 #define EMP_MEMORY_IMAGE_H
 
+// For std::memcpy
+#include <cstring>
+
 #include "../base/assert.h"
 #include "../base/Ptr.h"
 #include "../base/array.h"
@@ -77,11 +80,15 @@ namespace emp {
     }
   };
 
+  class MemoryVector;
+
   template <unsigned int SIZE>
   class MemoryArray : MemoryImage< emp::array<std::byte, SIZE> > {
   protected:
     unsigned int free_pos = 0;
 
+    using base_t = MemoryImage< emp::array<std::byte, SIZE> >;
+    using base_t::memory;
   public:
     ~MemoryArray() { }
 
@@ -97,7 +104,7 @@ namespace emp {
     size_t AddObject(ARGS &&... args) {
       const size_t obj_pos = free_pos;
       free_pos += sizeof(T);
-      Construct<T>(obj_pos, std::forward<ARGS>(args)...);
+      base_t::template Construct<T>(obj_pos, std::forward<ARGS>(args)...);
       return obj_pos;
     }
 
@@ -106,17 +113,12 @@ namespace emp {
     void RawCopy(MemoryArray<IN_SIZE> & in_image) {
       emp_assert(free_pos == 0, free_pos, "Must clean up memory image before a RawCopy into it.");
       emp_assert(in_image.free_pos <= SIZE, SIZE, in_image.free_pos, IN_SIZE);
-      std::mem_copy(&memory, &in_image.memory, in_image.free_pos);
+      std::memcpy(&memory, &in_image.memory, in_image.free_pos);
       free_pos = in_image.free_pos;
     }
 
     /// Copy provided memory from another type of MemoryImage (it may be slower...)
-    void RawCopy(MemoryImage & in_image) {
-      emp_assert(free_pos == 0, free_pos, "Must clean up memory image before a RawCopy into it.");
-      emp_assert(in_image.size() <= SIZE, SIZE, in_image.size());
-      for (size_t i = 0; i < in_image.size(); i++) memory[i] = in_image.memory[i];
-      free_pos = in_image.size();
-    }
+    void RawCopy(MemoryVector & in_image);
   };
 
   class MemoryVector : MemoryImage< emp::vector<std::byte> > {
@@ -154,6 +156,20 @@ namespace emp {
       for (size_t i = 0; i < size(); i++) memory[i] = in_image.memory[i];
     }
   };
+
+
+  //////////////////////////////////////
+  //
+  //   -- Function definitions --
+  //
+
+  template <unsigned int SIZE>
+  void MemoryArray<SIZE>::RawCopy(MemoryVector & in_image) {
+    emp_assert(free_pos == 0, free_pos, "Must clean up memory image before a RawCopy into it.");
+    emp_assert(in_image.size() <= SIZE, SIZE, in_image.size());
+    for (size_t i = 0; i < in_image.size(); i++) memory[i] = in_image.memory[i];
+    free_pos = in_image.size();
+  }
 
 }
 
