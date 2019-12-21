@@ -299,4 +299,21 @@ namespace emp {
 
 //}
 
+
+namespace std {
+  /// Hash function to allow BitVector to be used with maps and sets (must be in std).
+  template <>
+  struct hash<emp::TypeID> {
+    std::size_t operator()(const emp::TypeID & id) const {
+      return id.GetID();
+    }
+  };
+
+  /// operator<< to work with ostream (must be in std to work)
+  inline std::ostream & operator<<(std::ostream & out, const emp::TypeID & id) {
+    out << id.GetName();
+    return out;
+  }
+}
+
 #endif
