@@ -48,11 +48,17 @@ namespace emp {
     std::unordered_map<std::string, size_t> id_map;       ///< Lookup vector positions by name.
     std::unordered_map<size_t, SettingInfo> setting_map;  ///< Lookup setting info by id.
 
+    /// Collect all of the constructors and destructors that we need to worry about.
+    using cconstruct_fun_t = std::function<void(MemoryImage &, MemoryImage &)>;
+    using destruct_fun_t = std::function<void(MemoryImage &)>;
+    emp::vector<cconstruct_fun_t> copy_constructors;
+    emp::vector<destruct_fun_t> destructors;
+
   public:
     DataMap() { ; }
     // DataMap(const DataMap &) = default;
     DataMap(DataMap &&) = default;
-    ~DataMap() { ; }
+    ~DataMap() { ClearImage(default_image); }
 
     // DataMap & operator=(const DataMap &) = default;
     DataMap & operator=(DataMap &&) = default;
@@ -157,20 +163,23 @@ namespace emp {
 
     template <typename IN_IMAGE_T>
     void ClearImage(IN_IMAGE_T & image) {
-      // @CAO: Run destructor on contents of image.
+      // Run destructor on contents of image and then empty it!
+      for (auto & d : destructors) { d(image)}
       image.resize(0);
     }
 
     template <typename IN_IMAGE_T>
     void Initialize(IN_IMAGE_T & image) {
+      // Transfer over the default image and then run the required copy constructors.
       image.RawCopy(default_image);
-      // @CAO: Now do any constructors that need to be run!
+      for (auto & c : copy_constructors) { c(default_image, image)}
     }
 
     template <typename IMAGE1_T, typename IMAGE2_T>
     void CopyImage(IMAGE1_T & from_image, IMAGE2_T to_image) {
+      // Transfer over the from image and then run the required copy constructors.
       to_image.RawCopy(from_image);
-      // @CAO: Now do any copy constructors that need to be run!
+      for (auto & c : copy_constructors) { c(from_image, to_image)}
     }
 
 
