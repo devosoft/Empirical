@@ -64,13 +64,13 @@ namespace emp {
     // DataMap & operator=(const DataMap &) = default;
     DataMap & operator=(DataMap &&) = default;
 
-    // Lookup the unique idea for an entry.
+    /// Lookup the unique idea for an entry.
     size_t GetID(const std::string & name) const {
       emp_assert(Has(id_map, name), name);
       return id_map.find(name)->second;
     }
 
-    // Lookup the type of an entry.
+    /// Lookup the type of an entry.
     emp::TypeID GetType(const std::string & name) const {
       emp_assert(Has(id_map, name), name);
       return setting_map.find(GetID(name))->second.type;
@@ -88,7 +88,7 @@ namespace emp {
       size_t pos = default_image.template AddObject<T>(default_value);
 
       // Store the position in the id map.
-      GetID(name) = pos;
+      id_map[name] = pos;
 
       // Store all of the other settings for this object.
       setting_map[pos] = { emp::GetTypeID<T>(), name, desc, notes };
@@ -100,8 +100,11 @@ namespace emp {
     template <typename T>
     T & GetDefault(size_t pos) {
       emp_assert(emp::Has(setting_map, pos) && seting_map[pos].type == emp::GetTypeID<T>());
-      default_image.template GetRef<T>(pos);
+      return default_image.template GetRef<T>(pos);
     }
+
+    template <typename T>
+    T & GetDefault(const std::string & name) { return GetDefault<T>(GetID(name)); }
 
     /// Retrieve a variable from an image by its type and position.
     template <typename T>
@@ -118,6 +121,9 @@ namespace emp {
       emp_assert(emp::Has(setting_map, pos) && seting_map[pos].type == emp::GetTypeID<T>());
       default_image.template GetRef<T>(pos);
     }
+
+    template <typename T>
+    const T & GetDefault(const std::string & name) const { return GetDefault<T>(GetID(name)); }
 
     /// Retrieve a const variable from an image by its type and position.
     template <typename T>
@@ -166,21 +172,21 @@ namespace emp {
 
     void ClearImage(IMAGE_T & image) {
       // Run destructor on contents of image and then empty it!
-      for (auto & d : destructors) { d(image)}
+      for (auto & d : destructors) { d(image); }
       image.resize(0);
     }
 
     void Initialize(IMAGE_T & image) {
       // Transfer over the default image and then run the required copy constructors.
       image.RawCopy(default_image);
-      for (auto & c : copy_constructors) { c(default_image, image)}
+      for (auto & c : copy_constructors) { c(default_image, image); }
     }
 
     template <typename IMAGE1_T, typename IMAGE2_T>
     void CopyImage(IMAGE1_T & from_image, IMAGE2_T to_image) {
       // Transfer over the from image and then run the required copy constructors.
       to_image.RawCopy(from_image);
-      for (auto & c : copy_constructors) { c(from_image, to_image)}
+      for (auto & c : copy_constructors) { c(from_image, to_image); }
     }
 
 
