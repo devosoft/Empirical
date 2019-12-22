@@ -64,19 +64,31 @@ namespace emp {
     // DataMap & operator=(const DataMap &) = default;
     DataMap & operator=(DataMap &&) = default;
 
+    // Lookup the unique idea for an entry.
+    size_t GetID(const std::string & name) const {
+      emp_assert(Has(id_map, name), name);
+      return id_map.find(name)->second;
+    }
+
+    // Lookup the type of an entry.
+    emp::TypeID GetType(const std::string & name) const {
+      emp_assert(Has(id_map, name), name);
+      return setting_map.find(GetID(name))->second.type;
+    }
+
     /// Add a new variable with a specified type, name and value.
     template <typename T>
-    void Add(const std::String & name,
+    void Add(const std::string & name,
 	     T default_value,
 	     const std::string & desc="",
 	     const std::string & notes="") {
       emp_assert(!Has(id_map, name), name);               // Make sure this doesn't already exist.
 
       // Setup the default version of this object and save its position.
-      size_t pos = default_image.AddObject<T>(default_value);
+      size_t pos = default_image.template AddObject<T>(default_value);
 
       // Store the position in the id map.
-      id_map[name] = pos;
+      GetID(name) = pos;
 
       // Store all of the other settings for this object.
       setting_map[pos] = { emp::GetTypeID<T>(), name, desc, notes };
@@ -88,14 +100,14 @@ namespace emp {
     template <typename T>
     T & GetDefault(size_t pos) {
       emp_assert(emp::Has(setting_map, pos) && seting_map[pos].type == emp::GetTypeID<T>());
-      default_image.GetRef<T>(pos);
+      default_image.template GetRef<T>(pos);
     }
 
     /// Retrieve a variable from an image by its type and position.
     template <typename T>
     T & Get(IMAGE_T & image, size_t pos) {
       emp_assert(emp::Has(setting_map, pos) && seting_map[pos].type == emp::GetTypeID<T>());
-      image.GetRef<T>(pos);
+      image.template GetRef<T>(pos);
     }
 
     // -- Constant versions of above two Get fuctions... --
@@ -104,14 +116,14 @@ namespace emp {
     template <typename T>
     const T & GetDefault(size_t pos) const {
       emp_assert(emp::Has(setting_map, pos) && seting_map[pos].type == emp::GetTypeID<T>());
-      default_image.GetRef<T>(pos);
+      default_image.template GetRef<T>(pos);
     }
 
     /// Retrieve a const variable from an image by its type and position.
     template <typename T>
     const T & Get(IMAGE_T & image, size_t pos) const {
       emp_assert(emp::Has(setting_map, pos) && seting_map[pos].type == emp::GetTypeID<T>());
-      image.GetRef<T>(pos);
+      image.template GetRef<T>(pos);
     }
 
 
@@ -120,45 +132,35 @@ namespace emp {
 
     /// Retrieve a default variable by its type and position.
     template <typename T>
-    T & GetDefault(& std::string & name) {
+    T & GetDefault(std::string & name) {
       emp_assert(emp::Has(id_map, name));
-      default_image.GetRef<T>(id_map[name]);
+      default_image.template GetRef<T>(GetID(name));
     }
 
     /// Retrieve a variable from an image by its type and position.
     template <typename T>
-    T & Get(IMAGE_T & image, & std::string & name) {
+    T & Get(IMAGE_T & image, std::string & name) {
       emp_assert(emp::Has(id_map, name));
-      image.GetRef<T>(id_map[name]);
+      image.template GetRef<T>(GetID(name));
     }
 
     // -- Constant versions of above two Get fuctions... --
 
     /// Retrieve a const default variable by its type and position.
     template <typename T>
-    const T & GetDefault(& std::string & name) const {
+    const T & GetDefault(std::string & name) const {
       emp_assert(emp::Has(id_map, name));
-      default_image.GetRef<T>(id_map[name]);
+      default_image.template GetRef<T>(GetID(name));
     }
 
     /// Retrieve a const variable from an image by its type and position.
     template <typename T>
-    const T & Get(IMAGE_T & image, & std::string & name) const {
+    const T & Get(IMAGE_T & image, std::string & name) const {
       emp_assert(emp::Has(id_map, name));
-      image.GetRef<T>(id_map[name]);
+      image.template GetRef<T>(GetID(name));
     }
 
 
-
-    size_t GetID(const std::string & name) const {
-      emp_assert(Has(id_map, name), name);
-      return id_map[name];
-    }
-
-    emp::TypeID GetType(const std::string & name) const {
-      emp_assert(Has(id_map, name), name);
-      return setting_map[id_map[name]].type;
-    }
 
     /// Manipulations of images
 
