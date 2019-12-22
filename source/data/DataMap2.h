@@ -35,6 +35,7 @@ namespace emp {
   class DataMap {
   public:
     using this_t = DataMap<IMAGE_T>;
+    using image_t = IMAGE_T;
 
     struct SettingInfo {
       emp::TypeID type;   ///< Type name as converted to string by typeid()
@@ -49,8 +50,8 @@ namespace emp {
     std::unordered_map<size_t, SettingInfo> setting_map;  ///< Lookup setting info by id.
 
     /// Collect all of the constructors and destructors that we need to worry about.
-    using cconstruct_fun_t = std::function<void(MemoryImage &, MemoryImage &)>;
-    using destruct_fun_t = std::function<void(MemoryImage &)>;
+    using cconstruct_fun_t = std::function<void(IMAGE_T &, IMAGE_T &)>;
+    using destruct_fun_t = std::function<void(IMAGE_T &)>;
     emp::vector<cconstruct_fun_t> copy_constructors;
     emp::vector<destruct_fun_t> destructors;
 
@@ -91,8 +92,8 @@ namespace emp {
     }
 
     /// Retrieve a variable from an image by its type and position.
-    template <typename T, typename IN_IMAGE_T>
-    T & Get(IN_IMAGE_T & image, size_t pos) {
+    template <typename T>
+    T & Get(IMAGE_T & image, size_t pos) {
       emp_assert(emp::Has(setting_map, pos) && seting_map[pos].type == emp::GetTypeID<T>());
       image.GetRef<T>(pos);
     }
@@ -107,8 +108,8 @@ namespace emp {
     }
 
     /// Retrieve a const variable from an image by its type and position.
-    template <typename T, typename IN_IMAGE_T>
-    const T & Get(IN_IMAGE_T & image, size_t pos) const {
+    template <typename T>
+    const T & Get(IMAGE_T & image, size_t pos) const {
       emp_assert(emp::Has(setting_map, pos) && seting_map[pos].type == emp::GetTypeID<T>());
       image.GetRef<T>(pos);
     }
@@ -125,8 +126,8 @@ namespace emp {
     }
 
     /// Retrieve a variable from an image by its type and position.
-    template <typename T, typename IN_IMAGE_T>
-    T & Get(IN_IMAGE_T & image, & std::string & name) {
+    template <typename T>
+    T & Get(IMAGE_T & image, & std::string & name) {
       emp_assert(emp::Has(id_map, name));
       image.GetRef<T>(id_map[name]);
     }
@@ -141,8 +142,8 @@ namespace emp {
     }
 
     /// Retrieve a const variable from an image by its type and position.
-    template <typename T, typename IN_IMAGE_T>
-    const T & Get(IN_IMAGE_T & image, & std::string & name) const {
+    template <typename T>
+    const T & Get(IMAGE_T & image, & std::string & name) const {
       emp_assert(emp::Has(id_map, name));
       image.GetRef<T>(id_map[name]);
     }
@@ -161,15 +162,13 @@ namespace emp {
 
     /// Manipulations of images
 
-    template <typename IN_IMAGE_T>
-    void ClearImage(IN_IMAGE_T & image) {
+    void ClearImage(IMAGE_T & image) {
       // Run destructor on contents of image and then empty it!
       for (auto & d : destructors) { d(image)}
       image.resize(0);
     }
 
-    template <typename IN_IMAGE_T>
-    void Initialize(IN_IMAGE_T & image) {
+    void Initialize(IMAGE_T & image) {
       // Transfer over the default image and then run the required copy constructors.
       image.RawCopy(default_image);
       for (auto & c : copy_constructors) { c(default_image, image)}
