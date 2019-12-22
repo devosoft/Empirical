@@ -149,12 +149,8 @@ namespace emp {
       memory = in_image.memory;
     }
 
-    /// Copy provided memory from another MemoryImage (it may be slower...)
-    void RawCopy(MemoryImage & in_image) {
-      emp_assert(memory.size() == 0, memory.size(), "Must clean up memory image before a RawCopy into it.");
-      memory.resize(in_image.size());
-      for (size_t i = 0; i < size(); i++) memory[i] = in_image.memory[i];
-    }
+    /// Copy provided memory from a MemoryArray (it may be slower...)
+    template <unsigned int SIZE> void RawCopy(MemoryArray<SIZE> & in_image);
   };
 
 
@@ -163,12 +159,21 @@ namespace emp {
   //   -- Function definitions --
   //
 
+  /// Copy provided memory from another type of MemoryImage (it may be slower...)
   template <unsigned int SIZE>
   void MemoryArray<SIZE>::RawCopy(MemoryVector & in_image) {
     emp_assert(free_pos == 0, free_pos, "Must clean up memory image before a RawCopy into it.");
     emp_assert(in_image.size() <= SIZE, SIZE, in_image.size());
     for (size_t i = 0; i < in_image.size(); i++) memory[i] = in_image.memory[i];
     free_pos = in_image.size();
+  }
+
+  /// Copy provided memory from another MemoryImage (it may be slower...)
+  template <unsigned int SIZE>
+  void MemoryVector::RawCopy(MemoryArray<SIZE> & in_image) {
+    emp_assert(memory.size() == 0, memory.size(), "Must clean up memory image before a RawCopy into it.");
+    memory.resize(in_image.size());
+    for (size_t i = 0; i < size(); i++) memory[i] = in_image.memory[i];
   }
 
 }
