@@ -63,7 +63,7 @@ namespace emp {
     template <typename T, typename... ARGS>
     void Construct(size_t pos, ARGS &&... args) {
       emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
-      new (GetPtr<T>(pos).Raw( std::forward<ARGS>(args)... )) T;
+      new (GetPtr<T>(pos).Raw()) T( std::forward<ARGS>(args)... );
     }
 
     /// Destruct an object of the provided type at the memory position indicated; don't release memory!
@@ -83,7 +83,7 @@ namespace emp {
   class MemoryVector;
 
   template <unsigned int SIZE>
-  class MemoryArray : MemoryImage< emp::array<std::byte, SIZE> > {
+  class MemoryArray : public MemoryImage< emp::array<std::byte, SIZE> > {
   protected:
     unsigned int free_pos = 0;
 
@@ -121,7 +121,7 @@ namespace emp {
     void RawCopy(MemoryVector & in_image);
   };
 
-  class MemoryVector : MemoryImage< emp::vector<std::byte> > {
+  class MemoryVector : public MemoryImage< emp::vector<std::byte> > {
   protected:
 
   public:
