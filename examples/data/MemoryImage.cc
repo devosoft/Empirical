@@ -161,6 +161,12 @@ int main()
   emp::MemoryArray<100> mem_a2(mem_a);
   emp::MemoryVector mem_v2(mem_v);
 
+  // Make sure to properly initialize strings.
+  new (mem_a2.GetPtr<std::string>(12).Raw()) std::string(mem_a.GetRef<std::string>(12));
+  new (mem_v2.GetPtr<std::string>(12).Raw()) std::string(mem_v.GetRef<std::string>(12));
+  new (mem_a2.GetPtr<std::string>(44).Raw()) std::string(mem_a.GetRef<std::string>(44));
+  new (mem_v2.GetPtr<std::string>(44).Raw()) std::string(mem_v.GetRef<std::string>(44));
+
   std::cout << "Made a copy; mem_a2.size() == " << mem_a2.size()
             << "  mem_v2.size() == " << mem_v2.size()
             << std::endl;
@@ -176,6 +182,43 @@ int main()
   std::cout << "LONG string values refs:\n  mem_a2[44] == " << mem_a2.GetRef<std::string>(44)
             << "\n  mem_v2[44] == " << mem_v2.GetRef<std::string>(44)
             << std::endl;
+
+
+  // Try changing strings in just one copy of each MemoryImage.
+
+  std::cout << "\n-- Testing manipulating ORIGINAL MemoryImage, but not the COPY!" << std::endl;
+
+  mem_a.GetRef<double>(4) = 333.333;
+  mem_v.GetRef<double>(4) = 333.333;
+  mem_a.GetRef<std::string>(12)[6] = '3';
+  mem_v.GetRef<std::string>(12)[6] = '3';
+  mem_a.GetRef<std::string>(44)[6] = '3';
+  mem_v.GetRef<std::string>(44)[6] = '3';
+
+  std::cout << "double values refs: mem_a[4] == " << mem_a.GetRef<double>(4)
+            << "  mem_v[4] == " << mem_v.GetRef<double>(4)
+            << std::endl;
+
+  std::cout << "double values refs: mem_a2[4] == " << mem_a2.GetRef<double>(4)
+            << "  mem_v2[4] == " << mem_v2.GetRef<double>(4)
+            << std::endl;
+
+  std::cout << "SHORT string values refs: mem_a[12] == " << mem_a.GetRef<std::string>(12)
+            << "  mem_v[12] == " << mem_v.GetRef<std::string>(12)
+            << std::endl;
+
+  std::cout << "SHORT string values refs: mem_a2[12] == " << mem_a2.GetRef<std::string>(12)
+            << "  mem_v2[12] == " << mem_v2.GetRef<std::string>(12)
+            << std::endl;
+
+  std::cout << "LONG string values refs:\n  mem_a[44] == " << mem_a.GetRef<std::string>(44)
+            << "\n  mem_v[44] == " << mem_v.GetRef<std::string>(44)
+            << std::endl;
+
+  std::cout << "LONG string values refs:\n  mem_a2[44] == " << mem_a2.GetRef<std::string>(44)
+            << "\n  mem_v2[44] == " << mem_v2.GetRef<std::string>(44)
+            << std::endl;
+
 
   // Clean up the images...
 
