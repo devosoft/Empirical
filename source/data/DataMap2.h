@@ -32,9 +32,9 @@
 namespace emp {
 
   template <typename IMAGE_T>
-  class DataMap {
+  class DataMapBase {
   public:
-    using this_t = DataMap<IMAGE_T>;
+    using this_t = DataMapBase<IMAGE_T>;
     using image_t = IMAGE_T;
 
     struct SettingInfo {
@@ -56,13 +56,13 @@ namespace emp {
     emp::vector<destruct_fun_t> destructors;
 
   public:
-    DataMap() { ; }
-    // DataMap(const DataMap &) = default;
-    DataMap(DataMap &&) = default;
-    ~DataMap() { ClearImage(default_image); }
+    DataMapBase() { ; }
+    // DataMapBase(const DataMapBase &) = default;
+    DataMapBase(DataMapBase &&) = default;
+    ~DataMapBase() { ClearImage(default_image); }
 
-    // DataMap & operator=(const DataMap &) = default;
-    DataMap & operator=(DataMap &&) = default;
+    // DataMapBase & operator=(const DataMapBase &) = default;
+    DataMapBase & operator=(DataMapBase &&) = default;
 
     /// Lookup the unique idea for an entry.
     size_t GetID(const std::string & name) const {
@@ -198,6 +198,10 @@ namespace emp {
 
   };
 
+  using DataMap = DataMapBase<emp::MemoryVector>;
+
+  template <size_t SIZE>
+  using DataMapFixed = DataMapBase<emp::MemoryArray<SIZE>>;
 }
 
 #endif
