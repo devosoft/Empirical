@@ -58,6 +58,64 @@ int main()
             << "  mem_v[4] == " << *(mem_v.GetPtr<double>(4))
             << std::endl;
 
+  // Changing a Double...
+
+ std::cout << "\n-- Testing CHANGING the double" << std::endl;
+
+  mem_a.GetRef<double>(4) = 222.222;
+  mem_v.GetRef<double>(4) = 222.222;
+
+  std::cout << "Changed double to 222.222; mem_a.size() == " << mem_a.size()
+            << "  mem_v.size() == " << mem_v.size()
+            << std::endl;
+
+  std::cout << "Double values refs: mem_a[4] == " << mem_a.GetRef<double>(4)
+            << "  mem_v[4] == " << mem_v.GetRef<double>(4)
+            << std::endl;
+
+  std::cout << "Double values ptrs: mem_a[4] == " << *(mem_a.GetPtr<double>(4))
+            << "  mem_v[4] == " << *(mem_v.GetPtr<double>(4))
+            << std::endl;
+
+
+  // Testing a SHORT std::string...
+
+  std::cout << "\n-- Testing SHORT Strings" << std::endl;
+
+  mem_a.AddObject<std::string>("string1");
+  mem_v.AddObject<std::string>("string1");
+
+  std::cout << "Added string 'string1'; mem_a.size() == " << mem_a.size()
+            << "  mem_v.size() == " << mem_v.size()
+            << std::endl;
+
+  std::cout << "String values refs: mem_a[12] == " << mem_a.GetRef<std::string>(12)
+            << "  mem_v[12] == " << mem_v.GetRef<std::string>(12)
+            << std::endl;
+
+  std::cout << "String values ptrs: mem_a[12] == " << *(mem_a.GetPtr<std::string>(12))
+            << "  mem_v[12] == " << *(mem_v.GetPtr<std::string>(12))
+            << std::endl;
+
+  // Changing a String...
+
+ std::cout << "\n-- Testing CHANGING the SHORT string" << std::endl;
+
+  mem_a.GetRef<std::string>(12)[6] = '2';
+  mem_v.GetRef<std::string>(12)[6] = '2';
+
+  std::cout << "Changed std::string to 'string2' altering last char; mem_a.size() == " << mem_a.size()
+            << "  mem_v.size() == " << mem_v.size()
+            << std::endl;
+
+  std::cout << "String values refs: mem_a[12] == " << mem_a.GetRef<std::string>(12)
+            << "  mem_v[12] == " << mem_v.GetRef<std::string>(12)
+            << std::endl;
+
+  std::cout << "String values ptrs: mem_a[12] == " << *(mem_a.GetPtr<std::string>(12))
+            << "  mem_v[12] == " << *(mem_v.GetPtr<std::string>(12))
+            << std::endl;
+
 
   // Try copying the MemoryImage.
   std::cout << "\n-- Testing copying!" << std::endl;
