@@ -13,7 +13,7 @@
 
 int main()
 {
-  emp::DataMap<emp::MemoryVector> dmap;
+  emp::DataMap dmap;
 
   size_t id1 = dmap.Add<double>("fitness", 0.0);
   size_t id2 = dmap.Add<bool>("do_muts", false);
