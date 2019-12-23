@@ -29,14 +29,18 @@ namespace emp {
   class MemoryImage {
   protected:
     using byte_t = unsigned char;
-    MEM_T memory;      ///< The specific memory values.
+    MEM_T memory;          ///< The specific memory values.
+    size_t free_pos = 0;   ///< Next position to add data to.
 
   public:
     MemoryImage() : memory() { ; }
-    MemoryImage(MemoryImage && _in) : memory(std::move(_in.memory)) { _in.memory.resize(0); }
+    MemoryImage(MemoryImage && _in) : memory(std::move(_in.memory)) { ; }
     // Note: No copy constructor since each object needs to be copied independently.
 
     ~MemoryImage() { emp_assert(memory.size() == 0, "Must manually delete memory before destructing."); }
+
+    size_t size() const { return free_pos; }
+    size_t GetSize() const { return free_pos; }
 
     /// Get a typed pointer to a specific position in this image.
     template <typename T> emp::Ptr<T> GetPtr(size_t pos) {
@@ -85,15 +89,13 @@ namespace emp {
   template <unsigned int SIZE>
   class MemoryArray : public MemoryImage< emp::array<std::byte, SIZE> > {
   protected:
-    unsigned int free_pos = 0;
-
     using base_t = MemoryImage< emp::array<std::byte, SIZE> >;
     using base_t::memory;
+    using base_t::free_pos;
   public:
+    MemoryArray(const MemoryArray & in_mem) { }
     ~MemoryArray() { }
 
-    size_t size() const { return free_pos; }
-    size_t GetSize() const { return free_pos; }
     void resize(size_t new_size) {
       emp_assert(free_pos <= SIZE, free_pos, SIZE);
       free_pos = new_size;
@@ -127,18 +129,19 @@ namespace emp {
   public:
     MemoryVector(size_t num_bytes=0) {
       memory.resize(num_bytes);
+      free_pos = num_bytes;
     }
+    MemoryVector(const MemoryVector & _in) { memory = _in.memory; free_pos = _in.free_pos; }
     ~MemoryVector() { }
 
-    size_t size() const { return memory.size(); }
-    size_t GetSize() const { return memory.size(); }
-    void resize(size_t new_size) { memory.resize(new_size); }
+    void resize(size_t new_size) { memory.resize(new_size); free_pos = new_size; }
 
     /// Increase the size of this memory to add a new object inside it.
     template <typename T, typename... ARGS>
     size_t AddObject(ARGS &&... args) {
       const size_t obj_pos = memory.size();
       memory.resize(obj_pos + sizeof(T));
+      free_pos = memory.size();
       Construct<T>(obj_pos, std::forward<ARGS>(args)...);
       return obj_pos;
     }
@@ -173,6 +176,7 @@ namespace emp {
   void MemoryVector::RawCopy(MemoryArray<SIZE> & in_image) {
     emp_assert(memory.size() == 0, memory.size(), "Must clean up memory image before a RawCopy into it.");
     memory.resize(in_image.size());
+    free_pos = memory.size();
     for (size_t i = 0; i < size(); i++) memory[i] = in_image.memory[i];
   }
 
