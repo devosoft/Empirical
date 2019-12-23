@@ -99,7 +99,7 @@ namespace emp {
     /// Retrieve a default variable by its type and position.
     template <typename T>
     T & GetDefault(size_t pos) {
-      emp_assert(emp::Has(setting_map, pos) && seting_map[pos].type == emp::GetTypeID<T>());
+      emp_assert(emp::Has(setting_map, pos) && setting_map[pos].type == emp::GetTypeID<T>());
       return default_image.template GetRef<T>(pos);
     }
 
@@ -109,7 +109,7 @@ namespace emp {
     /// Retrieve a variable from an image by its type and position.
     template <typename T>
     T & Get(IMAGE_T & image, size_t pos) {
-      emp_assert(emp::Has(setting_map, pos) && seting_map[pos].type == emp::GetTypeID<T>());
+      emp_assert(emp::Has(setting_map, pos) && setting_map[pos].type == emp::GetTypeID<T>());
       image.template GetRef<T>(pos);
     }
 
@@ -118,7 +118,7 @@ namespace emp {
     /// Retrieve a const default variable by its type and position.
     template <typename T>
     const T & GetDefault(size_t pos) const {
-      emp_assert(emp::Has(setting_map, pos) && seting_map[pos].type == emp::GetTypeID<T>());
+      emp_assert(emp::Has(setting_map, pos) && setting_map[pos].type == emp::GetTypeID<T>());
       default_image.template GetRef<T>(pos);
     }
 
@@ -128,7 +128,7 @@ namespace emp {
     /// Retrieve a const variable from an image by its type and position.
     template <typename T>
     const T & Get(IMAGE_T & image, size_t pos) const {
-      emp_assert(emp::Has(setting_map, pos) && seting_map[pos].type == emp::GetTypeID<T>());
+      emp_assert(emp::Has(setting_map, pos) && setting_map[pos].type == emp::GetTypeID<T>());
       image.template GetRef<T>(pos);
     }
 
