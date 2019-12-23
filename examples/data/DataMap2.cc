@@ -15,21 +15,29 @@ int main()
 {
   emp::DataMap<emp::MemoryVector> dmap;
 
-  dmap.Add<double>("fitness", 0.0);
-  dmap.Add<bool>("do_muts", false);
-  dmap.Add<std::string>("name", "MyOrg1");
-  dmap.Add<std::string>("name2", "MyOrg2");
-  dmap.Add<std::string>("name3", "MyOrg3");
+  size_t id1 = dmap.Add<double>("fitness", 0.0);
+  size_t id2 = dmap.Add<bool>("do_muts", false);
+  size_t id3 = dmap.Add<std::string>("name", "MyOrg1");
+  size_t id4 = dmap.Add<std::string>("name2", "MyOrg2");
+  size_t id5 = dmap.Add<std::string>("name3", "MyOrg3");
+
+  std::cout << "IDs: "
+            << " id1 = " << id1
+            << " id2 = " << id2
+            << " id3 = " << id3
+            << " id4 = " << id4
+            << " id5 = " << id5
+            << std::endl;
 
   dmap.GetDefault<std::string>("name") = "FirstOrg";
-  dmap.GetDefault<std::string>(1) = "Org TWO!";
+  dmap.GetDefault<std::string>(id4) = "Org TWO!";
   dmap.GetDefault<std::string>("name3") = "Test Output!";
   dmap.GetDefault<double>("fitness") = 1000000.1;
 
   std::cout << "Name 1 = " << dmap.GetDefault<std::string>("name") << std::endl;
   std::cout << "Name 2 = " << dmap.GetDefault<std::string>("name2") << std::endl;
   std::cout << "Name 3 = " << dmap.GetDefault<std::string>("name3") << std::endl;
-  std::cout << "Name 3 = " << dmap.GetDefault<std::string>(2) << std::endl;
+  std::cout << "Name 3 = " << dmap.GetDefault<std::string>(id5) << std::endl;
   std::cout << "Name 3 = " << dmap.GetDefault<std::string>( dmap.GetID("name3") ) << std::endl;
 
   std::cout << "\nTypes:\n";
