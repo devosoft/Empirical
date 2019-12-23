@@ -34,10 +34,10 @@ namespace emp {
 
   public:
     MemoryImage() : memory() { ; }
+    MemoryImage(const MemoryImage & _in) : memory(_in.memory), free_pos(_in.free_pos) { }
     MemoryImage(MemoryImage && _in) : memory(std::move(_in.memory)) { ; }
-    // Note: No copy constructor since each object needs to be copied independently.
 
-    ~MemoryImage() { emp_assert(memory.size() == 0, "Must manually delete memory before destructing."); }
+    ~MemoryImage() { emp_assert(free_pos == 0, "Must manually delete memory before destructing."); }
 
     size_t size() const { return free_pos; }
     size_t GetSize() const { return free_pos; }
@@ -79,7 +79,7 @@ namespace emp {
 
     /// Copy an object from another MemoryImage with an identical layout.
     template<typename T>
-    void CopyObj(size_t pos, MemoryImage & image2) {
+    void CopyObj(size_t pos, const MemoryImage & image2) {
       Construct<T, const T &>(pos, image2.GetRef<T>(pos));
     }
   };
@@ -93,7 +93,6 @@ namespace emp {
     using base_t::memory;
     using base_t::free_pos;
   public:
-    MemoryArray(const MemoryArray & in_mem) { }
     ~MemoryArray() { }
 
     void resize(size_t new_size) {
@@ -125,13 +124,15 @@ namespace emp {
 
   class MemoryVector : public MemoryImage< emp::vector<std::byte> > {
   protected:
+    using base_t = MemoryImage<emp::vector<std::byte>>;
 
   public:
-    MemoryVector(size_t num_bytes=0) {
+    MemoryVector() = default;
+    MemoryVector(size_t num_bytes) {
       memory.resize(num_bytes);
       free_pos = num_bytes;
     }
-    MemoryVector(const MemoryVector & _in) { memory = _in.memory; free_pos = _in.free_pos; }
+    MemoryVector(const MemoryVector &) = default;
     ~MemoryVector() { }
 
     void resize(size_t new_size) { memory.resize(new_size); free_pos = new_size; }
