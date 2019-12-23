@@ -97,7 +97,7 @@ int main()
             << "  mem_v[12] == " << *(mem_v.GetPtr<std::string>(12))
             << std::endl;
 
-  // Changing a String...
+  // Changing a SHORT String...
 
  std::cout << "\n-- Testing CHANGING the SHORT string" << std::endl;
 
@@ -116,6 +116,44 @@ int main()
             << "  mem_v[12] == " << *(mem_v.GetPtr<std::string>(12))
             << std::endl;
 
+  // Testing a LONG std::string...
+
+  std::cout << "\n-- Testing LONG Strings" << std::endl;
+
+  mem_a.AddObject<std::string>("This is a much longer string than before; so long that it can't use short-string optimization.");
+  mem_v.AddObject<std::string>("This is a much longer string than before; so long that it can't use short-string optimization.");
+
+  std::cout << "Added LONG string; mem_a.size() == " << mem_a.size()
+            << "  mem_v.size() == " << mem_v.size()
+            << std::endl;
+
+  std::cout << "String values refs:\n  mem_a[44] == " << mem_a.GetRef<std::string>(44)
+            << "\n  mem_v[44] == " << mem_v.GetRef<std::string>(44)
+            << std::endl;
+
+  std::cout << "String values ptrs:\n  mem_a[44] == " << *(mem_a.GetPtr<std::string>(44))
+            << "\n  mem_v[44] == " << *(mem_v.GetPtr<std::string>(44))
+            << std::endl;
+
+  // Changing a LONG String...
+
+ std::cout << "\n-- Testing CHANGING the LONG string" << std::endl;
+
+  mem_a.GetRef<std::string>(44)[6] = '2';
+  mem_v.GetRef<std::string>(44)[6] = '2';
+
+  std::cout << "Changed altered longer string to have a '2'; mem_a.size() == " << mem_a.size()
+            << "  mem_v.size() == " << mem_v.size()
+            << std::endl;
+
+  std::cout << "String values refs:\n  mem_a[44] == " << mem_a.GetRef<std::string>(44)
+            << "\n  mem_v[44] == " << mem_v.GetRef<std::string>(44)
+            << std::endl;
+
+  std::cout << "String values ptrs:\n  mem_a[44] == " << *(mem_a.GetPtr<std::string>(44))
+            << "\n  mem_v[44] == " << *(mem_v.GetPtr<std::string>(44))
+            << std::endl;
+
 
   // Try copying the MemoryImage.
   std::cout << "\n-- Testing copying!" << std::endl;
@@ -131,10 +169,13 @@ int main()
             << "  mem_v2[4] == " << mem_v2.GetRef<double>(4)
             << std::endl;
 
-  std::cout << "Double values ptrs: mem_a2[4] == " << *(mem_a2.GetPtr<double>(4))
-            << "  mem_v2[4] == " << *(mem_v2.GetPtr<double>(4))
+  std::cout << "SHORT string values refs: mem_a2[12] == " << mem_a2.GetRef<std::string>(12)
+            << "  mem_v2[12] == " << mem_v2.GetRef<std::string>(12)
             << std::endl;
 
+  std::cout << "LONG string values refs:\n  mem_a2[44] == " << mem_a2.GetRef<std::string>(44)
+            << "\n  mem_v2[44] == " << mem_v2.GetRef<std::string>(44)
+            << std::endl;
 
   // Clean up the images...
 
