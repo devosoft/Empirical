@@ -28,6 +28,16 @@ namespace emp {
 
   using namespace std::string_literals;
 
+  void SetupTypeNames();
+
+  namespace internal {
+    // Internal class to setup type names on startup.
+    struct TypeID_Setup {
+      TypeID_Setup() { SetupTypeNames(); }
+    };
+    static TypeID_Setup _TypeID_Setup;
+  }
+
   /// Basic TypeID data structure.
   struct TypeID {
     struct Info {
@@ -215,6 +225,7 @@ namespace emp {
 
   /// Setup a bunch of standard type names to be more readable.
   void SetupTypeNames() {
+
     // Built-in types.
     GetTypeID<void>().SetName("void");
 
