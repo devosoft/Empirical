@@ -86,7 +86,7 @@ namespace emp {
 
   class MemoryVector;
 
-  template <unsigned int SIZE>
+  template <size_t SIZE>
   class MemoryArray : public MemoryImage< emp::array<std::byte, SIZE> > {
   protected:
     using base_t = MemoryImage< emp::array<std::byte, SIZE> >;
@@ -111,7 +111,7 @@ namespace emp {
     }
 
     /// Copy provided memory from another MemoryArray
-    template <unsigned int IN_SIZE>
+    template <size_t IN_SIZE>
     void RawCopy(MemoryArray<IN_SIZE> & in_image) {
       emp_assert(free_pos == 0, free_pos, "Must clean up memory image before a RawCopy into it.");
       emp_assert(in_image.free_pos <= SIZE, SIZE, in_image.free_pos, IN_SIZE);
@@ -153,7 +153,7 @@ namespace emp {
     }
 
     /// Copy provided memory from a MemoryArray (it may be slower...)
-    template <unsigned int SIZE> void RawCopy(MemoryArray<SIZE> & in_image);
+    template <size_t SIZE> void RawCopy(MemoryArray<SIZE> & in_image);
   };
 
 
@@ -163,7 +163,7 @@ namespace emp {
   //
 
   /// Copy provided memory from another type of MemoryImage (it may be slower...)
-  template <unsigned int SIZE>
+  template <size_t SIZE>
   void MemoryArray<SIZE>::RawCopy(MemoryVector & in_image) {
     emp_assert(free_pos == 0, free_pos, "Must clean up memory image before a RawCopy into it.");
     emp_assert(in_image.size() <= SIZE, SIZE, in_image.size());
@@ -172,7 +172,7 @@ namespace emp {
   }
 
   /// Copy provided memory from another MemoryImage (it may be slower...)
-  template <unsigned int SIZE>
+  template <size_t SIZE>
   void MemoryVector::RawCopy(MemoryArray<SIZE> & in_image) {
     emp_assert(memory.size() == 0, memory.size(), "Must clean up memory image before a RawCopy into it.");
     memory.resize(in_image.size());
