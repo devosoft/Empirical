@@ -80,7 +80,16 @@ namespace emp {
     /// Copy an object from another MemoryImage with an identical layout.
     template<typename T>
     void CopyObj(size_t pos, const MemoryImage & image2) {
+      emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
       Construct<T, const T &>(pos, image2.GetRef<T>(pos));
+    }
+
+    /// Move an object from another MemoryImage with an identical layout.
+    template<typename T>
+    void MoveObj(size_t pos, MemoryImage & image2) {
+      emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
+      Construct<T, const T &>(pos, std::move(image2.GetRef<T>(pos)));  // Move the object.
+      image2.Destruct(pos);                                            // Destruct old version.
     }
   };
 
