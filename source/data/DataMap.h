@@ -50,10 +50,12 @@ namespace emp {
     std::unordered_map<size_t, SettingInfo> setting_map;  ///< Lookup setting info by id.
 
     /// Collect all of the constructors and destructors that we need to worry about.
-    using cconstruct_fun_t = std::function<void(IMAGE_T &, IMAGE_T &)>;
+    using copy_fun_t = std::function<void(const IMAGE_T &, IMAGE_T &)>;
     using destruct_fun_t = std::function<void(IMAGE_T &)>;
-    emp::vector<cconstruct_fun_t> copy_constructors;
+    using move_fun_t = std::function<void(IMAGE_T &, IMAGE_T &)>;
+    emp::vector<copy_fun_t> copy_constructors;
     emp::vector<destruct_fun_t> destructors;
+    emp::vector<move_fun_t> move_constructors;
 
   public:
     DataMapBase() { ; }
@@ -92,6 +94,31 @@ namespace emp {
 
       // Store all of the other settings for this object.
       setting_map[pos] = { emp::GetTypeID<T>(), name, desc, notes };
+
+      // Store copy constructor if needed.
+      if (std::is_trivially_copyable<T>() == false) {
+        copy_constructors.push_back(
+          [pos](const IMAGE_T & from_image, IMAGE_T & to_image) {
+            to_image.template CopyObj<T>(pos, from_image);
+          }
+        );
+      }
+
+      // Store destructor if needed.
+      if (std::is_trivially_destructible<T>() == false) {
+        destructors.push_back(
+          [pos](IMAGE_T & image) { image.template Destruct<T>(pos); }
+        );
+      }
+
+      // Store move constructor if needed.
+      if (std::is_trivially_destructible<T>() == false) {
+        move_constructors.push_back(
+          [pos](IMAGE_T & from_image, IMAGE_T & to_image) {
+            to_image.template MoveObj<T>(pos, from_image);
+          }
+        );
+      }
 
       return pos;
     }
