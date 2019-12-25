@@ -33,7 +33,7 @@ namespace emp {
     size_t free_pos = 0;   ///< Next position to add data to.
 
   public:
-    MemoryImage() : memory() { ; }
+    MemoryImage() { ; }
     MemoryImage(const MemoryImage & _in) : memory(_in.memory), free_pos(_in.free_pos) { }
     MemoryImage(MemoryImage && _in) : memory(std::move(_in.memory)) { ; }
 
@@ -131,35 +131,63 @@ namespace emp {
     void RawCopy(MemoryVector & in_image);
   };
 
-  class MemoryVector : public MemoryImage< emp::vector<std::byte> > {
+  class MemoryVector : public MemoryImage< emp::Ptr<std::byte> > {
   protected:
-    using base_t = MemoryImage<emp::vector<std::byte>>;
+    using base_t = MemoryImage< emp::Ptr<std::byte> >;
+    using base_t::memory;
+    using base_t::free_pos;
 
   public:
-    MemoryVector() = default;
+    MemoryVector() { memory = nullptr; }
     MemoryVector(size_t num_bytes) {
-      memory.resize(num_bytes);
+      memory.NewArray(num_bytes);
       free_pos = num_bytes;
     }
-    MemoryVector(const MemoryVector &) = default;
-    ~MemoryVector() { }
+    MemoryVector(const MemoryVector & _in) {
+      free_pos = _in.free_pos;
+      if (free_pos) {
+        memory.NewArray(free_pos);
+        std::memcpy(memory, _in.memory, free_pos);
+      }
+    }
+    ~MemoryVector() { 
+      if (free_pos) memory.DeleteArray();
+      free_pos = 0;
+    }
 
-    void resize(size_t new_size) { memory.resize(new_size); free_pos = new_size; }
+    void resize(size_t new_size) {
+      // Should only clear the memory (to zero) or increase the size.
+      emp_assert(new_size == 0 || new_size > free_pos, new_size, free_pos);
+
+      emp::Ptr<std::byte> new_mem = nullptr);
+      if (new_size) {
+        new_mem.NewArray(new_size);
+        std::memcpy(new_mem, memory, free_pos);
+      }
+
+      // @CAO Run move constructors?
+      // @CAO Run destructors on old memory?
+
+      memory.DeleteArray();
+      memory = new_mem;
+      free_pos = new_size;
+    }
 
     /// Increase the size of this memory to add a new object inside it.
     template <typename T, typename... ARGS>
     size_t AddObject(ARGS &&... args) {
-      const size_t obj_pos = memory.size();
-      memory.resize(obj_pos + sizeof(T));
-      free_pos = memory.size();
+      const size_t obj_pos = free_pos;
+      free_pos = obj_pos + sizeof(T);
+      resize(free_pos);
       Construct<T>(obj_pos, std::forward<ARGS>(args)...);
       return obj_pos;
     }
 
     /// Copy provided memory from another MemoryVector
     void RawCopy(MemoryVector & in_image) {
-      emp_assert(memory.size() == 0, memory.size(), "Must clean up memory image before a RawCopy into it.");
-      memory = in_image.memory;
+      emp_assert(free_pos == 0, free_pos, "Must clean up memory image before a RawCopy into it.");
+      resize(in_image.size());
+      std::memcpy(memory, in_image.memory, free_pos);
     }
 
     /// Copy provided memory from a MemoryArray (it may be slower...)
@@ -184,9 +212,8 @@ namespace emp {
   /// Copy provided memory from another MemoryImage (it may be slower...)
   template <size_t SIZE>
   void MemoryVector::RawCopy(MemoryArray<SIZE> & in_image) {
-    emp_assert(memory.size() == 0, memory.size(), "Must clean up memory image before a RawCopy into it.");
-    memory.resize(in_image.size());
-    free_pos = memory.size();
+    emp_assert(free_pos == 0, free_pos, "Must clean up memory image before a RawCopy into it.");
+    resize(in_image.size());
     for (size_t i = 0; i < size(); i++) memory[i] = in_image.memory[i];
   }
 
