@@ -92,14 +92,22 @@ namespace emp {
 
     protected: // Only available to friend class DataMap
 
-      /// Copy all of the bytes directly from another memory image.
+      /// Change the size of this memory.  Assume all cleanup and setup is done elsewhere.
+      void RawResize(size_t new_size) {
+        // If the size is already good, stop here.
+        if (mem_size == new_size) return;
+
+        if (memory) memory.DeleteArray();  // If there was memory here, free it.
+        mem_size = new_size;               // Determine the new size.
+        memory.NewArray(mem_size);         // Allocate the new space.
+      }
+
+
+      /// Copy all of the bytes directly from another memory image.  Size manipulation must be
+      /// done beforehand to ensure sufficient space is availabe.
       void RawCopy(const MemoryImage & in_image) {
-        // If the memory size has changed, free the old memory and allocate the new.
-        if (mem_size != in_image.mem_size) {
-          if (memory) memory.DeleteArray();  // If there was memory here, free it.
-          mem_size = in_image.mem_size;      // Determine the new size.
-          memory.NewArray(mem_size);         // Allocate the new space.
-        }
+        emp_assert(mem_size >= in_image.mem_size);
+        if (in_image.mem_size == 0) return; // Nothing to copy!
 
         // Copy byte-by-byte into this memory.
         std::memcpy(memory.Raw(), in_image.memory.Raw(), mem_size);
@@ -186,11 +194,11 @@ namespace emp {
       // Create a new image with enough room for the new object.
       MemoryImage new_image(default_image.GetSize() + obj_size);
 
-      // Move the memory from the old image to the new one.
-      MoveImage(default_image, new_image);
+      // Move the memory from the old image to the new one with more space.
+      MoveImageContents(default_image, new_image);
 
       // Cleanup the old image.
-      DestructImage(default_image);
+      ClearImage(default_image);
 
       // Put the new image in place (and let the old version destruct cleanly)
       default_image.memory = new_image.memory;
@@ -343,11 +351,14 @@ namespace emp {
       DestructImage(to_image);
 
       // Transfer over the from image and then run the required copy constructors.
+      to_image.RawResize(from_image.mem_size);
       to_image.RawCopy(from_image);
       for (auto & c : copy_constructors) { c(from_image, to_image); }
     }
 
-    void MoveImage(MemoryImage & from_image, MemoryImage & to_image) const {
+    // Move contents from one image to another.  Size must already be setup!
+    void MoveImageContents(MemoryImage & from_image, MemoryImage & to_image) const {
+      emp_assert(to_image.GetSize() >= from_image.GetSize());
       DestructImage(to_image);
 
       // Transfer over the from image and then run the required copy constructors.
