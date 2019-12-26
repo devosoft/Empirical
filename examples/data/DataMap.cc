@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-#include "data/DataMap2.h"
+#include "data/DataMap.h"
 
 int main()
 {
@@ -46,4 +46,125 @@ int main()
   std::cout << "name:    " << dmap.GetType("name") << std::endl;
   std::cout << "name2:   " << dmap.GetType("name2") << std::endl;
   std::cout << "name3:   " << dmap.GetType("name3") << std::endl;
+
+  
+  // -------------- Examples of EXTERNAL images --------------
+
+  emp::DataMap data_map;
+
+  emp::DataMap::MemoryImage image1;
+  emp::DataMap::MemoryImage image2;
+  const auto & default_image = data_map.GetDefaultImage();
+
+  std::cout << "At start:\n  image1.GetSize() == " << image1.GetSize()
+            << "\n  image2.GetSize() == " << image2.GetSize()
+            << "\n  default_image.GetSize() == " << data_map.GetImageSize()
+            << std::endl;
+
+  // Add some values...
+
+  size_t idA = data_map.Add<int>("test_int", 20);
+  size_t idB = data_map.Add<double>("test_double", 111.111);
+  size_t idC = data_map.Add<std::string>("short_string", "string1");
+  size_t idD = data_map.Add<std::string>("long_string", "This is a much longer string that shouldn't be used for short-string optimization.");
+
+  std::cout << "\nAfter inserting an int, a double, and two strings:"
+            << "\n  image1.GetSize() == " << image1.GetSize()
+            << "\n  image2.GetSize() == " << image2.GetSize()
+            << "\n  default_image.GetSize() == " << data_map.GetImageSize()
+            << "\n  (A) Default: " << default_image.Get<int>(idA)
+            << "\n  (B) Default: " << default_image.Get<double>(idB)
+            << "\n  (C) Default: " << default_image.Get<std::string>(idC)
+            << "\n  (D) Default: " << default_image.Get<std::string>(idD)
+            << std::endl;
+
+  data_map.Initialize(image1);
+
+  std::cout << "\nAfter initializing image 1:"
+            << "\n  image1.GetSize() == " << image1.GetSize()
+            << "\n  image2.GetSize() == " << image2.GetSize()
+            << "\n  default_image.GetSize() == " << data_map.GetImageSize()
+            << "\n  (A) Default: " << default_image.Get<int>(idA)
+            << "\n      Image1 : " << image1.Get<int>(idA)
+            << "\n  (B) Default: " << default_image.Get<double>(idB)
+            << "\n      Image1 : " << image1.Get<double>(idB)
+            << "\n  (C) Default: " << default_image.Get<std::string>(idC)
+            << "\n      Image1 : " << image1.Get<std::string>(idC)
+            << "\n  (D) Default: " << default_image.Get<std::string>(idD)
+            << "\n      Image1 : " << image1.Get<std::string>(idD)
+            << std::endl;
+
+  data_map.GetDefault<double>(idB) = 222.222;
+
+  std::cout << "\nAfter changing the default double value to 222.222:"
+            << "\n  image1.GetSize() == " << image1.GetSize()
+            << "\n  image2.GetSize() == " << image2.GetSize()
+            << "\n  default_image.GetSize() == " << data_map.GetImageSize()
+            << "\n  (A) Default: " << default_image.Get<int>(idA)
+            << "\n      Image1 : " << image1.Get<int>(idA)
+            << "\n  (B) Default: " << default_image.Get<double>(idB)
+            << "\n      Image1 : " << image1.Get<double>(idB)
+            << "\n  (C) Default: " << default_image.Get<std::string>(idC)
+            << "\n      Image1 : " << image1.Get<std::string>(idC)
+            << "\n  (D) Default: " << default_image.Get<std::string>(idD)
+            << "\n      Image1 : " << image1.Get<std::string>(idD)
+            << std::endl;
+
+  image1.Get<std::string>(idC)[6] = '2';
+
+  std::cout << "\nAfter changing the image1 short-string value to 'string2':"
+            << "\n  image1.GetSize() == " << image1.GetSize()
+            << "\n  image2.GetSize() == " << image2.GetSize()
+            << "\n  default_image.GetSize() == " << data_map.GetImageSize()
+            << "\n  (A) Default: " << default_image.Get<int>(idA)
+            << "\n      Image1 : " << image1.Get<int>(idA)
+            << "\n  (B) Default: " << default_image.Get<double>(idB)
+            << "\n      Image1 : " << image1.Get<double>(idB)
+            << "\n  (C) Default: " << default_image.Get<std::string>(idC)
+            << "\n      Image1 : " << image1.Get<std::string>(idC)
+            << "\n  (D) Default: " << default_image.Get<std::string>(idD)
+            << "\n      Image1 : " << image1.Get<std::string>(idD)
+            << std::endl;
+
+
+  data_map.Initialize(image2);
+
+  std::cout << "\nAfter initializing image2 with current defaults:"
+            << "\n  image1.GetSize() == " << image1.GetSize()
+            << "\n  image2.GetSize() == " << image2.GetSize()
+            << "\n  default_image.GetSize() == " << data_map.GetImageSize()
+            << "\n  (A) Default: " << default_image.Get<int>(idA)
+            << "\n      Image1 : " << image1.Get<int>(idA)
+            << "\n      Image2 : " << image2.Get<int>(idA)
+            << "\n  (B) Default: " << default_image.Get<double>(idB)
+            << "\n      Image1 : " << image1.Get<double>(idB)
+            << "\n      Image2 : " << image2.Get<double>(idB)
+            << "\n  (C) Default: " << default_image.Get<std::string>(idC)
+            << "\n      Image1 : " << image1.Get<std::string>(idC)
+            << "\n      Image2 : " << image2.Get<std::string>(idC)
+            << "\n  (D) Default: " << default_image.Get<std::string>(idD)
+            << "\n      Image1 : " << image1.Get<std::string>(idD)
+            << "\n      Image2 : " << image2.Get<std::string>(idD)
+            << std::endl;
+
+  image1.Get<std::string>(idD)[6] = '2';
+
+  std::cout << "\nAfter changing the image1 LONG-string value to have a '2':"
+            << "\n  image1.GetSize() == " << image1.GetSize()
+            << "\n  image2.GetSize() == " << image2.GetSize()
+            << "\n  default_image.GetSize() == " << data_map.GetImageSize()
+            << "\n  (A) Default: " << default_image.Get<int>(idA)
+            << "\n      Image1 : " << image1.Get<int>(idA)
+            << "\n      Image2 : " << image2.Get<int>(idA)
+            << "\n  (B) Default: " << default_image.Get<double>(idB)
+            << "\n      Image1 : " << image1.Get<double>(idB)
+            << "\n      Image2 : " << image2.Get<double>(idB)
+            << "\n  (C) Default: " << default_image.Get<std::string>(idC)
+            << "\n      Image1 : " << image1.Get<std::string>(idC)
+            << "\n      Image2 : " << image2.Get<std::string>(idC)
+            << "\n  (D) Default: " << default_image.Get<std::string>(idD)
+            << "\n      Image1 : " << image1.Get<std::string>(idD)
+            << "\n      Image2 : " << image2.Get<std::string>(idD)
+            << std::endl;
+
 }
