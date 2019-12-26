@@ -224,6 +224,15 @@ int main()
 
   std::cout << "\n-- Cleaning up!" << std::endl;
 
+  mem_a.Destruct<std::string>(12);
+  mem_a.Destruct<std::string>(44);
+  mem_a2.Destruct<std::string>(12);
+  mem_a2.Destruct<std::string>(44);
+  mem_v.Destruct<std::string>(12);
+  mem_v.Destruct<std::string>(44);
+  mem_v2.Destruct<std::string>(12);
+  mem_v2.Destruct<std::string>(44);
+
   mem_a.resize(0);
   mem_v.resize(0);
   mem_a2.resize(0);
