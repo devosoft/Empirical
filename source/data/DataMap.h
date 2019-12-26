@@ -11,6 +11,10 @@
  *  There are two derived types:
  *    DataArray is fast, but requires size to be provided at compile time.
  *    DataVector is slower, but has a dynamic memory size.
+ * 
+ * 
+ *  DEVELOPER NOTES:
+ *  - Should each memory image have a pointer back to its DataMap for simplicity?
  */
 
 #ifndef EMP_DATA_MAP_H
@@ -43,7 +47,7 @@ namespace emp {
       emp::Ptr<std::byte> memory = nullptr;
       size_t mem_size = 0;
 
-      MemoryImage() { ; }
+    protected:
       MemoryImage(size_t in_size) : mem_size(in_size) {
         memory.NewArray(mem_size);
       }
@@ -55,11 +59,13 @@ namespace emp {
         in_image.memory = nullptr;
         in_image.mem_size = 0;
       }
+
+    public:  // Available to users of a MemoryImage.
+      MemoryImage() { ; }
       ~MemoryImage() {
         if (!memory.IsNull()) memory.DeleteArray();
       }
 
-    public:  // Available to users of a MemoryImage.
 
       size_t GetSize() const { return mem_size; }
 
@@ -70,13 +76,13 @@ namespace emp {
       }
 
       /// Get a proper reference to an object represented in this image.
-      template <typename T> T & GetRef(size_t pos) {
+      template <typename T> T & Get(size_t pos) {
         emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
         return *(reinterpret_cast<T*>(&memory[pos]));
       }
 
       /// Get a const reference to an object represented in this image.
-      template <typename T> const T & GetRef(size_t pos) const {
+      template <typename T> const T & Get(size_t pos) const {
         emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
         return *(reinterpret_cast<const T*>(&memory[pos]));
       }
@@ -131,14 +137,14 @@ namespace emp {
       template<typename T>
       void CopyObj(size_t pos, const MemoryImage & from_image) {
         emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
-        Construct<T, const T &>(pos, from_image.GetRef<T>(pos));
+        Construct<T, const T &>(pos, from_image.Get<T>(pos));
       }
 
       /// Move an object from another MemoryImage with an identical layout.
       template<typename T>
       void MoveObj(size_t pos, MemoryImage & from_image) {
         emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
-        Construct<T, const T &>(pos, std::move(from_image.GetRef<T>(pos)));  // Move the object.
+        Construct<T, const T &>(pos, std::move(from_image.Get<T>(pos)));  // Move the object.
         from_image.Destruct<T>(pos);                                         // Destruct old version.
       }
 
@@ -166,6 +172,12 @@ namespace emp {
     // DataMap & operator=(const DataMap &) = default;
     DataMap & operator=(DataMap &&) = default;
 
+    /// Return the number of bytes in the default image.
+    size_t GetImageSize() const { return default_image.GetSize(); }
+
+    /// Get a const reference to the default image.
+    const MemoryImage & GetDefaultImage() const { return default_image; }
+
     /// Lookup the unique idea for an entry.
     size_t GetID(const std::string & name) const {
       emp_assert(Has(id_map, name), name);
@@ -179,12 +191,11 @@ namespace emp {
     }
 
     /// Add a new variable with a specified type, name and value.
-    template <typename T, typename... ARGS>
+    template <typename T>
     size_t Add(const std::string & name,
 	             const T & default_value,
 	             const std::string & desc="",
-	             const std::string & notes="",
-               ARGS &&... args) {
+	             const std::string & notes="") {
       emp_assert(!Has(id_map, name), name);               // Make sure this doesn't already exist.
 
       // Analyze the size of the new object and where it will go.
@@ -244,14 +255,12 @@ namespace emp {
       return pos;
     }
 
-    const MemoryImage & GetDefaultImage() const { return default_image; }
-
     /// Retrieve a default variable by its type and position.
     template <typename T>
     T & GetDefault(size_t pos) {
       emp_assert(emp::Has(setting_map, pos), setting_map.size(), pos, default_image.GetSize());
       emp_assert(setting_map[pos].type == emp::GetTypeID<T>());
-      return default_image.template GetRef<T>(pos);
+      return default_image.template Get<T>(pos);
     }
 
     template <typename T>
@@ -262,7 +271,7 @@ namespace emp {
     T & Get(MemoryImage & image, size_t pos) {
       emp_assert(emp::Has(setting_map, pos), setting_map.size(), pos, default_image.GetSize());
       emp_assert(setting_map[pos].type == emp::GetTypeID<T>());
-      image.template GetRef<T>(pos);
+      image.template Get<T>(pos);
     }
 
     // -- Constant versions of above two Get fuctions... --
@@ -272,7 +281,7 @@ namespace emp {
     const T & GetDefault(size_t pos) const {
       emp_assert(emp::Has(setting_map, pos), setting_map.size(), pos, default_image.GetSize());
       emp_assert(setting_map.find(pos)->second.type == emp::GetTypeID<T>());
-      default_image.template GetRef<T>(pos);
+      default_image.template Get<T>(pos);
     }
 
     template <typename T>
@@ -283,7 +292,7 @@ namespace emp {
     const T & Get(MemoryImage & image, size_t pos) const {
       emp_assert(emp::Has(setting_map, pos), setting_map.size(), pos, default_image.GetSize());
       emp_assert(setting_map.find(pos)->second.type == emp::GetTypeID<T>());
-      image.template GetRef<T>(pos);
+      image.template Get<T>(pos);
     }
 
 
@@ -294,14 +303,14 @@ namespace emp {
     template <typename T>
     T & GetDefault(std::string & name) {
       emp_assert(emp::Has(id_map, name));
-      default_image.template GetRef<T>(GetID(name));
+      default_image.template Get<T>(GetID(name));
     }
 
     /// Retrieve a variable from an image by its type and position.
     template <typename T>
     T & Get(MemoryImage & image, std::string & name) {
       emp_assert(emp::Has(id_map, name));
-      image.template GetRef<T>(GetID(name));
+      image.template Get<T>(GetID(name));
     }
 
     // -- Constant versions of above two Get fuctions... --
@@ -310,14 +319,14 @@ namespace emp {
     template <typename T>
     const T & GetDefault(std::string & name) const {
       emp_assert(emp::Has(id_map, name));
-      default_image.template GetRef<T>(GetID(name));
+      default_image.template Get<T>(GetID(name));
     }
 
     /// Retrieve a const variable from an image by its type and position.
     template <typename T>
     const T & Get(MemoryImage & image, std::string & name) const {
       emp_assert(emp::Has(id_map, name));
-      image.template GetRef<T>(GetID(name));
+      image.template Get<T>(GetID(name));
     }
 
 
