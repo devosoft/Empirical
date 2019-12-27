@@ -52,13 +52,9 @@ int main()
 
   emp::DataMap data_map;
 
-  emp::DataMap::MemoryImage image1;
-  emp::DataMap::MemoryImage image2;
   const auto & default_image = data_map.GetDefaultImage();
 
-  std::cout << "At start:\n  image1.GetSize() == " << image1.GetSize()
-            << "\n  image2.GetSize() == " << image2.GetSize()
-            << "\n  default_image.GetSize() == " << data_map.GetImageSize()
+  std::cout << "At start:\n  default_image.GetSize() == " << data_map.GetImageSize()
             << std::endl;
 
   // Add some values...
@@ -69,8 +65,6 @@ int main()
   size_t idD = data_map.Add<std::string>("long_string", "This is a much longer string that shouldn't be used for short-string optimization.");
 
   std::cout << "\nAfter inserting an int, a double, and two strings:"
-            << "\n  image1.GetSize() == " << image1.GetSize()
-            << "\n  image2.GetSize() == " << image2.GetSize()
             << "\n  default_image.GetSize() == " << data_map.GetImageSize()
             << "\n  (A) Default: " << default_image.Get<int>(idA)
             << "\n  (B) Default: " << default_image.Get<double>(idB)
@@ -78,11 +72,10 @@ int main()
             << "\n  (D) Default: " << default_image.Get<std::string>(idD)
             << std::endl;
 
-  data_map.Initialize(image1);
+  emp::DataMap::MemoryImage image1(data_map);
 
   std::cout << "\nAfter initializing image 1:"
             << "\n  image1.GetSize() == " << image1.GetSize()
-            << "\n  image2.GetSize() == " << image2.GetSize()
             << "\n  default_image.GetSize() == " << data_map.GetImageSize()
             << "\n  (A) Default: " << default_image.Get<int>(idA)
             << "\n      Image1 : " << image1.Get<int>(idA)
@@ -98,7 +91,6 @@ int main()
 
   std::cout << "\nAfter changing the default double value to 222.222:"
             << "\n  image1.GetSize() == " << image1.GetSize()
-            << "\n  image2.GetSize() == " << image2.GetSize()
             << "\n  default_image.GetSize() == " << data_map.GetImageSize()
             << "\n  (A) Default: " << default_image.Get<int>(idA)
             << "\n      Image1 : " << image1.Get<int>(idA)
@@ -114,7 +106,6 @@ int main()
 
   std::cout << "\nAfter changing the image1 short-string value to 'string2':"
             << "\n  image1.GetSize() == " << image1.GetSize()
-            << "\n  image2.GetSize() == " << image2.GetSize()
             << "\n  default_image.GetSize() == " << data_map.GetImageSize()
             << "\n  (A) Default: " << default_image.Get<int>(idA)
             << "\n      Image1 : " << image1.Get<int>(idA)
@@ -127,7 +118,7 @@ int main()
             << std::endl;
 
 
-  data_map.Initialize(image2);
+  emp::DataMap::MemoryImage image2(data_map);
 
   std::cout << "\nAfter initializing image2 with current defaults:"
             << "\n  image1.GetSize() == " << image1.GetSize()
