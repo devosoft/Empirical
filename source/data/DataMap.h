@@ -46,26 +46,32 @@ namespace emp {
     protected:
       emp::Ptr<std::byte> memory = nullptr;
       size_t mem_size = 0;
+      DataMap & data_map;
 
-    protected:
-      MemoryImage(size_t in_size) : mem_size(in_size) {
-        memory.NewArray(mem_size);
+      MemoryImage(DataMap & in_data_map, size_t in_size) : data_map(in_data_map) {
+        if (in_size) RawResize(in_size);
       }
-      MemoryImage(const MemoryImage & in_image) : mem_size(in_image.mem_size) {
-        memory.NewArray(mem_size);
-        std::memcpy(memory.Raw(), in_image.memory.Raw(), mem_size);
+
+    public:  // Available to users of a MemoryImage.
+      MemoryImage(DataMap & in_data_map) : data_map(in_data_map) {
+        data_map.Initialize(*this);
       }
-      MemoryImage(MemoryImage && in_image) : memory(in_image.memory), mem_size(in_image.mem_size) {
+      MemoryImage(const MemoryImage & in_image)
+      : mem_size(in_image.mem_size), data_map(in_image.data_map) {
+        data_map.CopyImage(in_image, *this);
+      }
+      MemoryImage(MemoryImage && in_image)
+      : memory(in_image.memory), mem_size(in_image.mem_size), data_map(in_image.data_map) {
         in_image.memory = nullptr;
         in_image.mem_size = 0;
       }
 
-    public:  // Available to users of a MemoryImage.
-      MemoryImage() { ; }
       ~MemoryImage() {
-        if (!memory.IsNull()) memory.DeleteArray();
+        if (memory) memory.DeleteArray();
       }
 
+      DataMap & GetDataMap() { return data_map; }
+      const DataMap & GetDataMap() const { return data_map; }
 
       size_t GetSize() const { return mem_size; }
 
@@ -137,6 +143,7 @@ namespace emp {
       template<typename T>
       void CopyObj(size_t pos, const MemoryImage & from_image) {
         emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
+        emp_assert(&from_image.data_map == &data_map);
         Construct<T, const T &>(pos, from_image.Get<T>(pos));
       }
 
@@ -144,6 +151,7 @@ namespace emp {
       template<typename T>
       void MoveObj(size_t pos, MemoryImage & from_image) {
         emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
+        emp_assert(&from_image.data_map == &data_map);
         Construct<T, const T &>(pos, std::move(from_image.Get<T>(pos)));  // Move the object.
         from_image.Destruct<T>(pos);                                         // Destruct old version.
       }
@@ -164,9 +172,9 @@ namespace emp {
     emp::vector<destruct_fun_t> destructors;
 
   public:
-    DataMap() { ; }
+    DataMap() : default_image(*this, 0) { ; }
     // DataMap(const DataMap &) = default;
-    DataMap(DataMap &&) = default;
+    // DataMap(DataMap &&) = default;
     ~DataMap() { ClearImage(default_image); }
 
     // DataMap & operator=(const DataMap &) = default;
@@ -203,7 +211,7 @@ namespace emp {
       const size_t pos = default_image.GetSize();
 
       // Create a new image with enough room for the new object.
-      MemoryImage new_image(default_image.GetSize() + obj_size);
+      MemoryImage new_image(*this, default_image.GetSize() + obj_size);
 
       // Move the memory from the old image to the new one with more space.
       MoveImageContents(default_image, new_image);
@@ -357,6 +365,8 @@ namespace emp {
     }
 
     void CopyImage(const MemoryImage & from_image, MemoryImage & to_image) const {
+      emp_assert(&from_image.data_map == &to_image.data_map);
+
       DestructImage(to_image);
 
       // Transfer over the from image and then run the required copy constructors.
@@ -368,6 +378,8 @@ namespace emp {
     // Move contents from one image to another.  Size must already be setup!
     void MoveImageContents(MemoryImage & from_image, MemoryImage & to_image) const {
       emp_assert(to_image.GetSize() >= from_image.GetSize());
+      emp_assert(&from_image.data_map == &to_image.data_map);
+
       DestructImage(to_image);
 
       // Transfer over the from image and then run the required copy constructors.
