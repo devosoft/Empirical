@@ -11,10 +11,6 @@
  *  There are two derived types:
  *    DataArray is fast, but requires size to be provided at compile time.
  *    DataVector is slower, but has a dynamic memory size.
- * 
- * 
- *  DEVELOPER NOTES:
- *  - Should each memory image have a pointer back to its DataMap for simplicity?
  */
 
 #ifndef EMP_DATA_MAP_H
@@ -70,36 +66,41 @@ namespace emp {
         if (memory) memory.DeleteArray();
       }
 
+      /// Retrieve the DataMap associated with this image.
       DataMap & GetDataMap() { return data_map; }
       const DataMap & GetDataMap() const { return data_map; }
 
+      /// Determine how many Bytes large this image is.
       size_t GetSize() const { return mem_size; }
 
+      /// Is this image using the most current version of the DataMap?
+      bool IsCurrent() const { return mem_size == data_map.GetImageSize(); }
+
       /// Get a typed pointer to a specific position in this image.
-      template <typename T> emp::Ptr<T> GetPtr(size_t pos) {
-        emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
-        return reinterpret_cast<T*>(&memory[pos]);
+      template <typename T> emp::Ptr<T> GetPtr(size_t id) {
+        emp_assert(id + sizeof(T) <= GetSize(), id, sizeof(T), GetSize());
+        return reinterpret_cast<T*>(&memory[id]);
       }
 
       /// Get a proper reference to an object represented in this image.
-      template <typename T> T & Get(size_t pos) {
-        emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
-        return *(reinterpret_cast<T*>(&memory[pos]));
+      template <typename T> T & Get(size_t id) {
+        emp_assert(id + sizeof(T) <= GetSize(), id, sizeof(T), GetSize());
+        return *(reinterpret_cast<T*>(&memory[id]));
       }
 
       /// Get a const reference to an object represented in this image.
-      template <typename T> const T & Get(size_t pos) const {
-        emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
-        return *(reinterpret_cast<const T*>(&memory[pos]));
+      template <typename T> const T & Get(size_t id) const {
+        emp_assert(id + sizeof(T) <= GetSize(), id, sizeof(T), GetSize());
+        return *(reinterpret_cast<const T*>(&memory[id]));
       }
 
-      std::byte & operator[](size_t pos) {
-        emp_assert(pos < GetSize(), pos, GetSize());
-        return memory[pos];
+      std::byte & operator[](size_t id) {
+        emp_assert(id < GetSize(), id, GetSize());
+        return memory[id];
       }
-      const std::byte & operator[](size_t pos) const {
-        emp_assert(pos < GetSize(), pos, GetSize());
-        return memory[pos];
+      const std::byte & operator[](size_t id) const {
+        emp_assert(id < GetSize(), id, GetSize());
+        return memory[id];
       }
 
     protected: // Only available to friend class DataMap
@@ -127,33 +128,33 @@ namespace emp {
 
       /// Build a new object of the provided type at the memory position indicated.
       template <typename T, typename... ARGS>
-      void Construct(size_t pos, ARGS &&... args) {
-        emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
-        new (GetPtr<T>(pos).Raw()) T( std::forward<ARGS>(args)... );
+      void Construct(size_t id, ARGS &&... args) {
+        emp_assert(id + sizeof(T) <= GetSize(), id, sizeof(T), GetSize());
+        new (GetPtr<T>(id).Raw()) T( std::forward<ARGS>(args)... );
       }
 
       /// Destruct an object of the provided type at the memory position indicated; don't release memory!
       template <typename T>
-      void Destruct(size_t pos) {
-        emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
-        GetPtr<T>(pos)->~T();
+      void Destruct(size_t id) {
+        emp_assert(id + sizeof(T) <= GetSize(), id, sizeof(T), GetSize());
+        GetPtr<T>(id)->~T();
       }
 
       /// Copy an object from another MemoryImage with an identical layout.
       template<typename T>
-      void CopyObj(size_t pos, const MemoryImage & from_image) {
-        emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
+      void CopyObj(size_t id, const MemoryImage & from_image) {
+        emp_assert(id + sizeof(T) <= GetSize(), id, sizeof(T), GetSize());
         emp_assert(&from_image.data_map == &data_map);
-        Construct<T, const T &>(pos, from_image.Get<T>(pos));
+        Construct<T, const T &>(id, from_image.Get<T>(id));
       }
 
       /// Move an object from another MemoryImage with an identical layout.
       template<typename T>
-      void MoveObj(size_t pos, MemoryImage & from_image) {
-        emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
+      void MoveObj(size_t id, MemoryImage & from_image) {
+        emp_assert(id + sizeof(T) <= GetSize(), id, sizeof(T), GetSize());
         emp_assert(&from_image.data_map == &data_map);
-        Construct<T, const T &>(pos, std::move(from_image.Get<T>(pos)));  // Move the object.
-        from_image.Destruct<T>(pos);                                         // Destruct old version.
+        Construct<T, const T &>(id, std::move(from_image.Get<T>(id)));  // Move the object.
+        from_image.Destruct<T>(id);                                         // Destruct old version.
       }
 
     };
@@ -192,10 +193,16 @@ namespace emp {
       return id_map.find(name)->second;
     }
 
-    /// Lookup the type of an entry.
+    /// Lookup the type of an entry by ID.
+    emp::TypeID GetType(size_t id) const {
+      emp_assert(Has(setting_map, id), id);
+      return setting_map.find(id)->second.type;
+    }
+
+    /// Lookup the type of an entry by name.
     emp::TypeID GetType(const std::string & name) const {
       emp_assert(Has(id_map, name), name);
-      return setting_map.find(GetID(name))->second.type;
+      return GetType(GetID(name));
     }
 
     /// Add a new variable with a specified type, name and value.
@@ -263,12 +270,25 @@ namespace emp {
       return pos;
     }
 
+    /// Detemine if we have the correct type of a specific variable ID.
+    template <typename T>
+    bool IsType(size_t id) const {
+      emp_assert(Has(setting_map, id), id);
+      return setting_map.find(id)->second.type == emp::GetTypeID<T>();
+    }
+
+    /// Detemine if we have the correct type of a specific variable name.
+    template <typename T>
+    bool IsType(const std::string & name) const {
+      return GetType(name) == emp::GetTypeID<T>();
+    }
+
     /// Retrieve a default variable by its type and position.
     template <typename T>
-    T & GetDefault(size_t pos) {
-      emp_assert(emp::Has(setting_map, pos), setting_map.size(), pos, default_image.GetSize());
-      emp_assert(setting_map[pos].type == emp::GetTypeID<T>());
-      return default_image.template Get<T>(pos);
+    T & GetDefault(size_t id) {
+      emp_assert(emp::Has(setting_map, id), setting_map.size(), id, default_image.GetSize());
+      emp_assert(IsType<T>(id));
+      return default_image.template Get<T>(id);
     }
 
     template <typename T>
@@ -276,20 +296,20 @@ namespace emp {
 
     /// Retrieve a variable from a provided image by its type and position.
     template <typename T>
-    T & Get(MemoryImage & image, size_t pos) {
-      emp_assert(emp::Has(setting_map, pos), setting_map.size(), pos, default_image.GetSize());
-      emp_assert(setting_map[pos].type == emp::GetTypeID<T>());
-      image.template Get<T>(pos);
+    T & Get(MemoryImage & image, size_t id) {
+      emp_assert(emp::Has(setting_map, id), setting_map.size(), id, default_image.GetSize());
+      emp_assert(IsType<T>(id));
+      image.template Get<T>(id);
     }
 
     // -- Constant versions of above two Get fuctions... --
 
     /// Retrieve a const default variable by its type and position.
     template <typename T>
-    const T & GetDefault(size_t pos) const {
-      emp_assert(emp::Has(setting_map, pos), setting_map.size(), pos, default_image.GetSize());
-      emp_assert(setting_map.find(pos)->second.type == emp::GetTypeID<T>());
-      default_image.template Get<T>(pos);
+    const T & GetDefault(size_t id) const {
+      emp_assert(emp::Has(setting_map, id), setting_map.size(), id, default_image.GetSize());
+      emp_assert(IsType<T>(id));
+      default_image.template Get<T>(id);
     }
 
     template <typename T>
@@ -297,10 +317,10 @@ namespace emp {
 
     /// Retrieve a const variable from an image by its type and position.
     template <typename T>
-    const T & Get(MemoryImage & image, size_t pos) const {
-      emp_assert(emp::Has(setting_map, pos), setting_map.size(), pos, default_image.GetSize());
-      emp_assert(setting_map.find(pos)->second.type == emp::GetTypeID<T>());
-      image.template Get<T>(pos);
+    const T & Get(MemoryImage & image, size_t id) const {
+      emp_assert(emp::Has(setting_map, id), setting_map.size(), id, default_image.GetSize());
+      emp_assert(IsType<T>(id));
+      image.template Get<T>(id);
     }
 
 
