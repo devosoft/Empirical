@@ -4,28 +4,39 @@
  *  @date 2018-2019.
  *
  *  @file  DataMap2.h
- *  @brief Track arbitrary data by name (slow) or id (faster).
+ *  @brief A DataMap links names to arbitrary object types.
  *  @note Status: ALPHA
  *
- *  A DataMap links to a provided memory image to maintain arbitrary object types.
- *  There are two derived types:
- *    DataArray is fast, but requires size to be provided at compile time.
- *    DataVector is slower, but has a dynamic memory size.
+ *  A DataMap links data names to arbitrary object types.
+ * 
+ *  Use the Add() method to include a new data entry into the DataMap.
+ * 
+ *  Use the Get() method to retrieve reference to a value in the DataMap.
+ * 
+ *  Use the Set() method to change a value in the DataMap
+ *  (you may also use Get() followed by an assignment.)
+ * 
+ *  New data entries can be added to a DataMap, but never removed (for efficiency purposes).
+ *  When a DataMap is copied, all data entries are also copied (relatively fast).
+ *  As long as a DataMaps layout doesn't change, all copied maps will share the same layout (fast). 
+ * 
  * 
  *  DEVELOPER NOTES:
- *  - Rename so that DataMap is the main object to use.
- *  - Each DataMap can have a key that's internally managed.  Copied maps share a key.
- *    Keys are automatically deleted when all maps that use them are gone.
- *  - When a key is added to, first check if it has already advanced (in a different map)
- *    beyond the current mappings.  If so, duplicate the key.
- *  - Keys should be freezable to ensure that no new maps change the key.
+ *  - Each DataMap can have a Layout that's internally managed.  Copied maps share a Layout.
+ *    Layouts are automatically deleted when all maps that use them are gone.
+ *  - When a Layout is added to, first check if it has already advanced (in a different map)
+ *    beyond the current mappings.  If so, duplicate the Layout.
+ *  - Layouts should be freezable to ensure that no new maps change the Layout.
  *  - Simple helper functions:
- *     Set(key, value)
+ *     Set(Layout, value)
  *     Get/SetValue, String, etc
  *  - AddLog() instead of Add() if you want to keep a set of values.  This should take flags to
  *    indicate how values should be retrieved by default, such as First, Last, Average, etc.
  *  - Settings for all entries should have more information on how they are dealt with, such as if
  *    they should be included in output an how.
+ * 
+ *  - After everything else is working, build a LocalDataMap<size_t> that locks in the size at
+ *    compiletime, providing more localized memory.
  */
 
 #ifndef EMP_DATA_MAP_H
@@ -46,13 +57,15 @@ namespace emp {
   class DataMap {
   protected:
 
-    class Key {
+    class Layout {
     public:
       struct SettingInfo {
         emp::TypeID type;   ///< Type name as converted to string by typeid()
         std::string name;   ///< Name of this setting.
         std::string desc;   ///< Full description of this setting.
         std::string notes;  ///< Any additional notes about this setting.
+
+        bool is_log;        ///< Is this setting a current value or a log of all values?
       };
 
     protected:
@@ -62,20 +75,21 @@ namespace emp {
 
       /// Collect all of the constructors and destructors that we need to worry about.
       using copy_fun_t = std::function<void(const DataMap &, DataMap &)>;
-      using destruct_fun_t = std::function<void(DataMap &)>;
       using move_fun_t = std::function<void(DataMap &, DataMap &)>;
+      using destruct_fun_t = std::function<void(DataMap &)>;
       emp::vector<copy_fun_t> copy_constructors;
       emp::vector<move_fun_t> move_constructors;
       emp::vector<destruct_fun_t> destructors;
 
     public:
-      Key() = default;
-      Key(const Key &) = default;
-      Key(Key &&) = default;
-      ~Key() { ; }
+      Layout() = default;
+      Layout(const Layout &) = default;
+      Layout(Layout &&) = default;
+      ~Layout() { ; }
 
-      // Key & operator=(const Key &) = default;
-      Key & operator=(Key &&) = default;
+      // Layouts should never change out from under a DataMap.
+      Layout & operator=(const Layout &) = delete;
+      Layout & operator=(Layout &&) = delete;
 
       /// Return the number of bytes in the default image.
       size_t GetImageSize() const { return image_size; }
@@ -270,22 +284,22 @@ namespace emp {
 
     emp::Ptr<std::byte> memory = nullptr;
     size_t mem_size = 0;
-    emp::Ptr<Key> key_ptr;
+    emp::Ptr<Layout> layout_ptr;
 
-    DataMap(emp::Ptr<Key> in_key_ptr, size_t in_size) : key_ptr(in_key_ptr) {
+    DataMap(emp::Ptr<Layout> in_layout_ptr, size_t in_size) : layout_ptr(in_layout_ptr) {
       if (in_size) RawResize(in_size);
     }
 
   public:  // Available to users of a DataMap.
-    DataMap(Key & in_key_ptr) : key_ptr(&in_key_ptr) {
-      key_ptr->Initialize(*this);
+    DataMap(Layout & in_layout_ptr) : layout_ptr(&in_layout_ptr) {
+      layout_ptr->Initialize(*this);
     }
     DataMap(const DataMap & in_image)
-    : mem_size(in_image.mem_size), key_ptr(in_image.key_ptr) {
-      key_ptr->CopyImage(in_image, *this);
+    : mem_size(in_image.mem_size), layout_ptr(in_image.layout_ptr) {
+      layout_ptr->CopyImage(in_image, *this);
     }
     DataMap(DataMap && in_image)
-    : memory(in_image.memory), mem_size(in_image.mem_size), key_ptr(in_image.key_ptr) {
+    : memory(in_image.memory), mem_size(in_image.mem_size), layout_ptr(in_image.layout_ptr) {
       in_image.memory = nullptr;
       in_image.mem_size = 0;
     }
@@ -294,15 +308,15 @@ namespace emp {
       if (memory) memory.DeleteArray();
     }
 
-    /// Retrieve the Key associated with this image.
-    Key & GetMapKey() { return *key_ptr; }
-    const Key & GetMapKey() const { return *key_ptr; }
+    /// Retrieve the Layout associated with this image.
+    Layout & GetMapLayout() { return *layout_ptr; }
+    const Layout & GetMapLayout() const { return *layout_ptr; }
 
     /// Determine how many Bytes large this image is.
     size_t GetSize() const { return mem_size; }
 
-    /// Is this image using the most current version of the Key?
-    bool IsCurrent() const { return mem_size == key_ptr->GetImageSize(); }
+    /// Is this image using the most current version of the Layout?
+    bool IsCurrent() const { return mem_size == layout_ptr->GetImageSize(); }
 
     /// Get a typed pointer to a specific position in this image.
     template <typename T> emp::Ptr<T> GetPtr(size_t id) {
@@ -331,7 +345,7 @@ namespace emp {
       return memory[id];
     }
 
-  protected: // Only available to friend class Key
+  protected: // Only available to friend class Layout
 
     /// Change the size of this memory.  Assume all cleanup and setup is done elsewhere.
     void RawResize(size_t new_size) {
@@ -372,7 +386,7 @@ namespace emp {
     template<typename T>
     void CopyObj(size_t id, const DataMap & from_image) {
       emp_assert(id + sizeof(T) <= GetSize(), id, sizeof(T), GetSize());
-      emp_assert(from_image.key_ptr == key_ptr);
+      emp_assert(from_image.layout_ptr == layout_ptr);
       Construct<T, const T &>(id, from_image.Get<T>(id));
     }
 
@@ -380,7 +394,7 @@ namespace emp {
     template<typename T>
     void MoveObj(size_t id, DataMap & from_image) {
       emp_assert(id + sizeof(T) <= GetSize(), id, sizeof(T), GetSize());
-      emp_assert(from_image.key_ptr == key_ptr);
+      emp_assert(from_image.layout_ptr == layout_ptr);
       Construct<T, const T &>(id, std::move(from_image.Get<T>(id)));  // Move the object.
       from_image.Destruct<T>(id);                                         // Destruct old version.
     }
