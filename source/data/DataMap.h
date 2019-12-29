@@ -11,6 +11,21 @@
  *  There are two derived types:
  *    DataArray is fast, but requires size to be provided at compile time.
  *    DataVector is slower, but has a dynamic memory size.
+ * 
+ *  DEVELOPER NOTES:
+ *  - Rename so that DataMap is the main object to use.
+ *  - Each DataMap can have a key that's internally managed.  Copied maps share a key.
+ *    Keys are automatically deleted when all maps that use them are gone.
+ *  - When a key is added to, first check if it has already advanced (in a different map)
+ *    beyond the current mappings.  If so, duplicate the key.
+ *  - Keys should be freezable to ensure that no new maps change the key.
+ *  - Simple helper functions:
+ *     Set(key, value)
+ *     Get/SetValue, String, etc
+ *  - AddLog() instead of Add() if you want to keep a set of values.  This should take flags to
+ *    indicate how values should be retrieved by default, such as First, Last, Average, etc.
+ *  - Settings for all entries should have more information on how they are dealt with, such as if
+ *    they should be included in output an how.
  */
 
 #ifndef EMP_DATA_MAP_H
