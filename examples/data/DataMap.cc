@@ -54,7 +54,7 @@ int main()
 
   const auto & default_image = data_map.GetDefaultImage();
 
-  std::cout << "At start:\n  default_image.GetSize() == " << data_map.GetImageSize()
+  std::cout << "\nAt start:\n  default_image.GetSize() == " << data_map.GetImageSize()
             << std::endl;
 
   // Add some values...
