@@ -8,8 +8,8 @@
  *  @note Status: ALPHA
  *
  *  A DataMap links data names to arbitrary object types.  Each data map is composed of a memory
- *  image that holds a set of values and a Layout that maps names and other information to those
- *  values.
+ *  image that holds a set of values and a DataLayout that maps names and other information to
+ *  those values.
  * 
  *  Use the Add() method to include a new data entry into the DataMap.
  * 
@@ -81,8 +81,8 @@ namespace emp {
     }
 
     /// Get proper references to an object represented in this image.
-    template <typename T> T & Get(size_t pos) { return *GetPtr(pos); }
-    template <typename T> const T & Get(size_t pos) const { return *GetPtr(pos); }
+    template <typename T> T & Get(size_t pos) { return *GetPtr<T>(pos); }
+    template <typename T> const T & Get(size_t pos) const { return *GetPtr<T>(pos); }
 
     /// Change the size of this memory.  Assume all cleanup and setup is done elsewhere.
     void RawResize(size_t new_size) {
@@ -119,14 +119,14 @@ namespace emp {
       GetPtr<T>(id)->~T();
     }
 
-    /// Copy an object from another MemoryImage with an identical Layout.
+    /// Copy an object from another MemoryImage with an identical DataLayout.
     template<typename T>
     void CopyObj(size_t id, const MemoryImage & from_image) {
       emp_assert(id + sizeof(T) <= GetSize(), id, sizeof(T), GetSize());
       Construct<T, const T &>(id, from_image.Get<T>(id));
     }
 
-    /// Move an object from another MemoryImage with an identical Layout.
+    /// Move an object from another MemoryImage with an identical DataLayout.
     template<typename T>
     void MoveObj(size_t id, MemoryImage & from_image) {
       emp_assert(id + sizeof(T) <= GetSize(), id, sizeof(T), GetSize());
@@ -135,7 +135,7 @@ namespace emp {
     }
   };
 
-  class Layout {
+  class DataLayout {
   public:
     struct SettingInfo {
       emp::TypeID type;   ///< Type name as converted to string by typeid()
@@ -160,35 +160,50 @@ namespace emp {
     emp::vector<destruct_fun_t> destructors;
 
   public:
-    Layout() = default;
-    Layout(const Layout &) = default;
-    Layout(Layout &&) = default;
-    ~Layout() { ; }
+    DataLayout() = default;
+    DataLayout(const DataLayout &) = default;
+    DataLayout(DataLayout &&) = default;
+    ~DataLayout() { ; }
 
     // Existing layouts should never change out from under a DataMap.
-    Layout & operator=(const Layout &) = delete;
-    Layout & operator=(Layout &&) = delete;
+    DataLayout & operator=(const DataLayout &) = delete;
+    DataLayout & operator=(DataLayout &&) = delete;
+
+    /// Determine if we have a variable by a given name.
+    bool HasName(const std::string & name) const { return emp::Has(id_map, name); }
+
+    /// Determine if we have an ID.
+    bool HasID(size_t id) const { return emp::Has(setting_map, id); }
+
+    /// Detemine if we have the correct type of a specific variable ID.
+    template <typename T>
+    bool IsType(size_t id) const {
+      emp_assert(Has(setting_map, id), id);
+      return setting_map.find(id)->second.type == emp::GetTypeID<T>();
+    }
+
 
     /// Return the number of bytes in the default image.
     size_t GetImageSize() const { return image_size; }
 
     /// Lookup the unique idea for an entry.
     size_t GetID(const std::string & name) const {
-      emp_assert(Has(id_map, name), name);
+      emp_assert(HasName(name), name);
       return id_map.find(name)->second;
     }
 
     /// Lookup the type of an entry by ID.
     emp::TypeID GetType(size_t id) const {
-      emp_assert(Has(setting_map, id), id);
+      emp_assert(HasID(id), id);
       return setting_map.find(id)->second.type;
     }
 
     /// Lookup the type of an entry by name.
     emp::TypeID GetType(const std::string & name) const {
-      emp_assert(Has(id_map, name), name);
+      emp_assert(HasName(name), name);
       return GetType(GetID(name));
     }
+
 
     /// Add a new variable with a specified type, name and value.
     template <typename T>
@@ -197,7 +212,7 @@ namespace emp {
                 const T & default_value,
                 const std::string & desc="",
                 const std::string & notes="") {
-      emp_assert(!Has(id_map, name), name);               // Make sure this doesn't already exist.
+      emp_assert(!HasName(name), name);               // Make sure this doesn't already exist.
 
       // Analyze the size of the new object and where it will go.
       constexpr const size_t obj_size = sizeof(T);
@@ -254,14 +269,6 @@ namespace emp {
       return pos;
     }
 
-    /// Detemine if we have the correct type of a specific variable ID.
-    template <typename T>
-    bool IsType(size_t id) const {
-      emp_assert(Has(setting_map, id), id);
-      return setting_map.find(id)->second.type == emp::GetTypeID<T>();
-    }
-
-
     // -- Manipulations of images --
 
     /// Run destructors on all objects in a memory image (but otherwise leave it intact.)
@@ -311,9 +318,10 @@ namespace emp {
   class DataMap {
   protected:
     MemoryImage memory;
-    emp::Ptr<Layout> layout_ptr;
+    emp::Ptr<DataLayout> layout_ptr;
 
-    DataMap(emp::Ptr<Layout> in_layout_ptr, size_t in_size) : memory(in_size), layout_ptr(in_layout_ptr) { ; }
+    DataMap(emp::Ptr<DataLayout> in_layout_ptr, size_t in_size)
+      : memory(in_size), layout_ptr(in_layout_ptr) { ; }
 
     void CopyImage(const DataMap & from_map, DataMap & to_map) {
       emp_assert(from_map.layout_ptr == to_map.layout_ptr);
@@ -322,28 +330,42 @@ namespace emp {
 
   public:  // Available to users of a DataMap.
     DataMap(const DataMap & in_map) : layout_ptr(in_map.layout_ptr) { CopyImage(in_map, *this); }
-    DataMap(DataMap && in_map) : memory(in_map.memory), layout_ptr(in_map.layout_ptr) {
-      in_map.memory = nullptr;
-      in_map.mem_size = 0;
+    DataMap(DataMap && in_map) : memory(std::move(in_map.memory)), layout_ptr(in_map.layout_ptr) {
+      in_map.memory.RawResize(0);
     }
 
     ~DataMap() {
     }
 
-    /// Retrieve the Layout associated with this image.
-    Layout & GetMapLayout() { return *layout_ptr; }
-    const Layout & GetMapLayout() const { return *layout_ptr; }
+    /// Retrieve the DataLayout associated with this image.
+    DataLayout & GetMapLayout() { return *layout_ptr; }
+    const DataLayout & GetMapLayout() const { return *layout_ptr; }
 
     /// Determine how many Bytes large this image is.
-    size_t GetSize() const { return mem_size; }
+    size_t GetSize() const { return memory.GetSize(); }
 
-    /// Is this image using the most current version of the Layout?
-    bool IsCurrent() const { return mem_size == layout_ptr->GetImageSize(); }
+    /// Translate a name into an ID.
+    size_t GetID(const std::string & name) const { return layout_ptr->GetID(name); }
+
+    /// Is this image using the most current version of the DataLayout?
+    bool IsCurrent() const { return GetSize() == layout_ptr->GetImageSize(); }
+
+    /// Test if this map has a setting ID.
+    bool HasID(size_t id) const { return layout_ptr->HasID(id); }
+
+    /// Test is this map has a variable by a given name.
+    bool HasName(const std::string & name) const { return layout_ptr->HasName(name); }
+
+    /// Test if a variable is of a given type.
+    template <typename T> bool IsType(size_t id) const { return layout_ptr->IsType<T>(id); }
+    template <typename T> bool IsType(const std::string & name) const {
+      return layout_ptr->IsType<T>(GetID(name));
+    }
 
     /// Retrieve a variable by its type and position.
     template <typename T>
     T & Get(size_t id) {
-      emp_assert(emp::Has(setting_map, id), setting_map.size(), id, GetSize());
+      emp_assert(HasID(id), id, GetSize());
       emp_assert(IsType<T>(id));
       memory.Get<T>(id);
     }
@@ -351,7 +373,7 @@ namespace emp {
     /// Retrieve a const variable by its type and position.
     template <typename T>
     const T & Get(size_t id) const {
-      emp_assert(emp::Has(setting_map, id), setting_map.size(), id, GetSize());
+      emp_assert(HasID(id), id, GetSize());
       emp_assert(IsType<T>(id));
       memory.Get<T>(id);
     }
@@ -363,42 +385,15 @@ namespace emp {
     /// Retrieve a variable by its type and name.
     template <typename T>
     T & Get(std::string & name) {
-      emp_assert(emp::Has(id_map, name));
+      emp_assert(HasName(name));
       memory.Get<T>(GetID(name));
     }
 
     /// Retrieve a const variable by its type and name.
     template <typename T>
     const T & Get(std::string & name) const {
-      emp_assert(emp::Has(id_map, name));
+      emp_assert(HasName(name));
       memory.Get<T>(GetID(name));
-    }
-
-    /// Get a typed pointer to a specific position in this image.
-    template <typename T> emp::Ptr<T> GetPtr(size_t id) {
-      emp_assert(id + sizeof(T) <= GetSize(), id, sizeof(T), GetSize());
-      return reinterpret_cast<T*>(&memory[id]);
-    }
-
-    /// Get a proper reference to an object represented in this image.
-    template <typename T> T & Get(size_t id) {
-      emp_assert(id + sizeof(T) <= GetSize(), id, sizeof(T), GetSize());
-      return *(reinterpret_cast<T*>(&memory[id]));
-    }
-
-    /// Get a const reference to an object represented in this image.
-    template <typename T> const T & Get(size_t id) const {
-      emp_assert(id + sizeof(T) <= GetSize(), id, sizeof(T), GetSize());
-      return *(reinterpret_cast<const T*>(&memory[id]));
-    }
-
-    std::byte & operator[](size_t id) {
-      emp_assert(id < GetSize(), id, GetSize());
-      return memory[id];
-    }
-    const std::byte & operator[](size_t id) const {
-      emp_assert(id < GetSize(), id, GetSize());
-      return memory[id];
     }
 
   };
