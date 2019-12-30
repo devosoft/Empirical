@@ -7,7 +7,9 @@
  *  @brief A DataMap links names to arbitrary object types.
  *  @note Status: ALPHA
  *
- *  A DataMap links data names to arbitrary object types.
+ *  A DataMap links data names to arbitrary object types.  Each data map is composed of a memory
+ *  image that holds a set of values and a Layout that maps names and other information to those
+ *  values.
  * 
  *  Use the Add() method to include a new data entry into the DataMap.
  * 
@@ -36,7 +38,8 @@
  *    they should be included in output an how.
  * 
  *  - After everything else is working, build a LocalDataMap<size_t> that locks in the size at
- *    compiletime, providing more localized memory.
+ *    compiletime, providing more localized memory.  Otherwise DataMap as a whole can be built
+ *    on a templated class that takes an IMAGE_T as an argument.
  */
 
 #ifndef EMP_DATA_MAP_H
@@ -134,7 +137,7 @@ namespace emp {
         // Cleanup the old image.
         ClearImage(base_map);
 
-        // Put the new image in place (and let the old version destruct cleanly)
+        // Put the new image in place (and let its old version destruct cleanly)
         base_map.memory = new_image.memory;
         base_map.mem_size = new_image.mem_size;
         new_image.memory = nullptr;
@@ -144,11 +147,9 @@ namespace emp {
         // Setup the default version of this object.
         base_map.template Construct<T>(pos, default_value);
 
-        // Store the position in the id map.
+        // Store the information about this object.
         id_map[name] = pos;
-
-        // Store all of the other settings for this object.
-        setting_map[pos] = { emp::GetTypeID<T>(), name, desc, notes };
+        setting_map[pos] = { emp::GetTypeID<T>(), name, desc, notes, false };
 
         // Store copy constructor if needed.
         if (std::is_trivially_copyable<T>() == false) {
@@ -185,12 +186,6 @@ namespace emp {
         return setting_map.find(id)->second.type == emp::GetTypeID<T>();
       }
 
-      /// Detemine if we have the correct type of a specific variable name.
-      template <typename T>
-      bool IsType(const std::string & name) const {
-        return GetType(name) == emp::GetTypeID<T>();
-      }
-
       /// Retrieve a variable from a provided image by its type and position.
       template <typename T>
       T & Get(DataMap & image, size_t id) {
@@ -198,8 +193,6 @@ namespace emp {
         emp_assert(IsType<T>(id));
         image.template Get<T>(id);
       }
-
-      // -- Constant versions of above two Get fuctions... --
 
       /// Retrieve a const variable from an image by its type and position.
       template <typename T>
@@ -219,9 +212,6 @@ namespace emp {
         emp_assert(emp::Has(id_map, name));
         image.template Get<T>(GetID(name));
       }
-
-      // -- Constant versions of above two Get fuctions... --
-
 
       /// Retrieve a const variable from an image by its type and position.
       template <typename T>
@@ -258,7 +248,7 @@ namespace emp {
       }
 
       void CopyImage(const DataMap & from_image, DataMap & to_image) const {
-        emp_assert(&from_image.data_map == &to_image.data_map);
+        emp_assert(from_image.layout_ptr == to_image.layout_ptr);
 
         DestructImage(to_image);
 
@@ -271,7 +261,7 @@ namespace emp {
       // Move contents from one image to another.  Size must already be setup!
       void MoveImageContents(DataMap & from_image, DataMap & to_image) const {
         emp_assert(to_image.GetSize() >= from_image.GetSize());
-        emp_assert(&from_image.data_map == &to_image.data_map);
+        emp_assert(from_image.layout_ptr == to_image.layout_ptr);
 
         DestructImage(to_image);
 
