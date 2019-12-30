@@ -209,12 +209,6 @@ namespace emp {
       return setting_map.find(id)->second.type;
     }
 
-    /// Lookup the type of an entry by name.
-    emp::TypeID GetType(const std::string & name) const {
-      emp_assert(HasName(name), name);
-      return GetType(GetID(name));
-    }
-
 
     /// Add a new variable with a specified type, name and value.
     template <typename T>
@@ -396,23 +390,35 @@ namespace emp {
     }
 
 
-    // == Retrivals by name instead of by ID (slower!) ==
-
-
-    /// Retrieve a variable by its type and name.
+    /// Retrieve a variable by its type and name. (Slower!)
     template <typename T>
-    T & Get(std::string & name) {
+    T & Get(const std::string & name) {
       emp_assert(HasName(name));
       memory.Get<T>(GetID(name));
     }
 
-    /// Retrieve a const variable by its type and name.
+    /// Retrieve a const variable by its type and name. (Slower!)
     template <typename T>
-    const T & Get(std::string & name) const {
+    const T & Get(const std::string & name) const {
       emp_assert(HasName(name));
       memory.Get<T>(GetID(name));
     }
 
+    /// Look up the type of a variable by ID.
+    emp::TypeID GetType(size_t id) const { return layout_ptr->GetType(id); }
+
+    /// Look up the type of a variable by name.
+    emp::TypeID GetType(const std::string & name) const { return layout_ptr->GetType(GetID(name)); }
+
+
+    /// Add a new variable with a specified type, name and value.
+    template <typename T>
+    size_t Add(const std::string & name,
+               const T & default_value,
+               const std::string & desc="",
+               const std::string & notes="") {
+      return Add(memory, name, default_value, desc, notes);
+    }
   };
 
 }
