@@ -99,12 +99,22 @@ namespace emp {
 
     /// Copy all of the bytes directly from another memory image.  Size manipulation must be
     /// done beforehand to ensure sufficient space is availabe.
-    void RawCopy(const MemoryImage & in_image) {
-      emp_assert(GetSize() >= in_image.GetSize());
-      if (in_image.GetSize() == 0) return; // Nothing to copy!
+    void RawCopy(const MemoryImage & in_memory) {
+      emp_assert(GetSize() >= in_memory.GetSize());
+      if (in_memory.GetSize() == 0) return; // Nothing to copy!
 
       // Copy byte-by-byte into this memory.
-      std::memcpy(image.Raw(), in_image.image.Raw(), in_image.GetSize());
+      std::memcpy(image.Raw(), in_memory.image.Raw(), in_memory.GetSize());
+    }
+
+    /// Steal the memory from the image passed in.  Current memory should have been cleaned up
+    /// and set to null already.
+    void RawMove(MemoryImage & in_memory) {
+      emp_assert(image.IsNull());
+      image = in_memory.image;
+      size = in_memory.size;
+      in_memory.image = nullptr;
+      in_memory.size = 0;
     }
 
     /// Build a new object of the provided type at the memory position indicated.
@@ -223,23 +233,16 @@ namespace emp {
       constexpr const size_t obj_size = sizeof(T);
       const size_t pos = image_size;
 
-      // Create a new image with enough room for the new object.
+      // Create a new image with enough room for the new object and move the old data over.
       MemoryImage new_memory(image_size + obj_size);
-
-      // Move the memory from the old image to the new one with more space.
       MoveImageContents(base_memory, new_memory);
 
-      // Now that everything is moved out of it, cleanup the old image.
+      // Now that the data is moved, cleanup the old image and put the new one in place.
       ClearImage(base_memory);
+      base_memory.RawMove(new_memory);
+      image_size = base_memory.GetSize();
 
-      // Put the new image in place (and let its old version destruct cleanly)
-      base_memory.image = new_memory.image;
-      base_memory.size = new_memory.size;
-      new_memory.image = nullptr;
-      new_memory.size = 0;
-      image_size = base_memory.size;
-
-      // Setup the default version of this object.
+      // Setup the default version of this new object.
       base_memory.Construct<T>(pos, default_value);
 
       // Store the information about this object.
@@ -378,7 +381,7 @@ namespace emp {
     T & Get(size_t id) {
       emp_assert(HasID(id), id, GetSize());
       emp_assert(IsType<T>(id));
-      memory.Get<T>(id);
+      return memory.Get<T>(id);
     }
 
     /// Retrieve a const variable by its type and position.
@@ -386,7 +389,7 @@ namespace emp {
     const T & Get(size_t id) const {
       emp_assert(HasID(id), id, GetSize());
       emp_assert(IsType<T>(id));
-      memory.Get<T>(id);
+      return memory.Get<T>(id);
     }
 
 
@@ -394,14 +397,14 @@ namespace emp {
     template <typename T>
     T & Get(const std::string & name) {
       emp_assert(HasName(name));
-      memory.Get<T>(GetID(name));
+      return memory.Get<T>(GetID(name));
     }
 
     /// Retrieve a const variable by its type and name. (Slower!)
     template <typename T>
     const T & Get(const std::string & name) const {
       emp_assert(HasName(name));
-      memory.Get<T>(GetID(name));
+      return memory.Get<T>(GetID(name));
     }
 
     /// Look up the type of a variable by ID.
@@ -417,7 +420,7 @@ namespace emp {
                const T & default_value,
                const std::string & desc="",
                const std::string & notes="") {
-      return Add(memory, name, default_value, desc, notes);
+      return layout_ptr->Add<T>(memory, name, default_value, desc, notes);
     }
   };
 
