@@ -57,6 +57,55 @@
 
 namespace emp {
 
+  class MemoryImage {
+  private:
+    emp::Ptr<std::byte> image = nullptr;
+    size_t size = 0;
+
+  public:
+    MemoryImage() = default;
+    MemoryImage(size_t in_size) : image( emp::NewPtr<std::byte>(in_size) ), size(in_size) { ; }
+    ~MemoryImage() { if (image) image.DeleteArray(); }
+
+    size_t GetSize() const { return size; }
+
+    /// Get a typed pointer to a specific position in this image.
+    template <typename T> emp::Ptr<T> GetPtr(size_t pos) {
+      emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
+      return reinterpret_cast<T*>(&image[pos]);
+    }
+
+    template <typename T> emp::Ptr<const T> GetPtr(size_t pos) const {
+      emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
+      return reinterpret_cast<T const *>(&image[pos]);
+    }
+
+    /// Get proper references to an object represented in this image.
+    template <typename T> T & Get(size_t pos) { return *GetPtr(pos); }
+    template <typename T> const T & Get(size_t pos) const { return *GetPtr(pos); }
+
+    /// Change the size of this memory.  Assume all cleanup and setup is done elsewhere.
+    void RawResize(size_t new_size) {
+      // If the size is already good, stop here.
+      if (GetSize() == new_size) return;
+
+      if (image) image.DeleteArray();   // If there was memory here, free it.
+      size = new_size;                  // Determine the new size.
+      image.NewArray(size);             // Allocate the new space.
+    }
+
+    /// Copy all of the bytes directly from another memory image.  Size manipulation must be
+    /// done beforehand to ensure sufficient space is availabe.
+    void RawCopy(const MemoryImage & in_image) {
+      emp_assert(GetSize() >= in_image.GetSize());
+      if (in_image.GetSize() == 0) return; // Nothing to copy!
+
+      // Copy byte-by-byte into this memory.
+      std::memcpy(image.Raw(), in_image.image.Raw(), in_image.GetSize());
+    }
+
+  };
+
   class DataMap {
   protected:
 
@@ -337,56 +386,33 @@ namespace emp {
 
   protected: // Only available to friend class Layout
 
-    /// Change the size of this memory.  Assume all cleanup and setup is done elsewhere.
-    void RawResize(size_t new_size) {
-      // If the size is already good, stop here.
-      if (mem_size == new_size) return;
-
-      if (memory) memory.DeleteArray();  // If there was memory here, free it.
-      mem_size = new_size;               // Determine the new size.
-      memory.NewArray(mem_size);         // Allocate the new space.
-    }
-
-
-    /// Copy all of the bytes directly from another memory image.  Size manipulation must be
-    /// done beforehand to ensure sufficient space is availabe.
-    void RawCopy(const DataMap & in_image) {
-      emp_assert(mem_size >= in_image.mem_size);
-      if (in_image.mem_size == 0) return; // Nothing to copy!
-
-      // Copy byte-by-byte into this memory.
-      std::memcpy(memory.Raw(), in_image.memory.Raw(), mem_size);
-    }
-
     /// Build a new object of the provided type at the memory position indicated.
     template <typename T, typename... ARGS>
     void Construct(size_t id, ARGS &&... args) {
       emp_assert(id + sizeof(T) <= GetSize(), id, sizeof(T), GetSize());
-      new (GetPtr<T>(id).Raw()) T( std::forward<ARGS>(args)... );
+      new (memory.GetPtr<T>(id).Raw()) T( std::forward<ARGS>(args)... );
     }
 
     /// Destruct an object of the provided type at the memory position indicated; don't release memory!
     template <typename T>
     void Destruct(size_t id) {
       emp_assert(id + sizeof(T) <= GetSize(), id, sizeof(T), GetSize());
-      GetPtr<T>(id)->~T();
+      memory.GetPtr<T>(id)->~T();
     }
 
-    /// Copy an object from another DataMap with an identical layout.
+    /// Copy an object from another MemoryImage with an identical layout.
     template<typename T>
-    void CopyObj(size_t id, const DataMap & from_image) {
+    void CopyObj(size_t id, const MemoryImage & from_image) {
       emp_assert(id + sizeof(T) <= GetSize(), id, sizeof(T), GetSize());
-      emp_assert(from_image.layout_ptr == layout_ptr);
       Construct<T, const T &>(id, from_image.Get<T>(id));
     }
 
     /// Move an object from another DataMap with an identical layout.
     template<typename T>
-    void MoveObj(size_t id, DataMap & from_image) {
+    void MoveObj(size_t id, MemoryImage & from_image) {
       emp_assert(id + sizeof(T) <= GetSize(), id, sizeof(T), GetSize());
-      emp_assert(from_image.layout_ptr == layout_ptr);
-      Construct<T, const T &>(id, std::move(from_image.Get<T>(id)));  // Move the object.
-      from_image.Destruct<T>(id);                                         // Destruct old version.
+      Construct<T, const T &>(id, std::move(from_image.Get<T>(id)));     // Move the object.
+      from_image.Destruct<T>(id);                                        // Destruct old version.
     }
 
   };
