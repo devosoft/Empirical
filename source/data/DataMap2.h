@@ -57,6 +57,8 @@
 
 namespace emp {
 
+  /// A helper class for DataMap; tracks a memory image (sequence of bytes).
+
   class MemoryImage {
   private:
     emp::Ptr<std::byte> image = nullptr;
@@ -135,6 +137,9 @@ namespace emp {
     }
   };
 
+
+  /// A helper class for DataMap; tracks how data is organized in a MemoryImage.
+
   class DataLayout {
   public:
     struct SettingInfo {
@@ -149,7 +154,9 @@ namespace emp {
   protected:
     std::unordered_map<std::string, size_t> id_map;       ///< Lookup vector positions by name.
     std::unordered_map<size_t, SettingInfo> setting_map;  ///< Lookup setting info by id.
-    size_t image_size;                                    ///< What size image is expected? @CAO COMPLETE!
+    size_t image_size;                                    ///< What size image is expected?
+
+    size_t num_maps = 1;                                  ///< How many DataMaps use this layout?
 
     /// Collect all of the constructors and destructors that we need to worry about.
     using copy_fun_t = std::function<void(const MemoryImage &, MemoryImage &)>;
@@ -168,6 +175,10 @@ namespace emp {
     // Existing layouts should never change out from under a DataMap.
     DataLayout & operator=(const DataLayout &) = delete;
     DataLayout & operator=(DataLayout &&) = delete;
+
+    void IncMaps() { num_maps++; }
+    void DecMaps() { num_maps--; }
+    size_t GetNumMaps() const { return num_maps; }
 
     /// Determine if we have a variable by a given name.
     bool HasName(const std::string & name) const { return emp::Has(id_map, name); }
@@ -328,13 +339,19 @@ namespace emp {
       layout_ptr->CopyImage(from_map.memory, to_map.memory);
     }
 
-  public:  // Available to users of a DataMap.
-    DataMap(const DataMap & in_map) : layout_ptr(in_map.layout_ptr) { CopyImage(in_map, *this); }
+  public:
+    DataMap() : layout_ptr(emp::NewPtr<DataLayout>()) { ; }
+    DataMap(const DataMap & in_map) : layout_ptr(in_map.layout_ptr) {
+      CopyImage(in_map, *this);
+      layout_ptr->IncMaps();
+    }
     DataMap(DataMap && in_map) : memory(std::move(in_map.memory)), layout_ptr(in_map.layout_ptr) {
       in_map.memory.RawResize(0);
     }
 
     ~DataMap() {
+      layout_ptr->DecMaps();
+      if (layout_ptr->GetNumMaps() == 0) layout_ptr.Delete();
     }
 
     /// Retrieve the DataLayout associated with this image.
