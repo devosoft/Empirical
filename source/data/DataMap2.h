@@ -24,14 +24,7 @@
  * 
  * 
  *  DEVELOPER NOTES:
- *  - Each DataMap can have a Layout that's internally managed.  Copied maps share a Layout.
- *    Layouts are automatically deleted when all maps that use them are gone.
- *  - When a Layout is added to, first check if it has already advanced (in a different map)
- *    beyond the current mappings.  If so, duplicate the Layout.
  *  - Layouts should be freezable to ensure that no new maps change the Layout.
- *  - Simple helper functions:
- *     Set(Layout, value)
- *     Get/SetValue, String, etc
  *  - AddLog() instead of Add() if you want to keep a set of values.  This should take flags to
  *    indicate how values should be retrieved by default, such as First, Last, Average, etc.
  *  - Settings for all entries should have more information on how they are dealt with, such as if
@@ -420,6 +413,21 @@ namespace emp {
     template <typename T> T & Set(const std::string & name, const T & value) {
       return (Get<T>(name) = value);
     }
+
+    // Type-specific Getters and Setters
+    double & GetDouble(size_t id) { return Get<double>(id); }
+    double GetDouble(size_t id) const { return Get<double>(id); }
+    double & GetDouble(const std::string & name) { return Get<double>(name); }
+    double GetDouble(const std::string & name) const { return Get<double>(name); }
+    double & SetDouble(size_t id, double value) { return Set<double>(id, value); }
+    double & SetDouble(const std::string & name, double value) { return Set<double>(name, value); }
+
+    std::string & GetString(const size_t id) { return Get<std::string>(id); }
+    const std::string & GetString(const size_t id) const { return Get<std::string>(id); }
+    std::string & GetString(const std::string & name) { return Get<std::string>(name); }
+    const std::string & GetString(const std::string & name) const { return Get<std::string>(name); }
+    std::string & SetString(const size_t id, const std::string & value) { return Set<std::string>(id, value); }
+    std::string & SetString(const std::string & name, const std::string & value) { return Set<std::string>(name, value); }
 
     /// Look up the type of a variable by ID.
     emp::TypeID GetType(size_t id) const { return layout_ptr->GetType(id); }
