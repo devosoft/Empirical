@@ -20,7 +20,7 @@ CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../source/
 CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
-TARGETS := AnyFunction attrs Binomial BitSet BitVector Cache combos const DFA File flex_function GenericFunction IndexMap info_theory Lexer lexer_utils math memo_function NFA ra_set Random Range RegEx StringMap tuple_utils TypeMap TypeTracker valsort_map vector_utils
+TARGETS := AnyFunction attrs Binomial BitSet BitVector Cache combos const ContiguousStream DFA File flex_function GenericFunction IndexMap info_theory Lexer lexer_utils math memo_function NFA ra_set Random Range RegEx StringMap tuple_utils TypeMap TypeTracker valsort_map vector_utils
 
 TOOLS := ../../source/tools
 TOOL_DEPEND := ../../source/base/assert.h
