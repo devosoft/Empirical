@@ -178,8 +178,10 @@ namespace emp {
 
   public:
     DataLayout() = default;
-    DataLayout(const DataLayout &) = default;
-    DataLayout(DataLayout &&) = default;
+    DataLayout(const DataLayout & _in)
+      : id_map(_in.id_map), setting_map(_in.setting_map), image_size(_in.image_size), num_maps(1)
+    { }
+    //DataLayout(DataLayout &&) = default;
     ~DataLayout() { ; }
 
     // Existing layouts should never change out from under a DataMap.
@@ -397,6 +399,7 @@ namespace emp {
     template <typename T>
     T & Get(const std::string & name) {
       emp_assert(HasName(name));
+      emp_assert(IsType<T>(name), name, GetType(name), emp::GetTypeID<T>());
       return memory.Get<T>(GetID(name));
     }
 
@@ -404,7 +407,18 @@ namespace emp {
     template <typename T>
     const T & Get(const std::string & name) const {
       emp_assert(HasName(name));
+      emp_assert(IsType<T>(name), name, GetType(name), emp::GetTypeID<T>());
       return memory.Get<T>(GetID(name));
+    }
+
+    /// Set a variable by ID.
+    template <typename T> T & Set(size_t id, const T & value) {
+      return (Get<T>(id) = value);
+    }
+
+    /// Set a variable by name.
+    template <typename T> T & Set(const std::string & name, const T & value) {
+      return (Get<T>(name) = value);
     }
 
     /// Look up the type of a variable by ID.
@@ -420,6 +434,12 @@ namespace emp {
                const T & default_value,
                const std::string & desc="",
                const std::string & notes="") {
+      // If the current layout is shared, first make a copy of it.
+      if (layout_ptr->GetNumMaps() > 1) {
+        layout_ptr->DecMaps();
+        layout_ptr.New(*layout_ptr);
+      }
+
       return layout_ptr->Add<T>(memory, name, default_value, desc, notes);
     }
   };
