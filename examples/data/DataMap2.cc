@@ -57,7 +57,7 @@ int main()
 
   // Add some values...
 
-  size_t idA = data_map.Add<int>("test_int", 20);
+  size_t idA = data_map.Add<int>("test_int", 10);
   size_t idB = data_map.Add<double>("test_double", 111.111);
   size_t idC = data_map.Add<std::string>("short_string", "string1");
   size_t idD = data_map.Add<std::string>("long_string", "This is a much longer string that shouldn't be used for short-string optimization.");
@@ -68,6 +68,14 @@ int main()
             << "\n  (B) data_map : " << data_map.Get<double>(idB)
             << "\n  (C) data_map : " << data_map.Get<std::string>(idC)
             << "\n  (D) data_map : " << data_map.Get<std::string>(idD)
+            << std::endl;
+
+  std::cout << "\nAnd calling by NAME rather than ID:"
+            << "\n  data_map.GetSize() == " << data_map.GetSize()
+            << "\n  (A) data_map : " << data_map.Get<int>("test_int")
+            << "\n  (B) data_map : " << data_map.Get<double>("test_double")
+            << "\n  (C) data_map : " << data_map.Get<std::string>("short_string")
+            << "\n  (D) data_map : " << data_map.Get<std::string>("long_string")
             << std::endl;
 
   emp::DataMap data_map2(data_map);
@@ -85,9 +93,10 @@ int main()
             << "\n      data_map2: " << data_map2.Get<std::string>(idD)
             << std::endl;
 
-  data_map.Get<double>(idB) = 222.222;
+  data_map.Set<int>("test_int", 20);
+  data_map.Set<double>(idB, 222.222);
 
-  std::cout << "\nAfter changing the default double value to 222.222:"
+  std::cout << "\nAfter changing the test_int to 20 and test_double value to 222.222:"
             << "\n  data_map.GetSize() == " << data_map.GetSize()
             << "\n  data_map2.GetSize() == " << data_map2.GetSize()
             << "\n  (A) data_map : " << data_map.Get<int>(idA)
