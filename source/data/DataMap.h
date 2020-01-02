@@ -66,6 +66,13 @@ namespace emp {
       layout_ptr->CopyImage(from_map.memory, to_map.memory);
     }
 
+    /// If the current layout is shared, make a copy of it.
+    void MakeLayoutUnique() {
+      if (layout_ptr->GetNumMaps() > 1) {
+        layout_ptr->DecMaps();
+        layout_ptr.New(*layout_ptr);
+      }
+    }
   public:
     DataMap() : layout_ptr(emp::NewPtr<DataLayout>()) { ; }
     DataMap(const DataMap & in_map) : layout_ptr(in_map.layout_ptr) {
@@ -173,22 +180,17 @@ namespace emp {
 
     /// Add a new variable with a specified type, name and value.
     template <typename T>
-    size_t Add(const std::string & name,
+    size_t AddVar(const std::string & name,
                const T & default_value,
                const std::string & desc="",
                const std::string & notes="") {
-      // If the current layout is shared, first make a copy of it.
-      if (layout_ptr->GetNumMaps() > 1) {
-        layout_ptr->DecMaps();
-        layout_ptr.New(*layout_ptr);
-      }
-
+      MakeLayoutUnique();  // If the current layout is shared, first make a copy of it.
       return layout_ptr->Add<T>(memory, name, default_value, desc, notes);
     }
 
     // Add type-specific variables.
-    template <typename... Ts> size_t AddString(Ts &&... args) { return Add<std::string>(args...); }
-    template <typename... Ts> size_t AddValue(Ts &&... args) { return Add<double>(args...); }
+    template <typename... Ts> size_t AddStringVar(Ts &&... args) { return AddVar<std::string>(args...); }
+    template <typename... Ts> size_t AddValueVar(Ts &&... args) { return AddVar<double>(args...); }
   };
 
 }
