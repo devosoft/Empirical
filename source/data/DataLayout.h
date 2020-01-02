@@ -40,8 +40,8 @@ namespace emp {
     std::unordered_map<std::string, size_t> id_map;       ///< Lookup vector positions by name.
     std::unordered_map<size_t, SettingInfo> setting_map;  ///< Lookup setting info by id.
     size_t image_size;                                    ///< What size image is expected?
-
     size_t num_maps = 1;                                  ///< How many DataMaps use this layout?
+    bool is_locked = false;                               ///< Can this layout still be modified?
 
     /// Collect all of the constructors and destructors that we need to worry about.
     using copy_fun_t = std::function<void(const MemoryImage &, MemoryImage &)>;
@@ -66,6 +66,7 @@ namespace emp {
     void IncMaps() { num_maps++; }
     void DecMaps() { num_maps--; }
     size_t GetNumMaps() const { return num_maps; }
+    bool IsLocked() const { return is_locked; }
 
     /// Determine if we have a variable by a given name.
     bool HasName(const std::string & name) const { return emp::Has(id_map, name); }
@@ -96,6 +97,8 @@ namespace emp {
       return setting_map.find(id)->second.type;
     }
 
+    /// Prevent this layout from being modified.
+    void Lock() { is_locked = true; }
 
     /// Add a new variable with a specified type, name and value.
     template <typename T>
@@ -104,7 +107,8 @@ namespace emp {
                 const T & default_value,
                 const std::string & desc="",
                 const std::string & notes="") {
-      emp_assert(!HasName(name), name);               // Make sure this doesn't already exist.
+      emp_assert(!HasName(name), name);    // Make sure this doesn't already exist.
+      emp_assert(is_locked == false);      // Cannot add to a locked layout.
 
       // Analyze the size of the new object and where it will go.
       constexpr const size_t obj_size = sizeof(T);
@@ -154,7 +158,7 @@ namespace emp {
       return pos;
     }
 
-    // -- Manipulations of images --
+    // -- Manipulations of MemoryImages --
 
     /// Run destructors on all objects in a memory image (but otherwise leave it intact.)
     void DestructImage(MemoryImage & image) const {
