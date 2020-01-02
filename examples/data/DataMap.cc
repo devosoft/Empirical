@@ -15,11 +15,11 @@ int main()
 {
   emp::DataMap dmap;
 
-  size_t id1 = dmap.Add<double>("fitness", 0.0);
-  size_t id2 = dmap.Add<bool>("do_muts", false);
-  size_t id3 = dmap.Add<std::string>("name", "MyOrg1");
-  size_t id4 = dmap.Add<std::string>("name2", "MyOrg2");
-  size_t id5 = dmap.Add<std::string>("name3", "MyOrg3");
+  size_t id1 = dmap.AddVar<double>("fitness", 0.0);
+  size_t id2 = dmap.AddVar<bool>("do_muts", false);
+  size_t id3 = dmap.AddVar<std::string>("name", "MyOrg1");
+  size_t id4 = dmap.AddStringVar("name2", "MyOrg2");
+  size_t id5 = dmap.AddVar<std::string>("name3", "MyOrg3");
 
   std::cout << "IDs: "
             << " id1 = " << id1
@@ -57,10 +57,10 @@ int main()
 
   // Add some values...
 
-  size_t idA = data_map.Add<int>("test_int", 10);
-  size_t idB = data_map.Add<double>("test_double", 111.111);
-  size_t idC = data_map.Add<std::string>("short_string", "string1");
-  size_t idD = data_map.Add<std::string>("long_string", "This is a much longer string that shouldn't be used for short-string optimization.");
+  size_t idA = data_map.AddVar<int>("test_int", 10);
+  size_t idB = data_map.AddVar<double>("test_double", 111.111);
+  size_t idC = data_map.AddVar<std::string>("short_string", "string1");
+  size_t idD = data_map.AddVar<std::string>("long_string", "This is a much longer string that shouldn't be used for short-string optimization.");
 
   std::cout << "\nAfter inserting an int, a double, and two strings:"
             << "\n  data_map.GetSize() == " << data_map.GetSize()
