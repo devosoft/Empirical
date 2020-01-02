@@ -24,27 +24,40 @@
  * 
  * 
  *  DEVELOPER NOTES:
- *  - AddLog() instead of Add() if you want to keep a set of values.  This should take flags to
- *    indicate how values should be retrieved by default, such as First, Last, Average, etc.
+ *  - We should be able to keep a series of values, not just a single on.  This can be done with
+ *    a series of new functions:
+ *      AddLog() instead of AddVar() when new veriable is created.
+ *      Get() should still work for latest value.  Ideally keep lates in first position.
+ *      Change non-const Get() to GetRef() which cannot be used for a log.
+ *      Add GetAve() function for logs as well as GetLog() for the full vector.
+ * 
  *  - Settings for all entries should have more information on how they are dealt with, such as if
- *    they should be included in output an how.
+ *    they should be included in output an how.  Perhaps a system of tags for dynamic use?
  * 
  *  - After everything else is working, build a LocalDataMap<size_t> that locks in the size at
- *    compiletime, providing more localized memory.  Otherwise DataMap as a whole can be built
+ *    compile time, providing more localized memory.  Otherwise DataMap as a whole can be built
  *    on a templated class that takes an IMAGE_T as an argument.
+ * 
+ *  - Default values should be saved in the layout allowing any MemoryImage to be easily reset to
+ *    factory settings.
+ * 
+ *  - A user should be able to override copy constructors (though probably not move constructors
+ *    or destructors?).  Then the copy process can be more customizable, for example having some
+ *    settings retrun to the default value or be further processed.  It's also possible to have
+ *    multiple types of copies, so if we indicate a "Copy birth" we get the above, but if we
+ *    indicate a "Copy clone" or "Copy inject" we do something different.  We also probably need
+ *    to allow for multiple parents...
  */
 
 #ifndef EMP_DATA_MAP_H
 #define EMP_DATA_MAP_H
 
 #include <string>
-#include <unordered_map>
 #include <cstring>        // For std::memcpy
 
 #include "../base/assert.h"
 #include "../base/Ptr.h"
 #include "../meta/TypeID.h"
-#include "../tools/map_utils.h"
 #include "../tools/string_utils.h"
 
 #include "MemoryImage.h"
