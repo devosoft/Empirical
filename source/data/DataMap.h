@@ -24,7 +24,6 @@
  * 
  * 
  *  DEVELOPER NOTES:
- *  - Layouts should be freezable to ensure that no new maps change the Layout.
  *  - AddLog() instead of Add() if you want to keep a set of values.  This should take flags to
  *    indicate how values should be retrieved by default, such as First, Last, Average, etc.
  *  - Settings for all entries should have more information on how they are dealt with, such as if
@@ -191,6 +190,13 @@ namespace emp {
     // Add type-specific variables.
     template <typename... Ts> size_t AddStringVar(Ts &&... args) { return AddVar<std::string>(args...); }
     template <typename... Ts> size_t AddValueVar(Ts &&... args) { return AddVar<double>(args...); }
+
+    bool IsLocked() const { return layout_ptr->IsLocked(); }
+
+    void LockLayout() {
+      MakeLayoutUnique();
+      layout_ptr->Lock();
+    }
   };
 
 }
