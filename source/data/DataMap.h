@@ -55,8 +55,8 @@ namespace emp {
 
   class DataMap {
   protected:
-    MemoryImage memory;
-    emp::Ptr<DataLayout> layout_ptr;
+    MemoryImage memory;              ///< Memory status for this Map.
+    emp::Ptr<DataLayout> layout_ptr; ///< Which layout are we using?
 
     DataMap(emp::Ptr<DataLayout> in_layout_ptr, size_t in_size)
       : memory(in_size), layout_ptr(in_layout_ptr) { ; }
@@ -150,12 +150,12 @@ namespace emp {
     }
 
     // Type-specific Getters and Setters
-    double & GetDouble(size_t id) { return Get<double>(id); }
-    double GetDouble(size_t id) const { return Get<double>(id); }
-    double & GetDouble(const std::string & name) { return Get<double>(name); }
-    double GetDouble(const std::string & name) const { return Get<double>(name); }
-    double & SetDouble(size_t id, double value) { return Set<double>(id, value); }
-    double & SetDouble(const std::string & name, double value) { return Set<double>(name, value); }
+    double & GetValue(size_t id) { return Get<double>(id); }
+    double GetValue(size_t id) const { return Get<double>(id); }
+    double & GetValue(const std::string & name) { return Get<double>(name); }
+    double GetValue(const std::string & name) const { return Get<double>(name); }
+    double & SetValue(size_t id, double value) { return Set<double>(id, value); }
+    double & SetValue(const std::string & name, double value) { return Set<double>(name, value); }
 
     std::string & GetString(const size_t id) { return Get<std::string>(id); }
     const std::string & GetString(const size_t id) const { return Get<std::string>(id); }
@@ -185,6 +185,10 @@ namespace emp {
 
       return layout_ptr->Add<T>(memory, name, default_value, desc, notes);
     }
+
+    // Add type-specific variables.
+    template <typename... Ts> size_t AddString(Ts &&... args) { return Add<std::string>(args...); }
+    template <typename... Ts> size_t AddValue(Ts &&... args) { return Add<double>(args...); }
   };
 
 }
