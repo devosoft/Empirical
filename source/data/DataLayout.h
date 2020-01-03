@@ -110,6 +110,12 @@ namespace emp {
       emp_assert(!HasName(name), name);    // Make sure this doesn't already exist.
       emp_assert(is_locked == false);      // Cannot add to a locked layout.
 
+      // std::cout << "\nL: Adding var '" << name
+      //           << "' of type " << emp::GetTypeID<T>()
+      //           << " to DataMap with " << id_map.size() << " elements"
+      //           << " totalling " << image_size << " bytes."
+      //           << std::endl;
+
       // Analyze the size of the new object and where it will go.
       constexpr const size_t obj_size = sizeof(T);
       const size_t pos = image_size;
@@ -190,11 +196,10 @@ namespace emp {
       for (auto & c : copy_constructors) { c(from_image, to_image); }
     }
 
-    // Move contents from one image to another.  Size must already be setup!
+    // Move contents from one image to another.  Size must already be setup, and to_image must
+    // be uninitialized (or destructed)
     void MoveImageContents(MemoryImage & from_image, MemoryImage & to_image) const {
       emp_assert(to_image.GetSize() >= from_image.GetSize());
-
-      DestructImage(to_image);
 
       // Transfer over the from image and then run the required copy constructors.
       to_image.RawCopy(from_image);
