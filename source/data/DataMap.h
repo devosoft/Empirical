@@ -105,6 +105,10 @@ namespace emp {
     }
 
     ~DataMap() {
+      // Clean up the current MemoryImage.
+      layout_ptr->ClearImage(memory);
+
+      // Clean up the DataLayout
       layout_ptr->DecMaps();
       if (layout_ptr->GetNumMaps() == 0) layout_ptr.Delete();
     }
