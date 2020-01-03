@@ -8,19 +8,28 @@
  *  @note Status: ALPHA
  *
  *  A DataMap links data names to arbitrary object types.  Each data map is composed of a
- *  MemoryImage that holds a set of values and a DataLayout that maps names and other information
- *  to those values.
+ *  MemoryImage (that holds a set of values) and a DataLayout (that maps names and other info
+ *  to those values.)
  * 
- *  Use the Add() method to include a new data entry into the DataMap.
+ *  AddVar<type>("name", value, ["desc"], ["notes"])
+ *   Includes a new data entry into the DataMap and returns its uniquq ID.
  * 
- *  Use the Get() method to retrieve reference to a value in the DataMap.
- * 
- *  Use the Set() method to change a value in the DataMap
- *  (you may also use Get() followed by an assignment.)
+ *  Get<type>("name")   - retrieve a reference to a value in the DataMap slowly.
+ *  Get<type>(ID)       - retrieve a reference more quickly.
+ *  GetID("name")       - convert a name into a unique ID.
+ *  Set(name|id, value) - change a value in the DataMap
+ *    (you may also use Get() followed by an assignment.)
  * 
  *  New data entries can be added to a DataMap, but never removed (for efficiency purposes).
  *  When a DataMap is copied, all data entries are also copied (relatively fast).
  *  As long as a DataMaps layout doesn't change, all copied maps will share the same layout (fast). 
+ * 
+ *  A layout can also be locked with LockLayout(), which will throw an error if there is an attempt
+ *  to modify that layout again.  A lock can be checked with IsLocked().
+ * 
+ *  Specialty versions of Get and Set exist if you don't want to use templates for simple types.
+ *  They are GetValue(*), SetValue(*), GetString(*), and SetString(*).  Values are all represented
+ *  as doubles.
  * 
  * 
  *  DEVELOPER NOTES:
