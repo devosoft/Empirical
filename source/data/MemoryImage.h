@@ -12,8 +12,8 @@
 #ifndef EMP_MEMORY_IMAGE_H
 #define EMP_MEMORY_IMAGE_H
 
-#include <unordered_map>
 #include <cstring>        // For std::memcpy
+#include <new>            // For placement new
 
 #include "../base/assert.h"
 #include "../base/Ptr.h"
@@ -24,10 +24,11 @@ namespace emp {
 
   class MemoryImage {
   private:
-    emp::Ptr<std::byte> image = nullptr;
-    size_t size = 0;
+    emp::Ptr<std::byte> image = nullptr;   ///< Current memory image.
+    size_t size = 0;                       ///< Size of current image.
 
   public:
+
     MemoryImage() = default;
     MemoryImage(size_t in_size) : image( emp::NewArrayPtr<std::byte>(in_size) ), size(in_size) { ; }
     ~MemoryImage() { if (image) image.DeleteArray(); }
@@ -62,22 +63,25 @@ namespace emp {
 
     /// Copy all of the bytes directly from another memory image.  Size manipulation must be
     /// done beforehand to ensure sufficient space is availabe.
-    void RawCopy(const MemoryImage & in_memory) {
-      emp_assert(GetSize() >= in_memory.GetSize());
-      if (in_memory.GetSize() == 0) return; // Nothing to copy!
+    void RawCopy(const MemoryImage & from_memory) {
+      emp_assert(GetSize() >= from_memory.GetSize());
+      if (from_memory.GetSize() == 0) return; // Nothing to copy!
 
       // Copy byte-by-byte into this memory.
-      std::memcpy(image.Raw(), in_memory.image.Raw(), in_memory.GetSize());
+      std::memcpy(image.Raw(), from_memory.image.Raw(), from_memory.GetSize());
     }
 
     /// Steal the memory from the image passed in.  Current memory should have been cleaned up
     /// and set to null already.
-    void RawMove(MemoryImage & in_memory) {
+    void RawMove(MemoryImage & from_memory) {
       emp_assert(image.IsNull());
-      image = in_memory.image;
-      size = in_memory.size;
-      in_memory.image = nullptr;
-      in_memory.size = 0;
+
+      if (from_memory.GetSize() == 0) return;  // Nothing to do!
+
+      image = from_memory.image;
+      size = from_memory.size;
+      from_memory.image = nullptr;
+      from_memory.size = 0;
     }
 
     /// Build a new object of the provided type at the memory position indicated.
