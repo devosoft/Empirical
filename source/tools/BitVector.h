@@ -403,7 +403,7 @@ namespace emp {
     }
 
     /// Update the bit value at the specified index.
-    void Set(size_t index, bool value=true) {
+    BitVector & Set(size_t index, bool value=true) {
       emp_assert(index < num_bits, index, num_bits);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
@@ -412,6 +412,8 @@ namespace emp {
 
       if (value) bit_set[field_id] |= pos_mask;
       else       bit_set[field_id] &= ~pos_mask;
+
+      return *this;
     }
 
     /// A simple hash function for bit vectors.
