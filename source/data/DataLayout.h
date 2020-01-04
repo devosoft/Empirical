@@ -125,12 +125,12 @@ namespace emp {
       MoveImageContents(base_memory, new_memory);
 
       // Now that the data is moved, cleanup the old image and put the new one in place.
-      ClearImage(base_memory);
       base_memory.RawMove(new_memory);
-      image_size = base_memory.GetSize();
 
-      // Setup the default version of this new object.
+      // Setup this new object.
+      image_size = base_memory.GetSize();
       base_memory.Construct<T>(pos, default_value);
+      base_memory.init_to = image_size;
 
       // Store the information about this object.
       id_map[name] = pos;
@@ -173,18 +173,21 @@ namespace emp {
 
       // Run destructor on contents of image and then empty it!
       for (auto & d : destructors) { d(image); }
+      image.init_to = 0;
     }
 
     /// Destruct and delete all memomry assocated with this DataMap.
-    void ClearImage(MemoryImage & memory) const {
+    void ClearImage(MemoryImage & image) const {
       // If this memory image is already clear, stop.
-      if (memory.GetSize() == 0) return;
+      if (image.GetSize() == 0) return;
 
       // Run destructor on contents of image and then empty it!
-      for (auto & d : destructors) { d(memory); }
+      emp_assert(image.GetInitSize() == image_size);
+      for (auto & d : destructors) { d(image); }
+      image.init_to = 0;
 
       // Clean up image memory.
-      memory.RawResize(0);
+      image.RawResize(0);
     }
 
     void CopyImage(const MemoryImage & from_image, MemoryImage & to_image) const {
@@ -194,16 +197,20 @@ namespace emp {
       to_image.RawResize(from_image.GetSize());
       to_image.RawCopy(from_image);
       for (auto & c : copy_constructors) { c(from_image, to_image); }
+      to_image.init_to = from_image.init_to;
     }
 
     // Move contents from one image to another.  Size must already be setup, and to_image must
     // be uninitialized (or destructed)
     void MoveImageContents(MemoryImage & from_image, MemoryImage & to_image) const {
-      emp_assert(to_image.GetSize() >= from_image.GetSize());
+      emp_assert(from_image.GetInitSize() >= image_size);
+      emp_assert(to_image.GetSize() >= image_size);
 
       // Transfer over the from image and then run the required copy constructors.
       to_image.RawCopy(from_image);
       for (auto & c : move_constructors) { c(from_image, to_image); }
+      to_image.init_to = image_size;  // Everything in the to image is now initialized.
+      from_image.init_to = 0;         // Everything in the from image has been destructed.
     }
 
   };
