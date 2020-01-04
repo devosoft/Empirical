@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018-2019.
+ *  @date 2018-2020.
  *
  *  @file  DataMap.h
  *  @brief A DataMap links names to arbitrary object types.
@@ -141,7 +141,7 @@ namespace emp {
     /// Retrieve a variable by its type and position.
     template <typename T>
     T & Get(size_t id) {
-      emp_assert(HasID(id), id, GetSize());
+      emp_assert(HasID(id), "Can only get IDs the are available in DataMap.", id, GetSize());
       emp_assert(IsType<T>(id));
       return memory.Get<T>(id);
     }
@@ -159,7 +159,8 @@ namespace emp {
     template <typename T>
     T & Get(const std::string & name) {
       emp_assert(HasName(name));
-      emp_assert(IsType<T>(name), name, GetType(name), emp::GetTypeID<T>());
+      emp_assert(IsType<T>(name), "DataMap::Get() must be provided the correct type.",
+                 name, GetType(name), emp::GetTypeID<T>());
       return memory.Get<T>(GetID(name));
     }
 
