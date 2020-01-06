@@ -731,7 +731,7 @@ namespace emp {
       template <class Archive>
       void serialize( Archive & ar )
       {
-          ar(program);
+        ar(program);
       }
 
     };
