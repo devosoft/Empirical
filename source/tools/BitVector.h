@@ -1,12 +1,14 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2019.
+ *  @date 2016-2020.
  *
  *  @file  BitVector.h
  *  @brief A drop-in replacement for std::vector<bool>, with additional bitwise logic features.
  *  @note Status: RELEASE
  *
+ *  Compile with -O3 and -msse4.2 for fast bit counting.
+ * 
  *  @todo Do small BitVector optimization.  Currently we have number of bits (8 bytes) and a
  *        pointer to the memory for the bitset (another 8 bytes), but we could use those 16 bytes
  *        as 1 byte of size info followed by 15 bytes of bitset (120 bits!)
@@ -45,11 +47,10 @@ namespace emp {
 
   class BitVector {
   private:
-#ifdef EMSCRIPTEN
-    using field_t = uint32_t;  ///< Field sizes are 32 bits in Emscripten (max directly handled)
-#else
-    using field_t = uint64_t;  ///< Field sizes are 64 bits in native.
-#endif
+    // For the moment, field_t will always be equal to size_t.  Since size_t is normally the native
+    // size for a processor (and, correctly, 32 bits for Emscripten), this should work in almost all
+    // cases.
+    using field_t = size_t;
 
     static constexpr size_t FIELD_BITS = sizeof(field_t)*8; ///< How many bits are in a field?
     size_t num_bits;                                        ///< How many total bits are we using?
@@ -63,9 +64,6 @@ namespace emp {
 
     /// How many bytes are used in the current vector (round up to whole bytes.)
     size_t NumBytes()  const { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
-
-    /// How many fields would we need if they had the same number of bits as size_t?
-    size_t NumSizeFields() const { return NumFields() * sizeof(field_t) / sizeof(std::size_t); }
 
     /// BitProxy lets us use operator[] on with BitVector as an lvalue.
     struct BitProxy {
@@ -261,6 +259,7 @@ namespace emp {
       #endif
 
       in_set.bit_set = nullptr;
+      in_set.num_bits = 0;
     }
 
     /// Copy, but with a resize.
@@ -307,6 +306,7 @@ namespace emp {
       num_bits = in_set.num_bits;         // Update the number of bits...
       bit_set = in_set.bit_set;           // And steal the old memory for what those bits are.
       in_set.bit_set = nullptr;           // Prepare in_set for deletion without deallocating.
+      in_set.num_bits = 0;
 
       return *this;
     }
@@ -403,7 +403,7 @@ namespace emp {
     }
 
     /// Update the bit value at the specified index.
-    void Set(size_t index, bool value=true) {
+    BitVector & Set(size_t index, bool value=true) {
       emp_assert(index < num_bits, index, num_bits);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
@@ -412,14 +412,16 @@ namespace emp {
 
       if (value) bit_set[field_id] |= pos_mask;
       else       bit_set[field_id] &= ~pos_mask;
+
+      return *this;
     }
 
     /// A simple hash function for bit vectors.
     std::size_t Hash() const {
-      const size_t num_sfields = NumSizeFields();
       std::size_t hash_val = 0;
-      for (size_t i = 0; i < num_sfields; i++) {
-        hash_val ^= (bit_set.Cast<std::size_t>())[i];
+      const size_t NUM_FIELDS = NumFields();
+      for (size_t i = 0; i < NUM_FIELDS; i++) {
+        hash_val ^= bit_set[i];
       }
       return hash_val ^ ((97*num_bits) << 8);
     }
@@ -443,16 +445,33 @@ namespace emp {
 
     /// Retrive the 32-bit uint from the specifeid uint index.
     uint32_t GetUInt(size_t index) const {
-      // @CAO Need proper assert for variable bit fields!
-      // emp_assert(index < NumFields());
-      return bit_set.Cast<uint32_t>()[index];
+      // If the fields are already 32 bits, return.
+      if constexpr (sizeof(field_t) == 4) return bit_set[index];
+
+      emp_assert(sizeof(field_t) == 8);
+
+      const size_t field_id = index/2;
+      const size_t field_pos = 1 - (index & 1);
+
+      emp_assert(field_id < NumFields());
+
+      return (uint32_t) (bit_set[field_id] >> (field_pos * 32));
     }
 
     /// Update the 32-bit uint at the specified uint index.
     void SetUInt(size_t index, uint32_t value) {
-      // @CAO Need proper assert for variable bit fields!
-      // emp_assert(index < NumFields());
-      bit_set.Cast<uint32_t>()[index] = value;
+      if constexpr (sizeof(field_t) == 4) bit_set[index] = value;
+
+      emp_assert(sizeof(field_t) == 8);
+
+      const size_t field_id = index/2;
+      const size_t field_pos = 1 - (index & 1);
+      const field_t mask = ((field_t) ((uint32_t) -1)) << (1-field_pos);
+
+      emp_assert(field_id < NumFields());
+
+      bit_set[field_id] &= mask;   // Clear out bits that we are setting.
+      bit_set[field_id] |= ((field_t) value) << (field_pos * 32);
     }
 
     /// Retrive the 32-bit uint at the specified BIT index.
