@@ -310,6 +310,12 @@ namespace emp {
           return std::tie(id, args, affinity) < std::tie(other.id, other.args, other.affinity);
       }
 
+      template <class Archive>
+      void serialize( Archive & ar )
+      {
+        ar(affinity, args, id);
+      }
+
     };
 
     using inst_t = Instruction;                    //< Convenient Instruction type alias.
@@ -401,6 +407,12 @@ namespace emp {
 
       void SetInst(size_t pos, const inst_t & inst) {
         inst_seq[pos].Set(inst);
+      }
+
+      template <class Archive>
+      void serialize( Archive & ar )
+      {
+        ar(affinity, inst_seq);
       }
 
     };
@@ -714,6 +726,12 @@ namespace emp {
           }
           os << '\n';
         }
+      }
+
+      template <class Archive>
+      void serialize( Archive & ar )
+      {
+          ar(program);
       }
 
     };
