@@ -259,6 +259,28 @@ namespace emp {
     /// Get the full population to analyze externally.
     const pop_t & GetFullPop() const { return pop; }
 
+    /// Get the organism most frequently found in the population and its
+    /// abundance.
+    std::pair<org_t, size_t> GetDominantInfo() const {
+
+      std::map<org_t, size_t> counts;
+      for (const auto & org_ptr : GetFullPop()) {
+        if (org_ptr) ++counts[*org_ptr];
+      }
+
+      return *std::max_element(
+        std::begin(counts),
+        std::end(counts),
+        [](const auto & p1, const auto & p2) {
+          return p1.second < p2.second; // compare by counts
+        }
+      );
+
+    }
+
+    /// Get the organism most frequently found in the population.
+    org_t GetDominantOrg() const { return GetDominantInfo().first; }
+
     /// What phenotypic traits is the population tracking?
     const emp::TraitSet<ORG> & GetPhenotypes() const { return phenotypes; }
 
