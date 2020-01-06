@@ -209,20 +209,11 @@ namespace emp {
      * @return The pseudo random number.
      **/
     inline uint64_t GetUInt64() {
-      return ( static_cast<uint64_t>(GetUInt()) << 32)
+      // @MAM profiled,
+      // this is faster than using RandFill
+      // https://gist.github.com/mmore500/8747e456b949b5b18b3ee85dd9b4444d
+      return ( static_cast<uint64_t>(GetUInt()) << 32 )
              + static_cast<uint64_t>(GetUInt());
-    }
-
-    /**
-     * Generate a random 64-bit block of bits.
-     * Use a fast, non-backwards compatible approach.
-     *
-     * @return The pseudo random number.
-     **/
-    inline uint64_t GetUInt64Fast() {
-      uint64_t res;
-      RandFill<sizeof(res)>(reinterpret_cast<unsigned char*>(&res));
-      return res;
     }
 
     /**
@@ -230,38 +221,39 @@ namespace emp {
      **/
     inline void RandFill(unsigned char* dest, const size_t num_bytes) {
 
+      // go three bytes at a time because we only get
+      // _RAND_MBIG (not quite four bytes) of entropy
+      // from the generator
+
+      // @MAM profiled,
+      // sampling raw bytes and rejecting the region of integer space
+      // that would introduce bias is faster than rescaling using double
+      // multiplication
+      // https://gist.github.com/mmore500/46f3dee11734a8668d60f180cf5d0590
+
+      const uint32_t accept_thresh = (
+        _RAND_MBIG - _RAND_MBIG % 16777216 /* 2^(3*8) */
+      );
+
       for (size_t byte = 0; byte + 3 < num_bytes; byte += 3) {
-        // only the first 3 bytes are randomized
-        uint32_t rnd = (GetDouble() * 16777216.0);
+        uint32_t rnd;
+        while (true) {
+          rnd = Get();
+          if (rnd < accept_thresh) break;
+        }
         std::memcpy(dest+byte, &rnd, 3);
       }
 
       if (num_bytes%3) {
-        uint32_t rnd = (GetDouble() * 16777216.0);
+        uint32_t rnd;
+        while (true) {
+          rnd = Get();
+          if (rnd < accept_thresh) break;
+        }
         std::memcpy(dest+num_bytes-num_bytes%3, &rnd, num_bytes%3);
       }
 
     }
-
-    /**
-     * Randomize a contiguous segment of memory.
-     **/
-    template<size_t num_bytes>
-    inline void RandFill(unsigned char* dest) {
-
-      for (size_t byte = 0; byte + 3 < num_bytes; byte += 3) {
-        // only the first 3 bytes are randomized
-        uint32_t rnd = (GetDouble() * 16777216.0);
-        std::memcpy(dest+byte, &rnd, 3);
-      }
-
-      if constexpr (static_cast<bool>(num_bytes % 3)) {
-        uint32_t rnd = (GetDouble() * 16777216.0);
-        std::memcpy(dest+num_bytes-num_bytes%3, &rnd, num_bytes%3);
-      }
-
-    }
-
 
     /**
      * Generate an uint64_t.

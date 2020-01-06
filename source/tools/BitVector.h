@@ -1,15 +1,19 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2019.
  *
  *  @file  BitVector.h
  *  @brief A drop-in replacement for std::vector<bool>, with additional bitwise logic features.
  *  @note Status: RELEASE
  *
+ *  @todo Do small BitVector optimization.  Currently we have number of bits (8 bytes) and a
+ *        pointer to the memory for the bitset (another 8 bytes), but we could use those 16 bytes
+ *        as 1 byte of size info followed by 15 bytes of bitset (120 bits!)
+ *  @todo For BitVectors larger than 120 bits, we can use a factory to preserve bit info.
  *  @todo Implement append(), resize()...
  *  @todo Implement techniques to push bits (we have pop)
- *  @todo Implement techniques to insert of remove bits from middle.
+ *  @todo Implement techniques to insert or remove bits from middle.
  *
  *  @note This class is 15-20% slower than emp::BitSet, but more flexible & run-time configurable.
  */
@@ -19,6 +23,7 @@
 #define EMP_BIT_VECTOR_H
 
 #include <iostream>
+#include <bitset>
 
 #include "../base/assert.h"
 #include "../base/Ptr.h"
@@ -27,6 +32,8 @@
 #include "bitset_utils.h"
 #include "functions.h"
 #include "math.h"
+
+
 
 namespace emp {
 
@@ -232,12 +239,18 @@ namespace emp {
     /// Copy constructor of existing bit field.
     BitVector(const BitVector & in_set) : num_bits(in_set.num_bits), bit_set(nullptr) {
       #ifdef EMP_TRACK_MEM
-      emp_assert(in_set.bit_set.IsNull() || in_set.bit_set.DebugIsArray(), in_set.bit_set.IsNull(), in_set.bit_set.DebugIsArray());
+      emp_assert(in_set.bit_set.IsNull() || in_set.bit_set.DebugIsArray());
       emp_assert(in_set.bit_set.OK());
       #endif
 
-      if (num_bits) bit_set = NewArrayPtr<field_t>(NumFields());
-      RawCopy(in_set.bit_set);
+      // There is only something to copy if there are a non-zero number of bits!
+      if (num_bits) {
+        #ifdef EMP_TRACK_MEM
+        emp_assert(!in_set.bit_set.IsNull() && in_set.bit_set.DebugIsArray(), in_set.bit_set.IsNull(), in_set.bit_set.DebugIsArray());
+        #endif
+        bit_set = NewArrayPtr<field_t>(NumFields());
+        RawCopy(in_set.bit_set);
+      }
     }
 
     /// Move constructor of existing bit field.
@@ -248,6 +261,11 @@ namespace emp {
       #endif
 
       in_set.bit_set = nullptr;
+    }
+
+    /// Copy, but with a resize.
+    BitVector(const BitVector & in_set, size_t new_size) : BitVector(in_set) {
+      if (num_bits != new_size) Resize(new_size);
     }
 
     /// Destructor
@@ -534,18 +552,16 @@ namespace emp {
       }
       return bit_count;
     }
-
-    /// Count 1's in semi-parallel; fastest for even 0's & 1's
+    // TODO: see https://arxiv.org/pdf/1611.07612.pdf for faster pop counts
     size_t CountOnes_Mixed() const {
-      const size_t NUM_FIELDS = NumFields() * sizeof(field_t)/4;
-      Ptr<const uint32_t> uint_bit_set = bit_set.Cast<const uint32_t>();
+      const field_t NUM_FIELDS = (1 + ((num_bits - 1) / FIELD_BITS));
       size_t bit_count = 0;
       for (size_t i = 0; i < NUM_FIELDS; i++) {
-        const uint32_t v = uint_bit_set[i];
-        const uint32_t t1 = v - ((v >> 1) & 0x55555555);
-        const uint32_t t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
-        bit_count += (((t2 + (t2 >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
-      }
+          // when compiling with -O3 and -msse4.2, this is the fastest population count method.
+          std::bitset<FIELD_BITS> std_bs(bit_set[i]);
+          bit_count += std_bs.count();
+       }
+
       return bit_count;
     }
 

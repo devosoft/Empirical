@@ -55,8 +55,10 @@ namespace emp {
   struct Token {
     int token_id;        ///< Which type of token is this?
     std::string lexeme;  ///< Sequence matched by this token (or empty if not saved)
+    size_t line_id;      ///< Which line did this token start on?
 
-    Token(int id, const std::string & str="") : token_id(id), lexeme(str) { ; }
+    Token(int id, const std::string & str="", size_t _line=0)
+      : token_id(id), lexeme(str), line_id(_line) { ; }
     Token(const Token &) = default;
     Token(Token &&) = default;
     Token & operator=(const Token &) = default;
@@ -151,14 +153,21 @@ namespace emp {
       lexer_dfa = to_DFA(lexer_nfa);
     }
 
-    /// Get the next token found in an input stream.
+    /// Get the next token found in an input stream.  Do so by examining one character at a time.
+    /// Keep going as long as there is a chance of a valid lexeme (since we want to choose the
+    /// longest one we can find.)  Every time we do hit a valid lexeme, store it as the current
+    /// "best" and keep going.  Once we hit a point where no other valid lexemes are possible,
+    /// stop and return the best we've found so far.
     Token Process(std::istream & is) {
+      // If we still need to generate the DFA for the lexer, do so.
       if (generate_lexer) Generate();
-      size_t cur_pos = 0;
-      size_t best_pos = 0;
-      int cur_state = 0;
-      int cur_stop = 0;
-      int best_stop = -1;
+
+      size_t cur_pos = 0;   // What position in the file are we actively analyzing?
+      size_t best_pos = 0;  // What is the best look-ahead we've found so far?
+      int cur_state = 0;    // What is the next state for the DFA analysis?
+      int cur_stop = 0;     // What is the current "stop" state (if we can stop here)
+      int best_stop = -1;   // What is the best stop state found so far?
+
       lexeme.resize(0);
 
       // Keep looking as long as:
@@ -180,12 +189,13 @@ namespace emp {
         while (best_pos < cur_pos) { is.unget(); cur_pos--; }
       }
 
-      // If we are at the end of this input stream (with no token to return) give back a 0.
+      // If we are at the end of this input stream and still haven't found a token, return 0.
       if (best_stop < 0) {
         if (!is) return { 0, "" };
         return { ERROR_ID, lexeme };
       }
 
+      // Otherwise return the best token we've found so far.
       return { best_stop, lexeme };
     }
 
@@ -198,16 +208,21 @@ namespace emp {
       return out_val;
     }
 
+    /// Turn an input stream of text into a vector of tokens.
     emp::vector<Token> Tokenize(std::istream & is) {
       emp::vector<Token> out_tokens;
+      size_t cur_line = 1;
       emp::Token token = Process(is);
       while (token > 0) {
+        token.line_id = cur_line;
+        cur_line += emp::count(token.lexeme, '\n');
         if (GetSaveToken(token)) out_tokens.push_back(token);
         token = Process(is);
       }
       return out_tokens;
     }
 
+    /// Turn an input string into a vector of tokens.
     emp::vector<Token> Tokenize(const std::string & str) {
       std::stringstream ss;
       ss << str;

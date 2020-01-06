@@ -3,7 +3,7 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  Find all words in a dictionary with a combination of letters, annotated by length.
+//  Find all words in a dictionary with a combination of letters IN ORDER, annotated by length.
 
 #include <fstream>
 #include <iostream>
@@ -14,9 +14,11 @@
 
 // Test if a word has ALL of the required letters.
 bool StringOK(const std::string & letters, const std::string & word) {
-  bool ok = true;
-  for (char l : letters) {
-    if (word.find(l) == std::string::npos) return false;
+  size_t pos = 0;                                // Start at the begining of the word.
+  for (char l : letters) {                       // Loop through all letters.
+    pos = word.find(l, pos);                     // Find letter from current position.
+    if (pos == std::string::npos) return false;  // If cur letter is not found, fail.
+    pos++;                                       // Move on to the next position.
   }
   return true;
 }

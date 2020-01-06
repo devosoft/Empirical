@@ -138,7 +138,9 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h')", "[hardware]")
 
   // Add handcoded program to hw1.
   hw1.PushFunction();
-  hw1.GetProgram()[0].affinity.SetAll();
+  auto aff = hw1.GetProgram()[0].GetAffinity();
+  aff.SetAll();
+  hw1.GetProgram()[0].SetAffinity(aff);
   hw1.PushInst("SetMem", 0, 16, 0, tag_t());
   hw1.PushInst("Commit", 0, 0);
 
@@ -183,7 +185,9 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h')", "[hardware]")
     size_t fcnt = random.GetUInt(min_fun_cnt, max_fun_cnt+1);
     for (size_t fID = 0; fID < fcnt; ++fID) {
       hardware_t::Function new_fun;
-      new_fun.affinity.Randomize(random);
+      auto aff = new_fun.GetAffinity();
+      aff.Randomize(random);
+      new_fun.SetAffinity(aff);
       size_t icnt = random.GetUInt(min_fun_len, max_fun_len);
       for (size_t iID = 0; iID < icnt; ++iID) {
         new_fun.PushInst(random.GetUInt(prog1.GetInstLib()->GetSize()),
@@ -201,7 +205,9 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h')", "[hardware]")
     fcnt = random.GetUInt(min_fun_cnt, max_fun_cnt+1);
     for (size_t fID = 0; fID < fcnt; ++fID) {
       hardware_t::Function new_fun;
-      new_fun.affinity.Randomize(random);
+      auto aff = new_fun.GetAffinity();
+      aff.Randomize(random);
+      new_fun.SetAffinity(aff);
 
       size_t icnt = random.GetUInt(min_fun_len, max_fun_len);
 
@@ -570,7 +576,9 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: SignalGPMutator struct", "
   mutator.AddMutator("99BottlesOfNothing", [](program_t &, emp::Random &)->size_t { return 99; }, "This mutator does nothing and returns 99.");
   mutator.AddMutator("AllFunTagsAllOnes", [](program_t & p, emp::Random & r)->size_t {
     for (size_t fID = 0; fID < p.GetSize(); ++fID) {
-      p[fID].GetAffinity().SetAll();
+      auto aff = p[fID].GetAffinity();
+      aff.SetAll();
+      p[fID].SetAffinity(aff);
     }
     return p.GetSize();
   });
@@ -650,12 +658,6 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: SignalGP MatchBin Cache", 
   using inst_lib_t = emp::InstLib<hardware_t>;   // Instruction library
   using event_lib_t = emp::EventLib<hardware_t>; // Event library
 
-  class Hardware : public hardware_t {
-    public:
-    Hardware(emp::Ptr<const inst_lib_t> _ilib, emp::Ptr<const event_lib_t> _elib, emp::Ptr<emp::Random> rnd=nullptr)
-    : EventDrivenGP_AW<16>(_ilib, _elib, rnd){}
-    bool GetIsMatchBinCacheDirty(){return is_matchbin_cache_dirty;}
-  };
   constexpr size_t RANDOM_SEED = 1;
 
   emp::Random random(RANDOM_SEED);
@@ -665,20 +667,26 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: SignalGP MatchBin Cache", 
   inst_lib.AddInst("Dec", hardware_t::Inst_Dec, 1, "Decrement value in local memory Arg1");
 
   // Let's make two SignalGP virtual hardwares: 2 with 16-bit tags
-  Hardware hw1(&inst_lib, &event_lib, &random);
+  hardware_t hw1(&inst_lib, &event_lib, &random);
+
+  REQUIRE(hw1.GetMatchBin().Size() == 0);
 
   // Add handcoded program to hw1.
   hw1.PushFunction();
-  hw1.GetProgram()[0].affinity.SetAll();
+  auto aff = hw1.GetProgram()[0].GetAffinity();
+  aff.SetAll();
+  hw1.GetProgram()[0].SetAffinity(aff);
   hw1.PushInst("Inc", 0);
+
+  hw1.SetProgram(hw1.GetProgram());
+  REQUIRE(hw1.GetMatchBin().Size() == 1);
 
   hw1.PushFunction();                        // Tag will be all zeros
   hw1.PushInst("Dec", 0);
 
-  REQUIRE(!hw1.GetIsMatchBinCacheDirty());
-  hw1.SetProgram(hw1.GetProgram());
-  REQUIRE(hw1.GetIsMatchBinCacheDirty());
+  REQUIRE(hw1.GetMatchBin().Size() == 2);
+
   hw1.CallFunction(emp::BitSet<16>(), 0.5);
-  REQUIRE(!hw1.GetIsMatchBinCacheDirty());
+  REQUIRE(hw1.GetMatchBin().Size() == 2);
 
 }

@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
+ *  @date 2016-2019
  *
  *  @file Ptr.h
  *  @brief A wrapper for pointers that does careful memory tracking (but only in debug mode).
@@ -169,6 +169,9 @@ namespace emp {
                     << "  active=" << info.IsActive()
                     << "  id=" << ptr_id[info.GetPtr()]
                     << std::endl;
+        }
+        if (undeleted_info.size() > 10) {
+          std::cerr << "  ..." << std::endl;
         }
         abort();
       }
@@ -489,9 +492,10 @@ namespace emp {
 
     /// Delete this pointer (must NOT be an array).
     void Delete() {
-      emp_assert(ptr, "Deleting null Ptr.");
-      emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
+      emp_assert(ptr, "Trying to delete null Ptr.");
+      emp_assert(id < Tracker().GetNumIDs(), id, "Trying to delete Ptr that we are not resposible for.");
       emp_assert(Tracker().IsArrayID(id) == false, id, "Trying to delete array pointer as non-array.");
+      emp_assert(Tracker().IsActive(ptr), id, "Trying to delete inactive pointer (already deleted!)");
       if (internal::ptr_debug) std::cout << "Ptr::Delete() : " << ptr << std::endl;
       delete ptr;
       Tracker().MarkDeleted(id);
@@ -500,9 +504,10 @@ namespace emp {
 
     /// Delete this pointer to an array (must be an array).
     void DeleteArray() {
-      emp_assert(id < Tracker().GetNumIDs(), id, "Deleting Ptr that we are not resposible for.");
-      emp_assert(ptr, "Deleting null Ptr.");
+      emp_assert(id < Tracker().GetNumIDs(), id, "Trying to delete Ptr that we are not resposible for.");
+      emp_assert(ptr, "Trying to delete null Ptr.");
       emp_assert(Tracker().IsArrayID(id), id, "Trying to delete non-array pointer as array.");
+      emp_assert(Tracker().IsActive(ptr), id, "Trying to delete inactive pointer (already deleted!)");
       if (internal::ptr_debug) std::cout << "Ptr::DeleteArray() : " << ptr << std::endl;
       delete [] ptr;
       Tracker().MarkDeleted(id);
@@ -783,6 +788,10 @@ namespace emp {
     // Follow a pointer.
     TYPE * operator->() { return ptr; }
     TYPE * const operator->() const { return ptr; }
+
+    // Should implement operator->* to follow a pointer to a member function.
+    // For an example, see:
+    //  https://stackoverflow.com/questions/27634036/overloading-operator-in-c
 
     // Indexing into array
     TYPE & operator[](size_t pos) { return ptr[pos]; }

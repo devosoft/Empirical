@@ -90,14 +90,25 @@ namespace emp {
   /// @param inst_lib - Instruction library used to generate the instruction (instruction will be valid within instruction library)
   /// @param min_arg_val - Mininum value for an instruction argument.
   /// @param max_arg_val - Maximum value for an instruction argument.
-  template<size_t TAG_WIDTH
-    , typename TRAIT_TYPE=double
-    , typename MATCHBIN_TYPE=emp::MatchBin<size_t, emp::HammingMetric<TAG_WIDTH>, emp::RankedSelector<std::ratio<16+8,16>>>
+  template<
+    size_t TAG_WIDTH,
+    typename TRAIT_T=double,
+    typename MATCHBIN_T=emp::MatchBin<
+      size_t,
+      emp::HammingMetric<TAG_WIDTH>,
+      emp::RankedSelector<std::ratio<1,2>>,
+      emp::MultiplicativeCountdownRegulator<>
     >
-  typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>::Instruction GenRandSignalGPInst(emp::Random & rnd, const emp::InstLib<EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>> & inst_lib, int min_arg_val=0, int max_arg_val=15) {
+  > typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>::Instruction
+  GenRandSignalGPInst(
+    emp::Random & rnd,
+    const emp::InstLib<EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>> & inst_lib,
+    int min_arg_val=0,
+    int max_arg_val=15
+  ) {
     emp_assert(inst_lib.GetSize() > 0, "Instruction library must have at least one instruction definition before being used to generate a random instruction.");
     emp_assert(min_arg_val < max_arg_val, "Minimum argument value must be less than maximum argument value to generate a number between the two.");
-    using inst_t = typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>::Instruction;
+    using inst_t = typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>::Instruction;
     using tag_t = BitSet<TAG_WIDTH>;
     return inst_t(rnd.GetUInt(inst_lib.GetSize()),
                   rnd.GetInt(min_arg_val, max_arg_val+1),
@@ -113,15 +124,31 @@ namespace emp {
   /// @param max_inst_cnt - Maximum number of instructions in generated function.
   /// @param min_arg_val - Mininum value for an instruction argument.
   /// @param max_arg_val - Maximum value for an instruction argument.
-  template<size_t TAG_WIDTH
-    , typename TRAIT_TYPE=double
-    , typename MATCHBIN_TYPE=emp::MatchBin<size_t, emp::HammingMetric<TAG_WIDTH>, emp::RankedSelector<std::ratio<16+8,16>>>
+  template<
+    size_t TAG_WIDTH,
+    typename TRAIT_T=double,
+    typename MATCHBIN_T=emp::MatchBin<
+      size_t,
+      emp::HammingMetric<TAG_WIDTH>,
+      emp::RankedSelector<std::ratio<1,2>>,
+      emp::MultiplicativeCountdownRegulator<>
     >
-  typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>::Function GenRandSignalGPFunction(emp::Random & rnd, const emp::InstLib<EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>> & inst_lib,
-                                                                            size_t min_inst_cnt=1, size_t max_inst_cnt=32,
-                                                                            int min_arg_val=0, int max_arg_val=15) {
-    emp_assert(inst_lib.GetSize() > 0, "Instruction library must have at least one instruction definition before being used to generate a random instruction.");
-    using fun_t = typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>::Function;
+  > typename EventDrivenGP_AW<TAG_WIDTH, TRAIT_T, MATCHBIN_T>::Function
+  GenRandSignalGPFunction(
+    emp::Random & rnd,
+    const emp::InstLib<
+      EventDrivenGP_AW<TAG_WIDTH, TRAIT_T, MATCHBIN_T>
+    > & inst_lib,
+    size_t min_inst_cnt=1,
+    size_t max_inst_cnt=32,
+    int min_arg_val=0,
+    int max_arg_val=15
+  ) {
+    emp_assert(
+      inst_lib.GetSize() > 0,
+      "Instruction library must have at least one instruction definition before being used to generate a random instruction."
+    );
+    using fun_t = typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>::Function;
     size_t inst_cnt = rnd.GetUInt(min_inst_cnt, max_inst_cnt+1);
     fun_t new_fun(emp::GenRandSignalGPTag<TAG_WIDTH>(rnd));
     for (size_t i = 0; i < inst_cnt; ++i) new_fun.PushInst(emp::GenRandSignalGPInst(rnd, inst_lib, min_arg_val, max_arg_val));
@@ -137,16 +164,33 @@ namespace emp {
   /// @param max_inst_cnt - Maximum number of instructions per function.
   /// @param min_arg_val - Mininum value for an instruction argument.
   /// @param max_arg_val - Maximum value for an instruction argument.
-  template<size_t TAG_WIDTH
-    , typename TRAIT_TYPE=double
-    , typename MATCHBIN_TYPE=emp::MatchBin<size_t, emp::HammingMetric<TAG_WIDTH>, emp::RankedSelector<std::ratio<16+8,16>>>
+  template<
+    size_t TAG_WIDTH,
+    typename TRAIT_T=double,
+    typename MATCHBIN_T=emp::MatchBin<
+      size_t,
+      emp::HammingMetric<TAG_WIDTH>,
+      emp::RankedSelector<std::ratio<1,2>>,
+      emp::MultiplicativeCountdownRegulator<>
     >
-  typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>::Program GenRandSignalGPProgram(emp::Random & rnd, const emp::InstLib<EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>> & inst_lib,
-                                                                       size_t min_func_cnt=1, size_t max_func_cnt=16,
-                                                                       size_t min_fun_len=1, size_t max_fun_len=32,
-                                                                       int min_arg_val=0, int max_arg_val=15) {
-    emp_assert(inst_lib.GetSize() > 0, "Instruction library must have at least one instruction definition before being used to generate a random instruction.");
-    using program_t = typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>::Program;
+  > typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>::Program
+  GenRandSignalGPProgram(
+    emp::Random & rnd,
+    const emp::InstLib<
+      EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>
+    > & inst_lib,
+    size_t min_func_cnt=1,
+    size_t max_func_cnt=16,
+    size_t min_fun_len=1,
+    size_t max_fun_len=32,
+    int min_arg_val=0,
+    int max_arg_val=15
+  ) {
+    emp_assert(
+      inst_lib.GetSize() > 0,
+      "Instruction library must have at least one instruction definition before being used to generate a random instruction."
+    );
+    using program_t = typename EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>::Program;
     program_t program(&inst_lib);
     size_t fun_cnt = rnd.GetUInt(min_func_cnt, max_func_cnt+1);
     for (size_t f = 0; f < fun_cnt; ++f)
@@ -177,15 +221,19 @@ namespace emp {
   /// NOTE: could use some feedback on this!
   ///  - Not loving the inconsistency between rates and constraints at the moment.
   template<
-    size_t TAG_WIDTH
-    , typename TRAIT_TYPE=double
-    , typename MATCHBIN_TYPE=emp::MatchBin<size_t, emp::HammingMetric<TAG_WIDTH>, emp::RankedSelector<std::ratio<16+8,16>>>
+    size_t TAG_WIDTH,
+    typename TRAIT_T=double,
+    typename MATCHBIN_T=emp::MatchBin<
+      size_t,
+      emp::HammingMetric<TAG_WIDTH>,
+      emp::RankedSelector<std::ratio<1,2>>,
+      emp::MultiplicativeCountdownRegulator<>
     >
-  class SignalGPMutator {
+  > class SignalGPMutator {
   public:
     // Generally useful aliases
     // - Hardware aliases
-    using hardware_t = EventDrivenGP_AW<TAG_WIDTH,TRAIT_TYPE, MATCHBIN_TYPE>;     ///< SignalGP hardware type
+    using hardware_t = EventDrivenGP_AW<TAG_WIDTH,TRAIT_T, MATCHBIN_T>;     ///< SignalGP hardware type
     using program_t = typename hardware_t::program_t;   ///< SignalGP program type
     using tag_t = typename hardware_t::affinity_t;      ///< SignalGP tag type
     using inst_lib_t = typename hardware_t::inst_lib_t; ///< SignalGP instruction library type
@@ -313,7 +361,6 @@ namespace emp {
         mutator_type.last_mut_cnt = mutator_type.mutator(p, r);
         mut_cnt += mutator_type.last_mut_cnt;
       }
-      if (mut_cnt) { p.fun_clear_matchbin_cache(); } 
       return mut_cnt;
     }
 
@@ -484,16 +531,13 @@ namespace emp {
     /// Deletions occur at a per-function rate specified by the "FUNC_DEL__PER_FUNC" parameter value.
     size_t DefaultMutator_FuncDel(program_t & program, emp::Random & rnd) {
       size_t mut_cnt = 0;
-      size_t expected_prog_len = program.GetInstCnt();
       // Perform function deletions!
       for (int fID = 0; fID < (int) program.GetSize(); ++fID) {
         // Should we delete this function?
         if (rnd.P(FUNC_DEL__PER_FUNC()) &&
             program.GetSize() > GetProgMinFuncCnt())
           {
-            expected_prog_len -= program[(size_t)fID].GetSize();
-            program[(size_t)fID] = program[program.GetSize() - 1];
-            program.program.resize(program.GetSize() - 1);
+            program.DeleteFunction(fID);
             ++mut_cnt;
             fID -= 1;
             continue;
@@ -509,13 +553,14 @@ namespace emp {
       size_t mut_cnt = 0;
       // Perform function tag mutations!
       for (size_t fID = 0; fID < program.GetSize(); ++fID) {
-        tag_t & tag = program[fID].GetAffinity();
+        tag_t tag = program[fID].GetAffinity();
         for (size_t i = 0; i < tag.GetSize(); ++i) {
           if (rnd.P(TAG_BIT_FLIP__PER_BIT())) {
             tag.Toggle(i);
             ++mut_cnt;
           }
         }
+        program[fID].SetAffinity(tag);
       }
       return mut_cnt;
     }
@@ -701,7 +746,7 @@ namespace emp {
     }
   };
 
-  template<typename Hardware> 
+  template<typename Hardware>
   class SignalGPMutatorFacade : public SignalGPMutator<Hardware::affinity_width, typename Hardware::trait_t, typename Hardware::matchbin_t> { } ;
 }
 

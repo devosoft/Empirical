@@ -33,11 +33,12 @@ namespace emp {
 
       virtual emp::Ptr<VarBase> Clone() const = 0;
       virtual TypeID GetTypeID() const = 0;
+      virtual std::string ToString() const = 0;
     };
 
     template <typename T>
     struct VarInfo : public VarBase {
-      T value;                                       ///< Current value of this variable.
+      T value;      ///< Current value of this variable.
 
       VarInfo(const std::string & name, const T & in_value)
       : VarBase(name)
@@ -46,6 +47,7 @@ namespace emp {
 
       emp::Ptr<VarBase> Clone() const override { return emp::NewPtr< VarInfo<T> >(name, value); }
       TypeID GetTypeID() const override { return emp::GetTypeID<T>(); };
+      std::string ToString() const override { return emp::to_string(value); }
     };
 
     emp::vector<emp::Ptr<VarBase>> vars;             ///< Vector of all current variables.
@@ -121,20 +123,21 @@ namespace emp {
     TypeID GetType(size_t id) const { return vars[id]->GetTypeID(); }
     TypeID GetType(std::string name) const { return GetType(GetID(name)); }
 
-    // Type-specific Accessors
+    // Common Type-specific Accessors    
     std::string & GetString(const std::string & name) { return Get<std::string>(name); }
     int & GetInt(const std::string & name) { return Get<int>(name); }
     double & GetDouble(const std::string & name) { return Get<double>(name); }
     char & GetChar(const std::string & name) { return Get<char>(name); }
     bool & GetBool(const std::string & name) { return Get<bool>(name); }
 
-    // Type-specific const accessors
+    // Common Type-specific const accessors
     const std::string & GetString(const std::string & name) const { return Get<std::string>(name); }
     int GetInt(const std::string & name) const { return Get<int>(name); }
     double GetDouble(const std::string & name) const { return Get<double>(name); }
     char GetChar(const std::string & name) const { return Get<char>(name); }
     bool GetBool(const std::string & name) const { return Get<bool>(name); }
 
+    /// Set a variable that already exists by ID.
     template <typename T>
     void Set(size_t id, const T & value) {
       emp_assert(id < vars.size());
@@ -143,6 +146,7 @@ namespace emp {
       ptr->value = value;
     }
 
+    /// Set a variable that already exists by name.
     template <typename T>
     void Set(const std::string & name, const T & value) {
       if (auto it = id_map.find(name); it != id_map.end()) { Set(it->second, value); }

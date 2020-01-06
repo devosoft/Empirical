@@ -256,6 +256,7 @@ namespace emp {
       std::sort(std::begin(dup), std::end(dup));
       const double idx = pct/100.0 * (dup.size() - 1);
 
+      // if needed, linearly interpolate
       return dup[idx] == dup[std::ceil(idx)]
         ? dup[idx]
         : (
