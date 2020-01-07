@@ -200,8 +200,9 @@ namespace emp {
 
     /// Print out summary of instruction library.
     void PrintManifest(std::ostream & os=std::cout) const {
+      os << "id" << "," << "name" << std::endl;
       for (size_t i = 0; i < inst_lib.size(); ++i) {
-        os << i << " " << inst_lib[i].name << std::endl;
+        os << i << "," << inst_lib[i].name << std::endl;
       }
     }
 
