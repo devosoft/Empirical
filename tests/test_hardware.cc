@@ -3,6 +3,15 @@
 
 #include <unordered_set>
 
+#include <cereal/cereal.hpp>
+#include <cereal/types/array.hpp>
+#include <cereal/types/map.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/string.hpp>
+
+#include <cereal/archives/json.hpp>
+#include <cereal/archives/binary.hpp>
+
 #include "base/Ptr.h"
 #include "hardware/EventDrivenGP.h"
 #include "hardware/signalgp_utils.h"
@@ -378,6 +387,8 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPInst", "[ha
   inst_lib.AddInst("SetMem", hardware_t::Inst_SetMem, 2, "Local memory: Arg1 = numerical value of Arg2");
   inst_lib.AddInst("Fork", hardware_t::Inst_Fork, 0, "Fork a new thread. Local memory contents of callee are loaded into forked thread's input memory.");
 
+  inst_lib.PrintManifest();
+
   // Generate a bunch of random instructions, check that they conform with requested bounds.
   for (size_t i = 0; i < 10000; ++i) {
     inst_t inst(emp::GenRandSignalGPInst(random, inst_lib, MIN_ARG_VAL, MAX_ARG_VAL));
@@ -510,6 +521,48 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPProgram", "
     hw.Reset();
     hw.SetProgram(program);
     hw.Process(128);
+
+    { // test with JSON archive
+    std::stringstream stringstream;
+
+    {
+      cereal::JSONOutputArchive json_out(stringstream);
+      json_out(program);
+    }
+
+    cereal::JSONInputArchive json_in(stringstream);
+
+    program_t json_program(&inst_lib);
+    json_in(json_program);
+
+    REQUIRE(json_program == program);
+
+    hw.Reset();
+    hw.SetProgram(json_program);
+    hw.Process(128);
+    }
+
+    { // test with binary archive
+    std::stringstream stringstream;
+
+    {
+      cereal::BinaryOutputArchive binary_out(stringstream);
+      binary_out(program);
+    }
+
+    cereal::BinaryInputArchive binary_in(stringstream);
+
+    program_t binary_program(&inst_lib);
+    binary_in(binary_program);
+
+    REQUIRE(binary_program == program);
+
+    hw.Reset();
+    hw.SetProgram(binary_program);
+    hw.Process(128);
+    }
+
+
   }
 }
 
