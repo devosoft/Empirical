@@ -3127,6 +3127,121 @@ TEST_CASE("Test matchbin_utils", "[tools]")
 
   }
 
+  // tests for NopRegulator
+  {
+
+  emp::Random rand(1);
+
+  emp::MatchBin<
+    std::string,
+    emp::AbsDiffMetric,
+    emp::RouletteSelector<>,
+    emp::NopRegulator
+  >bin(rand);
+
+  const size_t ndraws = 1000000;
+  const size_t error = 5000;
+
+  const size_t hi = bin.Put("hi", std::numeric_limits<int>::max()/2);
+  REQUIRE( bin.GetVal(hi) == "hi" );
+  const size_t salut = bin.Put("salut", std::numeric_limits<int>::max()/10);
+  REQUIRE( bin.GetVal(salut) == "salut" );
+
+  REQUIRE( bin.Size() == 2 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+
+  auto res = bin.GetVals(bin.Match(0, ndraws));
+  const size_t count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( count > ndraws/2);
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.AdjRegulator(salut, 20.0); // downregulate
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > ndraws/2 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.AdjRegulator(hi, -20.0); // upregulate
+  bin.AdjRegulator(salut, -20.0); // restore
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  res = bin.GetVals(bin.Match(0, ndraws));
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > ndraws/2 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.SetRegulator(salut, 5.0); // downregulate
+  bin.SetRegulator(hi, -5.0); // upregulate
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+
+  bin.SetRegulator(salut, -1.0); // upregulate
+  bin.SetRegulator(hi, 1.0); // downregulate
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  res = bin.GetVals(bin.Match(0, ndraws));
+  const size_t hi_count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( std::max(hi_count, count) - std::min(hi_count, count) < error );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  bin.DecayRegulator(salut, -2);
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+
+  {
+  res = bin.GetVals(bin.Match(0, ndraws));
+  const size_t s_count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( std::max(s_count, count) - std::min(s_count, count) < error );
+  const size_t h_count = std::count(std::begin(res), std::end(res), "hi");
+  REQUIRE((
+    std::max(h_count, ndraws - count)
+    - std::min(h_count, ndraws - count)
+    < error
+  ));
+  }
+
+  bin.DecayRegulator(salut, 1);
+  bin.DecayRegulator(hi, 0);
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+
+  {
+  res = bin.GetVals(bin.Match(0, ndraws));
+  const size_t s_count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( std::max(s_count, count) - std::min(s_count, count) < error );
+  REQUIRE( std::max(s_count, hi_count) - std::min(s_count, hi_count) < error );
+  const size_t h_count = std::count(std::begin(res), std::end(res), "hi");
+  REQUIRE((
+    std::max(h_count, ndraws - count)
+    - std::min(h_count, ndraws - count)
+    < error
+  ));
+  }
+
+  bin.DecayRegulator(salut, 500);
+  bin.DecayRegulator(hi, 1);
+  REQUIRE( bin.ViewRegulator(salut) == 0.0 );
+  REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") > ndraws/2 );
+  REQUIRE( std::count(std::begin(res), std::end(res), "salut") < hi_count );
+  REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
+
+  {
+  res = bin.GetVals(bin.Match(0, ndraws));
+  const size_t s_count = std::count(std::begin(res), std::end(res), "salut");
+  REQUIRE( std::max(s_count, count) - std::min(s_count, count) < error );
+  REQUIRE( std::max(s_count, hi_count) - std::min(s_count, hi_count) < error );
+  const size_t h_count = std::count(std::begin(res), std::end(res), "hi");
+  REQUIRE((
+    std::max(h_count, ndraws - count)
+    - std::min(h_count, ndraws - count)
+    < error
+  ));
+  }
+
+  }
+
 
 }
 
