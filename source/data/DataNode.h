@@ -24,6 +24,9 @@
 #ifndef EMP_DATA_NODE_H
 #define EMP_DATA_NODE_H
 
+#include <limits>
+#include <algorithm>
+
 #include "../base/vector.h"
 #include "../base/assert.h"
 #include "../meta/ValPack.h"
@@ -119,6 +122,11 @@ namespace emp {
     double GetStandardDeviation() const {emp_assert(false, "Calculating standard deviation requires a DataNode with the Stats or FullStats modifier"); return 0;}
     double GetSkew() const {emp_assert(false, "Calculating skew requires a DataNode with the Stats or FullStats modifier"); return 0;}
     double GetKurtosis() const {emp_assert(false, "Calculating kurtosis requires a DataNode with the Stats or FullStats modifier"); return 0;}
+
+    /// Calculate the median of observed values
+    double GetMedian() const {emp_assert(false, "Calculating median requires a DataNode with the Log modifier"); return 0;}
+    /// Calculate a percentile of observed values
+    double GetPercentile(const double pct) const {emp_assert(false, "Calculating percentile requires a DataNode with the Log modifier"); return 0;}
 
     const std::string & GetName() const { return emp::empty_string(); }
     const std::string & GetDescription() const { return emp::empty_string(); }
@@ -230,6 +238,32 @@ namespace emp {
 
     /// Get a vector of all data added since the last reset
     const emp::vector<VAL_TYPE> & GetData() const { return val_set; }
+
+    /// Calculate the median of observed values
+    double GetMedian() const {
+      return GetPercentile(50);
+    }
+
+    /// Calculate a percentile of observed values
+    double GetPercentile(const double pct) const {
+
+      emp_assert(pct >= 0.0);
+      emp_assert(pct <= 100.0);
+
+      if (!val_set.size()) return std::numeric_limits<double>::quiet_NaN();
+
+      emp::vector<VAL_TYPE> dup(std::begin(val_set), std::end(val_set));
+      std::sort(std::begin(dup), std::end(dup));
+      const double idx = pct/100.0 * (dup.size() - 1);
+
+      // if needed, linearly interpolate
+      return dup[idx] == dup[std::ceil(idx)]
+        ? dup[idx]
+        : (
+          dup[idx] * (1.0 - emp::Mod(idx, 1.0))
+          + dup[std::ceil(idx)] * emp::Mod(idx, 1.0)
+        );
+    }
 
     /// Add @param val to this DataNode
     void AddDatum(const VAL_TYPE & val) {

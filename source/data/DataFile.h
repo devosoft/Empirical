@@ -208,6 +208,33 @@ namespace emp {
       return Add(in_fun, key, desc);
     }
 
+    /// Add a function that always pulls the median value from the DataNode @param node.
+    /// Requires that @param node have the data::Range or data::FullRange modifier.
+    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// current value from the node
+    template <typename VAL_TYPE, emp::data... MODS>
+    size_t AddMedian(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
+        if (pull) node.PullData();
+        os << node.GetMedian();
+        if (reset) node.Reset();
+      };
+      return Add(in_fun, key, desc);
+    }
+
+    /// Add a function that always pulls the Percentile value from the DataNode @param node.
+    /// Requires that @param node have the data::Range or data::FullRange modifier.
+    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// current value from the node
+    template <typename VAL_TYPE, emp::data... MODS>
+    size_t AddPercentile(DataNode<VAL_TYPE, MODS...> & node, const double pct=100.0, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
+      std::function<fun_t> in_fun = [&node, reset, pull, pct](std::ostream & os){
+        if (pull) node.PullData();
+        os << node.GetPercentile(pct);
+        if (reset) node.Reset();
+      };
+      return Add(in_fun, key, desc);
+    }
 
     /// Add a function that always pulls the total value from the DataNode @param node.
     /// Requires that @param node have the data::Range or data::FullRange modifier.

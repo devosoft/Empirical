@@ -57,10 +57,14 @@ namespace web {
       bool autofocus;
 
       std::function<void(std::string)> callback;
+      std::function<bool(std::string)> checker;
       uint32_t callback_id;
       std::string onchange_info;
 
-      InputInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
+      InputInfo(const std::string & in_id="")
+      : internal::WidgetInfo(in_id)
+      , checker([](std::string in){ return true; })
+      { ; }
       InputInfo(const InputInfo &) = delete;               // No copies of INFO allowed
       InputInfo & operator=(const InputInfo &) = delete;   // No copies of INFO allowed
       virtual ~InputInfo() {
@@ -82,13 +86,24 @@ namespace web {
       }
 
       void DoChange(std::string new_val) {
-        curr_val = new_val;
-        callback(curr_val);
-        UpdateDependants();
+        if (curr_val == new_val) return;
+
+        if (!checker(new_val)) {
+          std::swap(curr_val, new_val);
+          UpdateValue(new_val);
+        } else {
+          curr_val = new_val;
+          callback(curr_val);
+          UpdateDependants();
+        }
       }
 
       void UpdateCallback(const std::function<void(std::string)> & in_cb) {
         callback = in_cb;
+      }
+
+      void UpdateChecker(const std::function<bool(std::string)> & in_ck) {
+        checker = in_ck;
       }
 
       void UpdateLabel(const std::string & in_label) {
@@ -117,10 +132,12 @@ namespace web {
       }
       void UpdateValue(const std::string & in_value) {
         value = in_value;
+        DoChange(in_value);
         if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
       }
       void UpdateValue(const double & in_value) {
         value = to_string(in_value);
+        DoChange(value);
         if (state == Widget::ACTIVE) ReplaceHTML();     // If node is active, immediately redraw!
       }
       void UpdateStep(const std::string & in_step) {
@@ -173,7 +190,7 @@ namespace web {
       Info()->callback = in_cb;
       InputInfo * b_info = Info();
       Info()->callback_id = JSWrap( std::function<void(std::string)>( [b_info](std::string new_val){b_info->DoChange(new_val);} )  );
-      Info()->onchange_info = emp::to_string("emp.Callback(", Info()->callback_id, ", ('checked' in this) ? this.checked.toString() : this.value);");
+      Info()->onchange_info = emp::to_string("emp.Callback(", Info()->callback_id, ", ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);");
     }
 
     /// Link to an existing Input.
@@ -187,6 +204,12 @@ namespace web {
     /// Set a new callback function to trigger when the Input is clicked.
     Input & Callback(const std::function<void(std::string)> & in_cb) {
       Info()->UpdateCallback(in_cb);
+      return *this;
+    }
+
+    /// Set a new checker function to trigger when the Input is clicked.
+    Input & Checker(const std::function<bool(std::string)> & in_ck) {
+      Info()->UpdateChecker(in_ck);
       return *this;
     }
 

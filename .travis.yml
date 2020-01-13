@@ -21,7 +21,7 @@ before_install:
 - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 - sudo apt-get update -qq
 
-install: 
+install:
 - sudo apt-get install -qq g++-8 cmake build-essential python-virtualenv python-pip nodejs tar gzip
 - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
 - export python="/usr/bin/python"
@@ -33,7 +33,7 @@ services:
   - xvfb
 before_script:
 - ${CXX} --version
-script: 
+script:
 - make test CXX=${CXX}
 
 jobs:
@@ -61,8 +61,8 @@ jobs:
     - wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
     - sudo apt-add-repository "deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-7 main"
     - sudo apt-get update -qq
-    install: 
-    - sudo apt-get install -qq g++-8 
+    install:
+    - sudo apt-get install -qq g++-8
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
     - sudo apt-get install cmake build-essential python-virtualenv python-pip nodejs tar gzip libclang-7-dev llvm-7 clang-7 libstdc++-7-dev # might have to happen after we update g++
     before_script:
@@ -70,5 +70,5 @@ jobs:
     - make install-test-dependencies
     - make install-coverage-dependencies
     script: make coverage CXX=${CXX}
-    after_success: 
+    after_success:
       - curl -s https://codecov.io/bash | bash

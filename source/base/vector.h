@@ -127,21 +127,21 @@ namespace emp {
         return wrapped_t::operator->();
       }
 
-      this_t & operator++() { 
+      this_t & operator++() {
         emp_assert(OK(true,false), ErrorCode());
         wrapped_t::operator++();
         return *this;
       }
-      this_t operator++(int x) { 
+      this_t operator++(int x) {
         emp_assert(OK(true,false), ErrorCode());
         return this_t(wrapped_t::operator++(x), v_ptr);
       }
-      this_t & operator--() { 
+      this_t & operator--() {
         emp_assert(OK(false,true), ErrorCode());
         wrapped_t::operator--();
         return *this;
       }
-      this_t operator--(int x) { 
+      this_t operator--(int x) {
         emp_assert(OK(false,true), ErrorCode());
         return this_t(wrapped_t::operator--(x), v_ptr);
       }
