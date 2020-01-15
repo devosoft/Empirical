@@ -2,8 +2,7 @@ GCOV_FLAGS := -o0 -g --coverage
 
 TEST_NAMES := assert base constexpr data evo geometry meta scholar systematics tools games hardware
 
-# pthread flag for test-tools MatchBin
-FLAGS := -std=c++17 -Wall -Wno-unused-function -I../source/ -I../ -I../third-party/cereal/include/ -msse4.2 -pthread	
+FLAGS := -std=c++17 -Wall -Wno-unused-function -I../source/ -I../ -I../third-party/cereal/include/ -msse4.2	
 
 #CXX = clang++
 CXX := g++
