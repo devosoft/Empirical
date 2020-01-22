@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2019
+ *  @date 2016-2020
  *
  *  @file string_utils.h
  *  @brief Simple functions to manipulate strings.
@@ -287,7 +287,7 @@ namespace emp {
     return value;
   }
 
-  // Convert an integer to a roman numeral string.
+  /// Convert an integer to a roman numeral string.
   static inline std::string to_roman_numeral(int val, const std::string & prefix="") {
     std::string ret_string(prefix);
     if (val < 0) ret_string += to_roman_numeral(-val, "-");
@@ -850,6 +850,36 @@ namespace emp {
     T out_val;
     ss >> out_val;
     return out_val;
+  }
+
+
+  // -------- Functions that operate on VECTORS of strings --------
+
+  using string_vec_t = emp::vector<std::string>;
+
+  /// Convert a vector of strings to an English list, such as "one, two, three, and four."
+  static inline std::string to_english_list(const string_vec_t & strings) {
+    // If there are no input strings, return an empty string.
+    if (strings.size() == 0) { return ""; }
+
+    // If there is one string provided, return it by itself.
+    if (strings.size() == 1) { return strings[0]; }
+
+    // If two strings are provided, link them by an "and".
+    if (strings.size() == 2) { return to_string(strings[0], " and ", strings[1]); }
+
+    // If MORE than two strings are provided, list the first n-1 followed by commas, ending
+    // with an "and" before the final one.
+    std::string out_str;
+    for (size_t i = 0; i < strings.size(); i++) {
+      if (i) {
+        out_str += ", ";
+        if (i == strings.size()-1) out_str += "and ";
+      }
+      out_str += strings[i];
+    }
+
+    return out_str;
   }
 
 }
