@@ -892,6 +892,15 @@ namespace emp {
     }
     return out_strings;
   }
+
+  /// Put all strings provided in quotes (Like 'this'), pre- and post-fixing another string if
+  /// provided.
+  static inline string_vec_t quote_strings(const string_vec_t & in_strings,
+                                           const std::string quote="'") {
+    return transform_strings(in_strings, [quote](const std::string & str) {
+      return to_string(quote, str, quote);
+    });
+  }
 }
 
 #endif
