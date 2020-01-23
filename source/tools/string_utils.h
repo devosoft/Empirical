@@ -901,6 +901,15 @@ namespace emp {
       return to_string(quote, str, quote);
     });
   }
+
+  /// Pre-pend and post-pend specified sequences to all strings provided.
+  static inline string_vec_t quote_strings(const string_vec_t & in_strings,
+                                           const std::string open_quote,
+                                           const std::string close_quote) {
+    return transform_strings(in_strings, [open_quote, close_quote](const std::string & str) {
+      return to_string(open_quote, str, close_quote);
+    });
+  }
 }
 
 #endif
