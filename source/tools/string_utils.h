@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2020
+ *  @date 2016-2020.
  *
  *  @file string_utils.h
  *  @brief Simple functions to manipulate strings.
@@ -882,6 +882,16 @@ namespace emp {
     return out_str;
   }
 
+
+  /// Transform all strings in a vector.
+  static inline string_vec_t transform_strings(const string_vec_t & in_strings,
+                                               std::function<std::string(const std::string &)> fun) {
+    string_vec_t out_strings(in_strings.size());
+    for (size_t i = 0; i < in_strings.size(); i++) {
+      out_strings[i] = fun(in_strings[i]);
+    }
+    return out_strings;
+  }
 }
 
 #endif
