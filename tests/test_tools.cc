@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2018.
+//  Copyright (C) Michigan State University, 2016-2020.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  Tests for files in the tools/ folder.
@@ -6193,6 +6193,26 @@ TEST_CASE("Test string_utils", "[tools]")
     ==
     emp::join_on(strings(els, els + 3), std::string("+\0", 2).c_str())
   );
+
+  emp::string_vec_t string_v;
+
+  REQUIRE( emp::to_english_list(string_v) == "" );
+
+  string_v.push_back("one");
+
+  REQUIRE( emp::to_english_list(string_v) == "one" );
+
+  string_v.push_back("two");
+
+  REQUIRE( emp::to_english_list(string_v) == "one and two" );
+
+  string_v.push_back("three");
+
+  REQUIRE( emp::to_english_list(string_v) == "one, two, and three" );
+
+  string_v.push_back("four");
+
+  REQUIRE( emp::to_english_list(string_v) == "one, two, three, and four" );
 
 }
 
