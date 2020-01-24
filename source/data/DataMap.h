@@ -33,7 +33,20 @@
  * 
  * 
  *  DEVELOPER NOTES:
- *  - We should be able to keep a series of values, not just a single on.  This can be done with
+ *  - Each entry can have a one-byte control block immediately proceeding it in memory.  Each
+ *    bit would be associated with additional information about the entry.  Options include:
+ *    1. The memory is a POINTER not an instance.  This would allow entries to behave like
+ *       references, potentially eliminating the need to copy larger data structures into the
+ *       memory image.
+ *    2. The memory is a LOG of values, not a single value.  This allows for quick identification
+ *       of when something special needs to be done.
+ *    3. The entry has a SIGNAL monitoring it that should be notified whenever it changes.  The
+ *       signal itself would need to be stored elsewhere (presumably in the memory image, but
+ *       possibly in the layout.)
+ *    4. The entry has a non-trivial (or user-provided) COPY/MOVE CONSTRUCTOR or DESTRUCTOR
+ *    5-8. Limited type information (16 types that can be handled more effectively?)
+ * 
+ *  - We should be able to keep a series of values, not just a single one.  This can be done with
  *    a series of new functions:
  *      AddLog() instead of AddVar() when new veriable is created.
  *      Get() should still work for latest value.  Ideally keep lates in first position.
