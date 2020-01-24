@@ -6214,6 +6214,21 @@ TEST_CASE("Test string_utils", "[tools]")
 
   REQUIRE( emp::to_english_list(string_v) == "one, two, three, and four" );
 
+  emp::string_vec_t quoted_strings = emp::quote_strings(string_v);
+
+  REQUIRE( quoted_strings[0] == "'one'" );
+  REQUIRE( quoted_strings[2] == "'three'" );
+
+  quoted_strings = emp::quote_strings(string_v, "***");
+
+  REQUIRE( quoted_strings[1] == "***two***" );
+  REQUIRE( quoted_strings[3] == "***four***" );
+
+  quoted_strings = emp::quote_strings(string_v, "([{<", ">}])");
+
+  REQUIRE( quoted_strings[0] == "([{<one>}])" );
+  REQUIRE( quoted_strings[2] == "([{<three>}])" );
+
 }
 
 
