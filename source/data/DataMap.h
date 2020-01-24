@@ -104,11 +104,6 @@ namespace emp {
     DataMap(emp::Ptr<DataLayout> in_layout_ptr, size_t in_size)
       : memory(in_size), layout_ptr(in_layout_ptr) { ; }
 
-    void CopyImage(const DataMap & from_map, DataMap & to_map) {
-      emp_assert(from_map.layout_ptr == to_map.layout_ptr);
-      layout_ptr->CopyImage(from_map.memory, to_map.memory);
-    }
-
     /// If the current layout is shared, make a copy of it.
     void MakeLayoutUnique() {
       if (layout_ptr->GetNumMaps() > 1) {
@@ -119,7 +114,7 @@ namespace emp {
   public:
     DataMap() : layout_ptr(emp::NewPtr<DataLayout>()) { ; }
     DataMap(const DataMap & in_map) : layout_ptr(in_map.layout_ptr) {
-      CopyImage(in_map, *this);
+      layout_ptr->CopyImage(in_map.memory, memory);
       layout_ptr->IncMaps();
     }
     DataMap(DataMap && in_map) : memory(std::move(in_map.memory)), layout_ptr(in_map.layout_ptr) {
