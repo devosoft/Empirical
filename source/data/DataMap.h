@@ -69,6 +69,15 @@
  *    multiple types of copies, so if we indicate a "Copy birth" we get the above, but if we
  *    indicate a "Copy clone" or "Copy inject" we do something different.  We also probably need
  *    to allow for multiple parents...
+ * 
+ *  - An OptimizeLayout() function that can reorder entries so that they are somehow more sensible?
+ * 
+ *  - A MemoryImage factory to speed up allocation, deallocation if we're using the same size
+ *    images repeatedly.
+ * 
+ *  - Some way of grouping memory across DataMaps so that a particular entry for many maps has all
+ *    of its instances consecutive in memory?  This seems really tricky to pull of, but if we can 
+ *    do it, the improvement in cache performance could be dramatic.
  */
 
 #ifndef EMP_DATA_MAP_H
