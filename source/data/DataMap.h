@@ -106,52 +106,63 @@ namespace emp {
 
     /// If the current layout is shared, make a copy of it.
     void MakeLayoutUnique() {
-      if (layout_ptr->GetNumMaps() > 1) {
+      // Make sure we have a layout, even if empty.
+      if (layout_ptr.IsNull()) layout_ptr = emp::NewPtr<DataLayout>();
+
+      // If our we already had layout and it is shared, make a copy.
+      else if (layout_ptr->GetNumMaps() > 1) {   
         layout_ptr->DecMaps();
         layout_ptr.New(*layout_ptr);
       }
     }
   public:
-    DataMap() : layout_ptr(emp::NewPtr<DataLayout>()) { ; }
+    DataMap() : layout_ptr(nullptr) { ; }
     DataMap(const DataMap & in_map) : layout_ptr(in_map.layout_ptr) {
-      layout_ptr->CopyImage(in_map.memory, memory);
-      layout_ptr->IncMaps();
+      if (layout_ptr) {
+        layout_ptr->CopyImage(in_map.memory, memory);
+        layout_ptr->IncMaps();
+      }
     }
     DataMap(DataMap && in_map) : memory(std::move(in_map.memory)), layout_ptr(in_map.layout_ptr) {
       in_map.memory.RawResize(0);
     }
 
     ~DataMap() {
-      // Clean up the current MemoryImage.
-      layout_ptr->ClearImage(memory);
+      /// If we have a layout pointer, clean up!
+      if (!layout_ptr.IsNull()) {
+        // Clean up the current MemoryImage.
+        layout_ptr->ClearImage(memory);
 
-      // Clean up the DataLayout
-      layout_ptr->DecMaps();
-      if (layout_ptr->GetNumMaps() == 0) layout_ptr.Delete();
+        // Clean up the DataLayout
+        layout_ptr->DecMaps();
+        if (layout_ptr->GetNumMaps() == 0) layout_ptr.Delete();
+      }
     }
-
-    /// Retrieve the DataLayout associated with this image.
-    DataLayout & GetMapLayout() { return *layout_ptr; }
-    const DataLayout & GetMapLayout() const { return *layout_ptr; }
 
     /// Determine how many Bytes large this image is.
     size_t GetSize() const { return memory.GetSize(); }
 
     /// Translate a name into an ID.
-    size_t GetID(const std::string & name) const { return layout_ptr->GetID(name); }
-
-    /// Is this image using the most current version of the DataLayout?
-    bool IsCurrent() const { return GetSize() == layout_ptr->GetImageSize(); }
+    size_t GetID(const std::string & name) const {
+      emp_assert(layout_ptr);
+      return layout_ptr->GetID(name);
+    }
 
     /// Test if this map has a setting ID.
-    bool HasID(size_t id) const { return layout_ptr->HasID(id); }
+    bool HasID(size_t id) const {
+      return layout_ptr && layout_ptr->HasID(id);
+    }
 
     /// Test is this map has a variable by a given name.
-    bool HasName(const std::string & name) const { return layout_ptr->HasName(name); }
+    bool HasName(const std::string & name) const { return layout_ptr && layout_ptr->HasName(name); }
 
     /// Test if a variable is of a given type.
-    template <typename T> bool IsType(size_t id) const { return layout_ptr->IsType<T>(id); }
+    template <typename T> bool IsType(size_t id) const {
+      emp_assert(layout_ptr);
+      return layout_ptr->IsType<T>(id);
+    }
     template <typename T> bool IsType(const std::string & name) const {
+      emp_assert(layout_ptr);
       return layout_ptr->IsType<T>(GetID(name));
     }
 
@@ -215,10 +226,16 @@ namespace emp {
     std::string & SetString(const std::string & name, const std::string & value) { return Set<std::string>(name, value); }
 
     /// Look up the type of a variable by ID.
-    emp::TypeID GetType(size_t id) const { return layout_ptr->GetType(id); }
+    emp::TypeID GetType(size_t id) const {
+      emp_assert(layout_ptr);
+      return layout_ptr->GetType(id);
+    }
 
     /// Look up the type of a variable by name.
-    emp::TypeID GetType(const std::string & name) const { return layout_ptr->GetType(GetID(name)); }
+    emp::TypeID GetType(const std::string & name) const {
+      emp_assert(layout_ptr);
+      return layout_ptr->GetType(GetID(name));
+    }
 
 
     /// Add a new variable with a specified type, name and value.
@@ -235,7 +252,7 @@ namespace emp {
     template <typename... Ts> size_t AddStringVar(Ts &&... args) { return AddVar<std::string>(args...); }
     template <typename... Ts> size_t AddValueVar(Ts &&... args) { return AddVar<double>(args...); }
 
-    bool IsLocked() const { return layout_ptr->IsLocked(); }
+    bool IsLocked() const { return layout_ptr && layout_ptr->IsLocked(); }
 
     void LockLayout() {
       MakeLayoutUnique();
