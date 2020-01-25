@@ -127,6 +127,33 @@ namespace emp {
       in_map.memory.RawResize(0);
     }
 
+    // Copy Operator...
+    DataMap & operator=(const DataMap & in_map) {
+      // If we have a layout pointer, use it to clear our memory image and update it if needed.
+      if (layout_ptr) {
+        layout_ptr->ClearImage(memory);
+
+        // If layout pointer doesn't match the new one, shift over.
+        if (layout_ptr != in_map.layout_ptr) {
+          layout_ptr->DecMaps();                                   // Remove self from counter.
+          if (layout_ptr->GetNumMaps() == 0) layout_ptr.Delete();  // Delete layout if now unused.
+          layout_ptr = in_map.layout_ptr;                          // Shift to new layout.
+          if (layout_ptr) layout_ptr->IncMaps();                   // Add self to new counter.
+        }
+      }
+
+      // Otherwise we DON'T have a layout pointer, so setup the new one.
+      else {
+        layout_ptr = in_map.layout_ptr;                            // Shift to new layout.
+        if (layout_ptr) layout_ptr->IncMaps();                     // Add self to new counter.
+      }
+
+      // Now that we know we have a good layout, copy over the image.
+      layout_ptr->CopyImage(in_map.memory, memory);
+
+      return *this;
+    }
+
     ~DataMap() {
       /// If we have a layout pointer, clean up!
       if (!layout_ptr.IsNull()) {
