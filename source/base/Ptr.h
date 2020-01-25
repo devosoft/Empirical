@@ -470,8 +470,8 @@ namespace emp {
     }
 
     /// Reallocate this Ptr to a newly allocated array using the size passed in.
-    template <typename... T>
-    void NewArray(size_t array_size, T &&... args) {
+    template <typename... Ts>
+    void NewArray(size_t array_size, Ts &&... args) {
       Tracker().DecID(id);                              // Remove a pointer to any old memory...
 
       // @CAO: This next portion of code is allocating an array of the appropriate type.
