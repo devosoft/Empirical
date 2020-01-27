@@ -40,7 +40,7 @@ namespace web {
       info = new internal::DivInfo(in_name, in_tag);
     }
     Element(const Element & in) : WidgetFacet(in) { ; }
-    Element(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsElement()); }
+    Element(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsDiv()); }
     ~Element() { ; }
 
     using INFO_TYPE = internal::DivInfo;

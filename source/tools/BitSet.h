@@ -38,7 +38,7 @@ namespace emp {
 
   /// SFINAE helper to determine field_t for BitSet
   template <size_t NUM_BITS> struct FieldHelper {
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     ///< Field sizes are 32 bits in Emscripten (max directly handled)
     using field_t = uint32_t;
 #else
