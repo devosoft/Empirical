@@ -261,7 +261,13 @@ namespace emp {
 
     /// Get the organism most frequently found in the population and its
     /// abundance.
+    /// Be sure to check whether the population is empty before calling!
     std::pair<org_t, size_t> GetDominantInfo() const {
+
+      emp_assert(
+        GetNumOrgs(),
+        "called GetDominantInfo on an empty population"
+      );
 
       std::map<org_t, size_t> counts;
       for (const auto & org_ptr : GetFullPop()) {
@@ -279,6 +285,7 @@ namespace emp {
     }
 
     /// Get the organism most frequently found in the population.
+    /// Be sure to check whether the population is empty before calling!
     org_t GetDominantOrg() const { return GetDominantInfo().first; }
 
     /// What phenotypic traits is the population tracking?
