@@ -23,6 +23,7 @@
 
 #include "../base/vector.h"
 #include "../meta/type_traits.h"
+#include "vector_utils.h"
 #include "math.h"
 
 namespace emp {
@@ -147,7 +148,7 @@ namespace emp {
   template <typename C>
   emp::sfinae_decoy<double, typename C::value_type> 
   Median(C elements) {
-    Sort(elements);
+    emp::Sort(elements);
     if (elements.size() % 2 == 1) {
       return elements[elements.size() / 2];
     } else {

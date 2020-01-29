@@ -381,6 +381,8 @@ namespace emp {
     virtual double GetSumPairwiseDistance(bool branch_only) const = 0;
     virtual double GetVariancePairwiseDistance(bool branch_only) const = 0;
     virtual emp::vector<double> GetPairwiseDistances(bool branch_only) const = 0;
+    virtual int SackinIndex() const = 0;
+    virtual double CollessLikeIndex() const = 0;    
     virtual int GetMRCADepth() const = 0;
     virtual void AddOrg(ORG && org, WorldPosition pos, int update) = 0;
     virtual void AddOrg(ORG & org, WorldPosition pos, int update) = 0;
@@ -1261,7 +1263,7 @@ namespace emp {
       double sum_diffs = 0;
       // std::cout << "Median: " << med << std::endl;
       for (double n : result.ns) {
-        std::cout << n << std::endl;
+        // std::cout << n << std::endl;
         sum_diffs += std::abs(n-med);
       }
       // std::cout << "Sumdiffs: " << sum_diffs << " n: " << result.ns.size() << " average: " << sum_diffs/result.ns.size() << std::endl;

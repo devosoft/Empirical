@@ -40,7 +40,7 @@ namespace emp {
 
     WorldPosition() : index(invalid_id), pop_id(invalid_id) { ; }
     WorldPosition(size_t _id, size_t _pop_id=0) : index((uint32_t) _id), pop_id((uint32_t) _pop_id) {
-      emp_assert(_id <= invalid_id);
+      emp_assert(_id <= invalid_id, _id, invalid_id);
       emp_assert(_pop_id <= invalid_id);
     }
     WorldPosition(const WorldPosition &) = default;
@@ -214,23 +214,23 @@ namespace emp {
 
   /// Setup a MAP-Elites world, given the provided set of traits.
   /// Requires world to already have a size; that size is respected when deciding trait bins.
-  template <typename ORG>
-  void SetMapElites(World<ORG> & world, TraitSet<ORG> traits) {
-    emp::vector<size_t> trait_counts;
-    emp_assert(traits.GetSize() > 0);
+  // template <typename ORG>
+  // void SetMapElites(World<ORG> & world, TraitSet<ORG> traits) {
+  //   emp::vector<size_t> trait_counts;
+  //   emp_assert(traits.GetSize() > 0);
 
-    // If there's only a single trait, it should get the full population.
-    if (traits.GetSize() == 1) {
-      trait_counts.push_back(world.GetSize());
-      SetMapElites(world, traits, trait_counts);
-      return;
-    }
-    const size_t num_traits = traits.GetSize();
-    size_t trait_size = 1;
-    while (Pow(trait_size+1, num_traits) < world.GetSize()) trait_size++;
-    trait_counts.resize(num_traits, trait_size);
-    SetMapElites(world, traits, trait_counts);
-  }
+  //   // If there's only a single trait, it should get the full population.
+  //   if (traits.GetSize() == 1) {
+  //     trait_counts.push_back(world.GetSize());
+  //     SetMapElites(world, traits, trait_counts);
+  //     return;
+  //   }
+  //   const size_t num_traits = traits.GetSize();
+  //   size_t trait_size = 1;
+  //   while (Pow(trait_size+1, num_traits) < world.GetSize()) trait_size++;
+  //   trait_counts.resize(num_traits, trait_size);
+  //   SetMapElites(world, traits, trait_counts);
+  // }
 
   /// Setup a MAP-Elites world, given the provided trait counts (number of bins).
   /// Requires world to already have a phenotypes that those counts are applied to.

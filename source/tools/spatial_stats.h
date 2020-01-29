@@ -31,20 +31,20 @@ namespace emp {
 
         if ((int)xid < neighborhood_size) {
             x_modifier = neighborhood_size - xid;
-        } else if (xid + neighborhood_size >= w.GetWidth()) {
+        } else if ((int)xid + neighborhood_size >= (int)w.GetWidth()) {
             x_modifier = xid + neighborhood_size - w.GetWidth() + 1;
         }
 
         if ((int)yid < neighborhood_size) {
             y_modifier = neighborhood_size - yid;
-        } else if (yid + neighborhood_size >= w.GetHeight()) {
+        } else if ((int)yid + neighborhood_size >= (int)w.GetHeight()) {
             y_modifier = yid + neighborhood_size - w.GetHeight() + 1;
         }
 
         double denominator = (neighborhood_size*2 + 1 - x_modifier) * (neighborhood_size * 2 + 1 - y_modifier);
         
-        for (size_t x = std::max((int)xid - neighborhood_size, 0); x <= std::min((int)xid + neighborhood_size, (int)w.GetWidth()-1); x++) {
-            for (size_t y = std::max((int)yid - neighborhood_size, 0); y <= std::min((int)yid + neighborhood_size, (int)w.GetHeight()-1); y++) {
+        for (size_t x = std::max((int)xid - neighborhood_size, 0); (int)x <= std::min((int)xid + neighborhood_size, (int)w.GetWidth()-1); x++) {
+            for (size_t y = std::max((int)yid - neighborhood_size, 0); (int)y <= std::min((int)yid + neighborhood_size, (int)w.GetHeight()-1); y++) {
                 if (w.IsOccupied(x+y*w.GetWidth())) {
                     density++;
                 }
