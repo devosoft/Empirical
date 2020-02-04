@@ -147,7 +147,16 @@ namespace emp {
 
       Event & operator=(const Event &) = default;
       Event & operator=(Event &&) = default;
-
+      bool operator<(const Event & other) const {
+        size_t msg_size = msg.size();
+        size_t other_msg_size = other.msg.size();
+        return std::tie(id, affinity, msg_size)
+          < std::tie(other.id, other.affinity, other_msg_size);
+      }
+      bool operator==(const Event & other) const {
+        return std::tie(id, affinity, msg, properties)
+          == std::tie(other.id, other.affinity, msg, properties);
+      }
       /// Does event object have given property?
       bool HasProperty(std::string property) const { return properties.count(property); }
 
