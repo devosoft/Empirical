@@ -392,31 +392,36 @@ namespace emp {
   template<size_t N>
   struct ExactStreakDistribution {
 
-    std::unordered_map<
+    static inline std::unordered_map<
       std::tuple<size_t, size_t>, /* (min_heads, num_coins) */
       double,
       emp::TupleHash<size_t, size_t>
-    > computed;
+    > computed{};
 
     ExactStreakDistribution() {
       // prep the cache
       for (size_t min_heads = 0; min_heads <= N; ++min_heads) {
-        StreakProbability(min_heads);
+        CalcStreakProbability(min_heads);
       }
     }
 
-    double StreakProbability(
+    double GetStreakProbability(
+      const size_t min_heads,
+      const size_t num_coins=N
+    ) const { return computed.at({min_heads, num_coins}); }
+
+    double CalcStreakProbability(
       const size_t min_heads,
       const size_t num_coins=N
     ) {
+
+      // edge cases for recursion
+      if (min_heads > num_coins || num_coins <= 0) return 0.0;
 
       // check the cache
       if (computed.find({min_heads, num_coins}) != std::end(computed)) {
         return computed.at({min_heads, num_coins});
       }
-
-      // edge cases for recursion
-      if (min_heads > num_coins || num_coins <= 0) return 0.0;
 
       constexpr double head_prob = 0.5;
 
@@ -425,7 +430,7 @@ namespace emp {
         res += (
           emp::Pow(head_prob, static_cast<double>(first_tail))
           * (1.0 - head_prob)
-          * StreakProbability(
+          * CalcStreakProbability(
             min_heads,
             num_coins - first_tail - 1
           )
@@ -457,7 +462,7 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
     using tag_t = emp::BitSet<Width>;
 
-    inline static ExactStreakDistribution<Width> distn;
+    const ExactStreakDistribution<Width> distn{};
 
     size_t dim() const override { return 1; }
 
@@ -473,8 +478,8 @@ namespace emp {
       const emp::BitSet<Width> bs = a^b;
       const size_t same = (~bs).LongestSegmentOnes();
       const size_t different = bs.LongestSegmentOnes();
-      const double ps = distn.StreakProbability(same);;
-      const double pd = distn.StreakProbability(different);
+      const double ps = distn.GetStreakProbability(same);
+      const double pd = distn.GetStreakProbability(different);
 
       const double match = pd / (ps + pd);
       // Note: here, close match score > poor match score
@@ -500,7 +505,7 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
     using tag_t = emp::BitSet<Width>;
 
-    inline static ExactStreakDistribution<Width> distn;
+    const ExactStreakDistribution<Width> distn{};
 
     size_t dim() const override { return 1; }
 
@@ -517,7 +522,7 @@ namespace emp {
       // sampling from probabilty distribution
       // and then viewing location in cumulative probability distribution
       // gives us a uniform result
-      const double p_same = distn.StreakProbability(same);
+      const double p_same = distn.GetStreakProbability(same);
 
       return p_same;
     }
@@ -704,13 +709,11 @@ namespace emp {
       using query_t = typename Metric::query_t;
       using tag_t = typename Metric::query_t;
 
-      Metric metric;
-
       // pairs of (raw, uniformified)
       emp::vector<std::pair<double, double>> table;
 
     public:
-      EstimatedLookupTable() {
+      EstimatedLookupTable(const Metric & metric) {
         emp::Random rand(1);
 
         emp::vector<double> raw;
@@ -824,29 +827,36 @@ namespace emp {
 
   }
 
+  namespace internal {
+    template <typename Metric, size_t Samples>
+    struct lookup_holder {
+      const Metric metric;
+      const internal::EstimatedLookupTable<
+        Metric,
+        Samples
+      > lookup;
+      lookup_holder() : metric(), lookup(metric) { ; }
+    };
+  }
+
   /// Reshape metric's probability distribution to be approximately uniform.
   /// Sample from the original distribution to create a percentile map,
   /// and then, at runtime, put raw matches through the percentile map to
   /// approximate a uniform distribution.
-  template <typename Metric, size_t Samples=1000000>
+  template <typename Metric, size_t Samples=10000>
   struct UnifMod : public Metric {
 
     using query_t = typename Metric::query_t;
     using tag_t = typename Metric::query_t;
 
-    Metric metric;
-
-    const static inline internal::EstimatedLookupTable<
-      Metric,
-      Samples
-    > lookup{};
+    const static internal::lookup_holder<Metric, Samples> held;
 
     std::string name() const override {
-      return emp::to_string("Uniformified ", metric.name());
+      return emp::to_string("Uniformified ", held.metric.name());
     }
 
     double operator()(const query_t& a, const tag_t& b) const override {
-      return lookup(metric(a, b));
+      return held.lookup(held.metric(a, b));
     }
 
   };
@@ -1037,6 +1047,15 @@ namespace emp {
     }
 
   };
+
+  // template <size_t Width>
+  // const ExactStreakDistribution<Width> ExactDualStreakMetric<Width>::distn{};
+  //
+  // template <size_t Width>
+  // const ExactStreakDistribution<Width> ExactSingleStreakMetric<Width>::distn{};
+
+  template <typename Metric, size_t Samples>
+  const internal::lookup_holder<Metric, Samples> UnifMod<Metric, Samples>::held{};
 
 }
 
