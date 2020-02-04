@@ -392,7 +392,7 @@ namespace emp {
   template<size_t N>
   struct ExactStreakDistribution {
 
-    static inline std::unordered_map<
+    std::unordered_map<
       std::tuple<size_t, size_t>, /* (min_heads, num_coins) */
       double,
       emp::TupleHash<size_t, size_t>
