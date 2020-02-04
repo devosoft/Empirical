@@ -910,6 +910,13 @@ namespace emp {
       return to_string(open_quote, str, close_quote);
     });
   }
+
+  /// Take a vector of strings, put them in quotes, and then transform it into an English list.
+  static inline std::string to_quoted_list(const string_vec_t & in_strings,
+                                           const std::string quote="'") {
+    return to_english_list(quote_strings(in_strings, quote));
+  }
+
 }
 
 #endif
