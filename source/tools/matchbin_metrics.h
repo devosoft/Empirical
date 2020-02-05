@@ -448,6 +448,15 @@ namespace emp {
 
   };
 
+  // RE: the “static initialization order ‘fiasco’ (problem)”
+  // https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
+  template<size_t N>
+  const ExactStreakDistribution<N>&
+  ExactStreakDistribution_ConstructOnFirstUse() {
+    static ExactStreakDistribution<N>* res = new ExactStreakDistribution<N>{};
+    return *res;
+  }
+
   /// Matches based on longest streaks of equal and unequal bits in two bitsets.
   /// This implementation uses Corect Math adapted from
   /// https://www.askamathematician.com/2010/07/q-whats-the-chance-of-getting-a-run-of-k-successes-in-n-bernoulli-trials-why-use-approximations-when-the-exact-answer-is-known/
@@ -462,7 +471,9 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
     using tag_t = emp::BitSet<Width>;
 
-    const ExactStreakDistribution<Width> distn{};
+    const ExactStreakDistribution<Width> & distn{
+      ExactStreakDistribution_ConstructOnFirstUse<Width>()
+    };
 
     size_t dim() const override { return 1; }
 
@@ -505,7 +516,9 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
     using tag_t = emp::BitSet<Width>;
 
-    const ExactStreakDistribution<Width> distn{};
+    const ExactStreakDistribution<Width> & distn{
+      ExactStreakDistribution_ConstructOnFirstUse<Width>()
+    };
 
     size_t dim() const override { return 1; }
 
@@ -849,7 +862,7 @@ namespace emp {
     using query_t = typename Metric::query_t;
     using tag_t = typename Metric::query_t;
 
-    const static internal::lookup_holder<Metric, Samples> held;
+    inline const static internal::lookup_holder<Metric, Samples> held{};
 
     std::string name() const override {
       return emp::to_string("Uniformified ", held.metric.name());
@@ -1047,15 +1060,6 @@ namespace emp {
     }
 
   };
-
-  // template <size_t Width>
-  // const ExactStreakDistribution<Width> ExactDualStreakMetric<Width>::distn{};
-  //
-  // template <size_t Width>
-  // const ExactStreakDistribution<Width> ExactSingleStreakMetric<Width>::distn{};
-
-  template <typename Metric, size_t Samples>
-  const internal::lookup_holder<Metric, Samples> UnifMod<Metric, Samples>::held{};
 
 }
 
