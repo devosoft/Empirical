@@ -387,6 +387,7 @@ namespace emp {
     virtual void AddOrg(ORG && org, WorldPosition pos, int update) = 0;
     virtual void AddOrg(ORG & org, WorldPosition pos, int update) = 0;
     virtual bool RemoveOrg(WorldPosition pos, int time=-1) = 0;
+    virtual void RemoveOrgAfterRepro(WorldPosition pos, int time=-1) = 0;
     // virtual bool RemoveNextOrg(WorldPosition pos, int time=-1) = 0;
     virtual void PrintStatus(std::ostream & os) const = 0;
     virtual double CalcDiversity() const = 0;
@@ -454,6 +455,7 @@ namespace emp {
     using parent_t::GetMRCADepth;
     using parent_t::AddOrg;
     using parent_t::RemoveOrg;
+    using parent_t::RemoveOrgAfterRepro;
     // using parent_t::RemoveNextOrg;
     // using parent_t::Parent;
     using parent_t::PrintStatus;
@@ -494,6 +496,7 @@ namespace emp {
 
     Ptr<taxon_t> to_be_removed = nullptr;
     int removal_time = -1;
+    int removal_pos = -1;
 
     emp::vector<Ptr<taxon_t> > taxon_locations;
     emp::vector<Ptr<taxon_t> > next_taxon_locations;
@@ -1603,17 +1606,23 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrgAfterRepro(WorldPosition pos, int time) {
     emp_assert(store_position, "Trying to remove org based on position from systematics manager that doesn't track it.");
-    emp_assert(pos.GetIndex() < taxon_locations.size(), "Invalid position requested for removal", pos, taxon_locations.size());
-    emp_assert(taxon_locations[pos.GetIndex()], pos.GetIndex(), "No org at pos");
+    
+    if (pos.GetIndex() >= taxon_locations.size() || !taxon_locations[pos.GetIndex()]) {
+      // There's not actually a taxon here
+      return;
+    }
+
     RemoveOrgAfterRepro(taxon_locations[pos.GetIndex()], time);
-    taxon_locations[pos.GetIndex()] = nullptr;
+    removal_pos = pos.GetIndex();
   }
   
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrgAfterRepro(Ptr<taxon_t> taxon, int time) {
     if (to_be_removed != nullptr) {
       RemoveOrg(to_be_removed, removal_time);
+      taxon_locations[removal_pos] = nullptr;
       to_be_removed = nullptr;
+      removal_pos = -1;
     }
     to_be_removed = taxon;
     // std::cout << "Setting remove time to " << time << std::endl;

@@ -914,7 +914,7 @@ namespace emp {
     } 
 
     for (Ptr<SystematicsBase<ORG> > s : systematics) {
-      s->RemoveOrg(pos, update);          // Notify systematics about organism removal
+      s->RemoveOrgAfterRepro(pos, update);          // Notify systematics about organism removal
     }
 
   }
