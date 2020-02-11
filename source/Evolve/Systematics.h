@@ -1637,7 +1637,11 @@ namespace emp {
  
     if (pos.GetPopID() == 0) {
       emp_assert(pos.GetIndex() < taxon_locations.size(), "Invalid position requested for removal", pos.GetIndex(), taxon_locations.size());
-      bool active = RemoveOrg(taxon_locations[pos.GetIndex()], time);
+      bool active = false;
+      if (taxon_locations[pos.GetIndex()]) {
+        //TODO: Figure out how this can ever not be true
+        active = RemoveOrg(taxon_locations[pos.GetIndex()], time);
+      }
       taxon_locations[pos.GetIndex()] = nullptr;
       return active;
     } else {
