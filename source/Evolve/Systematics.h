@@ -546,6 +546,15 @@ namespace emp {
     void Update() {
       ++curr_update;
       if (track_synchronous) {
+
+        // Clear pending removal
+        if (to_be_removed != nullptr) {
+          RemoveOrg(to_be_removed, removal_time);
+          taxon_locations[removal_pos] = nullptr;
+          to_be_removed = nullptr;
+          removal_pos = -1;
+        }
+
         std::swap(taxon_locations, next_taxon_locations);
         next_taxon_locations.resize(0);
       }
