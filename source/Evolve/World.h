@@ -1191,7 +1191,7 @@ namespace emp {
 
     // 2. If synchronous generations (i.e, pops[1] is not empty), move next population into
     //    place as the current popoulation.
-    if (pops[1].size()) {
+    if (IsSynchronous()) {
       // Trigger signals for orgs in next pop before they are moved into the active pop.
       for (size_t i = 0; i < pops[1].size(); i++) {
         if (!pops[1][i]) continue;
