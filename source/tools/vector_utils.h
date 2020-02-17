@@ -18,6 +18,29 @@
 
 namespace emp {
 
+  /// Base case for Append; we just have a single vector with nothing to append.
+  template <typename T>
+  emp::vector<T> & Append(emp::vector<T> & base) {
+    return base;
+  }
+  
+  /// Append one or more vectors on to the end of an existing vector.
+  template <typename T, typename V1, typename... Vs>
+  emp::vector<T> & Append(emp::vector<T> & base, const V1 & v1, const Vs &... vs) {
+    base.insert(base.end(), v1.begin(), v1.end());
+    Append(base, vs...);
+    return base;
+  }
+  
+
+  /// Concatonate two or more vectors together, creating a new vector.
+  template <typename T, typename... Vs>
+  emp::vector<T> Concat(const emp::vector<T> & v1, const Vs &... vs) {
+    emp::vector<T> out_v = v1;
+    Append(out_v, vs...);
+    return out_v;
+  }
+
   /// Return the first position of a value in a vector (or -1 if none exists)
   template <typename T>
   int FindValue(const emp::vector<T> & v, const T & val, size_t start_pos=0) {
