@@ -579,7 +579,7 @@ namespace emp {
   }
 
   /// Make a string safe(r) 
-  static std::string slugify(const std::string & in_string) {
+  static inline std::string slugify(const std::string & in_string) {
     //TODO handle complicated unicode strings
     std::string res = to_lower(in_string);
     remove_punctuation(res);
