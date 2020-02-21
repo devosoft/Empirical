@@ -110,7 +110,7 @@ namespace emp {
 
     /// Set the next combination of settings to be active.  Return true if successful
     /// or false if we ran through all combinations and reset.
-    bool NextCombo() {
+    bool Next() {
     for (size_t i = 0; i < cur_combo.size(); i++) {
         cur_combo[i]++;
 
@@ -124,6 +124,16 @@ namespace emp {
       // No valid combo found.
       return false;
     }
+
+    std::string CurString() const {
+      std::string out_str;
+      for (size_t i = 0; i < cur_combo.size(); i++) {
+        if (i) out_str += ",";
+        out_str += settings[i]->AsString(cur_combo[i]);
+      }
+      return out_str;
+    }
+
   };
 
 }
