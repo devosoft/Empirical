@@ -4,7 +4,7 @@
 Empirical -- A library of tools for scientific software development
 ###################################################################
 
-:Authors: Charles Ofria, Emily Dolson, Alex Lalejini, Jacob Fenton
+:Authors: Charles Ofria, Emily Dolson, Alex Lalejini, Jacob Fenton, Matthew Andres Moreno
 :GitHub: https://github.com/devosoft/Empirical
 
 Empirical is a library of tools for scientific software development with an
@@ -12,11 +12,11 @@ emphasis on being able to build web interfaces using Mozilla's Emscripten
 compiler.  The project goal is to improve the accessibility and reproducibility
 of the computational research.
 
-Emprical is a C++ project though it uses Python for development
-infrastructure. 
+Empirical is a C++ project though it uses Python for development
+infrastructure.
 
-The developer documentation is for contributing to the Emscripten project and
-the user documentation is for those wanting to incorporate the Emscripten
+The developer documentation is for contributing to the Empirical project and
+the user documentation is for those wanting to incorporate the Empirical
 library into their own projects.
 
 Contents:
@@ -25,6 +25,8 @@ Contents:
    :caption: Using Empirical
    :maxdepth: 2
 
+   BuiltWithEmpiricalGallery/index
+   QuickStartGuides/index
    library/base/base
    library/data/data
    library/web/web

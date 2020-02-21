@@ -56,7 +56,7 @@ namespace web {
       // Setup a canvas to be drawn on.
       void TargetCanvas() {
         EM_ASM_ARGS({
-            var cname = Pointer_stringify($0);
+            var cname = UTF8ToString($0);
             var canvas = document.getElementById(cname);
             emp_i.ctx = canvas.getContext('2d');
         }, id.c_str());
@@ -261,6 +261,27 @@ namespace web {
       Info()->AddAction( new CanvasClearRect({0,0}, GetWidth(), GetHeight()) );
       Info()->AddAction( new CanvasRect({0,0}, GetWidth(), GetHeight(), bg_color, "") );
       return *this;
+    }
+
+    /// Download a PNG image of a canvas.
+    void DownloadPNG() { DownloadPNG(Info()->id + ".png"); }
+
+    /// Download a PNG image of a canvas.
+    void DownloadPNG(const std::string & fname) {
+
+      const std::string ext = ".png";
+      emscripten_run_script(
+        (
+          std::string()
+          + "emp.download(document.getElementById('"
+          + Info()->id
+          + "').toDataURL('img/png'), '"
+          + fname
+          + (fname.rfind(ext, fname.length()) == std::string::npos ? ext : "")
+          + "', 'img/png');"
+        ).c_str()
+      );
+
     }
 
   };

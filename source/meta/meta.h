@@ -30,6 +30,9 @@ namespace emp {
   template <typename T1, typename T2, typename... Ts> using second_type = T2;
   template <typename T1, typename T2, typename T3, typename... Ts> using third_type = T3;
 
+  // Create a placeholder template to substitute for a real type.
+  template <int> struct PlaceholderType;
+
   // Index into a template parameter pack to grab a specific type.
   namespace internal {
     template <size_t ID, typename T, typename... Ts>
@@ -95,6 +98,7 @@ namespace emp {
   // X is type you want it to be; Y is a decoy trigger potential substituion failue.
   template <typename REAL_TYPE, typename EVAL_TYPE> using sfinae_decoy = REAL_TYPE;
   template <typename REAL_TYPE, typename EVAL_TYPE> using type_decoy = REAL_TYPE;
+  template <typename REAL_TYPE, typename EVAL_TYPE> using decoy_t = REAL_TYPE;
   template <typename EVAL_TYPE>                     using bool_decoy = bool;
   template <typename EVAL_TYPE>                     using int_decoy = int;
 

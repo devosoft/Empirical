@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018
+ *  @date 2018-2019
  *
  *  @file  File.h
  *  @brief The File object maintains a simple, in-memory file.
@@ -229,6 +229,9 @@ namespace emp {
       return *this;
     }
 
+    /// Allow remove comments to also be specified with a single character.
+    File & RemoveComments(char marker) { return RemoveComments(emp::to_string(marker)); }
+
     /// Run a function on each line of a file and return the restults as a vector.
     /// Note: Function is allowed to modify string.
     template <typename T>
@@ -240,18 +243,71 @@ namespace emp {
       return results;
     }
 
+    /// Remove the first column from the file, returning it as a vector of strings.
     emp::vector<std::string> ExtractCol(char delim=',') {
       return Process<std::string>( [delim](std::string & line){
         return string_pop(line, delim);
       });
     }
 
+    /// Remove the first column from the file, returning it as a vector of a specified type.
     template <typename T>
     emp::vector<T> ExtractColAs(char delim=',') {
       return Process<T>( [delim](std::string & line){
         return emp::from_string<T>(string_pop(line, delim));
       });
     }
+
+    /// Convert a row of a file to a vector of string views.
+    emp::vector<std::string_view> ViewRowSlices(size_t row_id, char delim=',') {
+      return view_slices(lines[row_id], delim);
+    }
+
+    /// Remove the first row from the file, returning it as a vector of strings.
+    emp::vector<std::string> ExtractRow(char delim=',') {
+      // Identify the data as string_views
+      emp::vector<std::string_view> sv_row = ViewRowSlices(0, delim); 
+
+      // Build the array to return and copy strings into it.
+      emp::vector<std::string> out_row(sv_row.size());
+      for (size_t i=0; i < sv_row.size(); i++) out_row[i] = sv_row[i];
+
+      // Remove the row to be extrated and return the result.
+      lines.erase(begin());
+      return out_row;
+    }
+
+    /// Remove the first row from the file, returning it as a vector of a specified type.
+    template <typename T>
+    emp::vector<T> ExtractRowAs(char delim=',') {
+      // Identify the data as string_views
+      emp::vector<std::string_view> sv_row = ViewRowSlices(0, delim); 
+
+      // Build the array to return and copy strings into it.
+      emp::vector<T> out_row(sv_row.size());
+      for (size_t i=0; i < sv_row.size(); i++) out_row[i] = from_string<T>(sv_row[i]);
+
+      // Remove the row to be extrated and return the result.
+      lines.erase(begin());
+      return out_row;
+    }
+
+    template <typename T>
+    emp::vector< emp::vector<T> > ToData(char delim=',') {
+      emp::vector< emp::vector<T> > out_data(lines.size());
+
+      emp::vector<std::string_view> sv_row;
+      for (size_t row_id = 0; row_id < lines.size(); row_id++) {
+        view_slices(lines[row_id], sv_row, delim);
+        out_data[row_id].resize(sv_row.size());
+        for (size_t i=0; i < sv_row.size(); i++) {
+          out_data[row_id][i] = from_string<T>(sv_row[i]);
+        }
+      }
+
+      return out_data;
+    }
+
   };
   
 }

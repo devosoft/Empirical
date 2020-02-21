@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2019.
  *
  *  @file  RegEx.h
  *  @brief Basic regular expression handler.
@@ -16,11 +16,12 @@
  *   '?'          - previous is optional
  *   '.'          - Match any character except \n
  *
- *  Pluse the following group contents (and change may translation rules)
+ *  Plus the following group contents (and change may translation rules)
  *   '(' and ')'  - group contents
  *   '"'          - Ignore special characters in contents (quotes still need to be escaped)
  *   '[' and ']'  - character set -- choose ONE character
- *                  ^ as first char negates contents ; - indicates range UNLESS first or last.
+ *                  '^' as first char negates contents
+ *                  '-' indicates range UNLESS first or last.
  *
  *  Additional overloads for functions in lexer_utils.h:
  *
@@ -58,11 +59,11 @@ namespace emp {
     using opts_t = BitSet<NUM_SYMBOLS>;
     std::string regex;                         ///< Original string to define this RegEx.
     emp::vector<std::string> notes;            ///< Any warnings or errors would be provided here.
-    bool valid;                                ///< Set to false if regex cannot be processed.
-    size_t pos;                                ///< Position being read in regex.
+    bool valid = true;                         ///< Set to false if regex cannot be processed.
+    size_t pos = 0;                            ///< Position being read in regex.
 
     mutable DFA dfa;                           ///< DFA that this RegEx translates to.
-    mutable bool dfa_ready;                    ///< Is the dfa ready? (or does it need to be generated?)
+    mutable bool dfa_ready = false;            ///< Is the dfa ready? (or does it need to be generated?)
 
     template <typename... T>
     void Error(T &&... args) {
@@ -150,6 +151,7 @@ namespace emp {
       Ptr<re_base> pop() { auto out = nodes.back(); nodes.pop_back(); return out; }
       size_t GetSize() const override { return nodes.size(); }
       Ptr<re_parent> AsParent() override { return ToPtr(this); }
+
       bool Simplify() override {
         bool m=false;
         for (auto & x : nodes) {
@@ -171,7 +173,12 @@ namespace emp {
     /// Representation of a series of components...
     struct re_block : public re_parent {   // Series of re's
       void Print(std::ostream & os) const override {
-        os << "BLOCK["; for (auto x : nodes) x->Print(os); os << "]";
+        os << "BLOCK[";
+        for (size_t i = 0; i < nodes.size(); i++) {
+          if (i > 0) os << " ";
+          nodes[i]->Print(os);
+        }
+        os << "]";
       }
       Ptr<re_block> AsBlock() override { return ToPtr(this); }
       bool Simplify() override {
@@ -185,6 +192,7 @@ namespace emp {
             nodes[i] = new_node;
             modify = true;
           }
+
           // If two neighboring nodes are strings, merge them.
           if (i > 0 && nodes[i]->AsString() && nodes[i-1]->AsString()) {
             nodes[i-1]->AsString()->str += nodes[i]->AsString()->str;
@@ -230,6 +238,7 @@ namespace emp {
       void Print(std::ostream & os) const override {
         os << "|[";
         nodes[0]->Print(os);
+        os << ",";
         nodes[1]->Print(os);
         os << "]";
       }
@@ -245,10 +254,12 @@ namespace emp {
       void Print(std::ostream & os) const override { os << "*["; nodes[0]->Print(os); os << "]"; }
 
       virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+        const size_t origin = nfa.AddNewState();
         const size_t target = nfa.AddNewState();
-        nodes[0]->AddToNFA(nfa, start, target);
-        nfa.AddFreeTransition(target, start);
-        nfa.AddFreeTransition(start, stop);
+        nodes[0]->AddToNFA(nfa, origin, target);
+        nfa.AddFreeTransition(start, origin);
+        nfa.AddFreeTransition(target, origin);
+        nfa.AddFreeTransition(origin, stop);
       }
     };
 
@@ -257,10 +268,12 @@ namespace emp {
       re_plus(Ptr<re_base> c) { push(c); }
       void Print(std::ostream & os) const override { os << "+["; nodes[0]->Print(os); os << "]"; }
       virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+        const size_t origin = nfa.AddNewState();
         const size_t target = nfa.AddNewState();
-        nodes[0]->AddToNFA(nfa, start, target);
-        // From the target, can either go back to start and repeat, or straight to stop.
-        nfa.AddFreeTransition(target, start);
+        nodes[0]->AddToNFA(nfa, origin, target);
+        // From the target, can either go back to origin and repeat, or straight to stop.
+        nfa.AddFreeTransition(start, origin);
+        nfa.AddFreeTransition(target, origin);
         nfa.AddFreeTransition(target, stop);
       }
     };
@@ -295,6 +308,7 @@ namespace emp {
       auto out = NewPtr<re_charset>();
       char prev_c = -1;
       while (c != ']' && pos < regex.size()) {
+        // Hyphens indicate a range UNLESS they are the first character in the set.
         if (c == '-' && prev_c != -1) {
           c = regex[pos++];
           if (c < prev_c) { Error("Invalid character range ", prev_c, '-', c); continue; }
@@ -305,12 +319,29 @@ namespace emp {
           c = regex[pos++];
           continue;
         }
+        // Sets need to have certain escape characters identified.
         else if (c == '\\') {
           c = regex[pos++];  // Identify the specific escape char.
+          char c2, c3;       // In case they are needed.
           switch(c) {
             case 'n': c = '\n'; break;
             case 'r': c = '\r'; break;
             case 't': c = '\t'; break;
+            // A backslash followed by a digit indicates we should expect an ascii code.
+            case '0': case '1': case '2': case '3': case '4': 
+            case '5': case '6': case '7': case '8': case '9':
+              if (pos+3 >= regex.size()) { Error("Escaped ascii codes must have three digits!"); }
+              c2 = regex[pos+1];
+              if (!is_digit(c2)) { Error("Escaped ascii codes must have three digits!"); }
+              c3 = regex[pos+2];
+              if (!is_digit(c3)) { Error("Escaped ascii codes must have three digits!"); }
+              c -= '0';  c2 -= '0'; c3 -= '0';   // Find actual digit values.
+              if (c > 1) { Error("Escaped ascii codes must be in range 0-127!"); }
+              if (c == 1 && c2 > 2) { Error("Escaped ascii codes must be in range 0-127!"); }
+              if (c == 1 && c2 == 2 && c3 > 7) { Error("Escaped ascii codes must be in range 0-127!"); }
+              c = c*100 + c2*10 + c3;
+              pos += 3;
+              break;
             // Any of these characters should just be themselves!
             case '-':
             case '\\':
@@ -327,7 +358,7 @@ namespace emp {
         c = regex[pos++];
       }
       if (neg) out->char_set.NOT_SELF();
-      if (c == ']') --pos;
+      if (c == ']') --pos;  // SHOULD be the case, but is checked after return.
       return out;
     }
 
@@ -454,14 +485,12 @@ namespace emp {
 
   public:
     RegEx() = delete;
-    RegEx(const std::string & r)
-    : regex(r), notes(), valid(true), pos(0), dfa(), dfa_ready(false), head() {
-      Process(ToPtr(&head));
+    RegEx(const std::string & r) : regex(r), dfa(), head() {
+      if (regex.size()) Process(ToPtr(&head));
       while(head.Simplify());
     }
-    RegEx(const RegEx & r)
-    : regex(r.regex), notes(), valid(true), pos(0), dfa(), dfa_ready(false), head() {
-      Process(ToPtr(&head));
+    RegEx(const RegEx & r) : regex(r.regex), dfa(), head() {
+      if (regex.size()) Process(ToPtr(&head));
       while(head.Simplify());
     }
     ~RegEx() { ; }
@@ -494,17 +523,17 @@ namespace emp {
     }
 
     /// For debugging: print the internal representation of the regex.
-    void PrintInternal() { head.Print(std::cout); std::cout << std::endl; }
+    void PrintInternal() const { head.Print(std::cout); std::cout << std::endl; }
 
     /// For debugging: print any internal notes generated about this regex.
-    void PrintNotes() {
+    void PrintNotes() const {
       for (const std::string & n : notes) {
         std::cout << n << std::endl;
       }
     }
 
     /// Print general debuging information about this regex.
-    void PrintDebug() {
+    void PrintDebug() const {
       if (notes.size()) {
         std::cout << "NOTES:" << std::endl;
         PrintNotes();

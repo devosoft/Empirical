@@ -36,7 +36,7 @@ namespace emp {
     using value_type = std::pair<const Key,T>;
   private:
     struct SortOrder {
-      bool operator()(const value_type & in1, const value_type & in2) {
+      bool operator()(const value_type & in1, const value_type & in2) const {
         if (in1.second == in2.second) return (in1.first < in2.first);
         return in1.second < in2.second;
       }

@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2018
+ *  @date 2015-2019
  *
  *  @file unit_tests.h
  *  @brief Macros to facilitate unit testing.
@@ -55,8 +55,10 @@ namespace emp {
                 << test_input << " == " << result << std::endl;
     }
     if (!pass) {
-      std::cout << "-> \033[1;31mMATCH FAILED!  Expected: "
-                << exp_result << "\033[0m" << std::endl;
+      std::cout << "-> \033[1;31mMATCH FAILED!  Expected: ["
+                << exp_result << "]\033[0m" << std::endl;
+      std::cout << "                    Output: ["
+                << exp_result << "]" << std::endl;
       GetUnitTestOutput().errors++;
       if (GetUnitTestOutput().abort) {
         std::cout << "Aborting!\n";

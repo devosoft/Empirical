@@ -10,6 +10,7 @@
 #ifndef EMP_COLOR_MAP_H
 #define EMP_COLOR_MAP_H
 
+#include <cmath>
 #include <iomanip>
 #include <map>
 #include <string>
@@ -39,9 +40,9 @@ namespace emp {
 
   /// Generate a string to describe a JS color out of RGB values.
   std::string ColorRGB(int r, int g, int b) {
-    emp_assert(r >= 0 && r < 255);
-    emp_assert(g >= 0 && g < 255);
-    emp_assert(b >= 0 && b < 255);
+    emp_assert(r >= 0 && r <= 255);
+    emp_assert(g >= 0 && g <= 255);
+    emp_assert(b >= 0 && b <= 255);
     std::stringstream ss;
     ss << '#' << std::setw(2) << std::setfill('0') << std::hex << r
        << std::setw(2) << std::setfill('0') << std::hex << g
@@ -51,12 +52,59 @@ namespace emp {
 
   /// Generate a string to describe a JS color with an alpha channel.
   std::string ColorRGB(int r, int g, int b, double a) {
-    emp_assert(r >= 0 && r < 255);
-    emp_assert(g >= 0 && g < 255);
-    emp_assert(b >= 0 && b < 255);
+    emp_assert(r >= 0 && r <= 255);
+    emp_assert(g >= 0 && g <= 255);
+    emp_assert(b >= 0 && b <= 255);
+    emp_assert(a >= 0 && a <= 1.0);
     std::stringstream ss;
     ss << "rgba(" << r << ',' << g << ',' << b << ',' << a << ')';
     return ss.str();
+  }
+
+  /// Generate a string to describe a JS color out of HSV values.
+  std::string ColorHSV(double h, double s, double v) {
+    // adapted from https://gist.github.com/kuathadianto/200148f53616cbd226d993b400214a7f
+
+    emp_assert( h >= 0.0 && h <= 360.0);
+    emp_assert( s >= 0.0 && s <= 1.0);
+    emp_assert( v >= 0.0 && v <= 1.0);
+
+  	double c = s * v;
+  	double x = c * (1 - std::abs(std::fmod(h / 60.0, 2) - 1));
+  	double m = v - c;
+  	double rs, gs, bs;
+
+  	if(h >= 0 && h < 60) {
+  		rs = c;
+  		gs = x;
+  		bs = 0;
+  	} else if(h >= 60 && h < 120) {
+  		rs = x;
+  		gs = c;
+  		bs = 0;
+  	} else if(h >= 120 && h < 180) {
+  		rs = 0;
+  		gs = c;
+  		bs = x;
+  	} else if(h >= 180 && h < 240) {
+  		rs = 0;
+  		gs = x;
+  		bs = c;
+  	} else if(h >= 240 && h < 300) {
+  		rs = x;
+  		gs = 0;
+  		bs = c;
+  	} else {
+  		rs = c;
+  		gs = 0;
+  		bs = x;
+  	}
+
+    int r = (int) ((rs + m) * 255);
+    int g = (int) ((gs + m) * 255);
+    int b = (int) ((bs + m) * 255);
+
+    return ColorRGB(r, g, b);
   }
 
   /// Generate a vector of color strings with a specified range of hues, and fixed satuation and

@@ -106,15 +106,11 @@ int main(int argc, char* argv[])
   constexpr size_t num_fit_funs = 100;
   emp::vector< std::function<double(const SorterOrg &)> > fit_set(num_fit_funs);
 
-
   PrintOrg(0, pop[0]);
 
   // Loop through updates
   for (uint32_t ud = 0; ud < MAX_GENS; ud++) {
-    // Print current state.
-    // for (uint32_t i = 0; i < pop.GetSize(); i++) std::cout << pop[i] << std::endl;
-    // std::cout << std::endl;
-
+    
     // Build the lexicase fitness functions (changing each update)
     for (size_t i = 0; i < num_fit_funs; i++) {
       // Setup the fitness function.

@@ -98,7 +98,7 @@ namespace D3 {
 
     void LoadDataFromFile(std::string filename) {
       EM_ASM_ARGS ({
-        d3.json(Pointer_stringify($1), function(data){js.objects[$0]=data;});
+        d3.json(UTF8ToString($1), function(data){js.objects[$0]=data;});
       }, id, filename.c_str());
     }
 
@@ -107,7 +107,7 @@ namespace D3 {
       emp::JSWrap(fun, "__json_load_fun__"+emp::to_string(id));
 
       EM_ASM_ARGS ({
-        d3.json(Pointer_stringify($1), function(data){
+        d3.json(UTF8ToString($1), function(data){
             js.objects[$0]=data;
             emp["__json_load_fun__"+$0](data);
         });
@@ -118,7 +118,7 @@ namespace D3 {
       emp::JSWrap(fun, "__json_load_fun__"+emp::to_string(id));
       std::cout << filename.c_str() << std::endl;
       EM_ASM_ARGS ({
-        var filename = Pointer_stringify($1);
+        var filename = UTF8ToString($1);
         d3.json(filename, function(data){
             js.objects[$0]=data;
             console.log(filename, data);
@@ -130,7 +130,7 @@ namespace D3 {
 
     void Append(std::string json) {
       EM_ASM_ARGS({
-        js.objects[$0].push(JSON.parse(Pointer_stringify($1)));
+        js.objects[$0].push(JSON.parse(UTF8ToString($1)));
       }, this->id, json.c_str());
     }
 
@@ -138,7 +138,7 @@ namespace D3 {
 
       int fail = EM_ASM_INT({
 
-        var obj = JSON.parse(Pointer_stringify($2));
+        var obj = JSON.parse(UTF8ToString($2));
 
         var result = null;
         for (var i in js.objects[$0]) {
@@ -165,7 +165,7 @@ namespace D3 {
       int pos = EM_ASM_INT({
         var parent_node = null;
         var pos = -1;
-        var child_node = JSON.parse(Pointer_stringify($1));
+        var child_node = JSON.parse(UTF8ToString($1));
         for (var item in js.objects[$0]) {
           if (js.objects[$0][item].name == child_node.parent) {
             parent_node = js.objects[$0][item];
@@ -198,8 +198,8 @@ namespace D3 {
             return ([+d[0], +d[1]]);
         };
 
-        var arg1 = Pointer_stringify($0);
-        var in_string = Pointer_stringify($1);
+        var arg1 = UTF8ToString($0);
+        var in_string = UTF8ToString($1);
         if (typeof window[in_string] === "function"){
           in_string = window[in_string];
         } else if (typeof window["d3"][in_string] === "function") {

@@ -2,9 +2,11 @@ Empirical is a library of tools for developing efficient, reliable, and accessib
 software.  The provided code is header-only and encapsulated into the emp namespace, so it
 is simple to incorporate into existing projects.
 
-[![Build Status](https://travis-ci.org/devosoft/Empirical.svg?branch=master)](https://travis-ci.org/devosoft/Empirical) [![Documentation Status](https://readthedocs.org/projects/empirical/badge/?version=latest)](https://empirical.readthedocs.io/en/latest/?badge=latest)
+[![Build Status](https://travis-ci.org/devosoft/Empirical.svg?branch=master)](https://travis-ci.org/devosoft/Empirical) [![Documentation Status](https://readthedocs.org/projects/empirical/badge/?version=latest)](https://empirical.readthedocs.io/en/latest/?badge=latest) [![DOI](https://zenodo.org/badge/24824563.svg)](https://zenodo.org/badge/latestdoi/24824563)
 
-See the doc/QuickStartGuides/ folder to start using the library.
+See our [Built With Empirical Gallery](https://empirical.readthedocs.io/en/latest/BuiltWithEmpiricalGallery) for examples of web tools built with Empirical.
+
+See our [Quick Start Guides](https://empirical.readthedocs.io/en/latest/QuickStartGuides) to start using the library.
 
 Tools in Empirical include:
 * Web-enabled elements to facilitate compiling to JavaScript and with a full web interfaces,
@@ -12,12 +14,12 @@ Tools in Empirical include:
 * Debug tools to facilitate audited memory management; these tools are turned off outside of
   debug mode allowing the full speed of raw pointers and normal standard library components.
 * A wide range of Helper tools to streamline common scientific computing tasks such as
-  configuration, data mangement, mathematical manipulations, etc.
+  configuration, data management, mathematical manipulations, etc.
   All of these are designed to be  easy-to-use and efficient.
 * A powerful set of evolution tools for building Artificial Life or Evolutionary Computation
   software.
 * A signal-action system that allows for efficient customization of tools, and flexible
-  software that can easily facilitate plug-in functionality..
+  software that can easily facilitate plug-in functionality.
 
 See https://empirical.readthedocs.io/en/latest for more detailed documentation
 on the available source files.

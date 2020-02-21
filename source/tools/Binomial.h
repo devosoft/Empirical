@@ -6,7 +6,7 @@
  *  @file  Binomial.h
  *  @brief A heavy-weight binomial distribution that can quickly generate random values.
  *  @note Status: ALPHA
- * 
+ *
  *  @todo Consider converting this class to a more generic Distribution class
  *        (though technically it will only work with discrete distributions.)
  */
@@ -42,7 +42,7 @@ namespace emp {
     double GetTotalProb() const { return weights.GetWeight(); }
     double operator[](size_t id) const { return weights.GetWeight(id); }
 
-    size_t PickRandom(Random & random) {
+    size_t PickRandom(Random & random) const {
       return weights.Index( random.GetDouble(GetTotalProb()) );
     }
   };

@@ -24,9 +24,12 @@
 #ifndef EMP_DATA_NODE_H
 #define EMP_DATA_NODE_H
 
+#include <limits>
+#include <algorithm>
+
 #include "../base/vector.h"
 #include "../base/assert.h"
-#include "../meta/IntPack.h"
+#include "../meta/ValPack.h"
 #include "../tools/FunctionSet.h"
 #include "../tools/IndexMap.h"
 #include "../tools/string_utils.h"
@@ -62,8 +65,8 @@ namespace emp {
   };
 
 
-  /// A shortcut for converting DataNode mod ID's to IntPacks.
-  template <emp::data... MODS> using ModPack = emp::IntPack<(int) MODS...>;
+  /// A shortcut for converting DataNode mod ID's to ValPacks.
+  template <emp::data... MODS> using ModPack = emp::ValPack<(int) MODS...>;
 
   /// Extra info about data modules that we need to know before actually building this DataNode.
   /// (for now, just REQUISITES for each module.)
@@ -76,7 +79,7 @@ namespace emp {
 
   // A set of structs to collect and merge data module requisites.
   template <emp::data... MODS> struct DataModuleRequisiteAdd { };
-  template <> struct DataModuleRequisiteAdd<> { using type = IntPack<>; };
+  template <> struct DataModuleRequisiteAdd<> { using type = ValPack<>; };
   template <emp::data CUR_MOD, emp::data... MODS> struct DataModuleRequisiteAdd<CUR_MOD, MODS...> {
     using next_type = typename DataModuleRequisiteAdd<MODS...>::type;
     using this_req = typename DataModInfo<CUR_MOD>::reqs;
@@ -119,6 +122,11 @@ namespace emp {
     double GetStandardDeviation() const {emp_assert(false, "Calculating standard deviation requires a DataNode with the Stats or FullStats modifier"); return 0;}
     double GetSkew() const {emp_assert(false, "Calculating skew requires a DataNode with the Stats or FullStats modifier"); return 0;}
     double GetKurtosis() const {emp_assert(false, "Calculating kurtosis requires a DataNode with the Stats or FullStats modifier"); return 0;}
+
+    /// Calculate the median of observed values
+    double GetMedian() const {emp_assert(false, "Calculating median requires a DataNode with the Log modifier"); return 0;}
+    /// Calculate a percentile of observed values
+    double GetPercentile(const double pct) const {emp_assert(false, "Calculating percentile requires a DataNode with the Log modifier"); return 0;}
 
     const std::string & GetName() const { return emp::empty_string(); }
     const std::string & GetDescription() const { return emp::empty_string(); }
@@ -230,6 +238,32 @@ namespace emp {
 
     /// Get a vector of all data added since the last reset
     const emp::vector<VAL_TYPE> & GetData() const { return val_set; }
+
+    /// Calculate the median of observed values
+    double GetMedian() const {
+      return GetPercentile(50);
+    }
+
+    /// Calculate a percentile of observed values
+    double GetPercentile(const double pct) const {
+
+      emp_assert(pct >= 0.0);
+      emp_assert(pct <= 100.0);
+
+      if (!val_set.size()) return std::numeric_limits<double>::quiet_NaN();
+
+      emp::vector<VAL_TYPE> dup(std::begin(val_set), std::end(val_set));
+      std::sort(std::begin(dup), std::end(dup));
+      const double idx = pct/100.0 * (dup.size() - 1);
+
+      // if needed, linearly interpolate
+      return dup[idx] == dup[std::ceil(idx)]
+        ? dup[idx]
+        : (
+          dup[idx] * (1.0 - emp::Mod(idx, 1.0))
+          + dup[std::ceil(idx)] * emp::Mod(idx, 1.0)
+        );
+    }
 
     /// Add @param val to this DataNode
     void AddDatum(const VAL_TYPE & val) {
@@ -630,13 +664,13 @@ namespace emp {
 
   /// Outermost interface to all DataNode modules.
   template <typename VAL_TYPE, int... IMODS>
-  class DataNode_Interface<VAL_TYPE, IntPack<IMODS...>>
+  class DataNode_Interface<VAL_TYPE, ValPack<IMODS...>>
     : public DataNodeModule<VAL_TYPE, (emp::data) IMODS...> {
     using parent_t = DataNodeModule<VAL_TYPE, (emp::data) IMODS...>;
   };
 
   /// A template that will determing requisites, sort, make unique the data mods provided.
-  /// The final, sorted IntPack of the requisites plus originals is in 'sorted'.
+  /// The final, sorted ValPack of the requisites plus originals is in 'sorted'.
   template<emp::data... MODS>
   struct FormatDataMods {
     using reqs = typename DataModuleRequisiteAdd<MODS...>::type;    ///< Identify requisites

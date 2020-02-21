@@ -1,13 +1,15 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
+ *  @date 2016-2019.
  *
  *  @file vector.h
  *  @brief A drop-in wrapper for std::vector; adds on bounds checking in debug mode.
  *  @note Status: BETA
  *
- *  This class is a drop-in wrapper for std::vector, adding on bounds checking.
+ *  This class is a drop-in wrapper for std::vector, adding on bounds checking, both for the
+ *  indexing operator and for the use of iterators (ensure that iterators do not outlive the
+ *  version of vector for which it was created.)
  *  If EMP_NDEBUG is set then it reverts back to std::vector.
  *
  *  @todo Debug code: member functions that take iterators should also take emp iterators that verify
@@ -78,10 +80,26 @@ namespace emp {
         if (v_ptr == nullptr) { ErrorCode() = "Invalid Vector! (set to nullptr)"; return false; }
         if (v_ptr->revision == 0) { ErrorCode() = "Vector deleted! (revision==0)"; return false; }
         if (revision != v_ptr->revision) { ErrorCode() = "Vector has changed memeory!"; return false; }
-        size_t pos = (size_t) (*this - v_ptr->begin());
-        if (pos > v_ptr->size()) { ErrorCode() = "Iterator out of range."; return false; }
+        int64_t pos = 0;
+        if constexpr (std::is_same<ITERATOR_T, typename stdv_t::reverse_iterator>() ||
+                      std::is_same<ITERATOR_T, typename stdv_t::const_reverse_iterator>()) {
+          // pos = std::distance(*((ITERATOR_T *) this), ((stdv_t *) v_ptr)->rend()) - 1;
+          pos = ((stdv_t *) v_ptr)->rend() - *((ITERATOR_T *) this) - 1;
+        }
+        else {
+          // pos = std::distance(((stdv_t *) v_ptr)->begin(), *((ITERATOR_T *) this));
+          pos = *((ITERATOR_T *) this) - ((stdv_t *) v_ptr)->begin();
+        }
+        if (pos < 0 || ((size_t) pos) > v_ptr->size()) {
+          ErrorCode() = "Iterator out of range.";
+          ErrorCode() += " size=";
+          ErrorCode() += std::to_string(v_ptr->size());
+          ErrorCode() += "  pos=";
+          ErrorCode() += std::to_string(pos);
+          return false;
+        }
         if (!begin_ok && pos == 0) { ErrorCode() = "Iterator not allowed at begin()."; return false; }
-        if (!end_ok && pos == v_ptr->size()) { ErrorCode() = "Iterator not allowed at end()."; return false; }
+        if (!end_ok && ((size_t) pos) == v_ptr->size()) { ErrorCode() = "Iterator not allowed at end()."; return false; }
         return true;
       }
 
@@ -109,21 +127,21 @@ namespace emp {
         return wrapped_t::operator->();
       }
 
-      this_t & operator++() { 
+      this_t & operator++() {
         emp_assert(OK(true,false), ErrorCode());
         wrapped_t::operator++();
         return *this;
       }
-      this_t operator++(int x) { 
+      this_t operator++(int x) {
         emp_assert(OK(true,false), ErrorCode());
         return this_t(wrapped_t::operator++(x), v_ptr);
       }
-      this_t & operator--() { 
+      this_t & operator--() {
         emp_assert(OK(false,true), ErrorCode());
         wrapped_t::operator--();
         return *this;
       }
-      this_t operator--(int x) { 
+      this_t operator--(int x) {
         emp_assert(OK(false,true), ErrorCode());
         return this_t(wrapped_t::operator--(x), v_ptr);
       }
@@ -308,19 +326,18 @@ namespace emp {
     }
   };
 
-}
+  // A crude, generic printing function for vectors.
+  template <typename T, typename... Ts>
+  std::ostream & operator<<(std::ostream & out, const emp::vector<T,Ts...> & v) {
+    for (const T & x : v) out << x << " ";
+    return out;
+  }
 
-// A crude, generic printing function for vectors.
-template <typename T, typename... Ts>
-std::ostream & operator<<(std::ostream & out, const emp::vector<T,Ts...> & v) {
-  for (const T & x : v) out << x << " ";
-  return out;
-}
-
-template <typename T, typename... Ts>
-std::istream & operator>>(std::istream & is, emp::vector<T,Ts...> & v) {
-  for (T & x : v) is >> x;
-  return is;
+  template <typename T, typename... Ts>
+  std::istream & operator>>(std::istream & is, emp::vector<T,Ts...> & v) {
+    for (T & x : v) is >> x;
+    return is;
+  }
 }
 
 #endif

@@ -12,7 +12,7 @@
 #define EMP_WEB_STYLE_H
 
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
 
@@ -86,19 +86,19 @@ namespace web {
       if (settings.size() == 0) return;
 
       // Find the current object only once.
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
       EM_ASM_ARGS({
-          var id = Pointer_stringify($0);
+          var id = UTF8ToString($0);
           emp_i.cur_obj = $( '#' + id );
         }, widget_id.c_str());
 #endif
 
       for (auto css_pair : settings) {
         if (css_pair.second == "") continue; // Ignore empty entries.
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
         EM_ASM_ARGS({
-            var name = Pointer_stringify($0);
-            var value = Pointer_stringify($1);
+            var name = UTF8ToString($0);
+            var value = UTF8ToString($1);
             emp_i.cur_obj.css( name, value);
           }, css_pair.first.c_str(), css_pair.second.c_str());
 #else
@@ -112,11 +112,11 @@ namespace web {
     void Apply(const std::string & widget_id, const std::string & setting) {
       emp_assert(Has(setting));
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
       EM_ASM_ARGS({
-          var id = Pointer_stringify($0);
-          var setting = Pointer_stringify($1);
-          var value = Pointer_stringify($2);
+          var id = UTF8ToString($0);
+          var setting = UTF8ToString($1);
+          var value = UTF8ToString($2);
           $( '#' + id ).css( setting, value);
         }, widget_id.c_str(), setting.c_str(), settings[setting].c_str());
 #else
@@ -128,11 +128,11 @@ namespace web {
     /// Apply onlay a SPECIFIC style setting with a specifid value!
     static void Apply(const std::string & widget_id, const std::string & setting,
                       const std::string & value) {
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
       EM_ASM_ARGS({
-          var id = Pointer_stringify($0);
-          var setting = Pointer_stringify($1);
-          var value = Pointer_stringify($2);
+          var id = UTF8ToString($0);
+          var setting = UTF8ToString($1);
+          var value = UTF8ToString($2);
           $( '#' + id ).css( setting, value);
         }, widget_id.c_str(), setting.c_str(), value.c_str());
 #else

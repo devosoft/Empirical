@@ -104,7 +104,7 @@ namespace emp {
 
     	// Iterate over array, get values, and add them to incoming array.
     	for (i=0; i<$1; i++) {
-    	  curr_array.push(getValue($0+(i*$2), Pointer_stringify($3)));
+        curr_array.push(getValue($0+(i*$2), UTF8ToString($3)));
     	}
     }, &values[0], values.size(), type_size, type_string.c_str(), recursive_el.data());
   }
@@ -135,7 +135,7 @@ namespace emp {
     for (auto val : values) {
       (void) val;
       EM_ASM_ARGS({
-        emp_i.__curr_array.push(Pointer_stringify($0));
+        emp_i.__curr_array.push(UTF8ToString($0));
       }, val.c_str());
     };
 
@@ -194,10 +194,10 @@ namespace emp {
     	      curr_array = curr_array[next_index];
     	    }
 
-    	    if (Pointer_stringify($1) == "string") {
-    	      curr_array[$3][Pointer_stringify($2)] = Pointer_stringify($0);
+    	    if (UTF8ToString($1) == "string") {
+    	      curr_array[$3][UTF8ToString($2)] = UTF8ToString($0);
     	    } else {
-    	      curr_array[$3][Pointer_stringify($2)] = getValue($0, Pointer_stringify($1));
+    	      curr_array[$3][UTF8ToString($2)] = getValue($0, UTF8ToString($1));
     	    }
     	  }, values[j].pointers[i], type_string.c_str(), var_name.c_str(),
     	  j, recursive_el.data());
@@ -314,7 +314,7 @@ namespace emp {
     	var buffer = Module._malloc(emp_i.__outgoing_array.length*$0);
 
     	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-    	  setValue(buffer+(i*$0), emp_i.__outgoing_array[i], Pointer_stringify($1));
+    	  setValue(buffer+(i*$0), emp_i.__outgoing_array[i], UTF8ToString($1));
     	}
 
       return buffer;
@@ -345,7 +345,7 @@ namespace emp {
     	var buffer = Module._malloc(emp_i.__outgoing_array.length*$0);
 
     	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-    	  setValue(buffer+(i*$0), emp_i.__outgoing_array[i], Pointer_stringify($1));
+    	  setValue(buffer+(i*$0), emp_i.__outgoing_array[i], UTF8ToString($1));
     	}
 
     	return buffer;
@@ -379,7 +379,7 @@ namespace emp {
   //       var buffer = Module._malloc(emp_i.__outgoing_array.length*$0);
   //
   //       for (i=0; i<emp_i.__outgoing_array.length; i++) {
-  //         setValue(buffer+(i*$0), emp_i.__outgoing_array[i], Pointer_stringify($1));
+  //         setValue(buffer+(i*$0), emp_i.__outgoing_array[i], UTF8ToString($1));
   //       }
   //
   //       return buffer;
@@ -404,10 +404,11 @@ namespace emp {
     char * buffer = (char *) EM_ASM_INT_V({
     	// Since we're treating each char as it's own string, each one
     	// will be null-termianted. So we malloc length*2 addresses.
-    	var buffer = Module._malloc(emp_i.__outgoing_array.length*2);
+      var new_length = emp_i.__outgoing_array.length*2;
+    	var buffer = Module._malloc(new_length);
 
     	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-    	  writeStringToMemory(emp_i.__outgoing_array[i], buffer+(i*2));
+    	  stringToUTF8(emp_i.__outgoing_array[i], buffer+(i*2),2);
     	}
 
     	return buffer;
@@ -431,7 +432,7 @@ namespace emp {
     	var buffer = Module._malloc(emp_i.__outgoing_array.length*2);
 
     	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-    	  writeStringToMemory(emp_i.__outgoing_array[i], buffer+(i*2));
+    	  stringToUTF8(emp_i.__outgoing_array[i], buffer+(i*2),2);
     	}
 
     	return buffer;
@@ -461,9 +462,11 @@ namespace emp {
 
     	// Track place in memory to write too
     	var cumulative_size = 0;
+      var cur_length = 0;
     	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-    	  writeStringToMemory(emp_i.__outgoing_array[i], buffer + (cumulative_size));
-    	    cumulative_size += emp_i.__outgoing_array[i].length + 1;
+        cur_length = emp_i.__outgoing_array[i].length + 1;
+    	  stringToUTF8(emp_i.__outgoing_array[i], buffer + (cumulative_size), cur_length);
+    	  cumulative_size += cur_length;
     	}
 
     	return buffer;
@@ -494,9 +497,11 @@ namespace emp {
 
     	// Track place in memory to write too
     	var cumulative_size = 0;
+      var cur_length = 0;
     	for (i=0; i<emp_i.__outgoing_array.length; i++) {
-    	  writeStringToMemory(emp_i.__outgoing_array[i], buffer + (cumulative_size));
-    	  cumulative_size += emp_i.__outgoing_array[i].length + 1;
+        cur_length = emp_i.__outgoing_array[i].length + 1;
+    	  stringToUTF8(emp_i.__outgoing_array[i], buffer + (cumulative_size), cur_length);
+    	  cumulative_size += cur_length;
     	}
 
     	return buffer;
@@ -550,7 +555,6 @@ namespace emp {
     if (recurse == 0) {
       EM_ASM({
         emp_i.__temp_array = [emp_i.__outgoing_array];
-        console.log(emp_i.__outgoing_array);
       });
     } else {
       // This is a little wasteful of space, but the alternatives are

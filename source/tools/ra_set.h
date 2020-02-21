@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017
+ *  @date 2017-2019
  *
  *  @file  ra_set.h
  *  @brief This file defines a Random Access Set template.
@@ -13,6 +13,7 @@
 
 #include <map>
 
+#include "../base/map.h"
 #include "../base/vector.h"
 
 namespace emp {
@@ -26,11 +27,11 @@ namespace emp {
   template <typename T>
   class ra_set {
   private:
-    std::map<T,size_t> id_map;  ///< A map of where to find values in vector.
+    emp::map<T,size_t> id_map;  ///< A map of where to find values in vector.
     emp::vector<T> vals;        ///< A vector of all values contained.
 
   public:
-    ra_set() : id_map(), vals() { }
+    ra_set() = default;
     ra_set(const ra_set &) = default;
     ra_set(ra_set &&) = default;
     ra_set<T> & operator=(const ra_set &) = default;

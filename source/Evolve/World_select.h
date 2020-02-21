@@ -93,7 +93,47 @@ namespace emp {
     for (size_t T = 0; T < tourny_count; T++) {
       entries.resize(0);
       // Choose organisms for this tournament (with replacement!)
-      for (size_t i=0; i < t_size; i++) entries.push_back( world.GetRandomOrgID() );
+      for (size_t i=0; i < t_size; i++) entries.push_back(
+        world.GetRandomOrgID()
+      );
+
+      double best_fit = world.CalcFitnessID(entries[0]);
+      size_t best_id = entries[0];
+
+      // Search for a higher fit org in the tournament.
+      for (size_t i = 1; i < t_size; i++) {
+        const double cur_fit = world.CalcFitnessID(entries[i]);
+        if (cur_fit > best_fit) {
+          best_fit = cur_fit;
+          best_id = entries[i];
+        }
+      }
+
+      // Place the highest fitness into the next generation!
+      world.DoBirth( world.GetGenomeAt(best_id), best_id, 1 );
+    }
+  }
+
+  /// ==LOCAL TOURNAMENT== Selection creates a tournament with a random sub-set of organisms that are neighbor to a random organism,
+  /// finds the one with the highest fitness, and moves it to the next generation.
+  /// User provides the world (with a fitness function), the tournament size, and
+  /// (optionally) the number of tournaments to run.
+  /// @param world The emp::World object with the organisms to be selected.
+  /// @param t_size How many organisms should be placed in each tournament?
+  /// @param tourny_count How many tournaments should be run? (with replacement of organisms)
+  template<typename ORG>
+  void LocalTournamentSelect(World<ORG> & world, size_t t_size, size_t tourny_count=1) {
+    emp_assert(t_size > 0, "Cannot have a tournament with zero organisms.", t_size, world.GetNumOrgs());
+    emp_assert(t_size <= world.GetNumOrgs(), "Tournament too big for world.", t_size, world.GetNumOrgs());
+    emp_assert(tourny_count > 0);
+
+    for (size_t T = 0; T < tourny_count; T++) {
+      emp::vector<size_t> entries{world.GetRandomOrgID()};
+
+      // Choose organisms for this tournament (with replacement!)
+      for (size_t i = 1; i < t_size; i++) entries.push_back(
+        world.GetRandomNeighborPos(entries[0]).GetPopID()
+      );
 
       double best_fit = world.CalcFitnessID(entries[0]);
       size_t best_id = entries[0];

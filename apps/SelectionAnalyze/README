@@ -1,0 +1,6 @@
+These files analyze the probability of different organisms being chosen by different
+selection mechanisms.
+
+Input files contain one line for each fitness function (for some selection schemes, only
+a single fitness function is used).  Each column represents the fitness assoicated with
+the associated organisms.

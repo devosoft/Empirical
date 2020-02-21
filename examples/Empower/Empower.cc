@@ -3,7 +3,7 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  Some examples code for using emp::Random
+//  Some examples code for using emp::Empower
 
 #include <iostream>
 

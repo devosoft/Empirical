@@ -1,6 +1,6 @@
 # Flags to use regardless of compiler
 CFLAGS_all := -Wall -Wno-unused-function -I../../source/
-CFLAGS_version := -std=c++14
+CFLAGS_version := -std=c++17
 
 # Emscripten compiler information
 CXX_web := emcc
@@ -19,7 +19,7 @@ CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../source/
 CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
 #CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
-TARGETS := array errors macros Ptr vector
+TARGETS := array errors macros map Ptr vector
 
 BASE := ../../source/base
 

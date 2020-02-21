@@ -188,6 +188,16 @@
   std::array<void *, EMP_COUNT_ARGS(EMP_GET_EVEN_ARGS(__VA_ARGS__))>    \
   pointers{{EMP_WRAP_ARGS(GET_POINTER, EMP_GET_EVEN_ARGS(__VA_ARGS__))}};
 
+namespace emp {
+
+  template <typename T>
+  using n_fields_member_type = decltype(T::n_fields);
+ 
+  template <typename T>
+  constexpr bool is_introspective_tuple() { return test_type_exist<n_fields_member_type, T>(); };
+
+}
+
 /// This varient of the tuple building macro can be used in situations where
 /// access to stringified versions of variable names is necessary.
 /// It stores an array of stringified variable names called var_names in the

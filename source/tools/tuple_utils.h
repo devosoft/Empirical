@@ -14,7 +14,7 @@
 #include <functional>
 #include <tuple>
 
-#include "../meta/IntPack.h"
+#include "../meta/ValPack.h"
 #include "../meta/meta.h"
 
 namespace emp {
@@ -26,22 +26,22 @@ namespace emp {
 
   /// Reorganize the entries in tuple; the provided int pack must specify the new ordering.
   template <typename... Ts, int... Ps>
-  auto shuffle_tuple(const std::tuple<Ts...> & tup, IntPack<Ps...>) {
+  auto shuffle_tuple(const std::tuple<Ts...> & tup, ValPack<Ps...>) {
     return std::make_tuple( std::get<Ps>(tup)... );
   }
 
 
   /// Apply a tuple as arguments to a function, where all argument positions in function are
-  /// specified with and IntPack
+  /// specified with and ValPack
   template < typename FUN_T, typename TUPLE_T, int... N >   // Specify positions to apply...
-  auto ApplyTuple(const FUN_T & fun, const TUPLE_T & tup, IntPack<N...>) {
+  auto ApplyTuple(const FUN_T & fun, const TUPLE_T & tup, ValPack<N...>) {
     return fun(std::get<N>(tup)...);
   }
 
   /// Apply a tuple as arguments to a function, in order.
   template <typename FUN_T, typename TUPLE_T>              // Apply whole tuple
   auto ApplyTuple(const FUN_T & fun, const TUPLE_T & tup) {
-    return ApplyTuple(fun, tup, IntPackRange<0,tuple_size<TUPLE_T>()>());
+    return ApplyTuple(fun, tup, ValPackRange<0,tuple_size<TUPLE_T>()>());
   }
 
 

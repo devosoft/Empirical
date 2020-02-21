@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2020.
  *
  *  @file  bitset_utils.h
  *  @brief A set of simple functions to manipulate bitsets.
@@ -48,34 +48,27 @@ namespace emp {
       ByteCount[  val        & 0xFF ];
   }
 
-  /// Count the number of bits in a 32-bit unsigned integer.
-  inline constexpr size_t count_bits(uint32_t val) {
-    return
-      ByteCount[  val >> 24         ] +
-      ByteCount[ (val >> 16) & 0xFF ] +
-      ByteCount[ (val >>  8) & 0xFF ] +
-      ByteCount[  val        & 0xFF ];
-  }
+  // /// Count the number of bits in a 32-bit unsigned integer.
+  // inline constexpr size_t count_bits(uint32_t val) {
+  //   return
+  //     ByteCount[  val >> 24         ] +
+  //     ByteCount[ (val >> 16) & 0xFF ] +
+  //     ByteCount[ (val >>  8) & 0xFF ] +
+  //     ByteCount[  val        & 0xFF ];
+  // }
 
-  /// Return the position of the first one bit (in a 64-bit unsigned int)
-  inline constexpr size_t find_bit(const uint64_t & val) { return count_bits( (~val) & (val-1) ); }
+  /// Return the position of the first one bit
+  template <typename T>
+  inline constexpr size_t find_bit(T val) { return count_bits( (~val) & (val-1) ); }
 
-  /// Return the position of the first one bit (in a 32-bit unsigned int)
-  inline constexpr size_t find_bit(const uint32_t & val) { return count_bits( (~val) & (val-1) ); }
-
-  /// Return the position of the first one bit AND REMOVE IT (in a 32-bit unsigned int)
-  inline size_t pop_bit(uint32_t & val) {
+  /// Return the position of the first one bit AND REMOVE IT.
+  template <typename T>
+  inline size_t pop_bit(T & val) {
     const size_t pos = find_bit(val);
     val &= ~(1 << pos);
     return pos;
   }
 
-  /// Return the position of the first one bit AND REMOVE IT (in a 64-bit unsigned int)
-  inline size_t pop_bit(uint64_t & val) {
-    const size_t pos = find_bit(val);
-    val &= ~(1 << pos);
-    return pos;
-  }
 
   /*
   // Returns the position of the first set (one) bit or a -1 if none exist.

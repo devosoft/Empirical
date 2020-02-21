@@ -1,15 +1,21 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2017
+ *  @date 2016-2020.
  *
  *  @file  BitVector.h
  *  @brief A drop-in replacement for std::vector<bool>, with additional bitwise logic features.
  *  @note Status: RELEASE
  *
+ *  Compile with -O3 and -msse4.2 for fast bit counting.
+ * 
+ *  @todo Do small BitVector optimization.  Currently we have number of bits (8 bytes) and a
+ *        pointer to the memory for the bitset (another 8 bytes), but we could use those 16 bytes
+ *        as 1 byte of size info followed by 15 bytes of bitset (120 bits!)
+ *  @todo For BitVectors larger than 120 bits, we can use a factory to preserve bit info.
  *  @todo Implement append(), resize()...
  *  @todo Implement techniques to push bits (we have pop)
- *  @todo Implement techniques to insert of remove bits from middle.
+ *  @todo Implement techniques to insert or remove bits from middle.
  *
  *  @note This class is 15-20% slower than emp::BitSet, but more flexible & run-time configurable.
  */
@@ -19,6 +25,7 @@
 #define EMP_BIT_VECTOR_H
 
 #include <iostream>
+#include <bitset>
 
 #include "../base/assert.h"
 #include "../base/Ptr.h"
@@ -27,6 +34,8 @@
 #include "bitset_utils.h"
 #include "functions.h"
 #include "math.h"
+
+
 
 namespace emp {
 
@@ -38,11 +47,10 @@ namespace emp {
 
   class BitVector {
   private:
-#ifdef EMSCRIPTEN
-    using field_t = uint32_t;  ///< Field sizes are 32 bits in Emscripten (max directly handled)
-#else
-    using field_t = uint64_t;  ///< Field sizes are 64 bits in native.
-#endif
+    // For the moment, field_t will always be equal to size_t.  Since size_t is normally the native
+    // size for a processor (and, correctly, 32 bits for Emscripten), this should work in almost all
+    // cases.
+    using field_t = size_t;
 
     static constexpr size_t FIELD_BITS = sizeof(field_t)*8; ///< How many bits are in a field?
     size_t num_bits;                                        ///< How many total bits are we using?
@@ -56,9 +64,6 @@ namespace emp {
 
     /// How many bytes are used in the current vector (round up to whole bytes.)
     size_t NumBytes()  const { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
-
-    /// How many fields would we need if they had the same number of bits as size_t?
-    size_t NumSizeFields() const { return NumFields() * sizeof(field_t) / sizeof(std::size_t); }
 
     /// BitProxy lets us use operator[] on with BitVector as an lvalue.
     struct BitProxy {
@@ -232,12 +237,18 @@ namespace emp {
     /// Copy constructor of existing bit field.
     BitVector(const BitVector & in_set) : num_bits(in_set.num_bits), bit_set(nullptr) {
       #ifdef EMP_TRACK_MEM
-      emp_assert(in_set.bit_set.IsNull() || in_set.bit_set.DebugIsArray(), in_set.bit_set.IsNull(), in_set.bit_set.DebugIsArray());
+      emp_assert(in_set.bit_set.IsNull() || in_set.bit_set.DebugIsArray());
       emp_assert(in_set.bit_set.OK());
       #endif
 
-      if (num_bits) bit_set = NewArrayPtr<field_t>(NumFields());
-      RawCopy(in_set.bit_set);
+      // There is only something to copy if there are a non-zero number of bits!
+      if (num_bits) {
+        #ifdef EMP_TRACK_MEM
+        emp_assert(!in_set.bit_set.IsNull() && in_set.bit_set.DebugIsArray(), in_set.bit_set.IsNull(), in_set.bit_set.DebugIsArray());
+        #endif
+        bit_set = NewArrayPtr<field_t>(NumFields());
+        RawCopy(in_set.bit_set);
+      }
     }
 
     /// Move constructor of existing bit field.
@@ -248,6 +259,12 @@ namespace emp {
       #endif
 
       in_set.bit_set = nullptr;
+      in_set.num_bits = 0;
+    }
+
+    /// Copy, but with a resize.
+    BitVector(const BitVector & in_set, size_t new_size) : BitVector(in_set) {
+      if (num_bits != new_size) Resize(new_size);
     }
 
     /// Destructor
@@ -289,8 +306,18 @@ namespace emp {
       num_bits = in_set.num_bits;         // Update the number of bits...
       bit_set = in_set.bit_set;           // And steal the old memory for what those bits are.
       in_set.bit_set = nullptr;           // Prepare in_set for deletion without deallocating.
+      in_set.num_bits = 0;
 
       return *this;
+    }
+
+    template <typename T>
+    operator emp::vector<T>() {
+      emp::vector<T> out(GetSize());
+      for (size_t i = 0; i < GetSize(); i++) {
+        out[i] = (T) Get(i);
+      }
+      return out;
     }
 
     /// Resize this BitVector to have the specified number of bits.
@@ -376,7 +403,7 @@ namespace emp {
     }
 
     /// Update the bit value at the specified index.
-    void Set(size_t index, bool value=true) {
+    BitVector & Set(size_t index, bool value=true) {
       emp_assert(index < num_bits, index, num_bits);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
@@ -385,14 +412,16 @@ namespace emp {
 
       if (value) bit_set[field_id] |= pos_mask;
       else       bit_set[field_id] &= ~pos_mask;
+
+      return *this;
     }
 
     /// A simple hash function for bit vectors.
     std::size_t Hash() const {
-      const size_t num_sfields = NumSizeFields();
       std::size_t hash_val = 0;
-      for (size_t i = 0; i < num_sfields; i++) {
-        hash_val ^= (bit_set.Cast<std::size_t>())[i];
+      const size_t NUM_FIELDS = NumFields();
+      for (size_t i = 0; i < NUM_FIELDS; i++) {
+        hash_val ^= bit_set[i];
       }
       return hash_val ^ ((97*num_bits) << 8);
     }
@@ -416,16 +445,33 @@ namespace emp {
 
     /// Retrive the 32-bit uint from the specifeid uint index.
     uint32_t GetUInt(size_t index) const {
-      // @CAO Need proper assert for variable bit fields!
-      // emp_assert(index < NumFields());
-      return bit_set.Cast<uint32_t>()[index];
+      // If the fields are already 32 bits, return.
+      if constexpr (sizeof(field_t) == 4) return bit_set[index];
+
+      emp_assert(sizeof(field_t) == 8);
+
+      const size_t field_id = index/2;
+      const size_t field_pos = 1 - (index & 1);
+
+      emp_assert(field_id < NumFields());
+
+      return (uint32_t) (bit_set[field_id] >> (field_pos * 32));
     }
 
     /// Update the 32-bit uint at the specified uint index.
     void SetUInt(size_t index, uint32_t value) {
-      // @CAO Need proper assert for variable bit fields!
-      // emp_assert(index < NumFields());
-      bit_set.Cast<uint32_t>()[index] = value;
+      if constexpr (sizeof(field_t) == 4) bit_set[index] = value;
+
+      emp_assert(sizeof(field_t) == 8);
+
+      const size_t field_id = index/2;
+      const size_t field_pos = 1 - (index & 1);
+      const field_t mask = ((field_t) ((uint32_t) -1)) << (1-field_pos);
+
+      emp_assert(field_id < NumFields());
+
+      bit_set[field_id] &= mask;   // Clear out bits that we are setting.
+      bit_set[field_id] |= ((field_t) value) << (field_pos * 32);
     }
 
     /// Retrive the 32-bit uint at the specified BIT index.
@@ -525,23 +571,24 @@ namespace emp {
       }
       return bit_count;
     }
-
-    /// Count 1's in semi-parallel; fastest for even 0's & 1's
+    // TODO: see https://arxiv.org/pdf/1611.07612.pdf for faster pop counts
     size_t CountOnes_Mixed() const {
-      const size_t NUM_FIELDS = NumFields() * sizeof(field_t)/4;
-      Ptr<const uint32_t> uint_bit_set = bit_set.Cast<const uint32_t>();
+      const field_t NUM_FIELDS = (1 + ((num_bits - 1) / FIELD_BITS));
       size_t bit_count = 0;
       for (size_t i = 0; i < NUM_FIELDS; i++) {
-        const uint32_t v = uint_bit_set[i];
-        const uint32_t t1 = v - ((v >> 1) & 0x55555555);
-        const uint32_t t2 = (t1 & 0x33333333) + ((t1 >> 2) & 0x33333333);
-        bit_count += (((t2 + (t2 >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
-      }
+          // when compiling with -O3 and -msse4.2, this is the fastest population count method.
+          std::bitset<FIELD_BITS> std_bs(bit_set[i]);
+          bit_count += std_bs.count();
+       }
+
       return bit_count;
     }
 
     /// Count the number of ones in the BitVector.
     size_t CountOnes() const { return CountOnes_Mixed(); }
+
+    /// Count the number of zeros in the BitVector.
+    size_t CountZeros() const { return GetSize() - CountOnes(); }
 
     /// Return the position of the first one; return -1 if no ones in vector.
     int FindBit() const {

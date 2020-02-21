@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2017.
+//  Copyright (C) Michigan State University, 2016-2019.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -9,10 +9,10 @@
 #define EMP_CITATION_H
 
 #include <ostream>
-#include <map>
 #include <set>
 #include <string>
 
+#include "../base/map.h"
 #include "../base/vector.h"
 #include "../tools/map_utils.h"
 #include "../tools/string_utils.h"
@@ -30,10 +30,10 @@ namespace emp {
     emp::vector<std::string> notes;   // An optional note.
     std::set<std::string> keywords;   // Optional keywords.
 
-    std::map<std::string, std::string> setting_map;
+    emp::map<std::string, std::string> setting_map;
 
-    static const std::map<std::string, CITE_TYPE> & GetNameMap() {
-      static std::map<std::string, CITE_TYPE> name_map;
+    static const emp::map<std::string, CITE_TYPE> & GetNameMap() {
+      static emp::map<std::string, CITE_TYPE> name_map;
       if (name_map.size() == 0) {
         name_map["unknown"] = UNKNOWN;
         name_map["article"] = ARTICLE;
@@ -54,7 +54,7 @@ namespace emp {
     }
 
     // Name map in opposite direction (enum -> name)
-    static const std::multimap<CITE_TYPE, std::string> & GetRNameMap() {
+    static const emp::multimap<CITE_TYPE, std::string> & GetRNameMap() {
       static const auto rname_map = emp::flip_map(GetNameMap());
       return rname_map;
     }

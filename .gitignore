@@ -1,22 +1,21 @@
 *~
-*.map
-*.o
+*.debug
+*.dSYM
 *.gcov
 *.js.mem
+*.map
+*.mp4
+*.o
+*.out
 *.pyc
 *.swp
 *.swo
-*.dSYM
-*tmp.*
-*.out
-*.debug
-*.mp4
-*.csv
+*.wasm
+*.wast
 *-bak.cc
 *.dat
 *.exe
-*.wasm
-*.wast
+*tmp.*
 
 */env/*
 */3nv/*
@@ -24,6 +23,9 @@
 .DS_Store
 a.out
 a.out.js
+fitness.csv
+population.csv
+systematics.csv
 
 incoming/
 tmp/
@@ -32,11 +34,22 @@ tmp/
 
 apps/Avida/Avida
 apps/Avida/web/Avida.js
+apps/Emphatic/Emphatic
+apps/Emphatic/examples/ConceptTest
+apps/Emphatic/examples/ConceptTest.cc
+apps/MABE/examples/NK
 apps/NK.bak/
 apps/NK/NK
 apps/NK/web/NK.js
+apps/OEE-Breaker/OEE-Breaker
+apps/OpenWorld/OpenWorld
+apps/SelectionAnalyze/Lexicase
+apps/SelectionAnalyze/Roulette
+apps/SelectionAnalyze/out.csv
+apps/SelectionAnalyze/output
 apps/SpatialCoop2017/SimplePDWorld
 apps/SpatialCoop2017/web/SimplePDWorld.js
+apps/StateGrid/StateGrid
 apps/Sudoku/Sudoku.js
 apps/utils/graphs/web/MSS.js
 apps/NK/helloworld.cpp
@@ -60,7 +73,9 @@ examples/*/*
 !examples/*/*.html
 !examples/*/images
 !examples/*/Makefile
+examples/timing/short_strings.html
 
+tests/*.csv
 tests/StatsConfig.cfg
 tests/web/*.js
 tests/web/package.json
@@ -68,6 +83,7 @@ tests/web/node_modules/
 tests/test_file.dat
 
 third-party/doxygen/
+third-party/emsdk/
 build/
 doc/_build/
 

@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2017
+ *  @date 2015-2019
  *
  *  @file serialize.h
  *  @brief Tools to save and load data from classes.
@@ -65,16 +65,15 @@ namespace serialize {
   protected:
     std::ostream * os;
     std::istream * is;
-    bool own_os;
-    bool own_is;
+    bool own_os = false;
+    bool own_is = false;
 
     void ClearData() {
       if (own_os && os) delete os;
       if (own_is && is) delete is;
     }
   public:
-    DataPod(std::ostream & _os, std::istream & _is)
-      : os(&_os), is(&_is), own_os(false), own_is(false) { ; }
+    DataPod(std::ostream & _os, std::istream & _is) : os(&_os), is(&_is) { ; }
     DataPod(std::iostream & _ios) : DataPod(_ios, _ios) { ; }
 
     // Allow move transfer of a DataPod.

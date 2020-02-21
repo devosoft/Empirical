@@ -102,10 +102,10 @@ namespace D3 {
     void SetType(std::string type){
       emp_assert (
         EM_ASM_INT({
-          return d3.symbolTypes.includes(Pointer_stringify($0)) ||
-          window[Pointer_stringify($0)] === "function" ||
-          window["d3"][Pointer_stringify($0)] === "function" ||
-          window["emp"][Pointer_stringify($0)] === "function";
+          return d3.symbolTypes.includes(UTF8ToString($0)) ||
+          window[UTF8ToString($0)] === "function" ||
+          window["d3"][UTF8ToString($0)] === "function" ||
+          window["emp"][UTF8ToString($0)] === "function";
         }, type.c_str())
       );
       D3_CALLBACK_METHOD_1_ARG(type, type.c_str())

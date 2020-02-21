@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2018
+ *  @date 2015-2019
  *
  *  @file  Random.h
  *  @brief A versatile and non-patterned pseudo-random-number generator.
@@ -14,6 +14,7 @@
 #include <ctime>
 #include <climits>
 #include <cmath>
+#include <cstring>
 #include <iterator>
 
 #include "../base/assert.h"
@@ -24,14 +25,14 @@ namespace emp {
   ///  A versatile and non-patterned pseudo-random-number generator (Mersenne Twister).
   class Random {
   protected:
-    int seed;           ///< Current random number seed.
-    int original_seed;  ///< Orignal random number seed when object was first created.
-    int inext;          ///< First position in use in internal state.
-    int inextp;         ///< Second position in use in internal state.
-    int ma[56];         ///< Internal state of RNG
+    int seed = 0;          ///< Current random number seed.
+    int original_seed = 0; ///< Orignal random number seed when object was first created.
+    int inext = 0;         ///< First position in use in internal state.
+    int inextp = 0;        ///< Second position in use in internal state.
+    int ma[56];            ///< Internal state of RNG
 
     // Members & functions for stat functions
-    double expRV; // Exponential Random Variable for the randNormal function
+    double expRV = 0.0;    ///< Exponential Random Variable for the randNormal function
 
     // Constants ////////////////////////////////////////////////////////////////
     // Statistical Approximation
@@ -95,7 +96,7 @@ namespace emp {
      * random number generator gets its seed from a combination of the actual system time and
      * the memory position of the random number generator.
      **/
-    Random(const int _seed = -1) : seed(0), original_seed(0), inext(0), inextp(0), expRV(0) {
+    Random(const int _seed = -1) {
       for (int i = 0; i < 56; ++i) ma[i] = 0;
       ResetSeed(_seed);  // Calls init()
     }
@@ -200,6 +201,58 @@ namespace emp {
     inline uint32_t GetUInt() {
       return ( static_cast<uint32_t>(GetDouble() * 65536.0) << 16 )
              + static_cast<uint32_t>(GetDouble() * 65536.0);
+    }
+
+    /**
+     * Generate a random 64-bit block of bits.
+     *
+     * @return The pseudo random number.
+     **/
+    inline uint64_t GetUInt64() {
+      // @MAM profiled,
+      // this is faster than using RandFill
+      // https://gist.github.com/mmore500/8747e456b949b5b18b3ee85dd9b4444d
+      return ( static_cast<uint64_t>(GetUInt()) << 32 )
+             + static_cast<uint64_t>(GetUInt());
+    }
+
+    /**
+     * Randomize a contiguous segment of memory.
+     **/
+    inline void RandFill(unsigned char* dest, const size_t num_bytes) {
+
+      // go three bytes at a time because we only get
+      // _RAND_MBIG (not quite four bytes) of entropy
+      // from the generator
+
+      // @MAM profiled,
+      // sampling raw bytes and rejecting the region of integer space
+      // that would introduce bias is faster than rescaling using double
+      // multiplication
+      // https://gist.github.com/mmore500/46f3dee11734a8668d60f180cf5d0590
+
+      const uint32_t accept_thresh = (
+        _RAND_MBIG - _RAND_MBIG % 16777216 /* 2^(3*8) */
+      );
+
+      for (size_t byte = 0; byte + 3 < num_bytes; byte += 3) {
+        uint32_t rnd;
+        while (true) {
+          rnd = Get();
+          if (rnd < accept_thresh) break;
+        }
+        std::memcpy(dest+byte, &rnd, 3);
+      }
+
+      if (num_bytes%3) {
+        uint32_t rnd;
+        while (true) {
+          rnd = Get();
+          if (rnd < accept_thresh) break;
+        }
+        std::memcpy(dest+num_bytes-num_bytes%3, &rnd, num_bytes%3);
+      }
+
     }
 
     /**
@@ -371,10 +424,10 @@ namespace emp {
 
     /**
      * By default GetRandBinomial calls the full (non-approximation) version.
-     * 
+     *
      * Note that if approximations are okay, they can create a big speedup
      * for n > 1000.
-     * 
+     *
      * @see Random::GetFullRandBinomial
      * @see Random::GetApproxRandBinomial
      * @see emp::Binomial in source/tools/Binomial.h

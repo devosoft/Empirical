@@ -29,6 +29,7 @@
 #include <sstream>
 
 #include "../base/errors.h"
+#include "../tools/string_utils.h"
 
 namespace emp {
 

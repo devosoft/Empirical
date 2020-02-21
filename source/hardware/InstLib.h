@@ -64,8 +64,8 @@ namespace emp {
 
   public:
     InstLib() : inst_lib(), inst_funs(), name_map(), arg_map() { ; }  ///< Default Constructor
-    InstLib(const InstLib &) = default;                               ///< Copy Constructor
-    InstLib(InstLib &&) = default;                                    ///< Move Constructor
+    InstLib(const InstLib &) = delete;                               ///< Copy Constructor
+    InstLib(InstLib &&) = delete;                                    ///< Move Constructor
     ~InstLib() { ; }                                                  ///< Destructor
 
     InstLib & operator=(const InstLib &) = default;                   ///< Copy Operator
@@ -195,6 +195,14 @@ namespace emp {
           std::cerr << "Unknown argument '" << arg_name << "'.  Ignoring." << std::endl;
         }
         genome.back().args[i] = arg_map[arg_name];
+      }
+    }
+
+    /// Print out summary of instruction library.
+    void PrintManifest(std::ostream & os=std::cout) const {
+      os << "id" << "," << "name" << std::endl;
+      for (size_t i = 0; i < inst_lib.size(); ++i) {
+        os << i << "," << inst_lib[i].name << std::endl;
       }
     }
 

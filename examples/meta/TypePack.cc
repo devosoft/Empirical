@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
+//  Copyright (C) Michigan State University, 2016-2019.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -12,21 +12,21 @@
 #include "meta/TypeID.h"
 #include "meta/TypePack.h"
 
+#define DEBUG_PRINT(X) std::cout << #X << " : " << emp::GetTypeID<X>().GetName() << std::endl
+
 int Sum4(int a, int b, int c, int d) { return a+b+c+d; }
 
 struct HasA { static int A; static std::string TypeID() { return "HasA"; } };
 struct HasA2 { static char A; };
 template <typename T> using MemberA = decltype(T::A);
 
-namespace emp {
-  template<> struct TypeID<HasA2> { static std::string GetName() { return "HasA2"; } };
-}
-
 int main()
 {
+  emp::SetupTypeNames();
+
   using test_t = emp::TypePack<int, std::string, float, bool, double>;
 
-  std::cout << "test_t = " << emp::TypeID<test_t>::GetName() << std::endl;
+  std::cout << "test_t = " << emp::GetTypeID<test_t>().GetName() << std::endl;
 
   std::cout << "Num types = " << test_t::GetSize() << std::endl;
   std::cout << "float pos = " << test_t::GetID<float>() << std::endl;
@@ -66,7 +66,7 @@ int main()
 
 
   using test_A = emp::TypePack<HasA, std::string, bool, HasA2, HasA, int>;
-  std::cout << "test_A = " << emp::TypeID<test_A>::GetName() << std::endl;
+  std::cout << "test_A = " << emp::GetTypeID<test_A>().GetName() << std::endl;
 
   using test_exist = test_A::filter<MemberA>;
   std::cout << "Number that have a member A = " << test_exist::GetSize() << std::endl;
@@ -84,11 +84,25 @@ int main()
   std::cout << "emp::test_type<std::is_integral, HasA2>() = " << emp::test_type<std::is_integral, HasA2>() << std::endl;
 
   using wrap_v_t = test_t::wrap<std::vector>;
-  std::cout << "wrap_v_t = " << emp::TypeID<wrap_v_t>::GetName() << std::endl;
+  std::cout << "wrap_v_t = " << emp::GetTypeID<wrap_v_t>().GetName() << std::endl;
   using wrap_A_t = test_A::wrap<MemberA>;
-  std::cout << "wrap_A_t = " << emp::TypeID<wrap_A_t>::GetName() << std::endl;
+  std::cout << "wrap_A_t = " << emp::GetTypeID<wrap_A_t>().GetName() << std::endl;
 
   std::cout << std::endl;
   using shuffle_t = test_t::select<2,3,4,1,3,3,3,0>;
-  std::cout << "Shuffle with test_t::select<>:" << emp::TypeID<shuffle_t>::GetName() << std::endl;
+  std::cout << "Shuffle with test_t::select<>:" << emp::GetTypeID<shuffle_t>().GetName() << std::endl;
+
+  using tp_size_3_t = emp::TypePack<int, double, bool>;
+  std::cout << "\nTesting combos; tp_size_3_t has " << tp_size_3_t::SIZE << " types: "
+	    << emp::GetTypeID<tp_size_3_t>().GetName() << "\n"
+	    << "Combo size three has " << tp_size_3_t::make_combos<3>::SIZE << " triples:"
+	    << emp::GetTypeID<tp_size_3_t::make_combos<3>>().GetName() << "\n";
+
+  using tmp_t = emp::internal::all_combos<3,tp_size_3_t,tp_size_3_t>;
+  DEBUG_PRINT(tmp_t::next_combos);
+  DEBUG_PRINT(tmp_t::cur_type);
+  DEBUG_PRINT(tmp_t::next_options);
+  DEBUG_PRINT(tmp_t::pushed_types);
+  DEBUG_PRINT(tmp_t::other_results);
+  DEBUG_PRINT(tmp_t::result_t);
 }
