@@ -58,6 +58,10 @@ namespace emp {
   public:
     SettingCombos() = default;
 
+    ~SettingCombos() {
+      for (auto ptr : settings) ptr.Delete();
+    }
+
     void Reset() { for (size_t & x : cur_combo) x = 0; }
 
     template <typename T>
