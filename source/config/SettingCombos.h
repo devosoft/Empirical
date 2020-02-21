@@ -88,6 +88,13 @@ namespace emp {
     }
 
     template <typename T>
+    emp::vector<T> & Values(const std::string & name) {
+      emp_assert(emp::Has(setting_map, name));
+      emp::Ptr<SettingInfo<T>> ptr = setting_map[name].DynamicCast<SettingInfo<T>>();
+      return ptr->values;
+    }
+
+    template <typename T>
     void AddValue(const std::string & name, T && val) {
       emp_assert(emp::Has(setting_map, name));
       emp::Ptr<SettingInfo<T>> ptr = setting_map[name].DynamicCast<SettingInfo<T>>();
