@@ -17,6 +17,8 @@
 
 #include "base/Ptr.h"
 #include "base/vector.h"
+#include "tools/string_utils.h"
+#include "tools/vector_utils.h"
 
 namespace emp {
 
@@ -39,7 +41,7 @@ namespace emp {
         std::stringstream ss;
         for (size_t i; i < values.size(); i++) {
           if (i) ss << ',';
-          ss << value[i];
+          ss << values[i];
         }
         return ss.str();
       }
@@ -51,7 +53,7 @@ namespace emp {
     using set_ptr_t = emp::Ptr<SettingBase>;
 
     emp::vector<set_ptr_t> settings;                           ///< Order to be varied.
-    std::unordered_map<std::string &, set_ptr_t> setting_map;  ///< Settings by name.
+    std::unordered_map<std::string, set_ptr_t> setting_map;  ///< Settings by name.
 
     emp::vector<size_t> cur_combo;    ///< Which settings are we currently using?
 
@@ -67,8 +69,9 @@ namespace emp {
     template <typename T>
     const T & GetValue(const std::string & name) const {
       emp_assert(emp::Has(setting_map, name));
-      emp::Ptr<SettingInfo<T>> ptr = setting_map[name].Cast<SettingInfo<T>>();
-      size_t id = cur_combos[ptr->GetID()];
+      emp::Ptr<SettingBase> base_ptr = setting_map.find(name);
+      emp::Ptr<SettingInfo<T>> ptr = base_ptr.Cast<SettingInfo<T>>();
+      size_t id = cur_combo[ptr->GetID()];
       return ptr->values[id];
     }
 
@@ -85,16 +88,15 @@ namespace emp {
     template <typename T>
     void AddValue(const std::string & name, T && val) {
       emp_assert(emp::Has(setting_map, name));
-      emp::Ptr<SettingInfo<T>> ptr = setting_map[name].Cast<SettingInfo<T>>();
+      emp::Ptr<SettingInfo<T>> ptr = setting_map[name].DynamicCast<SettingInfo<T>>();
       ptr->values.emplace_back(std::forward<T>(val));
     }
 
     template <typename T1, typename... Ts>
-    void AddValues(const std::string & name, T1 && val1, Ts &&... vals) {
+    void SetValues(const std::string & name, T1 && val1, Ts &&... vals) {
       emp_assert(emp::Has(setting_map, name));
-      emp::Ptr<SettingInfo<T1>> ptr = setting_map[name].Cast<SettingInfo<T1>>();
-      ptr->values.emplace_back(std::forward<T1>(val1));
-      ptr->values.emplace_back(std::forward<Ts>(vals))...;
+      emp::Ptr<SettingInfo<T1>> ptr = setting_map[name].DynamicCast<SettingInfo<T1>>();
+      emp::Append(ptr->values, std::forward<T1>(val1), std::forward<Ts>(vals)...);
     }
 
     /// Determine how many unique combinations there currently are.
