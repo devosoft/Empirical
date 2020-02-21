@@ -67,6 +67,21 @@ namespace emp {
       cur_combo.push_back(0);
     }
 
+    template <typename T>
+    void AddValue(const std::string & name, T && val) {
+      emp_assert(emp::Has(setting_map, name));
+      emp::Ptr<SettingInfo<T>> ptr = setting_map[name].Cast<SettingInfo<T>>();
+      ptr->values.emplace_back(std::forward<T>(val));
+    }
+
+    template <typename T1, typename... Ts>
+    void AddValues(const std::string & name, T1 && val1, Ts &&... vals) {
+      emp_assert(emp::Has(setting_map, name));
+      emp::Ptr<SettingInfo<T1>> ptr = setting_map[name].Cast<SettingInfo<T1>>();
+      ptr->values.emplace_back(std::forward<T1>(val1));
+      ptr->values.emplace_back(std::forward<Ts>(vals))...;
+    }
+
     /// Determine how many unique combinations there currently are.
     size_t CountCombos() {
       size_t result = 1;
