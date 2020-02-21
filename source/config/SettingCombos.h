@@ -23,6 +23,8 @@ namespace emp {
   class SettingCombos {
   private:
     struct SettingBase {
+      size_t id;                                       ///< Unique ID/position for this setting.
+
       virtual size_t GetSize() const = 0;              ///< How many values are available?
       virtual std::string AsString() const = 0;        ///< All values, as a single string.
       virtual std::string AsString(size_t) const = 0;  ///< A specified value as a string.
@@ -59,9 +61,18 @@ namespace emp {
     void Reset() { for (size_t & x : cur_combo) x = 0; }
 
     template <typename T>
+    const T & GetValue(const std::string & name) const {
+      emp_assert(emp::Has(setting_map, name));
+      emp::Ptr<SettingInfo<T>> ptr = setting_map[name].Cast<SettingInfo<T>>();
+      size_t id = cur_combos[ptr->GetID()];
+      return ptr->values[id];
+    }
+
+    template <typename T>
     void AddSetting(const std::string & name) {
       emp_assert(!emp::Has(setting_map, name));
       set_ptr_t new_ptr = emp::NewPtr<SettingInfo<T>>;
+      new_ptr->id = settings.size();
       settings.push_back(new_ptr);
       setting_map[name] = new_ptr;
       cur_combo.push_back(0);
