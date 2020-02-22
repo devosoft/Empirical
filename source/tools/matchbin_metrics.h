@@ -129,7 +129,7 @@ namespace emp {
     // adapted from https://www.uncg.edu/cmp/faculty/srtate/580.f11/sha1examples.php
     double operator()(const query_t& a, const tag_t& b) const override {
 
-    std::array<unsigned char, query_t::GetNumBytes()+tag_t::GetNumBytes()> data;
+    std::array<unsigned char, a.GetNumBytes() + b.GetNumBytes()> data;
 
     size_t i = 0;
     for (size_t j = 0; j < a.GetNumBytes(); ++j) data[i++] = a.GetByte(j);
