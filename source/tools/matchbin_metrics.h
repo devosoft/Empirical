@@ -109,6 +109,7 @@ namespace emp {
   };
 
   /// Generate an arbitrary, but consistent, match score between 0 and 1
+  /// Be sure to link against -lcrypto and -lssl
   template<size_t Width>
   struct CryptoHashMetric: public BaseMetric<emp::BitSet<Width>, emp::BitSet<Width>> {
 
