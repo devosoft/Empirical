@@ -2363,15 +2363,15 @@ TEST_CASE("Test matchbin_utils", "[tools]")
   {
     emp::ExactStreakDistribution<4> dist;
 
-    REQUIRE( dist.StreakProbability(2,2) == 0.25 );
-    REQUIRE( dist.StreakProbability(2,3) == 0.375 );
-    REQUIRE( dist.StreakProbability(2,4) == 8.0/16.0 );
+    REQUIRE( dist.GetStreakProbability(2,2) == 0.25 );
+    REQUIRE( dist.GetStreakProbability(2,3) == 0.375 );
+    REQUIRE( dist.GetStreakProbability(2,4) == 8.0/16.0 );
 
-    REQUIRE( dist.StreakProbability(0) == 16.0/16.0 );
-    REQUIRE( dist.StreakProbability(1) == 15.0/16.0 );
-    REQUIRE( dist.StreakProbability(2) == 8.0/16.0 );
-    REQUIRE( dist.StreakProbability(3) == 3.0/16.0 );
-    REQUIRE( dist.StreakProbability(4) == 1.0/16.0 );
+    REQUIRE( dist.GetStreakProbability(0) == 16.0/16.0 );
+    REQUIRE( dist.GetStreakProbability(1) == 15.0/16.0 );
+    REQUIRE( dist.GetStreakProbability(2) == 8.0/16.0 );
+    REQUIRE( dist.GetStreakProbability(3) == 3.0/16.0 );
+    REQUIRE( dist.GetStreakProbability(4) == 1.0/16.0 );
 
   }
 
