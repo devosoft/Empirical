@@ -5,7 +5,7 @@
  *
  *  @file  SettingCombos.h
  *  @brief A tool for exploring all parameter combinations
- *  @note Status: PLANNING
+ *  @note Status: ALPHA
  */
 
 #ifndef EMP_SETTING_COMBOS_H
@@ -21,6 +21,9 @@
 #include "tools/vector_utils.h"
 
 namespace emp {
+
+  /// Class to take a set of value for each "setting" and then step through all combinations of
+  /// those values for a factorial analysis.
 
   class SettingCombos {
   private:
@@ -65,8 +68,10 @@ namespace emp {
       for (auto ptr : settings) ptr.Delete();
     }
 
+    /// Start over stepping through all combinations of parameter values.
     void Reset() { for (size_t & x : cur_combo) x = 0; }
 
+    /// Get the current value of a specified setting.
     template <typename T>
     const T & GetValue(const std::string & name) const {
       emp_assert(emp::Has(setting_map, name));
@@ -76,6 +81,11 @@ namespace emp {
       return ptr->values[id];
     }
 
+    /// Add a new setting of a specified type.  Returns the (initially empty) vector of values 
+    /// to allow easy setting.
+    /// Example:
+    ///   combos.AddSetting("pop_size") = {100,200,400,800};
+    
     template <typename T>
     emp::vector<T> & AddSetting(const std::string & name) {
       emp_assert(!emp::Has(setting_map, name));
@@ -87,6 +97,7 @@ namespace emp {
       return new_ptr->values;
     }
 
+    /// Access ALL values for a specified setting, to be modified freely.
     template <typename T>
     emp::vector<T> & Values(const std::string & name) {
       emp_assert(emp::Has(setting_map, name));
@@ -94,6 +105,7 @@ namespace emp {
       return ptr->values;
     }
 
+    /// Add a single new value to the specified setting.
     template <typename T>
     void AddValue(const std::string & name, T && val) {
       emp_assert(emp::Has(setting_map, name));
@@ -101,6 +113,7 @@ namespace emp {
       ptr->values.emplace_back(std::forward<T>(val));
     }
 
+    /// Set all values for the specified setting.
     template <typename T1, typename... Ts>
     void SetValues(const std::string & name, T1 && val1, Ts &&... vals) {
       emp_assert(emp::Has(setting_map, name));
@@ -132,6 +145,7 @@ namespace emp {
       return false;
     }
 
+    /// Convert all of the current values into a comma-separated string.
     std::string CurString() const {
       std::string out_str;
       for (size_t i = 0; i < cur_combo.size(); i++) {
