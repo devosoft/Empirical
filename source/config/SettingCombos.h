@@ -18,6 +18,7 @@
 #include "../base/Ptr.h"
 #include "../base/vector.h"
 #include "../tools/string_utils.h"
+#include "../tools/map_utils.h"
 #include "../tools/vector_utils.h"
 
 namespace emp {
@@ -93,10 +94,10 @@ namespace emp {
     /// Get the current value of a specified setting.
     template <typename T>
     const T & GetValue(const std::string & name) const {
-      emp_assert(emp::Has(setting_map, name));
+      emp_assert(emp::Has(setting_map, name), name);
       emp::Ptr<SettingBase> base_ptr = setting_map.find(name)->second;
       emp::Ptr<SettingInfo<T>> ptr = base_ptr.Cast<SettingInfo<T>>();
-      size_t id = cur_combo[ptr->GetID()];
+      size_t id = cur_combo[ptr->id];
       return ptr->values[id];
     }
 
