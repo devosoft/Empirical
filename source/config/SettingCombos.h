@@ -166,6 +166,16 @@ namespace emp {
       return false;
     }
 
+    /// Get the set of headers used for the CSV file.
+    std::string GetHeaders() {
+      std::string out_string;
+      for (size_t i = 0; i < settings.size(); i++) {
+        if (i) out_string += ",";
+        out_string += settings[i]->name;
+      }
+      return out_string;
+    }
+
     /// Convert all of the current values into a comma-separated string.
     std::string CurString() const {
       std::string out_str;
