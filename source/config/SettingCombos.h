@@ -15,10 +15,10 @@
 #include <sstream>
 #include <string>
 
-#include "base/Ptr.h"
-#include "base/vector.h"
-#include "tools/string_utils.h"
-#include "tools/vector_utils.h"
+#include "../base/Ptr.h"
+#include "../base/vector.h"
+#include "../tools/string_utils.h"
+#include "../tools/vector_utils.h"
 
 namespace emp {
 
@@ -29,16 +29,31 @@ namespace emp {
   private:
     struct SettingBase {
       size_t id;                                       ///< Unique ID/position for this setting.
+      std::string name;
+      std::string desc;
+      std::string flag;
+      std::string option;
 
+      SettingBase(const std::string & _name, const std::string & _desc, const std::string & _flag)
+        : name(_name), desc(_desc), flag(_flag), option(emp::to_string("--",_name)) { }
       virtual ~SettingBase() { }
-      virtual size_t GetSize() const = 0;              ///< How many values are available?
-      virtual std::string AsString() const = 0;        ///< All values, as a single string.
-      virtual std::string AsString(size_t) const = 0;  ///< A specified value as a string.
+
+      virtual size_t GetSize() const = 0;               ///< How many values are available?
+      virtual std::string AsString() const = 0;         ///< All values, as a single string.
+      virtual std::string AsString(size_t) const = 0;   ///< A specified value as a string.
+      virtual void FromString(const std::string &) = 0; ///< Convert string to range of settings.
+
+      bool IsMatch(const std::string & test_option) const {
+        return test_option == flag || test_option == option;
+      }
     };
 
     template <typename T>
     struct SettingInfo : public SettingBase {
       emp::vector<T> values;
+
+      SettingInfo(const std::string & _name, const std::string & _desc, const std::string & _flag)
+        : SettingBase(_name, _desc, _flag) { }
 
       size_t GetSize() const override { return values.size(); }
       std::string AsString() const override {
@@ -51,6 +66,10 @@ namespace emp {
       }
       std::string AsString(size_t id) const override {
         return emp::to_string(values[id]);
+      }
+
+      void FromString(const std::string & input) override {
+        values = emp::from_strings<T>(emp::slice(input, ','));
       }
     };
 
@@ -75,7 +94,7 @@ namespace emp {
     template <typename T>
     const T & GetValue(const std::string & name) const {
       emp_assert(emp::Has(setting_map, name));
-      emp::Ptr<SettingBase> base_ptr = setting_map.find(name);
+      emp::Ptr<SettingBase> base_ptr = setting_map.find(name)->second;
       emp::Ptr<SettingInfo<T>> ptr = base_ptr.Cast<SettingInfo<T>>();
       size_t id = cur_combo[ptr->GetID()];
       return ptr->values[id];
@@ -85,11 +104,13 @@ namespace emp {
     /// to allow easy setting.
     /// Example:
     ///   combos.AddSetting("pop_size") = {100,200,400,800};
-    
+
     template <typename T>
-    emp::vector<T> & AddSetting(const std::string & name) {
+    emp::vector<T> & AddSetting(const std::string & name,
+                                const std::string & desc="",
+                                const std::string & option_flag="") {
       emp_assert(!emp::Has(setting_map, name));
-      emp::Ptr<SettingInfo<T>> new_ptr = emp::NewPtr<SettingInfo<T>>();
+      emp::Ptr<SettingInfo<T>> new_ptr = emp::NewPtr<SettingInfo<T>>(name, desc, option_flag);
       new_ptr->id = settings.size();
       settings.push_back(new_ptr);
       setting_map[name] = new_ptr;
@@ -155,6 +176,35 @@ namespace emp {
       return out_str;
     }
 
+    /// Scan through all settings for a match option and return ID.
+    size_t FindOptionMatch(const std::string & option_name) {
+      for (const auto & setting : settings) {
+        if (setting->IsMatch(option_name)) return setting->id;
+      }
+      return (size_t) -1;
+    }
+
+    /// Take an input set of config options, process them, and return set of unpressed ones.
+    emp::vector<std::string> ProcessOptions(const emp::vector<std::string> & args) {
+      emp::vector<std::string> out_args;
+
+      for (size_t i = 0; i < args.size(); i++) {
+        size_t id = FindOptionMatch(args[i]);
+        if (id < settings.size()) {
+          if (++i >= args.size()) {
+            std::cout << "ERROR: Must provide args to use!\n";          
+            // @CAO Need to signal error...
+            return args;
+          }
+          settings[id]->FromString(args[i]);
+        }
+
+        // Otherwise this argument will go unused; send it back.
+        else out_args.push_back(args[i]);
+      }
+
+      return out_args;
+    }
   };
 
 }
