@@ -26,11 +26,16 @@ namespace emp {
     bool value;
 
   public:
-      Bool(const Bool & b) : value(b.value) { }
+      // Bool(const Bool & b) : value(b.value) { }
+      Bool(bool b=false) : value(b) { }
       Bool & operator=(bool b) { value = b; return *this; }
 
       /// Conversion of this proxy to Boolean (as an rvalue)
       operator bool() const { return value; }
+
+      // Conversion to a bool reference.
+      bool & Value() { return value; }
+      bool Value() const { return value; }
 
       /// Compound assignement operators using Bool as lvalue.
       Bool & operator &=(bool b) { value &= b; return *this; }
@@ -38,13 +43,19 @@ namespace emp {
       Bool & operator ^=(bool b) { value ^= b; return *this; }
       Bool & operator +=(bool b) { value += b; return *this; }
       Bool & operator -=(bool b) { value -= b; return *this; }
-      Bool & operator *=(bool b) { value *= b; return *this; }
-      Bool & operator /=(bool b) {  emp_assert(b == true);  value /= b; return *this; }
+      Bool & operator *=(bool b) { value = value && b; return *this; }
+      Bool & operator /=(bool b) { emp_assert(b == true); return *this; }
     };
 
 }
 
 namespace std {
+
+  /// Setup operator<< to work with ostream (must be in std to work)
+  inline std::istream & operator>>(std::istream & out, const emp::Bool & b) {
+    out >> b.Value();
+    return out;
+  }
 
   /// Setup operator<< to work with ostream (must be in std to work)
   inline std::ostream & operator<<(std::ostream & out, const emp::Bool & b) {
