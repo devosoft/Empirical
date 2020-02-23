@@ -1,0 +1,57 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ *
+ *  @file  Bool.h
+ *  @brief A bool representation that doesn't trip up std::vector
+ *  @note Status: ALPHA
+ *
+ */
+
+
+#ifndef EMP_BOOL_H
+#define EMP_BOOL_H
+
+#include <iostream>
+
+#include "../base/assert.h"
+
+namespace emp {
+
+  /// @brief A simple replacement for bool type that doesn't trip up std::vector
+
+  class Bool {
+  private:
+    bool value;
+
+  public:
+      Bool(const Bool & b) : value(b.value) { }
+      Bool & operator=(bool b) { value = b; return *this; }
+
+      /// Conversion of this proxy to Boolean (as an rvalue)
+      operator bool() const { return value; }
+
+      /// Compound assignement operators using Bool as lvalue.
+      Bool & operator &=(bool b) { value &= b; return *this; }
+      Bool & operator |=(bool b) { value |= b; return *this; }
+      Bool & operator ^=(bool b) { value ^= b; return *this; }
+      Bool & operator +=(bool b) { value += b; return *this; }
+      Bool & operator -=(bool b) { value -= b; return *this; }
+      Bool & operator *=(bool b) { value *= b; return *this; }
+      Bool & operator /=(bool b) {  emp_assert(b == true);  value /= b; return *this; }
+    };
+
+}
+
+namespace std {
+
+  /// Setup operator<< to work with ostream (must be in std to work)
+  inline std::ostream & operator<<(std::ostream & out, const emp::Bool & b) {
+    out << (bool) b;
+    return out;
+  }
+
+}
+
+#endif
