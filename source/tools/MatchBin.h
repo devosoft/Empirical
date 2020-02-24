@@ -177,6 +177,7 @@ namespace emp {
       typename Selector::cache_state_type_t
     > cache_raw; // cache of raw scores
 
+  public:
     Metric metric;
     Selector selector;
 
