@@ -29,11 +29,11 @@
 
 #include "data/DataNode.h"
 
-#include "tools/Binomial.h"
 #include "tools/BitMatrix.h"
 #include "tools/BitSet.h"
 #include "tools/BitVector.h"
 #include "tools/ContiguousStream.h"
+#include "tools/Distribution.h"
 #include "tools/DFA.h"
 #include "tools/DynamicString.h"
 #include "tools/FunctionSet.h"
