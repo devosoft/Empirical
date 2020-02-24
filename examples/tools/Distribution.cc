@@ -3,11 +3,11 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
-//  Some examples code for using emp::Binomial
+//  Some examples code for using emp::Distribution are derived classes.
 
 #include <iostream>
 #include "tools/Random.h"
-#include "tools/Binomial.h"
+#include "tools/Distribution.h"
 
 int main()
 {
@@ -40,4 +40,17 @@ int main()
 	    << (((double) total) / (double) test_count)
 	    << std::endl;
 
+  
+  //emp::NegativeBinomial nbi10(0.5, 2);
+  emp::NegativeBinomial nbi10(0.3, 10);
+
+  std::cout << "\n-- Negative Binomial--\n";
+
+  std::cout << "size = " << nbi10.GetSize() << std::endl
+	    << "total_prob = " << nbi10.GetTotalProb() << std::endl;
+
+  // for (size_t i = 0; i < 10; i++) {
+  for (size_t i = 9; i < 40; i++) {
+    std::cout << "nbi10[" << i << "] = " << nbi10[i] << "\n";
+  }
 }
