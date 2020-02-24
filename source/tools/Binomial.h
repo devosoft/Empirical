@@ -3,16 +3,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018-2020.
  *
- *  @file  Binomial.h
- *  @brief A heavy-weight binomial distribution that can quickly generate random values.
+ *  @file  Distribution.h
+ *  @brief A set of pre-calculated discrete distributions that can quickly generate random values.
  *  @note Status: ALPHA
  *
- *  @todo Consider converting this class to a more generic Distribution class
- *        (though technically it will only work with discrete distributions.)
  */
 
-#ifndef EMP_BINOMIAL_H
-#define EMP_BINOMIAL_H
+#ifndef EMP_DISTRIBUTION_H
+#define EMP_DISTRIBUTION_H
 
 #include "Random.h"
 #include "UnorderedIndexMap.h"
@@ -33,6 +31,7 @@ namespace emp {
     }
   };
 
+  /// How many successes with p probability and N attempts?
   class Binomial : public Distribution {
   public:
     Binomial(double p, size_t N) {
@@ -50,6 +49,38 @@ namespace emp {
         }
         weights.Adjust(k, prob);
       }
+    }
+
+  };
+
+  /// How many attemtps to reach N successes, assumming p probability per attempt?
+  class NegativeBinomial : public Distribution {
+  public:
+    NegativeBinomial(double p, size_t N) {
+      emp_assert(p > 0.0 && p <= 1.0, p);
+      emp_assert(N > 0, N);
+ 
+      // Track the probability of each number of successes at each point in time.
+      emp::vector<double> cur_probs(N, 0.0);
+      cur_probs[0] = 1.0;        // Initially we start with zero successes.
+      double found_probs = 0.0;  // Tally the total probability found so far.
+      double q = 1.0 - p;        // Probability of failure.
+
+      emp::vector<double> outcome_probs(1, 0.0);
+
+      while (found_probs < 0.999999 || cur_probs[N-1] > 0.0000000001) {
+        double next_prob = cur_probs[N-1] * p;  // Probability of being one short + new success!
+        outcome_probs.push_back(next_prob);
+        found_probs += next_prob;
+
+        // Update all of the other probabilities.
+        for (size_t i = N-1; i > 0; i--) {
+          cur_probs[i] = cur_probs[i] * q + cur_probs[i-1] * p;
+        }
+        cur_probs[0] = cur_probs[0] * q;
+      }
+
+      weights.Adjust(outcome_probs);
     }
 
   };
