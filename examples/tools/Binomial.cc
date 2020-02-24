@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2018.
+//  Copyright (C) Michigan State University, 2018-2020.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -27,4 +27,17 @@ int main()
     std::cout << " " << bi1000.PickRandom(random);
   }
   std::cout << std::endl;
+
+  // And total some more random picks (to take a bit of time).
+  size_t total = 0;
+  const size_t test_count = 10000000;
+  
+  for (size_t i = 0; i < test_count; i++) {
+    total += bi1000.PickRandom(random);
+  }
+
+  std::cout << "Average of " << test_count << " = "
+	    << (((double) total) / (double) test_count)
+	    << std::endl;
+
 }
