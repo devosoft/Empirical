@@ -414,7 +414,7 @@ namespace emp {
   /// Mutate bits, return how many mutations were performed
   size_t Mutate(
     Random & random,
-    const size_t num_muts, // hint: use tools/Binomial.h with this part
+    const size_t num_muts, // @CAO: use tools/Binomial in Distribution.h with this part?
     const size_t min_idx=0 // draw this from a distribution to make some
                            // bits more volatile than others
   ) {
