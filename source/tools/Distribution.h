@@ -33,8 +33,22 @@ namespace emp {
 
   /// How many successes with p probability and N attempts?
   class Binomial : public Distribution {
+  private:
+    double p = 0.0;
+    size_t N = 0;
+
   public:
-    Binomial(double p, size_t N) {
+    Binomial(double _p, size_t _N) { Setup(_p, _N); }
+
+    double GetP() { return p; }
+    double GetN() { return N; }
+
+    void Setup(double _p, size_t _N) {
+      // If we're not changing these values, it's already setup!
+      if (p == _p && N == _N) return;
+
+      p = _p;
+      N = _N;
       weights.Resize(N+1);
       // p^k * (1-p)^(N-k) * N!/k!(N-k)!
 
@@ -55,8 +69,22 @@ namespace emp {
 
   /// How many attemtps to reach N successes, assumming p probability per attempt?
   class NegativeBinomial : public Distribution {
+  private:
+    double p = 0.0;
+    size_t N = 0;
+
   public:
-    NegativeBinomial(double p, size_t N) {
+    NegativeBinomial(double _p, size_t _N) { Setup(_p, _N); }
+
+    double GetP() { return p; }
+    double GetN() { return N; }
+
+    void Setup(double _p, size_t _N) {
+      // If we're not changing these values, it's already setup!
+      if (p == _p && N == _N) return;
+
+      p = _p;
+      N = _N;
       emp_assert(p > 0.0 && p <= 1.0, p);
       emp_assert(N > 0, N);
  
