@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018
+ *  @date 2018-2020.
  *
  *  @file  Binomial.h
  *  @brief A heavy-weight binomial distribution that can quickly generate random values.
@@ -19,11 +19,24 @@
 
 namespace emp {
 
-  class Binomial {
-  private:
+  class Distribution {
+  protected:
     UnorderedIndexMap weights;
+
   public:
-    Binomial(double p, size_t N) : weights(N+1) {
+    size_t GetSize() const { return weights.GetSize(); }
+    double GetTotalProb() const { return weights.GetWeight(); }
+    double operator[](size_t id) const { return weights.GetWeight(id); }
+
+    size_t PickRandom(Random & random) const {
+      return weights.Index( random.GetDouble(GetTotalProb()) );
+    }
+  };
+
+  class Binomial : public Distribution {
+  public:
+    Binomial(double p, size_t N) {
+      weights.Resize(N+1);
       // p^k * (1-p)^(N-k) * N!/k!(N-k)!
 
       // Loop through all of the results and calculate their probabilities.
@@ -39,12 +52,6 @@ namespace emp {
       }
     }
 
-    double GetTotalProb() const { return weights.GetWeight(); }
-    double operator[](size_t id) const { return weights.GetWeight(id); }
-
-    size_t PickRandom(Random & random) const {
-      return weights.Index( random.GetDouble(GetTotalProb()) );
-    }
   };
 
 }
