@@ -14,7 +14,7 @@ TEST_CASE("Test Lexer", "[tools]")
   REQUIRE(lx.GetNumTokens() == 1);
   REQUIRE(lx.GetTokenID("vowel") == 255);
   REQUIRE(lx.GetTokenName(255) == "vowel");
-  REQUIRE(lx.MaxTokenID() == 256);
+  // REQUIRE(lx.MaxTokenID() == 256);
   REQUIRE(!lx.TokenOK(257));
   
   std::string word = "hello";
