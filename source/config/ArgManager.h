@@ -576,7 +576,7 @@ namespace emp {
       }
 
     }
-     
+
     // Argspecs with a string including flags separated by '|' are turned
     // into one argspec with a list of aliases
     // example input: specs[“—help|-h”] = ArgSpec a with a.aliases = {}
