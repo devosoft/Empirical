@@ -21,6 +21,11 @@ namespace emp {
     uint64_t a = a_, b = b_;
     return a >= b ? a * a + a + b : a + b * b;
   }
+  //https://www.boost.org/doc/libs/1_37_0/doc/html/hash/reference.html#boost.hash_combine
+  constexpr inline std::size_t hash_combine(std::size_t hash1, std::size_t hash2)
+  {
+    return hash1 ^ (hash2 * 0x9e3779b9 + (hash1 << 6) + (hash1 >> 2));
+  }
 
 }
 

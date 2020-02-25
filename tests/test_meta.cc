@@ -30,9 +30,6 @@ template <typename A, typename B>
 struct MetaTestClass { A a; B b; };
 
 int Sum4(int a, int b, int c, int d) { return a+b+c+d; }
-namespace emp {
-  template<> struct TypeID<HasA2> { static std::string GetName() { return "HasA2"; } };
-}
 
 
 
@@ -106,12 +103,14 @@ TEST_CASE("Test reflection", "[meta]")
 
 TEST_CASE("Test TypeID", "[meta]")
 {
+  emp::SetupTypeNames();
+
   // Test GetTypeValue
-  size_t int_value = emp::GetTypeValue<int>();
-  size_t char_value = emp::GetTypeValue<char>();
-  size_t str_value = emp::GetTypeValue<std::string>();
-  size_t int_value2 = emp::GetTypeValue<int>();
-  size_t bool_value = emp::GetTypeValue<bool>();
+  size_t int_value = emp::GetTypeID<int>();
+  size_t char_value = emp::GetTypeID<char>();
+  size_t str_value = emp::GetTypeID<std::string>();
+  size_t int_value2 = emp::GetTypeID<int>();
+  size_t bool_value = emp::GetTypeID<bool>();
 
   // Make sure that we are generating unique values for types.
   REQUIRE(int_value != char_value);
@@ -125,22 +124,51 @@ TEST_CASE("Test TypeID", "[meta]")
   REQUIRE (int_value == int_value2);
 
   // Check TypeID strings...
-  REQUIRE(emp::TypeID<char>::GetName() == "char");
-  REQUIRE(emp::TypeID<void>::GetName() == "void");
-  REQUIRE(emp::TypeID<int>::GetName() == "int32_t");
-  REQUIRE(emp::TypeID<std::string>::GetName() == "std::string");
+  REQUIRE(emp::GetTypeID<char>().GetName() == "char");
+  REQUIRE(emp::GetTypeID<void>().GetName() == "void");
+  REQUIRE(emp::GetTypeID<int>().GetName() == "int32_t");
+  REQUIRE(emp::GetTypeID<std::string>().GetName() == "std::string");
 
-  REQUIRE((emp::TypeID<emp::array<double,7>>::GetName()) == ("emp::array<double,7>"));
-  REQUIRE(emp::TypeID<emp::vector<double>>::GetName() == "emp::vector<double>");
+  // Check on qualities.
+  REQUIRE(emp::GetTypeID<int>().IsConst() == false);
+  REQUIRE(emp::GetTypeID<const int>().IsConst() == true);
 
-  REQUIRE(emp::TypeID<char*>::GetName() == "char*");
+  REQUIRE(emp::GetTypeID<char>().IsClass() == false);
+  REQUIRE(emp::GetTypeID<std::string>().IsClass() == true);
+  REQUIRE(emp::GetTypeID<HasA>().IsClass() == true);
 
+  REQUIRE(emp::GetTypeID<char>().IsReference() == false);
+  REQUIRE(emp::GetTypeID<char*>().IsReference() == false);
+  REQUIRE(emp::GetTypeID<char&>().IsReference() == true);
+  REQUIRE(emp::GetTypeID<emp::Ptr<char>>().IsReference() == false);
+
+  REQUIRE(emp::GetTypeID<char>().IsPointer() == false);
+  REQUIRE(emp::GetTypeID<char*>().IsPointer() == true);
+  REQUIRE(emp::GetTypeID<char&>().IsPointer() == false);
+  REQUIRE(emp::GetTypeID<emp::Ptr<char>>().IsPointer() == true);
+
+    // bool IsArray() { return (info_ptr) ? info_ptr->is_array : false; }
+    // bool IsAbstract() { return (info_ptr) ? info_ptr->is_abstract : false; }
+
+ 
+  //REQUIRE((emp::GetTypeID<emp::array<double,7>>().GetName()) == ("emp::array<double,7>"));
+  //REQUIRE(emp::GetTypeID<emp::vector<double>>().GetName() == "emp::vector<double>");
+
+  REQUIRE(emp::GetTypeID<char*>().GetName() == "char*");
+  REQUIRE(emp::GetTypeID<const int>().GetName() == "const int32_t");
+
+  emp::vector<emp::TypeID> type_ids = emp::GetTypeIDs<int, char, int, std::string>();
+  REQUIRE(type_ids.size() == 4);
+  REQUIRE(type_ids[0].GetID() == type_ids[2].GetID());
+  REQUIRE(type_ids[0].GetID() == int_value);
+  REQUIRE(type_ids[1].GetID() == char_value);
+  REQUIRE(type_ids[3].GetID() == str_value);
 }
 
 TEST_CASE("Test TypePack", "[meta]")
 {
   using test_t = emp::TypePack<int, std::string, float, bool, double>;
-  REQUIRE(emp::TypeID<test_t>::GetName() == "emp::TypePack<int32_t,std::string,float,bool,double>");
+  // REQUIRE(emp::GetTypeID<test_t>().GetName() == "emp::TypePack<int32_t,std::string,float,bool,double>");
   REQUIRE(test_t::GetSize() == 5);
   REQUIRE(test_t::GetID<float>() == 2);
   REQUIRE(test_t::add<long long>::GetSize() == 6);
@@ -182,7 +210,7 @@ TEST_CASE("Test TypePack", "[meta]")
   REQUIRE(test_remove::GetSize() == 4);
 
   using test_A = emp::TypePack<HasA, std::string, bool, HasA2, HasA, int>;
-  REQUIRE(emp::TypeID<test_A>::GetName() == "emp::TypePack<HasA,std::string,bool,HasA2,HasA,int32_t>");
+  // REQUIRE(emp::GetTypeID<test_A>().GetName() == "emp::TypePack<HasA,std::string,bool,HasA2,HasA,int32_t>");
 
   using test_exist = test_A::filter<MemberA>;
   REQUIRE(test_exist::GetSize() == 3);
@@ -190,14 +218,14 @@ TEST_CASE("Test TypePack", "[meta]")
   using test_print = test_exist::set<1,int>;
   REQUIRE(test_print::Count<int>() == 1);
 
-  using wrap_v_t = test_t::wrap<emp::vector>;
-  REQUIRE(emp::TypeID<wrap_v_t>::GetName() == "emp::TypePack<emp::vector<int32_t>,emp::vector<std::string>,emp::vector<float>,emp::vector<bool>,emp::vector<double>>");
+  // using wrap_v_t = test_t::wrap<emp::vector>;
+  // REQUIRE(emp::GetTypeID<wrap_v_t>().GetName() == "emp::TypePack<emp::vector<int32_t>,emp::vector<std::string>,emp::vector<float>,emp::vector<bool>,emp::vector<double>>");
 
-  using wrap_A_t = test_A::wrap<MemberA>;
-  REQUIRE(emp::TypeID<wrap_A_t>::GetName() == "emp::TypePack<int32_t,char,int32_t>");
+  // using wrap_A_t = test_A::wrap<MemberA>;
+  // REQUIRE(emp::GetTypeID<wrap_A_t>().GetName() == "emp::TypePack<int32_t,char,int32_t>");
 
-  using shuffle_t = test_t::select<2,3,4,1,3,3,3,0>;
-  REQUIRE(emp::TypeID<shuffle_t>::GetName() == "emp::TypePack<float,bool,double,std::string,bool,bool,bool,int32_t>");
+  // using shuffle_t = test_t::select<2,3,4,1,3,3,3,0>;
+  // REQUIRE(emp::GetTypeID<shuffle_t>().GetName() == "emp::TypePack<float,bool,double,std::string,bool,bool,bool,int32_t>");
 
 
   using dup_test_t = emp::TypePack<int, int, double, int, double, std::string, bool, int, char, int>;
