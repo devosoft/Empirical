@@ -216,7 +216,7 @@ namespace emp {
         // try looking at each of the characters
         for (const char ch : deflag) {
           if (alias_map.count( std::string{ch} )) {
-            std::cout << "made it inside!" << std::endl;
+
             // check that the command does not take arguments
             assert(
               specs.find(alias_map.find(
