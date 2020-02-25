@@ -26,7 +26,9 @@
 #include <utility>
 #include <queue>
 
+#ifndef __EMSCRIPTEN__
 #include <openssl/sha.h>
+#endif
 
 #include "tools/Binomial.h"
 
@@ -108,6 +110,7 @@ namespace emp {
 
   };
 
+  #ifndef __EMSCRIPTEN__
   /// Generate an arbitrary, but consistent, match score between 0 and 1
   /// Be sure to link against -lcrypto and -lssl
   template<size_t Width>
@@ -155,6 +158,7 @@ namespace emp {
   }
 
   };
+  #endif
 
   /// Metric gives the absolute difference between two integers
   struct AbsDiffMetric : public BaseMetric<int, int> {
