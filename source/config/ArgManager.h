@@ -116,10 +116,12 @@ namespace emp {
 
   /// Manager for command line arguments and URL query params.
   class ArgManager {
+
   public:
     using pack_t = emp::vector<std::string>;
     using pack_map_t = std::multimap<std::string, pack_t>;
     using spec_map_t = std::unordered_map<std::string, ArgSpec>;
+
   private:
     // the actual data collected
     pack_map_t packs;
@@ -176,13 +178,12 @@ namespace emp {
       }(), "duplicate aliases detected");
 
       // lookup table with leading dashes stripped
+      // this is an immediately-invoked lambda
       const pack_t deflagged = [&args](){
         auto res = args;
         for (size_t i = 0; i < args.size(); ++i) {
 
-		  // without +1 this line would cause an initial non-dashed argument
-      // to be treated as a literal
-		  const size_t dash_stop = args[i].find_first_not_of('-');
+          const size_t dash_stop = args[i].find_first_not_of('-');
           if (dash_stop == 0) {
             // nop
           } else if (dash_stop < args[i].size()) {
@@ -195,6 +196,7 @@ namespace emp {
             break;
           }
           // " ", -, ---, ----, etc. left in place and treated as non-flags
+
         }
         return res;
       }();
@@ -252,49 +254,53 @@ namespace emp {
 
       for(size_t i = 1; i < args.size(); ++i) {
 
+        // there *could* be multiple commands contained
+        // if the user passed something a la tar -czvf
+        // so we loop through them one-by-one
         const pack_t & commands = parse_alias(i);
 
         for (const auto & command : commands) {
-        // if command is unknown
-        // and user hasn't provided an ArgSpec for unknown commands
-        if (command == "_unknown" && !specs.count("_unknown")) {
-          res.insert({
-              "_unknown",
-              { args[i] }
-          });
-          continue;
-        }
 
-        const ArgSpec & spec = specs.find(command)->second;
-
-        // fast forward to grab all the words for this argument pack
-        size_t j;
-        for (j = i;
-             j < args.size()
-              && j - i < spec.most_quota
-              && (spec.gobble_flags
-                   || !( j+1 < args.size() )
-                   || deflagged[j+1] == args[j+1]
-                 );
-             ++j
-            );
-
-        // store the argument pack
-        res.insert(
-          {
-            command,
-            pack_t(
-              std::next(
-                std::begin(args),
-                command == "_positional" || command == "_unknown" ? i : i+1
-              ),
-              j+1 < args.size() ? std::next(std::begin(args), j+1) : std::end(args)
-            )
+          // if command is unknown
+          // and user hasn't provided an ArgSpec for unknown commands
+          if (command == "_unknown" && !specs.count("_unknown")) {
+            res.insert({
+                "_unknown",
+                { args[i] }
+            });
+            continue;
           }
-        );
-			i = j;
 
-		}
+          const ArgSpec & spec = specs.find(command)->second;
+
+          // fast forward to grab all the words for this argument pack
+          size_t j;
+          for (
+            j = i;
+            j < args.size()
+              && j - i < spec.most_quota
+              && (
+                spec.gobble_flags
+                || !( j+1 < args.size() )
+                || deflagged[j+1] == args[j+1]
+            );
+            ++j
+          );
+
+          // store the argument pack
+          res.insert({
+              command,
+              pack_t(
+                std::next(
+                  std::begin(args),
+                  command == "_positional" || command == "_unknown" ? i : i+1
+                ),
+                j+1 < args.size() ? std::next(std::begin(args), j+1) : std::end(args)
+              )
+          });
+          i = j;
+
+		    }
 
       }
 
