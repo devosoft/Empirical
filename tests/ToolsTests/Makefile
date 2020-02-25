@@ -20,7 +20,7 @@ test-prep:
 test-%: test_%.cc
 	$(CXX) $(FLAGS) $< -o $@.out
 	# execute test
-	./$@.out
+	gdb -batch -ex "run" -ex "bt" ./$@.out
 
 # Test in debug mode without pointer tracker
 test: test-prep $(addprefix test-, $(TEST_NAMES))
