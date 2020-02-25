@@ -43,6 +43,10 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h')", "[hardware]")
   hardware_t hw1(&inst_lib, &event_lib, &random);
   hardware_t hw2(&inst_lib, &event_lib, &random);
 
+  // Spin up main cores (used to be handled in constructor)
+  hw1.SpawnCore(0);
+  hw2.SpawnCore(0);
+
   // Configure the hardware.
   hw1.SetMinBindThresh(HW_MIN_SIM_THRESH);
   hw1.SetMaxCores(HW_MAX_THREADS);
@@ -492,6 +496,7 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPProgram", "
   // We'll use some SignalGP hardware to test randomly generated programs.
   event_lib_t event_lib;
   hardware_t hw(&inst_lib, &event_lib, &random);
+  hw.SpawnCore(0); // Spin up main cores (used to be handled in constructor)
   hw.SetMinBindThresh(HW_MIN_SIM_THRESH);
   hw.SetMaxCores(HW_MAX_THREADS);
   hw.SetMaxCallDepth(HW_MAX_CALL_DEPTH);
@@ -721,6 +726,7 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: SignalGP MatchBin Cache", 
 
   // Let's make two SignalGP virtual hardwares: 2 with 16-bit tags
   hardware_t hw1(&inst_lib, &event_lib, &random);
+  hw1.SpawnCore(0); // Spin up main cores (used to be handled in constructor)
 
   REQUIRE(hw1.GetMatchBin().Size() == 0);
 
