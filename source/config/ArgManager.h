@@ -97,13 +97,21 @@ namespace emp {
   // compares member variables of lhs and rhs, ignoring callback functions
   // useful for tests
   bool operator==(const ArgSpec& lhs, const ArgSpec& rhs) {
-    if (lhs.most_quota == rhs.most_quota && lhs.least_quota == rhs.least_quota &&
-      lhs.description == rhs.description && lhs.aliases == rhs.aliases && 
-      lhs.gobble_flags == rhs.gobble_flags && lhs.flatten == rhs.flatten) {
-        return true;
-    } else {
-      return false;
-    }
+    return std::tuple{
+      lhs.most_quota,
+      lhs.least_quota,
+      lhs.description,
+      lhs.aliases,
+      lhs.gobble_flags,
+      lhs.flatten
+    } == std::tuple{
+      rhs.most_quota,
+      rhs.least_quota,
+      rhs.description,
+      rhs.aliases,
+      rhs.gobble_flags,
+      rhs.flatten
+    };
   }
 
   /// Manager for command line arguments and URL query params.
