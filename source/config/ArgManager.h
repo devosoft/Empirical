@@ -179,9 +179,12 @@ namespace emp {
       const pack_t deflagged = [&args](){
         auto res = args;
         for (size_t i = 0; i < args.size(); ++i) {
-          const size_t dash_stop = args[i].find_first_not_of('-');
+
+		  // without +1 this line would cause an initial non-dashed argument
+      // to be treated as a literal
+		  const size_t dash_stop = args[i].find_last_of('-') + 1;
           if (dash_stop < args[i].size()) {
-            res[i].erase(0, dash_stop);
+            res[i].erase(0, dash_stop); // remove initial dash
           } else if (args[i].size() == 2) {
             // in POSIX, -- means treat subsequent words as literals
             // so we remove the -- and stop deflagging subsequent words
@@ -189,7 +192,7 @@ namespace emp {
             args.erase(std::next(std::begin(args),i));
             break;
           }
-          // -, ---, ----, etc. left in place and treated as non-flags
+          // " ", -, ---, ----, etc. left in place and treated as non-flags
         }
         return res;
       }();
@@ -198,7 +201,7 @@ namespace emp {
       // return the deflagged, dealiased command
       // otherwise, it's a positional command
       auto parse_alias = [deflagged, args, alias_map, specs](size_t i) {
-        return alias_map.count(deflagged[i]) ?
+        return alias_map.count(deflagged[i]) && args[i] != deflag ?
           alias_map.find(deflagged[i])->second : (
             alias_map.count("_positional")
             && (

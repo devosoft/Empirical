@@ -344,5 +344,43 @@ TEST_CASE("Test config", "[config]"){
     REQUIRE(oSpecs == expOSpecs);
   }
 
+  // regression test (bug was positional arguments being interpreted as flags)
+  {
+
+    emp::vector<std::string> arguments = {
+      "command", "help", "--halp"
+    };
+
+    std::vector<char*> argv;
+    for (const auto& arg : arguments) argv.push_back((char*)arg.data());
+
+    argv.push_back(nullptr);
+
+    emp::ArgManager am(argv.size() - 1, argv.data());
+
+    am.PrintHelp(std::cout);
+
+    am.PrintDiagnostic(std::cout);
+
+    REQUIRE(
+      *am.UseArg("_positional")
+      == ((emp::vector<std::string>) {"help"})
+    );
+
+    REQUIRE(
+      *am.UseArg("_unknown")
+      == ((emp::vector<std::string>) {"--halp"})
+    );
+
+    REQUIRE(am.UseArg("help") == std::nullopt);
+
+    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"command"});
+    REQUIRE(!am.UseArg("_command"));
+
+    REQUIRE(!am.HasUnused());
+
+  }
+
+
 
 }
