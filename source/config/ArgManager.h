@@ -231,11 +231,14 @@ namespace emp {
             commands.push_back(alias_map.find(
               std::string{ch}
             )->second);
+
           } else {
             // found a bad letter! abort and return positional or unknown
             if (
-              alias_map.count("_positional") &&
-              (deflag == args[i] || specs.find("_positional")->second.gobble_flags)
+              alias_map.count("_positional") && (
+                deflag == args[i]
+                || specs.find("_positional")->second.gobble_flags
+              )
             ){
               return pack_t{"_positional"};
             } else {

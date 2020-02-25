@@ -398,7 +398,7 @@ TEST_CASE("Test config", "[config]"){
       0,
       "some information 'n stuff"
     );
-    specs["info|i"] = emp::ArgSpec(0, "two things");
+    specs["info|i"] = emp::ArgSpec(0, "no things");
 
     emp::ArgManager am(argv.size() - 1, argv.data(), specs);
 
