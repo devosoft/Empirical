@@ -182,8 +182,10 @@ namespace emp {
 
 		  // without +1 this line would cause an initial non-dashed argument
       // to be treated as a literal
-		  const size_t dash_stop = args[i].find_last_of('-') + 1;
-          if (dash_stop < args[i].size()) {
+		  const size_t dash_stop = args[i].find_first_not_of('-');
+          if (dash_stop == 0) {
+            // nop
+          } else if (dash_stop < args[i].size()) {
             res[i].erase(0, dash_stop); // remove initial dash
           } else if (args[i].size() == 2) {
             // in POSIX, -- means treat subsequent words as literals
