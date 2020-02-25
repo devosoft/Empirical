@@ -18,7 +18,7 @@
 #include <unordered_map>
 #include <map>
 #include <string>
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
 #include <filesystem>
 #else
 #include <experimental/filesystem>
@@ -78,7 +78,7 @@ namespace emp::keyname {
     unpack_t res;
 
     const auto kv_strs = emp::slice(
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
       std::filesystem::path(filename).filename(), // get basename
 #else
       std::experimental::filesystem::path(filename).filename(), // get basename

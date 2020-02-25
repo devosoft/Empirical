@@ -41,7 +41,7 @@
 /// @cond DEFINES
 
 /// If we are in emscripten, make sure to include the header.
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
 
@@ -128,7 +128,7 @@ namespace emp {
   } while(0)
 
 // Unit-testing asserts to check only when in Emscripten should depend on if we are in Emscripten
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 #define emp_emscripten_assert(...) emp_assert(__VA_ARGS__)
 #else
 #define emp_emscripten_assert(...)
@@ -136,7 +136,7 @@ namespace emp {
 
 
 // GROUP 3:   --- Emscripten debug ON ---
-#elif EMSCRIPTEN  // Neither EMP_NDEBUG nor EMP_TDEBUG set, but compiling with Emscripten
+#elif __EMSCRIPTEN__  // Neither EMP_NDEBUG nor EMP_TDEBUG set, but compiling with Emscripten
 
 namespace emp {
   constexpr bool assert_on = true;

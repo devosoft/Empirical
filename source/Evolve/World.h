@@ -261,7 +261,13 @@ namespace emp {
 
     /// Get the organism most frequently found in the population and its
     /// abundance.
+    /// Be sure to check whether the population is empty before calling!
     std::pair<org_t, size_t> GetDominantInfo() const {
+
+      emp_assert(
+        GetNumOrgs(),
+        "called GetDominantInfo on an empty population"
+      );
 
       std::map<org_t, size_t> counts;
       for (const auto & org_ptr : GetFullPop()) {
@@ -279,6 +285,7 @@ namespace emp {
     }
 
     /// Get the organism most frequently found in the population.
+    /// Be sure to check whether the population is empty before calling!
     org_t GetDominantOrg() const { return GetDominantInfo().first; }
 
     /// What phenotypic traits is the population tracking?
@@ -1184,7 +1191,7 @@ namespace emp {
 
     // 2. If synchronous generations (i.e, pops[1] is not empty), move next population into
     //    place as the current popoulation.
-    if (pops[1].size()) {
+    if (IsSynchronous()) {
       // Trigger signals for orgs in next pop before they are moved into the active pop.
       for (size_t i = 0; i < pops[1].size(); i++) {
         if (!pops[1][i]) continue;

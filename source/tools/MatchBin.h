@@ -21,6 +21,8 @@
 #include <limits>
 #include <ratio>
 #include <math.h>
+#include <mutex>
+#include <shared_mutex>
 
 #include "../base/assert.h"
 #include "../base/vector.h"
@@ -178,6 +180,10 @@ namespace emp {
     Metric metric;
     Selector selector;
 
+  private:
+    mutable std::shared_mutex cache_regulated_mutex;
+    mutable std::shared_mutex cache_raw_mutex;
+
   public:
     MatchBin()
     : uid_stepper(0)
@@ -190,6 +196,23 @@ namespace emp {
     , selector(rand)
     { ; }
 
+  // have to define this manually due to mutexes
+  MatchBin &operator=(const MatchBin &other) {
+    state = other.state;
+    uid_stepper = other.uid_stepper;
+    return *this;
+  }
+
+  // have to define this manually due to mutexes
+  MatchBin(const MatchBin &other)
+  : caching_activated(cache_available)
+  , metric(other.metric)
+  , selector(other.selector)
+  {
+    state = other.state;
+    uid_stepper = other.uid_stepper;
+  }
+
     /// Compare a query tag to all stored tags using the distance metric
     /// function and return a vector of unique IDs chosen by the selector
     /// function.
@@ -198,41 +221,63 @@ namespace emp {
     emp::vector<uid_t> Match(const query_t & query, size_t n=0) override {
 
       // try looking up in cache
-      if constexpr (cache_available) {
+      if (cache_available && caching_activated) {
+
         if (
-          caching_activated
-          && cache_regulated.find(query) != std::end(cache_regulated)
+          std::shared_lock lock(cache_regulated_mutex);
+          cache_regulated.find(query) != std::end(cache_regulated)
         ) {
           const auto res = cache_regulated.at(query)(n); /* std::optional */
           if (res) return res.value();
         }
-      }
 
-      // compute distance between query and all stored tags
-      std::unordered_map<tag_t, double> matches;
-      for (const auto &[uid, tag] : state.tags) {
-        if (matches.find(tag) == std::end(matches)) {
-          matches[tag] = metric(query, tag);
+        std::unique_lock lock(cache_regulated_mutex);
+
+        // compute distance between query and all stored tags
+        std::unordered_map<tag_t, double> matches;
+        for (const auto &[uid, tag] : state.tags) {
+          if (matches.find(tag) == std::end(matches)) {
+            matches[tag] = metric(query, tag);
+          }
         }
+
+        // apply regulation to generate match scores
+        std::unordered_map<uid_t, double> scores;
+        for (const auto & uid : state.uids) {
+          scores[uid] = state.regulators.at(uid)(
+            matches.at( state.tags.at(uid) )
+          );
+        }
+
+        auto cacheResult = selector(state.uids, scores, n);
+
+        cache_regulated[query] = cacheResult;
+
+        return cacheResult(n).value();
+
+      } else {
+
+        // compute distance between query and all stored tags
+        std::unordered_map<tag_t, double> matches;
+        for (const auto &[uid, tag] : state.tags) {
+          if (matches.find(tag) == std::end(matches)) {
+            matches[tag] = metric(query, tag);
+          }
+        }
+
+        // apply regulation to generate match scores
+        std::unordered_map<uid_t, double> scores;
+        for (const auto & uid : state.uids) {
+          scores[uid] = state.regulators.at(uid)(
+            matches.at( state.tags.at(uid) )
+          );
+        }
+
+        auto cacheResult = selector(state.uids, scores, n);
+
+        return cacheResult(n).value();
+
       }
-
-      // apply regulation to generate match scores
-      std::unordered_map<uid_t, double> scores;
-      for (const auto & uid : state.uids) {
-        scores[uid] = state.regulators.at(uid)(
-          matches.at( state.tags.at(uid) )
-        );
-      }
-
-      auto cacheResult = selector(state.uids, scores, n);
-
-      // maybe save result into cache
-      if constexpr (cache_available) {
-        if (caching_activated) cache_regulated[query] = cacheResult;
-      }
-
-      return cacheResult(n).value();
-
     }
 
     /// Compare a query tag to all stored tags using the distance metric
@@ -241,38 +286,59 @@ namespace emp {
     emp::vector<uid_t> MatchRaw(const query_t & query, size_t n=0) override {
 
       // try looking up in cache
-      if constexpr (cache_available) {
+      if (cache_available && caching_activated) {
+
         if (
-          caching_activated
-          && cache_raw.find(query) != std::end(cache_raw)
+          std::shared_lock lock(cache_raw_mutex);
+          cache_raw.find(query) != std::end(cache_raw)
         ) {
           const auto res = cache_raw.at(query)(n); /* std::optional */
           if (res) return res.value();
         }
-      }
 
-      // compute distance between query and all stored tags
-      std::unordered_map<tag_t, double> matches;
-      for (const auto &[uid, tag] : state.tags) {
-        if (matches.find(tag) == std::end(matches)) {
-          matches[tag] = metric(query, tag);
+        std::unique_lock lock(cache_raw_mutex);
+
+        // compute distance between query and all stored tags
+        std::unordered_map<tag_t, double> matches;
+        for (const auto &[uid, tag] : state.tags) {
+          if (matches.find(tag) == std::end(matches)) {
+            matches[tag] = metric(query, tag);
+          }
         }
+
+        // apply regulation to generate match scores
+        std::unordered_map<uid_t, double> scores;
+        for (const auto & uid : state.uids) {
+          scores[uid] = matches[state.tags[uid]];
+        }
+
+        auto cacheResult = selector(state.uids, scores, n);
+
+        cache_raw[query] = cacheResult;
+
+        return cacheResult(n).value();
+
+      } else {
+
+        // compute distance between query and all stored tags
+        std::unordered_map<tag_t, double> matches;
+        for (const auto &[uid, tag] : state.tags) {
+          if (matches.find(tag) == std::end(matches)) {
+            matches[tag] = metric(query, tag);
+          }
+        }
+
+        // apply regulation to generate match scores
+        std::unordered_map<uid_t, double> scores;
+        for (const auto & uid : state.uids) {
+          scores[uid] = matches[state.tags[uid]];
+        }
+
+        auto cacheResult = selector(state.uids, scores, n);
+
+        return cacheResult(n).value();
+
       }
-
-      // apply regulation to generate match scores
-      std::unordered_map<uid_t, double> scores;
-      for (const auto & uid : state.uids) {
-        scores[uid] = matches[state.tags[uid]];
-      }
-
-      auto cacheResult = selector(state.uids, scores, n);
-
-      // maybe save result into cache
-      if constexpr (cache_available) {
-        if (caching_activated) cache_raw[query] = cacheResult;
-      }
-
-      return cacheResult(n).value();
 
     }
 

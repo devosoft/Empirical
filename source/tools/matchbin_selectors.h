@@ -140,10 +140,10 @@ namespace emp {
     RankedCacheState() = default;
     RankedCacheState(
       emp::vector<size_t>::iterator begin,
-      size_t back,
+      emp::vector<size_t>::iterator back,
       size_t n,
       size_t default_n_
-    ) : uids(emp::vector<size_t>(begin, begin + back))
+    ) : uids(begin, back)
       , requestSize(n)
       , default_n(default_n_)
     { ; }
@@ -227,14 +227,15 @@ namespace emp {
         }
       );
 
-
-      size_t back = 0;
-      while (
-        back < uids.size()
-        && back < n
-        && scores.at(uids[back]) <= thresh
-      ) ++back;
-
+      // Binary search for threshold
+      const auto back = std::upper_bound(
+        std::begin(uids),
+        std::begin(uids) + std::min(n, uids.size()),
+        thresh,
+        [&scores](const double &amt, const size_t &uid){
+          return amt < scores.at(uid);
+        }
+      );
 
       return RankedCacheState(std::begin(uids), back, n, DefaultN);
     }

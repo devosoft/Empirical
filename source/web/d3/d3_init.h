@@ -8,7 +8,7 @@
 #include "../JSWrap.h"
 #include "utils.h"
 
-// #ifdef EMSCRIPTEN
+// #ifdef __EMSCRIPTEN__
 // extern "C" {
 //     extern void D3_Initialize();
 // }
@@ -17,7 +17,7 @@
 namespace D3 {
 
 
-    // #ifdef EMSCRIPTEN
+    // #ifdef __EMSCRIPTEN__
     // static void InitD3() {
     //     static bool init = false;
     //     if (!init) {

@@ -22,7 +22,7 @@ before_install:
 - sudo apt-get update -qq
 
 install:
-- sudo apt-get install -qq g++-8 cmake build-essential python-virtualenv python-pip nodejs tar gzip
+- sudo apt-get install -qq g++-8 cmake build-essential python-virtualenv python-pip nodejs tar gzip libpthread-stubs0-dev
 - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
 - export python="/usr/bin/python"
 - git fetch origin master:refs/remotes/origin/master
