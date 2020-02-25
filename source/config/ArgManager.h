@@ -560,14 +560,18 @@ namespace emp {
         : std::map<std::string,ArgSpec>(std::begin(specs), std::end(specs))
       ) {
         if (name != "_unknown" && name != "_positional") os << "-";
+
         os << name;
+
         for (const auto & alias : spec.aliases) os << " -" << alias;
+
         if (spec.least_quota == spec.most_quota) {
           os << " [ quota = " << spec.most_quota << " ]";
         } else {
           os << " [ " << spec.least_quota << " <= quota <= "
             << spec.most_quota << " ]";
         }
+
         os << std::endl
           << "   | "
           << spec.description
