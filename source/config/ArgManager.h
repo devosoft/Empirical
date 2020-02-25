@@ -218,11 +218,15 @@ namespace emp {
           if (alias_map.count( std::string{ch} )) {
 
             // check that the command does not take arguments
-            assert(
-              specs.find(alias_map.find(
-                std::string{ch}
-              )->second)->second.most_quota == 0
-            );
+            if (
+              specs.find(
+                alias_map.find(std::string{ch})->second
+              )->second.most_quota != 0
+            ) {
+              // put strung-together commands that take arguments
+              // into _invalid
+              return pack_t{"_invalid"};
+            };
 
             commands.push_back(alias_map.find(
               std::string{ch}
@@ -265,6 +269,15 @@ namespace emp {
             });
             continue;
           }
+          // if command is unknown
+          // and user hasn't provided an ArgSpec for invalid commands
+          if (command == "_invalid" && !specs.count("_invalid")) {
+            res.insert({
+                "_invalid",
+                { args[i] }
+            });
+            continue;
+          }
 
           const ArgSpec & spec = specs.find(command)->second;
 
@@ -288,7 +301,10 @@ namespace emp {
               pack_t(
                 std::next(
                   std::begin(args),
-                  command == "_positional" || command == "_unknown" ? i : i+1
+                  command == "_positional"
+                    || command == "_unknown"
+                    || command == "_invalid"
+                  ? i : i+1
                 ),
                 j+1 < args.size() ? std::next(std::begin(args), j+1) : std::end(args)
               )

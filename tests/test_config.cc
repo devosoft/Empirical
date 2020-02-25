@@ -417,4 +417,43 @@ TEST_CASE("Test config", "[config]"){
 
   }
 
+  // another test for single-letter options (commands) e.g., tar -czvf
+  // do end strung-together single-letters w/ quotas > 0 up in _invalid?
+  {
+
+    emp::vector<std::string> arguments{
+      "command", "-h", "-i", "boop", "-ahi"
+    };
+
+    std::vector<char*> argv;
+    for (const auto& arg : arguments) argv.push_back((char*)arg.data());
+
+    argv.push_back(nullptr);
+
+    auto specs = emp::ArgManager::make_builtin_specs();
+    specs["aardvark|a"] = emp::ArgSpec(
+      0,
+      "some information 'n stuff"
+    );
+    specs["ink|i"] = emp::ArgSpec(1, "a things");
+
+    emp::ArgManager am(argv.size() - 1, argv.data(), specs);
+
+    am.PrintHelp(std::cout);
+
+    am.PrintDiagnostic(std::cout);
+
+    REQUIRE(am.UseArg("help") == ((emp::vector<std::string>) {}));
+    REQUIRE(am.UseArg("aardvark") == std::nullopt);
+    REQUIRE(am.UseArg("ink") == ((emp::vector<std::string>) {"boop"}));
+
+    REQUIRE(am.UseArg("_invalid") == ((emp::vector<std::string>) {"-ahi"}));
+
+    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"command"});
+    REQUIRE(!am.UseArg("_command"));
+
+    REQUIRE(!am.HasUnused());
+
+  }
+
 }
