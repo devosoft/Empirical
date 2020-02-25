@@ -374,7 +374,7 @@ namespace emp {
       const pack_t args,
       const spec_map_t & specs_ = make_builtin_specs()
     ) : ArgManager(
-      ArgManager::parse(args, specs_),
+      ArgManager::parse(args, DealiasSpecs(specs_)),
       specs_
     ) { ; }
 
@@ -384,7 +384,7 @@ namespace emp {
     ArgManager(
       const pack_map_t & packs_,
       const spec_map_t & specs_ = make_builtin_specs()
-    ) : packs(packs_), specs(specs_) {
+    ) : packs(packs_), specs(DealiasSpecs(specs_)) {
 
       // Flatten any argument packs with `flatten` specified; move into packs.
       for (auto & [n, s] : specs) {
