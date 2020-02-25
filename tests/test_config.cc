@@ -381,6 +381,40 @@ TEST_CASE("Test config", "[config]"){
 
   }
 
+  // test for single-letter options (commands) e.g., tar -czvf
+  {
 
+    emp::vector<std::string> arguments = {
+      "command", "-ahi"
+    };
+
+    std::vector<char*> argv;
+    for (const auto& arg : arguments) argv.push_back((char*)arg.data());
+
+    argv.push_back(nullptr);
+
+    auto specs = emp::ArgManager::make_builtin_specs();
+    specs["apple|a"] = emp::ArgSpec(
+      0,
+      "some information 'n stuff"
+    );
+    specs["info|i"] = emp::ArgSpec(0, "two things");
+
+    emp::ArgManager am(argv.size() - 1, argv.data(), specs);
+
+    am.PrintHelp(std::cout);
+
+    am.PrintDiagnostic(std::cout);
+
+    REQUIRE(am.UseArg("help") == ((emp::vector<std::string>) {}));
+    REQUIRE(am.UseArg("apple") == ((emp::vector<std::string>) {}));
+    REQUIRE(am.UseArg("info") == ((emp::vector<std::string>) {}));
+
+    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"command"});
+    REQUIRE(!am.UseArg("_command"));
+
+    REQUIRE(!am.HasUnused());
+
+  }
 
 }

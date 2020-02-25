@@ -200,18 +200,51 @@ namespace emp {
       }();
 
       // If word is a valid command or alias for a command,
-      // return the deflagged, dealiased command
-      // otherwise, it's a positional command
-      auto parse_alias = [deflagged, args, alias_map, specs](size_t i) {
-        return alias_map.count(deflagged[i]) && args[i] != deflag ?
-          alias_map.find(deflagged[i])->second : (
-            alias_map.count("_positional")
-            && (
-              deflagged[i] == args[i]
-              || specs.find("_positional")->second.gobble_flags
-            )
-            ? "_positional" : "_unknown"
-          );
+      // return the deflagged, dealiased command...
+      // otherwise, it's a positional command.
+	    // In this context, positional commands are options that take
+      // option-arguments
+      auto parse_alias = [deflagged, args, alias_map, specs](const size_t i) {
+        const std::string deflag = deflagged[i];
+
+        // the whole deflagged version is an alias
+        // and there were leading hyphens that WERE removed then, return that
+        if ( alias_map.count(deflag) && args[i] != deflag ) {
+          return pack_t{alias_map.find(deflag)->second};
+        }
+
+        pack_t commands;
+        // since it might be a concatenation of single-letter commands,
+        // we must go through it letter by letter
+        // try looking at each of the characters
+        for (const char ch : deflag) {
+          if (alias_map.count( std::string{ch} )) {
+            std::cout << "made it inside!" << std::endl;
+            // check that the command does not take arguments
+            assert(
+              specs.find(alias_map.find(
+                std::string{ch}
+              )->second)->second.most_quota == 0
+            );
+
+            commands.push_back(alias_map.find(
+              std::string{ch}
+            )->second);
+          } else {
+            // found a bad letter! abort and return positional or unknown
+            if (
+              alias_map.count("_positional") &&
+              (deflag == args[i] || specs.find("_positional")->second.gobble_flags)
+            ){
+              return pack_t{"_positional"};
+            } else {
+              return pack_t{"_unknown"};
+            }
+          }
+        }
+
+        // found all good letters
+        return commands;
       };
 
       if (!args.size()) return res;
@@ -219,8 +252,9 @@ namespace emp {
 
       for(size_t i = 1; i < args.size(); ++i) {
 
-        const std::string & command = parse_alias(i);
+        const pack_t & commands = parse_alias(i);
 
+        for (const auto & command : commands) {
         // if command is unknown
         // and user hasn't provided an ArgSpec for unknown commands
         if (command == "_unknown" && !specs.count("_unknown")) {
@@ -231,7 +265,7 @@ namespace emp {
           continue;
         }
 
-        const ArgSpec & spec = specs.find(parse_alias(i))->second;
+        const ArgSpec & spec = specs.find(command)->second;
 
         // fast forward to grab all the words for this argument pack
         size_t j;
@@ -258,8 +292,9 @@ namespace emp {
             )
           }
         );
+			i = j;
 
-        i = j;
+		}
 
       }
 
