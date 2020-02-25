@@ -163,19 +163,14 @@ namespace emp {
       );
 
       // check for duplicate aliases
-      emp_assert([&](){
-        return alias_map.size() == std::accumulate(
-          std::begin(specs),
-          std::end(specs),
-          specs.size(),
-          [](
-            const size_t l,
-            const std::pair<std::string, ArgSpec> & r
-          ){
-            return l + r.second.aliases.size();
-          }
-        );
-      }(), "duplicate aliases detected");
+      emp_assert(alias_map.size() == std::accumulate(
+        std::begin(specs),
+        std::end(specs),
+        specs.size(),
+        [](const size_t l, const std::pair<std::string, ArgSpec> & r){
+          return l + r.second.aliases.size();
+        }
+      ), "duplicate aliases detected");
 
       // lookup table with leading dashes stripped
       // this is an immediately-invoked lambda
