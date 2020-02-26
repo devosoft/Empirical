@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019
+ *  @date 2019-2020.
  *
  *  @file matchbin_metrics.h
  *  @brief Metric structs that can be plugged into MatchBin.
@@ -25,8 +25,7 @@
 #include <array>
 #include <utility>
 #include <queue>
-
-#include "tools/Binomial.h"
+#include <openssl/sha.h>
 
 #include "../base/assert.h"
 #include "../base/array.h"
@@ -34,6 +33,7 @@
 #include "../tools/math.h"
 #include "../tools/IndexMap.h"
 #include "../tools/BitSet.h"
+#include "../tools/Distribution.h"
 #include "../tools/string_utils.h"
 #include "../tools/hash_utils.h"
 #include "../tools/tuple_utils.h"
@@ -103,6 +103,54 @@ namespace emp {
         thasher(b)
       )) / std::numeric_limits<size_t>::max();
     }
+
+  };
+
+  /// Generate an arbitrary, but consistent, match score between 0 and 1
+  /// Be sure to link against -lcrypto and -lssl
+  template<size_t Width>
+  struct CryptoHashMetric: public BaseMetric<emp::BitSet<Width>, emp::BitSet<Width>> {
+
+    using query_t = emp::BitSet<Width>;
+    using tag_t = emp::BitSet<Width>;
+
+    size_t dim() const override { return 1; }
+
+    size_t width() const override { return Width; }
+
+    std::string name() const override {
+      return emp::to_string(Width) + "-bit " + base();
+    }
+
+    std::string base() const override { return "Hash Metric"; }
+
+    // adapted from https://www.uncg.edu/cmp/faculty/srtate/580.f11/sha1examples.php
+    double operator()(const query_t& a, const tag_t& b) const override {
+
+    std::array<unsigned char, a.GetNumBytes() + b.GetNumBytes()> data;
+
+    size_t i = 0;
+    for (size_t j = 0; j < a.GetNumBytes(); ++j) data[i++] = a.GetByte(j);
+    for (size_t j = 0; j < b.GetNumBytes(); ++j) data[i++] = b.GetByte(j);
+
+    SHA_CTX shactx;
+    std::array<unsigned char, SHA_DIGEST_LENGTH> digest;
+
+    SHA1_Init(&shactx);
+    SHA1_Update(&shactx, data.data(), data.size());
+    SHA1_Final(digest.data(), &shactx);
+
+    const std::string hashme{
+      reinterpret_cast<const char *>(digest.data()),
+      digest.size()
+    };
+
+    return (
+      static_cast<double>(std::hash<std::string>{}(hashme))
+      / std::numeric_limits<size_t>::max()
+    );
+
+  }
 
   };
 

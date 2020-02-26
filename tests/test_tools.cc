@@ -29,11 +29,11 @@
 
 #include "data/DataNode.h"
 
-#include "tools/Binomial.h"
 #include "tools/BitMatrix.h"
 #include "tools/BitSet.h"
 #include "tools/BitVector.h"
 #include "tools/ContiguousStream.h"
+#include "tools/Distribution.h"
 #include "tools/DFA.h"
 #include "tools/DynamicString.h"
 #include "tools/FunctionSet.h"
@@ -409,6 +409,27 @@ struct MultiTester {
 template class emp::BitSet<5>;
 TEST_CASE("Test BitSet", "[tools]")
 {
+
+  // test BitSet GetSize, GetNumBytes
+  {
+    REQUIRE(emp::BitSet<2>{}.GetSize() == 2);
+    REQUIRE(emp::BitSet<2>{}.GetNumBytes() == 1);
+
+    REQUIRE(emp::BitSet<7>{}.GetSize() == 7);
+    REQUIRE(emp::BitSet<7>{}.GetNumBytes() == 1);
+
+    REQUIRE(emp::BitSet<8>{}.GetSize() == 8);
+    REQUIRE(emp::BitSet<8>{}.GetNumBytes() == 1);
+
+    REQUIRE(emp::BitSet<9>{}.GetSize() == 9);
+    REQUIRE(emp::BitSet<9>{}.GetNumBytes() == 2);
+
+    REQUIRE(emp::BitSet<16>{}.GetSize() == 16);
+    REQUIRE(emp::BitSet<16>{}.GetNumBytes() == 2);
+
+    REQUIRE(emp::BitSet<24>{}.GetSize() == 24);
+    REQUIRE(emp::BitSet<24>{}.GetNumBytes() == 3);
+  }
 
   // test BitSet reverse
   {

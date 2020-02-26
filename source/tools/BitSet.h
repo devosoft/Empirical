@@ -414,7 +414,7 @@ namespace emp {
   /// Mutate bits, return how many mutations were performed
   size_t Mutate(
     Random & random,
-    const size_t num_muts, // hint: use tools/Binomial.h with this part
+    const size_t num_muts, // @CAO: use tools/Binomial in Distribution.h with this part?
     const size_t min_idx=0 // draw this from a distribution to make some
                            // bits more volatile than others
   ) {
@@ -525,6 +525,9 @@ namespace emp {
 
     /// How many bits are in this BitSet?
     constexpr static size_t GetSize() { return NUM_BITS; }
+
+    /// How many bytes are in this BitSet?
+    constexpr static size_t GetNumBytes() { return NUM_BYTES; }
 
     /// Retrieve the bit as a specified index.
     bool Get(size_t index) const {
