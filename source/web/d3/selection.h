@@ -19,7 +19,7 @@
 #include "../js_utils.h"
 #include "../JSWrap.h"
 
-/// @cond EMSCRIPTEN_STUFF
+/// @cond __EMSCRIPTEN___STUFF
 extern "C" {
   extern int n_objects();
 }

@@ -50,7 +50,7 @@ namespace emp {
     DataFile(const std::string & in_filename,
              const std::string & b="", const std::string & s=",", const std::string & e="\n")
       : filename(in_filename), os(
-      #ifdef EMSCRIPTEN
+      #ifdef __EMSCRIPTEN__
       new emp::NullStream()
       #else
       new std::ofstream(in_filename)

@@ -10,8 +10,8 @@
 #ifndef EMP_INIT_H
 #define EMP_INIT_H
 
-/// If EMSCRIPTEN is defined, initialize everything.  Otherwise create useful stubs.
-#ifdef EMSCRIPTEN
+/// If __EMSCRIPTEN__ is defined, initialize everything.  Otherwise create useful stubs.
+#ifdef __EMSCRIPTEN__
 
 #include <emscripten.h>
 #include "../tools/string_utils.h"

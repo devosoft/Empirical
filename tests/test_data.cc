@@ -342,6 +342,8 @@ TEST_CASE("Test DataFile", "[data]") {
 
     emp::DataFile dfile("test_file.dat");
 
+    REQUIRE(dfile.GetFilename() == "test_file.dat");
+    
     emp::DataMonitor<double> data_fracs;
     emp::DataMonitor<int> data_squares;
     emp::DataMonitor<uint64_t> data_cubes;

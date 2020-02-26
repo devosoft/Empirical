@@ -38,7 +38,7 @@ namespace emp {
 
   /// SFINAE helper to determine field_t for BitSet
   template <size_t NUM_BITS> struct FieldHelper {
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     ///< Field sizes are 32 bits in Emscripten (max directly handled)
     using field_t = uint32_t;
 #else
@@ -525,6 +525,9 @@ namespace emp {
 
     /// How many bits are in this BitSet?
     constexpr static size_t GetSize() { return NUM_BITS; }
+
+    /// How many bytes are in this BitSet?
+    constexpr static size_t GetNumBytes() { return NUM_BYTES; }
 
     /// Retrieve the bit as a specified index.
     bool Get(size_t index) const {
