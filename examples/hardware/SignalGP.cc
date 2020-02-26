@@ -153,7 +153,7 @@ int main() {
 
   // What about an instruction to allow the two SignalGP hardwares to communicate?
   // This time we'll use a lambda to specify how the instruction should work.
-  inst_lib.AddInst("MsgFriend", []( & hw, const inst_t & inst) {
+  inst_lib.AddInst("MsgFriend", [](hardware_t & hw, const inst_t & inst) {
     // Trigger a Msg event using the hardware that executed this instruction where the event's data is
     // the output memory of the sender.
     hw.TriggerEvent("Msg", inst.affinity, hw.GetCurState().output_mem);
