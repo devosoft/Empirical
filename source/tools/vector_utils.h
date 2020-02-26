@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018
+ *  @date 2017-2020.
  *
  *  @file vector_utils.h
  *  @brief A set of simple functions to manipulate emp::vector
@@ -17,6 +17,38 @@
 #include "../base/vector.h"
 
 namespace emp {
+
+  /// Base case for Append; we just have a single vector with nothing to append.
+  template <typename T>
+  emp::vector<T> & Append(emp::vector<T> & base) {
+    return base;
+  }
+  
+  /// Append one or more vectors on to the end of an existing vector.
+  template <typename T, typename V1, typename... Vs>
+  emp::vector<T> & Append(emp::vector<T> & base, const V1 & v1, const Vs &... vs) {
+    // If the next entry is a single element, push it on the back.
+    if constexpr (std::is_convertible<T, V1>()) {
+      base.push_back(v1);
+    }
+    
+    // Otherwise assume we have a container and append all of it.
+    else {
+      base.insert(base.end(), v1.begin(), v1.end());
+    }
+
+    // Recurse.
+    return Append(base, vs...);
+  }
+  
+
+  /// Concatonate two or more vectors together, creating a new vector.
+  template <typename T, typename... Vs>
+  emp::vector<T> Concat(const emp::vector<T> & v1, const Vs &... vs) {
+    emp::vector<T> out_v = v1;
+    Append(out_v, vs...);
+    return out_v;
+  }
 
   /// Return the first position of a value in a vector (or -1 if none exists)
   template <typename T>

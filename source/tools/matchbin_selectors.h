@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019
+ *  @date 2019-2020.
  *
  *  @file matchbin_selectors.h
  *  @brief Selector structs that can be plugged into MatchBin.
@@ -25,7 +25,7 @@
 #include <array>
 #include <utility>
 
-#include "tools/Binomial.h"
+#include "tools/Distribution.h"
 
 #include "../base/assert.h"
 #include "../base/array.h"
