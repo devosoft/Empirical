@@ -1341,7 +1341,7 @@ namespace emp {
 
     // ---------- Hardware Execution ----------
     /// Process a single instruction, provided by the caller.
-    void ProcessInst(const inst_t & inst) { program.inst_lib->ProcessInst(*this, inst); }
+    void ProcessInst(const inst_t & inst) { program.GetInstLib()->ProcessInst(*this, inst); }
 
     /// Handle an event (on this hardware).
     void HandleEvent(const event_t & event) { event_lib->HandleEvent(*this, event); }
