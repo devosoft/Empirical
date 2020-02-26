@@ -1,7 +1,7 @@
 TEST_NAMES = event_driven_gp avida_gp
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
-FLAGS = -std=c++17 -Wall -Wno-unused-function -I../../source/ -I../../
+FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -I../../source/ -I../../
 
 default: test
 
@@ -26,7 +26,7 @@ test-%: test_%.cc
 test: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
   
-test-coverage: FLAGS := -std=c++17 -g -Wall -Wno-unused-function -I../../coverage_source/ -I../../ -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 -fprofile-instr-generate -fcoverage-mapping -fno-inline -fno-elide-constructors -O0 
+test-coverage: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../coverage_source/ -I../../ -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 -fprofile-instr-generate -fcoverage-mapping -fno-inline -fno-elide-constructors -O0 
 test-coverage: test-prep $(addprefix cover-test-, $(TEST_NAMES))
   
 clean:
