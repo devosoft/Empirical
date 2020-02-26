@@ -14,7 +14,7 @@ TEST_CASE("Test tuple_utils", "[tools]")
 	std::tuple<int, int, int> tup(1,2,3);
 	REQUIRE(emp::tuple_size<decltype(tup)>() == 3);
 	
-	emp::IntPack<2, 1, 0> ints;
+	emp::ValPack<2, 1, 0> ints;
 	std::tuple<int, int, double> tup1(150, 1, 5.0);
 	tup1 = emp::shuffle_tuple(tup1, ints);
 	REQUIRE(std::get<0>(tup1) == 5.0);
