@@ -71,6 +71,10 @@ int main() {
   hardware_t hw16_1(&inst_lib, &event_lib, &random);
   hardware_t hw16_2(&inst_lib, &event_lib, &random);
 
+  // Spin up main cores (used to be handled in constructor)
+  hw16_1.SpawnCore(0);
+  hw16_2.SpawnCore(0);
+ 
   // Configure the hardware.
   hw16_1.SetMinBindThresh(HW_MIN_SIM_THRESH);
   hw16_1.SetMaxCores(HW_MAX_THREADS);
