@@ -115,16 +115,21 @@ TEST_CASE("Test Event Driven GP", "[Hardware]")
 	ss.str(std::string());
 	
 	// Traits
-	gp.SetTrait(0, 2.0);
-	REQUIRE(gp.GetTrait(0) == 2.0);
-	gp.IncTrait(0, 5.0);
-	REQUIRE(gp.GetTrait(0) == 7.0);
-	gp.DecTrait(0);
-	REQUIRE(gp.GetTrait(0) == 6.0);
-	gp.PushTrait(3.0);
-	REQUIRE(gp.GetTrait(1) == 3.0);
+	gp.GetTrait().push_back(2.0);
+	REQUIRE(gp.GetTrait()[0] == 2.0);
+	gp.GetTrait()[0] += 5.0;
+	REQUIRE(gp.GetTrait()[0] == 7.0);
+	gp.GetTrait()[0]--;
+	REQUIRE(gp.GetTrait()[0] == 6.0);
+	gp.GetTrait().push_back(3.0);
+	REQUIRE(gp.GetTrait()[1] == 3.0);
+        gp.SetTraitPrintFun(
+          [](std::ostream& os, emp::vector<double> t){
+            for (const auto & v : t) os << v << " ";
+	  }
+        );
 	gp.PrintTraits(ss);
-	REQUIRE(ss.str() == "[6, 3]");
+	REQUIRE(ss.str() == "6 3 ");
 	ss.str(std::string());
 	
 	// Loading a program
