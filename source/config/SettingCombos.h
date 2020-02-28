@@ -43,6 +43,7 @@ namespace emp {
       virtual std::string AsString() const = 0;         ///< All values, as a single string.
       virtual std::string AsString(size_t) const = 0;   ///< A specified value as a string.
       virtual void FromString(const std::string &) = 0; ///< Convert string to range of settings.
+      virtual void SetValueID(size_t) = 0;              ///< Setup cur value in linked variable
 
       bool IsMatch(const std::string & test_option) const {
         return test_option == flag || test_option == option;
@@ -52,9 +53,13 @@ namespace emp {
     template <typename T>
     struct SettingInfo : public SettingBase {
       emp::vector<T> values;
+      emp::Ptr<T> var_ptr = nullptr;
 
-      SettingInfo(const std::string & _name, const std::string & _desc, const std::string & _flag)
-        : SettingBase(_name, _desc, _flag) { }
+      SettingInfo(const std::string & _name,
+                  const std::string & _desc,
+                  const std::string & _flag,
+                  emp::Ptr<T> _var=nullptr)
+        : SettingBase(_name, _desc, _flag), var_ptr(_var) { }
 
       size_t GetSize() const override { return values.size(); }
       std::string AsString() const override {
@@ -71,6 +76,10 @@ namespace emp {
 
       void FromString(const std::string & input) override {
         values = emp::from_strings<T>(emp::slice(input, ','));
+      }
+
+      void SetValueID(size_t id) override {
+        if (var_ptr) *var_ptr = values[id];
       }
     };
 
@@ -89,7 +98,13 @@ namespace emp {
     }
 
     /// Start over stepping through all combinations of parameter values.
-    void Reset() { for (size_t & x : cur_combo) x = 0; }
+    void Reset() {
+      // Setup as base combo.
+      for (size_t & x : cur_combo) x = 0;
+
+      // Setup all linked values.
+      for (auto x : settings) x->SetValueID(0);
+    }
 
     /// Get the current value of a specified setting.
     template <typename T>
@@ -112,6 +127,22 @@ namespace emp {
                                 const std::string & option_flag="") {
       emp_assert(!emp::Has(setting_map, name));
       emp::Ptr<SettingInfo<T>> new_ptr = emp::NewPtr<SettingInfo<T>>(name, desc, option_flag);
+      new_ptr->id = settings.size();
+      settings.push_back(new_ptr);
+      setting_map[name] = new_ptr;
+      cur_combo.push_back(0);
+      return new_ptr->values;
+    }
+
+    /// A setting can also be linked to a value that is kept up-to-date.
+    template <typename T>
+    emp::vector<T> & AddSetting(const std::string & name,
+                                const std::string & desc,
+                                const std::string & option_flag,
+                                T & var) {
+      emp_assert(!emp::Has(setting_map, name));
+      emp::Ptr<SettingInfo<T>> new_ptr =
+        emp::NewPtr<SettingInfo<T>>(name, desc, option_flag, &var);
       new_ptr->id = settings.size();
       settings.push_back(new_ptr);
       setting_map[name] = new_ptr;
@@ -153,14 +184,18 @@ namespace emp {
     /// Set the next combination of settings to be active.  Return true if successful
     /// or false if we ran through all combinations and reset.
     bool Next() {
-    for (size_t i = 0; i < cur_combo.size(); i++) {
+      for (size_t i = 0; i < cur_combo.size(); i++) {
         cur_combo[i]++;
 
         // Check if this new combo is valid.
-        if (cur_combo[i] < settings[i]->GetSize()) return true;
+        if (cur_combo[i] < settings[i]->GetSize()) {
+          settings[i]->SetValueID( cur_combo[i] );  // Set value in linked variable.
+          return true;
+        }
 
         // Since it's not, prepare to move on to the next one.
         cur_combo[i] = 0;
+        settings[i]->SetValueID(0);      
       }
 
       // No valid combo found.
