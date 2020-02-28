@@ -178,10 +178,10 @@ namespace emp {
     }
 
     /// Convert all of the current values into a comma-separated string.
-    std::string CurString() const {
+    std::string CurString(const std::string & separator=",") const {
       std::string out_str;
       for (size_t i = 0; i < cur_combo.size(); i++) {
-        if (i) out_str += ",";
+        if (i) out_str += separator;
         out_str += settings[i]->AsString(cur_combo[i]);
       }
       return out_str;
