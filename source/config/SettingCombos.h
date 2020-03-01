@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include <sstream>
 #include <string>
+#include <string_view>
 
 #include "../base/Ptr.h"
 #include "../base/vector.h"
@@ -29,13 +30,13 @@ namespace emp {
   class SettingCombos {
   private:
     struct SettingBase {
-      size_t id;                                       ///< Unique ID/position for this setting.
-      std::string name;
-      std::string desc;
-      std::string flag;
-      std::string option;
+      size_t id;            ///< Unique ID/position for this setting.
+      std::string name;     ///< Name for this setting
+      std::string desc;     ///< Description of setting
+      char flag;            ///< Command-line flag ('\0' for none)
+      std::string option;   ///< Command-line longer option.
 
-      SettingBase(const std::string & _name, const std::string & _desc, const std::string & _flag)
+      SettingBase(const std::string & _name, const std::string & _desc, const char _flag)
         : name(_name), desc(_desc), flag(_flag), option(emp::to_string("--",_name)) { }
       virtual ~SettingBase() { }
 
@@ -45,9 +46,8 @@ namespace emp {
       virtual void FromString(const std::string &) = 0; ///< Convert string to range of settings.
       virtual void SetValueID(size_t) = 0;              ///< Setup cur value in linked variable
 
-      bool IsMatch(const std::string & test_option) const {
-        return test_option == flag || test_option == option;
-      }
+      bool IsOptionMatch(const std::string & test_option) const { return test_option == option; }
+      bool IsFlagMatch(const char test_flag) const { return test_flag == flag; }
     };
 
     template <typename T>
@@ -57,7 +57,7 @@ namespace emp {
 
       SettingInfo(const std::string & _name,
                   const std::string & _desc,
-                  const std::string & _flag,
+                  const char _flag,
                   emp::Ptr<T> _var=nullptr)
         : SettingBase(_name, _desc, _flag), var_ptr(_var) { }
 
@@ -124,7 +124,7 @@ namespace emp {
     template <typename T>
     emp::vector<T> & AddSetting(const std::string & name,
                                 const std::string & desc="",
-                                const std::string & option_flag="") {
+                                const char option_flag='\0') {
       emp_assert(!emp::Has(setting_map, name));
       emp::Ptr<SettingInfo<T>> new_ptr = emp::NewPtr<SettingInfo<T>>(name, desc, option_flag);
       new_ptr->id = settings.size();
@@ -138,7 +138,7 @@ namespace emp {
     template <typename T>
     emp::vector<T> & AddSetting(const std::string & name,
                                 const std::string & desc,
-                                const std::string & option_flag,
+                                const char option_flag,
                                 T & var) {
       emp_assert(!emp::Has(setting_map, name));
       emp::Ptr<SettingInfo<T>> new_ptr =
@@ -225,7 +225,15 @@ namespace emp {
     /// Scan through all settings for a match option and return ID.
     size_t FindOptionMatch(const std::string & option_name) {
       for (const auto & setting : settings) {
-        if (setting->IsMatch(option_name)) return setting->id;
+        if (setting->IsOptionMatch(option_name)) return setting->id;
+      }
+      return (size_t) -1;
+    }
+
+    /// Scan through all settings for a match option and return ID.
+    size_t FindFlagMatch(const char symbol) {
+      for (const auto & setting : settings) {
+        if (setting->IsFlagMatch(symbol)) return setting->id;
       }
       return (size_t) -1;
     }
@@ -235,7 +243,22 @@ namespace emp {
       emp::vector<std::string> out_args;
 
       for (size_t i = 0; i < args.size(); i++) {
-        size_t id = FindOptionMatch(args[i]);
+        const std::string & cur_arg = args[i];
+        if (cur_arg[0] != '-' || cur_arg.size() < 2) continue;  // If isn't an option, continue.
+
+        // See if this is a fully spelled-out option.
+        size_t id = FindOptionMatch(cur_arg);
+        if (id < settings.size()) {
+          if (++i >= args.size()) {
+            std::cout << "ERROR: Must provide args to use!\n";          
+            // @CAO Need to signal error...
+            return args;
+          }
+          settings[id]->FromString(args[i]);
+        }
+
+        // See if we have a flag option.
+        id = FindFlagMatch(cur_arg[1]);
         if (id < settings.size()) {
           if (++i >= args.size()) {
             std::cout << "ERROR: Must provide args to use!\n";          
@@ -246,7 +269,7 @@ namespace emp {
         }
 
         // Otherwise this argument will go unused; send it back.
-        else out_args.push_back(args[i]);
+        else out_args.push_back(cur_arg);
       }
 
       return out_args;
