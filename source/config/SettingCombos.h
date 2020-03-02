@@ -43,7 +43,7 @@ namespace emp {
       virtual size_t GetSize() const = 0;               ///< How many values are available?
       virtual std::string AsString() const = 0;         ///< All values, as a single string.
       virtual std::string AsString(size_t) const = 0;   ///< A specified value as a string.
-      virtual void FromString(const std::string &) = 0; ///< Convert string to range of settings.
+      virtual void FromString(const std::string_view &) = 0; ///< Convert string to range of settings.
       virtual void SetValueID(size_t) = 0;              ///< Setup cur value in linked variable
 
       bool IsOptionMatch(const std::string & test_option) const { return test_option == option; }
@@ -74,7 +74,7 @@ namespace emp {
         return emp::to_string(values[id]);
       }
 
-      void FromString(const std::string & input) override {
+      void FromString(const std::string_view & input) override {
         values = emp::from_strings<T>(emp::slice(input, ','));
       }
 
@@ -244,7 +244,7 @@ namespace emp {
 
       for (size_t i = 0; i < args.size(); i++) {
         const std::string & cur_arg = args[i];
-        if (cur_arg[0] != '-' || cur_arg.size() < 2) continue;  // If isn't an option, continue.
+        if (cur_arg.size() < 2 || cur_arg[0] != '-') continue;  // If isn't an option, continue.
 
         // See if this is a fully spelled-out option.
         size_t id = FindOptionMatch(cur_arg);
@@ -260,12 +260,18 @@ namespace emp {
         // See if we have a flag option.
         id = FindFlagMatch(cur_arg[1]);
         if (id < settings.size()) {
-          if (++i >= args.size()) {
+          // Check if the flag is followed by the values without whitespace.
+          if (cur_arg.size() > 2) {
+            settings[id]->FromString( emp::view_string(cur_arg,2) );
+          }
+          else if (++i >= args.size()) {
             std::cout << "ERROR: Must provide args to use!\n";          
             // @CAO Need to signal error...
             return args;
           }
-          settings[id]->FromString(args[i]);
+          else {
+            settings[id]->FromString(args[i]);
+          }
         }
 
         // Otherwise this argument will go unused; send it back.
