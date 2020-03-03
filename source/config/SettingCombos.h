@@ -91,9 +91,11 @@ namespace emp {
       std::function<void()> fun;  ///< Function to be called if flag is set.
     };
 
-    emp::vector<emp::Ptr<SettingBase>> settings;                         ///< Order to be varied.
-    std::unordered_map<std::string, emp::Ptr<SettingBase>> setting_map;  ///< Settings by name.
-    std::unordered_map<std::string, ActionFlag> action_map;              ///< Available flags
+    std::string exe_name = "";
+
+    emp::vector<emp::Ptr<SettingBase>> settings;               ///< Order to be varied.
+    std::map<std::string, emp::Ptr<SettingBase>> setting_map;  ///< Settings by name.
+    std::map<std::string, ActionFlag> action_map;              ///< Available flags
 
     emp::vector<size_t> cur_combo;    ///< Which settings are we currently using?
 
@@ -262,8 +264,9 @@ namespace emp {
     /// Take an input set of config options, process them, and return set of unpressed ones.
     emp::vector<std::string> ProcessOptions(const emp::vector<std::string> & args) {
       emp::vector<std::string> out_args;
+      exe_name = args[0];
 
-      for (size_t i = 0; i < args.size(); i++) {
+      for (size_t i = 1; i < args.size(); i++) {
         const std::string & cur_arg = args[i];
         if (cur_arg.size() < 2 || cur_arg[0] != '-') continue;  // If isn't an option, continue.
 
@@ -308,7 +311,21 @@ namespace emp {
     }
 
     void PrintHelp() const {
-      std::cout << "COMBOS HELP!" << std::endl;
+
+      std::cout << "Format: " << exe_name << " [OPTIONS...]\n"
+                << "\nSetting Options:\n";
+      for (auto [name, ptr] : setting_map) {
+        std::cout << " -" << ptr->flag << " [Values...] : "
+                  << ptr->desc << " (--" << name << ") ["
+                  << ptr->AsString() << "]\n";
+      }
+      std::cout << "\nAction Options:\n";
+      for (auto [name, action] : action_map) {
+        if (name.size() == 2) continue;  // Skip flag entries.
+        std::cout << " -" << action.flag << " : "
+                  << action.desc << " (" << name << ")\n";
+      }
+      std::cout.flush();
     }
   };
 
