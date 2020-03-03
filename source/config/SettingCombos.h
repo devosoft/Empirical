@@ -83,8 +83,8 @@ namespace emp {
       }
     };
 
-    /// A setting that is just a flag with a function to be run if it's called.
-    struct SettingFlag {
+    /// A setting that is just a flag with an action function to run if it's called.
+    struct ActionFlag {
       std::string name;           ///< Name for this flag
       std::string desc;           ///< Description of flag
       char flag;                  ///< Command-line flag ('\0' for none)
@@ -93,7 +93,7 @@ namespace emp {
 
     emp::vector<emp::Ptr<SettingBase>> settings;                         ///< Order to be varied.
     std::unordered_map<std::string, emp::Ptr<SettingBase>> setting_map;  ///< Settings by name.
-    std::unordered_map<char, SettingFlag> flag_map;                      ///< Available flags
+    std::unordered_map<std::string, ActionFlag> action_map;              ///< Available flags
 
     emp::vector<size_t> cur_combo;    ///< Which settings are we currently using?
 
@@ -158,13 +158,17 @@ namespace emp {
       return new_ptr->values;
     }
 
-    void AddFlag(const std::string & name,
+    void AddAction(const std::string & name,
                    const std::string & desc,
-                   const char option_flag,
+                   const char flag,
                    std::function<void()> fun)
     {
-      emp_assert(!emp::Has(flag_map, option_flag));
-      flag_map[option_flag] = SettingFlag{ name, desc, option_flag, fun };
+      std::string name_option = emp::to_string("--", name);
+      std::string flag_option = emp::to_string("-", flag);
+      emp_assert(!emp::Has(action_map, name_option));
+      emp_assert(!emp::Has(action_map, flag_option));
+      action_map[name_option] = ActionFlag{ name, desc, flag, fun };
+      action_map[flag_option] = ActionFlag{ name, desc, flag, fun };
     }
 
     /// Access ALL values for a specified setting, to be modified freely.
@@ -292,8 +296,8 @@ namespace emp {
         }
 
         // Or see of this is a flag trigger.
-        else if (cur_arg.size() == 2 && Has(flag_map, cur_arg[1])) {
-          flag_map[cur_arg[1]].fun();
+        else if (Has(action_map, cur_arg)) {
+          action_map[cur_arg].fun();
         }
 
         // Otherwise this argument will go unused; send it back.
@@ -301,6 +305,10 @@ namespace emp {
       }
 
       return out_args;
+    }
+
+    void PrintHelp() const {
+      std::cout << "COMBOS HELP!" << std::endl;
     }
   };
 
