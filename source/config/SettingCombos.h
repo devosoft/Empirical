@@ -83,10 +83,17 @@ namespace emp {
       }
     };
 
-    using set_ptr_t = emp::Ptr<SettingBase>;
+    /// A setting that is just a flag with a function to be run if it's called.
+    struct SettingFlag {
+      std::string name;           ///< Name for this flag
+      std::string desc;           ///< Description of flag
+      char flag;                  ///< Command-line flag ('\0' for none)
+      std::function<void()> fun;  ///< Function to be called if flag is set.
+    };
 
-    emp::vector<set_ptr_t> settings;                           ///< Order to be varied.
-    std::unordered_map<std::string, set_ptr_t> setting_map;  ///< Settings by name.
+    emp::vector<emp::Ptr<SettingBase>> settings;                         ///< Order to be varied.
+    std::unordered_map<std::string, emp::Ptr<SettingBase>> setting_map;  ///< Settings by name.
+    std::unordered_map<char, SettingFlag> flag_map;                      ///< Available flags
 
     emp::vector<size_t> cur_combo;    ///< Which settings are we currently using?
 
@@ -139,7 +146,8 @@ namespace emp {
     emp::vector<T> & AddSetting(const std::string & name,
                                 const std::string & desc,
                                 const char option_flag,
-                                T & var) {
+                                T & var)
+    {
       emp_assert(!emp::Has(setting_map, name));
       emp::Ptr<SettingInfo<T>> new_ptr =
         emp::NewPtr<SettingInfo<T>>(name, desc, option_flag, &var);
@@ -148,6 +156,15 @@ namespace emp {
       setting_map[name] = new_ptr;
       cur_combo.push_back(0);
       return new_ptr->values;
+    }
+
+    void AddFlag(const std::string & name,
+                   const std::string & desc,
+                   const char option_flag,
+                   std::function<void()> fun)
+    {
+      emp_assert(!emp::Has(flag_map, option_flag));
+      flag_map[option_flag] = SettingFlag{ name, desc, option_flag, fun };
     }
 
     /// Access ALL values for a specified setting, to be modified freely.
@@ -177,7 +194,7 @@ namespace emp {
     /// Determine how many unique combinations there currently are.
     size_t CountCombos() {
       size_t result = 1;
-      for (set_ptr_t ptr : settings) result *= ptr;
+      for (auto ptr : settings) result *= ptr->GetSize();
       return result;
     }
 
@@ -272,6 +289,11 @@ namespace emp {
           else {
             settings[id]->FromString(args[i]);
           }
+        }
+
+        // Or see of this is a flag trigger.
+        else if (cur_arg.size() == 2 && Has(flag_map, cur_arg[1])) {
+          flag_map[cur_arg[1]].fun();
         }
 
         // Otherwise this argument will go unused; send it back.
