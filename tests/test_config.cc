@@ -320,5 +320,180 @@ TEST_CASE("Test config", "[config]"){
 
   }
 
+  // unit test for DealiasSpecs(spec_map_t inSpecsMap)
+  {
+    using spec_map_t = std::unordered_map<std::string, emp::ArgSpec>;
+    spec_map_t iSpecs;
+    iSpecs["noAlias"] = emp::ArgSpec(1, "test1");
+    iSpecs["alias2a|alias2b"] = emp::ArgSpec(2, "test2");
+    iSpecs["alias3a|alias3b|alias3c"] = emp::ArgSpec(3, "test3");
+
+    auto oSpecs = emp::ArgManager::DealiasSpecs(iSpecs);
+
+    auto expSpec1 = emp::ArgSpec(1, "test1");
+    auto expSpec2 = emp::ArgSpec(2, "test2");
+    expSpec2.aliases = {"alias2b"};
+    auto expSpec3 = emp::ArgSpec(3, "test3");
+    expSpec3.aliases = {"alias3b", "alias3c"};
+
+    emp::ArgManager::spec_map_t expOSpecs;
+    expOSpecs.emplace("noAlias", expSpec1);
+    expOSpecs.emplace("alias2a", expSpec2);
+    expOSpecs.emplace("alias3a", expSpec3);
+
+    REQUIRE(oSpecs == expOSpecs);
+  }
+
+  // regression test (bug was positional arguments being interpreted as flags)
+  {
+
+    emp::vector<std::string> arguments = {
+      "command", "help", "--halp"
+    };
+
+    std::vector<char*> argv;
+    for (const auto& arg : arguments) argv.push_back((char*)arg.data());
+
+    argv.push_back(nullptr);
+
+    emp::ArgManager am(argv.size() - 1, argv.data());
+
+    am.PrintHelp(std::cout);
+
+    am.PrintDiagnostic(std::cout);
+
+    REQUIRE(
+      *am.UseArg("_positional")
+      == ((emp::vector<std::string>) {"help"})
+    );
+
+    REQUIRE(
+      *am.UseArg("_unknown")
+      == ((emp::vector<std::string>) {"--halp"})
+    );
+
+    REQUIRE(am.UseArg("help") == std::nullopt);
+
+    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"command"});
+    REQUIRE(!am.UseArg("_command"));
+
+    REQUIRE(!am.HasUnused());
+
+  }
+
+  // test for single-letter options (commands) e.g., tar -czvf
+  {
+
+    emp::vector<std::string> arguments = {
+      "command", "-ahi"
+    };
+
+    std::vector<char*> argv;
+    for (const auto& arg : arguments) argv.push_back((char*)arg.data());
+
+    argv.push_back(nullptr);
+
+    auto specs = emp::ArgManager::make_builtin_specs();
+    specs["apple|a"] = emp::ArgSpec(
+      0,
+      "some information 'n stuff"
+    );
+    specs["info|i"] = emp::ArgSpec(0, "no things");
+
+    emp::ArgManager am(argv.size() - 1, argv.data(), specs);
+
+    am.PrintHelp(std::cout);
+
+    am.PrintDiagnostic(std::cout);
+
+    REQUIRE(am.UseArg("help") == ((emp::vector<std::string>) {}));
+    REQUIRE(am.UseArg("apple") == ((emp::vector<std::string>) {}));
+    REQUIRE(am.UseArg("info") == ((emp::vector<std::string>) {}));
+
+    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"command"});
+    REQUIRE(!am.UseArg("_command"));
+
+    REQUIRE(!am.HasUnused());
+
+  }
+
+  // another test for single-letter options (commands) e.g., tar -czvf
+  // do end strung-together single-letters w/ quotas > 0 up in _invalid?
+  {
+
+    emp::vector<std::string> arguments{
+      "command", "-h", "-i", "boop", "-ahi"
+    };
+
+    std::vector<char*> argv;
+    for (const auto& arg : arguments) argv.push_back((char*)arg.data());
+
+    argv.push_back(nullptr);
+
+    auto specs = emp::ArgManager::make_builtin_specs();
+    specs["aardvark|a"] = emp::ArgSpec(
+      0,
+      "some information 'n stuff"
+    );
+    specs["ink|i"] = emp::ArgSpec(1, "a things");
+
+    emp::ArgManager am(argv.size() - 1, argv.data(), specs);
+
+    am.PrintHelp(std::cout);
+
+    am.PrintDiagnostic(std::cout);
+
+    REQUIRE(am.UseArg("help") == ((emp::vector<std::string>) {}));
+    REQUIRE(am.UseArg("aardvark") == std::nullopt);
+    REQUIRE(am.UseArg("ink") == ((emp::vector<std::string>) {"boop"}));
+
+    REQUIRE(am.UseArg("_invalid") == ((emp::vector<std::string>) {"-ahi"}));
+
+    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"command"});
+    REQUIRE(!am.UseArg("_command"));
+
+    REQUIRE(!am.HasUnused());
+
+  }
+
+  // do we comply with POSIX ignore leading dashes after -- encountered?
+  {
+
+    emp::vector<std::string> arguments{
+      "command", "--help", "--", "-i", "boop", "-ahi", "--aardvark"
+    };
+
+    std::vector<char*> argv;
+    for (const auto& arg : arguments) argv.push_back((char*)arg.data());
+
+    argv.push_back(nullptr);
+
+    auto specs = emp::ArgManager::make_builtin_specs();
+    specs["aardvark|a"] = emp::ArgSpec(
+      0,
+      "some information 'n stuff"
+    );
+    specs["ink|i"] = emp::ArgSpec(1, "a things");
+
+    emp::ArgManager am(argv.size() - 1, argv.data(), specs);
+
+    am.PrintHelp(std::cout);
+
+    am.PrintDiagnostic(std::cout);
+
+    REQUIRE(am.UseArg("help") == ((emp::vector<std::string>) {}));
+    REQUIRE(am.UseArg("aardvark") == std::nullopt);
+    REQUIRE(am.UseArg("ink") == std::nullopt);
+
+    REQUIRE(am.UseArg("_positional") ==
+      ((emp::vector<std::string>) {"-i", "boop", "-ahi", "--aardvark"})
+    );
+
+    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"command"});
+    REQUIRE(!am.UseArg("_command"));
+
+    REQUIRE(!am.HasUnused());
+
+  }
 
 }

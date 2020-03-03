@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019
+ *  @date 2019-2020.
  *
  *  @file matchbin_metrics.h
  *  @brief Metric structs that can be plugged into MatchBin.
@@ -30,14 +30,13 @@
 #include <openssl/sha.h>
 #endif
 
-#include "tools/Binomial.h"
-
 #include "../base/assert.h"
 #include "../base/array.h"
 #include "../base/vector.h"
 #include "../tools/math.h"
 #include "../tools/IndexMap.h"
 #include "../tools/BitSet.h"
+#include "../tools/Distribution.h"
 #include "../tools/string_utils.h"
 #include "../tools/hash_utils.h"
 #include "../tools/tuple_utils.h"
