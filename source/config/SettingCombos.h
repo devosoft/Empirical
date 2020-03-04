@@ -310,7 +310,8 @@ namespace emp {
       return out_args;
     }
 
-    void PrintHelp() const {
+    template <typename... Ts>
+    void PrintHelp(const Ts &... examples) const {
 
       std::cout << "Format: " << exe_name << " [OPTIONS...]\n"
                 << "\nSetting Options:\n";
@@ -319,12 +320,18 @@ namespace emp {
                   << ptr->desc << " (--" << name << ") ["
                   << ptr->AsString() << "]\n";
       }
+
       std::cout << "\nAction Options:\n";
       for (auto [name, action] : action_map) {
         if (name.size() == 2) continue;  // Skip flag entries.
         std::cout << " -" << action.flag << " : "
                   << action.desc << " (" << name << ")\n";
       }
+
+      if constexpr (sizeof...(examples) > 0) {
+        std::cout << "\nExample: " << emp::to_string(examples...) << std::endl;
+      }
+
       std::cout.flush();
     }
   };
