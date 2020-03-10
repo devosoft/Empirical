@@ -114,6 +114,7 @@ TEST_CASE("Test Event Driven GP", "[Hardware]")
 	ss.str(std::string());
 
 	// Testing states and SingleProcess
+	gp.SpawnCore(0); // Spin up main core
 	emp::EventDrivenGP::Instruction i_not(2, 0); // not id = 2, not arg 0 = 0
 	gp.PushInst(i_not); // will be pushed onto the end of the last function
 	REQUIRE(gp.GetFunction(0).GetSize() == 2);
