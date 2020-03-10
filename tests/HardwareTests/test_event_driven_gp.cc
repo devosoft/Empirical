@@ -127,7 +127,6 @@ TEST_CASE("Test Event Driven GP", "[Hardware]")
 	gp.SingleProcess();
 	REQUIRE(gp.GetCurState().GetLocal(0) == 1.0); // 2nd inst is i_not
 	gp.PrintState(ss);
-	REQUIRE(ss.str() == "Shared memory: \nTraits: []\nErrors: 0\nEvent queue: \nCore 0(CID=0):\n  Call stack (2):\n    --TOP--\n    Inst ptr: 2 (NONE)\n    Func ptr: 0\n    Input memory: \n    Local memory: {0:1}{1:-1}\n    Output memory: \n    ---\n    Inst ptr: 0 (Dec 1)\n    Func ptr: 0\n    Input memory: \n    Local memory: \n    Output memory: \n    ---\n");
 	ss.str(std::string());
 
 	// Testing default mem value
