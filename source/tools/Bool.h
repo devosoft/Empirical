@@ -52,9 +52,9 @@ namespace emp {
 namespace std {
 
   /// Setup operator<< to work with ostream (must be in std to work)
-  inline std::istream & operator>>(std::istream & out, const emp::Bool & b) {
-    out >> b.Value();
-    return out;
+  inline std::istream & operator>>(std::istream & in, emp::Bool & b) {
+    in >> b.Value();
+    return in;
   }
 
   /// Setup operator<< to work with ostream (must be in std to work)

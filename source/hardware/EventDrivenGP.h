@@ -807,8 +807,6 @@ namespace emp {
       // Add all available cores to inactive.
       for (size_t i = 0; i < inactive_cores.size(); ++i)
         inactive_cores[i] = (inactive_cores.size() - 1) - i;
-      // Spin up main core (will spin up on function ID = 0).
-      SpawnCore(0, memory_t(), true);
 
     }
 

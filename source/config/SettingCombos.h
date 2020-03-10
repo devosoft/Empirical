@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include <sstream>
 #include <string>
+#include <string_view>
 
 #include "../base/Ptr.h"
 #include "../base/vector.h"
@@ -29,32 +30,36 @@ namespace emp {
   class SettingCombos {
   private:
     struct SettingBase {
-      size_t id;                                       ///< Unique ID/position for this setting.
-      std::string name;
-      std::string desc;
-      std::string flag;
-      std::string option;
+      size_t id;            ///< Unique ID/position for this setting.
+      std::string name;     ///< Name for this setting
+      std::string desc;     ///< Description of setting
+      char flag;            ///< Command-line flag ('\0' for none)
+      std::string option;   ///< Command-line longer option.
 
-      SettingBase(const std::string & _name, const std::string & _desc, const std::string & _flag)
+      SettingBase(const std::string & _name, const std::string & _desc, const char _flag)
         : name(_name), desc(_desc), flag(_flag), option(emp::to_string("--",_name)) { }
       virtual ~SettingBase() { }
 
       virtual size_t GetSize() const = 0;               ///< How many values are available?
       virtual std::string AsString() const = 0;         ///< All values, as a single string.
       virtual std::string AsString(size_t) const = 0;   ///< A specified value as a string.
-      virtual void FromString(const std::string &) = 0; ///< Convert string to range of settings.
+      virtual void FromString(const std::string_view &) = 0; ///< Convert string to range of settings.
+      virtual void SetValueID(size_t) = 0;              ///< Setup cur value in linked variable
 
-      bool IsMatch(const std::string & test_option) const {
-        return test_option == flag || test_option == option;
-      }
+      bool IsOptionMatch(const std::string & test_option) const { return test_option == option; }
+      bool IsFlagMatch(const char test_flag) const { return test_flag == flag; }
     };
 
     template <typename T>
     struct SettingInfo : public SettingBase {
       emp::vector<T> values;
+      emp::Ptr<T> var_ptr = nullptr;
 
-      SettingInfo(const std::string & _name, const std::string & _desc, const std::string & _flag)
-        : SettingBase(_name, _desc, _flag) { }
+      SettingInfo(const std::string & _name,
+                  const std::string & _desc,
+                  const char _flag,
+                  emp::Ptr<T> _var=nullptr)
+        : SettingBase(_name, _desc, _flag), var_ptr(_var) { }
 
       size_t GetSize() const override { return values.size(); }
       std::string AsString() const override {
@@ -69,15 +74,28 @@ namespace emp {
         return emp::to_string(values[id]);
       }
 
-      void FromString(const std::string & input) override {
+      void FromString(const std::string_view & input) override {
         values = emp::from_strings<T>(emp::slice(input, ','));
+      }
+
+      void SetValueID(size_t id) override {
+        if (var_ptr) *var_ptr = values[id];
       }
     };
 
-    using set_ptr_t = emp::Ptr<SettingBase>;
+    /// A setting that is just a flag with an action function to run if it's called.
+    struct ActionFlag {
+      std::string name;           ///< Name for this flag
+      std::string desc;           ///< Description of flag
+      char flag;                  ///< Command-line flag ('\0' for none)
+      std::function<void()> fun;  ///< Function to be called if flag is set.
+    };
 
-    emp::vector<set_ptr_t> settings;                           ///< Order to be varied.
-    std::unordered_map<std::string, set_ptr_t> setting_map;  ///< Settings by name.
+    std::string exe_name = "";
+
+    emp::vector<emp::Ptr<SettingBase>> settings;               ///< Order to be varied.
+    std::map<std::string, emp::Ptr<SettingBase>> setting_map;  ///< Settings by name.
+    std::map<std::string, ActionFlag> action_map;              ///< Available flags
 
     emp::vector<size_t> cur_combo;    ///< Which settings are we currently using?
 
@@ -89,7 +107,13 @@ namespace emp {
     }
 
     /// Start over stepping through all combinations of parameter values.
-    void Reset() { for (size_t & x : cur_combo) x = 0; }
+    void Reset() {
+      // Setup as base combo.
+      for (size_t & x : cur_combo) x = 0;
+
+      // Setup all linked values.
+      for (auto x : settings) x->SetValueID(0);
+    }
 
     /// Get the current value of a specified setting.
     template <typename T>
@@ -109,7 +133,7 @@ namespace emp {
     template <typename T>
     emp::vector<T> & AddSetting(const std::string & name,
                                 const std::string & desc="",
-                                const std::string & option_flag="") {
+                                const char option_flag='\0') {
       emp_assert(!emp::Has(setting_map, name));
       emp::Ptr<SettingInfo<T>> new_ptr = emp::NewPtr<SettingInfo<T>>(name, desc, option_flag);
       new_ptr->id = settings.size();
@@ -117,6 +141,36 @@ namespace emp {
       setting_map[name] = new_ptr;
       cur_combo.push_back(0);
       return new_ptr->values;
+    }
+
+    /// A setting can also be linked to a value that is kept up-to-date.
+    template <typename T>
+    emp::vector<T> & AddSetting(const std::string & name,
+                                const std::string & desc,
+                                const char option_flag,
+                                T & var)
+    {
+      emp_assert(!emp::Has(setting_map, name));
+      emp::Ptr<SettingInfo<T>> new_ptr =
+        emp::NewPtr<SettingInfo<T>>(name, desc, option_flag, &var);
+      new_ptr->id = settings.size();
+      settings.push_back(new_ptr);
+      setting_map[name] = new_ptr;
+      cur_combo.push_back(0);
+      return new_ptr->values;
+    }
+
+    void AddAction(const std::string & name,
+                   const std::string & desc,
+                   const char flag,
+                   std::function<void()> fun)
+    {
+      std::string name_option = emp::to_string("--", name);
+      std::string flag_option = emp::to_string("-", flag);
+      emp_assert(!emp::Has(action_map, name_option));
+      emp_assert(!emp::Has(action_map, flag_option));
+      action_map[name_option] = ActionFlag{ name, desc, flag, fun };
+      action_map[flag_option] = ActionFlag{ name, desc, flag, fun };
     }
 
     /// Access ALL values for a specified setting, to be modified freely.
@@ -146,21 +200,25 @@ namespace emp {
     /// Determine how many unique combinations there currently are.
     size_t CountCombos() {
       size_t result = 1;
-      for (set_ptr_t ptr : settings) result *= ptr;
+      for (auto ptr : settings) result *= ptr->GetSize();
       return result;
     }
 
     /// Set the next combination of settings to be active.  Return true if successful
     /// or false if we ran through all combinations and reset.
     bool Next() {
-    for (size_t i = 0; i < cur_combo.size(); i++) {
+      for (size_t i = 0; i < cur_combo.size(); i++) {
         cur_combo[i]++;
 
         // Check if this new combo is valid.
-        if (cur_combo[i] < settings[i]->GetSize()) return true;
+        if (cur_combo[i] < settings[i]->GetSize()) {
+          settings[i]->SetValueID( cur_combo[i] );  // Set value in linked variable.
+          return true;
+        }
 
         // Since it's not, prepare to move on to the next one.
         cur_combo[i] = 0;
+        settings[i]->SetValueID(0);      
       }
 
       // No valid combo found.
@@ -178,10 +236,10 @@ namespace emp {
     }
 
     /// Convert all of the current values into a comma-separated string.
-    std::string CurString() const {
+    std::string CurString(const std::string & separator=",") const {
       std::string out_str;
       for (size_t i = 0; i < cur_combo.size(); i++) {
-        if (i) out_str += ",";
+        if (i) out_str += separator;
         out_str += settings[i]->AsString(cur_combo[i]);
       }
       return out_str;
@@ -190,7 +248,15 @@ namespace emp {
     /// Scan through all settings for a match option and return ID.
     size_t FindOptionMatch(const std::string & option_name) {
       for (const auto & setting : settings) {
-        if (setting->IsMatch(option_name)) return setting->id;
+        if (setting->IsOptionMatch(option_name)) return setting->id;
+      }
+      return (size_t) -1;
+    }
+
+    /// Scan through all settings for a match option and return ID.
+    size_t FindFlagMatch(const char symbol) {
+      for (const auto & setting : settings) {
+        if (setting->IsFlagMatch(symbol)) return setting->id;
       }
       return (size_t) -1;
     }
@@ -198,9 +264,14 @@ namespace emp {
     /// Take an input set of config options, process them, and return set of unpressed ones.
     emp::vector<std::string> ProcessOptions(const emp::vector<std::string> & args) {
       emp::vector<std::string> out_args;
+      exe_name = args[0];
 
-      for (size_t i = 0; i < args.size(); i++) {
-        size_t id = FindOptionMatch(args[i]);
+      for (size_t i = 1; i < args.size(); i++) {
+        const std::string & cur_arg = args[i];
+        if (cur_arg.size() < 2 || cur_arg[0] != '-') continue;  // If isn't an option, continue.
+
+        // See if this is a fully spelled-out option.
+        size_t id = FindOptionMatch(cur_arg);
         if (id < settings.size()) {
           if (++i >= args.size()) {
             std::cout << "ERROR: Must provide args to use!\n";          
@@ -210,11 +281,58 @@ namespace emp {
           settings[id]->FromString(args[i]);
         }
 
+        // See if we have a flag option.
+        id = FindFlagMatch(cur_arg[1]);
+        if (id < settings.size()) {
+          // Check if the flag is followed by the values without whitespace.
+          if (cur_arg.size() > 2) {
+            settings[id]->FromString( emp::view_string(cur_arg,2) );
+          }
+          else if (++i >= args.size()) {
+            std::cout << "ERROR: Must provide args to use!\n";          
+            // @CAO Need to signal error...
+            return args;
+          }
+          else {
+            settings[id]->FromString(args[i]);
+          }
+        }
+
+        // Or see of this is a flag trigger.
+        else if (Has(action_map, cur_arg)) {
+          action_map[cur_arg].fun();
+        }
+
         // Otherwise this argument will go unused; send it back.
-        else out_args.push_back(args[i]);
+        else out_args.push_back(cur_arg);
       }
 
       return out_args;
+    }
+
+    template <typename... Ts>
+    void PrintHelp(const Ts &... examples) const {
+
+      std::cout << "Format: " << exe_name << " [OPTIONS...]\n"
+                << "\nSetting Options:\n";
+      for (auto [name, ptr] : setting_map) {
+        std::cout << " -" << ptr->flag << " [Values...] : "
+                  << ptr->desc << " (--" << name << ") ["
+                  << ptr->AsString() << "]\n";
+      }
+
+      std::cout << "\nAction Options:\n";
+      for (auto [name, action] : action_map) {
+        if (name.size() == 2) continue;  // Skip flag entries.
+        std::cout << " -" << action.flag << " : "
+                  << action.desc << " (" << name << ")\n";
+      }
+
+      if constexpr (sizeof...(examples) > 0) {
+        std::cout << "\nExample: " << emp::to_string(examples...) << std::endl;
+      }
+
+      std::cout.flush();
     }
   };
 

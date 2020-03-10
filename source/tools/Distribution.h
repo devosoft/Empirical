@@ -26,6 +26,12 @@ namespace emp {
     double GetTotalProb() const { return weights.GetWeight(); }
     double operator[](size_t id) const { return weights.GetWeight(id); }
 
+    /// Pick an item from a distribution using a value between 0.0 and 1.0.
+    size_t PickPosition(double in_value) {
+      emp_assert(in_value >= 0.0 && in_value <= 1.0, in_value);
+      return weights.Index( in_value * GetTotalProb() );
+    }
+
     size_t PickRandom(Random & random) const {
       return weights.Index( random.GetDouble(GetTotalProb()) );
     }
