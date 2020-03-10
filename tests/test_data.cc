@@ -41,6 +41,17 @@ bool compareFiles(const std::string& p1, const std::string& p2) {
                         std::istreambuf_iterator<char>(f2.rdbuf()));
 }
 
+TEST_CASE("Test DataNode", "[data]") {
+    emp::DataNode<int, emp::data::Current, emp::data::Range, emp::data::Pull, emp::data::Log> data;
+    REQUIRE(data.GetCount()==0);
+    data.Add(27, 28, 29);
+    REQUIRE(data.GetCount()==3);
+    data.Reset();
+    REQUIRE(data.GetCount()==0);
+
+
+}
+
 TEST_CASE("Test DataRange", "[data]") {
     emp::DataNode<int, emp::data::Current, emp::data::Range, emp::data::Pull, emp::data::Log> data;
 
