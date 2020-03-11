@@ -6,10 +6,10 @@
 
 #include "tools/BitSet.h"
 #include "tools/Random.h"
- 
- 
+
+
 /**
- * Status booleans (Any, All, None) 
+ * Status booleans (Any, All, None)
  * as well as Clear and SetAll
  */
 void test_status(){
@@ -21,21 +21,21 @@ void test_status(){
 	REQUIRE(bs10.all());
 	bs10.Clear();
 	REQUIRE(bs10.none());
-} 
- 
+}
+
 /**
  * GetSize
  */
 void test_size(){
 	emp::BitSet<42> bs42;
 	REQUIRE(bs42.size() == 42);
-	
+
 	emp::BitSet<35> bs35;
 	REQUIRE(bs35.GetSize() == 35);
-	
+
 	emp::BitSet<1> bs1;
 	REQUIRE(bs1.size() == 1);
-} 
+}
 
 /**
  * Flip and Toggle
@@ -44,7 +44,7 @@ void test_flip(){
 	emp::BitSet<2> bs2;	// bs2 = 00
 	bs2.flip(0);				// bs2 = 01
 	REQUIRE(bs2[0]);
-	
+
 	emp::BitSet<8> bs8;	// bs8 = 00000000
 	bs8.flip(0,4);			// bs8 = 00001111
 	REQUIRE(bs8[0]);
@@ -52,10 +52,10 @@ void test_flip(){
 	REQUIRE(bs8[2]);
 	REQUIRE(bs8[3]);
 	REQUIRE(!bs8[4]);
-	
+
 	bs8[0].Toggle();		// bs8 = 00001110
 	REQUIRE(!bs8[0]);
-	
+
 	emp::BitSet<4> bs4;	// bs4 = 0000
 	bs4.flip();					// bs4 = 1111
 	REQUIRE(bs4.all());
@@ -83,7 +83,7 @@ void test_byte(){
 	emp::BitSet<10>	bs10;
 	bs10.SetByte(0, 10);
 	REQUIRE(bs10.GetByte(0) == 10);
-	
+
 	bs10.flip(0,4);
 	REQUIRE(bs10.GetByte(0) == 5);
 	bs10.SetByte(1, 3);
@@ -98,7 +98,7 @@ void test_shift(){
 	bs40.SetByte(0, 1);
 	bs40 <<= 34;
 	REQUIRE(bs40.GetByte(4) == 4);
-	
+
 	emp::BitSet<10> bs10;
 	bs10.SetByte(0, 10);
 	bs10 >>= 2;
@@ -136,7 +136,7 @@ void test_bit(){
 	emp::BitSet<8> bs8;
 	bs8.Set(0, 1); 			// bs8 = 00000001
 	REQUIRE(bs8.Get(0));
-	
+
 	bs8.Set(7, 1);			// bs8 = 10000001
 	bs8.Set(0, 0);			// bs8 = 10000000
 	REQUIRE(!bs8.Get(0));
@@ -198,7 +198,7 @@ void test_more_comparators(){
 	bs8_1.NAND_SELF(bs8_2);
 	REQUIRE(bs8_1.Any());
 	REQUIRE( !(bs8_1.Get(1)) );
-	
+
 	// NOR
 	bs8_1.SetAll();
 	bs8_2.Clear();
@@ -206,7 +206,7 @@ void test_more_comparators(){
 	bs8_1.flip(1);
 	bs8_1.NOR_SELF(bs8_2);
 	REQUIRE(bs8_1.Get(1));
-	
+
 	// EQU
 	bs8_1.Clear();
 	bs8_2.SetAll();
@@ -235,7 +235,7 @@ void test_copy(){
 	emp::BitSet<10> bs10;
 	bs10.SetAll();
 	bs10.flip(0,5);
-	
+
 	emp::BitSet<10> bs10_1;
 	bs10_1 = bs10;
 	REQUIRE(bs10 == bs10_1);
@@ -279,10 +279,10 @@ void test_import(){
 	emp::BitSet<8> bs8;
 	emp::BitSet<20> bs20;
 	bs20[5] = 1;
-	
+
 	bs8.Import(bs20);
 	REQUIRE(bs8[5]);
-	
+
 	emp::BitSet<10> bs10;
 	bs10.SetAll();
 	bs20.Import(bs10);
@@ -296,20 +296,20 @@ void test_print(){
 	emp::BitSet<8> bs8;
 	bs8.SetAll();
 	bs8.Set(1, false);
-	
+
 	std::stringstream ss;
 	bs8.Print(ss);
 	REQUIRE(ss.str() == "11111101");
 	ss.str(std::string());
-	
+
 	ss << bs8;
 	REQUIRE(ss.str() == "11111101");
 	ss.str(std::string());
-	
+
 	bs8.PrintArray(ss);
 	REQUIRE(ss.str() == "10111111");
 	ss.str(std::string());
-	
+
 	bs8.Clear();
 	bs8.Set(1, true);
 	bs8.Set(4, true);
