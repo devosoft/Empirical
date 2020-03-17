@@ -215,7 +215,7 @@ namespace emp {
     /// Retrieve a variable by its type and name. (Slower!)
     template <typename T>
     T & Get(const std::string & name) {
-      emp_assert(HasName(name));
+      emp_assert(HasName(name), name);
       emp_assert(IsType<T>(name), "DataMap::Get() must be provided the correct type.",
                  name, GetType(name), emp::GetTypeID<T>());
       return memory.Get<T>(GetID(name));
