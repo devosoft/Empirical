@@ -11,7 +11,6 @@ TEST_CASE("Test Range", "[tools]")
 {
   // Basic constructor
   emp::Range<int> rng;
-  rng = emp::Range<int>(15,30);
   
 	// GetLower GetUpper
 	emp::Range<int> r(0,10);
