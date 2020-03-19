@@ -106,7 +106,7 @@ TEST_CASE("Test memo_function", "[tools]")
   //REQUIRE(m2(5,5) == multiply(5,5));
   
   emp::memo_function<std::string(std::string, std::string)> addWords;
-  addWords = [](std::string a, std::string b){ return a+" "+b; };
+  addWords = [](std::string a, const std::string & b){ return a+" "+b; };
   REQUIRE(addWords("Once", "upon") == "Once upon");
   
   emp::memo_function<std::string(std::string, std::string)> addWords1(std::move(addWords));
@@ -119,7 +119,7 @@ TEST_CASE("Test memo_function", "[tools]")
   addWords2 = std::move(addWords1);
   REQUIRE(addWords2("Yellow", "chair") == "Yellow chair");
   
-  std::function<std::string(std::string, std::string)> stdCreateSentence = [](std::string a, std::string b){ a[0] = toupper(a[0]); return a+" "+b+"."; };
+  std::function<std::string(std::string, std::string)> stdCreateSentence = [](std::string a, const std::string & b){ a[0] = toupper(a[0]); return a+" "+b+"."; };
   emp::memo_function<std::string(std::string, std::string)> createSentence;
   createSentence = std::move(stdCreateSentence);
   REQUIRE(createSentence("he","is") == "He is.");
