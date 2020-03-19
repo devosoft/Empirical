@@ -50,7 +50,6 @@ TEST_CASE("Test graph_utils", "[tools]")
 	/// 1 4
 	/// 2 4
 	/// 3 4
-	emp::Graph grc = build_graph_random(5, 7, random, true);
 	//grc.PrintSym();
 	
 	/// unconnected doesn't have this issue b/c it doesn't rely on build_graph_tree
