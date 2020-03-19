@@ -22,10 +22,6 @@ TEST_CASE("Test NFA", "[tools]")
 	nfa.AddTransition(3,0,"d");
 	
 	size_t a = 97;
-	size_t b = 98;
-	size_t c = 99;
-	size_t d = 100;
-	size_t e = 101;
 	
 	// GetSymbolOptions
 	std::set<size_t> s;
