@@ -14,7 +14,7 @@ class MyOrg
 	private:
 		double value;
 	public:
-		MyOrg(double val) : value(val) {}
+		explicit MyOrg(double val) : value(val) {}
 		
 		double GetFitness(){ return value; }
 		double DoMutations(emp::Random& r){ value = value+1.0; return value; }
