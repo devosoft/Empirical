@@ -22,7 +22,6 @@ TEST_CASE("Test Random", "[tools]")
 	
 	// Get UInt
 	size_t r_ui = rnd.GetUInt(emp::Range<size_t>(0,5));
-	REQUIRE(r_ui >= 0);
 	REQUIRE(r_ui < 5);
 	
 	// Get Int
