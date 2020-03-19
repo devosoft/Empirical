@@ -197,7 +197,7 @@ namespace emp {
 
 // specialization for std::tuple_size
 template <class T, size_t N>
-class std::tuple_size<emp::array<T, N>> : public integral_constant<size_t, N> {
+struct std::tuple_size<emp::array<T, N>> : public integral_constant<size_t, N> {
 };
 
 // A crude, generic printing function for arrays.
