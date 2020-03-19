@@ -146,7 +146,7 @@ TEST_CASE("Test World", "[Evolve]")
 	REQUIRE(world3[2] == 16.0);
 	
 	size_t randomID = world3.GetRandomCellID(0, 3);
-	bool inRange = ( (randomID < 3) && (randomID >= 0) );
+	bool inRange = ( (randomID < 3) );
 	REQUIRE( inRange );
 	
 	world3.DoDeath(2);
