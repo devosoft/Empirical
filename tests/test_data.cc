@@ -43,7 +43,7 @@ bool compareFiles(const std::string& p1, const std::string& p2) {
 
 TEST_CASE("Test DataNode", "[data]") {
     // Create a new empty DataNode
-    emp::DataNode<int, emp::data::Current, emp::data::Range, emp::data::Pull, emp::data::Log> data;
+    emp::DataNode<int, emp::data::Current, emp::data::Range, emp::data::Pull, emp::data::Log, emp::data::Info> data;
     // Test GetCount function before and after adding to the node
     REQUIRE(data.GetCount()==0);
     data.Add(27, 28, 29);
@@ -52,6 +52,14 @@ TEST_CASE("Test DataNode", "[data]") {
     REQUIRE(data.GetCount()==0);
     // ResetCount is untracked so should always be 0
     REQUIRE(data.GetResetCount()==0);
+
+    const std::string info = "test data node";
+    data.SetDescription(info);
+    data.SetName(info);
+    data.SetKeyword(info);
+    REQUIRE(data.GetDescription()==info);
+    REQUIRE(data.GetName()==info);
+    REQUIRE(data.GetKeyword()==info);
 }
 
 TEST_CASE("Test DataRange", "[data]") {
