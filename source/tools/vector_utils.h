@@ -268,10 +268,12 @@ namespace emp {
   template <typename T>
   void HeapInsert(emp::vector<T> & v, T val) {
     size_t pos = v.size();
+    size_t ppos = tree_parent(pos);
     v.push_back(val);
-    while (pos > 0) {
-      pos = tree_parent(pos);
-      if (!Heapify(v,pos)) break;
+    while (pos > 0 && v[ppos] < v[pos]) {
+      std::swap(v[pos], v[ppos]);
+      pos = ppos;
+      ppos = tree_parent(pos);
     }
   }
 
