@@ -28,7 +28,7 @@ TEST_CASE("Test Lexer", "[tools]")
   std::stringstream ss;
   emp::TokenInfo ti = lx.GetTokenInfo(lx.GetTokenID("vowel"));
   ti.Print(ss);
-  REQUIRE(ss.str() == "Name:vowel  RegEx:\"[a-z]*([aeiou])+[a-z]*\"  ID:255  save_lexeme:0\n");
+  REQUIRE(ss.str() == "Name:vowel  RegEx:\"[a-z]*([aeiou])+[a-z]*\"  ID:255  save_lexeme:1  save_token:1\n");
   ss.str(std::string());
   
   emp::Lexer lxr;
