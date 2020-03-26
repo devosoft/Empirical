@@ -106,7 +106,7 @@ TEST_CASE("Test memo_function", "[tools]")
   //REQUIRE(m2(5,5) == multiply(5,5));
   
   emp::memo_function<std::string(std::string, std::string)> addWords;
-  addWords = [](std::string a, const std::string & b){ return a+" "+b; };
+  addWords = [](const std::string & a, const std::string & b){ return a+" "+b; };
   REQUIRE(addWords("Once", "upon") == "Once upon");
   
   emp::memo_function<std::string(std::string, std::string)> addWords1(std::move(addWords));
