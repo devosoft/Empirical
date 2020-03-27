@@ -74,3 +74,20 @@ TEST_CASE("Test array", "[base]")
 	REQUIRE(emp::assert_last_fail);
 	emp::assert_clear();
 }
+
+TEST_CASE("Another test array", "[base]")
+{
+  constexpr int A_SIZE = 50;
+  emp::array<int, A_SIZE> test_array;
+
+  for (size_t i = 0; i < A_SIZE; i++) {
+    test_array[i] = (int) (i * i);
+  }
+
+  int sum = 0;
+  for (size_t i = 0; i < A_SIZE; i++) {
+    sum += test_array[i];
+  }
+
+  REQUIRE(sum == 40425);
+}
