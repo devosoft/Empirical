@@ -305,3 +305,82 @@ TEST_CASE("Test BitMatrix", "[tools]")
 	test_conversions();
   test_mask();
 }
+
+// this templating is necessary to force full coverage of templated classes.
+// Since c++ doesn't generate code for templated methods if those methods aren't
+// explicitly called (and thus our profiling doesn't see them), we have to
+// force them all to be included in the comilation.
+template class emp::BitMatrix<4, 5>;
+TEST_CASE("Another test BitMatrix", "[tools]")
+{
+
+  emp::BitMatrix<4,5> bm45;
+
+  REQUIRE(bm45.NumCols() == 4);
+  REQUIRE(bm45.NumRows() == 5);
+  REQUIRE(bm45.GetSize() == 20);
+
+  REQUIRE(bm45.Any() == false);
+  REQUIRE(bm45.None() == true);
+  REQUIRE(bm45.All() == false);
+  REQUIRE(bm45.Get(1,1) == 0);
+  REQUIRE(bm45.Get(1,2) == 0);
+  REQUIRE(bm45.CountOnes() == 0);
+
+  bm45.Set(1,2);  // Try setting a single bit!
+
+  REQUIRE(bm45.Any() == true);
+  REQUIRE(bm45.None() == false);
+  REQUIRE(bm45.All() == false);
+  REQUIRE(bm45.Get(1,1) == 0);
+  REQUIRE(bm45.Get(1,2) == 1);
+  REQUIRE(bm45.CountOnes() == 1);
+  REQUIRE(bm45.FindBit() == bm45.ToID(1,2));
+
+  bm45.SetAll();
+  REQUIRE(bm45.All() == true);
+  REQUIRE(bm45.None() == false);
+  bm45.ClearRow(2);
+  REQUIRE(bm45.Get(2,2) == 0);
+  REQUIRE(bm45.Get(2,1) == 1);
+  bm45.ClearCol(1);
+  REQUIRE(bm45.Get(1,1) == 0);
+  bm45.Clear();
+  REQUIRE(bm45.Get(0,2) == 0);
+  bm45.SetRow(2);
+  REQUIRE(bm45.Get(0,2) == 1);
+  REQUIRE(bm45.Get(0,0) == 0);
+  bm45.SetCol(0);
+  REQUIRE(bm45.Get(0,0) == 1);
+  bm45.Clear();
+  bm45.SetRow(2);
+  REQUIRE(bm45.Get(0,2) == 1);
+  REQUIRE(bm45.Get(0,1) == 0);
+  bm45.UpShift();
+  // TODO: figure out how upshift actually works and write a real test for it
+
+
+
+/* This block needs asserts
+  bm45 = bm45.GetReach().GetReach();
+
+  bm45 = bm45.DownShift();
+
+  bm45 = bm45.RightShift();
+
+  bm45 = bm45.URShift();
+
+  bm45 = bm45.UpShift();
+
+  bm45 = bm45.ULShift();
+
+  bm45 = bm45.LeftShift();
+
+  bm45 = bm45.DLShift();
+
+  bm45 = bm45.DRShift();
+
+  emp::BitMatrix<10,10> bm100;
+  bm100.Set(9,9);
+*/
+}
