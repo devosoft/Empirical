@@ -9,7 +9,7 @@
 
 #include <sstream>
 #include <iostream>
-
+#include <functional>
 TEST_CASE("Test Ptr", "[base]")
 {
 	emp::SetPtrDebug();
@@ -56,7 +56,7 @@ TEST_CASE("Test Ptr", "[base]")
 	REQUIRE( numPtr.operator<=(numPtr2) );
 }
 
-TEST_CASE("Test Ptr", "[base]")
+TEST_CASE("Another Test Ptr", "[base]")
 {
   // Test default constructor.
   emp::Ptr<int> ptr1;
