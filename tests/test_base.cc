@@ -31,26 +31,6 @@
   } while (false)
 
 
-TEST_CASE("Test array", "[base]")
-{
-  constexpr int A_SIZE = 50;
-  emp::array<int, A_SIZE> test_array;
-  
-  REQUIRE(std::tuple_size<decltype(test_array)>::value == A_SIZE);
-
-  for (size_t i = 0; i < A_SIZE; i++) {
-    test_array[i] = (int) (i * i);
-  }
-
-  int sum = 0;
-  for (size_t i = 0; i < A_SIZE; i++) {
-    sum += test_array[i];
-  }
-
-  REQUIRE(sum == 40425);
-}
-
-
 TEST_CASE("Test macro_math", "[base]")
 {
 
