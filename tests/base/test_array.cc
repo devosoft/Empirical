@@ -1,3 +1,7 @@
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2016-2018.
+//  Released under the MIT Software license; see doc/LICENSE
+
 #define CATCH_CONFIG_MAIN
 
 #include "third-party/Catch/single_include/catch.hpp"
