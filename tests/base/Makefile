@@ -1,4 +1,4 @@
-TEST_NAMES = array assert errors ptr vector
+TEST_NAMES = array assert errors macros macro_math ptr vector
 
 #  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 FLAGS = -std=c++17 -DTDEBUG -Wall -Wno-unused-function -I../../source/ -I../../
