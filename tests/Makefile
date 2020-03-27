@@ -1,6 +1,6 @@
 GCOV_FLAGS := -o0 -g --coverage
 
-TEST_NAMES := assert base constexpr data evo geometry meta scholar systematics tools games hardware
+TEST_NAMES :=  constexpr data evo geometry meta scholar systematics tools games hardware
 
 FLAGS := -std=c++17 -pthread -Wall -Wno-unused-function -I../source/ -I../ -I../third-party/cereal/include/ -msse4.2
 
@@ -31,10 +31,10 @@ cover-test-%: test_%.cc
 # Test in debug mode without pointer tracker
 test: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
-	cd ToolsTests && make test
-	cd BaseTests && make test
-	cd EvoTests && make test
-	cd HardwareTests && make test
+	cd tools && make test
+	cd base && make test
+	cd Evolve && make test
+	cd hardware && make test
 
 # Test optimized version without debug features
 opt: FLAGS := -std=c++17 -pthread -DNDEBUG -O3 -Wno-unused-function -DCI=$(CI) -I../source/ -I../third-party/cereal/include/ -I../
