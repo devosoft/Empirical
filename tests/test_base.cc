@@ -336,22 +336,6 @@ TEST_CASE("Test macros", "[base]")
 }
 
 
-TEST_CASE("Test errors", "[tools]")
-{
-  emp::TriggerExcept("test_fail", "The test failed.  *sob*");
-  emp::TriggerExcept("test_fail2", "The second test failed too.  But it's not quite as aweful.", false);
-  emp::TriggerExcept("test_fail2", "The third test is just test 2 again, but worse", true);
-
-  REQUIRE( emp::CountExcepts() == 3 );
-  auto except = emp::PopExcept("test_fail2");
-  REQUIRE( emp::CountExcepts() == 2 );
-  REQUIRE( except.desc == "The second test failed too.  But it's not quite as aweful." );
-  REQUIRE( emp::HasExcept("test_fail2") == true );
-  REQUIRE( emp::HasExcept("test_fail3") == false );
-  emp::ClearExcepts();
-  REQUIRE( emp::CountExcepts() == 0 );
-}
-
 
 
 
