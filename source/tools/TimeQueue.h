@@ -69,12 +69,14 @@ namespace emp {
     double GetMinWait() const { return min_wait; }
     double GetSize() const { return cell_queue.size() + cell_buffer.size() - pos; }
 
+    /// Reset and empty the TimeQueue.
     void Clear() {
       cur_time = 0.0;
       item_queue.resize(0);
       item_buffer.resize(0);
     }
 
+    /// Grab the next item from the TimeQueue, but don't remove it.
     T Top() {
       emp_assert(pos <= item_queue.size());        // Pos should never be more than one past end.
       if (pos == item_queue.size()) RefillQueue(); // Move over from buffer if needed.
@@ -82,6 +84,7 @@ namespace emp {
       return item_queue[pos].item;
     }
 
+    /// Remove and return the next item from the TimeQueue.
     T Pop() {
       emp_assert(pos <= item_queue.size());        // Pos should never be more than one past end.
       if (pos == item_queue.size()) RefillQueue(); // Move over from buffer if needed.
@@ -89,6 +92,17 @@ namespace emp {
       cur_time = item_queue[pos].timing;
       return item_queue[pos++].item;
     }
+
+    /// Remove the next item from TimeQueue, setting argument to it; return whether items remain.
+    bool Pop(T & out_item) {
+      emp_assert(pos <= item_queue.size());        // Pos should never be more than one past end.
+      if (pos == item_queue.size()) RefillQueue(); // Move over from buffer if needed.
+      if (item_queue.size() == 0) return false;    // Return false if no items left.
+      cur_time = item_queue[pos].timing;
+      out_item = item_queue[pos++].item;
+      return true;
+    }
+
   };
 
 }
