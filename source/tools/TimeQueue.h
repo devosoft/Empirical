@@ -35,6 +35,7 @@ namespace emp {
     double min_wait = 1.0;               ///< Minimum amount of time for the next event.
     emp::vector<EventInfo> item_queue;   ///< Sorted events to be triggered.
     emp::vector<EventInfo> item_buffer;  ///< Unsorted events out of current range.
+    size_t pos = 0;                      ///< What position are we up to in the item_queue?
 
     // Helper function to move more items into the queue.
     bool RefillQueue() {
@@ -55,6 +56,7 @@ namespace emp {
 
       // Sort the cell queue so that it's ready to go.
       emp::Sort(item_queue);
+      pos = 0;
 
       return true;
     }
@@ -65,8 +67,28 @@ namespace emp {
 
     double GetTime() const { return cur_time; }
     double GetMinWait() const { return min_wait; }
-    double GetSize() const { return cell_queue.size() + cell_buffer.size(); }
+    double GetSize() const { return cell_queue.size() + cell_buffer.size() - pos; }
 
+    void Clear() {
+      cur_time = 0.0;
+      item_queue.resize(0);
+      item_buffer.resize(0);
+    }
+
+    T Top() {
+      emp_assert(pos <= item_queue.size());        // Pos should never be more than one past end.
+      if (pos == item_queue.size()) RefillQueue(); // Move over from buffer if needed.
+      emp_assert(item_queue.size() > 0);           // Must have an element to return it!
+      return item_queue[pos].item;
+    }
+
+    T Pop() {
+      emp_assert(pos <= item_queue.size());        // Pos should never be more than one past end.
+      if (pos == item_queue.size()) RefillQueue(); // Move over from buffer if needed.
+      emp_assert(item_queue.size() > 0);           // Must have an element to return it!
+      cur_time = item_queue[pos].timing;
+      return item_queue[pos++].item;
+    }
   };
 
 }
