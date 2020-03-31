@@ -40,13 +40,16 @@ namespace emp {
 
     // Helper function to move more items into the queue.
     bool RefillQueue() {
-      emp_assert(item_queue.size() == 0);
+      emp_assert(pos == item_queue.size());       // Make sure we've used up current queue.
       if (item_buffer.size() == 0) return false;  // No items left!
+
+      item_queue.resize(0);  // Clear out old queue.
+      pos = 0;
 
       // Scan the buffer to determine the earliest time.
       const double first_time = FindMin(item_buffer).timing;
 
-      // Move all items that will triegger in the next "min_wait" timesteps to item_queue.
+      // Move all items that will trigger in the next "min_wait" timesteps to item_queue.
       double last_time = first_time + min_wait;
       size_t keep_count = 0;
       for (size_t i = 0; i < item_buffer.size(); i++) {
@@ -57,7 +60,6 @@ namespace emp {
 
       // Sort the item queue so that it's ready to go.
       emp::Sort(item_queue);
-      pos = 0;
 
       return true;
     }
