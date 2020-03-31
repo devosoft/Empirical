@@ -34,8 +34,8 @@ namespace emp {
 
     double cur_time = 0.0;               ///< What time are we up to?
     double min_wait = 1.0;               ///< Minimum amount of time for the next event.
-    emp::vector<ItemInfo> item_queue;   ///< Sorted events to be triggered.
-    emp::vector<ItemInfo> item_buffer;  ///< Unsorted events out of current range.
+    emp::vector<ItemInfo> item_queue;    ///< Sorted events to be triggered.
+    emp::vector<ItemInfo> item_buffer;   ///< Unsorted events out of current range.
     size_t pos = 0;                      ///< What position are we up to in the item_queue?
 
     // Helper function to move more items into the queue.
@@ -64,13 +64,13 @@ namespace emp {
       return true;
     }
   public:
-    TimeQueue(size_t _min_wait=1.0) : min_wait(_min_wait) {
+    TimeQueue(double _min_wait=1.0) : min_wait(_min_wait) {
       emp_assert(min_wait > 0.0);
     }
 
     double GetTime() const { return cur_time; }
     double GetMinWait() const { return min_wait; }
-    double GetSize() const { return item_queue.size() + item_buffer.size() - pos; }
+    size_t GetSize() const { return item_queue.size() + item_buffer.size() - pos; }
 
     /// Reset and empty the TimeQueue.
     void Clear() {
@@ -80,7 +80,7 @@ namespace emp {
     }
 
     void Insert(T in_item, double time_offset) {
-      item_buffer.push_back( { in_item, cur_time + time_offset } );
+      item_buffer.emplace_back( ItemInfo{ in_item, cur_time + time_offset } );
     }
 
     /// Grab the next item from the TimeQueue, but don't remove it.
