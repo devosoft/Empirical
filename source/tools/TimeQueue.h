@@ -76,8 +76,12 @@ namespace emp {
       item_buffer.resize(0);
     }
 
+    void Insert(T in_item, double time_offset) {
+      item_buffer.push_back( { in_item, cur_time + time_offset } );
+    }
+
     /// Grab the next item from the TimeQueue, but don't remove it.
-    T Top() {
+    T Front() {
       emp_assert(pos <= item_queue.size());        // Pos should never be more than one past end.
       if (pos == item_queue.size()) RefillQueue(); // Move over from buffer if needed.
       emp_assert(item_queue.size() > 0);           // Must have an element to return it!
@@ -85,7 +89,7 @@ namespace emp {
     }
 
     /// Remove and return the next item from the TimeQueue.
-    T Pop() {
+    T Next() {
       emp_assert(pos <= item_queue.size());        // Pos should never be more than one past end.
       if (pos == item_queue.size()) RefillQueue(); // Move over from buffer if needed.
       emp_assert(item_queue.size() > 0);           // Must have an element to return it!
@@ -94,7 +98,7 @@ namespace emp {
     }
 
     /// Remove the next item from TimeQueue, setting argument to it; return whether items remain.
-    bool Pop(T & out_item) {
+    bool Next(T & out_item) {
       emp_assert(pos <= item_queue.size());        // Pos should never be more than one past end.
       if (pos == item_queue.size()) RefillQueue(); // Move over from buffer if needed.
       if (item_queue.size() == 0) return false;    // Return false if no items left.
