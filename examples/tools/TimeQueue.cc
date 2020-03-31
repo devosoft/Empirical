@@ -27,4 +27,26 @@ int main()
   }
 
   std::cout << "End time = " << time_queue.GetTime() << std::endl;
+
+
+  std::cout << "\nNow with strings:\n";
+  
+  emp::TimeQueue<std::string> time_queue2;
+
+  time_queue2.Insert("Item 0", 1.3);
+  time_queue2.Insert("Item 1", 1.5);
+  time_queue2.Insert("Item 2", 1.4);
+  time_queue2.Insert("Item 3", 1.2);
+  time_queue2.Insert("Item 4", 102.6);
+
+  // Print the first item; advance time to 120.
+  std::cout << time_queue2.Next() << std::endl;
+  time_queue2.Insert("Item 5", 1.1);  // Should be inserted at 1.2+1.1 = 2.3 (before item 4).
+  
+  
+  while (time_queue2.GetSize()) {
+    std::cout << time_queue2.Next() << std::endl;
+  }
+
+  std::cout << "End time = " << time_queue2.GetTime() << std::endl;
 }
