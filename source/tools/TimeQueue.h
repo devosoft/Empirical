@@ -19,6 +19,9 @@
 
 namespace emp {
 
+  /// A TimeQueue is used to track when "items" are ready.  Insert() items with the amount of
+  /// time until they should be triggered.
+
   template <typename T=size_t>
   class TimeQueue {
   private:
@@ -72,6 +75,8 @@ namespace emp {
     double GetMinWait() const { return min_wait; }
     size_t GetSize() const { return item_queue.size() + item_buffer.size() - pos; }
 
+    void SetTime(double _time) { cur_time = _time; }
+
     /// Reset and empty the TimeQueue.
     void Clear() {
       cur_time = 0.0;
@@ -79,6 +84,7 @@ namespace emp {
       item_buffer.resize(0);
     }
 
+    /// Add a new item to the TimeQueue.
     void Insert(T in_item, double time_offset) {
       item_buffer.emplace_back( ItemInfo{ in_item, cur_time + time_offset } );
     }
