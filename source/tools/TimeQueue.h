@@ -13,6 +13,9 @@
 #ifndef EMP_TIME_QUEUE_H
 #define EMP_TIME_QUEUE_H
 
+#include <string>
+#include <sstream>
+
 #include "../base/assert.h"
 #include "../base/vector.h"
 #include "vector_utils.h"
@@ -114,6 +117,18 @@ namespace emp {
       cur_time = item_queue[pos].timing;
       out_item = item_queue[pos++].item;
       return true;
+    }
+
+    std::string AsString() {
+      std::stringstream ss;
+      emp::Sort(item_buffer);
+      ss << GetSize() << " entries:";
+      for (size_t i = pos; i < item_queue.size(); i++) {
+        auto x = item_queue[i];
+        ss << " " << x.item << "(" << x.timing << ")";
+      }
+      for (auto x : item_buffer) ss << " " << x.item << "(" << x.timing << ")";
+      return ss.str();
     }
 
   };
