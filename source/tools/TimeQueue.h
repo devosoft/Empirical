@@ -22,8 +22,8 @@
 
 namespace emp {
 
-  /// A TimeQueue is used to track when "items" are ready.  Insert() items with the amount of
-  /// time until they should be triggered.
+  /// A TimeQueue is used to track when "items" are ready.  Insert() items with the 
+  /// time they should be triggered.  Must be at least min_wait in the future.
 
   template <typename T=size_t>
   class TimeQueue {
@@ -85,11 +85,13 @@ namespace emp {
       cur_time = 0.0;
       item_queue.resize(0);
       item_buffer.resize(0);
+      pos = 0;
     }
 
     /// Add a new item to the TimeQueue.
-    void Insert(T in_item, double time_offset) {
-      item_buffer.emplace_back( ItemInfo{ in_item, cur_time + time_offset } );
+    void Insert(T in_item, double trigger_time) {
+      emp_assert(cur_time + min_wait <= trigger_time);
+      item_buffer.emplace_back( ItemInfo{ in_item, trigger_time } );
     }
 
     /// Grab the next item from the TimeQueue, but don't remove it.
@@ -102,7 +104,8 @@ namespace emp {
 
     /// Remove and return the next item from the TimeQueue.
     T Next() {
-      emp_assert(pos <= item_queue.size());        // Pos should never be more than one past end.
+      emp_assert(pos <= item_queue.size(), pos, item_queue.size(),
+                 "Pos should never be more than one past end.");
       if (pos == item_queue.size()) RefillQueue(); // Move over from buffer if needed.
       emp_assert(item_queue.size() > 0);           // Must have an element to return it!
       cur_time = item_queue[pos].timing;
