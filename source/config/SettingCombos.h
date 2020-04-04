@@ -29,6 +29,7 @@ namespace emp {
 
   class SettingCombos {
   private:
+    /// Base class to describe information about a single setting.
     struct SettingBase {
       size_t id;            ///< Unique ID/position for this setting.
       std::string name;     ///< Name for this setting
@@ -50,6 +51,7 @@ namespace emp {
       bool IsFlagMatch(const char test_flag) const { return test_flag == flag; }
     };
 
+    /// Full details about a single setting, including type information and values.
     template <typename T>
     struct SettingInfo : public SettingBase {
       emp::vector<T> values;
@@ -98,6 +100,7 @@ namespace emp {
     std::map<std::string, ActionFlag> action_map;              ///< Available flags
 
     emp::vector<size_t> cur_combo;    ///< Which settings are we currently using?
+    size_t combo_id = 0;              ///< Unique value indicating which combination we are on.
 
   public:
     SettingCombos() = default;
@@ -106,10 +109,13 @@ namespace emp {
       for (auto ptr : settings) ptr.Delete();
     }
 
+    size_t GetComboID() const { return combo_id; }
+
     /// Start over stepping through all combinations of parameter values.
     void Reset() {
       // Setup as base combo.
       for (size_t & x : cur_combo) x = 0;
+      combo_id = 0;
 
       // Setup all linked values.
       for (auto x : settings) x->SetValueID(0);
@@ -207,12 +213,13 @@ namespace emp {
     /// Set the next combination of settings to be active.  Return true if successful
     /// or false if we ran through all combinations and reset.
     bool Next() {
+      combo_id++;
       for (size_t i = 0; i < cur_combo.size(); i++) {
         cur_combo[i]++;
 
         // Check if this new combo is valid.
         if (cur_combo[i] < settings[i]->GetSize()) {
-          settings[i]->SetValueID( cur_combo[i] );  // Set value in linked variable.
+          settings[i]->SetValueID( cur_combo[i] );    // Set value in linked variable.
           return true;
         }
 
@@ -222,6 +229,7 @@ namespace emp {
       }
 
       // No valid combo found.
+      combo_id = 0;
       return false;
     }
 
@@ -261,7 +269,7 @@ namespace emp {
       return (size_t) -1;
     }
 
-    /// Take an input set of config options, process them, and return set of unpressed ones.
+    /// Take an input set of config options, process them, and return set of unprocessed ones.
     emp::vector<std::string> ProcessOptions(const emp::vector<std::string> & args) {
       emp::vector<std::string> out_args;
       exe_name = args[0];
