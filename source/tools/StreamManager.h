@@ -3,8 +3,8 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020.
  *
- *  @file  FileManager.h
- *  @brief The FileManager object links filenames to open files.
+ *  @file  StreamManager.h
+ *  @brief The StreamManager object links names to files or other streams.
  *  @note  Status: BETA
  *
  *  @todo  Ideally should also work with emp::File
@@ -24,16 +24,16 @@
 
 namespace emp {
 
-  /// A class to maintin files for loading, writing, storing, and easy access to components.
-  class FileManager {
+  /// A class to maintain files and other streams.
+  class StreamManager {
   protected:
     emp::unordered_map<std::string, emp::Ptr<std::ostream>> streams;
 
   public:
-    FileManager() : streams() { ; }
-    FileManager(const FileManager &) = default;
-    FileManager(FileManager &&) = default;
-    ~FileManager() { ; }
+    StreamManager() : streams() { ; }
+    StreamManager(const StreamManager &) = default;
+    StreamManager(StreamManager &&) = default;
+    ~StreamManager() { ; }
 
     std::ostream & get_ostream(const std::string & filename, const std::string & stdout_name="cout") {
       if (filename == stdout_name) return std::cout;
