@@ -11,8 +11,8 @@
  */
 
 
-#ifndef EMP_FILE_MANAGER_H
-#define EMP_FILE_MANAGER_H
+#ifndef EMP_STREAM_MANAGER_H
+#define EMP_STREAM_MANAGER_H
 
 #include <fstream>
 #include <iostream>
@@ -27,7 +27,7 @@ namespace emp {
   /// A class to maintain files and other streams.
   class StreamManager {
   protected:
-    emp::unordered_map<std::string, emp::Ptr<std::ostream>> streams;
+    std::unordered_map<std::string, emp::Ptr<std::ostream>> streams;
 
   public:
     StreamManager() : streams() { ; }
@@ -37,7 +37,9 @@ namespace emp {
 
     std::ostream & get_ostream(const std::string & filename, const std::string & stdout_name="cout") {
       if (filename == stdout_name) return std::cout;
-      if (!emp::Has(streams, filename)) streams[filename] = emp::NewPtr<ofstream>(filename);
+      if (!emp::Has(streams, filename)) {
+        streams[filename] = emp::NewPtr<std::ofstream>(filename);
+      }
       return *streams[filename];
     }
 
