@@ -36,10 +36,13 @@ namespace emp {
       std::string desc;          ///< Description of setting
       char flag;                 ///< Command-line flag ('\0' for none)
       std::string option;        ///< Command-line longer option.
+      std::string args_label;    ///< Label for option arguments (used in --help)
       size_t cap = (size_t) -1;  ///< Max number of settings allowed in combo
 
-      SettingBase(const std::string & _name, const std::string & _desc, const char _flag)
-        : name(_name), desc(_desc), flag(_flag), option(emp::to_string("--",_name)) { }
+      SettingBase(const std::string & _name, const std::string & _desc, 
+                  const char _flag, const std::string & _args_label, const size_t _cap)
+        : name(_name), desc(_desc), flag(_flag), option(emp::to_string("--",_name))
+        , args_label(_args_label), cap(_cap) { }
       virtual ~SettingBase() { }
 
       virtual size_t GetSize() const = 0;                    ///< How many values are available?
@@ -62,8 +65,10 @@ namespace emp {
       SettingInfo(const std::string & _name,
                   const std::string & _desc,
                   const char _flag,
+                  const std::string & _args_label,
+                  const size_t _cap,
                   emp::Ptr<T> _var=nullptr)
-        : SettingBase(_name, _desc, _flag), var_ptr(_var) { }
+        : SettingBase(_name, _desc, _flag, _args_label, _cap), var_ptr(_var) { }
 
       size_t GetSize() const override { return values.size(); }
       std::string AsString() const override {
@@ -148,7 +153,8 @@ namespace emp {
                                 const std::string & desc="",
                                 const char option_flag='\0') {
       emp_assert(!emp::Has(setting_map, name));
-      emp::Ptr<SettingInfo<T>> new_ptr = emp::NewPtr<SettingInfo<T>>(name, desc, option_flag);
+      emp::Ptr<SettingInfo<T>> new_ptr =
+        emp::NewPtr<SettingInfo<T>>(name, desc, option_flag, "Values...", (size_t) -1);
       new_ptr->id = settings.size();
       settings.push_back(new_ptr);
       setting_map[name] = new_ptr;
@@ -162,11 +168,12 @@ namespace emp {
                                 const std::string & desc,
                                 const char option_flag,
                                 T & var,
+                                const std::string & args_label="Values...",
                                 size_t cap=(size_t) -1)
     {
       emp_assert(!emp::Has(setting_map, name));
       emp::Ptr<SettingInfo<T>> new_ptr =
-        emp::NewPtr<SettingInfo<T>>(name, desc, option_flag, &var);
+        emp::NewPtr<SettingInfo<T>>(name, desc, option_flag, args_label, cap, &var);
       new_ptr->id = settings.size();
       new_ptr->cap = cap;
       settings.push_back(new_ptr);
@@ -180,9 +187,10 @@ namespace emp {
     emp::vector<T> & AddSingleSetting(const std::string & name,
                                 const std::string & desc,
                                 const char option_flag,
-                                T & var)
+                                T & var,
+                                const std::string & args_label="Value")
     {
-      return AddSetting<T>(name, desc, option_flag, var, 1);
+      return AddSetting<T>(name, desc, option_flag, var, args_label, 1);
     }
 
     void AddAction(const std::string & name,
@@ -354,7 +362,7 @@ namespace emp {
       std::cout << "Format: " << exe_name << " [OPTIONS...]\n"
                 << "\nSetting Options:\n";
       for (auto [name, ptr] : setting_map) {
-        std::cout << " -" << ptr->flag << " [Values...] : "
+        std::cout << " -" << ptr->flag << " [" << ptr->args_label << "] : "
                   << ptr->desc << " (--" << name << ") ["
                   << ptr->AsString() << "]\n";
       }
