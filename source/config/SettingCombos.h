@@ -31,21 +31,23 @@ namespace emp {
   private:
     /// Base class to describe information about a single setting.
     struct SettingBase {
-      size_t id;            ///< Unique ID/position for this setting.
-      std::string name;     ///< Name for this setting
-      std::string desc;     ///< Description of setting
-      char flag;            ///< Command-line flag ('\0' for none)
-      std::string option;   ///< Command-line longer option.
+      size_t id;                 ///< Unique ID/position for this setting.
+      std::string name;          ///< Name for this setting
+      std::string desc;          ///< Description of setting
+      char flag;                 ///< Command-line flag ('\0' for none)
+      std::string option;        ///< Command-line longer option.
+      size_t cap = (size_t) -1;  ///< Max number of settings allowed in combo
 
       SettingBase(const std::string & _name, const std::string & _desc, const char _flag)
         : name(_name), desc(_desc), flag(_flag), option(emp::to_string("--",_name)) { }
       virtual ~SettingBase() { }
 
-      virtual size_t GetSize() const = 0;               ///< How many values are available?
-      virtual std::string AsString() const = 0;         ///< All values, as a single string.
-      virtual std::string AsString(size_t) const = 0;   ///< A specified value as a string.
-      virtual void FromString(const std::string_view &) = 0; ///< Convert string to range of settings.
-      virtual void SetValueID(size_t) = 0;              ///< Setup cur value in linked variable
+      virtual size_t GetSize() const = 0;                    ///< How many values are available?
+      virtual std::string AsString() const = 0;              ///< All values, as a single string.
+      virtual std::string AsString(size_t) const = 0;        ///< A specified value as a string.
+      virtual bool FromString(const std::string_view &) = 0; ///< Convert string to set of settings.
+      virtual void SetValueID(size_t) = 0;                   ///< Setup cur value in linked variable
+      virtual bool OK() const = 0;                           ///< Any problems with this setting?
 
       bool IsOptionMatch(const std::string & test_option) const { return test_option == option; }
       bool IsFlagMatch(const char test_flag) const { return test_flag == flag; }
@@ -76,8 +78,13 @@ namespace emp {
         return emp::to_string(values[id]);
       }
 
-      void FromString(const std::string_view & input) override {
+      bool OK() const override {
+        return values.size() > 0 && values.size() <= cap;
+      }
+
+      bool FromString(const std::string_view & input) override {
         values = emp::from_strings<T>(emp::slice(input, ','));
+        return OK();
       }
 
       void SetValueID(size_t id) override {
@@ -154,16 +161,28 @@ namespace emp {
     emp::vector<T> & AddSetting(const std::string & name,
                                 const std::string & desc,
                                 const char option_flag,
-                                T & var)
+                                T & var,
+                                size_t cap=(size_t) -1)
     {
       emp_assert(!emp::Has(setting_map, name));
       emp::Ptr<SettingInfo<T>> new_ptr =
         emp::NewPtr<SettingInfo<T>>(name, desc, option_flag, &var);
       new_ptr->id = settings.size();
+      new_ptr->cap = cap;
       settings.push_back(new_ptr);
       setting_map[name] = new_ptr;
       cur_combo.push_back(0);
       return new_ptr->values;
+    }
+
+    /// A SingleSetting must have exactly one value, not multiple.
+    template <typename T>
+    emp::vector<T> & AddSingleSetting(const std::string & name,
+                                const std::string & desc,
+                                const char option_flag,
+                                T & var)
+    {
+      return AddSetting<T>(name, desc, option_flag, var, 1);
     }
 
     void AddAction(const std::string & name,
@@ -287,6 +306,11 @@ namespace emp {
             return args;
           }
           settings[id]->FromString(args[i]);
+          if (!settings[id]->OK()) {
+            std::cout << "ERROR: Invalid arguments for option " << cur_arg << "!\n";
+            // @CAO Need to signal error...
+            return args;
+          }
         }
 
         // See if we have a flag option.
@@ -303,6 +327,12 @@ namespace emp {
           }
           else {
             settings[id]->FromString(args[i]);
+          }
+
+          if (!settings[id]->OK()) {
+            std::cout << "ERROR: Invalid arguments for flag -" << cur_arg[1] << "!\n";
+            // @CAO Need to signal error...
+            return args;
           }
         }
 
