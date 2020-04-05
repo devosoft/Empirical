@@ -1864,7 +1864,7 @@ namespace emp {
       for (const auto & target : targets) {
         hw.GetMatchBin().SetRegulator(
           target,
-          state.GetLocal(inst.args[0])
+          state.GetLocal(inst.args[0]) + 0.5
         );
         hw.GetMatchBin().DecayRegulator(
           target,
@@ -1884,7 +1884,7 @@ namespace emp {
 
       hw.GetMatchBin().SetRegulator(
         target,
-        state.GetLocal(inst.args[0])
+        state.GetLocal(inst.args[0]) + 0.5
       );
       hw.GetMatchBin().DecayRegulator(
         target,
@@ -1900,7 +1900,7 @@ namespace emp {
     static void Inst_AdjRegulator(EventDrivenGP_t & hw, const inst_t & inst){
       const State & state = hw.GetCurState();
 
-      const double goal = state.GetLocal(inst.args[0]);
+      const double goal = state.GetLocal(inst.args[0])  + 0.5;
       const double budge = emp::Mod(
         state.GetLocal(inst.args[1]) + 1.0,
         5.0
@@ -1934,7 +1934,7 @@ namespace emp {
       const State & state = hw.GetCurState();
 
       const size_t target = state.GetFP();
-      const double goal = state.GetLocal(inst.args[0]);
+      const double goal = state.GetLocal(inst.args[0]) + 0.5;
       const double budge = emp::Mod(
         state.GetLocal(inst.args[1]) + 1.0,
         5.0
