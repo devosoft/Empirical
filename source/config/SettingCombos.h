@@ -18,8 +18,9 @@
 
 #include "../base/Ptr.h"
 #include "../base/vector.h"
-#include "../tools/string_utils.h"
+#include "../tools/math.h"
 #include "../tools/map_utils.h"
+#include "../tools/string_utils.h"
 #include "../tools/vector_utils.h"
 
 namespace emp {
@@ -362,7 +363,8 @@ namespace emp {
       std::cout << "Format: " << exe_name << " [OPTIONS...]\n"
                 << "\nSetting Options:\n";
       for (auto [name, ptr] : setting_map) {
-        std::cout << " -" << ptr->flag << " [" << ptr->args_label << "] : "
+        std::string spacing(emp::Max(1, 12 - (int) ptr->args_label.size()), ' ');
+        std::cout << " -" << ptr->flag << " [" << ptr->args_label << "]" << spacing << ": "
                   << ptr->desc << " (--" << name << ") ["
                   << ptr->AsString() << "]\n";
       }
