@@ -262,19 +262,22 @@ namespace emp {
     }
 
     /// Get the set of headers used for the CSV file.
-    std::string GetHeaders() {
+    /// By default, don't include settings capped at one value.
+    std::string GetHeaders(const std::string & separator=",", bool include_fixed=false) {
       std::string out_string;
       for (size_t i = 0; i < settings.size(); i++) {
-        if (i) out_string += ",";
+        if (!include_fixed && settings[i]->cap == 1) continue;
+        if (i) out_string += separator;
         out_string += settings[i]->name;
       }
       return out_string;
     }
 
     /// Convert all of the current values into a comma-separated string.
-    std::string CurString(const std::string & separator=",") const {
+    std::string CurString(const std::string & separator=",", bool include_fixed=false) const {
       std::string out_str;
       for (size_t i = 0; i < cur_combo.size(); i++) {
+        if (!include_fixed && settings[i]->cap == 1) continue;
         if (i) out_str += separator;
         out_str += settings[i]->AsString(cur_combo[i]);
       }
