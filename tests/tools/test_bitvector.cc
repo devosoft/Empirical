@@ -255,3 +255,29 @@ TEST_CASE("Test BitVector", "[tools]")
 	bv_f <<= 1;
 	REQUIRE(bv_f.none());
 }
+
+TEST_CASE("Another Test BitVector", "[tools]")
+{
+  emp::BitVector bv10(10);
+  emp::BitVector bv32(32);
+  emp::BitVector bv50(50);
+  emp::BitVector bv64(64);
+  emp::BitVector bv80(80);
+
+  bv80[70] = 1;
+  emp::BitVector bv80c(bv80);
+
+  bv80 <<= 1;
+
+  for (size_t i = 0; i < 75; i += 2) {
+    emp::BitVector shift_vector = bv80 >> i;
+    REQUIRE((shift_vector.CountOnes() == 1) == (i <= 71));
+  }
+
+  bv10 = (bv80 >> 70);
+
+  // Test arbitrary bit retrieval of UInts
+  bv80[65] = 1;
+  REQUIRE(bv80.GetUIntAtBit(64) == 130);
+  REQUIRE(bv80.GetValueAtBit<5>(64) == 2);
+}
