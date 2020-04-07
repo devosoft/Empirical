@@ -59,3 +59,29 @@ TEST_CASE("Test DFA", "[tools]")
   
   
 }
+
+TEST_CASE("Another Test DFA", "[tools]")
+{
+  emp::DFA dfa(10);
+  dfa.SetTransition(0, 1, 'a');
+  dfa.SetTransition(1, 2, 'a');
+  dfa.SetTransition(2, 0, 'a');
+  dfa.SetTransition(0, 3, 'b');
+
+  int state = 0;
+  REQUIRE( (state = dfa.Next(state, 'a')) == 1 );
+  REQUIRE( (state = dfa.Next(state, 'a')) == 2 );
+  REQUIRE( (state = dfa.Next(state, 'a')) == 0 );
+  REQUIRE( (state = dfa.Next(state, 'b')) == 3 );
+  REQUIRE( (state = dfa.Next(state, 'b')) == -1 );
+  REQUIRE( (state = dfa.Next(state, 'b')) == -1 );
+  REQUIRE( (state = dfa.Next(state, 'b')) == -1 );
+
+  REQUIRE(dfa.Next(0, "aaaaaab") == 3);
+  REQUIRE(dfa.Next(0, "aaaaab") == -1);
+  REQUIRE(dfa.Next(0, "aaaaaabb") == -1);
+  REQUIRE(dfa.Next(0, "a") == 1);
+  REQUIRE(dfa.Next(0, "aa") == 2);
+  REQUIRE(dfa.Next(0, "aaa") == 0);
+  REQUIRE(dfa.Next(0, "b")  == 3);
+}
