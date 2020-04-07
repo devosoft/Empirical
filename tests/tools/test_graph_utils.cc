@@ -132,3 +132,15 @@ TEST_CASE("Test graph_utils", "[tools]")
 	
 	
 }
+
+// // TODO: add asserts
+// emp::Random grand;
+TEST_CASE("Test Graph utils", "[tools]")
+{
+  emp::Random random(1);
+  // emp::Graph graph( emp::build_graph_tree(20, random) );
+  // emp::Graph graph( emp::build_graph_random(20, 40, random) );
+  emp::Graph graph( emp::build_graph_grid(5, 4, random) );
+
+  // graph.PrintSym();
+}
