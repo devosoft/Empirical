@@ -35,3 +35,36 @@ TEST_CASE("Test Lexer", "[tools]")
   lxr.Print(ss);
   REQUIRE(ss.str() == "Num states = 0\nStop IDs:\n");
 }
+
+TEST_CASE("Another Test Lexer", "[tools]")
+{
+  emp::Lexer lexer;
+  lexer.AddToken("Integer", "[0-9]+");
+  lexer.AddToken("Float", "[0-9]*\\.[0-9]+");
+  lexer.AddToken("Lower", "[a-z]+");
+  lexer.AddToken("Upper", "[A-Z]+");
+  lexer.AddToken("Mixed", "[a-zA-Z]+");
+  lexer.AddToken("Whitespace", "[ \t\n\r]");
+  lexer.AddToken("Other", ".");
+
+  std::stringstream ss;
+  ss << "This is a 123 TEST.  It should also have 1. .2 123.456 789 FLOATING point NUMbers!";
+
+  REQUIRE(lexer.Process(ss).lexeme == "This");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == "is");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == "a");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == "123");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == "TEST");
+  REQUIRE(lexer.Process(ss).lexeme == ".");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+  REQUIRE(lexer.Process(ss).lexeme == " ");
+
+  REQUIRE(lexer.GetTokenName(lexer.Process(ss)) == "Mixed");
+  REQUIRE(lexer.GetTokenName(lexer.Process(ss)) == "Whitespace");
+  REQUIRE(lexer.GetTokenName(lexer.Process(ss)) == "Lower");
+}
+
