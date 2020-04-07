@@ -131,3 +131,17 @@ TEST_CASE("Test Graph", "[tools]")
 	REQUIRE((ss.str() == "15 4\n0 1 3.2\n2 3 1.5\n3 2 1.5\n13 14 15.1\n"));
 	ss.str(std::string()); // clearing ss
 }
+
+// TODO: add moar asserts
+TEST_CASE("Test graph", "[tools]")
+{
+
+  emp::Graph graph(20);
+
+  REQUIRE(graph.GetSize() == 20);
+
+  graph.AddEdgePair(0, 1);
+  graph.AddEdgePair(0, 2);
+  graph.AddEdgePair(0, 3);
+
+}
