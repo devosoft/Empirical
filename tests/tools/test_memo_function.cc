@@ -160,4 +160,17 @@ TEST_CASE("Test memo_function", "[tools]")
   
   // assignment operators
   emp::memo_function<double()> aMemoFunction;
+} 
+
+TEST_CASE("Test emp::memo_function", "[tools]")
+{
+  emp::memo_function<uint64_t(int)> test_fun;
+
+  // Build a Fibonacchi function...
+  test_fun = [&test_fun](int N) {
+    if (N<=1) return (uint64_t) N;
+    return test_fun(N-1) + test_fun(N-2);
+  };
+
+  REQUIRE( test_fun(80) == 0x533163ef0321e5 );
 }
