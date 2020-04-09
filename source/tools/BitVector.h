@@ -475,7 +475,7 @@ namespace emp {
     }
 
     void SetUIntAtBit(size_t index, uint32_t value) {
-      // if constexpr (sizeof(field_t) == 4) bit_set[index] = value;
+      if constexpr (sizeof(field_t) == 4) bit_set[index] = value;
 
       emp_assert(sizeof(field_t) == 8);
 
