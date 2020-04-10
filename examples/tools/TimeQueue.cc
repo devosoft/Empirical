@@ -9,7 +9,7 @@
 
 int main()
 {
-  emp::TimeQueue time_queue(100.0);
+  emp::TimeQueue time_queue;
 
   time_queue.Insert(0, 130.0);
   time_queue.Insert(1, 150.0);
@@ -19,7 +19,7 @@ int main()
 
   // Print the first item; advance time to 120.
   std::cout << time_queue.Next() << std::endl;
-  time_queue.Insert(5, 110.0);  // Should be inserted at 120+110 = 230 (before 4).
+  time_queue.Insert(5, 230.0);
   
   
   while (time_queue.GetSize()) {
@@ -41,7 +41,7 @@ int main()
 
   // Print the first item; advance time to 120.
   std::cout << time_queue2.Next() << std::endl;
-  time_queue2.Insert("Item 5", 1.1);  // Should be inserted at 1.2+1.1 = 2.3 (before item 4).
+  time_queue2.Insert("Item 5", 2.3);
   
   
   while (time_queue2.GetSize()) {
