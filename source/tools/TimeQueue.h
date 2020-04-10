@@ -13,6 +13,7 @@
 #ifndef EMP_TIME_QUEUE_H
 #define EMP_TIME_QUEUE_H
 
+#include <limits>
 #include <string>
 #include <sstream>
 
@@ -69,8 +70,26 @@ namespace emp {
 
       return true;
     }
+
+    // If the minimum wait changes we need to make sure that the item_queue is still accurate.
+    void UpdateMinimum(double new_min) {
+      min_wait = new_min;
+      double time_limit = cur_time + min_wait;
+      size_t shift_pos = 0;
+      for (size_t i=pos; i < item_queue.size(); i++) {
+        // If the next entry is no longer in range, move it back to buffer and set shift as needed.
+        if (item_queue[i].timing > time_limit) item_buffer.push_back(item_queue[i]);
+
+        // Otherwise shift it into position.
+        else item_queue[shift_pos++] = item_queue[i];
+      }
+
+      pos = 0;
+      item_queue.resize(shift_pos);
+    }
+
   public:
-    TimeQueue(double _min_wait=1.0) : min_wait(_min_wait) {
+    TimeQueue(double _min_wait=std::numeric_limits<double>::max()/2) : min_wait(_min_wait) {
       emp_assert(min_wait > 0.0);
     }
 
@@ -90,7 +109,8 @@ namespace emp {
 
     /// Add a new item to the TimeQueue.
     void Insert(T in_item, double trigger_time) {
-      emp_assert(cur_time + min_wait <= trigger_time);
+      emp_assert(trigger_time > cur_time, trigger_time, cur_time); // Triggers must be in the future
+      if (cur_time + min_wait > trigger_time) UpdateMinimum(trigger_time - cur_time);
       item_buffer.emplace_back( ItemInfo{ in_item, trigger_time } );
     }
 
@@ -106,8 +126,8 @@ namespace emp {
     T Next() {
       emp_assert(pos <= item_queue.size(), pos, item_queue.size(),
                  "Pos should never be more than one past end.");
-      if (pos == item_queue.size()) RefillQueue(); // Move over from buffer if needed.
-      emp_assert(item_queue.size() > 0);           // Must have an element to return it!
+      if (pos == item_queue.size()) RefillQueue();                  // Refill from buffer if needed.
+      emp_assert(item_queue.size() > pos, item_queue.size(), pos);  // Must have an element to return!
       cur_time = item_queue[pos].timing;
       return item_queue[pos++].item;
     }
