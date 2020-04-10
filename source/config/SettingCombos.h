@@ -144,6 +144,15 @@ namespace emp {
       return ptr->values[id];
     }
 
+    /// Scan through all values and return the maximum.
+    template <typename T>
+    T MaxValue(const std::string & name) const {
+      emp_assert(emp::Has(setting_map, name), name);
+      emp::Ptr<SettingBase> base_ptr = setting_map.find(name)->second;
+      emp::Ptr<SettingInfo<T>> ptr = base_ptr.Cast<SettingInfo<T>>();
+      return emp::FindMax(ptr->values);
+    }
+
     /// Add a new setting of a specified type.  Returns the (initially empty) vector of values 
     /// to allow easy setting.
     /// Example:
