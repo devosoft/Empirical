@@ -36,7 +36,7 @@ namespace emp {
     ~StreamManager() { ; }
 
     std::ostream & get_ostream(const std::string & filename, const std::string & stdout_name="cout") {
-      if (filename == stdout_name) return std::cout;
+      if (filename == "" || filename == stdout_name) return std::cout;
       if (!emp::Has(streams, filename)) {
         streams[filename] = emp::NewPtr<std::ofstream>(filename);
       }
