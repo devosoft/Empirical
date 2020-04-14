@@ -99,14 +99,18 @@ namespace emp {
 
     void SetTime(double _time) { cur_time = _time; }
 
-    /// Reset and empty the TimeQueue.
+    /// Empty the TimeQueue.
     void Clear() {
-      cur_time = 0.0;
       item_queue.resize(0);
       item_buffer.resize(0);
       pos = 0;
     }
 
+    /// Empty the TimeQueue and start over at time zero.
+    void Reset() {
+      Clear();
+      cur_time = 0.0;
+    }
     /// Add a new item to the TimeQueue.
     void Insert(T in_item, double trigger_time) {
       emp_assert(trigger_time > cur_time, trigger_time, cur_time); // Triggers must be in the future
