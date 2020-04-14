@@ -443,7 +443,8 @@ namespace emp {
       bit_set[field_id] = (bit_set[field_id] & ~(static_cast<field_t>(255) << pos_id)) | (val_uint << pos_id);
     }
 
-    /// Retrive the 32-bit uint from the specifeid uint index.
+    /// Retrieve the 32-bit uint from the specified uint index.
+    /*
     uint32_t GetUInt(size_t index) const {
       // If the fields are already 32 bits, return.
       if constexpr (sizeof(field_t) == 4) return bit_set[index];
@@ -457,21 +458,41 @@ namespace emp {
 
       return (uint32_t) (bit_set[field_id] >> (field_pos * 32));
     }
+    */
+   // Retrieve the 32-bit uint from the specified uint index.
+   // new implementation based on bitset.h GetUInt32
+    uint32_t GetUInt(size_t index) const {
+      emp_assert(index * 32 < num_bits);
+
+      uint32_t res;
+
+      std::memcpy(
+        &res,
+        bit_set.Cast<unsigned char>().Raw() + index * (32/8),
+        sizeof(res)
+      );
+
+      return res;
+    }
 
     /// Update the 32-bit uint at the specified uint index.
-    void SetUInt(size_t index, uint32_t value) {
-      if constexpr (sizeof(field_t) == 4) bit_set[index] = value;
+    void SetUInt(const size_t index, uint32_t value) {
+      emp_assert(index * 32 < num_bits);
 
-      emp_assert(sizeof(field_t) == 8);
+      std::memcpy(
+        bit_set.Cast<unsigned char>().Raw() + index * (32/8),
+        &value,
+        sizeof(value)
+      );
 
-      const size_t field_id = index/2;
-      const size_t field_pos = 1 - (index & 1);
-      const field_t mask = ((field_t) ((uint32_t) -1)) << (1-field_pos);
+      // Mask out filler bits if necessary
+      //if constexpr (static_cast<bool>(LastBitID())) {
+        // we only need to do this
+        // if (index * 32 == (NumFields() - 1) * FIELD_BITS)
+        // but just doing it always is probably faster
+        bit_set[NumFields() - 1] &= MaskLow<field_t>(LastBitID());
+      //}
 
-      emp_assert(field_id < NumFields());
-
-      bit_set[field_id] &= mask;   // Clear out bits that we are setting.
-      bit_set[field_id] |= ((field_t) value) << (field_pos * 32);
     }
 
     void SetUIntAtBit(size_t index, uint32_t value) {
