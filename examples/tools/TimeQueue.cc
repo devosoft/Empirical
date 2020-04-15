@@ -21,7 +21,6 @@ int main()
   std::cout << time_queue.Next() << std::endl;
   time_queue.Insert(5, 230.0);
   
-  
   while (time_queue.GetSize()) {
     std::cout << time_queue.Next() << std::endl;
   }

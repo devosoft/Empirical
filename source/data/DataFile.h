@@ -149,8 +149,8 @@ namespace emp {
       os->flush();
     }
 
-    /// If Update is called with an update number, call the full version of update only if the update value
-    /// passes the timing function (that is, the timing function returns true).
+    /// If Update is called with an update number, call the full version of update only if the
+    /// update value passes the timing function (that is, the timing function returns true).
     virtual void Update(size_t update) { if (timing_fun(update)) Update(); }
 
 
