@@ -37,12 +37,11 @@ namespace emp {
       char flag;                 ///< Command-line flag ('\0' for none)
       std::string option;        ///< Command-line longer option.
       std::string args_label;    ///< Label for option arguments (used in --help)
-      size_t cap = (size_t) -1;  ///< Max number of settings allowed in combo
 
       SettingBase(const std::string & _name, const std::string & _desc, 
-                  const char _flag, const std::string & _args_label, const size_t _cap)
+                  const char _flag, const std::string & _args_label)
         : name(_name), desc(_desc), flag(_flag), option(emp::to_string("--",_name))
-        , args_label(_args_label), cap(_cap) { }
+        , args_label(_args_label) { }
       virtual ~SettingBase() { }
 
       virtual size_t GetSize() const = 0;                    ///< How many values are available?
@@ -67,13 +66,13 @@ namespace emp {
                   const char _flag,           ///< Single char flag for easy access (e.g., "-h")
                   const std::string & _arg,   ///< Label for option argument (for help)
                   emp::Ptr<T> _var=nullptr)   ///< Pointer to variable to set (optional)
-        : SettingBase(_name, _desc, _flag, _arg_label, _cap), var_ptr(_var) { }
+        : SettingBase(_name, _desc, _flag, _arg), var_ptr(_var) { }
 
       size_t GetSize() const override { return 1; }
       std::string AsString() const override { return emp::to_string(value); }
 
       bool FromString(const std::string_view & input) override {
-        values = emp::from_string<T>(input);
+        value = emp::from_string<T>(input);
         // @CAO: Could do more tests to make sure whole string was used.
         return true;
       }
@@ -91,7 +90,7 @@ namespace emp {
                        const char _flag,           ///< Char flag for easy access (e.g., "-h")
                        const std::string & _args,  ///< Label for option arguments (for help)
                        emp::Ptr<T> _var=nullptr)   ///< Pointer to variable to set (optional)
-        : SettingBase(_name, _desc, _flag, _args_label, _cap), var_ptr(_var) { }
+        : SettingBase(_name, _desc, _flag, _args), var_ptr(_var) { }
 
       size_t GetSize() const override { return values.size(); }
       std::string AsString() const override {
@@ -292,7 +291,7 @@ namespace emp {
 
         // Check if this new combo is valid.
         if (cur_combo[i] < combo_settings[i]->GetSize()) {
-          settings[i]->SetValueID( cur_combo[i] );    // Set value in linked variable.
+          combo_settings[i]->SetValueID( cur_combo[i] );    // Set value in linked variable.
           return true;
         }
 
@@ -307,22 +306,19 @@ namespace emp {
     }
 
     /// Get the set of headers used for the CSV file.
-    /// By default, don't include settings capped at one value.
-    std::string GetComboHeaders(const std::string & separator=",", bool include_fixed=false) {
+    std::string GetComboHeaders(const std::string & separator=",") {
       std::string out_string;
       for (size_t i = 0; i < combo_settings.size(); i++) {
-        if (!include_fixed && combo_settings[i]->cap == 1) continue;
         if (i) out_string += separator;
-        out_string += settings[i]->name;
+        out_string += combo_settings[i]->name;
       }
       return out_string;
     }
 
     /// Convert all of the current values into a comma-separated string.
-    std::string CurComboString(const std::string & separator=",", bool include_fixed=false) const {
+    std::string CurComboString(const std::string & separator=",") const {
       std::string out_str;
       for (size_t i = 0; i < cur_combo.size(); i++) {
-        if (!include_fixed && combo_settings[i]->cap == 1) continue;
         if (i) out_str += separator;
         out_str += combo_settings[i]->AsString(cur_combo[i]);
       }
