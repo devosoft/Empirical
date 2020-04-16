@@ -485,13 +485,9 @@ namespace emp {
         sizeof(value)
       );
 
-      // Mask out filler bits if necessary
-      //if constexpr (static_cast<bool>(LastBitID())) {
-        // we only need to do this
-        // if (index * 32 == (NumFields() - 1) * FIELD_BITS)
-        // but just doing it always is probably faster
-        bit_set[NumFields() - 1] &= MaskLow<field_t>(LastBitID());
-      //}
+      // check to make sure there are no leading ones in the unused bits
+      // or if LastBitID is 0 everything should pass too
+      emp_assert(LastBitID() == 0 || (bit_set[NumFields() - 1] & MaskHigh<field_t>(LastBitID())) == 0);
 
     }
 
