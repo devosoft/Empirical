@@ -1,9 +1,20 @@
+#include "../../../source/base/vector.h"
+#include "../../../source/config/command_line.h"
+#include "../../../source/config/SettingConfig.h"
 #include "../../../source/tools/File.h"
 #include "../../../source/tools/vector_utils.h"
 
 int main(int argc, char* argv[])
 {
-  if (argc != 2) {
+  emp::SettingConfig config;
+
+  size_t num_bins = 40;
+  config.AddSetting("num_bins", "How many bins in histogram?", 'b', num_bins) = 40;
+  
+  config.ProcessOptions(argc, argv);
+  auto unused_args = config.GetUnusedArgs();
+  
+  if (unused_args.size() != 1) {
     std::cout << "Must include a single filename for data." << std::endl;
     exit(1);
   }
@@ -37,10 +48,9 @@ int main(int argc, char* argv[])
   }
 
   // Collect the full histogram.
-  size_t bins = 40;
   double full_span = (max_val - min_val) * 1.00001;
-  double bin_width = full_span / (double) bins;
-  emp::vector<size_t> bin_counts(bins, 0);
+  double bin_width = full_span / (double) num_bins;
+  emp::vector<size_t> bin_counts(num_bins, 0);
   for (auto & row : data) {
     for (double val : row) {
       size_t cur_bin = (size_t) ((val - min_val) / bin_width);
@@ -59,7 +69,7 @@ int main(int argc, char* argv[])
     double cap = min_val;
     double pos = 0;
     size_t count = 0;
-    for (size_t bin_id = 0; bin_id < bins; bin_id++) {
+    for (size_t bin_id = 0; bin_id < num_bins; bin_id++) {
       cap += bin_width;
       while (pos < row.size() && row[pos] <= cap) {
         pos++;
