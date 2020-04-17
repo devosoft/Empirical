@@ -50,6 +50,7 @@ namespace emp {
       virtual bool FromString(const std::string_view &) = 0; ///< Convert string to set of settings.
       virtual bool SetValueID(size_t) {return false; }       ///< Setup cur value in linked variable
       virtual bool IsComboSetting() { return false; }        ///< Do we have a combo setting?
+      virtual size_t GetID() const { return (size_t) -1; }   ///< Combination ID for this setting.
 
       bool IsOptionMatch(const std::string & test_option) const { return test_option == option; }
       bool IsFlagMatch(const char test_flag) const { return test_flag == flag; }
@@ -112,6 +113,7 @@ namespace emp {
 
       bool SetValueID(size_t id) override { if (var_ptr) *var_ptr = values[id]; return true; }
       bool IsComboSetting() override { return true; }
+      size_t GetID() const override  { return id; }
     };
 
     /// A setting that is just a flag with an action function to run if it's called.
@@ -125,11 +127,14 @@ namespace emp {
     std::string exe_name = "";
 
     std::map<std::string, emp::Ptr<SettingBase>> setting_map;  ///< All settings by name
-    emp::vector<emp::Ptr<SettingBase>> combo_settings;         ///< Multi-value settings (in order)
     std::map<std::string, ActionFlag> action_map;              ///< Action flags
 
+    emp::vector<emp::Ptr<SettingBase>> combo_settings;         ///< Multi-value settings (in order)
     emp::vector<size_t> cur_combo;    ///< Which combo settings are we currently using?
     size_t combo_id = 0;              ///< Unique value indicating which combination we are on.
+
+    emp::vector<std::string> unused_args;  // Arguments that we were unable to process.
+    std::string errors;
 
   public:
     SettingConfig() = default;
@@ -306,6 +311,27 @@ namespace emp {
     }
 
     /// Get the set of headers used for the CSV file.
+    std::string GetSettingHeaders(const std::string & separator=",") {
+      std::string out_str;
+      for (auto [name,ptr] : setting_map) {
+        if (out_str.size()) out_str += separator;
+        out_str += ptr->name;
+      }
+      return out_str;
+    }
+
+    /// Convert all of the current values into a comma-separated string.
+    std::string CurSettings(const std::string & separator=",") const {
+      std::string out_str;
+      for (auto [name,ptr] : setting_map) {
+        if (out_str.size()) out_str += separator;
+        if (ptr)
+        out_str += ptr->IsComboSetting() ? ptr->AsString(cur_combo[ptr->id]) : ptr->AsString();
+      }
+      return out_str;
+    }
+
+    /// Get the set of headers used for the CSV file.
     std::string GetComboHeaders(const std::string & separator=",") {
       std::string out_string;
       for (size_t i = 0; i < combo_settings.size(); i++) {
@@ -342,8 +368,7 @@ namespace emp {
     }
 
     /// Take an input set of config options, process them, and return set of unprocessed ones.
-    emp::vector<std::string> ProcessOptions(const emp::vector<std::string> & args) {
-      emp::vector<std::string> out_args;
+    bool ProcessOptions(const emp::vector<std::string> & args) {
       exe_name = args[0];
 
       for (size_t i = 1; i < args.size(); i++) {
@@ -354,10 +379,11 @@ namespace emp {
         auto setting_ptr = FindOptionMatch(cur_arg);
         if (!setting_ptr.IsNull()) {
           if (++i >= args.size()) {
-            std::cout << "ERROR: Must provide args for option '--"
-                      << setting_ptr->name << "' to use!\n";          
-            // @CAO Need to signal error...
-            return args;
+            errors += "ERROR: Must provide args for option '--";
+            errors += setting_ptr->name;
+            errors += "' to use!\n";          
+            std::cerr << errors;
+            return false;
           }
           setting_ptr->FromString(args[i]);
           // @CAO: Should make sure string translated correctly.
@@ -372,8 +398,7 @@ namespace emp {
           }
           else if (++i >= args.size()) {
             std::cout << "ERROR: Must provide args to use!\n";          
-            // @CAO Need to signal error...
-            return args;
+            return false;
           }
           else {
             setting_ptr->FromString(args[i]);
@@ -386,10 +411,10 @@ namespace emp {
         }
 
         // Otherwise this argument will go unused; send it back.
-        else out_args.push_back(cur_arg);
+        else unused_args.push_back(cur_arg);
       }
 
-      return out_args;
+      return unused_args;
     }
 
     template <typename... Ts>
