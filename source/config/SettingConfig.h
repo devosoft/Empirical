@@ -18,6 +18,7 @@
 
 #include "../base/Ptr.h"
 #include "../base/vector.h"
+#include "../config/command_line.h"
 #include "../tools/math.h"
 #include "../tools/map_utils.h"
 #include "../tools/string_utils.h"
@@ -143,17 +144,13 @@ namespace emp {
       for (auto [name,ptr] : setting_map) ptr.Delete();
     }
 
+    const std::string & GetExeName() const { return exe_name; }
     size_t GetComboID() const { return combo_id; }
+    const emp::vector<std::string> & GetUnusedArgs() const { unused_args; }
+    const std::string & GetErrors() const { return errors; }
 
-    /// Start over stepping through all combinations of parameter values.
-    void ResetCombos() {
-      // Setup as base combo.
-      for (size_t & x : cur_combo) x = 0;
-      combo_id = 0;
-
-      // Setup all linked values.
-      for (auto x : combo_settings) x->SetValueID(0);
-    }
+    bool HasUnusedArgs() const { return unused_args.size(); }
+    bool HasErrors() const { return errors.size(); }
 
     /// Get the current value of a specified setting.
     template <typename T>
@@ -263,6 +260,16 @@ namespace emp {
       return setting_map[name].DynamicCast<ComboSettingInfo<T>>()->values;
     }
 
+    /// Start over stepping through all combinations of parameter values.
+    void ResetCombos() {
+      // Setup as base combo.
+      for (size_t & x : cur_combo) x = 0;
+      combo_id = 0;
+
+      // Setup all linked values.
+      for (auto x : combo_settings) x->SetValueID(0);
+    }
+
     /// Add a single new value to the specified setting.
     template <typename T>
     void AddComboValue(const std::string & name, T && val) {
@@ -326,7 +333,7 @@ namespace emp {
       for (auto [name,ptr] : setting_map) {
         if (out_str.size()) out_str += separator;
         if (ptr)
-        out_str += ptr->IsComboSetting() ? ptr->AsString(cur_combo[ptr->id]) : ptr->AsString();
+        out_str += ptr->IsComboSetting() ? ptr->AsString(cur_combo[ptr->GetID()]) : ptr->AsString();
       }
       return out_str;
     }
@@ -414,8 +421,13 @@ namespace emp {
         else unused_args.push_back(cur_arg);
       }
 
-      return unused_args;
+      return true;
     }
+
+    bool ProcessOptions(int argc, char* argv[]) {
+      return ProcessOptions(emp::cl::args_to_strings(argc, argv));
+    }
+
 
     template <typename... Ts>
     void PrintHelp(const Ts &... examples) const {
