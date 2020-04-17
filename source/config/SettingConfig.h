@@ -72,10 +72,15 @@ namespace emp {
 
       size_t GetSize() const override { return 1; }
       std::string AsString() const override { return emp::to_string(value); }
+      std::string AsString(size_t id) const override {
+        emp_assert(id == 0);
+        return emp::to_string(value);
+      }
 
       bool FromString(const std::string_view & input) override {
         value = emp::from_string<T>(input);
         // @CAO: Could do more tests to make sure whole string was used.
+        if (!var_ptr.IsNull()) *var_ptr = value;
         return true;
       }
     };
@@ -109,6 +114,7 @@ namespace emp {
 
       bool FromString(const std::string_view & input) override {
         values = emp::from_strings<T>(emp::slice(input, ','));
+        if (!var_ptr.IsNull() && values.size()) *var_ptr = values[0];
         return values.size();  // Must result in at least one value.
       }
 
@@ -146,7 +152,7 @@ namespace emp {
 
     const std::string & GetExeName() const { return exe_name; }
     size_t GetComboID() const { return combo_id; }
-    const emp::vector<std::string> & GetUnusedArgs() const { unused_args; }
+    const emp::vector<std::string> & GetUnusedArgs() const { return unused_args; }
     const std::string & GetErrors() const { return errors; }
 
     bool HasUnusedArgs() const { return unused_args.size(); }
@@ -198,8 +204,7 @@ namespace emp {
                    const std::string & args_label="Value")
     {
       emp_assert(!emp::Has(setting_map, name));
-      auto new_ptr = emp::NewPtr<SettingInfo<T>>(name, desc, option_flag, args_label, var);
-      new_ptr->id = (size_t) -1; // Non-combo settings don't need an ID...
+      auto new_ptr = emp::NewPtr<SettingInfo<T>>(name, desc, option_flag, args_label, &var);
       setting_map[name] = new_ptr;
       return new_ptr->value;
     }
@@ -256,7 +261,7 @@ namespace emp {
     template <typename T>
     emp::vector<T> & ComboValues(const std::string & name) {
       emp_assert(emp::Has(setting_map, name), name);
-      emp_assert(setting_map[name].IsComboSetting());
+      emp_assert(setting_map[name]->IsComboSetting());
       return setting_map[name].DynamicCast<ComboSettingInfo<T>>()->values;
     }
 
@@ -274,7 +279,7 @@ namespace emp {
     template <typename T>
     void AddComboValue(const std::string & name, T && val) {
       emp_assert(emp::Has(setting_map, name), name);
-      emp_assert(setting_map[name].IsComboSetting());
+      emp_assert(setting_map[name]->IsComboSetting());
       auto ptr = setting_map[name].DynamicCast<ComboSettingInfo<T>>();
       ptr->values.emplace_back(std::forward<T>(val));
     }
@@ -380,7 +385,10 @@ namespace emp {
 
       for (size_t i = 1; i < args.size(); i++) {
         const std::string & cur_arg = args[i];
-        if (cur_arg.size() < 2 || cur_arg[0] != '-') continue;  // If isn't an option, continue.
+        if (cur_arg.size() < 2 || cur_arg[0] != '-') {
+          unused_args.push_back(cur_arg);
+          continue;  // If isn't an option, continue.
+        }
 
         // See if this is a fully spelled-out option.
         auto setting_ptr = FindOptionMatch(cur_arg);
