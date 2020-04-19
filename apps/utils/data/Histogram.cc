@@ -1,6 +1,7 @@
 #include "../../../source/base/vector.h"
 #include "../../../source/config/command_line.h"
 #include "../../../source/config/SettingConfig.h"
+#include "../../../source/terminal/AsciiGraphs.h"
 #include "../../../source/tools/File.h"
 #include "../../../source/tools/vector_utils.h"
 
@@ -19,7 +20,7 @@ int main(int argc, char* argv[])
     exit(1);
   }
 
-  emp::File file(argv[1]);
+  emp::File file(unused_args[0]);
   file.RemoveWhitespace();  // Clear out all whitespace in file.
   file.RemoveEmpty();       // Remove all now-empty lines from file.
 
@@ -66,26 +67,17 @@ int main(int argc, char* argv[])
     emp::Sort(row);
 
     std::cout << "MIN_VAL: " << min_val << std::endl;
-    double cap = min_val;
-    double pos = 0;
-    size_t count = 0;
-    for (size_t bin_id = 0; bin_id < num_bins; bin_id++) {
-      cap += bin_width;
-      while (pos < row.size() && row[pos] <= cap) {
-        pos++;
-        std::cout << "*";
-        count++;
-      }
-      std::cout << std::endl;
-    }
+    emp::AsciiHistogram(row);
     std::cout << "MAX_VAL: " << max_val << std::endl;
-    std::cout << "Data count: " << count << std::endl;
+    //std::cout << "Data count: " << count << std::endl;
   }
 
   std::cout << "OVERALL COUNT: " << num_vals << std::endl;
   std::cout << "OVERALL MIN:   " << min_val << std::endl;
   std::cout << "OVERALL MAX:   " << max_val << std::endl;
   std::cout << "OVERALL MEAN:  " << (total_val/(double) num_vals) << std::endl;
+
+  emp::AsciiBarGraph(bin_counts);
 
   double scale = ((double) max_bin_count) / 80.0;
   if (scale < 1.0) scale = 1.0;
