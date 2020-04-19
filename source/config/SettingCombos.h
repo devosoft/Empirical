@@ -18,8 +18,9 @@
 
 #include "../base/Ptr.h"
 #include "../base/vector.h"
-#include "../tools/string_utils.h"
+#include "../tools/math.h"
 #include "../tools/map_utils.h"
+#include "../tools/string_utils.h"
 #include "../tools/vector_utils.h"
 
 namespace emp {
@@ -29,27 +30,34 @@ namespace emp {
 
   class SettingCombos {
   private:
+    /// Base class to describe information about a single setting.
     struct SettingBase {
-      size_t id;            ///< Unique ID/position for this setting.
-      std::string name;     ///< Name for this setting
-      std::string desc;     ///< Description of setting
-      char flag;            ///< Command-line flag ('\0' for none)
-      std::string option;   ///< Command-line longer option.
+      size_t id;                 ///< Unique ID/position for this setting.
+      std::string name;          ///< Name for this setting
+      std::string desc;          ///< Description of setting
+      char flag;                 ///< Command-line flag ('\0' for none)
+      std::string option;        ///< Command-line longer option.
+      std::string args_label;    ///< Label for option arguments (used in --help)
+      size_t cap = (size_t) -1;  ///< Max number of settings allowed in combo
 
-      SettingBase(const std::string & _name, const std::string & _desc, const char _flag)
-        : name(_name), desc(_desc), flag(_flag), option(emp::to_string("--",_name)) { }
+      SettingBase(const std::string & _name, const std::string & _desc, 
+                  const char _flag, const std::string & _args_label, const size_t _cap)
+        : name(_name), desc(_desc), flag(_flag), option(emp::to_string("--",_name))
+        , args_label(_args_label), cap(_cap) { }
       virtual ~SettingBase() { }
 
-      virtual size_t GetSize() const = 0;               ///< How many values are available?
-      virtual std::string AsString() const = 0;         ///< All values, as a single string.
-      virtual std::string AsString(size_t) const = 0;   ///< A specified value as a string.
-      virtual void FromString(const std::string_view &) = 0; ///< Convert string to range of settings.
-      virtual void SetValueID(size_t) = 0;              ///< Setup cur value in linked variable
+      virtual size_t GetSize() const = 0;                    ///< How many values are available?
+      virtual std::string AsString() const = 0;              ///< All values, as a single string.
+      virtual std::string AsString(size_t) const = 0;        ///< A specified value as a string.
+      virtual bool FromString(const std::string_view &) = 0; ///< Convert string to set of settings.
+      virtual void SetValueID(size_t) = 0;                   ///< Setup cur value in linked variable
+      virtual bool OK() const = 0;                           ///< Any problems with this setting?
 
       bool IsOptionMatch(const std::string & test_option) const { return test_option == option; }
       bool IsFlagMatch(const char test_flag) const { return test_flag == flag; }
     };
 
+    /// Full details about a single setting, including type information and values.
     template <typename T>
     struct SettingInfo : public SettingBase {
       emp::vector<T> values;
@@ -58,8 +66,10 @@ namespace emp {
       SettingInfo(const std::string & _name,
                   const std::string & _desc,
                   const char _flag,
+                  const std::string & _args_label,
+                  const size_t _cap,
                   emp::Ptr<T> _var=nullptr)
-        : SettingBase(_name, _desc, _flag), var_ptr(_var) { }
+        : SettingBase(_name, _desc, _flag, _args_label, _cap), var_ptr(_var) { }
 
       size_t GetSize() const override { return values.size(); }
       std::string AsString() const override {
@@ -74,8 +84,13 @@ namespace emp {
         return emp::to_string(values[id]);
       }
 
-      void FromString(const std::string_view & input) override {
+      bool OK() const override {
+        return values.size() > 0 && values.size() <= cap;
+      }
+
+      bool FromString(const std::string_view & input) override {
         values = emp::from_strings<T>(emp::slice(input, ','));
+        return OK();
       }
 
       void SetValueID(size_t id) override {
@@ -98,6 +113,7 @@ namespace emp {
     std::map<std::string, ActionFlag> action_map;              ///< Available flags
 
     emp::vector<size_t> cur_combo;    ///< Which settings are we currently using?
+    size_t combo_id = 0;              ///< Unique value indicating which combination we are on.
 
   public:
     SettingCombos() = default;
@@ -106,10 +122,13 @@ namespace emp {
       for (auto ptr : settings) ptr.Delete();
     }
 
+    size_t GetComboID() const { return combo_id; }
+
     /// Start over stepping through all combinations of parameter values.
     void Reset() {
       // Setup as base combo.
       for (size_t & x : cur_combo) x = 0;
+      combo_id = 0;
 
       // Setup all linked values.
       for (auto x : settings) x->SetValueID(0);
@@ -125,6 +144,15 @@ namespace emp {
       return ptr->values[id];
     }
 
+    /// Scan through all values and return the maximum.
+    template <typename T>
+    T MaxValue(const std::string & name) const {
+      emp_assert(emp::Has(setting_map, name), name);
+      emp::Ptr<SettingBase> base_ptr = setting_map.find(name)->second;
+      emp::Ptr<SettingInfo<T>> ptr = base_ptr.Cast<SettingInfo<T>>();
+      return emp::FindMax(ptr->values);
+    }
+
     /// Add a new setting of a specified type.  Returns the (initially empty) vector of values 
     /// to allow easy setting.
     /// Example:
@@ -135,7 +163,8 @@ namespace emp {
                                 const std::string & desc="",
                                 const char option_flag='\0') {
       emp_assert(!emp::Has(setting_map, name));
-      emp::Ptr<SettingInfo<T>> new_ptr = emp::NewPtr<SettingInfo<T>>(name, desc, option_flag);
+      emp::Ptr<SettingInfo<T>> new_ptr =
+        emp::NewPtr<SettingInfo<T>>(name, desc, option_flag, "Values...", (size_t) -1);
       new_ptr->id = settings.size();
       settings.push_back(new_ptr);
       setting_map[name] = new_ptr;
@@ -148,16 +177,30 @@ namespace emp {
     emp::vector<T> & AddSetting(const std::string & name,
                                 const std::string & desc,
                                 const char option_flag,
-                                T & var)
+                                T & var,
+                                const std::string & args_label="Values...",
+                                size_t cap=(size_t) -1)
     {
       emp_assert(!emp::Has(setting_map, name));
       emp::Ptr<SettingInfo<T>> new_ptr =
-        emp::NewPtr<SettingInfo<T>>(name, desc, option_flag, &var);
+        emp::NewPtr<SettingInfo<T>>(name, desc, option_flag, args_label, cap, &var);
       new_ptr->id = settings.size();
+      new_ptr->cap = cap;
       settings.push_back(new_ptr);
       setting_map[name] = new_ptr;
       cur_combo.push_back(0);
       return new_ptr->values;
+    }
+
+    /// A SingleSetting must have exactly one value, not multiple.
+    template <typename T>
+    emp::vector<T> & AddSingleSetting(const std::string & name,
+                                const std::string & desc,
+                                const char option_flag,
+                                T & var,
+                                const std::string & args_label="Value")
+    {
+      return AddSetting<T>(name, desc, option_flag, var, args_label, 1);
     }
 
     void AddAction(const std::string & name,
@@ -207,12 +250,13 @@ namespace emp {
     /// Set the next combination of settings to be active.  Return true if successful
     /// or false if we ran through all combinations and reset.
     bool Next() {
+      combo_id++;
       for (size_t i = 0; i < cur_combo.size(); i++) {
         cur_combo[i]++;
 
         // Check if this new combo is valid.
         if (cur_combo[i] < settings[i]->GetSize()) {
-          settings[i]->SetValueID( cur_combo[i] );  // Set value in linked variable.
+          settings[i]->SetValueID( cur_combo[i] );    // Set value in linked variable.
           return true;
         }
 
@@ -222,23 +266,27 @@ namespace emp {
       }
 
       // No valid combo found.
+      combo_id = 0;
       return false;
     }
 
     /// Get the set of headers used for the CSV file.
-    std::string GetHeaders() {
+    /// By default, don't include settings capped at one value.
+    std::string GetHeaders(const std::string & separator=",", bool include_fixed=false) {
       std::string out_string;
       for (size_t i = 0; i < settings.size(); i++) {
-        if (i) out_string += ",";
+        if (!include_fixed && settings[i]->cap == 1) continue;
+        if (i) out_string += separator;
         out_string += settings[i]->name;
       }
       return out_string;
     }
 
     /// Convert all of the current values into a comma-separated string.
-    std::string CurString(const std::string & separator=",") const {
+    std::string CurString(const std::string & separator=",", bool include_fixed=false) const {
       std::string out_str;
       for (size_t i = 0; i < cur_combo.size(); i++) {
+        if (!include_fixed && settings[i]->cap == 1) continue;
         if (i) out_str += separator;
         out_str += settings[i]->AsString(cur_combo[i]);
       }
@@ -261,7 +309,7 @@ namespace emp {
       return (size_t) -1;
     }
 
-    /// Take an input set of config options, process them, and return set of unpressed ones.
+    /// Take an input set of config options, process them, and return set of unprocessed ones.
     emp::vector<std::string> ProcessOptions(const emp::vector<std::string> & args) {
       emp::vector<std::string> out_args;
       exe_name = args[0];
@@ -279,6 +327,11 @@ namespace emp {
             return args;
           }
           settings[id]->FromString(args[i]);
+          if (!settings[id]->OK()) {
+            std::cout << "ERROR: Invalid arguments for option " << cur_arg << "!\n";
+            // @CAO Need to signal error...
+            return args;
+          }
         }
 
         // See if we have a flag option.
@@ -295,6 +348,12 @@ namespace emp {
           }
           else {
             settings[id]->FromString(args[i]);
+          }
+
+          if (!settings[id]->OK()) {
+            std::cout << "ERROR: Invalid arguments for flag -" << cur_arg[1] << "!\n";
+            // @CAO Need to signal error...
+            return args;
           }
         }
 
@@ -316,7 +375,8 @@ namespace emp {
       std::cout << "Format: " << exe_name << " [OPTIONS...]\n"
                 << "\nSetting Options:\n";
       for (auto [name, ptr] : setting_map) {
-        std::cout << " -" << ptr->flag << " [Values...] : "
+        std::string spacing(emp::Max(1, 12 - (int) ptr->args_label.size()), ' ');
+        std::cout << " -" << ptr->flag << " [" << ptr->args_label << "]" << spacing << ": "
                   << ptr->desc << " (--" << name << ") ["
                   << ptr->AsString() << "]\n";
       }
