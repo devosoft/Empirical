@@ -25,6 +25,7 @@ namespace emp {
   template <typename T>
   void AsciiBarGraph(const emp::vector<T> & data,     ///< Data for the bar graph
 		     size_t max_width=80,             ///< What's the widest bars allowed?
+		     bool show_scale=true,            ///< Should we show the scale at bottom.
 		     bool max_scale_1=true,           ///< Should we limit scaling to 1:1?
 		     std::ostream & os=std::cout) {
     T min_size = emp::FindMin(data);
@@ -37,15 +38,20 @@ namespace emp {
       if (bar_width > 0.0) os << '~';
       os << "  (" << datum << ")\n";
     }
+    if (show_scale) {
+      os << "SCALE: = -> " << (1.0 / scale) << std::endl;
+    }
   }
 
 
   /// Take the input data, break it into bins, and print it as a bar graph.
   template <typename T>
   void AsciiHistogram(const emp::vector<T> & data,    ///< Data to bin for histogram
-		     size_t num_bins=40,              ///< How many bins in histogram?
-		     size_t max_width=80,             ///< What's the widest bars allowed?
-		     std::ostream & os=std::cout) {
+		      size_t num_bins=40,             ///< How many bins in histogram?
+		      size_t max_width=80,            ///< What's the widest bars allowed?
+		      bool show_scale=true,           ///< Should we show the scale at bottom?
+		      std::ostream & os=std::cout)
+  {
     T min_val = emp::FindMin(data);
     T max_val = emp::FindMax(data);
     T val_range = max_val - min_val;
@@ -58,7 +64,7 @@ namespace emp {
       bins[bin_id]++;
     }
 
-    AsciiBarGraph(bins, max_width, true, os);
+    AsciiBarGraph(bins, max_width, show_scale, true, os);
   }
 		     
 }
