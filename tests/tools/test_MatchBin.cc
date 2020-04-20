@@ -1765,7 +1765,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   // Cache Testing
   struct DummySelector: public emp::RankedSelector<std::ratio<2,1>>{
 
-    DummySelector(emp::Random &rand) : emp::RankedSelector<std::ratio<2,1>>(rand) { ; }
+    explicit DummySelector(emp::Random &rand) : emp::RankedSelector<std::ratio<2,1>>(rand) { ; }
 
     size_t opCount = 0;
 
@@ -1787,7 +1787,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   >;
   class MatchBinTest : public parent_t {
   public:
-    MatchBinTest(emp::Random & rand) : parent_t(rand) { ; }
+    explicit MatchBinTest(emp::Random & rand) : parent_t(rand) { ; }
 
     size_t GetCacheSize(){ return cache_regulated.size(); }
     size_t GetSelectCount(){ return selector.opCount; }
