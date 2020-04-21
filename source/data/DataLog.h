@@ -55,8 +55,8 @@ namespace emp {
     void AsciiBarGraph( size_t max_width=80,          ///< What's the widest bars allowed?
                         bool show_scale=true,         ///< Should we show the scale at bottom.
                         bool max_scale_1=true,        ///< Should we limit scaling to 1:1?
-                        std::ostream & os=std::cout   ///< Where to output the bar graph?
-                      ) {
+                        std::ostream & os=std::cout)  ///< Where to output the bar graph?
+    {
       T min_size = emp::FindMin(data);
       T max_size = emp::FindMax(data);
       double scale = ((double) max_width) / ((double) max_size);
