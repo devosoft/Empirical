@@ -31,6 +31,10 @@ cover-test-%: test_%.cc
 # Test in debug mode without pointer tracker
 test: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
+	cd ToolsTests && make test
+	cd BaseTests && make test
+	cd EvoTests && make test
+	cd HardwareTests && make test
 
 # Test optimized version without debug features
 opt: FLAGS := -std=c++17 -pthread -DNDEBUG -O3 -Wno-unused-function -DCI=$(CI) -I../source/ -I../third-party/cereal/include/ -I../
@@ -55,6 +59,10 @@ coverage_conversion:
 
 test-coverage: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../coverage_source/ -I../ -I../third-party/cereal/include/ -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 -fprofile-instr-generate -fcoverage-mapping -fno-inline -fno-elide-constructors -O0
 test-coverage: coverage_conversion test-prep $(addprefix cover-test-, $(TEST_NAMES))
+	       cd ToolsTests && make test-coverage
+		   cd BaseTests && make test-coverage
+		   cd EvoTests && make test-coverage
+		   cd HardwareTests && make test-coverage
 	       rm -r ../coverage_source
 
 clean:

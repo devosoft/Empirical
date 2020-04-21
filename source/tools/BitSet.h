@@ -64,7 +64,11 @@ namespace emp {
     ///< field size is 64 for native (except NUM_BITS == 32), 32 for emscripten
     using field_t = typename FieldHelper<NUM_BITS>::field_t;
 
-    static constexpr field_t FIELD_BITS = sizeof(field_t)*8; ///< How many bits are in a field?
+    ///< How many bytes are in a field?
+    static constexpr field_t FIELD_BYTES = sizeof(field_t);
+
+    ///< How many bits are in a field?
+    static constexpr field_t FIELD_BITS = 8 * FIELD_BYTES;
 
     static constexpr field_t FIELD_LOG2 = emp::Log2(FIELD_BITS);
 
@@ -110,10 +114,18 @@ namespace emp {
       emp_assert((index >> FIELD_LOG2) < NUM_FIELDS);
       return index >> FIELD_LOG2;
     }
-    inline static size_t FieldPos(const size_t index) { return index & (FIELD_BITS - 1); }
 
-    inline static size_t Byte2Field(const size_t index) { return index/4; }
-    inline static size_t Byte2FieldPos(const size_t index) { return (index & 3) << 3; }
+    inline static size_t FieldPos(const size_t index) {
+      return index & (FIELD_BITS - 1);
+    }
+
+    inline static size_t Byte2Field(const size_t index) {
+      return index / FIELD_BYTES;
+    }
+
+    inline static size_t Byte2FieldPos(const size_t index) {
+      return FieldPos(index * 8);
+    }
 
     inline void Copy(const field_t in_set[NUM_FIELDS]) {
       std::memcpy(bit_set, in_set, sizeof(bit_set));

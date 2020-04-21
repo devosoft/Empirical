@@ -26,10 +26,6 @@
 #include <utility>
 #include <queue>
 
-#ifndef __EMSCRIPTEN__
-#include <openssl/sha.h>
-#endif
-
 #include "../base/assert.h"
 #include "../base/array.h"
 #include "../base/vector.h"
@@ -109,9 +105,10 @@ namespace emp {
 
   };
 
-  #ifndef __EMSCRIPTEN__
+  #ifdef EMP_HAS_CRYPTO
+  #include <openssl/sha.h>
   /// Generate an arbitrary, but consistent, match score between 0 and 1
-  /// Be sure to link against -lcrypto and -lssl
+  /// Be sure to link against -lcrypto, -lssl, and provide -DEMP_HAS_CRYPTO
   template<size_t Width>
   struct CryptoHashMetric: public BaseMetric<emp::BitSet<Width>, emp::BitSet<Width>> {
 
