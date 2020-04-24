@@ -844,7 +844,7 @@ namespace emp {
 
     EventDrivenGP_AW(const EventDrivenGP_t & in)
       : event_lib(in.event_lib),
-        random_ptr(nullptr), random_owner(false),
+        random_ptr(in.random_owner ? NewPtr<Random>(-1) : in.random_ptr), random_owner(in.random_owner),
         program(in.program),
         shared_mem(in.shared_mem),
         event_queue(in.event_queue),
@@ -856,10 +856,9 @@ namespace emp {
         active_cores(in.active_cores), inactive_cores(in.inactive_cores),
         pending_cores(in.pending_cores),
         exec_core_id(in.exec_core_id), is_executing(in.is_executing),
-        fun_trait_print(in.fun_trait_print)
+        fun_trait_print(in.fun_trait_print),
+        matchBin(*random_ptr)
     {
-      if (in.random_owner) NewRandom();
-      else random_ptr = in.random_ptr;
       program.SetMatchBinRefreshFun( [this](){ this->RefreshMatchBin(); } );
     }
 
@@ -1339,7 +1338,7 @@ namespace emp {
 
     // ---------- Hardware Execution ----------
     /// Process a single instruction, provided by the caller.
-    void ProcessInst(const inst_t & inst) { program.inst_lib->ProcessInst(*this, inst); }
+    void ProcessInst(const inst_t & inst) { program.GetInstLib()->ProcessInst(*this, inst); }
 
     /// Handle an event (on this hardware).
     void HandleEvent(const event_t & event) { event_lib->HandleEvent(*this, event); }
@@ -1456,7 +1455,7 @@ namespace emp {
       os << "[" << event_lib->GetName(event.id) << ","; event.affinity.Print(os); os << ",(";
       for (const auto & mem : event.msg) std::cout << "{" << mem.first << ":" << mem.second << "}";
       os << "),(Properties:";
-      for (const auto & property : event.properties) std::cout << " " << property;
+      for (const auto & property : event.properties) os << " " << property;
       os << ")]";
     }
 
