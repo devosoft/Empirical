@@ -144,6 +144,10 @@ namespace emp {
     return sum;
   }
 
+  /// Calculate the average value in a vector.
+  template <typename T>
+  T CalcMean(const emp::vector<T> & v) { return Sum(v) / (T) v.size(); }
+
   /// Multiply all of the contents of a vector.
   template <typename T>
   T Product(const emp::vector<T> & v) {
