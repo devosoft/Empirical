@@ -65,7 +65,7 @@ namespace emp {
       bins[bin_id]++;
     }
 
-    DataLog<size_t>(bins).AsciiBarGraph(max_width, show_scale, true, os);
+    AsciiBarGraph<size_t>(bins, max_width, show_scale, true, os);
   }
 
 }
