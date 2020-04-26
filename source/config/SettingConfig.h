@@ -113,7 +113,33 @@ namespace emp {
       }
 
       bool FromString(const std::string_view & input) override {
-        values = emp::from_strings<T>(emp::slice(input, ','));
+        // Divide up inputs into comma-separated units.
+        auto slices = emp::slice(input, ',');
+
+        // Clear out the values to set, one at a time (in most cases, aleady clear)
+        values.resize(0);
+
+        // Process each slice into one or more values.
+        for (auto & cur_str : slices) {
+          // If we are working with an arithmetic type, check if this is a range.
+          if constexpr (std::is_arithmetic<T>::value) {
+            auto r_slices = emp::slice(cur_str, ':');
+            if (r_slices.size() > 3) return false; // Error!  Too many slices!!!
+            T start = emp::from_string<T>( r_slices[0] );
+            T end = emp::from_string<T>( r_slices.back() ); // Same as start if one value.
+            T step = (r_slices.size() == 3) ? emp::from_string<T>( r_slices[1] ) : 1;
+            while (start <= end) {
+              values.push_back(start);
+              start += step;
+            }
+          }
+          
+          // Otherwise do a direct conversion.
+          else {
+            values.push_back( emp::from_string<T>(cur_str) );
+          }
+        }
+
         if (!var_ptr.IsNull() && values.size()) *var_ptr = values[0];
         return values.size();  // Must result in at least one value.
       }
@@ -379,7 +405,7 @@ namespace emp {
       return nullptr;
     }
 
-    /// Take an input set of config options, process them, and return set of unprocessed ones.
+    /// Take an input set of config options, process them, and track set of unprocessed ones.
     bool ProcessOptions(const emp::vector<std::string> & args) {
       exe_name = args[0];
 
