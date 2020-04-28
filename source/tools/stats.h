@@ -41,16 +41,21 @@ namespace emp {
 
   /// Calculate Shannon Entropy of the members of the container passed
   template <typename C>
-  typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value, double>::type
-  ShannonEntropy(C & elements) {
+  double ShannonEntropy(C & elements) {
     // Count number of each value present
-    emp::map<typename C::value_type, int> counts;
+    emp::map<typename emp::remove_ptr_type<typename C::value_type>::type, int> counts;
     for (auto element : elements) {
-      auto it = counts.find(element);
-      if (it != counts.end()) {
-	       it->second++;
-      } else {
-	       counts[element] = 1;
+      // If we have a container of pointers, dereference them
+      if constexpr (emp::is_ptr_type<typename C::value_type>::value) {
+        auto it = counts.find(*element);
+        if (it != counts.end()) it->second++;
+        else counts[*element] = 1;
+      }
+      // otherwise operate on elements directly.
+      else {
+        auto it = counts.find(element);
+        if (it != counts.end()) it->second++;
+        else counts[element] = 1;
       }
     }
 
@@ -64,31 +69,6 @@ namespace emp {
     return -1 * result;
   }
 
-  /// Calculate Shannon Entropy of the members of the container when those members are pointers
-  template <typename C>
-  typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value, double>::type
-  ShannonEntropy(C & elements) {
-    //   std::cout<< "In se" << std::endl;
-    using pointed_at = typename emp::remove_ptr_type<typename C::value_type>::type;
-    // Count number of each value present
-    emp::map<pointed_at, int> counts;
-    for (auto element : elements) {
-      if (counts.find(*element) != counts.end()) {
-        counts[*element]++;
-      } else {
-        counts[*element] = 1;
-      }
-
-    }
-    // Shannon entropy calculation
-    double result = 0;
-    for (auto element : counts) {
-      double p = double(element.second)/elements.size();
-      result +=  p * log2(p);
-    }
-    //   std::cout<< "leaving se" << std::endl;
-    return -1 * result;
-  }
 
   /// Calculate variance of the members of the container passed
   /// Only works on containers with a scalar member type
