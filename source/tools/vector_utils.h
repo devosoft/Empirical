@@ -172,6 +172,20 @@ namespace emp {
     return new_vec;
   }
 
+  /// Collapse a vector of vectors into a single vector.
+  template <typename T>
+  emp::vector<T> Flatten( const emp::vector< emp::vector< T > > & vv ) {
+    size_t element_count = 0;
+    for (const auto & v : vv) element_count += v.size();
+
+    emp::vector<T> out_v;
+    out_v.reserve(element_count);
+
+    for (const auto & v : vv) out_v.insert(out_v.end(), v.begin(), v.end());
+
+    return out_v;
+  }
+
   /// Swap the order of a vector of vectors.  That is, swap rows and columns.
   /// NOTE: All rows must be the same size or smaller than those above for this to work.
   template <typename T>
