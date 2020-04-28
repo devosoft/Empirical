@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <limits>
 
 #include "../base/vector.h"
 
@@ -135,18 +136,6 @@ namespace emp {
   /// Find the maximum value in a vector.
   template <typename T>
   T FindMax(const emp::vector<T> & v) { return v[ FindMaxIndex(v) ]; }
-
-  /// Sum up the contents of a vector.
-  template <typename T>
-  T Sum(const emp::vector<T> & v) {
-    T sum = 0;
-    for (auto x : v) sum += x;
-    return sum;
-  }
-
-  /// Calculate the average value in a vector.
-  template <typename T>
-  T CalcMean(const emp::vector<T> & v) { return Sum(v) / (T) v.size(); }
 
   /// Multiply all of the contents of a vector.
   template <typename T>
