@@ -27,45 +27,28 @@
 
 namespace emp {
 
-  /// Calculate sum of the members of the container passed
-  /// Only works on containers with a scalar member type
+  /// Calculate sum of the values in a container; if pointers to scalars, convert to scalar type
   template <typename C>
-  typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value && std::is_scalar<typename C::value_type>::value, typename C::value_type>::type
+  typename emp::remove_ptr_type<typename C::value_type>::type
   Sum(C & elements) {
-
-    double total = 0;
+    typename emp::remove_ptr_type<typename C::value_type>::type total = 0;
     for (auto element : elements) {
-      total += element;
+      if constexpr (emp::is_ptr_type<typename C::value_type>::value) total += *element;
+      else total += element;
     }
-
     return total;
   }
-
-  /// Calculate sum of the values pointed at by pointers in a container
-  /// Only works on containers of pointers to a scalar type
-  template <typename C>
-  typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value && std::is_scalar<typename emp::remove_ptr_type<typename C::value_type>::type >::value, typename emp::remove_ptr_type<typename C::value_type>::type >::type
-  Sum(C & elements) {
-
-    double total = 0;
-    for (auto element : elements) {
-      total += *element;
-    }
-
-    return total;
-  }
-
 
   /// Calculate Shannon Entropy of the members of the container passed
   template <typename C>
   typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value, double>::type
   ShannonEntropy(C & elements) {
-
     // Count number of each value present
     emp::map<typename C::value_type, int> counts;
     for (auto element : elements) {
-      if (counts.find(element) != counts.end()) {
-	       counts[element]++;
+      auto it = counts.find(element);
+      if (it != counts.end()) {
+	       it->second++;
       } else {
 	       counts[element] = 1;
       }
