@@ -41,10 +41,8 @@ namespace emp {
 
   /// Sum the RESULTS of scalar values in a container; if pointers to scalars, convert to scalar type
   template <typename C, typename FUN>
-  auto SumScalarResults(C & elements, FUN & fun) {
-    constexpr bool is_ptr = emp::is_ptr_type<typename C::value_type>::value;
-
-    using return_t = decltype( fun( emp::remove_ptr_value(elements[0]) ) );
+  auto SumScalarResults(C & elements, FUN && fun) {
+    using return_t = decltype( fun( emp::remove_ptr_value(*elements.begin()) ) );
     return_t total = 0;
     for (auto element : elements) {
       total += fun(emp::remove_ptr_value(element));
@@ -83,34 +81,6 @@ namespace emp {
   }
 
 
-  /// Calculate variance of the members of the container passed
-  /// Only works on containers with a scalar member type
-  template <typename C>
-  typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value && std::is_scalar<typename C::value_type>::value, double>::type
-  Variance(C & elements) {
-
-    double var = 0;
-    double mean = (double)Sum(elements)/elements.size();
-    for (auto element : elements) {
-      var += emp::Pow(element - mean, 2);
-    }
-    return var/elements.size();
-  }
-
-  /// Calculate variance of the values pointed at by members of the container passed
-  /// Only works on containers with a scalar member type
-  template <typename C>
-  typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value && std::is_scalar<typename emp::remove_ptr_type<typename C::value_type>::type >::value, double>::type
-  Variance(C & elements) {
-
-    double var = 0;
-    double mean = (double)Sum(elements)/elements.size();
-    for (auto element : elements) {
-      var += emp::Pow(*element - mean, 2);
-    }
-    return var/elements.size();
-  }
-
   /// Calculate the mean of the values in a container
   /// If values are pointers, they will be automatically de-referenced
   /// Values must be numeric.
@@ -119,6 +89,17 @@ namespace emp {
   Mean(C & elements) {
     return (double)Sum(elements)/elements.size();
   }
+
+
+  /// Calculate variance of the members of the container passed
+  /// Only works on containers with a scalar member type
+  template <typename C>
+  auto Variance(C & elements) {
+    const double mean = Mean(elements);
+    auto sum = SumScalarResults(elements, [mean](auto x){ return emp::Pow(x - mean, 2); } );
+    return sum / (elements.size() - 1);
+  }
+
 
   /// Calculate the standard deviation of the values in a container
   /// If values are pointers, they will be automatically de-referenced
