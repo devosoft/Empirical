@@ -16,8 +16,8 @@ int main()
 {
   emp::vector<double> v1 = { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0 };
   emp::vector<double> v2 = { 1.0, 5.0, 3.0, 4.0, 2.0, 6.0 };
-  emp::vector<size_t> v3 = { 7, 8, 9, 10, 11, 12 };
-  emp::vector<int> v4 = { -2, -1, 0, 1, 2, 3 };
+  emp::vector<size_t> v3 = { 4, 6, 8, 10, 12, 14 };
+  emp::vector<int> v4 = { -2, -1, 0, 1, 2, 4 };
   std::set<double> s1 = { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0 };
   std::set<int> s4 = { -2, -1, 0, 1, 2, 3 };
 
@@ -31,13 +31,41 @@ int main()
   std::cout << "v4 = " << emp::to_string(v4) << std::endl;
 
   std::cout << std::endl;
-  std::cout << "Sum(v1) = " << emp::Sum(v1) << std::endl;
-  std::cout << "Sum(v2) = " << emp::Sum(v2) << std::endl;
-  std::cout << "Sum(v3) = " << emp::Sum(v3) << std::endl;
-  std::cout << "Sum(v4) = " << emp::Sum(v4) << std::endl;
-  std::cout << "Sum(s1) = " << emp::Sum(s1) << std::endl;
-  std::cout << "Sum(s4) = " << emp::Sum(s4) << std::endl;
-  std::cout << "Sum(vp4) = " << emp::Sum(vp4) << std::endl;
+  std::cout << "Sum(v1) = " << emp::Sum(v1) 
+            << "  Mean(v1) = " << emp::Mean(v1)
+            << "  Var(v1) = " << emp::Variance(v1)
+            << "  StdDev(v1) = " << emp::StandardDeviation(v1)
+            << std::endl;
+  std::cout << "Sum(v2) = " << emp::Sum(v2) 
+            << "  Mean(v2) = " << emp::Mean(v2)
+            << "  Var(v2) = " << emp::Variance(v2)
+            << "  StdDev(v2) = " << emp::StandardDeviation(v2)
+            << std::endl;
+  std::cout << "Sum(v3) = " << emp::Sum(v3) 
+            << "  Mean(v3) = " << emp::Mean(v3)
+            << "  Var(v3) = " << emp::Variance(v3)
+            << "  StdDev(v3) = " << emp::StandardDeviation(v3)
+            << std::endl;
+  std::cout << "Sum(v4) = " << emp::Sum(v4) 
+            << "  Mean(v4) = " << emp::Mean(v4)
+            << "  Var(v4) = " << emp::Variance(v4)
+            << "  StdDev(v4) = " << emp::StandardDeviation(v4)
+            << std::endl;
+  std::cout << "Sum(s1) = " << emp::Sum(s1) 
+            << "  Mean(s1) = " << emp::Mean(s1)
+            << "  Var(s1) = " << emp::Variance(s1)
+            << "  StdDev(s1) = " << emp::StandardDeviation(s1)
+            << std::endl;
+  std::cout << "Sum(s4) = " << emp::Sum(s4) 
+            << "  Mean(s4) = " << emp::Mean(s4)
+            << "  Var(s4) = " << emp::Variance(s4)
+            << "  StdDev(s4) = " << emp::StandardDeviation(s4)
+            << std::endl;
+  std::cout << "Sum(vp4) = " << emp::Sum(vp4) 
+            << "  Mean(vp4) = " << emp::Mean(vp4)
+            << "  Var(vp4) = " << emp::Variance(vp4)
+            << "  StdDev(vp4) = " << emp::StandardDeviation(vp4)
+            << std::endl;
 
   std::cout << std::endl;
   emp::vector<char> v5 = { 'a', 'b', 'c', 'a', 'a', 'b', 'c', 'a' };
@@ -47,4 +75,5 @@ int main()
   std::cout << "v5 = " << emp::to_string(v5) << std::endl;
   std::cout << "ShannonEntropy(v5) = " << emp::ShannonEntropy(v5) << std::endl;
   std::cout << "ShannonEntropy(vp5) = " << emp::ShannonEntropy(vp5) << std::endl;
+
 }
