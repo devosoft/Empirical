@@ -39,6 +39,19 @@ namespace emp {
     return total;
   }
 
+  /// Sum the RESULTS of scalar values in a container; if pointers to scalars, convert to scalar type
+  template <typename C, typename FUN>
+  auto SumScalarResults(C & elements, FUN & fun) {
+    constexpr bool is_ptr = emp::is_ptr_type<typename C::value_type>::value;
+
+    using return_t = decltype( fun( emp::remove_ptr_value(elements[0]) ) );
+    return_t total = 0;
+    for (auto element : elements) {
+      total += fun(emp::remove_ptr_value(element));
+    }
+    return total;
+  }
+
   /// Calculate Shannon Entropy of the members of the container passed
   template <typename C>
   double ShannonEntropy(C & elements) {
