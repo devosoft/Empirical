@@ -362,9 +362,10 @@ namespace emp {
     std::string CurSettings(const std::string & separator=",") const {
       std::string out_str;
       for (auto [name,ptr] : setting_map) {
-        if (out_str.size()) out_str += separator;
-        if (ptr)
-        out_str += ptr->IsComboSetting() ? ptr->AsString(cur_combo[ptr->GetID()]) : ptr->AsString();
+        if (ptr) {
+          if (out_str.size()) out_str += separator;
+          out_str += ptr->IsComboSetting() ? ptr->AsString(cur_combo[ptr->GetID()]) : ptr->AsString();
+        }
       }
       return out_str;
     }
@@ -380,10 +381,15 @@ namespace emp {
     }
 
     /// Convert all of the current values into a comma-separated string.
-    std::string CurComboString(const std::string & separator=",") const {
+    std::string CurComboString(const std::string & separator=",",
+                               bool use_labels=false,   ///< Print name with each value?
+                               bool multi_only=false    ///< Only print values that can change?
+                              ) const {
       std::string out_str;
       for (size_t i = 0; i < cur_combo.size(); i++) {
-        if (i) out_str += separator;
+        if (multi_only && combo_settings[i]->GetSize() == 1) continue;
+        if (out_str.size()) out_str += separator;
+        if (use_labels) out_str += emp::to_string(combo_settings[i]->name, '=');
         out_str += combo_settings[i]->AsString(cur_combo[i]);
       }
       return out_str;
