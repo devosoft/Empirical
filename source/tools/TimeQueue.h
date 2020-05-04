@@ -36,6 +36,11 @@
  *  time with:
  * 
  *    double cur_time = time_queue.GetTime();
+ * 
+ *  Important note for EFFICIENCY: You must always insert events for after the current time,
+ *  but the longer after the current time (and the more other insertions that occuer between
+ *  each insertion and its trigger) the faster the TimeQueue will run.  If an item will be 
+ *  triggered immediately, you should try to avoid putting it in the TimeQueue. 
  */
 
 
