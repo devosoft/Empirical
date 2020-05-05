@@ -110,6 +110,11 @@ namespace emp {
     virtual void ImprintRegulators(const BaseMatchBin & target) = 0;
     virtual std::string name() const = 0;
     virtual const emp::vector<uid_t>& ViewUIDs() const = 0;
+
+    #ifdef EMP_LOG_MATCHBIN
+    virtual void ClearLogs() = 0;
+    #endif
+
   };
 
 
@@ -637,6 +642,14 @@ namespace emp {
       state = state_;
       ClearCache();
     }
+
+    #ifdef EMP_LOG_MATCHBIN
+    /// Clear the logs
+    /// This method must be called manually each time.
+    void ClearLogs() override {
+      logtable.clear();
+    };
+    #endif
 
   };
 
