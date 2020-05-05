@@ -214,8 +214,7 @@ namespace emp {
     { ; }
 
     MatchBin(emp::Random & rand)
-    : uid_stepper(0)
-    , caching_activated(cache_available)
+    : MatchBin()
     , selector(rand)
     { ; }
 
