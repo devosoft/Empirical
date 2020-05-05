@@ -310,62 +310,58 @@ namespace emp {
     /// function and return a vector of unique IDs chosen by the selector
     /// function. Ignore regulators.
     emp::vector<uid_t> MatchRaw(const query_t & query, size_t n=0) override {
-
-      // try looking up in cache
-      if (cache_available && caching_activated) {
-
-        if (
-          std::shared_lock lock(cache_raw_mutex);
-          cache_raw.find(query) != std::end(cache_raw)
-        ) {
-          const auto res = cache_raw.at(query)(n); /* std::optional */
-          if (res) return res.value();
+      const auto makeResult = [&]() {
+      // compute distance between query and all stored tags
+      std::unordered_map<tag_t, double> matches;
+      for (const auto &[uid, tag] : state.tags) {
+        if (matches.find(tag) == std::end(matches)) {
+          matches[tag] = metric(query, tag);
         }
-
-        std::unique_lock lock(cache_raw_mutex);
-
-        // compute distance between query and all stored tags
-        std::unordered_map<tag_t, double> matches;
-        for (const auto &[uid, tag] : state.tags) {
-          if (matches.find(tag) == std::end(matches)) {
-            matches[tag] = metric(query, tag);
-          }
-        }
-
-        // apply regulation to generate match scores
-        std::unordered_map<uid_t, double> scores;
-        for (const auto & uid : state.uids) {
-          scores[uid] = matches[state.tags[uid]];
-        }
-
-        auto cacheResult = selector(state.uids, scores, n);
-
-        cache_raw[query] = cacheResult;
-
-        return cacheResult(n).value();
-
-      } else {
-
-        // compute distance between query and all stored tags
-        std::unordered_map<tag_t, double> matches;
-        for (const auto &[uid, tag] : state.tags) {
-          if (matches.find(tag) == std::end(matches)) {
-            matches[tag] = metric(query, tag);
-          }
-        }
-
-        // apply regulation to generate match scores
-        std::unordered_map<uid_t, double> scores;
-        for (const auto & uid : state.uids) {
-          scores[uid] = matches[state.tags[uid]];
-        }
-
-        auto cacheResult = selector(state.uids, scores, n);
-
-        return cacheResult(n).value();
-
       }
+      // apply regulation to generate match scores
+      std::unordered_map<uid_t, double> scores;
+      for (const auto & uid : state.uids) {
+        scores[uid] = matches[state.tags[uid]];
+      }
+      return selector(state.uids, scores, n);
+    }
+      const auto getResult = [&]() {
+        // try looking up in cache
+        if (cache_available && caching_activated) {
+          // try cache lookup first
+          if (
+            std::shared_lock lock(cache_raw_mutex);
+            cache_raw.find(query) != std::end(cache_raw)
+          ) {
+            const auto res = cache_raw.at(query)(n); /* std::optional */
+            if (res) return res.value();
+          }
 
+          std::unique_lock lock(cache_raw_mutex);
+
+          auto cacheResult = makeResult();
+
+          cache_raw[query] = cacheResult;
+
+          return cacheResult(n).value();
+
+        } else {
+
+          auto cacheResult = makeResult();
+
+          return cacheResult(n).value();
+        }
+      };
+      auto result = getResult();
+
+      #ifdef EMP_LOG_MATCHBIN
+      // store counts for results
+      for (const auto &value : result) {
+        ++logtable[std::make_pair(query, GetTag(value))];
+      }
+      #endif
+
+      return result;
     }
 
     /// Put an item and associated tag in the container. Returns the uid for
