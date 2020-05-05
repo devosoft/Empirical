@@ -23,12 +23,15 @@
 #include <math.h>
 #include <mutex>
 #include <shared_mutex>
+#include <string>
+#include <unordered_map>
 
 #include "../base/assert.h"
 #include "../base/vector.h"
 #include "../tools/IndexMap.h"
 #include "../tools/BitSet.h"
 #include "../tools/matchbin_utils.h"
+#include "../data/DataFile.h"
 
 namespace emp {
 
@@ -175,10 +178,30 @@ namespace emp {
     std::unordered_map<
       query_t,
       typename Selector::cache_state_type_t
-    > cache_raw; // cache of raw scores
+    > cache_raw; //+ cache of raw scores
 
     Metric metric;
     Selector selector;
+
+    // logging
+    #ifdef EMP_LOG_MATCHBIN
+    using logtable_t = std::unordered_map<
+      std::pair<
+        query_t,
+        tag_t
+      >,
+      size_t,
+      emp::TupleHash<query_t, tag_t>
+    >;
+
+    logtable_t logtable{};
+
+    // TODO: figure out a way to define logfile name via macros
+    emp::ContainerDataFile<logtable_t> datafile = MakeContainerDataFile<logtable_t>(
+      [this](){ return logtable; },
+      "matchbin_log.csv"
+    );
+    #endif
 
   private:
     mutable std::shared_mutex cache_regulated_mutex;
@@ -267,6 +290,13 @@ namespace emp {
       };
 
       auto result = getResult();
+
+      #ifdef EMP_LOG_MATCHBIN
+      // store counts for results
+      for (const auto &value : result) {
+        ++logtable[std::make_pair(query, GetTag(value))];
+      }
+      #endif
 
       return result;
     }
