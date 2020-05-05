@@ -263,7 +263,7 @@ namespace emp {
             matches.at( state.tags.at(uid) )
           );
         }
-        
+
         return selector(state.uids, scores, n);
       };
       const auto getResult = [&]() {
@@ -311,20 +311,20 @@ namespace emp {
     /// function. Ignore regulators.
     emp::vector<uid_t> MatchRaw(const query_t & query, size_t n=0) override {
       const auto makeResult = [&]() {
-      // compute distance between query and all stored tags
-      std::unordered_map<tag_t, double> matches;
-      for (const auto &[uid, tag] : state.tags) {
-        if (matches.find(tag) == std::end(matches)) {
-          matches[tag] = metric(query, tag);
+        // compute distance between query and all stored tags
+        std::unordered_map<tag_t, double> matches;
+        for (const auto &[uid, tag] : state.tags) {
+          if (matches.find(tag) == std::end(matches)) {
+            matches[tag] = metric(query, tag);
+          }
         }
-      }
-      // apply regulation to generate match scores
-      std::unordered_map<uid_t, double> scores;
-      for (const auto & uid : state.uids) {
-        scores[uid] = matches[state.tags[uid]];
-      }
-      return selector(state.uids, scores, n);
-    }
+        // apply regulation to generate match scores
+        std::unordered_map<uid_t, double> scores;
+        for (const auto & uid : state.uids) {
+          scores[uid] = matches[state.tags[uid]];
+        }
+        return selector(state.uids, scores, n);
+      };
       const auto getResult = [&]() {
         // try looking up in cache
         if (cache_available && caching_activated) {
