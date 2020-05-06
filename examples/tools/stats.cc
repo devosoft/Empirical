@@ -15,7 +15,7 @@
 int main()
 {
   emp::vector<double> v1 = { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0 };
-  emp::vector<double> v2 = { 1.0, 5.0, 3.0, 4.0, 2.0, 6.0 };
+  const emp::vector<double> v2 = { 1.0, 5.0, 3.0, 4.0, 2.0, 6.0 };
   emp::vector<size_t> v3 = { 4, 6, 8, 10, 12, 14 };
   emp::vector<int> v4 = { -2, -1, 0, 1, 2, 4 };
   std::set<double> s1 = { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0 };
