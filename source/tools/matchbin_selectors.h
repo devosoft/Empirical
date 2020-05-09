@@ -336,7 +336,7 @@ namespace emp {
         std::partition(
           std::begin(uids),
           std::end(uids),
-          [&scores, thresh](size_t uid){ return scores.at(uid) <= thresh; }
+          [&scores](size_t uid){ return scores.at(uid) <= thresh; }
         )
       );
 
@@ -474,7 +474,7 @@ namespace emp {
         std::partition(
           std::begin(uids),
           std::end(uids),
-          [&scores, thresh](size_t uid){ return scores.at(uid) <= thresh; }
+          [&scores](size_t uid){ return scores.at(uid) <= thresh; }
         )
       );
 
