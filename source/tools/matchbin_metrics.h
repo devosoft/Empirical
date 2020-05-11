@@ -100,7 +100,7 @@ namespace emp {
       return static_cast<double>(emp::hash_combine(
         qhasher(a),
         thasher(b)
-      )) / std::numeric_limits<double>::max();
+      )) / std::numeric_limits<size_t>::max();
     }
 
   };
