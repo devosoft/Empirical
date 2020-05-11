@@ -72,8 +72,6 @@ namespace emp {
   namespace internal {
     template<typename Query, typename Tag>
     class MatchBinLog {
-
-
       using query_t = Query;
       using tag_t = Tag;
 
