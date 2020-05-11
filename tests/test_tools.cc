@@ -4048,6 +4048,34 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(bitBin64.GetTags(bitBin64.Match(bs9, 5)) == (emp::vector<emp::BitSet<64>> {bs9, bs1, bs7}));
 
   }
+  // test static instance ID
+  #define EMP_LOG_MATCHBIN
+  {
+    using matchbin_t = emp::MatchBin<
+      std::string,
+      emp::StreakMetric<64>,
+      emp::RankedSelector<std::ratio<1+1, 1>>,
+      emp::LegacyRegulator
+   >;
+
+    emp::vector<matchbin_t> matchbins;
+    std::set<size_t> ids;
+
+    // create vector of matchbins
+    for (size_t i = 0; i < 100; ++i) {
+      emp::Random rand(1);
+      matchbin_t bin(rand);
+      matchbins.push_back(bin);
+    }
+    // test that every matchbin has a unique ID
+    for (auto& bin: matchbins) {
+      ids.insert(bin.log.getID());
+      bin.log.FlushLogBuffer();
+    }
+
+    REQUIRE(ids.size() == matchbins.size());
+  }
+  #undef EMP_LOG_MATCHBIN
 
   {
   emp::Random rand(1);
