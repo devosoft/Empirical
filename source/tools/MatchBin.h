@@ -12,6 +12,11 @@
 #ifndef EMP_MATCH_BIN_H
 #define EMP_MATCH_BIN_H
 
+// take care of preprocessored filename
+#ifndef EMP_LOG_MATCHBIN_FILENAME
+#define EMP_LOG_MATCHBIN_FILENAME "matchbin_log"
+#endif
+
 #include <iostream>
 #include <unordered_map>
 #include <unordered_set>
@@ -25,6 +30,7 @@
 #include <shared_mutex>
 #include <string>
 #include <unordered_map>
+#include <atomic>
 
 #include "../base/assert.h"
 #include "../base/vector.h"
@@ -32,9 +38,10 @@
 #include "../tools/BitSet.h"
 #include "../tools/matchbin_utils.h"
 #include "../data/DataFile.h"
+#include "../data/DataNode.h"
+#include "../base/errors.h"
 
 namespace emp {
-
   /// Internal state packet for MatchBin
   template<typename Val, typename Tag, typename Regulator>
   struct MatchBinState {
@@ -61,6 +68,155 @@ namespace emp {
     #endif
   };
 
+  // namespace used for logging and caching
+  namespace internal {
+    template<typename Query, typename Tag>
+    class MatchBinLog {
+
+
+      using query_t = Query;
+      using tag_t = Tag;
+
+      struct Logpair {
+        query_t first;
+        tag_t second;
+
+        Logpair(query_t query, tag_t tag)
+        : first(query)
+        , second(tag)
+        { ; }
+
+        operator size_t() const { return emp::Hash<query_t>(first) + emp::Hash<tag_t>(second); }
+      };
+
+      using logitem_t = std::pair<Logpair, std::string>;
+
+      using logbuffer_t = std::unordered_map<
+        logitem_t,
+        size_t,
+        TupleHash<
+          Logpair,
+          std::string
+        >
+      >;
+
+      size_t log_counter;
+      size_t id;
+      const std::string filename = EMP_LOG_MATCHBIN_FILENAME;
+      logbuffer_t logbuffer;
+
+      #ifdef EMP_LOG_MATCHBIN
+      static constexpr bool logging_enabled = true;
+      #else
+      static constexpr bool logging_enabled = false;
+      #endif
+      bool logging_activated{logging_enabled};
+
+      emp::ContainerDataFile<logbuffer_t> datafile;
+
+      // setup getter functions
+      std::function<query_t(const std::pair<const logitem_t, size_t>)> get_query_log = [](const std::pair<const logitem_t, size_t> datapoint){ return datapoint.first.first.first; };
+      std::function<tag_t(const std::pair<const logitem_t, size_t>)> get_tag_log = [](const std::pair<const logitem_t, size_t> datapoint){ return datapoint.first.first.second; };
+      std::function<size_t(const std::pair<const logitem_t, size_t>)> get_hit_count_log = [](const std::pair<const logitem_t, size_t> datapoint){ return datapoint.second; };
+      std::function<std::string(const std::pair<const logitem_t, size_t>)> get_logbuffer_type = [](const std::pair<const logitem_t, size_t> datapoint) { return datapoint.first.second; };
+
+      size_t make_id() {
+        static std::atomic<int> counter{0};
+        return counter++;
+      }
+
+      public:
+        MatchBinLog()
+        : log_counter(0)
+        , id(make_id())
+        , datafile(MakeContainerDataFile<logbuffer_t>(
+              [this](){ return logbuffer; },
+              filename + ".csv"
+            )
+          )
+        {
+          if constexpr (logging_enabled) {
+            datafile.AddContainerFun(get_query_log, "query", "query");
+            datafile.AddContainerFun(get_tag_log, "tag", "tag");
+            datafile.AddContainerFun(get_hit_count_log, "hit_count", "hit_count");
+            datafile.AddVar(log_counter, "counter", "Counter for how many times this file was written to");
+            datafile.AddVar(id, "id", "Matchbin ID");
+            datafile.AddContainerFun(get_logbuffer_type, "matchtype", "Type of match");
+          }
+        }
+
+        ~MatchBinLog() {
+          if constexpr (logging_enabled) {
+            if (!logbuffer.empty()) {
+              emp::LibraryWarning(
+                emp::to_string("Match log buffer was not empty before destructing.\n",
+                "Match log buffer was written ", log_counter, " times.")
+              );
+            }
+          }
+        }
+
+        /// Clear the logs
+        /// This method must be called manually each time.
+        void ClearLogBuffer() {
+          if constexpr (logging_enabled) {
+            logbuffer.clear();
+          }
+        };
+
+        /// Write log buffer to file
+        void WriteLogBuffer() {
+          if constexpr (logging_enabled) {
+            datafile.Update();
+            ++log_counter;
+          }
+        }
+
+        /// Write logbuffer to file and then clear it
+        void FlushLogBuffer() {
+          if constexpr (logging_enabled) {
+            WriteLogBuffer();
+            ClearLogBuffer();
+          }
+        }
+
+        /// Enable logging
+        /// Will have no effect if EMP_MATCHBIN_LOG was not set at compile-time
+        void EnableLogging() { logging_activated = true; }
+
+        /// Disable logging
+        /// Will have no effect if EMP_MATCHBIN_LOG was not set at compile-time
+        void DisableLogging() { logging_activated = false; }
+
+        /// Set logging to given argument
+        /// Will have no effect if EMP_MATCHBIN_LOG was not set at compile-time
+        void SetLogging(bool log) { logging_activated = log; }
+
+        /// Access the data in logbuffer.
+        logbuffer_t GetLogBuffer() { return logbuffer; }
+
+        // get this instance's ID
+        int getID() const { return id; }
+
+        // logs only if logging is enabled
+        void DoLog(const query_t& query, const tag_t& tag, const std::string& buffer) {
+          if constexpr (logging_enabled) {
+            if (logging_activated) {
+              Logpair logpair(query, tag);
+
+              ++logbuffer[
+                std::make_pair(
+                  logpair,
+                  buffer
+                )
+              ];
+            }
+          }
+        }
+
+    };
+    class MatchBinCache {};
+  }
   /// Abstract base class for MatchBin
   template<typename Val, typename Query, typename Tag, typename Regulator>
   class BaseMatchBin {
@@ -110,11 +266,6 @@ namespace emp {
     virtual void ImprintRegulators(const BaseMatchBin & target) = 0;
     virtual std::string name() const = 0;
     virtual const emp::vector<uid_t>& ViewUIDs() const = 0;
-
-    #ifdef EMP_LOG_MATCHBIN
-    virtual void ClearLogs() = 0;
-    #endif
-
   };
 
 
@@ -155,9 +306,10 @@ namespace emp {
     using uid_t = typename base_t::uid_t;
     using state_t = MatchBinState<Val, tag_t, Regulator>;
 
+    emp::internal::MatchBinLog<query_t, tag_t> log;
+
   protected:
     state_t state;
-
     uid_t uid_stepper;
 
     static constexpr bool cache_available = std::is_base_of<
@@ -188,29 +340,12 @@ namespace emp {
     Metric metric;
     Selector selector;
 
-    // logging
-    #ifdef EMP_LOG_MATCHBIN
-    using logtable_t = std::unordered_map<
-      std::pair<
-        query_t,
-        tag_t
-      >,
-      size_t,
-      emp::TupleHash<query_t, tag_t>
-    >;
-
-    logtable_t logtable{};
-
-    // TODO: figure out a way to define logfile name via macros
-    emp::ContainerDataFile<logtable_t> datafile = MakeContainerDataFile<logtable_t>(
-      [this](){ return logtable; },
-      "matchbin_log.csv"
-    );
-    #endif
 
   private:
     mutable std::shared_mutex cache_regulated_mutex;
     mutable std::shared_mutex cache_raw_mutex;
+
+    size_t log_counter;
 
   public:
     MatchBin()
@@ -296,12 +431,10 @@ namespace emp {
 
       auto result = getResult();
 
-      #ifdef EMP_LOG_MATCHBIN
       // store counts for results
-      for (const auto &value : result) {
-        ++logtable[std::make_pair(query, GetTag(value))];
+      for (const auto &uid : result) {
+        log.DoLog(query, GetTag(uid), "regulated");
       }
-      #endif
 
       return result;
     }
@@ -354,16 +487,13 @@ namespace emp {
       };
       auto result = getResult();
 
-      #ifdef EMP_LOG_MATCHBIN
       // store counts for results
-      for (const auto &value : result) {
-        ++logtable[std::make_pair(query, GetTag(value))];
+      for (const auto &uid : result) {
+        log.DoLog(query, GetTag(uid), "raw");
       }
-      #endif
 
       return result;
     }
-
     /// Put an item and associated tag in the container. Returns the uid for
     /// that entry.
     uid_t Put(const Val & v, const tag_t & t) override {
@@ -640,13 +770,8 @@ namespace emp {
       ClearCache();
     }
 
-    #ifdef EMP_LOG_MATCHBIN
-    /// Clear the logs
-    /// This method must be called manually each time.
-    void ClearLogs() override {
-      logtable.clear();
-    };
-    #endif
+
+
 
   };
 
