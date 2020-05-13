@@ -824,6 +824,8 @@ namespace emp {
 
     emp::internal::MatchBinLog<query_t, tag_t>& GetLog() override { return log; }
 
+    size_t GetRegulatedCacheSize() { return cache.RegulatedSize(); }
+    size_t GetRawCacheSize() { return cache.RawSize(); }
 
 
   };
