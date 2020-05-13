@@ -14,7 +14,7 @@
 
 // take care of preprocessored filename
 #ifndef EMP_LOG_MATCHBIN_FILENAME
-#define EMP_LOG_MATCHBIN_FILENAME "matchbin_log"
+#define EMP_LOG_MATCHBIN_FILENAME "matchbin_log.csv"
 #endif
 
 #include <iostream>
