@@ -367,6 +367,7 @@ namespace emp {
     virtual void ImprintRegulators(const BaseMatchBin & target) = 0;
     virtual std::string name() const = 0;
     virtual const emp::vector<uid_t>& ViewUIDs() const = 0;
+    virtual emp::internal::MatchBinLog<query_t, tag_t>& GetLog() = 0;
   };
 
 
@@ -819,9 +820,9 @@ namespace emp {
     /// Load MatchBin state
     void SetState(const state_t & state_) {
       state = state_;
-      ClearCache();
     }
 
+    emp::internal::MatchBinLog<query_t, tag_t>& GetLog() override { return log; }
 
 
 
