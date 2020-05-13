@@ -5073,7 +5073,6 @@ TEST_CASE("Test MatchBin", "[tools]")
   public:
     MatchBinTest(emp::Random & rand) : parent_t(rand) { ; }
 
-    size_t GetCacheSize(){ return cache_regulated.size(); }
     size_t GetSelectCount(){ return selector.opCount; }
   };
 
@@ -5087,22 +5086,22 @@ TEST_CASE("Test MatchBin", "[tools]")
     ids.push_back(bin.Put(bs,bs));
   }
 
-  REQUIRE( bin.GetCacheSize() == 0);
+  REQUIRE( bin.GetRegulatedCacheSize() == 0);
   REQUIRE( bin.GetSelectCount() == 0);
   emp::vector<size_t> uncached = bin.Match(emp::BitSet<32>(), 10);// first match caches
   emp::vector<size_t> cached = bin.Match(emp::BitSet<32>(), 10);// second already cached
-  REQUIRE( bin.GetCacheSize() == 1);
+  REQUIRE( bin.GetRegulatedCacheSize() == 1);
   REQUIRE( bin.GetSelectCount() == 1);
   REQUIRE( cached == uncached );
   bin.DeactivateCaching();
-  REQUIRE(bin.GetCacheSize() == 0 );
+  REQUIRE(bin.GetRegulatedCacheSize() == 0 );
   bin.Match(emp::BitSet<32>(),10);//second cache
   bin.Match(emp::BitSet<32>(),10);//third cache
-  REQUIRE(bin.GetCacheSize() == 0 );
+  REQUIRE(bin.GetRegulatedCacheSize() == 0 );
   REQUIRE(bin.GetSelectCount() == 3);
 
   bin.ActivateCaching();
-  REQUIRE(bin.GetCacheSize() == 0 );
+  REQUIRE(bin.GetRegulatedCacheSize() == 0 );
 
 
   for(unsigned int i = 0; i < 1000; ++i){
@@ -5110,11 +5109,11 @@ TEST_CASE("Test MatchBin", "[tools]")
     bs.SetUInt32(0, i);
 
     uncached = bin.Match(bs, 3);
-    REQUIRE(bin.GetCacheSize() == i + 1);
+    REQUIRE(bin.GetRegulatedCacheSize() == i + 1);
     REQUIRE(bin.GetSelectCount() == 3 + i + 1);
 
     cached = bin.Match(bs, 3);
-    REQUIRE(bin.GetCacheSize() == i + 1); //shouldnt change
+    REQUIRE(bin.GetRegulatedCacheSize() == i + 1); //shouldnt change
     REQUIRE(bin.GetSelectCount() == 3 + i + 1); //shouldnt change
 
     REQUIRE(cached == uncached);
@@ -5123,14 +5122,14 @@ TEST_CASE("Test MatchBin", "[tools]")
   emp::BitSet<32> bs;
   bs.SetUInt32(0,1001);
   bin.SetTag(ids[0], bs);
-  REQUIRE(bin.GetCacheSize() == 0);
+  REQUIRE(bin.GetRegulatedCacheSize() == 0);
 
   bin.Match(emp::BitSet<32>(), 3);
-  REQUIRE(bin.GetCacheSize() == 1);
+  REQUIRE(bin.GetRegulatedCacheSize() == 1);
   REQUIRE(bin.GetSelectCount() == 1000 + 3 + 1);
 
   bin.Match(emp::BitSet<32>(), 4); //Asking for more than last time so we recache.
-  REQUIRE(bin.GetCacheSize() == 1); //replace the current one so same size.
+  REQUIRE(bin.GetRegulatedCacheSize() == 1); //replace the current one so same size.
   REQUIRE(bin.GetSelectCount() == 1000 + 3 + 2);
   }
 
