@@ -42,6 +42,256 @@
 #include "../base/errors.h"
 
 namespace emp {
+  template <
+    typename Val,
+    typename Metric,
+    typename Selector,
+    typename Regulator
+  > class MatchBin;
+}
+
+// namespace used for logging and caching
+namespace emp::internal {
+  template<typename Query, typename Tag>
+  class MatchBinLog {
+    using query_t = Query;
+    using tag_t = Tag;
+
+    struct Logpair {
+      query_t first;
+      tag_t second;
+
+      Logpair(query_t query, tag_t tag)
+      : first(query)
+      , second(tag)
+      { ; }
+
+      operator size_t() const { return emp::Hash<query_t>(first) + emp::Hash<tag_t>(second); }
+    };
+
+    using logitem_t = std::pair<Logpair, std::string>;
+
+    using logbuffer_t = std::unordered_map<
+      logitem_t,
+      size_t,
+      TupleHash<
+        Logpair,
+        std::string
+      >
+    >;
+
+    size_t log_counter;
+    size_t id;
+    logbuffer_t logbuffer;
+
+    #ifdef EMP_LOG_MATCHBIN
+    static constexpr bool logging_enabled = true;
+    #else
+    static constexpr bool logging_enabled = false;
+    #endif
+    bool logging_activated{logging_enabled};
+
+    emp::ContainerDataFile<logbuffer_t> datafile;
+
+    // setup getter functions
+    std::function<query_t(const std::pair<const logitem_t, size_t>)> get_query_log = [](const std::pair<const logitem_t, size_t> datapoint){ return datapoint.first.first.first; };
+    std::function<tag_t(const std::pair<const logitem_t, size_t>)> get_tag_log = [](const std::pair<const logitem_t, size_t> datapoint){ return datapoint.first.first.second; };
+    std::function<size_t(const std::pair<const logitem_t, size_t>)> get_hit_count_log = [](const std::pair<const logitem_t, size_t> datapoint){ return datapoint.second; };
+    std::function<std::string(const std::pair<const logitem_t, size_t>)> get_logbuffer_type = [](const std::pair<const logitem_t, size_t> datapoint) { return datapoint.first.second; };
+
+    size_t make_id() {
+      static std::atomic<int> counter{0};
+      return counter++;
+    }
+
+    public:
+      MatchBinLog()
+      : log_counter(0)
+      , id(make_id())
+      , datafile(MakeContainerDataFile<logbuffer_t>(
+            [this](){ return logbuffer; },
+            EMP_LOG_MATCHBIN_FILENAME
+          )
+        )
+      {
+        if constexpr (logging_enabled) {
+          datafile.AddContainerFun(get_query_log, "query", "query");
+          datafile.AddContainerFun(get_tag_log, "tag", "tag");
+          datafile.AddContainerFun(get_hit_count_log, "hit_count", "hit_count");
+          datafile.AddVar(log_counter, "counter", "Counter for how many times this file was written to");
+          datafile.AddVar(id, "id", "Matchbin ID");
+          datafile.AddContainerFun(get_logbuffer_type, "matchtype", "Type of match");
+        }
+      }
+
+      ~MatchBinLog() {
+        if constexpr (logging_enabled) {
+          if (!logbuffer.empty()) {
+            emp::LibraryWarning(
+              emp::to_string("Match log buffer was not empty before destructing.\n",
+              "Match log buffer was written ", log_counter, " times.")
+            );
+          }
+        }
+      }
+
+      /// Clear the logs
+      /// This method must be called manually each time.
+      void ClearLogBuffer() {
+        if constexpr (logging_enabled) {
+          logbuffer.clear();
+        }
+      };
+
+      /// Write log buffer to file
+      void WriteLogBuffer() {
+        if constexpr (logging_enabled) {
+          datafile.Update();
+          ++log_counter;
+        }
+      }
+
+      /// Write logbuffer to file and then clear it
+      void FlushLogBuffer() {
+        if constexpr (logging_enabled) {
+          WriteLogBuffer();
+          ClearLogBuffer();
+        }
+      }
+
+      /// Enable logging
+      /// Will have no effect if EMP_MATCHBIN_LOG was not set at compile-time
+      void EnableLogging() { logging_activated = true; }
+
+      /// Disable logging
+      /// Will have no effect if EMP_MATCHBIN_LOG was not set at compile-time
+      void DisableLogging() { logging_activated = false; }
+
+      /// Set logging to given argument
+      /// Will have no effect if EMP_MATCHBIN_LOG was not set at compile-time
+      void SetLogging(bool log) { logging_activated = log; }
+
+      /// Access the data in logbuffer.
+      logbuffer_t GetLogBuffer() { return logbuffer; }
+
+      // get this instance's ID
+      int GetID() const { return id; }
+
+      void SetDataFile(const emp::ContainerDataFile<logbuffer_t>& _datafile) { datafile = _datafile; }
+
+      // logs only if logging is enabled
+      void DoLog(const query_t& query, const tag_t& tag, const std::string& buffer) {
+        if constexpr (logging_enabled) {
+          if (logging_activated) {
+            Logpair logpair(query, tag);
+
+            ++logbuffer[
+              std::make_pair(
+                logpair,
+                buffer
+              )
+            ];
+          }
+        }
+      }
+
+  };
+  template <typename Query, typename Selector>
+  class MatchBinCache {
+    using query_t = Query;
+    using cache_state_t = typename Selector::cache_state_type_t;
+
+    template <typename Val,
+      typename Metric,
+      typename Regulator>
+    friend class MatchBin;
+
+    private:
+      mutable std::shared_mutex cache_regulated_mutex;
+      mutable std::shared_mutex cache_raw_mutex;
+
+      static constexpr bool cache_available = std::is_base_of<
+        CacheStateBase,
+        cache_state_t
+      >::value;
+      bool caching_activated{cache_available};
+
+      // caches
+      std::unordered_map<
+        query_t,
+        cache_state_t
+      > cache_regulated; // cache of regulated scores
+      std::unordered_map<
+        query_t,
+        cache_state_t
+      > cache_raw; // cache of raw scores
+
+    public:
+      /// Reset the Selector cache for regulated scores.
+      void ClearRegulated() {
+        if constexpr (cache_available) cache_regulated.clear();
+      }
+
+      /// Reset the Selector cache for raw scores.
+      void ClearRaw() {
+        if constexpr (cache_available) cache_raw.clear();
+      }
+
+      void Clear() {
+        ClearRaw();
+        ClearRegulated();
+      }
+
+      constexpr bool IsAvailable() const { return cache_available; }
+      bool IsActivated() { return caching_activated; }
+
+      bool Activate() {
+        Clear();
+        if (IsAvailable()) caching_activated = true;
+        return caching_activated;
+      }
+
+      void Deactivate() {
+        Clear();
+        caching_activated = false;
+      }
+
+      size_t CountRaw(const query_t& query) {
+        std::shared_lock lock(cache_raw_mutex);
+        return cache_raw.count(query);
+      }
+      size_t CountRegulated(const query_t& query) {
+        std::shared_lock lock(cache_regulated_mutex);
+        return cache_regulated.count(query);
+      }
+
+      void CacheRegulated(const query_t& query, const cache_state_t& result) {
+        if (CountRegulated(query) != 0) return;
+        std::unique_lock lock(cache_regulated_mutex);
+        cache_regulated.emplace(query, result);
+      }
+      void CacheRaw(const query_t& query, const cache_state_t& result) {
+        if (CountRaw(query) != 0) return;
+        std::unique_lock lock(cache_raw_mutex);
+        cache_raw.emplace(query, result);
+      }
+
+      // TODO: fix the type name
+      cache_state_t& GetRegulated(const query_t& query) {
+        return cache_regulated.at(query);
+      }
+      cache_state_t& GetRaw(const query_t& query) {
+        return cache_raw.at(query);
+      }
+      size_t RegulatedSize() { return cache_regulated.size(); }
+      size_t RawSize() { return cache_raw.size(); }
+
+
+
+  };
+}
+
+namespace emp {
   /// Internal state packet for MatchBin
   template<typename Val, typename Tag, typename Regulator>
   struct MatchBinState {
@@ -68,153 +318,6 @@ namespace emp {
     #endif
   };
 
-  // namespace used for logging and caching
-  namespace internal {
-    template<typename Query, typename Tag>
-    class MatchBinLog {
-      using query_t = Query;
-      using tag_t = Tag;
-
-      struct Logpair {
-        query_t first;
-        tag_t second;
-
-        Logpair(query_t query, tag_t tag)
-        : first(query)
-        , second(tag)
-        { ; }
-
-        operator size_t() const { return emp::Hash<query_t>(first) + emp::Hash<tag_t>(second); }
-      };
-
-      using logitem_t = std::pair<Logpair, std::string>;
-
-      using logbuffer_t = std::unordered_map<
-        logitem_t,
-        size_t,
-        TupleHash<
-          Logpair,
-          std::string
-        >
-      >;
-
-      size_t log_counter;
-      size_t id;
-      const std::string filename = EMP_LOG_MATCHBIN_FILENAME;
-      logbuffer_t logbuffer;
-
-      #ifdef EMP_LOG_MATCHBIN
-      static constexpr bool logging_enabled = true;
-      #else
-      static constexpr bool logging_enabled = false;
-      #endif
-      bool logging_activated{logging_enabled};
-
-      emp::ContainerDataFile<logbuffer_t> datafile;
-
-      // setup getter functions
-      std::function<query_t(const std::pair<const logitem_t, size_t>)> get_query_log = [](const std::pair<const logitem_t, size_t> datapoint){ return datapoint.first.first.first; };
-      std::function<tag_t(const std::pair<const logitem_t, size_t>)> get_tag_log = [](const std::pair<const logitem_t, size_t> datapoint){ return datapoint.first.first.second; };
-      std::function<size_t(const std::pair<const logitem_t, size_t>)> get_hit_count_log = [](const std::pair<const logitem_t, size_t> datapoint){ return datapoint.second; };
-      std::function<std::string(const std::pair<const logitem_t, size_t>)> get_logbuffer_type = [](const std::pair<const logitem_t, size_t> datapoint) { return datapoint.first.second; };
-
-      size_t make_id() {
-        static std::atomic<int> counter{0};
-        return counter++;
-      }
-
-      public:
-        MatchBinLog()
-        : log_counter(0)
-        , id(make_id())
-        , datafile(MakeContainerDataFile<logbuffer_t>(
-              [this](){ return logbuffer; },
-              filename + ".csv"
-            )
-          )
-        {
-          if constexpr (logging_enabled) {
-            datafile.AddContainerFun(get_query_log, "query", "query");
-            datafile.AddContainerFun(get_tag_log, "tag", "tag");
-            datafile.AddContainerFun(get_hit_count_log, "hit_count", "hit_count");
-            datafile.AddVar(log_counter, "counter", "Counter for how many times this file was written to");
-            datafile.AddVar(id, "id", "Matchbin ID");
-            datafile.AddContainerFun(get_logbuffer_type, "matchtype", "Type of match");
-          }
-        }
-
-        ~MatchBinLog() {
-          if constexpr (logging_enabled) {
-            if (!logbuffer.empty()) {
-              emp::LibraryWarning(
-                emp::to_string("Match log buffer was not empty before destructing.\n",
-                "Match log buffer was written ", log_counter, " times.")
-              );
-            }
-          }
-        }
-
-        /// Clear the logs
-        /// This method must be called manually each time.
-        void ClearLogBuffer() {
-          if constexpr (logging_enabled) {
-            logbuffer.clear();
-          }
-        };
-
-        /// Write log buffer to file
-        void WriteLogBuffer() {
-          if constexpr (logging_enabled) {
-            datafile.Update();
-            ++log_counter;
-          }
-        }
-
-        /// Write logbuffer to file and then clear it
-        void FlushLogBuffer() {
-          if constexpr (logging_enabled) {
-            WriteLogBuffer();
-            ClearLogBuffer();
-          }
-        }
-
-        /// Enable logging
-        /// Will have no effect if EMP_MATCHBIN_LOG was not set at compile-time
-        void EnableLogging() { logging_activated = true; }
-
-        /// Disable logging
-        /// Will have no effect if EMP_MATCHBIN_LOG was not set at compile-time
-        void DisableLogging() { logging_activated = false; }
-
-        /// Set logging to given argument
-        /// Will have no effect if EMP_MATCHBIN_LOG was not set at compile-time
-        void SetLogging(bool log) { logging_activated = log; }
-
-        /// Access the data in logbuffer.
-        logbuffer_t GetLogBuffer() { return logbuffer; }
-
-        // get this instance's ID
-        int getID() const { return id; }
-
-        // logs only if logging is enabled
-        void DoLog(const query_t& query, const tag_t& tag, const std::string& buffer) {
-          if constexpr (logging_enabled) {
-            if (logging_activated) {
-              Logpair logpair(query, tag);
-
-              ++logbuffer[
-                std::make_pair(
-                  logpair,
-                  buffer
-                )
-              ];
-            }
-          }
-        }
-
-    };
-    class MatchBinCache {};
-  }
   /// Abstract base class for MatchBin
   template<typename Val, typename Query, typename Tag, typename Regulator>
   class BaseMatchBin {
@@ -310,50 +413,20 @@ namespace emp {
     state_t state;
     uid_t uid_stepper;
 
-    static constexpr bool cache_available = std::is_base_of<
-      CacheStateBase,
-      typename Selector::cache_state_type_t
-    >::value;
-    bool caching_activated;
+    emp::internal::MatchBinCache<query_t, Selector> cache;
 
-    /// Reset the Selector cache for regulated scores.
-    void ClearRegulatedCache() {
-      if constexpr (cache_available) cache_regulated.clear();
-    }
-
-    /// Reset the Selector cache for raw scores.
-    void ClearRawCache() {
-      if constexpr (cache_available) cache_raw.clear();
-    }
-
-    std::unordered_map<
-      query_t,
-      typename Selector::cache_state_type_t
-    > cache_regulated; // cache of regulated scores
-    std::unordered_map<
-      query_t,
-      typename Selector::cache_state_type_t
-    > cache_raw; //+ cache of raw scores
 
     Metric metric;
     Selector selector;
 
 
-  private:
-    mutable std::shared_mutex cache_regulated_mutex;
-    mutable std::shared_mutex cache_raw_mutex;
-
-    size_t log_counter;
-
   public:
     MatchBin()
     : uid_stepper(0)
-    , caching_activated(cache_available)
     { ; }
 
     MatchBin(emp::Random & rand)
     : uid_stepper(0)
-    , caching_activated(cache_available)
     , selector(rand)
     { ; }
 
@@ -366,8 +439,7 @@ namespace emp {
 
   // have to define this manually due to mutexes
   MatchBin(const MatchBin &other)
-  : caching_activated(cache_available)
-  , metric(other.metric)
+  : metric(other.metric)
   , selector(other.selector)
   {
     state = other.state;
@@ -401,21 +473,16 @@ namespace emp {
       };
       const auto getResult = [&]() {
         // try looking up in cache
-        if (cache_available && caching_activated) {
+        if (cache.IsAvailable() && cache.IsActivated()) {
           // try cache lookup first
-          if (
-            std::shared_lock lock(cache_regulated_mutex);
-            cache_regulated.find(query) != std::end(cache_regulated)
-          ) {
-            const auto res = cache_regulated.at(query)(n); /* std::optional */
+          if (cache.CountRegulated(query)) {
+            const auto res = cache.GetRegulated(query)(n); /* std::optional */
             if (res) return res.value();
           }
 
-          std::unique_lock lock(cache_regulated_mutex);
-
           auto cacheResult = makeResult();
 
-          cache_regulated[query] = cacheResult;
+          cache.CacheRegulated(query, cacheResult);
 
           return cacheResult(n).value();
 
@@ -458,21 +525,15 @@ namespace emp {
       };
       const auto getResult = [&]() {
         // try looking up in cache
-        if (cache_available && caching_activated) {
+        if (cache.IsAvailable() && cache.IsActivated()) {
           // try cache lookup first
-          if (
-            std::shared_lock lock(cache_raw_mutex);
-            cache_raw.find(query) != std::end(cache_raw)
-          ) {
-            const auto res = cache_raw.at(query)(n); /* std::optional */
+          if (cache.CountRaw(query)) {
+            const auto res = cache.GetRaw(query)(n); /* std::optional */
             if (res) return res.value();
           }
-
-          std::unique_lock lock(cache_raw_mutex);
-
           auto cacheResult = makeResult();
 
-          cache_raw[query] = cacheResult;
+          cache.CacheRaw(query, cacheResult);
 
           return cacheResult(n).value();
 
@@ -510,7 +571,7 @@ namespace emp {
     uid_t Set(const Val & v, const tag_t & t, const uid_t uid) override {
       emp_assert(state.values.find(uid) == std::end(state.values));
 
-      ClearCache();
+      cache.Clear();
 
       state.values[uid] = v;
       state.regulators.insert({{uid},{}});
@@ -533,7 +594,7 @@ namespace emp {
         ) != std::end(state.uids)
       );
 
-      ClearCache();
+      cache.Clear();
 
       state.values.erase(uid);
       state.regulators.erase(uid);
@@ -559,32 +620,25 @@ namespace emp {
 
     /// Clear all items and tags.
     void Clear() override {
-      ClearCache();
+      cache.Clear();
       state.values.clear();
       state.regulators.clear();
       state.tags.clear();
       state.uids.clear();
     }
-
     /// Reset the Selector caches.
     void ClearCache() override {
-      if constexpr (cache_available) {
-        ClearRawCache();
-        ClearRegulatedCache();
-      }
+      cache.Clear();
     }
 
     /// Attempt to activate result caching.
     /// @return true if caching activated
     bool ActivateCaching() override {
-      ClearCache();
-      if constexpr (cache_available) caching_activated = true;
-      return caching_activated;
+      return cache.Activate();
     }
 
     void DeactivateCaching() override {
-      ClearCache();
-      caching_activated = false;
+      cache.Deactivate();
     }
 
     /// Access a reference single stored value by uid.
@@ -602,7 +656,7 @@ namespace emp {
     /// Change the tag at a given uid and clear the cache.
     void SetTag(const uid_t uid, tag_t tag) override {
       emp_assert(state.tags.find(uid) != std::end(state.tags));
-      ClearCache();
+      cache.Clear();
       state.tags.at(uid) = tag;
     }
 
@@ -642,7 +696,7 @@ namespace emp {
     ) override {
       emp_assert(state.regulators.find(uid) != std::end(state.regulators));
 
-      if (state.regulators.at(uid).Adj(amt)) ClearRegulatedCache();
+      if (state.regulators.at(uid).Adj(amt)) cache.ClearRegulated();
 
     }
 
@@ -653,7 +707,7 @@ namespace emp {
     ) override {
       emp_assert(state.regulators.find(uid) != std::end(state.regulators));
 
-      if (state.regulators.at(uid).Set(set)) ClearRegulatedCache();
+      if (state.regulators.at(uid).Set(set)) cache.ClearRegulated();
 
     }
 
@@ -666,7 +720,7 @@ namespace emp {
 
       if (
         set != std::exchange(state.regulators.at(uid), set)
-      ) ClearRegulatedCache();
+      ) cache.ClearRegulated();
 
     }
 
@@ -692,14 +746,14 @@ namespace emp {
 
       if (
         state.regulators.at(uid).Decay(steps)
-      ) ClearRegulatedCache();
+      ) cache.ClearRegulated();
 
     }
 
     /// Apply decay to all regulators.
     void DecayRegulators(const int steps=1) override {
       for (auto & [uid, regulator] : state.regulators) {
-        if ( regulator.Decay(steps) ) ClearRegulatedCache();
+        if ( regulator.Decay(steps) ) cache.ClearRegulated();
       }
     }
 
@@ -735,7 +789,7 @@ namespace emp {
 
       }
 
-      ClearRegulatedCache();
+      cache.ClearRegulated();
 
     }
 
