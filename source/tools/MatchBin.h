@@ -820,12 +820,15 @@ namespace emp {
     /// Load MatchBin state
     void SetState(const state_t & state_) {
       state = state_;
+      cache.Clear();
     }
 
     emp::internal::MatchBinLog<query_t, tag_t>& GetLog() override { return log; }
 
     size_t GetRegulatedCacheSize() { return cache.RegulatedSize(); }
     size_t GetRawCacheSize() { return cache.RawSize(); }
+
+
 
 
   };
