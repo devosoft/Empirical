@@ -4072,7 +4072,7 @@ TEST_CASE("Test MatchBin", "[tools]")
     }
     // test that every matchbin has a unique ID
     for (auto& bin: matchbins) {
-      ids.insert(bin.log.getID());
+      ids.insert(bin.log.GetID());
       bin.log.FlushLogBuffer();
     }
 
