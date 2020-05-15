@@ -6269,13 +6269,13 @@ TEST_CASE("Test stats", "[tools]") {
   REQUIRE(emp::ShannonEntropy(vec2) == Approx(0.81128));
   REQUIRE(emp::ShannonEntropy(deque1) == Approx(1.918648));
 
-  REQUIRE(emp::Variance(vec1) == Approx(0.55539));
-  REQUIRE(emp::Variance(vec2) == Approx(0.1875));
-  REQUIRE(emp::Variance(deque1) == Approx(0.9166666667));
+  REQUIRE(emp::Variance(vec1) == Approx(0.66666));
+  REQUIRE(emp::Variance(vec2) == Approx(0.25));
+  REQUIRE(emp::Variance(deque1) == Approx(1.1));
 
-  REQUIRE(emp::StandardDeviation(vec1) == Approx(0.745245));
-  REQUIRE(emp::StandardDeviation(vec2) == Approx(0.433013));
-  REQUIRE(emp::StandardDeviation(deque1) == Approx(0.957427));
+  REQUIRE(emp::StandardDeviation(vec1) == Approx(0.81649));
+  REQUIRE(emp::StandardDeviation(vec2) == Approx(0.5));
+  REQUIRE(emp::StandardDeviation(deque1) == Approx(1.0488));
 
   REQUIRE(emp::Sum(vec1) == 10);
   REQUIRE(emp::Sum(vec2) == 5);
