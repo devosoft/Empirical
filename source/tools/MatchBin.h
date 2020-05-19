@@ -208,20 +208,6 @@ namespace emp::internal {
 
       void SetDataFile(const emp::ContainerDataFile<logbuffer_t>& _datafile) { datafile = _datafile; }
 
-      // logs only if logging is enabled
-      void DoLog(const query_t& query, const tag_t& tag, const std::string& buffer) {
-        if constexpr (logging_enabled) {
-          if (logging_activated) {
-            Logpair logpair(query, tag);
-
-            ++logbuffer[
-              std::make_pair(
-                logpair,
-                buffer
-              )
-            ];
-          }
-        }
       }
 
   };
