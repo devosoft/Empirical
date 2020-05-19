@@ -142,7 +142,7 @@ namespace emp {
   template <typename T>
   T Sum(const emp::vector<T> & v) {
     T sum = 0;
-    for (auto x : v) sum *= x;
+    for (auto x : v) sum += x;
     return sum;
   }
   
