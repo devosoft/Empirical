@@ -1,7 +1,7 @@
 #include "../../../source/base/vector.h"
 #include "../../../source/config/command_line.h"
 #include "../../../source/config/SettingConfig.h"
-#include "../../../source/terminal/AsciiGraphs.h"
+#include "../../../source/data/DataLog.h"
 #include "../../../source/tools/File.h"
 #include "../../../source/tools/vector_utils.h"
 
@@ -63,13 +63,11 @@ int main(int argc, char* argv[])
 
 
   while (file.GetNumLines()) {
-    emp::vector<double> row = file.ExtractRowAs<double>();
-    emp::Sort(row);
+    emp::DataLog<double> row = file.ExtractRowAs<double>();
 
     std::cout << "MIN_VAL: " << min_val << std::endl;
-    emp::AsciiHistogram(row);
+    row.AsciiHistogram();
     std::cout << "MAX_VAL: " << max_val << std::endl;
-    //std::cout << "Data count: " << count << std::endl;
   }
 
   std::cout << "OVERALL COUNT: " << num_vals << std::endl;
