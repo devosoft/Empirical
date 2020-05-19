@@ -206,8 +206,10 @@ namespace emp::internal {
       // get this instance's ID
       int GetID() const { return id; }
 
-      void SetDataFile(const emp::ContainerDataFile<logbuffer_t>& _datafile) { datafile = _datafile; }
-
+      template <typename ...ARGS>
+      void EmplaceDataFile(ARGS&&... arguments) {
+        datafile = decltype(datafile)(std::forward<ARGS>(arguments)...);
+        SetupDatafile();
       }
 
   };
