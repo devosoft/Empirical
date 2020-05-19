@@ -57,6 +57,13 @@ namespace emp::internal {
     using query_t = Query;
     using tag_t = Tag;
 
+    template <
+      typename Val,
+      typename Metric,
+      typename Selector,
+      typename Regulator
+    >
+    friend class emp::MatchBin;
 
 
     struct LogEntry {
@@ -103,6 +110,24 @@ namespace emp::internal {
     size_t make_id() {
       static std::atomic<int> counter{0};
       return counter++;
+    }
+
+    // logs only if logging is enabled
+    void LogMatch(const query_t& query, const tag_t& tag, const std::string& buffer) {
+      if constexpr (logging_enabled) {
+        if (logging_activated) {
+          LogEntry logentry{query, tag, buffer};
+          ++logbuffer[logentry];
+        }
+      }
+    }
+    void LogMiss(const query_t& query, const std::string& buffer) {
+      if constexpr (logging_enabled) {
+        if (logging_activated) {
+          LogEntry logentry{query, std::nullopt, buffer};
+          ++logbuffer[logentry];
+        }
+      }
     }
 
     public:
@@ -499,8 +524,11 @@ namespace emp {
       auto result = getResult();
 
       // store counts for results
+      if (result.empty()) {
+        log.LogMiss(query, "regulated");
+      }
       for (const auto &uid : result) {
-        log.DoLog(query, GetTag(uid), "regulated");
+        log.LogMatch(query, GetTag(uid), "regulated");
       }
 
       return result;
@@ -548,9 +576,12 @@ namespace emp {
       };
       auto result = getResult();
 
+      if (result.empty()) {
+        log.LogMiss(query, "regulated");
+      }
       // store counts for results
       for (const auto &uid : result) {
-        log.DoLog(query, GetTag(uid), "raw");
+        log.LogMatch(query, GetTag(uid), "raw");
       }
 
       return result;
