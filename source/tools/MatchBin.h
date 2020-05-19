@@ -112,6 +112,19 @@ namespace emp::internal {
       return counter++;
     }
 
+    void SetupDatafile() {
+      datafile.SetUpdateContainerFun([this](){ return logbuffer; });
+
+      datafile.AddVar(id, emp::to_string(id), "Matchbin ID");
+      datafile.AddVar(log_counter, "epoch", "Counter for how many times this file was written to");
+      datafile.AddContainerFun(get_query_log, "query", "query");
+      datafile.AddContainerFun(get_tag_log, "tag", "tag");
+      datafile.AddContainerFun(get_hit_count_log, "hit_count", "hit_count");
+      datafile.AddContainerFun(get_logbuffer_type, "matchtype", "Type of match");
+
+      datafile.PrintHeaderKeys();
+    }
+
     // logs only if logging is enabled
     void LogMatch(const query_t& query, const tag_t& tag, const std::string& buffer) {
       if constexpr (logging_enabled) {
@@ -134,21 +147,8 @@ namespace emp::internal {
       MatchBinLog()
       : log_counter(0)
       , id(make_id())
-      , datafile(MakeContainerDataFile<logbuffer_t>(
-            [this](){ return logbuffer; },
-            EMP_LOG_MATCHBIN_FILENAME
-          )
-        )
-      {
-        if constexpr (logging_enabled) {
-          datafile.AddContainerFun(get_query_log, "query", "query");
-          datafile.AddContainerFun(get_tag_log, "tag", "tag");
-          datafile.AddContainerFun(get_hit_count_log, "hit_count", "hit_count");
-          datafile.AddVar(log_counter, "counter", "Counter for how many times this file was written to");
-          datafile.AddVar(id, "id", "Matchbin ID");
-          datafile.AddContainerFun(get_logbuffer_type, "matchtype", "Type of match");
-        }
-      }
+      , datafile(EMP_LOG_MATCHBIN_FILENAME)
+      { SetupDatafile(); }
 
       ~MatchBinLog() {
         if constexpr (logging_enabled) {
