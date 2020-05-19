@@ -107,7 +107,7 @@ namespace emp::internal {
     std::function<size_t(const std::pair<const LogEntry, size_t>)> get_hit_count_log = [](const std::pair<const LogEntry, size_t> datapoint){ return datapoint.second; };
     std::function<std::string(const std::pair<const LogEntry, size_t>)> get_logbuffer_type = [](const std::pair<const LogEntry, size_t> datapoint) { return datapoint.first.buffer; };
 
-    size_t make_id() {
+    size_t MakeID() {
       static std::atomic<int> counter{0};
       return counter++;
     }
@@ -146,7 +146,7 @@ namespace emp::internal {
     public:
       MatchBinLog()
       : log_counter(0)
-      , id(make_id())
+      , id(MakeID())
       , datafile(EMP_LOG_MATCHBIN_FILENAME)
       { SetupDatafile(); }
 
