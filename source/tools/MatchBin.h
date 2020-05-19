@@ -220,6 +220,7 @@ namespace emp::internal {
 
     template <typename Val,
       typename Metric,
+      typename Selector_,
       typename Regulator>
     friend class MatchBin;
 
