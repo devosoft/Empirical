@@ -87,7 +87,7 @@ namespace emp {
   template <typename C>
   emp::sfinae_decoy<double, typename C::value_type> 
   Mean(C & elements) {
-    return (double)Sum(elements)/elements.size();
+    return (double)Sum(elements)/ (double) elements.size();
   }
 
 
@@ -96,7 +96,8 @@ namespace emp {
   template <typename C>
   auto Variance(C & elements) {
     const double mean = Mean(elements);
-    auto sum = SumScalarResults(elements, [mean](auto x){ return emp::Pow(x - mean, 2); } );
+    auto sum = SumScalarResults(elements,
+                                [mean](auto x){ return emp::Pow(mean - (double) x, 2); } );
     return sum / (elements.size() - 1);
   }
 
