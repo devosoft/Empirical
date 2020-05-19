@@ -42,7 +42,11 @@
 #include "tools/Graph.h"
 #include "tools/IndexMap.h"
 #include "tools/Lexer.h"
+
+#define EMP_LOG_MATCHBIN
 #include "tools/MatchBin.h"
+
+
 #include "tools/NFA.h"
 #include "tools/RegEx.h"
 #include "tools/Random.h"
@@ -78,13 +82,11 @@
 #include "tools/SolveState.h"
 #include "tools/serialize_macros.h"
 
-#define true false
 
 TEST_CASE("Test MatchBin", "[tools]")
 {
   // <------- TEST LOGGING ------->
   // test static instance ID
-  #define EMP_LOG_MATCHBIN
   {
     using matchbin_t = emp::MatchBin<
       std::string,
