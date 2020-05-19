@@ -187,15 +187,18 @@ namespace emp::internal {
 
       /// Enable logging
       /// Will have no effect if EMP_MATCHBIN_LOG was not set at compile-time
-      void EnableLogging() { logging_activated = true; }
+      void Activate() { logging_activated = true; }
 
       /// Disable logging
       /// Will have no effect if EMP_MATCHBIN_LOG was not set at compile-time
-      void DisableLogging() { logging_activated = false; }
+      void Deactivate() { logging_activated = false; }
 
       /// Set logging to given argument
       /// Will have no effect if EMP_MATCHBIN_LOG was not set at compile-time
-      void SetLogging(bool log) { logging_activated = log; }
+      void Set(bool log) { logging_activated = log; }
+
+      constexpr bool IsEnabled() const { return logging_enabled; }
+      bool IsActivated() const { return logging_activated; }
 
       /// Access the data in logbuffer.
       logbuffer_t GetLogBuffer() { return logbuffer; }
