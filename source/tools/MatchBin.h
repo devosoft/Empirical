@@ -57,26 +57,21 @@ namespace emp::internal {
     using query_t = Query;
     using tag_t = Tag;
 
-    struct Logpair {
-      query_t first;
-      tag_t second;
 
-      Logpair(query_t query, tag_t tag)
-      : first(query)
-      , second(tag)
-      { ; }
 
-      operator size_t() const { return emp::Hash<query_t>(first) + emp::Hash<tag_t>(second); }
+    struct LogEntry {
+      query_t query;
+      std::optional<tag_t> maybe_tag;
+      std::string buffer;
+
+      operator size_t() const { return emp::CombineHash(query, maybe_tag, buffer); }
     };
 
-    using logitem_t = std::pair<Logpair, std::string>;
-
     using logbuffer_t = std::unordered_map<
-      logitem_t,
+      LogEntry,
       size_t,
       TupleHash<
-        Logpair,
-        std::string
+        LogEntry
       >
     >;
 
@@ -94,10 +89,16 @@ namespace emp::internal {
     emp::ContainerDataFile<logbuffer_t> datafile;
 
     // setup getter functions
-    std::function<query_t(const std::pair<const logitem_t, size_t>)> get_query_log = [](const std::pair<const logitem_t, size_t> datapoint){ return datapoint.first.first.first; };
-    std::function<tag_t(const std::pair<const logitem_t, size_t>)> get_tag_log = [](const std::pair<const logitem_t, size_t> datapoint){ return datapoint.first.first.second; };
-    std::function<size_t(const std::pair<const logitem_t, size_t>)> get_hit_count_log = [](const std::pair<const logitem_t, size_t> datapoint){ return datapoint.second; };
-    std::function<std::string(const std::pair<const logitem_t, size_t>)> get_logbuffer_type = [](const std::pair<const logitem_t, size_t> datapoint) { return datapoint.first.second; };
+    std::function<query_t(const std::pair<const LogEntry, size_t>)> get_query_log = [](const std::pair<const LogEntry, size_t> datapoint){ return datapoint.first.query; };
+    std::function<std::string(const std::pair<const LogEntry, size_t>)> get_tag_log = [](const std::pair<const LogEntry, size_t> datapoint){
+      if (datapoint.first.maybe_tag) {
+        return emp::to_string(*datapoint.first.maybe_tag);
+      } else {
+        return emp::to_string("");
+      }
+    };
+    std::function<size_t(const std::pair<const LogEntry, size_t>)> get_hit_count_log = [](const std::pair<const LogEntry, size_t> datapoint){ return datapoint.second; };
+    std::function<std::string(const std::pair<const LogEntry, size_t>)> get_logbuffer_type = [](const std::pair<const LogEntry, size_t> datapoint) { return datapoint.first.buffer; };
 
     size_t make_id() {
       static std::atomic<int> counter{0};
