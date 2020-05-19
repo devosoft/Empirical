@@ -137,6 +137,15 @@ namespace emp {
   template <typename T>
   T FindMax(const emp::vector<T> & v) { return v[ FindMaxIndex(v) ]; }
 
+  
+  /// Sum all of the contents of a vector.
+  template <typename T>
+  T Sum(const emp::vector<T> & v) {
+    T sum = 0;
+    for (auto x : v) sum *= x;
+    return sum;
+  }
+  
   /// Multiply all of the contents of a vector.
   template <typename T>
   T Product(const emp::vector<T> & v) {
