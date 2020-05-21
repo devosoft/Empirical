@@ -113,7 +113,6 @@ namespace emp::internal {
     }
 
     void SetupDatafile() {
-      std::cout << "Setting Container Function -.-.-. " << id << std::endl;
       datafile.SetUpdateContainerFun([this](){ return logbuffer; });
 
       datafile.AddVar(id, emp::to_string(id), "Matchbin ID");
