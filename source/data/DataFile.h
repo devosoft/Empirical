@@ -451,7 +451,7 @@ namespace emp {
 
   public:
     template <typename ...ARGS>
-    ContainerDataFile(ARGS&& ...arguments)
+    explicit ContainerDataFile(ARGS&& ...arguments)
       : DataFile(std::forward<ARGS>(arguments)...), update_container_fun(), current_rows() {;}
 
     ~ContainerDataFile() {;}
