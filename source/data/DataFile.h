@@ -459,6 +459,7 @@ namespace emp {
     /// Tell this file what function to run to update the contents of the
     /// container that data is being calculated on.
     void SetUpdateContainerFun(const fun_update_container_t fun) {
+      std::cout << "IN SetUpdateContainerFun -.-.-.-" << std::endl;
       update_container_fun = fun;
     }
 
@@ -507,7 +508,9 @@ namespace emp {
 
     /// Run all of the functions and print the results as a new line in the file
     void Update() override {
+      std::cout << "Before assert" << std::endl;
       emp_assert(update_container_fun);
+      std::cout << "After assert" << std::endl;
       current_rows = update_container_fun();
       internal::update_impl<container_t>().Update(this);
       os->flush();
