@@ -110,11 +110,15 @@ namespace emp {
     template <> struct vp_sort<ValPack<>> { using result = ValPack<>; };
   } // End internal namespace
 
-  // Generate a ValPack with a specified range of values.
+  /// Generate a ValPack with a specified range of values.
   template <auto START, auto END, auto STEP=1>
   using ValPackRange = typename internal::vp_range<(START >= END), START, END, STEP>::type;
 
-  // ValPack with at least one value.
+  /// Generate a count from 0 to COUNT-1 (so a total of COUNT values)
+  template <auto COUNT>
+  using ValPackCount = ValPackRange<0, COUNT, 1>;
+
+  /// ValPack with at least one value.
   template <auto V1, auto... Vs>
   struct ValPack<V1,Vs...> {
     /// First value in ValPack
