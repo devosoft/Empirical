@@ -187,8 +187,7 @@ namespace emp::internal {
         }
       }
 
-      /// Clear the logs
-      /// This method must be called manually each time.
+      /// Clear the logbuffer
       void ClearLogBuffer() {
         if constexpr (logging_enabled) {
           logbuffer.clear();
