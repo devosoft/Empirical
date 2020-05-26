@@ -12,7 +12,8 @@
 #ifndef EMP_MATCH_BIN_H
 #define EMP_MATCH_BIN_H
 
-// take care of preprocessored filename
+// the default log filename can be set by passing
+// '-D filename.csv' to the compiler
 #ifndef EMP_LOG_MATCHBIN_FILENAME
 #define EMP_LOG_MATCHBIN_FILENAME "matchbin_log.csv"
 #endif
