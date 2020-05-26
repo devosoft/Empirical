@@ -121,11 +121,13 @@ namespace emp::internal {
       return datapoint.first.buffer;
     };
 
+    /// Creates a unique ID for this logging instance.
     size_t MakeID() {
       static std::atomic<int> counter{0};
       return counter++;
     }
 
+    /// Sets up the various functions and variables we keep track of.
     void SetupDatafile() {
       datafile.SetUpdateContainerFun([this](){ return logbuffer; });
 
@@ -139,7 +141,7 @@ namespace emp::internal {
       datafile.PrintHeaderKeys();
     }
 
-    // logs only if logging is enabled
+    /// Logs a match into the logbuffer.
     void LogMatch(const query_t& query, const tag_t& tag, const std::string& buffer) {
       if constexpr (logging_enabled) {
         if (logging_activated) {
@@ -148,6 +150,7 @@ namespace emp::internal {
         }
       }
     }
+    /// Logs a miss (no tag resulted from Match) into the logbuffer.
     void LogMiss(const query_t& query, const std::string& buffer) {
       if constexpr (logging_enabled) {
         if (logging_activated) {
