@@ -189,11 +189,11 @@ namespace emp {
   constexpr bool assert_on = true;
 
   /// Base case for assert_print...
-  inline void assert_print() { ; }
+  void assert_print() { ; }
 
   /// Print out information about the next variable and recurse...
   template <typename T, typename... EXTRA>
-  inline void assert_print(std::string name, T && val, EXTRA &&... extra) {
+  void assert_print(std::string name, T && val, EXTRA &&... extra) {
     std::cerr << name << ": [" << val << "]" << std::endl;
     assert_print(std::forward<EXTRA>(extra)...);
   }
