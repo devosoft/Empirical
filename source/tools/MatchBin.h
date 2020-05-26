@@ -69,7 +69,7 @@ namespace emp::internal {
 
     struct LogEntry {
       query_t query;
-      std::optional<tag_t> maybe_tag;
+      std::optional<tag_t> maybe_tag; // when a match results in no tags, this is a std::nullopt, and we write an empty string
       std::string buffer;
 
       operator size_t() const { return emp::CombineHash(query, maybe_tag, buffer); }
