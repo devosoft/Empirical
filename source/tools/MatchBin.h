@@ -92,7 +92,7 @@ namespace emp::internal {
     #else
     static constexpr bool logging_enabled = false;
     #endif
-    bool logging_activated{logging_enabled};
+    bool logging_activated;
 
     emp::ContainerDataFile<logbuffer_t> datafile;
 
@@ -149,6 +149,7 @@ namespace emp::internal {
       : log_counter(0)
       , id(MakeID())
       , datafile(EMP_LOG_MATCHBIN_FILENAME)
+      , logging_activated(false)
       { SetupDatafile(); }
 
       ~MatchBinLog() {
