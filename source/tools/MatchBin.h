@@ -214,15 +214,23 @@ namespace emp::internal {
       /// Will have no effect if EMP_MATCHBIN_LOG was not set at compile-time
       void Set(bool log) { logging_activated = log; }
 
+      /// Returns whether logging was enabled at compile-time
+      /// (aka whether EMP_MATCHBIN_LOG was set)
       constexpr bool IsEnabled() const { return logging_enabled; }
+
+      /// Returns whether logging is activated for this particular instance.
       bool IsActivated() const { return logging_activated; }
 
       /// Access the data in logbuffer.
       logbuffer_t GetLogBuffer() { return logbuffer; }
 
-      // get this instance's ID
+      /// Get this log instance's ID
       int GetID() const { return matchbin_id; }
 
+      /// Constucts a ContainerDataFile in place (without copy) by
+      /// forwarding the arguments to the ContainerDataFile constructor,
+      /// and then setting it up.
+      /// Look in the ContainerDataFile constructor for this function's type signature.
       template <typename ...ARGS>
       void EmplaceDataFile(ARGS&&... arguments) {
         datafile = decltype(datafile)(std::forward<ARGS>(arguments)...);
