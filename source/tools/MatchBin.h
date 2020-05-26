@@ -160,6 +160,14 @@ namespace emp::internal {
       }
     }
 
+    /// Write log buffer to file
+    void WriteLogBuffer() {
+      if constexpr (logging_enabled) {
+        datafile.Update();
+        ++log_counter;
+      }
+    }
+
     public:
       MatchBinLog()
       : log_counter(0)
@@ -186,14 +194,6 @@ namespace emp::internal {
           logbuffer.clear();
         }
       };
-
-      /// Write log buffer to file
-      void WriteLogBuffer() {
-        if constexpr (logging_enabled) {
-          datafile.Update();
-          ++log_counter;
-        }
-      }
 
       /// Write logbuffer to file and then clear it
       void FlushLogBuffer() {
