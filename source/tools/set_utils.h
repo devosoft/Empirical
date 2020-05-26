@@ -58,7 +58,7 @@ namespace emp {
 
   /// Compute the set difference of @param s1 and @param s2 (elements that are in S1 but no S2)
   template <typename T>
-  std::set<T> difference(emp::vector<T> s1, emp::vector<T> & s2) {
+  std::set<T> difference(emp::vector<T> s1, emp::vector<T> s2) {
     // Based on PierreBdR's answer to https://stackoverflow.com/questions/283977/c-stl-set-difference
     std::sort(s1.begin(), s1.end()); // set_difference expects sorted things
     std::sort(s2.begin(), s2.end()); // set_difference expects sorted things
