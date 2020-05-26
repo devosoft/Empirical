@@ -159,8 +159,8 @@ namespace emp::internal {
       MatchBinLog()
       : log_counter(0)
       , matchbin_id(MakeID())
-      , datafile(EMP_LOG_MATCHBIN_FILENAME)
       , logging_activated(false)
+      , datafile(EMP_LOG_MATCHBIN_FILENAME)
       { SetupDatafile(); }
 
       ~MatchBinLog() {
