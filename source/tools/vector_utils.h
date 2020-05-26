@@ -86,6 +86,7 @@ namespace emp {
     return std::count (vec.begin(), vec.end(), val);
   }
 
+  /// Print the contents of a vector.
   template <typename T>
   void Print(const emp::vector<T> & v, std::ostream & os=std::cout, const std::string & spacer=" ") {
     for (size_t id = 0; id < v.size(); id++) {
