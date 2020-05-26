@@ -84,7 +84,7 @@ namespace emp::internal {
     >;
 
     size_t log_counter; // stores the number of times we wrote to file
-    size_t id; // stores the unique ID of this log instance
+    size_t matchbin_id; // stores the unique ID of this log instance
     logbuffer_t logbuffer; // stores the actual log buffer
 
     #ifdef EMP_LOG_MATCHBIN
@@ -116,7 +116,7 @@ namespace emp::internal {
     void SetupDatafile() {
       datafile.SetUpdateContainerFun([this](){ return logbuffer; });
 
-      datafile.AddVar(id, emp::to_string(id), "Matchbin ID");
+      datafile.AddVar(matchbin_id, emp::to_string(matchbin_id), "Matchbin ID");
       datafile.AddVar(log_counter, "epoch", "Counter for how many times this file was written to");
       datafile.AddContainerFun(get_query_log, "query", "query");
       datafile.AddContainerFun(get_tag_log, "tag", "tag");
@@ -147,7 +147,7 @@ namespace emp::internal {
     public:
       MatchBinLog()
       : log_counter(0)
-      , id(MakeID())
+      , matchbin_id(MakeID())
       , datafile(EMP_LOG_MATCHBIN_FILENAME)
       , logging_activated(false)
       { SetupDatafile(); }
