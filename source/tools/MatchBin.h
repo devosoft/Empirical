@@ -51,7 +51,8 @@ namespace emp {
   > class MatchBin;
 }
 
-// namespace used for logging and caching
+// namespace used for caching matches,
+// as well as logging of matches and misses into a file.
 namespace emp::internal {
   template<typename Query, typename Tag>
   class MatchBinLog {
@@ -280,39 +281,56 @@ namespace emp::internal {
         if constexpr (cache_available) cache_raw.clear();
       }
 
+      /// Reset the Selector cache for all scores.
       void Clear() {
         ClearRaw();
         ClearRegulated();
       }
 
+      /// Returns whether caching is available
       constexpr bool IsAvailable() const { return cache_available; }
+
+      /// Returns whether caching is activated for this particular instance.
       bool IsActivated() { return caching_activated; }
 
+      /// Tries to activate caching for this instance.
+      /// Returns true on success.
       bool Activate() {
         Clear();
         if (IsAvailable()) caching_activated = true;
         return caching_activated;
       }
 
+      /// Deactivates caching.
       void Deactivate() {
         Clear();
         caching_activated = false;
       }
 
+      /// Finds a query in raw cache.
+      /// This method is thread-safe.
       size_t CountRaw(const query_t& query) {
         std::shared_lock lock(cache_raw_mutex);
         return cache_raw.count(query);
       }
+
+      /// Finds a query in regulated cache.
+      /// This method is thread-safe.
       size_t CountRegulated(const query_t& query) {
         std::shared_lock lock(cache_regulated_mutex);
         return cache_regulated.count(query);
       }
 
+      /// Stores a query in regulated cache.
+      /// This method is thread-safe.
       void CacheRegulated(const query_t& query, const cache_state_t& result) {
         if (CountRegulated(query) != 0) return;
         std::unique_lock lock(cache_regulated_mutex);
         cache_regulated.emplace(query, result);
       }
+
+      /// Stores a query in raw cache.
+      /// This method is thread-safe.
       void CacheRaw(const query_t& query, const cache_state_t& result) {
         if (CountRaw(query) != 0) return;
         std::unique_lock lock(cache_raw_mutex);
@@ -320,13 +338,22 @@ namespace emp::internal {
       }
 
       // TODO: fix the type name
+      /// Gets query from regulated cache.
+      /// User must check for existance of query in cache before calling this method.
       cache_state_t& GetRegulated(const query_t& query) {
         return cache_regulated.at(query);
       }
+
+      /// Gets query from regulated cache.
+      /// User must check for existance of query in cache before calling this method.
       cache_state_t& GetRaw(const query_t& query) {
         return cache_raw.at(query);
       }
+
+      /// Returns size of regulated cache.
       size_t RegulatedSize() { return cache_regulated.size(); }
+
+      /// Returns size of raw cache.
       size_t RawSize() { return cache_raw.size(); }
 
 
