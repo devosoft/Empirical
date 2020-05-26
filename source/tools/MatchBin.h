@@ -83,9 +83,9 @@ namespace emp::internal {
       >
     >;
 
-    size_t log_counter;
-    size_t id;
-    logbuffer_t logbuffer;
+    size_t log_counter; // stores the number of times we wrote to file
+    size_t id; // stores the unique ID of this log instance
+    logbuffer_t logbuffer; // stores the actual log buffer
 
     #ifdef EMP_LOG_MATCHBIN
     static constexpr bool logging_enabled = true;
