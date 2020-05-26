@@ -94,8 +94,10 @@ namespace emp::internal {
     #endif
     bool logging_activated;
 
+    // a DataFile is an object that deals with wriing to files.
+    // a ContaierDataFile is a DataFile that runs a function before every write.
+    // in our case, we need to get the data from our logbuffer, so we need the second one.
     emp::ContainerDataFile<logbuffer_t> datafile;
-
 
     using datapoint_t = const std::pair<const LogEntry, size_t>;
     // setup getter functions
