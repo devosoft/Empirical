@@ -45,12 +45,13 @@ namespace web {
   class Selector;
   class Div;
   class Table;
+  class Element;
 
   namespace internal {
 
     class TableInfo;
     class DivInfo : public internal::WidgetInfo {
-      friend Div; friend TableInfo;
+      friend Element; friend Div; friend TableInfo;
     protected:
       double scroll_top;                              ///< Where should div scroll to? (0.0 to 1.0)
       emp::vector<Widget> m_children;                 ///< Widgets contained in this one.
@@ -58,10 +59,12 @@ namespace web {
       bool text_append;                               ///< Can we append to a current text widget?
       std::map<std::string, Widget> widget_dict;      ///< By-name lookup for descendent widgets
       std::map<std::string, web::Animate *> anim_map; ///< Streamline creation of Animate objects.
+      std::string tag; ///< Jury rig this class for non-div duty (i.e., footer, header, p, etc.)
 
-      DivInfo(const std::string & in_id="")
+      /// @param in_tag sets the html tag for used this object (i.e., div, footer, header, p, etc.)
+      DivInfo(const std::string & in_id="", const std::string & in_tag="div")
         : internal::WidgetInfo(in_id), scroll_top(0.0), append_ok(true), text_append(false)
-        , widget_dict(), anim_map()
+        , widget_dict(), anim_map(), tag(in_tag)
       {
         emp::Initialize();
       }
@@ -72,6 +75,13 @@ namespace web {
       }
 
       std::string GetTypeName() const override { return "DivInfo"; }
+
+       /// Set the html tag for used this object (i.e., div, footer, header, p, etc.)
+      void DoSetTag(const std::string & tag_name) {
+        tag = tag_name;
+        if (state == Widget::ACTIVE) ReplaceHTML();
+      }
+
 
       bool IsRegistered(const std::string & test_name) const {
         return (widget_dict.find(test_name) != widget_dict.end());
@@ -207,11 +217,11 @@ namespace web {
         HTML.str("");       // Clear the current text.
 
         // Loop through all children and build a span element for each to replace.
-        HTML << "<div id=\'" << id << "\'>"; // Tag to envelope Div
+        HTML << "<" << tag << " id=\'" << id << "\'>"; // Tag to envelop Div
         for (Widget & w : m_children) {
           HTML << "<span id=\'" << w.GetID() << "'></span>";  // Span element for current widget.
         }
-        HTML << "</div>";
+        HTML << "</" << tag << ">";
       }
 
 
@@ -259,18 +269,17 @@ namespace web {
   /// A widget to track a div in an HTML file, and all of its contents.
   class Div : public internal::WidgetFacet<Div> {
   protected:
-    // Get a properly cast version of indo.
+    // Get a properly cast version of info.
     internal::DivInfo * Info() { return (internal::DivInfo *) info; }
     const internal::DivInfo * Info() const { return (internal::DivInfo *) info; }
 
   public:
-    Div(const std::string & in_name) : WidgetFacet(in_name) {
+    Div(const std::string & in_name="") : WidgetFacet(in_name) {
       // When a name is provided, create an associated Widget info.
       info = new internal::DivInfo(in_name);
     }
     Div(const Div & in) : WidgetFacet(in) { ; }
     Div(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsDiv()); }
-    Div() { ; }
     ~Div() { ; }
 
     using INFO_TYPE = internal::DivInfo;

@@ -195,6 +195,11 @@ namespace emp {
 
 }
 
+// specialization for std::tuple_size
+template <class T, size_t N>
+struct std::tuple_size<emp::array<T, N>> : public integral_constant<size_t, N> {
+};
+
 // A crude, generic printing function for arrays.
 template <typename T, size_t N>
 std::ostream & operator<<(std::ostream & out, const emp::array<T,N> & v) {
@@ -209,16 +214,5 @@ std::istream & operator>>(std::istream & is, emp::array<T,N> & v) {
 }
 
 #endif
-
-namespace emp{
-  /// Ensure that emp::array works with TypeID
-  template <typename T, size_t N> struct TypeID<emp::array<T,N>> {
-    static std::string GetName() {
-      std::stringstream ss;
-      ss << "emp::array<" << TypeID<T>::GetName() << "," << N << ">";
-      return ss.str();
-    }
-  };
-}
 
 #endif

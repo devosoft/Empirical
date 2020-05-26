@@ -12,7 +12,7 @@
 #define EMP_WEB_STYLE_H
 
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
 
@@ -107,7 +107,7 @@ namespace web {
       if (settings.size() == 0 && classes.size() == 0) return;
 
       // Find the current object only once.
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
       EM_ASM_ARGS({
           var id = UTF8ToString($0);
           emp_i.cur_obj = $( '#' + id );
@@ -116,7 +116,7 @@ namespace web {
 
       for (auto css_pair : settings) {
         if (css_pair.second == "") continue; // Ignore empty entries.
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
         EM_ASM_ARGS({
             var name = UTF8ToString($0);
             var value = UTF8ToString($1);
@@ -147,7 +147,7 @@ namespace web {
     void Apply(const std::string & widget_id, const std::string & setting) {
       emp_assert(Has(setting));
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
       EM_ASM_ARGS({
           var id = UTF8ToString($0);
           var setting = UTF8ToString($1);
@@ -163,7 +163,7 @@ namespace web {
     /// Apply onlay a SPECIFIC style setting with a specifid value!
     static void Apply(const std::string & widget_id, const std::string & setting,
                       const std::string & value) {
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
       EM_ASM_ARGS({
           var id = UTF8ToString($0);
           var setting = UTF8ToString($1);

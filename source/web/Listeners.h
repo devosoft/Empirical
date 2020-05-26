@@ -12,7 +12,7 @@
 #define EMP_WEB_LISTENERS_H
 
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
 
@@ -82,7 +82,7 @@ namespace web {
     /// Apply all of the listeners being tracked.
     void Apply(const std::string & widget_id) {
       // Find the current object only once.
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
       EM_ASM_ARGS({
           var id = UTF8ToString($0);
           emp_i.cur_obj = $( '#' + id );
@@ -90,7 +90,7 @@ namespace web {
 #endif
 
       for (auto event_pair : listeners) {
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
         EM_ASM_ARGS({
           var name = UTF8ToString($0);
           emp_i.cur_obj.on( name, function(evt) { emp.Callback($1, evt); } );
@@ -107,7 +107,7 @@ namespace web {
     static void Apply(const std::string & widget_id,
                       const std::string event_name,
                       size_t fun_id) {
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
         EM_ASM_ARGS({
           var id = UTF8ToString($0);
           var name = UTF8ToString($1);

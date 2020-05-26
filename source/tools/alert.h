@@ -14,13 +14,13 @@
 #include "string_utils.h"
 
 // If we are in emscripten, make sure to include the header.
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
 
 
 namespace emp {
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
   void Alert(const std::string & msg) { EM_ASM_ARGS({ msg = UTF8ToString($0); alert(msg); }, msg.c_str()); }
 #else
   /// Send msg to cerr if in C++, or show msg in an alert box if compiled to Javascript

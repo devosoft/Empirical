@@ -1,24 +1,26 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016.
-//  Released under the MIT Software license; see doc/LICENSE
-//
-//  A simple ArgManager tool for sythesizing command-line arguments,
-//  URL query params, arguments and config files.
-
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2019
+ *
+ *  @file  ArgManager.h
+ *  @brief A tool for sythesizing command-line arguments, URL query params, and config files.
+ *  @note Status: BETA
+ */
 
 #ifndef EMP_CL_ARG_MANAGER_H
 #define EMP_CL_ARG_MANAGER_H
 
 #include <algorithm>
+#include <cstdlib>
+#include <iterator>
+#include <limits>
+#include <map>
+#include <numeric>
+#include <optional>
+#include <set>
 #include <string>
 #include <vector>
-#include <map>
-#include <iterator>
-#include <set>
-#include <limits>
-#include <numeric>
-#include <cstdlib>
-#include <optional>
 
 #include "base/Ptr.h"
 #include "base/vector.h"
@@ -30,26 +32,29 @@ namespace emp {
   /// A helper struct for ArgManager that specifies a single argument type.
   /// Note that the primary argument name is specified as the keys of the specs
   /// map constructor argument for ArgManager.
-  /// * most_quota: at most how many words after the flag should be packed into
-  ///   the argument pack? (enforced during parsing and on UseArg request)
-  /// * least_quota: at least how many words after the flag should be packed
-  ///   into the argument pack? (enforced on UseArg request)
-  /// * aliases: what set of alternate flag names should trigger this argument? ///   (specify without - prepended)
-  /// * callbaack: provide a callback function to process the argument
-  /// * gobble_flags: should the argument pack accept flag words
-  ///   (words that begin with -) instead of curtailing the argument pack
-  ///   before the first encountered flag word.
-  /// * flatten: should all argument packs collected for this key be
-  ///   consolidated into a single argument pack?
-  ///   (e.g., a single list of words instead of a list of lists of words).
+
   struct ArgSpec {
 
+    /// Max words after flag to be used (enforced during parsing and on UseArg request)
     size_t most_quota;
+
+    /// Minimum words after flag required (enforced during parsing and on UseArg request)
     size_t least_quota;
+
+    /// User-level description of this flag.
     std::string description;
+
+    /// Set of alternate flag names that will trigger this flag
     std::unordered_set<std::string> aliases;
+
+    /// Function that can process this flag and its arguments.
     std::function<void(std::optional<emp::vector<std::string>>)> callback;
+
+    /// Should this flag collect subsequent flags (that begin with -) as arguments?
     bool gobble_flags;
+
+    /// If this flag is used multiple times, should we combine all argument packs?
+    ///   (e.g., a single list of words instead of a list of lists of words).
     bool flatten;
 
     ArgSpec(
@@ -89,35 +94,59 @@ namespace emp {
 
   };
 
+  // compares member variables of lhs and rhs, ignoring callback functions
+  // useful for tests
+  bool operator==(const ArgSpec& lhs, const ArgSpec& rhs) {
+    return std::tuple{
+      lhs.most_quota,
+      lhs.least_quota,
+      lhs.description,
+      lhs.aliases,
+      lhs.gobble_flags,
+      lhs.flatten
+    } == std::tuple{
+      rhs.most_quota,
+      rhs.least_quota,
+      rhs.description,
+      rhs.aliases,
+      rhs.gobble_flags,
+      rhs.flatten
+    };
+  }
+
   /// Manager for command line arguments and URL query params.
   class ArgManager {
 
-  private:
+  public:
+    using pack_t = emp::vector<std::string>;
+    using pack_map_t = std::multimap<std::string, pack_t>;
+    using spec_map_t = std::unordered_map<std::string, ArgSpec>;
 
+  private:
     // the actual data collected
-    std::multimap<std::string, emp::vector<std::string>> packs;
+    pack_map_t packs;
 
     // the specification for how to collect and dispense the data
-    const std::unordered_map<std::string, ArgSpec> specs;
+    const spec_map_t specs;
 
   public:
-    // Convert input arguments to a vector of strings for easier processing.
-    static emp::vector<std::string> args_to_strings(int argc, char* argv[]) {
-      emp::vector<std::string> args;
+    /// Convert input arguments to a vector of strings for easier processing.
+    static pack_t args_to_strings(int argc, char* argv[]) {
+      pack_t args;
       for (size_t i = 0; i < (size_t) argc; i++) {
         args.push_back(argv[i]);
       }
       return args;
     }
 
-    // Use argument specifications to convert command line arguments
-    // to argument packs.
-    static std::multimap<std::string, emp::vector<std::string>> parse(
-      emp::vector<std::string> args,
-      const std::unordered_map<std::string, ArgSpec> & specs = std::unordered_map<std::string, ArgSpec>()
+    /// Use argument specifications to convert command line arguments
+    /// to argument packs.
+    static pack_map_t parse(
+      pack_t args,
+      const spec_map_t & specs = spec_map_t()
     ) {
 
-      auto res = std::multimap<std::string, emp::vector<std::string>>();
+      auto res = pack_map_t();
 
       const auto alias_map = std::accumulate(
         std::begin(specs),
@@ -134,27 +163,26 @@ namespace emp {
       );
 
       // check for duplicate aliases
-      emp_assert([&](){
-        return alias_map.size() == std::accumulate(
-          std::begin(specs),
-          std::end(specs),
-          specs.size(),
-          [](
-            const size_t l,
-            const std::pair<std::string, ArgSpec> & r
-          ){
-            return l + r.second.aliases.size();
-          }
-        );
-      }(), "duplicate aliases detected");
+      emp_assert(alias_map.size() == std::accumulate(
+        std::begin(specs),
+        std::end(specs),
+        specs.size(),
+        [](const size_t l, const std::pair<std::string, ArgSpec> & r){
+          return l + r.second.aliases.size();
+        }
+      ), "duplicate aliases detected");
 
       // lookup table with leading dashes stripped
-      const emp::vector<std::string> deflagged = [&args](){
+      // this is an immediately-invoked lambda
+      const pack_t deflagged = [&args](){
         auto res = args;
         for (size_t i = 0; i < args.size(); ++i) {
+
           const size_t dash_stop = args[i].find_first_not_of('-');
-          if (dash_stop < args[i].size()) {
-            res[i].erase(0, dash_stop);
+          if (dash_stop == 0) {
+            // nop
+          } else if (dash_stop < args[i].size()) {
+            res[i].erase(0, dash_stop); // remove initial dash
           } else if (args[i].size() == 2) {
             // in POSIX, -- means treat subsequent words as literals
             // so we remove the -- and stop deflagging subsequent words
@@ -162,71 +190,131 @@ namespace emp {
             args.erase(std::next(std::begin(args),i));
             break;
           }
-          // -, ---, ----, etc. left in place and treated as non-flags
+          // " ", -, ---, ----, etc. left in place and treated as non-flags
+
         }
         return res;
       }();
 
-      // if word is a valid command or alias for a command,
-      // return the deflagged, dealiased command
-      // otherwise, it's a positional command
-      auto parse_alias = [deflagged, args, alias_map, specs](size_t i) {
-        return alias_map.count(deflagged[i]) ?
-          alias_map.find(deflagged[i])->second : (
-            alias_map.count("_positional")
-            && (
-              deflagged[i] == args[i]
-              || specs.find("_positional")->second.gobble_flags
-            )
-            ? "_positional" : "_unknown"
-          );
-      };
+      // If word is a valid command or alias for a command,
+      // return the deflagged, dealiased command...
+      // otherwise, it's a positional command.
+	    // In this context, positional commands are options that take
+      // option-arguments
+      auto parse_alias = [deflagged, args, alias_map, specs](const size_t i) {
+        const std::string deflag = deflagged[i];
 
-      for(size_t i = 0; i < args.size(); ++i) {
-
-        const std::string & command = parse_alias(i);
-
-        // if command is unknown
-        // and user hasn't provided an ArgSpec for unknown commands
-        if (command == "_unknown" && !specs.count("_unknown")) {
-          res.insert({
-              "_unknown",
-              { args[i] }
-          });
-          continue;
+        // the whole deflagged version is an alias
+        // and there were leading hyphens that WERE removed then, return that
+        if ( alias_map.count(deflag) && args[i] != deflag ) {
+          return pack_t{alias_map.find(deflag)->second};
         }
 
-        const ArgSpec & spec = specs.find(parse_alias(i))->second;
+        pack_t commands;
+        // since it might be a concatenation of single-letter commands,
+        // we must go through it letter by letter
+        // try looking at each of the characters
+        for (const char ch : deflag) {
+          if (alias_map.count( std::string{ch} )) {
 
-        // fast forward to grab all the words for this argument pack
-        size_t j;
-        for (
-          j = i;
-          j < args.size()
-          && j - i < spec.most_quota
-          && (
-            spec.gobble_flags
-            || ! (j + 1 < args.size())
-            || deflagged[j+1] == args[j+1]
-          );
-          ++j
-        );
+            // check that the command does not take arguments
+            if (
+              specs.find(
+                alias_map.find(std::string{ch})->second
+              )->second.most_quota != 0
+            ) {
+              // put strung-together commands that take arguments
+              // into _invalid
+              return pack_t{"_invalid"};
+            };
 
-        // store the argument pack
-        res.insert(
-          {
-            command,
-            emp::vector<std::string>(
-              std::next(
-                std::begin(args),
-                command == "_positional" || command == "_unknown" ? i : i+1
-              ),
-              j+1 < args.size() ? std::next(std::begin(args), j+1) : std::end(args)
-            )
+            commands.push_back(alias_map.find(
+              std::string{ch}
+            )->second);
+
+          } else {
+            // found a bad letter! abort and return positional or unknown
+            if (
+              alias_map.count("_positional") && (
+                deflag == args[i]
+                || specs.find("_positional")->second.gobble_flags
+              )
+            ){
+              return pack_t{"_positional"};
+            } else {
+              return pack_t{"_unknown"};
+            }
           }
-        );
+        }
 
-        i = j;
+        // found all good letters
+        return commands;
+      };
+
+      if (!args.size()) return res;
+      res.insert({"_command", {args[0]}});
+
+      for(size_t i = 1; i < args.size(); ++i) {
+
+        // there *could* be multiple commands contained
+        // if the user passed something a la tar -czvf
+        // so we loop through them one-by-one
+        const pack_t & commands = parse_alias(i);
+
+        for (const auto & command : commands) {
+
+          // if command is unknown
+          // and user hasn't provided an ArgSpec for unknown commands
+          if (command == "_unknown" && !specs.count("_unknown")) {
+            res.insert({
+                "_unknown",
+                { args[i] }
+            });
+            continue;
+          }
+          // if command is unknown
+          // and user hasn't provided an ArgSpec for invalid commands
+          if (command == "_invalid" && !specs.count("_invalid")) {
+            res.insert({
+                "_invalid",
+                { args[i] }
+            });
+            continue;
+          }
+
+          const ArgSpec & spec = specs.find(command)->second;
+
+          // fast forward to grab all the words for this argument pack
+          size_t j;
+          for (
+            j = i;
+            j < args.size()
+              && j - i < spec.most_quota
+              && (
+                spec.gobble_flags
+                || !( j+1 < args.size() )
+                || deflagged[j+1] == args[j+1]
+            );
+            ++j
+          );
+
+          // store the argument pack
+          res.insert({
+              command,
+              pack_t(
+                std::next(
+                  std::begin(args),
+                  command == "_positional"
+                    || command == "_unknown"
+                    || command == "_invalid"
+                  ? i : i+1
+                ),
+                j+1 < args.size() ? std::next(std::begin(args), j+1) : std::end(args)
+              )
+          });
+          i = j;
+
+		    }
 
       }
 
@@ -235,11 +323,11 @@ namespace emp {
     }
 
     /// Make specs for builtin commands, including any config adjustment args.
-    static std::unordered_map<std::string, ArgSpec> make_builtin_specs(
+    static spec_map_t make_builtin_specs(
       const emp::Ptr<Config> config=nullptr
     ) {
 
-      std::unordered_map<std::string, ArgSpec> res({
+      spec_map_t res({
         {"_positional", ArgSpec(
           std::numeric_limits<size_t>::max(),
           1,
@@ -254,7 +342,7 @@ namespace emp {
           1,
           "Unknown arguments.",
           {},
-          [](std::optional<emp::vector<std::string>> res){
+          [](std::optional<pack_t> res){
             if (res) {
               std::cerr << "UNKNOWN | _unknown:";
               for(const auto & v : *res) std::cerr << " " << v;
@@ -263,31 +351,40 @@ namespace emp {
             }
           }
         )},
+        {"_command", ArgSpec(
+          1,
+          1,
+          "Command name.",
+          {},
+          [](std::optional<emp::vector<std::string>> res){ /*no-op*/ }
+        )},
         {"help", ArgSpec(0, "Print help information.", {"h"})},
         {"gen", ArgSpec(
           1,
           "Generate configuration file.",
           {},
-          [config](std::optional<emp::vector<std::string>> res){
+          [config](std::optional<pack_t> res){
             if (res && config) {
               const std::string cfg_file = res->front();
               std::cout << "Generating new config file: " << cfg_file << std::endl;
               config->Write(cfg_file);
             }
           }
-        )},
-        {"make-const", ArgSpec(
-          1,
-          "Generate const version of macros file.",
-          {},
-          [config](std::optional<emp::vector<std::string>> res){
-            if (res && config) {
-              const std::string macro_file = res->front();
-              std::cout << "Generating new macros file: " << macro_file << std::endl;
-              config->WriteMacros(macro_file, true);
-            }
-          }
         )}
+        // @CAO: Removing "make-const" as a default until we have it working properly.
+        //,
+        // {"make-const", ArgSpec(
+        //   1,
+        //   "Generate const version of macros file.",
+        //   {},
+        //   [config](std::optional<pack_t> res){
+        //     if (res && config) {
+        //       const std::string macro_file = res->front();
+        //       std::cout << "Generating new macros file: " << macro_file << std::endl;
+        //       config->WriteMacros(macro_file, true);
+        //     }
+        //   }
+        // )}
       });
 
       if (config) {
@@ -303,7 +400,7 @@ namespace emp {
                 "; default=", entry->GetDefault(), ')'
               ),
               {},
-              [config, entry](std::optional<emp::vector<std::string>> res){
+              [config, entry](std::optional<pack_t> res){
                 if (res && config) {
                   config->Set(entry->GetName(), res->front());
                 }
@@ -322,7 +419,7 @@ namespace emp {
     ArgManager(
       int argc,
       char* argv[],
-      const std::unordered_map<std::string, ArgSpec> & specs_ = make_builtin_specs()
+      const spec_map_t & specs_ = make_builtin_specs()
     ) : ArgManager(
       ArgManager::args_to_strings(argc, argv),
       specs_
@@ -331,10 +428,10 @@ namespace emp {
     // Constructor for command line arguments converted to vector of string.
     /// This constructor is second in the constructor daisy chain.
     ArgManager(
-      const emp::vector<std::string> args,
-      const std::unordered_map<std::string, ArgSpec> & specs_ = make_builtin_specs()
+      const pack_t args,
+      const spec_map_t & specs_ = make_builtin_specs()
     ) : ArgManager(
-      ArgManager::parse(args, specs_),
+      ArgManager::parse(args, DealiasSpecs(specs_)),
       specs_
     ) { ; }
 
@@ -342,20 +439,20 @@ namespace emp {
     /// packs are provided directly, e.g., for use with URL query params.
     /// This constructor is last in the constructor daisy chain.
     ArgManager(
-      const std::multimap<std::string, emp::vector<std::string>> & packs_,
-      const std::unordered_map<std::string, ArgSpec> & specs_ = make_builtin_specs()
-    ) : packs(packs_), specs(specs_) {
+      const pack_map_t & packs_,
+      const spec_map_t & specs_ = make_builtin_specs()
+    ) : packs(packs_), specs(DealiasSpecs(specs_)) {
 
-      // flatten any argument packs with flatten specified
+      // Flatten any argument packs with `flatten` specified; move into packs.
       for (auto & [n, s] : specs) {
         if (s.flatten && packs.count(n)) {
-          emp::vector<std::string> flat = std::accumulate(
+          pack_t flat = std::accumulate(
             packs.equal_range(n).first,
             packs.equal_range(n).second,
-            emp::vector<std::string>(),
+            pack_t(),
             [](
-              emp::vector<std::string> l,
-              const std::pair<std::string, emp::vector<std::string>> & r
+              pack_t l,
+              const std::pair<std::string, pack_t> & r
             ){
               l.insert(std::end(l), std::begin(r.second), std::end(r.second));
               return l;
@@ -396,10 +493,10 @@ namespace emp {
     }
 
     /// UseArg consumes an argument pack accessed by a certain name.
-    std::optional<emp::vector<std::string>> UseArg(const std::string & name) {
+    std::optional<pack_t> UseArg(const std::string & name) {
 
       const auto res = [this, name]()
-        -> std::optional<emp::vector<std::string>> {
+        -> std::optional<pack_t> {
 
         if (!packs.count(name)) return std::nullopt;
 
@@ -424,9 +521,9 @@ namespace emp {
 
     /// ViewArg provides, but doesn't comsume,
     /// all argument packs under a certain name.
-    emp::vector<emp::vector<std::string>> ViewArg(const std::string & name) const {
+    emp::vector<pack_t> ViewArg(const std::string & name) const {
 
-      emp::vector<emp::vector<std::string>> res;
+      emp::vector<pack_t> res;
 
       const auto range = packs.equal_range(name);
       for (auto it = range.first; it != range.second; ++it) {
@@ -443,6 +540,8 @@ namespace emp {
       const emp::Ptr<Config> config=nullptr,
       std::ostream & os=std::cout
     ) {
+
+      UseArg("_command");
 
       if (UseArg("help")) {
         PrintHelp(os);
@@ -521,14 +620,18 @@ namespace emp {
         : std::map<std::string,ArgSpec>(std::begin(specs), std::end(specs))
       ) {
         if (name != "_unknown" && name != "_positional") os << "-";
+
         os << name;
+
         for (const auto & alias : spec.aliases) os << " -" << alias;
+
         if (spec.least_quota == spec.most_quota) {
           os << " [ quota = " << spec.most_quota << " ]";
         } else {
           os << " [ " << spec.least_quota << " <= quota <= "
             << spec.most_quota << " ]";
         }
+
         os << std::endl
           << "   | "
           << spec.description
@@ -537,6 +640,33 @@ namespace emp {
       }
 
     }
+
+    // Argspecs with a string including flags separated by '|' are turned
+    // into one argspec with a list of aliases
+    // example input: specs[“—help|-h”] = ArgSpec a with a.aliases = {}
+    // example output: specs[“—help”] = ArgSpecs b with b.aliases = {“-h”}
+    static spec_map_t DealiasSpecs(spec_map_t inSpecsMap) {
+      spec_map_t outSpecs;
+
+      //convert each Argspec
+      for (auto iSpec : inSpecsMap) {
+        std::string flags = iSpec.first;
+        std::vector <std::string> aliases = slice(flags, '|');
+        std::string mainFlag = aliases[0];
+        aliases.erase(aliases.begin());
+
+        //set aliases
+        ArgSpec oSpec = iSpec.second;
+        for(auto iAlias : aliases) {
+          oSpec.aliases.insert(iAlias);
+        }
+
+        outSpecs.emplace(mainFlag, oSpec);
+      }
+
+      return outSpecs;
+    }
+
 
     /// Test if there are any unused argument packs,
     /// and if so, output an error message.

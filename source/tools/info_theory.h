@@ -46,9 +46,10 @@ namespace emp {
   double Entropy(const CONTAINER & objs, WEIGHT_FUN fun, double total=0.0) {
     // If we don't know the total, calculate it.
     if (total == 0.0) for (auto & o : objs) total += (double) fun(o);
-    if (total == 0) {
-      return 0;
-    }
+
+    // we *can* calculate the entropy of the empty set
+    // https://www.askamathematician.com/2011/02/q-what-is-the-entropy-of-nothing/
+    emp_assert(total > 0.0 || std::size(objs) == 0);
 
     double entropy = 0.0;
     for (auto & o : objs) {
@@ -63,22 +64,6 @@ namespace emp {
     return -(p * Log2(p) + (1.0-p)*Log2(1.0-p));
   }
 
-  /// Conitional Entropy: H(X|Y)
-  /// Allow for entropy of arbitrary objects with a converter.
-  template<typename CONTAINER, typename CAT_FUN_X, typename CAT_FUN_Y, typename WEIGHT_FUN>
-  double Entropy(const CONTAINER & objs, CAT_FUN_X funX, CAT_FUN_Y funY, WEIGHT_FUN funW) {
-    // @CAO Categorize all XY and all Y (maybe with helper function?) and count each.
-    // @CAO Run each through Entropy function.
-
-    double total = 0.0;
-    double entropy = 0.0;
-    for (auto & o : objs) total += fun(o);
-    for (auto & o : objs) {
-      double p = ((double) fun(o)) / total;
-      entropy -= p * Log2(p);
-    }
-    return entropy;
-  }
 }
 
 #endif

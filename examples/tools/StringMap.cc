@@ -30,4 +30,11 @@ int main()
 
   PRINT_VAL(test_map[EMP_STRING("Beta")]);
   PRINT_VAL(test_map["Beta"]);
+
+  test_map.CTGet("Alpha") = 5;
+  test_map.CTGet("Beta") = 6;
+  test_map.CTGet("Gamma") = 7;
+
+  PRINT_VAL(test_map[EMP_STRING("Gamma")]);
+  PRINT_VAL(test_map["Gamma"]);
  }

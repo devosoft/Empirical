@@ -1,15 +1,16 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018
+ *  @date 2018-2019.
  *
  *  @file StringMap.h
- *  @brief An std::map wrapper that deals smootly with strigns and fast compile-time optimizations.
+ *  @brief An std::unordered_map wrapper that deals smootly with strigns and fast compile-time optimizations.
  *  @note Status: ALPHA
  * 
  *  StringMap is setup to be a generic dictionary that can link strings to objects of any other
- *  desginated type.  It is more powerful than std::map because it will accept strings wrapped in
+ *  desginated type.  It is more powerful than std::unordered_map because it will accept strings wrapped in
  *  the EMP_STRING_ID macro, which is hashed at compile-time instead of run-time.
+ *
  *  @CO2:
  *  StringMap = PAdictionary   (PA = Perfectly accurate)
  *  StringMap = HIDL (HIDL = having an identification of linking)
@@ -22,7 +23,7 @@
 #ifndef EMP_STRING_MAP_H
 #define EMP_STRING_MAP_H
 
-#include <unordered_map>
+#include "../base/unordered_map.h"
 
 #include "string_utils.h"
 
@@ -35,6 +36,11 @@
     constexpr auto temp = EMP_TEXT_PACK(STR);      \
     return emp::StringID::Get<decltype(temp)>();   \
   }())
+
+
+/// Macro to build a fake member function for StringMap that can only be passed a literal
+/// string that will be converted at compile time.
+#define CTGet(STR) Get( EMP_STRING(STR) )
 
 
 namespace emp {
@@ -78,7 +84,7 @@ namespace emp {
   template <typename T>
   class StringMap {
   private:
-    std::unordered_map<size_t, T> str_map;
+    emp::unordered_map<size_t, T> str_map;
   public:
     StringMap() = default;
     StringMap(const StringMap &) = default;
@@ -92,6 +98,16 @@ namespace emp {
     T & operator[](size_t id) { return str_map[id]; }
     T & operator[](const StringID & str_id) { return str_map[str_id.ToValue()]; }
     T & operator[](const std::string & str) { return str_map[StringID(str).ToValue()]; }
+    // const T & operator[](size_t id) const { return str_map[id]; }
+    // const T & operator[](const StringID & str_id) const { return str_map[str_id.ToValue()]; }
+    // const T & operator[](const std::string & str) const { return str_map[StringID(str).ToValue()]; }
+
+    T & Get(size_t id) { return str_map[id]; }
+    T & Get(const StringID & str_id) { return str_map[str_id.ToValue()]; }
+    T & Get(const std::string & str) { return str_map[StringID(str).ToValue()]; }
+    // const T & Get(size_t id) const { return str_map[id]; }
+    // const T & Get(const StringID & str_id) const { return str_map[str_id.ToValue()]; }
+    // const T & Get(const std::string & str) const { return str_map[StringID(str).ToValue()]; }
   };
 }
 

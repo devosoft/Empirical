@@ -555,7 +555,6 @@ namespace emp {
     if (recurse == 0) {
       EM_ASM({
         emp_i.__temp_array = [emp_i.__outgoing_array];
-        console.log(emp_i.__outgoing_array);
       });
     } else {
       // This is a little wasteful of space, but the alternatives are

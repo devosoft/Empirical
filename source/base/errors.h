@@ -45,7 +45,7 @@
 #include <string>
 
 /// If we are in emscripten, make sure to include the header.
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
 
@@ -129,7 +129,7 @@ namespace emp {
   void Notify(Ts &&... args) {
     std::stringstream ss;
     Notify_impl(ss, std::forward<Ts>(args)...);
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     EM_ASM_ARGS({ msg = UTF8ToString($0); alert(msg); }, ss.str().c_str());
 #else
     std::cerr << ss.str() << std::endl;

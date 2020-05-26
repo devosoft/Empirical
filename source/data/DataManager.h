@@ -35,6 +35,24 @@ namespace emp {
       for (auto & x : node_map) delete x.second;
     }
 
+    // so we can use range-based for loops
+    auto begin() -> decltype(std::begin(node_map)) {
+      return std::begin(node_map);
+    }
+    // so we can use range-based for loops
+    auto end() -> decltype(std::end(node_map)) {
+      return std::end(node_map);
+    }
+
+    // so we can use range-based for loops with const
+    auto begin() const -> const decltype(std::begin(node_map)) {
+      return std::begin(node_map);
+    }
+    // so we can use range-based for loops with const
+    auto end() const -> const decltype(std::end(node_map)) {
+      return std::end(node_map);
+    }
+
     /// Returns the number of DataNodes in this DataManager
     size_t GetSize() const { return node_map.size(); }
     /// Returns the std::map mapping node names (strings) to DataNodes

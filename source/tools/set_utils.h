@@ -27,20 +27,20 @@ namespace emp {
   }
 
   /// Test if an std::set has a particular element without modifying the set in any way.
-  template <typename T, typename H>
-  bool Has(const std::set<T,H> & s, const T & val) { return s.count(val); }
+  template <typename T, typename H, typename V>
+  bool Has(const std::set<T,H> & s, const V & val) { return s.count(val); }
 
   /// Test if an std::multiset has a particular element without modifying the set in any way.
-  template <typename T, typename H>
-  bool Has(const std::multiset<T,H> & s, const T & val) { return s.count(val); }
+  template <typename T, typename H, typename V>
+  bool Has(const std::multiset<T,H> & s, const V & val) { return s.count(val); }
 
   /// Test if an std::unordered_set has a particular element without modifying the set in any way.
-  template <typename T, typename H>
-  bool Has(const std::unordered_set<T,H> & s, const T & val) { return s.count(val); }
+  template <typename T, typename H, typename V>
+  bool Has(const std::unordered_set<T,H> & s, const V & val) { return s.count(val); }
 
   /// Test if an std::unordere_multiset has a particular element without modifying the set in any way.
-  template <typename T, typename H>
-  bool Has(const std::unordered_multiset<T,H> & s, const T & val) { return s.count(val); }
+  template <typename T, typename H, typename V>
+  bool Has(const std::unordered_multiset<T,H> & s, const V & val) { return s.count(val); }
 
   // Note: the following functions allow the use of sets or vectors. Sets are passed
   // by reference and vectors are passed by value, because these functions only work

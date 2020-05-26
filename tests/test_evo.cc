@@ -32,7 +32,10 @@ TEST_CASE("Test fitness sharing", "[evo]")
     BitOrg next_org;
     for (size_t j = 0; j < N; j++) next_org[j] = 0;
     pop.Inject(next_org);
+    REQUIRE( pop.GetDominantOrg() == next_org );
   }
+  REQUIRE( pop.GetDominantInfo().second == POP_SIZE );
+
 
 
   // Setup the (shared) fitness function.
@@ -51,6 +54,7 @@ TEST_CASE("Test fitness sharing", "[evo]")
   pop.InjectAt(next_org, POP_SIZE-3);
   pop.InjectAt(next_org, POP_SIZE-4);
   pop.InjectAt(next_org, POP_SIZE-5);
+  REQUIRE( pop.GetDominantInfo().second == POP_SIZE - 5 );
 
   REQUIRE(pop.CalcFitnessID(0) == Approx(0.526316));
   REQUIRE(pop.CalcFitnessID(POP_SIZE-1) == 2);
@@ -59,6 +63,7 @@ TEST_CASE("Test fitness sharing", "[evo]")
   emp::TournamentSelect(pop, 5, POP_SIZE);
   pop.Update();
 
+  REQUIRE( pop.GetDominantInfo().second < POP_SIZE - 5 );
   REQUIRE(pop.CalcFitnessID(0) == Approx(0.322581));
 
   pop.SetFitFun([](BitOrg &org){ return N - org.CountOnes(); });

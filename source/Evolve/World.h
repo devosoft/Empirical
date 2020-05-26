@@ -72,7 +72,7 @@ namespace emp {
   ///   2. If the organism type can be cast to double, use it!
   ///   3. Start with a fitness function that throws an assert indicating function must be set.
   ///
-  ///  MUTATIONS: The mutation function deteramines a main source of variation for most evolving
+  ///  MUTATIONS: The mutation function determines a main source of variation for most evolving
   ///             systems.
   ///   0. If you set the mutation function using SetMutFun(), it will have priority.
   ///   1. Or DoMutations(random) member function.
@@ -259,6 +259,35 @@ namespace emp {
     /// Get the full population to analyze externally.
     const pop_t & GetFullPop() const { return pop; }
 
+    /// Get the organism most frequently found in the population and its
+    /// abundance.
+    /// Be sure to check whether the population is empty before calling!
+    std::pair<org_t, size_t> GetDominantInfo() const {
+
+      emp_assert(
+        GetNumOrgs(),
+        "called GetDominantInfo on an empty population"
+      );
+
+      std::map<org_t, size_t> counts;
+      for (const auto & org_ptr : GetFullPop()) {
+        if (org_ptr) ++counts[*org_ptr];
+      }
+
+      return *std::max_element(
+        std::begin(counts),
+        std::end(counts),
+        [](const auto & p1, const auto & p2) {
+          return p1.second < p2.second; // compare by counts
+        }
+      );
+
+    }
+
+    /// Get the organism most frequently found in the population.
+    /// Be sure to check whether the population is empty before calling!
+    org_t GetDominantOrg() const { return GetDominantInfo().first; }
+
     /// What phenotypic traits is the population tracking?
     const emp::TraitSet<ORG> & GetPhenotypes() const { return phenotypes; }
 
@@ -436,7 +465,7 @@ namespace emp {
       OnBeforePlacement( [this,test_fun](ORG & org, size_t pos){ if (test_fun(pos)) DoMutationsOrg(org); } );
     }
 
-    /// Setup the population to automatically test for and trigger mutations IF the organism is being 
+    /// Setup the population to automatically test for and trigger mutations IF the organism is being
     /// placed in a cell after a designated ID.
     void SetAutoMutate(size_t first_pos) {
       SetAutoMutate( [first_pos](size_t pos){ return pos >= first_pos; } );
@@ -641,7 +670,7 @@ namespace emp {
 
     /// Get the value for an attribute that you know exists.
     std::string GetAttribute(const std::string name) const {
-      emp_assert( Has(attributes, name), attributes.size(), name );
+      emp_assert( Has(attributes, name) );
       return Find(attributes, name, "UNKNOWN");
     }
 
@@ -1023,17 +1052,28 @@ namespace emp {
       return WorldPosition(GetRandomCellID());
     };
 
-    // neighbors are in 9-sized neighborhood.
+    // neighbors are in 8-sized neighborhood.
     fun_get_neighbor = [this](WorldPosition pos) {
+
       emp_assert(random_ptr);
       emp_assert(pop_sizes.size() == 2);
+
       const size_t size_x = pop_sizes[0];
       const size_t size_y = pop_sizes[1];
       const size_t id = pos.GetIndex();
-      const int offset = random_ptr->GetInt(9);
+
+      // fancy footwork to exclude self (4) from consideration
+      const int offset = (random_ptr->GetInt(8) * 5) % 9;
       const int rand_x = (int) (id%size_x) + offset%3 - 1;
       const int rand_y = (int) (id/size_x) + offset/3 - 1;
-      const auto neighbor_id = emp::Mod(rand_x, (int) size_x) + emp::Mod(rand_y, (int) size_y) * (int)size_x;
+
+      const auto neighbor_id = (
+        emp::Mod(rand_x, (int) size_x)
+        + emp::Mod(rand_y, (int) size_y) * (int)size_x
+      );
+
+      emp_assert((int)pos.GetIndex() != neighbor_id);
+
       return pos.SetIndex(neighbor_id);
     };
 
@@ -1366,7 +1406,7 @@ namespace emp {
   template<typename ORG>
   void World<ORG>::Print(std::ostream & os, const std::string & empty, const std::string & spacer) {
     for (Ptr<ORG> org : pop) {
-      if (org) os << fun_print_org(*org, os);
+      if (org) fun_print_org(*org, os);
       else os << empty;
       os << spacer;
     }

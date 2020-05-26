@@ -92,12 +92,12 @@ namespace emp {
     // @CAO: Also try emp::to_string ??
 
     template <typename WORLD, typename ORG>
-    void SetDefaultPrintFun_impl(WORLD & world, bool_decoy<decltype( declval<ORG>().Print(std::cout) )>) {
+    void SetDefaultPrintFun_impl(WORLD & world, bool_decoy<decltype( std::declval<ORG>().Print(std::cout) )>) {
       world.SetPrintFun( [](ORG & org, std::ostream & os){ org.Print(os); } );
     }
 
     template <typename WORLD, typename ORG>
-    void SetDefaultPrintFun_impl(WORLD & world, int_decoy<decltype( std::cout << declval<ORG>() )>) {
+    void SetDefaultPrintFun_impl(WORLD & world, int_decoy<decltype( std::declval<std::ostream&>() << std::declval<const ORG &>() )>) {
       world.SetPrintFun( [](ORG & org, std::ostream & os){ os << org; } );
     }
 

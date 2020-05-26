@@ -13,8 +13,10 @@
 *.wasm
 *.wast
 *-bak.cc
+*.dat
+*.exe
 *tmp.*
-	
+
 */env/*
 */3nv/*
 
@@ -32,12 +34,19 @@ tmp/
 
 apps/Avida/Avida
 apps/Avida/web/Avida.js
+apps/Emphatic/Emphatic
+apps/Emphatic/examples/ConceptTest
+apps/Emphatic/examples/ConceptTest.cc
 apps/MABE/examples/NK
 apps/NK.bak/
 apps/NK/NK
 apps/NK/web/NK.js
 apps/OEE-Breaker/OEE-Breaker
 apps/OpenWorld/OpenWorld
+apps/SelectionAnalyze/Lexicase
+apps/SelectionAnalyze/Roulette
+apps/SelectionAnalyze/out.csv
+apps/SelectionAnalyze/output
 apps/SpatialCoop2017/SimplePDWorld
 apps/SpatialCoop2017/web/SimplePDWorld.js
 apps/StateGrid/StateGrid
@@ -74,6 +83,7 @@ tests/web/node_modules/
 tests/test_file.dat
 
 third-party/doxygen/
+third-party/emsdk/
 build/
 doc/_build/
 
