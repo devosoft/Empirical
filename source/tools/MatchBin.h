@@ -206,7 +206,7 @@ namespace emp::internal {
       logbuffer_t GetLogBuffer() { return logbuffer; }
 
       // get this instance's ID
-      int GetID() const { return id; }
+      int GetID() const { return matchbin_id; }
 
       template <typename ...ARGS>
       void EmplaceDataFile(ARGS&&... arguments) {
