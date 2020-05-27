@@ -199,7 +199,7 @@ TEST_CASE("Test MatchBin", "[tools]")
       bin.MatchRaw(i);
     }
 
-    bin.log.WriteLogBuffer();
+    bin.log.FlushLogBuffer();
 
     // make an emp::File from our string stream
     emp::File file(ss);
@@ -213,7 +213,6 @@ TEST_CASE("Test MatchBin", "[tools]")
 
     REQUIRE(dataset.size() == data.size());
 
-    bin.log.FlushLogBuffer();
   }
   // test clearing the logbuffer in various ways
   {
@@ -241,7 +240,7 @@ TEST_CASE("Test MatchBin", "[tools]")
     REQUIRE(bin.log.GetLogBuffer().empty());
 
     // write an empty file
-    bin.log.WriteLogBuffer();
+    bin.log.FlushLogBuffer();
 
     emp::File file(ss);
 
