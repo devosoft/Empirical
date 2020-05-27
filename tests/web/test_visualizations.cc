@@ -331,7 +331,7 @@ int main() {
 
         it('should correctly set styles to ints', function(){
             emp.TestSetStyleInt();
-            chai.assert.equal(js.objects[emp.id].style("stroke-width"), "5px");
+            chai.assert.oneof(js.objects[emp.id].style("stroke-width"), ["5","5px"]);
         });
 
         it('should correctly set styles with callback functions', function(){
