@@ -138,6 +138,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   bin.log.Set(false);
   REQUIRE(!bin.log.IsActivated());
   }
+  // test EmplaceDataFile
   {
     emp::Random rand(1);
     emp::MatchBin<
@@ -147,11 +148,14 @@ TEST_CASE("Test MatchBin", "[tools]")
       emp::LegacyRegulator
     > bin(rand);
 
+    // output to a file
     bin.log.EmplaceDataFile("datafile.csv");
 
+    // put some data in the matchbin
     bin.Put("1", 1);
     bin.Put("2", 2);
 
+    // do some matches
     bin.Match(2);
     bin.MatchRaw(2);
 
@@ -159,6 +163,7 @@ TEST_CASE("Test MatchBin", "[tools]")
     bin.MatchRaw(2);
 
     std::cout << "Printing logging test:" << std::endl;
+    // emplace an ostream without flushing
     bin.log.EmplaceDataFile(std::cout);
 
     bin.MatchRaw(2);
@@ -166,6 +171,7 @@ TEST_CASE("Test MatchBin", "[tools]")
 
     bin.log.FlushLogBuffer();
   }
+  // test writing to an emp::File
   {
     emp::Random rand(1);
     emp::MatchBin<
@@ -175,13 +181,16 @@ TEST_CASE("Test MatchBin", "[tools]")
       emp::LegacyRegulator
     > bin(rand);
 
+    // log to a string stream
     std::stringstream ss;
     bin.log.EmplaceDataFile(ss);
 
+    // put some data in the matchbin
     for (size_t i = 0; i < 50; ++i) {
       bin.Put(emp::to_string(i), i);
     }
 
+    // do matches
     for (size_t i = 0; i < 50; ++i) {
       bin.Match(i);
       bin.MatchRaw(i);
@@ -189,11 +198,13 @@ TEST_CASE("Test MatchBin", "[tools]")
 
     bin.log.WriteLogBuffer();
 
+    // make an emp::File from our string stream
     emp::File file(ss);
 
+    // read from the emp::File
     emp::vector<emp::vector<std::string>> data = file.ToData<std::string>();
 
-    // check for uniqueness
+    // check that every line is unique
     std::set<emp::vector<std::string>> dataset;
     for (size_t i = 0; i < data.size(); ++i) dataset.insert(data[i]);
 
@@ -201,6 +212,7 @@ TEST_CASE("Test MatchBin", "[tools]")
 
     bin.log.FlushLogBuffer();
   }
+  // test clearing the logbuffer in various ways
   {
     emp::Random rand(1);
     emp::MatchBin<
@@ -209,7 +221,6 @@ TEST_CASE("Test MatchBin", "[tools]")
       emp::RankedSelector<std::ratio<1+1, 1>>,
       emp::LegacyRegulator
     > bin(rand);
-
 
     std::stringstream ss;
     bin.log.EmplaceDataFile(ss);
@@ -225,6 +236,7 @@ TEST_CASE("Test MatchBin", "[tools]")
 
     REQUIRE(bin.log.GetLogBuffer().empty());
 
+    // write an empty file
     bin.log.WriteLogBuffer();
 
     emp::File file(ss);
@@ -245,6 +257,7 @@ TEST_CASE("Test MatchBin", "[tools]")
     REQUIRE(data.size() == 2);
     REQUIRE(bin.log.GetLogBuffer().empty());
   }
+  // test whether we write the correct number of lines with a single matchbin
   {
     emp::Random rand(1);
     emp::MatchBin<
@@ -279,7 +292,9 @@ TEST_CASE("Test MatchBin", "[tools]")
     REQUIRE(data.size() == 4);
     REQUIRE(bin.log.GetLogBuffer().empty());
   }
+  // test whether multiple matchbins can write to the same ostream concurrently
   {
+    // number of matchbins to test
     const size_t n = 37;
 
     emp::Random rand(1);
