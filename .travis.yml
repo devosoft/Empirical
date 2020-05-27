@@ -14,7 +14,7 @@ notifications:
 compiler:
 - g++
 - clang++
-#- emcc
+- emcc
 python:
 - '3.5'
 before_install:
@@ -29,6 +29,7 @@ install:
 - git fetch origin master:refs/remotes/origin/master
 - npm install source-map
 - make install-test-dependencies
+- source third-party/emsdk/emsdk_env.sh
 - if [ "${TRAVIS_COMPILER}" = "emcc" ]; then export CXX=emcc; . third-party/emsdk/emsdk_env.sh; fi
 services:
   - xvfb
