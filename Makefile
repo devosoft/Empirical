@@ -4,7 +4,7 @@ test:
 	cd tests && make opt
 	cd examples && make
 	cd examples && make debug
-	# cd tests && make test-web
+	cd tests && make test-web
 
 doc: build-doxygen-xml
 	cd doc && ./make_docs.sh
