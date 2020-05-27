@@ -103,6 +103,7 @@ TEST_CASE("Test MatchBin", "[tools]")
     for (size_t i = 0; i < 100; ++i) {
       matchbin_t bin(rand);
       matchbins.push_back(bin);
+      bin.log.Activate();
     }
     // test that every matchbin has a unique ID
     for (auto& bin: matchbins) {
@@ -123,20 +124,20 @@ TEST_CASE("Test MatchBin", "[tools]")
   // is the macro setting the constexpr?
   REQUIRE(bin.log.IsEnabled());
 
-  // logging should be activated by default when macro is set
-  REQUIRE(bin.log.IsActivated());
-
-  // are we actually disabling logging?
-  bin.log.Deactivate();
+  // logging should be deactivated by default even when macro is set
   REQUIRE(!bin.log.IsActivated());
 
-  // can we reenable it?
+  // are we actually activating logging?
   bin.log.Activate();
   REQUIRE(bin.log.IsActivated());
 
-  // what about setting it to a bool?
-  bin.log.Set(false);
+  // can we deactivate it?
+  bin.log.Deactivate();
   REQUIRE(!bin.log.IsActivated());
+
+  // what about setting it to a bool?
+  bin.log.Set(true);
+  REQUIRE(bin.log.IsActivated());
   }
   // test EmplaceDataFile
   {
@@ -147,6 +148,7 @@ TEST_CASE("Test MatchBin", "[tools]")
       emp::RankedSelector<std::ratio<1+1, 1>>,
       emp::LegacyRegulator
     > bin(rand);
+    bin.log.Activate();
 
     // output to a file
     bin.log.EmplaceDataFile("datafile.csv");
@@ -180,6 +182,7 @@ TEST_CASE("Test MatchBin", "[tools]")
       emp::RankedSelector<std::ratio<1+1, 1>>,
       emp::LegacyRegulator
     > bin(rand);
+    bin.log.Activate();
 
     // log to a string stream
     std::stringstream ss;
@@ -221,6 +224,7 @@ TEST_CASE("Test MatchBin", "[tools]")
       emp::RankedSelector<std::ratio<1+1, 1>>,
       emp::LegacyRegulator
     > bin(rand);
+    bin.log.Activate();
 
     std::stringstream ss;
     bin.log.EmplaceDataFile(ss);
@@ -266,6 +270,7 @@ TEST_CASE("Test MatchBin", "[tools]")
       emp::RankedSelector<std::ratio<1+1, 1>>,
       emp::LegacyRegulator
     > bin(rand);
+    bin.log.Activate();
 
     std::stringstream ss;
     bin.log.EmplaceDataFile(ss);
@@ -315,6 +320,7 @@ TEST_CASE("Test MatchBin", "[tools]")
     // match for all matchbins
     std::stringstream ss;
     for (auto& bin: matchbins) {
+      bin.log.Activate();
       bin.log.EmplaceDataFile(ss);
       bin.Put("1", 1);
       bin.Put("2", 2);
