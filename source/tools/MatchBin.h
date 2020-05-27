@@ -899,9 +899,13 @@ namespace emp {
       cache.Clear();
     }
 
+    /// Returns reference to internal logging instance.
     emp::internal::MatchBinLog<query_t, tag_t>& GetLog() override { return log; }
 
+    /// Returns size of regulated cache.
     size_t GetRegulatedCacheSize() { return cache.RegulatedSize(); }
+
+    /// Returns size of raw cache.
     size_t GetRawCacheSize() { return cache.RawSize(); }
 
 
