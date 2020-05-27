@@ -76,8 +76,8 @@ namespace emp {
 
   /// Return whether a value exists in a vector
   template <typename T>
-  bool Has(const emp::vector<T> vec, const T & val) {
-    return FindValue(vec, val) >= 0;
+  bool Has(const emp::vector<T> & v, const T & val) {
+    return FindValue(v, val) >= 0;
   }
 
   /// Return number of times a value occurs in a vector
