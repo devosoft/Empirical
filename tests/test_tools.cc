@@ -5017,7 +5017,7 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(metric(bs_15, bs_11) == 16.0/norm);
   }
   {
-  // Cache Testing
+  // Regulated Cache Testing
   struct DummySelector: public emp::RankedSelector<std::ratio<2,1>>{
 
     DummySelector(emp::Random &rand) : emp::RankedSelector<std::ratio<2,1>>(rand) { ; }
@@ -5103,7 +5103,63 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(bin.GetRegulatedCacheSize() == 1); //replace the current one so same size.
   REQUIRE(bin.GetSelectCount() == 1000 + 3 + 2);
   }
+  // Raw cache testing
+  {
+  struct DummySelector: public emp::RankedSelector<std::ratio<2,1>>{
 
+    DummySelector(emp::Random &rand) : emp::RankedSelector<std::ratio<2,1>>(rand) { ; }
+
+    size_t opCount = 0;
+    emp::RankedCacheState operator()(
+      emp::vector<size_t>& uids,
+      std::unordered_map<size_t, double>& scores,
+      size_t n
+    ){
+      opCount+=1;
+      return emp::RankedSelector<std::ratio<2,1>>::operator()(uids, scores, n);
+    }
+  };
+
+  using parent_t = emp::MatchBin<
+    emp::BitSet<32>,
+    emp::HammingMetric<32>,
+    DummySelector,
+    emp::LegacyRegulator
+  >;
+  class MatchBinTest : public parent_t {
+  public:
+    MatchBinTest(emp::Random & rand) : parent_t(rand) { ; }
+
+    size_t GetSelectCount(){ return selector.opCount; }
+  };
+
+  emp::Random rand(1);
+  MatchBinTest bin(rand);
+  std::vector<size_t> ids;
+
+  for(unsigned int i = 0; i < 1000; ++i){
+    emp::BitSet<32> bs;
+    bs.SetUInt32(0, i);
+    ids.push_back(bin.Put(bs,bs));
+  }
+  // test raw caching
+  REQUIRE( bin.GetRawCacheSize() == 0);
+  REQUIRE( bin.GetSelectCount() == 0);
+  emp::vector<size_t> uncached_raw = bin.MatchRaw(emp::BitSet<32>(), 10);// first match caches
+  emp::vector<size_t> cached_raw = bin.MatchRaw(emp::BitSet<32>(), 10);// second already cached
+  REQUIRE( bin.GetRawCacheSize() == 1);
+  REQUIRE( bin.GetSelectCount() == 1);
+  REQUIRE( uncached_raw == cached_raw );
+  bin.DeactivateCaching();
+  REQUIRE(bin.GetRawCacheSize() == 0 );
+  bin.MatchRaw(emp::BitSet<32>(),10);//second cache
+  bin.MatchRaw(emp::BitSet<32>(),10);//third cache
+  REQUIRE(bin.GetRawCacheSize() == 0 );
+  REQUIRE(bin.GetSelectCount() == 3);
+
+  bin.ActivateCaching();
+  REQUIRE(bin.GetRawCacheSize() == 0 );
+  }
   // serialization / deserialization
   {
   // set up
