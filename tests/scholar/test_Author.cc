@@ -3,7 +3,7 @@
 
 #include "scholar/Author.h"
 
-TEST_CASE("Test author", "[scholar]")
+TEST_CASE("Test Author", "[scholar]")
 {
   emp::Author fml("First", "Middle", "Last");
   REQUIRE(fml.GetFullName() == "First Middle Last");
