@@ -473,14 +473,13 @@ namespace emp {
     Regulator
   > {
 
-  using base_t = BaseMatchBin<
-    Val,
-    typename Metric::query_t,
-    typename Metric::tag_t,
-    Regulator
-  >;
-
   public:
+    using base_t = BaseMatchBin<
+      Val,
+      typename Metric::query_t,
+      typename Metric::tag_t,
+      Regulator
+    >;
     using query_t = typename base_t::query_t;
     using tag_t = typename base_t::tag_t;
     using uid_t = typename base_t::uid_t;
