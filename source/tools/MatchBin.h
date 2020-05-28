@@ -637,7 +637,7 @@ namespace emp {
       auto result = getResult();
 
       if (result.empty()) {
-        log.LogMiss(query, "regulated");
+        log.LogMiss(query, "raw");
       }
       // store counts for results
       for (const auto &uid : result) {
