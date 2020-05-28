@@ -183,10 +183,13 @@ namespace emp::internal {
 
       ~MatchBinLog() {
         if constexpr (logging_enabled) {
-          if (!logbuffer.empty()) {
+          if (!logbuffer.empty() && log_counter == 0) {
             emp::LibraryWarning(
-              emp::to_string("Match log buffer was not empty before destructing.\n",
-              "Match log buffer was written ", log_counter, " times.")
+              emp::to_string(
+                "Match log buffer was not empty before destructing.\n",
+                "Be sure to call ClearLogBuffer() or FlushLogBuffer().\n"
+                "Match log buffer was never written to file."
+              )
             );
           }
         }
