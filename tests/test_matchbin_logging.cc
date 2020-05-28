@@ -341,5 +341,45 @@ TEST_CASE("Test MatchBin", "[tools]")
     // 1 header and 2 matches, and at the end an EOF newline
     REQUIRE(data.size() == 3 * n + 1);
   }
+    // test logging misses
+  {
+    emp::Random rand(1);
+    emp::MatchBin<
+      std::string,
+      emp::AbsDiffMetric,
+      emp::RankedSelector<std::ratio<1+1, 1>>,
+      emp::LegacyRegulator
+    > bin(rand);
+
+    bin.log.Activate();
+
+    std::stringstream ss;
+    bin.log.EmplaceDataFile(ss);
+
+    // do some matches without putting anything in the matchbin
+    // this should always result in a miss
+    bin.Match(99);
+    bin.MatchRaw(99);
+
+    bin.log.FlushLogBuffer();
+
+    emp::File file(ss);
+
+    // extract header
+    std::vector<std::string> header{file.ExtractRow()};
+    std::vector<std::string> regulated_row{file.ExtractRow()};
+    std::vector<std::string> raw_row{file.ExtractRow()};
+
+    // find the index of the tag
+    // if a future change moves it, this test won't break
+    size_t i = std::find(
+      header.begin(),
+      header.end(),
+      "tag"
+    ) - header.begin();
+
+    REQUIRE(regulated_row[i] == "");
+    REQUIRE(raw_row[i] == "");
+  }
 }
 #undef EMP_LOG_MATCHBIN
