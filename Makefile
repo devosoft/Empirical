@@ -1,9 +1,18 @@
 test:
+	make test-native
+	make test-examples
+	make test-web	
+
+test-examples:
+	cd examples && make
+	cd examples && make debug
+
+test-native:
 	cd tests && make test
 	cd tests && make fulldebug
 	cd tests && make opt
-	cd examples && make
-	cd examples && make debug
+
+test-web:
 	cd tests && make test-web
 
 doc: build-doxygen-xml
