@@ -11,9 +11,11 @@ test-native:
 	cd tests && make test
 	cd tests && make fulldebug
 	cd tests && make opt
+	cd examples && make native-test
 
 test-web:
 	cd tests && make test-web
+	cd examples && make web-test
 
 doc: build-doxygen-xml
 	cd doc && ./make_docs.sh
