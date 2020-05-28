@@ -61,12 +61,15 @@ coverage_conversion:
 
 test-coverage: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../coverage_source/ -I../ -I../third-party/cereal/include/ -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 -fprofile-instr-generate -fcoverage-mapping -fno-inline -fno-elide-constructors -O0
 test-coverage: coverage_conversion test-prep $(addprefix cover-test-, $(TEST_NAMES))
-	       cd ToolsTests && make test-coverage
-		   cd BaseTests && make test-coverage
-		   cd EvoTests && make test-coverage
-		   cd games && make test-coverage
-		   cd HardwareTests && make test-coverage
-	       rm -r ../coverage_source
+	cd tools && make test-coverage
+	cd base && make test-coverage
+	cd Evolve && make test-coverage
+	cd data && make test-coverage
+	cd games && make test-coverage
+	cd hardware && make test-coverage
+	cd geometry && make test-coverage
+	cd scholar && make test-coverage
+	rm -r ../coverage_source
 
 clean:
 	rm -f *.out
