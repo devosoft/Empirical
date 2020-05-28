@@ -100,18 +100,17 @@ namespace emp::internal {
     #endif
     bool logging_activated;
 
-    // a DataFile is an object that deals with wriing to files.
-    // a ContaierDataFile is a DataFile that runs a function before every write.
-    // in our case, we need to get the data from our logbuffer, so we need the second one.
+    // a ContaierDataFile is a DataFile that runs a function on every element of a container before every write.
+    // in this case, we simply return the data from our logbuffer.
     emp::ContainerDataFile<logbuffer_t> datafile;
 
-    using datapoint_t = const std::pair<const LogEntry, size_t>;
+    using datapoint_t = std::pair<const LogEntry, size_t>;
     // setup getter functions
-    std::function<query_t(datapoint_t)> get_query_log = [](datapoint_t datapoint){
+    std::function<query_t(const datapoint_t)> get_query_log = [](const datapoint_t datapoint){
       return datapoint.first.query;
     };
 
-    std::function<std::string(datapoint_t)> get_tag_log = [](datapoint_t datapoint){
+    std::function<std::string(const datapoint_t)> get_tag_log = [](const datapoint_t datapoint){
       if (datapoint.first.maybe_tag) {
         return emp::to_string(*datapoint.first.maybe_tag);
       } else {
@@ -119,11 +118,11 @@ namespace emp::internal {
       }
     };
 
-    std::function<size_t(datapoint_t)> get_hit_count_log = [](datapoint_t datapoint){
+    std::function<size_t(const datapoint_t)> get_hit_count_log = [](const datapoint_t datapoint){
       return datapoint.second;
     };
 
-    std::function<std::string(datapoint_t)> get_logbuffer_type = [](datapoint_t datapoint) {
+    std::function<std::string(const datapoint_t)> get_logbuffer_type = [](const datapoint_t datapoint) {
       return datapoint.first.buffer;
     };
 
