@@ -381,5 +381,45 @@ TEST_CASE("Test MatchBin", "[tools]")
     REQUIRE(regulated_row[i] == "");
     REQUIRE(raw_row[i] == "");
   }
+  // test logging in container of pointers to abstract base class
+  {
+
+    emp::Random rand(1);
+    using matchbin_t = emp::MatchBin<
+      std::string,
+      emp::AbsDiffMetric,
+      emp::RankedSelector<std::ratio<1+1, 1>>,
+      emp::LegacyRegulator
+    >;
+    using matchbin_base_t = matchbin_t::base_t;
+
+    emp::vector<std::unique_ptr<matchbin_base_t>> matchbins;
+
+    // fill our vector of base pointers with new matchbins
+    for (size_t i = 0; i < 10; ++i) {
+      matchbins.emplace_back(
+        dynamic_cast<matchbin_base_t*>(new matchbin_t(rand))
+      );
+    }
+    // try logging some matches
+    for (auto& bin : matchbins) {
+      // we use the arrow operator because
+      // these are actually pointers to a base class
+      bin->GetLog().Activate();
+
+      // test with some data
+      bin->Put("1", 1);
+      bin->Put("2", 2);
+      bin->Match(2);
+      bin->MatchRaw(2);
+
+      // test whether the logbuffer is not empty (aka whether something was logged)
+      // we don't do further testing here given that it would be redundant
+      REQUIRE(!bin->GetLog().GetLogBuffer().empty());
+
+      // clear the log buffer to prevent non-empty warning
+      bin->GetLog().ClearLogBuffer();
+    }
+  }
 }
 #undef EMP_LOG_MATCHBIN
