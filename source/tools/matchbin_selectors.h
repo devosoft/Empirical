@@ -24,6 +24,7 @@
 #include <tuple>
 #include <array>
 #include <utility>
+#include <limits>
 
 #include "tools/Distribution.h"
 
@@ -64,7 +65,7 @@ namespace emp {
 
     std::optional<emp::vector<size_t>> operator()(size_t n) override {
 
-      if (n == 0) n = default_n;
+      if (n == std::numeric_limits<size_t>::max()) n = default_n;
 
       // don't perform a lookup into an empty IndexMap, that's a segfault
       // double braces: an empty vector inside an optional
@@ -111,7 +112,7 @@ namespace emp {
 
     std::optional<emp::vector<size_t>> operator()(size_t n) override {
 
-      if (n == 0) n = default_n;
+      if (n == std::numeric_limits<size_t>::max()) n = default_n;
 
       emp::vector<size_t> res;
 
@@ -147,7 +148,7 @@ namespace emp {
     { ; }
 
     std::optional<emp::vector<size_t>> operator()(size_t n) override {
-      if (n == 0) n = default_n;
+      if (n == std::numeric_limits<size_t>::max()) n = default_n;
 
       if (n > requestSize) return std::nullopt;
       if (n >= uids.size()) return uids;
@@ -203,7 +204,7 @@ namespace emp {
       size_t n
     ) override {
 
-      if (n == 0) n = DefaultN;
+      if (n == std::numeric_limits<size_t>::max()) n = DefaultN;
 
       emp::vector<size_t> uids(uids_);
 
@@ -296,7 +297,7 @@ namespace emp {
       size_t n
     ) override {
 
-      if (n == 0) n = DefaultN;
+      if (n == std::numeric_limits<size_t>::max()) n = DefaultN;
 
       emp::vector<size_t> uids(uids_);
 
@@ -424,7 +425,7 @@ namespace emp {
       size_t n
     ) override {
 
-      if (n == 0) n = DefaultN;
+      if (n == std::numeric_limits<size_t>::max()) n = DefaultN;
 
       emp::vector<size_t> uids(uids_);
 
@@ -556,7 +557,7 @@ namespace emp {
       size_t n
     ) override {
 
-      if (n == 0) n = DefaultN;
+      if (n == std::numeric_limits<size_t>::max()) n = DefaultN;
 
       emp::vector<size_t> uids(uids_);
 

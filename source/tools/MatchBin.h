@@ -520,9 +520,12 @@ namespace emp {
     /// Compare a query tag to all stored tags using the distance metric
     /// function and return a vector of unique IDs chosen by the selector
     /// function.
-    /// Calling with n = 0 means delegate choice for how many values to return
-    /// to the Selector.
-    emp::vector<uid_t> Match(const query_t & query, size_t n=0) override {
+    /// Calling with n = std::numeric_limits<size_t>::max() means
+    /// delegate choice for how many values to return to the Selector.
+    emp::vector<uid_t> Match(
+      const query_t & query,
+      size_t n=std::numeric_limits<size_t>::max()
+    ) override {
       const auto makeResult = [&]() {
         // compute distance between query and all stored tags
         std::unordered_map<tag_t, double> matches;
@@ -581,7 +584,12 @@ namespace emp {
     /// Compare a query tag to all stored tags using the distance metric
     /// function and return a vector of unique IDs chosen by the selector
     /// function. Ignore regulators.
-    emp::vector<uid_t> MatchRaw(const query_t & query, size_t n=0) override {
+    /// Calling with n = std::numeric_limits<size_t>::max() means
+    /// delegate choice for how many values to return to the Selector.
+    emp::vector<uid_t> MatchRaw(
+      const query_t & query,
+      size_t n=std::numeric_limits<size_t>::max()
+    ) override {
       const auto makeResult = [&]() {
         // compute distance between query and all stored tags
         std::unordered_map<tag_t, double> matches;
