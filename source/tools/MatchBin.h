@@ -51,9 +51,10 @@ namespace emp {
   > class MatchBin;
 }
 
-// namespace used for caching matches,
-// as well as logging of matches and misses into a file.
 namespace emp::internal {
+  // Every time Match or MatchRaw is called on a Matchbin, and logging is enabled,
+  // this class will log the query-tag and result-tag (if any).
+  // User is responsible for calling FlushLogBuffer() to write data to a file.
   template<typename Query, typename Tag>
   class MatchBinLog {
     using query_t = Query;
@@ -70,7 +71,8 @@ namespace emp::internal {
 
     struct LogEntry {
       query_t query;
-      std::optional<tag_t> maybe_tag; // when a match results in no tags, this is a std::nullopt, and we write an empty string
+      // when a match results in no tags, this is a std::nullopt, and we write an empty string
+      std::optional<tag_t> maybe_tag;
       std::string buffer;
 
       operator size_t() const { return emp::CombineHash(query, maybe_tag, buffer); }
@@ -84,9 +86,12 @@ namespace emp::internal {
       >
     >;
 
-    size_t log_counter; // stores the number of times we wrote to file
-    size_t matchbin_id; // stores the unique ID of this log instance
-    logbuffer_t logbuffer; // stores the actual log buffer
+    // stores the number of times we wrote to file
+    size_t log_counter;
+    // stores the unique ID of this log instance
+    size_t instance_id;
+    // stores the actual log buffer
+    logbuffer_t logbuffer;
 
     #ifdef EMP_LOG_MATCHBIN
     static constexpr bool logging_enabled = true;
@@ -230,7 +235,7 @@ namespace emp::internal {
 
       /// Constucts a ContainerDataFile in place (without copy) by
       /// forwarding the arguments to the ContainerDataFile constructor,
-      /// and then setting it up.
+      /// and then setting up the variables we keep track of.
       /// Look in the ContainerDataFile constructor for this function's type signature.
       template <typename ...ARGS>
       void EmplaceDataFile(ARGS&&... arguments) {
@@ -261,14 +266,16 @@ namespace emp::internal {
       bool caching_activated{cache_available};
 
       // caches
+      // cache of regulated scores
       std::unordered_map<
         query_t,
         cache_state_t
-      > cache_regulated; // cache of regulated scores
+      > cache_regulated;
+      // cache of raw scores
       std::unordered_map<
         query_t,
         cache_state_t
-      > cache_raw; // cache of raw scores
+      > cache_raw;
 
     public:
       /// Reset the Selector cache for regulated scores.
@@ -337,7 +344,6 @@ namespace emp::internal {
         cache_raw.emplace(query, result);
       }
 
-      // TODO: fix the type name
       /// Gets query from regulated cache.
       /// User must check for existance of query in cache before calling this method.
       cache_state_t& GetRegulated(const query_t& query) {
@@ -355,9 +361,6 @@ namespace emp::internal {
 
       /// Returns size of raw cache.
       size_t RawSize() { return cache_raw.size(); }
-
-
-
   };
 }
 
@@ -915,10 +918,6 @@ namespace emp {
 
     /// Returns size of raw cache.
     size_t GetRawCacheSize() { return cache.RawSize(); }
-
-
-
-
   };
 
 }
