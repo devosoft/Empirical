@@ -1,11 +1,11 @@
 GCOV_FLAGS := -o0 -g --coverage
 
-TEST_NAMES := assert base constexpr data evo geometry meta scholar systematics tools games hardware
+TEST_NAMES := assert base constexpr data evo geometry meta scholar systematics tools games hardware matchbin_logging
 
-FLAGS := -std=c++17 -pthread -Wall -Wno-unused-function -I../source/ -I../ -I../third-party/cereal/include/ -msse4.2
+FLAGS := -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../source/ -I../ -I../third-party/cereal/include/ -msse4.2
 
-#CXX = clang++
-CXX := g++
+CXX = clang++
+#CXX := g++
 
 default: test
 
