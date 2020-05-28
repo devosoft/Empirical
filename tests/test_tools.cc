@@ -5160,6 +5160,40 @@ TEST_CASE("Test MatchBin", "[tools]")
   bin.ActivateCaching();
   REQUIRE(bin.GetRawCacheSize() == 0 );
   }
+  // test clearing the cache
+  {
+    emp::Random rand(1);
+    emp::MatchBin<
+      std::string,
+      emp::AbsDiffMetric,
+      emp::RankedSelector<std::ratio<1+1, 1>>,
+      emp::LegacyRegulator
+    > bin(rand);
+    bin.ActivateCaching();
+
+    // put some things in our matchbin
+    bin.Put("1", 1);
+    bin.Put("2", 2);
+
+    // do some matches
+    bin.Match(2);
+    bin.MatchRaw(2);
+
+    // these should be cached
+    bin.Match(2);
+    bin.MatchRaw(2);
+
+    REQUIRE( bin.GetRegulatedCacheSize() == 1);
+    REQUIRE( bin.GetRawCacheSize() == 1);
+
+    // let's clear the cache!
+    bin.ClearCache();
+
+    // cache should be empty
+    REQUIRE( bin.GetRegulatedCacheSize() == 0);
+    REQUIRE( bin.GetRawCacheSize() == 0);
+
+  }
   // serialization / deserialization
   {
   // set up
