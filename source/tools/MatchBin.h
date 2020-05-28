@@ -176,7 +176,7 @@ namespace emp::internal {
     public:
       MatchBinLog()
       : log_counter(0)
-      , matchbin_id(MakeID())
+      , instance_id(MakeID())
       , logging_activated(false)
       , datafile(EMP_LOG_MATCHBIN_FILENAME)
       { SetupDatafile(); }
@@ -233,7 +233,7 @@ namespace emp::internal {
       logbuffer_t GetLogBuffer() { return logbuffer; }
 
       /// Get this log instance's ID
-      int GetID() const { return matchbin_id; }
+      int GetID() const { return instance_id; }
 
       /// Constucts a ContainerDataFile in place (without copy) by
       /// forwarding the arguments to the ContainerDataFile constructor,
