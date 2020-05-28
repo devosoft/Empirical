@@ -246,6 +246,9 @@ namespace emp::internal {
       }
 
   };
+  // This class will cache results for recent tag queries if caching is enabled.
+  // It is automatically cleared when operations on the MatchBin would invalidate it (such
+  // as adding tags, removing tags, adjusting regulators)
   template <typename Query, typename Selector>
   class MatchBinCache {
     using query_t = Query;
