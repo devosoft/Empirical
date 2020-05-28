@@ -252,7 +252,7 @@ namespace emp::internal {
   template <typename Query, typename Selector>
   class MatchBinCache {
     using query_t = Query;
-    using cache_state_t = typename Selector::cache_state_type_t;
+    using cache_state_t = typename Selector::cache_state_t;
 
     template <typename Val,
       typename Metric,

@@ -182,7 +182,7 @@ namespace emp {
 
     RankedSelector(emp::Random&){ ; }
 
-    using cache_state_type_t = RankedCacheState;
+    using cache_state_t = RankedCacheState;
 
     std::string name() const override {
       return emp::to_string(
@@ -259,7 +259,7 @@ namespace emp {
   >
   struct RouletteSelector : public SelectorBase<RouletteCacheState> {
 
-    using cache_state_type_t = RouletteCacheState;
+    using cache_state_t = RouletteCacheState;
 
     emp::Random & rand;
 
@@ -377,7 +377,7 @@ namespace emp {
   >
   struct ExpRouletteSelector : public SelectorBase<RouletteCacheState> {
 
-    using cache_state_type_t = RouletteCacheState;
+    using cache_state_t = RouletteCacheState;
 
     emp::Random & rand;
 
@@ -524,7 +524,7 @@ namespace emp {
   >
   struct SieveSelector : public SelectorBase<SieveCacheState> {
 
-    using cache_state_type_t = SieveCacheState;
+    using cache_state_t = SieveCacheState;
 
     emp::Random & rand;
 
