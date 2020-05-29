@@ -30,8 +30,8 @@ GetUrlParams.js: GetUrlParams.cc
 js_utils.js: js_utils.cc
 	$(CXX_web) $(CFLAGS_web) js_utils.cc -o js_utils.js
 
-test_visualizations.js: test_visualizations.cc
-	$(CXX_web) $(CFLAGS_web) test_visualizations.cc -o test_visualizations.js
+test_visualizations.js: visualizations.cc
+	$(CXX_web) $(CFLAGS_web) visualizations.cc -o test_visualizations.js
 
 clean:
 	rm -f GetUrlParams.js JSWrap.js js_utils.js test_visualizations.js *.js.map *.js.mem *~ color_map

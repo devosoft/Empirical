@@ -26,7 +26,7 @@ module.exports = function(config) {
       {pattern: 'tests/web/assets/lineage-example.json', included: false},
       {pattern: 'tests/web/assets/test-line-graph.csv', included: false},
       {pattern: 'tests/web/test_visualizations.js.map', included: false},
-      {pattern: 'tests/web/test_visualizations.js'}
+      {pattern: 'tests/web/test_visualizations.js'},
       {pattern: 'tests/web/test_visualizations.wasm', included: false, nocache:true},
       {pattern: 'tests/web/test_visualizations.wasm.map', included: false, nocache:true}
     ],
