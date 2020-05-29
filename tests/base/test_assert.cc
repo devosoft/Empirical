@@ -14,19 +14,33 @@
 #include <iostream>
 
 TEST_CASE("Test assert", "[base]")
-{	
+{
+
+	// Asserts are tricky to test.  Here are a bunch that should PASS.
+  emp_assert(true);
+  REQUIRE(emp::assert_last_fail == 0);
+
+  emp_assert(100);
+  REQUIRE(emp::assert_last_fail == 0);
+
+  emp_assert(23 < 24);
+  REQUIRE(emp::assert_last_fail == 0);
+
+  emp_assert((14 < 13)?0:1);
+  REQUIRE(emp::assert_last_fail == 0);
+
 	// Best way to test different behavior of emp_assert based on compiler flags?
 
 	emp_assert(false);
 	REQUIRE(emp::assert_last_fail);
-	
+
 	/* not sure why file is assert.h and line_num is 95, is this expected behavior?
 	std::string filen = emp::assert_fail_info.filename;
 	std::string test_filen = "assert.h";
 	REQUIRE(filen.substr(filen.size()-test_filen.size()) == test_filen);
 	REQUIRE(emp::assert_fail_info.line_num == 95);
 	*/
-	
+
 	REQUIRE(emp::assert_fail_info.error == "false");
 	emp::assert_clear();
 }
