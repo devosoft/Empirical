@@ -3,6 +3,8 @@
 //  Released under the MIT Software license; see doc/LICENSE
 
 #define CATCH_CONFIG_MAIN
+#undef NDEBUG
+#define TDEBUG 1
 
 #include "third-party/Catch/single_include/catch.hpp"
 
