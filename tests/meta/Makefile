@@ -32,4 +32,9 @@ test-coverage: test-prep $(addprefix cover-test-, $(TEST_NAMES))
 clean:
 	rm -f *.out
 	rm -f *.o
+	rm -f *.gcda
+	rm -f *.gcno
+	rm -f *.info
+	rm -f *.gcov
+	rm -f ./Coverage*
 	rm -rf ./temp

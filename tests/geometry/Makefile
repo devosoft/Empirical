@@ -28,8 +28,13 @@ test: test-prep $(addprefix test-, $(TEST_NAMES))
   
 test-coverage: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../coverage_source/ -I../../ -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 -fprofile-instr-generate -fcoverage-mapping -fno-inline -fno-elide-constructors -O0 
 test-coverage: test-prep $(addprefix cover-test-, $(TEST_NAMES))
-  
+
 clean:
 	rm -f *.out
 	rm -f *.o
+	rm -f *.gcda
+	rm -f *.gcno
+	rm -f *.info
+	rm -f *.gcov
+	rm -f ./Coverage*
 	rm -rf ./temp
