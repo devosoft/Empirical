@@ -29,6 +29,20 @@ test: test-prep $(addprefix test-, $(TEST_NAMES))
 test-coverage: FLAGS := -std=c++17 -g -pthread -Wall -Wno-unused-function -I../../coverage_source/ -I../../ -I../../third-party/cereal/include/ -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 -fprofile-instr-generate -fcoverage-mapping -fno-inline -fno-elide-constructors -O0
 test-coverage: test-prep $(addprefix cover-test-, $(TEST_NAMES))
 
+# Test optimized version without debug features
+opt: FLAGS := -std=c++17 -pthread -DNDEBUG -O3 -Wno-unused-function -DCI=$(CI) -I../../source/ -I../../third-party/cereal/include/ -I../../
+opt: test-prep $(addprefix test-, $(TEST_NAMES))
+	rm -rf test*.out
+
+# Test in debug mode with pointer tracking
+fulldebug: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../source/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 # -Wmisleading-indentation
+fulldebug: test-prep $(addprefix test-, $(TEST_NAMES))
+	rm -rf test*.out
+
+cranky: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../source/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
+cranky: test-prep $(addprefix test-, $(TEST_NAMES))
+	rm -rf test*.out
+
 clean:
 	rm -f *.out
 	rm -f *.o
