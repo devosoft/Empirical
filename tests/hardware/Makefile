@@ -30,7 +30,7 @@ test-coverage: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../.
 test-coverage: test-prep $(addprefix cover-test-, $(TEST_NAMES))
 
 # Test optimized version without debug features
-opt: FLAGS := -std=c++17 -pthread -DNDEBUG -O3 -Wno-unused-function -DCI=$(CI) -I../../source/ -I../../third-party/cereal/include/ -I../../
+opt: FLAGS := -std=c++17 -pthread -DNDEBUG -O3 -Wno-unused-function -I../../source/ -I../../third-party/cereal/include/ -I../../
 opt: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
