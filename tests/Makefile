@@ -13,7 +13,7 @@ test: $(addprefix test-, $(TEST_NAMES))
 cover-test-%:
 	cd $(@:cover-test-%=%) && make test-coverage
 
-test-coverage: $(addprefix cover-test-, $(TEST_NAMES))
+test-coverage: coverage_conversion $(addprefix cover-test-, $(TEST_NAMES))
 
 coverage_conversion:
 	  ./convert_for_tests.sh
