@@ -1,4 +1,4 @@
-TEST_NAMES = alert BitMatrix BitSet bitset_utils BitVector Cache combos ContiguousStream DFA Distribution DynamicString File flex_function functions FunctionSet genericfunction Graph graph_utils hash_utils InexMap info_theory keyname_utils Lexer lexer_utils map_utils MatchBin matchbin_utils math memo_function mem_track NFA NullStream Random random_utils Range RegEx sequence_utils set_utils SolveState stats string_utils tuple_utils TypeTracker UnorderedIndexMap vector_utils
+TEST_NAMES = alert BitMatrix BitSet bitset_utils BitVector Cache combos ContiguousStream DFA Distribution DynamicString File flex_function functions FunctionSet genericfunction Graph graph_utils hash_utils IndexMap info_theory keyname_utils Lexer lexer_utils map_utils MatchBin matchbin_utils math memo_function mem_track NFA NullStream Random random_utils Range RegEx sequence_utils set_utils SolveState stats string_utils tuple_utils TypeTracker UnorderedIndexMap vector_utils
 
 #  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -I../../source/ -I../../ -I../../third-party/cereal/include/
