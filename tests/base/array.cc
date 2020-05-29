@@ -3,8 +3,9 @@
 //  Released under the MIT Software license; see doc/LICENSE
 
 #define CATCH_CONFIG_MAIN
-#undef NDEBUG
-#define TDEBUG 1
+#ifndef NDEBUG
+	#define TDEBUG
+#endif
 
 #include "third-party/Catch/single_include/catch.hpp"
 
@@ -18,6 +19,7 @@ TEST_CASE("Test array", "[base]")
 	const size_t SIZE = 10;
 	emp::array<int, SIZE> arr = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 	REQUIRE(arr[5] == 5);
+#ifndef NDEBUG
 	emp::array<int, SIZE> arr2(arr.begin(), arr.end());
 	REQUIRE(arr == arr2);
 	std::array<int, SIZE> s_arr = (std::array<int,SIZE>) arr2;
@@ -79,6 +81,7 @@ TEST_CASE("Test array", "[base]")
 	arr.emplace_back(12);
 	REQUIRE(emp::assert_last_fail);
 	emp::assert_clear();
+#endif
 }
 
 TEST_CASE("Another test array", "[base]")

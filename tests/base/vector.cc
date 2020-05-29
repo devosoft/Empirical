@@ -15,7 +15,7 @@ TEST_CASE("Test vector", "[base]")
 		sum += *it;
 	}
 	REQUIRE(sum == "abc");
-	
+
 	/// This throws an error...
 	// because it's a reverse iterator?
 	//sum += *vec.rend();
@@ -24,7 +24,7 @@ TEST_CASE("Test vector", "[base]")
 	auto itr = vec.emplace(vec.begin()+1, "1");
 	REQUIRE(*itr == "1");
 	REQUIRE(*(itr-1) == "a");
-	
+
 	emp::vector<bool> bvec;
 	bvec.resize(1);
 	REQUIRE(bvec.size() == 1);
@@ -32,23 +32,25 @@ TEST_CASE("Test vector", "[base]")
 	REQUIRE(bvec[0] == true);
 	bvec.resize(5,false);
 	REQUIRE(bvec[1] == false);
-	
+
 	/// Can't seem to get front() and back() to work for bool vector
 	/// throws error on this line in vector.h "size_t pos = (size_t) (*this - v_ptr->begin());"
 	//auto b = bvec.front();
-	
+
 	emp::vector<bool> bvec2 = { true, false, true, false };
 	REQUIRE(bvec2.size() == 4);
 	bvec2.pop_back();
 	REQUIRE(bvec2.size() == 3);
-	
+
+#ifndef NDEBUG
 	std::stringstream ss;
 	ss << bvec2;
 	REQUIRE(ss.str() == "1 0 1 ");
 	ss.str(std::string());
+#endif
 	
 	emp::vector<bool> bvec3(3);
-	/// Can't do this 
+	/// Can't do this
 	/// "error: invalid initialization of non-const reference of type 'bool&' from an rvalue of type 'bool'"
 	//ss >> bvec3;
 }
