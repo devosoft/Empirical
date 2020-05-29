@@ -1,6 +1,6 @@
 GCOV_FLAGS := -o0 -g --coverage
 
-TEST_NAMES := data evo geometry systematics hardware
+TEST_NAMES := data evo geometry hardware
 
 FLAGS := -std=c++17 -pthread -Wall -Wno-unused-function -I../source/ -I../ -I../third-party/cereal/include/ -msse4.2
 
