@@ -2,7 +2,6 @@
 //#define EMP_TRACK_MEM
 
 #define CATCH_CONFIG_MAIN
-#define TDEBUG 1
 
 #include "third-party/Catch/single_include/catch.hpp"
 
@@ -24,7 +23,7 @@ TEST_CASE("Test Ptr", "[base]")
 
 	int arr1[5] = {-4, -3, -2, -1, 0};
 	auto & tracker = emp::PtrTracker::Get();
-	tracker.NewArray(arr1, 5);
+	tracker.NewArray(arr1, 5 * sizeof(int));
 	REQUIRE(tracker.HasPtr(arr1));
 	size_t arr1ID = tracker.GetCurID(arr1);
 	REQUIRE(tracker.IsActiveID(arr1ID));
@@ -37,13 +36,13 @@ TEST_CASE("Test Ptr", "[base]")
 	arr1ptr.NewArray(10);
 	//REQUIRE(arr1ptr.DebugGetArrayBytes() == (10 * sizeof(int)));
 
+	size_t arr1ptrID = tracker.GetCurID(arr1ptr.Raw());
+
 	arr1ptr.DeleteArray();
+	REQUIRE(!tracker.IsActiveID(arr1ptrID));
 
 	tracker.MarkDeleted(arr1ID);
 	REQUIRE(!tracker.IsActiveID(arr1ID));
-	size_t arr1ptrID = tracker.GetCurID(arr1ptr);
-	tracker.MarkDeleted(arr1ptrID);
-	tracker.MarkDeleted(tracker.GetCurID(arr));
 
 	int num = 123;
 	int* num_ptr = &num;
