@@ -39,6 +39,7 @@ test: test-prep $(addprefix test-, $(TEST_NAMES))
 	cd scholar && make test
 	cd meta && make test
 	cd constexpr && make test
+	cd config && make test
 
 # Test optimized version without debug features
 opt: FLAGS := -std=c++17 -pthread -DNDEBUG -O3 -Wno-unused-function -DCI=$(CI) -I../source/ -I../third-party/cereal/include/ -I../
@@ -73,6 +74,7 @@ test-coverage: coverage_conversion test-prep $(addprefix cover-test-, $(TEST_NAM
 	cd scholar && make test-coverage
 	cd meta && make test-coverage
 	cd constexpr && make test-coverage
+	cd config && make test-coverage
 	rm -r ../coverage_source
 
 clean:

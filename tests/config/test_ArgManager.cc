@@ -12,30 +12,11 @@
 #include "base/assert.h"
 #include "base/vector.h"
 #include "config/ArgManager.h"
-#include "config/command_line.h"
 #include "config/config.h"
-#include "config/config_setup.h"
+#include "assets/config_setup.h"
 
-TEST_CASE("Test config", "[config]"){
-
-  // test config class template
-  {
-
-    MyConfig config;
-    config.Read("config/test.cfg");
-
-    std::cout << "Random seed = " << config.RANDOM_SEED() << std::endl;
-
-    REQUIRE(config.RANDOM_SEED() == 333);
-    REQUIRE(config.TEST_STRING() == "default");
-
-    config.RANDOM_SEED(123);
-
-    std::cout << "Random seed = " << config.RANDOM_SEED() << std::endl;
-
-    REQUIRE(config.RANDOM_SEED() == 123);
-
-  }
+TEST_CASE("Test ArgManager", "[config]")
+{
 
   // old ArgManager in cl namespace
   {
