@@ -44,6 +44,8 @@ native-test:
 	$(MAKE) -C hardware/
 	$(MAKE) -C meta/
 	$(MAKE) -C tools/
+
+native-test-debug:
 	$(MAKE) debug -C base/
 	$(MAKE) debug -C control/
 	$(MAKE) debug -C data/

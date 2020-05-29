@@ -1,21 +1,30 @@
-test:
+test: test-native test-examples test-web
 	make test-native
 	make test-examples
 	make test-web	
 
-test-examples:
-	cd examples && make
-	cd examples && make debug
+test-examples: test-native-examples test-web-examples
 
-test-native:
+test-native: test-native-regular test-native-fulldebug test-native-opt test-native-examples
+
+test-native-regular:
 	cd tests && make test
+
+test-native-fulldebug:
 	cd tests && make fulldebug
+
+test-native-opt:
 	cd tests && make opt
+
+test-native-examples:
 	cd examples && make native-test
+	cd examples && make native-test-debug
+
+test-web-examples:
+	cd examples && make web-test
 
 test-web:
 	cd tests && make test-web
-	cd examples && make web-test
 
 doc: build-doxygen-xml
 	cd doc && ./make_docs.sh
