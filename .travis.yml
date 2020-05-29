@@ -34,6 +34,8 @@ install:
 - npm install source-map
 - make install-test-dependencies
 - source third-party/emsdk/emsdk_env.sh
+services:
+  - xvfb
 before_script:
 - ${CXX} --version
 script:
