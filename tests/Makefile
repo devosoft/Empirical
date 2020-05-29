@@ -1,6 +1,6 @@
 GCOV_FLAGS := -o0 -g --coverage
 
-TEST_NAMES :=  constexpr data evo geometry meta systematics tools hardware
+TEST_NAMES :=  constexpr data evo geometry systematics tools hardware
 
 FLAGS := -std=c++17 -pthread -Wall -Wno-unused-function -I../source/ -I../ -I../third-party/cereal/include/ -msse4.2
 
@@ -37,6 +37,7 @@ test: test-prep $(addprefix test-, $(TEST_NAMES))
 	cd games && make test
 	cd hardware && make test
 	cd scholar && make test
+	cd meta && make test
 
 # Test optimized version without debug features
 opt: FLAGS := -std=c++17 -pthread -DNDEBUG -O3 -Wno-unused-function -DCI=$(CI) -I../source/ -I../third-party/cereal/include/ -I../
@@ -69,6 +70,7 @@ test-coverage: coverage_conversion test-prep $(addprefix cover-test-, $(TEST_NAM
 	cd hardware && make test-coverage
 	cd geometry && make test-coverage
 	cd scholar && make test-coverage
+	cd meta && make test-coverage
 	rm -r ../coverage_source
 
 clean:
