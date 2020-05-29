@@ -24,4 +24,12 @@ TEST_CASE("Test Circle2D", "[geometry]")
   emp::Circle circle_xyr(7.0, 10.0, 3.0);
   REQUIRE(circle_xyr.GetCenterX() == 7.0);
   REQUIRE(circle_xyr.GetCenterY() == 10.0);
+
+  circle_xyr.SetCenter(4.0,9.0);
+  REQUIRE(circle_xyr.GetCenterX() == 4.0);
+  REQUIRE(circle_xyr.GetCenterY() == 9.0);
+
+  circle_xyr.SetCenterY(11.0);
+  REQUIRE(circle_xyr.GetCenterY() == 11.0);
+
 }
