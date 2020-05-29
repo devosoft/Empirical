@@ -2,6 +2,7 @@
 //#define EMP_TRACK_MEM
 
 #define CATCH_CONFIG_MAIN
+#define TDEBUG 1
 
 #include "third-party/Catch/single_include/catch.hpp"
 
