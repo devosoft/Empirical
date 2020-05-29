@@ -36,10 +36,12 @@ TEST_CASE("Test Ptr", "[base]")
 	arr1ptr.NewArray(10);
 	//REQUIRE(arr1ptr.DebugGetArrayBytes() == (10 * sizeof(int)));
 
-
-	arr1ptr.DeleteArray();
 #ifdef EMP_TRACK_MEM
 	size_t arr1ptrID = tracker.GetCurID(arr1ptr.Raw());
+	REQUIRE(tracker.IsActiveID(arr1ptrID));
+#endif
+	arr1ptr.DeleteArray();
+#ifdef EMP_TRACK_MEM
 	REQUIRE(!tracker.IsActiveID(arr1ptrID));
 #endif
 
