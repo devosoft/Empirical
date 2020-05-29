@@ -8,7 +8,7 @@ module.exports = function(config) {
     basePath: '../../',
 
     proxies: {
-      "/tests/": "/base/tests"
+      "/assets/": "/base/tests/web/assets"
     },
 
     // frameworks to use
