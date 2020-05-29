@@ -200,7 +200,7 @@ namespace D3 {
         char * buffer = (char *) EM_ASM_INT({
           var text = js.objects[$0]($1);
           var buffer = Module._malloc(text.length+1);
-    	  Module.writeStringToMemory(text, buffer);
+    	  Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
     	  return buffer;
         }, this->id, d);
         std::string result = std::string(buffer);
