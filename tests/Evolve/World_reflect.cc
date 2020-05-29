@@ -1,5 +1,7 @@
 #define CATCH_CONFIG_MAIN
-#define EMP_TDEBUG
+#ifndef NDEBUG
+	#define TDEBUG
+#endif
 
 #include "third-party/Catch/single_include/catch.hpp"
 
@@ -35,7 +37,7 @@ TEST_CASE("Test World reflect", "[Evolve]")
 	REQUIRE(ss.str() == "2.2 8.5 9.3 ");
 	ss.str(std::string());
 
-	#ifdef EMP_TDEBUG
+	#ifndef NDEBUG
 	emp::SetDefaultFitFun_impl<emp::World<double>, double>(world);
 	double org = 2.2;
 	world.CalcFitnessOrg(org);

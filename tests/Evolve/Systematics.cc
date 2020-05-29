@@ -1,5 +1,7 @@
 #define CATCH_CONFIG_MAIN
-#define EMP_TDEBUG
+#ifndef NDEBUG
+	#define TDEBUG
+#endif
 
 #include "third-party/Catch/single_include/catch.hpp"
 
@@ -78,7 +80,7 @@ TEST_CASE("Test Systematics", "[Evolve]")
 	sys1.SetStorePosition(false);
 	REQUIRE(sys1.GetStorePosition() == false);
 
-	#ifdef EMP_TDEBUG
+	#ifndef NDEBUG
 	sys1.AddDeleteriousStepDataNodeImpl(true);
 	REQUIRE(emp::assert_last_fail);
 	emp::assert_clear();
