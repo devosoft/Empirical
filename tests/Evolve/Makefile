@@ -1,4 +1,4 @@
-TEST_NAMES = world world_structure world_select nk systematics world_reflect resource
+TEST_NAMES = World World_structure World_select NK Systematics World_reflect Resource
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../source/ -I../../
