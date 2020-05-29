@@ -11,7 +11,7 @@ test-%:
 test: $(addprefix test-, $(TEST_NAMES))
 
 cover-test-%:
-	cd $(@:test-%=%) && make cover-test
+	cd $(@:cover-test-%=%) && make cover-test
 
 test-coverage: $(addprefix cover-test-, $(TEST_NAMES))
 
@@ -19,17 +19,17 @@ coverage_conversion:
 	  ./convert_for_tests.sh
 
 opt-%:
-	cd $(@:test-%=%) && make opt
+	cd $(@:opt-%=%) && make opt
 
 opt: $(addprefix opt-, $(TEST_NAMES))
 
 fulldebug-%:
-	cd $(@:test-%=%) && make fulldebug
+	cd $(@:fulldebug-%=%) && make fulldebug
 
 fulldebug: $(addprefix fulldebug-, $(TEST_NAMES))
 
 cranky-%:
-	cd $(@:test-%=%) && make cranky
+	cd $(@:cranky-%=%) && make cranky
 
 cranky: $(addprefix cranky-, $(TEST_NAMES))
 
@@ -48,4 +48,4 @@ clean: $(addprefix clean-, $(TEST_NAMES)) clean-web
 	rm -rf ./temp
 
 clean-%:
-	cd $(@:test-%=%) && make clean
+	cd $(@:clean-%=%) && make clean
