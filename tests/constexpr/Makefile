@@ -1,7 +1,7 @@
 TEST_NAMES = ce_array ce_random ce_string
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
-FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -I../../source/ -I../../ -I../../third-party/cereal/include/
+FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../source/ -I../../ -I../../third-party/cereal/include/
 
 default: test
 

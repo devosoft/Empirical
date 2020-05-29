@@ -1,7 +1,7 @@
 TEST_NAMES = Body2D Circle2D Point2D
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
-FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -I../../source/ -I../../
+FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../source/ -I../../
 
 default: test
 

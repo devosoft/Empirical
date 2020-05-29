@@ -1,7 +1,7 @@
 TEST_NAMES = DataFile DataManager DataNode DataInterface
 
 #  -Wl,--stack,8388608 -ftrack-macro-expansion=0
-FLAGS = -std=c++17 -Wall -Wno-unused-function -I../../source/ -I../../
+FLAGS = -std=c++17 -Wall -Wno-unused-function -Wno-unused-private-field -I../../source/ -I../../
 
 default: test
 

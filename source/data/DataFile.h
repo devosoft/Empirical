@@ -149,8 +149,8 @@ namespace emp {
       os->flush();
     }
 
-    /// If Update is called with an update number, call the full version of update only if the update value
-    /// passes the timing function (that is, the timing function returns true).
+    /// If Update is called with an update number, call the full version of update only if the
+    /// update value passes the timing function (that is, the timing function returns true).
     virtual void Update(size_t update) { if (timing_fun(update)) Update(); }
 
 
@@ -450,10 +450,9 @@ namespace emp {
     emp::vector<std::string> container_descs;
 
   public:
-
-    ContainerDataFile(const std::string & filename,
-             const std::string & b="", const std::string & s=",", const std::string & e="\n")
-             : DataFile(filename, b, s, e), update_container_fun(), current_rows() {;}
+    template <typename ...ARGS>
+    explicit ContainerDataFile(ARGS&& ...arguments)
+      : DataFile(std::forward<ARGS>(arguments)...), update_container_fun(), current_rows() {;}
 
     ~ContainerDataFile() {;}
 

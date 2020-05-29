@@ -1,7 +1,7 @@
 TEST_NAMES := base config constexpr data Evolve games geometry hardware meta scholar tools
 
-#CXX = clang++
-CXX := g++
+CXX = clang++
+#CXX := g++
 
 default: test
 

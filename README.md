@@ -1,3 +1,5 @@
+![Empirical Logo](/doc/EmpiricalBanner.png)
+
 Empirical is a library of tools for developing efficient, reliable, and accessible scientific
 software.  The provided code is header-only and encapsulated into the emp namespace, so it
 is simple to incorporate into existing projects.

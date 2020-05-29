@@ -215,7 +215,7 @@ namespace emp {
     /// Retrieve a variable by its type and name. (Slower!)
     template <typename T>
     T & Get(const std::string & name) {
-      emp_assert(HasName(name));
+      emp_assert(HasName(name), name);
       emp_assert(IsType<T>(name), "DataMap::Get() must be provided the correct type.",
                  name, GetType(name), emp::GetTypeID<T>());
       return memory.Get<T>(GetID(name));
@@ -281,8 +281,16 @@ namespace emp {
     template <typename... Ts> size_t AddStringVar(Ts &&... args) { return AddVar<std::string>(args...); }
     template <typename... Ts> size_t AddValueVar(Ts &&... args) { return AddVar<double>(args...); }
 
+    /// Test if this DataMap is using the identical layout as another DataMap.
+    bool SameLayout(const emp::DataMap & in_dm) const {
+      return layout_ptr == in_dm.layout_ptr;
+      // @CAO: Should we also see if it's using a different layout object, but otherwise identical?
+    }
+
+    /// Test if this layout is locked (i.e., it cannot be changed.)
     bool IsLocked() const { return layout_ptr && layout_ptr->IsLocked(); }
 
+    /// Prevent this DataMap's layout from having any additional changed made to it.
     void LockLayout() {
       MakeLayoutUnique();
       layout_ptr->Lock();
