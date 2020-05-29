@@ -11,7 +11,7 @@ test-%:
 test: $(addprefix test-, $(TEST_NAMES))
 
 cover-test-%:
-	cd $(@:cover-test-%=%) && make cover-test
+	cd $(@:cover-test-%=%) && make test-coverage
 
 test-coverage: $(addprefix cover-test-, $(TEST_NAMES))
 
