@@ -7,6 +7,11 @@
 #include <sstream>
 #include <map>
 
+TEST_CASE("Test serialize", "[tools]")
+{
+
+}
+
 // struct SerializeTest {
 //   int a;
 //   float b;        // unimportant data!
