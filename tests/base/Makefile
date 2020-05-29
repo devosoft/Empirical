@@ -5,7 +5,7 @@ FLAGS = -std=c++17 -DTDEBUG -Wall -Wno-unused-function -I../../source/ -I../../
 
 default: test
 
-cover-test-%: test_%.cc
+cover-test-%: %.cc
 	$(CXX) $(FLAGS) $< -o $@.out
 	#echo "running $@.out"
 	# execute test
@@ -17,7 +17,7 @@ cover-test-%: test_%.cc
 test-prep:
 	mkdir -p temp
 
-test-%: test_%.cc
+test-%: %.cc
 	$(CXX) $(FLAGS) $< -o $@.out
 	# execute test
 	./$@.out
