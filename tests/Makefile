@@ -8,29 +8,34 @@ default: test
 test-%:
 	cd $(@:test-%=%) && make test
 
+test: $(addprefix test-, $(TEST_NAMES))
+
 cover-test-%:
 	cd $(@:test-%=%) && make cover-test
 
-# Test in debug mode without pointer tracker
-test: $(addprefix test-, $(TEST_NAMES))
-
-opt-%:
-	cd $(@:test-%=%) && make opt
-
-fulldebug-%:
-	cd $(@:test-%=%) && make fulldebug
-
-cranky-%:
-	cd $(@:test-%=%) && make cranky
-
-test-web:
-	  cd web && bash run_tests.sh
-	  cd .. && third-party/node_modules/karma/bin/karma start tests/web/karma.conf.js
+test-coverage: $(addprefix cover-test-, $(TEST_NAMES))
 
 coverage_conversion:
 	  ./convert_for_tests.sh
 
-test-coverage: $(addprefix cover-test-, $(TEST_NAMES))
+opt-%:
+	cd $(@:test-%=%) && make opt
+
+opt: $(addprefix opt-, $(TEST_NAMES))
+
+fulldebug-%:
+	cd $(@:test-%=%) && make fulldebug
+
+fulldebug: $(addprefix fulldebug-, $(TEST_NAMES))
+
+cranky-%:
+	cd $(@:test-%=%) && make cranky
+
+cranky: $(addprefix cranky-, $(TEST_NAMES))
+
+test-web:
+	  cd web && bash run_tests.sh
+	  cd .. && third-party/node_modules/karma/bin/karma start tests/web/karma.conf.js
 
 clean: $(addprefix clean-, $(TEST_NAMES)) clean-web
 	rm -f *.out
