@@ -489,10 +489,9 @@ namespace emp {
     emp::vector<std::string> container_descs;
 
   public:
-
-    ContainerDataFile(const std::string & filename,
-             const std::string & b="", const std::string & s=",", const std::string & e="\n")
-             : DataFile(filename, b, s, e), update_container_fun(), current_rows() {;}
+    template <typename ...ARGS>
+    explicit ContainerDataFile(ARGS&& ...arguments)
+      : DataFile(std::forward<ARGS>(arguments)...), update_container_fun(), current_rows() {;}
 
     ~ContainerDataFile() {;}
 
