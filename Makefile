@@ -30,7 +30,7 @@ doc: build-doxygen-xml
 	cd doc && ./make_docs.sh
 
 coverage:
-	cd tests && make test-coverage
+	cd tests && make coverage
 
 build-doxygen-xml:
 	./third-party/doxygen/build/bin/doxygen Doxyfile
