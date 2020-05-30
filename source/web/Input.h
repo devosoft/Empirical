@@ -53,7 +53,7 @@ namespace web {
       std::string step = "";
 
       std::string curr_val ="";
-      bool show_value = true;
+      bool show_value = false;
       bool autofocus;
 
       std::function<void(std::string)> callback;
@@ -78,7 +78,7 @@ namespace web {
         // CSS from https://stackoverflow.com/questions/46695616/align-range-slider-and-label
 
         HTML.str("");                                           // Clear the current text.
-        HTML << "<form style=\"display:flex; flex-flow:row; align-items:center;\">";                                       // Needs to be part of form for label + output to work
+        // HTML << "<form style=\"display:flex; flex-flow:row; align-items:center;\">";                                       // Needs to be part of form for label + output to work
         if (label != "") {                                      // Add label, if one exists
           HTML << "<label for=\"" << id << "\"> ";
           HTML << label <<  "</label>";
@@ -94,7 +94,7 @@ namespace web {
         if (show_value) {
           HTML << "<output for=" << id << "onforminput=\"value = " << id << ".valueAsNumber;\"></output>";         // Add output to show value of slider
         }
-        HTML << "</form>";
+        // HTML << "</form>";
       }
 
       virtual void TriggerJS() override {
@@ -237,7 +237,7 @@ namespace web {
     /// @param in_label The label that should appear on the Input.
     /// @param in_id The HTML ID to use for this Input (leave blank for auto-generated)
     Input(const std::function<void(std::string)> & in_cb, const std::string & in_type,
-          const std::string & in_label, const std::string & in_id="", bool show_value=true)
+          const std::string & in_label, const std::string & in_id="", bool show_value=false)
       : WidgetFacet(in_id)
     {
       info = new InputInfo(in_id);

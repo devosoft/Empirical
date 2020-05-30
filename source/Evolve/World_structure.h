@@ -227,7 +227,7 @@ namespace emp {
     }
     const size_t num_traits = traits.GetSize();
     size_t trait_size = 1;
-    while (Pow(trait_size+1, num_traits) < world.GetSize()) trait_size++;
+    while (std::pow(trait_size+1, num_traits) < world.GetSize()) trait_size++;
     trait_counts.resize(num_traits, trait_size);
     SetMapElites(world, traits, trait_counts);
   }

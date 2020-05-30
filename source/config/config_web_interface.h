@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "../web/Div.h"
+#include "../web/Element.h"
 #include "../web/Input.h"
 
 #include <map>
@@ -76,6 +77,7 @@ namespace emp {
             } 
 
             void Setup(const std::string & id_prefix = "settings_") {
+                
                 for (auto group : config.group_set) {
                     // std::cout << "GROUP: " << group->GetName() << std::endl;
                     std::string group_name = group->GetName();
@@ -93,11 +95,11 @@ namespace emp {
                         if (Has(numeric_types, type)) {
                             input_map[name] = emp::web::Input(
                                 [this, name](std::string val){
-                                                            //   std::cout << name << " " << val << " " <<config.Get(name) << std::endl;
+                                                              std::cout << name << " " << val << " " <<config.Get(name) << std::endl;
                                                               config.Set(name, val);
-                                                            //   std::cout << config.Get(name) << std::endl;
+                                                              std::cout << config.Get(name) << std::endl;
                                                               on_change_fun(val);},
-                                "range", format_label_fun(name), name + "_input_slider"
+                                "range", format_label_fun(name), name + "_input_slider", true
                             );
 
                             // Attempt to have intelligent defaults
@@ -127,7 +129,7 @@ namespace emp {
 
                         input_map[name].Value(value); 
 
-                        group_divs[group_name] << input_map[name];
+                        group_divs[group_name] << web::Element("form") << input_map[name];
 
                     }
                     settings_div << group_divs[group_name];
