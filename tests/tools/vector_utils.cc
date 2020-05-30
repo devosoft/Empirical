@@ -93,6 +93,7 @@ TEST_CASE("Test vector_utils", "[tools]")
 
 TEST_CASE("Another Test vector utils", "[tools]") {
   emp::vector<int> v1({6,2,5,1,3});
+  emp::vector<int> v2({7,6,7,1,7});
   emp::Sort(v1);
   REQUIRE(v1 == emp::vector<int>({1,2,3,5,6}));
   REQUIRE(emp::FindValue(v1, 3) == 2);
@@ -101,6 +102,8 @@ TEST_CASE("Another Test vector utils", "[tools]") {
   REQUIRE(!emp::Has(v1, 4));
   REQUIRE(emp::Product(v1) == 180);
   REQUIRE(emp::Slice(v1,1,3) == emp::vector<int>({2,3}));
+  REQUIRE(emp::Count(v1, 2) == 1);
+  REQUIRE(emp::Count(v2, 7) == 3);
 
   // Test handling vector-of-vectors.
   using vv_int_t = emp::vector< emp::vector< int > >;

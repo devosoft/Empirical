@@ -129,7 +129,22 @@ TEST_CASE("Test string_utils", "[tools]")
 	REQUIRE(int_numbers[1] == 2);
 	REQUIRE(int_numbers[2] == 3);
 	
-	// TODO: try this with more arguments
+  REQUIRE(emp::is_digits("391830581734"));
+  REQUIRE(!emp::is_digits("3h91830581734"));
+  REQUIRE(emp::is_alphanumeric("39adg18af3tj05ykty81734"));
+  REQUIRE(!emp::is_alphanumeric("39adg18af?3tj05ykty81734"));
+  REQUIRE(emp::is_literal_char("'f'"));
+  REQUIRE(!emp::is_literal_char("f"));
+  REQUIRE(emp::is_literal_char("'\n'"));
+  REQUIRE(emp::from_literal_char("'f'") == 'f');
+  REQUIRE(emp::from_literal_char("'\n'") == '\n');
+  REQUIRE(emp::is_literal_string("\"Hello!\""));
+  REQUIRE(!emp::is_literal_string("\"He\"llo!\""));
+  REQUIRE(emp::is_literal_string("\"Hel\nlo!\""));
+  REQUIRE(emp::from_literal_string("\"Hello!\"") == "Hello!");
+  REQUIRE(emp::from_literal_string("\"Hel\nlo!\"") == "Hel\nlo!");
+
+  // TODO: try this with more arguments
 	int one;
 	emp::from_string<int>("1", one);
 	REQUIRE(one == 1);
@@ -340,6 +355,8 @@ TEST_CASE("Another Test string_utils", "[tools]")
   REQUIRE(cat_full == "ABC123");
   emp::array<int, 3> test_arr({{ 4, 2, 5 }});
   REQUIRE(emp::to_string(test_arr) == "[ 4 2 5 ]");
+  REQUIRE(emp::count(emp::to_string(test_arr), ' ') == 4);
+  REQUIRE(emp::join(emp::vector<size_t>({17,18,19}), ",") == "17,18,19");
 
   // tests adapted from https://stackoverflow.com/questions/5288396/c-ostream-out-manipulation/5289170#5289170
   std::string els[] = { "aap", "noot", "mies" };
