@@ -6,7 +6,7 @@ FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field
 default: test
 
 coverage-%: %.cc
-	$(CXX) $(FLAGS) $< -o $@.out
+	$(CXX) $(FLAGS) $< -lstdc++fs -o $@.out
 	#echo "running $@.out"
 	# execute test
 	./$@.out
@@ -18,7 +18,7 @@ test-prep:
 	mkdir -p temp
 
 test-%: %.cc
-	$(CXX) $(FLAGS) $< -o $@.out
+	$(CXX) $(FLAGS) $< -lstdc++fs -o $@.out
 	# execute test
 	./$@.out
 
