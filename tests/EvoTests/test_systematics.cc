@@ -1,27 +1,21 @@
 #define CATCH_CONFIG_MAIN
-#ifndef NDEBUG
-	#define TDEBUG
-#endif
+#define EMP_TDEBUG
 
 #include "third-party/Catch/single_include/catch.hpp"
 
 #include "Evolve/SystematicsAnalysis.h"
-
-#include <sstream>
-#include <iostream>
-
 #include "Evolve/Systematics.h"
-#include "Evolve/SystematicsAnalysis.h"
 #include "Evolve/World.h"
 #include "base/vector.h"
 #include <iostream>
 #include "hardware/AvidaGP.h"
 #include "Evolve/World_output.h"
 
+#include <sstream>
+#include <iostream>
 
 TEST_CASE("Test Systematics", "[Evolve]")
 {
-
 	// Taxon
 	emp::Taxon<std::string> tx(0, "a");
 	REQUIRE(tx.GetID() == 0);
@@ -35,14 +29,14 @@ TEST_CASE("Test Systematics", "[Evolve]")
 	REQUIRE(tx.GetNumOrgs() == 0);
 	REQUIRE(tx.GetTotOrgs() == 1);
 	REQUIRE(tx.GetTotalOffspring() == 0);
-
+	
 	emp::Ptr< emp::Taxon<std::string, emp::datastruct::no_data> > parentPtr(&tx);
 	emp::Taxon<std::string> tx_1(1, "b", parentPtr);
 	REQUIRE(tx_1.GetParent() == parentPtr);
 	tx_1.AddTotalOffspring();
 	REQUIRE(tx_1.GetTotalOffspring() == 1);
 	REQUIRE(tx.GetTotalOffspring() == 1);
-
+	
 	// Systematics
 	std::function<std::string(double &)> calc_taxon = [](double & o){ return o > 50.0 ? "large" : "small"; };
 	emp::Systematics<double, std::string> sys1(calc_taxon);
@@ -52,7 +46,7 @@ TEST_CASE("Test Systematics", "[Evolve]")
 	REQUIRE(sys1.GetNumOutside() == 0);
 	REQUIRE(sys1.GetTreeSize() == 0);
 	REQUIRE(sys1.GetNumTaxa() == 0);
-
+	
 	sys1.SetTrackSynchronous(true);
 	sys1.AddOrg(15.0, {0,0}, 0);
 	REQUIRE(sys1.GetNumActive() == 1);
@@ -62,7 +56,7 @@ TEST_CASE("Test Systematics", "[Evolve]")
 	REQUIRE(sys1.GetNextTaxonAt(1)->GetInfo() == "large");
 	sys1.RemoveOrg({1,1});
 	REQUIRE(sys1.GetNumActive() == 1);
-
+	
 	// Base setters and getters
 	REQUIRE(sys1.GetStoreActive() == true);
 	REQUIRE(sys1.GetStoreAncestors() == true);
@@ -79,25 +73,25 @@ TEST_CASE("Test Systematics", "[Evolve]")
 	REQUIRE(sys1.GetArchive() == false);
 	sys1.SetStorePosition(false);
 	REQUIRE(sys1.GetStorePosition() == false);
-
-	#ifndef NDEBUG
+	
+	#ifdef EMP_TDEBUG
 	sys1.AddDeleteriousStepDataNodeImpl(true);
 	REQUIRE(emp::assert_last_fail);
 	emp::assert_clear();
-
+	
 	sys1.AddVolatilityDataNodeImpl(true);
 	REQUIRE(emp::assert_last_fail);
 	emp::assert_clear();
-
+	
 	sys1.AddUniqueTaxaDataNodeImpl(true);
 	REQUIRE(emp::assert_last_fail);
 	emp::assert_clear();
-
+	
 	sys1.AddMutationCountDataNodeImpl(true);
 	REQUIRE(emp::assert_last_fail);
 	emp::assert_clear();
 	#endif
-
+	
 	// Analysis
 	using my_taxon = emp::Taxon<std::string, emp::datastruct::mut_landscape_info<double>>;
 	//emp::Systematics<double, std::string, emp::datastruct::mut_landscape_info> sys2(calc_taxon)
@@ -114,7 +108,7 @@ TEST_CASE("Test Systematics", "[Evolve]")
 	taxon2.GetData().RecordMutation(muts);
 	REQUIRE(taxon2.GetData().mut_counts.size() == 2);
 	REQUIRE(taxon2.GetData().mut_counts["tall"] == 3);
-
+	
 	emp::vector<std::string> types;
 	types.push_back("tall");
 	types.push_back("short");
@@ -127,23 +121,27 @@ TEST_CASE("Test Systematics", "[Evolve]")
 	REQUIRE(emp::CountMuts(ptr2, "short") == 16);
 	REQUIRE(emp::CountMutSteps(ptr1, "short") == 1);
 	REQUIRE(emp::CountMutSteps(ptr2, "short") == 2);
+}
 
-	 emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
 
-  	std::cout << "\nAddOrg 25 (id1, no parent)\n";
-  	auto id1 = sys.AddOrg(25, nullptr, 0);
-  	std::cout << "\nAddOrg -10 (id2; parent id1)\n";
-  	auto id2 = sys.AddOrg(-10, id1, 6);
-  	std::cout << "\nAddOrg 26 (id3; parent id1)\n";
-  	auto id3 = sys.AddOrg(26, id1, 10);
-  	std::cout << "\nAddOrg 27 (id4; parent id2)\n";
-  	auto id4 = sys.AddOrg(27, id2, 25);
-  	std::cout << "\nAddOrg 28 (id5; parent id2)\n";
-  	auto id5 = sys.AddOrg(28, id2, 32);
-  	std::cout << "\nAddOrg 29 (id6; parent id5)\n";
-  	auto id6 = sys.AddOrg(29, id5, 39);
-  	std::cout << "\nAddOrg 30 (id7; parent id1)\n";
-  	auto id7 = sys.AddOrg(30, id1, 6);
+TEST_CASE("Test Systematics more", "[Evolve]")
+{
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
+
+  std::cout << "\nAddOrg 25 (id1, no parent)\n";
+  auto id1 = sys.AddOrg(25, nullptr, 0);
+  std::cout << "\nAddOrg -10 (id2; parent id1)\n";
+  auto id2 = sys.AddOrg(-10, id1, 6);
+  std::cout << "\nAddOrg 26 (id3; parent id1)\n";
+  auto id3 = sys.AddOrg(26, id1, 10);
+  std::cout << "\nAddOrg 27 (id4; parent id2)\n";
+  auto id4 = sys.AddOrg(27, id2, 25);
+  std::cout << "\nAddOrg 28 (id5; parent id2)\n";
+  auto id5 = sys.AddOrg(28, id2, 32);
+  std::cout << "\nAddOrg 29 (id6; parent id5)\n";
+  auto id6 = sys.AddOrg(29, id5, 39);
+  std::cout << "\nAddOrg 30 (id7; parent id1)\n";
+  auto id7 = sys.AddOrg(30, id1, 6);
 
 
   std::cout << "\nRemoveOrg (id2)\n";
@@ -520,6 +518,7 @@ TEST_CASE("Test not tracking ancestors", "[Evolve]")
   CHECK(active_vec[10]->GetParent()->GetID() == 17);
 
 }
+
 
 TEST_CASE("Pointer to systematics", "[evo]") {
   emp::Ptr<emp::Systematics<int, int>> sys;
