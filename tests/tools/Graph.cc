@@ -25,6 +25,10 @@ TEST_CASE("Test Graph", "[tools]")
 	REQUIRE(!graph.HasEdge(2,4));
 	REQUIRE((graph.GetEdgeCount() == 1));
 	
+	// Labels
+	graph.SetLabel(1, "node 1");
+	REQUIRE(graph.GetLabel(1) == "node 1");
+
 	// Assignment
 	emp::Graph g2 = graph;
 	REQUIRE((g2.GetEdgeCount() == 1));

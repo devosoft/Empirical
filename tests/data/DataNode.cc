@@ -285,4 +285,8 @@ TEST_CASE("Test histogram", "[data]") {
 
     data.Reset();
     REQUIRE(data.GetHistCounts() == emp::vector<size_t>({0,0,0,0,0,0,0,0,0,0}));
+
+    std::stringstream result;
+    data.PrintDebug(result);
+    REQUIRE(result.str() == "Main DataNode.\nDataNodeModule for data::Pull. (level 8)\nDataNodeModule for data::Histogram. (level 5)\nDataNodeModule for data::Range. (level 4)\nDataNodeModule for data::Log. (level 2)\nDataNodeModule for data::Current. (level 0)\nBASE DataNodeModule.\n");
 }

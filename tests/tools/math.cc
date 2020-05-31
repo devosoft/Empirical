@@ -275,4 +275,6 @@ TEST_CASE("Another Test math", "[tools]")
   REQUIRE(emp::Sgn(-3.0) == -1);
   REQUIRE(emp::Sgn(-102.5) == -1);
 
+  REQUIRE(emp::Factorial(5) == 120);
+  REQUIRE(emp::Factorial(3) == 6);
 }

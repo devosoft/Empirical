@@ -82,17 +82,21 @@ TEST_CASE("Test vector_utils", "[tools]")
 	emp::HeapInsert(v_d2, 35.0);
 	REQUIRE(v_d2.at(0) == 35.0);
 	
+
+	// NRange
 	emp::vector range_vec = emp::NRange(4, 7);
 	REQUIRE(range_vec[0] == 4);
 	REQUIRE(range_vec[1] == 5);
 	REQUIRE(range_vec[2] == 6);	
 	REQUIRE(range_vec.size() == 3);	
 
+	// RemoveDuplicates
 	range_vec.push_back(4);
 	REQUIRE(range_vec.size() == 4);
 	range_vec = emp::RemoveDuplicates(range_vec);
 	REQUIRE(range_vec.size() == 3);
 
+	// Flatten
 	emp::vector<emp::vector<int>> nested_v = {{2,1,6}, {4,5,3}};
 	emp::vector<int> flattened_v = emp::Flatten(nested_v);
 	REQUIRE(flattened_v[0] == 2);
@@ -102,9 +106,11 @@ TEST_CASE("Test vector_utils", "[tools]")
 	REQUIRE(flattened_v[4] == 5);
 	REQUIRE(flattened_v[5] == 3);
 
+	// FindMin and FindMax
 	REQUIRE(emp::FindMax(flattened_v) == 6);
 	REQUIRE(emp::FindMin(flattened_v) == 1);
 
+	// Concat
 	nested_v = emp::Concat(nested_v, range_vec);
 	REQUIRE(nested_v[0][0] == 2);
 	REQUIRE(nested_v[0][1] == 1);
@@ -116,15 +122,24 @@ TEST_CASE("Test vector_utils", "[tools]")
 	REQUIRE(nested_v[2][1] == 5);	
 	REQUIRE(nested_v[2][2] == 6);	
 
+	// FindEval
 	std::function<bool(int)> is_even = [](int i){return ((i % 2) == 0);};
-
 	REQUIRE(emp::FindEval(flattened_v, is_even, 1) == 2);
 
+	// Scale
 	emp::Scale(range_vec, 2);
 	REQUIRE(range_vec[0] == 8);
 	REQUIRE(range_vec[1] == 10);
 	REQUIRE(range_vec[2] == 12);		
 
+	// Heapify on a larger vector
+	emp::Heapify(flattened_v);
+	REQUIRE(flattened_v.at(0) == 6);
+	REQUIRE(flattened_v.at(0) > flattened_v.at(1));
+	REQUIRE(flattened_v.at(0) > flattened_v.at(2));
+	REQUIRE(flattened_v.at(1) > flattened_v.at(3));
+	REQUIRE(flattened_v.at(1) > flattened_v.at(4));
+	REQUIRE(flattened_v.at(2) > flattened_v.at(5));
 }
 
 
