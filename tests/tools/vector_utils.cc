@@ -82,13 +82,7 @@ TEST_CASE("Test vector_utils", "[tools]")
 	emp::HeapInsert(v_d2, 35.0);
 	REQUIRE(v_d2.at(0) == 35.0);
 	
-<<<<<<< HEAD
-
-	// NRange
-	emp::vector range_vec = emp::NRange(4, 7);
-=======
 	emp::vector<int> range_vec = emp::NRange(4, 7);
->>>>>>> 85401ee984c8550704a0043c987baa42ffe6faff
 	REQUIRE(range_vec[0] == 4);
 	REQUIRE(range_vec[1] == 5);
 	REQUIRE(range_vec[2] == 6);	
