@@ -41,7 +41,7 @@ namespace emp {
 
   /// Count the number of times a specific character appears in a string
   /// (a clean shortcut to std::count)
-  static inline size_t count_char(const std::string & str, char c) {
+  static inline size_t count(const std::string & str, char c) {
     return std::count(str.begin(), str.end(), c);
   }
 
@@ -900,11 +900,6 @@ namespace emp {
       }
       return res.str();
     }
-  }
-
-  inline int count(std::string s, const char val) {
-    // From https://stackoverflow.com/a/3871346/1560599
-    return std::count(s.begin(), s.end(), val);
   }
 
 
