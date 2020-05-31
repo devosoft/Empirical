@@ -13,7 +13,7 @@ See our [Built With Empirical Gallery](https://empirical.readthedocs.io/en/lates
 See our [Quick Start Guides](https://empirical.readthedocs.io/en/latest/QuickStartGuides) to start using the library.
 
 Starting out on a new project that will use Empirical?
-Take a look at the [cookiecutter Empirical project template](https://github.com/devosoft/cookiecutter-empirical-template) -- step-by-step instructions included!
+Take a look at the [cookiecutter Empirical project template](https://github.com/devosoft/cookiecutter-empirical-project) -- step-by-step instructions included!
 
 Tools in Empirical include:
 * Web-enabled elements to facilitate compiling to JavaScript and with a full web interfaces,
