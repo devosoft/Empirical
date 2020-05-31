@@ -63,6 +63,9 @@ TEST_CASE("Test DataFile", "[data]") {
     dfile.AddTotal(data_cubes);
     dfile.AddMin(data_cubes);
     dfile.AddMax(data_cubes);
+    dfile.AddStandardDeviation(data_cubes);
+    dfile.AddSkew(data_cubes);
+    dfile.AddKurtosis(data_cubes);
     dfile.AddFun<int>(test_fun);
     dfile.AddVar<int>(test_int);
 
