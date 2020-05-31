@@ -101,7 +101,8 @@ namespace emp {
     }
 
     Node GetNode(int i) {return nodes[i];}
-
+    emp::vector<Node> GetNodes(){return nodes;}
+    
     /// Change the number of vertices in this graph.
     void Resize(size_t new_size) {
       nodes.resize(new_size, new_size);
@@ -328,7 +329,6 @@ namespace emp {
       }
     }
 
-    emp::vector<Node> GetNodes(){return nodes;}
     emp::vector<emp::vector<double> > GetWeights(){return weights;}
 
   };
