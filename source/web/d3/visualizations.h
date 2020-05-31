@@ -1018,7 +1018,7 @@ public:
     double x = (d.loc() % grid_width) - grid_width/2;
     double y = (d.loc() / grid_width) - grid_height/2;
 
-    double r = sqrt(emp::Pow((int)x,2)+emp::Pow((int)y,2)) / sqrt(emp::Pow(grid_width,2)+emp::Pow(grid_height,2));
+    double r = sqrt(std::pow((int)x,2)+std::pow((int)y,2)) / sqrt(std::pow(grid_width,2)+std::pow(grid_height,2));
     (void) r;
 
     //atan2 takes sign into account
@@ -1028,7 +1028,7 @@ public:
     char * color = (char *) EM_ASM_INT({
         var text = d3.hcl($1, 150, $0*175).toString();
 	    var buffer = Module._malloc(text.length+1);
-	    Module.writeStringToMemory(text, buffer);
+	    Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
 	    return buffer;
     }, r, theta);
 
@@ -1045,7 +1045,7 @@ public:
     double x = (d.loc() % grid_width) - grid_width/2;
     double y = (d.loc() / grid_width) - grid_height/2;
 
-    double r = sqrt(emp::Pow((int)x,2)+emp::Pow((int)y,2)) / sqrt(emp::Pow(grid_width,2)+emp::Pow(grid_height,2));
+    double r = sqrt(std::pow((int)x,2)+std::pow((int)y,2)) / sqrt(std::pow(grid_width,2)+std::pow(grid_height,2));
     (void) r;
 
     //atan2 takes sign into account
@@ -1055,7 +1055,7 @@ public:
     char * color = (char *) EM_ASM_INT({
         var text = d3.hcl($1, 150, $0*175).darker().toString();
       var buffer = Module._malloc(text.length+1);
-      Module.writeStringToMemory(text, buffer);
+      Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
       return buffer;
     }, r, theta);
 

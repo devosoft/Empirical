@@ -1,4 +1,4 @@
-source ../../third-party/emsdk_portable_repo/emsdk_portable/emsdk_env.sh
+source ../../third-party/emsdk/emsdk_env.sh
 echo "Source loaded"
 make
 echo "compilation done"
