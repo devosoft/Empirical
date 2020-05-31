@@ -441,6 +441,7 @@ namespace emp {
       emp_assert(p >= 0 && p <= 1, "Pobabilities must be between 0 and 1");
       // TODO: When we have warnings, add one for passing a really small number to
       // this function. Alternatively, make this function not ludicrously slow with small numbers.
+      // Looks like return floor(ln(GetDouble())/ln(1-p)) might be sufficient?
       if (p == 0) {
         return std::numeric_limits<uint32_t>::infinity();
       }

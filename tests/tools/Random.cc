@@ -66,6 +66,10 @@ TEST_CASE("Test Random", "[tools]")
 	
 	emp::RandomStdAdaptor randomStd(rnd);
 	REQUIRE(randomStd(4) == 3);
+
+  REQUIRE(rnd.GetRandGeometric(1) == 1);
+  REQUIRE(rnd.GetRandGeometric(0) == std::numeric_limits<uint32_t>::infinity());
+  REQUIRE(rnd.GetRandGeometric(.25) == 8);
 }
 
 TEST_CASE("Another Test random", "[tools]")

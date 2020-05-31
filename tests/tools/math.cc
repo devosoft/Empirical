@@ -277,4 +277,6 @@ TEST_CASE("Another Test math", "[tools]")
 
   REQUIRE(emp::Factorial(5) == 120);
   REQUIRE(emp::Factorial(3) == 6);
+  REQUIRE(emp::Min(4,2,7,9,-90,3,1,-3) == -90);
+  REQUIRE(emp::Max(4,2,7,9,-90,3,1,-3) == 9);
 }
