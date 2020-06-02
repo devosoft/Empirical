@@ -1,6 +1,7 @@
 #include <vector>
 #define CATCH_CONFIG_MAIN
 #include "third-party/Catch/single_include/catch.hpp"
+#include <stdlib.h>
 
 #include "geometry/Circle2D.h"
 
@@ -31,5 +32,20 @@ TEST_CASE("Test Circle2D", "[geometry]")
 
   circle_xyr.SetCenterY(11.0);
   REQUIRE(circle_xyr.GetCenterY() == 11.0);
+
+  circle_xyr.SetCenterX(2.0);
+  REQUIRE(circle_xyr.GetCenterX() == 2.0);
+
+  circle_xyr.SetRadius(7.0);
+  REQUIRE(circle_xyr.GetRadius()== 7.0);
+
+  circle_xyr.Set(1.0,9.0,2.5);
+  REQUIRE(circle_xyr.GetCenterX() == 1.0);
+  REQUIRE(circle_xyr.GetCenterY() == 9.0);
+  REQUIRE(circle_xyr.GetRadius() == 2.5);
+
+  REQUIRE(circle_xyr.Contains(1.5,9.5) == true);
+
+  
 
 }
