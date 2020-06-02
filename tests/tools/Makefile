@@ -1,11 +1,11 @@
 TEST_NAMES = alert BitMatrix BitSet bitset_utils BitVector Cache combos ContiguousStream DFA Distribution DynamicString File flex_function functions FunctionSet genericfunction Graph graph_utils hash_utils IndexMap info_theory keyname_utils Lexer lexer_utils map_utils MatchBin MatchBin_logging matchbin_utils math memo_function mem_track NFA NullStream Random random_utils Range RegEx sequence_utils set_utils SolveState stats string_utils tuple_utils TypeTracker UnorderedIndexMap vector_utils
 
-#  -Wl,--stack,8388608 -ftrack-macro-expansion=0
+# -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../source/ -I../../ -I../../third-party/cereal/include/
 
 default: test
 
-cover-test-%: %.cc
+coverage-%: %.cc
 	$(CXX) $(FLAGS) $< -lstdc++fs -o $@.out
 	#echo "running $@.out"
 	# execute test
@@ -26,8 +26,8 @@ test-%: %.cc
 test: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
-test-coverage: FLAGS := -std=c++17 -g -pthread -Wall -Wno-unused-function -I../../coverage_source/ -I../../ -I../../third-party/cereal/include/ -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 -fprofile-instr-generate -fcoverage-mapping -fno-inline -fno-elide-constructors -O0
-test-coverage: test-prep $(addprefix cover-test-, $(TEST_NAMES))
+coverage: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../coverage_source/ -I../../ -I../../third-party/cereal/include/ -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 -fprofile-instr-generate -fcoverage-mapping -fno-inline -fno-elide-constructors -O0
+coverage: test-prep $(addprefix coverage-, $(TEST_NAMES))
 
 # Test optimized version without debug features
 opt: FLAGS := -std=c++17 -pthread -DNDEBUG -O3 -Wno-unused-function -I../../source/ -I../../third-party/cereal/include/ -I../../

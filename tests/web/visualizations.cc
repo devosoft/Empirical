@@ -43,7 +43,7 @@ D3::Selection sub_div;
 void MakeLineGraph(std::string callback) {
   doc << line_graph;
   line_graph.SetDrawCallback(callback);
-  line_graph.LoadDataFromFile("/base/tests/web/assets/test-line-graph.csv");
+  line_graph.LoadDataFromFile("/assets/test-line-graph.csv");
 };
 
 void TestAnimateStep_LineGraph(std::string callback) {
@@ -58,7 +58,7 @@ void ClearLineGraph() {
 void MakeTreeViz(std::string callback) {
   tree_viz << tree;
   tree.SetDrawCallback(callback);
-  tree.LoadDataFromFile("/base/tests/web/assets/lineage-example.json");
+  tree.LoadDataFromFile("/assets/lineage-example.json");
 };
 
 void TestAnimateStep_Tree(std::string callback) {
@@ -331,7 +331,7 @@ int main() {
 
         it('should correctly set styles to ints', function(){
             emp.TestSetStyleInt();
-            chai.assert.equal(js.objects[emp.id].style("stroke-width"), 5);
+            chai.assert.oneOf(js.objects[emp.id].style("stroke-width"), ["5","5px"]);
         });
 
         it('should correctly set styles with callback functions', function(){

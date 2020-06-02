@@ -10,13 +10,13 @@ test-%:
 
 test: $(addprefix test-, $(TEST_NAMES))
 
-cover-test-%:
-	cd $(@:cover-test-%=%) && make test-coverage
+coverage-%:
+	cd $(@:coverage-%=%) && make coverage
 
-test-coverage: coverage_conversion $(addprefix cover-test-, $(TEST_NAMES))
+coverage: coverage_conversion $(addprefix coverage-, $(TEST_NAMES))
 
 coverage_conversion:
-	  ./convert_for_tests.sh
+	./convert_for_tests.sh
 
 opt-%:
 	cd $(@:opt-%=%) && make opt
