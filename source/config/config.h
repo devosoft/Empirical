@@ -670,6 +670,11 @@ namespace emp {
                      std::bind(&ConfigManager<MANAGED_TYPE>::UseObject, new_manager, _1) );
     }
 
+    // Access group_set using this method since it is protected
+    emp::vector<ConfigGroup *> GetGroupSet(){
+      return group_set;
+    }
+
   };
 
 }

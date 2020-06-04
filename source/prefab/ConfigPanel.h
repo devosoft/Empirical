@@ -78,7 +78,7 @@ namespace emp {
 
             void Setup(const std::string & id_prefix = "settings_") {
 
-                for (auto group : config.group_set) {
+                for (auto group : config.GetGroupSet()) {
                     // std::cout << "GROUP: " << group->GetName() << std::endl;
                     std::string group_name = group->GetName();
                     group_divs[group_name] = web::Div(id_prefix + group_name);
