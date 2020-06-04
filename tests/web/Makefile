@@ -16,7 +16,7 @@ OFLAGS_web_braces := -g4 -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_
 CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../source/web/library_emp.js --js-library ../../source/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' -s WASM=0
 
 default: all
-all: GetUrlParams.js JSWrap.js js_utils.js test_visualizations.js color_map
+all: GetUrlParams.js JSWrap.js js_utils.js test_visualizations.js test_widget.js color_map
 
 color_map: color_map.cc
 	g++ $(CFLAGS_all) color_map.cc -o color_map
@@ -33,8 +33,11 @@ js_utils.js: js_utils.cc
 test_visualizations.js: test_visualizations.cc
 	$(CXX_web) $(CFLAGS_web) test_visualizations.cc -o test_visualizations.js
 
+test_widget.js: test_widget.cc
+	$(CXX_web) $(CFLAGS_web) test_widget.cc -o test_widget.js
+
 clean:
-	rm -f GetUrlParams.js JSWrap.js js_utils.js test_visualizations.js *.js.map *.js.mem *~ color_map
+	rm -f GetUrlParams.js JSWrap.js js_utils.js test_visualizations.js test_widget.js *.js.map *.js.mem *~ color_map
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
