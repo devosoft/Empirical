@@ -100,12 +100,12 @@ namespace web {
 
       // Register is used so we can lookup classes by name.
       void Register(Widget & new_widget) override {
-        Register_recurse(new_widget);          // Register THIS widget here an in ancestors.
+        Register_recurse(new_widget);          // Register THIS widget here and in ancestors.
         new_widget->RegisterChildren( this );  // Register CHILD widgets, if any
       }
 
-      void RegisterChildren(DivInfo * regestrar) override {
-        for (Widget & child : m_children) regestrar->Register(child);
+      void RegisterChildren(DivInfo * registrar) override {
+        for (Widget & child : m_children) registrar->Register(child);
       }
 
       void Unregister_recurse(Widget & old_widget) override {
@@ -121,8 +121,8 @@ namespace web {
         old_widget.Deactivate(false);
       }
 
-      void UnregisterChildren(DivInfo * regestrar) override {
-        for (Widget & child : m_children) regestrar->Unregister(child);
+      void UnregisterChildren(DivInfo * registrar) override {
+        for (Widget & child : m_children) registrar->Unregister(child);
       }
 
       void ClearChildren() {
