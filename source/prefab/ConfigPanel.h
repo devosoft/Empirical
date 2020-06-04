@@ -1,7 +1,7 @@
 #ifndef EMP_CONFIG_WEB_INTERFACE_H
 #define EMP_CONFIG_WEB_INTERFACE_H
 
-#include "config.h"
+#include "../config/config.h"
 #include "../web/Div.h"
 #include "../web/Element.h"
 #include "../web/Input.h"
