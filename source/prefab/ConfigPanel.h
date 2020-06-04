@@ -13,7 +13,7 @@
 
 namespace emp {
 
-    class ConfigWebUI {
+    class ConfigPanel {
         private:
             inline static std::set<std::string> numeric_types = {"int", "double", "float", "uint32_t", "uint64_t", "size_t"};
             Config & config;
@@ -27,7 +27,7 @@ namespace emp {
                 return to_titlecase(join(sliced, " "));
             };
         public:
-            ConfigWebUI(Config & c, const std::string & div_name = "settings_div") 
+            ConfigPanel(Config & c, const std::string & div_name = "settings_div") 
                 : config(c), settings_div(div_name) {;}
 
             void SetOnChangeFun(std::function<void(const std::string & val)> fun) {on_change_fun = fun;}
