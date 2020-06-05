@@ -16,10 +16,10 @@
  *  HTML code (otherwise it will generate a unique name on its own.)
  *
  *  Member functions to set state:
- *    Button & Callback(const std::function<void()> & in_callback)
- *    Button & Label(const std::string & in_label)
- *    Button & Autofocus(bool in_af)
- *    Button & Disabled(bool in_dis)
+ *    Button & SetCallback(const std::function<void()> & in_callback)
+ *    Button & SetLabel(const std::string & in_label)
+ *    Button & SetAutofocus(bool in_af)
+ *    Button & SetDisabled(bool in_dis)
  *
  *  Retriving current state:
  *    const std::string & GetLabel() const
