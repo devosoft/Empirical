@@ -1,12 +1,9 @@
 var D3Library = {
-    $js: {objects:{}, counts:{}, next_id:0},
-    n_objects: function(){
-	    return js.objects.length;
-    },
-    // D3_Initialize: function() {
-    //   $.getScript('d3.min.js', function(data, textStatus) { console.log("yay", textStatus); return true ;});
-    // },
+  $emp_d3: {objects: {}, counts: {}, next_id:0},
+  get_emp_d3: function() {
+    return this.emp_d3;
+  }
 };
 
-autoAddDeps(D3Library, '$js');
+autoAddDeps(D3Library, '$emp_d3');
 mergeInto(LibraryManager.library, D3Library);
