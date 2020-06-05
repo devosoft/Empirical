@@ -82,7 +82,24 @@ namespace emp {
                     // std::cout << "GROUP: " << group->GetName() << std::endl;
                     std::string group_name = group->GetName();
                     group_divs[group_name] = web::Div(id_prefix + group_name);
-                    group_divs[group_name] << "<h3 style='text-align: center'>" << group->GetDesc() << "</h3>";
+                    // group_divs[group_name] << "<h3 style='text-align: center'>" << group->GetDesc() << "</h3>";
+
+                    web::Div card("card_" + group_name);
+                    web::Div card_header("card_header_" + group_name);
+                    web::Element collapse_link("a");
+                    collapse_link.SetAttr("data-toggle", "collapse").SetAttr("href", "#card_body_" + group_name);
+                    collapse_link << "<h3>" << group->GetDesc() << "</h3>";
+                    card_header << collapse_link;
+                    card << card_header;
+
+
+                    web::Div card_body("card_body_" + group_name);
+                    card_body.SetAttr("class", "collapse").SetAttr("class", "show");
+                    // make card true bootstrap cards
+                    card.SetAttr("class", "card");
+                    card_header.SetAttr("class", "card-header");
+                    card_body.SetAttr("class", "card-body");
+
                     for (size_t i = 0; i < group->GetSize(); i++) {
                         // std::cout << group->GetEntry(i)->GetType() << std::endl;
                         std::string name = group->GetEntry(i)->GetName();
@@ -129,9 +146,12 @@ namespace emp {
 
                         input_map[name].Value(value);
 
-                        group_divs[group_name] << web::Element("form") << input_map[name];
+                        // group_divs[group_name] << web::Element("form") << input_map[name];
+                        card_body << web::Element("form") << input_map[name];
+                        group_divs[group_name] << card << card_body;
 
                     }
+                    // settings_div.SetAttr("class", "col-lg-6 col-md-12"); makes all CSS go away!!!!
                     settings_div << group_divs[group_name];
                 }
 
