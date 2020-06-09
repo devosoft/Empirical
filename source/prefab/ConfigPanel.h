@@ -5,6 +5,8 @@
 #include "../web/Div.h"
 #include "../web/Element.h"
 #include "../web/Input.h"
+#include <emscripten.h>   // to use EM_JS
+#include "../web/JSWrap.h" // to use EM_ASM
 
 #include <map>
 #include <set>
@@ -27,6 +29,18 @@ namespace emp {
                 emp::vector<std::string> sliced = slice(name, '_');
                 return to_titlecase(join(sliced, " "));
             };
+            void SyncForm(std::string val, std::string input1, std::string input2){
+                std::cout << "Begin SyncForm" << std::endl;
+                emp::web::Input div1(settings_div.Find(input1));
+                div1.Value(val);
+                emp::web::Input div2(settings_div.Find(input2));
+                div2.Value(val);
+                std::cout << "SyncForm: after updating other two divs" << std::endl;
+                
+                div1.Redraw();
+                div2.Redraw();
+                std::cout << "SyncForm: after redraw" << std::endl;
+            }
         public:
             ConfigPanel(Config & c, const std::string & div_name = "settings_div") 
                 : config(c), settings_div(div_name) {;}
@@ -83,23 +97,28 @@ namespace emp {
                     // std::cout << "GROUP: " << group->GetName() << std::endl;
                     std::string group_name = group->GetName();
                     group_divs[group_name] = web::Div(id_prefix + group_name);
-                    // group_divs[group_name] << "<h3 style='text-align: center'>" << group->GetDesc() << "</h3>"; 
+                    settings_div << group_divs[group_name]; 
 
+                    // Setting card setup
                     web::Div card("card_" + group_name);
+                    group_divs[group_name] << card;
                     web::Div card_header("card_header_" + group_name);
+                    card << card_header;
                     web::Element collapse_link("a");
+                    card_header << collapse_link;
                     collapse_link.SetAttr("data-toggle", "collapse").SetAttr("href", "#card_body_" + group_name);
                     collapse_link << "<h3>" << group->GetDesc() << "</h3>";
-                    card_header << collapse_link;
-                    card << card_header;
 
                     
                     web::Div card_body("card_body_" + group_name);
+                    card << card_body;
                     card_body.SetAttr("class", "collapse").SetAttr("class", "show");
                     // make card true bootstrap cards
                     card.SetAttr("class", "card");
                     card_header.SetAttr("class", "card-header");
                     card_body.SetAttr("class", "card-body");
+
+                    
 
                     for (size_t i = 0; i < group->GetSize(); i++) {
                         // std::cout << group->GetEntry(i)->GetType() << std::endl;
@@ -109,108 +128,133 @@ namespace emp {
                         }
                         std::string type = group->GetEntry(i)->GetType();
                         std::string value = group->GetEntry(i)->GetValue();
+                   
+                        card_body << web::Element("form").SetCSS("width", "100%") << input_divs[name];
 
-                        web::Div mobile_dropdown("mobile_dropdown_" + name);
-                        mobile_dropdown.SetAttr("class", "d-md-none");
-
+                        // Setting element label
                         web::Div setting_element(name + "_row");
+                        input_divs[name] << setting_element;
                         setting_element.SetCSS("width", "100%");
                         web::Element title_span("span");
                         web::Element title("a");
+                        setting_element << title_span << title;
                         title.SetAttr("data-toggle", "collapse").SetAttr("href", "#" + name + "_dropdown");
                         title << format_label_fun(name);
                         title_span.SetCSS("width", "38%").SetCSS("display", "inline-block");
-                        setting_element << title_span << title;
-
-                        if (Has(numeric_types, type)) {
-                            // Seems more efficient to use web::Input, but it's not working
-                            // TODO: need to define on change function to use built in Input
-                            // emp::web::Input slider([this, name](std::string val){
-                                                            //   std::cout << name << " " << val << " " <<config.Get(name) << std::endl;
-                                                            //   config.Set(name, val);
-                                                            //   std::cout << config.Get(name) << std::endl;
-                                                            //   on_change_fun(val);}, 
-                                                            // "range", format_label_fun(name), name + "_input_slider", true
-                                                            // );
-                            web::Element slider("input");
-                            slider.SetAttr("type", "range");
-                            
-                        
-                            web::Element number("input");
-                            web::Element spacer("span");
-                            spacer.SetCSS("width", "38%").SetAttr("class", "d-inline-block d-md-none");
-                            number.SetAttr("type", "number");
-                            slider.SetCSS("width", "38%").SetAttr("class", "d-none d-md-inline-block");
-                            number.SetCSS("width", "18%").SetCSS("right", "10px");
-                            setting_element << spacer;
-                            setting_element << slider;
-                            setting_element << number;
-
-                            web::Element mobile_slider("input");
-                            mobile_slider.SetAttr("type", "range");
-                            mobile_dropdown << "<hr>" << mobile_slider;
-
-                            // NOTE: adding an id to slider or number breaks it!
-
-                            // Attempt to have intelligent defaults
-                            // TODO: uncomment this area after onchange function is defined
-                            // if (type == "double") {
-                                // SetDefaultRangeFloatingPoint(input_map[name], emp::from_string<double>(value));
-                            // } else if (type == "float") {
-                                // SetDefaultRangeFloatingPoint(input_map[name], emp::from_string<float>(value));
-                            // } else {
-                                // TODO: Correctly handle all types (although I'm not sure it actually matters?)
-                                // SetDefaultRangeFixedPoint(input_map[name], emp::from_string<int>(value));
-                            // }
-
-                        } 
-                        else if (type == "bool") {
-                        //     input_map[name] = emp::web::Input(
-                        //         [this, name](std::string val){config.Set(name, val);
-                        //                                       on_change_fun(val);},
-                        //         "checkbox", format_label_fun(name), name + "_input_checkbox"
-                        //     );
-                            web::Element bool_input("input");
-                            bool_input.SetAttr("type", "checkbox");
-                            setting_element << bool_input;
-
-                        } else {
-                        //     input_map[name] = emp::web::Input(
-                        //         [this, name](std::string val){config.Set(name, val);
-                        //                                        on_change_fun(val);},
-                        //         "text", format_label_fun(name), name + "_input_textbox"
-                        //     );
-                            web::Element text_input("input");
-                            text_input.SetAttr("type", "text");
-                            text_input.SetCSS("width", "39%");
-                            setting_element << text_input;
-                        }
 
                         // Dropdown bubble
                         // Should probably be modularlized in the future
                         web::Div drop_down(name + "_dropdown");
+                        input_divs[name] << drop_down;
                         web::Div triangle(name + "_triangle_up");
+                        drop_down << triangle;
                         web::Div content(name + "_content");
-                        triangle.SetCSS("width", "0").SetCSS("height", "0").SetCSS("border-left", "12px solid transparent").SetCSS("border-right", "12px solid transparent").SetCSS("border-bottom", "12px solid #ede9e8").SetCSS("margin-left", "15px");
-                        drop_down << triangle;
-                        content.SetAttr("class", "p-3").SetCSS("font-style", "italic");
-                        content << "hello world!";
-                        content << mobile_dropdown;
-                        drop_down << triangle;
                         drop_down << content;
+                        triangle.SetCSS("width", "0").SetCSS("height", "0").SetCSS("border-left", "12px solid transparent").SetCSS("border-right", "12px solid transparent").SetCSS("border-bottom", "12px solid #ede9e8").SetCSS("margin-left", "15px");
+                        content.SetAttr("class", "p-3").SetCSS("font-style", "italic");
+                        content << group->GetEntry(i)->GetDescription();
                         content.SetBackground("#ede9e8");
                         drop_down.SetAttr("class", "collapse");
+                        drop_down.SetCSS("width", "auto").SetCSS("margin-bottom", "10px");
+                        // Portion of dropdown only visible on small screens
+                        web::Div mobile_dropdown("mobile_dropdown_" + name);
+                        content << mobile_dropdown;
+                        mobile_dropdown.SetAttr("class", "d-md-none");
 
-                        // input_map[name].Value(value); 
-                        input_divs[name] << setting_element;
-                        input_divs[name] << drop_down;
+                        if (Has(numeric_types, type)) {
+                            // Empty div to keep elements aligned in mobile view
+                            web::Element spacer("span");
+                            setting_element << spacer;
+                            spacer.SetCSS("width", "38%").SetAttr("class", "d-inline-block d-md-none");
 
-                        // group_divs[group_name] << web::Element("form") << input_map[name];
-                        card_body << web::Element("form").SetCSS("width", "100%") << input_divs[name];
-                        group_divs[group_name] << card << card_body;
+                            const std::string name_input_slider = name + "_input_slider";
+                            const std::string name_input_number = name + "_input_number";
+                            const std::string name_input_mobile_slider = name + "_input_mobile_slider";
+                            emp::web::Input slider( [](std::string x){
+                                std::cout << "empty slider function" << std::endl;},
+                            "range", NULL, name_input_slider
+                            );
+                            setting_element << slider;
 
+                            emp::web::Input number([](std::string val){
+                                std::cout << "empty number function" << std::endl;
+                                }, 
+                                "number", NULL, name_input_number
+                                );
+                            setting_element << number;
+                            emp::web::Input mobile_slider([](std::string val){
+                                std::cout << "empty mobile slider function" << std::endl;
+                            }, 
+                                "range", NULL, name_input_mobile_slider
+                                ); 
+                            mobile_dropdown << "<hr>" << mobile_slider;
+
+                            // Set onchange behavior for inputs
+                            slider.Callback(
+                                [this,name, name_input_number, name_input_mobile_slider](std::string val){ 
+                                config.Set(name, val);
+                                std::cout << "slider callback: after setting new value" << std::endl;
+
+                                SyncForm(val, name_input_number, name_input_mobile_slider);
+                                });
+                            number.Callback(
+                                [this,name, name_input_slider, name_input_mobile_slider](std::string val){ 
+                                config.Set(name, val);
+                                std::cout << "slider callback: after setting new value" << std::endl;
+                                
+                                SyncForm(val, name_input_slider, name_input_mobile_slider);
+                                });
+                            mobile_slider.Callback(
+                                [this,name, name_input_number, name_input_slider](std::string val){ 
+                                config.Set(name, val);
+                                std::cout << "slider callback: after setting new value" << std::endl;
+
+                                SyncForm(val, name_input_number, name_input_slider);
+                                });
+                            // Set initial values
+                            slider.Value(config.Get(name));
+                            number.Value(config.Get(name));
+                            mobile_slider.Value(config.Get(name));
+                            slider.SetCSS("width", "38%").SetCSS("margin-right", "10px").SetAttr("class", "d-none d-md-inline-block");
+                            number.SetCSS("width", "18%").SetCSS("right", "10px");
+
+                            // Attempt to have intelligent defaults
+                            if (type == "double") {
+                                SetDefaultRangeFloatingPoint(slider, emp::from_string<double>(value));
+                                SetDefaultRangeFloatingPoint(number, emp::from_string<double>(value));
+                                SetDefaultRangeFloatingPoint(mobile_slider, emp::from_string<double>(value));
+                            } else if (type == "float") {
+                                SetDefaultRangeFloatingPoint(slider, emp::from_string<float>(value));
+                                SetDefaultRangeFloatingPoint(number, emp::from_string<float>(value));
+                                SetDefaultRangeFloatingPoint(mobile_slider, emp::from_string<float>(value));
+                            } else {
+                                // TODO: Correctly handle all types (although I'm not sure it actually matters?)
+                                SetDefaultRangeFixedPoint(slider, emp::from_string<int>(value));
+                                SetDefaultRangeFixedPoint(number, emp::from_string<int>(value));
+                                SetDefaultRangeFixedPoint(mobile_slider, emp::from_string<int>(value));
+                            }
+
+                        } 
+                        else if (type == "bool") {
+                            emp::web::Input bool_input(
+                                [this, name](std::string val){config.Set(name, val);
+                                                              on_change_fun(val);},
+                                "checkbox", NULL, name + "_input_checkbox"
+                            );
+                            setting_element << bool_input;
+
+                        } else {
+                            emp::web::Input text_input(
+                                [this, name](std::string val){config.Set(name, val);
+                                                               on_change_fun(val);},
+                                "text", NULL, name + "_input_textbox"
+                            );
+                            setting_element << text_input;
+                            text_input.Value("none");
+                            text_input.SetAttr("type", "text");
+                            text_input.SetCSS("width", "39%");
+                        }
                     }
-                    settings_div << group_divs[group_name];
                 }
 
             }
