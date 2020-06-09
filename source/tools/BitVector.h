@@ -9,6 +9,9 @@
  *
  *  Compile with -O3 and -msse4.2 for fast bit counting.
  * 
+ *  @todo Most of the operators don't check to make sure that both Bitvextors are the same size.
+ *        We should create versions (Intersection() and Union()?) that adjust sizes if needed.
+ * 
  *  @todo Do small BitVector optimization.  Currently we have number of bits (8 bytes) and a
  *        pointer to the memory for the bitset (another 8 bytes), but we could use those 16 bytes
  *        as 1 byte of size info followed by 15 bytes of bitset (120 bits!)
@@ -16,6 +19,9 @@
  *  @todo Implement append(), resize()...
  *  @todo Implement techniques to push bits (we have pop)
  *  @todo Implement techniques to insert or remove bits from middle.
+ *  @todo Think about how itertors should work for BitVector.  It should probably go bit-by-bit,
+ *        but there are very few circumstances where that would be useful.  Going through the
+ *        positions of all ones would be more useful, but perhaps less intuitive.
  *
  *  @note This class is 15-20% slower than emp::BitSet, but more flexible & run-time configurable.
  */
