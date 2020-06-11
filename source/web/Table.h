@@ -221,7 +221,7 @@ namespace web {
       }
 
       // If no cell is specified for AddChild, use the current cell.
-      void AddChild(Widget in) {
+      void AddChild(Widget in) override {
         // Make sure the number of rows hasn't changed, making the current position illegal.
         if (append_row >= row_count) append_row = 0;
         if (append_col >= col_count) append_col = 0;
