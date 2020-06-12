@@ -45,6 +45,7 @@
 
 #include <functional>
 #include <map>
+#include <locale>
 
 #include "events.h"
 #include "JSWrap.h"
@@ -117,6 +118,8 @@ namespace web {
       if (order == -1) order = next_order;
       if (order >= next_order) next_order = order+1;
 
+      key = std::toupper(key);
+
       fun_map[order] =
         [key, cb_fun](const KeyboardEvent & evt)
         { if (evt.keyCode == key) { cb_fun(); return true; } return false; };
@@ -130,6 +133,14 @@ namespace web {
       int order
     ) {
       if (order >= next_order) next_order = order+1;
+
+      std::string uppercase_key_set{key_set};
+      std::transform(
+        std::begin(uppercase_key_set),
+        std::end(uppercase_key_set),
+        std::begin(uppercase_key_set),
+        ::toupper
+      );
 
       fun_map[order] = [key_set, cb_fun](const KeyboardEvent & evt) {
         if (key_set.find((char)evt.keyCode) == std::string::npos) {
