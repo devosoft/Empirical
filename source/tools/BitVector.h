@@ -487,7 +487,13 @@ namespace emp {
 
       // check to make sure there are no leading ones in the unused bits
       // or if LastBitID is 0 everything should pass too
-      emp_assert(LastBitID() == 0 || (bit_set[NumFields() - 1] & MaskHigh<field_t>(LastBitID())) == 0);
+      emp_assert(
+        LastBitID() == 0
+        || (
+          bit_set[NumFields() - 1]
+          & MaskHigh<field_t>(LastBitID())
+        ) == 0
+      );
 
     }
 
