@@ -295,7 +295,7 @@ TEST_CASE("BitVector padding bits protected", "[tools]") {
 
     emp::BitVector vec(i);
     REQUIRE(emp::assert_last_fail == 0);
-    vec.SetUInt(0, std::numeric_limits<size_t>::max());
+    vec.SetUInt(0, std::numeric_limits<uint32_t>::max());
     REQUIRE(emp::assert_last_fail);
     emp::assert_clear();
 
@@ -304,7 +304,7 @@ TEST_CASE("BitVector padding bits protected", "[tools]") {
   REQUIRE(emp::assert_last_fail == 0);
 
   emp::BitVector vec(32);
-  vec.SetUInt(0, std::numeric_limits<size_t>::max());
+  vec.SetUInt(0, std::numeric_limits<uint32_t>::max());
 
   REQUIRE(emp::assert_last_fail == 0);
 
