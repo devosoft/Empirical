@@ -580,7 +580,17 @@ namespace emp {
     }
   }
 
-/// @endcond
+  /// @endcond
+
+  std::string pass_str_to_cpp() {
+    char * buffer = (char *)EM_ASM_INT({
+      return emp_i.__outgoing_string;
+    });
+
+    std::string result(buffer);
+    free(buffer);
+    return result;
+  }
 
 }
 
