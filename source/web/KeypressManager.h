@@ -47,6 +47,8 @@
 #include <map>
 #include <locale>
 
+#include "../base/errors.h"
+
 #include "events.h"
 #include "JSWrap.h"
 
@@ -118,6 +120,11 @@ namespace web {
       if (order == -1) order = next_order;
       if (order >= next_order) next_order = order+1;
 
+      if (std::isupper(key)) emp::NotifyWarning(
+        "Uppercase character was passed for the key argument. ",
+        "To specify uppercase, you'll need to monitor for the shift modifier associated with a KeypressEvent."
+      );
+
       key = std::toupper(key);
 
       fun_map[order] =
@@ -133,6 +140,15 @@ namespace web {
       int order
     ) {
       if (order >= next_order) next_order = order+1;
+
+      if (std::any_of(
+        std::begin(key_set),
+        std::end(key_set),
+        ::isupper
+      )) emp::NotifyWarning(
+        "Uppercase character was passed for the key argument. ",
+        "To specify uppercase, you'll need to monitor for the shift modifier associated with a KeypressEvent."
+      );
 
       std::string uppercase_key_set{key_set};
       std::transform(
