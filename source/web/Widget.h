@@ -78,12 +78,9 @@ namespace web {
   /// Widget is effectively a smart pointer to a WidgetInfo object, plus some basic accessors.
   class Widget {
     friend internal::WidgetInfo; friend internal::DivInfo; friend internal::TableInfo;
-  protected:
+  public:
     using WidgetInfo = internal::WidgetInfo;
     WidgetInfo * info;                        ///< Information associated with this widget.
-
-    /// If an Append doesn't work with current class, forward it to the parent and try there.
-    template <typename FWD_TYPE> Widget & ForwardAppend(FWD_TYPE && arg);
 
     /// Set the information associated with this widget.
     Widget & SetInfo(WidgetInfo * in_info);
