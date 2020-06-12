@@ -315,6 +315,6 @@ TEST_CASE("BitVector regression test for #277", "[tools]") {
   emp::BitVector vec(4);
 
   for (size_t i = 0; i < 4; ++i) REQUIRE(!vec[i]);
-  vec.SetUIntAtBit(0, 15);
+  vec.SetUInt(0, 15);
   for (size_t i = 0; i < 4; ++i) REQUIRE(vec[i]);
 }
