@@ -103,15 +103,40 @@ namespace emp {
                     group_divs[group_name] << card;
                     web::Div card_header("card_header_" + group_name);
                     card << card_header;
+<<<<<<< HEAD
                     web::Element collapse_link("a");
                     card_header << collapse_link;
                     collapse_link.SetAttr("data-toggle", "collapse").SetAttr("href", "#card_body_" + group_name);
                     collapse_link << "<h3>" << group->GetDesc() << "</h3>";
 
 
+=======
+                    web::Div inline_elements(group_name + "_inline");
+                    inline_elements.SetAttr("class", "clearfix");
+                    card_header << inline_elements;
+                    web::Element collapse_name_link("button");
+                    inline_elements << collapse_name_link;
+                    collapse_name_link.SetAttr("data-toggle", "collapse").SetAttr("data-target", "#card_collapse_" + group_name);
+                    collapse_name_link.SetAttr("class", "btn btn-link float-left collapse_toggle setting_heading").SetAttr("type", "button").SetAttr("aria-expanded", "true").SetAttr("aria-controls", "#card_body_" + group_name);
+                    collapse_name_link << "<h3>" << group->GetDesc() << "</h3>";
+                    web::Element collapse_icon_link("button");
+                    inline_elements << collapse_icon_link;
+                    collapse_icon_link.SetAttr("data-toggle", "collapse").SetAttr("data-target", "#card_collapse_" + group_name);
+                    collapse_icon_link.SetAttr("class", "btn btn-link float-right collapse_toggle").SetAttr("type", "button").SetAttr("aria-expanded", "true").SetAttr("aria-controls", "#card_body_" + group_name);
+
+                    // Toggle Icons
+                    web::Element arrow_down("span");
+                    collapse_icon_link << arrow_down;
+                    arrow_down.SetAttr("class", "fa fa-angle-double-down");
+                    web::Element arrow_up("span");
+                    collapse_icon_link << arrow_up;
+                    arrow_up.SetAttr("class", "fa fa-angle-double-up");
+
+                    web::Div card_collapse("card_collapse_" + group_name);
+                    card << card_collapse;
+                    card_collapse.SetAttr("class", "collapse show").SetAttr("data-parent", "card_" + group_name).SetAttr("aria-labelledby", "card_header_" + group_name);
                     web::Div card_body("card_body_" + group_name);
-                    card << card_body;
-                    card_body.SetAttr("class", "collapse").SetAttr("class", "show");
+                    card_collapse << card_body;
                     // make card true bootstrap cards
                     card.SetAttr("class", "card");
                     card_header.SetAttr("class", "card-header");
@@ -130,24 +155,10 @@ namespace emp {
 
                         card_body << web::Element("form").SetCSS("width", "100%") << input_divs[name];
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-                        if (Has(numeric_types, type)) {
-                            input_map[name] = emp::web::Input(
-                                [this, name](std::string val){
-                                                              std::cout << name << " " << val << " " <<config.Get(name) << std::endl;
-                                                              config.Set(name, val);
-                                                              std::cout << config.Get(name) << std::endl;
-                                                              on_change_fun(val);},
-                                "range", format_label_fun(name), name + "_input_slider", true
-                            );
-=======
                         web::Div mobile_dropdown("mobile_dropdown_" + name);
                         mobile_dropdown.SetAttr("class", "d-md-none");
 
-=======
                         // Setting element label
->>>>>>> 9738447... display appropriate setting descriptions and synchronize form when one input is changed
                         web::Div setting_element(name + "_row");
                         input_divs[name] << setting_element;
                         setting_element.SetCSS("width", "100%");
@@ -155,6 +166,13 @@ namespace emp {
                         web::Element title("a");
                         setting_element << title_span << title;
                         title.SetAttr("data-toggle", "collapse").SetAttr("href", "#" + name + "_dropdown");
+                        title.SetAttr("class", "collapse_toggle").SetAttr("role", "button").SetAttr("aria-expanded", "false").SetAttr("aria-controls", "#" + name + "_dropdown");
+                        web::Element arrow_down_for_dropdown("span");
+                        title << arrow_down_for_dropdown;
+                        arrow_down_for_dropdown.SetAttr("class", "fa fa-angle-double-right toggle_icon_left_margin");
+                        web::Element arrow_up_for_dropdown("span");
+                        title << arrow_up_for_dropdown;
+                        arrow_up_for_dropdown.SetAttr("class", "fa fa-angle-double-up toggle_icon_left_margin");
                         title << format_label_fun(name);
                         title_span.SetCSS("width", "38%").SetCSS("display", "inline-block");
 
@@ -178,7 +196,6 @@ namespace emp {
                         mobile_dropdown.SetAttr("class", "d-md-none");
 
                         if (Has(numeric_types, type)) {
-<<<<<<< HEAD
                             // Seems more efficient to use web::Input, but it's not working
                             // TODO: need to define on change function to use built in Input
                             // emp::web::Input slider([this, name](std::string val){
@@ -302,7 +319,7 @@ namespace emp {
                             setting_element << text_input;
                             text_input.Value("none");
                             text_input.SetAttr("type", "text");
-                            text_input.SetCSS("width", "39%");
+                            text_input.SetCSS("width", "57%");
                         }
 <<<<<<< HEAD
 
