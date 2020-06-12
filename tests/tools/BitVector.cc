@@ -1,4 +1,8 @@
 #define CATCH_CONFIG_MAIN
+#ifndef NDEBUG
+	#undef NDEBUG
+	#define TDEBUG 1
+#endif
 
 #include "third-party/Catch/single_include/catch.hpp"
 
@@ -7,6 +11,7 @@
 
 #include <sstream>
 #include <map>
+#include <limits>
 
 TEST_CASE("Test BitVector", "[tools]")
 {
@@ -280,9 +285,33 @@ TEST_CASE("Another Test BitVector", "[tools]")
   bv80[65] = 1;
   REQUIRE(bv80.GetUIntAtBit(64) == 130);
   REQUIRE(bv80.GetValueAtBit<5>(64) == 2);
+
 }
 
-TEST_CASE("Regression test for #277", "[tools]") {
+TEST_CASE("BitVector padding bits protected", "[tools]") {
+#ifdef TDEBUG
+
+  for (size_t i = 0; i < 31; ++i) {
+	
+    emp::BitVector vec(i);
+    REQUIRE(emp::assert_last_fail == 0);
+    vec.SetUInt(0, std::numeric_limits<size_t>::max());
+    REQUIRE(emp::assert_last_fail);
+    emp::assert_clear();	
+
+  }
+
+  REQUIRE(emp::assert_last_fail == 0);
+
+  emp::BitVector vec(32);
+  vec.SetUInt(0, std::numeric_limits<size_t>::max());
+
+  REQUIRE(emp::assert_last_fail == 0);
+
+#endif
+}
+
+TEST_CASE("BitVector regression test for #277", "[tools]") {
   emp::BitVector vec(4);
 
   for (size_t i = 0; i < 4; ++i) REQUIRE(!vec[i]);
