@@ -36,6 +36,7 @@
 #include <string>
 
 #include "../base/vector.h"
+#include "../base/errors.h"
 #include "../tools/mem_track.h"
 
 #include "events.h"
@@ -865,6 +866,11 @@ namespace web {
           // switch out parent's existing child for wrapper
           parent_info->RemoveChild((return_t &) *this);
           parent_info->AddChild(wrapper);
+        } else if (Info(wrapper)->ptr_count == 1) {
+          emp::NotifyWarning(
+            "Only one reference held to wrapper. ",
+            "It will be destroyed when it goes out of scope."
+          );
         }
 
         // put this Widget inside of the wrapper
