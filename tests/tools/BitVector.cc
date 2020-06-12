@@ -312,9 +312,13 @@ TEST_CASE("BitVector padding bits protected", "[tools]") {
 }
 
 TEST_CASE("BitVector regression test for #277", "[tools]") {
-  emp::BitVector vec(4);
+  emp::BitVector vec1(4);
+  emp::BitVector vec2(4);
 
-  for (size_t i = 0; i < 4; ++i) REQUIRE(!vec[i]);
-  vec.SetUInt(0, 15);
-  for (size_t i = 0; i < 4; ++i) REQUIRE(vec[i]);
+  for (size_t i = 0; i < 4; ++i) REQUIRE(!vec1[i]);
+  for (size_t i = 0; i < 4; ++i) REQUIRE(!vec2[i]);
+  vec1.SetUInt(0, 15);
+  vec2.SetUIntAtBit(0, 15);
+  for (size_t i = 0; i < 4; ++i) REQUIRE(vec1[i]);
+  for (size_t i = 0; i < 4; ++i) REQUIRE(vec2[i]);
 }
