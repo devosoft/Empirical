@@ -15,11 +15,11 @@
  *
  *  The specific versions of AddKeydownCallback are:
  *
- *    void AddKeydownCallback(std::function<bool(const html5::KeyboardEvent &)> cb_fun,
+ *    void AddKeydownCallback(std::function<bool(const emp::web::KeyboardEvent &)> cb_fun,
  *                            int order=-1)
  *
  *      Link a function to the KeypressManager that is called for any unresolved keypress.
- *      The function must take in an html5::KeyboardEvent (which includes information about
+ *      The function must take in an emp::web::KeyboardEvent (which includes information about
  *      the specific key pressed as well as any modifiers such as SHIFT or CTRL) and it
  *      must return a boolean value indicating whether it has resolved the keypress.
  *
@@ -94,7 +94,7 @@ namespace web {
     int GetNextOrder() const { return next_order; }
 
     ///  Link a function to the KeypressManager that is called for any unresolved keypress.
-    ///  The function must take in an html5::KeyboardEvent (which includes information about
+    ///  The function must take in an emp::web::KeyboardEvent (which includes information about
     ///  the specific key pressed as well as any modifiers such as SHIFT or CTRL) and it
     ///  must return a boolean value indicating whether it has resolved the keypress.
     void AddKeydownCallback(std::function<bool(const KeyboardEvent &)> cb_fun, int order=-1)
