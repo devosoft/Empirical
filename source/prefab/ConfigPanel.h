@@ -5,8 +5,6 @@
 #include "../web/Div.h"
 #include "../web/Element.h"
 #include "../web/Input.h"
-#include <emscripten.h>   // to use EM_JS
-#include "../web/JSWrap.h" // to use EM_ASM
 
 #include <map>
 #include <set>
@@ -161,7 +159,7 @@ namespace emp {
                         // Setting element label
                         web::Div setting_element(name + "_row");
                         input_divs[name] << setting_element;
-                        setting_element.SetCSS("width", "100%");
+                        setting_element.SetAttr("class", "setting_element");
                         web::Element title_span("span");
                         web::Element title("a");
                         setting_element << title_span << title;
@@ -174,7 +172,7 @@ namespace emp {
                         title << arrow_up_for_dropdown;
                         arrow_up_for_dropdown.SetAttr("class", "fa fa-angle-double-up toggle_icon_left_margin");
                         title << format_label_fun(name);
-                        title_span.SetCSS("width", "38%").SetCSS("display", "inline-block");
+                        title_span.SetAttr("class", "title_area");
 
                         // Dropdown bubble
                         // Should probably be modularlized in the future
@@ -182,18 +180,17 @@ namespace emp {
                         input_divs[name] << drop_down;
                         web::Div triangle(name + "_triangle_up");
                         drop_down << triangle;
+                        triangle.SetAttr("class", "dropdown_triangle");
                         web::Div content(name + "_content");
                         drop_down << content;
-                        triangle.SetCSS("width", "0").SetCSS("height", "0").SetCSS("border-left", "12px solid transparent").SetCSS("border-right", "12px solid transparent").SetCSS("border-bottom", "12px solid #ede9e8").SetCSS("margin-left", "15px");
-                        content.SetAttr("class", "p-3").SetCSS("font-style", "italic");
+                        content.SetAttr("class", "dropdown_content");
                         content << group->GetEntry(i)->GetDescription();
-                        content.SetBackground("#ede9e8");
                         drop_down.SetAttr("class", "collapse");
-                        drop_down.SetCSS("width", "auto").SetCSS("margin-bottom", "10px");
+                        
                         // Portion of dropdown only visible on small screens
                         web::Div mobile_dropdown("mobile_dropdown_" + name);
                         content << mobile_dropdown;
-                        mobile_dropdown.SetAttr("class", "d-md-none");
+                        mobile_dropdown.SetAttr("class", "mobile_dropdown");
 
                         if (Has(numeric_types, type)) {
                             // Seems more efficient to use web::Input, but it's not working
@@ -215,7 +212,7 @@ namespace emp {
 >>>>>>> 9738447... display appropriate setting descriptions and synchronize form when one input is changed
                             web::Element spacer("span");
                             setting_element << spacer;
-                            spacer.SetCSS("width", "38%").SetAttr("class", "d-inline-block d-md-none");
+                            spacer.SetAttr("class", "blank_div");
 
                             const std::string name_input_slider = name + "_input_slider";
                             const std::string name_input_number = name + "_input_number";
@@ -265,8 +262,8 @@ namespace emp {
                             slider.Value(config.Get(name));
                             number.Value(config.Get(name));
                             mobile_slider.Value(config.Get(name));
-                            slider.SetCSS("width", "38%").SetCSS("margin-right", "10px").SetAttr("class", "d-none d-md-inline-block");
-                            number.SetCSS("width", "18%").SetCSS("right", "10px");
+                            slider.SetAttr("class", "input_slider");
+                            number.SetAttr("class", "input_number");
 
                             // Attempt to have intelligent defaults
                             if (type == "double") {
@@ -317,9 +314,8 @@ namespace emp {
                                 "text", NULL, name + "_input_textbox"
                             );
                             setting_element << text_input;
-                            text_input.Value("none");
-                            text_input.SetAttr("type", "text");
-                            text_input.SetCSS("width", "57%");
+                            text_input.SetAttr("class", "input_text").SetAttr("type", "text");
+                            text_input.Value(config.Get(name));
                         }
 <<<<<<< HEAD
 
