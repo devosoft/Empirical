@@ -100,12 +100,12 @@ namespace web {
 
       // Register is used so we can lookup classes by name.
       void Register(Widget & new_widget) override {
-        Register_recurse(new_widget);          // Register THIS widget here an in ancestors.
+        Register_recurse(new_widget);          // Register THIS widget here and in ancestors.
         new_widget->RegisterChildren( this );  // Register CHILD widgets, if any
       }
 
-      void RegisterChildren(DivInfo * regestrar) override {
-        for (Widget & child : m_children) regestrar->Register(child);
+      void RegisterChildren(DivInfo * registrar) override {
+        for (Widget & child : m_children) registrar->Register(child);
       }
 
       void Unregister_recurse(Widget & old_widget) override {
@@ -121,8 +121,8 @@ namespace web {
         old_widget.Deactivate(false);
       }
 
-      void UnregisterChildren(DivInfo * regestrar) override {
-        for (Widget & child : m_children) regestrar->Unregister(child);
+      void UnregisterChildren(DivInfo * registrar) override {
+        for (Widget & child : m_children) registrar->Unregister(child);
       }
 
       void ClearChildren() {
@@ -132,13 +132,42 @@ namespace web {
         if (state == Widget::ACTIVE) ReplaceHTML();
       }
 
+      /// Remove a specific Widget child.
+      /// @param the Widget to remove
+      void RemoveChild(Widget & child) override {
+        // ensure child is present
+        emp_assert(1 == std::count(
+          std::begin(m_children),
+          std::end(m_children),
+          child
+        ));
+        // unregister and remove child
+        Unregister(*std::find(
+          std::begin(m_children),
+          std::end(m_children),
+          child
+        ));
+        m_children.erase(
+          std::remove(
+            std::begin(m_children),
+            std::end(m_children),
+            child
+          ),
+          std::end(m_children)
+        );
+        // render changes
+        if (state == Widget::ACTIVE) ReplaceHTML();
+      }
+
       void Clear() {
         ClearChildren();
         extras.Clear();
         if (state == Widget::ACTIVE) ReplaceHTML();
       }
 
-      void AddChild(Widget in) {
+      // Add a child Widget
+      // @param in the Widget to add
+      void AddChild(Widget in) override {
         // If the inserted widget is already active, remove it from its old position.
         emp_assert(in->parent == nullptr && "Cannot insert widget if already has parent!", in->id);
         emp_assert(in->state != Widget::ACTIVE && "Cannot insert a stand-alone active widget!");
