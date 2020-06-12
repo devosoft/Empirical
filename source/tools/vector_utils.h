@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <limits>
 
 #include "../base/vector.h"
 
@@ -136,14 +137,15 @@ namespace emp {
   template <typename T>
   T FindMax(const emp::vector<T> & v) { return v[ FindMaxIndex(v) ]; }
 
-  /// Sum up the contents of a vector.
+  
+  /// Sum all of the contents of a vector.
   template <typename T>
   T Sum(const emp::vector<T> & v) {
     T sum = 0;
     for (auto x : v) sum += x;
     return sum;
   }
-
+  
   /// Multiply all of the contents of a vector.
   template <typename T>
   T Product(const emp::vector<T> & v) {
@@ -177,6 +179,20 @@ namespace emp {
       new_vec.push_back(vec[i]);
     }
     return new_vec;
+  }
+
+  /// Collapse a vector of vectors into a single vector.
+  template <typename T>
+  emp::vector<T> Flatten( const emp::vector< emp::vector< T > > & vv ) {
+    size_t element_count = 0;
+    for (const auto & v : vv) element_count += v.size();
+
+    emp::vector<T> out_v;
+    out_v.reserve(element_count);
+
+    for (const auto & v : vv) out_v.insert(out_v.end(), v.begin(), v.end());
+
+    return out_v;
   }
 
   /// Swap the order of a vector of vectors.  That is, swap rows and columns.

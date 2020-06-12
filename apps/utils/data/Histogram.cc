@@ -1,14 +1,26 @@
+#include "../../../source/base/vector.h"
+#include "../../../source/config/command_line.h"
+#include "../../../source/config/SettingConfig.h"
+#include "../../../source/data/DataLog.h"
 #include "../../../source/tools/File.h"
 #include "../../../source/tools/vector_utils.h"
 
 int main(int argc, char* argv[])
 {
-  if (argc != 2) {
+  emp::SettingConfig config;
+
+  size_t num_bins = 40;
+  config.AddSetting("num_bins", "How many bins in histogram?", 'b', num_bins) = 40;
+  
+  config.ProcessOptions(argc, argv);
+  auto unused_args = config.GetUnusedArgs();
+  
+  if (unused_args.size() != 1) {
     std::cout << "Must include a single filename for data." << std::endl;
     exit(1);
   }
 
-  emp::File file(argv[1]);
+  emp::File file(unused_args[0]);
   file.RemoveWhitespace();  // Clear out all whitespace in file.
   file.RemoveEmpty();       // Remove all now-empty lines from file.
 
@@ -37,10 +49,9 @@ int main(int argc, char* argv[])
   }
 
   // Collect the full histogram.
-  size_t bins = 40;
   double full_span = (max_val - min_val) * 1.00001;
-  double bin_width = full_span / (double) bins;
-  emp::vector<size_t> bin_counts(bins, 0);
+  double bin_width = full_span / (double) num_bins;
+  emp::vector<size_t> bin_counts(num_bins, 0);
   for (auto & row : data) {
     for (double val : row) {
       size_t cur_bin = (size_t) ((val - min_val) / bin_width);
@@ -52,30 +63,19 @@ int main(int argc, char* argv[])
 
 
   while (file.GetNumLines()) {
-    emp::vector<double> row = file.ExtractRowAs<double>();
-    emp::Sort(row);
+    emp::DataLog<double> row = file.ExtractRowAs<double>();
 
     std::cout << "MIN_VAL: " << min_val << std::endl;
-    double cap = min_val;
-    double pos = 0;
-    size_t count = 0;
-    for (size_t bin_id = 0; bin_id < bins; bin_id++) {
-      cap += bin_width;
-      while (pos < row.size() && row[pos] <= cap) {
-        pos++;
-        std::cout << "*";
-        count++;
-      }
-      std::cout << std::endl;
-    }
+    row.AsciiHistogram();
     std::cout << "MAX_VAL: " << max_val << std::endl;
-    std::cout << "Data count: " << count << std::endl;
   }
 
   std::cout << "OVERALL COUNT: " << num_vals << std::endl;
   std::cout << "OVERALL MIN:   " << min_val << std::endl;
   std::cout << "OVERALL MAX:   " << max_val << std::endl;
   std::cout << "OVERALL MEAN:  " << (total_val/(double) num_vals) << std::endl;
+
+  emp::AsciiBarGraph(bin_counts);
 
   double scale = ((double) max_bin_count) / 80.0;
   if (scale < 1.0) scale = 1.0;
