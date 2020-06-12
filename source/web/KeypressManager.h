@@ -112,6 +112,8 @@ namespace web {
 
     ///  Link a specific key to a target function to be called when that key is pressed.
     ///  The function my return a void and take no arguments.
+    /// Specify keys as lowercase characters. To sepcify uppercase, you'll
+    /// need to monitor fo rthe shift modifier associated with a KeypressEvent.
     void AddKeydownCallback(
       char key,
       std::function<void()> cb_fun,
@@ -134,6 +136,8 @@ namespace web {
 
     /// Provide a whole set of keys that should all trigger the same function, including an
     /// ordering for priority.
+    /// Specify keys as lowercase characters. To sepcify uppercase, you'll
+    /// need to monitor fo rthe shift modifier associated with a KeypressEvent.
     void AddKeydownCallback(
       const std::string & key_set,
       const std::function<void()> & cb_fun,
