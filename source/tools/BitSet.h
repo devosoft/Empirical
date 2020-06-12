@@ -641,7 +641,7 @@ namespace emp {
         // if (index * 32 == (NUM_FIELDS - 1) * FIELD_BITS)
         // but just doing it always is probably faster
         // check to make sure there are no leading ones in the unused bits
-        emp_assert((bit_set[NUM_FIELDS - 1] & MaskHigh<field_t>(LAST_BIT)) == 0);
+        emp_assert((bit_set[NUM_FIELDS - 1] & ~MaskLow<field_t>(LAST_BIT)) == 0);
       }
 
     }
