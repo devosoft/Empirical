@@ -36,6 +36,7 @@
 #include <string>
 
 #include "../base/vector.h"
+#include "../base/errors.h"
 #include "../tools/mem_track.h"
 
 #include "events.h"
@@ -252,6 +253,9 @@ namespace web {
       // Some nodes can have children and need to be able to recursively register them.
       virtual void RegisterChildren(DivInfo * registrar) { ; }   // No children by default.
       virtual void UnregisterChildren(DivInfo * regestrar) { ; } // No children by default.
+
+      virtual void AddChild(Widget in) { ; }
+      virtual void RemoveChild(Widget & child) { ; }
 
       // Record dependants.  Dependants are only acted upon when this widget's action is
       // triggered (e.g. a button is pressed)
@@ -844,6 +848,40 @@ namespace web {
       return_t & SetPadding(double p, const std::string & unit="px") {
         return SetCSS("padding", emp::to_string(p, unit));
       }
+
+      /// Wrap a wrapper around this Widget.
+      /// @param wrapper the wrapper that will be placed around this Widget
+      /// @return this Widget
+      return_t & WrapWith(Widget wrapper) {
+
+        // if this Widget is already nested within a parent
+        // we'll need to wedge the wrapper between this Widget and the parent
+        // e.g., parent->child will become parent->wrapper->child
+        if (Info(*this)->parent) {
+
+          // parent should be a DivInfo
+          emp_assert(dynamic_cast<internal::DivInfo*>(
+            Info(*this)->parent
+          ));
+
+          const auto parent_info = Info((return_t &) *this)->parent;
+
+          // switch out parent's existing child for wrapper
+          parent_info->RemoveChild((return_t &) *this);
+          parent_info->AddChild(wrapper);
+        } else if (Info(wrapper)->ptr_count == 1) {
+          emp::NotifyWarning(
+            "Only one reference held to wrapper. ",
+            "It will be destroyed when it goes out of scope."
+          );
+        }
+
+        // put this Widget inside of the wrapper
+        wrapper << (return_t &) *this;
+
+        return (return_t &) *this;
+      }
+
     };
 
   }
