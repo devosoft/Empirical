@@ -1,0 +1,83 @@
+/* Glyphicon Toggle */
+.collapse_toggle[aria-expanded=true] .fa-angle-double-down{
+    display: none;
+}
+.collapse_toggle[aria-expanded=true] .fa-angle-double-right{
+    display: none;
+}
+.collapse_toggle[aria-expanded=false] .fa-angle-double-up{
+    display: none;
+}
+.toggle_icon_left_margin{
+    margin-right: 10px;
+}
+
+/* Card Header */
+.setting_heading{
+    color: black;
+    text-decoration: underline;
+}
+.setting_heading:hover{
+    color: #0275d8 /* Bootstrap default pirmary color */
+}
+
+/* Card Body */
+.setting_element {
+    width: 100%;
+}
+.title_area{
+    width: 38%;
+    display: inline-block;
+}
+.blank_div{
+    width: 38%;
+    display: none;
+}
+/* Form Inputs */
+.input_slider{
+    width: 38%;
+    margin-right: 10px;
+}
+.input_number{
+    width: 18%;
+    right: 10px;
+}
+.input_text{
+    width: 57%;
+}
+
+/* Dropdown Bubble */
+.dropdown_triangle{
+    width: 0; 
+    height: 0; 
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    
+    border-bottom: 12px solid #ede9e8;
+    margin-left: 15px;
+}
+.dropdown_content{
+    font-style: italic;
+    padding: 10px;
+    background-color: #ede9e8;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    width: 95%;
+}
+.mobile_dropdown{
+    display: none;
+}
+
+/* Mobile Version */
+@media screen and (max-width: 992px) {
+    .blank_div{
+        display: inline-block;
+    }
+    .input_slider{
+        display: none;
+    }
+    /* Dropdown Bubble */
+    .mobile_dropdown{
+        display: inline;
+    }
+}
