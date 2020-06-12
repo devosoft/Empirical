@@ -291,7 +291,7 @@ TEST_CASE("Another Test BitVector", "[tools]")
 TEST_CASE("BitVector padding bits protected", "[tools]") {
 #ifdef TDEBUG
 
-  for (size_t i = 0; i < 31; ++i) {
+  for (size_t i = 1; i < 32; ++i) {
 
     emp::BitVector vec(i);
     REQUIRE(emp::assert_last_fail == 0);
