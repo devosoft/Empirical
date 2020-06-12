@@ -491,7 +491,7 @@ namespace emp {
         LastBitID() == 0
         || (
           bit_set[NumFields() - 1]
-          & MaskHigh<field_t>(LastBitID())
+          & ~MaskLow<field_t>(LastBitID())
         ) == 0
       );
 
