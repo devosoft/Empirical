@@ -97,8 +97,10 @@ namespace web {
     ///  The function must take in an emp::web::KeyboardEvent (which includes information about
     ///  the specific key pressed as well as any modifiers such as SHIFT or CTRL) and it
     ///  must return a boolean value indicating whether it has resolved the keypress.
-    void AddKeydownCallback(std::function<bool(const KeyboardEvent &)> cb_fun, int order=-1)
-    {
+    void AddKeydownCallback(
+      std::function<bool(const KeyboardEvent &)> cb_fun,
+      int order=-1
+    ) {
       if (order == -1) order = next_order;
       if (order >= next_order) next_order = order+1;
 
@@ -107,8 +109,11 @@ namespace web {
 
     ///  Link a specific key to a target function to be called when that key is pressed.
     ///  The function my return a void and take no arguments.
-    void AddKeydownCallback(char key, std::function<void()> cb_fun, int order=-1)
-    {
+    void AddKeydownCallback(
+      char key,
+      std::function<void()> cb_fun,
+      int order=-1
+    ) {
       if (order == -1) order = next_order;
       if (order >= next_order) next_order = order+1;
 
@@ -119,19 +124,27 @@ namespace web {
 
     /// Provide a whole set of keys that should all trigger the same function, including an
     /// ordering for priority.
-    void AddKeydownCallback(const std::string & key_set, const std::function<void()> & cb_fun,
-                            int order)
-    {
+    void AddKeydownCallback(
+      const std::string & key_set,
+      const std::function<void()> & cb_fun,
+      int order
+    ) {
       if (order >= next_order) next_order = order+1;
 
-      fun_map[order] =
-        [key_set, cb_fun](const KeyboardEvent & evt)
-        { if (key_set.find((char)evt.keyCode) == std::string::npos) return false; cb_fun(); return true;};
+      fun_map[order] = [key_set, cb_fun](const KeyboardEvent & evt) {
+        if (key_set.find((char)evt.keyCode) == std::string::npos) {
+          return false;
+        }
+        cb_fun();
+        return true;
+      };
     }
 
     /// Provide a whole set of keys that should all trigger the same function; use default ordering.
-    void AddKeydownCallback(const std::string & key_set, const std::function<void()> & cb_fun)
-    {
+    void AddKeydownCallback(
+      const std::string & key_set,
+      const std::function<void()> & cb_fun
+    ) {
       AddKeydownCallback(key_set, cb_fun, next_order);
     }
   };
