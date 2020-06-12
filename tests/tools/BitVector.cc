@@ -281,3 +281,11 @@ TEST_CASE("Another Test BitVector", "[tools]")
   REQUIRE(bv80.GetUIntAtBit(64) == 130);
   REQUIRE(bv80.GetValueAtBit<5>(64) == 2);
 }
+
+TEST_CASE("Regression test for #277", "[tools]") {
+  emp::BitVector vec(4);
+
+  for (size_t i = 0; i < 4; ++i) REQUIRE(!vec[i]);
+  vec.SetUIntAtBit(0, 15);
+  for (size_t i = 0; i < 4; ++i) REQUIRE(vec[i]);
+}
