@@ -50,7 +50,7 @@ namespace emp {
     DataFile(const std::string & in_filename,
              const std::string & b="", const std::string & s=",", const std::string & e="\n")
       : filename(in_filename), os(
-      #ifdef EMSCRIPTEN
+      #ifdef __EMSCRIPTEN__
       new emp::NullStream()
       #else
       new std::ofstream(in_filename)
@@ -149,8 +149,8 @@ namespace emp {
       os->flush();
     }
 
-    /// If Update is called with an update number, call the full version of update only if the update value
-    /// passes the timing function (that is, the timing function returns true).
+    /// If Update is called with an update number, call the full version of update only if the
+    /// update value passes the timing function (that is, the timing function returns true).
     virtual void Update(size_t update) { if (timing_fun(update)) Update(); }
 
 
@@ -208,6 +208,33 @@ namespace emp {
       return Add(in_fun, key, desc);
     }
 
+    /// Add a function that always pulls the median value from the DataNode @param node.
+    /// Requires that @param node have the data::Range or data::FullRange modifier.
+    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// current value from the node
+    template <typename VAL_TYPE, emp::data... MODS>
+    size_t AddMedian(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
+        if (pull) node.PullData();
+        os << node.GetMedian();
+        if (reset) node.Reset();
+      };
+      return Add(in_fun, key, desc);
+    }
+
+    /// Add a function that always pulls the Percentile value from the DataNode @param node.
+    /// Requires that @param node have the data::Range or data::FullRange modifier.
+    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// current value from the node
+    template <typename VAL_TYPE, emp::data... MODS>
+    size_t AddPercentile(DataNode<VAL_TYPE, MODS...> & node, const double pct=100.0, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
+      std::function<fun_t> in_fun = [&node, reset, pull, pct](std::ostream & os){
+        if (pull) node.PullData();
+        os << node.GetPercentile(pct);
+        if (reset) node.Reset();
+      };
+      return Add(in_fun, key, desc);
+    }
 
     /// Add a function that always pulls the total value from the DataNode @param node.
     /// Requires that @param node have the data::Range or data::FullRange modifier.
@@ -423,10 +450,9 @@ namespace emp {
     emp::vector<std::string> container_descs;
 
   public:
-
-    ContainerDataFile(const std::string & filename,
-             const std::string & b="", const std::string & s=",", const std::string & e="\n")
-             : DataFile(filename, b, s, e), update_container_fun(), current_rows() {;}
+    template <typename ...ARGS>
+    explicit ContainerDataFile(ARGS&& ...arguments)
+      : DataFile(std::forward<ARGS>(arguments)...), update_container_fun(), current_rows() {;}
 
     ~ContainerDataFile() {;}
 

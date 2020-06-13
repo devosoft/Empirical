@@ -7,6 +7,10 @@ module.exports = function(config) {
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '../../',
 
+    proxies: {
+      "/assets/": "/base/tests/web/assets"
+    },
+
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['mocha'],
@@ -19,10 +23,12 @@ module.exports = function(config) {
       {pattern: 'source/web/d3/d3.min.js'},
       {pattern: 'source/web/d3/d3-tip.min.js'},
       {pattern: 'tests/web/test_header.js'},
-      {pattern: 'tests/data/lineage-example.json', included: false},
-      {pattern: 'tests/data/test-line-graph.csv', included: false},
+      {pattern: 'tests/web/assets/lineage-example.json', included: false},
+      {pattern: 'tests/web/assets/test-line-graph.csv', included: false},
       {pattern: 'tests/web/test_visualizations.js.map', included: false},
-      {pattern: 'tests/web/test_visualizations.js'}
+      {pattern: 'tests/web/test_visualizations.js'},
+      {pattern: 'tests/web/test_visualizations.wasm', included: false, nocache:true},
+      {pattern: 'tests/web/test_visualizations.wasm.map', included: false, nocache:true}
     ],
 
 

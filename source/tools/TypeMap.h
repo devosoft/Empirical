@@ -48,27 +48,27 @@ namespace emp {
     const_iterator cend() const noexcept { return val_map.end();  }
     
     template <typename INDEX_TYPE>
-    mapped_type & Get() { return val_map[GetTypeValue<INDEX_TYPE>()]; }
+    mapped_type & Get() { return val_map[GetTypeID<INDEX_TYPE>()]; }
 
     template <typename INDEX_TYPE>
-    mapped_type & at() { return val_map.at(GetTypeValue<INDEX_TYPE>()); }
+    mapped_type & at() { return val_map.at(GetTypeID<INDEX_TYPE>()); }
 
     template <typename INDEX_TYPE>
-    const mapped_type & at() const { return val_map.at(GetTypeValue<INDEX_TYPE>()); }
+    const mapped_type & at() const { return val_map.at(GetTypeID<INDEX_TYPE>()); }
 
     template <typename INDEX_TYPE>
-    iterator find() { return val_map.find( GetTypeValue<INDEX_TYPE>() ); }
+    iterator find() { return val_map.find( GetTypeID<INDEX_TYPE>() ); }
 
     template <typename INDEX_TYPE>
-    const_iterator find() const { return val_map.find( GetTypeValue<INDEX_TYPE>() ); }
+    const_iterator find() const { return val_map.find( GetTypeID<INDEX_TYPE>() ); }
 
     template <typename INDEX_TYPE>
-    size_t count() const { return val_map.count( GetTypeValue<INDEX_TYPE>() ); }
+    size_t count() const { return val_map.count( GetTypeID<INDEX_TYPE>() ); }
 
     iterator erase (const_iterator position) { return val_map.erase(position); }
 
     template <typename INDEX_TYPE>
-    size_type erase() { return val_map.erase( GetTypeValue<INDEX_TYPE>() ); }
+    size_type erase() { return val_map.erase( GetTypeID<INDEX_TYPE>() ); }
 
     void clear() noexcept { val_map.clear(); }
   };

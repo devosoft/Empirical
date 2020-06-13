@@ -60,7 +60,7 @@ struct D {
 
 struct E {
   static constexpr int class_id = 5;
-  bool use_this;
+  bool use_this = true;
 
   static std::string GetName() { return "E"; }
 };

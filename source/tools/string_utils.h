@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2019
+ *  @date 2016-2020.
  *
  *  @file string_utils.h
  *  @brief Simple functions to manipulate strings.
@@ -19,7 +19,10 @@
 #include <string>
 #include <string_view>
 #include <unordered_set>
+#include <iterator>
+#include <limits>
 
+#include "../base/array.h"
 #include "../base/Ptr.h"
 #include "../base/vector.h"
 #include "../meta/reflection.h"
@@ -35,6 +38,11 @@ namespace emp {
     return empty;
   }
 
+  /// Count the number of times a specific character appears in a string
+  /// (a clean shortcut to std::count)
+  static inline size_t count(const std::string & str, char c) {
+    return std::count(str.begin(), str.end(), c);
+  }
 
   /// Convert a single chararcter to one that uses a proper escape sequence (in a string) if needed.
   static inline std::string to_escaped_string(char value) {
@@ -123,6 +131,144 @@ namespace emp {
     return ss.str();
   }
 
+  /// Test if an input string is properly formated as a literal character.
+  static inline char is_literal_char(const std::string & value) {
+    // A literal char must beging with a single quote, contain a representation of a single
+    // character, and end with a single quote.
+    if (value.size() < 3) return false;
+    if (value[0] != '\'' || value.back() != '\'') return false;
+
+    // If there's only a single character in the quotes, it's USUALLY legal.
+    if (value.size() == 3) {
+      switch (value[1]) {
+        case '\'':         // Can't be a single quote (must be escaped!)
+        case '\\':         // Can't be a backslash (must be followed by something!)
+          return false;
+        default:
+          return true;
+      }
+    }
+
+    // If there are more characters, must be an escape sequence.
+    if (value.size() == 4) {
+      if (value[1] != '\\') return false;
+
+      // Identify legal escape sequences.
+      // @CAO Need more here!
+      switch (value[2]) {
+        case 'n':   // Newline
+        case 'r':   // Return
+        case 't':   // Tab
+        case '0':   // Empty (character 0)
+        case '\\':  // Backslash
+        case '\'':  // Single quote
+          return true;
+        default:
+          return false;
+      }
+    }
+
+    // @CAO: Need to add special types of numerical escapes here (e.g., ascii codes!)
+
+    // If we made it here without a problem, it must be correct!
+    return true;
+  }
+
+  /// Convert a literal character representation to an actual string.
+  /// (i.e., 'A', ';', or '\n')
+  static inline char from_literal_char(const std::string & value) {
+    emp_assert(is_literal_char(value));
+    // Given the assert, we can assume the string DOES contain a literal representation,
+    // and we just need to convert it.
+
+    if (value.size() == 3) return value[1];
+    if (value.size() == 4) {
+      switch (value[2]) {
+        case 'n': return '\n';   // Newline
+        case 'r': return '\r';   // Return
+        case 't': return '\t';   // Tab
+        case '0': return '\0';   // Empty (character 0)
+        case '\\': return '\\';  // Backslash
+        case '\'': return '\'';  // Single quote
+      }
+    }
+
+    // @CAO: Need to add special types of numerical escapes here (e.g., ascii codes!)
+
+    // Problem!
+    return '0';
+  }
+
+  /// Test if an input string is properly formated as a literal string.
+  static inline char is_literal_string(const std::string & value) {
+    // A literal string must begin and end with a double quote and contain only valid characters.
+    if (value.size() < 2) return false;
+    if (value[0] != '"' || value.back() != '"') return false;
+
+    // Are all of the characters valid?
+    for (size_t pos = 1; pos < value.size() - 1; pos++) {
+      if (value[pos] == '"') return false;  // Cannot have a raw double-quote in the middle.
+      if (value[pos] == '\\') {
+        if (pos == value.size()-2) return false;  // Backslash must have char to escape.
+
+        // Move to the next char and make sure it's legal to be escaped.
+        // @CAO Expand on options!
+        pos++;
+        switch (value[pos]) {
+          case 'n':   // Newline
+          case 'r':   // Return
+          case 't':   // Tab
+          case '0':   // Empty (character 0)
+          case '\\':  // Backslash
+          case '\'':  // Single quote
+            continue;
+          default:
+            return false;
+        }
+      }
+    }
+
+    // @CAO: Need to check special types of numerical escapes (e.g., ascii codes!)
+
+    // If we made it here without a problem, it must be correct!
+    return true;
+  }
+
+  /// Convert a literal string representation to an actual string.
+  static inline std::string from_literal_string(const std::string & value) {
+    emp_assert(is_literal_string(value));
+    // Given the assert, we can assume the string DOES contain a literal representation,
+    // and we just need to convert it.
+
+    std::string out_string;
+    out_string.reserve(value.size()-2);  // Make a guess on final size.
+
+    for (size_t pos = 1; pos < value.size() - 1; pos++) {
+      // If we don't have an escaped character, just move it over.
+      if (value[pos] != '\\') {
+        out_string.push_back(value[pos]);
+        continue;
+      }
+
+      // If we do have an escape character, convert it.
+      pos++;
+
+      switch (value[pos]) {
+        case 'n': out_string.push_back('\n'); break;   // Newline
+        case 'r': out_string.push_back('\r'); break;   // Return
+        case 't': out_string.push_back('\t'); break;   // Tab
+        case '0': out_string.push_back('\0'); break;   // Empty (character 0)
+        case '\\': out_string.push_back('\\'); break;  // Backslash
+        case '\'': out_string.push_back('\''); break;  // Single quote
+        default:
+          emp_assert(false, "unknown escape char used; probably need to update converter!");
+      }
+    }
+
+    return out_string;
+  }
+
+
   /// Convert a string to all uppercase.
   static inline std::string to_upper(std::string value) {
     constexpr int char_shift = 'a' - 'A';
@@ -141,7 +287,7 @@ namespace emp {
     return value;
   }
 
-  // Convert an integer to a roman numeral string.
+  /// Convert an integer to a roman numeral string.
   static inline std::string to_roman_numeral(int val, const std::string & prefix="") {
     std::string ret_string(prefix);
     if (val < 0) ret_string += to_roman_numeral(-val, "-");
@@ -242,10 +388,22 @@ namespace emp {
     return false;
   }
 
+  /// Determine if there are only digits in a string.
+  inline bool is_digits(const std::string & test_str) {
+    for (char c : test_str) if (!is_digit(c)) return false;
+    return true;
+  }
+
   /// Determine if there are any letters or digits anywhere in a string.
   inline bool has_alphanumeric(const std::string & test_str) {
     for (char c : test_str) if (is_alphanumeric(c)) return true;
     return false;
+  }
+
+  /// Determine if there are any letters or digits anywhere in a string.
+  inline bool is_alphanumeric(const std::string & test_str) {
+    for (char c : test_str) if (!is_alphanumeric(c)) return false;
+    return true;
   }
 
   /// Determine if there are any letters, digit, or underscores anywhere in a string.
@@ -310,7 +468,7 @@ namespace emp {
 
   /// Return a prefix of the input string (up to a specified delimeter), but do not modify it.
   /// If the delimeter is not found, return the entire input string.
-  inline std::string string_get(const std::string & in_string, const char delim, size_t start_pos=0) {
+  inline std::string string_get(const std::string & in_string, const char delim=' ', size_t start_pos=0) {
     return string_get_range(in_string, start_pos, in_string.find(delim, start_pos));
   }
 
@@ -420,61 +578,88 @@ namespace emp {
     in_string.resize(pos);
   }
 
+  /// Make a string safe(r) 
+  static inline std::string slugify(const std::string & in_string) {
+    //TODO handle complicated unicode strings
+    std::string res = to_lower(in_string);
+    remove_punctuation(res);
+    compress_whitespace(res);
+    std::transform(res.begin(), res.end(), res.begin(), [](char ch) {
+      return ch == ' ' ? '-' : ch;
+    });
+    return res;
+  }
 
   /// Provide a string_view on a given string
-  static inline std::string_view view_string(const std::string & str) {
+  static inline std::string_view view_string(const std::string_view & str) {
     return std::string_view(str);
   }
 
   /// Provide a string_view on a string from a given starting point.
-  static inline std::string_view view_string(const std::string & str, size_t start) {
+  static inline std::string_view view_string(const std::string_view & str, size_t start) {
     emp_assert(start <= str.size());
-    return std::string_view(str.c_str() + start, str.size() - start);
+    return str.substr(start, str.size() - start);
   }
 
   /// Provide a string_view on a string from a starting point with a given size.
-  static inline std::string_view view_string(const std::string & str, size_t start, size_t npos) {
+  static inline std::string_view view_string(const std::string_view & str, 
+                                             size_t start, 
+                                             size_t npos) {
     emp_assert(start + npos <= str.size());
-    return std::string_view(str.c_str() + start, npos);
+    return str.substr(start, npos);
   }
 
   /// Provide a string_view on a string from the beginning to a given size.
-  static inline std::string_view view_string_front(const std::string & str, size_t npos) {
+  static inline std::string_view view_string_front(const std::string_view & str,
+                                                   size_t npos) {
     emp_assert(npos <= str.size());
-    return std::string_view(str.c_str(), npos);
+    return str.substr(0, npos);
   }
 
   /// Provide a string_view on a string from a starting point with a given size.
-  static inline std::string_view view_string_back(const std::string & str, size_t npos) {
+  static inline std::string_view view_string_back(const std::string_view & str,
+                                                  size_t npos) {
     emp_assert(npos <= str.size());
-    return std::string_view(str.c_str() + str.size() - npos, npos);
+    return str.substr(str.size() - npos, npos);
   }
 
   /// Provide a string_view on a string from a starting point to an ending point.
-  static inline std::string_view view_string_range(const std::string & str, size_t start, size_t end) {
+  static inline std::string_view view_string_range(const std::string_view & str,
+                                                   size_t start,
+                                                   size_t end) {
     emp_assert(start <= end);
     emp_assert(end <= str.size());
-    return std::string_view(str.c_str() + start, end - start);
+    return str.substr(start, end - start);
   }
 
   /// Return a view of the prefix of the input string up to a specified delimeter.
   /// If the delimeter is not found, return the entire input string.
-  static inline std::string_view view_string_to(const std::string & in_string, const char delim, size_t start_pos=0) {
+  static inline std::string_view view_string_to(const std::string_view & in_string,
+                                                const char delim,
+                                                size_t start_pos=0) {
     const size_t in_size = in_string.size();
     size_t end_pos = start_pos;
-    while (end_pos < in_size && in_string[end_pos] != delim) end_pos++;    
+    while (end_pos < in_size && in_string[end_pos] != delim) end_pos++;
     return view_string_range(in_string, start_pos, end_pos);
   }
 
-  /// Cut up a string based on the provided delimitor; fill them in to the provided vector.
-  static inline void slice(const std::string & in_string, emp::vector<std::string> & out_set,
-                           char delim='\n') {
+  /// Cut up a string based on the provided delimiter; fill them in to the provided vector.
+  /// @in_string operand
+  /// @out_set destination
+  /// @delim delimiter to split on
+  /// @max_split defines the maximum number of splits
+  static inline void slice(
+    const std::string_view & in_string,
+    emp::vector<std::string> & out_set,
+    const char delim='\n',
+    const size_t max_split=std::numeric_limits<size_t>::max()
+  ) {
     const size_t test_size = in_string.size();
 
     // Count produced strings
     size_t out_count = 0;
     size_t pos = 0;
-    while (pos < test_size) {
+    while (pos < test_size && out_count <= max_split) {
       while (pos < test_size && in_string[pos] != delim) pos++;
       pos++; // Skip over deliminator
       out_count++;  // Increment for each delim plus once at the end (so once if no delims).
@@ -486,7 +671,10 @@ namespace emp {
     size_t string_id = 0;
     while (pos < test_size) {
       out_set[string_id] = "";
-      while (pos < test_size && in_string[pos] != delim) {
+      while (
+        pos < test_size
+        && (in_string[pos] != delim || string_id == out_count - 1)
+      ) {
         out_set[string_id] += in_string[pos];
         pos++;
       }
@@ -497,15 +685,23 @@ namespace emp {
   }
 
   /// Slice a string without passing in result vector (may be less efficient).
-  static inline emp::vector<std::string> slice(const std::string & in_string, char delim='\n') {
+  /// @in_string operand
+  /// @delim delimiter to split on
+  /// @max_split defines the maximum number of splits
+  static inline emp::vector<std::string> slice(
+    const std::string_view & in_string,
+    const char delim='\n',
+    const size_t max_split=std::numeric_limits<size_t>::max()
+  ) {
     emp::vector<std::string> result;
-    slice(in_string, result, delim);
+    slice(in_string, result, delim, max_split);
     return result;
   }
 
   /// Create a set of string_views based on the provided delimitor; fill them in to the provided vector.
-  static inline void view_slices(const std::string & in_string, emp::vector<std::string_view> & out_set,
-                           char delim='\n') {
+  static inline void view_slices(const std::string_view & in_string,
+                                 emp::vector<std::string_view> & out_set,
+                                 char delim='\n') {
     const size_t in_size = in_string.size();
     out_set.resize(0);
 
@@ -518,7 +714,8 @@ namespace emp {
   }
 
   /// Slice a string without passing in result vector (may be less efficient).
-  static inline emp::vector<std::string_view> view_slices(const std::string & in_string, char delim='\n') {
+  static inline emp::vector<std::string_view> view_slices(const std::string_view & in_string,
+                                                          char delim='\n') {
     emp::vector<std::string_view> result;
     view_slices(in_string, result, delim);
     return result;
@@ -527,59 +724,91 @@ namespace emp {
   /// @cond TEMPLATES
 
   // The next functions are not efficient, but they will take any number of inputs and
-  // dynamically convert them all into a single, concatanated strings or stringstreams.
+  // dynamically convert them all into a single, concatanated string.
+
+  /// Setup emp::ToString declarations for built-in types.
+  template <typename T, size_t N> inline std::string ToString(const emp::array<T,N> & container);
+  template <typename... Ts> inline std::string ToString(const emp::vector<Ts...> & container);
+
+  /// Join a container of strings with a delimiter.
+  /// Adapted fromhttps://stackoverflow.com/questions/5288396/c-ostream-out-manipulation/5289170#5289170
+  template <typename Range, typename Value = typename Range::value_type>
+  std::string join_on(
+    Range const& elements,
+    const char *const delimiter
+  ) {
+    std::ostringstream os;
+    auto b = std::begin(elements), e = std::end(elements);
+
+    if (b != e) {
+        std::copy(b, std::prev(e), std::ostream_iterator<Value>(os, delimiter));
+        b = std::prev(e);
+    }
+    if (b != e) {
+        os << *b;
+    }
+
+    return os.str();
+  }
+
 
   namespace internal {
-    inline void append_sstream(std::stringstream & ss) { (void) ss; }
-
-    template <typename TYPE, typename... OTHER_TYPES>
-    static void append_sstream(std::stringstream & ss, TYPE value, OTHER_TYPES... other_values) {
-      ss << value;
-      append_sstream(ss, other_values...);
-    }
-
-    // Give mutliple implmentations of to_string_impl... if we can append quickly, do so!!
-    template <typename T1, typename T2, typename... EXTRA_TYPES>
-    inline std::string to_string_impl(int, T1 val1, T2 val2, EXTRA_TYPES... extra_values) {
-      std::stringstream ss;
-      append_sstream(ss, val1, val2, extra_values...);
-      return ss.str();
-    }
-
-    // If std::to_string knows how to handle the case use it!
+    // If the item passed in has a ToString(), always use it.
     template <typename T>
-    inline auto to_string_impl(bool, T val) -> decltype(std::to_string(val))
-    { return std::to_string(val); }
-
-    // If there's another single POD entry, we can convert it manually and pass the result back.
-    inline std::string to_string_impl(bool, const std::string & s) { return s; }
-    inline std::string to_string_impl(bool, char c) { return std::string(1,c); }
-    inline std::string to_string_impl(bool, unsigned char c) { return std::string(1,(char)c); }
-    inline std::string to_string_impl(bool, char* str) { return std::string(str); }
-
-    // Operate on std::containers
-    template <typename T>
-    inline typename emp::sfinae_decoy<std::string, typename T::value_type>
-    to_string_impl(bool, T container) {
-      std::stringstream ss;
-      ss << "[ ";
-      for (const auto & el : container) {
-        ss << to_string_impl(true, el);
-        ss << " ";
-      }
-      ss << "]";
-      return ss.str();
+    decltype(std::declval<T>().ToString()) to_stream_item(const T & in, bool) {
+      return in.ToString();
     }
+
+    // Otherwise, if emp::ToString(x) is defined for x, use it.
+    template <typename T>
+    auto to_stream_item(const T & in, int) -> decltype(emp::ToString(in)) {
+      return emp::ToString(in);
+    }
+
+    // If neither works, just assume stream operator will handle things...
+    // @CAO: Technically we can detect this to give a more informative error...
+    template <typename T> const T & to_stream_item(const T & in, ...) { return in; }
+
   }
 
   /// @endcond
 
-  /// This function does its very best to convert everything it's to a string. Takes any number
-  /// of arguments and returns a single string containing all of them concatenated. Objects can be
-  /// any normal (POD) data type, container, or anything that can be passed into a stringstream.
-  template <typename... ALL_TYPES>
-  inline std::string to_string(ALL_TYPES &&... all_values) {
-    return internal::to_string_impl(true, std::forward<ALL_TYPES>(all_values)...);
+
+  /// This function does its very best to convert anything it gets to a string. Takes any number
+  /// of arguments and returns a single string containing all of them concatenated.  Any objects
+  /// that can go through a stringstream, have a ToString() memember functon, or are defined to
+  /// be passed into emp::ToString(x) will work correctly.
+  template <typename... Ts>
+  inline std::string to_string(const Ts &... values) {
+    std::stringstream ss;
+    (ss << ... << internal::to_stream_item(values, true));
+    return ss.str();
+  }
+
+  /// Setup emp::ToString to work on arrays.
+  template <typename T, size_t N>
+  inline std::string ToString(const emp::array<T,N> & container) {
+    std::stringstream ss;
+    ss << "[ ";
+    for (const auto & el : container) {
+      ss << to_string(el);
+      ss << " ";
+    }
+    ss << "]";
+    return ss.str();
+  }
+
+  /// Setup emp::ToString to work on vectors.
+  template <typename... Ts>
+  inline std::string ToString(const emp::vector<Ts...> & container) {
+    std::stringstream ss;
+    ss << "[ ";
+    for (const auto & el : container) {
+      ss << to_string(el);
+      ss << " ";
+    }
+    ss << "]";
+    return ss.str();
   }
 
   /// This function tries to convert a string into any type you're looking for...  You just
@@ -631,6 +860,71 @@ namespace emp {
     T out_val;
     ss >> out_val;
     return out_val;
+  }
+
+
+  // -------- Functions that operate on VECTORS of strings --------
+
+  using string_vec_t = emp::vector<std::string>;
+
+  /// Convert a vector of strings to an English list, such as "one, two, three, and four."
+  static inline std::string to_english_list(const string_vec_t & strings) {
+    // If there are no input strings, return an empty string.
+    if (strings.size() == 0) { return ""; }
+
+    // If there is one string provided, return it by itself.
+    if (strings.size() == 1) { return strings[0]; }
+
+    // If two strings are provided, link them by an "and".
+    if (strings.size() == 2) { return to_string(strings[0], " and ", strings[1]); }
+
+    // If MORE than two strings are provided, list the first n-1 followed by commas, ending
+    // with an "and" before the final one.
+    std::string out_str;
+    for (size_t i = 0; i < strings.size(); i++) {
+      if (i) {
+        out_str += ", ";
+        if (i == strings.size()-1) out_str += "and ";
+      }
+      out_str += strings[i];
+    }
+
+    return out_str;
+  }
+
+
+  /// Transform all strings in a vector.
+  static inline string_vec_t transform_strings(const string_vec_t & in_strings,
+                                               std::function<std::string(const std::string &)> fun) {
+    string_vec_t out_strings(in_strings.size());
+    for (size_t i = 0; i < in_strings.size(); i++) {
+      out_strings[i] = fun(in_strings[i]);
+    }
+    return out_strings;
+  }
+
+  /// Put all strings provided in quotes (Like 'this'), pre- and post-fixing another string if
+  /// provided.
+  static inline string_vec_t quote_strings(const string_vec_t & in_strings,
+                                           const std::string quote="'") {
+    return transform_strings(in_strings, [quote](const std::string & str) {
+      return to_string(quote, str, quote);
+    });
+  }
+
+  /// Pre-pend and post-pend specified sequences to all strings provided.
+  static inline string_vec_t quote_strings(const string_vec_t & in_strings,
+                                           const std::string open_quote,
+                                           const std::string close_quote) {
+    return transform_strings(in_strings, [open_quote, close_quote](const std::string & str) {
+      return to_string(open_quote, str, close_quote);
+    });
+  }
+
+  /// Take a vector of strings, put them in quotes, and then transform it into an English list.
+  static inline std::string to_quoted_list(const string_vec_t & in_strings,
+                                           const std::string quote="'") {
+    return to_english_list(quote_strings(in_strings, quote));
   }
 
 }

@@ -27,6 +27,7 @@
 #include "Button.h"
 #include "Canvas.h"
 #include "Div.h"
+#include "Element.h"
 #include "FileInput.h"
 #include "Image.h"
 #include "Input.h"

@@ -58,7 +58,7 @@
 #include "init.h"
 #include "js_utils.h"
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 extern "C" {
   extern int EMP_GetCBArgCount();  // Get the number of arguments associated with a callback.
 }
