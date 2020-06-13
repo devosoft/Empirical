@@ -1,3 +1,10 @@
+
+################################################################################
+WARNING: ProjectTemplate is deprecated in favor of the Cookiecutter Empirical
+Project, which you can find at
+https://github.com/devosoft/cookiecutter-empirical-project
+################################################################################
+
 In order to customize this template, you must:
 
 * Put these files into the directory for your project.

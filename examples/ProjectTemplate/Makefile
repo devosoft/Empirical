@@ -19,6 +19,7 @@ OFLAGS_web_debug := -g4 -Oz -pedantic -Wno-dollar-in-identifier-extension
 CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) $(OFLAGS_web_all)
 CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) $(OFLAGS_web_all)
 
+%: $(warning WARNING: ProjectTemplate is deprecated in favor of the Cookiecutter Empirical Project, which you can find at https://github.com/devosoft/cookiecutter-empirical-project)
 
 default: $(PROJECT)
 native: $(PROJECT)
