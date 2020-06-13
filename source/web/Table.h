@@ -157,9 +157,11 @@ namespace web {
 
       void DoActivate(bool top_level=true) override {
         // Activate all of the cell children.
-        for (size_t r = 0; r < row_count; r++) {
-          for (size_t c = 0; c < col_count; c++) {
-            for (auto & child : rows[r].data[c].children) child->DoActivate(false);
+        for (auto & row : rows) {
+          for (auto & col : row.data) {
+            for (auto & child : col.children) {
+              child->DoActivate(false);
+            }
           }
         }
 
