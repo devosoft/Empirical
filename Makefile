@@ -30,6 +30,7 @@ test-web:
 	cd .. && git clone --recursive https://github.com/devosoft/cookiecutter-empirical-project.git
 
 test-cookiecutter: ../cookiecutter-empirical-project
+	. third-party/env/bin/activate && \
 	cd ../cookiecutter-empirical-project && make clean && make test
 
 doc: build-doxygen-xml
