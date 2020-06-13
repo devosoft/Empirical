@@ -9,7 +9,7 @@
 #	echo    # (optional) move to a new line
 #	if [[ $REPLY =~ ^[Yy]$ ]]
 #	then
-#		env/bin/pip install -r requirements.txt 
+#		env/bin/pip install -r requirements.txt
 #	else
 #		exit 0
 #	fi
