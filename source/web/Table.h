@@ -264,11 +264,11 @@ namespace web {
           for (size_t c = 0; c < col_count; ++c) {
             if (use_colg && col_groups[c].masked == false) {
               HTML << "<colgroup";
-              if (col_groups[c].extras) HTML << " id=" << id << "_cg" << c;
+              HTML << " id=" << id << "_cg" << c;
               HTML << ">";
             }
             HTML << "<col";
-            if (use_cols && cols[c].extras) HTML << " id=" << id << "_c" << c;
+            HTML << " id=" << id << "_c" << c;
             HTML << ">";
           }
         }
@@ -277,13 +277,13 @@ namespace web {
         for (size_t r = 0; r < rows.size(); r++) {
           if (use_rowg && row_groups[r].masked == false) {
             HTML << "<tbody";
-            if (row_groups[r].extras) HTML << " id=" << id << "_rg" << r;
+            HTML << " id=" << id << "_rg" << r;
             HTML << ">";
           }
 
           auto & row = rows[r];
           HTML << "<tr";
-          if (row.extras) HTML << " id=" << id << '_' << r;
+          HTML << " id=" << id << '_' << r;
           HTML << ">";
 
           // Loop through each cell in this row.
@@ -295,7 +295,7 @@ namespace web {
             HTML << (datum.header ? "<th" : "<td");
 
             // Include an id for this cell if we have one.
-            if (datum.extras) HTML << " id=" << id << '_' << r << '_' << c;
+            HTML << " id=" << id << '_' << r << '_' << c;
 
             // If this cell spans multiple rows or columns, indicate!
             if (datum.colspan > 1) HTML << " colspan=\"" << datum.colspan << "\"";
