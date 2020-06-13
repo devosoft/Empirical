@@ -17,3 +17,4 @@
 #	pip install -r requirements.txt
 #fi
 env/bin/pip install -r requirements.txt
+source env/bin/activate
