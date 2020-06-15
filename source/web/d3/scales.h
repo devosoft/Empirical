@@ -7,13 +7,21 @@
  *  @brief Tools for scaling graph axes in D3.
  */
 
-#ifndef EMP_D3_SCALES_H
-#define EMP_D3_SCALES_H
+#ifndef __EMP_D3_SCALES_H__
+#define __EMP_D3_SCALES_H__
 
 #include "d3_init.h"
+
+#include <iostream>
+#include <string>
+#include <typeinfo>
+#include <map>
+#include <array>
 //#include "utils.h"
 
+#include "../../base/assert.h"
 #include "../js_utils.h"
+#include "../JSWrap.h"
 
 namespace D3 {
 
@@ -90,19 +98,42 @@ namespace D3 {
         //         return emp_d3.objects[$0]($1);
         //     }, this->id, input);
         // }
-        
-        /// Calculate the ouput for [input], based on the scale's scaling function
+        // std::string ApplyScaleString(double input) {
+        //     char * buffer = (char *) EM_ASM_INT({
+        //         let result = emp_d3.objects[$0]($1);
+        //         // console.log(result);
+        //         var buffer = Module._malloc(result.length+1);
+        //         Module.stringToUTF8(result, buffer, result.length*4+1);
+        //         return buffer;
+        //         }, this->id, input);
+        //     std::string result = std::string(buffer);
+        //     free(buffer);
+        //     return result;
+        // }
+
+         /// Calculate the ouput for [input], based on the scale's scaling function
         std::string ApplyScaleString(double input) {
-            char * buffer = (char *) EM_ASM_INT({
-                let result = emp_d3.objects[$0]($1);
-                // console.log(result);
-                var buffer = Module._malloc(result.length+1);
-                Module.stringToUTF8(result, buffer, result.length*4+1);
-                return buffer;
-                }, this->id, input);
-            std::string result = std::string(buffer);
-            free(buffer);
-            return result;
+            EM_ASM({
+                const resultStr = emp_d3.objects[$0]($1));
+                emp.PassStringToCpp(resultStr);
+            }, this->id, input);
+            return emp::pass_str_to_cpp();
+        }
+
+        std::string ApplyScaleString(int input) {
+            EM_ASM({
+                const resultStr = emp_d3.objects[$0]($1));
+                emp.PassStringToCpp(resultStr);
+            }, this->id, input);
+            return emp::pass_str_to_cpp();
+        }
+
+        std::string ApplyScaleString(const std::string & input) {
+            EM_ASM({
+                const resultStr = emp_d3.objects[$0](UTF8ToString($1));
+                emp.PassStringToCpp(resultStr);
+            }, this->id, input.c_str());
+            return emp::pass_str_to_cpp();
         }
 
         double ApplyScale(double input) {
@@ -111,16 +142,30 @@ namespace D3 {
             }, this->id, input);
         }
 
+        double ApplyScale(const std::string & input) {
+            return EM_ASM_DOUBLE({
+                return emp_d3.objects[$0](UTF8ToString($1));
+            }, this->id, input.c_str());
+        }
+
         int ApplyScale(int input) {
             return EM_ASM_INT({
                 return emp_d3.objects[$0]($1);
             }, this->id, input);
         }
+
+        int ApplyScale(const std::string & input) {
+            return EM_ASM_INT({
+                return emp_d3.objects[$0](UTF8ToString($1));
+            }, this->id, input.c_str());
+        }
         
         //TODO:Getters
     };
 
-    /// Scales with continuous input and discrete output
+    ////////////////////////////////////////////////////////
+    /// Scales with continuous input and discrete output ///
+    ////////////////////////////////////////////////////////
     class ContinuousInputDiscreteOutputScale : public Scale {
     public: 
         ContinuousInputDiscreteOutputScale() : Scale(true) {;}
@@ -181,7 +226,87 @@ namespace D3 {
         ThresholdScale(bool derived) : ContinuousInputDiscreteOutputScale(true) {;}
     };
     
-    /// Scales with continuous input and continuous output
+    //////////////////////////////////////////////////////////
+    /// Scales with continuous input and continuous output ///
+    //////////////////////////////////////////////////////////
+    class ContinuousScale : public Scale {
+    public: 
+        ContinuousScale() : Scale(true) {;}
+
+        template <typename T>
+        double Invert(T y) {
+            return EM_ASM_DOUBLE({
+                return emp_d3.objects[$0].invert($1);
+            }, this->id, y);
+        }
+
+        // .ticks()
+        ContinuousScale & SetTicks(int count) {
+            EM_ASM_ARGS({js.objects[$0].ticks($1);}, this->id, count);
+            return *this;
+        }
+
+        // .tickFormat()
+        ContinuousScale & SetTickFormat(int count, const std::string & format) {
+        //TODO: format is technically optional, but what is the point of this
+        //function without it?
+            EM_ASM({
+                emp_d3.objects[$0].tickFormat($1, UTF8ToString($2));
+            }, this->id, count, format.c_str());
+            return *this;
+        }
+
+        // .nice()
+        /// Extend the domain so that it start and ends on nice values
+        /// Nicing a scale only modifies the current domain
+        ///// How can we make sure this only gets called on the domain?
+        Scale & MakeNice() {
+            EM_ASM({ 
+                emp_d3.objects[$0].nice()
+            }, this->id);
+            return *this;
+        }
+
+        // Sets the scale’s range to the specified array of values 
+        // while also setting the scale’s interpolator to interpolateRound
+        template <typename T, size_t SIZE>
+        ContinuousScale & SetRangeRound(emp::array<T,SIZE> values) {
+            emp::pass_array_to_javascript(values);
+            EM_ASM({
+                emp_d3.objects[$0].rangeRound(emp.__incoming_array);
+            }, this->id);
+            return *this;
+        }
+
+        ContinuousScale & SetRangeRound(double min, double max) {
+            EM_ASM({
+                emp_d3.objects[$0].rangeRound([$1, $2]);
+            }, this->id, min, max);
+            return *this;
+        }
+
+        // Enables or disables clamping accordingly
+        ContinuousScale & Clamp(bool clamp) {
+            EM_ASM({ emp_d3.objects[$0].clamp($1); }, this->id, clamp);
+            return *this;
+        }
+
+
+        // .interpolate() (need to pass in an interpolator)
+
+    protected: 
+        ContinuousScale(bool derived) : Scale(true) {;}
+    };
+
+    class LinearScale : public ContinuousScale {
+    public:
+        LinearScale() : ContinuousScale(true) {
+            EM_ASM({ emp_d3.objects[$0] = d3.scaleLinear(); }, this->id);
+        }
+
+    protected:
+        LinearScale(bool derived) : ContinuousScale(true) { ; }
+    }
     // scaleLinear
     // scaleIdentity
     // scalePow
