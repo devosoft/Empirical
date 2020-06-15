@@ -11,6 +11,10 @@
 #include "../tools/set_utils.h"
 #include "../tools/string_utils.h"
 
+// Using prefab elements
+// #include "Card.h"
+#include "CommentBox.h"
+
 namespace emp {
 
     class ConfigPanel {
@@ -20,23 +24,19 @@ namespace emp {
             web::Div settings_div;
             std::set<std::string> exclude;
             std::map<std::string, web::Div> group_divs;
-            std::map<std::string, web::Input> input_map;
+            std::map<std::string, web::Div> input_divs;
             std::function<void(const std::string & val)> on_change_fun = [](const std::string & val){;};
             std::function<std::string(std::string val)> format_label_fun = [](std::string name){
                 emp::vector<std::string> sliced = slice(name, '_');
                 return to_titlecase(join(sliced, " "));
             };
             void SyncForm(std::string val, std::string input1, std::string input2){
-                std::cout << "Begin SyncForm" << std::endl;
                 emp::web::Input div1(settings_div.Find(input1));
                 div1.Value(val);
                 emp::web::Input div2(settings_div.Find(input2));
                 div2.Value(val);
-                std::cout << "SyncForm: after updating other two divs" << std::endl;
-
                 div1.Redraw();
                 div2.Redraw();
-                std::cout << "SyncForm: after redraw" << std::endl;
             }
         public:
             ConfigPanel(Config & c, const std::string & div_name = "settings_div")
@@ -89,7 +89,6 @@ namespace emp {
             }
 
             void Setup(const std::string & id_prefix = "settings_") {
-
                 for (auto group : config.GetGroupSet()) {
                     // std::cout << "GROUP: " << group->GetName() << std::endl;
                     std::string group_name = group->GetName();
@@ -101,27 +100,40 @@ namespace emp {
                     group_divs[group_name] << card;
                     web::Div card_header("card_header_" + group_name);
                     card << card_header;
-<<<<<<< HEAD
-                    web::Element collapse_link("a");
-                    card_header << collapse_link;
-                    collapse_link.SetAttr("data-toggle", "collapse").SetAttr("href", "#card_body_" + group_name);
-                    collapse_link << "<h3>" << group->GetDesc() << "</h3>";
 
-
-=======
-                    web::Div inline_elements(group_name + "_inline");
+					web::Div inline_elements(group_name + "_inline");
                     inline_elements.SetAttr("class", "clearfix");
                     card_header << inline_elements;
                     web::Element collapse_name_link("button");
                     inline_elements << collapse_name_link;
-                    collapse_name_link.SetAttr("data-toggle", "collapse").SetAttr("data-target", "#card_collapse_" + group_name);
-                    collapse_name_link.SetAttr("class", "btn btn-link float-left collapse_toggle setting_heading").SetAttr("type", "button").SetAttr("aria-expanded", "true").SetAttr("aria-controls", "#card_body_" + group_name);
+                    collapse_name_link.SetAttr(
+                        "data-toggle", "collapse",
+                        "data-target", "#card_collapse_" + group_name
+                    );
+                    collapse_name_link.SetAttr(
+                        "class", "btn btn-link float-left collapse_toggle setting_heading",
+                        "type", "button",
+                        "aria-expanded", "true",
+                        "aria-controls", "#card_body_" + group_name
+                    );
                     collapse_name_link << "<h3>" << group->GetDesc() << "</h3>";
                     web::Element collapse_icon_link("button");
                     inline_elements << collapse_icon_link;
+<<<<<<< HEAD
                     collapse_icon_link.SetAttr("data-toggle", "collapse").SetAttr("data-target", "#card_collapse_" + group_name);
                     collapse_icon_link.SetAttr("class", "btn btn-link float-right collapse_toggle").SetAttr("type", "button").SetAttr("aria-expanded", "true").SetAttr("aria-controls", "#card_body_" + group_name);
 
+=======
+                    collapse_icon_link.SetAttr(
+                        "data-toggle", "collapse",
+                        "data-target", "#card_collapse_" + group_name,
+                        "class", "btn btn-link float-right collapse_toggle",
+                        "type", "button",
+                        "aria-expanded", "true",
+                        "aria-controls", "#card_body_" + group_name
+                    );
+
+>>>>>>> 1509465... added prefab module for comment box
                     // Toggle Icons
                     web::Element arrow_down("span");
                     collapse_icon_link << arrow_down;
@@ -132,7 +144,11 @@ namespace emp {
 
                     web::Div card_collapse("card_collapse_" + group_name);
                     card << card_collapse;
-                    card_collapse.SetAttr("class", "collapse show").SetAttr("data-parent", "card_" + group_name).SetAttr("aria-labelledby", "card_header_" + group_name);
+                    card_collapse.SetAttr(
+                        "class", "collapse show",
+                        "data-parent", "card_" + group_name,
+                        "aria-labelledby", "card_header_" + group_name
+                    );
                     web::Div card_body("card_body_" + group_name);
                     card_collapse << card_body;
                     // make card true bootstrap cards
@@ -163,8 +179,14 @@ namespace emp {
                         web::Element title_span("span");
                         web::Element title("a");
                         setting_element << title_span << title;
-                        title.SetAttr("data-toggle", "collapse").SetAttr("href", "#" + name + "_dropdown");
-                        title.SetAttr("class", "collapse_toggle").SetAttr("role", "button").SetAttr("aria-expanded", "false").SetAttr("aria-controls", "#" + name + "_dropdown");
+                        title.SetAttr(
+                            "data-toggle", "collapse",
+                            "href", "#" + name + "_dropdown",
+                            "class", "collapse_toggle",
+                            "role", "button",
+                            "aria-expanded", "false",
+                            "aria-controls", "#" + name + "_dropdown"
+                        );
                         web::Element arrow_down_for_dropdown("span");
                         title << arrow_down_for_dropdown;
                         arrow_down_for_dropdown.SetAttr("class", "fa fa-angle-double-right toggle_icon_left_margin");
@@ -174,23 +196,16 @@ namespace emp {
                         title << format_label_fun(name);
                         title_span.SetAttr("class", "title_area");
 
-                        // Dropdown bubble
-                        // Should probably be modularlized in the future
-                        web::Div drop_down(name + "_dropdown");
-                        input_divs[name] << drop_down;
-                        web::Div triangle(name + "_triangle_up");
-                        drop_down << triangle;
-                        triangle.SetAttr("class", "dropdown_triangle");
-                        web::Div content(name + "_content");
-                        drop_down << content;
-                        content.SetAttr("class", "dropdown_content");
-                        content << group->GetEntry(i)->GetDescription();
-                        drop_down.SetAttr("class", "collapse");
-                        
-                        // Portion of dropdown only visible on small screens
-                        web::Div mobile_dropdown("mobile_dropdown_" + name);
-                        content << mobile_dropdown;
-                        mobile_dropdown.SetAttr("class", "mobile_dropdown");
+                        // This makes the Comment box toggle when title is clicked
+                        // TODO: make a class to create a toggle for two elements?
+                        web::Div dropdown_target(name + "_dropdown");
+                        input_divs[name] << dropdown_target;
+                        dropdown_target.SetAttr("class", "collapse");
+
+                        // Prefab Dropdown Box Version
+                        emp::CommentBox box;
+                        dropdown_target << box.GetDiv();
+                        box.AddContent(group->GetEntry(i)->GetDescription());
 
                         if (Has(numeric_types, type)) {
                             // Seems more efficient to use web::Input, but it's not working
@@ -233,29 +248,36 @@ namespace emp {
                                 std::cout << "empty mobile slider function" << std::endl;
                             },
                                 "range", NULL, name_input_mobile_slider
+<<<<<<< HEAD
                                 );
                             mobile_dropdown << "<hr>" << mobile_slider;
+=======
+                                );
+                            std::cout << name << " ---- adding mobile content" << std::endl;
+                            box.AddMobileContent("<hr>");
+                            box.AddMobileContent(mobile_slider);
+                            std::cout << "BACK to config panel after adding mobile content" << std::endl;
+>>>>>>> 1509465... added prefab module for comment box
 
                             // Set onchange behavior for inputs
                             slider.Callback(
                                 [this,name, name_input_number, name_input_mobile_slider](std::string val){
                                 config.Set(name, val);
-                                std::cout << "slider callback: after setting new value" << std::endl;
-
                                 SyncForm(val, name_input_number, name_input_mobile_slider);
                                 });
                             number.Callback(
                                 [this,name, name_input_slider, name_input_mobile_slider](std::string val){
                                 config.Set(name, val);
+<<<<<<< HEAD
                                 std::cout << "slider callback: after setting new value" << std::endl;
 
+=======
+>>>>>>> 1509465... added prefab module for comment box
                                 SyncForm(val, name_input_slider, name_input_mobile_slider);
                                 });
                             mobile_slider.Callback(
                                 [this,name, name_input_number, name_input_slider](std::string val){
                                 config.Set(name, val);
-                                std::cout << "slider callback: after setting new value" << std::endl;
-
                                 SyncForm(val, name_input_number, name_input_slider);
                                 });
                             // Set initial values
@@ -296,6 +318,7 @@ namespace emp {
                                 SetDefaultRangeFixedPoint(number, emp::from_string<int>(value));
                                 SetDefaultRangeFixedPoint(mobile_slider, emp::from_string<int>(value));
                             }
+                            std::cout << "After calling set default range methods" << std::endl;
 
                         }
                         else if (type == "bool") {
@@ -314,7 +337,10 @@ namespace emp {
                                 "text", NULL, name + "_input_textbox"
                             );
                             setting_element << text_input;
-                            text_input.SetAttr("class", "input_text").SetAttr("type", "text");
+                            text_input.SetAttr(
+                                "class", "input_text",
+                                "type", "text"
+                            );
                             text_input.Value(config.Get(name));
                         }
 <<<<<<< HEAD
