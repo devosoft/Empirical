@@ -11,8 +11,8 @@
 #include "../tools/set_utils.h"
 #include "../tools/string_utils.h"
 
-// Using prefab elements
-// #include "Card.h"
+// Prefab elements
+#include "Card.h"
 #include "CommentBox.h"
 
 namespace emp {
@@ -95,6 +95,7 @@ namespace emp {
                     group_divs[group_name] = web::Div(id_prefix + group_name);
                     settings_div << group_divs[group_name];
 
+<<<<<<< HEAD
                     // Setting card setup
                     web::Div card("card_" + group_name);
                     group_divs[group_name] << card;
@@ -102,19 +103,28 @@ namespace emp {
                     card << card_header;
 
 					web::Div inline_elements(group_name + "_inline");
+=======
+                    // Prefab Card
+                    emp::Card card("card_collapse_" + group_name, true);
+                    group_divs[group_name] << card.GetDiv();
+                    // Header formatting 
+                    web::Div inline_elements(group_name + "_inline");
+>>>>>>> 0595c91... added card element
                     inline_elements.SetAttr("class", "clearfix");
-                    card_header << inline_elements;
+                    card.AddHeaderContent(inline_elements);
+                    // Header content
+                    // TODO: take care of toggle attribute in a class or function
                     web::Element collapse_name_link("button");
                     inline_elements << collapse_name_link;
                     collapse_name_link.SetAttr(
                         "data-toggle", "collapse",
-                        "data-target", "#card_collapse_" + group_name
+                        "data-target", "#card_collapse_" + group_name // id passed to card constructor
                     );
                     collapse_name_link.SetAttr(
                         "class", "btn btn-link float-left collapse_toggle setting_heading",
                         "type", "button",
                         "aria-expanded", "true",
-                        "aria-controls", "#card_body_" + group_name
+                        "aria-controls", "#card_collapse_" + group_name // id passed to card constructor
                     );
                     collapse_name_link << "<h3>" << group->GetDesc() << "</h3>";
                     web::Element collapse_icon_link("button");
@@ -130,7 +140,7 @@ namespace emp {
                         "class", "btn btn-link float-right collapse_toggle",
                         "type", "button",
                         "aria-expanded", "true",
-                        "aria-controls", "#card_body_" + group_name
+                        "aria-controls", "#card_collapse_" + group_name // id passed to card constructor
                     );
 
 >>>>>>> 1509465... added prefab module for comment box
@@ -142,6 +152,7 @@ namespace emp {
                     collapse_icon_link << arrow_up;
                     arrow_up.SetAttr("class", "fa fa-angle-double-up");
 
+<<<<<<< HEAD
                     web::Div card_collapse("card_collapse_" + group_name);
                     card << card_collapse;
                     card_collapse.SetAttr(
@@ -157,6 +168,17 @@ namespace emp {
                     card_body.SetAttr("class", "card-body");
 
 
+=======
+                    // this is taken care of in card element
+                    // TODO: decide what to do with data-parent and aria-labelledby
+                    // web::Div card_collapse("card_collapse_" + group_name);
+                    // card_collapse.SetAttr(
+                    //     // "class", "collapse show",
+                    //     "data-parent", "card_" + group_name,
+                    //     "aria-labelledby", "card_header_" + group_name
+                    // );
+                    
+>>>>>>> 0595c91... added card element
 
                     for (size_t i = 0; i < group->GetSize(); i++) {
                         // std::cout << group->GetEntry(i)->GetType() << std::endl;
@@ -166,8 +188,13 @@ namespace emp {
                         }
                         std::string type = group->GetEntry(i)->GetType();
                         std::string value = group->GetEntry(i)->GetValue();
+<<<<<<< HEAD
 
                         card_body << web::Element("form").SetCSS("width", "100%") << input_divs[name];
+=======
+                   
+                        card.AddBodyContent(web::Element("form").SetCSS("width", "100%") << input_divs[name]);
+>>>>>>> 0595c91... added card element
 
                         web::Div mobile_dropdown("mobile_dropdown_" + name);
                         mobile_dropdown.SetAttr("class", "d-md-none");
@@ -249,6 +276,7 @@ namespace emp {
                             },
                                 "range", NULL, name_input_mobile_slider
 <<<<<<< HEAD
+<<<<<<< HEAD
                                 );
                             mobile_dropdown << "<hr>" << mobile_slider;
 =======
@@ -258,6 +286,11 @@ namespace emp {
                             box.AddMobileContent(mobile_slider);
                             std::cout << "BACK to config panel after adding mobile content" << std::endl;
 >>>>>>> 1509465... added prefab module for comment box
+=======
+                                ); 
+                            box.AddMobileContent("<hr>");
+                            box.AddMobileContent(mobile_slider);
+>>>>>>> 0595c91... added card element
 
                             // Set onchange behavior for inputs
                             slider.Callback(
