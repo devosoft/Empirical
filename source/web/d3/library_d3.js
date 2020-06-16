@@ -3,6 +3,11 @@ var D3Library = {
   get_emp_d3: function() {
     return this.emp_d3;
   },
+  // This is a useful utility function for testing. You shouldn't call this in application code unless
+  // you really know what you're doing. This WILL break any existing emp d3 objects.
+  clear_emp_d3: function() {
+    this.emp_d3 = {objects: {}, counts: {}, next_id:0};
+  },
   // If the 'func_name' is a function in the global namespace, the d3 namespace, or the emp namespace
   // return the proper function, otherwise just return 'func_name'
   find_function: function(sel) {
