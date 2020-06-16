@@ -15,6 +15,7 @@
 #include "Card.h"
 #include "CommentBox.h"
 #include "FontAwesomeIcon.h"
+#include "Collapse.h"
 
 namespace emp {
 
@@ -113,22 +114,17 @@ namespace emp {
 >>>>>>> 0595c91... added card element
                     inline_elements.SetAttr("class", "clearfix");
                     card.AddHeaderContent(inline_elements);
+
                     // Header content
-                    // TODO: take care of toggle attribute in a class
                     web::Element collapse_name_link("button");
-                    inline_elements << collapse_name_link;
-                    collapse_name_link.SetAttr(
-                        "data-toggle", "collapse",
-                        "data-target", "#card_collapse_" + group_name // id passed to card constructor
-                    );
-                    collapse_name_link.SetAttr(
-                        "class", "btn btn-link float-left collapse_toggle setting_heading",
-                        "type", "button",
-                        "aria-expanded", "true",
-                        "aria-controls", "#card_collapse_" + group_name // id passed to card constructor
-                    );
+                    emp::Collapse header_title_toggle(collapse_name_link, "card_collapse_" + group_name, true);
+                    inline_elements << header_title_toggle.GetLinkDiv();
+                    collapse_name_link.SetAttr("class", "btn btn-link float-left collapse_toggle setting_heading");
+                    
+                    // Prefab Collapse/toggle for card
                     collapse_name_link << "<h3>" << group->GetDesc() << "</h3>";
                     web::Element collapse_icon_link("button");
+<<<<<<< HEAD
                     inline_elements << collapse_icon_link;
 <<<<<<< HEAD
                     collapse_icon_link.SetAttr("data-toggle", "collapse").SetAttr("data-target", "#card_collapse_" + group_name);
@@ -154,6 +150,11 @@ namespace emp {
                     collapse_icon_link << arrow_up;
                     arrow_up.SetAttr("class", "fa fa-angle-double-up");
 =======
+=======
+                    emp::Collapse header_icon_toggle(collapse_icon_link, "card_collapse_" + group_name, true);
+                    inline_elements << header_icon_toggle.GetLinkDiv();
+                    collapse_icon_link.SetAttr("class", "btn btn-link float-right collapse_toggle");
+>>>>>>> 5f848a8... add prefab element to add collapibility to web elements
                     
                     // Prefab Icons
                     emp::FontAwesomeIcon arrow_down("fa-angle-double-down");
@@ -178,6 +179,7 @@ namespace emp {
                     card_body.SetAttr("class", "card-body");
 
 
+<<<<<<< HEAD
 =======
                     // this is taken care of in card element
                     // TODO: decide what to do with data-parent and aria-labelledby
@@ -190,6 +192,8 @@ namespace emp {
                     
 >>>>>>> 0595c91... added card element
 
+=======
+>>>>>>> 5f848a8... add prefab element to add collapibility to web elements
                     for (size_t i = 0; i < group->GetSize(); i++) {
                         // std::cout << group->GetEntry(i)->GetType() << std::endl;
                         std::string name = group->GetEntry(i)->GetName();
@@ -214,6 +218,7 @@ namespace emp {
                         input_divs[name] << setting_element;
                         setting_element.SetAttr("class", "setting_element");
                         web::Element title_span("span");
+<<<<<<< HEAD
                         web::Element title("a");
                         setting_element << title_span << title;
                         title.SetAttr(
@@ -224,6 +229,11 @@ namespace emp {
                             "aria-expanded", "false",
                             "aria-controls", "#" + name + "_dropdown"
                         );
+=======
+                        setting_element << title_span;
+                        web::Element title("button");
+                        title.SetAttr("class", "btn btn-link");
+>>>>>>> 5f848a8... add prefab element to add collapibility to web elements
 
                         emp::FontAwesomeIcon arrow_right_for_dropdown("fa-angle-double-right toggle_icon_left_margin");
                         title << arrow_right_for_dropdown.GetDiv();
@@ -231,6 +241,7 @@ namespace emp {
                         title << arrow_up_for_dropdown.GetDiv();
                         title << format_label_fun(name);
                         title_span.SetAttr("class", "title_area");
+<<<<<<< HEAD
 
                         // This makes the Comment box toggle when title is clicked
                         // TODO: make a class to create a toggle for two elements?
@@ -239,9 +250,18 @@ namespace emp {
                         dropdown_target.SetAttr("class", "collapse");
 
                         // Prefab Dropdown Box Version
+=======
+                        
+                        // Prefab Dropdown Box Version 
+>>>>>>> 5f848a8... add prefab element to add collapibility to web elements
                         emp::CommentBox box;
-                        dropdown_target << box.GetDiv();
                         box.AddContent(group->GetEntry(i)->GetDescription());
+
+                        // Prefab Collapse/toggle for setting element
+                        emp::Collapse title_toggle(title, box.GetDiv(), name + "_dropdown", false);
+                        input_divs[name] << title_toggle.GetToggleDiv();
+                        title_span << title_toggle.GetLinkDiv();
+
 
                         if (Has(numeric_types, type)) {
                             // Seems more efficient to use web::Input, but it's not working
