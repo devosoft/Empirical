@@ -114,7 +114,7 @@ namespace D3 {
          /// Calculate the ouput for [input], based on the scale's scaling function
         std::string ApplyScaleString(double input) {
             EM_ASM({
-                const resultStr = emp_d3.objects[$0]($1));
+                const resultStr = emp_d3.objects[$0]($1);
                 emp.PassStringToCpp(resultStr);
             }, this->id, input);
             return emp::pass_str_to_cpp();
@@ -122,7 +122,7 @@ namespace D3 {
 
         std::string ApplyScaleString(int input) {
             EM_ASM({
-                const resultStr = emp_d3.objects[$0]($1));
+                const resultStr = emp_d3.objects[$0]($1);
                 emp.PassStringToCpp(resultStr);
             }, this->id, input);
             return emp::pass_str_to_cpp();
@@ -136,25 +136,25 @@ namespace D3 {
             return emp::pass_str_to_cpp();
         }
 
-        double ApplyScale(double input) {
+        double ApplyScaleDouble(double input) {
             return EM_ASM_DOUBLE({
                 return emp_d3.objects[$0]($1);
             }, this->id, input);
         }
 
-        double ApplyScale(const std::string & input) {
+        double ApplyScaleDouble(const std::string & input) {
             return EM_ASM_DOUBLE({
                 return emp_d3.objects[$0](UTF8ToString($1));
             }, this->id, input.c_str());
         }
 
-        int ApplyScale(int input) {
+        int ApplyScaleInt(int input) {
             return EM_ASM_INT({
                 return emp_d3.objects[$0]($1);
             }, this->id, input);
         }
 
-        int ApplyScale(const std::string & input) {
+        int ApplyScaleInt(const std::string & input) {
             return EM_ASM_INT({
                 return emp_d3.objects[$0](UTF8ToString($1));
             }, this->id, input.c_str());
@@ -306,7 +306,7 @@ namespace D3 {
 
     protected:
         LinearScale(bool derived) : ContinuousScale(true) { ; }
-    }
+    };
     // scaleLinear
     // scaleIdentity
     // scalePow
