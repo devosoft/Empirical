@@ -5,7 +5,7 @@ module.exports = function(config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '../../',
+    basePath: '../../../',
 
     proxies: {
       "/assets/": "/base/tests/web/assets"
@@ -25,10 +25,10 @@ module.exports = function(config) {
       {pattern: 'tests/web/test_header.js'},
       {pattern: 'tests/web/assets/lineage-example.json', included: false},
       {pattern: 'tests/web/assets/test-line-graph.csv', included: false},
-      {pattern: 'tests/web/test_visualizations.js.map', included: false},
-      {pattern: 'tests/web/test_visualizations.js'},
-      {pattern: 'tests/web/test_visualizations.wasm', included: false, nocache:true},
-      {pattern: 'tests/web/test_visualizations.wasm.map', included: false, nocache:true}
+      {pattern: 'tests/web/d3/d3_init.js.map', included: false},
+      {pattern: 'tests/web/d3/d3_init.js'},
+      {pattern: 'tests/web/d3/d3_init.wasm', included: false, nocache:true},
+      {pattern: 'tests/web/d3/d3_init.wasm.map', included: false, nocache:true}
     ],
 
 
