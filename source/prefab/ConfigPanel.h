@@ -14,6 +14,7 @@
 // Prefab elements
 #include "Card.h"
 #include "CommentBox.h"
+#include "FontAwesomeIcon.h"
 
 namespace emp {
 
@@ -113,7 +114,7 @@ namespace emp {
                     inline_elements.SetAttr("class", "clearfix");
                     card.AddHeaderContent(inline_elements);
                     // Header content
-                    // TODO: take care of toggle attribute in a class or function
+                    // TODO: take care of toggle attribute in a class
                     web::Element collapse_name_link("button");
                     inline_elements << collapse_name_link;
                     collapse_name_link.SetAttr(
@@ -142,6 +143,7 @@ namespace emp {
                         "aria-expanded", "true",
                         "aria-controls", "#card_collapse_" + group_name // id passed to card constructor
                     );
+<<<<<<< HEAD
 
 >>>>>>> 1509465... added prefab module for comment box
                     // Toggle Icons
@@ -151,6 +153,14 @@ namespace emp {
                     web::Element arrow_up("span");
                     collapse_icon_link << arrow_up;
                     arrow_up.SetAttr("class", "fa fa-angle-double-up");
+=======
+                    
+                    // Prefab Icons
+                    emp::FontAwesomeIcon arrow_down("fa-angle-double-down");
+                    collapse_icon_link << arrow_down.GetDiv();
+                    emp::FontAwesomeIcon arrow_up("fa-angle-double-up");
+                    collapse_icon_link << arrow_up.GetDiv();
+>>>>>>> c2cc336... prefab element for font awesome icons
 
 <<<<<<< HEAD
                     web::Div card_collapse("card_collapse_" + group_name);
@@ -214,12 +224,11 @@ namespace emp {
                             "aria-expanded", "false",
                             "aria-controls", "#" + name + "_dropdown"
                         );
-                        web::Element arrow_down_for_dropdown("span");
-                        title << arrow_down_for_dropdown;
-                        arrow_down_for_dropdown.SetAttr("class", "fa fa-angle-double-right toggle_icon_left_margin");
-                        web::Element arrow_up_for_dropdown("span");
-                        title << arrow_up_for_dropdown;
-                        arrow_up_for_dropdown.SetAttr("class", "fa fa-angle-double-up toggle_icon_left_margin");
+
+                        emp::FontAwesomeIcon arrow_right_for_dropdown("fa-angle-double-right toggle_icon_left_margin");
+                        title << arrow_right_for_dropdown.GetDiv();
+                        emp::FontAwesomeIcon arrow_up_for_dropdown("fa-angle-double-up toggle_icon_left_margin");
+                        title << arrow_up_for_dropdown.GetDiv();
                         title << format_label_fun(name);
                         title_span.SetAttr("class", "title_area");
 
