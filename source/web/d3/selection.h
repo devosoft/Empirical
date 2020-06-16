@@ -97,7 +97,7 @@ namespace internal {
       emp::sfinae_decoy<DERIVED, decltype(&T::operator())>
       Filter(T selector) const {
         const int new_id = NextD3ID();
-        D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(filter, selector)
+        D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(filter, selector);
         StoreNewObject(new_id);
         return DERIVED(new_id);
       }
@@ -356,7 +356,7 @@ namespace internal {
       template <typename T>
       emp::sfinae_decoy<DERIVED&, decltype(&T::operator())>
       SetText(T func) {
-        D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(text, func)
+        D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(text, func);
         return *(static_cast<DERIVED *>(this));
       }
 
@@ -514,8 +514,6 @@ namespace internal {
 
     /// @}
   };
-
-
 }
 
 }
