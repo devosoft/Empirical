@@ -36,6 +36,7 @@
 #include <string>
 
 #include "../base/vector.h"
+#include "../base/errors.h"
 #include "../tools/mem_track.h"
 
 #include "events.h"
@@ -77,12 +78,9 @@ namespace web {
   /// Widget is effectively a smart pointer to a WidgetInfo object, plus some basic accessors.
   class Widget {
     friend internal::WidgetInfo; friend internal::DivInfo; friend internal::TableInfo;
-  protected:
+  public:
     using WidgetInfo = internal::WidgetInfo;
     WidgetInfo * info;                        ///< Information associated with this widget.
-
-    /// If an Append doesn't work with current class, forward it to the parent and try there.
-    template <typename FWD_TYPE> Widget & ForwardAppend(FWD_TYPE && arg);
 
     /// Set the information associated with this widget.
     Widget & SetInfo(WidgetInfo * in_info);
@@ -868,6 +866,11 @@ namespace web {
           // switch out parent's existing child for wrapper
           parent_info->RemoveChild((return_t &) *this);
           parent_info->AddChild(wrapper);
+        } else if (Info(wrapper)->ptr_count == 1) {
+          emp::NotifyWarning(
+            "Only one reference held to wrapper. ",
+            "It will be destroyed when it goes out of scope."
+          );
         }
 
         // put this Widget inside of the wrapper
