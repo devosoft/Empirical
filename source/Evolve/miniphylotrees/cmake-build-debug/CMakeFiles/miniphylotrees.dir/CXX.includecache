@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/abbys/Empirical/source/Evolve/miniphylotrees/main.cpp
+iostream
+-
+vector
+-
+memory
+-
+cstdlib
+-
+ctime
+-
+
