@@ -20,6 +20,10 @@
 .setting_heading:hover{
     color: #0275d8 /* Bootstrap default pirmary color */
 }
+/* Lower opacity of card body when hovering over collapsible header */
+.collapse_toggle:hover + .collapse .card-body{
+    opacity: .6;
+}
 
 /* Card Body */
 .setting_element {
