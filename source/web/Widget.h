@@ -577,7 +577,12 @@ namespace web {
       /// By default DoAttr will track the new information and apply it (if active) to the widget.
       virtual void DoAttr(const std::string & setting, const std::string & value) {
         info->extras.attr.DoSet(setting, value);
-        if (IsActive()) Attributes::Apply(info->id, setting, value);
+        std::string updated_val = value;
+        if(setting.compare("class")==0){ 
+          // apply new class (value) and any previously added classes
+          updated_val = info->extras.attr.GetAttrValue(setting);
+        }
+        if (IsActive()) Attributes::Apply(info->id, setting, updated_val);
       }
       /// Listener options may be overridden in derived classes that have multiple listen targets.
       /// By default DoListen will track new listens and set them up immediately, if active.
@@ -613,6 +618,10 @@ namespace web {
         SetCSS(setting1, val1);                      // Set the first CSS value.
         return SetCSS(setting2, val2, others...);    // Recurse to the others.
       }
+
+      // TODO: AddClass ->extras ->attributes
+      // Now when you call SetAttr for class more than once, new class is added to list, doen't replace other classes 
+      // Should we add a separate function instead? in addition to?
 
       /// Multiple Attributes can be provided simultaneously.
       template <typename T1, typename T2, typename... OTHER_SETTINGS>
