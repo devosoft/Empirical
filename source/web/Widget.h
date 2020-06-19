@@ -877,7 +877,7 @@ namespace web {
           parent_info->RemoveChild((return_t &) *this);
           parent_info->AddChild(wrapper);
         } else if (Info(wrapper)->ptr_count == 1) {
-          emp::NotifyWarning(
+          emp::LibraryWarning(
             "Only one reference held to wrapper. ",
             "It will be destroyed when it goes out of scope."
           );
