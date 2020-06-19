@@ -122,7 +122,7 @@ namespace web {
       if (order == -1) order = next_order;
       if (order >= next_order) next_order = order+1;
 
-      if (std::isupper(key)) emp::NotifyWarning(
+      if (std::isupper(key)) emp::LibraryWarning(
         "Uppercase character was passed for the key argument. ",
         "To specify uppercase, you'll need to monitor for the shift modifier associated with a KeypressEvent."
       );
