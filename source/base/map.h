@@ -65,6 +65,9 @@ namespace emp {
     using difference_type = typename base_t::difference_type;
     using size_type = typename base_t::size_type;
 
+    map() = default;
+    map(const this_t &) = default;
+    map(this_t &&) = default;
     explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
       : base_t(comp, alloc) { }
     explicit map (const allocator_type& alloc) : base_t(alloc) { }
@@ -111,6 +114,8 @@ namespace emp {
     using difference_type = typename base_t::difference_type;
     using size_type = typename base_t::size_type;
 
+    multimap(const this_t &) = default;
+    multimap(this_t &&) = default;
     explicit multimap (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
       : base_t(comp, alloc) { }
     explicit multimap (const allocator_type& alloc) : base_t(alloc) { }
