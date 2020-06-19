@@ -124,7 +124,7 @@ namespace emp {
     }
   }
 
-  /// Send information to a program user (via standard error in native mode, or alter in Emscripten)
+  /// Send information to a program user (via standard error in native mode, or alert in Emscripten)
   template <typename... Ts>
   void Notify(Ts &&... args) {
     std::stringstream ss;
