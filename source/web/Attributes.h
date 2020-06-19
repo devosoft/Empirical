@@ -39,8 +39,20 @@ namespace web {
     int GetSize() const { return (int) settings.size(); }
 
     Attributes & DoSet(const std::string & in_set, const std::string & in_val) {
-      settings[in_set] = in_val;
+      if(in_set.compare("class")==0 && Has(in_set)){
+        // Append new class to classes already assigned to attribute
+        std::string classes = settings[in_set];
+        classes += " " + in_val;
+        settings[in_set] = classes;
+      }
+      else{
+        settings[in_set] = in_val;
+      }
       return *this;
+    }
+
+    std::string GetAttrValue(const std::string & in_set){
+      return settings[in_set];
     }
 
     /// Record that attribute "a" is set to value "v" (converted to string) and return this object.
@@ -106,7 +118,7 @@ namespace web {
       }
     }
 
-    /// Apply onlay a SPECIFIC attributes setting from the setting library to widget_id.
+    /// Apply only a SPECIFIC attributes setting from the setting library to widget_id.
     void Apply(const std::string & widget_id, const std::string & setting) {
       emp_assert(Has(setting));
 
