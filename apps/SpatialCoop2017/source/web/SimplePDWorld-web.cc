@@ -77,7 +77,7 @@ int anim_step = 1;
 
 void TogglePlay()
 {
-  auto & anim = doc.AddAnimation("anim_world");
+  auto & anim = doc.Animate("anim_world");
   anim.ToggleActive();
   auto but = doc.Button("start_but");
   if (anim.GetActive()) but.SetLabel("Pause");

@@ -426,7 +426,7 @@ namespace D3 {
         char * buffer = (char *)EM_ASM_INT({
   	      var text = js.objects[$0].attr(UTF8ToString($1));
   	      var buffer = Module._malloc(text.length+1);
-  	      Module.writeStringToMemory(text, buffer);
+  	      Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
   	      return buffer;
         }, this->id, name.c_str());
 
@@ -454,7 +454,7 @@ namespace D3 {
         char * buffer = (char *)EM_ASM_INT({
   	      var text = js.objects[$0].style(UTF8ToString($1));
   	      var buffer = Module._malloc(text.length+1);
-  	      Module.writeStringToMemory(text, buffer);
+  	      Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
   	      return buffer;
         }, this->id, name.c_str());
 
@@ -483,7 +483,7 @@ namespace D3 {
         char * buffer = (char *)EM_ASM_INT({
   	      var text = js.objects[$0].text();
   	      var buffer = Module._malloc(text.length+1);
-  	      Module.writeStringToMemory(text, buffer);
+  	      Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
   	      return buffer;
   	    }, this->id);
 
@@ -883,7 +883,7 @@ namespace D3 {
       char * buffer = (char *)EM_ASM_INT({
         var text = d3.select(js.objects[$0]).html();
         var buffer = Module._malloc(text.length+1);
-        Module.writeStringToMemory(text, buffer);
+        Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
         return buffer;
       }, this->id);
 
@@ -897,7 +897,7 @@ namespace D3 {
       char * buffer = (char *)EM_ASM_INT({
         var text = d3.select(js.objects[$0]).property(UTF8ToString($1));
         var buffer = Module._malloc(text.length+1);
-        Module.writeStringToMemory(text, buffer);
+        Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
         return buffer;
       }, this->id, name.c_str());
 
@@ -1372,7 +1372,7 @@ namespace D3 {
       char * buffer = (char *)EM_ASM_INT({
 	    var text = js.objects[$0].html();
 	    var buffer = Module._malloc(text.length+1);
-	    Module.writeStringToMemory(text, buffer);
+	    Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
 	    return buffer;
 	  }, this->id);
 
@@ -1386,7 +1386,7 @@ namespace D3 {
       char * buffer = (char *)EM_ASM_INT({
 	    var text = js.objects[$0].property(UTF8ToString($1));
 	    var buffer = Module._malloc(text.length+1);
-	    Module.writeStringToMemory(text, buffer);
+	    Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
 	    return buffer;
 	  }, this->id, name.c_str());
 

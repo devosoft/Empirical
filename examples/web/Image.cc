@@ -7,7 +7,7 @@
 #include "web/canvas_utils.h"
 #include "web/color_map.h"
 #include "web/emfunctions.h"
-#include "web/Slider.h"
+#include "web/Input.h"
 #include "web/web.h"
 
 namespace UI = emp::web;
@@ -67,15 +67,15 @@ public:
       velocity[i] = angle.SetPortion(random.GetDouble()).GetPoint(random.GetDouble(1.0,3.0));
     }
 
+    UI::Div slider_info_div;
     UI::Div slider_div;
 
-    slider_div << UI::Live(test_var) << " ";
-    UI::Slider cell_count_slider("cell_count");
+    slider_info_div << UI::Live(test_var) << " ";
+    UI::Input cell_count_slider([this, slider_info_div](std::string val) mutable { test_var = emp::from_string<double>(val); slider_info_div.Redraw(); }, "range", "cell_count");
     slider_div << cell_count_slider;
 
+    doc << slider_info_div;
     doc << slider_div;
-
-    cell_count_slider.SetCallback([this, slider_div](double val) mutable { test_var = val; slider_div.Redraw(); });
 
     DoFrame();
   }
