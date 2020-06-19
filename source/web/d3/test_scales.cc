@@ -38,13 +38,6 @@ struct TestLinearScale {
 
       console.log(color(20)); // "#9a3439" or "rgb(154, 52, 57)"
       console.log(color(50)); // "#7b5167" or "rgb(123, 81, 103)"
-      
-      //
-      //??? THIS DOESN"T WORK ON JS SIDE
-      //
-
-      console.log(color.invert("#9a3439")); // 20
-      console.log(color.invert("#7b5167")); // 50
     });
 
     D3::LinearScale testLinearX = D3::LinearScale();
@@ -66,14 +59,10 @@ struct TestLinearScale {
     testLinearColor.SetRange(colorArray);
     std::string result3 = testLinearColor.ApplyScaleString(20);
     std::string result4 = testLinearColor.ApplyScaleString(50);
-    // double result3i = testLinearColor.Invert<std::string>("rgb(154, 52, 57)");
-    // double result4i = testLinearColor.Invert<std::string>("rgb(123, 81, 103)");
-
+   
     std::cout << "value 3: " << result3 << std::endl;
     std::cout << "value 4: " << result4 << std::endl;
-    // std::cout << "value 3 invert: " << result3i << std::endl;
-    // std::cout << "value 4 invert: " << result4i << std::endl;
-
+   
     std::cout << "------Linear Test End------" << std::endl << std::endl;
   }
 };
@@ -279,18 +268,21 @@ struct TestTimeScale {
     });
 
     D3::TimeScale testTime = D3::TimeScale();
-    emp::array<std::string, 2> dateArray = {"2000-0-1", "2000-0-2"};
-    testTime.SetDomain(dateArray);
+    D3::TimeScale::Date dateMin(2000, 0, 1);
+    D3::TimeScale::Date dateMax(2000, 0, 2);
+    testTime.SetDomain(dateMin, dateMax);
     testTime.SetRange(0, 960);
-    double result1 = testTime.ApplyScaleDouble("2000-0-1-5");
-    double result2 = testTime.ApplyScaleDouble("2000-0-1-16");
-    double result1i = testTime.Invert<int>(200);
-    double result2i = testTime.Invert<int>(640);
+    D3::TimeScale::Date test1(2000, 0, 1, 5);
+    D3::TimeScale::Date test2(2000, 0, 1, 16);
+    double result1 = testTime.ApplyScaleDouble(test1);
+    double result2 = testTime.ApplyScaleDouble(test2);
+    D3::TimeScale::Date result1i = testTime.InvertDate(200);
+    D3::TimeScale::Date result2i = testTime.InvertDate(640);
 
     std::cout << "value 1: " << result1 << std::endl;
     std::cout << "value 2: " << result2 << std::endl;
-    std::cout << "value 1 invert: " << result1i << std::endl;
-    std::cout << "value 2 invert: " << result2i << std::endl;
+    std::cout << "value 1 invert: " << result1i.ToString() << std::endl;
+    std::cout << "value 2 invert: " << result2i.ToString() << std::endl;
 
     std::cout << "------Time Test End------" << std::endl << std::endl;
   }
