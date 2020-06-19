@@ -1,9 +1,9 @@
 // This is the main function for the NATIVE version of this project.
 
 /*
- * WARNING: ProjectTemplate is deprecated in favor of the Cookiecutter Empirical
- * Project, which you can find at
- * https://github.com/devosoft/cookiecutter-empirical-project
+ * WARNING: the Cookiecutter Empirical Project, which you can find at
+ * https://github.com/devosoft/cookiecutter-empirical-project, should be
+ * preferred over ProjectTemplate
 */
 
 #include <iostream>
@@ -17,6 +17,6 @@ int main(int argc, char* argv[])
 
   std::cout << "Hello World!" << std::endl;
 
-  std::cout << "WARNING: ProjectTemplate is deprecated in favor of the Cookiecutter Empirical Project, which you can find at https://github.com/devosoft/cookiecutter-empirical-project" << std::endl;
+  std::cout << "WARNING: the Cookiecutter Empirical Project, which you can find at https://github.com/devosoft/cookiecutter-empirical-project, should be preferred over ProjectTemplate" << std::endl;
 
 }

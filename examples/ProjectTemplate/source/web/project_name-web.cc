@@ -3,9 +3,9 @@
 //  Released under the MIT Software license; see doc/LICENSE
 
 /*
- * WARNING: ProjectTemplate is deprecated in favor of the Cookiecutter Empirical
- * Project, which you can find at
- * https://github.com/devosoft/cookiecutter-empirical-project
+ * WARNING: the Cookiecutter Empirical Project, which you can find at
+ * https://github.com/devosoft/cookiecutter-empirical-project, should be
+ * preferred over ProjectTemplate
 */
 
 #include "web/web.h"
@@ -18,6 +18,6 @@ int main()
 {
   doc << "<h1>Hello, world!</h1>";
 
-  doc << "WARNING: ProjectTemplate is deprecated in favor of the Cookiecutter Empirical Project, which you can find at https://github.com/devosoft/cookiecutter-empirical-project";
+  doc << "WARNING: the Cookiecutter Empirical Project, which you can find at https://github.com/devosoft/cookiecutter-empirical-project, should be preferred over ProjectTemplate";
 
 }
