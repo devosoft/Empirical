@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019
+ *  @date 2019-2020.
  *
  *  @file map.h
  *  @brief A drop-in wrapper for std::map and std:multimap; makes sure we create vars on access.
@@ -66,8 +66,6 @@ namespace emp {
     using size_type = typename base_t::size_type;
 
     map() = default;
-    map(const this_t &) = default;
-    map(this_t &&) = default;
     explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
       : base_t(comp, alloc) { }
     explicit map (const allocator_type& alloc) : base_t(alloc) { }
@@ -75,13 +73,16 @@ namespace emp {
     map (InputIterator first, InputIterator last,
          const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
       : base_t(first, last, comp, alloc) { }
-    map (const map& x) : base_t(x) { }
-    map (const map& x, const allocator_type& alloc) : base_t(x, alloc) { }
-    map (map && x) : base_t(std::move(x)) { }
-    map (map && x, const allocator_type& alloc) : base_t(std::move(x), alloc) { }
+    map (const this_t& x) : base_t(x) { }
+    map (const this_t& x, const allocator_type& alloc) : base_t(x, alloc) { }
+    map (this_t && x) : base_t(std::move(x)) { }
+    map (this_t && x, const allocator_type& alloc) : base_t(std::move(x), alloc) { }
     map (std::initializer_list<value_type> il, const key_compare& comp = key_compare(),
          const allocator_type& alloc = allocator_type())
       : base_t(il, comp, alloc) { }
+
+    this_t & operator=(const this_t &) = default;
+    this_t & operator=(this_t &&) = default;
 
     proxy_t operator[] (const Key & k) {
       const bool is_init = (this->find(k) != this->end());
@@ -114,8 +115,6 @@ namespace emp {
     using difference_type = typename base_t::difference_type;
     using size_type = typename base_t::size_type;
 
-    multimap(const this_t &) = default;
-    multimap(this_t &&) = default;
     explicit multimap (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
       : base_t(comp, alloc) { }
     explicit multimap (const allocator_type& alloc) : base_t(alloc) { }
@@ -123,13 +122,16 @@ namespace emp {
     multimap (InputIterator first, InputIterator last,
          const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
       : base_t(first, last, comp, alloc) { }
-    multimap (const multimap& x) : base_t(x) { }
-    multimap (const multimap& x, const allocator_type& alloc) : base_t(x, alloc) { }
-    multimap (multimap && x) : base_t(std::move(x)) { }
-    multimap (multimap && x, const allocator_type& alloc) : base_t(std::move(x), alloc) { }
+    multimap (const this_t & x) : base_t(x) { }
+    multimap (const this_t & x, const allocator_type& alloc) : base_t(x, alloc) { }
+    multimap (this_t && x) : base_t(std::move(x)) { }
+    multimap (this_t && x, const allocator_type& alloc) : base_t(std::move(x), alloc) { }
     multimap (std::initializer_list<value_type> il, const key_compare& comp = key_compare(),
          const allocator_type& alloc = allocator_type())
       : base_t(il, comp, alloc) { }
+
+    this_t & operator=(const this_t &) = default;
+    this_t & operator=(this_t &&) = default;
 
     proxy_t operator[] (const Key & k) {
       const bool is_init = (this->find(k) != this->end());
