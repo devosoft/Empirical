@@ -19,31 +19,14 @@ void ResetD3Context() {
 
 /// Base test class that all tests should inherit from.
 struct BaseTest {
-  emp::Signal<void()> before_test_sig;  ///< NOTE: This *must* get triggered by the before function!
-  emp::Signal<void()> after_test_sig;   ///< NOTE: This *must* get triggered by the after function!
-  uint32_t test_setup_func_id=0;
-  uint32_t test_done_func_id=0;
 
-  BaseTest() {
-    test_done_func_id = emp::JSWrap([this](){
-      after_test_sig.Trigger();
-    });
-    test_setup_func_id = emp::JSWrap([this]() {
-      before_test_sig.Trigger();
-    });
-  }
+  BaseTest() { ; }
 
-  virtual ~BaseTest() {
-    emp::JSDelete(test_done_func_id);
-    emp::JSDelete(test_setup_func_id);
-  }
+  virtual ~BaseTest() { }
 
   /// Put code to actually run the test here.
   virtual void Describe() { ; }
   virtual void Setup() { ; }
-
-  uint32_t GetDoneJSFuncID() const { return test_done_func_id; }
-  uint32_t GetSetupJSFuncID() const { return test_setup_func_id; }
 };
 
 class TestManager {
@@ -61,28 +44,13 @@ protected:
   emp::Signal<void()> after_each_test_sig;
   emp::vector<TestRunner> test_runners;
   size_t cur_test=0;
-  size_t next_tests_js_func_id=0;
+  size_t next_test_js_func_id=0;
+  size_t cleanup_test_js_func_id=0;
+  size_t cleanup_all_js_func_id=0;
 
   /// Cleanup previous test, if necessary. Queue next test's 'describe'.
   void NextTest() {
-    if (cur_test > 0) {
-      // Cleanup previous test
-      emp_assert(test_runners[cur_test-1].done);
-      test_runners[cur_test-1].cleanup();
-    }
-    if (cur_test >= test_runners.size()) {
-      // finished running all tests. Make sure all dynamically allocated memory is cleaned up.
-      std::for_each(
-        test_runners.begin(),
-        test_runners.end(),
-        [](TestRunner & runner) {
-          if (runner.test != nullptr) runner.test.Delete();
-        }
-      );
-      // Clear test runners.
-      test_runners.clear();
-      return; // Relinquish execution control (don't queue anymore NextTest calls)
-    }
+    emp_assert(cur_test < test_runners.size());
     // ResetD3Context();                   // Reset D3 namespace
     before_each_test_sig.Trigger();
     test_runners[cur_test].create();    // Create test object in clean namespace
@@ -90,14 +58,46 @@ protected:
     ++cur_test; // note: this will execute before the test is run
   }
 
+  void CleanupTest(size_t runner_id) {
+    emp_assert(runner_id < test_runners.size());
+    test_runners[runner_id].cleanup();
+  }
+
+  void Cleanup() {
+    // finished running all tests. Make sure all dynamically allocated memory is cleaned up.
+    std::for_each(
+      test_runners.begin(),
+      test_runners.end(),
+      [](TestRunner & runner) {
+        emp_assert(runner.done);
+        if (runner.test != nullptr) runner.test.Delete();
+      }
+    );
+    // Clear test runners.
+    test_runners.clear();
+  }
+
 public:
 
   TestManager() {
-    next_tests_js_func_id = emp::JSWrap([this](){ this->NextTest(); }, "NextTest");
+    next_test_js_func_id = emp::JSWrap(
+      [this]() { this->NextTest(); },
+      "NextTest"
+    );
+    cleanup_test_js_func_id = emp::JSWrap(
+      [this](size_t test_id) { this->CleanupTest(test_id); },
+      "CleanupTest"
+    );
+    cleanup_all_js_func_id = emp::JSWrap(
+      [this]() { this->Cleanup(); },
+      "CleanupManager"
+    );
   }
 
   ~TestManager() {
-    emp::JSDelete(next_tests_js_func_id);
+    emp::JSDelete(next_test_js_func_id);
+    emp::JSDelete(cleanup_test_js_func_id);
+    emp::JSDelete(cleanup_all_js_func_id);
   }
 
   // Arguments are forwarded to the constructor.
@@ -115,34 +115,54 @@ public:
       std::apply([this, runner_id](auto&&... constructor_args) {
         // Allocate memory for test
         this->test_runners[runner_id].test = emp::NewPtr<TEST_TYPE>(std::forward<Args>(constructor_args)...);
-        // Hook setup signal
-        auto & tst = *(this->test_runners[runner_id].test);
         this->test_runners[runner_id].done = false;
-        tst.before_test_sig.AddAction([this, runner_id]() {
-          this->test_runners[runner_id].test->Setup();
-        });
-        tst.after_test_sig.AddAction([this, runner_id]() {
-          this->test_runners[runner_id].done=true;
-          this->after_each_test_sig.Trigger();
-        });
+        // Run test setup
+        this->test_runners[runner_id].test->Setup();
       }, std::move(constructor_args));
     };
 
     runner.describe = [runner_id, this]() {
-      this->test_runners[runner_id].test->Describe(); // this will run c++ setup code & queue up the describe
+      this->test_runners[runner_id].test->Describe(); // this will queue up the next test's describe
+      const size_t next_test_id = runner_id + 1;
+
       EM_ASM({
-        describe("NextTest", function() {
-          it("should queue the next test", function() {
-            emp.NextTest();
+        const test_id = $0;
+        // Queue up cleanup for this test
+        describe("Cleanup test " + test_id, function() {
+          it('should clean up test ' + test_id, function() {
+            emp.CleanupTest($0);
           });
         });
-      });
+      }, runner_id);
+
+      // If there are still more tests to do, queue them...
+      // otherwise, queue up a cleanup
+      if (next_test_id < this->test_runners.size()) {
+        EM_ASM({
+          const next_test_id = $0;
+          // Queue up next test
+          describe("Queue test " + next_test_id, function() {
+            it("should queue the next test " + next_test_id, function() {
+              emp.NextTest();
+            });
+          });
+        }, next_test_id);
+      } else {
+        EM_ASM({
+          describe("Finished running tests.", function() {
+            it("should cleanup test manager", function() {
+              emp.CleanupManager();
+            });
+          });
+        });
+      }
     };
 
     runner.cleanup = [runner_id, this]() {
+      this->test_runners[runner_id].done = true;
+      this->after_each_test_sig.Trigger();
       this->test_runners[runner_id].test.Delete();
       this->test_runners[runner_id].test = nullptr;
-      ResetD3Context();
     };
   }
 
