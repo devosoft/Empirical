@@ -42,22 +42,30 @@ var D3Library = {
     // If the 'func_name' is a function in the global namespace, the d3 namespace, or the emp namespace
     // return the proper function, otherwise just return 'func_name'
     find_function: function(func_name) {
-      for (namespace in this.searchable_namespaces) {
-        if (window[namespace][func_name] === "function") {
+      for (namespace of this.searchable_namespaces) {
+        if (!(func_name in window[namespace])) { continue; }
+        if (typeof window[namespace][func_name] === "function") {
           return window[namespace][func_name];
         }
       }
-      return (window[func_name] === "function") ? window[func_name] : func_name;
+      if (!(func_name in window)) {
+        return func_name;
+      }
+      return (typeof window[func_name] === "function") ? window[func_name] : func_name;
     },
 
     // Is the 'func_name' a function in the global namespace, the d3 namespace, or the emp namespace?
     is_function: function(func_name) {
-      for (namespace in this.searchable_namespaces) {
-        if (window[namespace][func_name] === "function") {
+      for (namespace of this.searchable_namespaces) {
+        if (!(func_name in window[namespace])) { continue; }
+        if (typeof window[namespace][func_name] === "function") {
           return true;
         }
       }
-      return (window[func_name] === "function");
+      if (!(func_name in window)) {
+        return false;
+      }
+      return (typeof window[func_name] === "function");
     },
 
   },
