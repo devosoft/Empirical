@@ -11,7 +11,7 @@ var D3Library = {
     // Returns whether namespace is successfully added.
     add_searchable_namespace: function(name) {
       if (!(name in this.searchable_namespaces) && name in window) {
-        this.emp_d3.usable_namespaces.push(name);
+        this.searchable_namespaces.push(name);
         return true;
       }
       return false;
