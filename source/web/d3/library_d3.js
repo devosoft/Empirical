@@ -47,7 +47,7 @@ var D3Library = {
           return window[namespace][func_name];
         }
       }
-      return func_name;
+      return (window[func_name] === "function") ? window[func_name] : func_name;
     },
 
     // Is the 'func_name' a function in the global namespace, the d3 namespace, or the emp namespace?
@@ -57,7 +57,7 @@ var D3Library = {
           return true;
         }
       }
-      return false;
+      return (window[func_name] === "function");
     },
 
   },
