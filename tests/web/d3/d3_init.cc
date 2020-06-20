@@ -23,6 +23,10 @@ struct BaseTester : D3::D3_Base {
     BaseTester(int id) : D3::D3_Base(id) {}
 };
 
+// Test_BaseObjectIDAssignment
+// - Tests:
+//   - Reference counting
+//   - Correct assignment of next ID
 struct Test_BaseObjectIDAssignment : BaseTest {
   // All persistent data structures necessary for test should be member variables.
   BaseTester test1{}; // This will get created 1st.
@@ -43,15 +47,9 @@ struct Test_BaseObjectIDAssignment : BaseTest {
   }
 
   // Describe test (should only contain 'describe' call)
-  void Describe() override { // option => move this into 'Setup'
+  void Describe() override {
     EM_ASM({
-      const done_func_id = $0;
-      const setup_func_id = $1;
       describe('Base Object', function() {
-
-        before(function() {
-          emp.Callback(setup_func_id); // This will call setup!
-        });
 
         it('should create objects in Javascript', function() {
             chai.assert.equal(Object.keys(emp_d3.objects).length, 4, "emp_d3.objects");
@@ -77,12 +75,8 @@ struct Test_BaseObjectIDAssignment : BaseTest {
             chai.assert.equal(3 in emp_d3.objects, false);
         });
 
-        after(function() {
-          emp.Callback(done_func_id); // This will mark this test as done
-        });
-
       });
-    }, this->GetDoneJSFuncID(), this->GetSetupJSFuncID()); // -- end EM_ASM --
+    }); // -- end EM_ASM --
   }
 
   ~Test_BaseObjectIDAssignment() {
@@ -90,15 +84,31 @@ struct Test_BaseObjectIDAssignment : BaseTest {
   }
 };
 
+// Test_LibraryD3
+// - Tests the functions in library_d3.js
+//  - add_searchable_namespace
+//  - remove_searchable_namespace
+//  - clear_emp_d3
+//  - find_function
+//  - is_function
+// struct Test_LibraryD3 {
+
+//   void Describe() {
+//     EM_ASM({
+
+//     });
+//   }
+
+// };
+
+
 // Proof of concept (will delete later)
 struct TestThingy : BaseTest {
   size_t num;
   TestThingy(double i) : num(i) { ; }
   void Describe() override {
-    before_test_sig.Trigger();
     std::cout << "  > Testing thingy!" << std::endl;
     std::cout << "      num = " << num << std::endl;
-    after_test_sig.Trigger();
   }
 };
 
