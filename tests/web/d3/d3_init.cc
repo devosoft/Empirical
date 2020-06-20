@@ -71,8 +71,8 @@ struct Test_BaseObjectIDAssignment : BaseTest {
             chai.assert.equal(emp_d3.counts[0], 1);
             chai.assert.equal(emp_d3.counts[1], 1);
             chai.assert.equal(emp_d3.counts[2], 1);
-            chai.assert.equal(3 in emp_d3.counts, false);
-            chai.assert.equal(3 in emp_d3.objects, false);
+            chai.assert(!(3 in emp_d3.counts));
+            chai.assert(!(3 in emp_d3.objects));
         });
 
       });
@@ -91,15 +91,125 @@ struct Test_BaseObjectIDAssignment : BaseTest {
 //  - clear_emp_d3
 //  - find_function
 //  - is_function
-// struct Test_LibraryD3 {
+struct Test_LibraryD3 : BaseTest {
 
-//   void Describe() {
-//     EM_ASM({
+  void Describe() {
+    EM_ASM({
+      describe("library_d3.js", function() {
+        // describe("objects")
+        describe("searchable namespaces", function() {
+          it("should have expected default values", function() {
+            chai.assert.deepEqual(emp_d3.searchable_namespaces, ["d3", "emp"]);
+          });
+        });
 
-//     });
-//   }
+        describe("add_searchable_namespace", function() {
+          it("should fail to add a non-existing namespace", function() {
+            const success = emp_d3.add_searchable_namespace("THIS_JS_NAMESPACE_SHOULD_NOT_EXIST_HELLO_FROM_MY_COUCH");
+            chai.assert(!success);
+            chai.assert.deepEqual(emp_d3.searchable_namespaces, ["d3", "emp"]);
+          });
 
-// };
+          it("should add an existing namespace", function() {
+            window["library_d3_test_ns"] = {};
+            const success = emp_d3.add_searchable_namespace("library_d3_test_ns");
+            chai.assert(success);
+            chai.assert.deepEqual(emp_d3.searchable_namespaces, ["d3", "emp", "library_d3_test_ns"]);
+          });
+        });
+
+        describe("remove_searchable_namespace", function() {
+          it("should fail to remove namespace that is not in searchable_namespaces", function() {
+            var current = [];
+            for (ns of emp_d3.searchable_namespaces) { current.push(ns); }
+            const success = emp_d3.remove_searchable_namespace("THIS_JS_NAMESPACE_SHOULD_NOT_EXIST_HELLO_FROM_MY_COUCH");
+            chai.assert(!success);
+            chai.assert.deepEqual(current, emp_d3.searchable_namespaces);
+          });
+
+          it("should remove namespace in searchable_namespace", function() {
+            const success = emp_d3.remove_searchable_namespace("library_d3_test_ns");
+            chai.assert(success);
+            chai.assert.deepEqual(emp_d3.searchable_namespaces, ["d3", "emp"]);
+          });
+        });
+
+        describe("clear_emp_d3", function() {
+          it("should reset emp_d3 internal state", function() {
+            // Throw some trash into the emp_d3 internal state objects.
+            emp_d3.objects["garbage"] = "monster";
+            emp_d3.counts["garbage"] = 128;
+            emp_d3.objects["dumpster"] = "fire";
+            emp_d3.counts["dumpster"] = 256;
+            emp_d3.next_id = 512;
+            emp_d3.searchable_namespaces = ["this", "is", "not", "what", "this", "should", "be"];
+            // Take out the trash.
+            emp_d3.clear_emp_d3();
+            // Assert that we took out the trash.
+            chai.assert.deepEqual(emp_d3.objects, {});
+            chai.assert.deepEqual(emp_d3.counts, {});
+            chai.assert.deepEqual(emp_d3.next_id, 0);
+            chai.assert.deepEqual(emp_d3.searchable_namespaces, ["d3", "emp"]);
+          });
+        });
+
+        describe("find_function", function() {
+          before(function() {
+            window["library_d3_test_ns"]["real_function"] = function() { return 42; };
+            window["library_d3_test_ns"]["fake_function"] = "not a function";
+            window["very_exposed_very_real_function"] = function() { return 43; };
+            emp_d3.add_searchable_namespace("library_d3_test_ns");
+          });
+
+          it("should fail to return a function that doesn't exist", function() {
+            const func0 = emp_d3.find_function("this_function_does_not_exist");
+            const func1 = emp_d3.find_function("fake_function");
+            chai.assert.equal(func0, "this_function_does_not_exist");
+            chai.assert.equal(func1, "fake_function");
+          });
+
+          it("should return a function that exists", function() {
+            // find function in root namespace
+            var root_func = emp_d3.find_function("very_exposed_very_real_function");
+            chai.assert.typeOf(root_func, "function");
+            chai.assert.equal(root_func(), 43);
+
+            // find function in custom namespace
+            const custom_func = emp_d3.find_function("real_function");
+            chai.assert.typeOf(custom_func, "function");
+            chai.assert.equal(custom_func(), 42);
+
+            // find function in emp namespace
+            const emp_func = emp_d3.find_function("PassStringToCpp");
+            chai.assert.typeOf(emp_func, "function");
+
+            // find function in d3 namespace
+            const d3_func = emp_d3.find_function("interpolatePurples");
+            chai.assert.typeOf(d3_func, "function");
+          });
+        });
+
+        describe("is_function", function() {
+          it("should fail to find a function that doesn't exist", function() {
+            chai.assert(!emp_d3.is_function("this_function_does_not_exist"));
+            chai.assert(!emp_d3.is_function("fake_function"));
+          });
+          it("should find a function that exists", function() {
+            // find function in root namespace
+            chai.assert(emp_d3.is_function("very_exposed_very_real_function"));
+            // find function in custom namespace
+            chai.assert(emp_d3.is_function("real_function"));
+            // find function in emp namespace
+            chai.assert(emp_d3.is_function("PassStringToCpp"));
+            // find function in d3 namespace
+            chai.assert(emp_d3.is_function("interpolatePurples"));
+          });
+        });
+      });
+    });
+  }
+
+};
 
 
 // Proof of concept (will delete later)
@@ -120,12 +230,9 @@ int main() {
   std::cout << "Creating test manager." << std::endl;
 
   test_manager.AddTest<Test_BaseObjectIDAssignment>();
+  test_manager.AddTest<Test_BaseObjectIDAssignment>(); // demo that we can add tests arbitrary number of times
   test_manager.AddTest<TestThingy>(1);
-  test_manager.AddTest<Test_BaseObjectIDAssignment>();
-  test_manager.AddTest<TestThingy>(2);
-  test_manager.AddTest<Test_BaseObjectIDAssignment>();
-  test_manager.AddTest<TestThingy>(3);
-  test_manager.AddTest<Test_BaseObjectIDAssignment>();
+  test_manager.AddTest<Test_LibraryD3>();
 
   test_manager.OnBeforeEachTest([]() { ResetD3Context(); });
   test_manager.Run();
