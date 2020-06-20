@@ -20,8 +20,8 @@ var D3Library = {
     // Remove a namespace from the set of namespaces.
     // Namespace must exist in searchable_namespaces.
     // Returns whether or not namespace is successfully removed.
-    remove_namespace: function(name) {
-      const index = this.searchable_namespaces.index(name);
+    remove_searchable_namespace: function(name) {
+      const index = this.searchable_namespaces.indexOf(name);
       if (index != -1) {
         this.searchable_namespaces.splice(index, 1);
         return true;
