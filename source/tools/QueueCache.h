@@ -8,83 +8,97 @@
  *  @note
  */
 
-#ifndef EMP_QUEUECACHE_H
-#define EMP_QUEUECACHE_H
-
 #include <list>
 #include <unordered_map>
 #include <utility>
 #include <stdexcept>
+#include <functional>
+#include <limits>
 
-namespace emp {
+#include "../base/assert.h"
+
+ namespace emp {
 	template <
 		class Key,
 		class Value,
-		class Allocator = std::allocator<std::pair<Key, Value>>
+		class Hash = std::hash<Key>,
+		class Pred = std::equal_to<Key>
 	>
 	class QueueCache {
 		private:
-			typedef typename std::list<typename std::pair<Key, Value>::iterator> cache_t;
+			using cache_t = typename std::list<std::pair<Key, Value>>;
 
 			cache_t cache;
-			std::unordered_map<Key, typename cache_t::iterator> cache_map;
+			std::unordered_map<Key, typename cache_t::iterator, Hash, Pred> cache_map;
 
-			const Value& update_cache(typename cache_t::iterator it) {
+			size_t capacity;
+
+			Value& update_cache(typename cache_t::iterator it) {
 				// update our cache since we are accesing an item
 				cache.splice(
 					cache.begin(),
 					cache,
-					it->second
+					it
 				);
-				return it->second->second;
+				return it->second;
+			}
+			void Shrink() {
+				while (Size() > Capacity()) {
+					// deal with removing last element
+					cache_map.erase(cache.back().first);
+					cache.pop_back();
+				}
+			}
+
+			static Value default_fun(const Key&) {
+				throw std::invalid_argument("Key not in cache");
+				Value* horrible = nullptr;
+				return *horrible;
 			}
 		public:
-			QueueCache(size_t _capacity) {
-				cache.resize(_capacity);
-			}
+			QueueCache(size_t _capacity = std::numeric_limits<size_t>::max()) : capacity(_capacity) { ; }
 			~QueueCache() = default;
 
 			/// Returns number of elements in cache.
-			size_t size() { return cache.size(); }
+			size_t Size() { return cache.size(); }
 
 			/// Returns maximum number of elements that will fit in cache.
-			size_t capacity() { return cache.max_size(); }
+			size_t Capacity() { return capacity; }
 
 			/// Clears the cache.
-			void clear() { cache.clear(); }
+			void Clear() { cache.clear(); }
 
 			/// Stores element in front of cache.
-			void put(const Key& key, const Value& val) {
+			typename cache_t::iterator Put(const Key& key, const Value& val) {
 				// put element into our cache
 				// we use insert because it returns a pointer to our element
-				auto it = cache.insert(cache.begin(), std::make_pair(key, val));
+				auto it = cache.emplace(cache.begin(), key, val);
 				// add pointer to this element to our map
-				cache_map[key] = it;
+				cache_map.emplace(key, it);
+
+				Shrink();
+
+				return it;
 			}
 
 			/// Gets an element from cache.
 			/// By default, it throws an exception if the element is not in cache.
-			/// This behaviour can be changed by specifying a callable as a second parameter.
-			template <typename Function>
-			const Value& get(const Key& key, const Function&& fun = [](){ throw std::invalid_argument("Key not in cache"); }) {
+			/// This behaviour can be changed by specifying a callable as a second parameter,
+			/// which must return a Value.
+			Value& Get(const Key& key, const std::function<Value(const Key& k)>& fun = default_fun) {
 				// attempt to find key in our iterator map
-				auto it = cache_map.find(key);
-
-				// check whether value is in cache
-				if (it != cache_map.end()) {
-					// value is in cache, so we update it
-					update_cache(it);
-				} else {
+				if (!cache_map.count(key)) {
 					// value is not in cache, so we call function
-					fun();
+					Put(key, fun(key));
 				}
+				// value is in cache, so we find it
+				return update_cache(cache_map.find(key)->second);
 			}
 
 			/// Resizes the cache.
-			/// Returns true if the cache shrunk (elements were lost).
-			bool resize(size_t new_size) {
-				cache.resize(new_size);
-				return new_size < cache.size();
+			void SetCapacity(size_t _capacity) {
+				capacity = _capacity;
+				Shrink();
 			}
 
 			/// Returns a constant iterator to the beginning of the cache.
@@ -99,25 +113,15 @@ namespace emp {
 
 			/// Gets an element from cache if found, and creates it otherwise.
 			/// Value type must have a default constructor and an assignment operator.
-			std::pair<Key, Value>& operator[](const Key& index) {
+			Value& operator[](const Key& index) {
 				// Check whether Value has a default constructor
 				emp_assert(std::is_trivially_constructible<Value>::value);
 
 				// attempt to find key in our iterator map
-				auto it = cache_map.find(index);
-
-				// check whether value is in cache
-				if (it != cache_map.end()) {
-					// value is in cache, so we update it
-					update_cache(it);
-				} else {
-					// value is not in cache, so we constuct it
-					auto val = cache.insert(cache.begin(), std::make_pair(index, Value()));
-					cache_map[index] = val;
-
-					return *val;
+				if (!cache_map.count(index)) {
+					Put(index, Value());
 				}
+				return Get(index);
 			}
 	};
 }
-#endif
