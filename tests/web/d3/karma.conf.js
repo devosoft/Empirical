@@ -25,10 +25,16 @@ module.exports = function(config) {
       {pattern: 'tests/web/test_header.js'},
       {pattern: 'tests/web/assets/lineage-example.json', included: false},
       {pattern: 'tests/web/assets/test-line-graph.csv', included: false},
-      {pattern: 'tests/web/d3/d3_init.js.map', included: false},
-      {pattern: 'tests/web/d3/d3_init.js'},
-      {pattern: 'tests/web/d3/d3_init.wasm', included: false, nocache:true},
-      {pattern: 'tests/web/d3/d3_init.wasm.map', included: false, nocache:true}
+      // d3_init tests
+      // {pattern: 'tests/web/d3/d3_init.js.map', included: false},
+      // {pattern: 'tests/web/d3/d3_init.js'},
+      // {pattern: 'tests/web/d3/d3_init.wasm', included: false, nocache:true},
+      // {pattern: 'tests/web/d3/d3_init.wasm.map', included: false, nocache:true},
+      // transition tests
+      {pattern: 'tests/web/d3/transition.js.map', included: false},
+      {pattern: 'tests/web/d3/transition.js'},
+      {pattern: 'tests/web/d3/transition.wasm', included: false, nocache:true},
+      {pattern: 'tests/web/d3/transition.wasm.map', included: false, nocache:true}
     ],
 
 
