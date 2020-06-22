@@ -26,7 +26,7 @@ public:
         clade++;
     }
 
-    void reproduce(vector<Organism> &childGen, emp::Systematics<Organism, int> &sys){
+    static void reproduce(vector<Organism> &childGen, emp::Systematics<Organism, int> &sys){
         for(int i = 0; i < 10; i++){
             childGen.emplace_back(); //fills childGen vector with Organisms
 
