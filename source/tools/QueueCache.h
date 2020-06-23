@@ -78,6 +78,11 @@
 				cache_map.clear();
 			}
 
+			/// Deletes element from cache.
+			void Delete(const Key& key) {
+				auto it = cache_map.find(key);
+				Delete(it);
+			}
 			/// Stores element in front of cache.
 			typename cache_t::iterator Put(const Key& key, const Value& val) {
 				// put element into our cache
