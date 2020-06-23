@@ -88,6 +88,11 @@
 				Delete(it);
 			}
 
+			/// Returns true if cache has key.
+			bool Contains(const Key& key) {
+				return cache_map.count(key);
+			}
+
 			/// Stores element in front of cache.
 			typename cache_t::iterator Put(const Key& key, const Value& val) {
 				// try to find element in map
