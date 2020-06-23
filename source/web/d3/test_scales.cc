@@ -41,8 +41,8 @@ struct TestLinearScale {
     });
 
     D3::LinearScale testLinearX = D3::LinearScale();
-    testLinearX.SetDomain(10, 130);
-    testLinearX.SetRange(0, 960);
+    testLinearX.SetDomain(10, 130.00);
+    testLinearX.SetRange(0, 960.00);
     int result1 = testLinearX.ApplyScaleInt(20);
     int result2 = testLinearX.ApplyScaleInt(50);
     int result1i = testLinearX.Invert<int>(80);
@@ -208,7 +208,7 @@ struct TestLogScale {
     std::cout << "value 3: " << result3 << std::endl;
 
     D3::LogScale testLog2 = D3::LogScale();
-    testLog2.Base(2);
+    testLog2.SetBase(2);
     testLog2.SetDomain(16, 1048576);
     testLog2.SetRange(0, 700);
     double result4 = testLog2.ApplyScaleDouble(64);
@@ -220,6 +220,46 @@ struct TestLogScale {
     std::cout << "value 6: " << result6 << std::endl;
 
     std::cout << "------Log Test End------" << std::endl << std::endl;
+  }
+};
+
+// scaleSymlog
+struct TestSymlogScale {
+  TestSymlogScale() {
+    std::cout << "------Symlog Test Begin------" << std::endl;
+
+    EM_ASM({
+      var logScale = d3.scaleSymlog()
+	      .domain([-100000, 100000])
+        .constant(0.01)
+	      .range([-100, 100]);
+
+      console.log(logScale(-80000)); // -98.61557140643649
+      console.log(logScale(-50)); // -52.843669022827925
+      console.log(logScale(1.5)); // 31.128241911062098
+      console.log(logScale(50)); // 52.843669022827925
+      console.log(logScale(80000)); // 98.61557140643649
+    });
+
+    D3::SymlogScale testSymlog = D3::SymlogScale();
+    testSymlog.SetDomain(-100000, 100000);
+    testSymlog.SetConstant(0.01);
+    testSymlog.SetRange(-100, 100);
+    double result1 = testSymlog.ApplyScaleDouble(-80000);
+    double result2 = testSymlog.ApplyScaleDouble(-50);
+    double result3 = testSymlog.ApplyScaleDouble(1.5);
+    double result4 = testSymlog.ApplyScaleDouble(50);
+    double result5 = testSymlog.ApplyScaleDouble(80000);
+
+
+    std::cout << "value 1: " << result1 << std::endl;
+    std::cout << "value 2: " << result2 << std::endl;
+    std::cout << "value 3: " << result3 << std::endl;
+    std::cout << "value 4: " << result4 << std::endl;
+    std::cout << "value 5: " << result5 << std::endl;
+
+
+    std::cout << "------Symlog Test End------" << std::endl << std::endl;
   }
 };
 
@@ -331,40 +371,12 @@ int main() {
   TestPowScale test2{};
   TestSqrtScale test3{};
   TestLogScale test4{};
-  TestIdentityScale test5{};
-  TestTimeScale test6{};
-  // TestRadialScale test7{};
+  TestSymlogScale test5{};
+  TestIdentityScale test6{};
+  TestTimeScale test7{};
 
   // TestQuantizeScale test6{};
 }
 
 
-
-// scaleRadial
-// struct TestRadialScale {
-//   TestRadialScale() {
-//     std::cout << "------Radial Test Begin------" << std::endl;
-
-//     EM_ASM({
-//       var radialScale = d3.scaleRadial();
-
-//       console.log(radialScale(0.10)); // 12
-//       console.log(radialScale(0.777)); // 50.6789
-//       console.log(radialScale(1.000)); // 1234
-//     });
-
-//     // D3::RadialScale testRad = D3::RadialScale();
-//     // // testRad.SetDomain(10, 1000);
-//     // testRad.SetRange(30, 300);
-//     // double result1 = testRad.ApplyScaleDouble(10);
-//     // double result2 = testRad.ApplyScaleDouble(777);
-//     // double result3 = testRad.ApplyScaleDouble(1000);
-
-//     // std::cout << "value 1: " << result1 << std::endl;
-//     // std::cout << "value 2: " << result2 << std::endl;
-//     // std::cout << "value 3: " << result3 << std::endl;
-
-//     std::cout << "------Radial Test End------" << std::endl << std::endl;
-//   }
-// };
 

@@ -7,6 +7,7 @@
  *  @brief Tools for scaling graph axes in D3.
  */
 
+
 #ifndef __EMP_D3_SCALES_H__
 #define __EMP_D3_SCALES_H__
 
@@ -50,6 +51,8 @@ namespace D3 {
       return *this;
     }
 
+    // template<typename T>
+    // typename std::enable_if<std::is_integral<T>::value, Scale &>::type
     Scale & SetDomain(double min, double max) {
       EM_ASM({
         emp_d3.objects[$0].domain([$1, $2]);
@@ -70,6 +73,8 @@ namespace D3 {
       return *this;
     }
 
+    // template<typename T>
+    // typename std::enable_if<std::is_integral<T>::value, Scale &>::type
     Scale & SetRange(double min, double max) {
       EM_ASM({
         emp_d3.objects[$0].range([$1, $2]);
@@ -131,7 +136,7 @@ namespace D3 {
     }
 
     double ApplyScaleDouble(int input) {
-      return EM_ASM_INT({
+      return EM_ASM_DOUBLE({
         return emp_d3.objects[$0]($1);
       }, this->id, input);
     }
@@ -143,7 +148,7 @@ namespace D3 {
     }
 
     int ApplyScaleInt(double input) {
-      return EM_ASM_DOUBLE({
+      return EM_ASM_INT({
         return emp_d3.objects[$0]($1);
       }, this->id, input);
     }
@@ -174,7 +179,6 @@ namespace D3 {
     ContinuousScale() : Scale(true) {;}
     
     // Invert is only supported if the range is numeric. If the range is not numeric, returns NaN
-    // do i need to make a separate invert that returns ints?
     template <typename T>
     double Invert(T y) {
       return EM_ASM_DOUBLE({
@@ -245,12 +249,6 @@ namespace D3 {
 
       return *this;
     }
-
-    // LinearScale& SetInterpolate(std::string factory) {
-    // D3_CALLBACK_METHOD_1_ARG(interpolate, factory.c_str())
-    // return *this;
-    // }
-    
   };
 
   // scaleLinear
@@ -298,8 +296,24 @@ namespace D3 {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleLog(); }, this->id);
     }
 
-    LogScale & Base(double baseNum) {
+    LogScale & SetBase(double baseNum) {
       EM_ASM({ emp_d3.objects[$0].base($1);}, this->id, baseNum);
+      return *this;
+    }
+  };
+
+  // scaleSymlog
+  class SymlogScale : public ContinuousScale {
+  protected:
+    SymlogScale(bool derived) : ContinuousScale(true) { ; }
+  
+  public:
+    SymlogScale() : ContinuousScale(true) {
+      EM_ASM({ emp_d3.objects[$0] = d3.scaleSymlog(); }, this->id);
+    }
+
+    SymlogScale & SetConstant(double constant) {
+      EM_ASM({ emp_d3.objects[$0].constant($1);}, this->id, constant);
       return *this;
     }
   };
@@ -430,19 +444,6 @@ namespace D3 {
       return returnDate;
     }
   };
-
-  // scaleRadial
-  // Note that radial scales do not support interpolate
-  class RadialScale : public ContinuousScale {
-  protected:
-    RadialScale(bool derived) : ContinuousScale(true) { ; }
-  
-  public:
-    RadialScale() : ContinuousScale(true) {
-      EM_ASM({ emp_d3.objects[$0] = d3.scaleRadial(); }, this->id);
-    }
-  };
-
   
 
   ////////////////////////////////////////////////////////
