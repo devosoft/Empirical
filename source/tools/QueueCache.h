@@ -83,17 +83,24 @@
 				auto it = cache_map.find(key);
 				Delete(it);
 			}
+
 			/// Stores element in front of cache.
 			typename cache_t::iterator Put(const Key& key, const Value& val) {
+				// try to find element in map
+				auto found = cache_map.find(key);
+				if (found != cache_map.end()) {
+					Delete(found);
+				}
+
 				// put element into our cache
 				// we use insert because it returns a pointer to our element
-				auto it = cache.emplace(cache.begin(), key, val);
+				cache.emplace_front(key, val);
 				// add pointer to this element to our map
-				cache_map.emplace(key, it);
+				cache_map.emplace(key, cache.begin());
 
 				Shrink();
 
-				return it;
+				return cache.begin();
 			}
 
 			/// Gets an element from cache.
