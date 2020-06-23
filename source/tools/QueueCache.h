@@ -67,6 +67,9 @@
 			QueueCache(size_t _capacity = DefaultCapacity) : capacity(_capacity) { ; }
 			~QueueCache() = default;
 
+			using const_iterator = typename cache_t::const_iterator;
+			using iterator = typename cache_t::const_iterator;
+
 			/// Returns number of elements in cache.
 			size_t Size() { return cache.size(); }
 
