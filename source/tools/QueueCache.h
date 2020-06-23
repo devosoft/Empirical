@@ -100,7 +100,7 @@
 			/// By default, it throws an exception if the element is not in cache.
 			/// This behaviour can be changed by specifying a callable as a second parameter,
 			/// which must return a Value.
-			Value& Get(const Key& key, const std::function<Value(const Key& k)>& fun = default_fun) {
+			Value& Get(const Key& key, const std::function<Value(const Key& k)>& fun = DefaultFun) {
 				// attempt to find key in our iterator map
 				if (!cache_map.count(key)) {
 					// value is not in cache, so we call function
