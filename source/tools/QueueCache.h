@@ -27,9 +27,10 @@
 	class QueueCache {
 		private:
 			using cache_t = typename std::list<std::pair<Key, Value>>;
+			using cache_map_t = std::unordered_map<Key, typename cache_t::iterator, Hash, Pred>;
 
 			cache_t cache;
-			std::unordered_map<Key, typename cache_t::iterator, Hash, Pred> cache_map;
+			cache_map_t cache_map;
 
 			size_t capacity;
 
@@ -54,7 +55,12 @@
 				throw std::invalid_argument("Key not in cache");
 				Value* horrible = nullptr;
 				return *horrible;
+			void Delete(typename cache_map_t::iterator it) {
+				std::cout << "key: " << it->second->first << " val: " << it->second->second << std::endl;
+				cache_map.erase(it);
+				cache.erase(it->second);
 			}
+
 		public:
 			QueueCache(size_t _capacity = std::numeric_limits<size_t>::max()) : capacity(_capacity) { ; }
 			~QueueCache() = default;
