@@ -18,6 +18,8 @@
 #include <typeinfo>
 #include <map>
 #include <array>
+#include "../../base/vector.h"
+#include "../../base/array.h"
 #include "utils.h"
 
 #include "../../base/assert.h"
@@ -92,17 +94,6 @@ namespace D3 {
       }, this->id, new_id);
       return Scale(new_id);
     }
-
-    
-    /// Calculate the ouput for [input], based on the scale's scaling function
-    // template <typename T, std::enable_if<std::is_integral<T>::value, int>>
-    // std::string ApplyScaleString(T input) {
-    //     EM_ASM({
-    //         const resultStr = emp_d3.objects[$0]($1);
-    //         emp.PassStringToCpp(resultStr);
-    //     }, this->id, input);
-    //     return emp::pass_str_to_cpp();
-    // }
 
     std::string ApplyScaleString(double input) {
       EM_ASM({
@@ -249,6 +240,28 @@ namespace D3 {
 
       return *this;
     }
+
+    // .unknown()
+    ContinuousScale & SetUnkown(double value) {
+      EM_ASM({
+        emp_d3.objects[$0].unknown($1);
+      }, this->id, value)
+      return *this;
+    }
+
+    ContinuousScale & SetUnkown(int value) {
+      EM_ASM({
+        emp_d3.objects[$0].unknown($1);
+      }, this->id, value)
+      return *this;
+    }
+
+    ContinuousScale & SetUnkown(const std::string & value) {
+      EM_ASM({
+        emp_d3.objects[$0](UTF8ToString($1));
+      }, this->id, value.c_str());
+      return *this;
+    }
   };
 
   // scaleLinear
@@ -319,7 +332,6 @@ namespace D3 {
   };
 
   // scaleIdentity
-  // Note that Identity scales do not support rangeRound, clamp or interpolate
   class IdentityScale : public ContinuousScale {
   protected:
     IdentityScale(bool derived) : ContinuousScale(true) { ; }
@@ -328,6 +340,14 @@ namespace D3 {
     IdentityScale() : ContinuousScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleIdentity(); }, this->id);
     }
+
+    // get rid of functions that shouldn't be called:
+    // Identity scales do not support rangeRound, clamp or interpolate
+    template <typename T, size_t SIZE>
+    ContinuousScale & SetRangeRound(emp::array<T,SIZE> values) = delete;
+    ContinuousScale &SetRangeRound(double min, double max) = delete;
+    ContinuousScale & SetClamp(bool clamp) = delete;
+    ContinuousScale & SetInterpolate(const std::string & interpolatorName) = delete;
   };
 
   // scaleTime
@@ -445,6 +465,129 @@ namespace D3 {
     }
   };
   
+  // scaleSequential
+  // is used for mapping continuous values to an output range 
+  // determined by a preset (or custom) interpolator
+  // the input domain and output range of a sequential scale always has exactly two elements,
+  // and the output range is typically specified as an interpolator rather than an array of values
+  class SequentialScale : public ContinuousScale {
+  protected:
+    SequentialScale(bool derived) : ContinuousScale(true) { ; }
+  
+  public:
+    SequentialScale() : ContinuousScale(true) {
+      EM_ASM({ emp_d3.objects[$0] = d3.scaleSequential(); }, this->id);
+    }
+
+    // get rid of functions that shouldn't be called:
+    // Identity scales do not support invert or interpolate
+    template <typename T>
+    double Invert(T y) = delete;
+    ContinuousScale & SetInterpolate(const std::string & interpolatorName) = delete;
+  
+    
+    // .interpolator
+    SequentialScale & SetInterpolator(const std::string & interpolatorName) {
+      // note: this doesn't allow you to specify arguments to a d3.interpolator function
+      EM_ASM({
+        const id = $0;
+        const interpolator_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(interpolator_str);
+        emp_d3.objects[id].interpolator(sel);
+      }, this->id, interpolatorName.c_str());
+
+      return *this;
+    }
+
+    // .quantiles  
+    // Returns an array of n + 1 quantiles. For example, if n = 4, returns an array of five numbers: 
+    // the minimum value, the first quartile, the median, the third quartile, and the maximum.
+    emp::vector<double> GetQuantiles(const int n) {
+      EM_ASM({
+        emp_i.__outgoing_array = emp_d3.objects[$0].quantiles($1);
+      }, this->id, n);
+      // access JS array
+      emp::vector<double> quantile_vector;
+      emp::pass_vector_to_cpp(quantile_vector);
+      return quantile_vector;
+    }
+  };
+
+  // scaleSequentialLog
+  class SequentialLogScale : public SequentialScale {
+  protected:
+    SequentialLogScale(bool derived) : SequentialScale(true) { ; }
+  public:
+    SequentialLogScale() : SequentialScale(true) {
+      EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialLog(); }, this->id);
+    }
+  };
+
+  // scaleSequentialLog
+  class SequentialPowScale : public SequentialScale {
+  protected:
+    SequentialPowScale(bool derived) : SequentialScale(true) { ; }
+  public:
+    SequentialPowScale() : SequentialScale(true) {
+      EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialPow(); }, this->id);
+    }
+  };
+
+  // scaleSequentialSymlog
+  class SequentialSymlogScale : public SequentialScale {
+  protected:
+    SequentialSymlogScale(bool derived) : SequentialScale(true) { ; }
+  public:
+    SequentialSymlogScale() : SequentialScale(true) {
+      EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialSymlog(); }, this->id);
+    }
+  };
+
+  // scaleSequentialQuantile
+  class SequentialQuantileScale : public SequentialScale {
+  protected:
+    SequentialQuantileScale(bool derived) : SequentialScale(true) { ; }
+  public:
+    SequentialQuantileScale() : SequentialScale(true) {
+      EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialQuantile(); }, this->id);
+    }
+  };
+
+
+  // scaleDiverging
+  // map a continuous, numeric input domain to a continuous output range. 
+  // However, unlike continuous scales, the input domain and output range of a diverging scale always has exactly three elements,
+  // and the output range is typically specified as an interpolator rather than an array of values
+  class DivergingScale : public ContinuousScale {
+  protected:
+    DivergingScale(bool derived) : ContinuousScale(true) { ; }
+  
+  public:
+    DivergingScale() : ContinuousScale(true) {
+      EM_ASM({ emp_d3.objects[$0] = d3.scaleSequential(); }, this->id);
+    }
+
+    // get rid of functions that shouldn't be called:
+    // Identity scales do not support invert or interpolate
+    template <typename T>
+    double Invert(T y) = delete;
+    ContinuousScale & SetInterpolate(const std::string & interpolatorName) = delete;
+  
+    
+    // .interpolator
+    DivergingScale & SetInterpolator(const std::string & interpolatorName) {
+      // note: this doesn't allow you to specify arguments to a d3.interpolator function
+      EM_ASM({
+        const id = $0;
+        const interpolator_str = UTF8ToString($1);
+        var sel = emp_d3.find_function(interpolator_str);
+        emp_d3.objects[id].interpolator(sel);
+      }, this->id, interpolatorName.c_str());
+
+      return *this;
+    }
+  };
+
 
   ////////////////////////////////////////////////////////
   /// Scales with continuous input and discrete output ///
@@ -463,17 +606,7 @@ namespace D3 {
         return emp_d3.objects[$0].invertExtent($1);
       }, this->id, y);
     }
-
   };
-
-  // scaleSequential
-  // no invert and interpolate
-  // delete invert extent
-
-  // scaleDiverging
-  // no invert and interpolate
-  // delete invert extent
-
 
   // scaleQuantize
   // ticks tickformat nice thresholds
@@ -577,7 +710,6 @@ namespace D3 {
       }, this->id);
     }
   };
-  
 }
 
 #endif
