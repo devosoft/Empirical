@@ -204,7 +204,7 @@ SCENARIO("Queue Caches can be iterated on", "[tools]") {
         CHECK(result == expected);
       }
     }
-    WHEN("we apply std::algoritms") {
+    WHEN("we apply std::algoritms using begin() and end() iterators") {
       emp::vector<int> result;
       emp::vector<int> expected{'E', 'D', 'C', 'B', 'A'};
 
