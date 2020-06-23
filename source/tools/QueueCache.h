@@ -21,6 +21,7 @@
 	template <
 		class Key,
 		class Value,
+		size_t DefaultCapacity = std::numeric_limits<size_t>::max(),
 		class Hash = std::hash<Key>,
 		class Pred = std::equal_to<Key>
 	>
@@ -63,7 +64,7 @@
 			}
 
 		public:
-			QueueCache(size_t _capacity = std::numeric_limits<size_t>::max()) : capacity(_capacity) { ; }
+			QueueCache(size_t _capacity = DefaultCapacity) : capacity(_capacity) { ; }
 			~QueueCache() = default;
 
 			/// Returns number of elements in cache.
