@@ -32,9 +32,10 @@
 			cache_t cache;
 			cache_map_t cache_map;
 
+
 			size_t capacity;
 
-			Value& update_cache(typename cache_t::iterator it) {
+			Value& UpdateCache(typename cache_t::iterator it) {
 				// update our cache since we are accesing an item
 				cache.splice(
 					cache.begin(),
@@ -51,10 +52,10 @@
 				}
 			}
 
-			static Value default_fun(const Key&) {
 				throw std::invalid_argument("Key not in cache");
 				Value* horrible = nullptr;
 				return *horrible;
+			static Value DefaultFun(const Key&) {
 			void Delete(typename cache_map_t::iterator it) {
 				std::cout << "key: " << it->second->first << " val: " << it->second->second << std::endl;
 				cache_map.erase(it);
@@ -98,7 +99,7 @@
 					Put(key, fun(key));
 				}
 				// value is in cache, so we find it
-				return update_cache(cache_map.find(key)->second);
+				return UpdateCache(cache_map.find(key)->second);
 			}
 
 			/// Resizes the cache.
