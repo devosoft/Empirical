@@ -73,7 +73,10 @@
 			size_t Capacity() { return capacity; }
 
 			/// Clears the cache.
-			void Clear() { cache.clear(); }
+			void Clear() {
+				cache.clear();
+				cache_map.clear();
+			}
 
 			/// Stores element in front of cache.
 			typename cache_t::iterator Put(const Key& key, const Value& val) {
