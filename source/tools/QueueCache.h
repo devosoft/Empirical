@@ -52,10 +52,10 @@
 				}
 			}
 
-				throw std::invalid_argument("Key not in cache");
-				Value* horrible = nullptr;
-				return *horrible;
 			static Value DefaultFun(const Key&) {
+				throw std::invalid_argument("Key not in cache.");
+			}
+
 			void Delete(typename cache_map_t::iterator it) {
 				std::cout << "key: " << it->second->first << " val: " << it->second->second << std::endl;
 				cache_map.erase(it);
