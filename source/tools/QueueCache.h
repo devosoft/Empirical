@@ -133,6 +133,9 @@
 				return cache.end();
 			}
 
+			const typename cache_t::const_iterator begin() const { return cbegin(); }
+			const typename cache_t::const_iterator end() const { return cend(); }
+
 			/// Gets an element from cache if found, and creates it otherwise.
 			/// Value type must have a default constructor and an assignment operator.
 			Value& operator[](const Key& index) {
