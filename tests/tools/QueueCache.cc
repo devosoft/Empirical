@@ -65,9 +65,9 @@ SCENARIO("Queue Caches store elements", "[tools]") {
         }
       }
     }
-
   }
 }
+
 SCENARIO("Queue Caches can be sized and resized", "[tools]") {
   GIVEN("a queue cache of a set size with elements in it") {
     const size_t capacity = 10;
@@ -102,6 +102,7 @@ SCENARIO("Queue Caches can be sized and resized", "[tools]") {
     }
   }
 }
+
 SCENARIO("Queue Caches behave like queues (first-in, first-out)", "[tools]") {
   GIVEN("a queue cache full with elements") {
     const size_t capacity = 2;
