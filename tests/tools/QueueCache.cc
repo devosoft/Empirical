@@ -203,6 +203,13 @@ SCENARIO("Queue Caches can be subscripted", "[tools]") {
         REQUIRE(qch['z'] == it_z->second);
       }
     }
+    WHEN("we subscript into a new key") {
+      qch['a'] = 64;
+
+      THEN("the element is put into the cache") {
+        REQUIRE(qch.Get('a') == 64);
+      }
+    }
   }
 }
 
