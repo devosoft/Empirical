@@ -46,6 +46,11 @@ SCENARIO("Queue Caches store elements", "[tools]") {
         qch.Get('a') = 1;
         REQUIRE(qch.Get('a') == 1);
       }
+
+      AND_THEN("they can be overwritten") {
+        qch.Put('a', 2);
+        REQUIRE(qch.Get('a') == 2);
+      }
     }
     WHEN("an element is not in it") {
       AND_WHEN("a function isn't passed") {
