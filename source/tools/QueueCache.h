@@ -58,7 +58,6 @@
 			}
 
 			void Delete(typename cache_map_t::iterator it) {
-				std::cout << "key: " << it->second->first << " val: " << it->second->second << std::endl;
 				cache_map.erase(it);
 				cache.erase(it->second);
 			}
