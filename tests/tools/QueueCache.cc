@@ -124,6 +124,23 @@ SCENARIO("Queue Caches behave like queues (first-in, first-out)", "[tools]") {
     }
   }
 }
+SCENARIO("Queue Caches can delete elements", "[tools]") {
+  GIVEN("a queue cache with elements") {
+    const size_t capacity = 2;
+    emp::QueueCache<char, int> qch(capacity);
+
+    qch.Put('a', 0);
+    qch.Put('b', 1);
+
+    WHEN("we call delete on one of them") {
+      qch.Delete('a');
+
+      THEN("it is deleted") {
+        REQUIRE_THROWS_WITH(qch.Get('a'), "Key not in cache.");
+      }
+    }
+  }
+}
 
 SCENARIO("Queue Caches can be cleared", "[tools]") {
   GIVEN("a queue cache with elements") {
