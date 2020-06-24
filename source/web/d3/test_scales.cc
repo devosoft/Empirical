@@ -22,10 +22,44 @@ struct TestLinearScale {
   TestLinearScale() {
     std::cout << "------Linear Test Begin------" << std::endl;
 
+    emp::vector<std::string, int> cpp_result_vec;
+
+    D3::LinearScale testLinearX = D3::LinearScale();
+    testLinearX.SetDomain(10, 130.00);
+    testLinearX.SetRange(0, 960.00);
+    int result1 = testLinearX.ApplyScaleInt(20);
+    int result2 = testLinearX.ApplyScaleInt(50);
+    int result1i = testLinearX.Invert<int>(80);
+    int result2i = testLinearX.Invert<int>(320);
+
+    cpp_result_map["val1"] = result1;
+    cpp_result_map["val2"] = result2;
+    cpp_result_map["val3"] = result1i;
+    cpp_result_map["val4"] = result2i;
+
+    std::cout << "value 1: " << result1 << std::endl;
+    std::cout << "value 2: " << result2 << std::endl;
+    std::cout << "value 1 invert: " << result1i << std::endl;
+    std::cout << "value 2 invert: " << result2i << std::endl;
+
+    emp::pass_array_to_javascript(cpp_result_map);
+
+    // function pass_map_to_javascript
     EM_ASM({
+      console.log(emp_i.__incoming_array);
+      
+      window["test_linear_scale"] = ( {"js_results" : [],
+                                      "js_results_names" : [],
+                                       "cpp_results" : [],
+                                       "cpp_results_names" : [],
+                                       "js_results_lu" : {},
+                                       "cpp_results_lu" : {} } );
+      
+      // create dictionaries based on object above
+
       var x = d3.scaleLinear()
-        .domain([10, 130])
-        .range([0, 960]);
+                  .domain([ 10, 130 ])
+                  .range([ 0, 960 ]);
 
       console.log(x(20)); // 80
       console.log(x(50)); // 320
@@ -40,28 +74,15 @@ struct TestLinearScale {
       console.log(color(50)); // "#7b5167" or "rgb(123, 81, 103)"
     });
 
-    D3::LinearScale testLinearX = D3::LinearScale();
-    testLinearX.SetDomain(10, 130.00);
-    testLinearX.SetRange(0, 960.00);
-    int result1 = testLinearX.ApplyScaleInt(20);
-    int result2 = testLinearX.ApplyScaleInt(50);
-    int result1i = testLinearX.Invert<int>(80);
-    int result2i = testLinearX.Invert<int>(320);
-
-    std::cout << "value 1: " << result1 << std::endl;
-    std::cout << "value 2: " << result2 << std::endl;
-    std::cout << "value 1 invert: " << result1i << std::endl;
-    std::cout << "value 2 invert: " << result2i << std::endl;
-    
-    D3::LinearScale testLinearColor = D3::LinearScale();
-    testLinearColor.SetDomain(10, 100);
-    emp::array<std::string, 2> colorArray = {"brown", "steelblue"};
-    testLinearColor.SetRange(colorArray);
-    std::string result3 = testLinearColor.ApplyScaleString(20);
-    std::string result4 = testLinearColor.ApplyScaleString(50);
+    // D3::LinearScale testLinearColor = D3::LinearScale();
+    // testLinearColor.SetDomain(10, 100);
+    // emp::array<std::string, 2> colorArray = {"brown", "steelblue"};
+    // testLinearColor.SetRange(colorArray);
+    // std::string result3 = testLinearColor.ApplyScaleString(20);
+    // std::string result4 = testLinearColor.ApplyScaleString(50);
    
-    std::cout << "value 3: " << result3 << std::endl;
-    std::cout << "value 4: " << result4 << std::endl;
+    // std::cout << "value 3: " << result3 << std::endl;
+    // std::cout << "value 4: " << result4 << std::endl;
    
     std::cout << "------Linear Test End------" << std::endl << std::endl;
   }
@@ -449,5 +470,31 @@ int main() {
   // TestQuantizeScale test6{};
 }
 
+// scaleRadial
+// struct TestRadialScale {
+//   TestRadialScale() {
+//     std::cout << "------Radial Test Begin------" << std::endl;
 
+//     EM_ASM({
+//       var radialScale = d3.scaleRadial();
+
+//       console.log(radialScale(0.10)); // 12
+//       console.log(radialScale(0.777)); // 50.6789
+//       console.log(radialScale(1.000)); // 1234
+//     });
+
+//     // D3::RadialScale testRad = D3::RadialScale();
+//     // // testRad.SetDomain(10, 1000);
+//     // testRad.SetRange(30, 300);
+//     // double result1 = testRad.ApplyScaleDouble(10);
+//     // double result2 = testRad.ApplyScaleDouble(777);
+//     // double result3 = testRad.ApplyScaleDouble(1000);
+
+//     // std::cout << "value 1: " << result1 << std::endl;
+//     // std::cout << "value 2: " << result2 << std::endl;
+//     // std::cout << "value 3: " << result3 << std::endl;
+
+//     std::cout << "------Radial Test End------" << std::endl << std::endl;
+//   }
+// };
 

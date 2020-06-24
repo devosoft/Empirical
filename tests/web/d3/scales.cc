@@ -18,8 +18,19 @@ struct Test_Scales : BaseTest {
         it("should work", function() {
           chai.assert(false);
         });
-      });
+
+        it("should match first values", function() ) {
+          chai.assert(window["test_linear_scales"].js_results[0] === window["test_linear_scales"].cpp_results[0]);
+        });
+
     });
+  }
+
+  ~Test_Scales() {
+    EM_ASM({
+      // window.linear_scale_test ??
+      delete window["linear_scale_test"];
+    })
   }
 };
 

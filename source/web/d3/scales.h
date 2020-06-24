@@ -358,7 +358,22 @@ namespace D3 {
     ContinuousScale &SetRangeRound(double min, double max) = delete;
     ContinuousScale & SetClamp(bool clamp) = delete;
     ContinuousScale & SetInterpolate(const std::string & interpolatorName) = delete;
-  };
+  };  
+
+  // scaleRadial
+  // class RadialScale : public ContinuousScale {
+  // protected:
+  //   RadialScale(bool derived) : ContinuousScale(true) { ; }
+  
+  // public:
+  //   RadialScale() : ContinuousScale(true) {
+  //     EM_ASM({ emp_d3.objects[$0] = d3.scaleRadial(); }, this->id);
+  //   }
+
+  //   // get rid of functions that shouldn't be called:
+  //   // Radial scales do not support interpolate
+  //   ContinuousScale & SetInterpolate(const std::string & interpolatorName) = delete;
+  // };  
 
   // scaleTime
   class TimeScale : public ContinuousScale {
@@ -520,13 +535,23 @@ namespace D3 {
     }
   };
 
-  // scaleSequentialLog
+  // scaleSequentialPow
   class SequentialPowScale : public SequentialScale {
   protected:
     SequentialPowScale(bool derived) : SequentialScale(true) { ; }
   public:
     SequentialPowScale() : SequentialScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialPow(); }, this->id);
+    }
+  };
+
+  // scaleSequentialSqrt
+  class SequentialSqrtScale : public SequentialScale {
+  protected:
+    SequentialSqrtScale(bool derived) : SequentialScale(true) { ; }
+  public:
+    SequentialSqrtScale() : SequentialScale(true) {
+      EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialSqrt(); }, this->id);
     }
   };
 
