@@ -16,6 +16,7 @@
 #endif
 
 #include "../tools/string_utils.h"
+#include "../base/errors.h"
 
 #include <map>
 #include <string>
@@ -39,15 +40,18 @@ namespace web {
     int GetSize() const { return (int) settings.size(); }
 
     Attributes & DoSet(const std::string & in_set, const std::string & in_val) {
-      if(in_set.compare("class")==0 && Has(in_set)){
-        // Append new class to classes already assigned to attribute
-        std::string classes = settings[in_set];
-        classes += " " + in_val;
-        settings[in_set] = classes;
+      settings[in_set] = in_val;
+      return *this;
+    }
+
+    Attributes & DoAddClass(const std::string & in_val) {
+      if (!Has("class")){
+        emp::LibraryWarning("AddClass should be used after SetAttr has been used to set the first class \nEx: SetAttr(\"class\", \""+in_val+"\")");
       }
-      else{
-        settings[in_set] = in_val;
-      }
+      // Eventhough warning is given, in_val is added as a class in any case
+      std::string classes = settings["class"];
+      classes += " " + in_val;
+      settings["class"] = classes;
       return *this;
     }
 
