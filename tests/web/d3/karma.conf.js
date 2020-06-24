@@ -3,6 +3,13 @@
 
 module.exports = function(config) {
   config.set({
+    
+    // to enable commandline input
+    client: {
+      // args: config.name ? ["--name"] : [],
+      // note that this works only with `karma start`, not `karma run`
+      filename: config.filename,
+    },
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '../../../',
@@ -31,10 +38,10 @@ module.exports = function(config) {
       // {pattern: 'tests/web/d3/d3_init.wasm', included: false, nocache:true},
       // {pattern: 'tests/web/d3/d3_init.wasm.map', included: false, nocache:true},
       // transition tests
-      {pattern: 'tests/web/d3/transition.js.map', included: false},
-      {pattern: 'tests/web/d3/transition.js'},
-      {pattern: 'tests/web/d3/transition.wasm', included: false, nocache:true},
-      {pattern: 'tests/web/d3/transition.wasm.map', included: false, nocache:true}
+      {pattern: 'tests/web/d3/' + config.filename + '.js.map', included: false},
+      {pattern: 'tests/web/d3/' + config.filename + '.js'},
+      {pattern: 'tests/web/d3/' + config.filename + '.wasm', included: false, nocache:true},
+      {pattern: 'tests/web/d3/' + config.filename + '.wasm.map', included: false, nocache:true}
     ],
 
 
