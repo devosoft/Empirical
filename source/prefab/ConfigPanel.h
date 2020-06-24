@@ -18,7 +18,7 @@
 #include "Collapse.h"
 
 namespace emp {
-
+    namespace prefab{
     class ConfigPanel {
         private:
             inline static std::set<std::string> numeric_types = {"int", "double", "float", "uint32_t", "uint64_t", "size_t"};
@@ -107,6 +107,7 @@ namespace emp {
 					web::Div inline_elements(group_name + "_inline");
 =======
                     // Prefab Card
+<<<<<<< HEAD
                     emp::Card card("card_collapse_" + group_name, true);
                     group_divs[group_name] << card.GetDiv();
                     // Header formatting 
@@ -178,6 +179,16 @@ namespace emp {
                     card_header.SetAttr("class", "card-header");
                     card_body.SetAttr("class", "card-body");
 
+=======
+                    prefab::Card card(prefab::Card::Collapse::OPEN);
+                    group_divs[group_name] << card;
+
+                    // Header content
+                    web::Div setting_heading;
+                    card.AddHeaderContent(setting_heading);
+                    setting_heading << "<h3>" + group->GetDesc() + "</h3>";
+                    setting_heading.SetAttr("class", "setting_heading");
+>>>>>>> 3305a14... change namespace to emp::prefab and inherit from web components for some prefab components
 
 <<<<<<< HEAD
 =======
@@ -235,12 +246,13 @@ namespace emp {
                         title.SetAttr("class", "btn btn-link");
 >>>>>>> 5f848a8... add prefab element to add collapibility to web elements
 
-                        emp::FontAwesomeIcon arrow_right_for_dropdown("fa-angle-double-right toggle_icon_left_margin");
-                        title << arrow_right_for_dropdown.GetDiv();
-                        emp::FontAwesomeIcon arrow_up_for_dropdown("fa-angle-double-up toggle_icon_left_margin");
-                        title << arrow_up_for_dropdown.GetDiv();
+                        prefab::FontAwesomeIcon arrow_right_for_dropdown("fa-angle-double-right");
+                        title << arrow_right_for_dropdown;
+                        prefab::FontAwesomeIcon arrow_up_for_dropdown("fa-angle-double-up");
+                        title << arrow_up_for_dropdown;
                         title << format_label_fun(name);
                         title_span.SetAttr("class", "title_area");
+<<<<<<< HEAD
 <<<<<<< HEAD
 
                         // This makes the Comment box toggle when title is clicked
@@ -255,10 +267,17 @@ namespace emp {
                         // Prefab Dropdown Box Version 
 >>>>>>> 5f848a8... add prefab element to add collapibility to web elements
                         emp::CommentBox box;
+=======
+                        arrow_right_for_dropdown.AddClass("toggle_icon_left_margin");
+                        arrow_up_for_dropdown.AddClass("toggle_icon_left_margin");
+                        
+                        // Prefab Dropdown Box 
+                        prefab::CommentBox box;
+>>>>>>> 3305a14... change namespace to emp::prefab and inherit from web components for some prefab components
                         box.AddContent(group->GetEntry(i)->GetDescription());
 
                         // Prefab Collapse/toggle for setting element
-                        emp::Collapse title_toggle(title, box.GetDiv(), name + "_dropdown", false);
+                        prefab::Collapse title_toggle(title, box, false, name + "_dropdown");
                         input_divs[name] << title_toggle.GetToggleDiv();
                         title_span << title_toggle.GetLinkDiv();
 
@@ -288,19 +307,19 @@ namespace emp {
                             const std::string name_input_slider = name + "_input_slider";
                             const std::string name_input_number = name + "_input_number";
                             const std::string name_input_mobile_slider = name + "_input_mobile_slider";
-                            emp::web::Input slider( [](std::string x){
+                            web::Input slider( [](std::string x){
                                 std::cout << "empty slider function" << std::endl;},
                             "range", NULL, name_input_slider
                             );
                             setting_element << slider;
 
-                            emp::web::Input number([](std::string val){
+                            web::Input number([](std::string val){
                                 std::cout << "empty number function" << std::endl;
                                 },
                                 "number", NULL, name_input_number
                                 );
                             setting_element << number;
-                            emp::web::Input mobile_slider([](std::string val){
+                            web::Input mobile_slider([](std::string val){
                                 std::cout << "empty mobile slider function" << std::endl;
                             },
                                 "range", NULL, name_input_mobile_slider
@@ -384,7 +403,7 @@ namespace emp {
 
                         }
                         else if (type == "bool") {
-                            emp::web::Input bool_input(
+                            web::Input bool_input(
                                 [this, name](std::string val){config.Set(name, val);
                                                               on_change_fun(val);},
                                 "checkbox", NULL, name + "_input_checkbox"
@@ -393,7 +412,7 @@ namespace emp {
 
 >>>>>>> 9738447... display appropriate setting descriptions and synchronize form when one input is changed
                         } else {
-                            emp::web::Input text_input(
+                            web::Input text_input(
                                 [this, name](std::string val){config.Set(name, val);
                                                                on_change_fun(val);},
                                 "text", NULL, name + "_input_textbox"
@@ -444,7 +463,7 @@ namespace emp {
             web::Div & GetDiv() {return settings_div;}
 
     };
-
+    }
 }
 
 #endif
