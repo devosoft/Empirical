@@ -13,16 +13,20 @@
 
 // Using prefab elements
 #include "CommentBox.h"
+#include "Card.h"
+#include "Collapse.h"
+#include "FontAwesomeIcon.h"
 
-/*
+/**
 * This config panel will not render on the web.  When setting the initial value for the first slider, 
 * it throws this exception: uncaught exception: abort(2). Build with -s ASSERTIONS=1 for more info.
 * Emscripten notes on exception: https://emscripten.org/docs/porting/Debugging.html#debugging-assertions
 * 
 * Methods called when setting value: Value -> UpdateValue -> DoChange -> callback -> SynchForm -> Value
 * 
-* Note: this is not an issue when the prefab comment box element is added to the map of input_divs immediately
-* after creation. (uncomment line 160 and comment line 239)
+* Note: This is not an issue when the prefab comment box element is added to the map of input_divs immediately
+* after creation. (uncomment line 109 and comment line 188) 
+* All description boxes will be expanded.
 */
 
 namespace emp {
@@ -67,61 +71,15 @@ namespace emp {
                     group_divs[group_name] = web::Div(id_prefix + group_name);
                     settings_div << group_divs[group_name]; 
 
-                    // Setting card setup
-                    web::Div card("card_" + group_name);
+                    // Prefab Card
+                    prefab::Card card(prefab::Card::Collapse::OPEN);
                     group_divs[group_name] << card;
-                    web::Div card_header("card_header_" + group_name);
-                    card << card_header;
-                    web::Div inline_elements(group_name + "_inline");
-                    inline_elements.SetAttr("class", "clearfix");
-                    card_header << inline_elements;
-                    web::Element collapse_name_link("button");
-                    inline_elements << collapse_name_link;
-                    collapse_name_link.SetAttr(
-                        "data-toggle", "collapse",
-                        "data-target", "#card_collapse_" + group_name
-                    );
-                    collapse_name_link.SetAttr(
-                        "class", "btn btn-link float-left collapse_toggle setting_heading",
-                        "type", "button",
-                        "aria-expanded", "true",
-                        "aria-controls", "#card_body_" + group_name
-                    );
-                    collapse_name_link << "<h3>" << group->GetDesc() << "</h3>";
-                    web::Element collapse_icon_link("button");
-                    inline_elements << collapse_icon_link;
-                    collapse_icon_link.SetAttr(
-                        "data-toggle", "collapse",
-                        "data-target", "#card_collapse_" + group_name,
-                        "class", "btn btn-link float-right collapse_toggle",
-                        "type", "button",
-                        "aria-expanded", "true",
-                        "aria-controls", "#card_body_" + group_name
-                    );
-                    
-                    // Toggle Icons
-                    web::Element arrow_down("span");
-                    collapse_icon_link << arrow_down;
-                    arrow_down.SetAttr("class", "fa fa-angle-double-down");
-                    web::Element arrow_up("span");
-                    collapse_icon_link << arrow_up;
-                    arrow_up.SetAttr("class", "fa fa-angle-double-up");
 
-                    web::Div card_collapse("card_collapse_" + group_name);
-                    card << card_collapse;
-                    card_collapse.SetAttr(
-                        "class", "collapse show",
-                        "data-parent", "card_" + group_name,
-                        "aria-labelledby", "card_header_" + group_name
-                    );
-                    web::Div card_body("card_body_" + group_name);
-                    card_collapse << card_body;
-                    // make card true bootstrap cards
-                    card.SetAttr("class", "card");
-                    card_header.SetAttr("class", "card-header");
-                    card_body.SetAttr("class", "card-body");
-
-                    
+                    // Card header content
+                    web::Div setting_heading;
+                    card.AddHeaderContent(setting_heading);
+                    setting_heading << "<h3>" + group->GetDesc() + "</h3>";
+                    setting_heading.SetAttr("class", "setting_heading");
 
                     for (size_t i = 0; i < group->GetSize(); i++) {
                         // std::cout << group->GetEntry(i)->GetType() << std::endl;
@@ -132,35 +90,23 @@ namespace emp {
                         std::string type = group->GetEntry(i)->GetType();
                         std::string value = group->GetEntry(i)->GetValue();
                    
-                        card_body << web::Element("form").SetCSS("width", "100%") << input_divs[name];
+                        card.AddBodyContent(web::Element("form").SetCSS("width", "100%") << input_divs[name]);
 
                         // Setting element label
                         web::Div setting_element(name + "_row");
                         input_divs[name] << setting_element;
                         setting_element.SetAttr("class", "setting_element");
                         web::Element title_span("span");
-                        web::Element title("a");
-                        setting_element << title_span << title;
-                        title.SetAttr(
-                            "data-toggle", "collapse",
-                            "href", "#" + name + "_dropdown",
-                            "class", "collapse_toggle", 
-                            "role", "button", 
-                            "aria-expanded", "false", 
-                            "aria-controls", "#" + name + "_dropdown"
-                        );
-                        web::Element arrow_down_for_dropdown("span");
-                        title << arrow_down_for_dropdown;
-                        arrow_down_for_dropdown.SetAttr("class", "fa fa-angle-double-right toggle_icon_left_margin");
-                        web::Element arrow_up_for_dropdown("span");
-                        title << arrow_up_for_dropdown;
-                        arrow_up_for_dropdown.SetAttr("class", "fa fa-angle-double-up toggle_icon_left_margin");
+                        setting_element << title_span;
+                        web::Element title("button");
+                        title_span << title;
+                        title.SetAttr("class", "btn btn-link");
                         title << format_label_fun(name);
                         title_span.SetAttr("class", "title_area");
                         
-                        // Prefab Dropdown Box Version 
-                        emp::CommentBox box;
-                        // input_divs[name] << box.GetDiv();  
+                        // Prefab Dropdown Box 
+                        prefab::CommentBox box;
+                        // input_divs[name] << box;  // TODO: uncomment this line 
                         box.AddContent(group->GetEntry(i)->GetDescription());
 
                         if (Has(numeric_types, type)) {
@@ -239,7 +185,7 @@ namespace emp {
                             );
                             text_input.Value(config.Get(name));
                         }
-                        input_divs[name] << box.GetDiv();
+                        input_divs[name] << box;    // TODO: Comment this line 
                     }
                 }
 
