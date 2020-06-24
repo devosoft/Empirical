@@ -167,7 +167,7 @@ SCENARIO("Queue Caches can be cleared", "[tools]") {
 
 SCENARIO("Queue Caches can be subscripted", "[tools]") {
   // Test whether the subscript operator can get values from cache.
-  GIVEN("a queue cache with elements") {
+  GIVEN("a queue cache") {
     const size_t capacity = 3;
     emp::QueueCache<char, int> qch(capacity);
 
@@ -175,7 +175,7 @@ SCENARIO("Queue Caches can be subscripted", "[tools]") {
     auto it_y = qch.Put('y', 24);
     auto it_z = qch.Put('z', 25);
 
-    WHEN("we subscript into it") {
+    WHEN("we subscript into an existing key") {
       auto res_x = qch['x'];
       auto res_y = qch['y'];
       auto res_z = qch['z'];
@@ -215,7 +215,7 @@ SCENARIO("Queue Caches can be iterated on", "[tools]") {
       qch.Put(i, i);
     }
 
-    WHEN("we iterate on it") {
+    WHEN("we iterate on it with for loops") {
       emp::vector<int> result;
       emp::vector<int> expected{'A', 'B', 'C', 'D', 'E'};
 
