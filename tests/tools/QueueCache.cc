@@ -254,7 +254,7 @@ SCENARIO("Queue Caches can be iterated on", "[tools]") {
 
       THEN("we get the expected result") {
         REQUIRE(expected == result);
-        CHECK(distance == 5);
+        CHECK(distance == qch.Size());
       }
     }
   }
