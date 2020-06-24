@@ -155,9 +155,9 @@ struct TestSqrtScale {
       console.log(population(427e3)); // 4.383491758860737
     });
 
-    D3::PowScale testSqrtPop = D3::PowScale();
+    D3::SqrtScale testSqrtPop = D3::SqrtScale();
     // testSqrtPop = testSqrtPop.SqrtScale();
-    testSqrtPop.SqrtScale();
+    // testSqrtPop.SqrtScale();
     testSqrtPop.SetDomain(0, 2e9);
     testSqrtPop.SetRange(0, 300);
     double result1 = testSqrtPop.ApplyScaleDouble(1.386e9);
@@ -328,6 +328,73 @@ struct TestTimeScale {
   }
 };
 
+// scaleSequential
+struct TestSequentialScale {
+  TestSequentialScale() {
+    std::cout << "------Sequential Test Begin------" << std::endl;
+
+    EM_ASM({
+      var sequentialScale = d3.scaleSequential()
+        .domain([0, 100])
+        .interpolator(d3.interpolateRainbow);
+
+      console.log(sequentialScale(0));   // returns 'rgb(110, 64, 170)'
+      console.log(sequentialScale(50));  // returns 'rgb(175, 240, 91)'
+      console.log(sequentialScale(100)); // returns 'rgb(110, 64, 170)'
+    });
+
+    D3::SequentialScale testSeq = D3::SequentialScale();
+    testSeq.SetDomain(0, 100);
+    testSeq.SetInterpolator("interpolateRainbow");
+    std::string result1 = testSeq.ApplyScaleString(0);
+    std::string result2 = testSeq.ApplyScaleString(50);
+    std::string result3 = testSeq.ApplyScaleString(100);
+
+    std::cout << "value 1: " << result1 << std::endl;
+    std::cout << "value 2: " << result2 << std::endl;
+    std::cout << "value 3: " << result3 << std::endl;
+
+    std::cout << "------Sequential Test End------" << std::endl << std::endl;
+  }
+};
+
+// scaleSequentialQuantile
+struct TestSequentialQuantileScale {
+  TestSequentialQuantileScale() {
+    std::cout << "------SequentialQuantile Test Begin------" << std::endl;
+
+    EM_ASM({
+      var myData = ( [0, 5, 7, 10, 20, 30, 35, 40, 60, 62, 65, 70, 80, 90, 100] );
+
+      var seq = d3.scaleSequentialQuantile()
+                  .domain(myData)
+                  .interpolator(d3.interpolateRdYlBu);
+      
+      console.log(seq(0));  // returns rgb(165, 0, 38)
+      console.log(seq(50));  // returns rgb(250, 248, 193)
+      console.log(seq(60));  // returns rgb(231, 245, 227)
+      console.log(seq(100)); // returns rgb(49, 54, 149)
+      console.log(seq.quantiles(4)); // should return [0, 15, 40, 67.5, 100]
+    });
+
+    D3::SequentialQuantileScale testSeq = D3::SequentialQuantileScale();
+    emp::array<int, 15> myData = {0, 5, 7, 10, 20, 30, 35, 40, 60, 62, 65, 70, 80, 90, 100};
+    testSeq.SetDomain(myData);
+    testSeq.SetInterpolator("interpolateRainbow");
+    std::string result1 = testSeq.ApplyScaleString(0);
+    std::string result2 = testSeq.ApplyScaleString(50);
+    std::string result3 = testSeq.ApplyScaleString(60);
+    emp::vector<double> result4 = testSeq.GetQuantiles(4);
+
+    std::cout << "value 1: " << result1 << std::endl;
+    std::cout << "value 2: " << result2 << std::endl;
+    std::cout << "value 3: " << result3 << std::endl;
+    std::cout << "value 3: " << result4 << std::endl;
+
+    std::cout << "------SequentialQuantile Test End------" << std::endl << std::endl;
+  }
+};
+
 
 //***********************************//    
 //******** __________ Scales ********//
@@ -374,6 +441,10 @@ int main() {
   TestSymlogScale test5{};
   TestIdentityScale test6{};
   TestTimeScale test7{};
+
+  TestSequentialScale test8{};
+
+  TestSequentialQuantileScale test10{};
 
   // TestQuantizeScale test6{};
 }

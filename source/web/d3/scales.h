@@ -245,14 +245,14 @@ namespace D3 {
     ContinuousScale & SetUnkown(double value) {
       EM_ASM({
         emp_d3.objects[$0].unknown($1);
-      }, this->id, value)
+      }, this->id, value);
       return *this;
     }
 
     ContinuousScale & SetUnkown(int value) {
       EM_ASM({
         emp_d3.objects[$0].unknown($1);
-      }, this->id, value)
+      }, this->id, value);
       return *this;
     }
 
@@ -289,15 +289,25 @@ namespace D3 {
       EM_ASM({ emp_d3.objects[$0].exponent($1);}, this->id, ex);
       return *this;
     }
-
-    // scaleSqrt
-    // A convenience function to set the exponent to 0.5
-    PowScale & SqrtScale() {
-      EM_ASM({ emp_d3.objects[$0].exponent(0.5);}, this->id);
-      return *this;
-      // return PowScale().SetExponent(0.5);
-    }
+    // PowScale & SqrtScale() {
+    //   EM_ASM({ emp_d3.objects[$0].exponent(0.5);}, this->id);
+    //   return *this;
+    //   // return PowScale().SetExponent(0.5);
+    // }
   };
+
+  // scaleSqrt
+  // A convenience scale to set the exponent to 0.5 in a PowScale
+  class SqrtScale : public ContinuousScale {
+  protected:
+    SqrtScale(bool derived) : ContinuousScale(true) { ; }
+  
+  public:
+    SqrtScale() : ContinuousScale(true) {
+      EM_ASM({ emp_d3.objects[$0] = d3.scaleSqrt(); }, this->id);
+    } 
+  };
+    
 
   // scaleLog
   class LogScale : public ContinuousScale {
@@ -498,19 +508,6 @@ namespace D3 {
 
       return *this;
     }
-
-    // .quantiles  
-    // Returns an array of n + 1 quantiles. For example, if n = 4, returns an array of five numbers: 
-    // the minimum value, the first quartile, the median, the third quartile, and the maximum.
-    emp::vector<double> GetQuantiles(const int n) {
-      EM_ASM({
-        emp_i.__outgoing_array = emp_d3.objects[$0].quantiles($1);
-      }, this->id, n);
-      // access JS array
-      emp::vector<double> quantile_vector;
-      emp::pass_vector_to_cpp(quantile_vector);
-      return quantile_vector;
-    }
   };
 
   // scaleSequentialLog
@@ -551,6 +548,19 @@ namespace D3 {
     SequentialQuantileScale() : SequentialScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialQuantile(); }, this->id);
     }
+
+    // .quantiles  
+    // Returns an array of n + 1 quantiles. For example, if n = 4, returns an array of five numbers: 
+    // the minimum value, the first quartile, the median, the third quartile, and the maximum.
+    emp::vector<double> GetQuantiles(const int n) {
+      EM_ASM({
+        emp_i.__outgoing_array = emp_d3.objects[$0].quantiles($1);
+      }, this->id, n);
+      // access JS array
+      emp::vector<double> quantile_vector;
+      emp::pass_vector_to_cpp(quantile_vector);
+      return quantile_vector;
+    }
   };
 
 
@@ -588,7 +598,47 @@ namespace D3 {
     }
   };
 
+  // scaleDivergingLog
+  class DivergingLogScale : public DivergingScale {
+  protected:
+    DivergingLogScale(bool derived) : DivergingScale(true) { ; }
+  public:
+    DivergingLogScale() : DivergingScale(true) {
+      EM_ASM({ emp_d3.objects[$0] = d3.scaleDivergingLog(); }, this->id);
+    }
+  };
 
+  // scaleDivergingPow
+  class DivergingPowScale : public DivergingScale {
+  protected:
+    DivergingPowScale(bool derived) : DivergingScale(true) { ; }
+  public:
+    DivergingPowScale() : DivergingScale(true) {
+      EM_ASM({ emp_d3.objects[$0] = d3.scaleDivergingPow(); }, this->id);
+    }
+  };
+
+  // scaleDivergingSqrt
+  class DivergingSqrtScale : public DivergingScale {
+  protected:
+    DivergingSqrtScale(bool derived) : DivergingScale(true) { ; }
+  public:
+    DivergingSqrtScale() : DivergingScale(true) {
+      EM_ASM({ emp_d3.objects[$0] = d3.scaleDivergingSqrt(); }, this->id);
+    }
+  };
+
+  // scaleDivergingSymlog
+  class DivergingSymlogScale : public DivergingScale {
+  protected:
+    DivergingSymlogScale(bool derived) : DivergingScale(true) { ; }
+  public:
+    DivergingSymlogScale() : DivergingScale(true) {
+      EM_ASM({ emp_d3.objects[$0] = d3.scaleDivergingSymlog(); }, this->id);
+    }
+  };
+
+  
   ////////////////////////////////////////////////////////
   /// Scales with continuous input and discrete output ///
   ////////////////////////////////////////////////////////
