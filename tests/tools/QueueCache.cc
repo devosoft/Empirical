@@ -238,6 +238,11 @@ SCENARIO("Queue Caches can be iterated on", "[tools]") {
       emp::vector<int> result;
       emp::vector<int> expected{'E', 'D', 'C', 'B', 'A'};
 
+      size_t distance = std::distance(
+        qch.begin(),
+        qch.end()
+      );
+
       std::transform(
         qch.cbegin(),
         qch.cend(),
@@ -249,6 +254,7 @@ SCENARIO("Queue Caches can be iterated on", "[tools]") {
 
       THEN("we get the expected result") {
         REQUIRE(expected == result);
+        CHECK(distance == 5);
       }
     }
   }
