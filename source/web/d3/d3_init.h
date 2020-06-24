@@ -1,6 +1,8 @@
 #ifndef D3_INIT_H
 #define D3_INIT_H
 
+#include "../web.h"
+
 namespace D3 {
 namespace internal {
 
