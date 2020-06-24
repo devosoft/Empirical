@@ -14,15 +14,14 @@
 
 /* Card Header */
 .setting_heading{
-    color: black;
-    text-decoration: underline;
+    color: rgb(58, 57, 57);
 }
 .setting_heading:hover{
-    color: #0275d8 /* Bootstrap default pirmary color */
+    color: rgb(116, 114, 114);
 }
-/* Lower opacity of card body when hovering over collapsible header */
-.collapse_toggle:hover + .collapse .card-body{
-    opacity: .6;
+/* Change background of card header on hover to convey collapsibility */
+.collapse_toggle_card_header:hover {
+    background-color: #C0C0C0;
 }
 
 /* Card Body */
