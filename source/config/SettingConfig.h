@@ -235,6 +235,19 @@ namespace emp {
       return new_ptr->value;
     }
 
+    /// Add a new setting not linked to a variable
+
+    template <typename T>
+    T & AddSetting(const std::string & name,
+                   const std::string & desc="",
+                   const char option_flag='\0')
+    {
+      emp_assert(!emp::Has(setting_map, name));
+      auto new_ptr = emp::NewPtr<SettingInfo<T>>(name, desc, option_flag, "Value");
+      setting_map[name] = new_ptr;
+      return new_ptr->value;
+    }
+
     /// Add a new setting of a specified type.  Returns the (initially empty) vector of values 
     /// to allow easy setting.
     /// Example:
