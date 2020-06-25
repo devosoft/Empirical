@@ -218,11 +218,15 @@ namespace emp {
                         card_body << web::Element("form").SetCSS("width", "100%") << input_divs[name];
 =======
                    
+<<<<<<< HEAD
                         card.AddBodyContent(web::Element("form").SetCSS("width", "100%") << input_divs[name]);
 >>>>>>> 0595c91... added card element
 
                         web::Div mobile_dropdown("mobile_dropdown_" + name);
                         mobile_dropdown.SetAttr("class", "d-md-none");
+=======
+                        card.AddBodyContent(input_divs[name]);
+>>>>>>> 6ccbb1f... fixed error in adding settings to card body
 
                         // Setting element label
                         web::Div setting_element(name + "_row");
