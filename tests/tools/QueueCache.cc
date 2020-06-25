@@ -60,8 +60,10 @@ SCENARIO("Queue Caches store elements", "[tools]") {
       AND_WHEN("a function is passed") {
         THEN("it is called") {
           // Test whether function gets called correctly when key is not found.
-          std::function<int(char)> qch_fn = [](char ch){ return (int)ch - 'a'; };
-          REQUIRE(qch.Get('d', qch_fn) == 3);
+          REQUIRE(qch.Get(
+            'd',
+            [](char ch){ return (int)ch - 'a'; }
+          ) == 3);
         }
       }
     }
