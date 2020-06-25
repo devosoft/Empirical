@@ -37,6 +37,9 @@
 			// maximum number of elements the cache can hold
 			size_t capacity;
 
+			// Put the iterator at the beginning of the list, and returns its value
+			// @param it Iterator to element to update
+			// @return Reference to value of updated element
 			Value& UpdateCache(const typename cache_list_t::iterator it) {
 				// update our cache since we are accesing an item
 				cache_list.splice(
@@ -46,6 +49,8 @@
 				);
 				return it->second;
 			}
+
+			// Shrink cache to its capacity by removing elements at the end of it
 			void Shrink() {
 				while (Size() > Capacity()) {
 					// deal with removing last element
@@ -54,10 +59,14 @@
 				}
 			}
 
+			// Default function to be run by Get() if none is provided
+			// @param key Key of element passed to Get(). Unused.
 			static Value DefaultFun(const Key&) {
 				throw std::invalid_argument("Key not in cache.");
 			}
 
+			// Delete given iterator from cache
+			// @param it cache_map iterator to element to be deleted from cache
 			void Delete(const typename cache_map_t::iterator it) {
 				cache_map.erase(it);
 				cache_list.erase(it->second);
@@ -70,30 +79,38 @@
 			using const_iterator = typename cache_list_t::const_iterator;
 			using iterator = typename cache_list_t::const_iterator;
 
-			/// Returns number of elements in cache.
+			/// Return number of elements in cache.
+			/// @return number of elements in the cache
 			size_t Size() const { return cache_list.size(); }
 
-			/// Returns maximum number of elements that will fit in cache.
 			size_t Capacity() { return capacity; }
+			/// Return maximum number of elements that will fit in cache.
+			/// @return maximum number of elements that the cache can contain
 
-			/// Clears the cache.
+			/// Clear the cache.
 			void Clear() {
 				cache_list.clear();
 				cache_map.clear();
 			}
 
-			/// Deletes element from cache.
+			/// Delete element from cache.
+			/// @param key Key to delete from cache
 			void Delete(const Key& key) {
 				auto it = cache_map.find(key);
 				Delete(it);
 			}
 
-			/// Returns true if cache has key.
 			bool Contains(const Key& key) {
+			/// Does cache contain key?
+			/// @param key Key to check presence of
+			/// @return whether cache contains key
 				return cache_map.count(key);
 			}
 
-			/// Stores element in front of cache.
+			/// Store element in front of cache.
+			/// @param key Key of element to store
+			/// @param val Value of element to store
+			/// @return Iterator to newly-added element in cache queue
 			typename cache_list_t::iterator Put(const Key& key, const Value& val) {
 				// try to find element in map
 				auto found = cache_map.find(key);
@@ -111,10 +128,12 @@
 				return cache_list.begin();
 			}
 
-			/// Gets an element from cache.
-			/// By default, it throws an exception if the element is not in cache.
+			/// Get an element from cache.
+			/// By default, this method throws an exception if the element is not in cache.
 			/// This behaviour can be changed by specifying a callable as a second parameter,
 			/// which must return a Value.
+			/// @param key Key of element to get
+			/// @param fun Optional function to be executed in case the key is not in cache
 			Value& Get(const Key& key, const std::function<Value(const Key& k)>& fun = DefaultFun) {
 				// attempt to find key in our iterator map
 				if (!cache_map.count(key)) {
@@ -125,27 +144,39 @@
 				return UpdateCache(cache_map.find(key)->second);
 			}
 
-			/// Resizes the cache.
-			void SetCapacity(size_t _capacity) {
+			/// Resize the cache.
+			/// @param _capacity New capacity of the cache.
+			void SetCapacity(const size_t _capacity) {
 				capacity = _capacity;
 				Shrink();
 			}
 
-			/// Returns a constant iterator to the beginning of the cache.
 			const typename cache_t::const_iterator cbegin() const {
 				return cache.begin();
+			/// Return a constant iterator to the beginning of the cache queue.
+			/// @return Constant const_iterator to the beginning of cache queue
 			}
 
-			/// Returns a constant iterator to one past the end of the cache.
 			const typename cache_t::const_iterator cend() const {
 				return cache.end();
+			/// Return a constant iterator to one past the end of the cache queue.
+			/// @return Constant const_iterator to one past the end of cache queue
 			}
 
 			const typename cache_t::const_iterator begin() const { return cbegin(); }
 			const typename cache_t::const_iterator end() const { return cend(); }
+			/// Return a constant iterator to the beginning of the cache queue.
+			/// Alias of cbegin()
+			/// @return Constant const_iterator to the beginning of cache queue
 
-			/// Gets an element from cache if found, and creates it otherwise.
+			/// Return a constant iterator to one past the end of the cache queue.
+			/// Alias of cend()
+			/// @return Constant const_iterator to one past the end of cache queue
+
+			/// Get an element from cache if found, and creates it otherwise.
 			/// Value type must have a default constructor and an assignment operator.
+			/// @param index Key of element to add/retrieve
+			/// @return Reference to value of element of given key
 			Value& operator[](const Key& index) {
 				// Check whether Value has a default constructor
 				emp_assert(std::is_trivially_constructible<Value>::value);
