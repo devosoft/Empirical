@@ -30,10 +30,11 @@
 			using cache_list_t = typename std::list<std::pair<Key, Value>>;
 			using cache_map_t = std::unordered_map<Key, typename cache_list_t::iterator, Hash, Pred>;
 
+			// this list keeps track of the order of the elements in cache
 			cache_list_t cache_list;
+			// this map associates a key with an iterator to the cache_list, facilitating lookups
 			cache_map_t cache_map;
-
-
+			// maximum number of elements the cache can hold
 			size_t capacity;
 
 			Value& UpdateCache(const typename cache_list_t::iterator it) {
