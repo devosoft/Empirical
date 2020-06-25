@@ -96,8 +96,9 @@
 			/// Delete element from cache.
 			/// @param key Key to delete from cache
 			void Delete(const Key& key) {
-				auto it = cache_map.find(key);
-				Delete(it);
+				Delete(
+					cache_map.find(key)
+				);
 			}
 
 			/// Does cache contain key?
