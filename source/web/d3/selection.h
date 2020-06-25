@@ -856,18 +856,478 @@ namespace internal {
     /// See the [d3 documentation](https://github.com/d3/d3-selection#selection_property)
     /// for more information.
     // std::string version
-    Selection & SetProperty(const std::string & name, const std::string & value){
-      D3_CALLBACK_METHOD_2_ARGS(property, name.c_str(), value.c_str())
+    Selection & SetProperty(const std::string & name, const std::string & value) {
+
+      EM_ASM({
+        const id = $0;
+        const name = UTF8ToString($1);
+        const value = UTF8ToString($2);
+        var sel = emp_d3.find_function(value);
+        emp_d3.objects[id].property(name, sel);
+      }, this->id, name.c_str(), value.c_str());
+
       return *this;
     }
 
 
+    /// @cond TEMPLATES
 
+    // Const char * version so raw strings work
+    Selection & SetProperty(const std::string & name, const char* value){
 
+      EM_ASM({
+        const id = $0;
+        const name = UTF8ToString($1);
+        const value = UTF8ToString($2);
+        var sel = emp_d3.find_function(value);
+        emp_d3.objects[id].property(name, sel);
+      }, this->id, name.c_str(), value);
 
+      return *this;
+    }
 
+    // Generic template version
+    template <typename T>
+    typename std::enable_if<std::is_fundamental<T>::value, Selection&>::type
+    SetProperty(const std::string & name, T value) {
+      EM_ASM({
+        const id = $0;
+        const name = UTF8ToString($1);
+        const value = $2;
+        emp_d3.objects[id].property(name, value);
+      }, this->id, name.c_str(), value);
+      return *this;
+    }
+
+    // This version handles values that are C++ functions and wraps them with JSWrap
+    // If a function is being used repeatedly, it may be more efficient to wrap it
+    // once and then pass the name as a string.
+    template <typename T>
+    emp::sfinae_decoy<Selection&, decltype(&T::operator())>
+    SetProperty(std::string name, T value) {
+      const uint32_t func_id = emp::JSWrap(value);
+
+      EM_ASM({
+        const id = $0;
+        const name = UTF8ToString($1);
+        const func_id = $2;
+        emp_d3.objects[id].property(name, function(d, i, j) {
+                                            return emp.Callback(func_id, d, i, j);
+                                          });
+      }, this->id, name.c_str(), func_id);
+
+      emp::JSDelete(func_id);
+
+      return *this;
+    }
+
+    /// @endcond
+
+    /// Sets this selection's inner html to the specified string, or the string returned by running the
+    /// specified function on the element's bound data
+    Selection & SetHtml(const std::string & value) {
+      EM_ASM({
+        const id = $0;
+        const value = UTF8ToString($1);
+        var sel = emp_d3.find_function(value);
+        emp_d3.objects[id].html(sel);
+      }, this->id, value.c_str());
+
+      return *this;
+    }
+
+    /// @cond TEMPLATES
+
+    template <typename T>
+    emp::sfinae_decoy<Selection&, decltype(&T::operator())>
+    SetHtml(T func) {
+      const uint32_t func_id = emp::JSWrap(value);
+
+      EM_ASM({
+        const id = $0;
+        const func_id = $1;
+        emp_d3.objects[id].html(function(d, i, j) {
+                                  return emp.Callback(func_id, d, i, j);
+                                });
+      }, this->id, func_id);
+
+      emp::JSDelete(func_id);
+      return *this;
+    }
+
+    /// @endcond
+
+    /// Change whether or not element in this selection have the [classname] class.
+    /// Example: Add the data-point class with selection.SetClassed("data-point", true);
+    // Value can also be a function that takes bound data and returns a bool
+    Selection & SetClassed(const std::string & classname, bool value) {
+      EM_ASM({
+        const id = $0;
+        const class = UTF8ToString($1);
+        const value = $2;
+        emp_d3.objects[id].classed(class, value);
+      }, this->id, classname.c_str(), value);
+      return *this;
+    }
+
+    ///@cond TEMPLATES
+
+    // Version for C++ function
+    template <typename T>
+    emp::sfinae_decoy<Selection&, decltype(&T::operator())>
+    SetClassed(const std::string & classname, T func) {
+
+      const uint32_t func_id = emp::JSWrap(value);
+
+      EM_ASM({
+        const id = $0;
+        const class_name = UTF8ToString($1);
+        const func_id = $2;
+        emp_d3.objects[id].classed(class_name, function(d, i, j) {
+                                                return emp.Callback(func_id, d, i, j);
+                                              });
+      }, this->id, classname.c_str(), func_id);
+
+      emp::JSDelete(func_id);
+
+      return *this;
+    }
+
+    // Version that allows strings containing function names but warns on other strings
+    Selection& SetClassed(const std::string & classname, const std::string & value){
+      emp_assert(EM_ASM_INT({
+        var func_string = UTF8ToString($0);
+        return emp_d3.is_function(func_string);
+      }, value.c_str()) && "String passed to SetClassed is not a Javascript function", value);
+
+      EM_ASM({
+        const id = $0;
+        const classname = UTF8ToString($1);
+        const value = UTF8ToString($2);
+        var sel = emp_d3.find_function(value);
+        emp_d3.objects[id].classed(classname, sel);
+      }, this->id, classname.c_str(), value.c_str());
+
+      return *this;
+    }
+
+    ///@endcond
+
+    /** @} */
+
+    /**************************************************************************//**
+    * @name Getters
+    *
+    * There are three main types of values you might want to access about a selection:
+    * attributes (use `GetAttr`), styles (use `GetStyle`), and properties (use `GetProperty`).
+    * The distinction between these types is rooted in how they are represented in web languages
+    * (Javascript, CSS, and HTML) and would ideally be abstracted in this wrapper but can't be.
+    *
+    * Additional traits you can set include text and html.
+    *
+    * Advanced note: In D3.js, the same functions are used to set and get values (depending on
+    * whether an argument is passed). Because C++ needs to have clearly defined
+    * return types (and because different macros are required to return different types from
+    * Javascript), we need separate getters for each return type.
+    *
+    * @{
+    ***********************************************/
+
+    /// Get this object's html
+    std::string GetHtml() const {
+      EM_ASM({
+        const resultStr = emp_d3.objects[$0].html();
+        emp.PassStringToCpp(resultStr);
+      }, this->id);
+      return emp::pass_str_to_cpp();
+    }
+
+    /// Get the value of this object's [name] property when its a string
+    std::string GetPropertyString(const std::string & name) const {
+      EM_ASM({
+        var text = emp_d3.objects[$0].property(UTF8ToString($1));
+        emp.PassStringToCpp(text);
+      }, this->id, name.c_str());
+      return emp::pass_str_to_cpp();
+    }
+
+    /// Get the value of this object's [name] property when it's an int
+    int GetPropertyInt(const std::string & name) const {
+      return EM_ASM_INT({
+        return emp_d3.objects[$0].property(UTF8ToString($1));
+      }, this->id, name.c_str());
+    }
+
+    /// Get the value of this object's [name] property when it's a double
+    double GetPropertyDouble(const std::string & name) const {
+      return EM_ASM_DOUBLE({
+        return emp_d3.objects[$0].property(UTF8ToString($1));
+      }, this->id, name.c_str());
+    }
+
+    /// @}
+
+    #endif
+
+    /// Create a transition from the current selection. If a [name] is specified
+    /// the transition will be given that name
+    Transition MakeTransition(const std::string & name="") {
+      const int new_id = NextD3ID();
+      EM_ASM({
+        var transition = emp_d3.objects[$0].transition(UTF8ToString($1));
+        emp_d3.objects[$2] = transition;
+      }, this->id, name.c_str(), new_id);
+
+      return Transition(new_id);
+    }
+
+    Transition MakeTransition(Transition & t) {
+      const int new_id = NextD3ID();
+      EM_ASM_ARGS({
+        var transition = emp_d3.objects[$0].transition(emp_d3.objects[$1]);
+        emp_d3.objects[$2] = transition;
+      }, this->id, t.GetID(), new_id);
+
+      return Transition(new_id);
+    }
+
+    /// Interrupt the transition with the name [name] on the current selection
+    Selection & Interrupt(const std::string & name="") {
+      EM_ASM_ARGS({
+        emp_d3.objects[$0].interrupt(UTF8ToString($1));
+      }, this->id, name.c_str());
+      return *this;
+    }
+
+    /// Move the elements in this selection by [x] in the x direction and [y]
+    /// in the y direction.
+    /// Note for advanced users: this method is just a shortcut for setting the
+    /// "transform" attribute to "translate(x, y)", because doing that is a pain
+    /// in C++ (even more so than in Javascript)
+    Selection & Move(int x, int y) {
+      EM_ASM({
+        emp_d3.objects[$0].attr("transform", "translate("+$1+","+$2+")");
+      }, this->id, x, y);
+      return *this;
+    }
+
+    /// Rotate the elements in this selection by [degrees].
+    /// Note for advanced users: this method is just a shortcut for setting the
+    /// "transform" attribute to "rotate(degrees)", because doing that is a pain
+    /// in C++ (even more so than in Javascript)
+    Selection & Rotate(int degrees) {
+      EM_ASM({
+        emp_d3.objects[$0].attr("transform", "rotate("+$1+")");
+      }, this->id, degrees);
+      return *this;
+    }
+
+    /// Change the order of elements in the document to match their order in this selection
+    Selection & Order() {
+      EM_ASM({
+        emp_d3.objects[$0].order()
+      }, this->id);
+      return *this;
+    }
+
+    Selection & Raise() {
+      EM_ASM({
+        emp_d3.objects[$0].raise();
+      }, this->id);
+      return *this;
+    }
+
+    Selection & Lower() {
+      EM_ASM({
+        emp_d3.objects[$0].lower();
+      }, this->id);
+      return *this;
+    }
+
+    /// Listen for an event of type [type] and call [listener] when it happens
+    /// [listener] can be a string containing the name of a Javascript function, or a C++ function
+    ///
+    /// The third paramter for the listener function is the id of a selection containing the
+    /// relevant DOM object.
+    ///
+    /// To remove an event listener, call On with that type and "null" as the listener (default)
+    ///
+    /// Advanced note: the optional capture flag invokes Javascript's
+    /// [useCapture](https://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-registration)
+    /// option
+    Selection& On(const std::string & type, const std::string & listener="null", bool capture=false){
+
+      // Check that the listener is valid
+      emp_assert(EM_ASM_INT({
+        var func_string = UTF8ToString($0);
+        return emp_d3.is_function(func_string);
+      }, listener.c_str()) \
+      && "String passed to On is not a Javascript function or null", listener);
+
+      // const int new_id = NextD3ID();
+
+      EM_ASM({
+        const id = $0;
+        const type = UTF8ToString($1);
+        const listener_str = UTF8ToString($2);
+        const capture = $3;
+        // const new_id = $4;
+
+        var listener = emp_d3.find_function(listener_str);
+
+        if (typeof listener === "function") {
+          emp_d3.objects[id].on(
+            type,
+            function(d, i) {
+              // emp_d3.objects[new_id] = d3.select(this);
+              listener(d, i, id);
+            },
+            capture
+          );
+        } else {
+          emp_d3.objects[id].on(type, null);
+        }
+
+      }, this->id, type.c_str(), listener.c_str(), capture);
+
+      return *this;
+    }
+
+    /// @cond TEMPLATES
+
+    /// Version for C++ functions
+    template <typename T>
+    emp::sfinae_decoy<Selection&, decltype(&T::operator())>
+    On(const std::string & type, T listener, bool capture=false) {
+
+      const uint32_t fun_id = emp::JSWrap(listener, "", false);
+
+      EM_ASM({
+        const id = $0;
+        const type = UTF8ToString($1);
+        const func_id = $2;
+        const capture = $3;
+
+        emp_d3.objects[id].on(
+          type,
+          function(d, i) {
+            emp.Callback(func_id, d, i, id);
+          },
+          capture
+        );
+      }, this->id, type.c_str(), fun_id, capture);
+
+      emp::JSDelete(fun_id);
+      return (*this);
+    }
+
+    /// @endcond
+
+    /** Sort the selection by the given comparator function. The function
+    can be a C++ function or a stirng indicating a function in the d3 namespace,
+    the emp namespace (as results from JSWrapping C++ functions), or the
+    window namespace. These three options are checked sequentially in that
+    order, so a C++ function with the same name as d3 built-in will not
+    override the built-in. Similarly, a function declared directly in the
+    window will be overriden by a JSWrapped function with the same name.
+    */
+
+    Selection & Sort(const std::string & comparator = "ascending") {
+      EM_ASM({
+        const id = $0;
+        const comparator = UTF8ToString($1);
+        var sel = emp_d3.find_function(comparator);
+        emp_d3.objects[id].sort(sel);
+      }, this->id, comparator.c_str());
+
+      return (*this);
+    }
+
+    /// @cond TEMPLATES
+
+    template <typename T>
+    emp::sfinae_decoy<Selection&, decltype(&T::operator())>
+    Sort(T comparator) {
+      const uint32_t func_id = emp::JSWrap(comparator);
+      EM_ASM({
+        const id = $0;
+        const func_id = $1;
+        emp_d3.objects[id].sort(function(a, b) {
+          emp.Callback(func_id, a, b);
+        });
+      }, this->id, func_id);
+      emp::JSDelete(comparator);
+      return (*this);
+    }
+
+    /// @endcond
+
+    /// @cond DEVELOPERS
+
+  // TODO:
+  //   //Set the tool tip up for this selection.
+  //   //This function exists in case you want to bind the tooltip to an
+  //   //event other than mouseover/out
+  //   void SetupToolTip(ToolTip & tip) {
+  //     EM_ASM_ARGS({
+  //      js.objects[$0].call(js.objects[$1]);
+  //  }, this->id, tip.GetID());
+  //   }
+
+  //   //Tell tooltip to appear on mouseover and dissapear on mouseout
+  //   void BindToolTipMouseover(ToolTip & tip) {
+  //     EM_ASM_ARGS({
+  //      js.objects[$0].on("mouseover", js.objects[$1].show)
+  //                    .on("mouseout", js.objects[$1].hide);
+  //     }, this->id, tip.GetID());
+  //   }
+
+  //   /// @endcond
+
+  //   /// Add the ToolTip [tip] to the current selection
+  //   void AddToolTip(ToolTip & tip) {
+  //     SetupToolTip(tip);
+  //     BindToolTipMouseover(tip);
+  //   }
+
+  //GetClassed()
+
+  //Datum() //requires callbacks
+
+  //Node()  //Is the node a selection? Do we even need this?
 
   };
+
+  /// Create a selection containing the first DOM element matching [selector]
+  /// (convenience function to match D3 syntax - you can also just use the constructor)
+  Selection Select(const std::string & selector) {
+    return Selection(selector);
+  }
+
+  /// Create a selection containing all DOM elements matching [selector]
+  /// (convenience function to match D3 syntax - you can also just use the constructor)
+  Selection SelectAll(const std::string & selector) {
+    return Selection(selector, true);
+  }
+
+  /// Makes a shape of type [shape] for each element in [values] on the first svg canvas on the DOM
+  /// Values can be a D3::Dataset, an array, or a vector.
+  // template<typename T>
+  // Selection ShapesFromData(T values, const std::string & shape){
+  //   Selection s = Select("svg").SelectAll(shape).Data(values);
+  //   s.EnterAppend(shape);
+  //   return s;
+  // }
+
+  /// Makes a shape of type [shape] for each element in [values] on [svg], which must be a selection
+  /// containing an SVG canvas.
+  /// Values can be a D3::Dataset, an array, or a vector.
+  // template<typename T>
+  // Selection ShapesFromData(T values, const std::string & shape, Selection & svg){
+  //   Selection s = svg.SelectAll(shape).Data(values);
+  //   s.EnterAppend(shape);
+  //   return s;
+  // }
 
 }
 
