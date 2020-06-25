@@ -215,27 +215,26 @@ SCENARIO("Queue Caches can be iterated on", "[tools]") {
   GIVEN("a queue cache with elements in it") {
     emp::QueueCache<char, int, 6> qch;
 
-    for (char i = 'A'; i < 'F'; ++i) {
-      qch.Put(i, i);
-    }
+    qch.Put('A', 'A');
+    qch.Put('B', 'B');
+    qch.Put('C', 'C');
+    qch.Put('D', 'D');
+    qch.Put('E', 'E');
 
     WHEN("we iterate on it with for loops") {
       emp::vector<int> result;
-      emp::vector<int> expected{'A', 'B', 'C', 'D', 'E'};
-
       for (char i = 'A'; i < 'F'; ++i) {
         result.push_back(qch.Get(i));
       }
 
       THEN("we get the expected result") {
+        const emp::vector<int> expected{'A', 'B', 'C', 'D', 'E'};
         CHECK(result == expected);
       }
     }
     WHEN("we apply std::algoritms using begin() and end() iterators") {
       emp::vector<int> result;
-      emp::vector<int> expected{'E', 'D', 'C', 'B', 'A'};
-
-      size_t distance = std::distance(
+      const size_t distance = std::distance(
         qch.begin(),
         qch.end()
       );
