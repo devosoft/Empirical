@@ -151,27 +151,27 @@
 				Shrink();
 			}
 
-			const typename cache_t::const_iterator cbegin() const {
-				return cache.begin();
 			/// Return a constant iterator to the beginning of the cache queue.
 			/// @return Constant const_iterator to the beginning of cache queue
+			const typename cache_list_t::const_iterator cbegin() const {
+				return cache_list.begin();
 			}
 
-			const typename cache_t::const_iterator cend() const {
-				return cache.end();
 			/// Return a constant iterator to one past the end of the cache queue.
 			/// @return Constant const_iterator to one past the end of cache queue
+			const typename cache_list_t::const_iterator cend() const {
+				return cache_list.end();
 			}
 
-			const typename cache_t::const_iterator begin() const { return cbegin(); }
-			const typename cache_t::const_iterator end() const { return cend(); }
 			/// Return a constant iterator to the beginning of the cache queue.
 			/// Alias of cbegin()
 			/// @return Constant const_iterator to the beginning of cache queue
+			const typename cache_list_t::const_iterator begin() const { return cbegin(); }
 
 			/// Return a constant iterator to one past the end of the cache queue.
 			/// Alias of cend()
 			/// @return Constant const_iterator to one past the end of cache queue
+			const typename cache_list_t::const_iterator end() const { return cend(); }
 
 			/// Get an element from cache if found, and creates it otherwise.
 			/// Value type must have a default constructor and an assignment operator.
