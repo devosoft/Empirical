@@ -27,20 +27,20 @@
 	>
 	class QueueCache {
 		private:
-			using cache_t = typename std::list<std::pair<Key, Value>>;
-			using cache_map_t = std::unordered_map<Key, typename cache_t::iterator, Hash, Pred>;
+			using cache_list_t = typename std::list<std::pair<Key, Value>>;
+			using cache_map_t = std::unordered_map<Key, typename cache_list_t::iterator, Hash, Pred>;
 
-			cache_t cache;
+			cache_list_t cache_list;
 			cache_map_t cache_map;
 
 
 			size_t capacity;
 
-			Value& UpdateCache(typename cache_t::iterator it) {
+			Value& UpdateCache(const typename cache_list_t::iterator it) {
 				// update our cache since we are accesing an item
-				cache.splice(
-					cache.begin(),
-					cache,
+				cache_list.splice(
+					cache_list.begin(),
+					cache_list,
 					it
 				);
 				return it->second;
@@ -48,8 +48,8 @@
 			void Shrink() {
 				while (Size() > Capacity()) {
 					// deal with removing last element
-					cache_map.erase(cache.back().first);
-					cache.pop_back();
+					cache_map.erase(cache_list.back().first);
+					cache_list.pop_back();
 				}
 			}
 
@@ -57,27 +57,27 @@
 				throw std::invalid_argument("Key not in cache.");
 			}
 
-			void Delete(typename cache_map_t::iterator it) {
+			void Delete(const typename cache_map_t::iterator it) {
 				cache_map.erase(it);
-				cache.erase(it->second);
+				cache_list.erase(it->second);
 			}
 
 		public:
 			QueueCache(size_t _capacity = DefaultCapacity) : capacity(_capacity) { ; }
 			~QueueCache() = default;
 
-			using const_iterator = typename cache_t::const_iterator;
-			using iterator = typename cache_t::const_iterator;
+			using const_iterator = typename cache_list_t::const_iterator;
+			using iterator = typename cache_list_t::const_iterator;
 
 			/// Returns number of elements in cache.
-			size_t Size() { return cache.size(); }
+			size_t Size() const { return cache_list.size(); }
 
 			/// Returns maximum number of elements that will fit in cache.
 			size_t Capacity() { return capacity; }
 
 			/// Clears the cache.
 			void Clear() {
-				cache.clear();
+				cache_list.clear();
 				cache_map.clear();
 			}
 
@@ -93,7 +93,7 @@
 			}
 
 			/// Stores element in front of cache.
-			typename cache_t::iterator Put(const Key& key, const Value& val) {
+			typename cache_list_t::iterator Put(const Key& key, const Value& val) {
 				// try to find element in map
 				auto found = cache_map.find(key);
 				if (found != cache_map.end()) {
@@ -102,13 +102,12 @@
 
 				// put element into our cache
 				// we use insert because it returns a pointer to our element
-				cache.emplace_front(key, val);
+				cache_list.emplace_front(key, val);
 				// add pointer to this element to our map
-				cache_map.emplace(key, cache.begin());
-
+				cache_map.emplace(key, cache_list.begin());
 				Shrink();
 
-				return cache.begin();
+				return cache_list.begin();
 			}
 
 			/// Gets an element from cache.
