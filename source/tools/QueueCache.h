@@ -121,6 +121,7 @@
 				cache_list.emplace_front(key, val);
 				// add pointer to this element to our map
 				cache_map.emplace(key, cache_list.begin());
+				// make sure we don't have more elements than our capacity
 				Shrink();
 
 				return cache_list.begin();
