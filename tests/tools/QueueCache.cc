@@ -249,8 +249,41 @@ SCENARIO("Queue Caches can be iterated on", "[tools]") {
       );
 
       THEN("we get the expected result") {
+        const emp::vector<int> expected{'E', 'D', 'C', 'B', 'A'};
         REQUIRE(expected == result);
         CHECK(distance == qch.Size());
+      }
+    }
+  }
+}
+
+struct MyInt {
+  int val;
+  MyInt() = delete;
+  MyInt(const int _val) : val(_val) { ; }
+
+  bool operator==(const MyInt& other) const {
+    return val == other.val;
+  }
+};
+// operator<< is needed to get Catch2 expansions to work correctly
+std::ostream& operator<<(std::ostream& os, const MyInt& in ) {
+  os << in.val;
+  return os;
+}
+SCENARIO("Queue Caches can contain non default-constructible values"){
+  GIVEN("a queue cache templated on a struct with no default constructor") {
+    emp::QueueCache<
+      char,
+      MyInt,
+      2
+    > qch;
+    WHEN("we attempt to put elements in it") {
+      qch.Put('a', 1);
+      qch.Put('b', 2);
+      THEN("these are stored") {
+        REQUIRE(qch.Get('a') == MyInt(1));
+        REQUIRE(qch.Get('b') == MyInt(2));
       }
     }
   }
