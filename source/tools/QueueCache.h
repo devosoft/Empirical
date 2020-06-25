@@ -117,9 +117,7 @@
 				if (found != cache_map.end()) {
 					Delete(found);
 				}
-
 				// put element into our cache
-				// we use insert because it returns a pointer to our element
 				cache_list.emplace_front(key, val);
 				// add pointer to this element to our map
 				cache_map.emplace(key, cache_list.begin());
