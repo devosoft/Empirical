@@ -7,6 +7,20 @@
  *  @brief Tools for scaling graph axes in D3.
  */
 
+// TODO:
+// add .thresholds and .quantiles in quantize and quantile scale
+// test quantize, quantile threshold scale (including functions like invert extent)
+// clean up copy constructur?
+
+// make nice testing framework in C++ 
+// make pass_map_to_js psuedo thingy (see test_scales)
+// reimplement stuff to match pass_map_to_hs
+
+// make sure all functions match documentation
+// test each functino
+// delete functions when appropriate
+
+// clean up applyscale?
 
 #ifndef __EMP_D3_SCALES_H__
 #define __EMP_D3_SCALES_H__
@@ -41,6 +55,29 @@ namespace D3 {
   
   public:
     Scale() { ; }
+
+    /// Make a copy of this scale
+    /// Copy constructor
+    Scale(const Scale & other) {
+      int new_id = EM_ASM_INT({
+        return emp_d3.objects.next_id++;
+      });
+      EM_ASM({
+        emp_d3.objects[$1] = emp_d3.objects[$0].copy();
+      }, other.id, new_id);
+
+      this->id = new_id;
+    }
+    /// Make a copy of this scale
+    // Scale Copy() {
+    //   int new_id = EM_ASM_INT({
+    //     return emp_d3.objects.next_id++;
+    //   });
+    //   EM_ASM({
+    //     emp_d3.objects[$1] = emp_d3.objects[$0].copy();
+    //   }, this->id, new_id);
+    //   return Scale(new_id);
+    // }
 
     /// Set the domain of possible input values corresponding to values in the range
     /// Note that an array of strings can be passed in here
@@ -84,17 +121,8 @@ namespace D3 {
       return *this;
     }
 
-    /// Make a copy of this scale
-    Scale Copy() {
-      int new_id = EM_ASM_INT({
-        return emp_d3.objects.next_id++;
-      });
-      EM_ASM({
-        emp_d3.objects[$1] = emp_d3.objects[$0].copy();
-      }, this->id, new_id);
-      return Scale(new_id);
-    }
-
+    // ApplyScale functions
+    // note that might want to condense ApplyScaleDouble and Int into ApplyScale
     std::string ApplyScaleString(double input) {
       EM_ASM({
         const resultStr = emp_d3.objects[$0]($1);
@@ -156,7 +184,30 @@ namespace D3 {
       }, this->id, input.c_str());
     }
     
-    //TODO:Getters
+    // Getter methods for a scale's domain and range
+    // Use: GetDomain.domain()
+    template <typename T>
+    emp::vector<T> GetDomain() {
+      EM_ASM({
+        emp_i.__outgoing_array = emp_d3.objects[$0].domain();
+      }, this->id);
+      // access JS array
+      emp::vector<T> domain_vector;
+      emp::pass_vector_to_cpp(domain_vector);
+      return domain_vector;
+    }
+
+    // .range()
+    template <typename T>
+    emp::vector<T> GetRange() {
+      EM_ASM({
+        emp_i.__outgoing_array = emp_d3.objects[$0].range();
+      }, this->id);
+      // access JS array
+      emp::vector<T> range_vector;
+      emp::pass_vector_to_cpp(range_vector);
+      return range_vector;
+    }
   };
 
   //////////////////////////////////////////////////////////
@@ -196,7 +247,7 @@ namespace D3 {
     // .nice()
     /// Extend the domain so that it start and ends on nice values
     /// Nicing a scale only modifies the current domain
-    Scale & MakeNice() {
+    ContinuousScale & MakeNice() {
       EM_ASM({ 
         emp_d3.objects[$0].nice()
       }, this->id);
@@ -604,37 +655,6 @@ namespace D3 {
   // map a continuous, numeric input domain to a continuous output range. 
   // However, unlike continuous scales, the input domain and output range of a diverging scale always has exactly three elements,
   // and the output range is typically specified as an interpolator rather than an array of values
-  // class DivergingScale : public ContinuousScale {
-  // protected:
-  //   DivergingScale(bool derived) : ContinuousScale(true) { ; }
-  
-  // public:
-  //   DivergingScale() : ContinuousScale(true) {
-  //     EM_ASM({ emp_d3.objects[$0] = d3.scaleDiverging(); }, this->id);
-  //   }
-
-  //   // get rid of functions that shouldn't be called:
-  //   // Identity scales do not support invert or interpolate
-  //   template <typename T>
-  //   double Invert(T y) = delete;
-  //   ContinuousScale & SetInterpolate(const std::string & interpolatorName) = delete;
-  
-    
-  //   // .interpolator
-  //   DivergingScale & SetInterpolator(const std::string & interpolatorName) {
-  //     // note: this doesn't allow you to specify arguments to a d3.interpolator function
-  //     EM_ASM({
-  //       const id = $0;
-  //       const interpolator_str = UTF8ToString($1);
-  //       var sel = emp_d3.find_function(interpolator_str);
-  //       emp_d3.objects[id].interpolator(sel);
-  //     }, this->id, interpolatorName.c_str());
-
-  //     return *this;
-  //   }
-  // };
-
-  // scaleDiverging
   class DivergingScale : public SequentialOrDivergingScale {
   protected:
     DivergingScale(bool derived) : SequentialOrDivergingScale(true) { ; }
@@ -705,7 +725,7 @@ namespace D3 {
   };
 
   // scaleQuantize
-  // ticks tickformat nice thresholds
+  // thresholds
   class QuantizeScale : public ContinuousInputDiscreteOutputScale { 
   protected: 
     QuantizeScale(bool derived) : ContinuousInputDiscreteOutputScale(true) {;}
@@ -716,9 +736,36 @@ namespace D3 {
         emp_d3.objects[$0] = d3.scaleQuantize();
       }, this->id);
     }
+
+    // .ticks()
+    QuantizeScale & SetTicks(int count) {
+      EM_ASM_ARGS({js.objects[$0].ticks($1);}, this->id, count);
+      return *this;
+    }
+
+    // .tickFormat()
+    QuantizeScale & SetTickFormat(int count, const std::string & format) {
+    //TODO: format is technically optional, but what is the point of this
+    //function without it?
+      EM_ASM({
+        emp_d3.objects[$0].tickFormat($1, UTF8ToString($2));
+      }, this->id, count, format.c_str());
+      return *this;
+    }
+
+    // .nice()
+    QuantizeScale & MakeNice() {
+      EM_ASM({ 
+        emp_d3.objects[$0].nice()
+      }, this->id);
+      return *this;
+    }
+
+    // .thresholds()
   };
 
   // scaleQuantile
+  // quantiles
   class QuantileScale : public ContinuousInputDiscreteOutputScale {
   protected:
     // is there another design pattern besides decoy constructors?
@@ -730,7 +777,19 @@ namespace D3 {
         emp_d3.objects[$0] = d3.scaleQuantile();
       }, this->id);
     }
-    //TODO: .quantiles() -- will return an array of numbers 
+   
+    // .quantiles()
+    // Returns an array of n + 1 quantiles. For example, if n = 4, returns an array of five numbers: 
+    // the minimum value, the first quartile, the median, the third quartile, and the maximum.
+    // emp::vector<double> GetQuantiles(const int n) {
+    //   EM_ASM({
+    //     emp_i.__outgoing_array = emp_d3.objects[$0].quantiles($1);
+    //   }, this->id, n);
+    //   // access JS array
+    //   emp::vector<double> quantile_vector;
+    //   emp::pass_vector_to_cpp(quantile_vector);
+    //   return quantile_vector;
+    // } 
   };
 
   // scaleThreshold

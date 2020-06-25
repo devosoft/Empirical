@@ -124,6 +124,8 @@ struct TestPowScale {
         .domain([0, 2e9])
         .range([0, 300]);
 
+      console.log(population.domain()); // [0, 2000000]
+      console.log(population.range()); // [0, 300]
       console.log(population(1.386e9)); // 249.73986465920893
       console.log(population(127e6)); // 75.59761901012492
       console.log(population(427e3)); // 4.383491758860737
@@ -141,6 +143,8 @@ struct TestPowScale {
         .domain([0, 2e9])
         .range(["yellow", "red"]);
 
+      console.log(populationColor.domain()); // [0, 2000000]
+      console.log(populationColor.range()); // ["yellow", "red"]
       console.log(populationColor(1.386e9)); // 249.73986465920893
       console.log(populationColor(127e6)); // 75.59761901012492
       console.log(populationColor(427e3)); // 4.383491758860737
@@ -150,43 +154,53 @@ struct TestPowScale {
     testPowPop.SetExponent(0.5);
     testPowPop.SetDomain(0, 2e9);
     testPowPop.SetRange(0, 300);
-    double result1 = testPowPop.ApplyScaleDouble(1.386e9);
-    double result2 = testPowPop.ApplyScaleDouble(127e6);
-    double result3 = testPowPop.ApplyScaleDouble(427e3);
+    emp::vector<double> result1 = testPowPop.GetDomain<double>();
+    emp::vector<double> result2 = testPowPop.GetRange<double>();
+    double result3 = testPowPop.ApplyScaleDouble(1.386e9);
+    double result4 = testPowPop.ApplyScaleDouble(127e6);
+    double result5 = testPowPop.ApplyScaleDouble(427e3);
 
     std::cout << "value 1: " << result1 << std::endl;
     std::cout << "value 2: " << result2 << std::endl;
     std::cout << "value 3: " << result3 << std::endl;
+    std::cout << "value 4: " << result4 << std::endl;
+    std::cout << "value 5: " << result5 << std::endl;
 
     D3::PowScale testPowPop2; 
     testPowPop2.SetExponent(1.5);
     testPowPop2.SetDomain(0, 2e9);
     testPowPop2.SetRange(0, 300);
-    double result4 = testPowPop2.ApplyScaleDouble(1.386e9);
-    double result5 = testPowPop2.ApplyScaleDouble(127e6);
-    double result6 = testPowPop2.ApplyScaleDouble(427e3);
+    double result6 = testPowPop2.ApplyScaleDouble(1.386e9);
+    double result7 = testPowPop2.ApplyScaleDouble(127e6);
+    double result8 = testPowPop2.ApplyScaleDouble(427e3);
 
-    std::cout << "value 4: " << result4 << std::endl;
-    std::cout << "value 5: " << result5 << std::endl;
     std::cout << "value 6: " << result6 << std::endl;
+    std::cout << "value 7: " << result7 << std::endl;
+    std::cout << "value 8: " << result8 << std::endl;
 
     D3::PowScale testPowPopColor; 
     emp::array<std::string, 2> colorArray = {"yellow", "red"};
     testPowPopColor.SetDomain(0, 2e9);
     testPowPopColor.SetRange(colorArray);
-    std::string result7 = testPowPopColor.ApplyScaleString(1.386e9);
-    std::string result8 = testPowPopColor.ApplyScaleString(127e6);
-    std::string result9 = testPowPopColor.ApplyScaleString(427e3);
+    // emp::vector<double> result9 = testPowPopColor.GetDomainDouble();
+    // emp::vector<std::string> result10 = testPowPopColor.GetRangeString();
+    emp::vector<double> result9 = testPowPopColor.GetDomain<double>();
+    emp::vector<std::string> result10 = testPowPopColor.GetRange<std::string>();
+    std::string result11 = testPowPopColor.ApplyScaleString(1.386e9);
+    std::string result12 = testPowPopColor.ApplyScaleString(127e6);
+    std::string result13 = testPowPopColor.ApplyScaleString(427e3);
 
-    std::cout << "value 7: " << result7 << std::endl;
-    std::cout << "value 8: " << result8 << std::endl;
     std::cout << "value 9: " << result9 << std::endl;
+    std::cout << "value 10: " << result10 << std::endl;
+    std::cout << "value 11: " << result11 << std::endl;
+    std::cout << "value 12: " << result12 << std::endl;
+    std::cout << "value 13: " << result13 << std::endl;
    
     std::cout << "------Pow Test End------" << std::endl << std::endl;
   }
 };
 
-// scaleSqrt
+// scaleSqrt (and copy)
 struct TestSqrtScale {
   TestSqrtScale() {
     std::cout << "------Sqrt Test Begin------" << std::endl;
@@ -199,6 +213,11 @@ struct TestSqrtScale {
       console.log(population(1.386e9)); // 249.73986465920893
       console.log(population(127e6)); // 75.59761901012492
       console.log(population(427e3)); // 4.383491758860737
+
+      var copyPop = population.copy();
+      console.log(copyPop(1.386e9)); // 249.73986465920893
+      console.log(copyPop(127e6)); // 75.59761901012492
+      console.log(copyPop(427e3)); // 4.383491758860737
     });
 
     D3::SqrtScale testSqrtPop; 
@@ -207,11 +226,19 @@ struct TestSqrtScale {
     double result1 = testSqrtPop.ApplyScaleDouble(1.386e9);
     double result2 = testSqrtPop.ApplyScaleDouble(127e6);
     double result3 = testSqrtPop.ApplyScaleDouble(427e3);
-
     std::cout << "value 1: " << result1 << std::endl;
     std::cout << "value 2: " << result2 << std::endl;
     std::cout << "value 3: " << result3 << std::endl;
 
+    // D3::SqrtScale copyPop = testSqrtPop.Copy();
+    D3::SqrtScale copyPop(testSqrtPop);  // = new D3::SqrtScale(testSqrtPop);
+    double result4 = copyPop.ApplyScaleDouble(1.386e9);
+    double result5 = copyPop.ApplyScaleDouble(127e6);
+    double result6 = copyPop.ApplyScaleDouble(427e3);
+    std::cout << "value 4: " << result4 << std::endl;
+    std::cout << "value 5: " << result5 << std::endl;
+    std::cout << "value 6: " << result6 << std::endl;
+    
     std::cout << "------Sqrt Test End------" << std::endl << std::endl;
   }
 };
@@ -443,6 +470,41 @@ struct TestSequentialQuantileScale {
   }
 };
 
+// caleDiverging
+struct TestDivergingScale {
+  TestDivergingScale() {
+    std::cout << "------Diverging Test Begin------" << std::endl;
+
+    EM_ASM({
+      scaleAnomalyPuOr = d3.scaleDiverging()
+                            .domain( [-0.78, 0, 1.35] )
+                            .interpolator(d3.interpolatePuOr);
+
+      console.log(scaleAnomalyPuOr.domain()); // [-0.78, 0, 1.35]
+      console.log(scaleAnomalyPuOr(-0.5)); // "rgb(119, 98, 165)"
+      console.log(scaleAnomalyPuOr(0)); // "rgb(243, 238, 234)"
+      console.log(scaleAnomalyPuOr(1.01)); //"rgb(190, 100, 11)"
+    });
+
+    D3::DivergingScale testDiv;
+    emp::array<double, 3> domainArr = {-0.78, 0, 1.35};
+    testDiv.SetDomain(domainArr);
+    testDiv.SetInterpolator("interpolatePuOr");
+    emp::vector<double> result1 = testDiv.GetDomain<double>();
+    std::string result3 = testDiv.ApplyScaleString(-0.5);
+    std::string result4 = testDiv.ApplyScaleString(0);
+    std::string result5 = testDiv.ApplyScaleString(1.01);
+
+    std::cout << "value 1: " << result1 << std::endl;
+    std::cout << "value 3: " << result3 << std::endl;
+    std::cout << "value 4: " << result4 << std::endl;
+    std::cout << "value 5: " << result5 << std::endl;
+
+    std::cout << "------Diverging Test End------" << std::endl << std::endl;
+  }
+};
+
+
 
 //***********************************//    
 //******** __________ Scales ********//
@@ -493,6 +555,8 @@ int main() {
   TestSequentialScale test8{};
 
   TestSequentialQuantileScale test10{};
+
+  TestDivergingScale test11{};
 
   // TestQuantizeScale test6{};
 }
