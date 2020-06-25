@@ -132,7 +132,7 @@ namespace emp {
     using fun_get_neighbor_t    = std::function<WorldPosition(WorldPosition)>;
 
     /// Function type for determining if two organisms are neighbors.
-    using fun_is_neighbor_t     = std::function<boolean(WorldPosition, WorldPosition)>;
+    using fun_is_neighbor_t     = std::function<bool(size_t, size_t)>;
 
   protected:
     // Internal state member variables
@@ -831,8 +831,8 @@ namespace emp {
     /// Use the specified function to get a neighbor (if not set, assume well mixed).
     WorldPosition GetRandomNeighborPos(WorldPosition pos) { return fun_get_neighbor(pos); }
 
-    /// Use the specified function to determine if two organisms are neighbors.
-    boolean IsNeighbor(WorldPosition pos1, WorldPosition pos2) {return fun_is_neighbor(pos1, pos2); }
+    /// Use the specified function to determine if two indices are neighboring.
+    bool IsNeighbor(size_t id1, size_t id2) {return fun_is_neighbor(id1, id2); }
 
     /// Get the id of a random *occupied* cell.
     size_t GetRandomOrgID();
@@ -852,6 +852,11 @@ namespace emp {
 
     /// Return IDs of all empty cells in the population.
     emp::vector<size_t> GetEmptyPopIDs() { return FindCellIDs([](ORG*org){ return !org; }); }
+
+    /// Return IDs of all occupied neighbors of specified position.
+    emp::vector<size_t> GetValidNeighborOrgIDs(size_t id) { 
+      return FindCellIDs([id](ORG*org){ return (((bool) org) && IsNeighbor(id, org.GetIndex()));});
+    }
 
 
     // --- POPULATION MANIPULATIONS ---
@@ -972,7 +977,7 @@ namespace emp {
 
     // Since neighbors are anywhere in the same population, all organisms in the same
     // population are neighbors.
-    fun_is_neighbor = [this](WorldPosition pos1, WorldPosition pos2) {return true;};
+    fun_is_neighbor = [this](size_t pos1, size_t pos2) {return true;};
 
     // Kill random organisms and move end into vacant position to keep pop compact.
     fun_kill_org = [this](){
@@ -1021,7 +1026,7 @@ namespace emp {
     fun_get_neighbor = [this](WorldPosition pos) { return pos.SetIndex(GetRandomCellID()); };
 
     // Neighbors are anywhere in same population, so all organisms are neighbors.
-    fun_is_neighbor = [this](WorldPosition pos) {return true;};
+    fun_is_neighbor = [this](size_t pos) {return true;};
 
     // Kill random organisms and move end into vacant position to keep pop compact.
     fun_kill_org = [this](){
@@ -1090,20 +1095,22 @@ namespace emp {
     };
 
     // Neighbors are in 8-sized neighborhood excluding self
-    fun_is_neighbor = [this](WorldPosition pos1, WorldPosition pos2) {
+    fun_is_neighbor = [this](size_t id1, size_t id2) {
       emp_assert(pop_sizes.size() == 2);
 
       const size_t size_x = pop_sizes[0];
       const size_t size_y = pop_sizes[1];
-      const size_t id1 = pos1.GetIndex();
-      const size_t id2 = pos2.GetIndex();
 
       if(id1 == id2) { //self, not neighbors
 	return false;
       }
 
-      
-      
+      int row_diff = (id1 - id2) / size_x;
+      int col_diff = id1%size_x - id2%size_x;
+
+      if((abs(row_diff) <= 1) && (abs(col_diff) <= 1))	return true;
+      else return false;
+
     };
 
     fun_kill_org = [this](){
