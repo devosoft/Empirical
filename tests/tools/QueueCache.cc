@@ -154,8 +154,9 @@ SCENARIO("Queue Caches can be cleared", "[tools]") {
       THEN("its elements are removed") {
         REQUIRE(qch.Size() == 0);
 
+        // different ways to check for existence in cache
         REQUIRE_THROWS_WITH(qch.Get('a'), "Key not in cache.");
-        REQUIRE_THROWS_WITH(qch.Get('b'), "Key not in cache.");
+        REQUIRE(!qch.Contains('b'));
       }
       AND_THEN("its capacity is unchanged") {
         REQUIRE(qch.Capacity() == capacity);
@@ -283,7 +284,7 @@ SCENARIO("Queue Caches can contain non default-constructible values"){
       qch.Put('b', 2);
       THEN("these are stored") {
         REQUIRE(qch.Get('a') == MyInt(1));
-        REQUIRE(qch.Get('b') == MyInt(2));
+        REQUIRE(qch.Contains('b'));
       }
     }
   }
