@@ -177,13 +177,14 @@
 			/// @param index Key of element to add/retrieve
 			/// @return Reference to value of element of given key
 			Value& operator[](const Key& index) {
-				// Check whether Value has a default constructor
-				emp_assert(std::is_trivially_constructible<Value>::value);
-
 				// attempt to find key in our iterator map
+				// Use of this method requires a Value that is default constructible.
+				static_assert(std::is_trivially_constructible<Value>::value,
+					"Operator subscript requires a default constructor");
 				if (!cache_map.count(index)) {
 					Put(index, Value());
 				}
+
 				return Get(index);
 			}
 	};
