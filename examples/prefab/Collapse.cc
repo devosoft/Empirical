@@ -17,7 +17,7 @@ int main()
   UI::Div btn1;
   UI::Div content1;
 
-  emp::Collapse collapse1(btn1, content1, true, "my_collapse");
+  emp::prefab::Collapse collapse1(btn1, content1, true, "my_collapse");
   doc << collapse1.GetLinkDiv();
   doc << collapse1.GetToggleDiv();
 
@@ -30,7 +30,7 @@ int main()
   
   UI::Div btn2;
   UI::Div content2;
-  emp::Collapse collapse2(btn2, content2, false);
+  emp::prefab::Collapse collapse2(btn2, content2, false);
   doc << collapse2.GetLinkDiv();
   doc << collapse2.GetToggleDiv();
 

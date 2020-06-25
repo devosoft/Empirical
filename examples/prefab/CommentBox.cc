@@ -15,7 +15,7 @@ UI::Document doc("emp_base");
 
 int main()
 {
-    emp::CommentBox box;
+    emp::prefab::CommentBox box;
     UI::Div title("desktop_content");
     title << "<h1>Content that shows on all screen sizes</h1>";
     box.AddContent(title);
@@ -24,5 +24,5 @@ int main()
     mobile << "<hr>";
     box.AddMobileContent(mobile);
     box.AddMobileContent("<b>String literals can also be added to box content!</b>");
-    doc << box.GetDiv();
+    doc << box;
 }
