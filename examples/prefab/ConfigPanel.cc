@@ -18,7 +18,7 @@ UI::Document doc("emp_base");
 
 Config cfg;
 
-emp::ConfigPanel config_panel(cfg);
+emp::prefab::ConfigPanel config_panel(cfg);
 
 int main()
 {

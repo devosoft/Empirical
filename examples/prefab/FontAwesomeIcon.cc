@@ -17,26 +17,26 @@ int main()
   UI::Div toggleIcons;
   doc << toggleIcons;
   toggleIcons << "<h1>Collapse Icons</h1>";
-  emp::FontAwesomeIcon up("fa-angle-double-up");
-  toggleIcons << up.GetDiv();
+  emp::prefab::FontAwesomeIcon up("fa-angle-double-up");
+  toggleIcons << up;
   toggleIcons << "<br>";
-  emp::FontAwesomeIcon down("fa-angle-double-down");
-  toggleIcons << down.GetDiv();
+  emp::prefab::FontAwesomeIcon down("fa-angle-double-down");
+  toggleIcons << down;
   toggleIcons << "<br>";
-  emp::FontAwesomeIcon right("fa-angle-double-right");
-  toggleIcons << right.GetDiv();
+  emp::prefab::FontAwesomeIcon right("fa-angle-double-right");
+  toggleIcons << right;
 
   doc << "<br><hr><br>"; 
 
   UI::Div infoIcons;
   doc << infoIcons;
   infoIcons << "<h1>Circle icons</h1>";
-  emp::FontAwesomeIcon i_circle("fa-info-circle");
-  infoIcons << i_circle.GetDiv();
+  emp::prefab::FontAwesomeIcon i_circle("fa-info-circle");
+  infoIcons << i_circle;
   infoIcons << "<br>";
-  emp::FontAwesomeIcon question_circle("fa-question-circle-o");
-  infoIcons << question_circle.GetDiv();
+  emp::prefab::FontAwesomeIcon question_circle("fa-question-circle-o");
+  infoIcons << question_circle;
   infoIcons << "<br>";
-  emp::FontAwesomeIcon plus_circle("fa-plus-circle");
-  infoIcons << plus_circle.GetDiv();
+  emp::prefab::FontAwesomeIcon plus_circle("fa-plus-circle");
+  infoIcons << plus_circle;
 }
