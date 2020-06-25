@@ -21,9 +21,9 @@ SCENARIO("Queue Caches store elements", "[tools]") {
 
     WHEN("elements are stored in it") {
       // Put some things in the cache.
-      auto it_a = qch.Put('a', 0);
-      auto it_b = qch.Put('b', 1);
-      auto it_c = qch.Put('c', 2);
+      const auto it_a = qch.Put('a', 0);
+      const auto it_b = qch.Put('b', 1);
+      const auto it_c = qch.Put('c', 2);
 
       // Check whether iterators point to the right elements.
       REQUIRE(it_a->first == 'a');
@@ -171,14 +171,14 @@ SCENARIO("Queue Caches can be subscripted", "[tools]") {
     const size_t capacity = 3;
     emp::QueueCache<char, int> qch(capacity);
 
-    auto it_x = qch.Put('x', 23);
-    auto it_y = qch.Put('y', 24);
-    auto it_z = qch.Put('z', 25);
+    const auto it_x = qch.Put('x', 23);
+    const auto it_y = qch.Put('y', 24);
+    const auto it_z = qch.Put('z', 25);
 
     WHEN("we subscript into an existing key") {
-      auto res_x = qch['x'];
-      auto res_y = qch['y'];
-      auto res_z = qch['z'];
+      const int res_x = qch['x'];
+      const int res_y = qch['y'];
+      const int res_z = qch['z'];
 
       THEN("the value from its given key is returned") {
         REQUIRE(res_x == it_x->second);
