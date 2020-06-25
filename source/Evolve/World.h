@@ -131,6 +131,9 @@ namespace emp {
     /// Function type for identifying an organism's random neighbor.
     using fun_get_neighbor_t    = std::function<WorldPosition(WorldPosition)>;
 
+    /// Function type for determining if two organisms are neighbors.
+    using fun_is_neighbor_t     = std::function<boolean(WorldPosition, WorldPosition)>;
+
   protected:
     // Internal state member variables
     size_t update;                  ///< How many times has Update() been called?
@@ -164,6 +167,7 @@ namespace emp {
     fun_find_birth_pos_t   fun_find_birth_pos;  ///< ...find where to add a new offspring organism.
     fun_kill_org_t         fun_kill_org;        ///< ...kill an organism.
     fun_get_neighbor_t     fun_get_neighbor;    ///< ...choose a random neighbor "near" specified id.
+    fun_is_neighbor_t      fun_is_neighbor;     ///< ...determine if two organisms are neighbors.
 
     /// Attributes are a dynamic way to track extra characteristics about a world.
     std::map<std::string, std::string> attributes;
@@ -207,7 +211,7 @@ namespace emp {
       , is_synchronous(false), is_space_structured(false), is_pheno_structured(false)
       , fun_calc_fitness(), fun_do_mutations(), fun_print_org(), fun_get_genome()
       , fun_find_inject_pos(), fun_find_birth_pos(), fun_kill_org(), fun_get_neighbor()
-      , attributes(), control()
+      , fun_is_neighbor(), attributes(), control()
       , before_repro_sig(to_string(name,"::before-repro"), control)
       , offspring_ready_sig(to_string(name,"::offspring-ready"), control)
       , inject_ready_sig(to_string(name,"::inject-ready"), control)
@@ -560,6 +564,10 @@ namespace emp {
     /// the population.
     void SetGetNeighborFun(const fun_get_neighbor_t & _fun) { fun_get_neighbor = _fun; }
 
+    /// Setup the function to determine if two organisms are neighbors. It should return a
+    /// boolean indicating if they are neighbors.
+    void SetIsNeighborFun(const fun_is_neighbor_t & _fun) {fun_is_neighbor = _fun; }
+
     /// Same as setting a fitness function, but uses Goldberg and Richardson's fitness sharing
     /// function (1987) to make similar organisms detract from each other's fitness and prevent
     /// the population from clustering around a single peak.  In addition to the base fitness
@@ -823,6 +831,9 @@ namespace emp {
     /// Use the specified function to get a neighbor (if not set, assume well mixed).
     WorldPosition GetRandomNeighborPos(WorldPosition pos) { return fun_get_neighbor(pos); }
 
+    /// Use the specified function to determine if two organisms are neighbors.
+    boolean IsNeighbor(WorldPosition pos1, WorldPosition pos2) {return fun_is_neighbor(pos1, pos2); }
+
     /// Get the id of a random *occupied* cell.
     size_t GetRandomOrgID();
 
@@ -959,6 +970,10 @@ namespace emp {
     // Neighbors are anywhere in the same population.
     fun_get_neighbor = [this](WorldPosition pos) { return pos.SetIndex(GetRandomCellID()); };
 
+    // Since neighbors are anywhere in the same population, all organisms in the same
+    // population are neighbors.
+    fun_is_neighbor = [this](WorldPosition pos1, WorldPosition pos2) {return true;};
+
     // Kill random organisms and move end into vacant position to keep pop compact.
     fun_kill_org = [this](){
       const size_t last_id = pop.size() - 1;
@@ -1004,6 +1019,9 @@ namespace emp {
 
     // Neighbors are anywhere in the same population.
     fun_get_neighbor = [this](WorldPosition pos) { return pos.SetIndex(GetRandomCellID()); };
+
+    // Neighbors are anywhere in same population, so all organisms are neighbors.
+    fun_is_neighbor = [this](WorldPosition pos) {return true;};
 
     // Kill random organisms and move end into vacant position to keep pop compact.
     fun_kill_org = [this](){
@@ -1069,6 +1087,23 @@ namespace emp {
       emp_assert((int)pos.GetIndex() != neighbor_id);
 
       return pos.SetIndex(neighbor_id);
+    };
+
+    // Neighbors are in 8-sized neighborhood excluding self
+    fun_is_neighbor = [this](WorldPosition pos1, WorldPosition pos2) {
+      emp_assert(pop_sizes.size() == 2);
+
+      const size_t size_x = pop_sizes[0];
+      const size_t size_y = pop_sizes[1];
+      const size_t id1 = pos1.GetIndex();
+      const size_t id2 = pos2.GetIndex();
+
+      if(id1 == id2) { //self, not neighbors
+	return false;
+      }
+
+      
+      
     };
 
     fun_kill_org = [this](){
