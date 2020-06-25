@@ -90,7 +90,7 @@ namespace emp {
                         std::string type = group->GetEntry(i)->GetType();
                         std::string value = group->GetEntry(i)->GetValue();
                    
-                        card.AddBodyContent(web::Element("form").SetCSS("width", "100%") << input_divs[name]);
+                        card.AddBodyContent(input_divs[name]);
 
                         // Setting element label
                         web::Div setting_element(name + "_row");
