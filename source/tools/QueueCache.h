@@ -83,9 +83,9 @@
 			/// @return number of elements in the cache
 			size_t Size() const { return cache_list.size(); }
 
-			size_t Capacity() { return capacity; }
 			/// Return maximum number of elements that will fit in cache.
 			/// @return maximum number of elements that the cache can contain
+			size_t Capacity() const { return capacity; }
 
 			/// Clear the cache.
 			void Clear() {
@@ -100,10 +100,10 @@
 				Delete(it);
 			}
 
-			bool Contains(const Key& key) {
 			/// Does cache contain key?
 			/// @param key Key to check presence of
 			/// @return whether cache contains key
+			bool Contains(const Key& key) const {
 				return cache_map.count(key);
 			}
 
