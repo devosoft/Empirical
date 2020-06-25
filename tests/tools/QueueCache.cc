@@ -72,8 +72,7 @@ SCENARIO("Queue Caches store elements", "[tools]") {
 
 SCENARIO("Queue Caches can be sized and resized", "[tools]") {
   GIVEN("a queue cache of a set size with elements in it") {
-    const size_t capacity = 10;
-    emp::QueueCache<char, int> qch(capacity);
+    emp::QueueCache<char, int, 10> qch;
 
     // Put some things in the cache.
     qch.Put('a', 0);
@@ -107,8 +106,7 @@ SCENARIO("Queue Caches can be sized and resized", "[tools]") {
 
 SCENARIO("Queue Caches behave like queues (first-in, first-out)", "[tools]") {
   GIVEN("a queue cache full with elements") {
-    const size_t capacity = 2;
-    emp::QueueCache<char, int> qch(capacity);
+    emp::QueueCache<char, int, 2> qch;
 
     // Saturate the cache.
     qch.Put('b', 1);
@@ -128,8 +126,7 @@ SCENARIO("Queue Caches behave like queues (first-in, first-out)", "[tools]") {
 }
 SCENARIO("Queue Caches can delete elements", "[tools]") {
   GIVEN("a queue cache with elements") {
-    const size_t capacity = 2;
-    emp::QueueCache<char, int> qch(capacity);
+    emp::QueueCache<char, int, 2> qch;
 
     qch.Put('a', 0);
     qch.Put('b', 1);
@@ -170,8 +167,7 @@ SCENARIO("Queue Caches can be cleared", "[tools]") {
 SCENARIO("Queue Caches can be subscripted", "[tools]") {
   // Test whether the subscript operator can get values from cache.
   GIVEN("a queue cache") {
-    const size_t capacity = 3;
-    emp::QueueCache<char, int> qch(capacity);
+    emp::QueueCache<char, int, 3> qch;
 
     const auto it_x = qch.Put('x', 23);
     const auto it_y = qch.Put('y', 24);
@@ -217,8 +213,7 @@ SCENARIO("Queue Caches can be subscripted", "[tools]") {
 
 SCENARIO("Queue Caches can be iterated on", "[tools]") {
   GIVEN("a queue cache with elements in it") {
-    const size_t capacity = 6;
-    emp::QueueCache<char, int> qch(capacity);
+    emp::QueueCache<char, int, 6> qch;
 
     for (char i = 'A'; i < 'F'; ++i) {
       qch.Put(i, i);
