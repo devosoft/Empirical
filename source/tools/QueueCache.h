@@ -73,7 +73,7 @@
 			}
 
 		public:
-			QueueCache(size_t _capacity = DefaultCapacity) : capacity(_capacity) { ; }
+			QueueCache(const size_t _capacity = DefaultCapacity) : capacity(_capacity) { ; }
 			~QueueCache() = default;
 
 			using const_iterator = typename cache_list_t::const_iterator;
@@ -113,7 +113,7 @@
 			/// @return Iterator to newly-added element in cache queue
 			typename cache_list_t::iterator Put(const Key& key, const Value& val) {
 				// try to find element in map
-				auto found = cache_map.find(key);
+				const auto found = cache_map.find(key);
 				if (found != cache_map.end()) {
 					Delete(found);
 				}
