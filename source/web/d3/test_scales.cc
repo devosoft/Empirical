@@ -9,6 +9,7 @@
 #include "utils.h"
 #include "../js_utils.h"
 
+#include "../../base/vector.h"
 
 namespace UI = emp::web;
 UI::Document doc("emp_d3_test");
@@ -22,9 +23,23 @@ struct TestLinearScale {
   TestLinearScale() {
     std::cout << "------Linear Test Begin------" << std::endl;
 
-    emp::vector<std::string, int> cpp_result_vec;
+    // initialize objects in JavaScript
+    EM_ASM({
+      window["test_linear_scale"] = ( {"js_results" : [],
+                                      "js_results_names" : [],
+                                       "cpp_results" : [],
+                                       "cpp_results_names" : [],
+                                       "js_results_lu" : {},
+                                       "cpp_results_lu" : {} } );
+    });
 
-    D3::LinearScale testLinearX = D3::LinearScale();
+    // a vector to store results
+    emp::vector<int> cpp_result_vec;
+
+    // a vector to store names
+    emp::vector<std::string> cpp_name_vec;
+
+    D3::LinearScale testLinearX; 
     testLinearX.SetDomain(10, 130.00);
     testLinearX.SetRange(0, 960.00);
     int result1 = testLinearX.ApplyScaleInt(20);
@@ -32,55 +47,65 @@ struct TestLinearScale {
     int result1i = testLinearX.Invert<int>(80);
     int result2i = testLinearX.Invert<int>(320);
 
-    cpp_result_map["val1"] = result1;
-    cpp_result_map["val2"] = result2;
-    cpp_result_map["val3"] = result1i;
-    cpp_result_map["val4"] = result2i;
+    cpp_result_vec.push_back(result1); 
+    cpp_result_vec.push_back(result2);
+    cpp_result_vec.push_back(result1i);
+    cpp_result_vec.push_back(result2i);
+
+    cpp_name_vec.push_back("applyScale1"); 
+    cpp_name_vec.push_back("applyScale2");
+    cpp_name_vec.push_back("invert1");
+    cpp_name_vec.push_back("invert2");
 
     std::cout << "value 1: " << result1 << std::endl;
     std::cout << "value 2: " << result2 << std::endl;
     std::cout << "value 1 invert: " << result1i << std::endl;
     std::cout << "value 2 invert: " << result2i << std::endl;
+    
+    // add cpp results to JS
+    emp::pass_array_to_javascript(cpp_result_vec);
 
-    emp::pass_array_to_javascript(cpp_result_map);
-
-    // function pass_map_to_javascript
     EM_ASM({
-      console.log(emp_i.__incoming_array);
-      
-      window["test_linear_scale"] = ( {"js_results" : [],
-                                      "js_results_names" : [],
-                                       "cpp_results" : [],
-                                       "cpp_results_names" : [],
-                                       "js_results_lu" : {},
-                                       "cpp_results_lu" : {} } );
-      
-      // create dictionaries based on object above
+      window["test_linear_scale"].cpp_results = emp_i.__incoming_array;
+      console.log(window["test_linear_scale"].cpp_results);
+    });
 
+    emp::pass_array_to_javascript(cpp_name_vec);
+
+    EM_ASM({
+      window["test_linear_scale"].cpp_results_names = emp_i.__incoming_array;
+      console.log(window["test_linear_scale"].cpp_results_names);
+    });
+
+    // add JS results
+    EM_ASM({  
       var x = d3.scaleLinear()
                   .domain([ 10, 130 ])
                   .range([ 0, 960 ]);
 
-      console.log(x(20)); // 80
-      console.log(x(50)); // 320
-      console.log(x.invert(80)); // 20
+      console.log(x(20));         // 80
+      console.log(x(50));         // 320
+      console.log(x.invert(80));  // 20
       console.log(x.invert(320)); // 50
 
       var color = d3.scaleLinear()
-        .domain([10, 100])
-        .range(["brown", "steelblue"]);
+                      .domain([ 10, 100 ])
+                      .range([ "brown", "steelblue" ]);
 
       console.log(color(20)); // "#9a3439" or "rgb(154, 52, 57)"
       console.log(color(50)); // "#7b5167" or "rgb(123, 81, 103)"
     });
 
-    // D3::LinearScale testLinearColor = D3::LinearScale();
+    // function pass_map_to_javascript
+    // create dictionaries based on object above
+
+    // D3::LinearScale testLinearColor; // = D3::LinearScale();
     // testLinearColor.SetDomain(10, 100);
     // emp::array<std::string, 2> colorArray = {"brown", "steelblue"};
     // testLinearColor.SetRange(colorArray);
     // std::string result3 = testLinearColor.ApplyScaleString(20);
     // std::string result4 = testLinearColor.ApplyScaleString(50);
-   
+
     // std::cout << "value 3: " << result3 << std::endl;
     // std::cout << "value 4: " << result4 << std::endl;
    
@@ -121,7 +146,7 @@ struct TestPowScale {
       console.log(populationColor(427e3)); // 4.383491758860737
     });
 
-    D3::PowScale testPowPop = D3::PowScale();
+    D3::PowScale testPowPop; 
     testPowPop.SetExponent(0.5);
     testPowPop.SetDomain(0, 2e9);
     testPowPop.SetRange(0, 300);
@@ -133,7 +158,7 @@ struct TestPowScale {
     std::cout << "value 2: " << result2 << std::endl;
     std::cout << "value 3: " << result3 << std::endl;
 
-    D3::PowScale testPowPop2 = D3::PowScale();
+    D3::PowScale testPowPop2; 
     testPowPop2.SetExponent(1.5);
     testPowPop2.SetDomain(0, 2e9);
     testPowPop2.SetRange(0, 300);
@@ -145,7 +170,7 @@ struct TestPowScale {
     std::cout << "value 5: " << result5 << std::endl;
     std::cout << "value 6: " << result6 << std::endl;
 
-    D3::PowScale testPowPopColor = D3::PowScale();
+    D3::PowScale testPowPopColor; 
     emp::array<std::string, 2> colorArray = {"yellow", "red"};
     testPowPopColor.SetDomain(0, 2e9);
     testPowPopColor.SetRange(colorArray);
@@ -176,9 +201,7 @@ struct TestSqrtScale {
       console.log(population(427e3)); // 4.383491758860737
     });
 
-    D3::SqrtScale testSqrtPop = D3::SqrtScale();
-    // testSqrtPop = testSqrtPop.SqrtScale();
-    // testSqrtPop.SqrtScale();
+    D3::SqrtScale testSqrtPop; 
     testSqrtPop.SetDomain(0, 2e9);
     testSqrtPop.SetRange(0, 300);
     double result1 = testSqrtPop.ApplyScaleDouble(1.386e9);
@@ -217,7 +240,7 @@ struct TestLogScale {
       console.log(logScale2(1048576)); // 700
     });
 
-    D3::LogScale testLog = D3::LogScale();
+    D3::LogScale testLog; 
     testLog.SetDomain(10, 100000);
     testLog.SetRange(0, 700);
     double result1 = testLog.ApplyScaleDouble(1000);
@@ -228,7 +251,7 @@ struct TestLogScale {
     std::cout << "value 2: " << result2 << std::endl;
     std::cout << "value 3: " << result3 << std::endl;
 
-    D3::LogScale testLog2 = D3::LogScale();
+    D3::LogScale testLog2; 
     testLog2.SetBase(2);
     testLog2.SetDomain(16, 1048576);
     testLog2.SetRange(0, 700);
@@ -262,7 +285,7 @@ struct TestSymlogScale {
       console.log(logScale(80000)); // 98.61557140643649
     });
 
-    D3::SymlogScale testSymlog = D3::SymlogScale();
+    D3::SymlogScale testSymlog; 
     testSymlog.SetDomain(-100000, 100000);
     testSymlog.SetConstant(0.01);
     testSymlog.SetRange(-100, 100);
@@ -298,7 +321,7 @@ struct TestIdentityScale {
       console.log(identityScale(1234)); // 1234
     });
 
-    D3::IdentityScale testId = D3::IdentityScale();
+    D3::IdentityScale testId; 
     testId.SetDomain(12, 1234);
     double result1 = testId.ApplyScaleDouble(12);
     double result2 = testId.ApplyScaleDouble(50.6789);
@@ -328,7 +351,7 @@ struct TestTimeScale {
       console.log(timeScale.invert(640)); // Sat Jan 01 2000 16:00:00 GMT-0800 (PST)
     });
 
-    D3::TimeScale testTime = D3::TimeScale();
+    D3::TimeScale testTime;  
     D3::TimeScale::Date dateMin(2000, 0, 1);
     D3::TimeScale::Date dateMax(2000, 0, 2);
     testTime.SetDomain(dateMin, dateMax);
@@ -364,7 +387,7 @@ struct TestSequentialScale {
       console.log(sequentialScale(100)); // returns 'rgb(110, 64, 170)'
     });
 
-    D3::SequentialScale testSeq = D3::SequentialScale();
+    D3::SequentialScale testSeq; 
     testSeq.SetDomain(0, 100);
     testSeq.SetInterpolator("interpolateRainbow");
     std::string result1 = testSeq.ApplyScaleString(0);
@@ -395,22 +418,26 @@ struct TestSequentialQuantileScale {
       console.log(seq(50));  // returns rgb(250, 248, 193)
       console.log(seq(60));  // returns rgb(231, 245, 227)
       console.log(seq(100)); // returns rgb(49, 54, 149)
-      console.log(seq.quantiles(4)); // should return [0, 15, 40, 67.5, 100]
+      // This functionality is included in the newest version of d3-scale, but not base d3
+      // console.log(seq.quantiles(4)); // should return [0, 15, 40, 67.5, 100]
     });
 
-    D3::SequentialQuantileScale testSeq = D3::SequentialQuantileScale();
     emp::array<int, 15> myData = {0, 5, 7, 10, 20, 30, 35, 40, 60, 62, 65, 70, 80, 90, 100};
-    testSeq.SetDomain(myData);
-    testSeq.SetInterpolator("interpolateRainbow");
-    std::string result1 = testSeq.ApplyScaleString(0);
-    std::string result2 = testSeq.ApplyScaleString(50);
-    std::string result3 = testSeq.ApplyScaleString(60);
-    emp::vector<double> result4 = testSeq.GetQuantiles(4);
+    D3::SequentialQuantileScale testSeqQuant; 
+    testSeqQuant.SetDomain(myData);
+    testSeqQuant.SetInterpolator("interpolateRdYlBu");
+    std::string result1 = testSeqQuant.ApplyScaleString(0);
+    std::string result2 = testSeqQuant.ApplyScaleString(50);
+    std::string result3 = testSeqQuant.ApplyScaleString(60);
+    std::string result4 = testSeqQuant.ApplyScaleString(100);
+    // This functionality is included in the newest version of d3-scale, but not base d3
+    // emp::vector<double> result5 = testSeq.GetQuantiles(4);
 
     std::cout << "value 1: " << result1 << std::endl;
     std::cout << "value 2: " << result2 << std::endl;
     std::cout << "value 3: " << result3 << std::endl;
-    std::cout << "value 3: " << result4 << std::endl;
+    std::cout << "value 4: " << result4 << std::endl;
+    // std::cout << "value 5: " << result5 << std::endl;
 
     std::cout << "------SequentialQuantile Test End------" << std::endl << std::endl;
   }
@@ -470,6 +497,7 @@ int main() {
   // TestQuantizeScale test6{};
 }
 
+// This functionality is included in the newest version of d3-scale, but not base d3
 // scaleRadial
 // struct TestRadialScale {
 //   TestRadialScale() {
@@ -497,4 +525,3 @@ int main() {
 //     std::cout << "------Radial Test End------" << std::endl << std::endl;
 //   }
 // };
-

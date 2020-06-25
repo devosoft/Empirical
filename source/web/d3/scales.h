@@ -360,6 +360,7 @@ namespace D3 {
     ContinuousScale & SetInterpolate(const std::string & interpolatorName) = delete;
   };  
 
+  // This functionality is included in the newest version of d3-scale, but not the newest version of base d3
   // scaleRadial
   // class RadialScale : public ContinuousScale {
   // protected:
@@ -490,19 +491,14 @@ namespace D3 {
     }
   };
   
-  // scaleSequential
-  // is used for mapping continuous values to an output range 
-  // determined by a preset (or custom) interpolator
-  // the input domain and output range of a sequential scale always has exactly two elements,
-  // and the output range is typically specified as an interpolator rather than an array of values
-  class SequentialScale : public ContinuousScale {
+  // class for sequential or diverging scale to inherent, should never be called alone
+  // sets up base functionality
+  class SequentialOrDivergingScale : public ContinuousScale {
   protected:
-    SequentialScale(bool derived) : ContinuousScale(true) { ; }
+    SequentialOrDivergingScale(bool derived) : ContinuousScale(true) { ; }
   
   public:
-    SequentialScale() : ContinuousScale(true) {
-      EM_ASM({ emp_d3.objects[$0] = d3.scaleSequential(); }, this->id);
-    }
+    SequentialOrDivergingScale() : ContinuousScale(true) {;}
 
     // get rid of functions that shouldn't be called:
     // Identity scales do not support invert or interpolate
@@ -510,9 +506,8 @@ namespace D3 {
     double Invert(T y) = delete;
     ContinuousScale & SetInterpolate(const std::string & interpolatorName) = delete;
   
-    
     // .interpolator
-    SequentialScale & SetInterpolator(const std::string & interpolatorName) {
+    SequentialOrDivergingScale & SetInterpolator(const std::string & interpolatorName) {
       // note: this doesn't allow you to specify arguments to a d3.interpolator function
       EM_ASM({
         const id = $0;
@@ -525,67 +520,83 @@ namespace D3 {
     }
   };
 
-  // scaleSequentialLog
-  class SequentialLogScale : public SequentialScale {
+  // scaleSequential
+  // is used for mapping continuous values to an output range 
+  // determined by a preset (or custom) interpolator
+  // the input domain and output range of a sequential scale always has exactly two elements,
+  // and the output range is typically specified as an interpolator rather than an array of values
+  class SequentialScale : public SequentialOrDivergingScale {
   protected:
-    SequentialLogScale(bool derived) : SequentialScale(true) { ; }
+    SequentialScale(bool derived) : SequentialOrDivergingScale(true) { ; }
   public:
-    SequentialLogScale() : SequentialScale(true) {
+    SequentialScale() : SequentialOrDivergingScale(true) {
+      EM_ASM({ emp_d3.objects[$0] = d3.scaleSequential(); }, this->id);
+    }
+  };
+   
+
+  // scaleSequentialLog
+  class SequentialLogScale : public SequentialOrDivergingScale {
+  protected:
+    SequentialLogScale(bool derived) : SequentialOrDivergingScale(true) { ; }
+  public:
+    SequentialLogScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialLog(); }, this->id);
     }
   };
 
   // scaleSequentialPow
-  class SequentialPowScale : public SequentialScale {
+  class SequentialPowScale : public SequentialOrDivergingScale {
   protected:
-    SequentialPowScale(bool derived) : SequentialScale(true) { ; }
+    SequentialPowScale(bool derived) : SequentialOrDivergingScale(true) { ; }
   public:
-    SequentialPowScale() : SequentialScale(true) {
+    SequentialPowScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialPow(); }, this->id);
     }
   };
 
   // scaleSequentialSqrt
-  class SequentialSqrtScale : public SequentialScale {
+  class SequentialSqrtScale : public SequentialOrDivergingScale {
   protected:
-    SequentialSqrtScale(bool derived) : SequentialScale(true) { ; }
+    SequentialSqrtScale(bool derived) : SequentialOrDivergingScale(true) { ; }
   public:
-    SequentialSqrtScale() : SequentialScale(true) {
+    SequentialSqrtScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialSqrt(); }, this->id);
     }
   };
 
   // scaleSequentialSymlog
-  class SequentialSymlogScale : public SequentialScale {
+  class SequentialSymlogScale : public SequentialOrDivergingScale {
   protected:
-    SequentialSymlogScale(bool derived) : SequentialScale(true) { ; }
+    SequentialSymlogScale(bool derived) : SequentialOrDivergingScale(true) { ; }
   public:
-    SequentialSymlogScale() : SequentialScale(true) {
+    SequentialSymlogScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialSymlog(); }, this->id);
     }
   };
 
   // scaleSequentialQuantile
-  class SequentialQuantileScale : public SequentialScale {
+  class SequentialQuantileScale : public SequentialOrDivergingScale {
   protected:
-    SequentialQuantileScale(bool derived) : SequentialScale(true) { ; }
+    SequentialQuantileScale(bool derived) : SequentialOrDivergingScale(true) { ; }
   public:
-    SequentialQuantileScale() : SequentialScale(true) {
+    SequentialQuantileScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialQuantile(); }, this->id);
     }
 
+    // This functionality is included in the newest version of d3-scale, but not base d3
     // .quantiles  
     // Returns an array of n + 1 quantiles. For example, if n = 4, returns an array of five numbers: 
     // the minimum value, the first quartile, the median, the third quartile, and the maximum.
-    emp::vector<double> GetQuantiles(const int n) {
-      EM_ASM({
-        emp_i.__outgoing_array = emp_d3.objects[$0].quantiles($1);
-      }, this->id, n);
-      // access JS array
-      emp::vector<double> quantile_vector;
-      emp::pass_vector_to_cpp(quantile_vector);
-      return quantile_vector;
-    }
+    // emp::vector<double> GetQuantiles(const int n) {
+    //   EM_ASM({
+    //     emp_i.__outgoing_array = emp_d3.objects[$0].quantiles($1);
+    //   }, this->id, n);
+    //   // access JS array
+    //   emp::vector<double> quantile_vector;
+    //   emp::pass_vector_to_cpp(quantile_vector);
+    //   return quantile_vector;
+    // }
   };
 
 
@@ -593,72 +604,82 @@ namespace D3 {
   // map a continuous, numeric input domain to a continuous output range. 
   // However, unlike continuous scales, the input domain and output range of a diverging scale always has exactly three elements,
   // and the output range is typically specified as an interpolator rather than an array of values
-  class DivergingScale : public ContinuousScale {
-  protected:
-    DivergingScale(bool derived) : ContinuousScale(true) { ; }
+  // class DivergingScale : public ContinuousScale {
+  // protected:
+  //   DivergingScale(bool derived) : ContinuousScale(true) { ; }
   
-  public:
-    DivergingScale() : ContinuousScale(true) {
-      EM_ASM({ emp_d3.objects[$0] = d3.scaleSequential(); }, this->id);
-    }
+  // public:
+  //   DivergingScale() : ContinuousScale(true) {
+  //     EM_ASM({ emp_d3.objects[$0] = d3.scaleDiverging(); }, this->id);
+  //   }
 
-    // get rid of functions that shouldn't be called:
-    // Identity scales do not support invert or interpolate
-    template <typename T>
-    double Invert(T y) = delete;
-    ContinuousScale & SetInterpolate(const std::string & interpolatorName) = delete;
+  //   // get rid of functions that shouldn't be called:
+  //   // Identity scales do not support invert or interpolate
+  //   template <typename T>
+  //   double Invert(T y) = delete;
+  //   ContinuousScale & SetInterpolate(const std::string & interpolatorName) = delete;
   
     
-    // .interpolator
-    DivergingScale & SetInterpolator(const std::string & interpolatorName) {
-      // note: this doesn't allow you to specify arguments to a d3.interpolator function
-      EM_ASM({
-        const id = $0;
-        const interpolator_str = UTF8ToString($1);
-        var sel = emp_d3.find_function(interpolator_str);
-        emp_d3.objects[id].interpolator(sel);
-      }, this->id, interpolatorName.c_str());
+  //   // .interpolator
+  //   DivergingScale & SetInterpolator(const std::string & interpolatorName) {
+  //     // note: this doesn't allow you to specify arguments to a d3.interpolator function
+  //     EM_ASM({
+  //       const id = $0;
+  //       const interpolator_str = UTF8ToString($1);
+  //       var sel = emp_d3.find_function(interpolator_str);
+  //       emp_d3.objects[id].interpolator(sel);
+  //     }, this->id, interpolatorName.c_str());
 
-      return *this;
+  //     return *this;
+  //   }
+  // };
+
+  // scaleDiverging
+  class DivergingScale : public SequentialOrDivergingScale {
+  protected:
+    DivergingScale(bool derived) : SequentialOrDivergingScale(true) { ; }
+  public:
+    DivergingScale() : SequentialOrDivergingScale(true) {
+      EM_ASM({ emp_d3.objects[$0] = d3.scaleDiverging(); }, this->id);
     }
   };
 
   // scaleDivergingLog
-  class DivergingLogScale : public DivergingScale {
+  class DivergingLogScale : public SequentialOrDivergingScale {
   protected:
-    DivergingLogScale(bool derived) : DivergingScale(true) { ; }
+    DivergingLogScale(bool derived) : SequentialOrDivergingScale(true) { ; }
   public:
-    DivergingLogScale() : DivergingScale(true) {
+    DivergingLogScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleDivergingLog(); }, this->id);
     }
   };
 
   // scaleDivergingPow
-  class DivergingPowScale : public DivergingScale {
+  class DivergingPowScale : public SequentialOrDivergingScale {
   protected:
-    DivergingPowScale(bool derived) : DivergingScale(true) { ; }
+    DivergingPowScale(bool derived) : SequentialOrDivergingScale(true) { ; }
   public:
-    DivergingPowScale() : DivergingScale(true) {
+    DivergingPowScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleDivergingPow(); }, this->id);
     }
   };
 
   // scaleDivergingSqrt
-  class DivergingSqrtScale : public DivergingScale {
+  class DivergingSqrtScale : public SequentialOrDivergingScale {
   protected:
-    DivergingSqrtScale(bool derived) : DivergingScale(true) { ; }
+    DivergingSqrtScale(bool derived) : SequentialOrDivergingScale(true) { ; }
   public:
-    DivergingSqrtScale() : DivergingScale(true) {
+    DivergingSqrtScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleDivergingSqrt(); }, this->id);
     }
   };
 
   // scaleDivergingSymlog
-  class DivergingSymlogScale : public DivergingScale {
+  class DivergingSymlogScale : public SequentialOrDivergingScale {
   protected:
-    DivergingSymlogScale(bool derived) : DivergingScale(true) { ; }
+    DivergingSymlogScale(bool derived) : SequentialOrDivergingScale(true) { ; }
   public:
-    DivergingSymlogScale() : DivergingScale(true) {
+    DivergingSymlogScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleDivergingSymlog(); }, this->id);
     }
   };
@@ -757,7 +778,7 @@ namespace D3 {
       EM_ASM({
         emp_d3.objects[$0] = d3.scaleOrdinal()
       }, this->id);
-    }
+    } 
   };
 
   // scaleBand
