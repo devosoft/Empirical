@@ -1,9 +1,11 @@
 ===============================================================================
 The MIT License (MIT)
 
-Copyright (c) 2015-2017 Michigan State University
-Contributers: Charles Ofria, Emily Dolson, Jacob Fenton, Steven Jorgensen,
-              Jason Stredwick, Luis Zaman, and Jory Schossau
+Copyright (c) 2015-2020 Michigan State University
+Contributers: Charles Ofria, Emily Dolson, Jacob Fenton, Riley Hoffman,
+	      Steven Jorgensen, Alex Lalejini, Robin Miller, Matthew Moreno,
+	      Katherine Perry, Santiago Rodriguez-Papa, Jory Schossau,
+	      Jason Stredwick, Anya Vostinar, and Luis Zaman
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
