@@ -6,8 +6,8 @@
 TEST_CASE("Test SettingConfig", "[config]")
 {
     emp::SettingConfig config_set;
-    config_set.AddSetting<int>("test_non_combo") = {5};  
+    config_set.AddSetting<int>("test_non_combo") = 5;  
 
-    CHECK(config_set.GetValue<double>("test_non_combo") == 5); 
+    CHECK(config_set.GetValue<int>("test_non_combo") == 5); 
 
 }

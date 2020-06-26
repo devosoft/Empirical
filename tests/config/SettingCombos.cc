@@ -5,5 +5,6 @@
 
 TEST_CASE("Test SettingCombos", "[config]")
 {
+  emp::SettingCombos config_set;
 
 }
