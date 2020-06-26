@@ -408,7 +408,6 @@ namespace emp {
     using query_t = Query;
     using tag_t = Tag;
     using uid_t = size_t;
-    using state_t = MatchBinState<Val, tag_t, Regulator>;
 
     virtual ~BaseMatchBin() {};
     virtual emp::vector<uid_t> Match(const query_t & query, size_t n=0) = 0;
@@ -447,9 +446,7 @@ namespace emp {
     virtual const typename Regulator::view_t & ViewRegulator(
       const uid_t uid
     ) const = 0;
-    virtual const state_t & GetState() const = 0;
     virtual void ImprintRegulators(const BaseMatchBin & target) = 0;
-    virtual void ImprintRegulators(const BaseMatchBin::state_t & target) = 0;
     virtual std::string name() const = 0;
     virtual const emp::vector<uid_t>& ViewUIDs() const = 0;
     virtual emp::internal::MatchBinLog<query_t, tag_t>& GetLog() = 0;
@@ -490,7 +487,7 @@ namespace emp {
     using query_t = typename base_t::query_t;
     using tag_t = typename base_t::tag_t;
     using uid_t = typename base_t::uid_t;
-    using state_t = typename base_t::state_t;
+    using state_t = MatchBinState<Val, tag_t, Regulator>;
 
     emp::internal::MatchBinLog<query_t, tag_t> log;
 
@@ -859,27 +856,25 @@ namespace emp {
     /// Set up regulators to match target MatchBin
     void ImprintRegulators(
       const BaseMatchBin<Val, query_t, tag_t, Regulator> & target
-    ) override { ImprintRegulators(target.GetState()); }
-
-    void ImprintRegulators(const state_t & target) override {
+    ) override {
 
       for (const uid_t & uid : state.uids) {
 
         std::unordered_map<uid_t, double> scores;
         std::transform(
-          std::cbegin(target.uids),
-          std::cend(target.uids),
+          std::cbegin(target.ViewUIDs()),
+          std::cend(target.ViewUIDs()),
           std::inserter(scores, std::begin(scores)),
           [&](size_t target_uid){
             return std::pair{
               target_uid,
-              metric(target.tags.at(target_uid), GetTag(uid))
+              metric(target.GetTag(target_uid), GetTag(uid))
             };
           }
         );
         SetRegulator(
           uid,
-          target.regulators.at(
+          target.ViewRegulator(
             std::min_element(
               std::begin(scores),
               std::end(scores),
@@ -915,7 +910,7 @@ namespace emp {
     }
 
     /// Extract MatchBin state
-    const state_t & GetState() const override { return state; }
+    const state_t & GetState() const { return state; }
 
     /// Load MatchBin state
     void SetState(const state_t & state_) {

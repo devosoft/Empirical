@@ -147,13 +147,7 @@ namespace emp {
 
       Event & operator=(const Event &) = default;
       Event & operator=(Event &&) = default;
-      bool operator<(const Event & other) const {
-        return std::tie(id, affinity) < std::tie(other.id, other.affinity);
-      }
-      bool operator==(const Event & other) const {
-        return std::tie(id, affinity, msg, properties)
-          == std::tie(other.id, other.affinity, msg, properties);
-      }
+
       /// Does event object have given property?
       bool HasProperty(std::string property) const { return properties.count(property); }
 
@@ -1861,11 +1855,11 @@ namespace emp {
       for (const auto & target : targets) {
         hw.GetMatchBin().SetRegulator(
           target,
-          state.GetLocal(inst.args[0]) + 0.5
+          state.GetLocal(inst.args[0])
         );
         hw.GetMatchBin().DecayRegulator(
           target,
-          -1 - state.GetLocal(inst.args[1]) // 0 is a no-op
+          -state.GetLocal(inst.args[1]) // 0 is a no-op
         );
       }
 
@@ -1881,11 +1875,11 @@ namespace emp {
 
       hw.GetMatchBin().SetRegulator(
         target,
-        state.GetLocal(inst.args[0]) + 0.5
+        state.GetLocal(inst.args[0])
       );
       hw.GetMatchBin().DecayRegulator(
         target,
-        -1 - state.GetLocal(inst.args[1]) // 0 is a no-op
+        -state.GetLocal(inst.args[1]) // 0 is a no-op
       );
 
     }
@@ -1897,7 +1891,7 @@ namespace emp {
     static void Inst_AdjRegulator(EventDrivenGP_t & hw, const inst_t & inst){
       const State & state = hw.GetCurState();
 
-      const double goal = state.GetLocal(inst.args[0])  + 0.5;
+      const double goal = state.GetLocal(inst.args[0]);
       const double budge = emp::Mod(
         state.GetLocal(inst.args[1]) + 1.0,
         5.0
@@ -1916,7 +1910,7 @@ namespace emp {
         );
         hw.GetMatchBin().DecayRegulator(
           target,
-          -1 - state.GetLocal(inst.args[2]) // 0 is a no-op
+          -state.GetLocal(inst.args[2]) // 0 is a no-op
         );
 
       }
@@ -1931,7 +1925,7 @@ namespace emp {
       const State & state = hw.GetCurState();
 
       const size_t target = state.GetFP();
-      const double goal = state.GetLocal(inst.args[0]) + 0.5;
+      const double goal = state.GetLocal(inst.args[0]);
       const double budge = emp::Mod(
         state.GetLocal(inst.args[1]) + 1.0,
         5.0
@@ -1944,7 +1938,7 @@ namespace emp {
       );
       hw.GetMatchBin().DecayRegulator(
         target,
-        -1 - state.GetLocal(inst.args[2]) // 0 is a no-op
+        -state.GetLocal(inst.args[2]) // 0 is a no-op
       );
 
     }
@@ -1963,7 +1957,7 @@ namespace emp {
       for (const auto & target : targets) {
         hw.GetMatchBin().DecayRegulator(
           target,
-          -1 - state.GetLocal(inst.args[1]) // 0 is a no-op
+          -state.GetLocal(inst.args[1]) // 0 is a no-op
         );
       }
 
@@ -1981,7 +1975,7 @@ namespace emp {
 
       hw.GetMatchBin().DecayRegulator(
         target,
-        -1 - state.GetLocal(inst.args[1]) // 0 is a no-op
+        -state.GetLocal(inst.args[1]) // 0 is a no-op
       );
 
     }
