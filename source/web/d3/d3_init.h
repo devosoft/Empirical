@@ -33,7 +33,7 @@ namespace internal {
   protected:
     int id;
 
-    /// Default constructor - adds placeholder to js.objects array in Javascript
+    /// Default constructor - adds placeholder to emp_d3.objects array in Javascript
     D3_Base() {
       this->id = internal::NextD3ID();
       EM_ASM({
@@ -41,7 +41,7 @@ namespace internal {
       }, this->id);
     }
 
-    /// Construct an object pointing to a pre-determined location in js.objects.
+    /// Construct an object pointing to a pre-determined location in emp_d3.objects.
     /// Warning: This trusts that you know what you're doing in choosing an id.
     D3_Base(int id){
       this->id = id;
@@ -82,7 +82,7 @@ namespace internal {
 
   public:
 
-    /// Get this object's ID (i.e. it's location in the js.objects array in Javascript)
+    /// Get this object's ID (i.e. it's location in the emp_d3.objects array in Javascript)
     int GetID() const {
       return this->id;
     }
