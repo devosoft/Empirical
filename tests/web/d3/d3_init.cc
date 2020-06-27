@@ -219,21 +219,44 @@ struct TestThingy : BaseTest {
   void Describe() override {
     std::cout << "  > Testing thingy!" << std::endl;
     std::cout << "      num = " << num << std::endl;
+    EM_ASM({
+      $("#emp_test_container").append("<p>HELLO "+$0+"<p>");
+      $("#emp_test_container").append("<p>HELLO "+$0+"<p>");
+      $("#emp_test_container").append("<p>HELLO "+$0+"<p>");
+      $("#emp_test_container").append("<p>HELLO "+$0+"<p>");
+    }, num);
   }
 };
 
-emp::web::Document doc("test_d3_init");
 TestManager test_manager;
 
 int main() {
-  D3::internal::get_emp_d3();
-  std::cout << "Creating test manager." << std::endl;
+  emp::Initialize();          // Initialize emp
+  D3::internal::get_emp_d3(); // Initialize emp_d3
+  // Append container div to document.
+  EM_ASM({
+    $("body").append('<div id="emp_test_container"></div>');
+  });
+  // First, use js to add anything you need to the html
 
+  std::cout << "Creating test manager." << std::endl;
   test_manager.AddTest<Test_BaseObjectIDAssignment>();
   test_manager.AddTest<Test_BaseObjectIDAssignment>(); // demo that we can add tests arbitrary number of times
   test_manager.AddTest<TestThingy>(1);
+  test_manager.AddTest<TestThingy>(2);
+  test_manager.AddTest<TestThingy>(3);
+  test_manager.AddTest<TestThingy>(4);
   test_manager.AddTest<Test_LibraryD3>();
 
-  test_manager.OnBeforeEachTest([]() { ResetD3Context(); });
+  test_manager.OnBeforeEachTest([]() {
+    EM_ASM({
+      console.log($("#emp_test_container").html());
+    });
+    ResetD3Context();
+    EM_ASM({
+      console.log($("#emp_test_container").html());
+    });
+  });
+
   test_manager.Run();
 }

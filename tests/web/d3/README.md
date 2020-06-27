@@ -6,5 +6,14 @@ emcc -Wall -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments -Wno-doll
 Run d3_init.cc test
 ```
 cd ../.. && third-party/node_modules/karma/bin/karma start tests/web/d3/karma.conf.js
-
 ```
+
+## Rolling tests out beyond d3
+
+Refresh the browser?
+```
+location.reload()
+```
+No! This breaks testing framework environment (it assumes no refreshes allowed).
+
+Add a container div to wipe every time.
