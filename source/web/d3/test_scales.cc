@@ -18,26 +18,116 @@ UI::Document doc("emp_d3_test");
 //******** Continuous Scales ********//
 //***********************************// 
 
+// for vectors
+template <typename T>
+void pass_map_to_javascript(emp::vector<std::string> & keys, emp::vector<T> & values) { 
+  // initialize emp_js_map object
+  EM_ASM({
+    window["emp_cpp_map"] = ( {"cpp_keys" : [],
+                              "cpp_values" : [],
+                              "cpp_dict" : {} } );
+  });
+
+  emp::pass_array_to_javascript(keys);
+  EM_ASM({
+    window["emp_cpp_map"].cpp_keys = emp_i.__incoming_array;
+  });
+
+  emp::pass_array_to_javascript(values);
+  EM_ASM({
+    window["emp_cpp_map"].cpp_values = emp_i.__incoming_array;
+ 
+    // create dictionary 
+    window["emp_cpp_map"].cpp_keys.forEach(function(key, val) {
+      window["emp_cpp_map"].cpp_dict[key] = window["emp_cpp_map"].cpp_values[val]
+    });
+    // console.log(window["emp_cpp_map"].cpp_dict);
+  });
+}
+
+// for arrays
+template <typename T, size_t SIZE>
+void pass_map_to_javascript(emp::array<std::string, SIZE> & keys, emp::array<T, SIZE> & values) { 
+  // initialize emp_js_map object
+  EM_ASM({
+    window["emp_cpp_map"] = ( {"cpp_keys" : [],
+                              "cpp_values" : [],
+                              "cpp_dict" : {} } );
+  });
+
+  emp::pass_array_to_javascript(keys);
+  EM_ASM({
+    window["emp_cpp_map"].cpp_keys = emp_i.__incoming_array;
+  });
+
+  emp::pass_array_to_javascript(values);
+  EM_ASM({
+    window["emp_cpp_map"].cpp_values = emp_i.__incoming_array;
+ 
+    // create dictionary 
+    window["emp_cpp_map"].cpp_keys.forEach(function(key, val) {
+      window["emp_cpp_map"].cpp_dict[key] = window["emp_cpp_map"].cpp_values[val]
+    });
+    // console.log(window["emp_cpp_map"].cpp_dict);
+  });
+}
+
+// for std::map
+template <typename T>
+void pass_map_to_javascript(std::map<std::string, T> & dict) { 
+  // extract keys and values from dict
+  emp::vector<std::string> keys;
+  emp::vector<T> values;
+  for(typename std::map<std::string, T>::iterator it = dict.begin(); it != dict.end(); ++it) {
+    keys.push_back(it->first);
+    values.push_back(it->second);
+  }
+  
+  // initialize emp_js_map object
+  EM_ASM({
+    window["emp_cpp_map"] = ( {"cpp_keys" : [],
+                              "cpp_values" : [],
+                              "cpp_dict" : {} } );
+  });
+
+  emp::pass_array_to_javascript(keys);
+  EM_ASM({
+    window["emp_cpp_map"].cpp_keys = emp_i.__incoming_array;
+  });
+
+  emp::pass_array_to_javascript(values);
+  EM_ASM({
+    window["emp_cpp_map"].cpp_values = emp_i.__incoming_array;
+ 
+    // create dictionary 
+    window["emp_cpp_map"].cpp_keys.forEach(function(key, val) {
+      window["emp_cpp_map"].cpp_dict[key] = window["emp_cpp_map"].cpp_values[val]
+    });
+    // console.log(window["emp_cpp_map"].cpp_dict);
+  });
+}
+
 // scaleLinear
 struct TestLinearScale {
   TestLinearScale() {
     std::cout << "------Linear Test Begin------" << std::endl;
 
     // initialize objects in JavaScript
+    // combine two arrays to make a final lookup (dict) dictionay
     EM_ASM({
-      window["test_linear_scale"] = ( {"js_results" : [],
-                                      "js_results_names" : [],
-                                       "cpp_results" : [],
-                                       "cpp_results_names" : [],
-                                       "js_results_lu" : {},
-                                       "cpp_results_lu" : {} } );
+      window["test_linear_scale"] = ( {"js_keys" : [],
+                                      "js_values" : [],
+                                       "cpp_keys" : [],
+                                       "cpp_values" : [],
+                                       "js_dict" : {},
+                                       "cpp_dict" : {} } );
     });
 
     // a vector to store results
-    emp::vector<int> cpp_result_vec;
+    emp::vector<int> cpp_values_vec;
 
     // a vector to store names
-    emp::vector<std::string> cpp_name_vec;
+    emp::vector<std::string> cpp_keys_vec;
 
     D3::LinearScale testLinearX; 
     testLinearX.SetDomain(10, 130.00);
@@ -46,68 +136,58 @@ struct TestLinearScale {
     int result2 = testLinearX.ApplyScaleInt(50);
     int result1i = testLinearX.Invert<int>(80);
     int result2i = testLinearX.Invert<int>(320);
+    cpp_values_vec.push_back(result1); 
+    cpp_values_vec.push_back(result2);
+    cpp_values_vec.push_back(result1i);
+    cpp_values_vec.push_back(result2i);
+    cpp_keys_vec.push_back("applyScale1"); 
+    cpp_keys_vec.push_back("applyScale2");
+    cpp_keys_vec.push_back("invert1");
+    cpp_keys_vec.push_back("invert2");
 
-    cpp_result_vec.push_back(result1); 
-    cpp_result_vec.push_back(result2);
-    cpp_result_vec.push_back(result1i);
-    cpp_result_vec.push_back(result2i);
-
-    cpp_name_vec.push_back("applyScale1"); 
-    cpp_name_vec.push_back("applyScale2");
-    cpp_name_vec.push_back("invert1");
-    cpp_name_vec.push_back("invert2");
-
-    std::cout << "value 1: " << result1 << std::endl;
-    std::cout << "value 2: " << result2 << std::endl;
-    std::cout << "value 1 invert: " << result1i << std::endl;
-    std::cout << "value 2 invert: " << result2i << std::endl;
-    
-    // add cpp results to JS
-    emp::pass_array_to_javascript(cpp_result_vec);
-
-    EM_ASM({
-      window["test_linear_scale"].cpp_results = emp_i.__incoming_array;
-      console.log(window["test_linear_scale"].cpp_results);
-    });
-
-    emp::pass_array_to_javascript(cpp_name_vec);
-
-    EM_ASM({
-      window["test_linear_scale"].cpp_results_names = emp_i.__incoming_array;
-      console.log(window["test_linear_scale"].cpp_results_names);
-    });
-
-    // add JS results
-    EM_ASM({  
-      var x = d3.scaleLinear()
-                  .domain([ 10, 130 ])
-                  .range([ 0, 960 ]);
-
-      console.log(x(20));         // 80
-      console.log(x(50));         // 320
-      console.log(x.invert(80));  // 20
-      console.log(x.invert(320)); // 50
-
-      var color = d3.scaleLinear()
-                      .domain([ 10, 100 ])
-                      .range([ "brown", "steelblue" ]);
-
-      console.log(color(20)); // "#9a3439" or "rgb(154, 52, 57)"
-      console.log(color(50)); // "#7b5167" or "rgb(123, 81, 103)"
-    });
-
-    // function pass_map_to_javascript
-    // create dictionaries based on object above
-
-    // D3::LinearScale testLinearColor; // = D3::LinearScale();
+    // D3::LinearScale testLinearColor; 
     // testLinearColor.SetDomain(10, 100);
     // emp::array<std::string, 2> colorArray = {"brown", "steelblue"};
     // testLinearColor.SetRange(colorArray);
     // std::string result3 = testLinearColor.ApplyScaleString(20);
     // std::string result4 = testLinearColor.ApplyScaleString(50);
+    // cpp_keys_vec.push_back("color1");
+    // cpp_keys_vec.push_back("color2");
+    // cpp_values_vec.push_back(result3);
+    // cpp_values_vec.push_back(result4);
 
-    // std::cout << "value 3: " << result3 << std::endl;
-    // std::cout << "value 4: " << result4 << std::endl;
+    pass_map_to_javascript(cpp_keys_vec, cpp_values_vec);
+    
+    // add results to JS
+    EM_ASM({  
+      var x = d3.scaleLinear()
+                  .domain([ 10, 130 ])
+                  .range([ 0, 960 ]);
+
+      var color = d3.scaleLinear()
+                      .domain([ 10, 100 ])
+                      .range([ "brown", "steelblue" ]);
+
+      // add js results
+      window["test_linear_scale"].js_values.push(x(20), x(50), x.invert(80), x.invert(320)); //, color(20), color(50));
+      window["test_linear_scale"].js_keys.push("applyScale1", "applyScale2", "invert1", "invert2"); //, "color1", "color2");
+
+      // add to dict 
+      window["test_linear_scale"].js_keys.forEach(function(key, val) {
+        window["test_linear_scale"].js_dict[key] = window["test_linear_scale"].js_values[val]
+      });
+
+      // add cpp stuff
+      window["test_linear_scale"].cpp_keys = window["emp_cpp_map"].cpp_keys;
+      window["test_linear_scale"].cpp_values = window["emp_cpp_map"].cpp_values;
+      window["test_linear_scale"].cpp_dict = window["emp_cpp_map"].cpp_dict;
+      
+      console.log(window["test_linear_scale"].js_dict);
+      console.log(window["test_linear_scale"].cpp_dict);
+
+      // compare both dictionaries
+      console.log(JSON.stringify(window["test_linear_scale"].js_dict) === JSON.stringify(window["test_linear_scale"].cpp_dict));
+    });
    
     std::cout << "------Linear Test End------" << std::endl << std::endl;
   }
@@ -551,14 +631,18 @@ int main() {
   TestSymlogScale test5{};
   TestIdentityScale test6{};
   TestTimeScale test7{};
-
   TestSequentialScale test8{};
 
   TestSequentialQuantileScale test10{};
-
   TestDivergingScale test11{};
 
-  // TestQuantizeScale test6{};
+  // emp::array<std::string, 5> keysCpp = {"test1", "test2", "test3", "test4", "test5"};
+  // // emp::array<int, 5> keysCpp = {11, 12, 13, 14, 15};
+  // emp::array<std::string, 5> vals = {"red", "blue", "blue", "yellow", "purple"};
+  // pass_map_to_javascript(keysCpp, vals); 
+
+  // std::map<std::string, std::string> testMap = {{"test1", "a"}, {"test2", "b"}, {"test3", "c"}, {"test4", "d"}, {"test5", "e"}}; 
+  // pass_map_to_javascript(testMap);  
 }
 
 // This functionality is included in the newest version of d3-scale, but not base d3

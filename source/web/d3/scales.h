@@ -8,9 +8,8 @@
  */
 
 // TODO:
-// add .thresholds and .quantiles in quantize and quantile scale
 // test quantize, quantile threshold scale (including functions like invert extent)
-// clean up copy constructur?
+// clean up copy constructur? -- ask group
 
 // make nice testing framework in C++ 
 // make pass_map_to_js psuedo thingy (see test_scales)
@@ -185,7 +184,7 @@ namespace D3 {
     }
     
     // Getter methods for a scale's domain and range
-    // Use: GetDomain.domain()
+    // Use: GetDomain<type>()
     template <typename T>
     emp::vector<T> GetDomain() {
       EM_ASM({
@@ -725,7 +724,6 @@ namespace D3 {
   };
 
   // scaleQuantize
-  // thresholds
   class QuantizeScale : public ContinuousInputDiscreteOutputScale { 
   protected: 
     QuantizeScale(bool derived) : ContinuousInputDiscreteOutputScale(true) {;}
@@ -762,6 +760,16 @@ namespace D3 {
     }
 
     // .thresholds()
+    template <typename T>
+    emp::vector<T> GetThresholds() {
+      EM_ASM({
+        emp_i.__outgoing_array = emp_d3.objects[$0].thresholds();
+      }, this->id);
+      // access JS array
+      emp::vector<T> thresholds_vec;
+      emp::pass_vector_to_cpp(thresholds_vec);
+      return thresholds_vec;
+    }
   };
 
   // scaleQuantile
@@ -777,23 +785,21 @@ namespace D3 {
         emp_d3.objects[$0] = d3.scaleQuantile();
       }, this->id);
     }
-   
+
     // .quantiles()
-    // Returns an array of n + 1 quantiles. For example, if n = 4, returns an array of five numbers: 
-    // the minimum value, the first quartile, the median, the third quartile, and the maximum.
-    // emp::vector<double> GetQuantiles(const int n) {
-    //   EM_ASM({
-    //     emp_i.__outgoing_array = emp_d3.objects[$0].quantiles($1);
-    //   }, this->id, n);
-    //   // access JS array
-    //   emp::vector<double> quantile_vector;
-    //   emp::pass_vector_to_cpp(quantile_vector);
-    //   return quantile_vector;
-    // } 
+    template <typename T>
+    emp::vector<T> GetQuantiles() {
+      EM_ASM({
+        emp_i.__outgoing_array = emp_d3.objects[$0].quantiles();
+      }, this->id);
+      // access JS array
+      emp::vector<T> quantiles_vec;
+      emp::pass_vector_to_cpp(quantiles_vec);
+      return quantiles_vec;
+    }
   };
 
   // scaleThreshold
-  // no quantiles
   class ThresholdScale : public ContinuousInputDiscreteOutputScale {
   protected:
     ThresholdScale(bool derived) : ContinuousInputDiscreteOutputScale(true) {;}
