@@ -16,6 +16,7 @@
 #include "CommentBox.h"
 #include "FontAwesomeIcon.h"
 #include "Collapse.h"
+#include "ToggleSwitch.h"
 
 namespace emp {
     namespace prefab{
@@ -287,6 +288,7 @@ namespace emp {
 
 
                         if (Has(numeric_types, type)) {
+<<<<<<< HEAD
                             // Seems more efficient to use web::Input, but it's not working
                             // TODO: need to define on change function to use built in Input
                             // emp::web::Input slider([this, name](std::string val){
@@ -308,6 +310,8 @@ namespace emp {
                             setting_element << spacer;
                             spacer.SetAttr("class", "blank_div");
 
+=======
+>>>>>>> b7cb8b4... updated classes
                             const std::string name_input_slider = name + "_input_slider";
                             const std::string name_input_number = name + "_input_number";
                             const std::string name_input_mobile_slider = name + "_input_mobile_slider";
@@ -403,7 +407,6 @@ namespace emp {
                                 SetDefaultRangeFixedPoint(number, emp::from_string<int>(value));
                                 SetDefaultRangeFixedPoint(mobile_slider, emp::from_string<int>(value));
                             }
-                            std::cout << "After calling set default range methods" << std::endl;
 
                         }
                         else if (type == "bool") {
@@ -412,7 +415,14 @@ namespace emp {
                                                               on_change_fun(val);},
                                 "checkbox", NULL, name + "_input_checkbox"
                             );
-                            setting_element << bool_input;
+                            // Default checkbox
+                            // setting_element << bool_input;
+                            // bool_input.SetAttr("class", "input_bool");
+
+                            // Bootstrap Toggle Switch (need at least v4.5.0)
+                            emp::prefab::ToggleSwitch toggle_switch(bool_input);
+                            setting_element << toggle_switch;
+                            toggle_switch.AddClass("input_bool");
 
 >>>>>>> 9738447... display appropriate setting descriptions and synchronize form when one input is changed
                         } else {

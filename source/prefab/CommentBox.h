@@ -4,30 +4,6 @@
 #include "../web/Div.h"
 #include "../tools/string_utils.h"
 
-/* Notes for how to use
-
-include "prefab/CommentBox.h"
-
-for (int i=0; i < 2; i++){
-    emp::CommentBox box; 
-    box.AddContent("Box ");
-    box.AddContent(i);
-    doc << box.GetDiv();
-  }
-
-emp::CommentBox box;
-UI::Div title("desktop_content");
-title << "<h1>Shows in Desktop view</h1>";
-UI::Element mobile("span");
-mobile << "<p>Here is hidden info</p>";
-mobile << "<hr>";
-box.AddContent(title);
-box.AddMobileContent(mobile);
-box.AddMobileContent("<b>Even more hidden info!</b>");
-doc << box.GetDiv();
-
-*/
-
 namespace emp {
     namespace prefab{
         class CommentBox: public web::Div {
@@ -43,10 +19,10 @@ namespace emp {
                     *this << all_content;
                     all_content << desktop_content;
                     all_content << mobile_content;
-                    //TODO: change class names to reflect comment box
-                    triangle.SetAttr("class", "dropdown_triangle");
-                    all_content.SetAttr("class", "dropdown_content");
-                    mobile_content.SetAttr("class", "mobile_dropdown");
+                    
+                    triangle.SetAttr("class", "commentbox_triangle");
+                    all_content.SetAttr("class", "commentbox_content");
+                    mobile_content.SetAttr("class", "mobile_commentbox");
                     }
                 template <typename T>
                 void AddContent(T val){
