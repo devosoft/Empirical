@@ -288,6 +288,8 @@ namespace web {
     //     cycle_obj.innerHTML = "&nbsp;&nbsp;&nbsp;Cycles Used = " + $2;
     // }, ss.str().c_str(), scroll_frac, hardware->GetExeCount());
 
+        internal::WidgetInfo::TriggerJS();
+
       }
 
     public:

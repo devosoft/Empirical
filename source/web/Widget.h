@@ -37,6 +37,7 @@
 
 #include "../base/vector.h"
 #include "../tools/mem_track.h"
+#include "../control/Signal.h"
 
 #include "events.h"
 #include "Font.h"
@@ -223,6 +224,7 @@ namespace web {
       emp::vector<Widget> dependants; ///< Widgets to be refreshed if this one is triggered
       Widget::ActivityState state;    ///< Is this element active in DOM?
 
+      emp::Signal<void()> on_update_js_signal; /// Signal for JavaScript functions to be called with TriggerJS()
 
       /// WidgetInfo cannot be built unless within derived class, so constructor is protected
       WidgetInfo(const std::string & in_id="")
@@ -334,7 +336,14 @@ namespace web {
       virtual void GetHTML(std::stringstream & ss) = 0;
 
       // Derived widgets may also provide JavaScript code to be run on redraw.
-      virtual void TriggerJS() { ; }
+      virtual void TriggerJS() { 
+        on_update_js_signal.Trigger();
+      }
+
+      // Add JS function to be executed when TriggerJS() is called
+      SignalKey DoUpdateJS(const std::function<void()> &fun){
+        return on_update_js_signal.AddAction(fun);
+      }
 
       // Assume that the associated ID exists and replace it with the current HTML code.
       virtual void ReplaceHTML() {
@@ -356,7 +365,8 @@ namespace web {
         // If active update style, trigger JS, and recurse to children!
         if (state == Widget::ACTIVE) {
           extras.Apply(id); // Update the attributes, style, and listeners.
-          TriggerJS();      // Run associated Javascript code, if any (e.g., to fill out a canvas)
+          // commented this out when testing HightlightJS, called in protected section of DivInfo instead
+          // TriggerJS();      // Run associated Javascript code, if any (e.g., to fill out a canvas)
         }
       }
 
@@ -897,6 +907,11 @@ namespace web {
         wrapper << (return_t &) *this;
 
         return (return_t &) *this;
+      }
+
+      // Add JS function to on_update_js_sig
+      SignalKey DoUpdateJS(const std::function<void()> & fun){
+        return info->DoUpdateJS(fun);
       }
 
     };
