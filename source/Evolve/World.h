@@ -854,9 +854,7 @@ namespace emp {
     emp::vector<size_t> GetEmptyPopIDs() { return FindCellIDs([](ORG*org){ return !org; }); }
 
     /// Return IDs of all occupied neighbors of specified position.
-    emp::vector<size_t> GetValidNeighborOrgIDs(size_t id) { 
-      return FindCellIDs([id](ORG*org){ return (((bool) org) && IsNeighbor(id, org.GetIndex()));});
-    }
+    emp::vector<size_t> GetValidNeighborOrgIDs(size_t id);
 
 
     // --- POPULATION MANIPULATIONS ---
@@ -977,7 +975,7 @@ namespace emp {
 
     // Since neighbors are anywhere in the same population, all organisms in the same
     // population are neighbors.
-    fun_is_neighbor = [this](size_t pos1, size_t pos2) {return true;};
+    fun_is_neighbor = [](size_t pos1, size_t pos2) {return true;};
 
     // Kill random organisms and move end into vacant position to keep pop compact.
     fun_kill_org = [this](){
@@ -1026,7 +1024,7 @@ namespace emp {
     fun_get_neighbor = [this](WorldPosition pos) { return pos.SetIndex(GetRandomCellID()); };
 
     // Neighbors are anywhere in same population, so all organisms are neighbors.
-    fun_is_neighbor = [this](size_t pos) {return true;};
+    fun_is_neighbor = [](size_t pos1, size_t pos2) {return true;};
 
     // Kill random organisms and move end into vacant position to keep pop compact.
     fun_kill_org = [this](){
@@ -1099,14 +1097,13 @@ namespace emp {
       emp_assert(pop_sizes.size() == 2);
 
       const size_t size_x = pop_sizes[0];
-      const size_t size_y = pop_sizes[1];
 
       if(id1 == id2) { //self, not neighbors
 	return false;
       }
 
-      int row_diff = (id1 - id2) / size_x;
-      int col_diff = id1%size_x - id2%size_x;
+      double row_diff = (id1 - id2) / size_x;
+      double col_diff = id1%size_x - id2%size_x;
 
       if((abs(row_diff) <= 1) && (abs(col_diff) <= 1))	return true;
       else return false;
@@ -1374,6 +1371,20 @@ namespace emp {
     emp::vector<size_t> valid_IDs(0);
     for (size_t i = 0; i < pop.size(); i++) {
       if (filter(pop[i].Raw())) valid_IDs.push_back(i);
+    }
+    return valid_IDs;
+  }
+
+  /// Return IDs of all occupied neighbors of specified position.
+  template<typename ORG>
+  emp::vector<size_t> World<ORG>::GetValidNeighborOrgIDs(size_t id) { 
+    //Note: this function is similar to FindCellIDs, but because ORG don't know their index, 
+    //FindCellIDs can't be used.
+    emp::vector<size_t> valid_IDs(0);
+    for(size_t i = 0; i < pop.size(); i++) {
+      if ((bool) (pop[i].Raw()) && IsNeighbor(id, i)) {
+	valid_IDs.push_back(i);
+      }
     }
     return valid_IDs;
   }
