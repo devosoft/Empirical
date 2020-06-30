@@ -130,7 +130,7 @@ public:
         // Queue up cleanup for this test
         describe("Cleanup test " + test_id, function() {
           it('should clean up test ' + test_id, function() {
-            emp.CleanupTest($0);
+            emp.CleanupTest(test_id);
           });
         });
       }, runner_id);

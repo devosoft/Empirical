@@ -1,10 +1,12 @@
 #include "web/Document.h"
 #include "web/d3/d3_init.h"
+#include "web/d3/transition.h"
 #include "d3_testing_utils.h"
 
 struct Test_Transition : BaseTest {
 
   void Setup() { ; }
+
   void Describe() {
     EM_ASM({
       describe("transition", function() {
