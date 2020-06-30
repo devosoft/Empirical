@@ -1,5 +1,5 @@
 # Flags to use regardless of compiler
-CFLAGS_all := -Wall -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments -Wno-dollar-in-identifier-extension -std=c++17 -I../../source/
+CFLAGS_all := -Wall -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments -Wno-dollar-in-identifier-extension -std=c++17 -I../../source/ -I../../
 
 # Emscripten compiler information
 CXX_web := emcc
@@ -16,7 +16,7 @@ OFLAGS_web_braces := -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMO
 CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../source/web/library_emp.js --js-library ../../source/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "stringToUTF8"]' -s WASM=0
 
 default: all
-all: GetUrlParams.js js_utils.js test_visualizations.js test_widget.js test_jswrap.js color_map
+all: GetUrlParams.js js_utils.js test_visualizations.js test_widget.js jswrap.js color_map
 
 color_map: color_map.cc
 	g++ $(CFLAGS_all) color_map.cc -o color_map.out
@@ -33,11 +33,11 @@ test_visualizations.js: visualizations.cc
 test_widget.js: test_widget.cc
 	$(CXX_web) $(CFLAGS_web) test_widget.cc -o test_widget.js
 
-test_jswrap.js: TestJSWrap.cc
-	$(CXX_web) $(CFLAGS_web) TestJSWrap.cc -o test_jswrap.js
+jswrap.js: JSWrap.cc
+	$(CXX_web) $(CFLAGS_web) JSWrap.cc -o jswrap.js
 
 clean:
-	rm -f GetUrlParams.js JSWrap.js js_utils.js test_visualizations.js test_widget.js test_jswrap.js *.js.map *.js.mem *~ color_map.out
+	rm -f GetUrlParams.js JSWrap.js js_utils.js test_visualizations.js test_widget.js jswrap.js *.js.map *.js.mem *~ color_map.out
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
