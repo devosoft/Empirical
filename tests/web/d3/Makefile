@@ -15,11 +15,14 @@ OFLAGS_web_braces := -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMO
 CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../../source/web/library_emp.js --js-library ../../../source/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "stringToUTF8"]' -s WASM=0
 
 default: all
-all: d3_init.js transition.js
+all: d3_init.js selection.js transition.js
 
 
 d3_init.js: d3_init.cc
 	$(CXX_web) $(CFLAGS_web) d3_init.cc -o d3_init.js
+
+selection.js: selection.cc
+	$(CXX_web) $(CFLAGS_web) selection.cc -o selection.js
 
 transition.js: transition.cc
 	$(CXX_web) $(CFLAGS_web) transition.cc -o transition.js

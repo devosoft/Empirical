@@ -38,7 +38,7 @@ namespace internal {
       /// Create a new selection/transition containing the first element matching the
       /// [selector] string that are within this current selection/transition
       DERIVED Select(const std::string & selector) const {
-        const int new_id = NextD3ID();
+        const int new_id =internal::NextD3ID();
 
         EM_ASM({
           const id = $0;
@@ -54,7 +54,7 @@ namespace internal {
       /// Create a new selection/transition containing all elements matching the [selector]
       /// string that are within this current selection/transition
       DERIVED SelectAll(const std::string & selector) const {
-        const int new_id = NextD3ID();
+        const int new_id =internal::NextD3ID();
 
         EM_ASM({
           const id = $0;
@@ -75,10 +75,15 @@ namespace internal {
       /// string representing a function in either the d3, emp, or window namespaces that
       /// returns a bool, or a string containing a selector to filter by.
       ///
+      /// Note that the version of this function that accepts a C++ function to filter by does not
+      /// allow that function to accept the optional third argument (nodes) that d3 passes to a filter
+      /// function. In order to use that argument, use the version of filter that accepts a Javascript
+      /// function name as a string.
+      ///
       /// For more information see the
       /// [D3 documentation](https://github.com/d3/d3-3.x-api-reference/blob/master/Selections.md#filter)
       DERIVED Filter(const std::string & selector) const {
-        const int new_id = NextD3ID();
+        const int new_id =internal::NextD3ID();
 
         EM_ASM({
           const id = $0;
@@ -92,13 +97,31 @@ namespace internal {
       }
 
       /// @cond TEMPLATES
-
+      // This version handles values that are C++ functions and wraps them with JSWrap
+      // If a function is being used repeatedly, it may be more efficient to wrap it
+      // once and then pass the name as a string.
+      // Note that this version does not allow the filter function to accept the optional
+      // third argument (nodes), because there isn't currently a way to write a C++
+      // function that will accept a group of nodes as an argument. If you need to use the
+      // third argument, you should implement the function in Javascript and use the previous
+      // version of filter to refer to it.
       template <typename T>
       emp::sfinae_decoy<DERIVED, decltype(&T::operator())>
       Filter(T selector) const {
-        const int new_id = NextD3ID();
-        D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(filter, selector);
-        StoreNewObject(new_id);
+        const int new_id =internal::NextD3ID();
+        const uint32_t func_id = emp::JSWrap(selector);
+
+        EM_ASM({
+          const id = $0;
+          const func_id = $1;
+          // We leave off the third argument (nodes) because a wrapped C++ will not
+          // be able to accept it as an argument.
+          emp_d3.objects[id].filter(name, function(d, i) {
+                                              return emp.Callback(func_id, d, i);
+                                            });
+        }, this->id, func_id);
+
+        emp::JSDelete(func_id);
         return DERIVED(new_id);
       }
 
@@ -108,6 +131,11 @@ namespace internal {
       /// Call the given function on each element of the selection/transition. [function] can
       /// either be a C++ function or a string with the name of a Javascript function in the d3,
       /// emp, or current window namespace.
+      ///
+      /// Note that the version of this function that accepts a C++ function as an argument will not pass
+      /// the third argument (nodes) to that function. In order to use a function that accepts all three
+      /// arguments that d3 can pass to the function, implement the function in Javascript and refer to it
+      /// by name using the version of this function that accepts a string as a an argument.
       DERIVED & Each(const std::string & function_name) {
 
         EM_ASM({
@@ -125,7 +153,21 @@ namespace internal {
       template <typename T>
       emp::sfinae_decoy<DERIVED&, decltype(&T::operator())>
       Each(T function) {
-        D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(each, function);
+
+        const uint32_t func_id = emp::JSWrap(function);
+
+        EM_ASM({
+          const id = $0;
+          const func_id = $1;
+          // We leave off the third argument (nodes) because a wrapped C++ will not
+          // be able to accept it as an argument.
+          emp_d3.objects[id].each(name, function(d, i) {
+                                              return emp.Callback(func_id, d, i);
+                                            });
+        }, this->id, func_id);
+
+        emp::JSDelete(func_id);
+
         return *(static_cast<DERIVED *>(this));
       }
 
@@ -141,7 +183,7 @@ namespace internal {
       }
 
       DERIVED Merge(DERIVED & other) {
-        const int new_id = NextD3ID();
+        const int new_id = internal::NextD3ID();
         EM_ASM({
           const id = $0;
           const other_id = $1;
@@ -282,7 +324,7 @@ namespace internal {
           } else {
             emp_d3.objects[id].style(style_name, func_value);
           }
-        }, this->id, name.c_str(), value.c_str(), (int32_t)priority);
+        }, this->id, name.c_str(), value.c_str(), (uint32_t)priority);
 
         return *(static_cast<DERIVED *>(this));
       }
@@ -304,7 +346,7 @@ namespace internal {
           } else {
             emp_d3.objects[id].style(style_name, func_value);
           }
-        }, this->id, name.c_str(), value, (int32_t)priority);
+        }, this->id, name.c_str(), value, (uint32_t)priority);
 
         return *(static_cast<DERIVED *>(this));
       }
@@ -314,8 +356,34 @@ namespace internal {
       // once and then pass the name as a string.
       template <typename T>
       emp::sfinae_decoy<DERIVED&, decltype(&T::operator())>
-      SetStyle(const std::string & name, T value) {
-        D3_CALLBACK_METHOD_CPP_FUNCTION_2_ARGS(style, name.c_str(), value);
+      SetStyle(const std::string & name, T value, bool priority=false) {
+        uint32_t fun_id = emp::JSWrap(value, "", false);
+
+        EM_ASM({
+          const id = $0;
+          const name = UTF8ToString($1);
+          const fun_id = $2;
+          const priority = $3;
+
+          if (priority) {
+            emp_d3.objects[i].style(
+              name,
+              function(d, i) {
+                return emp.Callback(fun_id, d, i);
+              },
+              "important"
+            );
+          } else {
+            emp_d3.objects[i].style(
+              name,
+              function(d, i) {
+                return emp.Callback(fun_id, d, i);
+              }
+            );
+          }
+        }, this->id, name.c_str(), fun_id, (uint32_t)priority);
+
+        emp::JSDelete(fun_id);
         return *(static_cast<DERIVED *>(this));
       }
 
@@ -339,14 +407,18 @@ namespace internal {
 
       /// Sets this selection's text to the specified string, or the string returned by running the
       /// specified function on the element's bound data
-      DERIVED & SetText(const std::string & text) {
+      DERIVED & SetText(const std::string & text, bool literal=false) {
+
         EM_ASM({
           const id = $0;
-          const new_id = $1;
-          const value_name = UTF8ToString($2);
-          const value = emp_d3.find_function(value_name);
-          emp_d3.objects[new_id] = emp_d3.objects[id].text(value);
-        }, this->id, new_id, text.c_str());
+          const value_name = UTF8ToString($1);
+          const literal = $2;
+          var value = value_name;
+          if (!literal) {
+            value = emp_d3.find_function(value_name);
+          }
+          emp_d3.objects[id].text(value);
+        }, this->id, text.c_str(), literal);
 
         return *(static_cast<DERIVED *>(this));
       }
@@ -356,7 +428,19 @@ namespace internal {
       template <typename T>
       emp::sfinae_decoy<DERIVED&, decltype(&T::operator())>
       SetText(T func) {
-        D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(text, func);
+        const uint32_t func_id = emp::JSWrap(func);
+
+        EM_ASM({
+          const id = $0;
+          const func_id = $1;
+          // We leave off the third argument (nodes) because a wrapped C++ will not
+          // be able to accept it as an argument.
+          emp_d3.objects[id].text(name, function(d, i) {
+                                              return emp.Callback(func_id, d, i);
+                                            });
+        }, this->id, func_id);
+
+        emp::JSDelete(func_id);
         return *(static_cast<DERIVED *>(this));
       }
 
@@ -517,8 +601,16 @@ namespace internal {
 }
 
   // Forward-declare dataset and transition
-  class Dataset;
-  class Transition;
+  // class Dataset;
+  class Dataset : public D3_Base {
+  public:
+    Dataset(int id) : D3_Base(id) { ; }
+  };
+}
+
+#include "transition.h"
+
+namespace D3 {
 
   /// [Selections](https://github.com/d3/d3-3.x-api-reference/blob/master/Selections.md/)
   /// are the primary way that d3 allows you to operate on DOM elements
@@ -591,7 +683,7 @@ namespace internal {
 
     // Option to pass loaded dataset stored in Javascript without translating to C++
     Selection Data(Dataset & values, const std::string & key=""){
-      const int new_id = NextD3ID();
+      const int new_id = internal::NextD3ID();
 
       EM_ASM({
         //We could make this slightly prettier with macros, but would
@@ -619,8 +711,8 @@ namespace internal {
     // Accepts Dataset and C++ function as key
     template<typename T>
     emp::sfinae_decoy<Selection, decltype(&T::operator())>
-    Data(Dataset & values, T key){
-      const int new_id = NextD3ID();
+    Data(Dataset & values, T key) {
+      const int new_id = internal::NextD3ID();
       const uint32_t fun_id = emp::JSWrap(key, "", false);
 
       EM_ASM({
@@ -636,13 +728,13 @@ namespace internal {
       }, this->id, fun_id, values.GetID(), new_id);
 
       emp::JSDelete(fun_id);
-      return Selection(update_id);
+      return Selection(new_id);
     }
 
     // Accepts string referring to Javascript function
     template<typename C, class = typename C::value_type>
     Selection Data(const C & values, const std::string & key="") {
-      const int new_id = NextD3ID();
+      const int new_id = internal::NextD3ID();
 
       emp::pass_array_to_javascript(values); // This passes arbitrary container data into js
 
@@ -671,7 +763,7 @@ namespace internal {
     template<typename C, class = typename C::value_type, typename T>
     emp::sfinae_decoy<Selection, decltype(&T::operator())>
     Data(const C & values, T key){
-      const int new_id = NextD3ID();
+      const int new_id = internal::NextD3ID();
       emp::pass_array_to_javascript(values);
       const uint32_t fun_id = emp::JSWrap(key, "", false);
 
@@ -695,7 +787,7 @@ namespace internal {
     /// @endcond
 
     Dataset GetData() const {
-        const int new_id = NextD3ID();
+        const int new_id =internal::NextD3ID();
         EM_ASM({
             emp_d3.objects[$1] = [emp_d3.objects[$0].data()];
         }, this->id, new_id);
@@ -714,7 +806,7 @@ namespace internal {
     ///
     /// Returns a selection object pointing at this selection's enter selection.
     Selection Enter() {
-      const int new_id = NextD3ID();
+      const int new_id =internal::NextD3ID();
 
       EM_ASM({
 	      var enter_selection = emp_d3.objects[$0].enter();
@@ -731,7 +823,7 @@ namespace internal {
     ///
     /// Returns a selection object pointing at this selection's exit selection.
     Selection Exit() {
-      const int new_id = NextD3ID();
+      const int new_id =internal::NextD3ID();
 
       EM_ASM({
         var exit_selection = emp_d3.objects[$0].exit();
@@ -743,7 +835,7 @@ namespace internal {
 
     /// Append DOM element(s) of the type specified by [name] to this selection.
     Selection Append(const std::string & name) {
-      const int new_id = NextD3ID();
+      const int new_id =internal::NextD3ID();
 
       EM_ASM({
         var new_selection = emp_d3.objects[$0].append(UTF8ToString($1));
@@ -758,7 +850,7 @@ namespace internal {
     /// For more information, see the D3 documention on
     /// [insert](https://github.com/d3/d3-3.x-api-reference/blob/master/Selections.md#insert)
     Selection Insert(const std::string & name, const std::string & before=NULL){
-      int new_id = NextD3ID();
+      int new_id =internal::NextD3ID();
 
       if (before.c_str()){
         EM_ASM({
@@ -781,7 +873,7 @@ namespace internal {
     /// Selection must have an enter selection (i.e. have just had data bound to it).
     Selection EnterAppend(const std::string & type) {
 
-      const int new_id = NextD3ID();
+      const int new_id =internal::NextD3ID();
 
       EM_ASM({
         const selection_id = $0;
@@ -800,7 +892,7 @@ namespace internal {
 
     ///Selection must have an exit selection (i.e. have just had data bound to it).
     void ExitRemove() {
-      const int new_id = NextD3ID();
+      const int new_id =internal::NextD3ID();
 
       EM_ASM({
 	      var exit_selection = emp_d3.objects[$0].exit().remove();
@@ -813,7 +905,7 @@ namespace internal {
     /// For more information, see the D3 documention on
     /// [insert](https://github.com/d3/d3-selection#selection_insert)
     Selection EnterInsert(const std::string & name, const std::string & before=NULL) {
-      const int new_id = NextD3ID();
+      const int new_id =internal::NextD3ID();
 
       if (before.c_str()) {
         EM_ASM({
@@ -904,7 +996,7 @@ namespace internal {
     // once and then pass the name as a string.
     template <typename T>
     emp::sfinae_decoy<Selection&, decltype(&T::operator())>
-    SetProperty(std::string name, T value) {
+    SetProperty(const std::string & name, T value) {
       const uint32_t func_id = emp::JSWrap(value);
 
       EM_ASM({
@@ -941,7 +1033,7 @@ namespace internal {
     template <typename T>
     emp::sfinae_decoy<Selection&, decltype(&T::operator())>
     SetHtml(T func) {
-      const uint32_t func_id = emp::JSWrap(value);
+      const uint32_t func_id = emp::JSWrap(func);
 
       EM_ASM({
         const id = $0;
@@ -977,7 +1069,7 @@ namespace internal {
     emp::sfinae_decoy<Selection&, decltype(&T::operator())>
     SetClassed(const std::string & classname, T func) {
 
-      const uint32_t func_id = emp::JSWrap(value);
+      const uint32_t func_id = emp::JSWrap(func);
 
       EM_ASM({
         const id = $0;
@@ -1072,7 +1164,7 @@ namespace internal {
     /// Create a transition from the current selection. If a [name] is specified
     /// the transition will be given that name
     Transition MakeTransition(const std::string & name="") {
-      const int new_id = NextD3ID();
+      const int new_id =internal::NextD3ID();
       EM_ASM({
         var transition = emp_d3.objects[$0].transition(UTF8ToString($1));
         emp_d3.objects[$2] = transition;
@@ -1082,7 +1174,7 @@ namespace internal {
     }
 
     Transition MakeTransition(Transition & t) {
-      const int new_id = NextD3ID();
+      const int new_id =internal::NextD3ID();
       EM_ASM_ARGS({
         var transition = emp_d3.objects[$0].transition(emp_d3.objects[$1]);
         emp_d3.objects[$2] = transition;
@@ -1164,7 +1256,7 @@ namespace internal {
       }, listener.c_str()) \
       && "String passed to On is not a Javascript function or null", listener);
 
-      // const int new_id = NextD3ID();
+      // const int new_id =internal::NextD3ID();
 
       EM_ASM({
         const id = $0;
