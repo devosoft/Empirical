@@ -11,6 +11,7 @@
 
 #include "../../base/vector.h"
 
+// TODO: test quantize, quantile threshold scale (including functions like invert extent)
 // TODO: Fix date apply scale tests
 // TODO: be able to add any type to maps 
 // TODO: clean up overall testing framework
@@ -50,6 +51,7 @@ void pass_map_to_javascript(emp::vector<std::string> & keys, emp::vector<T> & va
 }
 
 // for arrays
+// TODO: template keys
 template <typename T, size_t SIZE>
 void pass_map_to_javascript(emp::array<std::string, SIZE> & keys, emp::array<T, SIZE> & values) { 
   // initialize emp_js_map object
@@ -77,16 +79,19 @@ void pass_map_to_javascript(emp::array<std::string, SIZE> & keys, emp::array<T, 
 }
 
 // for std::map
-template <typename T>
-void pass_map_to_javascript(std::map<std::string, T> & dict) { 
+template <typename KEY_T, typename VAL_T>
+void pass_map_to_javascript(std::map<KEY_T, VAL_T> & dict) { 
   // extract keys and values from dict
-  emp::vector<std::string> keys;
-  emp::vector<T> values;
-  for(typename std::map<std::string, T>::iterator it = dict.begin(); it != dict.end(); ++it) {
+  emp::vector<KEY_T> keys;
+  emp::vector<VAL_T> values;
+
+  // TODO: Make sure this works with KEY_T as opposed to std::string
+  for (typename std::map<KEY_T, T>::iterator it = dict.begin(); it != dict.end(); ++it)
+  {
     keys.push_back(it->first);
     values.push_back(it->second);
   }
-  
+
   // initialize emp_js_map object
   EM_ASM({
     window["emp_cpp_map"] = ( {"cpp_keys" : [],
@@ -94,6 +99,8 @@ void pass_map_to_javascript(std::map<std::string, T> & dict) {
                               "cpp_dict" : {} } );
   });
 
+  // TODO: make sure the keys are not of type object on the JS side emp assert(em_asm_int) !thing===object
+  // TODO: emp_i.__incoming_map
   emp::pass_array_to_javascript(keys);
   EM_ASM({
     window["emp_cpp_map"].cpp_keys = emp_i.__incoming_array;
@@ -148,11 +155,13 @@ struct TestLinearScale {
     std::cout << result3 << std::endl;
     std::cout << result4 << std::endl;
 
+   // TODO: emp to string?? (keep everything as a string)
     std::map<std::string, int> testMap = {{"applyScale1", result1}, {"applyScale2", result2}, {"invert1", result1i}, {"invert2", result2i}}; //, {"color1", result3}, {"color2", result4}};
     pass_map_to_javascript(testMap);
     
     // add results to JS
     EM_ASM({  
+      // TODO: make x and color in the describe statement, and just compare cpp dict value to actual JS result (e.g. x(20))
       var x = d3.scaleLinear()
                   .domain([ 10, 130 ])
                   .range([ 0, 960 ]);
@@ -171,6 +180,7 @@ struct TestLinearScale {
       });
 
       // add cpp stuff
+      // TODO: just keep dict objects
       window["test_linear_scale"].cpp_keys = window["emp_cpp_map"].cpp_keys;
       window["test_linear_scale"].cpp_values = window["emp_cpp_map"].cpp_values;
       window["test_linear_scale"].cpp_dict = window["emp_cpp_map"].cpp_dict;
@@ -179,7 +189,10 @@ struct TestLinearScale {
       console.log(window["test_linear_scale"].cpp_dict);
 
       // compare both dictionaries
+      // only works if the order is the same 
       console.log(JSON.stringify(window["test_linear_scale"].js_dict) === JSON.stringify(window["test_linear_scale"].cpp_dict));
+
+      // TODO: separate it() for each item in dictionary
     });
    
     std::cout << "------Linear Test End------" << std::endl << std::endl;
@@ -460,8 +473,8 @@ struct TestTimeScale {
     D3::TimeScale::Date test2(2000, 0, 1, 16);
     // double result1 = testTime.ApplyScale<double>(test1);
     // double result2 = testTime.ApplyScale<double>(test2);
-    D3::TimeScale::Date result1i = testTime.InvertDate(200);
-    D3::TimeScale::Date result2i = testTime.InvertDate(640);
+    D3::TimeScale::Date result1i = testTime.Invert(200);
+    D3::TimeScale::Date result2i = testTime.Invert(640);
 
     // std::cout << "value 1: " << result1 << std::endl;
     // std::cout << "value 2: " << result2 << std::endl;

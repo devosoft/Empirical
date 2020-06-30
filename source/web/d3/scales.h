@@ -7,9 +7,9 @@
  *  @brief Tools for scaling graph axes in D3.
 **/
 
-// TODO: test quantize, quantile threshold scale (including functions like invert extent)
+
 // clean up copy constructur? -- ask group
-// TODO: template specialization on applyscale? -- fix Date applyscale 
+// TODO: template specialization on applyscale? -- fix Date applyscale (delete appropriate templates)
 // TODO: clean up Date struct (introspective tuple)
 // TODO: make sure all functions match documentation
 
@@ -564,6 +564,7 @@ namespace D3 {
       return dummy;
     }
 
+    // add int ApplyScale<int, const Date &>(const Date & dateInput)
     template<>
     double ApplyScale<double, const Date &>(const Date & dateInput) {
       return EM_ASM_DOUBLE({
@@ -581,8 +582,27 @@ namespace D3 {
       }, this->id, dateInput.year, dateInput.month, dateInput.day, dateInput.hours, dateInput.minutes, dateInput.seconds, dateInput.milliseconds);
     }
 
+    // TODO: make this the same as regular Invert (but templated similar to ApplyScale?)
     // special Invert for dates
-    Date InvertDate(double input) {
+    // template <typename T>
+    // double Invert(T y) {
+    Date Invert(int input) {
+      EM_ASM({
+        const id = $0;
+        const input = $1;
+        const newDate = emp_d3.objects[id].invert(input);
+
+        emp_i.__outgoing_array = ([ newDate.getFullYear(), newDate.getMonth(), newDate.getDate(), newDate.getHours(), newDate.getMinutes(), newDate.getSeconds(), newDate.getMilliseconds() ]);
+      }, this->id, input);
+
+      // access JS array, create date struct
+      emp::array<int, 7> date_array;
+      emp::pass_array_to_cpp(date_array);
+      Date returnDate(date_array[0], date_array[1], date_array[2], date_array[3], date_array[4], date_array[5], date_array[6]);
+      return returnDate;
+    }
+
+    Date Invert(double input) {
       EM_ASM({
         const id = $0;
         const input = $1;
