@@ -35,8 +35,6 @@ test_widget.js: test_widget.cc
 
 test_jswrap.js: TestJSWrap.cc
 	$(CXX_web) $(CFLAGS_web) TestJSWrap.cc -o test_jswrap.js
-	../../third-party/node_modules/karma/bin/karma start karma.conf.js --filename test_jswrap
-
 
 clean:
 	rm -f GetUrlParams.js JSWrap.js js_utils.js test_visualizations.js test_widget.js test_jswrap.js *.js.map *.js.mem *~ color_map
