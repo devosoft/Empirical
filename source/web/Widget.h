@@ -364,7 +364,7 @@ namespace web {
         if (state == Widget::ACTIVE) {
           extras.Apply(id); // Update the attributes, style, and listeners.
           // commented this out when testing HightlightJS, called in protected section of DivInfo instead
-          // TriggerJS();      // Run associated Javascript code, if any (e.g., to fill out a canvas)
+          TriggerJS();      // Run associated Javascript code, if any (e.g., to fill out a canvas)
         }
       }
 
