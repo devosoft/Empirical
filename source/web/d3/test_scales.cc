@@ -11,12 +11,16 @@
 
 #include "../../base/vector.h"
 
+// TODO: Fix date apply scale tests
+// TODO: be able to add any type to maps 
+// TODO: clean up overall testing framework
+
 namespace UI = emp::web;
 UI::Document doc("emp_d3_test");
 
-//***********************************//    
-//******** Continuous Scales ********//
-//***********************************// 
+//****************************************//    
+//******** Pass map to javascript ********//
+//****************************************// 
 
 // for vectors
 template <typename T>
@@ -107,6 +111,10 @@ void pass_map_to_javascript(std::map<std::string, T> & dict) {
   });
 }
 
+//***********************************//    
+//******** Continuous scales ********//
+//***********************************// 
+
 // scaleLinear
 struct TestLinearScale {
   TestLinearScale() {
@@ -123,40 +131,25 @@ struct TestLinearScale {
                                        "cpp_dict" : {} } );
     });
 
-    // a vector to store results
-    emp::vector<int> cpp_values_vec;
-
-    // a vector to store names
-    emp::vector<std::string> cpp_keys_vec;
-
     D3::LinearScale testLinearX; 
     testLinearX.SetDomain(10, 130.00);
     testLinearX.SetRange(0, 960.00);
-    int result1 = testLinearX.ApplyScaleInt(20);
-    int result2 = testLinearX.ApplyScaleInt(50);
+    int result1 = testLinearX.ApplyScale<int>(20);
+    int result2 = testLinearX.ApplyScale<int>(50);
     int result1i = testLinearX.Invert<int>(80);
     int result2i = testLinearX.Invert<int>(320);
-    cpp_values_vec.push_back(result1); 
-    cpp_values_vec.push_back(result2);
-    cpp_values_vec.push_back(result1i);
-    cpp_values_vec.push_back(result2i);
-    cpp_keys_vec.push_back("applyScale1"); 
-    cpp_keys_vec.push_back("applyScale2");
-    cpp_keys_vec.push_back("invert1");
-    cpp_keys_vec.push_back("invert2");
 
-    // D3::LinearScale testLinearColor; 
-    // testLinearColor.SetDomain(10, 100);
-    // emp::array<std::string, 2> colorArray = {"brown", "steelblue"};
-    // testLinearColor.SetRange(colorArray);
-    // std::string result3 = testLinearColor.ApplyScaleString(20);
-    // std::string result4 = testLinearColor.ApplyScaleString(50);
-    // cpp_keys_vec.push_back("color1");
-    // cpp_keys_vec.push_back("color2");
-    // cpp_values_vec.push_back(result3);
-    // cpp_values_vec.push_back(result4);
+    D3::LinearScale testLinearColor; 
+    testLinearColor.SetDomain(10, 100);
+    emp::array<std::string, 2> colorArray = {"brown", "steelblue"};
+    testLinearColor.SetRange(colorArray);
+    std::string result3 = testLinearColor.ApplyScale<std::string>(20);
+    std::string result4 = testLinearColor.ApplyScale<std::string>(50);
+    std::cout << result3 << std::endl;
+    std::cout << result4 << std::endl;
 
-    pass_map_to_javascript(cpp_keys_vec, cpp_values_vec);
+    std::map<std::string, int> testMap = {{"applyScale1", result1}, {"applyScale2", result2}, {"invert1", result1i}, {"invert2", result2i}}; //, {"color1", result3}, {"color2", result4}};
+    pass_map_to_javascript(testMap);
     
     // add results to JS
     EM_ASM({  
@@ -236,9 +229,9 @@ struct TestPowScale {
     testPowPop.SetRange(0, 300);
     emp::vector<double> result1 = testPowPop.GetDomain<double>();
     emp::vector<double> result2 = testPowPop.GetRange<double>();
-    double result3 = testPowPop.ApplyScaleDouble(1.386e9);
-    double result4 = testPowPop.ApplyScaleDouble(127e6);
-    double result5 = testPowPop.ApplyScaleDouble(427e3);
+    double result3 = testPowPop.ApplyScale<double>(1.386e9);
+    double result4 = testPowPop.ApplyScale<double>(127e6);
+    double result5 = testPowPop.ApplyScale<double>(427e3);
 
     std::cout << "value 1: " << result1 << std::endl;
     std::cout << "value 2: " << result2 << std::endl;
@@ -250,9 +243,9 @@ struct TestPowScale {
     testPowPop2.SetExponent(1.5);
     testPowPop2.SetDomain(0, 2e9);
     testPowPop2.SetRange(0, 300);
-    double result6 = testPowPop2.ApplyScaleDouble(1.386e9);
-    double result7 = testPowPop2.ApplyScaleDouble(127e6);
-    double result8 = testPowPop2.ApplyScaleDouble(427e3);
+    double result6 = testPowPop2.ApplyScale<double>(1.386e9);
+    double result7 = testPowPop2.ApplyScale<double>(127e6);
+    double result8 = testPowPop2.ApplyScale<double>(427e3);
 
     std::cout << "value 6: " << result6 << std::endl;
     std::cout << "value 7: " << result7 << std::endl;
@@ -266,9 +259,9 @@ struct TestPowScale {
     // emp::vector<std::string> result10 = testPowPopColor.GetRangeString();
     emp::vector<double> result9 = testPowPopColor.GetDomain<double>();
     emp::vector<std::string> result10 = testPowPopColor.GetRange<std::string>();
-    std::string result11 = testPowPopColor.ApplyScaleString(1.386e9);
-    std::string result12 = testPowPopColor.ApplyScaleString(127e6);
-    std::string result13 = testPowPopColor.ApplyScaleString(427e3);
+    std::string result11 = testPowPopColor.ApplyScale<std::string>(1.386e9);
+    std::string result12 = testPowPopColor.ApplyScale<std::string>(127e6);
+    std::string result13 = testPowPopColor.ApplyScale<std::string>(427e3);
 
     std::cout << "value 9: " << result9 << std::endl;
     std::cout << "value 10: " << result10 << std::endl;
@@ -303,18 +296,18 @@ struct TestSqrtScale {
     D3::SqrtScale testSqrtPop; 
     testSqrtPop.SetDomain(0, 2e9);
     testSqrtPop.SetRange(0, 300);
-    double result1 = testSqrtPop.ApplyScaleDouble(1.386e9);
-    double result2 = testSqrtPop.ApplyScaleDouble(127e6);
-    double result3 = testSqrtPop.ApplyScaleDouble(427e3);
+    double result1 = testSqrtPop.ApplyScale<double>(1.386e9);
+    double result2 = testSqrtPop.ApplyScale<double>(127e6);
+    double result3 = testSqrtPop.ApplyScale<double>(427e3);
     std::cout << "value 1: " << result1 << std::endl;
     std::cout << "value 2: " << result2 << std::endl;
     std::cout << "value 3: " << result3 << std::endl;
 
     // D3::SqrtScale copyPop = testSqrtPop.Copy();
     D3::SqrtScale copyPop(testSqrtPop);  // = new D3::SqrtScale(testSqrtPop);
-    double result4 = copyPop.ApplyScaleDouble(1.386e9);
-    double result5 = copyPop.ApplyScaleDouble(127e6);
-    double result6 = copyPop.ApplyScaleDouble(427e3);
+    double result4 = copyPop.ApplyScale<double>(1.386e9);
+    double result5 = copyPop.ApplyScale<double>(127e6);
+    double result6 = copyPop.ApplyScale<double>(427e3);
     std::cout << "value 4: " << result4 << std::endl;
     std::cout << "value 5: " << result5 << std::endl;
     std::cout << "value 6: " << result6 << std::endl;
@@ -350,9 +343,9 @@ struct TestLogScale {
     D3::LogScale testLog; 
     testLog.SetDomain(10, 100000);
     testLog.SetRange(0, 700);
-    double result1 = testLog.ApplyScaleDouble(1000);
-    double result2 = testLog.ApplyScaleDouble(1234);
-    double result3 = testLog.ApplyScaleDouble(100000);
+    double result1 = testLog.ApplyScale<double>(1000);
+    double result2 = testLog.ApplyScale<double>(1234);
+    double result3 = testLog.ApplyScale<double>(100000);
 
     std::cout << "value 1: " << result1 << std::endl;
     std::cout << "value 2: " << result2 << std::endl;
@@ -362,9 +355,9 @@ struct TestLogScale {
     testLog2.SetBase(2);
     testLog2.SetDomain(16, 1048576);
     testLog2.SetRange(0, 700);
-    double result4 = testLog2.ApplyScaleDouble(64);
-    double result5 = testLog2.ApplyScaleDouble(1234);
-    double result6 = testLog2.ApplyScaleDouble(1048576);
+    double result4 = testLog2.ApplyScale<double>(64);
+    double result5 = testLog2.ApplyScale<double>(1234);
+    double result6 = testLog2.ApplyScale<double>(1048576);
 
     std::cout << "value 4: " << result4 << std::endl;
     std::cout << "value 5: " << result5 << std::endl;
@@ -396,11 +389,11 @@ struct TestSymlogScale {
     testSymlog.SetDomain(-100000, 100000);
     testSymlog.SetConstant(0.01);
     testSymlog.SetRange(-100, 100);
-    double result1 = testSymlog.ApplyScaleDouble(-80000);
-    double result2 = testSymlog.ApplyScaleDouble(-50);
-    double result3 = testSymlog.ApplyScaleDouble(1.5);
-    double result4 = testSymlog.ApplyScaleDouble(50);
-    double result5 = testSymlog.ApplyScaleDouble(80000);
+    double result1 = testSymlog.ApplyScale<double>(-80000);
+    double result2 = testSymlog.ApplyScale<double>(-50);
+    double result3 = testSymlog.ApplyScale<double>(1.5);
+    double result4 = testSymlog.ApplyScale<double>(50);
+    double result5 = testSymlog.ApplyScale<double>(80000);
 
 
     std::cout << "value 1: " << result1 << std::endl;
@@ -430,9 +423,9 @@ struct TestIdentityScale {
 
     D3::IdentityScale testId; 
     testId.SetDomain(12, 1234);
-    double result1 = testId.ApplyScaleDouble(12);
-    double result2 = testId.ApplyScaleDouble(50.6789);
-    double result3 = testId.ApplyScaleDouble(1234);
+    double result1 = testId.ApplyScale<double>(12);
+    double result2 = testId.ApplyScale<double>(50.6789);
+    double result3 = testId.ApplyScale<double>(1234);
 
     std::cout << "value 1: " << result1 << std::endl;
     std::cout << "value 2: " << result2 << std::endl;
@@ -465,13 +458,13 @@ struct TestTimeScale {
     testTime.SetRange(0, 960);
     D3::TimeScale::Date test1(2000, 0, 1, 5);
     D3::TimeScale::Date test2(2000, 0, 1, 16);
-    double result1 = testTime.ApplyScaleDouble(test1);
-    double result2 = testTime.ApplyScaleDouble(test2);
+    // double result1 = testTime.ApplyScale<double>(test1);
+    // double result2 = testTime.ApplyScale<double>(test2);
     D3::TimeScale::Date result1i = testTime.InvertDate(200);
     D3::TimeScale::Date result2i = testTime.InvertDate(640);
 
-    std::cout << "value 1: " << result1 << std::endl;
-    std::cout << "value 2: " << result2 << std::endl;
+    // std::cout << "value 1: " << result1 << std::endl;
+    // std::cout << "value 2: " << result2 << std::endl;
     std::cout << "value 1 invert: " << result1i.ToString() << std::endl;
     std::cout << "value 2 invert: " << result2i.ToString() << std::endl;
 
@@ -497,9 +490,9 @@ struct TestSequentialScale {
     D3::SequentialScale testSeq; 
     testSeq.SetDomain(0, 100);
     testSeq.SetInterpolator("interpolateRainbow");
-    std::string result1 = testSeq.ApplyScaleString(0);
-    std::string result2 = testSeq.ApplyScaleString(50);
-    std::string result3 = testSeq.ApplyScaleString(100);
+    std::string result1 = testSeq.ApplyScale<std::string>(0);
+    std::string result2 = testSeq.ApplyScale<std::string>(50);
+    std::string result3 = testSeq.ApplyScale<std::string>(100);
 
     std::cout << "value 1: " << result1 << std::endl;
     std::cout << "value 2: " << result2 << std::endl;
@@ -533,10 +526,10 @@ struct TestSequentialQuantileScale {
     D3::SequentialQuantileScale testSeqQuant; 
     testSeqQuant.SetDomain(myData);
     testSeqQuant.SetInterpolator("interpolateRdYlBu");
-    std::string result1 = testSeqQuant.ApplyScaleString(0);
-    std::string result2 = testSeqQuant.ApplyScaleString(50);
-    std::string result3 = testSeqQuant.ApplyScaleString(60);
-    std::string result4 = testSeqQuant.ApplyScaleString(100);
+    std::string result1 = testSeqQuant.ApplyScale<std::string>(0);
+    std::string result2 = testSeqQuant.ApplyScale<std::string>(50);
+    std::string result3 = testSeqQuant.ApplyScale<std::string>(60);
+    std::string result4 = testSeqQuant.ApplyScale<std::string>(100);
     // This functionality is included in the newest version of d3-scale, but not base d3
     // emp::vector<double> result5 = testSeq.GetQuantiles(4);
 
@@ -550,7 +543,7 @@ struct TestSequentialQuantileScale {
   }
 };
 
-// caleDiverging
+// scaleDiverging
 struct TestDivergingScale {
   TestDivergingScale() {
     std::cout << "------Diverging Test Begin------" << std::endl;
@@ -571,9 +564,9 @@ struct TestDivergingScale {
     testDiv.SetDomain(domainArr);
     testDiv.SetInterpolator("interpolatePuOr");
     emp::vector<double> result1 = testDiv.GetDomain<double>();
-    std::string result3 = testDiv.ApplyScaleString(-0.5);
-    std::string result4 = testDiv.ApplyScaleString(0);
-    std::string result5 = testDiv.ApplyScaleString(1.01);
+    std::string result3 = testDiv.ApplyScale<std::string>(-0.5);
+    std::string result4 = testDiv.ApplyScale<std::string>(0);
+    std::string result5 = testDiv.ApplyScale<std::string>(1.01);
 
     std::cout << "value 1: " << result1 << std::endl;
     std::cout << "value 3: " << result3 << std::endl;
@@ -662,9 +655,9 @@ int main() {
 //     // D3::RadialScale testRad = D3::RadialScale();
 //     // // testRad.SetDomain(10, 1000);
 //     // testRad.SetRange(30, 300);
-//     // double result1 = testRad.ApplyScaleDouble(10);
-//     // double result2 = testRad.ApplyScaleDouble(777);
-//     // double result3 = testRad.ApplyScaleDouble(1000);
+//     // double result1 = testRad.ApplyScale<double>(10);
+//     // double result2 = testRad.ApplyScale<double>(777);
+//     // double result3 = testRad.ApplyScale<double>(1000);
 
 //     // std::cout << "value 1: " << result1 << std::endl;
 //     // std::cout << "value 2: " << result2 << std::endl;

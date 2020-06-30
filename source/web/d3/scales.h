@@ -5,22 +5,13 @@
  *
  *  @file  scales.h
  *  @brief Tools for scaling graph axes in D3.
- */
+**/
 
-// TODO:
-// test quantize, quantile threshold scale (including functions like invert extent)
+// TODO: test quantize, quantile threshold scale (including functions like invert extent)
 // clean up copy constructur? -- ask group
-
-// make nice testing framework in C++
-// make pass_map_to_js psuedo thingy (see test_scales)
-// reimplement stuff to match pass_map_to_hs
-
-// make sure all functions match documentation
-// test each functino
-// delete functions when appropriate
-// TODO: template specialization
-
-// clean up applyscale?
+// TODO: template specialization on applyscale? -- fix Date applyscale 
+// TODO: clean up Date struct (introspective tuple)
+// TODO: make sure all functions match documentation
 
 #ifndef __EMP_D3_SCALES_H__
 #define __EMP_D3_SCALES_H__
@@ -67,18 +58,7 @@ namespace D3 {
       }, other.id, new_id);
 
       this->id = new_id;
-    }
-
-    /// Make a copy of this scale
-    // Scale Copy() {
-    //   int new_id = EM_ASM_INT({
-    //     return emp_d3.objects.next_id++;
-    //   });
-    //   EM_ASM({
-    //     emp_d3.objects[$1] = emp_d3.objects[$0].copy();
-    //   }, this->id, new_id);
-    //   return Scale(new_id);
-    // }
+    } 
 
     /// Set the domain of possible input values corresponding to values in the range
     /// Note that an array of strings can be passed in here
@@ -97,6 +77,13 @@ namespace D3 {
       EM_ASM({
         emp_d3.objects[$0].domain([$1, $2]);
       }, this->id, min, max);
+      return *this;
+    }
+
+    Scale & SetDomain(const std::string & lower, const std::string & upper) {
+      EM_ASM({
+        emp_d3.objects[$0].domain([UTF8ToString($1), UTF8ToString($2)]);
+      }, this->id, lower.c_str(), upper.c_str());
       return *this;
     }
 
@@ -122,32 +109,23 @@ namespace D3 {
       return *this;
     }
 
-    // TODO: template specialization
-    // template<typename T, typename INPUT_TYPE>
-    // T ApplyScale(INPUT_TYPE input) {
-    //   emp_assert(false);
-    // }
-
-    // template<>
-    // std::string ApplyScale(double input) {
-    //   EM_ASM({
-    //     const resultStr = emp_d3.objects[$0]($1);
-    //     emp.PassStringToCpp(resultStr);
-    //   }, this->id, input);
-    //   return emp::pass_str_to_cpp();
-    // }
-
-    // ApplyScale functions
-    // note that might want to condense ApplyScaleDouble and Int into ApplyScale
-    std::string ApplyScaleString(double input) {
+    Scale & SetRange(const std::string & lower, const std::string & upper) {
       EM_ASM({
-        const resultStr = emp_d3.objects[$0]($1);
-        emp.PassStringToCpp(resultStr);
-      }, this->id, input);
-      return emp::pass_str_to_cpp();
+        emp_d3.objects[$0].range([UTF8ToString($1), UTF8ToString($2)]);
+      }, this->id, lower.c_str(), upper.c_str());
+      return *this;
     }
 
-    std::string ApplyScaleString(const std::string & input) {
+    // TODO: template specialization
+    template<typename T, typename INPUT_TYPE>
+    T ApplyScale(INPUT_TYPE input) {
+      emp_assert(false);
+      T dummy; 
+      return dummy;
+    }
+
+    template<>
+    std::string ApplyScale<std::string, const std::string &>(const std::string & input) {
       EM_ASM({
         const resultStr = emp_d3.objects[$0](UTF8ToString($1));
         emp.PassStringToCpp(resultStr);
@@ -155,29 +133,106 @@ namespace D3 {
       return emp::pass_str_to_cpp();
     }
 
-    double ApplyScaleDouble(double input) {
-      return EM_ASM_DOUBLE({
-        return emp_d3.objects[$0]($1);
+    template<>
+    std::string ApplyScale<std::string, double>(double input) {
+      EM_ASM({
+        const resultStr = emp_d3.objects[$0]($1);
+        emp.PassStringToCpp(resultStr);
       }, this->id, input);
+      return emp::pass_str_to_cpp();
     }
-
-    double ApplyScaleDouble(const std::string & input) {
+    
+    template<>
+    std::string ApplyScale<std::string, int>(int input) {
+      EM_ASM({
+        const resultStr = emp_d3.objects[$0]($1);
+        emp.PassStringToCpp(resultStr);
+      }, this->id, input);
+      return emp::pass_str_to_cpp();
+    }
+    
+    template<>
+    double ApplyScale<double, const std::string &>(const std::string & input) {
       return EM_ASM_DOUBLE({
         return emp_d3.objects[$0](UTF8ToString($1));
       }, this->id, input.c_str());
     }
 
-    int ApplyScaleInt(double input) {
+    template<>
+    double ApplyScale<double, double>(double input) {
+      return EM_ASM_DOUBLE({
+        return emp_d3.objects[$0]($1);
+      }, this->id, input);
+    }
+
+    template<>
+    double ApplyScale<double, int>(int input) {
+      return EM_ASM_DOUBLE({
+        return emp_d3.objects[$0]($1);
+      }, this->id, input);
+    }
+
+    template<>
+    int ApplyScale<int, const std::string &>(const std::string & input) {
+      return EM_ASM_INT({
+        return emp_d3.objects[$0](UTF8ToString($1));
+      }, this->id, input.c_str());
+    }
+
+    template<>
+    int ApplyScale<int, double>(double input) {
       return EM_ASM_INT({
         return emp_d3.objects[$0]($1);
       }, this->id, input);
     }
 
-    int ApplyScaleInt(const std::string & input) {
+    template<>
+    int ApplyScale<int, int>(int input) {
       return EM_ASM_INT({
-        return emp_d3.objects[$0](UTF8ToString($1));
-      }, this->id, input.c_str());
+        return emp_d3.objects[$0]($1);
+      }, this->id, input);
     }
+
+    // ApplyScale functions
+    // std::string ApplyScaleString(double input) {
+    //   EM_ASM({
+    //     const resultStr = emp_d3.objects[$0]($1);
+    //     emp.PassStringToCpp(resultStr);
+    //   }, this->id, input);
+    //   return emp::pass_str_to_cpp();
+    // }
+
+    // std::string ApplyScaleString(const std::string & input) {
+    //   EM_ASM({
+    //     const resultStr = emp_d3.objects[$0](UTF8ToString($1));
+    //     emp.PassStringToCpp(resultStr);
+    //   }, this->id, input.c_str());
+    //   return emp::pass_str_to_cpp();
+    // }
+
+    // double ApplyScaleDouble(double input) {
+    //   return EM_ASM_DOUBLE({
+    //     return emp_d3.objects[$0]($1);
+    //   }, this->id, input);
+    // }
+
+    // double ApplyScaleDouble(const std::string & input) {
+    //   return EM_ASM_DOUBLE({
+    //     return emp_d3.objects[$0](UTF8ToString($1));
+    //   }, this->id, input.c_str());
+    // }
+
+    // int ApplyScaleInt(double input) {
+    //   return EM_ASM_INT({
+    //     return emp_d3.objects[$0]($1);
+    //   }, this->id, input);
+    // }
+
+    // int ApplyScaleInt(const std::string & input) {
+    //   return EM_ASM_INT({
+    //     return emp_d3.objects[$0](UTF8ToString($1));
+    //   }, this->id, input.c_str());
+    // }
 
     // Getter methods for a scale's domain and range
     // Use: GetDomain<type>()
@@ -502,8 +557,15 @@ namespace D3 {
                    dateMax.year, dateMax.month, dateMax.day, dateMax.hours, dateMax.minutes, dateMax.seconds, dateMax.milliseconds);
       return *this;
     }
+    template<typename T, typename INPUT_TYPE>
+    T ApplyScale(INPUT_TYPE input) {
+      emp_assert(false);
+      T dummy; 
+      return dummy;
+    }
 
-    double ApplyScaleDouble(const Date & dateInput) {
+    template<>
+    double ApplyScale<double, const Date &>(const Date & dateInput) {
       return EM_ASM_DOUBLE({
         const id = $0;
         const year = $1;
