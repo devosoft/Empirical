@@ -115,6 +115,7 @@ namespace web {
       emp::JSDelete(cleanup_all_js_func_id);
     }
 
+    /// Add
     // Arguments are forwarded to the constructor.
     // For variatic capture: https://stackoverflow.com/questions/47496358/c-lambdas-how-to-capture-variadic-parameter-pack-from-the-upper-scope
     //  - NOTE: this can get cleaned up quite a bit w/C++ 20!
@@ -186,9 +187,13 @@ namespace web {
       };
     }
 
+    /// TODO
     void Run() { NextTest(); }
 
+    /// TODO
     void OnBeforeEachTest(const std::function<void()> & fun) { before_each_test_sig.AddAction(fun); };
+
+    /// TODO
     void OnAfterEachTest(const std::function<void()> & fun) { after_each_test_sig.AddAction(fun); };
 
   };
