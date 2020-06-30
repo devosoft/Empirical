@@ -16,7 +16,7 @@ OFLAGS_web_braces := -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMO
 CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../source/web/library_emp.js --js-library ../../source/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "stringToUTF8"]' -s WASM=0
 
 default: all
-all: GetUrlParams.js JSWrap.js js_utils.js test_visualizations.js test_widget.js color_map
+all: GetUrlParams.js JSWrap.js js_utils.js test_visualizations.js test_widget.js test_jswrap.js color_map
 
 color_map: color_map.cc
 	g++ $(CFLAGS_all) color_map.cc -o color_map
@@ -36,8 +36,13 @@ test_visualizations.js: visualizations.cc
 test_widget.js: test_widget.cc
 	$(CXX_web) $(CFLAGS_web) test_widget.cc -o test_widget.js
 
+test_jswrap.js: TestJSWrap.cc
+	$(CXX_web) $(CFLAGS_web) TestJSWrap.cc -o test_jswrap.js
+	../../third-party/node_modules/karma/bin/karma start karma.conf.js --filename test_jswrap
+
+
 clean:
-	rm -f GetUrlParams.js JSWrap.js js_utils.js test_visualizations.js test_widget.js *.js.map *.js.mem *~ color_map
+	rm -f GetUrlParams.js JSWrap.js js_utils.js test_visualizations.js test_widget.js test_jswrap.js *.js.map *.js.mem *~ color_map
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
