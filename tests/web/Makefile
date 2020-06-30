@@ -19,7 +19,7 @@ default: all
 all: GetUrlParams.js js_utils.js test_visualizations.js test_widget.js test_jswrap.js color_map
 
 color_map: color_map.cc
-	g++ $(CFLAGS_all) color_map.cc -o color_map
+	g++ $(CFLAGS_all) color_map.cc -o color_map.out
 
 GetUrlParams.js: GetUrlParams.cc
 	$(CXX_web) $(CFLAGS_web) GetUrlParams.cc -o GetUrlParams.js
@@ -37,7 +37,7 @@ test_jswrap.js: TestJSWrap.cc
 	$(CXX_web) $(CFLAGS_web) TestJSWrap.cc -o test_jswrap.js
 
 clean:
-	rm -f GetUrlParams.js JSWrap.js js_utils.js test_visualizations.js test_widget.js test_jswrap.js *.js.map *.js.mem *~ color_map
+	rm -f GetUrlParams.js JSWrap.js js_utils.js test_visualizations.js test_widget.js test_jswrap.js *.js.map *.js.mem *~ color_map.out
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
