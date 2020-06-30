@@ -1,0 +1,146 @@
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2020.
+//  Released under the MIT Software license; see doc/LICENSE
+
+#include <functional>
+#include <unordered_map>
+
+#include "base/assert.h"
+#include "web/testing/TestManager.h"
+#include "web/Document.h"
+#include "web/Element.h"
+#include "web/web.h"
+
+
+struct Test_WidgetWrapWith : emp::web::BaseTest {
+  emp::web::Document doc{"emp_test_container"};
+
+  void Setup() override {
+    // Construct the following HTML structure using empirical
+    // <div id="wrapper2"> <!-- inserted with WrapWith -->
+    //   <p id="parent">
+    //     parent
+    //     <div id="wrapper"> <!-- inserted with WrapWith -->
+    //       wrapper
+    //       <button id="child"></button>
+    //     </div>
+    //   </p>
+    //   <br/><br/>
+    // </div>
+
+    // Manually activate document (and re-trigger ready signal)
+    doc.Activate();
+    EM_ASM({
+      jQuery.ready();
+    });
+
+    emp::web::Element parent("p", "parent");
+    parent << "parent";
+    doc << parent;
+
+    emp::web::Button child(
+      []() {
+        EM_ASM({
+          $("#child_button").attr("clicked", "yes");
+        });
+      },
+      "child"
+    );
+    child.SetAttr("clicked", "no");
+    child.SetAttr("id", "child_button");
+    parent << child;
+
+    emp::web::Div wrapper("wrapper");
+    wrapper << "wrapper";
+    child.WrapWith(wrapper);
+
+    parent.WrapWith(
+      emp::web::Div("wrapper2").SetCSS("background-color", "red")
+    ).SetCSS("background-color", "blue");
+
+    doc.Div("wrapper2") << "<br/><br/>";
+
+    doc.Redraw(); // Manually tell document to redraw to html
+  }
+
+  void Describe() override {
+
+    // Test that the HTML components created in Setup are correct.
+    EM_ASM({
+
+      describe("Widget::WrapWith", function() {
+        describe("#wrapper2", function() {
+          it('should have parent #emp_test_container', function() {
+            const parent_id = $("#wrapper2").parent().attr("id");
+            chai.assert.equal(parent_id, "emp_test_container");
+          });
+          it('should have child #parent', function() {
+            var children = $("#wrapper2").children();
+            // Get ids of child
+            var child_ids = [];
+            for (i = 0; i < children.length; i++) {
+              child_ids.push(children[i].getAttribute("id"));
+            }
+            chai.assert.include(child_ids, "parent");
+            chai.assert.equal($("#wrapper2").children("#parent").length, 1);
+          });
+        });
+        describe("#parent", function() {
+          it('should have parent #wrapper2', function() {
+            const parent_id = $("#parent").parent().attr("id");
+            chai.assert.equal(parent_id, "wrapper2");
+          });
+          it('should have child #wrapper', function() {
+            chai.assert.equal($("#parent").children("#wrapper").length, 1);
+          });
+        });
+        describe("#wrapper", function() {
+          it('should have parent #parent', function() {
+            const parent_id = $("#wrapper").parent().attr("id");
+            chai.assert.equal(parent_id, "parent");
+          });
+          it('should have child #child_button', function() {
+            chai.assert.equal($("#wrapper").children("#child_button").length, 1);
+          });
+        });
+        describe("#child_button", function() {
+          it('should have parent #wrapper', function() {
+            const parent_id = $("#child_button").parent().attr("id");
+            chai.assert.equal(parent_id, "wrapper");
+          });
+        });
+        describe("button#child_button", function() {
+          it('should do stuff when clicked', function() {
+            const before = $("#child_button").attr("clicked");
+            chai.assert.equal(before, "no", "check initial clicked value");
+            $("#child_button").trigger( "click" );
+            const after = $("#child_button").attr("clicked");
+            chai.assert.equal(after, "yes", "check post-click clicked value");
+          });
+        });
+      });
+    });
+  }
+
+};
+
+emp::web::TestManager manager;
+int main() {
+  emp::Initialize();
+  // Add a container div to house html components that get added to document
+  EM_ASM({
+    $("body").append('<div id="emp_test_container"></div>');
+  });
+
+  // Before each test, clear out the emp_test_container div
+  manager.OnBeforeEachTest(
+    [](){
+      EM_ASM({
+        $("#emp_test_container").empty();
+      });
+    }
+  );
+
+  manager.AddTest<Test_WidgetWrapWith>("Test Widget::WrapWith");
+  manager.Run();
+}
