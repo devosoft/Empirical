@@ -44,11 +44,13 @@ namespace web {
     virtual void Describe() { ; }
 
     /// Use this to trigger test failure from C++.
-    void Require(bool result) {
+    void Require(bool result, const std::string & msg="") {
       if (result) return;
-      EM_ASM({
-        chai.assert(false);
-      });
+      if (msg == "") {
+        EM_ASM({ chai.assert.fail(); });
+      } else {
+        EM_ASM({ chai.assert.fail(UTF8ToString($0)); }, msg.c_str());
+      }
     }
 
   };
