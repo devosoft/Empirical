@@ -335,7 +335,9 @@ namespace emp {
 
     /// Construct a null Ptr by default.
     Ptr() : ptr(nullptr), id(UNTRACKED_ID) {
-      if (internal::ptr_debug) std::cout << "null construct: " << ptr << std::endl;
+      if (internal::ptr_debug) {
+        std::cout << "null construct." << std::endl;
+      }
     }
 
     /// Construct using copy constructor
@@ -452,6 +454,13 @@ namespace emp {
 
     /// Dynamically cast this Ptr to another type; throw an assert of the cast fails.
     template <typename T2> Ptr<T2> DynamicCast() {
+      emp_assert(dynamic_cast<T2*>(ptr) != nullptr);
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
+      return (T2*) ptr;
+    }
+
+    /// Dynamically cast this Ptr to another type; throw an assert of the cast fails.
+    template <typename T2> Ptr<const T2> DynamicCast() const {
       emp_assert(dynamic_cast<T2*>(ptr) != nullptr);
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
       return (T2*) ptr;
@@ -765,8 +774,9 @@ namespace emp {
     const TYPE * const Raw() const { return ptr; }
     const TYPE * const Raw(size_t pos) const { return &(ptr[pos]); }
     template <typename T2> Ptr<T2> Cast() { return (T2*) ptr; }
-    template <typename T2> const Ptr<const T2> Cast() const { return (T2*) ptr; }
+    template <typename T2> Ptr<const T2> Cast() const { return (T2*) ptr; }
     template <typename T2> Ptr<T2> DynamicCast() { return dynamic_cast<T2*>(ptr); }
+    template <typename T2> Ptr<const T2> DynamicCast() const { return dynamic_cast<T2*>(ptr); }
 
     template <typename... T>
     void New(T &&... args) { ptr = new TYPE(std::forward<T>(args)...); }  // New raw pointer.
