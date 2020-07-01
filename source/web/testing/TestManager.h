@@ -20,6 +20,7 @@
 #include "control/Signal.h"
 #include "base/vector.h"
 #include "web/JSWrap.h"
+#include "../../../tests2/unit_tests.h"
 
 namespace emp {
 namespace web {
@@ -64,6 +65,7 @@ namespace web {
       std::function<void()> cleanup{};
       std::string test_name{};
       bool done=false;
+      size_t before_test_error_count=0;
     };
 
     emp::Signal<void()> before_each_test_sig;   ///< Is triggered before each test.
@@ -153,6 +155,8 @@ namespace web {
       // arguments as constructor arguments) and then call TEST_TYPE::Setup.
       runner.create = [constructor_args = std::make_tuple(std::forward<Args>(constructor_args)...), runner_id, this]() mutable {
         std::apply([this, runner_id](auto&&... constructor_args) {
+          // Record the before test error count
+          this->test_runners[runner_id].before_test_error_count = emp::GetUnitTestOutput().errors;
           // Allocate memory for test
           this->test_runners[runner_id].test = emp::NewPtr<TEST_TYPE>(std::forward<Args>(constructor_args)...);
           this->test_runners[runner_id].done = false;
@@ -214,7 +218,26 @@ namespace web {
       // configure the function that, when called, triggers the 'after each test' signal, and cleans
       // up the dynamically allocated TEST_TYPE object.
       runner.cleanup = [runner_id, this]() {
+        // Mark test as done.
         this->test_runners[runner_id].done = true;
+
+        // Did this test trigger any C++ test failures?
+        const size_t post_test_error_cnt = emp::GetUnitTestOutput().errors;
+        auto & test_name = this->test_runners[runner_id].test_name;
+
+        // Did the error count increase after running this test? If so, force failure.
+        if (post_test_error_cnt != this->test_runners[runner_id].before_test_error_count) {
+          EM_ASM({
+            const test_name = UTF8ToString($0);
+            const runner_id = $1;
+            describe(test_name + " - Failed C++ unit test", function() {
+              it("failed C++ unit test in test id " + runner_id, function() {
+                chai.assert(false);
+              });
+            });
+          }, test_name.c_str(), runner_id);
+        }
+
         this->after_each_test_sig.Trigger();
         this->test_runners[runner_id].test.Delete();
         this->test_runners[runner_id].test = nullptr;
