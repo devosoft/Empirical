@@ -26,7 +26,12 @@
 #include <set>
 #include <unordered_set>
 #include <map>
+
 #include <limits>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <iostream>
 
 #include "../base/Ptr.h"
 #include "../control/Signal.h"
@@ -38,6 +43,7 @@
 #include "../tools/set_utils.h"
 #include "../tools/stats.h"
 #include "../tools/string_utils.h"
+#include "../tools/File.h"
 
 #include "SystematicsAnalysis.h"
 #include "World_structure.h"
@@ -806,11 +812,40 @@ namespace emp {
      *   origination of parent and origination of offspring
      * - Enable a paleontology compatibility mode where only branching points are calculated
      */
+
     int GetPhylogeneticDiversity() const {
       // As shown on page 5 of Faith 1992, when all branch lengths are equal the phylogenetic
       // diversity is the number of internal nodes plus the number of extant taxa - 1.
+      //int phylodiversity = ancestor_taxa.size() + active_taxa.size() -1;
+
       return ancestor_taxa.size() + active_taxa.size() - 1;
     }
+
+  
+  int FindPhyloData(){ 
+    int percentile; 
+
+    emp::File tree_percentiles("tree_percentiles.csv"); //loading file 
+
+    emp::vector< emp::vector<double> > percentile_data = tree_percentiles.ToData<double>(','); //turns data into an array
+
+     int PhyloDiversity = GetPhylogeneticDiversity(); 
+
+    for (int i = 0; i < percentile_data.size() - 1; i++){ 
+
+        if( (PhyloDiversity >= percentile_data[i][1]) && (PhyloDiversity < percentile_data[i + 1][1])){ 
+           std::cout << "Phylogenetic Diversity (recorded in systematics): " << PhyloDiversity << std::endl; 
+           std::cout << "phylo diversity is in between: " << percentile_data[i][1] << " and " << percentile_data[i + 1][1] << std::endl; 
+           std::cout << PhyloDiversity << " is in percentile: " << percentile_data[i][0] << std::endl;       
+
+           percentile = percentile_data[i][0];
+
+           std::cout << percentile << std::endl; 
+           }
+      }
+      return percentile; 
+    }
+
 
     /** This is a metric of how distinct @param tax is from the rest of the population.
      *
