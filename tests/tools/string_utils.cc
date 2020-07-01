@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
 
 #include "tools/string_utils.h"
-#include "../third-party/Catch/single_include/catch.hpp"
+#include "../third-party/Catch/single_include/catch2/catch.hpp"
 
 TEST_CASE("Test string_utils", "[tools]")
 {
