@@ -58,7 +58,7 @@ namespace D3 {
       }, other.id, new_id);
 
       this->id = new_id;
-    } 
+    }
 
     /// Set the domain of possible input values corresponding to values in the range
     /// Note that an array of strings can be passed in here
@@ -117,11 +117,10 @@ namespace D3 {
     }
 
     // TODO: template specialization
-    template<typename T, typename INPUT_TYPE>
-    T ApplyScale(INPUT_TYPE input) {
+    template<typename RETURN_T, typename INPUT_T>
+    RETURN_T ApplyScale(INPUT_T input) {
       emp_assert(false);
-      T dummy; 
-      return dummy;
+      return RETURN_T();
     }
 
     template<>
@@ -141,7 +140,7 @@ namespace D3 {
       }, this->id, input);
       return emp::pass_str_to_cpp();
     }
-    
+
     template<>
     std::string ApplyScale<std::string, int>(int input) {
       EM_ASM({
@@ -150,7 +149,7 @@ namespace D3 {
       }, this->id, input);
       return emp::pass_str_to_cpp();
     }
-    
+
     template<>
     double ApplyScale<double, const std::string &>(const std::string & input) {
       return EM_ASM_DOUBLE({
@@ -192,47 +191,6 @@ namespace D3 {
         return emp_d3.objects[$0]($1);
       }, this->id, input);
     }
-
-    // ApplyScale functions
-    // std::string ApplyScaleString(double input) {
-    //   EM_ASM({
-    //     const resultStr = emp_d3.objects[$0]($1);
-    //     emp.PassStringToCpp(resultStr);
-    //   }, this->id, input);
-    //   return emp::pass_str_to_cpp();
-    // }
-
-    // std::string ApplyScaleString(const std::string & input) {
-    //   EM_ASM({
-    //     const resultStr = emp_d3.objects[$0](UTF8ToString($1));
-    //     emp.PassStringToCpp(resultStr);
-    //   }, this->id, input.c_str());
-    //   return emp::pass_str_to_cpp();
-    // }
-
-    // double ApplyScaleDouble(double input) {
-    //   return EM_ASM_DOUBLE({
-    //     return emp_d3.objects[$0]($1);
-    //   }, this->id, input);
-    // }
-
-    // double ApplyScaleDouble(const std::string & input) {
-    //   return EM_ASM_DOUBLE({
-    //     return emp_d3.objects[$0](UTF8ToString($1));
-    //   }, this->id, input.c_str());
-    // }
-
-    // int ApplyScaleInt(double input) {
-    //   return EM_ASM_INT({
-    //     return emp_d3.objects[$0]($1);
-    //   }, this->id, input);
-    // }
-
-    // int ApplyScaleInt(const std::string & input) {
-    //   return EM_ASM_INT({
-    //     return emp_d3.objects[$0](UTF8ToString($1));
-    //   }, this->id, input.c_str());
-    // }
 
     // Getter methods for a scale's domain and range
     // Use: GetDomain<type>()
@@ -486,16 +444,26 @@ namespace D3 {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleTime(); }, this->id);
     }
 
+    template<typename RETURN_T, typename INPUT_T>
+    RETURN_T ApplyScale(INPUT_T input) {
+      emp_assert(false);
+      return RETURN_T();
+    }
+
     // get rid of functions that shouldn't be called
     template <typename T, size_t SIZE>
     Scale & SetDomain(const emp::array<T, SIZE> & values) = delete;
     Scale & SetDomain(double min, double max) = delete;
-    double ApplyScaleDouble(double input) = delete;
-    double ApplyScaleDouble(int input) = delete;
-    double ApplyScaleDouble(const std::string & input) = delete;
-    int ApplyScaleInt(double input) = delete;
-    int ApplyScaleInt(int input) = delete;
-    int ApplyScaleInt(const std::string & input) = delete;
+    // double ApplyScaleDouble(double input) = delete;
+    // double ApplyScaleDouble(int input) = delete;
+    // double ApplyScaleDouble(const std::string & input) = delete;
+    // int ApplyScaleInt(double input) = delete;
+    // int ApplyScaleInt(int input) = delete;
+    // int ApplyScaleInt(const std::string & input) = delete;
+    template<>
+    std::string ApplyScale<std::string, const std::string &>(const std::string & input) = delete;
+    // TODO: add other 8 applyscales
+
     template <typename T>
     double Invert(T y) = delete;
 
@@ -531,6 +499,7 @@ namespace D3 {
 
     // special SetDomain to deal with Dates
     TimeScale & SetDomain(const Date & dateMin, const Date & dateMax) {
+      // TODO: array of size 2 of intropsective tuples, use pass array to javascript to access member vars on JS side
       EM_ASM({
         const id = $0;
         const yearMin = $1;
@@ -556,12 +525,6 @@ namespace D3 {
       }, this->id, dateMin.year, dateMin.month, dateMin.day, dateMin.hours, dateMin.minutes, dateMin.seconds, dateMin.milliseconds,
                    dateMax.year, dateMax.month, dateMax.day, dateMax.hours, dateMax.minutes, dateMax.seconds, dateMax.milliseconds);
       return *this;
-    }
-    template<typename T, typename INPUT_TYPE>
-    T ApplyScale(INPUT_TYPE input) {
-      emp_assert(false);
-      T dummy; 
-      return dummy;
     }
 
     // add int ApplyScale<int, const Date &>(const Date & dateInput)
