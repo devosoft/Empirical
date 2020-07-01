@@ -3,7 +3,7 @@
 // under the MIT Software license; see doc/LICENSE
 
 #define CATCH_CONFIG_MAIN
-#include "third-party/Catch/single_include/catch.hpp"
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include <iostream>
 #include <map>
