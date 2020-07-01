@@ -43,6 +43,14 @@ namespace web {
     /// [https://mochajs.org/#getting-started](https://mochajs.org/#getting-started)
     virtual void Describe() { ; }
 
+    /// Use this to trigger test failure from C++.
+    void Require(bool result) {
+      if (result) return;
+      EM_ASM({
+        chai.assert(false);
+      });
+    }
+
   };
 
   /// Utility class for managing software tests written for Emscripten web code.
