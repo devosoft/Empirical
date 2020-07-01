@@ -109,6 +109,10 @@ int main() {
         cout << "phylogenetic diversity: " << sys.GetPhylogeneticDiversity() << endl;
         bool writeFile = writeToFile("treedata.csv", sys.GetPhylogeneticDiversity());
 
+        if(i == numRounds - 1){ 
+            sys.FindPhyloData(); 
+            }
+
 
         for(int j = 0; j < currentGen.size(); j++){
             sys.RemoveOrg(j, systime);
@@ -118,11 +122,10 @@ int main() {
         systime++;
     }
 
-
     int total_orgs = numRounds * numOrgs;
 
     cout << "generations: " << numRounds << " / total organisms: " << total_orgs << endl;
-};
+    };
 
 bool writeToFile(string filename, int field_one){
     ofstream file;
