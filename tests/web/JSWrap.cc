@@ -5,7 +5,7 @@
 #include <functional>
 #include <unordered_map>
 
-#include "web/testing/MochaTestRunner.h"
+#include "web/_MochaTestRunner.h"
 #include "base/assert.h"
 #include "web/init.h"
 #include "web/JSWrap.h"

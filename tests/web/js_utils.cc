@@ -5,7 +5,7 @@
 #include <string>
 #include <array>
 
-#include "web/testing/MochaTestRunner.h"
+#include "web/_MochaTestRunner.h"
 #include "../../tests2/unit_tests.h"
 #include "config/command_line.h"
 #include "base/assert.h"

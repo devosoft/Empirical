@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 #include "base/assert.h"
-#include "web/testing/MochaTestRunner.h"
+#include "web/_MochaTestRunner.h"
 #include "web/Document.h"
 #include "web/Element.h"
 #include "web/web.h"
