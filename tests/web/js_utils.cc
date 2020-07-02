@@ -20,7 +20,8 @@
 // - pass_array_to_javascript
 // - pass_array_to_cpp
 
-struct Test_pass_array_to_javascript : public emp::web::BaseTest {
+// Test pass_array_to_javascript functions
+struct TestPassArrayToJavaScript : public emp::web::BaseTest {
 
   struct JSDataObject {
     EMP_BUILD_INTROSPECTIVE_TUPLE(
@@ -35,7 +36,7 @@ struct Test_pass_array_to_javascript : public emp::web::BaseTest {
 
   emp::vector<uint32_t> wrapped_fun_ids;
 
-  ~Test_pass_array_to_javascript() {
+  ~TestPassArrayToJavaScript() {
     // cleanup wrapped functions
     std::for_each(
       wrapped_fun_ids.begin(),
@@ -204,9 +205,10 @@ struct Test_pass_array_to_javascript : public emp::web::BaseTest {
 };
 
 
+// Test pass_array_to_cpp (from javascript) functions
 // Because we want to check values on the C++ end, this test relies on raw C++ asserts (from cassert)
 // to check values.
-struct Test_pass_array_to_cpp : public emp::web::BaseTest {
+struct TestPassArrayToCpp : public emp::web::BaseTest {
 
   void Setup() override {
 
@@ -317,8 +319,8 @@ emp::web::MochaTestRunner test_runner;
 int main() {
   emp::Initialize();
 
-  test_runner.AddTest<Test_pass_array_to_javascript>("Test pass_array_to_javascript");
-  test_runner.AddTest<Test_pass_array_to_cpp>("Test pass_array_to_cpp");
+  test_runner.AddTest<TestPassArrayToJavaScript>("pass_array_to_javascript");
+  test_runner.AddTest<TestPassArrayToCpp>("pass_array_to_cpp");
 
   test_runner.Run();
 
