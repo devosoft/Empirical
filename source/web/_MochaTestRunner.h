@@ -92,12 +92,12 @@ namespace web {
     /// Access a document that has been registered at construction by ID.
     /// @param id the HTML ID being requested
     /// @return a reference to the document with that ID
-    emp::web::Document& Doc(const std::string id) {
+    emp::web::Document& Doc(const std::string & id) {
       emp_assert(
         documents.count(id),
         "Bad request for unregistered document."
       );
-      return documents.at("id");
+      return documents.at(id);
     }
 
   };

@@ -212,7 +212,7 @@ struct TestPassArrayToJavaScript : public emp::web::BaseTest {
 // to check values.
 struct TestPassArrayToCpp : public emp::web::BaseTest {
 
-  Test_pass_array_to_cpp() { Setup(); }
+  TestPassArrayToCpp() { Setup(); }
 
   void Setup() {
 
