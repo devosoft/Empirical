@@ -43,7 +43,9 @@ namespace web {
     /// [https://mochajs.org/#getting-started](https://mochajs.org/#getting-started)
     virtual void Describe() { ; }
 
-    /// Use this to trigger test failure from C++.
+    /// Use this function to trigger test failure from C++.
+    /// @param result this test should fail if result is false.
+    /// @param msg print this message on test failure.
     void Require(bool result, const std::string & msg="") {
       if (result) return;
       if (msg == "") {
@@ -97,6 +99,7 @@ namespace web {
     }
 
     /// Cleanup test runner specified by runner_id.
+    /// @param runner_id the index of the test_runner we should run cleanup on.
     void CleanupTest(size_t runner_id) {
       emp_assert(runner_id < test_runners.size());
       test_runners[runner_id].cleanup();
@@ -144,10 +147,9 @@ namespace web {
     /// Add a test type to be run. The MochaTestRunner creates, runs, and cleans up each test.
     /// This function should be called with the test type (which should inherit from BaseTest) as a
     /// template argument (e.g., AddTest<TEST_TYPE>(...) ).
-    /// Arguments:
-    /// - test_name specifies the name of the test (this is only used when printing which test is running
+    /// @param test_name specifies the name of the test (this is only used when printing which test is running
     ///   and does not need to be unique across tests).
-    /// - All subsequent arguments are forwarded to the TEST_TYPE constructor.
+    /// @param constructor_args All subsequent arguments (after test_name) are forwarded to the TEST_TYPE constructor.
     // For variatic capture: https://stackoverflow.com/questions/47496358/c-lambdas-how-to-capture-variadic-parameter-pack-from-the-upper-scope
     //  - NOTE: this can get cleaned up quite a bit w/C++ 20!
     template<typename TEST_TYPE, typename... Args>
@@ -260,9 +262,11 @@ namespace web {
     void Run() { NextTest(); }
 
     /// Provide a function for MochaTestRunner to call before each test is created and run.
+    /// @param fun a function to be run before each test is created and run
     void OnBeforeEachTest(const std::function<void()> & fun) { before_each_test_sig.AddAction(fun); };
 
     /// Provide a function for MochaTestRunner to call before after each test runs (but before it is deleted).
+    /// @param fun a function to be run after each test is run (but before it is deleted)
     void OnAfterEachTest(const std::function<void()> & fun) { after_each_test_sig.AddAction(fun); };
 
   };
