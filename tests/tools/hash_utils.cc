@@ -76,17 +76,18 @@ TEST_CASE("Test hash_utils", "[tools]")
   REQUIRE(hash_vec.size() == hash_set.size());
   }
   {
-  REQUIRE(emp::hash_combine((size_t) 0, (size_t) 0) == (size_t) 0);
-  REQUIRE(emp::hash_combine((size_t) 0, (size_t) 1) == (size_t) 2654435769);
-  REQUIRE(emp::hash_combine((size_t) 0, (size_t) 2) == (size_t) 5308871538);
-  REQUIRE(emp::hash_combine((size_t) 1, (size_t) 0) == (size_t) 65);
-  REQUIRE(emp::hash_combine((size_t) 2, (size_t) 0) == (size_t) 130);
+  REQUIRE(emp::hash_combine((size_t) 0, (size_t) 0) == (size_t) 2654435769);
+  REQUIRE(emp::hash_combine((size_t) 0, (size_t) 1) == (size_t) 2654435770);
+  REQUIRE(emp::hash_combine((size_t) 0, (size_t) 2) == (size_t) 2654435771);
+  REQUIRE(emp::hash_combine((size_t) 1, (size_t) 0) == (size_t) 2654435832);
+  REQUIRE(emp::hash_combine((size_t) 2, (size_t) 0) == (size_t) 2654435899);
 
-  REQUIRE(emp::hash_combine((size_t) 1, (size_t) 1) == (size_t) 2654435832);
-  REQUIRE(emp::hash_combine((size_t) 2, (size_t) 2) == (size_t) 5308871664);
-  REQUIRE(emp::hash_combine((size_t) 3, (size_t) 3) == (size_t) 7963307496);
+  REQUIRE(emp::hash_combine((size_t) 1, (size_t) 1) == (size_t) 2654435835);
+  REQUIRE(emp::hash_combine((size_t) 2, (size_t) 2) == (size_t) 2654435897);
+  REQUIRE(emp::hash_combine((size_t) 3, (size_t) 3) == (size_t) 2654435967);
 
-  REQUIRE(emp::hash_combine((size_t) 1, (size_t) 3) == (size_t) 7963307370);
-  REQUIRE(emp::hash_combine((size_t) 3, (size_t) 1) == (size_t) 2654435962);
+  REQUIRE(emp::hash_combine((size_t) 1, (size_t) 3) == (size_t) 2654435837);
+  REQUIRE(emp::hash_combine((size_t) 3, (size_t) 1) == (size_t) 2654435961);
   }
 }
+
