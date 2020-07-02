@@ -71,12 +71,12 @@ namespace web {
   class MochaTestRunner {
   protected:
 
-    // TestRunner encapsulates everything needed to create, run, and cleanup a test.
+    /// TestRunner encapsulates everything needed to create, run, and cleanup a test.
     struct TestRunner {
       emp::Ptr<BaseTest> test{nullptr};
-      std::function<void()> create{};
-      std::function<void()> describe{};
-      std::function<void()> cleanup{};
+      std::function<void()> create;
+      std::function<void()> describe;
+      std::function<void()> cleanup;
       std::string test_name{};
       bool done=false;
       size_t before_test_error_count=0;
@@ -86,9 +86,9 @@ namespace web {
     emp::Signal<void()> after_each_test_sig;    ///< Is triggered after each test (after test marked 'done', but before test is deleted).
     std::deque<TestRunner> test_runners;        ///< Store test runners in a first-in-first-out (out=run) queue
 
-    size_t next_test_js_func_id=0;
-    size_t pop_test_js_func_id=0;
-    size_t cleanup_all_js_func_id=0;
+    const size_t next_test_js_func_id;
+    const size_t pop_test_js_func_id;
+    const size_t cleanup_all_js_func_id;
 
     /// Run the next test!
     void NextTest() {
@@ -106,7 +106,7 @@ namespace web {
     }
 
     /// Cleanup all test runners.
-    void Cleanup() {
+    void CleanupTestRunners() {
       // finished running all tests. Make sure all dynamically allocated memory is cleaned up.
       std::for_each(
         test_runners.begin(),
@@ -122,25 +122,14 @@ namespace web {
 
   public:
 
-    MochaTestRunner() {
-      next_test_js_func_id = emp::JSWrap(
-        [this]() { this->NextTest(); },
-        "NextTest"
-      );
-
-      pop_test_js_func_id = emp::JSWrap(
-        [this]() { this->PopTest(); },
-        "PopTest"
-      );
-
-      cleanup_all_js_func_id = emp::JSWrap(
-        [this]() { this->Cleanup(); },
-        "CleanupManager"
-      );
-    }
+    MochaTestRunner()
+      : next_test_js_func_id(emp::JSWrap([this]() { this->NextTest(); }, "NextTest")),
+        pop_test_js_func_id(emp::JSWrap([this]() { this->PopTest(); }, "PopTest")),
+        cleanup_all_js_func_id(emp::JSWrap([this]() { this->CleanupTestRunners(); }, "CleanupTestRunners"))
+    { }
 
     ~MochaTestRunner() {
-      Cleanup();
+      CleanupTestRunners();
       emp::JSDelete(next_test_js_func_id);
       emp::JSDelete(pop_test_js_func_id);
       emp::JSDelete(cleanup_all_js_func_id);
@@ -221,7 +210,7 @@ namespace web {
           EM_ASM({
             describe("Finished running tests.", function() {
               it("should cleanup test manager", function() {
-                emp.CleanupManager();
+                emp.CleanupTestRunners();
               });
             });
           });
