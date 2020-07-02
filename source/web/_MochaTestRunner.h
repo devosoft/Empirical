@@ -162,6 +162,103 @@ namespace web {
       test_runners.clear();
     }
 
+    /// TestRunner create function factory.
+    /// @return a functor that, when called, creates a new instance of TEST_TYPE and then calls TEST_TYPE::Setup
+    template<typename TEST_TYPE>
+    std::function<void()> MakeTestCreate() {
+      return
+        [this]() {
+          auto & cur_runner = this->test_runners.front(); // Create the test in the front of the queue.
+          // Record the before test error count
+          cur_runner.before_test_error_count = emp::GetUnitTestOutput().errors;
+          // Allocate memory for test
+          cur_runner.test = emp::NewPtr<TEST_TYPE>(); // Force default constructor use.
+          cur_runner.done = false;
+          // Force redraw of tracked document elements
+          cur_runner.test->Redraw();
+        };
+    }
+
+    /// TestRunner describe function factory.
+    /// @return a functor that, when called, calls the test (at the front of the queue)'s Describe function
+    ///   and then queues up test cleanup and the next test/MochaTestRunner cleanup.
+    std::function<void()> MakeTestDescribe() {
+      return
+        [this]() {
+          emp_assert(test_runners.size());
+          auto & cur_runner = this->test_runners.front(); // When a test_runner's describe function is run, it will be at
+                                                          // the front of the queue.
+
+          cur_runner.test->Describe(); // this will queue up the next test's describe
+          auto & test_name = cur_runner.test_name;
+
+          // Queue cleanup for this test.
+          EM_ASM({
+            const test_name = UTF8ToString($0);
+            // Queue cleanup for this test
+            describe(`Cleanup ${test_name}`, function() {
+              it('should clean up the test ', function() {
+                emp.PopTest();
+              });
+            });
+          }, test_name.c_str());
+
+          // If there are still more tests to do (i.e., this is not the last test), queue them
+          // otherwise, queue up a cleanup
+          if (test_runners.size() > 1) {
+            auto & next_test_name = this->test_runners[1].test_name;
+            EM_ASM({
+              const next_test_name = UTF8ToString($0);
+              // Queue up next test
+              describe(`Queue ${next_test_name}` , function() {
+                it("should queue the next test", function() {
+                  emp.NextTest();
+                });
+              });
+            }, next_test_name.c_str());
+          } else {
+            EM_ASM({
+              describe("Finished running tests.", function() {
+                it("should cleanup test manager", function() {
+                  emp.CleanupTestRunners();
+                });
+              });
+            });
+          }
+        };
+    }
+
+    /// TestRunner cleanup function factory.
+    /// @return a functor that, when called, cleans up the current test (at the front of the test queue)
+    std::function<void()> MakeTestCleanup() {
+      return
+        [this]() {
+          auto & cur_runner = this->test_runners.front();
+          // Mark test as done.
+          cur_runner.done = true;
+
+          // Did this test trigger any C++ test failures?
+          const size_t post_test_error_cnt = emp::GetUnitTestOutput().errors;
+          auto & test_name = cur_runner.test_name;
+
+          // Did the error count increase after running this test? If so, force failure.
+          if (post_test_error_cnt != cur_runner.before_test_error_count) {
+            EM_ASM({
+              const test_name = UTF8ToString($0);
+              describe(`${test_name} failed`, function() {
+                it("failed at least one C++ unit test", function() {
+                  chai.assert(false);
+                });
+              });
+            }, test_name.c_str());
+          }
+
+          this->after_each_test_sig.Trigger();
+          cur_runner.test.Delete();
+          cur_runner.test = nullptr;
+        };
+    }
+
   public:
 
     MochaTestRunner()
@@ -216,15 +313,15 @@ namespace web {
 
     /// Add a test type to be run. The MochaTestRunner creates, runs, and cleans up each test.
     /// This function should be called with the test type (which should inherit from BaseTest) as a
-    /// template argument (e.g., AddTest<TEST_TYPE>(...) ).
+    /// template argument (e.g., AddTest<TEST_TYPE>() ).
     /// Tests are eventually run in the order they were added (first-in-first-out).
     /// @param test_name specifies the name of the test (this is only used when printing which test is running
     ///   and does not need to be unique across tests).
-    /// @param constructor_args All subsequent arguments (after test_name) are forwarded to the TEST_TYPE constructor.
-    // For variatic capture: https://stackoverflow.com/questions/47496358/c-lambdas-how-to-capture-variadic-parameter-pack-from-the-upper-scope
-    //  - NOTE: this can get cleaned up quite a bit w/C++ 20!
-    template<typename TEST_TYPE, typename... Args>
-    void AddTest(const std::string & test_name, Args&&... constructor_args) {
+    // NOTE: I eliminated constructor argument forwarding because of potential for unintuitive side-effects.
+    //       Constructors are not called immediately (and so arguments are not used immediately).
+    //       It may be worth revisiting support for constructor argument forwarding in the future.
+    template<typename TEST_TYPE>
+    void AddTest(const std::string & test_name) {
 
       // create a new test runner for this test
       test_runners.emplace_back();
@@ -233,19 +330,8 @@ namespace web {
       // name it!
       runner.test_name = test_name;
 
-      // configure the function that, when called, will create a new instance of TEST_TYPE (using forwarded
-      // arguments as constructor arguments) and then call TEST_TYPE::Setup.
-      runner.create = [constructor_args = std::make_tuple(std::forward<Args>(constructor_args)...), this]() mutable {
-        std::apply([this](auto&&... constructor_args) {
-          auto & cur_runner = this->test_runners.front(); // Create the test in the front of the queue.
-          // Record the before test error count
-          cur_runner.before_test_error_count = emp::GetUnitTestOutput().errors;
-          // Allocate memory for test
-          cur_runner.test = emp::NewPtr<TEST_TYPE>(std::forward<Args>(constructor_args)...);
-          cur_runner.done = false;
-          cur_runner.test->Redraw();
-        }, std::move(constructor_args));
-      };
+      // configure the function that knows how to create a TEST_TYPE (and subsequently calls TEST_TYPE::Setup)
+      runner.create = MakeTestCreate<TEST_TYPE>();
 
       // configure the function that, when called, will call TEST_TYPE::Describe, which should queue
       // up a Mocha describe function (containing js tests). Next, this function will either (1) queue
@@ -254,74 +340,11 @@ namespace web {
       // This function takes advantage of Mocha describe functions to use 'browser' events to chain
       // together tests (which is necessary because js 'describe' calls add themselves to the browser's
       // event queue instead of executing as soon as you call them).
-      runner.describe = [this]() {
-        auto & cur_runner = this->test_runners.front();
-        cur_runner.test->Describe(); // this will queue up the next test's describe
-
-        auto & test_name = cur_runner.test_name;
-
-        EM_ASM({
-          const test_name = UTF8ToString($0);
-
-          // Queue up cleanup for this test
-          describe("Cleanup " + test_name, function() {
-            it('should clean up test ', function() {
-              emp.PopTest();
-            });
-          });
-        }, test_name.c_str());
-
-        // If there are still more tests to do (i.e., this is not the last test), queue them
-        // otherwise, queue up a cleanup
-        if (test_runners.size() > 1) {
-          auto & next_test_name = this->test_runners[1].test_name;
-          EM_ASM({
-            const next_test_name = UTF8ToString($0);
-            // Queue up next test
-            describe("Queue " + next_test_name , function() {
-              it("should queue the next test", function() {
-                emp.NextTest();
-              });
-            });
-          }, next_test_name.c_str());
-        } else {
-          EM_ASM({
-            describe("Finished running tests.", function() {
-              it("should cleanup test manager", function() {
-                emp.CleanupTestRunners();
-              });
-            });
-          });
-        }
-      };
+      runner.describe = MakeTestDescribe();
 
       // configure the function that, when called, triggers the 'after each test' signal, and cleans
       // up the dynamically allocated TEST_TYPE object.
-      runner.cleanup = [this]() {
-        auto & cur_runner = this->test_runners.front();
-        // Mark test as done.
-        cur_runner.done = true;
-
-        // Did this test trigger any C++ test failures?
-        const size_t post_test_error_cnt = emp::GetUnitTestOutput().errors;
-        auto & test_name = cur_runner.test_name;
-
-        // Did the error count increase after running this test? If so, force failure.
-        if (post_test_error_cnt != cur_runner.before_test_error_count) {
-          EM_ASM({
-            const test_name = UTF8ToString($0);
-            describe(test_name + " - Failed C++ unit test", function() {
-              it("failed at least one C++ unit test", function() {
-                chai.assert(false);
-              });
-            });
-          }, test_name.c_str());
-        }
-
-        this->after_each_test_sig.Trigger();
-        cur_runner.test.Delete();
-        cur_runner.test = nullptr;
-      };
+      runner.cleanup = MakeTestCleanup();
     }
 
     /// Run all tests that have been added to the MochaTestRunner thus far.
