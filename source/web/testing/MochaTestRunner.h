@@ -56,7 +56,7 @@ namespace web {
   };
 
   /// Utility class for managing software tests written for Emscripten web code.
-  /// IMPORTANT: This utility assumes the Karma + Mocha javascript testin framework.
+  /// IMPORTANT: This utility assumes the Karma + Mocha javascript testing framework.
   // MochaTestRunner is useful because emscripten does not play very nice with the browser event queue (i.e.,
   // it does not relinquish control back to the browser until it finishes executing the compiled 'C++'
   // code). This interacts poorly with Mocha because Mocha's 'describe' statements do not execute when
