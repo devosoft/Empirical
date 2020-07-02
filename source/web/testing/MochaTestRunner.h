@@ -2,7 +2,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2020-2020
+ *  @date 2020
  *
  *  @file  MochaTestRunner.h
  *  @brief Utility class for managing software testing for Emscripten web code using the Karma + Mocha
