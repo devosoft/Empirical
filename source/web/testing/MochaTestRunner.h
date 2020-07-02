@@ -68,7 +68,6 @@ namespace web {
   // they are called; instead, they are added to the browser's event queue.
   // The MochaTestRunner exploits Mocha's describe statements + the browser's event queue to chain together
   // the tests added to the MochaTestRunner.
-  // QUESTION: should this be the KarmaMochaTestingManager?
   class MochaTestRunner {
   protected:
 
