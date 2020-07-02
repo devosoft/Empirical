@@ -18,6 +18,9 @@
 #include <utility>
 #include <algorithm>
 #include <deque>
+#include <unordered_map>
+
+#include "Document.h"
 #include "control/Signal.h"
 #include "base/vector.h"
 #include "web/JSWrap.h"
@@ -28,9 +31,31 @@ namespace web {
 
   /// Base test class that all web tests managed by MochaTestRunner should inherit from.
   /// Order of operations: Construction, Setup, Describe, Destruction
-  struct BaseTest {
+  class BaseTest {
 
-    BaseTest() { ; }
+  private:
+    std::unordered_map<
+      std::string,
+      emp::web::Document
+    > documents;
+
+  public:
+    /// @document_ids vector of HTML IDs of divs to attach to
+    BaseTest(const emp::vector<std::string> document_ids={}) {
+
+      for (const auto & id : document_ids) {
+        auto res = documents.emplace(
+          id, id
+        );
+        emp_assert(res.second, "Document IDs should be unqiue.");
+        res.first->second.Activate();
+      }
+
+      EM_ASM({
+        jQuery.ready();
+      });
+
+    }
 
     // Remember to clean up after your test!
     virtual ~BaseTest() { ; }
@@ -56,6 +81,24 @@ namespace web {
       } else {
         EM_ASM({ chai.assert.fail(UTF8ToString($0)); }, msg.c_str());
       }
+    }
+
+    /// Force redraw of all registered documents.
+    void Redraw() {
+      for (auto & [id, doc] : documents) {
+        doc.Redraw();
+      }
+    }
+
+    /// Access a document that has been registered at construction by ID.
+    /// @param id the HTML ID being requested
+    /// @return a reference to the document with that ID
+    emp::web::Document& Doc(const std::string id) {
+      emp_assert(
+        documents.count(id),
+        "Bad request for unregistered document."
+      );
+      return documents.at("id");
     }
 
   };

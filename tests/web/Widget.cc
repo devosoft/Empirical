@@ -13,7 +13,11 @@
 
 
 struct Test_WidgetWrapWith : emp::web::BaseTest {
-  emp::web::Document doc{"emp_test_container"};
+
+  Test_WidgetWrapWith()
+  : BaseTest({"emp_test_container"})
+  { ; }
+
 
   void Setup() override {
     // Construct the following HTML structure using empirical
@@ -28,15 +32,9 @@ struct Test_WidgetWrapWith : emp::web::BaseTest {
     //   <br/><br/>
     // </div>
 
-    // Manually activate document (and re-trigger ready signal)
-    doc.Activate();
-    EM_ASM({
-      jQuery.ready();
-    });
-
     emp::web::Element parent("p", "parent");
     parent << "parent";
-    doc << parent;
+    Doc("emp_test_container") << parent;
 
     emp::web::Button child(
       []() {
@@ -58,9 +56,9 @@ struct Test_WidgetWrapWith : emp::web::BaseTest {
       emp::web::Div("wrapper2").SetCSS("background-color", "red")
     ).SetCSS("background-color", "blue");
 
-    doc.Div("wrapper2") << "<br/><br/>";
+    Doc("emp_test_container").Div("wrapper2") << "<br/><br/>";
 
-    doc.Redraw(); // Manually tell document to redraw to html
+    Redraw(); // Manually tell document to redraw to html
   }
 
   void Describe() override {

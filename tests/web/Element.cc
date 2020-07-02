@@ -14,7 +14,10 @@
 
 // This tests that the Element class properly gets attached and layed out via emp::web::Document.
 struct Test_Element_HTMLLayout : public emp::web::BaseTest {
-  emp::web::Document doc{"emp_test_container"}; // When this test is created/run, grab our test container div
+
+  Test_Element_HTMLLayout()
+  : BaseTest({"emp_test_container"})
+  { ; }
 
   void Setup() override {
     // Construct the following HTML structure:
@@ -30,24 +33,19 @@ struct Test_Element_HTMLLayout : public emp::web::BaseTest {
     // **Empirical weirdness warning**
     // because this test will be created *after* the document's ready signal is triggered,
     // we need to manually activate the document + trigger the ready signal
-    doc.Activate();
-    EM_ASM({
-      jQuery.ready();
-    });
 
     emp::web::Element header("h1", "element_h1");
 
-    doc
+    Doc("emp_test_container")
       << emp::web::Div("test_div")
       << header << "Header1!";
 
-    doc.Div("test_div")
+    Doc("emp_test_container").Div("test_div")
       << emp::web::Element("p", "element_p")
       << emp::web::Element("h4", "element_h4")
       << "Header4!";
 
-
-    doc.Redraw();
+    Redraw();
   }
 
   void Describe() override {
