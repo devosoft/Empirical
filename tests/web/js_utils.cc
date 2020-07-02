@@ -59,7 +59,7 @@ struct Test_pass_array_to_javascript : public emp::web::BaseTest {
     wrapped_fun_ids.emplace_back(
       emp::JSWrap(
         [](){
-          emp::vector<emp::vector<emp::vector<double> > > nested_vec = {{{1,2,3},{4,5,6}}};
+          emp::vector<emp::vector<emp::vector<double> > > nested_vec{{{1,2,3},{4,5,6}}};
           emp::pass_array_to_javascript(nested_vec);
         },
         "PassNestedVectorToJS",
@@ -70,7 +70,7 @@ struct Test_pass_array_to_javascript : public emp::web::BaseTest {
     wrapped_fun_ids.emplace_back(
       emp::JSWrap(
         []() {
-          emp::vector<int> int_vec = {5,1,2,3,6};
+          emp::vector<int> int_vec{5,1,2,3,6};
           emp::pass_array_to_javascript(int_vec);
         },
         "PassIntVectorToJS",
@@ -81,7 +81,7 @@ struct Test_pass_array_to_javascript : public emp::web::BaseTest {
     wrapped_fun_ids.emplace_back(
       emp::JSWrap(
         []() {
-          emp::vector<std::string> string_vec = {"a", "vector", "of", "strings"};
+          emp::vector<std::string> string_vec{"a", "vector", "of", "strings"};
           emp::pass_array_to_javascript(string_vec);
         },
         "PassStringVectorToJS",
@@ -92,7 +92,7 @@ struct Test_pass_array_to_javascript : public emp::web::BaseTest {
     wrapped_fun_ids.emplace_back(
       emp::JSWrap(
         []() {
-          emp::array<int32_t, 3> test_data = {{10,30,60}};
+          emp::array<int32_t, 3> test_data{{10,30,60}};
           emp::pass_array_to_javascript(test_data);
         },
         "PassArrayIntToJS",
@@ -103,7 +103,7 @@ struct Test_pass_array_to_javascript : public emp::web::BaseTest {
     wrapped_fun_ids.emplace_back(
       emp::JSWrap(
         [this]() {
-          emp::array<JSDataObject, 2> test_data_2 = {{test_obj_1, test_obj_2}};
+          emp::array<JSDataObject, 2> test_data_2{{test_obj_1, test_obj_2}};
           emp::pass_array_to_javascript(test_data_2);
         },
         "PassArrayJSDataObjectToJS",
@@ -114,7 +114,7 @@ struct Test_pass_array_to_javascript : public emp::web::BaseTest {
     wrapped_fun_ids.emplace_back(
       emp::JSWrap(
         []() {
-          emp::array<emp::array<std::string, 5>, 1> string_arr = {{{{"do", "strings", "work", "in", "arrays?"}}}};
+          emp::array<emp::array<std::string, 5>, 1> string_arr{{{{"do", "strings", "work", "in", "arrays?"}}}};
           emp::pass_array_to_javascript(string_arr);
         },
         "PassNestedArrayStringToJS",
@@ -125,7 +125,7 @@ struct Test_pass_array_to_javascript : public emp::web::BaseTest {
     wrapped_fun_ids.emplace_back(
       emp::JSWrap(
         []() {
-          emp::array<emp::array<emp::array<int, 2>, 1>, 5> horrible_array = {{{{{{0,0}}}}, {{{{0,10}}}}, {{{{10,10}}}}, {{{{20,20}}}}, {{{{30, 30}}}}}};
+          emp::array<emp::array<emp::array<int, 2>, 1>, 5> horrible_array{{{{{{0,0}}}}, {{{{0,10}}}}, {{{{10,10}}}}, {{{{20,20}}}}, {{{{30, 30}}}}}};
           emp::pass_array_to_javascript(horrible_array);
         },
         "PassNestedArrayIntToJS",
@@ -136,7 +136,7 @@ struct Test_pass_array_to_javascript : public emp::web::BaseTest {
     wrapped_fun_ids.emplace_back(
       emp::JSWrap(
         [this]() {
-          emp::array<emp::array<JSDataObject, 2>, 2> test_data_4 = {{{{test_obj_1, test_obj_2}}, {{test_obj_2, test_obj_2}}}};
+          emp::array<emp::array<JSDataObject, 2>, 2> test_data_4{{{{test_obj_1, test_obj_2}}, {{test_obj_2, test_obj_2}}}};
           emp::pass_array_to_javascript(test_data_4);
         },
         "PassNestedArrayJSDataObjectToJS",
