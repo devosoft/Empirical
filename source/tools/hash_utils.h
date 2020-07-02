@@ -1,10 +1,10 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019
+ *  @date 2019-2020
  *
  *  @file  hash_utils.h
- *  @brief This file provides tools for hashing values.
+ *  @brief This file provides tools for hashing values and containers.
  *  @note Status: BETA
  */
 
