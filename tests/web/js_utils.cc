@@ -204,7 +204,8 @@ struct Test_pass_array_to_javascript : public emp::web::BaseTest {
 };
 
 
-// Because we want to check values on the C++ end, this test relies on emp_assert to check values.
+// Because we want to check values on the C++ end, this test relies on raw C++ asserts (from cassert)
+// to check values.
 struct Test_pass_array_to_cpp : public emp::web::BaseTest {
 
   void Setup() override {
