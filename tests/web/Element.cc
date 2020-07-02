@@ -154,6 +154,6 @@ int main() {
   //  where "Test Element" is the name of the test (and does not need to be unique)
   test_runner.AddTest<Test_Element_HTMLLayout>("Test Element HTML Layout" /*, any constructor args for test struct would go here*/);
 
-  // Once we adde all of the tests we want to run in this file, we run them with .Run()
+  // Once we add all of the tests we want to run in this file, we run them with .Run()
   test_runner.Run();
 }
