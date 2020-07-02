@@ -84,6 +84,7 @@ namespace web {
     }
 
     /// Force redraw of all registered documents.
+    /// Automatically run after construction but before Describe.
     void Redraw() {
       for (auto & [id, doc] : documents) {
         doc.Redraw();
@@ -246,6 +247,7 @@ namespace web {
           cur_runner.done = false;
           // Run test setup
           cur_runner.test->Setup();
+          cur_runner.test->Redraw();
         }, std::move(constructor_args));
       };
 

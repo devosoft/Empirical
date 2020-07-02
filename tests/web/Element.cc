@@ -45,7 +45,6 @@ struct Test_Element_HTMLLayout : public emp::web::BaseTest {
       << emp::web::Element("h4", "element_h4")
       << "Header4!";
 
-    Redraw();
   }
 
   void Describe() override {

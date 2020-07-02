@@ -58,7 +58,6 @@ struct Test_WidgetWrapWith : emp::web::BaseTest {
 
     Doc("emp_test_container").Div("wrapper2") << "<br/><br/>";
 
-    Redraw(); // Manually tell document to redraw to html
   }
 
   void Describe() override {
