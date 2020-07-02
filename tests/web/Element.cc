@@ -12,7 +12,7 @@
 #include "web/web.h"
 
 
-// This tests that the Element class properly gets attached and layed out via emp::web::Document.
+// Test that the Element class properly gets attached and laid out via emp::web::Document.
 struct Test_Element_HTMLLayout : public emp::web::BaseTest {
 
   Test_Element_HTMLLayout()
@@ -150,8 +150,11 @@ int main() {
 
   // We add tests to the test runner like this:
   //  where "Test Element" is the name of the test (and does not need to be unique)
-  test_runner.AddTest<Test_Element_HTMLLayout>("Test Element HTML Layout" /*, any constructor args for test struct would go here*/);
+  test_runner.AddTest<Test_Element_HTMLLayout>(
+    "Test Element HTML Layout"
+    /*, any constructor args for test struct would go here*/
+  );
 
-  // Once we add all of the tests we want to run in this file, we run them with .Run()
+  // Once we add all of the tests we want to run in this file, run them!
   test_runner.Run();
 }
