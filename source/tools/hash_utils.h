@@ -12,6 +12,8 @@
 #define EMP_HASH_UTILS_H
 
 #include <type_traits>
+#include <cstddef>
+#include <stdint.h>
 
 namespace emp {
 
