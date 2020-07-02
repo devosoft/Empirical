@@ -207,6 +207,10 @@ struct TestPassArrayToJavaScript : public emp::web::BaseTest {
 };
 
 
+// struct TestPassMapToJavascript : public emp::web::BaseTest {
+
+// };
+
 // Test pass_array_to_cpp (from javascript) functions
 // Because we want to check values on the C++ end, this test relies on raw C++ asserts (from cassert)
 // to check values.
