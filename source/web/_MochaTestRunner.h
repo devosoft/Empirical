@@ -33,7 +33,7 @@ namespace web {
     BaseTest() { ; }
 
     // Remember to clean up after your test!
-    virtual ~BaseTest() { }
+    virtual ~BaseTest() { ; }
 
     /// Setup is run immediately after construction and before Describe.
     /// Setup should run any configuration/setup (e.g., dom manipulation, object creation/configuration)
