@@ -15,25 +15,18 @@
 // Test that the Element class properly gets attached and laid out via emp::web::Document.
 struct Test_Element_HTMLLayout : public emp::web::BaseTest {
 
+
+  // Construct the following HTML structure:
+  // <div id="emp_test_container">
+  //   <div id="test_div">
+  //     <h1 id="element_h1"><span>Header!</span></h1>
+  //     <p id="element_p">
+  //       <h4 id="element_h4"></h4>
+  //     </p>
+  //   </div>
+  // </div>
   Test_Element_HTMLLayout()
-  : BaseTest({"emp_test_container"})
-  { ; }
-
-  void Setup() override {
-    // Construct the following HTML structure:
-    // <div id="emp_test_container">
-    //   <div id="test_div">
-    //     <h1 id="element_h1"><span>Header!</span></h1>
-    //     <p id="element_p">
-    //       <h4 id="element_h4"></h4>
-    //     </p>
-    //   </div>
-    // </div>
-
-    // **Empirical weirdness warning**
-    // because this test will be created *after* the document's ready signal is triggered,
-    // we need to manually activate the document + trigger the ready signal
-
+  : BaseTest({"emp_test_container"}) {
     emp::web::Element header("h1", "element_h1");
 
     Doc("emp_test_container")

@@ -14,23 +14,21 @@
 
 struct Test_WidgetWrapWith : emp::web::BaseTest {
 
+
+  // Construct the following HTML structure:
+  // <div id="wrapper2"> <!-- inserted with WrapWith -->
+  //   <p id="parent">
+  //     parent
+  //     <div id="wrapper"> <!-- inserted with WrapWith -->
+  //       wrapper
+  //       <button id="child"></button>
+  //     </div>
+  //   </p>
+  //   <br/><br/>
+  // </div>
   Test_WidgetWrapWith()
   : BaseTest({"emp_test_container"})
-  { ; }
-
-
-  void Setup() override {
-    // Construct the following HTML structure using empirical
-    // <div id="wrapper2"> <!-- inserted with WrapWith -->
-    //   <p id="parent">
-    //     parent
-    //     <div id="wrapper"> <!-- inserted with WrapWith -->
-    //       wrapper
-    //       <button id="child"></button>
-    //     </div>
-    //   </p>
-    //   <br/><br/>
-    // </div>
+  {
 
     emp::web::Element parent("p", "parent");
     parent << "parent";
@@ -62,7 +60,7 @@ struct Test_WidgetWrapWith : emp::web::BaseTest {
 
   void Describe() override {
 
-    // Test that the HTML components created in Setup are correct.
+    // Test that the HTML components created in constructor are correct.
     EM_ASM({
 
       describe("Widget::WrapWith", function() {

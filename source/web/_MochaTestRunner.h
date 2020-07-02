@@ -30,7 +30,10 @@ namespace emp {
 namespace web {
 
   /// Base test class that all web tests managed by MochaTestRunner should inherit from.
-  /// Order of operations: Construction, Setup, Describe, Destruction
+  /// Order of operations: Construction, Describe, Destruction
+  /// Derived constructor should run any configuration/setup
+  /// (e.g., dom manipulation, object creation/configuration)
+  /// necessary for test.
   class BaseTest {
 
   private:
@@ -60,12 +63,7 @@ namespace web {
     // Remember to clean up after your test!
     virtual ~BaseTest() { ; }
 
-    /// Setup is run immediately after construction and before Describe.
-    /// Setup should run any configuration/setup (e.g., dom manipulation, object creation/configuration)
-    /// necessary for test.
-    virtual void Setup() { ; }
-
-    /// Describe is run after Setup.
+    /// Describe is run after construction.
     /// Describe should contain the Mocha testing statements (e.g., 'describes', 'its', etc)
     /// [https://mochajs.org/#getting-started](https://mochajs.org/#getting-started)
     virtual void Describe() { ; }
@@ -245,8 +243,6 @@ namespace web {
           // Allocate memory for test
           cur_runner.test = emp::NewPtr<TEST_TYPE>(std::forward<Args>(constructor_args)...);
           cur_runner.done = false;
-          // Run test setup
-          cur_runner.test->Setup();
           cur_runner.test->Redraw();
         }, std::move(constructor_args));
       };
