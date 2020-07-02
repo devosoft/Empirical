@@ -26,7 +26,9 @@ struct Test_Element_HTMLLayout : public emp::web::BaseTest {
   //   </div>
   // </div>
   Test_Element_HTMLLayout()
-  : BaseTest({"emp_test_container"}) {
+  : BaseTest({"emp_test_container"}) // we can tell BaseTest that we want to create a set of emp::web::Document
+                                     // objects for each given html element ids.
+  {
     emp::web::Element header("h1", "element_h1");
 
     Doc("emp_test_container")
@@ -120,6 +122,11 @@ emp::web::MochaTestRunner test_runner;
 
 int main() {
 
+  // MochaTestRunner::Initialize will make sure empirical's web environment is initialized, and will
+  // append a set of div elements (with the given string ids) to the HTML document body.
+  // Between tests, the MochaTestRunner clears the contents of these div elements.
+  // Remember, karma is generating our HTML file, so this is useful for attaching any HTML divs that
+  // you want to interact with in your tests.
   test_runner.Initialize({"emp_test_container"});
 
   // We add tests to the test runner like this:

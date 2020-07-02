@@ -163,7 +163,7 @@ namespace web {
     }
 
     /// TestRunner create function factory.
-    /// @return a functor that, when called, creates a new instance of TEST_TYPE and then calls TEST_TYPE::Setup
+    /// @return a functor that, when called, creates a new instance of TEST_TYPE
     template<typename TEST_TYPE>
     std::function<void()> MakeTestCreate() {
       return
@@ -330,7 +330,7 @@ namespace web {
       // name it!
       runner.test_name = test_name;
 
-      // configure the function that knows how to create a TEST_TYPE (and subsequently calls TEST_TYPE::Setup)
+      // configure the function that knows how to create a TEST_TYPE
       runner.create = MakeTestCreate<TEST_TYPE>();
 
       // configure the function that, when called, will call TEST_TYPE::Describe, which should queue
