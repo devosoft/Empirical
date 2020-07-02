@@ -27,6 +27,7 @@ namespace emp {
 namespace web {
 
   /// Base test class that all web tests managed by MochaTestRunner should inherit from.
+  /// Order of operations: Construction, Setup, Describe, Destruction
   struct BaseTest {
 
     BaseTest() { ; }
@@ -44,7 +45,8 @@ namespace web {
     /// [https://mochajs.org/#getting-started](https://mochajs.org/#getting-started)
     virtual void Describe() { ; }
 
-    /// Use this function to trigger test failure from C++.
+    /// This is a utility function that can be used to trigger test failure from C++. (it is not automatically
+    /// run for you).
     /// @param result this test should fail if result is false.
     /// @param msg print this message on test failure.
     void Require(bool result, const std::string & msg="") {
