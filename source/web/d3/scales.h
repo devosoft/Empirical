@@ -7,10 +7,7 @@
  *  @brief Tools for scaling graph axes in D3.
 **/
 
-
-// clean up copy constructur? -- ask group
-// TODO: template specialization on applyscale? -- fix Date applyscale (delete appropriate templates)
-// TODO: clean up Date struct (introspective tuple)
+// TODO: clean up copy constructur? -- ask group
 // TODO: make sure all functions match documentation
 
 #ifndef __EMP_D3_SCALES_H__
@@ -71,8 +68,6 @@ namespace D3 {
       return *this;
     }
 
-    // template<typename T>
-    // typename std::enable_if<std::is_integral<T>::value, Scale &>::type
     Scale & SetDomain(double min, double max) {
       EM_ASM({
         emp_d3.objects[$0].domain([$1, $2]);
@@ -100,8 +95,6 @@ namespace D3 {
       return *this;
     }
 
-    // template<typename T>
-    // typename std::enable_if<std::is_integral<T>::value, Scale &>::type
     Scale & SetRange(double min, double max) {
       EM_ASM({
         emp_d3.objects[$0].range([$1, $2]);
@@ -116,7 +109,6 @@ namespace D3 {
       return *this;
     }
 
-    // TODO: template specialization
     template<typename RETURN_T, typename INPUT_T>
     RETURN_T ApplyScale(INPUT_T input) {
       emp_assert(false);
@@ -193,7 +185,6 @@ namespace D3 {
     }
 
     // Getter methods for a scale's domain and range
-    // Use: GetDomain<type>()
     template <typename T>
     emp::vector<T> GetDomain() {
       EM_ASM({
@@ -205,7 +196,6 @@ namespace D3 {
       return domain_vector;
     }
 
-    // .range()
     template <typename T>
     emp::vector<T> GetRange() {
       EM_ASM({
@@ -434,6 +424,35 @@ namespace D3 {
   //   ContinuousScale & SetInterpolate(const std::string & interpolatorName) = delete;
   // };
 
+  // A struct to deal with dates that mimics the JS Date object
+  struct Date {
+    int year;
+    int month;
+    int day;
+    int hours;
+    int minutes;
+    int seconds;
+    int milliseconds;
+
+    // note that month should be passed in 0 indexed to keep consistent with JavaScript (0 = January)
+    Date(int year, int month, int day = 1, int hours = 0, int minutes = 0,
+    int seconds = 0, int milliseconds = 0) {
+      this->year = year;
+      this->month = month;
+      this->day = day;
+      this->hours = hours;
+      this->minutes = minutes;
+      this->seconds = seconds;
+      this->milliseconds = milliseconds;
+    }
+
+    std::string ToString() {
+      return std::to_string(this->year) + " " + std::to_string(this->month) + " " + std::to_string(this->day) +
+      " " + std::to_string(this->hours) + ":" + std::to_string(this->minutes) + ":" + std::to_string(this->seconds) +
+      ":" + std::to_string(this->milliseconds);
+    }
+  };
+
   // scaleTime
   class TimeScale : public ContinuousScale {
   protected:
@@ -444,6 +463,7 @@ namespace D3 {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleTime(); }, this->id);
     }
 
+    // We need to redeclare this so that the ApplyScale functions can be properly deleted
     template<typename RETURN_T, typename INPUT_T>
     RETURN_T ApplyScale(INPUT_T input) {
       emp_assert(false);
@@ -454,52 +474,33 @@ namespace D3 {
     template <typename T, size_t SIZE>
     Scale & SetDomain(const emp::array<T, SIZE> & values) = delete;
     Scale & SetDomain(double min, double max) = delete;
-    // double ApplyScaleDouble(double input) = delete;
-    // double ApplyScaleDouble(int input) = delete;
-    // double ApplyScaleDouble(const std::string & input) = delete;
-    // int ApplyScaleInt(double input) = delete;
-    // int ApplyScaleInt(int input) = delete;
-    // int ApplyScaleInt(const std::string & input) = delete;
+    // template<>
+    // std::string ApplyScale<std::string, const Date &>(const std::string & input) = delete;
+    // template<>
+    // std::string ApplyScale<std::string, Date>(const std::string & input) = delete;
     template<>
     std::string ApplyScale<std::string, const std::string &>(const std::string & input) = delete;
-    // TODO: add other 8 applyscales
-
+    template<>
+    std::string ApplyScale<std::string, double>(double input) = delete;
+    template<>
+    std::string ApplyScale<std::string, int>(int input) = delete;
+    template<>
+    double ApplyScale<double, const std::string &>(const std::string &input) = delete;
+    template<>
+    double ApplyScale<double, double>(double input) = delete;
+    template<>
+    double ApplyScale<double, int>(int input) = delete;
+    template<>
+    int ApplyScale<int, const std::string &>(const std::string & input) = delete;
+    template<>
+    int ApplyScale<int, double>(double input) = delete;
+    template<>
+    int ApplyScale<int, int>(int input) = delete;
     template <typename T>
     double Invert(T y) = delete;
 
-    // TODO: introspective tuple struct -- examples in visualizations.h in d3-old, js-wrap test file, visual-elements.h
-    // A struct to deal with dates that mimics the JS Date object
-    struct Date {
-      int year;
-      int month;
-      int day;
-      int hours;
-      int minutes;
-      int seconds;
-      int milliseconds;
-
-      // note that month should be passed in 0 indexed to keep consistent with JavaScript (0 = January)
-      Date(int year, int month, int day = 1, int hours = 0, int minutes = 0,
-      int seconds = 0, int milliseconds = 0) {
-        this->year = year;
-        this->month = month;
-        this->day = day;
-        this->hours = hours;
-        this->minutes = minutes;
-        this->seconds = seconds;
-        this->milliseconds = milliseconds;
-      }
-
-      std::string ToString() {
-        return std::to_string(this->year) + " " + std::to_string(this->month) + " " + std::to_string(this->day) +
-        " " + std::to_string(this->hours) + ":" + std::to_string(this->minutes) + ":" + std::to_string(this->seconds) +
-        ":" + std::to_string(this->milliseconds);
-      }
-    };
-
     // special SetDomain to deal with Dates
     TimeScale & SetDomain(const Date & dateMin, const Date & dateMax) {
-      // TODO: array of size 2 of intropsective tuples, use pass array to javascript to access member vars on JS side
       EM_ASM({
         const id = $0;
         const yearMin = $1;
@@ -527,9 +528,10 @@ namespace D3 {
       return *this;
     }
 
-    // add int ApplyScale<int, const Date &>(const Date & dateInput)
-    template<>
-    double ApplyScale<double, const Date &>(const Date & dateInput) {
+    // we need this because directly adding a new templated version of ApplyScale does not work
+    template<typename RETURN_T>
+    typename std::enable_if<std::is_arithmetic<RETURN_T>::value, RETURN_T>::type
+    ApplyScale(const Date & dateInput) {
       return EM_ASM_DOUBLE({
         const id = $0;
         const year = $1;
@@ -545,11 +547,9 @@ namespace D3 {
       }, this->id, dateInput.year, dateInput.month, dateInput.day, dateInput.hours, dateInput.minutes, dateInput.seconds, dateInput.milliseconds);
     }
 
-    // TODO: make this the same as regular Invert (but templated similar to ApplyScale?)
-    // special Invert for dates
-    // template <typename T>
-    // double Invert(T y) {
-    Date Invert(int input) {
+    // TODO: Apply scale that returns a string
+    
+    Date Invert(double input) {
       EM_ASM({
         const id = $0;
         const input = $1;
@@ -565,7 +565,9 @@ namespace D3 {
       return returnDate;
     }
 
-    Date Invert(double input) {
+    // we need this copy (for int inputs) since any templating has already been deleted from the base version of Invert
+    // (and trying to fix this makes the code messier than just adding this second function)
+    Date Invert(int input) {
       EM_ASM({
         const id = $0;
         const input = $1;

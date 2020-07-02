@@ -13,7 +13,6 @@
 
 // TODO: test quantize, quantile threshold scale (including functions like invert extent)
 // TODO: Fix date apply scale tests
-// TODO: clean up overall testing framework
 // TODO: make sure numbers of CPP and JS side round to same value (because of string comparison)
 
 namespace UI = emp::web;
@@ -23,9 +22,16 @@ UI::Document doc("emp_d3_test");
 //******** Pass map to javascript ********//
 //****************************************//
 
-// for vectors
-template <typename KEY_T, typename VAL_T>
-void pass_map_to_javascript(emp::vector<KEY_T> & keys, emp::vector<VAL_T> & values) {
+/// This function can be called to pass a map or two arrays (one holding keys
+/// and the other hodling values) into JavaScript.
+/// The resulting JavaScript object will be stored in emp.__incoming_map. 
+
+/// @cond TEMPLATES
+
+// For two arrays holding keys and values 
+// (note that the keys vector can not hold objects or functions)
+template <typename KEY_T, typename VAL_T, size_t SIZE>
+void pass_map_to_javascript(emp::array<KEY_T, SIZE> & keys, emp::array<VAL_T, SIZE> & values) {
   emp::pass_array_to_javascript(keys);
   EM_ASM({
     emp_i.__incoming_map_keys = emp_i.__incoming_array;
@@ -47,7 +53,7 @@ void pass_map_to_javascript(emp::vector<KEY_T> & keys, emp::vector<VAL_T> & valu
     // create dictionary
     emp_i.__incoming_map = ( {} );
     emp_i.__incoming_map_keys.forEach(function(key, val) {
-       emp_i.__incoming_map[key] = emp_i.__incoming_map_values[val]
+      emp_i.__incoming_map[key] = emp_i.__incoming_map_values[val]
     });
 
     delete emp_i.__incoming_map_keys;
@@ -55,83 +61,48 @@ void pass_map_to_javascript(emp::vector<KEY_T> & keys, emp::vector<VAL_T> & valu
   });
 }
 
-// for arrays
-// TODO: template keys
-template <typename KEY_T, typename VAL_T, size_t SIZE>
-void pass_map_to_javascript(emp::array<KEY_T, SIZE> & keys, emp::array<VAL_T, SIZE> & values) {
-  // initialize emp_cpp_map object
-  EM_ASM({
-    // TODO: reset map?
-    emp_i.__incoming_map = ( {} );
-
-    window["emp_cpp_map"] = ( {"cpp_keys" : [],
-                              "cpp_values" : [],
-                              "cpp_dict" : {} } );
-  });
-
-  // TODO: make sure the keys are not of type object on the JS side emp assert(em_asm_int) !thing===object
-  emp::pass_array_to_javascript(keys);
-  EM_ASM({
-    window["emp_cpp_map"].cpp_keys = emp_i.__incoming_array;
-  });
-
-  emp::pass_array_to_javascript(values);
-  EM_ASM({
-    window["emp_cpp_map"].cpp_values = emp_i.__incoming_array;
-
-    // create dictionary
-    window["emp_cpp_map"].cpp_keys.forEach(function(key, val) {
-      window["emp_cpp_map"].cpp_dict[key] = window["emp_cpp_map"].cpp_values[val]
-    });
-
-    emp_i.__incoming_map = window["emp_cpp_map"].cpp_dict;
-    delete window["emp_cpp_map"];
-  });
-}
-
-// for std::map
+// For passing a map directly 
 template <typename KEY_T, typename VAL_T>
 void pass_map_to_javascript(std::map<KEY_T, VAL_T> & dict) {
   // extract keys and values from dict
   emp::vector<KEY_T> keys;
   emp::vector<VAL_T> values;
 
-  // TODO: emp assert to make sure keys vector is not of type object in JS
-  for (typename std::map<KEY_T, VAL_T>::iterator it = dict.begin(); it != dict.end(); ++it)
-  {
+  for (typename std::map<KEY_T, VAL_T>::iterator it = dict.begin(); it != dict.end(); ++it) {
     keys.push_back(it->first);
     values.push_back(it->second);
   }
 
-  // initialize emp_cpp_map object
-  EM_ASM({
-    // TODO: reset map?
-    emp_i.__incoming_map = ( {} );
-
-    window["emp_cpp_map"] = ( {"cpp_keys" : [],
-                              "cpp_values" : [],
-                              "cpp_dict" : {} } );
-  });
-
-  // TODO: make sure the keys are not of type object on the JS side emp assert(em_asm_int) !thing===object
   emp::pass_array_to_javascript(keys);
   EM_ASM({
-    window["emp_cpp_map"].cpp_keys = emp_i.__incoming_array;
+    emp_i.__incoming_map_keys = emp_i.__incoming_array;
   });
+
+  // check to make sure each key is not an object or a function
+  emp_assert(
+      EM_ASM_INT({
+        emp_i.__incoming_map_keys.forEach(function(key) {
+          if (typeof key === "object" || typeof key === "function") { return 0; }
+        });
+        return 1;
+      }), "Keys cannot be an object or a function");
 
   emp::pass_array_to_javascript(values);
   EM_ASM({
-    window["emp_cpp_map"].cpp_values = emp_i.__incoming_array;
+    emp_i.__incoming_map_values = emp_i.__incoming_array;
 
     // create dictionary
-    window["emp_cpp_map"].cpp_keys.forEach(function(key, val) {
-      window["emp_cpp_map"].cpp_dict[key] = window["emp_cpp_map"].cpp_values[val]
+    emp_i.__incoming_map = ( {} );
+    emp_i.__incoming_map_keys.forEach(function(key, val) {
+      emp_i.__incoming_map[key] = emp_i.__incoming_map_values[val]
     });
 
-    emp_i.__incoming_map = window["emp_cpp_map"].cpp_dict;
-    delete window["emp_cpp_map"];
+    delete emp_i.__incoming_map_keys;
+    delete emp_i.__incoming_map_values;
   });
 }
+
+/// @endcond 
 
 //***********************************//
 //******** Continuous scales ********//
@@ -143,8 +114,8 @@ struct TestLinearScale {
     std::cout << "------Linear Test Begin------" << std::endl;
 
     D3::LinearScale testLinearX;
-    testLinearX.SetDomain(10, 130.00);
-    testLinearX.SetRange(0, 960.00);
+    testLinearX.SetDomain(10, 130);
+    testLinearX.SetRange(0, 960);
     int result1 = testLinearX.ApplyScale<int>(20);
     int result2 = testLinearX.ApplyScale<int>(50);
     int result1i = testLinearX.Invert<int>(80);
@@ -157,7 +128,6 @@ struct TestLinearScale {
     std::string result3 = testLinearColor.ApplyScale<std::string>(20);
     std::string result4 = testLinearColor.ApplyScale<std::string>(50);
 
-    // TODO: emp to string?? (keep everything as a string)
     std::map<std::string, std::string> testMap = {{"applyScale1", std::to_string(result1)}, {"applyScale2", std::to_string(result2)}, \
                                                   {"invert1", std::to_string(result1i)}, {"invert2", std::to_string(result2i)}, {"color1", result3}, {"color2", result4}};
     pass_map_to_javascript(testMap);
@@ -173,12 +143,10 @@ struct TestLinearScale {
                       .domain([ 10, 100 ])
                       .range([ "brown", "steelblue" ]);
 
-      // TODO: make it neater when dealing with strings
       console.log(emp_i.__incoming_map);
       console.log([ x(20).toString(), x(50), x.invert(80), x.invert(320), color(20), color(50) ]);
       console.log(emp_i.__incoming_map["applyScale1"] === x(20).toString());
       console.log(emp_i.__incoming_map["color1"] === color(20));
-      // TODO: separate it() for each item in dictionary
     });
 
     std::cout << "------Linear Test End------" << std::endl << std::endl;
@@ -224,9 +192,9 @@ struct TestPowScale {
 
     D3::PowScale testPowPop;
     testPowPop.SetExponent(0.5);
-    testPowPop.SetDomain(0, 2e9);
+    testPowPop.SetDomain(0.0, 2e9);
     testPowPop.SetRange(0, 300);
-    // TODO: fix issue of adding vectors to a map (need a to string type method that will match the string representation in JS)
+
     emp::vector<double> result1 = testPowPop.GetDomain<double>();
     emp::vector<double> result2 = testPowPop.GetRange<double>();
     double result3 = testPowPop.ApplyScale<double>(1.386e9);
@@ -241,7 +209,7 @@ struct TestPowScale {
 
     D3::PowScale testPowPop2;
     testPowPop2.SetExponent(1.5);
-    testPowPop2.SetDomain(0, 2e9);
+    testPowPop2.SetDomain(0.0, 2e9);
     testPowPop2.SetRange(0, 300);
     double result6 = testPowPop2.ApplyScale<double>(1.386e9);
     double result7 = testPowPop2.ApplyScale<double>(127e6);
@@ -264,7 +232,7 @@ struct TestPowScale {
 
     D3::PowScale testPowPopColor;
     emp::array<std::string, 2> colorArray = {"yellow", "red"};
-    testPowPopColor.SetDomain(0, 2e9);
+    testPowPopColor.SetDomain(0.0, 2e9);
     testPowPopColor.SetRange(colorArray);
     // emp::vector<double> result9 = testPowPopColor.GetDomainDouble();
     // emp::vector<std::string> result10 = testPowPopColor.GetRangeString();
@@ -305,7 +273,7 @@ struct TestSqrtScale {
     });
 
     D3::SqrtScale testSqrtPop;
-    testSqrtPop.SetDomain(0, 2e9);
+    testSqrtPop.SetDomain(0.0, 2e9);
     testSqrtPop.SetRange(0, 300);
     double result1 = testSqrtPop.ApplyScale<double>(1.386e9);
     double result2 = testSqrtPop.ApplyScale<double>(127e6);
@@ -463,19 +431,21 @@ struct TestTimeScale {
     });
 
     D3::TimeScale testTime;
-    D3::TimeScale::Date dateMin(2000, 0, 1);
-    D3::TimeScale::Date dateMax(2000, 0, 2);
+    D3::Date dateMin(2000, 0, 1);
+    D3::Date dateMax(2000, 0, 2);
     testTime.SetDomain(dateMin, dateMax);
     testTime.SetRange(0, 960);
-    D3::TimeScale::Date test1(2000, 0, 1, 5);
-    D3::TimeScale::Date test2(2000, 0, 1, 16);
-    // double result1 = testTime.ApplyScale<double>(test1);
-    // double result2 = testTime.ApplyScale<double>(test2);
-    D3::TimeScale::Date result1i = testTime.Invert(200);
-    D3::TimeScale::Date result2i = testTime.Invert(640);
+    D3::Date date1(2000, 0, 1, 5);
+    D3::Date date2(2000, 0, 1, 16);
+    double result1 = testTime.ApplyScale<double>(date1);
+    int result2 = testTime.ApplyScale<int>(date2);
+    // double result1 = testTime.ApplyScale(date1);
+    // double result2 = testTime.ApplyScale(date2);
+    D3::Date result1i = testTime.Invert(200);
+    D3::Date result2i = testTime.Invert(640);
 
-    // std::cout << "value 1: " << result1 << std::endl;
-    // std::cout << "value 2: " << result2 << std::endl;
+    std::cout << "value 1: " << result1 << std::endl;
+    std::cout << "value 2: " << result2 << std::endl;
     std::cout << "value 1 invert: " << result1i.ToString() << std::endl;
     std::cout << "value 2 invert: " << result2i.ToString() << std::endl;
 
