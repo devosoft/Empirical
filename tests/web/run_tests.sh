@@ -1,3 +1,5 @@
+#!/bin/bash
+
 source ../../third-party/emsdk/emsdk_env.sh
 echo "Source loaded"
 make

@@ -18,6 +18,9 @@
 #include <utility>
 #include <algorithm>
 #include <deque>
+#include <unordered_map>
+
+#include "Document.h"
 #include "control/Signal.h"
 #include "base/vector.h"
 #include "web/JSWrap.h"
@@ -27,20 +30,40 @@ namespace emp {
 namespace web {
 
   /// Base test class that all web tests managed by MochaTestRunner should inherit from.
-  /// Order of operations: Construction, Setup, Describe, Destruction
-  struct BaseTest {
+  /// Order of operations: Construction, Describe, Destruction
+  /// Derived constructor should run any configuration/setup
+  /// (e.g., dom manipulation, object creation/configuration)
+  /// necessary for test.
+  class BaseTest {
 
-    BaseTest() { ; }
+  private:
+    std::unordered_map<
+      std::string,
+      emp::web::Document
+    > documents;
+
+  public:
+    /// @document_ids vector of HTML IDs of divs to attach to
+    BaseTest(const emp::vector<std::string> document_ids={}) {
+
+      for (const auto & id : document_ids) {
+        auto res = documents.emplace(
+          id, id
+        );
+        emp_assert(res.second, "Document IDs should be unqiue.");
+        res.first->second.Activate();
+      }
+
+      EM_ASM({
+        jQuery.ready();
+      });
+
+    }
 
     // Remember to clean up after your test!
-    virtual ~BaseTest() { }
+    virtual ~BaseTest() { ; }
 
-    /// Setup is run immediately after construction and before Describe.
-    /// Setup should run any configuration/setup (e.g., dom manipulation, object creation/configuration)
-    /// necessary for test.
-    virtual void Setup() { ; }
-
-    /// Describe is run after Setup.
+    /// Describe is run after construction.
     /// Describe should contain the Mocha testing statements (e.g., 'describes', 'its', etc)
     /// [https://mochajs.org/#getting-started](https://mochajs.org/#getting-started)
     virtual void Describe() { ; }
@@ -56,6 +79,25 @@ namespace web {
       } else {
         EM_ASM({ chai.assert.fail(UTF8ToString($0)); }, msg.c_str());
       }
+    }
+
+    /// Force redraw of all registered documents.
+    /// Automatically run after construction but before Describe.
+    void Redraw() {
+      for (auto & [id, doc] : documents) {
+        doc.Redraw();
+      }
+    }
+
+    /// Access a document that has been registered at construction by ID.
+    /// @param id the HTML ID being requested
+    /// @return a reference to the document with that ID
+    emp::web::Document& Doc(const std::string id) {
+      emp_assert(
+        documents.count(id),
+        "Bad request for unregistered document."
+      );
+      return documents.at("id");
     }
 
   };
@@ -132,8 +174,8 @@ namespace web {
           // Allocate memory for test
           cur_runner.test = emp::NewPtr<TEST_TYPE>(); // Force default constructor use.
           cur_runner.done = false;
-          // Run test setup
-          cur_runner.test->Setup();
+          // Force redraw of tracked document elements
+          cur_runner.test->Redraw();
         };
     }
 
@@ -230,6 +272,43 @@ namespace web {
       emp::JSDelete(next_test_js_func_id);
       emp::JSDelete(pop_test_js_func_id);
       emp::JSDelete(cleanup_all_js_func_id);
+    }
+
+    /// Handle boilerplate initialization.
+    /// Written as member function rather than constructor to maximize
+    /// flexibility.
+    /// @param document_ids vector of HTML IDs of divs to attach to
+    void Initialize(const emp::vector<std::string> document_ids) {
+
+      // We have to initialize Empirical web tools
+      // (for Emscripten-compilation reasons)
+      emp::Initialize();
+
+      for (const auto & id : document_ids) {
+        // Element tests will attach things to the DOM, so we'll want to add a
+        // container div where test HTML components can live.
+        // Remember, Karma is generating our HTML file, so we need to attach any
+        // pre-requisite HTML using javascript.
+        EM_ASM(
+          {
+            const id = UTF8ToString($0);
+            $("body").append(`<div id="${id}"></div>`);
+          },
+          id.c_str()
+        );
+
+        // Before each test, we want to clear out our container div
+        OnBeforeEachTest([id](){
+          EM_ASM(
+            {
+              const id = UTF8ToString($0);
+              $(`#${id}`).empty();
+            },
+            id.c_str()
+          );
+        });
+      }
+
     }
 
     /// Add a test type to be run. The MochaTestRunner creates, runs, and cleans up each test.

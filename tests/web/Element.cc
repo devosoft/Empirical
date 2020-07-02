@@ -12,42 +12,32 @@
 #include "web/web.h"
 
 
-// This tests that the Element class properly gets attached and layed out via emp::web::Document.
+// Test that the Element class properly gets attached and laid out via emp::web::Document.
 struct Test_Element_HTMLLayout : public emp::web::BaseTest {
-  emp::web::Document doc{"emp_test_container"}; // When this test is created/run, grab our test container div
 
-  void Setup() override {
-    // Construct the following HTML structure:
-    // <div id="emp_test_container">
-    //   <div id="test_div">
-    //     <h1 id="element_h1"><span>Header!</span></h1>
-    //     <p id="element_p">
-    //       <h4 id="element_h4"></h4>
-    //     </p>
-    //   </div>
-    // </div>
 
-    // **Empirical weirdness warning**
-    // because this test will be created *after* the document's ready signal is triggered,
-    // we need to manually activate the document + trigger the ready signal
-    doc.Activate();
-    EM_ASM({
-      jQuery.ready();
-    });
-
+  // Construct the following HTML structure:
+  // <div id="emp_test_container">
+  //   <div id="test_div">
+  //     <h1 id="element_h1"><span>Header!</span></h1>
+  //     <p id="element_p">
+  //       <h4 id="element_h4"></h4>
+  //     </p>
+  //   </div>
+  // </div>
+  Test_Element_HTMLLayout()
+  : BaseTest({"emp_test_container"}) {
     emp::web::Element header("h1", "element_h1");
 
-    doc
+    Doc("emp_test_container")
       << emp::web::Div("test_div")
       << header << "Header1!";
 
-    doc.Div("test_div")
+    Doc("emp_test_container").Div("test_div")
       << emp::web::Element("p", "element_p")
       << emp::web::Element("h4", "element_h4")
       << "Header4!";
 
-
-    doc.Redraw();
   }
 
   void Describe() override {
@@ -130,30 +120,15 @@ emp::web::MochaTestRunner test_runner;
 
 int main() {
 
-  emp::Initialize(); // We have to initialize Empirical web tools (for Emscripten-compilation reasons)
-
-  // Element tests will attach things to the DOM, so we'll want to add a container div where I'll test
-  // HTML components can live.
-  // Remember, Karma is generating our HTML file, so we need to attach any pre-requisite html using
-  // javascript.
-  EM_ASM({
-    $("body").append('<div id="emp_test_container"></div>');
-  });
-
-  // Before each test, we want to clear out our container div
-  // - we're only writing one test here, so this is less important to do, but still a good habbit.
-  test_runner.OnBeforeEachTest(
-    []() {
-      EM_ASM({
-        $("#emp_test_container").empty();
-      });
-    }
-  );
+  test_runner.Initialize({"emp_test_container"});
 
   // We add tests to the test runner like this:
   //  where "Test Element" is the name of the test (and does not need to be unique)
-  test_runner.AddTest<Test_Element_HTMLLayout>("Test Element HTML Layout" /*, any constructor args for test struct would go here*/);
+  test_runner.AddTest<Test_Element_HTMLLayout>(
+    "Test Element HTML Layout"
+    /*, any constructor args for test struct would go here*/
+  );
 
-  // Once we add all of the tests we want to run in this file, we run them with .Run()
+  // Once we add all of the tests we want to run in this file, run them!
   test_runner.Run();
 }

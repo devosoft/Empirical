@@ -13,30 +13,26 @@
 
 
 struct Test_WidgetWrapWith : emp::web::BaseTest {
-  emp::web::Document doc{"emp_test_container"};
 
-  void Setup() override {
-    // Construct the following HTML structure using empirical
-    // <div id="wrapper2"> <!-- inserted with WrapWith -->
-    //   <p id="parent">
-    //     parent
-    //     <div id="wrapper"> <!-- inserted with WrapWith -->
-    //       wrapper
-    //       <button id="child"></button>
-    //     </div>
-    //   </p>
-    //   <br/><br/>
-    // </div>
 
-    // Manually activate document (and re-trigger ready signal)
-    doc.Activate();
-    EM_ASM({
-      jQuery.ready();
-    });
+  // Construct the following HTML structure:
+  // <div id="wrapper2"> <!-- inserted with WrapWith -->
+  //   <p id="parent">
+  //     parent
+  //     <div id="wrapper"> <!-- inserted with WrapWith -->
+  //       wrapper
+  //       <button id="child"></button>
+  //     </div>
+  //   </p>
+  //   <br/><br/>
+  // </div>
+  Test_WidgetWrapWith()
+  : BaseTest({"emp_test_container"})
+  {
 
     emp::web::Element parent("p", "parent");
     parent << "parent";
-    doc << parent;
+    Doc("emp_test_container") << parent;
 
     emp::web::Button child(
       []() {
@@ -58,14 +54,13 @@ struct Test_WidgetWrapWith : emp::web::BaseTest {
       emp::web::Div("wrapper2").SetCSS("background-color", "red")
     ).SetCSS("background-color", "blue");
 
-    doc.Div("wrapper2") << "<br/><br/>";
+    Doc("emp_test_container").Div("wrapper2") << "<br/><br/>";
 
-    doc.Redraw(); // Manually tell document to redraw to html
   }
 
   void Describe() override {
 
-    // Test that the HTML components created in Setup are correct.
+    // Test that the HTML components created in constructor are correct.
     EM_ASM({
 
       describe("Widget::WrapWith", function() {
@@ -126,20 +121,8 @@ struct Test_WidgetWrapWith : emp::web::BaseTest {
 
 emp::web::MochaTestRunner test_runner;
 int main() {
-  emp::Initialize();
-  // Add a container div to house html components that get added to document
-  EM_ASM({
-    $("body").append('<div id="emp_test_container"></div>');
-  });
 
-  // Before each test, clear out the emp_test_container div
-  test_runner.OnBeforeEachTest(
-    [](){
-      EM_ASM({
-        $("#emp_test_container").empty();
-      });
-    }
-  );
+  test_runner.Initialize({"emp_test_container"});
 
   test_runner.AddTest<Test_WidgetWrapWith>("Test Widget::WrapWith");
   test_runner.Run();

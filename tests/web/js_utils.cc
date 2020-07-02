@@ -36,6 +36,8 @@ struct TestPassArrayToJavaScript : public emp::web::BaseTest {
 
   emp::vector<uint32_t> wrapped_fun_ids;
 
+  TestPassArrayToJavaScript() { Setup(); }
+
   ~TestPassArrayToJavaScript() {
     // cleanup wrapped functions
     std::for_each(
@@ -47,7 +49,7 @@ struct TestPassArrayToJavaScript : public emp::web::BaseTest {
     );
   }
 
-  void Setup() override {
+  void Setup() {
     test_obj_1.val() = 10;
     test_obj_1.word() = "hi";
     test_obj_1.val2() = 4.4;
@@ -210,7 +212,9 @@ struct TestPassArrayToJavaScript : public emp::web::BaseTest {
 // to check values.
 struct TestPassArrayToCpp : public emp::web::BaseTest {
 
-  void Setup() override {
+  Test_pass_array_to_cpp() { Setup(); }
+
+  void Setup() {
 
     // Test ints
     EM_ASM({emp_i.__outgoing_array = ([5, 1, 3])});

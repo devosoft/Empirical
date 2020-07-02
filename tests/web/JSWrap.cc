@@ -45,6 +45,10 @@ struct TestJSWrap : emp::web::BaseTest {
   // emp::vector<uint32_t> wrapped_func_ids;
   // emp::vector<std::string> wrapped_func_names;
 
+  TestJSWrap() {
+    Setup();
+  }
+
   ~TestJSWrap() {
     std::for_each(
       wrapped_func_ids.begin(),
@@ -55,7 +59,7 @@ struct TestJSWrap : emp::web::BaseTest {
   }
 
   // Here we perform the necessary setup.
-  void Setup() override {
+  void Setup() {
     // Wrap a function to get function ids by name.
     wrapped_func_ids["GetTestFuncID"] =
       emp::JSWrap(
