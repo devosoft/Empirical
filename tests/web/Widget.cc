@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 #include "base/assert.h"
-#include "web/testing/TestManager.h"
+#include "web/testing/MochaTestRunner.h"
 #include "web/Document.h"
 #include "web/Element.h"
 #include "web/web.h"
@@ -124,7 +124,7 @@ struct Test_WidgetWrapWith : emp::web::BaseTest {
 
 };
 
-emp::web::TestManager manager;
+emp::web::MochaTestRunner test_runner;
 int main() {
   emp::Initialize();
   // Add a container div to house html components that get added to document
@@ -133,7 +133,7 @@ int main() {
   });
 
   // Before each test, clear out the emp_test_container div
-  manager.OnBeforeEachTest(
+  test_runner.OnBeforeEachTest(
     [](){
       EM_ASM({
         $("#emp_test_container").empty();
@@ -141,6 +141,6 @@ int main() {
     }
   );
 
-  manager.AddTest<Test_WidgetWrapWith>("Test Widget::WrapWith");
-  manager.Run();
+  test_runner.AddTest<Test_WidgetWrapWith>("Test Widget::WrapWith");
+  test_runner.Run();
 }

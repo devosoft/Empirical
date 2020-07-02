@@ -5,7 +5,7 @@
 #include <string>
 #include <array>
 
-#include "web/testing/TestManager.h"
+#include "web/testing/MochaTestRunner.h"
 #include "../../tests2/unit_tests.h"
 #include "config/command_line.h"
 #include "base/assert.h"
@@ -311,14 +311,14 @@ struct Test_pass_array_to_cpp : public emp::web::BaseTest {
 
 };
 
-emp::web::TestManager manager;
+emp::web::MochaTestRunner test_runner;
 
 int main() {
   emp::Initialize();
 
-  manager.AddTest<Test_pass_array_to_javascript>("Test pass_array_to_javascript");
-  manager.AddTest<Test_pass_array_to_cpp>("Test pass_array_to_cpp");
+  test_runner.AddTest<Test_pass_array_to_javascript>("Test pass_array_to_javascript");
+  test_runner.AddTest<Test_pass_array_to_cpp>("Test pass_array_to_cpp");
 
-  manager.Run();
+  test_runner.Run();
 
 }

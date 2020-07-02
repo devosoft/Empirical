@@ -5,7 +5,7 @@
 #include <functional>
 #include <unordered_map>
 
-#include "web/testing/TestManager.h"
+#include "web/testing/MochaTestRunner.h"
 #include "base/assert.h"
 #include "web/init.h"
 #include "web/JSWrap.h"
@@ -301,9 +301,9 @@ struct TestJSWrap : emp::web::BaseTest {
 
 };
 
-emp::web::TestManager manager; // Create a test manager to run JSWrap tests.
+emp::web::MochaTestRunner test_runner; // Create a test manager to run JSWrap tests.
 int main() {
   emp::Initialize();
-  manager.AddTest<TestJSWrap>("TestJSWrap");
-  manager.Run();
+  test_runner.AddTest<TestJSWrap>("TestJSWrap");
+  test_runner.Run();
 }

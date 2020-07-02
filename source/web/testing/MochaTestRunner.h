@@ -4,14 +4,14 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020-2020
  *
- *  @file  TestManager.h
+ *  @file  MochaTestRunner.h
  *  @brief Utility class for managing software testing for Emscripten web code using the Karma + Mocha
  *         javascript testing framework.
  *
  */
 
-#ifndef WEB_TESTING_UTILS_H
-#define WEB_TESTING_UTILS_H
+#ifndef WEB_TESTING_MOCHA_TEST_RUNNER_H
+#define WEB_TESTING_MOCHA_TEST_RUNNER_H
 
 #include <functional>
 #include <type_traits>
@@ -25,7 +25,7 @@
 namespace emp {
 namespace web {
 
-  /// Base test class that all web tests managed by TestManager should inherit from.
+  /// Base test class that all web tests managed by MochaTestRunner should inherit from.
   struct BaseTest {
 
     BaseTest() { ; }
@@ -57,14 +57,14 @@ namespace web {
 
   /// Utility class for managing software tests written for Emscripten web code.
   /// IMPORTANT: This utility assumes the Karma + Mocha javascript testin framework.
-  // TestManager is useful because emscripten does not play very nice with the browser event queue (i.e.,
+  // MochaTestRunner is useful because emscripten does not play very nice with the browser event queue (i.e.,
   // it does not relinquish control back to the browser until it finishes executing the compiled 'C++'
   // code). This interacts poorly with Mocha because Mocha's 'describe' statements do not execute when
   // they are called; instead, they are added to the browser's event queue.
-  // The TestManager exploits Mocha's describe statements + the browser's event queue to chain together
-  // the tests added to the TestManager.
+  // The MochaTestRunner exploits Mocha's describe statements + the browser's event queue to chain together
+  // the tests added to the MochaTestRunner.
   // QUESTION: should this be the KarmaMochaTestingManager?
-  class TestManager {
+  class MochaTestRunner {
   protected:
 
     // TestRunner encapsulates everything needed to create, run, and cleanup a test.
@@ -119,7 +119,7 @@ namespace web {
 
   public:
 
-    TestManager() {
+    MochaTestRunner() {
       next_test_js_func_id = emp::JSWrap(
         [this]() { this->NextTest(); },
         "NextTest"
@@ -134,14 +134,14 @@ namespace web {
       );
     }
 
-    ~TestManager() {
+    ~MochaTestRunner() {
       Cleanup();
       emp::JSDelete(next_test_js_func_id);
       emp::JSDelete(cleanup_test_js_func_id);
       emp::JSDelete(cleanup_all_js_func_id);
     }
 
-    /// Add a test type to be run. The TestManager creates, runs, and cleans up each test.
+    /// Add a test type to be run. The MochaTestRunner creates, runs, and cleans up each test.
     /// This function should be called with the test type (which should inherit from BaseTest) as a
     /// template argument (e.g., AddTest<TEST_TYPE>(...) ).
     /// Arguments:
@@ -177,7 +177,7 @@ namespace web {
 
       // configure the function that, when called, will call TEST_TYPE::Describe, which should queue
       // up a Mocha describe function (containing js tests). Next, this function will either (1) queue
-      // up the next test to be run or (2) queue up general TestManager cleanup if there are no more
+      // up the next test to be run or (2) queue up general MochaTestRunner cleanup if there are no more
       // tests to run.
       // This function takes advantage of Mocha describe functions to use 'browser' events to chain
       // together tests (which is necessary because js 'describe' calls add themselves to the browser's
@@ -254,15 +254,15 @@ namespace web {
       };
     }
 
-    /// Run all tests that have been added to the TestManager thus far.
+    /// Run all tests that have been added to the MochaTestRunner thus far.
     /// Running a test consumes it (i.e., executing Run a second time will not re-run previously run
     /// tests).
     void Run() { NextTest(); }
 
-    /// Provide a function for TestManager to call before each test is created and run.
+    /// Provide a function for MochaTestRunner to call before each test is created and run.
     void OnBeforeEachTest(const std::function<void()> & fun) { before_each_test_sig.AddAction(fun); };
 
-    /// Provide a function for TestManager to call before after each test runs (but before it is deleted).
+    /// Provide a function for MochaTestRunner to call before after each test runs (but before it is deleted).
     void OnAfterEachTest(const std::function<void()> & fun) { after_each_test_sig.AddAction(fun); };
 
   };

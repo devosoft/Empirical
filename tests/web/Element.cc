@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 #include "base/assert.h"
-#include "web/testing/TestManager.h"
+#include "web/testing/MochaTestRunner.h"
 #include "web/Document.h"
 #include "web/Element.h"
 #include "web/web.h"
@@ -125,8 +125,8 @@ struct Test_Element_HTMLLayout : public emp::web::BaseTest {
 
 };
 
-// Create a TestManager object in the global namespace so that it hangs around after main finishes.
-emp::web::TestManager manager;
+// Create a MochaTestRunner object in the global namespace so that it hangs around after main finishes.
+emp::web::MochaTestRunner test_runner;
 
 int main() {
 
@@ -142,7 +142,7 @@ int main() {
 
   // Before each test, we want to clear out our container div
   // - we're only writing one test here, so this is less important to do, but still a good habbit.
-  manager.OnBeforeEachTest(
+  test_runner.OnBeforeEachTest(
     []() {
       EM_ASM({
         $("#emp_test_container").empty();
@@ -150,10 +150,10 @@ int main() {
     }
   );
 
-  // We add tests to the test manager like this:
+  // We add tests to the test runner like this:
   //  where "Test Element" is the name of the test (and does not need to be unique)
-  manager.AddTest<Test_Element_HTMLLayout>("Test Element HTML Layout" /*, any constructor args for test struct would go here*/);
+  test_runner.AddTest<Test_Element_HTMLLayout>("Test Element HTML Layout" /*, any constructor args for test struct would go here*/);
 
   // Once we adde all of the tests we want to run in this file, we run them with .Run()
-  manager.Run();
+  test_runner.Run();
 }
