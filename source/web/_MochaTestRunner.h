@@ -178,6 +178,43 @@ namespace web {
       emp::JSDelete(cleanup_all_js_func_id);
     }
 
+    /// Handle boilerplate initialization.
+    /// Written as member function rather than constructor to maximize
+    /// flexibility.
+    /// @param document_ids vector of HTML IDs of divs to attach to
+    void Initialize(const emp::vector<std::string> document_ids) {
+
+      // We have to initialize Empirical web tools
+      // (for Emscripten-compilation reasons)
+      emp::Initialize();
+
+      for (const auto & id : document_ids) {
+        // Element tests will attach things to the DOM, so we'll want to add a
+        // container div where test HTML components can live.
+        // Remember, Karma is generating our HTML file, so we need to attach any
+        // pre-requisite HTML using javascript.
+        EM_ASM(
+          {
+            const id = UTF8ToString($0);
+            $("body").append(`<div id="${id}"></div>`);
+          },
+          id.c_str()
+        );
+
+        // Before each test, we want to clear out our container div
+        OnBeforeEachTest([id](){
+          EM_ASM(
+            {
+              const id = UTF8ToString($0);
+              $(`#${id}`).empty();
+            },
+            id.c_str()
+          );
+        });
+      }
+
+    }
+
     /// Add a test type to be run. The MochaTestRunner creates, runs, and cleans up each test.
     /// This function should be called with the test type (which should inherit from BaseTest) as a
     /// template argument (e.g., AddTest<TEST_TYPE>(...) ).

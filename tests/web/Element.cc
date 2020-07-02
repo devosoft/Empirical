@@ -128,25 +128,7 @@ emp::web::MochaTestRunner test_runner;
 
 int main() {
 
-  emp::Initialize(); // We have to initialize Empirical web tools (for Emscripten-compilation reasons)
-
-  // Element tests will attach things to the DOM, so we'll want to add a container div where I'll test
-  // HTML components can live.
-  // Remember, Karma is generating our HTML file, so we need to attach any pre-requisite html using
-  // javascript.
-  EM_ASM({
-    $("body").append('<div id="emp_test_container"></div>');
-  });
-
-  // Before each test, we want to clear out our container div
-  // - we're only writing one test here, so this is less important to do, but still a good habbit.
-  test_runner.OnBeforeEachTest(
-    []() {
-      EM_ASM({
-        $("#emp_test_container").empty();
-      });
-    }
-  );
+  test_runner.Initialize({"emp_test_container"});
 
   // We add tests to the test runner like this:
   //  where "Test Element" is the name of the test (and does not need to be unique)

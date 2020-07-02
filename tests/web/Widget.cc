@@ -124,20 +124,8 @@ struct Test_WidgetWrapWith : emp::web::BaseTest {
 
 emp::web::MochaTestRunner test_runner;
 int main() {
-  emp::Initialize();
-  // Add a container div to house html components that get added to document
-  EM_ASM({
-    $("body").append('<div id="emp_test_container"></div>');
-  });
 
-  // Before each test, clear out the emp_test_container div
-  test_runner.OnBeforeEachTest(
-    [](){
-      EM_ASM({
-        $("#emp_test_container").empty();
-      });
-    }
-  );
+  test_runner.Initialize({"emp_test_container"});
 
   test_runner.AddTest<Test_WidgetWrapWith>("Test Widget::WrapWith");
   test_runner.Run();
