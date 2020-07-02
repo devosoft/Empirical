@@ -27,6 +27,19 @@ namespace emp {
     return hash1 ^ (hash2 * 0x9e3779b9 + (hash1 << 6) + (hash1 >> 2));
   }
 
+  template <typename Container, size_t Seed = 0>
+  struct ContainerHash
+  {
+    size_t operator()(const Container& v) const {
+        size_t data = Seed;
+        for (const auto& x : v) {
+            using T = typename std::decay<decltype(x)>::type;
+            const std::hash<T> hasher;
+            data = hash_combine(data, hasher(x));
+        }
+        return data;
+    }
+  };
 }
 
 #endif
