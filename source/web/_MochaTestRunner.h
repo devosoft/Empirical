@@ -186,8 +186,8 @@ namespace web {
           const test_name = UTF8ToString($0);
 
           // Queue up cleanup for this test
-          describe("Cleanup " + test_name, function() {
-            it('should clean up test ', function() {
+          describe(`Cleanup ${test_name}`, function() {
+            it('should clean up the test ', function() {
               emp.PopTest();
             });
           });
@@ -200,7 +200,7 @@ namespace web {
           EM_ASM({
             const next_test_name = UTF8ToString($0);
             // Queue up next test
-            describe("Queue " + next_test_name , function() {
+            describe(`Queue ${next_test_name}` , function() {
               it("should queue the next test", function() {
                 emp.NextTest();
               });
@@ -232,7 +232,7 @@ namespace web {
         if (post_test_error_cnt != cur_runner.before_test_error_count) {
           EM_ASM({
             const test_name = UTF8ToString($0);
-            describe(test_name + " - Failed C++ unit test", function() {
+            describe(`${test_name} failed`, function() {
               it("failed at least one C++ unit test", function() {
                 chai.assert(false);
               });
