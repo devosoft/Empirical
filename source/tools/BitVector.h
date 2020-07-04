@@ -618,6 +618,31 @@ namespace emp {
       }
     }
 
+    void SetUIntAtBit(size_t index, uint32_t value) {
+      if (num_bits > SHORT_THRESHOLD) {
+        if constexpr (sizeof(field_t) == 4) BitSetPtr()[index] = value;
+
+        emp_assert(sizeof(field_t) == 8);
+
+        const size_t field_id = FieldID(index);
+        const size_t field_pos = FieldPos(index);
+        const field_t mask = ((field_t) ((uint32_t) -1)) << (1-field_pos);
+
+        emp_assert(field_id < NumFields());
+
+        BitSetPtr()[field_id] &= mask;   // Clear out bits that we are setting.
+        BitSetPtr()[field_id] |= ((field_t) value) << (field_pos * 32);
+      } else {
+        if (index == 0) {
+          *BitSetPtr().Raw() &= 0xFFFFFFFF00000000;
+          *BitSetPtr().Raw() += (field_t) value;
+        } else {
+          *BitSetPtr().Raw() &= 0x00000000FFFFFFFF;
+          *BitSetPtr().Raw() += ( ((field_t) value) << 32);
+        }
+      }
+    }
+
     /// Retrive the 32-bit uint at the specified BIT index.
     uint32_t GetUIntAtBit(size_t index) {
       // @CAO Need proper assert for non-32-size bit fields!
