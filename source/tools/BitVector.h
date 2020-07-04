@@ -164,10 +164,12 @@ namespace emp {
     /// being copied and only the fields need to be copied over.
     void RawCopy(Ptr<const field_t> in_set) {
       #ifdef EMP_TRACK_MEM
-      emp_assert(in_set.IsNull() == false);
-      emp_assert(BitSetPtr().DebugIsArray() && in_set.DebugIsArray());
-      emp_assert(BitSetPtr().DebugGetArrayBytes() == in_set.DebugGetArrayBytes(),
-                 BitSetPtr().DebugGetArrayBytes(), in_set.DebugGetArrayBytes());
+      if (num_bits > SHORT_THRESHOLD) {
+        emp_assert(in_set.IsNull() == false);
+        emp_assert(BitSetPtr().DebugIsArray() && in_set.DebugIsArray());
+        emp_assert(BitSetPtr().DebugGetArrayBytes() == in_set.DebugGetArrayBytes(),
+                  BitSetPtr().DebugGetArrayBytes(), in_set.DebugGetArrayBytes());
+      }
       #endif
       
       const size_t NUM_FIELDS = NumFields();
@@ -407,7 +409,9 @@ namespace emp {
           } else {
             bit_set = old_bit_set;
           }
-          for (size_t i = min_fields; i < NUM_FIELDS; i++) bit_set[i] = std::byte(0);
+          std::cout << *BitSetPtr().Raw() << std::endl;
+          std::cout << (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits)) << std::endl;
+          *BitSetPtr().Raw() = *BitSetPtr().Raw() & (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
           
         }
         if (old_bit_set && old_num_bits > SHORT_THRESHOLD) BitSetPtr(old_bit_set, old_num_bits).DeleteArray();
@@ -618,14 +622,20 @@ namespace emp {
     uint32_t GetUIntAtBit(size_t index) {
       // @CAO Need proper assert for non-32-size bit fields!
       // emp_assert(index < num_bits);
-      const size_t field_id = FieldID(index);
-      const size_t pos_id = FieldPos(index);
-      if (pos_id == 0) return (uint32_t) BitSetPtr()[field_id];
-      const size_t NUM_FIELDS = NumFields();
-      const uint32_t part1 = (uint32_t) (BitSetPtr()[field_id] >> pos_id);
-      const uint32_t part2 =
-        (uint32_t)((field_id+1 < NUM_FIELDS) ? BitSetPtr()[field_id+1] << (FIELD_BITS-pos_id) : 0);
-      return part1 | part2;
+      if (num_bits > SHORT_THRESHOLD) {
+        const size_t field_id = FieldID(index);
+        const size_t pos_id = FieldPos(index);
+        if (pos_id == 0) return (uint32_t) BitSetPtr()[field_id];
+        const size_t NUM_FIELDS = NumFields();
+        const uint32_t part1 = (uint32_t) (BitSetPtr()[field_id] >> pos_id);
+        const uint32_t part2 =
+          (uint32_t)((field_id+1 < NUM_FIELDS) ? BitSetPtr()[field_id+1] << (FIELD_BITS-pos_id) : 0);
+        return part1 | part2;
+      }
+      if (index == 0) {
+        return (uint32_t) *BitSetPtr().Raw() & 0xFFFFFFFF;
+      }
+      return (uint32_t) (*BitSetPtr().Raw() >> 32) & 0xFFFFFFFF;
     }
 
     /// Retrieve the specified number of bits (stored in the field type) at the target bit index.
