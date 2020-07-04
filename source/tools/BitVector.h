@@ -732,13 +732,11 @@ namespace emp {
       if (num_bits > SHORT_THRESHOLD) {
         for (size_t i = 0; i < NUM_FIELDS; i++) BitSetPtr()[i] = ~all0;
       } else {
-        *BitSetPtr().Raw() = ~all0;
+        *BitSetPtr().Raw() = (0xFFFFFFFFFFFFFFFF >> (64 - num_bits)); 
       }
       if (LastBitID() > 0) { 
         if (num_bits > SHORT_THRESHOLD) {
           BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID()); 
-        } else {
-          *BitSetPtr().Raw() |= (0xFFFFFFFFFFFFFFFF >> (64 - num_bits)); 
         }
         
       }
