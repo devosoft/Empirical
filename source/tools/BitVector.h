@@ -688,7 +688,17 @@ namespace emp {
     bool None() const { return !Any(); }
 
     /// Return true if ALL bits are set to 1, otherwise return false.
-    bool All() const { return (~(*this)).None(); }
+    bool All() const {
+      const size_t NUM_FIELDS = NumFields();
+      for (size_t i = 0; i < NUM_FIELDS; i++) {
+        if (num_bits > SHORT_THRESHOLD) {
+          if (~(BitSetPtr()[i])) return false;
+        } else {
+          if (~(*BitSetPtr().Raw())) return false;
+        }
+      }
+      return true;
+    }
 
     /// Casting a bit array to bool identifies if ANY bits are set to 1.
     explicit operator bool() const { return Any(); }
