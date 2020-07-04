@@ -409,14 +409,16 @@ namespace emp {
           } else {
             bit_set = old_bit_set;
           }
-          std::cout << *BitSetPtr().Raw() << std::endl;
-          std::cout << (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits)) << std::endl;
-          *BitSetPtr().Raw() = *BitSetPtr().Raw() & (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
+          
           
         }
         if (old_bit_set && old_num_bits > SHORT_THRESHOLD) BitSetPtr(old_bit_set, old_num_bits).DeleteArray();
 
         
+      }
+
+      if (num_bits <= SHORT_THRESHOLD) {
+        *BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
       }
       return *this;
     }
@@ -594,27 +596,31 @@ namespace emp {
       if (num_bits > SHORT_THRESHOLD) {
         return (uint32_t) (BitSetPtr()[field_id] >> (field_pos * 32));
       } else {
-        return (uint32_t) (*BitSetPtr().Raw() >> (field_pos * 32));
+        return (uint32_t) (*BitSetPtr().Raw() >> (index * 32));
       }
-
       
     }
 
     /// Update the 32-bit uint at the specified uint index.
     void SetUInt(size_t index, uint32_t value) {
-      if constexpr (sizeof(field_t) == 4) BitSetPtr()[index] = value;
+      //if constexpr (sizeof(field_t) == 4) BitSetPtr()[index] = value;
       emp_assert(sizeof(field_t) == 8);
-      const size_t field_pos = 1 - (index & 1);
-      const field_t mask = ((field_t) ((uint32_t) -1)) << (1-field_pos);
-
+      
       if (num_bits > SHORT_THRESHOLD) {
+        const size_t field_pos = 1 - (index & 1);
+        const field_t mask = ((field_t) ((uint32_t) -1)) << (1-field_pos);
         const size_t field_id = index/2;
         emp_assert(field_id < NumFields());
         BitSetPtr()[field_id] &= mask;   // Clear out bits that we are setting.
         BitSetPtr()[field_id] |= ((field_t) value) << (field_pos * 32);
       } else {
-        *BitSetPtr().Raw() &= mask;   // Clear out bits that we are setting.
-        *BitSetPtr().Raw() |= ((field_t) value) << (field_pos * 32);
+        if (num_bits < 32) {
+          emp_assert(value == (value & (0xFFFFFFFF >> (32 - num_bits))));
+        } else {
+          emp_assert(value == (value & (0xFFFFFFFF >> (64 - num_bits))));
+        }
+        *BitSetPtr().Raw() &= (0x00000000FFFFFFFF << (32 * (1-index)));   // Clear out bits that we are setting.
+        *BitSetPtr().Raw() |= ((field_t) value) << (index * 32);
       }
     }
 
@@ -660,7 +666,7 @@ namespace emp {
       if (index == 0) {
         return (uint32_t) *BitSetPtr().Raw() & 0xFFFFFFFF;
       }
-      return (uint32_t) (*BitSetPtr().Raw() >> 32) & 0xFFFFFFFF;
+      return (uint32_t) (*BitSetPtr().Raw() >> 32) ;
     }
 
     /// Retrieve the specified number of bits (stored in the field type) at the target bit index.
@@ -674,12 +680,12 @@ namespace emp {
     /// Return true if ANY bits are set to 1, otherwise return false.
     bool Any() const {
       const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) {
-        if (num_bits > SHORT_THRESHOLD) {
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) {
           if (BitSetPtr()[i]) return true;
-        } else {
-          if (*BitSetPtr().Raw()) return true;
-        }
+        } 
+      } else {
+        if (*BitSetPtr().Raw()) return true;
       }
       return false;
     }
@@ -690,12 +696,12 @@ namespace emp {
     /// Return true if ALL bits are set to 1, otherwise return false.
     bool All() const {
       const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) {
-        if (num_bits > SHORT_THRESHOLD) {
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) {
           if (~(BitSetPtr()[i])) return false;
-        } else {
-          if (~(*BitSetPtr().Raw())) return false;
         }
+      } else {
+        if (~(*BitSetPtr().Raw() | (0xFFFFFFFFFFFFFFFF << num_bits))) return false;
       }
       return true;
     }
@@ -732,7 +738,7 @@ namespace emp {
         if (num_bits > SHORT_THRESHOLD) {
           BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID()); 
         } else {
-          *BitSetPtr().Raw()  &= MaskLow<field_t>(LastBitID()); 
+          *BitSetPtr().Raw() |= (0xFFFFFFFFFFFFFFFF >> (64 - num_bits)); 
         }
         
       }
@@ -817,6 +823,7 @@ namespace emp {
         return (field_id < NUM_FIELDS) ?
           (int) (find_bit(BitSetPtr()[field_id]) + (field_id * FIELD_BITS))  :  -1;
       } else {
+        if (field_id < NUM_FIELDS && *BitSetPtr().Raw()==0) field_id++;
         return (field_id < NUM_FIELDS) ?
           (int) (find_bit(*BitSetPtr().Raw()) + (field_id * FIELD_BITS))  :  -1;
       }
@@ -836,6 +843,9 @@ namespace emp {
         BitSetPtr()[field_id] &= ~(val_one << pos_found);
         return (int) (pos_found + (field_id * FIELD_BITS));
       } else {
+        if (field_id < NUM_FIELDS && *BitSetPtr().Raw()==0) field_id++;
+        if (field_id == NUM_FIELDS) return -1;  // Failed to find bit!
+
         const size_t pos_found = find_bit(*BitSetPtr().Raw());
         constexpr field_t val_one = 1;
         *BitSetPtr().Raw() &= ~(val_one << pos_found);
@@ -903,6 +913,8 @@ namespace emp {
         if (LastBitID() > 0) out_set.BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
       } else {
         *(out_set.BitSetPtr().Raw()) = ~(*(BitSetPtr().Raw()));
+        if (num_bits <= SHORT_THRESHOLD) *out_set.BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
+        
       }
       return out_set;
     }
@@ -915,6 +927,7 @@ namespace emp {
         for (size_t i = 0; i < NUM_FIELDS; i++) out_set.BitSetPtr()[i] = BitSetPtr()[i] & set2.BitSetPtr()[i];
       } else {
         *(out_set.BitSetPtr().Raw()) = *BitSetPtr().Raw() & *(set2.BitSetPtr().Raw());
+        if (num_bits <= SHORT_THRESHOLD) *out_set.BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
       }
       return out_set;
     }
@@ -927,6 +940,7 @@ namespace emp {
         for (size_t i = 0; i < NUM_FIELDS; i++) out_set.BitSetPtr()[i] = BitSetPtr()[i] | set2.BitSetPtr()[i];
       } else {
         *(out_set.BitSetPtr().Raw()) = *BitSetPtr().Raw() | *set2.BitSetPtr().Raw();
+        if (num_bits <= SHORT_THRESHOLD) *out_set.BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
       }
       return out_set;
     }
@@ -940,6 +954,7 @@ namespace emp {
         if (LastBitID() > 0) out_set.BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
       } else {
         *(out_set.BitSetPtr().Raw()) = ~(*BitSetPtr().Raw() & *set2.BitSetPtr().Raw());
+        if (num_bits <= SHORT_THRESHOLD) *out_set.BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
       }
       return out_set;
     }
@@ -953,6 +968,7 @@ namespace emp {
         if (LastBitID() > 0) out_set.BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
       } else {
         *(out_set.BitSetPtr().Raw()) = ~(*BitSetPtr().Raw() | *set2.BitSetPtr().Raw());
+        if (num_bits <= SHORT_THRESHOLD) *out_set.BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
       }
       return out_set;
     }
@@ -965,6 +981,7 @@ namespace emp {
         for (size_t i = 0; i < NUM_FIELDS; i++) out_set.BitSetPtr()[i] = BitSetPtr()[i] ^ set2.BitSetPtr()[i];
       }else {
         *(out_set.BitSetPtr().Raw()) = *BitSetPtr().Raw() ^ *set2.BitSetPtr().Raw();
+        if (num_bits <= SHORT_THRESHOLD) *out_set.BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
       }
       return out_set;
     }
@@ -978,6 +995,7 @@ namespace emp {
         if (LastBitID() > 0) out_set.BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
       } else {
          *(out_set.BitSetPtr().Raw()) = ~(*BitSetPtr().Raw() ^ *set2.BitSetPtr().Raw());
+         if (num_bits <= SHORT_THRESHOLD) *out_set.BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - out_set.GetSize()));
       }
       return out_set;
     }
@@ -991,6 +1009,7 @@ namespace emp {
         if (LastBitID() > 0) BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
       } else {
         *BitSetPtr().Raw() = ~*BitSetPtr().Raw();
+        if (num_bits <= SHORT_THRESHOLD) *BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
       }
       return *this;
     }
@@ -1002,6 +1021,7 @@ namespace emp {
         for (size_t i = 0; i < NUM_FIELDS; i++) BitSetPtr()[i] = BitSetPtr()[i] & set2.BitSetPtr()[i];
       } else {
         *BitSetPtr().Raw() = *BitSetPtr().Raw() & *set2.BitSetPtr().Raw();
+        if (num_bits <= SHORT_THRESHOLD) *BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
       }
       return *this;
     }
@@ -1013,6 +1033,7 @@ namespace emp {
         for (size_t i = 0; i < NUM_FIELDS; i++) BitSetPtr()[i] = BitSetPtr()[i] | set2.BitSetPtr()[i];
       } else {
         *BitSetPtr().Raw() = *BitSetPtr().Raw() | *set2.BitSetPtr().Raw();
+        if (num_bits <= SHORT_THRESHOLD) *BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
       }
       return *this;
     }
@@ -1025,6 +1046,7 @@ namespace emp {
         if (LastBitID() > 0) BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
       } else {
         *BitSetPtr().Raw() = ~(*BitSetPtr().Raw() & *set2.BitSetPtr().Raw());
+        if (num_bits <= SHORT_THRESHOLD) *BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
       }
       return *this;
     }
@@ -1037,6 +1059,7 @@ namespace emp {
         if (LastBitID() > 0) BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
       } else {
         *BitSetPtr().Raw() = ~(*BitSetPtr().Raw() | *set2.BitSetPtr().Raw());
+        if (num_bits <= SHORT_THRESHOLD) *BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
       }
       return *this;
     }
@@ -1048,6 +1071,7 @@ namespace emp {
         for (size_t i = 0; i < NUM_FIELDS; i++) BitSetPtr()[i] = BitSetPtr()[i] ^ set2.BitSetPtr()[i];
       } else {
         *BitSetPtr().Raw() = *BitSetPtr().Raw() ^ *set2.BitSetPtr().Raw();
+        if (num_bits <= SHORT_THRESHOLD) *BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
       }
       return *this;
     }
@@ -1060,6 +1084,8 @@ namespace emp {
         if (LastBitID() > 0) BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
       } else {
         *BitSetPtr().Raw() = ~(*BitSetPtr().Raw() ^ *set2.BitSetPtr().Raw());
+        if (num_bits <= SHORT_THRESHOLD) *BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
+
       }
       return *this;
     }
@@ -1069,6 +1095,7 @@ namespace emp {
       BitVector out_set(*this);
       if (shift_size > 0) out_set.ShiftRight((size_t) shift_size);
       else if (shift_size < 0) out_set.ShiftLeft((size_t) -shift_size);
+      if (num_bits <= SHORT_THRESHOLD) *out_set.BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
       return out_set;
     }
 
@@ -1076,6 +1103,7 @@ namespace emp {
     BitVector & SHIFT_SELF(const int shift_size) {
       if (shift_size > 0) ShiftRight((size_t) shift_size);
       else if (shift_size < 0) ShiftLeft((size_t) -shift_size);
+      if (num_bits <= SHORT_THRESHOLD) *BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
       return *this;
     }
 
