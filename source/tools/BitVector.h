@@ -584,7 +584,7 @@ namespace emp {
     }
 
     /// Print a space between each field (or other provided spacer)
-    void PrintFields(std::ostream & out=std::cout, const std::string spacer=" ") const {
+    void PrintFields(std::ostream & out=std::cout, const std::string & spacer=" ") const {
       for (size_t i = num_bits; i > 0; i--) {
         out << Get(i-1);
         if (i % FIELD_BITS == 0) out << spacer;
@@ -597,10 +597,28 @@ namespace emp {
     }
 
     /// Print the positions of all one bits, spaces are the default separator.
-    void PrintOneIDs(std::ostream & out=std::cout, std::string spacer=" ") const {
+    void PrintOneIDs(std::ostream & out=std::cout, const std::string & spacer=" ") const {
       for (size_t i = 0; i < num_bits; i++) { if (Get(i)) out << i << spacer; }
     }
 
+    /// Print the ones in a range format.  E.g., 2-5,7,10-15
+    void PrintAsRange(std::ostream & out=std::cout,
+                      const std::string & spacer=",",
+                      const std::string & ranger="-") const
+    {
+      emp::vector<size_t> ones = GetOnes();
+
+      for (size_t pos = 0; pos < ones.size(); pos++) {
+        if (pos) out << spacer;
+
+        size_t start = ones[pos];
+        while (pos+1 < ones.size() && ones[pos+1] == ones[pos]+1) pos++;
+        size_t end = ones[pos];
+
+        out << start;
+        if (start != end) out << ranger << end;
+      }
+    }
 
     /// Count 1's by looping through once for each bit equal to 1
     size_t CountOnes_Sparse() const {
