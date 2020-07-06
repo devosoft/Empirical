@@ -29,18 +29,18 @@ namespace emp {
     return hash1 ^ (hash2 + 0x9e3779b9 + (hash1 << 6) + (hash1 >> 2));
   }
 
-  constexpr size_t rotate(const size_t x, const size_t r)
-  {
-    return (x << r) | (x >> (64 - r));
-  }
-
-  constexpr inline void fmix64(size_t& k)
-  {
-    k ^= k >> 33;
-    k *= 0xff51afd7ed558ccd;
-    k ^= k >> 33;
-    k *= 0xc4ceb9fe1a85ec53;
-    k ^= k >> 33;
+  // helper functions for murmur hash
+  namespace internal {
+    constexpr size_t rotate(const size_t x, const size_t r) {
+      return (x << r) | (x >> (64 - r));
+    }
+    constexpr inline void fmix64(size_t& k) {
+      k ^= k >> 33;
+      k *= 0xff51afd7ed558ccd;
+      k ^= k >> 33;
+      k *= 0xc4ceb9fe1a85ec53;
+      k ^= k >> 33;
+    }
   }
 
   constexpr size_t inline murmur_hash(
@@ -61,20 +61,20 @@ namespace emp {
       size_t k2 = static_cast<size_t>(key[2 * i + 1]);
 
       k1 *= c1;
-      k1 = rotate(k1, 31);
+      k1 = internal::rotate(k1, 31);
       k1 *= c2;
       h1 ^= k1;
 
-      h1 = rotate(h1, 27);
+      h1 = internal::rotate(h1, 27);
       h1 += h2;
       h1 = 5 * h1 + 0x52dce729;
 
       k2 *= c2;
-      k2 = rotate(k2, 33);
+      k2 = internal::rotate(k2, 33);
       k2 *= c1;
       h2 ^= k2;
 
-      h2 = rotate(h2, 31);
+      h2 = internal::rotate(h2, 31);
       h2 += h1;
       h2 = 5 * h2 + 0x38495ab5;
     }
