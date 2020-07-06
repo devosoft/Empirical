@@ -80,8 +80,11 @@ namespace emp {
     }
 
     // finalization
-    h1 ^= 64;
-    h2 ^= 64;
+    h1 ^= numbytes;
+    h2 ^= numbytes;
+
+    h1 += h2;
+    h2 += h1;
 
     fmix64(h1);
     fmix64(h2);
