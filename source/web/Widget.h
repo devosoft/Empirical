@@ -604,6 +604,11 @@ namespace web {
     public:
       using return_t = RETURN_TYPE;
 
+      std::string GetHTML(){
+        std::stringstream ss;
+        info->GetHTML(ss);
+        return ss.str();
+      }
       /// Set a specific CSS value for this widget.
       template <typename SETTING_TYPE>
       return_t & SetCSS(const std::string & setting, SETTING_TYPE && value) {
