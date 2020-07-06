@@ -168,6 +168,10 @@ double TestGetAttrDouble() {
 }
 
 int main() {
+  EM_ASM({
+    d3.select("body").append("div").attr("id", "line_graph");
+    d3.select("body").append("div").attr("id","tree_viz");
+  });
 
   emp::JSWrap(MakeLineGraph, "MakeLineGraph");
   emp::JSWrap(TestAnimateStep_LineGraph, "TestAnimateStep_LineGraph");

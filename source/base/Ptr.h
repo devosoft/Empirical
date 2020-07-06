@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2019
+ *  @date 2016-2020.
  *
  *  @file Ptr.h
  *  @brief A wrapper for pointers that does careful memory tracking (but only in debug mode).
@@ -208,7 +208,7 @@ namespace emp {
 
     /// Check if an ID is for a pointer that has been deleted.
     bool IsDeleted(size_t id) const {
-      if (id == UNTRACKED_ID) return false;   // Not tracked!
+      if (id == UNTRACKED_ID) return false;   // Not tracked, so not deleted.
       if (internal::ptr_debug) std::cout << "IsDeleted: " << id << std::endl;
       return !id_info[id].IsActive();
     }
@@ -430,6 +430,12 @@ namespace emp {
     const TYPE * const Raw() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to raw.", id);
       return ptr;
+    }
+
+    /// Convert this Ptr to a raw pointer of a position in an array.
+    TYPE * Raw(size_t pos) {
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to array raw.", id);
+      return &(ptr[pos]);
     }
 
     /// Cast this Ptr to a different type.
@@ -757,6 +763,7 @@ namespace emp {
     bool IsNull() const { return ptr == nullptr; }
     TYPE * Raw() { return ptr; }
     const TYPE * const Raw() const { return ptr; }
+    const TYPE * const Raw(size_t pos) const { return &(ptr[pos]); }
     template <typename T2> Ptr<T2> Cast() { return (T2*) ptr; }
     template <typename T2> const Ptr<const T2> Cast() const { return (T2*) ptr; }
     template <typename T2> Ptr<T2> DynamicCast() { return dynamic_cast<T2*>(ptr); }
