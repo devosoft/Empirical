@@ -121,6 +121,8 @@ namespace emp {
     emp::vector< Ptr< BodyLink<CircleBody2D> > > to_links;    // Active links targeting body
 
   public:
+    // delete to avoid a possiblity of EMP_TRACK_CONSTRUCT and EMP_TRACK_DESTRUCT mismatch
+    CircleBody2D() = delete; 
     CircleBody2D(const Circle2D<double> & _p)
       : perimeter(_p), target_radius(_p.GetRadius()), from_links(0), to_links(0)
     {

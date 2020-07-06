@@ -1,3 +1,10 @@
+
+################################################################################
+WARNING: the Cookiecutter Empirical Project, which you can find at
+https://github.com/devosoft/cookiecutter-empirical-project, should be preferred
+over ProjectTemplate
+################################################################################
+
 In order to customize this template, you must:
 
 * Put these files into the directory for your project.

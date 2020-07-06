@@ -51,7 +51,7 @@ namespace emp {
     /// Erase a specific entry from cache.
     void Erase(const KEY & k) { cache_map.erase(k); }
 
-    /// Lookup a specific key; provide a function to use if value is not in cahce.
+    /// Lookup a specific key; provide a function to use if value is not in cache.
     T Get(KEY k, const std::function<T(KEY k)> & calc_fun) {
       auto cache_it = cache_map.find(k);
       if (cache_it != cache_map.end()) return cache_it->second;
