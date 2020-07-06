@@ -86,22 +86,25 @@ namespace emp {
     h1 += h2;
     h2 += h1;
 
-    fmix64(h1);
-    fmix64(h2);
+    internal::fmix64(h1);
+    internal::fmix64(h2);
 
     h1 += h2;
 
     return h1;
-}
+  }
+
+  /// This structure serves as a hash for containers that are iterable.
+  /// Use as a drop-in replacement for std::hash
   template <typename Container, size_t Seed = 0>
   struct ContainerHash
   {
     size_t operator()(const Container& v) const {
         size_t data = Seed;
-        for (const auto& x : v) {
-            using T = typename std::decay<decltype(x)>::type;
-            const std::hash<T> hasher;
-            data = hash_combine(data, hasher(x));
+        for (const auto& item : v) {
+            using item_type = typename std::decay<decltype(item)>::type;
+            const std::hash<item_type> hasher;
+            data = hash_combine(data, hasher(item));
         }
         return data;
     }
