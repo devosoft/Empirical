@@ -26,9 +26,6 @@ GetUrlParams.js: GetUrlParams.cc
 js_utils.js: js_utils.cc
 	$(CXX_web) $(CFLAGS_web) js_utils.cc -o js_utils.js
 
-test_visualizations.js: visualizations.cc
-	$(CXX_web) $(CFLAGS_web) visualizations.cc -o test_visualizations.js
-
 jswrap.js: JSWrap.cc
 	$(CXX_web) $(CFLAGS_web) JSWrap.cc -o jswrap.js
 
