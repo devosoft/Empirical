@@ -36,7 +36,6 @@
 #include <string>
 
 #include "../base/vector.h"
-#include "../base/errors.h"
 #include "../tools/mem_track.h"
 #include "../control/Signal.h"
 
@@ -79,9 +78,12 @@ namespace web {
   /// Widget is effectively a smart pointer to a WidgetInfo object, plus some basic accessors.
   class Widget {
     friend internal::WidgetInfo; friend internal::DivInfo; friend internal::TableInfo;
-  public:
+  protected:
     using WidgetInfo = internal::WidgetInfo;
     WidgetInfo * info;                        ///< Information associated with this widget.
+
+    /// If an Append doesn't work with current class, forward it to the parent and try there.
+    template <typename FWD_TYPE> Widget & ForwardAppend(FWD_TYPE && arg);
 
     /// Set the information associated with this widget.
     Widget & SetInfo(WidgetInfo * in_info);
@@ -689,16 +691,6 @@ namespace web {
         DoListen(event_name, fun_id);
         return (return_t &) *this;
       }
-      
-      /// Provide an event and a function that will be called when that event is triggered.
-      /// In this case, the function takes a keyboard event as an argument, with full info about keyboard.
-      return_t & On(const std::string & event_name,
-                    const std::function<void(KeyboardEvent evt)> & fun) {
-        emp_assert(info != nullptr);
-        size_t fun_id = JSWrap(fun);
-        DoListen(event_name, fun_id);
-        return (return_t &) *this;
-      }
 
       /// Provide an event and a function that will be called when that event is triggered.
       /// In this case, the function takes two doubles which will be filled in with mouse coordinates.
@@ -904,11 +896,6 @@ namespace web {
           // switch out parent's existing child for wrapper
           parent_info->RemoveChild((return_t &) *this);
           parent_info->AddChild(wrapper);
-        } else if (Info(wrapper)->ptr_count == 1) {
-          emp::LibraryWarning(
-            "Only one reference held to wrapper. ",
-            "It will be destroyed when it goes out of scope."
-          );
         }
 
         // put this Widget inside of the wrapper
