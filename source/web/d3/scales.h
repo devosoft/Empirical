@@ -7,9 +7,6 @@
  *  @brief Tools for scaling graph axes in D3.
 **/
 
-// TODO: clean up copy constructur? -- ask group
-// TODO: make sure all functions match documentation
-
 #ifndef __EMP_D3_SCALES_H__
 #define __EMP_D3_SCALES_H__
 
@@ -109,11 +106,9 @@ namespace D3 {
       return *this;
     }
 
+    // ApplyScale
     template<typename RETURN_T, typename INPUT_T>
-    RETURN_T ApplyScale(INPUT_T input) {
-      emp_assert(false);
-      return RETURN_T();
-    }
+    RETURN_T ApplyScale(INPUT_T input) { ; }
 
     template<>
     std::string ApplyScale<std::string, const std::string &>(const std::string & input) {
@@ -463,41 +458,36 @@ namespace D3 {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleTime(); }, this->id);
     }
 
-    // We need to redeclare this so that the ApplyScale functions can be properly deleted
-    template<typename RETURN_T, typename INPUT_T>
-    RETURN_T ApplyScale(INPUT_T input) {
-      emp_assert(false);
-      return RETURN_T();
-    }
+    // template<typename RETURN_T, typename INPUT_T>
+    // RETURN_T ApplyScale(INPUT_T input) { ; }
 
     // get rid of functions that shouldn't be called
     template <typename T, size_t SIZE>
     Scale & SetDomain(const emp::array<T, SIZE> & values) = delete;
     Scale & SetDomain(double min, double max) = delete;
-    // template<>
-    // std::string ApplyScale<std::string, const Date &>(const std::string & input) = delete;
-    // template<>
-    // std::string ApplyScale<std::string, Date>(const std::string & input) = delete;
-    template<>
-    std::string ApplyScale<std::string, const std::string &>(const std::string & input) = delete;
-    template<>
-    std::string ApplyScale<std::string, double>(double input) = delete;
-    template<>
-    std::string ApplyScale<std::string, int>(int input) = delete;
-    template<>
-    double ApplyScale<double, const std::string &>(const std::string &input) = delete;
-    template<>
-    double ApplyScale<double, double>(double input) = delete;
-    template<>
-    double ApplyScale<double, int>(int input) = delete;
-    template<>
-    int ApplyScale<int, const std::string &>(const std::string & input) = delete;
-    template<>
-    int ApplyScale<int, double>(double input) = delete;
-    template<>
-    int ApplyScale<int, int>(int input) = delete;
     template <typename T>
     double Invert(T y) = delete;
+    // template<>
+    // std::string ApplyScale<std::string, const std::string &>(const std::string & input) = delete;
+    // template<>
+    // std::string ApplyScale<std::string, double>(double input) = delete;
+    // template<>
+    // std::string ApplyScale<std::string, int>(int input) = delete;
+    // template<>
+    // double ApplyScale<double, const std::string &>(const std::string & input) = delete;
+    // template <>
+    // double ApplyScale<double, double>(double input) = delete;
+    // template <>
+    // double ApplyScale<double, int>(int input) = delete;
+    // template<>
+    // int ApplyScale<int, const std::string &>(const std::string & input) = delete;
+    // template<>
+    // int ApplyScale<int, double>(double input) = delete;
+    // template<>
+    // int ApplyScale<int, int>(int input) = delete;
+    template<typename RETURN_T, typename INPUT_T>
+    RETURN_T ApplyScale(INPUT_T input) = delete;
+
 
     // special SetDomain to deal with Dates
     TimeScale & SetDomain(const Date & dateMin, const Date & dateMax) {
@@ -529,9 +519,33 @@ namespace D3 {
     }
 
     // we need this because directly adding a new templated version of ApplyScale does not work
-    template<typename RETURN_T>
-    typename std::enable_if<std::is_arithmetic<RETURN_T>::value, RETURN_T>::type
-    ApplyScale(const Date & dateInput) {
+    // template<typename RETURN_T>
+    // typename std::enable_if<std::is_arithmetic<RETURN_T>::value, RETURN_T>::type
+    // ApplyScale(const Date & dateInput) {
+    //   return EM_ASM_DOUBLE({
+    //     const id = $0;
+    //     const year = $1;
+    //     const month = $2;
+    //     const day = $3;
+    //     const hours = $4;
+    //     const minutes = $5;
+    //     const seconds = $6;
+    //     const milliseconds = $7;
+
+    //     const dateInput = new Date(year, month, day, hours, minutes, seconds, milliseconds);
+    //     return emp_d3.objects[id](dateInput);
+    //   }, this->id, dateInput.year, dateInput.month, dateInput.day, dateInput.hours, dateInput.minutes, dateInput.seconds, dateInput.milliseconds);
+    // }
+
+    // ApplyScale
+    // template<typename RETURN_T, typename INPUT_T>
+    // RETURN_T ApplyScale(INPUT_T input) { ; }
+
+    template<typename T>
+    T ApplyScale(const Date & dateInput) { ; }
+
+    template<>
+    double ApplyScale<double>(const Date & dateInput) {
       return EM_ASM_DOUBLE({
         const id = $0;
         const year = $1;
@@ -547,7 +561,44 @@ namespace D3 {
       }, this->id, dateInput.year, dateInput.month, dateInput.day, dateInput.hours, dateInput.minutes, dateInput.seconds, dateInput.milliseconds);
     }
 
-    // TODO: Apply scale that returns a string
+    template<>
+    int ApplyScale<int>(const Date & dateInput) {
+      return EM_ASM_INT({
+        const id = $0;
+        const year = $1;
+        const month = $2;
+        const day = $3;
+        const hours = $4;
+        const minutes = $5;
+        const seconds = $6;
+        const milliseconds = $7;
+
+        const dateInput = new Date(year, month, day, hours, minutes, seconds, milliseconds);
+        return emp_d3.objects[id](dateInput);
+      }, this->id, dateInput.year, dateInput.month, dateInput.day, dateInput.hours, dateInput.minutes, dateInput.seconds, dateInput.milliseconds);
+    }
+
+    // ApplyScale that returns a string
+    template<>
+    std::string ApplyScale<std::string>(const Date & dateInput) {
+    // std::string ApplyScaleString(const Date & dateInput) {
+      EM_ASM({
+        const id = $0;
+        const year = $1;
+        const month = $2;
+        const day = $3;
+        const hours = $4;
+        const minutes = $5;
+        const seconds = $6;
+        const milliseconds = $7;
+
+        const dateInput = new Date(year, month, day, hours, minutes, seconds, milliseconds);
+        const resultStr = emp_d3.objects[id](dateInput);
+        emp.PassStringToCpp(resultStr);
+      }, this->id, dateInput.year, dateInput.month, dateInput.day, dateInput.hours, dateInput.minutes, dateInput.seconds, dateInput.milliseconds);
+
+      return emp::pass_str_to_cpp();
+    }
     
     Date Invert(double input) {
       EM_ASM({

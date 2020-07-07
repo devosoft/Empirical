@@ -424,10 +424,17 @@ struct TestTimeScale {
         .domain([new Date(2000, 0, 1), new Date(2000, 0, 2)])
         .range([0, 960]);
 
-      console.log(timeScale(new Date(2000, 0, 1,  5))); // 200
+      console.log(timeScale(new Date(2000, 0, 1, 5))); // 200
       console.log(timeScale(new Date(2000, 0, 1, 16))); // 640
       console.log(timeScale.invert(200)); // Sat Jan 01 2000 05:00:00 GMT-0800 (PST)
       console.log(timeScale.invert(640)); // Sat Jan 01 2000 16:00:00 GMT-0800 (PST)
+
+      var timeColor = d3.scaleTime()
+                    .domain([new Date(2000, 0, 1), new Date(2000, 0, 2)])
+                    .range(["red", "yellow"]);
+
+      console.log(timeColor(new Date(2000, 0, 1, 5))); // rgb(255, 53, 0)
+      console.log(timeColor(new Date(2000, 0, 1, 16))); // rgb(255, 170, 0)
     });
 
     D3::TimeScale testTime;
@@ -439,15 +446,24 @@ struct TestTimeScale {
     D3::Date date2(2000, 0, 1, 16);
     double result1 = testTime.ApplyScale<double>(date1);
     int result2 = testTime.ApplyScale<int>(date2);
-    // double result1 = testTime.ApplyScale(date1);
-    // double result2 = testTime.ApplyScale(date2);
     D3::Date result1i = testTime.Invert(200);
     D3::Date result2i = testTime.Invert(640);
+
+    D3::TimeScale testColorTime;
+    testColorTime.SetDomain(dateMin, dateMax);
+    emp::array<std::string, 2> colorArray = {"red", "yellow"};
+    testColorTime.SetRange(colorArray);
+    // std::string result3 = testColorTime.ApplyScaleString(date1);
+    // std::string result4 = testColorTime.ApplyScaleString(date2);  
+    std::string result3 = testColorTime.ApplyScale<std::string>(date1);
+    std::string result4 = testColorTime.ApplyScale<std::string>(date2);  
 
     std::cout << "value 1: " << result1 << std::endl;
     std::cout << "value 2: " << result2 << std::endl;
     std::cout << "value 1 invert: " << result1i.ToString() << std::endl;
     std::cout << "value 2 invert: " << result2i.ToString() << std::endl;
+    std::cout << "value 3: " << result3 << std::endl;
+    std::cout << "value 4: " << result4 << std::endl;
 
     std::cout << "------Time Test End------" << std::endl << std::endl;
   }
