@@ -24,6 +24,9 @@ d3_init.js: d3_init.cc
 selection.js: selection.cc
 	$(CXX_web) $(CFLAGS_web) selection.cc -o selection.js
 
+scales.js: scales.cc
+	$(CXX_web) $(CFLAGS_web) scales.cc -o scales.js
+
 transition.js: transition.cc
 	$(CXX_web) $(CFLAGS_web) transition.cc -o transition.js
 
