@@ -7,6 +7,16 @@ Bootstrap classes required. These tools use Empirical's web tools to provide
 structure for the site, and many of the prefab tools inherit from web tools so you can add your
 own styling and stream them into other web components in a similar way.
 
+When using these prefab tools be sure to link to the Bootstrap library, jQuery, and the default style stylesheet
+for this class in the head section of your HTML file.
+.. code-block:: html
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/devosoft/Empirical@prefab/source/prefab/DefaultConfigPanelStyle.css">
+    <script src="jquery-1.11.2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+
 You can view these tools in action `here <https://devosoft.github.io/empirical-prefab-demo/empirical-prefab-demo>`_.
 
 Card
@@ -237,6 +247,86 @@ Example:
 
     emp::prefab::LoadingIcon spinner;
     doc << spinner;
+
+LoadingModal
+~~~~~~~~~~~~
+The LoadingModal header file is used to add a loading modal to a web page. It will appear while the 
+content of the page is rendering and will disappear when the page has completed loading.
+
+This header file is slightly different from the other prefab web tools. To place the loading modal on
+your web page, you must import the LoadingModal.js script into your HTML file right after the opening 
+body tag. To close the modal you must call the CloseLoadingModal() function in your .cc file after 
+you've loaded all the desired content into the doc.
+
+Example:
+********
+.. code-block:: cpp
+
+    // .cc file
+    #include "web/web.h"
+    #include "LoadingModal.h"
+
+    emp::web::Document doc("emp_base");
+
+    // Add elements to the doc a normal
+
+    emp::prefab::CloseLoadingModal();
+
+.. code-block:: html
+
+    <!-- HTML file -->
+    <html>
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/devosoft/Empirical@prefab/source/prefab/DefaultConfigPanelStyle.css">
+        <script src="jquery-1.11.2.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <!-- Loading Modal JS -->
+        <script src="https://cdn.jsdelivr.net/gh/devosoft/Empirical@prefab/source/prefab/LoadingModal.js"></script>
+
+        <!-- Rest of body section -->
+    </body>
+    </html>
+
+Modal
+~~~~~
+The Modal class can be used to create Bootstrap modals that pop up in the middle of the screen. 
+
+Since this class inherits from web::Div, you can stream your Modal into other web
+components with the << operator. You can also set the background color of the Modal
+with SetBackground() passing it a string with a color name or it's hex code value.
+
+Example:
+********
+.. code-block:: cpp
+
+    #include "web/web.h"
+    #include "web/Button.h"
+    #include "prefab/Modal.h"
+
+    emp::web::Document doc("emp_base");
+
+    emp::prefab::Modal modal;
+    doc << modal;
+
+    modal.AddHeaderContent("<h3>Modal Header Section</h3>");
+    modal.AddBodyContent("This is the content of the modal");
+
+    modal.AddFooterContent("Modal Footer Section");
+    UI::Button close_btn([](){;}, "Close");
+    close_btn.SetAttr("class", "btn btn-secondary");
+    modal.AddFooterContent(close_btn);
+    modal.AddButton(close_btn);
+
+    modal.AddClosingX();
+
+    UI::Button modal_btn([](){;}, "Show Modal");
+    doc << modal_btn;
+    modal_btn.SetAttr("class", "btn btn-info");
+    modal.AddButton(modal_btn);
 
 ToggleSwitch
 ~~~~~~~~~~~~
