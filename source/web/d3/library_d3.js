@@ -68,6 +68,27 @@ var D3Library = {
       return (typeof window[func_name] === "function");
     },
 
+    // Inspired by Niels' answer to
+    // http://stackoverflow.com/questions/12899609/how-to-add-an-object-to-a-nested-javascript-object-using-a-parent-id/37888800#37888800
+    find_in_hierarchy: function(root, id) {
+      if (root.name == id) {
+        return root;
+      }
+      if (root.children) {
+        for (var k in root.children) {
+          if (root.children[k].name == id) {
+            return root.children[k];
+          }
+          else if (root.children[k].children) {
+            result = this.find_in_hierarchy(root.children[k], id);
+            if (result) {
+              return result;
+            }
+          }
+        }
+      }
+    },
+
   },
 
   // TODO: Rename to InitializeEmpD3?
