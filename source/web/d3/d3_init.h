@@ -93,6 +93,13 @@ namespace internal {
         }, this->id);
     }
   };
+
+  /// Catch-all object for storing references to things created in JS
+  class JSObject : public D3_Base {
+  public:
+      JSObject() {;};
+  };
+
 }
 
 #endif
