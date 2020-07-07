@@ -1,6 +1,6 @@
 [submodule "third-party/Catch"]
 	path = third-party/Catch
-	url = https://github.com/philsquared/Catch.git
+	url = https://github.com/catchorg/Catch2.git
 [submodule "third-party/force-cover"]
 	path = third-party/force-cover
 	url = https://github.com/emilydolson/force-cover.git

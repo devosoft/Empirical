@@ -9,6 +9,9 @@
  *
  *  Compile with -O3 and -msse4.2 for fast bit counting.
  * 
+ *  @todo Most of the operators don't check to make sure that both Bitvextors are the same size.
+ *        We should create versions (Intersection() and Union()?) that adjust sizes if needed.
+ * 
  *  @todo Do small BitVector optimization.  Currently we have number of bits (8 bytes) and a
  *        pointer to the memory for the bitset (another 8 bytes), but we could use those 16 bytes
  *        as 1 byte of size info followed by 15 bytes of bitset (120 bits!)
@@ -16,6 +19,9 @@
  *  @todo Implement append(), resize()...
  *  @todo Implement techniques to push bits (we have pop)
  *  @todo Implement techniques to insert or remove bits from middle.
+ *  @todo Think about how itertors should work for BitVector.  It should probably go bit-by-bit,
+ *        but there are very few circumstances where that would be useful.  Going through the
+ *        positions of all ones would be more useful, but perhaps less intuitive.
  *
  *  @note This class is 15-20% slower than emp::BitSet, but more flexible & run-time configurable.
  */
@@ -164,7 +170,7 @@ namespace emp {
       emp_assert(bit_set.DebugGetArrayBytes() == in_set.DebugGetArrayBytes(),
                  bit_set.DebugGetArrayBytes(), in_set.DebugGetArrayBytes());
       #endif
-      
+
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
     }
@@ -282,7 +288,7 @@ namespace emp {
       emp_assert(in_set.bit_set != nullptr || in_set.num_bits == 0);
       emp_assert(in_set.bit_set.OK());
       #endif
-      
+
       if (&in_set == this) return *this;
       const size_t in_num_fields = in_set.NumFields();
       const size_t prev_num_fields = NumFields();
@@ -443,7 +449,8 @@ namespace emp {
       bit_set[field_id] = (bit_set[field_id] & ~(static_cast<field_t>(255) << pos_id)) | (val_uint << pos_id);
     }
 
-    /// Retrive the 32-bit uint from the specifeid uint index.
+    /// Retrieve the 32-bit uint from the specified uint index.
+    /*
     uint32_t GetUInt(size_t index) const {
       // If the fields are already 32 bits, return.
       if constexpr (sizeof(field_t) == 4) return bit_set[index];
@@ -457,15 +464,52 @@ namespace emp {
 
       return (uint32_t) (bit_set[field_id] >> (field_pos * 32));
     }
+    */
+   // Retrieve the 32-bit uint from the specified uint index.
+   // new implementation based on bitset.h GetUInt32
+    uint32_t GetUInt(size_t index) const {
+      emp_assert(index * 32 < num_bits);
+
+      uint32_t res;
+
+      std::memcpy(
+        &res,
+        bit_set.Cast<unsigned char>().Raw() + index * (32/8),
+        sizeof(res)
+      );
+
+      return res;
+    }
 
     /// Update the 32-bit uint at the specified uint index.
-    void SetUInt(size_t index, uint32_t value) {
+    void SetUInt(const size_t index, uint32_t value) {
+      emp_assert(index * 32 < num_bits);
+
+      std::memcpy(
+        bit_set.Cast<unsigned char>().Raw() + index * (32/8),
+        &value,
+        sizeof(value)
+      );
+
+      // check to make sure there are no leading ones in the unused bits
+      // or if LastBitID is 0 everything should pass too
+      emp_assert(
+        LastBitID() == 0
+        || (
+          bit_set[NumFields() - 1]
+          & ~MaskLow<field_t>(LastBitID())
+        ) == 0
+      );
+
+    }
+
+    void SetUIntAtBit(size_t index, uint32_t value) {
       if constexpr (sizeof(field_t) == 4) bit_set[index] = value;
 
       emp_assert(sizeof(field_t) == 8);
 
-      const size_t field_id = index/2;
-      const size_t field_pos = 1 - (index & 1);
+      const size_t field_id = FieldID(index);
+      const size_t field_pos = FieldPos(index);
       const field_t mask = ((field_t) ((uint32_t) -1)) << (1-field_pos);
 
       emp_assert(field_id < NumFields());

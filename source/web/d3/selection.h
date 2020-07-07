@@ -630,7 +630,7 @@ namespace D3 {
 
     /// Default constructor - constructs empty selection
     Selection() {
-        EM_ASM({emp_d3.objects[$0] = d3.selection();}, this->id);
+        EM_ASM({emp_d3.objects[$0] = d3.select();}, this->id);
     };
 
     /// Create Selection object with a specific id.
