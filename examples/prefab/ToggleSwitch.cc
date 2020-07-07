@@ -5,8 +5,6 @@
 #include <iostream>
 
 #include "web/web.h"
-#include "web/Div.h"
-#include "web/Input.h"
 #include "prefab/ToggleSwitch.h"
 
 namespace UI = emp::web;
@@ -15,16 +13,14 @@ UI::Document doc("emp_base");
 
 int main()
 {
-  UI::Input input_element(
-      [](std::string str){;},
-      "checkbox", NULL, "input_id"
-  );
-  emp::prefab::ToggleSwitch my_switch(input_element);
-  doc << my_switch;
+  emp::prefab::ToggleSwitch on_switch([](std::string val){}, "checkbox", "Switch Defult On", true, "user_defined_switch_id");
+  doc << on_switch;
 
-  UI::Div title;
-  title << "Switch Label";
-  my_switch.AddLabel(title);
+  doc << "<br>";
+
+  emp::prefab::ToggleSwitch off_switch([](std::string val){}, "checkbox", NULL, false);
+  doc << off_switch;
+  off_switch.AddLabel("Switch Defult Off");
 
   std::cout << "end of main... !" << std::endl;
 }
