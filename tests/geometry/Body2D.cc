@@ -1,6 +1,6 @@
 #include <vector>
 #define CATCH_CONFIG_MAIN
-#include "third-party/Catch/single_include/catch.hpp"
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "geometry/Body2D.h"
 
@@ -40,4 +40,13 @@ TEST_CASE("Test Body2d", "[geometry]")
   REQUIRE(body1.GetTargetLinkDist(*body2) == 20);
   REQUIRE(body2->GetTargetLinkDist(body1) == 20);
   body2.Delete();
+
+
+  //Simple test creating and getting birth time
+  
+  emp::CircleBody2D body3(body_outline);
+  body3.SetBirthTime(1.1);
+  REQUIRE(body3.GetBirthTime() == 1.1);
+
+
 }

@@ -27,6 +27,9 @@ selection.js: selection.cc
 transition.js: transition.cc
 	$(CXX_web) $(CFLAGS_web) transition.cc -o transition.js
 
+test_visualizations.js: visualizations.cc
+	$(CXX_web) $(CFLAGS_web) visualizations.cc -o test_visualizations.js
+
 clean:
 	rm -f d3_init.js transition.js *.js.map *.js.mem *~
 

@@ -1,6 +1,7 @@
 #include "web/JSWrap.h"
 #include "web/d3/d3_init.h"
 #include "web/Document.h"
+#include "web/_MochaTestRunner.h"
 #include <iostream>
 #include <functional>
 #include <type_traits>
@@ -27,7 +28,7 @@ struct BaseTester : D3::D3_Base {
 // - Tests:
 //   - Reference counting
 //   - Correct assignment of next ID
-struct Test_BaseObjectIDAssignment : BaseTest {
+struct Test_BaseObjectIDAssignment : emp::web::BaseTest {
   // All persistent data structures necessary for test should be member variables.
   BaseTester test1{}; // This will get created 1st.
   BaseTester test2{}; // This will get created 2nd.
@@ -35,15 +36,14 @@ struct Test_BaseObjectIDAssignment : BaseTest {
   emp::Ptr<BaseTester> test4;
   uint32_t test4_del_func_id=0;
 
-  // This code will run in the 'before' call for this function's describe clause.
-  void Setup() override {
+  Test_BaseObjectIDAssignment() {
     test4 = emp::NewPtr<BaseTester>(D3::internal::NextD3ID());
     test4_del_func_id = emp::JSWrap([this]() { test4.Delete(); }, "TestDeleteBaseObject");
 
-    emp_assert(test1.GetID() == 0);
-    emp_assert(test2.GetID() == 1);
-    emp_assert(test3.GetID() == 2);
-    emp_assert(test4->GetID() == 3);
+    this->Require(test1.GetID() == 0, "test1 id wrong");
+    this->Require(test2.GetID() == 1, "test2 id wrong");
+    this->Require(test3.GetID() == 2, "test3 id wrong");
+    this->Require(test4->GetID() == 3, "test4 id wrong");
   }
 
   // Describe test (should only contain 'describe' call)
@@ -91,9 +91,9 @@ struct Test_BaseObjectIDAssignment : BaseTest {
 //  - clear_emp_d3
 //  - find_function
 //  - is_function
-struct Test_LibraryD3 : BaseTest {
+struct Test_LibraryD3 : emp::web::BaseTest {
 
-  void Describe() {
+  void Describe() override {
     EM_ASM({
       describe("library_d3.js", function() {
         // describe("objects")
@@ -211,52 +211,19 @@ struct Test_LibraryD3 : BaseTest {
 
 };
 
-
-// Proof of concept (will delete later)
-struct TestThingy : BaseTest {
-  size_t num;
-  TestThingy(double i) : num(i) { ; }
-  void Describe() override {
-    std::cout << "  > Testing thingy!" << std::endl;
-    std::cout << "      num = " << num << std::endl;
-    EM_ASM({
-      $("#emp_test_container").append("<p>HELLO "+$0+"<p>");
-      $("#emp_test_container").append("<p>HELLO "+$0+"<p>");
-      $("#emp_test_container").append("<p>HELLO "+$0+"<p>");
-      $("#emp_test_container").append("<p>HELLO "+$0+"<p>");
-    }, num);
-  }
-};
-
-TestManager test_manager;
-
+emp::web::MochaTestRunner test_runner;
 int main() {
-  emp::Initialize();          // Initialize emp
   D3::internal::get_emp_d3(); // Initialize emp_d3
-  // Append container div to document.
-  EM_ASM({
-    $("body").append('<div id="emp_test_container"></div>');
-  });
-  // First, use js to add anything you need to the html
+
+  test_runner.Initialize({"emp_test_container"});
 
   std::cout << "Creating test manager." << std::endl;
-  test_manager.AddTest<Test_BaseObjectIDAssignment>();
-  test_manager.AddTest<Test_BaseObjectIDAssignment>(); // demo that we can add tests arbitrary number of times
-  test_manager.AddTest<TestThingy>(1);
-  test_manager.AddTest<TestThingy>(2);
-  test_manager.AddTest<TestThingy>(3);
-  test_manager.AddTest<TestThingy>(4);
-  test_manager.AddTest<Test_LibraryD3>();
+  test_runner.AddTest<Test_BaseObjectIDAssignment>("D3 Base Object ID Assignment");
+  test_runner.AddTest<Test_LibraryD3>("LibraryD3");
 
-  test_manager.OnBeforeEachTest([]() {
-    EM_ASM({
-      console.log($("#emp_test_container").html());
-    });
+  test_runner.OnBeforeEachTest([]() {
     ResetD3Context();
-    EM_ASM({
-      console.log($("#emp_test_container").html());
-    });
   });
 
-  test_manager.Run();
+  test_runner.Run();
 }
