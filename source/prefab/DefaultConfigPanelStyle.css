@@ -1,3 +1,8 @@
+/*
+ NOTE: If you modify this file, run the purge_script.sh script 
+ to see your changes take effect in the browser
+*/
+
 /* Glyphicon Toggle */
 .collapse_toggle[aria-expanded=true] .fa-angle-double-down{
     display: none;

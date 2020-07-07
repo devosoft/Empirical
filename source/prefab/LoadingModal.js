@@ -1,4 +1,7 @@
-// inject modal html and start it
+// NOTE: If you modify this file, run the purge_script.sh script 
+// to see your changes take effect in the browser
+
+// inject loading modal html and start it
 var modal_html = '<div class="modal bd-example-modal-lg" id="loading_modal" data-backdrop="static" data-keyboard="false" tabindex="-1">\
                     <div class="modal-dialog modal-sm"> \
                         <div class="modal-content" style="width: 256px"> \
