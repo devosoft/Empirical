@@ -410,17 +410,10 @@ namespace emp {
 
                         }
                         else if (type == "bool") {
-                            web::Input bool_input(
-                                [this, name](std::string val){config.Set(name, val);
-                                                              on_change_fun(val);},
-                                "checkbox", NULL, name + "_input_checkbox"
-                            );
-                            // Default checkbox
-                            // setting_element << bool_input;
-                            // bool_input.SetAttr("class", "input_bool");
-
                             // Bootstrap Toggle Switch (need at least v4.5.0)
-                            emp::prefab::ToggleSwitch toggle_switch(bool_input);
+                            emp::prefab::ToggleSwitch toggle_switch([this, name](std::string val){config.Set(name, val);
+                                                              on_change_fun(val);},
+                                "checkbox", NULL, emp::from_string<bool>(value), name + "_input_checkbox");
                             setting_element << toggle_switch;
                             toggle_switch.AddClass("input_bool");
 

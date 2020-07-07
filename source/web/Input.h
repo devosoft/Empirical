@@ -177,7 +177,7 @@ namespace web {
     /// @param in_label The label that should appear on the Input.
     /// @param in_id The HTML ID to use for this Input (leave blank for auto-generated)
     Input(const std::function<void(std::string)> & in_cb, const std::string & in_type,
-          const std::string & in_label, const std::string & in_id="")
+          const std::string & in_label, const std::string & in_id="", bool show_value=false, bool is_checked=false)
       : WidgetFacet(in_id)
     {
       info = new InputInfo(in_id);
@@ -191,6 +191,10 @@ namespace web {
       InputInfo * b_info = Info();
       Info()->callback_id = JSWrap( std::function<void(std::string)>( [b_info](std::string new_val){b_info->DoChange(new_val);} )  );
       Info()->onchange_info = emp::to_string("emp.Callback(", Info()->callback_id, ", ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);");
+      // Allows user to set the checkbox to start out on/checked
+      if (in_type.compare("checkbox") == 0 && is_checked){
+        this->SetAttr("checked", "true");
+      }
     }
 
     /// Link to an existing Input.

@@ -255,19 +255,16 @@ Example:
 .. code-block:: cpp
 
     #include "web/web.h"
-    #include "web/Input.h"
     #include "prefab/ToggleSwitch.h"
 
-    emp::web::Document doc("emp_base");
+    emp::prefab::ToggleSwitch on_switch([](std::string val){}, "checkbox", "Switch Defult On", true, "user_defined_switch_id");
+    doc << on_switch;
 
-    emp::web::Input input_element(
-      [](std::string str){;},
-      "checkbox", NULL, "input_id"
-    );
-    emp::prefab::ToggleSwitch my_switch(input_element);
-    doc << my_switch;
+    doc << "<br>";
 
-    my_switch.AddLabel("Switch Label");
+    emp::prefab::ToggleSwitch off_switch([](std::string val){}, "checkbox", NULL, false);
+    doc << off_switch;
+    off_switch.AddLabel("Switch Defult Off");
 
 Add the link to Bootstrap in the head of your HTML file:
 .. code-block:: html
