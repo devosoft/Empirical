@@ -397,6 +397,20 @@ struct TestPassMapToJavascript : public emp::web::BaseTest {
 
     wrapped_fun_ids.emplace_back(
       emp::JSWrap(
+        []() {
+          emp::vector<double> arr1 = {1.01, 2.02, 3.03};
+          emp::vector<double> arr2 = {10.01, 20.02, 30.03};
+          emp::vector<double> arr3 = {100.01, 200.02, 300.03};
+          std::map<std::string, emp::vector<double>> testMap = {{"test1", arr1}, {"test2", arr2}, {"test3", arr3}};
+          emp::pass_map_to_javascript(testMap);
+        },
+        "PassStringVectorMapToJS",
+        false
+      )
+    );
+
+    wrapped_fun_ids.emplace_back(
+      emp::JSWrap(
         [](){
           emp::array<std::string, 5> keysCpp = {"test1", "test2", "test3", "test4", "test5"};
           emp::array<double, 5> vals = {10.1, 20.2, 30.3, 40.4, 50.5};
@@ -477,6 +491,12 @@ struct TestPassMapToJavascript : public emp::web::BaseTest {
           emp.PassIntStringMapToJS(); // {{1, "test1"}, {2, "test2"}, {3, "test3"}, {4, "test4"}, {5, "test5"}};
           const incoming = emp_i.__incoming_map;
           const jsVersion = ( {1: "test1", 2: "test2", 3: "test3", 4: "test4", 5: "test5"} );
+          chai.assert.deepEqual(incoming, jsVersion);
+        });
+        it("should pass std::map<std::string, emp::vector<double>> to javascript", function() {
+          emp.PassStringVectorMapToJS(); // {{"test1", {1.01, 2.02, 3.03}},  {"test2", {10.01, 20.02, 30.03}}, {"test3", {100.01, 200.02, 300.03}}}
+          const incoming = emp_i.__incoming_map;
+          const jsVersion = ( {"test1": [1.01, 2.02, 3.03], "test2": [10.01, 20.02, 30.03], "test3": [100.01, 200.02, 300.03]} );
           chai.assert.deepEqual(incoming, jsVersion);
         });
         it("should pass emp::array<std::string, 5> and emp::array<double, 5> to javascript as a map", function() {
