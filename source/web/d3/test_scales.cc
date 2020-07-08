@@ -175,9 +175,9 @@ struct TestPowScale {
         .domain([0, 2e9])
         .range([0, 300]);
 
-      console.log(population2(1.386e9)); // 249.73986465920893
-      console.log(population2(127e6)); // 75.59761901012492
-      console.log(population2(427e3)); // 4.383491758860737
+      console.log(population2(1.386e9)); // 173.06972620883178
+      console.log(population2(127e6)); // 4.800448807142932
+      console.log(population2(427e3)); // 0.0009358754905167673
 
       var populationColor = d3.scalePow()
         .domain([0, 2e9])

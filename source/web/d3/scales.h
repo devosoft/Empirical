@@ -332,11 +332,6 @@ namespace D3 {
       EM_ASM({ emp_d3.objects[$0].exponent($1);}, this->id, ex);
       return *this;
     }
-    // PowScale & SqrtScale() {
-    //   EM_ASM({ emp_d3.objects[$0].exponent(0.5);}, this->id);
-    //   return *this;
-    //   // return PowScale().SetExponent(0.5);
-    // }
   };
 
   // scaleSqrt
