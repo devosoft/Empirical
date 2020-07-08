@@ -15,6 +15,15 @@
 #include <cstddef>
 #include <stdint.h>
 
+#include "../../third-party/span-lite/include/nonstd/span.hpp"
+
+// alias span-lite's nonstd::span to std::span
+// this is done to ease transition to C++20 spans at a later point
+namespace std {
+  template <typename ...Args>
+  using span = nonstd::span<Args...>;
+}
+
 namespace emp {
 
   /// generate a unique long from a pair of ints
@@ -43,11 +52,13 @@ namespace emp {
     }
   }
 
-  constexpr size_t inline murmur_hash(
-    const std::byte* key,
-    const size_t numbytes,
+  size_t murmur_hash(
+    const std::span<const std::byte> key,
     const size_t seed = 0
   ) {
+    const size_t numbytes = key.size();
+    const size_t nblocks = numbytes / 16;
+
     // define constants and starting seeds
     size_t h1 = seed;
     size_t h2 = seed;
@@ -56,7 +67,7 @@ namespace emp {
     const size_t c2 = 0x4cf5ad432745937fLLU;
 
     // main algorithm loop
-    for (size_t i = 0; i < numbytes / 2; i++) {
+    for (size_t i = 0; i < nblocks; i++) {
       size_t k1 = static_cast<size_t>(key[2 * i]);
       size_t k2 = static_cast<size_t>(key[2 * i + 1]);
 
@@ -78,6 +89,32 @@ namespace emp {
       h2 += h1;
       h2 = 5 * h2 + 0x38495ab5;
     }
+    // tail
+    uint64_t k1 = 0;
+    uint64_t k2 = 0;
+
+    const uint8_t * tail = (const uint8_t*)(key.data() + nblocks*16);
+
+    switch(numbytes & 15) {
+      case 15: k2 ^= ((uint64_t)tail[14]) << 48;
+      case 14: k2 ^= ((uint64_t)tail[13]) << 40;
+      case 13: k2 ^= ((uint64_t)tail[12]) << 32;
+      case 12: k2 ^= ((uint64_t)tail[11]) << 24;
+      case 11: k2 ^= ((uint64_t)tail[10]) << 16;
+      case 10: k2 ^= ((uint64_t)tail[ 9]) << 8;
+      case  9: k2 ^= ((uint64_t)tail[ 8]) << 0;
+              k2 *= c2; k2  = internal::rotate(k2,33); k2 *= c1; h2 ^= k2;
+
+      case  8: k1 ^= ((uint64_t)tail[ 7]) << 56;
+      case  7: k1 ^= ((uint64_t)tail[ 6]) << 48;
+      case  6: k1 ^= ((uint64_t)tail[ 5]) << 40;
+      case  5: k1 ^= ((uint64_t)tail[ 4]) << 32;
+      case  4: k1 ^= ((uint64_t)tail[ 3]) << 24;
+      case  3: k1 ^= ((uint64_t)tail[ 2]) << 16;
+      case  2: k1 ^= ((uint64_t)tail[ 1]) << 8;
+      case  1: k1 ^= ((uint64_t)tail[ 0]) << 0;
+              k1 *= c1; k1  = internal::rotate(k1,31); k1 *= c2; h1 ^= k1;
+    };
 
     // finalization
     h1 ^= numbytes;
