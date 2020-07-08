@@ -32,7 +32,14 @@
 #include "hash_utils.h"
 #include "random_utils.h"
 
+#include "../../third-party/span-lite/include/nonstd/span.hpp"
 
+// alias span-lite's nonstd::span to std::span
+// this is done to ease transition to C++20 spans at a later point
+namespace std {
+  template <typename ...Args>
+  using span = nonstd::span<Args...>;
+}
 
 namespace emp {
 
@@ -589,6 +596,11 @@ namespace emp {
       return (bit_set[field_id] >> pos_id) & 255;
     }
 
+    /// Get a read-only view into the internal array used by BitSet
+    std::span<const field_t> GetBytes() const {
+      return std::span<const field_t>(bit_set);
+    }
+
     /// Set the full byte starting at the bit at the specified index.
     void SetByte(size_t index, uint8_t value) {
       emp_assert(index < NUM_BYTES);
@@ -714,7 +726,7 @@ namespace emp {
         // check to make sure there are no leading ones in the unused bits
         emp_assert((bit_set[NUM_FIELDS - 1] & ~MaskLow<field_t>(LAST_BIT)) == 0);
       }
-      
+
 
     }
 
