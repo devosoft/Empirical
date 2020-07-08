@@ -97,9 +97,11 @@ namespace emp {
       std::hash<query_t> qhasher;
       std::hash<tag_t> thasher;
 
-      return static_cast<double>(emp::hash_combine(
-        qhasher(a),
-        thasher(b)
+      std::array<size_t, 2> input{qhasher(a), thasher(b)};
+
+      return static_cast<double>(emp::murmur_hash(
+        reinterpret_cast<std::byte*>(input.data()),
+        sizeof(size_t) * input.size()
       )) / (static_cast<double>(std::numeric_limits<size_t>::max()));
     }
 
