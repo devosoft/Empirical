@@ -13,6 +13,7 @@
 
 #include <type_traits>
 #include <cstddef>
+#include <cstring>
 #include <stdint.h>
 
 #include "../../third-party/span-lite/include/nonstd/span.hpp"
@@ -52,7 +53,7 @@ namespace emp {
     }
   }
 
-  size_t murmur_hash(
+  constexpr size_t murmur_hash(
     const std::span<const std::byte> key,
     const size_t seed = 0
   ) {
@@ -93,26 +94,31 @@ namespace emp {
     uint64_t k1 = 0;
     uint64_t k2 = 0;
 
-    const uint8_t * tail = (const uint8_t*)(key.data() + nblocks*16);
+    const auto do_magic = [&key, nblocks](const size_t a, const size_t b) {
+      uint64_t tail_{0};
+
+      std::memcpy(&tail_, key.data() + nblocks*16 + a, sizeof(uint8_t));
+      return tail_ << b;
+    };
 
     switch(numbytes & 15) {
-      case 15: k2 ^= ((uint64_t)tail[14]) << 48;
-      case 14: k2 ^= ((uint64_t)tail[13]) << 40;
-      case 13: k2 ^= ((uint64_t)tail[12]) << 32;
-      case 12: k2 ^= ((uint64_t)tail[11]) << 24;
-      case 11: k2 ^= ((uint64_t)tail[10]) << 16;
-      case 10: k2 ^= ((uint64_t)tail[ 9]) << 8;
-      case  9: k2 ^= ((uint64_t)tail[ 8]) << 0;
+      case 15: k2 ^= do_magic(14, 48);
+      case 14: k2 ^= do_magic(13, 40);
+      case 13: k2 ^= do_magic(12, 32);
+      case 12: k2 ^= do_magic(11, 24);
+      case 11: k2 ^= do_magic(10, 16);
+      case 10: k2 ^= do_magic(9, 8);
+      case  9: k2 ^= do_magic(8, 0);
               k2 *= c2; k2  = internal::rotate(k2,33); k2 *= c1; h2 ^= k2;
 
-      case  8: k1 ^= ((uint64_t)tail[ 7]) << 56;
-      case  7: k1 ^= ((uint64_t)tail[ 6]) << 48;
-      case  6: k1 ^= ((uint64_t)tail[ 5]) << 40;
-      case  5: k1 ^= ((uint64_t)tail[ 4]) << 32;
-      case  4: k1 ^= ((uint64_t)tail[ 3]) << 24;
-      case  3: k1 ^= ((uint64_t)tail[ 2]) << 16;
-      case  2: k1 ^= ((uint64_t)tail[ 1]) << 8;
-      case  1: k1 ^= ((uint64_t)tail[ 0]) << 0;
+      case  8: k1 ^= do_magic(7, 56);
+      case  7: k1 ^= do_magic(6, 48);
+      case  6: k1 ^= do_magic(5, 40);
+      case  5: k1 ^= do_magic(4, 32);
+      case  4: k1 ^= do_magic(3, 24);
+      case  3: k1 ^= do_magic(2, 16);
+      case  2: k1 ^= do_magic(1, 8);
+      case  1: k1 ^= do_magic(0, 0);
               k1 *= c1; k1  = internal::rotate(k1,31); k1 *= c2; h1 ^= k1;
     };
 
