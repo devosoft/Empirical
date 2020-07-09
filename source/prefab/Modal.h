@@ -86,15 +86,9 @@ namespace emp {
                 }
                 void SetBackground(const std::string color){
                     modal_content.SetBackground(color);
-                    std::cout << "Override background function" << std::endl;
                 }
         };
     }
 }
-//  TODO: 
-//  [*] add x to header
-//  [] make generic class so you can add your own content
-//  [] test where you can place modal (stream into a nested div?)
-//  [] add test modal button for 2 seconds for demo
-//  [] allow user to change background options for modal
+
 #endif

@@ -4,24 +4,29 @@
 */
 
 /* Glyphicon Toggle */
-.collapse_toggle[aria-expanded=true] .fa-angle-double-down{
+.collapse_toggle[aria-expanded=true] .fa-angle-double-down {
     display: none;
 }
-.collapse_toggle[aria-expanded=true] .fa-angle-double-right{
+.collapse_toggle[aria-expanded=true] .fa-angle-double-right {
     display: none;
 }
-.collapse_toggle[aria-expanded=false] .fa-angle-double-up{
+.collapse_toggle[aria-expanded=false] .fa-angle-double-up {
     display: none;
 }
-.toggle_icon_left_margin{
+.toggle_icon_right_margin {
     margin-right: 10px;
 }
 
+/* Card */
+.card{
+    margin-bottom: 10px;
+}
+
 /* Card Header */
-.setting_heading{
+.setting_heading {
     color: rgb(58, 57, 57);
 }
-.setting_heading:hover{
+.setting_heading:hover {
     color: rgb(116, 114, 114);
 }
 /* Change background of card header on hover to convey collapsibility */

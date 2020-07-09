@@ -259,6 +259,7 @@ namespace emp {
                         title_span.SetAttr("class", "title_area");
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
                         // This makes the Comment box toggle when title is clicked
                         // TODO: make a class to create a toggle for two elements?
@@ -275,6 +276,10 @@ namespace emp {
 =======
                         arrow_right_for_dropdown.AddClass("toggle_icon_left_margin");
                         arrow_up_for_dropdown.AddClass("toggle_icon_left_margin");
+=======
+                        arrow_right_for_dropdown.AddClass("toggle_icon_right_margin");
+                        arrow_up_for_dropdown.AddClass("toggle_icon_right_margin");
+>>>>>>> 4f77c5a... added notes for users and removed print statements
                         
                         // Prefab Dropdown Box 
                         prefab::CommentBox box;
@@ -413,7 +418,7 @@ namespace emp {
                             // Bootstrap Toggle Switch (need at least v4.5.0)
                             emp::prefab::ToggleSwitch toggle_switch([this, name](std::string val){config.Set(name, val);
                                                               on_change_fun(val);},
-                                "checkbox", NULL, emp::from_string<bool>(value), name + "_input_checkbox");
+                                NULL, emp::from_string<bool>(value), name + "_input_checkbox");
                             setting_element << toggle_switch;
                             toggle_switch.AddClass("input_bool");
 
