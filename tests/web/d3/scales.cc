@@ -233,6 +233,228 @@ struct TestPowScale : emp::web::BaseTest {
   }
 };
 
+struct TestSqrtScale : emp::web::BaseTest {
+  // a regular SqrtScale with domain and range as ints/doubles
+  D3::SqrtScale testSqrt1;
+  double testSqrt1_val1;
+  double testSqrt1_val2;
+  double testSqrt1_val3;
+
+  // a copy of the above testSqrt1 scale
+  // D3::SqrtScale testSqrtCopy;
+  double testSqrtCopy_val1;
+  double testSqrtCopy_val2;
+  double testSqrtCopy_val3;
+
+  TestSqrtScale() { Setup(); }
+
+  void Setup() {
+    testSqrt1.SetDomain(0, 2e9);
+    testSqrt1.SetRange(0, 300);
+    testSqrt1_val1 = testSqrt1.ApplyScale<double>(1.386e9);
+    testSqrt1_val2 = testSqrt1.ApplyScale<double>(127e6);
+    testSqrt1_val3 = testSqrt1.ApplyScale<double>(427e3);
+
+    D3::SqrtScale testSqrtCopy(testSqrt1);
+    testSqrtCopy_val1 = testSqrtCopy.ApplyScale<double>(1.386e9);
+    testSqrtCopy_val2 = testSqrtCopy.ApplyScale<double>(127e6);
+    testSqrtCopy_val3 = testSqrtCopy.ApplyScale<double>(427e3);
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const testSqrt1_val1 = $0;
+      const testSqrt1_val2 = $1;
+      const testSqrt1_val3 = $2;
+      const testSqrtCopy_val1 = $3;
+      const testSqrtCopy_val2 = $4;
+      const testSqrtCopy_val3 = $5;
+
+      var population = d3.scaleSqrt()
+        .domain([0, 2e9])
+        .range([0, 300]);
+
+      var copyPopulation = population.copy();
+
+      describe("creating a sqrt scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testSqrt1_val1, population(1.386e9)); // 249.73986465920893
+          chai.assert.equal(testSqrt1_val2, population(127e6));   // 75.59761901012492
+          chai.assert.equal(testSqrt1_val3, population(427e3));   // 4.383491758860737
+        });
+        it("copy the first scale correctly", function() {
+          chai.assert.equal(testSqrtCopy_val1, copyPopulation(1.386e9)); // 249.73986465920893
+          chai.assert.equal(testSqrtCopy_val2, copyPopulation(127e6));   // 75.59761901012492
+          chai.assert.equal(testSqrtCopy_val3, copyPopulation(427e3));   // 4.383491758860737
+        });
+      });
+    }, testSqrt1_val1, testSqrt1_val2, testSqrt1_val3, testSqrtCopy_val1, testSqrtCopy_val2, testSqrtCopy_val3);
+  }
+};
+
+struct TestLogScale : emp::web::BaseTest {
+  // a log scale with no explicit base set (default is 10)
+  D3::LogScale testLog1;
+  double testLog1_val1;
+  double testLog1_val2;
+  double testLog1_val3;
+
+  // a log scale with a base of 2
+  D3::LogScale testLog2;
+  double testLog2_val1;
+  double testLog2_val2;
+  double testLog2_val3;
+  double testLog2_Unclamped;
+  double testLog2_Clamped;
+
+  TestLogScale() { Setup(); }
+
+  void Setup() {
+    testLog1.SetDomain(10, 100000).SetRange(0, 700);
+    testLog1_val1 = testLog1.ApplyScale<double>(1000);
+    testLog1_val2 = testLog1.ApplyScale<double>(1234);
+    testLog1_val3 = testLog1.ApplyScale<double>(100000);
+
+    testLog2.SetBase(2);
+    testLog2.SetDomain(16, 1048576);
+    testLog2.SetRange(0, 700);
+    testLog2_val1 = testLog2.ApplyScale<double>(64);
+    testLog2_val2 = testLog2.ApplyScale<double>(1234);
+    testLog2_val3 = testLog2.ApplyScale<double>(1048576);
+    testLog2_Unclamped = testLog2.ApplyScale<double>(5000000);
+    
+    // now clamp TestScale2 to test the SetClamp method
+    testLog2.SetClamp(true);
+    testLog2_Clamped = testLog2.ApplyScale<double>(5000000);
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const testLog1_val1 = $0;
+      const testLog1_val2 = $1;
+      const testLog1_val3 = $2;
+      const testLog2_val1 = $3;
+      const testLog2_val2 = $4;
+      const testLog2_val3 = $5;
+      const testLog2_Unclamped = $6;
+      const testLog2_Clamped = $7;
+
+      var logScale = d3.scaleLog()
+	      .domain([10, 100000])
+	      .range([0, 700]);
+      
+      var logScale2 = d3.scaleLog()
+        .base(2)
+	      .domain([16, 1048576])
+	      .range([0, 700]);
+      
+      var logScale2_Clamped = d3.scaleLog()
+        .base(2)
+	      .domain([16, 1048576])
+	      .range([0, 700])
+        .clamp(true);
+
+      describe("creating a log scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testLog1_val1, logScale(1000));   // 349.99999999999994
+          chai.assert.equal(testLog1_val2, logScale(1234));   // 365.980152947014
+          chai.assert.equal(testLog1_val3, logScale(100000)); // 700
+        });
+        it("should apply the second scale correctly", function() {
+          chai.assert.equal(testLog2_val1, logScale2(64));      // 87.49999999999999
+          chai.assert.equal(testLog2_val2, logScale2(1234));    // 274.2742922127871
+          chai.assert.equal(testLog2_val3, logScale2(1048576)); // 700
+        });
+        it("should enable clamping on the second scale correctly", function() {
+          chai.assert.equal(testLog2_Unclamped, logScale2(5000000));       // 798.5904790592547
+          chai.assert.equal(testLog2_Clamped, logScale2_Clamped(5000000)); // 700 
+        });
+      });
+    }, testLog1_val1, testLog1_val2, testLog1_val3, testLog2_val1, testLog2_val2, testLog2_val3, testLog2_Unclamped, testLog2_Clamped);
+  }
+};
+
+struct TestSymlogScale : emp::web::BaseTest {
+  // a symlog scale with no explicit constant set (default is 1)
+  D3::SymlogScale testSymlog1;
+  double testSymlog1_val1;
+  double testSymlog1_val2;
+  double testSymlog1_val3;
+  double testSymlog1_val4;
+  double testSymlog1_val5;
+
+  // the same symlog scale but with a constant of 0.01
+  D3::SymlogScale testSymlog2;
+  double testSymlog2_val1;
+  double testSymlog2_val2;
+  double testSymlog2_val3;
+  double testSymlog2_val4;
+  double testSymlog2_val5;
+
+  TestSymlogScale() { Setup(); }
+
+  void Setup() {
+    testSymlog1.SetDomain(-100000, 100000);
+    testSymlog1.SetRange(-100, 100);
+    testSymlog1_val1 = testSymlog1.ApplyScale<double>(-80000);
+    testSymlog1_val2 = testSymlog1.ApplyScale<double>(-50);
+    testSymlog1_val3 = testSymlog1.ApplyScale<double>(1.5); 
+    testSymlog1_val4 = testSymlog1.ApplyScale<double>(50);
+    testSymlog1_val5 = testSymlog1.ApplyScale<double>(80000);
+
+    testSymlog2.SetDomain(-100000, 100000);
+    testSymlog2.SetRange(-100, 100);
+    testSymlog2.SetConstant(0.01);
+    testSymlog2_val1 = testSymlog2.ApplyScale<double>(-80000);
+    testSymlog2_val2 = testSymlog2.ApplyScale<double>(-50);
+    testSymlog2_val3 = testSymlog2.ApplyScale<double>(1.5); 
+    testSymlog2_val4 = testSymlog2.ApplyScale<double>(50);
+    testSymlog2_val5 = testSymlog2.ApplyScale<double>(80000);
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const testSymlog1_val1 = $0;
+      const testSymlog1_val2 = $1;
+      const testSymlog1_val3 = $2;
+      const testSymlog1_val4 = $3;
+      const testSymlog1_val5 = $4;
+      const testSymlog2_val1 = $5;
+      const testSymlog2_val2 = $6;
+      const testSymlog2_val3 = $7;
+      const testSymlog2_val4 = $8;
+      const testSymlog2_val5 = $9;
+
+      var symlogScale1 = d3.scaleSymlog()
+	      .domain([-100000, 100000])
+	      .range([-100, 100]);
+
+      var symlogScale2 = d3.scaleSymlog()
+	      .domain([-100000, 100000])
+	      .range([-100, 100])
+        .constant(0.01);
+
+      describe("creating a symlog scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testSymlog1_val1, symlogScale1(-80000)); // -98.06182313778929
+          chai.assert.equal(testSymlog1_val2, symlogScale1(-50));    // -34.15137385860061
+          chai.assert.equal(testSymlog1_val3, symlogScale1(1.5));    // 7.958793260555325
+          chai.assert.equal(testSymlog1_val4, symlogScale1(50));     // 34.15137385860061
+          chai.assert.equal(testSymlog1_val5, symlogScale1(80000));  // 98.06182313778928
+        });
+        it("should apply the second scale correctly", function() {
+          chai.assert.equal(testSymlog2_val1, symlogScale2(-80000)); // -98.61557140643649
+          chai.assert.equal(testSymlog2_val2, symlogScale2(-50));    // -52.843669022827925
+          chai.assert.equal(testSymlog2_val3, symlogScale2(1.5));    // 31.128241911062098
+          chai.assert.equal(testSymlog2_val4, symlogScale2(50));     // 52.843669022827925
+          chai.assert.equal(testSymlog2_val5, symlogScale2(80000));  // 98.61557140643649
+        });
+      });
+    }, testSymlog1_val1, testSymlog1_val2, testSymlog1_val3, testSymlog1_val4, testSymlog1_val5,
+       testSymlog2_val1, testSymlog2_val2, testSymlog2_val3, testSymlog2_val4, testSymlog2_val5);
+  }
+};
+
 emp::web::MochaTestRunner test_runner;
 
 int main() {
@@ -241,6 +463,9 @@ int main() {
 
   test_runner.AddTest<TestLinearScale>("LinearScale");
   test_runner.AddTest<TestPowScale>("PowScale");
+  test_runner.AddTest<TestSqrtScale>("SqrtScale");
+  test_runner.AddTest<TestLogScale>("LogScale");
+  test_runner.AddTest<TestSymlogScale>("SymlogScale");
   
   test_runner.OnBeforeEachTest([]() {
     ResetD3Context();
@@ -248,3 +473,26 @@ int main() {
   
   test_runner.Run();
 }
+
+// struct TestSqrtScale : emp::web::BaseTest {
+//   D3::PowScale testSqrt1;
+
+//   TestSqrtScale() { Setup(); }
+
+//   void Setup() {
+//     testSqrt1.SetDomain();
+//     testSqrt1.SetRange();
+//   }
+
+//   void Describe() override {
+//     EM_ASM({
+//       describe("creating a pow scale", function() {
+//         it("should apply the first scale correctly", function() {
+//           chai.assert.equal(testPow1_val1, population(1.386e9)); // 249.73986465920893
+//           chai.assert.equal(testPow1_val2, population(127e6));    // 75.59761901012492
+//           chai.assert.equal(testPow1_val3, population(427e3));    // 4.383491758860737
+//         });
+//       });
+//     });
+//   }
+// };

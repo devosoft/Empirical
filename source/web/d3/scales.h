@@ -292,14 +292,14 @@ namespace D3 {
     }
 
     // .unknown()
-    ContinuousScale & SetUnkown(double value) {
+    ContinuousScale & SetUnknown(double value) {
       EM_ASM({
         emp_d3.objects[$0].unknown($1);
       }, this->id, value);
       return *this;
     }
 
-    ContinuousScale & SetUnkown(const std::string & value) {
+    ContinuousScale & SetUnknown(const std::string & value) {
       EM_ASM({
         emp_d3.objects[$0](UTF8ToString($1));
       }, this->id, value.c_str());
@@ -345,7 +345,6 @@ namespace D3 {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleSqrt(); }, this->id);
     }
   };
-
 
   // scaleLog
   class LogScale : public ContinuousScale {
