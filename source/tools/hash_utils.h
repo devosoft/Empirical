@@ -41,10 +41,10 @@ namespace emp {
 
   // helper functions for murmur hash
   namespace internal {
-    constexpr size_t rotate(const size_t x, const size_t r) {
+    constexpr uint64_t rotate(const size_t x, const size_t r) {
       return (x << r) | (x >> (64 - r));
     }
-    constexpr inline void fmix64(size_t& k) {
+    constexpr inline void fmix64(uint64_t& k) {
       k ^= k >> 33;
       k *= 0xff51afd7ed558ccd;
       k ^= k >> 33;
@@ -61,16 +61,16 @@ namespace emp {
     const size_t nblocks = numbytes / 16;
 
     // define constants and starting seeds
-    size_t h1 = seed;
-    size_t h2 = seed;
+    uint64_t h1 = seed;
+    uint64_t h2 = seed;
 
-    const size_t c1 = 0x87c37b91114253d5LLU;
-    const size_t c2 = 0x4cf5ad432745937fLLU;
+    const uint64_t c1 = 0x87c37b91114253d5LLU;
+    const uint64_t c2 = 0x4cf5ad432745937fLLU;
 
     // main algorithm loop
     for (size_t i = 0; i < nblocks; i++) {
-      size_t k1 = static_cast<size_t>(key[2 * i]);
-      size_t k2 = static_cast<size_t>(key[2 * i + 1]);
+      uint64_t k1 = static_cast<uint64_t>(key[2 * i]);
+      uint64_t k2 = static_cast<uint64_t>(key[2 * i + 1]);
 
       k1 *= c1;
       k1 = internal::rotate(k1, 31);
