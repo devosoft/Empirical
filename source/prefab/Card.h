@@ -75,7 +75,6 @@ namespace emp {
                     card_body << val;
                 }
                 // TODO: override operator<< so that it streams into body content
-                web::Div GetBodyDiv() {return card_body;}
         };
     }
 }

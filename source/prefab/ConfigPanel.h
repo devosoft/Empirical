@@ -134,8 +134,8 @@ namespace emp {
                         title << arrow_up_for_dropdown;
                         title << format_label_fun(name);
                         title_span.SetAttr("class", "title_area");
-                        arrow_right_for_dropdown.AddClass("toggle_icon_left_margin");
-                        arrow_up_for_dropdown.AddClass("toggle_icon_left_margin");
+                        arrow_right_for_dropdown.AddClass("toggle_icon_right_margin");
+                        arrow_up_for_dropdown.AddClass("toggle_icon_right_margin");
                         
                         // Prefab Dropdown Box 
                         prefab::CommentBox box;
@@ -215,7 +215,7 @@ namespace emp {
                             // Bootstrap Toggle Switch (need at least v4.5.0)
                             emp::prefab::ToggleSwitch toggle_switch([this, name](std::string val){config.Set(name, val);
                                                               on_change_fun(val);},
-                                "checkbox", NULL, emp::from_string<bool>(value), name + "_input_checkbox");
+                                NULL, emp::from_string<bool>(value), name + "_input_checkbox");
                             setting_element << toggle_switch;
                             toggle_switch.AddClass("input_bool");
 
