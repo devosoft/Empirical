@@ -15,13 +15,13 @@ namespace emp {
             private:
                 web::Element label{emp::to_string("label")};
             public:
-                ToggleSwitch(const std::function<void(std::string)> & in_cb, const std::string & in_type,
+                ToggleSwitch(const std::function<void(std::string)> & in_cb,
           const std::string & in_label, bool is_checked=false, const std::string & t_switch_id=""): web::Element("span", t_switch_id){
                     // When constructing checkbox input, do not use built in label
                     // functionality because for toggle switch classes to work,
                     // the label element must come after input element. Label element is
                     // placed before input element in Input constructor.
-                    web::Input checkbox(in_cb, in_type, NULL, "", false, is_checked);
+                    web::Input checkbox(in_cb, "checkbox", NULL, "", false, is_checked);
                     *this << checkbox;
                     *this << label;
                     label << in_label;

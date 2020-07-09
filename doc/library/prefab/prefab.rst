@@ -347,12 +347,12 @@ Example:
     #include "web/web.h"
     #include "prefab/ToggleSwitch.h"
 
-    emp::prefab::ToggleSwitch on_switch([](std::string val){}, "checkbox", "Switch Defult On", true, "user_defined_switch_id");
+    emp::prefab::ToggleSwitch on_switch([](std::string val){}, "Switch Defult On", true, "user_defined_switch_id");
     doc << on_switch;
 
     doc << "<br>";
 
-    emp::prefab::ToggleSwitch off_switch([](std::string val){}, "checkbox", NULL, false);
+    emp::prefab::ToggleSwitch off_switch([](std::string val){}, NULL, false);
     doc << off_switch;
     off_switch.AddLabel("Switch Defult Off");
 
