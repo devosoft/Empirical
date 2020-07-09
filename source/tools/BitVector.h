@@ -398,6 +398,7 @@ namespace emp {
         if (num_bits > SHORT_THRESHOLD) {
           if (old_num_bits > SHORT_THRESHOLD) {
             for (size_t i = 0; i < min_fields; i++) BitSetPtr()[i] = BitSetPtr(old_bit_set, old_num_bits)[i];
+            BitSetPtr()[min_fields - 1] = BitSetPtr()[min_fields - 1] & (0xFFFFFFFFFFFFFFFF >> (FIELD_BITS - (num_bits % FIELD_BITS)));
           } else {
             BitSetPtr()[0] = *BitSetPtr(old_bit_set, old_num_bits).Raw();
           }
