@@ -582,57 +582,22 @@ namespace emp {
 
   /// @endcond
 
-  /// This function can be called to pass a map or two arrays (one holding keys
-  /// and the other hodling values) into JavaScript.
+  /// This function can be called to pass a map into JavaScript.
   /// The resulting JavaScript object will be stored in emp.__incoming_map. 
-
-  /// @cond TEMPLATES
-
-  // For two arrays holding keys and values 
-  // (note that the keys vector can not hold objects or functions)
-  template <typename KEY_T, typename VAL_T, size_t SIZE>
-  void pass_map_to_javascript(emp::array<KEY_T, SIZE> & keys, emp::array<VAL_T, SIZE> & values) {
-    emp::pass_array_to_javascript(keys);
-    EM_ASM({
-      emp_i.__incoming_map_keys = emp_i.__incoming_array;
-    });
-
-    // check to make sure each key is not an object or a function
-    emp_assert(
-        EM_ASM_INT({
-          emp_i.__incoming_map_keys.forEach(function(key) {
-            if (typeof key === "object" || typeof key === "function") { return 0; }
-          });
-          return 1;
-        }), "Keys cannot be an object or a function");
-
-    emp::pass_array_to_javascript(values);
-    EM_ASM({
-      emp_i.__incoming_map_values = emp_i.__incoming_array;
-
-      // create dictionary
-      emp_i.__incoming_map = ( {} );
-      emp_i.__incoming_map_keys.forEach(function(key, val) {
-        emp_i.__incoming_map[key] = emp_i.__incoming_map_values[val]
-      });
-
-      delete emp_i.__incoming_map_keys;
-      delete emp_i.__incoming_map_values;
-    });
-  }
-
-  // For passing a map directly 
+  /// @param dict the map being passed into JavaScript
   template <typename KEY_T, typename VAL_T>
-  void pass_map_to_javascript(std::map<KEY_T, VAL_T> & dict) {
-    // extract keys and values from dict
+  void pass_map_to_javascript(const std::map<KEY_T, VAL_T> & dict) {
+   
     emp::vector<KEY_T> keys;
     emp::vector<VAL_T> values;
 
-    for (typename std::map<KEY_T, VAL_T>::iterator it = dict.begin(); it != dict.end(); ++it) {
+    // extract keys and values from dict
+    for (typename std::map<KEY_T, VAL_T>::const_iterator it = dict.begin(); it != dict.end(); ++it) {
       keys.push_back(it->first);
       values.push_back(it->second);
     }
 
+    // pass in extracted keys vector to JS
     emp::pass_array_to_javascript(keys);
     EM_ASM({
       emp_i.__incoming_map_keys = emp_i.__incoming_array;
@@ -647,6 +612,7 @@ namespace emp {
           return 1;
         }), "Keys cannot be an object or a function");
 
+    // pass in extracted values vector to JS
     emp::pass_array_to_javascript(values);
     EM_ASM({
       emp_i.__incoming_map_values = emp_i.__incoming_array;
@@ -657,12 +623,53 @@ namespace emp {
         emp_i.__incoming_map[key] = emp_i.__incoming_map_values[val]
       });
 
+      // clean up unneeded vars
       delete emp_i.__incoming_map_keys;
       delete emp_i.__incoming_map_values;
     });
   }
 
-  /// @endcond
+ 
+  /// This function can be called to pass two arrays of the same length into JavaScript (where a map is then created) 
+  /// One array should hold keys, and the other should hold values 
+  /// (note that the key-value pairs must line up across the arrays)
+  /// The resulting JavaScript object will be stored in emp.__incoming_map. 
+  /// @param keys an array holding the keys to the map
+  /// @param values an array holding the values to the map
+  template <typename KEY_T, typename VAL_T, size_t SIZE>
+  void pass_map_to_javascript(const emp::array<KEY_T, SIZE> & keys, const emp::array<VAL_T, SIZE> & values) {
+    
+    // pass in keys vector to JS
+    emp::pass_array_to_javascript(keys);
+    EM_ASM({
+      emp_i.__incoming_map_keys = emp_i.__incoming_array;
+    });
+
+    // check to make sure each key is not an object or a function
+    emp_assert(
+        EM_ASM_INT({
+          emp_i.__incoming_map_keys.forEach(function(key) {
+            if (typeof key === "object" || typeof key === "function") { return 0; }
+          });
+          return 1;
+        }), "Keys cannot be an object or a function");
+
+    // pass in values vector to JS
+    emp::pass_array_to_javascript(values);
+    EM_ASM({
+      emp_i.__incoming_map_values = emp_i.__incoming_array;
+
+      // create dictionary
+      emp_i.__incoming_map = ( {} );
+      emp_i.__incoming_map_keys.forEach(function(key, val) {
+        emp_i.__incoming_map[key] = emp_i.__incoming_map_values[val]
+      });
+
+      // clean up unneeded vars
+      delete emp_i.__incoming_map_keys;
+      delete emp_i.__incoming_map_values;
+    });
+  }
 
 }
 
