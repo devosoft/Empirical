@@ -228,7 +228,7 @@ namespace internal {
           const func_name_str = UTF8ToString($1);
           const attr_name_str = UTF8ToString($2);
           const value = emp_d3.find_function(func_name_str);
-          emp_d3.objects[new_id] = emp_d3.objects[id].attr(attr_name_str, value);
+          emp_d3.objects[id].attr(attr_name_str, value);
         }, this->id, value.c_str(), name.c_str());
 
         return *(static_cast<DERIVED *>(this));
@@ -279,7 +279,7 @@ namespace internal {
           const func_name_str = UTF8ToString($1);
           const attr_name_str = UTF8ToString($2);
           const value = emp_d3.find_function(func_name_str);
-          emp_d3.objects[new_id] = emp_d3.objects[id].attr(attr_name_str, value);
+          emp_d3.objects[id].attr(attr_name_str, value);
         }, this->id, value, name.c_str());
 
         return *(static_cast<DERIVED *>(this));
@@ -835,8 +835,7 @@ namespace D3 {
 
     /// Append DOM element(s) of the type specified by [name] to this selection.
     Selection Append(const std::string & name) {
-      const int new_id =internal::NextD3ID();
-
+      const int new_id = internal::NextD3ID();
       EM_ASM({
         var new_selection = emp_d3.objects[$0].append(UTF8ToString($1));
         emp_d3.objects[$2] = new_selection;
