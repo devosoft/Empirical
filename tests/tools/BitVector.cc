@@ -259,6 +259,69 @@ TEST_CASE("Test BitVector", "[tools]")
 	REQUIRE(bv_f.count() == 1);
 	bv_f <<= 1;
 	REQUIRE(bv_f.none());
+	
+	
+	// The new series of tests which covers all subcases of the short/long BitVector and all methods.
+	std::vector<emp::BitVector> bvs{bv, bv1, bv2, bv3, bv4, bv5, bv_a, bv_b, bv_c, bv_d, bv_e, bv_f};
+
+	for (int i = 0; i < bvs.size(); i ++) {
+		for (int j = 0; j < bvs[i].GetSize(); j ++) {
+		    bvs[i][j] = 1; // clear them all (checks for leaks in those methods)
+		}
+	}
+
+	emp::BitVector bva(100, true); // long resize minorly smaller
+	emp::BitVector bvb(200, true); // long resize smaller
+	emp::BitVector bvc(100, true); // long resize to short
+	emp::BitVector bvd(10, true); // short resize minorly smaller
+	emp::BitVector bve(60, true); // short resize smaller
+	emp::BitVector bvf(10, true); // short resize to long
+
+	bva.resize(90);
+	bvb.resize(90);
+	bvc.resize(20);
+	bvd.resize(5);
+	bve.resize(5);
+	bvf.resize(100);
+	for (int i=10; i<100; i++) bvf[i] = 1;
+
+	bvs.push_back(bva);
+	bvs.push_back(bvb);
+	bvs.push_back(bvc);
+	bvs.push_back(bvd);
+	bvs.push_back(bve);
+	bvs.push_back(bvf);
+
+	for (int i = 0; i < bvs.size(); i ++) { // checks to see if assigned properly
+		REQUIRE((bvs[i].FindBit() == 0));
+		REQUIRE((bvs[i].CountOnes() == bvs[i].GetSize()));
+		REQUIRE((bvs[i].FindBit(bvs[i].GetSize() / 2 - 1) == bvs[i].GetSize() / 2 - 1));
+		REQUIRE((bvs[i].PopBit() == 0));
+	}
+
+	std::vector<emp::BitVector> bvstemp{bva, bvb, bvc, bvd, bve, bvf};
+
+	for (int i = 0; i < 6; i ++) { // do all generations for bit operations
+		bvs.push_back(bvstemp[i].NOT());
+		bvs.push_back((~bvstemp[i]).AND(~bvstemp[i]));
+		bvs.push_back(bvstemp[i].OR(~bvstemp[i]));
+		bvs.push_back(bvstemp[i].NAND(bvstemp[i]));
+		bvs.push_back(bvstemp[i].NOR(bvstemp[i]));
+		bvs.push_back(bvstemp[i].XOR(~bvstemp[i]));
+		bvs.push_back(bvstemp[i].EQU(bvstemp[i]));
+		bvs.push_back(bvstemp[i].SHIFT(-2));
+		bvs.push_back(bvstemp[i].SHIFT(2));
+	}
+
+	for (int i = 0; i < bvs.size(); i ++) { // checks to see if overflow occurred
+		for (int j = 0; j < bvs[i].GetSize(); j ++){
+		    bvs[i][j] = 0;
+		}
+		REQUIRE((bvs[i].FindBit() == -1));
+		REQUIRE((bvs[i].CountOnes() == 0));
+		REQUIRE((bvs[i].FindBit(5) == -1));
+		REQUIRE((bvs[i].PopBit() == -1));
+	}
 }
 
 TEST_CASE("Another Test BitVector", "[tools]")
