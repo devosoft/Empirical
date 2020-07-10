@@ -35,7 +35,6 @@ cranky: $(addprefix cranky-, $(TEST_NAMES))
 
 test-web:
 	  cd web && bash run_tests.sh
-	  cd .. && third-party/node_modules/karma/bin/karma start tests/web/karma.conf.js
 
 clean: $(addprefix clean-, $(TEST_NAMES)) clean-web
 	rm -f *.out
