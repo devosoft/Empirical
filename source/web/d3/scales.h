@@ -423,7 +423,9 @@ namespace D3 {
     int seconds;
     int milliseconds;
 
-    // note that month should be passed in 0 indexed to keep consistent with JavaScript (0 = January)
+    Date() { ; }
+
+    // note that month should be passed in 0-indexed to keep consistent with JavaScript (0 = January)
     Date(int year, int month, int day = 1, int hours = 0, int minutes = 0,
     int seconds = 0, int milliseconds = 0) {
       this->year = year;
@@ -452,33 +454,13 @@ namespace D3 {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleTime(); }, this->id);
     }
 
-    // template<typename RETURN_T, typename INPUT_T>
-    // RETURN_T ApplyScale(INPUT_T input) { ; }
-
     // get rid of functions that shouldn't be called
     template <typename T, size_t SIZE>
     Scale & SetDomain(const emp::array<T, SIZE> & values) = delete;
     Scale & SetDomain(double min, double max) = delete;
+    Scale & SetDomain(const std::string & lower, const std::string & upper) = delete;
     template <typename T>
     double Invert(T y) = delete;
-    // template<>
-    // std::string ApplyScale<std::string, const std::string &>(const std::string & input) = delete;
-    // template<>
-    // std::string ApplyScale<std::string, double>(double input) = delete;
-    // template<>
-    // std::string ApplyScale<std::string, int>(int input) = delete;
-    // template<>
-    // double ApplyScale<double, const std::string &>(const std::string & input) = delete;
-    // template <>
-    // double ApplyScale<double, double>(double input) = delete;
-    // template <>
-    // double ApplyScale<double, int>(int input) = delete;
-    // template<>
-    // int ApplyScale<int, const std::string &>(const std::string & input) = delete;
-    // template<>
-    // int ApplyScale<int, double>(double input) = delete;
-    // template<>
-    // int ApplyScale<int, int>(int input) = delete;
     template<typename RETURN_T, typename INPUT_T>
     RETURN_T ApplyScale(INPUT_T input) = delete;
 
@@ -511,29 +493,6 @@ namespace D3 {
                    dateMax.year, dateMax.month, dateMax.day, dateMax.hours, dateMax.minutes, dateMax.seconds, dateMax.milliseconds);
       return *this;
     }
-
-    // we need this because directly adding a new templated version of ApplyScale does not work
-    // template<typename RETURN_T>
-    // typename std::enable_if<std::is_arithmetic<RETURN_T>::value, RETURN_T>::type
-    // ApplyScale(const Date & dateInput) {
-    //   return EM_ASM_DOUBLE({
-    //     const id = $0;
-    //     const year = $1;
-    //     const month = $2;
-    //     const day = $3;
-    //     const hours = $4;
-    //     const minutes = $5;
-    //     const seconds = $6;
-    //     const milliseconds = $7;
-
-    //     const dateInput = new Date(year, month, day, hours, minutes, seconds, milliseconds);
-    //     return emp_d3.objects[id](dateInput);
-    //   }, this->id, dateInput.year, dateInput.month, dateInput.day, dateInput.hours, dateInput.minutes, dateInput.seconds, dateInput.milliseconds);
-    // }
-
-    // ApplyScale
-    // template<typename RETURN_T, typename INPUT_T>
-    // RETURN_T ApplyScale(INPUT_T input) { ; }
 
     template<typename T>
     T ApplyScale(const Date & dateInput) { ; }
@@ -575,7 +534,6 @@ namespace D3 {
     // ApplyScale that returns a string
     template<>
     std::string ApplyScale<std::string>(const Date & dateInput) {
-    // std::string ApplyScaleString(const Date & dateInput) {
       EM_ASM({
         const id = $0;
         const year = $1;

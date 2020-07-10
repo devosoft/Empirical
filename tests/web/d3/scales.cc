@@ -455,6 +455,124 @@ struct TestSymlogScale : emp::web::BaseTest {
   }
 };
 
+struct TestIdentityScale : emp::web::BaseTest {
+  // an identity scale 
+  D3::IdentityScale testIdentity1;
+  double testIdentity1_val1;
+  double testIdentity1_val2;
+  double testIdentity1_val3;
+
+  TestIdentityScale() { Setup(); }
+
+  void Setup() {
+    testIdentity1.SetDomain(12, 1234.5);
+    testIdentity1_val1 = testIdentity1.ApplyScale<double>(12);
+    testIdentity1_val2 = testIdentity1.ApplyScale<double>(50.6789);
+    testIdentity1_val3 = testIdentity1.ApplyScale<double>(1234);
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const testIdentity1_val1 = $0;
+      const testIdentity1_val2 = $1;
+      const testIdentity1_val3 = $2;
+
+      var identityScale1 = d3.scaleIdentity()
+	      .domain([12, 1234.5]);
+
+      describe("creating an identity scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testIdentity1_val1, identityScale1(12));      // 12
+          chai.assert.equal(testIdentity1_val2, identityScale1(50.6789)); // 50.6789
+          chai.assert.equal(testIdentity1_val3, identityScale1(1234));    // 1234
+        });
+      });
+    }, testIdentity1_val1, testIdentity1_val2, testIdentity1_val3);
+  }
+};
+
+struct TestTimeScale : emp::web::BaseTest {
+  // a time scale with a numeric range
+  D3::TimeScale testTime1;
+  double testTime1_val1;
+  int testTime1_val2;
+  D3::Date testTime1_val1_i;
+  D3::Date testTime1_val2_i;
+
+  // a time scale with a string range
+  D3::TimeScale testTime2;
+  std::string testTime2_val1;
+  std::string testTime2_val2;
+
+  TestTimeScale() { Setup(); }
+
+  void Setup() {
+    D3::Date dateMin(2000, 0, 1);
+    D3::Date dateMax(2000, 0, 2);
+    testTime1.SetDomain(dateMin, dateMax);
+    testTime1.SetRange(0, 960);
+    D3::Date date1(2000, 0, 1, 5);
+    D3::Date date2(2000, 0, 1, 16);
+
+    testTime1_val1 = testTime1.ApplyScale<double>(date1);
+    testTime1_val2 = testTime1.ApplyScale<int>(date2);
+    testTime1_val1_i = testTime1.Invert(200);
+    testTime1_val2_i = testTime1.Invert(640);
+
+    testTime2.SetDomain(dateMin, dateMax);
+    testTime2.SetRange("red", "yellow");
+    testTime2_val1 = testTime2.ApplyScale<std::string>(date1);
+    testTime2_val2 = testTime2.ApplyScale<std::string>(date2);
+  }
+
+  void Describe() override {
+
+    EM_ASM({
+      const testTime1_val1 = $0;
+      const testTime1_val2 = $1;
+      const testTime1_val1_i_month = $2;
+      const testTime1_val2_i_month = $3;
+      const testTime1_val1_i_year = $4;
+      const testTime1_val2_i_year = $5;
+      const testTime1_val1_i_hour = $6;
+      const testTime1_val2_i_hour = $7;
+      const testTime2_val1 = UTF8ToString($8);
+      const testTime2_val2 = UTF8ToString($9);
+
+      var timeScale = d3.scaleTime()
+        .domain([new Date(2000, 0, 1), new Date(2000, 0, 2)])
+        .range([0, 960]);
+
+      var timeColor = d3.scaleTime()
+        .domain([new Date(2000, 0, 1), new Date(2000, 0, 2)])
+        .range(["red", "yellow"]);
+        
+      describe("creating a time scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testTime1_val1, timeScale(new Date(2000, 0, 1, 5)));   // 200
+          chai.assert.equal(testTime1_val2, timeScale(new Date(2000, 0, 1, 16)));  // 640
+        });
+        it("should invert the first scale correctly", function() {
+          // check the months
+          chai.assert.equal(testTime1_val1_i_month, timeScale.invert(200).getMonth());  // Sat Jan 01 2000 05:00:00 GMT-0800 (PST)
+          chai.assert.equal(testTime1_val2_i_month, timeScale.invert(640).getMonth());  // Sat Jan 01 2000 16:00:00 GMT-0800 (PST)
+          // check the years
+          chai.assert.equal(testTime1_val1_i_year, timeScale.invert(200).getFullYear());  // Sat Jan 01 2000 05:00:00 GMT-0800 (PST)
+          chai.assert.equal(testTime1_val2_i_year, timeScale.invert(640).getFullYear());  // Sat Jan 01 2000 16:00:00 GMT-0800 (PST)
+          // check the hours
+          chai.assert.equal(testTime1_val1_i_hour, timeScale.invert(200).getHours());  // Sat Jan 01 2000 05:00:00 GMT-0800 (PST)
+          chai.assert.equal(testTime1_val2_i_hour, timeScale.invert(640).getHours());  // Sat Jan 01 2000 16:00:00 GMT-0800 (PST)
+        });
+        it("should apply the second scale correctly", function() {
+          chai.assert.equal(testTime2_val1, timeColor(new Date(2000, 0, 1, 5)));   // rgb(255, 53, 0)
+          chai.assert.equal(testTime2_val2, timeColor(new Date(2000, 0, 1, 16)));  // rgb(255, 170, 0)
+        });
+      });
+    }, testTime1_val1, testTime1_val2, testTime1_val1_i.month, testTime1_val2_i.month, testTime1_val1_i.year, testTime1_val2_i.year, 
+       testTime1_val1_i.hours, testTime1_val2_i.hours, testTime2_val1.c_str(), testTime2_val2.c_str());
+  }
+};
+
 emp::web::MochaTestRunner test_runner;
 
 int main() {
@@ -466,6 +584,8 @@ int main() {
   test_runner.AddTest<TestSqrtScale>("SqrtScale");
   test_runner.AddTest<TestLogScale>("LogScale");
   test_runner.AddTest<TestSymlogScale>("SymlogScale");
+  test_runner.AddTest<TestIdentityScale>("IdentityScale");
+  test_runner.AddTest<TestTimeScale>("TimeScale");
   
   test_runner.OnBeforeEachTest([]() {
     ResetD3Context();
@@ -473,26 +593,3 @@ int main() {
   
   test_runner.Run();
 }
-
-// struct TestSqrtScale : emp::web::BaseTest {
-//   D3::PowScale testSqrt1;
-
-//   TestSqrtScale() { Setup(); }
-
-//   void Setup() {
-//     testSqrt1.SetDomain();
-//     testSqrt1.SetRange();
-//   }
-
-//   void Describe() override {
-//     EM_ASM({
-//       describe("creating a pow scale", function() {
-//         it("should apply the first scale correctly", function() {
-//           chai.assert.equal(testPow1_val1, population(1.386e9)); // 249.73986465920893
-//           chai.assert.equal(testPow1_val2, population(127e6));    // 75.59761901012492
-//           chai.assert.equal(testPow1_val3, population(427e3));    // 4.383491758860737
-//         });
-//       });
-//     });
-//   }
-// };
