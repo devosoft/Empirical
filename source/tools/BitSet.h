@@ -36,6 +36,7 @@
 
 // alias span-lite's nonstd::span to std::span
 // this is done to ease transition to C++20 spans at a later point
+// TODO: C++20 || cpp20
 namespace std {
   template <typename ...Args>
   using span = nonstd::span<Args...>;
@@ -597,8 +598,11 @@ namespace emp {
     }
 
     /// Get a read-only view into the internal array used by BitSet
-    std::span<const field_t> GetBytes() const {
-      return std::span<const field_t>(bit_set);
+    std::span<const std::byte> GetBytes() const {
+      return std::span<const std::byte>(
+        reinterpret_cast<const std::byte*>(bit_set),
+        NUM_BYTES
+      );
     }
 
     /// Set the full byte starting at the bit at the specified index.
