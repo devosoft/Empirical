@@ -37,6 +37,16 @@
 #include "../tools/hash_utils.h"
 #include "../tools/tuple_utils.h"
 
+#include "../../third-party/span-lite/include/nonstd/span.hpp"
+
+// alias span-lite's nonstd::span to std::span
+// this is done to ease transition to C++20 spans at a later point
+// TODO: C++20 || cpp20
+namespace std {
+  template <typename ...Args>
+  using span = nonstd::span<Args...>;
+}
+
 namespace emp {
 
   /// Abstract base class for metrics
@@ -97,12 +107,13 @@ namespace emp {
       std::hash<query_t> qhasher;
       std::hash<tag_t> thasher;
 
-      std::array<size_t, 2> input{qhasher(a), thasher(b)};
-
-      return static_cast<double>(emp::murmur_hash(
-        reinterpret_cast<std::byte*>(input.data()),
-        sizeof(size_t) * input.size()
-      )) / (static_cast<double>(std::numeric_limits<size_t>::max()));
+      size_t input[2]{qhasher(a), thasher(b)};
+      const std::span<const std::byte> input_as_bytes(
+          reinterpret_cast<std::byte*>(input),
+          sizeof(input)
+      );
+      const size_t hash = emp::murmur_hash(input_as_bytes);
+      return static_cast<double>(hash) / (static_cast<double>(std::numeric_limits<size_t>::max()));
     }
 
   };
