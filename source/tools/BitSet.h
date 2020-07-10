@@ -1390,12 +1390,7 @@ namespace std
     {
         size_t operator()( const emp::BitSet<N>& bs ) const
         {
-           static const uint32_t NUM_BYTES = 1 + ((bs.GetSize() - 1) >> 3);
-           size_t result = bs.GetByte(0);
-           for (unsigned int i = 1; i < NUM_BYTES; ++i){
-                result = emp::hash_combine(result, bs.GetByte(i));
-           }
-           return result;
+          return emp::murmur_hash(bs.GetBytes());
         }
     };
 }
