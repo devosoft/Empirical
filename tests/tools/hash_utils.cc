@@ -132,6 +132,19 @@ TEST_CASE("Test hash_utils", "[tools]")
       , {15197870503703975824U, {std::byte{0x00}, std::byte{0x00}, std::byte{0x00}, std::byte{0x02}}}
       , {12969456943879063794U, {std::byte{0x00}, std::byte{0x00}, std::byte{0x00}, std::byte{0x10}}}
       , {6487796989963411242U, {std::byte{0xDE}, std::byte{0xAD}, std::byte{0xBE}, std::byte{0xEF}}}
+
+      , {594135684810436114U, {std::byte{188}, std::byte{118}, std::byte{76}, std::byte{216},
+                               std::byte{221}, std::byte{247}, std::byte{160}, std::byte{207},
+                               std::byte{196}, std::byte{240}, std::byte{27}, std::byte{8},
+                               std::byte{50}, std::byte{217}, std::byte{74}, std::byte{129}}}
+      , {12301005348282349488U, {std::byte{188}, std::byte{118}, std::byte{76}, std::byte{216},
+                               std::byte{221}, std::byte{247}, std::byte{160}, std::byte{207},
+                               std::byte{73}, std::byte{96}, std::byte{209}, std::byte{237},
+                               std::byte{74}, std::byte{29}, std::byte{198}, std::byte{127}}}
+      , {12729319182556432091U, {std::byte{188}, std::byte{118}, std::byte{76}, std::byte{216},
+                               std::byte{221}, std::byte{247}, std::byte{160}, std::byte{207},
+                               std::byte{1}, std::byte{122}, std::byte{48}, std::byte{84},
+                               std::byte{144}, std::byte{72}, std::byte{213}, std::byte{15}}}
     };
 
     for (auto& [hash, data] : key_hashes) {

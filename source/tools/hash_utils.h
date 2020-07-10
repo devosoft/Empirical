@@ -67,10 +67,16 @@ namespace emp {
     const uint64_t c1 = 0x87c37b91114253d5LLU;
     const uint64_t c2 = 0x4cf5ad432745937fLLU;
 
+    const auto get_ints = [&key](const size_t idx) {
+      uint64_t ret{0};
+      std::memcpy(&ret, key.data() + idx * sizeof(uint64_t), sizeof(uint64_t));
+      return ret;
+    };
+
     // main algorithm loop
     for (size_t i = 0; i < nblocks; i++) {
-      uint64_t k1 = static_cast<uint64_t>(key[2 * i]);
-      uint64_t k2 = static_cast<uint64_t>(key[2 * i + 1]);
+      uint64_t k1 = get_ints(2 * i);
+      uint64_t k2 = get_ints(2 * i + 1);
 
       k1 *= c1;
       k1 = internal::rotate(k1, 31);
@@ -96,7 +102,6 @@ namespace emp {
 
     const auto do_magic = [&key, nblocks](const size_t a, const size_t b) {
       uint64_t tail_{0};
-
       std::memcpy(&tail_, key.data() + nblocks*16 + a, sizeof(uint8_t));
       return tail_ << b;
     };
