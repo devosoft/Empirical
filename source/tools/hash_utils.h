@@ -53,20 +53,26 @@ namespace emp {
     }
   }
 
+  // implementation of the murmur3 hash, a fast hash with low collisions
+  // this hash makes it suitable for hash-based lookups
+  // for more info, see: https://en.wikipedia.org/wiki/MurmurHash
+  // this implementation was directly based on: https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp
   constexpr size_t murmur_hash(
     const std::span<const std::byte> key,
     const size_t seed = 0
   ) {
+    // define constants
     const size_t numbytes = key.size();
     const size_t nblocks = numbytes / 16;
 
-    // define constants and starting seeds
+    // initialize seeds
     uint64_t h1 = seed;
     uint64_t h2 = seed;
 
     const uint64_t c1 = 0x87c37b91114253d5LLU;
     const uint64_t c2 = 0x4cf5ad432745937fLLU;
 
+    // helper lambda for reading std::bytes into uint64_ts
     const auto get_ints = [&key](const size_t idx) {
       uint64_t ret{0};
       std::memcpy(&ret, key.data() + idx * sizeof(uint64_t), sizeof(uint64_t));
@@ -74,6 +80,7 @@ namespace emp {
     };
 
     // main algorithm loop
+    // does not run if length < 16
     for (size_t i = 0; i < nblocks; i++) {
       uint64_t k1 = get_ints(2 * i);
       uint64_t k2 = get_ints(2 * i + 1);
@@ -96,10 +103,11 @@ namespace emp {
       h2 += h1;
       h2 = 5 * h2 + 0x38495ab5;
     }
-    // tail
+    // tail of algorithm
     uint64_t k1 = 0;
     uint64_t k2 = 0;
 
+    // helper lambda for reading std::bytes as uint64_ts and then shifting them left
     const auto do_magic = [&key, nblocks](const size_t a, const size_t b) {
       uint64_t tail_{0};
       std::memcpy(&tail_, key.data() + nblocks*16 + a, sizeof(uint8_t));

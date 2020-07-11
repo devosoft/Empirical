@@ -100,6 +100,7 @@ TEST_CASE("Test hash_utils", "[tools]")
       uint64_t,
       std::vector<std::byte>
     > key_hashes{
+      // test 1 byte hashes
         {5048724184180415669U, {std::byte{0x00}}}
       , {8849112093580131862U, {std::byte{0x01}}}
       , {7160176530259582706U, {std::byte{0x02}}}
@@ -118,6 +119,7 @@ TEST_CASE("Test hash_utils", "[tools]")
       , {1440240768098792060U, {std::byte{0x0F}}}
       , {7131323204957192209U, {std::byte{0xFA}}}
 
+      // test some 2 byte hashes
       , {3478107235931676136U, {std::byte{0x00}, std::byte{0x00}}}
       , {11535399551474674108U, {std::byte{0x00}, std::byte{0xBC}}}
       , {13907197105396577022U, {std::byte{0xDC}, std::byte{0xFB}}}
@@ -125,6 +127,7 @@ TEST_CASE("Test hash_utils", "[tools]")
       , {2263528191020739987U, {std::byte{0xBE}, std::byte{0xEF}}}
       , {17029924217408412190U, {std::byte{0xCA}, std::byte{0xFE}}}
 
+      // test 4 byte hashes, showing how transposition errors change the resulting hash significantly
       , {14710500545568337960U, {std::byte{0xAA}, std::byte{0xBB}, std::byte{0xCC}, std::byte{0xDD}}}
       , {11132466383285019020U, {std::byte{0xBB}, std::byte{0xAA}, std::byte{0xCC}, std::byte{0xDD}}}
       , {6462300326891101032U, {std::byte{0xBB}, std::byte{0xAA}, std::byte{0xDD}, std::byte{0xCC}}}
@@ -133,6 +136,7 @@ TEST_CASE("Test hash_utils", "[tools]")
       , {12969456943879063794U, {std::byte{0x00}, std::byte{0x00}, std::byte{0x00}, std::byte{0x10}}}
       , {6487796989963411242U, {std::byte{0xDE}, std::byte{0xAD}, std::byte{0xBE}, std::byte{0xEF}}}
 
+      // test 16 byte hashes with data from HashMetric tests
       , {594135684810436114U, {std::byte{188}, std::byte{118}, std::byte{76}, std::byte{216},
                                std::byte{221}, std::byte{247}, std::byte{160}, std::byte{207},
                                std::byte{196}, std::byte{240}, std::byte{27}, std::byte{8},
