@@ -147,6 +147,11 @@ RUN \
     && \
   git submodule update \
     && \
+  echo "initialized submodules"
+
+RUN \
+  cd /opt/Empirical \
+    && \
   make install-test-dependencies \
     && \
   echo "installed test dependencies"
