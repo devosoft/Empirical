@@ -140,7 +140,7 @@ RUN \
 RUN \
   cd /opt/Empirical \
     && \
-  git submodule deinit . \
+  git submodule deinit -f . \
     && \
   git submodule init \
     && \
