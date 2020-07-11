@@ -141,6 +141,8 @@ RUN \
 RUN \
   cd /opt/Empirical \
     && \
+  git submodule update --init \
+    && \
   make install-test-dependencies \
     && \
   echo "installed test dependencies"
