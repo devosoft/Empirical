@@ -174,8 +174,8 @@ WORKDIR /opt/Empirical
 
 RUN \
   echo $'#!/bin/bash\n\
-set -e\n\
 /etc/init.d/xvfb start\n\
+echo "running" "$@"\n\
 exec "$@"\n\
 ' > /opt/entrypoint.sh \
     && \
