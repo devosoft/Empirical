@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #define EMP_NDEBUG
 
-#include "third-party/Catch/single_include/catch.hpp"
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "Evolve/World.h"
 #include "base/array.h"

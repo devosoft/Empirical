@@ -1,14 +1,14 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2019-2020.
+//  Copyright (C) Michigan State University, 2020.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include <algorithm>
 
-#include "base/map.h"
+#include "base/unordered_map.h"
 
 int main()
 {
-  emp::map<int, std::string> test_map;
+  emp::unordered_map<int, std::string> test_map;
 
   test_map[3] = "Three";
   test_map[0] = "Zero";
@@ -26,7 +26,7 @@ int main()
   }
 
 
-  emp::map<int, std::string> test_map_copy(test_map);
+  emp::unordered_map<int, std::string> test_map_copy(test_map);
   std::cout << "\nCopy (by constructor):\n";
   for (auto [key, value] : test_map_copy) {
     std::cout << "  key = " << key
@@ -47,7 +47,7 @@ int main()
 
   
 
-  emp::map<std::string, int> test_map2;
+  emp::unordered_map<std::string, int> test_map2;
 
   test_map2["one"] = 1;
   test_map2["two"] = 2;

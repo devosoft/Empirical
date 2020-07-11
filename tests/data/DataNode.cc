@@ -4,7 +4,7 @@
 #define EMP_TRACK_MEM
 #endif
 
-#include "third-party/Catch/single_include/catch.hpp"
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "data/DataNode.h"
 #include "data/DataManager.h"
