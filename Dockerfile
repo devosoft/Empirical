@@ -187,4 +187,6 @@ RUN \
   echo "make entrypoint script executable"
 
 # Define default entrypoint.
-ENTRYPOINT "/opt/entrypoint.sh"
+ENTRYPOINT ["/opt/entrypoint.sh"]
+
+CMD ["bash"]
