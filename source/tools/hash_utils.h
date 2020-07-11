@@ -64,13 +64,12 @@ namespace emp {
     // define constants
     const size_t numbytes = key.size();
     const size_t nblocks = numbytes / 16;
+    const uint64_t c1 = 0x87c37b91114253d5LLU;
+    const uint64_t c2 = 0x4cf5ad432745937fLLU;
 
     // initialize seeds
     uint64_t h1 = seed;
     uint64_t h2 = seed;
-
-    const uint64_t c1 = 0x87c37b91114253d5LLU;
-    const uint64_t c2 = 0x4cf5ad432745937fLLU;
 
     // helper lambda for reading std::bytes into uint64_ts
     const auto get_ints = [&key](const size_t idx) {
@@ -122,8 +121,10 @@ namespace emp {
       case 11: k2 ^= do_magic(10, 16);
       case 10: k2 ^= do_magic(9, 8);
       case  9: k2 ^= do_magic(8, 0);
-              k2 *= c2; k2  = internal::rotate(k2,33); k2 *= c1; h2 ^= k2;
-
+               k2 *= c2;
+               k2  = internal::rotate(k2,33);
+               k2 *= c1;
+               h2 ^= k2;
       case  8: k1 ^= do_magic(7, 56);
       case  7: k1 ^= do_magic(6, 48);
       case  6: k1 ^= do_magic(5, 40);
@@ -132,7 +133,10 @@ namespace emp {
       case  3: k1 ^= do_magic(2, 16);
       case  2: k1 ^= do_magic(1, 8);
       case  1: k1 ^= do_magic(0, 0);
-              k1 *= c1; k1  = internal::rotate(k1,31); k1 *= c2; h1 ^= k1;
+               k1 *= c1;
+               k1  = internal::rotate(k1,31);
+               k1 *= c2;
+               h1 ^= k1;
     };
 
     // finalization
