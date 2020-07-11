@@ -141,7 +141,7 @@ RUN \
 RUN \
   cd /opt/Empirical \
     && \
-  rm -rf third-party/* \
+  rm -rf third-party/{Catch,cereal,force-cover} \
     && \
   git submodule init \
     && \
