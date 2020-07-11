@@ -69,7 +69,7 @@ RUN \
 
 RUN \
   echo $'\
-#!/bin/bash\n\
+\#!/bin/bash\n\
 export DISPLAY=:99\n\
 /etc/init.d/xvfb start\n\
 sleep 1\n\
@@ -170,7 +170,7 @@ WORKDIR /opt/Empirical
 
 RUN \
   echo $'\
-#!/bin/bash\n\
+\#!/bin/bash\n\
 set -e\n\
 /etc/init.d/xvfb start\n\
 exec "$@"\n\
