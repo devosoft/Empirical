@@ -141,6 +141,8 @@ RUN \
 RUN \
   cd /opt/Empirical \
     && \
+  rm -rf third-party/* \
+    && \
   git submodule init \
     && \
   git submodule update \
