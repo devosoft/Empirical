@@ -62,8 +62,9 @@ exit 0 \n\
   && \
   echo "write xvfb init.d script"
 
-RUN chmod a+x /etc/init.d/xvfb \
-  && \
+RUN \
+  chmod a+x /etc/init.d/xvfb \
+    && \
   echo "make xvfb init.d script executable"
 
 RUN \
@@ -80,8 +81,9 @@ exit $exit_value\n\
   && \
   echo "write xvfb daemon script"
 
-RUN chmod a+x /usr/bin/xvfb-daemon-run \
-  && \
+RUN \
+  chmod a+x /usr/bin/xvfb-daemon-run \
+    && \
   echo "make xvfb daemon script executable"
 
 ENV DISPLAY :99
