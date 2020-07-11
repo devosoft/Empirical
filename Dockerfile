@@ -145,7 +145,7 @@ RUN \
     && \
   git submodule init \
     && \
-  git submodule update \
+  git submodule update -f \
     && \
   echo "initialized submodules"
 
