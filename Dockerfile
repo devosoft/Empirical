@@ -188,6 +188,3 @@ RUN \
 
 # Define default entrypoint.
 ENTRYPOINT "/opt/entrypoint.sh"
-
-# Define default command.
-CMD "bash"
