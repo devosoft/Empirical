@@ -159,8 +159,24 @@ RUN \
 # Define default working directory.
 WORKDIR /opt/Empirical
 
+
+RUN \
+  echo $'\
+#!/bin/bash\n\
+set -e\n\
+/etc/init.d/xvfb start\n\
+exec "$@"\n\
+' > /opt/entrypoint.sh \
+    && \
+  echo "write entrypoint script"
+
+RUN \
+  chmod a+x /opt/entrypoint.sh \
+    && \
+  echo "make entrypoint script executable"
+
 # Define default entrypoint.
-ENTRYPOINT "/etc/init.d/xvfb start" && /bin/bash
+ENTRYPOINT "/opt/entrypoint.sh"
 
 # Define default command.
 CMD "bash"
