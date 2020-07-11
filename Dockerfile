@@ -68,8 +68,7 @@ RUN \
   echo "make xvfb init.d script executable"
 
 RUN \
-  echo $'\
-\#!/bin/bash\n\
+  echo $'#!/bin/bash\n\
 export DISPLAY=:99\n\
 /etc/init.d/xvfb start\n\
 sleep 1\n\
@@ -174,8 +173,7 @@ WORKDIR /opt/Empirical
 
 
 RUN \
-  echo $'\
-\#!/bin/bash\n\
+  echo $'#!/bin/bash\n\
 set -e\n\
 /etc/init.d/xvfb start\n\
 exec "$@"\n\
