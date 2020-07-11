@@ -145,6 +145,37 @@ void test_byte(){
 }
 
 /**
+ * GetBytes
+ */
+// actual testing function
+template <size_t Bits>
+void do_byte_test() {
+  emp::BitSet<Bits> bs;
+
+  for (size_t i = 0; i < Bits / 8; ++i) {
+    bs.SetByte(i, 10 * i);
+  }
+
+  auto myspan = bs.GetBytes();
+  for (size_t i = 0; i < Bits / 8; ++i) {
+    REQUIRE(myspan[i] == static_cast<std::byte>(i * 10));
+  }
+}
+// helper function that uses a fold expression to
+// unpack the integer sequence of bits to test
+// and then call the actual testing function with each as a template arg
+template <typename T, T... Bits>
+void do_byte_tests(const std::integer_sequence<T, Bits...>& sequence) {
+  ((do_byte_test<Bits>()),...);
+}
+// function that holds what number of bits to test, and then calls
+// the helper function with them
+void test_bytes() {
+  // sequence of number of bits to test
+  std::index_sequence<16, 17, 32, 33, 64, 65, 128, 129> bits_to_test{};
+  do_byte_tests(bits_to_test);
+}
+/**
  * Left and Right shifts
  */
 void test_shift(){
@@ -379,6 +410,7 @@ TEST_CASE("Test BitSet", "[tools]")
 	test_flip();
 	test_bit();
 	test_byte();
+  test_bytes();
 	test_find();
 	test_count();
 	test_get_ones();
@@ -462,6 +494,7 @@ struct ImportExportTester {
 
 // for BitSet ROTATE_SELF
 // adapted from spraetor.github.io/2015/12/26/compile-time-loops.html
+// TODO: replace with https://en.cppreference.com/w/cpp/utility/integer_sequence
 template <size_t N>
 struct MultiTester2 {
 
@@ -527,6 +560,7 @@ struct MultiTester2 {
 
 };
 
+// TODO: replace with https://en.cppreference.com/w/cpp/utility/integer_sequence
 template <int N>
 struct MultiTester {
 
