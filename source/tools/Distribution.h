@@ -6,6 +6,17 @@
  *  @file  Distribution.h
  *  @brief A set of pre-calculated discrete distributions that can quickly generate random values.
  *  @note Status: ALPHA
+ * 
+ *  A Distribution is a pre-calculated set of probabilities to quickly pick a whole-number result.
+ * 
+ *  Currently, we have:
+ * 
+ *    Binomial - How many successes with p probability will occur in N attempts?
+ *    NegativeBinomial - How many attempts to reach N successes, with p probability per attempt?
+ * 
+ * 
+ *  Developor Notes:
+ *  - We should setup an offset in the base Distribution class to ignore "impossible" low values.
  *
  */
 
@@ -46,10 +57,12 @@ namespace emp {
   public:
     Binomial(double _p, size_t _N) { Setup(_p, _N); }
 
-    double GetP() { return p; }
-    double GetN() { return N; }
+    double GetP() const { return p; }
+    double GetN() const { return N; }
 
     void Setup(double _p, size_t _N) {
+      emp_assert(_p >= 0.0 && _p <= 1.0);
+
       // If we're not changing these values, it's already setup!
       if (p == _p && N == _N) return;
 
@@ -73,7 +86,7 @@ namespace emp {
 
   };
 
-  /// How many attemtps to reach N successes, assumming p probability per attempt?
+  /// How many attempts to reach N successes, assumming p probability per attempt?
   class NegativeBinomial : public Distribution {
   private:
     double p = 0.0;
@@ -82,8 +95,8 @@ namespace emp {
   public:
     NegativeBinomial(double _p, size_t _N) { Setup(_p, _N); }
 
-    double GetP() { return p; }
-    double GetN() { return N; }
+    double GetP() const { return p; }
+    double GetN() const { return N; }
 
     void Setup(double _p, size_t _N) {
       // If we're not changing these values, it's already setup!
