@@ -8,9 +8,13 @@
  *  @note Status: ALPHA
  * 
  *  A Distribution is a pre-calculated set of probabilities to quickly pick a whole-number result.
+ *  These should be used when either we need to draw from the same distribution many time (and hence
+ *  the extra time to pre-calculate it is amortized away) -or- in functions that we want to call with
+ *  a range of distributions that we may not know ahead of time.
  * 
  *  Currently, we have:
  * 
+ *    Uniform - All values in a range are equally likelty to be picked.
  *    Binomial - How many successes with p probability will occur in N attempts?
  *    NegativeBinomial - How many attempts to reach N successes, with p probability per attempt?
  * 
@@ -45,6 +49,36 @@ namespace emp {
 
     size_t PickRandom(Random & random) const {
       return weights.Index( random.GetDouble(GetTotalProb()) );
+    }
+  };
+
+  class Uniform : public Distribution {
+  private:
+    size_t min_val = 0;  // Inclusive
+    size_t max_val = 0;  // Exclusive
+
+  public:
+    Uniform(size_t _min, size_t _max) { Setup(_min, _max); }
+
+    size_t GetMin() const { return min_val; }
+    size_t GetMax() const { return max_val; }
+
+    void Setup(size_t _min, size_t _max) {
+      emp_assert(_min < _max);
+
+      // If we're not changing these values, it's already setup!
+      if (min_val == _min && max_val == _max) return;
+
+      min_val = _min;
+      max_val = _max;
+
+      size_t num_vals = max_val - min_val;
+      double val_prob = 1.0 / (double) num_vals;
+
+      weights.Resize(max_val);
+      for (size_t k = min_val; k < max_val; k++) {
+        weights.Adjust(k, val_prob);
+      }
     }
   };
 
