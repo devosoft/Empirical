@@ -19,11 +19,12 @@ namespace emp {
                     this->SetAttr("class", "card");
                     card_header.SetAttr("class", "card-header");
                     card_body.SetAttr("class", "card-body");
-                    card_header.AddClass("collapse_toggle_card_header");
+                    // card_header.AddClass("collapse_toggle_card_header");
                 }
             public:
                 enum Collapse {NONE, OPEN, CLOSED}; // collapse options for constructing a card 
                 Card(Collapse state=NONE, bool showGlyphs=true, const std::string & in_name=""): web::Div(in_name){
+                    AddBootstrap();
                     if(state != NONE){ // if card is collapsible, make the collapse link the head of the card
                         if(state == OPEN){ 
                             prefab::Collapse accordion(card_header, card_body, true, emp::to_string(card_base+ "_card_collapse"));
@@ -41,18 +42,18 @@ namespace emp {
                             prefab::FontAwesomeIcon down("fa-angle-double-down");
                             card_header << up;
                             card_header << down;
-                            up.AddClass("float-right btn-link collapse_toggle collapse_toggle_card_header setting_heading");
-                            down.AddClass("float-right btn-link collapse_toggle collapse_toggle_card_header setting_heading");
+                            up.AddClass("float-right btn-link collapse_toggle setting_heading");
+                            down.AddClass("float-right btn-link collapse_toggle setting_heading");
 
                         }
                         *this << collapse_link;
                         *this << collapse_body;
+                        card_header.AddClass("collapse_toggle_card_header");
                     }
                     else{ // plain card with no toggle enabled
                         *this << card_header;
                         *this << card_body;
                     }
-                    AddBootstrap();
                 }
                 template <typename T>
                 void AddHeaderContent(T val, bool link_content=false){
