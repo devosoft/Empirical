@@ -12,12 +12,13 @@
 //   - empty selection
 //   - non empty selection
 
-struct Test_Selection : emp::web::BaseTest {
+// Test the Selection constructors
+struct Test_SelectionConstruction : emp::web::BaseTest {
   D3::Selection empty_selection;
   D3::Selection svg_selection;
   D3::Selection circle_selection;
 
-  Test_Selection() : emp::web::BaseTest({"emp_test_container"}) {
+  Test_SelectionConstruction() : emp::web::BaseTest({"emp_test_container"}) {
     std::cout << empty_selection.GetID() << std::endl;
     EM_ASM({
       $("#emp_test_container").append("<svg id='test_svg'><circle/><circle/></svg>");
@@ -82,6 +83,58 @@ struct Test_Selection : emp::web::BaseTest {
   }
 };
 
+// enter, append, etc
+struct Test_SelectionEnter : emp::web::BaseTest {
+  D3::Selection svg_selection;
+  D3::Selection enter_selection;
+  emp::vector<int32_t> data{1, 2, 4, 8, 16, 32, 64};
+  // uint32_t enter_func_id = 0;
+  uint32_t append_func_id = 0;
+
+
+  Test_SelectionEnter() {
+    EM_ASM({
+      $("#emp_test_container").append("<svg id='test_svg'></svg>");
+    });
+
+    svg_selection = D3::Select("#test_svg");
+
+    enter_selection = svg_selection.SelectAll("circle").Data(data).Enter();
+
+    append_func_id = emp::JSWrap(
+      [this]() {
+        enter_selection.Append("circle").SetAttr("class", "test_circle");
+      },
+      "AppendSel"
+    );
+  }
+
+  ~Test_SelectionEnter() {
+    // emp::JSDelete(enter_func_id);
+    emp::JSDelete(append_func_id);
+  }
+
+  void Describe() override {
+
+    EM_ASM({
+      describe("calling enter on a data-bound selection", function() {
+        it("should have 7 things in it", function() {
+          chai.assert.equal(emp_d3.objects[$0]._groups[0].length, 7);
+        });
+      });
+    }, enter_selection.GetID());
+
+    EM_ASM({
+      describe("calling append on our enter selection", function() {
+        it("should put circles in the svg", function() {
+          emp.AppendSel();
+          chai.assert.equal($("#test_svg").children(".test_circle").length, 7);
+        });
+      });
+    });
+  }
+};
+
 
 emp::web::MochaTestRunner test_runner;
 
@@ -91,7 +144,8 @@ int main() {
 
   D3::internal::get_emp_d3();
 
-  test_runner.AddTest<Test_Selection>("Selection");
+  test_runner.AddTest<Test_SelectionConstruction>("SelectionConstruction");
+  test_runner.AddTest<Test_SelectionEnter>("Selection::Enter");
 
   test_runner.OnBeforeEachTest([]() {
     ResetD3Context();
