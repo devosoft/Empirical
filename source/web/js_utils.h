@@ -18,6 +18,7 @@
 #include "../base/assert.h"
 #include "../base/vector.h"
 #include "../base/array.h"
+#include "../base/map.h"
 
 #include "init.h"
 
@@ -586,7 +587,7 @@ namespace emp {
   /// The resulting JavaScript object will be stored in emp.__incoming_map. 
   /// @param dict the map being passed into JavaScript
   template <typename KEY_T, typename VAL_T>
-  void pass_map_to_javascript(const std::map<KEY_T, VAL_T> & dict) {
+  void pass_map_to_javascript(const emp::map<KEY_T, VAL_T> & dict) {
    
     emp::vector<KEY_T> keys;
     emp::vector<VAL_T> values;

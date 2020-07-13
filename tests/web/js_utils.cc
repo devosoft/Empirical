@@ -340,10 +340,10 @@ struct TestPassMapToJavascript : public emp::web::BaseTest {
 
   void Setup() {
     // Configure functions that can be called from JS that pass various C++ maps/pairs of arrays to JS
-    wrapped_fun_ids.emplace_back(
+    wrapped_fun_ids.emplace_back( 
       emp::JSWrap(
         [](){
-          std::map<std::string, std::string> testMap = {{"test1", "a"}, {"test2", "b"}, {"test3", "c"}, {"test4", "d"}, {"test5", "e"}};
+          emp::map<std::string, std::string> testMap = {{"test1", "a"}, {"test2", "b"}, {"test3", "c"}, {"test4", "d"}, {"test5", "e"}};
           emp::pass_map_to_javascript(testMap);
         },
         "PassStringStringMapToJS",
@@ -354,7 +354,7 @@ struct TestPassMapToJavascript : public emp::web::BaseTest {
     wrapped_fun_ids.emplace_back(
       emp::JSWrap(
         [](){
-          std::map<std::string, double> testMap = {{"test1", 1.01}, {"test2", 2.02}, {"test3", 3.03}, {"test4", 4.04}, {"test5", 5.05}};
+          emp::map<std::string, double> testMap = {{"test1", 1.01}, {"test2", 2.02}, {"test3", 3.03}, {"test4", 4.04}, {"test5", 5.05}};
           emp::pass_map_to_javascript(testMap);
         },
         "PassStringDoubleMapToJS",
@@ -365,7 +365,7 @@ struct TestPassMapToJavascript : public emp::web::BaseTest {
     wrapped_fun_ids.emplace_back(
       emp::JSWrap(
         [](){
-          std::map<std::string, int> testMap = {{"test1", 1}, {"test2", 2}, {"test3", 3}, {"test4", 4}, {"test5", 5}};
+          emp::map<std::string, int> testMap = {{"test1", 1}, {"test2", 2}, {"test3", 3}, {"test4", 4}, {"test5", 5}};
           emp::pass_map_to_javascript(testMap);
         },
         "PassStringIntMapToJS",
@@ -376,7 +376,7 @@ struct TestPassMapToJavascript : public emp::web::BaseTest {
     wrapped_fun_ids.emplace_back(
       emp::JSWrap(
         [](){
-          std::map<double, std::string> testMap = {{1.01, "test1"}, {2.02, "test2"}, {3.03, "test3"}, {4.04, "test4"}, {5.05, "test5"}};
+          emp::map<double, std::string> testMap = {{1.01, "test1"}, {2.02, "test2"}, {3.03, "test3"}, {4.04, "test4"}, {5.05, "test5"}};
           emp::pass_map_to_javascript(testMap);
         },
         "PassDoubleStringMapToJS",
@@ -387,7 +387,7 @@ struct TestPassMapToJavascript : public emp::web::BaseTest {
     wrapped_fun_ids.emplace_back(
       emp::JSWrap(
         [](){
-          std::map<int, std::string> testMap = {{1, "test1"}, {2, "test2"}, {3, "test3"}, {4, "test4"}, {5, "test5"}};
+          emp::map<int, std::string> testMap = {{1, "test1"}, {2, "test2"}, {3, "test3"}, {4, "test4"}, {5, "test5"}};
           emp::pass_map_to_javascript(testMap);
         },
         "PassIntStringMapToJS",
@@ -401,12 +401,12 @@ struct TestPassMapToJavascript : public emp::web::BaseTest {
           emp::vector<double> arr1 = {1.01, 2.02, 3.03};
           emp::vector<double> arr2 = {10.01, 20.02, 30.03};
           emp::vector<double> arr3 = {100.01, 200.02, 300.03};
-          std::map<std::string, emp::vector<double>> testMap = {{"test1", arr1}, {"test2", arr2}, {"test3", arr3}};
+          emp::map<std::string, emp::vector<double>> testMap = {{"test1", arr1}, {"test2", arr2}, {"test3", arr3}};
           emp::pass_map_to_javascript(testMap);
         },
         "PassStringVectorMapToJS",
         false
-      )
+      ) 
     );
 
     wrapped_fun_ids.emplace_back(
