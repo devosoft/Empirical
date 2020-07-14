@@ -151,11 +151,16 @@ RUN \
 RUN \
   cd /opt/Empirical \
     && \
-  git remote set-url origin https://github.com/devosoft/Empirical.git
-    && \
   make install-test-dependencies \
     && \
   echo "installed test dependencies"
+
+RUN \
+  cd /opt/Empirical \
+    && \
+  git remote set-url origin https://github.com/devosoft/Empirical.git \
+    && \
+  echo "switched to https origin remote url"
 
 RUN \
   /etc/init.d/xvfb start \
