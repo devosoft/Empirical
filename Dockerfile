@@ -151,6 +151,8 @@ RUN \
 RUN \
   cd /opt/Empirical \
     && \
+  git remote set-url origin https://github.com/devosoft/Empirical.git
+    && \
   make install-test-dependencies \
     && \
   echo "installed test dependencies"
