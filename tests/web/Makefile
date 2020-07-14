@@ -1,4 +1,4 @@
-TEST_NAMES = FontAwesomeIcon Element GetUrlParams js_utils visualizations JSWrap Widget
+TEST_NAMES = FontAwesomeIcon Element js_utils visualizations JSWrap Widget
 
 # Flags to use regardless of compiler
 CFLAGS_all := -Wall -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments -Wno-dollar-in-identifier-extension -std=c++17 -I../../source/ -I../../
@@ -13,7 +13,7 @@ OFLAGS_web_braces := -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMO
 
 CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../source/web/library_emp.js --js-library ../../source/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "stringToUTF8"]' -s WASM=0
 
-test: $(addprefix test-, $(TEST_NAMES)) test-color_map
+test: $(addprefix test-, $(TEST_NAMES)) test-color_map test-GetUrlParams
 
 test-%: %.cc
 	$(CXX_web) $(CFLAGS_web) $< -o $@.js
@@ -22,6 +22,10 @@ test-%: %.cc
 test-color_map: color_map.cc ../../third-party/Catch/single_include/catch2/catch.hpp
 	g++ $(CFLAGS_all) color_map.cc -o color_map.out
 	./color_map.out
+
+test-GetUrlParams: GetUrlParams.cc
+	$(CXX_web) $(CFLAGS_web) $< -o $@.js
+	node $@.js
 
 ../../third-party/Catch/single_include/catch2/catch.hpp:
 	git submodule init
