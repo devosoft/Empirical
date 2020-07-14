@@ -463,37 +463,37 @@ struct TestPassMapToJavascript : public emp::web::BaseTest {
     // Test passing maps to javascript
     EM_ASM({
       describe("pass_map_to_javascript", function() {
-        it("should pass std::map<std::string, std::string> to javascript", function() {
+        it("should pass emp::map<std::string, std::string> to javascript", function() {
           emp.PassStringStringMapToJS(); // {{"test1", "a"}, {"test2", "b"}, {"test3", "c"}, {"test4", "d"}, {"test5", "e"}}
           const incoming = emp_i.__incoming_map;
           const jsVersion = ( {"test1": "a", "test2": "b", "test3": "c", "test4": "d", "test5": "e"} );
           chai.assert.deepEqual(incoming, jsVersion);
         });
-        it("should pass std::map<std::string, double> to javascript", function() {
+        it("should pass emp::map<std::string, double> to javascript", function() {
           emp.PassStringDoubleMapToJS(); // {{"test1", 1.01}, {"test2", 2.02}, {"test3", 3.03}, {"test4", 4.04}, {"test5", 5.05}}
           const incoming = emp_i.__incoming_map;
           const jsVersion = ( {"test1": 1.01, "test2": 2.02, "test3": 3.03, "test4": 4.04, "test5": 5.05} );
           chai.assert.deepEqual(incoming, jsVersion);
         });
-        it("should pass std::map<std::string, int> to javascript", function() {
+        it("should pass emp::map<std::string, int> to javascript", function() {
           emp.PassStringIntMapToJS(); // {{"test1", 1}, {"test2", 2}, {"test3", 3}, {"test4", 4}, {"test5", 5}}
           const incoming = emp_i.__incoming_map;
           const jsVersion = ( {"test1": 1, "test2": 2, "test3": 3, "test4": 4, "test5": 5} );
           chai.assert.deepEqual(incoming, jsVersion);
         });
-        it("should pass std::map<double, std::string> to javascript", function() {
+        it("should pass emp::map<double, std::string> to javascript", function() {
           emp.PassDoubleStringMapToJS(); // {{1.01, "test1"}, {2.02, "test2"}, {3.03, "test3"}, {4.04, "test4"}, {5.05, "test5"}};
           const incoming = emp_i.__incoming_map;
           const jsVersion = ( {1.01: "test1", 2.02: "test2", 3.03: "test3", 4.04: "test4", 5.05: "test5"} );
           chai.assert.deepEqual(incoming, jsVersion);
         });
-        it("should pass std::map<int, std::string> to javascript", function() {
+        it("should pass emp::map<int, std::string> to javascript", function() {
           emp.PassIntStringMapToJS(); // {{1, "test1"}, {2, "test2"}, {3, "test3"}, {4, "test4"}, {5, "test5"}};
           const incoming = emp_i.__incoming_map;
           const jsVersion = ( {1: "test1", 2: "test2", 3: "test3", 4: "test4", 5: "test5"} );
           chai.assert.deepEqual(incoming, jsVersion);
         });
-        it("should pass std::map<std::string, emp::vector<double>> to javascript", function() {
+        it("should pass emp::map<std::string, emp::vector<double>> to javascript", function() {
           emp.PassStringVectorMapToJS(); // {{"test1", {1.01, 2.02, 3.03}},  {"test2", {10.01, 20.02, 30.03}}, {"test3", {100.01, 200.02, 300.03}}}
           const incoming = emp_i.__incoming_map;
           const jsVersion = ( {"test1": [1.01, 2.02, 3.03], "test2": [10.01, 20.02, 30.03], "test3": [100.01, 200.02, 300.03]} );
