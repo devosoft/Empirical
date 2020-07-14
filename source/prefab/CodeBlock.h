@@ -17,7 +17,7 @@ namespace emp {
                     this->DoUpdateJS([](){
                         emscripten_run_script("hljs.initHighlighting.called = false; hljs.initHighlighting();");
                     });
-                    code << code_str;
+                    code << emp::to_web_safe_string(code_str);
                     *this << code;
                     }
                 // TODO: << operator throw error

@@ -21,6 +21,7 @@
 #include <unordered_set>
 #include <iterator>
 #include <limits>
+#include <regex>
 
 #include "../base/array.h"
 #include "../base/Ptr.h"
@@ -105,6 +106,23 @@ namespace emp {
     return ss.str();
   }
 
+  /// Take a string and replace reserved HTML characters with character entities
+  std::string to_web_safe_string(const std::string & value) {
+    std::string web_safe = value;
+    std::regex apm("[&]");
+    std::regex open_brace("[<]");
+    std::regex close_brace("[>]");
+    std::regex single_quote("[']");
+    std::regex double_quote("[\"]");
+
+    web_safe = std::regex_replace(web_safe,apm, "&amp");
+    web_safe = std::regex_replace(web_safe, open_brace, "&lt");
+    web_safe = std::regex_replace(web_safe,close_brace, "&gt");
+    web_safe = std::regex_replace(web_safe,single_quote, "&apos");
+    web_safe = std::regex_replace(web_safe,double_quote, "&quot");
+
+    return web_safe;
+  }
 
   /// Take a value and convert it to a C++-style literal.
   template <typename LIT_TYPE>
