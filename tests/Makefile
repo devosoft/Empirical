@@ -34,7 +34,7 @@ cranky-%:
 cranky: $(addprefix cranky-, $(TEST_NAMES))
 
 test-web:
-	  cd web && bash run_tests.sh
+	  cd web && make test
 
 clean: $(addprefix clean-, $(TEST_NAMES)) clean-web
 	rm -f *.out
