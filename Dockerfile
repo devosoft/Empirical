@@ -197,3 +197,18 @@ RUN \
 ENTRYPOINT ["/opt/entrypoint.sh"]
 
 CMD ["bash"]
+
+# Adapted from https://github.com/karma-runner/karma-firefox-launcher/issues/93#issuecomment-519333245
+# Maybe important for container compatability running on Windows?
+RUN \
+  cd /opt/ \
+  && \
+  npm install -g yarn \
+  && \
+  git clone https://github.com/karma-runner/karma-firefox-launcher.git \
+  && \
+  cd karma-firefox-launcher \
+  && \
+  yarn install \
+  && \
+  echo "installed karma-firefox-launcher"
