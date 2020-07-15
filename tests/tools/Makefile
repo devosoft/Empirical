@@ -5,7 +5,7 @@ FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field
 
 default: test
 
-coverage-%: %.cc
+coverage-%: %.cc ../../third-party/Catch/single_include/catch2/catch.hpp
 	$(CXX) $(FLAGS) $< -lstdc++fs -o $@.out
 	#echo "running $@.out"
 	# execute test
@@ -17,7 +17,7 @@ coverage-%: %.cc
 test-prep:
 	mkdir -p temp
 
-test-%: %.cc
+test-%: %.cc ../../third-party/Catch/single_include/catch2/catch.hpp
 	$(CXX) $(FLAGS) $< -lstdc++fs -o $@.out
 	# execute test
 	./$@.out
@@ -42,6 +42,10 @@ fulldebug: test-prep $(addprefix test-, $(TEST_NAMES))
 cranky: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../source/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
 cranky: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
+
+../../third-party/Catch/single_include/catch2/catch.hpp:
+	git submodule init
+	git submodule update
 
 clean:
 	rm -f *.out

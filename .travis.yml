@@ -20,6 +20,7 @@ env:
 - TEST_SET=test-native-fulldebug
 - TEST_SET=test-native-opt
 - TEST_SET=test-examples
+- TEST_SET=test-cookiecutter
 python:
 - '3.5'
 before_install:

@@ -661,6 +661,16 @@ namespace web {
         DoListen(event_name, fun_id);
         return (return_t &) *this;
       }
+      
+      /// Provide an event and a function that will be called when that event is triggered.
+      /// In this case, the function takes a keyboard event as an argument, with full info about keyboard.
+      return_t & On(const std::string & event_name,
+                    const std::function<void(KeyboardEvent evt)> & fun) {
+        emp_assert(info != nullptr);
+        size_t fun_id = JSWrap(fun);
+        DoListen(event_name, fun_id);
+        return (return_t &) *this;
+      }
 
       /// Provide an event and a function that will be called when that event is triggered.
       /// In this case, the function takes two doubles which will be filled in with mouse coordinates.
@@ -867,7 +877,7 @@ namespace web {
           parent_info->RemoveChild((return_t &) *this);
           parent_info->AddChild(wrapper);
         } else if (Info(wrapper)->ptr_count == 1) {
-          emp::NotifyWarning(
+          emp::LibraryWarning(
             "Only one reference held to wrapper. ",
             "It will be destroyed when it goes out of scope."
           );

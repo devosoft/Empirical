@@ -585,7 +585,7 @@ namespace emp {
     remove_punctuation(res);
     compress_whitespace(res);
     std::transform(res.begin(), res.end(), res.begin(), [](char ch) {
-      return ch == ' ' ? '-' : ch;
+      return (ch == ' ') ? '-' : ch;
     });
     return res;
   }
