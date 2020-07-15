@@ -16,14 +16,7 @@
 #include <cstring>
 #include <stdint.h>
 
-#include "../../third-party/span-lite/include/nonstd/span.hpp"
-
-// alias span-lite's nonstd::span to std::span
-// this is done to ease transition to C++20 spans at a later point
-namespace std {
-  template <typename ...Args>
-  using span = nonstd::span<Args...>;
-}
+#include "../polyfill/span.h"
 
 namespace emp {
 
