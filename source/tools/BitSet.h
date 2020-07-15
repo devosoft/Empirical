@@ -597,7 +597,8 @@ namespace emp {
       return (bit_set[field_id] >> pos_id) & 255;
     }
 
-    /// Get a read-only view into the internal array used by BitSet
+    /// Get a read-only view into the internal array used by BitSet.
+    /// @return Read-only span of BitSet's bytes.
     std::span<const std::byte> GetBytes() const {
       return std::span<const std::byte>(
         reinterpret_cast<const std::byte*>(bit_set),

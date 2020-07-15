@@ -27,13 +27,20 @@ namespace std {
 
 namespace emp {
 
-  /// generate a unique long from a pair of ints
+  /// Generate a unique long from a pair of ints.
+  /// @param a First 32-bit unsigned int.
+  /// @param b Second 32-bit unsigned int.
+  /// @return 64-bit unsigned int representing the szudzik hash of both inputs.
   uint64_t szudzik_hash(uint32_t a_, uint32_t b_)
   {
     uint64_t a = a_, b = b_;
     return a >= b ? a * a + a + b : a + b * b;
   }
-  //https://www.boost.org/doc/libs/1_37_0/doc/html/hash/reference.html#boost.hash_combine
+  /// Boost's implementation of a simple hash-combining function.
+  /// Taken from https://www.boost.org/doc/libs/1_37_0/doc/html/hash/reference.html#boost.hash_combine
+  /// @param hash1 First hash to combine.
+  /// @param hash2 Second hash to combine.
+  /// @return Combined hash.
   constexpr inline std::size_t hash_combine(std::size_t hash1, std::size_t hash2)
   {
     return hash1 ^ (hash2 + 0x9e3779b9 + (hash1 << 6) + (hash1 >> 2));
@@ -53,10 +60,14 @@ namespace emp {
     }
   }
 
-  // implementation of the murmur3 hash, a fast hash with low collisions
-  // this hash makes it suitable for hash-based lookups
-  // for more info, see: https://en.wikipedia.org/wiki/MurmurHash
-  // this implementation was directly based on: https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp
+  /// Implementation of the murmur3 hash, a fast hash with low collisions.
+  /// This hash makes it suitable for hash-based lookups.
+  /// For more info, see: https://en.wikipedia.org/wiki/MurmurHash
+  /// This implementation was directly based on:
+  /// https://github.com/aappleby/smhasher/blob/92cf3702fcfaadc84eb7bef59825a23e0cd84f56/src/MurmurHash3.cpp
+  /// @param key Span of bytes to hash.
+  /// @param seed Optional seed.
+  /// @return Hash of key.
   constexpr size_t murmur_hash(
     const std::span<const std::byte> key,
     const size_t seed = 0
@@ -155,7 +166,7 @@ namespace emp {
   }
 
   /// This structure serves as a hash for containers that are iterable.
-  /// Use as a drop-in replacement for std::hash
+  /// Use as a drop-in replacement for std::hash.
   template <typename Container, size_t Seed = 0>
   struct ContainerHash
   {
