@@ -70,11 +70,9 @@ struct Test_FontAwesome_Icon_HTMLLayout : public emp::web::BaseTest {
             chai.assert.equal(parent_id, "test_div");
           });
 
-          // it should have classes fa and fa-check-square-o
-          // this should fail
           it('should have fontawesome classes', function(){
             const classes = document.getElementById("checkbox_icon").className;
-            chai.assert.equal(classes, "fa-check-square-o");
+            chai.assert.equal(classes, "fa fa-check-square-o");
           });
         });
 
