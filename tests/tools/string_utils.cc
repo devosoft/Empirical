@@ -411,3 +411,16 @@ TEST_CASE("Another Test string_utils", "[tools]")
   REQUIRE( quoted_strings[2] == "([{<three>}])" );
 
 }
+
+TEST_CASE("Test to_web_safe_string", "[tools]" ){
+  // requires that angle backets are replaced with &lt or &gt
+  REQUIRE( emp::to_web_safe_string("<h1>hi</h1>" ) == "&lth1&gthi&lt/h1&gt");
+  // requires that ampersands are replaced with &amp
+  REQUIRE( emp::to_web_safe_string("one & two" ) == "one &amp two");
+  // requires that double quotes are replaced with &quot
+  REQUIRE( emp::to_web_safe_string("\"one and two\"" ) == "&quotone and two&quot");
+  // requires that single quotes are replaced with &apos
+  REQUIRE( emp::to_web_safe_string("'one and two'" ) == "&aposone and two&apos");
+  // requires that strings with multiple reserved characters are replaced as expected
+  REQUIRE ( emp::to_web_safe_string("<h1>\"Hello\" & 'bye'</h1>") == "&lth1&gt&quotHello&quot &amp &aposbye&apos&lt/h1&gt" );
+}
