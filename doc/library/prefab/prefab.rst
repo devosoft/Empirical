@@ -1,14 +1,10 @@
 Prefabricated Web Tools (for use with Emscripten)
 =================================================
 
-These prefabricated tools were created to help you quickly create interesting
-web applicications without being overwhelmed with the underlying HTML, CSS, and 
-Bootstrap classes required. These tools use Empirical's web tools to provide 
-structure for the site, and many of the prefab tools inherit from web tools so you can add your
-own styling and stream them into other web components in a similar way.
+These prefabricated tools were created to help you quickly create interesting web applicications without being overwhelmed with the underlying HTML, CSS, and Bootstrap classes required. 
+These tools use Empirical's web tools to provide structure for the site, and many of the prefab tools inherit from web tools so you can add your own styling and stream them into other web components in a similar way.
 
-When using these prefab tools be sure to link to the Bootstrap library, jQuery, and the default style stylesheet
-for this class in the head section of your HTML file.
+When using these prefab tools be sure to link to the Bootstrap library, jQuery, and the default style stylesheet for this class in the head section of your HTML file.
 .. code-block:: html
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
@@ -21,14 +17,12 @@ You can view these tools in action `here <https://devosoft.github.io/empirical-p
 
 Card
 ~~~~
-The Card class allows you to define a Bootstrap style card into your
-project. A card can be collapsible if it's state parameter it set to OPEN or CLOSED.
-By default, if a card is collapsible, it will have toggle icons in the header,
-but this can be overridden by setting the showGlyphs parameter to false.
+The Card class allows you to define a Bootstrap style card into your project. 
+A card can be collapsible if its state parameter it set to :code:`OPEN` or :code:` CLOSED`.
+By default, if a card is collapsible, it will have toggle icons in the header, but this can be overridden by setting the :code:`showGlyphs` parameter to false.
 
-Since this class inherits from web::Div, you can set styling and attributes
-with SetCSS and SetAttr respectively. You can also stream your Card into other web
-components with the << operator.
+Since this class inherits from :code:`web::Div`, you can set styling and attributes with :code:`SetCS`S and :code:`SetAttr` respectively. 
+You can also stream your Card into other web components with the :code:`<<` operator.
 
 Example:
 ********
@@ -55,15 +49,12 @@ You will need to add the CSS file for this library to the head of your HTML file
 
 CodeBlock
 ~~~~~~~~~
-The CardBlock class is an interface for `highlightjs`_ which allows you to display code on 
-web pages with language specific highlighting. You can find a list of `all languages`_ on
-their GitHub page.
+The CardBlock class provides an interface for the `HighlightJS Library`_ which allows you to display code on web pages with language specific highlighting. 
+You can find a list of `all languages`_ on their GitHub page.
 
-To use this class you need to pass the code you want displayed and the programming language
-to the constructor. 
+To use this class, you need to pass the code you want displayed and the programming language to the constructor. 
 
-Since this class inherits from web::Element, you can stream your CodeBlock into other web
-components with the << operator.
+Since this class inherits from :code:`web::Element`, you can stream your CodeBlock into other web components with the :code:`<<` operator.
 
 Example:
 ********
@@ -91,23 +82,17 @@ Example:
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.0/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
     
-.. _highlightjs: https://highlightjs.org/
+.. _HighlightJS Library: https://highlightjs.org/
 .. _all languages: https://github.com/highlightjs/highlight.js/blob/master/SUPPORTED_LANGUAGES.md
     
 Collapse
 ~~~~~~~~
-The Collapse class is used to create collapsible elements in the document. It requires a web
-component to be the element that controls the expaning and collapsing of the another element on
-the page. The element that will expand and collapse can be passed to the constructor if it is not
-controlled by another linking element already. Otherwise, only providing the linking element and 
-the id of the collapseing element is necessary.
+The Collapse class creates collapsible elements in the document. 
+When a controller element is clicked, the target element or elements will expand or collapse.
 
-By default, the toggle element will be closed, but this can be set to open by passing true for the
-expanded parameter.
+By default, the target element will start off closed, but this can be set to open by passing :code:`true` for the :code:`expanded` parameter.
 
-Since the linking and collapsing element will not necessarily be neighboring on the page, call 
-GetLinkDiv() to obtain the HTML for the link element and GetToggleDiv() to obtain the HTML
-for the toggle element.
+Since the collapse controller and collapse target element will not necessarily directly neighbor eachother, call :code:`GetLinkDiv()` to obtain the HTML for the link element and :code:`GetToggleDiv()` to obtain the HTML for the toggle element.
 
 Example:
 ********
@@ -130,13 +115,12 @@ Example:
 
 CommentBox
 ~~~~~~~~~~
-A CommentBox is a simple grey comment bubble. Content can be added to it using 
-the AddContent method. If there is data you only want to be visible on mobile
-devices, used the AddMobileContent method.
+A CommentBox is a simple grey comment bubble. 
+Content can be added to it using :code:`AddContent()`. 
+If there is data you only want to be visible on mobile devices, use :code:`AddMobileContent()`.
 
-Since this class inherits from web::Div, you can set styling and attributes
-with SetCSS and SetAttr respectively. You can also stream your CommentBox into other web
-components with the << operator.
+Since this class inherits from :code:`web::Div`, you can set styling and attributes with :code:`SetCSS()` and :code:`SetAttr()` respectively. 
+You can also stream your CommentBox into other web components with the :code:`<<` operator.
 
 Example:
 ********
@@ -156,9 +140,16 @@ Example:
 
 ConfigPanel
 ~~~~~~~~~~~
-Using the ConfigPanel class, a configuration panel is constructed when passed a Config file. It uses other
-Prefabricated components to add styling and structure to the panel. Use the GetDiv 
-method to stream this component into another web component or document.
+The ConfigPanel allows developers to easily set up a user interface for their configuration options.
+It allows web apps to be interactive and dynamic, allowing users to change configuration settings within the applicaiton and providing a better user experiance. 
+
+Using the ConfigPanel class, a configuration panel is constructed when passed a Config file. 
+It uses other Prefabricated components to add styling and structure to the panel. 
+Use :code:`GetDiv()` to stream this component into another web component or document.
+
+It is important to note that ConfigPanel instances are destroyed when they go out of scope.
+This causes the form to no longer respond to changes made by the user.
+You will need to initialize an instance outside of :code:`main()` if you would like the user to be able to interact with the panel.
 
 Example:
 ********
@@ -193,16 +184,15 @@ FontAwesomeIcon
 To use this class:
 
 1. Find the icon you wish to use in the `FontAwesome library`_
-2. Pass "fa-" + *icon name* as a parameter to the constructor.
+2. Pass :code:`"fa-" + *icon name*` as a parameter to the constructor.
 3. Add the following CSS file to the head of your HTML document.
 
 .. code-block:: html
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     
-Since this class inherits from web::Element, you can set styling and attributes
-with SetCSS and SetAttr respectively. You can also stream your FontAwesomeIcon into other web
-components with the << operator.
+Since this class inherits from web::Element, you can set styling and attributes with :code:`SetCSS()` and :code:`SetAttr()` respectively. 
+You can also stream your FontAwesomeIcon into other web components with the :code:`<<` operator.
 
 Example:
 ********
@@ -223,18 +213,16 @@ Example:
 
 LoadingIcon
 ~~~~~~~~~~~
-The LoadingIcon class is used to add an animated loading icon. One possible use
-for this icon is to be displayed while the contents of a web page is loading. The icon
-is provided by `FontAwesome`_, so you will need to add its CSS to your HTML file to use
-this class.
+The LoadingIcon class is used to add an animated loading icon. 
+One possible use for this icon is to be displayed while the contents of a web page is loading. 
+The icon is provided by `FontAwesome`_, so you will need to add its CSS to your HTML file to use this class.
 
 .. code-block:: html
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   
-Since this class inherits from web::Element, you can set styling and attributes
-with SetCSS and SetAttr respectively. You can also stream your LoadingIcon into other web
-components with the << operator.
+Since this class inherits from :code:`web::Element`, you can set styling and attributes with :code:`SetCSS()` and :code:`SetAttr()` respectively. 
+You can also stream your LoadingIcon into other web components with the :code:`<<` operator.
 
 Example:
 ********
@@ -250,13 +238,12 @@ Example:
 
 LoadingModal
 ~~~~~~~~~~~~
-The LoadingModal header file is used to add a loading modal to a web page. It will appear while the 
-content of the page is rendering and will disappear when the page has completed loading.
+The LoadingModal header file makes adding a loading modal to a web page easy. 
+It will appear while the content of the page is rendering and will disappear when the page has completed loading.
 
-This header file is slightly different from the other prefab web tools. To place the loading modal on
-your web page, you must import the LoadingModal.js script into your HTML file right after the opening 
-body tag. To close the modal you must call the CloseLoadingModal() function in your .cc file after 
-you've loaded all the desired content into the doc.
+This header file is slightly different from the other prefab web tools. 
+To place the loading modal on your web page, you must import the LoadingModal.js script into your HTML file right after the opening body tag. 
+To close the modal you must call the :code:`CloseLoadingModal()` function in your .cc file after loading the desired content into the doc.
 
 Example:
 ********
@@ -293,11 +280,10 @@ Example:
 
 Modal
 ~~~~~
-The Modal class can be used to create Bootstrap modals that pop up in the middle of the screen. 
+The Modal class can be used to create Bootstrap modals that pops up in the middle of the screen. 
 
-Since this class inherits from web::Div, you can stream your Modal into other web
-components with the << operator. You can also set the background color of the Modal
-with SetBackground() passing it a string with a color name or it's hex code value.
+Since this class inherits from :code:`web::Div`, you can stream your Modal into other web components with the :code:`<<` operator. 
+You can also set the background color of the Modal with :code:`SetBackground()` passing it a string with a color name or its hex code value.
 
 Example:
 ********
@@ -330,15 +316,12 @@ Example:
 
 ToggleSwitch
 ~~~~~~~~~~~~
-This class is a wrapper for a checkbox input. It uses Bootstrap 4.5.0 to create a 
-custom toggle switch. To create a ToggleSwitch instance, an Input widget must be 
-passed as a parameter. If you need to add a CSS class to the Input, do it after the creating
-the ToggleSwitch instance with AddClass().
+The ToggleSwitch class wraps checkbox input with Bootstrap custom swtich classes.
+If you need to add a CSS class to the Input, do it after the creating the ToggleSwitch instance with :code:`AddClass()`.
 
 
-Since this class inherits from web::Element, you can set styling and attributes
-with SetCSS and SetAttr respectively. You can also stream your ToggleSwitch into other web
-components with the << operator.
+Since this class inherits from :code:`web::Element`, you can set styling and attributes with :code:`SetCSS()` and :code:`SetAttr()` respectively. 
+You can also stream your ToggleSwitch into other web components with the `<<` operator.
 
 Example:
 ********
