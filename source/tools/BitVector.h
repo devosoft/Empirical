@@ -422,6 +422,31 @@ namespace emp {
       return *this;
     }
 
+    /// Change every bit in the sequence.
+    BitVector & Toggle() { return NOT_SELF(); }
+
+    /// Change a specified bit to the opposite value
+    BitVector & Toggle(size_t index) {
+      emp_assert(index < num_bits, index, num_bits);
+      const size_t field_id = FieldID(index);
+      const size_t pos_id = FieldPos(index);
+      constexpr field_t val_one = 1;
+      const field_t pos_mask = val_one << pos_id;
+
+      bit_set[field_id] ^= pos_mask;
+
+      return *this;
+    }
+
+    /// Flips all the bits in a range [start, end)
+    BitVector & Toggle(size_t start, size_t end) {
+      emp_assert(start <= end && end <= NUM_BITS);
+      for(size_t index = start; index < end; index++) {
+        Toggle(index);
+      }
+      return *this;
+    }
+
     /// A simple hash function for bit vectors.
     std::size_t Hash() const {
       std::size_t hash_val = 0;
