@@ -156,6 +156,13 @@ RUN \
   echo "installed test dependencies"
 
 RUN \
+  cd /opt/Empirical \
+    && \
+  git remote set-url origin https://github.com/devosoft/Empirical.git \
+    && \
+  echo "switched to https origin remote url"
+
+RUN \
   /etc/init.d/xvfb start \
    && \
   cd /opt/Empirical/tests \
@@ -190,3 +197,18 @@ RUN \
 ENTRYPOINT ["/opt/entrypoint.sh"]
 
 CMD ["bash"]
+
+# Adapted from https://github.com/karma-runner/karma-firefox-launcher/issues/93#issuecomment-519333245
+# Maybe important for container compatability running on Windows?
+RUN \
+  cd /opt/ \
+  && \
+  npm install -g yarn \
+  && \
+  git clone https://github.com/karma-runner/karma-firefox-launcher.git \
+  && \
+  cd karma-firefox-launcher \
+  && \
+  yarn install \
+  && \
+  echo "installed karma-firefox-launcher"
