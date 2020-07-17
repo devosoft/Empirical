@@ -287,9 +287,9 @@ namespace emp {
                         box.AddContent(group->GetEntry(i)->GetDescription());
 
                         // Prefab Collapse/toggle for setting element
-                        prefab::Collapse title_toggle(title, box, false, name + "_dropdown");
-                        input_divs[name] << title_toggle.GetToggleDiv();
-                        title_span << title_toggle.GetLinkDiv();
+                        prefab::CollapseCoupling title_toggle(title, box, false, name + "_dropdown");
+                        input_divs[name] << title_toggle.GetTargetDiv(0);
+                        title_span << title_toggle.GetControllerDiv(0);
 
 
                         if (Has(numeric_types, type)) {
