@@ -87,12 +87,13 @@ Example:
     
 Collapse
 ~~~~~~~~
-The Collapse class creates collapsible elements in the document. 
-When a controller element is clicked, the target element or elements will expand or collapse.
+The CollapseCouple maintains a group of targets and controllers. 
+When a controller is clicked on a web page, all the associated targets will change state (expand/collapse).
 
 By default, the target element will start off closed, but this can be set to open by passing :code:`true` for the :code:`expanded` parameter.
 
-Since the collapse controller and collapse target element will not necessarily directly neighbor eachother, call :code:`GetLinkDiv()` to obtain the HTML for the link element and :code:`GetToggleDiv()` to obtain the HTML for the toggle element.
+Since the collapse controller and collapse target element will not necessarily directly neighbor eachother, call :code:`GetControllerDiv()` and :code:`GetTargetDiv()` to obtain a vector of all the asspociated controllers and targets, respectively.
+To obtain just one controller or target, pass its index into a get div function call.
 
 Example:
 ********
@@ -100,18 +101,22 @@ Example:
 
     #include "web/web.h"
     #include "web/Div.h"
+    #include "prefab/CommentBox.h"
+
     #include "prefab/Collapse.h"
 
     emp::web::Document doc("emp_base");
 
-    // Fill these divs with content
-    emp::web::Div link_ele;
-    emp::web::Div toggle_ele;
+    emp::prefab::CommentBox box1;
+    box1.AddContent("<h3>Box 1</h3>");
+    emp::web::Div btn1;
+    btn1.SetAttr("class", "btn btn-info");
+    btn1 << "Button 1: controls box 1";
 
-    emp::prefab::Collapse my_collapse(link_ele, toggle_ele, true);
+    emp::prefab::CollapseCoupling collapse1(btn1, box1, true);
 
-    doc << my_collapse.GetLinkDiv();
-    doc << my_collapse.GetToggleDiv();
+    doc << collapse1.GetControllerDiv(0);
+    doc << collapse1.GetTargetDiv(0);
 
 CommentBox
 ~~~~~~~~~~

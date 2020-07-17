@@ -27,14 +27,14 @@ namespace emp {
                     AddBootstrap();
                     if(state != NONE){ // if card is collapsible, make the collapse link the head of the card
                         if(state == OPEN){ 
-                            prefab::Collapse accordion(card_header, card_body, true, emp::to_string(card_base+ "_card_collapse"));
-                            collapse_link = accordion.GetLinkDiv();
-                            collapse_body = accordion.GetToggleDiv();
+                            prefab::CollapseCoupling accordion(card_header, card_body, true, emp::to_string(card_base+ "_card_collapse"));
+                            collapse_link = accordion.GetControllerDiv(0);
+                            collapse_body = accordion.GetTargetDiv(0);
                         }
                         else{
-                            prefab::Collapse accordion(card_header, card_body, false, emp::to_string(card_base + "_card_collapse"));
-                            collapse_link = accordion.GetLinkDiv();
-                            collapse_body = accordion.GetToggleDiv();
+                            prefab::CollapseCoupling accordion(card_header, card_body, false, emp::to_string(card_base + "_card_collapse"));
+                            collapse_link = accordion.GetControllerDiv(0);
+                            collapse_body = accordion.GetTargetDiv(0);
                         }
                         if(showGlyphs){ // by default add glyphs to a collapsible card
                         // TODO: Don't use float, just set it to align to the right (need to make icon decend from div first)

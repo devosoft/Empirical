@@ -1,42 +1,47 @@
-//  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2020.
-//  Released under the MIT Software license; see doc/LICENSE
+//  This file is part of Config Panel App
+//  Copyright (C) Matthew Andres Moreno, 2020.
+//  Released under MIT license; see LICENSE
 
 #include <iostream>
 
 #include "web/web.h"
 #include "web/Div.h"
+
 #include "prefab/Collapse.h"
+#include "prefab/CommentBox.h"
 
-namespace UI = emp::web;
 
-UI::Document doc("emp_base");
+emp::web::Document doc("emp_base");
 
 int main()
 {
-  UI::Div btn1;
-  UI::Div content1;
+  emp::prefab::CommentBox box1;
+  box1.AddContent("<h3>Box 1</h3>");
+  emp::web::Div btn1;
+  btn1.SetAttr("class", "btn btn-info");
+  btn1 << "Button 1: controls box 1";
 
-  emp::prefab::Collapse collapse1(btn1, content1, true, "my_collapse");
-  doc << collapse1.GetLinkDiv();
-  doc << collapse1.GetToggleDiv();
+  emp::prefab::CommentBox box2;
+  box2.AddContent("<h3>Box 2</h3>");
+  emp::web::Div btn2;
+  btn2.SetAttr("class", "btn btn-info");
+  btn2 << "Button 2: controls box 2";
 
-  btn1.SetAttr("class", "btn btn-primary");
-  btn1 << "Click me 1";
-  content1 << "This content starts out open and has an id of 'my_collapse'.<hr>";
-  content1 << "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+  emp::prefab::CollapseCoupling collapse1(btn1, box1, true);
+  emp::prefab::CollapseCoupling collapse2(btn2, box2, true);
 
-  doc << "<br><br>";
-  
-  UI::Div btn2;
-  UI::Div content2;
-  emp::prefab::Collapse collapse2(btn2, content2, false);
-  doc << collapse2.GetLinkDiv();
-  doc << collapse2.GetToggleDiv();
+  emp::web::Div btn3;
+  btn3.SetAttr("class", "btn btn-success");
+  btn3 << "Button 3: controls all boxes";
 
-  btn2.SetAttr("class", "btn btn-primary");
-  btn2 << "Click me 2";
-  content2 << "This content starts out closed and has an emscripten generated id.<hr>";
-  content2 << "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-  
+  collapse1.AddController(btn3, true);
+  collapse2.AddController(collapse1.GetControllerDiv(1), true);
+
+  doc << collapse1.GetControllerDiv(0);
+  doc << collapse1.GetTargetDiv(0);
+  doc << collapse2.GetControllerDiv(0);
+  doc << collapse2.GetTargetDiv(0);
+  doc << collapse1.GetControllerDiv(1);
+
+  std::cout << "end of main... !" << std::endl;
 }
