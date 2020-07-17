@@ -17,7 +17,7 @@ test: $(addprefix test-, $(TEST_NAMES)) test-color_map test-GetUrlParams
 
 test-%: %.cc
 	$(CXX_web) $(CFLAGS_web) $< -o $@.js
-	../../third-party/node_modules/karma/bin/karma start karma.conf.js --filename $@.js
+	../../third-party/node_modules/karma/bin/karma start karma.conf.js --filename $@
 
 test-color_map: color_map.cc ../../third-party/Catch/single_include/catch2/catch.hpp
 	g++ $(CFLAGS_all) color_map.cc -o color_map.out
@@ -32,7 +32,8 @@ test-GetUrlParams: GetUrlParams.cc
 	git submodule update
 
 clean:
-	rm -f fontawesome_icon.js element.js GetUrlParams.js JSWrap.js widget.js js_utils.js test_visualizations.js jswrap.js *.js.map *.js.mem *~ color_map.out
+	rm -f *.js.map *.js.mem *~ color_map.out
+	ls *.js | grep -v karma.conf.js | xargs rm
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
