@@ -89,6 +89,7 @@ namespace emp {
     size_t N = 0;
 
   public:
+    Binomial() { }
     Binomial(double _p, size_t _N) { Setup(_p, _N); }
 
     double GetP() const { return p; }
