@@ -215,6 +215,7 @@ namespace emp {
                         std::string type = group->GetEntry(i)->GetType();
                         std::string value = group->GetEntry(i)->GetValue();
 <<<<<<< HEAD
+<<<<<<< HEAD
 
                         card_body << web::Element("form").SetCSS("width", "100%") << input_divs[name];
 =======
@@ -226,6 +227,9 @@ namespace emp {
                         web::Div mobile_dropdown("mobile_dropdown_" + name);
                         mobile_dropdown.SetAttr("class", "d-md-none");
 =======
+=======
+
+>>>>>>> 4e37ab7... Strip trailing whitespace
                         card.AddBodyContent(input_divs[name]);
 >>>>>>> 6ccbb1f... fixed error in adding settings to card body
 
@@ -279,9 +283,14 @@ namespace emp {
 =======
                         arrow_right_for_dropdown.AddClass("toggle_icon_right_margin");
                         arrow_up_for_dropdown.AddClass("toggle_icon_right_margin");
+<<<<<<< HEAD
 >>>>>>> 4f77c5a... added notes for users and removed print statements
                         
                         // Prefab Dropdown Box 
+=======
+
+                        // Prefab Dropdown Box
+>>>>>>> 4e37ab7... Strip trailing whitespace
                         prefab::CommentBox box;
 >>>>>>> 3305a14... change namespace to emp::prefab and inherit from web components for some prefab components
                         box.AddContent(group->GetEntry(i)->GetDescription());
@@ -338,6 +347,7 @@ namespace emp {
                                 "range", NULL, name_input_mobile_slider
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                                 );
                             mobile_dropdown << "<hr>" << mobile_slider;
 =======
@@ -349,6 +359,9 @@ namespace emp {
 >>>>>>> 1509465... added prefab module for comment box
 =======
                                 ); 
+=======
+                                );
+>>>>>>> 4e37ab7... Strip trailing whitespace
                             box.AddMobileContent("<hr>");
                             box.AddMobileContent(mobile_slider);
 >>>>>>> 0595c91... added card element
