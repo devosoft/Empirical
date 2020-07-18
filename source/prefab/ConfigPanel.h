@@ -42,22 +42,22 @@ namespace emp {
                 div2.Redraw();
             }
         public:
-            ConfigPanel(Config & c, const std::string & div_name = "settings_div") 
+            ConfigPanel(Config & c, const std::string & div_name = "settings_div")
                 : config(c), settings_div(div_name) {;}
 
             void SetOnChangeFun(std::function<void(const std::string & val)> fun) {on_change_fun = fun;}
-            
+
             template <typename T>
             void SetDefaultRangeFloatingPoint(web::Input & input, T val) {
                 if (val > 0 && val < 1) {
                     // This is a common range for numbers to be in
-                    input.Min(0);   
+                    input.Min(0);
                     if (val > .1) {
                         input.Max(1);
                     } else {
                         input.Max(val * 100);
                     }
-                    input.Step(val/10.0);      
+                    input.Step(val/10.0);
                 } else if (val > 0) {
                     // Assume this is a positive number
                     input.Min(0);
@@ -84,19 +84,19 @@ namespace emp {
                     input.Max(val * -10);
                 }
 
-                // Otherwise val is 0 and we have nothing to go on                
+                // Otherwise val is 0 and we have nothing to go on
             }
 
             void ExcludeConfig(std::string setting) {
                 exclude.insert(setting);
-            } 
+            }
 
             void Setup(const std::string & id_prefix = "settings_") {
                 for (auto group : config.GetGroupSet()) {
                     // std::cout << "GROUP: " << group->GetName() << std::endl;
                     std::string group_name = group->GetName();
                     group_divs[group_name] = web::Div(id_prefix + group_name);
-                    settings_div << group_divs[group_name]; 
+                    settings_div << group_divs[group_name];
 
                     // Prefab Card
                     prefab::Card card(prefab::Card::Collapse::OPEN);
@@ -116,7 +116,7 @@ namespace emp {
                         }
                         std::string type = group->GetEntry(i)->GetType();
                         std::string value = group->GetEntry(i)->GetValue();
-                   
+
                         card.AddBodyContent(input_divs[name]);
 
                         // Setting element label
@@ -136,8 +136,8 @@ namespace emp {
                         title_span.SetAttr("class", "title_area");
                         arrow_right_for_dropdown.AddClass("toggle_icon_right_margin");
                         arrow_up_for_dropdown.AddClass("toggle_icon_right_margin");
-                        
-                        // Prefab Dropdown Box 
+
+                        // Prefab Dropdown Box
                         prefab::CommentBox box;
                         box.AddContent(group->GetEntry(i)->GetDescription());
 
@@ -159,31 +159,31 @@ namespace emp {
 
                             web::Input number([](std::string val){
                                 std::cout << "empty number function" << std::endl;
-                                }, 
+                                },
                                 "number", NULL, name_input_number
                                 );
                             setting_element << number;
                             web::Input mobile_slider([](std::string val){
                                 std::cout << "empty mobile slider function" << std::endl;
-                            }, 
+                            },
                                 "range", NULL, name_input_mobile_slider
-                                ); 
+                                );
                             box.AddMobileContent("<hr>");
                             box.AddMobileContent(mobile_slider);
 
                             // Set onchange behavior for inputs
                             slider.Callback(
-                                [this,name, name_input_number, name_input_mobile_slider](std::string val){ 
+                                [this,name, name_input_number, name_input_mobile_slider](std::string val){
                                 config.Set(name, val);
                                 SyncForm(val, name_input_number, name_input_mobile_slider);
                                 });
                             number.Callback(
-                                [this,name, name_input_slider, name_input_mobile_slider](std::string val){ 
+                                [this,name, name_input_slider, name_input_mobile_slider](std::string val){
                                 config.Set(name, val);
                                 SyncForm(val, name_input_slider, name_input_mobile_slider);
                                 });
                             mobile_slider.Callback(
-                                [this,name, name_input_number, name_input_slider](std::string val){ 
+                                [this,name, name_input_number, name_input_slider](std::string val){
                                 config.Set(name, val);
                                 SyncForm(val, name_input_number, name_input_slider);
                                 });
@@ -210,7 +210,7 @@ namespace emp {
                                 SetDefaultRangeFixedPoint(mobile_slider, emp::from_string<int>(value));
                             }
 
-                        } 
+                        }
                         else if (type == "bool") {
                             // Bootstrap Toggle Switch (need at least v4.5.0)
                             emp::prefab::ToggleSwitch toggle_switch([this, name](std::string val){config.Set(name, val);
