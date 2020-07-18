@@ -408,6 +408,12 @@ namespace emp {
       return (bit_set[field_id] & (static_cast<field_t>(1) << pos_id)) != 0;
     }
 
+    /// A safe version of Get() for indexing out of range. Typically used when a BitVector
+    /// represents a collection.
+    bool Has(size_t index) const {
+      return (index < num_bits) ? Get(index) : false;
+    }
+
     /// Update the bit value at the specified index.
     BitVector & Set(size_t index, bool value=true) {
       emp_assert(index < num_bits, index, num_bits);
