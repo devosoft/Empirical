@@ -440,7 +440,7 @@ namespace emp {
 
     /// Flips all the bits in a range [start, end)
     BitVector & Toggle(size_t start, size_t end) {
-      emp_assert(start <= end && end <= NUM_BITS);
+      emp_assert(start <= end && end <= num_bits);
       for(size_t index = start; index < end; index++) {
         Toggle(index);
       }
