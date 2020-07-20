@@ -155,7 +155,9 @@ namespace emp {
     internal::fmix64(h2);
 
     h1 += h2;
+//  h2 += h1;
 
+    // discard h2 since we are returning a 64-bit int
     return h1;
   }
 
