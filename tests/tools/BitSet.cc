@@ -156,7 +156,7 @@ void do_byte_test() {
     bs.SetByte(i, 10 * i);
   }
 
-  auto myspan = bs.GetBytes();
+  const auto myspan = bs.GetBytes();
   for (size_t i = 0; i < Bits / 8; ++i) {
     REQUIRE(myspan[i] == static_cast<std::byte>(i * 10));
   }
