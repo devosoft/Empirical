@@ -173,6 +173,7 @@ namespace emp {
           v.end(),
           data,
           [&hasher](size_t accumulator, const auto& item){
+            // TODO: profile and consider using murmur_hash instead
             return hash_combine(accumulator, hasher(item));
           }
         );
