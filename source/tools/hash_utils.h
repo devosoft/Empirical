@@ -11,6 +11,7 @@
 #ifndef EMP_HASH_UTILS_H
 #define EMP_HASH_UTILS_H
 
+#include <algorithm>
 #include <type_traits>
 #include <cstddef>
 #include <cstring>
@@ -165,12 +166,16 @@ namespace emp {
   {
     size_t operator()(const Container& v) const {
         size_t data = Seed;
-        for (const auto& item : v) {
-            using item_type = typename std::decay<decltype(item)>::type;
-            const std::hash<item_type> hasher;
-            data = hash_combine(data, hasher(item));
-        }
-        return data;
+        using item_type = typename std::decay<decltype(*v.begin())>::type;
+        const std::hash<item_type> hasher;
+        return std::accumulate(
+          v.begin(),
+          v.end(),
+          data,
+          [&hasher](size_t accumulator, const auto& item){
+            return hash_combine(accumulator, hasher(item));
+          }
+        );
     }
   };
 }
