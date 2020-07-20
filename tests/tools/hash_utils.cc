@@ -10,6 +10,7 @@
 #include <unordered_set>
 #include <array>
 #include <unordered_map>
+#include "base/vector.h"
 
 // TODO: add asserts
 // emp::Random grand;
@@ -157,6 +158,38 @@ TEST_CASE("Test hash_utils", "[tools]")
       // make sure hashed value equals known-good value
       REQUIRE(hash == emp::murmur_hash(spn));
     }
+  }
+  // test ContainerHash
+  {
+    // we can create a hashing container with it
+    std::unordered_map<
+      emp::vector<int>,
+      int,
+      emp::ContainerHash<emp::vector<int>>
+    > test_map{
+        {{0, 0, 0, 0, 0, 0}, 0}
+    };
+
+    // make sure hashes stay the same
+    const auto hasher1 = test_map.hash_function();
+
+    REQUIRE(hasher1({0}) == 2654435769);
+    REQUIRE(hasher1({0, 0}) == 175247769566);
+    REQUIRE(hasher1({0, 0, 0}) == 11093822414574);
+    REQUIRE(hasher1({1, 2, 3}) == 11093822460243);
+    REQUIRE(hasher1({3, 2, 1}) == 11093822468169);
+    REQUIRE(hasher1({0, 1, 2}) == 11093822415422);
+
+    // we can also create a ContainerHash with a specific seed
+    const auto hasher2 = emp::ContainerHash<emp::vector<int>, 28980>();
+
+    // make sure hashes stay the same
+    REQUIRE(hasher2({0}) == 2656277042);
+    REQUIRE(hasher2({0, 0}) == 175101933815);
+    REQUIRE(hasher2({0, 0, 0}) == 11084449574209);
+    REQUIRE(hasher2({1, 2, 3}) == 11084449569853);
+    REQUIRE(hasher2({3, 2, 1}) == 11084449921232);
+    REQUIRE(hasher2({0, 1, 2}) == 11084449573900);
   }
 }
 
