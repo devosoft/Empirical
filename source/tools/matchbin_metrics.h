@@ -105,7 +105,7 @@ namespace emp {
           sizeof(input)
       );
       const size_t hash = emp::murmur_hash(input_as_bytes);
-      return static_cast<double>(hash) / (static_cast<double>(std::numeric_limits<size_t>::max()));
+      return static_cast<double>(hash) / static_cast<double>(std::numeric_limits<size_t>::max());
     }
 
   };
