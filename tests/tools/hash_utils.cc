@@ -12,7 +12,6 @@
 #include <unordered_map>
 #include "base/vector.h"
 
-// TODO: add asserts
 // emp::Random grand;
 TEST_CASE("Test hash_utils", "[tools]")
 {
