@@ -20,15 +20,71 @@
 
 namespace emp {
     namespace prefab{
-    class ConfigPanel {
+
+    namespace internal {
+
+        /// Shared pointer held by instances of ConfigPanel class representing
+        /// the same conceptual ConfigPanel DOM object.
+        /// Contains state that should persist while ConfigPanel DOM object
+        /// persists.
+        class ConfigPanelInfo : public web::internal::DivInfo {
+
+        public:
+            using on_change_fun_t = std::function<void(const std::string & val)>;
+
         private:
+            on_change_fun_t on_change_fun{ [](const std::string & val){ ; } };
+
+        public:
+
+            /// Construct a shared pointer to manage ConfigPanel state.
+            /// @in_id HTML ID of ConfigPanel div
+            ConfigPanelInfo(
+              const std::string & in_id=""
+            ) : web::internal::DivInfo(in_id)
+            { ; }
+
+            /// Get current on-update callback for a ConfigPanel.
+            /// @return current callback function handle
+            on_change_fun_t & GetOnChangeFun() { return on_change_fun; }
+
+            /// Set on-update callback for a ConfigPanel.
+            /// @fun callback function handle
+            void SetOnChangeFun(const on_change_fun_t & fun) {
+              on_change_fun = fun;
+            }
+
+        };
+
+    }
+
+    class ConfigPanel : public web::Div {
+        public:
+            using on_change_fun_t = internal::ConfigPanelInfo::on_change_fun_t;
+
+        private:
+            /// Type of shared pointer shared among instances of ConfigPanel
+            /// representing the same conceptual DOM element.
+            using INFO_TYPE = internal::ConfigPanelInfo;
+
+            /// Get shared info pointer, cast to ConfigPanel-specific type.
+            /// @return cast pointer
+            INFO_TYPE * Info() {
+              return dynamic_cast<INFO_TYPE *>(info);
+            }
+
+            /// Get shared info pointer, cast to const ConfigPanel-specific type.
+            /// @return cast pointer
+            const INFO_TYPE * Info() const {
+              return dynamic_cast<INFO_TYPE *>(info);
+            }
+
             inline static std::set<std::string> numeric_types = {"int", "double", "float", "uint32_t", "uint64_t", "size_t"};
             Config & config;
             web::Div settings_div;
             std::set<std::string> exclude;
             std::map<std::string, web::Div> group_divs;
             std::map<std::string, web::Div> input_divs;
-            std::function<void(const std::string & val)> on_change_fun = [](const std::string & val){;};
             std::function<std::string(std::string val)> format_label_fun = [](std::string name){
                 emp::vector<std::string> sliced = slice(name, '_');
                 return to_titlecase(join(sliced, " "));
@@ -41,23 +97,45 @@ namespace emp {
                 div1.Redraw();
                 div2.Redraw();
             }
-        public:
-            ConfigPanel(Config & c, const std::string & div_name = "settings_div") 
-                : config(c), settings_div(div_name) {;}
 
-            void SetOnChangeFun(std::function<void(const std::string & val)> fun) {on_change_fun = fun;}
-            
+        /// Get current on-update callback.
+        /// @return current callback function handle
+        on_change_fun_t& GetOnChangeFun() {
+            return Info()->GetOnChangeFun();
+        };
+
+        /// Run on-update callback.
+        /// @val TODO what is this?
+        void DoOnChangeFun(const std::string & val) {
+            Info()->GetOnChangeFun()(val);
+        };
+
+        public:
+
+            ConfigPanel(
+              Config & c,
+              const std::string & div_name = "settings_div"
+            ) : config(c)
+            , settings_div(div_name)
+            { info = new internal::ConfigPanelInfo(div_name); }
+
+            /// Sets on-update callback for a ConfigPanel.
+            /// @fun callback function handle
+            void SetOnChangeFun(const on_change_fun_t& fun) {
+              Info()->SetOnChangeFun(fun);
+            }
+
             template <typename T>
             void SetDefaultRangeFloatingPoint(web::Input & input, T val) {
                 if (val > 0 && val < 1) {
                     // This is a common range for numbers to be in
-                    input.Min(0);   
+                    input.Min(0);
                     if (val > .1) {
                         input.Max(1);
                     } else {
                         input.Max(val * 100);
                     }
-                    input.Step(val/10.0);      
+                    input.Step(val/10.0);
                 } else if (val > 0) {
                     // Assume this is a positive number
                     input.Min(0);
@@ -84,19 +162,19 @@ namespace emp {
                     input.Max(val * -10);
                 }
 
-                // Otherwise val is 0 and we have nothing to go on                
+                // Otherwise val is 0 and we have nothing to go on
             }
 
             void ExcludeConfig(std::string setting) {
                 exclude.insert(setting);
-            } 
+            }
 
             void Setup(const std::string & id_prefix = "settings_") {
                 for (auto group : config.GetGroupSet()) {
                     // std::cout << "GROUP: " << group->GetName() << std::endl;
                     std::string group_name = group->GetName();
                     group_divs[group_name] = web::Div(id_prefix + group_name);
-                    settings_div << group_divs[group_name]; 
+                    settings_div << group_divs[group_name];
 
                     // Prefab Card
                     prefab::Card card(prefab::Card::Collapse::OPEN);
@@ -116,7 +194,7 @@ namespace emp {
                         }
                         std::string type = group->GetEntry(i)->GetType();
                         std::string value = group->GetEntry(i)->GetValue();
-                   
+
                         card.AddBodyContent(input_divs[name]);
 
                         // Setting element label
@@ -136,8 +214,8 @@ namespace emp {
                         title_span.SetAttr("class", "title_area");
                         arrow_right_for_dropdown.AddClass("toggle_icon_right_margin");
                         arrow_up_for_dropdown.AddClass("toggle_icon_right_margin");
-                        
-                        // Prefab Dropdown Box 
+
+                        // Prefab Dropdown Box
                         prefab::CommentBox box;
                         box.AddContent(group->GetEntry(i)->GetDescription());
 
@@ -159,31 +237,31 @@ namespace emp {
 
                             web::Input number([](std::string val){
                                 std::cout << "empty number function" << std::endl;
-                                }, 
+                                },
                                 "number", NULL, name_input_number
                                 );
                             setting_element << number;
                             web::Input mobile_slider([](std::string val){
                                 std::cout << "empty mobile slider function" << std::endl;
-                            }, 
+                            },
                                 "range", NULL, name_input_mobile_slider
-                                ); 
+                                );
                             box.AddMobileContent("<hr>");
                             box.AddMobileContent(mobile_slider);
 
                             // Set onchange behavior for inputs
                             slider.Callback(
-                                [this,name, name_input_number, name_input_mobile_slider](std::string val){ 
+                                [this,name, name_input_number, name_input_mobile_slider](std::string val){
                                 config.Set(name, val);
                                 SyncForm(val, name_input_number, name_input_mobile_slider);
                                 });
                             number.Callback(
-                                [this,name, name_input_slider, name_input_mobile_slider](std::string val){ 
+                                [this,name, name_input_slider, name_input_mobile_slider](std::string val){
                                 config.Set(name, val);
                                 SyncForm(val, name_input_slider, name_input_mobile_slider);
                                 });
                             mobile_slider.Callback(
-                                [this,name, name_input_number, name_input_slider](std::string val){ 
+                                [this,name, name_input_number, name_input_slider](std::string val){
                                 config.Set(name, val);
                                 SyncForm(val, name_input_number, name_input_slider);
                                 });
@@ -210,19 +288,27 @@ namespace emp {
                                 SetDefaultRangeFixedPoint(mobile_slider, emp::from_string<int>(value));
                             }
 
-                        } 
+                        }
                         else if (type == "bool") {
                             // Bootstrap Toggle Switch (need at least v4.5.0)
-                            emp::prefab::ToggleSwitch toggle_switch([this, name](std::string val){config.Set(name, val);
-                                                              on_change_fun(val);},
-                                NULL, emp::from_string<bool>(value), name + "_input_checkbox");
+                            emp::prefab::ToggleSwitch toggle_switch(
+                                [this, name](std::string val){
+                                  config.Set(name, val);
+                                  DoOnChangeFun(val);
+                                },
+                                NULL,
+                                emp::from_string<bool>(value),
+                                name + "_input_checkbox"
+                            );
                             setting_element << toggle_switch;
                             toggle_switch.AddClass("input_bool");
 
                         } else {
                             web::Input text_input(
-                                [this, name](std::string val){config.Set(name, val);
-                                                               on_change_fun(val);},
+                                [this, name](std::string val){
+                                    config.Set(name, val);
+                                    DoOnChangeFun(val);
+                                },
                                 "text", NULL, name + "_input_textbox"
                             );
                             setting_element << text_input;
