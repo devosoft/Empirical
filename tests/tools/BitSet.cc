@@ -405,26 +405,25 @@ void test_print(){
 
 TEST_CASE("Test BitSet", "[tools]")
 {
-	test_status();
-	test_size();
-	test_flip();
-	test_bit();
-	test_byte();
+  test_status();
+  test_size();
+  test_flip();
+  test_bit();
+  test_byte();
   test_bytes();
-	test_find();
-	test_count();
-	test_get_ones();
-	test_copy();
-	test_shift();
-	test_comparators();
-	test_bitwise_or();
-	test_bitwise_xor();
-	test_bitwise_and();
-	test_more_comparators();
-	test_random();
-	test_export();
-	test_import();
-	test_print();
+  test_find();
+  test_count();
+  test_get_ones();
+  test_copy();
+  test_shift();
+  test_comparators();
+  test_bitwise_or();
+  test_bitwise_xor();
+  test_bitwise_and();
+  test_more_comparators();
+  test_export();
+  test_import();
+  test_print();
 }
 
 
