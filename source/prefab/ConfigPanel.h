@@ -342,6 +342,7 @@ namespace emp {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
                         // This makes the Comment box toggle when title is clicked
                         // TODO: make a class to create a toggle for two elements?
@@ -369,6 +370,14 @@ namespace emp {
 
                         // Prefab Dropdown Box
 >>>>>>> 4e37ab7... Strip trailing whitespace
+=======
+
+                        arrow_right_for_dropdown.AddAttr("class", "toggle_icon_right_margin");
+                        arrow_up_for_dropdown.AddAttr("class", "toggle_icon_right_margin");
+                        
+                        // Prefab Dropdown Box 
+
+>>>>>>> a4fc814... added LoadingIcon tests and more CodeBlock tests
                         prefab::CommentBox box;
 >>>>>>> 3305a14... change namespace to emp::prefab and inherit from web components for some prefab components
                         box.AddContent(group->GetEntry(i)->GetDescription());
@@ -517,7 +526,7 @@ namespace emp {
                                 name + "_input_checkbox"
                             );
                             setting_element << toggle_switch;
-                            toggle_switch.AddClass("input_bool");
+                            toggle_switch.AddAttr("class", "input_bool");
 
 >>>>>>> 9738447... display appropriate setting descriptions and synchronize form when one input is changed
                         } else {
