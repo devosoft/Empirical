@@ -1,4 +1,4 @@
-TEST_NAMES = FontAwesomeIcon Element js_utils visualizations JSWrap Widget
+TEST_NAMES = CodeBlock LoadingIcon FontAwesomeIcon Element js_utils visualizations JSWrap Widget
 
 # Flags to use regardless of compiler
 CFLAGS_all := -Wall -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments -Wno-dollar-in-identifier-extension -std=c++17 -I../../source/ -I../../

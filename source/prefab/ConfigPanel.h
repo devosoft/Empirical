@@ -212,10 +212,12 @@ namespace emp {
                         title << arrow_up_for_dropdown;
                         title << format_label_fun(name);
                         title_span.SetAttr("class", "title_area");
-                        arrow_right_for_dropdown.AddClass("toggle_icon_right_margin");
-                        arrow_up_for_dropdown.AddClass("toggle_icon_right_margin");
 
-                        // Prefab Dropdown Box
+                        arrow_right_for_dropdown.AddAttr("class", "toggle_icon_right_margin");
+                        arrow_up_for_dropdown.AddAttr("class", "toggle_icon_right_margin");
+                        
+                        // Prefab Dropdown Box 
+
                         prefab::CommentBox box;
                         box.AddContent(group->GetEntry(i)->GetDescription());
 
@@ -301,7 +303,7 @@ namespace emp {
                                 name + "_input_checkbox"
                             );
                             setting_element << toggle_switch;
-                            toggle_switch.AddClass("input_bool");
+                            toggle_switch.AddAttr("class", "input_bool");
 
                         } else {
                             web::Input text_input(
