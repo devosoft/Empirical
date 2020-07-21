@@ -45,6 +45,9 @@ namespace D3 {
     ///
     /// For example, if your label was "Per capita mortality", you could select the axis with:
     /// `D3::Select("#Percapitamortality_axis");`.
+
+    //TODO constructor with margins
+
     Axis(const std::string & type = "bottom", const std::string & label = "") {
       // The scale got added to the list of objects before this one
       this->label = label;
@@ -75,7 +78,7 @@ namespace D3 {
       emp::remove_whitespace(nospace_label); // DOM ids can't contain whitespace
       dom_id = (label != "") ? nospace_label + "_axis" 
              //: emp::to_string(scale.GetID()) + "_axis";
-             : emp::to_string(GetID()) + "_axis";
+             : "axis_" + emp::to_string(this->id);
 
       EM_ASM({
         const id = $0;
@@ -181,7 +184,6 @@ namespace D3 {
       return *this;
     }
 
-    // TODO work with pass array to js?
     template <typename T, std::size_t SIZE>
     Axis& SetTickValues(const emp::array<T, SIZE> & values) {
       emp::pass_array_to_javascript(values);
@@ -219,6 +221,8 @@ namespace D3 {
       return *this;
     }
 
+    //TODO add  format param option
+
     /// Set the number of ticks along the axis
     Axis& SetTicks(int count){
       EM_ASM({
@@ -242,9 +246,12 @@ namespace D3 {
     template <typename T>
     Axis& Rescale(double new_min, double new_max, const internal::SelectionOrTransition<T> & svg){
       this->scale.SetDomain(new_min, new_max);
-      ApplyAxis(svg.Select("#"+dom_id));
+      D3::Selection s = svg.Select("#"+dom_id);
+      ApplyAxis(s);
       return *this;
     }
+
+    // TODO finish below
 
     /// Change the orientation of the axis
     Axis& ChangeOrientation(const std::string & type) {
