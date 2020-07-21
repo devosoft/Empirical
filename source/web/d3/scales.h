@@ -108,7 +108,7 @@ namespace D3 {
 
     // ApplyScale
     // Note that when passing in an std::string as an input you must explicitly specify it 
-    // in the template (when pasing in a double or an int it will match to the proper
+    // in the template (but when pasing in a double or an int it will match to the proper
     // template automatically so you only need to specify the return type)
     template<typename RETURN_T, typename INPUT_T>
     RETURN_T ApplyScale(INPUT_T input) { ; }
@@ -209,13 +209,13 @@ namespace D3 {
   //////////////////////////////////////////////////////////
   /// Scales with continuous input and continuous output ///
   //////////////////////////////////////////////////////////
+  /// This is a base class to inherit from - it should never be made stand-alone
   class ContinuousScale : public Scale {
   protected:
     ContinuousScale(bool derived) : Scale(true) {;}
     ContinuousScale() : Scale(true) {;}
 
   public:
-
     // Invert is only supported if the range is numeric. If the range is not numeric, returns NaN
     template <typename T>
     double Invert(T y) {
@@ -259,8 +259,8 @@ namespace D3 {
       return *this;
     }
 
-    // Sets the scale’s range to the specified array of values
-    // while also setting the scale’s interpolator to interpolateRound
+    /// Sets the scale’s range to the specified array of values
+    /// while also setting the scale’s interpolator to interpolateRound
     template <typename T, size_t SIZE>
     ContinuousScale & SetRangeRound(const emp::array<T,SIZE> & values) {
       emp::pass_array_to_javascript(values);
@@ -277,7 +277,7 @@ namespace D3 {
       return *this;
     }
 
-    // Enables or disables clamping accordingly
+    /// Enables or disables clamping accordingly
     ContinuousScale & SetClamp(bool clamp) {
       EM_ASM({ emp_d3.objects[$0].clamp($1); }, this->id, clamp);
       return *this;
@@ -592,8 +592,7 @@ namespace D3 {
     }
   };
 
-  // class for sequential or diverging scale to inherent, should never be called alone
-  // sets up base functionality
+  /// This is a base class for sequential or diverging scales to inherit from - it should never be called alone
   class SequentialOrDivergingScale : public ContinuousScale {
   protected:
     SequentialOrDivergingScale(bool derived) : ContinuousScale(true) { ; }
@@ -702,7 +701,7 @@ namespace D3 {
     // .quantiles
     // Returns an array of n + 1 quantiles. For example, if n = 4, returns an array of five numbers:
     // the minimum value, the first quartile, the median, the third quartile, and the maximum.
-    // emp::vector<double> GetQuantiles(const int n) {
+    // emp::vector<double> GetQuantiles(int n) {
     //   EM_ASM({
     //     emp_i.__outgoing_array = emp_d3.objects[$0].quantiles($1);
     //   }, this->id, n);
@@ -786,6 +785,7 @@ namespace D3 {
   ////////////////////////////////////////////////////////
   /// Scales with continuous input and discrete output ///
   ////////////////////////////////////////////////////////
+  /// This is a base class to inherit from - it should never be called alone
   class ContinuousInputDiscreteOutputScale : public Scale {
   protected:
     ContinuousInputDiscreteOutputScale(bool derived) : Scale(true) {;}
@@ -911,6 +911,7 @@ namespace D3 {
   //////////////////////////////////////////////////////////
   ///   Scales with discrete input and discrete output   ///
   //////////////////////////////////////////////////////////
+  /// This is a base class to inherit from - it should never be called alone
   class DiscreteScale : public Scale {
   protected:
     DiscreteScale(bool derived) : Scale(true) {;}
