@@ -37,6 +37,8 @@
 #include "../tools/hash_utils.h"
 #include "../tools/tuple_utils.h"
 
+#include "../polyfill/span.h"
+
 namespace emp {
 
   /// Abstract base class for metrics
@@ -97,10 +99,13 @@ namespace emp {
       std::hash<query_t> qhasher;
       std::hash<tag_t> thasher;
 
-      return static_cast<double>(emp::hash_combine(
-        qhasher(a),
-        thasher(b)
-      )) / (static_cast<double>(std::numeric_limits<size_t>::max()));
+      size_t input[2]{qhasher(a), thasher(b)};
+      const std::span<const std::byte> input_as_bytes(
+          reinterpret_cast<std::byte*>(input),
+          sizeof(input)
+      );
+      const size_t hash = emp::murmur_hash(input_as_bytes);
+      return static_cast<double>(hash) / static_cast<double>(std::numeric_limits<size_t>::max());
     }
 
   };
