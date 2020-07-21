@@ -11,7 +11,7 @@
 #ifndef EMP_HASH_UTILS_H
 #define EMP_HASH_UTILS_H
 
-#include <algorithm>
+#include <numeric>
 #include <type_traits>
 #include <cstddef>
 #include <cstring>
