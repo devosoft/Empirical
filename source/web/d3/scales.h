@@ -107,11 +107,14 @@ namespace D3 {
     }
 
     // ApplyScale
+    // Note that when passing in an std::string as an input you must explicitly specify it 
+    // in the template (when pasing in a double or an int it will match to the proper
+    // template automatically so you only need to specify the return type)
     template<typename RETURN_T, typename INPUT_T>
     RETURN_T ApplyScale(INPUT_T input) { ; }
 
     template<>
-    std::string ApplyScale<std::string, const std::string &>(const std::string & input) {
+    std::string ApplyScale<std::string, std::string>(std::string input) {
       EM_ASM({
         const resultStr = emp_d3.objects[$0](UTF8ToString($1));
         emp.PassStringToCpp(resultStr);
@@ -138,7 +141,7 @@ namespace D3 {
     }
 
     template<>
-    double ApplyScale<double, const std::string &>(const std::string & input) {
+    double ApplyScale<double, std::string>(std::string input) {
       return EM_ASM_DOUBLE({
         return emp_d3.objects[$0](UTF8ToString($1));
       }, this->id, input.c_str());
@@ -159,7 +162,7 @@ namespace D3 {
     }
 
     template<>
-    int ApplyScale<int, const std::string &>(const std::string & input) {
+    int ApplyScale<int, std::string>(std::string input) {
       return EM_ASM_INT({
         return emp_d3.objects[$0](UTF8ToString($1));
       }, this->id, input.c_str());
@@ -223,7 +226,9 @@ namespace D3 {
 
     // .ticks()
     ContinuousScale & SetTicks(int count) {
-      EM_ASM({emp_d3.objects[$0].ticks($1);}, this->id, count);
+      EM_ASM({
+        emp_d3.objects[$0].ticks($1);
+      }, this->id, count);
       return *this;
     }
 
@@ -595,7 +600,6 @@ namespace D3 {
     SequentialOrDivergingScale() : ContinuousScale(true) {;}
 
   public:
-
     // get rid of functions that shouldn't be called:
     // Identity scales do not support invert or interpolate
     template <typename T>
@@ -630,7 +634,6 @@ namespace D3 {
     }
   };
 
-
   // scaleSequentialLog
   class SequentialLogScale : public SequentialOrDivergingScale {
   protected:
@@ -638,6 +641,11 @@ namespace D3 {
   public:
     SequentialLogScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialLog(); }, this->id);
+    }
+
+    SequentialLogScale & SetBase(double baseNum) {
+      EM_ASM({ emp_d3.objects[$0].base($1);}, this->id, baseNum);
+      return *this;
     }
   };
 
@@ -648,6 +656,11 @@ namespace D3 {
   public:
     SequentialPowScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialPow(); }, this->id);
+    }
+
+    SequentialPowScale & SetExponent(double ex) {
+      EM_ASM({ emp_d3.objects[$0].exponent($1);}, this->id, ex);
+      return *this;
     }
   };
 
@@ -668,6 +681,11 @@ namespace D3 {
   public:
     SequentialSymlogScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialSymlog(); }, this->id);
+    }
+
+    SequentialSymlogScale & SetConstant(double constant) {
+      EM_ASM({ emp_d3.objects[$0].constant($1); }, this->id, constant);
+      return *this;
     }
   };
 
@@ -717,6 +735,11 @@ namespace D3 {
     DivergingLogScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleDivergingLog(); }, this->id);
     }
+
+    DivergingLogScale & SetBase(double baseNum) {
+      EM_ASM({ emp_d3.objects[$0].base($1);}, this->id, baseNum);
+      return *this;
+    }
   };
 
   // scaleDivergingPow
@@ -726,6 +749,11 @@ namespace D3 {
   public:
     DivergingPowScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleDivergingPow(); }, this->id);
+    }
+
+    DivergingPowScale & SetExponent(double ex) {
+      EM_ASM({ emp_d3.objects[$0].exponent($1);}, this->id, ex);
+      return *this;
     }
   };
 
@@ -747,6 +775,11 @@ namespace D3 {
     DivergingSymlogScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleDivergingSymlog(); }, this->id);
     }
+
+    DivergingSymlogScale & SetConstant(double constant) {
+      EM_ASM({ emp_d3.objects[$0].constant($1); }, this->id, constant);
+      return *this;
+    }
   };
 
 
@@ -759,13 +792,25 @@ namespace D3 {
     ContinuousInputDiscreteOutputScale() : Scale(true) {;}
 
   public:
+    
+    emp::array<int, 2> InvertExtent(double input) {
+      EM_ASM({
+        emp_i.__outgoing_array = emp_d3.objects[$0].invertExtent($1);
+      }, this->id, input);
+      // access JS array
+      emp::array<int, 2> invertExtentArr;
+      emp::pass_array_to_cpp(invertExtentArr);
+      return invertExtentArr;
+    }
 
-    // needs to be fixed to return array and take in string
-    template <typename T>
-    double InvertExtent(T y) {
-      return EM_ASM_DOUBLE({
-        return emp_d3.objects[$0].invertExtent($1);
-      }, this->id, y);
+    emp::array<int, 2> InvertExtent(const std::string & input) {
+      EM_ASM({
+        emp_i.__outgoing_array = emp_d3.objects[$0].invertExtent(UTF8ToString($1));
+      }, this->id, input.c_str());
+      // access JS array
+      emp::array<int, 2> invertExtentArr;
+      emp::pass_array_to_cpp(invertExtentArr);
+      return invertExtentArr;
     }
   };
 
@@ -783,7 +828,9 @@ namespace D3 {
 
     // .ticks()
     QuantizeScale & SetTicks(int count) {
-      EM_ASM_ARGS({js.objects[$0].ticks($1);}, this->id, count);
+      EM_ASM({
+        emp_d3.objects[$0].ticks($1);
+      }, this->id, count);
       return *this;
     }
 
@@ -813,13 +860,12 @@ namespace D3 {
     }
 
     // .thresholds()
-    template <typename T>
-    emp::vector<T> GetThresholds() {
+    emp::vector<double> GetThresholds() {
       EM_ASM({
         emp_i.__outgoing_array = emp_d3.objects[$0].thresholds();
       }, this->id);
       // access JS array
-      emp::vector<T> thresholds_vec;
+      emp::vector<double> thresholds_vec;
       emp::pass_vector_to_cpp(thresholds_vec);
       return thresholds_vec;
     }
@@ -838,13 +884,12 @@ namespace D3 {
     }
 
     // .quantiles()
-    template <typename T>
-    emp::vector<T> GetQuantiles() {
+    emp::vector<double> GetQuantiles() {
       EM_ASM({
         emp_i.__outgoing_array = emp_d3.objects[$0].quantiles();
       }, this->id);
       // access JS array
-      emp::vector<T> quantiles_vec;
+      emp::vector<double> quantiles_vec;
       emp::pass_vector_to_cpp(quantiles_vec);
       return quantiles_vec;
     }
@@ -870,17 +915,6 @@ namespace D3 {
   protected:
     DiscreteScale(bool derived) : Scale(true) {;}
     DiscreteScale() : Scale(true) {;}
-
-  public:
-    // get rid of functions that shouldn't be called
-    Scale & SetDomain(double min, double max) = delete;
-
-    DiscreteScale & SetDomain(int min, int max) {
-      EM_ASM({
-        emp_d3.objects[$0].domain([$1, $2]);
-      }, this->id, min, max);
-      return *this;
-    }
   };
 
   // scaleOrdinal
@@ -907,9 +941,29 @@ namespace D3 {
         emp_d3.objects[$0] = d3.scaleBand()
       }, this->id);
     }
+
+    BandScale & Round(bool val) {
+      EM_ASM({
+        emp_d3.objects[$0].round(val);
+      }, this->id, val);
+      return *this;
+    }
+
+    double GetBandwidth() {
+      return EM_ASM_DOUBLE({
+        return emp_d3.objects[$0].bandwidth();
+      }, this->id);
+    }
+
+    double GetStep() {
+      return EM_ASM_DOUBLE({
+        return emp_d3.objects[$0].step();
+      }, this->id);
+    }
   };
 
   // scalePoint
+  // Point scales are a variant of band scales with the bandwidth fixed to zero
   class PointScale : public DiscreteScale {
   protected:
     PointScale(bool derived) : DiscreteScale(true) {;}
@@ -918,6 +972,25 @@ namespace D3 {
     PointScale() : DiscreteScale(true) {
       EM_ASM({
         emp_d3.objects[$0] = d3.scalePoint()
+      }, this->id);
+    }
+
+    PointScale & Round(bool val) {
+      EM_ASM({
+        emp_d3.objects[$0].round(val);
+      }, this->id, val);
+      return *this;
+    } 
+
+    double GetBandwidth() {
+      return EM_ASM_DOUBLE({
+        return emp_d3.objects[$0].bandwidth();
+      }, this->id);
+    }
+
+    double GetStep() {
+      return EM_ASM_DOUBLE({
+        return emp_d3.objects[$0].step();
       }, this->id);
     }
   };

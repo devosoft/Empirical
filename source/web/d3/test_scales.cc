@@ -11,10 +11,6 @@
 
 #include "../../base/vector.h"
 
-// TODO: test quantize, quantile threshold scale (including functions like invert extent)
-// TODO: Fix date apply scale tests
-// TODO: make sure numbers of CPP and JS side round to same value (because of string comparison)
-
 namespace UI = emp::web;
 UI::Document doc("emp_d3_test");
 
@@ -134,7 +130,6 @@ struct TestLinearScale {
 
     // add results to JS
     EM_ASM({
-      // TODO: make x and color in the describe statement, and just compare cpp dict value to actual JS result (e.g. x(20))
       var x = d3.scaleLinear()
                   .domain([ 10, 130 ])
                   .range([ 0, 960 ]);
@@ -574,38 +569,6 @@ struct TestDivergingScale {
   }
 };
 
-
-
-//***********************************//
-//******** __________ Scales ********//
-//***********************************//
-
-// struct TestQuantizeScale {
-//   TestQuantizeScale() {
-//     EM_ASM({
-//       var color = d3.scaleQuantize()
-//         .domain([0, 1])
-//         .range(["brown", "steelblue"]);
-
-//       console.log(color(0.49)); // "brown"
-//       console.log(color(0.51)); // "steelblue"
-//     )};
-
-//     D3::QuantizeScale testQuantize = D3::QuantizeScale();
-//     emp::array<std::string, 2> colors = {"brown", "steelblue"};
-//     testQuantize.SetDomain(0, 1);
-//     // quantScale.SetRange({"brown", "steelblue"});
-//     testQuantize.SetRange(colors);
-
-//     std::string value1 = testQuantize.ApplyScaleString(0.49);
-//     std::string value2 = testQuantize.ApplyScaleString(0.51);
-
-//     std::cout << "value 1: " << value1 << std::endl;
-//     std::cout << "value 2: " << value2 << std::endl;
-//   }
-// };
-
-
 //***********************************//
 //********     Run tests     ********//
 //***********************************//
@@ -622,17 +585,8 @@ int main() {
   TestIdentityScale test6{};
   TestTimeScale test7{};
   TestSequentialScale test8{};
-
-  TestSequentialQuantileScale test10{};
-  TestDivergingScale test11{};
-
-  // emp::array<std::string, 5> keysCpp = {"test1", "test2", "test3", "test4", "test5"};
-  // // emp::array<int, 5> keysCpp = {11, 12, 13, 14, 15};
-  // emp::array<std::string, 5> vals = {"red", "blue", "blue", "yellow", "purple"};
-  // pass_map_to_javascript(keysCpp, vals);
-
-  // std::map<std::string, std::string> testMap = {{"test1", "a"}, {"test2", "b"}, {"test3", "c"}, {"test4", "d"}, {"test5", "e"}};
-  // pass_map_to_javascript(testMap);
+  TestSequentialQuantileScale test9{};
+  TestDivergingScale test10{};
 }
 
 // This functionality is included in the newest version of d3-scale, but not base d3

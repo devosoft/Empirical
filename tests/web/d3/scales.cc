@@ -4,8 +4,35 @@
 #include "web/_MochaTestRunner.h"
 #include "d3_testing_utils.h"
 
+// To run these tests call `../../third-party/node_modules/karma/bin/karma start karma.conf.js --filename d3/scales` from tests/web
+// or call `cd d3 && make scales.js && .. && ../../third-party/node_modules/karma/bin/karma start karma.conf.js --filename d3/scales` from tests/web
+
 // This file tests:
 // - D3_Scales
+// -- LinearScale
+// -- PowScale
+// -- SqrtScale
+// -- LogScale
+// -- SymlogScale
+// -- IdentityScale
+// -- TimeScale
+// -- SequentialScale
+// -- SequentialLogScale
+// -- SequentialPowScale
+// -- SequentialSqrtScale
+// -- SequentialSymlogScale
+// -- SequentialQuantileScale
+// -- DivergingScale
+// -- DivergingLogScale
+// -- DivergingPowScale
+// -- DivergingSqrtScale
+// -- DivergingSymlogScale
+// -- QuantizeScale
+// -- QuantileScale
+// -- ThresholdScale
+// -- OrdinalScale
+// -- BandScale
+// -- PointScale
 
 struct TestLinearScale : emp::web::BaseTest {
   D3::LinearScale testLinearInt;
@@ -41,16 +68,13 @@ struct TestLinearScale : emp::web::BaseTest {
     testLinearIntNice.SetRange(0, 1000);
     testLinearIntNice.Nice();
     testLinearIntNiceDomain = testLinearIntNice.GetDomain<int>();
-  
-    // TODO: figure out a way for: emp::pass_array_to_javascript(testLinearIntDomain)
-    // to not get overridden when testLinearColor.SetRange(colorArray) is called
 
     testLinearColor.SetDomain(10, 100);
     emp::array<std::string, 2> colorArray = {"brown", "steelblue"};
     testLinearColor.SetRange(colorArray);
     linearColor_1 = testLinearColor.ApplyScale<std::string>(20);
     linearColor_2 = testLinearColor.ApplyScale<std::string>(50);
-    testLinearColorDomain = testLinearColor.GetDomain<int>();
+    testLinearColorDomain = testLinearColor.GetDomain<int>(); 
     testLinearColorRange = testLinearColor.GetRange<std::string>();
   }
   
@@ -573,6 +597,796 @@ struct TestTimeScale : emp::web::BaseTest {
   }
 };
 
+struct TestSequentialScale : emp::web::BaseTest {
+  // a sequential scale 
+  D3::SequentialScale testSequentialScale1;
+  std::string testSequentialScale1_val1;
+  std::string testSequentialScale1_val2;
+  std::string testSequentialScale1_val3;
+
+  TestSequentialScale() { Setup(); }
+
+  void Setup() {
+    testSequentialScale1.SetDomain(0, 100);
+    testSequentialScale1.SetInterpolator("interpolateRainbow");
+    testSequentialScale1_val1 = testSequentialScale1.ApplyScale<std::string>(0);
+    testSequentialScale1_val2 = testSequentialScale1.ApplyScale<std::string>(50);
+    testSequentialScale1_val3 = testSequentialScale1.ApplyScale<std::string>(100);
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const testSequentialScale1_val1 = UTF8ToString($0);
+      const testSequentialScale1_val2 = UTF8ToString($1);
+      const testSequentialScale1_val3 = UTF8ToString($2);
+
+      var sequentialScale = d3.scaleSequential()
+        .domain([0, 100])
+        .interpolator(d3.interpolateRainbow);
+
+      describe("creating a sequential scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testSequentialScale1_val1, sequentialScale(0));    // rgb(110, 64, 170)
+          chai.assert.equal(testSequentialScale1_val2, sequentialScale(50));   // rgb(175, 240, 91)
+          chai.assert.equal(testSequentialScale1_val3, sequentialScale(100));  // rgb(110, 64, 170)
+        });
+      });
+    }, testSequentialScale1_val1.c_str(), testSequentialScale1_val2.c_str(), testSequentialScale1_val3.c_str());
+  }
+};
+
+struct TestSequentialLogScale : emp::web::BaseTest {
+  // a sequential log scale 
+  D3::SequentialLogScale testSeqLogScale1;
+  std::string testSeqLogScale1_val1;
+  std::string testSeqLogScale1_val2;
+  std::string testSeqLogScale1_val3;
+
+  TestSequentialLogScale() { Setup(); }
+
+  void Setup() {
+    testSeqLogScale1.SetDomain(1e-8, 1e8);
+    testSeqLogScale1.SetInterpolator("interpolatePuBuGn");
+    testSeqLogScale1_val1 = testSeqLogScale1.ApplyScale<std::string>(1e-8);
+    testSeqLogScale1_val2 = testSeqLogScale1.ApplyScale<std::string>(100.1234);
+    testSeqLogScale1_val3 = testSeqLogScale1.ApplyScale<std::string>(1e8);
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const testSeqLogScale1_val1 = UTF8ToString($0);
+      const testSeqLogScale1_val2 = UTF8ToString($1);
+      const testSeqLogScale1_val3 = UTF8ToString($2);
+
+      var seqLog = d3.scaleSequentialLog()
+                       .domain([ 1e-8, 1e8 ])
+                       .interpolator(d3.interpolatePuBuGn);
+
+      describe("creating a sequential log scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testSeqLogScale1_val1, seqLog(1e-8));  // rgb(255, 247, 251)
+          chai.assert.equal(testSeqLogScale1_val2, seqLog(100.1234));   // rgb(53, 146, 185)
+          chai.assert.equal(testSeqLogScale1_val3, seqLog(1e8));   // rgb(1, 70, 54)
+        });
+      });
+    }, testSeqLogScale1_val1.c_str(), testSeqLogScale1_val2.c_str(), testSeqLogScale1_val3.c_str());
+  }
+};
+
+struct TestSequentialPowScale : emp::web::BaseTest {
+  // a sequential pow scale 
+  D3::SequentialPowScale testSeqPowScale1;
+  std::string testSeqPowScale1_val1;
+  std::string testSeqPowScale1_val2;
+  std::string testSeqPowScale1_val3;
+
+  TestSequentialPowScale() { Setup(); }
+
+  void Setup() {
+    testSeqPowScale1.SetExponent(0);
+    testSeqPowScale1.SetDomain(1e-8, 1e8);
+    testSeqPowScale1.SetInterpolator("interpolatePuBuGn");
+    testSeqPowScale1_val1 = testSeqPowScale1.ApplyScale<std::string>(1e-8);
+    testSeqPowScale1_val2 = testSeqPowScale1.ApplyScale<std::string>(1e5);
+    testSeqPowScale1_val3 = testSeqPowScale1.ApplyScale<std::string>(1e8);
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const testSeqPowScale1_val1 = UTF8ToString($0);
+      const testSeqPowScale1_val2 = UTF8ToString($1);
+      const testSeqPowScale1_val3 = UTF8ToString($2);
+
+      var seqPow = d3.scaleSequentialPow()
+                       .exponent(0)
+                       .domain([ 1e-8, 1e8 ])
+                       .interpolator(d3.interpolatePuBuGn);
+
+      describe("creating a sequential pow scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testSeqPowScale1_val1, seqPow(1e-8));  // rgb(105, 168, 207)
+          chai.assert.equal(testSeqPowScale1_val2, seqPow(1e5));   // rgb(105, 168, 207)
+          chai.assert.equal(testSeqPowScale1_val3, seqPow(1e8));   // rgb(105, 168, 207)
+        });
+      });
+    }, testSeqPowScale1_val1.c_str(), testSeqPowScale1_val2.c_str(), testSeqPowScale1_val3.c_str());
+  }
+};
+
+struct TestSequentialSqrtScale : emp::web::BaseTest {
+  // a sequential sqrt scale 
+  D3::SequentialSqrtScale testSeqSqrtScale1;
+  std::string testSeqSqrtScale1_val1;
+  std::string testSeqSqrtScale1_val2;
+  std::string testSeqSqrtScale1_val3;
+
+  TestSequentialSqrtScale() { Setup(); }
+
+  void Setup() {
+    testSeqSqrtScale1.SetDomain(1e-8, 1e8);
+    testSeqSqrtScale1.SetInterpolator("interpolatePuBuGn");
+    testSeqSqrtScale1_val1 = testSeqSqrtScale1.ApplyScale<std::string>(1e-8);
+    testSeqSqrtScale1_val2 = testSeqSqrtScale1.ApplyScale<std::string>(1e5);
+    testSeqSqrtScale1_val3 = testSeqSqrtScale1.ApplyScale<std::string>(1e7);
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const testSeqSqrtScale1_val1 = UTF8ToString($0);
+      const testSeqSqrtScale1_val2 = UTF8ToString($1);
+      const testSeqSqrtScale1_val3 = UTF8ToString($2);
+
+      var seqSqrt = d3.scaleSequentialSqrt()
+                       .domain([ 1e-8, 1e8 ])
+                       .interpolator(d3.interpolatePuBuGn);
+
+      describe("creating a sequential sqrt scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testSeqSqrtScale1_val1, seqSqrt(1e-8));  // rgb(255, 247, 251)
+          chai.assert.equal(testSeqSqrtScale1_val2, seqSqrt(1e5));   // rgb(250, 242, 248)
+          chai.assert.equal(testSeqSqrtScale1_val3, seqSqrt(1e7));   // rgb(185, 198, 224)
+        });
+      });
+    }, testSeqSqrtScale1_val1.c_str(), testSeqSqrtScale1_val2.c_str(), testSeqSqrtScale1_val3.c_str());
+  }
+};
+
+struct TestSequentialSymlogScale : emp::web::BaseTest {
+  // a sequential symlog scale 
+  D3::SequentialSymlogScale testSeqSymlogScale1;
+  std::string testSeqSymlogScale1_val1;
+  std::string testSeqSymlogScale1_val2;
+  std::string testSeqSymlogScale1_val3;
+
+  TestSequentialSymlogScale() { Setup(); }
+
+  void Setup() {
+    testSeqSymlogScale1.SetConstant(5);
+    testSeqSymlogScale1.SetDomain(1e-8, 1e8);
+    testSeqSymlogScale1.SetInterpolator("interpolatePuBuGn");
+    testSeqSymlogScale1_val1 = testSeqSymlogScale1.ApplyScale<std::string>(1e-7);
+    testSeqSymlogScale1_val2 = testSeqSymlogScale1.ApplyScale<std::string>(1e5);
+    testSeqSymlogScale1_val3 = testSeqSymlogScale1.ApplyScale<std::string>(1e7);
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const testSeqSymlogScale1_val1 = UTF8ToString($0);
+      const testSeqSymlogScale1_val2 = UTF8ToString($1);
+      const testSeqSymlogScale1_val3 = UTF8ToString($2);
+
+      var seqSymlog = d3.scaleSequentialSymlog()
+                       .constant(5)
+                       .domain([ 1e-8, 1e8 ])
+                       .interpolator(d3.interpolatePuBuGn);
+
+      describe("creating a sequential symlog scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testSeqSymlogScale1_val1, seqSymlog(1e-7));  // rgb(255, 247, 251)
+          chai.assert.equal(testSeqSymlogScale1_val2, seqSymlog(1e5));   // rgb(68, 152, 194)
+          chai.assert.equal(testSeqSymlogScale1_val3, seqSymlog(1e7));   // rgb(1, 108, 95)
+        });
+      });
+    }, testSeqSymlogScale1_val1.c_str(), testSeqSymlogScale1_val2.c_str(), testSeqSymlogScale1_val3.c_str());
+  }
+};
+
+struct TestSequentialQuantileScale: emp::web::BaseTest {
+  // a sequential quantile scale 
+  D3::SequentialQuantileScale testSeqQuantScale1;
+  double testSeqQuantScale1_val1;
+  double testSeqQuantScale1_val2;
+  double testSeqQuantScale1_val3;
+  double testSeqQuantScale1_val4;
+
+  TestSequentialQuantileScale() { Setup(); }
+
+  void Setup() {
+    emp::array<int, 3> domainArr = {100, 1, 13};
+    testSeqQuantScale1.SetDomain(domainArr);
+    testSeqQuantScale1_val1 = testSeqQuantScale1.ApplyScale<double>(1);
+    testSeqQuantScale1_val2 = testSeqQuantScale1.ApplyScale<double>(13);
+    testSeqQuantScale1_val3 = testSeqQuantScale1.ApplyScale<double>(99.99);
+    testSeqQuantScale1_val4 = testSeqQuantScale1.ApplyScale<double>(100);
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const testSeqQuantScale1_val1 = $0;
+      const testSeqQuantScale1_val2 = $1;
+      const testSeqQuantScale1_val3 = $2;
+      const testSeqQuantScale1_val4 = $3;
+
+      var seqQuant = d3.scaleSequentialQuantile()
+                         .domain([ 100, 1, 13 ]);
+
+      describe("creating a sequential quantile scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testSeqQuantScale1_val1, seqQuant(1));     // 0
+          chai.assert.equal(testSeqQuantScale1_val2, seqQuant(13));    // 0.5
+          chai.assert.equal(testSeqQuantScale1_val3, seqQuant(99.99)); // 0.5
+          chai.assert.equal(testSeqQuantScale1_val4, seqQuant(100));   // 1
+        });
+      });
+    }, testSeqQuantScale1_val1, testSeqQuantScale1_val2, testSeqQuantScale1_val3, testSeqQuantScale1_val4);
+  }
+};
+
+struct TestDivergingScale: emp::web::BaseTest {
+  // a diverging scale 
+  D3::DivergingScale testDivergingScale1;
+  std::string testDivergingScale1_val1;
+  std::string testDivergingScale1_val2;
+  std::string testDivergingScale1_val3;
+  emp::vector<double> testDivergingScale1_Domain;
+
+  TestDivergingScale() { Setup(); }
+
+  void Setup() {
+    emp::array<double, 3> domainArr = {-0.78, 0, 1.35};
+    testDivergingScale1.SetDomain(domainArr);
+    testDivergingScale1.SetInterpolator("interpolatePuOr");
+    testDivergingScale1_val1 = testDivergingScale1.ApplyScale<std::string>(-0.5);
+    testDivergingScale1_val2 = testDivergingScale1.ApplyScale<std::string>(0);
+    testDivergingScale1_val3 = testDivergingScale1.ApplyScale<std::string>(1.01);
+
+    testDivergingScale1_Domain = testDivergingScale1.GetDomain<double>();
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const testDivergingScale1_val1 = UTF8ToString($0);
+      const testDivergingScale1_val2 = UTF8ToString($1);
+      const testDivergingScale1_val3 = UTF8ToString($2);
+      const testDivergingScale1_Domain_0 = $3;
+      const testDivergingScale1_Domain_1 = $4;
+      const testDivergingScale1_Domain_2 = $5;
+
+      var scaleDiverging = d3.scaleDiverging()
+                            .domain( [-0.78, 0, 1.35] )
+                            .interpolator(d3.interpolatePuOr);
+
+      describe("creating a diverging quantile scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testDivergingScale1_val1, scaleDiverging(-0.5));    // rgb(119, 98, 165)
+          chai.assert.equal(testDivergingScale1_val2, scaleDiverging(0));       // rgb(243, 238, 234)
+          chai.assert.equal(testDivergingScale1_val3, scaleDiverging(1.01));    // rgb(190, 100, 11)
+        });
+        it("should get the domain correctly", function() {
+          chai.assert.equal(testDivergingScale1_Domain_0, scaleDiverging.domain()[0]); // [-0.78, 0, 1.35]
+          chai.assert.equal(testDivergingScale1_Domain_1, scaleDiverging.domain()[1]);
+          chai.assert.equal(testDivergingScale1_Domain_2, scaleDiverging.domain()[2]);
+        });
+      });
+    }, testDivergingScale1_val1.c_str(), testDivergingScale1_val2.c_str(), testDivergingScale1_val3.c_str(),
+       testDivergingScale1_Domain[0], testDivergingScale1_Domain[1], testDivergingScale1_Domain[2]);
+  }
+};
+
+struct TestDivergingLogScale: emp::web::BaseTest {
+  // a diverging log scale 
+  D3::DivergingLogScale testDivergingLogScale1;
+  std::string testDivergingLogScale1_val1;
+  std::string testDivergingLogScale1_val2;
+  std::string testDivergingLogScale1_val3;
+
+  TestDivergingLogScale() { Setup(); }
+
+  void Setup() {
+    testDivergingLogScale1.SetDomain(1e-8, 1e8);
+    testDivergingLogScale1.SetInterpolator("interpolatePuOr");
+    testDivergingLogScale1_val1 = testDivergingLogScale1.ApplyScale<std::string>(1e-5);
+    testDivergingLogScale1_val2 = testDivergingLogScale1.ApplyScale<std::string>(0);
+    testDivergingLogScale1_val3 = testDivergingLogScale1.ApplyScale<std::string>(1e5);
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const testDivergingLogScale1_val1 = UTF8ToString($0);
+      const testDivergingLogScale1_val2 = UTF8ToString($1);
+      const testDivergingLogScale1_val3 = UTF8ToString($2);
+
+      var scaleDivergingLog = d3.scaleDivergingLog()
+                            .domain( [1e-8, 1e8] )
+                            .interpolator(d3.interpolatePuOr);
+
+      describe("creating a diverging quantile scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testDivergingLogScale1_val1, scaleDivergingLog(1e-5));    // rgb(82, 42, 129)
+          chai.assert.equal(testDivergingLogScale1_val2, scaleDivergingLog(0));       // rgb(45, 0, 75)
+          chai.assert.equal(testDivergingLogScale1_val3, scaleDivergingLog(1e5));     // rgb(217, 217, 234)
+        });
+      });
+    }, testDivergingLogScale1_val1.c_str(), testDivergingLogScale1_val2.c_str(), testDivergingLogScale1_val3.c_str());
+  }
+};
+
+struct TestDivergingPowScale: emp::web::BaseTest {
+  // a diverging pow scale 
+  D3::DivergingPowScale testDivergingPowScale1;
+  std::string testDivergingPowScale1_val1;
+  std::string testDivergingPowScale1_val2;
+  std::string testDivergingPowScale1_val3;
+
+  TestDivergingPowScale() { Setup(); }
+
+  void Setup() {
+    testDivergingPowScale1.SetDomain(1e-8, 1e8);
+    testDivergingPowScale1.SetInterpolator("interpolatePuOr");
+    testDivergingPowScale1_val1 = testDivergingPowScale1.ApplyScale<std::string>(1e-5);
+    testDivergingPowScale1_val2 = testDivergingPowScale1.ApplyScale<std::string>(1e6);
+    testDivergingPowScale1_val3 = testDivergingPowScale1.ApplyScale<std::string>(1.9e7);
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const testDivergingPowScale1_val1 = UTF8ToString($0);
+      const testDivergingPowScale1_val2 = UTF8ToString($1);
+      const testDivergingPowScale1_val3 = UTF8ToString($2);
+
+      var scaleDivergingPow = d3.scaleDivergingPow()
+                            .domain( [1e-8, 1e8] )
+                            .interpolator(d3.interpolatePuOr);
+
+      describe("creating a diverging pow scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testDivergingPowScale1_val1, scaleDivergingPow(1e-5));    // rgb(45, 0, 75)
+          chai.assert.equal(testDivergingPowScale1_val2, scaleDivergingPow(1e6));     // rgb(47, 2, 78)
+          chai.assert.equal(testDivergingPowScale1_val3, scaleDivergingPow(1.9e7));    // rgb(83, 42, 129)
+        });
+      });
+    }, testDivergingPowScale1_val1.c_str(), testDivergingPowScale1_val2.c_str(), testDivergingPowScale1_val3.c_str());
+  }
+};
+
+struct TestDivergingSqrtScale: emp::web::BaseTest {
+  // a diverging sqrt scale 
+  D3::DivergingSqrtScale testDivergingSqrtScale1;
+  std::string testDivergingSqrtScale1_val1;
+  std::string testDivergingSqrtScale1_val2;
+  std::string testDivergingSqrtScale1_val3;
+
+  TestDivergingSqrtScale() { Setup(); }
+
+  void Setup() {
+    testDivergingSqrtScale1.SetDomain(1e-8, 1e8);
+    testDivergingSqrtScale1.SetInterpolator("interpolatePuOr");
+    testDivergingSqrtScale1_val1 = testDivergingSqrtScale1.ApplyScale<std::string>(1e-5);
+    testDivergingSqrtScale1_val2 = testDivergingSqrtScale1.ApplyScale<std::string>(1e6);
+    testDivergingSqrtScale1_val3 = testDivergingSqrtScale1.ApplyScale<std::string>(1.9e7);
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const testDivergingSqrtScale1_val1 = UTF8ToString($0);
+      const testDivergingSqrtScale1_val2 = UTF8ToString($1);
+      const testDivergingSqrtScale1_val3 = UTF8ToString($2);
+
+      var scaleDivergingSqrt = d3.scaleDivergingSqrt()
+                            .domain( [1e-8, 1e8] )
+                            .interpolator(d3.interpolatePuOr);
+
+      describe("creating a diverging sqrt scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testDivergingSqrtScale1_val1, scaleDivergingSqrt(1e-5));    // rgb(45, 0, 75)
+          chai.assert.equal(testDivergingSqrtScale1_val2, scaleDivergingSqrt(1e6));     // rgb(65, 20, 105)
+          chai.assert.equal(testDivergingSqrtScale1_val3, scaleDivergingSqrt(1.9e7));   // rgb(138, 123, 179)
+        });
+      });
+    }, testDivergingSqrtScale1_val1.c_str(), testDivergingSqrtScale1_val2.c_str(), testDivergingSqrtScale1_val3.c_str());
+  }
+};
+
+struct TestDivergingSymlogScale: emp::web::BaseTest {
+  // a diverging symlog scale 
+  D3::DivergingSymlogScale testDivergingSymlogScale1;
+  std::string testDivergingSymlogScale1_val1;
+  std::string testDivergingSymlogScale1_val2;
+  std::string testDivergingSymlogScale1_val3;
+
+  TestDivergingSymlogScale() { Setup(); }
+
+  void Setup() {
+    testDivergingSymlogScale1.SetDomain(1e-8, 1e8);
+    testDivergingSymlogScale1.SetInterpolator("interpolatePuOr");
+    testDivergingSymlogScale1_val1 = testDivergingSymlogScale1.ApplyScale<std::string>(1e-5);
+    testDivergingSymlogScale1_val2 = testDivergingSymlogScale1.ApplyScale<std::string>(1e6);
+    testDivergingSymlogScale1_val3 = testDivergingSymlogScale1.ApplyScale<std::string>(1.9e7);
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const testDivergingSymlogScale1_val1 = UTF8ToString($0);
+      const testDivergingSymlogScale1_val2 = UTF8ToString($1);
+      const testDivergingSymlogScale1_val3 = UTF8ToString($2);
+
+      var scaleDivergingSymlog = d3.scaleDivergingSymlog()
+                            .domain( [1e-8, 1e8] )
+                            .interpolator(d3.interpolatePuOr);
+
+      describe("creating a diverging symlog scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testDivergingSymlogScale1_val1, scaleDivergingSymlog(1e-5));    // rgb(45, 0, 75)
+          chai.assert.equal(testDivergingSymlogScale1_val2, scaleDivergingSymlog(1e6));     // rgb(206, 205, 228)
+          chai.assert.equal(testDivergingSymlogScale1_val3, scaleDivergingSymlog(1.9e7));   // rgb(232, 232, 239)
+        });
+      });
+    }, testDivergingSymlogScale1_val1.c_str(), testDivergingSymlogScale1_val2.c_str(), testDivergingSymlogScale1_val3.c_str());
+  }
+};
+
+struct TestQuantizeScale: emp::web::BaseTest {
+  // a quantize scale with a string range
+  D3::QuantizeScale testQuantizeScale1;
+  std::string testQuantizeScale1_val1;
+  std::string testQuantizeScale1_val2;
+  std::string testQuantizeScale1_val3;
+  emp::array<int, 2> testQuantizeScale1_invert;
+  emp::vector<double> testQuantizeScale1_thresholds;
+
+  // a quantize scale with an integer range
+  D3::QuantizeScale testQuantizeScale2;
+  int testQuantizeScale2_val1;
+  int testQuantizeScale2_val2;
+  int testQuantizeScale2_val3;
+  emp::array<int, 2> testQuantizeScale2_invert;
+  emp::vector<double> testQuantizeScale2_thresholds;
+
+  TestQuantizeScale() { Setup(); }
+
+  void Setup() {
+    testQuantizeScale1.SetDomain(0, 100);
+    emp::array<std::string, 4> rangeArr = {"lightblue", "orange", "lightgreen", "pink"};
+    testQuantizeScale1.SetRange(rangeArr);
+    testQuantizeScale1_val1 = testQuantizeScale1.ApplyScale<std::string>(10);
+    testQuantizeScale1_val2 = testQuantizeScale1.ApplyScale<std::string>(30);
+    testQuantizeScale1_val3 = testQuantizeScale1.ApplyScale<std::string>(90);
+    testQuantizeScale1_invert = testQuantizeScale1.InvertExtent("orange");
+    testQuantizeScale1_thresholds = testQuantizeScale1.GetThresholds();
+
+    testQuantizeScale2.SetDomain(10, 100);
+    emp::array<int, 3> rangeArr2 = {1, 2, 4};
+    testQuantizeScale2.SetRange(rangeArr2);
+    testQuantizeScale2_val1 = testQuantizeScale2.ApplyScale<int>(20);
+    testQuantizeScale2_val2 = testQuantizeScale2.ApplyScale<int>(50);
+    testQuantizeScale2_val3 = testQuantizeScale2.ApplyScale<int>(80);
+    testQuantizeScale2_invert = testQuantizeScale2.InvertExtent(4);
+    testQuantizeScale2_thresholds = testQuantizeScale2.GetThresholds();
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const testQuantizeScale1_val1 = UTF8ToString($0);
+      const testQuantizeScale1_val2 = UTF8ToString($1);
+      const testQuantizeScale1_val3 = UTF8ToString($2);
+      const testQuantizeScale1_invert0 = $3;
+      const testQuantizeScale1_invert1 = $4;
+      const testQuantizeScale1_thresholds0 = $5;
+      const testQuantizeScale1_thresholds1 = $6;
+      const testQuantizeScale1_thresholds2 = $7;
+
+      const testQuantizeScale2_val1 = $8; 
+      const testQuantizeScale2_val2 = $9;
+      const testQuantizeScale2_val3 = $10;
+      const testQuantizeScale2_invert0 = $11;
+      const testQuantizeScale2_invert1 = $12;
+      const testQuantizeScale2_thresholds0 = $13;
+      const testQuantizeScale2_thresholds1 = $14;
+
+      var quantizeScale = d3.scaleQuantize()
+                            .domain([0, 100])
+                            .range(['lightblue', 'orange', 'lightgreen', 'pink']);
+
+      var quantizeScale2 = d3.scaleQuantize()
+                              .domain([10, 100])
+                              .range([1, 2, 4]);
+
+      describe("creating a quantize scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testQuantizeScale1_val1, quantizeScale(10));   // "lightblue"
+          chai.assert.equal(testQuantizeScale1_val2, quantizeScale(30));   // "orange"
+          chai.assert.equal(testQuantizeScale1_val3, quantizeScale(90));   // "pink"
+        });
+        it("should InvertExtent the first scale correctly", function() {
+          chai.assert.equal(testQuantizeScale1_invert0, quantizeScale.invertExtent("orange")[0]);   // [25, 50]
+          chai.assert.equal(testQuantizeScale1_invert1, quantizeScale.invertExtent("orange")[1]);   
+        });
+        it("should get the correct thresholds for the first scale", function() {
+          chai.assert.equal(testQuantizeScale1_thresholds0, quantizeScale.thresholds()[0]);   // [25, 50, 75]
+          chai.assert.equal(testQuantizeScale1_thresholds1, quantizeScale.thresholds()[1]); 
+          chai.assert.equal(testQuantizeScale1_thresholds2, quantizeScale.thresholds()[2]); 
+        });
+        it("should apply the second scale correctly", function() {
+          chai.assert.equal(testQuantizeScale2_val1, quantizeScale2(20));   // 1
+          chai.assert.equal(testQuantizeScale2_val2, quantizeScale2(50));   // 2
+          chai.assert.equal(testQuantizeScale2_val3, quantizeScale2(80));   // 4
+        });
+        it("should InvertExtent the second scale correctly", function() {
+          chai.assert.equal(testQuantizeScale2_invert0, quantizeScale2.invertExtent(4)[0]);   // [70, 100]
+          chai.assert.equal(testQuantizeScale2_invert1, quantizeScale2.invertExtent(4)[1]);   
+        });
+        it("should get the correct thresholds for the second scale", function() {
+          chai.assert.equal(testQuantizeScale2_thresholds0, quantizeScale2.thresholds()[0]);   // [40, 70]
+          chai.assert.equal(testQuantizeScale2_thresholds1, quantizeScale2.thresholds()[1]); 
+        });
+      });
+    }, testQuantizeScale1_val1.c_str(), testQuantizeScale1_val2.c_str(), testQuantizeScale1_val3.c_str(),
+       testQuantizeScale1_invert[0], testQuantizeScale1_invert[1], testQuantizeScale1_thresholds[0], testQuantizeScale1_thresholds[1], testQuantizeScale1_thresholds[2], 
+       testQuantizeScale2_val1, testQuantizeScale2_val2, testQuantizeScale2_val3, 
+       testQuantizeScale2_invert[0], testQuantizeScale2_invert[1], testQuantizeScale2_thresholds[0], testQuantizeScale2_thresholds[1]);
+  }
+};
+
+struct TestQuantileScale: emp::web::BaseTest {
+  // a quantile scale with a string range
+  D3::QuantileScale testQuantileScale1;
+  std::string testQuantileScale1_val1;
+  std::string testQuantileScale1_val2;
+  std::string testQuantileScale1_val3;
+  std::string testQuantileScale1_val4;
+  emp::vector<double> testQuantileScale1_quantiles;
+
+  TestQuantileScale() { Setup(); }
+
+  void Setup() {
+    emp::array<int, 15> domainArr = {0, 5, 7, 10, 20, 30, 35, 40, 60, 62, 65, 70, 80, 90, 100};
+    testQuantileScale1.SetDomain(domainArr);
+    emp::array<std::string, 4> rangeArr = {"lightblue", "orange", "lightgreen", "purple"};
+    testQuantileScale1.SetRange(rangeArr);
+    testQuantileScale1_val1 = testQuantileScale1.ApplyScale<std::string>(0);
+    testQuantileScale1_val2 = testQuantileScale1.ApplyScale<std::string>(20);
+    testQuantileScale1_val3 = testQuantileScale1.ApplyScale<std::string>(65);
+    testQuantileScale1_val4 = testQuantileScale1.ApplyScale<std::string>(70);
+    testQuantileScale1_quantiles = testQuantileScale1.GetQuantiles();
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const testQuantileScale1_val1 = UTF8ToString($0);
+      const testQuantileScale1_val2 = UTF8ToString($1);
+      const testQuantileScale1_val3 = UTF8ToString($2);
+      const testQuantileScale1_val4 = UTF8ToString($3);
+      const testQuantileScale1_quantiles0 = $4;
+      const testQuantileScale1_quantiles1 = $5;
+      const testQuantileScale1_quantiles2 = $6;
+
+      var myData = ([0, 5, 7, 10, 20, 30, 35, 40, 60, 62, 65, 70, 80, 90, 100]);
+
+      var quantileScale = d3.scaleQuantile()
+                              .domain(myData)
+                              .range([ "lightblue", "orange", "lightgreen", "purple" ]); 
+
+      describe("creating a quantile scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testQuantileScale1_val1, quantileScale(0));    // "lightblue"
+          chai.assert.equal(testQuantileScale1_val2, quantileScale(20));   // "orange"
+          chai.assert.equal(testQuantileScale1_val3, quantileScale(65));   // "lightgreen"
+          chai.assert.equal(testQuantileScale1_val4, quantileScale(70));   // "purple"
+        });
+        it("should get the correct quantiles for the first scale", function() {
+          chai.assert.equal(testQuantileScale1_quantiles0, quantileScale.quantiles()[0]);   // [15, 40, 67.5]
+          chai.assert.equal(testQuantileScale1_quantiles1, quantileScale.quantiles()[1]); 
+          chai.assert.equal(testQuantileScale1_quantiles2, quantileScale.quantiles()[2]); 
+        });
+      });
+    }, testQuantileScale1_val1.c_str(),  testQuantileScale1_val2.c_str(),  testQuantileScale1_val3.c_str(),  testQuantileScale1_val4.c_str(), 
+       testQuantileScale1_quantiles[0], testQuantileScale1_quantiles[1], testQuantileScale1_quantiles[2]);
+  }
+}; 
+
+struct TestThresholdScale: emp::web::BaseTest {
+  // a threshold scale with a string range
+  D3::ThresholdScale testThresholdScale1;
+  std::string testThresholdScale1_val1;
+  std::string testThresholdScale1_val2;
+  std::string testThresholdScale1_val3;
+  std::string testThresholdScale1_val4;
+
+  TestThresholdScale() { Setup(); }
+
+  void Setup() {
+    emp::array<int, 3> domainArr = {0, 50, 100};
+    testThresholdScale1.SetDomain(domainArr);
+    emp::array<std::string, 4> rangeArr = {"#ccc", "lightblue", "orange", "#ccc"};
+    testThresholdScale1.SetRange(rangeArr);
+    testThresholdScale1_val1 = testThresholdScale1.ApplyScale<std::string>(-10);
+    testThresholdScale1_val2 = testThresholdScale1.ApplyScale<std::string>(20);
+    testThresholdScale1_val3 = testThresholdScale1.ApplyScale<std::string>(70);
+    testThresholdScale1_val4 = testThresholdScale1.ApplyScale<std::string>(110);
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const testThresholdScale1_val1 = UTF8ToString($0);
+      const testThresholdScale1_val2 = UTF8ToString($1);
+      const testThresholdScale1_val3 = UTF8ToString($2);
+      const testThresholdScale1_val4 = UTF8ToString($3);
+
+      var thresholdScale = d3.scaleThreshold()
+                              .domain([0, 50, 100])
+                              .range(['#ccc', 'lightblue', 'orange', '#ccc']);
+
+      describe("creating a threshold scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testThresholdScale1_val1, thresholdScale(-10));   // "#ccc"
+          chai.assert.equal(testThresholdScale1_val2, thresholdScale(20));    // "lightblue"
+          chai.assert.equal(testThresholdScale1_val3, thresholdScale(70));    // "orange"
+          chai.assert.equal(testThresholdScale1_val4, thresholdScale(110));   // "#ccc"
+        });
+      });
+    }, testThresholdScale1_val1.c_str(), testThresholdScale1_val2.c_str(), testThresholdScale1_val3.c_str(), testThresholdScale1_val4.c_str());
+  }
+};  
+
+struct TestOrdinalScale: emp::web::BaseTest {
+  // an ordinal scale with a string range
+  D3::OrdinalScale testOrdinalScale1;
+  std::string testOrdinalScale1_val1;
+  std::string testOrdinalScale1_val2;
+  std::string testOrdinalScale1_val3;
+  std::string testOrdinalScale1_val4;
+
+  TestOrdinalScale() { Setup(); }
+
+  void Setup() {
+    emp::array<std::string, 12> domainArr = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+    testOrdinalScale1.SetDomain(domainArr);
+    emp::array<std::string, 3> rangeArr = {"black", "#ccc", "#ccc"};
+    testOrdinalScale1.SetRange(rangeArr);
+    testOrdinalScale1_val1 = testOrdinalScale1.ApplyScale<std::string>(-10);
+    testOrdinalScale1_val2 = testOrdinalScale1.ApplyScale<std::string>(20);
+    testOrdinalScale1_val3 = testOrdinalScale1.ApplyScale<std::string>(70);
+    testOrdinalScale1_val4 = testOrdinalScale1.ApplyScale<std::string>(110);
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const testOrdinalScale1_val1 = UTF8ToString($0);
+      const testOrdinalScale1_val2 = UTF8ToString($1);
+      const testOrdinalScale1_val3 = UTF8ToString($2);
+      const testOrdinalScale1_val4 = UTF8ToString($3);
+      var myData = (['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']);
+
+      var ordinalScale = d3.scaleOrdinal()
+                            .domain(myData)
+                            .range(['black', '#ccc', '#ccc']);
+
+      describe("creating an ordinal scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testOrdinalScale1_val1, ordinalScale("Jan"));    // "black"
+          chai.assert.equal(testOrdinalScale1_val2, ordinalScale("Feb"));    // "#ccc"
+          chai.assert.equal(testOrdinalScale1_val3, ordinalScale("Mar"));    // "#ccc"
+          chai.assert.equal(testOrdinalScale1_val4, ordinalScale("Apr"));    // "blac"
+        });
+      });
+    }, testOrdinalScale1_val1.c_str(), testOrdinalScale1_val2.c_str(), testOrdinalScale1_val3.c_str(), testOrdinalScale1_val4.c_str());
+  }
+};  
+
+struct TestBandScale: emp::web::BaseTest {
+  // a band scale
+  D3::BandScale testBandScale1;
+  int testBandScale1_val1;
+  int testBandScale1_val2;
+  int testBandScale1_val3;
+  double testBandScale1_bandwidth;
+  double testBandScale1_step;
+
+  TestBandScale() { Setup(); }
+
+  void Setup() {
+    emp::array<std::string, 5> domainArr = {"Mon", "Tue", "Wed", "Thu", "Fri"};
+    testBandScale1.SetDomain(domainArr);
+    testBandScale1.SetRange(0, 200);
+    testBandScale1_val1 = testBandScale1.ApplyScale<int, std::string>("Mon");
+    testBandScale1_val2 = testBandScale1.ApplyScale<int, std::string>("Tue");
+    testBandScale1_val3 = testBandScale1.ApplyScale<int, std::string>("Fri");
+    testBandScale1_bandwidth = testBandScale1.GetBandwidth();
+    testBandScale1_step = testBandScale1.GetStep();
+  } 
+ 
+  void Describe() override {
+    EM_ASM({
+      const testBandScale1_val1 = $0;
+      const testBandScale1_val2 = $1;
+      const testBandScale1_val3 = $2;
+      const testBandScale1_bandwidth = $3;
+      const testBandScale1_step = $4;
+
+      var bandScale = d3.scaleBand()
+                        .domain(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
+                        .range([0, 200]);
+
+      describe("creating a band scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testBandScale1_val1, bandScale("Mon"));    // 0
+          chai.assert.equal(testBandScale1_val2, bandScale("Tue"));    // 40
+          chai.assert.equal(testBandScale1_val3, bandScale("Fri"));    // 160
+        });
+        it("should get the bandwidth correctly", function() {
+          chai.assert.equal(testBandScale1_bandwidth, bandScale.bandwidth());  // 40
+        });
+        it("should get the step correctly", function() {
+          chai.assert.equal(testBandScale1_step, bandScale.step());    // 40
+        });
+      });
+    }, testBandScale1_val1, testBandScale1_val2, testBandScale1_val3, 
+       testBandScale1_bandwidth, testBandScale1_step);
+  }
+};  
+
+struct TestPointScale: emp::web::BaseTest {
+  // a point scale
+  D3::PointScale testPointScale1;
+  int testPointScale1_val1;
+  int testPointScale1_val2;
+  int testPointScale1_val3;
+  double testPointScale1_bandwidth;
+  double testPointScale1_step;
+
+  TestPointScale() { Setup(); }
+
+  void Setup() {
+    emp::array<std::string, 5> domainArr = {"Mon", "Tue", "Wed", "Thu", "Fri"};
+    testPointScale1.SetDomain(domainArr);
+    testPointScale1.SetRange(0, 500);
+    testPointScale1_val1 = testPointScale1.ApplyScale<int, std::string>("Mon");
+    testPointScale1_val2 = testPointScale1.ApplyScale<int, std::string>("Tue");
+    testPointScale1_val3 = testPointScale1.ApplyScale<int, std::string>("Fri");
+    testPointScale1_bandwidth = testPointScale1.GetBandwidth();
+    testPointScale1_step = testPointScale1.GetStep();
+  } 
+ 
+  void Describe() override {
+    EM_ASM({
+      const testPointScale1_val1 = $0;
+      const testPointScale1_val2 = $1;
+      const testPointScale1_val3 = $2;
+      const testPointScale1_bandwidth = $3;
+      const testPointScale1_step = $4;
+
+      var pointScale = d3.scalePoint()
+                          .domain(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
+                          .range([0, 500]);  
+
+      describe("creating a point scale", function() {
+        it("should apply the first scale correctly", function() {
+          chai.assert.equal(testPointScale1_val1, pointScale("Mon"));    // 0
+          chai.assert.equal(testPointScale1_val2, pointScale("Tue"));    // 125
+          chai.assert.equal(testPointScale1_val3, pointScale("Fri"));    // 500
+        });
+        it("should get the bandwidth correctly", function() {
+          chai.assert.equal(testPointScale1_bandwidth, pointScale.bandwidth());  // 0
+        });
+        it("should get the step correctly", function() {
+          chai.assert.equal(testPointScale1_step, pointScale.step());    // 125
+        });
+      });
+    }, testPointScale1_val1, testPointScale1_val2, testPointScale1_val3, 
+       testPointScale1_bandwidth, testPointScale1_step);
+  }
+};  
+
 emp::web::MochaTestRunner test_runner;
 
 int main() {
@@ -586,7 +1400,24 @@ int main() {
   test_runner.AddTest<TestSymlogScale>("SymlogScale");
   test_runner.AddTest<TestIdentityScale>("IdentityScale");
   test_runner.AddTest<TestTimeScale>("TimeScale");
-  
+  test_runner.AddTest<TestSequentialScale>("SequentialScale");
+  test_runner.AddTest<TestSequentialLogScale>("SequentialLogScale");
+  test_runner.AddTest<TestSequentialPowScale>("SequentialPowScale");
+  test_runner.AddTest<TestSequentialSqrtScale>("SequentialSqrtScale");
+  test_runner.AddTest<TestSequentialSymlogScale>("SequentialSymlogScale");
+  test_runner.AddTest<TestSequentialQuantileScale>("SequentialQuantileScale");
+  test_runner.AddTest<TestDivergingScale>("DivergingScale");
+  test_runner.AddTest<TestDivergingLogScale>("DivergingLogScale");
+  test_runner.AddTest<TestDivergingPowScale>("DivergingPowScale");
+  test_runner.AddTest<TestDivergingSqrtScale>("DivergingSqrtScale");
+  test_runner.AddTest<TestDivergingSymlogScale>("DivergingSymlogScale");
+  test_runner.AddTest<TestQuantizeScale>("QuantizeScale");
+  test_runner.AddTest<TestQuantileScale>("QuantileScale");
+  test_runner.AddTest<TestThresholdScale>("ThresholdScale");
+  test_runner.AddTest<TestOrdinalScale>("OrdinalScale");
+  test_runner.AddTest<TestBandScale>("BandScale");
+  test_runner.AddTest<TestPointScale>("PointScale");
+
   test_runner.OnBeforeEachTest([]() {
     ResetD3Context();
   });
