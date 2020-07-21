@@ -135,6 +135,39 @@ struct Test_SelectionEnter : emp::web::BaseTest {
   }
 };
 
+// Tests the following Selection actions: Move
+struct Test_SelectionActions : emp::web::BaseTest {
+  D3::Selection svg_selection;
+  D3::Selection circle_selection;
+
+  Test_SelectionActions() : emp::web::BaseTest({"emp_test_container"}) {
+    EM_ASM({
+      $("#emp_test_container").append("<svg id='test_svg'><circle/><circle/></svg>");
+    });
+    svg_selection = D3::Select("#test_svg");
+    circle_selection = svg_selection.SelectAll("circle");
+
+    circle_selection.SetAttr("r", 5);
+    circle_selection.SetAttr("cx", 0);
+    circle_selection.SetAttr("cy", 0);
+    circle_selection.Move(100, 100);
+  }
+
+  void Describe() override {
+
+    EM_ASM({
+      describe("moving/transforming a selection", function() {
+
+        it("should move the circle selection by (100, 100)", function() {
+          chai.assert.equal(emp_d3.objects[$0].attr("transform"), "translate(100,100)");
+        });
+
+      });
+    }, circle_selection.GetID());
+  }
+
+};
+
 
 emp::web::MochaTestRunner test_runner;
 
@@ -146,6 +179,7 @@ int main() {
 
   test_runner.AddTest<Test_SelectionConstruction>("SelectionConstruction");
   test_runner.AddTest<Test_SelectionEnter>("Selection::Enter");
+  test_runner.AddTest<Test_SelectionActions>("SelectionActions");
 
   test_runner.OnBeforeEachTest([]() {
     ResetD3Context();
