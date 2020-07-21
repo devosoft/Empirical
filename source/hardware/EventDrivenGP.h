@@ -148,12 +148,12 @@ namespace emp {
       Event & operator=(const Event &) = default;
       Event & operator=(Event &&) = default;
       bool operator<(const Event & other) const {
-        return std::tie(id, affinity, msg, properties)
-          < std::tie(other.id, other.affinity, other.msg, other.properties);
+        return std::tie(id, affinity)
+          < std::tie(other.id, other.affinity);
       }
       bool operator==(const Event & other) const {
-        return std::tie(id, affinity, msg, properties)
-          == std::tie(other.id, other.affinity, msg, properties);
+        return std::tie(id, affinity)
+          == std::tie(other.id, other.affinity);
       }
       /// Does event object have given property?
       bool HasProperty(std::string property) const { return properties.count(property); }
