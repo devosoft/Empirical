@@ -10,7 +10,7 @@ namespace internal {
   // d3 objects to get initialized
   /// @cond __EMSCRIPTEN___STUFF
   extern "C" {
-    extern int get_emp_d3();
+    extern void get_emp_d3();
   }
   /// @endcond
 
@@ -27,6 +27,16 @@ namespace internal {
 
 }
 
+  /// This is a convenience function used to initialize the Empirical web/D3 layout so the user doesn't have to
+  static void InitializeEmpD3() {
+    static bool init = false;      // Make sure we only initialize once!
+    if (!init) {
+      internal::get_emp_d3();      // Call JS initializations
+      emp::Initialize();
+      init = true;
+    }
+  };
+
   /// A base object that all D3 objects inherit from. Handles storing the object in Javascript
   /// You probably don't want to instantiate this directly
   class D3_Base {
@@ -35,6 +45,7 @@ namespace internal {
 
     /// Default constructor - adds placeholder to emp_d3.objects array in Javascript
     D3_Base() {
+      InitializeEmpD3();
       this->id = internal::NextD3ID();
       EM_ASM({
         emp_d3.counts[$0] = 1;
@@ -44,6 +55,7 @@ namespace internal {
     /// Construct an object pointing to a pre-determined location in emp_d3.objects.
     /// Warning: This trusts that you know what you're doing in choosing an id.
     D3_Base(int id){
+      InitializeEmpD3();
       this->id = id;
 
       emp_assert(EM_ASM_INT({ return $0 in emp_d3.counts;}, this->id));
@@ -54,6 +66,7 @@ namespace internal {
     }
 
     D3_Base(const D3_Base & other) {
+      InitializeEmpD3();
       // make deep copy?
       this->id = other.id;
       EM_ASM({

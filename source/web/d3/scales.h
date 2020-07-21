@@ -5,8 +5,7 @@
  *
  *  @file  scales.h
  *  @brief Tools for scaling graph axes in D3.
- */
-
+**/
 
 #ifndef __EMP_D3_SCALES_H__
 #define __EMP_D3_SCALES_H__
@@ -35,17 +34,30 @@ namespace D3 {
   class Scale : public D3_Base {
   protected:
     Scale(int id) : D3_Base(id) { ; };
+    Scale() { ; }
 
     /// Decoy constructor so we don't construct extra base scales
     Scale(bool derived){;};
-  
+
   public:
-    Scale() { ; }
+
+    /// Make a copy of this scale
+    /// Copy constructor
+    Scale(const Scale & other) {
+      int new_id = EM_ASM_INT({
+        return emp_d3.objects.next_id++;
+      });
+      EM_ASM({
+        emp_d3.objects[$1] = emp_d3.objects[$0].copy();
+      }, other.id, new_id);
+
+      this->id = new_id;
+    }
 
     /// Set the domain of possible input values corresponding to values in the range
     /// Note that an array of strings can be passed in here
     template <typename T, size_t SIZE>
-    Scale & SetDomain(emp::array<T, SIZE> values) {
+    Scale & SetDomain(const emp::array<T, SIZE> & values) {
       emp::pass_array_to_javascript(values);
       EM_ASM({
         emp_d3.objects[$0].domain(emp_i.__incoming_array);
@@ -53,8 +65,6 @@ namespace D3 {
       return *this;
     }
 
-    // template<typename T>
-    // typename std::enable_if<std::is_integral<T>::value, Scale &>::type
     Scale & SetDomain(double min, double max) {
       EM_ASM({
         emp_d3.objects[$0].domain([$1, $2]);
@@ -62,21 +72,26 @@ namespace D3 {
       return *this;
     }
 
-    /// Set the range of possible output values corresponding to values in the domain. 
-    /// Output for values in between will be interpolated with a function determined 
-    /// by the type of the scale.
-    /// Note that an array of strings can be passed in here
-    template <typename T, size_t SIZE>
-    Scale & SetRange(emp::array<T, SIZE> values) {
-      emp::pass_array_to_javascript(values);
+    Scale & SetDomain(const std::string & lower, const std::string & upper) {
       EM_ASM({
-        emp_d3.objects[$0].range(emp_i.__incoming_array);
-      }, this->id); 
+        emp_d3.objects[$0].domain([UTF8ToString($1), UTF8ToString($2)]);
+      }, this->id, lower.c_str(), upper.c_str());
       return *this;
     }
 
-    // template<typename T>
-    // typename std::enable_if<std::is_integral<T>::value, Scale &>::type
+    /// Set the range of possible output values corresponding to values in the domain.
+    /// Output for values in between will be interpolated with a function determined
+    /// by the type of the scale.
+    /// Note that an array of strings can be passed in here
+    template <typename T, size_t SIZE>
+    Scale & SetRange(const emp::array<T, SIZE> & values) {
+      emp::pass_array_to_javascript(values);
+      EM_ASM({
+        emp_d3.objects[$0].range(emp_i.__incoming_array);
+      }, this->id);
+      return *this;
+    }
+
     Scale & SetRange(double min, double max) {
       EM_ASM({
         emp_d3.objects[$0].range([$1, $2]);
@@ -84,35 +99,22 @@ namespace D3 {
       return *this;
     }
 
-    /// Make a copy of this scale
-    Scale Copy() {
-      int new_id = EM_ASM_INT({
-        return emp_d3.objects.next_id++;
-      });
+    Scale & SetRange(const std::string & lower, const std::string & upper) {
       EM_ASM({
-        emp_d3.objects[$1] = emp_d3.objects[$0].copy();
-      }, this->id, new_id);
-      return Scale(new_id);
+        emp_d3.objects[$0].range([UTF8ToString($1), UTF8ToString($2)]);
+      }, this->id, lower.c_str(), upper.c_str());
+      return *this;
     }
 
-    std::string ApplyScaleString(double input) {
-      EM_ASM({
-        const resultStr = emp_d3.objects[$0]($1);
-        emp.PassStringToCpp(resultStr);
-      }, this->id, input);
-      return emp::pass_str_to_cpp();
-    }
+    // ApplyScale
+    // Note that when passing in an std::string as an input you must explicitly specify it 
+    // in the template (but when pasing in a double or an int it will match to the proper
+    // template automatically so you only need to specify the return type)
+    template<typename RETURN_T, typename INPUT_T>
+    RETURN_T ApplyScale(INPUT_T input) { ; }
 
-
-    std::string ApplyScaleString(int input) {
-      EM_ASM({
-        const resultStr = emp_d3.objects[$0]($1);
-        emp.PassStringToCpp(resultStr);
-      }, this->id, input);
-      return emp::pass_str_to_cpp();
-    }
-
-    std::string ApplyScaleString(const std::string & input) {
+    template<>
+    std::string ApplyScale<std::string, std::string>(std::string input) {
       EM_ASM({
         const resultStr = emp_d3.objects[$0](UTF8ToString($1));
         emp.PassStringToCpp(resultStr);
@@ -120,55 +122,100 @@ namespace D3 {
       return emp::pass_str_to_cpp();
     }
 
-    double ApplyScaleDouble(double input) {
-      return EM_ASM_DOUBLE({
-        return emp_d3.objects[$0]($1);
+    template<>
+    std::string ApplyScale<std::string, double>(double input) {
+      EM_ASM({
+        const resultStr = emp_d3.objects[$0]($1);
+        emp.PassStringToCpp(resultStr);
       }, this->id, input);
+      return emp::pass_str_to_cpp();
     }
 
-    double ApplyScaleDouble(int input) {
-      return EM_ASM_DOUBLE({
-        return emp_d3.objects[$0]($1);
+    template<>
+    std::string ApplyScale<std::string, int>(int input) {
+      EM_ASM({
+        const resultStr = emp_d3.objects[$0]($1);
+        emp.PassStringToCpp(resultStr);
       }, this->id, input);
+      return emp::pass_str_to_cpp();
     }
 
-    double ApplyScaleDouble(const std::string & input) {
+    template<>
+    double ApplyScale<double, std::string>(std::string input) {
       return EM_ASM_DOUBLE({
         return emp_d3.objects[$0](UTF8ToString($1));
       }, this->id, input.c_str());
     }
 
-    int ApplyScaleInt(double input) {
-      return EM_ASM_INT({
+    template<>
+    double ApplyScale<double, double>(double input) {
+      return EM_ASM_DOUBLE({
         return emp_d3.objects[$0]($1);
       }, this->id, input);
     }
 
-    int ApplyScaleInt(int input) {
-      return EM_ASM_INT({
+    template<>
+    double ApplyScale<double, int>(int input) {
+      return EM_ASM_DOUBLE({
         return emp_d3.objects[$0]($1);
       }, this->id, input);
     }
 
-    int ApplyScaleInt(const std::string & input) {
+    template<>
+    int ApplyScale<int, std::string>(std::string input) {
       return EM_ASM_INT({
         return emp_d3.objects[$0](UTF8ToString($1));
       }, this->id, input.c_str());
     }
-    
-    //TODO:Getters
+
+    template<>
+    int ApplyScale<int, double>(double input) {
+      return EM_ASM_INT({
+        return emp_d3.objects[$0]($1);
+      }, this->id, input);
+    }
+
+    template<>
+    int ApplyScale<int, int>(int input) {
+      return EM_ASM_INT({
+        return emp_d3.objects[$0]($1);
+      }, this->id, input);
+    }
+
+    // Getter methods for a scale's domain and range
+    template <typename T>
+    emp::vector<T> GetDomain() {
+      EM_ASM({
+        emp_i.__outgoing_array = emp_d3.objects[$0].domain();
+      }, this->id);
+      // access JS array
+      emp::vector<T> domain_vector;
+      emp::pass_vector_to_cpp(domain_vector);
+      return domain_vector;
+    }
+
+    template <typename T>
+    emp::vector<T> GetRange() {
+      EM_ASM({
+        emp_i.__outgoing_array = emp_d3.objects[$0].range();
+      }, this->id);
+      // access JS array
+      emp::vector<T> range_vector;
+      emp::pass_vector_to_cpp(range_vector);
+      return range_vector;
+    }
   };
 
   //////////////////////////////////////////////////////////
   /// Scales with continuous input and continuous output ///
   //////////////////////////////////////////////////////////
+  /// This is a base class to inherit from - it should never be made stand-alone
   class ContinuousScale : public Scale {
-  protected: 
+  protected:
     ContinuousScale(bool derived) : Scale(true) {;}
-  
-  public: 
     ContinuousScale() : Scale(true) {;}
-    
+
+  public:
     // Invert is only supported if the range is numeric. If the range is not numeric, returns NaN
     template <typename T>
     double Invert(T y) {
@@ -179,34 +226,43 @@ namespace D3 {
 
     // .ticks()
     ContinuousScale & SetTicks(int count) {
-      EM_ASM_ARGS({js.objects[$0].ticks($1);}, this->id, count);
+      EM_ASM({
+        emp_d3.objects[$0].ticks($1);
+      }, this->id, count);
       return *this;
     }
 
     // .tickFormat()
-    ContinuousScale & SetTickFormat(int count, const std::string & format) {
-    //TODO: format is technically optional, but what is the point of this
-    //function without it?
+    ContinuousScale & SetTickFormat(int count, const std::string & format="") {
       EM_ASM({
-        emp_d3.objects[$0].tickFormat($1, UTF8ToString($2));
+        const id = $0;
+        const count = $1;
+        const format = UTF8ToString($2);
+        if (format === "") {
+          emp_d3.objects[id].tickFormat(count);
+        }
+        else {
+          emp_d3.objects[id].tickFormat(count, format);
+        }
       }, this->id, count, format.c_str());
+
       return *this;
     }
 
     // .nice()
     /// Extend the domain so that it start and ends on nice values
     /// Nicing a scale only modifies the current domain
-    Scale & MakeNice() {
-      EM_ASM({ 
+    ContinuousScale & Nice() {
+      EM_ASM({
         emp_d3.objects[$0].nice()
       }, this->id);
       return *this;
     }
 
-    // Sets the scale’s range to the specified array of values 
-    // while also setting the scale’s interpolator to interpolateRound
+    /// Sets the scale’s range to the specified array of values
+    /// while also setting the scale’s interpolator to interpolateRound
     template <typename T, size_t SIZE>
-    ContinuousScale & SetRangeRound(emp::array<T,SIZE> values) {
+    ContinuousScale & SetRangeRound(const emp::array<T,SIZE> & values) {
       emp::pass_array_to_javascript(values);
       EM_ASM({
         emp_d3.objects[$0].rangeRound(emp.__incoming_array);
@@ -221,12 +277,11 @@ namespace D3 {
       return *this;
     }
 
-    // Enables or disables clamping accordingly
+    /// Enables or disables clamping accordingly
     ContinuousScale & SetClamp(bool clamp) {
       EM_ASM({ emp_d3.objects[$0].clamp($1); }, this->id, clamp);
       return *this;
     }
-
 
     // .interpolate() (need to pass in an interpolator)
     ContinuousScale & SetInterpolate(const std::string & interpolatorName) {
@@ -242,21 +297,14 @@ namespace D3 {
     }
 
     // .unknown()
-    ContinuousScale & SetUnkown(double value) {
+    ContinuousScale & SetUnknown(double value) {
       EM_ASM({
         emp_d3.objects[$0].unknown($1);
       }, this->id, value);
       return *this;
     }
 
-    ContinuousScale & SetUnkown(int value) {
-      EM_ASM({
-        emp_d3.objects[$0].unknown($1);
-      }, this->id, value);
-      return *this;
-    }
-
-    ContinuousScale & SetUnkown(const std::string & value) {
+    ContinuousScale & SetUnknown(const std::string & value) {
       EM_ASM({
         emp_d3.objects[$0](UTF8ToString($1));
       }, this->id, value.c_str());
@@ -268,7 +316,7 @@ namespace D3 {
   class LinearScale : public ContinuousScale {
   protected:
     LinearScale(bool derived) : ContinuousScale(true) { ; }
-  
+
   public:
     LinearScale() : ContinuousScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleLinear(); }, this->id);
@@ -279,7 +327,7 @@ namespace D3 {
   class PowScale : public ContinuousScale {
   protected:
     PowScale(bool derived) : ContinuousScale(true) { ; }
-  
+
   public:
     PowScale() : ContinuousScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scalePow(); }, this->id);
@@ -289,11 +337,6 @@ namespace D3 {
       EM_ASM({ emp_d3.objects[$0].exponent($1);}, this->id, ex);
       return *this;
     }
-    // PowScale & SqrtScale() {
-    //   EM_ASM({ emp_d3.objects[$0].exponent(0.5);}, this->id);
-    //   return *this;
-    //   // return PowScale().SetExponent(0.5);
-    // }
   };
 
   // scaleSqrt
@@ -301,19 +344,18 @@ namespace D3 {
   class SqrtScale : public ContinuousScale {
   protected:
     SqrtScale(bool derived) : ContinuousScale(true) { ; }
-  
+
   public:
     SqrtScale() : ContinuousScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleSqrt(); }, this->id);
-    } 
+    }
   };
-    
 
   // scaleLog
   class LogScale : public ContinuousScale {
   protected:
     LogScale(bool derived) : ContinuousScale(true) { ; }
-  
+
   public:
     LogScale() : ContinuousScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleLog(); }, this->id);
@@ -329,14 +371,14 @@ namespace D3 {
   class SymlogScale : public ContinuousScale {
   protected:
     SymlogScale(bool derived) : ContinuousScale(true) { ; }
-  
+
   public:
     SymlogScale() : ContinuousScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleSymlog(); }, this->id);
     }
 
     SymlogScale & SetConstant(double constant) {
-      EM_ASM({ emp_d3.objects[$0].constant($1);}, this->id, constant);
+      EM_ASM({ emp_d3.objects[$0].constant($1); }, this->id, constant);
       return *this;
     }
   };
@@ -345,7 +387,7 @@ namespace D3 {
   class IdentityScale : public ContinuousScale {
   protected:
     IdentityScale(bool derived) : ContinuousScale(true) { ; }
-  
+
   public:
     IdentityScale() : ContinuousScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleIdentity(); }, this->id);
@@ -355,16 +397,17 @@ namespace D3 {
     // Identity scales do not support rangeRound, clamp or interpolate
     template <typename T, size_t SIZE>
     ContinuousScale & SetRangeRound(emp::array<T,SIZE> values) = delete;
-    ContinuousScale &SetRangeRound(double min, double max) = delete;
+    ContinuousScale & SetRangeRound(double min, double max) = delete;
     ContinuousScale & SetClamp(bool clamp) = delete;
     ContinuousScale & SetInterpolate(const std::string & interpolatorName) = delete;
-  };  
+  };
 
+  // This functionality is included in the newest version of d3-scale, but not the newest version of base d3
   // scaleRadial
   // class RadialScale : public ContinuousScale {
   // protected:
   //   RadialScale(bool derived) : ContinuousScale(true) { ; }
-  
+
   // public:
   //   RadialScale() : ContinuousScale(true) {
   //     EM_ASM({ emp_d3.objects[$0] = d3.scaleRadial(); }, this->id);
@@ -373,59 +416,59 @@ namespace D3 {
   //   // get rid of functions that shouldn't be called:
   //   // Radial scales do not support interpolate
   //   ContinuousScale & SetInterpolate(const std::string & interpolatorName) = delete;
-  // };  
+  // };
+
+  // A struct to deal with dates that mimics the JS Date object
+  struct Date {
+    int year;
+    int month;
+    int day;
+    int hours;
+    int minutes;
+    int seconds;
+    int milliseconds;
+
+    Date() { ; }
+
+    // note that month should be passed in 0-indexed to keep consistent with JavaScript (0 = January)
+    Date(int year, int month, int day = 1, int hours = 0, int minutes = 0,
+    int seconds = 0, int milliseconds = 0) {
+      this->year = year;
+      this->month = month;
+      this->day = day;
+      this->hours = hours;
+      this->minutes = minutes;
+      this->seconds = seconds;
+      this->milliseconds = milliseconds;
+    }
+
+    std::string ToString() {
+      return std::to_string(this->year) + " " + std::to_string(this->month) + " " + std::to_string(this->day) +
+      " " + std::to_string(this->hours) + ":" + std::to_string(this->minutes) + ":" + std::to_string(this->seconds) +
+      ":" + std::to_string(this->milliseconds);
+    }
+  };
 
   // scaleTime
   class TimeScale : public ContinuousScale {
   protected:
     TimeScale(bool derived) : ContinuousScale(true) { ; }
-  
+
   public:
     TimeScale() : ContinuousScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleTime(); }, this->id);
     }
 
-    // get rid of functions that shouldn't be called 
+    // get rid of functions that shouldn't be called
     template <typename T, size_t SIZE>
-    Scale & SetDomain(emp::array<T, SIZE> values) = delete;
+    Scale & SetDomain(const emp::array<T, SIZE> & values) = delete;
     Scale & SetDomain(double min, double max) = delete;
-    double ApplyScaleDouble(double input) = delete;
-    double ApplyScaleDouble(int input) = delete;
-    double ApplyScaleDouble(const std::string & input) = delete;
-    int ApplyScaleInt(double input) = delete;
-    int ApplyScaleInt(int input) = delete;
-    int ApplyScaleInt(const std::string & input) = delete;
+    Scale & SetDomain(const std::string & lower, const std::string & upper) = delete;
     template <typename T>
     double Invert(T y) = delete;
-    
-    // A struct to deal with dates that mimics the JS Date object
-    struct Date {
-      int year;
-      int month;
-      int day;
-      int hours;
-      int minutes;
-      int seconds;
-      int milliseconds; 
+    template<typename RETURN_T, typename INPUT_T>
+    RETURN_T ApplyScale(INPUT_T input) = delete;
 
-      // note that month should be passed in 0 indexed to keep consistent with JavaScript (0 = January)
-      Date(int year, int month, int day = 1, int hours = 0, int minutes = 0,
-      int seconds = 0, int milliseconds = 0) {
-        this->year = year;
-        this->month = month;
-        this->day = day;
-        this->hours = hours;
-        this->minutes = minutes;
-        this->seconds = seconds;
-        this->milliseconds = milliseconds;
-      }
-
-      std::string ToString() {
-        return std::to_string(this->year) + " " + std::to_string(this->month) + " " + std::to_string(this->day) +
-        " " + std::to_string(this->hours) + ":" + std::to_string(this->minutes) + ":" + std::to_string(this->seconds) +
-        ":" + std::to_string(this->milliseconds);
-      } 
-    };
 
     // special SetDomain to deal with Dates
     TimeScale & SetDomain(const Date & dateMin, const Date & dateMax) {
@@ -456,7 +499,11 @@ namespace D3 {
       return *this;
     }
 
-    double ApplyScaleDouble(const Date & dateInput) {
+    template<typename T>
+    T ApplyScale(const Date & dateInput) { ; }
+
+    template<>
+    double ApplyScale<double>(const Date & dateInput) {
       return EM_ASM_DOUBLE({
         const id = $0;
         const year = $1;
@@ -466,14 +513,51 @@ namespace D3 {
         const minutes = $5;
         const seconds = $6;
         const milliseconds = $7;
-    
+
         const dateInput = new Date(year, month, day, hours, minutes, seconds, milliseconds);
         return emp_d3.objects[id](dateInput);
       }, this->id, dateInput.year, dateInput.month, dateInput.day, dateInput.hours, dateInput.minutes, dateInput.seconds, dateInput.milliseconds);
     }
 
-    // special Invert for dates
-    Date InvertDate(double input) {
+    template<>
+    int ApplyScale<int>(const Date & dateInput) {
+      return EM_ASM_INT({
+        const id = $0;
+        const year = $1;
+        const month = $2;
+        const day = $3;
+        const hours = $4;
+        const minutes = $5;
+        const seconds = $6;
+        const milliseconds = $7;
+
+        const dateInput = new Date(year, month, day, hours, minutes, seconds, milliseconds);
+        return emp_d3.objects[id](dateInput);
+      }, this->id, dateInput.year, dateInput.month, dateInput.day, dateInput.hours, dateInput.minutes, dateInput.seconds, dateInput.milliseconds);
+    }
+
+    // ApplyScale that returns a string
+    template<>
+    std::string ApplyScale<std::string>(const Date & dateInput) {
+      EM_ASM({
+        const id = $0;
+        const year = $1;
+        const month = $2;
+        const day = $3;
+        const hours = $4;
+        const minutes = $5;
+        const seconds = $6;
+        const milliseconds = $7;
+
+        const dateInput = new Date(year, month, day, hours, minutes, seconds, milliseconds);
+        const resultStr = emp_d3.objects[id](dateInput);
+        emp.PassStringToCpp(resultStr);
+      }, this->id, dateInput.year, dateInput.month, dateInput.day, dateInput.hours, dateInput.minutes, dateInput.seconds, dateInput.milliseconds);
+
+      return emp::pass_str_to_cpp();
+    }
+    
+    Date Invert(double input) {
       EM_ASM({
         const id = $0;
         const input = $1;
@@ -481,7 +565,25 @@ namespace D3 {
 
         emp_i.__outgoing_array = ([ newDate.getFullYear(), newDate.getMonth(), newDate.getDate(), newDate.getHours(), newDate.getMinutes(), newDate.getSeconds(), newDate.getMilliseconds() ]);
       }, this->id, input);
-      
+
+      // access JS array, create date struct
+      emp::array<int, 7> date_array;
+      emp::pass_array_to_cpp(date_array);
+      Date returnDate(date_array[0], date_array[1], date_array[2], date_array[3], date_array[4], date_array[5], date_array[6]);
+      return returnDate;
+    }
+
+    // we need this copy (for int inputs) since any templating has already been deleted from the base version of Invert
+    // (and trying to fix this makes the code messier than just adding this second function)
+    Date Invert(int input) {
+      EM_ASM({
+        const id = $0;
+        const input = $1;
+        const newDate = emp_d3.objects[id].invert(input);
+
+        emp_i.__outgoing_array = ([ newDate.getFullYear(), newDate.getMonth(), newDate.getDate(), newDate.getHours(), newDate.getMinutes(), newDate.getSeconds(), newDate.getMilliseconds() ]);
+      }, this->id, input);
+
       // access JS array, create date struct
       emp::array<int, 7> date_array;
       emp::pass_array_to_cpp(date_array);
@@ -489,30 +591,22 @@ namespace D3 {
       return returnDate;
     }
   };
-  
-  // scaleSequential
-  // is used for mapping continuous values to an output range 
-  // determined by a preset (or custom) interpolator
-  // the input domain and output range of a sequential scale always has exactly two elements,
-  // and the output range is typically specified as an interpolator rather than an array of values
-  class SequentialScale : public ContinuousScale {
-  protected:
-    SequentialScale(bool derived) : ContinuousScale(true) { ; }
-  
-  public:
-    SequentialScale() : ContinuousScale(true) {
-      EM_ASM({ emp_d3.objects[$0] = d3.scaleSequential(); }, this->id);
-    }
 
+  /// This is a base class for sequential or diverging scales to inherit from - it should never be called alone
+  class SequentialOrDivergingScale : public ContinuousScale {
+  protected:
+    SequentialOrDivergingScale(bool derived) : ContinuousScale(true) { ; }
+    SequentialOrDivergingScale() : ContinuousScale(true) {;}
+
+  public:
     // get rid of functions that shouldn't be called:
     // Identity scales do not support invert or interpolate
     template <typename T>
     double Invert(T y) = delete;
     ContinuousScale & SetInterpolate(const std::string & interpolatorName) = delete;
-  
-    
+
     // .interpolator
-    SequentialScale & SetInterpolator(const std::string & interpolatorName) {
+    SequentialOrDivergingScale & SetInterpolator(const std::string & interpolatorName) {
       // note: this doesn't allow you to specify arguments to a d3.interpolator function
       EM_ASM({
         const id = $0;
@@ -525,195 +619,283 @@ namespace D3 {
     }
   };
 
-  // scaleSequentialLog
-  class SequentialLogScale : public SequentialScale {
+  // scaleSequential
+  // is used for mapping continuous values to an output range
+  // determined by a preset (or custom) interpolator
+  // the input domain and output range of a sequential scale always has exactly two elements,
+  // and the output range is typically specified as an interpolator rather than an array of values
+  class SequentialScale : public SequentialOrDivergingScale {
   protected:
-    SequentialLogScale(bool derived) : SequentialScale(true) { ; }
+    SequentialScale(bool derived) : SequentialOrDivergingScale(true) { ; }
   public:
-    SequentialLogScale() : SequentialScale(true) {
+    SequentialScale() : SequentialOrDivergingScale(true) {
+      EM_ASM({ emp_d3.objects[$0] = d3.scaleSequential(); }, this->id);
+    }
+  };
+
+  // scaleSequentialLog
+  class SequentialLogScale : public SequentialOrDivergingScale {
+  protected:
+    SequentialLogScale(bool derived) : SequentialOrDivergingScale(true) { ; }
+  public:
+    SequentialLogScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialLog(); }, this->id);
+    }
+
+    SequentialLogScale & SetBase(double baseNum) {
+      EM_ASM({ emp_d3.objects[$0].base($1);}, this->id, baseNum);
+      return *this;
     }
   };
 
   // scaleSequentialPow
-  class SequentialPowScale : public SequentialScale {
+  class SequentialPowScale : public SequentialOrDivergingScale {
   protected:
-    SequentialPowScale(bool derived) : SequentialScale(true) { ; }
+    SequentialPowScale(bool derived) : SequentialOrDivergingScale(true) { ; }
   public:
-    SequentialPowScale() : SequentialScale(true) {
+    SequentialPowScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialPow(); }, this->id);
+    }
+
+    SequentialPowScale & SetExponent(double ex) {
+      EM_ASM({ emp_d3.objects[$0].exponent($1);}, this->id, ex);
+      return *this;
     }
   };
 
   // scaleSequentialSqrt
-  class SequentialSqrtScale : public SequentialScale {
+  class SequentialSqrtScale : public SequentialOrDivergingScale {
   protected:
-    SequentialSqrtScale(bool derived) : SequentialScale(true) { ; }
+    SequentialSqrtScale(bool derived) : SequentialOrDivergingScale(true) { ; }
   public:
-    SequentialSqrtScale() : SequentialScale(true) {
+    SequentialSqrtScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialSqrt(); }, this->id);
     }
   };
 
   // scaleSequentialSymlog
-  class SequentialSymlogScale : public SequentialScale {
+  class SequentialSymlogScale : public SequentialOrDivergingScale {
   protected:
-    SequentialSymlogScale(bool derived) : SequentialScale(true) { ; }
+    SequentialSymlogScale(bool derived) : SequentialOrDivergingScale(true) { ; }
   public:
-    SequentialSymlogScale() : SequentialScale(true) {
+    SequentialSymlogScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialSymlog(); }, this->id);
     }
-  };
 
-  // scaleSequentialQuantile
-  class SequentialQuantileScale : public SequentialScale {
-  protected:
-    SequentialQuantileScale(bool derived) : SequentialScale(true) { ; }
-  public:
-    SequentialQuantileScale() : SequentialScale(true) {
-      EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialQuantile(); }, this->id);
-    }
-
-    // .quantiles  
-    // Returns an array of n + 1 quantiles. For example, if n = 4, returns an array of five numbers: 
-    // the minimum value, the first quartile, the median, the third quartile, and the maximum.
-    emp::vector<double> GetQuantiles(const int n) {
-      EM_ASM({
-        emp_i.__outgoing_array = emp_d3.objects[$0].quantiles($1);
-      }, this->id, n);
-      // access JS array
-      emp::vector<double> quantile_vector;
-      emp::pass_vector_to_cpp(quantile_vector);
-      return quantile_vector;
-    }
-  };
-
-
-  // scaleDiverging
-  // map a continuous, numeric input domain to a continuous output range. 
-  // However, unlike continuous scales, the input domain and output range of a diverging scale always has exactly three elements,
-  // and the output range is typically specified as an interpolator rather than an array of values
-  class DivergingScale : public ContinuousScale {
-  protected:
-    DivergingScale(bool derived) : ContinuousScale(true) { ; }
-  
-  public:
-    DivergingScale() : ContinuousScale(true) {
-      EM_ASM({ emp_d3.objects[$0] = d3.scaleSequential(); }, this->id);
-    }
-
-    // get rid of functions that shouldn't be called:
-    // Identity scales do not support invert or interpolate
-    template <typename T>
-    double Invert(T y) = delete;
-    ContinuousScale & SetInterpolate(const std::string & interpolatorName) = delete;
-  
-    
-    // .interpolator
-    DivergingScale & SetInterpolator(const std::string & interpolatorName) {
-      // note: this doesn't allow you to specify arguments to a d3.interpolator function
-      EM_ASM({
-        const id = $0;
-        const interpolator_str = UTF8ToString($1);
-        var sel = emp_d3.find_function(interpolator_str);
-        emp_d3.objects[id].interpolator(sel);
-      }, this->id, interpolatorName.c_str());
-
+    SequentialSymlogScale & SetConstant(double constant) {
+      EM_ASM({ emp_d3.objects[$0].constant($1); }, this->id, constant);
       return *this;
     }
   };
 
-  // scaleDivergingLog
-  class DivergingLogScale : public DivergingScale {
+  // scaleSequentialQuantile
+  class SequentialQuantileScale : public SequentialOrDivergingScale {
   protected:
-    DivergingLogScale(bool derived) : DivergingScale(true) { ; }
+    SequentialQuantileScale(bool derived) : SequentialOrDivergingScale(true) { ; }
   public:
-    DivergingLogScale() : DivergingScale(true) {
+    SequentialQuantileScale() : SequentialOrDivergingScale(true) {
+      EM_ASM({ emp_d3.objects[$0] = d3.scaleSequentialQuantile(); }, this->id);
+    }
+
+    // This functionality is included in the newest version of d3-scale, but not base d3
+    // .quantiles
+    // Returns an array of n + 1 quantiles. For example, if n = 4, returns an array of five numbers:
+    // the minimum value, the first quartile, the median, the third quartile, and the maximum.
+    // emp::vector<double> GetQuantiles(int n) {
+    //   EM_ASM({
+    //     emp_i.__outgoing_array = emp_d3.objects[$0].quantiles($1);
+    //   }, this->id, n);
+    //   // access JS array
+    //   emp::vector<double> quantile_vector;
+    //   emp::pass_vector_to_cpp(quantile_vector);
+    //   return quantile_vector;
+    // }
+  };
+
+
+  // scaleDiverging
+  // map a continuous, numeric input domain to a continuous output range.
+  // However, unlike continuous scales, the input domain and output range of a diverging scale always has exactly three elements,
+  // and the output range is typically specified as an interpolator rather than an array of values
+  class DivergingScale : public SequentialOrDivergingScale {
+  protected:
+    DivergingScale(bool derived) : SequentialOrDivergingScale(true) { ; }
+  public:
+    DivergingScale() : SequentialOrDivergingScale(true) {
+      EM_ASM({ emp_d3.objects[$0] = d3.scaleDiverging(); }, this->id);
+    }
+  };
+
+  // scaleDivergingLog
+  class DivergingLogScale : public SequentialOrDivergingScale {
+  protected:
+    DivergingLogScale(bool derived) : SequentialOrDivergingScale(true) { ; }
+  public:
+    DivergingLogScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleDivergingLog(); }, this->id);
+    }
+
+    DivergingLogScale & SetBase(double baseNum) {
+      EM_ASM({ emp_d3.objects[$0].base($1);}, this->id, baseNum);
+      return *this;
     }
   };
 
   // scaleDivergingPow
-  class DivergingPowScale : public DivergingScale {
+  class DivergingPowScale : public SequentialOrDivergingScale {
   protected:
-    DivergingPowScale(bool derived) : DivergingScale(true) { ; }
+    DivergingPowScale(bool derived) : SequentialOrDivergingScale(true) { ; }
   public:
-    DivergingPowScale() : DivergingScale(true) {
+    DivergingPowScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleDivergingPow(); }, this->id);
+    }
+
+    DivergingPowScale & SetExponent(double ex) {
+      EM_ASM({ emp_d3.objects[$0].exponent($1);}, this->id, ex);
+      return *this;
     }
   };
 
   // scaleDivergingSqrt
-  class DivergingSqrtScale : public DivergingScale {
+  class DivergingSqrtScale : public SequentialOrDivergingScale {
   protected:
-    DivergingSqrtScale(bool derived) : DivergingScale(true) { ; }
+    DivergingSqrtScale(bool derived) : SequentialOrDivergingScale(true) { ; }
   public:
-    DivergingSqrtScale() : DivergingScale(true) {
+    DivergingSqrtScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleDivergingSqrt(); }, this->id);
     }
   };
 
   // scaleDivergingSymlog
-  class DivergingSymlogScale : public DivergingScale {
+  class DivergingSymlogScale : public SequentialOrDivergingScale {
   protected:
-    DivergingSymlogScale(bool derived) : DivergingScale(true) { ; }
+    DivergingSymlogScale(bool derived) : SequentialOrDivergingScale(true) { ; }
   public:
-    DivergingSymlogScale() : DivergingScale(true) {
+    DivergingSymlogScale() : SequentialOrDivergingScale(true) {
       EM_ASM({ emp_d3.objects[$0] = d3.scaleDivergingSymlog(); }, this->id);
+    }
+
+    DivergingSymlogScale & SetConstant(double constant) {
+      EM_ASM({ emp_d3.objects[$0].constant($1); }, this->id, constant);
+      return *this;
     }
   };
 
-  
+
   ////////////////////////////////////////////////////////
   /// Scales with continuous input and discrete output ///
   ////////////////////////////////////////////////////////
+  /// This is a base class to inherit from - it should never be called alone
   class ContinuousInputDiscreteOutputScale : public Scale {
-  protected: 
+  protected:
     ContinuousInputDiscreteOutputScale(bool derived) : Scale(true) {;}
-      
-  public: 
     ContinuousInputDiscreteOutputScale() : Scale(true) {;}
 
-    // needs to be fixed to return array and take in string
-    template <typename T>
-    double InvertExtent(T y) {
-      return EM_ASM_DOUBLE({
-        return emp_d3.objects[$0].invertExtent($1);
-      }, this->id, y);
+  public:
+    
+    emp::array<int, 2> InvertExtent(double input) {
+      EM_ASM({
+        emp_i.__outgoing_array = emp_d3.objects[$0].invertExtent($1);
+      }, this->id, input);
+      // access JS array
+      emp::array<int, 2> invertExtentArr;
+      emp::pass_array_to_cpp(invertExtentArr);
+      return invertExtentArr;
+    }
+
+    emp::array<int, 2> InvertExtent(const std::string & input) {
+      EM_ASM({
+        emp_i.__outgoing_array = emp_d3.objects[$0].invertExtent(UTF8ToString($1));
+      }, this->id, input.c_str());
+      // access JS array
+      emp::array<int, 2> invertExtentArr;
+      emp::pass_array_to_cpp(invertExtentArr);
+      return invertExtentArr;
     }
   };
 
   // scaleQuantize
-  // ticks tickformat nice thresholds
-  class QuantizeScale : public ContinuousInputDiscreteOutputScale { 
-  protected: 
+  class QuantizeScale : public ContinuousInputDiscreteOutputScale {
+  protected:
     QuantizeScale(bool derived) : ContinuousInputDiscreteOutputScale(true) {;}
-      
+
   public:
     QuantizeScale() : ContinuousInputDiscreteOutputScale(true) {
       EM_ASM({
         emp_d3.objects[$0] = d3.scaleQuantize();
       }, this->id);
     }
+
+    // .ticks()
+    QuantizeScale & SetTicks(int count) {
+      EM_ASM({
+        emp_d3.objects[$0].ticks($1);
+      }, this->id, count);
+      return *this;
+    }
+
+    // .tickFormat()
+    QuantizeScale & SetTickFormat(int count, const std::string & format="") {
+      EM_ASM({
+        const id = $0;
+        const count = $1;
+        const format = UTF8ToString($2);
+        if (format === "") {
+          emp_d3.objects[id].tickFormat(count);
+        }
+        else {
+          emp_d3.objects[id].tickFormat(count, format);
+        }
+      }, this->id, count, format.c_str());
+
+      return *this;
+    }
+
+    // .nice()
+    QuantizeScale & Nice() {
+      EM_ASM({
+        emp_d3.objects[$0].nice()
+      }, this->id);
+      return *this;
+    }
+
+    // .thresholds()
+    emp::vector<double> GetThresholds() {
+      EM_ASM({
+        emp_i.__outgoing_array = emp_d3.objects[$0].thresholds();
+      }, this->id);
+      // access JS array
+      emp::vector<double> thresholds_vec;
+      emp::pass_vector_to_cpp(thresholds_vec);
+      return thresholds_vec;
+    }
   };
 
   // scaleQuantile
   class QuantileScale : public ContinuousInputDiscreteOutputScale {
   protected:
-    // is there another design pattern besides decoy constructors?
     QuantileScale(bool derived) : ContinuousInputDiscreteOutputScale(true) {;}
-      
+
   public:
-    QuantileScale() : ContinuousInputDiscreteOutputScale(true) { 
+    QuantileScale() : ContinuousInputDiscreteOutputScale(true) {
       EM_ASM({
         emp_d3.objects[$0] = d3.scaleQuantile();
       }, this->id);
     }
-    //TODO: .quantiles() -- will return an array of numbers 
+
+    // .quantiles()
+    emp::vector<double> GetQuantiles() {
+      EM_ASM({
+        emp_i.__outgoing_array = emp_d3.objects[$0].quantiles();
+      }, this->id);
+      // access JS array
+      emp::vector<double> quantiles_vec;
+      emp::pass_vector_to_cpp(quantiles_vec);
+      return quantiles_vec;
+    }
   };
 
   // scaleThreshold
-  // no quantiles
   class ThresholdScale : public ContinuousInputDiscreteOutputScale {
   protected:
     ThresholdScale(bool derived) : ContinuousInputDiscreteOutputScale(true) {;}
@@ -729,22 +911,11 @@ namespace D3 {
   //////////////////////////////////////////////////////////
   ///   Scales with discrete input and discrete output   ///
   //////////////////////////////////////////////////////////
+  /// This is a base class to inherit from - it should never be called alone
   class DiscreteScale : public Scale {
-  protected: 
+  protected:
     DiscreteScale(bool derived) : Scale(true) {;}
-  
-  public: 
     DiscreteScale() : Scale(true) {;}
-
-    // get rid of functions that shouldn't be called 
-    Scale & SetDomain(double min, double max) = delete;
-
-    DiscreteScale & SetDomain(int min, int max) {
-      EM_ASM({
-        emp_d3.objects[$0].domain([$1, $2]);
-      }, this->id, min, max);
-      return *this;
-    }
   };
 
   // scaleOrdinal
@@ -771,9 +942,29 @@ namespace D3 {
         emp_d3.objects[$0] = d3.scaleBand()
       }, this->id);
     }
+
+    BandScale & Round(bool val) {
+      EM_ASM({
+        emp_d3.objects[$0].round(val);
+      }, this->id, val);
+      return *this;
+    }
+
+    double GetBandwidth() {
+      return EM_ASM_DOUBLE({
+        return emp_d3.objects[$0].bandwidth();
+      }, this->id);
+    }
+
+    double GetStep() {
+      return EM_ASM_DOUBLE({
+        return emp_d3.objects[$0].step();
+      }, this->id);
+    }
   };
 
   // scalePoint
+  // Point scales are a variant of band scales with the bandwidth fixed to zero
   class PointScale : public DiscreteScale {
   protected:
     PointScale(bool derived) : DiscreteScale(true) {;}
@@ -782,6 +973,25 @@ namespace D3 {
     PointScale() : DiscreteScale(true) {
       EM_ASM({
         emp_d3.objects[$0] = d3.scalePoint()
+      }, this->id);
+    }
+
+    PointScale & Round(bool val) {
+      EM_ASM({
+        emp_d3.objects[$0].round(val);
+      }, this->id, val);
+      return *this;
+    } 
+
+    double GetBandwidth() {
+      return EM_ASM_DOUBLE({
+        return emp_d3.objects[$0].bandwidth();
+      }, this->id);
+    }
+
+    double GetStep() {
+      return EM_ASM_DOUBLE({
+        return emp_d3.objects[$0].step();
       }, this->id);
     }
   };
