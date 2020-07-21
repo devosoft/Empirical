@@ -96,3 +96,43 @@ This allows for easier debugging of failed tests.
 
 Catch provides several different frameworks for constructing test cases which are detailed within
 `their documentation <https://github.com/philsquared/Catch/blob/master/docs/tutorial.md>`_.
+
+Running Tests with Docker
+-------------------------
+
+A `devosoft/empirical <https://hub.docker.com/r/devosoft/empirical>`_ Docker image has been set up
+to make recreating a development environment on your machine easier.
+The first step is to download Docker. https://docs.docker.com/get-docker/
+
+To download and run the Docker image, enter the following commands in the Docker terminal::
+
+                docker pull devosoft/empirical:latest
+                docker run --name emp-tests -dit devosoft/empirical:latest /sbin/init
+                docker exec -it emp-tests bash -l
+                
+To exit Docker containter shell::
+
+                CTRL+D
+                
+Commands to stop and start the Docker container::
+
+                docker start emp-tests
+                docker stop emp-tests
+                
+Commands to allow you to pull and push to Empirical GitHub (from Docker container shell)::
+
+                git remote rm origin
+                git remote add origin https://github.com/devosoft/Empirical.git
+                
+If you get :code:`error: cannot open display: 99` when running Mocha web tests, try::
+
+                Xvfb :99 -ac -screen 0 1024x768x8 &
+                export DISPLAY=:99
+                
+If you get an error prompting you to *check if server X is already running* after 
+entering :code:`Xvfb :99 -ac -screen 0 1024x768x8 &`, try this to kill the process::
+
+                ps -ef | grep Xvfb
+                kill *pid*
+
+**Note:** Instructions adapted from https://andy-carter.com/blog/setting-up-travis-locally-with-docker-to-test-continuous-integration and https://github.com/karma-runner/karma-firefox-launcher/issues/93#issuecomment-519333245
