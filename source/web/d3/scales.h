@@ -950,6 +950,29 @@ namespace D3 {
       return *this;
     }
 
+    BandScale & SetInnerPadding(double pad) {
+      EM_ASM({
+        emp_d3.objects[$0].paddingInner(pad);
+      }, this->id, pad);
+      return *this;
+    }
+
+    BandScale & SetOuterPadding(double pad) {
+      EM_ASM({
+        emp_d3.objects[$0].paddingOuter(pad);
+      }, this->id, pad);
+      return *this;
+    }
+
+    /// A convenience method for setting the inner and outer padding to the same padding value. 
+    /// If padding is not specified, returns the inner padding.
+    BandScale & SetPadding(double pad) {
+      EM_ASM({
+        emp_d3.objects[$0].padding(pad);
+      }, this->id, pad);
+      return *this;
+    }
+
     double GetBandwidth() {
       return EM_ASM_DOUBLE({
         return emp_d3.objects[$0].bandwidth();
@@ -982,6 +1005,13 @@ namespace D3 {
       }, this->id, val);
       return *this;
     } 
+    
+    PointScale & SetPadding(double pad) {
+      EM_ASM({
+        emp_d3.objects[$0].padding(pad);
+      }, this->id, pad);
+      return *this;
+    }
 
     double GetBandwidth() {
       return EM_ASM_DOUBLE({
