@@ -30,9 +30,10 @@ namespace D3 {
     std::string dom_id = "";
     std::string label_offset = "";
     std::string orientation;
-
-    double margin_top = 0.0;
-    double margin_left = 0.0;
+    bool has_padding = false;
+    double padding = 60;
+    double shift_x;
+    double shift_y;
 
   public:
 
@@ -49,16 +50,22 @@ namespace D3 {
     /// For example, if your label was "Per capita mortality", you could select the axis with:
     /// `D3::Select("#Percapitamortality_axis");`.
     ///
-    /// By default, this constructor will create an axisBottom with no label,
-    /// and will set the axis's id to "axis_[d3_index]." 
+    /// The padding argument shifts the axis a given distance (in px) away from the side of the 
+    /// svg that it corresponds with. For example, setting the padding to 80 means than an 
+    /// axisLeft would have an 80px gap between the axis line and the left side of its svg;
+    /// an axisBottom would have an 80px gap between the axis line and the bottom of its svg.
+    /// To set the exact initial position of the axis yourself, use the constructor that takes 
+    /// shift_x and shift_y arguments.
     ///
-    /// It will also set a margin of 60px between the axis and the side of the svg that it corresponds with. 
-    /// For example, an axisLeft will have a 60px margin between the axis line and the left side of its svg.
-    /// To set top and left margins yourself, use the other constructor below that takes margin arguments.
-    Axis(const std::string & type = "bottom", const std::string & label = "") {
+    /// By default, this constructor will create an axisBottom with no label, and will set the 
+    /// axis's id to "axis_[d3_index]." It will also set the padding to 60px, meaning that it 
+    /// will shift the axis 60px away from the side of the svg that it corresponds with.
+    Axis(const std::string & type = "bottom", const std::string & label = "", double padding = 60) {
       // The scale got added to the list of objects before this one
       this->label = label;
       this->orientation = type;
+      this->has_padding = true;
+      this->padding = padding;
 
       // if invalid type, sets to axisBottom and prints warning in debug mode
       emp_assert(std::regex_match(type, std::regex("left|right|bottom|top")) 
@@ -75,8 +82,9 @@ namespace D3 {
       }, this->id, scale.GetID(), type.c_str());
     }
 
-    /// Consruct an axis and specify its top and left margins in px.
-    /// The order of margin arguments is: top, right, bottom, left.
+    /// Consruct an axis and specify its initial position in px with shift_x and shift_y.
+    /// For example, given a shift_x of 50 and shift_y of 100, the axis will be shifted
+    /// 50px to the right and 100px down from its origin. 
     ///
     /// This doesn't draw anything yet, but sets up the necessary infrastructure
     /// to draw it when you call the Draw method. Optionally takes a label to label the axis with.
@@ -89,13 +97,14 @@ namespace D3 {
     ///
     /// By default, this constructor will create an axisBottom with no label,
     /// and will set the axis's id to "axis_[d3_index]."
-    Axis(const double & margin_top, const double & margin_left,
+    Axis(double shift_x, double shift_y,
          const std::string & type = "bottom", const std::string & label = "") {
       // The scale got added to the list of objects before this one
       this->label = label;
       this->orientation = type;
-      this->margin_top = margin_top;
-      this->margin_left = margin_left;
+      this->has_padding = false;
+      this->shift_x = shift_x;
+      this->shift_y = shift_y;
 
       // if invalid type, sets to axisBottom and prints warning in debug mode
       emp_assert(std::regex_match(type, std::regex("left|right|bottom|top")) 
@@ -112,8 +121,8 @@ namespace D3 {
       }, this->id, scale.GetID(), type.c_str());
     }
 
-    /// Draw axis on [selection] with intelligent default positioning or
-    /// positioned with specified margins (selection must contain a single SVG element).
+    /// Draw axis on [selection] with intelligent default positioning or positioned with
+    /// specified shift_x and shift_y (selection must contain a single SVG element).
     /// Returns a reference to this object.
     Axis& Draw(Selection & selection){
 
@@ -132,10 +141,10 @@ namespace D3 {
         const label_str = UTF8ToString($4);
         const label_offset = UTF8ToString($5); 
         const orient = UTF8ToString($6); 
-        const margin_top = $7;
-        const margin_left = $10;
-        
-        const margin_default = 60;
+        const has_padding = $7;
+        const padding = $8;
+        const shift_x = $9;
+        const shift_y = $10;
 
         var axis_range = emp_d3.objects[id].scale().range();
         emp_d3.objects[g] = emp_d3.objects[sel].append("g");
@@ -143,31 +152,34 @@ namespace D3 {
                     .attr("id", dom_id)
                     .call(emp_d3.objects[id]);
 
-        var canvas_width = emp_d3.objects[sel].attr("width");
-        var canvas_height = emp_d3.objects[sel].attr("height");
+        var svg_width = emp_d3.objects[sel].attr("width");
+        var svg_height = emp_d3.objects[sel].attr("height");
         
         var dy = "0em";
         var x_divisor = 2;
         var text_orient = 0;
+        var padding_translation = "";
         if (orient == "top") {
           dy = "-2.5em";
-          emp_d3.objects[g].attr("transform", "translate(0,"+margin_default+")");   
+          padding_translation = "translate(0,"+padding+")"; 
         } else if (orient == "left") {
           x_divisor = -2;
           dy = "-2.5em";
           text_orient = -90;
-          emp_d3.objects[g].attr("transform", "translate("+margin_default+",0)");
+          padding_translation = "translate("+padding+",0)";
         } else if (orient == "right") {
           dy = "-2.5em";
           text_orient = 90;
-          emp_d3.objects[g].attr("transform", "translate("+(canvas_width - margin_default)+",0)");
+          padding_translation = "translate("+(svg_width - padding)+",0)";
         } else {
           dy = "2.5em";
-          emp_d3.objects[g].attr("transform", "translate(0,"+(canvas_height - margin_default)+")");
+          padding_translation = "translate(0,"+(svg_height - padding)+")"; 
         }
 
-        if (margin_top != "") {
-          emp_d3.objects[g].attr("transform", "translate("+margin_left+","+margin_top+")");
+        if (has_padding) {
+          emp_d3.objects[g].attr("transform", padding_translation);
+        } else {
+          emp_d3.objects[g].attr("transform", "translate("+shift_x+","+shift_y+")");
         }
 
         if (label_offset != "") {
@@ -189,7 +201,7 @@ namespace D3 {
 
       }, this->id, selection.GetID(), dom_id.c_str(), group.GetID(), 
          label.c_str(), label_offset.c_str(), orientation.c_str(), 
-         margin_top, margin_left);
+         has_padding, padding, shift_x, shift_y);
 
       return *this; 
     }
