@@ -249,22 +249,6 @@ namespace D3 {
       D3::Selection s = svg.Select("#"+dom_id);
       ApplyAxis(s);
       return *this;
-    }
-
-    // TODO finish below
-
-    /// Change the orientation of the axis
-    Axis& ChangeOrientation(const std::string & type) {
-      this->orientation = type;
-      // if invalid type, sets to axisBottom and prints warning in debug mode
-      emp_assert(std::regex_match(type, std::regex("left|right|bottom|top")) 
-        && "WARNING: Invalid type given to axis constructor");
-
-      D3::Axis<D3::LinearScale> * axis = new D3::Axis<D3::LinearScale>(type);
-      /* TODO: delete old axis */
-      axis->Draw(group);
-
-      return *this;
     } 
 
   }; 
