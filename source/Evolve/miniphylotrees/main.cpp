@@ -16,19 +16,33 @@ using namespace std;
 int randScope;
 int numOrgs = 10;
 int parentNum;
-int numRounds = 100;
+int numGens = 100;
 int nextClade = 0;
+//int nextGenotype = 0;
 int systime = 0;
 
 class Organism{
 public:
     int clade;
+    //int genotype;
+
+    //heritable, can mutate in reproduction //replace clade with genotype
+    //need mutation rate .05 -> or higher (configurable at top)
+    //(.P use to determine if mutation happens)
+    //how much does genotype change when it mutates
+        //choose random new genotype within certain range
+        //option to turn on pressure for diversity (empirical config object) (change from command line)
 
     Organism(){
         clade = nextClade;
         nextClade++;
 
-        assert(nextClade == clade + 1);
+        //genotype = nextGenotype;
+        //nextGenotype++;
+
+        //cout << "GENOTYPE " << genotype << endl;
+
+        //assert(nextClade == clade + 1);
 
     }
 
@@ -49,10 +63,25 @@ public:
 };
 
 int chooseOrg(vector<Organism> &currentGen, emp::Random &randNum){
+
     parentNum = randNum.GetInt(10);  //chooses random spot in array for parent
     //cout << "parent chosen is in spot " << parentNum << " in currentGen array which is " << size(currentGen) << " long" << endl;
     return parentNum;
 }
+
+int chooseOrgDiversity(vector<Organism> &currentGen){
+    
+
+
+
+return 0;
+}
+
+//chooseOrgDiversity
+//preferntially choose rarer genotypes
+//how many copies of each genotype in pop, things with fewer have higher chance of getting chosen
+
+//always have rarest one reproduce!!!!!
 
 void switchGens(vector<Organism> &currentGen, vector<Organism> &childGen, emp::Systematics<Organism, int> &sys){
     currentGen.swap(childGen);
@@ -67,7 +96,7 @@ int main() {
 
     emp::Random randNum;
 
-    function<int(Organism)> taxonFunc = [](Organism org){return org.clade;};//takes org return int
+    function<int(Organism)> taxonFunc = [](Organism org){return org.clade;};//takes org return int //use .genotype
 
     //function<int(int)> square = [](int squaredNum){return (squaredNum*squaredNum);};
 
@@ -89,7 +118,7 @@ int main() {
 //        cout << currentGen[i] . printVect() << " " << endl;
 //    }
 
-    for (int i = 0; i < numRounds; i++) {
+    for (int i = 0; i < numGens; i++) {
         cout << "generation: " << i << endl;
         randScope = size(currentGen); //this tells the chooseOrg function how large the vector is
         assert(currentGen.size() == 10);
@@ -107,10 +136,10 @@ int main() {
         }
         //sys.PrintStatus();
         cout << "phylogenetic diversity: " << sys.GetPhylogeneticDiversity() << endl;
-        bool writeFile = writeToFile("treedata.csv", sys.GetPhylogeneticDiversity());
 
-        if(i == numRounds - 1){ 
-            sys.FindPhyloData(); 
+        if(i == numGens - 1){
+            //sys.FindPhyloData();
+            writeToFile("CladeMultiGen.csv", sys.GetPhylogeneticDiversity());
             }
 
 
@@ -122,9 +151,9 @@ int main() {
         systime++;
     }
 
-    int total_orgs = numRounds * numOrgs;
+    int total_orgs = numGens * numOrgs;
 
-    cout << "generations: " << numRounds << " / total organisms: " << total_orgs << endl;
+    cout << "generations: " << numGens << " / total organisms: " << total_orgs << endl;
     };
 
 bool writeToFile(string filename, int field_one){
