@@ -1388,9 +1388,9 @@ struct TestPointScale: emp::web::BaseTest {
 
 emp::web::MochaTestRunner test_runner;
 
-int main() {
-  emp::Initialize();
-  D3::internal::get_emp_d3();
+int main() { 
+  // emp::Initialize();
+  // D3::internal::get_emp_d3();
 
   test_runner.AddTest<TestLinearScale>("LinearScale");
   test_runner.AddTest<TestPowScale>("PowScale");
