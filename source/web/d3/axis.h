@@ -31,6 +31,9 @@ namespace D3 {
     std::string label_offset = "";
     std::string orientation;
 
+    double margin_top = 0.0;
+    double margin_left = 0.0;
+
   public:
 
     /// There are a lot of graphical elements associated with an axis, so it's best to group them all 
@@ -45,9 +48,13 @@ namespace D3 {
     ///
     /// For example, if your label was "Per capita mortality", you could select the axis with:
     /// `D3::Select("#Percapitamortality_axis");`.
-
-    //TODO constructor with margins
-
+    ///
+    /// By default, this constructor will create an axisBottom with no label,
+    /// and will set the axis's id to "axis_[d3_index]." 
+    ///
+    /// It will also set a margin of 60px between the axis and the side of the svg that it corresponds with. 
+    /// For example, an axisLeft will have a 60px margin between the axis line and the left side of its svg.
+    /// To set top and left margins yourself, use the other constructor below that takes margin arguments.
     Axis(const std::string & type = "bottom", const std::string & label = "") {
       // The scale got added to the list of objects before this one
       this->label = label;
@@ -68,8 +75,45 @@ namespace D3 {
       }, this->id, scale.GetID(), type.c_str());
     }
 
-    /// Draw axis on [selection] with intelligent default positioning
-    /// (selection must contain a single SVG element).
+    /// Consruct an axis and specify its top and left margins in px.
+    /// The order of margin arguments is: top, right, bottom, left.
+    ///
+    /// This doesn't draw anything yet, but sets up the necessary infrastructure
+    /// to draw it when you call the Draw method. Optionally takes a label to label the axis with.
+    /// This label will also be used to create an id for the axis, to make it easier to select it
+    /// later. The id will be the same as [label], but with all whitespace removed and "_axis"
+    /// appended to the end.
+    ///
+    /// For example, if your label was "Per capita mortality", you could select the axis with:
+    /// `D3::Select("#Percapitamortality_axis");`.
+    ///
+    /// By default, this constructor will create an axisBottom with no label,
+    /// and will set the axis's id to "axis_[d3_index]."
+    Axis(const double & margin_top, const double & margin_left,
+         const std::string & type = "bottom", const std::string & label = "") {
+      // The scale got added to the list of objects before this one
+      this->label = label;
+      this->orientation = type;
+      this->margin_top = margin_top;
+      this->margin_left = margin_left;
+
+      // if invalid type, sets to axisBottom and prints warning in debug mode
+      emp_assert(std::regex_match(type, std::regex("left|right|bottom|top")) 
+        && "WARNING: Invalid type given to axis constructor");
+
+      EM_ASM({
+        const id = $0;
+        const scale = emp_d3.objects[$1];
+        const type = UTF8ToString($2);
+        emp_d3.objects[id] = (type == "left") ? (d3.axisLeft(scale))
+                           : (type == "right") ? (d3.axisRight(scale))
+                           : (type == "top") ? (d3.axisTop(scale))
+                           : (d3.axisBottom(scale)); 
+      }, this->id, scale.GetID(), type.c_str());
+    }
+
+    /// Draw axis on [selection] with intelligent default positioning or
+    /// positioned with specified margins (selection must contain a single SVG element).
     /// Returns a reference to this object.
     Axis& Draw(Selection & selection){
 
@@ -88,6 +132,10 @@ namespace D3 {
         const label_str = UTF8ToString($4);
         const label_offset = UTF8ToString($5); 
         const orient = UTF8ToString($6); 
+        const margin_top = $7;
+        const margin_left = $10;
+        
+        const margin_default = 60;
 
         var axis_range = emp_d3.objects[id].scale().range();
         emp_d3.objects[g] = emp_d3.objects[sel].append("g");
@@ -95,7 +143,6 @@ namespace D3 {
                     .attr("id", dom_id)
                     .call(emp_d3.objects[id]);
 
-        const margin = 60;
         var canvas_width = emp_d3.objects[sel].attr("width");
         var canvas_height = emp_d3.objects[sel].attr("height");
         
@@ -104,19 +151,23 @@ namespace D3 {
         var text_orient = 0;
         if (orient == "top") {
           dy = "-2.5em";
-          emp_d3.objects[g].attr("transform", "translate(0,"+margin+")");   
+          emp_d3.objects[g].attr("transform", "translate(0,"+margin_default+")");   
         } else if (orient == "left") {
           x_divisor = -2;
           dy = "-2.5em";
           text_orient = -90;
-          emp_d3.objects[g].attr("transform", "translate("+margin+",0)");
+          emp_d3.objects[g].attr("transform", "translate("+margin_default+",0)");
         } else if (orient == "right") {
           dy = "-2.5em";
           text_orient = 90;
-          emp_d3.objects[g].attr("transform", "translate("+(canvas_width-margin)+",0)");
+          emp_d3.objects[g].attr("transform", "translate("+(canvas_width - margin_default)+",0)");
         } else {
           dy = "2.5em";
-          emp_d3.objects[g].attr("transform", "translate(0,"+(canvas_height-margin)+")");
+          emp_d3.objects[g].attr("transform", "translate(0,"+(canvas_height - margin_default)+")");
+        }
+
+        if (margin_top != "") {
+          emp_d3.objects[g].attr("transform", "translate("+margin_left+","+margin_top+")");
         }
 
         if (label_offset != "") {
@@ -136,8 +187,9 @@ namespace D3 {
                      .style("text-anchor", "middle")
                      .text(label_str);
 
-      }, this->id, selection.GetID(), dom_id.c_str(), group.GetID(), label.c_str(),
-         label_offset.c_str(), orientation.c_str());
+      }, this->id, selection.GetID(), dom_id.c_str(), group.GetID(), 
+         label.c_str(), label_offset.c_str(), orientation.c_str(), 
+         margin_top, margin_left);
 
       return *this; 
     }
