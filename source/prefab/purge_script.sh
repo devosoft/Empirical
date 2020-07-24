@@ -20,7 +20,8 @@ curl -X POST http://purge.jsdelivr.net \
 -d'{
 "path":[
 "/gh/devosoft/Empirical@prefab/source/prefab/DefaultConfigPanelStyle.css",
-"/gh/devosoft/Empirical@prefab/source/prefab/LoadingModal.js"
+"/gh/devosoft/Empirical@prefab/source/prefab/LoadingModal.js",
+"/gh/devosoft/Empirical@prefab/source/prefab/HighlightJS.js"
 ]
 }'
 

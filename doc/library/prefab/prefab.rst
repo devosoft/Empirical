@@ -18,10 +18,10 @@ You can view these tools in action `here <https://devosoft.github.io/empirical-p
 Card
 ~~~~
 The Card class allows you to define a Bootstrap style card into your project. 
-A card can be collapsible if its state parameter it set to :code:`OPEN` or :code:` CLOSED`.
+A card can be collapsible if its state parameter it set to :code:`OPEN` or :code:`CLOSED`.
 By default, if a card is collapsible, it will have toggle icons in the header, but this can be overridden by setting the :code:`showGlyphs` parameter to false.
 
-Since this class inherits from :code:`web::Div`, you can set styling and attributes with :code:`SetCS`S and :code:`SetAttr` respectively. 
+Since this class inherits from :code:`web::Div`, you can set styling and attributes with :code:`SetCSS` and :code:`SetAttr` respectively. 
 You can also stream your Card into other web components with the :code:`<<` operator.
 
 Example:
@@ -80,7 +80,8 @@ Example:
 
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.0/styles/default.min.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.0/highlight.min.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="https://cdn.jsdelivr.net/gh/devosoft/Empirical@prefab/source/prefab/HighlightJS.js"></script>
+
     
 .. _HighlightJS Library: https://highlightjs.org/
 .. _all languages: https://github.com/highlightjs/highlight.js/blob/master/SUPPORTED_LANGUAGES.md
@@ -196,7 +197,7 @@ To use this class:
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     
-Since this class inherits from web::Element, you can set styling and attributes with :code:`SetCSS()` and :code:`SetAttr()` respectively. 
+Since this class inherits from :code:`web::Element`, you can set styling and attributes with :code:`SetCSS()` and :code:`SetAttr()` respectively. 
 You can also stream your FontAwesomeIcon into other web components with the :code:`<<` operator.
 
 Example:
@@ -326,7 +327,7 @@ If you need to add a CSS class to the Input, do it after the creating the Toggle
 
 
 Since this class inherits from :code:`web::Element`, you can set styling and attributes with :code:`SetCSS()` and :code:`SetAttr()` respectively. 
-You can also stream your ToggleSwitch into other web components with the `<<` operator.
+You can also stream your ToggleSwitch into other web components with the :code:`<<` operator.
 
 Example:
 ********
