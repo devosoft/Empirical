@@ -592,9 +592,9 @@ namespace web {
         if (IsActive()) Attributes::Apply(info->id, setting, value);
       }
       /// New class will be appended to any existing classes for this widget, not overridden.
-      virtual void DoClass(const std::string & value){
-        info->extras.attr.DoAddClass(value);
-        if (IsActive()) Attributes::Apply(info->id, "class", info->extras.attr.GetAttrValue("class"));
+      virtual void DoAddAttr(const std::string attr, const std::string & value){
+        info->extras.attr.DoAddAttr(attr, value);
+        if (IsActive()) Attributes::Apply(info->id, attr, info->extras.attr.GetAttrValue(attr));
       }
       /// Listener options may be overridden in derived classes that have multiple listen targets.
       /// By default DoListen will track new listens and set them up immediately, if active.
@@ -636,12 +636,21 @@ namespace web {
         return SetCSS(setting2, val2, others...);    // Recurse to the others.
       }
 
-      /// Add more than one class to this widget.
-      template <typename SETTING_TYPE>
-      return_t & AddClass(SETTING_TYPE && value){
+      /// Add more than one value to an attribute.
+      template <typename T>
+      return_t & AddAttr(const std::string attr, T && value){
         emp_assert(info != nullptr);
-        DoClass(emp::to_string(value));
+        DoAddAttr(attr, emp::to_string(value));
         return (return_t &) *this;
+      }
+
+      /// Multiple Attributes can be added to simultaneously.
+      template <typename T1, typename T2, typename... OTHER_SETTINGS>
+      return_t & AddAttr(const std::string & setting1, T1 && val1,
+                            const std::string & setting2, T2 && val2,
+                            OTHER_SETTINGS... others) {
+        AddAttr(setting1, val1);                      // Set the first CSS value.
+        return AddAttr(setting2, val2, others...);    // Recurse to the others.
       }
 
       /// Multiple Attributes can be provided simultaneously.
