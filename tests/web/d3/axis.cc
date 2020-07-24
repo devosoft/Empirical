@@ -92,7 +92,7 @@ struct Test_Axis : emp::web::BaseTest {
 
     // set up a simple scale that all of the axes will be constructed on
     scale = D3::LinearScale();
-    scale.SetDomain(0, 100).SetRange(0, 500);
+    scale.SetDomain(0, 100).SetRange(50, 500);
 
     // set up axis for testing the default axis constructor
     default_axis = D3::Axis<D3::LinearScale>().SetScale(scale).Draw(svg_default_axis);
