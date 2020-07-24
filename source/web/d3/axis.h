@@ -31,13 +31,13 @@ namespace D3 {
     std::string label_offset = "";
     std::string orientation;
     bool has_padding = false;
-    double padding = 60;
+    double padding;
     double shift_x;
     double shift_y;
 
   public:
 
-    /// There are a lot of graphical elements associated with an axis, so it's best to group them all 
+    /// There are a lot of graphical elements associated with an axis, so it's best to group them all
     /// together into an HTML group element. This selection holds a pointer to the group for this axis.
     Selection group;
 
@@ -50,15 +50,15 @@ namespace D3 {
     /// For example, if your label was "Per capita mortality", you could select the axis with:
     /// `D3::Select("#Percapitamortality_axis");`.
     ///
-    /// The padding argument shifts the axis a given distance (in px) away from the side of the 
-    /// svg that it corresponds with. For example, setting the padding to 80 means than an 
+    /// The padding argument shifts the axis a given distance (in px) away from the side of the
+    /// svg that it corresponds with. For example, setting the padding to 80 means than an
     /// axisLeft would have an 80px gap between the axis line and the left side of its svg;
     /// an axisBottom would have an 80px gap between the axis line and the bottom of its svg.
-    /// To set the exact initial position of the axis yourself, use the constructor that takes 
+    /// To set the exact initial position of the axis yourself, use the constructor that takes
     /// shift_x and shift_y arguments.
     ///
-    /// By default, this constructor will create an axisBottom with no label, and will set the 
-    /// axis's id to "axis_[d3_index]." It will also set the padding to 60px, meaning that it 
+    /// By default, this constructor will create an axisBottom with no label, and will set the
+    /// axis's id to "axis_[d3_index]." It will also set the padding to 60px, meaning that it
     /// will shift the axis 60px away from the side of the svg that it corresponds with.
     Axis(const std::string & type = "bottom", const std::string & label = "", double padding = 60) {
       // The scale got added to the list of objects before this one
@@ -68,7 +68,7 @@ namespace D3 {
       this->padding = padding;
 
       // if invalid type, sets to axisBottom and prints warning in debug mode
-      emp_assert(std::regex_match(type, std::regex("left|right|bottom|top")) 
+      emp_assert(std::regex_match(type, std::regex("left|right|bottom|top"))
         && "WARNING: Invalid type given to axis constructor");
 
       EM_ASM({
@@ -78,13 +78,13 @@ namespace D3 {
         emp_d3.objects[id] = (type == "left") ? (d3.axisLeft(scale))
                            : (type == "right") ? (d3.axisRight(scale))
                            : (type == "top") ? (d3.axisTop(scale))
-                           : (d3.axisBottom(scale)); 
+                           : (d3.axisBottom(scale));
       }, this->id, scale.GetID(), type.c_str());
     }
 
     /// Consruct an axis and specify its initial position in px with shift_x and shift_y.
     /// For example, given a shift_x of 50 and shift_y of 100, the axis will be shifted
-    /// 50px to the right and 100px down from its origin. 
+    /// 50px to the right and 100px down from its origin.
     ///
     /// This doesn't draw anything yet, but sets up the necessary infrastructure
     /// to draw it when you call the Draw method. Optionally takes a label to label the axis with.
@@ -102,12 +102,11 @@ namespace D3 {
       // The scale got added to the list of objects before this one
       this->label = label;
       this->orientation = type;
-      this->has_padding = false;
       this->shift_x = shift_x;
       this->shift_y = shift_y;
 
       // if invalid type, sets to axisBottom and prints warning in debug mode
-      emp_assert(std::regex_match(type, std::regex("left|right|bottom|top")) 
+      emp_assert(std::regex_match(type, std::regex("left|right|bottom|top"))
         && "WARNING: Invalid type given to axis constructor");
 
       EM_ASM({
@@ -117,7 +116,7 @@ namespace D3 {
         emp_d3.objects[id] = (type == "left") ? (d3.axisLeft(scale))
                            : (type == "right") ? (d3.axisRight(scale))
                            : (type == "top") ? (d3.axisTop(scale))
-                           : (d3.axisBottom(scale)); 
+                           : (d3.axisBottom(scale));
       }, this->id, scale.GetID(), type.c_str());
     }
 
@@ -129,18 +128,18 @@ namespace D3 {
       // if no label given, dom_id is set to <id>_axis
       std::string nospace_label = label;
       emp::remove_whitespace(nospace_label); // DOM ids can't contain whitespace
-      dom_id = (label != "") ? nospace_label + "_axis" 
+      dom_id = (label != "") ? nospace_label + "_axis"
              //: emp::to_string(scale.GetID()) + "_axis";
              : "axis_" + emp::to_string(this->id);
 
       EM_ASM({
         const id = $0;
-        const sel = $1; 
+        const sel = $1;
         const dom_id = UTF8ToString($2);
-        const g = $3; 
+        const g = $3;
         const label_str = UTF8ToString($4);
-        const label_offset = UTF8ToString($5); 
-        const orient = UTF8ToString($6); 
+        const label_offset = UTF8ToString($5);
+        const orient = UTF8ToString($6);
         const has_padding = $7;
         const padding = $8;
         const shift_x = $9;
@@ -154,14 +153,14 @@ namespace D3 {
 
         var svg_width = emp_d3.objects[sel].attr("width");
         var svg_height = emp_d3.objects[sel].attr("height");
-        
+
         var dy = "0em";
         var x_divisor = 2;
         var text_orient = 0;
         var padding_translation = "";
         if (orient == "top") {
           dy = "-2.5em";
-          padding_translation = "translate(0,"+padding+")"; 
+          padding_translation = "translate(0,"+padding+")";
         } else if (orient == "left") {
           x_divisor = -2;
           dy = "-2.5em";
@@ -173,7 +172,7 @@ namespace D3 {
           padding_translation = "translate("+(svg_width - padding)+",0)";
         } else {
           dy = "2.5em";
-          padding_translation = "translate(0,"+(svg_height - padding)+")"; 
+          padding_translation = "translate(0,"+(svg_height - padding)+")";
         }
 
         if (has_padding) {
@@ -186,8 +185,8 @@ namespace D3 {
           dy = label_offset;
         }
 
-        var label_x = (axis_range[0] < axis_range[1]) 
-                    ? axis_range[0] + (axis_range[1]-axis_range[0])/x_divisor 
+        var label_x = (axis_range[0] < axis_range[1])
+                    ? axis_range[0] + (axis_range[1]-axis_range[0])/x_divisor
                     : axis_range[1] + (axis_range[0]-axis_range[1])/x_divisor;
 
         emp_d3.objects[g].append("text")
@@ -199,11 +198,11 @@ namespace D3 {
                      .style("text-anchor", "middle")
                      .text(label_str);
 
-      }, this->id, selection.GetID(), dom_id.c_str(), group.GetID(), 
-         label.c_str(), label_offset.c_str(), orientation.c_str(), 
+      }, this->id, selection.GetID(), dom_id.c_str(), group.GetID(),
+         label.c_str(), label_offset.c_str(), orientation.c_str(),
          has_padding, padding, shift_x, shift_y);
 
-      return *this; 
+      return *this;
     }
 
     template <typename T>
@@ -244,12 +243,18 @@ namespace D3 {
     /// Draw tries to make a good guess about where to place the axis, but sometimes you want to
     /// scoot it over. This method will move the axis to the x,y location specified.
     Axis& Move(int x, int y) {
+      // prints warning in debug mode if this method is called before Draw() since it will overwrite changes
+      emp_assert((dom_id != "") && "WARNING: Calling Draw() after this method will overwrite your changes");
+
       group.Move(x,y);
       return *this;
     }
 
     template <typename T, std::size_t SIZE>
     Axis& SetTickValues(const emp::array<T, SIZE> & values) {
+      // prints warning in debug mode if this method is called before Draw() since it will overwrite changes
+      emp_assert((dom_id != "") && "WARNING: Calling Draw() after this method will overwrite your changes");
+
       emp::pass_array_to_javascript(values);
       EM_ASM({
   	    emp_d3.objects[$0].tickValues(emp_i.__incoming_array);
@@ -258,6 +263,9 @@ namespace D3 {
     }
 
     Axis& SetTickSize(float size) {
+      // prints warning in debug mode if this method is called before Draw() since it will overwrite changes
+      emp_assert((dom_id != "") && "WARNING: Calling Draw() after this method will overwrite your changes");
+
       EM_ASM({
 	      emp_d3.objects[$0].tickSize($1);
       }, this->id, size);
@@ -265,6 +273,9 @@ namespace D3 {
     }
 
     Axis& SetTickSizeInner(float size) {
+      // prints warning in debug mode if this method is called before Draw() since it will overwrite changes
+      emp_assert((dom_id != "") && "WARNING: Calling Draw() after this method will overwrite your changes");
+
       EM_ASM({
 	      emp_d3.objects[$0].tickSizeInner($1);
 	    }, this->id, size);
@@ -272,6 +283,9 @@ namespace D3 {
     }
 
     Axis& SetTickSizeOuter(float size) {
+      // prints warning in debug mode if this method is called before Draw() since it will overwrite changes
+      emp_assert((dom_id != "") && "WARNING: Calling Draw() after this method will overwrite your changes");
+
       EM_ASM({
 	      emp_d3.objects[$0].tickSizeOuter($1);
   	  }, this->id, size);
@@ -279,25 +293,44 @@ namespace D3 {
     }
 
     Axis& SetTickPadding(int padding) {
+      // prints warning in debug mode if this method is called before Draw() since it will overwrite changes
+      emp_assert((dom_id != "") && "WARNING: Calling Draw() after this method will overwrite your changes");
+
       EM_ASM({
 	      emp_d3.objects[$0].tickPadding($1);
 	    }, this->id, padding);
       return *this;
     }
 
-    //TODO add  format param option
-
     /// Set the number of ticks along the axis
     Axis& SetTicks(int count){
+      // prints warning in debug mode if this method is called before Draw() since it will overwrite changes
+      emp_assert((dom_id != "") && "WARNING: Calling Draw() after this method will overwrite your changes");
+
       EM_ASM({
 	      emp_d3.objects[$0].ticks($1);
 	    }, this->id, count);
+      return *this;
+    }
+    /// Version of ticks() to set the number of ticks along the axis as well as the format
+    /// for displaying numbers assoiated with ticks. [format] should be a format following
+    /// [the rules for d3.format()](https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format)
+    Axis& SetTicks(int count, const std::string & format){
+      // prints warning in debug mode if this method is called before Draw() since it will overwrite changes
+      emp_assert((dom_id != "") && "WARNING: Calling Draw() after this method will overwrite your changes");
+
+      EM_ASM({
+	      emp_d3.objects[$0].ticks($1, $2);
+	    }, this->id, count, format);
       return *this;
     }
 
     /// Set the format for displaying numbers assoiated with ticks. [format] should be a format following
     /// [the rules for d3.format()](https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format)
     Axis& SetTickFormat(const std::string & format) {
+      // prints warning in debug mode if this method is called before Draw() since it will overwrite changes
+      emp_assert((dom_id != "") && "WARNING: Calling Draw() after this method will overwrite your changes");
+
       EM_ASM({
         emp_d3.objects[$0].tickFormat(d3.format(UTF8ToString($1)));
       }, this->id, format.c_str());
@@ -305,17 +338,37 @@ namespace D3 {
     }
 
     /// Adjust scale and axis to accomodate the new range of data specified by [new_min],
-    /// and [new_max]. [svg] is a Selection or Transition containing the current axis. 
+    /// and [new_max]. [svg] is a Selection or Transition containing the current axis.
     /// If it's a transition, then the rescaling will be animated.
+    /// Prints a warning in debug mode if this method is called before Draw()
+    /// since Draw() creates the dom_id required to select the axis.
+    /// There are three versions since SetDomain() can take three types of arguments.
+    template <typename A, size_t SIZE, typename T>
+    Axis& Rescale(const emp::array<A, SIZE> & new_min_and_max, const internal::SelectionOrTransition<T> & svg){
+      emp_assert((dom_id != "") && "WARNING: Rescale() cannot be called before Draw()");
+      this->scale.SetDomain(new_min_and_max);
+      D3::Selection s = svg.Select("#"+dom_id);
+      ApplyAxis(s);
+      return *this;
+    }
     template <typename T>
     Axis& Rescale(double new_min, double new_max, const internal::SelectionOrTransition<T> & svg){
+      emp_assert((dom_id != "") && "WARNING: Rescale() cannot be called before Draw()");
       this->scale.SetDomain(new_min, new_max);
       D3::Selection s = svg.Select("#"+dom_id);
       ApplyAxis(s);
       return *this;
-    } 
+    }
+    template <typename T>
+    Axis& Rescale(const std::string & lower, const std::string & upper, const internal::SelectionOrTransition<T> & svg){
+      emp_assert((dom_id != "") && "WARNING: Rescale() cannot be called before Draw()");
+      this->scale.SetDomain(lower, upper);
+      D3::Selection s = svg.Select("#"+dom_id);
+      ApplyAxis(s);
+      return *this;
+    }
 
-  }; 
+  };
 
   /// Helper function to draw a standard set of x and y axes
   /// Takes the desired x axis, y axis, and the selection on which to draw them
@@ -339,6 +392,6 @@ namespace D3 {
     }, x_axis.GetID(), y_axis.GetID(), x_axis.group.GetID(), y_axis.group.GetID());
   }
 
-} 
+}
 
 #endif
