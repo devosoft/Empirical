@@ -31,6 +31,8 @@
 //     - rescale axis by new domain
 //     - adjust label offset correctly
 //     - set tick size, padding, number, format, and new values
+//   - DrawAxes() convenience function (bottom and left axes that meet at origin)
+//     - position the axes correctly (both padding values taken into account)
 
 struct Test_Axis : emp::web::BaseTest {
 
@@ -40,6 +42,7 @@ struct Test_Axis : emp::web::BaseTest {
   D3::Selection svg_padded_axes;
   D3::Selection svg_shifted_axes;
   D3::Selection svg_edited_axis;
+  D3::Selection svg_drawn_axes;
 
   // Scale
   D3::LinearScale scale;
@@ -72,6 +75,7 @@ struct Test_Axis : emp::web::BaseTest {
     D3::Select("#d3_testing_div").Append("div").SetAttr("id", "padded_axes_div");
     D3::Select("#d3_testing_div").Append("div").SetAttr("id", "shifted_axes_div");
     D3::Select("#d3_testing_div").Append("div").SetAttr("id", "edited_axis_div");
+    D3::Select("#d3_testing_div").Append("div").SetAttr("id", "drawn_axes_div");
 
     // set the svg for default axis testing to 600x100px
     svg_default_axis = D3::Select("#default_axis_div").Append("svg").SetAttr("id", "default_axis_svg").SetAttr("width", 600).SetAttr("height", 100);
@@ -83,6 +87,8 @@ struct Test_Axis : emp::web::BaseTest {
     svg_shifted_axes = D3::Select("#shifted_axes_div").Append("svg").SetAttr("id", "shifted_axes_svg").SetAttr("width", 600).SetAttr("height", 200);
     // set the svg for edited axis testing to 600x100px
     svg_edited_axis = D3::Select("#edited_axis_div").Append("svg").SetAttr("id", "edited_axis_svg").SetAttr("width", 600).SetAttr("height", 100);
+    // set the svg for shifted axes testing to 600x600px (taller to fit vertical axis)
+    svg_drawn_axes = D3::Select("#drawn_axes_div").Append("svg").SetAttr("id", "drawn_axes_svg").SetAttr("width", 600).SetAttr("height", 600);
 
     // set up a simple scale that all of the axes will be constructed on
     scale = D3::LinearScale();
@@ -105,6 +111,10 @@ struct Test_Axis : emp::web::BaseTest {
     shifted_labeled_axis = D3::Axis<D3::LinearScale>(30, 55, "top", "Labeled Shifted").SetScale(scale).Draw(svg_shifted_axes);
     // set up axis to test other functions that can be called to edit a default axis
     edited_axis = D3::Axis<D3::LinearScale>("bottom", "Edited Axis").SetScale(scale).Draw(svg_edited_axis);
+    // set up axes to test DrawAxes() function
+    D3::Axis<D3::LinearScale> drawn_bottom_axis = D3::Axis<D3::LinearScale>("bottom", "DrawAxes Bottom", 90).SetScale(scale);
+    D3::Axis<D3::LinearScale> drawn_left_axis = D3::Axis<D3::LinearScale>("left", "DrawAxes Left", 170).SetScale(scale);
+    DrawAxes(drawn_bottom_axis, drawn_left_axis, svg_drawn_axes);
 
     // call various modifying functions on edited_axis to test them
     edited_axis.AdjustLabelOffset("4em");
@@ -398,6 +408,25 @@ struct Test_Axis : emp::web::BaseTest {
         });
         it("should change tick values (set first tick to '1122') and set formatting to ',.2r'", function() {
           chai.assert.equal(e_axis_tick_label.text(), "1,100");
+        });
+
+      });
+
+    });
+
+    // Test axes that are drawn with DrawAxes()
+    EM_ASM({
+
+      describe("Drawn Axes", function() {
+
+        var drawn_b_axis_container = d3.select("#drawn_axes_svg>g:nth-child(1)"); // padding: 90
+        var drawn_l_axis_container = d3.select("#drawn_axes_svg>g:nth-child(2)"); // padding: 170
+
+        it("should position the bottom axis correctly (shifted 170px right and 90px from bottom)", function() {
+          chai.assert.equal(drawn_b_axis_container.attr("transform"), "translate(170,510)");
+        });
+        it("should position the left axis correctly (shifted 170px right and 590px from bottom)", function() {
+          chai.assert.equal(drawn_l_axis_container.attr("transform"), "translate(170,10)");
         });
 
       });
