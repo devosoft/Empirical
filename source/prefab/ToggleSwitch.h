@@ -21,12 +21,14 @@ namespace emp {
                     // functionality because for toggle switch classes to work,
                     // the label element must come after input element. Label element is
                     // placed before input element in Input constructor.
-                    web::Input checkbox(in_cb, "checkbox", NULL, "", false, is_checked);
+                    web::Input checkbox(in_cb, "checkbox", "", "", false, is_checked);
                     *this << checkbox;
                     *this << label;
-                    label << in_label;
+                    if (in_label != ""){
+                        label << in_label;
+                    }
                     // NOTE: If you added a class to the input before you called this constructor, 
-                    // it will be overridden here. Instead, use AddClass after creating this object
+                    // it will be overridden here. Instead, use AddAttr("class", ___) after creating this object
                     checkbox.SetAttr("class", "custom-control-input"); 
                     this->SetAttr("class", "custom-control custom-switch");
                     this->SetCSS(
