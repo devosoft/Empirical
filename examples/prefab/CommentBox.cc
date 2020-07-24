@@ -6,7 +6,6 @@
 
 #include "web/web.h"
 #include "web/Div.h"
-#include "web/Element.h"
 #include "prefab/CommentBox.h"
 
 namespace UI = emp::web;
@@ -15,14 +14,10 @@ UI::Document doc("emp_base");
 
 int main()
 {
-    emp::prefab::CommentBox box;
-    UI::Div title("desktop_content");
-    title << "<h1>Content that shows on all screen sizes</h1>";
-    box.AddContent(title);
-    UI::Element mobile("span");
-    mobile << "<p>Content that only shows on small screens <br>Web conponents can be added as content</p>";
-    mobile << "<hr>";
-    box.AddMobileContent(mobile);
-    box.AddMobileContent("<b>String literals can also be added to box content!</b>");
-    doc << box;
+  emp::prefab::CommentBox box("comment_box");
+  doc << box;
+  box.AddContent("<h1>Comment Box Title</h1>");
+  UI::Div body("body");
+  box.AddContent(body);
+  body << "More content for comment box";
 }
