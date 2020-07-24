@@ -30,8 +30,6 @@ namespace D3 {
     std::string dom_id = "";
     std::string label_offset = "";
     std::string orientation;
-    bool has_padding = false;
-    double padding;
     double shift_x;
     double shift_y;
 
@@ -40,6 +38,11 @@ namespace D3 {
     /// There are a lot of graphical elements associated with an axis, so it's best to group them all
     /// together into an HTML group element. This selection holds a pointer to the group for this axis.
     Selection group;
+
+    /// Padding values set the distance between an axis line and its corresponding side of the svg.
+    /// They're also used by DrawAxes().
+    bool has_padding = false;
+    double padding;
 
     /// Consruct an axis - this doesn't draw anything yet, but sets up the necessary infrastructure
     /// to draw it when you call the Draw method. Optionally takes a label to label the axis with.
@@ -370,26 +373,46 @@ namespace D3 {
 
   };
 
-  /// Helper function to draw a standard set of x and y axes
-  /// Takes the desired x axis, y axis, and the selection on which to draw them
+  /// Helper function to draw a standard set of x and y axes at bottom and left.
+  /// Takes the desired x axis, y axis, and the selection on which to draw them.
+  /// Only takes padding into account (not shift). If either axis specifies
+  /// a padding value, it will be moved that distance away from the svg border and
+  /// the axes will meet at their origins. By default, they will have 60px padding.
   template <typename SCALE_X_TYPE = D3::LinearScale, typename SCALE_Y_TYPE = D3::LinearScale>
   void DrawAxes(Axis<SCALE_X_TYPE> & x_axis, Axis<SCALE_Y_TYPE> & y_axis, Selection & selection){
+    double x_axis_padding;
+    double y_axis_padding;
+
     x_axis.Draw(selection);
     y_axis.Draw(selection);
 
+    if (x_axis.has_padding) {
+      x_axis_padding = x_axis.padding;
+    } else {
+      x_axis_padding = 60;
+    }
+    if (y_axis.has_padding) {
+      y_axis_padding = y_axis.padding;
+    } else {
+      y_axis_padding = 60;
+    }
+
     EM_ASM({
-      const x_axis_id = $0;
-      const y_axis_id = $1;
-      const x_axis_g = $2;
-      const y_axis_g = $3;
+      const y_axis = $0;
+      const x_axis_g = $1;
+      const y_axis_g = $2;
+      const svg = $3;
+      const x_axis_padding = $4;
+      const y_axis_padding = $5;
 
-      x_range = emp_d3.objects[x_axis_id].scale().range();
-      y_range = emp_d3.objects[y_axis_id].scale().range();
+      var y_axis_height = d3.max(emp_d3.objects[y_axis].scale().range());
+      var svg_width = emp_d3.objects[svg].attr("width");
+      var svg_height = emp_d3.objects[svg].attr("height");
 
-      emp_d3.objects[x_axis_g].attr("transform", "translate(0,"+d3.max(y_range)+")");
-      emp_d3.objects[y_axis_g].attr("transform", "translate("+x_range[0]+",0)");
+      emp_d3.objects[x_axis_g].attr("transform", "translate("+y_axis_padding+","+(svg_height - x_axis_padding)+")");
+      emp_d3.objects[y_axis_g].attr("transform", "translate("+y_axis_padding+","+(svg_height - y_axis_height - x_axis_padding)+")");
 
-    }, x_axis.GetID(), y_axis.GetID(), x_axis.group.GetID(), y_axis.group.GetID());
+    }, y_axis.GetID(), x_axis.group.GetID(), y_axis.group.GetID(), selection.GetID(), x_axis_padding, y_axis_padding);
   }
 
 }
