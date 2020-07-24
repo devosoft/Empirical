@@ -15,7 +15,7 @@ OFLAGS_web_braces := -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMO
 CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../../source/web/library_emp.js --js-library ../../../source/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "stringToUTF8"]' -s WASM=0
 
 default: all
-all: d3_init.js scales.js selection.js transition.js
+all: d3_init.js scales.js axis.js selection.js transition.js
 
 
 d3_init.js: d3_init.cc
@@ -27,6 +27,9 @@ selection.js: selection.cc
 scales.js: scales.cc
 	$(CXX_web) $(CFLAGS_web) scales.cc -o scales.js
 
+axis.js: axis.cc
+	$(CXX_web) $(CFLAGS_web) axis.cc -o axis.js
+
 transition.js: transition.cc
 	$(CXX_web) $(CFLAGS_web) transition.cc -o transition.js
 
@@ -34,7 +37,7 @@ transition.js: transition.cc
 #	$(CXX_web) $(CFLAGS_web) visualizations.cc -o test_visualizations.js
 
 clean:
-	rm -f d3_init.js transition.js *.js.map *.js.mem *~
+	rm -f d3_init.js selection.js scales.js axis.js transition.js *.js.map *.js.mem *~
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
