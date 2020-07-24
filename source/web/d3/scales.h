@@ -945,21 +945,21 @@ namespace D3 {
 
     BandScale & Round(bool val) {
       EM_ASM({
-        emp_d3.objects[$0].round(val);
+        emp_d3.objects[$0].round($1);
       }, this->id, val);
       return *this;
     }
 
     BandScale & SetInnerPadding(double pad) {
       EM_ASM({
-        emp_d3.objects[$0].paddingInner(pad);
+        emp_d3.objects[$0].paddingInner($1);
       }, this->id, pad);
       return *this;
     }
 
     BandScale & SetOuterPadding(double pad) {
       EM_ASM({
-        emp_d3.objects[$0].paddingOuter(pad);
+        emp_d3.objects[$0].paddingOuter($1);
       }, this->id, pad);
       return *this;
     }
@@ -968,7 +968,7 @@ namespace D3 {
     /// If padding is not specified, returns the inner padding.
     BandScale & SetPadding(double pad) {
       EM_ASM({
-        emp_d3.objects[$0].padding(pad);
+        emp_d3.objects[$0].padding($1);
       }, this->id, pad);
       return *this;
     }
@@ -1001,14 +1001,14 @@ namespace D3 {
 
     PointScale & Round(bool val) {
       EM_ASM({
-        emp_d3.objects[$0].round(val);
+        emp_d3.objects[$0].round($1);
       }, this->id, val);
       return *this;
     } 
     
     PointScale & SetPadding(double pad) {
       EM_ASM({
-        emp_d3.objects[$0].padding(pad);
+        emp_d3.objects[$0].padding($1);
       }, this->id, pad);
       return *this;
     }
