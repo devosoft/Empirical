@@ -44,14 +44,13 @@ namespace web {
       return *this;
     }
 
-    Attributes & DoAddClass(const std::string & in_val) {
-      if (!Has("class")){
-        emp::LibraryWarning("AddClass should be used after SetAttr has been used to set the first class \nEx: SetAttr(\"class\", \""+in_val+"\")");
+    Attributes & DoAddAttr(const std::string in_attr, const std::string & in_val) {
+      if (!Has(in_attr)){
+        DoSet(in_attr, in_val);
       }
-      // Eventhough warning is given, in_val is added as a class in any case
-      std::string classes = settings["class"];
-      classes += " " + in_val;
-      settings["class"] = classes;
+      else if(settings[in_attr].find(in_val) == std::string::npos){
+        settings[in_attr] += " , " + in_val;
+      }
       return *this;
     }
 

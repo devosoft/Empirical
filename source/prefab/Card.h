@@ -10,8 +10,8 @@ namespace emp {
     namespace prefab{
         class Card : public web::Div{
             private:
-                web::Div collapse_link;
-                web::Div collapse_body;
+                // web::Div collapse_link;
+                // web::Div collapse_body;
                 std::string card_base = this->GetID();
                 web::Div card_header{emp::to_string(card_base, "_card_header")};
                 web::Div card_body{emp::to_string(card_base, "_card_body")};
@@ -19,36 +19,25 @@ namespace emp {
                     this->SetAttr("class", "card");
                     card_header.SetAttr("class", "card-header");
                     card_body.SetAttr("class", "card-body");
-                    // card_header.AddClass("collapse_toggle_card_header");
                 }
             public:
                 enum Collapse {NONE, OPEN, CLOSED}; // collapse options for constructing a card 
-                Card(Collapse state=NONE, bool showGlyphs=true, const std::string & in_name=""): web::Div(in_name){
-                    AddBootstrap();
+                Card(Collapse state=NONE, bool showGlyphs=true, const std::string & in_name=""): web::Div(in_name){                    AddBootstrap();
                     if(state != NONE){ // if card is collapsible, make the collapse link the head of the card
-                        if(state == OPEN){ 
-                            prefab::CollapseCoupling accordion(card_header, card_body, true, emp::to_string(card_base+ "_card_collapse"));
-                            collapse_link = accordion.GetControllerDiv(0);
-                            collapse_body = accordion.GetTargetDiv(0);
-                        }
-                        else{
-                            prefab::CollapseCoupling accordion(card_header, card_body, false, emp::to_string(card_base + "_card_collapse"));
-                            collapse_link = accordion.GetControllerDiv(0);
-                            collapse_body = accordion.GetTargetDiv(0);
-                        }
+                        prefab::CollapseCoupling accordion(card_header, card_body, state == OPEN, emp::to_string(card_base+ "_card_collapse"));
+                        *this << accordion.GetControllerDiv();
+                        *this << accordion.GetTargetDiv();
+                        
                         if(showGlyphs){ // by default add glyphs to a collapsible card
                         // TODO: Don't use float, just set it to align to the right (need to make icon decend from div first)
                             prefab::FontAwesomeIcon up("fa-angle-double-up");
                             prefab::FontAwesomeIcon down("fa-angle-double-down");
                             card_header << up;
                             card_header << down;
-                            up.AddClass("float-right btn-link collapse_toggle setting_heading");
-                            down.AddClass("float-right btn-link collapse_toggle setting_heading");
-
+                            up.AddAttr("class", "float-right btn-link collapse_toggle setting_heading");
+                            down.AddAttr("class", "float-right btn-link collapse_toggle setting_heading");
                         }
-                        *this << collapse_link;
-                        *this << collapse_body;
-                        card_header.AddClass("collapse_toggle_card_header");
+                        card_header.AddAttr("class", "collapse_toggle_card_header");
                     }
                     else{ // plain card with no toggle enabled
                         *this << card_header;
