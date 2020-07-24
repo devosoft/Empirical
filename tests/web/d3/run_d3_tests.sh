@@ -5,7 +5,7 @@ echo "Source loaded"
 make all
 echo "compilation done"
 
-karmaWebTests=(d3_init scales selection transition)   
+karmaWebTests=(d3_init scales axis selection transition)   
 
 cd ../../../
 
