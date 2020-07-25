@@ -3,7 +3,6 @@
 
 #include "../web/Div.h"
 #include "../tools/string_utils.h"
-#include "ConfigPanel.h"
 
 // TODO: When prefab tools for adding mobile only and desktop only
 // content are created, remove AddMobileContent(), desktop_content 
@@ -14,7 +13,7 @@ namespace emp {
     namespace prefab{
         class ConfigPanel;
         class CommentBox: public web::Div {
-            friend class prefab::ConfigPanel;
+            friend prefab::ConfigPanel;
             private:
                 std::string box_base = this->GetID();
                 web::Div triangle{emp::to_string(box_base, "_triangle")};
