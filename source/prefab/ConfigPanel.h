@@ -116,7 +116,7 @@ namespace emp {
               Config & c,
               const std::string & div_name = "settings_div"
             ) : config(c)
-            , settings_div(div_name)
+            , settings_div(div_name) // TODO: construct a settings div without a name?
             { info = new internal::ConfigPanelInfo(div_name); }
 
             /// Sets on-update callback for a ConfigPanel.
@@ -177,7 +177,7 @@ namespace emp {
                     settings_div << group_divs[group_name];
 
                     // Prefab Card
-                    prefab::Card card(prefab::Card::Collapse::OPEN);
+                    prefab::Card card("INIT_OPEN");
                     group_divs[group_name] << card;
 
                     // Header content
