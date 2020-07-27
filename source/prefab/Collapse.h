@@ -47,8 +47,8 @@ namespace internal {
 // will change state (expand/collapse).
 class CollapseCoupling {
     private:
-        emp::vector<web::Div> targets;
-        emp::vector<web::Div> controllers;
+        emp::vector<web::Widget> targets;
+        emp::vector<web::Widget> controllers;
         std::string target_class;
         // counter used to generate unique class names, shared by all instances of this class
         inline static int counter = 0; 
@@ -129,7 +129,7 @@ class CollapseCoupling {
         // (Like dictionary accesses, key/value pairs)
         
         // Returns the vector of all controllers associated with this CollapseCouple
-        emp::vector<web::Div> & GetControllerDivs(){
+        emp::vector<web::Widget> & GetControllerDivs(){
             return controllers;
         }
         // Returns the controller at the given index
@@ -137,11 +137,11 @@ class CollapseCoupling {
             return controllers[index];
         }
         // Returns the vector of all targets associated with this CollapseCouple
-        emp::vector<web::Div> & GetTargetDivs(){
+        emp::vector<web::Widget> & GetTargetDivs(){
             return targets;
         }
         // Returns the target at the given index
-        web::Div & GetTargetDiv(int index=0){
+        web::Widget & GetTargetDiv(int index=0){
             return targets[index];
         }
 };
