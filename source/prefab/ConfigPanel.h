@@ -116,7 +116,7 @@ namespace emp {
               Config & c,
               const std::string & div_name = "settings_div"
             ) : config(c)
-            , settings_div(div_name)
+            , settings_div(div_name) // TODO: construct a settings div without a name?
             { info = new internal::ConfigPanelInfo(div_name); }
 
             /// Sets on-update callback for a ConfigPanel.
@@ -186,6 +186,7 @@ namespace emp {
 					web::Div inline_elements(group_name + "_inline");
 =======
                     // Prefab Card
+<<<<<<< HEAD
 <<<<<<< HEAD
                     emp::Card card("card_collapse_" + group_name, true);
                     group_divs[group_name] << card.GetDiv();
@@ -260,6 +261,9 @@ namespace emp {
 
 =======
                     prefab::Card card(prefab::Card::Collapse::OPEN);
+=======
+                    prefab::Card card("INIT_OPEN");
+>>>>>>> 962b5db... added ConfigPanelInfo class back in
                     group_divs[group_name] << card;
 
                     // Header content
