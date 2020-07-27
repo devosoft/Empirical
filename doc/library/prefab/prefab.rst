@@ -17,9 +17,11 @@ You can view these tools in action `here <https://devosoft.github.io/empirical-p
 
 Card
 ~~~~
-The Card class allows you to define a Bootstrap style card into your project. 
-A card can be collapsible if its state parameter it set to :code:`OPEN` or :code:`CLOSED`.
-By default, if a card is collapsible, it will have toggle icons in the header, but this can be overridden by setting the :code:`showGlyphs` parameter to false.
+The Card class allows you to define a Bootstrap style card into your project.
+A card that is not collapsible will have its state set to :code:`STATIC`.
+Cards are static by default.
+A card can be collapsible if its state parameter it set to :code:`INIT_OPEN` or :code:`INIT_CLOSED`.
+By default, if a card is collapsible, it will have toggle icons in the header, but this can be overridden by setting the :code:`showGlyphs` parameter to :code:`false`.
 
 Since this class inherits from :code:`web::Div`, you can set styling and attributes with :code:`SetCSS` and :code:`SetAttr` respectively. 
 You can also stream your Card into other web components with the :code:`<<` operator.
@@ -33,7 +35,7 @@ Example:
 
     emp::web::Document doc("emp_base");
 
-    emp::prefab::Card my_card(emp::prefab::Card::Collapse::NONE);
+    emp::prefab::Card my_card("STATIC");
     doc << my_card;
 
     my_card.AddHeaderContent("Title");
