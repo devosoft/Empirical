@@ -26,7 +26,7 @@ function AddLoadingModal(){
     setTimeout(function () { 
         $('#loading_modal').modal('hide');
         },
-        10000);
+        600000); // 10 mins for testing purposes
 }
 function DemoLoadingModal(){
     $('#loading_modal').modal('show');
