@@ -80,7 +80,7 @@ public:
 
 int chooseOrg(vector<Organism> &currentGen, emp::Random &randNum){
 
-    parentNum = randNum.GetInt(numOrgs);  //chooses random spot in array for parent
+    parentNum = randNum.GetInt(size(currentGen));  //chooses random spot in array for parent
     //cout << "parent chosen is in spot " << parentNum << " in currentGen array which is " << size(currentGen) << " long" << endl;
     return parentNum;
 }
@@ -181,13 +181,13 @@ int main() {
         randScope = currentGen.size(); //this tells the chooseOrg function how large the vector is
         //assert(currentGen.size() == 10);
 
-        //calcFitness(currentGen, fitnessVect,randNum);
+        calcFitness(currentGen, fitnessVect,randNum);
 
 
         for(int r = 0; r < numOrgs; r++){
 
-            chooseOrg(currentGen, randNum);
-            //chooseOrgDiversity(fitnessVect, randNum); //chooses the parent of the next generation
+            //chooseOrg(currentGen, randNum);
+            chooseOrgDiversity(fitnessVect, randNum); //chooses the parent of the next generation
             //cout << "parent: " << parentNum << endl;
             sys.SetNextParent(parentNum);
             //currentGen[parentNum].reproduce(childGen, sys); //fills childGen with 10 Organisms

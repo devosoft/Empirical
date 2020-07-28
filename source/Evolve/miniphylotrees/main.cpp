@@ -1,65 +1,38 @@
 #include <iostream>
 #include <vector>
 #include <memory>
-#include <cstdlib>
 #include <assert.h>
 #include "../Systematics.h"
-#include "../../tools/Random.h"
 
 //g++ -std=c++17 -I../../ main.cpp -o main.o && ./main.o
 //for i in {1..5}; do g++ -std=c++17 -I../../ main.cpp -o main.o && ./main.o; done
 //for i in {1..100}; do ./main.o; done
 
+/*This is the null model for the systematics normalization project. This program generates a random tree with a depth of
+ * 100 generations. This can be changed in the numGens variable. This tree has 10 organisms per generation and uses a clade
+ * as the method of tracking in systematics.h. The program returns phylogenetic diversity after each generation and prints the
+ * final phylogenetic diversity to a csv file of your choice. You will have to uncomment the writeToFile function and give it a
+ * file path to use this function.
+ * You can also use this tree to test the systematics.h FindPhyloData() function. You can uncomment the line sys.FindPhyloData() to
+ * use this function of the program. */
+
 
 using namespace std;
 
-int randScope;
 int numOrgs = 10;
 int parentNum;
 int numGens = 100;
 int nextClade = 0;
-//int nextGenotype = 0;
 int systime = 0;
 
 class Organism{
 public:
     int clade;
-    //int genotype;
-
-    //heritable, can mutate in reproduction //replace clade with genotype
-    //need mutation rate .05 -> or higher (configurable at top)
-    //(.P use to determine if mutation happens)
-    //how much does genotype change when it mutates
-        //choose random new genotype within certain range
-        //option to turn on pressure for diversity (empirical config object) (change from command line)
 
     Organism(){
         clade = nextClade;
         nextClade++;
-
-        //genotype = nextGenotype;
-        //nextGenotype++;
-
-        //cout << "GENOTYPE " << genotype << endl;
-
-        //assert(nextClade == clade + 1);
-
     }
-
-    static const char * printVect(){
-        return "currentgen org";
-    }
-
-//    static void reproduce(vector<Organism> &childGen, emp::Systematics<Organism, int> &sys){
-//        for(int i = 0; i < 2; i++){
-//            childGen.emplace_back(); //fills childGen vector with Organisms
-//
-//            //ORG & org, WorldPosition pos, int update=-1
-//            emp::WorldPosition pos(i, 1);
-//            sys.AddOrg(childGen[i], pos, systime); //removed brackets childGen[i], {i, 0}
-//        }
-//        cout << "child generation created" << endl;
-//    //}
 };
 
 int chooseOrg(vector<Organism> &currentGen, emp::Random &randNum){
@@ -69,19 +42,6 @@ int chooseOrg(vector<Organism> &currentGen, emp::Random &randNum){
     return parentNum;
 }
 
-int chooseOrgDiversity(vector<Organism> &currentGen){
-    
-
-
-
-return 0;
-}
-
-//chooseOrgDiversity
-//preferntially choose rarer genotypes
-//how many copies of each genotype in pop, things with fewer have higher chance of getting chosen
-
-//always have rarest one reproduce!!!!!
 
 void switchGens(vector<Organism> &currentGen, vector<Organism> &childGen, emp::Systematics<Organism, int> &sys){
     currentGen.swap(childGen);
@@ -96,9 +56,7 @@ int main() {
 
     emp::Random randNum;
 
-    function<int(Organism)> taxonFunc = [](Organism org){return org.clade;};//takes org return int //use .genotype
-
-    //function<int(int)> square = [](int squaredNum){return (squaredNum*squaredNum);};
+    function<int(Organism)> taxonFunc = [](Organism org){return org.clade;};//takes org return int
 
     emp::Systematics<Organism, int> sys(taxonFunc); //optional 3rd arg
     sys.SetTrackSynchronous(true);
@@ -111,35 +69,31 @@ int main() {
 
     for (int i = 0; i < numOrgs; i++) {
         currentGen.emplace_back(); //currentGen is filled with 10 organism
-        sys.AddOrg(currentGen[i], i, systime); //parent is null (removed brackets)
+        sys.AddOrg(currentGen[i], i, systime); //parent is null (original organisms have no parent pointers)
     }
 
-//    for(int i = 0; i < currentGen.size(); i++){
-//        cout << currentGen[i] . printVect() << " " << endl;
-//    }
 
     for (int i = 0; i < numGens; i++) {
         cout << "generation: " << i << endl;
-        randScope = size(currentGen); //this tells the chooseOrg function how large the vector is
         assert(currentGen.size() == 10);
 
         for(int r = 0; r < 10; r++){
             chooseOrg(currentGen, randNum); //chooses the parent of the next generation
-            //cout << "parent: " << parentNum << endl;
             sys.SetNextParent(parentNum);
-            //currentGen[parentNum].reproduce(childGen, sys); //fills childGen with 10 Organisms
 
             childGen.emplace_back(); //fills childGen vector with Organisms
             emp::WorldPosition pos(r, 1);
-            sys.AddOrg(childGen[r], pos, systime); //removed brackets childGen[i], {i, 0}
-            //cout << "size of child population: " << size(childGen) << endl;
+            sys.AddOrg(childGen[r], pos, systime);
         }
-        //sys.PrintStatus();
+
+        //sys.PrintStatus(); //uncomment to see more info about systematics tracking
         cout << "phylogenetic diversity: " << sys.GetPhylogeneticDiversity() << endl;
 
         if(i == numGens - 1){
+            /* uncomment these for different program functionality described in file header. */
+
             //sys.FindPhyloData();
-            writeToFile("CladeMultiGen.csv", sys.GetPhylogeneticDiversity());
+            //writeToFile("filename.csv", sys.GetPhylogeneticDiversity());
             }
 
 
@@ -164,20 +118,3 @@ bool writeToFile(string filename, int field_one){
 
     return true;
 }
-
-//use only end phylo num
-
-//use python script to convert each value to percentile
-//order smallest to larget -- '
-
-//end up with file with 100 nums --star num and second num that starts percentile
-//in systematics class, we will want to modify some tree calcualtions
-
-//modify phpy diversity and others
-//give it optional arg, string pointing to file with percentiles
-//file as arg, should open file and read everything
-
-//check out file.h class (tools) -- use to read in file
-//at end of phylo funct, if data is providec to normalize, normalize
-
-//figure out which percentile it falls into
