@@ -29,6 +29,10 @@ module.exports = function(config) {
       'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.0/styles/default.min.css',
       'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.0/highlight.min.js',
       {pattern: 'source/prefab/HighlightJS.js'},
+      'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js',
+      'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js',
+      {pattern: 'source/prefab/LoadingModal.js'},
+      // TODO: put all prefab dependencies in a directory and link it somehow
       // {pattern: 'tests/web/CodeBlock/*', included: false},
       {pattern: 'tests/web/assets/*', included: false},
       {pattern: `tests/web/${config.filename}.js.map`, included: false},

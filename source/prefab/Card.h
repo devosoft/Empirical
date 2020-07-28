@@ -12,8 +12,8 @@ namespace prefab {
   class Card : public web::Div{
   private:
     std::string card_base = this->GetID();
-    web::Div card_header{emp::to_string(card_base, "_card_header")};
-    web::Div card_body{emp::to_string(card_base, "_card_body")};
+    web::Div card_header{emp::to_string(card_base, "_card_header")}; // all header content will be added here
+    web::Div card_body{emp::to_string(card_base, "_card_body")}; // all body content will be added here
     // Asssigns classes to card elements for styling
     void AddBootstrap(){
       this->SetAttr("class", "card");
@@ -28,8 +28,7 @@ namespace prefab {
       if(state == "STATIC"){ // static card with no toggle enabled
         *this << card_header;
         *this << card_body;
-      }
-      else{ 
+      } else { 
         // card is collapsible, make the collapse link the head of the card
         prefab::CollapseCoupling accordion(card_header, card_body, state == "INIT_OPEN", emp::to_string(card_base+ "_card_collapse"));
         *this << accordion.GetControllerDiv();
@@ -46,6 +45,7 @@ namespace prefab {
         card_header.AddAttr("class", "collapse_toggle_card_header");
       }
     }
+
     /// Add content to header section of card
     /// @param val content to be added to header, can be a web element or primitive type
     /// @param link_content indicates whether the content should have Bootstrap link properties (default false)
@@ -74,6 +74,7 @@ namespace prefab {
       void AddBodyContent(T val){
       card_body << val;
     }
+    
     // TODO: override operator<< so that it streams into body of card
     // Methods tried so far (without success) are listed in
     // Issue #345 (https://github.com/devosoft/Empirical/issues/345)
