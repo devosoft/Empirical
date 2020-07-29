@@ -148,24 +148,26 @@ namespace D3 {
         const shift_x = $9;
         const shift_y = $10;
 
-        var axis_range = emp_d3.objects[id].scale().range();
         emp_d3.objects[g] = emp_d3.objects[sel].append("g");
         emp_d3.objects[g].append("g")
-                    .attr("id", dom_id)
-                    .call(emp_d3.objects[id]);
+                         .attr("id", dom_id)
+                         .call(emp_d3.objects[id]);
 
         var svg_width = emp_d3.objects[sel].attr("width");
         var svg_height = emp_d3.objects[sel].attr("height");
 
+        var axis_range_low = d3.min(emp_d3.objects[id].scale().range());
+        var axis_range_high = d3.max(emp_d3.objects[id].scale().range());
+
         var dy = "0em";
-        var x_divisor = 2;
         var text_orient = 0;
         var padding_translation = "";
         if (orient == "top") {
           dy = "-2.5em";
           padding_translation = "translate(0,"+padding+")";
         } else if (orient == "left") {
-          x_divisor = -2;
+          axis_range_low *= -1;  // since left axis label is rotated -90,
+          axis_range_high *= -1; // range values must be given opposite sign
           dy = "-2.5em";
           text_orient = -90;
           padding_translation = "translate("+padding+",0)";
@@ -188,9 +190,7 @@ namespace D3 {
           dy = label_offset;
         }
 
-        var label_x = (axis_range[0] < axis_range[1])
-                    ? axis_range[0] + (axis_range[1]-axis_range[0])/x_divisor
-                    : axis_range[1] + (axis_range[0]-axis_range[1])/x_divisor;
+        var label_x = axis_range_low + (axis_range_high - axis_range_low) / 2;
 
         emp_d3.objects[g].append("text")
                      .attr("id", dom_id+"_label")
