@@ -1,3 +1,11 @@
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ * 
+ *  Unit Tests for emp::Ptr template.
+ **/
+
 #include "../unit_tests.h"
 
 #include "base/Ptr.h"
