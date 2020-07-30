@@ -5,7 +5,7 @@
  *
  *  @file  SettingConfig.h
  *  @brief A tool for collecting settings, including from files and the command line.
- *  @note Status: ALPHA
+ *  @note Status: DEPRECATED!
  */
 
 #ifndef EMP_SETTING_CONFIG_H

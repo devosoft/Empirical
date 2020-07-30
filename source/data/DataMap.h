@@ -127,6 +127,7 @@ namespace emp {
     }
     DataMap(DataMap && in_map) : memory(std::move(in_map.memory)), layout_ptr(in_map.layout_ptr) {
       in_map.memory.RawResize(0);
+      // @CAO: Should we set in_map.layout_ptr to null???
     }
 
     // Copy Operator...
@@ -240,6 +241,7 @@ namespace emp {
     }
 
     // Type-specific Getters and Setters
+    // @CAO: Should we change to GetDouble() and SetDouble() for clarity?
     double & GetValue(size_t id) { return Get<double>(id); }
     double GetValue(size_t id) const { return Get<double>(id); }
     double & GetValue(const std::string & name) { return Get<double>(name); }

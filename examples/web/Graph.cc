@@ -209,17 +209,22 @@ private:
   }
 
 public:
-  GraphDriver() : doc("emp_base")
+  GraphDriver()
+  : doc("emp_base")
+  , main_table(1,2,"main_table")
+  , graph_canvas(can_w, can_h, "graph_canvas")
+  , info_panel("info_panel")
+  , mode_select("mode")
+  , table_list(1,1,"adj_list")
+  , table_matrix(1,1,"adj_matrix")
   {
     doc << "<h2>Graph Explorer</h2>";
 
-    doc << (main_table = UI::Table(1,2,"main_table"));
-    main_table.GetCell(0,0) << (graph_canvas = UI::Canvas(can_w, can_h, "graph_canvas"));
-    main_table.GetCell(0,1) << (mode_select = UI::Selector("mode"));
-    main_table.GetCell(0,1) << (info_panel = UI::Div("info_panel"));
+    doc << main_table;
+    main_table.GetCell(0,0) << graph_canvas;
+    main_table.GetCell(0,1) << mode_select;
+    main_table.GetCell(0,1) << info_panel;
 
-    table_list = UI::Table(1,1,"adj_list");
-    table_matrix = UI::Table(1,1,"adj_matrix");
     info_panel << table_matrix;
 
     main_table.GetCell(0,0).SetCSS("vertical-align", "top");

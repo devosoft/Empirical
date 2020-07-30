@@ -1,9 +1,12 @@
 [submodule "third-party/Catch"]
 	path = third-party/Catch
-	url = https://github.com/philsquared/Catch.git
+	url = https://github.com/catchorg/Catch2.git
 [submodule "third-party/force-cover"]
 	path = third-party/force-cover
 	url = https://github.com/emilydolson/force-cover.git
 [submodule "third-party/cereal"]
 	path = third-party/cereal
 	url = https://github.com/mmore500/cereal.git
+[submodule "third-party/span-lite"]
+	path = third-party/span-lite
+	url = https://github.com/martinmoene/span-lite.git

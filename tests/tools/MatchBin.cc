@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
 
-#include "third-party/Catch/single_include/catch.hpp"
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>
 #include <cereal/types/unordered_map.hpp>
@@ -881,9 +881,9 @@ TEST_CASE("Test MatchBin", "[tools]")
     );
   }
 
-  REQUIRE(scores.GetMean() - 0.5 < 0.01);
+  REQUIRE(std::abs(scores.GetMean() - 0.5) < 0.01);
   REQUIRE(scores.GetMin() < 0.01);
-  REQUIRE(scores.GetMax() > 0.01);
+  REQUIRE(scores.GetMax() > 0.99);
   for (auto & c : scores.GetHistCounts()) {
     REQUIRE(c > N_SAMPLES / N_BINS - 20000);
     REQUIRE(c < N_SAMPLES / N_BINS + 20000);
@@ -899,9 +899,9 @@ TEST_CASE("Test MatchBin", "[tools]")
     );
   }
 
-  REQUIRE(scores.GetMean() - 0.5 < 0.01);
+  REQUIRE(std::abs(scores.GetMean() - 0.5) < 0.01);
   REQUIRE(scores.GetMin() < 0.01);
-  REQUIRE(scores.GetMax() > 0.01);
+  REQUIRE(scores.GetMax() > 0.99);
   for (auto & c : scores.GetHistCounts()) {
     REQUIRE(c > N_SAMPLES / N_BINS - 20000);
     REQUIRE(c < N_SAMPLES / N_BINS + 20000);
@@ -917,9 +917,9 @@ TEST_CASE("Test MatchBin", "[tools]")
     );
   }
 
-  REQUIRE(scores.GetMean() - 0.5 < 0.01);
+  REQUIRE(std::abs(scores.GetMean() - 0.5) < 0.01);
   REQUIRE(scores.GetMin() < 0.01);
-  REQUIRE(scores.GetMax() > 0.01);
+  REQUIRE(scores.GetMax() > 0.99);
   for (auto & c : scores.GetHistCounts()) {
     REQUIRE(c > N_SAMPLES / N_BINS - 20000);
     REQUIRE(c < N_SAMPLES / N_BINS + 20000);
@@ -935,9 +935,9 @@ TEST_CASE("Test MatchBin", "[tools]")
     );
   }
 
-  REQUIRE(scores.GetMean() - 0.5 < 0.01);
+  REQUIRE(std::abs(scores.GetMean() - 0.5) < 0.01);
   REQUIRE(scores.GetMin() < 0.01);
-  REQUIRE(scores.GetMax() > 0.01);
+  REQUIRE(scores.GetMax() > 0.99);
   for (auto & c : scores.GetHistCounts()) {
     REQUIRE(c > N_SAMPLES / N_BINS - 20000);
     REQUIRE(c < N_SAMPLES / N_BINS + 20000);

@@ -32,7 +32,7 @@
 #include "hash_utils.h"
 #include "random_utils.h"
 
-
+#include "../polyfill/span.h"
 
 namespace emp {
 
@@ -589,6 +589,15 @@ namespace emp {
       return (bit_set[field_id] >> pos_id) & 255;
     }
 
+    /// Get a read-only view into the internal array used by BitSet.
+    /// @return Read-only span of BitSet's bytes.
+    std::span<const std::byte> GetBytes() const {
+      return std::span<const std::byte>(
+        reinterpret_cast<const std::byte*>(bit_set),
+        NUM_BYTES
+      );
+    }
+
     /// Set the full byte starting at the bit at the specified index.
     void SetByte(size_t index, uint8_t value) {
       emp_assert(index < NUM_BYTES);
@@ -640,7 +649,8 @@ namespace emp {
         // we only need to do this
         // if (index * 32 == (NUM_FIELDS - 1) * FIELD_BITS)
         // but just doing it always is probably faster
-        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+        // check to make sure there are no leading ones in the unused bits
+        emp_assert((bit_set[NUM_FIELDS - 1] & ~MaskLow<field_t>(LAST_BIT)) == 0);
       }
 
     }
@@ -710,8 +720,10 @@ namespace emp {
         // we only need to do this
         // if (index * 64 == (NUM_FIELDS - 1) * FIELD_BITS)
         // but just doing it always is probably faster
-        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+        // check to make sure there are no leading ones in the unused bits
+        emp_assert((bit_set[NUM_FIELDS - 1] & ~MaskLow<field_t>(LAST_BIT)) == 0);
       }
+
 
     }
 
@@ -1371,12 +1383,7 @@ namespace std
     {
         size_t operator()( const emp::BitSet<N>& bs ) const
         {
-           static const uint32_t NUM_BYTES = 1 + ((bs.GetSize() - 1) >> 3);
-           size_t result = bs.GetByte(0);
-           for (unsigned int i = 1; i < NUM_BYTES; ++i){
-                result = emp::hash_combine(result, bs.GetByte(i));
-           }
-           return result;
+          return emp::murmur_hash(bs.GetBytes());
         }
     };
 }
