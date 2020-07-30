@@ -375,11 +375,18 @@ namespace D3 {
 
   /// Helper function to draw a standard set of x and y axes at bottom and left.
   /// Takes the desired x axis, y axis, and the selection on which to draw them.
+  ///
   /// Only takes padding into account (not shift). If either axis specifies
   /// a padding value, it will be moved that distance away from the svg border and
   /// the axes will meet at their origins. By default, they will have 60px padding.
+  ///
+  /// The axes' scale ranges' lower limits must be zero for the axes' origins to match up.
+  /// To move the pair to a different place, add padding values when constructing each axis.
+  /// The padding on the bottom axis will be their distance from the bottom of the svg,
+  /// and the padding on the left axis will be their distance from the svg's left edge.
   template <typename SCALE_X_TYPE = D3::LinearScale, typename SCALE_Y_TYPE = D3::LinearScale>
   void DrawAxes(Axis<SCALE_X_TYPE> & x_axis, Axis<SCALE_Y_TYPE> & y_axis, Selection & selection){
+
     double x_axis_padding;
     double y_axis_padding;
 
@@ -405,9 +412,13 @@ namespace D3 {
       const x_axis_padding = $4;
       const y_axis_padding = $5;
 
-      var y_axis_height = d3.max(emp_d3.objects[y_axis].scale().range());
       var svg_width = emp_d3.objects[svg].attr("width");
       var svg_height = emp_d3.objects[svg].attr("height");
+
+      var y_axis_range_low = d3.min(emp_d3.objects[y_axis].scale().range());
+      var y_axis_range_high = d3.max(emp_d3.objects[y_axis].scale().range());
+
+      var y_axis_height = y_axis_range_high - y_axis_range_low;
 
       emp_d3.objects[x_axis_g].attr("transform", "translate("+y_axis_padding+","+(svg_height - x_axis_padding)+")");
       emp_d3.objects[y_axis_g].attr("transform", "translate("+y_axis_padding+","+(svg_height - y_axis_height - x_axis_padding)+")");
