@@ -44,11 +44,15 @@ namespace web {
       return *this;
     }
 
+    /// Append a new value to an existing attribute
+    /// @param in_attr attribute name
+    /// @param in_val attribute value to be added
     Attributes & DoAddAttr(const std::string in_attr, const std::string & in_val) {
       if (!Has(in_attr)){
+        // Attribute has not been assigned to this Widget. Add it with DoSet instead
         DoSet(in_attr, in_val);
-      }
-      else if(settings[in_attr].find(in_val) == std::string::npos){
+      } else if(settings[in_attr].find(in_val) == std::string::npos){
+        // New value is not a duplicate of any values assigned to this attribute. Append it.
         settings[in_attr] += " , " + in_val;
       }
       return *this;
