@@ -473,7 +473,7 @@ namespace emp {
 
   template <typename Needle, typename Haystack,
             template <typename, typename> class... Cmp>
-  static constexpr auto variadic_index_of_v = {
+  static constexpr size_t variadic_index_of_v{
     variadic_index_of<Needle, Haystack, Cmp...>::value};
 
   namespace __impl_variadics_type_traits {
