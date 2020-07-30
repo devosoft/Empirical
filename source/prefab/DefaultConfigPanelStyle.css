@@ -1,114 +1,119 @@
 /*
- NOTE: If you modify this file, run the purge_script.sh script 
+ These are the default styles for prefab elements. You can
+ override any of these settings in your own CSS file as long
+ as it's linked after the this default CSS file in the
+ head of the HTML document.
+
+ NOTE: If you modify this file, run the purge_script.sh script
  to see your changes take effect in the browser
 */
 
 /* Glyphicon Toggle */
 .collapse_toggle[aria-expanded=true] .fa-angle-double-down {
-    display: none;
+  display: none;
 }
 .collapse_toggle[aria-expanded=true] .fa-angle-double-right {
-    display: none;
+  display: none;
 }
 .collapse_toggle[aria-expanded=false] .fa-angle-double-up {
-    display: none;
+  display: none;
 }
 .toggle_icon_right_margin {
-    margin-right: 10px;
+  margin-right: 10px;
 }
 
 /* Card */
 .card{
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 /* Card Header */
 .setting_heading {
-    color: rgb(58, 57, 57);
+  color: rgb(58, 57, 57);
 }
 .setting_heading:hover {
-    color: rgb(116, 114, 114);
+  color: rgb(116, 114, 114);
 }
 /* Change background of card header on hover to convey collapsibility */
 .collapse_toggle_card_header:hover {
-    background-color: #C0C0C0;
+  background-color: #C0C0C0;
 }
 
 /* Card Body */
 .setting_element {
-    width: 100%;
+  width: 100%;
 }
 .title_area {
-    width: 38%;
-    display: inline-block;
+  width: 38%;
+  display: inline-block;
 }
 .btn {
-    text-align: left;
+  text-align: left;
 }
 /* Form Inputs */
 .input_slider {
-    width: 38%;
-    margin-right: 10px;
+  width: 38%;
+  margin-right: 10px;
 }
 .input_number {
-    width: 18%;
-    right: 10px;
+  width: 18%;
+  right: 10px;
 }
 .input_text {
-    width: 57%;
+  width: 57%;
 }
 .input_bool {
-    width: 12%;
-    float: right;
+  width: 12%;
+  float: right;
 }
 
 /* Dropdown Bubble */
 .commentbox_triangle {
-    width: 0; 
-    height: 0; 
-    border-left: 12px solid transparent;
-    border-right: 12px solid transparent;
-    
-    border-bottom: 12px solid #ede9e8;
-    margin-left: 15px;
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+
+  border-bottom: 12px solid #ede9e8;
+  margin-left: 15px;
 }
 .commentbox_content {
-    padding: 10px;
-    background-color: #ede9e8;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    width: 95%;
+  padding: 10px;
+  background-color: #ede9e8;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  width: 95%;
 }
 .mobile_commentbox {
-    display: none;
+  display: none;
 }
 
 /* Loading Modal  */
 .bd-example-modal-lg .modal-dialog {
-    display: table;
-    position: relative;
-    margin: 0 auto;
-    top: calc(50% - 24px);
+  display: table;
+  position: relative;
+  margin: 0 auto;
+  top: calc(50% - 24px);
 }
-    
+
 .bd-example-modal-lg .modal-dialog .modal-content {
-    background-color: transparent;
-    border: none;
+  background-color: transparent;
+  border: none;
 }
 
 /* Mobile Version */
 @media screen and (max-width: 992px) {
-    .input_slider {
-        display: none;
-    }
-    /* Dropdown Bubble */
-    .mobile_commentbox {
-        display: inline;
-    }
-    .title_area {
-        width: 80%;
-    }
-    .input_bool {
-        width: 18%;
-    }
+  .input_slider {
+    display: none;
+  }
+  /* Dropdown Bubble */
+  .mobile_commentbox {
+    display: inline;
+  }
+  .title_area {
+    width: 80%;
+  }
+  .input_bool {
+    width: 18%;
+  }
 }

@@ -20,17 +20,26 @@ namespace prefab {
       card_header.SetAttr("class", "card-header");
       card_body.SetAttr("class", "card-body");
     }
+
   public:
     /// @param state indicate whether card should be STAITC, INIT_OPEN, or INIT_CLOSED (default STAITC)
     /// @param show_glyphs should toggle icons show in collapsible card header? (default true)
-    Card(const std::string & state="STATIC", const bool & show_glyphs=true, const std::string & in_name=""): web::Div(in_name){     
+    Card(
+      const std::string & state="STATIC",
+      const bool & show_glyphs=true,
+      const std::string & in_name=""
+    ): web::Div(in_name){
+
       AddBootstrap();
       if(state == "STATIC"){ // static card with no toggle enabled
         *this << card_header;
         *this << card_body;
-      } else { 
+      } else {
         // card is collapsible, make the collapse link the head of the card
-        prefab::CollapseCoupling accordion(card_header, card_body, state == "INIT_OPEN", emp::to_string(card_base+ "_card_collapse"));
+        prefab::CollapseCoupling accordion(card_header,
+                                            card_body,
+                                            state == "INIT_OPEN",
+                                            emp::to_string(card_base+ "_card_collapse"));
         *this << accordion.GetControllerDiv();
         *this << accordion.GetTargetDiv();
 
@@ -74,7 +83,7 @@ namespace prefab {
       void AddBodyContent(T val){
       card_body << val;
     }
-    
+
     // TODO: override operator<< so that it streams into body of card
     // Methods tried so far (without success) are listed in
     // Issue #345 (https://github.com/devosoft/Empirical/issues/345)

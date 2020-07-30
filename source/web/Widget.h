@@ -336,7 +336,7 @@ namespace web {
       virtual void GetHTML(std::stringstream & ss) = 0;
 
       // Derived widgets may also provide JavaScript code to be run on redraw.
-      virtual void TriggerJS() { 
+      virtual void TriggerJS() {
         on_update_js_signal.Trigger();
       }
 
@@ -591,11 +591,13 @@ namespace web {
         info->extras.attr.DoSet(setting, value);
         if (IsActive()) Attributes::Apply(info->id, setting, value);
       }
-      /// New class will be appended to any existing classes for this widget, not overridden.
+
+      /// New attribute value will be appended to any existing values for this widget, not overridden.
       virtual void DoAddAttr(const std::string attr, const std::string & value){
         info->extras.attr.DoAddAttr(attr, value);
         if (IsActive()) Attributes::Apply(info->id, attr, info->extras.attr.GetAttrValue(attr));
       }
+
       /// Listener options may be overridden in derived classes that have multiple listen targets.
       /// By default DoListen will track new listens and set them up immediately, if active.
       virtual void DoListen(const std::string & event_name, size_t fun_id) {
