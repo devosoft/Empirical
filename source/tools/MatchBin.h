@@ -100,6 +100,10 @@ namespace emp::internal {
     #endif
     bool logging_activated;
 
+    // shared file stream for each Matchbin
+    // this is done to prevent too many file handles.
+    static thread_local inline std::ofstream filestream{EMP_LOG_MATCHBIN_FILENAME};
+
     // a ContaierDataFile is a DataFile that runs a function on every element of a container before every write.
     // in this case, we simply return the data from our logbuffer.
     emp::ContainerDataFile<logbuffer_t> datafile;
@@ -178,7 +182,7 @@ namespace emp::internal {
       : log_counter(0)
       , instance_id(MakeID())
       , logging_activated(false)
-      , datafile(EMP_LOG_MATCHBIN_FILENAME)
+      , datafile(filestream)
       { SetupDatafile(); }
 
       ~MatchBinLog() {

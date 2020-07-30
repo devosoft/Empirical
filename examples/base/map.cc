@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2019.
+//  Copyright (C) Michigan State University, 2019-2020.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #include <algorithm>
@@ -25,6 +25,27 @@ int main()
  	      << std::endl;
   }
 
+
+  emp::map<int, std::string> test_map_copy(test_map);
+  std::cout << "\nCopy (by constructor):\n";
+  for (auto [key, value] : test_map_copy) {
+    std::cout << "  key = " << key
+ 	      << "  value = " << value
+ 	      << std::endl;
+  }
+
+  test_map[67] = "Sixty Seven (New!!)";
+  
+  test_map_copy = test_map;
+  std::cout << "\nCopy2 (by operator):\n";
+  for (auto [key, value] : test_map_copy) {
+    std::cout << "  key = " << key
+ 	      << "  value = " << value
+ 	      << std::endl;
+  }
+
+
+  
 
   emp::map<std::string, int> test_map2;
 

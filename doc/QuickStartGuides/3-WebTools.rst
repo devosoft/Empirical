@@ -218,13 +218,13 @@ it back from the container again.  So, for example instead of
 
 .. code-block:: C++
 
-    my_button.Label("PLEASE Click Me!");
+    my_button.SetLabel("PLEASE Click Me!");
 
 we could have said
 
 .. code-block:: C++
 
-    doc.Button("my_button").Label("PLEASE Click Me!");
+    doc.Button("my_button").SetLabel("PLEASE Click Me!");
 
 and :code:`doc` will properly look up the correct button for us (or trip an assert if the required
 button cannot be found.)  In practice, allowing containers to track Widgets is much easier

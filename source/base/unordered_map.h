@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019
+ *  @date 2019-2020.
  *
  *  @file unordered_map.h
  *  @brief A drop-in wrapper for std::unordered_map and unordered_multi_map; makes sure we create vars on access.
@@ -60,6 +60,7 @@ namespace emp {
     using size_type = typename base_t::size_type;
 
     unordered_map() = default;
+    
     explicit unordered_map ( size_type n,
                              const hasher& hf = hasher(),
                              const key_equal& eql = key_equal(),
@@ -110,6 +111,8 @@ namespace emp {
                     size_type n, const hasher& hf, const allocator_type& alloc )
       : base_t(il, n ,hf, alloc) { }
 
+    this_t & operator=(const this_t &) = default;
+    this_t & operator=(this_t &&) = default;
 
     proxy_t operator[] (const Key & k) {
       const bool is_init = (this->find(k) != this->end());
@@ -192,6 +195,9 @@ namespace emp {
     unordered_multimap ( std::initializer_list<value_type> il,
                     size_type n, const hasher& hf, const allocator_type& alloc )
       : base_t(il, n ,hf, alloc) { }
+
+    this_t & operator=(const this_t &) = default;
+    this_t & operator=(this_t &&) = default;
 
     proxy_t operator[] (const Key & k) {
       const bool is_init = (this->find(k) != this->end());

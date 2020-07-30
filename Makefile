@@ -1,7 +1,7 @@
 test: test-native test-examples test-web
 	make test-native
 	make test-examples
-	make test-web	
+	make test-web
 
 test-examples: test-native-examples test-web-examples
 
@@ -25,6 +25,14 @@ test-web-examples:
 
 test-web:
 	cd tests && make test-web
+
+../cookiecutter-empirical-project:
+	cd .. && git clone --recursive https://github.com/devosoft/cookiecutter-empirical-project.git
+
+test-cookiecutter: ../cookiecutter-empirical-project
+	. third-party/env/bin/activate && \
+	export COOKIECUTTER_EMP_DIR=../Empirical/source && \
+	cd ../cookiecutter-empirical-project && make clean && make test
 
 doc: build-doxygen-xml
 	cd doc && ./make_docs.sh
