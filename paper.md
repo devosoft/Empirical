@@ -2,6 +2,7 @@
 title: 'Empirical'
 tags:
   - C++
+  - Artificial Life
 authors:
   - name: Author 1
     orcid: 0000-0003-0872-7098
