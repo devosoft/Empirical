@@ -94,6 +94,11 @@ namespace web {
       info->Append(new_widget);
       return new_widget;
     }
+    template <class... T> web::Input AddInput(T &&... args) {
+      web::Input new_widget(std::forward<T>(args)...);
+      info->Append(new_widget);
+      return new_widget;
+    }
     template <class... T> web::Table AddTable(T &&... args) {
       web::Table new_widget(std::forward<T>(args)...);
       info->Append(new_widget);
