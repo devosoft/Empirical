@@ -85,9 +85,10 @@ namespace D3 {
       }, this->id, scale.GetID(), type.c_str());
     }
 
-    /// Consruct an axis and specify its initial position in px with shift_x and shift_y.
+    /// Construct an axis and specify its initial position in px with shift_x and shift_y.
     /// For example, given a shift_x of 50 and shift_y of 100, the axis will be shifted
-    /// 50px to the right and 100px down from its origin.
+    /// 50px to the right and 100px down from its origin. It's very helpful to use this
+    /// constructor to position your axes if you're using a scale range minimum that isn't zero.
     ///
     /// This doesn't draw anything yet, but sets up the necessary infrastructure
     /// to draw it when you call the Draw method. Optionally takes a label to label the axis with.
@@ -132,7 +133,6 @@ namespace D3 {
       std::string nospace_label = label;
       emp::remove_whitespace(nospace_label); // DOM ids can't contain whitespace
       dom_id = (label != "") ? nospace_label + "_axis"
-             //: emp::to_string(scale.GetID()) + "_axis";
              : "axis_" + emp::to_string(this->id);
 
       EM_ASM({
@@ -376,14 +376,13 @@ namespace D3 {
   /// Helper function to draw a standard set of x and y axes at bottom and left.
   /// Takes the desired x axis, y axis, and the selection on which to draw them.
   ///
-  /// Only takes padding into account (not shift). If either axis specifies
-  /// a padding value, it will be moved that distance away from the svg border and
-  /// the axes will meet at their origins. By default, they will have 60px padding.
+  /// Only takes padding into account (not shift). The padding on the bottom axis
+  /// will be their distance from the bottom of the svg, and the padding on the left axis
+  /// will be their distance from the svg's left edge. The axes will meet at their origins.
+  /// By default, they will have 60px padding.
   ///
   /// The axes' scale ranges' lower limits must be zero for the axes' origins to match up.
-  /// To move the pair to a different place, add padding values when constructing each axis.
-  /// The padding on the bottom axis will be their distance from the bottom of the svg,
-  /// and the padding on the left axis will be their distance from the svg's left edge.
+  /// TODO: make this function work with non-zero scale range minimums
   template <typename SCALE_X_TYPE = D3::LinearScale, typename SCALE_Y_TYPE = D3::LinearScale>
   void DrawAxes(Axis<SCALE_X_TYPE> & x_axis, Axis<SCALE_Y_TYPE> & y_axis, Selection & selection){
 

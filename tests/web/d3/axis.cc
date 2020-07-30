@@ -158,12 +158,8 @@ struct Test_Axis : emp::web::BaseTest {
     // set the svg for shifted axes testing to 600x600px (taller to fit vertical axis)
     svg_drawn_axes = D3::Select("#drawn_axes_div").Append("svg").SetAttr("id", "drawn_axes_svg").SetAttr("width", 600).SetAttr("height", 600);
     // set up axes to test DrawAxes() function
-
-    D3::LinearScale new_scale = D3::LinearScale();
-    new_scale.SetDomain(0, 100).SetRange(200, 400);
-
-    drawn_bottom_axis = D3::Axis<D3::LinearScale>("bottom", "DrawAxes Bottom", 90).SetScale(new_scale);
-    drawn_left_axis = D3::Axis<D3::LinearScale>  ("left", "DrawAxes Left", 170).SetScale(new_scale);
+    drawn_bottom_axis = D3::Axis<D3::LinearScale>("bottom", "DrawAxes Bottom", 90).SetScale(scale);
+    drawn_left_axis = D3::Axis<D3::LinearScale>  ("left", "DrawAxes Left", 170).SetScale(scale);
     DrawAxes(drawn_bottom_axis, drawn_left_axis, svg_drawn_axes);
 
     //////////////////////////////////////
@@ -347,7 +343,7 @@ struct Test_Axis : emp::web::BaseTest {
 
       describe("Padded axisBottom", function() {
 
-        var pad_b_axis_container = d3.select("#padded_axes_svg>g:nth-child(1)");
+        var pad_b_axis_container = d3.select("#padded_axes_svg>g:nth-child(1)"); // padding: 0
         var pad_b_axis = d3.select("#padded_axes_svg>g:nth-child(1)>g");
 
         it("should set id to 'axis_<cpp_id>' since no label provided", function() {
@@ -363,7 +359,7 @@ struct Test_Axis : emp::web::BaseTest {
 
       describe("Padded axisTop", function() {
 
-        var pad_t_axis_container = d3.select("#padded_axes_svg>g:nth-child(2)");
+        var pad_t_axis_container = d3.select("#padded_axes_svg>g:nth-child(2)"); // padding: 80
         var pad_t_axis = d3.select("#padded_axes_svg>g:nth-child(2)>g");
         var pad_t_axis_label = d3.select("#padded_axes_svg>g:nth-child(2)>text");
 
@@ -379,7 +375,7 @@ struct Test_Axis : emp::web::BaseTest {
 
       describe("Padded axisLeft", function() {
 
-        var pad_l_axis_container = d3.select("#padded_axes_svg>g:nth-child(3)");
+        var pad_l_axis_container = d3.select("#padded_axes_svg>g:nth-child(3)"); // padding: 70
         var pad_l_axis = d3.select("#padded_axes_svg>g:nth-child(3)>g");
         var pad_l_axis_label = d3.select("#padded_axes_svg>g:nth-child(3)>text");
 
@@ -395,7 +391,7 @@ struct Test_Axis : emp::web::BaseTest {
 
       describe("Padded axisRight", function() {
 
-        var pad_r_axis_container = d3.select("#padded_axes_svg>g:nth-child(4)");
+        var pad_r_axis_container = d3.select("#padded_axes_svg>g:nth-child(4)"); // padding: -10
         var pad_r_axis = d3.select("#padded_axes_svg>g:nth-child(4)>g");
         var pad_r_axis_label = d3.select("#padded_axes_svg>g:nth-child(4)>text");
 
@@ -415,10 +411,10 @@ struct Test_Axis : emp::web::BaseTest {
     EM_ASM({
       describe("Shifted Axis", function() {
 
-        var shift_axis_container = d3.select("#shifted_axes_svg>g:nth-child(1)");
+        var shift_axis_container = d3.select("#shifted_axes_svg>g:nth-child(1)"); // shift: 0,75
         var shift_axis = d3.select("#shifted_axes_svg>g:nth-child(1)>g");
 
-        var labeled_shift_axis_container = d3.select("#shifted_axes_svg>g:nth-child(2)");
+        var labeled_shift_axis_container = d3.select("#shifted_axes_svg>g:nth-child(2)"); // shift: 30,55
         var labeled_shift_axis = d3.select("#shifted_axes_svg>g:nth-child(2)>g");
         var labeled_shift_axis_label = d3.select("#shifted_axes_svg>g:nth-child(2)>text");
 
@@ -587,11 +583,11 @@ struct Test_Axis : emp::web::BaseTest {
 
       describe("Different Ranges row2col1", function() {
 
-        var ranges_row2col1_bottom_container = d3.select("#different_ranges_svg>g:nth-child(5)");
+        var ranges_row2col1_bottom_container = d3.select("#different_ranges_svg>g:nth-child(5)"); // shifted -20
         var ranges_row2col1_bottom_axis = d3.select("#different_ranges_svg>g:nth-child(5)>g");
         var ranges_row2col1_bottom_axis_label = d3.select("#different_ranges_svg>g:nth-child(5)>text");
 
-        var ranges_row2col1_left_container = d3.select("#different_ranges_svg>g:nth-child(6)");
+        var ranges_row2col1_left_container = d3.select("#different_ranges_svg>g:nth-child(6)"); // shifted -20
         var ranges_row2col1_left_axis = d3.select("#different_ranges_svg>g:nth-child(6)>g");
         var ranges_row2col1_left_axis_label = d3.select("#different_ranges_svg>g:nth-child(6)>text");
 
@@ -669,7 +665,7 @@ emp::web::MochaTestRunner test_runner;
 
 int main() {
   test_runner.Initialize({"emp_test_container"});
-  D3::internal::get_emp_d3();
+  D3::InitializeEmpD3();
 
   test_runner.AddTest<Test_Axis>("Axis");
 
