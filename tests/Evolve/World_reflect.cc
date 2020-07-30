@@ -3,7 +3,7 @@
 	#define TDEBUG
 #endif
 
-#include "third-party/Catch/single_include/catch.hpp"
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "Evolve/World.h"
 #include "Evolve/World_reflect.h"
