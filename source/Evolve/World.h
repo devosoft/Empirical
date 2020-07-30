@@ -450,6 +450,10 @@ namespace emp {
     /// argument determines if the generations should be synchronous (true) or not (false, default)
     void SetPopStruct_Grid(size_t width, size_t height, bool synchronous_gen=false);
 
+    /// Set the population to be a 3D grid of cells using the specified dimensions.  The third
+    /// argument determines if the generations should be synchronous (true) or not (false, default)
+    void SetPopStruct_3DGrid(size_t width, size_t height, size_t depth, bool synchronous_gen=false);
+
     /// Setup the population to automatically test for and trigger mutations.  By default, this
     /// occurs before deciding where an offspring should be placed. Note that this pre-placement
     /// timing may be needed if fitness or other phenotypic traits are required to determine placement.
@@ -1100,6 +1104,120 @@ namespace emp {
     }
 
     SetAttribute("PopStruct", "Grid");
+    SetSynchronousSystematics(synchronous_gen);
+  }
+
+  template<typename ORG>
+  void World<ORG>::SetPopStruct_3DGrid(size_t width, size_t height, size_t depth, bool synchronous_gen) {
+    emp::vector<size_t> sizes = {width, height, depth};
+    Resize(sizes);
+    is_synchronous = synchronous_gen;
+    is_space_structured = true;
+    is_pheno_structured = false;
+
+    // -- Setup functions --
+    // Inject a random position in grid
+    fun_find_inject_pos = [this](Ptr<ORG> new_org) {
+      (void) new_org;
+      return WorldPosition(GetRandomCellID());
+    };
+
+    // neighbors are in 8-sized neighborhood.
+    fun_get_neighbor = [this](WorldPosition pos) {
+
+      emp_assert(random_ptr);
+      emp_assert(pop_sizes.size() == 3);
+
+      const int size_x = (int) pop_sizes[0];
+      const int size_y = (int) pop_sizes[1];
+      const int size_z = (int) pop_sizes[2];
+      const int id = (int) pos.GetIndex();
+
+      const int x_pos = (id%size_x);
+      const int y_pos = (id/size_x) % (size_y);
+      const int z_pos = (id/size_x) / (size_y);
+
+      emp_assert(z_pos < size_z);
+
+      // fancy footwork to exclude self (4) from consideration
+      int rand_pos = random_ptr->GetInt(26);
+      int rand_x = 0; //= (int) x_pos + offset%3 - 1;
+      int rand_y = 0; //= (int) y_pos + offset/3 - 1;
+      int rand_z = 0; //= (int) z_pos + offset/3 - 1;
+
+      if (rand_pos < 9) {
+        // We're in the z_pos - 1 plane unless we can't be
+        if (z_pos == 0) {
+          rand_z = z_pos + random_ptr->P(9.0/17.0);
+        } else {
+          rand_z = z_pos - 1;
+        }
+      } else if (rand_pos < 17) {
+        // we're in the z_pos plane
+        rand_z = z_pos;
+        rand_pos -= 9;
+
+        // Avoid choosing self
+        if (rand_pos > 3) {
+          rand_pos++;
+        }
+      } else {
+        // we're in the z_pos + 1 plane unless we can't be
+        if (z_pos >= size_z - 1) {
+          rand_z = z_pos - random_ptr->P(9.0/17.0);
+        } else {
+          rand_z = z_pos + 1;
+        }
+        rand_z = z_pos + 1;
+        rand_pos -= 17;
+      }
+
+      rand_x = x_pos + rand_pos % 3;
+      rand_y = y_pos + rand_pos / 3;
+
+      if (rand_x >= size_x) {
+        rand_x -= 1 + random_ptr->P(9.0/17.0);
+      } else if (rand_x < 0) {
+        rand_x += 1 + random_ptr->P(9.0/17.0);        
+      }
+
+      if (rand_y >= size_y) {
+        rand_y -= 1 + random_ptr->P(9.0/17.0);
+      } else if (rand_y < 0) {
+        rand_y += 1 + random_ptr->P(9.0/17.0);        
+      }
+
+      const int neighbor_id = rand_z*size_y*size_x + rand_y*size_x + rand_x;
+
+      emp_assert(neighbor_id >= 0 && neighbor_id < size_x*size_y*size_z, neighbor_id, size_x*size_y*size_z);
+      emp_assert((int)pos.GetIndex() != neighbor_id);
+
+      return pos.SetIndex(neighbor_id);
+    };
+
+    fun_kill_org = [this](){
+      const size_t kill_id = GetRandomCellID();
+      RemoveOrgAt(kill_id);
+      return kill_id;
+    };
+
+    if (synchronous_gen) {
+      // Place births in a neighboring position in the new grid.
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
+        emp_assert(new_org);                                    // New organism must exist.
+        WorldPosition next_pos = fun_get_neighbor(parent_pos);  // Place near parent.
+        return next_pos.SetPopID(1);                            // Adjust position to next pop and place..
+      };
+      SetAttribute("SynchronousGen", "True");
+    } else {
+      // Asynchronous: always go to a neighbor in current population.
+      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
+        return WorldPosition(fun_get_neighbor(parent_pos)); // Place org in existing population.
+      };
+      SetAttribute("SynchronousGen", "False");
+    }
+
+    SetAttribute("PopStruct", "3DGrid");
     SetSynchronousSystematics(synchronous_gen);
   }
 
