@@ -4,25 +4,36 @@
 #include <memory>
 #include <cstdlib>
 #include "../../Systematics.h"
-#include "../../../tools/Random.h"
-#include "../../../tools/IndexMap.h"
-#include "../../../base/map.h"
-#include "../../../tools/map_utils.h"
 
 //g++ -std=c++17 -I../../ main.cpp -o main.o && ./main.o
 //for i in {1..5}; do g++ -std=c++17 -I../../ main.cpp -o main.o && ./main.o; done
 //for i in {1..100}; do ./main.o; done
 
+/*This file creates trees with mutations and pressure for diversity (optional) for the systematics normalization project.
+ * This program generates trees with a depth of 10 to 100 generations. Mutation occurs when a random number generted between
+ * 0 and 1 is less than 0.05. When a mutation occurs, another random number is generated between -3 and 3. Whatever number is chosen
+ * is then subtracted from the original genotype value. If the user chooses to use pressure for diversity, they must use the
+ * ChooseOrgDiversity() function and the CalcFitness() function. The ChooseOrg() function should be left unused in this scenario.
+ *
+
+
+/*This file creates trees with mutations and pressure for diversity (optional) for the systematics normalization project.
+ * This program generates a random tree with a depth of
+ * 100 generations. This can be changed in the numGens variable. This tree has 10 organisms per generation and uses a clade
+ * as the method of tracking in systematics.h. The program returns phylogenetic diversity after each generation and prints the
+ * final phylogenetic diversity to a csv file of your choice. You will have to uncomment the writeToFile function and give it a
+ * file path to use this function.
+ * You can also use this tree to test the systematics.h FindPhyloData() function. You can uncomment the line sys.FindPhyloData() to
+ * use this function of the program. */
+
 
 using namespace std;
 
-int randScope;
 int numOrgs = 10;
 int parentNum;
 int numGens = 100;
 int systime = 0;
 double mutRate = 0.05;
-//int genotype = 0;
 int TenGens = 10;
 
 class Organism {
@@ -37,10 +48,10 @@ public:
     //choose random new genotype within certain range
     //option to turn on pressure for diversity (empirical config object) (change from command line)
 
-    Organism() {
+    Organism() { //default constructor sets genotype to 0
     }
 
-    Organism(int _genotype) {
+    Organism(int _genotype) { //this constructor sets genotype to the parent genotype
         genotype = _genotype;
     }
 
@@ -63,20 +74,6 @@ public:
         return genotype;
     }
 };
-
-
-
-//    static void reproduce(vector<Organism> &childGen, emp::Systematics<Organism, int> &sys){
-//        for(int i = 0; i < 2; i++){
-//            childGen.emplace_back(); //fills childGen vector with Organisms
-//
-//            //ORG & org, WorldPosition pos, int update=-1
-//            emp::WorldPosition pos(i, 1);
-//            sys.AddOrg(childGen[i], pos, systime); //removed brackets childGen[i], {i, 0}
-//        }
-//        cout << "child generation created" << endl;
-//    //}
-
 
 int chooseOrg(vector<Organism> &currentGen, emp::Random &randNum){
 
@@ -178,7 +175,6 @@ int main() {
 
     for (int i = 0; i < numGens; i++) {
         cout << "generation: " << i << endl;
-        randScope = currentGen.size(); //this tells the chooseOrg function how large the vector is
         //assert(currentGen.size() == 10);
 
         calcFitness(currentGen, fitnessVect,randNum);
@@ -205,7 +201,10 @@ int main() {
         if(i == TenGens - 1){
             //sys.FindPhyloData();
             cout << "Ten Gens = " << TenGens << endl;
-            sys.FindPhyloMultipleGens(TenGens);
+            //sys.FindPhyloMultipleGens(TenGens);
+            sys.GetPhylogeneticDiversityNormalize(TenGens, "TensChooseOrgGenotype.csv");
+            //cout << "Phylogenetic Diversity Return: " << sys.GetPhyloNormalize() << endl;
+
             //writeToFile("ChooseOrgDiversityGenotype1000.csv", sys.GetPhylogeneticDiversity())
             TenGens = TenGens + 10;
         }

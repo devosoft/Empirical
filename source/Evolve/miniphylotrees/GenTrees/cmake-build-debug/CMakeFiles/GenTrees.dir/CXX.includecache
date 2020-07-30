@@ -85,14 +85,6 @@ cstdlib
 -
 ../../Systematics.h
 C:/Users/abbys/Empirical/source/Evolve/Systematics.h
-../../../tools/Random.h
-C:/Users/abbys/Empirical/source/tools/Random.h
-../../../tools/IndexMap.h
-C:/Users/abbys/Empirical/source/tools/IndexMap.h
-../../../base/map.h
-C:/Users/abbys/Empirical/source/base/map.h
-../../../tools/map_utils.h
-C:/Users/abbys/Empirical/source/tools/map_utils.h
 
 C:/Users/abbys/Empirical/source/base/MapProxy.h
 
