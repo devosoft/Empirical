@@ -537,13 +537,15 @@ namespace web {
     }
 
     /// Apply CSS to appropriate component based on current state.
-    void DoListen(const std::string & event_name, size_t fun_id) override {
-      parent_t::DoListen(event_name, fun_id);
+    void DoListen(const std::string & event_name, size_t fun_id, 
+        const std::string handler_id="default",
+        bool add_before_onclick = false) override {
+      parent_t::DoListen(event_name, fun_id, handler_id, add_before_onclick);
     }
 
   public:
-    TableWidget(size_t r, size_t c, const std::string & in_id="")
-      : WidgetFacet(in_id), cur_row(0), cur_col(0)
+    TableWidget(size_t r, size_t c, const std::string & in_id=""):
+       WidgetFacet(in_id), cur_row(0), cur_col(0)
     {
       emp_assert(r > 0 && c > 0);              // Ensure that we have rows and columns!
       info = new internal::TableInfo(in_id);

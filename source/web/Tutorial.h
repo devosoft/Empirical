@@ -286,7 +286,7 @@ std::string popover_id;
     emp_assert(parent_widget != nullptr);
 
     std::cout << "Adding popover" << std::endl;
-    widget.WrapWithInPlace(parent_widget);
+    widget.WrapWith(parent_widget, true);
     std::cout << "1" << std::endl;
     parent_widget.SetCSS("position", "relative");
     std::cout << "2" << std::endl;

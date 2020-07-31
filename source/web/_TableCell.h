@@ -37,7 +37,9 @@ namespace web {
     }
 
     /// Update a listener for this cell (override default Table)
-    void DoListen(const std::string & event_name, size_t fun_id) override {
+    void DoListen(const std::string & event_name, size_t fun_id, 
+        const std::string handler_id="default",
+        bool add_before_onclick = false) override {
       Info()->rows[cur_row].data[cur_col].extras.listen.Set(event_name, fun_id);
       if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
     }

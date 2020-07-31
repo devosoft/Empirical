@@ -36,9 +36,10 @@ namespace web {
       if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
     }
 
-    void DoListen(const std::string & event_name, size_t fun_id) override {
+    void DoListen(const std::string & event_name, size_t fun_id, const std::string handler_id="default",
+        bool add_before_onclick = false) override {
       if (Info()->col_groups.size() == 0) Info()->col_groups.resize(GetNumCols());
-      Info()->col_groups[cur_col].extras.listen.Set(event_name, fun_id);
+      Info()->col_groups[cur_col].extras.listen.Set(event_name, fun_id, handler_id);
       if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
     }
 
