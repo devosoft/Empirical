@@ -6,18 +6,23 @@
  * This file can be used to test triggering a mouse click by the user.
  * It appears that .click() can be used to trigger a click.
  * Issues encountered:
- *  - When click() is called  on line 95 (1st call), it looks
+ *  - When click() is called  on line 100 (1st call), it looks
  *    like it triggers this function before any of the tests execute.
  *    As a result, the it statements in the 1st and 3rd describes
  *    all fail.
  *
- *  - When click() is called on line 113 (2nd call), the it statements
+ *  - When click() is called on line 123 (2nd call), the it statements
  *    in the 1st and 3rd describes all fail too. Maybe we can't click
  *    the same element multiple time in one test?
  *
  * Goals:
  *  - Be able to trigger a click at a particular point in a test
  *  - Be able to click an element multiple times.
+ * 
+ * Thoughts:
+ *  - Give control back to the browser for click and take it back for tests.
+ *  - Sleep between clicks so bowser doesn't think we're double clicking
+ *  - Compile tests inside of docker, and serve them in regular browser
  */
 
 #include <functional>
@@ -106,7 +111,12 @@ struct Test_Collapse_Click : emp::web::BaseTest {
         });
       });
 
-      describe("Controller 2nd click, collapse target", function() {
+      // function sleepFor( sleepDuration ){
+      //     var now = new Date().getTime();
+      //     while(new Date().getTime() < now + sleepDuration){ /* do nothing */ } 
+      // }
+
+      describe("Controller 2nd click, expand target", function() {
         const controller = document.getElementsByTagName("span")[1];
         const target = document.getElementsByTagName("span")[2];
         // TODO: Click controller here

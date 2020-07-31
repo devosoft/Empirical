@@ -119,11 +119,6 @@ Commands to stop and start the Docker container::
                 docker start emp-tests
                 docker stop emp-tests
                 
-Commands to allow you to pull and push to Empirical GitHub (from Docker container shell)::
-
-                git remote rm origin
-                git remote add origin https://github.com/devosoft/Empirical.git
-                
 If you get :code:`error: cannot open display: 99` when running Mocha web tests, try::
 
                 Xvfb :99 -ac -screen 0 1024x768x8 &

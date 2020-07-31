@@ -24,7 +24,7 @@ namespace prefab {
         template <typename T>
         CollapseController(
           T controller,
-          std::string controls_class,
+          const std::string controls_class,
           bool expanded, std::string id=""
         ) : inner_controller(id) {
 
@@ -71,7 +71,8 @@ namespace prefab {
       CollapseCoupling(
         web::Widget controller,
         web::Widget target,
-        bool expanded=false, std::string in_class=""
+        const bool expanded=false, 
+        const std::string in_class=""
       ) : CollapseCoupling(emp::vector<web::Widget>{controller},
             emp::vector<web::Widget>{target}, expanded, in_class) { ; }
 
@@ -81,8 +82,8 @@ namespace prefab {
       CollapseCoupling(
         emp::vector<web::Widget> controllers,
         emp::vector<web::Widget> targets,
-        bool expanded=false,
-        std::string in_class="") {
+        const bool expanded=false,
+        const std::string in_class="") {
           // if a class is defined by the user, use it
           // Otherwise generate a unique class
           if (in_class == "") {
@@ -116,14 +117,14 @@ namespace prefab {
       CollapseCoupling(
         const std::string controller,
         const std::string target,
-        bool expanded=false,
-        std::string in_class=""
+        const bool expanded=false,
+        const std::string in_class=""
       ): CollapseCoupling(web::Div{} << controller, web::Div{} << target, expanded, in_class) { ; }
 
       /// Adds a controller to the vector of controllers for this CollapseCouple
       /// @param controller new controller to add to coupling is of type Widget
       /// @param expaned initial state of the target(s), is it expaned or not?
-      void AddController(web::Widget controller, bool expanded) {
+      void AddController(web::Widget controller, const bool expanded) {
         internal::CollapseController controller_widget(controller, target_class, expanded);
         controllers.push_back(controller_widget.GetLinkDiv());
       }
@@ -133,14 +134,14 @@ namespace prefab {
       /// @param expaned initial state of the target(s), is it expaned or not?
       // TODO: Ideally, this method would be templated, but running into same issues
       // as when trying to do this with the constructor
-      void AddController(const std::string controller, bool expanded) {
+      void AddController(const std::string controller, const bool expanded) {
         AddController(web::Div{} << controller, expanded);
       }
 
       /// Adds a target to the vector of targets for this CollapseCouple
       /// @param widget new target to add to coupling is a web element
       /// @param expaned initial state of the target(s), is it expaned or not?
-      void AddTarget(web::internal::FacetedWidget widget, bool expanded) {
+      void AddTarget(web::internal::FacetedWidget widget, const bool expanded) {
         if (expanded) {
           widget.AddAttr("class", "collapse show");
         } else {
@@ -156,7 +157,7 @@ namespace prefab {
       // If the target is not a web widget, place it in a div and call the other AddTarget function
       // TODO: Ideally, this method would be templated, but running into same issues
       // as when trying to do this with the constructor
-      void AddTarget(const std::string target, bool expanded) {
+      void AddTarget(const std::string target, const bool expanded) {
         AddTarget(web::Div{} << target, expanded);
       }
 
@@ -171,13 +172,13 @@ namespace prefab {
       emp::vector<web::Widget> & GetControllerDivs() { return controllers; }
 
       /// Returns the controller at the given index
-      web::Widget & GetControllerDiv(int index=0) { return controllers[index]; }
+      web::Widget & GetControllerDiv(const int index=0) { return controllers[index]; }
 
       /// Returns the vector of all targets associated with this CollapseCouple
       emp::vector<web::Widget> & GetTargetDivs() { return targets; }
 
       /// Returns the target at the given index
-      web::Widget & GetTargetDiv(int index=0) { return targets[index]; }
+      web::Widget & GetTargetDiv(const int index=0) { return targets[index]; }
   };
 }
 }
