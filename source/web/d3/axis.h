@@ -85,9 +85,10 @@ namespace D3 {
       }, this->id, scale.GetID(), type.c_str());
     }
 
-    /// Consruct an axis and specify its initial position in px with shift_x and shift_y.
+    /// Construct an axis and specify its initial position in px with shift_x and shift_y.
     /// For example, given a shift_x of 50 and shift_y of 100, the axis will be shifted
-    /// 50px to the right and 100px down from its origin.
+    /// 50px to the right and 100px down from its origin. It's very helpful to use this
+    /// constructor to position your axes if you're using a scale range minimum that isn't zero.
     ///
     /// This doesn't draw anything yet, but sets up the necessary infrastructure
     /// to draw it when you call the Draw method. Optionally takes a label to label the axis with.
@@ -132,7 +133,6 @@ namespace D3 {
       std::string nospace_label = label;
       emp::remove_whitespace(nospace_label); // DOM ids can't contain whitespace
       dom_id = (label != "") ? nospace_label + "_axis"
-             //: emp::to_string(scale.GetID()) + "_axis";
              : "axis_" + emp::to_string(this->id);
 
       EM_ASM({
@@ -148,24 +148,26 @@ namespace D3 {
         const shift_x = $9;
         const shift_y = $10;
 
-        var axis_range = emp_d3.objects[id].scale().range();
         emp_d3.objects[g] = emp_d3.objects[sel].append("g");
         emp_d3.objects[g].append("g")
-                    .attr("id", dom_id)
-                    .call(emp_d3.objects[id]);
+                         .attr("id", dom_id)
+                         .call(emp_d3.objects[id]);
 
         var svg_width = emp_d3.objects[sel].attr("width");
         var svg_height = emp_d3.objects[sel].attr("height");
 
+        var axis_range_low = d3.min(emp_d3.objects[id].scale().range());
+        var axis_range_high = d3.max(emp_d3.objects[id].scale().range());
+
         var dy = "0em";
-        var x_divisor = 2;
         var text_orient = 0;
         var padding_translation = "";
         if (orient == "top") {
           dy = "-2.5em";
           padding_translation = "translate(0,"+padding+")";
         } else if (orient == "left") {
-          x_divisor = -2;
+          axis_range_low *= -1;  // since left axis label is rotated -90,
+          axis_range_high *= -1; // range values must be given opposite sign
           dy = "-2.5em";
           text_orient = -90;
           padding_translation = "translate("+padding+",0)";
@@ -188,9 +190,7 @@ namespace D3 {
           dy = label_offset;
         }
 
-        var label_x = (axis_range[0] < axis_range[1])
-                    ? axis_range[0] + (axis_range[1]-axis_range[0])/x_divisor
-                    : axis_range[1] + (axis_range[0]-axis_range[1])/x_divisor;
+        var label_x = axis_range_low + (axis_range_high - axis_range_low) / 2;
 
         emp_d3.objects[g].append("text")
                      .attr("id", dom_id+"_label")
@@ -323,8 +323,8 @@ namespace D3 {
       emp_assert((dom_id != "") && "WARNING: Calling Draw() after this method will overwrite your changes");
 
       EM_ASM({
-	      emp_d3.objects[$0].ticks($1, $2);
-	    }, this->id, count, format);
+	      emp_d3.objects[$0].ticks($1, d3.format(UTF8ToString($2)));
+	    }, this->id, count, format.c_str());
       return *this;
     }
 
@@ -375,11 +375,17 @@ namespace D3 {
 
   /// Helper function to draw a standard set of x and y axes at bottom and left.
   /// Takes the desired x axis, y axis, and the selection on which to draw them.
-  /// Only takes padding into account (not shift). If either axis specifies
-  /// a padding value, it will be moved that distance away from the svg border and
-  /// the axes will meet at their origins. By default, they will have 60px padding.
+  ///
+  /// Only takes padding into account (not shift). The padding on the bottom axis
+  /// will be their distance from the bottom of the svg, and the padding on the left axis
+  /// will be their distance from the svg's left edge. The axes will meet at their origins.
+  /// By default, they will have 60px padding.
+  ///
+  /// The axes' scale ranges' lower limits must be zero for the axes' origins to match up.
+  /// TODO: make this function work with non-zero scale range minimums
   template <typename SCALE_X_TYPE = D3::LinearScale, typename SCALE_Y_TYPE = D3::LinearScale>
   void DrawAxes(Axis<SCALE_X_TYPE> & x_axis, Axis<SCALE_Y_TYPE> & y_axis, Selection & selection){
+
     double x_axis_padding;
     double y_axis_padding;
 
@@ -405,9 +411,13 @@ namespace D3 {
       const x_axis_padding = $4;
       const y_axis_padding = $5;
 
-      var y_axis_height = d3.max(emp_d3.objects[y_axis].scale().range());
       var svg_width = emp_d3.objects[svg].attr("width");
       var svg_height = emp_d3.objects[svg].attr("height");
+
+      var y_axis_range_low = d3.min(emp_d3.objects[y_axis].scale().range());
+      var y_axis_range_high = d3.max(emp_d3.objects[y_axis].scale().range());
+
+      var y_axis_height = y_axis_range_high - y_axis_range_low;
 
       emp_d3.objects[x_axis_g].attr("transform", "translate("+y_axis_padding+","+(svg_height - x_axis_padding)+")");
       emp_d3.objects[y_axis_g].attr("transform", "translate("+y_axis_padding+","+(svg_height - y_axis_height - x_axis_padding)+")");

@@ -31,6 +31,11 @@
 //     - rescale axis by new domain
 //     - adjust label offset correctly
 //     - set tick size, padding, number, format, and new values
+//   - DrawAxes() convenience function (bottom and left axes that meet at origin)
+//     - position the axes correctly (both padding values taken into account)
+//   - different ranges (constructed on scales with various ranges)
+//     - position the axis correctly (on the correct range and translated by any x and y shifts)
+//     - position the label correctly (centered above/below/beside the axis)
 
 struct Test_Axis : emp::web::BaseTest {
 
@@ -40,6 +45,8 @@ struct Test_Axis : emp::web::BaseTest {
   D3::Selection svg_padded_axes;
   D3::Selection svg_shifted_axes;
   D3::Selection svg_edited_axis;
+  D3::Selection svg_drawn_axes;
+  D3::Selection svg_different_ranges;
 
   // Scale
   D3::LinearScale scale;
@@ -62,58 +69,133 @@ struct Test_Axis : emp::web::BaseTest {
 
   D3::Axis<D3::LinearScale> edited_axis;
 
+  D3::Axis<D3::LinearScale> drawn_bottom_axis;
+  D3::Axis<D3::LinearScale> drawn_left_axis;
+
+  D3::Axis<D3::LinearScale> ranges_row1col1_bottom_axis;
+  D3::Axis<D3::LinearScale> ranges_row1col1_left_axis;
+  D3::Axis<D3::LinearScale> ranges_row1col2_bottom_axis;
+  D3::Axis<D3::LinearScale> ranges_row1col2_left_axis;
+  D3::Axis<D3::LinearScale> ranges_row2col1_bottom_axis;
+  D3::Axis<D3::LinearScale> ranges_row2col1_left_axis;
+  D3::Axis<D3::LinearScale> ranges_row2col2_shifted_bottom_axis;
+  D3::Axis<D3::LinearScale> ranges_row2col2_shifted_left_axis;
+
   Test_Axis() : emp::web::BaseTest({"emp_test_container"}) {
 
-    // create divs to organize the different axes we're testing and position them in separate svgs
+    // create a div to organize the different axes we're testing and position them in separate svgs
     // FIXME: selecting #emp_test_container doesn't work since it's a Widget object and gets redrawn
     D3::Select("body").Append("div").SetAttr("id", "d3_testing_div");
-    D3::Select("#d3_testing_div").Append("div").SetAttr("id", "default_axis_div");
-    D3::Select("#d3_testing_div").Append("div").SetAttr("id", "oriented_axes_div");
-    D3::Select("#d3_testing_div").Append("div").SetAttr("id", "padded_axes_div");
-    D3::Select("#d3_testing_div").Append("div").SetAttr("id", "shifted_axes_div");
-    D3::Select("#d3_testing_div").Append("div").SetAttr("id", "edited_axis_div");
-
-    // set the svg for default axis testing to 600x100px
-    svg_default_axis = D3::Select("#default_axis_div").Append("svg").SetAttr("id", "default_axis_svg").SetAttr("width", 600).SetAttr("height", 100);
-    // set the svg for oriented axes testing to 600x600px (taller to fit vertical axes)
-    svg_oriented_axes = D3::Select("#oriented_axes_div").Append("svg").SetAttr("id", "oriented_axes_svg").SetAttr("width", 600).SetAttr("height", 600);
-    // set the svg for padded axes testing to 600x600px (taller to fit vertical axes)
-    svg_padded_axes = D3::Select("#padded_axes_div").Append("svg").SetAttr("id", "padded_axes_svg").SetAttr("width", 600).SetAttr("height", 600);
-    // set the svg for shifted axes testing to 600x200px (taller to allow for vertical shift)
-    svg_shifted_axes = D3::Select("#shifted_axes_div").Append("svg").SetAttr("id", "shifted_axes_svg").SetAttr("width", 600).SetAttr("height", 200);
-    // set the svg for edited axis testing to 600x100px
-    svg_edited_axis = D3::Select("#edited_axis_div").Append("svg").SetAttr("id", "edited_axis_svg").SetAttr("width", 600).SetAttr("height", 100);
 
     // set up a simple scale that all of the axes will be constructed on
     scale = D3::LinearScale();
     scale.SetDomain(0, 100).SetRange(0, 500);
 
+    //////////////////////////////////
+    //  SETUP DEFAULT AXIS TESTING  //
+    //////////////////////////////////
+    D3::Select("#d3_testing_div").Append("div").SetAttr("id", "default_axis_div");
+    // set the svg for default axis testing to 600x100px
+    svg_default_axis = D3::Select("#default_axis_div").Append("svg").SetAttr("id", "default_axis_svg").SetAttr("width", 600).SetAttr("height", 100);
     // set up axis for testing the default axis constructor
     default_axis = D3::Axis<D3::LinearScale>().SetScale(scale).Draw(svg_default_axis);
+
+    ///////////////////////////////////
+    //  SETUP ORIENTED AXES TESTING  //
+    ///////////////////////////////////
+    D3::Select("#d3_testing_div").Append("div").SetAttr("id", "oriented_axes_div");
+    // set the svg for oriented axes testing to 600x600px (taller to fit vertical axes)
+    svg_oriented_axes = D3::Select("#oriented_axes_div").Append("svg").SetAttr("id", "oriented_axes_svg").SetAttr("width", 600).SetAttr("height", 600);
     // set up oriented axes for tests specific to location
     bottom_axis = D3::Axis<D3::LinearScale>("bottom", "Bottom Axis").SetScale(scale).Draw(svg_oriented_axes);
-    top_axis = D3::Axis<D3::LinearScale>("top", "Top Axis").SetScale(scale).Draw(svg_oriented_axes);
-    left_axis = D3::Axis<D3::LinearScale>("left", "Left Axis").SetScale(scale).Draw(svg_oriented_axes);
-    right_axis = D3::Axis<D3::LinearScale>("right", "Right Axis").SetScale(scale).Draw(svg_oriented_axes);
+    top_axis = D3::Axis<D3::LinearScale>   ("top", "Top Axis").SetScale(scale).Draw(svg_oriented_axes);
+    left_axis = D3::Axis<D3::LinearScale>  ("left", "Left Axis").SetScale(scale).Draw(svg_oriented_axes);
+    right_axis = D3::Axis<D3::LinearScale> ("right", "Right Axis").SetScale(scale).Draw(svg_oriented_axes);
+
+    /////////////////////////////////
+    //  SETUP PADDED AXES TESTING  //
+    /////////////////////////////////
+    D3::Select("#d3_testing_div").Append("div").SetAttr("id", "padded_axes_div");
+    // set the svg for padded axes testing to 600x600px (taller to fit vertical axes)
+    svg_padded_axes = D3::Select("#padded_axes_div").Append("svg").SetAttr("id", "padded_axes_svg").SetAttr("width", 600).SetAttr("height", 600);
     // set up padded axes for tests specific to passed-in relative padding argument
     padded_bottom_axis = D3::Axis<D3::LinearScale>("bottom", "", 0).SetScale(scale).Draw(svg_padded_axes);
-    padded_top_axis = D3::Axis<D3::LinearScale>("top", "Padded Top", 80).SetScale(scale).Draw(svg_padded_axes);
-    padded_left_axis = D3::Axis<D3::LinearScale>("left", "Padded Left", 70).SetScale(scale).Draw(svg_padded_axes);
-    padded_right_axis = D3::Axis<D3::LinearScale>("right", "Padded Right", -10).SetScale(scale).Draw(svg_padded_axes);
+    padded_top_axis = D3::Axis<D3::LinearScale>   ("top", "Padded Top", 80).SetScale(scale).Draw(svg_padded_axes);
+    padded_left_axis = D3::Axis<D3::LinearScale>  ("left", "Padded Left", 70).SetScale(scale).Draw(svg_padded_axes);
+    padded_right_axis = D3::Axis<D3::LinearScale> ("right", "Padded Right", -10).SetScale(scale).Draw(svg_padded_axes);
+
+    //////////////////////////////////
+    //  SETUP SHIFTED AXES TESTING  //
+    //////////////////////////////////
+    D3::Select("#d3_testing_div").Append("div").SetAttr("id", "shifted_axes_div");
+    // set the svg for shifted axes testing to 600x200px (taller to allow for vertical shift)
+    svg_shifted_axes = D3::Select("#shifted_axes_div").Append("svg").SetAttr("id", "shifted_axes_svg").SetAttr("width", 600).SetAttr("height", 200);
     // set up shifted axes for tests specific to constructor that sets position with shift_x and shift_y
     shifted_axis = D3::Axis<D3::LinearScale>(0, 75).SetScale(scale).Draw(svg_shifted_axes);
     shifted_labeled_axis = D3::Axis<D3::LinearScale>(30, 55, "top", "Labeled Shifted").SetScale(scale).Draw(svg_shifted_axes);
+
+    /////////////////////////////////
+    //  SETUP EDITED AXIS TESTING  //
+    /////////////////////////////////
+    D3::Select("#d3_testing_div").Append("div").SetAttr("id", "edited_axis_div");
+    // set the svg for edited axis testing to 600x100px
+    svg_edited_axis = D3::Select("#edited_axis_div").Append("svg").SetAttr("id", "edited_axis_svg").SetAttr("width", 600).SetAttr("height", 100);
     // set up axis to test other functions that can be called to edit a default axis
     edited_axis = D3::Axis<D3::LinearScale>("bottom", "Edited Axis").SetScale(scale).Draw(svg_edited_axis);
-
     // call various modifying functions on edited_axis to test them
+    emp::array<int, 6> new_tick_values({1122,2075,3086,4454,6894,9223});
     edited_axis.AdjustLabelOffset("4em");
     edited_axis.SetTicks(5).SetTickSize(10.5).SetTickSizeInner(10.5).SetTickSizeOuter(0);
     edited_axis.SetTickPadding(10).SetTickFormat(",.2r");
-    emp::array<int, 6> new_tick_values({1122,2075,3086,4454,6894,9223});
     edited_axis.SetTickValues(new_tick_values);
     edited_axis.Move(60,0);
     edited_axis.Rescale(1000, 10000, svg_edited_axis);
+
+    ////////////////////////////////
+    //  SETUP DRAWN AXES TESTING  //
+    ////////////////////////////////
+    D3::Select("#d3_testing_div").Append("div").SetAttr("id", "drawn_axes_div");
+    // set the svg for shifted axes testing to 600x600px (taller to fit vertical axis)
+    svg_drawn_axes = D3::Select("#drawn_axes_div").Append("svg").SetAttr("id", "drawn_axes_svg").SetAttr("width", 600).SetAttr("height", 600);
+    // set up axes to test DrawAxes() function
+    drawn_bottom_axis = D3::Axis<D3::LinearScale>("bottom", "DrawAxes Bottom", 90).SetScale(scale);
+    drawn_left_axis = D3::Axis<D3::LinearScale>  ("left", "DrawAxes Left", 170).SetScale(scale);
+    DrawAxes(drawn_bottom_axis, drawn_left_axis, svg_drawn_axes);
+
+    //////////////////////////////////////
+    //  SETUP DIFFERENT RANGES TESTING  //
+    //////////////////////////////////////
+    D3::Select("#d3_testing_div").Append("div").SetAttr("id", "different_ranges_div");
+    // set up scales with different ranges to test positioning on different inputs
+    size_t stack1_min = 70;
+    size_t stack1_max = 270;
+    size_t stack2_min = 340;
+    size_t stack2_max = 540;
+    D3::LinearScale col1_x_scale = D3::LinearScale();
+    col1_x_scale.SetDomain(0, 100).SetRange(stack1_min, stack1_max);
+    D3::LinearScale col2_x_scale = D3::LinearScale();
+    col2_x_scale.SetDomain(0, 100).SetRange(stack2_min, stack2_max);
+    D3::LinearScale row1_y_scale = D3::LinearScale();
+    row1_y_scale.SetDomain(0, 100).SetRange(stack1_max, stack1_min);
+    D3::LinearScale row2_y_scale = D3::LinearScale();
+    row2_y_scale.SetDomain(0, 100).SetRange(stack2_max, stack2_min);
+    // set the svg for different scale ranges testing to 600x600px (taller to fit two sets of axes)
+    size_t ranges_svg_size = 600;
+    svg_different_ranges = D3::Select("#different_ranges_div").Append("svg").SetAttr("id", "different_ranges_svg").SetAttr("width", ranges_svg_size).SetAttr("height", ranges_svg_size);
+    // set up axes to test positioning on different ranges, arranged:
+    //  +-------------------------+
+    //  |  row1col1  |  row1col2  |
+    //  |------------+------------|
+    //  |  row2col1  |  row2col1  |
+    //  +-------------------------+
+    ranges_row1col1_bottom_axis = D3::Axis<D3::LinearScale>(0,stack1_max, "bottom", "Ranges First Bottom") .SetScale(col1_x_scale).Draw(svg_different_ranges);
+    ranges_row1col1_left_axis = D3::Axis<D3::LinearScale>  (stack1_min,0, "left", "Ranges First Left")     .SetScale(row1_y_scale).Draw(svg_different_ranges);
+    ranges_row1col2_bottom_axis = D3::Axis<D3::LinearScale>(0,stack1_max, "bottom", "Ranges Second Bottom").SetScale(col2_x_scale).Draw(svg_different_ranges);
+    ranges_row1col2_left_axis = D3::Axis<D3::LinearScale>  (stack2_min,0, "left", "Ranges Second Left")    .SetScale(row1_y_scale).Draw(svg_different_ranges);
+    ranges_row2col1_bottom_axis = D3::Axis<D3::LinearScale>(0,stack2_max, "bottom", "Ranges Third Bottom") .SetScale(col1_x_scale).Draw(svg_different_ranges);
+    ranges_row2col1_left_axis = D3::Axis<D3::LinearScale>  (stack1_min,0, "left", "Ranges Third Left")     .SetScale(row2_y_scale).Draw(svg_different_ranges);
+    ranges_row2col2_shifted_bottom_axis = D3::Axis<D3::LinearScale>(-20,stack2_max-20, "bottom", "Ranges Shifted Bottom").SetScale(col2_x_scale).Draw(svg_different_ranges);
+    ranges_row2col2_shifted_left_axis = D3::Axis<D3::LinearScale>  (stack2_min-20,-20, "left", "Ranges Shifted Left")    .SetScale(row2_y_scale).Draw(svg_different_ranges);
 
   }
 
@@ -248,7 +330,7 @@ struct Test_Axis : emp::web::BaseTest {
           chai.assert.equal(r_axis_label.attr("dy"), "-2.5em");
           chai.assert.equal(r_axis_label.attr("style"), "text-anchor: middle;");
         });
-        it("should rotate the label counterclockwise since the axis is vertical and rightward", function() {
+        it("should rotate the label clockwise since the axis is vertical and rightward", function() {
           chai.assert.equal(r_axis_label.attr("transform"), "rotate(90)");
         });
 
@@ -261,7 +343,7 @@ struct Test_Axis : emp::web::BaseTest {
 
       describe("Padded axisBottom", function() {
 
-        var pad_b_axis_container = d3.select("#padded_axes_svg>g:nth-child(1)");
+        var pad_b_axis_container = d3.select("#padded_axes_svg>g:nth-child(1)"); // padding: 0
         var pad_b_axis = d3.select("#padded_axes_svg>g:nth-child(1)>g");
 
         it("should set id to 'axis_<cpp_id>' since no label provided", function() {
@@ -277,7 +359,7 @@ struct Test_Axis : emp::web::BaseTest {
 
       describe("Padded axisTop", function() {
 
-        var pad_t_axis_container = d3.select("#padded_axes_svg>g:nth-child(2)");
+        var pad_t_axis_container = d3.select("#padded_axes_svg>g:nth-child(2)"); // padding: 80
         var pad_t_axis = d3.select("#padded_axes_svg>g:nth-child(2)>g");
         var pad_t_axis_label = d3.select("#padded_axes_svg>g:nth-child(2)>text");
 
@@ -293,7 +375,7 @@ struct Test_Axis : emp::web::BaseTest {
 
       describe("Padded axisLeft", function() {
 
-        var pad_l_axis_container = d3.select("#padded_axes_svg>g:nth-child(3)");
+        var pad_l_axis_container = d3.select("#padded_axes_svg>g:nth-child(3)"); // padding: 70
         var pad_l_axis = d3.select("#padded_axes_svg>g:nth-child(3)>g");
         var pad_l_axis_label = d3.select("#padded_axes_svg>g:nth-child(3)>text");
 
@@ -309,7 +391,7 @@ struct Test_Axis : emp::web::BaseTest {
 
       describe("Padded axisRight", function() {
 
-        var pad_r_axis_container = d3.select("#padded_axes_svg>g:nth-child(4)");
+        var pad_r_axis_container = d3.select("#padded_axes_svg>g:nth-child(4)"); // padding: -10
         var pad_r_axis = d3.select("#padded_axes_svg>g:nth-child(4)>g");
         var pad_r_axis_label = d3.select("#padded_axes_svg>g:nth-child(4)>text");
 
@@ -327,13 +409,12 @@ struct Test_Axis : emp::web::BaseTest {
 
     // Test axes that were constructed with shift_x and shift_y to specify their initial positions
     EM_ASM({
-      // position the axis correctly (translate by the given x and y shifts)
-      describe("Shifted Axes", function() {
+      describe("Shifted Axis", function() {
 
-        var shift_axis_container = d3.select("#shifted_axes_svg>g:nth-child(1)");
+        var shift_axis_container = d3.select("#shifted_axes_svg>g:nth-child(1)"); // shift: 0,75
         var shift_axis = d3.select("#shifted_axes_svg>g:nth-child(1)>g");
 
-        var labeled_shift_axis_container = d3.select("#shifted_axes_svg>g:nth-child(2)");
+        var labeled_shift_axis_container = d3.select("#shifted_axes_svg>g:nth-child(2)"); // shift: 30,55
         var labeled_shift_axis = d3.select("#shifted_axes_svg>g:nth-child(2)>g");
         var labeled_shift_axis_label = d3.select("#shifted_axes_svg>g:nth-child(2)>text");
 
@@ -404,6 +485,178 @@ struct Test_Axis : emp::web::BaseTest {
 
     });
 
+    // Test axes that are drawn with DrawAxes()
+    EM_ASM({
+
+      describe("Drawn Axes", function() {
+
+        var drawn_b_axis_container = d3.select("#drawn_axes_svg>g:nth-child(1)"); // padding: 90
+        var drawn_l_axis_container = d3.select("#drawn_axes_svg>g:nth-child(2)"); // padding: 170
+
+        it("should position the bottom axis correctly (shifted 170px right and 90px from bottom)", function() {
+          chai.assert.equal(drawn_b_axis_container.attr("transform"), "translate(170,510)");
+        });
+        it("should position the left axis correctly (shifted 170px right and 590px from bottom)", function() {
+          chai.assert.equal(drawn_l_axis_container.attr("transform"), "translate(170,10)");
+        });
+
+      });
+
+    });
+
+    // Test axes that are constructed on scales with different ranges
+    EM_ASM({
+
+      describe("Different Ranges row1col1", function() {
+
+        var ranges_row1col1_bottom_container = d3.select("#different_ranges_svg>g:nth-child(1)");
+        var ranges_row1col1_bottom_axis = d3.select("#different_ranges_svg>g:nth-child(1)>g");
+        var ranges_row1col1_bottom_axis_label = d3.select("#different_ranges_svg>g:nth-child(1)>text");
+
+        var ranges_row1col1_left_container = d3.select("#different_ranges_svg>g:nth-child(2)");
+        var ranges_row1col1_left_axis = d3.select("#different_ranges_svg>g:nth-child(2)>g");
+        var ranges_row1col1_left_axis_label = d3.select("#different_ranges_svg>g:nth-child(2)>text");
+
+        it("should position the bottom axis correctly (horizontal, ticks down, 70px from left edge and 270px from top)", function() {
+          chai.assert.equal(ranges_row1col1_bottom_container.attr("transform"), "translate(0,270)");
+          chai.assert.equal(ranges_row1col1_bottom_axis.select("path").attr("d"), "M70.5,6V0.5H270.5V6");
+        });
+        it("should position the left axis correctly (vertical, ticks left, 70px from left edge and 70px from top)", function() {
+          chai.assert.equal(ranges_row1col1_left_container.attr("transform"), "translate(70,0)");
+          chai.assert.equal(ranges_row1col1_left_axis.select("path").attr("d"), "M-6,270.5H0.5V70.5H-6");
+        });
+        it("should position the bottom label correctly (centered under the bottom axis)", function() {
+          chai.assert.equal(ranges_row1col1_bottom_axis_label.attr("x"), "170");
+          chai.assert.equal(ranges_row1col1_bottom_axis_label.attr("y"), "0");
+          chai.assert.equal(ranges_row1col1_bottom_axis_label.attr("dy"), "2.5em");
+          chai.assert.equal(ranges_row1col1_bottom_axis_label.attr("style"), "text-anchor: middle;");
+          chai.assert.equal(ranges_row1col1_bottom_axis_label.attr("transform"), "rotate(0)");
+        });
+        it("should position the left label correctly (centered to the left of the left axis)", function() {
+          chai.assert.equal(ranges_row1col1_left_axis_label.attr("x"), "-170");
+          chai.assert.equal(ranges_row1col1_left_axis_label.attr("y"), "0");
+          chai.assert.equal(ranges_row1col1_left_axis_label.attr("dy"), "-2.5em");
+          chai.assert.equal(ranges_row1col1_left_axis_label.attr("style"), "text-anchor: middle;");
+        });
+        it("should rotate the left label counterclockwise since the axis is vertical and leftward", function() {
+          chai.assert.equal(ranges_row1col1_left_axis_label.attr("transform"), "rotate(-90)");
+        });
+
+      });
+
+      describe("Different Ranges row1col2", function() {
+
+        var ranges_row1col2_bottom_container = d3.select("#different_ranges_svg>g:nth-child(3)");
+        var ranges_row1col2_bottom_axis = d3.select("#different_ranges_svg>g:nth-child(3)>g");
+        var ranges_row1col2_bottom_axis_label = d3.select("#different_ranges_svg>g:nth-child(3)>text");
+
+        var ranges_row1col2_left_container = d3.select("#different_ranges_svg>g:nth-child(4)");
+        var ranges_row1col2_left_axis = d3.select("#different_ranges_svg>g:nth-child(4)>g");
+        var ranges_row1col2_left_axis_label = d3.select("#different_ranges_svg>g:nth-child(4)>text");
+
+        it("should position the bottom axis correctly (horizontal, ticks down, 340px from left edge and 270px from top)", function() {
+          chai.assert.equal(ranges_row1col2_bottom_container.attr("transform"), "translate(0,270)");
+          chai.assert.equal(ranges_row1col2_bottom_axis.select("path").attr("d"), "M340.5,6V0.5H540.5V6");
+        });
+        it("should position the left axis correctly (vertical, ticks left, 340px from left edge and 70px from top)", function() {
+          chai.assert.equal(ranges_row1col2_left_container.attr("transform"), "translate(340,0)");
+          chai.assert.equal(ranges_row1col2_left_axis.select("path").attr("d"), "M-6,270.5H0.5V70.5H-6");
+        });
+        it("should position the bottom label correctly (centered under the bottom axis)", function() {
+          chai.assert.equal(ranges_row1col2_bottom_axis_label.attr("x"), "440");
+          chai.assert.equal(ranges_row1col2_bottom_axis_label.attr("y"), "0");
+          chai.assert.equal(ranges_row1col2_bottom_axis_label.attr("dy"), "2.5em");
+          chai.assert.equal(ranges_row1col2_bottom_axis_label.attr("style"), "text-anchor: middle;");
+          chai.assert.equal(ranges_row1col2_bottom_axis_label.attr("transform"), "rotate(0)");
+        });
+        it("should position the left label correctly (centered to the left of the left axis)", function() {
+          chai.assert.equal(ranges_row1col2_left_axis_label.attr("x"), "-170");
+          chai.assert.equal(ranges_row1col2_left_axis_label.attr("y"), "0");
+          chai.assert.equal(ranges_row1col2_left_axis_label.attr("dy"), "-2.5em");
+          chai.assert.equal(ranges_row1col2_left_axis_label.attr("style"), "text-anchor: middle;");
+        });
+        it("should rotate the left label counterclockwise since the axis is vertical and leftward", function() {
+          chai.assert.equal(ranges_row1col2_left_axis_label.attr("transform"), "rotate(-90)");
+        });
+
+      });
+
+      describe("Different Ranges row2col1", function() {
+
+        var ranges_row2col1_bottom_container = d3.select("#different_ranges_svg>g:nth-child(5)"); // shifted -20
+        var ranges_row2col1_bottom_axis = d3.select("#different_ranges_svg>g:nth-child(5)>g");
+        var ranges_row2col1_bottom_axis_label = d3.select("#different_ranges_svg>g:nth-child(5)>text");
+
+        var ranges_row2col1_left_container = d3.select("#different_ranges_svg>g:nth-child(6)"); // shifted -20
+        var ranges_row2col1_left_axis = d3.select("#different_ranges_svg>g:nth-child(6)>g");
+        var ranges_row2col1_left_axis_label = d3.select("#different_ranges_svg>g:nth-child(6)>text");
+
+        it("should position the bottom axis correctly (horizontal, ticks down, 70px from left edge and 540px from top)", function() {
+          chai.assert.equal(ranges_row2col1_bottom_container.attr("transform"), "translate(0,540)");
+          chai.assert.equal(ranges_row2col1_bottom_axis.select("path").attr("d"), "M70.5,6V0.5H270.5V6");
+        });
+        it("should position the left axis correctly (vertical, ticks left, 70px from left edge and 340px from top)", function() {
+          chai.assert.equal(ranges_row2col1_left_container.attr("transform"), "translate(70,0)");
+          chai.assert.equal(ranges_row2col1_left_axis.select("path").attr("d"), "M-6,540.5H0.5V340.5H-6");
+        });
+        it("should position the bottom label correctly (centered under the bottom axis)", function() {
+          chai.assert.equal(ranges_row2col1_bottom_axis_label.attr("x"), "170");
+          chai.assert.equal(ranges_row2col1_bottom_axis_label.attr("y"), "0");
+          chai.assert.equal(ranges_row2col1_bottom_axis_label.attr("dy"), "2.5em");
+          chai.assert.equal(ranges_row2col1_bottom_axis_label.attr("style"), "text-anchor: middle;");
+          chai.assert.equal(ranges_row2col1_bottom_axis_label.attr("transform"), "rotate(0)");
+        });
+        it("should position the left label correctly (centered to the left of the left axis)", function() {
+          chai.assert.equal(ranges_row2col1_left_axis_label.attr("x"), "-440");
+          chai.assert.equal(ranges_row2col1_left_axis_label.attr("y"), "0");
+          chai.assert.equal(ranges_row2col1_left_axis_label.attr("dy"), "-2.5em");
+          chai.assert.equal(ranges_row2col1_left_axis_label.attr("style"), "text-anchor: middle;");
+        });
+        it("should rotate the left label counterclockwise since the axis is vertical and leftward", function() {
+          chai.assert.equal(ranges_row2col1_left_axis_label.attr("transform"), "rotate(-90)");
+        });
+
+      });
+
+      describe("Different Ranges row2col2 (shifted)", function() {
+
+        var ranges_row2col2_bottom_container = d3.select("#different_ranges_svg>g:nth-child(7)");
+        var ranges_row2col2_bottom_axis = d3.select("#different_ranges_svg>g:nth-child(7)>g");
+        var ranges_row2col2_bottom_axis_label = d3.select("#different_ranges_svg>g:nth-child(7)>text");
+
+        var ranges_row2col2_left_container = d3.select("#different_ranges_svg>g:nth-child(8)");
+        var ranges_row2col2_left_axis = d3.select("#different_ranges_svg>g:nth-child(8)>g");
+        var ranges_row2col2_left_axis_label = d3.select("#different_ranges_svg>g:nth-child(8)>text");
+
+        it("should position the bottom axis correctly (horizontal, ticks down, 320px from left edge and 520px from top)", function() {
+          chai.assert.equal(ranges_row2col2_bottom_container.attr("transform"), "translate(-20,520)");
+          chai.assert.equal(ranges_row2col2_bottom_axis.select("path").attr("d"), "M340.5,6V0.5H540.5V6");
+        });
+        it("should position the left axis correctly (vertical, ticks left, 320px from left edge and 320px from top)", function() {
+          chai.assert.equal(ranges_row2col2_left_container.attr("transform"), "translate(320,-20)");
+          chai.assert.equal(ranges_row2col2_left_axis.select("path").attr("d"), "M-6,540.5H0.5V340.5H-6");
+        });
+        it("should position the bottom label correctly (centered under the bottom axis)", function() {
+          chai.assert.equal(ranges_row2col2_bottom_axis_label.attr("x"), "440");
+          chai.assert.equal(ranges_row2col2_bottom_axis_label.attr("y"), "0");
+          chai.assert.equal(ranges_row2col2_bottom_axis_label.attr("dy"), "2.5em");
+          chai.assert.equal(ranges_row2col2_bottom_axis_label.attr("style"), "text-anchor: middle;");
+          chai.assert.equal(ranges_row2col2_bottom_axis_label.attr("transform"), "rotate(0)");
+        });
+        it("should position the left label correctly (centered to the left of the left axis)", function() {
+          chai.assert.equal(ranges_row2col2_left_axis_label.attr("x"), "-440");
+          chai.assert.equal(ranges_row2col2_left_axis_label.attr("y"), "0");
+          chai.assert.equal(ranges_row2col2_left_axis_label.attr("dy"), "-2.5em");
+          chai.assert.equal(ranges_row2col2_left_axis_label.attr("style"), "text-anchor: middle;");
+        });
+        it("should rotate the left label counterclockwise since the axis is vertical and leftward", function() {
+          chai.assert.equal(ranges_row2col2_left_axis_label.attr("transform"), "rotate(-90)");
+        });
+
+      });
+
+    });
+
   }
 
 };
@@ -412,7 +665,7 @@ emp::web::MochaTestRunner test_runner;
 
 int main() {
   test_runner.Initialize({"emp_test_container"});
-  D3::internal::get_emp_d3();
+  D3::InitializeEmpD3();
 
   test_runner.AddTest<Test_Axis>("Axis");
 
