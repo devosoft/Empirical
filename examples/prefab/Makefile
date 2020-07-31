@@ -28,11 +28,11 @@ CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../source/
 CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' -s NO_EXIT_RUNTIME=1
 
 
-JS_TARGETS := Animate.js Animate2.js Attributes.js Canvas.js Div.js DP.js Example.js Font.js Graph.js Hello.js Image.js keypress.js Sudoku.js Table.js TextArea.js Tween.js Web.js
+JS_TARGETS := Card.js CodeBlock.js Collapse.js CommentBox.js ConfigPanel.js FontAwesomeIcon.js LoadingIcon.js LoadingModal.js Modal.js ToggleSwitch.js
 
 default: web
 
-WEB := ../../source/web
+WEB := ../../source/prefab
 
 CXX := $(CXX_web)
 CFLAGS_web := $(CFLAGS_web_opt)
