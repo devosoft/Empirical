@@ -6,6 +6,7 @@ default:
 	$(MAKE) -C geometry/
 	$(MAKE) -C hardware/
 	$(MAKE) -C meta/
+	$(MAKE) -C prefab/
 	$(MAKE) -C ProjectTemplate/
 	$(MAKE) -C tools/
 	$(MAKE) -C web/
@@ -18,6 +19,7 @@ clean:
 	$(MAKE) clean -C geometry/
 	$(MAKE) clean -C hardware/
 	$(MAKE) clean -C meta/
+	$(MAKE) clean -C prefab/
 	$(MAKE) clean -C ProjectTemplate/
 	$(MAKE) clean -C tools/
 	$(MAKE) clean -C web/
@@ -30,11 +32,14 @@ debug:
 	$(MAKE) debug -C geometry/
 	$(MAKE) debug -C hardware/
 	$(MAKE) debug -C meta/
+	$(MAKE) debug -C prefab/
 	$(MAKE) debug -C ProjectTemplate/
 	$(MAKE) debug -C tools/
 	$(MAKE) debug -C web/
 
 web-test:
+	$(MAKE) debug -C prefab/
+	$(MAKE) -C prefab/
 	$(MAKE) debug -C web/
 	$(MAKE) -C web/
 
