@@ -12,7 +12,7 @@ emp::web::Document doc("emp_base");
 int main()
 {
   std::cout << "entering main\n";
-  std::string my_code = 
+  std::string my_code =
   R"(
       int num = 9;
       std::cout << num << " is a square number" << std::endl;

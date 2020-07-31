@@ -17,13 +17,13 @@
 #include "../tools/string_utils.h"
 
 namespace emp {
-namespace prefab{
+namespace prefab {
   /// This method does not belong to a class, but it is used
   /// to close a loading modal that is added with the
   /// LoadingModal.js script. See the prefab demo site
   /// for more details on how to implement the Loading Modal
   /// in your web app. https://devosoft.github.io/empirical-prefab-demo
-  void CloseLoadingModal(){
+  void CloseLoadingModal() {
     emscripten_run_script("CloseLoadingModal();");
   }
 }

@@ -26,7 +26,7 @@ int main()
   emp::prefab::FontAwesomeIcon right("fa-angle-double-right");
   toggleIcons << right;
 
-  doc << "<br><hr><br>"; 
+  doc << "<br><hr><br>";
 
   UI::Div infoIcons;
   doc << infoIcons;

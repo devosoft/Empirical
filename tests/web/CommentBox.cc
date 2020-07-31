@@ -19,19 +19,19 @@ struct Test_Comment_Box_HTMLLayout : public emp::web::BaseTest {
 
 
   // Construct the following HTML structure:
-  /*
+  /**
    * <div id="emp_base">
    *  <div id="comment_box">
    *    <div id="comment_box_triangle" class="commentbox_triangle"></div>
-   * 
+   *
    *    <div id="comment_box_all_content" class="commentbox_content">
-   * 
+   *
    *      <div id="comment_box_desktop_content">
    *        <span id="emp__0"><h1>Comment Box Title</h1></span>
    *        <div id="body"><span id="emp__1">More content for comment box</span></div>
    *      </div>
    *      <div id="comment_box_mobile_content" class="mobile_commentbox"></div>
-   * 
+   *
    *    </div>
    *  </div>
    * </div>
@@ -119,7 +119,7 @@ struct Test_Comment_Box_HTMLLayout : public emp::web::BaseTest {
           });
         });
 
-        // TODO: When AddMobileContent() is removed from CommentBox, the remaining tests 
+        // TODO: When AddMobileContent() is removed from CommentBox, the remaining tests
         // will apply to #comment_box_all_content instead of #comment_box_desktop_content
         describe("div#comment_box_desktop_content", function() {
           it('should exist', function() {

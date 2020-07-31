@@ -18,7 +18,7 @@ namespace prefab {
       web::Element text{emp::to_string("span")}; // Alternative text
 
     public:
-      LoadingIcon(const std::string & in_name=""): web::Element("span", in_name){
+      LoadingIcon(const std::string & in_name=""): web::Element("span", in_name) {
           *this << icon;
           *this << text;
           icon.SetAttr("class", "fa fa-spinner fa-pulse fa-3x fa-fw");
@@ -30,7 +30,7 @@ namespace prefab {
       // The method below throws an error when trying to stream
       // a code block into anything else (web element, html).
       // template <typename T>
-      // void operator<<(T invalid){
+      // void operator<<(T invalid) {
       //     emp::LibraryError("Not allowed to add code to the loading icon");
       // }
   };

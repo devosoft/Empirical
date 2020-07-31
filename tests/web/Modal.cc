@@ -74,7 +74,7 @@ struct Test_Modal : emp::web::BaseTest {
             chai.assert.equal(first_child, "modal_trigger");
           });
         });
-        
+
         describe("div#modal", function() {
           it('should have parent #emp_test_container', function() {
             const parent_id = document.getElementById("modal").parentNode.id;
@@ -220,7 +220,7 @@ struct Test_Modal : emp::web::BaseTest {
             });
           });
         });
-        
+
 
         describe(".modal-body", function() {
           it('should have parent .modal-content', function() {
@@ -324,7 +324,7 @@ struct Test_Modal : emp::web::BaseTest {
       });
 
       /*
-      TODO: Find a way to trigger a click and check the DOM 
+      TODO: Find a way to trigger a click and check the DOM
       These tests should pass once we find a way to do this
 
       describe("Open modal, div#modal, 1st time", function() {

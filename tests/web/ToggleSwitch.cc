@@ -56,7 +56,7 @@ struct Test_ToggleSwitch_init_on : emp::web::BaseTest {
           });
 
         });
-        
+
         describe("input element", function() {
           it('should have parent #switch_on', function() {
             const parent_id = $("#"+input_id).parent().attr("id");

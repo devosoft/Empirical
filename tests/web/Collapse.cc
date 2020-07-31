@@ -21,23 +21,23 @@ struct Test_Collapse_String : emp::web::BaseTest {
   // Construct the following HTML structure:
   /**
    * <div id="emp_test_container">
-   * 
+   *
    * <span aria-controls=".set1" aria-expanded="true" class="collapse_toggle" data-target=".set1" data-toggle="collapse" role="button">Controller 1</span>
-   * 
+   *
    * <span aria-controls=".set1" aria-expanded="true" class="collapse_toggle" data-target=".set1" data-toggle="collapse" role="button">Controller 1.2</span>
-   * 
+   *
    * <span class="collapse show , set1">[1] Target Content (set1)</span>
-   * 
+   *
    * <span aria-controls=".set2" aria-expanded="false" class="collapse_toggle , collapsed" data-target=".set2" data-toggle="collapse" role="button">Controller 2</span>
-   * 
+   *
    * <span class="collapse , set2">[2] Target Content (set2)</span>
-   * 
+   *
    * <div id="target3" class="collapse , set2">
    *  <span>[3] Target Content (set2)</span>
    * </div>
-   * 
+   *
    * <div id="master_controller" aria-controls=".set1 , .set2" aria-expanded="true" class="collapse_toggle" data-target=".set1 , .set2" data-toggle="collapse" role="button"><span id="emp__#">Controller of all</span></div>
-   * 
+   *
    * </div>
    */
 
@@ -64,7 +64,7 @@ struct Test_Collapse_String : emp::web::BaseTest {
     couple1.AddController(master, true);
     couple2.AddController(couple1.GetControllerDiv(2), true);
     master << "Controller of all";
-    
+
     Doc("emp_test_container") << couple2.GetControllerDiv();
     Doc("emp_test_container") << couple2.GetTargetDiv();
     Doc("emp_test_container") << couple2.GetTargetDiv(1);
@@ -116,7 +116,7 @@ struct Test_Collapse_String : emp::web::BaseTest {
           it('should be of type span', function() {
             chai.assert.equal(controller.nodeName, "SPAN");
           });
-          
+
           it('should have aria-controls set to the class set1', function() {
             chai.assert.equal(controller.getAttribute("aria-controls"), ".set1");
           });
@@ -160,7 +160,7 @@ struct Test_Collapse_String : emp::web::BaseTest {
           it('should be of type span', function() {
             chai.assert.equal(controller.nodeName, "SPAN");
           });
-          
+
           it('should have aria-controls set to the class set1', function() {
             chai.assert.equal(controller.getAttribute("aria-controls"), ".set1");
           });
@@ -232,7 +232,7 @@ struct Test_Collapse_String : emp::web::BaseTest {
           it('should be of type span', function() {
             chai.assert.equal(controller.nodeName, "SPAN");
           });
-          
+
           it('should have aria-controls set to the class set2', function() {
             chai.assert.equal(controller.getAttribute("aria-controls"), ".set2");
           });
@@ -258,7 +258,7 @@ struct Test_Collapse_String : emp::web::BaseTest {
           });
 
           // collapsed class only added after controller is clicked, even if the target is initially closed
-          it('should not have class collapsed', function() {  
+          it('should not have class collapsed', function() {
             chai.assert.isTrue(controller.classList.contains("collapsed"));
           });
         });
@@ -349,7 +349,7 @@ struct Test_Collapse_String : emp::web::BaseTest {
         it('should be of type div', function() {
           chai.assert.equal(controller.nodeName, "DIV");
         });
-        
+
         it('should have aria-controls set to the classes set1 and set2', function() {
           chai.assert.equal(controller.getAttribute("aria-controls"), ".set1 , .set2");
         });
@@ -421,20 +421,20 @@ struct Test_Collapse_String : emp::web::BaseTest {
         // TODO: Once we figure out a way to trigger clicks, run tests to see if
         // target areas collaspse and expand as expected
         // document.getElementById(ctrl_1_id).click();
-        // first click ctrl_1_id ---> 
+        // first click ctrl_1_id --->
         //      ctrl_1_id should have class "collapsed" and aria-expanded="false"
         //      ctrl_2_id should have class "collapsed" and aria-expanded="false"
         //      target_1_id should not have class "show"
-        // second click ctrl_1_id ---> 
+        // second click ctrl_1_id --->
         //      ctrl_1_id should not have class "collapsed" and should have aria-expanded="true"
         //      ctrl_2_id should not have class "collapsed" and should have aria-expanded="true"
         //      target_1_id should have class "show"
 
-        // first click ctrl_2_id ---> 
+        // first click ctrl_2_id --->
         //      ctrl_1_id should have class "collapsed" and aria-expanded="false"
         //      ctrl_2_id should have class "collapsed" and aria-expanded="false"
         //      target_1_id should not have class "show"
-        // second click ctrl_2_id ---> 
+        // second click ctrl_2_id --->
         //      ctrl_1_id should not have class "collapsed" and should have aria-expanded="true"
         //      ctrl_2_id should not have class "collapsed" and should have aria-expanded="true"
         //      target_1_id should have class "show"
@@ -462,7 +462,7 @@ struct Test_Collapse_String : emp::web::BaseTest {
         //      ctrl_3_id should have class "collapsed" and aria-expanded="false"
         //      target_2_id should not have class "show"
         //      target_3_id should not have class "show"
-        // Note: Since ctrl_4_id controls multiple targets, it hard to predict its value for aria-expaned  
+        // Note: Since ctrl_4_id controls multiple targets, it hard to predict its value for aria-expaned
         // and if it will have class collapsed. It seems to depend on which target area was changed last.
       // });
     }, class_name.c_str());
@@ -474,27 +474,27 @@ struct Test_Collapse_Widget : emp::web::BaseTest {
   // Construct the following HTML structure:
   /**
    * <div id="emp_test_container">
-   * 
+   *
    * <div id="btn1" aria-controls=".emp__collapse_class_0" aria-expanded="true" class="btn btn-info , collapse_toggle" data-target=".emp__collapse_class_0" data-toggle="collapse" role="button">
    *  <span>Button 1: controls box 1</span>
    * </div>
-   * 
+   *
    * <div id="box1" class="collapse show , emp__collapse_class_0">
    *  <span><h3>Box 1</h3></span>
    * </div>
-   * 
+   *
    * <div id="btn2" aria-controls=".emp__collapse_class_1" aria-expanded="false" class="btn btn-info , collapse_toggle collapsed" data-target=".emp__collapse_class_1" data-toggle="collapse" role="button">
    *  <span>Button 2: controls box 2</span>
    * </div>
-   * 
+   *
    * <div id="box2" class="collapse , emp__collapse_class_1">
    *  <span><h3>Box 2</h3></span>
    * </div>
-   * 
+   *
    * <div id="btn3" aria-controls=".emp__collapse_class_0 , .emp__collapse_class_1" aria-expanded="true" class="btn btn-success" data-target=".emp__collapse_class_0 , .emp__collapse_class_1" data-toggle="collapse" role="button">
    *  <span>Button 3: controls all boxes</span>
    * </div>
-   * 
+   *
    * </div>
    */
 
@@ -510,7 +510,7 @@ struct Test_Collapse_Widget : emp::web::BaseTest {
 
     box1 << "<h3>Box 1</h3>";
     btn1.SetAttr("class", "btn btn-info");
-    btn1 << "Button 1: controls box 1"; 
+    btn1 << "Button 1: controls box 1";
 
     emp::prefab::CollapseCoupling collapse1(btn1, box1, true);
     Doc("emp_test_container") << collapse1.GetControllerDiv();
@@ -570,7 +570,7 @@ struct Test_Collapse_Widget : emp::web::BaseTest {
           it('should be of type div', function() {
             chai.assert.equal(controller.nodeName, "DIV");
           });
-          
+
           it('should have aria-controls set to the class emp__collapse_class_0', function() {
             chai.assert.equal(controller.getAttribute("aria-controls"), ".emp__collapse_class_0");
           });
@@ -684,7 +684,7 @@ struct Test_Collapse_Widget : emp::web::BaseTest {
           it('should be of type div', function() {
             chai.assert.equal(controller.nodeName, "DIV");
           });
-          
+
           it('should have aria-controls set to the class emp__collapse_class_1', function() {
             chai.assert.equal(controller.getAttribute("aria-controls"), ".emp__collapse_class_1");
           });
@@ -731,7 +731,7 @@ struct Test_Collapse_Widget : emp::web::BaseTest {
           it('should not have children', function() {
             chai.assert.equal(child.childElementCount, 0);
           });
-          
+
           it('should be type span', function() {
             chai.assert.equal(child.nodeName, "SPAN");
           });
@@ -798,7 +798,7 @@ struct Test_Collapse_Widget : emp::web::BaseTest {
           it('should be of type div', function() {
             chai.assert.equal(controller.nodeName, "DIV");
           });
-          
+
           it('should have aria-controls set to emp__collapse_class_0 and emp__collapse_class_1 ', function() {
             chai.assert.equal(controller.getAttribute("aria-controls"), ".emp__collapse_class_0 , .emp__collapse_class_1");
           });
@@ -824,7 +824,7 @@ struct Test_Collapse_Widget : emp::web::BaseTest {
           });
 
           // collapsed class only added after controller is clicked, even if the target is initially closed
-          it('should not have class collapsed', function() {  
+          it('should not have class collapsed', function() {
             chai.assert.isFalse(controller.classList.contains("collapsed"));
           });
 
@@ -846,7 +846,7 @@ struct Test_Collapse_Widget : emp::web::BaseTest {
           it('should not have children', function() {
             chai.assert.equal(child.childElementCount, 0);
           });
-        
+
           it('should be type span', function() {
             chai.assert.equal(child.nodeName, "SPAN");
           });
@@ -877,32 +877,32 @@ struct Test_Collapse_Widget : emp::web::BaseTest {
       // describe("The effects of clicking contorllers", function() {
         // TODO: Once we figure out a way to trigger clicks, run tests to see if
         // target areas collaspse and expand as expected
-    
-        // first click #btn1 ---> 
+
+        // first click #btn1 --->
         //      #btn1 should have class "collapsed" and aria-expaned="false"
         //      #box1 should not have class "show"
-        // second click #btn1 ---> 
+        // second click #btn1 --->
         //      #btn1 should not have class "collapsed" and should have aria-expaned="true"
         //      #box1 should have class "show"
 
-        // first click #btn2 ---> 
+        // first click #btn2 --->
         //      #btn2 should have aria-expaned="true"
         //      #box2 should have class "show"
-        // second click #btn2 ---> 
+        // second click #btn2 --->
         //      #btn2 should have class "collapsed" and aria-expaned="false"
         //      #box2 should not have class "show"
 
-        // first click #btn3 ---> 
+        // first click #btn3 --->
         //      #btn1 should have class "collapsed" and aria-expaned="false"
         //      #box1 should not have class "show"
         //      #btn2 should not have class "collapsed" and should have aria-expaned="true"
         //      #box2 should have class "show"
-        // second click #btn3 ---> 
+        // second click #btn3 --->
         //      #btn1 should have not class "collapsed" and should have aria-expaned="true"
         //      #box1 should have class "show"
         //      #btn2 should have class "collapsed" and aria-expaned="false"
         //      #box2 should not have class "show"
-        // Note: Since btn3 controls multiple targets, it hard to predict its value for aria-expaned and 
+        // Note: Since btn3 controls multiple targets, it hard to predict its value for aria-expaned and
         // if it will have class collapsed. It seems to depend on which target area was changed last.
       // });
     }, class_name.c_str());

@@ -21,17 +21,17 @@ struct Test_Card_STATIC_HTMLLayout : public emp::web::BaseTest {
   /**
    * <div id="emp_test_container">
    * <div id="static" class="card">
-   * 
+   *
    *  <div id="static_card_header" class="card-header">
    *    <span id="emp__0">Static Card Title</span>
    *  </div>
-   * 
+   *
    *  <div id="static_card_body" class="card-body">
    *    <div id="div_body">
    *      <span id="emp__1">body content</span>
    *    </div>
    *  </div>
-   * 
+   *
    * </div>
    * </div>
    */
@@ -155,7 +155,7 @@ struct Test_Card_STATIC_HTMLLayout : public emp::web::BaseTest {
               const parent_id = child.parentElement.id;
               chai.assert.equal(parent_id, "static_card_body");
             });
-            
+
             it('should be a div element', function() {
               chai.assert.equal(child.nodeName, "DIV");
             });
@@ -182,7 +182,7 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
   /**
    * <div id="emp_test_container">
    * <div id="open" class="card">
-   * 
+   *
    *  <div id="open_card_header" aria-controls=".open_card_collapse" aria-expanded="true" class="card-header , collapse_toggle , collapse_toggle_card_header" data-target=".open_card_collapse" data-toggle="collapse" role="button">
    *    <span id="emp__3" class="fa fa-angle-double-up , float-right btn-link collapse_toggle setting_heading"></span>
    *    <span id="emp__4" class="fa fa-angle-double-down , float-right btn-link collapse_toggle setting_heading"></span>
@@ -192,13 +192,13 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
    *      </span>
    *    </div>
    *  </div>
-   * 
+   *
    *  <div id="open_card_body" class="card-body , collapse show , open_card_collapse">
    *    <span id="emp__5">
    *      <p>collapsible card body</p>
    *    </span>
    *  </div>
-   * 
+   *
    * </div>
    * </div>
    */
@@ -405,7 +405,7 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
             it('should be a span element', function() {
               chai.assert.equal(child.nodeName, "SPAN");
             });
-            
+
             it('should have one child', function() {
               chai.assert.equal(child.childElementCount, 1);
             });
@@ -495,15 +495,15 @@ struct Test_Card_INIT_CLOSED_HTMLLayout : public emp::web::BaseTest {
   /**
    * <div id="emp_test_container">
    * <div id="closed" class="card">
-   * 
+   *
    *  <div id="closed_card_header" aria-controls=".closed_card_collapse" aria-expanded="false" class="card-header , collapse_toggle , collapsed , collapse_toggle_card_header" data-target=".closed_card_collapse" data-toggle="collapse" role="button">
    *    <div id="emp__8" class="btn-link">
    *      <span id="emp__9">linked Header</span>
    *    </div>
    *  </div>
-   * 
+   *
    *  <div id="closed_card_body" class="card-body , collapse , closed_card_collapse"></div>
-   * 
+   *
    * </div>
    * </div>
    */
@@ -626,9 +626,9 @@ struct Test_Card_INIT_CLOSED_HTMLLayout : public emp::web::BaseTest {
           });
         });
 
-        
 
-        
+
+
 
         describe("div#closed_card_body", function() {
           it('should exist', function() {
