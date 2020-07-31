@@ -39,7 +39,7 @@ namespace prefab {
 
       public:
         /// Construct a shared pointer to manage ConfigPanel state.
-        /// @in_id HTML ID of ConfigPanel div
+        /// @param in_id HTML ID of ConfigPanel div
         ConfigPanelInfo( const std::string & in_id="" )
         : web::internal::DivInfo(in_id) { ; }
 
@@ -99,7 +99,7 @@ namespace prefab {
       /// @param val new value to be update the inputs with
       /// @param input1 ID of one input that needs its value updated
       /// @param input2 ID of the second input that needs its value updated
-      void SyncForm(std::string val, std::string input1, std::string input2) {
+      void SyncForm(const std::string val, const std::string input1, const std::string input2) {
           emp::web::Input div1(settings_div.Find(input1));
           div1.Value(val);
           emp::web::Input div2(settings_div.Find(input2));
@@ -159,7 +159,7 @@ namespace prefab {
         // Otherwise val is 0 and we have nothing to go on
       }
 
-      void SetDefaultRangeFixedPoint(web::Input & input, int val) {
+      void SetDefaultRangeFixedPoint(web::Input & input, const int val) {
         // Default step is 1, which should be fine for fixed point
 
         if (val > 0) {
@@ -174,7 +174,7 @@ namespace prefab {
         // Otherwise val is 0 and we have nothing to go on
       }
 
-      void ExcludeConfig(std::string setting) {
+      void ExcludeConfig(const std::string setting) {
         exclude.insert(setting);
       }
 

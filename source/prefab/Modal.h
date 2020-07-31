@@ -20,7 +20,7 @@ namespace prefab {
         web::Div modal_footer; // footer content goes here
 
     public:
-      Modal(const std::string & in_name=""): web::Div(in_name) {
+      Modal(const std::string & id=""): web::Div(id) {
         // nest Divs propery
         *this << modal_dialog;
         modal_dialog << modal_content;

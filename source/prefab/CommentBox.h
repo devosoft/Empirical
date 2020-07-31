@@ -39,7 +39,7 @@ namespace prefab {
       }
 
     public:
-      CommentBox(std::string id="") : web::Div(id) {
+      CommentBox(const std::string id="") : web::Div(id) {
         *this << triangle;
         *this << all_content;
         all_content << desktop_content;

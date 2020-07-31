@@ -18,7 +18,7 @@ namespace prefab {
       web::Element text{emp::to_string("span")}; // Alternative text
 
     public:
-      LoadingIcon(const std::string & in_name=""): web::Element("span", in_name) {
+      LoadingIcon(const std::string & id=""): web::Element("span", id) {
           *this << icon;
           *this << text;
           icon.SetAttr("class", "fa fa-spinner fa-pulse fa-3x fa-fw");

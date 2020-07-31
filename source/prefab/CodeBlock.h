@@ -16,13 +16,13 @@ namespace prefab {
       web::Element code{emp::to_string("code")};
 
     public:
-      /// @param code_str string of the code to be placed in code block
+      /// @param code_block string of the code to be placed in code block
       /// @param lang programming language to base syntax highlighting
       /// List of all supported languages: https://highlightjs.org/static/demo/
       /// Note: Due to JavaScript callback functions, can only set code for block
       /// in constructor.
-      CodeBlock(const std::string code_str, const std::string lang, const std::string & in_name="")
-        : web::Element("pre", in_name) {
+      CodeBlock(const std::string code_block, const std::string lang, const std::string & id="")
+        : web::Element("pre", id) {
           this->SetAttr("class", lang);
           // trigger HighlightJS library to apply syntax highlighting
           this->DoUpdateJS([]() {
@@ -30,7 +30,7 @@ namespace prefab {
           });
           // make sure special characters (", ', &, <, >) appear as their symbol,
           // not rendered as html on web page
-          code << emp::to_web_safe_string(code_str);
+          code << emp::to_web_safe_string(code_block);
           *this << code;
           }
 

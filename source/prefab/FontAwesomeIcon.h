@@ -14,8 +14,8 @@ namespace prefab {
   class FontAwesomeIcon: public web::Element {
     public:
       /// @param fa_name the font awesome class of the desired icon
-      FontAwesomeIcon(std::string fa_name, const std::string & in_name="")
-        : web::Element("span", in_name) {
+      FontAwesomeIcon(const std::string fa_name, const std::string & id="")
+        : web::Element("span", id) {
         std::string full_class = emp::to_string("fa ", fa_name);
         this->SetAttr("class", full_class);
       }

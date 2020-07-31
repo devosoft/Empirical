@@ -64,7 +64,7 @@ namespace prefab {
     /// @param val content to be added to header, can be a web element or primitive type
     /// @param link_content indicates whether the content should have Bootstrap link properties (default false)
     template <typename T>
-    void AddHeaderContent(T val, bool link_content=false) {
+    void AddHeaderContent(T val, const bool link_content=false) {
       // Note: val can be a controller of a target area (made with CollapseCoupling class)
       // but when added to header of the card, it will also trigger the card
       // to collapse/expand
