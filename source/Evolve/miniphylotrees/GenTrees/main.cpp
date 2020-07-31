@@ -41,13 +41,6 @@ public:
     //int clade;
     int genotype = 0;
 
-    //heritable, can mutate in reproduction //replace clade with genotype
-    //need mutation rate .05 -> or higher (configurable at top)
-    //(.P use to determine if mutation happens)
-    //how much does genotype change when it mutates
-    //choose random new genotype within certain range
-    //option to turn on pressure for diversity (empirical config object) (change from command line)
-
     Organism() { //default constructor sets genotype to 0
     }
 
@@ -59,7 +52,6 @@ public:
 
         double randMutation = RandNum.GetDouble(0, 1);
         //cout << "random mutation rate = " << randMutation << endl;
-
         //cout << "GENOTYPE BEFORE MUTATION: " << genotype << endl;
 
         if (randMutation < mutRate) {
@@ -231,20 +223,3 @@ bool writeToFile(string filename, int field_one){
 
     return true;
 }
-
-//use only end phylo num
-
-//use python script to convert each value to percentile
-//order smallest to larget -- '
-
-//end up with file with 100 nums --star num and second num that starts percentile
-//in systematics class, we will want to modify some tree calcualtions
-
-//modify phpy diversity and others
-//give it optional arg, string pointing to file with percentiles
-//file as arg, should open file and read everything
-
-//check out file.h class (tools) -- use to read in file
-//at end of phylo funct, if data is providec to normalize, normalize
-
-//figure out which percentile it falls into
