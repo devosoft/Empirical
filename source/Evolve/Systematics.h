@@ -822,35 +822,40 @@ namespace emp {
     }
 
   
-  // int FindPhyloData(){
-  //   int percentile; 
+  int FindPhyloData(){
+    int percentile; 
 
-  //   emp::File tree_percentiles("tree_percentiles.csv"); //loading file
+    emp::File tree_percentiles("tree_percentiles.csv"); //loading file
 
-  //   emp::vector< emp::vector<double> > percentile_data = tree_percentiles.ToData<double>(','); //turns data into an array
+    emp::vector< emp::vector<double> > percentile_data = tree_percentiles.ToData<double>(','); //turns data into an array
 
-  //    int PhyloDiversity = GetPhylogeneticDiversity(); 
+     int PhyloDiversity = GetPhylogeneticDiversity(); 
 
-  //   for (int i = 0; i < percentile_data.size() - 1; i++){ 
+    for (int i = 0; i < percentile_data.size() - 1; i++){ 
 
-  //       if( (PhyloDiversity >= percentile_data[i][1]) && (PhyloDiversity < percentile_data[i + 1][1])){ 
-  //          std::cout << "Phylogenetic Diversity (recorded in systematics): " << PhyloDiversity << std::endl; 
-  //          std::cout << "phylo diversity is in between: " << percentile_data[i][1] << " and " << percentile_data[i + 1][1] << std::endl; 
-  //          std::cout << PhyloDiversity << " is in percentile: " << percentile_data[i][0] << std::endl;       
+        if( (PhyloDiversity >= percentile_data[i][1]) && (PhyloDiversity < percentile_data[i + 1][1])){ 
+           //std::cout << "Phylogenetic Diversity: " << PhyloDiversity << std::endl; 
+           //std::cout << "phylo diversity is in between: " << percentile_data[i][1] << " and " << percentile_data[i + 1][1] << std::endl; 
+           std::cout << PhyloDiversity << " is in percentile: " << percentile_data[i][0] << std::endl;       
 
-  //          percentile = percentile_data[i][0];
+           percentile = percentile_data[i][0];
 
-  //          std::cout << percentile << std::endl; 
-  //          }
-  //     }
-  //     return percentile; 
-  //   }
+           std::cout << percentile << std::endl; 
+           }
+      }
+      return percentile; 
+    }
 
-  // int GetPhyloNormalize(string filename = 0, int Generation = 0); 
+  //this function returns phylogenetic diversity if used without any arguments 
+  //if you want to receive normalized data, you need to include the number of generations your tree has (multiples of 10 from 10 to 100 are allowed)
+  //you also need to specify a file with which to normalize your data. 
+  //if you want to normalize with no pressure for diversity, use "TensChooseOrgGenotype.csv"
+  //if you want to normalize with pressure for diversity, use "TensChooseOrgDiversityGenotype.csv"
+  //these are located in Empirical/source/Evolve/miniphulotrees/GenTrees
+  //if your value is outside of the values in the file, 100th percentile will be returned
 
   int GetPhylogeneticDiversityNormalize(int Generation = 0, std::string filename = ""){ 
-    int GenValue =((Generation / 10) - 1); //indexes from 0, 100 generations would correspond to the 10th line in the csv
-    int percentile; 
+    int GenValue = ((Generation / 10) - 1); //indexes from 0, 100 generations would correspond to the 10th line in the csv
     bool percentFound = false; 
     int PhylogeneticDiversity = ancestor_taxa.size() + active_taxa.size() - 1; 
 
@@ -859,81 +864,70 @@ namespace emp {
       return PhylogeneticDiversity; 
     } else{ 
 
-      emp::File generation_percentiles(filename);
-      emp::vector< emp::vector<double> >percentile_data2 = generation_percentiles.ToData<double>(',');
+      emp::File generation_percentiles(filename); //opens file
+      emp::vector< emp::vector<double> >percentile_data = generation_percentiles.ToData<double>(','); //turns file contents into vector
 
-      int lastval = size(percentile_data2[GenValue]) - 1; 
-      //std::cout << "Last element of array is: " << percentile_data2[GenValue][lastval] << std::endl;
+          for(int j = 0; j <= percentile_data[GenValue].size() - 2; j++){ //searches through vector for slot where phylo diversity fits 
 
-          for(int j = 0; j <= percentile_data2[GenValue].size() - 2; j++){
-          
-          if((percentile_data2[GenValue][j] <= PhylogeneticDiversity) && (percentile_data2[GenValue][j + 1] > PhylogeneticDiversity)){
-            std::cout << "phylo diversity is in between: " << percentile_data2[GenValue][j] << "and " << percentile_data2[GenValue][j+1] << std::endl;
-            //std::cout << "I is equal to: " << GenValue << std::endl; 
-            //std::cout << "J is equal to: " << j << std::endl;
-
-            std::cout << "The Phylogentic diversity value " << PhylogeneticDiversity << " is in the " << j << " percentile, in the " << ((GenValue + 1)* 10) << " generation" << std::endl;
+          if((percentile_data[GenValue][j] <= PhylogeneticDiversity) && (percentile_data[GenValue][j + 1] > PhylogeneticDiversity)){
+            std::cout << "phylogenetic diversity is in between: " << percentile_data[GenValue][j] << "and " << percentile_data[GenValue][j+1] << std::endl;
+            std::cout << "The phylogenetic diversity value " << PhylogeneticDiversity << " is in the " << j << " percentile, in the " << ((GenValue + 1)* 10) << " generation" << std::endl;
             return j;   
 
             percentFound = true; 
           }
-          
-          if(PhylogeneticDiversity >= percentile_data2[GenValue][lastval]){ 
-            std::cout << " The phylogenetic diversity value " << PhylogeneticDiversity << "is in the 100 percentile" << std::endl; 
-            return 100;
-          }
-
           if(percentFound == true){ 
             break; 
           }
         }
       }
+      return 100; 
    }
 
 
-    void FindPhyloMultipleGens(int GenValueRaw){ 
-      int GenValue = ((GenValueRaw / 10) - 1); 
-      int percentile; 
-      bool percentFound = false; 
+    // void FindPhyloMultipleGens(int GenValueRaw){ 
+    //   int GenValue = ((GenValueRaw / 10) - 1); 
+    //   int percentile; 
+    //   bool percentFound = false; 
 
-        emp::File generation_percentiles("TensChooseOrgGenotype.csv");
-        emp::vector< emp::vector<double> >percentile_data2 = generation_percentiles.ToData<double>(',');
+    //     emp::File generation_percentiles("TensChooseOrgGenotype.csv");
+    //     emp::vector< emp::vector<double> >percentile_data2 = generation_percentiles.ToData<double>(',');
 
-      int PhyloDiversity = GetPhylogeneticDiversity(); 
-      int lastval = size(percentile_data2[GenValue]) - 1; 
-      std::cout << "Last element of array is: " << percentile_data2[GenValue][lastval] << std::endl;
+    //   int PhyloDiversity = GetPhylogeneticDiversity(); 
+    //   int lastval = size(percentile_data2[GenValue]) - 1; 
+    //   std::cout << "Last element of array is: " << percentile_data2[GenValue][lastval] << std::endl;
 
-      std::fstream fs; 
-      fs.open("PercentileWithPressureTwo.csv", std::fstream::in | std::fstream::out | std::fstream::app);
+    //   std::fstream fs; 
+    //   fs.open("PercentileWithPressureTwo.csv", std::fstream::in | std::fstream::out | std::fstream::app);
 
-        //for(int i = 0; i < percentile_data2.size() - 1; i++){ 
-          for(int j = 0; j <= percentile_data2[GenValue].size() - 2; j++){
+    //     //for(int i = 0; i < percentile_data2.size() - 1; i++){ 
+    //       for(int j = 0; j <= percentile_data2[GenValue].size() - 2; j++){
           
-          if((percentile_data2[GenValue][j] <= PhyloDiversity) && (percentile_data2[GenValue][j + 1] > PhyloDiversity)){
-            std::cout << "phylo diversity is in between: " << percentile_data2[GenValue][j] << "and " << percentile_data2[GenValue][j+1] << std::endl;
-            std::cout << "I is equal to: " << GenValue << std::endl; 
-            std::cout << "J is equal to: " << j << std::endl;
+    //       if((percentile_data2[GenValue][j] <= PhyloDiversity) && (percentile_data2[GenValue][j + 1] > PhyloDiversity)){
+    //         std::cout << "phylo diversity is in between: " << percentile_data2[GenValue][j] << "and " << percentile_data2[GenValue][j+1] << std::endl;
+    //         std::cout << "I is equal to: " << GenValue << std::endl; 
+    //         std::cout << "J is equal to: " << j << std::endl;
 
-            std::cout << "The Phylogentic diversity value " << PhyloDiversity << " is in the " << j << " percentile, in the " << ((GenValue + 1)* 10) << " generation" << std::endl;  
+    //         std::cout << "The Phylogentic diversity value " << PhyloDiversity << " is in the " << j << " percentile, in the " << ((GenValue + 1)* 10) << " generation" << std::endl;  
 
-            fs << ((GenValue + 1)* 10) << "," << j << std::endl; 
+    //         fs << ((GenValue + 1)* 10) << "," << j << std::endl; 
 
-            percentFound = true; 
-          }
+    //         percentFound = true; 
+    //       }
           
-          if(PhyloDiversity >= percentile_data2[GenValue][lastval]){ 
-              fs << ((GenValue + 1) * 10) << "," << 100 << std::endl; 
-              fs.close(); 
-            }
+    //       if(PhyloDiversity >= percentile_data2[GenValue][lastval]){ 
+    //           fs << ((GenValue + 1) * 10) << "," << 100 << std::endl; 
+    //           fs.close(); 
+    //         }
 
-        if(percentFound == true){ 
-            break; 
-          }
-          }
-          if(percentFound == false){ 
-            std::cout << "PHYLO DIVERSITY IS IN 100TH PERCENTILE" << std::endl; 
-           }
-        }
+    //     if(percentFound == true){ 
+    //         break; 
+    //       }
+    //       }
+    //       if(percentFound == false){ 
+    //         std::cout << "PHYLO DIVERSITY IS IN 100TH PERCENTILE" << std::endl; 
+    //        }
+    //     }
 
 
     /** This is a metric of how distinct @param tax is from the rest of the population.
