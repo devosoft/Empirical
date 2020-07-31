@@ -7,3 +7,6 @@
 [submodule "third-party/cereal"]
 	path = third-party/cereal
 	url = https://github.com/mmore500/cereal.git
+[submodule "third-party/span-lite"]
+	path = third-party/span-lite
+	url = https://github.com/martinmoene/span-lite.git

@@ -8,6 +8,9 @@
  *		It orders elements by access time and removes the stalest ones in case maximum capacity is reached.
  */
 
+#ifndef EMP_QUEUECACHE_H
+#define EMP_QUEUECACHE_H
+
 #include <list>
 #include <unordered_map>
 #include <utility>
@@ -190,3 +193,4 @@
 			}
 	};
 }
+#endif
