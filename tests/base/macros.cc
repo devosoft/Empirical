@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2018.
+//  Copyright (C) Michigan State University, 2016-2020.
 //  Released under the MIT Software license; see doc/LICENSE
 
 #define EMP_DECORATE(X) [X]
@@ -10,6 +10,7 @@
 
 #include "base/macros.h"
 
+#include <array>
 #include <sstream>
 #include <iostream>
 #include <string>
