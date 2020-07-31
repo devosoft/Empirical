@@ -22,10 +22,12 @@
 * it throws this exception: uncaught exception: abort(2). Build with -s ASSERTIONS=1 for more info.
 * Emscripten notes on exception: https://emscripten.org/docs/porting/Debugging.html#debugging-assertions
 *
+* More details here: https://github.com/devosoft/Empirical/issues/307
+*
 * Methods called when setting value: Value -> UpdateValue -> DoChange -> callback -> SynchForm -> Value
 *
 * Note: This is not an issue when the prefab comment box element is added to the map of input_divs immediately
-* after creation. (uncomment line 109 and comment line 188)
+* after creation. (uncomment line 113 and comment line 193)
 * All description boxes will be expanded.
 */
 
@@ -39,12 +41,13 @@ class CP_Bug {
       std::set<std::string> exclude;
       std::map<std::string, web::Div> group_divs;
       std::map<std::string, web::Div> input_divs;
-      std::function<void(const std::string & val)> on_change_fun = [](const std::string & val){;};
-      std::function<std::string(std::string val)> format_label_fun = [](std::string name){
+      std::function<void(const std::string & val)> on_change_fun = [](const std::string & val) { ; };
+      std::function<std::string(std::string val)> format_label_fun = [](std::string name) {
           emp::vector<std::string> sliced = slice(name, '_');
           return to_titlecase(join(sliced, " "));
       };
-      void SyncForm(std::string val, std::string input1, std::string input2){
+
+      void SyncForm(std::string val, std::string input1, std::string input2) {
         std::cout << "---- SyncForm() -----\n";
         emp::web::Input div1(settings_div.Find(input1));
         div1.Value(val);
@@ -54,9 +57,10 @@ class CP_Bug {
         div2.Redraw();
         std::cout << "END SyncForm()\n";
       }
+
     public:
       CP_Bug(Config & c, const std::string & div_name = "settings_div")
-        : config(c), settings_div(div_name) {;}
+        : config(c), settings_div(div_name) { ; }
 
       void SetOnChangeFun(std::function<void(const std::string & val)> fun) {on_change_fun = fun;}
 
@@ -72,7 +76,7 @@ class CP_Bug {
           settings_div << group_divs[group_name];
 
           // Prefab Card
-          prefab::Card card(prefab::Card::Collapse::OPEN);
+          prefab::Card card("INIT_OPEN");
           group_divs[group_name] << card;
 
           // Card header content
@@ -118,41 +122,42 @@ class CP_Bug {
               const std::string name_input_slider = name + "_input_slider";
               const std::string name_input_number = name + "_input_number";
               const std::string name_input_mobile_slider = name + "_input_mobile_slider";
-              emp::web::Input slider( [](std::string x){
+              emp::web::Input slider( [](std::string x) {
                   std::cout << "empty slider function" << std::endl;},
               "range", NULL, name_input_slider
               );
               setting_element << slider;
 
-              emp::web::Input number([](std::string val){
+              emp::web::Input number([](std::string val) {
                 std::cout << "empty number function" << std::endl;
                 },
                 "number", NULL, name_input_number
                 );
               setting_element << number;
-              emp::web::Input mobile_slider([](std::string val){
+              emp::web::Input mobile_slider([](std::string val) {
                 std::cout << "empty mobile slider function" << std::endl;
               },
                 "range", NULL, name_input_mobile_slider
               );
               std::cout << name << " ---- adding mobile content" << std::endl;
-              box.AddMobileContent("<hr>");
-              box.AddMobileContent(mobile_slider);
+              // This method is now proteted, but it shouldn't affect issue
+              // box.AddMobileContent("<hr>");
+              // box.AddMobileContent(mobile_slider);
               std::cout << "BACK to config panel after adding mobile content" << std::endl;
 
               // Set onchange behavior for inputs
               slider.Callback(
-                [this,name, name_input_number, name_input_mobile_slider](std::string val){
+                [this,name, name_input_number, name_input_mobile_slider](std::string val) {
                 config.Set(name, val);
                 SyncForm(val, name_input_number, name_input_mobile_slider);
                 });
               number.Callback(
-                [this,name, name_input_slider, name_input_mobile_slider](std::string val){
+                [this,name, name_input_slider, name_input_mobile_slider](std::string val) {
                 config.Set(name, val);
                 SyncForm(val, name_input_slider, name_input_mobile_slider);
                 });
               mobile_slider.Callback(
-                [this,name, name_input_number, name_input_slider](std::string val){
+                [this,name, name_input_number, name_input_slider](std::string val) {
                 config.Set(name, val);
                 SyncForm(val, name_input_number, name_input_slider);
                 });
@@ -166,7 +171,7 @@ class CP_Bug {
             }
             else if (type == "bool") {
               emp::web::Input bool_input(
-                [this, name](std::string val){config.Set(name, val);
+                [this, name](std::string val) { config.Set(name, val);
                                                 on_change_fun(val);},
                 "checkbox", NULL, name + "_input_checkbox"
               );
@@ -174,7 +179,7 @@ class CP_Bug {
 
             } else {
               emp::web::Input text_input(
-                [this, name](std::string val){config.Set(name, val);
+                [this, name](std::string val) {config.Set(name, val);
                                                 on_change_fun(val);},
                 "text", NULL, name + "_input_textbox"
               );
@@ -191,7 +196,7 @@ class CP_Bug {
 
       }
 
-        web::Div & GetDiv() {return settings_div;}
+        web::Div & GetDiv() { return settings_div; }
 
 };
 

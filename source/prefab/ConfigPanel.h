@@ -22,7 +22,7 @@
 // after a ConfigPanel object goes out of scope.
 
 namespace emp {
-namespace prefab{
+namespace prefab {
 
   namespace internal {
       /// Shared pointer held by instances of ConfigPanel class representing
@@ -35,15 +35,13 @@ namespace prefab{
         using on_change_fun_t = std::function<void(const std::string & val)>;
 
       private:
-        on_change_fun_t on_change_fun{ [](const std::string & val){ ; } };
+        on_change_fun_t on_change_fun{ [](const std::string & val) { ; } };
 
       public:
         /// Construct a shared pointer to manage ConfigPanel state.
         /// @in_id HTML ID of ConfigPanel div
-        ConfigPanelInfo(
-          const std::string & in_id=""
-        ) : web::internal::DivInfo(in_id)
-        { ; }
+        ConfigPanelInfo( const std::string & in_id="" )
+        : web::internal::DivInfo(in_id) { ; }
 
         /// Get current on-update callback for a ConfigPanel.
         /// @return current callback function handle
@@ -90,7 +88,7 @@ namespace prefab{
       std::map<std::string, web::Div> group_divs;
       std::map<std::string, web::Div> input_divs;
 
-      std::function<std::string(std::string val)> format_label_fun = [](std::string name){
+      std::function<std::string(std::string val)> format_label_fun = [](std::string name) {
         emp::vector<std::string> sliced = slice(name, '_');
         return to_titlecase(join(sliced, " "));
       };
@@ -101,7 +99,7 @@ namespace prefab{
       /// @param val new value to be update the inputs with
       /// @param input1 ID of one input that needs its value updated
       /// @param input2 ID of the second input that needs its value updated
-      void SyncForm(std::string val, std::string input1, std::string input2){
+      void SyncForm(std::string val, std::string input1, std::string input2) {
           emp::web::Input div1(settings_div.Find(input1));
           div1.Value(val);
           emp::web::Input div2(settings_div.Find(input2));
@@ -184,20 +182,20 @@ namespace prefab{
       /// @param id_prefix string appended to id for each setting group Div
       void Setup(const std::string & id_prefix = "settings_") {
         for (auto group : config.GetGroupSet()) {
-            // std::cout << "GROUP: " << group->GetName() << std::endl;
-            std::string group_name = group->GetName();
-            group_divs[group_name] = web::Div(id_prefix + group_name);
-            settings_div << group_divs[group_name];
+          // std::cout << "GROUP: " << group->GetName() << std::endl;
+          std::string group_name = group->GetName();
+          group_divs[group_name] = web::Div(id_prefix + group_name);
+          settings_div << group_divs[group_name];
 
-            // Prefab Card
-            prefab::Card card("INIT_OPEN");
-            group_divs[group_name] << card;
+          // Prefab Card
+          prefab::Card card("INIT_OPEN");
+          group_divs[group_name] << card;
 
-            // Header content
-            web::Div setting_heading;
-            card.AddHeaderContent(setting_heading);
-            setting_heading << "<h3>" + group->GetDesc() + "</h3>";
-            setting_heading.SetAttr("class", "setting_heading");
+          // Header content
+          web::Div setting_heading;
+          card.AddHeaderContent(setting_heading);
+          setting_heading << "<h3>" + group->GetDesc() + "</h3>";
+          setting_heading.SetAttr("class", "setting_heading");
 
           for (size_t i = 0; i < group->GetSize(); i++) {
             // std::cout << group->GetEntry(i)->GetType() << std::endl;
@@ -244,19 +242,19 @@ namespace prefab{
               const std::string name_input_slider = name + "_input_slider";
               const std::string name_input_number = name + "_input_number";
               const std::string name_input_mobile_slider = name + "_input_mobile_slider";
-              web::Input slider( [](std::string x){
+              web::Input slider( [](std::string x) {
                 std::cout << "empty slider function" << std::endl;},
                 "range", NULL, name_input_slider
               );
               setting_element << slider;
 
-              web::Input number([](std::string val){
+              web::Input number([](std::string val) {
                 std::cout << "empty number function" << std::endl;
                 },
                 "number", NULL, name_input_number
               );
               setting_element << number;
-              web::Input mobile_slider([](std::string val){
+              web::Input mobile_slider([](std::string val) {
                 std::cout << "empty mobile slider function" << std::endl;
                 },
                 "range", NULL, name_input_mobile_slider
@@ -266,17 +264,17 @@ namespace prefab{
 
               // Set onchange behavior for inputs
               slider.Callback(
-                [this,name, name_input_number, name_input_mobile_slider](std::string val){
+                [this,name, name_input_number, name_input_mobile_slider](std::string val) {
                 config.Set(name, val);
                 SyncForm(val, name_input_number, name_input_mobile_slider);
                 });
               number.Callback(
-                [this,name, name_input_slider, name_input_mobile_slider](std::string val){
+                [this,name, name_input_slider, name_input_mobile_slider](std::string val) {
                 config.Set(name, val);
                 SyncForm(val, name_input_slider, name_input_mobile_slider);
                 });
               mobile_slider.Callback(
-                [this,name, name_input_number, name_input_slider](std::string val){
+                [this,name, name_input_number, name_input_slider](std::string val) {
                 config.Set(name, val);
                 SyncForm(val, name_input_number, name_input_slider);
                 });
@@ -303,11 +301,10 @@ namespace prefab{
                 SetDefaultRangeFixedPoint(mobile_slider, emp::from_string<int>(value));
               }
 
-            }
-            else if (type == "bool") {
+            } else if (type == "bool") {
               // Bootstrap Toggle Switch (need at least v4.5.0)
               emp::prefab::ToggleSwitch toggle_switch(
-                  [this, name](std::string val){
+                  [this, name](std::string val) {
                     config.Set(name, val);
                     DoOnChangeFun(val);
                   },
@@ -320,7 +317,7 @@ namespace prefab{
 
             } else {
               web::Input text_input(
-                [this, name](std::string val){
+                [this, name](std::string val) {
                     config.Set(name, val);
                     DoOnChangeFun(val);
                 },
@@ -337,6 +334,7 @@ namespace prefab{
         }
       }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
             void Setup(const std::string & id_prefix = "settings_") {
                 for (auto group : config.GetGroupSet()) {
@@ -753,6 +751,9 @@ namespace prefab{
 =======
       web::Div & GetDiv() {return settings_div;}
 >>>>>>> 89ff9a4... improved prefab tools documentation
+=======
+      web::Div & GetDiv() { return settings_div; }
+>>>>>>> bd6e458... second pass for documentation
 
   };
 }

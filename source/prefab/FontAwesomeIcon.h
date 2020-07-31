@@ -15,7 +15,7 @@ namespace prefab {
     public:
       /// @param fa_name the font awesome class of the desired icon
       FontAwesomeIcon(std::string fa_name, const std::string & in_name="")
-        : web::Element("span", in_name){
+        : web::Element("span", in_name) {
         std::string full_class = emp::to_string("fa ", fa_name);
         this->SetAttr("class", full_class);
       }
@@ -24,7 +24,7 @@ namespace prefab {
       // The method below throws an error when trying to stream
       // a code block into anything else (web element, html).
       // template <typename T>
-      // void operator<<(T invalid){
+      // void operator<<(T invalid) {
       //     emp::LibraryError("Not allowed to add code to the FontAwesome icon");
       // }
   };

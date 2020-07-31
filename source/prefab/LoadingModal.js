@@ -1,6 +1,6 @@
 // To add a loading modal to your web page while the content is rendering,
 // place this script just below the opening body tag in your HTML file:
-// <script src="https://cdn.jsdelivr.net/gh/devosoft/Empirical@prefab/source/prefab/LoadingModal.js"></script>
+// <script src="https://cdn.jsdelivr.net/gh/devosoft/Empirical/source/prefab/LoadingModal.js"></script>
 // Don't forget to close the loading modal with the emp::prefab::CloseLoadingModal() function.
 
 // See https://devosoft.github.io/empirical-prefab-demo/empirical-prefab-demo for more details.
@@ -28,6 +28,8 @@ function AddLoadingModal(){
         },
         600000); // 10 mins for testing purposes
 }
+
+// Show loading modal for a few seconds for demonstration
 function DemoLoadingModal(){
     $('#loading_modal').modal('show');
     setTimeout(CloseLoadingModal,2000);
@@ -35,4 +37,6 @@ function DemoLoadingModal(){
 function CloseLoadingModal(){
     $('#loading_modal').modal('hide');
 }
+
+// Function called when script is added to HTML 
 AddLoadingModal();

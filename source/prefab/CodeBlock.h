@@ -22,10 +22,10 @@ namespace prefab {
       /// Note: Due to JavaScript callback functions, can only set code for block
       /// in constructor.
       CodeBlock(const std::string code_str, const std::string lang, const std::string & in_name="")
-        : web::Element("pre", in_name){
+        : web::Element("pre", in_name) {
           this->SetAttr("class", lang);
           // trigger HighlightJS library to apply syntax highlighting
-          this->DoUpdateJS([](){
+          this->DoUpdateJS([]() {
               emscripten_run_script("hljs.initHighlighting.called = false; hljs.initHighlighting();");
           });
           // make sure special characters (", ', &, <, >) appear as their symbol,
@@ -38,7 +38,7 @@ namespace prefab {
       // The method below throws an error when trying to stream
       // a code block into anything else (web element, html).
       // template <typename T>
-      // void operator<<(T invalid){
+      // void operator<<(T invalid) {
       //     emp::LibraryError("Not allowed to add code to the code block after construction due to JavaScript callback order");
       // }
   };
