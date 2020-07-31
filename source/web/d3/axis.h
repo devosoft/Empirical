@@ -323,8 +323,8 @@ namespace D3 {
       emp_assert((dom_id != "") && "WARNING: Calling Draw() after this method will overwrite your changes");
 
       EM_ASM({
-	      emp_d3.objects[$0].ticks($1, $2);
-	    }, this->id, count, format);
+	      emp_d3.objects[$0].ticks($1, d3.format(UTF8ToString($2)));
+	    }, this->id, count, format.c_str());
       return *this;
     }
 
