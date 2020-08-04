@@ -147,10 +147,18 @@ namespace emp {
 
       Event & operator=(const Event &) = default;
       Event & operator=(Event &&) = default;
+
+      /// Compares two events, only taking into account ID and affinity.
+      /// Message and properties aren't compared due to performance considerations.
+      /// Returns true if rhs is 'larger' than lhs.
       bool operator<(const Event & other) const {
         return std::tie(id, affinity)
           < std::tie(other.id, other.affinity);
       }
+
+      /// Compares two events, only taking into account ID and affinity.
+      /// Message and properties aren't compared due to performance considerations.
+      /// Returns true if events are 'equal.'
       bool operator==(const Event & other) const {
         return std::tie(id, affinity)
           == std::tie(other.id, other.affinity);

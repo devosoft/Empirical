@@ -857,10 +857,13 @@ namespace emp {
     }
 
     /// Set up regulators to match target MatchBin
+    /// @param target MatchBin to match
     void ImprintRegulators(
       const BaseMatchBin<Val, query_t, tag_t, Regulator> & target
     ) override { ImprintRegulators(target.GetState()); }
 
+    /// Set up regulators to match target state
+    /// @param target State to match
     void ImprintRegulators(const state_t & target) override {
 
       for (const uid_t & uid : state.uids) {
