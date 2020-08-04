@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2019.
+//  Copyright (C) Michigan State University, 2016-2020.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  TypeID provides an easy way to convert types to strings.
@@ -118,13 +118,13 @@ namespace emp {
     TypeID GetRemoveVolatileTypeID() const { return info_ptr->remove_volatile_id; }
   };
 
-  template <typename T> static TypeID::Info BuildInfo();
+  template <typename T> static emp::Ptr<TypeID::Info> BuildInfo();
 
   /// Retrieve the correct TypeID for a given type.
   template <typename T>
   static TypeID GetTypeID() {
-    static TypeID::Info info = BuildInfo<T>();  // Create static info so that it is persistent.
-    return TypeID(&info);
+    static emp::Ptr<TypeID::Info> info = BuildInfo<T>();  // Create static info so that it is persistent.
+    return TypeID(info);
   }
 
   /// Retrieve a vector of TypeIDs for a pack of types passed in.
@@ -152,7 +152,7 @@ namespace emp {
 
   /// Build the information for a single TypeID.
   template <typename T>
-  static TypeID::Info BuildInfo() {
+  static emp::Ptr<TypeID::Info> BuildInfo() {
     static TypeID::Info info;
     if (info.init == false) {
       TypeID type_id(&info);
@@ -220,7 +220,7 @@ namespace emp {
       }
     }
     
-    return info;
+    return &info;
   }
 
   /// Setup a bunch of standard type names to be more readable.
