@@ -48,9 +48,12 @@ namespace emp {
     DataLog & Push(T in) { data.push_back(in); return *this; }
     DataLog & Sort() { emp::Sort(data); return *this; }
 
-    T Min() { emp::FindMin(data); }
-    T Max() { emp::FindMax(data); }
-    T Mean() { emp::CalcMean(data); }
+    T Min() const { emp::FindMin(data); }
+    T Max() const { emp::FindMax(data); }
+    T Mean() const { emp::CalcMean(data); }
+    T Variance() const { emp::CalcVariance(data); }
+    T StdDev() const { emp::CalcStdDev(data); }
+    T StdError() const { emp::CalcStdError(data); }
 
     /// The following function prints an ascii bar graph on to the screen (or provided stream).
     void AsciiBarGraph( size_t max_width=80,          ///< What's the widest bars allowed?
