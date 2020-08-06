@@ -43,7 +43,9 @@ namespace emp {
     struct Info {
       bool init = false;                     ///< Has this info been initialized yet?
       std::string name = "[unknown type]";   ///< Unique (ideally human-readable) type name
-      bool is_abstract = false;
+
+      virtual bool IsAbstract() const { return false; }
+
       bool is_array = false;
       bool is_class = false;
       bool is_const = false;
@@ -70,7 +72,7 @@ namespace emp {
 
     template <typename T>
     struct InfoData : public Info {
-
+      bool IsAbstract() const override { return std::is_abstract<T>(); }
     };
 
     using info_t = emp::Ptr<TypeID::Info>;
@@ -102,7 +104,7 @@ namespace emp {
     bool IsInitialized() const { return info_ptr->init ; }
     void SetInitialized(bool _in=true) { info_ptr->init = _in; }
 
-    bool IsAbstract() const { return info_ptr->is_abstract ; }
+    bool IsAbstract() const { return info_ptr->IsAbstract(); }
     bool IsArray() const { return info_ptr->is_array ; }
     bool IsClass() const { return info_ptr->is_class ; }
     bool IsConst() const { return info_ptr->is_const ; }
@@ -164,7 +166,6 @@ namespace emp {
 
       info.init = true;
       info.name = typeid(T).name();
-      info.is_abstract = std::is_abstract<T>();
       info.is_array = std::is_array<T>();
       info.is_class = std::is_class<T>();
       info.is_const = std::is_const<T>();
