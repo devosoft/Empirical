@@ -45,18 +45,17 @@ namespace emp {
       std::string name = "[unknown type]";   ///< Unique (ideally human-readable) type name
 
       virtual bool IsAbstract() const { return false; }
+      virtual bool IsArray() const { return false; }
+      virtual bool IsClass() const { return false; }
+      virtual bool IsConst() const { return false; }
+      virtual bool IsEmpty() const { return false; }
+      virtual bool IsObject() const { return false; }
+      virtual bool IsPointer() const { return false; }
+      virtual bool IsReference() const { return false; }
+      virtual bool IsTrivial() const { return false; }
+      virtual bool IsVolatile() const { return false; }
 
-      bool is_array = false;
-      bool is_class = false;
-      bool is_const = false;
-      bool is_empty = false;
-      bool is_object = false;
-      bool is_pointer = false;
-      bool is_reference = false;
-      bool is_trivial = false;
-      bool is_volatile = false;
-
-      bool is_TypePack = false;
+      virtual bool IsTypePack() const { return false; }
 
       size_t decay_id = 0;
       size_t remove_const_id = 0;
@@ -73,6 +72,17 @@ namespace emp {
     template <typename T>
     struct InfoData : public Info {
       bool IsAbstract() const override { return std::is_abstract<T>(); }
+      bool IsArray() const override { return std::is_array<T>(); }
+      bool IsClass() const override { return std::is_class<T>(); }
+      bool IsConst() const override { return std::is_const<T>(); }
+      bool IsEmpty() const override { return std::is_empty<T>(); }
+      bool IsObject() const override { return std::is_object<T>(); }
+      bool IsPointer() const override { return emp::is_pointer<T>(); } // Not std::is_pointer<T>() to deal with emp::Ptr.
+      bool IsReference() const override { return std::is_reference<T>(); }
+      bool IsTrivial() const override { return std::is_trivial<T>(); }
+      bool IsVolatile() const override { return std::is_volatile<T>(); }
+
+      bool IsTypePack() const override { return emp::is_TypePack<T>(); }
     };
 
     using info_t = emp::Ptr<TypeID::Info>;
@@ -105,17 +115,17 @@ namespace emp {
     void SetInitialized(bool _in=true) { info_ptr->init = _in; }
 
     bool IsAbstract() const { return info_ptr->IsAbstract(); }
-    bool IsArray() const { return info_ptr->is_array ; }
-    bool IsClass() const { return info_ptr->is_class ; }
-    bool IsConst() const { return info_ptr->is_const ; }
-    bool IsEmpty() const { return info_ptr->is_empty ; }
-    bool IsObject() const { return info_ptr->is_object ; }
-    bool IsPointer() const { return info_ptr->is_pointer ; }
-    bool IsReference() const { return info_ptr->is_reference ; }
-    bool IsTrivial() const { return info_ptr->is_trivial ; }
-    bool IsVolatile() const { return info_ptr->is_volatile ; }
+    bool IsArray() const { return info_ptr->IsArray() ; }
+    bool IsClass() const { return info_ptr->IsClass() ; }
+    bool IsConst() const { return info_ptr->IsConst() ; }
+    bool IsEmpty() const { return info_ptr->IsEmpty() ; }
+    bool IsObject() const { return info_ptr->IsObject() ; }
+    bool IsPointer() const { return info_ptr->IsPointer() ; }
+    bool IsReference() const { return info_ptr->IsReference() ; }
+    bool IsTrivial() const { return info_ptr->IsTrivial() ; }
+    bool IsVolatile() const { return info_ptr->IsVolatile() ; }
 
-    bool IsTypePack() const { return info_ptr->is_TypePack ; }
+    bool IsTypePack() const { return info_ptr->IsTypePack() ; }
 
     TypeID GetDecayTypeID() const { return info_ptr->decay_id; }
     TypeID GetRemoveConstTypeID() const { return info_ptr->remove_const_id; }
@@ -166,17 +176,6 @@ namespace emp {
 
       info.init = true;
       info.name = typeid(T).name();
-      info.is_array = std::is_array<T>();
-      info.is_class = std::is_class<T>();
-      info.is_const = std::is_const<T>();
-      info.is_empty = std::is_empty<T>();
-      info.is_object = std::is_object<T>();
-      info.is_pointer = emp::is_pointer<T>(); // Not std::is_pointer<T>() to deal with emp::Ptr.
-      info.is_reference = std::is_reference<T>();
-      info.is_trivial = std::is_trivial<T>();
-      info.is_volatile = std::is_volatile<T>();
-
-      info.is_TypePack = emp::is_TypePack<T>();
 
       using decay_t = std::decay_t<T>;
       if constexpr (std::is_same<T, decay_t>()) info.decay_id = (size_t) &info;
@@ -203,16 +202,16 @@ namespace emp {
       else info.remove_volatile_id = GetTypeID< remove_volatile_t >();
 
       // Now, fix the name if we can be more precise about it.
-      if (info.is_const) {
+      if (info.IsConst()) {
         info.name = "const "s + type_id.GetRemoveConstTypeID().GetName();
       }
-      else if (info.is_volatile) {
+      else if (info.IsVolatile()) {
         info.name = "volatile "s + type_id.GetRemoveVolatileTypeID().GetName();
       }
-      else if (info.is_pointer) {
+      else if (info.IsPointer()) {
         info.name = type_id.GetRemovePointerTypeID().GetName() + '*';
       }
-      else if (info.is_reference) {
+      else if (info.IsReference()) {
         info.name = type_id.GetRemoveReferenceTypeID().GetName() + '&';
       }
       else if constexpr (emp::is_TypePack<T>()) {
