@@ -68,6 +68,11 @@ namespace emp {
       Info(const Info&) = default;
     };
 
+    template <typename T>
+    struct InfoData : public Info {
+
+    };
+
     using info_t = emp::Ptr<TypeID::Info>;
     info_t info_ptr;
 
@@ -153,7 +158,7 @@ namespace emp {
   /// Build the information for a single TypeID.
   template <typename T>
   static emp::Ptr<TypeID::Info> BuildInfo() {
-    static TypeID::Info info;
+    static TypeID::InfoData<T> info;
     if (info.init == false) {
       TypeID type_id(&info);
 
