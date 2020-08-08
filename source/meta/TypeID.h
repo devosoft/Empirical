@@ -28,6 +28,10 @@ namespace emp {
 
   using namespace std::string_literals;
 
+  // Pre-declare some types and functions.
+  struct TypeID;
+  template <typename T> static TypeID GetTypeID();
+
   void SetupTypeNames();
 
   namespace internal {
@@ -57,12 +61,12 @@ namespace emp {
 
       virtual bool IsTypePack() const { return false; }
 
-      size_t decay_id = 0;
-      size_t remove_const_id = 0;
-      size_t remove_cv_id = 0;
-      size_t remove_ptr_id = 0;
-      size_t remove_ref_id = 0;
-      size_t remove_volatile_id = 0;
+      virtual size_t GetDecayID() const { return 0; }
+      virtual size_t GetRemoveConstID() const { return 0; }
+      virtual size_t GetRemoveCVID() const { return 0; }
+      virtual size_t GetRemovePtrID() const { return 0; }
+      virtual size_t GetRemoveRefID() const { return 0; }
+      virtual size_t GetRemoveVolatileID() const { return 0; }
 
       Info() { ; }
       Info(const std::string & in_name) : name(in_name) { ; }
@@ -83,6 +87,37 @@ namespace emp {
       bool IsVolatile() const override { return std::is_volatile<T>(); }
 
       bool IsTypePack() const override { return emp::is_TypePack<T>(); }
+
+      size_t GetDecayID() const override { 
+        using decay_t = std::decay_t<T>;
+        if constexpr (std::is_same<T, decay_t>()) return (size_t) this;
+        else return GetTypeID< decay_t >();
+      }
+      size_t GetRemoveConstID() const override { 
+        using remove_const_t = std::remove_const_t<T>;
+        if constexpr (std::is_same<T, remove_const_t>()) return (size_t) this;
+        else return GetTypeID< remove_const_t >();
+      }
+      size_t GetRemoveCVID() const override { 
+        using remove_cv_t = std::remove_cv_t<T>;
+        if constexpr (std::is_same<T, remove_cv_t>()) return (size_t) this;
+        else return GetTypeID< remove_cv_t >();
+      }
+      size_t GetRemovePtrID() const override { 
+        using remove_ptr_t = emp::remove_pointer_t<T>;
+        if constexpr (std::is_same<T, remove_ptr_t>()) return (size_t) this;
+        else return GetTypeID< remove_ptr_t >();
+      }
+      size_t GetRemoveRefID() const override { 
+        using remove_ref_t = std::remove_reference_t<T>;
+        if constexpr (std::is_same<T, remove_ref_t>()) return (size_t) this;
+        else return GetTypeID< remove_ref_t >();
+      }
+      size_t GetRemoveVolatileID() const override { 
+        using remove_volatile_t = std::remove_volatile_t<T>;
+        if constexpr (std::is_same<T, remove_volatile_t>()) return (size_t) this;
+        else return GetTypeID< remove_volatile_t >();
+      }
     };
 
     using info_t = emp::Ptr<TypeID::Info>;
@@ -127,12 +162,12 @@ namespace emp {
 
     bool IsTypePack() const { return info_ptr->IsTypePack() ; }
 
-    TypeID GetDecayTypeID() const { return info_ptr->decay_id; }
-    TypeID GetRemoveConstTypeID() const { return info_ptr->remove_const_id; }
-    TypeID GetRemoveCVTypeID() const { return info_ptr->remove_cv_id; }
-    TypeID GetRemovePointerTypeID() const { return info_ptr->remove_ptr_id; }
-    TypeID GetRemoveReferenceTypeID() const { return info_ptr->remove_ref_id; }
-    TypeID GetRemoveVolatileTypeID() const { return info_ptr->remove_volatile_id; }
+    TypeID GetDecayTypeID() const { return info_ptr->GetDecayID(); }
+    TypeID GetRemoveConstTypeID() const { return info_ptr->GetRemoveConstID(); }
+    TypeID GetRemoveCVTypeID() const { return info_ptr->GetRemoveCVID(); }
+    TypeID GetRemovePointerTypeID() const { return info_ptr->GetRemovePtrID(); }
+    TypeID GetRemoveReferenceTypeID() const { return info_ptr->GetRemoveRefID(); }
+    TypeID GetRemoveVolatileTypeID() const { return info_ptr->GetRemoveVolatileID(); }
   };
 
   template <typename T> static emp::Ptr<TypeID::Info> BuildInfo();
@@ -176,30 +211,6 @@ namespace emp {
 
       info.init = true;
       info.name = typeid(T).name();
-
-      using decay_t = std::decay_t<T>;
-      if constexpr (std::is_same<T, decay_t>()) info.decay_id = (size_t) &info;
-      else info.decay_id = GetTypeID< decay_t >();
-
-      using remove_const_t = std::remove_const_t<T>;
-      if constexpr (std::is_same<T, remove_const_t>()) info.remove_const_id = (size_t) &info;
-      else info.remove_const_id = GetTypeID< remove_const_t >();
-
-      using remove_cv_t = std::remove_cv_t<T>;
-      if constexpr (std::is_same<T, remove_cv_t>()) info.remove_cv_id = (size_t) &info;
-      else info.remove_cv_id = GetTypeID< remove_cv_t >();
-
-      using remove_ptr_t = emp::remove_pointer_t<T>;
-      if constexpr (std::is_same<T, remove_ptr_t>()) info.remove_ptr_id = (size_t) &info;
-      else info.remove_ptr_id = GetTypeID< remove_ptr_t >();
-
-      using remove_ref_t = std::remove_reference_t<T>;
-      if constexpr (std::is_same<T, remove_ref_t>()) info.remove_ref_id = (size_t) &info;
-      else info.remove_ref_id = GetTypeID< remove_ref_t >();
-
-      using remove_volatile_t = std::remove_volatile_t<T>;
-      if constexpr (std::is_same<T, remove_volatile_t>()) info.remove_volatile_id = (size_t) &info;
-      else info.remove_volatile_id = GetTypeID< remove_volatile_t >();
 
       // Now, fix the name if we can be more precise about it.
       if (info.IsConst()) {
