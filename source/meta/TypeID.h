@@ -266,65 +266,8 @@ namespace emp {
     // Standard library types.
     GetTypeID<std::string>().SetName("std::string");
 
-    // @CAO -- we can actually establish these links when building types...
-    // // Check for type attributes...
-    // template<typename T> struct TypeID<T*> {
-    //   static std::string GetName() { return TypeID<T>::GetName() + '*'; }
-    // };
-
-    // // Tools for using TypePack
-    // template<typename T, typename... Ts> struct TypeID<emp::TypePack<T,Ts...>> {
-    //   static std::string GetTypes() {
-    //     std::string out = TypeID<T>::GetName();
-    //     if (sizeof...(Ts) > 0) out += ",";
-    //     out += TypeID<emp::TypePack<Ts...>>::GetTypes();
-    //     return out;
-    //   }
-    //   static std::string GetName() {
-    //     std::string out = "emp::TypePack<";
-    //     out += GetTypes();
-    //     out += ">";
-    //     return out;
-    //   }
-    // };
-    // template<> struct TypeID< emp::TypePack<> > {
-    //   static std::string GetTypes() { return ""; }
-    //   static std::string GetName() { return "emp::TypePack<>"; }
-    // };
-
-    // // Generic TemplateID structure for when none of the specialty cases trigger.
-    // template <typename T> struct TemplateID {
-    //   static std::string GetName() { return "UnknownTemplate"; }
-    // };
-
-    // template<template <typename...> class TEMPLATE, typename... Ts>
-    // struct TypeID<TEMPLATE<Ts...>> {
-    //   static std::string GetName() {
-    //     return TemplateID<TEMPLATE<Ts...>>::GetName()
-    //           + '<' + TypeID<emp::TypePack<Ts...>>::GetTypes() + '>';
-    //   }
-    // };
   }
 }
-
-// namespace emp{
-
-
-//   // Standard library templates.
-//   //  template <typename... Ts> struct TemplateID<std::array<Ts...>> { static std::string GetName() { return "array"; } };
-
-//   template<typename T, typename... Ts> struct TypeID< emp::vector<T,Ts...> > {
-//     static std::string GetName() {
-//       using simple_vt = emp::vector<T>;
-//       using full_vt = emp::vector<T,Ts...>;
-//       if (std::is_same<simple_vt,full_vt>::value) {
-//         return "emp::vector<" + TypeID<T>::GetName() + ">";
-//       }
-//       return "emp::vector<" + TypeID<TypePack<T,Ts...>>::GetTypes() + ">";
-//     }
-//   };
-
-//}
 
 
 namespace std {
