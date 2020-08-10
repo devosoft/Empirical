@@ -14,6 +14,7 @@
 #ifndef EMP_TYPE_ID_H
 #define EMP_TYPE_ID_H
 
+#include <cmath>
 #include <sstream>
 #include <string>
 
@@ -68,6 +69,9 @@ namespace emp {
       virtual size_t GetRemoveRefID() const { return 0; }
       virtual size_t GetRemoveVolatileID() const { return 0; }
 
+      /// Take a void pointer, treat is as the correct type, and then convert to double (if possible)
+      virtual double ToDouble(void *) const { return std::nan(""); }
+
       Info() { ; }
       Info(const std::string & in_name) : name(in_name) { ; }
       Info(const Info&) = default;
@@ -118,7 +122,18 @@ namespace emp {
         if constexpr (std::is_same<T, remove_volatile_t>()) return (size_t) this;
         else return GetTypeID< remove_volatile_t >();
       }
+
+      double ToDouble(void * ptr) const override {
+        // If this type is convertable to a double, cast the pointer to the correct type, de-reference it,
+        // and then return the conversion.  Otherwise return NaN
+        if constexpr (std::is_convertible<T, double>::value) {
+          using base_t = std::decay_t<T>;
+          return (double) *reinterpret_cast<base_t *>(ptr);
+        }
+        else return std::nan("");
+      }
     };
+
 
     using info_t = emp::Ptr<TypeID::Info>;
     info_t info_ptr;
@@ -168,6 +183,8 @@ namespace emp {
     TypeID GetRemovePointerTypeID() const { return info_ptr->GetRemovePtrID(); }
     TypeID GetRemoveReferenceTypeID() const { return info_ptr->GetRemoveRefID(); }
     TypeID GetRemoveVolatileTypeID() const { return info_ptr->GetRemoveVolatileID(); }
+
+    double ToDouble(void * ptr) const { return info_ptr->ToDouble(ptr); }
   };
 
   template <typename T> static emp::Ptr<TypeID::Info> BuildInfo();
