@@ -77,4 +77,9 @@ TEST_CASE("Test TypeID", "[meta]")
   REQUIRE(type_ids[0].GetID() == int_value);
   REQUIRE(type_ids[1].GetID() == char_value);
   REQUIRE(type_ids[3].GetID() == str_value);
+
+  int x = 27;
+  std::string s = "27";
+  REQUIRE(emp::GetTypeID<int>().ToDouble(&x) == 27.0);
+  REQUIRE(std::isnan(emp::GetTypeID<std::string>().ToDouble(&s)));
 }
