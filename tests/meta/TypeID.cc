@@ -82,4 +82,10 @@ TEST_CASE("Test TypeID", "[meta]")
   std::string s = "27";
   REQUIRE(emp::GetTypeID<int>().ToDouble(&x) == 27.0);
   REQUIRE(std::isnan(emp::GetTypeID<std::string>().ToDouble(&s)));
+
+  REQUIRE(emp::GetTypeID<int>().ToString(&x) == "27");
+  REQUIRE(emp::GetTypeID<std::string>().ToString(&s) == "27");
+
+  char c = 'c';
+  REQUIRE(emp::GetTypeID<char>().ToString(&c) == "c");
 }
