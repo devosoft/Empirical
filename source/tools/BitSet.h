@@ -381,12 +381,16 @@ namespace emp {
     /// Constructor to fill in a bit set from a vector.
     template <typename T>
     BitSet(const std::initializer_list<T> l) {
+      // TODO: should we enforce the initializer list to be the same length as the bitset?
+      // emp_assert(l.size() == NUM_BITS);
+
+      // check that initializer list isn't longer than bitset
+      emp_assert(l.size() <= NUM_BITS);
 
       Clear();
 
       size_t idx = 0;
       for (auto i = std::rbegin(l); i != std::rend(l); ++i) {
-        emp_assert(idx < NUM_BITS);
         Set(idx, *i);
         ++idx;
       }
