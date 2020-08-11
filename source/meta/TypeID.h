@@ -72,6 +72,9 @@ namespace emp {
       /// Take a void pointer, treat is as the correct type, and then convert to double (if possible)
       virtual double ToDouble(void *) const { return std::nan(""); }
 
+      /// Take a void pointer, treat is as the correct type, and then convert to std::string (if possible)
+      virtual std::string ToString(void *) const { return ""; }
+
       Info() { ; }
       Info(const std::string & in_name) : name(in_name) { ; }
       Info(const Info&) = default;
@@ -132,6 +135,28 @@ namespace emp {
         }
         else return std::nan("");
       }
+
+      std::string ToString(void * ptr) const override {
+        using base_t = std::decay_t<T>;
+
+        // If this variable is a string or can be directly converted to a string, do so.
+        if constexpr (std::is_convertible<T, std::string>::value) {
+          return (std::string) *reinterpret_cast<base_t *>(ptr);
+        }
+
+        // If this variable is a char, treat it as a single-character string.
+        if constexpr (std::is_same<T, char>::value) {
+          return std::string(1, (char) *reinterpret_cast<base_t *>(ptr));
+        }
+
+        // If this variable is a numeric value, use to_string.
+        else if constexpr (std::is_arithmetic<T>::value) {
+          return std::to_string( *reinterpret_cast<base_t *>(ptr) );
+        }
+
+        // If we made it this far, we don't know how to convert...
+        return "";
+      }
     };
 
 
@@ -185,6 +210,7 @@ namespace emp {
     TypeID GetRemoveVolatileTypeID() const { return info_ptr->GetRemoveVolatileID(); }
 
     double ToDouble(void * ptr) const { return info_ptr->ToDouble(ptr); }
+    std::string ToString(void * ptr) const { return info_ptr->ToString(ptr); }
   };
 
   template <typename T> static emp::Ptr<TypeID::Info> BuildInfo();
