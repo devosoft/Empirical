@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2019.
+ *  @date 2016-2020.
  *
  *  @file  type_traits.h
  *  @brief Extensions on the standard library type traits to handle Empirical classes (such as Ptr).
@@ -13,11 +13,21 @@
 
 #include <functional>
 #include <tuple>
+#include <type_traits>
 #include <utility>
 
 #include "../base/Ptr.h"
 
 namespace emp {
+
+  template <typename...> using void_t = void;
+
+  template <typename T, typename=void> struct HasToString : public std::false_type { };
+
+  template<typename T> 
+  struct HasToString<T, void_t<std::enable_if_t<
+      std::is_same<std::string, decltype(std::declval<T>().ToString())>::value
+    >>> : std::true_type{};
 
   /// Determine if a type passed in is an std::function type (vs a lambda or a raw function)
   template <typename> struct is_std_function : std::false_type { };
