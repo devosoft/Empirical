@@ -22,10 +22,15 @@
 
 namespace emp {
 
+  // Determine if a type has a ToString() member function.
   template <typename T, typename=void> struct HasToString : std::false_type { };
-
   template<typename T> 
   struct HasToString<emp::decoy_t<T, decltype(std::declval<T>().ToString())>> : std::true_type{};
+
+  // Determine if a type has a ToDouble() member function.
+  template <typename T, typename=void> struct HasToDouble : std::false_type { };
+  template<typename T> 
+  struct HasToDouble<emp::decoy_t<T, decltype(std::declval<T>().ToDouble())>> : std::true_type{};
 
   /// Determine if a type passed in is an std::function type (vs a lambda or a raw function)
   template <typename> struct is_std_function : std::false_type { };
