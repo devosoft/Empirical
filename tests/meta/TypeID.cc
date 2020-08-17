@@ -88,4 +88,7 @@ TEST_CASE("Test TypeID", "[meta]")
 
   char c = 'c';
   REQUIRE(emp::GetTypeID<char>().ToString(&c) == "c");
+
+  // Test GetSize()
+  REQUIRE(emp::GetTypeID<char>().GetSize() == 1);
 }
