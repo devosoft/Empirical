@@ -127,6 +127,11 @@ namespace emp {
       }
 
       double ToDouble(void * ptr) const override {
+        // If this variable has a built-in ToDouble() trait, use it!
+        if constexpr (emp::HasToDouble<T>()) {
+          return reinterpret_cast<base_t *>(ptr)->ToDouble();
+        }
+
         // If this type is convertable to a double, cast the pointer to the correct type, de-reference it,
         // and then return the conversion.  Otherwise return NaN
         if constexpr (std::is_convertible<T, double>::value) {
@@ -138,6 +143,11 @@ namespace emp {
 
       std::string ToString(void * ptr) const override {
         using base_t = std::decay_t<T>;
+
+        // If this variable has a built-in ToString() trait, use it!
+        if constexpr (emp::HasToString<T>()) {
+          return reinterpret_cast<base_t *>(ptr)->ToString();
+        }
 
         // If this variable is a string or can be directly converted to a string, do so.
         if constexpr (std::is_convertible<T, std::string>::value) {
