@@ -69,6 +69,9 @@ namespace emp {
       virtual size_t GetRemoveRefID() const { return 0; }
       virtual size_t GetRemoveVolatileID() const { return 0; }
 
+      /// Return the size (in bytes) of objects of this type.
+      virtual size_t GetSize() const { return 0; }
+
       /// Take a void pointer, treat is as the correct type, and then convert to double (if possible)
       virtual double ToDouble(void *) const { return std::nan(""); }
 
@@ -126,7 +129,14 @@ namespace emp {
         else return GetTypeID< remove_volatile_t >();
       }
 
+      size_t GetSize() const override {
+        if constexpr (std::is_void<T>()) return 0;
+        else return sizeof(T);
+      }
+
       double ToDouble(void * ptr) const override {
+        using base_t = std::decay_t<T>;
+
         // If this variable has a built-in ToDouble() trait, use it!
         if constexpr (emp::HasToDouble<T>()) {
           return reinterpret_cast<base_t *>(ptr)->ToDouble();
@@ -135,7 +145,6 @@ namespace emp {
         // If this type is convertable to a double, cast the pointer to the correct type, de-reference it,
         // and then return the conversion.  Otherwise return NaN
         if constexpr (std::is_convertible<T, double>::value) {
-          using base_t = std::decay_t<T>;
           return (double) *reinterpret_cast<base_t *>(ptr);
         }
         else return std::nan("");
@@ -219,6 +228,8 @@ namespace emp {
     TypeID GetRemoveReferenceTypeID() const { return info_ptr->GetRemoveRefID(); }
     TypeID GetRemoveVolatileTypeID() const { return info_ptr->GetRemoveVolatileID(); }
 
+    size_t GetSize() const { return info_ptr->GetSize(); }
+  
     double ToDouble(void * ptr) const { return info_ptr->ToDouble(ptr); }
     std::string ToString(void * ptr) const { return info_ptr->ToString(ptr); }
   };
