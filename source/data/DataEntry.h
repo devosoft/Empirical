@@ -30,8 +30,26 @@ namespace emp {
 
     DataEntry & operator=(const DataEntry &) = default;
 
+    const std::string & GetTypeName() const { return type.GetName(); }
+    TypeID GetTypeID() const { return type; }
+
+    template <typename T>
+    bool IsType() const { return type == GetTypeID<T>(); }
+
     double ToDouble() { return type.ToDouble(data); }
     std::string ToString() { return type.ToString(data); }
+
+    template <typename T>
+    void SetPtr(emp::Ptr<T> ptr) { data = ptr; }
+
+    template <typename T>
+    void SetRef(T & ref) { data = &ref; }
+
+    template <typename T>
+    T & As() { return *data.ReinterpretCast<T>(); }
+
+    template <typename T>
+    const T & As() const { return *data.ReinterpretCast<const T>(); }
   };
 
 }
