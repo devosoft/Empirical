@@ -456,16 +456,26 @@ namespace emp {
 
     /// Dynamically cast this Ptr to another type; throw an assert of the cast fails.
     template <typename T2> Ptr<T2> DynamicCast() {
-      emp_assert(dynamic_cast<T2*>(ptr) != nullptr);
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
-      return (T2*) ptr;
+      return dynamic_cast<T2*>(ptr);
     }
 
     /// Dynamically cast this Ptr to another type; throw an assert of the cast fails.
     template <typename T2> Ptr<const T2> DynamicCast() const {
-      emp_assert(dynamic_cast<T2*>(ptr) != nullptr);
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
-      return (T2*) ptr;
+      return dynamic_cast<const T2*>(ptr);
+    }
+
+    /// Dynamically cast this Ptr to another type; throw an assert of the cast fails.
+    template <typename T2> Ptr<T2> ReinterpretCast() {
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
+      return reinterpret_cast<T2*>(ptr);
+    }
+
+    /// Dynamically cast this Ptr to another type; throw an assert of the cast fails.
+    template <typename T2> Ptr<const T2> ReinterpretCast() const {
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
+      return reinterpret_cast<const T2*>(ptr);
     }
 
     /// Get the unique ID associated with this pointer.
@@ -779,6 +789,8 @@ namespace emp {
     template <typename T2> Ptr<const T2> Cast() const { return (T2*) ptr; }
     template <typename T2> Ptr<T2> DynamicCast() { return dynamic_cast<T2*>(ptr); }
     template <typename T2> Ptr<const T2> DynamicCast() const { return dynamic_cast<T2*>(ptr); }
+    template <typename T2> Ptr<T2> ReinterpretCast() { return reinterpret_cast<T2*>(ptr); }
+    template <typename T2> Ptr<const T2> ReinterpretCast() const { return reinterpret_cast<T2*>(ptr); }
 
     template <typename... T>
     void New(T &&... args) { ptr = new TYPE(std::forward<T>(args)...); }  // New raw pointer.
