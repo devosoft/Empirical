@@ -82,18 +82,17 @@ to automagically check the spelling within the file being edited.
 Checklist
 ---------
 
-Copy and paste the following into a pull request comment when it is ready for
-review::
+Before requesting a review on a pull request, all of the checks on github should pass, confirming that the code::
 
-   - [ ] Is it mergeable?
-   - [ ] Did it pass the tests?
-   - [ ] Does 'make doc' succeed?
-   - [ ] If you added code, is it tested? Look at the output for 'make diff-cover'
-   - [ ] Was a spellchecker run on the source code and documentation after
-     changes were made?
+   - Is mergeable
+   - Passes the tests
+   - 'make doc' succeeds
+   - If you added code, it is tested
 
-It's expected that before requesting a code review the author of the PR will have checked all these
-things on their own. It's also expected that whomever reviews the PR will check these individual
-items as well. Though the CI runs most of these and will pass/fail the PR accordingly it is not
-infallible and the whole point of having a code review process is to have human eyes go over the
-changes to the codebase.
+The code submitter and reviewer should verify that::
+
+  - The code is well-organized
+  - The code is commented appropriately
+  - All newly-added functions and classes have doxygen-compatible docstrings
+  - Any new tests are of acceptable quality 
+  - The addition represents an improvement to Empirical
