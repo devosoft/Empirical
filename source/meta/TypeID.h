@@ -72,11 +72,21 @@ namespace emp {
       /// Return the size (in bytes) of objects of this type.
       virtual size_t GetSize() const { return 0; }
 
-      /// Take a void pointer, treat is as the correct type, and then convert to double (if possible)
+      /// Treat the memory referred to by a void pointer as the current type, convert it to a
+      /// double, and return that value. (Default to nan if no such conversion is possible.)
       virtual double ToDouble(void *) const { return std::nan(""); }
 
-      /// Take a void pointer, treat is as the correct type, and then convert to std::string (if possible)
+      /// Treat the memory referred to by a void pointer as the current type, convert it to a
+      /// string, and return that value. (Default to empty if no such conversion is possible.)
       virtual std::string ToString(void *) const { return ""; }
+
+      /// Take a double and a void pointer, treat the pointer as the correct type, and assign
+      /// the double to it (if possible).  Returns success.
+      virtual bool FromDouble(double, void *) const { }
+
+      /// Take a string and a void pointer, treat the pointer as the correct type, and assign
+      /// the string to it (if possible).  Returns success.
+      virtual bool FromString(const std::string &, void *) const { }
 
       Info() { ; }
       Info(const std::string & in_name) : name(in_name) { ; }
@@ -175,6 +185,55 @@ namespace emp {
 
         // If we made it this far, we don't know how to convert...
         return "";
+      }
+
+      bool FromDouble(double value, void * ptr) const override {
+        using base_t = std::decay_t<T>;
+
+        // If this variable has a built-in FromDouble() trait, use it!
+        if constexpr (emp::HasFromDouble<T>()) {
+          return reinterpret_cast<base_t *>(ptr)->FromDouble(value);
+        }
+
+        // If this type is convertable to a double, cast the pointer to the correct type, de-reference it,
+        // and then return the conversion.  Otherwise return NaN
+        if constexpr (std::is_convertible<double, T>::value) {
+          *reinterpret_cast<base_t *>(ptr) = value;
+          return true;
+        }
+
+        else return false;
+      }
+
+      bool FromString(const std::string & value, void * ptr) const override {
+        using base_t = std::decay_t<T>;
+
+        // If this variable has a built-in ToString() trait, use it!
+        if constexpr (emp::HasFromString<T>()) {
+          return reinterpret_cast<base_t *>(ptr)->FromString(value);
+        }
+
+        // If this variable is a string or can be directly converted to a string, do so.
+        if constexpr (std::is_convertible<std::string, T>::value) {
+          *reinterpret_cast<base_t *>(ptr) = value;
+          return true;
+        }
+
+        // If this variable is a char, treat it as a single-character string.
+        if constexpr (std::is_same<T, char>::value) {
+          if (value.size() > 1) return false;
+          *reinterpret_cast<char *>(ptr) = value[0];
+          return true;
+        }
+
+        // If this variable is a numeric value, use from_string.
+        else if constexpr (std::is_arithmetic<T>::value) {
+          *reinterpret_cast<base_t *>(ptr) = stod(value);
+          return true;
+        }
+
+        // If we made it this far, we don't know how to convert...
+        return false;
       }
     };
 
