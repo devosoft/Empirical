@@ -32,6 +32,16 @@ namespace emp {
   template<typename T> 
   struct HasToDouble<emp::decoy_t<T, decltype(std::declval<T>().ToDouble())>> : std::true_type{};
 
+  // Determine if a type has a FromString() member function.
+  template <typename T, typename=void> struct HasFromString : std::false_type { };
+  template<typename T> 
+  struct HasFromString<emp::decoy_t<T, decltype(std::declval<T>().FromString(""))>> : std::true_type{};
+
+  // Determine if a type has a FromDouble() member function.
+  template <typename T, typename=void> struct HasFromDouble : std::false_type { };
+  template<typename T> 
+  struct HasFromDouble<emp::decoy_t<T, decltype(std::declval<T>().FromDouble(0.0))>> : std::true_type{};
+
   /// Determine if a type passed in is an std::function type (vs a lambda or a raw function)
   template <typename> struct is_std_function : std::false_type { };
   template <typename... Ts> struct is_std_function<std::function<Ts...>> : std::true_type { };
