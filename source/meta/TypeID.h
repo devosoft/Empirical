@@ -49,6 +49,8 @@ namespace emp {
       bool init = false;                     ///< Has this info been initialized yet?
       std::string name = "[unknown type]";   ///< Unique (ideally human-readable) type name
 
+      virtual ~Info() { }
+
       virtual bool IsAbstract() const { return false; }
       virtual bool IsArray() const { return false; }
       virtual bool IsClass() const { return false; }
@@ -74,19 +76,19 @@ namespace emp {
 
       /// Treat the memory referred to by a void pointer as the current type, convert it to a
       /// double, and return that value. (Default to nan if no such conversion is possible.)
-      virtual double ToDouble(void *) const { return std::nan(""); }
+      virtual double ToDouble(const emp::Ptr<void>) const { return std::nan(""); }
 
       /// Treat the memory referred to by a void pointer as the current type, convert it to a
       /// string, and return that value. (Default to empty if no such conversion is possible.)
-      virtual std::string ToString(void *) const { return ""; }
+      virtual std::string ToString(const emp::Ptr<void>) const { return ""; }
 
       /// Take a double and a void pointer, treat the pointer as the correct type, and assign
       /// the double to it (if possible).  Returns success.
-      virtual bool FromDouble(double, void *) const { }
+      virtual bool FromDouble(double, const emp::Ptr<void>) const { return false; }
 
       /// Take a string and a void pointer, treat the pointer as the correct type, and assign
       /// the string to it (if possible).  Returns success.
-      virtual bool FromString(const std::string &, void *) const { }
+      virtual bool FromString(const std::string &, const emp::Ptr<void>) const { return false; }
 
       Info() { ; }
       Info(const std::string & in_name) : name(in_name) { ; }
@@ -144,91 +146,91 @@ namespace emp {
         else return sizeof(T);
       }
 
-      double ToDouble(void * ptr) const override {
+      double ToDouble(const emp::Ptr<void> ptr) const override {
         using base_t = std::decay_t<T>;
 
         // If this variable has a built-in ToDouble() trait, use it!
         if constexpr (emp::HasToDouble<T>()) {
-          return reinterpret_cast<base_t *>(ptr)->ToDouble();
+          return ptr.ReinterpretCast<base_t>()->ToDouble();
         }
 
         // If this type is convertable to a double, cast the pointer to the correct type, de-reference it,
         // and then return the conversion.  Otherwise return NaN
         if constexpr (std::is_convertible<T, double>::value) {
-          return (double) *reinterpret_cast<base_t *>(ptr);
+          return (double) *ptr.ReinterpretCast<base_t>();
         }
         else return std::nan("");
       }
 
-      std::string ToString(void * ptr) const override {
+      std::string ToString(const emp::Ptr<void> ptr) const override {
         using base_t = std::decay_t<T>;
 
         // If this variable has a built-in ToString() trait, use it!
         if constexpr (emp::HasToString<T>()) {
-          return reinterpret_cast<base_t *>(ptr)->ToString();
+          return ptr.ReinterpretCast<base_t>()->ToString();
         }
 
         // If this variable is a string or can be directly converted to a string, do so.
         if constexpr (std::is_convertible<T, std::string>::value) {
-          return (std::string) *reinterpret_cast<base_t *>(ptr);
+          return (std::string) *ptr.ReinterpretCast<base_t>();
         }
 
         // If this variable is a char, treat it as a single-character string.
         if constexpr (std::is_same<T, char>::value) {
-          return std::string(1, (char) *reinterpret_cast<base_t *>(ptr));
+          return std::string(1, (char) *ptr.ReinterpretCast<base_t>());
         }
 
         // If this variable is a numeric value, use to_string.
         else if constexpr (std::is_arithmetic<T>::value) {
-          return std::to_string( *reinterpret_cast<base_t *>(ptr) );
+          return std::to_string( *ptr.ReinterpretCast<base_t>() );
         }
 
         // If we made it this far, we don't know how to convert...
         return "";
       }
 
-      bool FromDouble(double value, void * ptr) const override {
+      bool FromDouble(double value, const emp::Ptr<void> ptr) const override {
         using base_t = std::decay_t<T>;
 
         // If this variable has a built-in FromDouble() trait, use it!
         if constexpr (emp::HasFromDouble<T>()) {
-          return reinterpret_cast<base_t *>(ptr)->FromDouble(value);
+          return ptr.ReinterpretCast<base_t>()->FromDouble(value);
         }
 
         // If this type is convertable to a double, cast the pointer to the correct type, de-reference it,
         // and then return the conversion.  Otherwise return NaN
         if constexpr (std::is_convertible<double, T>::value) {
-          *reinterpret_cast<base_t *>(ptr) = value;
+          *ptr.ReinterpretCast<base_t>() = value;
           return true;
         }
 
         else return false;
       }
 
-      bool FromString(const std::string & value, void * ptr) const override {
+      bool FromString(const std::string & value, const emp::Ptr<void> ptr) const override {
         using base_t = std::decay_t<T>;
 
-        // If this variable has a built-in ToString() trait, use it!
+        // If this variable has a built-in FromString() trait, use it!
         if constexpr (emp::HasFromString<T>()) {
-          return reinterpret_cast<base_t *>(ptr)->FromString(value);
+          return ptr.ReinterpretCast<base_t>()->FromString(value);
         }
 
         // If this variable is a string or can be directly converted to a string, do so.
         if constexpr (std::is_convertible<std::string, T>::value) {
-          *reinterpret_cast<base_t *>(ptr) = value;
+          *ptr.ReinterpretCast<base_t>() = value;
           return true;
         }
 
         // If this variable is a char, treat it as a single-character string.
         if constexpr (std::is_same<T, char>::value) {
           if (value.size() > 1) return false;
-          *reinterpret_cast<char *>(ptr) = value[0];
+          *ptr.ReinterpretCast<char>() = value[0];
           return true;
         }
 
         // If this variable is a numeric value, use from_string.
         else if constexpr (std::is_arithmetic<T>::value) {
-          *reinterpret_cast<base_t *>(ptr) = stod(value);
+          *ptr.ReinterpretCast<base_t>() = stod(value);
           return true;
         }
 
@@ -289,8 +291,14 @@ namespace emp {
 
     size_t GetSize() const { return info_ptr->GetSize(); }
   
-    double ToDouble(void * ptr) const { return info_ptr->ToDouble(ptr); }
-    std::string ToString(void * ptr) const { return info_ptr->ToString(ptr); }
+    double ToDouble(const emp::Ptr<void> ptr) const { return info_ptr->ToDouble(ptr); }
+    std::string ToString(const emp::Ptr<void> ptr) const { return info_ptr->ToString(ptr); }
+    bool FromDouble(double value, const emp::Ptr<void> ptr) {
+      return info_ptr->FromDouble(value, ptr);
+    }
+    bool FromString(const std::string & value, const emp::Ptr<void> ptr) {
+      return info_ptr->FromString(value, ptr);
+    }
   };
 
   template <typename T> static emp::Ptr<TypeID::Info> BuildInfo();
