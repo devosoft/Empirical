@@ -8,6 +8,8 @@
  *  @note Status: ALPHA
  *
  *  A DataEntry pairs a memory position with a TypeID for dynamic variable manipulation.
+ *  Effectively it acts as a void pointer, but with run-time type information that will
+ *  allow for dynamic manipulation of the underlying value.
  *
  */
 
@@ -36,14 +38,17 @@ namespace emp {
     template <typename T>
     bool IsType() const { return type == GetTypeID<T>(); }
 
-    double ToDouble() { return type.ToDouble(data); }
-    std::string ToString() { return type.ToString(data); }
+    double ToDouble() const { return type.ToDouble(data); }
+    std::string ToString() const { return type.ToString(data); }
 
     template <typename T>
     void SetPtr(emp::Ptr<T> ptr) { data = ptr; }
 
     template <typename T>
     void SetRef(T & ref) { data = &ref; }
+
+    bool SetValue(double value) { return type.FromDouble(value, data); }
+    bool SetValue(const std::string & value) { return type.FromString(value, data); }
 
     template <typename T>
     T & As() { return *data.ReinterpretCast<T>(); }
