@@ -333,16 +333,8 @@ namespace emp {
     static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
 
     /// Dereference a pointer.
-    [[nodiscard]] TYPE & operator*() {
+    [[nodiscard]] TYPE & operator*() const {
       // Make sure a pointer is active and non-null before we dereference it.
-      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
-      emp_assert(ptr != nullptr, "Do not dereference a null pointer!");
-      return *ptr;
-    }
-
-    /// Dereference a pointer to a const type.
-    [[nodiscard]] const TYPE & operator*() const {
-      // Make sure a pointer is active before we dereference it.
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
       emp_assert(ptr != nullptr, "Do not dereference a null pointer!");
       return *ptr;
@@ -393,6 +385,18 @@ namespace emp {
     void * ptr;                 ///< The raw pointer associated with this Ptr object.
     size_t id;                  ///< A unique ID for this pointer type.
 
+    BasePtr(void * in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) { }
+    static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
+  };
+
+  /// Base class with functionality only needed in void pointers.
+  template <>
+  class BasePtr<const void> {
+  public:
+    void * const ptr;                 ///< The raw pointer associated with this Ptr object.
+    size_t id;                  ///< A unique ID for this pointer type.
+
+    BasePtr(void * const in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) { }
     static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
   };
 
@@ -492,59 +496,34 @@ namespace emp {
     [[nodiscard]] bool IsNull() const { return ptr == nullptr; }
 
     /// Convert this Ptr to a raw pointer that isn't going to be tracked.
-    [[nodiscard]] TYPE * Raw() {
-      emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to raw.", id);
-      return ptr;
-    }
-
-    /// Convert this Ptr to a const raw pointer that isn't going to be tracked.
-    [[nodiscard]] const TYPE * const Raw() const {
+    [[nodiscard]] TYPE * Raw() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to raw.", id);
       return ptr;
     }
 
     /// Convert this Ptr to a raw pointer of a position in an array.
-    [[nodiscard]] TYPE * Raw(size_t pos) {
+    [[nodiscard]] TYPE * Raw(size_t pos) const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to array raw.", id);
       return &(ptr[pos]);
     }
 
     /// Cast this Ptr to a different type.
     template <typename T2>
-    [[nodiscard]] Ptr<T2> Cast() {
-      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
-      return (T2*) ptr;
-    }
-
-    /// Cast this Ptr to a const Ptr of a different type.
-    template <typename T2>
-    [[nodiscard]] const Ptr<const T2> Cast() const {
+    [[nodiscard]] Ptr<T2> Cast() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
       return (T2*) ptr;
     }
 
     /// Dynamically cast this Ptr to another type; throw an assert of the cast fails.
-    template <typename T2> Ptr<T2> DynamicCast() {
+    template <typename T2> Ptr<T2> DynamicCast() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
       return dynamic_cast<T2*>(ptr);
     }
 
     /// Dynamically cast this Ptr to another type; throw an assert of the cast fails.
-    template <typename T2> Ptr<const T2> DynamicCast() const {
-      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
-      return dynamic_cast<const T2*>(ptr);
-    }
-
-    /// Dynamically cast this Ptr to another type; throw an assert of the cast fails.
-    template <typename T2> Ptr<T2> ReinterpretCast() {
+    template <typename T2> Ptr<T2> ReinterpretCast() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
       return reinterpret_cast<T2*>(ptr);
-    }
-
-    /// Dynamically cast this Ptr to another type; throw an assert of the cast fails.
-    template <typename T2> Ptr<const T2> ReinterpretCast() const {
-      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
-      return reinterpret_cast<const T2*>(ptr);
     }
 
     /// Get the unique ID associated with this pointer.
@@ -776,8 +755,7 @@ namespace emp {
     BasePtr(TYPE * in_ptr) : ptr(in_ptr) { }
 
     // Dereference a pointer.
-    [[nodiscard]] TYPE & operator*() { return *ptr; }
-    [[nodiscard]] const TYPE & operator*() const { return *ptr; }
+    [[nodiscard]] TYPE & operator*() const { return *ptr; }
 
     // Follow a pointer.
     TYPE * operator->() { return ptr; }
@@ -793,10 +771,14 @@ namespace emp {
   };
 
   /// Base class with functionality only needed in void pointers.
-  template <>
-  class BasePtr<void> {
-  protected:
-    void * ptr;                 ///< The raw pointer associated with this Ptr object.
+  template <> class BasePtr<void> {
+  protected: void * ptr;                 ///< The raw pointer associated with this Ptr object.
+  public: BasePtr(void * in_ptr) : ptr(in_ptr) { }
+  };
+
+  template <> class BasePtr<const void> {
+  protected: void * const ptr;           ///< The raw pointer associated with this Ptr object.
+  public: BasePtr(void * const in_ptr) : ptr(in_ptr) { }
   };
 
   template <typename TYPE>
@@ -829,15 +811,11 @@ namespace emp {
     ~Ptr() { ; }                                                             
 
     [[nodiscard]] bool IsNull() const { return ptr == nullptr; }
-    [[nodiscard]] TYPE * Raw() { return ptr; }
-    [[nodiscard]] const TYPE * const Raw() const { return ptr; }
-    [[nodiscard]] const TYPE * const Raw(size_t pos) const { return &(ptr[pos]); }
-    template <typename T2> Ptr<T2> Cast() { return (T2*) ptr; }
-    template <typename T2> Ptr<const T2> Cast() const { return (T2*) ptr; }
-    template <typename T2> Ptr<T2> DynamicCast() { return dynamic_cast<T2*>(ptr); }
-    template <typename T2> Ptr<const T2> DynamicCast() const { return dynamic_cast<T2*>(ptr); }
-    template <typename T2> Ptr<T2> ReinterpretCast() { return reinterpret_cast<T2*>(ptr); }
-    template <typename T2> Ptr<const T2> ReinterpretCast() const { return reinterpret_cast<T2*>(ptr); }
+    [[nodiscard]] TYPE * Raw() const { return ptr; }
+    [[nodiscard]] TYPE * Raw(size_t pos) const { return &(ptr[pos]); }
+    template <typename T2> Ptr<T2> Cast() const { return (T2*) ptr; }
+    template <typename T2> Ptr<T2> DynamicCast() const { return dynamic_cast<T2*>(ptr); }
+    template <typename T2> Ptr<T2> ReinterpretCast() const { return reinterpret_cast<T2*>(ptr); }
 
     template <typename... T>
     void New(T &&... args) { ptr = new TYPE(std::forward<T>(args)...); }  // New raw pointer.
