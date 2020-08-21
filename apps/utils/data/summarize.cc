@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2018
+//  Copyright (C) Michigan State University, 2016-2020.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  This file takes in one or more CSV files with values and, for each, calculates the mnimium,
@@ -33,11 +33,13 @@ void ProcessFile(const std::string & filename, std::ostream & os=std::cout) {
 
   // Loop through the file!
   std::string cur_line;
+  emp::vector<std::string> cols;        // Create a vector to store cols in.
   while (!is.eof()) {
-    std::getline(is, cur_line);
-    emp::remove_whitespace(cur_line);
-    emp::vector<std::string> cols;
-    emp::slice(cur_line, cols, ',');
+    std::getline(is, cur_line);         // Collect the next line to process
+    emp::remove_whitespace(cur_line);   // Strip out all whitespace for simplicity
+    if (cur_line[0] == '#') continue;   // Skip lines beginning with a comment.
+    cols.resize(0);                     // Clear our vector for columns.
+    emp::slice(cur_line, cols, ',');    // Split up this line by columns and put in cols.
 
     // Convert to doubles
     emp::vector<double> vals = emp::from_strings<double>(cols);
@@ -75,6 +77,7 @@ void ProcessFile(const std::string & filename, std::ostream & os=std::cout) {
   os << "Min: " << col_min << std::endl;
   os << "Max: " << col_max << std::endl;
   os << "Ave: " << col_ave << std::endl;
+  os << "Tot: " << col_total << std::endl;
 }
 
 int main(int argc, char* argv[])

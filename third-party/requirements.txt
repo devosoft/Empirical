@@ -3,4 +3,4 @@ breathe==4.8.0
 gcovr
 diff
 sphinx_rtd_theme
-
+cookiecutter

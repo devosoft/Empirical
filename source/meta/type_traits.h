@@ -45,6 +45,13 @@ namespace emp {
   template <typename T> using remove_pointer_t = remove_ptr_type_t<T>;
   // @CAO: Make sure we are dealing with const and volitile pointers correctly.
 
+  /// Convert a value to a non-pointer if and only if it is one.
+  template <typename T>
+  auto & remove_ptr_value(T & value) {
+    if constexpr (is_ptr_type<T>::value) return *value;
+    else return value;
+  }
+
   // Can we convert the first pointer into the second?
   template <typename T1, typename T2> struct ptr_pair {
     static constexpr bool Same() { return false; }

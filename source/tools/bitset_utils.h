@@ -17,7 +17,7 @@ namespace emp {
 
   /// Create a series of a specified number of ones (at compile time) in a uint.
   template <int NUM_BITS>
-  constexpr uint32_t UIntMaskFirst() { return (UIntMaskFirst<NUM_BITS-1> << 1) | 1; }
+  constexpr uint32_t UIntMaskFirst() { return (UIntMaskFirst<NUM_BITS-1>() << 1) | 1; }
 
   /// Create an empty bit mask (all zeros)
   template <>

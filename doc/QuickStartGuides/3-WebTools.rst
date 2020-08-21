@@ -71,19 +71,17 @@ provided Makefile can be run by typing :code:`make Example.js`.  This will trigg
 
 .. code-block:: bash
 
-  emcc -std=c++14 -Wall -Wno-unused-function -I../../source/ -Os
-  -s TOTAL_MEMORY=67108864 --js-library ../../source/web/library_emp.js
-  -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
-  Example.cc -o Example.js
+  emcc -std=c++17 -Wall -Wno-unused-function -I../../source/ -Os -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']" -s TOTAL_MEMORY=67108864 --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1 Example.cc -o Example.js
 
 - emscripten uses the :code:`emcc` compiler (or :code:`em++`, since we are using C++).
-- :code:`-std=c++14` : Empirical requires c++14.
+- :code:`-std=c++17` : Empirical requires c++17.
 - :code:`-Wall -Wno-unused-function` : turn on all warnings by default except for unused functions, since not all library functions are going to be used.
 - :code:`-I../../source/` : The compiled file is two directories up in the Empirical library, so this flag properly includes the source files.
 - :code:`-Os` : Optimize for size, though :code:`-O3` may perform better in some situations.
 - :code:`-s TOTAL_MEMORY=67108864` : Make sure we have enough memory; in this case reserve 64 MB.
 - :code:`--js-library ../../source/web/library_emp.js` : Load Empirical JS functions that we might need.
 - :code:`-s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']"` : Make sure we can run the C++ functions :code:`main()` and :code:`_empCppCallback()` from Javascript, to facilitate two-way communication.
+- :code: `-s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']"` : expose necessary Emscripten utilities for internal Empirical use
 - :code:`-s NO_EXIT_RUNTIME=1` : In most cases, we don't want our program to stop when :code:`main()` finishes.
 
 ...finally we list the source file we are compiling (:code:`Example.cc`) and the output file that we
@@ -220,13 +218,13 @@ it back from the container again.  So, for example instead of
 
 .. code-block:: C++
 
-    my_button.Label("PLEASE Click Me!");
+    my_button.SetLabel("PLEASE Click Me!");
 
 we could have said
 
 .. code-block:: C++
 
-    doc.Button("my_button").Label("PLEASE Click Me!");
+    doc.Button("my_button").SetLabel("PLEASE Click Me!");
 
 and :code:`doc` will properly look up the correct button for us (or trip an assert if the required
 button cannot be found.)  In practice, allowing containers to track Widgets is much easier

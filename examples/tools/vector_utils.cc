@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2017.
+//  Copyright (C) Michigan State University, 2017-2020.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //
@@ -11,6 +11,18 @@
 
 int main()
 {
+  emp::vector<std::string> v1 = { "a", "b", "cde" };
+  emp::vector<std::string> v2 = { "f", "g", "hij" };
+  emp::vector<std::string> v3 = { "klm", "n", "op" };
+  emp::vector<std::string> v4 = { "qrstuv", "wxy", "z" };
+
+  auto all = emp::Concat(v1, v2, v3, v4);
+
+  std::cout << "Words: ";
+  for (const auto & w : all) {
+    std::cout << w << " ";
+  }
+  std::cout << std::endl;
 
   emp::vector<int> v = { 14, 13, 1, 2, 3, 4, 22, 5, 6, 7, 8, 9, 10, 12 };
 

@@ -32,7 +32,7 @@
 #include "hash_utils.h"
 #include "random_utils.h"
 
-
+#include "../polyfill/span.h"
 
 namespace emp {
 
@@ -64,7 +64,11 @@ namespace emp {
     ///< field size is 64 for native (except NUM_BITS == 32), 32 for emscripten
     using field_t = typename FieldHelper<NUM_BITS>::field_t;
 
-    static constexpr field_t FIELD_BITS = sizeof(field_t)*8; ///< How many bits are in a field?
+    ///< How many bytes are in a field?
+    static constexpr field_t FIELD_BYTES = sizeof(field_t);
+
+    ///< How many bits are in a field?
+    static constexpr field_t FIELD_BITS = 8 * FIELD_BYTES;
 
     static constexpr field_t FIELD_LOG2 = emp::Log2(FIELD_BITS);
 
@@ -110,10 +114,18 @@ namespace emp {
       emp_assert((index >> FIELD_LOG2) < NUM_FIELDS);
       return index >> FIELD_LOG2;
     }
-    inline static size_t FieldPos(const size_t index) { return index & (FIELD_BITS - 1); }
 
-    inline static size_t Byte2Field(const size_t index) { return index/4; }
-    inline static size_t Byte2FieldPos(const size_t index) { return (index & 3) << 3; }
+    inline static size_t FieldPos(const size_t index) {
+      return index & (FIELD_BITS - 1);
+    }
+
+    inline static size_t Byte2Field(const size_t index) {
+      return index / FIELD_BYTES;
+    }
+
+    inline static size_t Byte2FieldPos(const size_t index) {
+      return FieldPos(index * 8);
+    }
 
     inline void Copy(const field_t in_set[NUM_FIELDS]) {
       std::memcpy(bit_set, in_set, sizeof(bit_set));
@@ -369,12 +381,16 @@ namespace emp {
     /// Constructor to fill in a bit set from a vector.
     template <typename T>
     BitSet(const std::initializer_list<T> l) {
+      // TODO: should we enforce the initializer list to be the same length as the bitset?
+      // emp_assert(l.size() == NUM_BITS);
+
+      // check that initializer list isn't longer than bitset
+      emp_assert(l.size() <= NUM_BITS);
 
       Clear();
 
       size_t idx = 0;
       for (auto i = std::rbegin(l); i != std::rend(l); ++i) {
-        emp_assert(idx < NUM_BITS);
         Set(idx, *i);
         ++idx;
       }
@@ -414,7 +430,7 @@ namespace emp {
   /// Mutate bits, return how many mutations were performed
   size_t Mutate(
     Random & random,
-    const size_t num_muts, // hint: use tools/Binomial.h with this part
+    const size_t num_muts, // @CAO: use tools/Binomial in Distribution.h with this part?
     const size_t min_idx=0 // draw this from a distribution to make some
                            // bits more volatile than others
   ) {
@@ -577,6 +593,15 @@ namespace emp {
       return (bit_set[field_id] >> pos_id) & 255;
     }
 
+    /// Get a read-only view into the internal array used by BitSet.
+    /// @return Read-only span of BitSet's bytes.
+    std::span<const std::byte> GetBytes() const {
+      return std::span<const std::byte>(
+        reinterpret_cast<const std::byte*>(bit_set),
+        NUM_BYTES
+      );
+    }
+
     /// Set the full byte starting at the bit at the specified index.
     void SetByte(size_t index, uint8_t value) {
       emp_assert(index < NUM_BYTES);
@@ -628,7 +653,8 @@ namespace emp {
         // we only need to do this
         // if (index * 32 == (NUM_FIELDS - 1) * FIELD_BITS)
         // but just doing it always is probably faster
-        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+        // check to make sure there are no leading ones in the unused bits
+        emp_assert((bit_set[NUM_FIELDS - 1] & ~MaskLow<field_t>(LAST_BIT)) == 0);
       }
 
     }
@@ -698,8 +724,10 @@ namespace emp {
         // we only need to do this
         // if (index * 64 == (NUM_FIELDS - 1) * FIELD_BITS)
         // but just doing it always is probably faster
-        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+        // check to make sure there are no leading ones in the unused bits
+        emp_assert((bit_set[NUM_FIELDS - 1] & ~MaskLow<field_t>(LAST_BIT)) == 0);
       }
+
 
     }
 
@@ -1359,12 +1387,7 @@ namespace std
     {
         size_t operator()( const emp::BitSet<N>& bs ) const
         {
-           static const uint32_t NUM_BYTES = 1 + ((bs.GetSize() - 1) >> 3);
-           size_t result = bs.GetByte(0);
-           for (unsigned int i = 1; i < NUM_BYTES; ++i){
-                result = emp::hash_combine(result, bs.GetByte(i));
-           }
-           return result;
+          return emp::murmur_hash(bs.GetBytes());
         }
     };
 }

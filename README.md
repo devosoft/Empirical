@@ -1,12 +1,19 @@
+![Empirical Logo](/doc/EmpiricalBanner.png)
+
 Empirical is a library of tools for developing efficient, reliable, and accessible scientific
 software.  The provided code is header-only and encapsulated into the emp namespace, so it
 is simple to incorporate into existing projects.
 
-[![Build Status](https://travis-ci.org/devosoft/Empirical.svg?branch=master)](https://travis-ci.org/devosoft/Empirical) [![Documentation Status](https://readthedocs.org/projects/empirical/badge/?version=latest)](https://empirical.readthedocs.io/en/latest/?badge=latest) [![DOI](https://zenodo.org/badge/24824563.svg)](https://zenodo.org/badge/latestdoi/24824563)
+[![Build Status](https://travis-ci.org/devosoft/Empirical.svg?branch=master)](https://travis-ci.org/devosoft/Empirical) [![Documentation Status](https://readthedocs.org/projects/empirical/badge/?version=latest)](https://empirical.readthedocs.io/en/latest/?badge=latest) [![DOI](https://zenodo.org/badge/24824563.svg)](https://zenodo.org/badge/latestdoi/24824563) [![codecov](https://codecov.io/gh/devosoft/Empirical/branch/master/graph/badge.svg)](https://codecov.io/gh/devosoft/Empirical)
+[![DockerHub](https://img.shields.io/docker/build/devosoft/empirical.svg)](https://hub.docker.com/r/devosoft/empirical)
+
 
 See our [Built With Empirical Gallery](https://empirical.readthedocs.io/en/latest/BuiltWithEmpiricalGallery) for examples of web tools built with Empirical.
 
 See our [Quick Start Guides](https://empirical.readthedocs.io/en/latest/QuickStartGuides) to start using the library.
+
+Starting out on a new project that will use Empirical?
+Take a look at the [cookiecutter Empirical project template](https://github.com/devosoft/cookiecutter-empirical-project) for automarically setting up a directory structure with all the files you need to get started -- step-by-step instructions included!
 
 Tools in Empirical include:
 * Web-enabled elements to facilitate compiling to JavaScript and with a full web interfaces,

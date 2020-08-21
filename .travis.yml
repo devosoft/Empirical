@@ -14,7 +14,13 @@ notifications:
 compiler:
 - g++
 - clang++
-#- emcc
+env:
+- TEST_SET=test-web
+- TEST_SET=test-native-regular
+- TEST_SET=test-native-fulldebug
+- TEST_SET=test-native-opt
+- TEST_SET=test-examples
+- TEST_SET=test-cookiecutter
 python:
 - '3.5'
 before_install:
@@ -22,23 +28,24 @@ before_install:
 - sudo apt-get update -qq
 
 install:
-- sudo apt-get install -qq g++-8 cmake build-essential python-virtualenv python-pip nodejs tar gzip libpthread-stubs0-dev
+- sudo apt-get install -qq g++-8 cmake build-essential python-virtualenv python-pip nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
 - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
 - export python="/usr/bin/python"
 - git fetch origin master:refs/remotes/origin/master
 - npm install source-map
 - make install-test-dependencies
-- if [ "${TRAVIS_COMPILER}" = "emcc" ]; then export CXX=emcc; . third-party/emsdk/emsdk_env.sh; fi
+- source third-party/emsdk/emsdk_env.sh
 services:
   - xvfb
 before_script:
 - ${CXX} --version
 script:
-- make test CXX=${CXX}
+- make ${TEST_SET} CXX=${CXX}
 
 jobs:
   include:
   - stage: test
+    name: documentation
     compiler: clang++
     addons:
       apt:
@@ -55,6 +62,7 @@ jobs:
     - make install-doc-dependencies
     script: make doc
   - stage: test
+    name: coverage
     compiler: clang++
     before_install:
     - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test

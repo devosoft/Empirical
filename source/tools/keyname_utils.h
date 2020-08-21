@@ -79,9 +79,9 @@ namespace emp::keyname {
 
     const auto kv_strs = emp::slice(
 #ifndef __EMSCRIPTEN__
-      std::filesystem::path(filename).filename(), // get basename
+      std::filesystem::path(filename).filename().string(), // get basename
 #else
-      std::experimental::filesystem::path(filename).filename(), // get basename
+      std::experimental::filesystem::path(filename).filename().string(), // get basename
 #endif
       '+'
     );

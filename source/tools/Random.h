@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2015-2019
+ *  @date 2015-2020.
  *
  *  @file  Random.h
  *  @brief A versatile and non-patterned pseudo-random-number generator.
@@ -379,7 +379,7 @@ namespace emp {
      *
      * This function is exact, but slow.
      * @see Random::GetApproxRandBinomial
-     * @see emp::Binomial in source/tools/Binomial.h
+     * @see emp::Binomial in source/tools/Distribution.h
      **/
     inline uint32_t GetFullRandBinomial(const double n, const double p) { // Exact
       emp_assert(p >= 0.0 && p <= 1.0, p);
@@ -400,7 +400,7 @@ namespace emp {
      * exact interface.
      *
      * @see Random::GetFullRandBinomial
-     * @see emp::Binomial in source/tools/Binomial.h
+     * @see emp::Binomial in source/tools/Distribution.h
      **/
     inline uint32_t GetApproxRandBinomial(const double n, const double p) { // Approx
       emp_assert(p >= 0.0 && p <= 1.0, p);
@@ -430,7 +430,7 @@ namespace emp {
      *
      * @see Random::GetFullRandBinomial
      * @see Random::GetApproxRandBinomial
-     * @see emp::Binomial in source/tools/Binomial.h
+     * @see emp::Binomial in source/tools/Distribution.h
      **/
 
     inline uint32_t GetRandBinomial(const double n, const double p) {

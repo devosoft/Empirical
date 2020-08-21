@@ -1,63 +1,42 @@
-GCOV_FLAGS := -o0 -g --coverage
+TEST_NAMES := base config constexpr data Evolve games geometry hardware meta scholar tools
 
-TEST_NAMES := assert base constexpr data evo geometry meta scholar systematics tools games hardware
-
-FLAGS := -std=c++17 -pthread -Wall -Wno-unused-function -I../source/ -I../ -I../third-party/cereal/include/ -msse4.2
-
-#CXX = clang++
-CXX := g++
+CXX = clang++
+#CXX := g++
 
 default: test
 
-test-prep:
-	mkdir -p temp
+test-%:
+	cd $(@:test-%=%) && make test
 
-test-%: test_%.cc
-	$(CXX) $(FLAGS) $< -lstdc++fs -o $@.out
-	#echo "running $@.out"
-	# execute test
-	./$@.out
+test: $(addprefix test-, $(TEST_NAMES))
 
-cover-test-%: test_%.cc
-	$(CXX) $(FLAGS) $< -lstdc++fs -o $@.out
-	#echo "running $@.out"
-	# execute test
-	./$@.out
-	llvm-profdata merge default.profraw -o default.profdata
-	llvm-cov show ./$@.out -instr-profile=default.profdata > coverage_$@.txt
-	python ../third-party/force-cover/fix_coverage.py coverage_$@.txt
+coverage-%:
+	cd $(@:coverage-%=%) && make coverage
 
+coverage: coverage_conversion $(addprefix coverage-, $(TEST_NAMES))
 
-# Test in debug mode without pointer tracker
-test: test-prep $(addprefix test-, $(TEST_NAMES))
-	rm -rf test*.out
+coverage_conversion:
+	./convert_for_tests.sh
 
-# Test optimized version without debug features
-opt: FLAGS := -std=c++17 -pthread -DNDEBUG -O3 -Wno-unused-function -DCI=$(CI) -I../source/ -I../third-party/cereal/include/ -I../
-opt: test-prep $(addprefix test-, $(TEST_NAMES))
-	rm -rf test*.out
+opt-%:
+	cd $(@:opt-%=%) && make opt
 
-# Test in debug mode with pointer tracking
-fulldebug: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../source/ -I../third-party/cereal/include/ -I../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 # -Wmisleading-indentation
-fulldebug: test-prep $(addprefix test-, $(TEST_NAMES))
-	rm -rf test*.out
+opt: $(addprefix opt-, $(TEST_NAMES))
 
-cranky: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../source/ -I../third-party/cereal/include/ -I../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
-cranky: test-prep $(addprefix test-, $(TEST_NAMES))
-	rm -rf test*.out
+fulldebug-%:
+	cd $(@:fulldebug-%=%) && make fulldebug
+
+fulldebug: $(addprefix fulldebug-, $(TEST_NAMES))
+
+cranky-%:
+	cd $(@:cranky-%=%) && make cranky
+
+cranky: $(addprefix cranky-, $(TEST_NAMES))
 
 test-web:
 	  cd web && bash run_tests.sh
-	  cd .. && third-party/node_modules/karma/bin/karma start tests/web/karma.conf.js
 
-coverage_conversion:
-	  ./convert_for_tests.sh
-
-test-coverage: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../coverage_source/ -I../ -I../third-party/cereal/include/ -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 -fprofile-instr-generate -fcoverage-mapping -fno-inline -fno-elide-constructors -O0
-test-coverage: coverage_conversion test-prep $(addprefix cover-test-, $(TEST_NAMES))
-	       rm -r ../coverage_source
-
-clean:
+clean: $(addprefix clean-, $(TEST_NAMES)) clean-web
 	rm -f *.out
 	rm -f *.o
 	rm -f *.gcda
@@ -66,4 +45,6 @@ clean:
 	rm -f *.gcov
 	rm -f ./Coverage*
 	rm -rf ./temp
-	cd web && make clean
+
+clean-%:
+	cd $(@:clean-%=%) && make clean

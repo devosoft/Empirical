@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019
+ *  @date 2019-2020.
  *
  *  @file matchbin_metrics.h
  *  @brief Metric structs that can be plugged into MatchBin.
@@ -26,19 +26,18 @@
 #include <utility>
 #include <queue>
 
-#include <openssl/sha.h>
-
-#include "tools/Binomial.h"
-
 #include "../base/assert.h"
 #include "../base/array.h"
 #include "../base/vector.h"
 #include "../tools/math.h"
 #include "../tools/IndexMap.h"
 #include "../tools/BitSet.h"
+#include "../tools/Distribution.h"
 #include "../tools/string_utils.h"
 #include "../tools/hash_utils.h"
 #include "../tools/tuple_utils.h"
+
+#include "../polyfill/span.h"
 
 namespace emp {
 
@@ -100,16 +99,21 @@ namespace emp {
       std::hash<query_t> qhasher;
       std::hash<tag_t> thasher;
 
-      return static_cast<double>(emp::hash_combine(
-        qhasher(a),
-        thasher(b)
-      )) / std::numeric_limits<size_t>::max();
+      size_t input[2]{qhasher(a), thasher(b)};
+      const std::span<const std::byte> input_as_bytes(
+          reinterpret_cast<std::byte*>(input),
+          sizeof(input)
+      );
+      const size_t hash = emp::murmur_hash(input_as_bytes);
+      return static_cast<double>(hash) / static_cast<double>(std::numeric_limits<size_t>::max());
     }
 
   };
 
+  #ifdef EMP_HAS_CRYPTO
+  #include <openssl/sha.h>
   /// Generate an arbitrary, but consistent, match score between 0 and 1
-  /// Be sure to link against -lcrypto and -lssl
+  /// Be sure to link against -lcrypto, -lssl, and provide -DEMP_HAS_CRYPTO
   template<size_t Width>
   struct CryptoHashMetric: public BaseMetric<emp::BitSet<Width>, emp::BitSet<Width>> {
 
@@ -155,6 +159,7 @@ namespace emp {
   }
 
   };
+  #endif
 
   /// Metric gives the absolute difference between two integers
   struct AbsDiffMetric : public BaseMetric<int, int> {

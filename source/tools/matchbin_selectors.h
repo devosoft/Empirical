@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019
+ *  @date 2019-2020.
  *
  *  @file matchbin_selectors.h
  *  @brief Selector structs that can be plugged into MatchBin.
@@ -24,8 +24,9 @@
 #include <tuple>
 #include <array>
 #include <utility>
+#include <limits>
 
-#include "tools/Binomial.h"
+#include "tools/Distribution.h"
 
 #include "../base/assert.h"
 #include "../base/array.h"
@@ -48,10 +49,9 @@ namespace emp {
 
     emp::IndexMap indexMap;
     emp::vector<size_t> uids;
-    emp::Random rand;
+    emp::Random& rand;
     size_t default_n;
 
-    RouletteCacheState() = default;
     RouletteCacheState(
       emp::IndexMap& im,
       emp::vector<size_t>& ids,
@@ -65,7 +65,7 @@ namespace emp {
 
     std::optional<emp::vector<size_t>> operator()(size_t n) override {
 
-      if (n == 0) n = default_n;
+      if (n == std::numeric_limits<size_t>::max()) n = default_n;
 
       // don't perform a lookup into an empty IndexMap, that's a segfault
       // double braces: an empty vector inside an optional
@@ -95,10 +95,9 @@ namespace emp {
 
     emp::vector<size_t> uids;
     emp::vector<double> probs;
-    emp::Random rand;
+    emp::Random& rand;
     size_t default_n;
 
-    SieveCacheState() = default;
     SieveCacheState(
       emp::vector<size_t>::iterator uids_begin,
       emp::vector<size_t>::iterator uids_end,
@@ -113,7 +112,7 @@ namespace emp {
 
     std::optional<emp::vector<size_t>> operator()(size_t n) override {
 
-      if (n == 0) n = default_n;
+      if (n == std::numeric_limits<size_t>::max()) n = default_n;
 
       emp::vector<size_t> res;
 
@@ -149,7 +148,7 @@ namespace emp {
     { ; }
 
     std::optional<emp::vector<size_t>> operator()(size_t n) override {
-      if (n == 0) n = default_n;
+      if (n == std::numeric_limits<size_t>::max()) n = default_n;
 
       if (n > requestSize) return std::nullopt;
       if (n >= uids.size()) return uids;
@@ -183,7 +182,7 @@ namespace emp {
 
     RankedSelector(emp::Random&){ ; }
 
-    using cache_state_type_t = RankedCacheState;
+    using cache_state_t = RankedCacheState;
 
     std::string name() const override {
       return emp::to_string(
@@ -205,7 +204,7 @@ namespace emp {
       size_t n
     ) override {
 
-      if (n == 0) n = DefaultN;
+      if (n == std::numeric_limits<size_t>::max()) n = DefaultN;
 
       emp::vector<size_t> uids(uids_);
 
@@ -260,7 +259,7 @@ namespace emp {
   >
   struct RouletteSelector : public SelectorBase<RouletteCacheState> {
 
-    using cache_state_type_t = RouletteCacheState;
+    using cache_state_t = RouletteCacheState;
 
     emp::Random & rand;
 
@@ -298,7 +297,7 @@ namespace emp {
       size_t n
     ) override {
 
-      if (n == 0) n = DefaultN;
+      if (n == std::numeric_limits<size_t>::max()) n = DefaultN;
 
       emp::vector<size_t> uids(uids_);
 
@@ -336,7 +335,7 @@ namespace emp {
         std::partition(
           std::begin(uids),
           std::end(uids),
-          [&scores, thresh](size_t uid){ return scores.at(uid) <= thresh; }
+          [&scores](size_t uid){ return scores.at(uid) <= thresh; }
         )
       );
 
@@ -378,7 +377,7 @@ namespace emp {
   >
   struct ExpRouletteSelector : public SelectorBase<RouletteCacheState> {
 
-    using cache_state_type_t = RouletteCacheState;
+    using cache_state_t = RouletteCacheState;
 
     emp::Random & rand;
 
@@ -426,7 +425,7 @@ namespace emp {
       size_t n
     ) override {
 
-      if (n == 0) n = DefaultN;
+      if (n == std::numeric_limits<size_t>::max()) n = DefaultN;
 
       emp::vector<size_t> uids(uids_);
 
@@ -474,7 +473,7 @@ namespace emp {
         std::partition(
           std::begin(uids),
           std::end(uids),
-          [&scores, thresh](size_t uid){ return scores.at(uid) <= thresh; }
+          [&scores](size_t uid){ return scores.at(uid) <= thresh; }
         )
       );
 
@@ -525,7 +524,7 @@ namespace emp {
   >
   struct SieveSelector : public SelectorBase<SieveCacheState> {
 
-    using cache_state_type_t = SieveCacheState;
+    using cache_state_t = SieveCacheState;
 
     emp::Random & rand;
 
@@ -558,7 +557,7 @@ namespace emp {
       size_t n
     ) override {
 
-      if (n == 0) n = DefaultN;
+      if (n == std::numeric_limits<size_t>::max()) n = DefaultN;
 
       emp::vector<size_t> uids(uids_);
 

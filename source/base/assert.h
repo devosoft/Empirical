@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2019.
+ *  @date 2016-2020.
  *
  *  @file assert.h
  *  @brief A more dynamic replacement for standard library asserts.
@@ -198,8 +198,8 @@ namespace emp {
     assert_print(std::forward<EXTRA>(extra)...);
   }
 
-  template <typename IGNORE, typename... EXTRA>
-  bool assert_trigger(std::string filename, size_t line, std::string expr, IGNORE, EXTRA &&... extra) {
+  template <typename Ignore, typename... EXTRA>
+  bool assert_trigger(std::string filename, size_t line, std::string expr, Ignore, EXTRA &&... extra) {
     std::cerr << "Assert Error (In " << filename << " line " << line
               <<  "): " << expr << std::endl;
     assert_print(std::forward<EXTRA>(extra)...);
@@ -211,7 +211,25 @@ namespace emp {
 
 // Debug; Not Emscripten
 
+// MS Visual Studio has some issues with complex macros.  For them, we will use a simple one.
+#ifdef _MSC_VER
+
 /// Require a specified condition to be true.  If it is false, immediately halt execution.
+/// Since we are in MS Visual Studio mode, no extra information will be printed.
+/// Note: If NDEBUG is defined, emp_assert() will not do anything.
+#define emp_assert_msc_impl(TEST)                                                           \
+  do {                                                                                 \
+    !(TEST) && emp::assert_trigger(__FILE__, __LINE__, #TEST, 0) && (abort(), false);  \
+  } while(0)
+#define emp_assert_msc(TEST) emp_assert_msc_impl(TEST)
+#define emp_assert(...) emp_assert_msc(EMP_GET_ARG_1(__VA_ARGS__, ~))
+
+
+// Ended ifdef when we are using Visual Studio; now do else for when we are not.
+#else
+
+/// Require a specified condition to be true.  If it is false, immediately halt execution.
+/// Print also extra information on any variables or experessions provided as variadic args.
 /// Note: If NDEBUG is defined, emp_assert() will not do anything.
 #define emp_assert(...)                                                                          \
   do {                                                                                           \
@@ -219,6 +237,9 @@ namespace emp {
     emp::assert_trigger(__FILE__, __LINE__, EMP_WRAP_ARGS(emp_assert_TO_PAIR, __VA_ARGS__) ) &&  \
     (abort(), false);                                                                            \
   } while(0)
+
+#endif
+// Ended else on ifdef when we are NOT using Visual Studio
 
 // Emscripten-only asserts should be disabled since we are not in Emscripten
 /// Require a specified condition to be true if this program was compiled to Javascript with Emscripten.

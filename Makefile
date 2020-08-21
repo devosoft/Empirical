@@ -1,16 +1,44 @@
-test:
+test: test-native test-examples test-web
+	make test-native
+	make test-examples
+	make test-web
+
+test-examples: test-native-examples test-web-examples
+
+test-native: test-native-regular test-native-fulldebug test-native-opt test-native-examples
+
+test-native-regular:
 	cd tests && make test
+
+test-native-fulldebug:
 	cd tests && make fulldebug
+
+test-native-opt:
 	cd tests && make opt
-	cd examples && make
-	cd examples && make debug
-	# cd tests && make test-web
+
+test-native-examples:
+	cd examples && make native-test
+	cd examples && make native-test-debug
+
+test-web-examples:
+	cd examples && make web-test
+
+test-web:
+	cd tests && make test-web
+
+../cookiecutter-empirical-project:
+	cd .. && git clone --recursive https://github.com/devosoft/cookiecutter-empirical-project.git
+
+test-cookiecutter: ../cookiecutter-empirical-project
+	. third-party/env/bin/activate && \
+	export COOKIECUTTER_EMP_DIR=../Empirical/source && \
+	cd ../cookiecutter-empirical-project && make clean && make test
 
 doc: build-doxygen-xml
 	cd doc && ./make_docs.sh
 
 coverage:
-	cd tests && make test-coverage
+	cd tests && make coverage
 
 build-doxygen-xml:
 	./third-party/doxygen/build/bin/doxygen Doxyfile

@@ -1,11 +1,19 @@
-// Karma configuration
-// Generated on Mon Oct 03 2016 15:06:06 GMT-0400 (EDT)
-
 module.exports = function(config) {
   config.set({
 
+    // to enable commandline input
+    client: {
+      // args: config.name ? ["--name"] : [],
+      // note that this works only with `karma start`, not `karma run`
+      filename: config.filename,
+    },
+
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '../../',
+
+    proxies: {
+      "/assets/": "/base/tests/web/assets"
+    },
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
@@ -18,11 +26,11 @@ module.exports = function(config) {
       {pattern: 'third-party/node_modules/chai/chai.js'},
       {pattern: 'source/web/d3/d3.min.js'},
       {pattern: 'source/web/d3/d3-tip.min.js'},
-      {pattern: 'tests/web/test_header.js'},
-      {pattern: 'tests/data/lineage-example.json', included: false},
-      {pattern: 'tests/data/test-line-graph.csv', included: false},
-      {pattern: 'tests/web/test_visualizations.js.map', included: false},
-      {pattern: 'tests/web/test_visualizations.js'}
+      {pattern: 'tests/web/assets/*', included: false},
+      {pattern: `tests/web/${config.filename}.js.map`, included: false},
+      {pattern: `tests/web/${config.filename}.js`},
+      {pattern: `tests/web/${config.filename}.wasm`, included: false, nocache:true},
+      {pattern: `tests/web/${config.filename}.wasm.map`, included: false, nocache:true}
     ],
 
 

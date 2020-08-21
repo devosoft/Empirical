@@ -13,8 +13,10 @@
 *.wasm
 *.wast
 *-bak.cc
+*.dat
+*.exe
 *tmp.*
-	
+
 */env/*
 */3nv/*
 

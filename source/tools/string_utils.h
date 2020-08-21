@@ -579,56 +579,64 @@ namespace emp {
   }
 
   /// Make a string safe(r) 
-  static std::string slugify(const std::string & in_string) {
+  static inline std::string slugify(const std::string & in_string) {
     //TODO handle complicated unicode strings
     std::string res = to_lower(in_string);
     remove_punctuation(res);
     compress_whitespace(res);
     std::transform(res.begin(), res.end(), res.begin(), [](char ch) {
-      return ch == ' ' ? '-' : ch;
+      return (ch == ' ') ? '-' : ch;
     });
     return res;
   }
 
   /// Provide a string_view on a given string
-  static inline std::string_view view_string(const std::string & str) {
+  static inline std::string_view view_string(const std::string_view & str) {
     return std::string_view(str);
   }
 
   /// Provide a string_view on a string from a given starting point.
-  static inline std::string_view view_string(const std::string & str, size_t start) {
+  static inline std::string_view view_string(const std::string_view & str, size_t start) {
     emp_assert(start <= str.size());
-    return std::string_view(str.c_str() + start, str.size() - start);
+    return str.substr(start, str.size() - start);
   }
 
   /// Provide a string_view on a string from a starting point with a given size.
-  static inline std::string_view view_string(const std::string & str, size_t start, size_t npos) {
+  static inline std::string_view view_string(const std::string_view & str, 
+                                             size_t start, 
+                                             size_t npos) {
     emp_assert(start + npos <= str.size());
-    return std::string_view(str.c_str() + start, npos);
+    return str.substr(start, npos);
   }
 
   /// Provide a string_view on a string from the beginning to a given size.
-  static inline std::string_view view_string_front(const std::string & str, size_t npos) {
+  static inline std::string_view view_string_front(const std::string_view & str,
+                                                   size_t npos) {
     emp_assert(npos <= str.size());
-    return std::string_view(str.c_str(), npos);
+    return str.substr(0, npos);
   }
 
   /// Provide a string_view on a string from a starting point with a given size.
-  static inline std::string_view view_string_back(const std::string & str, size_t npos) {
+  static inline std::string_view view_string_back(const std::string_view & str,
+                                                  size_t npos) {
     emp_assert(npos <= str.size());
-    return std::string_view(str.c_str() + str.size() - npos, npos);
+    return str.substr(str.size() - npos, npos);
   }
 
   /// Provide a string_view on a string from a starting point to an ending point.
-  static inline std::string_view view_string_range(const std::string & str, size_t start, size_t end) {
+  static inline std::string_view view_string_range(const std::string_view & str,
+                                                   size_t start,
+                                                   size_t end) {
     emp_assert(start <= end);
     emp_assert(end <= str.size());
-    return std::string_view(str.c_str() + start, end - start);
+    return str.substr(start, end - start);
   }
 
   /// Return a view of the prefix of the input string up to a specified delimeter.
   /// If the delimeter is not found, return the entire input string.
-  static inline std::string_view view_string_to(const std::string & in_string, const char delim, size_t start_pos=0) {
+  static inline std::string_view view_string_to(const std::string_view & in_string,
+                                                const char delim,
+                                                size_t start_pos=0) {
     const size_t in_size = in_string.size();
     size_t end_pos = start_pos;
     while (end_pos < in_size && in_string[end_pos] != delim) end_pos++;
@@ -641,7 +649,7 @@ namespace emp {
   /// @delim delimiter to split on
   /// @max_split defines the maximum number of splits
   static inline void slice(
-    const std::string & in_string,
+    const std::string_view & in_string,
     emp::vector<std::string> & out_set,
     const char delim='\n',
     const size_t max_split=std::numeric_limits<size_t>::max()
@@ -681,7 +689,7 @@ namespace emp {
   /// @delim delimiter to split on
   /// @max_split defines the maximum number of splits
   static inline emp::vector<std::string> slice(
-    const std::string & in_string,
+    const std::string_view & in_string,
     const char delim='\n',
     const size_t max_split=std::numeric_limits<size_t>::max()
   ) {
@@ -691,8 +699,9 @@ namespace emp {
   }
 
   /// Create a set of string_views based on the provided delimitor; fill them in to the provided vector.
-  static inline void view_slices(const std::string & in_string, emp::vector<std::string_view> & out_set,
-                           char delim='\n') {
+  static inline void view_slices(const std::string_view & in_string,
+                                 emp::vector<std::string_view> & out_set,
+                                 char delim='\n') {
     const size_t in_size = in_string.size();
     out_set.resize(0);
 
@@ -705,7 +714,8 @@ namespace emp {
   }
 
   /// Slice a string without passing in result vector (may be less efficient).
-  static inline emp::vector<std::string_view> view_slices(const std::string & in_string, char delim='\n') {
+  static inline emp::vector<std::string_view> view_slices(const std::string_view & in_string,
+                                                          char delim='\n') {
     emp::vector<std::string_view> result;
     view_slices(in_string, result, delim);
     return result;
@@ -910,6 +920,13 @@ namespace emp {
       return to_string(open_quote, str, close_quote);
     });
   }
+
+  /// Take a vector of strings, put them in quotes, and then transform it into an English list.
+  static inline std::string to_quoted_list(const string_vec_t & in_strings,
+                                           const std::string quote="'") {
+    return to_english_list(quote_strings(in_strings, quote));
+  }
+
 }
 
 #endif

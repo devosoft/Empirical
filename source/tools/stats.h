@@ -27,47 +27,46 @@
 
 namespace emp {
 
-  /// Calculate sum of the members of the container passed
-  /// Only works on containers with a scalar member type
+  /// Calculate sum of the values in a container; if pointers to scalars, convert to scalar type
   template <typename C>
-  typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value && std::is_scalar<typename C::value_type>::value, typename C::value_type>::type
+  typename emp::remove_ptr_type<typename C::value_type>::type
   Sum(C & elements) {
-
-    double total = 0;
+    typename emp::remove_ptr_type<typename C::value_type>::type total = 0;
     for (auto element : elements) {
-      total += element;
+      if constexpr (emp::is_ptr_type<typename C::value_type>::value) total += *element;
+      else total += element;
     }
-
     return total;
   }
 
-  /// Calculate sum of the values pointed at by pointers in a container
-  /// Only works on containers of pointers to a scalar type
-  template <typename C>
-  typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value && std::is_scalar<typename emp::remove_ptr_type<typename C::value_type>::type >::value, typename emp::remove_ptr_type<typename C::value_type>::type >::type
-  Sum(C & elements) {
-
-    double total = 0;
+  /// Sum the RESULTS of scalar values in a container; if pointers to scalars, convert to scalar type
+  template <typename C, typename FUN>
+  auto SumScalarResults(C & elements, FUN && fun) {
+    using return_t = decltype( fun( emp::remove_ptr_value(*elements.begin()) ) );
+    return_t total = 0;
     for (auto element : elements) {
-      total += *element;
+      total += fun(emp::remove_ptr_value(element));
     }
-
     return total;
   }
-
 
   /// Calculate Shannon Entropy of the members of the container passed
   template <typename C>
-  typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value, double>::type
-  ShannonEntropy(C & elements) {
-
+  double ShannonEntropy(C & elements) {
     // Count number of each value present
-    emp::map<typename C::value_type, int> counts;
+    emp::map<typename emp::remove_ptr_type<typename C::value_type>::type, int> counts;
     for (auto element : elements) {
-      if (counts.find(element) != counts.end()) {
-	       counts[element]++;
-      } else {
-	       counts[element] = 1;
+      // If we have a container of pointers, dereference them
+      if constexpr (emp::is_ptr_type<typename C::value_type>::value) {
+        auto it = counts.find(*element);
+        if (it != counts.end()) it->second++;
+        else counts[*element] = 1;
+      }
+      // otherwise operate on elements directly.
+      else {
+        auto it = counts.find(element);
+        if (it != counts.end()) it->second++;
+        else counts[element] = 1;
       }
     }
 
@@ -81,59 +80,6 @@ namespace emp {
     return -1 * result;
   }
 
-  /// Calculate Shannon Entropy of the members of the container when those members are pointers
-  template <typename C>
-  typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value, double>::type
-  ShannonEntropy(C & elements) {
-    //   std::cout<< "In se" << std::endl;
-    using pointed_at = typename emp::remove_ptr_type<typename C::value_type>::type;
-    // Count number of each value present
-    emp::map<pointed_at, int> counts;
-    for (auto element : elements) {
-      if (counts.find(*element) != counts.end()) {
-        counts[*element]++;
-      } else {
-        counts[*element] = 1;
-      }
-
-    }
-    // Shannon entropy calculation
-    double result = 0;
-    for (auto element : counts) {
-      double p = double(element.second)/elements.size();
-      result +=  p * log2(p);
-    }
-    //   std::cout<< "leaving se" << std::endl;
-    return -1 * result;
-  }
-
-  /// Calculate variance of the members of the container passed
-  /// Only works on containers with a scalar member type
-  template <typename C>
-  typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value && std::is_scalar<typename C::value_type>::value, double>::type
-  Variance(C & elements) {
-
-    double var = 0;
-    double mean = (double)Sum(elements)/elements.size();
-    for (auto element : elements) {
-      var += emp::Pow(element - mean, 2);
-    }
-    return var/elements.size();
-  }
-
-  /// Calculate variance of the values pointed at by members of the container passed
-  /// Only works on containers with a scalar member type
-  template <typename C>
-  typename std::enable_if<emp::is_ptr_type<typename C::value_type>::value && std::is_scalar<typename emp::remove_ptr_type<typename C::value_type>::type >::value, double>::type
-  Variance(C & elements) {
-
-    double var = 0;
-    double mean = (double)Sum(elements)/elements.size();
-    for (auto element : elements) {
-      var += emp::Pow(*element - mean, 2);
-    }
-    return var/elements.size();
-  }
 
   /// Calculate the mean of the values in a container
   /// If values are pointers, they will be automatically de-referenced
@@ -141,8 +87,20 @@ namespace emp {
   template <typename C>
   emp::sfinae_decoy<double, typename C::value_type> 
   Mean(C & elements) {
-    return (double)Sum(elements)/elements.size();
+    return (double)Sum(elements)/ (double) elements.size();
   }
+
+
+  /// Calculate variance of the members of the container passed
+  /// Only works on containers with a scalar member type
+  template <typename C>
+  auto Variance(C & elements) {
+    const double mean = Mean(elements);
+    auto sum = SumScalarResults(elements,
+                                [mean](auto x){ return emp::Pow(mean - (double) x, 2); } );
+    return sum / (elements.size() - 1);
+  }
+
 
   /// Calculate the standard deviation of the values in a container
   /// If values are pointers, they will be automatically de-referenced

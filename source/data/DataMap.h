@@ -38,13 +38,15 @@
  *    1. The memory is a POINTER not an instance.  This would allow entries to behave like
  *       references, potentially eliminating the need to copy larger data structures into the
  *       memory image.
- *    2. The memory is a LOG of values, not a single value.  This allows for quick identification
+ *    2. The entry has a non-trivial (or user-provided) COPY/MOVE CONSTRUCTOR or DESTRUCTOR
+ *    3. The entry has a function to call for a Get instead of a value in memory.  The space
+ *       reserved is used for the function pointer (incompatible with bit 1...)
+ *    4. The entry has a function to call when it is set.  Effectively this can implement SIGNAL
+ *       monitoring it that should be notified whenever it changes.  The signal itself would need
+ *       to be stored elsewhere (presumably in the memory image, but possibly in the layout.)
+ *    5. The memory is a LOG of values, not a single value.  This allows for quick identification
  *       of when something special needs to be done.
- *    3. The entry has a SIGNAL monitoring it that should be notified whenever it changes.  The
- *       signal itself would need to be stored elsewhere (presumably in the memory image, but
- *       possibly in the layout.)
- *    4. The entry has a non-trivial (or user-provided) COPY/MOVE CONSTRUCTOR or DESTRUCTOR
- *    5-8. Limited type information (16 types that can be handled more effectively?)
+ *    6-8. Limited type information (8 types that can be handled more effectively?)
  * 
  *  - We should be able to keep a series of values, not just a single one.  This can be done with
  *    a series of new functions:
@@ -125,6 +127,7 @@ namespace emp {
     }
     DataMap(DataMap && in_map) : memory(std::move(in_map.memory)), layout_ptr(in_map.layout_ptr) {
       in_map.memory.RawResize(0);
+      // @CAO: Should we set in_map.layout_ptr to null???
     }
 
     // Copy Operator...
@@ -213,7 +216,7 @@ namespace emp {
     /// Retrieve a variable by its type and name. (Slower!)
     template <typename T>
     T & Get(const std::string & name) {
-      emp_assert(HasName(name));
+      emp_assert(HasName(name), name);
       emp_assert(IsType<T>(name), "DataMap::Get() must be provided the correct type.",
                  name, GetType(name), emp::GetTypeID<T>());
       return memory.Get<T>(GetID(name));
@@ -238,6 +241,7 @@ namespace emp {
     }
 
     // Type-specific Getters and Setters
+    // @CAO: Should we change to GetDouble() and SetDouble() for clarity?
     double & GetValue(size_t id) { return Get<double>(id); }
     double GetValue(size_t id) const { return Get<double>(id); }
     double & GetValue(const std::string & name) { return Get<double>(name); }
@@ -279,8 +283,16 @@ namespace emp {
     template <typename... Ts> size_t AddStringVar(Ts &&... args) { return AddVar<std::string>(args...); }
     template <typename... Ts> size_t AddValueVar(Ts &&... args) { return AddVar<double>(args...); }
 
+    /// Test if this DataMap is using the identical layout as another DataMap.
+    bool SameLayout(const emp::DataMap & in_dm) const {
+      return layout_ptr == in_dm.layout_ptr;
+      // @CAO: Should we also see if it's using a different layout object, but otherwise identical?
+    }
+
+    /// Test if this layout is locked (i.e., it cannot be changed.)
     bool IsLocked() const { return layout_ptr && layout_ptr->IsLocked(); }
 
+    /// Prevent this DataMap's layout from having any additional changed made to it.
     void LockLayout() {
       MakeLayoutUnique();
       layout_ptr->Lock();

@@ -43,7 +43,7 @@ namespace D3 {
       char * buffer = (char *)EM_ASM_INT({
 	    var result = js.objects[$0](emp_i.__incoming_array);
 	    var buffer = Module._malloc(result.length+1);
-	    Module.writeStringToMemory(result, buffer);
+	    Module.stringToUTF8(result, buffer, lengthBytesUTF8(result)+1);
 	    return buffer;
       }, this->id);
 
