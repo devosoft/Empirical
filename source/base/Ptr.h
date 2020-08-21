@@ -346,14 +346,6 @@ namespace emp {
       Tracker().IncID(id);
     }
 
-    /// Construct using move constructor
-    Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr), id(_in.id) {
-      if (internal::ptr_debug) std::cout << "move construct: " << ptr << std::endl;
-      _in.ptr = nullptr;
-      _in.id = UNTRACKED_ID;
-      // No IncID or DecID in Tracker since we just move the id.
-    }
-
     /// Construct from a raw pointer of campatable type.
     template <typename T2>
     Ptr(T2 * in_ptr, bool track=false) : ptr(in_ptr), id(UNTRACKED_ID)
@@ -484,9 +476,9 @@ namespace emp {
     /// Reallocate this Ptr to a newly allocated value using arguments passed in.
     template <typename... T>
     void New(T &&... args) {
-      Tracker().DecID(id);                            // Remove a pointer to any old memory...
+      Tracker().DecID(id);                               // Remove a pointer to any old memory...
 
-      ptr = new TYPE(std::forward<T>(args)...); // Special new that uses allocated space.
+      ptr = new TYPE(std::forward<T>(args)...);          // Special new that uses allocated space.
       // ptr = (TYPE*) malloc (sizeof(TYPE));            // Build a new raw pointer.
       // emp_emscripten_assert(ptr);                     // No exceptions in emscripten; assert alloc!
       // ptr = new (ptr) TYPE(std::forward<T>(args)...); // Special new that uses allocated space.
@@ -564,20 +556,6 @@ namespace emp {
         Tracker().IncID(id);
       } else {
         if (internal::ptr_debug) std::cout << "...pointers same -- no copying!" << std::endl;
-      }
-      return *this;
-    }
-
-    /// Move assignment
-    Ptr<TYPE> & operator=(Ptr<TYPE> && _in) {
-      if (internal::ptr_debug) std::cout << "move assignment: " << _in.ptr << std::endl;
-      emp_assert(Tracker().IsDeleted(_in.id) == false, _in.id, "Do not move deleted pointers.");
-      if (ptr != _in.ptr) {
-        Tracker().DecID(id);   // Decrement references to former pointer at this position.
-        ptr = _in.ptr;
-        id = _in.id;
-        _in.ptr = nullptr;
-        _in.id = UNTRACKED_ID;
       }
       return *this;
     }
@@ -774,7 +752,6 @@ namespace emp {
 
     Ptr() : ptr(nullptr) {}                                              ///< Default constructor
     Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) {}                         ///< Copy constructor
-    Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr) {}                              ///< Move constructor
     template <typename T2> Ptr(T2 * in_ptr, bool=false) : ptr(in_ptr) {} ///< Construct from raw ptr
     template <typename T2> Ptr(T2 * _ptr, size_t, bool) : ptr(_ptr) {}   ///< Construct from array
     template <typename T2> Ptr(Ptr<T2> _in) : ptr(_in.Raw()) {}          ///< From compatible Ptr
@@ -804,9 +781,8 @@ namespace emp {
     }
     struct hash_t { size_t operator()(const Ptr<TYPE> & t) const { return t.Hash(); } };
 
-    // Copy/Move assignments
+    // Copy assignments
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) { ptr = _in.ptr; return *this; }
-    Ptr<TYPE> & operator=(Ptr<TYPE> && _in) { ptr = _in.ptr; _in.ptr = nullptr; return *this; }
 
     // Assign to compatible Ptr or raw (non-managed) pointer.
     template <typename T2> Ptr<TYPE> & operator=(T2 * _in) { ptr = _in; return *this; }
