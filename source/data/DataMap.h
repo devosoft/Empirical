@@ -240,22 +240,6 @@ namespace emp {
       return (Get<T>(name) = value);
     }
 
-    // Type-specific Getters and Setters
-    // @CAO: Should we change to GetDouble() and SetDouble() for clarity?
-    double & GetValue(size_t id) { return Get<double>(id); }
-    double GetValue(size_t id) const { return Get<double>(id); }
-    double & GetValue(const std::string & name) { return Get<double>(name); }
-    double GetValue(const std::string & name) const { return Get<double>(name); }
-    double & SetValue(size_t id, double value) { return Set<double>(id, value); }
-    double & SetValue(const std::string & name, double value) { return Set<double>(name, value); }
-
-    std::string & GetString(const size_t id) { return Get<std::string>(id); }
-    const std::string & GetString(const size_t id) const { return Get<std::string>(id); }
-    std::string & GetString(const std::string & name) { return Get<std::string>(name); }
-    const std::string & GetString(const std::string & name) const { return Get<std::string>(name); }
-    std::string & SetString(const size_t id, const std::string & value) { return Set<std::string>(id, value); }
-    std::string & SetString(const std::string & name, const std::string & value) { return Set<std::string>(name, value); }
-
     /// Look up the type of a variable by ID.
     emp::TypeID GetType(size_t id) const {
       emp_assert(layout_ptr);
@@ -268,6 +252,19 @@ namespace emp {
       return layout_ptr->GetType(GetID(name));
     }
 
+    /// Get the memory at the target position, assume it is the provided type, and convert the
+    /// value found there to double.
+    double GetAsDouble(size_t id, TypeID type_id) const {
+      emp_assert(HasID(id), "Can only Get IDs that are available in DataMap.", id, GetSize());
+      emp_assert(type_id == layout_ptr->GetType(id));
+      return type_id.ToDouble(memory.GetPtr(id));
+    }
+
+    /// Get the memory at the target position, lookup it's type, and convert the value to double.
+    double GetAsDouble(size_t id) const {
+      emp_assert(HasID(id), "Can only get IDs the are available in DataMap.", id, GetSize());
+      return GetAsDouble(id, layout_ptr->GetType(id));
+    }
 
     /// Add a new variable with a specified type, name and value.
     template <typename T>
