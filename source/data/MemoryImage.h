@@ -52,14 +52,22 @@ namespace emp {
     size_t GetInitSize() const { return init_to; }
 
     /// Get a typed pointer to a specific position in this image.
-    template <typename T> emp::Ptr<T> GetPtr(size_t pos) {
-      emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
+    template <typename T=void> emp::Ptr<T> GetPtr(size_t pos) {
+      if constexpr (!std::is_same_v<T,void>) {
+        emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
+      }
       return reinterpret_cast<T*>(&image[pos]);
     }
 
-    template <typename T> emp::Ptr<const T> GetPtr(size_t pos) const {
-      emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
-      return reinterpret_cast<T const *>(&image[pos]);
+    template <typename T=void> emp::Ptr<const T> GetPtr(size_t pos) const {
+      if constexpr (!std::is_same_v<T,void>) {
+        emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
+      }
+      // return reinterpret_cast<T const *>(&image[pos]);
+      // return emp::Ptr<const std::byte>(&image[pos]).ReinterpretCast<const T>();
+      emp::Ptr<const std::byte> mem_ptr(&image[pos]);
+      emp::Ptr<const T> T_ptr = mem_ptr.ReinterpretCast<const T>();
+      return T_ptr;
     }
 
     /// Get proper references to an object represented in this image.
