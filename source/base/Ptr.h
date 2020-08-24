@@ -376,10 +376,10 @@ namespace emp {
   template <>
   class BasePtr<const void> {
   public:
-    void * const ptr;                 ///< The raw pointer associated with this Ptr object.
+    const void * ptr;                 ///< The raw pointer associated with this Ptr object.
     size_t id;                  ///< A unique ID for this pointer type.
 
-    BasePtr(void * const in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) { }
+    BasePtr(const void * in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) { }
     static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
   };
 
@@ -741,16 +741,14 @@ namespace emp {
     [[nodiscard]] TYPE & operator*() const { return *ptr; }
 
     // Follow a pointer.
-    TYPE * operator->() { return ptr; }
-    TYPE * const operator->() const { return ptr; }
+    TYPE * operator->() const { return ptr; }
 
     // Should implement operator->* to follow a pointer to a member function.
     // For an example, see:
     //  https://stackoverflow.com/questions/27634036/overloading-operator-in-c
 
     // Indexing into array
-    TYPE & operator[](size_t pos) { return ptr[pos]; }
-    const TYPE & operator[](size_t pos) const { return ptr[pos]; }
+    TYPE & operator[](size_t pos) const { return ptr[pos]; }
   };
 
   /// Base class with functionality only needed in void pointers.
@@ -760,8 +758,8 @@ namespace emp {
   };
 
   template <> class BasePtr<const void> {
-  protected: void * const ptr;           ///< The raw pointer associated with this Ptr object.
-  public: BasePtr(void * const in_ptr) : ptr(in_ptr) { }
+  protected: const void * ptr;           ///< The raw pointer associated with this Ptr object.
+  public: BasePtr(const void * in_ptr) : ptr(in_ptr) { }
   };
 
   template <typename TYPE>
