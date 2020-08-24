@@ -76,11 +76,11 @@ namespace emp {
 
       /// Treat the memory referred to by a void pointer as the current type, convert it to a
       /// double, and return that value. (Default to nan if no such conversion is possible.)
-      virtual double ToDouble(const emp::Ptr<void>) const { return std::nan(""); }
+      virtual double ToDouble(const emp::Ptr<const void>) const { return std::nan(""); }
 
       /// Treat the memory referred to by a void pointer as the current type, convert it to a
       /// string, and return that value. (Default to empty if no such conversion is possible.)
-      virtual std::string ToString(const emp::Ptr<void>) const { return ""; }
+      virtual std::string ToString(const emp::Ptr<const void>) const { return ""; }
 
       /// Take a double and a void pointer, treat the pointer as the correct type, and assign
       /// the double to it (if possible).  Returns success.
@@ -146,43 +146,43 @@ namespace emp {
         else return sizeof(T);
       }
 
-      double ToDouble(const emp::Ptr<void> ptr) const override {
+      double ToDouble(const emp::Ptr<const void> ptr) const override {
         using base_t = std::decay_t<T>;
 
         // If this variable has a built-in ToDouble() trait, use it!
         if constexpr (emp::HasToDouble<T>()) {
-          return ptr.ReinterpretCast<base_t>()->ToDouble();
+          return ptr.ReinterpretCast<const base_t>()->ToDouble();
         }
 
         // If this type is convertable to a double, cast the pointer to the correct type, de-reference it,
         // and then return the conversion.  Otherwise return NaN
         if constexpr (std::is_convertible<T, double>::value) {
-          return (double) *ptr.ReinterpretCast<base_t>();
+          return (double) *ptr.ReinterpretCast<const base_t>();
         }
         else return std::nan("");
       }
 
-      std::string ToString(const emp::Ptr<void> ptr) const override {
+      std::string ToString(const emp::Ptr<const void> ptr) const override {
         using base_t = std::decay_t<T>;
 
         // If this variable has a built-in ToString() trait, use it!
         if constexpr (emp::HasToString<T>()) {
-          return ptr.ReinterpretCast<base_t>()->ToString();
+          return ptr.ReinterpretCast<const base_t>()->ToString();
         }
 
         // If this variable is a string or can be directly converted to a string, do so.
         if constexpr (std::is_convertible<T, std::string>::value) {
-          return (std::string) *ptr.ReinterpretCast<base_t>();
+          return (std::string) *ptr.ReinterpretCast<const base_t>();
         }
 
         // If this variable is a char, treat it as a single-character string.
         if constexpr (std::is_same<T, char>::value) {
-          return std::string(1, (char) *ptr.ReinterpretCast<base_t>());
+          return std::string(1, (char) *ptr.ReinterpretCast<const base_t>());
         }
 
         // If this variable is a numeric value, use to_string.
         else if constexpr (std::is_arithmetic<T>::value) {
-          return std::to_string( *ptr.ReinterpretCast<base_t>() );
+          return std::to_string( *ptr.ReinterpretCast<const base_t>() );
         }
 
         // If we made it this far, we don't know how to convert...
@@ -291,8 +291,8 @@ namespace emp {
 
     size_t GetSize() const { return info_ptr->GetSize(); }
   
-    double ToDouble(const emp::Ptr<void> ptr) const { return info_ptr->ToDouble(ptr); }
-    std::string ToString(const emp::Ptr<void> ptr) const { return info_ptr->ToString(ptr); }
+    double ToDouble(const emp::Ptr<const void> ptr) const { return info_ptr->ToDouble(ptr); }
+    std::string ToString(const emp::Ptr<const void> ptr) const { return info_ptr->ToString(ptr); }
     bool FromDouble(double value, const emp::Ptr<void> ptr) {
       return info_ptr->FromDouble(value, ptr);
     }
