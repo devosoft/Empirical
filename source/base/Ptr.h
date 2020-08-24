@@ -46,7 +46,7 @@ namespace emp {
   private:
     const void * ptr;   ///< Which pointer are we keeping data on?
     int count;          ///< How many of this pointer do we have?
-    PtrStatus status;   ///< Has this pointer been deleted? (i.e., we should no longer access it!)
+    PtrStatus status;   ///< Has this pointer been deleted? (i.e., if so, don't access it!)
     size_t array_bytes; ///< How big is the array pointed to (in bytes)?
 
   public:
@@ -341,15 +341,7 @@ namespace emp {
     }
 
     /// Follow a pointer.
-    TYPE * operator->() {
-      // Make sure a pointer is active before we follow it.
-      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
-      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
-      return ptr;
-    }
-
-    /// Follow a pointer to a const target.
-    TYPE * const operator->() const {
+    TYPE * operator->() const {
       // Make sure a pointer is active before we follow it.
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
@@ -357,7 +349,7 @@ namespace emp {
     }
 
     /// Indexing into array
-    TYPE & operator[](size_t pos) {
+    TYPE & operator[](size_t pos) const {
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
       emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.", id);
       emp_assert(Tracker().GetArrayBytes(id) > (pos*sizeof(TYPE)),
@@ -366,15 +358,6 @@ namespace emp {
       return ptr[pos];
     }
 
-    /// Indexing into const array
-    const TYPE & operator[](size_t pos) const {
-      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
-      emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.", id);
-      emp_assert(Tracker().GetArrayBytes(id) > (pos*sizeof(TYPE)),
-        "Indexing out of range.", id, ptr, pos, sizeof(TYPE), Tracker().GetArrayBytes(id));
-      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
-      return ptr[pos];
-    }
   };
 
 
