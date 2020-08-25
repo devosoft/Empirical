@@ -63,11 +63,7 @@ namespace emp {
       if constexpr (!std::is_same_v<T,void>) {
         emp_assert(pos + sizeof(T) <= GetSize(), pos, sizeof(T), GetSize());
       }
-      // return reinterpret_cast<T const *>(&image[pos]);
-      // return emp::Ptr<const std::byte>(&image[pos]).ReinterpretCast<const T>();
-      emp::Ptr<const std::byte> mem_ptr(&image[pos]);
-      emp::Ptr<const T> T_ptr = mem_ptr.ReinterpretCast<const T>();
-      return T_ptr;
+      return emp::Ptr<const std::byte>(&image[pos]).ReinterpretCast<const T>();
     }
 
     /// Get proper references to an object represented in this image.
