@@ -390,6 +390,10 @@ namespace emp {
 
   /// Determine if there are only digits in a string.
   inline bool is_digits(const std::string & test_str) {
+    // If string is empty, there are no digits.
+    if (test_str.size() == 0) return false;
+
+    // Otherwise return false if any character is not a digit.
     for (char c : test_str) if (!is_digit(c)) return false;
     return true;
   }
