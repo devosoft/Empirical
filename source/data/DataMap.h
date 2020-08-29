@@ -266,6 +266,20 @@ namespace emp {
       return GetAsDouble(id, layout_ptr->GetType(id));
     }
 
+    /// Get the memory at the target position, assume it is the provided type, and convert the
+    /// value found there to string.
+    std::string GetAsString(size_t id, TypeID type_id) const {
+      emp_assert(HasID(id), "Can only Get IDs that are available in DataMap.", id, GetSize());
+      emp_assert(type_id == layout_ptr->GetType(id));
+      return type_id.ToString(memory.GetPtr(id));
+    }
+
+    /// Get the memory at the target position, lookup it's type, and convert the value to string.
+    std::string GetAsString(size_t id) const {
+      emp_assert(HasID(id), "Can only get IDs the are available in DataMap.", id, GetSize());
+      return GetAsString(id, layout_ptr->GetType(id));
+    }
+
     /// Add a new variable with a specified type, name and value.
     template <typename T>
     size_t AddVar(const std::string & name,
@@ -275,10 +289,6 @@ namespace emp {
       MakeLayoutUnique();  // If the current layout is shared, first make a copy of it.
       return layout_ptr->Add<T>(memory, name, default_value, desc, notes);
     }
-
-    // Add type-specific variables.
-    template <typename... Ts> size_t AddStringVar(Ts &&... args) { return AddVar<std::string>(args...); }
-    template <typename... Ts> size_t AddValueVar(Ts &&... args) { return AddVar<double>(args...); }
 
     /// Test if this DataMap is using the identical layout as another DataMap.
     bool SameLayout(const emp::DataMap & in_dm) const {
