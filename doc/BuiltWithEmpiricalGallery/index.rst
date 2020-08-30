@@ -44,6 +44,10 @@ Put in a PR or raise an issue to have *your* project featured!
 - `A.A.G.O.S.`_ `[source]`__
 
   - An interactive artificial life model that demonstrates (1) how changing environments can promote the evolution of modular genetic architectures and (2) how high mutation rates can promote the evolution of more compact architectures (more goverlapping genes).
+  
+- `Symbulation`_ `[source]`__
+
+  - An interactive artificial life model focused on the evolution of symbiosis between parasitism to mutualism. Also features a game to recreate major results from published work.
 
 .. _`Choose Your Words!`: https://devosoft.github.io/dynamic-word/
 .. __: https://github.com/devosoft/dynamic-word
@@ -65,4 +69,6 @@ Put in a PR or raise an issue to have *your* project featured!
 .. __: https://github.com/emilydolson/genomic_stability_model/
 .. _`A.A.G.O.S.`: https://lalejini.com/Aagos/web/Aagos.html
 .. __: https://github.com/amlalejini/Aagos/
+.. _`Symbulation`: https://anyaevostinar.github.io/SymbulationEmp/web/symbulation.html
+.. __: https://github.com/anyaevostinar/SymbulationEmp
 
