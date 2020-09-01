@@ -75,6 +75,16 @@ namespace emp {
     else return value;
   }
 
+  /// Match the constness of another type.
+  template <typename T, typename MATCH_T>
+  struct match_const { using type = std::remove_const_t<T>; };
+
+  template <typename T, typename MATCH_T>
+  struct match_const<T,const MATCH_T> { using type = std::add_const_t<T>; };
+
+  template <typename T, typename MATCH_T> using match_const_t
+    = typename match_const<T,MATCH_T>::type;
+
   // Can we convert the first pointer into the second?
   template <typename T1, typename T2> struct ptr_pair {
     static constexpr bool Same() { return false; }
