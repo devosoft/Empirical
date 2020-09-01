@@ -8,7 +8,7 @@ TEST_CASE("Test string_utils", "[tools]")
 	const std::string empt = emp::empty_string();
 	REQUIRE(empt == "");
 
-	REQUIRE('\0' == NULL);
+	REQUIRE('\0' == (char) NULL);
 	std::string zero = emp::to_escaped_string('\0');
 	REQUIRE(zero != "\0");
 	REQUIRE(zero == "\\0");
