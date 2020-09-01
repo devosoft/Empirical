@@ -212,3 +212,8 @@ RUN \
   yarn install \
   && \
   echo "installed karma-firefox-launcher"
+  
+RUN \
+  pip install -r /opt/Empirical/third-party/requirements.txt \
+    && \
+  echo "installed documentation build requirements"
