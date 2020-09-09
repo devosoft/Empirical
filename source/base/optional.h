@@ -15,6 +15,7 @@
 #ifndef EMP_OPTIONAL_H
 
 #include <type_traits>
+#include <utility>
 
 #include "assert.h"
 
@@ -70,6 +71,35 @@ namespace emp {
     }
 
   };
+
+  template <class T>
+  constexpr emp::optional<std::decay_t<T>>
+  make_optional(T&& value) {
+    return emp::optional<std::decay_t<T>>{
+      std::forward<T>(value)
+    };
+  }
+
+  template <class T, class... Args>
+  constexpr emp::optional<T>
+  make_optional(Args&&... args) {
+    return emp::optional<T>{
+      std::in_place,
+      std::forward<Args>(args)...
+    };
+  }
+
+  template <class T, class Elem, class... Args>
+  constexpr emp::optional<T> make_optional(
+    std::initializer_list<Elem> il,
+    Args&&... args
+  ) {
+    return emp::optional<T>{
+      std::in_place,
+      il,
+      std::forward<Args>(args)...
+    };
+  }
 
 } // namespace emp
 

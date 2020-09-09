@@ -113,3 +113,22 @@ TEST_CASE("Test optional good access", "[base]") {
   REQUIRE(!emp::assert_last_fail);
 
 }
+
+TEST_CASE("Test make_optional", "[base]") {
+
+  {
+  auto res = emp::make_optional(7);
+  REQUIRE( *res == 7 );
+  }
+
+  {
+  auto res = emp::make_optional<std::string>(3ul, 'a');
+  REQUIRE( *res == "aaa" );
+  }
+
+  {
+  auto res = emp::make_optional<emp::vector<char>>({'a', 'b', 'c'});
+  REQUIRE( *res == emp::vector<char>{'a', 'b', 'c'} );
+  }
+
+}
