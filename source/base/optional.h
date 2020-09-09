@@ -104,6 +104,17 @@ namespace emp {
 
 } // namespace emp
 
+namespace std {
+
+  template <typename T>
+  struct hash<emp::optional<T>> {
+    size_t operator()( const emp::optional<T>& opt ) const {
+      return std::hash<std::optional<T>>{}( opt );
+    }
+  };
+
+} // namespace std
+
 #endif
 
 #endif
