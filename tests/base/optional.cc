@@ -10,6 +10,7 @@
 
 #include "base/assert.h"
 #include "base/optional.h"
+#include "base/vector.h"
 
 #include <utility>
 #include <sstream>
