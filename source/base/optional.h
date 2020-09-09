@@ -13,6 +13,7 @@
  */
 
 #ifndef EMP_OPTIONAL_H
+#define EMP_OPTIONAL_H
 
 #include <type_traits>
 #include <utility>
