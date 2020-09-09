@@ -24,6 +24,17 @@
 
 namespace emp {
   template <typename T> using optional = std::optional<T>;
+
+  template <class T>
+  inline decltype(auto) make_optional(T&& val) {
+    return std::make_optional<T>(std::forward<T>(val));
+  }
+
+  template <class T, class... Args>
+  inline decltype(auto) make_optional(Args&&... args) {
+    return std::make_optional<T>(std::forward<Args>(args)... );
+  }
+
 }
 
 #else // #EMP_NDEBUG *not* set
