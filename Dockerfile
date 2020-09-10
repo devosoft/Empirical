@@ -91,6 +91,7 @@ RUN \
   apt-get install -y \
     gtk2-engines-pixbuf \
     firefox \
+    libnss3 \
     && \
   echo "installed headless firefox dependencies"
 
