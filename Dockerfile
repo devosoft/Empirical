@@ -92,6 +92,8 @@ RUN \
     gtk2-engines-pixbuf \
     firefox \
     libnss3 \
+    lsb-release \
+    xdg-utils \
     && \
   echo "installed headless firefox dependencies"
 
