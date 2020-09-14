@@ -523,6 +523,8 @@ namespace emp {
         fun_matchbin_refresh = fun;
       }
 
+      void SetInstLib(const Ptr<const inst_lib_t> in) { inst_lib = in; }
+
       void SetProgram(const program_t & _program) {
         program = _program;
         for (auto & f : program) f.SetMatchBinRefreshFun(fun_matchbin_refresh);
@@ -863,7 +865,7 @@ namespace emp {
       in.random_ptr = nullptr;
       in.random_owner = false;
       in.event_lib = nullptr;
-      in.program.inst_lib = nullptr;
+      in.program.SetInstLib( nullptr );
       program.SetMatchBinRefreshFun( [this](){ this->RefreshMatchBin(); } );
     }
 
