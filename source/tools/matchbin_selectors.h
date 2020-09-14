@@ -179,6 +179,8 @@ namespace emp {
   >
   struct RankedSelector : public SelectorBase<RankedCacheState> {
 
+    RankedSelector() = default;
+
     RankedSelector(emp::Random&){ ; }
 
     using cache_state_t = RankedCacheState;
