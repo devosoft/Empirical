@@ -10,6 +10,10 @@
 #include <ratio>
 #include "InstLib.h"
 #include "EventLib.h"
+#include "../../third-party/cereal/include/cereal/cereal.hpp"
+#include "../../third-party/cereal/include/cereal/types/string.hpp"
+#include "../../third-party/cereal/include/cereal/types/unordered_map.hpp"
+#include "../../third-party/cereal/include/cereal/types/unordered_set.hpp"
 #include "../tools/BitSet.h"
 #include "../tools/BitVector.h"
 #include "../tools/map_utils.h"
@@ -165,6 +169,18 @@ namespace emp {
       }
       /// Does event object have given property?
       bool HasProperty(std::string property) const { return properties.count(property); }
+
+      /// Cereal serialization interface.
+      template <class Archive>
+      void serialize( Archive & ar ) {
+        ar(
+          CEREAL_NVP(id),
+          CEREAL_NVP(affinity),
+          CEREAL_NVP(msg),
+          CEREAL_NVP(properties)
+        );
+      }
+
 
     };
 
@@ -325,7 +341,6 @@ namespace emp {
           return std::tie(id, args, affinity) < std::tie(other.id, other.args, other.affinity);
       }
 
-      #ifdef CEREAL_NVP
       template <class Archive>
       void serialize( Archive & ar )
       {
@@ -335,7 +350,6 @@ namespace emp {
           CEREAL_NVP(id)
         );
       }
-      #endif
 
     };
 
@@ -430,7 +444,6 @@ namespace emp {
         inst_seq[pos].Set(inst);
       }
 
-      #ifdef CEREAL_NVP
       template <class Archive>
       void serialize( Archive & ar )
       {
@@ -439,7 +452,6 @@ namespace emp {
           CEREAL_NVP(inst_seq)
         );
       }
-      #endif
 
     };
 
@@ -755,7 +767,6 @@ namespace emp {
       }
 
 
-      #ifdef CEREAL_NVP
       template <class Archive>
       void serialize( Archive & ar )
       {
@@ -763,7 +774,6 @@ namespace emp {
           CEREAL_NVP(program)
         );
       }
-      #endif
 
     };
 
