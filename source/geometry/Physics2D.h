@@ -12,8 +12,8 @@
 #include <unordered_set>
 #include <functional>
 
-#include "base/Ptr.h"
-#include "base/vector.h"
+#include "../base/Ptr.h"
+#include "../base/vector.h"
 
 using namespace std::placeholders;
 
