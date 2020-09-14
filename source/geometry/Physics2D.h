@@ -161,7 +161,7 @@ namespace emp {
 
         // @CAO Arbitrary pressure threshold!
         if (cur_pressure > 3.0) {                // If pressure too high, burst this cell!
-          body_set[cur_id].Delete();             // Delete the burst cell.      
+          body_set[cur_id].Delete();             // Delete the burst cell.
           if (cur_id < body_set.size() - 1) {    // If we are not at the end of the body set...
             body_set[cur_id] = body_set.back();  // ...move last cell to popped position.
           }
