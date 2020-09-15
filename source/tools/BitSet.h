@@ -32,7 +32,7 @@
 #include "hash_utils.h"
 #include "random_utils.h"
 
-
+#include "../polyfill/span.h"
 
 namespace emp {
 
@@ -381,12 +381,16 @@ namespace emp {
     /// Constructor to fill in a bit set from a vector.
     template <typename T>
     BitSet(const std::initializer_list<T> l) {
+      // TODO: should we enforce the initializer list to be the same length as the bitset?
+      // emp_assert(l.size() == NUM_BITS);
+
+      // check that initializer list isn't longer than bitset
+      emp_assert(l.size() <= NUM_BITS);
 
       Clear();
 
       size_t idx = 0;
       for (auto i = std::rbegin(l); i != std::rend(l); ++i) {
-        emp_assert(idx < NUM_BITS);
         Set(idx, *i);
         ++idx;
       }
@@ -589,6 +593,15 @@ namespace emp {
       return (bit_set[field_id] >> pos_id) & 255;
     }
 
+    /// Get a read-only view into the internal array used by BitSet.
+    /// @return Read-only span of BitSet's bytes.
+    std::span<const std::byte> GetBytes() const {
+      return std::span<const std::byte>(
+        reinterpret_cast<const std::byte*>(bit_set),
+        NUM_BYTES
+      );
+    }
+
     /// Set the full byte starting at the bit at the specified index.
     void SetByte(size_t index, uint8_t value) {
       emp_assert(index < NUM_BYTES);
@@ -714,7 +727,7 @@ namespace emp {
         // check to make sure there are no leading ones in the unused bits
         emp_assert((bit_set[NUM_FIELDS - 1] & ~MaskLow<field_t>(LAST_BIT)) == 0);
       }
-      
+
 
     }
 
@@ -1374,12 +1387,7 @@ namespace std
     {
         size_t operator()( const emp::BitSet<N>& bs ) const
         {
-           static const uint32_t NUM_BYTES = 1 + ((bs.GetSize() - 1) >> 3);
-           size_t result = bs.GetByte(0);
-           for (unsigned int i = 1; i < NUM_BYTES; ++i){
-                result = emp::hash_combine(result, bs.GetByte(i));
-           }
-           return result;
+          return emp::murmur_hash(bs.GetBytes());
         }
     };
 }

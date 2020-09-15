@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
 
-#include "third-party/Catch/single_include/catch.hpp"
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>
 #include <cereal/types/unordered_map.hpp>
@@ -795,6 +795,47 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(bitBin64.GetTags(bitBin64.Match(bs9, 5)) == (emp::vector<emp::BitSet<64>> {bs9, bs1, bs7}));
 
   }
+  // test ImprintRegulators
+  {
+    // setup template MatchBin
+    emp::Random rand(1);
+    emp::MatchBin<
+      std::string,
+      emp::AbsDiffMetric,
+      emp::RouletteSelector<>,
+      emp::LegacyRegulator
+    > bin1(rand);
+
+    // put some things in template
+    const size_t hi1 = bin1.Put("hi", 1);
+    const size_t bye1 = bin1.Put("bye", 2);
+
+    bin1.SetRegulator(hi1, 0.1);
+    bin1.SetRegulator(bye1, 0.2);
+
+    // make sure regulators were set
+    REQUIRE(bin1.GetRegulator(hi1).state == 0.1);
+    REQUIRE(bin1.GetRegulator(bye1).state == 0.2);
+
+    // setup MatchBin to imprint on template
+    emp::MatchBin<
+      std::string,
+      emp::AbsDiffMetric,
+      emp::RouletteSelector<>,
+      emp::LegacyRegulator
+    > bin2(rand);
+
+    // put same matches as before
+    const size_t hi2 = bin2.Put("hi", 1);
+    const size_t bye2 = bin2.Put("bye", 2);
+
+    // do the imprinting
+    bin2.ImprintRegulators(bin1);
+
+    // now, bin2's regulators should match bin1's
+    REQUIRE(bin2.GetRegulator(hi2).state == bin1.GetRegulator(hi1).state);
+    REQUIRE(bin2.GetRegulator(bye2).state == bin1.GetRegulator(bye1).state);
+  }
 
   {
   emp::Random rand(1);
@@ -881,9 +922,9 @@ TEST_CASE("Test MatchBin", "[tools]")
     );
   }
 
-  REQUIRE(scores.GetMean() - 0.5 < 0.01);
+  REQUIRE(std::abs(scores.GetMean() - 0.5) < 0.01);
   REQUIRE(scores.GetMin() < 0.01);
-  REQUIRE(scores.GetMax() > 0.01);
+  REQUIRE(scores.GetMax() > 0.99);
   for (auto & c : scores.GetHistCounts()) {
     REQUIRE(c > N_SAMPLES / N_BINS - 20000);
     REQUIRE(c < N_SAMPLES / N_BINS + 20000);
@@ -899,9 +940,9 @@ TEST_CASE("Test MatchBin", "[tools]")
     );
   }
 
-  REQUIRE(scores.GetMean() - 0.5 < 0.01);
+  REQUIRE(std::abs(scores.GetMean() - 0.5) < 0.01);
   REQUIRE(scores.GetMin() < 0.01);
-  REQUIRE(scores.GetMax() > 0.01);
+  REQUIRE(scores.GetMax() > 0.99);
   for (auto & c : scores.GetHistCounts()) {
     REQUIRE(c > N_SAMPLES / N_BINS - 20000);
     REQUIRE(c < N_SAMPLES / N_BINS + 20000);
@@ -917,9 +958,9 @@ TEST_CASE("Test MatchBin", "[tools]")
     );
   }
 
-  REQUIRE(scores.GetMean() - 0.5 < 0.01);
+  REQUIRE(std::abs(scores.GetMean() - 0.5) < 0.01);
   REQUIRE(scores.GetMin() < 0.01);
-  REQUIRE(scores.GetMax() > 0.01);
+  REQUIRE(scores.GetMax() > 0.99);
   for (auto & c : scores.GetHistCounts()) {
     REQUIRE(c > N_SAMPLES / N_BINS - 20000);
     REQUIRE(c < N_SAMPLES / N_BINS + 20000);
@@ -935,9 +976,9 @@ TEST_CASE("Test MatchBin", "[tools]")
     );
   }
 
-  REQUIRE(scores.GetMean() - 0.5 < 0.01);
+  REQUIRE(std::abs(scores.GetMean() - 0.5) < 0.01);
   REQUIRE(scores.GetMin() < 0.01);
-  REQUIRE(scores.GetMax() > 0.01);
+  REQUIRE(scores.GetMax() > 0.99);
   for (auto & c : scores.GetHistCounts()) {
     REQUIRE(c > N_SAMPLES / N_BINS - 20000);
     REQUIRE(c < N_SAMPLES / N_BINS + 20000);

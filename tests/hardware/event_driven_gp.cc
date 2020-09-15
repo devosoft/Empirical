@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
 
-#include "third-party/Catch/single_include/catch.hpp"
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include <cereal/cereal.hpp>
 #include <cereal/types/array.hpp>
@@ -171,6 +171,37 @@ TEST_CASE("Test Event Driven GP", "[Hardware]")
 	gp.PrintEvent(ev, ss);
 	REQUIRE(ss.str() == "[Message,00000000,(),(Properties: add)]");
 	ss.str(std::string());
+
+	// Event copy assignment operator
+	auto ev2 = ev;
+	gp.TriggerEvent(ev2);
+	gp.PrintEvent(ev2, ss);
+	REQUIRE(ss.str() == "[Message,00000000,(),(Properties: add)]");
+	ss.str(std::string());
+
+	// Event move assignment operator
+	auto ev3 = std::move(ev2);
+	gp.TriggerEvent(ev3);
+	gp.PrintEvent(ev3, ss);
+	REQUIRE(ss.str() == "[Message,00000000,(),(Properties: add)]");
+	ss.str(std::string());
+
+	// Event less-than operator
+	emp::EventDrivenGP::Event ev4(1);
+	REQUIRE(ev3 < ev4);
+	emp::EventDrivenGP::Event ev5(1, {0, 1});
+	REQUIRE(ev4 < ev5);
+
+	// Event equals operator
+	emp::EventDrivenGP::Event ev4_1(1);
+	emp::EventDrivenGP::Event ev4_2(2);
+	REQUIRE(ev4 == ev4_1);
+	REQUIRE(!(ev4 == ev4_2));
+
+	emp::EventDrivenGP::Event ev5_1(1, {0, 1});
+	emp::EventDrivenGP::Event ev5_2(1, {1, 0});
+	REQUIRE(ev5 == ev5_1);
+	REQUIRE(!(ev5 == ev5_2));
 
 	// Traits
 	gp.GetTrait().push_back(2.0);

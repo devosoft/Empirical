@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #define EMP_TDEBUG
 
-#include "third-party/Catch/single_include/catch.hpp"
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "Evolve/World_structure.h"
 #include "Evolve/World.h"
