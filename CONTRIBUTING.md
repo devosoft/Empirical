@@ -1,4 +1,5 @@
 # Contributing to Empirical
+
 We love your input! We want to make contributing to this project as easy and transparent as possible, whether it's:
 
 - Reporting a bug
@@ -6,19 +7,18 @@ We love your input! We want to make contributing to this project as easy and tra
 - Submitting new code
 - Writing documentation
 
-
-# Reporting bugs
+## Reporting bugs
 
 To report bugs, please [open an issue on Github](https://github.com/devosoft/Empirical/issues) 
-clearly stating the observed (buggy) behavior, the desired behavior, 
+clearly stating the observed (buggy) behavior (screenshots are encouraged), the desired behavior, 
 which operating system and compiler you're using (including version), and any additional information that might 
-help us fix the bug.
+help us fix the bug. If possible, please provide a minimum example that reproduces the bug.
 
-# Requesting features
+## Requesting features
 
-We welcome suggestions for how to make Empirical better! To give us your ideas, [open an issue on Github](https://github.com/devosoft/Empirical/issues).
+We welcome suggestions for how to make Empirical better! To give us your ideas, [open an issue on Github](https://github.com/devosoft/Empirical/issues). 
 
-# Submitting new code
+## Submitting new code and documentation
 
 Empirical is developed by a group of computational scientists, none of whom can be full-time software developers.
 We try to fix bugs and implement new features as quickly as we can, but we can't make any promises.
@@ -33,14 +33,14 @@ In-depth guides to [getting started with Empirical development](https://empirica
 [writing documentation](https://empirical.readthedocs.io/en/latest/dev/adding-documentation.html), and
 [writing tests](https://empirical.readthedocs.io/en/latest/dev/guide-to-testing.html) are available in the documentation.
 
-Once you start working on a feature, we reccomend making a pull request and giving it the "Merge: not ready" label. This was it's easy for everyone
+Once you start working on a feature, we recommend making a pull request and giving it the "Merge: not ready" label. This way it's easy for everyone
 to keep tabs on ongoing Empirical development and the status of new features. Once you're done developing, remove the "Merge: not ready" label and
 add the "Merge: ready" label so that we know your pull request is ready for review.
 
-# Code of Conduct
+## Code of Conduct
 
 Please note we have a [code of conduct](CODE_OF_CONDUCT.md) and follow it in all your interactions with the project.
    
-   
-# License
-By contributing, you agree that your contributions will be licensed under its MIT License.
+## License
+
+By contributing, you agree that your contributions will be released under [Empirical's MIT License](LICENSE.md).
