@@ -1,5 +1,5 @@
 # Pull base image.
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 COPY . /opt/Empirical
 
@@ -91,8 +91,14 @@ RUN \
   apt-get install -y \
     gtk2-engines-pixbuf \
     firefox \
+    libnss3 \
+    lsb-release \
+    xdg-utils \
     && \
   echo "installed headless firefox dependencies"
+
+# magic from https://github.com/puppeteer/puppeteer/issues/3451#issuecomment-523961368
+RUN echo 'kernel.unprivileged_userns_clone=1' > /etc/sysctl.d/userns.conf
 
 RUN \
   apt-get install -y \
@@ -193,11 +199,6 @@ RUN \
     && \
   echo "make entrypoint script executable"
 
-# Define default entrypoint.
-ENTRYPOINT ["/opt/entrypoint.sh"]
-
-CMD ["bash"]
-
 # Adapted from https://github.com/karma-runner/karma-firefox-launcher/issues/93#issuecomment-519333245
 # Maybe important for container compatability running on Windows?
 RUN \
@@ -212,3 +213,31 @@ RUN \
   yarn install \
   && \
   echo "installed karma-firefox-launcher"
+  
+RUN \
+  pip install -r /opt/Empirical/third-party/requirements.txt \
+    && \
+  echo "installed documentation build requirements"
+
+# Perform any further action as an unprivileged user.
+# adapted from https://stackoverflow.com/a/27703359
+# and https://superuser.com/a/235398
+RUN \
+  useradd --create-home --shell /bin/bash user \
+    && \
+  groupadd group \
+    && \
+  gpasswd -a user group \
+    && \
+  chgrp --recursive user /opt \
+    && \
+  chmod --recursive g+rwx /opt \
+    && \
+  echo "user added and granted permissions to /opt"
+
+USER user
+
+# Define default entrypoint.
+ENTRYPOINT ["/opt/entrypoint.sh"]
+
+CMD ["bash"]
