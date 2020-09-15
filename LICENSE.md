@@ -1,8 +1,9 @@
 ===============================================================================
 The MIT License (MIT)
 
-Copyright (c) 2015-2020 Michigan State University
-Contributers: Charles Ofria, Emily Dolson, Jacob Fenton, Riley Hoffman,
+Copyright (c) 2015-2020 Michigan State University Digital Evolution Laboratory
+
+Contributors: Charles Ofria, Emily Dolson, Jacob Fenton, Riley Hoffman,
 	      Steven Jorgensen, Alex Lalejini, Robin Miller, Matthew Moreno,
 	      Katherine Perry, Santiago Rodriguez-Papa, Jory Schossau,
 	      Jason Stredwick, Anya Vostinar, and Luis Zaman
