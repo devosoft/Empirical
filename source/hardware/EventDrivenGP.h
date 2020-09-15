@@ -847,20 +847,27 @@ namespace emp {
       : EventDrivenGP_AW(DefaultInstLib(), DefaultEventLib(), rnd) { ; }
 
     EventDrivenGP_AW(EventDrivenGP_t && in)
-      : event_lib(in.event_lib),
-        random_ptr(in.random_ptr), random_owner(in.random_owner),
-        program(in.program),
-        shared_mem(in.shared_mem),
-        event_queue(in.event_queue),
-        traits(in.traits), errors(in.errors),
-        max_cores(in.max_cores), max_call_depth(in.max_call_depth),
-        default_mem_value(in.default_mem_value), min_bind_thresh(in.min_bind_thresh),
-        stochastic_fun_call(in.stochastic_fun_call),
-        cores(in.cores),
-        active_cores(in.active_cores), inactive_cores(in.inactive_cores),
-        pending_cores(in.pending_cores),
-        exec_core_id(in.exec_core_id), is_executing(in.is_executing),
-        fun_trait_print(in.fun_trait_print)
+      : event_lib( std::move(in.event_lib) ),
+        random_ptr( std::move(in.random_ptr) ),
+        random_owner( std::move(in.random_owner) ),
+        program( std::move(in.program) ),
+        shared_mem( std::move(in.shared_mem) ),
+        event_queue( std::move(in.event_queue) ),
+        traits( std::move(in.traits) ),
+        errors( std::move(in.errors) ),
+        max_cores( std::move(in.max_cores) ),
+        max_call_depth( std::move(in.max_call_depth) ),
+        default_mem_value( std::move(in.default_mem_value) ),
+        min_bind_thresh( std::move(in.min_bind_thresh) ),
+        stochastic_fun_call( std::move(in.stochastic_fun_call) ),
+        cores( std::move(in.cores) ),
+        active_cores( std::move(in.active_cores) ),
+        inactive_cores( std::move(in.inactive_cores) ),
+        pending_cores( std::move(in.pending_cores) ),
+        exec_core_id( std::move(in.exec_core_id) ),
+        is_executing( std::move(in.is_executing) ),
+        matchBin(*random_ptr),
+        fun_trait_print( std::move(in.fun_trait_print) )
     {
       in.random_ptr = nullptr;
       in.random_owner = false;
