@@ -198,14 +198,7 @@ TEST_CASE("Test World", "[Evolve]")
 	REQUIRE( *world4.begin() == 2.3 );
 	
 	world4.SetGetNeighborFun([](emp::WorldPosition pos){ return emp::WorldPosition(pos.GetIndex()+1); });
-	world4.SetIsNeighborFun([](emp::WorldPosition pos1, emp::WorldPosition pos2) {
-		if(pos1.GetIndex()==(pos2.GetIndex()+1)) return true;
-		else return false;
-	});
 	REQUIRE(world4.GetRandomNeighborPos(0).GetIndex() == 1);
-	REQUIRE(world4.IsNeighbor(0, 2));
-	emp::vector<size_t> valid_neighbors = [2];
-	REQUIRE(world4.GetValidNeighborOrgIDs(0) == valid_neighbors);
 	
 	REQUIRE(world4.GetPhenotypes().GetSize() == 0);
 	std::function<double(double&)> func = [](double& o){ return ((int)o % 2 == 0) ?  o*2.0 : o*0.5; };
@@ -287,6 +280,7 @@ TEST_CASE("Test World", "[Evolve]")
 	REQUIRE( (w_it.end() == world6.end()) );
 }
 
+
 TEST_CASE("Test fitness sharing", "[evo]")
 {
   size_t POP_SIZE = 100;
@@ -304,7 +298,6 @@ TEST_CASE("Test fitness sharing", "[evo]")
     REQUIRE( pop.GetDominantOrg() == next_org );
   }
   REQUIRE( pop.GetDominantInfo().second == POP_SIZE );
-
 
 
   // Setup the (shared) fitness function.
@@ -327,6 +320,10 @@ TEST_CASE("Test fitness sharing", "[evo]")
 
   REQUIRE(pop.CalcFitnessID(0) == Approx(0.526316));
   REQUIRE(pop.CalcFitnessID(POP_SIZE-1) == 2);
+
+  // Check neighbor function works for mixed
+  REQUIRE(pop.GetValidNeighborOrgIDs(21).size() == POP_SIZE);
+  REQUIRE(pop.IsNeighbor(21, 20));
 
   // Run a tournament...
   emp::TournamentSelect(pop, 5, POP_SIZE);
@@ -373,14 +370,23 @@ TEST_CASE("Test fitness sharing", "[evo]")
   grid_world.InjectAt(4, side*(side+1)/2);
   grid_world.PrintGrid();
 
+
+
   auto fit_fun = [](int & org){ return (double) org; };
   grid_world.SetSharedFitFun(fit_fun, [](int & a, int & b){ return (double) (a>b)?(a-b):(b-a); }, 3, 1);
   RouletteSelect(grid_world, 500);
+
+  // Check neighbor function works for grid
+  emp::vector<size_t> valid_neighbors = {0, 1, 20};
+  REQUIRE(grid_world.GetValidNeighborOrgIDs(21) == valid_neighbors);
+  REQUIRE(grid_world.IsNeighbor(21, 20));
 
   std::cout << std::endl;
   grid_world.PrintGrid();
   std::cout << "Final Org Counts:\n";
   //   grid_world.PrintOrgCounts(print_fun);
   //   std::cout << std::endl;
+
+;
 
 }
