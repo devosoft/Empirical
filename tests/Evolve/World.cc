@@ -198,7 +198,14 @@ TEST_CASE("Test World", "[Evolve]")
 	REQUIRE( *world4.begin() == 2.3 );
 	
 	world4.SetGetNeighborFun([](emp::WorldPosition pos){ return emp::WorldPosition(pos.GetIndex()+1); });
+	world4.SetIsNeighborFun([](emp::WorldPosition pos1, emp::WorldPosition pos2) {
+		if(pos1.GetIndex()==(pos2.GetIndex()+1)) return true;
+		else return false;
+	});
 	REQUIRE(world4.GetRandomNeighborPos(0).GetIndex() == 1);
+	REQUIRE(world4.IsNeighbor(0, 2));
+	emp::vector<size_t> valid_neighbors = [2];
+	REQUIRE(world4.GetValidNeighborOrgIDs(0) == valid_neighbors);
 	
 	REQUIRE(world4.GetPhenotypes().GetSize() == 0);
 	std::function<double(double&)> func = [](double& o){ return ((int)o % 2 == 0) ?  o*2.0 : o*0.5; };
