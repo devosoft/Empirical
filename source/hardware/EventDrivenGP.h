@@ -8,6 +8,7 @@
 #include <utility>
 #include <algorithm>
 #include <ratio>
+#include <type_traits>
 #include "InstLib.h"
 #include "EventLib.h"
 #include "../../third-party/cereal/include/cereal/cereal.hpp"
@@ -876,7 +877,21 @@ namespace emp {
       program.SetMatchBinRefreshFun( [this](){ this->RefreshMatchBin(); } );
     }
 
-    EventDrivenGP_AW(const EventDrivenGP_t & in)
+    // SFINAE makes copy constructor only available when TRAIT_T is copy
+    // constructible
+    // adapted from https://akrzemi1.wordpress.com/2015/03/02/a-conditional-copy-constructor/
+    EventDrivenGP_AW(const EventDrivenGP_t & in) = delete;
+
+    /// Copy constructor.
+    template<
+      typename U,
+      std::enable_if_t<
+        std::is_same<EventDrivenGP_t, std::decay_t<U>>::value
+        && std::is_copy_constructible<TRAIT_T>::value,
+        int
+      > = 0
+    >
+    EventDrivenGP_AW(const U& in)
       : event_lib(in.event_lib),
         random_ptr(in.random_owner ? NewPtr<Random>(-1) : in.random_ptr), random_owner(in.random_owner),
         program(in.program),
