@@ -1166,9 +1166,7 @@ namespace emp {
 
     /// Set trait in traits vector given by id to value given by val.
     /// Will resize traits vector if given id is greater than current traits vector size.
-    void SetTrait(TRAIT_T t) {
-      traits = t;
-    }
+    void SetTrait(TRAIT_T t) { traits = std::move(t); }
 
     /// Shortcut to this hardware object's program's SetInst function of the same signature.
     void SetInst(size_t fID, size_t pos, const inst_t & inst) {
