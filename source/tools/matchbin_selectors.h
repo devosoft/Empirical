@@ -26,14 +26,13 @@
 #include <utility>
 #include <limits>
 
-#include "tools/Distribution.h"
-
 #include "../base/assert.h"
 #include "../base/array.h"
 #include "../base/vector.h"
 #include "../tools/math.h"
 #include "../tools/IndexMap.h"
 #include "../tools/BitSet.h"
+#include "../tools/Distribution.h"
 #include "../tools/string_utils.h"
 #include "../tools/hash_utils.h"
 
@@ -179,6 +178,8 @@ namespace emp {
     size_t DefaultN = 1
   >
   struct RankedSelector : public SelectorBase<RankedCacheState> {
+
+    RankedSelector() = default;
 
     RankedSelector(emp::Random&){ ; }
 

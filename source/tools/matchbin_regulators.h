@@ -25,11 +25,10 @@
 #include <array>
 #include <utility>
 
-#include "tools/Distribution.h"
-
 #include "../base/assert.h"
 #include "../base/array.h"
 #include "../base/vector.h"
+#include "../tools/Distribution.h"
 #include "../tools/math.h"
 #include "../tools/IndexMap.h"
 #include "../tools/BitSet.h"
