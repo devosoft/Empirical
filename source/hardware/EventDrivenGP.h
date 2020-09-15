@@ -890,8 +890,8 @@ namespace emp {
         active_cores(in.active_cores), inactive_cores(in.inactive_cores),
         pending_cores(in.pending_cores),
         exec_core_id(in.exec_core_id), is_executing(in.is_executing),
-        fun_trait_print(in.fun_trait_print),
-        matchBin(*random_ptr)
+        matchBin(*random_ptr),
+        fun_trait_print(in.fun_trait_print)
     {
       program.SetMatchBinRefreshFun( [this](){ this->RefreshMatchBin(); } );
     }
