@@ -37,6 +37,8 @@ Once you start working on a feature, we recommend making a pull request and givi
 to keep tabs on ongoing Empirical development and the status of new features. Once you're done developing, remove the "Merge: not ready" label and
 add the "Merge: ready" label so that we know your pull request is ready for review.
 
+As part of your pull request, please add yourself to the list of contributors in the [license file](LICENSE.md).
+
 ## Code of Conduct
 
 Please note we have a [code of conduct](CODE_OF_CONDUCT.md) and follow it in all your interactions with the project.
