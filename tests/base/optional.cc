@@ -20,6 +20,8 @@ TEST_CASE("Test optional bad access", "[base]") {
 
   REQUIRE( !opt.has_value() );
 
+  #ifndef NDEBUG // these should only throw in debug mode, so only test then
+
   REQUIRE_THROWS_AS( opt->size(), std::bad_optional_access );
 
   REQUIRE_THROWS_AS( *opt, std::bad_optional_access );
@@ -45,6 +47,8 @@ TEST_CASE("Test optional bad access", "[base]") {
 
   REQUIRE_THROWS_AS( *std::move(optref), std::bad_optional_access );
   }
+
+  #endif
 
 }
 
