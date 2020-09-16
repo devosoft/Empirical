@@ -52,34 +52,18 @@ namespace emp {
     // adapted from https://stackoverflow.com/a/434784
     using parent_t::parent_t;
 
-    constexpr const T* operator->() const {
-      emp_assert(parent_t::has_value(), "bad optional access");
-      return parent_t::operator->();
-    }
+    constexpr const T* operator->() const { return &parent_t::value(); }
 
-    constexpr T* operator->() {
-      emp_assert(parent_t::has_value(), "bad optional access");
-      return parent_t::operator->();
-    }
+    constexpr T* operator->() { return &parent_t::value(); }
 
-    constexpr const T& operator*() const& {
-      emp_assert(parent_t::has_value(), "bad optional access");
-      return parent_t::operator*();
-    }
+    constexpr const T& operator*() const& { return parent_t::value(); }
 
-    constexpr T& operator*() & {
-      emp_assert(parent_t::has_value(), "bad optional access");
-      return parent_t::operator*();
-    }
+    constexpr T& operator*() & { return parent_t::value(); }
 
-    constexpr T&& operator*() && {
-      emp_assert(parent_t::has_value(), "bad optional access");
-      return std::move( parent_t::operator*() );
-    }
+    constexpr T&& operator*() && { return std::move( parent_t::value() ); }
 
     constexpr const T&& operator*() const&& {
-      emp_assert(parent_t::has_value(), "bad optional access");
-      return std::move( parent_t::operator*() );
+      return std::move( parent_t::value() );
     }
 
   };
