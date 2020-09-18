@@ -12,7 +12,7 @@
 TEST_CASE("MemoryIStream", "[tools]") {
 
   const size_t num_ints = std::kilo{}.num;
-  emp::vector<int> source(num_ints * sizeof(int));
+  emp::vector<int> source(num_ints);
 
   emp::Random rng{ 1 };
   rng.RandFill(
