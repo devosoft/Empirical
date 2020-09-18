@@ -18,3 +18,12 @@ TEST_CASE("Test NullStream", "[tools]")
   ns << 123.456;
   ns.flush();
 }
+
+TEST_CASE("Test nout", "[tools]")
+{
+  emp::nout << "abcdefg";
+  emp::nout << std::endl;
+  emp::nout << 123;
+  emp::nout << 123.456;
+  emp::nout.flush();
+}
