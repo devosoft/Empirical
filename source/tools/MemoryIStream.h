@@ -15,8 +15,8 @@ namespace emp {
 
   // adapted from https://stackoverflow.com/a/13059195
   struct MemoryBuf: std::streambuf {
-    /// @base address to beginning of memory region to stream from
-    /// @size number of bytes available to stream
+    /// @param base address to beginning of memory region to stream from
+    /// @param size number of bytes available to stream
     MemoryBuf(char const* base, size_t size) {
       char* p(const_cast<char*>(base));
       this->setg(p, p, p + size);
@@ -24,8 +24,8 @@ namespace emp {
   };
 
   struct MemoryIStream: virtual MemoryBuf, std::istream {
-    /// @base address to beginning of memory region to stream from
-    /// @size number of bytes available to stream
+    /// @param base address to beginning of memory region to stream from
+    /// @param size number of bytes available to stream
     MemoryIStream(char const* base, size_t size)
       : MemoryBuf(base, size)
       , std::istream(static_cast<std::streambuf*>(this)) {
