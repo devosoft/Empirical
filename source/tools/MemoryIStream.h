@@ -28,7 +28,7 @@ namespace emp {
     /// @param size number of bytes available to stream
     MemoryIStream(char const* base, size_t size)
       : MemoryBuf(base, size)
-      , std::istream(reinterpret_cast<std::streambuf*>(this)) {
+      , std::istream(static_cast<std::streambuf*>(this)) {
     }
   };
 
