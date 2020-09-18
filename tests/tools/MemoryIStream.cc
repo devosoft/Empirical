@@ -19,8 +19,8 @@ TEST_CASE("MemoryIStream", "[tools]") {
   emp::vector<int> source = emp::RandomVector<int>(
     rng,
     num_ints,
-    std::numeric_limits<int>::min(),
-    std::numeric_limits<int>::max()
+    0,
+    std::mega{}.num
   );
 
   emp::MemoryIStream is{
