@@ -15,6 +15,7 @@
 #ifndef EMP_OPTIONAL_H
 #define EMP_OPTIONAL_H
 
+#include <optional>
 #include <type_traits>
 #include <utility>
 
