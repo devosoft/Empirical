@@ -305,6 +305,26 @@ namespace emp {
     return value;
   }
 
+  /// Make first letter of each word upper case
+  static inline std::string to_titlecase(std::string value) {
+    constexpr int char_shift = 'a' - 'A';
+    bool next_upper = true;
+    for (size_t i = 0; i < value.size(); i++) {
+      if (next_upper && value[i] >= 'a' && value[i] <= 'z') {
+        value[i] = (char) (value[i] - char_shift);
+      } else if (!next_upper && value[i] >= 'A' && value[i] <= 'Z') {
+        value[i] = (char) (value[i] + char_shift);
+      }
+
+      if (value[i] == ' ') {
+        next_upper = true;
+      } else {
+        next_upper = false;
+      }
+    }
+    return value;
+  }
+
   /// Convert an integer to a roman numeral string.
   static inline std::string to_roman_numeral(int val, const std::string & prefix="") {
     std::string ret_string(prefix);
