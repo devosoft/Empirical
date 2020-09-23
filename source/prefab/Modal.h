@@ -13,11 +13,11 @@ namespace prefab {
   /// modal to your web app.
   class Modal: public web::Div {
     private:
-        web::Div modal_dialog; // necessary for Bootstrap structure
-        web::Div modal_content; // necessary for Bootstrap structure
-        web::Div modal_header; // header content goes here
-        web::Div modal_body; // body content goes here
-        web::Div modal_footer; // footer content goes here
+      web::Div modal_dialog; // necessary for Bootstrap structure
+      web::Div modal_content; // necessary for Bootstrap structure
+      web::Div modal_header; // header content goes here
+      web::Div modal_body; // body content goes here
+      web::Div modal_footer; // footer content goes here
 
     public:
       Modal(const std::string & id=""): web::Div(id) {

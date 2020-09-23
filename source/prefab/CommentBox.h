@@ -56,7 +56,7 @@ namespace prefab {
       // See issue #345 (https://github.com/devosoft/Empirical/issues/345)
       // for methods tried already.
       template <typename T>
-        void AddContent(T val) {
+      void AddContent(T val) {
         desktop_content << val;
       }
   };

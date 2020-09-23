@@ -304,13 +304,13 @@ namespace prefab {
             } else if (type == "bool") {
               // Bootstrap Toggle Switch (need at least v4.5.0)
               emp::prefab::ToggleSwitch toggle_switch(
-                  [this, name](std::string val) {
-                    config.Set(name, val);
-                    DoOnChangeFun(val);
-                  },
-                  NULL,
-                  emp::from_string<bool>(value),
-                  name + "_input_checkbox"
+                [this, name](std::string val) {
+                  config.Set(name, val);
+                  DoOnChangeFun(val);
+                },
+                NULL,
+                emp::from_string<bool>(value),
+                name + "_input_checkbox"
               );
               setting_element << toggle_switch;
               toggle_switch.AddAttr("class", "input_bool");
@@ -318,8 +318,8 @@ namespace prefab {
             } else {
               web::Input text_input(
                 [this, name](std::string val) {
-                    config.Set(name, val);
-                    DoOnChangeFun(val);
+                  config.Set(name, val);
+                  DoOnChangeFun(val);
                 },
                 "text", NULL, name + "_input_textbox"
               );

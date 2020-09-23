@@ -84,7 +84,7 @@ namespace prefab {
     /// Add content to body section of card
     /// @param val can be a web element or primitive type
     template <typename T>
-      void AddBodyContent(T val) {
+    void AddBodyContent(T val) {
       card_body << val;
     }
 

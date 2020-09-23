@@ -9,33 +9,33 @@
 // to see your changes take effect in the browser
 
 // inject loading modal html and start it
-var modal_html = '<div class="modal bd-example-modal-lg" id="loading_modal" data-backdrop="static" data-keyboard="false" tabindex="-1">\
+const modal_html = '<div class="modal bd-example-modal-lg" id="loading_modal" data-backdrop="static" data-keyboard="false" tabindex="-1">\
                     <div class="modal-dialog modal-sm"> \
-                        <div class="modal-content" style="width: 256px"> \
+                      <div class="modal-content" style="width: 256px"> \
                         <div class="modal-body">\
-                            <div class="spinner-border text-light" style="width: 256px; height: 256px;" role="status"> \
-                            <span class="sr-only">Loading...</span> \
+                          <div class="spinner-border text-light" style="width: 256px; height: 256px;" role="status"> \
+                          <span class="sr-only">Loading...</span> \
                         </div> \
-                        </div> \
-                        </div>\
-                        </div>';
+                      </div> \
+                    </div>\
+                  </div>';
 
-function AddLoadingModal(){
-    document.body.innerHTML += modal_html;
-    $('#loading_modal').modal('show');
-    setTimeout(function () { 
-        $('#loading_modal').modal('hide');
-        },
-        600000); // 10 mins for testing purposes
+function AddLoadingModal() {
+  document.body.innerHTML += modal_html;
+  $('#loading_modal').modal('show');
+  setTimeout(function () { 
+    $('#loading_modal').modal('hide');
+    },
+    600000); // 10 mins for testing purposes
 }
 
 // Show loading modal for a few seconds for demonstration
-function DemoLoadingModal(){
-    $('#loading_modal').modal('show');
-    setTimeout(CloseLoadingModal,2000);
+function DemoLoadingModal() {
+  $('#loading_modal').modal('show');
+  setTimeout(CloseLoadingModal,2000);
 }
-function CloseLoadingModal(){
-    $('#loading_modal').modal('hide');
+function CloseLoadingModal() {
+  $('#loading_modal').modal('hide');
 }
 
 // Function called when script is added to HTML 
