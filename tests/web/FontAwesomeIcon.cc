@@ -70,12 +70,16 @@ struct Test_FontAwesome_Icon_HTMLLayout : public emp::web::BaseTest {
             chai.assert.equal(parent_id, "test_div");
           });
 
-          it('should have fontawesome classes', function(){
-            const classes = document.getElementById("checkbox_icon").className;
-            chai.assert.equal(classes, "fa fa-check-square-o");
+          const icon = document.getElementById("checkbox_icon");
+
+          it('should have class fa', function(){
+            chai.assert.isTrue(icon.classList.contains("fa"));
+          });
+
+          it('should have class fa-check-square-o', function(){
+            chai.assert.isTrue(icon.classList.contains("fa-check-square-o"));
           });
         });
-
 
       });
     });

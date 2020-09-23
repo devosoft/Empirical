@@ -75,8 +75,8 @@ struct Test_Card_STATIC_HTMLLayout : public emp::web::BaseTest {
             chai.assert.equal(parent_id, "emp_test_container");
           });
 
-          it('should have the class card', function() {
-            chai.assert.equal($("#static").attr("class"), "card");
+          it('should have the class "card"', function() {
+            chai.assert.isTrue(document.getElementById('static').classList.contains('card'));
           });
 
           it('should have two children', function() {
@@ -103,7 +103,7 @@ struct Test_Card_STATIC_HTMLLayout : public emp::web::BaseTest {
           });
 
           it('should have the class card-header', function() {
-            chai.assert.equal($("#static_card_header").attr("class"), "card-header");
+            chai.assert.isTrue(document.getElementById('static_card_header').classList.contains('card-header'));
           });
 
           it('should have one child', function() {
@@ -138,7 +138,7 @@ struct Test_Card_STATIC_HTMLLayout : public emp::web::BaseTest {
           });
 
           it('should have the class card-body', function() {
-            chai.assert.equal($("#static_card_body").attr("class"), "card-body");
+            chai.assert.isTrue(document.getElementById('static_card_body').classList.contains('card-body'));
           });
 
           it('should have one child', function() {
@@ -243,7 +243,7 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
           });
 
           it('should have the class card', function() {
-            chai.assert.equal($("#open").attr("class"), "card");
+            chai.assert.isTrue(document.getElementById('open').classList.contains('card'));
           });
 
           it('should have two children', function() {
@@ -260,42 +260,50 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
         });
 
         describe("div#open_card_header", function() {
-          const header = $("div#open_card_header");
+          const header = document.getElementById('open_card_header');
           it('should exist', function() {
             chai.assert.equal($("div#open_card_header").length, 1);
           });
 
           it('should have parent #open', function() {
-            const parent_id = $("#open_card_header").parent().attr("id");
+            const parent_id = header.parentNode.getAttribute("id");
             chai.assert.equal(parent_id, "open");
           });
 
-          it('should have the classes card-header, collase-toggle, and collapse_toggle_card_header', function() {
-            chai.assert.equal($("#open_card_header").attr("class"), "card-header , collapse_toggle , collapse_toggle_card_header");
+          it('should have class card-header', function() {
+            chai.assert.isTrue(header.classList.contains('card-header'));          
           });
 
+          it('should have class collapse_toggle', function() {
+            chai.assert.isTrue(header.classList.contains('collapse_toggle'));          
+          });
+
+          it('should have class collapse_toggle_card_header', function() {
+            chai.assert.isTrue(header.classList.contains('collapse_toggle_card_header'));          
+          });
+          
           it('should have aria-controls set to .open_card_collapse', function() {
-            chai.assert.equal(header.attr("aria-controls"), ".open_card_collapse");
+            chai.assert.equal(header.getAttribute("aria-controls"), ".open_card_collapse");
           });
 
           it('should have aria-expaned set to true', function() {
-            chai.assert.equal(header.attr("aria-expanded"), "true");
+            chai.assert.equal(header.getAttribute("aria-expanded"), "true");
           });
 
           it('should have data-target set to .open_card_collapse', function() {
-            chai.assert.equal(header.attr("data-target"), ".open_card_collapse");
+            chai.assert.equal(header.getAttribute("data-target"), ".open_card_collapse");
           });
 
           it('should have data-toggle set to collapse', function() {
-            chai.assert.equal(header.attr("data-toggle"), "collapse");
+            chai.assert.equal(header.getAttribute("data-toggle"), "collapse");
           });
 
           it('should have role set to button', function() {
-            chai.assert.equal(header.attr("role"), "button");
+            chai.assert.equal(header.getAttribute("role"), "button");
           });
 
           it('should have three children', function() {
-            chai.assert.equal($("#open_card_header").children().length, 3);
+            chai.assert.equal(header.childElementCount, 3);
           });
         });
 
@@ -424,6 +432,7 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
         });
 
         describe("div#open_card_body", function() {
+          const body = document.getElementById("open_card_body");
           it('should exist', function() {
             chai.assert.equal($( "div#open_card_body" ).length, 1);
           });
@@ -433,8 +442,20 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
             chai.assert.equal(parent_id, "open");
           });
 
-          it('should have the classes card-body, collapse, show, and open_card_collapse', function() {
-            chai.assert.equal($("#open_card_body").attr("class"), "card-body , collapse show , open_card_collapse");
+          it('should have class card-body', function() {
+            chai.assert.isTrue(body.classList.contains("card-body"));
+          });
+
+          it('should have class collapse', function() {
+            chai.assert.isTrue(body.classList.contains("collapse"));
+          });
+
+          it('should have class show', function() {
+            chai.assert.isTrue(body.classList.contains("show"));
+          });
+
+          it('should have class open_card_collapse', function() {
+            chai.assert.isTrue(body.classList.contains("open_card_collapse"));
           });
 
           it('should have one child', function() {
@@ -544,7 +565,7 @@ struct Test_Card_INIT_CLOSED_HTMLLayout : public emp::web::BaseTest {
           });
 
           it('should have the class card', function() {
-            chai.assert.equal($("#closed").attr("class"), "card");
+            chai.assert.isTrue(document.getElementById("closed").classList.contains("card"));
           });
 
           it('should have two children', function() {
@@ -561,38 +582,46 @@ struct Test_Card_INIT_CLOSED_HTMLLayout : public emp::web::BaseTest {
         });
 
         describe("div#closed_card_header", function() {
-          const header = $("#closed_card_header");
+          const header = document.getElementById("closed_card_header");
           it('should exist', function() {
-            chai.assert.equal(header.length, 1);
+            chai.assert.equal($("div#closed_card_header").length, 1);
           });
 
           it('should have parent #closed', function() {
-            const parent_id = header.parent().attr("id");
+            const parent_id = $("#closed_card_header").parent().attr("id");
             chai.assert.equal(parent_id, "closed");
           });
 
-          it('should have the classes card-header, collase-toggle, and collapse_toggle_card_header', function() {
-            chai.assert.equal(header.attr("class"), "card-header , collapse_toggle , collapsed , collapse_toggle_card_header");
+          it('should have class card-header', function() {
+            chai.assert.isTrue(header.classList.contains("card-header"));
+          });
+
+          it('should have class collapse_toggle', function() {
+            chai.assert.isTrue(header.classList.contains("collapse_toggle"));
+          });
+
+          it('should have class collapse_toggle_card_header', function() {
+            chai.assert.isTrue(header.classList.contains("collapse_toggle_card_header"));
           });
 
           it('should have aria-controls set to .closed_card_collapse', function() {
-            chai.assert.equal(header.attr("aria-controls"), ".closed_card_collapse");
+            chai.assert.equal(header.getAttribute("aria-controls"), ".closed_card_collapse");
           });
 
           it('should have aria-expaned set to false', function() {
-            chai.assert.equal(header.attr("aria-expanded"), "false");
+            chai.assert.equal(header.getAttribute("aria-expanded"), "false");
           });
 
           it('should have data-target set to .closed_card_collapse', function() {
-            chai.assert.equal(header.attr("data-target"), ".closed_card_collapse");
+            chai.assert.equal(header.getAttribute("data-target"), ".closed_card_collapse");
           });
 
           it('should have data-toggle set to collapse', function() {
-            chai.assert.equal(header.attr("data-toggle"), "collapse");
+            chai.assert.equal(header.getAttribute("data-toggle"), "collapse");
           });
 
           it('should have role set to button', function() {
-            chai.assert.equal(header.attr("role"), "button");
+            chai.assert.equal(header.getAttribute("role"), "button");
           });
 
           it('should have one child', function() {
@@ -626,11 +655,8 @@ struct Test_Card_INIT_CLOSED_HTMLLayout : public emp::web::BaseTest {
           });
         });
 
-
-
-
-
         describe("div#closed_card_body", function() {
+          const body = document.getElementById("closed_card_body");
           it('should exist', function() {
             chai.assert.equal($( "div#closed_card_body" ).length, 1);
           });
@@ -640,8 +666,16 @@ struct Test_Card_INIT_CLOSED_HTMLLayout : public emp::web::BaseTest {
             chai.assert.equal(parent_id, "closed");
           });
 
-          it('should have the classes card-body, collapse, and closed_card_collapse', function() {
-            chai.assert.equal($("#closed_card_body").attr("class"), "card-body , collapse , closed_card_collapse");
+          it('should have class card-body', function() {
+            chai.assert.isTrue(body.classList.contains("card-body"));
+          });
+
+          it('should have class collapse', function() {
+            chai.assert.isTrue(body.classList.contains("collapse"));
+          });
+
+          it('should have class closed_card_collapse', function() {
+            chai.assert.isTrue(body.classList.contains("closed_card_collapse"));
           });
 
           it('should have no children', function() {

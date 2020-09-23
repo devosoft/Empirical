@@ -222,7 +222,7 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
 
           const card = main.children[0];
           describe("Basic card layout", function() {
-            it('should have card class', function() {
+            it('should have class card', function() {
               chai.assert.isTrue(card.classList.contains("card"));
             });
 
@@ -463,8 +463,8 @@ struct Test_Config_Panel_Int_HTMLLayout : public emp::web::BaseTest {
 
         describe("Setting row", function() {
           const row = setting.children[0];
-          it('should have 5 children (title area, input number+label, input slider+label)', function() {
-            chai.assert.equal(row.childElementCount, 5);
+          it('should have 3 children (title area, input number, input slider)', function() {
+            chai.assert.equal(row.childElementCount, 3);
           });
 
           describe("Title area (child 1)", function(){
@@ -494,8 +494,8 @@ struct Test_Config_Panel_Int_HTMLLayout : public emp::web::BaseTest {
             });
           });
 
-          describe("Slider input (child 3)", function() {
-            const slider = row.children[2];
+          describe("Slider input (child 2)", function() {
+            const slider = row.children[1];
             it('should be an input element', function() {
               chai.assert.equal(slider.nodeName, "INPUT");
             });
@@ -513,8 +513,8 @@ struct Test_Config_Panel_Int_HTMLLayout : public emp::web::BaseTest {
             });
           });
 
-          describe("Numerical input (child 5)", function() {
-            const number = row.children[4];
+          describe("Numerical input (child 3)", function() {
+            const number = row.children[2];
             it('should be an input element', function() {
               chai.assert.equal(number.nodeName, "INPUT");
             });
@@ -549,7 +549,7 @@ struct Test_Config_Panel_Int_HTMLLayout : public emp::web::BaseTest {
           // TODO: When the mobile prefab tools is created, need to rethink how to
           // obtain the mobile slider object
           describe("Mobile slider", function() {
-            const mobile_slider = box.children[1].children[1].children[2];
+            const mobile_slider = box.children[1].children[1].children[1];
             it('should be an input element', function() {
               chai.assert.equal(mobile_slider.nodeName, "INPUT");
             });
@@ -644,8 +644,8 @@ struct Test_Config_Panel_Double_HTMLLayout : public emp::web::BaseTest {
 
       describe("Setting row", function() {
         const row = setting.children[0];
-        it('should have 5 children (title area, input number+label, input slider+label)', function() {
-          chai.assert.equal(row.childElementCount, 5);
+        it('should have 3 children (title area, input number, input slider)', function() {
+          chai.assert.equal(row.childElementCount, 3);
         });
 
         describe("Title area (child 1)", function(){
@@ -675,8 +675,8 @@ struct Test_Config_Panel_Double_HTMLLayout : public emp::web::BaseTest {
           });
         });
 
-        describe("Slider input (child 3)", function() {
-          const slider = row.children[2];
+        describe("Slider input (child 2)", function() {
+          const slider = row.children[1];
           it('should be an input element', function() {
             chai.assert.equal(slider.nodeName, "INPUT");
           });
@@ -694,8 +694,8 @@ struct Test_Config_Panel_Double_HTMLLayout : public emp::web::BaseTest {
           });
         });
 
-        describe("Numerical input (child 5)", function() {
-          const number = row.children[4];
+        describe("Numerical input (child 3)", function() {
+          const number = row.children[2];
           it('should be an input element', function() {
             chai.assert.equal(number.nodeName, "INPUT");
           });
@@ -730,7 +730,7 @@ struct Test_Config_Panel_Double_HTMLLayout : public emp::web::BaseTest {
         // TODO: When the mobile prefab tools is created, need to rethink how to
         // obtain the mobile slider object
         describe("Mobile slider", function() {
-          const mobile_slider = box.children[1].children[1].children[2];
+          const mobile_slider = box.children[1].children[1].children[1];
           it('should be an input element', function() {
             chai.assert.equal(mobile_slider.nodeName, "INPUT");
           });
@@ -819,8 +819,8 @@ struct Test_Config_Panel_Text_HTMLLayout : public emp::web::BaseTest {
 
       describe("Setting row", function() {
         const row = setting.children[0];
-        it('should have 3 children (title area and text input+label)', function() {
-          chai.assert.equal(row.childElementCount, 3);
+        it('should have 2 children (title area and text input)', function() {
+          chai.assert.equal(row.childElementCount, 2);
         });
 
         describe("Title area (child 1)", function(){
@@ -850,8 +850,8 @@ struct Test_Config_Panel_Text_HTMLLayout : public emp::web::BaseTest {
           });
         });
 
-        describe("Text input (child 3)", function() {
-          const text = row.children[2];
+        describe("Text input (child 2)", function() {
+          const text = row.children[1];
           it('should be an input element', function() {
             chai.assert.equal(text.nodeName, "INPUT");
           });

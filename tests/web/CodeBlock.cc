@@ -72,37 +72,37 @@ struct Test_Code_Block_HTMLLayout : public emp::web::BaseTest {
             chai.assert.equal(parent_id, "test_div");
           });
 
+          const code_block = document.getElementById("code_block");
+
           it('should have element type pre', function() {
-            const ele_type = document.getElementById("code_block").nodeName;
-            chai.assert.equal(ele_type, "PRE");
+            chai.assert.equal(code_block.nodeName, "PRE");
           });
 
-          it("should have a class c++", function() {
-            const class_name = document.getElementById("code_block").className;
-            chai.assert.equal(class_name, "c++");
+          it("should have class c++", function() {
+            chai.assert.isTrue(code_block.classList.contains("c++"));
           });
 
           it('should have one child', function() {
-            const num_children = document.getElementById("code_block").childElementCount;
-            chai.assert.equal(num_children, 1);
+            chai.assert.equal(code_block.childElementCount, 1);
           });
         });
 
         describe("pre#code_block child", function() {
-
+          const cb_child = document.getElementById("code_block").children[0];
           it("should have element type code", function() {
-            const ele_type = document.getElementById("code_block").children[0].nodeName;
-            chai.assert.equal(ele_type, "CODE");
+            chai.assert.equal(cb_child.nodeName, "CODE");
           });
 
-          it("should have a classes hljs and cpp", function() {
-            const class_name = document.getElementById("code_block").children[0].className;
-            chai.assert.equal(class_name, "hljs cpp");
+          it("should have class hljs", function() {
+            chai.assert.isTrue(cb_child.classList.contains("hljs"));
+          });
+
+          it("should have class cpp", function() {
+            chai.assert.isTrue(cb_child.classList.contains("cpp"));
           });
 
           it("should have one child (span that contains code)", function() {
-            const num_children = document.getElementById("code_block").children[0].childElementCount;
-            chai.assert.equal(num_children, 1);
+            chai.assert.equal(cb_child.childElementCount, 1);
           });
         });
 

@@ -45,14 +45,19 @@ struct Test_ToggleSwitch_init_on : emp::web::BaseTest {
             chai.assert.equal(parent_id, "emp_test_container");
           });
 
+          const t_switch = document.getElementById("switch_on");
+
           it('should have two children', function() {
-            const num_children = document.getElementById("switch_on").childElementCount;
+            const num_children = t_switch.childElementCount;
             chai.assert.equal(num_children, 2);
           });
 
-          it('should have custom-control and custom-switch classes', function() {
-            const classes = document.getElementById("switch_on").className;
-            chai.assert.equal(classes, "custom-control custom-switch");
+          it('should have class custom-control', function() {
+            chai.assert.isTrue(t_switch.classList.contains("custom-control"));
+          });
+
+          it('should have class custom-switch', function() {
+            chai.assert.isTrue(t_switch.classList.contains("custom-switch"));
           });
 
         });
@@ -63,36 +68,40 @@ struct Test_ToggleSwitch_init_on : emp::web::BaseTest {
             chai.assert.equal(parent_id, "switch_on");
           });
 
+          const input_element = document.getElementById(input_id);
+
           it('should have type checkbox', function() {
-            chai.assert.equal($("#"+input_id).attr("type"), "checkbox");
+            chai.assert.equal(input_element.getAttribute("type"), "checkbox");
           });
 
           it('should have attribute checked', function() {
-            chai.assert.notEqual($("#"+input_id).attr("checked"), undefined);
+            chai.assert.notEqual(input_element.getAttribute("checked"), undefined);
           });
 
-          it('should have custom-control-input class', function() {
-            chai.assert.equal($("#"+input_id).attr("class"), "custom-control-input");
+          it('should have class custom-control-input', function() {
+            chai.assert.isTrue(input_element.classList.contains("custom-control-input"));
           });
         });
 
         describe("label element", function() {
-          it('should have parent #switch_on', function() {                       /// fail (undefined)
-            const parent_id = document.getElementById(label_id).parentNode.id;
+          const label_element = document.getElementById(label_id);
+
+          it('should have parent #switch_on', function() {
+            const parent_id = label_element.parentNode.id;
             chai.assert.equal(parent_id, "switch_on");
           });
 
-          it('should have one span child', function() {                       /// fail (0)
-            chai.assert.equal($("#"+label_id).children().length, 1);
-            chai.assert.equal($("#"+label_id).children()[0].nodeName, "SPAN");
+          it('should have one span child', function() {
+            chai.assert.equal(label_element.childElementCount, 1);
+            chai.assert.equal(label_element.children[0].nodeName, "SPAN");
           });
 
-          it('should have custom-control-label class', function() {
-            chai.assert.equal($("#"+label_id).attr("class"), "custom-control-label");
+          it('should have class custom-control-label', function() {
+            chai.assert.isTrue(label_element.classList.contains("custom-control-label"));
           });
 
-          it('should have for attribute equal to input id', function() {                       /// fail (undefined)
-            chai.assert.equal($("#"+label_id).attr("for"), input_id);
+          it('should have for attribute equal to input id', function() {
+            chai.assert.equal(label_element.getAttribute("for"), input_id);
           });
 
         });
@@ -134,14 +143,19 @@ struct Test_ToggleSwitch_init_off : emp::web::BaseTest {
             chai.assert.equal(parent_id, "emp_test_container");
           });
 
+          const t_switch = document.getElementById("switch_off");
+
           it('should have two children', function() {
-            const num_children = document.getElementById("switch_off").childElementCount;
+            const num_children = t_switch.childElementCount;
             chai.assert.equal(num_children, 2);
           });
 
-          it('should have custom-control and custom-switch classes', function() {
-            const classes = document.getElementById("switch_off").className;
-            chai.assert.equal(classes, "custom-control custom-switch");
+          it('should have class custom-control and custom-switch', function() {
+            chai.assert.isTrue(t_switch.classList.contains("custom-control"));
+          });
+
+          it('should have class custom-switch', function() {
+            chai.assert.isTrue(t_switch.classList.contains("custom-switch"));
           });
 
         });
@@ -152,16 +166,18 @@ struct Test_ToggleSwitch_init_off : emp::web::BaseTest {
             chai.assert.equal(parent_id, "switch_off");
           });
 
+          const input_element = document.getElementById(input_id);
+
           it('should have type checkbox', function() {
-            chai.assert.equal($("#"+input_id).attr("type"), "checkbox");
+            chai.assert.equal(input_element.getAttribute("type"), "checkbox");
           });
 
           it('should not have attribute checked', function() {
-            chai.assert.equal($("#"+input_id).attr("checked"), undefined);
+            chai.assert.equal(input_element.getAttribute("checked"), undefined);
           });
 
-          it('should have custom-control-input class', function() {
-            chai.assert.equal($("#"+input_id).attr("class"), "custom-control-input");
+          it('should have class custom-control-input', function() {
+            chai.assert.isTrue(input_element.classList.contains("custom-control-input"));
           });
         });
 
@@ -171,17 +187,19 @@ struct Test_ToggleSwitch_init_off : emp::web::BaseTest {
             chai.assert.equal(parent_id, "switch_off");
           });
 
+          const label_element = document.getElementById(label_id);
+
           it('should have one span child', function() {
-            chai.assert.equal($("#"+label_id).children().length, 1);
-            chai.assert.equal($("#"+label_id).children()[0].nodeName, "SPAN");
+            chai.assert.equal(label_element.childElementCount, 1);
+            chai.assert.equal(label_element.children[0].nodeName, "SPAN");
           });
 
-          it('should have custom-control-label class', function() {
-            chai.assert.equal($("#"+label_id).attr("class"), "custom-control-label");
+          it('should have class custom-control-label', function() {
+            chai.assert.isTrue(label_element.classList.contains("custom-control-label"));
           });
 
           it('should have "for" attribute equal to input id', function() {
-            chai.assert.equal($("#"+label_id).attr("for"), input_id);
+            chai.assert.equal(label_element.getAttribute("for"), input_id);
           });
 
         });
@@ -229,14 +247,18 @@ struct Test_ToggleSwitch_add_label : emp::web::BaseTest {
             chai.assert.equal(parent_id, "emp_test_container");
           });
 
+          const t_switch = document.getElementById("switch");
+
           it('should have two children', function() {
-            const num_children = document.getElementById("switch").childElementCount;
-            chai.assert.equal(num_children, 2);
+            chai.assert.equal(t_switch.childElementCount, 2);
           });
 
-          it('should have custom-control and custom-switch classes', function() {
-            const classes = document.getElementById("switch").className;
-            chai.assert.equal(classes, "custom-control custom-switch");
+          it('should have class custom-control', function() {
+            chai.assert.isTrue(t_switch.classList.contains("custom-control"));
+          });
+
+          it('should have class custom-switch', function() {
+            chai.assert.isTrue(t_switch.classList.contains("custom-switch"));
           });
 
         });
@@ -247,16 +269,18 @@ struct Test_ToggleSwitch_add_label : emp::web::BaseTest {
             chai.assert.equal(parent_id, "switch");
           });
 
+          const input_element = document.getElementById(input_id);
+
           it('should have type checkbox', function() {
-            chai.assert.equal($("#"+input_id).attr("type"), "checkbox");
+            chai.assert.equal(input_element.getAttribute("type"), "checkbox");
           });
 
           it('should not have attribute checked', function() {
-            chai.assert.equal($("#"+input_id).attr("checked"), undefined);
+            chai.assert.equal(input_element.getAttribute("checked"), undefined);
           });
 
-          it('should have custom-control-input class', function() {
-            chai.assert.equal($("#"+input_id).attr("class"), "custom-control-input");
+          it('should have class custom-control-input', function() {
+            chai.assert.isTrue(input_element.classList.contains("custom-control-input"));
           });
         });
 
@@ -266,20 +290,22 @@ struct Test_ToggleSwitch_add_label : emp::web::BaseTest {
             chai.assert.equal(parent_id, "switch");
           });
 
+          const label_element = document.getElementById(label_id);
+
           it('should have one child', function() {
-            chai.assert.equal($("#"+label_id).children().length, 1);
+            chai.assert.equal(label_element.childElementCount, 1);
           });
 
           it('the child is the div added with AddLabel()', function() {
-            chai.assert.equal($("#"+label_id).children()[0].nodeName, "DIV");
+            chai.assert.equal(label_element.children[0].nodeName, "DIV");
           });
 
-          it('should have custom-control-label class', function() {
-            chai.assert.equal($("#"+label_id).attr("class"), "custom-control-label");
+          it('should have class custom-control-label', function() {
+            chai.assert.isTrue(label_element.classList.contains("custom-control-label"));
           });
 
           it('should have "for" attribute equal to input id', function() {
-            chai.assert.equal($("#"+label_id).attr("for"), input_id);
+            chai.assert.equal(label_element.getAttribute("for"), input_id);
           });
 
         });

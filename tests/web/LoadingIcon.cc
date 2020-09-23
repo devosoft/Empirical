@@ -77,26 +77,41 @@ struct Test_Loading_Icon_HTMLLayout : public emp::web::BaseTest {
             const num_children = document.getElementById("loading_icon").childElementCount;
             chai.assert.equal(num_children, 2);
           });
-
-          it('should have a FontAwesome spinner as the first child', function() {
-            const child_one = document.getElementById("loading_icon").children[0];
-            const child_classes = child_one.className;
-            chai.assert.equal(child_classes, "fa fa-spinner fa-pulse fa-3x fa-fw");
-          });
-
-          it('should have alternative loading text as the second child', function() {
-            const child_two = document.getElementById("loading_icon").children[1];
-            const child_classes = child_two.className;
-            chai.assert.equal(child_classes, "sr-only");
-          });
-
         });
 
-        describe("span#loading_icon child#2", function() {
+        describe("span#loading_icon child #1", function() {
+          const child_one = document.getElementById("loading_icon").children[0];
+          it('should have class fa', function() {
+            chai.assert.isTrue(child_one.classList.contains("fa"));
+          });
+
+          it('should have class fa-spinner', function() {
+            chai.assert.isTrue(child_one.classList.contains("fa-spinner"));
+          });
+
+          it('should have class fa-pulse', function() {
+            chai.assert.isTrue(child_one.classList.contains("fa-pulse"));
+          });
+
+          it('should have class fa-3x', function() {
+            chai.assert.isTrue(child_one.classList.contains("fa-3x"));
+          });
+
+          it('should have class fa-fw', function() {
+            chai.assert.isTrue(child_one.classList.contains("fa-fw"));
+          });
+        });
+
+        describe("span#loading_icon child #2", function() {
+          it('should be alternative loading text', function() {
+            const child_two = document.getElementById("loading_icon").children[1];
+            chai.assert.isTrue(child_two.classList.contains("sr-only"));
+          });
+
           it('should have one child', function() {
             const num_children = document.getElementById("loading_icon").children[1].childElementCount;
             chai.assert.equal(num_children, 1);
-          })
+          });
         });
 
 

@@ -43,8 +43,8 @@ struct Test_Loading_Modal_Open_HTMLLayout : public emp::web::BaseTest {
 
     EM_ASM({
       describe("emp::prefab::LoadingModal Open HTML Layout Scenario", function() {
-        const modal = $("div#loading_modal");
-        const modal_dialog = modal.children()[0];
+        const modal = document.getElementById("loading_modal");
+        const modal_dialog = modal.children[0];
         const modal_content = modal_dialog.children[0];
         const modal_body = modal_content.children[0];
         const spinner = modal_body.children[0];
@@ -57,35 +57,43 @@ struct Test_Loading_Modal_Open_HTMLLayout : public emp::web::BaseTest {
 
         describe("div#loading_modal", function() {
           it('should exist', function() {
-            chai.assert.equal(modal.length, 1);
+            chai.assert.equal($("div#loading_modal").length, 1);
           });
 
           it('should have parent <body>', function() {
-            chai.assert.equal(modal.parent()[0].tagName, "BODY");
+            chai.assert.equal(modal.parentNode.tagName, "BODY");
           });
 
-          it('should have classes modal, bd-example-modal-lg, show', function() {
-            chai.assert.equal(modal.attr("class"), "modal bd-example-modal-lg show");
+          it('should have class modal', function() {
+            chai.assert.isTrue(modal.classList.contains("modal"));
+          });
+
+          it('should have class bd-example-modal-lg', function() {
+            chai.assert.isTrue(modal.classList.contains("bd-example-modal-lg"));
+          });
+
+          it('should have class show', function() {
+            chai.assert.isTrue(modal.classList.contains("show"));
           });
 
           it('should have static data-backdrop', function() {
-            chai.assert.equal(modal.attr("data-backdrop"), "static");
+            chai.assert.equal(modal.getAttribute("data-backdrop"), "static");
           });
 
           it('should have false data-keyboard', function() {
-            chai.assert.equal(modal.attr("data-keyboard"), "false");
+            chai.assert.equal(modal.getAttribute("data-keyboard"), "false");
           });
 
           it('should have tabindex -1', function() {
-            chai.assert.equal(modal.attr("tabindex"), "-1");
+            chai.assert.equal(modal.getAttribute("tabindex"), "-1");
           });
 
           it('should display block', function() {
-            chai.assert.equal(modal.attr("style"), "display: block;");
+            chai.assert.equal(modal.getAttribute("style"), "display: block;");
           });
 
           it('should have one child', function() {
-            chai.assert.equal(modal.children().length, 1);
+            chai.assert.equal(modal.childElementCount, 1);
           });
         });
 
@@ -98,8 +106,12 @@ struct Test_Loading_Modal_Open_HTMLLayout : public emp::web::BaseTest {
             chai.assert.equal(modal_dialog.parentElement.id, "loading_modal");
           });
 
-          it('should have class modal-dialog and modal-sm', function() {
-            chai.assert.equal(modal_dialog.getAttribute("class"), "modal-dialog modal-sm");
+          it('should have class modal-dialog', function() {
+            chai.assert.isTrue(modal_dialog.classList.contains("modal-dialog"));
+          });
+
+          it('should have class modal-sm', function() {
+            chai.assert.isTrue(modal_dialog.classList.contains("modal-sm"));
           });
 
           it('should have one child', function() {
@@ -117,7 +129,7 @@ struct Test_Loading_Modal_Open_HTMLLayout : public emp::web::BaseTest {
           });
 
           it('should have class modal-content', function() {
-            chai.assert.equal(modal_content.getAttribute("class"), "modal-content");
+            chai.assert.isTrue(modal_content.classList.contains("modal-content"));
           });
 
           it('should have width = 256px', function() {
@@ -139,7 +151,7 @@ struct Test_Loading_Modal_Open_HTMLLayout : public emp::web::BaseTest {
           });
 
           it('should have class modal-body', function() {
-            chai.assert.equal(modal_body.getAttribute("class"), "modal-body");
+            chai.assert.isTrue(modal_body.classList.contains("modal-body"));
           });
 
           it('should have one child', function() {
@@ -156,8 +168,12 @@ struct Test_Loading_Modal_Open_HTMLLayout : public emp::web::BaseTest {
             chai.assert.isTrue(spinner.parentNode.classList.contains("modal-body"));
           });
 
-          it('should have class spinner-border and text-light', function() {
-            chai.assert.equal(spinner.getAttribute("class"), "spinner-border text-light");
+          it('should have class spinner-border', function() {
+            chai.assert.isTrue(spinner.classList.contains("spinner-border"));
+          });
+
+          it('should have class text-light', function() {
+            chai.assert.isTrue(spinner.classList.contains("text-light"));
           });
 
           it('should have width and height set to 256px', function() {
@@ -188,7 +204,7 @@ struct Test_Loading_Modal_Open_HTMLLayout : public emp::web::BaseTest {
           });
 
           it('should have class sr-only', function() {
-            chai.assert.equal(child.getAttribute("class"), "sr-only");
+            chai.assert.isTrue(child.classList.contains("sr-only"));
           });
 
           it('should have no children', function() {
@@ -230,8 +246,8 @@ struct Test_Loading_Modal_Closed_HTMLLayout : public emp::web::BaseTest {
 
     EM_ASM({
       describe("emp::prefab::LoadingModal Open HTML Layout Scenario", function() {
-        const modal = $("div#loading_modal");
-        const modal_dialog = modal.children()[0];
+        const modal = document.getElementById("loading_modal");
+        const modal_dialog = modal.children[0];
         const modal_content = modal_dialog.children[0];
         const modal_body = modal_content.children[0];
         const spinner = modal_body.children[0];
@@ -244,39 +260,43 @@ struct Test_Loading_Modal_Closed_HTMLLayout : public emp::web::BaseTest {
 
         describe("div#loading_modal", function() {
           it('should exist', function() {
-            chai.assert.equal(modal.length, 1);
+            chai.assert.equal($("div#loading_modal").length, 1);
           });
 
           it('should have parent <body>', function() {
-            chai.assert.equal(modal.parent()[0].tagName, "BODY");
+            chai.assert.equal(modal.parentNode.tagName, "BODY");
           });
 
-          it('should have classes modal and bd-example-modal-lg', function() {
-            chai.assert.equal(modal.attr("class"), "modal bd-example-modal-lg");
+          it('should have class modal and bd-example-modal-lg', function() {
+            chai.assert.isTrue(modal.classList.contains("modal"));
+          });
+
+          it('should have class bd-example-modal-lg', function() {
+            chai.assert.isTrue(modal.classList.contains("bd-example-modal-lg"));
           });
 
           it('should have static data-backdrop', function() {
-            chai.assert.equal(modal.attr("data-backdrop"), "static");
+            chai.assert.equal(modal.getAttribute("data-backdrop"), "static");
           });
 
           it('should have false data-keyboard', function() {
-            chai.assert.equal(modal.attr("data-keyboard"), "false");
+            chai.assert.equal(modal.getAttribute("data-keyboard"), "false");
           });
 
           it('should have tabindex -1', function() {
-            chai.assert.equal(modal.attr("tabindex"), "-1");
+            chai.assert.equal(modal.getAttribute("tabindex"), "-1");
           });
 
           it('should display block', function() {
-            chai.assert.equal(modal.attr("style"), "display: none;");
+            chai.assert.equal(modal.getAttribute("style"), "display: none;");
           });
 
           it('should have aria-hidden set to true', function() {
-            chai.assert.equal(modal.attr("aria-hidden"), "true");
+            chai.assert.equal(modal.getAttribute("aria-hidden"), "true");
           });
 
           it('should have one child', function() {
-            chai.assert.equal(modal.children().length, 1);
+            chai.assert.equal(modal.childElementCount, 1);
           });
         });
 
@@ -289,8 +309,12 @@ struct Test_Loading_Modal_Closed_HTMLLayout : public emp::web::BaseTest {
             chai.assert.equal(modal_dialog.parentElement.id, "loading_modal");
           });
 
-          it('should have class modal-dialog and modal-sm', function() {
-            chai.assert.equal(modal_dialog.getAttribute("class"), "modal-dialog modal-sm");
+          it('should have class modal-dialog', function() {
+            chai.assert.isTrue(modal_dialog.classList.contains("modal-dialog"));
+          });
+
+          it('should have class modal-sm', function() {
+            chai.assert.isTrue(modal_dialog.classList.contains("modal-sm"));
           });
 
           it('should have one child', function() {
@@ -308,7 +332,7 @@ struct Test_Loading_Modal_Closed_HTMLLayout : public emp::web::BaseTest {
           });
 
           it('should have class modal-content', function() {
-            chai.assert.equal(modal_content.getAttribute("class"), "modal-content");
+            chai.assert.isTrue(modal_content.classList.contains("modal-content"));
           });
 
           it('should have width = 256px', function() {
@@ -330,7 +354,7 @@ struct Test_Loading_Modal_Closed_HTMLLayout : public emp::web::BaseTest {
           });
 
           it('should have class modal-body', function() {
-            chai.assert.equal(modal_body.getAttribute("class"), "modal-body");
+            chai.assert.isTrue(modal_body.classList.contains("modal-body"));
           });
 
           it('should have one child', function() {
@@ -347,8 +371,12 @@ struct Test_Loading_Modal_Closed_HTMLLayout : public emp::web::BaseTest {
             chai.assert.isTrue(spinner.parentNode.classList.contains("modal-body"));
           });
 
-          it('should have class spinner-border and text-light', function() {
-            chai.assert.equal(spinner.getAttribute("class"), "spinner-border text-light");
+          it('should have class spinner-border', function() {
+            chai.assert.isTrue(spinner.classList.contains("spinner-border"));
+          });
+
+          it('should have class text-light', function() {
+            chai.assert.isTrue(spinner.classList.contains("text-light"));
           });
 
           it('should have width and height set to 256px', function() {
@@ -379,7 +407,7 @@ struct Test_Loading_Modal_Closed_HTMLLayout : public emp::web::BaseTest {
           });
 
           it('should have class sr-only', function() {
-            chai.assert.equal(child.getAttribute("class"), "sr-only");
+            chai.assert.isTrue(child.classList.contains("sr-only"));
           });
 
           it('should have no children', function() {
