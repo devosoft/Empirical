@@ -53,8 +53,8 @@ namespace prefab {
           prefab::FontAwesomeIcon down("fa-angle-double-down");
           card_header << up;
           card_header << down;
-          up.AddAttr("class", "float-right btn-link collapse_toggle setting_heading");
-          down.AddAttr("class", "float-right btn-link collapse_toggle setting_heading");
+          up.AddAttr("class", "toggle_glyph");
+          down.AddAttr("class", "toggle_glyph");
         }
         card_header.AddAttr("class", "collapse_toggle_card_header");
       }

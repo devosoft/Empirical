@@ -1,12 +1,19 @@
 /*
- These are the default styles for prefab elements. You can
- override any of these settings in your own CSS file as long
- as it's linked after the this default CSS file in the
- head of the HTML document.
-
- NOTE: If you modify this file, run the purge_script.sh script
- to see your changes take effect in the browser
+* These are the default styles for prefab elements. You can
+* override any of these settings in your own CSS file as long
+* as it's linked after the this default CSS file in the
+* head of the HTML document.
+* 
+* Using LESS CSS in this file
+* http://lesscss.org/
+*
+* NOTE: If you modify this file, run the purge_script.sh script
+* to see your changes take effect in the browser
 */
+
+@CardHeaderTextColor: #3a3939;
+@CardHeaderHoverColor: #C0C0C0;
+@CommentBoxColor: #ede9e8;
 
 /* Glyphicon Toggle */
 .collapse_toggle[aria-expanded=true] .fa-angle-double-down {
@@ -22,21 +29,31 @@
   margin-right: 10px;
 }
 
+.collapse_toggle {
+  .fa:hover {
+    text-decoration: underline;
+  } 
+}
+
+.toggle_glyph {
+  .collapse_toggle();
+  .setting_heading();
+  float: right;
+}
+
 /* Card */
 .card{
   margin-bottom: 10px;
 }
 
 /* Card Header */
-.setting_heading {
-  color: rgb(58, 57, 57);
+.setting_heading{
+  color: @CardHeaderTextColor;
 }
-.setting_heading:hover {
-  color: rgb(116, 114, 114);
-}
+
 /* Change background of card header on hover to convey collapsibility */
 .collapse_toggle_card_header:hover {
-  background-color: #C0C0C0;
+  background-color: @CardHeaderHoverColor;
 }
 
 /* Card Body */
@@ -67,19 +84,19 @@
   float: right;
 }
 
-/* Dropdown Bubble */
+/* Comment Box */
 .commentbox_triangle {
-  width: 0;
-  height: 0;
+  width: 0; 
+  height: 0; 
   border-left: 12px solid transparent;
   border-right: 12px solid transparent;
-
-  border-bottom: 12px solid #ede9e8;
+  
+  border-bottom: 12px solid @CommentBoxColor;
   margin-left: 15px;
 }
 .commentbox_content {
   padding: 10px;
-  background-color: #ede9e8;
+  background-color: @CommentBoxColor;
   border-radius: 5px;
   margin-bottom: 10px;
   width: 95%;
@@ -88,14 +105,14 @@
   display: none;
 }
 
-/* Loading Modal  */
+/* Loading modal  */
 .bd-example-modal-lg .modal-dialog {
   display: table;
   position: relative;
   margin: 0 auto;
   top: calc(50% - 24px);
 }
-
+  
 .bd-example-modal-lg .modal-dialog .modal-content {
   background-color: transparent;
   border: none;
@@ -104,16 +121,16 @@
 /* Mobile Version */
 @media screen and (max-width: 992px) {
   .input_slider {
-    display: none;
+      display: none;
   }
   /* Dropdown Bubble */
   .mobile_commentbox {
-    display: inline;
+      display: inline;
   }
   .title_area {
-    width: 80%;
+      width: 80%;
   }
   .input_bool {
-    width: 18%;
+      width: 18%;
   }
 }
