@@ -335,87 +335,87 @@ struct Test_Collapse_String : emp::web::BaseTest {
           });
         });
 
-      describe("Controller 4 Initial HTML (#master_controller)", function() {
-        const controller = document.getElementById(ctrl_4_id);
-        it('should have parent #emp_test_container', function() {
-          const parent_id = controller.parentElement.getAttribute("id");
-          chai.assert.equal(parent_id, "emp_test_container");
+        describe("Controller 4 Initial HTML (#master_controller)", function() {
+          const controller = document.getElementById(ctrl_4_id);
+          it('should have parent #emp_test_container', function() {
+            const parent_id = controller.parentElement.getAttribute("id");
+            chai.assert.equal(parent_id, "emp_test_container");
+          });
+
+          it('should have 1 child', function() {
+            chai.assert.equal(controller.childElementCount, 1);
+          });
+
+          it('should be of type div', function() {
+            chai.assert.equal(controller.nodeName, "DIV");
+          });
+
+          it('should have aria-controls set to the classes set1 and set2', function() {
+            chai.assert.equal(controller.getAttribute("aria-controls"), ".set1 , .set2");
+          });
+
+          it('should have aria-expanded set to true', function() {
+            chai.assert.equal(controller.getAttribute("aria-expanded"), "true");
+          });
+
+          it('should have data-target set to the classes set1 set2', function() {
+            chai.assert.equal(controller.getAttribute("data-target"), ".set1 , .set2");
+          });
+
+          it('should have data-toggle set to collapse', function() {
+            chai.assert.equal(controller.getAttribute("data-toggle"), "collapse");
+          });
+
+          it('should have role set to button', function() {
+            chai.assert.equal(controller.getAttribute("role"), "button");
+          });
+
+          it('should have class collapse_toggle', function() {
+          chai.assert.isTrue(controller.classList.contains("collapse_toggle"));
+          });
+
+          it('should false have class collapsed', function() {
+          chai.assert.isFalse(controller.classList.contains("collapsed"));
+          });
         });
 
-        it('should have 1 child', function() {
-          chai.assert.equal(controller.childElementCount, 1);
-        });
+        describe("#master_controller child", function() {
+          const child = document.getElementById("master_controller").children[0];
+          it('should have parent #master_controller', function() {
+            const parent_id = child.parentElement.getAttribute("id");
+            chai.assert.equal(parent_id, "master_controller");
+          });
 
-        it('should be of type div', function() {
-          chai.assert.equal(controller.nodeName, "DIV");
-        });
+          it('should have not children', function(){
+            chai.assert.equal(child.childElementCount, 0);
+          });
 
-        it('should have aria-controls set to the classes set1 and set2', function() {
-          chai.assert.equal(controller.getAttribute("aria-controls"), ".set1 , .set2");
-        });
-
-        it('should have aria-expanded set to true', function() {
-          chai.assert.equal(controller.getAttribute("aria-expanded"), "true");
-        });
-
-        it('should have data-target set to the classes set1 set2', function() {
-          chai.assert.equal(controller.getAttribute("data-target"), ".set1 , .set2");
-        });
-
-        it('should have data-toggle set to collapse', function() {
-          chai.assert.equal(controller.getAttribute("data-toggle"), "collapse");
-        });
-
-        it('should have role set to button', function() {
-          chai.assert.equal(controller.getAttribute("role"), "button");
-        });
-
-        it('should have class collapse_toggle', function() {
-        chai.assert.isTrue(controller.classList.contains("collapse_toggle"));
-        });
-
-        it('should false have class collapsed', function() {
-        chai.assert.isFalse(controller.classList.contains("collapsed"));
+          it('should have type span', function(){
+            chai.assert.equal(child.nodeName, "SPAN");
+          });
         });
       });
 
-      describe("#master_controller child", function() {
-        const child = document.getElementById("master_controller").children[0];
-        it('should have parent #master_controller', function() {
-          const parent_id = child.parentElement.getAttribute("id");
-          chai.assert.equal(parent_id, "master_controller");
-        });
-
-        it('should have not children', function(){
-          chai.assert.equal(child.childElementCount, 0);
-        });
-
-        it('should have type span', function(){
-          chai.assert.equal(child.nodeName, "SPAN");
+      describe("GetClass method for couple1", function() {
+        it('should return "set1"', function() {
+          chai.assert.equal(UTF8ToString($0), "set1");
         });
       });
-    });
 
-    describe("GetClass method for couple1", function() {
-      it('should return "set1"', function() {
-        chai.assert.equal(UTF8ToString($0), "set1");
-      });
-    });
+      describe("GetTargetDivs method for couple2", function() {
+        const js_targets = emp_i.__incoming_array;
+        it('should have two targets', function() {
+          chai.assert.equal(js_targets.length, 2);
+        });
 
-    describe("GetTargetDivs method for couple2", function() {
-      const js_targets = emp_i.__incoming_array;
-      it('should have two targets', function() {
-        chai.assert.equal(js_targets.length, 2);
-      });
+        it('should have class set2 for target 1', function() {
+          chai.assert.isTrue(js_targets[0].includes("set2"));
+        });
 
-      it('should have class set2 for target 1', function() {
-        chai.assert.isTrue(js_targets[0].includes("set2"));
+        it('should have class set2 for target 2', function() {
+          chai.assert.isTrue(js_targets[1].includes("set2"));
+        });
       });
-
-      it('should have class set2 for target 2', function() {
-        chai.assert.isTrue(js_targets[1].includes("set2"));
-      });
-    });
 
       // describe("The effects of clicking contorllers", function() {
         // TODO: Once we figure out a way to trigger clicks, run tests to see if
@@ -909,6 +909,274 @@ struct Test_Collapse_Widget : emp::web::BaseTest {
   }
 };
 
+struct Test_Collapse_Vector : emp::web::BaseTest {
+
+  // Construct the following HTML structure:
+  /**
+   */
+
+  Test_Collapse_Vector()
+  : BaseTest({"emp_test_container"})
+  {
+
+  }
+
+  void Describe() override {
+    EM_ASM({
+
+    });
+  }
+};
+
+struct Test_Expand_On_Click : emp::web::BaseTest {
+
+  // Construct the following HTML structure:
+  /**
+  * <span id="emp__1" aria-controls=".collapse_id" aria-expanded="false" class="collapse_toggle , collapsed" data-target=".collapse_id" data-toggle="collapse" role="button">
+  * Controller1
+  * </span>
+  *
+  * <span id="emp__3" class="collapse , collapse_id">Target1</span>
+  */
+
+  Test_Expand_On_Click()
+  : BaseTest({"emp_test_container"})
+  {
+
+    emp::prefab::CollapseCoupling collapsed("Controller1", "Target1", false, "collapse_id");
+    Doc("emp_test_container") << collapsed.GetControllerDiv();
+    Doc("emp_test_container") << collapsed.GetTargetDiv();
+
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const controller = document.getElementsByClassName('collapse_toggle')[0];
+      const target = document.getElementsByClassName('collapse_id')[0];
+
+      describe("Initial DOM, Collapsed", function() {
+
+        describe("Controller", function() {
+          it('should have aria-controls set to collapse_id class', function() {
+            chai.assert.equal(controller.getAttribute('aria-controls'), '.collapse_id');
+          });
+
+          it('should have aria-expanded set to false', function() {
+            chai.assert.equal(controller.getAttribute('aria-expanded'), 'false');
+          });
+
+          it('should have class collapse_toggle', function() {
+            chai.assert.isTrue(controller.classList.contains('collapse_toggle'));
+          });
+
+          it('should have class collapsed', function() {
+            chai.assert.isTrue(controller.classList.contains('collapsed'));
+          });
+
+          it('should have data-target set to .collapse_id', function() {
+            chai.assert.equal(controller.getAttribute('data-target'), '.collapse_id');
+          });
+
+          it('should have data-toggle set to collapse', function() {
+            chai.assert.equal(controller.getAttribute('data-toggle'), 'collapse');
+          });
+
+          it('should have role set to button', function() {
+            chai.assert.equal(controller.getAttribute('role'), 'button');
+          });
+        });
+
+        describe("Target", function() {
+          it('should have class collapse_id', function() {
+            chai.assert.isTrue(target.classList.contains('collapse_id'));
+          });
+
+          it('should have class collapse', function() {
+            chai.assert.isTrue(target.classList.contains('collapse'));
+          });
+
+          it('should not have class show', function() {
+            chai.assert.isFalse(target.classList.contains('show'));
+          });
+        });
+
+      });
+
+      describe("DOM after first click of controller", function() {
+
+        describe("Controller", function() {
+          it('should have aria-expanded set to true', function() {
+            controller.click();
+            chai.assert.equal(controller.getAttribute('aria-expanded'), 'true');
+          });
+
+          it('should not have class collapsed', function() {
+            chai.assert.isFalse(controller.classList.contains('collapsed'));
+          });
+        });
+
+        describe("Target", function() {
+          // TODO: Fix timing: No matter how long we sleep before checking target has class show,
+          // this check fails. Instead, target has class collapsing. 
+          // it('should have class show', function() {
+          //   chai.assert.isTrue(target.classList.contains('show'));
+          // });
+        });
+
+      });
+
+      // TODO: When Issue 368 is resolved, implement here
+      // https://github.com/devosoft/Empirical/issues/368
+      // describe("DOM after second click of controller", function() {
+
+        // describe("Controller", function() {
+        //   it('should have aria-expanded set to false', function() {
+        //     controller.click();
+        //     chai.assert.equal(controller.getAttribute('aria-expanded'), 'false');
+        //   });
+
+        //   it('should have class collapsed', function() {
+        //     chai.assert.isTrue(controller.classList.contains('collapsed'));
+        //   });
+        // });
+
+        // describe("Target", function() {
+        //   it('should not have class show', function() {
+        //     chai.assert.isFalse(target.classList.contains('show'));
+        //   });
+        // });
+
+      });
+
+    }
+  };
+
+struct Test_Collapse_On_Click : emp::web::BaseTest {
+
+  // Construct the following HTML structure:
+  /**
+  * <span id="emp__1" aria-controls=".collapse_id" aria-expanded="true" class="collapse_toggle" data-target=".collapse_id" data-toggle="collapse" role="button">
+  * Controller1
+  * </span>
+  *
+  * <span id="emp__3" class="collapse show , collapse_id">Target1</span>
+  */
+
+  Test_Collapse_On_Click()
+  : BaseTest({"emp_test_container"})
+  {
+    emp::prefab::CollapseCoupling collapsed("Controller1", "Target1", true, "collapse_id");
+    Doc("emp_test_container") << collapsed.GetControllerDiv();
+    Doc("emp_test_container") << collapsed.GetTargetDiv();
+  }
+
+  void Describe() override {
+    EM_ASM({
+      const controller = document.getElementsByClassName('collapse_toggle')[0];
+      const target = document.getElementsByClassName('collapse_id')[0];
+
+      function sleepFor( sleepDuration ){ // milliseconds
+        var now = new Date().getTime();
+        while(new Date().getTime() < now + sleepDuration){ /* do nothing */ } 
+      }
+      describe("Initial DOM, Expanded", function() {
+
+        describe("Controller", function() {
+          it('should have aria-controls set to collapse_id class', function() {
+            chai.assert.equal(controller.getAttribute('aria-controls'), '.collapse_id');
+          });
+
+          it('should have aria-expanded set to true', function() {
+            chai.assert.equal(controller.getAttribute('aria-expanded'), 'true');
+          });
+
+          it('should have class collapse_toggle', function() {
+            chai.assert.isTrue(controller.classList.contains('collapse_toggle'));
+          });
+
+          it('should not have class collapsed', function() {
+            chai.assert.isFalse(controller.classList.contains('collapsed'));
+          });
+
+          it('should have data-target set to .collapse_id', function() {
+            chai.assert.equal(controller.getAttribute('data-target'), '.collapse_id');
+          });
+
+          it('should have data-toggle set to collapse', function() {
+            chai.assert.equal(controller.getAttribute('data-toggle'), 'collapse');
+          });
+
+          it('should have role set to button', function() {
+            chai.assert.equal(controller.getAttribute('role'), 'button');
+          });
+        });
+
+        describe("Target", function() {
+          it('should have class collapse_id', function() {
+            chai.assert.isTrue(target.classList.contains('collapse_id'));
+          });
+
+          it('should have class collapse', function() {
+            chai.assert.isTrue(target.classList.contains('collapse'));
+          });
+
+          // TODO: Fix timing
+          // it('should have class show', function() {
+          //   sleepFor(5000);
+          //   chai.assert.isTrue(target.classList.contains('show'));
+          // });
+        });
+
+      });
+
+      describe("DOM after first click of controller", function() {
+
+        describe("Controller", function() {
+          it('should have aria-expanded set to false', function() {
+            controller.click();
+            chai.assert.equal(controller.getAttribute('aria-expanded'), 'false');
+          });
+
+          it('should have class collapsed', function() {
+            chai.assert.isTrue(controller.classList.contains('collapsed'));
+          });
+        });
+
+        describe("Target", function() {
+          it('should not have class show', function() {
+            chai.assert.isFalse(target.classList.contains('show'));
+          });
+        });
+
+      });
+
+      // TODO: When Issue 368 is resolved, implement here
+      // https://github.com/devosoft/Empirical/issues/368
+      // describe("DOM after second click of controller", function() {
+
+      //   describe("Controller", function() {
+      //     it('should have aria-expanded set to true', function() {
+      //       controller.click();
+      //       chai.assert.equal(controller.getAttribute('aria-expanded'), 'true');
+      //     });
+
+      //     it('should not have class collapsed', function() {
+      //       chai.assert.isFalse(controller.classList.contains('collapsed'));
+      //     });
+      //   });
+
+      //   describe("Target", function() {
+      //     it('should have class show', function() {
+      //       chai.assert.isTrue(target.classList.contains('show'));
+      //     });
+      //   });
+
+      // });
+
+    });
+  }
+};
+
 emp::web::MochaTestRunner test_runner;
 int main() {
 
@@ -916,6 +1184,9 @@ int main() {
 
   test_runner.AddTest<Test_Collapse_String>("Test emp::prefab::Collapse String Constructor");
   test_runner.AddTest<Test_Collapse_Widget>("Test emp::prefab::Collapse Widget Constructor");
-  // TODO: add test to explicitly call vector version of CollapseCoupling constructor
+
+  // test_runner.AddTest<Test_Collapse_Vector>("Test emp::prefab::Collapse Vector Constructor"); // TODO: implement
+  test_runner.AddTest<Test_Expand_On_Click>("Test emp::prefab::Collapse Initially Collapsed");
+  test_runner.AddTest<Test_Collapse_On_Click>("Test emp::prefab::Collapse Initially Expanded");
   test_runner.Run();
 }

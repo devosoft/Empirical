@@ -491,18 +491,44 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
         });
       });
 
-      // TODO: check DOM after card has been closed and opened
-      // need to figure out siulating click first
-
       // When #open_card_header is clicked first time --->
-      //    #open_card_header should have class collapsed
-      //    #open_card_header should have aria-expanded set to false
-      //    #open_card_body should not have class show
+      describe("Click to collapse card", function() {
+        const card_head = document.getElementById('open_card_header');
+        it('card header should have class collapsed', function() {
+          card_head.click(); // collapses card
+          chai.assert.isTrue(card_head.classList.contains("collapsed"));
+        });
+
+        it('card header should have aria-expanded set to false', function() {
+          chai.assert.equal(card_head.getAttribute('aria-expanded'), 'false');
+        });
+
+        it('card body should not have class show', function() {
+          const body = document.getElementById('open_card_body');
+          chai.assert.isFalse(body.classList.contains("show"));
+        });
+      });
+
+      // TODO: When Issue 368 is resolved, implement here
+      // https://github.com/devosoft/Empirical/issues/368
 
       // When #open_card_header is clicked second time --->
-      //    #open_card_header should not have class collapsed
-      //    #open_card_header should have aria-expanded set to true
-      //    #open_card_body should have class show
+      // describe("Click to expand card", function() {
+      //   const card_head = document.getElementById('open_card_header');
+      //   it('card header should not have class collapsed', function() {
+      //     card_head.click(); // expands card
+      //     chai.assert.isFalse(card_head.classList.contains("collapses"));
+      //   });
+
+      //   it('card header should have aria-expanded set to true', function() {
+      //     chai.assert.equal(card_head.getAttribute('aria-expanded'), 'true');
+      //   });
+
+      //   it('card body should have class show', function() {
+      //     const body = document.getElementById('open_card_body');
+      //     chai.assert.isTrue(body.classList.contains("show"));
+      //   });
+      // });
 
     });
   }
@@ -678,24 +704,65 @@ struct Test_Card_INIT_CLOSED_HTMLLayout : public emp::web::BaseTest {
             chai.assert.isTrue(body.classList.contains("closed_card_collapse"));
           });
 
+          it('should not have class show', function() {
+            chai.assert.isFalse(body.classList.contains("show"));
+          });
+
           it('should have no children', function() {
             chai.assert.equal($("#closed_card_body").children().length, 0);
           });
         });
       });
 
-      // TODO: check DOM after card has been opened and closed
-      // need to figure out siulating click first
-
       // When #closed_card_header is clicked first time --->
-      //    #closed_card_header should not have class collapsed
-      //    #closed_card_header should have aria-expanded set to true
-      //    #closed_card_body should have class show
+      describe("Click to expand card", function() {
+        function sleepFor( sleepDuration ){ // milliseconds
+          var now = new Date().getTime();
+          while(new Date().getTime() < now + sleepDuration){ /* do nothing */ } 
+        }
+
+        const card_head = document.getElementById('closed_card_header');
+        it('card header should not have class collapsed', function() {
+          card_head.click(); // expands card
+          chai.assert.isFalse(card_head.classList.contains("collapsed"));
+        });
+
+        it('card header should have aria-expanded set to true', function() {
+          chai.assert.equal(card_head.getAttribute('aria-expanded'), 'true');
+        });
+
+        // TODO: No matter how long we sleep before checking body has class show,
+        // this check fails. Instead, body has class collapsing.
+        // it('card body should have class show', function() {
+        //   const body = document.getElementById('closed_card_body');
+        //   sleepFor(10000);
+        //   console.log(body.classList);
+        //   chai.assert.isTrue(body.classList.contains("show"));
+        // });
+      });
+
+      // TODO: When Issue 368 is resolved, implement here
+      // https://github.com/devosoft/Empirical/issues/368
 
       // When #closed_card_header is clicked second time --->
-      //    #closed_card_header should have class collapsed
-      //    #closed_card_header should have aria-expanded set to false
-      //    #closed_card_body should not have class show
+      // describe("Click to collapse card", function() {
+      //   const card_head = document.getElementById('closed_card_header');
+
+      //   it('card header should have class collapsed', function() {
+      //     card_head.click(); // collapses card
+      //     chai.assert.isTrue(card_head.classList.contains("collapses"));
+      //   });
+
+      //   it('card header should have aria-expanded set to false', function() {
+      //     chai.assert.equal(card_head.getAttribute('aria-expanded'), 'false');
+      //   });
+
+      //   it('card body should not have class show', function() {
+      //     const body = document.getElementById('closed_card_body');
+      //     chai.assert.isFalse(body.classList.contains("show"));
+      //   });
+      // });
+
     });
   }
 

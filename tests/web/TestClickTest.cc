@@ -16,8 +16,9 @@
  *    the same element multiple time in one test?
  *
  * Goals:
- *  - Be able to trigger a click at a particular point in a test
- *  - Be able to click an element multiple times.
+ *  - Be able to trigger a click at a particular point in a test 
+ *      [can click once when triggered in an it statement]
+ *  - Be able to click an element multiple times. <----------- TODO:
  * 
  * Thoughts:
  *  - Give control back to the browser for click and take it back for tests.
@@ -38,7 +39,7 @@
 
 #include "prefab/Collapse.h"
 
-struct Test_Collapse_Click : emp::web::BaseTest {
+struct Test_Collapse_Click_Initial : emp::web::BaseTest {
 
   // Construct the following HTML structure:
   /**
@@ -51,11 +52,7 @@ struct Test_Collapse_Click : emp::web::BaseTest {
    * </div>
    */
 
-  // variables to pass to javascript
-  std::string class_name;
-  std::vector<std::string> controller1_classes;
-
-  Test_Collapse_Click()
+  Test_Collapse_Click_Initial()
   : BaseTest({"emp_test_container"})
   {
     emp::prefab::CollapseCoupling couple1("Controller 1", "[1] Target Content (set1)", true, "set1");
@@ -66,8 +63,6 @@ struct Test_Collapse_Click : emp::web::BaseTest {
   }
 
   void Describe() override {
-    // Pass vector of controllers to JavaScript
-    emp::pass_array_to_javascript(controller1_classes);
     // Test that the HTML components created in constructor are correct.
     EM_ASM({
 
@@ -93,12 +88,44 @@ struct Test_Collapse_Click : emp::web::BaseTest {
         });
       });
 
+    });
+  }
+};
+
+struct Test_Collapse_One_Click : emp::web::BaseTest {
+
+  // Construct the following HTML structure:
+  /**
+   * <div id="emp_test_container">
+   *
+   * <span aria-controls=".set1" aria-expanded="true" class="collapse_toggle" data-target=".set1" data-toggle="collapse" role="button">Controller 1</span>
+   *
+   * <span class="collapse show , set1">[1] Target Content (set1)</span>
+   *
+   * </div>
+   */
+
+
+
+  Test_Collapse_One_Click()
+  : BaseTest({"emp_test_container"})
+  {
+    emp::prefab::CollapseCoupling couple1("Controller 1", "[1] Target Content (set1)", true, "set1");
+
+    Doc("emp_test_container") << couple1.GetControllerDiv();
+    Doc("emp_test_container") << couple1.GetTargetDiv();
+
+  }
+
+  void Describe() override {
+    // Test that the HTML components created in constructor are correct.
+    EM_ASM({
+
       describe("Controller 1st click, collapse target", function() {
         const controller = document.getElementsByTagName("span")[1];
         const target = document.getElementsByTagName("span")[2];
-        // TODO: Click controller here
-        // controller.click();
-        it('should make the controller have class "collapsed"', function() {
+        it('should make the controller have class "collapsed" after first click', function() {
+          controller.click();
           chai.assert.isTrue(controller.classList.contains("collapsed"));
         });
 
@@ -111,17 +138,72 @@ struct Test_Collapse_Click : emp::web::BaseTest {
         });
       });
 
-      // function sleepFor( sleepDuration ){
-      //     var now = new Date().getTime();
-      //     while(new Date().getTime() < now + sleepDuration){ /* do nothing */ } 
-      // }
+    });
+  }
+};
+
+struct Test_Collapse_Two_Clicks : emp::web::BaseTest {
+
+  // Construct the following HTML structure:
+  /**
+   * <div id="emp_test_container">
+   *
+   * <span aria-controls=".set1" aria-expanded="true" class="collapse_toggle" data-target=".set1" data-toggle="collapse" role="button">Controller 1</span>
+   *
+   * <span class="collapse show , set1">[1] Target Content (set1)</span>
+   *
+   * </div>
+   */
+
+  Test_Collapse_Two_Clicks()
+  : BaseTest({"emp_test_container"})
+  {
+    emp::prefab::CollapseCoupling couple1("Controller 1", "[1] Target Content (set1)", true, "set1");
+
+    Doc("emp_test_container") << couple1.GetControllerDiv();
+    Doc("emp_test_container") << couple1.GetTargetDiv();
+
+  }
+
+  /* TODO: Find a way to click an element multiple times within the same test
+   * https://github.com/devosoft/Empirical/issues/368
+   *
+   * Methods tried (unsuccessful):
+   *  - wait 1 second before clicking the element a second time
+   *  - click element a second time immediately after first click
+   *  - double click element after first click (no time delay)
+   *  - click element twice after first click (1 sec time delay)
+   */
+  void Describe() override {
+    // Test that the HTML components created in constructor are correct.
+    EM_ASM({
+      function sleepFor( sleepDuration ){ // milliseconds
+        var now = new Date().getTime();
+        while(new Date().getTime() < now + sleepDuration){ /* do nothing */ } 
+      }
 
       describe("Controller 2nd click, expand target", function() {
         const controller = document.getElementsByTagName("span")[1];
         const target = document.getElementsByTagName("span")[2];
-        // TODO: Click controller here
+        // sleepFor(1000);
+        // console.log("Second click");
+        // // TODO: Click controller here
         // controller.click();
         it('should make the controller not have class "collapsed"', function() {
+          controller.click(); // first click to collapse target
+
+          // sleepFor(1000);
+          // controller.click();
+
+          // controller.click();
+
+          // controller.click();
+          // controller.click();
+
+          // controller.click();
+          // sleepFor(1000);
+          // controller.click();
+
           chai.assert.isFalse(controller.classList.contains("collapsed"));
         });
 
@@ -143,6 +225,8 @@ int main() {
 
   test_runner.Initialize({"emp_test_container"});
 
-  test_runner.AddTest<Test_Collapse_Click>("Test emp::prefab::Collapse for Click Response");
+  test_runner.AddTest<Test_Collapse_Click_Initial>("Test DOM of original emp::prefab::Collapse element"); // Should pass all
+  test_runner.AddTest<Test_Collapse_One_Click>("Test DOM after 1st click of emp::prefab::Collapse element"); // Should pass all
+  test_runner.AddTest<Test_Collapse_Two_Clicks>("Test DOM after 2nd click of emp::prefab::Collapse element"); // TODO: not working
   test_runner.Run();
 }

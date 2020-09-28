@@ -315,60 +315,65 @@ struct Test_Modal : emp::web::BaseTest {
         });
       });
 
-      /*
-      TODO: Find a way to trigger a click and check the DOM
-      These tests should pass once we find a way to do this
+      
+      // TODO: The describe on line 322 passes all checks, but the entire test
+      //  seems to exit and not execute the remaining describes (lines 335, 350, 363).
 
       describe("Open modal, div#modal, 1st time", function() {
-        $("#modal_trigger").trigger("click");
-        it('should add the class show', function() { // fail [modal]
-          const has_show = $("#modal").hasClass("show");
-          chai.assert.equal(has_show, true);
+        const modal = document.getElementById("modal");
+
+        it('modal should have the class show', function() {
+          document.getElementById("modal_trigger").click(); // open modal
+          chai.assert.isTrue(modal.classList.contains("show"));
         });
-        it('should display block', function() { // fail [undefined]
-          const style = $("#modal").attr("style");
-          chai.assert.equal(style, "display: block;");
+
+        it('modal should have style display: block', function() {
+          chai.assert.equal(modal.getAttribute("style"), "display: block;");
         });
       });
 
       describe("Close modal with x button in header, div#modal", function() {
-        const x_id = document.getElementById("#modal").children[0].children[0].children[0].children[1].id;
-        $("#"+x_id).trigger("click");
-        it('should remove the class show', function() {
-          const classes = $("#modal").attr("class");
-          chai.assert.equal(classes, "modal");
+        const x_close = document.getElementById("#modal").children[0].children[0].children[0].children[1];
+        const modal = document.getElementById("modal");
+
+        it('modal should not have class show', function() {
+          x_close.click();
+          chai.assert.isFalse(modal.classList.contains("show"));
         });
-        it('should display none', function() {
-          const style = $("#modal").attr("style");
-          chai.assert.equal(style, "display: none;");
+
+        it('modal should have style display: none', function() {
+          chai.assert.equal(modal.getAttribute("style"), "display: none;");
         });
       });
 
+      // we may not be able to click this again...
       describe("Open modal, div#modal, 2nd time", function() {
-        $("#modal_trigger").click();
-        it('should add the class show', function() {
-          const classes = $("#modal").attr("class");
-          chai.assert.equal(classes, "modal show");
+        const modal = document.getElementById("modal");
+
+        it('modal should have class show', function() {
+          document.getElementById("modal_trigger").click(); // close modal
+          chai.assert.isTrue(modal.classList.contains("show"));
         });
-        it('should display block', function() {
-          const style = $("#modal").attr("style");
-          chai.assert.equal(style, "display: block;");
+
+        it('modal should have style display: block', function() {
+          chai.assert.equal(modal.getAttribute("style"), "display: block;");
         });
       });
 
       describe("Close modal with close button in footer, div#modal", function() {
-        const close_btn_id = document.getElementById("#modal").children[0].children[0].children[2].children[1].id;
-        $("#"+close_btn_id).click();
-        it('should remove the class show', function() {
-          const classes = $("#modal").attr("class");
-          chai.assert.equal(classes, "modal");
+        const close_btn = document.getElementById("#modal").children[0].children[0].children[2].children[1];
+        const modal = document.getElementById("modal");
+        
+        it('modal should not have class show', function() {
+          close_btn.click();
+          chai.assert.isFalse(modal.classList.contains("show"));
         });
-        it('should display none', function() {
-          const style = $("#modal").attr("style");
-          chai.assert.equal(style, "display: none;");
+
+        it('modal should have style display: none', function() {
+          chai.assert.equal(modal.getAttribute("style"), "display: none;");
         });
       });
-      */
+      
     });
   }
 };
