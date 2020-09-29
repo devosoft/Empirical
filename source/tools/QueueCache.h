@@ -86,6 +86,10 @@
 			/// @return number of elements in the cache
 			size_t Size() const { return cache_list.size(); }
 
+			/// Test if cache has any elements.
+			/// @return true if cache is empty
+			bool Empty() const { return cache_list.size() == 0; }
+
 			/// Return maximum number of elements that will fit in cache.
 			/// @return maximum number of elements that the cache can contain
 			size_t Capacity() const { return capacity; }
