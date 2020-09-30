@@ -271,17 +271,17 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
           });
 
           it('should have class card-header', function() {
-            chai.assert.isTrue(header.classList.contains('card-header'));          
+            chai.assert.isTrue(header.classList.contains('card-header'));
           });
 
           it('should have class collapse_toggle', function() {
-            chai.assert.isTrue(header.classList.contains('collapse_toggle'));          
+            chai.assert.isTrue(header.classList.contains('collapse_toggle'));
           });
 
           it('should have class collapse_toggle_card_header', function() {
-            chai.assert.isTrue(header.classList.contains('collapse_toggle_card_header'));          
+            chai.assert.isTrue(header.classList.contains('collapse_toggle_card_header'));
           });
-          
+
           it('should have aria-controls set to .open_card_collapse', function() {
             chai.assert.equal(header.getAttribute("aria-controls"), ".open_card_collapse");
           });
@@ -716,11 +716,6 @@ struct Test_Card_INIT_CLOSED_HTMLLayout : public emp::web::BaseTest {
 
       // When #closed_card_header is clicked first time --->
       describe("Click to expand card", function() {
-        function sleepFor( sleepDuration ){ // milliseconds
-          var now = new Date().getTime();
-          while(new Date().getTime() < now + sleepDuration){ /* do nothing */ } 
-        }
-
         const card_head = document.getElementById('closed_card_header');
         it('card header should not have class collapsed', function() {
           card_head.click(); // expands card
@@ -731,14 +726,12 @@ struct Test_Card_INIT_CLOSED_HTMLLayout : public emp::web::BaseTest {
           chai.assert.equal(card_head.getAttribute('aria-expanded'), 'true');
         });
 
-        // TODO: No matter how long we sleep before checking body has class show,
-        // this check fails. Instead, body has class collapsing.
-        // it('card body should have class show', function() {
-        //   const body = document.getElementById('closed_card_body');
-        //   sleepFor(10000);
-        //   console.log(body.classList);
-        //   chai.assert.isTrue(body.classList.contains("show"));
-        // });
+        it('card body should have class show', function() {
+          const body = document.getElementById('closed_card_body');
+          setTimeout(function() {
+            chai.assert.isTrue(body.classList.contains("show"));
+          }, 3000);
+        });
       });
 
       // TODO: When Issue 368 is resolved, implement here

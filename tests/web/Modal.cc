@@ -315,7 +315,7 @@ struct Test_Modal : emp::web::BaseTest {
         });
       });
 
-      
+
       // TODO: The describe on line 322 passes all checks, but the entire test
       //  seems to exit and not execute the remaining describes (lines 335, 350, 363).
 
@@ -363,7 +363,7 @@ struct Test_Modal : emp::web::BaseTest {
       describe("Close modal with close button in footer, div#modal", function() {
         const close_btn = document.getElementById("#modal").children[0].children[0].children[2].children[1];
         const modal = document.getElementById("modal");
-        
+
         it('modal should not have class show', function() {
           close_btn.click();
           chai.assert.isFalse(modal.classList.contains("show"));
@@ -373,7 +373,7 @@ struct Test_Modal : emp::web::BaseTest {
           chai.assert.equal(modal.getAttribute("style"), "display: none;");
         });
       });
-      
+
     });
   }
 };

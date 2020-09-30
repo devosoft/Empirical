@@ -256,7 +256,7 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
               });
 
               it('should have a title with class setting_heading', function() {
-                chai.assert.isTrue(card_header.children[1].classList.contains("setting_heading"));
+                chai.assert.isTrue(card_header.children[2].classList.contains("setting_heading"));
               });
             });
 
@@ -315,7 +315,7 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
               });
 
               it('should have a title with class setting_heading', function() {
-                chai.assert.isTrue(card_header.children[1].classList.contains("setting_heading"));
+                chai.assert.isTrue(card_header.children[2].classList.contains("setting_heading"));
               });
             });
 
@@ -375,7 +375,7 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
               });
 
               it('should have a title with class setting_heading', function() {
-                chai.assert.isTrue(card_header.children[1].classList.contains("setting_heading"));
+                chai.assert.isTrue(card_header.children[2].classList.contains("setting_heading"));
               });
             });
 
