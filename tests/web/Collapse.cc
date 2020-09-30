@@ -9,9 +9,9 @@
 #include "base/assert.h"
 #include "web/_MochaTestRunner.h"
 #include "web/Document.h"
-#include "web/Element.h"
 #include "web/web.h"
 #include "web/Div.h"
+#include "web/Button.h"
 #include "web/js_utils.h"
 
 #include "prefab/Collapse.h"
@@ -913,18 +913,253 @@ struct Test_Collapse_Vector : emp::web::BaseTest {
 
   // Construct the following HTML structure:
   /**
+   * <div id="c1" aria-controls=".collapse_id" aria-expanded="true" class="collapse_toggle" data-target=".collapse_id" data-toggle="collapse" role="button">
+   *  <span id="emp__0">controller 1</span>
+   * </div>
+   * <button id="c2" aria-controls=".collapse_id" aria-expanded="true" class="collapse_toggle" data-target=".collapse_id" data-toggle="collapse" onclick="emp.Callback(2)" role="button">
+   *  button controller
+   * </button>
+   *
+   * <div id="t1" class="collapse show , collapse_id">
+   *  <span id="emp__2">target 1</span>
+   * </div>
+   * <div id="t2" class="collapse show , collapse_id">
+   *  <span id="emp__3">target 2</span>
+   * </div>
+   * <div id="t3" class="collapse show , collapse_id">
+   *  <span id="emp__4">target 2</span>
+   * </div>
    */
 
   Test_Collapse_Vector()
   : BaseTest({"emp_test_container"})
   {
+    emp::vector<emp::web::Widget> controllers;
+    emp::vector<emp::web::Widget> targets;
 
+    emp::web::Div c1("c1");
+    emp::web::Button c2([](){}, "button controller", "c2");
+    emp::web::Div t1("t1");
+    emp::web::Div t2("t2");
+    emp::web::Div t3("t3");
+
+    c1 << "controller 1";
+    t1 << "target 1";
+    t2 << "target 2";
+    t3 << "target 2";
+
+    controllers.push_back(c1);
+    controllers.push_back(c2);
+    targets.push_back(t1);
+    targets.push_back(t2);
+    targets.push_back(t3);
+
+    emp::prefab::CollapseCoupling collapsed(controllers, targets, true, "collapse_id");
+    Doc("emp_test_container") << collapsed.GetControllerDiv(0);
+    Doc("emp_test_container") << collapsed.GetControllerDiv(1);
+    Doc("emp_test_container") << collapsed.GetTargetDiv(0);
+    Doc("emp_test_container") << collapsed.GetTargetDiv(1);
+    Doc("emp_test_container") << collapsed.GetTargetDiv(2);
   }
 
   void Describe() override {
     EM_ASM({
 
-    });
+      describe("Initial HTML - Collapse Vector Constructor", function() {
+        const test_container = document.getElementById('emp_test_container');
+        it('should have 5 elements on the page', function() {
+          chai.assert.equal(test_container.childElementCount, 5);
+        });
+
+        describe("Child 1 - Controller 1", function() {
+          const controller = test_container.children[0];
+          it('should have id c1', function() {
+            chai.assert.equal(controller.id, "c1");
+          });
+
+          it('should be a DIV element', function() {
+            chai.assert.equal(controller.nodeName, "DIV");
+          });
+
+          it('should have 1 child', function() {
+            chai.assert.equal(controller.childElementCount, 1);
+          });
+
+          it('should have aria-controls set to collapse_id', function() {
+            chai.assert.equal(controller.getAttribute("aria-controls"), ".collapse_id");
+          });
+
+          it('should have aria-expanded set to true', function() {
+            chai.assert.equal(controller.getAttribute("aria-expanded"), "true");
+          });
+
+          it('should have data-target set to collapse_id', function() {
+            chai.assert.equal(controller.getAttribute("data-target"), ".collapse_id");
+          });
+
+          it('should have data-toggle set to collapse', function() {
+            chai.assert.equal(controller.getAttribute("data-toggle"), "collapse");
+          });
+
+          it('should have role set to button', function() {
+            chai.assert.equal(controller.getAttribute("role"), "button");
+          });
+
+          it('should have class collapse_toggle', function() {
+            chai.assert.isTrue(controller.classList.contains("collapse_toggle"));
+          });
+        });
+
+        describe("Child 2 - Controller 2", function() {
+          const controller = test_container.children[1];
+          it('should have id c2', function() {
+            chai.assert.equal(controller.id, "c2");
+          });
+
+          it('should be a BUTTON element', function() {
+            chai.assert.equal(controller.nodeName, "BUTTON");
+          });
+
+          it('should have no children', function() {
+            chai.assert.equal(controller.childElementCount, 0);
+          });
+
+          it('should have aria-controls set to collapse_id', function() {
+            chai.assert.equal(controller.getAttribute("aria-controls"), ".collapse_id");
+          });
+
+          it('should have aria-expanded set to true', function() {
+            chai.assert.equal(controller.getAttribute("aria-expanded"), "true");
+          });
+
+          it('should have data-target set to collapse_id', function() {
+            chai.assert.equal(controller.getAttribute("data-target"), ".collapse_id");
+          });
+
+          it('should have data-toggle set to collapse', function() {
+            chai.assert.equal(controller.getAttribute("data-toggle"), "collapse");
+          });
+
+          it('should have role set to button', function() {
+            chai.assert.equal(controller.getAttribute("role"), "button");
+          });
+
+          it('should have class collapse_toggle', function() {
+            chai.assert.isTrue(controller.classList.contains("collapse_toggle"));
+          });
+        });
+
+        describe("Child 3 - Target 1", function() {
+          const child = test_container.children[2];
+          it('should have id t1', function() {
+            chai.assert.equal(child.id, "t1");
+          });
+
+          it('should be a DIV element', function() {
+            chai.assert.equal(child.nodeName, "DIV");
+          });
+
+          it('should have 1 child', function() {
+            chai.assert.equal(child.childElementCount, 1);
+          });
+
+          it('should have class collapse_id', function() {
+            chai.assert.isTrue(child.classList.contains("collapse_id"));
+          });
+
+          it('should have class show', function() {
+            chai.assert.isTrue(child.classList.contains("show"));
+          });
+
+          it('should have class collapse', function() {
+            chai.assert.isTrue(child.classList.contains("collapse"));
+          });
+        });
+
+        describe("Child 4 - Target 2", function() {
+          const child = test_container.children[3];
+          it('should have id t2', function() {
+            chai.assert.equal(child.id, "t2");
+          });
+
+          it('should be a DIV element', function() {
+            chai.assert.equal(child.nodeName, "DIV");
+          });
+
+          it('should have 1 child', function() {
+            chai.assert.equal(child.childElementCount, 1);
+          });
+
+          it('should have class collapse_id', function() {
+            chai.assert.isTrue(child.classList.contains("collapse_id"));
+          });
+
+          it('should have class show', function() {
+            chai.assert.isTrue(child.classList.contains("show"));
+          });
+
+          it('should have class collapse', function() {
+            chai.assert.isTrue(child.classList.contains("collapse"));
+          });
+        });
+
+        describe("Child 5 - Target 3", function() {
+          const child = test_container.children[4];
+          it('should have id t3', function() {
+            chai.assert.equal(child.id, "t3");
+          });
+
+          it('should be a DIV element', function() {
+            chai.assert.equal(child.nodeName, "DIV");
+          });
+
+          it('should have 1 child', function() {
+            chai.assert.equal(child.childElementCount, 1);
+          });
+
+          it('should have class collapse_id', function() {
+            chai.assert.isTrue(child.classList.contains("collapse_id"));
+          });
+
+          it('should have class show', function() {
+            chai.assert.isTrue(child.classList.contains("show"));
+          });
+
+          it('should have class collapse', function() {
+            chai.assert.isTrue(child.classList.contains("collapse"));
+          });
+        });
+
+      }); // end initial HTML
+
+      // TODO: Click tests
+      // first click #c1 --->
+      //      #c1 should have class "collapsed" and aria-expaned="false"
+      //      #c2 should have class "collapsed" and aria-expaned="false"
+      //      #t1 should not have class "show"
+      //      #t2 should not have class "show"
+      //      #t3 should not have class "show"
+      // second click #c1 --->
+      //      #c1 should not have class "collapsed" and should have aria-expaned="true"
+      //      #c2 should not have class "collapsed" and should have aria-expaned="true"
+      //      #t1 should have class "show"
+      //      #t2 should have class "show"
+      //      #t3 should have class "show"
+
+      // first click #c2 --->
+      //      #c1 should have class "collapsed" and aria-expaned="false"
+      //      #c2 should have class "collapsed" and aria-expaned="false"
+      //      #t1 should not have class "show"
+      //      #t2 should not have class "show"
+      //      #t3 should not have class "show"
+      // second click #c2 --->
+      //      #c1 should not have class "collapsed" and should have aria-expaned="true"
+      //      #c2 should not have class "collapsed" and should have aria-expaned="true"
+      //      #t1 should have class "show"
+      //      #t2 should have class "show"
+      //      #t3 should have class "show"
+
+    }); // end EM_ASM
   }
 };
 
@@ -1016,11 +1251,11 @@ struct Test_Expand_On_Click : emp::web::BaseTest {
         });
 
         describe("Target", function() {
-          // TODO: Fix timing: No matter how long we sleep before checking target has class show,
-          // this check fails. Instead, target has class collapsing. 
-          // it('should have class show', function() {
-          //   chai.assert.isTrue(target.classList.contains('show'));
-          // });
+          it('should have class show', function() {
+            setTimeout(function() {
+              chai.assert.isTrue(target.classList.contains("show"));
+            }, 3000);
+          });
         });
 
       });
@@ -1075,10 +1310,6 @@ struct Test_Collapse_On_Click : emp::web::BaseTest {
       const controller = document.getElementsByClassName('collapse_toggle')[0];
       const target = document.getElementsByClassName('collapse_id')[0];
 
-      function sleepFor( sleepDuration ){ // milliseconds
-        var now = new Date().getTime();
-        while(new Date().getTime() < now + sleepDuration){ /* do nothing */ } 
-      }
       describe("Initial DOM, Expanded", function() {
 
         describe("Controller", function() {
@@ -1120,11 +1351,11 @@ struct Test_Collapse_On_Click : emp::web::BaseTest {
             chai.assert.isTrue(target.classList.contains('collapse'));
           });
 
-          // TODO: Fix timing
-          // it('should have class show', function() {
-          //   sleepFor(5000);
-          //   chai.assert.isTrue(target.classList.contains('show'));
-          // });
+          it('should have class show', function() {
+            setTimeout(function() {
+              chai.assert.isTrue(target.classList.contains("show"));
+            }, 3000);
+          });
         });
 
       });
@@ -1167,7 +1398,9 @@ struct Test_Collapse_On_Click : emp::web::BaseTest {
 
       //   describe("Target", function() {
       //     it('should have class show', function() {
-      //       chai.assert.isTrue(target.classList.contains('show'));
+      //       setTimeout(function() {
+      //         chai.assert.isTrue(target.classList.contains("show"));
+      //       }, 3000);
       //     });
       //   });
 
@@ -1185,7 +1418,7 @@ int main() {
   test_runner.AddTest<Test_Collapse_String>("Test emp::prefab::Collapse String Constructor");
   test_runner.AddTest<Test_Collapse_Widget>("Test emp::prefab::Collapse Widget Constructor");
 
-  // test_runner.AddTest<Test_Collapse_Vector>("Test emp::prefab::Collapse Vector Constructor"); // TODO: implement
+  test_runner.AddTest<Test_Collapse_Vector>("Test emp::prefab::Collapse Vector Constructor");
   test_runner.AddTest<Test_Expand_On_Click>("Test emp::prefab::Collapse Initially Collapsed");
   test_runner.AddTest<Test_Collapse_On_Click>("Test emp::prefab::Collapse Initially Expanded");
   test_runner.Run();
