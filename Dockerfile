@@ -9,7 +9,9 @@ SHELL ["/bin/bash", "-c"]
 RUN \
   apt-get update -y \
     && \
-  apt-get install -y software-properties-common \
+  apt-get install -y \
+    software-properties-common \
+    apt-show-versions \
     && \
   add-apt-repository -y ppa:ubuntu-toolchain-r/test \
     && \
