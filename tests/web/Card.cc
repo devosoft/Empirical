@@ -184,8 +184,8 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
    * <div id="open" class="card">
    *
    *  <div id="open_card_header" aria-controls=".open_card_collapse" aria-expanded="true" class="card-header , collapse_toggle , collapse_toggle_card_header" data-target=".open_card_collapse" data-toggle="collapse" role="button">
-   *    <span id="emp__3" class="fa fa-angle-double-up , float-right btn-link collapse_toggle setting_heading"></span>
-   *    <span id="emp__4" class="fa fa-angle-double-down , float-right btn-link collapse_toggle setting_heading"></span>
+   *    <span id="emp__3" class="fa fa-angle-double-up , toggle_glyph"></span>
+   *    <span id="emp__4" class="fa fa-angle-double-down , toggle_glyph"></span>
    *    <div id="div_header">
    *      <span id="emp__6">
    *        <h3>init open title</h3>
@@ -331,20 +331,8 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
               chai.assert.isTrue(glyph.classList.contains("fa-angle-double-up"));
             });
 
-            it('should have class float-right', function() {
-              chai.assert.isTrue(glyph.classList.contains("float-right"));
-            });
-
-            it('should have class btn-link', function() {
-              chai.assert.isTrue(glyph.classList.contains("btn-link"));
-            });
-
-            it('should have class collapse_toggle', function() {
-              chai.assert.isTrue(glyph.classList.contains("collapse_toggle"));
-            });
-
-            it('should have class setting_heading', function() {
-              chai.assert.isTrue(glyph.classList.contains("setting_heading"));
+            it('should have class toggle_glyph', function() {
+              chai.assert.isTrue(glyph.classList.contains("toggle_glyph"));
             });
           });
 
@@ -371,20 +359,8 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
               chai.assert.isTrue(glyph.classList.contains("fa-angle-double-down"));
             });
 
-            it('should have class float-right', function() {
-              chai.assert.isTrue(glyph.classList.contains("float-right"));
-            });
-
-            it('should have class btn-link', function() {
-              chai.assert.isTrue(glyph.classList.contains("btn-link"));
-            });
-
-            it('should have class collapse_toggle', function() {
-              chai.assert.isTrue(glyph.classList.contains("collapse_toggle"));
-            });
-
-            it('should have class setting_heading', function() {
-              chai.assert.isTrue(glyph.classList.contains("setting_heading"));
+            it('should have class toggle_glyph', function() {
+              chai.assert.isTrue(glyph.classList.contains("toggle_glyph"));
             });
           });
         });
