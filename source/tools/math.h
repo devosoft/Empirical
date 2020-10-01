@@ -254,9 +254,17 @@ namespace emp {
   /// A fast method for calculating exponents on doubles or integral types.
   /// Uses if constexpr to work around compiler bug in Emscripten (issue #296).
   template<typename T>
-  static constexpr decltype(auto) Pow(
+  static constexpr T Pow(
     T base, typename internal::identity<T>::type exp
   ) {
+    // TODO cpp20, C++20 replace with std::is_constant_evaluated
+    // adapted from https://stackoverflow.com/a/62610143
+    #ifdef __GNUC__ // defined for both GCC and clang
+    // if base is not known at compile time, use std::pow which is faster
+    if ( !__builtin_constant_p( base ) ) return std::pow(base, exp); 
+    // otherwise, use constexpr-friendly implementations
+    else
+    #endif
     if constexpr( std::is_integral<T>::value ){
       return internal::PowIntImpl(base, exp);
     } else return internal::PowDoubleImpl(base, exp);
