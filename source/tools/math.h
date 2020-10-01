@@ -220,7 +220,7 @@ namespace emp {
   static constexpr T PowIntImpl(T base, T p) {
     if (p <= 0) return 1;
     if (p & 1) return base * PowIntImpl(base, p-1); // Odd exponent: strip one mulitple off and recurse.
-    return Square( PowIntImpl(base,p/2) );          // Even exponent: calc for half and square result.
+    return emp::Square( PowIntImpl(base,p/2) );          // Even exponent: calc for half and square result.
   }
   } // namespace internal
 
@@ -241,7 +241,9 @@ namespace emp {
   static constexpr double PowDoubleImpl(double base, double exp) {
     // Normally, convert to a base of 2 and then use Pow2.
     // If base is negative, we don't want to deal with imaginary numbers, so use IntPow.
-    return (base > 0) ? Pow2(Log2(base) * exp) : IntPow(base,exp);
+    return (base > 0)
+      ? emp::Pow2(emp::Log2(base) * exp)
+      : emp::IntPow(base,exp);
   }
 
   // adapted from https://stackoverflow.com/a/30836042
