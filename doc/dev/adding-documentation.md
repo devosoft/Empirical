@@ -30,7 +30,7 @@ add either an extra \* or /, depending on the kind of comment:
     across several lines
 
     This comment will be associated with the function immediately following.
-    */
+    **/
     void somefunc(sometype param)
     {
 
