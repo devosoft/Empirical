@@ -31,7 +31,7 @@ for how elements of your web page should look.
 
 This example assumes the following file structure:
 
-![Directory structure for this example](images/d3_file_tree.png){.align-center}
+![Directory structure for this example](../../images/d3_file_tree.png){.align-center}
 
 Here are the basics of what you need in order to get up and running. The
 easiest way to make a visualization is to use one of the pre-built
@@ -44,7 +44,7 @@ C++ File
 The C++ file that you\'ll compile to Javascript. For this example,
 we\'ll use the Empirical web module to build the whole web page:
 
-``` {.c++}
+``` cpp
 // Always include web_init.h when you're doing web stuff -
 // it makes sure everything gets initialized right
 #include "../Empirical/web/web_init.h"
@@ -81,7 +81,7 @@ int main {
 
 Now we need to compile it:
 
-``` {.bash}
+``` bash
 emcc my_program.cc -o my_program.js \ #.js extension tells Emscripten to compile to Javascript
      --js-library ../Empirical/web/library_emp.js    \ #Include the Empirical Javascript library
      --js-library ../Empirical/web/d3/library_d3.js  \ #Include Javascript library for D3 wrapper
@@ -100,7 +100,7 @@ HTML File
 To tell the browser what to do with your Javascript, you need an html
 file:
 
-``` {.html}
+``` html
 <!-- This is an html comment -->
 <!DOCTYPE html>
 <html>
@@ -143,7 +143,7 @@ want them to. Here\'s one that includes the necessary styles to make
 tooltips work (the html file above assumes it\'s called
 style\_sheet.css, and is in the same directory as the html file):
 
-``` {.css}
+``` css
 .d3-tip {
   line-height: 1;
   font-weight: bold;
@@ -184,19 +184,19 @@ The easiest way around this is with the Python simpleHTTPServer library.
 If you\'re using Python 2.x, run the following command from the
 directory containing your html file:
 
-``` {.bash}
+``` bash
 python -m SimpleHTTPServer
 ```
 
-![Using SimpleHTTPServer with Python2](images/SimpleHTTPServer.png){.align-center}
+![Using SimpleHTTPServer with Python2](../../images/SimpleHTTPServer.png){.align-center}
 
 If you\'re running Python 3.x, use this command instead:
 
-``` {.bash}
+``` bash
 python -m http.server
 ```
 
-![Using SimpleHTTPServer with Python3](images/python3HTTPserver.png){.align-center}
+![Using SimpleHTTPServer with Python3](../../images/python3HTTPserver.png){.align-center}
 
 You can now open a browser to the server (<http://localhost:8000>,
 replacing 8000 with whatever number was after \"port\" in the output
@@ -233,7 +233,7 @@ to make interactive visualizations that run on the web.
 When your browser loads a website, it takes the html for that page and
 turns it into a tree:
 
-![The tree your browser builds from an html file](images/DOM.png){.align-center}
+![The tree your browser builds from an html file](../../images/DOM.png){.align-center}
 
 This tree is called the Document Object Model (DOM) and every set of
 tags (things in angle brackets, like \<head\>\</head\>) in the html is
@@ -241,7 +241,7 @@ an element in it. Elements that are nested inside other elements are
 represented as children of those elements in the tree. For instance, the
 tree pictured above is representing the following html:
 
-``` {.html}
+``` html
 <!DOCTYPE html>
 <html>
   <head>
@@ -269,7 +269,7 @@ Selections
 role="ref"} are a way to work with groups of DOM elements. For instance,
 let\'s say we have this html file:
 
-``` {.html}
+``` html
 <!DOCTYPE html>
 <html>
 
@@ -313,14 +313,14 @@ their radii (r).
 If we want to operate on the circles, we can create a selection object
 that contains them:
 
-``` {.c++}
+``` cpp
 //s is a container that contains both circle elements in the DOM
 D3::Selection s = D3::SelectAll("circle");
 ```
 
 We can then do things to all of the circles, like turn them purple:
 
-``` {.c++}
+``` cpp
 // Set the "fill" style of everything in the s selection
 // to "purple". "fill" is the color of the inside of a shape
 // We'll talk more about modifying shapes a bit later
@@ -332,7 +332,7 @@ want to affect? We can select an element with a specific id using the
 \"\#\", and then take a sub-selection by calling the
 [SelectAll]{.title-ref} method on it:
 
-``` {.c++}
+``` cpp
 // Select will create a selection containing the first matching
 // element, whereas SelectAll creates a selection containing
 // all matching elements
@@ -351,7 +351,7 @@ because you to visualize it with SVG elements. So, usually the selection
 that we\'re binding data to is a selection of some type of SVG element
 on an SVG canvas. Something like this:
 
-``` {.c++}
+``` cpp
 // Here we're using D3 to add the svg canvas to the document.
 // We could also have Selected a pre-existing svg canvas that
 // we put in the html, as we did in previous examples.
@@ -372,7 +372,7 @@ with the [selection.enter()]{.title-ref} method. Most commonly, we use
 the enter selection to append elements for every data point. Here\'s
 what that all looks like together:
 
-``` {.c++}
+``` cpp
 // Create example data
 emp::vector<int> data = {1,2,3,4,5};
 
@@ -401,7 +401,7 @@ going to pass it three arguements, so you should write your C++ function
 to accept three parameters, or your compiler will probably throw a
 tantrum:
 
-``` {.c++}
+``` cpp
 // For now, we're going to use the simplest calllback function
 // possible: one that returns exactly the data value that it
 // was given.
@@ -422,7 +422,7 @@ Now we have 5 circles, with the numbers from 1-5 bound to them as data
 
 What if we get more data?
 
-``` {.c++}
+``` cpp
 // Change data
 data = {1, 2, 3, 4, 5, 6, 7};
 
@@ -450,7 +450,7 @@ selection\". In the same way the enter selection contains all of the
 data points without circles, the exit selection contains all of the
 circles without data points. Usually we want to remove them:
 
-``` {.c++}
+``` cpp
 // Change data
 data = {1,2,3,4};
 
@@ -481,7 +481,7 @@ points associated with circles that already existed before the data was
 bound. We can use it to re-set the circles\' attributes, based on the
 new data:
 
-``` {.c++}
+``` cpp
 // Change data
 data = {10, 11, 12, 13};
 
@@ -511,7 +511,7 @@ the string returned by running the function on the data point matches
 the string returned by running the function on the data bound to the
 element.
 
-``` {.c++}
+``` cpp
 // Change data (re-arrange three elements and replace the fourth)
 data = {13, 12, 11, 8}
 
@@ -614,7 +614,7 @@ transitions, because there isn\'t a clear way to animate them.
 For instance, here\'s an example of animating a circle moving across the
 screen and gradually changing color from black (default) to blue:
 
-``` {.c++}
+``` cpp
 // Add an svg canvas to the body and set its width to 100 pixels
 D3::Selection svg = D3::Select("body").Append("svg")
                                       .SetAttr("width", 100);
@@ -661,7 +661,7 @@ For example, lets say we have data ranging from 0 to 1 and we want to
 convert it to coordinates on our screen from 0 to 100. We can make a
 scale to do it:
 
-``` {.c++}
+``` cpp
 // Make a scale. We'll use a LinearScale, but you could also use
 // an IdentityScale, LogScale, or PowScale
 D3::LinearScale y_scale = D3::LinearScale();
@@ -715,7 +715,7 @@ know what the original data values were, now? With an
 `axis <Axes_API>`{.interpreted-text role="ref"} object! Axes are a way
 of creating a visual representation of a scale:
 
-``` {.c++}
+``` cpp
 // Make an axis object, templated off of
 // the type of scale we're depicting
 // We pass the constructor a string to tell it
@@ -779,7 +779,7 @@ into d3 methods:
     object](http://en.cppreference.com/w/cpp/utility/functional/function)
     and pass it into the d3 method.
 
-``` {.c++}
+``` cpp
 int times_two(int d, int i, int j) {return d*2;};
 
 int main() {
@@ -811,7 +811,7 @@ int main() {
     one that you defined globally on the current webpage, or a d3
     built-in function).
 
-``` {.c++}
+``` cpp
 // For instance, if we wanted to sort our selection from
 // the previous example, we could use d3's built-in
 // "ascending" function:
@@ -823,7 +823,7 @@ s.sort("ascending");
     the two previous approaches, using Empirical\'s
     `JSWrap <JSWrap>`{.interpreted-text role="ref"} function.
 
-``` {.c++}
+``` cpp
 // Creates a function in Javascript called "times_two"
 // that calls times_two
 emp::JSWrap(times_two, "times_two");
@@ -835,7 +835,7 @@ s.SetAttr("r", "times_two");
 -   Advanced users may also wish to write functions directly in
     Javascript, which is possible using Emscripten\'s macros.
 
-``` {.c++}
+``` cpp
 // Put the function in global scope by adding it
 // to the current window
 EM_ASM({window["times_two"] = function(d, i, j){return d*2;};});
@@ -856,7 +856,7 @@ feature called
 role="ref"} provide a convenient way to do that, which JSWrap
 understands.
 
-``` {.c++}
+``` cpp
 struct JSONData {
   EMP_BUILD_INTROSPECTIVE_TUPLE( int, x,
                                  int, y,
