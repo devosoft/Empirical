@@ -214,13 +214,15 @@ namespace emp {
     }
   }
 
+  namespace internal {
   /// A fast (O(log p)) integral-power command.
   template <typename T>
-  static constexpr type_if<T, std::is_integral> Pow(T base, T p) {
+  static constexpr T PowIntImpl(T base, T p) {
     if (p <= 0) return 1;
-    if (p & 1) return base * Pow(base, p-1); // Odd exponent: strip one mulitple off and recurse.
-    return Square( Pow(base,p/2) );          // Even exponent: calc for half and square result.
+    if (p & 1) return base * PowIntImpl(base, p-1); // Odd exponent: strip one mulitple off and recurse.
+    return Square( PowIntImpl(base,p/2) );          // Even exponent: calc for half and square result.
   }
+  } // namespace internal
 
   /// A fast 2^x command.
   static constexpr double Pow2(double exp) {
@@ -234,11 +236,30 @@ namespace emp {
     return exp < 1 ? 1 : (base * IntPow(base, exp-1));
   }
 
+  namespace internal {
   /// A fast method for calculating exponents on doubles.
-  static constexpr double Pow(double base, double exp) {
+  static constexpr double PowDoubleImpl(double base, double exp) {
     // Normally, convert to a base of 2 and then use Pow2.
     // If base is negative, we don't want to deal with imaginary numbers, so use IntPow.
     return (base > 0) ? Pow2(Log2(base) * exp) : IntPow(base,exp);
+  }
+
+  // adapted from https://stackoverflow.com/a/30836042
+  // prevents argument from being used for type deduction
+  template <typename T> struct identity { typedef T type; };
+
+  } // namespace internal
+
+
+  /// A fast method for calculating exponents on doubles or integral types.
+  /// Uses if constexpr to work around compiler bug in Emscripten (issue #296).
+  template<typename T>
+  static constexpr decltype(auto) Pow(
+    T base, typename internal::identity<T>::type exp
+  ) {
+    if constexpr( std::is_integral<T>::value ){
+      return internal::PowIntImpl(base, exp);
+    } else return internal::PowDoubleImpl(base, exp);
   }
 
   // A fast (O(log p)) integer-power command.
