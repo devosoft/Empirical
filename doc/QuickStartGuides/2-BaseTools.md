@@ -1,26 +1,24 @@
-Base Tools
-==========
+# Base Tools
 
 A handful of tools are available in the source/base/ folder in
 Empirical. These mimic basic functionality available in C++ or the
 standard library, but provide extra protection against common memory use
 errors and additional information to the developer.
 
-base/assert.h
--------------
+## base/assert.h
 
 This file adds an `emp_assert` macro that can handle all of the same
 functionality as the standard library assert, but with additional
 features. Specifically, additional arguments may be added that are
 printed when the assert is triggered. For example, the line
 
-``` {.C++}
+```cpp
 emp_assert(i < 10, i);
 ```
 
 if triggered, would print something to the effect of
 
-``` {.bash}
+```shell
 Assert Error (In assert.cc line 6): i < 10
 i: [1844674]
 Abort
@@ -36,8 +34,7 @@ compiled using the `NDEBUG` option (for most compilers, this
 deactivation is accomplished by using the `-DNDEBUG` flag at compile
 time.)
 
-base/array.h and base/vector.h
-------------------------------
+## base/array.h and base/vector.h
 
 These files setup the `emp::array<...>` and `emp::vector<...>` template
 objects, which behave almost identically to `std::array<...>` and
@@ -46,8 +43,7 @@ bounds checking when they are indexed into or specific size matters. As
 with asserts, these additional bounds checks are removed when compiled
 with the `NDEBUG` option.
 
-base/Ptr.h
-----------
+## base/Ptr.h
 
 The `emp::Ptr<...>` template provides an alternate method of building
 pointers, but with the ability to turn on additional debugging
@@ -65,7 +61,7 @@ all operator. Differences include:
 
 -   Rather than using `new TYPE` to allocate a new pointer, use
     `emp::NewPtr<TYPE>`
--   If allocating an array, use :code\`:emp::NewArrayPtr\<TYPE\>(SIZE)\`
+-   If allocating an array, use `emp::NewArrayPtr<TYPE>(SIZE)`
 -   To delete use the `.Delete()` or `.DeleteArray()` member function
     (not `delete` or `delete[]`).
 -   To cast one `Ptr` type to another, use the `.Cast<TYPE>` member

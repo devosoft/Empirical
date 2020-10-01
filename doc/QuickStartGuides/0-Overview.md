@@ -1,5 +1,4 @@
-Overview
-========
+# Overview
 
 The goal of Empirical is to simplify the development of efficient,
 reliable, and accessible scientific software.
@@ -11,5 +10,5 @@ Getting started: - Using specific header files is simple, just
 `Empirical/source/` folder to the include directories for your C++
 compiler (usually with the `-I` option). - To use the web features in
 Empirical, you must first install the emscripten compiler, which can be
-slightly more complicated. \* Our [Hello World Guide](1-HelloWorld.html)
+slightly more complicated. \* Our [Hello World Guide](1-HelloWorld)
 will help you get compiling with Empirical, natively and for web.
