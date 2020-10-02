@@ -138,6 +138,11 @@ RUN \
   echo "finalized set up dependency versions"
 
 RUN \
+  pip3 install -r /opt/Empirical/doc/requirements.txt \
+    && \
+  echo "installed documentation build requirements"
+
+RUN \
   cd /opt/Empirical \
     && \
   git submodule deinit -f . \
