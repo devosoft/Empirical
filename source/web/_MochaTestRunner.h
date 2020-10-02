@@ -21,9 +21,9 @@
 #include <unordered_map>
 
 #include "Document.h"
-#include "control/Signal.h"
-#include "base/vector.h"
-#include "web/JSWrap.h"
+#include "../control/Signal.h"
+#include "../base/vector.h"
+#include "../web/JSWrap.h"
 #include "../../tests2/unit_tests.h"
 
 namespace emp {

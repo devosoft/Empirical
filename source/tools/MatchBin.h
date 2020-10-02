@@ -34,6 +34,7 @@
 #include <atomic>
 
 #include "../base/assert.h"
+#include "../base/optional.h"
 #include "../base/vector.h"
 #include "../tools/IndexMap.h"
 #include "../tools/BitSet.h"
@@ -72,7 +73,7 @@ namespace emp::internal {
     struct LogEntry {
       query_t query;
       // when a match results in no tags, this is a std::nullopt, and we write an empty string
-      std::optional<tag_t> maybe_tag;
+      emp::optional<tag_t> maybe_tag;
       std::string buffer;
 
       operator size_t() const { return emp::CombineHash(query, maybe_tag, buffer); }
@@ -564,7 +565,7 @@ namespace emp {
         if (cache.IsAvailable() && cache.IsActivated()) {
           // try cache lookup first
           if (cache.CountRegulated(query)) {
-            const auto res = cache.GetRegulated(query)(n); /* std::optional */
+            const auto res = cache.GetRegulated(query)(n); /* emp::optional */
             if (res) return res.value();
           }
 
@@ -624,7 +625,7 @@ namespace emp {
         if (cache.IsAvailable() && cache.IsActivated()) {
           // try cache lookup first
           if (cache.CountRaw(query)) {
-            const auto res = cache.GetRaw(query)(n); /* std::optional */
+            const auto res = cache.GetRaw(query)(n); /* emp::optional */
             if (res) return res.value();
           }
           auto cacheResult = makeResult();

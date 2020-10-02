@@ -26,14 +26,14 @@
 #include <utility>
 #include <limits>
 
-#include "tools/Distribution.h"
-
 #include "../base/assert.h"
 #include "../base/array.h"
+#include "../base/optional.h"
 #include "../base/vector.h"
 #include "../tools/math.h"
 #include "../tools/IndexMap.h"
 #include "../tools/BitSet.h"
+#include "../tools/Distribution.h"
 #include "../tools/string_utils.h"
 #include "../tools/hash_utils.h"
 
@@ -42,7 +42,7 @@ namespace emp {
   struct CacheStateBase {
     CacheStateBase() = default;
     virtual ~CacheStateBase() {};
-    virtual std::optional<emp::vector<size_t>> operator()(size_t n) = 0;
+    virtual emp::optional<emp::vector<size_t>> operator()(size_t n) = 0;
   };
 
   struct RouletteCacheState : public CacheStateBase {
@@ -63,14 +63,14 @@ namespace emp {
       , default_n(default_n_)
     { ; }
 
-    std::optional<emp::vector<size_t>> operator()(size_t n) override {
+    emp::optional<emp::vector<size_t>> operator()(size_t n) override {
 
       if (n == std::numeric_limits<size_t>::max()) n = default_n;
 
       // don't perform a lookup into an empty IndexMap, that's a segfault
       // double braces: an empty vector inside an optional
       if (indexMap.GetSize() == 0) {
-        return std::optional<emp::vector<size_t>>{emp::vector<size_t>{}};
+        return emp::optional<emp::vector<size_t>>{emp::vector<size_t>{}};
       }
 
       emp::vector<size_t> res;
@@ -110,7 +110,7 @@ namespace emp {
       , default_n(default_n_)
     { emp_assert(uids.size() == probs.size()); }
 
-    std::optional<emp::vector<size_t>> operator()(size_t n) override {
+    emp::optional<emp::vector<size_t>> operator()(size_t n) override {
 
       if (n == std::numeric_limits<size_t>::max()) n = default_n;
 
@@ -147,7 +147,7 @@ namespace emp {
       , default_n(default_n_)
     { ; }
 
-    std::optional<emp::vector<size_t>> operator()(size_t n) override {
+    emp::optional<emp::vector<size_t>> operator()(size_t n) override {
       if (n == std::numeric_limits<size_t>::max()) n = default_n;
 
       if (n > requestSize) return std::nullopt;
@@ -179,6 +179,8 @@ namespace emp {
     size_t DefaultN = 1
   >
   struct RankedSelector : public SelectorBase<RankedCacheState> {
+
+    RankedSelector() = default;
 
     RankedSelector(emp::Random&){ ; }
 
