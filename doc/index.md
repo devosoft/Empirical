@@ -1,14 +1,11 @@
-Empirical \-- A library of tools for scientific software development
-====================================================================
+# Empirical -- A library of tools for scientific software development
 
-Authors
-
-:   Charles Ofria, Emily Dolson, Alex Lalejini, Jacob Fenton, Matthew
-    Andres Moreno
-
-GitHub
-
-:   <https://github.com/devosoft/Empirical>
+% MyST does not yet have support for field lists, so we need to use rST here
+% see https://github.com/executablebooks/MyST-Parser/issues/163
+```{eval-rst}
+:Authors: Charles Ofria, Emily Dolson, Alex Lalejini, Jacob Fenton, Matthew Andres Moreno
+:GitHub: https://github.com/devosoft/Empirical
+```
 
 Empirical is a library of tools for scientific software development with
 an emphasis on being able to build web interfaces using Mozilla\'s
@@ -24,15 +21,27 @@ Empirical library into their own projects.
 
 Contents:
 
-::: {.toctree caption="Using Empirical" maxdepth="2"}
-BuiltWithEmpiricalGallery/index QuickStartGuides/index library/base/base
-library/data/data library/web/web library/tools/tools Full
-Class/Namespace Hierarchy \<../\_build/html/index.html\#http://\>
-:::
+```{toctree}
+:caption: Using Empirical
+:maxdepth: 2
 
-::: {.toctree caption="Contributing"}
-dev/getting-started dev/contribution-guidelines-and-review
-dev/adding-documentation dev/guide-to-testing
-:::
+BuiltWithEmpiricalGallery/index
+QuickStartGuides/index
+library/index
+api/library_root
 
-`genindex`{.interpreted-text role="ref"}
+```
+
+```{toctree}
+:caption: Contributing to Empirical
+:maxdepth: 0
+
+dev/getting-started
+dev/contribution-guidelines-and-review
+dev/adding-documentation
+dev/guide-to-testing
+```
+
+
+
+{ref}`genindex`
