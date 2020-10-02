@@ -125,7 +125,7 @@ struct Test_Collapse_One_Click : emp::web::BaseTest {
         const controller = document.getElementsByTagName("span")[1];
         const target = document.getElementsByTagName("span")[2];
         it('should make the controller have class "collapsed" after first click', function() {
-          controller.click();
+          controller.click(); // click to collapse
           chai.assert.isTrue(controller.classList.contains("collapsed"));
         });
 
@@ -165,7 +165,7 @@ struct Test_Collapse_Two_Clicks : emp::web::BaseTest {
 
   }
 
-  /* TODO: Find a way to click an element multiple times within the same test
+  /* TODO: Test successfully clicks multiple times, but to efficient
    * https://github.com/devosoft/Empirical/issues/368
    *
    * Methods tried (unsuccessful):
@@ -173,51 +173,47 @@ struct Test_Collapse_Two_Clicks : emp::web::BaseTest {
    *  - click element a second time immediately after first click
    *  - double click element after first click (no time delay)
    *  - click element twice after first click (1 sec time delay)
+   *  - put whole describe in setTimeout()
+   *  - put whole it or multile it statements in setTimeout()
    */
   void Describe() override {
     // Test that the HTML components created in constructor are correct.
     EM_ASM({
-      function sleepFor( sleepDuration ){ // milliseconds
-        var now = new Date().getTime();
-        while(new Date().getTime() < now + sleepDuration){ /* do nothing */ }
-      }
 
-      describe("Controller 2nd click, expand target", function() {
-        const controller = document.getElementsByTagName("span")[1];
-        const target = document.getElementsByTagName("span")[2];
-        // sleepFor(1000);
-        // console.log("Second click");
-        // // TODO: Click controller here
-        // controller.click();
-        it('should make the controller not have class "collapsed"', function() {
-          controller.click(); // first click to collapse target
+        describe("Controller 2nd click, expand target", function() {
+          const controller = document.getElementsByTagName("span")[1];
+          const target = document.getElementsByTagName("span")[2];
 
-          // sleepFor(1000);
-          // controller.click();
+          it('should make the controller not have class "collapsed"', function() {
+            controller.click();
 
-          // controller.click();
+            setTimeout(function() {
+              controller.click();
+            }, 1000);
 
-          // controller.click();
-          // controller.click();
+            setTimeout(function() {
+              chai.assert.isFalse(controller.classList.contains("collapsed"));
+            }, 1000);
+          });
 
-          // controller.click();
-          // sleepFor(1000);
-          // controller.click();
+          it('should make the controller have aria-expanded = true', function() {
+            setTimeout(function() {
+              chai.assert.equal(controller.getAttribute("aria-expanded"), "true");
+            }, 1000);
+          });
 
-          chai.assert.isFalse(controller.classList.contains("collapsed"));
-        });
-
-        it('should make the controller have aria-expanded = true', function() {
-          chai.assert.equal(controller.getAttribute("aria-expanded"), "true");
-        });
-
-        it('should cause the target to have the class "show"', function() {
-          chai.assert.isTrue(target.classList.contains("show"));
-        });
+          it('should cause the target to have the class "show"', function() {
+            setTimeout(function() {
+              chai.assert.isTrue(target.classList.contains("show"));
+            }, 1000);
+          });
+        
       });
+      
     });
   }
 };
+
 
 struct Test_show_timing : emp::web::BaseTest {
 
@@ -274,9 +270,9 @@ int main() {
 
   test_runner.Initialize({"emp_test_container"});
 
-  // test_runner.AddTest<Test_Collapse_Click_Initial>("Test DOM of original emp::prefab::Collapse element"); // Should pass all
-  // test_runner.AddTest<Test_Collapse_One_Click>("Test DOM after 1st click of emp::prefab::Collapse element"); // Should pass all
-  // test_runner.AddTest<Test_Collapse_Two_Clicks>("Test DOM after 2nd click of emp::prefab::Collapse element"); // TODO: not working
-  test_runner.AddTest<Test_show_timing>("Test existance of class show after expanding");
+  test_runner.AddTest<Test_Collapse_Click_Initial>("Test DOM of original emp::prefab::Collapse element"); // Passes
+  test_runner.AddTest<Test_Collapse_One_Click>("Test DOM after 1st click of emp::prefab::Collapse element"); // Passes
+  test_runner.AddTest<Test_Collapse_Two_Clicks>("Test DOM after 2nd click of emp::prefab::Collapse element"); // Passes, but not efficient
+  test_runner.AddTest<Test_show_timing>("Test existance of class show after expanding"); // Passes
   test_runner.Run();
 }
