@@ -1,329 +1,330 @@
-Other Tools
-===========
+# Other Tools
 
-Alert
------
+## Alert
 
-::: {.doxygenfile project="Empirical"}
-tools/alert.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/alert.h
+  :project: Empirical
+```
 
-BitMatrix
----------
+## BitMatrix
 
-::: {.doxygenfile project="Empirical"}
-tools/BitMatrix.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/BitMatrix.h
+  :project: Empirical
+```
 
-BitSet
-------
+## BitSet
 
-::: {.doxygenfile project="Empirical"}
-tools/BitSet.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/BitSet.h
+  :project: Empirical
+```
 
-BitSet Utilities
-----------------
+## BitSet Utilities
 
-::: {.doxygenfile project="Empirical"}
-tools/bitset\_utils.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/bitset\_utils.h
+  :project: Empirical
+```
 
-BitVector
----------
+## BitVector
 
-::: {.doxygenfile project="Empirical"}
-tools/BitVector.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/BitVector.h
+  :project: Empirical
+```
 
-Cache
------
+## Cache
 
-::: {.doxygenfile project="Empirical"}
-tools/Cache.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/Cache.h
+  :project: Empirical
+```
 
-Combinations
-------------
+## Combinations
 
-::: {.doxygenfile project="Empirical"}
-tools/combos.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/combos.h
+  :project: Empirical
+```
 
-Constants
----------
+## Constants
 
-::: {.doxygenfile project="Empirical"}
-tools/const.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/const.h
+  :project: Empirical
+```
 
-Debugging Tools
----------------
+## Debugging Tools
 
-::: {.doxygenfile project="Empirical"}
-tools/debug.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/debug.h
+  :project: Empirical
+```
 
-Deterministic Finite Automata
------------------------------
+## Deterministic Finite Automata
 
-::: {.doxygenfile project="Empirical"}
-tools/DFA.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/DFA.h
+  :project: Empirical
+```
 
 Dynamic Strings \~\~\~\~\~\~
 
-::: {.doxygenfile project="Empirical"}
-tools/DynamicString.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/DynamicString.h
+  :project: Empirical
+```
 
-Errors
-------
+## Errors
 
-::: {.doxygenfile project="Empirical"}
-tools/errors.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/errors.h
+  :project: Empirical
+```
 
-In-memory Files
----------------
+## Inmemory Files
 
-::: {.doxygenfile project="Empirical"}
-tools/File.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/File.h
+  :project: Empirical
+```
 
-Flex Functions
---------------
+## Flex Functions
 
-::: {.doxygenfile project="Empirical"}
-tools/flex\_function.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/flex\_function.h
+  :project: Empirical
+```
 
-Functions
----------
+## Functions
 
-::: {.doxygenfile project="Empirical"}
-tools/functions.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/functions.h
+  :project: Empirical
+```
 
-Function Sets
--------------
+## Function Sets
 
-::: {.doxygenfile project="Empirical"}
-tools/FunctionSet.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/FunctionSet.h
+  :project: Empirical
+```
 
-Generic Functions
------------------
+## Generic Functions
 
-::: {.doxygenfile project="Empirical"}
-tools/GenericFunctions.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/GenericFunctions.h
+  :project: Empirical
+```
 
-Graph Utilities
----------------
+## Graph Utilities
 
-::: {.doxygenfile project="Empirical"}
-tools/graph\_utils.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/graph\_utils.h
+  :project: Empirical
+```
 
-Graphs
-------
+## Graphs
 
-::: {.doxygenfile project="Empirical"}
-tools/Graph.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/Graph.h
+  :project: Empirical
+```
 
-Grids
------
+## Grids
 
-::: {.doxygenfile project="Empirical"}
-tools/grid.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/grid.h
+  :project: Empirical
+```
 
-Index Map
----------
+## Index Map
 
-::: {.doxygenfile project="Empirical"}
-tools/IndexMap.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/IndexMap.h
+  :project: Empirical
+```
 
-Information Theory Tools
-------------------------
+## Information Theory Tools
 
-::: {.doxygenfile project="Empirical"}
-tools/info\_theory.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/info\_theory.h
+  :project: Empirical
+```
 
-Lexer Utilities
----------------
+## Lexer Utilities
 
-::: {.doxygenfile project="Empirical"}
-tools/lexer\_utils.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/lexer\_utils.h
+  :project: Empirical
+```
 
-Lexer
------
+## Lexer
 
-::: {.doxygenfile project="Empirical"}
-tools/Lexer.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/Lexer.h
+  :project: Empirical
+```
 
-Map Utilities
--------------
+## Map Utilities
 
-::: {.doxygenfile project="Empirical"}
-tools/map\_utils.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/map\_utils.h
+  :project: Empirical
+```
 
-Math
-----
+## Math
 
-::: {.doxygenfile project="Empirical"}
-tools/math.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/math.h
+  :project: Empirical
+```
 
-Memory Tracking
----------------
+## Memory Tracking
 
-::: {.doxygenfile project="Empirical"}
-tools/mem\_track.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/mem\_track.h
+  :project: Empirical
+```
 
-Memoized Functions
-------------------
+## Memoized Functions
 
-::: {.doxygenfile project="Empirical"}
-tools/memo\_functions.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/memo\_functions.h
+  :project: Empirical
+```
 
-Non-Deterministic Finite Automata
----------------------------------
+## NonDeterministic Finite Automata
 
-::: {.doxygenfile project="Empirical"}
-tools/NFA.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/NFA.h
+  :project: Empirical
+```
 
-Parser
-------
+## Parser
 
-::: {.doxygenfile project="Empirical"}
-tools/Parser.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/Parser.h
+  :project: Empirical
+```
 
-Random-Access Set
------------------
+## RandomAccess Set
 
-::: {.doxygenfile project="Empirical"}
-tools/ra\_set.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/ra\_set.h
+  :project: Empirical
+```
 
-Randomness Utilites
--------------------
+## Randomness Utilites
 
-::: {.doxygenfile project="Empirical"}
-tools/random\_utils.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/random\_utils.h
+  :project: Empirical
+```
 
 Random Number Generator \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~
 
-::: {.doxygenfile project="Empirical"}
-tools/Random.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/Random.h
+  :project: Empirical
+```
 
-Range
------
+## Range
 
-::: {.doxygenfile project="Empirical"}
-tools/Range.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/Range.h
+  :project: Empirical
+```
 
-Regular Expressions
--------------------
+## Regular Expressions
 
-::: {.doxygenfile project="Empirical"}
-tools/RegEx.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/RegEx.h
+  :project: Empirical
+```
 
-Sequence Utilities
-------------------
+## Sequence Utilities
 
-::: {.doxygenfile project="Empirical"}
-tools/sequence\_utils.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/sequence\_utils.h
+  :project: Empirical
+```
 
-Serialization Macros
---------------------
+## Serialization Macros
 
-::: {.doxygenfile project="Empirical"}
-tools/serialize\_macros.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/serialize\_macros.h
+  :project: Empirical
+```
 
-Serialization Tools
--------------------
+## Serialization Tools
 
-::: {.doxygenfile project="Empirical"}
-tools/serialize.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/serialize.h
+  :project: Empirical
+```
 
-Set Utilities
--------------
+## Set Utilities
 
-::: {.doxygenfile project="Empirical"}
-tools/set\_utils.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/set\_utils.h
+  :project: Empirical
+```
 
-Branch and Bound Solution States
---------------------------------
+## Branch and Bound Solution States
 
-::: {.doxygenfile project="Empirical"}
-tools/SolveState.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/SolveState.h
+  :project: Empirical
+```
 
-Statistics Tools
-----------------
+## Statistics Tools
 
-::: {.doxygenfile project="Empirical"}
-tools/stats.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/stats.h
+  :project: Empirical
+```
 
-String Utilities
-----------------
+## String Utilities
 
-::: {.doxygenfile project="Empirical"}
-tools/string\_utils.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/string\_utils.h
+  :project: Empirical
+```
 
-Tuple Struct
-------------
+## Tuple Struct
 
-::: {.doxygenfile project="Empirical"}
-tools/tuple\_struct.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/tuple\_struct.h
+  :project: Empirical
+```
 
-Tuple Utilities
----------------
+## Tuple Utilities
 
-::: {.doxygenfile project="Empirical"}
-tools/tuple\_utils.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/tuple\_utils.h
+  :project: Empirical
+```
 
-Type Tracker
-------------
+## Type Tracker
 
-::: {.doxygenfile project="Empirical"}
-tools/TypeTracker.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/TypeTracker.h
+  :project: Empirical
+```
 
-Unit Testing
-------------
+## Unit Testing
 
-::: {.doxygenfile project="Empirical"}
-tools/unit\_tests.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/unit\_tests.h
+  :project: Empirical
+```
 
-Vector Utilities
-----------------
+## Vector Utilities
 
-::: {.doxygenfile project="Empirical"}
-tools/vector\_utils.h
-:::
+```{eval-rst}
+.. doxygenfile:: tools/vector\_utils.h
+  :project: Empirical
+```

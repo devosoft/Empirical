@@ -1,216 +1,215 @@
-Web Tools (for use with Emscripten)
-===================================
+# Web Tools (for use with Emscripten)
 
-D3 Data Visualization Tools
----------------------------
+## D3 Data Visualization Tools
 
-::: {.toctree maxdepth="0"}
-d3/d3-intro d3/d3-contents
-:::
+```{toctree}
+d3/d3
+```
 
-Animations
-----------
+## Animations
 
-::: {.doxygenfile project="Empirical"}
-web/Animate.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/Animate.h
+  :project: Empirical
+```
 
-Attributes
-----------
+## Attributes
 
-::: {.doxygenfile project="Empirical"}
-web/Attributes.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/Attributes.h
+  :project: Empirical
+```
 
-Buttons
--------
+## Buttons
 
-::: {.doxygenfile project="Empirical"}
-web/Button.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/Button.h
+  :project: Empirical
+```
 
-Canvas
-------
+## Canvas
 
-::: {.doxygenfile project="Empirical"}
-web/Canvas.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/Canvas.h
+  :project: Empirical
+```
 
-Canvas Utilities
-----------------
+## Canvas Utilities
 
-::: {.doxygenfile project="Empirical"}
-web/canvas\_utils.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/canvas_utils.h
+  :project: Empirical
+```
 
-Canvas Actions
---------------
+## Canvas Actions
 
-::: {.doxygenfile project="Empirical"}
-web/CanvasAction.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/CanvasAction.h
+  :project: Empirical
+```
 
-Canvas Shapes
--------------
+## Canvas Shapes
 
-::: {.doxygenfile project="Empirical"}
-web/CanvasShape.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/CanvasShape.h
+  :project: Empirical
+```
 
-Color maps
-----------
+## Color maps
 
-::: {.doxygenfile project="Empirical"}
-web/color\_map.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/color_map.h
+  :project: Empirical
+```
 
-Commands
---------
+## Commands
 
-::: {.doxygenfile project="Empirical"}
-web/commands.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/commands.h
+  :project: Empirical
+```
 
-Divs
-----
+## Divs
 
-::: {.doxygenfile project="Empirical"}
-web/Div.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/Div.h
+  :project: Empirical
+```
 
-Documents
----------
+## Documents
 
-::: {.doxygenfile project="Empirical"}
-web/Document.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/Document.h
+  :project: Empirical
+```
 
-Useful functions for emscripten
--------------------------------
+## Useful functions for emscripten
 
-::: {.doxygenfile project="Empirical"}
-web/emfunctions.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/emfunctions.h
+  :project: Empirical
+```
 
-Event Handling
---------------
+## Event Handling
 
-::: {.doxygenfile project="Empirical"}
-web/events.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/events.h
+  :project: Empirical
+```
 
-File Input
-----------
+## File Input
 
-::: {.doxygenfile project="Empirical"}
-web/FileInput.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/FileInput.h
+  :project: Empirical
+```
 
-Font
-----
+## Font
 
-::: {.doxygenfile project="Empirical"}
-web/Font.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/Font.h
+  :project: Empirical
+```
 
-Images
-------
+## Images
 
-::: {.doxygenfile project="Empirical"}
-web/Image.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/Image.h
+  :project: Empirical
+```
 
-Initialization
---------------
+## Initialization
 
-::: {.doxygenfile project="Empirical"}
-web/init.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/init.h
+  :project: Empirical
+```
 
-Javascript Utilities
---------------------
+## Javascript Utilities
 
-::: {.doxygenfile project="Empirical"}
-web/js\_utils.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/js_utils.h
+  :project: Empirical
+```
 
-JSWrap
-------
+## JSWrap
 
-::: {.doxygenfile project="Empirical"}
-web/JSWrap.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/JSWrap.h
+  :project: Empirical
+```
 
-Keypress Manager
-----------------
+## Keypress Manager
 
-::: {.doxygenfile project="Empirical"}
-web/KeypressManager.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/KeypressManager.h
+  :project: Empirical
+```
 
-Listeners
----------
+## Listeners
 
-::: {.doxygenfile project="Empirical"}
-web/Listeners.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/Listeners.h
+  :project: Empirical
+```
 
-Raw Image
----------
+## Raw Image
 
-::: {.doxygenfile project="Empirical"}
-web/RawImage.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/RawImage.h
+  :project: Empirical
+```
 
-Selector
---------
+## Selector
 
-::: {.doxygenfile project="Empirical"}
-web/Selector.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/Selector.h
+  :project: Empirical
+```
 
-Styles
-------
+## Styles
 
-::: {.doxygenfile project="Empirical"}
-web/Style.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/Style.h
+  :project: Empirical
+```
 
-Tables
-------
+## Tables
 
-::: {.doxygenfile project="Empirical"}
-web/Table.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/Table.h
+  :project: Empirical
+```
 
-Text
-----
+## Text
 
-::: {.doxygenfile project="Empirical"}
-web/Text.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/Text.h
+  :project: Empirical
+```
 
-Text Areas
-----------
+## Text Areas
 
-::: {.doxygenfile project="Empirical"}
-web/TextArea.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/TextArea.h
+  :project: Empirical
+```
 
-Tweens
-------
+## Tweens
 
-::: {.doxygenfile project="Empirical"}
-web/Tween.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/Tween.h
+  :project: Empirical
+```
 
-Widgets
--------
+## Widgets
 
-::: {.doxygenfile project="Empirical"}
-web/Widget.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/Widget.h
+  :project: Empirical
+```
 
-::: {.doxygenfile project="Empirical"}
-web/WidgetExtras.h
-:::
+```{eval-rst}
+.. doxygenfile:: web/WidgetExtras.h
+  :project: Empirical
+```
