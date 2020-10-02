@@ -257,7 +257,7 @@ namespace emp {
   /// Uses if constexpr to work around compiler bug in Emscripten (issue #296).
   template<typename T>
   static constexpr T Pow(
-    T base, typename identity<T>::type exp
+    T base, typename internal::identity<T>::type exp
   ) {
     // TODO cpp20, C++20 replace with std::is_constant_evaluated
     // adapted from https://stackoverflow.com/a/62610143
@@ -269,8 +269,8 @@ namespace emp {
     else
     #endif
     if constexpr( std::is_integral<T>::value ){
-      return 1;
-    } else return 0;
+      return internal::PowIntImpl(base, exp);
+    } else return internal::PowDoubleImpl(base, exp);
   }
 
   // A fast (O(log p)) integer-power command.
