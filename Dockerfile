@@ -117,6 +117,7 @@ RUN \
     libpthread-stubs0-dev \
     libc6-dbg \
     gdb \
+    doxygen \
     && \
   echo "installed core dependencies"
 
