@@ -497,14 +497,24 @@ namespace emp {
       return (T2*) ptr;
     }
 
+    /// Change constness of this Ptr's target; throw an assert of the cast fails.
+    template <typename T2>
+    [[nodiscard]] Ptr<T2> ConstCast() const {
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
+      emp_assert( (std::is_same< std::remove_const_t<TYPE> , std::remove_const_t<T2> >()) );
+      return const_cast<T2*>(ptr);
+    }
+
     /// Dynamically cast this Ptr to another type; throw an assert of the cast fails.
-    template <typename T2> Ptr<T2> DynamicCast() const {
+    template <typename T2>
+    [[nodiscard]] Ptr<T2> DynamicCast() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
       return dynamic_cast<T2*>(ptr);
     }
 
-    /// Dynamically cast this Ptr to another type; throw an assert of the cast fails.
-    template <typename T2> Ptr<T2> ReinterpretCast() const {
+    /// Reinterpret this Ptr to another type; throw an assert of the cast fails.
+    template <typename T2>
+    [[nodiscard]] Ptr<T2> ReinterpretCast() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
       return reinterpret_cast<T2*>(ptr);
     }
@@ -795,6 +805,7 @@ namespace emp {
     [[nodiscard]] TYPE * Raw() const { return ptr; }
     [[nodiscard]] TYPE * Raw(size_t pos) const { return &(ptr[pos]); }
     template <typename T2> Ptr<T2> Cast() const { return (T2*) ptr; }
+    template <typename T2> Ptr<T2> ConstCast() const { return const_cast<T2*>(ptr); }
     template <typename T2> Ptr<T2> DynamicCast() const { return dynamic_cast<T2*>(ptr); }
     template <typename T2> Ptr<T2> ReinterpretCast() const { return reinterpret_cast<T2*>(ptr); }
 
