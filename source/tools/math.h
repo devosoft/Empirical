@@ -257,19 +257,20 @@ namespace emp {
   /// Uses if constexpr to work around compiler bug in Emscripten (issue #296).
   template<typename T>
   static constexpr T Pow(
-    T base, typename internal::identity<T>::type exp
+    T base, typename identity<T>::type exp
   ) {
     // TODO cpp20, C++20 replace with std::is_constant_evaluated
     // adapted from https://stackoverflow.com/a/62610143
-    #ifdef __GNUC__ // defined for both GCC and clang
+    // exclude clang versions with compiler bug https://reviews.llvm.org/D35190
+    #if defined(__clang__) && __clang_major__>=9 || defined(__GNUC__) && !defined(__clang__)
     // if base is not known at compile time, use std::pow which is faster
     if ( !__builtin_constant_p( base ) ) return std::pow(base, exp); 
     // otherwise, use constexpr-friendly implementations
     else
     #endif
     if constexpr( std::is_integral<T>::value ){
-      return internal::PowIntImpl(base, exp);
-    } else return internal::PowDoubleImpl(base, exp);
+      return 1;
+    } else return 0;
   }
 
   // A fast (O(log p)) integer-power command.
