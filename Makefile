@@ -34,14 +34,11 @@ test-cookiecutter: ../cookiecutter-empirical-project
 	export COOKIECUTTER_EMP_DIR=../../Empirical/source && \
 	cd ../cookiecutter-empirical-project && make clean && make test
 
-doc: build-doxygen-xml
-	cd doc && ./make_docs.sh
+doc:
+	cd doc && make html coverage
 
 coverage:
 	cd tests && make coverage
-
-build-doxygen-xml:
-	./third-party/doxygen/build/bin/doxygen Doxyfile
 
 install-dependencies:
 	git submodule init
