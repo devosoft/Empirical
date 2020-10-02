@@ -57,9 +57,10 @@ jobs:
         - python-pip
         - tar
         - gzip
+        - doxygen
     before_script:
     - git fetch origin master:refs/remotes/origin/master
-    - make install-doc-dependencies
+    - pip install -r doc/requirements.txt
     script: make doc
   - stage: test
     name: coverage
