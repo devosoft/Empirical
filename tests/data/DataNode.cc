@@ -255,11 +255,16 @@ TEST_CASE("Test DataStats", "[data]") {
     REQUIRE(data3.GetVariance() == Approx(5.87654));
     REQUIRE(data3.GetStandardDeviation() == Approx(2.42416));
     // skewness calculation: https://www.wolframalpha.com/input/?i=skewness+1%2C2%2C3%2C4%2C5%2C6%2C7%2C8%2C8
-    REQUIRE(data3.GetSkew() == Approx(-0.150986));
+    // allow fallback to less precise constexpr Pow
+    const bool skew_res{ data3.GetSkew() == Approx(-0.150986) || data3.GetSkew() == Approx(-0.151045) };
+    REQUIRE( skew_res );
     // kurtosis calculateion
     // - https://www.wolframalpha.com/input/?i=N%5BKurtosis%5B%7B1%2C+2%2C+3%2C+4%2C+5%2C+6%2C+7%2C+8%2C+8%7D%5D%5D+-+3
     // - https://www.itl.nist.gov/div898/handbook/eda/section3/eda35b.htm
-    REQUIRE(data3.GetKurtosis() == Approx(-1.325383));
+    // allow fallback to less precise constexpr Pow
+    const bool kurtosis_res{ data3.GetKurtosis() == Approx(-1.325383) || data3.GetKurtosis() == Approx(-1.3253830944) };
+    REQUIRE( kurtosis_res );
+    
 }
 
 TEST_CASE("Test histogram", "[data]") {
