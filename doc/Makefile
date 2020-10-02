@@ -178,8 +178,10 @@ doctest:
 
 coverage:
 	$(SPHINXBUILD) -b coverage $(ALLSPHINXOPTS) $(BUILDDIR)/coverage
+	python3 -m coverxygen --xml-dir doxyoutput/xml --src-dir .. --format json-summary --output $(BUILDDIR)/doc-coverage.json
+	./upload_documentation_coverage.sh
 	@echo "Testing of coverage in the sources finished, look at the " \
-	      "results in $(BUILDDIR)/coverage/python.txt."
+	      "results in $(BUILDDIR)/doc-coverage.json."
 
 xml:
 	$(SPHINXBUILD) -b xml $(ALLSPHINXOPTS) $(BUILDDIR)/xml
