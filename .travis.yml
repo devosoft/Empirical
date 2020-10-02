@@ -55,6 +55,7 @@ jobs:
         - bison
         - python-virtualenv
         - python-pip
+        - python3-pip
         - tar
         - gzip
         - doxygen
