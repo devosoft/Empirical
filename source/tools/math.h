@@ -214,13 +214,15 @@ namespace emp {
     }
   }
 
+  namespace internal {
   /// A fast (O(log p)) integral-power command.
   template <typename T>
-  static constexpr type_if<T, std::is_integral> Pow(T base, T p) {
+  static constexpr T PowIntImpl(T base, T p) {
     if (p <= 0) return 1;
-    if (p & 1) return base * Pow(base, p-1); // Odd exponent: strip one mulitple off and recurse.
-    return Square( Pow(base,p/2) );          // Even exponent: calc for half and square result.
+    if (p & 1) return base * PowIntImpl(base, p-1); // Odd exponent: strip one mulitple off and recurse.
+    return emp::Square( PowIntImpl(base,p/2) );          // Even exponent: calc for half and square result.
   }
+  } // namespace internal
 
   /// A fast 2^x command.
   static constexpr double Pow2(double exp) {
@@ -234,11 +236,41 @@ namespace emp {
     return exp < 1 ? 1 : (base * IntPow(base, exp-1));
   }
 
+  namespace internal {
   /// A fast method for calculating exponents on doubles.
-  static constexpr double Pow(double base, double exp) {
+  static constexpr double PowDoubleImpl(double base, double exp) {
     // Normally, convert to a base of 2 and then use Pow2.
     // If base is negative, we don't want to deal with imaginary numbers, so use IntPow.
-    return (base > 0) ? Pow2(Log2(base) * exp) : IntPow(base,exp);
+    return (base > 0)
+      ? emp::Pow2(emp::Log2(base) * exp)
+      : emp::IntPow(base,exp);
+  }
+
+  // adapted from https://stackoverflow.com/a/30836042
+  // prevents argument from being used for type deduction
+  template <typename T> struct identity { typedef T type; };
+
+  } // namespace internal
+
+
+  /// A fast method for calculating exponents on doubles or integral types.
+  /// Uses if constexpr to work around compiler bug in Emscripten (issue #296).
+  template<typename T>
+  static constexpr T Pow(
+    T base, typename internal::identity<T>::type exp
+  ) {
+    // TODO cpp20, C++20 replace with std::is_constant_evaluated
+    // adapted from https://stackoverflow.com/a/62610143
+    // exclude clang versions with compiler bug https://reviews.llvm.org/D35190
+    #if defined(__clang__) && __clang_major__>=9 || defined(__GNUC__) && !defined(__clang__)
+    // if base is not known at compile time, use std::pow which is faster
+    if ( !__builtin_constant_p( base ) ) return std::pow(base, exp); 
+    // otherwise, use constexpr-friendly implementations
+    else
+    #endif
+    if constexpr( std::is_integral<T>::value ){
+      return internal::PowIntImpl(base, exp);
+    } else return internal::PowDoubleImpl(base, exp);
   }
 
   // A fast (O(log p)) integer-power command.

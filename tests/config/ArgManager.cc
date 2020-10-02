@@ -10,6 +10,7 @@
 #include <optional>
 
 #include "base/assert.h"
+#include "base/optional.h"
 #include "base/vector.h"
 #include "config/ArgManager.h"
 #include "config/config.h"
@@ -269,7 +270,7 @@ TEST_CASE("Test ArgManager", "[config]")
         0,
         "blah",
         {},
-        [&test](std::optional<emp::vector<std::string>> res){
+        [&test](emp::optional<emp::vector<std::string>> res){
           if (!res) test = true;
         }
       )}

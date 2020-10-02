@@ -10,6 +10,10 @@
 #include <ratio>
 #include "InstLib.h"
 #include "EventLib.h"
+#include "../../third-party/cereal/include/cereal/cereal.hpp"
+#include "../../third-party/cereal/include/cereal/types/string.hpp"
+#include "../../third-party/cereal/include/cereal/types/unordered_map.hpp"
+#include "../../third-party/cereal/include/cereal/types/unordered_set.hpp"
 #include "../tools/BitSet.h"
 #include "../tools/BitVector.h"
 #include "../tools/map_utils.h"
@@ -165,6 +169,18 @@ namespace emp {
       }
       /// Does event object have given property?
       bool HasProperty(std::string property) const { return properties.count(property); }
+
+      /// Cereal serialization interface.
+      template <class Archive>
+      void serialize( Archive & ar ) {
+        ar(
+          CEREAL_NVP(id),
+          CEREAL_NVP(affinity),
+          CEREAL_NVP(msg),
+          CEREAL_NVP(properties)
+        );
+      }
+
 
     };
 
@@ -325,7 +341,6 @@ namespace emp {
           return std::tie(id, args, affinity) < std::tie(other.id, other.args, other.affinity);
       }
 
-      #ifdef CEREAL_NVP
       template <class Archive>
       void serialize( Archive & ar )
       {
@@ -335,7 +350,6 @@ namespace emp {
           CEREAL_NVP(id)
         );
       }
-      #endif
 
     };
 
@@ -430,7 +444,6 @@ namespace emp {
         inst_seq[pos].Set(inst);
       }
 
-      #ifdef CEREAL_NVP
       template <class Archive>
       void serialize( Archive & ar )
       {
@@ -439,7 +452,6 @@ namespace emp {
           CEREAL_NVP(inst_seq)
         );
       }
-      #endif
 
     };
 
@@ -510,6 +522,8 @@ namespace emp {
       void SetMatchBinRefreshFun(std::function<void()> fun) {
         fun_matchbin_refresh = fun;
       }
+
+      void SetInstLib(const Ptr<const inst_lib_t> in) { inst_lib = in; }
 
       void SetProgram(const program_t & _program) {
         program = _program;
@@ -755,7 +769,6 @@ namespace emp {
       }
 
 
-      #ifdef CEREAL_NVP
       template <class Archive>
       void serialize( Archive & ar )
       {
@@ -763,7 +776,6 @@ namespace emp {
           CEREAL_NVP(program)
         );
       }
-      #endif
 
     };
 
@@ -835,25 +847,32 @@ namespace emp {
       : EventDrivenGP_AW(DefaultInstLib(), DefaultEventLib(), rnd) { ; }
 
     EventDrivenGP_AW(EventDrivenGP_t && in)
-      : event_lib(in.event_lib),
-        random_ptr(in.random_ptr), random_owner(in.random_owner),
-        program(in.program),
-        shared_mem(in.shared_mem),
-        event_queue(in.event_queue),
-        traits(in.traits), errors(in.errors),
-        max_cores(in.max_cores), max_call_depth(in.max_call_depth),
-        default_mem_value(in.default_mem_value), min_bind_thresh(in.min_bind_thresh),
-        stochastic_fun_call(in.stochastic_fun_call),
-        cores(in.cores),
-        active_cores(in.active_cores), inactive_cores(in.inactive_cores),
-        pending_cores(in.pending_cores),
-        exec_core_id(in.exec_core_id), is_executing(in.is_executing),
-        fun_trait_print(in.fun_trait_print)
+      : event_lib( std::move(in.event_lib) ),
+        random_ptr( std::move(in.random_ptr) ),
+        random_owner( std::move(in.random_owner) ),
+        program( std::move(in.program) ),
+        shared_mem( std::move(in.shared_mem) ),
+        event_queue( std::move(in.event_queue) ),
+        traits( std::move(in.traits) ),
+        errors( std::move(in.errors) ),
+        max_cores( std::move(in.max_cores) ),
+        max_call_depth( std::move(in.max_call_depth) ),
+        default_mem_value( std::move(in.default_mem_value) ),
+        min_bind_thresh( std::move(in.min_bind_thresh) ),
+        stochastic_fun_call( std::move(in.stochastic_fun_call) ),
+        cores( std::move(in.cores) ),
+        active_cores( std::move(in.active_cores) ),
+        inactive_cores( std::move(in.inactive_cores) ),
+        pending_cores( std::move(in.pending_cores) ),
+        exec_core_id( std::move(in.exec_core_id) ),
+        is_executing( std::move(in.is_executing) ),
+        matchBin(*random_ptr),
+        fun_trait_print( std::move(in.fun_trait_print) )
     {
       in.random_ptr = nullptr;
       in.random_owner = false;
       in.event_lib = nullptr;
-      in.program.inst_lib = nullptr;
+      in.program.SetInstLib( nullptr );
       program.SetMatchBinRefreshFun( [this](){ this->RefreshMatchBin(); } );
     }
 
@@ -871,8 +890,8 @@ namespace emp {
         active_cores(in.active_cores), inactive_cores(in.inactive_cores),
         pending_cores(in.pending_cores),
         exec_core_id(in.exec_core_id), is_executing(in.is_executing),
-        fun_trait_print(in.fun_trait_print),
-        matchBin(*random_ptr)
+        matchBin(*random_ptr),
+        fun_trait_print(in.fun_trait_print)
     {
       program.SetMatchBinRefreshFun( [this](){ this->RefreshMatchBin(); } );
     }
@@ -1132,9 +1151,7 @@ namespace emp {
 
     /// Set trait in traits vector given by id to value given by val.
     /// Will resize traits vector if given id is greater than current traits vector size.
-    void SetTrait(TRAIT_T t) {
-      traits = t;
-    }
+    void SetTrait(TRAIT_T t) { traits = std::move(t); }
 
     /// Shortcut to this hardware object's program's SetInst function of the same signature.
     void SetInst(size_t fID, size_t pos, const inst_t & inst) {

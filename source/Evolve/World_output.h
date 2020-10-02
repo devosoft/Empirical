@@ -9,10 +9,10 @@
 #ifndef EMP_EVO_WORLD_OUTPUT_H
 #define EMP_EVO_WORLD_OUTPUT_H
 
-#include "base/vector.h"
-#include "data/DataFile.h"     // Helper to determine when specific events should occur.
+#include "../base/vector.h"
+#include "../data/DataFile.h"     // Helper to determine when specific events should occur.
 #include "SystematicsAnalysis.h"
-#include "tools/string_utils.h"
+#include "../tools/string_utils.h"
 
 namespace emp {
 
