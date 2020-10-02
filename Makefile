@@ -49,11 +49,6 @@ install-dependencies:
 	git submodule update
 	cd third-party && make
 
-install-doc-dependencies:
-	git submodule init
-	git submodule update
-	cd third-party && make install-doc-dependencies
-
 install-test-dependencies:
 	cd third-party && make install-test-dependencies
 
