@@ -9,9 +9,6 @@
  *
  *  Compile with -O3 and -msse4.2 for fast bit counting.
  * 
- *  @todo Most of the operators don't check to make sure that both Bitvextors are the same size.
- *        We should create versions (Intersection() and Union()?) that adjust sizes if needed.
- * 
  *  @todo Do small BitVector optimization.  Currently we have number of bits (8 bytes) and a
  *        pointer to the memory for the bitset (another 8 bytes), but we could use those 16 bytes
  *        as 1 byte of size info followed by 15 bytes of bitset (120 bits!)
@@ -19,9 +16,6 @@
  *  @todo Implement append(), resize()...
  *  @todo Implement techniques to push bits (we have pop)
  *  @todo Implement techniques to insert or remove bits from middle.
- *  @todo Think about how itertors should work for BitVector.  It should probably go bit-by-bit,
- *        but there are very few circumstances where that would be useful.  Going through the
- *        positions of all ones would be more useful, but perhaps less intuitive.
  *
  *  @note This class is 15-20% slower than emp::BitSet, but more flexible & run-time configurable.
  */
@@ -36,6 +30,7 @@
 #include "../base/assert.h"
 #include "../base/Ptr.h"
 #include "../base/vector.h"
+#include "../base/array.h"
 
 #include "bitset_utils.h"
 #include "functions.h"
@@ -60,7 +55,11 @@ namespace emp {
 
     static constexpr size_t FIELD_BITS = sizeof(field_t)*8; ///< How many bits are in a field?
     size_t num_bits;                                        ///< How many total bits are we using?
-    Ptr<field_t> bit_set;                                   ///< What is the status of each bit?
+    //Ptr<field_t> bit_set;                                   ///< What is the status of each bit?
+    // emp::array<std::byte, 8> bit_set;                       ///< What is the status of each bit?
+    emp::Ptr<std::byte> bit_set;
+
+    static constexpr const size_t SHORT_THRESHOLD = 64;
 
     /// End position of the stored bits in the last field; 0 if perfect fit.
     size_t LastBitID() const { return num_bits & (FIELD_BITS - 1); }
@@ -163,16 +162,18 @@ namespace emp {
 
     /// Assume that the size of the bit_set has already been adjusted to be the size of the one
     /// being copied and only the fields need to be copied over.
-    void RawCopy(const Ptr<field_t> in_set) {
+    void RawCopy(Ptr<const field_t> in_set) {
       #ifdef EMP_TRACK_MEM
-      emp_assert(in_set.IsNull() == false);
-      emp_assert(bit_set.DebugIsArray() && in_set.DebugIsArray());
-      emp_assert(bit_set.DebugGetArrayBytes() == in_set.DebugGetArrayBytes(),
-                 bit_set.DebugGetArrayBytes(), in_set.DebugGetArrayBytes());
+      if (num_bits > SHORT_THRESHOLD) {
+        emp_assert(in_set.IsNull() == false);
+        emp_assert(BitSetPtr().DebugIsArray() && in_set.DebugIsArray());
+        emp_assert(BitSetPtr().DebugGetArrayBytes() == in_set.DebugGetArrayBytes(),
+                  BitSetPtr().DebugGetArrayBytes(), in_set.DebugGetArrayBytes());
+      }
       #endif
-
+      
       const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = in_set[i];
+      for (size_t i = 0; i < NUM_FIELDS; i++) BitSetPtr()[i] = in_set[i];
     }
 
     /// Helper: call SHIFT with positive number
@@ -181,31 +182,33 @@ namespace emp {
       const size_t bit_shift = shift_size % FIELD_BITS;
       const size_t bit_overflow = FIELD_BITS - bit_shift;
       const size_t NUM_FIELDS = NumFields();
-
-      // Loop through each field, from L to R, and update it.
-      if (field_shift) {
-        for (size_t i = NUM_FIELDS; i > field_shift; --i) {
-          bit_set[i-1] = bit_set[i - field_shift - 1];
+      if (num_bits > SHORT_THRESHOLD) {
+        // Loop through each field, from L to R, and update it.
+        if (field_shift) {
+          for (size_t i = NUM_FIELDS; i > field_shift; --i) {
+            BitSetPtr()[i-1] = BitSetPtr()[i - field_shift - 1];
+          }
+          for (size_t i = field_shift; i > 0; --i) BitSetPtr()[i-1] = 0;
         }
-        for (size_t i = field_shift; i > 0; --i) bit_set[i-1] = 0;
-      }
 
-      // account for bit_shift
-      if (bit_shift) {
-        for (size_t i = NUM_FIELDS - 1; i > field_shift; --i) {
-          bit_set[i] <<= bit_shift;
-          bit_set[i] |= (bit_set[i-1] >> bit_overflow);
+        // account for bit_shift
+        if (bit_shift) {
+          for (size_t i = NUM_FIELDS - 1; i > field_shift; --i) {
+            BitSetPtr()[i] <<= bit_shift;
+            BitSetPtr()[i] |= (BitSetPtr()[i-1] >> bit_overflow);
+          }
+          // Handle final field (field_shift position)
+          BitSetPtr()[field_shift] <<= bit_shift;
         }
-        // Handle final field (field_shift position)
-        bit_set[field_shift] <<= bit_shift;
-      }
 
-      // Mask out any bits that have left-shifted away
-      const size_t last_bit_id = LastBitID();
-      constexpr field_t val_one = 1;
-      if (last_bit_id) { bit_set[NUM_FIELDS - 1] &= (val_one << last_bit_id) - val_one; }
+        // Mask out any bits that have left-shifted away
+        const size_t last_bit_id = LastBitID();
+        constexpr field_t val_one = 1;
+        if (last_bit_id) { BitSetPtr()[NUM_FIELDS - 1] &= (val_one << last_bit_id) - val_one; }
+      } else {
+        *BitSetPtr().Raw() <<= bit_shift;
+      }
     }
-
 
     /// Helper for calling SHIFT with negative number
     void ShiftRight(const size_t shift_size) {
@@ -215,55 +218,79 @@ namespace emp {
       const size_t NUM_FIELDS = NumFields();
       const size_t field_shift2 = NUM_FIELDS - field_shift;
 
+      if (num_bits > SHORT_THRESHOLD) {
       // account for field_shift
-      if (field_shift) {
-        for (size_t i = 0; i < field_shift2; ++i) {
-          bit_set[i] = bit_set[i + field_shift];
+        if (field_shift) {
+          for (size_t i = 0; i < field_shift2; ++i) {
+            BitSetPtr()[i] = BitSetPtr()[i + field_shift];
+          }
+          for (size_t i = field_shift2; i < NUM_FIELDS; i++) BitSetPtr()[i] = 0U;
         }
-        for (size_t i = field_shift2; i < NUM_FIELDS; i++) bit_set[i] = 0U;
-      }
 
-      // account for bit_shift
-      if (bit_shift) {
-        for (size_t i = 0; i < (field_shift2 - 1); ++i) {
-          bit_set[i] >>= bit_shift;
-          bit_set[i] |= (bit_set[i+1] << bit_overflow);
+        // account for bit_shift
+        if (bit_shift) {
+          for (size_t i = 0; i < (field_shift2 - 1); ++i) {
+            BitSetPtr()[i] >>= bit_shift;
+            BitSetPtr()[i] |= (BitSetPtr()[i+1] << bit_overflow);
+          }
+          BitSetPtr()[field_shift2 - 1] >>= bit_shift;
         }
-        bit_set[field_shift2 - 1] >>= bit_shift;
+      } else {
+        *BitSetPtr().Raw() >>= bit_shift;
       }
     }
 
   public:
     /// Build a new BitVector with specified bit count (default 0) and initialization (default 0)
-    BitVector(size_t in_num_bits=0, bool init_val=false) : num_bits(in_num_bits), bit_set(nullptr) {
-      if (num_bits) bit_set = NewArrayPtr<field_t>(NumFields());
+    BitVector(size_t in_num_bits=0, bool init_val=false)
+      : num_bits(in_num_bits), bit_set()
+    {
+      //if (num_bits) bit_set = emp::array<std::byte, 8>();
+      
+      if (num_bits > SHORT_THRESHOLD) {
+        //bit_set = emp::NewArrayPtr<std::byte>(8);
+        //BitSetPtr() = NewArrayPtr<field_t>(NumFields());
+        bit_set = NewArrayPtr<field_t>(NumFields()).Cast<std::byte>();
+      }
       if (init_val) SetAll(); else Clear();
     }
 
     /// Copy constructor of existing bit field.
-    BitVector(const BitVector & in_set) : num_bits(in_set.num_bits), bit_set(nullptr) {
+    BitVector(const BitVector & in_set)
+      : num_bits(in_set.num_bits), bit_set()
+    {
       #ifdef EMP_TRACK_MEM
-      emp_assert(in_set.bit_set.IsNull() || in_set.bit_set.DebugIsArray());
-      emp_assert(in_set.bit_set.OK());
+      if (num_bits > SHORT_THRESHOLD) {
+        emp_assert(in_set.bit_set.IsNull() || in_set.bit_set.DebugIsArray());
+        emp_assert(in_set.bit_set.OK());
+      }
       #endif
-
       // There is only something to copy if there are a non-zero number of bits!
       if (num_bits) {
         #ifdef EMP_TRACK_MEM
-        emp_assert(!in_set.bit_set.IsNull() && in_set.bit_set.DebugIsArray(), in_set.bit_set.IsNull(), in_set.bit_set.DebugIsArray());
+        if (in_set.num_bits > SHORT_THRESHOLD)
+          emp_assert(!in_set.bit_set.IsNull() && in_set.bit_set.DebugIsArray(), in_set.bit_set.IsNull(), in_set.bit_set.DebugIsArray());
         #endif
-        bit_set = NewArrayPtr<field_t>(NumFields());
-        RawCopy(in_set.bit_set);
+        if (num_bits > SHORT_THRESHOLD) 
+        {
+          bit_set = NewArrayPtr<field_t>(NumFields()).Cast<std::byte>();
+        }
+        if (in_set.num_bits > SHORT_THRESHOLD){
+          RawCopy(in_set.BitSetPtr());
+        } else {
+          *BitSetPtr().Raw() =  *(in_set.BitSetPtr().Raw()); 
+        }
       }
     }
 
     /// Move constructor of existing bit field.
     BitVector(BitVector && in_set) : num_bits(in_set.num_bits), bit_set(in_set.bit_set) {
       #ifdef EMP_TRACK_MEM
-      emp_assert(bit_set == nullptr || bit_set.DebugIsArray());
-      emp_assert(bit_set.OK());
+      if (in_set.num_bits > SHORT_THRESHOLD) {
+        emp_assert(bit_set == nullptr || bit_set.DebugIsArray());
+        emp_assert(bit_set.OK());
+      }
       #endif
-
       in_set.bit_set = nullptr;
       in_set.num_bits = 0;
     }
@@ -276,31 +303,44 @@ namespace emp {
     /// Destructor
     ~BitVector() {
       if (bit_set) {        // A move constructor can make bit_set == nullptr
-        bit_set.DeleteArray();
-        bit_set = nullptr;
+          if (num_bits > SHORT_THRESHOLD) {
+            BitSetPtr().DeleteArray();
+          }    
       }
     }
 
     /// Assignment operator.
     BitVector & operator=(const BitVector & in_set) {
       #ifdef EMP_TRACK_MEM
-      emp_assert(in_set.bit_set == nullptr || in_set.bit_set.DebugIsArray());
-      emp_assert(in_set.bit_set != nullptr || in_set.num_bits == 0);
-      emp_assert(in_set.bit_set.OK());
+      if (in_set.num_bits > SHORT_THRESHOLD) {
+        emp_assert(in_set.BitSetPtr() == nullptr || in_set.BitSetPtr().DebugIsArray());
+        emp_assert(in_set.BitSetPtr() != nullptr || in_set.num_bits == 0);
+        emp_assert(in_set.BitSetPtr().OK());
+      }
       #endif
-
+      
       if (&in_set == this) return *this;
       const size_t in_num_fields = in_set.NumFields();
       const size_t prev_num_fields = NumFields();
-      num_bits = in_set.num_bits;
 
       if (in_num_fields != prev_num_fields) {
-        if (bit_set) bit_set.DeleteArray();
-	      if (num_bits) bit_set = NewArrayPtr<field_t>(in_num_fields);
-        else bit_set = nullptr;
+        if (bit_set) {
+          if (num_bits > SHORT_THRESHOLD) {
+            BitSetPtr().DeleteArray();
+          } else {
+            *BitSetPtr().Raw() = 0;
+          }
+        }
       }
-
-      if (num_bits) RawCopy(in_set.bit_set);
+      num_bits = in_set.num_bits;
+      if (in_num_fields != prev_num_fields && in_set.num_bits > SHORT_THRESHOLD) {
+          bit_set = NewArrayPtr<field_t>(NumFields()).Cast<std::byte>();
+      }
+      if (num_bits > SHORT_THRESHOLD){
+        RawCopy(in_set.BitSetPtr());
+      } else {
+        *BitSetPtr().Raw() =  *(in_set.BitSetPtr().Raw()); 
+      }
 
       return *this;
     }
@@ -308,7 +348,7 @@ namespace emp {
     /// Move operator.
     BitVector & operator=(BitVector && in_set) {
       emp_assert(&in_set != this);        // in_set is an r-value, so this shouldn't be possible...
-      if (bit_set) bit_set.DeleteArray(); // If we already had a bitset, get rid of it.
+      if (num_bits > SHORT_THRESHOLD && BitSetPtr()) BitSetPtr().DeleteArray(); // If we already had a bitset, get rid of it.
       num_bits = in_set.num_bits;         // Update the number of bits...
       bit_set = in_set.bit_set;           // And steal the old memory for what those bits are.
       in_set.bit_set = nullptr;           // Prepare in_set for deletion without deallocating.
@@ -328,6 +368,7 @@ namespace emp {
 
     /// Resize this BitVector to have the specified number of bits.
     BitVector & Resize(size_t new_bits) {
+      const size_t old_num_bits = num_bits;
       const size_t old_num_fields = NumFields();
       num_bits = new_bits;
       const size_t NUM_FIELDS = NumFields();
@@ -335,19 +376,51 @@ namespace emp {
       if (NUM_FIELDS == old_num_fields) {   // We can use our existing bit field
         num_bits = new_bits;
         // If there are extra bits, zero them out.
-        if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+        if (LastBitID() > 0) {
+          if (num_bits > SHORT_THRESHOLD) {
+            BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+          } else {
+            *BitSetPtr().Raw() &= MaskLow<field_t>(LastBitID());
+          }
+        }
       }
-
+        
       else {  // We have to change the number of bitfields.  Resize & copy old info.
-        Ptr<field_t> old_bit_set = bit_set;
-        if (num_bits > 0) bit_set = NewArrayPtr<field_t>(NUM_FIELDS);
-        else bit_set = nullptr;
+        auto old_bit_set = bit_set;
+        
+        if (num_bits > SHORT_THRESHOLD) {
+          bit_set = NewArrayPtr<field_t>(NUM_FIELDS).Cast<std::byte>();
+        } else {
+          bit_set = Ptr<std::byte>();
+          Clear();
+        }
         const size_t min_fields = std::min(old_num_fields, NUM_FIELDS);
-        for (size_t i = 0; i < min_fields; i++) bit_set[i] = old_bit_set[i];
-        for (size_t i = min_fields; i < NUM_FIELDS; i++) bit_set[i] = 0U;
-        if (old_bit_set) old_bit_set.DeleteArray();
+        if (num_bits > SHORT_THRESHOLD) {
+          if (old_num_bits > SHORT_THRESHOLD) {
+            for (size_t i = 0; i < min_fields; i++) BitSetPtr()[i] = BitSetPtr(old_bit_set, old_num_bits)[i];
+            BitSetPtr()[min_fields - 1] = BitSetPtr()[min_fields - 1] & (0xFFFFFFFFFFFFFFFF >> (FIELD_BITS - (num_bits % FIELD_BITS)));
+          } else {
+            BitSetPtr()[0] = *BitSetPtr(old_bit_set, old_num_bits).Raw();
+          }
+          for (size_t i = min_fields; i < NUM_FIELDS; i++) BitSetPtr()[i] = 0U;
+          
+        } else {
+          if (old_num_bits > SHORT_THRESHOLD) {
+            *BitSetPtr().Raw() =  BitSetPtr(old_bit_set, old_num_bits)[0];
+          } else {
+            bit_set = old_bit_set;
+          }
+          
+          
+        }
+        if (old_bit_set && old_num_bits > SHORT_THRESHOLD) BitSetPtr(old_bit_set, old_num_bits).DeleteArray();
+
+        
       }
 
+      if (num_bits <= SHORT_THRESHOLD) {
+        *BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
+      }
       return *this;
     }
 
@@ -357,7 +430,11 @@ namespace emp {
 
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; ++i) {
-        if (bit_set[i] != in_set.bit_set[i]) return false;
+        if (num_bits > SHORT_THRESHOLD) {
+          if (BitSetPtr()[i] != in_set.BitSetPtr()[i]) return false;
+        } else {
+          if (*BitSetPtr().Raw() != *(in_set.BitSetPtr().Raw())) return false;
+        }
       }
       return true;
     }
@@ -365,12 +442,13 @@ namespace emp {
     /// Compare the would-be numerical values of two bit vectors.
     bool operator<(const BitVector & in_set) const {
       if (num_bits != in_set.num_bits) return num_bits < in_set.num_bits;
+      if (num_bits <= SHORT_THRESHOLD) return (*BitSetPtr().Raw() < *(in_set.BitSetPtr().Raw()));
 
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = NUM_FIELDS; i > 0; --i) {         // Start loop at the largest field.
         const size_t pos = i-1;
-        if (bit_set[pos] == in_set.bit_set[pos]) continue;  // If same, keep looking!
-        return (bit_set[pos] < in_set.bit_set[pos]);        // Otherwise, do comparison
+        if (BitSetPtr()[pos] == in_set.BitSetPtr()[pos]) continue;  // If same, keep looking!
+        return (BitSetPtr()[pos] < in_set.BitSetPtr()[pos]);        // Otherwise, do comparison
       }
       return false;
     }
@@ -378,12 +456,13 @@ namespace emp {
     /// Compare the would-be numerical values of two bit vectors.
     bool operator<=(const BitVector & in_set) const {
       if (num_bits != in_set.num_bits) return num_bits <= in_set.num_bits;
+      if (num_bits <= SHORT_THRESHOLD) return (*BitSetPtr().Raw() <= *(in_set.BitSetPtr().Raw()));
 
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = NUM_FIELDS; i > 0; --i) {         // Start loop at the largest field.
         const size_t pos = i-1;
-        if (bit_set[pos] == in_set.bit_set[pos]) continue;  // If same, keep looking!
-        return (bit_set[pos] < in_set.bit_set[pos]);        // Otherwise, do comparison
+        if (BitSetPtr()[pos] == in_set.BitSetPtr()[pos]) continue;  // If same, keep looking!
+        return (BitSetPtr()[pos] < in_set.BitSetPtr()[pos]);        // Otherwise, do comparison
       }
       return true;
     }
@@ -399,13 +478,50 @@ namespace emp {
 
     /// How many bits do we currently have?
     size_t GetSize() const { return num_bits; }
+      
+    /// Return the proper casting of bit_set (but const)
+    emp::Ptr<const field_t> BitSetPtr() const{
+      // For large bit sets, the bit_set pointer tells you where it is.
+      if (num_bits > SHORT_THRESHOLD) {
+        return bit_set.Cast<const field_t>();
+      }
+
+      // For small bit_sets assume they all fit in the space of the bit_set pointer.
+      return emp::Ptr<const field_t>((const field_t*) &bit_set);
+    }
+
+    /// Return the proper casting of bit_set
+    emp::Ptr<field_t> BitSetPtr() {
+      // For large bit sets, the bit_set pointer tells you where it is.
+      if (num_bits > SHORT_THRESHOLD) {
+        return bit_set.Cast<field_t>();
+      }
+
+      // For small bit_sets assume they all fit in the space of the bit_set pointer.
+      return emp::Ptr<field_t>((field_t*) &bit_set);
+    }
+
+    /// Return the proper casting of a supplied bit_set and number of bits
+    emp::Ptr<field_t> BitSetPtr(emp::Ptr<std::byte> p, size_t num) {
+      // For large bit sets, the bit_set pointer tells you where it is.
+      if (num > SHORT_THRESHOLD) {
+        return p.Cast<field_t>();
+      }
+
+      // For small bit_sets assume they all fit in the space of the bit_set pointer.
+      return emp::Ptr<field_t>((field_t*) &p);
+    }
+
 
     /// Retrive the bit value from the specified index.
     bool Get(size_t index) const {
       emp_assert(index < num_bits, index, num_bits);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
-      return (bit_set[field_id] & (static_cast<field_t>(1) << pos_id)) != 0;
+      if (num_bits > SHORT_THRESHOLD) {
+        return (BitSetPtr()[field_id] & (static_cast<field_t>(1) << pos_id)) != 0;
+      }
+      return (*BitSetPtr().Raw() & (static_cast<field_t>(1) << pos_id)) != 0;
     }
 
     /// Update the bit value at the specified index.
@@ -416,18 +532,27 @@ namespace emp {
       constexpr field_t val_one = 1;
       const field_t pos_mask = val_one << pos_id;
 
-      if (value) bit_set[field_id] |= pos_mask;
-      else       bit_set[field_id] &= ~pos_mask;
-
+      if (num_bits > SHORT_THRESHOLD) {
+        if (value) BitSetPtr()[field_id] |= pos_mask;
+        else       BitSetPtr()[field_id] &= ~pos_mask;
+      } else {
+        if (value) *BitSetPtr().Raw() |=  pos_mask;
+        else       *BitSetPtr().Raw() &= ~pos_mask;
+      }
+      
       return *this;
     }
 
     /// A simple hash function for bit vectors.
     std::size_t Hash() const {
       std::size_t hash_val = 0;
-      const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) {
-        hash_val ^= bit_set[i];
+      if (num_bits > SHORT_THRESHOLD) {
+        const size_t NUM_FIELDS = NumFields();
+        for (size_t i = 0; i < NUM_FIELDS; i++) {
+          hash_val ^= BitSetPtr()[i];
+        }
+      } else {
+        hash_val ^= *BitSetPtr().Raw();
       }
       return hash_val ^ ((97*num_bits) << 8);
     }
@@ -435,25 +560,32 @@ namespace emp {
     /// Retrive the byte at the specified byte index.
     uint8_t GetByte(size_t index) const {
       emp_assert(index < NumBytes(), index, NumBytes());
-      const size_t field_id = Byte2Field(index);
       const size_t pos_id = Byte2FieldPos(index);
-      return (bit_set[field_id] >> pos_id) & 255U;
+      if (num_bits > SHORT_THRESHOLD) {
+        const size_t field_id = Byte2Field(index);
+        return (BitSetPtr()[field_id] >> pos_id) & 255U;
+      } else {
+        return (*BitSetPtr().Raw() >> pos_id) & 255U;
+      }
     }
 
     /// Update the byte at the specified byte index.
     void SetByte(size_t index, uint8_t value) {
       emp_assert(index < NumBytes(), index, NumBytes());
-      const size_t field_id = Byte2Field(index);
       const size_t pos_id = Byte2FieldPos(index);
       const field_t val_uint = value;
-      bit_set[field_id] = (bit_set[field_id] & ~(static_cast<field_t>(255) << pos_id)) | (val_uint << pos_id);
+      if (num_bits > SHORT_THRESHOLD) {
+        const size_t field_id = Byte2Field(index);
+        BitSetPtr()[field_id] = (BitSetPtr()[field_id] & ~(static_cast<field_t>(255) << pos_id)) | (val_uint << pos_id);
+      } else {
+        *BitSetPtr().Raw() = (*BitSetPtr().Raw() & ~(static_cast<field_t>(255) << pos_id)) | (val_uint << pos_id);
+      }
     }
 
-    /// Retrieve the 32-bit uint from the specified uint index.
-    /*
+    /// Retrive the 32-bit uint from the specifeid uint index.
     uint32_t GetUInt(size_t index) const {
       // If the fields are already 32 bits, return.
-      if constexpr (sizeof(field_t) == 4) return bit_set[index];
+      if constexpr (sizeof(field_t) == 4) return BitSetPtr()[index];
 
       emp_assert(sizeof(field_t) == 8);
 
@@ -462,74 +594,80 @@ namespace emp {
 
       emp_assert(field_id < NumFields());
 
-      return (uint32_t) (bit_set[field_id] >> (field_pos * 32));
-    }
-    */
-   // Retrieve the 32-bit uint from the specified uint index.
-   // new implementation based on bitset.h GetUInt32
-    uint32_t GetUInt(size_t index) const {
-      emp_assert(index * 32 < num_bits);
-
-      uint32_t res;
-
-      std::memcpy(
-        &res,
-        bit_set.Cast<unsigned char>().Raw() + index * (32/8),
-        sizeof(res)
-      );
-
-      return res;
+      if (num_bits > SHORT_THRESHOLD) {
+        return (uint32_t) (BitSetPtr()[field_id] >> (field_pos * 32));
+      } else {
+        return (uint32_t) (*BitSetPtr().Raw() >> (index * 32));
+      }
+      
     }
 
     /// Update the 32-bit uint at the specified uint index.
-    void SetUInt(const size_t index, uint32_t value) {
-      emp_assert(index * 32 < num_bits);
-
-      std::memcpy(
-        bit_set.Cast<unsigned char>().Raw() + index * (32/8),
-        &value,
-        sizeof(value)
-      );
-
-      // check to make sure there are no leading ones in the unused bits
-      // or if LastBitID is 0 everything should pass too
-      emp_assert(
-        LastBitID() == 0
-        || (
-          bit_set[NumFields() - 1]
-          & ~MaskLow<field_t>(LastBitID())
-        ) == 0
-      );
-
+    void SetUInt(size_t index, uint32_t value) {
+      //if constexpr (sizeof(field_t) == 4) BitSetPtr()[index] = value;
+      emp_assert(sizeof(field_t) == 8);
+      
+      if (num_bits > SHORT_THRESHOLD) {
+        const size_t field_pos = 1 - (index & 1);
+        const field_t mask = ((field_t) ((uint32_t) -1)) << (1-field_pos);
+        const size_t field_id = index/2;
+        emp_assert(field_id < NumFields());
+        BitSetPtr()[field_id] &= mask;   // Clear out bits that we are setting.
+        BitSetPtr()[field_id] |= ((field_t) value) << (field_pos * 32);
+      } else {
+        if (num_bits < 32) {
+          emp_assert(value == (value & (0xFFFFFFFF >> (32 - num_bits))));
+        } else {
+          emp_assert(value == (value & (0xFFFFFFFF >> (64 - num_bits))));
+        }
+        *BitSetPtr().Raw() &= (0x00000000FFFFFFFF << (32 * (1-index)));   // Clear out bits that we are setting.
+        *BitSetPtr().Raw() |= ((field_t) value) << (index * 32);
+      }
     }
 
     void SetUIntAtBit(size_t index, uint32_t value) {
-      if constexpr (sizeof(field_t) == 4) bit_set[index] = value;
+      if (num_bits > SHORT_THRESHOLD) {
+        if constexpr (sizeof(field_t) == 4) BitSetPtr()[index] = value;
 
-      emp_assert(sizeof(field_t) == 8);
+        emp_assert(sizeof(field_t) == 8);
 
-      const size_t field_id = FieldID(index);
-      const size_t field_pos = FieldPos(index);
-      const field_t mask = ((field_t) ((uint32_t) -1)) << (1-field_pos);
+        const size_t field_id = FieldID(index);
+        const size_t field_pos = FieldPos(index);
+        const field_t mask = ((field_t) ((uint32_t) -1)) << (1-field_pos);
 
-      emp_assert(field_id < NumFields());
+        emp_assert(field_id < NumFields());
 
-      bit_set[field_id] &= mask;   // Clear out bits that we are setting.
-      bit_set[field_id] |= ((field_t) value) << (field_pos * 32);
+        BitSetPtr()[field_id] &= mask;   // Clear out bits that we are setting.
+        BitSetPtr()[field_id] |= ((field_t) value) << (field_pos * 32);
+      } else {
+        if (index == 0) {
+          *BitSetPtr().Raw() &= 0xFFFFFFFF00000000;
+          *BitSetPtr().Raw() += (field_t) value;
+        } else {
+          *BitSetPtr().Raw() &= 0x00000000FFFFFFFF;
+          *BitSetPtr().Raw() += ( ((field_t) value) << 32);
+        }
+      }
     }
 
     /// Retrive the 32-bit uint at the specified BIT index.
     uint32_t GetUIntAtBit(size_t index) {
       // @CAO Need proper assert for non-32-size bit fields!
       // emp_assert(index < num_bits);
-      const size_t field_id = FieldID(index);
-      const size_t pos_id = FieldPos(index);
-      if (pos_id == 0) return (uint32_t) bit_set[field_id];
-      const size_t NUM_FIELDS = NumFields();
-      const uint32_t part1 = (uint32_t) (bit_set[field_id] >> pos_id);
-      const uint32_t part2 =
-        (uint32_t)((field_id+1 < NUM_FIELDS) ? bit_set[field_id+1] << (FIELD_BITS-pos_id) : 0);
-      return part1 | part2;
+      if (num_bits > SHORT_THRESHOLD) {
+        const size_t field_id = FieldID(index);
+        const size_t pos_id = FieldPos(index);
+        if (pos_id == 0) return (uint32_t) BitSetPtr()[field_id];
+        const size_t NUM_FIELDS = NumFields();
+        const uint32_t part1 = (uint32_t) (BitSetPtr()[field_id] >> pos_id);
+        const uint32_t part2 =
+          (uint32_t)((field_id+1 < NUM_FIELDS) ? BitSetPtr()[field_id+1] << (FIELD_BITS-pos_id) : 0);
+        return part1 | part2;
+      }
+      if (index == 0) {
+        return (uint32_t) *BitSetPtr().Raw() & 0xFFFFFFFF;
+      }
+      return (uint32_t) (*BitSetPtr().Raw() >> 32) ;
     }
 
     /// Retrieve the specified number of bits (stored in the field type) at the target bit index.
@@ -543,8 +681,12 @@ namespace emp {
     /// Return true if ANY bits are set to 1, otherwise return false.
     bool Any() const {
       const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) {
-        if (bit_set[i]) return true;
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) {
+          if (BitSetPtr()[i]) return true;
+        } 
+      } else {
+        if (*BitSetPtr().Raw()) return true;
       }
       return false;
     }
@@ -553,7 +695,17 @@ namespace emp {
     bool None() const { return !Any(); }
 
     /// Return true if ALL bits are set to 1, otherwise return false.
-    bool All() const { return (~(*this)).None(); }
+    bool All() const {
+      const size_t NUM_FIELDS = NumFields();
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) {
+          if (~(BitSetPtr()[i])) return false;
+        }
+      } else {
+        if (~(*BitSetPtr().Raw() | (0xFFFFFFFFFFFFFFFF << num_bits))) return false;
+      }
+      return true;
+    }
 
     /// Casting a bit array to bool identifies if ANY bits are set to 1.
     explicit operator bool() const { return Any(); }
@@ -567,15 +719,28 @@ namespace emp {
     /// Set all bits to 0.
     void Clear() {
       const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = 0U;
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) BitSetPtr()[i] = 0U;
+      } else {
+        *BitSetPtr().Raw() = 0U;
+      }
     }
 
     /// Set all bits to 1.
     void SetAll() {
       const size_t NUM_FIELDS = NumFields();
       constexpr field_t all0 = 0;
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~all0;
-      if (LastBitID() > 0) { bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID()); }
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) BitSetPtr()[i] = ~all0;
+      } else {
+        *BitSetPtr().Raw() = (0xFFFFFFFFFFFFFFFF >> (64 - num_bits)); 
+      }
+      if (LastBitID() > 0) { 
+        if (num_bits > SHORT_THRESHOLD) {
+          BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID()); 
+        }
+        
+      }
     }
 
     /// Regular print function (from most significant bit to least)
@@ -606,8 +771,16 @@ namespace emp {
     size_t CountOnes_Sparse() const {
       const size_t NUM_FIELDS = NumFields();
       size_t bit_count = 0;
-      for (size_t i = 0; i < NUM_FIELDS; i++) {
-        field_t cur_field = bit_set[i];
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) {
+          field_t cur_field = BitSetPtr()[i];
+          while (cur_field) {
+            cur_field &= (cur_field-1);       // Peel off a single 1.
+            bit_count++;      // And increment the counter
+          }
+        }
+      } else {
+        field_t cur_field = *BitSetPtr().Raw();
         while (cur_field) {
           cur_field &= (cur_field-1);       // Peel off a single 1.
           bit_count++;      // And increment the counter
@@ -619,11 +792,17 @@ namespace emp {
     size_t CountOnes_Mixed() const {
       const field_t NUM_FIELDS = (1 + ((num_bits - 1) / FIELD_BITS));
       size_t bit_count = 0;
-      for (size_t i = 0; i < NUM_FIELDS; i++) {
+      
+       if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) {
           // when compiling with -O3 and -msse4.2, this is the fastest population count method.
-          std::bitset<FIELD_BITS> std_bs(bit_set[i]);
+          std::bitset<FIELD_BITS> std_bs(BitSetPtr()[i]);
           bit_count += std_bs.count();
-       }
+        }
+      } else {
+        std::bitset<FIELD_BITS> std_bs(*BitSetPtr().Raw());
+        bit_count += std_bs.count();
+      }
 
       return bit_count;
     }
@@ -638,22 +817,39 @@ namespace emp {
     int FindBit() const {
       const size_t NUM_FIELDS = NumFields();
       size_t field_id = 0;
-      while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
-      return (field_id < NUM_FIELDS) ?
-        (int) (find_bit(bit_set[field_id]) + (field_id * FIELD_BITS))  :  -1;
+      if (num_bits > SHORT_THRESHOLD) {
+        while (field_id < NUM_FIELDS && BitSetPtr()[field_id]==0) field_id++;
+        return (field_id < NUM_FIELDS) ?
+          (int) (find_bit(BitSetPtr()[field_id]) + (field_id * FIELD_BITS))  :  -1;
+      } else {
+        if (field_id < NUM_FIELDS && *BitSetPtr().Raw()==0) field_id++;
+        return (field_id < NUM_FIELDS) ?
+          (int) (find_bit(*BitSetPtr().Raw()) + (field_id * FIELD_BITS))  :  -1;
+      }
+      
     }
 
     /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
     int PopBit() {
       const size_t NUM_FIELDS = NumFields();
       size_t field_id = 0;
-      while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
-      if (field_id == NUM_FIELDS) return -1;  // Failed to find bit!
+      if (num_bits > SHORT_THRESHOLD) {
+        while (field_id < NUM_FIELDS && BitSetPtr()[field_id]==0) field_id++;
+        if (field_id == NUM_FIELDS) return -1;  // Failed to find bit!
 
-      const size_t pos_found = find_bit(bit_set[field_id]);
-      constexpr field_t val_one = 1;
-      bit_set[field_id] &= ~(val_one << pos_found);
-      return (int) (pos_found + (field_id * FIELD_BITS));
+        const size_t pos_found = find_bit(BitSetPtr()[field_id]);
+        constexpr field_t val_one = 1;
+        BitSetPtr()[field_id] &= ~(val_one << pos_found);
+        return (int) (pos_found + (field_id * FIELD_BITS));
+      } else {
+        if (field_id < NUM_FIELDS && *BitSetPtr().Raw()==0) field_id++;
+        if (field_id == NUM_FIELDS) return -1;  // Failed to find bit!
+
+        const size_t pos_found = find_bit(*BitSetPtr().Raw());
+        constexpr field_t val_one = 1;
+        *BitSetPtr().Raw() &= ~(val_one << pos_found);
+        return (int) (pos_found + (field_id * FIELD_BITS));
+      }
     }
 
     /// Return the position of the first one after start_pos; return -1 if no ones in vector.
@@ -665,17 +861,35 @@ namespace emp {
       if (start_pos >= num_bits) return -1;
       size_t field_id  = FieldID(start_pos);     // What field do we start in?
       const size_t field_pos = FieldPos(start_pos);    // What position in that field?
-      if (field_pos && (bit_set[field_id] & ~(MaskLow<field_t>(field_pos)))) {  // First field hit!
-        return (int) (find_bit(bit_set[field_id] & ~(MaskLow<field_t>(field_pos))) +
-                      field_id * FIELD_BITS);
-      }
+      
 
-      // Search other fields...
-      const size_t NUM_FIELDS = NumFields();
-      if (field_pos) field_id++;
-      while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
-      return (field_id < NUM_FIELDS) ?
-        (int) (find_bit(bit_set[field_id]) + (field_id * FIELD_BITS)) : -1;
+
+
+
+      if (num_bits > SHORT_THRESHOLD) {
+        if (field_pos && (BitSetPtr()[field_id] & ~(MaskLow<field_t>(field_pos)))) {  // First field hit!
+          return (int) (find_bit(BitSetPtr()[field_id] & ~(MaskLow<field_t>(field_pos))) +
+                      field_id * FIELD_BITS);
+        }
+
+        // Search other fields...
+        const size_t NUM_FIELDS = NumFields();
+        if (field_pos) field_id++;
+        while (field_id < NUM_FIELDS && BitSetPtr()[field_id]==0) field_id++;
+        return (field_id < NUM_FIELDS) ?
+          (int) (find_bit(BitSetPtr()[field_id]) + (field_id * FIELD_BITS)) : -1;
+      } else {
+        if (field_pos && (*BitSetPtr().Raw() & ~(MaskLow<field_t>(field_pos)))) {  // First field hit!
+          return (int) (find_bit(*BitSetPtr().Raw() & ~(MaskLow<field_t>(field_pos))) +
+                      field_id * FIELD_BITS);
+        }
+
+        // Search other fields...
+        const size_t NUM_FIELDS = NumFields();
+        if (field_pos) field_id++;
+        return (field_id < NUM_FIELDS) ?
+          (int) (find_bit(*BitSetPtr().Raw()) + (field_id * FIELD_BITS)) : -1;
+      }
     }
 
     /// Return positions of all ones.
@@ -693,8 +907,14 @@ namespace emp {
     BitVector NOT() const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~bit_set[i];
-      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) out_set.BitSetPtr()[i] = ~BitSetPtr()[i];
+        if (LastBitID() > 0) out_set.BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      } else {
+        *(out_set.BitSetPtr().Raw()) = ~(*(BitSetPtr().Raw()));
+        if (num_bits <= SHORT_THRESHOLD) *out_set.BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
+        
+      }
       return out_set;
     }
 
@@ -702,7 +922,12 @@ namespace emp {
     BitVector AND(const BitVector & set2) const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] & set2.bit_set[i];
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) out_set.BitSetPtr()[i] = BitSetPtr()[i] & set2.BitSetPtr()[i];
+      } else {
+        *(out_set.BitSetPtr().Raw()) = *BitSetPtr().Raw() & *(set2.BitSetPtr().Raw());
+        if (num_bits <= SHORT_THRESHOLD) *out_set.BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
+      }
       return out_set;
     }
 
@@ -710,7 +935,12 @@ namespace emp {
     BitVector OR(const BitVector & set2) const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] | set2.bit_set[i];
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) out_set.BitSetPtr()[i] = BitSetPtr()[i] | set2.BitSetPtr()[i];
+      } else {
+        *(out_set.BitSetPtr().Raw()) = *BitSetPtr().Raw() | *set2.BitSetPtr().Raw();
+        if (num_bits <= SHORT_THRESHOLD) *out_set.BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
+      }
       return out_set;
     }
 
@@ -718,8 +948,13 @@ namespace emp {
     BitVector NAND(const BitVector & set2) const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) out_set.BitSetPtr()[i] = ~(BitSetPtr()[i] & set2.BitSetPtr()[i]);
+        if (LastBitID() > 0) out_set.BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      } else {
+        *(out_set.BitSetPtr().Raw()) = ~(*BitSetPtr().Raw() & *set2.BitSetPtr().Raw());
+        if (num_bits <= SHORT_THRESHOLD) *out_set.BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
+      }
       return out_set;
     }
 
@@ -727,8 +962,13 @@ namespace emp {
     BitVector NOR(const BitVector & set2) const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) out_set.BitSetPtr()[i] = ~(BitSetPtr()[i] | set2.BitSetPtr()[i]);
+        if (LastBitID() > 0) out_set.BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      } else {
+        *(out_set.BitSetPtr().Raw()) = ~(*BitSetPtr().Raw() | *set2.BitSetPtr().Raw());
+        if (num_bits <= SHORT_THRESHOLD) *out_set.BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
+      }
       return out_set;
     }
 
@@ -736,7 +976,12 @@ namespace emp {
     BitVector XOR(const BitVector & set2) const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] ^ set2.bit_set[i];
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) out_set.BitSetPtr()[i] = BitSetPtr()[i] ^ set2.BitSetPtr()[i];
+      }else {
+        *(out_set.BitSetPtr().Raw()) = *BitSetPtr().Raw() ^ *set2.BitSetPtr().Raw();
+        if (num_bits <= SHORT_THRESHOLD) *out_set.BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
+      }
       return out_set;
     }
 
@@ -744,8 +989,13 @@ namespace emp {
     BitVector EQU(const BitVector & set2) const {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) out_set.BitSetPtr()[i] = ~(BitSetPtr()[i] ^ set2.BitSetPtr()[i]);
+        if (LastBitID() > 0) out_set.BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      } else {
+         *(out_set.BitSetPtr().Raw()) = ~(*BitSetPtr().Raw() ^ *set2.BitSetPtr().Raw());
+         if (num_bits <= SHORT_THRESHOLD) *out_set.BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - out_set.GetSize()));
+      }
       return out_set;
     }
 
@@ -753,53 +1003,89 @@ namespace emp {
     /// Perform a Boolean NOT with this BitVector, store result here, and return this object.
     BitVector & NOT_SELF() {
       const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
-      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) BitSetPtr()[i] = ~BitSetPtr()[i];
+        if (LastBitID() > 0) BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      } else {
+        *BitSetPtr().Raw() = ~*BitSetPtr().Raw();
+        if (num_bits <= SHORT_THRESHOLD) *BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
+      }
       return *this;
     }
 
     /// Perform a Boolean AND with this BitVector, store result here, and return this object.
     BitVector & AND_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] & set2.bit_set[i];
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) BitSetPtr()[i] = BitSetPtr()[i] & set2.BitSetPtr()[i];
+      } else {
+        *BitSetPtr().Raw() = *BitSetPtr().Raw() & *set2.BitSetPtr().Raw();
+        if (num_bits <= SHORT_THRESHOLD) *BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
+      }
       return *this;
     }
 
     /// Perform a Boolean OR with this BitVector, store result here, and return this object.
     BitVector & OR_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] | set2.bit_set[i];
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) BitSetPtr()[i] = BitSetPtr()[i] | set2.BitSetPtr()[i];
+      } else {
+        *BitSetPtr().Raw() = *BitSetPtr().Raw() | *set2.BitSetPtr().Raw();
+        if (num_bits <= SHORT_THRESHOLD) *BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
+      }
       return *this;
     }
 
     /// Perform a Boolean NAND with this BitVector, store result here, and return this object.
     BitVector & NAND_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) BitSetPtr()[i] = ~(BitSetPtr()[i] & set2.BitSetPtr()[i]);
+        if (LastBitID() > 0) BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      } else {
+        *BitSetPtr().Raw() = ~(*BitSetPtr().Raw() & *set2.BitSetPtr().Raw());
+        if (num_bits <= SHORT_THRESHOLD) *BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
+      }
       return *this;
     }
 
     /// Perform a Boolean NOR with this BitVector, store result here, and return this object.
     BitVector & NOR_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) BitSetPtr()[i] = ~(BitSetPtr()[i] | set2.BitSetPtr()[i]);
+        if (LastBitID() > 0) BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      } else {
+        *BitSetPtr().Raw() = ~(*BitSetPtr().Raw() | *set2.BitSetPtr().Raw());
+        if (num_bits <= SHORT_THRESHOLD) *BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
+      }
       return *this;
     }
 
     /// Perform a Boolean XOR with this BitVector, store result here, and return this object.
     BitVector & XOR_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] ^ set2.bit_set[i];
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) BitSetPtr()[i] = BitSetPtr()[i] ^ set2.BitSetPtr()[i];
+      } else {
+        *BitSetPtr().Raw() = *BitSetPtr().Raw() ^ *set2.BitSetPtr().Raw();
+        if (num_bits <= SHORT_THRESHOLD) *BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
+      }
       return *this;
     }
 
     /// Perform a Boolean EQU with this BitVector, store result here, and return this object.
     BitVector & EQU_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      if (num_bits > SHORT_THRESHOLD) {
+        for (size_t i = 0; i < NUM_FIELDS; i++) BitSetPtr()[i] = ~(BitSetPtr()[i] ^ set2.BitSetPtr()[i]);
+        if (LastBitID() > 0) BitSetPtr()[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      } else {
+        *BitSetPtr().Raw() = ~(*BitSetPtr().Raw() ^ *set2.BitSetPtr().Raw());
+        if (num_bits <= SHORT_THRESHOLD) *BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
+
+      }
       return *this;
     }
 
@@ -808,6 +1094,7 @@ namespace emp {
       BitVector out_set(*this);
       if (shift_size > 0) out_set.ShiftRight((size_t) shift_size);
       else if (shift_size < 0) out_set.ShiftLeft((size_t) -shift_size);
+      if (num_bits <= SHORT_THRESHOLD) *out_set.BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
       return out_set;
     }
 
@@ -815,6 +1102,7 @@ namespace emp {
     BitVector & SHIFT_SELF(const int shift_size) {
       if (shift_size > 0) ShiftRight((size_t) shift_size);
       else if (shift_size < 0) ShiftLeft((size_t) -shift_size);
+      if (num_bits <= SHORT_THRESHOLD) *BitSetPtr().Raw() &= (0xFFFFFFFFFFFFFFFF >> (SHORT_THRESHOLD - num_bits));
       return *this;
     }
 
