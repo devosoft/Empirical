@@ -107,6 +107,9 @@ RUN \
     build-essential \
     python-virtualenv \
     python-pip \
+    python3-virtualenv \
+    python-pip \
+    python3-pip \
     nodejs \
     npm \
     tar \
