@@ -1,3 +1,7 @@
+.PHONY: test test-examples test-native test-native-regular test-native-fulldebug test-native-examples test-web test-web-examples \
+	test-cookiecutter doc coverage install-dependencies install-doc-dependencies install-coverage-dependencies install-test-dependencies \
+	clean clean-dep
+
 test: test-native test-examples test-web
 	make test-native
 	make test-examples
