@@ -49,7 +49,7 @@ jobs:
     install:
     - docker build -t devosoft/empirical .
     - docker ps -a
-    script: docker run devosoft/empirical /bin/bash -c "cd /opt/Empirical/doc && make html coverage"
+    script: docker run devosoft/empirical /bin/bash -c "cd /opt/Empirical/doc && make html coverage | ./headtail.sh"
   - stage: test
     name: coverage
     compiler: clang++
