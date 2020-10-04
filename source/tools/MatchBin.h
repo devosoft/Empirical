@@ -554,19 +554,23 @@ namespace emp {
     ) override {
       const auto makeResult = [&]() {
         // compute distance between query and all stored tags
-        robin_hood::unordered_map<tag_t, double> matches;
-        for (const auto &[uid, tag] : state.tags) {
-          if (matches.find(tag) == std::end(matches)) {
-            matches[tag] = metric(query, tag);
+        emp::vector<double> matches;
+        matches.reserve( state.tags.size() );
+
+        std::transform(
+          std::begin(state.uids),
+          std::end(state.uids),
+          std::back_inserter(matches),
+          [&](const uid_t uid){
+            return metric(  query, state.tags.at(uid) );
           }
-        }
+        );
 
         // apply regulation to generate match scores
         robin_hood::unordered_map<uid_t, double> scores;
-        for (const auto & uid : state.uids) {
-          scores[uid] = state.regulators.at(uid)(
-            matches.at( state.tags.at(uid) )
-          );
+        for (size_t i = 0; i < state.uids.size(); ++i) {
+          const uid_t uid = state.uids[i];
+          scores[uid] = state.regulators.at(uid)( matches[i] );
         }
 
         return selector(state.uids, scores, n);
