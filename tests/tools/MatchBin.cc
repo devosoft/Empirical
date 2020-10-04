@@ -1812,7 +1812,7 @@ TEST_CASE("Test MatchBin", "[tools]")
 
     emp::RankedCacheState operator()(
       emp::vector<size_t>& uids,
-      std::unordered_map<size_t, double>& scores,
+      robin_hood::unordered_map<size_t, double>& scores,
       size_t n
     ){
       opCount+=1;
@@ -1899,7 +1899,7 @@ TEST_CASE("Test MatchBin", "[tools]")
     size_t opCount = 0;
     emp::RankedCacheState operator()(
       emp::vector<size_t>& uids,
-      std::unordered_map<size_t, double>& scores,
+      robin_hood::unordered_map<size_t, double>& scores,
       size_t n
     ){
       opCount+=1;

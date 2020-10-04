@@ -30,8 +30,9 @@
 #include <mutex>
 #include <shared_mutex>
 #include <string>
-#include <unordered_map>
 #include <atomic>
+
+#include "../../third-party/robin-hood-hashing/src/include/robin_hood.h"
 
 #include "../base/assert.h"
 #include "../base/optional.h"
@@ -79,7 +80,7 @@ namespace emp::internal {
       operator size_t() const { return emp::CombineHash(query, maybe_tag, buffer); }
     };
 
-    using logbuffer_t = std::unordered_map<
+    using logbuffer_t = robin_hood::unordered_map<
       LogEntry,
       size_t,
       TupleHash<
@@ -109,7 +110,7 @@ namespace emp::internal {
     // in this case, we simply return the data from our logbuffer.
     emp::ContainerDataFile<logbuffer_t> datafile;
 
-    using datapoint_t = std::pair<const LogEntry, size_t>;
+    using datapoint_t = robin_hood::pair<const LogEntry, size_t>;
     // setup getter functions
     std::function<query_t(const datapoint_t)> get_query_log = [](const datapoint_t datapoint){
       return datapoint.first.query;
@@ -277,12 +278,12 @@ namespace emp::internal {
 
       // caches
       // cache of regulated scores
-      std::unordered_map<
+      robin_hood::unordered_map<
         query_t,
         cache_state_t
       > cache_regulated;
       // cache of raw scores
-      std::unordered_map<
+      robin_hood::unordered_map<
         query_t,
         cache_state_t
       > cache_raw;
@@ -382,9 +383,9 @@ namespace emp {
     using tag_t = Tag;
     using uid_t = size_t;
 
-    std::unordered_map<uid_t, Val> values;
-    std::unordered_map<uid_t, Regulator> regulators;
-    std::unordered_map<uid_t, tag_t> tags;
+    robin_hood::unordered_map<uid_t, Val> values;
+    robin_hood::unordered_map<uid_t, Regulator> regulators;
+    robin_hood::unordered_map<uid_t, tag_t> tags;
     emp::vector<uid_t> uids;
 
     #ifdef CEREAL_NVP
@@ -543,7 +544,7 @@ namespace emp {
     ) override {
       const auto makeResult = [&]() {
         // compute distance between query and all stored tags
-        std::unordered_map<tag_t, double> matches;
+        robin_hood::unordered_map<tag_t, double> matches;
         for (const auto &[uid, tag] : state.tags) {
           if (matches.find(tag) == std::end(matches)) {
             matches[tag] = metric(query, tag);
@@ -551,7 +552,7 @@ namespace emp {
         }
 
         // apply regulation to generate match scores
-        std::unordered_map<uid_t, double> scores;
+        robin_hood::unordered_map<uid_t, double> scores;
         for (const auto & uid : state.uids) {
           scores[uid] = state.regulators.at(uid)(
             matches.at( state.tags.at(uid) )
@@ -607,14 +608,14 @@ namespace emp {
     ) override {
       const auto makeResult = [&]() {
         // compute distance between query and all stored tags
-        std::unordered_map<tag_t, double> matches;
+        robin_hood::unordered_map<tag_t, double> matches;
         for (const auto &[uid, tag] : state.tags) {
           if (matches.find(tag) == std::end(matches)) {
             matches[tag] = metric(query, tag);
           }
         }
         // apply regulation to generate match scores
-        std::unordered_map<uid_t, double> scores;
+        robin_hood::unordered_map<uid_t, double> scores;
         for (const auto & uid : state.uids) {
           scores[uid] = matches[state.tags[uid]];
         }
@@ -674,7 +675,7 @@ namespace emp {
       cache.Clear();
 
       state.values[uid] = v;
-      state.regulators.insert({{uid},{}});
+      state.regulators[uid] = {};
       state.tags[uid] = t;
       state.uids.push_back(uid);
       return uid;
@@ -938,5 +939,50 @@ namespace emp {
   };
 
 }
+
+namespace cereal {
+
+template<
+  class Archive,
+  class T
+>
+void save(
+  Archive & archive,
+  robin_hood::unordered_map<size_t, T> const & m
+) {
+
+  std::unordered_map<size_t, T> t;
+  std::transform(
+    std::begin( m ),
+    std::end( m ),
+    std::inserter( t , std::begin(t) ),
+    [](const auto& pair){
+      const auto& [k , v] = pair;
+      return std::pair{k, v};
+    }
+  );
+
+  archive( t );
+}
+
+template<
+  class Archive,
+  class T
+>
+void load(
+  Archive & archive,
+  robin_hood::unordered_map<size_t, T> & m
+) {
+
+  std::unordered_map<size_t, T> t;
+  archive( t );
+
+  for (const auto& [k, v] :  t) {
+    m[k] = v;
+  }
+
+}
+
+} // namespace cereal
 
 #endif

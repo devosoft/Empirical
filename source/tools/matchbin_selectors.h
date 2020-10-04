@@ -13,7 +13,6 @@
 #define EMP_MATCH_BIN_SELECTORS_H
 
 #include <iostream>
-#include <unordered_map>
 #include <unordered_set>
 #include <functional>
 #include <algorithm>
@@ -25,6 +24,8 @@
 #include <array>
 #include <utility>
 #include <limits>
+
+#include "../../third-party/robin-hood-hashing/src/include/robin_hood.h"
 
 #include "../base/assert.h"
 #include "../base/array.h"
@@ -167,7 +168,7 @@ namespace emp {
     virtual ~SelectorBase() {};
     virtual CacheType operator()(
         const emp::vector<size_t>& uids,
-        const std::unordered_map<size_t, double>& scores,
+        const robin_hood::unordered_map<size_t, double>& scores,
         size_t n
         ) = 0;
     virtual std::string name() const = 0;
@@ -202,7 +203,7 @@ namespace emp {
 
     RankedCacheState operator()(
       const emp::vector<size_t>& uids_,
-      const std::unordered_map<size_t, double>& scores,
+      const robin_hood::unordered_map<size_t, double>& scores,
       size_t n
     ) override {
 
@@ -295,7 +296,7 @@ namespace emp {
 
     RouletteCacheState operator()(
       const emp::vector<size_t>& uids_,
-      const std::unordered_map<size_t, double>& scores,
+      const robin_hood::unordered_map<size_t, double>& scores,
       size_t n
     ) override {
 
@@ -423,7 +424,7 @@ namespace emp {
 
     RouletteCacheState operator()(
       const emp::vector<size_t>& uids_,
-      const std::unordered_map<size_t, double>& scores,
+      const robin_hood::unordered_map<size_t, double>& scores,
       size_t n
     ) override {
 
@@ -555,7 +556,7 @@ namespace emp {
     // scores (post-regulation) are assumed to be between 0 and 1
     SieveCacheState operator()(
       const emp::vector<size_t>& uids_,
-      const std::unordered_map<size_t, double>& scores,
+      const robin_hood::unordered_map<size_t, double>& scores,
       size_t n
     ) override {
 
