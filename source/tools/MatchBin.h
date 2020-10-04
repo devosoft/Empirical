@@ -267,8 +267,10 @@ namespace emp::internal {
     friend class MatchBin;
 
     private:
+      #ifdef EMP_THREAD_SAFE
       mutable std::shared_mutex cache_regulated_mutex;
       mutable std::shared_mutex cache_raw_mutex;
+      #endif
 
       static constexpr bool cache_available = std::is_base_of<
         CacheStateBase,
@@ -326,32 +328,40 @@ namespace emp::internal {
       }
 
       /// Finds a query in raw cache.
-      /// This method is thread-safe.
+      /// This method is thread-safe if EMP_THREAD_SAFE is defined.
       size_t CountRaw(const query_t& query) {
+        #ifdef EMP_THREAD_SAFE
         std::shared_lock lock(cache_raw_mutex);
+        #endif
         return cache_raw.count(query);
       }
 
       /// Finds a query in regulated cache.
-      /// This method is thread-safe.
+      /// This method is thread-safe if EMP_THREAD_SAFE is defined.
       size_t CountRegulated(const query_t& query) {
+        #ifdef EMP_THREAD_SAFE
         std::shared_lock lock(cache_regulated_mutex);
+        #endif
         return cache_regulated.count(query);
       }
 
       /// Stores a query in regulated cache.
-      /// This method is thread-safe.
+      /// This method is thread-safe if EMP_THREAD_SAFE is defined.
       void CacheRegulated(const query_t& query, const cache_state_t& result) {
         if (CountRegulated(query) != 0) return;
+        #ifdef EMP_THREAD_SAFE
         std::unique_lock lock(cache_regulated_mutex);
+        #endif
         cache_regulated.emplace(query, result);
       }
 
       /// Stores a query in raw cache.
-      /// This method is thread-safe.
+      /// This method is thread-safe if EMP_THREAD_SAFE is defined.
       void CacheRaw(const query_t& query, const cache_state_t& result) {
         if (CountRaw(query) != 0) return;
+        #ifdef EMP_THREAD_SAFE
         std::unique_lock lock(cache_raw_mutex);
+        #endif
         cache_raw.emplace(query, result);
       }
 
