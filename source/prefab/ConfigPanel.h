@@ -18,17 +18,21 @@
 #include "Collapse.h"
 #include "ToggleSwitch.h"
 
-// TODO: Find a way for input callbacks to remain active
-// after a ConfigPanel object goes out of scope.
+/*
+ * TODO: Find a way for input callbacks to remain active
+ * after a ConfigPanel object goes out of scope.
+ */
 
 namespace emp {
 namespace prefab {
 
   namespace internal {
-      /// Shared pointer held by instances of ConfigPanel class representing
-      /// the same conceptual ConfigPanel DOM object.
-      /// Contains state that should persist while ConfigPanel DOM object
-      /// persists.
+      /**
+       * Shared pointer held by instances of ConfigPanel class representing
+       * the same conceptual ConfigPanel DOM object.
+       * Contains state that should persist while ConfigPanel DOM object
+       * persists.
+       */
       class ConfigPanelInfo : public web::internal::DivInfo {
 
       public:
@@ -38,17 +42,25 @@ namespace prefab {
         on_change_fun_t on_change_fun{ [](const std::string & val) { ; } };
 
       public:
-        /// Construct a shared pointer to manage ConfigPanel state.
-        /// @param in_id HTML ID of ConfigPanel div
+        /**
+         * Construct a shared pointer to manage ConfigPanel state.
+         *
+         * @param in_id HTML ID of ConfigPanel div
+         */
         ConfigPanelInfo( const std::string & in_id="" )
         : web::internal::DivInfo(in_id) { ; }
 
-        /// Get current on-update callback for a ConfigPanel.
-        /// @return current callback function handle
+        /**
+         * Get current on-update callback for a ConfigPanel.
+         *
+         * @return current callback function handle
+         */
         on_change_fun_t & GetOnChangeFun() { return on_change_fun; }
 
-        /// Set on-update callback for a ConfigPanel.
-        /// @fun callback function handle
+        /**
+         * Set on-update callback for a ConfigPanel.
+         *  @fun callback function handle
+         */
         void SetOnChangeFun(const on_change_fun_t & fun) {
           on_change_fun = fun;
         }
@@ -57,26 +69,36 @@ namespace prefab {
 
   }
 
-  /// Use the ConfigPanel class to easily add a dynamic configuration
-  /// panel to your web app. Users can interact with the config panel
-  /// by updating values.
+  /**
+   * Use the ConfigPanel class to easily add a dynamic configuration
+   * panel to your web app. Users can interact with the config panel
+   * by updating values.
+   */
   class ConfigPanel : public web::Div {
     public:
       using on_change_fun_t = internal::ConfigPanelInfo::on_change_fun_t;
 
     private:
-      /// Type of shared pointer shared among instances of ConfigPanel
-      /// representing the same conceptual DOM element.
+      /**
+       * Type of shared pointer shared among instances of ConfigPanel
+       * representing the same conceptual DOM element.
+       */
       using INFO_TYPE = internal::ConfigPanelInfo;
 
-      /// Get shared info pointer, cast to ConfigPanel-specific type.
-      /// @return cast pointer
+      /**
+       * Get shared info pointer, cast to ConfigPanel-specific type.
+       *
+       * @return cast pointer
+       */
       INFO_TYPE * Info() {
         return dynamic_cast<INFO_TYPE *>(info);
       }
 
-      /// Get shared info pointer, cast to const ConfigPanel-specific type.
-      /// @return cast pointer
+      /**
+       * Get shared info pointer, cast to const ConfigPanel-specific type.
+       *
+       * @return cast pointer
+       */
       const INFO_TYPE * Info() const {
         return dynamic_cast<INFO_TYPE *>(info);
       }
@@ -93,12 +115,15 @@ namespace prefab {
         return to_titlecase(join(sliced, " "));
       };
 
-      /// For ints and doubles, there are three inputs:
-      /// a number input and two slider inputs.
-      /// SyncForm updates two inputs with the new value in the third input.
-      /// @param val new value to be update the inputs with
-      /// @param input1 ID of one input that needs its value updated
-      /// @param input2 ID of the second input that needs its value updated
+      /**
+       * For ints and doubles, there are three inputs:
+       * a number input and two slider inputs.
+       * SyncForm updates two inputs with the new value in the third input.
+       *
+       * @param val new value to be update the inputs with
+       * @param input1 ID of one input that needs its value updated
+       * @param input2 ID of the second input that needs its value updated
+       */
       void SyncForm(const std::string val, const std::string input1, const std::string input2) {
           emp::web::Input div1(settings_div.Find(input1));
           div1.Value(val);
@@ -108,14 +133,19 @@ namespace prefab {
           div2.Redraw();
       }
 
-      /// Get current on-update callback.
-      /// @return current callback function handle
+      /**
+       * Get current on-update callback.
+       *
+       * @return current callback function handle
+       */
       on_change_fun_t& GetOnChangeFun() {
           return Info()->GetOnChangeFun();
       };
 
-      /// Run on-update callback.
-      /// @val TODO what is this?
+      /**
+       * Run on-update callback.
+       * @val TODO what is this?
+       */
       void DoOnChangeFun(const std::string & val) {
           Info()->GetOnChangeFun()(val);
       };
@@ -128,8 +158,10 @@ namespace prefab {
       ) : config(c)
       { info = new internal::ConfigPanelInfo(div_name); }
 
-      /// Sets on-update callback for a ConfigPanel.
-      /// @fun callback function handle
+      /**
+       * Sets on-update callback for a ConfigPanel.
+       * @fun callback function handle
+       */
       void SetOnChangeFun(const on_change_fun_t& fun) {
         Info()->SetOnChangeFun(fun);
       }
@@ -178,8 +210,11 @@ namespace prefab {
         exclude.insert(setting);
       }
 
-      /// Arranges config panel based configuration pass to constructor
-      /// @param id_prefix string appended to id for each setting group Div
+      /**
+       * Arranges config panel based configuration pass to constructor
+       *
+       * @param id_prefix string appended to id for each setting group Div
+       */
       void Setup(const std::string & id_prefix = "settings_") {
         for (auto group : config.GetGroupSet()) {
           // std::cout << "GROUP: " << group->GetName() << std::endl;

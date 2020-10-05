@@ -18,15 +18,17 @@ struct Test_Code_Block_HTMLLayout : public emp::web::BaseTest {
 
 
   // Construct the following HTML structure:
-  // <div id="emp_test_container">
-  //   <div id="test_div">
-  //        <pre id="code_block" class="c++">
-  //            <code class="hljs cpp">
-  //                <span>[contents of code block]</span>
-  //            </code>
-  //        </pre>
-  //    </div>
-  // </div>
+  /*
+   * <div id="emp_test_container">
+   *  <div id="test_div">
+   *    <pre id="code_block" class="c++">
+   *      <code class="hljs cpp">
+   *        <span>[contents of code block]</span>
+   *      </code>
+   *    </pre>
+   *  </div>
+   * </div>
+   */
   Test_Code_Block_HTMLLayout()
   : BaseTest({"emp_test_container"})
   {
@@ -125,9 +127,9 @@ struct Test_Code_Block_HTMLLayout : public emp::web::BaseTest {
 emp::web::MochaTestRunner test_runner;
 
 int main() {
+
   test_runner.Initialize({"emp_test_container"});
-
   test_runner.AddTest<Test_Code_Block_HTMLLayout>("Test emp::prefab::CodeBlock");
-
   test_runner.Run();
+  
 }

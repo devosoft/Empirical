@@ -25,9 +25,11 @@ namespace prefab {
     }
 
   public:
-    /// @param state indicate whether card should be STAITC, INIT_OPEN, or INIT_CLOSED (default STAITC)
-    /// @param show_glyphs should toggle icons show in collapsible card header? (default true)
-    /// @param id user defined ID for card Div, (default emscripten generated)
+    /**
+     * @param state indicate whether card should be STAITC, INIT_OPEN, or INIT_CLOSED (default STAITC)
+     * @param show_glyphs should toggle icons show in collapsible card header? (default true)
+     * @param id user defined ID for card Div, (default emscripten generated)
+     */
     Card(
       const std::string & state="STATIC",
       const bool & show_glyphs=true,
@@ -60,19 +62,26 @@ namespace prefab {
       }
     }
 
-    /// Add content to header section of card
-    /// @param val content to be added to header, can be a web element or primitive type
-    /// @param link_content indicates whether the content should have Bootstrap link properties (default false)
+    /**
+     * Add content to header section of card
+     *
+     * @param val content to be added to header, can be a web element or primitive type
+     * @param link_content indicates whether the content should have Bootstrap link properties (default false)
+     */
     template <typename T>
     void AddHeaderContent(T val, const bool link_content=false) {
-      // Note: val can be a controller of a target area (made with CollapseCoupling class)
-      // but when added to header of the card, it will also trigger the card
-      // to collapse/expand
+      /*
+       * Note: val can be a controller of a target area (made with CollapseCoupling class)
+       * but when added to header of the card, it will also trigger the card
+       * to collapse/expand
+       */
       if (link_content) {
-        // add bootstrap link properities to content (hover, underline, etc.),
-        // but does not set a target or href because it is assumed that
-        // this content will control the card collapse, which is done in the
-        // constructor.
+        /*
+         * Add bootstrap link properities to content (hover, underline, etc.),
+         * but does not set a target or href because it is assumed that
+         * this content will control the card collapse, which is done in the
+         * constructor.
+         */
         web::Div btn_link;
         btn_link.SetAttr("class", "btn-link");
         card_header << btn_link << val;
@@ -81,16 +90,21 @@ namespace prefab {
       }
     }
 
-    /// Add content to body section of card
-    /// @param val can be a web element or primitive type
+    /**
+     * Add content to body section of card
+     *
+     * @param val can be a web element or primitive type
+     */
     template <typename T>
     void AddBodyContent(T val) {
       card_body << val;
     }
 
-    // TODO: override operator<< so that it streams into body of card
-    // Methods tried so far (without success) are listed in
-    // Issue #345 (https://github.com/devosoft/Empirical/issues/345)
+    /*
+     * TODO: override operator<< so that it streams into body of card
+     * Methods tried so far (without success) are listed in
+     * Issue #345 (https://github.com/devosoft/Empirical/issues/345)
+     */
   };
 }
 }

@@ -87,24 +87,12 @@ struct Test_FontAwesome_Icon_HTMLLayout : public emp::web::BaseTest {
 
 };
 
-// Create a MochaTestRunner object in the global namespace so that it hangs around after main finishes.
 emp::web::MochaTestRunner test_runner;
 
 int main() {
 
-  // MochaTestRunner::Initialize will make sure empirical's web environment is initialized, and will
-  // append a set of div elements (with the given string ids) to the HTML document body.
-  // Between tests, the MochaTestRunner clears the contents of these div elements.
-  // Remember, karma is generating our HTML file, so this is useful for attaching any HTML divs that
-  // you want to interact with in your tests.
   test_runner.Initialize({"emp_test_container"});
-
-  // We add tests to the test runner like this:
-  //  where "Test Element" is the name of the test (and does not need to be unique)
-  test_runner.AddTest<Test_FontAwesome_Icon_HTMLLayout>(
-    "Test FontAwesome Icon HTML Layout"
-  );
-
-  // Once we add all of the tests we want to run in this file, run them!
+  test_runner.AddTest<Test_FontAwesome_Icon_HTMLLayout>("Test FontAwesome Icon HTML Layout");
   test_runner.Run();
+  
 }

@@ -4,16 +4,20 @@
 #include "../web/Div.h"
 #include "../tools/string_utils.h"
 
-// TODO: When prefab tools for adding mobile only and desktop only
-// content are created, remove AddMobileContent(), desktop_content
-// and mobile_content divs, and ConfigPanel as a friend class.
-// AddConent() should stream into all_content div.
+/*
+ * TODO: When prefab tools for adding mobile only and desktop only
+ * content are created, remove AddMobileContent(), desktop_content
+ * and mobile_content divs, and ConfigPanel as a friend class.
+ * AddConent() should stream into all_content div.
+ */
 
 namespace emp {
 namespace prefab {
   class ConfigPanel;
-  /// Use CommentBox class to create a light grey "comment bubble".
-  /// Optionally, it can contain text and other web elements.
+  /**
+   * Use CommentBox class to create a light grey "comment bubble".
+   * Optionally, it can contain text and other web elements.
+   */
   class CommentBox: public web::Div {
     friend prefab::ConfigPanel;
     private:
@@ -30,9 +34,12 @@ namespace prefab {
 
     protected:
       /// Add content only to be shown on small screens
-      // TODO: In the future, remove this method and instead
-      // have a prefab tool that can add mobile content to
-      // web element.
+
+      /*
+       * TODO: In the future, remove this method and instead
+       * have a prefab tool that can add mobile content to
+       *  web element.
+       */
       template <typename T>
       void AddMobileContent(T val) {
         mobile_content << val;
@@ -50,11 +57,16 @@ namespace prefab {
         mobile_content.SetAttr("class", "mobile_commentbox");
       }
 
-      /// Take input of any type and add it to the comment box.
-      /// Content will show on all screen sizes.
-      // TODO: override the input operator to stream into the correct div
-      // See issue #345 (https://github.com/devosoft/Empirical/issues/345)
-      // for methods tried already.
+      /**
+       * Take input of any type and add it to the comment box.
+       * Content will show on all screen sizes.
+       */
+
+      /*
+       * TODO: override the input operator to stream into the correct div
+       * See issue #345 (https://github.com/devosoft/Empirical/issues/345)
+       * for methods tried already.
+       */
       template <typename T>
       void AddContent(T val) {
         desktop_content << val;

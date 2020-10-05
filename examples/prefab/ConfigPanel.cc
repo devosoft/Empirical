@@ -10,7 +10,7 @@
 #include "web/web.h"
 #include "web/UrlParams.h"
 
-#include "SampleConfig.h"
+#include "assets/SampleConfig.h"
 
 namespace UI = emp::web;
 

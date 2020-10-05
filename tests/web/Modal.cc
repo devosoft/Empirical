@@ -16,14 +16,14 @@
 
 struct Test_Modal : emp::web::BaseTest {
   // Construct the following HTML structure:
-  /**
-    <span id="switch_on" style="clear: none; display: inline;" class="custom-control custom-switch">
-        <input type="checkbox" onchange="emp.Callback(32, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" checked="checked" class="custom-control-input">
-        <label class="custom-control-label" for="[input_id]">
-            <span>Switch Defult On</span>
-        </label>
-    </span>
- */
+  /*
+   * <span id="switch_on" style="clear: none; display: inline;" class="custom-control custom-switch">
+   *  <input type="checkbox" onchange="emp.Callback(32, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" checked="checked" class="custom-control-input">
+   *  <label class="custom-control-label" for="[input_id]">
+   *    <span>Switch Defult On</span>
+   *  </label>
+   * </span>
+   */
   Test_Modal()
   : BaseTest({"emp_test_container"})
   {
@@ -382,7 +382,7 @@ emp::web::MochaTestRunner test_runner;
 int main() {
 
   test_runner.Initialize({"emp_test_container"});
-
   test_runner.AddTest<Test_Modal>("Test emp::prefab::Modal");
   test_runner.Run();
+
 }

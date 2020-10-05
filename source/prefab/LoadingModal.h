@@ -10,7 +10,7 @@
  *
  * See https://devosoft.github.io/empirical-prefab-demo/empirical-prefab-demo
  * for more details.
-*/
+ */
 #include "../web/Element.h"
 #include "../web/Div.h"
 #include "../web/Widget.h"
@@ -18,11 +18,13 @@
 
 namespace emp {
 namespace prefab {
-  /// This method does not belong to a class, but it is used
-  /// to close a loading modal that is added with the
-  /// LoadingModal.js script. See the prefab demo site
-  /// for more details on how to implement the Loading Modal
-  /// in your web app. https://devosoft.github.io/empirical-prefab-demo
+  /**
+   * This method does not belong to a class, but it is used
+   * to close a loading modal that is added with the
+   * LoadingModal.js script. See the prefab demo site
+   * for more details on how to implement the Loading Modal
+   * in your web app. https://devosoft.github.io/empirical-prefab-demo
+   */
   void CloseLoadingModal() {
     emscripten_run_script("CloseLoadingModal();");
   }

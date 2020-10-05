@@ -16,14 +16,14 @@
 
 struct Test_ToggleSwitch_init_on : emp::web::BaseTest {
   // Construct the following HTML structure:
-  /**
-    <span id="switch_on" style="clear: none; display: inline;" class="custom-control custom-switch">
-        <input type="checkbox" onchange="emp.Callback(32, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" checked="checked" class="custom-control-input">
-        <label class="custom-control-label" for="[input_id]">
-            <span>Switch Defult On</span>
-        </label>
-    </span>
- */
+  /*
+   * <span id="switch_on" style="clear: none; display: inline;" class="custom-control custom-switch">
+   *  <input type="checkbox" onchange="emp.Callback(32, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" checked="checked" class="custom-control-input">
+   *  <label class="custom-control-label" for="[input_id]">
+   *    <span>Switch Defult On</span>
+   *  </label>
+   * </span>
+   */
   Test_ToggleSwitch_init_on()
   : BaseTest({"emp_test_container"})
   {
@@ -114,7 +114,7 @@ struct Test_ToggleSwitch_init_on : emp::web::BaseTest {
 struct Test_ToggleSwitch_init_off : emp::web::BaseTest {
 
   // Construct the following HTML structure:
-  /**
+  /*
   * <span id="switch_off" style="clear: none; display: inline;" class="custom-control custom-switch">
   *     <input type="checkbox" onchange="emp.Callback(32, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" class="custom-control-input">
   *     <label class="custom-control-label">
@@ -213,16 +213,16 @@ struct Test_ToggleSwitch_add_label : emp::web::BaseTest {
 
 
   // Construct the following HTML structure:
-  /**
-    <span id="switch" style="clear: none; display: inline;" class="custom-control custom-switch">
-        <input type="checkbox" onchange="emp.Callback(32, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" class="custom-control-input">
-        <label class="custom-control-label">
-            <div id="added_label">
-              <span><h3>Text</h3></span>
-            </div>
-        </label>
-    </span>
- */
+  /*
+   * <span id="switch" style="clear: none; display: inline;" class="custom-control custom-switch">
+   *  <input type="checkbox" onchange="emp.Callback(32, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" class="custom-control-input">
+   *  <label class="custom-control-label">
+   *    <div id="added_label">
+   *      <span><h3>Text</h3></span>
+   *    </div>
+   *  </label>
+   * </span>
+   */
   Test_ToggleSwitch_add_label()
   : BaseTest({"emp_test_container"})
   {
@@ -344,11 +344,11 @@ struct Test_ToggleSwitch_add_label : emp::web::BaseTest {
 };
 emp::web::MochaTestRunner test_runner;
 int main() {
-
   test_runner.Initialize({"emp_test_container"});
 
   test_runner.AddTest<Test_ToggleSwitch_init_on>("Test emp::prefab::ToggleSwitch default on");
   test_runner.AddTest<Test_ToggleSwitch_init_off>("Test emp::prefab::ToggleSwitch default off");
   test_runner.AddTest<Test_ToggleSwitch_add_label>("Test emp::prefab::ToggleSwitch test AddLabel()");
+
   test_runner.Run();
 }

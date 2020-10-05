@@ -1,3 +1,6 @@
+// Adapted from Emily's memic_model project
+// https://github.com/emilydolson/memic_model
+
 #pragma once
 
 #include "config/config.h"

@@ -8,9 +8,11 @@
 
 namespace emp {
 namespace prefab {
-  /// Use FontAwesomeIcon class to add a glyph from the
-  /// FontAwesome library to your web app.
-  /// (https://fontawesome.com/v4.7.0/icons/)
+  /**
+   * Use FontAwesomeIcon class to add a glyph from the
+   * FontAwesome library to your web app.
+   * (https://fontawesome.com/v4.7.0/icons/)
+   */
   class FontAwesomeIcon: public web::Element {
     public:
       /// @param fa_name the font awesome class of the desired icon
@@ -20,13 +22,16 @@ namespace prefab {
         this->SetAttr("class", full_class);
       }
 
-      // TODO: Prevent user from streaming content into the icon, throw error
-      // The method below throws an error when trying to stream
-      // a code block into anything else (web element, html).
-      // template <typename T>
-      // void operator<<(T invalid) {
-      //     emp::LibraryError("Not allowed to add code to the FontAwesome icon");
-      // }
+      /*
+       * TODO: Prevent user from streaming content into the icon, throw error
+       * The method below throws an error when trying to stream
+       * a code block into anything else (web element, html).
+       *
+       * template <typename T>
+       * void operator<<(T invalid) {
+       *      emp::LibraryError("Not allowed to add code to the FontAwesome icon");
+       * }
+       */
   };
 }
 }

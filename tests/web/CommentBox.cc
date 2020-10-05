@@ -19,7 +19,7 @@ struct Test_Comment_Box_HTMLLayout : public emp::web::BaseTest {
 
 
   // Construct the following HTML structure:
-  /**
+  /*
    * <div id="emp_base">
    *  <div id="comment_box">
    *    <div id="comment_box_triangle" class="commentbox_triangle"></div>
@@ -179,13 +179,12 @@ struct Test_Comment_Box_HTMLLayout : public emp::web::BaseTest {
 
 };
 
-// Create a MochaTestRunner object in the global namespace so that it hangs around after main finishes.
 emp::web::MochaTestRunner test_runner;
 
 int main() {
+
   test_runner.Initialize({"emp_test_container"});
-
   test_runner.AddTest<Test_Comment_Box_HTMLLayout>("Test emp::prefab::CommentBox HTML Layout");
-
   test_runner.Run();
+  
 }

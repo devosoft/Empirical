@@ -19,7 +19,7 @@ struct Test_Loading_Modal_Open_HTMLLayout : public emp::web::BaseTest {
 
 
   // Construct the following HTML structure:
-  /**
+  /*
    * <div class="modal bd-example-modal-lg show" id="loading_modal" data-backdrop="static" data-keyboard="false" tabindex="-1" style="display: block;">
    *  <div class="modal-dialog modal-sm">
    *    <div class="modal-content" style="width: 256px">
@@ -221,7 +221,7 @@ struct Test_Loading_Modal_Closed_HTMLLayout : public emp::web::BaseTest {
 
 
   // Construct the following HTML structure:
-  /**
+  /*
    * <div class="modal bd-example-modal-lg" id="loading_modal" data-backdrop="static" data-keyboard="false" tabindex="-1" style="display: none;" aria-hidden="true">
    *  <div class="modal-dialog modal-sm">
    *    <div class="modal-content" style="width: 256px">

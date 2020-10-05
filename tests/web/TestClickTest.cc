@@ -2,7 +2,7 @@
 //  Copyright (C) Michigan State University, 2020.
 //  Released under the MIT Software license; see doc/LICENSE
 
-/**
+/*
  * This file can be used to test triggering a mouse click by the user.
  * It appears that .click() can be used to trigger a click.
  * Issues encountered:
@@ -42,7 +42,7 @@
 struct Test_Collapse_Click_Initial : emp::web::BaseTest {
 
   // Construct the following HTML structure:
-  /**
+  /*
    * <div id="emp_test_container">
    *
    * <span aria-controls=".set1" aria-expanded="true" class="collapse_toggle" data-target=".set1" data-toggle="collapse" role="button">Controller 1</span>
@@ -95,7 +95,7 @@ struct Test_Collapse_Click_Initial : emp::web::BaseTest {
 struct Test_Collapse_One_Click : emp::web::BaseTest {
 
   // Construct the following HTML structure:
-  /**
+  /*
    * <div id="emp_test_container">
    *
    * <span aria-controls=".set1" aria-expanded="true" class="collapse_toggle" data-target=".set1" data-toggle="collapse" role="button">Controller 1</span>
@@ -145,7 +145,7 @@ struct Test_Collapse_One_Click : emp::web::BaseTest {
 struct Test_Collapse_Two_Clicks : emp::web::BaseTest {
 
   // Construct the following HTML structure:
-  /**
+  /*
    * <div id="emp_test_container">
    *
    * <span aria-controls=".set1" aria-expanded="true" class="collapse_toggle" data-target=".set1" data-toggle="collapse" role="button">Controller 1</span>
@@ -207,9 +207,9 @@ struct Test_Collapse_Two_Clicks : emp::web::BaseTest {
               chai.assert.isTrue(target.classList.contains("show"));
             }, 1000);
           });
-        
+
       });
-      
+
     });
   }
 };
@@ -218,7 +218,7 @@ struct Test_Collapse_Two_Clicks : emp::web::BaseTest {
 struct Test_show_timing : emp::web::BaseTest {
 
   // Construct the following HTML structure:
-  /**
+  /*
    * <div id="emp_test_container">
    *
    * <span aria-controls=".set1" aria-expanded="false" class="collapse_toggle" data-target=".set1" data-toggle="collapse" role="button">Controller 1</span>
@@ -267,12 +267,12 @@ struct Test_show_timing : emp::web::BaseTest {
 
 emp::web::MochaTestRunner test_runner;
 int main() {
-
   test_runner.Initialize({"emp_test_container"});
 
   test_runner.AddTest<Test_Collapse_Click_Initial>("Test DOM of original emp::prefab::Collapse element"); // Passes
   test_runner.AddTest<Test_Collapse_One_Click>("Test DOM after 1st click of emp::prefab::Collapse element"); // Passes
   test_runner.AddTest<Test_Collapse_Two_Clicks>("Test DOM after 2nd click of emp::prefab::Collapse element"); // Passes, but not efficient
   test_runner.AddTest<Test_show_timing>("Test existance of class show after expanding"); // Passes
+
   test_runner.Run();
 }

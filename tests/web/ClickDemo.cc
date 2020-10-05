@@ -12,12 +12,12 @@
 
 #include "web/Button.h"
 
-int x = 0; 
+int x = 0;
 
 // Test that the user can trigger multiple clicks of a web element.
 struct Test_Click : public emp::web::BaseTest {
   // Construct the following HTML structure:
-  /**
+  /*
    * <span id="emp__0">0</span>
    * <button id="counter_id" onclick="emp.Callback(2)">Increment</button>
    */
@@ -27,7 +27,7 @@ struct Test_Click : public emp::web::BaseTest {
                                      // objects for each given html element ids.
   {
     Doc("emp_test_container") << emp::web::Live(x);
-    
+
     emp::web::Button counter( [this](){ x+=1; Doc("emp_test_container").Redraw(); }, "Increment", "counter_id" );
     Doc("emp_test_container") << counter;
 
@@ -96,14 +96,12 @@ struct Test_Click : public emp::web::BaseTest {
 
 };
 
-// Create a MochaTestRunner object in the global namespace so that it hangs around after main finishes.
 emp::web::MochaTestRunner test_runner;
 
 int main() {
 
   test_runner.Initialize({"emp_test_container"});
-
   test_runner.AddTest<Test_Click>("Test Increment Button");
-
   test_runner.Run();
+  
 }

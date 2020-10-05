@@ -179,7 +179,7 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
 
 
   // Construct the following HTML structure:
-  /**
+  /*
    * <div id="emp_test_container">
    * <div id="open" class="card">
    *
@@ -740,7 +740,6 @@ struct Test_Card_INIT_CLOSED_HTMLLayout : public emp::web::BaseTest {
 emp::web::MochaTestRunner test_runner;
 
 int main() {
-
   test_runner.Initialize({"emp_test_container"});
 
   test_runner.AddTest<Test_Card_STATIC_HTMLLayout>("Test Static Card HTML Layout");
