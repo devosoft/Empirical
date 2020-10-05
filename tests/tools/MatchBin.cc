@@ -1811,12 +1811,14 @@ TEST_CASE("Test MatchBin", "[tools]")
     size_t opCount = 0;
 
     emp::RankedCacheState operator()(
-      emp::vector<size_t>& uids,
-      robin_hood::unordered_map<size_t, double>& scores,
+      emp::vector< std::pair<size_t, double> > scores,
       size_t n
     ){
       opCount+=1;
-      return emp::RankedSelector<std::ratio<2,1>>::operator()(uids, scores, n);
+      return emp::RankedSelector<std::ratio<2,1>>::operator()(
+        scores,
+        n
+      );
     }
   };
 
@@ -1898,12 +1900,11 @@ TEST_CASE("Test MatchBin", "[tools]")
 
     size_t opCount = 0;
     emp::RankedCacheState operator()(
-      emp::vector<size_t>& uids,
-      robin_hood::unordered_map<size_t, double>& scores,
+      emp::vector< std::pair<size_t, double> > scores,
       size_t n
     ){
       opCount+=1;
-      return emp::RankedSelector<std::ratio<2,1>>::operator()(uids, scores, n);
+      return emp::RankedSelector<std::ratio<2,1>>::operator()(scores, n);
     }
   };
 

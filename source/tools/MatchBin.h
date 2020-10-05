@@ -393,22 +393,27 @@ namespace emp {
     using tag_t = Tag;
     using uid_t = size_t;
 
-    robin_hood::unordered_map<uid_t, Val> values;
-    robin_hood::unordered_map<uid_t, Regulator> regulators;
-    robin_hood::unordered_map<uid_t, tag_t> tags;
-    emp::vector<uid_t> uids;
+    struct entry {
+      Val val;
+      Regulator regulator;
+      Tag tag;
+
+      template <class Archive>
+      void serialize( Archive & ar ) {
+        ar(
+          CEREAL_NVP(val),
+          CEREAL_NVP(regulator),
+          CEREAL_NVP(tag)
+        );
+      }
+
+    };
+
+    robin_hood::unordered_map< uid_t, entry > data;
 
     #ifdef CEREAL_NVP
     template <class Archive>
-    void serialize( Archive & ar )
-    {
-      ar(
-        CEREAL_NVP(values),
-        CEREAL_NVP(regulators),
-        CEREAL_NVP(tags),
-        CEREAL_NVP(uids)
-      );
-    }
+    void serialize( Archive & ar ) { ar( CEREAL_NVP(data) ); }
     #endif
   };
 
@@ -463,7 +468,7 @@ namespace emp {
     virtual void ImprintRegulators(const BaseMatchBin & target) = 0;
     virtual void ImprintRegulators(const BaseMatchBin::state_t & target) = 0;
     virtual std::string name() const = 0;
-    virtual const emp::vector<uid_t>& ViewUIDs() const = 0;
+    virtual emp::vector<uid_t> ViewUIDs() const = 0;
     virtual emp::internal::MatchBinLog<query_t, tag_t>& GetLog() = 0;
   };
 
@@ -554,26 +559,23 @@ namespace emp {
     ) override {
       const auto makeResult = [&]() {
         // compute distance between query and all stored tags
-        emp::vector<double> matches;
-        matches.reserve( state.tags.size() );
+        emp::vector< std::pair< uid_t, double > > scores;
+        scores.reserve( state.data.size() );
 
         std::transform(
-          std::begin(state.uids),
-          std::end(state.uids),
-          std::back_inserter(matches),
-          [&](const uid_t uid){
-            return metric(  query, state.tags.at(uid) );
+          std::begin(state.data),
+          std::end(state.data),
+          std::back_inserter(scores),
+          [&](const auto& pair){
+            const auto& [uid, pack] = pair;
+            return std::pair{
+              uid,
+              pack.regulator( metric(query, pack.tag) )
+            };
           }
         );
 
-        // apply regulation to generate match scores
-        robin_hood::unordered_map<uid_t, double> scores;
-        for (size_t i = 0; i < state.uids.size(); ++i) {
-          const uid_t uid = state.uids[i];
-          scores[uid] = state.regulators.at(uid)( matches[i] );
-        }
-
-        return selector(state.uids, scores, n);
+        return selector( std::move(scores), n );
       };
       const auto getResult = [&]() {
         // try looking up in cache
@@ -622,18 +624,23 @@ namespace emp {
     ) override {
       const auto makeResult = [&]() {
         // compute distance between query and all stored tags
-        robin_hood::unordered_map<tag_t, double> matches;
-        for (const auto &[uid, tag] : state.tags) {
-          if (matches.find(tag) == std::end(matches)) {
-            matches[tag] = metric(query, tag);
+        emp::vector< std::pair< uid_t, double > > scores;
+        scores.reserve( state.data.size() );
+
+        std::transform(
+          std::begin(state.data),
+          std::end(state.data),
+          std::back_inserter(scores),
+          [&](const auto& pair){
+            const auto& [uid, pack] = pair;
+            return std::pair{
+              uid,
+              metric(query, pack.tag)
+            };
           }
-        }
-        // apply regulation to generate match scores
-        robin_hood::unordered_map<uid_t, double> scores;
-        for (const auto & uid : state.uids) {
-          scores[uid] = matches[state.tags[uid]];
-        }
-        return selector(state.uids, scores, n);
+        );
+
+        return selector( std::move(scores), n );
       };
       const auto getResult = [&]() {
         // try looking up in cache
@@ -672,7 +679,7 @@ namespace emp {
     /// that entry.
     uid_t Put(const Val & v, const tag_t & t) override {
       const uid_t orig = uid_stepper;
-      while (state.values.find(++uid_stepper) != std::end(state.values)) {
+      while (state.data.find(++uid_stepper) != std::end(state.data)) {
         // if container is full
         // i.e., wrapped around because all uids already allocated
         if (uid_stepper == orig) throw std::runtime_error("container full");
@@ -684,62 +691,30 @@ namespace emp {
     /// (Caller is responsible for ensuring UID is unique
     /// or calling Delete beforehand.)
     uid_t Set(const Val & v, const tag_t & t, const uid_t uid) override {
-      emp_assert(state.values.find(uid) == std::end(state.values));
+      emp_assert(state.data.find(uid) == std::end(state.data));
 
       cache.Clear();
 
-      state.values[uid] = v;
-      state.regulators[uid] = {};
-      state.tags[uid] = t;
-      state.uids.push_back(uid);
+      state.data[uid] = { v, {}, t };
+
       return uid;
     }
 
 
     /// Delete an item and its associated tag.
     void Delete(const uid_t uid) override {
-      emp_assert(state.values.find(uid) != std::end(state.values));
-      emp_assert(state.regulators.find(uid) != std::end(state.regulators));
-      emp_assert(state.tags.find(uid) != std::end(state.tags));
-      emp_assert(
-        std::find(
-          std::begin(state.uids),
-          std::end(state.uids),
-          uid
-        ) != std::end(state.uids)
-      );
+      emp_assert(state.data.find(uid) != std::end(state.data));
 
       cache.Clear();
 
-      state.values.erase(uid);
-      state.regulators.erase(uid);
-      state.tags.erase(uid);
-      std::iter_swap(
-        std::find(
-          std::begin(state.uids),
-          std::end(state.uids),
-          uid
-        ),
-        std::prev(std::end(state.uids))
-      ); // delete from uids swap 'n pop
-      state.uids.pop_back();
+      state.data.erase( uid );
 
-      emp_assert(
-        std::find(
-          std::begin(state.uids),
-          std::end(state.uids),
-          uid
-        ) == std::end(state.uids)
-      );
     }
 
     /// Clear all items and tags.
     void Clear() override {
       cache.Clear();
-      state.values.clear();
-      state.regulators.clear();
-      state.tags.clear();
-      state.uids.clear();
+      state.data.clear();
     }
     /// Reset the Selector caches.
     void ClearCache() override {
@@ -758,21 +733,21 @@ namespace emp {
 
     /// Access a reference single stored value by uid.
     Val & GetVal(const uid_t uid) override {
-      emp_assert(state.values.find(uid) != std::end(state.values));
-      return state.values.at(uid);
+      emp_assert(state.data.find(uid) != std::end(state.data));
+      return state.data.at(uid).val;
     }
 
     /// Access a const reference to a single stored tag by uid.
     const tag_t & GetTag(const uid_t uid) const override {
-      emp_assert(state.tags.find(uid) != std::end(state.tags));
-      return state.tags.at(uid);
+      emp_assert(state.data.find(uid) != std::end(state.data));
+      return state.data.at(uid).tag;
     }
 
     /// Change the tag at a given uid and clear the cache.
-    void SetTag(const uid_t uid, tag_t tag) override {
-      emp_assert(state.tags.find(uid) != std::end(state.tags));
+    void SetTag(const uid_t uid, const tag_t tag) override {
+      emp_assert(state.data.find(uid) != std::end(state.data));
       cache.Clear();
-      state.tags.at(uid) = tag;
+      state.data.at(uid).tag = tag;
     }
 
     /// Generate a vector of values corresponding to a vector of uids.
@@ -800,18 +775,16 @@ namespace emp {
     }
 
     /// Get the number of items stored in the container.
-    size_t Size() const override {
-      return state.values.size();
-    }
+    size_t Size() const override { return state.data.size(); }
 
     /// Adjust an item's regulator value.
     void AdjRegulator(
       const uid_t uid,
       const typename Regulator::adj_t & amt
     ) override {
-      emp_assert(state.regulators.find(uid) != std::end(state.regulators));
+      emp_assert(state.data.find(uid) != std::end(state.data));
 
-      if (state.regulators.at(uid).Adj(amt)) cache.ClearRegulated();
+      if (state.data.at(uid).regulator.Adj(amt)) cache.ClearRegulated();
 
     }
 
@@ -820,9 +793,9 @@ namespace emp {
       const uid_t uid,
       const typename Regulator::set_t & set
     ) override {
-      emp_assert(state.regulators.find(uid) != std::end(state.regulators));
+      emp_assert(state.data.find(uid) != std::end(state.data));
 
-      if (state.regulators.at(uid).Set(set)) cache.ClearRegulated();
+      if (state.data.at(uid).regulator.Set(set)) cache.ClearRegulated();
 
     }
 
@@ -831,10 +804,10 @@ namespace emp {
       const uid_t uid,
       const Regulator & set
     ) override {
-      emp_assert(state.regulators.find(uid) != std::end(state.regulators));
+      emp_assert(state.data.find(uid) != std::end(state.data));
 
       if (
-        set != std::exchange(state.regulators.at(uid), set)
+        set != std::exchange(state.data.at(uid).regulator, set)
       ) cache.ClearRegulated();
 
     }
@@ -843,32 +816,32 @@ namespace emp {
     const typename Regulator::view_t & ViewRegulator(
       const uid_t uid
     ) const override {
-      emp_assert(state.regulators.find(uid) != std::end(state.regulators));
+      emp_assert(state.data.find(uid) != std::end(state.data));
 
-      return state.regulators.at(uid).View();
+      return state.data.at(uid).regulator.View();
     }
 
     /// Get a regulator.
     const Regulator & GetRegulator(const uid_t uid) override {
-      emp_assert(state.regulators.find(uid) != std::end(state.regulators));
+      emp_assert(state.data.find(uid) != std::end(state.data));
 
-      return state.regulators.at(uid);
+      return state.data.at(uid).regulator;
     }
 
     /// Apply decay to a regulator.
     void DecayRegulator(const uid_t uid, const int steps) override {
-      emp_assert(state.regulators.find(uid) != std::end(state.regulators));
+      emp_assert(state.data.find(uid) != std::end(state.data));
 
       if (
-        state.regulators.at(uid).Decay(steps)
+        state.data.at(uid).regulator.Decay(steps)
       ) cache.ClearRegulated();
 
     }
 
     /// Apply decay to all regulators.
     void DecayRegulators(const int steps=1) override {
-      for (auto & [uid, regulator] : state.regulators) {
-        if ( regulator.Decay(steps) ) cache.ClearRegulated();
+      for (auto & [uid, pack] : state.data ) {
+        if ( pack.regulator.Decay(steps) ) cache.ClearRegulated();
       }
     }
 
@@ -882,29 +855,30 @@ namespace emp {
     /// @param target State to match
     void ImprintRegulators(const state_t & target) override {
 
-      for (const uid_t & uid : state.uids) {
+      for (const auto& [uid, pack] : state.data) {
 
         std::unordered_map<uid_t, double> scores;
         std::transform(
-          std::cbegin(target.uids),
-          std::cend(target.uids),
+          std::cbegin(target.data),
+          std::cend(target.data),
           std::inserter(scores, std::begin(scores)),
-          [&](size_t target_uid){
+          [&](const auto& target_pair){
+            const auto& [target_uid, target_pack] = target_pair;
             return std::pair{
               target_uid,
-              metric(target.tags.at(target_uid), GetTag(uid))
+              metric(target_pack.tag, GetTag(uid))
             };
           }
         );
         SetRegulator(
           uid,
-          target.regulators.at(
+          target.data.at(
             std::min_element(
               std::begin(scores),
               std::end(scores),
               [](const auto& l, const auto& r){ return l.second < r.second; }
             )->first
-          )
+          ).regulator
         );
 
       }
@@ -914,8 +888,16 @@ namespace emp {
     }
 
     /// View UIDs associated with this MatchBin
-    const emp::vector<uid_t>& ViewUIDs() const override {
-      return state.uids;
+    emp::vector<uid_t> ViewUIDs() const override {
+      emp::vector<uid_t> res;
+      res.reserve( state.data.size() );
+      std::transform(
+        std::begin(state.data),
+        std::end(state.data),
+        std::back_inserter(res),
+        [](const auto& pair){ return pair.first; }
+      );
+      return res;
     }
 
     /// Get selector, metric name
