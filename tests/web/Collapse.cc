@@ -18,8 +18,9 @@
 
 struct Test_Collapse_String : emp::web::BaseTest {
 
-  // Construct the following HTML structure:
   /*
+   * Construct the following HTML structure:
+   *
    * <div id="emp_test_container">
    *
    * <span aria-controls=".set1" aria-expanded="true" class="collapse_toggle" data-target=".set1" data-toggle="collapse" role="button">Controller 1</span>
@@ -470,8 +471,9 @@ struct Test_Collapse_String : emp::web::BaseTest {
 
 struct Test_Collapse_Widget : emp::web::BaseTest {
 
-  // Construct the following HTML structure:
   /*
+   * Construct the following HTML structure:
+   *
    * <div id="emp_test_container">
    *
    * <div id="btn1" aria-controls=".emp__collapse_class_0" aria-expanded="true" class="btn btn-info , collapse_toggle" data-target=".emp__collapse_class_0" data-toggle="collapse" role="button">
@@ -911,8 +913,9 @@ struct Test_Collapse_Widget : emp::web::BaseTest {
 
 struct Test_Collapse_Vector : emp::web::BaseTest {
 
-  // Construct the following HTML structure:
   /*
+   * Construct the following HTML structure:
+   *
    * <div id="c1" aria-controls=".collapse_id" aria-expanded="true" class="collapse_toggle" data-target=".collapse_id" data-toggle="collapse" role="button">
    *  <span id="emp__0">controller 1</span>
    * </div>
@@ -1165,14 +1168,15 @@ struct Test_Collapse_Vector : emp::web::BaseTest {
 
 struct Test_Expand_On_Click : emp::web::BaseTest {
 
-  // Construct the following HTML structure:
   /*
-  * <span id="emp__1" aria-controls=".collapse_id" aria-expanded="false" class="collapse_toggle , collapsed" data-target=".collapse_id" data-toggle="collapse" role="button">
-  * Controller1
-  * </span>
-  *
-  * <span id="emp__3" class="collapse , collapse_id">Target1</span>
-  */
+   * Construct the following HTML structure:
+   *
+   * <span id="emp__1" aria-controls=".collapse_id" aria-expanded="false" class="collapse_toggle , collapsed" data-target=".collapse_id" data-toggle="collapse" role="button">
+   * Controller1
+   * </span>
+   *
+   * <span id="emp__3" class="collapse , collapse_id">Target1</span>
+   */
 
   Test_Expand_On_Click()
   : BaseTest({"emp_test_container"})
@@ -1288,14 +1292,15 @@ struct Test_Expand_On_Click : emp::web::BaseTest {
 
 struct Test_Collapse_On_Click : emp::web::BaseTest {
 
-  // Construct the following HTML structure:
   /*
-  * <span id="emp__1" aria-controls=".collapse_id" aria-expanded="true" class="collapse_toggle" data-target=".collapse_id" data-toggle="collapse" role="button">
-  * Controller1
-  * </span>
-  *
-  * <span id="emp__3" class="collapse show , collapse_id">Target1</span>
-  */
+   * Construct the following HTML structure:
+   *
+   * <span id="emp__1" aria-controls=".collapse_id" aria-expanded="true" class="collapse_toggle" data-target=".collapse_id" data-toggle="collapse" role="button">
+   * Controller1
+   * </span>
+   *
+   * <span id="emp__3" class="collapse show , collapse_id">Target1</span>
+   */
 
   Test_Collapse_On_Click()
   : BaseTest({"emp_test_container"})

@@ -16,9 +16,9 @@
 // Test that the Card class properly gets attached and laid out via emp::web::Document.
 struct Test_Card_STATIC_HTMLLayout : public emp::web::BaseTest {
 
-
-  // Construct the following HTML structure:
   /**
+   * Construct the following HTML structure:
+   *
    * <div id="emp_test_container">
    * <div id="static" class="card">
    *
@@ -177,9 +177,9 @@ struct Test_Card_STATIC_HTMLLayout : public emp::web::BaseTest {
 // Test that the Card class properly gets attached and laid out via emp::web::Document.
 struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
 
-
-  // Construct the following HTML structure:
   /*
+   * Construct the following HTML structure:
+   *
    * <div id="emp_test_container">
    * <div id="open" class="card">
    *
@@ -513,9 +513,9 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
 
 struct Test_Card_INIT_CLOSED_HTMLLayout : public emp::web::BaseTest {
 
-
-  // Construct the following HTML structure:
   /**
+   * Construct the following HTML structure:
+   *
    * <div id="emp_test_container">
    * <div id="closed" class="card">
    *

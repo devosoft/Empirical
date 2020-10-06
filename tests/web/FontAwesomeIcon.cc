@@ -16,13 +16,15 @@
 // Test that the Element class properly gets attached and laid out via emp::web::Document.
 struct Test_FontAwesome_Icon_HTMLLayout : public emp::web::BaseTest {
 
-
-  // Construct the following HTML structure:
-  // <div id="emp_test_container">
-  //   <div id="test_div">
-  //        <span id="checkbox_icon" class="fa fa-check-square-o"></span>
-  //    </div>
-  // </div>
+  /*
+   * Construct the following HTML structure:
+   *
+   * <div id="emp_test_container">
+   *  <div id="test_div">
+   *    <span id="checkbox_icon" class="fa fa-check-square-o"></span>
+   *  </div>
+   * </div>
+   */
 
   Test_FontAwesome_Icon_HTMLLayout()
   : BaseTest({"emp_test_container"}) // we can tell BaseTest that we want to create a set of emp::web::Document
@@ -94,5 +96,5 @@ int main() {
   test_runner.Initialize({"emp_test_container"});
   test_runner.AddTest<Test_FontAwesome_Icon_HTMLLayout>("Test FontAwesome Icon HTML Layout");
   test_runner.Run();
-  
+
 }

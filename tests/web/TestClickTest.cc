@@ -41,8 +41,9 @@
 
 struct Test_Collapse_Click_Initial : emp::web::BaseTest {
 
-  // Construct the following HTML structure:
   /*
+   * Construct the following HTML structure:
+   *
    * <div id="emp_test_container">
    *
    * <span aria-controls=".set1" aria-expanded="true" class="collapse_toggle" data-target=".set1" data-toggle="collapse" role="button">Controller 1</span>
@@ -94,8 +95,9 @@ struct Test_Collapse_Click_Initial : emp::web::BaseTest {
 
 struct Test_Collapse_One_Click : emp::web::BaseTest {
 
-  // Construct the following HTML structure:
   /*
+   * Construct the following HTML structure:
+   *
    * <div id="emp_test_container">
    *
    * <span aria-controls=".set1" aria-expanded="true" class="collapse_toggle" data-target=".set1" data-toggle="collapse" role="button">Controller 1</span>
@@ -144,8 +146,9 @@ struct Test_Collapse_One_Click : emp::web::BaseTest {
 
 struct Test_Collapse_Two_Clicks : emp::web::BaseTest {
 
-  // Construct the following HTML structure:
   /*
+   * Construct the following HTML structure:
+   *
    * <div id="emp_test_container">
    *
    * <span aria-controls=".set1" aria-expanded="true" class="collapse_toggle" data-target=".set1" data-toggle="collapse" role="button">Controller 1</span>
@@ -165,7 +168,7 @@ struct Test_Collapse_Two_Clicks : emp::web::BaseTest {
 
   }
 
-  /* TODO: Test successfully clicks multiple times, but to efficient
+  /* TODO: Test successfully clicks multiple times, but not too efficient
    * https://github.com/devosoft/Empirical/issues/368
    *
    * Methods tried (unsuccessful):
@@ -217,8 +220,9 @@ struct Test_Collapse_Two_Clicks : emp::web::BaseTest {
 
 struct Test_show_timing : emp::web::BaseTest {
 
-  // Construct the following HTML structure:
   /*
+   * Construct the following HTML structure:
+   *
    * <div id="emp_test_container">
    *
    * <span aria-controls=".set1" aria-expanded="false" class="collapse_toggle" data-target=".set1" data-toggle="collapse" role="button">Controller 1</span>
@@ -240,7 +244,12 @@ struct Test_show_timing : emp::web::BaseTest {
 
   /*
    * Use setTimeout() when needing to check if an element has the
-   * class show after triggering a click.
+   * class show after triggering a click. If not, the assert may
+   * incorrectly return false. This is becuase Bootstrap briefly
+   * gives elements that are in the process of collapsing or expanding
+   * the class "collapsing" before the "show" class is removed or added,
+   * respectively. If setTimeout() is not used, the element will be
+   * tested for the assert during this transition period.
    */
   void Describe() override {
     // Test that the HTML components created in constructor are correct.

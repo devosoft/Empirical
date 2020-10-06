@@ -15,8 +15,10 @@
 
 
 struct Test_ToggleSwitch_init_on : emp::web::BaseTest {
-  // Construct the following HTML structure:
+
   /*
+   * Construct the following HTML structure:
+   *
    * <span id="switch_on" style="clear: none; display: inline;" class="custom-control custom-switch">
    *  <input type="checkbox" onchange="emp.Callback(32, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" checked="checked" class="custom-control-input">
    *  <label class="custom-control-label" for="[input_id]">
@@ -113,15 +115,16 @@ struct Test_ToggleSwitch_init_on : emp::web::BaseTest {
 };
 struct Test_ToggleSwitch_init_off : emp::web::BaseTest {
 
-  // Construct the following HTML structure:
   /*
-  * <span id="switch_off" style="clear: none; display: inline;" class="custom-control custom-switch">
-  *     <input type="checkbox" onchange="emp.Callback(32, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" class="custom-control-input">
-  *     <label class="custom-control-label">
-  *         <span>Switch Defult Off</span>
-  *     </label>
-  * </span>
-  */
+   * Construct the following HTML structure:
+   *
+   * <span id="switch_off" style="clear: none; display: inline;" class="custom-control custom-switch">
+   *     <input type="checkbox" onchange="emp.Callback(32, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" class="custom-control-input">
+   *     <label class="custom-control-label">
+   *         <span>Switch Defult Off</span>
+   *     </label>
+   * </span>
+   */
   Test_ToggleSwitch_init_off()
   : BaseTest({"emp_test_container"})
   {
@@ -211,9 +214,9 @@ struct Test_ToggleSwitch_init_off : emp::web::BaseTest {
 };
 struct Test_ToggleSwitch_add_label : emp::web::BaseTest {
 
-
-  // Construct the following HTML structure:
   /*
+   * Construct the following HTML structure:
+   *
    * <span id="switch" style="clear: none; display: inline;" class="custom-control custom-switch">
    *  <input type="checkbox" onchange="emp.Callback(32, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" class="custom-control-input">
    *  <label class="custom-control-label">

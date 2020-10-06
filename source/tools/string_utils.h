@@ -115,11 +115,11 @@ namespace emp {
     std::regex single_quote("[']");
     std::regex double_quote("[\"]");
 
-    web_safe = std::regex_replace(web_safe,apm, "&amp");
+    web_safe = std::regex_replace(web_safe, apm, "&amp");
     web_safe = std::regex_replace(web_safe, open_brace, "&lt");
-    web_safe = std::regex_replace(web_safe,close_brace, "&gt");
-    web_safe = std::regex_replace(web_safe,single_quote, "&apos");
-    web_safe = std::regex_replace(web_safe,double_quote, "&quot");
+    web_safe = std::regex_replace(web_safe, close_brace, "&gt");
+    web_safe = std::regex_replace(web_safe, single_quote, "&apos");
+    web_safe = std::regex_replace(web_safe, double_quote, "&quot");
 
     return web_safe;
   }

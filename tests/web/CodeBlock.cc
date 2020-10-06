@@ -16,9 +16,9 @@
 // Test that the Element class properly gets attached and laid out via emp::web::Document.
 struct Test_Code_Block_HTMLLayout : public emp::web::BaseTest {
 
-
-  // Construct the following HTML structure:
   /*
+   * Construct the following HTML structure:
+   *
    * <div id="emp_test_container">
    *  <div id="test_div">
    *    <pre id="code_block" class="c++">
@@ -131,5 +131,5 @@ int main() {
   test_runner.Initialize({"emp_test_container"});
   test_runner.AddTest<Test_Code_Block_HTMLLayout>("Test emp::prefab::CodeBlock");
   test_runner.Run();
-  
+
 }

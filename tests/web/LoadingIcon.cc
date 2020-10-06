@@ -16,16 +16,18 @@
 // Test that the Element class properly gets attached and laid out via emp::web::Document.
 struct Test_Loading_Icon_HTMLLayout : public emp::web::BaseTest {
 
-
-  // Construct the following HTML structure:
-  // <div id="emp_test_container">
-  //   <div id="test_div">
-  //        <span id="loading_icon">
-  //            <span class="fa fa-spinner fa-pulse fa-3x fa-fw"></span>
-  //            <span class="sr-only"><span>Loading...</span></span>
-  //        </span>
-  //    </div>
-  // </div>
+  /*
+   * Construct the following HTML structure:
+   *
+   * <div id="emp_test_container">
+   *  <div id="test_div">
+   *    <span id="loading_icon">
+   *      <span class="fa fa-spinner fa-pulse fa-3x fa-fw"></span>
+   *      <span class="sr-only"><span>Loading...</span></span>
+   *    </span>
+   *  </div>
+   * </div>
+   */
 
   Test_Loading_Icon_HTMLLayout()
   : BaseTest({"emp_test_container"}) // we can tell BaseTest that we want to create a set of emp::web::Document
@@ -129,5 +131,5 @@ int main() {
   test_runner.Initialize({"emp_test_container"});
   test_runner.AddTest<Test_Loading_Icon_HTMLLayout>("Test Loading Icon HTML Layout");
   test_runner.Run();
-  
+
 }

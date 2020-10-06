@@ -17,9 +17,9 @@
 // Test that the Element class properly gets attached and laid out via emp::web::Document.
 struct Test_Comment_Box_HTMLLayout : public emp::web::BaseTest {
 
-
-  // Construct the following HTML structure:
   /*
+   * Construct the following HTML structure:
+   *
    * <div id="emp_base">
    *  <div id="comment_box">
    *    <div id="comment_box_triangle" class="commentbox_triangle"></div>
@@ -186,5 +186,5 @@ int main() {
   test_runner.Initialize({"emp_test_container"});
   test_runner.AddTest<Test_Comment_Box_HTMLLayout>("Test emp::prefab::CommentBox HTML Layout");
   test_runner.Run();
-  
+
 }
