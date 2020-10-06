@@ -104,7 +104,7 @@ namespace emp {
       const emp::vector<double> & probs_,
       emp::Random& r,
       const size_t default_n_
-    ) : uids( std::move(uids) )
+    ) : uids( std::move(uids_) )
       , probs(probs_)
       , rand(r)
       , default_n(default_n_)
