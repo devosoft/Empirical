@@ -275,9 +275,9 @@ namespace emp {
   template <typename TYPE>
   static constexpr TYPE MaskUsed(TYPE val) {
     size_t shift = 1;
-    while (val >> shift) { // While the shift produces something to use...
-      val |= val >> shift;
-      shift <<= 1;            // Double the size of the shift for the next loop.
+    while (val >> shift) {  // While the shift produces something to use...
+      val |= val >> shift;  // Copy 1's over to the shifted position of val.
+      shift <<= 1;          // Double the size of the shift for the next loop.
     }
     return val;
   }
