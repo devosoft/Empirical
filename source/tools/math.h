@@ -272,6 +272,16 @@ namespace emp {
     return MaskLow<TYPE>(num_bits) << (8*sizeof(TYPE)-num_bits);
   }
 
+  template <typename TYPE>
+  static constexpr TYPE MaskUsed(TYPE val) {
+    size_t shift = 1;
+    while (val >> shift) { // While the shift produces something to use...
+      val |= val >> shift;
+      shift <<= 1;            // Double the size of the shift for the next loop.
+    }
+    return val;
+  }
+
   /// Return the minimum of three values.
   template <typename T> constexpr const T & Min(const T& in1, const T& in2, const T& in3) {
     return std::min(std::min(in1,in2), in3);
