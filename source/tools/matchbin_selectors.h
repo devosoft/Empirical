@@ -634,6 +634,7 @@ namespace emp {
       std::transform(
         std::begin(scores),
         partition,
+        std::back_inserter(uids),
         [](const auto& pair){ return pair.first; }
       );
 
