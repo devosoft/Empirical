@@ -1,5 +1,4 @@
-Coding guidelines and review checklist
-======================================
+# Coding guidelines and review checklist
 
 This document is for those who want to contribute code or documentation
 fixes to the Empirical project and describes our coding standards as
@@ -8,8 +7,7 @@ well as our code review process.
 This document has been adapted from the [khmer
 project](https://khmer.readthedocs.org/en/v1.4.1/dev/coding-guidelines-and-review.html)
 
-C++ standards
--------------
+## C++ standards
 
 We use C++11 features throughout the project and currently that is the
 de-facto standard version to use.
@@ -32,24 +30,23 @@ for a strong pro-levelization argument.
 In-code identifier formatting is always hard to settle upon. The
 guidelines below are for consistency.
 
-> -   Variable names should be all\_lowercase, with words separated by
+> -   Variable names should be all_lowercase, with words separated by
 >     underscores
 > -   Function names should be CamelCase() unless they are meant to
 >     mimic a function from the C++ standard library, at which point
->     they can be all\_lowercase to fit in.
+>     they can be all_lowercase to fit in.
 > -   User-defined types should be CamelCase
-> -   Constants should be ALL\_UPPERCASE, with words separated by
+> -   Constants should be ALL_UPPERCASE, with words separated by
 >     underscores
-> -   Template parameters should be ALL\_UPPERCASE.
+> -   Template parameters should be ALL_UPPERCASE.
 > -   Typedefs should match the casing of the types they are aliasing.
 >     For example, a typedef on a template parameter might be all
 >     uppercase, while a typedef on a user-defined type should be
 >     CamelCase.
 
-Guidelines based on Emscripten Limitations
-------------------------------------------
+## Guidelines based on Emscripten Limitations
 
-> -   Try to avoid use of 64-bit integers (that is, the \"long long\"
+> -   Try to avoid use of 64-bit integers (that is, the "long long"
 >     type). Emscripten has to emulate these and they can cause a
 >     notable slowdown.
 > -   Do not rely on exceptions when possible. Emscripten is slow at
@@ -67,8 +64,7 @@ Please see the [Emscripten doc
 page](https://kripken.github.io/emscripten-site/docs/porting/guidelines/portability_guidelines.html)
 for a full list.
 
-General Standards
------------------
+## General Standards
 
 All plain-text files should have line widths of 100 characters or less
 unless that is unsupported for the particular file format.
@@ -78,12 +74,13 @@ committed to the codebase.
 
 Vim users can run:
 
+```
     :setlocal spell spelllang=en_us
+```
 
 to automagically check the spelling within the file being edited.
 
-Checklist
----------
+## Checklist
 
 Copy and paste the following into a pull request comment when it is
 ready for review:
@@ -95,8 +92,8 @@ ready for review:
     - [ ] Was a spellchecker run on the source code and documentation after
       changes were made?
 
-It\'s expected that before requesting a code review the author of the PR
-will have checked all these things on their own. It\'s also expected
+It's expected that before requesting a code review the author of the PR
+will have checked all these things on their own. It's also expected
 that whomever reviews the PR will check these individual items as well.
 Though the CI runs most of these and will pass/fail the PR accordingly
 it is not infallible and the whole point of having a code review process

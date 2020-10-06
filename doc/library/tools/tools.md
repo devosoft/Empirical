@@ -24,7 +24,7 @@
 ## BitSet Utilities
 
 ```{eval-rst}
-.. doxygenfile:: tools/bitset\_utils.h
+.. doxygenfile:: tools/bitset_utils.h
   :project: Empirical
 ```
 
@@ -70,7 +70,7 @@
   :project: Empirical
 ```
 
-Dynamic Strings \~\~\~\~\~\~
+## Dynamic Strings
 
 ```{eval-rst}
 .. doxygenfile:: tools/DynamicString.h
@@ -94,7 +94,7 @@ Dynamic Strings \~\~\~\~\~\~
 ## Flex Functions
 
 ```{eval-rst}
-.. doxygenfile:: tools/flex\_function.h
+.. doxygenfile:: tools/flex_function.h
   :project: Empirical
 ```
 
@@ -122,7 +122,7 @@ Dynamic Strings \~\~\~\~\~\~
 ## Graph Utilities
 
 ```{eval-rst}
-.. doxygenfile:: tools/graph\_utils.h
+.. doxygenfile:: tools/graph_utils.h
   :project: Empirical
 ```
 
@@ -150,14 +150,14 @@ Dynamic Strings \~\~\~\~\~\~
 ## Information Theory Tools
 
 ```{eval-rst}
-.. doxygenfile:: tools/info\_theory.h
+.. doxygenfile:: tools/info_theory.h
   :project: Empirical
 ```
 
 ## Lexer Utilities
 
 ```{eval-rst}
-.. doxygenfile:: tools/lexer\_utils.h
+.. doxygenfile:: tools/lexer_utils.h
   :project: Empirical
 ```
 
@@ -171,7 +171,7 @@ Dynamic Strings \~\~\~\~\~\~
 ## Map Utilities
 
 ```{eval-rst}
-.. doxygenfile:: tools/map\_utils.h
+.. doxygenfile:: tools/map_utils.h
   :project: Empirical
 ```
 
@@ -185,14 +185,14 @@ Dynamic Strings \~\~\~\~\~\~
 ## Memory Tracking
 
 ```{eval-rst}
-.. doxygenfile:: tools/mem\_track.h
+.. doxygenfile:: tools/mem_track.h
   :project: Empirical
 ```
 
 ## Memoized Functions
 
 ```{eval-rst}
-.. doxygenfile:: tools/memo\_functions.h
+.. doxygenfile:: tools/memo_functions.h
   :project: Empirical
 ```
 
@@ -213,18 +213,18 @@ Dynamic Strings \~\~\~\~\~\~
 ## RandomAccess Set
 
 ```{eval-rst}
-.. doxygenfile:: tools/ra\_set.h
+.. doxygenfile:: tools/ra_set.h
   :project: Empirical
 ```
 
 ## Randomness Utilites
 
 ```{eval-rst}
-.. doxygenfile:: tools/random\_utils.h
+.. doxygenfile:: tools/random_utils.h
   :project: Empirical
 ```
 
-Random Number Generator \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~
+## Random Number Generator
 
 ```{eval-rst}
 .. doxygenfile:: tools/Random.h
@@ -248,14 +248,14 @@ Random Number Generator \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~
 ## Sequence Utilities
 
 ```{eval-rst}
-.. doxygenfile:: tools/sequence\_utils.h
+.. doxygenfile:: tools/sequence_utils.h
   :project: Empirical
 ```
 
 ## Serialization Macros
 
 ```{eval-rst}
-.. doxygenfile:: tools/serialize\_macros.h
+.. doxygenfile:: tools/serialize_macros.h
   :project: Empirical
 ```
 
@@ -269,7 +269,7 @@ Random Number Generator \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~
 ## Set Utilities
 
 ```{eval-rst}
-.. doxygenfile:: tools/set\_utils.h
+.. doxygenfile:: tools/set_utils.h
   :project: Empirical
 ```
 
@@ -290,21 +290,21 @@ Random Number Generator \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~
 ## String Utilities
 
 ```{eval-rst}
-.. doxygenfile:: tools/string\_utils.h
+.. doxygenfile:: tools/string_utils.h
   :project: Empirical
 ```
 
 ## Tuple Struct
 
 ```{eval-rst}
-.. doxygenfile:: tools/tuple\_struct.h
+.. doxygenfile:: tools/tuple_struct.h
   :project: Empirical
 ```
 
 ## Tuple Utilities
 
 ```{eval-rst}
-.. doxygenfile:: tools/tuple\_utils.h
+.. doxygenfile:: tools/tuple_utils.h
   :project: Empirical
 ```
 
@@ -318,13 +318,13 @@ Random Number Generator \~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~
 ## Unit Testing
 
 ```{eval-rst}
-.. doxygenfile:: tools/unit\_tests.h
+.. doxygenfile:: tools/unit_tests.h
   :project: Empirical
 ```
 
 ## Vector Utilities
 
 ```{eval-rst}
-.. doxygenfile:: tools/vector\_utils.h
+.. doxygenfile:: tools/vector_utils.h
   :project: Empirical
 ```

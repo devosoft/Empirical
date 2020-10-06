@@ -42,6 +42,4 @@ dev/adding-documentation
 dev/guide-to-testing
 ```
 
-
-
 {ref}`genindex`
