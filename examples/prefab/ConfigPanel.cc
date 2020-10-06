@@ -38,6 +38,6 @@ int main()
 
   // setup configuration panel
   config_panel.Setup();
-  doc << config_panel.GetDiv();
+  doc << config_panel.GetConfigPanelDiv();
 
 }

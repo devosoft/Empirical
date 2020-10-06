@@ -22,8 +22,10 @@ Config cfg; // config class used in all test to construct config panel
 
 // Test that the ConfigPanel class properly gets attached and laid out via emp::web::Document.
 struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
-  // Construct the following HTML structure:
+
   /*
+   * Construct the following HTML structure:
+   *
    * <div id="emp_base">
    *  <div id="emp__1">
    *    <div id="settings_MAIN">
@@ -158,7 +160,7 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
 
     // setup configuration panel
     config_panel.Setup();
-    Doc("emp_test_container") << config_panel.GetDiv();
+    Doc("emp_test_container") << config_panel.GetConfigPanelDiv();
     emp::prefab::CloseLoadingModal();
 
   }
@@ -393,8 +395,10 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
 };
 
 struct Test_Config_Panel_Int_HTMLLayout : public emp::web::BaseTest {
-  // Construct the following HTML structure:
+
   /*
+   * Construct the following HTML structure:
+   *
    *        <div id="emp__21">
    *          <div id="SEED_row" class="setting_element">
    *            <span id="emp__22" class="title_area">
@@ -438,7 +442,7 @@ struct Test_Config_Panel_Int_HTMLLayout : public emp::web::BaseTest {
 
     // setup configuration panel
     config_panel.Setup();
-    Doc("emp_test_container") << config_panel.GetDiv();
+    Doc("emp_test_container") << config_panel.GetConfigPanelDiv();
     emp::prefab::CloseLoadingModal();
   }
 
@@ -575,8 +579,10 @@ struct Test_Config_Panel_Int_HTMLLayout : public emp::web::BaseTest {
 };
 
 struct Test_Config_Panel_Double_HTMLLayout : public emp::web::BaseTest {
-  // Construct the following HTML structure:
+
   /*
+   * Construct the following HTML structure:
+   *
    *      <div id="emp__47">
    *        <div id="NEUTRAL_MUTATION_RATE_row" class="setting_element">
    *          <span id="emp__48" class="title_area">
@@ -621,7 +627,7 @@ struct Test_Config_Panel_Double_HTMLLayout : public emp::web::BaseTest {
 
     // setup configuration panel
     config_panel.Setup();
-    Doc("emp_test_container") << config_panel.GetDiv();
+    Doc("emp_test_container") << config_panel.GetConfigPanelDiv();
     emp::prefab::CloseLoadingModal();
   }
 
@@ -756,8 +762,10 @@ struct Test_Config_Panel_Double_HTMLLayout : public emp::web::BaseTest {
 };
 
 struct Test_Config_Panel_Text_HTMLLayout : public emp::web::BaseTest {
-  // Construct the following HTML structure:
+
   /*
+   * Construct the following HTML structure:
+   *
    *        <div id="emp__31">
    *          <div id="RADIATION_PRESCRIPTION_FILE_row" class="setting_element">
    *            <span id="emp__32" class="title_area">
@@ -796,7 +804,7 @@ struct Test_Config_Panel_Text_HTMLLayout : public emp::web::BaseTest {
 
     // setup configuration panel
     config_panel.Setup();
-    Doc("emp_test_container") << config_panel.GetDiv();
+    Doc("emp_test_container") << config_panel.GetConfigPanelDiv();
     emp::prefab::CloseLoadingModal();
   }
 
@@ -889,8 +897,10 @@ struct Test_Config_Panel_Text_HTMLLayout : public emp::web::BaseTest {
 };
 
 struct Test_Config_Panel_Bool_HTMLLayout : public emp::web::BaseTest {
-  // Construct the following HTML structure:
+
   /*
+   * Construct the following HTML structure:
+   *
    *        <div id="emp__9">
    *          <div id="BOOL_EX_row" class="setting_element">
    *            <span id="emp__10" class="title_area">
@@ -930,7 +940,7 @@ struct Test_Config_Panel_Bool_HTMLLayout : public emp::web::BaseTest {
 
     // setup configuration panel
     config_panel.Setup();
-    Doc("emp_test_container") << config_panel.GetDiv();
+    Doc("emp_test_container") << config_panel.GetConfigPanelDiv();
     emp::prefab::CloseLoadingModal();
   }
 

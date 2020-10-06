@@ -154,7 +154,7 @@ It allows web apps to be interactive and dynamic, allowing users to change confi
 
 Using the ConfigPanel class, a configuration panel is constructed when passed a Config file.
 It uses other Prefabricated components to add styling and structure to the panel.
-Use :code:`GetDiv()` to stream this component into another web component or document.
+Use :code:`GetConfigPanelDiv()` to stream this component into another web component or document.
 
 It is important to note that ConfigPanel instances are destroyed when they go out of scope.
 This causes the form to no longer respond to changes made by the user.
@@ -184,7 +184,7 @@ Example:
 
   // setup configuration panel
   config_panel.Setup();
-  doc << config_panel.GetDiv();
+  doc << config_panel.GetConfigPanelDiv();
 
 FontAwesomeIcon
 ~~~~~~~~~~~~~~~

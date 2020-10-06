@@ -1,15 +1,16 @@
 #ifndef EMP_CONFIG_WEB_INTERFACE_H
 #define EMP_CONFIG_WEB_INTERFACE_H
 
+#include <map>
+#include <set>
+
+#include "../tools/set_utils.h"
+#include "../tools/string_utils.h"
+
 #include "../config/config.h"
 #include "../web/Div.h"
 #include "../web/Element.h"
 #include "../web/Input.h"
-
-#include <map>
-#include <set>
-#include "../tools/set_utils.h"
-#include "../tools/string_utils.h"
 
 // Prefab elements
 #include "Card.h"
@@ -59,7 +60,8 @@ namespace prefab {
 
         /**
          * Set on-update callback for a ConfigPanel.
-         *  @fun callback function handle
+         *
+         * @param fun callback function handle
          */
         void SetOnChangeFun(const on_change_fun_t & fun) {
           on_change_fun = fun;
@@ -144,11 +146,191 @@ namespace prefab {
 
       /**
        * Run on-update callback.
-       * @val TODO what is this?
+       *
+       * @param val TODO what is this?
        */
       void DoOnChangeFun(const std::string & val) {
           Info()->GetOnChangeFun()(val);
       };
+
+      /**
+       * Add toggle glyphs and title for setting
+       * 
+       * @param name setting's name
+       * @param setting_element Div for all of setting's contents
+       * @param title Button for setting's glyphs and title
+       */
+      void AddSettingLabel(
+        const std::string & name,
+        web::Div & setting_element,
+        web::Element & title
+      ) {
+        input_divs[name] << setting_element;
+        setting_element.SetAttr("class", "setting_element");
+        title.AddAttr("class", "btn btn-link");
+
+        prefab::FontAwesomeIcon arrow_right_for_dropdown("fa-angle-double-right");
+        title << arrow_right_for_dropdown;
+        prefab::FontAwesomeIcon arrow_up_for_dropdown("fa-angle-double-up");
+        title << arrow_up_for_dropdown;
+        title << format_label_fun(name);
+
+        arrow_right_for_dropdown.AddAttr("class", "toggle_icon_right_margin");
+        arrow_up_for_dropdown.AddAttr("class", "toggle_icon_right_margin");
+      }
+
+      /**
+       * Add numeric specific inputs to setting element.
+       *
+       * @param name setting's name
+       * @param setting_element Div for all of setting's contents
+       * @param box CommentBox for setting's dropdown section
+       * @param type string representing the settting's type (int, double, float)
+       * @param value string representing the numerical value of the setting
+       */
+      void AddNumericSetting(
+        const std::string & name,
+        web::Div & setting_element,
+        prefab::CommentBox & box,
+        const std::string & type,
+        const std::string & value
+      ){
+        const std::string name_input_slider = name + "_input_slider";
+        const std::string name_input_number = name + "_input_number";
+        const std::string name_input_mobile_slider = name + "_input_mobile_slider";
+        web::Input slider( [](std::string x) {
+          std::cout << "empty slider function" << std::endl;},
+          "range", NULL, name_input_slider
+        );
+        setting_element << slider;
+
+        web::Input number([](std::string val) {
+          std::cout << "empty number function" << std::endl;
+          },
+          "number", NULL, name_input_number
+        );
+        setting_element << number;
+        web::Input mobile_slider([](std::string val) {
+          std::cout << "empty mobile slider function" << std::endl;
+          },
+          "range", NULL, name_input_mobile_slider
+        );
+        box.AddMobileContent("<hr>");
+        box.AddMobileContent(mobile_slider);
+
+        // Set onchange behavior for inputs
+        slider.Callback(
+          [this,name, name_input_number, name_input_mobile_slider](std::string val) {
+          config.Set(name, val);
+          SyncForm(val, name_input_number, name_input_mobile_slider);
+          });
+        number.Callback(
+          [this,name, name_input_slider, name_input_mobile_slider](std::string val) {
+          config.Set(name, val);
+          SyncForm(val, name_input_slider, name_input_mobile_slider);
+          });
+        mobile_slider.Callback(
+          [this,name, name_input_number, name_input_slider](std::string val) {
+          config.Set(name, val);
+          SyncForm(val, name_input_number, name_input_slider);
+          });
+        // Set initial values
+        slider.Value(config.Get(name));
+        number.Value(config.Get(name));
+        mobile_slider.Value(config.Get(name));
+        slider.SetAttr("class", "input_slider");
+        number.SetAttr("class", "input_number");
+
+
+        SetDefaultNumericInputs(type, value, slider, number, mobile_slider);
+      }
+
+      /**
+       * Sets the desktop slider, mobile slider, and number
+       * input for numeric settings to the default value
+       * provided by the linked config file.
+       *
+       * @param type string representing the settting's type (int, double, float)
+       * @param value string representing the numerical value of the setting
+       * @param slider reference setting's desktop slider input
+       * @param number reference setting's number input
+       * @param mobile_slider reference setting's mobile slider input
+       */
+      void SetDefaultNumericInputs(
+        const std::string & type,
+        const std::string & value,
+        web::Input & slider,
+        web::Input & number,
+        web::Input & mobile_slider
+      ){
+        // Attempt to have intelligent defaults
+        if (type == "double") {
+          SetDefaultRangeFloatingPoint(slider, emp::from_string<double>(value));
+          SetDefaultRangeFloatingPoint(number, emp::from_string<double>(value));
+          SetDefaultRangeFloatingPoint(mobile_slider, emp::from_string<double>(value));
+        } else if (type == "float") {
+          SetDefaultRangeFloatingPoint(slider, emp::from_string<float>(value));
+          SetDefaultRangeFloatingPoint(number, emp::from_string<float>(value));
+          SetDefaultRangeFloatingPoint(mobile_slider, emp::from_string<float>(value));
+        } else {
+          // TODO: Correctly handle all types (although I'm not sure it actually matters?)
+          SetDefaultRangeFixedPoint(slider, emp::from_string<int>(value));
+          SetDefaultRangeFixedPoint(number, emp::from_string<int>(value));
+          SetDefaultRangeFixedPoint(mobile_slider, emp::from_string<int>(value));
+        }
+      }
+
+      /**
+       * Add prefab ToggleSwitch to boolean setting element.
+       *
+       * @param name setting's name
+       * @param setting_element Div for all of setting's contents
+       * @param value string representing the numerical value of the setting
+       */
+      void AddBoolSetting(
+        const std::string & name,
+        web::Div & setting_element,
+        const std::string & value
+      ){
+        // Bootstrap Toggle Switch
+        emp::prefab::ToggleSwitch toggle_switch(
+          [this, name](std::string val) {
+            config.Set(name, val);
+            DoOnChangeFun(val);
+          },
+          NULL,
+          emp::from_string<bool>(value),
+          name + "_input_checkbox"
+        );
+        setting_element << toggle_switch;
+        toggle_switch.AddAttr("class", "input_bool");
+      }
+
+      /**
+       * Add text input box to text setting element.
+       *
+       * @param name setting's name
+       * @param setting_element Div for all of setting's contents
+       */
+      void AddTextSetting(
+        const std::string & name,
+        web::Div & setting_element
+      ){
+        web::Input text_input(
+          [this, name](std::string val) {
+            config.Set(name, val);
+            DoOnChangeFun(val);
+          },
+          "text", NULL, name + "_input_textbox"
+        );
+        setting_element << text_input;
+        text_input.SetAttr(
+          "class", "input_text",
+          "type", "text"
+        );
+        text_input.Value(config.Get(name));
+      }
+
 
     public:
       /// @param c config panel to construct prefab ConfigPanel for
@@ -160,7 +342,8 @@ namespace prefab {
 
       /**
        * Sets on-update callback for a ConfigPanel.
-       * @fun callback function handle
+       *
+       * @param fun callback function handle
        */
       void SetOnChangeFun(const on_change_fun_t& fun) {
         Info()->SetOnChangeFun(fun);
@@ -217,7 +400,6 @@ namespace prefab {
        */
       void Setup(const std::string & id_prefix = "settings_") {
         for (auto group : config.GetGroupSet()) {
-          // std::cout << "GROUP: " << group->GetName() << std::endl;
           std::string group_name = group->GetName();
           group_divs[group_name] = web::Div(id_prefix + group_name);
           settings_div << group_divs[group_name];
@@ -233,7 +415,6 @@ namespace prefab {
           setting_heading.SetAttr("class", "setting_heading");
 
           for (size_t i = 0; i < group->GetSize(); i++) {
-            // std::cout << group->GetEntry(i)->GetType() << std::endl;
             std::string name = group->GetEntry(i)->GetName();
             if (Has(exclude, name)) {
               continue;
@@ -245,131 +426,47 @@ namespace prefab {
 
             // Setting element label
             web::Div setting_element(name + "_row");
-            input_divs[name] << setting_element;
-            setting_element.SetAttr("class", "setting_element");
-            web::Element title_span("span");
-            setting_element << title_span;
             web::Element title("button");
-            title.SetAttr("class", "btn btn-link");
-
-            prefab::FontAwesomeIcon arrow_right_for_dropdown("fa-angle-double-right");
-            title << arrow_right_for_dropdown;
-            prefab::FontAwesomeIcon arrow_up_for_dropdown("fa-angle-double-up");
-            title << arrow_up_for_dropdown;
-            title << format_label_fun(name);
-            title_span.SetAttr("class", "title_area");
-
-            arrow_right_for_dropdown.AddAttr("class", "toggle_icon_right_margin");
-            arrow_up_for_dropdown.AddAttr("class", "toggle_icon_right_margin");
+            title.SetAttr("class", "title_area");
+            AddSettingLabel(name, setting_element, title);
 
             // Prefab Dropdown Box
-
             prefab::CommentBox box;
             box.AddContent(group->GetEntry(i)->GetDescription());
 
             // Prefab Collapse/toggle for setting element
             prefab::CollapseCoupling title_toggle(title, box, false, name + "_dropdown");
             input_divs[name] << title_toggle.GetTargetDiv(0);
-            title_span << title_toggle.GetControllerDiv(0);
+            setting_element << title_toggle.GetControllerDiv(0);
 
-
+            /*
+             * There are 3 categories of settings that can be
+             * added to a Config Panel: numeric, boolean, and text values.
+             * Each category has unique components that should be
+             * added for a setting of that type.
+             *
+             * Numeric values (ints, doubles, floats) should have a slider
+             * for the desktop and mobile view as well as a numerical
+             * input for the user to type their value.
+             *
+             * Boolean values should have a prefab toggle switch.
+             *
+             * Text values should have a textbox for the user to
+             * type their input.
+             */
             if (Has(numeric_types, type)) {
-              const std::string name_input_slider = name + "_input_slider";
-              const std::string name_input_number = name + "_input_number";
-              const std::string name_input_mobile_slider = name + "_input_mobile_slider";
-              web::Input slider( [](std::string x) {
-                std::cout << "empty slider function" << std::endl;},
-                "range", NULL, name_input_slider
-              );
-              setting_element << slider;
-
-              web::Input number([](std::string val) {
-                std::cout << "empty number function" << std::endl;
-                },
-                "number", NULL, name_input_number
-              );
-              setting_element << number;
-              web::Input mobile_slider([](std::string val) {
-                std::cout << "empty mobile slider function" << std::endl;
-                },
-                "range", NULL, name_input_mobile_slider
-              );
-              box.AddMobileContent("<hr>");
-              box.AddMobileContent(mobile_slider);
-
-              // Set onchange behavior for inputs
-              slider.Callback(
-                [this,name, name_input_number, name_input_mobile_slider](std::string val) {
-                config.Set(name, val);
-                SyncForm(val, name_input_number, name_input_mobile_slider);
-                });
-              number.Callback(
-                [this,name, name_input_slider, name_input_mobile_slider](std::string val) {
-                config.Set(name, val);
-                SyncForm(val, name_input_slider, name_input_mobile_slider);
-                });
-              mobile_slider.Callback(
-                [this,name, name_input_number, name_input_slider](std::string val) {
-                config.Set(name, val);
-                SyncForm(val, name_input_number, name_input_slider);
-                });
-              // Set initial values
-              slider.Value(config.Get(name));
-              number.Value(config.Get(name));
-              mobile_slider.Value(config.Get(name));
-              slider.SetAttr("class", "input_slider");
-              number.SetAttr("class", "input_number");
-
-              // Attempt to have intelligent defaults
-              if (type == "double") {
-                SetDefaultRangeFloatingPoint(slider, emp::from_string<double>(value));
-                SetDefaultRangeFloatingPoint(number, emp::from_string<double>(value));
-                SetDefaultRangeFloatingPoint(mobile_slider, emp::from_string<double>(value));
-              } else if (type == "float") {
-                SetDefaultRangeFloatingPoint(slider, emp::from_string<float>(value));
-                SetDefaultRangeFloatingPoint(number, emp::from_string<float>(value));
-                SetDefaultRangeFloatingPoint(mobile_slider, emp::from_string<float>(value));
-              } else {
-                // TODO: Correctly handle all types (although I'm not sure it actually matters?)
-                SetDefaultRangeFixedPoint(slider, emp::from_string<int>(value));
-                SetDefaultRangeFixedPoint(number, emp::from_string<int>(value));
-                SetDefaultRangeFixedPoint(mobile_slider, emp::from_string<int>(value));
-              }
-
+              AddNumericSetting(name, setting_element, box, type, value);
             } else if (type == "bool") {
-              // Bootstrap Toggle Switch (need at least v4.5.0)
-              emp::prefab::ToggleSwitch toggle_switch(
-                [this, name](std::string val) {
-                  config.Set(name, val);
-                  DoOnChangeFun(val);
-                },
-                NULL,
-                emp::from_string<bool>(value),
-                name + "_input_checkbox"
-              );
-              setting_element << toggle_switch;
-              toggle_switch.AddAttr("class", "input_bool");
-
+              AddBoolSetting(name, setting_element, value);
             } else {
-              web::Input text_input(
-                [this, name](std::string val) {
-                  config.Set(name, val);
-                  DoOnChangeFun(val);
-                },
-                "text", NULL, name + "_input_textbox"
-              );
-              setting_element << text_input;
-              text_input.SetAttr(
-                "class", "input_text",
-                "type", "text"
-              );
-              text_input.Value(config.Get(name));
+              AddTextSetting(name, setting_element);
             }
           }
         }
       }
 
-      web::Div & GetDiv() { return settings_div; }
+      /// @return Div containing the entire config panel
+      web::Div & GetConfigPanelDiv() { return settings_div; }
 
   };
 }
