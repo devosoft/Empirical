@@ -31,7 +31,7 @@ namespace prefab {
         : web::Element("pre", id) {
           this->SetAttr("class", lang);
           // trigger HighlightJS library to apply syntax highlighting
-          this->DoUpdateJS([]() {
+          this->RegisterUpdateJS([]() {
               emscripten_run_script("hljs.initHighlighting.called = false; hljs.initHighlighting();");
           });
           /*

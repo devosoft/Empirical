@@ -341,7 +341,7 @@ namespace web {
       }
 
       // Add JS function to be executed when TriggerJS() is called
-      SignalKey DoUpdateJS(const std::function<void()> &fun){
+      SignalKey RegisterUpdateJS(const std::function<void()> &fun){
         return on_update_js_signal.AddAction(fun);
       }
 
@@ -365,7 +365,6 @@ namespace web {
         // If active update style, trigger JS, and recurse to children!
         if (state == Widget::ACTIVE) {
           extras.Apply(id); // Update the attributes, style, and listeners.
-          // commented this out when testing HightlightJS, called in protected section of DivInfo instead
           TriggerJS();      // Run associated Javascript code, if any (e.g., to fill out a canvas)
         }
       }
@@ -916,8 +915,8 @@ namespace web {
       }
 
       // Add JS function to on_update_js_sig
-      SignalKey DoUpdateJS(const std::function<void()> & fun){
-        return info->DoUpdateJS(fun);
+      SignalKey RegisterUpdateJS(const std::function<void()> & fun){
+        return info->RegisterUpdateJS(fun);
       }
 
     };
