@@ -79,14 +79,14 @@ namespace emp {
 
     // Basic Random number
     // Returns a random number [0,_RAND_MBIG)
-    int32_t Get() {
+    uint32_t Get() {
       if (++inext == 56) inext = 0;
       if (++inextp == 56) inextp = 0;
       int mj = ma[inext] - ma[inextp];
       if (mj < 0) mj += _RAND_MBIG;
       ma[inext] = mj;
 
-      return mj;
+      return (uint32_t) mj;
     }
 
   public:
