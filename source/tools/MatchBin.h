@@ -104,7 +104,11 @@ namespace emp::internal {
 
     // shared file stream for each Matchbin
     // this is done to prevent too many file handles.
-    static thread_local inline std::ofstream filestream{EMP_LOG_MATCHBIN_FILENAME};
+    static thread_local inline std::ofstream filestream
+    #ifdef EMP_LOG_MATCHBIN
+      { EMP_LOG_MATCHBIN_FILENAME }
+    #endif
+    ;
 
     // a ContaierDataFile is a DataFile that runs a function on every element of a container before every write.
     // in this case, we simply return the data from our logbuffer.
@@ -140,7 +144,6 @@ namespace emp::internal {
 
     /// Sets up the various functions and variables we keep track of.
     void SetupDatafile() {
-      #ifdef EMP_LOG_MATCHBIN
       datafile.SetUpdateContainerFun([this](){ return logbuffer; });
 
       datafile.AddVar(instance_id, emp::to_string(instance_id), "Instance ID");
@@ -150,7 +153,6 @@ namespace emp::internal {
       datafile.AddContainerFun(get_hit_count_log, "hit_count", "Counter for how many times this match occured");
       datafile.AddContainerFun(get_logbuffer_type, "matchtype", "Type of match");
       datafile.PrintHeaderKeys();
-      #endif
     }
 
     /// Logs a match into the logbuffer.
@@ -186,7 +188,7 @@ namespace emp::internal {
       , instance_id(MakeID())
       , logging_activated(false)
       , datafile(filestream)
-      { SetupDatafile(); }
+      { if constexpr (logging_enabled) SetupDatafile(); }
 
       ~MatchBinLog() {
         if constexpr (logging_enabled) {
