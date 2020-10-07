@@ -11,27 +11,59 @@
 #include "tools/Random.h"
 #include "tools/Random2.h"
 
-constexpr const size_t N = 1000000;
+constexpr const size_t N = 1048576; // 10^20
 
 int main()
 {
-  emp::Random random;
-  // emp2::Random random;
+  // emp::Random random;
+  emp2::Random random;
 
-  size_t success_count = 0;
   std::clock_t start_time = std::clock();
 
-  constexpr const size_t N_P = N * 500;
+  constexpr const size_t buckets = 1024;
+  constexpr const size_t N_UInt = N * 512;
+  constexpr const size_t expected_per_bucket = N_UInt / buckets;
+
+  emp::vector<size_t> hit_counts(buckets+1, 0);
+
+  for (size_t i = 0; i < N_UInt; i++) {
+    const size_t id = random.GetUInt(buckets);
+    hit_counts[id]++;
+  }
+  
+  std::clock_t total_time = std::clock() - start_time;
+
+  std::cout << "Testing Random::GetUInt()."
+	    << "  Doing " << N_UInt << " tests "
+	    << " with " << buckets << " buckets;"
+	    << " expecting ~" << expected_per_bucket << " per_bucket.\n";
+
+  for (size_t i = 0; i < 10; i++) {
+    std::cout << "hits[" << i << "] = " << hit_counts[i]
+	      << "     hits[" << buckets-i << "] = " << hit_counts[buckets-i]
+	      << "\n";
+  }
+  
+  std::cout << " time = " << ((double) total_time) / (double) CLOCKS_PER_SEC
+            << " seconds." << std::endl;
+
+
+
+  
+  size_t success_count = 0;
+  start_time = std::clock();
+
+  constexpr const size_t N_P = N * 512;
   constexpr const double p = 0.345;
-  constexpr const size_t expected = N_P * p;
+  constexpr const size_t expected = (size_t) (N_P * p);
 
   for (size_t i = 0; i < N_P; i++) {
     if (random.P(p)) success_count++;
   }
   
-  std::clock_t total_time = std::clock() - start_time;
+  total_time = std::clock() - start_time;
 
-  std::cout << "Testing Random::P()."
+  std::cout << "\nTesting Random::P()."
 	    << "  Doing " << N_P << " tests;"
 	    << " expecting ~" << expected << " hits.\n"
 	    << "  num hits = " << success_count
