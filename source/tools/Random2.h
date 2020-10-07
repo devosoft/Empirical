@@ -8,8 +8,8 @@
  *  @note Status: RELEASE
  */
 
-#ifndef EMP_RANDOM_H
-#define EMP_RANDOM_H
+#ifndef EMP_RANDOM2_H
+#define EMP_RANDOM2_H
 
 #include <ctime>
 #include <climits>
@@ -21,7 +21,8 @@
 #include "bitset_utils.h"
 #include "Range.h"
 
-namespace emp {
+namespace emp2 {
+  using namespace emp;
 
   ///  A versatile and non-patterned pseudo-random-number generator (Mersenne Twister).
   class Random {
@@ -44,7 +45,8 @@ namespace emp {
     uint32_t Get() {
       value *= value;                            // Square the current value.
       value += (weyl_state += step_size);        // Take a step in the Weyl sequence
-      return value = (value>>32) | (value<<32);  // Return the middle of the value
+      value = (value>>32) | (value<<32);  // Return the middle of the value
+      return (uint32_t) value;
     }
 
   public:
@@ -64,12 +66,12 @@ namespace emp {
     /**
      * @return The current state of the seed in the random sequence.
      **/
-    inline int GetSeed() const { return weyl_state; }
+    inline uint64_t GetSeed() const { return weyl_state; }
 
     /**
      * @return The seed that was originally provided by the user.
      **/
-    inline int GetOriginalSeed() const { return original_seed; }
+    inline uint64_t GetOriginalSeed() const { return original_seed; }
 
     /**
      * Starts a new sequence of pseudo random numbers.
@@ -81,12 +83,12 @@ namespace emp {
     inline void ResetSeed(const int seed) {
       // If the provided seed is <= 0, choose a unique seed based on time and memory location.
       if (seed <= 0) {
-        uint64_t seed_time = time(NULL);
+        uint64_t seed_time = (uint64_t) time(NULL);
         uint64_t seed_mem = (uint64_t) this;
         weyl_state = seed_time ^ seed_mem;
       }
 
-      else weyl_state = seed;
+      else weyl_state = (uint64_t) seed;
 
       weyl_state *= 2;  // Make sure starting state is even.
 
