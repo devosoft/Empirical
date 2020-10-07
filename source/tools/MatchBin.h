@@ -876,7 +876,7 @@ namespace emp {
           std::cbegin(target.data),
           std::cend(target.data),
           std::inserter(scores, std::begin(scores)),
-          [this, uid](const auto& target_pair){
+          [this, uid = uid](const auto& target_pair){
             const auto& [target_uid, target_pack] = target_pair;
             return std::pair{
               target_uid,
