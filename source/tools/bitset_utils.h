@@ -69,6 +69,31 @@ namespace emp {
     return pos;
   }
 
+  /// A compile-time bit counter.
+  template <typename TYPE>
+  static constexpr int CountOnes(TYPE x) { return x == 0 ? 0 : (CountOnes(x/2) + (x&1)); }
+
+  /// Quick bit-mask generator for low bits.
+  template <typename TYPE>
+  static constexpr TYPE MaskLow(std::size_t num_bits) {
+    return (num_bits == 8*sizeof(TYPE)) ? ((TYPE)-1) : ((((TYPE)1) << num_bits) - 1);
+  }
+
+  /// Quick bit-mask generator for high bits.
+  template <typename TYPE>
+  static constexpr TYPE MaskHigh(std::size_t num_bits) {
+    return MaskLow<TYPE>(num_bits) << (8*sizeof(TYPE)-num_bits);
+  }
+
+  template <typename TYPE>
+  static constexpr TYPE MaskUsed(TYPE val) {
+    size_t shift = 1;
+    while (val >> shift) {  // While the shift produces something to use...
+      val |= val >> shift;  // Copy 1's over to the shifted position of val.
+      shift <<= 1;          // Double the size of the shift for the next loop.
+    }
+    return val;
+  }
 
   /*
   // Returns the position of the first set (one) bit or a -1 if none exist.
