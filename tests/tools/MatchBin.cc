@@ -534,8 +534,29 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(bitBin.GetVals(bitBin.Match(bs11, 2)) == (emp::vector<std::string>{"eleven", "three"}));
   REQUIRE(bitBin.GetTags(bitBin.Match(bs11, 2)) == (emp::vector<emp::BitSet<32>>{bs11, bs3}));
 
-  REQUIRE(bitBin.GetVals(bitBin.Match(bs3, 5)) == (emp::vector<std::string> {"three","one","eleven"}));
-  REQUIRE(bitBin.GetTags(bitBin.Match(bs3, 5)) == (emp::vector<emp::BitSet<32>> {bs3, bs1, bs11}));
+  {
+  const auto res{ bitBin.GetVals(bitBin.Match(bs3, 5)) };
+
+  const bool in_first_okay_order =
+    res == (emp::vector<std::string> {"three","one","eleven"})
+  ;
+  const bool in_second_okay_order =
+    res == (emp::vector<std::string> {"three","eleven","one"})
+  ;
+  REQUIRE( (in_first_okay_order || in_second_okay_order) );
+  }
+
+  {
+  const auto res{ bitBin.GetTags(bitBin.Match(bs3, 5)) };
+
+  const bool in_first_okay_order =
+    res == (emp::vector<emp::BitSet<32>> {bs3, bs1, bs11})
+  ;
+  const bool in_second_okay_order =
+    res == (emp::vector<emp::BitSet<32>> {bs3, bs11, bs1})
+  ;
+  REQUIRE( (in_first_okay_order || in_second_okay_order) );
+  }
 
   REQUIRE (bitBin.Size() == 3);
 
