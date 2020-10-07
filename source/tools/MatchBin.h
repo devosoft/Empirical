@@ -140,6 +140,7 @@ namespace emp::internal {
 
     /// Sets up the various functions and variables we keep track of.
     void SetupDatafile() {
+      #ifdef EMP_LOG_MATCHBIN
       datafile.SetUpdateContainerFun([this](){ return logbuffer; });
 
       datafile.AddVar(instance_id, emp::to_string(instance_id), "Instance ID");
@@ -148,8 +149,8 @@ namespace emp::internal {
       datafile.AddContainerFun(get_tag_log, "tag", "Tag");
       datafile.AddContainerFun(get_hit_count_log, "hit_count", "Counter for how many times this match occured");
       datafile.AddContainerFun(get_logbuffer_type, "matchtype", "Type of match");
-
       datafile.PrintHeaderKeys();
+      #endif
     }
 
     /// Logs a match into the logbuffer.
