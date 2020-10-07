@@ -871,7 +871,7 @@ namespace emp {
 
       for (const auto& [uid, pack] : state.data) {
 
-        std::unordered_flat_map<uid_t, double> scores;
+        std::unordered_map<uid_t, double> scores;
         std::transform(
           std::cbegin(target.data),
           std::cend(target.data),
