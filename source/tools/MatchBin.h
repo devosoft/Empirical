@@ -280,12 +280,12 @@ namespace emp::internal {
 
       // caches
       // cache of regulated scores
-      robin_hood::unordered_map<
+      robin_hood::unordered_flat_map<
         query_t,
         cache_state_t
       > cache_regulated;
       // cache of raw scores
-      robin_hood::unordered_map<
+      robin_hood::unordered_flat_map<
         query_t,
         cache_state_t
       > cache_raw;
@@ -409,7 +409,7 @@ namespace emp {
 
     };
 
-    robin_hood::unordered_map< uid_t, entry > data;
+    robin_hood::unordered_flat_map< uid_t, entry > data;
 
     #ifdef CEREAL_NVP
     template <class Archive>
@@ -871,7 +871,7 @@ namespace emp {
 
       for (const auto& [uid, pack] : state.data) {
 
-        std::unordered_map<uid_t, double> scores;
+        std::unordered_flat_map<uid_t, double> scores;
         std::transform(
           std::cbegin(target.data),
           std::cend(target.data),
@@ -958,7 +958,7 @@ template<
 >
 void save(
   Archive & archive,
-  robin_hood::unordered_map<size_t, T> const & m
+  robin_hood::unordered_flat_map<size_t, T> const & m
 ) {
 
   std::unordered_map<size_t, T> t;
@@ -981,7 +981,7 @@ template<
 >
 void load(
   Archive & archive,
-  robin_hood::unordered_map<size_t, T> & m
+  robin_hood::unordered_flat_map<size_t, T> & m
 ) {
 
   std::unordered_map<size_t, T> t;
