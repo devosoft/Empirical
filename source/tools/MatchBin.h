@@ -513,7 +513,7 @@ namespace emp {
 
   protected:
     state_t state;
-    uid_t uid_stepper;
+    uid_t uid_stepper{};
 
     emp::internal::MatchBinCache<query_t, Selector> cache;
 
@@ -523,29 +523,43 @@ namespace emp {
 
 
   public:
-    MatchBin()
-    : uid_stepper(0)
-    { ; }
+    MatchBin() = default;
 
     MatchBin(emp::Random & rand)
-    : uid_stepper(0)
-    , selector(rand)
+    : selector(rand)
     { ; }
+
+    // have to define this manually due to mutexes
+    MatchBin(const MatchBin &other)
+    : metric( other.metric )
+    , selector( other.selector )
+    , state( other.state )
+    , uid_stepper( other.uid_stepper ) { }
+
+    // have to define this manually due to mutexes
+    MatchBin(MatchBin &&other)
+    : metric( std::move(other.metric) )
+    , selector( std::move(other.selector) )
+    , state( std::move(other.state) )
+    , uid_stepper( std::move(other.uid_stepper) ) {
+    }
 
   // have to define this manually due to mutexes
   MatchBin &operator=(const MatchBin &other) {
+    metric = other.metric;
+    selector = other.selector;
     state = other.state;
     uid_stepper = other.uid_stepper;
     return *this;
   }
 
   // have to define this manually due to mutexes
-  MatchBin(const MatchBin &other)
-  : metric(other.metric)
-  , selector(other.selector)
-  {
-    state = other.state;
-    uid_stepper = other.uid_stepper;
+  MatchBin &operator=(MatchBin &&other) {
+    metric = std::move( other.metric );
+    selector = std::move( other.selector );
+    state = std::move( other.state );
+    uid_stepper = std::move( other.uid_stepper );
+    return *this;
   }
 
     /// Compare a query tag to all stored tags using the distance metric
