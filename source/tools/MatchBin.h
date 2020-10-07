@@ -352,7 +352,7 @@ namespace emp::internal {
         #ifdef EMP_THREAD_SAFE
         std::unique_lock lock(cache_regulated_mutex);
         #endif
-        cache_regulated.emplace(query, result);
+        cache_regulated[query] = result;
       }
 
       /// Stores a query in raw cache.
@@ -362,7 +362,7 @@ namespace emp::internal {
         #ifdef EMP_THREAD_SAFE
         std::unique_lock lock(cache_raw_mutex);
         #endif
-        cache_raw.emplace(query, result);
+        cache_raw[query] = result;
       }
 
       /// Gets query from regulated cache.

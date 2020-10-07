@@ -50,8 +50,10 @@ namespace emp {
 
     emp::IndexMap indexMap;
     emp::vector<size_t> uids;
-    emp::Random& rand;
+    emp::Random* rand; // non-owning ptr
     size_t default_n;
+
+    RouletteCacheState() = default;
 
     RouletteCacheState(
       emp::IndexMap& im,
@@ -60,7 +62,7 @@ namespace emp {
       const size_t default_n_
     ) : indexMap(im)
       , uids( std::move(ids) )
-      , rand(r)
+      , rand(&r)
       , default_n(default_n_)
     { ; }
 
@@ -82,7 +84,7 @@ namespace emp {
         const double match_pos = (
           indexMap.GetSize() == 1
           ? 0
-          : rand.GetDouble(indexMap.GetWeight())
+          : rand->GetDouble(indexMap.GetWeight())
         );
         const size_t idx = indexMap.Index(match_pos);
         res.push_back(uids[idx]);
@@ -96,8 +98,11 @@ namespace emp {
 
     emp::vector<size_t> uids;
     emp::vector<double> probs;
-    emp::Random& rand;
+    emp::Random* rand; // non-owning ptr
     size_t default_n;
+
+
+    SieveCacheState() = default;
 
     SieveCacheState(
       emp::vector<size_t> uids_,
@@ -106,7 +111,7 @@ namespace emp {
       const size_t default_n_
     ) : uids( std::move(uids_) )
       , probs(probs_)
-      , rand(r)
+      , rand(&r)
       , default_n(default_n_)
     { emp_assert(uids.size() == probs.size()); }
 
@@ -118,7 +123,7 @@ namespace emp {
 
       for (size_t i = 0; i < uids.size() && res.size() < n; ++i) {
 
-        if (probs[i] == 1.0 || rand.GetDouble() < probs[i]) {
+        if (probs[i] == 1.0 || rand->GetDouble() < probs[i]) {
           res.push_back(uids[i]);
         }
 
