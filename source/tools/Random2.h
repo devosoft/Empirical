@@ -18,7 +18,7 @@
 #include <iterator>
 
 #include "../base/assert.h"
-#include "math.h"
+#include "bitset_utils.h"
 #include "Range.h"
 
 namespace emp {
@@ -43,29 +43,28 @@ namespace emp {
     // Returns a random number [0,_RAND_MAX)
     uint32_t Get() {
       value *= value;                            // Square the current value.
-      value += (w += step_size);                 // Take a step in the Weyl sequence
+      value += (weyl_state += step_size);        // Take a step in the Weyl sequence
       return value = (value>>32) | (value<<32);  // Return the middle of the value
     }
 
   public:
     /**
      * Set up the random generator object.
-     * @param _seed The seed of the random number generator.  A negative seed means that the
+     * @param seed The seed of the random number generator.  A negative seed means that the
      * random number generator gets its seed from a combination of the actual system time and
      * the memory position of the random number generator.
      **/
-    Random(const int _seed = -1) {
-      for (int i = 0; i < 56; ++i) ma[i] = 0;
-      ResetSeed(_seed);  // Calls init()
+    Random(const int seed = -1) {
+      ResetSeed(seed);  // Calls init()
     }
 
     ~Random() { ; }
 
 
     /**
-     * @return The seed that was actually used to start the random sequence.
+     * @return The current state of the seed in the random sequence.
      **/
-    inline int GetSeed() const { return seed; }
+    inline int GetSeed() const { return weyl_state; }
 
     /**
      * @return The seed that was originally provided by the user.
@@ -79,20 +78,19 @@ namespace emp {
      * A negative seed means that the random number generator gets its
      * seed from the actual system time and the process ID.
      **/
-    inline void ResetSeed(const int _seed) {
-      original_seed = _seed;
-
-      if (_seed <= 0) {
-        int seed_time = (int) time(NULL);
-        int seed_mem = (int) ((uint64_t) this);
-        seed = seed_time ^ seed_mem;
-      } else {
-        seed = _seed;
+    inline void ResetSeed(const int seed) {
+      // If the provided seed is <= 0, choose a unique seed based on time and memory location.
+      if (seed <= 0) {
+        uint64_t seed_time = time(NULL);
+        uint64_t seed_mem = (uint64_t) this;
+        weyl_state = seed_time ^ seed_mem;
       }
 
-      if (seed < 0) seed *= -1;
+      else weyl_state = seed;
 
-      init();
+      weyl_state *= 2;  // Make sure starting state is even.
+
+      original_seed = weyl_state;
     }
 
 
@@ -249,7 +247,7 @@ namespace emp {
     /// @param p The probability of the result being "true".
     inline bool P(const double p) {
       emp_assert(p >= 0.0 && p <= 1.0, p);
-      return (Get() < (p * _RAND_MBIG));
+      return (Get() < (p * _RAND_MAX));
     }
 
 
@@ -324,7 +322,6 @@ namespace emp {
       for (uint32_t i = 0; i < n; ++i) if (P(p)) k++;
       return k;
     }
-
 
 
   };
