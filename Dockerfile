@@ -96,31 +96,31 @@ RUN \
 
 RUN \
   apt-get install -y \
-    g++-8 \
-    cmake \
-    build-essential \
-    python-virtualenv \
-    python-pip \
-    nodejs \
-    npm \
-    tar \
-    gzip \
-    libpthread-stubs0-dev \
-    libc6-dbg \
-    gdb \
+    g++-8=8.4.0-1ubuntu1~18.04 \
+    cmake=3.10.2-1ubuntu2.18.04.1 \
+    build-essential=12.4ubuntu1 \
+    python-virtualenv=15.1.0+ds-1.1 \
+    python-pip=9.0.1-2.3~ubuntu1.18.04.3 \
+    nodejs=8.10.0~dfsg-2ubuntu0.4 \
+    npm=3.5.2-0ubuntu4 \
+    tar=1.29b-2ubuntu0.1 \
+    gzip=1.6-5ubuntu1 \
+    libpthread-stubs0-dev=0.3-4 \
+    libc6-dbg=2.27-3ubuntu1.2 \
+    gdb=8.2-0ubuntu1~18.04 \
     && \
   echo "installed core dependencies"
 
 RUN \
   apt-get install -y \
-    curl \
-    git \
-    htop \
+    curl=7.58.0-2ubuntu3.10 \
+    git=1:2.17.1-1ubuntu0.7 \
+    htop=2.1.0-3 \
     man \
-    unzip \
-    vim \
-    nano \
-    wget \
+    unzip=6.0-21ubuntu1 \
+    vim=2:8.0.1453-1ubuntu1.3 \
+    nano=2.9.3-2 \
+    wget=1.19.4-1ubuntu2.2 \
     && \
   echo "installed creature comforts"
 
