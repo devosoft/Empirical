@@ -50,12 +50,7 @@ namespace emp2 {
     }
 
   public:
-    /**
-     * Set up the random generator object.
-     * @param seed The seed of the random number generator.  A negative seed means that the
-     * random number generator gets its seed from a combination of the actual system time and
-     * the memory position of the random number generator.
-     **/
+    /// Set up the random generator object with an optional seed value.
     Random(const int seed = -1) {
       ResetSeed(seed);  // Calls init()
     }
@@ -63,24 +58,15 @@ namespace emp2 {
     ~Random() { ; }
 
 
-    /**
-     * @return The current state of the seed in the random sequence.
-     **/
+    /// @return The current state of the seed in the random sequence.
     inline uint64_t GetSeed() const { return weyl_state; }
 
-    /**
-     * @return The seed that was originally provided by the user.
-     **/
+    /// @return The seed that was originally provided by the user.
     inline uint64_t GetOriginalSeed() const { return original_seed; }
 
-    /**
-     * Starts a new sequence of pseudo random numbers.
-     *
-     * @param new_seed The seed for the new sequence.
-     * A negative seed means that the random number generator gets its
-     * seed from the actual system time and the process ID.
-     **/
-    inline void ResetSeed(const int seed) {
+    /// Starts a new sequence of pseudo random numbers.  A negative seed means that the random
+    /// number generator gets its seed from the current system time and the process memory.
+    void ResetSeed(const int64_t seed) {
       // If the provided seed is <= 0, choose a unique seed based on time and memory location.
       if (seed <= 0) {
         uint64_t seed_time = (uint64_t) time(NULL);
@@ -98,81 +84,83 @@ namespace emp2 {
 
     // Random Number Generation /////////////////////////////////////////////////
 
-    /**
-     * Generate a double between 0.0 and 1.0
-     *
-     * @return The pseudo random number.
-     **/
+    /// @return A pseudo-random double value between 0.0 and 1.0
     inline double GetDouble() { return Get() / (double) _RAND_MAX; }
 
-    /**
-     * Generate a double between 0 and a given number.
-     *
-     * @return The pseudo random number.
-     * @param max The upper bound for the random numbers (will never be returned).
-     **/
+    /// @return A pseudo-random double value between 0.0 and max
     inline double GetDouble(const double max) {
       return GetDouble() * max;
     }
 
-    /**
-     * Generate a double out of a given interval.
-     *
-     * @return The pseudo random number.
-     * @param min The lower bound for the random numbers.
-     * @param max The upper bound for the random numbers (will never be returned).
-     **/
+    /// @return A pseudo-random double value between min and max
     inline double GetDouble(const double min, const double max) {
       return GetDouble() * (max - min) + min;
     }
 
-    /**
-     * Generate a double out of a given interval.
-     *
-     * @return The pseudo random number.
-     * @param range The upper and lower bounds for the random numbers [lower, upper)
-     **/
+    /// @return A pseudo-random double in the provided range.
     inline double GetDouble(const Range<double> range) {
       return GetDouble(range.GetLower(), range.GetUpper());
      }
 
-    /**
-     * Generate an uint32_t.
-     *
-     * @return The pseudo random number.
-     * @param max The upper bound for the random numbers (will never be returned).
-     **/
+
+    /// @return A pseudo-random 32-bit (4 byte) unsigned int value.
+    inline uint32_t GetUInt() {
+      return Get();
+    }
+
+    /// @return A pseudo-random 32-bit unsigned int value between 0 and max
     template <typename T>
     inline uint32_t GetUInt(const T max) {
       return static_cast<uint32_t>(GetDouble() * static_cast<double>(max));
     }
 
-    /**
-     * Generate a random 32-bit block of bits.
-     *
-     * @return The pseudo random number.
-     **/
-    inline uint32_t GetUInt() {
-      return Get();
+    /// @return A pseudo-random 32-bit unsigned int value between min and max
+    template <typename T1, typename T2>
+    inline uint32_t GetUInt(const T1 min, const T2 max) {
+      return GetUInt<uint32_t>((uint32_t) max - (uint32_t) min) + (uint32_t) min;
     }
 
-    /**
-     * Generate a random 64-bit block of bits.
-     *
-     * @return The pseudo random number.
-     **/
+    /// @return A pseudo-random 32-bit unsigned int value in the provided range.
+    template <typename T>
+    inline uint32_t GetUInt(const Range<T> range) {
+      return GetUInt(range.GetLower(), range.GetUpper());
+    }
+
+
+    /// @return A pseudo-random 64-bit (8 byte) unsigned int value.
     inline uint64_t GetUInt64() {
-      // @MAM profiled,
-      // this is faster than using RandFill
-      // https://gist.github.com/mmore500/8747e456b949b5b18b3ee85dd9b4444d
       return ( static_cast<uint64_t>(GetUInt()) << 32 )
              + static_cast<uint64_t>(GetUInt());
     }
 
+    /// @return A pseudo-random 64-bit unsigned int value between 0 and max
+    inline uint64_t GetUInt64(const uint64_t max) {
+      if (max <= _RAND_MAX) return (uint64_t) GetUInt(max);  // Don't need extra precision.
+
+      size_t mask = emp::MaskUsed(max);              // Create a mask for just the bits we need.
+      uint64_t val = GetUInt64() & mask;             // Grab a value using just the current bits.
+      while (val >= max) val = GetUInt64() & mask;   // Grab new values until we find a valid one.
+
+      return val;
+    }
+
+
+    /// @return A pseudo-random 32-bit (4 byte) int value between 0 and max
+    inline int32_t GetInt(const int32_t max) {
+      return static_cast<int32_t>(GetUInt((uint32_t) max));
+    }
+
+    /// @return A pseudo-random 32-bit (4 byte) int value between min and max
+    inline int32_t GetInt(const int min, const int max) { return GetInt(max - min) + min; }
+
+    /// @return A pseudo-random 32-bit (4 byte) int value in range
+    inline int32_t GetInt(const Range<int> range) {
+      return GetInt(range.GetLower(), range.GetUpper());
+    }
+
 
     /// Randomize a contiguous segment of memory.
-
-    inline void RandFill(unsigned char * dest, const size_t num_bytes) {
+    void RandFill(unsigned char * dest, const size_t num_bytes) {
       size_t leftover = num_bytes % 4;
       size_t limit = num_bytes - leftover;
 
@@ -187,60 +175,7 @@ namespace emp2 {
         uint32_t rnd = Get();
         std::memcpy(dest+num_bytes-leftover, &rnd, leftover);
       }
-
     }
-
-    /**
-     * Generate an uint64_t.
-     *
-     * @return The pseudo random number.
-     * @param max The upper bound for the random numbers (will never be returned).
-     * @todo this function needs to be tested and refined.
-     **/
-    inline uint64_t GetUInt64(const uint64_t max) {
-      if (max <= _RAND_MAX) return (uint64_t) GetUInt(max);  // Don't need extra precision.
-
-      size_t mask = emp::MaskUsed(max);              // Create a mask for just the bits we need.
-      uint64_t val = GetUInt64() & mask;             // Grab a value using just the current bits.
-      while (val >= max) val = GetUInt64() & mask;   // Grab new values until we find a valid one.
-
-      return val;
-    }
-
-
-    /**
-     * Generate an uint32_t out of an interval.
-     *
-     * @return The pseudo random number.
-     * @param min The lower bound for the random numbers.
-     * @param max The upper bound for the random numbers (will never be returned).
-     **/
-    template <typename T1, typename T2>
-    inline uint32_t GetUInt(const T1 min, const T2 max) {
-      return GetUInt<uint32_t>((uint32_t) max - (uint32_t) min) + (uint32_t) min;
-    }
-
-    /**
-     * Generate a uint32_t out of a given interval.
-     *
-     * @return The pseudo random number.
-     * @param range The upper and lower bounds for the random numbers [lower, upper)
-     **/
-    template <typename T>
-    inline uint32_t GetUInt(const Range<T> range) {
-      return GetUInt(range.GetLower(), range.GetUpper());
-    }
-
-    /**
-     * Generate an int out of an interval.
-     *
-     * @return The pseudo random number.
-     * @param min The lower bound for the random numbers.
-     * @param max The upper bound for the random numbers (will never be returned).
-     **/
-    inline int GetInt(const int max) { return static_cast<int>(GetUInt((uint32_t) max)); }
-    inline int GetInt(const int min, const int max) { return GetInt(max - min) + min; }
-    inline int GetInt(const Range<int> range) { return GetInt(range.GetLower(), range.GetUpper()); }
 
 
     // Random Event Generation //////////////////////////////////////////////////
