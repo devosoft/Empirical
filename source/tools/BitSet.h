@@ -754,11 +754,19 @@ namespace emp {
 
     /// Get the unsigned numeric value represented by the BitSet as a double
     double GetDouble() const {
-      double res = 0.0;
-      for (size_t i = 0; i < NUM_FIELDS; ++i) {
-        res += bit_set[i] * emp::Pow2(i * FIELD_BITS);
+
+      if constexpr (NUM_BITS <= 64) {
+        uint64_t res{};
+        std::memcpy(&res, bit_set, NUM_BYTES);
+        return res;
+      } else {
+        double res = 0.0;
+        for (size_t i = 0; i < (NUM_BITS + 63) / 64; ++i) {
+          res += GetUInt64(i) * emp::Pow2(i * 64);
+        }
+        return res;
       }
-      return res;
+
     }
 
     /// What is the maximum value this BitSet could contain, as a double?
