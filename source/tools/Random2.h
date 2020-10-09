@@ -37,15 +37,15 @@ namespace emp2 {
     double expRV = 0.0;    ///< Exponential Random Variable for the randNormal function
 
     // Constants ////////////////////////////////////////////////////////////////
-    static const uint64_t _RAND_MAX = 4294967296;
+    static constexpr const uint64_t _RAND_MAX = 4294967296;
 
 
-    // Basic Random number
-    // Returns a random number [0,_RAND_MAX)
+    /// Basic Random number
+    /// Returns a random number [0,_RAND_MAX)
     uint32_t Get() {
-      value *= value;                            // Square the current value.
-      value += (weyl_state += step_size);        // Take a step in the Weyl sequence
-      value = (value>>32) | (value<<32);  // Return the middle of the value
+      value *= value;                       // Square the current value.
+      value += (weyl_state += step_size);   // Take a step in the Weyl sequence
+      value = (value>>32) | (value<<32);    // Return the middle of the value
       return (uint32_t) value;
     }
 
@@ -169,10 +169,10 @@ namespace emp2 {
              + static_cast<uint64_t>(GetUInt());
     }
 
-    /**
-     * Randomize a contiguous segment of memory.
-     **/
-    inline void RandFill(unsigned char* dest, const size_t num_bytes) {
+
+    /// Randomize a contiguous segment of memory.
+
+    inline void RandFill(unsigned char * dest, const size_t num_bytes) {
       size_t leftover = num_bytes % 4;
       size_t limit = num_bytes - leftover;
 
