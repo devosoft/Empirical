@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019
+ *  @date 2020
  *
  *  @file MatchBin.h
  *  @brief A container that supports flexible tag-based lookup. .
@@ -472,7 +472,9 @@ namespace emp {
     virtual void ImprintRegulators(const BaseMatchBin::state_t & target) = 0;
     virtual std::string name() const = 0;
     virtual emp::vector<uid_t> ViewUIDs() const = 0;
+    #ifdef EMP_LOG_MATCHBIN
     virtual emp::internal::MatchBinLog<query_t, tag_t>& GetLog() = 0;
+    #endif
   };
 
 
@@ -512,8 +514,9 @@ namespace emp {
     using uid_t = typename base_t::uid_t;
     using state_t = typename base_t::state_t;
 
+    #ifdef EMP_LOG_MATCHBIN
     emp::internal::MatchBinLog<query_t, tag_t> log;
-
+    #endif
   protected:
     state_t state;
     uid_t uid_stepper{};
@@ -619,6 +622,7 @@ namespace emp {
 
       auto result = getResult();
 
+      #ifdef EMP_LOG_MATCHBIN
       // store counts for results
       if (result.empty()) {
         log.LogMiss(query, "regulated");
@@ -626,6 +630,7 @@ namespace emp {
       for (const auto &uid : result) {
         log.LogMatch(query, GetTag(uid), "regulated");
       }
+      #endif
 
       return result;
     }
@@ -682,6 +687,7 @@ namespace emp {
       };
       auto result = getResult();
 
+      #ifdef EMP_LOG_MATCHBIN
       if (result.empty()) {
         log.LogMiss(query, "raw");
       }
@@ -689,6 +695,7 @@ namespace emp {
       for (const auto &uid : result) {
         log.LogMatch(query, GetTag(uid), "raw");
       }
+      #endif
 
       return result;
     }
@@ -941,8 +948,10 @@ namespace emp {
       cache.Clear();
     }
 
+    #ifdef EMP_LOG_MATCHBIN
     /// Returns reference to internal logging instance.
     emp::internal::MatchBinLog<query_t, tag_t>& GetLog() override { return log; }
+    #endif
 
     /// Returns size of regulated cache.
     size_t GetRegulatedCacheSize() { return cache.RegulatedSize(); }
