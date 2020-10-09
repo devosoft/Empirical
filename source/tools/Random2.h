@@ -37,7 +37,7 @@ namespace emp2 {
     double expRV = 0.0;    ///< Exponential Random Variable for the randNormal function
 
     // Constants ////////////////////////////////////////////////////////////////
-    static constexpr const uint64_t _RAND_MAX = 4294967296;
+    static constexpr const uint64_t _RAND_MAX = 1 << 32;
 
 
     /// Basic Random number
