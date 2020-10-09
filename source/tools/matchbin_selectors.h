@@ -38,18 +38,20 @@
 #include "../tools/string_utils.h"
 #include "../tools/hash_utils.h"
 
+#include "mb_vector.h"
+
 namespace emp {
 
   struct CacheStateBase {
     CacheStateBase() = default;
     virtual ~CacheStateBase() {};
-    virtual emp::optional<emp::vector<size_t>> operator()(size_t n) = 0;
+    virtual emp::optional<emp::mb_vector<size_t>> operator()(size_t n) = 0;
   };
 
   struct RouletteCacheState : public CacheStateBase {
 
     emp::IndexMap indexMap;
-    emp::vector<size_t> uids;
+    emp::mb_vector<size_t> uids;
     emp::Random* rand; // non-owning ptr
     size_t default_n;
 
@@ -57,7 +59,7 @@ namespace emp {
 
     RouletteCacheState(
       emp::IndexMap& im,
-      emp::vector<size_t> ids,
+      emp::mb_vector<size_t> ids,
       emp::Random& r,
       const size_t default_n_
     ) : indexMap(im)
@@ -66,17 +68,17 @@ namespace emp {
       , default_n(default_n_)
     { ; }
 
-    emp::optional<emp::vector<size_t>> operator()(size_t n) override {
+    emp::optional<emp::mb_vector<size_t>> operator()(size_t n) override {
 
       if (n == std::numeric_limits<size_t>::max()) n = default_n;
 
       // don't perform a lookup into an empty IndexMap, that's a segfault
       // double braces: an empty vector inside an optional
       if (indexMap.GetSize() == 0) {
-        return emp::optional<emp::vector<size_t>>{emp::vector<size_t>{}};
+        return emp::optional<emp::mb_vector<size_t>>{emp::mb_vector<size_t>{}};
       }
 
-      emp::vector<size_t> res;
+      emp::mb_vector<size_t> res;
       res.reserve(n);
 
       for (size_t i = 0; i < n; ++i) {
@@ -96,8 +98,8 @@ namespace emp {
 
   struct SieveCacheState : public CacheStateBase {
 
-    emp::vector<size_t> uids;
-    emp::vector<double> probs;
+    emp::mb_vector<size_t> uids;
+    emp::mb_vector<double> probs;
     emp::Random* rand; // non-owning ptr
     size_t default_n;
 
@@ -105,8 +107,8 @@ namespace emp {
     SieveCacheState() = default;
 
     SieveCacheState(
-      emp::vector<size_t> uids_,
-      const emp::vector<double> & probs_,
+      emp::mb_vector<size_t> uids_,
+      const emp::mb_vector<double> & probs_,
       emp::Random& r,
       const size_t default_n_
     ) : uids( std::move(uids_) )
@@ -115,11 +117,11 @@ namespace emp {
       , default_n(default_n_)
     { emp_assert(uids.size() == probs.size()); }
 
-    emp::optional<emp::vector<size_t>> operator()(size_t n) override {
+    emp::optional<emp::mb_vector<size_t>> operator()(size_t n) override {
 
       if (n == std::numeric_limits<size_t>::max()) n = default_n;
 
-      emp::vector<size_t> res;
+      emp::mb_vector<size_t> res;
 
       for (size_t i = 0; i < uids.size() && res.size() < n; ++i) {
 
@@ -137,13 +139,13 @@ namespace emp {
 
   struct RankedCacheState: public CacheStateBase {
 
-    emp::vector<size_t> uids;
+    emp::mb_vector<size_t> uids;
     size_t requestSize;
     size_t default_n;
 
     RankedCacheState() = default;
     RankedCacheState(
-      emp::vector<size_t> uids_,
+      emp::mb_vector<size_t> uids_,
       size_t n,
       size_t default_n_
     ) : uids( std::move(uids_) )
@@ -151,13 +153,13 @@ namespace emp {
       , default_n(default_n_)
     { ; }
 
-    emp::optional<emp::vector<size_t>> operator()(size_t n) override {
+    emp::optional<emp::mb_vector<size_t>> operator()(size_t n) override {
       if (n == std::numeric_limits<size_t>::max()) n = default_n;
 
       if (n > requestSize) return std::nullopt;
       if (n >= uids.size()) return uids;
 
-      return emp::vector<size_t>(
+      return emp::mb_vector<size_t>(
         std::begin(uids),
         std::begin(uids) + n
       );
@@ -170,7 +172,7 @@ namespace emp {
   struct SelectorBase {
     virtual ~SelectorBase() {};
     virtual CacheType operator()(
-        emp::vector< std::pair<size_t, double> > scores,
+        emp::mb_vector< std::pair<size_t, double> > scores,
         size_t n
         ) = 0;
     virtual std::string name() const = 0;
@@ -204,7 +206,7 @@ namespace emp {
     }
 
     RankedCacheState operator()(
-      emp::vector< std::pair<size_t, double> > scores,
+      emp::mb_vector< std::pair<size_t, double> > scores,
       size_t n
     ) override {
 
@@ -238,7 +240,7 @@ namespace emp {
         }
       );
 
-      emp::vector<size_t> res;
+      emp::mb_vector<size_t> res;
       res.reserve( std::distance(std::begin(scores), back) );
       std::transform(
         std::begin(scores),
@@ -303,7 +305,7 @@ namespace emp {
     }
 
     RouletteCacheState operator()(
-      emp::vector< std::pair<size_t, double> > scores,
+      emp::mb_vector< std::pair<size_t, double> > scores,
       size_t n
     ) override {
 
@@ -362,7 +364,7 @@ namespace emp {
         match_index.Adjust(p, 1.0 / ( skew + scores[p].second - baseline ));
       }
 
-      emp::vector<size_t> uids;
+      emp::mb_vector<size_t> uids;
       uids.reserve( scores.size() );
       std::transform(
         std::begin(scores),
@@ -437,7 +439,7 @@ namespace emp {
     }
 
     RouletteCacheState operator()(
-      emp::vector< std::pair<size_t, double> > scores,
+      emp::mb_vector< std::pair<size_t, double> > scores,
       size_t n
     ) override {
 
@@ -512,7 +514,7 @@ namespace emp {
         );
       }
 
-      emp::vector<size_t> uids;
+      emp::mb_vector<size_t> uids;
       uids.reserve( scores.size() );
       std::transform(
         std::begin(scores),
@@ -575,7 +577,7 @@ namespace emp {
 
     // scores (post-regulation) are assumed to be between 0 and 1
     SieveCacheState operator()(
-      emp::vector< std::pair<size_t, double> > scores,
+      emp::mb_vector< std::pair<size_t, double> > scores,
       size_t n
     ) override {
 
@@ -612,7 +614,7 @@ namespace emp {
         }
       );
 
-      emp::vector<double> probabilities;
+      emp::mb_vector<double> probabilities;
       std::transform(
         std::begin(scores),
         partition,
@@ -634,7 +636,7 @@ namespace emp {
         }
       );
 
-      emp::vector<size_t> uids;
+      emp::mb_vector<size_t> uids;
       uids.reserve( scores.size() );
       std::transform(
         std::begin(scores),

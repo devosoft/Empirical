@@ -264,7 +264,7 @@ namespace emp {
     // exclude clang versions with compiler bug https://reviews.llvm.org/D35190
     #if defined(__clang__) && __clang_major__>=9 || defined(__GNUC__) && !defined(__clang__)
     // if base is not known at compile time, use std::pow which is faster
-    if ( !__builtin_constant_p( base ) ) return std::pow(base, exp); 
+    if ( !__builtin_constant_p( base ) ) return std::pow(base, exp);
     // otherwise, use constexpr-friendly implementations
     else
     #endif
@@ -327,6 +327,18 @@ namespace emp {
       if (*it > *max_found) max_found = it;
     }
     return *max_found;
+  }
+
+  /// Returns the next power of two (in 64-bits) that is strictly greater than A.
+  /// Returns zero on overflow.
+  inline uint64_t NextPowerOf2(uint64_t A) {
+    A |= (A >> 1);
+    A |= (A >> 2);
+    A |= (A >> 4);
+    A |= (A >> 8);
+    A |= (A >> 16);
+    A |= (A >> 32);
+    return A + 1;
   }
 
 }
