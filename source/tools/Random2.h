@@ -192,10 +192,8 @@ namespace emp2 {
 
     // Distributions //
 
-    /**
-     * Generate a random variable drawn from a unit normal distribution.
-     **/
-    inline double GetRandNormal() {
+    /// Generate a random variable drawn from a unit normal distribution.
+    double GetRandNormal() {
       // Draw from a Unit Normal Dist
       // Using Rejection Method and saving of initial exponential random variable
       double expRV2;
@@ -209,27 +207,20 @@ namespace emp2 {
       return -expRV2;
     }
 
-    /**
-     * Generate a random variable drawn from a distribution with given
-     * mean and standard deviation.
-     **/
+    /// @return A random variable drawn from a normal distribution.
+    /// @param mean Center of distribution.
+    /// @param std Standard deviation of distribution.
     inline double GetRandNormal(const double mean, const double std) { return mean + GetRandNormal() * std; }
 
-    /**
-     * Generate a random variable drawn from a Poisson distribution.
-     **/
-    inline uint32_t GetRandPoisson(const double n, double p) {
+    /// Generate a random variable drawn from a Poisson distribution.
+    inline uint32_t GetRandPoisson(const double n, const double p) {
       emp_assert(p >= 0.0 && p <= 1.0, p);
       // Optimizes for speed and calculability using symetry of the distribution
       if (p > .5) return (uint32_t) n - GetRandPoisson(n * (1 - p));
       else return GetRandPoisson(n * p);
     }
 
-    /**
-     * Generate a random variable drawn from a Poisson distribution.
-     *
-     * @param mean The mean of the distribution.
-     **/
+    /// Generate a random variable drawn from a Poisson distribution.
     inline uint32_t GetRandPoisson(const double mean) {
       // Draw from a Poisson Dist with mean; if cannot calculate, return UINT_MAX.
       // Uses Rejection Method
@@ -244,13 +235,11 @@ namespace emp2 {
       return k;
     }
 
-    /**
-     * Generate a random variable drawn from a Binomial distribution.
-     *
-     * This function is exact, but slow.
-     * @see Random::GetApproxRandBinomial
-     * @see emp::Binomial in source/tools/Distribution.h
-     **/
+    /// Generate a random variable drawn from a Binomial distribution.
+    ///
+    /// This function is exact, but slow.
+    /// @see Random::GetApproxRandBinomial
+    /// @see emp::Binomial in source/tools/Distribution.h
     inline uint32_t GetRandBinomial(const double n, const double p) { // Exact
       emp_assert(p >= 0.0 && p <= 1.0, p);
       emp_assert(n >= 0.0, n);
@@ -259,7 +248,6 @@ namespace emp2 {
       for (uint32_t i = 0; i < n; ++i) if (P(p)) k++;
       return k;
     }
-
 
   };
 
