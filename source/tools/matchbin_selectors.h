@@ -223,7 +223,7 @@ namespace emp {
         std::begin(scores),
         std::begin(scores) + std::min(n, scores.size()),
         std::end(scores),
-        [&scores](const auto& a, const auto& b){
+        [](const auto& a, const auto& b){
           return a.second < b.second;
         }
       );
