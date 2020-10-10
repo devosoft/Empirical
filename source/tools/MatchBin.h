@@ -523,8 +523,6 @@ namespace emp {
 
     emp::internal::MatchBinCache<query_t, Selector> cache;
 
-
-    Metric metric;
     Selector selector;
 
 
@@ -538,7 +536,6 @@ namespace emp {
     // have to define this manually due to mutexes
     MatchBin(const MatchBin &other)
     : state( other.state )
-    , metric( other.metric )
     , selector( other.selector )
     , uid_stepper( other.uid_stepper ) { }
 
@@ -546,13 +543,11 @@ namespace emp {
     MatchBin(MatchBin &&other)
     : state( std::move(other.state) )
     , selector( std::move(other.selector) )
-    , metric( std::move(other.metric) )
-    , uid_stepper( std::move(other.uid_stepper) ) {
-    }
+    , uid_stepper( std::move(other.uid_stepper) )
+    { }
 
   // have to define this manually due to mutexes
   MatchBin &operator=(const MatchBin &other) {
-    metric = other.metric;
     selector = other.selector;
     state = other.state;
     uid_stepper = other.uid_stepper;
@@ -561,7 +556,6 @@ namespace emp {
 
   // have to define this manually due to mutexes
   MatchBin &operator=(MatchBin &&other) {
-    metric = std::move( other.metric );
     selector = std::move( other.selector );
     state = std::move( other.state );
     uid_stepper = std::move( other.uid_stepper );
@@ -590,7 +584,7 @@ namespace emp {
             const auto& [uid, pack] = pair;
             return std::pair{
               uid,
-              pack.regulator( metric(query, pack.tag) )
+              pack.regulator( Metric::calculate(query, pack.tag) )
             };
           }
         );
@@ -657,7 +651,7 @@ namespace emp {
             const auto& [uid, pack] = pair;
             return std::pair{
               uid,
-              metric(query, pack.tag)
+              Metric::calculate(query, pack.tag)
             };
           }
         );
@@ -890,7 +884,7 @@ namespace emp {
             const auto& [target_uid, target_pack] = target_pair;
             return std::pair{
               target_uid,
-              metric(target_pack.tag, GetTag(uid))
+              Metric::calculate(target_pack.tag, GetTag(uid))
             };
           }
         );
@@ -926,6 +920,7 @@ namespace emp {
 
     /// Get selector, metric name
     std::string name() const override {
+      static Metric metric;
       Regulator reg{};
       return emp::to_string(
         "Selector: ",
