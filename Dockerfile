@@ -108,6 +108,7 @@ RUN \
     libpthread-stubs0-dev=0.3-4 \
     libc6-dbg=2.27-3ubuntu1.2 \
     gdb=8.2-0ubuntu1~18.04 \
+    doxygen \
     && \
   echo "installed core dependencies"
 
