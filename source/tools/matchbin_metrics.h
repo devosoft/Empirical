@@ -75,6 +75,10 @@ namespace emp {
     std::string base() const override { return "Hamming Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
       return (double)(a^b).CountOnes() / Width;
     }
 
@@ -98,6 +102,10 @@ namespace emp {
     std::string base() const override { return "Hash Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
       std::hash<query_t> qhasher;
       std::hash<tag_t> thasher;
 
@@ -132,8 +140,12 @@ namespace emp {
 
     std::string base() const override { return "Hash Metric"; }
 
-    // adapted from https://www.uncg.edu/cmp/faculty/srtate/580.f11/sha1examples.php
     double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    // adapted from https://www.uncg.edu/cmp/faculty/srtate/580.f11/sha1examples.php
+    inline static double calculate(const query_t& a, const tag_t& b) {
 
     std::array<unsigned char, a.GetNumBytes() + b.GetNumBytes()> data;
 
@@ -182,6 +194,10 @@ namespace emp {
     }
 
     double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
 
       return (double)std::abs(a-b) / std::numeric_limits<int>::max();
     }
@@ -206,6 +222,10 @@ namespace emp {
     std::string base() const override { return "Next Up Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
       const size_t difference = ((Max + 1) + b - a) % (Max + 1);
       return static_cast<double>(difference % (Max + 1)) / Max;
     }
@@ -231,6 +251,10 @@ namespace emp {
     std::string base() const override { return "Asymmetric Wrap Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
       return (b - a).GetDouble() / emp::BitSet<Width>::MaxDouble();
     }
 
@@ -254,6 +278,10 @@ namespace emp {
     std::string base() const override { return "Asymmetric No-Wrap Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
       constexpr double max_dist = emp::BitSet<Width>::MaxDouble() + 1.0;
       return (b >= a ? (b - a).GetDouble() : max_dist) / max_dist;
     }
@@ -281,6 +309,10 @@ namespace emp {
     std::string base() const override { return "Symmetric Wrap Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
       constexpr double max_dist = (
         (emp::BitSet<Width>::MaxDouble() + 1.0) / 2.0
       );
@@ -309,6 +341,10 @@ namespace emp {
     std::string base() const override { return "Symmetric No-Wrap Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
       return (
         a > b ? a - b : b - a
       ).GetDouble() /  emp::BitSet<Width>::MaxDouble();
@@ -322,17 +358,20 @@ namespace emp {
   template<size_t Width>
   struct HammingCumuMetric : public BaseMetric<emp::BitSet<Width>, emp::BitSet<Width>> {
 
-    emp::vector<double> cumulative;
+    struct static_constructed : public emp::vector<double> {
 
-    HammingCumuMetric() {
-      double cumsum = 0.0;
-      static emp::Binomial bino(0.5, Width);
-      while (cumulative.size() <= Width) {
-        cumsum += bino[cumulative.size()];
-        cumulative.push_back(cumsum);
+      static_constructed() {
+        double cumsum = 0.0;
+        emp::Binomial bino(0.5, Width);
+        while (this->size() <= Width) {
+          cumsum += bino[this->size()];
+          this->push_back(cumsum);
+        }
       }
-    }
 
+    };
+
+    inline static static_constructed cumulative{};
 
     using query_t = emp::BitSet<Width>;
     using tag_t = emp::BitSet<Width>;
@@ -348,6 +387,10 @@ namespace emp {
     std::string base() const override { return "Cumulative Hamming Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
 
       return cumulative[(a^b).CountOnes()];
 
@@ -379,6 +422,10 @@ namespace emp {
     std::string base() const override { return "Approx Dual Streak Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
       const emp::BitSet<Width> bs = a^b;
       const size_t same = (~bs).LongestSegmentOnes();
       const double ps = ProbabilityKBitSequence(same);
@@ -386,7 +433,7 @@ namespace emp {
       return ps;
     }
 
-    inline double ProbabilityKBitSequence(size_t k) const {
+    static inline double ProbabilityKBitSequence(const size_t k) {
       // Bad Math
       // ... at least clamp it
       return std::clamp(
@@ -422,6 +469,10 @@ namespace emp {
     std::string base() const override { return "Approx Dual Streak Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
       const emp::BitSet<Width> bs = a^b;
       const size_t same = (~bs).LongestSegmentOnes();
       const size_t different = bs.LongestSegmentOnes();
@@ -436,7 +487,7 @@ namespace emp {
       return 1.0 - match;
     }
 
-    inline double ProbabilityKBitSequence(size_t k) const {
+    inline static double ProbabilityKBitSequence(size_t k) {
       // Bad Math
       return static_cast<double>(Width - k + 1) / std::pow(2, k);
     }
@@ -528,8 +579,8 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
     using tag_t = emp::BitSet<Width>;
 
-    const ExactStreakDistribution<Width> & distn{
-      ExactStreakDistribution_ConstructOnFirstUse<Width>()
+    static const ExactStreakDistribution<Width>& GetDistn() {
+      return ExactStreakDistribution_ConstructOnFirstUse<Width>();
     };
 
     size_t dim() const override { return 1; }
@@ -543,11 +594,15 @@ namespace emp {
     std::string base() const override { return "Exact Dual Streak Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
       const emp::BitSet<Width> bs = a^b;
       const size_t same = (~bs).LongestSegmentOnes();
       const size_t different = bs.LongestSegmentOnes();
-      const double ps = distn.GetStreakProbability(same);
-      const double pd = distn.GetStreakProbability(different);
+      const double ps = GetDistn().GetStreakProbability(same);
+      const double pd = GetDistn().GetStreakProbability(different);
 
       const double match = pd / (ps + pd);
       // Note: here, close match score > poor match score
@@ -573,8 +628,8 @@ namespace emp {
     using query_t = emp::BitSet<Width>;
     using tag_t = emp::BitSet<Width>;
 
-    const ExactStreakDistribution<Width> & distn{
-      ExactStreakDistribution_ConstructOnFirstUse<Width>()
+    static const ExactStreakDistribution<Width>& GetDistn() {
+      return ExactStreakDistribution_ConstructOnFirstUse<Width>();
     };
 
     size_t dim() const override { return 1; }
@@ -588,11 +643,15 @@ namespace emp {
     std::string base() const override { return "Streak Metric"; }
 
     double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
       const size_t same = (a.EQU(b)).LongestSegmentOnes();
       // sampling from probabilty distribution
       // and then viewing location in cumulative probability distribution
       // gives us a uniform result
-      const double p_same = distn.GetStreakProbability(same);
+      const double p_same = GetDistn().GetStreakProbability(same);
 
       return p_same;
     }
@@ -620,7 +679,7 @@ namespace emp {
 
     std::string name() const override { return metric.name(); }
 
-    double operator()(const query_t& a, const tag_t& b) const override {
+    inline static double calculate(const query_t& a, const tag_t& b) {
 
       if (cache.find({a, b}) == std::end(cache)) {
         // make space if needed
@@ -629,7 +688,7 @@ namespace emp {
           purge_queue.pop();
         }
 
-        cache[{a, b}] = metric(a, b);
+        cache[{a, b}] = Metric::calculate(a, b);
         purge_queue.push({a, b});
       }
 
@@ -647,16 +706,16 @@ namespace emp {
 
     Metric metric;
 
-    std::string name() const override { return "Sliding " + metric.name(); }
+    inline static double calculate(const query_t& a, const tag_t& b) {
 
-    double operator()(const query_t& a, const tag_t& b) const override {
+      Metric metric;
 
       query_t dup(a);
 
       double best = 1.0;
 
       for (size_t i = 0; i < metric.width(); ++ i) {
-        best = std::min(metric(dup, b), best);
+        best = std::min(Metric::calculate(dup, b), best);
         dup.template ROTL_SELF<1>();
       }
 
@@ -675,9 +734,9 @@ namespace emp {
 
     std::string name() const override { return "Hard Started " + metric.name(); }
 
-    double operator()(const query_t& a, const tag_t& b) const override {
+    inline static double calculate(const query_t& a, const tag_t& b) {
 
-      const double res = metric(a, b);
+      const double res = Metric::calculate(a, b);
 
       if (a[0] == b[0]) {
         return res;
@@ -697,10 +756,12 @@ namespace emp {
 
     Metric metric;
 
-    std::string name() const override { return "Inverse " + metric.name(); }
+    inline static double calculate(const query_t& a, const tag_t& b) {
+      return 1.0 - Metric::calculate(a,b);
+    }
 
     double operator()(const query_t& a, const tag_t& b) const override {
-      return 1.0 - metric(a,b);
+      return calculate(a, b);
     }
 
   };
@@ -723,12 +784,12 @@ namespace emp {
       );
     }
 
-    double operator()(const query_t& a, const tag_t& b) const override {
+    inline static double calculate(const query_t& a, const tag_t& b) {
       constexpr double exp = static_cast<double>(Root::num) / Root::den;
       emp_assert(exp > 0);
-      if constexpr (exp == 1.0) return metric(a,b);
+      if constexpr (exp == 1.0) return Metric::calculate(a,b);
 
-      const double base = -1.0 + 2.0 * metric(a,b);
+      const double base = -1.0 + 2.0 * Metric::calculate(a,b);
       return 0.5 * (1.0 + std::copysign(std::pow(std::abs(base), exp), base));
     }
 
@@ -752,13 +813,13 @@ namespace emp {
       );
     }
 
-    double operator()(const query_t& a, const tag_t& b) const override {
+    inline static double calculate(const query_t& a, const tag_t& b) {
       constexpr double base = static_cast<double>(Base::num) / Base::den;
       emp_assert(base > 0);
-      if constexpr (base == 1.0) return metric(a,b);
+      if constexpr (base == 1.0) return Metric::calculate(a,b);
 
 
-      const double raw = metric(a,b) - 0.5;
+      const double raw = Metric::calculate(a,b) - 0.5;
       const double antilog = (
         (2 - base)
         + 2 * (base - 1) * (std::abs(raw) + 0.5)
@@ -925,7 +986,7 @@ namespace emp {
       return emp::to_string("Uniformified ", held.metric.name());
     }
 
-    double operator()(const query_t& a, const tag_t& b) const override {
+    inline static double calculate(const query_t& a, const tag_t& b) {
       return held.lookup(held.metric(a, b));
     }
 
@@ -955,9 +1016,13 @@ namespace emp {
     std::string base() const override { return metric.base(); }
 
     double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
 
       double res = 0.0;
-      for (size_t d = 0; d < Dim; ++d) res += metric(a[d], b[d]);
+      for (size_t d = 0; d < Dim; ++d) res += Metric::calculate(a[d], b[d]);
 
       return res / (double)Dim;
     }
@@ -988,10 +1053,14 @@ namespace emp {
     std::string base() const override { return metric.base(); }
 
     double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
 
       double res = 0.0;
       for (size_t d = 0; d < Dim; ++d) {
-        const double amt = metric(a[d], b[d]);
+        const double amt = Metric::calculate(a[d], b[d]);
         res += amt * amt;
       }
 
@@ -1024,9 +1093,13 @@ namespace emp {
     std::string base() const override { return metric.base(); }
 
     double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
 
       double res = 1.0;
-      for (size_t d = 0; d < Dim; ++d) res = std::min(res, metric(a[d], b[d]));
+      for (size_t d = 0; d < Dim; ++d) res = std::min(res, Metric::calculate(a[d], b[d]));
 
       return res;
     }
@@ -1057,11 +1130,15 @@ namespace emp {
     std::string base() const override { return metric.base(); }
 
     double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
 
       double res = 0.0;
 
       for (size_t d = 0; d < Dim; ++d) {
-        res += 1 / metric(a[d], b[d]);
+        res += 1 / Metric::metric(a[d], b[d]);
       }
 
       return static_cast<double>(Dim) / res;
@@ -1092,7 +1169,7 @@ namespace emp {
       * DimMetric::tag_t::value_type::GetSize()
     >;
 
-    DimMetric metric;
+    inline static DimMetric metric{};
 
     size_t width() const override { return metric.width(); }
 
@@ -1103,16 +1180,20 @@ namespace emp {
     std::string base() const override { return metric.base(); }
 
     double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
 
       typename DimMetric::query_t arr_a;
       typename DimMetric::tag_t arr_b;
 
-      for (size_t d = 0; d < dim(); ++d) {
+      for (size_t d = 0; d < metric.dim(); ++d) {
         arr_a[d].Import(a, d * DimMetric::query_t::value_type::GetSize());
         arr_b[d].Import(b, d * DimMetric::tag_t::value_type::GetSize());
       }
 
-      return metric(arr_a, arr_b);
+      return DimMetric::calculate(arr_a, arr_b);
 
     }
 
