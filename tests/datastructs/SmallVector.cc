@@ -14,7 +14,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/SmallVector.h"
+#include "datastructs/SmallVector.h"
 
 #include <list>
 #include <stdarg.h>
