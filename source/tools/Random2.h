@@ -38,12 +38,12 @@ namespace emp2 {
     double expRV = 0.0;    ///< Exponential Random Variable for the randNormal function
 
     // Constants ////////////////////////////////////////////////////////////////
-    static constexpr const uint64_t RAND_MAX = 4294967296;  // 2^32
+    static constexpr const uint64_t RAND_CAP = 4294967296;  // 2^32
     static constexpr const uint64_t STEP_SIZE = 0xb5ad4eceda1ce2a9;  ///< Weyl sequence step size
 
 
     /// Basic Random number
-    /// Returns a random number [0, RAND_MAX)
+    /// Returns a random number [0, RAND_CAP)
     uint32_t Get() {
       value *= value;                       // Square the current value.
       value += (weyl_state += STEP_SIZE);   // Take a step in the Weyl sequence
@@ -87,7 +87,7 @@ namespace emp2 {
     // Random Number Generation /////////////////////////////////////////////////
 
     /// @return A pseudo-random double value between 0.0 and 1.0
-    inline double GetDouble() { return Get() / (double) RAND_MAX; }
+    inline double GetDouble() { return Get() / (double) RAND_CAP; }
 
     /// @return A pseudo-random double value between 0.0 and max
     inline double GetDouble(const double max) { return GetDouble() * max; }
@@ -135,7 +135,7 @@ namespace emp2 {
 
     /// @return A pseudo-random 64-bit unsigned int value between 0 and max
     inline uint64_t GetUInt64(const uint64_t max) {
-      if (max <= RAND_MAX) return (uint64_t) GetUInt(max);  // Don't need extra precision.
+      if (max <= RAND_CAP) return (uint64_t) GetUInt(max);  // Don't need extra precision.
 
       size_t mask = emp::MaskUsed(max);              // Create a mask for just the bits we need.
       uint64_t val = GetUInt64() & mask;             // Grab a value using just the current bits.
@@ -184,7 +184,7 @@ namespace emp2 {
     /// @param p The probability of the result being "true".
     inline bool P(const double p) {
       emp_assert(p >= 0.0 && p <= 1.0, p);
-      return (Get() < (p * RAND_MAX));
+      return (Get() < (p * RAND_CAP));
     }
 
 
