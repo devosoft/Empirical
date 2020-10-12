@@ -107,6 +107,9 @@ RUN \
     build-essential \
     python-virtualenv \
     python-pip \
+    python3-virtualenv \
+    python-pip \
+    python3-pip \
     nodejs \
     npm \
     tar \
@@ -114,6 +117,7 @@ RUN \
     libpthread-stubs0-dev \
     libc6-dbg \
     gdb \
+    doxygen \
     && \
   echo "installed core dependencies"
 
@@ -142,6 +146,11 @@ RUN \
   npm install source-map \
   && \
   echo "finalized set up dependency versions"
+
+RUN \
+  pip3 install -r /opt/Empirical/doc/requirements.txt \
+    && \
+  echo "installed documentation build requirements"
 
 RUN \
   cd /opt/Empirical \

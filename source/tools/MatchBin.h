@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2019
+ *  @date 2020
  *
  *  @file MatchBin.h
  *  @brief A container that supports flexible tag-based lookup. .
@@ -30,8 +30,9 @@
 #include <mutex>
 #include <shared_mutex>
 #include <string>
-#include <unordered_map>
 #include <atomic>
+
+#include "../../third-party/robin-hood-hashing/src/include/robin_hood.h"
 
 #include "../base/assert.h"
 #include "../base/optional.h"
@@ -79,7 +80,7 @@ namespace emp::internal {
       operator size_t() const { return emp::CombineHash(query, maybe_tag, buffer); }
     };
 
-    using logbuffer_t = std::unordered_map<
+    using logbuffer_t = robin_hood::unordered_map<
       LogEntry,
       size_t,
       TupleHash<
@@ -103,13 +104,17 @@ namespace emp::internal {
 
     // shared file stream for each Matchbin
     // this is done to prevent too many file handles.
-    static thread_local inline std::ofstream filestream{EMP_LOG_MATCHBIN_FILENAME};
+    static thread_local inline std::ofstream filestream
+    #ifdef EMP_LOG_MATCHBIN
+      { EMP_LOG_MATCHBIN_FILENAME }
+    #endif
+    ;
 
     // a ContaierDataFile is a DataFile that runs a function on every element of a container before every write.
     // in this case, we simply return the data from our logbuffer.
     emp::ContainerDataFile<logbuffer_t> datafile;
 
-    using datapoint_t = std::pair<const LogEntry, size_t>;
+    using datapoint_t = robin_hood::pair<const LogEntry, size_t>;
     // setup getter functions
     std::function<query_t(const datapoint_t)> get_query_log = [](const datapoint_t datapoint){
       return datapoint.first.query;
@@ -147,7 +152,6 @@ namespace emp::internal {
       datafile.AddContainerFun(get_tag_log, "tag", "Tag");
       datafile.AddContainerFun(get_hit_count_log, "hit_count", "Counter for how many times this match occured");
       datafile.AddContainerFun(get_logbuffer_type, "matchtype", "Type of match");
-
       datafile.PrintHeaderKeys();
     }
 
@@ -184,7 +188,7 @@ namespace emp::internal {
       , instance_id(MakeID())
       , logging_activated(false)
       , datafile(filestream)
-      { SetupDatafile(); }
+      { if constexpr (logging_enabled) SetupDatafile(); }
 
       ~MatchBinLog() {
         if constexpr (logging_enabled) {
@@ -266,8 +270,10 @@ namespace emp::internal {
     friend class MatchBin;
 
     private:
+      #ifdef EMP_THREAD_SAFE
       mutable std::shared_mutex cache_regulated_mutex;
       mutable std::shared_mutex cache_raw_mutex;
+      #endif
 
       static constexpr bool cache_available = std::is_base_of<
         CacheStateBase,
@@ -277,12 +283,12 @@ namespace emp::internal {
 
       // caches
       // cache of regulated scores
-      std::unordered_map<
+      robin_hood::unordered_flat_map<
         query_t,
         cache_state_t
       > cache_regulated;
       // cache of raw scores
-      std::unordered_map<
+      robin_hood::unordered_flat_map<
         query_t,
         cache_state_t
       > cache_raw;
@@ -325,33 +331,41 @@ namespace emp::internal {
       }
 
       /// Finds a query in raw cache.
-      /// This method is thread-safe.
+      /// This method is thread-safe if EMP_THREAD_SAFE is defined.
       size_t CountRaw(const query_t& query) {
+        #ifdef EMP_THREAD_SAFE
         std::shared_lock lock(cache_raw_mutex);
+        #endif
         return cache_raw.count(query);
       }
 
       /// Finds a query in regulated cache.
-      /// This method is thread-safe.
+      /// This method is thread-safe if EMP_THREAD_SAFE is defined.
       size_t CountRegulated(const query_t& query) {
+        #ifdef EMP_THREAD_SAFE
         std::shared_lock lock(cache_regulated_mutex);
+        #endif
         return cache_regulated.count(query);
       }
 
       /// Stores a query in regulated cache.
-      /// This method is thread-safe.
+      /// This method is thread-safe if EMP_THREAD_SAFE is defined.
       void CacheRegulated(const query_t& query, const cache_state_t& result) {
         if (CountRegulated(query) != 0) return;
+        #ifdef EMP_THREAD_SAFE
         std::unique_lock lock(cache_regulated_mutex);
-        cache_regulated.emplace(query, result);
+        #endif
+        cache_regulated[query] = result;
       }
 
       /// Stores a query in raw cache.
-      /// This method is thread-safe.
+      /// This method is thread-safe if EMP_THREAD_SAFE is defined.
       void CacheRaw(const query_t& query, const cache_state_t& result) {
         if (CountRaw(query) != 0) return;
+        #ifdef EMP_THREAD_SAFE
         std::unique_lock lock(cache_raw_mutex);
-        cache_raw.emplace(query, result);
+        #endif
+        cache_raw[query] = result;
       }
 
       /// Gets query from regulated cache.
@@ -382,22 +396,27 @@ namespace emp {
     using tag_t = Tag;
     using uid_t = size_t;
 
-    std::unordered_map<uid_t, Val> values;
-    std::unordered_map<uid_t, Regulator> regulators;
-    std::unordered_map<uid_t, tag_t> tags;
-    emp::vector<uid_t> uids;
+    struct entry {
+      Val val;
+      Regulator regulator;
+      Tag tag;
+
+      template <class Archive>
+      void serialize( Archive & ar ) {
+        ar(
+          CEREAL_NVP(val),
+          CEREAL_NVP(regulator),
+          CEREAL_NVP(tag)
+        );
+      }
+
+    };
+
+    robin_hood::unordered_flat_map< uid_t, entry > data;
 
     #ifdef CEREAL_NVP
     template <class Archive>
-    void serialize( Archive & ar )
-    {
-      ar(
-        CEREAL_NVP(values),
-        CEREAL_NVP(regulators),
-        CEREAL_NVP(tags),
-        CEREAL_NVP(uids)
-      );
-    }
+    void serialize( Archive & ar ) { ar( CEREAL_NVP(data) ); }
     #endif
   };
 
@@ -452,8 +471,10 @@ namespace emp {
     virtual void ImprintRegulators(const BaseMatchBin & target) = 0;
     virtual void ImprintRegulators(const BaseMatchBin::state_t & target) = 0;
     virtual std::string name() const = 0;
-    virtual const emp::vector<uid_t>& ViewUIDs() const = 0;
+    virtual emp::vector<uid_t> ViewUIDs() const = 0;
+    #ifdef EMP_LOG_MATCHBIN
     virtual emp::internal::MatchBinLog<query_t, tag_t>& GetLog() = 0;
+    #endif
   };
 
 
@@ -493,11 +514,12 @@ namespace emp {
     using uid_t = typename base_t::uid_t;
     using state_t = typename base_t::state_t;
 
+    #ifdef EMP_LOG_MATCHBIN
     emp::internal::MatchBinLog<query_t, tag_t> log;
-
+    #endif
   protected:
     state_t state;
-    uid_t uid_stepper;
+    uid_t uid_stepper{};
 
     emp::internal::MatchBinCache<query_t, Selector> cache;
 
@@ -507,29 +529,43 @@ namespace emp {
 
 
   public:
-    MatchBin()
-    : uid_stepper(0)
-    { ; }
+    MatchBin() = default;
 
     MatchBin(emp::Random & rand)
-    : uid_stepper(0)
-    , selector(rand)
+    : selector(rand)
     { ; }
+
+    // have to define this manually due to mutexes
+    MatchBin(const MatchBin &other)
+    : state( other.state )
+    , metric( other.metric )
+    , selector( other.selector )
+    , uid_stepper( other.uid_stepper ) { }
+
+    // have to define this manually due to mutexes
+    MatchBin(MatchBin &&other)
+    : state( std::move(other.state) )
+    , selector( std::move(other.selector) )
+    , metric( std::move(other.metric) )
+    , uid_stepper( std::move(other.uid_stepper) ) {
+    }
 
   // have to define this manually due to mutexes
   MatchBin &operator=(const MatchBin &other) {
+    metric = other.metric;
+    selector = other.selector;
     state = other.state;
     uid_stepper = other.uid_stepper;
     return *this;
   }
 
   // have to define this manually due to mutexes
-  MatchBin(const MatchBin &other)
-  : metric(other.metric)
-  , selector(other.selector)
-  {
-    state = other.state;
-    uid_stepper = other.uid_stepper;
+  MatchBin &operator=(MatchBin &&other) {
+    metric = std::move( other.metric );
+    selector = std::move( other.selector );
+    state = std::move( other.state );
+    uid_stepper = std::move( other.uid_stepper );
+    return *this;
   }
 
     /// Compare a query tag to all stored tags using the distance metric
@@ -543,22 +579,23 @@ namespace emp {
     ) override {
       const auto makeResult = [&]() {
         // compute distance between query and all stored tags
-        std::unordered_map<tag_t, double> matches;
-        for (const auto &[uid, tag] : state.tags) {
-          if (matches.find(tag) == std::end(matches)) {
-            matches[tag] = metric(query, tag);
+        emp::vector< std::pair< uid_t, double > > scores;
+        scores.reserve( state.data.size() );
+
+        std::transform(
+          std::begin(state.data),
+          std::end(state.data),
+          std::back_inserter(scores),
+          [&](const auto& pair){
+            const auto& [uid, pack] = pair;
+            return std::pair{
+              uid,
+              pack.regulator( metric(query, pack.tag) )
+            };
           }
-        }
+        );
 
-        // apply regulation to generate match scores
-        std::unordered_map<uid_t, double> scores;
-        for (const auto & uid : state.uids) {
-          scores[uid] = state.regulators.at(uid)(
-            matches.at( state.tags.at(uid) )
-          );
-        }
-
-        return selector(state.uids, scores, n);
+        return selector( std::move(scores), n );
       };
       const auto getResult = [&]() {
         // try looking up in cache
@@ -585,6 +622,7 @@ namespace emp {
 
       auto result = getResult();
 
+      #ifdef EMP_LOG_MATCHBIN
       // store counts for results
       if (result.empty()) {
         log.LogMiss(query, "regulated");
@@ -592,6 +630,7 @@ namespace emp {
       for (const auto &uid : result) {
         log.LogMatch(query, GetTag(uid), "regulated");
       }
+      #endif
 
       return result;
     }
@@ -607,18 +646,23 @@ namespace emp {
     ) override {
       const auto makeResult = [&]() {
         // compute distance between query and all stored tags
-        std::unordered_map<tag_t, double> matches;
-        for (const auto &[uid, tag] : state.tags) {
-          if (matches.find(tag) == std::end(matches)) {
-            matches[tag] = metric(query, tag);
+        emp::vector< std::pair< uid_t, double > > scores;
+        scores.reserve( state.data.size() );
+
+        std::transform(
+          std::begin(state.data),
+          std::end(state.data),
+          std::back_inserter(scores),
+          [&](const auto& pair){
+            const auto& [uid, pack] = pair;
+            return std::pair{
+              uid,
+              metric(query, pack.tag)
+            };
           }
-        }
-        // apply regulation to generate match scores
-        std::unordered_map<uid_t, double> scores;
-        for (const auto & uid : state.uids) {
-          scores[uid] = matches[state.tags[uid]];
-        }
-        return selector(state.uids, scores, n);
+        );
+
+        return selector( std::move(scores), n );
       };
       const auto getResult = [&]() {
         // try looking up in cache
@@ -643,6 +687,7 @@ namespace emp {
       };
       auto result = getResult();
 
+      #ifdef EMP_LOG_MATCHBIN
       if (result.empty()) {
         log.LogMiss(query, "raw");
       }
@@ -650,6 +695,7 @@ namespace emp {
       for (const auto &uid : result) {
         log.LogMatch(query, GetTag(uid), "raw");
       }
+      #endif
 
       return result;
     }
@@ -657,7 +703,7 @@ namespace emp {
     /// that entry.
     uid_t Put(const Val & v, const tag_t & t) override {
       const uid_t orig = uid_stepper;
-      while (state.values.find(++uid_stepper) != std::end(state.values)) {
+      while (state.data.find(++uid_stepper) != std::end(state.data)) {
         // if container is full
         // i.e., wrapped around because all uids already allocated
         if (uid_stepper == orig) throw std::runtime_error("container full");
@@ -669,62 +715,30 @@ namespace emp {
     /// (Caller is responsible for ensuring UID is unique
     /// or calling Delete beforehand.)
     uid_t Set(const Val & v, const tag_t & t, const uid_t uid) override {
-      emp_assert(state.values.find(uid) == std::end(state.values));
+      emp_assert(state.data.find(uid) == std::end(state.data));
 
       cache.Clear();
 
-      state.values[uid] = v;
-      state.regulators.insert({{uid},{}});
-      state.tags[uid] = t;
-      state.uids.push_back(uid);
+      state.data[uid] = { v, {}, t };
+
       return uid;
     }
 
 
     /// Delete an item and its associated tag.
     void Delete(const uid_t uid) override {
-      emp_assert(state.values.find(uid) != std::end(state.values));
-      emp_assert(state.regulators.find(uid) != std::end(state.regulators));
-      emp_assert(state.tags.find(uid) != std::end(state.tags));
-      emp_assert(
-        std::find(
-          std::begin(state.uids),
-          std::end(state.uids),
-          uid
-        ) != std::end(state.uids)
-      );
+      emp_assert(state.data.find(uid) != std::end(state.data));
 
       cache.Clear();
 
-      state.values.erase(uid);
-      state.regulators.erase(uid);
-      state.tags.erase(uid);
-      std::iter_swap(
-        std::find(
-          std::begin(state.uids),
-          std::end(state.uids),
-          uid
-        ),
-        std::prev(std::end(state.uids))
-      ); // delete from uids swap 'n pop
-      state.uids.pop_back();
+      state.data.erase( uid );
 
-      emp_assert(
-        std::find(
-          std::begin(state.uids),
-          std::end(state.uids),
-          uid
-        ) == std::end(state.uids)
-      );
     }
 
     /// Clear all items and tags.
     void Clear() override {
       cache.Clear();
-      state.values.clear();
-      state.regulators.clear();
-      state.tags.clear();
-      state.uids.clear();
+      state.data.clear();
     }
     /// Reset the Selector caches.
     void ClearCache() override {
@@ -743,21 +757,21 @@ namespace emp {
 
     /// Access a reference single stored value by uid.
     Val & GetVal(const uid_t uid) override {
-      emp_assert(state.values.find(uid) != std::end(state.values));
-      return state.values.at(uid);
+      emp_assert(state.data.find(uid) != std::end(state.data));
+      return state.data.at(uid).val;
     }
 
     /// Access a const reference to a single stored tag by uid.
     const tag_t & GetTag(const uid_t uid) const override {
-      emp_assert(state.tags.find(uid) != std::end(state.tags));
-      return state.tags.at(uid);
+      emp_assert(state.data.find(uid) != std::end(state.data));
+      return state.data.at(uid).tag;
     }
 
     /// Change the tag at a given uid and clear the cache.
-    void SetTag(const uid_t uid, tag_t tag) override {
-      emp_assert(state.tags.find(uid) != std::end(state.tags));
+    void SetTag(const uid_t uid, const tag_t tag) override {
+      emp_assert(state.data.find(uid) != std::end(state.data));
       cache.Clear();
-      state.tags.at(uid) = tag;
+      state.data.at(uid).tag = tag;
     }
 
     /// Generate a vector of values corresponding to a vector of uids.
@@ -785,18 +799,16 @@ namespace emp {
     }
 
     /// Get the number of items stored in the container.
-    size_t Size() const override {
-      return state.values.size();
-    }
+    size_t Size() const override { return state.data.size(); }
 
     /// Adjust an item's regulator value.
     void AdjRegulator(
       const uid_t uid,
       const typename Regulator::adj_t & amt
     ) override {
-      emp_assert(state.regulators.find(uid) != std::end(state.regulators));
+      emp_assert(state.data.find(uid) != std::end(state.data));
 
-      if (state.regulators.at(uid).Adj(amt)) cache.ClearRegulated();
+      if (state.data.at(uid).regulator.Adj(amt)) cache.ClearRegulated();
 
     }
 
@@ -805,9 +817,9 @@ namespace emp {
       const uid_t uid,
       const typename Regulator::set_t & set
     ) override {
-      emp_assert(state.regulators.find(uid) != std::end(state.regulators));
+      emp_assert(state.data.find(uid) != std::end(state.data));
 
-      if (state.regulators.at(uid).Set(set)) cache.ClearRegulated();
+      if (state.data.at(uid).regulator.Set(set)) cache.ClearRegulated();
 
     }
 
@@ -816,10 +828,10 @@ namespace emp {
       const uid_t uid,
       const Regulator & set
     ) override {
-      emp_assert(state.regulators.find(uid) != std::end(state.regulators));
+      emp_assert(state.data.find(uid) != std::end(state.data));
 
       if (
-        set != std::exchange(state.regulators.at(uid), set)
+        set != std::exchange(state.data.at(uid).regulator, set)
       ) cache.ClearRegulated();
 
     }
@@ -828,32 +840,32 @@ namespace emp {
     const typename Regulator::view_t & ViewRegulator(
       const uid_t uid
     ) const override {
-      emp_assert(state.regulators.find(uid) != std::end(state.regulators));
+      emp_assert(state.data.find(uid) != std::end(state.data));
 
-      return state.regulators.at(uid).View();
+      return state.data.at(uid).regulator.View();
     }
 
     /// Get a regulator.
     const Regulator & GetRegulator(const uid_t uid) override {
-      emp_assert(state.regulators.find(uid) != std::end(state.regulators));
+      emp_assert(state.data.find(uid) != std::end(state.data));
 
-      return state.regulators.at(uid);
+      return state.data.at(uid).regulator;
     }
 
     /// Apply decay to a regulator.
     void DecayRegulator(const uid_t uid, const int steps) override {
-      emp_assert(state.regulators.find(uid) != std::end(state.regulators));
+      emp_assert(state.data.find(uid) != std::end(state.data));
 
       if (
-        state.regulators.at(uid).Decay(steps)
+        state.data.at(uid).regulator.Decay(steps)
       ) cache.ClearRegulated();
 
     }
 
     /// Apply decay to all regulators.
     void DecayRegulators(const int steps=1) override {
-      for (auto & [uid, regulator] : state.regulators) {
-        if ( regulator.Decay(steps) ) cache.ClearRegulated();
+      for (auto & [uid, pack] : state.data ) {
+        if ( pack.regulator.Decay(steps) ) cache.ClearRegulated();
       }
     }
 
@@ -867,29 +879,30 @@ namespace emp {
     /// @param target State to match
     void ImprintRegulators(const state_t & target) override {
 
-      for (const uid_t & uid : state.uids) {
+      for (const auto& [uid, pack] : state.data) {
 
         std::unordered_map<uid_t, double> scores;
         std::transform(
-          std::cbegin(target.uids),
-          std::cend(target.uids),
+          std::cbegin(target.data),
+          std::cend(target.data),
           std::inserter(scores, std::begin(scores)),
-          [&](size_t target_uid){
+          [this, uid = uid](const auto& target_pair){
+            const auto& [target_uid, target_pack] = target_pair;
             return std::pair{
               target_uid,
-              metric(target.tags.at(target_uid), GetTag(uid))
+              metric(target_pack.tag, GetTag(uid))
             };
           }
         );
         SetRegulator(
           uid,
-          target.regulators.at(
+          target.data.at(
             std::min_element(
               std::begin(scores),
               std::end(scores),
               [](const auto& l, const auto& r){ return l.second < r.second; }
             )->first
-          )
+          ).regulator
         );
 
       }
@@ -899,8 +912,16 @@ namespace emp {
     }
 
     /// View UIDs associated with this MatchBin
-    const emp::vector<uid_t>& ViewUIDs() const override {
-      return state.uids;
+    emp::vector<uid_t> ViewUIDs() const override {
+      emp::vector<uid_t> res;
+      res.reserve( state.data.size() );
+      std::transform(
+        std::begin(state.data),
+        std::end(state.data),
+        std::back_inserter(res),
+        [](const auto& pair){ return pair.first; }
+      );
+      return res;
     }
 
     /// Get selector, metric name
@@ -927,8 +948,10 @@ namespace emp {
       cache.Clear();
     }
 
+    #ifdef EMP_LOG_MATCHBIN
     /// Returns reference to internal logging instance.
     emp::internal::MatchBinLog<query_t, tag_t>& GetLog() override { return log; }
+    #endif
 
     /// Returns size of regulated cache.
     size_t GetRegulatedCacheSize() { return cache.RegulatedSize(); }
@@ -938,5 +961,50 @@ namespace emp {
   };
 
 }
+
+namespace cereal {
+
+template<
+  class Archive,
+  class T
+>
+void save(
+  Archive & archive,
+  robin_hood::unordered_flat_map<size_t, T> const & m
+) {
+
+  std::unordered_map<size_t, T> t;
+  std::transform(
+    std::begin( m ),
+    std::end( m ),
+    std::inserter( t , std::begin(t) ),
+    [](const auto& pair){
+      const auto& [k , v] = pair;
+      return std::pair{k, v};
+    }
+  );
+
+  archive( t );
+}
+
+template<
+  class Archive,
+  class T
+>
+void load(
+  Archive & archive,
+  robin_hood::unordered_flat_map<size_t, T> & m
+) {
+
+  std::unordered_map<size_t, T> t;
+  archive( t );
+
+  for (const auto& [k, v] :  t) {
+    m[k] = v;
+  }
+
+}
+
+} // namespace cereal
 
 #endif
