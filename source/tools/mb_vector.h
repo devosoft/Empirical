@@ -1,7 +1,5 @@
 #pragma once
 
-#include "SmallVector.h"
-
 namespace emp {
 
 template<typename T>
