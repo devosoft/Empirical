@@ -378,6 +378,17 @@ namespace emp {
     /// Constructor to generate a random BitSet with provided prob of 1's.
     BitSet(Random & random, const double p1) { Clear(); Randomize(random, p1); }
 
+    /// Constructor to generate a BitSet from a std::bitset.
+    explicit BitSet(const std::bitset<NUM_BITS>& bitset) {
+      Clear(); // have to clear out field bits beyond NUM_BITS
+      for (size_t bit{}; bit < NUM_BITS; ++bit) Set( bit, bitset[bit] );
+    }
+
+    /// Constructor to generate a BitSet from a string.
+    explicit BitSet(const std::string& bitstring)
+    : BitSet( std::bitset<NUM_BITS>( bitstring ) )
+    { emp_assert( bitstring.size() == NUM_BITS ); }
+
     /// Constructor to fill in a bit set from a vector.
     template <typename T>
     BitSet(const std::initializer_list<T> l) {
