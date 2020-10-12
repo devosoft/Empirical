@@ -39,9 +39,8 @@ struct RankedSelector {
 
   }
 
-  static res_t select_traverse( emp::vector< float >& scores ) {
+  static res_t select_traverse( const emp::vector< float >& scores ) {
 
-    // treat any negative numerator as positive infinity
     res_t res;
 
     for (size_t idx{}; idx < scores.size(); ++idx) {
