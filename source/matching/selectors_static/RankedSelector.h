@@ -80,9 +80,10 @@ struct RankedSelector {
     );
     const float best = *best_it;
 
+    // if threshold is finite
     if constexpr ( ThreshRatio::num < 0 ) if (best > thresh) return res;
 
-    res[0] = std::distance( std::begin(res), best_it );
+    res.push_back( std::distance( std::begin(res), best_it ) );
 
     return res;
 
