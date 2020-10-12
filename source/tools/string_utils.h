@@ -316,11 +316,7 @@ namespace emp {
         value[i] = (char) (value[i] + char_shift);
       }
 
-      if (value[i] == ' ') {
-        next_upper = true;
-      } else {
-        next_upper = false;
-      }
+      next_upper = (value[i] == ' ');
     }
     return value;
   }
@@ -900,6 +896,14 @@ namespace emp {
     return out_val;
   }
 
+  /**
+   * This function returns the values in a vector as a string separated
+   * by a given delimeter.
+   * 
+   * @param v a vector
+   * @param join_str delimeter
+   * @return string of vector values
+   */
   template <typename T>
   inline std::string join(const emp::vector<T> & v, std::string join_str) {
 
