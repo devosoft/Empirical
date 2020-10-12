@@ -121,7 +121,7 @@ public:
   }
 
   /// Access a reference to a single stored value by uid.
-  const Val& GetVal( const size_t uid ) { return data[uid].val; }
+  const Val& GetVal( const size_t uid ) const { return data[uid].val; }
 
   /// Store a value.
   uid_t Put(const Val &v, const tag_t& t) {
