@@ -136,7 +136,7 @@ docker exec -it emp-tests bash -l
 ```
 
 To exit Docker containter shell
-```
+``` bash
 CTRL+D
 ```
 
