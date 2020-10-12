@@ -43,7 +43,6 @@
 #include "../data/DataFile.h"
 #include "../data/DataNode.h"
 #include "../base/errors.h"
-#include "mb_vector.h"
 
 namespace emp {
   template <
@@ -432,8 +431,8 @@ namespace emp {
     using state_t = MatchBinState<Val, tag_t, Regulator>;
 
     virtual ~BaseMatchBin() {};
-    virtual emp::mb_vector<uid_t> Match(const query_t & query, size_t n=0) = 0;
-    virtual emp::mb_vector<uid_t> MatchRaw(const query_t & query, size_t n=0) = 0;
+    virtual emp::vector<uid_t> Match(const query_t & query, size_t n=0) = 0;
+    virtual emp::vector<uid_t> MatchRaw(const query_t & query, size_t n=0) = 0;
     virtual uid_t Put(const Val & v, const tag_t & t) = 0;
     virtual uid_t Set(const Val & v, const tag_t & t, const uid_t uid) = 0;
     virtual void Delete(const uid_t uid) = 0;
@@ -444,8 +443,8 @@ namespace emp {
     virtual Val & GetVal(const uid_t uid) = 0;
     virtual const tag_t & GetTag(const uid_t uid) const = 0;
     virtual void SetTag(const uid_t uid, tag_t tag) = 0;
-    virtual emp::mb_vector<Val> GetVals(const emp::mb_vector<uid_t> & uids) = 0;
-    virtual emp::mb_vector<tag_t> GetTags(const emp::mb_vector<uid_t> & uids) = 0;
+    virtual emp::vector<Val> GetVals(const emp::vector<uid_t> & uids) = 0;
+    virtual emp::vector<tag_t> GetTags(const emp::vector<uid_t> & uids) = 0;
     virtual size_t Size() const = 0;
     virtual void DecayRegulator(
       const uid_t uid,
@@ -472,7 +471,7 @@ namespace emp {
     virtual void ImprintRegulators(const BaseMatchBin & target) = 0;
     virtual void ImprintRegulators(const BaseMatchBin::state_t & target) = 0;
     virtual std::string name() const = 0;
-    virtual emp::mb_vector<uid_t> ViewUIDs() const = 0;
+    virtual emp::vector<uid_t> ViewUIDs() const = 0;
     #ifdef EMP_LOG_MATCHBIN
     virtual emp::internal::MatchBinLog<query_t, tag_t>& GetLog() = 0;
     #endif
@@ -572,13 +571,13 @@ namespace emp {
     /// function.
     /// Calling with n = std::numeric_limits<size_t>::max() means
     /// delegate choice for how many values to return to the Selector.
-    emp::mb_vector<uid_t> Match(
+    emp::vector<uid_t> Match(
       const query_t & query,
       size_t n=std::numeric_limits<size_t>::max()
     ) override {
       const auto makeResult = [&]() {
         // compute distance between query and all stored tags
-        emp::mb_vector< std::pair< uid_t, double > > scores;
+        emp::vector< std::pair< uid_t, double > > scores;
         scores.reserve( state.data.size() );
 
         std::transform(
@@ -639,13 +638,13 @@ namespace emp {
     /// function. Ignore regulators.
     /// Calling with n = std::numeric_limits<size_t>::max() means
     /// delegate choice for how many values to return to the Selector.
-    emp::mb_vector<uid_t> MatchRaw(
+    emp::vector<uid_t> MatchRaw(
       const query_t & query,
       size_t n=std::numeric_limits<size_t>::max()
     ) override {
       const auto makeResult = [&]() {
         // compute distance between query and all stored tags
-        emp::mb_vector< std::pair< uid_t, double > > scores;
+        emp::vector< std::pair< uid_t, double > > scores;
         scores.reserve( state.data.size() );
 
         std::transform(
@@ -774,8 +773,8 @@ namespace emp {
     }
 
     /// Generate a vector of values corresponding to a vector of uids.
-    emp::mb_vector<Val> GetVals(const emp::mb_vector<uid_t> & uids) override {
-      emp::mb_vector<Val> res;
+    emp::vector<Val> GetVals(const emp::vector<uid_t> & uids) override {
+      emp::vector<Val> res;
       std::transform(
         std::begin(uids),
         std::end(uids),
@@ -786,8 +785,8 @@ namespace emp {
     }
 
     /// Generate a vector of tags corresponding to a vector of uids.
-    emp::mb_vector<tag_t> GetTags(const emp::mb_vector<uid_t> & uids) override {
-      emp::mb_vector<tag_t> res;
+    emp::vector<tag_t> GetTags(const emp::vector<uid_t> & uids) override {
+      emp::vector<tag_t> res;
       std::transform(
         std::begin(uids),
         std::end(uids),
@@ -911,8 +910,8 @@ namespace emp {
     }
 
     /// View UIDs associated with this MatchBin
-    emp::mb_vector<uid_t> ViewUIDs() const override {
-      emp::mb_vector<uid_t> res;
+    emp::vector<uid_t> ViewUIDs() const override {
+      emp::vector<uid_t> res;
       res.reserve( state.data.size() );
       std::transform(
         std::begin(state.data),
