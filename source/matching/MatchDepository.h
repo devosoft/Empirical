@@ -41,8 +41,9 @@ private:
   /// Perform matching with regulation.
   res_t DoRegulatedMatch( const query_t& query ) {
 
-    emp::vector< float > scores;
+    thread_local emp::vector< float > scores;
     scores.reserve( data.size() );
+    scores.clear();
 
     std::transform(
       std::begin( data ),
@@ -64,8 +65,9 @@ private:
   /// Perform matching without regulation.
   res_t DoRawMatch( const query_t& query ) {
 
-    emp::vector< float > scores;
+    thread_local emp::vector< float > scores;
     scores.reserve( data.size() );
+    scores.clear();
 
     std::transform(
       std::begin( data ),
