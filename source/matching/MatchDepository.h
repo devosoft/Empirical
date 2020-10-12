@@ -93,6 +93,7 @@ public:
   /// Compare a query tag to all stored tags using the distance metric
   /// function and return a vector of unique IDs chosen by the selector
   /// function.
+  __attribute__ ((hot))
   res_t MatchRegulated( const query_t& query ) {
 
     if constexpr ( RegulatedCacheSize > 0 ) {
@@ -108,6 +109,7 @@ public:
   /// Compare a query tag to all stored tags using the distance metric
   /// function and return a vector of unique IDs chosen by the selector
   /// function. Ignore regulators.
+  __attribute__ ((hot))
   res_t MatchRaw( const query_t& query ) {
 
     if constexpr ( RawCacheSize > 0 ) {
