@@ -39,13 +39,11 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
    *      <div id="emp__3_card_body" class="card-body , collapse show , emp__3_card_collapse">
    *        <div id="emp__9">
    *          <div id="BOOL_EX_row" class="setting_element">
-   *            <span id="emp__10" class="title_area">
-   *              <button id="emp__11" aria-controls=".BOOL_EX_dropdown" aria-expanded="false" class="btn btn-link , collapse_toggle , collapsed" data-target=".BOOL_EX_dropdown" data-toggle="collapse" role="button">
-   *                <span id="emp__12" class="fa fa-angle-double-right , toggle_icon_right_margin"></span>
-   *                <span id="emp__13" class="fa fa-angle-double-up , toggle_icon_right_margin"></span>
-   *                <span id="emp__14">Bool Ex</span>
-   *              </button>
-   *            </span>
+   *            <button id="emp__11" aria-controls=".BOOL_EX_dropdown" aria-expanded="false" class="title_area , btn btn-link , collapse_toggle , collapsed" data-target=".BOOL_EX_dropdown" data-toggle="collapse" role="button">
+   *              <span id="emp__12" class="fa fa-angle-double-right , toggle_icon_right_margin"></span>
+   *              <span id="emp__13" class="fa fa-angle-double-up , toggle_icon_right_margin"></span>
+   *              <span id="emp__14">Bool Ex</span>
+   *            </button>
    *            <span id="BOOL_EX_input_checkbox" style="clear: none; display: inline;" class="custom-control custom-switch , input_bool">
    *              <input type="checkbox" id="emp__19" onchange="emp.Callback(2, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" checked="checked" class="custom-control-input">
    *              <label id="emp__18" class="custom-control-label" for="emp__19"></label>
@@ -62,13 +60,11 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
    *
    *        <div id="emp__20">
    *          <div id="SEED_row" class="setting_element">
-   *            <span id="emp__21" class="title_area">
-   *              <button id="emp__22" aria-controls=".SEED_dropdown" aria-expanded="false" class="btn btn-link , collapse_toggle , collapsed" data-target=".SEED_dropdown" data-toggle="collapse" role="button">
-   *                <span id="emp__23" class="fa fa-angle-double-right , toggle_icon_right_margin"></span>
-   *                <span id="emp__24" class="fa fa-angle-double-up , toggle_icon_right_margin"></span>
-   *                <span id="emp__25">Seed</span>
-   *              </button>
-   *            </span>
+   *            <button id="emp__22" aria-controls=".SEED_dropdown" aria-expanded="false" class="title_area , btn btn-link , collapse_toggle , collapsed" data-target=".SEED_dropdown" data-toggle="collapse" role="button">
+   *              <span id="emp__23" class="fa fa-angle-double-right , toggle_icon_right_margin"></span>
+   *              <span id="emp__24" class="fa fa-angle-double-up , toggle_icon_right_margin"></span>
+   *              <span id="emp__25">Seed</span>
+   *            </button>
    *            <input type="range" min="-10" max="10" value="-1" id="SEED_input_slider" onchange="emp.Callback(3, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" class="input_slider">
    *            <input type="number" min="-10" max="10" value="-1" id="SEED_input_number" onchange="emp.Callback(4, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" class="input_number">
    *          </div>
@@ -86,13 +82,11 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
    *
    *        <div id="emp__30">
    *          <div id="RADIATION_PRESCRIPTION_FILE_row" class="setting_element">
-   *            <span id="emp__31" class="title_area">
-   *              <button id="emp__32" aria-controls=".RADIATION_PRESCRIPTION_FILE_dropdown" aria-expanded="false" class="btn btn-link , collapse_toggle , collapsed" data-target=".RADIATION_PRESCRIPTION_FILE_dropdown" data-toggle="collapse" role="button">
-   *                <span id="emp__33" class="fa fa-angle-double-right , toggle_icon_right_margin"></span>
-   *                <span id="emp__34" class="fa fa-angle-double-up , toggle_icon_right_margin"></span>
-   *                <span id="emp__35">Radiation Prescription File</span>
-   *              </button>
-   *            </span>
+   *            <button id="emp__32" aria-controls=".RADIATION_PRESCRIPTION_FILE_dropdown" aria-expanded="false" class="title_area , btn btn-link , collapse_toggle , collapsed" data-target=".RADIATION_PRESCRIPTION_FILE_dropdown" data-toggle="collapse" role="button">
+   *              <span id="emp__33" class="fa fa-angle-double-right , toggle_icon_right_margin"></span>
+   *              <span id="emp__34" class="fa fa-angle-double-up , toggle_icon_right_margin"></span>
+   *              <span id="emp__35">Radiation Prescription File</span>
+   *            </button>
    *            <input type="text" value="none" id="RADIATION_PRESCRIPTION_FILE_input_textbox" onchange="emp.Callback(6, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" class="input_text">
    *          </div>
    *          <div id="emp__36" class="collapse , RADIATION_PRESCRIPTION_FILE_dropdown">
@@ -118,13 +112,11 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
    *    <div id="emp__40_card_body" class="card-body , collapse show , emp__40_card_collapse">
    *      <div id="emp__46">
    *        <div id="NEUTRAL_MUTATION_RATE_row" class="setting_element">
-   *          <span id="emp__47" class="title_area">
-   *            <button id="emp__48" aria-controls=".NEUTRAL_MUTATION_RATE_dropdown" aria-expanded="false" class="btn btn-link , collapse_toggle , collapsed" data-target=".NEUTRAL_MUTATION_RATE_dropdown" data-toggle="collapse" role="button">
-   *              <span id="emp__49" class="fa fa-angle-double-right , toggle_icon_right_margin"></span>
-   *              <span id="emp__50" class="fa fa-angle-double-up , toggle_icon_right_margin"></span>
-   *              <span id="emp__51">Neutral Mutation Rate</span>
-   *            </button>
-   *          </span>
+   *          <button id="emp__48" aria-controls=".NEUTRAL_MUTATION_RATE_dropdown" aria-expanded="false" class="title_area , btn btn-link , collapse_toggle , collapsed" data-target=".NEUTRAL_MUTATION_RATE_dropdown" data-toggle="collapse" role="button">
+   *            <span id="emp__49" class="fa fa-angle-double-right , toggle_icon_right_margin"></span>
+   *            <span id="emp__50" class="fa fa-angle-double-up , toggle_icon_right_margin"></span>
+   *            <span id="emp__51">Neutral Mutation Rate</span>
+   *          </button>
    *          <input type="range" min="0" max="5" value="0.05" step="0.005" id="NEUTRAL_MUTATION_RATE_input_slider" onchange="emp.Callback(7, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" class="input_slider">
    *          <input type="number" min="0" max="5" value="0.05" step="0.005" id="NEUTRAL_MUTATION_RATE_input_number" onchange="emp.Callback(8, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" class="input_number">
    *        </div>
@@ -401,13 +393,11 @@ struct Test_Config_Panel_Int_HTMLLayout : public emp::web::BaseTest {
    *
    *        <div id="emp__21">
    *          <div id="SEED_row" class="setting_element">
-   *            <span id="emp__22" class="title_area">
-   *              <button id="emp__23" aria-controls=".SEED_dropdown" aria-expanded="false" class="btn btn-link , collapse_toggle , collapsed" data-target=".SEED_dropdown" data-toggle="collapse" role="button">
-   *                <span id="emp__24" class="fa fa-angle-double-right , toggle_icon_right_margin"></span>
-   *                <span id="emp__25" class="fa fa-angle-double-up , toggle_icon_right_margin"></span>
-   *                <span id="emp__26">Seed</span>
-   *              </button>
-   *            </span>
+   *            <button id="emp__23" aria-controls=".SEED_dropdown" aria-expanded="false" class="title_area , btn btn-link , collapse_toggle , collapsed" data-target=".SEED_dropdown" data-toggle="collapse" role="button">
+   *              <span id="emp__24" class="fa fa-angle-double-right , toggle_icon_right_margin"></span>
+   *              <span id="emp__25" class="fa fa-angle-double-up , toggle_icon_right_margin"></span>
+   *              <span id="emp__26">Seed</span>
+   *            </button>
    *            <label for="SEED_input_slider"></label>
    *            <input for="SEED_input_number" type="range" min="-10" max="10" value="-1" id="SEED_input_slider" onchange="emp.Callback(3, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" class="input_slider">
    *            <label for="SEED_input_number"></label>
@@ -477,24 +467,24 @@ struct Test_Config_Panel_Int_HTMLLayout : public emp::web::BaseTest {
               chai.assert.isTrue(title_area.classList.contains("title_area"));
             });
 
-            it('should have 1 child', function() {
-              chai.assert.equal(title_area.childElementCount, 1);
+            it('should have 3 children (title + 2 glyphs)', function() {
+              chai.assert.equal(title_area.childElementCount, 3);
             });
 
-            it('should have a button element as the child', function() {
-              chai.assert.equal(title_area.children[0].nodeName, "BUTTON");
+            it('should be a button element', function() {
+              chai.assert.equal(title_area.nodeName, "BUTTON");
             });
 
             it('should have a right arrow glyph', function() {
-              chai.assert.isTrue(title_area.children[0].children[0].classList.contains("fa-angle-double-right"));
+              chai.assert.isTrue(title_area.children[0].classList.contains("fa-angle-double-right"));
             });
 
             it('should have an up arrow glyph', function() {
-              chai.assert.isTrue(title_area.children[0].children[1].classList.contains("fa-angle-double-up"));
+              chai.assert.isTrue(title_area.children[1].classList.contains("fa-angle-double-up"));
             });
 
             it('should have a span with title text', function() {
-              chai.assert.equal(title_area.children[0].children[1].nodeName, "SPAN");
+              chai.assert.equal(title_area.children[2].nodeName, "SPAN");
             });
           });
 
@@ -585,13 +575,11 @@ struct Test_Config_Panel_Double_HTMLLayout : public emp::web::BaseTest {
    *
    *      <div id="emp__47">
    *        <div id="NEUTRAL_MUTATION_RATE_row" class="setting_element">
-   *          <span id="emp__48" class="title_area">
-   *            <button id="emp__49" aria-controls=".NEUTRAL_MUTATION_RATE_dropdown" aria-expanded="false" class="btn btn-link , collapse_toggle , collapsed" data-target=".NEUTRAL_MUTATION_RATE_dropdown" data-toggle="collapse" role="button">
-   *              <span id="emp__50" class="fa fa-angle-double-right , toggle_icon_right_margin"></span>
-   *              <span id="emp__51" class="fa fa-angle-double-up , toggle_icon_right_margin"></span>
-   *              <span id="emp__52">Neutral Mutation Rate</span>
-   *            </button>
-   *          </span>
+   *          <button id="emp__49" aria-controls=".NEUTRAL_MUTATION_RATE_dropdown" aria-expanded="false" class="title_area , btn btn-link , collapse_toggle , collapsed" data-target=".NEUTRAL_MUTATION_RATE_dropdown" data-toggle="collapse" role="button">
+   *            <span id="emp__50" class="fa fa-angle-double-right , toggle_icon_right_margin"></span>
+   *            <span id="emp__51" class="fa fa-angle-double-up , toggle_icon_right_margin"></span>
+   *            <span id="emp__52">Neutral Mutation Rate</span>
+   *          </button>
    *          <label for="NEUTRAL_MUTATION_RATE_input_slider"></label>
    *          <input type="range" min="0" max="5" value="0.05" step="0.005" id="NEUTRAL_MUTATION_RATE_input_slider" onchange="emp.Callback(7, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" class="input_slider">
    *          <label for="NEUTRAL_MUTATION_RATE_input_number"></label>
@@ -660,24 +648,24 @@ struct Test_Config_Panel_Double_HTMLLayout : public emp::web::BaseTest {
             chai.assert.isTrue(title_area.classList.contains("title_area"));
           });
 
-          it('should have 1 child', function() {
-            chai.assert.equal(title_area.childElementCount, 1);
+          it('should have 3 children (title + 2 glyphs)', function() {
+            chai.assert.equal(title_area.childElementCount, 3);
           });
 
-          it('should have a button element as the child', function() {
-            chai.assert.equal(title_area.children[0].nodeName, "BUTTON");
+          it('should be a button element', function() {
+            chai.assert.equal(title_area.nodeName, "BUTTON");
           });
 
           it('should have a right arrow glyph', function() {
-            chai.assert.isTrue(title_area.children[0].children[0].classList.contains("fa-angle-double-right"));
+            chai.assert.isTrue(title_area.children[0].classList.contains("fa-angle-double-right"));
           });
 
           it('should have an up arrow glyph', function() {
-            chai.assert.isTrue(title_area.children[0].children[1].classList.contains("fa-angle-double-up"));
+            chai.assert.isTrue(title_area.children[1].classList.contains("fa-angle-double-up"));
           });
 
           it('should have a span with title text', function() {
-            chai.assert.equal(title_area.children[0].children[1].nodeName, "SPAN");
+            chai.assert.equal(title_area.children[2].nodeName, "SPAN");
           });
         });
 
@@ -768,13 +756,11 @@ struct Test_Config_Panel_Text_HTMLLayout : public emp::web::BaseTest {
    *
    *        <div id="emp__31">
    *          <div id="RADIATION_PRESCRIPTION_FILE_row" class="setting_element">
-   *            <span id="emp__32" class="title_area">
-   *              <button id="emp__33" aria-controls=".RADIATION_PRESCRIPTION_FILE_dropdown" aria-expanded="false" class="btn btn-link , collapse_toggle , collapsed" data-target=".RADIATION_PRESCRIPTION_FILE_dropdown" data-toggle="collapse" role="button">
-   *                <span id="emp__34" class="fa fa-angle-double-right , toggle_icon_right_margin"></span>
-   *                <span id="emp__35" class="fa fa-angle-double-up , toggle_icon_right_margin"></span>
-   *                <span id="emp__36">Radiation Prescription File</span>
-   *              </button>
-   *            </span>
+   *            <button id="emp__33" aria-controls=".RADIATION_PRESCRIPTION_FILE_dropdown" aria-expanded="false" class="title_area , btn btn-link , collapse_toggle , collapsed" data-target=".RADIATION_PRESCRIPTION_FILE_dropdown" data-toggle="collapse" role="button">
+   *              <span id="emp__34" class="fa fa-angle-double-right , toggle_icon_right_margin"></span>
+   *              <span id="emp__35" class="fa fa-angle-double-up , toggle_icon_right_margin"></span>
+   *              <span id="emp__36">Radiation Prescription File</span>
+   *            </button>
    *            <label for="RADIATION_PRESCRIPTION_FILE_input_textbox"></label>
    *            <input type="text" value="none" id="RADIATION_PRESCRIPTION_FILE_input_textbox" onchange="emp.Callback(6, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" class="input_text">
    *          </div>
@@ -837,24 +823,24 @@ struct Test_Config_Panel_Text_HTMLLayout : public emp::web::BaseTest {
             chai.assert.isTrue(title_area.classList.contains("title_area"));
           });
 
-          it('should have 1 child', function() {
-            chai.assert.equal(title_area.childElementCount, 1);
+          it('should have 3 children (title + 2 glyphs)', function() {
+            chai.assert.equal(title_area.childElementCount, 3);
           });
 
-          it('should have a button element as the child', function() {
-            chai.assert.equal(title_area.children[0].nodeName, "BUTTON");
+          it('should be a button element', function() {
+            chai.assert.equal(title_area.nodeName, "BUTTON");
           });
 
           it('should have a right arrow glyph', function() {
-            chai.assert.isTrue(title_area.children[0].children[0].classList.contains("fa-angle-double-right"));
+            chai.assert.isTrue(title_area.children[0].classList.contains("fa-angle-double-right"));
           });
 
           it('should have an up arrow glyph', function() {
-            chai.assert.isTrue(title_area.children[0].children[1].classList.contains("fa-angle-double-up"));
+            chai.assert.isTrue(title_area.children[1].classList.contains("fa-angle-double-up"));
           });
 
           it('should have a span with title text', function() {
-            chai.assert.equal(title_area.children[0].children[1].nodeName, "SPAN");
+            chai.assert.equal(title_area.children[2].nodeName, "SPAN");
           });
         });
 
@@ -903,13 +889,11 @@ struct Test_Config_Panel_Bool_HTMLLayout : public emp::web::BaseTest {
    *
    *        <div id="emp__9">
    *          <div id="BOOL_EX_row" class="setting_element">
-   *            <span id="emp__10" class="title_area">
-   *              <button id="emp__11" aria-controls=".BOOL_EX_dropdown" aria-expanded="false" class="btn btn-link , collapse_toggle , collapsed" data-target=".BOOL_EX_dropdown" data-toggle="collapse" role="button">
-   *                <span id="emp__12" class="fa fa-angle-double-right , toggle_icon_right_margin"></span>
-   *                <span id="emp__13" class="fa fa-angle-double-up , toggle_icon_right_margin"></span>
-   *                <span id="emp__14">Bool Ex</span>
-   *              </button>
-   *            </span>
+   *            <button id="emp__11" aria-controls=".BOOL_EX_dropdown" aria-expanded="false" class="title_area , btn btn-link , collapse_toggle , collapsed" data-target=".BOOL_EX_dropdown" data-toggle="collapse" role="button">
+   *              <span id="emp__12" class="fa fa-angle-double-right , toggle_icon_right_margin"></span>
+   *              <span id="emp__13" class="fa fa-angle-double-up , toggle_icon_right_margin"></span>
+   *              <span id="emp__14">Bool Ex</span>
+   *            </button>
    *            <span id="BOOL_EX_input_checkbox" style="clear: none; display: inline;" class="custom-control custom-switch , input_bool">
    *              <input type="checkbox" id="emp__19" onchange="emp.Callback(2, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" checked="checked" class="custom-control-input">
    *              <label id="emp__18" class="custom-control-label" for="emp__19"></label>
@@ -973,24 +957,24 @@ struct Test_Config_Panel_Bool_HTMLLayout : public emp::web::BaseTest {
               chai.assert.isTrue(title_area.classList.contains("title_area"));
             });
 
-            it('should have 1 child', function() {
-              chai.assert.equal(title_area.childElementCount, 1);
+            it('should have 3 children (title + 2 glyphs)', function() {
+              chai.assert.equal(title_area.childElementCount, 3);
             });
 
             it('should have a button element as the child', function() {
-              chai.assert.equal(title_area.children[0].nodeName, "BUTTON");
+              chai.assert.equal(title_area.nodeName, "BUTTON");
             });
 
             it('should have a right arrow glyph', function() {
-              chai.assert.isTrue(title_area.children[0].children[0].classList.contains("fa-angle-double-right"));
+              chai.assert.isTrue(title_area.children[0].classList.contains("fa-angle-double-right"));
             });
 
             it('should have a up arrow glyph', function() {
-              chai.assert.isTrue(title_area.children[0].children[1].classList.contains("fa-angle-double-up"));
+              chai.assert.isTrue(title_area.children[1].classList.contains("fa-angle-double-up"));
             });
 
             it('should have a span with title text', function() {
-              chai.assert.equal(title_area.children[0].children[1].nodeName, "SPAN");
+              chai.assert.equal(title_area.children[2].nodeName, "SPAN");
             });
           });
 
