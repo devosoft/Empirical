@@ -168,7 +168,7 @@ struct Test_Collapse_Two_Clicks : emp::web::BaseTest {
 
   }
 
-  /* TODO: Test successfully clicks multiple times, but not too efficient
+  /* TODO: Test successfully clicks multiple times, but repetitive
    * https://github.com/devosoft/Empirical/issues/368
    *
    * Methods tried (unsuccessful):
@@ -178,6 +178,11 @@ struct Test_Collapse_Two_Clicks : emp::web::BaseTest {
    *  - click element twice after first click (1 sec time delay)
    *  - put whole describe in setTimeout()
    *  - put whole it or multile it statements in setTimeout()
+   * 
+   * Suggestions to try next:
+   *  - change settimeout to 1 ms
+   *  - instead of settimeout append events to event queue
+   *  - create a macro to reduce repeated boilerplate code
    */
   void Describe() override {
     // Test that the HTML components created in constructor are correct.
