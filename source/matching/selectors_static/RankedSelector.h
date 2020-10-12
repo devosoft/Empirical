@@ -68,10 +68,31 @@ struct RankedSelector {
 
   }
 
+  static res_t select_pick( const emp::vector< float>& scores ) {
+
+    res_t res;
+
+    if ( scores.empty() ) return res;
+
+    const auto best_it = std::min_element(
+      std::begin( res ),
+      std::end( res )
+    );
+    const float best = *best_it;
+
+    if constexpr ( ThreshRatio::num < 0 ) if (best > thresh) return res;
+
+    res[0] = std::distance( std::begin(res), best_it );
+
+    return res;
+
+  }
+
   static res_t select( emp::vector< float >& scores ) {
     if constexpr (N == std::numeric_limits<size_t>::max() ) {
       return select_partition( scores );
-    } else return select_traverse( scores );
+    } else if constexpr (N == 1) return select_pick( scores );
+    else return select_traverse( scores );
   }
 
 };
