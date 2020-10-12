@@ -14,7 +14,8 @@ template<
   typename Metric,
   typename Selector,
   typename Regulator,
-  size_t CacheSize=0
+  size_t RawCacheSize=0,
+  size_t RegulatedCacheSize=0
 > class MatchDepository {
 
 public:
@@ -32,10 +33,10 @@ private:
   emp::vector< emp::internal::DepositoryEntry<Val, tag_t, Regulator> > data;
 
   // Cache of match results without regulation.
-  emp::AssociativeArrayCache< query_t, res_t, CacheSize > cache_raw;
+  emp::AssociativeArrayCache< query_t, res_t, RawCacheSize > cache_raw;
 
   // Cache of match results with regulation.
-  emp::AssociativeArrayCache< query_t, res_t, CacheSize > cache_regulated;
+  emp::AssociativeArrayCache<query_t, res_t, RegulatedCacheSize>cache_regulated;
 
   /// Perform matching with regulation.
   res_t DoRegulatedMatch( const query_t& query ) {
@@ -80,7 +81,10 @@ private:
   res_t* DoRawLookup( const query_t& query ) { return cache_raw.get( query ); }
 
   /// Clear cached raw, regulated results.
-  void ClearCache() { cache_raw.clear(); cache_regulated.clear(); }
+  void ClearCache() {
+    if constexpr ( RawCacheSize > 0 ) cache_raw.clear();
+    if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
+  }
 
 public:
 
@@ -89,7 +93,7 @@ public:
   /// function.
   res_t MatchRegulated( const query_t& query ) {
 
-    if constexpr ( CacheSize > 0 ) {
+    if constexpr ( RegulatedCacheSize > 0 ) {
       if (const auto res = DoRegulatedLookup( query ); res != nullptr) {
         return *res;
       }
@@ -104,7 +108,7 @@ public:
   /// function. Ignore regulators.
   res_t MatchRaw( const query_t& query ) {
 
-    if constexpr ( CacheSize > 0 ) {
+    if constexpr ( RawCacheSize > 0 ) {
       if (const auto res = DoRawLookup( query ); res != nullptr) return *res;
     }
 
@@ -130,16 +134,22 @@ public:
 
   using adj_t = typename Regulator::adj_t;
   void AdjRegulator( const uid_t uid, const adj_t amt ) {
-    if ( data.at(uid).reg.Adj(amt) ) cache_regulated.clear();
+    if ( data.at(uid).reg.Adj(amt) ) {
+      if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
+    }
   }
 
   using set_t = typename Regulator::set_t;
   void SetRegulator( const uid_t uid, const set_t set ) {
-    if ( data.at(uid).reg.Set(set) ) cache_regulated.clear();
+    if ( data.at(uid).reg.Set(set) ) {
+      if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
+    }
   }
 
   void SetRegulator( const uid_t uid, const Regulator& set ) {
-    if (set != std::exchange( data.at(uid).reg, set )) cache_regulated.clear();
+    if (set != std::exchange( data.at(uid).reg, set )) {
+      if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
+    }
   }
 
   const Regulator& GetRegulator( const uid_t uid ) { return data.at(uid).reg; }
@@ -151,13 +161,17 @@ public:
 
   /// Apply decay to a regulator.
   void DecayRegulator(const uid_t uid, const int steps=1) {
-    if ( data.at(uid).reg.Decay(steps) ) cache_regulated.clear();
+    if ( data.at(uid).reg.Decay(steps) ) {
+      if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
+    }
   }
 
   /// Apply decay to all regulators.
   void DecayRegulators(const int steps=1) {
     for (auto & pack : data ) {
-      if ( pack.reg.Decay(steps) ) cache_regulated.clear();
+      if ( pack.reg.Decay(steps) ) {
+        if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
+      }
     }
   }
 
