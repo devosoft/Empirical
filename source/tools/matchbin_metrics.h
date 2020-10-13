@@ -670,6 +670,7 @@ namespace emp {
     using tag_t = typename Metric::tag_t;
 
     Metric metric;
+
     static inline robin_hood::unordered_map<
       std::tuple<query_t, tag_t>,
       double,
@@ -696,6 +697,10 @@ namespace emp {
 
     }
 
+    double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
   };
 
   template<typename Metric>
@@ -704,22 +709,24 @@ namespace emp {
     using query_t = typename Metric::query_t;
     using tag_t = typename Metric::tag_t;
 
-    Metric metric;
+    inline static size_t metric_width{ Metric{}.width() };
 
     inline static double calculate(const query_t& a, const tag_t& b) {
-
-      Metric metric;
 
       query_t dup(a);
 
       double best = 1.0;
 
-      for (size_t i = 0; i < metric.width(); ++ i) {
+      for (size_t i = 0; i < metric_width; ++ i) {
         best = std::min(Metric::calculate(dup, b), best);
         dup.template ROTL_SELF<1>();
       }
 
       return best;
+    }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
     }
 
   };
@@ -744,6 +751,10 @@ namespace emp {
         return 1.0;
       }
 
+    }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
     }
 
   };
@@ -793,6 +804,10 @@ namespace emp {
       return 0.5 * (1.0 + std::copysign(std::pow(std::abs(base), exp), base));
     }
 
+    double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
   };
 
   // Base less than one squishes probability distribution to the center
@@ -827,6 +842,10 @@ namespace emp {
       return 0.5 * (
         1.0 + std::copysign(emp::Log(antilog, base), raw)
       );
+    }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
     }
 
   };
@@ -988,6 +1007,10 @@ namespace emp {
 
     inline static double calculate(const query_t& a, const tag_t& b) {
       return held.lookup(held.metric(a, b));
+    }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
     }
 
   };
