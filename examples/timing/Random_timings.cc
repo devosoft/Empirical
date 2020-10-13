@@ -18,6 +18,11 @@ int main()
   // emp::Random random;
   emp2::Random random;
 
+
+  //
+  // Test GetUInt()
+  //
+
   std::clock_t start_time = std::clock();
 
   constexpr const size_t buckets = 1024;
@@ -48,7 +53,9 @@ int main()
             << " seconds." << std::endl;
 
 
-
+  //
+  // Test P()
+  //
   
   size_t success_count = 0;
   start_time = std::clock();
@@ -69,5 +76,29 @@ int main()
 	    << "  num hits = " << success_count
             << ";  time = " << ((double) total_time) / (double) CLOCKS_PER_SEC
             << " seconds." << std::endl;
+
+
+  //
+  // Test RandFill()
+  //
+
+  constexpr const size_t layers = 2048;
+  unsigned char memory[N];
+
+  start_time = std::clock();
+
+  for (size_t i = 0; i < layers; i++) {
+    random.RandFill(memory, N);
+  }
+
+  total_time = std::clock() - start_time;
+
+  std::cout << "\nTesting Random::RandFill()."
+	    << "  Doing " << N_P << " tests;"
+	    << " expecting ~" << expected << " hits.\n"
+	    << "  num hits = " << success_count
+            << ";  time = " << ((double) total_time) / (double) CLOCKS_PER_SEC
+            << " seconds." << std::endl;
+
 
 }
