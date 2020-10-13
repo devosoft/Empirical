@@ -335,7 +335,7 @@ struct Test_Modal : emp::web::BaseTest {
       });
 
       describe("Close modal with x button in header, div#modal", function() {
-        const x_close = document.getElementById("#modal").children[0].children[0].children[0].children[1];
+        const x_close = document.getElementById("modal").children[0].children[0].children[0].children[1];
         const modal = document.getElementById("modal");
 
         it('modal should not have class show', function() {
@@ -363,7 +363,7 @@ struct Test_Modal : emp::web::BaseTest {
       });
 
       describe("Close modal with close button in footer, div#modal", function() {
-        const close_btn = document.getElementById("#modal").children[0].children[0].children[2].children[1];
+        const close_btn = document.getElementById("modal").children[0].children[0].children[2].children[1];
         const modal = document.getElementById("modal");
 
         it('modal should not have class show', function() {
