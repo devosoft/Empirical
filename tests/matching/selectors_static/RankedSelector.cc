@@ -19,7 +19,7 @@ TEST_CASE("N = 1, nothing to select on", "[tools]") {
 
 TEST_CASE("N = 1, zero results below threshold", "[tools]") {
 
-  const emp::vector<float> scores{0.5f, 0.42f, 0.42f, 0.9f, 0.2f};
+  emp::vector<float> scores{0.5f, 0.42f, 0.42f, 0.9f, 0.2f};
 
   const auto res = emp::statics::RankedSelector<tenth>::select( scores );
 
@@ -29,7 +29,7 @@ TEST_CASE("N = 1, zero results below threshold", "[tools]") {
 
 TEST_CASE("N = 1, one result below threshold", "[tools]") {
 
-  const emp::vector<float> scores{0.5f, 0.42f, 0.42f, 0.9f, 0.09f};
+  emp::vector<float> scores{0.5f, 0.42f, 0.42f, 0.9f, 0.09f};
 
   const auto res = emp::statics::RankedSelector<tenth>::select( scores );
 
@@ -40,7 +40,7 @@ TEST_CASE("N = 1, one result below threshold", "[tools]") {
 
 TEST_CASE("N = 1, two results below threshold", "[tools]") {
 
-  const emp::vector<float> scores{0.05f, 0.42f, 0.42f, 0.9f, 0.09f};
+  emp::vector<float> scores{0.05f, 0.42f, 0.42f, 0.9f, 0.09f};
 
   const auto res = emp::statics::RankedSelector<tenth>::select( scores );
 
@@ -67,7 +67,7 @@ TEST_CASE("N = 2, zero results below threshold", "[tools]") {
 
 TEST_CASE("N = 2, one result below threshold", "[tools]") {
 
-  const emp::vector<float> scores{0.5f, 0.42f, 0.042f, 0.9f, 0.2f};
+  emp::vector<float> scores{0.5f, 0.42f, 0.042f, 0.9f, 0.2f};
 
   const auto res = emp::statics::RankedSelector<tenth, 2>::select( scores );
 
@@ -78,7 +78,7 @@ TEST_CASE("N = 2, one result below threshold", "[tools]") {
 
 TEST_CASE("N = 2, two results below threshold", "[tools]") {
 
-  const emp::vector<float> scores{0.05f, 0.42f, 0.042f, 0.9f, 0.2f};
+  emp::vector<float> scores{0.05f, 0.42f, 0.042f, 0.9f, 0.2f};
 
   const auto res = emp::statics::RankedSelector<tenth, 2>::select( scores );
 
@@ -90,7 +90,7 @@ TEST_CASE("N = 2, two results below threshold", "[tools]") {
 
 TEST_CASE("N = 2, three results below threshold", "[tools]") {
 
-  const emp::vector<float> scores{0.05f, 0.42f, 0.042f, 0.009f, 0.2f};
+  emp::vector<float> scores{0.05f, 0.42f, 0.042f, 0.009f, 0.2f};
 
   const auto res = emp::statics::RankedSelector<tenth, 2>::select( scores );
 
