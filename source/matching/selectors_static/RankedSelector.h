@@ -102,4 +102,4 @@ struct RankedSelector {
 };
 
 } // namespace statics
-} // namespace empt
+} // namespace emp
