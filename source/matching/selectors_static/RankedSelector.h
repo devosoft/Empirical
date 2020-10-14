@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <numeric>
 #include <ratio>
 
 #include "../../base/vector.h"
@@ -16,7 +17,7 @@ template<
 >
 struct RankedSelector {
 
-  using res_t = emp::SmallVector<size_t, N + 1>;
+  using res_t = emp::SmallVector<size_t, 1>;
 
   inline static constexpr float thresh = (
     ThreshRatio::num < 0
@@ -25,17 +26,20 @@ struct RankedSelector {
       / static_cast<float>(ThreshRatio::den)
   );
 
-  static res_t select_partition( emp::vector< float >& scores ) {
+  static res_t select_partition( const emp::vector< float >& scores ) {
 
+    res_t res( scores.size() );
+    std::iota( std::begin(res), std::end(res), 0 );
+    
     const auto partition = std::partition(
-      std::begin( scores ),
-      std::end( scores ),
-      [](const float score){ return score <= thresh; }
+      std::begin( res ),
+      std::end( res ),
+      [&scores](const size_t idx){ return scores[idx] <= thresh; }
     );
 
-    scores.resize( std::distance( std::begin(scores), partition ) );
+    res.resize( std::distance( std::begin(res), partition ) );
 
-    return res_t( scores );
+    return res;
 
   }
 
@@ -88,7 +92,7 @@ struct RankedSelector {
 
   }
 
-  static res_t select( emp::vector< float >& scores ) {
+  static res_t select( const emp::vector< float >& scores ) {
     if constexpr (N == std::numeric_limits<size_t>::max() ) {
       return select_partition( scores );
     } else if constexpr (N == 1) return select_pick( scores );
