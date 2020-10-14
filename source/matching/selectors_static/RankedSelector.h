@@ -75,15 +75,14 @@ struct RankedSelector {
     if ( scores.empty() ) return res;
 
     const auto best_it = std::min_element(
-      std::begin( res ),
-      std::end( res )
+      std::begin( scores ),
+      std::end( scores )
     );
-    const float best = *best_it;
 
     // if threshold is finite
-    if constexpr ( ThreshRatio::num < 0 ) if (best > thresh) return res;
+    if constexpr ( ThreshRatio::num < 0 ) if (*best_it > thresh) return res;
 
-    res.push_back( std::distance( std::begin(res), best_it ) );
+    res.push_back( std::distance( std::begin( scores ), best_it ) );
 
     return res;
 
