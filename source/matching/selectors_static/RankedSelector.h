@@ -83,8 +83,8 @@ struct RankedSelector {
       std::end( scores )
     );
 
-    // if threshold is finite
-    if constexpr ( ThreshRatio::num < 0 ) if (*best_it > thresh) return res;
+    // if constexpr threshold is finite, then if best was better than thresh
+    if constexpr ( ThreshRatio::num >= 0 ) if (*best_it > thresh) return res;
 
     res.push_back( std::distance( std::begin( scores ), best_it ) );
 
