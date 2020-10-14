@@ -1,4 +1,4 @@
-TEST_NAMES := base config constexpr data Evolve games geometry hardware meta scholar tools
+TEST_NAMES := base config constexpr data datastructs Evolve games geometry hardware matching meta scholar tools
 
 CXX = clang++
 #CXX := g++
