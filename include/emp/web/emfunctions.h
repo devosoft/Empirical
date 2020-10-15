@@ -12,7 +12,7 @@
 
 #include <functional>
 
-#include "../tools/alert.h"
+#include "../debug/alert.h"
 #include "../tools/string_utils.h"
 #include "JSWrap.h"
 

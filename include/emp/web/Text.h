@@ -15,7 +15,7 @@
 #ifndef EMP_WEB_TEXT_H
 #define EMP_WEB_TEXT_H
 
-#include "../tools/DynamicString.h"
+#include "../datastructs/DynamicString.h"
 
 #include "Widget.h"
 

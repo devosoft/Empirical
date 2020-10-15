@@ -20,7 +20,7 @@
 #include "../geometry/Circle2D.h"
 #include "../geometry/Surface2D.h"
 #include "../geometry/Surface.h"
-#include "../tools/BitMatrix.h"
+#include "../bits/BitMatrix.h"
 #include "color_map.h"
 
 namespace emp {

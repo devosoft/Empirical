@@ -50,10 +50,10 @@
 #include "../base/assert.h"
 #include "../base/vector.h"
 
+#include "../datastructs/tuple_struct.h"
+#include "../datastructs/tuple_utils.h"
+#include "../debug/mem_track.h"
 #include "../tools/functions.h"
-#include "../tools/mem_track.h"
-#include "../tools/tuple_struct.h"
-#include "../tools/tuple_utils.h"
 
 #include "init.h"
 #include "js_utils.h"

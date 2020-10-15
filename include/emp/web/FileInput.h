@@ -5,7 +5,7 @@
  *
  *  @file  FileInput.h
  *  @brief Specs for the FileInput widget (click on to upload a file)
- * 
+ *
  *  @todo Setup FileInput to work outside of web mode as well.
  */
 
@@ -15,7 +15,7 @@
 #include <functional>
 #include <string>
 
-#include "../tools/File.h"
+#include "../io/File.h"
 #include "Widget.h"
 
 namespace emp {

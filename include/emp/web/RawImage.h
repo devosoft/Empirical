@@ -18,7 +18,7 @@
 #include "../base/Ptr.h"
 #include "../base/vector.h"
 #include "../control/Signal.h"
-#include "../tools/map_utils.h"
+#include "../datastructs/map_utils.h"
 
 #include "emfunctions.h"
 #include "JSWrap.h"
