@@ -20,8 +20,8 @@
 #include "../base/vector.h"
 
 #include "Graph.h"
-#include "Random.h"
-#include "random_utils.h"
+#include "../math/Random.h"
+#include "../math/random_utils.h"
 
 namespace emp {
 

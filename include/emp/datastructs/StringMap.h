@@ -6,7 +6,7 @@
  *  @file StringMap.h
  *  @brief An std::unordered_map wrapper that deals smootly with strigns and fast compile-time optimizations.
  *  @note Status: ALPHA
- * 
+ *
  *  StringMap is setup to be a generic dictionary that can link strings to objects of any other
  *  desginated type.  It is more powerful than std::unordered_map because it will accept strings wrapped in
  *  the EMP_STRING_ID macro, which is hashed at compile-time instead of run-time.
@@ -25,7 +25,7 @@
 
 #include "../base/unordered_map.h"
 
-#include "string_utils.h"
+#include "../tools/string_utils.h"
 
 /// Macro to covert a literal string to a unique ID, mostly at compile time.  Specifically,
 /// the string is converted to a unique type at compile time, which is then mapped to a unique
@@ -50,7 +50,7 @@ namespace emp {
   private:
     emp::Ptr<const std::string> str_ptr;   /// Pointer to a unique instance of this string.
 
-    static auto & GetStringSet() { 
+    static auto & GetStringSet() {
       static std::unordered_set< std::string > str_set;
       return str_set;
     }
@@ -65,7 +65,7 @@ namespace emp {
     size_t ToValue() const { return ((size_t) str_ptr.Raw()) / sizeof(std::string *); }
     const std::string & ToString() const { return *str_ptr; }
 
-    /// Get a StringID based on a StringType or another type with a 
+    /// Get a StringID based on a StringType or another type with a
     /// static ToString() member function.
     template <typename T>
     static StringID Get() {

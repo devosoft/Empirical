@@ -16,7 +16,7 @@
 #include "../base/assert.h"
 #include "../base/vector.h"
 
-#include "BitVector.h"
+#include "../bits/BitVector.h"
 
 namespace emp {
 
