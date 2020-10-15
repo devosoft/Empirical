@@ -19,7 +19,7 @@
 #include "../base/assert.h"
 #include "../meta/reflection.h"
 #include "Random.h"
-#include "const.h"
+#include "constants.h"
 
 namespace emp {
 
@@ -264,7 +264,7 @@ namespace emp {
     // exclude clang versions with compiler bug https://reviews.llvm.org/D35190
     #if defined(__clang__) && __clang_major__>=9 || defined(__GNUC__) && !defined(__clang__)
     // if base is not known at compile time, use std::pow which is faster
-    if ( !__builtin_constant_p( base ) ) return std::pow(base, exp); 
+    if ( !__builtin_constant_p( base ) ) return std::pow(base, exp);
     // otherwise, use constexpr-friendly implementations
     else
     #endif

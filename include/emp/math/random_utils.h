@@ -12,7 +12,7 @@
 #define EMP_RANDOM_UTILS_H
 
 #include "../base/vector.h"
-#include "BitVector.h"
+#include "../bits/BitVector.h"
 #include "Random.h"
 
 namespace emp {

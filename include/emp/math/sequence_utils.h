@@ -18,7 +18,7 @@
 
 #include "../base/vector.h"
 
-#include "functions.h"
+#include "../tools/functions.h"
 
 namespace emp {
 

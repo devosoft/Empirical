@@ -12,8 +12,8 @@
 #ifndef EMP_DISTRIBUTION_H
 #define EMP_DISTRIBUTION_H
 
+#include "../datastructs/UnorderedIndexMap.h"
 #include "Random.h"
-#include "UnorderedIndexMap.h"
 
 namespace emp {
 
@@ -93,7 +93,7 @@ namespace emp {
       N = _N;
       emp_assert(p > 0.0 && p <= 1.0, p);
       emp_assert(N > 0, N);
- 
+
       // Track the probability of each number of successes at each point in time.
       emp::vector<double> cur_probs(N, 0.0);
       cur_probs[0] = 1.0;        // Initially we start with zero successes.
