@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 TEST_NAMES = ConfigPanel Collapse LoadingModal Card CommentBox Modal ToggleSwitch CodeBlock LoadingIcon FontAwesomeIcon ClickCounterDemo ClickCollapseDemo Element js_utils visualizations JSWrap Widget
 
 # Flags to use regardless of compiler
