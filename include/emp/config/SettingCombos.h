@@ -18,10 +18,10 @@
 
 #include "../base/Ptr.h"
 #include "../base/vector.h"
-#include "../tools/math.h"
-#include "../tools/map_utils.h"
+#include "../datastructs/vector_utils.h"
+#include "../datastructs/map_utils.h"
+#include "../math/math.h"
 #include "../tools/string_utils.h"
-#include "../tools/vector_utils.h"
 
 namespace emp {
 
@@ -40,7 +40,7 @@ namespace emp {
       std::string args_label;    ///< Label for option arguments (used in --help)
       size_t cap = (size_t) -1;  ///< Max number of settings allowed in combo
 
-      SettingBase(const std::string & _name, const std::string & _desc, 
+      SettingBase(const std::string & _name, const std::string & _desc,
                   const char _flag, const std::string & _args_label, const size_t _cap)
         : name(_name), desc(_desc), flag(_flag), option(emp::to_string("--",_name))
         , args_label(_args_label), cap(_cap) { }
@@ -153,7 +153,7 @@ namespace emp {
       return emp::FindMax(ptr->values);
     }
 
-    /// Add a new setting of a specified type.  Returns the (initially empty) vector of values 
+    /// Add a new setting of a specified type.  Returns the (initially empty) vector of values
     /// to allow easy setting.
     /// Example:
     ///   combos.AddSetting("pop_size") = {100,200,400,800};
@@ -262,7 +262,7 @@ namespace emp {
 
         // Since it's not, prepare to move on to the next one.
         cur_combo[i] = 0;
-        settings[i]->SetValueID(0);      
+        settings[i]->SetValueID(0);
       }
 
       // No valid combo found.
@@ -322,7 +322,7 @@ namespace emp {
         size_t id = FindOptionMatch(cur_arg);
         if (id < settings.size()) {
           if (++i >= args.size()) {
-            std::cout << "ERROR: Must provide args to use!\n";          
+            std::cout << "ERROR: Must provide args to use!\n";
             // @CAO Need to signal error...
             return args;
           }
@@ -342,7 +342,7 @@ namespace emp {
             settings[id]->FromString( emp::view_string(cur_arg,2) );
           }
           else if (++i >= args.size()) {
-            std::cout << "ERROR: Must provide args to use!\n";          
+            std::cout << "ERROR: Must provide args to use!\n";
             // @CAO Need to signal error...
             return args;
           }

@@ -47,8 +47,8 @@
 #include "../base/errors.h"
 #include "../base/unordered_map.h"
 #include "../base/vector.h"
+#include "../datastructs/map_utils.h"
 #include "../tools/functions.h"
-#include "../tools/map_utils.h"
 #include "../tools/string_utils.h"
 #include "ConfigManager.h"
 

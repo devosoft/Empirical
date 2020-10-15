@@ -19,10 +19,10 @@
 #include "../base/Ptr.h"
 #include "../base/vector.h"
 #include "../config/command_line.h"
-#include "../tools/math.h"
-#include "../tools/map_utils.h"
+#include "../datastructs/map_utils.h"
+#include "../datastructs/vector_utils.h"
+#include "../math/math.h"
 #include "../tools/string_utils.h"
-#include "../tools/vector_utils.h"
 
 namespace emp {
 
@@ -39,7 +39,7 @@ namespace emp {
       std::string option;        ///< Command-line longer option.
       std::string args_label;    ///< Label for option arguments (used in --help)
 
-      SettingBase(const std::string & _name, const std::string & _desc, 
+      SettingBase(const std::string & _name, const std::string & _desc,
                   const char _flag, const std::string & _args_label)
         : name(_name), desc(_desc), flag(_flag), option(emp::to_string("--",_name))
         , args_label(_args_label) { }
@@ -133,7 +133,7 @@ namespace emp {
               start += step;
             }
           }
-          
+
           // Otherwise do a direct conversion.
           else {
             values.push_back( emp::from_string<T>(cur_str) );
@@ -217,7 +217,7 @@ namespace emp {
       return base_ptr.Cast<SettingInfo<T>>()->value;
     }
 
-    /// Add a new setting of a specified type.  Returns the (initially empty) vector of values 
+    /// Add a new setting of a specified type.  Returns the (initially empty) vector of values
     /// to allow easy setting.
     /// Example:
     ///   config.AddSetting("num_runs") = 200;
@@ -235,7 +235,7 @@ namespace emp {
       return new_ptr->value;
     }
 
-    /// Add a new setting of a specified type.  Returns the (initially empty) vector of values 
+    /// Add a new setting of a specified type.  Returns the (initially empty) vector of values
     /// to allow easy setting.
     /// Example:
     ///   config.AddComboSetting("pop_size") = { 100,200,400,800 };
@@ -340,7 +340,7 @@ namespace emp {
 
         // Since it's not, prepare to move on to the next one.
         cur_combo[i] = 0;
-        combo_settings[i]->SetValueID(0);      
+        combo_settings[i]->SetValueID(0);
       }
 
       // No valid combo found.
@@ -428,7 +428,7 @@ namespace emp {
           if (++i >= args.size()) {
             errors += "ERROR: Must provide args for option '--";
             errors += setting_ptr->name;
-            errors += "' to use!\n";          
+            errors += "' to use!\n";
             std::cerr << errors;
             return false;
           }
@@ -444,7 +444,7 @@ namespace emp {
             setting_ptr->FromString( emp::view_string(cur_arg,2) );
           }
           else if (++i >= args.size()) {
-            std::cout << "ERROR: Must provide args to use!\n";          
+            std::cout << "ERROR: Must provide args to use!\n";
             return false;
           }
           else {
