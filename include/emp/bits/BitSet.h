@@ -24,15 +24,13 @@
 #include "../base/assert.h"
 #include "../base/vector.h"
 #include "../base/Ptr.h"
-
-#include "bitset_utils.h"
-#include "functions.h"
-#include "math.h"
-#include "Random.h"
-#include "hash_utils.h"
-#include "random_utils.h"
-
+#include "../datastructs/hash_utils.h"
+#include "../math/math.h"
+#include "../math/Random.h"
+#include "../math/random_utils.h"
+#include "../tools/functions.h"
 #include "../polyfill/span.h"
+#include "bitset_utils.h"
 
 namespace emp {
 

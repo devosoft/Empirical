@@ -14,12 +14,12 @@
 #include <iostream>
 #include <typeinfo>
 
-#include "BitSet.h"
 
 #ifndef functions
-#include "functions.h"
+#include "../tools/functions.h"
 #endif
 
+#include "BitSet.h"
 #include "bitset_utils.h"
 
 namespace emp {
