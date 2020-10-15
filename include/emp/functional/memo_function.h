@@ -16,7 +16,7 @@
 #include "../base/assert.h"
 #include "../meta/meta.h"
 
-#include "tuple_utils.h"
+#include "../datastructs/tuple_utils.h"
 
 namespace emp {
 
