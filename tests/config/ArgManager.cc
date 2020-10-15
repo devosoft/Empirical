@@ -9,11 +9,11 @@
 #include <map>
 #include <optional>
 
-#include "base/assert.h"
-#include "base/optional.h"
-#include "base/vector.h"
-#include "config/ArgManager.h"
-#include "config/config.h"
+#include "emp/base/assert.h"
+#include "emp/base/optional.h"
+#include "emp/base/vector.h"
+#include "emp/config/ArgManager.h"
+#include "emp/config/config.h"
 #include "assets/config_setup.h"
 
 TEST_CASE("Test ArgManager", "[config]")
