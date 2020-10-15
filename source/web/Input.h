@@ -81,7 +81,7 @@ namespace web {
         if (value != "") HTML << " value=\"" << value << "\"";  // Add a current value if there is one.
         if (step != "") HTML << " step=\"" << step << "\"";     // Add a step if there is one.
         HTML << " id=\"" << id << "\"";                         // Indicate ID.
-        HTML << " onchange=\"" << onchange_info << "\"";        // Indicate action on change.
+        HTML << " oninput=\"" << onchange_info << "\"";        // Indicate action on change.
         HTML << ">" << label << "</input>";                     // Close and label the Input.
       }
 

@@ -191,6 +191,45 @@ namespace web {
         }
       }
 
+      /// Remove the old widget, putting the new widget in its place (i.e., same index)
+      /// @param the Widget to remove
+      /// @param the Widget to add
+      void ReplaceChild(Widget & old_child, Widget new_child) override {
+        // ensure child is present
+        emp_assert(1 == std::count(
+          std::begin(m_children),
+          std::end(m_children),
+          old_child
+        ));
+        // unregister and remove child
+        Unregister(*std::find(
+          std::begin(m_children),
+          std::end(m_children),
+          old_child
+        ));
+        m_children.emplace(std::find(
+          std::begin(m_children),
+          std::end(m_children),
+          old_child
+        ), new_child);
+        m_children.erase(
+          std::remove(
+            std::begin(m_children),
+            std::end(m_children),
+            old_child
+          ),
+          std::end(m_children)
+        );
+
+        old_child->parent = nullptr;
+        // update info for new child
+        new_child->parent = this;
+        Register(new_child);
+        new_child->DoActivate(false);
+        // render changes
+        if (state == Widget::ACTIVE) ReplaceHTML();
+      }
+
       void DoActivate(bool top_level=true) override {
         for (auto & child : m_children) child->DoActivate(false);
         internal::WidgetInfo::DoActivate(top_level);
