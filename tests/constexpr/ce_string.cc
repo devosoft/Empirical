@@ -15,9 +15,9 @@
 #include <sstream>
 #include <string>
 
-#include "constexpr/ce_string.h"
+#include "emp/constexpr/ce_string.h"
 
-#include "tools/BitSet.h"
+#include "emp/bits/BitSet.h"
 
 TEST_CASE("Test ce_string", "[constexpr]")
 {
