@@ -15,12 +15,12 @@
 #include <deque>
 
 #include "../../config/config.h"
-#include "../../tools/BitSet.h"
-#include "../../tools/Random.h"
-#include "../../tools/stats.h"
+#include "../../bits/BitSet.h"
+#include "../../math/Random.h"
+#include "../../math/stats.h"
 #include "../../tools/string_utils.h"
-#include "../../tools/FunctionSet.h"
-#include "../../tools/const.h"
+#include "../../functional/FunctionSet.h"
+#include "../../math/constants.h"
 
 #include "../init.h"
 #include "../Animate.h"

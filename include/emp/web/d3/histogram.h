@@ -1,7 +1,7 @@
 #include "d3_init.h"
 #include "dataset.h"
 #include "../../base/vector.h"
-#include "../../tools/tuple_struct.h"
+#include "../../datastructs/tuple_struct.h"
 #include "../js_utils.h"
 
 namespace D3 {

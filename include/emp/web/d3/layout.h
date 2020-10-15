@@ -15,7 +15,7 @@
 #include "selection.h"
 #include "svg_shapes.h"
 
-#include "../../tools/tuple_struct.h"
+#include "../../datastructs/tuple_struct.h"
 #include "../JSWrap.h"
 
 #include <functional>
