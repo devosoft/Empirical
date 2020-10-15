@@ -16,7 +16,7 @@
 #include "../base/array.h"
 #include "../base/assert.h"
 #include "../base/vector.h"
-#include "../tools/math.h"
+#include "../math/math.h"
 
 namespace emp {
 

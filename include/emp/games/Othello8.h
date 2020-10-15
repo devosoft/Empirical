@@ -5,7 +5,7 @@
  *
  *  @file  Othello8.h
  *  @brief A simple Othello game state handler limited to an 8x8 board.
- * 
+ *
  *  @todo Add Hash for boards to be able to cachce moves.
  *  @todo Setup OPTIONAL caching of expensive board measures.
  */
@@ -21,8 +21,8 @@
 #include "../base/array.h"
 #include "../base/assert.h"
 #include "../base/vector.h"
-#include "../tools/math.h"
-#include "../tools/bitset_utils.h"
+#include "../bits/bitset_utils.h"
+#include "../math/math.h"
 
 namespace emp {
   /// NOTE: This game could be made more black-box.
@@ -160,7 +160,7 @@ namespace emp {
       cache_ok = false;
     }
 
-    static constexpr Index GetIndex(size_t x, size_t y) { return Index(x, y); }    
+    static constexpr Index GetIndex(size_t x, size_t y) { return Index(x, y); }
     static constexpr size_t GetBoardWidth() { return BOARD_SIZE; }
     size_t GetNumCells() const { return NUM_CELLS; }
     Player GetCurPlayer() const { return cur_player; }
@@ -177,7 +177,7 @@ namespace emp {
     /// Get location adjacent to ID in direction dir.
     /// GetNeighbor function is save with garbage ID values.
     Index GetNeighbor(Index id, Facing dir) {
-      if (!id.IsValid()) return Index(); 
+      if (!id.IsValid()) return Index();
       return NEIGHBORS()[GetNeighborIndex(id, dir)];
     }
 
@@ -367,7 +367,7 @@ namespace emp {
       emp_assert(IsValidPlayer(player) && pos.IsValid());    // Validate position and player.
       emp_assert(GetPosOwner(pos) == Player::NONE);          // Make sure position is empty.
       SetPos(pos, player);                                   // Take position for player.
-      DoFlips(player, pos);                                  // Flip tiles on the board.      
+      DoFlips(player, pos);                                  // Flip tiles on the board.
       auto opp_moves = HasMoveOptions(GetOpponent(player));  // Test if opponent can go.
       if (opp_moves) { cur_player = GetOpponent(player); return false; }
 

@@ -5,7 +5,7 @@
  *
  *  @file  Othello.h
  *  @brief A simple Othello game state handler.
- * 
+ *
  *  @todo Add Hash for boards to be able to cachce moves.
  *  @todo Setup OPTIONAL caching of expensive board measures.
  */
@@ -21,7 +21,7 @@
 #include "../base/array.h"
 #include "../base/assert.h"
 #include "../base/vector.h"
-#include "../tools/math.h"
+#include "../math/math.h"
 
 namespace emp {
   /// NOTE: This game could be made more black-box.
@@ -316,7 +316,7 @@ namespace emp {
       emp_assert(IsValidPlayer(player) && pos.IsValid());    // Validate position and player.
       emp_assert(GetPosOwner(pos) == Player::NONE);          // Make sure position is empty.
       SetPos(pos, player);                                   // Take position for player.
-      DoFlips(player, pos);                                  // Flip tiles on the board.      
+      DoFlips(player, pos);                                  // Flip tiles on the board.
       auto opp_moves = HasMoveOptions(GetOpponent(player));  // Test if opponent can go.
       if (opp_moves) { cur_player = GetOpponent(player); return false; }
 
