@@ -1,7 +1,7 @@
 #ifndef POLYFILL_SPAN_H
 #define POLYFILL_SPAN_H
 
-#include "../../third-party/span-lite/include/nonstd/span.hpp"
+#include "../../../third-party/span-lite/include/nonstd/span.hpp"
 
 // alias span-lite's nonstd::span to std::span
 // this is done to ease transition to C++20 spans at a later point
