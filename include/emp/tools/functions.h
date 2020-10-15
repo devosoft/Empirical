@@ -21,8 +21,8 @@
 #include "../base/assert.h"
 #include "../base/vector.h"
 
-#include "const.h"
-#include "math.h"
+#include "../math/constants.h"
+#include "../math/math.h"
 
 /// A simple macro to time how long it takes for a function to complete.
 #define EMP_FUNCTION_TIMER(TEST_FUN) {                                       \

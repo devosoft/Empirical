@@ -9,11 +9,11 @@
  *
  *  TypeTracker is a templated class that must be declared with all of the types that can
  *  possibly be tracked.  For example:
- * 
+ *
  *      emp::TypeTracker<int, std::string, double> tt;
- * 
+ *
  *  ...would create a TypeTracker that can manage the three types listed and convert back.
- * 
+ *
  *  @todo Should use std::is_convertible<X,Y>::value to determine if casting on base type is allowed.
  *  @todo Functions should be able to have fixed type values mixed in.
  */
@@ -27,10 +27,9 @@
 #include "../base/assert.h"
 #include "../meta/meta.h"
 #include "../base/Ptr.h"
-
+#include "../datastructs/map_utils.h"
+#include "../functional/GenericFunction.h"
 #include "functions.h"
-#include "GenericFunction.h"
-#include "map_utils.h"
 
 namespace emp {
 
