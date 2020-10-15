@@ -8,7 +8,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "base/assert.h"
+#include "emp/base/assert.h"
 
 #include <sstream>
 #include <iostream>

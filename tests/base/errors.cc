@@ -6,7 +6,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "base/errors.h"
+#include "emp/base/errors.h"
 
 #include <sstream>
 #include <iostream>
@@ -25,7 +25,7 @@ TEST_CASE("Test errors", "[base]")
 	REQUIRE(empty.id == "");
 	REQUIRE(empty.desc == "");
 	REQUIRE(empty.default_to_error == false);
-	
+
 	std::stringstream ss; // redirect cerr
 	std::streambuf *old = std::cerr.rdbuf(ss.rdbuf());
 

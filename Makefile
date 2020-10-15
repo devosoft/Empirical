@@ -35,7 +35,7 @@ test-web:
 
 test-cookiecutter: ../cookiecutter-empirical-project
 	. third-party/env/bin/activate && \
-	export COOKIECUTTER_EMP_DIR=../../Empirical/source && \
+	export COOKIECUTTER_EMP_DIR=../../Empirical/include && \
 	cd ../cookiecutter-empirical-project && make clean && make test
 
 doc:

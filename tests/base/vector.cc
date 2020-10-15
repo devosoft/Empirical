@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "base/vector.h"
+#include "emp/base/vector.h"
 
 #include <sstream>
 #include <iostream>
@@ -48,7 +48,7 @@ TEST_CASE("Test vector", "[base]")
 	REQUIRE(ss.str() == "1 0 1 ");
 	ss.str(std::string());
 #endif
-	
+
 	emp::vector<bool> bvec3(3);
 	/// Can't do this
 	/// "error: invalid initialization of non-const reference of type 'bool&' from an rvalue of type 'bool'"
