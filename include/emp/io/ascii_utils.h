@@ -17,7 +17,7 @@
 
 #include "../base/assert.h"
 #include "../base/vector.h"
-#include "../tools/vector_utils.h"
+#include "../datastructs/vector_utils.h"
 
 namespace emp {
 

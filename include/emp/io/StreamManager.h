@@ -20,7 +20,7 @@
 #include <unordered_map>
 
 #include "../base/Ptr.h"
-#include "map_utils.h"
+#include "../datastructs/map_utils.h"
 
 namespace emp {
 
@@ -44,7 +44,7 @@ namespace emp {
     }
 
   };
-  
+
 }
 
 #endif
