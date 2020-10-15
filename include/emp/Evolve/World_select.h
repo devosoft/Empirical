@@ -17,10 +17,10 @@
 #include "../base/assert.h"
 #include "../base/vector.h"
 #include "../base/macros.h"
+#include "../datastructs/IndexMap.h"
+#include "../datastructs/vector_utils.h"
+#include "../math/Random.h"
 #include "../meta/reflection.h"
-#include "../tools/IndexMap.h"
-#include "../tools/Random.h"
-#include "../tools/vector_utils.h"
 
 namespace emp {
 

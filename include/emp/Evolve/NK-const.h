@@ -16,9 +16,9 @@
 #include <array>
 
 #include "../base/assert.h"
-#include "../tools/BitSet.h"
-#include "../tools/math.h"
-#include "../tools/Random.h"
+#include "../bits/BitSet.h"
+#include "../math/math.h"
+#include "../math/Random.h"
 
 namespace emp {
 namespace evo {

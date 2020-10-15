@@ -26,12 +26,11 @@
 #include "../base/assert.h"
 #include "../base/Ptr.h"
 #include "../base/vector.h"
-
-#include "../tools/BitVector.h"
-#include "../tools/File.h"
-#include "../tools/map_utils.h"
-#include "../tools/math.h"
-#include "../tools/Random.h"
+#include "../bits/BitVector.h"
+#include "../datastructs/map_utils.h"
+#include "../io/File.h"
+#include "../math/math.h"
+#include "../math/Random.h"
 
 namespace emp {
 

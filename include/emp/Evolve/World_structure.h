@@ -16,9 +16,9 @@
 #include "../base/vector.h"
 #include "../base/array.h"
 #include "../data/Trait.h"
-#include "../tools/math.h"
-#include "../tools/Random.h"
-#include "../tools/vector_utils.h"
+#include "../math/math.h"
+#include "../math/Random.h"
+#include "../datastructs/vector_utils.h"
 
 namespace emp {
 

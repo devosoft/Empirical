@@ -31,10 +31,10 @@
 #include "../control/Signal.h"
 #include "../data/DataManager.h"
 #include "../data/DataNode.h"
-#include "../tools/info_theory.h"
-#include "../tools/map_utils.h"
-#include "../tools/set_utils.h"
-#include "../tools/stats.h"
+#include "../math/info_theory.h"
+#include "../datastructs/map_utils.h"
+#include "../datastructs/set_utils.h"
+#include "../math/stats.h"
 #include "../tools/string_utils.h"
 
 namespace emp {

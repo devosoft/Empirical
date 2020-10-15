@@ -18,8 +18,8 @@
 #include <type_traits>
 
 #include "../base/assert.h"
+#include "../math/Random.h"
 #include "../meta/reflection.h"
-#include "../tools/Random.h"
 
 namespace emp {
 

@@ -37,11 +37,11 @@
 #include "../data/DataFile.h"
 #include "../data/DataManager.h"
 #include "../data/Trait.h"
+#include "../datastructs/map_utils.h"
+#include "../math/Random.h"
+#include "../math/Range.h"
+#include "../math/random_utils.h"
 #include "../meta/reflection.h"
-#include "../tools/map_utils.h"
-#include "../tools/Random.h"
-#include "../tools/Range.h"
-#include "../tools/random_utils.h"
 #include "../tools/string_utils.h"
 
 // World-specific includes.
