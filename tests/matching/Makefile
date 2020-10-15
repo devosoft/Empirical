@@ -16,7 +16,7 @@ coverage-%:
 coverage: coverage_conversion $(addprefix coverage-, $(TEST_NAMES))
 
 coverage_conversion:
-	../convert_for_tests.sh
+	cd .. && ./convert_for_tests.sh
 
 opt-%:
 	cd $(@:opt-%=%) && make opt
