@@ -13,8 +13,8 @@
 #ifndef EMP_MATCH_BIN_UTILS_H
 #define EMP_MATCH_BIN_UTILS_H
 
-#include "../tools/matchbin_metrics.h"
-#include "../tools/matchbin_selectors.h"
-#include "../tools/matchbin_regulators.h"
+#include "../matchbin/matchbin_metrics.h"
+#include "../matchbin/matchbin_selectors.h"
+#include "../matchbin/matchbin_regulators.h"
 
 #endif

@@ -31,12 +31,12 @@
 #include "../base/array.h"
 #include "../base/optional.h"
 #include "../base/vector.h"
-#include "../tools/math.h"
-#include "../tools/IndexMap.h"
-#include "../tools/BitSet.h"
-#include "../tools/Distribution.h"
+#include "../bits/BitSet.h"
+#include "../datastructs/hash_utils.h"
+#include "../datastructs/IndexMap.h"
+#include "../math/math.h"
+#include "../math/Distribution.h"
 #include "../tools/string_utils.h"
-#include "../tools/hash_utils.h"
 
 namespace emp {
 

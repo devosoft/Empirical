@@ -28,12 +28,12 @@
 #include "../base/assert.h"
 #include "../base/array.h"
 #include "../base/vector.h"
-#include "../tools/Distribution.h"
-#include "../tools/math.h"
-#include "../tools/IndexMap.h"
-#include "../tools/BitSet.h"
+#include "../bits/BitSet.h"
+#include "../datastructs/IndexMap.h"
+#include "../datastructs/hash_utils.h"
+#include "../math/Distribution.h"
+#include "../math/math.h"
 #include "../tools/string_utils.h"
-#include "../tools/hash_utils.h"
 
 namespace emp {
 
