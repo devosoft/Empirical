@@ -30,10 +30,10 @@
 #include "../base/vector.h"
 #include "../base/assert.h"
 #include "../meta/ValPack.h"
-#include "../tools/FunctionSet.h"
-#include "../tools/IndexMap.h"
+#include "../datastructs/IndexMap.h"
+#include "../functional/FunctionSet.h"
+#include "../math/math.h"
 #include "../tools/string_utils.h"
-#include "../tools/math.h"
 
 namespace emp {
 

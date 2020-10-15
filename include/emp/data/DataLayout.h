@@ -16,8 +16,8 @@
 
 #include "../base/assert.h"
 #include "../base/vector.h"
+#include "../datastructs/map_utils.h"
 #include "../meta/TypeID.h"
-#include "../tools/map_utils.h"
 
 #include "MemoryImage.h"
 

@@ -14,7 +14,7 @@
 #include <string>
 
 #include "../base/assert.h"
-#include "../tools/map_utils.h"
+#include "../datastructs/map_utils.h"
 
 #include "DataNode.h"
 

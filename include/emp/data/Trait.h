@@ -18,7 +18,7 @@
 #include "../base/assert.h"
 #include "../base/Ptr.h"
 #include "../base/vector.h"
-#include "../tools/Range.h"
+#include "../math/Range.h"
 #include "../tools/string_utils.h"
 
 namespace emp {

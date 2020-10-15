@@ -17,8 +17,8 @@
 
 #include "../base/assert.h"
 #include "../base/vector.h"
-#include "../tools/ascii_utils.h"
-#include "../tools/vector_utils.h"
+#include "../datastructs/vector_utils.h"
+#include "../io/ascii_utils.h"
 
 namespace emp {
 
@@ -70,7 +70,7 @@ namespace emp {
     {
       emp::AsciiHistogram(data, num_bins, max_width, show_scale, os);
     }
-  };   
+  };
 }
 
 #endif

@@ -18,9 +18,9 @@
 #include "../base/assert.h"
 #include "../base/vector.h"
 #include "../meta/type_traits.h"
-#include "../tools/FunctionSet.h"
+#include "../functional/FunctionSet.h"
+#include "../io/NullStream.h"
 #include "../tools/string_utils.h"
-#include "../tools/NullStream.h"
 
 #include "DataNode.h"
 

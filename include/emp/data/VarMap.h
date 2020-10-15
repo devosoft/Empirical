@@ -17,8 +17,8 @@
 #include "../base/Ptr.h"
 #include "../base/unordered_map.h"
 #include "../base/vector.h"
+#include "../datastructs/map_utils.h"
 #include "../meta/TypeID.h"
-#include "../tools/map_utils.h"
 #include "../tools/string_utils.h"
 
 namespace emp {
@@ -123,7 +123,7 @@ namespace emp {
     TypeID GetType(size_t id) const { return vars[id]->GetTypeID(); }
     TypeID GetType(std::string name) const { return GetType(GetID(name)); }
 
-    // Common Type-specific Accessors    
+    // Common Type-specific Accessors
     std::string & GetString(const std::string & name) { return Get<std::string>(name); }
     int & GetInt(const std::string & name) { return Get<int>(name); }
     double & GetDouble(const std::string & name) { return Get<double>(name); }
