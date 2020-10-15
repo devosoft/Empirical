@@ -18,12 +18,12 @@
 #include <algorithm>
 
 #include "../base/errors.h"
+#include "../bits/BitSet.h"
+#include "../datastructs/map_utils.h"
 #include "../hardware/EventDrivenGP.h"
-#include "../tools/BitSet.h"
-#include "../tools/math.h"
-#include "../tools/Random.h"
-#include "../tools/random_utils.h"
-#include "../tools/map_utils.h"
+#include "../math/math.h"
+#include "../math/Random.h"
+#include "../math/random_utils.h"
 
 namespace emp {
 

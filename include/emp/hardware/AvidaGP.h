@@ -26,9 +26,9 @@
 #include "../base/array.h"
 #include "../base/Ptr.h"
 #include "../base/vector.h"
-#include "../tools/File.h"
-#include "../tools/map_utils.h"
-#include "../tools/Random.h"
+#include "../datastructs/map_utils.h"
+#include "../io/File.h"
+#include "../math/Random.h"
 #include "../tools/string_utils.h"
 
 #include "AvidaCPU_InstLib.h"

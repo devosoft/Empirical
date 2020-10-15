@@ -10,7 +10,7 @@
 #ifndef EMP_AVIDA_CPU_INST_LIB_H
 #define EMP_AVIDA_CPU_INST_LIB_H
 
-#include "../tools/math.h"
+#include "../math/math.h"
 
 #include "InstLib.h"
 

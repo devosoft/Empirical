@@ -8,23 +8,23 @@
 #include <utility>
 #include <algorithm>
 #include <ratio>
-#include "InstLib.h"
-#include "EventLib.h"
 #include "../../third-party/cereal/include/cereal/cereal.hpp"
 #include "../../third-party/cereal/include/cereal/types/string.hpp"
 #include "../../third-party/cereal/include/cereal/types/unordered_map.hpp"
 #include "../../third-party/cereal/include/cereal/types/unordered_set.hpp"
-#include "../tools/BitSet.h"
-#include "../tools/BitVector.h"
-#include "../tools/map_utils.h"
+#include "../bits/BitSet.h"
+#include "../bits/BitVector.h"
+#include "../datastructs/map_utils.h"
 #include "../tools/string_utils.h"
-#include "../tools/Random.h"
-#include "../tools/MatchBin.h"
+#include "../math/Random.h"
+#include "../matchbin/MatchBin.h"
 #include "../base/vector.h"
 #include "../base/Ptr.h"
 #include "../base/array.h"
 #include "../control/SignalControl.h"
 #include "../control/Signal.h"
+#include "InstLib.h"
+#include "EventLib.h"
 
 // Developer Notes:
 //  * Program struct's PrintProgram prints program in a maximally readable format. However, this format
