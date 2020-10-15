@@ -1,5 +1,5 @@
 # Pull base image.
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 COPY . /opt/Empirical
 
@@ -91,8 +91,14 @@ RUN \
   apt-get install -y \
     gtk2-engines-pixbuf \
     firefox \
+    libnss3 \
+    lsb-release \
+    xdg-utils \
     && \
   echo "installed headless firefox dependencies"
+
+# magic from https://github.com/puppeteer/puppeteer/issues/3451#issuecomment-523961368
+RUN echo 'kernel.unprivileged_userns_clone=1' > /etc/sysctl.d/userns.conf
 
 RUN \
   apt-get install -y \
@@ -101,6 +107,8 @@ RUN \
     build-essential=12.4ubuntu1 \
     python-virtualenv=15.1.0+ds-1.1 \
     python-pip=9.0.1-2.3~ubuntu1.18.04.3 \
+    python3-virtualenv \
+    python3-pip \
     nodejs=8.10.0~dfsg-2ubuntu0.4 \
     npm=3.5.2-0ubuntu4 \
     tar=1.29b-2ubuntu0.1 \
@@ -139,6 +147,11 @@ RUN \
   echo "finalized set up dependency versions"
 
 RUN \
+  pip3 install -r /opt/Empirical/doc/requirements.txt \
+    && \
+  echo "installed documentation build requirements"
+
+RUN \
   cd /opt/Empirical \
     && \
   git submodule deinit -f . \
@@ -155,6 +168,13 @@ RUN \
   make install-test-dependencies \
     && \
   echo "installed test dependencies"
+
+RUN \
+  cd /opt/Empirical \
+    && \
+  git remote set-url origin https://github.com/devosoft/Empirical.git \
+    && \
+  echo "switched to https origin remote url"
 
 RUN \
   /etc/init.d/xvfb start \
@@ -186,6 +206,44 @@ RUN \
   chmod a+x /opt/entrypoint.sh \
     && \
   echo "make entrypoint script executable"
+
+# Adapted from https://github.com/karma-runner/karma-firefox-launcher/issues/93#issuecomment-519333245
+# Maybe important for container compatability running on Windows?
+RUN \
+  cd /opt/ \
+  && \
+  npm install -g yarn \
+  && \
+  git clone https://github.com/karma-runner/karma-firefox-launcher.git \
+  && \
+  cd karma-firefox-launcher \
+  && \
+  yarn install \
+  && \
+  echo "installed karma-firefox-launcher"
+  
+RUN \
+  pip install -r /opt/Empirical/third-party/requirements.txt \
+    && \
+  echo "installed documentation build requirements"
+
+# Perform any further action as an unprivileged user.
+# adapted from https://stackoverflow.com/a/27703359
+# and https://superuser.com/a/235398
+RUN \
+  useradd --create-home --shell /bin/bash user \
+    && \
+  groupadd group \
+    && \
+  gpasswd -a user group \
+    && \
+  chgrp --recursive user /opt \
+    && \
+  chmod --recursive g+rwx /opt \
+    && \
+  echo "user added and granted permissions to /opt"
+
+USER user
 
 # Define default entrypoint.
 ENTRYPOINT ["/opt/entrypoint.sh"]

@@ -1,3 +1,7 @@
+.PHONY: test test-examples test-native test-native-regular test-native-fulldebug test-native-examples test-web test-web-examples \
+	test-cookiecutter doc coverage install-dependencies install-doc-dependencies install-coverage-dependencies install-test-dependencies \
+	clean clean-dep
+
 test: test-native test-examples test-web
 	make test-native
 	make test-examples
@@ -31,26 +35,19 @@ test-web:
 
 test-cookiecutter: ../cookiecutter-empirical-project
 	. third-party/env/bin/activate && \
+	export COOKIECUTTER_EMP_DIR=../../Empirical/source && \
 	cd ../cookiecutter-empirical-project && make clean && make test
 
-doc: build-doxygen-xml
-	cd doc && ./make_docs.sh
+doc:
+	cd doc && make html coverage
 
 coverage:
 	cd tests && make coverage
-
-build-doxygen-xml:
-	./third-party/doxygen/build/bin/doxygen Doxyfile
 
 install-dependencies:
 	git submodule init
 	git submodule update
 	cd third-party && make
-
-install-doc-dependencies:
-	git submodule init
-	git submodule update
-	cd third-party && make install-doc-dependencies
 
 install-test-dependencies:
 	cd third-party && make install-test-dependencies

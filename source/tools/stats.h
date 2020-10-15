@@ -85,7 +85,7 @@ namespace emp {
   /// If values are pointers, they will be automatically de-referenced
   /// Values must be numeric.
   template <typename C>
-  emp::sfinae_decoy<double, typename C::value_type> 
+  emp::sfinae_decoy<double, typename C::value_type>
   Mean(C & elements) {
     return (double)Sum(elements)/ (double) elements.size();
   }
@@ -106,7 +106,7 @@ namespace emp {
   /// If values are pointers, they will be automatically de-referenced
   /// Values must be numeric.
   template <typename C>
-  emp::sfinae_decoy<double, typename C::value_type> 
+  emp::sfinae_decoy<double, typename C::value_type>
   StandardDeviation(C & elements) {
     return sqrt(Variance(elements));
   }
@@ -120,7 +120,7 @@ namespace emp {
                            elements.end());
     return unique_elements.size();
   }
-
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   /// Count the number of unique elements in the container of pointers. (compares objects pointed
   /// to; pointers do not have to be identical)
   template <typename C>
@@ -135,7 +135,7 @@ namespace emp {
 
     return unique_elements.size();
   }
-
+#endif
   /// Run the provided function on every member of a container and return the MAXIMUM result.
   template <typename C, typename RET_TYPE, typename ARG_TYPE>
   RET_TYPE MaxResult(std::function<RET_TYPE(ARG_TYPE)> & fun, C & elements){
@@ -161,7 +161,7 @@ namespace emp {
   /// Run the provided function on every member of a container and return the AVERAGE result.
   /// Function must return a scalar (i.e. numeric) type.
   template <typename C, typename RET_TYPE, typename ARG_TYPE>
-  typename std::enable_if<std::is_scalar<RET_TYPE>::value, double>::type 
+  typename std::enable_if<std::is_scalar<RET_TYPE>::value, double>::type
   MeanResult(std::function<RET_TYPE(ARG_TYPE)> & fun, C & elements){
     double cumulative_value = 0;
     double count = 0;

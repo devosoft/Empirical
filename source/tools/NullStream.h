@@ -31,6 +31,9 @@ namespace emp {
       NullBuffer m_sb{};
   };
 
+  /// No-operation drop-in replacement for std::cout
+  static NullStream nout;
+
 }
 
 #endif

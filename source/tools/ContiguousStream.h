@@ -8,6 +8,9 @@
  *  @note Status: RELEASE
  */
 
+#ifndef EMP_CONTIGUOUS_STREAM_H
+#define EMP_CONTIGUOUS_STREAM_H
+
 #include <iostream>
 
 #include "../base/vector.h"
@@ -180,4 +183,6 @@ namespace emp {
 
   };
 
-}
+} // namespace emp
+
+#endif // #ifdef EMP_CONTIGUOUS_STREAM_H

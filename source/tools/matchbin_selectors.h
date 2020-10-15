@@ -13,7 +13,6 @@
 #define EMP_MATCH_BIN_SELECTORS_H
 
 #include <iostream>
-#include <unordered_map>
 #include <unordered_set>
 #include <functional>
 #include <algorithm>
@@ -26,14 +25,16 @@
 #include <utility>
 #include <limits>
 
-#include "tools/Distribution.h"
+#include "../../third-party/robin-hood-hashing/src/include/robin_hood.h"
 
 #include "../base/assert.h"
 #include "../base/array.h"
+#include "../base/optional.h"
 #include "../base/vector.h"
 #include "../tools/math.h"
 #include "../tools/IndexMap.h"
 #include "../tools/BitSet.h"
+#include "../tools/Distribution.h"
 #include "../tools/string_utils.h"
 #include "../tools/hash_utils.h"
 
@@ -42,35 +43,37 @@ namespace emp {
   struct CacheStateBase {
     CacheStateBase() = default;
     virtual ~CacheStateBase() {};
-    virtual std::optional<emp::vector<size_t>> operator()(size_t n) = 0;
+    virtual emp::optional<emp::vector<size_t>> operator()(size_t n) = 0;
   };
 
   struct RouletteCacheState : public CacheStateBase {
 
     emp::IndexMap indexMap;
     emp::vector<size_t> uids;
-    emp::Random& rand;
+    emp::Random* rand; // non-owning ptr
     size_t default_n;
+
+    RouletteCacheState() = default;
 
     RouletteCacheState(
       emp::IndexMap& im,
-      emp::vector<size_t>& ids,
+      emp::vector<size_t> ids,
       emp::Random& r,
       const size_t default_n_
     ) : indexMap(im)
-      , uids(ids)
-      , rand(r)
+      , uids( std::move(ids) )
+      , rand(&r)
       , default_n(default_n_)
     { ; }
 
-    std::optional<emp::vector<size_t>> operator()(size_t n) override {
+    emp::optional<emp::vector<size_t>> operator()(size_t n) override {
 
       if (n == std::numeric_limits<size_t>::max()) n = default_n;
 
       // don't perform a lookup into an empty IndexMap, that's a segfault
       // double braces: an empty vector inside an optional
       if (indexMap.GetSize() == 0) {
-        return std::optional<emp::vector<size_t>>{emp::vector<size_t>{}};
+        return emp::optional<emp::vector<size_t>>{emp::vector<size_t>{}};
       }
 
       emp::vector<size_t> res;
@@ -81,7 +84,7 @@ namespace emp {
         const double match_pos = (
           indexMap.GetSize() == 1
           ? 0
-          : rand.GetDouble(indexMap.GetWeight())
+          : rand->GetDouble(indexMap.GetWeight())
         );
         const size_t idx = indexMap.Index(match_pos);
         res.push_back(uids[idx]);
@@ -95,22 +98,24 @@ namespace emp {
 
     emp::vector<size_t> uids;
     emp::vector<double> probs;
-    emp::Random& rand;
+    emp::Random* rand; // non-owning ptr
     size_t default_n;
 
+
+    SieveCacheState() = default;
+
     SieveCacheState(
-      emp::vector<size_t>::iterator uids_begin,
-      emp::vector<size_t>::iterator uids_end,
+      emp::vector<size_t> uids_,
       const emp::vector<double> & probs_,
       emp::Random& r,
       const size_t default_n_
-    ) : uids(uids_begin, uids_end)
+    ) : uids( std::move(uids_) )
       , probs(probs_)
-      , rand(r)
+      , rand(&r)
       , default_n(default_n_)
     { emp_assert(uids.size() == probs.size()); }
 
-    std::optional<emp::vector<size_t>> operator()(size_t n) override {
+    emp::optional<emp::vector<size_t>> operator()(size_t n) override {
 
       if (n == std::numeric_limits<size_t>::max()) n = default_n;
 
@@ -118,7 +123,7 @@ namespace emp {
 
       for (size_t i = 0; i < uids.size() && res.size() < n; ++i) {
 
-        if (probs[i] == 1.0 || rand.GetDouble() < probs[i]) {
+        if (probs[i] == 1.0 || rand->GetDouble() < probs[i]) {
           res.push_back(uids[i]);
         }
 
@@ -138,16 +143,15 @@ namespace emp {
 
     RankedCacheState() = default;
     RankedCacheState(
-      emp::vector<size_t>::iterator begin,
-      emp::vector<size_t>::iterator back,
+      emp::vector<size_t> uids_,
       size_t n,
       size_t default_n_
-    ) : uids(begin, back)
+    ) : uids( std::move(uids_) )
       , requestSize(n)
       , default_n(default_n_)
     { ; }
 
-    std::optional<emp::vector<size_t>> operator()(size_t n) override {
+    emp::optional<emp::vector<size_t>> operator()(size_t n) override {
       if (n == std::numeric_limits<size_t>::max()) n = default_n;
 
       if (n > requestSize) return std::nullopt;
@@ -166,8 +170,7 @@ namespace emp {
   struct SelectorBase {
     virtual ~SelectorBase() {};
     virtual CacheType operator()(
-        const emp::vector<size_t>& uids,
-        const std::unordered_map<size_t, double>& scores,
+        emp::vector< std::pair<size_t, double> > scores,
         size_t n
         ) = 0;
     virtual std::string name() const = 0;
@@ -179,6 +182,8 @@ namespace emp {
     size_t DefaultN = 1
   >
   struct RankedSelector : public SelectorBase<RankedCacheState> {
+
+    RankedSelector() = default;
 
     RankedSelector(emp::Random&){ ; }
 
@@ -199,14 +204,11 @@ namespace emp {
     }
 
     RankedCacheState operator()(
-      const emp::vector<size_t>& uids_,
-      const std::unordered_map<size_t, double>& scores,
+      emp::vector< std::pair<size_t, double> > scores,
       size_t n
     ) override {
 
       if (n == std::numeric_limits<size_t>::max()) n = DefaultN;
-
-      emp::vector<size_t> uids(uids_);
 
       // treat any negative numerator as positive infinity
       constexpr double thresh = (
@@ -218,25 +220,34 @@ namespace emp {
 
       // Perform a bounded partial sort to find the first n results
       std::partial_sort(
-        std::begin(uids),
-        std::begin(uids) + std::min(n, uids.size()),
-        std::end(uids),
-        [&scores](const size_t &a, const size_t &b){
-          return scores.at(a) < scores.at(b);
+        std::begin(scores),
+        std::begin(scores) + std::min(n, scores.size()),
+        std::end(scores),
+        [](const auto& a, const auto& b){
+          return a.second < b.second;
         }
       );
 
       // Binary search for threshold
       const auto back = std::upper_bound(
-        std::begin(uids),
-        std::begin(uids) + std::min(n, uids.size()),
+        std::begin(scores),
+        std::begin(scores) + std::min(n, scores.size()),
         thresh,
-        [&scores](const double &amt, const size_t &uid){
-          return amt < scores.at(uid);
+        [](const double amt, const auto &data){
+          return amt < data.second;
         }
       );
 
-      return RankedCacheState(std::begin(uids), back, n, DefaultN);
+      emp::vector<size_t> res;
+      res.reserve( std::distance(std::begin(scores), back) );
+      std::transform(
+        std::begin(scores),
+        back,
+        std::back_inserter(res),
+        [](const auto& pair){ return pair.first; }
+      );
+
+      return RankedCacheState( std::move(res), n, DefaultN );
     }
 
   };
@@ -292,14 +303,11 @@ namespace emp {
     }
 
     RouletteCacheState operator()(
-      const emp::vector<size_t>& uids_,
-      const std::unordered_map<size_t, double>& scores,
+      emp::vector< std::pair<size_t, double> > scores,
       size_t n
     ) override {
 
       if (n == std::numeric_limits<size_t>::max()) n = DefaultN;
-
-      emp::vector<size_t> uids(uids_);
 
       constexpr double skew = (
         static_cast<double>(SkewRatio::num)/static_cast<double>(SkewRatio::den)
@@ -331,11 +339,11 @@ namespace emp {
       )->second;
 
       const size_t partition = std::distance(
-        std::begin(uids),
+        std::begin(scores),
         std::partition(
-          std::begin(uids),
-          std::end(uids),
-          [&scores](size_t uid){ return scores.at(uid) <= thresh; }
+          std::begin(scores),
+          std::end(scores),
+          [thresh](const auto& pair){ return pair.second <= thresh; }
         )
       );
 
@@ -347,14 +355,23 @@ namespace emp {
       emp_assert(baseline >= 0);
       emp_assert(baseline <= max_baseline);
 
-      IndexMap match_index(partition);
+      IndexMap match_index( partition );
 
       for (size_t p = 0; p < partition; ++p) {
-        emp_assert(scores.at(uids[p]) - baseline >= 0);
-        match_index.Adjust(p, 1.0 / ( skew + scores.at(uids[p]) - baseline ));
+        emp_assert( scores[p].second - baseline >= 0 );
+        match_index.Adjust(p, 1.0 / ( skew + scores[p].second - baseline ));
       }
 
-      return RouletteCacheState(match_index, uids, rand, DefaultN);
+      emp::vector<size_t> uids;
+      uids.reserve( scores.size() );
+      std::transform(
+        std::begin(scores),
+        std::begin(scores) + partition,
+        std::back_inserter(uids),
+        [](const auto& pair){ return pair.first; }
+      );
+
+      return RouletteCacheState(match_index, std::move(uids), rand, DefaultN);
 
     }
 
@@ -420,14 +437,11 @@ namespace emp {
     }
 
     RouletteCacheState operator()(
-      const emp::vector<size_t>& uids_,
-      const std::unordered_map<size_t, double>& scores,
+      emp::vector< std::pair<size_t, double> > scores,
       size_t n
     ) override {
 
       if (n == std::numeric_limits<size_t>::max()) n = DefaultN;
-
-      emp::vector<size_t> uids(uids_);
 
       constexpr double b = (
         static_cast<double>(BRatio::num) / static_cast<double>(BRatio::den)
@@ -469,11 +483,11 @@ namespace emp {
       )->second;
 
       const size_t partition = std::distance(
-        std::begin(uids),
+        std::begin(scores),
         std::partition(
-          std::begin(uids),
-          std::end(uids),
-          [&scores](size_t uid){ return scores.at(uid) <= thresh; }
+          std::begin(scores),
+          std::end(scores),
+          [thresh](const auto& pair){ return pair.second <= thresh; }
         )
       );
 
@@ -485,20 +499,29 @@ namespace emp {
       emp_assert(baseline >= 0);
       emp_assert(baseline <= max_baseline);
 
-      IndexMap match_index(partition);
+      IndexMap match_index( partition );
 
       for (size_t p = 0; p < partition; ++p) {
-        emp_assert(scores.at(uids[p]) - baseline >= 0);
+        emp_assert(scores[p].second - baseline >= 0);
         match_index.Adjust(
           p,
           std::pow(
             b,
-            std::pow(c * (scores.at(uids[p]) - baseline), z)
+            std::pow(c * scores[p].second - baseline, z)
           )
         );
       }
 
-      return RouletteCacheState(match_index, uids, rand, DefaultN);
+      emp::vector<size_t> uids;
+      uids.reserve( scores.size() );
+      std::transform(
+        std::begin(scores),
+        std::begin(scores) + partition,
+        std::back_inserter(uids),
+        [](const auto& pair){ return pair.first; }
+      );
+
+      return RouletteCacheState(match_index, std::move(uids), rand, DefaultN);
 
     }
 
@@ -552,18 +575,15 @@ namespace emp {
 
     // scores (post-regulation) are assumed to be between 0 and 1
     SieveCacheState operator()(
-      const emp::vector<size_t>& uids_,
-      const std::unordered_map<size_t, double>& scores,
+      emp::vector< std::pair<size_t, double> > scores,
       size_t n
     ) override {
 
       if (n == std::numeric_limits<size_t>::max()) n = DefaultN;
 
-      emp::vector<size_t> uids(uids_);
-
       // if n is too small, the Selector probably isn't being used correctly
       // or the wrong Selector is probably being used
-      emp_assert(n >= uids.size());
+      emp_assert(n >= scores.size());
 
       constexpr double lock_in_raw = (
         static_cast<double>(LockInRatio::num)
@@ -571,7 +591,7 @@ namespace emp {
       );
 
       const double lock_in = lock_in_raw < 0.0 ? (
-        (-1.0 * lock_in_raw) / static_cast<double>(uids.size())
+        (-1.0 * lock_in_raw) / static_cast<double>(scores.size())
       ) : lock_in_raw;
 
       // treat any negative numerator as positive infinity
@@ -585,25 +605,25 @@ namespace emp {
       ) : stochastic_raw;
 
       const auto partition = std::partition(
-        std::begin(uids),
-        std::end(uids),
-        [&scores, lock_in, stochastic](size_t uid){
-          return scores.at(uid) < lock_in + stochastic;
+        std::begin(scores),
+        std::end(scores),
+        [&scores, lock_in, stochastic](const auto& pair){
+          return pair.second < lock_in + stochastic;
         }
       );
 
       emp::vector<double> probabilities;
       std::transform(
-        std::begin(uids),
+        std::begin(scores),
         partition,
         std::back_inserter(probabilities),
-        [&scores, lock_in, stochastic](size_t uid){
+        [&scores, lock_in, stochastic](const auto& pair){
           // goal:
           // RAW SCORE:    0.0 ... lock_in ... lock_in + stochastic ... 1.0
           // INTERMEDIATE: 0.0 ... 0.0 ... -> ... 1.0 ...           ... 1.0
           // RESULT:       1.0 ... 1.0 ... -> ... 0.0 ...           ... 0.0
 
-          const double raw_score = scores.at(uid);
+          const double raw_score = pair.second;
           const double intermediate = stochastic ? std::max(
             0.0,
             (raw_score - lock_in) / stochastic
@@ -614,9 +634,17 @@ namespace emp {
         }
       );
 
-      return SieveCacheState(
-        std::begin(uids),
+      emp::vector<size_t> uids;
+      uids.reserve( scores.size() );
+      std::transform(
+        std::begin(scores),
         partition,
+        std::back_inserter(uids),
+        [](const auto& pair){ return pair.first; }
+      );
+
+      return SieveCacheState(
+        uids,
         probabilities,
         rand,
         DefaultN

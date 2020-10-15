@@ -51,19 +51,25 @@ namespace emp {
   // Trick to call a function using each entry in a parameter pack.
 #define EMP_EXPAND_PPACK(PPACK) ::emp::run_and_ignore{ 0, ((PPACK), void(), 0)... }
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Check to see if a specified type is part of a set of types.
   template <typename TEST> constexpr bool has_type() { return false; }
+#endif
   template <typename TEST, typename FIRST, typename... OTHERS>
   constexpr bool has_type() { return std::is_same<TEST, FIRST>() || has_type<TEST,OTHERS...>(); }
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Count how many times a specified type appears in a set of types.
   template <typename TEST> constexpr size_t count_type() { return 0; }
+#endif
   template <typename TEST, typename FIRST, typename... OTHERS>
   constexpr size_t count_type() { return count_type<TEST,OTHERS...>() + (std::is_same<TEST, FIRST>()?1:0); }
 
   // Return the index of a test type in a set of types.
   namespace internal {
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
     template <typename TEST_T> constexpr int get_type_index_impl() { return -1; } // Not found!
+#endif
     template <typename TEST_T, typename T1, typename... Ts>
     constexpr int get_type_index_impl() {
       if (std::is_same<TEST_T, T1>()) return 0;                     // Found here!
@@ -79,8 +85,10 @@ namespace emp {
   // These functions can be used to test if a type-set has all unique types or not.
 
   // Base cases...
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename TYPE1> constexpr bool has_unique_first_type() { return true; }
   template <typename TYPE1> constexpr bool has_unique_types() { return true; }
+#endif
 
   template <typename TYPE1, typename TYPE2, typename... TYPE_LIST>
   constexpr bool has_unique_first_type() {

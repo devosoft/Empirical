@@ -534,8 +534,29 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(bitBin.GetVals(bitBin.Match(bs11, 2)) == (emp::vector<std::string>{"eleven", "three"}));
   REQUIRE(bitBin.GetTags(bitBin.Match(bs11, 2)) == (emp::vector<emp::BitSet<32>>{bs11, bs3}));
 
-  REQUIRE(bitBin.GetVals(bitBin.Match(bs3, 5)) == (emp::vector<std::string> {"three","one","eleven"}));
-  REQUIRE(bitBin.GetTags(bitBin.Match(bs3, 5)) == (emp::vector<emp::BitSet<32>> {bs3, bs1, bs11}));
+  {
+  const auto res{ bitBin.GetVals(bitBin.Match(bs3, 5)) };
+
+  const bool in_first_okay_order =
+    res == (emp::vector<std::string> {"three","one","eleven"})
+  ;
+  const bool in_second_okay_order =
+    res == (emp::vector<std::string> {"three","eleven","one"})
+  ;
+  REQUIRE( (in_first_okay_order || in_second_okay_order) );
+  }
+
+  {
+  const auto res{ bitBin.GetTags(bitBin.Match(bs3, 5)) };
+
+  const bool in_first_okay_order =
+    res == (emp::vector<emp::BitSet<32>> {bs3, bs1, bs11})
+  ;
+  const bool in_second_okay_order =
+    res == (emp::vector<emp::BitSet<32>> {bs3, bs11, bs1})
+  ;
+  REQUIRE( (in_first_okay_order || in_second_okay_order) );
+  }
 
   REQUIRE (bitBin.Size() == 3);
 
@@ -795,6 +816,47 @@ TEST_CASE("Test MatchBin", "[tools]")
   REQUIRE(bitBin64.GetTags(bitBin64.Match(bs9, 5)) == (emp::vector<emp::BitSet<64>> {bs9, bs1, bs7}));
 
   }
+  // test ImprintRegulators
+  {
+    // setup template MatchBin
+    emp::Random rand(1);
+    emp::MatchBin<
+      std::string,
+      emp::AbsDiffMetric,
+      emp::RouletteSelector<>,
+      emp::LegacyRegulator
+    > bin1(rand);
+
+    // put some things in template
+    const size_t hi1 = bin1.Put("hi", 1);
+    const size_t bye1 = bin1.Put("bye", 2);
+
+    bin1.SetRegulator(hi1, 0.1);
+    bin1.SetRegulator(bye1, 0.2);
+
+    // make sure regulators were set
+    REQUIRE(bin1.GetRegulator(hi1).state == 0.1);
+    REQUIRE(bin1.GetRegulator(bye1).state == 0.2);
+
+    // setup MatchBin to imprint on template
+    emp::MatchBin<
+      std::string,
+      emp::AbsDiffMetric,
+      emp::RouletteSelector<>,
+      emp::LegacyRegulator
+    > bin2(rand);
+
+    // put same matches as before
+    const size_t hi2 = bin2.Put("hi", 1);
+    const size_t bye2 = bin2.Put("bye", 2);
+
+    // do the imprinting
+    bin2.ImprintRegulators(bin1);
+
+    // now, bin2's regulators should match bin1's
+    REQUIRE(bin2.GetRegulator(hi2).state == bin1.GetRegulator(hi1).state);
+    REQUIRE(bin2.GetRegulator(bye2).state == bin1.GetRegulator(bye1).state);
+  }
 
   {
   emp::Random rand(1);
@@ -881,9 +943,9 @@ TEST_CASE("Test MatchBin", "[tools]")
     );
   }
 
-  REQUIRE(scores.GetMean() - 0.5 < 0.01);
+  REQUIRE(std::abs(scores.GetMean() - 0.5) < 0.01);
   REQUIRE(scores.GetMin() < 0.01);
-  REQUIRE(scores.GetMax() > 0.01);
+  REQUIRE(scores.GetMax() > 0.99);
   for (auto & c : scores.GetHistCounts()) {
     REQUIRE(c > N_SAMPLES / N_BINS - 20000);
     REQUIRE(c < N_SAMPLES / N_BINS + 20000);
@@ -899,9 +961,9 @@ TEST_CASE("Test MatchBin", "[tools]")
     );
   }
 
-  REQUIRE(scores.GetMean() - 0.5 < 0.01);
+  REQUIRE(std::abs(scores.GetMean() - 0.5) < 0.01);
   REQUIRE(scores.GetMin() < 0.01);
-  REQUIRE(scores.GetMax() > 0.01);
+  REQUIRE(scores.GetMax() > 0.99);
   for (auto & c : scores.GetHistCounts()) {
     REQUIRE(c > N_SAMPLES / N_BINS - 20000);
     REQUIRE(c < N_SAMPLES / N_BINS + 20000);
@@ -917,9 +979,9 @@ TEST_CASE("Test MatchBin", "[tools]")
     );
   }
 
-  REQUIRE(scores.GetMean() - 0.5 < 0.01);
+  REQUIRE(std::abs(scores.GetMean() - 0.5) < 0.01);
   REQUIRE(scores.GetMin() < 0.01);
-  REQUIRE(scores.GetMax() > 0.01);
+  REQUIRE(scores.GetMax() > 0.99);
   for (auto & c : scores.GetHistCounts()) {
     REQUIRE(c > N_SAMPLES / N_BINS - 20000);
     REQUIRE(c < N_SAMPLES / N_BINS + 20000);
@@ -935,9 +997,9 @@ TEST_CASE("Test MatchBin", "[tools]")
     );
   }
 
-  REQUIRE(scores.GetMean() - 0.5 < 0.01);
+  REQUIRE(std::abs(scores.GetMean() - 0.5) < 0.01);
   REQUIRE(scores.GetMin() < 0.01);
-  REQUIRE(scores.GetMax() > 0.01);
+  REQUIRE(scores.GetMax() > 0.99);
   for (auto & c : scores.GetHistCounts()) {
     REQUIRE(c > N_SAMPLES / N_BINS - 20000);
     REQUIRE(c < N_SAMPLES / N_BINS + 20000);
@@ -1770,12 +1832,14 @@ TEST_CASE("Test MatchBin", "[tools]")
     size_t opCount = 0;
 
     emp::RankedCacheState operator()(
-      emp::vector<size_t>& uids,
-      std::unordered_map<size_t, double>& scores,
+      emp::vector< std::pair<size_t, double> > scores,
       size_t n
     ){
       opCount+=1;
-      return emp::RankedSelector<std::ratio<2,1>>::operator()(uids, scores, n);
+      return emp::RankedSelector<std::ratio<2,1>>::operator()(
+        scores,
+        n
+      );
     }
   };
 
@@ -1857,12 +1921,11 @@ TEST_CASE("Test MatchBin", "[tools]")
 
     size_t opCount = 0;
     emp::RankedCacheState operator()(
-      emp::vector<size_t>& uids,
-      std::unordered_map<size_t, double>& scores,
+      emp::vector< std::pair<size_t, double> > scores,
       size_t n
     ){
       opCount+=1;
-      return emp::RankedSelector<std::ratio<2,1>>::operator()(uids, scores, n);
+      return emp::RankedSelector<std::ratio<2,1>>::operator()(scores, n);
     }
   };
 

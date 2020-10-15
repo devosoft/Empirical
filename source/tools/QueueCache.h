@@ -8,6 +8,9 @@
  *		It orders elements by access time and removes the stalest ones in case maximum capacity is reached.
  */
 
+#ifndef EMP_QUEUECACHE_H
+#define EMP_QUEUECACHE_H
+
 #include <list>
 #include <unordered_map>
 #include <utility>
@@ -82,6 +85,10 @@
 			/// Return number of elements in cache.
 			/// @return number of elements in the cache
 			size_t Size() const { return cache_list.size(); }
+
+			/// Test if cache has any elements.
+			/// @return true if cache is empty
+			bool Empty() const { return cache_list.size() == 0; }
 
 			/// Return maximum number of elements that will fit in cache.
 			/// @return maximum number of elements that the cache can contain
@@ -190,3 +197,4 @@
 			}
 	};
 }
+#endif
