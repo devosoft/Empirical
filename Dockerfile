@@ -127,7 +127,7 @@ RUN \
     htop=2.1.0-3 \
     man \
     unzip=6.0-21ubuntu1 \
-    vim=2:8.0.1453-1ubuntu1.3 \
+    vim \
     nano=2.9.3-2 \
     wget=1.19.4-1ubuntu2.2 \
     && \
