@@ -25,8 +25,8 @@
 #include "../base/Ptr.h"
 #include "../base/vector.h"
 
-#include "../tools/alert.h"
-#include "../tools/mem_track.h"
+#include "../debug/alert.h"
+#include "../debug/mem_track.h"
 
 #include "Angle2D.h"
 #include "Circle2D.h"
@@ -122,7 +122,7 @@ namespace emp {
 
   public:
     // delete to avoid a possiblity of EMP_TRACK_CONSTRUCT and EMP_TRACK_DESTRUCT mismatch
-    CircleBody2D() = delete; 
+    CircleBody2D() = delete;
     CircleBody2D(const Circle2D<double> & _p)
       : perimeter(_p), target_radius(_p.GetRadius()), from_links(0), to_links(0)
     {

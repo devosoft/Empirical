@@ -21,9 +21,9 @@
 #include <functional>
 
 #include "../base/Ptr.h"
+#include "../datastructs/vector_utils.h"
 #include "../meta/TypePack.h"
 #include "../tools/TypeTracker.h"
-#include "../tools/vector_utils.h"
 
 #include "Angle2D.h"
 #include "Point2D.h"
@@ -36,7 +36,7 @@ namespace emp {
     using body_types = TypePack<BODY_TYPES...>;
 
     class BodyInfo {
-    private:      
+    private:
       TrackedVar body_ptr;  ///< Pointer to the bodies
       size_t id;            ///< Index in body_set to find body info
       Point center;         ///< Center position of this body on surface.
@@ -109,7 +109,7 @@ namespace emp {
     // Clear out the watermarked body size and update the current largest.
     inline void RefreshBodySize() {
       max_radius = 0.0;
-      for (BodyInfo & body : body_set) if (body.IsActive()) TestBodySize(body);      
+      for (BodyInfo & body : body_set) if (body.IsActive()) TestBodySize(body);
     }
 
     // Determine which sector a body should be in.
@@ -248,7 +248,7 @@ namespace emp {
       emp_assert(body_set[id].IsActive());
       body_set[id].SetColor(_in);
     }
-    
+
     void RemoveBody(size_t id) {
       emp_assert(body_set[id].IsActive());
       body_set[id].Deactivate();
@@ -309,7 +309,7 @@ namespace emp {
     void AddOverlapFun( void (*overlap_fun)(BODY1_T &, BODY2_T &) ) {
       AddOverlapFun( std::function<void(BODY1_T&, BODY2_T&)>(overlap_fun) );
     }
- 
+
     /// Add a to call a lambda function in the case of overlaps (using a function pointer)
     template <typename LAMBDA_T>
     void AddOverlapFun( const LAMBDA_T & fun ) {
@@ -410,11 +410,11 @@ namespace emp {
       if (up_ok && right_ok)   FindSectorOverlaps(body, up_sector_id+1);
       if (left_ok)             FindSectorOverlaps(body, sector_id-1);
       if (right_ok)            FindSectorOverlaps(body, sector_id+1);
-      if (down_ok)             FindSectorOverlaps(body, down_sector_id); 
+      if (down_ok)             FindSectorOverlaps(body, down_sector_id);
       if (down_ok && left_ok)  FindSectorOverlaps(body, down_sector_id-1);
       if (down_ok && right_ok) FindSectorOverlaps(body, down_sector_id+1);
     }
-    
+
     void FindOverlap(size_t body_id) {
       emp_assert(body_set[body_id].IsActive());
       FindOverlap(body_set[body_id]);

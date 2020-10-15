@@ -15,7 +15,7 @@
 #include <cmath>
 #include <iostream>
 
-#include "../tools/math.h"
+#include "../math/math.h"
 
 namespace emp {
 

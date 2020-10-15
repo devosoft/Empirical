@@ -15,7 +15,7 @@
 
 #include <cmath>
 
-#include "../tools/const.h"
+#include "../math/constants.h"
 #include "Point2D.h"
 
 namespace emp {
