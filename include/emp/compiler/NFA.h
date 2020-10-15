@@ -27,8 +27,8 @@
 #include <set>
 
 #include "../base/vector.h"
-#include "BitSet.h"
-#include "set_utils.h"
+#include "../bits/BitSet.h"
+#include "../datastructs/set_utils.h"
 
 namespace emp {
 

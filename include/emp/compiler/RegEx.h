@@ -43,12 +43,10 @@
 
 #include "../base/vector.h"
 #include "../base/Ptr.h"
-
-#include "BitSet.h"
+#include "../bits/BitSet.h"
+#include "../tools/string_utils.h"
 #include "lexer_utils.h"
 #include "NFA.h"
-#include "string_utils.h"
-
 
 namespace emp {
 
@@ -328,7 +326,7 @@ namespace emp {
             case 'r': c = '\r'; break;
             case 't': c = '\t'; break;
             // A backslash followed by a digit indicates we should expect an ascii code.
-            case '0': case '1': case '2': case '3': case '4': 
+            case '0': case '1': case '2': case '3': case '4':
             case '5': case '6': case '7': case '8': case '9':
               if (pos+3 >= regex.size()) { Error("Escaped ascii codes must have three digits!"); }
               c2 = regex[pos+1];

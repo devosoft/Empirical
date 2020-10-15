@@ -16,8 +16,7 @@
 #include <utility> // std::pair
 
 #include "../base/vector.h"
-
-#include "BitVector.h"
+#include "../bits/BitVector.h"
 #include "DFA.h"
 #include "NFA.h"
 

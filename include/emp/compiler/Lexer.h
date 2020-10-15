@@ -16,9 +16,8 @@
 
 #include "../base/map.h"
 #include "../base/vector.h"
-
+#include "../datastructs/map_utils.h"
 #include "lexer_utils.h"
-#include "map_utils.h"
 #include "RegEx.h"
 
 namespace emp {
@@ -129,7 +128,7 @@ namespace emp {
     }
 
     /// Get the name associated with a token type (you provide the ID)
-    std::string GetTokenName(int id) const {      
+    std::string GetTokenName(int id) const {
       if (id < 0) return emp::to_string("Error (", id, ")");   // Negative tokens specify errors.
       if (id == 0) return "EOF";                               // Token zero is end-of-file.
       if (id < 128) return emp::to_escaped_string((char) id);  // Individual characters.
