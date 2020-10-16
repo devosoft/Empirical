@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/SolveState.h"
+#include "emp/tools/SolveState.h"
 
 #include <sstream>
 #include <iostream>
@@ -12,7 +12,7 @@ TEST_CASE("Test SolveState", "[tools]")
 	// Constructor
 	emp::SolveState ss0;
 	REQUIRE(ss0.GetSize() == 0);
-	
+
 	// Include Exclude Is
 	emp::SolveState ss1(10);
 	REQUIRE(!ss1.IsIn(0));
@@ -23,21 +23,21 @@ TEST_CASE("Test SolveState", "[tools]")
 	ss1.Include(1);
 	REQUIRE(ss1.IsIn(1));
 	REQUIRE(ss1.IsUnk(2));
-	
+
 	// GetNextUnk
 	REQUIRE(ss1.GetNextUnk(0) == 2);
-	
+
 	ss1.Include(2);
 	ss1.Exclude(3);
 	ss1.Exclude(4);
 	ss1.Exclude(5);
-	
+
 	// Count
 	REQUIRE(!ss1.IsFinal());
 	REQUIRE(ss1.CountIn() == 2);
 	REQUIRE(ss1.CountUnk() == 4);
 	REQUIRE(ss1.CountOut() == 4);
-	
+
 	// Get Vector
 	emp::BitVector vecIn = ss1.GetInVector();
 	emp::BitVector vecUnk = ss1.GetUnkVector();
@@ -53,19 +53,19 @@ TEST_CASE("Test SolveState", "[tools]")
 	vecOut.Print(ss);
 	REQUIRE(ss.str() == "0000111001");
 	ss.str(std::string());
-	
+
 	ss1.Include(6);
 	ss1.Exclude(7);
 	ss1.Include(8);
 	ss1.Include(9);
-	
+
 	// IsFinal ForceExclude
 	REQUIRE(ss1.IsFinal());
 	ss1.ForceExclude(9);
 	REQUIRE(!ss1.IsIn(9));
 	REQUIRE(ss1.IsFinal());
 	REQUIRE(ss1.IsOut(9));
-	
+
 	// IncludeSet ExcludeSet
 	emp::BitVector exc(5);
 	exc.SetByte(0,10);

@@ -1,7 +1,7 @@
-TEST_NAMES = alert BitMatrix BitSet bitset_utils BitVector Cache combos ContiguousStream DFA Distribution DynamicString File flex_function functions FunctionSet genericfunction Graph graph_utils hash_utils IndexMap info_theory keyname_utils Lexer lexer_utils map_utils MatchBin MatchBin_logging matchbin_utils math memo_function MemoryIStream mem_track NFA NullStream QueueCache Random random_utils Range RegEx sequence_utils set_utils SolveState stats string_utils tuple_utils TypeTracker UnorderedIndexMap vector_utils
+TEST_NAMES = functions keyname_utils SolveState string_utils TypeTracker
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
-FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../source/ -I../../ -I../../third-party/cereal/include/
+FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/
 
 default: test
 
@@ -30,16 +30,16 @@ coverage: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../cov
 coverage: test-prep $(addprefix cov-, $(TEST_NAMES))
 
 # Test optimized version without debug features
-opt: FLAGS := -std=c++17 -pthread -DNDEBUG -O3 -Wno-unused-function -I../../source/ -I../../third-party/cereal/include/ -I../../
+opt: FLAGS := -std=c++17 -pthread -DNDEBUG -O3 -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../
 opt: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
 # Test in debug mode with pointer tracking
-fulldebug: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../source/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 # -Wmisleading-indentation
+fulldebug: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 # -Wmisleading-indentation
 fulldebug: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 
-cranky: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../source/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
+cranky: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
 cranky: test-prep $(addprefix test-, $(TEST_NAMES))
 	rm -rf test*.out
 

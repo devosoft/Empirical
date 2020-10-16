@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/keyname_utils.h"
+#include "emp/tools/keyname_utils.h"
 
 #include <sstream>
 #include <iostream>
