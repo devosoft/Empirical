@@ -5,12 +5,11 @@
 #include <sstream>
 #include <string>
 
-#include "base/array.h"
-#include "base/vector.h"
-#include "base/Ptr.h"
-#include "tools/tuple_utils.h"
-
-#include "meta/reflection.h"
+#include "emp/base/array.h"
+#include "emp/base/vector.h"
+#include "emp/base/Ptr.h"
+#include "emp/datastructs/tuple_utils.h"
+#include "emp/meta/reflection.h"
 
 
 struct HasA { static int A; static std::string TypeID() { return "HasA"; } };
