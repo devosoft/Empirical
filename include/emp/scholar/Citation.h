@@ -55,7 +55,7 @@ namespace emp {
 
     // Name map in opposite direction (enum -> name)
     static const emp::multimap<CITE_TYPE, std::string> & GetRNameMap() {
-      static const auto rname_map = emp::flip_map(GetNameMap());
+      static const emp::multimap<CITE_TYPE, std::string> rname_map = emp::flip_map(GetNameMap());
       return rname_map;
     }
 

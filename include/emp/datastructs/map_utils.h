@@ -59,6 +59,19 @@ namespace emp {
     for (const auto & x : src) dst.insert( flip_pair(x) );
     return dst;
   }
+
+  // If debug is turned on, support flip_map on emp::map/multimap.
+  // Otherwise, emp::map and emp::multimap compile down to std::map/std::multimap, so this function is equivalent to flip_map above.
+  #ifndef EMP_NDEBUG
+  /// Take an emp::map<A,B> and return the flipped map (now multimap to be safe): emp::multimap<B,A>
+  template<typename A, typename B> emp::multimap<B,A> flip_map(const emp::map<A,B> &src)
+  {
+    emp::multimap<B,A> dst;
+    for (const auto & x : src) dst.insert( flip_pair(x) );
+    return dst;
+  }
+  #endif
+
 }
 
 #endif
