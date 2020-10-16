@@ -6,10 +6,10 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "data/DataNode.h"
-#include "data/DataManager.h"
-#include "data/DataInterface.h"
-#include "data/DataFile.h"
+#include "emp/data/DataNode.h"
+#include "emp/data/DataManager.h"
+#include "emp/data/DataInterface.h"
+#include "emp/data/DataFile.h"
 
 #include <algorithm>
 #include <cmath>
