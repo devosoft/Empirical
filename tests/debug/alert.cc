@@ -2,12 +2,12 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/alert.h"
+#include "emp/debug/alert.h"
 
 #include <sstream>
 #include <iostream>
 
-TEST_CASE("Test Alert", "[tools]")
+TEST_CASE("Test Alert", "[debug]")
 {
 
   // basic Alert

@@ -3,7 +3,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/mem_track.h"
+#include "emp/debug/mem_track.h"
 
 #include <sstream>
 #include <string>
@@ -26,7 +26,7 @@ struct TestClass2 {
   }
 };
 
-TEST_CASE("Test mem_track", "[tools]")
+TEST_CASE("Test mem_track", "[debug]")
 {
   emp::vector<TestClass1 *> test_v;
   TestClass2 class2_mem;
