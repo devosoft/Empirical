@@ -3,7 +3,7 @@
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 #include <stdlib.h>
 
-#include "geometry/Circle2D.h"
+#include "emp/geometry/Circle2D.h"
 
 TEST_CASE("Test Circle2D", "[geometry]")
 {
@@ -46,6 +46,6 @@ TEST_CASE("Test Circle2D", "[geometry]")
 
   REQUIRE(circle_xyr.Contains(1.5,9.5) == true);
 
-  
+
 
 }
