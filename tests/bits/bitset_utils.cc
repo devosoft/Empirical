@@ -6,7 +6,7 @@
 
 #include <sstream>
 
-TEST_CASE("Test bitset_utils", "[tools]")
+TEST_CASE("Test bitset_utils", "[bits]")
 {
   uint32_t three = emp::UIntMaskFirst<2>();
   REQUIRE(three == 3);

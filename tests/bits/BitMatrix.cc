@@ -283,7 +283,7 @@ void test_mask(){
   REQUIRE(bs.size() == (5*10));
 }
 
-TEST_CASE("Test BitMatrix", "[tools]")
+TEST_CASE("Test BitMatrix", "[bits]")
 {
 	test_matrix();
 	test_to_id();
@@ -311,7 +311,7 @@ TEST_CASE("Test BitMatrix", "[tools]")
 // explicitly called (and thus our profiling doesn't see them), we have to
 // force them all to be included in the comilation.
 template class emp::BitMatrix<4, 5>;
-TEST_CASE("Another test BitMatrix", "[tools]")
+TEST_CASE("Another test BitMatrix", "[bits]")
 {
 
   emp::BitMatrix<4,5> bm45;

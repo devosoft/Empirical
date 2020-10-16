@@ -384,7 +384,7 @@ void test_print(){
 }
 
 
-TEST_CASE("Test BitSet", "[tools]")
+TEST_CASE("Test BitSet", "[bits]")
 {
   test_status();
   test_size();
@@ -606,7 +606,7 @@ struct MultiTester {
 };
 
 template class emp::BitSet<5>;
-TEST_CASE("Another Test BitSet", "[tools]")
+TEST_CASE("Another Test BitSet", "[bits]")
 {
 
   // test BitSet GetSize, GetNumBytes
@@ -1578,7 +1578,7 @@ TEST_CASE("Another Test BitSet", "[tools]")
 
 }
 
-TEST_CASE("Test BitSet timing", "[tools]")
+TEST_CASE("Test BitSet timing", "[bits]")
 {
   const size_t set_size = 100000;
   typedef emp::BitSet<set_size> TEST_TYPE;

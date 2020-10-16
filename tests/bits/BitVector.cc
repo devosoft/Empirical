@@ -13,7 +13,7 @@
 #include <map>
 #include <limits>
 
-TEST_CASE("Test BitVector", "[tools]")
+TEST_CASE("Test BitVector", "[bits]")
 {
 	// Constructor
 	emp::BitVector bv(10);
@@ -261,7 +261,7 @@ TEST_CASE("Test BitVector", "[tools]")
 	REQUIRE(bv_f.none());
 }
 
-TEST_CASE("Another Test BitVector", "[tools]")
+TEST_CASE("Another Test BitVector", "[bits]")
 {
   emp::BitVector bv10(10);
   emp::BitVector bv32(32);
@@ -288,7 +288,7 @@ TEST_CASE("Another Test BitVector", "[tools]")
 
 }
 
-TEST_CASE("BitVector padding bits protected", "[tools]") {
+TEST_CASE("BitVector padding bits protected", "[bits]") {
 #ifdef TDEBUG
 
   for (size_t i = 1; i < 32; ++i) {
@@ -311,7 +311,7 @@ TEST_CASE("BitVector padding bits protected", "[tools]") {
 #endif
 }
 
-TEST_CASE("BitVector regression test for #277", "[tools]") {
+TEST_CASE("BitVector regression test for #277", "[bits]") {
   emp::BitVector vec1(4);
   emp::BitVector vec2(4);
 
