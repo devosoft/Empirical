@@ -6,14 +6,14 @@
 #include <cereal/types/unordered_map.hpp>
 #include <cereal/types/vector.hpp>
 
-#include "data/DataNode.h"
-#include "tools/MatchBin.h"
-#include "tools/Random.h"
+#include "emp/data/DataNode.h"
+#include "emp/matchbin/MatchBin.h"
+#include "emp/math/Random.h"
 
 #include <sstream>
 #include <string>
 
-TEST_CASE("Test MatchBin", "[tools]")
+TEST_CASE("Test MatchBin", "[matchbin]")
 {
 
   // test baseline default N (1)

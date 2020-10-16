@@ -27,63 +27,56 @@
 #include <cereal/types/unordered_map.hpp>
 #include <cereal/types/vector.hpp>
 
-#include "data/DataNode.h"
-
-#include "tools/File.h"
-
-#include "tools/BitMatrix.h"
-#include "tools/BitSet.h"
-#include "tools/BitVector.h"
-#include "tools/ContiguousStream.h"
-#include "tools/Distribution.h"
-#include "tools/DFA.h"
-#include "tools/DynamicString.h"
-#include "tools/FunctionSet.h"
-#include "tools/Graph.h"
-#include "tools/IndexMap.h"
-#include "tools/Lexer.h"
+#include "emp/bits/BitMatrix.h"
+#include "emp/bits/BitSet.h"
+#include "emp/bits/BitVector.h"
+#include "emp/compiler/DFA.h"
+#include "emp/compiler/Lexer.h"
+#include "emp/data/DataNode.h"
+#include "emp/datastructs/DynamicString.h"
+#include "emp/datastructs/Graph.h"
+#include "emp/datastructs/IndexMap.h"
+#include "emp/functional/FunctionSet.h"
+#include "emp/io/ContiguousStream.h"
+#include "emp/io/File.h"
+#include "emp/math/Distribution.h"
 
 #define EMP_LOG_MATCHBIN
-#include "tools/MatchBin.h"
-
-
-#include "tools/NFA.h"
-#include "tools/RegEx.h"
-#include "tools/Random.h"
-#include "tools/TypeTracker.h"
-#include "tools/attrs.h"
-
-#include "tools/flex_function.h"
-#include "tools/functions.h"
-#include "tools/graph_utils.h"
-#include "tools/hash_utils.h"
-//#include "tools/grid.h"
-#include "tools/info_theory.h"
-#include "tools/keyname_utils.h"
-#include "tools/lexer_utils.h"
-#include "tools/map_utils.h"
-#include "tools/math.h"
-#include "tools/matchbin_utils.h"
-#include "tools/mem_track.h"
-#include "tools/memo_function.h"
-#include "tools/NullStream.h"
-#include "tools/sequence_utils.h"
-// #include "tools/serialize.h"
-#include "tools/set_utils.h"
-#include "tools/stats.h"
-#include "tools/string_utils.h"
-#include "tools/tuple_struct.h"
-#include "tools/vector_utils.h"
+#include "emp/compiler/lexer_utils.h"
+#include "emp/compiler/NFA.h"
+#include "emp/compiler/RegEx.h"
+#include "emp/datastructs/graph_utils.h"
+#include "emp/datastructs/hash_utils.h"
+#include "emp/datastructs/map_utils.h"
+#include "emp/datastructs/set_utils.h"
+#include "emp/datastructs/tuple_struct.h"
+#include "emp/datastructs/vector_utils.h"
+#include "emp/debug/mem_track.h"
+#include "emp/functional/flex_function.h"
+#include "emp/functional/memo_function.h"
+#include "emp/io/NullStream.h"
+#include "emp/matchbin/matchbin_utils.h"
+#include "emp/matchbin/MatchBin.h"
+#include "emp/math/info_theory.h"
+#include "emp/math/math.h"
+#include "emp/math/Random.h"
+#include "emp/math/sequence_utils.h"
+#include "emp/math/stats.h"
+#include "emp/tools/attrs.h"
+#include "emp/tools/functions.h"
+#include "emp/tools/keyname_utils.h"
+#include "emp/tools/string_utils.h"
+#include "emp/tools/TypeTracker.h"
 
 // currently these have no coveage; we include them so we get metrics on them
 // this doesn't actually work--TODO: figure out why this doesn't work
-#include "tools/alert.h"
-#include "tools/const.h"
-#include "tools/SolveState.h"
-#include "tools/serialize_macros.h"
+#include "emp/debug/alert.h"
+#include "emp/io/serialize_macros.h"
+#include "emp/math/constants.h"
+#include "emp/tools/SolveState.h"
 
 
-TEST_CASE("Test MatchBin", "[tools]")
+TEST_CASE("Test MatchBin", "[matchbin]")
 {
   // <------- TEST LOGGING ------->
   // test static instance ID
