@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/FunctionSet.h"
+#include "emp/functional/FunctionSet.h"
 
 #include <sstream>
 #include <iostream>
@@ -24,7 +24,7 @@ double fun5(double input) { return input; }
 double fun6(double input) { return input * input; }
 double fun7(double input) { return input * input * input; }
 
-TEST_CASE("Test FunctionSet", "[tools]")
+TEST_CASE("Test FunctionSet", "[functional]")
 {
   // TEST 1: Functions with VOID returns.
   emp::FunctionSet<void(int,int)> fun_set;
