@@ -2,14 +2,14 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/set_utils.h"
+#include "emp/datastructs/set_utils.h"
 
 #include <sstream>
 #include <iostream>
 
 
 
-TEST_CASE("Test set utils", "[tools]") {
+TEST_CASE("Test set utils", "[datastructs]") {
   std::set<int> s1;
   std::set<int> s2;
   std::set<int> comp_set;

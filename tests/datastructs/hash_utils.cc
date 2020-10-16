@@ -2,18 +2,18 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/hash_utils.h"
-#include "tools/vector_utils.h"
 
 #include <sstream>
 #include <iostream>
 #include <unordered_set>
 #include <array>
 #include <unordered_map>
-#include "base/vector.h"
+#include "emp/base/vector.h"
+#include "emp/datastructs/hash_utils.h"
+#include "emp/datastructs/vector_utils.h"
 
 // emp::Random grand;
-TEST_CASE("Test hash_utils", "[tools]")
+TEST_CASE("Test hash_utils", "[datastructs]")
 {
   {
   REQUIRE(emp::szudzik_hash((uint32_t)0, (uint32_t)0) == (uint64_t)0);

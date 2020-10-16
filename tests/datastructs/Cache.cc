@@ -2,12 +2,12 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/Cache.h"
+#include "emp/datastructs/Cache.h"
 
 #include <sstream>
 #include <string>
 
-TEST_CASE("Test Cache", "[tools]")
+TEST_CASE("Test Cache", "[datastructs]")
 {
   emp::Cache<char,int> cch;
   std::function<int(char)> cch_fx = [](char ch){ return (int)ch; };

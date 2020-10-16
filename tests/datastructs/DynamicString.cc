@@ -2,13 +2,13 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/DynamicString.h"
+#include "emp/datastructs/DynamicString.h"
 
 #include <sstream>
 #include <iostream>
 
 
-TEST_CASE("Test DynamicString", "[tools]")
+TEST_CASE("Test DynamicString", "[datastructs]")
 {
   emp::DynamicString test_set;
 

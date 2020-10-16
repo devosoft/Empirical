@@ -2,13 +2,13 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/QueueCache.h"
-#include "base/vector.h"
+#include "emp/datastructs/QueueCache.h"
+#include "emp/base/vector.h"
 
 #include <sstream>
 #include <string>
 
-SCENARIO("Queue Caches store elements", "[tools]") {
+SCENARIO("Queue Caches store elements", "[datastructs]") {
   GIVEN("a queue cache of a certain capacity") {
     const size_t capacity = 10;
     emp::QueueCache<char, int> qch(capacity);
@@ -70,7 +70,7 @@ SCENARIO("Queue Caches store elements", "[tools]") {
   }
 }
 
-SCENARIO("Queue Caches can be sized and resized", "[tools]") {
+SCENARIO("Queue Caches can be sized and resized", "[datastructs]") {
   GIVEN("a queue cache of a set size with elements in it") {
     emp::QueueCache<char, int, 10> qch;
 
@@ -104,7 +104,7 @@ SCENARIO("Queue Caches can be sized and resized", "[tools]") {
   }
 }
 
-SCENARIO("Queue Caches behave like queues (first-in, first-out)", "[tools]") {
+SCENARIO("Queue Caches behave like queues (first-in, first-out)", "[datastructs]") {
   GIVEN("a queue cache full with elements") {
     emp::QueueCache<char, int, 2> qch;
 
@@ -124,7 +124,7 @@ SCENARIO("Queue Caches behave like queues (first-in, first-out)", "[tools]") {
     }
   }
 }
-SCENARIO("Queue Caches can delete elements", "[tools]") {
+SCENARIO("Queue Caches can delete elements", "[datastructs]") {
   GIVEN("a queue cache with elements") {
     emp::QueueCache<char, int, 2> qch;
 
@@ -141,7 +141,7 @@ SCENARIO("Queue Caches can delete elements", "[tools]") {
   }
 }
 
-SCENARIO("Queue Caches can be cleared", "[tools]") {
+SCENARIO("Queue Caches can be cleared", "[datastructs]") {
   GIVEN("a queue cache with elements") {
     const size_t capacity = 2;
     emp::QueueCache<char, int> qch(capacity);
@@ -165,7 +165,7 @@ SCENARIO("Queue Caches can be cleared", "[tools]") {
   }
 }
 
-SCENARIO("Queue Caches can be subscripted", "[tools]") {
+SCENARIO("Queue Caches can be subscripted", "[datastructs]") {
   // Test whether the subscript operator can get values from cache.
   GIVEN("a queue cache") {
     emp::QueueCache<char, int, 3> qch;
@@ -212,7 +212,7 @@ SCENARIO("Queue Caches can be subscripted", "[tools]") {
   }
 }
 
-SCENARIO("Queue Caches can be iterated on", "[tools]") {
+SCENARIO("Queue Caches can be iterated on", "[datastructs]") {
   GIVEN("a queue cache with elements in it") {
     emp::QueueCache<char, int, 6> qch;
 

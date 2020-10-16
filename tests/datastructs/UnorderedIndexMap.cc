@@ -2,18 +2,18 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/UnorderedIndexMap.h"
+#include "emp/datastructs/UnorderedIndexMap.h"
 
 #include <sstream>
 #include <iostream>
 
-TEST_CASE("Test UnorderedIndexMap", "[tools]")
+TEST_CASE("Test UnorderedIndexMap", "[datastructs]")
 {
 	emp::UnorderedIndexMap uim(10);
 	REQUIRE(uim.GetSize() == 10);
 	uim.resize(5);
 	REQUIRE(uim.size() == 5);
-	
+
 	emp::vector<double> vecd;
 	vecd.push_back(5);
 	vecd.push_back(4);
@@ -32,7 +32,7 @@ TEST_CASE("Test UnorderedIndexMap", "[tools]")
 	REQUIRE(uim.GetWeight() == 0);
 	REQUIRE(uim.GetSize() == 10);
 	uim.AdjustAll(2.0);
-	
+
 	// Index
 	size_t ind = uim.Index(0);
 	REQUIRE(uim[ind] == 2);
@@ -40,7 +40,7 @@ TEST_CASE("Test UnorderedIndexMap", "[tools]")
 	REQUIRE(uim[ind] == 3);
 	uim[ind] = 4;
 	REQUIRE(uim[ind] == 4);
-	
+
 	// -= +=
 	emp::UnorderedIndexMap uim2(10);
 	uim2.AdjustAll(2.0);

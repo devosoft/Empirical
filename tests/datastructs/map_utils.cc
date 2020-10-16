@@ -2,14 +2,14 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/map_utils.h"
+#include "emp/datastructs/map_utils.h"
 
 #include <sstream>
 #include <iostream>
 #include <string>
 
 
-TEST_CASE("Test map_utils", "[tools]")
+TEST_CASE("Test map_utils", "[datastructs]")
 {
   std::map<int, char> test_map;
   test_map[0] = 'a';
