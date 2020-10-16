@@ -14,6 +14,8 @@
 #include <map>
 #include <unordered_map>
 
+#include "../base/map.h"
+
 namespace emp {
 
   /// Take any map type, and run find to determine if a key is present.
