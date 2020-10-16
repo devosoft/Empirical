@@ -18,7 +18,7 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../source/web/l
 test: $(addprefix test-, $(TEST_NAMES)) test-color_map test-GetUrlParams
 
 test-%: %.cc
-	source ../../third-party/emsdk/emsdk_env.sh
+	source ../../third-party/emsdk/emsdk_env.sh; \
 	$(CXX_web) $(CFLAGS_web) $< -o $@.js
 	../../third-party/node_modules/karma/bin/karma start karma.conf.js --filename $@
 
@@ -27,7 +27,7 @@ test-color_map: color_map.cc ../../third-party/Catch/single_include/catch2/catch
 	./color_map.out
 
 test-GetUrlParams: GetUrlParams.cc
-	source ../../third-party/emsdk/emsdk_env.sh
+	source ../../third-party/emsdk/emsdk_env.sh; \
 	$(CXX_web) $(CFLAGS_web) $< -o $@.js
 	node $@.js
 
