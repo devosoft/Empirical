@@ -24,7 +24,7 @@
 #include "../control/Signal.h"
 #include "../base/vector.h"
 #include "../web/JSWrap.h"
-#include "../../tests2/unit_tests.h"
+#include "../../../tests2/unit_tests.h"
 
 namespace emp {
 namespace web {
