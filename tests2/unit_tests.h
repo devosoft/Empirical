@@ -6,7 +6,7 @@
  *  @file unit_tests.h
  *  @brief Macros to facilitate unit testing.
  *  @note Status: RESURGENT (Was depricated; now back to ALPHA)
- * 
+ *
  *  @todo Setup proper command line color handline (probably in its own file.)
  *  @todo Add EMP_TEST_BELOW, EMP_TEST_ABOVE, and EMP_TEST_RANGE to ensurge that a
  *        value is in a certain range.
@@ -20,8 +20,8 @@
 #include <iostream>
 #include <sstream>
 
-#include "../source/config/command_line.h"
-#include "../source/tools/string_utils.h"
+#include "../include/emp/config/command_line.h"
+#include "../include/emp/tools/string_utils.h"
 
 namespace emp {
 
