@@ -5,17 +5,17 @@
 #include <string>
 #include <array>
 
-#include "web/_MochaTestRunner.h"
 #include "../../tests2/unit_tests.h"
-#include "config/command_line.h"
-#include "base/assert.h"
-#include "base/vector.h"
-#include "web/init.h"
-#include "web/JSWrap.h"
-#include "web/js_utils.h"
+#include "emp/base/assert.h"
+#include "emp/base/vector.h"
+#include "emp/config/command_line.h"
+#include "emp/web/_MochaTestRunner.h"
+#include "emp/web/init.h"
+#include "emp/web/js_utils.h"
+#include "emp/web/JSWrap.h"
 
 #include <cassert>
-  
+
 // This file tests source/web/js_utils.h (using Mocha + Karma framework)
 // - pass_array_to_javascript
 // - pass_array_to_cpp
@@ -340,7 +340,7 @@ struct TestPassMapToJavascript : public emp::web::BaseTest {
 
   void Setup() {
     // Configure functions that can be called from JS that pass various C++ maps/pairs of arrays to JS
-    wrapped_fun_ids.emplace_back( 
+    wrapped_fun_ids.emplace_back(
       emp::JSWrap(
         [](){
           emp::map<std::string, std::string> testMap = {{"test1", "a"}, {"test2", "b"}, {"test3", "c"}, {"test4", "d"}, {"test5", "e"}};
@@ -406,7 +406,7 @@ struct TestPassMapToJavascript : public emp::web::BaseTest {
         },
         "PassStringVectorMapToJS",
         false
-      ) 
+      )
     );
 
     wrapped_fun_ids.emplace_back(
@@ -420,7 +420,7 @@ struct TestPassMapToJavascript : public emp::web::BaseTest {
         false
       )
     );
-    
+
     wrapped_fun_ids.emplace_back(
       emp::JSWrap(
         [](){
@@ -459,7 +459,7 @@ struct TestPassMapToJavascript : public emp::web::BaseTest {
   }
 
   void Describe() override {
-    
+
     // Test passing maps to javascript
     EM_ASM({
       describe("pass_map_to_javascript", function() {
@@ -536,6 +536,6 @@ int main() {
   test_runner.AddTest<TestPassArrayToJavaScript>("pass_array_to_javascript");
   test_runner.AddTest<TestPassArrayToCpp>("pass_array_to_cpp");
   test_runner.AddTest<TestPassMapToJavascript>("pass_map_to_javascript");
-  
+
   test_runner.Run();
 }

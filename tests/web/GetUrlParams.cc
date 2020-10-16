@@ -3,13 +3,12 @@
 //  Released under the MIT Software license; see doc/LICENSE
 #include <functional>
 
-#include "base/assert.h"
-#include "web/init.h"
-#include "web/JSWrap.h"
-
-#include "base/assert.h"
-#include "web/UrlParams.h"
-#include "config/ArgManager.h"
+#include "emp/base/assert.h"
+#include "emp/base/assert.h"
+#include "emp/config/ArgManager.h"
+#include "emp/web/init.h"
+#include "emp/web/JSWrap.h"
+#include "emp/web/UrlParams.h"
 
 int main() {
 

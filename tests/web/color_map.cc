@@ -8,11 +8,11 @@
 #include <iostream>
 #include <string>
 
-#include "base/assert.h"
-#include "base/vector.h"
-#include "config/command_line.h"
-#include "web/color_map.h"
-#include "tools/string_utils.h"
+#include "emp/base/assert.h"
+#include "emp/base/vector.h"
+#include "emp/config/command_line.h"
+#include "emp/tools/string_utils.h"
+#include "emp/web/color_map.h"
 
 TEST_CASE("Test GetHueMap", "[web][color_map]") {
   // Create a hue map with 30 colors with default values

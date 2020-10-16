@@ -5,11 +5,11 @@
 #include <functional>
 #include <unordered_map>
 
-#include "base/assert.h"
-#include "web/_MochaTestRunner.h"
-#include "web/Document.h"
-#include "web/Element.h"
-#include "web/web.h"
+#include "emp/base/assert.h"
+#include "emp/web/_MochaTestRunner.h"
+#include "emp/web/Document.h"
+#include "emp/web/Element.h"
+#include "emp/web/web.h"
 
 
 // Test that the Element class properly gets attached and laid out via emp::web::Document.
