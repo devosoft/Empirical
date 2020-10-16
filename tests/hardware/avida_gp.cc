@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "hardware/AvidaGP.h"
+#include "emp/hardware/AvidaGP.h"
 
 #include <sstream>
 #include <iostream>
@@ -22,7 +22,7 @@ TEST_CASE("Test Avida GP", "[Hardware]")
 	REQUIRE(gp.GetNumOutputs() == 0.0);
 	REQUIRE(gp.GetNumTraits() == 0.0);
 	REQUIRE(gp.GetNumErrors() == 0.0);
-	
+
 	// instructions
 	gp.PushInst(0, 0);
 	gp.PushInst("Dec", 1);
@@ -30,7 +30,7 @@ TEST_CASE("Test Avida GP", "[Hardware]")
 	REQUIRE(gp.GetInst(1).id == 1);
 	gp.SetInst(0, 2, 0);
 	REQUIRE(gp.GetInst(0).id == 2);
-	
+
 	// traits
 	gp.PushTrait(4.0);
 	REQUIRE(gp.GetNumTraits() == 1);
@@ -46,10 +46,10 @@ TEST_CASE("Test Avida GP", "[Hardware]")
 		}
 	}
 	REQUIRE(gp.GetTrait(2) == 6.0);
-	
+
 	gp.IncErrors();
 	REQUIRE(gp.GetNumErrors() == 1);
-	
+
 	// RandomizeInst PushRandom
 	emp::Random rnd(1200);
 	gp.PushRandom(rnd);
@@ -64,20 +64,20 @@ TEST_CASE("Test Avida GP", "[Hardware]")
 	REQUIRE(gp.GetInst(0).id == 2); // !4 10 15
 	REQUIRE(gp.GetInst(1).id == 1);
 	REQUIRE(gp.GetInst(2).id == 2); // !9 8 13
-	
+
 	// SingleProcess
 	REQUIRE(gp.GetReg(9) == 9.0);
 	gp.SetIP(2);
 	gp.SingleProcess();
 	REQUIRE(gp.GetReg(9) == 0.0);
-	
+
 	// ProcessInst
 	REQUIRE(gp.GetReg(4) == 4.0);
 	gp.ProcessInst(gp.GetInst(0));
 	REQUIRE(gp.GetReg(4.0) == 0.0);
 	gp.ProcessInst(gp.GetInst(0));
 	REQUIRE(gp.GetReg(4.0) == 1.0);
-	
+
 	// Inputs
 	std::unordered_map<int, double> inpts({{0, 2.0},{1, 6.0},{2, 34.0}});
 	gp.SetInputs(inpts);
@@ -86,7 +86,7 @@ TEST_CASE("Test Avida GP", "[Hardware]")
 	REQUIRE(gp.GetInput(0) == 2.0);
 	gp.SetInput(0, 46.0);
 	REQUIRE(gp.GetInput(0) == 46.0);
-	
+
 	// Outputs
 	std::unordered_map<int, double> otpts({{0, 72.0},{1, 8.0},{2, 18.0}});
 	gp.SetOutputs(otpts);

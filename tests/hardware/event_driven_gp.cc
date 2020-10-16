@@ -11,12 +11,12 @@
 #include <cereal/archives/json.hpp>
 #include <cereal/archives/binary.hpp>
 
-#include "base/Ptr.h"
-#include "hardware/EventDrivenGP.h"
-#include "hardware/signalgp_utils.h"
-#include "hardware/InstLib.h"
-#include "hardware/EventLib.h"
-#include "tools/Random.h"
+#include "emp/base/Ptr.h"
+#include "emp/hardware/EventDrivenGP.h"
+#include "emp/hardware/signalgp_utils.h"
+#include "emp/hardware/InstLib.h"
+#include "emp/hardware/EventLib.h"
+#include "emp/math/Random.h"
 
 #include <sstream>
 #include <iostream>
