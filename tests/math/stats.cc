@@ -2,15 +2,15 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/stats.h"
-#include "tools/vector_utils.h"
+#include "emp/math/stats.h"
+#include "emp/datastructs/vector_utils.h"
 
 #include <sstream>
 #include <iostream>
 #include <deque>
 
 
-TEST_CASE("Test stats", "[tools]") {
+TEST_CASE("Test stats", "[math]") {
   emp::vector<int> vec1({1,2,1,1,2,3});
   double i1 = 1;
   double i2 = 1;

@@ -2,13 +2,13 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/info_theory.h"
+#include "emp/math/info_theory.h"
 
 #include <sstream>
 #include <string>
 
 
-TEST_CASE("Test info_theory", "[tools]")
+TEST_CASE("Test info_theory", "[math]")
 {
   emp::vector<int> weights = { 100, 100, 200 };
   REQUIRE( emp::Entropy(weights) == 1.5 );

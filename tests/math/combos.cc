@@ -2,16 +2,16 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/combos.h"
+#include "emp/math/combos.h"
 
 #include <sstream>
 
-TEST_CASE("Test combos", "[tools]")
+TEST_CASE("Test combos", "[math]")
 {
   // constructor
   emp::ComboIDs cid(10, 3);
-  
-  // accessors 
+
+  // accessors
   REQUIRE((cid.GetNumCombos() == 120));
   REQUIRE((cid.size() == 120));
   REQUIRE((cid.GetComboSize() == 3));
@@ -19,7 +19,7 @@ TEST_CASE("Test combos", "[tools]")
   for(size_t i=0;i<cid.GetComboSize();i++){
     REQUIRE(cid.GetMaxCombo()[i] == first_max_combo+i);
   }
-  
+
   // stepping through combos
   REQUIRE((cid[0] == 0));
   REQUIRE((cid[1] == 1));
@@ -34,7 +34,7 @@ TEST_CASE("Test combos", "[tools]")
   REQUIRE((cid.GetCombo()[0] == 0));
   REQUIRE((cid.GetCombo()[1] == 2));
   REQUIRE((cid.GetCombo()[2] == 6));
-  
+
   for(size_t i=0;i<108;i++){
     ++cid; // test pre fix ++
   }
@@ -43,13 +43,13 @@ TEST_CASE("Test combos", "[tools]")
   REQUIRE(cid.GetCombo()[0] == 0);
   REQUIRE(cid.GetCombo()[1] == 1);
   REQUIRE(cid.GetCombo()[2] == 2);
-  
+
   // resize
   cid.ResizeCombos(2);
   REQUIRE(cid.size() == 45);
   REQUIRE(cid.GetCombo()[0] == 0);
   REQUIRE(cid.GetCombo()[1] == 1);
-  
+
   // inverse combo 2 3 4 5 6 7 8 9 ( everything not in cur combo )
   int first_inverse = 2;
   for(size_t i=0;i<8;i++){

@@ -2,8 +2,8 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/Distribution.h"
-#include "tools/Random.h"
+#include "emp/math/Distribution.h"
+#include "emp/math/Random.h"
 
 #include <sstream>
 #include <iostream>
@@ -19,7 +19,7 @@
   }
 
 
-TEST_CASE("Test Binomial", "[tools]")
+TEST_CASE("Test Binomial", "[math]")
 {
   // test over a consistent set of seeds
   for (int s = 1; s <= 200; ++s) {

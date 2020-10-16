@@ -2,14 +2,14 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/sequence_utils.h"
+#include "emp/math/sequence_utils.h"
 
 #include <sstream>
 #include <iostream>
 #include <string>
 
 
-TEST_CASE("Test sequence utils", "[tools]")
+TEST_CASE("Test sequence utils", "[math]")
 {
   std::string s1 = "This is the first test string.";
   std::string s2 = "This is the second test string.";

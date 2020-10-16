@@ -3,11 +3,12 @@
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 
-#include "tools/Lexer.h"
-#include "tools/MatchBin.h"
-#include "tools/NFA.h"
-#include "tools/RegEx.h"
-#include "tools/Random.h"
+// #include "tools/Lexer.h"
+// #include "tools/MatchBin.h"
+// #include "tools/NFA.h"
+// #include "tools/RegEx.h"
+#include "emp/math/Random.h"
+#include "emp/math/random_utils.h"
 
 
 
@@ -27,7 +28,7 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>
 
-TEST_CASE("Test Random", "[tools]")
+TEST_CASE("Test Random", "[math]")
 {
 	// Get Seed
 	emp::Random rnd(1);
@@ -35,40 +36,40 @@ TEST_CASE("Test Random", "[tools]")
 	REQUIRE(rnd.GetOriginalSeed() == 1);
 	rnd.ResetSeed(5);
 	REQUIRE(rnd.GetOriginalSeed() == 5);
-	
+
 	// Get Double
 	double r_d = rnd.GetDouble(emp::Range<double>(0.0,5.0));
 	REQUIRE(r_d >= 0.0);
 	REQUIRE(r_d < 5.0);
-	
+
 	// Get UInt
 	size_t r_ui = rnd.GetUInt(emp::Range<size_t>(0,5));
 	REQUIRE(r_ui < 5);
-	
+
 	// Get Int
 	int r_i = rnd.GetInt(emp::Range<int>(-5,5));
 	REQUIRE(r_i >= -5);
 	REQUIRE(r_i < 5);
-	
+
 	// Get UInt64
 	uint64_t ui64 = rnd.GetUInt64(100);
 	REQUIRE(ui64 < 100);
 	ui64 = rnd.GetUInt64(100000000000);
 	REQUIRE(ui64 < 100000000000);
-	
+
 	// Values are consistent when random seeded with 5
 	double rndNormal = rnd.GetRandNormal(5.0, 0.1);
 	REQUIRE( abs(rndNormal - 4.7872776323) < 0.1 );
-	
+
 	REQUIRE(rnd.GetRandPoisson(1.0, 0.9) == 1.0);
 	REQUIRE(rnd.GetApproxRandBinomial(3000, 0.1) == 314);
 	REQUIRE(rnd.GetApproxRandBinomial(10, 0.3) == 4);
-	
+
 	emp::RandomStdAdaptor randomStd(rnd);
 	REQUIRE(randomStd(4) == 3);
 }
 
-TEST_CASE("Another Test random", "[tools]")
+TEST_CASE("Another Test random", "[math]")
 {
 
   std::unordered_map<std::string, std::pair<size_t, size_t>> n_fails;
@@ -274,7 +275,7 @@ TEST_CASE("Another Test random", "[tools]")
 
 
   // Mimimal test of Choose()
-  emp::vector<size_t> choices = Choose(rng,100,10);
+  emp::vector<size_t> choices = emp::Choose(rng,100,10);
 
   REQUIRE(choices.size() == 10);
 
