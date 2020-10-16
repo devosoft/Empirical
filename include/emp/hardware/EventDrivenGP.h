@@ -8,10 +8,10 @@
 #include <utility>
 #include <algorithm>
 #include <ratio>
-#include "../../third-party/cereal/include/cereal/cereal.hpp"
-#include "../../third-party/cereal/include/cereal/types/string.hpp"
-#include "../../third-party/cereal/include/cereal/types/unordered_map.hpp"
-#include "../../third-party/cereal/include/cereal/types/unordered_set.hpp"
+#include "../../../third-party/cereal/include/cereal/cereal.hpp"
+#include "../../../third-party/cereal/include/cereal/types/string.hpp"
+#include "../../../third-party/cereal/include/cereal/types/unordered_map.hpp"
+#include "../../../third-party/cereal/include/cereal/types/unordered_set.hpp"
 #include "../bits/BitSet.h"
 #include "../bits/BitVector.h"
 #include "../datastructs/map_utils.h"
