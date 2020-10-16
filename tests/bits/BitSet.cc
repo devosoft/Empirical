@@ -21,33 +21,14 @@
 #include <unordered_set>
 #include <ratio>
 
-
-
-#include "data/DataNode.h"
-
-#include "tools/BitSet.h"
-#include "tools/FunctionSet.h"
-#include "tools/RegEx.h"
-#include "tools/Random.h"
-#include "tools/TypeTracker.h"
-#include "tools/attrs.h"
-
-//all of these include statements not necessarily used
-#include "tools/flex_function.h"
-#include "tools/functions.h"
-#include "tools/hash_utils.h"
-#include "tools/info_theory.h"
-#include "tools/keyname_utils.h"
-#include "tools/math.h"
-#include "tools/mem_track.h"
-#include "tools/memo_function.h"
-#include "tools/NullStream.h"
-#include "tools/sequence_utils.h"
-#include "tools/set_utils.h"
-#include "tools/stats.h"
-#include "tools/string_utils.h"
-#include "tools/tuple_struct.h"
-#include "tools/vector_utils.h"
+#include "emp/data/DataNode.h"
+#include "emp/bits/BitSet.h"
+#include "emp/functional/FunctionSet.h"
+#include "emp/compiler/RegEx.h"
+#include "emp/math/Random.h"
+#include "emp/tools/TypeTracker.h"
+#include "emp/tools/attrs.h"
+#include "emp/base/map.h"
 
 
 /// Ensures that

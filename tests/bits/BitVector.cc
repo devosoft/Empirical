@@ -6,8 +6,8 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/BitVector.h"
-#include "base/vector.h"
+#include "emp/bits/BitVector.h"
+#include "emp/base/vector.h"
 
 #include <sstream>
 #include <map>

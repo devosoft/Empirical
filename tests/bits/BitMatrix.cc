@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/BitMatrix.h"
+#include "emp/bits/BitMatrix.h"
 
 #include <sstream>
 
@@ -66,7 +66,7 @@ void test_flip(){
 }
 
 /**
- * SetAll, SetCol, SetRow, 
+ * SetAll, SetCol, SetRow,
  * Clear, ClearCol, ClearRow
  */
 void test_setall_clear(){
@@ -114,12 +114,12 @@ void test_shifts_one(){
 	REQUIRE(bm.Get(16));
 	REQUIRE(!bm.Get(12));
 	REQUIRE((bm.FindBit() == 6));
-	
+
 	emp::BitMatrix<3,3> bm1;
 	bm1.SetCol(2);
 	bm1 = bm1.RightShift();
 	REQUIRE(bm1.None());
-	
+
 	bm1.SetRow(0);
 	bm1 = bm1.UpShift();
 	REQUIRE(bm1.None());
@@ -133,15 +133,15 @@ void test_shifts_two(){
 	bm.Set(1,1);
 	bm = bm.DRShift();
 	REQUIRE( (bm.Get(2,2) && !bm.Get(1,1)) );
-	
+
 	bm = bm.ULShift();
 	bm = bm.ULShift();
 	REQUIRE( (!bm.Get(2,2) && bm.Get(0,0)) );
-	
+
 	bm.Set(1,1);
 	bm = bm.URShift();
 	REQUIRE( (bm.Get(2,0) && !bm.Get(0,0)) );
-	
+
 	bm = bm.DLShift();
 	REQUIRE( (bm.Get(1,1) && !bm.Get(2,0)) );
 }
@@ -163,13 +163,13 @@ void test_region(){
 	emp::BitMatrix<3,3> bm;
 	// nothing is set on this matrix, so get region will be empty
 	REQUIRE( bm.GetRegion(0).None() );
-	
+
 	bm.Set(3);
 	bm.Set(4);
 	bm.Set(8);
 	emp::BitMatrix<3,3> bm_region = bm.GetRegion(4);
 	REQUIRE( (bm_region.Get(3) && bm_region.Get(4) && !bm_region.Get(8)) );
-	
+
 	bm.Set(2);
 	bm.Set(5);
 	bm_region = bm.GetRegion(1,1);
@@ -184,7 +184,7 @@ void test_connected(){
 	bm.SetRow(1);
 	bm.Set(8);
 	REQUIRE(bm.IsConnected());
-	
+
 	bm.Unset(4);
 	REQUIRE(!bm.IsConnected());
 }
@@ -222,12 +222,12 @@ void test_assignments(){
 	bm0.Set(2);
 	emp::BitMatrix<2,2> bm1 = bm0;
 	REQUIRE( (!bm1.Get(0) && bm1.Get(1) && bm1.Get(2) && !bm1.Get(3)) );
-	
+
 	emp::BitMatrix<2,2> bm2;
 	bm2.Set(0);
 	bm2 |= bm1;
 	REQUIRE( (!bm2.Get(3) && bm2.Get(2)) );
-	
+
 	bm2 &= bm0;
 	REQUIRE( (!bm2.Get(0) && bm2.Get(1) && bm2.Get(2)) );
 	bm0.Set(0);

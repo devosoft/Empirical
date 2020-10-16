@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/bitset_utils.h"
+#include "emp/bits/bitset_utils.h"
 
 #include <sstream>
 
@@ -16,7 +16,7 @@ TEST_CASE("Test bitset_utils", "[tools]")
   uint64_t one = 2;
   REQUIRE(emp::count_bits(one) == 1);
   REQUIRE(emp::find_bit(one) == 1);
-  
+
   uint64_t two = 2;
   REQUIRE(emp::pop_bit(two) == 1);
   REQUIRE(emp::count_bits(two) == 0);
