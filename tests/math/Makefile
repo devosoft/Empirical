@@ -1,4 +1,4 @@
-TEST_NAMES = combos Distribution info_theory math random_utils Random sequence_utils stats
+TEST_NAMES = combos Distribution info_theory math random_utils Random sequence_utils stats Range
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/
