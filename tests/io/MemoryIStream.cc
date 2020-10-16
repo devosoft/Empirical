@@ -6,12 +6,12 @@
 #include <limits>
 #include <ratio>
 
-#include "tools/ContiguousStream.h"
-#include "tools/MemoryIStream.h"
-#include "tools/Random.h"
-#include "tools/random_utils.h"
+#include "emp/io/ContiguousStream.h"
+#include "emp/io/MemoryIStream.h"
+#include "emp/math/Random.h"
+#include "emp/math/random_utils.h"
 
-TEST_CASE("MemoryIStream", "[tools]") {
+TEST_CASE("MemoryIStream", "[io]") {
 
   const size_t num_ints = std::kilo{}.num;
 

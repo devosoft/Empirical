@@ -2,14 +2,14 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/NullStream.h"
+#include "emp/io/NullStream.h"
 
 #include <sstream>
 #include <iostream>
 
 
 
-TEST_CASE("Test NullStream", "[tools]")
+TEST_CASE("Test NullStream", "[io]")
 {
   emp::NullStream ns;
   ns << "abcdefg";
@@ -19,7 +19,7 @@ TEST_CASE("Test NullStream", "[tools]")
   ns.flush();
 }
 
-TEST_CASE("Test nout", "[tools]")
+TEST_CASE("Test nout", "[io]")
 {
   emp::nout << "abcdefg";
   emp::nout << std::endl;

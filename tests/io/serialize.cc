@@ -2,12 +2,12 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/serialize.h"
+#include "emp/io/serialize.h"
 
 #include <sstream>
 #include <map>
 
-TEST_CASE("Test serialize", "[tools]")
+TEST_CASE("Test serialize", "[io]")
 {
 
 }
@@ -69,7 +69,7 @@ TEST_CASE("Test serialize", "[tools]")
 //   EMP_SETUP_DATAPOD(BuiltInTypesTest, a, int_v);
 // };
 
-// TEST_CASE("Test serialize", "[tools]")
+// TEST_CASE("Test serialize", "[io]")
 // {
 //   std::stringstream ss;
 //   emp::serialize::DataPod pod(ss);
@@ -220,7 +220,7 @@ struct {
   }
 } sum_nocopy;
 */
-// TEST_CASE("Test Attribute Packs", "[tools]") {
+// TEST_CASE("Test Attribute Packs", "[io]") {
 //   using namespace emp::tools;
 //   // Test Construction & access
 //   CONSTEXPR_REQUIRE_EQ(Foo::CallOrGetAttribute(Foo(6)).Get(), 6);

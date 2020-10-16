@@ -2,14 +2,14 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "tools/ContiguousStream.h"
-#include "tools/Random.h"
+#include "emp/io/ContiguousStream.h"
+#include "emp/math/Random.h"
 
 #include <sstream>
 #include <iostream>
 
 
-TEST_CASE("Test ContiguousStreamBuf", "[tools]")
+TEST_CASE("Test ContiguousStreamBuf", "[io]")
 {
   emp::Random rand(1);
 
