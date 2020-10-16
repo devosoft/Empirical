@@ -2,17 +2,17 @@
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include <iostream>
-#include "base/array.h"
-#include "Evolve/NK-const.h"
-#include "Evolve/World.h"
-#include "Evolve/Resource.h"
-#include "Evolve/NK.h"
+#include "emp/base/array.h"
+#include "emp/Evolve/NK-const.h"
+#include "emp/Evolve/World.h"
+#include "emp/Evolve/Resource.h"
+#include "emp/Evolve/NK.h"
 
 
 
-#include "tools/BitSet.h"
-#include "tools/Random.h"
-#include "tools/string_utils.h"
+#include "emp/bits/BitSet.h"
+#include "emp/math/Random.h"
+#include "emp/tools/string_utils.h"
 
 constexpr size_t K = 3;
 constexpr size_t N = 40;

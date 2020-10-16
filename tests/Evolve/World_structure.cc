@@ -3,8 +3,8 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "Evolve/World_structure.h"
-#include "Evolve/World.h"
+#include "emp/Evolve/World_structure.h"
+#include "emp/Evolve/World.h"
 
 #include <sstream>
 #include <iostream>
@@ -16,7 +16,7 @@ TEST_CASE("Test World structure", "[Evolve]")
 	world.InjectAt(23, 0);
 	world.InjectAt(28, 1);
 	world.InjectAt(25, 2);
-	
+
 	SetPools(world, 3, 1);
 	REQUIRE(world.GetSize() == 3);
 	REQUIRE(world.GetNumOrgs() == 3);
@@ -31,9 +31,9 @@ TEST_CASE("Test World structure", "[Evolve]")
 	REQUIRE(world.GetNumOrgs() == 3);
 	world.DoDeath();
 	REQUIRE(world.GetNumOrgs() == 2);
-	world.Inject(48);	
+	world.Inject(48);
 	REQUIRE(world.GetNumOrgs() == 3);
-	
+
 	SetPools(world, 2, 2, true);
 	REQUIRE(world.GetSize() == 4);
 	REQUIRE(world.GetNumOrgs() == 3);
@@ -43,7 +43,7 @@ TEST_CASE("Test World structure", "[Evolve]")
 	world.DoBirth(42, 2);
 	REQUIRE(world[2] != 42);
 	REQUIRE(world.GetNextOrg(2) == 42);
-	
+
 	// Set Elites
 	emp::World<int> world1;
 	emp::TraitSet<int> ts1;
@@ -66,18 +66,18 @@ TEST_CASE("Test World structure", "[Evolve]")
 	REQUIRE(world1[0] == 51);
 	world1.DoDeath();
 	REQUIRE(world1.GetNumOrgs() == 0);
-	
+
 	#ifdef EMP_TDEBUG
 	REQUIRE(world1.GetRandomNeighborPos(0).GetIndex() == 0);
 	#endif
-	
+
 	emp::World<int> world2;
 	world2.Resize(10);
 	REQUIRE(world2.GetSize() == 10);
 	SetMapElites(world2, ts1);
 	REQUIRE(world2.GetAttribute("PopStruct") == "MapElites");
 	REQUIRE(world2.GetSize() == 9);
-	
+
 	emp::World<int> world2_1;
 	world2_1.Resize(5);
 	world2_1.AddPhenotype(">50", fun);
@@ -85,7 +85,7 @@ TEST_CASE("Test World structure", "[Evolve]")
 	trait_counts.push_back(world2_1.GetSize());
 	SetMapElites(world2_1, trait_counts);
 	REQUIRE(world2_1.size() == 5);
-	
+
 	emp::World<int> world3;
 	world3.Resize(10);
 	REQUIRE(world3.GetSize() == 10);
@@ -94,14 +94,14 @@ TEST_CASE("Test World structure", "[Evolve]")
 	SetMapElites(world3, ts2);
 	REQUIRE(world3.GetAttribute("PopStruct") == "MapElites");
 	REQUIRE(world3.GetSize() == 10);
-	
+
 	emp::World<int> world4;
 	world4.Resize(5);
 	world4.AddPhenotype(">50", fun);
 	SetMapElites(world4);
 	REQUIRE(world4.GetAttribute("PopStruct") == "MapElites");
 	REQUIRE(world4.GetSize() == 5);
-	
+
 	emp::World<int> world5;
 	world5.Resize(2);
 	world5.InjectAt(11, 0);
@@ -111,11 +111,11 @@ TEST_CASE("Test World structure", "[Evolve]")
 	REQUIRE(world5.GetSize() == 2);
 	REQUIRE(world5.IsSynchronous() == false);
 	REQUIRE(world5.IsSpaceStructured() == false);
-	
+
 	#ifdef EMP_TDEBUG
 	REQUIRE(world5.GetRandomNeighborPos(0).GetIndex() == 0);
 	#endif
-	
+
 	world5.InjectAt(33, 1);
 	REQUIRE(world5[1] == 33);
 	REQUIRE(world5.GetNumOrgs() == 2);
@@ -125,7 +125,7 @@ TEST_CASE("Test World structure", "[Evolve]")
 	world5.DoBirth(22, 0);
 	REQUIRE(world5.GetNumOrgs() == 2);
 	REQUIRE(world5[1] == 22);
-	
+
 	// World_MinDistInfo
 	emp::World<int> world6;
 	world6.InjectAt(4, 0);
@@ -145,7 +145,7 @@ TEST_CASE("Test World structure", "[Evolve]")
 	REQUIRE(w6_distInfo.bin_ids[1].size() == 0);
 	REQUIRE(w6_distInfo.nearest_id[0] == 1);
 	REQUIRE(w6_distInfo.distance[0] == 1.0);
-	
+
 	REQUIRE(w6_distInfo.distance.size() == 3);
 	REQUIRE(w6_distInfo.OK());
 	world6.InjectAt(11, 0);
@@ -153,10 +153,10 @@ TEST_CASE("Test World structure", "[Evolve]")
 	w6_distInfo.Update(0);
 	REQUIRE(w6_distInfo.distance[0] == 0.0);
 	REQUIRE(w6_distInfo.distance.size() == 3);
-	
+
 	w6_distInfo.Clear();
 	REQUIRE(w6_distInfo.distance.size() == 0);
-	
+
 	// WorldPosition
 	emp::WorldPosition worldPos(1, 0);
 	REQUIRE(worldPos.GetIndex() == 1);

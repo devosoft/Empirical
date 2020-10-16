@@ -5,18 +5,17 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "Evolve/SystematicsAnalysis.h"
 
 #include <sstream>
 #include <iostream>
 
-#include "Evolve/Systematics.h"
-#include "Evolve/SystematicsAnalysis.h"
-#include "Evolve/World.h"
-#include "base/vector.h"
-#include <iostream>
-#include "hardware/AvidaGP.h"
-#include "Evolve/World_output.h"
+#include "emp/Evolve/SystematicsAnalysis.h"
+#include "emp/Evolve/Systematics.h"
+#include "emp/Evolve/SystematicsAnalysis.h"
+#include "emp/Evolve/World.h"
+#include "emp/base/vector.h"
+#include "emp/hardware/AvidaGP.h"
+#include "emp/Evolve/World_output.h"
 
 
 TEST_CASE("Test Systematics", "[Evolve]")

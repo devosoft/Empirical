@@ -3,7 +3,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "Evolve/NK.h"
+#include "emp/Evolve/NK.h"
 
 #include <sstream>
 #include <iostream>
@@ -13,7 +13,7 @@ TEST_CASE("Test NK Landscapes", "[Evolve]")
 	emp::NKLandscape nk0;
 	REQUIRE(nk0.GetN() == 0);
 	REQUIRE(nk0.GetK() == 0);
-	
+
 	emp::Random rnd(52);
 	nk0.Config(5, 1, rnd);
 	REQUIRE(nk0.GetStateCount() == 4);
@@ -29,7 +29,7 @@ TEST_CASE("Test NK Landscapes", "[Evolve]")
 	REQUIRE(nk0.GetFitness(bv) == 5.0);
 	nk0.RandomizeStates(rnd, 100);
 	REQUIRE(nk0.GetFitness(0, 0) != 1.0);
-	
+
 	emp::NKLandscapeMemo nk1(5, 1, rnd);
 	REQUIRE(nk1.GetN() == 5);
 	REQUIRE(nk1.GetK() == 1);

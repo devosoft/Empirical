@@ -2,8 +2,8 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "Evolve/World.h"
-#include "Evolve/World_select.h"
+#include "emp/Evolve/World.h"
+#include "emp/Evolve/World_select.h"
 
 #include <sstream>
 #include <iostream>
@@ -27,9 +27,9 @@ TEST_CASE("Test World select", "[Evolve]")
 	world.Inject(7);
 	world.Inject(9);
 	world.Inject(5);
-	
+
 	std::function<double(const int&)> isoddconst = [](const int& o){ return (o % 2 == 0) ? 0.0 : 1.0;};
-	std::function<double(const int&)> remainthree = [](const int& o){ return o % 3; }; 
+	std::function<double(const int&)> remainthree = [](const int& o){ return o % 3; };
 	emp::vector<std::function<double(const int&)>> listOfFunctions;
 	listOfFunctions.push_back(isoddconst);
 	listOfFunctions.push_back(remainthree);
@@ -41,7 +41,7 @@ TEST_CASE("Test World select", "[Evolve]")
 	world.Inject(3);
 	world.Inject(7);
 	world.Inject(9);
-	
+
 	emp::OptimizedLexicaseSelect(world, listOfFunctions);
 	REQUIRE(world.GetNumOrgs() == 4);
 	world.Update();

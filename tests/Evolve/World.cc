@@ -3,14 +3,14 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "Evolve/World.h"
-#include "base/array.h"
-#include "Evolve/Resource.h"
+#include "emp/Evolve/World.h"
+#include "emp/base/array.h"
+#include "emp/Evolve/Resource.h"
 
 
-#include "tools/BitSet.h"
-#include "tools/Random.h"
-#include "tools/string_utils.h"
+#include "emp/bits/BitSet.h"
+#include "emp/math/Random.h"
+#include "emp/tools/string_utils.h"
 
 #include <sstream>
 #include <iostream>
@@ -26,25 +26,25 @@ TEST_CASE("Test World", "[Evolve]")
 	REQUIRE(world1.GetSize() == 0);
 	REQUIRE(world1.GetNumOrgs() == 0);
 	REQUIRE(world1.GetFullPop().size() == 0);
-	
+
 	world1.InjectAt(5, 0);
 	REQUIRE(world1.GetOrg(0) == 5);
 	REQUIRE(world1.GetNumOrgs() == 1);
-	
+
 	world1.InjectAt(3, 1);
 	REQUIRE(world1.GetOrg(1) == 3);
 	REQUIRE(world1.GetNumOrgs() == 2);
-	
+
 	world1.Swap(0, 1);
 	REQUIRE(world1.GetOrg(0) == 3);
 	REQUIRE(world1.GetOrg(1) == 5);
-	
+
 	world1.DoDeath(1);
 	REQUIRE(world1.GetNumOrgs() == 1);
-	
+
 	world1.Reset();
 	REQUIRE(world1.GetNumOrgs() == 0);
-	
+
 	world1.SetPopStruct_Grow(true);
 	world1.InjectAt(6, 3);
 	REQUIRE(world1.GetNumOrgs() == 1);
@@ -57,26 +57,26 @@ TEST_CASE("Test World", "[Evolve]")
 	world1.RemoveOrgAt(0);
 	REQUIRE(world1.GetNumOrgs() == 0);
 	world1.InjectAt(5, 0);
-	
+
 	world1.SetAddInjectFun([](emp::Ptr<int> new_org){ return 6; });
 	world1.Inject(9);
 	REQUIRE(world1.GetOrg(6) == 9);
 	world1.Inject(7);
 	REQUIRE(world1.GetOrg(6) == 7);
-	
+
 	world1.SetAddBirthFun([](emp::Ptr<int> new_org, emp::WorldPosition parent_pos){ return 4;});
 	world1.DoBirth(11, 6);
 	REQUIRE(world1.GetOrg(4) == 11);
-	
+
 	world1.SetKillOrgFun([&world1](){world1.DoDeath(4); return 4;});
 	REQUIRE(world1.GetNumOrgs() == 3);
 	world1.DoDeath();
 	REQUIRE(world1.GetNumOrgs() == 2);
-	
+
 	world1.clear();
 	REQUIRE(world1.GetNumOrgs() == 0);
 	REQUIRE(world1.size() == 0);
-	
+
 	emp::World<double> world2("World 2");
 	world2.SetPopStruct_Grid(1, 1, true);
 	REQUIRE(world2.GetWidth() == 1);
@@ -90,7 +90,7 @@ TEST_CASE("Test World", "[Evolve]")
 	REQUIRE(world2.GetNumOrgs() == 1);
 	REQUIRE(world2[0] == 2.5);
 	world2.DoDeath();
-	
+
 	REQUIRE(world2.IsSynchronous());
 	world2.MarkSynchronous(false);
 	REQUIRE(world2.IsSynchronous() == false);
@@ -98,11 +98,11 @@ TEST_CASE("Test World", "[Evolve]")
 	REQUIRE(world2.HasAttribute("PopStruct"));
 	REQUIRE(world2.GetAttribute("PopStruct") == "Grid");
 	world2.SetPopStruct_Grid(3, 5, true);
-	
+
 	world2.InjectAt(6.1, 0);
 	world2.InjectAt(3.5, 3);
 	world2.InjectAt(0.9, 6);
-	
+
 	REQUIRE(world2[0] == 6.1);
 	REQUIRE(world2[3] == 3.5);
 	REQUIRE(world2[6] == 0.9);
@@ -110,12 +110,12 @@ TEST_CASE("Test World", "[Evolve]")
 	REQUIRE(world2.GetOrg(0,1) == 3.5);
 	REQUIRE(world2.GetOrg(0,2) == 0.9);
 	REQUIRE(world2.GetGenome(world2.GetOrg(3)) == 3.5);
-	
+
 	REQUIRE(world2.IsSpaceStructured());
 	world2.MarkSpaceStructured(false);
 	REQUIRE(world2.IsSpaceStructured() == false);
 	world2.MarkSpaceStructured();
-	
+
 	REQUIRE(world2.IsPhenoStructured() == false);
 	world2.MarkPhenoStructured();
 	REQUIRE(world2.IsPhenoStructured());
@@ -129,7 +129,7 @@ TEST_CASE("Test World", "[Evolve]")
 	//world2.AddSystematics(w2_sys1, "sys1");
 	//std::cout << world2.GetSystematics() << std::endl;
 	//REQUIRE(world2.GetSystematics("sys1") == w2_sys1);
-	
+
 	emp::World<double> world3("World3");
 	REQUIRE(world3.GetNumOrgs() == 0);
 	emp::Random rnd(1);
@@ -137,81 +137,81 @@ TEST_CASE("Test World", "[Evolve]")
 	// Figure out how to use InjectRandomOrg
 	//world3.InjectRandomOrg(8.2);
 	//REQUIRE(world3.GetNumOrgs() == 1);
-	
+
 	world3.InjectAt(6.5, 0);
 	world3.SetCache();
 	REQUIRE(world3.IsCacheOn());
 	REQUIRE(world3.CalcFitnessID(0) == 6.5);
 	world3.ClearCache();
-	
+
 	//world3.CalcFitnessAll();
 	std::function<long long unsigned int(double&, emp::Random&)> mutfun = [](double &o, emp::Random& r){ o=o*2; return 1;};
 	world3.SetMutFun(mutfun);
 	world3.DoMutationsID(0);
 	REQUIRE(world3[0] == 13);
-	
+
 	world3.InjectAt(3.1, 1);
 	world3.InjectAt(8.0, 2);
 	world3.DoMutations();
 	REQUIRE(world3[0] == 26.0);
 	REQUIRE(world3[1] == 6.2);
 	REQUIRE(world3[2] == 16.0);
-	
+
 	size_t randomID = world3.GetRandomCellID(0, 3);
 	bool inRange = ( (randomID < 3) );
 	REQUIRE( inRange );
-	
+
 	world3.DoDeath(2);
 	world3.DoDeath(1);
 	REQUIRE(world3.GetRandomOrg() == 26.0);
-	
+
 	emp::vector<size_t> validIDs = world3.GetValidOrgIDs();
 	REQUIRE(validIDs.size() == 1);
 	REQUIRE(validIDs[0] == 0);
-	
+
 	emp::vector<size_t> emptyIDs = world3.GetEmptyPopIDs();
 	REQUIRE(emptyIDs.size() == (world3.GetSize() - 1) );
-	
+
 	world3.SetAutoMutate();
 	world3.SetAddBirthFun([](emp::Ptr<double> new_org, emp::WorldPosition parent_pos){ return parent_pos.GetIndex()+1;});
 	world3.DoBirth(1.8, 0);
 	// 3.6 because mutate function (defined above) doubles the org
 	// SetAutoMutate means the org will mutate before being placed in the world
 	REQUIRE(world3[1] == 3.6);
-	
+
 	world3.SetAutoMutate(3);
 	world3.InjectAt(4.5, 2);
 	REQUIRE(world3[2] == 4.5);
 	world3.InjectAt(3.3, 3);
 	REQUIRE(world3[3] == 6.6);
-	
+
 	emp::World<double> world4;
 	REQUIRE(world4.size() == 0);
 	world4.resize(10);
 	REQUIRE(world4.size() == 10);
 	REQUIRE( (world4.begin() == world4.end()) );
-	
+
 	// discards qualifiers because  world_iterator::bool() is const but calls MakeValid
 	// REQUIRE(world4.begin());
-	
+
 	world4.InjectAt(2.3, 0);
 	REQUIRE( *world4.begin() == 2.3 );
-	
+
 	world4.SetGetNeighborFun([](emp::WorldPosition pos){ return emp::WorldPosition(pos.GetIndex()+1); });
 	REQUIRE(world4.GetRandomNeighborPos(0).GetIndex() == 1);
-	
+
 	REQUIRE(world4.GetPhenotypes().GetSize() == 0);
 	std::function<double(double&)> func = [](double& o){ return ((int)o % 2 == 0) ?  o*2.0 : o*0.5; };
 	world4.AddPhenotype("trait1", func);
 	REQUIRE(world4.GetPhenotypes().GetSize() == 1);
 	//REQUIRE(world4.GetPhenotypes().Find("trait1") == 0);
-	
+
 	// Inject into maybe a full world? try to get else statement coverage
 	// Add/Get DataNode
 	// Resize #3
 	// GetFile
 	// Systematics (broke?)
-	
+
 	// Signals - having issues with clang++ test coverage
 	/*emp::World<double> world5;
 	world5.Resize(5);
@@ -219,7 +219,7 @@ TEST_CASE("Test World", "[Evolve]")
 	const emp::SignalControl sglc = world5.GetSignalControl();
 	REQUIRE(sglc.GetNumSignals() == 9);
 	REQUIRE(sglc.GetNumActions() == 0);
-	
+
 	std::function<void(size_t)> obr = [&world5](size_t w) mutable { world5.InjectAt(5.0, w); };
 	world5.OnBeforeRepro(obr);
 	world5.SetAddBirthFun([](emp::Ptr<double> o, emp::WorldPosition p){ return p.GetIndex()+1; });
@@ -227,26 +227,26 @@ TEST_CASE("Test World", "[Evolve]")
 	REQUIRE(world5[0] == 5.0);
 	REQUIRE(world5[1] == 6.7);
 	REQUIRE(world5.GetNumOrgs() == 2);
-	
+
 	std::function<void(size_t)> ood = [&world5](size_t w) mutable { world5.InjectAt(9.9, (w+1)%world5.size()); };
 	world5.OnOrgDeath(ood);
 	world5.RemoveOrgAt(1);
 	REQUIRE(world5[2] == 9.9);
 	REQUIRE(world5.GetNumOrgs() == 2);
-	
+
 	std::function<void(emp::WorldPosition, emp::WorldPosition)> oso = [&world5](emp::WorldPosition o1, emp::WorldPosition o2) mutable { world5.InjectAt(world5[o2.GetIndex()], (o1.GetIndex()+1)%world5.size()); };
 	world5.OnSwapOrgs(oso);
 	world5.Swap(0, 2);
 	REQUIRE(world5[1] == 5.0);
 	REQUIRE(world5[2] == 5.0);
 	REQUIRE(world5[0] == 9.9);
-	
+
 	std::function<void(double&)> oir = [](double& o) mutable { o = 1.0; };
 	world5.OnInjectReady(oir);
 	world5.InjectAt(33.0, 3);
 	REQUIRE(world5[3] == 1.0);
 	*/
-	
+
 	emp::World<double> world6;
 	world6.resize(5);
 	world6.InjectAt(5.0, 0);
