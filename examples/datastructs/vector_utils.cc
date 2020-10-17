@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "tools/vector_utils.h"
+#include "emp/datastructs/vector_utils.h"
 
 int main()
 {
@@ -26,7 +26,7 @@ int main()
 
   emp::vector<int> v = { 14, 13, 1, 2, 3, 4, 22, 5, 6, 7, 8, 9, 10, 12 };
 
-  
+
   emp::Print(v);  std::cout << std::endl;
 
   std::cout << "Min index = " << emp::FindMinIndex(v) << std::endl;
@@ -44,7 +44,7 @@ int main()
   emp::Print(v);  std::cout << std::endl;
   std::cout << "Min index = " << emp::FindMinIndex(v) << std::endl;
   std::cout << "Max index = " << emp::FindMaxIndex(v) << std::endl;
-  
+
   emp::HeapInsert(v, 11);
 
   std::cout << "\nPost Insert(11):\n";

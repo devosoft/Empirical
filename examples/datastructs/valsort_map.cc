@@ -8,8 +8,8 @@
 #include <set>
 #include <string>
 
-#include "tools/valsort_map.h"
-#include "tools/Random.h"
+#include "emp/datastructs/valsort_map.h"
+#include "emp/math/Random.h"
 
 int main()
 {
@@ -45,7 +45,7 @@ int main()
   score_map.Set("Merinita", 4);
   score_map.Set("Quaesitor", 0);
 
-  
+
 
   std::cout << "\n\nBY NAME:\n";
   for (auto it = score_map.cbegin(); it != score_map.cend(); it++) {
@@ -54,6 +54,6 @@ int main()
 
   std::cout << "\nBY HIGH SCORE\n";
   for (auto it = score_map.crvbegin(); it != score_map.crvend(); it++) {
-    std::cout << it->first << " : " << it->second << std::endl;    
+    std::cout << it->first << " : " << it->second << std::endl;
   }
 }

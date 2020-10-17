@@ -7,8 +7,8 @@
 
 #include <set>
 
-#include "tools/ra_set.h"
-#include "tools/Random.h"
+#include "emp/datastructs/ra_set.h"
+#include "emp/math/Random.h"
 
 int main()
 {

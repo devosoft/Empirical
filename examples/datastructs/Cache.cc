@@ -6,7 +6,7 @@
 //  Some examples code for using emp::Cache
 
 #include <iostream>
-#include "tools/Cache.h"
+#include "emp/datastructs/Cache.h"
 
 double F(int N) {
   double PI = 3.14159;

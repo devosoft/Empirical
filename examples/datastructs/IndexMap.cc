@@ -6,9 +6,9 @@
 //  Some examples code for using emp::Random
 
 #include <iostream>
-#include "base/vector.h"
-#include "tools/Random.h"
-#include "tools/IndexMap.h"
+#include "emp/base/vector.h"
+#include "emp/math/Random.h"
+#include "emp/datastructs/IndexMap.h"
 
 int main()
 {

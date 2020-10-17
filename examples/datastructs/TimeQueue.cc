@@ -5,7 +5,7 @@
 //  Some examples code for using emp::TimeQueue
 
 #include <iostream>
-#include "tools/TimeQueue.h"
+#include "emp/datastructs/TimeQueue.h"
 
 int main()
 {
@@ -20,7 +20,7 @@ int main()
   // Print the first item; advance time to 120.
   std::cout << time_queue.Next() << std::endl;
   time_queue.Insert(5, 230.0);
-  
+
   while (time_queue.GetSize()) {
     std::cout << time_queue.Next() << std::endl;
   }
@@ -29,7 +29,7 @@ int main()
 
 
   std::cout << "\nNow with strings:\n";
-  
+
   emp::TimeQueue<std::string> time_queue2;
 
   time_queue2.Insert("Item 0", 1.3);
@@ -41,8 +41,8 @@ int main()
   // Print the first item; advance time to 120.
   std::cout << time_queue2.Next() << std::endl;
   time_queue2.Insert("Item 5", 2.3);
-  
-  
+
+
   while (time_queue2.GetSize()) {
     std::cout << time_queue2.Next() << std::endl;
   }
