@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-#include "data/VarMap.h"
+#include "emp/data/VarMap.h"
 
 int main()
 {

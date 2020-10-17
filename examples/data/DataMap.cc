@@ -9,8 +9,8 @@
 
 #include <iostream>
 
-#include "data/DataMap.h"
-#include "tools/BitVector.h"
+#include "emp/data/DataMap.h"
+#include "emp/bits/BitVector.h"
 
 int main()
 {
@@ -57,7 +57,7 @@ int main()
   std::cout << "name3:      " << dmap.GetType("name3") << std::endl;
   std::cout << "bit_vector: " << dmap.GetType("bit_vector") << std::endl;
 
-  
+
   // -------------- Examples of MULTIPLE DataMaps --------------
 
   emp::DataMap data_map;

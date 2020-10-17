@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "data/DataFile.h"
+#include "emp/data/DataFile.h"
 
 using data = emp::data;
 

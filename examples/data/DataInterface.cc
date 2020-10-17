@@ -7,14 +7,14 @@
 
 #include <iostream>
 
-#include "data/DataInterface.h"
+#include "emp/data/DataInterface.h"
 
 using data = emp::data;
 
 int main()
 {
   auto * di = emp::MakeDataInterface<double, emp::data::Current, emp::data::Range, emp::data::Pull, emp::data::Log>();
-  
+
 
 
   delete di;

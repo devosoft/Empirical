@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "data/DataNode.h"
+#include "emp/data/DataNode.h"
 
 int main()
 {
@@ -105,22 +105,22 @@ int main()
   emp::DataNode<double, emp::data::Current, emp::data::Range, emp::data::Histogram, emp::data::Pull, emp::data::Log> hist_data;
   hist_data.SetupBins(1,21,10);
   hist_data.Add(1,2,1,19);
-  
+
   std::cout << "hist_data.GetHistMin() = " << hist_data.GetHistMin()
 	    << "; expected 1" << std::endl;
   std::cout << "hist_data.GetHistWidth(5) = " << hist_data.GetHistWidth(5)
 	    << "; expected 2" << std::endl;
-  
+
   std::cout << "hist_data.GetBinMins() = " << emp::to_string(hist_data.GetBinMins())
 	    << "; expected emp::vector<double>({1,3,5,7,9,11,13,15,17,19}" << std::endl;
-  
+
   std::cout << "hist_data.GetHistCount(9) = " << hist_data.GetHistCount(9)
 	    << "; expected 1" << std::endl;
   std::cout << "hist_data.GetHistCounts() = " << emp::to_string(hist_data.GetHistCounts())
 	    << "; expected emp::vector<size_t>({3,0,0,0,0,0,0,0,0,1}" << std::endl;
-  
+
   hist_data.Reset();
   std::cout << "hist_data.GetHistCounts() = " << emp::to_string(hist_data.GetHistCounts())
 	    << "; expected emp::vector<size_t>({0,0,0,0,0,0,0,0,0,0}" << std::endl;
-  
+
 }

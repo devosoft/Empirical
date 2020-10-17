@@ -7,7 +7,7 @@
  *  @brief An example file for Trait and TraitSet classes.
  */
 
-#include "data/Trait.h"
+#include "emp/data/Trait.h"
 
 int main()
 {
