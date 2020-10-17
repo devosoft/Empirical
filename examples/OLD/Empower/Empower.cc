@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../source/Empower/Empower.h"
+#include "../../include/emp/in_progress/Empower/Empower.h"
 
 int main()
 {

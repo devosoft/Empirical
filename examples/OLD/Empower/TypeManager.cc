@@ -7,14 +7,14 @@
 
 #include <iostream>
 
-#include "../../source/Empower/Type.h"
-#include "../../source/Empower/TypeManager.h"
+#include "../../include/emp/in_progress/Empower/Type.h"
+#include "../../include/emp/in_progress/Empower/TypeManager.h"
 
 void PrintType(const emp::Type & type) {
   std::cout << "type '" << type.GetName()
 	    << "' had id " << type.GetID()
 	    << " and size " << type.GetSize()
-	    << std::endl;  
+	    << std::endl;
 }
 
 int main()
@@ -29,6 +29,6 @@ int main()
   for (const auto * type_ptr : type_v) {
     PrintType(*type_ptr);
   }
-  
-  
+
+
 }

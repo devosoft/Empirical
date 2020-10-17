@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../source/Empower/Struct.h"
+#include "../../include/emp/in_progress/Empower/Struct.h"
 
 int main()
 {

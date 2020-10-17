@@ -7,18 +7,18 @@
 
 #include <iostream>
 
-#include "../../source/Empower/Type.h"
+#include "../../include/emp/in_progress/Empower/Type.h"
 
 void PrintType(emp::Type & type) {
   std::cout << "type '" << type.GetName()
 	    << "' had id " << type.GetID()
 	    << " and size " << type.GetSize()
-	    << std::endl;  
+	    << std::endl;
   std::cout << "   IsType<int> = " << type.IsType<int>()
 	    << "   IsType<double> = " << type.IsType<double>()
 	    << "   IsType<string> = " << type.IsType<std::string>()
 	    << "   IsType<bool> = " << type.IsType<bool>()
-	    << std::endl;  
+	    << std::endl;
 }
 
 int main()
@@ -33,5 +33,5 @@ int main()
   for (auto type_ptr : type_v) {
     PrintType(*type_ptr);
   }
-  
+
 }
