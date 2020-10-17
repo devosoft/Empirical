@@ -8,8 +8,8 @@
  *  @note Status: RELEASE
  */
 
-#ifndef EMP_RANDOM2_H
-#define EMP_RANDOM2_H
+#ifndef EMP_RANDOM_H
+#define EMP_RANDOM_H
 
 #include <ctime>
 #include <climits>
@@ -21,7 +21,7 @@
 #include "bitset_utils.h"
 #include "Range.h"
 
-namespace emp2 {
+namespace emp {
   using namespace emp;
 
   ///  Middle Square Weyl Sequence: A versatile and non-patterned pseudo-random-number
