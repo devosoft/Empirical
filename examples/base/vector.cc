@@ -4,7 +4,7 @@
 
 #include <algorithm>
 
-#include "base/vector.h"
+#include "emp/base/vector.h"
 
 int main()
 {
@@ -38,14 +38,14 @@ int main()
 
   // Removeing 3rd value
   v.erase(v.begin() + 3);
-  std::cout << "After removing value #3: " << std::endl; 
+  std::cout << "After removing value #3: " << std::endl;
   for (auto x : v) { std::cout << x << ' '; }
   std::cout << std::endl;
 
   // Try inserting value in place of old 30
   emp::vector<int> ins_vals = {25, 28, 32, 35};
   v.insert(v.begin() + 3, ins_vals.begin(), ins_vals.end());
-  std::cout << "After inserting four values in place of 30: " << std::endl; 
+  std::cout << "After inserting four values in place of 30: " << std::endl;
   for (auto x : v) { std::cout << x << ' '; }
   std::cout << std::endl;
 

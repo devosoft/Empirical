@@ -2,7 +2,7 @@
 //  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#include "base/array.h"
+#include "emp/base/array.h"
 
 #define A_SIZE 50
 
