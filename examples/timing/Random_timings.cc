@@ -9,14 +9,12 @@
 #include <vector>
 
 #include "tools/Random.h"
-#include "tools/Random2.h"
 
 constexpr const size_t N = 1048576; // 10^20
 
 int main()
 {
-  // emp::Random random;
-  emp2::Random random;
+  emp::Random random;
 
 
   //
