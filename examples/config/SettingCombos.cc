@@ -6,7 +6,7 @@
 //  Some examples code for using emp::SettingCombos
 
 #include <iostream>
-#include "config/SettingCombos.h"
+#include "emp/config/SettingCombos.h"
 
 #define PRINT(X) std::cout << #X " = " << X << std::endl
 
@@ -17,7 +17,7 @@ int main()
   config_set.AddSetting<int>("int1") = { 1, 2, 3, 4 };
   config_set.AddSetting<std::string>("string") = { "a", "b", "cde" };
   config_set.AddSetting<int>("int2") = { 5 };
-  config_set.AddSetting<double>("double", "A double value!", "-d") = { 1.1, 2.2 };
+  config_set.AddSetting<double>("double", "A double value!", 'd') = { 1.1, 2.2 };
 
   do {
     std::cout << config_set.CurString() << std::endl;

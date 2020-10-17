@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "../../source/config/config.h"
+#include "../../include/emp/config/config.h"
 
 EMP_BUILD_CONFIG( MyConfig,
   GROUP(DEFAULT_GROUP, "General Settings"),
@@ -12,14 +12,14 @@ EMP_BUILD_CONFIG( MyConfig,
   VALUE(TEST_STRING, std::string, "default", "This is a string!"),
   CONST(TEST_CONST, int, 91, "This is an unchanging const!"),
   VALUE(TEST_STRING_SPACE, std::string, "abc def   ghi", "This is a string with spaces."),
-  VALUE(TEST_DUP, int, 20, "This is a test of the same name in multiple namespaces.")	  
+  VALUE(TEST_DUP, int, 20, "This is a test of the same name in multiple namespaces.")
 )
 
 EMP_BUILD_CONFIG( MyConfig_internal,
   GROUP(DEFAULT_GROUP, "BASIC SETTINGS"),
   VALUE(TEST_INT1, int, 1, "This is my first integer test."),
   VALUE(TEST_INT2, int, 2, "This is my second integer test."),
-  VALUE(TEST_DUP, int, 3333, "This is a test of the same name in multiple namespaces.")	  
+  VALUE(TEST_DUP, int, 3333, "This is a test of the same name in multiple namespaces.")
 )
 
 int main()

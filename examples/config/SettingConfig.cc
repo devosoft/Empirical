@@ -6,7 +6,7 @@
 //  Some examples code for using emp::SettingConfig
 
 #include <iostream>
-#include "config/SettingConfig.h"
+#include "emp/config/SettingConfig.h"
 
 #define PRINT(X) std::cout << #X " = " << X << std::endl
 
