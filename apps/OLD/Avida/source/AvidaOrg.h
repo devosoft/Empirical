@@ -10,8 +10,8 @@
 #ifndef AVIDA_ORG_H
 #define AVIDA_ORG_H
 
-#include "hardware/AvidaCPU_InstLib.h"
-#include "hardware/AvidaGP.h"
+#include "emp/hardware/AvidaCPU_InstLib.h"
+#include "emp/hardware/AvidaGP.h"
 
 class AvidaOrg : public emp::AvidaCPU_Base {
 private:

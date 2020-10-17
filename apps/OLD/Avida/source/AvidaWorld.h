@@ -9,8 +9,8 @@
 
 #include "AvidaOrg.h"
 
-#include "Evolve/World.h"
-#include "hardware/InstLib.h"
+#include "emp/Evolve/World.h"
+#include "emp/hardware/InstLib.h"
 
 class AvidaWorld : public emp::World<AvidaOrg> {
 public:
