@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "tools/NFA.h"
+#include "emp/compiler/NFA.h"
 
 int main()
 {
