@@ -4,7 +4,7 @@
 //
 //  This file contains an easy-to-manipulate NK world.
 
-#include "web/web.h"
+#include "emp/web/web.h"
 
 #include "../NKWorld.h"
 
