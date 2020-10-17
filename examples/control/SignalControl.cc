@@ -6,7 +6,7 @@
 //  Some examples code for using emp::Signal
 
 #include <iostream>
-#include "control/SignalControl.h"
+#include "emp/control/SignalControl.h"
 
 // Build a set of potential actions.
 void PrintInt(int i) { std::cout << "[" << i << "]" << std::endl; }

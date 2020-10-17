@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "control/ActionManager.h"
+#include "emp/control/ActionManager.h"
 
 int main()
 {

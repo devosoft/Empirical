@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "control/Signal.h"
+#include "emp/control/Signal.h"
 
 int main()
 {
