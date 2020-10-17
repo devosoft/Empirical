@@ -16,7 +16,7 @@
 #define EMP_TRACK_MEM
 #endif
 
-#include "tools/BitVector.h"
+#include "emp/bits/BitVector.h"
 
 int main()
 {
