@@ -8,7 +8,7 @@
 #include <iostream>
 
 #include "emp/math/Range.h"
-#include "tools/string_utils.h"
+#include "emp/tools/string_utils.h"
 
 int main()
 {
