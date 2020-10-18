@@ -12,7 +12,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "../tools/string_utils.h"
+#include "../tools/string_utils.hpp"
 
 #include "Signal.h"
 

@@ -14,9 +14,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "../tools/string_utils.h"
-
-#include "Action.h"
+#include "../tools/string_utils.hpp"
+#include "Action.hpp"
 
 namespace emp {
 

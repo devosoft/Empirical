@@ -18,11 +18,11 @@
 #include <map>
 #include <string>
 
-#include "../meta/TypePack.h"
-#include "../functional/FunctionSet.h"
-#include "../datastructs/map_utils.h"
+#include "../meta/TypePack.hpp"
+#include "../functional/FunctionSet.hpp"
+#include "../datastructs/map_utils.hpp"
 
-#include "Action.h"
+#include "Action.hpp"
 
 namespace emp {
 

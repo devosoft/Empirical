@@ -20,8 +20,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "ActionManager.h"
-#include "SignalManager.h"
+#include "ActionManager.hpp"
+#include "SignalManager.hpp"
 
 namespace emp {
 
