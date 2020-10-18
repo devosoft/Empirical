@@ -4,7 +4,7 @@
 //
 //  This is an example file demonstrating Othello.
 
-#include "../../source/games/Othello.h"
+#include "emp/games/Othello.h"
 
 size_t BOARD_SIZE = 8;
 
@@ -29,7 +29,7 @@ int main()
     int SWid = othello.GetNeighbor(i, emp::Othello::SW());
     int Wid = othello.GetNeighbor(i, emp::Othello::W());
     int NWid = othello.GetNeighbor(i, emp::Othello::NW());
-    
+
     std::cout << "  Directions: ";
     std::cout << "N:  " << Nid << " (" << othello.GetPosX(Nid) << ", " << othello.GetPosY(Nid) << "); ";
     std::cout << "NE: " << NEid << " (" << othello.GetPosX(NEid) << ", " << othello.GetPosY(NEid) << "); ";

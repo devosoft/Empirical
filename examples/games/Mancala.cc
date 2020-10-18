@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include "../../games/Mancala.h"
+#include "emp/games/Mancala.h"
 
 int main()
 {
@@ -17,7 +17,7 @@ int main()
   mancala.Print();
 
   while (mancala.IsDone() == false) {
-    size_t player = mancala.GetCurrPlayer();
+    size_t player = mancala.GetCurPlayer();
     char symbol = 'A' + (char) player;
     std::cout << symbol << " move? " << std::endl;
     std::cin >> move;
