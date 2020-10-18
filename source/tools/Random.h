@@ -69,6 +69,8 @@ namespace emp {
     /// Starts a new sequence of pseudo random numbers.  A negative seed means that the random
     /// number generator gets its seed from the current system time and the process memory.
     void ResetSeed(const int64_t seed) {
+      original_seed = seed;
+
       // If the provided seed is <= 0, choose a unique seed based on time and memory location.
       if (seed <= 0) {
         uint64_t seed_time = (uint64_t) time(NULL);
@@ -80,7 +82,6 @@ namespace emp {
 
       weyl_state *= 2;  // Make sure starting state is even.
 
-      original_seed = weyl_state;
     }
 
 
