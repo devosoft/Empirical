@@ -1,5 +1,5 @@
 # Flags to use regardless of compiler
-CFLAGS_all := -Wall -Wno-unused-function -I../../source/
+CFLAGS_all := -Wall -Wno-unused-function -I../../include/
 CFLAGS_version := -std=c++17
 
 # Emscripten compiler information
@@ -16,14 +16,11 @@ OFLAGS_web_opt := -Os -DNDEBUG -s TOTAL_MEMORY=67108864
 CFLAGS_native_debug := $(CFLAGS_all) $(OFLAGS_native_debug)
 CFLAGS_native_opt := $(CFLAGS_all) $(OFLAGS_native_opt)
 
-CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
-CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
-#CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
+CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+#CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
 TARGETS := ConceptWrapper meta reflection StringType TypePack ValPack
-
-META := ../../source/meta
-META_DEPEND := ../../source/base/assert.h
 
 default: native
 
@@ -48,16 +45,16 @@ native: all
 
 all: $(TARGETS)
 
-$(TARGETS): % : %.cc $(META_DEPEND) $(META)/%.h
+$(TARGETS): % : %.cc
 	$(CXX) $(CFLAGS_version) $(CFLAGS) $< -o $@
 
-opt-%: %.cc $(META_DEPEND) $(META)/%.h
+opt-%: %.cc
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_opt) $< -o $@
 
-debug-%: %.cc $(META_DEPEND) $(META)/%.h
+debug-%: %.cc
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_debug) $< -o $@
 
-cpp14-%: %.cc $(META_DEPEND) $(META)/%.h
+cpp14-%: %.cc
 	$(CXX) -std=c++14 $(CFLAGS_native_debug) $< -o $@
 
 clean:

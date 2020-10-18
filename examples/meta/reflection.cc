@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "meta/reflection.h"
+#include "emp/meta/reflection.h"
 
 // Testing:
 //   EMP_CREATE_METHOD_FALLBACK

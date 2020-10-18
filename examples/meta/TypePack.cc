@@ -9,8 +9,8 @@
 #include <string>
 #include <vector>
 
-#include "meta/TypeID.h"
-#include "meta/TypePack.h"
+#include "emp/meta/TypeID.h"
+#include "emp/meta/TypePack.h"
 
 #define DEBUG_PRINT(X) std::cout << #X << " : " << emp::GetTypeID<X>().GetName() << std::endl
 

@@ -7,7 +7,7 @@
 #include <map>
 #include <string>
 
-#include "meta/meta.h"
+#include "emp/meta/meta.h"
 
 template <typename A, typename B>
 struct Temp2Type {
