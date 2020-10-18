@@ -1,6 +1,6 @@
 #include <ostream>
 
-#include "tools/ContiguousStream.h"
+#include "emp/io/ContiguousStream.h"
 
 int main() {
 
