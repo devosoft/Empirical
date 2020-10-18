@@ -9,6 +9,11 @@ default:
 	$(MAKE) -C ProjectTemplate/
 	$(MAKE) -C tools/
 	$(MAKE) -C web/
+	$(MAKE) -C bits/
+	$(MAKE) -C compiler/
+	$(MAKE) -C datastructs/
+	$(MAKE) -C io/
+	$(MAKE) -C math/
 
 clean:
 	$(MAKE) clean -C base/
@@ -21,6 +26,11 @@ clean:
 	$(MAKE) clean -C ProjectTemplate/
 	$(MAKE) clean -C tools/
 	$(MAKE) clean -C web/
+	$(MAKE) clean -C bits/
+	$(MAKE) clean -C compiler/
+	$(MAKE) clean -C datastructs/
+	$(MAKE) clean -C io/
+	$(MAKE) clean -C math/
 
 debug:
 	$(MAKE) debug -C base/
@@ -33,6 +43,11 @@ debug:
 	$(MAKE) debug -C ProjectTemplate/
 	$(MAKE) debug -C tools/
 	$(MAKE) debug -C web/
+	$(MAKE) debug -C bits/
+	$(MAKE) debug -C compiler/
+	$(MAKE) debug -C datastructs/
+	$(MAKE) debug -C io/
+	$(MAKE) debug -C math/
 
 web-test:
 	$(MAKE) debug -C web/
@@ -48,6 +63,11 @@ native-test:
 	$(MAKE) -C meta/
 	$(MAKE) -C ProjectTemplate/
 	$(MAKE) -C tools/
+	$(MAKE) -C bits/
+	$(MAKE) -C compiler/
+	$(MAKE) -C datastructs/
+	$(MAKE) -C io/
+	$(MAKE) -C math/
 
 native-test-debug:
 	$(MAKE) debug -C base/
@@ -59,3 +79,8 @@ native-test-debug:
 	$(MAKE) debug -C meta/
 	$(MAKE) debug -C ProjectTemplate/
 	$(MAKE) debug -C tools/
+	$(MAKE) debug -C bits/
+	$(MAKE) debug -C compiler/
+	$(MAKE) debug -C datastructs/
+	$(MAKE) debug -C io/
+	$(MAKE) debug -C math/
