@@ -60,17 +60,12 @@ namespace emp {
     ~Random() { ; }
 
 
-    /// @return The current state of the seed in the random sequence.
-    inline uint64_t GetSeed() const { return weyl_state; }
-
-    /// @return The seed that was originally provided by the user.
-    inline uint64_t GetOriginalSeed() const { return original_seed; }
+    /// @return The current seed used to initialize this pseudo-random sequence.
+    inline uint64_t GetSeed() const { return original_seed; }
 
     /// Starts a new sequence of pseudo random numbers.  A negative seed means that the random
     /// number generator gets its seed from the current system time and the process memory.
     void ResetSeed(const int64_t seed) {
-      original_seed = seed;
-
       // If the provided seed is <= 0, choose a unique seed based on time and memory location.
       if (seed <= 0) {
         uint64_t seed_time = (uint64_t) time(NULL);
@@ -79,6 +74,9 @@ namespace emp {
       }
 
       else weyl_state = (uint64_t) seed;
+
+      // Save the seed that was ultimately used to start this pseudo-random sequence.
+      original_seed = weyl_state;
 
       weyl_state *= 2;  // Make sure starting state is even.
 
