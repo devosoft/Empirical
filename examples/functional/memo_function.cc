@@ -6,8 +6,8 @@
 //  Some examples code for using emp::memo_function
 
 #include <iostream>
-#include "tools/memo_function.h"
-#include "tools/Random.h"
+#include "emp/functional/memo_function.h"
+#include "emp/math/Random.h"
 
 double F(int N) {
   double PI = 3.14159;
@@ -82,7 +82,7 @@ int main()
   std::cout << std::endl;
 
   emp::memo_function<double()> no_arg_fun(Compute);
-  
+
   std::cout << no_arg_fun() << "  Long..." << std::endl;
   std::cout << no_arg_fun() << "  Quick!" << std::endl;
   std::cout << no_arg_fun() << "  Quick!" << std::endl;
