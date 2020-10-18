@@ -19,7 +19,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../../source/tools/StringMap.h"
+#include "emp/datastructs/StringMap.h"
 
 using emp::StringID;
 

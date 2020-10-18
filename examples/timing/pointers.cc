@@ -14,7 +14,7 @@
 #include <memory>        // For std::shared_ptr
 #include <vector>
 
-#include "base/Ptr.h"
+#include "emp/base/Ptr.h"
 
 constexpr size_t N = 1000000;
 

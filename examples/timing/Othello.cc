@@ -11,9 +11,9 @@
 #include <memory>        // For std::shared_ptr
 #include <vector>
 
-#include "games/Othello.h"
-#include "games/Othello8.h"
-#include "tools/Random.h"
+#include "emp/games/Othello.h"
+#include "emp/games/Othello8.h"
+#include "emp/math/Random.h"
 
 int main()
 {
