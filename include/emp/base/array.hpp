@@ -22,8 +22,8 @@
 #include <initializer_list>
 #include <array>
 
-#include "assert.h"
-#include "../meta/TypeID.h"
+#include "assert.hpp"
+#include "../meta/TypeID.hpp"
 
 #ifdef EMP_NDEBUG
 

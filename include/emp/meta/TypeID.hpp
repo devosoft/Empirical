@@ -17,11 +17,11 @@
 #include <sstream>
 #include <string>
 
-#include "../base/Ptr.h"
-#include "../base/vector.h"
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
 
-#include "type_traits.h"
-#include "TypePack.h"
+#include "type_traits.hpp"
+#include "TypePack.hpp"
 
 
 namespace emp {
@@ -219,7 +219,7 @@ namespace emp {
         info.name += ">";
       }
     }
-    
+
     return info;
   }
 

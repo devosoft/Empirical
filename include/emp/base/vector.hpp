@@ -25,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-#include "assert.h"
+#include "assert.hpp"
 
 #ifdef EMP_NDEBUG
 

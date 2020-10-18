@@ -6,9 +6,9 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/base/assert.h"
-#include "emp/base/optional.h"
-#include "emp/base/vector.h"
+#include "emp/base/assert.hpp"
+#include "emp/base/optional.hpp"
+#include "emp/base/vector.hpp"
 
 #include <utility>
 #include <sstream>

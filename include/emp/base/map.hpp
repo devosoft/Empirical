@@ -20,8 +20,8 @@
 #include <initializer_list>
 #include <map>
 
-#include "assert.h"
-#include "MapProxy.h"
+#include "assert.hpp"
+#include "MapProxy.hpp"
 
 // If debug is turned out, translate back to std::map
 #ifdef EMP_NDEBUG

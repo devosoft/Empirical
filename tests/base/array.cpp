@@ -9,7 +9,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/base/array.h"
+#include "emp/base/array.hpp"
 
 #include <sstream>
 #include <iostream>

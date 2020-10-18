@@ -66,7 +66,7 @@
 #ifndef EMP_TYPE_PACK_H
 #define EMP_TYPE_PACK_H
 
-#include "meta.h"
+#include "meta.hpp"
 
 namespace emp {
 

@@ -15,7 +15,7 @@
 #include <tuple>
 #include <utility>
 
-#include "../base/Ptr.h"
+#include "../base/Ptr.hpp"
 
 namespace emp {
 

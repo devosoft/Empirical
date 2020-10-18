@@ -6,7 +6,7 @@
  *  @file macros.h
  *  @brief Generally useful macros that can perform cools tricks.
  *  @note Status: RELEASE
- * 
+ *
  *
  *  Generally useful macros that can perform cools tricks.  As with all macros, use only
  *  after careful exclusion of alternative approaches.
@@ -64,7 +64,7 @@
  *  @todo We should create a way to detect if an arg list is empty (right now it always counts
  *    as one arg); this should allow an arg count of 0 and generally change the behavior of
  *    macros when nothing is passed into them.)
- * 
+ *
  *  @todo We need to standardize how we handle macros that covert inputs to comma-separated
  *    results vs those that merge them together.  One option is to have comma-separated the
  *    default and then have an EMP_REMOVE_COMMAS (or somesuch)
@@ -83,7 +83,7 @@
 
 #include <utility>  // For declval
 
-#include "macro_math.h"
+#include "macro_math.hpp"
 
 #pragma GCC system_header
 

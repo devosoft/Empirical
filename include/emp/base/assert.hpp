@@ -36,7 +36,7 @@
 #include <string>
 #include <sstream>
 
-#include "macros.h"
+#include "macros.hpp"
 
 /// @cond DEFINES
 

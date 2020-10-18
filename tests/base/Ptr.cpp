@@ -5,7 +5,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/base/Ptr.h"
+#include "emp/base/Ptr.hpp"
 
 #include <sstream>
 #include <iostream>

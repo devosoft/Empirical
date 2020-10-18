@@ -26,8 +26,8 @@
 
 #include <unordered_map>
 
-#include "assert.h"
-#include "vector.h"
+#include "assert.hpp"
+#include "vector.hpp"
 
 namespace emp {
 

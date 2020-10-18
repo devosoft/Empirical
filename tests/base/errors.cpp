@@ -6,7 +6,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/base/errors.h"
+#include "emp/base/errors.hpp"
 
 #include <sstream>
 #include <iostream>

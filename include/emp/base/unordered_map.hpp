@@ -14,8 +14,8 @@
 #include <initializer_list>
 #include <unordered_map>
 
-#include "assert.h"
-#include "MapProxy.h"
+#include "assert.hpp"
+#include "MapProxy.hpp"
 
 // If debug is turned out, translate back to std::map
 #ifdef EMP_NDEBUG
@@ -60,7 +60,7 @@ namespace emp {
     using size_type = typename base_t::size_type;
 
     unordered_map() = default;
-    
+
     explicit unordered_map ( size_type n,
                              const hasher& hf = hasher(),
                              const key_equal& eql = key_equal(),

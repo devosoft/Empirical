@@ -19,7 +19,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "assert.h"
+#include "assert.hpp"
 
 #ifdef EMP_NDEBUG
 
