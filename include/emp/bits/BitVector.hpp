@@ -33,12 +33,12 @@
 #include <iostream>
 #include <bitset>
 
-#include "../base/assert.h"
-#include "../base/Ptr.h"
-#include "../base/vector.h"
-#include "../math/math.h"
-#include "../tools/functions.h"
-#include "bitset_utils.h"
+#include "../base/assert.hpp"
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
+#include "../math/math.hpp"
+#include "../tools/functions.hpp"
+#include "bitset_utils.hpp"
 
 namespace emp {
 

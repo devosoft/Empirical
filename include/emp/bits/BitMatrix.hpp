@@ -16,11 +16,11 @@
 
 
 #ifndef functions
-#include "../tools/functions.h"
+#include "../tools/functions.hpp"
 #endif
 
-#include "BitSet.h"
-#include "bitset_utils.h"
+#include "BitSet.hpp"
+#include "bitset_utils.hpp"
 
 namespace emp {
 

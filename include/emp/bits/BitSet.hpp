@@ -21,16 +21,16 @@
 #include <cstring>
 #include <bitset>
 
-#include "../base/assert.h"
-#include "../base/vector.h"
-#include "../base/Ptr.h"
-#include "../datastructs/hash_utils.h"
-#include "../math/math.h"
-#include "../math/Random.h"
-#include "../math/random_utils.h"
-#include "../tools/functions.h"
-#include "../polyfill/span.h"
-#include "bitset_utils.h"
+#include "../base/assert.hpp"
+#include "../base/vector.hpp"
+#include "../base/Ptr.hpp"
+#include "../datastructs/hash_utils.hpp"
+#include "../math/math.hpp"
+#include "../math/Random.hpp"
+#include "../math/random_utils.hpp"
+#include "../tools/functions.hpp"
+#include "../polyfill/span.hpp"
+#include "bitset_utils.hpp"
 
 namespace emp {
 

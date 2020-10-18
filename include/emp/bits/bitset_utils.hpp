@@ -11,7 +11,7 @@
 #ifndef EMP_BITSET_UTILS_H
 #define EMP_BITSET_UTILS_H
 
-#include "../tools/functions.h"
+#include "../tools/functions.hpp"
 
 namespace emp {
 
