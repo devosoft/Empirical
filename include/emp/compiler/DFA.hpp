@@ -13,10 +13,10 @@
 
 #include <string>
 
-#include "../base/array.h"
-#include "../base/vector.h"
+#include "../base/array.hpp"
+#include "../base/vector.hpp"
 
-#include "../tools/string_utils.h"
+#include "../tools/string_utils.hpp"
 
 namespace emp {
 

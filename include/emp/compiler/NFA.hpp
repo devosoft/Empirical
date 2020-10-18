@@ -26,9 +26,9 @@
 #include <map>
 #include <set>
 
-#include "../base/vector.h"
-#include "../bits/BitSet.h"
-#include "../datastructs/set_utils.h"
+#include "../base/vector.hpp"
+#include "../bits/BitSet.hpp"
+#include "../datastructs/set_utils.hpp"
 
 namespace emp {
 

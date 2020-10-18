@@ -14,11 +14,11 @@
 #include <map>
 #include <string>
 
-#include "../base/map.h"
-#include "../base/vector.h"
-#include "../datastructs/map_utils.h"
-#include "lexer_utils.h"
-#include "RegEx.h"
+#include "../base/map.hpp"
+#include "../base/vector.hpp"
+#include "../datastructs/map_utils.hpp"
+#include "lexer_utils.hpp"
+#include "RegEx.hpp"
 
 namespace emp {
 

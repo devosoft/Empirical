@@ -15,10 +15,10 @@
 #include <map>
 #include <utility> // std::pair
 
-#include "../base/vector.h"
-#include "../bits/BitVector.h"
-#include "DFA.h"
-#include "NFA.h"
+#include "../base/vector.hpp"
+#include "../bits/BitVector.hpp"
+#include "DFA.hpp"
+#include "NFA.hpp"
 
 namespace emp {
 

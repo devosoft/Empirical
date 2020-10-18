@@ -41,12 +41,12 @@
 #include <sstream>
 #include <string>
 
-#include "../base/vector.h"
-#include "../base/Ptr.h"
-#include "../bits/BitSet.h"
-#include "../tools/string_utils.h"
-#include "lexer_utils.h"
-#include "NFA.h"
+#include "../base/vector.hpp"
+#include "../base/Ptr.hpp"
+#include "../bits/BitSet.hpp"
+#include "../tools/string_utils.hpp"
+#include "lexer_utils.hpp"
+#include "NFA.hpp"
 
 namespace emp {
 
