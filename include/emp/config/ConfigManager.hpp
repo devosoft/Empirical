@@ -28,8 +28,8 @@
 #include <string>
 #include <sstream>
 
-#include "../base/errors.h"
-#include "../tools/string_utils.h"
+#include "../base/errors.hpp"
+#include "../tools/string_utils.hpp"
 
 namespace emp {
 

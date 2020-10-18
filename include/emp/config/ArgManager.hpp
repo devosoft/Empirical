@@ -21,11 +21,11 @@
 #include <string>
 #include <vector>
 
-#include "../base/Ptr.h"
-#include "../base/vector.h"
-#include "../base/optional.h"
-#include "command_line.h"
-#include "config.h"
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
+#include "../base/optional.hpp"
+#include "command_line.hpp"
+#include "config.hpp"
 
 namespace emp {
 

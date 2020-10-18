@@ -44,13 +44,13 @@
 #include <sstream>
 #include <unordered_set>
 
-#include "../base/errors.h"
-#include "../base/unordered_map.h"
-#include "../base/vector.h"
-#include "../datastructs/map_utils.h"
-#include "../tools/functions.h"
-#include "../tools/string_utils.h"
-#include "ConfigManager.h"
+#include "../base/errors.hpp"
+#include "../base/unordered_map.hpp"
+#include "../base/vector.hpp"
+#include "../datastructs/map_utils.hpp"
+#include "../tools/functions.hpp"
+#include "../tools/string_utils.hpp"
+#include "ConfigManager.hpp"
 
 namespace emp {
   using namespace std::placeholders;

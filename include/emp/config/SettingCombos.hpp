@@ -16,12 +16,12 @@
 #include <string>
 #include <string_view>
 
-#include "../base/Ptr.h"
-#include "../base/vector.h"
-#include "../datastructs/vector_utils.h"
-#include "../datastructs/map_utils.h"
-#include "../math/math.h"
-#include "../tools/string_utils.h"
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
+#include "../datastructs/vector_utils.hpp"
+#include "../datastructs/map_utils.hpp"
+#include "../math/math.hpp"
+#include "../tools/string_utils.hpp"
 
 namespace emp {
 

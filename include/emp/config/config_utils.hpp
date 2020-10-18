@@ -11,7 +11,7 @@
 #ifndef EMP_CONFIG_UTILS_H
 #define EMP_CONFIG_UTILS_H
 
-#include "config.h"
+#include "config.hpp"
 
 namespace emp {
 
