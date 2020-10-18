@@ -9,8 +9,8 @@
 
 #include <iostream>
 
-#include "hardware/BitSorter.h"
-#include "tools/Random.h"
+#include "emp/hardware/BitSorter.h"
+#include "emp/math/Random.h"
 
 int main()
 {

@@ -9,11 +9,11 @@
 
  #include <iostream>
 
-#include "base/Ptr.h"
-#include "hardware/EventDrivenGP.h"
-#include "hardware/InstLib.h"
-#include "hardware/EventLib.h"
-#include "tools/Random.h"
+#include "emp/base/Ptr.h"
+#include "emp/hardware/EventDrivenGP.h"
+#include "emp/hardware/InstLib.h"
+#include "emp/hardware/EventLib.h"
+#include "emp/math/Random.h"
 
 // A few constants
 constexpr int RANDOM_SEED = 1;
@@ -74,7 +74,7 @@ int main() {
   // Spin up main cores (used to be handled in constructor)
   hw16_1.SpawnCore(0);
   hw16_2.SpawnCore(0);
- 
+
   // Configure the hardware.
   hw16_1.SetMinBindThresh(HW_MIN_SIM_THRESH);
   hw16_1.SetMaxCores(HW_MAX_THREADS);
