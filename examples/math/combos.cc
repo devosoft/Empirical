@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "tools/combos.h"
+#include "emp/math/combos.h"
 
 int main()
 {

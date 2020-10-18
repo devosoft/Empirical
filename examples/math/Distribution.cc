@@ -6,8 +6,8 @@
 //  Some examples code for using emp::Distribution are derived classes.
 
 #include <iostream>
-#include "tools/Random.h"
-#include "tools/Distribution.h"
+#include "emp/math/Random.h"
+#include "emp/math/Distribution.h"
 
 int main()
 {
@@ -31,7 +31,7 @@ int main()
   // And total some more random picks (to take a bit of time).
   size_t total = 0;
   const size_t test_count = 10000000;
-  
+
   for (size_t i = 0; i < test_count; i++) {
     total += bi1000.PickRandom(random);
   }
@@ -40,7 +40,7 @@ int main()
 	    << (((double) total) / (double) test_count)
 	    << std::endl;
 
-  
+
   //emp::NegativeBinomial nbi10(0.5, 2);
   emp::NegativeBinomial nbi10(0.3, 10);
 

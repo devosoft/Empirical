@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <vector>
-#include "tools/Random14.h"
+#include "emp/math/Random14.h"
 
 constexpr double TestConstRandom(int seed) {
   emp14::Random random(seed);
