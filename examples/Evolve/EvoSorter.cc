@@ -7,10 +7,10 @@
 
 #include <iostream>
 
-#include "config/ArgManager.h"
-#include "Evolve/World.h"
-#include "hardware/BitSorter.h"
-#include "tools/Random.h"
+#include "emp/config/ArgManager.h"
+#include "emp/Evolve/World.h"
+#include "emp/hardware/BitSorter.h"
+#include "emp/math/Random.h"
 
 EMP_BUILD_CONFIG( EvoSortConfig,
   GROUP(DEFAULT, "Default settings for EvoSorter model"),
@@ -80,13 +80,13 @@ int main(int argc, char* argv[])
         num_muts++;
       }
       // Substitute before insert (to not change something just added)
-      if (random.P(MUT_SUB_PROB)) { 
+      if (random.P(MUT_SUB_PROB)) {
         const uint32_t pos = random.GetUInt(org.GetSize());
         org.EditCompare(pos, random.GetUInt(16), random.GetUInt(16));
         num_muts++;
       }
       // Finally, do any insertions.
-      if (random.P(MUT_INS_PROB)) { 
+      if (random.P(MUT_INS_PROB)) {
         const uint32_t pos = random.GetUInt(org.GetSize());
         org.InsertCompare(pos, random.GetUInt(16), random.GetUInt(16));
         num_muts++;
@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
 
   // Loop through updates
   for (uint32_t ud = 0; ud < MAX_GENS; ud++) {
-    
+
     // Build the lexicase fitness functions (changing each update)
     for (size_t i = 0; i < num_fit_funs; i++) {
       // Setup the fitness function.

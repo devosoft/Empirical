@@ -7,11 +7,11 @@
 
 #include <iostream>
 
-#include "Evolve/NK-const.h"
-#include "Evolve/World.h"
-#include "tools/BitSet.h"
-#include "tools/Random.h"
-#include "tools/string_utils.h"
+#include "emp/Evolve/NK-const.h"
+#include "emp/Evolve/World.h"
+#include "emp/bits/BitSet.h"
+#include "emp/math/Random.h"
+#include "emp/tools/string_utils.h"
 
 
 constexpr size_t K = 3;

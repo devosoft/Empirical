@@ -10,9 +10,9 @@
 
 #include <iostream>
 
-#include "Evolve/World.h"
-#include "tools/Random.h"
-#include "tools/string_utils.h"
+#include "emp/Evolve/World.h"
+#include "emp/math/Random.h"
+#include "emp/tools/string_utils.h"
 
 int main()
 {
@@ -63,7 +63,7 @@ std::cout << "Setup print functions." << std::endl;
 
   for (size_t g = 0; g <= GENS; g++) {
     for (size_t i = 0; i < map_world.GetSize(); ++i) {
-      size_t id = random.GetUInt(map_world.GetSize());      
+      size_t id = random.GetUInt(map_world.GetSize());
       if (map_world.IsOccupied(id)) {
         org_t offspring = map_world[id] + random.GetUInt64(200) - 100;
         if (offspring > MAX_ORG) continue; // Invalid mutation!  No birth.

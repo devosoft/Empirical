@@ -7,9 +7,9 @@
 
 #include <iostream>
 
-#include "Evolve/World.h"
-#include "tools/Random.h"
-#include "tools/string_utils.h"
+#include "emp/Evolve/World.h"
+#include "emp/math/Random.h"
+#include "emp/tools/string_utils.h"
 
 int main()
 {
