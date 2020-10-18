@@ -2,14 +2,14 @@
 //  Copyright (C) Michigan State University, 2017.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#include "base/vector.h"
-#include "tools/Random.h"
-#include "tools/vector_utils.h"
-#include "web/Animate.h"
-#include "web/canvas_utils.h"
-#include "web/emfunctions.h"
-#include "web/Selector.h"
-#include "web/web.h"
+#include "emp/base/vector.h"
+#include "emp/math/Random.h"
+#include "emp/datastructs/vector_utils.h"
+#include "emp/web/Animate.h"
+#include "emp/web/canvas_utils.h"
+#include "emp/web/emfunctions.h"
+#include "emp/web/Selector.h"
+#include "emp/web/web.h"
 
 namespace UI = emp::web;
 

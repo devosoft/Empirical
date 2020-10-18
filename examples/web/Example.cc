@@ -2,7 +2,7 @@
 //  Copyright (C) Michigan State University, 2016-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#include "web/web.h"
+#include "emp/web/web.h"
 
 namespace UI = emp::web;
 

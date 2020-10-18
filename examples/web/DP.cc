@@ -4,8 +4,8 @@
 
 #include <string>
 
-#include "tools/string_utils.h"
-#include "web/web.h"
+#include "emp/tools/string_utils.h"
+#include "emp/web/web.h"
 
 namespace UI = emp::web;
 

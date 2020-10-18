@@ -2,9 +2,9 @@
 //  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#include "web/web.h"
-#include "web/commands.h"
-#include "web/emfunctions.h"
+#include "emp/web/web.h"
+#include "emp/web/commands.h"
+#include "emp/web/emfunctions.h"
 
 namespace UI = emp::web;
 UI::Document doc("emp_base");

@@ -2,8 +2,8 @@
 //  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#include "tools/alert.h"
-#include "web/web.h"
+#include "emp/debug/alert.h"
+#include "emp/web/web.h"
 
 namespace UI = emp::web;
 
