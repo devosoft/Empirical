@@ -46,21 +46,10 @@ jobs:
   include:
   - stage: test
     name: documentation
-    compiler: clang++
-    addons:
-      apt:
-        packages:
-        - cmake
-        - build-essential
-        - bison
-        - python-virtualenv
-        - python-pip
-        - tar
-        - gzip
-    before_script:
-    - git fetch origin master:refs/remotes/origin/master
-    - make install-doc-dependencies
-    script: make doc
+    install:
+    - docker build -t devosoft/empirical .
+    - docker ps -a
+    script: docker run devosoft/empirical /bin/bash -c "cd /opt/Empirical/doc && make html coverage | ./headtail.sh"
   - stage: test
     name: coverage
     compiler: clang++

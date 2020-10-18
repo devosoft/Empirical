@@ -26,6 +26,8 @@
 #include <utility>
 #include <queue>
 
+#include "../../third-party/robin-hood-hashing/src/include/robin_hood.h"
+
 #include "../base/assert.h"
 #include "../base/array.h"
 #include "../base/vector.h"
@@ -447,7 +449,7 @@ namespace emp {
   template<size_t N>
   struct ExactStreakDistribution {
 
-    std::unordered_map<
+    robin_hood::unordered_map<
       std::tuple<size_t, size_t>, /* (min_heads, num_coins) */
       double,
       emp::TupleHash<size_t, size_t>
@@ -609,7 +611,7 @@ namespace emp {
     using tag_t = typename Metric::tag_t;
 
     Metric metric;
-    static inline std::unordered_map<
+    static inline robin_hood::unordered_map<
       std::tuple<query_t, tag_t>,
       double,
       emp::TupleHash<query_t, tag_t>

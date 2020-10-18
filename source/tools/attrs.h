@@ -8,8 +8,8 @@
 #include <utility>
 #include <vector>
 
-#include "meta/TypePack.h"
-#include "meta/type_traits.h"
+#include "../meta/TypePack.h"
+#include "../meta/type_traits.h"
 
 namespace emp {
   namespace tools {

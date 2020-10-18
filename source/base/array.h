@@ -55,7 +55,9 @@ namespace emp {
       using vec_t = emp::array<T,N>;
 
       /// What vector was this iterator created from?
-      const vec_t * v_ptr;
+      const vec_t * v_ptr{ nullptr };
+
+      iterator_wrapper() { ; }
 
       iterator_wrapper(const ITERATOR_T & _in, const vec_t * _v) : ITERATOR_T(_in), v_ptr(_v) { ; }
       iterator_wrapper(const this_t &) = default;

@@ -1,5 +1,5 @@
 # Pull base image.
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 COPY . /opt/Empirical
 
@@ -91,36 +91,45 @@ RUN \
   apt-get install -y \
     gtk2-engines-pixbuf \
     firefox \
+    libnss3 \
+    lsb-release \
+    xdg-utils \
     && \
   echo "installed headless firefox dependencies"
 
+# magic from https://github.com/puppeteer/puppeteer/issues/3451#issuecomment-523961368
+RUN echo 'kernel.unprivileged_userns_clone=1' > /etc/sysctl.d/userns.conf
+
 RUN \
   apt-get install -y \
-    g++-8 \
-    cmake \
-    build-essential \
-    python-virtualenv \
-    python-pip \
-    nodejs \
-    npm \
-    tar \
-    gzip \
-    libpthread-stubs0-dev \
-    libc6-dbg \
-    gdb \
+    g++-8=8.4.0-1ubuntu1~18.04 \
+    cmake=3.10.2-1ubuntu2.18.04.1 \
+    build-essential=12.4ubuntu1 \
+    python-virtualenv=15.1.0+ds-1.1 \
+    python-pip=9.0.1-2.3~ubuntu1.18.04.3 \
+    python3-virtualenv \
+    python3-pip \
+    nodejs=8.10.0~dfsg-2ubuntu0.4 \
+    npm=3.5.2-0ubuntu4 \
+    tar=1.29b-2ubuntu0.1 \
+    gzip=1.6-5ubuntu1 \
+    libpthread-stubs0-dev=0.3-4 \
+    libc6-dbg=2.27-3ubuntu1.2 \
+    gdb=8.2-0ubuntu1~18.04 \
+    doxygen \
     && \
   echo "installed core dependencies"
 
 RUN \
   apt-get install -y \
-    curl \
-    git \
-    htop \
+    curl=7.58.0-2ubuntu3.10 \
+    git=1:2.17.1-1ubuntu0.7 \
+    htop=2.1.0-3 \
     man \
-    unzip \
+    unzip=6.0-21ubuntu1 \
     vim \
-    nano \
-    wget \
+    nano=2.9.3-2 \
+    wget=1.19.4-1ubuntu2.2 \
     && \
   echo "installed creature comforts"
 
@@ -136,6 +145,11 @@ RUN \
   npm install source-map \
   && \
   echo "finalized set up dependency versions"
+
+RUN \
+  pip3 install -r /opt/Empirical/doc/requirements.txt \
+    && \
+  echo "installed documentation build requirements"
 
 RUN \
   cd /opt/Empirical \
@@ -193,11 +207,6 @@ RUN \
     && \
   echo "make entrypoint script executable"
 
-# Define default entrypoint.
-ENTRYPOINT ["/opt/entrypoint.sh"]
-
-CMD ["bash"]
-
 # Adapted from https://github.com/karma-runner/karma-firefox-launcher/issues/93#issuecomment-519333245
 # Maybe important for container compatability running on Windows?
 RUN \
@@ -212,3 +221,31 @@ RUN \
   yarn install \
   && \
   echo "installed karma-firefox-launcher"
+  
+RUN \
+  pip install -r /opt/Empirical/third-party/requirements.txt \
+    && \
+  echo "installed documentation build requirements"
+
+# Perform any further action as an unprivileged user.
+# adapted from https://stackoverflow.com/a/27703359
+# and https://superuser.com/a/235398
+RUN \
+  useradd --create-home --shell /bin/bash user \
+    && \
+  groupadd group \
+    && \
+  gpasswd -a user group \
+    && \
+  chgrp --recursive user /opt \
+    && \
+  chmod --recursive g+rwx /opt \
+    && \
+  echo "user added and granted permissions to /opt"
+
+USER user
+
+# Define default entrypoint.
+ENTRYPOINT ["/opt/entrypoint.sh"]
+
+CMD ["bash"]

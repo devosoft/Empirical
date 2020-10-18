@@ -71,6 +71,8 @@
 
 #include "../base/macros.h"
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
 ///@cond SIMPLIFY
 // For each entry, we want to build accessors to easily get and set each value.
 #define EMP_BUILD_TUPLE_ACCESSORS(TUPLE_NAME, POS, TYPE, NAME)     \
@@ -192,7 +194,7 @@ namespace emp {
 
   template <typename T>
   using n_fields_member_type = decltype(T::n_fields);
- 
+
   template <typename T>
   constexpr bool is_introspective_tuple() { return test_type_exist<n_fields_member_type, T>(); };
 
@@ -218,6 +220,5 @@ namespace emp {
 ///
 #define EMP_BUILD_INTROSPECTIVE_TUPLE(...) EMP_BUILD_INTROSPECTIVE_NAMED_TUPLE(emp__tuple_body, __VA_ARGS__)
 
-
-
+#endif /*DOXYGEN_SHOULD_SKIP_THIS*/
 #endif
