@@ -6,11 +6,11 @@
 //  Some examples code for using emp::Random
 
 #include <iostream>
-#include "geometry/Point2D.h"
-#include "geometry/Surface.h"
-#include "tools/Random.h"
-#include "tools/random_utils.h"
-#include "tools/string_utils.h"
+#include "emp/geometry/Point2D.h"
+#include "emp/geometry/Surface.h"
+#include "emp/math/Random.h"
+#include "emp/math/random_utils.h"
+#include "emp/tools/string_utils.h"
 
 struct TestBody {
   size_t id = 0;
