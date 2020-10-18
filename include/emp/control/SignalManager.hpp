@@ -14,7 +14,7 @@
 
 #include "../tools/string_utils.hpp"
 
-#include "Signal.h"
+#include "Signal.hpp"
 
 namespace emp {
 
