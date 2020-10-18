@@ -1,4 +1,4 @@
-#include "tools/attrs.h"
+#include "emp/tools/attrs.h"
 #include <array>
 #include <iostream>
 

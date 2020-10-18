@@ -1,5 +1,5 @@
 # Flags to use regardless of compiler
-CFLAGS_all := -Wall -Wno-unused-function -I../../source/
+CFLAGS_all := -Wall -Wno-unused-function -I../../include/
 CFLAGS_version := -std=c++17
 
 # Emscripten compiler information
@@ -16,14 +16,11 @@ OFLAGS_web_opt := -Os -DNDEBUG -s TOTAL_MEMORY=67108864
 CFLAGS_native_debug := $(CFLAGS_all) $(OFLAGS_native_debug)
 CFLAGS_native_opt := $(CFLAGS_all) $(OFLAGS_native_opt)
 
-CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
-CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
-#CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
+CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+#CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 
-TARGETS := AnyFunction attrs BitSet BitVector Cache combos const ContiguousStream Distribution DFA File flex_function GenericFunction IndexMap info_theory Lexer lexer_utils math memo_function NFA ra_set Random Range RegEx stats StringMap TimeQueue tuple_utils TypeMap TypeTracker valsort_map vector_utils
-
-TOOLS := ../../source/tools
-TOOL_DEPEND := ../../source/base/assert.h
+TARGETS := attrs TypeTracker
 
 default: native
 
@@ -45,7 +42,7 @@ native: all
 
 all: $(TARGETS)
 
-$(TARGETS): % : %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
+$(TARGETS): % : %.cc
 	$(CXX) $(CFLAGS_version) $(CFLAGS) $< -o $@
 
 # Lexer: Lexer.cc $(TOOLS)/Lexer.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
@@ -57,10 +54,10 @@ $(TARGETS): % : %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
 # Parser: Parser.cc $(TOOLS)/Parser.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
 # 	$(CXX) $(CFLAGS) Parser.cc -o Parser
 
-opt-%: %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
+opt-%: %.cc
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_opt) $< -o $@
 
-debug-%: %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
+debug-%: %.cc
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_debug) $< -o $@
 
 clean:
