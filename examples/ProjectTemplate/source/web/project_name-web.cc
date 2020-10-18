@@ -8,7 +8,7 @@
  * preferred over ProjectTemplate
 */
 
-#include "web/web.h"
+#include "emp/web/web.h"
 
 namespace UI = emp::web;
 
