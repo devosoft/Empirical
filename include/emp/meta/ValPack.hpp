@@ -13,7 +13,7 @@
 #ifndef EMP_VAL_PACK_H
 #define EMP_VAL_PACK_H
 
-#include "meta.h"
+#include "meta.hpp"
 
 #include <iostream>
 #include <string>
@@ -124,7 +124,7 @@ namespace emp {
     /// First value in ValPack
     static constexpr auto first = V1;
 
-    /// Number of values in ValPack    
+    /// Number of values in ValPack
     constexpr static size_t SIZE = 1+sizeof...(Vs);
 
     using this_t = ValPack<V1,Vs...>;

@@ -10,8 +10,8 @@
 #ifndef EMP_REFLECTION_H
 #define EMP_REFLECTION_H
 
-#include "meta.h"
-#include "TypePack.h"
+#include "meta.hpp"
+#include "TypePack.hpp"
 
 /// This macro will generate a function that calls a member function on a given object IF that
 /// member exists, but otherwise pass the object as an arguent to a function fallback.

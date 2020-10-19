@@ -12,14 +12,14 @@
  *     append - add another string type to the end of this one.
  *     upcase - change to all capital letters.
  *     downcase - change to all lowercase.
- * 
+ *
  *   Should this be merged into ValType?  Or derived from it since it already has most of the
  *   functionalities that we want?
- * 
+ *
  *   Create a StringTypeID class that just has a size_t in it BUT includes a cast to std::string
  *   that will lookup the string associated with an ID.  Should probably also have a more explicit
  *   ToString() as well.
- * 
+ *
  *   The static function that provides an ID for a string should call a different static function
  *   the first time an ID is created this other static function will store the string associated
  *   with the idea to simplify later retrieval.  If called on a run-time string that it doesn't
@@ -35,8 +35,8 @@
 #include <string>
 #include <sstream>
 
-#include "meta.h"
-#include "TypeID.h"
+#include "meta.hpp"
+#include "TypeID.hpp"
 
 /// Convert a literal string to an instance of a StringType
 #define EMP_TEXT_PACK(MSG) emp::StringPacketToStringType( [](){ return MSG; } )
