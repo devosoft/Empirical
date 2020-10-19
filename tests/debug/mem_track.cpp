@@ -3,7 +3,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/debug/mem_track.h"
+#include "emp/debug/mem_track.hpp"
 
 #include <sstream>
 #include <string>

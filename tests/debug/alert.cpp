@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/debug/alert.h"
+#include "emp/debug/alert.hpp"
 
 #include <sstream>
 #include <iostream>
