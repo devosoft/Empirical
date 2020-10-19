@@ -11,7 +11,7 @@
 
 #include <unordered_map>
 
-#include "../base/array.h"
+#include "../base/array.hpp"
 
 namespace emp {
 

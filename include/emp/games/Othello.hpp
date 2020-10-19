@@ -18,10 +18,10 @@
 #include <iomanip>
 #include <unordered_map>
 
-#include "../base/array.h"
-#include "../base/assert.h"
-#include "../base/vector.h"
-#include "../math/math.h"
+#include "../base/array.hpp"
+#include "../base/assert.hpp"
+#include "../base/vector.hpp"
+#include "../math/math.hpp"
 
 namespace emp {
   /// NOTE: This game could be made more black-box.
