@@ -14,9 +14,9 @@
 
 #include "d3_init.h"
 
-#include "../JSWrap.h"
-#include "../js_utils.h"
-#include "../../tools/string_utils.h"
+#include "../JSWrap.hpp"
+#include "../js_utils.hpp"
+#include "../../tools/string_utils.hpp"
 
 namespace D3 {
 

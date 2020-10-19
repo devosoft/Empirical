@@ -10,10 +10,10 @@
 #ifndef EMP_D3_SCALES_H
 #define EMP_D3_SCALES_H
 
-#include "d3_init.h"
-#include "utils.h"
+#include "d3_init.hpp"
+#include "utils.hpp"
 
-#include "../js_utils.h"
+#include "../js_utils.hpp"
 
 namespace D3 {
 

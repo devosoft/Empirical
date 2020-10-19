@@ -3,10 +3,10 @@
 
 #include <iostream>
 
-#include "../../base/errors.h"
-#include "../init.h"
-#include "../JSWrap.h"
-#include "utils.h"
+#include "../../base/errors.hpp"
+#include "../init.hpp"
+#include "../JSWrap.hpp"
+#include "utils.hpp"
 
 // #ifdef __EMSCRIPTEN__
 // extern "C" {

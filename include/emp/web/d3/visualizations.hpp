@@ -14,25 +14,23 @@
 #include <algorithm>
 #include <deque>
 
-#include "../../config/config.h"
-#include "../../bits/BitSet.h"
-#include "../../math/Random.h"
-#include "../../math/stats.h"
-#include "../../tools/string_utils.h"
-#include "../../functional/FunctionSet.h"
-#include "../../math/constants.h"
-
-#include "../init.h"
-#include "../Animate.h"
-#include "../JSWrap.h"
-
-#include "selection.h"
-#include "scales.h"
-#include "axis.h"
-#include "svg_shapes.h"
-#include "layout.h"
-#include "visual_elements.h"
-#include "histogram.h"
+#include "../../config/config.hpp"
+#include "../../bits/BitSet.hpp"
+#include "../../math/Random.hpp"
+#include "../../math/stats.hpp"
+#include "../../tools/string_utils.hpp"
+#include "../../functional/FunctionSet.hpp"
+#include "../../math/constants.hpp"
+#include "../init.hpp"
+#include "../Animate.hpp"
+#include "../JSWrap.hpp"
+#include "selection.hpp"
+#include "scales.hpp"
+#include "axis.hpp"
+#include "svg_shapes.hpp"
+#include "layout.hpp"
+#include "visual_elements.hpp"
+#include "histogram.hpp"
 
 //Pretty sure D3VisualizationInfo can't be shared among multiple D3Visualizations
 

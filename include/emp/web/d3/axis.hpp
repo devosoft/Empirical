@@ -10,12 +10,11 @@
 #ifndef EMP_D3_AXIS_H
 #define EMP_D3_AXIS_H
 
-#include "../js_utils.h"
-#include "../../tools/string_utils.h"
-
-#include "d3_init.h"
-#include "selection.h"
-#include "scales.h"
+#include "../js_utils.hpp"
+#include "../../tools/string_utils.hpp"
+#include "d3_init.hpp"
+#include "selection.hpp"
+#include "scales.hpp"
 
 namespace D3 {
 

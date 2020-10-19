@@ -15,9 +15,9 @@
 #include <map>
 #include <array>
 
-#include "../../base/assert.h"
-#include "../js_utils.h"
-#include "../JSWrap.h"
+#include "../../base/assert.hpp"
+#include "../js_utils.hpp"
+#include "../JSWrap.hpp"
 
 /// @cond __EMSCRIPTEN___STUFF
 extern "C" {

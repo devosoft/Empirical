@@ -10,13 +10,12 @@
 #ifndef EMP_D3_LAYOUT_H
 #define EMP_D3_LAYOUT_H
 
-#include "d3_init.h"
-#include "dataset.h"
-#include "selection.h"
-#include "svg_shapes.h"
-
-#include "../../datastructs/tuple_struct.h"
-#include "../JSWrap.h"
+#include "d3_init.hpp"
+#include "dataset.hpp"
+#include "selection.hpp"
+#include "svg_shapes.hpp"
+#include "../../datastructs/tuple_struct.hpp"
+#include "../JSWrap.hpp"
 
 #include <functional>
 #include <array>

@@ -1,9 +1,9 @@
 #ifndef VISUALIZATION_ELEMENTS_H
 #define VISUALIZATION_ELEMENTS_H
 
-#include "selection.h"
-#include "../../base/vector.h"
-#include "../JSWrap.h"
+#include "selection.hpp"
+#include "../../base/vector.hpp"
+#include "../JSWrap.hpp"
 
 
 namespace D3 {

@@ -1,11 +1,11 @@
 #ifndef EMP_D3_HISTOGRAM_H
 #define EMP_D3_HISTOGRAM_H
 
-#include "d3_init.h"
-#include "dataset.h"
-#include "../../base/vector.h"
-#include "../../datastructs/tuple_struct.h"
-#include "../js_utils.h"
+#include "d3_init.hpp"
+#include "dataset.hpp"
+#include "../../base/vector.hpp"
+#include "../../datastructs/tuple_struct.hpp"
+#include "../js_utils.hpp"
 
 namespace D3 {
 
