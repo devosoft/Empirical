@@ -6,10 +6,10 @@
 #include <limits>
 #include <ratio>
 
-#include "emp/io/ContiguousStream.h"
-#include "emp/io/MemoryIStream.h"
-#include "emp/math/Random.h"
-#include "emp/math/random_utils.h"
+#include "emp/io/ContiguousStream.hpp"
+#include "emp/io/MemoryIStream.hpp"
+#include "emp/math/Random.hpp"
+#include "emp/math/random_utils.hpp"
 
 TEST_CASE("MemoryIStream", "[io]") {
 

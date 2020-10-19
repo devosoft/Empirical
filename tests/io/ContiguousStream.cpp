@@ -2,8 +2,8 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/io/ContiguousStream.h"
-#include "emp/math/Random.h"
+#include "emp/io/ContiguousStream.hpp"
+#include "emp/math/Random.hpp"
 
 #include <sstream>
 #include <iostream>
