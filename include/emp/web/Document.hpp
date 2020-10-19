@@ -22,7 +22,7 @@
 #ifndef EMP_WEB_DOCUMENT_H
 #define EMP_WEB_DOCUMENT_H
 
-#include "events.h"
+#include "events.hpp"
 
 #include "Button.hpp"
 #include "Canvas.hpp"

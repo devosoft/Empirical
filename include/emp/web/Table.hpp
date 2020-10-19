@@ -734,11 +734,11 @@ namespace web {
 }
 }
 
-#include "_TableCell.h"
-#include "_TableRow.h"
-#include "_TableCol.h"
-#include "_TableRowGroup.h"
-#include "_TableColGroup.h"
+#include "_TableCell.hpp"
+#include "_TableRow.hpp"
+#include "_TableCol.hpp"
+#include "_TableRowGroup.hpp"
+#include "_TableColGroup.hpp"
 
 namespace emp {
 namespace web {

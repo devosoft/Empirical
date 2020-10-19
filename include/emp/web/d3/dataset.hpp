@@ -12,7 +12,7 @@
 
 #include <functional>
 
-#include "d3_init.h"
+#include "d3_init.hpp"
 
 #include "../JSWrap.hpp"
 #include "../js_utils.hpp"

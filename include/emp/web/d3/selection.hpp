@@ -5,9 +5,9 @@
 #ifndef __SELECTION_H__
 #define __SELECTION_H__
 
-#include "d3_init.h"
-#include "utils.h"
-#include "dataset.h"
+#include "d3_init.hpp"
+#include "utils.hpp"
+#include "dataset.hpp"
 
 #include <iostream>
 #include <string>
