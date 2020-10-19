@@ -12,9 +12,9 @@
 #ifndef EMP_SOLVE_STATE_H
 #define EMP_SOLVE_STATE_H
 
-#include "../base/assert.h"
+#include "../base/assert.hpp"
 
-#include "../bits/BitVector.h"
+#include "../bits/BitVector.hpp"
 
 namespace emp {
 

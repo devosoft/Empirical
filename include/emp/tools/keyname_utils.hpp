@@ -25,9 +25,9 @@
 #endif
 #include <array>
 
-#include "../base/assert.h"
-#include "../base/vector.h"
-#include "../tools/string_utils.h"
+#include "../base/assert.hpp"
+#include "../base/vector.hpp"
+#include "../tools/string_utils.hpp"
 
 namespace emp::keyname {
 

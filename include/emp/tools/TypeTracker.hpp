@@ -23,13 +23,13 @@
 
 #include <unordered_map>
 
-#include "../base/array.h"
-#include "../base/assert.h"
-#include "../meta/meta.h"
-#include "../base/Ptr.h"
-#include "../datastructs/map_utils.h"
-#include "../functional/GenericFunction.h"
-#include "functions.h"
+#include "../base/array.hpp"
+#include "../base/assert.hpp"
+#include "../meta/meta.hpp"
+#include "../base/Ptr.hpp"
+#include "../datastructs/map_utils.hpp"
+#include "../functional/GenericFunction.hpp"
+#include "functions.hpp"
 
 namespace emp {
 

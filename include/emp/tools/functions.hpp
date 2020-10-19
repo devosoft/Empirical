@@ -18,11 +18,11 @@
 #include <type_traits>
 #include <sstream>
 
-#include "../base/assert.h"
-#include "../base/vector.h"
+#include "../base/assert.hpp"
+#include "../base/vector.hpp"
 
-#include "../math/constants.h"
-#include "../math/math.h"
+#include "../math/constants.hpp"
+#include "../math/math.hpp"
 
 /// A simple macro to time how long it takes for a function to complete.
 #define EMP_FUNCTION_TIMER(TEST_FUN) {                                       \
