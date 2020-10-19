@@ -10,7 +10,7 @@
 #ifndef EMP_EVO_SYSTEMATICS_ANALYSIS_H
 #define EMP_EVO_SYSTEMATICS_ANALYSIS_H
 
-#include "Systematics.h"
+#include "Systematics.hpp"
 
 
 // Mutation info functions. Assumes each taxon has a struct containing an unordered map

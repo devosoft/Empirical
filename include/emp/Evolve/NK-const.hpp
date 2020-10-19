@@ -15,10 +15,10 @@
 
 #include <array>
 
-#include "../base/assert.h"
-#include "../bits/BitSet.h"
-#include "../math/math.h"
-#include "../math/Random.h"
+#include "../base/assert.hpp"
+#include "../bits/BitSet.hpp"
+#include "../math/math.hpp"
+#include "../math/Random.hpp"
 
 namespace emp {
 namespace evo {

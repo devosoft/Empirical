@@ -23,14 +23,14 @@
 #include <map>
 #include <string>
 
-#include "../base/assert.h"
-#include "../base/Ptr.h"
-#include "../base/vector.h"
-#include "../bits/BitVector.h"
-#include "../datastructs/map_utils.h"
-#include "../io/File.h"
-#include "../math/math.h"
-#include "../math/Random.h"
+#include "../base/assert.hpp"
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
+#include "../bits/BitVector.hpp"
+#include "../datastructs/map_utils.hpp"
+#include "../io/File.hpp"
+#include "../math/math.hpp"
+#include "../math/Random.hpp"
 
 namespace emp {
 

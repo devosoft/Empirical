@@ -27,15 +27,15 @@
 #include <unordered_set>
 #include <map>
 
-#include "../base/Ptr.h"
-#include "../control/Signal.h"
-#include "../data/DataManager.h"
-#include "../data/DataNode.h"
-#include "../math/info_theory.h"
-#include "../datastructs/map_utils.h"
-#include "../datastructs/set_utils.h"
-#include "../math/stats.h"
-#include "../tools/string_utils.h"
+#include "../base/Ptr.hpp"
+#include "../control/Signal.hpp"
+#include "../data/DataManager.hpp"
+#include "../data/DataNode.hpp"
+#include "../datastructs/map_utils.hpp"
+#include "../datastructs/set_utils.hpp"
+#include "../math/info_theory.hpp"
+#include "../math/stats.hpp"
+#include "../tools/string_utils.hpp"
 
 namespace emp {
 

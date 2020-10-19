@@ -13,14 +13,14 @@
 #include <map>
 #include <functional>
 
-#include "../base/array.h"
-#include "../base/assert.h"
-#include "../base/vector.h"
-#include "../base/macros.h"
-#include "../datastructs/IndexMap.h"
-#include "../datastructs/vector_utils.h"
-#include "../math/Random.h"
-#include "../meta/reflection.h"
+#include "../base/array.hpp"
+#include "../base/assert.hpp"
+#include "../base/macros.hpp"
+#include "../base/vector.hpp"
+#include "../datastructs/IndexMap.hpp"
+#include "../datastructs/vector_utils.hpp"
+#include "../math/Random.hpp"
+#include "../meta/reflection.hpp"
 
 namespace emp {
 

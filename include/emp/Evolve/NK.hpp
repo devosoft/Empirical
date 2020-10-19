@@ -20,11 +20,11 @@
 
 #include <array>
 
-#include "../base/vector.h"
-#include "../bits/BitVector.h"
-#include "../functional/memo_function.h"
-#include "../math/math.h"
-#include "../math/Random.h"
+#include "../base/vector.hpp"
+#include "../bits/BitVector.hpp"
+#include "../functional/memo_function.hpp"
+#include "../math/math.hpp"
+#include "../math/Random.hpp"
 
 namespace emp {
 

@@ -30,19 +30,19 @@
 #include <map>
 #include <unordered_map>
 
-#include "../base/Ptr.h"
-#include "../base/vector.h"
-#include "../control/Signal.h"
-#include "../control/SignalControl.h"
-#include "../data/DataFile.h"
-#include "../data/DataManager.h"
-#include "../data/Trait.h"
-#include "../datastructs/map_utils.h"
-#include "../math/Random.h"
-#include "../math/Range.h"
-#include "../math/random_utils.h"
-#include "../meta/reflection.h"
-#include "../tools/string_utils.h"
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
+#include "../control/Signal.hpp"
+#include "../control/SignalControl.hpp"
+#include "../data/DataFile.hpp"
+#include "../data/DataManager.hpp"
+#include "../data/Trait.hpp"
+#include "../datastructs/map_utils.hpp"
+#include "../math/random_utils.hpp"
+#include "../math/Random.hpp"
+#include "../math/Range.hpp"
+#include "../meta/reflection.hpp"
+#include "../tools/string_utils.hpp"
 
 // World-specific includes.
 #include "Systematics.h"     // Track relationships among organisms.

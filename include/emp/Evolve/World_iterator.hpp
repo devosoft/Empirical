@@ -15,7 +15,7 @@
 #ifndef EMP_EVO_WORLD_ITER_H
 #define EMP_EVO_WORLD_ITER_H
 
-#include "../base/Ptr.h"
+#include "../base/Ptr.hpp"
 
 namespace emp {
 

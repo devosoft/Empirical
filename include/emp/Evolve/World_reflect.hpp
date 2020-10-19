@@ -17,9 +17,9 @@
 #include <functional>
 #include <type_traits>
 
-#include "../base/assert.h"
-#include "../math/Random.h"
-#include "../meta/reflection.h"
+#include "../base/assert.hpp"
+#include "../math/Random.hpp"
+#include "../meta/reflection.hpp"
 
 namespace emp {
 
