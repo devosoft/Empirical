@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/datastructs/DynamicString.h"
+#include "emp/datastructs/DynamicString.hpp"
 
 #include <sstream>
 #include <iostream>

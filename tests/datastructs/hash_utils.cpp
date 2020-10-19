@@ -8,9 +8,9 @@
 #include <unordered_set>
 #include <array>
 #include <unordered_map>
-#include "emp/base/vector.h"
-#include "emp/datastructs/hash_utils.h"
-#include "emp/datastructs/vector_utils.h"
+#include "emp/base/vector.hpp"
+#include "emp/datastructs/hash_utils.hpp"
+#include "emp/datastructs/vector_utils.hpp"
 
 // emp::Random grand;
 TEST_CASE("Test hash_utils", "[datastructs]")

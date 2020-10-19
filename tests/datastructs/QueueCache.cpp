@@ -2,8 +2,8 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/datastructs/QueueCache.h"
-#include "emp/base/vector.h"
+#include "emp/datastructs/QueueCache.hpp"
+#include "emp/base/vector.hpp"
 
 #include <sstream>
 #include <string>

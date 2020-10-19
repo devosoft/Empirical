@@ -2,8 +2,8 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/datastructs/Graph.h"
-#include "emp/bits/BitVector.h"
+#include "emp/datastructs/Graph.hpp"
+#include "emp/bits/BitVector.hpp"
 
 #include <sstream>
 #include <iostream>

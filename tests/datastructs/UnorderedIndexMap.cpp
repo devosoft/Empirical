@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/datastructs/UnorderedIndexMap.h"
+#include "emp/datastructs/UnorderedIndexMap.hpp"
 
 #include <sstream>
 #include <iostream>

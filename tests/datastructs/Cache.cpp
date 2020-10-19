@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/datastructs/Cache.h"
+#include "emp/datastructs/Cache.hpp"
 
 #include <sstream>
 #include <string>

@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/datastructs/graph_utils.h"
+#include "emp/datastructs/graph_utils.hpp"
 
 #include <sstream>
 #include <iostream>

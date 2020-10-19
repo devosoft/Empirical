@@ -2,8 +2,8 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/datastructs/tuple_utils.h"
-#include "emp/base/vector.h"
+#include "emp/datastructs/tuple_utils.hpp"
+#include "emp/base/vector.hpp"
 
 #include <sstream>
 #include <iostream>
