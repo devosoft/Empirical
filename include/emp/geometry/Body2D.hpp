@@ -21,15 +21,13 @@
 #ifndef EMP_BODY_2D_H
 #define EMP_BODY_2D_H
 
-#include "../base/assert.h"
-#include "../base/Ptr.h"
-#include "../base/vector.h"
-
-#include "../debug/alert.h"
-#include "../debug/mem_track.h"
-
-#include "Angle2D.h"
-#include "Circle2D.h"
+#include "../base/assert.hpp"
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
+#include "../debug/alert.hpp"
+#include "../debug/mem_track.hpp"
+#include "Angle2D.hpp"
+#include "Circle2D.hpp"
 
 namespace emp {
 

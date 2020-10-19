@@ -20,13 +20,13 @@
 #include <algorithm>
 #include <functional>
 
-#include "../base/Ptr.h"
-#include "../datastructs/vector_utils.h"
-#include "../meta/TypePack.h"
-#include "../tools/TypeTracker.h"
+#include "../base/Ptr.hpp"
+#include "../datastructs/vector_utils.hpp"
+#include "../meta/TypePack.hpp"
+#include "../tools/TypeTracker.hpp"
 
-#include "Angle2D.h"
-#include "Point2D.h"
+#include "Angle2D.hpp"
+#include "Point2D.hpp"
 
 namespace emp {
 

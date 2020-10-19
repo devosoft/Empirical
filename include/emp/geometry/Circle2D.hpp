@@ -9,7 +9,7 @@
 #define EMP_CIRCLE_2D_H
 
 
-#include "Point2D.h"
+#include "Point2D.hpp"
 
 namespace emp {
 

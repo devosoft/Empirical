@@ -26,9 +26,9 @@
 #ifndef EMP_SURFACE_2D_H
 #define EMP_SURFACE_2D_H
 
-#include "../base/Ptr.h"
-#include "../tools/functions.h"
-#include "Body2D.h"
+#include "../base/Ptr.hpp"
+#include "../tools/functions.hpp"
+#include "Body2D.hpp"
 
 #include <functional>
 

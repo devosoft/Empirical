@@ -12,12 +12,12 @@
 #include <unordered_set>
 #include <functional>
 
-#include "../base/Ptr.h"
-#include "../base/vector.h"
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
 
 using namespace std::placeholders;
 
-#include "Surface2D.h"
+#include "Surface2D.hpp"
 
 namespace emp {
 
