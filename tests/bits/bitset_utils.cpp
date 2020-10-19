@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/bits/bitset_utils.h"
+#include "emp/bits/bitset_utils.hpp"
 
 #include <sstream>
 

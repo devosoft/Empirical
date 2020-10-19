@@ -21,14 +21,14 @@
 #include <unordered_set>
 #include <ratio>
 
-#include "emp/data/DataNode.h"
-#include "emp/bits/BitSet.h"
-#include "emp/functional/FunctionSet.h"
-#include "emp/compiler/RegEx.h"
-#include "emp/math/Random.h"
-#include "emp/tools/TypeTracker.h"
-#include "emp/tools/attrs.h"
-#include "emp/base/map.h"
+#include "emp/data/DataNode.hpp"
+#include "emp/bits/BitSet.hpp"
+#include "emp/functional/FunctionSet.hpp"
+#include "emp/compiler/RegEx.hpp"
+#include "emp/math/Random.hpp"
+#include "emp/tools/TypeTracker.hpp"
+#include "emp/tools/attrs.hpp"
+#include "emp/base/map.hpp"
 
 
 /// Ensures that
