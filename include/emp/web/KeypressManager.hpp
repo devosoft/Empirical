@@ -47,10 +47,10 @@
 #include <map>
 #include <locale>
 
-#include "../base/errors.h"
+#include "../base/errors.hpp"
 
-#include "events.h"
-#include "JSWrap.h"
+#include "events.hpp"
+#include "JSWrap.hpp"
 
 namespace emp {
 namespace web {

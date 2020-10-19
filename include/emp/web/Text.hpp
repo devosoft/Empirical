@@ -15,9 +15,9 @@
 #ifndef EMP_WEB_TEXT_H
 #define EMP_WEB_TEXT_H
 
-#include "../datastructs/DynamicString.h"
+#include "../datastructs/DynamicString.hpp"
 
-#include "Widget.h"
+#include "Widget.hpp"
 
 namespace emp {
 namespace web {

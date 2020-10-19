@@ -35,14 +35,14 @@
 
 #include <string>
 
-#include "../base/vector.h"
-#include "../base/errors.h"
-#include "../debug/mem_track.h"
+#include "../base/vector.hpp"
+#include "../base/errors.hpp"
+#include "../debug/mem_track.hpp"
 
-#include "events.h"
-#include "Font.h"
-#include "init.h"
-#include "WidgetExtras.h"
+#include "events.hpp"
+#include "Font.hpp"
+#include "init.hpp"
+#include "WidgetExtras.hpp"
 
 namespace emp {
 namespace web {

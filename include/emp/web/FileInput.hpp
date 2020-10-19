@@ -15,8 +15,8 @@
 #include <functional>
 #include <string>
 
-#include "../io/File.h"
-#include "Widget.h"
+#include "../io/File.hpp"
+#include "Widget.hpp"
 
 namespace emp {
 namespace web {

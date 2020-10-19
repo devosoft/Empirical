@@ -10,10 +10,10 @@
 #ifndef EMP_WEB_WIDGET_EXTRA_H
 #define EMP_WEB_WIDGET_EXTRA_H
 
-#include "Attributes.h"
-#include "init.h"
-#include "Listeners.h"
-#include "Style.h"
+#include "Attributes.hpp"
+#include "init.hpp"
+#include "Listeners.hpp"
+#include "Style.hpp"
 
 namespace emp {
 namespace web {

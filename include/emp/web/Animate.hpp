@@ -18,13 +18,13 @@
 
 #include <functional>
 
-#include "../base/assert.h"
-#include "../base/vector.h"
+#include "../base/assert.hpp"
+#include "../base/vector.hpp"
 
-#include "Button.h"
-#include "emfunctions.h"
-#include "JSWrap.h"
-#include "Widget.h"
+#include "Button.hpp"
+#include "emfunctions.hpp"
+#include "JSWrap.hpp"
+#include "Widget.hpp"
 
 
 namespace emp {

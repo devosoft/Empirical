@@ -11,7 +11,7 @@
 #ifndef EMP_WEB_IMAGE_H
 #define EMP_WEB_IMAGE_H
 
-#include "Widget.h"
+#include "Widget.hpp"
 
 namespace emp {
 namespace web {

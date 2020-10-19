@@ -12,9 +12,9 @@
 
 #include <functional>
 
-#include "../debug/alert.h"
-#include "../tools/string_utils.h"
-#include "JSWrap.h"
+#include "../debug/alert.hpp"
+#include "../tools/string_utils.hpp"
+#include "JSWrap.hpp"
 
 namespace emp {
 

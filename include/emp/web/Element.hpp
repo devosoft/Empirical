@@ -15,12 +15,12 @@
 #define EMP_WEB_ELEMENT_H
 
 
-#include "Animate.h"
-#include "Text.h"
-#include "Widget.h"
-#include "Div.h"
+#include "Animate.hpp"
+#include "Text.hpp"
+#include "Widget.hpp"
+#include "Div.hpp"
 
-#include "init.h"
+#include "init.hpp"
 
 namespace emp {
 namespace web {

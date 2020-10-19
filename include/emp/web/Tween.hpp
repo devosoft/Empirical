@@ -33,9 +33,9 @@
 #ifndef EMP_WEB_TWEEN_H
 #define EMP_WEB_TWEEN_H
 
-#include "emfunctions.h"
+#include "emfunctions.hpp"
 
-#include "Widget.h"
+#include "Widget.hpp"
 
 
 namespace emp {

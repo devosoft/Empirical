@@ -20,11 +20,11 @@
 #include <deque>
 #include <unordered_map>
 
-#include "Document.h"
-#include "../control/Signal.h"
-#include "../base/vector.h"
-#include "../web/JSWrap.h"
-#include "../../../tests2/unit_tests.h"
+#include "../base/vector.hpp"
+#include "../control/Signal.hpp"
+#include "Document.hpp"
+#include "JSWrap.hpp"
+#include "../../../tests2/unit_tests.hpp"
 
 namespace emp {
 namespace web {

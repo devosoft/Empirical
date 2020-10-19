@@ -13,15 +13,15 @@
 #ifndef EMP_WEB_CANVAS_UTILS_H
 #define EMP_WEB_CANVAS_UTILS_H
 
-#include "Canvas.h"
+#include "Canvas.hpp"
 
-#include "../base/vector.h"
-#include "../Evolve/StateGrid.h"
-#include "../geometry/Circle2D.h"
-#include "../geometry/Surface2D.h"
-#include "../geometry/Surface.h"
-#include "../bits/BitMatrix.h"
-#include "color_map.h"
+#include "../base/vector.hpp"
+#include "../Evolve/StateGrid.hpp"
+#include "../geometry/Circle2D.hpp"
+#include "../geometry/Surface2D.hpp"
+#include "../geometry/Surface.hpp"
+#include "../bits/BitMatrix.hpp"
+#include "color_map.hpp"
 
 namespace emp {
 namespace web {

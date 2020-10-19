@@ -27,11 +27,11 @@
 #ifndef EMP_WEB_TABLE_H
 #define EMP_WEB_TABLE_H
 
-#include "../base/vector.h"
+#include "../base/vector.hpp"
 
-#include "Div.h"
-#include "Widget.h"
-#include "WidgetExtras.h"
+#include "Div.hpp"
+#include "Widget.hpp"
+#include "WidgetExtras.hpp"
 
 namespace emp {
 namespace web {

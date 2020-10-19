@@ -25,10 +25,10 @@
 #define EMP_WEB_SELECTOR_H
 
 
-#include "../base/vector.h"
+#include "../base/vector.hpp"
 
-#include "JSWrap.h"
-#include "Widget.h"
+#include "JSWrap.hpp"
+#include "Widget.hpp"
 
 namespace emp {
 namespace web {

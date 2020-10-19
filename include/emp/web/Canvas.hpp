@@ -14,11 +14,11 @@
 
 #include <string>
 
-#include "../base/vector.h"
-#include "../geometry/Circle2D.h"
+#include "../base/vector.hpp"
+#include "../geometry/Circle2D.hpp"
 
-#include "CanvasAction.h"
-#include "CanvasShape.h"
+#include "CanvasAction.hpp"
+#include "CanvasShape.hpp"
 
 namespace emp {
 namespace web {

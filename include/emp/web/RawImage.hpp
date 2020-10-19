@@ -15,13 +15,13 @@
 #include <string>
 #include <vector>
 
-#include "../base/Ptr.h"
-#include "../base/vector.h"
-#include "../control/Signal.h"
-#include "../datastructs/map_utils.h"
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
+#include "../control/Signal.hpp"
+#include "../datastructs/map_utils.hpp"
 
-#include "emfunctions.h"
-#include "JSWrap.h"
+#include "emfunctions.hpp"
+#include "JSWrap.hpp"
 
 namespace emp {
 

@@ -12,11 +12,11 @@
 #ifndef EMP_WEB_DOCUEXTRAS_H
 #define EMP_WEB_DOCUEXTRAS_H
 
-#include "Animate.h"
-#include "Text.h"
-#include "Widget.h"
+#include "Animate.hpp"
+#include "Text.hpp"
+#include "Widget.hpp"
 
-#include "init.h"
+#include "init.hpp"
 
 namespace emp {
 namespace web {

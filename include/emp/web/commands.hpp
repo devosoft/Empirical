@@ -10,7 +10,7 @@
 #ifndef EMP_WEB_COMMANDS_H
 #define EMP_WEB_COMMANDS_H
 
-#include "Widget.h"
+#include "Widget.hpp"
 
 namespace emp {
 namespace web {

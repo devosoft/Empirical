@@ -45,18 +45,18 @@
 #include <tuple>
 #include <type_traits>
 
-#include "../meta/meta.h"
+#include "../meta/meta.hpp"
 
-#include "../base/assert.h"
-#include "../base/vector.h"
+#include "../base/assert.hpp"
+#include "../base/vector.hpp"
 
-#include "../datastructs/tuple_struct.h"
-#include "../datastructs/tuple_utils.h"
-#include "../debug/mem_track.h"
-#include "../tools/functions.h"
+#include "../datastructs/tuple_struct.hpp"
+#include "../datastructs/tuple_utils.hpp"
+#include "../debug/mem_track.hpp"
+#include "../tools/functions.hpp"
 
-#include "init.h"
-#include "js_utils.h"
+#include "init.hpp"
+#include "js_utils.hpp"
 
 #ifdef __EMSCRIPTEN__
 extern "C" {

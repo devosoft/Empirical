@@ -24,20 +24,20 @@
 
 #include "events.h"
 
-#include "Button.h"
-#include "Canvas.h"
-#include "Div.h"
-#include "Element.h"
-#include "FileInput.h"
-#include "Image.h"
-#include "Input.h"
-#include "Selector.h"
-#include "Table.h"
-#include "Text.h"
-#include "TextArea.h"
+#include "Button.hpp"
+#include "Canvas.hpp"
+#include "Div.hpp"
+#include "Element.hpp"
+#include "FileInput.hpp"
+#include "Image.hpp"
+#include "Input.hpp"
+#include "Selector.hpp"
+#include "Table.hpp"
+#include "Text.hpp"
+#include "TextArea.hpp"
 
-#include "canvas_utils.h"
-#include "color_map.h"
+#include "canvas_utils.hpp"
+#include "color_map.hpp"
 
 // Create an optional alternative to main, emp_main, that is only available after a document
 // has loaded and is ready.

@@ -20,7 +20,7 @@
 
 #include <utility>
 
-#include "JSWrap.h"
+#include "JSWrap.hpp"
 
 namespace emp {
 namespace web {

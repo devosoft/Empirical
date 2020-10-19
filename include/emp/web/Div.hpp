@@ -30,11 +30,10 @@
 #define EMP_WEB_DIV_H
 
 
-#include "Animate.h"
-#include "Text.h"
-#include "Widget.h"
-
-#include "init.h"
+#include "Animate.hpp"
+#include "Text.hpp"
+#include "Widget.hpp"
+#include "init.hpp"
 
 namespace emp {
 namespace web {

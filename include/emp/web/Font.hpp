@@ -14,8 +14,8 @@
 #include <string>
 #include <sstream>
 
-#include "color_map.h"
-#include "Style.h"
+#include "color_map.hpp"
+#include "Style.hpp"
 
 namespace emp {
 namespace web {

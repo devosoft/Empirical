@@ -31,7 +31,7 @@
 #define EMP_WEB_Input_H
 
 
-#include "Widget.h"
+#include "Widget.hpp"
 
 namespace emp {
 namespace web {

@@ -13,7 +13,7 @@
 #ifndef EMP_WEB_TEXT_AREA_H
 #define EMP_WEB_TEXT_AREA_H
 
-#include "Widget.h"
+#include "Widget.hpp"
 
 namespace emp {
 namespace web {
