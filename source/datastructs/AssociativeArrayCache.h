@@ -28,21 +28,21 @@ private:
 
 public:
 
-  using iterator = decltype(std::begin(std::declval<storage_t&>()));
+  using iterator = decltype(std::begin(std::declval<storage_t>()));
 
-  using const_iterator = decltype(std::begin(std::declval<const storage_t&>()));
+  using const_iterator = decltype(std::cbegin(std::declval<storage_t>()));
 
   iterator begin() { return std::begin( storage ); }
 
   const_iterator begin() const { return std::begin( storage ); }
 
-  const_iterator cbegin() const { return std::begin( storage ); }
+  const_iterator cbegin() const { return std::cbegin( storage ); }
 
   iterator end() { return begin() + size(); }
 
-  const_iterator end() const { return end() + size(); }
+  const_iterator end() const { return cbegin() + size(); }
 
-  const_iterator cend() const { return cend() + size(); }
+  const_iterator cend() const { return cbegin() + size(); }
 
   size_t size() const { return size_; }
 
