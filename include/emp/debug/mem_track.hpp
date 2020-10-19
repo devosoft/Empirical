@@ -36,8 +36,8 @@
 #include <string>
 #include <sstream>
 
-#include "../base/map.h"
-#include "alert.h"
+#include "../base/map.hpp"
+#include "alert.hpp"
 
 #ifdef EMP_NO_MEM_CHECK
 

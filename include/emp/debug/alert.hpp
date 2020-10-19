@@ -11,7 +11,7 @@
 #ifndef EMP_ALERT_H
 #define EMP_ALERT_H
 
-#include "../tools/string_utils.h"
+#include "../tools/string_utils.hpp"
 
 // If we are in emscripten, make sure to include the header.
 #ifdef __EMSCRIPTEN__
