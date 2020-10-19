@@ -2,7 +2,7 @@
 #define CATCH_CONFIG_MAIN
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/geometry/Body2D.h"
+#include "emp/geometry/Body2D.hpp"
 
 
 TEST_CASE("Test Body2d", "[geometry]")

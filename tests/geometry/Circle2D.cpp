@@ -3,7 +3,7 @@
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 #include <stdlib.h>
 
-#include "emp/geometry/Circle2D.h"
+#include "emp/geometry/Circle2D.hpp"
 
 TEST_CASE("Test Circle2D", "[geometry]")
 {
