@@ -1,3 +1,6 @@
+#ifndef EMP_D3_HISTOGRAM_H
+#define EMP_D3_HISTOGRAM_H
+
 #include "d3_init.h"
 #include "dataset.h"
 #include "../../base/vector.h"
@@ -106,3 +109,5 @@ namespace D3 {
         }
     };
 }
+
+#endif
