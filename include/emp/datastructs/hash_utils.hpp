@@ -17,7 +17,7 @@
 #include <cstring>
 #include <stdint.h>
 
-#include "../polyfill/span.h"
+#include "../polyfill/span.hpp"
 
 namespace emp {
 

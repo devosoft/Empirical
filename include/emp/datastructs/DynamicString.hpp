@@ -15,7 +15,7 @@
 #include <functional>
 #include <string>
 
-#include "../base/vector.h"
+#include "../base/vector.hpp"
 
 namespace emp {
 

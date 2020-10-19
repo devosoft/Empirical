@@ -16,12 +16,11 @@
 #include <string>
 #include <tuple>
 
-#include "../base/assert.h"
-#include "../base/vector.h"
-
-#include "Graph.h"
-#include "../math/Random.h"
-#include "../math/random_utils.h"
+#include "../base/assert.hpp"
+#include "../base/vector.hpp"
+#include "../math/random_utils.hpp"
+#include "../math/Random.hpp"
+#include "Graph.hpp"
 
 namespace emp {
 

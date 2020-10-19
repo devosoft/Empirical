@@ -15,7 +15,7 @@
 
 #include <iostream>
 
-#include "../base/assert.h"
+#include "../base/assert.hpp"
 
 namespace emp {
 

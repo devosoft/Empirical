@@ -14,7 +14,7 @@
 #include <map>
 #include <unordered_map>
 
-#include "../base/map.h"
+#include "../base/map.hpp"
 
 namespace emp {
 

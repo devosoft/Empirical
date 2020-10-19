@@ -13,10 +13,9 @@
 
 #include <iostream>
 
-#include "../base/assert.h"
-#include "../base/vector.h"
-
-#include "../bits/BitVector.h"
+#include "../base/assert.hpp"
+#include "../base/vector.hpp"
+#include "../bits/BitVector.hpp"
 
 namespace emp {
 

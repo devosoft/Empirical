@@ -69,7 +69,7 @@
 #include <typeinfo>
 #include <typeindex>
 
-#include "../base/macros.h"
+#include "../base/macros.hpp"
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 

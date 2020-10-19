@@ -11,8 +11,8 @@
 #ifndef EMP_REFERENCE_VECTOR_H
 #define EMP_REFERENCE_VECTOR_H
 
-#include "../base/Ptr.h"
-#include "../base/vector.h"
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
 
 namespace emp {
 

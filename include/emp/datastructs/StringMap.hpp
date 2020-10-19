@@ -23,9 +23,8 @@
 #ifndef EMP_STRING_MAP_H
 #define EMP_STRING_MAP_H
 
-#include "../base/unordered_map.h"
-
-#include "../tools/string_utils.h"
+#include "../base/unordered_map.hpp"
+#include "../tools/string_utils.hpp"
 
 /// Macro to covert a literal string to a unique ID, mostly at compile time.  Specifically,
 /// the string is converted to a unique type at compile time, which is then mapped to a unique

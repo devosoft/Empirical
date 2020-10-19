@@ -6,8 +6,8 @@
  *  @file vector_utils.h
  *  @brief A set of simple functions to manipulate emp::vector
  *  @note Status: BETA
- * 
- * 
+ *
+ *
  *  @note consider adding a work-around to avoid vector<bool> ?
  */
 
@@ -18,7 +18,7 @@
 #include <functional>
 #include <limits>
 
-#include "../base/vector.h"
+#include "../base/vector.hpp"
 
 namespace emp {
 
@@ -27,7 +27,7 @@ namespace emp {
   emp::vector<T> & Append(emp::vector<T> & base) {
     return base;
   }
-  
+
   /// Append one or more vectors on to the end of an existing vector.
   template <typename T, typename V1, typename... Vs>
   emp::vector<T> & Append(emp::vector<T> & base, const V1 & v1, const Vs &... vs) {
@@ -35,7 +35,7 @@ namespace emp {
     if constexpr (std::is_convertible<T, V1>()) {
       base.push_back(v1);
     }
-    
+
     // Otherwise assume we have a container and append all of it.
     else {
       base.insert(base.end(), v1.begin(), v1.end());
@@ -44,7 +44,7 @@ namespace emp {
     // Recurse.
     return Append(base, vs...);
   }
-  
+
 
   /// Concatonate two or more vectors together, creating a new vector.
   template <typename T, typename... Vs>
@@ -137,7 +137,7 @@ namespace emp {
   template <typename T>
   T FindMax(const emp::vector<T> & v) { return v[ FindMaxIndex(v) ]; }
 
-  
+
   /// Sum all of the contents of a vector.
   template <typename T>
   T Sum(const emp::vector<T> & v) {
@@ -145,7 +145,7 @@ namespace emp {
     for (auto x : v) sum += x;
     return sum;
   }
-  
+
   /// Multiply all of the contents of a vector.
   template <typename T>
   T Product(const emp::vector<T> & v) {

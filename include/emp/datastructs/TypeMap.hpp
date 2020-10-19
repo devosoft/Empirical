@@ -13,7 +13,7 @@
 
 #include <unordered_map>
 
-#include "../meta/TypeID.h"
+#include "../meta/TypeID.hpp"
 
 namespace emp {
 
@@ -46,7 +46,7 @@ namespace emp {
     iterator end() noexcept { return val_map.end(); }
     const_iterator end() const noexcept { return val_map.end();  }
     const_iterator cend() const noexcept { return val_map.end();  }
-    
+
     template <typename INDEX_TYPE>
     mapped_type & Get() { return val_map[GetTypeID<INDEX_TYPE>()]; }
 

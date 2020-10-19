@@ -9,38 +9,38 @@
  *
  *  A TimeQueue maintains a fast priority queue where a user inserts a set of items with a time
  *  that they should be triggered and can request information of which comes next.
- * 
+ *
  *  Create a TimeQueue with:
- * 
+ *
  *    TimeQueue time_queue;
- * 
+ *
  *  By default TimeQueue operates on unsigned integers (of type size_t), but you can specify a
  *  different type with a template parameter, such as:
- * 
+ *
  *    TimeQueue<std::string> my_string_queue;
- * 
+ *
  *  Once a TimeQueue is created, you can insert items with their trigger time specified as a
  *  double value, such as:
- * 
+ *
  *    time_queue.Insert(0, 130.0);
  *    time_queue.Insert(1, 150.0);
  *    time_queue.Insert(2, 140.0);
- * 
+ *
  *  The internal time of a time_queue starts at 0.0.  Whenever you want to know what happens next
  *  you can run:
- * 
+ *
  *    size_t next_id = time_queue.Next();
- * 
+ *
  *  This will set next_id to the earliest occuring event, removing that event from the queue
  *  and updating the current time to the time of that event.  You can check the current
  *  time with:
- * 
+ *
  *    double cur_time = time_queue.GetTime();
- * 
+ *
  *  Important note for EFFICIENCY: You must always insert events for after the current time,
  *  but the longer after the current time (and the more other insertions that occuer between
- *  each insertion and its trigger) the faster the TimeQueue will run.  If an item will be 
- *  triggered immediately, you should try to avoid putting it in the TimeQueue. 
+ *  each insertion and its trigger) the faster the TimeQueue will run.  If an item will be
+ *  triggered immediately, you should try to avoid putting it in the TimeQueue.
  */
 
 
@@ -51,13 +51,13 @@
 #include <string>
 #include <sstream>
 
-#include "../base/assert.h"
-#include "../base/vector.h"
-#include "vector_utils.h"
+#include "../base/assert.hpp"
+#include "../base/vector.hpp"
+#include "vector_utils.hpp"
 
 namespace emp {
 
-  /// A TimeQueue is used to track when "items" are ready.  Insert() items with the 
+  /// A TimeQueue is used to track when "items" are ready.  Insert() items with the
   /// time they should be triggered.  Must be at least min_wait in the future.
 
   template <typename T=size_t>
@@ -66,7 +66,7 @@ namespace emp {
     struct ItemInfo {
       T item;
       double timing;
-  
+
       bool operator<(const ItemInfo & _in) const {
         if (timing == _in.timing) return (item < _in.item);
         return (timing < _in.timing);

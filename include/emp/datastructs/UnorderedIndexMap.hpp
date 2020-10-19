@@ -14,7 +14,7 @@
 #ifndef EMP_UNORDERED_INDEX_MAP_H
 #define EMP_UNORDERED_INDEX_MAP_H
 
-#include "../base/vector.h"
+#include "../base/vector.hpp"
 
 namespace emp {
 

@@ -13,8 +13,8 @@
 
 #include <map>
 
-#include "../base/map.h"
-#include "../base/vector.h"
+#include "../base/map.hpp"
+#include "../base/vector.hpp"
 
 namespace emp {
 

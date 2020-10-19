@@ -14,8 +14,8 @@
 #include <functional>
 #include <tuple>
 
-#include "../meta/ValPack.h"
-#include "../meta/meta.h"
+#include "../meta/ValPack.hpp"
+#include "../meta/meta.hpp"
 
 namespace emp {
 

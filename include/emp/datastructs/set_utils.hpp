@@ -16,7 +16,7 @@
 #include <unordered_set>
 #include <algorithm>
 
-#include "../base/vector.h"
+#include "../base/vector.hpp"
 
 namespace emp {
 
