@@ -17,7 +17,7 @@
 
 #include <string>
 
-#include "../compiler/Lexer.h"
+#include "../compiler/Lexer.hpp"
 
 namespace emp {
 

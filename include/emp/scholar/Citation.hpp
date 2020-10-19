@@ -12,11 +12,11 @@
 #include <set>
 #include <string>
 
-#include "../base/map.h"
-#include "../base/vector.h"
-#include "../datastructs/map_utils.h"
-#include "../tools/string_utils.h"
-#include "Author.h"
+#include "../base/map.hpp"
+#include "../base/vector.hpp"
+#include "../datastructs/map_utils.hpp"
+#include "../tools/string_utils.hpp"
+#include "Author.hpp"
 
 namespace emp {
 

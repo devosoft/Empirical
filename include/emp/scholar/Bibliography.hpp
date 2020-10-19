@@ -8,8 +8,8 @@
 #ifndef EMP_BIBLIOGRAPHY_H
 #define EMP_BIBLIOGRAPHY_H
 
-#include "../base/vector.h"
-#include "Citation.h"
+#include "../base/vector.hpp"
+#include "Citation.hpp"
 
 namespace emp {
 
