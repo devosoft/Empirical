@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/compiler/NFA.h"
+#include "emp/compiler/NFA.hpp"
 
 #include <sstream>
 #include <iostream>

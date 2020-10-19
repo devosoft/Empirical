@@ -2,10 +2,10 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/compiler/lexer_utils.h"
-#include "emp/compiler/NFA.h"
-#include "emp/compiler/RegEx.h"
-#include "emp/compiler/DFA.h"
+#include "emp/compiler/lexer_utils.hpp"
+#include "emp/compiler/NFA.hpp"
+#include "emp/compiler/RegEx.hpp"
+#include "emp/compiler/DFA.hpp"
 
 #include <sstream>
 #include <iostream>

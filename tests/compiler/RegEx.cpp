@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/compiler/RegEx.h"
+#include "emp/compiler/RegEx.hpp"
 
 #include <sstream>
 #include <iostream>

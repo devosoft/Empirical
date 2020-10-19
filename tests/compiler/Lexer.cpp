@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/compiler/Lexer.h"
+#include "emp/compiler/Lexer.hpp"
 
 #include <sstream>
 
