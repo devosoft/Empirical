@@ -24,7 +24,7 @@
 #include "../control/Signal.hpp"
 #include "Document.hpp"
 #include "JSWrap.hpp"
-#include "../../../tests2/unit_tests.hpp"
+#include "../testing/unit_tests.hpp"
 
 namespace emp {
 namespace web {

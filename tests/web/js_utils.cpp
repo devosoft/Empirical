@@ -5,7 +5,7 @@
 #include <string>
 #include <array>
 
-#include "../../tests2/unit_tests.hpp"
+#include "emp/testing/unit_tests.hpp"
 #include "emp/base/assert.hpp"
 #include "emp/base/vector.hpp"
 #include "emp/config/command_line.hpp"
