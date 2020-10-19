@@ -11,9 +11,9 @@
 #include <string>
 #include <iostream>
 
-#include "../base/vector.h"
-#include "../datastructs/map_utils.h"
-#include "../functional/FunctionSet.h"
+#include "../base/vector.hpp"
+#include "../datastructs/map_utils.hpp"
+#include "../functional/FunctionSet.hpp"
 
 namespace emp {
 

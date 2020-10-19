@@ -17,13 +17,13 @@
 #include <functional>
 #include <algorithm>
 
-#include "../base/errors.h"
-#include "../bits/BitSet.h"
-#include "../datastructs/map_utils.h"
-#include "../hardware/EventDrivenGP.h"
-#include "../math/math.h"
-#include "../math/Random.h"
-#include "../math/random_utils.h"
+#include "../base/errors.hpp"
+#include "../bits/BitSet.hpp"
+#include "../datastructs/map_utils.hpp"
+#include "../hardware/EventDrivenGP.hpp"
+#include "../math/math.hpp"
+#include "../math/Random.hpp"
+#include "../math/random_utils.hpp"
 
 namespace emp {
 

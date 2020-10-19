@@ -14,11 +14,11 @@
 #include <string>
 #include <unordered_set>
 
-#include "../base/array.h"
-#include "../base/Ptr.h"
-#include "../base/vector.h"
-#include "../datastructs/map_utils.h"
-#include "../tools/string_utils.h"
+#include "../base/array.hpp"
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
+#include "../datastructs/map_utils.hpp"
+#include "../tools/string_utils.hpp"
 
 namespace emp {
 

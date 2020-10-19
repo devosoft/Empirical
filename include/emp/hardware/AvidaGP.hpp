@@ -23,15 +23,15 @@
 #include <iostream>
 #include <map>
 
-#include "../base/array.h"
-#include "../base/Ptr.h"
-#include "../base/vector.h"
-#include "../datastructs/map_utils.h"
-#include "../io/File.h"
-#include "../math/Random.h"
-#include "../tools/string_utils.h"
+#include "../base/array.hpp"
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
+#include "../datastructs/map_utils.hpp"
+#include "../io/File.hpp"
+#include "../math/Random.hpp"
+#include "../tools/string_utils.hpp"
 
-#include "AvidaCPU_InstLib.h"
+#include "AvidaCPU_InstLib.hpp"
 
 namespace emp {
 

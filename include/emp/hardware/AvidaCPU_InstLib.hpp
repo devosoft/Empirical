@@ -10,9 +10,8 @@
 #ifndef EMP_AVIDA_CPU_INST_LIB_H
 #define EMP_AVIDA_CPU_INST_LIB_H
 
-#include "../math/math.h"
-
-#include "InstLib.h"
+#include "../math/math.hpp"
+#include "InstLib.hpp"
 
 namespace emp {
 

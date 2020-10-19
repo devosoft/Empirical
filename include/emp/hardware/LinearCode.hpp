@@ -10,8 +10,8 @@
 #ifndef EMP_LINEAR_CODE_H
 #define EMP_LINEAR_CODE_H
 
-#include "../base/array.h"
-#include "../base/vector.h"
+#include "../base/array.hpp"
+#include "../base/vector.hpp"
 
 namespace emp {
 

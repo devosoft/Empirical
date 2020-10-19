@@ -12,9 +12,9 @@
 
 #include <string>
 
-#include "../base/vector.h"
-#include "../bits/bitset_utils.h"
-#include "../datastructs/vector_utils.h"
+#include "../base/vector.hpp"
+#include "../bits/bitset_utils.hpp"
+#include "../datastructs/vector_utils.hpp"
 
 namespace emp {
 
