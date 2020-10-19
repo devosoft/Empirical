@@ -3,14 +3,14 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/Evolve/World.h"
-#include "emp/base/array.h"
-#include "emp/Evolve/Resource.h"
+#include "emp/Evolve/World.hpp"
+#include "emp/base/array.hpp"
+#include "emp/Evolve/Resource.hpp"
 
 
-#include "emp/bits/BitSet.h"
-#include "emp/math/Random.h"
-#include "emp/tools/string_utils.h"
+#include "emp/bits/BitSet.hpp"
+#include "emp/math/Random.hpp"
+#include "emp/tools/string_utils.hpp"
 
 #include <sstream>
 #include <iostream>

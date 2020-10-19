@@ -9,13 +9,12 @@
 #include <sstream>
 #include <iostream>
 
-#include "emp/Evolve/SystematicsAnalysis.h"
-#include "emp/Evolve/Systematics.h"
-#include "emp/Evolve/SystematicsAnalysis.h"
-#include "emp/Evolve/World.h"
-#include "emp/base/vector.h"
-#include "emp/hardware/AvidaGP.h"
-#include "emp/Evolve/World_output.h"
+#include "emp/Evolve/SystematicsAnalysis.hpp"
+#include "emp/Evolve/Systematics.hpp"
+#include "emp/Evolve/World.hpp"
+#include "emp/base/vector.hpp"
+#include "emp/hardware/AvidaGP.hpp"
+#include "emp/Evolve/World_output.hpp"
 
 
 TEST_CASE("Test Systematics", "[Evolve]")

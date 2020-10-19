@@ -3,8 +3,8 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/Evolve/World_structure.h"
-#include "emp/Evolve/World.h"
+#include "emp/Evolve/World_structure.hpp"
+#include "emp/Evolve/World.hpp"
 
 #include <sstream>
 #include <iostream>

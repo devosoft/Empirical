@@ -5,8 +5,8 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/Evolve/World.h"
-#include "emp/Evolve/World_reflect.h"
+#include "emp/Evolve/World.hpp"
+#include "emp/Evolve/World_reflect.hpp"
 
 #include <sstream>
 #include <iostream>
