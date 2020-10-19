@@ -1,9 +1,9 @@
 #define CATCH_CONFIG_MAIN
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/games/Othello.h"
-#include "emp/base/vector.h"
-#include "emp/math/Random.h"
+#include "emp/games/Othello.hpp"
+#include "emp/base/vector.hpp"
+#include "emp/math/Random.hpp"
 
 TEST_CASE("Test Othello", "[games]") {
   constexpr size_t board_width_w8 = 8;
