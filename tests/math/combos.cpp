@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/math/combos.h"
+#include "emp/math/combos.hpp"
 
 #include <sstream>
 

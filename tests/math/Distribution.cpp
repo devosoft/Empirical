@@ -2,8 +2,8 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/math/Distribution.h"
-#include "emp/math/Random.h"
+#include "emp/math/Distribution.hpp"
+#include "emp/math/Random.hpp"
 
 #include <sstream>
 #include <iostream>

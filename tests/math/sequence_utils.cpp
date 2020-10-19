@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/math/sequence_utils.h"
+#include "emp/math/sequence_utils.hpp"
 
 #include <sstream>
 #include <iostream>

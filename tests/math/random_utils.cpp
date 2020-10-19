@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/math/random_utils.h"
+#include "emp/math/random_utils.hpp"
 
 #include <sstream>
 #include <string>

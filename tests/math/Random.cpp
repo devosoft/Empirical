@@ -3,14 +3,8 @@
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 
-// #include "tools/Lexer.h"
-// #include "tools/MatchBin.h"
-// #include "tools/NFA.h"
-// #include "tools/RegEx.h"
-#include "emp/math/Random.h"
-#include "emp/math/random_utils.h"
-
-
+#include "emp/math/Random.hpp"
+#include "emp/math/random_utils.hpp"
 
 #include <sstream>
 #include <fstream>

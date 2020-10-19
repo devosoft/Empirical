@@ -2,8 +2,8 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/math/math.h"
-#include "emp/data/DataNode.h"
+#include "emp/math/math.hpp"
+#include "emp/data/DataNode.hpp"
 
 #include <sstream>
 #include <iostream>

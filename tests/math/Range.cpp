@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/math/Range.h"
+#include "emp/math/Range.hpp"
 
 #include <sstream>
 #include <iostream>

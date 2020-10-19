@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/math/info_theory.h"
+#include "emp/math/info_theory.hpp"
 
 #include <sstream>
 #include <string>

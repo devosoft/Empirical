@@ -2,8 +2,8 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/math/stats.h"
-#include "emp/datastructs/vector_utils.h"
+#include "emp/math/stats.hpp"
+#include "emp/datastructs/vector_utils.hpp"
 
 #include <sstream>
 #include <iostream>
