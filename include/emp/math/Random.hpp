@@ -17,8 +17,8 @@
 #include <cstring>
 #include <iterator>
 
-#include "../base/assert.h"
-#include "Range.h"
+#include "../base/assert.hpp"
+#include "Range.hpp"
 
 namespace emp {
 

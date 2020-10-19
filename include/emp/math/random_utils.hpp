@@ -11,9 +11,9 @@
 #ifndef EMP_RANDOM_UTILS_H
 #define EMP_RANDOM_UTILS_H
 
-#include "../base/vector.h"
-#include "../bits/BitVector.h"
-#include "Random.h"
+#include "../base/vector.hpp"
+#include "../bits/BitVector.hpp"
+#include "Random.hpp"
 
 namespace emp {
 

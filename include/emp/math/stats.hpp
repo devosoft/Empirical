@@ -20,10 +20,10 @@
 #include <unordered_set>
 #include <functional>
 
-#include "../base/map.h"
-#include "../base/vector.h"
-#include "../meta/type_traits.h"
-#include "math.h"
+#include "../base/map.hpp"
+#include "../base/vector.hpp"
+#include "../meta/type_traits.hpp"
+#include "math.hpp"
 
 namespace emp {
 

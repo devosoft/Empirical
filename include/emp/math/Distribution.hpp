@@ -12,8 +12,8 @@
 #ifndef EMP_DISTRIBUTION_H
 #define EMP_DISTRIBUTION_H
 
-#include "../datastructs/UnorderedIndexMap.h"
-#include "Random.h"
+#include "../datastructs/UnorderedIndexMap.hpp"
+#include "Random.hpp"
 
 namespace emp {
 

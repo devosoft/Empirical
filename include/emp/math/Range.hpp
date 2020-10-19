@@ -13,8 +13,8 @@
 
 #include <limits>
 
-#include "../base/assert.h"
-#include "../base/vector.h"
+#include "../base/assert.hpp"
+#include "../base/vector.hpp"
 
 namespace emp {
 

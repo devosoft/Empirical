@@ -16,10 +16,10 @@
 #include <algorithm>
 #include <cmath>
 
-#include "../base/assert.h"
-#include "../meta/reflection.h"
-#include "Random.h"
-#include "constants.h"
+#include "../base/assert.hpp"
+#include "../meta/reflection.hpp"
+#include "Random.hpp"
+#include "constants.hpp"
 
 namespace emp {
 

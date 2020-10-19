@@ -22,8 +22,8 @@
 #ifndef EMP_INFO_THEORY_H
 #define EMP_INFO_THEORY_H
 
-#include "../base/vector.h"
-#include "math.h"
+#include "../base/vector.hpp"
+#include "math.hpp"
 
 namespace emp {
 
