@@ -13,10 +13,9 @@
 
 #include <unordered_map>
 
-#include "../base/assert.h"
-#include "../meta/meta.h"
-
-#include "../datastructs/tuple_utils.h"
+#include "../base/assert.hpp"
+#include "../datastructs/tuple_utils.hpp"
+#include "../meta/meta.hpp"
 
 namespace emp {
 

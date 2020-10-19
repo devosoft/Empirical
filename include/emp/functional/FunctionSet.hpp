@@ -12,7 +12,7 @@
 #define EMP_FUNCTION_SET_H
 
 #include <functional>
-#include "../base/vector.h"
+#include "../base/vector.hpp"
 
 namespace emp {
 

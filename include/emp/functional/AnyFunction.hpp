@@ -15,9 +15,9 @@
 #define EMP_ANY_FUNCTION_H
 
 #include <functional>
-#include "../base/assert.h"
-#include "../base/Ptr.h"
-#include "../meta/type_traits.h"
+#include "../base/assert.hpp"
+#include "../base/Ptr.hpp"
+#include "../meta/type_traits.hpp"
 
 namespace emp {
 
@@ -80,7 +80,7 @@ namespace emp {
 
     /// Get the std::function to be called.
     const fun_t & GetFunction() const { return fun; }
-  };  
+  };
 
 
   /// AnyFunction manages the function pointers to be dynamically handled.
@@ -180,13 +180,13 @@ namespace emp {
   template <typename RETURN, typename... Ts>
   bool BaseFunction::CallOK(Ts &&...) {
     using fun_t = DerivedFunction<RETURN(Ts...)>;
-    return dynamic_cast<fun_t *>(this);    
+    return dynamic_cast<fun_t *>(this);
   }
 
   template <typename RETURN, typename... Ts>
   bool BaseFunction::CallTypeOK() {
     using fun_t = DerivedFunction<RETURN(Ts...)>;
-    return dynamic_cast<fun_t *>(this);    
+    return dynamic_cast<fun_t *>(this);
   }
 
   template <typename T> auto BaseFunction::Convert() {

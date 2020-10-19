@@ -16,7 +16,7 @@
 #define EMP_GENERIC_FUNCTION_H
 
 #include <functional>
-#include "../base/assert.h"
+#include "../base/assert.hpp"
 
 namespace emp {
 
@@ -99,13 +99,13 @@ namespace emp {
   template <typename RETURN, typename... Ts>
   bool GenericFunction::CallOK(Ts &&...) {
     using fun_t = Function<RETURN(Ts...)>;
-    return dynamic_cast<fun_t *>(this);    
+    return dynamic_cast<fun_t *>(this);
   }
 
   template <typename RETURN, typename... Ts>
   bool GenericFunction::CallTypeOK() {
     using fun_t = Function<RETURN(Ts...)>;
-    return dynamic_cast<fun_t *>(this);    
+    return dynamic_cast<fun_t *>(this);
   }
 
   template <typename T> auto GenericFunction::Convert() {
