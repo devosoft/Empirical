@@ -46,7 +46,7 @@ namespace emp {
   private:
     const void * ptr;   ///< Which pointer are we keeping data on?
     int count;          ///< How many of this pointer do we have?
-    PtrStatus status;   ///< Has this pointer been deleted? (i.e., we should no longer access it!)
+    PtrStatus status;   ///< Has this pointer been deleted? (i.e., if so, don't access it!)
     size_t array_bytes; ///< How big is the array pointed to (in bytes)?
 
   public:
@@ -321,40 +321,98 @@ namespace emp {
     };
   }
 
+  /// Base class with common functionality (that should not exist in void pointers)
   template <typename TYPE>
-  class Ptr {
+  class BasePtr {
   public:
     TYPE * ptr;                 ///< The raw pointer associated with this Ptr object.
     size_t id;                  ///< A unique ID for this pointer type.
+
+    BasePtr(TYPE * in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) { }
+ 
+    static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
+
+    /// Dereference a pointer.
+    [[nodiscard]] TYPE & operator*() const {
+      // Make sure a pointer is active and non-null before we dereference it.
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
+      emp_assert(ptr != nullptr, "Do not dereference a null pointer!");
+      return *ptr;
+    }
+
+    /// Follow a pointer.
+    TYPE * operator->() const {
+      // Make sure a pointer is active before we follow it.
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
+      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
+      return ptr;
+    }
+
+    /// Indexing into array
+    TYPE & operator[](size_t pos) const {
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
+      emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.", id);
+      emp_assert(Tracker().GetArrayBytes(id) > (pos*sizeof(TYPE)),
+        "Indexing out of range.", id, ptr, pos, sizeof(TYPE), Tracker().GetArrayBytes(id));
+      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
+      return ptr[pos];
+    }
+
+  };
+
+
+  /// Base class with functionality only needed in void pointers.
+  template <>
+  class BasePtr<void> {
+  public:
+    void * ptr;                 ///< The raw pointer associated with this Ptr object.
+    size_t id;                  ///< A unique ID for this pointer type.
+
+    BasePtr(void * in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) { }
+    static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
+  };
+
+  /// Base class with functionality only needed in void pointers.
+  template <>
+  class BasePtr<const void> {
+  public:
+    const void * ptr;                 ///< The raw pointer associated with this Ptr object.
+    size_t id;                  ///< A unique ID for this pointer type.
+
+    BasePtr(const void * in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) { }
+    static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
+  };
+
+  /// Main Ptr class DEBUG definition.
+  template <typename TYPE>
+  class Ptr : public BasePtr<TYPE> {
+  public:
+    using BasePtr<TYPE>::ptr;
+    using BasePtr<TYPE>::id;
+    using BasePtr<TYPE>::Tracker;
+
     using element_type = TYPE;  ///< Type being pointed at.
 
     static constexpr size_t UNTRACKED_ID = (size_t) -1;
 
     static PtrDebug & DebugInfo() { static PtrDebug info; return info; } // Debug info for each type
-    static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
 
     /// Construct a null Ptr by default.
-    Ptr() : ptr(nullptr), id(UNTRACKED_ID) {
-      if (internal::ptr_debug) std::cout << "null construct: " << ptr << std::endl;
+    Ptr() : BasePtr<TYPE>(nullptr, UNTRACKED_ID) {
+      if (internal::ptr_debug) {
+        std::cout << "null construct." << std::endl;
+      }
     }
 
     /// Construct using copy constructor
-    Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr), id(_in.id) {
+    Ptr(const Ptr<TYPE> & _in) : BasePtr<TYPE>(_in.ptr, _in.id) {
       if (internal::ptr_debug) std::cout << "copy construct: " << ptr << std::endl;
       Tracker().IncID(id);
     }
 
-    /// Construct using move constructor
-    Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr), id(_in.id) {
-      if (internal::ptr_debug) std::cout << "move construct: " << ptr << std::endl;
-      _in.ptr = nullptr;
-      _in.id = UNTRACKED_ID;
-      // No IncID or DecID in Tracker since we just move the id.
-    }
-
     /// Construct from a raw pointer of campatable type.
     template <typename T2>
-    Ptr(T2 * in_ptr, bool track=false) : ptr(in_ptr), id(UNTRACKED_ID)
+    Ptr(T2 * in_ptr, bool track=false) : BasePtr<TYPE>(in_ptr, UNTRACKED_ID)
     {
       if (internal::ptr_debug) std::cout << "raw construct: " << ptr << ". track=" << track << std::endl;
       emp_assert( (PtrIsConvertable<T2, TYPE>(in_ptr)) );
@@ -373,7 +431,7 @@ namespace emp {
 
     /// Construct from a raw pointer of campatable ARRAY type.
     template <typename T2>
-    Ptr(T2 * _ptr, size_t array_size, bool track) : ptr(_ptr), id(UNTRACKED_ID)
+    Ptr(T2 * _ptr, size_t array_size, bool track) : BasePtr<TYPE>(_ptr, UNTRACKED_ID)
     {
       const size_t array_bytes = array_size * sizeof(T2);
       if (internal::ptr_debug) std::cout << "raw ARRAY construct: " << ptr
@@ -396,7 +454,7 @@ namespace emp {
 
     /// Construct from another Ptr<> object of compatable type.
     template <typename T2>
-    Ptr(Ptr<T2> _in) : ptr(_in.Raw()), id(_in.GetID()) {
+    Ptr(Ptr<T2> _in) : BasePtr<TYPE>(_in.Raw(), _in.GetID()) {
       if (internal::ptr_debug) std::cout << "inexact copy construct: " << ptr << std::endl;
       emp_assert( (PtrIsConvertable<T2, TYPE>(_in.Raw())), id );
       Tracker().IncID(id);
@@ -418,43 +476,47 @@ namespace emp {
     }
 
     /// Is this Ptr currently nullptr?
-    bool IsNull() const { return ptr == nullptr; }
+    [[nodiscard]] bool IsNull() const { return ptr == nullptr; }
 
     /// Convert this Ptr to a raw pointer that isn't going to be tracked.
-    TYPE * Raw() {
-      emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to raw.", id);
-      return ptr;
-    }
-
-    /// Convert this Ptr to a const raw pointer that isn't going to be tracked.
-    const TYPE * const Raw() const {
+    [[nodiscard]] TYPE * Raw() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to raw.", id);
       return ptr;
     }
 
     /// Convert this Ptr to a raw pointer of a position in an array.
-    TYPE * Raw(size_t pos) {
+    [[nodiscard]] TYPE * Raw(size_t pos) const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to array raw.", id);
       return &(ptr[pos]);
     }
 
     /// Cast this Ptr to a different type.
-    template <typename T2> Ptr<T2> Cast() {
+    template <typename T2>
+    [[nodiscard]] Ptr<T2> Cast() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
       return (T2*) ptr;
     }
 
-    /// Cast this Ptr to a const Ptr of a different type.
-    template <typename T2> const Ptr<const T2> Cast() const {
+    /// Change constness of this Ptr's target; throw an assert of the cast fails.
+    template <typename T2>
+    [[nodiscard]] Ptr<T2> ConstCast() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
-      return (T2*) ptr;
+      emp_assert( (std::is_same< std::remove_const_t<TYPE> , std::remove_const_t<T2> >()) );
+      return const_cast<T2*>(ptr);
     }
 
     /// Dynamically cast this Ptr to another type; throw an assert of the cast fails.
-    template <typename T2> Ptr<T2> DynamicCast() {
-      emp_assert(dynamic_cast<T2*>(ptr) != nullptr);
+    template <typename T2>
+    [[nodiscard]] Ptr<T2> DynamicCast() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
-      return (T2*) ptr;
+      return dynamic_cast<T2*>(ptr);
+    }
+
+    /// Reinterpret this Ptr to another type; throw an assert of the cast fails.
+    template <typename T2>
+    [[nodiscard]] Ptr<T2> ReinterpretCast() const {
+      emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
+      return reinterpret_cast<T2*>(ptr);
     }
 
     /// Get the unique ID associated with this pointer.
@@ -463,9 +525,9 @@ namespace emp {
     /// Reallocate this Ptr to a newly allocated value using arguments passed in.
     template <typename... T>
     void New(T &&... args) {
-      Tracker().DecID(id);                            // Remove a pointer to any old memory...
+      Tracker().DecID(id);                               // Remove a pointer to any old memory...
 
-      ptr = new TYPE(std::forward<T>(args)...); // Special new that uses allocated space.
+      ptr = new TYPE(std::forward<T>(args)...);          // Special new that uses allocated space.
       // ptr = (TYPE*) malloc (sizeof(TYPE));            // Build a new raw pointer.
       // emp_emscripten_assert(ptr);                     // No exceptions in emscripten; assert alloc!
       // ptr = new (ptr) TYPE(std::forward<T>(args)...); // Special new that uses allocated space.
@@ -547,20 +609,6 @@ namespace emp {
       return *this;
     }
 
-    /// Move assignment
-    Ptr<TYPE> & operator=(Ptr<TYPE> && _in) {
-      if (internal::ptr_debug) std::cout << "move assignment: " << _in.ptr << std::endl;
-      emp_assert(Tracker().IsDeleted(_in.id) == false, _in.id, "Do not move deleted pointers.");
-      if (ptr != _in.ptr) {
-        Tracker().DecID(id);   // Decrement references to former pointer at this position.
-        ptr = _in.ptr;
-        id = _in.id;
-        _in.ptr = nullptr;
-        _in.id = UNTRACKED_ID;
-      }
-      return *this;
-    }
-
     /// Assign to a raw pointer of the correct type; if this is already tracked, hooked in
     /// correctly, otherwise don't track.
     template <typename T2>
@@ -597,59 +645,7 @@ namespace emp {
       return *this;
     }
 
-    /// Dereference a pointer.
-    TYPE & operator*() {
-      // Make sure a pointer is active and non-null before we dereference it.
-      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
-      emp_assert(ptr != nullptr, "Do not dereference a null pointer!");
-      return *ptr;
-    }
-
-    /// Dereference a pointer to a const type.
-    const TYPE & operator*() const {
-      // Make sure a pointer is active before we dereference it.
-      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
-      emp_assert(ptr != nullptr, "Do not dereference a null pointer!");
-      return *ptr;
-    }
-
-    /// Follow a pointer.
-    TYPE * operator->() {
-      // Make sure a pointer is active before we follow it.
-      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
-      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
-      return ptr;
-    }
-
-    /// Follow a pointer to a const target.
-    TYPE * const operator->() const {
-      // Make sure a pointer is active before we follow it.
-      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
-      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
-      return ptr;
-    }
-
-    /// Indexing into array
-    TYPE & operator[](size_t pos) {
-      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
-      emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.", id);
-      emp_assert(Tracker().GetArrayBytes(id) > (pos*sizeof(TYPE)),
-        "Indexing out of range.", id, ptr, pos, sizeof(TYPE), Tracker().GetArrayBytes(id));
-      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
-      return ptr[pos];
-    }
-
-    /// Indexing into const array
-    const TYPE & operator[](size_t pos) const {
-      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
-      emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.", id);
-      emp_assert(Tracker().GetArrayBytes(id) > (pos*sizeof(TYPE)),
-        "Indexing out of range.", id, ptr, pos, sizeof(TYPE), Tracker().GetArrayBytes(id));
-      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
-      return ptr[pos];
-    }
-
-    /// Auto-case to raw pointer type.
+    /// Auto-cast to raw pointer type.
     operator TYPE *() {
       // Make sure a pointer is active before we convert it.
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
@@ -744,29 +740,74 @@ namespace emp {
 
 
   template <typename TYPE>
-  class Ptr {
+  class BasePtr {
+  protected:
+    TYPE * ptr;                 ///< The raw pointer associated with this Ptr object.
+
+  public:
+    BasePtr(TYPE * in_ptr) : ptr(in_ptr) { }
+
+    // Dereference a pointer.
+    [[nodiscard]] TYPE & operator*() const { return *ptr; }
+
+    // Follow a pointer.
+    TYPE * operator->() const { return ptr; }
+
+    // Should implement operator->* to follow a pointer to a member function.
+    // For an example, see:
+    //  https://stackoverflow.com/questions/27634036/overloading-operator-in-c
+
+    // Indexing into array
+    TYPE & operator[](size_t pos) const { return ptr[pos]; }
+  };
+
+  /// Base class with functionality only needed in void pointers.
+  template <> class BasePtr<void> {
+  protected: void * ptr;                 ///< The raw pointer associated with this Ptr object.
+  public: BasePtr(void * in_ptr) : ptr(in_ptr) { }
+  };
+
+  template <> class BasePtr<const void> {
+  protected: const void * ptr;           ///< The raw pointer associated with this Ptr object.
+  public: BasePtr(const void * in_ptr) : ptr(in_ptr) { }
+  };
+
+  template <typename TYPE>
+  class Ptr : public BasePtr<TYPE> {
   private:
-    TYPE * ptr;
+    using BasePtr<TYPE>::ptr;
 
   public:
     using element_type = TYPE;
 
-    Ptr() : ptr(nullptr) {}                                              ///< Default constructor
-    Ptr(const Ptr<TYPE> & _in) : ptr(_in.ptr) {}                         ///< Copy constructor
-    Ptr(Ptr<TYPE> && _in) : ptr(_in.ptr) {}                              ///< Move constructor
-    template <typename T2> Ptr(T2 * in_ptr, bool=false) : ptr(in_ptr) {} ///< Construct from raw ptr
-    template <typename T2> Ptr(T2 * _ptr, size_t, bool) : ptr(_ptr) {}   ///< Construct from array
-    template <typename T2> Ptr(Ptr<T2> _in) : ptr(_in.Raw()) {}          ///< From compatible Ptr
-    Ptr(std::nullptr_t) : Ptr() {}                                       ///< From nullptr
-    ~Ptr() { ; }                                                         ///< Destructor
+    /// Default constructor
+    Ptr() : BasePtr<TYPE>(nullptr) {}                                              
 
-    bool IsNull() const { return ptr == nullptr; }
-    TYPE * Raw() { return ptr; }
-    const TYPE * const Raw() const { return ptr; }
-    const TYPE * const Raw(size_t pos) const { return &(ptr[pos]); }
-    template <typename T2> Ptr<T2> Cast() { return (T2*) ptr; }
-    template <typename T2> const Ptr<const T2> Cast() const { return (T2*) ptr; }
-    template <typename T2> Ptr<T2> DynamicCast() { return dynamic_cast<T2*>(ptr); }
+    /// Copy constructor
+    Ptr(const Ptr<TYPE> & _in) : BasePtr<TYPE>(_in.ptr) {}                         
+
+    /// Construct from raw ptr
+    template <typename T2> Ptr(T2 * in_ptr, bool=false) : BasePtr<TYPE>(in_ptr) {} 
+
+    /// Construct from array
+    template <typename T2> Ptr(T2 * _ptr, size_t, bool) : BasePtr<TYPE>(_ptr) {}   
+
+    /// From compatible Ptr
+    template <typename T2> Ptr(Ptr<T2> _in) : BasePtr<TYPE>(_in.Raw()) {}          
+
+    /// From nullptr
+    Ptr(std::nullptr_t) : Ptr() {}                                           
+
+    /// Destructor
+    ~Ptr() { ; }                                                             
+
+    [[nodiscard]] bool IsNull() const { return ptr == nullptr; }
+    [[nodiscard]] TYPE * Raw() const { return ptr; }
+    [[nodiscard]] TYPE * Raw(size_t pos) const { return &(ptr[pos]); }
+    template <typename T2> Ptr<T2> Cast() const { return (T2*) ptr; }
+    template <typename T2> Ptr<T2> ConstCast() const { return const_cast<T2*>(ptr); }
+    template <typename T2> Ptr<T2> DynamicCast() const { return dynamic_cast<T2*>(ptr); }
+    template <typename T2> Ptr<T2> ReinterpretCast() const { return reinterpret_cast<T2*>(ptr); }
 
     template <typename... T>
     void New(T &&... args) { ptr = new TYPE(std::forward<T>(args)...); }  // New raw pointer.
@@ -780,31 +821,14 @@ namespace emp {
     }
     struct hash_t { size_t operator()(const Ptr<TYPE> & t) const { return t.Hash(); } };
 
-    // Copy/Move assignments
+    // Copy assignments
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) { ptr = _in.ptr; return *this; }
-    Ptr<TYPE> & operator=(Ptr<TYPE> && _in) { ptr = _in.ptr; _in.ptr = nullptr; return *this; }
 
     // Assign to compatible Ptr or raw (non-managed) pointer.
     template <typename T2> Ptr<TYPE> & operator=(T2 * _in) { ptr = _in; return *this; }
     template <typename T2> Ptr<TYPE> & operator=(Ptr<T2> _in) { ptr = _in.Raw(); return *this; }
 
-    // Dereference a pointer.
-    TYPE & operator*() { return *ptr; }
-    const TYPE & operator*() const { return *ptr; }
-
-    // Follow a pointer.
-    TYPE * operator->() { return ptr; }
-    TYPE * const operator->() const { return ptr; }
-
-    // Should implement operator->* to follow a pointer to a member function.
-    // For an example, see:
-    //  https://stackoverflow.com/questions/27634036/overloading-operator-in-c
-
-    // Indexing into array
-    TYPE & operator[](size_t pos) { return ptr[pos]; }
-    const TYPE & operator[](size_t pos) const { return ptr[pos]; }
-
-    // Auto-case to raw pointer type.
+    // Auto-cast to raw pointer type.
     operator TYPE *() { return ptr; }
 
     operator bool() { return ptr != nullptr; }
@@ -854,13 +878,16 @@ namespace emp {
   }
 
   /// Convert a T* to a Ptr<T>.  By default, don't track.
-  template <typename T> Ptr<T> ToPtr(T * _in, bool own=false) { return Ptr<T>(_in, own); }
+  template <typename T>
+  [[nodiscard]] Ptr<T> ToPtr(T * _in, bool own=false) { return Ptr<T>(_in, own); }
 
   /// Convert a T* to a Ptr<T> that we DO track.
-  template <typename T> Ptr<T> TrackPtr(T * _in, bool own=true) { return Ptr<T>(_in, own); }
+  template <typename T>
+  [[nodiscard]] Ptr<T> TrackPtr(T * _in, bool own=true) { return Ptr<T>(_in, own); }
 
   /// Create a new Ptr of the target type; use the args in the constructor.
-  template <typename T, typename... ARGS> Ptr<T> NewPtr(ARGS &&... args) {
+  template <typename T, typename... ARGS>
+  [[nodiscard]] Ptr<T> NewPtr(ARGS &&... args) {
     auto ptr = new T(std::forward<ARGS>(args)...);
     // auto ptr = (T*) malloc (sizeof(T));         // Build a new raw pointer.
     // emp_assert(ptr);                            // No exceptions in emscripten; assert alloc!
@@ -869,24 +896,28 @@ namespace emp {
   }
 
   /// Copy an object pointed to and return a Ptr to the copy.
-  template <typename T> Ptr<T> CopyPtr(Ptr<T> in) { return NewPtr<T>(*in); }
+  template <typename T>
+  [[nodiscard]] Ptr<T> CopyPtr(Ptr<T> in) { return NewPtr<T>(*in); }
 
   /// Copy a vector of objects pointed to; return a vector of Ptrs to the new copies.
-  template <typename T> emp::vector<Ptr<T>> CopyPtrs(const emp::vector<Ptr<T>> & in) {
+  template <typename T>
+  [[nodiscard]] emp::vector<Ptr<T>> CopyPtrs(const emp::vector<Ptr<T>> & in) {
     emp::vector<Ptr<T>> out_ptrs(in.size());
     for (size_t i = 0; i < in.size(); i++) out_ptrs[i] = CopyPtr(in[i]);
     return out_ptrs;
   }
 
   /// Copy a vector of objects pointed to by using their Clone() member function; return vector.
-  template <typename T> emp::vector<Ptr<T>> ClonePtrs(const emp::vector<Ptr<T>> & in) {
+  template <typename T>
+  [[nodiscard]] emp::vector<Ptr<T>> ClonePtrs(const emp::vector<Ptr<T>> & in) {
     emp::vector<Ptr<T>> out_ptrs(in.size());
     for (size_t i = 0; i < in.size(); i++) out_ptrs[i] = in[i]->Clone();
     return out_ptrs;
   }
 
   /// Create a pointer to an array of objects.
-  template <typename T, typename... ARGS> Ptr<T> NewArrayPtr(size_t array_size, ARGS &&... args) {
+  template <typename T, typename... ARGS>
+  [[nodiscard]] Ptr<T> NewArrayPtr(size_t array_size, ARGS &&... args) {
     auto ptr = new T[array_size];                     // Build a new raw pointer.
     // const size_t alloc_size = array_size * sizeof(T);
     // auto ptr = (T*) malloc (alloc_size);

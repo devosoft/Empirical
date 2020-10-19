@@ -41,7 +41,7 @@ namespace emp {
   /// Count the number of times a specific character appears in a string
   /// (a clean shortcut to std::count)
   static inline size_t count(const std::string & str, char c) {
-    return std::count(str.begin(), str.end(), c);
+    return (size_t) std::count(str.begin(), str.end(), c);
   }
 
   /// Convert a single chararcter to one that uses a proper escape sequence (in a string) if needed.
@@ -390,6 +390,10 @@ namespace emp {
 
   /// Determine if there are only digits in a string.
   inline bool is_digits(const std::string & test_str) {
+    // If string is empty, there are no digits.
+    if (test_str.size() == 0) return false;
+
+    // Otherwise return false if any character is not a digit.
     for (char c : test_str) if (!is_digit(c)) return false;
     return true;
   }

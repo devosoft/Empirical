@@ -6,6 +6,21 @@
  *  @file  Distribution.h
  *  @brief A set of pre-calculated discrete distributions that can quickly generate random values.
  *  @note Status: ALPHA
+ * 
+ *  A Distribution is a pre-calculated set of probabilities to quickly pick a whole-number result.
+ *  These should be used when either we need to draw from the same distribution many time (and hence
+ *  the extra time to pre-calculate it is amortized away) -or- in functions that we want to call with
+ *  a range of distributions that we may not know ahead of time.
+ * 
+ *  Currently, we have:
+ * 
+ *    Uniform - All values in a range are equally likelty to be picked.
+ *    Binomial - How many successes with p probability will occur in N attempts?
+ *    NegativeBinomial - How many attempts to reach N successes, with p probability per attempt?
+ * 
+ * 
+ *  Developor Notes:
+ *  - We should setup an offset in the base Distribution class to ignore "impossible" low values.
  *
  */
 
@@ -37,6 +52,36 @@ namespace emp {
     }
   };
 
+  class Uniform : public Distribution {
+  private:
+    size_t min_val = 0;  // Inclusive
+    size_t max_val = 0;  // Exclusive
+
+  public:
+    Uniform(size_t _min, size_t _max) { Setup(_min, _max); }
+
+    size_t GetMin() const { return min_val; }
+    size_t GetMax() const { return max_val; }
+
+    void Setup(size_t _min, size_t _max) {
+      emp_assert(_min < _max);
+
+      // If we're not changing these values, it's already setup!
+      if (min_val == _min && max_val == _max) return;
+
+      min_val = _min;
+      max_val = _max;
+
+      size_t num_vals = max_val - min_val;
+      double val_prob = 1.0 / (double) num_vals;
+
+      weights.Resize(max_val);
+      for (size_t k = min_val; k < max_val; k++) {
+        weights.Adjust(k, val_prob);
+      }
+    }
+  };
+
   /// How many successes with p probability and N attempts?
   class Binomial : public Distribution {
   private:
@@ -44,12 +89,15 @@ namespace emp {
     size_t N = 0;
 
   public:
+    Binomial() { }
     Binomial(double _p, size_t _N) { Setup(_p, _N); }
 
-    double GetP() { return p; }
-    double GetN() { return N; }
+    double GetP() const { return p; }
+    double GetN() const { return N; }
 
     void Setup(double _p, size_t _N) {
+      emp_assert(_p >= 0.0 && _p <= 1.0);
+
       // If we're not changing these values, it's already setup!
       if (p == _p && N == _N) return;
 
@@ -73,7 +121,7 @@ namespace emp {
 
   };
 
-  /// How many attemtps to reach N successes, assumming p probability per attempt?
+  /// How many attempts to reach N successes, assumming p probability per attempt?
   class NegativeBinomial : public Distribution {
   private:
     double p = 0.0;
@@ -82,8 +130,8 @@ namespace emp {
   public:
     NegativeBinomial(double _p, size_t _N) { Setup(_p, _N); }
 
-    double GetP() { return p; }
-    double GetN() { return N; }
+    double GetP() const { return p; }
+    double GetN() const { return N; }
 
     void Setup(double _p, size_t _N) {
       // If we're not changing these values, it's already setup!

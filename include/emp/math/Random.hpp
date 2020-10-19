@@ -18,294 +18,163 @@
 #include <iterator>
 
 #include "../base/assert.hpp"
+#include "../bits/bitset_utils.hpp"
 #include "Range.hpp"
 
 namespace emp {
+  using namespace emp;
 
-  ///  A versatile and non-patterned pseudo-random-number generator (Mersenne Twister).
+  ///  Middle Square Weyl Sequence: A versatile and non-patterned pseudo-random-number
+  ///  generator.
+  ///  Based on: https://en.wikipedia.org/wiki/Middle-square_method
   class Random {
   protected:
-    int seed = 0;          ///< Current random number seed.
-    int original_seed = 0; ///< Orignal random number seed when object was first created.
-    int inext = 0;         ///< First position in use in internal state.
-    int inextp = 0;        ///< Second position in use in internal state.
-    int ma[56];            ///< Internal state of RNG
+
+    uint64_t value = 0;                       ///< Current squaring value
+    uint64_t weyl_state = 0;                  ///< Weyl sequence state
+    uint64_t original_seed = 0;               ///< Seed to start sequence; initialized weyl_state
 
     // Members & functions for stat functions
     double expRV = 0.0;    ///< Exponential Random Variable for the randNormal function
 
     // Constants ////////////////////////////////////////////////////////////////
-    // Statistical Approximation
-    static const int32_t _BINOMIAL_TO_NORMAL = 50;     // if < n*p*(1-p)
-    static const int32_t _BINOMIAL_TO_POISSON = 1000;  // if < n && !Normal approx Engine
+    static constexpr const uint64_t RAND_CAP = 4294967296;  // 2^32
+    static constexpr const uint64_t STEP_SIZE = 0xb5ad4eceda1ce2a9;  ///< Weyl sequence step size
 
-    // Engine
-    static const int32_t _RAND_MBIG = 1000000000;
-    static const int32_t _RAND_MSEED = 161803398;
 
-    // Internal functions
-
-    // Setup, called on initialization and seed reset.
-    void init()
-    {
-      // Clear variables
-      for (int i = 0; i < 56; ++i) ma[i] = 0;
-
-      int32_t mj = (_RAND_MSEED - seed) % _RAND_MBIG;
-      ma[55] = mj;
-      int32_t mk = 1;
-
-      for (int32_t i = 1; i < 55; ++i) {
-        int32_t ii = (21 * i) % 55;
-        ma[ii] = mk;
-        mk = mj - mk;
-        if (mk < 0) mk += _RAND_MBIG;
-        mj = ma[ii];
-      }
-
-      for (int32_t k = 0; k < 4; ++k) {
-        for (int32_t j = 1; j < 55; ++j) {
-          ma[j] -= ma[1 + (j + 30) % 55];
-          if (ma[j] < 0) ma[j] += _RAND_MBIG;
-        }
-      }
-
-      inext = 0;
-      inextp = 31;
-
-      // Setup variables used by Statistical Distribution functions
-      expRV = -log(Random::Get() / (double) _RAND_MBIG);
-    }
-
-    // Basic Random number
-    // Returns a random number [0,_RAND_MBIG)
-    int32_t Get() {
-      if (++inext == 56) inext = 0;
-      if (++inextp == 56) inextp = 0;
-      int mj = ma[inext] - ma[inextp];
-      if (mj < 0) mj += _RAND_MBIG;
-      ma[inext] = mj;
-
-      return mj;
+    /// Basic Random number
+    /// Returns a random number [0, RAND_CAP)
+    uint32_t Get() {
+      value *= value;                       // Square the current value.
+      value += (weyl_state += STEP_SIZE);   // Take a step in the Weyl sequence
+      value = (value>>32) | (value<<32);    // Return the middle of the value
+      return (uint32_t) value;
     }
 
   public:
-    /**
-     * Set up the random generator object.
-     * @param _seed The seed of the random number generator.  A negative seed means that the
-     * random number generator gets its seed from a combination of the actual system time and
-     * the memory position of the random number generator.
-     **/
-    Random(const int _seed = -1) {
-      for (int i = 0; i < 56; ++i) ma[i] = 0;
-      ResetSeed(_seed);  // Calls init()
+    /// Set up the random generator object with an optional seed value.
+    Random(const int seed = -1) {
+      ResetSeed(seed);  // Calls init()
     }
 
     ~Random() { ; }
 
 
-    /**
-     * @return The seed that was actually used to start the random sequence.
-     **/
-    inline int GetSeed() const { return seed; }
+    /// @return The current seed used to initialize this pseudo-random sequence.
+    inline uint64_t GetSeed() const { return original_seed; }
 
-    /**
-     * @return The seed that was originally provided by the user.
-     **/
-    inline int GetOriginalSeed() const { return original_seed; }
-
-    /**
-     * Starts a new sequence of pseudo random numbers.
-     *
-     * @param new_seed The seed for the new sequence.
-     * A negative seed means that the random number generator gets its
-     * seed from the actual system time and the process ID.
-     **/
-    inline void ResetSeed(const int _seed) {
-      original_seed = _seed;
-
-      if (_seed <= 0) {
-        int seed_time = (int) time(NULL);
-        int seed_mem = (int) ((uint64_t) this);
-        seed = seed_time ^ seed_mem;
-      } else {
-        seed = _seed;
+    /// Starts a new sequence of pseudo random numbers.  A negative seed means that the random
+    /// number generator gets its seed from the current system time and the process memory.
+    void ResetSeed(const int64_t seed) {
+      // If the provided seed is <= 0, choose a unique seed based on time and memory location.
+      if (seed <= 0) {
+        uint64_t seed_time = (uint64_t) time(NULL);
+        uint64_t seed_mem = (uint64_t) this;
+        weyl_state = seed_time ^ seed_mem;
       }
 
-      if (seed < 0) seed *= -1;
-      seed %= _RAND_MSEED;
+      else weyl_state = (uint64_t) seed;
 
-      init();
+      // Save the seed that was ultimately used to start this pseudo-random sequence.
+      original_seed = weyl_state;
+
+      weyl_state *= 2;  // Make sure starting state is even.
+
     }
 
 
     // Random Number Generation /////////////////////////////////////////////////
 
-    /**
-     * Generate a double between 0.0 and 1.0
-     *
-     * @return The pseudo random number.
-     **/
-    inline double GetDouble() { return Get() / (double) _RAND_MBIG; }
+    /// @return A pseudo-random double value between 0.0 and 1.0
+    inline double GetDouble() { return Get() / (double) RAND_CAP; }
 
-    /**
-     * Generate a double between 0 and a given number.
-     *
-     * @return The pseudo random number.
-     * @param max The upper bound for the random numbers (will never be returned).
-     **/
-    inline double GetDouble(const double max) {
-      // emp_assert(max <= (double) _RAND_MBIG, max, (double) _RAND_MBIG);  // Precision will be too low past this point...
-      return GetDouble() * max;
-    }
+    /// @return A pseudo-random double value between 0.0 and max
+    inline double GetDouble(const double max) { return GetDouble() * max; }
 
-    /**
-     * Generate a double out of a given interval.
-     *
-     * @return The pseudo random number.
-     * @param min The lower bound for the random numbers.
-     * @param max The upper bound for the random numbers (will never be returned).
-     **/
+    /// @return A pseudo-random double value between min and max
     inline double GetDouble(const double min, const double max) {
-      emp_assert((max-min) <= (double) _RAND_MBIG, min, max);  // Precision will be too low past this point...
       return GetDouble() * (max - min) + min;
     }
 
-    /**
-     * Generate a double out of a given interval.
-     *
-     * @return The pseudo random number.
-     * @param range The upper and lower bounds for the random numbers [lower, upper)
-     **/
+    /// @return A pseudo-random double in the provided range.
     inline double GetDouble(const Range<double> range) {
       return GetDouble(range.GetLower(), range.GetUpper());
      }
 
-    /**
-     * Generate an uint32_t.
-     *
-     * @return The pseudo random number.
-     * @param max The upper bound for the random numbers (will never be returned).
-     **/
+
+    /// @return A pseudo-random 32-bit (4 byte) unsigned int value.
+    inline uint32_t GetUInt() {
+      return Get();
+    }
+
+    /// @return A pseudo-random 32-bit unsigned int value between 0 and max
     template <typename T>
     inline uint32_t GetUInt(const T max) {
-      emp_assert(max <= (T) _RAND_MBIG, max);  // Precision will be too low past this point...
       return static_cast<uint32_t>(GetDouble() * static_cast<double>(max));
     }
 
-    /**
-     * Generate a random 32-bit block of bits.
-     *
-     * @return The pseudo random number.
-     **/
-    inline uint32_t GetUInt() {
-      return ( static_cast<uint32_t>(GetDouble() * 65536.0) << 16 )
-             + static_cast<uint32_t>(GetDouble() * 65536.0);
-    }
-
-    /**
-     * Generate a random 64-bit block of bits.
-     *
-     * @return The pseudo random number.
-     **/
-    inline uint64_t GetUInt64() {
-      // @MAM profiled,
-      // this is faster than using RandFill
-      // https://gist.github.com/mmore500/8747e456b949b5b18b3ee85dd9b4444d
-      return ( static_cast<uint64_t>(GetUInt()) << 32 )
-             + static_cast<uint64_t>(GetUInt());
-    }
-
-    /**
-     * Randomize a contiguous segment of memory.
-     **/
-    inline void RandFill(unsigned char* dest, const size_t num_bytes) {
-
-      // go three bytes at a time because we only get
-      // _RAND_MBIG (not quite four bytes) of entropy
-      // from the generator
-
-      // @MAM profiled,
-      // sampling raw bytes and rejecting the region of integer space
-      // that would introduce bias is faster than rescaling using double
-      // multiplication
-      // https://gist.github.com/mmore500/46f3dee11734a8668d60f180cf5d0590
-
-      const uint32_t accept_thresh = (
-        _RAND_MBIG - _RAND_MBIG % 16777216 /* 2^(3*8) */
-      );
-
-      for (size_t byte = 0; byte + 3 < num_bytes; byte += 3) {
-        uint32_t rnd;
-        while (true) {
-          rnd = Get();
-          if (rnd < accept_thresh) break;
-        }
-        std::memcpy(dest+byte, &rnd, 3);
-      }
-
-      if (num_bytes%3) {
-        uint32_t rnd;
-        while (true) {
-          rnd = Get();
-          if (rnd < accept_thresh) break;
-        }
-        std::memcpy(dest+num_bytes-num_bytes%3, &rnd, num_bytes%3);
-      }
-
-    }
-
-    /**
-     * Generate an uint64_t.
-     *
-     * @return The pseudo random number.
-     * @param max The upper bound for the random numbers (will never be returned).
-     * @todo this function needs to be tested and refined.
-     **/
-    template <typename T>
-    inline uint64_t GetUInt64(const T max) {
-      if (max <= (T) _RAND_MBIG) return (uint64_t) GetUInt(max);  // Don't need extra precision.
-      const double max2 = ((double) max) / (double) _RAND_MBIG;
-      emp_assert(max2 <= (T) _RAND_MBIG, max);  // Precision will be too low past this point...
-
-      return static_cast<uint64_t>(GetDouble() * static_cast<double>(max))
-           + static_cast<uint64_t>(GetDouble() * static_cast<double>(max2) * _RAND_MBIG);
-    }
-
-
-    /**
-     * Generate an uint32_t out of an interval.
-     *
-     * @return The pseudo random number.
-     * @param min The lower bound for the random numbers.
-     * @param max The upper bound for the random numbers (will never be returned).
-     **/
+    /// @return A pseudo-random 32-bit unsigned int value between min and max
     template <typename T1, typename T2>
     inline uint32_t GetUInt(const T1 min, const T2 max) {
       return GetUInt<uint32_t>((uint32_t) max - (uint32_t) min) + (uint32_t) min;
     }
 
-    /**
-     * Generate a uint32_t out of a given interval.
-     *
-     * @return The pseudo random number.
-     * @param range The upper and lower bounds for the random numbers [lower, upper)
-     **/
+    /// @return A pseudo-random 32-bit unsigned int value in the provided range.
     template <typename T>
     inline uint32_t GetUInt(const Range<T> range) {
       return GetUInt(range.GetLower(), range.GetUpper());
     }
 
-    /**
-     * Generate an int out of an interval.
-     *
-     * @return The pseudo random number.
-     * @param min The lower bound for the random numbers.
-     * @param max The upper bound for the random numbers (will never be returned).
-     **/
-    inline int GetInt(const int max) { return static_cast<int>(GetUInt((uint32_t) max)); }
-    inline int GetInt(const int min, const int max) { return GetInt(max - min) + min; }
-    inline int GetInt(const Range<int> range) { return GetInt(range.GetLower(), range.GetUpper()); }
+
+    /// @return A pseudo-random 64-bit (8 byte) unsigned int value.
+    inline uint64_t GetUInt64() {
+      return ( static_cast<uint64_t>(GetUInt()) << 32 )
+             + static_cast<uint64_t>(GetUInt());
+    }
+
+    /// @return A pseudo-random 64-bit unsigned int value between 0 and max
+    inline uint64_t GetUInt64(const uint64_t max) {
+      if (max <= RAND_CAP) return (uint64_t) GetUInt(max);  // Don't need extra precision.
+
+      size_t mask = emp::MaskUsed(max);              // Create a mask for just the bits we need.
+      uint64_t val = GetUInt64() & mask;             // Grab a value using just the current bits.
+      while (val >= max) val = GetUInt64() & mask;   // Grab new values until we find a valid one.
+
+      return val;
+    }
+
+
+    /// @return A pseudo-random 32-bit (4 byte) int value between 0 and max
+    inline int32_t GetInt(const int32_t max) {
+      return static_cast<int32_t>(GetUInt((uint32_t) max));
+    }
+
+    /// @return A pseudo-random 32-bit (4 byte) int value between min and max
+    inline int32_t GetInt(const int min, const int max) { return GetInt(max - min) + min; }
+
+    /// @return A pseudo-random 32-bit (4 byte) int value in range
+    inline int32_t GetInt(const Range<int> range) {
+      return GetInt(range.GetLower(), range.GetUpper());
+    }
+
+
+    /// Randomize a contiguous segment of memory.
+    void RandFill(unsigned char * dest, const size_t num_bytes) {
+      size_t leftover = num_bytes % 4;
+      size_t limit = num_bytes - leftover;
+
+      // Fill out random bytes in groups of four.
+      for (size_t byte = 0; byte < limit; byte += 4) {
+        uint32_t rnd = Get();
+        std::memcpy(dest+byte, &rnd, 4);
+      }
+
+      // If we don't have a multiple of four, fill in the remaining.
+      if (leftover) {
+        uint32_t rnd = Get();
+        std::memcpy(dest+num_bytes-leftover, &rnd, leftover);
+      }
+    }
 
 
     // Random Event Generation //////////////////////////////////////////////////
@@ -314,7 +183,7 @@ namespace emp {
     /// @param p The probability of the result being "true".
     inline bool P(const double p) {
       emp_assert(p >= 0.0 && p <= 1.0, p);
-      return (Get() < (p * _RAND_MBIG));
+      return (Get() < (p * RAND_CAP));
     }
 
 
@@ -322,10 +191,8 @@ namespace emp {
 
     // Distributions //
 
-    /**
-     * Generate a random variable drawn from a unit normal distribution.
-     **/
-    inline double GetRandNormal() {
+    /// Generate a random variable drawn from a unit normal distribution.
+    double GetRandNormal() {
       // Draw from a Unit Normal Dist
       // Using Rejection Method and saving of initial exponential random variable
       double expRV2;
@@ -339,27 +206,20 @@ namespace emp {
       return -expRV2;
     }
 
-    /**
-     * Generate a random variable drawn from a distribution with given
-     * mean and standard deviation.
-     **/
+    /// @return A random variable drawn from a normal distribution.
+    /// @param mean Center of distribution.
+    /// @param std Standard deviation of distribution.
     inline double GetRandNormal(const double mean, const double std) { return mean + GetRandNormal() * std; }
 
-    /**
-     * Generate a random variable drawn from a Poisson distribution.
-     **/
-    inline uint32_t GetRandPoisson(const double n, double p) {
+    /// Generate a random variable drawn from a Poisson distribution.
+    inline uint32_t GetRandPoisson(const double n, const double p) {
       emp_assert(p >= 0.0 && p <= 1.0, p);
       // Optimizes for speed and calculability using symetry of the distribution
-      if (p > .5) return (uint32_t)n - GetRandPoisson(n * (1 - p));
+      if (p > .5) return (uint32_t) n - GetRandPoisson(n * (1 - p));
       else return GetRandPoisson(n * p);
     }
 
-    /**
-     * Generate a random variable drawn from a Poisson distribution.
-     *
-     * @param mean The mean of the distribution.
-     **/
+    /// Generate a random variable drawn from a Poisson distribution.
     inline uint32_t GetRandPoisson(const double mean) {
       // Draw from a Poisson Dist with mean; if cannot calculate, return UINT_MAX.
       // Uses Rejection Method
@@ -374,67 +234,18 @@ namespace emp {
       return k;
     }
 
-    /**
-     * Generate a random variable drawn from a Binomial distribution.
-     *
-     * This function is exact, but slow.
-     * @see Random::GetApproxRandBinomial
-     * @see emp::Binomial in source/tools/Distribution.h
-     **/
-    inline uint32_t GetFullRandBinomial(const double n, const double p) { // Exact
+    /// Generate a random variable drawn from a Binomial distribution.
+    ///
+    /// This function is exact, but slow.
+    /// @see Random::GetApproxRandBinomial
+    /// @see emp::Binomial in source/tools/Distribution.h
+    inline uint32_t GetRandBinomial(const double n, const double p) { // Exact
       emp_assert(p >= 0.0 && p <= 1.0, p);
       emp_assert(n >= 0.0, n);
       // Actually try n Bernoulli events, each with probability p
       uint32_t k = 0;
       for (uint32_t i = 0; i < n; ++i) if (P(p)) k++;
       return k;
-    }
-
-
-    /**
-     * Generate a random variable drawn from a Binomial distribution.
-     *
-     * This function is faster than @ref Random::GetFullRandBinomial(), but
-     * uses some approximations.  Note that for repeated calculations with
-     * the same n and p, the Binomial class provides a much faster and more
-     * exact interface.
-     *
-     * @see Random::GetFullRandBinomial
-     * @see emp::Binomial in source/tools/Distribution.h
-     **/
-    inline uint32_t GetApproxRandBinomial(const double n, const double p) { // Approx
-      emp_assert(p >= 0.0 && p <= 1.0, p);
-      emp_assert(n >= 0.0, n);
-      // Approximate Binomial if appropriate
-
-      // if np(1-p) is large, we might be tempted to use a Normal approx, but it is giving poor results.
-      // if (n * p * (1 - p) >= _BINOMIAL_TO_NORMAL) {
-      //   return static_cast<uint32_t>(GetRandNormal(n * p, n * p * (1 - p)) + 0.5);
-      // }
-
-      // If n is large, use a Poisson approx
-      if (n >= _BINOMIAL_TO_POISSON) {
-        uint32_t k = GetRandPoisson(n, p);
-        if (k < UINT_MAX) return k; // if approx worked
-      }
-
-      // otherwise, actually generate the randBinomial
-      return GetFullRandBinomial(n, p);
-    }
-
-    /**
-     * By default GetRandBinomial calls the full (non-approximation) version.
-     *
-     * Note that if approximations are okay, they can create a big speedup
-     * for n > 1000.
-     *
-     * @see Random::GetFullRandBinomial
-     * @see Random::GetApproxRandBinomial
-     * @see emp::Binomial in source/tools/Distribution.h
-     **/
-
-    inline uint32_t GetRandBinomial(const double n, const double p) {
-      return GetFullRandBinomial(n,p);
     }
 
   };

@@ -10,6 +10,7 @@
 #include <sstream>
 #include <iostream>
 #include <functional>
+
 TEST_CASE("Test Ptr", "[base]")
 {
 	emp::SetPtrDebug();
@@ -221,5 +222,25 @@ TEST_CASE("Replicate ptr bug", "[ptr]") {
   REQUIRE(*(tb.b) == 9);
 
 }
+
+
+TEST_CASE("Tests for Ptr<void> specialization.", "[base]")
+{
+  emp::Ptr<void> test_vptr = nullptr;
+  emp::Ptr<std::string> test_sptr = emp::NewPtr<std::string>("This is my string");
+
+  test_vptr = test_sptr.ReinterpretCast<void>();
+
+  REQUIRE(*(test_vptr.ReinterpretCast<std::string>()) == "This is my string");
+
+  const int x = 42;
+  emp::Ptr<const int> x_ptr = &x;
+  REQUIRE(*x_ptr == 42);
+
+  emp::Ptr<const void> xv_ptr = x_ptr.ReinterpretCast<const void>();
+
+  test_sptr.Delete();
+}
+
 
 //#endif // EMP_TRACK_MEM

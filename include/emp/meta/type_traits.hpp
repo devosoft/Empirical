@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2019.
+ *  @date 2016-2020.
  *
  *  @file  type_traits.h
  *  @brief Extensions on the standard library type traits to handle Empirical classes (such as Ptr).
@@ -13,11 +13,34 @@
 
 #include <functional>
 #include <tuple>
+#include <type_traits>
 #include <utility>
 
 #include "../base/Ptr.hpp"
 
+#include "meta.h"
+
 namespace emp {
+
+  // Determine if a type has a ToString() member function.
+  template <typename T, typename=void> struct HasToString : std::false_type { };
+  template<typename T> 
+  struct HasToString<emp::decoy_t<T, decltype(std::declval<T>().ToString())>> : std::true_type{};
+
+  // Determine if a type has a ToDouble() member function.
+  template <typename T, typename=void> struct HasToDouble : std::false_type { };
+  template<typename T> 
+  struct HasToDouble<emp::decoy_t<T, decltype(std::declval<T>().ToDouble())>> : std::true_type{};
+
+  // Determine if a type has a FromString() member function.
+  template <typename T, typename=void> struct HasFromString : std::false_type { };
+  template<typename T> 
+  struct HasFromString<emp::decoy_t<T, decltype(std::declval<T>().FromString(""))>> : std::true_type{};
+
+  // Determine if a type has a FromDouble() member function.
+  template <typename T, typename=void> struct HasFromDouble : std::false_type { };
+  template<typename T> 
+  struct HasFromDouble<emp::decoy_t<T, decltype(std::declval<T>().FromDouble(0.0))>> : std::true_type{};
 
   /// Determine if a type passed in is an std::function type (vs a lambda or a raw function)
   template <typename> struct is_std_function : std::false_type { };
@@ -51,6 +74,16 @@ namespace emp {
     if constexpr (is_ptr_type<T>::value) return *value;
     else return value;
   }
+
+  /// Match the constness of another type.
+  template <typename T, typename MATCH_T>
+  struct match_const { using type = std::remove_const_t<T>; };
+
+  template <typename T, typename MATCH_T>
+  struct match_const<T,const MATCH_T> { using type = std::add_const_t<T>; };
+
+  template <typename T, typename MATCH_T> using match_const_t
+    = typename match_const<T,MATCH_T>::type;
 
   // Can we convert the first pointer into the second?
   template <typename T1, typename T2> struct ptr_pair {

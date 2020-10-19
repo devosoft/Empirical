@@ -124,7 +124,8 @@ namespace emp {
 
   public:
     TimeQueue(double _min_wait=std::numeric_limits<double>::max()/2) : min_wait(_min_wait) {
-      emp_assert(min_wait > 0.0);
+      emp_assert(min_wait > 0.0,
+                "TimeQueue uses a minimum wait time; if you're unsure, leave blank and it will auto-configure.");
     }
 
     double GetTime() const { return cur_time; }

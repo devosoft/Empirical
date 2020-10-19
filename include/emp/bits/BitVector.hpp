@@ -405,6 +405,12 @@ namespace emp {
       return (bit_set[field_id] & (static_cast<field_t>(1) << pos_id)) != 0;
     }
 
+    /// A safe version of Get() for indexing out of range. Typically used when a BitVector
+    /// represents a collection.
+    bool Has(size_t index) const {
+      return (index < num_bits) ? Get(index) : false;
+    }
+
     /// Update the bit value at the specified index.
     BitVector & Set(size_t index, bool value=true) {
       emp_assert(index < num_bits, index, num_bits);
@@ -416,6 +422,31 @@ namespace emp {
       if (value) bit_set[field_id] |= pos_mask;
       else       bit_set[field_id] &= ~pos_mask;
 
+      return *this;
+    }
+
+    /// Change every bit in the sequence.
+    BitVector & Toggle() { return NOT_SELF(); }
+
+    /// Change a specified bit to the opposite value
+    BitVector & Toggle(size_t index) {
+      emp_assert(index < num_bits, index, num_bits);
+      const size_t field_id = FieldID(index);
+      const size_t pos_id = FieldPos(index);
+      constexpr field_t val_one = 1;
+      const field_t pos_mask = val_one << pos_id;
+
+      bit_set[field_id] ^= pos_mask;
+
+      return *this;
+    }
+
+    /// Flips all the bits in a range [start, end)
+    BitVector & Toggle(size_t start, size_t end) {
+      emp_assert(start <= end && end <= num_bits);
+      for(size_t index = start; index < end; index++) {
+        Toggle(index);
+      }
       return *this;
     }
 
@@ -581,7 +612,7 @@ namespace emp {
     }
 
     /// Print a space between each field (or other provided spacer)
-    void PrintFields(std::ostream & out=std::cout, const std::string spacer=" ") const {
+    void PrintFields(std::ostream & out=std::cout, const std::string & spacer=" ") const {
       for (size_t i = num_bits; i > 0; i--) {
         out << Get(i-1);
         if (i % FIELD_BITS == 0) out << spacer;
@@ -594,10 +625,28 @@ namespace emp {
     }
 
     /// Print the positions of all one bits, spaces are the default separator.
-    void PrintOneIDs(std::ostream & out=std::cout, std::string spacer=" ") const {
+    void PrintOneIDs(std::ostream & out=std::cout, const std::string & spacer=" ") const {
       for (size_t i = 0; i < num_bits; i++) { if (Get(i)) out << i << spacer; }
     }
 
+    /// Print the ones in a range format.  E.g., 2-5,7,10-15
+    void PrintAsRange(std::ostream & out=std::cout,
+                      const std::string & spacer=",",
+                      const std::string & ranger="-") const
+    {
+      emp::vector<size_t> ones = GetOnes();
+
+      for (size_t pos = 0; pos < ones.size(); pos++) {
+        if (pos) out << spacer;
+
+        size_t start = ones[pos];
+        while (pos+1 < ones.size() && ones[pos+1] == ones[pos]+1) pos++;
+        size_t end = ones[pos];
+
+        out << start;
+        if (start != end) out << ranger << end;
+      }
+    }
 
     /// Count 1's by looping through once for each bit equal to 1
     size_t CountOnes_Sparse() const {

@@ -54,7 +54,6 @@
 #define EMP_TDEBUG
 #endif
 
-/// Universal error (to use in place of emp_assert(false, ...); no need to debug toggle )
 namespace emp {
   template <typename... Ts>
   void trigger_emp_error(std::string filename, size_t line, Ts &&... args) {
@@ -66,6 +65,7 @@ namespace emp {
   }
 }
 
+/// Universal error (to use in place of emp_assert(false, ...); no need to debug toggle )
 #define emp_error(...)                                                                           \
   do {                                                                                           \
     emp::trigger_emp_error(__FILE__, __LINE__, __VA_ARGS__);                                     \

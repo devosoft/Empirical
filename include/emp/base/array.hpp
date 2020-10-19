@@ -202,19 +202,23 @@ template <class T, size_t N>
 struct std::tuple_size<emp::array<T, N>> : public integral_constant<size_t, N> {
 };
 
-// A crude, generic printing function for arrays.
-template <typename T, size_t N>
-std::ostream & operator<<(std::ostream & out, const emp::array<T,N> & v) {
-  for (const T & x : v) out << x << " ";
-  return out;
+#endif // NDEBUG off
+
+
+namespace std {
+  // A crude, generic printing function for arrays.
+  template <typename T, size_t N>
+  inline std::ostream & operator<<(std::ostream & out, const emp::array<T,N> & v) {
+    for (const T & x : v) out << x << " ";
+    return out;
+  }
+
+  template <typename T, size_t N>
+  std::istream & operator>>(std::istream & is, emp::array<T,N> & v) {
+    for (T & x : v) is >> x;
+    return is;
+  }
+
 }
 
-template <typename T, size_t N>
-std::istream & operator>>(std::istream & is, emp::array<T,N> & v) {
-  for (T & x : v) is >> x;
-  return is;
-}
-
-#endif
-
-#endif
+#endif // Include guards
