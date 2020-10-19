@@ -12,7 +12,7 @@
 #ifndef EMP_SERIALIZE_MACROS_H
 #define EMP_SERIALIZE_MACROS_H
 
-#include "../base/macros.h"
+#include "../base/macros.hpp"
 
 #define EMP_SERIALIZE_INIT_VAR(VAR) VAR(emp::serialize::SetupLoad(pod, &VAR, true))
 

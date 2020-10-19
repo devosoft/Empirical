@@ -54,8 +54,8 @@
 
 #include <iostream>
 
-#include "../base/vector.h"
-#include "serialize_macros.h"
+#include "../base/vector.hpp"
+#include "serialize_macros.hpp"
 
 namespace emp {
 namespace serialize {
@@ -120,7 +120,7 @@ namespace serialize {
 
     // @CAO for now use ':' separator, but more generally we need to ensure uniquness.
     pod.OStream() << ':';
-    // emp_assert(pod.OStream()); // @ELD - this is throwing a compiler error 
+    // emp_assert(pod.OStream()); // @ELD - this is throwing a compiler error
   }
 
   // As a fallback, just send the saved object to the DataPod's output stream.
@@ -128,7 +128,7 @@ namespace serialize {
   void StoreVar(DataPod & pod, const T & var, int) {
     // @CAO for now use ':', but more generally we need to ensure uniquness.
     pod.OStream() << var << ':';
-    // emp_assert(pod.OStream()); // @ELD - this is throwing a compiler error 
+    // emp_assert(pod.OStream()); // @ELD - this is throwing a compiler error
   }
 
 

@@ -15,9 +15,9 @@
 #include <iostream>
 #include <ostream>
 
-#include "../base/assert.h"
-#include "../base/vector.h"
-#include "../datastructs/vector_utils.h"
+#include "../base/assert.hpp"
+#include "../base/vector.hpp"
+#include "../datastructs/vector_utils.hpp"
 
 namespace emp {
 

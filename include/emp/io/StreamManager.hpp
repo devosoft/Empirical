@@ -19,8 +19,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "../base/Ptr.h"
-#include "../datastructs/map_utils.h"
+#include "../base/Ptr.hpp"
+#include "../datastructs/map_utils.hpp"
 
 namespace emp {
 
