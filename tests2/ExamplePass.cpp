@@ -7,7 +7,7 @@
  *  @brief An example file to show what PASSING unit tests look like, with commentary.
  *
  *  Unit tests can be built easily, with a good bit of flexibility, as described below.
- *  
+ *
  *  All unit tests can take command line arguments:
  *
  *    --help
@@ -21,16 +21,16 @@
 // The only required include for unit tests is the one below.
 // It includes everything else it needs.
 
-#include "unit_tests.h"
+#include "unit_tests.hpp"
 
 // You may also include any other files that you need for your specific tests.
 
 #include <string>
-#include "../source/tools/string_utils.h"
+#include "../source/tools/string_utils.hpp"
 
 // You may create an extra functins or macros that you may need.
 
-#define TRIPLE_INPUT(VAL) VAL+VAL+VAL 
+#define TRIPLE_INPUT(VAL) VAL+VAL+VAL
 
 // Define the main function like the one below.  You do NOT create main(); that will be done
 // for you and cammand-line arguments will be handled automatically.

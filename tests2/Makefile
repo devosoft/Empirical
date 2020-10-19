@@ -3,7 +3,7 @@ FLAGS_debug := -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion
 FLAGS_opt := -DNDEBUG
 FLAGS_web := -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864 --js-library ../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
 
-FLAGS_native_debug := $(FLAGS_all) $(FLAGS_debug) -g -DEMP_TRACK_MEM  
+FLAGS_native_debug := $(FLAGS_all) $(FLAGS_debug) -g -DEMP_TRACK_MEM
 FLAGS_native_opt := $(FLAGS_all) $(FLAGS_opt) -O3
 
 FLAGS_web_debug := $(FLAGS_all) $(FLAGS_web) $(FLAGS_debug) -g4 -s ASSERTIONS=2 -s DEMANGLE_SUPPORT=1
@@ -18,14 +18,14 @@ CXX := $(CXX_native)
 FLAGS := $(FLAGS_native_opt)
 
 # No exe flags by default.
-EXE_FLAGS := 
+EXE_FLAGS :=
 
 # A recursive wildcard function from https://stackoverflow.com/questions/3774568/makefile-issue-smart-way-to-scan-directory-tree-for-c-files
 rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
 
 DIRS := . tools
-ALL_SOURCES := $(call rwildcard,./,*/*.cc)
-ALL_EXES := $(patsubst %.cc,%,$(ALL_SOURCES))
+ALL_SOURCES := $(call rwildcard,./,*/*.cpp)
+ALL_EXES := $(patsubst %.cpp,%,$(ALL_SOURCES))
 
 MAIN_DIR := $(CURDIR)
 
@@ -56,17 +56,17 @@ silent: all
 verbose: EXE_FLAGS := --verbose
 verbose: all
 
-$(ALL_EXES): % : %.cc
+$(ALL_EXES): % : %.cpp
 	$(CXX) $(FLAGS) $< -o $@
 	./$@ $(EXE_FLAGS)
 	rm -f ./$@
 
 
 
-opt-%: %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
+opt-%: %.cpp $(TOOL_DEPEND) $(TOOLS)/%.h
 	$(CXX) $(FLAGS_version) $(FLAGS_native_opt) $< -o $@
 
-debug-%: %.cc $(TOOL_DEPEND) $(TOOLS)/%.h
+debug-%: %.cpp $(TOOL_DEPEND) $(TOOLS)/%.h
 	$(CXX) $(FLAGS_version) $(FLAGS_native_debug) $< -o $@
 
 clean:
