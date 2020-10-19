@@ -7,10 +7,10 @@
 #include <cereal/types/unordered_map.hpp>
 #include <cereal/types/vector.hpp>
 
-#include "emp/data/DataNode.h"
-#include "emp/matchbin/matchbin_utils.h"
-#include "emp/matchbin/MatchBin.h"
-#include "emp/math/Random.h"
+#include "emp/data/DataNode.hpp"
+#include "emp/matchbin/matchbin_utils.hpp"
+#include "emp/matchbin/MatchBin.hpp"
+#include "emp/math/Random.hpp"
 
 #include <sstream>
 #include <string>
