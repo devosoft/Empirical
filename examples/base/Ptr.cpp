@@ -16,8 +16,8 @@
 #define EMP_TRACK_MEM
 #endif
 
-#include "emp/base/Ptr.h"
-#include "emp/base/vector.h"
+#include "emp/base/Ptr.hpp"
+#include "emp/base/vector.hpp"
 
 // Example class that can be pointed to and derived from.
 struct TestBase {

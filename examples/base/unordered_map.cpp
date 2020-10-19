@@ -4,7 +4,7 @@
 
 #include <algorithm>
 
-#include "emp/base/unordered_map.h"
+#include "emp/base/unordered_map.hpp"
 
 int main()
 {

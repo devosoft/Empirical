@@ -4,7 +4,7 @@
 
 #include <algorithm>
 
-#include "emp/base/map.h"
+#include "emp/base/map.hpp"
 
 int main()
 {

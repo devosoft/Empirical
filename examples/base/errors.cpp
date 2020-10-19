@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "emp/base/errors.h"
+#include "emp/base/errors.hpp"
 
 int main()
 {

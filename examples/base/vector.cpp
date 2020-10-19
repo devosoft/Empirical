@@ -4,7 +4,7 @@
 
 #include <algorithm>
 
-#include "emp/base/vector.h"
+#include "emp/base/vector.hpp"
 
 int main()
 {

@@ -4,8 +4,8 @@
 
 #include <iostream>
 
-#include "emp/meta/reflection.h"
-#include "emp/base/macros.h"
+#include "emp/meta/reflection.hpp"
+#include "emp/base/macros.hpp"
 
 
 #define SHOW_MACRO(...) #__VA_ARGS__ " = " EMP_STRINGIFY( __VA_ARGS__ )
