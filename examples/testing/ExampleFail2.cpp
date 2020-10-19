@@ -11,7 +11,7 @@
 // The only required include for unit tests is the one below.
 // It includes everything else it needs.
 
-#include "unit_tests.hpp"
+#include "emp/testing/unit_tests.hpp"
 
 // You may create an extra functions or macros that you may need.
 
