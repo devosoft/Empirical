@@ -14,6 +14,7 @@ default:
 	$(MAKE) -C datastructs/
 	$(MAKE) -C io/
 	$(MAKE) -C math/
+	$(MAKE) -C testing/
 
 clean:
 	$(MAKE) clean -C base/
@@ -31,6 +32,7 @@ clean:
 	$(MAKE) clean -C datastructs/
 	$(MAKE) clean -C io/
 	$(MAKE) clean -C math/
+	$(MAKE) clean -C testing/
 
 debug:
 	$(MAKE) debug -C base/
@@ -48,6 +50,7 @@ debug:
 	$(MAKE) debug -C datastructs/
 	$(MAKE) debug -C io/
 	$(MAKE) debug -C math/
+	$(MAKE) debug -C testing/
 
 web-test:
 	$(MAKE) debug -C web/
@@ -68,6 +71,7 @@ native-test:
 	$(MAKE) -C datastructs/
 	$(MAKE) -C io/
 	$(MAKE) -C math/
+	$(MAKE) -C testing/
 
 native-test-debug:
 	$(MAKE) debug -C base/
@@ -84,3 +88,4 @@ native-test-debug:
 	$(MAKE) debug -C datastructs/
 	$(MAKE) debug -C io/
 	$(MAKE) debug -C math/
+	$(MAKE) debug -C testing/
