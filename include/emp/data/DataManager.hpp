@@ -13,10 +13,10 @@
 #include <map>
 #include <string>
 
-#include "../base/assert.h"
-#include "../datastructs/map_utils.h"
+#include "../base/assert.hpp"
+#include "../datastructs/map_utils.hpp"
 
-#include "DataNode.h"
+#include "DataNode.hpp"
 
 namespace emp {
 

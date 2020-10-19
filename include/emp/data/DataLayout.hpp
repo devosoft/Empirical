@@ -14,12 +14,12 @@
 #include <string>
 #include <unordered_map>
 
-#include "../base/assert.h"
-#include "../base/vector.h"
-#include "../datastructs/map_utils.h"
-#include "../meta/TypeID.h"
+#include "../base/assert.hpp"
+#include "../base/vector.hpp"
+#include "../datastructs/map_utils.hpp"
+#include "../meta/TypeID.hpp"
 
-#include "MemoryImage.h"
+#include "MemoryImage.hpp"
 
 namespace emp {
 

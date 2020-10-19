@@ -15,8 +15,8 @@
 #include <cstring>        // For std::memcpy
 #include <new>            // For placement new
 
-#include "../base/assert.h"
-#include "../base/Ptr.h"
+#include "../base/assert.hpp"
+#include "../base/Ptr.hpp"
 
 namespace emp {
 

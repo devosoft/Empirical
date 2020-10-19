@@ -27,13 +27,13 @@
 #include <limits>
 #include <algorithm>
 
-#include "../base/vector.h"
-#include "../base/assert.h"
-#include "../meta/ValPack.h"
-#include "../datastructs/IndexMap.h"
-#include "../functional/FunctionSet.h"
-#include "../math/math.h"
-#include "../tools/string_utils.h"
+#include "../base/vector.hpp"
+#include "../base/assert.hpp"
+#include "../meta/ValPack.hpp"
+#include "../datastructs/IndexMap.hpp"
+#include "../functional/FunctionSet.hpp"
+#include "../math/math.hpp"
+#include "../tools/string_utils.hpp"
 
 namespace emp {
 

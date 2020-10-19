@@ -15,11 +15,11 @@
 
 #include <string>
 
-#include "../base/assert.h"
-#include "../base/Ptr.h"
-#include "../base/vector.h"
-#include "../math/Range.h"
-#include "../tools/string_utils.h"
+#include "../base/assert.hpp"
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
+#include "../math/Range.hpp"
+#include "../tools/string_utils.hpp"
 
 namespace emp {
 

@@ -11,7 +11,7 @@
 #ifndef EMP_DATA_INTERFACE_H
 #define EMP_DATA_INTERFACE_H
 
-#include "DataNode.h"
+#include "DataNode.hpp"
 
 namespace emp {
 

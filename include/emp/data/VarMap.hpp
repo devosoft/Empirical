@@ -13,13 +13,13 @@
 
 #include <string>
 
-#include "../base/assert.h"
-#include "../base/Ptr.h"
-#include "../base/unordered_map.h"
-#include "../base/vector.h"
-#include "../datastructs/map_utils.h"
-#include "../meta/TypeID.h"
-#include "../tools/string_utils.h"
+#include "../base/assert.hpp"
+#include "../base/Ptr.hpp"
+#include "../base/unordered_map.hpp"
+#include "../base/vector.hpp"
+#include "../datastructs/map_utils.hpp"
+#include "../meta/TypeID.hpp"
+#include "../tools/string_utils.hpp"
 
 namespace emp {
 

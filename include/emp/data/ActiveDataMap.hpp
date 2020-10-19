@@ -13,9 +13,9 @@
 
 #include <functional>
 
-#include "../meta/TypePack.h"
+#include "../meta/TypePack.hpp"
 
-#include "DataMap.h"
+#include "DataMap.hpp"
 
 namespace emp {
 

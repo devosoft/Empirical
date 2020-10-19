@@ -15,14 +15,14 @@
 #include <iostream>
 #include <string>
 
-#include "../base/assert.h"
-#include "../base/vector.h"
-#include "../meta/type_traits.h"
-#include "../functional/FunctionSet.h"
-#include "../io/NullStream.h"
-#include "../tools/string_utils.h"
+#include "../base/assert.hpp"
+#include "../base/vector.hpp"
+#include "../meta/type_traits.hpp"
+#include "../functional/FunctionSet.hpp"
+#include "../io/NullStream.hpp"
+#include "../tools/string_utils.hpp"
 
-#include "DataNode.h"
+#include "DataNode.hpp"
 
 namespace emp {
 

@@ -10,28 +10,28 @@
  *  A DataMap links data names to arbitrary object types.  Each data map is composed of a
  *  MemoryImage (that holds a set of values) and a DataLayout (that maps names and other info
  *  to those values.)
- * 
+ *
  *  AddVar<type>("name", value, ["desc"], ["notes"])
  *   Includes a new data entry into the DataMap and returns its uniquq ID.
- * 
+ *
  *  Get<type>("name")   - retrieve a reference to a value in the DataMap slowly.
  *  Get<type>(ID)       - retrieve a reference more quickly.
  *  GetID("name")       - convert a name into a unique ID.
  *  Set(name|id, value) - change a value in the DataMap
  *    (you may also use Get() followed by an assignment.)
- * 
+ *
  *  New data entries can be added to a DataMap, but never removed (for efficiency purposes).
  *  When a DataMap is copied, all data entries are also copied (relatively fast).
- *  As long as a DataMaps layout doesn't change, all copied maps will share the same layout (fast). 
- * 
+ *  As long as a DataMaps layout doesn't change, all copied maps will share the same layout (fast).
+ *
  *  A layout can also be locked with LockLayout(), which will throw an error if there is an attempt
  *  to modify that layout again.  A lock can be checked with IsLocked().
- * 
+ *
  *  Specialty versions of Get and Set exist if you don't want to use templates for simple types.
  *  They are GetValue(*), SetValue(*), GetString(*), and SetString(*).  Values are all represented
  *  as doubles.
- * 
- * 
+ *
+ *
  *  DEVELOPER NOTES:
  *  - Each entry can have a one-byte control block immediately proceeding it in memory.  Each
  *    bit would be associated with additional information about the entry.  Options include:
@@ -47,38 +47,38 @@
  *    5. The memory is a LOG of values, not a single value.  This allows for quick identification
  *       of when something special needs to be done.
  *    6-8. Limited type information (8 types that can be handled more effectively?)
- * 
+ *
  *  - We should be able to keep a series of values, not just a single one.  This can be done with
  *    a series of new functions:
  *      AddLog() instead of AddVar() when new veriable is created.
  *      Get() should still work for latest value.  Ideally keep lates in first position.
  *      Change non-const Get() to GetRef() which cannot be used for a log.
  *      Add GetAve() function for logs as well as GetLog() for the full vector.
- * 
+ *
  *  - Settings for all entries should have more information on how they are dealt with, such as if
  *    they should be included in output an how.  Perhaps a system of tags for dynamic use?
- * 
+ *
  *  - After everything else is working, build a LocalDataMap<size_t> that locks in the size at
  *    compile time, providing more localized memory.  Otherwise DataMap as a whole can be built
  *    on a templated class that takes an IMAGE_T as an argument.
- * 
+ *
  *  - Default values should be saved in the layout allowing any MemoryImage to be easily reset to
  *    factory settings.
- * 
+ *
  *  - A user should be able to override copy constructors (though probably not move constructors
  *    or destructors?).  Then the copy process can be more customizable, for example having some
  *    settings retrun to the default value or be further processed.  It's also possible to have
  *    multiple types of copies, so if we indicate a "Copy birth" we get the above, but if we
  *    indicate a "Copy clone" or "Copy inject" we do something different.  We also probably need
  *    to allow for multiple parents...
- * 
+ *
  *  - An OptimizeLayout() function that can reorder entries so that they are somehow more sensible?
- * 
+ *
  *  - A MemoryImage factory to speed up allocation, deallocation if we're using the same size
  *    images repeatedly.
- * 
+ *
  *  - Some way of grouping memory across DataMaps so that a particular entry for many maps has all
- *    of its instances consecutive in memory?  This seems really tricky to pull of, but if we can 
+ *    of its instances consecutive in memory?  This seems really tricky to pull of, but if we can
  *    do it, the improvement in cache performance could be dramatic.
  */
 
@@ -88,13 +88,13 @@
 #include <string>
 #include <cstring>        // For std::memcpy
 
-#include "../base/assert.h"
-#include "../base/Ptr.h"
-#include "../meta/TypeID.h"
-#include "../tools/string_utils.h"
+#include "../base/assert.hpp"
+#include "../base/Ptr.hpp"
+#include "../meta/TypeID.hpp"
+#include "../tools/string_utils.hpp"
 
-#include "MemoryImage.h"
-#include "DataLayout.h"
+#include "MemoryImage.hpp"
+#include "DataLayout.hpp"
 
 namespace emp {
 
@@ -112,7 +112,7 @@ namespace emp {
       if (layout_ptr.IsNull()) layout_ptr = emp::NewPtr<DataLayout>();
 
       // If our we already had layout and it is shared, make a copy.
-      else if (layout_ptr->GetNumMaps() > 1) {   
+      else if (layout_ptr->GetNumMaps() > 1) {
         layout_ptr->DecMaps();
         layout_ptr.New(*layout_ptr);
       }
