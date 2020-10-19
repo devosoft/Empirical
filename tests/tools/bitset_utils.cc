@@ -24,4 +24,10 @@ TEST_CASE("Test bitset_utils", "[tools]")
   REQUIRE(emp::count_bits(four) == 1);
   REQUIRE(emp::pop_bit(four) == 2);
   REQUIRE(emp::count_bits(four) == 0);
+
+  REQUIRE(emp::MaskUsed<int>(5) == 7);
+  REQUIRE(emp::MaskUsed<int>(15) == 15);
+  REQUIRE(emp::MaskUsed<uint32_t>(30000) == 32767);
+  REQUIRE(emp::MaskUsed<uint64_t>(40000000000) == 0xfffffffff);
+  REQUIRE(emp::MaskUsed<uint64_t>(5000000000000) == 0x7ffffffffff);
 }
