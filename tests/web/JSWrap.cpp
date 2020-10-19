@@ -5,10 +5,10 @@
 #include <functional>
 #include <unordered_map>
 
-#include "emp/base/assert.h"
-#include "emp/web/_MochaTestRunner.h"
-#include "emp/web/init.h"
-#include "emp/web/JSWrap.h"
+#include "emp/base/assert.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/web/init.hpp"
+#include "emp/web/JSWrap.hpp"
 
 // --- These structs are used to test JSWrap ---
 struct JSDataObject {

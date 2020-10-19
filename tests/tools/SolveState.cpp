@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/tools/SolveState.h"
+#include "emp/tools/SolveState.hpp"
 
 #include <sstream>
 #include <iostream>

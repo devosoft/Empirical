@@ -2,9 +2,9 @@
 // Javascript files in karma will cause horrible problems.
 
 
-#include "emp/web/d3/visualizations.h"
-#include "emp/datastructs/tuple_struct.h"
-#include "emp/web/Document.h"
+#include "emp/web/d3/visualizations.hpp"
+#include "emp/datastructs/tuple_struct.hpp"
+#include "emp/web/Document.hpp"
 
 #include <iostream>
 #include <functional>

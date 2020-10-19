@@ -2,8 +2,8 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/tools/TypeTracker.h"
-#include "emp/tools/string_utils.h"
+#include "emp/tools/TypeTracker.hpp"
+#include "emp/tools/string_utils.hpp"
 
 #include <sstream>
 #include <iostream>

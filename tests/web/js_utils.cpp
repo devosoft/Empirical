@@ -5,14 +5,14 @@
 #include <string>
 #include <array>
 
-#include "../../tests2/unit_tests.h"
-#include "emp/base/assert.h"
-#include "emp/base/vector.h"
-#include "emp/config/command_line.h"
-#include "emp/web/_MochaTestRunner.h"
-#include "emp/web/init.h"
-#include "emp/web/js_utils.h"
-#include "emp/web/JSWrap.h"
+#include "../../tests2/unit_tests.hpp"
+#include "emp/base/assert.hpp"
+#include "emp/base/vector.hpp"
+#include "emp/config/command_line.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/web/init.hpp"
+#include "emp/web/js_utils.hpp"
+#include "emp/web/JSWrap.hpp"
 
 #include <cassert>
 

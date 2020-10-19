@@ -5,11 +5,11 @@
 #include <functional>
 #include <unordered_map>
 
-#include "emp/base/assert.h"
-#include "emp/web/_MochaTestRunner.h"
-#include "emp/web/Document.h"
-#include "emp/web/Element.h"
-#include "emp/web/web.h"
+#include "emp/base/assert.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/web/Document.hpp"
+#include "emp/web/Element.hpp"
+#include "emp/web/web.hpp"
 
 
 struct Test_WidgetWrapWith : emp::web::BaseTest {
