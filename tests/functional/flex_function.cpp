@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/functional/flex_function.h"
+#include "emp/functional/flex_function.hpp"
 
 #include <sstream>
 

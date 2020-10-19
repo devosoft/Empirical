@@ -2,7 +2,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/functional/FunctionSet.h"
+#include "emp/functional/FunctionSet.hpp"
 
 #include <sstream>
 #include <iostream>
