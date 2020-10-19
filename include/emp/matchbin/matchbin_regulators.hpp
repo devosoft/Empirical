@@ -25,15 +25,15 @@
 #include <array>
 #include <utility>
 
-#include "../base/assert.h"
-#include "../base/array.h"
-#include "../base/vector.h"
-#include "../bits/BitSet.h"
-#include "../datastructs/IndexMap.h"
-#include "../datastructs/hash_utils.h"
-#include "../math/Distribution.h"
-#include "../math/math.h"
-#include "../tools/string_utils.h"
+#include "../base/assert.hpp"
+#include "../base/array.hpp"
+#include "../base/vector.hpp"
+#include "../bits/BitSet.hpp"
+#include "../datastructs/IndexMap.hpp"
+#include "../datastructs/hash_utils.hpp"
+#include "../math/Distribution.hpp"
+#include "../math/math.hpp"
+#include "../tools/string_utils.hpp"
 
 namespace emp {
 

@@ -28,18 +28,17 @@
 
 #include "../../../third-party/robin-hood-hashing/src/include/robin_hood.h"
 
-#include "../base/assert.h"
-#include "../base/array.h"
-#include "../base/vector.h"
-#include "../bits/BitSet.h"
-#include "../datastructs/IndexMap.h"
-#include "../datastructs/hash_utils.h"
-#include "../datastructs/tuple_utils.h"
-#include "../math/math.h"
-#include "../math/Distribution.h"
-#include "../tools/string_utils.h"
-
-#include "../polyfill/span.h"
+#include "../base/assert.hpp"
+#include "../base/array.hpp"
+#include "../base/vector.hpp"
+#include "../bits/BitSet.hpp"
+#include "../datastructs/IndexMap.hpp"
+#include "../datastructs/hash_utils.hpp"
+#include "../datastructs/tuple_utils.hpp"
+#include "../math/math.hpp"
+#include "../math/Distribution.hpp"
+#include "../tools/string_utils.hpp"
+#include "../polyfill/span.hpp"
 
 namespace emp {
 

@@ -34,15 +34,15 @@
 
 #include "../../../third-party/robin-hood-hashing/src/include/robin_hood.h"
 
-#include "../base/assert.h"
-#include "../base/optional.h"
-#include "../base/vector.h"
-#include "../datastructs/IndexMap.h"
-#include "../bits/BitSet.h"
-#include "../matchbin/matchbin_utils.h"
-#include "../data/DataFile.h"
-#include "../data/DataNode.h"
-#include "../base/errors.h"
+#include "../base/assert.hpp"
+#include "../base/optional.hpp"
+#include "../base/vector.hpp"
+#include "../datastructs/IndexMap.hpp"
+#include "../bits/BitSet.hpp"
+#include "../matchbin/matchbin_utils.hpp"
+#include "../data/DataFile.hpp"
+#include "../data/DataNode.hpp"
+#include "../base/errors.hpp"
 
 namespace emp {
   template <
