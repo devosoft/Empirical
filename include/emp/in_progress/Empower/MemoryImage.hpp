@@ -10,9 +10,9 @@
 #ifndef EMP_MEMORY_IMAGE_H
 #define EMP_MEMORY_IMAGE_H
 
-#include "../base/assert.h"
-#include "../base/Ptr.h"
-#include "../base/vector.h"
+#include "../base/assert.hpp"
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
 
 namespace emp {
 

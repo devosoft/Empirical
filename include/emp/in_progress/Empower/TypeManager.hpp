@@ -14,8 +14,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "../base/assert.h"
-#include "../base/Ptr.h"
+#include "../base/assert.hpp"
+#include "../base/Ptr.hpp"
 
 #include "Type.h"
 

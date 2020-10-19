@@ -12,9 +12,9 @@
 #include <map>
 #include <string>
 
-#include "../base/vector.h"
+#include "../base/vector.hpp"
 
-#include "ConfigLexer.h"
+#include "ConfigLexer.hpp"
 
 namespace emp {
 

@@ -7,23 +7,23 @@
  *  @brief A scripting language built inside of C++
  *
  *  Empower is a scripting language built inside of Empirical to simplify and the use of fast
- *  run-time interpreting.  Internally, and Empower object will track all of the types used and 
+ *  run-time interpreting.  Internally, and Empower object will track all of the types used and
  *  all of the variables declared, ensuring that they interact correctly.
- * 
+ *
  *  MemoryImage  Values associated with a structured set of variables.
  *  Type         Details about a type, including a set of functions for how to manipulate it.
  *  Var          An instance of a specific variable, with associated data in a memory image.
  *  VarInfo      Information about a variable (type, position, etc) across instances of a struct.
- * 
+ *
  *  Struct       An agregate type, consisting of a mapping of names to VarInfo
  *  Object       A pairing of a Struct with a Memory image of actual variables
  *  Scope        A sinle-instance Object that can have new variables added dynamically
- * 
+ *
  *  Developer Notes:
  *  @todo After a memory image is locked down, we can optimize it by re-ordering variables, etc.
  *        to group identical types together, or isolate those that are trivially constructable or
- *        destructable. 
- *  
+ *        destructable.
+ *
  *  @todo Setup a template wrapper that adds annotations on to another class using a MemoryImage
  *  @todo Allow multiple memory spaces in Empower; basically scopes or namespaces.
  *  @todo Allow nested namespaces to be branched at any level (so outer levels share vars)
@@ -36,9 +36,9 @@
 #include <map>
 #include <string>
 
-#include "../base/Ptr.h"
-#include "../base/vector.h"
-#include "../meta/TypeID.h"
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
+#include "../meta/TypeID.hpp"
 #include "../tools/debug.h"
 
 namespace emp {
@@ -107,7 +107,7 @@ namespace emp {
       }
     };
 
-  protected:    
+  protected:
     /// Information about a single Empower variable, including its type, name, and where to
     /// find it in a memory image.
     struct VarInfo {
@@ -135,18 +135,18 @@ namespace emp {
     struct Type {
       size_t type_id;          ///< Unique value for this type
       std::string type_name;   ///< Name of this type (from std::typeid)
-      size_t mem_size;         ///< Bytes needed for this type (from sizeof)      
-      
+      size_t mem_size;         ///< Bytes needed for this type (from sizeof)
+
       dconstruct_fun_t dconstruct_fun; ///< Function to fun default constructor on var of this type
       cconstruct_fun_t cconstruct_fun; ///< Function to run copy constructor on var of this type
       copy_fun_t copy_fun;             ///< Function to copy var of this type across memory images
       destruct_fun_t destruct_fun;     ///< Function to run destructor on var of this type
       /// @todo Also add move function and move constructor?
-      
+
       // Core conversion functions for this type.
       std::function<double(Var &)> to_double;      ///< Fun to convert type to double (empty=>none)
       std::function<std::string(Var &)> to_string; ///< Fun to convert type to string (empty=>none)
-      
+
       Type(size_t _id, const std::string & _name, size_t _size,
            const dconstruct_fun_t & dc_fun, const cconstruct_fun_t & cc_fun,
            const copy_fun_t & c_fun, const destruct_fun_t & d_fun)

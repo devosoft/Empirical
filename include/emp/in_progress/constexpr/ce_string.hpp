@@ -12,7 +12,7 @@
 #include <string>
 #include <type_traits>
 
-#include "../tools/functions.h"
+#include "../tools/functions.hpp"
 
 namespace emp {
 

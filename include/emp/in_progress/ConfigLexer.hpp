@@ -15,7 +15,7 @@
 #include <map>
 #include <string>
 
-#include "../base/errors.h"
+#include "../base/errors.hpp"
 
 #include "Token.h"
 

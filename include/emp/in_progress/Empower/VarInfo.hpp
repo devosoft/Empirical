@@ -10,8 +10,8 @@
 #ifndef EMP_EMPOWER_VAR_INFO_H
 #define EMP_EMPOWER_VAR_INFO_H
 
-#include "../base/assert.h"
-#include "../base/Ptr.h"
+#include "../base/assert.hpp"
+#include "../base/Ptr.hpp"
 
 #include "MemoryImage.h"
 #include "Type.h"

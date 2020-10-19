@@ -5,7 +5,7 @@
  *
  *  @file  StructType.h
  *  @brief StructType maps variables to a MemoryImage; Struct is an instance of StructType
- * 
+ *
  *  @todo Immediately before setting a StructType to active, we can optimize variable ordering.
  */
 
@@ -14,9 +14,9 @@
 
 #include <unordered_map>
 
-#include "../base/assert.h"
-#include "../base/Ptr.h"
-#include "../base/vector.h"
+#include "../base/assert.hpp"
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
 
 #include "MemoryImage.h"
 #include "TypeManager.h"
@@ -56,7 +56,7 @@ namespace emp {
 
     /// Access a VarInfo based on its name.
     const VarInfo & GetVarInfo(const std::string & name) const {
-      return GetVarInfo( GetID(name) ); 
+      return GetVarInfo( GetID(name) );
     }
 
     /// And a new member variable to structs of this type.

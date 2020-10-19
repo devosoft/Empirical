@@ -5,8 +5,8 @@
  *
  *  @file  Var.h
  *  @brief A collection of information about a single, instantiated variable in Empower
- * 
- * 
+ *
+ *
  *  DEVELOPER NOTES
  *  Pros & Cons vs. Other version of Var being developed
  *    + MUCH simpler code; most details handled inside the Var class
@@ -20,9 +20,9 @@
 
 #include <string>
 
-#include "../base/assert.h"
-#include "../base/Ptr.h"
-#include "../meta/TypeID.h"
+#include "../base/assert.hpp"
+#include "../base/Ptr.hpp"
+#include "../meta/TypeID.hpp"
 
 namespace emp {
 
@@ -51,7 +51,7 @@ namespace emp {
 
     using var_t = TYPE;
 
-    size_t GetTypeID() const override { return GetTypeValue<var_t>(); }    
+    size_t GetTypeID() const override { return GetTypeValue<var_t>(); }
     std::string GetTypeName() const override { return typeid(var_t).name(); }
     TYPE & GetValue() { return value; }
     const TYPE & GetValue() const { return value; }

@@ -10,9 +10,9 @@
 #ifndef EMP_EMPOWER_STRUCT_H
 #define EMP_EMPOWER_STRUCT_H
 
-#include "../base/assert.h"
-#include "../base/Ptr.h"
-#include "../base/vector.h"
+#include "../base/assert.hpp"
+#include "../base/Ptr.hpp"
+#include "../base/vector.hpp"
 
 #include "StructType.h"
 #include "VarInfo.h"

@@ -46,7 +46,7 @@
 #include <iterator>
 #include <unistd.h>
 
-#include "../math/math.h"
+#include "../math/math.hpp"
 
 namespace emp {
   class Random {

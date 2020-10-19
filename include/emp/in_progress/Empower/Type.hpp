@@ -13,8 +13,8 @@
 #include <functional>
 #include <string>
 
-#include "../base/assert.h"
-#include "../meta/TypeID.h"
+#include "../base/assert.hpp"
+#include "../meta/TypeID.hpp"
 
 #include "MemoryImage.h"
 
