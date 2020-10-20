@@ -6,7 +6,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "data/DataLog.h"
+#include "emp/data/DataLog.hpp"
 
 TEST_CASE("Test DataLog", "[data]") {
 }
