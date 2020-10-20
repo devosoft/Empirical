@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "emp/data/DataNode.h"
+#include "emp/data/DataNode.hpp"
 
 int main()
 {

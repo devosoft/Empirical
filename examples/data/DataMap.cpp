@@ -9,8 +9,8 @@
 
 #include <iostream>
 
-#include "emp/data/DataMap.h"
-#include "emp/bits/BitVector.h"
+#include "emp/data/DataMap.hpp"
+#include "emp/bits/BitVector.hpp"
 
 int main()
 {
