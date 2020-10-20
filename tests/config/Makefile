@@ -1,4 +1,4 @@
-TEST_NAMES = ArgManager command_line config_utils config ConfigManager SettingCombos
+TEST_NAMES = ArgManager command_line config_utils config ConfigManager SettingCombos SettingConfig
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/
