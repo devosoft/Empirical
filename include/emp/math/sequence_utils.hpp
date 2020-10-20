@@ -17,8 +17,7 @@
 #define EMP_SEQUENCE_UTILS_H
 
 #include "../base/vector.hpp"
-
-#include "math.h"
+#include "math.hpp"
 
 namespace emp {
 
