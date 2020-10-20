@@ -7,9 +7,9 @@
 #include <iostream>
 #include <string>
 
-#include "emp/base/vector.h"
-#include "emp/tools/TypeTracker.h"
-#include "emp/debug/debug.h"
+#include "emp/base/vector.hpp"
+#include "emp/tools/TypeTracker.hpp"
+#include "emp/debug/debug.hpp"
 
 // Build some sample functions that we want called by type.
 void fun_int_int(int x, int y) { std::cout << x << "," << y << " : " << x+y << std::endl; }

@@ -42,22 +42,22 @@ native: all
 
 all: $(TARGETS)
 
-$(TARGETS): % : %.cc
+$(TARGETS): % : %.cpp
 	$(CXX) $(CFLAGS_version) $(CFLAGS) $< -o $@
 
-# Lexer: Lexer.cc $(TOOLS)/Lexer.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
-#	$(CXX) $(CFLAGS) Lexer.cc -o Lexer
+# Lexer: Lexer.cpp $(TOOLS)/Lexer.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
+#	$(CXX) $(CFLAGS) Lexer.cpp -o Lexer
 
-# lexer_utils: lexer_utils.cc $(TOOLS)/lexer_utils.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
-# 	$(CXX) $(CFLAGS) lexer_utils.cc -o lexer_utils
+# lexer_utils: lexer_utils.cpp $(TOOLS)/lexer_utils.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
+# 	$(CXX) $(CFLAGS) lexer_utils.cpp -o lexer_utils
 
-# Parser: Parser.cc $(TOOLS)/Parser.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
-# 	$(CXX) $(CFLAGS) Parser.cc -o Parser
+# Parser: Parser.cpp $(TOOLS)/Parser.h $(TOOL_DEPEND) $(TOOLS)/DFA.h $(TOOLS)/NFA.h
+# 	$(CXX) $(CFLAGS) Parser.cpp -o Parser
 
-opt-%: %.cc
+opt-%: %.cpp
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_opt) $< -o $@
 
-debug-%: %.cc
+debug-%: %.cpp
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_debug) $< -o $@
 
 clean:
