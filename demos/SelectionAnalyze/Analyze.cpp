@@ -4,11 +4,11 @@
 //
 //  Analyze probabilities for selection using various selection techniques.
 
-#include "config/command_line.h"
-#include "config/ArgManager.h"
-#include "tools/Random.h"
+#include "emp/config/command_line.hpp"
+#include "emp/config/ArgManager.hpp"
+#include "emp/math/Random.hpp"
 
-#include "SelectionData.h"
+#include "SelectionData.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -55,8 +55,8 @@ int main(int argc, char* argv[])
 
     std::cout << std::endl;
     data.PrintNewCriteria();
-    
-    data.PrintSelectProbs(out_stream, sort_output);  
+
+    data.PrintSelectProbs(out_stream, sort_output);
   }
 
   else {

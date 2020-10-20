@@ -14,11 +14,11 @@
 #include <string>
 #include <unordered_map>
 
-#include "../../source/base/vector.h"
-#include "../../source/tools/BitVector.h"
-#include "../../source/tools/File.h"
-#include "../../source/tools/random_utils.h"
-#include "../../source/tools/vector_utils.h"
+#include "emp/base/vector.hpp"
+#include "emp/bits/BitVector.hpp"
+#include "emp/io/File.hpp"
+#include "emp/math/random_utils.hpp"
+#include "emp/datastructs/vector_utils.hpp"
 
 class SelectionData {
 private:
@@ -260,15 +260,15 @@ public:
             if (maybe_dom2 == false) break;
           }
           if (org1[fit_id] > org2[fit_id]){
-            maybe_dom2 = false;            
+            maybe_dom2 = false;
             if (maybe_dom1 == false) break;
           }
         }
 
         // Both TRUE                                 => DUPLICATE
         // Both FALSE                                => No dominance
-        // maybe_dom1 == true && maybe_dom2 == false => ORG1 dominates        
-        // maybe_dom1 == false && maybe_dom2 == true => ORG2 dominates        
+        // maybe_dom1 == true && maybe_dom2 == false => ORG1 dominates
+        // maybe_dom1 == false && maybe_dom2 == true => ORG2 dominates
 
         if (maybe_dom1 == true && maybe_dom2 == true) {
           // This is a duplicate, so mark and remove org2 from additional consideration.

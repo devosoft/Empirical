@@ -1,6 +1,6 @@
-#include "config/command_line.h"
-#include "tools/Random.h"
-#include "tools/string_utils.h"
+#include "emp/config/command_line.hpp"
+#include "emp/math/Random.hpp"
+#include "emp/tools/string_utils.hpp"
 
 #include <iostream>
 

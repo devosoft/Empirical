@@ -5,9 +5,8 @@
 //  Calculate probabilities for selection using Roulette Selection (easy!)
 
 
-#include "SelectionData.h"
-
-#include "../../source/tools/IndexMap.h"
+#include "SelectionData.hpp"
+#include "emp/datastructs/IndexMap.hpp"
 
 int main()
 {
