@@ -34,7 +34,7 @@ public:
 
   iterator begin() { return std::begin( storage ); }
 
-  const_iterator begin() const { return std::begin( storage ); }
+  const_iterator begin() const { return std::cbegin( storage ); }
 
   const_iterator cbegin() const { return std::cbegin( storage ); }
 
