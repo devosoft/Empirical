@@ -1,5 +1,5 @@
 # Flags to use regardless of compiler
-CFLAGS_all := -std=c++14 -Wall -Wno-unused-function -I../../source/
+CFLAGS_all := -std=c++17 -Wall -Wno-unused-function -I../../include/
 
 # Emscripten compiler information
 CXX_web := emcc
@@ -16,17 +16,13 @@ CFLAGS_native_debug := $(CFLAGS_all) $(OFLAGS_native_debug)
 CFLAGS_native_opt := $(CFLAGS_all) $(OFLAGS_native_opt)
 CFLAGS_native := $(CFLAGS_native_opt)
 
-CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
-CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
+CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1
 
 
 JS_TARGETS := Sudoku.js
 
-TARGETS := debug-Animate debug-keypress debug-Slate debug-web
-
 default: web
-
-WEB := ../../web
 
 # CXX := $(CXX_native)
 # CFLAGS := $(CFLAGS_native_opt)
@@ -44,15 +40,11 @@ web-debug: CXX := $(CXX_web)
 web-debug: CFLAGS := $(CFLAGS_web_debug)
 web-debug: all
 
-native: all
-
-all: $(TARGETS)
-
-$(JS_TARGETS): %.js : %.cc # $(WEB)/%.h
+$(JS_TARGETS): %.js : %.cpp # $(WEB)/%.h
 	$(CXX_web) $(CFLAGS_web) $< -o $@
 
 
-debug-%: $*.cc
+debug-%: $*.cpp
 	$(CXX_native) $(CFLAGS_native) $< -o $@
 
 clean:

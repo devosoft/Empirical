@@ -2,8 +2,8 @@
 //  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#include "base/array.h"
-#include "web/web.h"
+#include "emp/base/array.hpp"
+#include "emp/web/web.hpp"
 
 namespace UI = emp::web;
 
