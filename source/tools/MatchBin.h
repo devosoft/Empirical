@@ -537,7 +537,6 @@ namespace emp {
     MatchBin(const MatchBin &other)
     : state( other.state )
     , uid_stepper( other.uid_stepper )
-    , metric( other.metric )
     , cache( other.cache) { }
     , selector( other.selector ) { }
 
@@ -545,7 +544,6 @@ namespace emp {
     MatchBin(MatchBin &&other)
     : state( std::move(other.state) )
     , uid_stepper( std::move(other.uid_stepper) )
-    , metric( std::move(other.metric) )
     , cache( std::move(other.cache) )
     , selector( std::move(other.selector) ) { }
 
