@@ -8,11 +8,11 @@
 #include <iostream>
 #include <string>
 
-#include "../../../source/base/assert.h"
-#include "../../../source/base/vector.h"
-#include "../../../source/config/command_line.h"
-#include "../../../source/tools/functions.h"
-#include "../../../source/tools/Random.h"
+#include "../../../include/emp/base/assert.hpp"
+#include "../../../include/emp/base/vector.hpp"
+#include "../../../include/emp/config/command_line.hpp"
+#include "../../../include/emp/tools/functions.hpp"
+#include "../../../include/emp/tools/Random.hpp"
 
 
 int main(int argc, char* argv[])

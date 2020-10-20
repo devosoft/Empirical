@@ -1,9 +1,10 @@
-#include "../../../source/base/vector.h"
-#include "../../../source/config/command_line.h"
-#include "../../../source/config/SettingConfig.h"
-#include "../../../source/data/DataLog.h"
-#include "../../../source/tools/File.h"
-#include "../../../source/tools/vector_utils.h"
+#include "../../../include/emp/base/vector.hpp"
+#include "../../../include/emp/config/command_line.hpp"
+#include "../../../include/emp/config/SettingConfig.hpp"
+#include "../../../include/emp/data/DataLog.hpp"
+#include "../../../include/emp/io/File.hpp"
+#include "../../../include/emp/datastructs/vector_utils.hpp"
+#include "../../../include/emp/math/stats.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -11,10 +12,10 @@ int main(int argc, char* argv[])
 
   size_t num_bins = 40;
   config.AddSetting("num_bins", "How many bins in histogram?", 'b', num_bins) = 40;
-  
+
   config.ProcessOptions(argc, argv);
   auto unused_args = config.GetUnusedArgs();
-  
+
   if (unused_args.size() != 1) {
     std::cout << "Must include a single filename for data." << std::endl;
     exit(1);

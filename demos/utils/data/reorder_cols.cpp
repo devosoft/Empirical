@@ -15,9 +15,9 @@
 #include <iostream>
 #include <string>
 
-#include "../../../source/config/command_line.h"
-#include "../../../source/tools/File.h"
-#include "../../../source/tools/string_utils.h"
+#include "../../../include/emp/config/command_line.hpp"
+#include "../../../include/emp/io/File.hpp"
+#include "../../../include/emp/tools/string_utils.hpp"
 
 int main(int argc, char * argv[]) {
   auto args = emp::cl::args_to_strings(argc, argv);
