@@ -10,8 +10,8 @@
 #include <string>
 #include <unordered_set>
 
-#include "emp/bits/BitSet.h"
-#include "emp/math/Random.h"
+#include "emp/bits/BitSet.hpp"
+#include "emp/math/Random.hpp"
 
 constexpr int set_size = 100000;
 
