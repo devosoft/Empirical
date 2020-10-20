@@ -821,7 +821,7 @@ EXCLUDE_SYMLINKS       = NO
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories for example use the pattern */test/*
 
-EXCLUDE_PATTERNS        = */apps/*
+EXCLUDE_PATTERNS        = */demos/*
 EXCLUDE_PATTERNS       += */examples/*
 EXCLUDE_PATTERNS       += */tests/config/*
 EXCLUDE_PATTERNS       += */third-party/*
