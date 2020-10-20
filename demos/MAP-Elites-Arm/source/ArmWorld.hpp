@@ -10,11 +10,11 @@
 #ifndef ARM_WORLD_H
 #define ARM_WORLD_H
 
-#include "base/vector.h"
-#include "Evolve/World.h"
-#include "geometry/Angle2D.h"
-#include "geometry/Point2D.h"
-#include "tools/Random.h"
+#include "emp/base/vector.hpp"
+#include "emp/Evolve/World.hpp"
+#include "emp/geometry/Angle2D.hpp"
+#include "emp/geometry/Point2D.hpp"
+#include "emp/math/Random.hpp"
 
 struct ArmOrg {
   emp::vector<emp::Angle> angles;
@@ -133,7 +133,7 @@ public:
   void ResetDiverse() {
     Reset();
     emp::SetDiverseElites(*this, WORLD_SIZE);
-    for (size_t i = 0; i < WORLD_SIZE; i++) Inject(ArmOrg(*random_ptr, segments.size()));    
+    for (size_t i = 0; i < WORLD_SIZE; i++) Inject(ArmOrg(*random_ptr, segments.size()));
   }
 
   double CalcTotalLength() const {

@@ -9,10 +9,10 @@
 
 #include <iostream>
 
-#include "base/vector.h"
-#include "config/command_line.h"
+#include "emp/base/vector.hpp"
+#include "emp/config/command_line.hpp"
 
-#include "../ArmWorld.h"
+#include "../ArmWorld.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
   for (size_t ud = 0; ud < MAX_GENS; ud++) {
     // Print current state.
     std::cout << "UD " << ud << std::endl;
-    
+
     //  << ": " << world[0].ToString()
     //           << "  pop_size = " << world.GetSize()
     //           << std::endl;
