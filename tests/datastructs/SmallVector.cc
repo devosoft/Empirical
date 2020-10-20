@@ -1104,3 +1104,54 @@ TEST_CASE("SmallVector, exceeding_small_buffer_two_times", "[tools]") {
 //   EXPECT_NO_THROW(vec.at(2));
 //   EXPECT_THROW(vec.at(3), std::exception);
 // }
+
+TEST_CASE("Small vector, iterators", "[tools]") {
+  emp::SmallVector<int, 4> v;
+  REQUIRE(v.empty());
+  REQUIRE(v.begin() == v.end());
+  REQUIRE(v.rbegin() == v.rend());
+
+  v.push_back(0);
+  v.push_back(1);
+  v.push_back(2);
+  v.push_back(3);
+
+  // Forward iterator
+  size_t i = 0;
+  for (emp::SmallVector<int, 4>::iterator it = v.begin(); it != v.end(); ++it) {
+    REQUIRE(*it == v[i]);
+    i++;
+  }
+
+  // Reverse iterator
+  i = v.size()-1;
+  for (emp::SmallVector<int, 4>::reverse_iterator it = v.rbegin(); it != v.rend(); ++it) {
+    REQUIRE(*it == v[i]);
+    i--;
+  }
+
+  // Constant iterator
+  const emp::SmallVector<int, 5> v2 = {4,3,2,1,0};
+  i = 0;
+  for (emp::SmallVector<int, 5>::const_iterator it = v2.begin(); it != v2.end(); ++it) {
+    REQUIRE(*it == v2[i]);
+    i++;
+  }
+
+  // Constant reverse iterator
+  i = v2.size()-1;
+  for (emp::SmallVector<int, 5>::const_reverse_iterator it = v2.rbegin(); it != v2.rend(); ++it) {
+    REQUIRE(*it == v2[i]);
+    i--;
+  }
+}
+TEST_CASE("Small vector, pointers", "[tools]") {
+    emp::SmallVector<int, 4> v = {0,1,2,3};
+    REQUIRE(v.front() == v[0]);
+    REQUIRE(v.back() == v[v.size()-1]);
+
+    const emp::SmallVector<int, 5> v2 = {4,3,2,1,0};
+    REQUIRE(v2.front() == v2[0]);
+    REQUIRE(v2.back() == v2[v2.size()-1]);
+}
+
