@@ -8,8 +8,8 @@
 
 #include <iostream>
 
-#include "emp/base/vector.h"
-#include "emp/config/command_line.h"
+#include "emp/base/vector.hpp"
+#include "emp/config/command_line.hpp"
 
 int main(int argc, char* argv[])
 {
