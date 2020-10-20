@@ -2,11 +2,11 @@
 //  Copyright (C) Michigan State University, 2015-2018.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#include "emp/math/Random.h"
-#include "emp/web/Animate.h"
-#include "emp/web/canvas_utils.h"
-#include "emp/web/emfunctions.h"
-#include "emp/web/web.h"
+#include "emp/math/Random.hpp"
+#include "emp/web/Animate.hpp"
+#include "emp/web/canvas_utils.hpp"
+#include "emp/web/emfunctions.hpp"
+#include "emp/web/web.hpp"
 
 namespace UI = emp::web;
 

@@ -52,11 +52,11 @@ native: all
 
 all: $(TARGETS)
 
-$(JS_TARGETS): %.js : %.cc # $(WEB)/%.h
+$(JS_TARGETS): %.js : %.cpp # $(WEB)/%.h
 	$(CXX_web) $(CFLAGS_web) $< -o $@
 
 
-debug-%: $*.cc
+debug-%: $*.cpp
 	$(CXX_native) $(CFLAGS_native) $< -o $@
 
 clean:

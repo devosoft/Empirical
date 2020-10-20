@@ -2,8 +2,8 @@
 //  Copyright (C) Michigan State University, 2015-2017.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#include "emp/base/vector.h"
-#include "emp/web/web.h"
+#include "emp/base/vector.hpp"
+#include "emp/web/web.hpp"
 
 namespace UI = emp::web;
 
