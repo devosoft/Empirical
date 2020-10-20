@@ -11,6 +11,8 @@
 #ifndef EMP_MAP_PROXY_H
 #define EMP_MAP_PROXY_H
 
+#include "assert.hpp"
+
 namespace emp {
 
   // The MapProxy class is returned in the place of a mapped type to track usage.
