@@ -111,6 +111,15 @@ namespace emp {
     return sqrt(Variance(elements));
   }
 
+  /// Calculate the standard error of the values in a container
+  /// If values are pointers, they will be automatically de-referenced
+  /// Values must be numeric.
+  template <typename C>
+  emp::sfinae_decoy<double, typename C::value_type>
+  StandardError(C & elements) {
+    return StandardDeviation(elements) / sqrt(elements.size());
+  }
+
   /// Count the number of unique elements in a container
   template <typename C>
   typename std::enable_if<!emp::is_ptr_type<typename C::value_type>::value, int>::type
