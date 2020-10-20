@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "emp/datastructs/vector_utils.h"
+#include "emp/datastructs/vector_utils.hpp"
 
 int main()
 {

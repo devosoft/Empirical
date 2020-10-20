@@ -6,7 +6,7 @@
 //  Some examples code for using emp::StringMap and emp::StringID
 
 #include <iostream>
-#include "emp/datastructs/StringMap.h"
+#include "emp/datastructs/StringMap.hpp"
 
 #define PRINT_VAL(X) std::cout << #X " = " << X << std::endl
 

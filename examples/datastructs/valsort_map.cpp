@@ -8,8 +8,8 @@
 #include <set>
 #include <string>
 
-#include "emp/datastructs/valsort_map.h"
-#include "emp/math/Random.h"
+#include "emp/datastructs/valsort_map.hpp"
+#include "emp/math/Random.hpp"
 
 int main()
 {

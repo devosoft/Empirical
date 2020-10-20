@@ -8,7 +8,7 @@
 #include <iostream>
 #include <unordered_map>
 
-#include "emp/datastructs/tuple_utils.h"
+#include "emp/datastructs/tuple_utils.hpp"
 
 int Sum3(int x, int y, int z) { return x+y+z; }
 

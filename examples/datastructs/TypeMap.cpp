@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 
-#include "emp/datastructs/TypeMap.h"
+#include "emp/datastructs/TypeMap.hpp"
 
 int main()
 {
