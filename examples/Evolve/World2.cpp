@@ -11,8 +11,8 @@
 
 #include <iostream>
 
-#include "emp/Evolve/World.h"
-#include "emp/math/Random.h"
+#include "emp/Evolve/World.hpp"
+#include "emp/math/Random.hpp"
 
 int main() {
   emp::World<int> world;

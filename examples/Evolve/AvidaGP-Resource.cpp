@@ -9,11 +9,11 @@
 
 #include <iostream>
 
-#include "emp/hardware/AvidaGP.h"
-#include "emp/hardware/InstLib.h"
-#include "emp/math/Random.h"
-#include "emp/Evolve/World.h"
-#include "emp/Evolve/Resource.h"
+#include "emp/hardware/AvidaGP.hpp"
+#include "emp/hardware/InstLib.hpp"
+#include "emp/math/Random.hpp"
+#include "emp/Evolve/World.hpp"
+#include "emp/Evolve/Resource.hpp"
 
 void Print(const emp::AvidaGP & cpu) {
   for (size_t i = 0; i < 16; i++) {

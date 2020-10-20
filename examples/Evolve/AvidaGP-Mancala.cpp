@@ -4,11 +4,11 @@
 
 #include <iostream>
 
-#include "emp/games/Mancala.h"
-#include "emp/hardware/AvidaGP.h"
-#include "emp/hardware/InstLib.h"
-#include "emp/math/Random.h"
-#include "emp/Evolve/World.h"
+#include "emp/games/Mancala.hpp"
+#include "emp/hardware/AvidaGP.hpp"
+#include "emp/hardware/InstLib.hpp"
+#include "emp/math/Random.hpp"
+#include "emp/Evolve/World.hpp"
 
 constexpr size_t POP_SIZE = 20;
 constexpr size_t GENOME_SIZE = 100;

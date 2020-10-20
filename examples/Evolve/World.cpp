@@ -7,8 +7,8 @@
 
 #include <iostream>
 
-#include "emp/Evolve/World.h"
-#include "emp/math/Random.h"
+#include "emp/Evolve/World.hpp"
+#include "emp/math/Random.hpp"
 
 struct TestOrg1 {
   int fitness;

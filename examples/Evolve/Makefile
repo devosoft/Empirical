@@ -25,8 +25,6 @@ CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../include/emp
 TARGETS := AvidaGP-Evo AvidaGP-Mancala AvidaGP-Resource AvidaGP-StateGrid AvidaGP-Test DiagnosticNiches EvoSorter Fitness_Share_NK Grid NK MAP-Elites Pools Roulette ShrinkPop World World2
 #TARGETS := AvidaGP-Evo AvidaGP-Mancala AvidaGP-Test Fitness_Share_NK Grid NK Roulette Systematics World World2
 
-EVO_DEPEND := ../../include/emp/Evolve/World.h
-
 default: native
 
 CXX := $(CXX_native)
@@ -50,13 +48,13 @@ native: all
 
 all: $(TARGETS)
 
-$(TARGETS): % : %.cc $(EVO_DEPEND)
+$(TARGETS): % : %.cpp
 	$(CXX) $(CFLAGS_version) $(CFLAGS) $< -o $@
 
-$(JS_TARGETS): %.js : %.cc
+$(JS_TARGETS): %.js : %.cpp
 	$(CXX_web) $(CFLAGS_web) $< -o $@
 
-debug-%: $*.cc $(EVO_DEPEND)
+debug-%: $*.cpp
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_debug) $< -o $@
 
 clean:

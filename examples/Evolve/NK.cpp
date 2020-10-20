@@ -7,11 +7,11 @@
 
 #include <iostream>
 
-#include "emp/config/ArgManager.h"
-#include "emp/Evolve/NK.h"
-#include "emp/Evolve/World.h"
-#include "emp/bits/BitVector.h"
-#include "emp/math/Random.h"
+#include "emp/config/ArgManager.hpp"
+#include "emp/Evolve/NK.hpp"
+#include "emp/Evolve/World.hpp"
+#include "emp/bits/BitVector.hpp"
+#include "emp/math/Random.hpp"
 
 EMP_BUILD_CONFIG( NKConfig,
   GROUP(DEFAULT, "Default settings for NK model"),

@@ -7,10 +7,10 @@
 
 #include <iostream>
 
-#include "emp/config/ArgManager.h"
-#include "emp/Evolve/World.h"
-#include "emp/hardware/BitSorter.h"
-#include "emp/math/Random.h"
+#include "emp/config/ArgManager.hpp"
+#include "emp/Evolve/World.hpp"
+#include "emp/hardware/BitSorter.hpp"
+#include "emp/math/Random.hpp"
 
 EMP_BUILD_CONFIG( EvoSortConfig,
   GROUP(DEFAULT, "Default settings for EvoSorter model"),

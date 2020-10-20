@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "emp/Evolve/Systematics.h"
+#include "emp/Evolve/Systematics.hpp"
 
 int main()
 {
