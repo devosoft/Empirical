@@ -12,7 +12,7 @@
 #include "../../../include/emp/base/vector.hpp"
 #include "../../../include/emp/config/command_line.hpp"
 #include "../../../include/emp/tools/functions.hpp"
-#include "../../../include/emp/tools/Random.hpp"
+#include "../../../include/emp/math/Random.hpp"
 
 
 int main(int argc, char* argv[])
