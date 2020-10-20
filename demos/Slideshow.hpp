@@ -10,10 +10,10 @@
 
 #include <string>
 
-#include "../base/vector.h"
-#include "../web/emfunctions.h"
-#include "../web/web.h"
-#include "../web/KeypressManager.h"
+#include "emp/base/vector.hpp"
+#include "emp/web/emfunctions.hpp"
+#include "emp/web/web.hpp"
+#include "emp/web/KeypressManager.hpp"
 
 namespace emp {
 
