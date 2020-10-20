@@ -22,8 +22,6 @@ CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../include/emp
 
 TARGETS := Action ActionManager Signal SignalControl
 
-CONTROL := ../../include/emp/control
-
 default: native
 
 CXX := $(CXX_native)
@@ -44,16 +42,16 @@ native: all
 
 all: $(TARGETS)
 
-$(TARGETS): % : %.cc $(CONTROL)/%.h
+$(TARGETS): % : %.cpp
 	$(CXX) $(CFLAGS_version) $(CFLAGS) $< -o $@
 
-opt-%: %.cc $(CONTROL)/%.h
+opt-%: %.cpp
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_opt) $< -o $@
 
-debug-%: %.cc $(CONTROL)/%.h
+debug-%: %.cpp cpp
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_debug) $< -o $@
 
-cpp14-%: %.cc $(CONTROL)/%.h
+cpp14-%: %.cpp
 	$(CXX) -std=c++14 $(CFLAGS_native_debug) $< -o $@
 
 clean:
