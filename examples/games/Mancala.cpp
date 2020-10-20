@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include "emp/games/Mancala.h"
+#include "emp/games/Mancala.hpp"
 
 int main()
 {
