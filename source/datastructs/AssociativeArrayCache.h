@@ -32,7 +32,7 @@ public:
 
   using const_iterator = typename storage_t::const_iterator;
 
-  iterator begin() { return std::begin( storage ); }
+  iterator begin() { return storage.begin(); }
 
   const_iterator begin() const { return std::cbegin( storage ); }
 
