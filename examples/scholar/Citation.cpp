@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "emp/scholar/Citation.h"
+#include "emp/scholar/Citation.hpp"
 
 int main()
 {
