@@ -1,4 +1,4 @@
-TEST_NAMES = World World_structure World_select NK Systematics World_reflect Resource
+TEST_NAMES = World World_structure World_select NK Systematics World_reflect Resource NK-const StateGrid World_iterator World_output
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/
