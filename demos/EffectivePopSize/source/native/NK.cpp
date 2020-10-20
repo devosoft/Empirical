@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../NKWorld.h"
+#include "../NKWorld.hpp"
 
 
 int main(int argc, char* argv[])
