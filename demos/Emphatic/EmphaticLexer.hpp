@@ -7,7 +7,7 @@
  *  @brief A Lexer that tokenizes inputs to Emphatic.
  **/
 
-#include "../../source/tools/Lexer.h"
+#include "emp/compiler/Lexer.hpp"
 
 class EmphaticLexer : public emp::Lexer {
 private:

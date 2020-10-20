@@ -5,7 +5,7 @@
  *
  *  @file  ElementInfo.h
  *  @brief Information about C++ elements (variables, functions, typedefs, etc) that are loaded in.
- * 
+ *
  *  Developer notes:
  *  * We may want to put just a pointer to a variable in the base class so that the real version
  *    can bew in either the derived class OR the class being wrapped.
@@ -13,10 +13,10 @@
 
 #include <string>
 
-#include "../../source/base/Ptr.h"
-#include "../../source/base/vector.h"
-#include "../../source/tools/set_utils.h"
-#include "../../source/tools/string_utils.h"
+#include "emp/base/Ptr.hpp"
+#include "emp/base/vector.hpp"
+#include "emp/datastructs/set_utils.hpp"
+#include "emp/tools/string_utils.hpp"
 
 /// Parameter in a function or template definition
 struct ParamInfo {

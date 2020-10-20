@@ -7,7 +7,7 @@
  *
  *****/
 
-#include "Testfile.h"
+#include "Testfile.hpp"
 
 namespace test {
   concept Vehicle : VehicleBase {
@@ -19,11 +19,11 @@ namespace test {
     // derived version.  Functions can be made either optional or required (=0).
 
     // If a function is optional, it should indicate the default behavior.
-    bool CanFly() const { return false; }  
+    bool CanFly() const { return false; }
 
     // If a function is required, it should be set to zero.
     double SetSpeed(double speed) = 0;
-    
+
     // A single function parameter can be marked overload.  This parameter must
     // be a TypeSet, which will be exploded to create many versions of the function.
     double SetPart( overload<part_types> part, size_t part_id ) = 0;

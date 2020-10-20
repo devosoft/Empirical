@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "base/Ptr.h"
+#include "base/Ptr.hpp"
 
 concept TestConcept : TestConcept_Base {
   int x=5;

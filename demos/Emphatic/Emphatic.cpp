@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-#include "Emphatic.h"
+#include "Emphatic.hpp"
 
 int main(int argc, char *argv[])
 {

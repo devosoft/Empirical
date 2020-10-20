@@ -13,7 +13,7 @@
  *   - STATEMENT_LIST: (nothing)                  (an unmatched close-mark next requires this option)
  *                   | STATEMENT STATEMENT_LIST
  *   - BLOCK: '{' STATEMENT_LIST '}'
- * 
+ *
  *   - TYPE: ID TYPE_END
  *   - TYPE_END: (nothing)
  *             | "::" TYPE
@@ -45,8 +45,8 @@
 #include <set>
 #include <string>
 
-#include "AST.h"
-#include "EmphaticLexer.h"
+#include "AST.hpp"
+#include "EmphaticLexer.hpp"
 
 class Emphatic {
 private:
@@ -73,7 +73,7 @@ private:
   std::string ConcatLexemes(size_t start_pos, size_t end_pos) const {
     emp_assert(start_pos <= end_pos);
     emp_assert(end_pos <= tokens.size());
-    std::stringstream ss;    
+    std::stringstream ss;
     for (size_t i = start_pos; i < end_pos; i++) {
       if (i > start_pos && tokens[i].lexeme != ":") ss << " ";  // No space with labels.
       ss << tokens[i].lexeme;
@@ -179,7 +179,7 @@ public:
     bool finished = false;
     while (!finished && pos < tokens.size()) {
       char cur_char = AsChar(pos++);
-      if (cur_char == stop_char) { 
+      if (cur_char == stop_char) {
         if (!keep_stop) pos--;
         break;
       }
@@ -315,7 +315,7 @@ public:
       else {
         new_element.SetDefaultCode(ProcessType(pos));    // Determine code being assigned to.
       }
- 
+
       RequireChar(';', pos++, "A using statement must end in a semi-colon.");
       new_element.SetTypedef();
     }
@@ -432,7 +432,7 @@ public:
       }
       // @CAO: Still need to deal with "template", variables and functions, enums, template specializations
       ///      and empty lines (';').
-      else { // Must be a regular element (function, variable, using)        
+      else { // Must be a regular element (function, variable, using)
         pos--; // Backup since the first ID should be the type name.
         Debug("...not defining concept, class, or namespace, so must be a regular element.");
         auto & new_node = cur_scope.NewChild<AST_Element>();
@@ -487,7 +487,7 @@ public:
 
     return concept;
   }
-  
+
   void Process() {
     size_t pos=0;
     ProcessTop(pos, ast_root);
