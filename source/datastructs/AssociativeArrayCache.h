@@ -28,9 +28,9 @@ private:
 
 public:
 
-  using iterator = decltype(std::begin(std::declval<storage_t>()));
+  using iterator = typename storage_t::iterator;
 
-  using const_iterator = decltype(std::cbegin(std::declval<storage_t>()));
+  using const_iterator = typename storage_t::const_iterator;
 
   iterator begin() { return std::begin( storage ); }
 
