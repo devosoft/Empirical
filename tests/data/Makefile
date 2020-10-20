@@ -1,4 +1,4 @@
-TEST_NAMES = DataFile DataManager DataNode DataInterface DataLog
+TEST_NAMES = ActiveDataMap DataEntry DataInterface DataLayout DataLog DataManager DataMap DataNode MemoryImage Trait VarMap
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/
