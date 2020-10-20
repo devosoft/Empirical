@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "../../include/emp/config/config.h"
+#include "emp/config/config.hpp"
 
 EMP_BUILD_CONFIG( MyConfig,
   GROUP(DEFAULT_GROUP, "General Settings"),
