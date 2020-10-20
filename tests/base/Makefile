@@ -1,4 +1,4 @@
-TEST_NAMES = array assert errors macros macro_math optional Ptr vector
+TEST_NAMES = array assert errors macros macro_math optional Ptr vector map MapProxy unordered_map
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/
