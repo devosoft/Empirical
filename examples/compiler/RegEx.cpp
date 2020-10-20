@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "emp/compiler/RegEx.h"
+#include "emp/compiler/RegEx.hpp"
 
 int main()
 {

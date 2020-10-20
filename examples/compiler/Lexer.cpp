@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "emp/compiler/Lexer.h"
+#include "emp/compiler/Lexer.hpp"
 
 int main()
 {

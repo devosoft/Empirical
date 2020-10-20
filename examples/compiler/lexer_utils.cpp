@@ -8,10 +8,10 @@
 #include <iostream>
 #include <string>
 
-#include "emp/compiler/DFA.h"
-#include "emp/compiler/NFA.h"
-#include "emp/compiler/lexer_utils.h"
-#include "emp/compiler/RegEx.h"
+#include "emp/compiler/DFA.hpp"
+#include "emp/compiler/NFA.hpp"
+#include "emp/compiler/lexer_utils.hpp"
+#include "emp/compiler/RegEx.hpp"
 
 void Test(const emp::DFA & dfa, const std::string & str) {
   int out_state = dfa.Next(0, str);
