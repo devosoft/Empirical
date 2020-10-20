@@ -21,8 +21,6 @@ CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../include/emp
 
 TARGETS := AvidaGP BitSorter LinearCode SignalGP
 
-HARDWARE := ../../include/hardware/
-
 default: native
 
 CXX := $(CXX_native)
@@ -43,13 +41,13 @@ native: all
 
 all: $(TARGETS)
 
-$(TARGETS): % : %.cc
+$(TARGETS): % : %.cpp
 	$(CXX) $(CFLAGS_version) $(CFLAGS) $< -o $@
 
-opt-%: %.cc
+opt-%: %.cpp
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_opt) $< -o $@
 
-debug-%: %.cc
+debug-%: %.cpp
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_debug) $< -o $@
 
 clean:

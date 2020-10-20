@@ -9,8 +9,8 @@
 
 #include <iostream>
 
-#include "emp/hardware/LinearCode.h"
-#include "emp/math/Random.h"
+#include "emp/hardware/LinearCode.hpp"
+#include "emp/math/Random.hpp"
 
 int main()
 {

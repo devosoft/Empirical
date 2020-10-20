@@ -9,9 +9,9 @@
 
 #include <iostream>
 
-#include "emp/hardware/AvidaGP.h"
-#include "emp/hardware/InstLib.h"
-#include "emp/math/Random.h"
+#include "emp/hardware/AvidaGP.hpp"
+#include "emp/hardware/InstLib.hpp"
+#include "emp/math/Random.hpp"
 
 void Print(const emp::AvidaGP & cpu) {
   for (size_t i = 0; i < 16; i++) {
