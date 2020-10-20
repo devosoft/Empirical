@@ -1,4 +1,4 @@
-TEST_NAMES = functions keyname_utils SolveState string_utils TypeTracker
+TEST_NAMES = functions keyname_utils SolveState string_utils TypeTracker attrs value_utils
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/
