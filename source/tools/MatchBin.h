@@ -536,17 +536,18 @@ namespace emp {
     // have to define this manually due to mutexes
     MatchBin(const MatchBin &other)
     : state( other.state )
-    , selector( other.selector )
     , uid_stepper( other.uid_stepper )
+    , metric( other.metric )
     , cache( other.cache) { }
+    , selector( other.selector ) { }
 
     // have to define this manually due to mutexes
     MatchBin(MatchBin &&other)
     : state( std::move(other.state) )
-    , selector( std::move(other.selector) )
     , uid_stepper( std::move(other.uid_stepper) )
+    , metric( std::move(other.metric) )
     , cache( std::move(other.cache) )
-    { }
+    , selector( std::move(other.selector) ) { }
 
   // have to define this manually due to mutexes
   MatchBin &operator=(const MatchBin &other) {

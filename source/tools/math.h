@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
+ *  @date 2016-2020.
  *
  *  @file  math.h
  *  @brief Useful mathematical functions (that are constexpr when possible.)
@@ -18,6 +18,7 @@
 
 #include "../base/assert.h"
 #include "../meta/reflection.h"
+#include "bitset_utils.h"
 #include "Random.h"
 #include "const.h"
 
@@ -288,21 +289,6 @@ namespace emp {
   template <typename TYPE>
   static constexpr int IntLog2(TYPE x) { return x <= 1 ? 0 : (IntLog2(x/2) + 1); }
 
-  /// A compile-time bit counter.
-  template <typename TYPE>
-  static constexpr int CountOnes(TYPE x) { return x == 0 ? 0 : (CountOnes(x/2) + (x&1)); }
-
-  /// Quick bit-mask generator for low bits.
-  template <typename TYPE>
-  static constexpr TYPE MaskLow(std::size_t num_bits) {
-    return (num_bits == 8*sizeof(TYPE)) ? ((TYPE)-1) : ((((TYPE)1) << num_bits) - 1);
-  }
-
-  /// Quick bit-mask generator for high bits.
-  template <typename TYPE>
-  static constexpr TYPE MaskHigh(std::size_t num_bits) {
-    return MaskLow<TYPE>(num_bits) << (8*sizeof(TYPE)-num_bits);
-  }
 
   /// Return the minimum of three values.
   template <typename T> constexpr const T & Min(const T& in1, const T& in2, const T& in3) {

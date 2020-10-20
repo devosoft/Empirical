@@ -1,5 +1,5 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
-//  Copyright (C) Michigan State University, 2016-2019.
+//  Copyright (C) Michigan State University, 2016-2020.
 //  Released under the MIT Software license; see doc/LICENSE
 //
 //  TypeID provides an easy way to convert types to strings.
@@ -14,6 +14,7 @@
 #ifndef EMP_TYPE_ID_H
 #define EMP_TYPE_ID_H
 
+#include <cmath>
 #include <sstream>
 #include <string>
 
@@ -27,6 +28,10 @@
 namespace emp {
 
   using namespace std::string_literals;
+
+  // Pre-declare some types and functions.
+  struct TypeID;
+  template <typename T> static TypeID GetTypeID();
 
   void SetupTypeNames();
 
@@ -43,30 +48,197 @@ namespace emp {
     struct Info {
       bool init = false;                     ///< Has this info been initialized yet?
       std::string name = "[unknown type]";   ///< Unique (ideally human-readable) type name
-      bool is_abstract = false;
-      bool is_array = false;
-      bool is_class = false;
-      bool is_const = false;
-      bool is_empty = false;
-      bool is_object = false;
-      bool is_pointer = false;
-      bool is_reference = false;
-      bool is_trivial = false;
-      bool is_volatile = false;
 
-      bool is_TypePack = false;
+      virtual ~Info() { }
 
-      size_t decay_id = 0;
-      size_t remove_const_id = 0;
-      size_t remove_cv_id = 0;
-      size_t remove_ptr_id = 0;
-      size_t remove_ref_id = 0;
-      size_t remove_volatile_id = 0;
+      virtual bool IsAbstract() const { return false; }
+      virtual bool IsArray() const { return false; }
+      virtual bool IsClass() const { return false; }
+      virtual bool IsConst() const { return false; }
+      virtual bool IsEmpty() const { return false; }
+      virtual bool IsObject() const { return false; }
+      virtual bool IsPointer() const { return false; }
+      virtual bool IsReference() const { return false; }
+      virtual bool IsTrivial() const { return false; }
+      virtual bool IsVolatile() const { return false; }
+
+      virtual bool IsTypePack() const { return false; }
+
+      virtual size_t GetDecayID() const { return 0; }
+      virtual size_t GetRemoveConstID() const { return 0; }
+      virtual size_t GetRemoveCVID() const { return 0; }
+      virtual size_t GetRemovePtrID() const { return 0; }
+      virtual size_t GetRemoveRefID() const { return 0; }
+      virtual size_t GetRemoveVolatileID() const { return 0; }
+
+      /// Return the size (in bytes) of objects of this type.
+      virtual size_t GetSize() const { return 0; }
+
+      /// Treat the memory referred to by a void pointer as the current type, convert it to a
+      /// double, and return that value. (Default to nan if no such conversion is possible.)
+      virtual double ToDouble(const emp::Ptr<const void>) const { return std::nan(""); }
+
+      /// Treat the memory referred to by a void pointer as the current type, convert it to a
+      /// string, and return that value. (Default to empty if no such conversion is possible.)
+      virtual std::string ToString(const emp::Ptr<const void>) const { return ""; }
+
+      /// Take a double and a void pointer, treat the pointer as the correct type, and assign
+      /// the double to it (if possible).  Returns success.
+      virtual bool FromDouble(double, const emp::Ptr<void>) const { return false; }
+
+      /// Take a string and a void pointer, treat the pointer as the correct type, and assign
+      /// the string to it (if possible).  Returns success.
+      virtual bool FromString(const std::string &, const emp::Ptr<void>) const { return false; }
 
       Info() { ; }
       Info(const std::string & in_name) : name(in_name) { ; }
       Info(const Info&) = default;
     };
+
+    template <typename T>
+    struct InfoData : public Info {
+      bool IsAbstract() const override { return std::is_abstract<T>(); }
+      bool IsArray() const override { return std::is_array<T>(); }
+      bool IsClass() const override { return std::is_class<T>(); }
+      bool IsConst() const override { return std::is_const<T>(); }
+      bool IsEmpty() const override { return std::is_empty<T>(); }
+      bool IsObject() const override { return std::is_object<T>(); }
+      bool IsPointer() const override { return emp::is_pointer<T>(); } // Not std::is_pointer<T>() to deal with emp::Ptr.
+      bool IsReference() const override { return std::is_reference<T>(); }
+      bool IsTrivial() const override { return std::is_trivial<T>(); }
+      bool IsVolatile() const override { return std::is_volatile<T>(); }
+
+      bool IsTypePack() const override { return emp::is_TypePack<T>(); }
+
+      size_t GetDecayID() const override { 
+        using decay_t = std::decay_t<T>;
+        if constexpr (std::is_same<T, decay_t>()) return (size_t) this;
+        else return GetTypeID< decay_t >();
+      }
+      size_t GetRemoveConstID() const override { 
+        using remove_const_t = std::remove_const_t<T>;
+        if constexpr (std::is_same<T, remove_const_t>()) return (size_t) this;
+        else return GetTypeID< remove_const_t >();
+      }
+      size_t GetRemoveCVID() const override { 
+        using remove_cv_t = std::remove_cv_t<T>;
+        if constexpr (std::is_same<T, remove_cv_t>()) return (size_t) this;
+        else return GetTypeID< remove_cv_t >();
+      }
+      size_t GetRemovePtrID() const override { 
+        using remove_ptr_t = emp::remove_pointer_t<T>;
+        if constexpr (std::is_same<T, remove_ptr_t>()) return (size_t) this;
+        else return GetTypeID< remove_ptr_t >();
+      }
+      size_t GetRemoveRefID() const override { 
+        using remove_ref_t = std::remove_reference_t<T>;
+        if constexpr (std::is_same<T, remove_ref_t>()) return (size_t) this;
+        else return GetTypeID< remove_ref_t >();
+      }
+      size_t GetRemoveVolatileID() const override { 
+        using remove_volatile_t = std::remove_volatile_t<T>;
+        if constexpr (std::is_same<T, remove_volatile_t>()) return (size_t) this;
+        else return GetTypeID< remove_volatile_t >();
+      }
+
+      size_t GetSize() const override {
+        if constexpr (std::is_void<T>()) return 0;
+        else return sizeof(T);
+      }
+
+      double ToDouble(const emp::Ptr<const void> ptr) const override {
+        using base_t = std::decay_t<T>;
+
+        // If this variable has a built-in ToDouble() trait, use it!
+        if constexpr (emp::HasToDouble<T>()) {
+          return ptr.ReinterpretCast<const base_t>()->ToDouble();
+        }
+
+        // If this type is convertable to a double, cast the pointer to the correct type, de-reference it,
+        // and then return the conversion.  Otherwise return NaN
+        if constexpr (std::is_convertible<T, double>::value) {
+          return (double) *ptr.ReinterpretCast<const base_t>();
+        }
+        else return std::nan("");
+      }
+
+      std::string ToString(const emp::Ptr<const void> ptr) const override {
+        using base_t = std::decay_t<T>;
+
+        // If this variable has a built-in ToString() trait, use it!
+        if constexpr (emp::HasToString<T>()) {
+          return ptr.ReinterpretCast<const base_t>()->ToString();
+        }
+
+        // If this variable is a string or can be directly converted to a string, do so.
+        if constexpr (std::is_convertible<T, std::string>::value) {
+          return (std::string) *ptr.ReinterpretCast<const base_t>();
+        }
+
+        // If this variable is a char, treat it as a single-character string.
+        if constexpr (std::is_same<T, char>::value) {
+          return std::string(1, (char) *ptr.ReinterpretCast<const base_t>());
+        }
+
+        // If this variable is a numeric value, use to_string.
+        else if constexpr (std::is_arithmetic<T>::value) {
+          return std::to_string( *ptr.ReinterpretCast<const base_t>() );
+        }
+
+        // If we made it this far, we don't know how to convert...
+        return "";
+      }
+
+      bool FromDouble(double value, const emp::Ptr<void> ptr) const override {
+        using base_t = std::decay_t<T>;
+
+        // If this variable has a built-in FromDouble() trait, use it!
+        if constexpr (emp::HasFromDouble<T>()) {
+          return ptr.ReinterpretCast<base_t>()->FromDouble(value);
+        }
+
+        // If this type is convertable to a double, cast the pointer to the correct type, de-reference it,
+        // and then return the conversion.  Otherwise return NaN
+        if constexpr (std::is_convertible<double, T>::value) {
+          *ptr.ReinterpretCast<base_t>() = value;
+          return true;
+        }
+
+        else return false;
+      }
+
+      bool FromString(const std::string & value, const emp::Ptr<void> ptr) const override {
+        using base_t = std::decay_t<T>;
+
+        // If this variable has a built-in FromString() trait, use it!
+        if constexpr (emp::HasFromString<T>()) {
+          return ptr.ReinterpretCast<base_t>()->FromString(value);
+        }
+
+        // If this variable is a string or can be directly converted to a string, do so.
+        if constexpr (std::is_convertible<std::string, T>::value) {
+          *ptr.ReinterpretCast<base_t>() = value;
+          return true;
+        }
+
+        // If this variable is a char, treat it as a single-character string.
+        if constexpr (std::is_same<T, char>::value) {
+          if (value.size() > 1) return false;
+          *ptr.ReinterpretCast<char>() = value[0];
+          return true;
+        }
+
+        // If this variable is a numeric value, use from_string.
+        else if constexpr (std::is_arithmetic<T>::value) {
+          *ptr.ReinterpretCast<base_t>() = stod(value);
+          return true;
+        }
+
+        // If we made it this far, we don't know how to convert...
+        return false;
+      }
+    };
+
 
     using info_t = emp::Ptr<TypeID::Info>;
     info_t info_ptr;
@@ -97,34 +269,45 @@ namespace emp {
     bool IsInitialized() const { return info_ptr->init ; }
     void SetInitialized(bool _in=true) { info_ptr->init = _in; }
 
-    bool IsAbstract() const { return info_ptr->is_abstract ; }
-    bool IsArray() const { return info_ptr->is_array ; }
-    bool IsClass() const { return info_ptr->is_class ; }
-    bool IsConst() const { return info_ptr->is_const ; }
-    bool IsEmpty() const { return info_ptr->is_empty ; }
-    bool IsObject() const { return info_ptr->is_object ; }
-    bool IsPointer() const { return info_ptr->is_pointer ; }
-    bool IsReference() const { return info_ptr->is_reference ; }
-    bool IsTrivial() const { return info_ptr->is_trivial ; }
-    bool IsVolatile() const { return info_ptr->is_volatile ; }
+    bool IsAbstract() const { return info_ptr->IsAbstract(); }
+    bool IsArray() const { return info_ptr->IsArray() ; }
+    bool IsClass() const { return info_ptr->IsClass() ; }
+    bool IsConst() const { return info_ptr->IsConst() ; }
+    bool IsEmpty() const { return info_ptr->IsEmpty() ; }
+    bool IsObject() const { return info_ptr->IsObject() ; }
+    bool IsPointer() const { return info_ptr->IsPointer() ; }
+    bool IsReference() const { return info_ptr->IsReference() ; }
+    bool IsTrivial() const { return info_ptr->IsTrivial() ; }
+    bool IsVolatile() const { return info_ptr->IsVolatile() ; }
 
-    bool IsTypePack() const { return info_ptr->is_TypePack ; }
+    bool IsTypePack() const { return info_ptr->IsTypePack() ; }
 
-    TypeID GetDecayTypeID() const { return info_ptr->decay_id; }
-    TypeID GetRemoveConstTypeID() const { return info_ptr->remove_const_id; }
-    TypeID GetRemoveCVTypeID() const { return info_ptr->remove_cv_id; }
-    TypeID GetRemovePointerTypeID() const { return info_ptr->remove_ptr_id; }
-    TypeID GetRemoveReferenceTypeID() const { return info_ptr->remove_ref_id; }
-    TypeID GetRemoveVolatileTypeID() const { return info_ptr->remove_volatile_id; }
+    TypeID GetDecayTypeID() const { return info_ptr->GetDecayID(); }
+    TypeID GetRemoveConstTypeID() const { return info_ptr->GetRemoveConstID(); }
+    TypeID GetRemoveCVTypeID() const { return info_ptr->GetRemoveCVID(); }
+    TypeID GetRemovePointerTypeID() const { return info_ptr->GetRemovePtrID(); }
+    TypeID GetRemoveReferenceTypeID() const { return info_ptr->GetRemoveRefID(); }
+    TypeID GetRemoveVolatileTypeID() const { return info_ptr->GetRemoveVolatileID(); }
+
+    size_t GetSize() const { return info_ptr->GetSize(); }
+  
+    double ToDouble(const emp::Ptr<const void> ptr) const { return info_ptr->ToDouble(ptr); }
+    std::string ToString(const emp::Ptr<const void> ptr) const { return info_ptr->ToString(ptr); }
+    bool FromDouble(double value, const emp::Ptr<void> ptr) {
+      return info_ptr->FromDouble(value, ptr);
+    }
+    bool FromString(const std::string & value, const emp::Ptr<void> ptr) {
+      return info_ptr->FromString(value, ptr);
+    }
   };
 
-  template <typename T> static TypeID::Info BuildInfo();
+  template <typename T> static emp::Ptr<TypeID::Info> BuildInfo();
 
   /// Retrieve the correct TypeID for a given type.
   template <typename T>
   static TypeID GetTypeID() {
-    static TypeID::Info info = BuildInfo<T>();  // Create static info so that it is persistent.
-    return TypeID(&info);
+    static emp::Ptr<TypeID::Info> info = BuildInfo<T>();  // Create static info so that it is persistent.
+    return TypeID(info);
   }
 
   /// Retrieve a vector of TypeIDs for a pack of types passed in.
@@ -152,61 +335,25 @@ namespace emp {
 
   /// Build the information for a single TypeID.
   template <typename T>
-  static TypeID::Info BuildInfo() {
-    static TypeID::Info info;
+  static emp::Ptr<TypeID::Info> BuildInfo() {
+    static TypeID::InfoData<T> info;
     if (info.init == false) {
       TypeID type_id(&info);
 
       info.init = true;
       info.name = typeid(T).name();
-      info.is_abstract = std::is_abstract<T>();
-      info.is_array = std::is_array<T>();
-      info.is_class = std::is_class<T>();
-      info.is_const = std::is_const<T>();
-      info.is_empty = std::is_empty<T>();
-      info.is_object = std::is_object<T>();
-      info.is_pointer = emp::is_pointer<T>(); // Not std::is_pointer<T>() to deal with emp::Ptr.
-      info.is_reference = std::is_reference<T>();
-      info.is_trivial = std::is_trivial<T>();
-      info.is_volatile = std::is_volatile<T>();
-
-      info.is_TypePack = emp::is_TypePack<T>();
-
-      using decay_t = std::decay_t<T>;
-      if constexpr (std::is_same<T, decay_t>()) info.decay_id = (size_t) &info;
-      else info.decay_id = GetTypeID< decay_t >();
-
-      using remove_const_t = std::remove_const_t<T>;
-      if constexpr (std::is_same<T, remove_const_t>()) info.remove_const_id = (size_t) &info;
-      else info.remove_const_id = GetTypeID< remove_const_t >();
-
-      using remove_cv_t = std::remove_cv_t<T>;
-      if constexpr (std::is_same<T, remove_cv_t>()) info.remove_cv_id = (size_t) &info;
-      else info.remove_cv_id = GetTypeID< remove_cv_t >();
-
-      using remove_ptr_t = emp::remove_pointer_t<T>;
-      if constexpr (std::is_same<T, remove_ptr_t>()) info.remove_ptr_id = (size_t) &info;
-      else info.remove_ptr_id = GetTypeID< remove_ptr_t >();
-
-      using remove_ref_t = std::remove_reference_t<T>;
-      if constexpr (std::is_same<T, remove_ref_t>()) info.remove_ref_id = (size_t) &info;
-      else info.remove_ref_id = GetTypeID< remove_ref_t >();
-
-      using remove_volatile_t = std::remove_volatile_t<T>;
-      if constexpr (std::is_same<T, remove_volatile_t>()) info.remove_volatile_id = (size_t) &info;
-      else info.remove_volatile_id = GetTypeID< remove_volatile_t >();
 
       // Now, fix the name if we can be more precise about it.
-      if (info.is_const) {
+      if (info.IsConst()) {
         info.name = "const "s + type_id.GetRemoveConstTypeID().GetName();
       }
-      else if (info.is_volatile) {
+      else if (info.IsVolatile()) {
         info.name = "volatile "s + type_id.GetRemoveVolatileTypeID().GetName();
       }
-      else if (info.is_pointer) {
+      else if (info.IsPointer()) {
         info.name = type_id.GetRemovePointerTypeID().GetName() + '*';
       }
-      else if (info.is_reference) {
+      else if (info.IsReference()) {
         info.name = type_id.GetRemoveReferenceTypeID().GetName() + '&';
       }
       else if constexpr (emp::is_TypePack<T>()) {
@@ -220,7 +367,7 @@ namespace emp {
       }
     }
     
-    return info;
+    return &info;
   }
 
   /// Setup a bunch of standard type names to be more readable.
@@ -250,65 +397,8 @@ namespace emp {
     // Standard library types.
     GetTypeID<std::string>().SetName("std::string");
 
-    // @CAO -- we can actually establish these links when building types...
-    // // Check for type attributes...
-    // template<typename T> struct TypeID<T*> {
-    //   static std::string GetName() { return TypeID<T>::GetName() + '*'; }
-    // };
-
-    // // Tools for using TypePack
-    // template<typename T, typename... Ts> struct TypeID<emp::TypePack<T,Ts...>> {
-    //   static std::string GetTypes() {
-    //     std::string out = TypeID<T>::GetName();
-    //     if (sizeof...(Ts) > 0) out += ",";
-    //     out += TypeID<emp::TypePack<Ts...>>::GetTypes();
-    //     return out;
-    //   }
-    //   static std::string GetName() {
-    //     std::string out = "emp::TypePack<";
-    //     out += GetTypes();
-    //     out += ">";
-    //     return out;
-    //   }
-    // };
-    // template<> struct TypeID< emp::TypePack<> > {
-    //   static std::string GetTypes() { return ""; }
-    //   static std::string GetName() { return "emp::TypePack<>"; }
-    // };
-
-    // // Generic TemplateID structure for when none of the specialty cases trigger.
-    // template <typename T> struct TemplateID {
-    //   static std::string GetName() { return "UnknownTemplate"; }
-    // };
-
-    // template<template <typename...> class TEMPLATE, typename... Ts>
-    // struct TypeID<TEMPLATE<Ts...>> {
-    //   static std::string GetName() {
-    //     return TemplateID<TEMPLATE<Ts...>>::GetName()
-    //           + '<' + TypeID<emp::TypePack<Ts...>>::GetTypes() + '>';
-    //   }
-    // };
   }
 }
-
-// namespace emp{
-
-
-//   // Standard library templates.
-//   //  template <typename... Ts> struct TemplateID<std::array<Ts...>> { static std::string GetName() { return "array"; } };
-
-//   template<typename T, typename... Ts> struct TypeID< emp::vector<T,Ts...> > {
-//     static std::string GetName() {
-//       using simple_vt = emp::vector<T>;
-//       using full_vt = emp::vector<T,Ts...>;
-//       if (std::is_same<simple_vt,full_vt>::value) {
-//         return "emp::vector<" + TypeID<T>::GetName() + ">";
-//       }
-//       return "emp::vector<" + TypeID<TypePack<T,Ts...>>::GetTypes() + ">";
-//     }
-//   };
-
-//}
 
 
 namespace std {

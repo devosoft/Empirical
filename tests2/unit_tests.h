@@ -47,18 +47,24 @@ namespace emp {
 
   void ResolveUnitTest(bool pass, const std::string & test_input,
                    const std::string & result, const std::string & exp_result,
-                   const std::string & filename, size_t line_num) {
+                   const std::string & filename, size_t line_num, bool is_require=false) {
     const UnitTestOutput::Mode verbose = GetUnitTestOutput().verbose;
     GetUnitTestOutput().num_tests++;
+
+    // If we are verbose OR the test failed, print information about it.
     if (verbose == UnitTestOutput::Mode::VERBOSE || !pass) {
       std::cout << filename << ", line " << line_num << ": "
                 << test_input << " == " << result << std::endl;
     }
     if (!pass) {
-      std::cout << "-> \033[1;31mMATCH FAILED!  Expected: ["
-                << exp_result << "]\033[0m" << std::endl;
-      std::cout << "                    Output: ["
-                << exp_result << "]" << std::endl;
+      if (is_require) {
+        std::cout << "-> \033[1;31mREQUIREMENT FAILED!\033[0m" << std::endl;
+      } else {
+        std::cout << "-> \033[1;31mMATCH FAILED!  Expected: ["
+                  << exp_result << "]\033[0m" << std::endl;
+        std::cout << "                    Output: ["
+                  << result << "]" << std::endl;
+      }
       GetUnitTestOutput().errors++;
       if (GetUnitTestOutput().abort) {
         std::cout << "Aborting!\n";
@@ -93,11 +99,19 @@ namespace emp {
     auto result = VALUE;                                                                 \
     auto exp_result = EXP_RESULT;                                                        \
     bool match = (result == (EXP_RESULT));                                               \
-    std::string result_str = emp::to_string(result);                                     \
-    std::string exp_result_str = emp::to_string(exp_result);                             \
+    std::string result_str = emp::to_literal(result);                                    \
+    std::string exp_result_str = emp::to_literal(exp_result);                            \
     emp::ResolveUnitTest(match, #VALUE, result_str, exp_result_str, __FILE__, __LINE__); \
   } while (false)
 
+#define EMP_REQUIRE( VALUE )                                                             \
+  do {                                                                                   \
+    auto result = VALUE;                                                                 \
+    std::string result_str = emp::to_string(result);                                     \
+    emp::ResolveUnitTest(result, #VALUE, result_str, "true", __FILE__, __LINE__, true);  \
+  } while (false)
+
+// Setup a default approx range.
 #define EMP_TEST_APPROX(...) EMP_TEST_APPROX_impl(__VA_ARGS__, 1.0, ~)
 
 #define EMP_TEST_APPROX_impl( VALUE, EXP_RESULT, THRESHOLD, ...)                          \

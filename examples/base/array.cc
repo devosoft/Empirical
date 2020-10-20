@@ -11,6 +11,8 @@ template <size_t N>
 void ArrayPrint(const std::array<int,N> & ar) {
   for (int x : ar) std::cout << x << " ";
   std::cout << std::endl;
+
+  std::cout << ar << std::endl;
 }
 
 int main()
