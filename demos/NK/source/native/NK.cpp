@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../NKWorld.h"
+#include "../NKWorld.hpp"
 
 
 int main(int argc, char* argv[])
@@ -23,7 +23,4 @@ int main(int argc, char* argv[])
   // Setup and run the world.
   world.Setup();
   world.Run();
-
-  // After finished, print out the lineage to the command line.
-  world.PrintLineage(0);
 }

@@ -1,8 +1,8 @@
-#include "config/ArgManager.h"
-#include "Evolve/NK.h"
-#include "Evolve/World.h"
-#include "tools/BitVector.h"
-#include "tools/Random.h"
+#include "emp/config/ArgManager.hpp"
+#include "emp/Evolve/NK.hpp"
+#include "emp/Evolve/World.hpp"
+#include "emp/bits/BitVector.hpp"
+#include "emp/math/Random.hpp"
 
 using BitOrg = emp::BitVector;
 

@@ -4,9 +4,9 @@
 //
 //  This file contains an easy-to-manipulate NK world.
 
-#include "web/web.h"
+#include "emp/web/web.hpp"
 
-#include "../NKWorld.h"
+#include "../NKWorld.hpp"
 
 namespace UI = emp::web;
 
