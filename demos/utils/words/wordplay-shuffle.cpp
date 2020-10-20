@@ -8,14 +8,14 @@
 #include <iostream>
 #include <set>
 
-#include "../../../source/base/assert.h"
-#include "../../../source/config/command_line.h"
-#include "../../../source/config/ArgManager.h"
-#include "../../../source/tools/File.h"
-#include "../../../source/tools/math.h"
-#include "../../../source/tools/set_utils.h"
-#include "../../../source/tools/string_utils.h"
-#include "../../../source/tools/vector_utils.h"
+#include "../../../include/emp/base/assert.hpp"
+#include "../../../include/emp/config/command_line.hpp"
+#include "../../../include/emp/config/ArgManager.hpp"
+#include "../../../include/emp/io/File.hpp"
+#include "../../../include/emp/math/math.hpp"
+#include "../../../include/emp/datastructs/set_utils.hpp"
+#include "../../../include/emp/tools/string_utils.hpp"
+#include "../../../include/emp/datastructs/vector_utils.hpp"
 
 int main(int argc, char* argv[])
 {

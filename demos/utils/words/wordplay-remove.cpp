@@ -8,12 +8,12 @@
 #include <iostream>
 #include <set>
 
-#include "../../../source/base/assert.h"
-#include "../../../source/config/command_line.h"
-#include "../../../source/tools/File.h"
-#include "../../../source/tools/math.h"
-#include "../../../source/tools/set_utils.h"
-#include "../../../source/tools/string_utils.h"
+#include "../../../include/emp/base/assert.hpp"
+#include "../../../include/emp/config/command_line.hpp"
+#include "../../../include/emp/tools/File.hpp"
+#include "../../../include/emp/tools/math.hpp"
+#include "../../../include/emp/tools/set_utils.hpp"
+#include "../../../include/emp/tools/string_utils.hpp"
 
 int main(int argc, char* argv[])
 {

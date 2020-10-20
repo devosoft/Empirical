@@ -11,12 +11,12 @@
 #include <iostream>
 #include <set>
 
-#include "../../../source/base/assert.h"
-#include "../../../source/config/command_line.h"
-#include "../../../source/tools/File.h"
-#include "../../../source/tools/math.h"
-#include "../../../source/tools/set_utils.h"
-#include "../../../source/tools/string_utils.h"
+#include "../../../include/emp/base/assert.hpp"
+#include "../../../include/emp/config/command_line.hpp"
+#include "../../../include/emp/io/File.hpp"
+#include "../../../include/emp/math/math.hpp"
+#include "../../../include/emp/datastructs/set_utils.hpp"
+#include "../../../include/emp/tools/string_utils.hpp"
 
 void Rot(std::string & str, int rot) {
   for (char & c : str) {
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 
   emp::File file(args[1]);   // Load the file.
   file.CompressWhitespace(); // Remove unneeded whitespace.
-  
+
   // Transfer the file into a set.
   std::set<std::string> words;
   for (size_t i = 0; i < file.size(); i++) {

@@ -8,14 +8,14 @@
 
 #include <iostream>
 
-#include "../../../source/base/assert.h"
-#include "../../../source/base/vector.h"
-#include "../../../source/config/command_line.h"
-#include "../../../source/tools/Graph.h"
-#include "../../../source/tools/graph_utils.h"
-#include "../../../source/tools/Random.h"
-#include "../../../source/tools/random_utils.h"
-#include "../../../source/tools/string_utils.h"
+#include "../../../include/emp/base/assert.hpp"
+#include "../../../include/emp/base/vector.hpp"
+#include "../../../include/emp/config/command_line.hpp"
+#include "../../../include/emp/datastructs/Graph.hpp"
+#include "../../../include/emp/datastructs/graph_utils.hpp"
+#include "../../../include/emp/math/Random.hpp"
+#include "../../../include/emp/math/random_utils.hpp"
+#include "../../../include/emp/tools/string_utils.hpp"
 
 int GetValue(const std::string & query,
 	     emp::vector<std::string> & args,

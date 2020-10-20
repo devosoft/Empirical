@@ -2,12 +2,12 @@
 #include <map>
 #include <string>
 
-#include "base/assert.h"
-#include "config/command_line.h"
-#include "tools/Graph.h"
-#include "tools/graph_utils.h"
-#include "tools/string_utils.h"
-#include "tools/SolveState.h"
+#include "emp/base/assert.hpp"
+#include "emp/config/command_line.hpp"
+#include "emp/datastructs/Graph.hpp"
+#include "emp/datastructs/graph_utils.hpp"
+#include "emp/tools/string_utils.hpp"
+#include "emp/tools/SolveState.hpp"
 
 #include <emscripten.h>
 
@@ -42,7 +42,7 @@ bool TestSolution(const emp::SolveState & solution) {
 
 void FindInitBound() {
   emp::BitVector node_mask(graph.GetSize(), true);  // IDs of which nodes need to be decided upon.
-  
+
   while (true) {
     // Find node of max untagged degree.
     int max_degree = 0;
@@ -70,7 +70,7 @@ void FindInitBound() {
 void Solve(const emp::SolveState & in_state, int depth=0)
 {
   if (debug) std::cout << "Solve(" << depth << ")" << std::endl;
-  
+
   // Simple Bounds tests
   const int cur_count = in_state.CountIn();
   if (cur_count >= best_count) return;
@@ -85,7 +85,7 @@ void Solve(const emp::SolveState & in_state, int depth=0)
   }
 
   emp::SolveState state(in_state);                     // @CAO Cache these!
-  
+
   // Scan the remaining nodes.
   int test_id = -1;
   emp::BitVector degree_mask = ~(state.GetInVector());       // Count edges only to not-yet-included nodes.
@@ -111,7 +111,7 @@ void Solve(const emp::SolveState & in_state, int depth=0)
     const int cur_degree = graph.GetMaskedDegree(test_id, degree_mask);
     if (cur_degree > max_degree) { max_degree = cur_degree; max_id = test_id; }
   }
-  
+
   // Continue recursion... First include max degree remaining...
   state.Include(max_id);
   Solve(state, depth+1);
@@ -134,7 +134,7 @@ extern "C" int empLoadString(char * _string)
   best_count = graph.GetSize();
   best_nodes.Resize(best_count);
   best_nodes.SetAll();
-  
+
   FindInitBound();
   Solve(emp::SolveState(graph.GetSize()));
 
@@ -142,7 +142,7 @@ extern "C" int empLoadString(char * _string)
       var out_obj = document.getElementById("container");
       out_obj.innerHTML = "Result = " + $0;
   }, best_count);
-  
+
 
   return 0;
 }

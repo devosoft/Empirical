@@ -9,8 +9,8 @@
 #include <iostream>
 #include <string>
 
-#include "../../../source/base/vector.h"
-#include "../../../source/config/command_line.h"
+#include "../../../include/emp/base/vector.hpp"
+#include "../../../include/emp/config/command_line.hpp"
 
 // Test if a word has ALL of the required letters.
 bool StringOK(const std::string & letters, const std::string & word) {
@@ -57,5 +57,5 @@ int main(int argc, char* argv[])
   else {
     Process(args[1], std::cin, std::cout);
   }
-	
+
 }

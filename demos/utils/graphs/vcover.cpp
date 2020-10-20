@@ -8,13 +8,13 @@
 #include <iostream>
 #include <map>
 
-#include "../../../source/base/assert.h"
-#include "../../../source/base/vector.h"
-#include "../../../source/config/command_line.h"
-#include "../../../source/tools/Graph.h"
-#include "../../../source/tools/graph_utils.h"
-#include "../../../source/tools/string_utils.h"
-#include "../../../source/tools/SolveState.h"
+#include "../../../include/emp/base/assert.hpp"
+#include "../../../include/emp/base/vector.hpp"
+#include "../../../include/emp/config/command_line.hpp"
+#include "../../../include/emp/datastructs/Graph.hpp"
+#include "../../../include/emp/datastructs/graph_utils.hpp"
+#include "../../../include/emp/tools/string_utils.hpp"
+#include "../../../include/emp/tools/SolveState.hpp"
 
 bool verbose;   // Should we print extra information about solving progress?
 bool debug;     // Should we print extra information to help diagnose problems?
