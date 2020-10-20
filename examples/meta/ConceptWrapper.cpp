@@ -7,8 +7,8 @@
 
 #include <iostream>
 
-#include "emp/base/Ptr.h"
-#include "emp/meta/ConceptWrapper.h"
+#include "emp/base/Ptr.hpp"
+#include "emp/meta/ConceptWrapper.hpp"
 
 EMP_BUILD_CONCEPT( TestConcept, TestConcept_Base,
                    PUBLIC( int x=5; ),

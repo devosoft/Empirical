@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-#include "emp/meta/StringType.h"
+#include "emp/meta/StringType.hpp"
 
 int main()
 {
