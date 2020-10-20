@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "emp/functional/AnyFunction.h"
+#include "emp/functional/AnyFunction.hpp"
 
 int main()
 {

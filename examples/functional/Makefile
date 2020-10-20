@@ -22,8 +22,6 @@ CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../include/emp
 
 TARGETS := AnyFunction flex_function GenericFunction memo_function
 
-DATA := ../../include/emp/functional
-
 default: native
 
 CXX := $(CXX_native)
@@ -44,13 +42,13 @@ native: all
 
 all: $(TARGETS)
 
-$(TARGETS): % : %.cc $(DATA)/%.h
+$(TARGETS): % : %.cpp
 	$(CXX) $(CFLAGS_version) $(CFLAGS) $< -o $@
 
-opt-%: %.cc $(DATA)/%.h
+opt-%: %.cpp
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_opt) $< -o $@
 
-debug-%: %.cc $(DATA)/%.h
+debug-%: %.cpp
 	$(CXX) $(CFLAGS_version) $(CFLAGS_native_debug) $< -o $@
 
 clean:

@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "emp/functional/GenericFunction.h"
+#include "emp/functional/GenericFunction.hpp"
 
 int main()
 {

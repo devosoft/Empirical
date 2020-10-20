@@ -6,7 +6,7 @@
 //  Some examples code for using emp::flex_function
 
 #include <iostream>
-#include "emp/functional/flex_function.h"
+#include "emp/functional/flex_function.hpp"
 
 int Sum4(int a1, int a2, int a3, int a4) {
   return a1 + a2 + a3 + a4;
