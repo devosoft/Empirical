@@ -7,10 +7,10 @@
 
 #include <ctime>         // For std::clock
 
-#include "emp/base/vector.h"
-#include "emp/datastructs/IndexMap.h"
-#include "emp/datastructs/UnorderedIndexMap.h"
-#include "emp/math/Random.h"
+#include "emp/base/vector.hpp"
+#include "emp/datastructs/IndexMap.hpp"
+#include "emp/datastructs/UnorderedIndexMap.hpp"
+#include "emp/math/Random.hpp"
 
 constexpr size_t NUM_WEIGHTS = 1000000;
 constexpr size_t NUM_CALLS = 10000000;

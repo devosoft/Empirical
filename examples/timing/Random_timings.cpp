@@ -8,7 +8,7 @@
 #include <ctime>         // For std::clock
 #include <vector>
 
-#include "tools/Random.h"
+#include "emp/math/Random.hpp"
 
 constexpr const size_t N = 1048576; // 10^20
 
@@ -33,7 +33,7 @@ int main()
     const size_t id = random.GetUInt(buckets);
     hit_counts[id]++;
   }
-  
+
   std::clock_t total_time = std::clock() - start_time;
 
   std::cout << "Testing Random::GetUInt()."
@@ -46,7 +46,7 @@ int main()
 	      << "     hits[" << buckets-i << "] = " << hit_counts[buckets-i]
 	      << "\n";
   }
-  
+
   std::cout << " time = " << ((double) total_time) / (double) CLOCKS_PER_SEC
             << " seconds." << std::endl;
 
@@ -54,7 +54,7 @@ int main()
   //
   // Test P()
   //
-  
+
   size_t success_count = 0;
   start_time = std::clock();
 
@@ -65,7 +65,7 @@ int main()
   for (size_t i = 0; i < N_P; i++) {
     if (random.P(p)) success_count++;
   }
-  
+
   total_time = std::clock() - start_time;
 
   std::cout << "\nTesting Random::P()."
