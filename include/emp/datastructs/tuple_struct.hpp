@@ -70,6 +70,7 @@
 #include <typeindex>
 
 #include "../base/macros.hpp"
+#include "../meta/meta.hpp"
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
