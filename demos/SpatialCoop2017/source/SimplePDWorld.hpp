@@ -1,5 +1,5 @@
-#include "base/vector.h"
-#include "tools/Random.h"
+#include "emp/base/vector.hpp"
+#include "emp/math/Random.hpp"
 
 struct Org {
   double x;

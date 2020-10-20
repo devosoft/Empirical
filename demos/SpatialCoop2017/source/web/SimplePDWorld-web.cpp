@@ -2,8 +2,8 @@
 //  Copyright (C) Michigan State University, 2017.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#include "web/web.h"
-#include "../SimplePDWorld.h"
+#include "emp/web/web.hpp"
+#include "../SimplePDWorld.hpp"
 
 namespace UI = emp::web;
 
