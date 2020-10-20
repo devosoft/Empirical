@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "emp/io/File.h"
+#include "emp/io/File.hpp"
 
 int main()
 {
