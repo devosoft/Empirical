@@ -8,9 +8,9 @@
 #include <iostream>
 #include <unordered_set>
 
-#include "emp/base/vector.h"
-#include "emp/math/stats.h"
-#include "emp/tools/string_utils.h"
+#include "emp/base/vector.hpp"
+#include "emp/math/stats.hpp"
+#include "emp/tools/string_utils.hpp"
 
 int main()
 {

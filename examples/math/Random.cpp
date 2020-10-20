@@ -7,8 +7,8 @@
 
 #include <iostream>
 #include <vector>
-#include "emp/math/Random.h"
-#include "emp/math/random_utils.h"
+#include "emp/math/Random.hpp"
+#include "emp/math/random_utils.hpp"
 
 int main()
 {

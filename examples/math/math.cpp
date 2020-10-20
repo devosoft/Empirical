@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "emp/math/math.h"
+#include "emp/math/math.hpp"
 
 int main()
 {

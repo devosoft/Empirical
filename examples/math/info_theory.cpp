@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "emp/math/info_theory.h"
+#include "emp/math/info_theory.hpp"
 
 int main()
 {
