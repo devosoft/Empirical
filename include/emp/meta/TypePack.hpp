@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  TypePack.h
+ *  @file  TypePack.hpp
  *  @brief A set of types that can be manipulated at compile time (good for metaprogramming)
  *
  *  TypePacks are static structues that provide a large set of mechanisms to access and adjust

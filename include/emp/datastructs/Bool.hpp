@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  Bool.h
+ *  @file  Bool.hpp
  *  @brief A bool representation that doesn't trip up std::vector
  *  @note Status: ALPHA
  *

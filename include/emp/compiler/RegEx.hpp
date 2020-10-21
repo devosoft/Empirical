@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2019.
  *
- *  @file  RegEx.h
+ *  @file  RegEx.hpp
  *  @brief Basic regular expression handler.
  *  @note Status: BETA
  *

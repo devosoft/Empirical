@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  RawImage.h
+ *  @file  RawImage.hpp
  *  @brief Handle the fundamental loading of an image (without Widget tracking)
  */
 

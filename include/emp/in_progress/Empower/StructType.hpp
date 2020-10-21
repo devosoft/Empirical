@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  StructType.h
+ *  @file  StructType.hpp
  *  @brief StructType maps variables to a MemoryImage; Struct is an instance of StructType
  *
  *  @todo Immediately before setting a StructType to active, we can optimize variable ordering.

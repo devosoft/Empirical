@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  DataFile.h
+ *  @file  DataFile.hpp
  *  @brief DataFile objects use DataNode objects to dynamically fill out file contents.
  */
 

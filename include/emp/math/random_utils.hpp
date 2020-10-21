@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file  random_utils.h
+ *  @file  random_utils.hpp
  *  @brief Helper functions for emp::Random for common random tasks.
  *  @note Status: RELEASE
  */

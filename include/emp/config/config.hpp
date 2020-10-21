@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2019.
  *
- *  @file  config.h
+ *  @file  config.hpp
  *  @brief Maintains a set of configuration options.
  *
  *  This file defines a master configuration option Config, whose values can be loaded

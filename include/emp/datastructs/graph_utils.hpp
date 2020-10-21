@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
  *
- *  @file  graph_utils.h
+ *  @file  graph_utils.hpp
  *  @brief This file provides a number of tools for manipulating graphs.
  *  @note Status: BETA
  */

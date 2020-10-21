@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2019
  *
- *  @file  DocuExtras.h
+ *  @file  DocuExtras.hpp
  *  @brief Control the styling and attributes of an existing div without nuking
 *   the content inside it.
  *

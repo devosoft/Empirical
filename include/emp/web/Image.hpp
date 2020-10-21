@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  Image.h
+ *  @file  Image.hpp
  *  @brief Easily load an image and place it in a document.
  */
 

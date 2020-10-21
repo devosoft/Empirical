@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018-2019.
  *
- *  @file  ConceptWrapper.h
+ *  @file  ConceptWrapper.hpp
  *  @brief A template wrapper that will either enforce functionality or provide default functions.
  *
  *  Starting in future versions of C++, a concept is a set of requirements for a class to be used

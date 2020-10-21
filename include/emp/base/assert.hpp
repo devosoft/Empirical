@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2020.
  *
- *  @file assert.h
+ *  @file assert.hpp
  *  @brief A more dynamic replacement for standard library asserts.
  *  @note Status: RELEASE
  *

@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  QueueCache.h
+ *  @file  QueueCache.hpp
  *  @brief A simple implementation of a Least-Recently Used Cache.
  *		It orders elements by access time and removes the stalest ones in case maximum capacity is reached.
  */

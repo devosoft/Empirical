@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  layout.h
+ *  @file  layout.hpp
  *  @brief Tools for laying out nodes in D3.
  */
 

@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  CanvasShape.h
+ *  @file  CanvasShape.hpp
  *  @brief Define simple shapes to draw on a canvas.
  *
  *  Canvas shapes can be definied in detail, describing how they modify a canvas.

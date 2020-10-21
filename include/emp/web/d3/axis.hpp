@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018
  *
- *  @file  axis.h
+ *  @file  axis.hpp
  *  @brief Handle drawing of axes on D3 graphts.
  */
 

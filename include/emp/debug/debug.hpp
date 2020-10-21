@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  debug.h
+ *  @file  debug.hpp
  *  @brief Basic tools for use in developing high-assurance code.
  *  @note Status: BETA
  */

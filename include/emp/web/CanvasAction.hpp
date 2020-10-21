@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  CanvasAction.h
+ *  @file  CanvasAction.hpp
  *  @brief Define a base class for all actions that can be done to widgets, plus simple actions.
  *
  *  CanvasAction objects modify the appearance of a canvas and can be tracked to reconstruct the

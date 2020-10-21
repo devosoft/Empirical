@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file macros.h
+ *  @file macros.hpp
  *  @brief Generally useful macros that can perform cools tricks.
  *  @note Status: RELEASE
  *

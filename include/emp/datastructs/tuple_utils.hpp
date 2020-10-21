@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file tuple_utils.h
+ *  @file tuple_utils.hpp
  *  @brief Functions to simplify the use of std::tuple
  *  @note Status: RELEASE
  */

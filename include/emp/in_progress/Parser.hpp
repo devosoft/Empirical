@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2019.
  *
- *  @file  Parser.h
+ *  @file  Parser.hpp
  *  @brief A general-purpose, fast parser.
  *  @note Status: DEVELOPMENT
  *

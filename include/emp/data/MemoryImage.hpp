@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019
  *
- *  @file  MemoryImage.h
+ *  @file  MemoryImage.hpp
  *  @brief A managed set of Bytes to store any kind of data.
  *  @note Status: ALPHA
  *

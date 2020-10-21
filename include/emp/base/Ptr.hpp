@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2020.
  *
- *  @file Ptr.h
+ *  @file Ptr.hpp
  *  @brief A wrapper for pointers that does careful memory tracking (but only in debug mode).
  *  @note Status: BETA
  *
@@ -329,7 +329,7 @@ namespace emp {
     size_t id;                  ///< A unique ID for this pointer type.
 
     BasePtr(TYPE * in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) { }
- 
+
     static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
 
     /// Dereference a pointer.
@@ -781,25 +781,25 @@ namespace emp {
     using element_type = TYPE;
 
     /// Default constructor
-    Ptr() : BasePtr<TYPE>(nullptr) {}                                              
+    Ptr() : BasePtr<TYPE>(nullptr) {}
 
     /// Copy constructor
-    Ptr(const Ptr<TYPE> & _in) : BasePtr<TYPE>(_in.ptr) {}                         
+    Ptr(const Ptr<TYPE> & _in) : BasePtr<TYPE>(_in.ptr) {}
 
     /// Construct from raw ptr
-    template <typename T2> Ptr(T2 * in_ptr, bool=false) : BasePtr<TYPE>(in_ptr) {} 
+    template <typename T2> Ptr(T2 * in_ptr, bool=false) : BasePtr<TYPE>(in_ptr) {}
 
     /// Construct from array
-    template <typename T2> Ptr(T2 * _ptr, size_t, bool) : BasePtr<TYPE>(_ptr) {}   
+    template <typename T2> Ptr(T2 * _ptr, size_t, bool) : BasePtr<TYPE>(_ptr) {}
 
     /// From compatible Ptr
-    template <typename T2> Ptr(Ptr<T2> _in) : BasePtr<TYPE>(_in.Raw()) {}          
+    template <typename T2> Ptr(Ptr<T2> _in) : BasePtr<TYPE>(_in.Raw()) {}
 
     /// From nullptr
-    Ptr(std::nullptr_t) : Ptr() {}                                           
+    Ptr(std::nullptr_t) : Ptr() {}
 
     /// Destructor
-    ~Ptr() { ; }                                                             
+    ~Ptr() { ; }
 
     [[nodiscard]] bool IsNull() const { return ptr == nullptr; }
     [[nodiscard]] TYPE * Raw() const { return ptr; }

@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019
  *
- *  @file MapProxy.h
+ *  @file MapProxy.hpp
  *  @brief A proxy for indecies returned from any map type to ensure they are initialized.
  *  @note Status: ALPHA
  */

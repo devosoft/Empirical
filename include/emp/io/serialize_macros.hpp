@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file serialize_macros.h
+ *  @file serialize_macros.hpp
  *  @brief Macros for simplifying to serialization of objects.
  *  @note Status: ALPHA
  */

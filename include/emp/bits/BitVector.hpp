@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2020.
  *
- *  @file  BitVector.h
+ *  @file  BitVector.hpp
  *  @brief A drop-in replacement for std::vector<bool>, with additional bitwise logic features.
  *  @note Status: RELEASE
  *

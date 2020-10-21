@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019-2020.
  *
- *  @file matchbin_metrics.h
+ *  @file matchbin_metrics.hpp
  *  @brief Metric structs that can be plugged into MatchBin.
  *
  */

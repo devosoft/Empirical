@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  Type.h
+ *  @file  Type.hpp
  *  @brief A collection of information about how to manage variables of a specified type.
  */
 

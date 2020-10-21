@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2020.
  *
- *  @file vector_utils.h
+ *  @file vector_utils.hpp
  *  @brief A set of simple functions to manipulate emp::vector
  *  @note Status: BETA
  *

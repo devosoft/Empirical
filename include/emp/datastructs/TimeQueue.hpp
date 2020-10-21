@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  TimeQueue.h
+ *  @file  TimeQueue.hpp
  *  @brief A priority queue for timings, always marching forward.
  *  @note Status: ALPHA
  *

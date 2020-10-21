@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019-2020.
  *
- *  @file matchbin_regulators.h
+ *  @file matchbin_regulators.hpp
  *  @brief Regulator structs that can be plugged into MatchBin.
  *
  */

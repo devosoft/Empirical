@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  Style.h
+ *  @file  Style.hpp
  *  @brief A CSS class for tracking font style, etc.
  */
 

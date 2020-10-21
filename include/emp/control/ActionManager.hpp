@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file  Action.h
+ *  @file  Action.hpp
  *  @brief ActionManager collects sets of Actions to be looked up or manipulated later.
  *  @note Status: Beta
  */

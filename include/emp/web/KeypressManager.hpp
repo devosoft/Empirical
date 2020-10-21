@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  KeypressManager.h
+ *  @file  KeypressManager.hpp
  *  @brief KeypressManager is a tracker for keypresses in HTML5 pages.
  *
  *  When a KeypressManager is created, it can be given functions to run in response

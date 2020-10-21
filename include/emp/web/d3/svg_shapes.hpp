@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  svg_shapes.h
+ *  @file  svg_shapes.hpp
  *  @brief Tools to build common SVG shapes.
  */
 

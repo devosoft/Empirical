@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  config_utils.h
+ *  @file  config_utils.hpp
  *  @brief Helper functions for working with emp::Config objects.
  *
  */

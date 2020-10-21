@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  MemoryImage.h
+ *  @file  MemoryImage.hpp
  *  @brief A collection of arbitrary objects stored in a chunk of memory.
  */
 

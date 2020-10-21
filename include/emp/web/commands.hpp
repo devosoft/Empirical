@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  commands.h
+ *  @file  commands.hpp
  *  @brief A set of command-defining classes that can be fed into widgets using the << operator.
  */
 

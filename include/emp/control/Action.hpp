@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file  Action.h
+ *  @file  Action.hpp
  *  @brief A mechanism to abstract functions from their underlying type and provide run-time names.
  *  @note Status: Beta
  *

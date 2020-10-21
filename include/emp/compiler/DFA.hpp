@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file  DFA.h
+ *  @file  DFA.hpp
  *  @brief A Deterministic Finite Automata simulator.
  *  @note Status: BETA
  */

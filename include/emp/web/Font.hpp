@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  Font.h
+ *  @file  Font.hpp
  *  @brief Maintains basic information about a font to be used in HTML.
  */
 

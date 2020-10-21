@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
  *
- *  @file  Graph.h
+ *  @file  Graph.hpp
  *  @brief A simple, fast class for managing verticies (nodes) and edges.
  *  @note Status: BETA
  */

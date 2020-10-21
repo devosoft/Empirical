@@ -4,7 +4,7 @@
  *  @date 2017-2018
  *  @note Originally called PopulationIterator.h
  *
- *  @file  World_iterator.h
+ *  @file  World_iterator.hpp
  *  @brief This file defines iterators for use with emp::World objects.
  *
  *  @todo Add a const interator.

@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  Attributes.h
+ *  @file  Attributes.hpp
  *  @brief An Attributes class for tracking non-style features about HTML objects
  */
 

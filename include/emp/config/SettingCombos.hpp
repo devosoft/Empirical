@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  SettingCombos.h
+ *  @file  SettingCombos.hpp
  *  @brief A tool for exploring all parameter combinations
  *  @note Status: ALPHA
  */

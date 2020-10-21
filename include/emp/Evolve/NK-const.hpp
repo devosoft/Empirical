@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file  NK-const.h
+ *  @file  NK-const.hpp
  *  @brief This file provides code to build NK landscapes, setup at compile time..
  *
  *  Knowing the size of N and K at compile time allow for slightly more optimized code, at the

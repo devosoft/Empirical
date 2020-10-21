@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  emfunctions.h
+ *  @file  emfunctions.hpp
  *  @brief Specialized, useful function for Empirical.
  */
 

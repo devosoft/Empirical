@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file  flex_function.h
+ *  @file  flex_function.hpp
  *  @brief Based on std::function, but holds default parameter values for calls with fewer args.
  *  @note Status: ALPHA
  */

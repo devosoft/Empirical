@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  VarInfo.h
+ *  @file  VarInfo.hpp
  *  @brief Generic info about a single variable (across MemoryImages)
  */
 

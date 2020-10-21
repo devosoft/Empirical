@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  Text.h
+ *  @file  Text.hpp
  *  @brief Specs for the Text widget.
  *
  *  A representation of text on a web page.  Text Widgets can be included inside of Divs or

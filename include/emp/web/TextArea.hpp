@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  TextArea.h
+ *  @file  TextArea.hpp
  *  @brief Specs for the TextArea widget.
  *
  *

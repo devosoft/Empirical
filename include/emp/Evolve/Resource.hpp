@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  Resource.h
+ *  @file  Resource.hpp
  *  @brief Implement resource-based selection.
  *
  *

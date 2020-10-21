@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018-2020.
  *
- *  @file  DataMap.h
+ *  @file  DataMap.hpp
  *  @brief A DataMap links names to arbitrary object types.
  *  @note Status: ALPHA
  *

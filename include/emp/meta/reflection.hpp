@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  reflection.h
+ *  @file  reflection.hpp
  *  @brief Macros and template utilities to help determine details about unknown classes.
  */
 

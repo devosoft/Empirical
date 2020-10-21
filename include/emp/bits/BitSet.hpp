@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  BitSet.h
+ *  @file  BitSet.hpp
  *  @brief A drop-in replacement for std::bitset, with additional bit magic features.
  *  @note Status: RELEASE
  *

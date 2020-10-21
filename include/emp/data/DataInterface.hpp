@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  DataInterface.h
+ *  @file  DataInterface.hpp
  *  @brief DataInterface is a *generic* interface to a DataNode.
  */
 

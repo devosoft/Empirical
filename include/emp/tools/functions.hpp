@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  flex_function.h
+ *  @file  flex_function.hpp
  *  @brief A collection of broadly-useful functions (that don't fit elsewhere)
  *  @note Status: BETA (though new functions are added frequently)
  */

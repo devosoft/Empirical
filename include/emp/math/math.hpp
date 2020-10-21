@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2020.
  *
- *  @file  math.h
+ *  @file  math.hpp
  *  @brief Useful mathematical functions (that are constexpr when possible.)
  *  @note Status: BETA (though new functions are added frequently)
  */

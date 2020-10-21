@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  Listeners.h
+ *  @file  Listeners.hpp
  *  @brief A class for tracking font event listeners for Widgets
  */
 

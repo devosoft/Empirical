@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  Action.h
+ *  @file  Action.hpp
  *  @brief Allow functions to be bundled (as Actions) and triggered enmasse.
  *  @note Status: Beta
  *

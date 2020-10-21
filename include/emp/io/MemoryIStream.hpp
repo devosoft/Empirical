@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  MemoryIStream.h
+ *  @file  MemoryIStream.hpp
  *  @brief Useful for streaming data from contiguous memory.
  *  @note Status: RELEASE
  */

@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  IndexMap.h
+ *  @file  IndexMap.hpp
  *  @brief A simple class to weight items differently within a container and return the correct index.
  *  @note Status: BETA
  *

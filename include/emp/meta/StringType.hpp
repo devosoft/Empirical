@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018-2019
  *
- *  @file  StringType.h
+ *  @file  StringType.hpp
  *  @brief A type that maintains compile-time information about a string sequence.
  *
  *  DEVELOPER NOTES

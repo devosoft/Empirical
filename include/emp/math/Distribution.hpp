@@ -3,22 +3,22 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018-2020.
  *
- *  @file  Distribution.h
+ *  @file  Distribution.hpp
  *  @brief A set of pre-calculated discrete distributions that can quickly generate random values.
  *  @note Status: ALPHA
- * 
+ *
  *  A Distribution is a pre-calculated set of probabilities to quickly pick a whole-number result.
  *  These should be used when either we need to draw from the same distribution many time (and hence
  *  the extra time to pre-calculate it is amortized away) -or- in functions that we want to call with
  *  a range of distributions that we may not know ahead of time.
- * 
+ *
  *  Currently, we have:
- * 
+ *
  *    Uniform - All values in a range are equally likelty to be picked.
  *    Binomial - How many successes with p probability will occur in N attempts?
  *    NegativeBinomial - How many attempts to reach N successes, with p probability per attempt?
- * 
- * 
+ *
+ *
  *  Developor Notes:
  *  - We should setup an offset in the base Distribution class to ignore "impossible" low values.
  *

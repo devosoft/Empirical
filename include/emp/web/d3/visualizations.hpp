@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018
  *
- *  @file  visualizations.h
+ *  @file  visualizations.hpp
  *  @brief Tools to build D3 visualizations.
  */
 

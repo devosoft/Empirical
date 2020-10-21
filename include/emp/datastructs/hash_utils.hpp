@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019-2020
  *
- *  @file  hash_utils.h
+ *  @file  hash_utils.hpp
  *  @brief This file provides tools for hashing values and containers.
  *  @note Status: BETA
  */

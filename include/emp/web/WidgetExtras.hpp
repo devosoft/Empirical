@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  WidgetExtras.h
+ *  @file  WidgetExtras.hpp
  *  @brief A collection of extra details about HTML Widgets (attributes, style, listerns)
  */
 

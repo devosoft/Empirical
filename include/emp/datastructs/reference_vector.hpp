@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019
  *
- *  @file  reference_vector.h
+ *  @file  reference_vector.hpp
  *  @brief A version of vector that holds only references to objects.  Be careful!
  *  @note Status: ALPHA
  **/

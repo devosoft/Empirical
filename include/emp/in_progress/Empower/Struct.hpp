@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  Struct.h
+ *  @file  Struct.hpp
  *  @brief Struct is a set of active variables, grouped by name (organized by a specific StructType)
  */
 

@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  ValPack.h
+ *  @file  ValPack.hpp
  *  @brief A set of values that can be manipulated at compile time (good for metaprogramming)
  *
  *  Any built-in type can be added to ValPack to be manipulated at compile time.

@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2020.
  *
- *  @file string_utils.h
+ *  @file string_utils.hpp
  *  @brief Simple functions to manipulate strings.
  *  @note Status: RELEASE
  */

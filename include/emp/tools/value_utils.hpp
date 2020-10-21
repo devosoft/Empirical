@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019
  *
- *  @file value_utils.h
+ *  @file value_utils.hpp
  *  @brief Simple functions to manipulate values.
  *  @note Status: ALPHA
  */

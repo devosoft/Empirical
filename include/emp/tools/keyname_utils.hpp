@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019
  *
- *  @file keyname_utils.h
+ *  @file keyname_utils.hpp
  *  @brief Utility functions that support the keyname file naming convention.
  *
  *  Plays nice with the Python package keyname.

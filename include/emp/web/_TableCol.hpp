@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018.
  *
- *  @file  _TableCol.h
+ *  @file  _TableCol.hpp
  *  @brief The TableCol widget, which behaves like the Table widget, but focuses on a single column.
  *
  *  DO NOT include this file directly.  All files begining with '_' are for internal use only.

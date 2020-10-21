@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  ascii_utils.h
+ *  @file  ascii_utils.hpp
  *  @brief Tools for working with ascii output.
  *  @note  Status: ALPHA
  *

@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2019.
  *
- *  @file  Widget.h
+ *  @file  Widget.hpp
  *  @brief Widgets maintain individual components on a web page and link to Elements
  *
  *  Each HTML Widget has all of its details stored in a WidgetInfo object; Multiple Widgets can

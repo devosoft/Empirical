@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2017
  *
- *  @file  map_utils.h
+ *  @file  map_utils.hpp
  *  @brief A set of simple functions to manipulate maps.
  *  @note Status: BETA
  */

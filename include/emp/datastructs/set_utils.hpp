@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file set_utils.h
+ *  @file set_utils.hpp
  *  @brief Tools to save and load data from classes.
  *  @note Status: ALPHA
  */

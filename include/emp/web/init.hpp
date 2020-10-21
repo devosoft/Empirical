@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018.
  *
- *  @file  init.h
+ *  @file  init.hpp
  *  @brief Define Initialize() and other functions to set up Empirical to build Emscripten projects.
  */
 

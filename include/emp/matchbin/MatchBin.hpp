@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file MatchBin.h
+ *  @file MatchBin.hpp
  *  @brief A container that supports flexible tag-based lookup. .
  *
  */
@@ -538,14 +538,14 @@ namespace emp {
     // have to define this manually due to mutexes
     MatchBin(const MatchBin &other)
     : state( other.state )
-    , uid_stepper( other.uid_stepper ) 
+    , uid_stepper( other.uid_stepper )
     , metric( other.metric )
     , selector( other.selector ) { }
 
     // have to define this manually due to mutexes
     MatchBin(MatchBin &&other)
     : state( std::move(other.state) )
-    , uid_stepper( std::move(other.uid_stepper) ) 
+    , uid_stepper( std::move(other.uid_stepper) )
     , metric( std::move(other.metric) )
     , selector( std::move(other.selector) ) { }
 

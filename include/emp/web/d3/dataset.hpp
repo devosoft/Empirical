@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  dataset.h
+ *  @file  dataset.hpp
  *  @brief Tools to maintain data in D3.
  */
 

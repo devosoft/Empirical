@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  Alert.h
+ *  @file  Alert.hpp
  *  @brief Define an Alert function that goes to std::cerr in c++ or to Alert() in Javascript.
  *  @note Status: RELEASE
  */

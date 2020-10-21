@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018-2019.
  *
- *  @file StringMap.h
+ *  @file StringMap.hpp
  *  @brief An std::unordered_map wrapper that deals smootly with strigns and fast compile-time optimizations.
  *  @note Status: ALPHA
  *

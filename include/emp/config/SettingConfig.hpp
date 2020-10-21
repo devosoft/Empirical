@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  SettingConfig.h
+ *  @file  SettingConfig.hpp
  *  @brief A tool for collecting settings, including from files and the command line.
  *  @note Status: DEPRECATED!
  */

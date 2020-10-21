@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file TypeTracker.h
+ *  @file TypeTracker.hpp
  *  @brief Track class types abstractly to dynamically call correct function overloads.
  *  @note Status: BETA
  *

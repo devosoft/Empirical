@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2019
  *
- *  @file  ContiguousStream.h
+ *  @file  ContiguousStream.hpp
  *  @brief Useful for streaming data to contiguous memory.
  *  @note Status: RELEASE
  */

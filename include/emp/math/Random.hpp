@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2020.
  *
- *  @file  Random.h
+ *  @file  Random.hpp
  *  @brief A versatile and non-patterned pseudo-random-number generator.
  *  @note Status: RELEASE
  */

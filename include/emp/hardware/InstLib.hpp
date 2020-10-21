@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017
  *
- *  @file  InstLib.h
+ *  @file  InstLib.hpp
  *  @brief This file maintains information about instructions availabel in virtual hardware.
  */
 

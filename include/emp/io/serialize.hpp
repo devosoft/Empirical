@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2019
  *
- *  @file serialize.h
+ *  @file serialize.hpp
  *  @brief Tools to save and load data from classes.
  *  @note Status: ALPHA
  *

@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018
  *
- *  @file  World_select.h
+ *  @file  World_select.hpp
  *  @brief Functions for popular selection methods applied to worlds.
  */
 

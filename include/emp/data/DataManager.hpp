@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018
  *
- *  @file  DataManager.h
+ *  @file  DataManager.hpp
  *  @brief DataManager handles a set of DataNode objects with the same tracking settings.
  */
 

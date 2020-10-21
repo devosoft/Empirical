@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2017
  *
- *  @file  Tween.h
+ *  @file  Tween.hpp
  *  @brief A Tween manages the gradual shift in properties of one or more widgets over time.
  *
  *  To create a Tween, a duration must be specified, along with an optional default

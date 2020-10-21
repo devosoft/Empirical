@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020.
  *
- *  @file optional.h
+ *  @file optional.hpp
  *  @brief Audited implementation of std::optional.
  *  @note Status: RELEASE
  *

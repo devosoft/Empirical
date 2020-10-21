@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  Input.h
+ *  @file  Input.hpp
  *  @brief Create/control an HTML input and call a specified function when it recieves input.
  *
  *  Use example:

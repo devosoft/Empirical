@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file array.h
+ *  @file array.hpp
  *  @brief A drop-in wrapper for std::array; adds on bounds checking in debug mode.
  *  @note Status: RELEASE
  *
