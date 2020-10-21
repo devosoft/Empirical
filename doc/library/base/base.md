@@ -21,7 +21,7 @@ using it.
 ### emp::vector Example
 
 ```cpp
-#include "Empirical/include/emp/base/vector.h"
+#include "Empirical/include/emp/base/vector.hpp"
 
 emp::vector<int> vec({1,2,3});
 // You can treat this just like an std::vector<int>
@@ -30,7 +30,7 @@ emp::vector<int> vec({1,2,3});
 ### emp::array Example
 
 ```cpp
-#include "Empirical/include/emp/base/array.h"
+#include "Empirical/include/emp/base/array.hpp"
 
 emp::array<int, 3> array({1,2,3});
 // You can treat this just like an std::array<int, 3>
@@ -51,7 +51,7 @@ does not abort. (useful for unit tests of asserts)
 Example:
 
 ```cpp
-#include "Empirical/include/emp/base/assert.h"
+#include "Empirical/include/emp/base/assert.hpp"
 
 int a = 6;
 emp_assert(a==5, a);
@@ -60,7 +60,7 @@ emp_assert(a==5, a);
 When compiled in debug mode (i.e. without the -DNDEBUG flag), this will
 trigger an assertion error and print the value of a.
 
-### emp_assert API (base/assert.h)
+### emp_assert API (base/assert.hpp)
 
 % ```{doxygendefine} emp_assert
 % :project: Empirical
@@ -91,7 +91,7 @@ easily in a debugger.
 Example:
 
 ```cpp
-#include "Empirical/include/emp/base/Ptr.h"
+#include "Empirical/include/emp/base/Ptr.hpp"
 
 emp::Ptr<int> int_ptr;
 int_ptr.New(123456); // Store the value 123456 in int_ptr.
