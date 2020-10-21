@@ -51,7 +51,7 @@ an interface, and most of it can be controlled via C++.
 Here is the `Example.cc` file:
 
 ```cpp
-#include "web/web.h"
+#include "emp/web/web.hpp"
 
 namespace UI = emp::web;
 
@@ -78,7 +78,7 @@ do is compile. The provided Makefile can be run by typing
 `make Example.js`. This will trigger:
 
 ```shell
-emcc -std=c++17 -Wall -Wno-unused-function -I../../source/ -Os -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']" -s TOTAL_MEMORY=67108864 --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1 Example.cc -o Example.js
+emcc -std=c++17 -Wall -Wno-unused-function -I../../include/emp/ -Os -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']" -s TOTAL_MEMORY=67108864 --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s NO_EXIT_RUNTIME=1 Example.cc -o Example.js
 ```
 
 -   emscripten uses the `emcc` compiler (or `em++`, since we are using
@@ -90,7 +90,7 @@ emcc -std=c++17 -Wall -Wno-unused-function -I../../source/ -Os -s "EXTRA_EXPORTE
     except for unused functions, since not all library functions are
     going to be used.
 
--   `-I../../source/` : The compiled file is two directories up in the
+-   `-I../../include/` : The compiled file is two directories up in the
     Empirical library, so this flag properly includes the source files.
 
 -   `-Os` : Optimize for size, though `-O3` may perform better in some
@@ -99,7 +99,7 @@ emcc -std=c++17 -Wall -Wno-unused-function -I../../source/ -Os -s "EXTRA_EXPORTE
 -   `-s TOTAL_MEMORY=67108864` : Make sure we have enough memory; in
     this case reserve 64 MB.
 
--   `--js-library ../../source/web/library_emp.js` : Load Empirical JS
+-   `--js-library ../../include/emp/web/library_emp.js` : Load Empirical JS
     functions that we might need.
 
 -   `-s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']"` : Make sure
