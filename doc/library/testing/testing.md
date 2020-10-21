@@ -3,6 +3,6 @@
 ## Unit Testing
 
 ```{eval-rst}
-.. doxygenfile:: tools/unit_tests.h
+.. doxygenfile:: emp/testing/unit_tests.hpp
   :project: Empirical
 ```

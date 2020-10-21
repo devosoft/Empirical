@@ -3,62 +3,62 @@
 ## Combinations
 
 ```{eval-rst}
-.. doxygenfile:: tools/combos.h
+.. doxygenfile:: emp/math/combos.hpp
   :project: Empirical
 ```
 
 ## Constants
 
 ```{eval-rst}
-.. doxygenfile:: tools/const.h
+.. doxygenfile:: emp/math/constants.hpp
   :project: Empirical
 ```
 
 ## Information Theory Tools
 
 ```{eval-rst}
-.. doxygenfile:: tools/info_theory.h
+.. doxygenfile:: emp/math/info_theory.hpp
   :project: Empirical
 ```
 
 ## Math
 
 ```{eval-rst}
-.. doxygenfile:: tools/math.h
+.. doxygenfile:: emp/math/math.hpp
   :project: Empirical
 ```
 
 ## Randomness Utilites
 
 ```{eval-rst}
-.. doxygenfile:: tools/random_utils.h
+.. doxygenfile:: emp/math/random_utils.hpp
   :project: Empirical
 ```
 
 ## Random Number Generator
 
 ```{eval-rst}
-.. doxygenfile:: tools/Random.h
+.. doxygenfile:: emp/math/Random.hpp
   :project: Empirical
 ```
 
 ## Range
 
 ```{eval-rst}
-.. doxygenfile:: tools/Range.h
+.. doxygenfile:: emp/math/Range.hpp
   :project: Empirical
 ```
 
 ## Sequence Utilities
 
 ```{eval-rst}
-.. doxygenfile:: tools/sequence_utils.h
+.. doxygenfile:: emp/math/sequence_utils.hpp
   :project: Empirical
 ```
 
 ## Statistics Tools
 
 ```{eval-rst}
-.. doxygenfile:: tools/stats.h
+.. doxygenfile:: emp/math/stats.hpp
   :project: Empirical
 ```

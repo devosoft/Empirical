@@ -3,34 +3,34 @@
 ## Deterministic Finite Automata
 
 ```{eval-rst}
-.. doxygenfile:: tools/DFA.h
+.. doxygenfile:: emp/compiler/DFA.hpp
   :project: Empirical
 ```
 
 ## Lexer Utilities
 
 ```{eval-rst}
-.. doxygenfile:: tools/lexer_utils.h
+.. doxygenfile:: emp/compiler/lexer_utils.hpp
   :project: Empirical
 ```
 
 ## Lexer
 
 ```{eval-rst}
-.. doxygenfile:: tools/Lexer.h
+.. doxygenfile:: emp/compiler/Lexer.hpp
   :project: Empirical
 ```
 
 ## NonDeterministic Finite Automata
 
 ```{eval-rst}
-.. doxygenfile:: tools/NFA.h
+.. doxygenfile:: emp/compiler/NFA.hpp
   :project: Empirical
 ```
 
 ## Regular Expressions
 
 ```{eval-rst}
-.. doxygenfile:: tools/RegEx.h
+.. doxygenfile:: emp/compiler/RegEx.hpp
   :project: Empirical
 ```

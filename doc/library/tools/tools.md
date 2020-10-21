@@ -3,27 +3,27 @@
 ## Functions
 
 ```{eval-rst}
-.. doxygenfile:: tools/functions.h
+.. doxygenfile:: emp/tools/functions.hpp
   :project: Empirical
 ```
 
 ## Branch and Bound Solution States
 
 ```{eval-rst}
-.. doxygenfile:: tools/SolveState.h
+.. doxygenfile:: emp/tools/SolveState.hpp
   :project: Empirical
 ```
 
 ## String Utilities
 
 ```{eval-rst}
-.. doxygenfile:: tools/string_utils.h
+.. doxygenfile:: emp/tools/string_utils.hpp
   :project: Empirical
 ```
 
 ## Type Tracker
 
 ```{eval-rst}
-.. doxygenfile:: tools/TypeTracker.h
+.. doxygenfile:: emp/tools/TypeTracker.hpp
   :project: Empirical
 ```

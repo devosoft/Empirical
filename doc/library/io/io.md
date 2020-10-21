@@ -3,20 +3,20 @@
 ## Inmemory Files
 
 ```{eval-rst}
-.. doxygenfile:: tools/File.h
+.. doxygenfile:: emp/io/File.hpp
   :project: Empirical
 ```
 
 ## Serialization Macros
 
 ```{eval-rst}
-.. doxygenfile:: tools/serialize_macros.h
+.. doxygenfile:: emp/io/serialize_macros.hpp
   :project: Empirical
 ```
 
 ## Serialization Tools
 
 ```{eval-rst}
-.. doxygenfile:: tools/serialize.h
+.. doxygenfile:: emp/io/serialize.hpp
   :project: Empirical
 ```

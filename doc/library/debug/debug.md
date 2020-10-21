@@ -3,27 +3,27 @@
 ## Alert
 
 ```{eval-rst}
-.. doxygenfile:: tools/alert.h
+.. doxygenfile:: emp/debug/alert.hpp
   :project: Empirical
 ```
 
 ## Debugging Tools
 
 ```{eval-rst}
-.. doxygenfile:: tools/debug.h
+.. doxygenfile:: emp/debug/debug.hpp
   :project: Empirical
 ```
 
 ## Errors
 
 ```{eval-rst}
-.. doxygenfile:: tools/errors.h
+.. doxygenfile:: emp/debug/errors.hpp
   :project: Empirical
 ```
 
 ## Memory Tracking
 
 ```{eval-rst}
-.. doxygenfile:: tools/mem_track.h
+.. doxygenfile:: emp/debug/mem_track.hpp
   :project: Empirical
 ```

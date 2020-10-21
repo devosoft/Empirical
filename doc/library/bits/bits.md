@@ -3,27 +3,27 @@
 ## BitMatrix
 
 ```{eval-rst}
-.. doxygenfile:: tools/BitMatrix.h
+.. doxygenfile:: emp/bits/BitMatrix.hpp
   :project: Empirical
 ```
 
 ## BitSet
 
 ```{eval-rst}
-.. doxygenfile:: tools/BitSet.h
+.. doxygenfile:: emp/bits/BitSet.hpp
   :project: Empirical
 ```
 
 ## BitSet Utilities
 
 ```{eval-rst}
-.. doxygenfile:: tools/bitset_utils.h
+.. doxygenfile:: emp/bits/bitset_utils.hpp
   :project: Empirical
 ```
 
 ## BitVector
 
 ```{eval-rst}
-.. doxygenfile:: tools/BitVector.h
+.. doxygenfile:: emp/bits/BitVector.hpp
   :project: Empirical
 ```
