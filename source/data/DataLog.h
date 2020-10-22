@@ -19,6 +19,7 @@
 #include "../base/vector.h"
 #include "../tools/ascii_utils.h"
 #include "../tools/vector_utils.h"
+#include "../tools/stats.h"
 
 namespace emp {
 
@@ -48,9 +49,12 @@ namespace emp {
     DataLog & Push(T in) { data.push_back(in); return *this; }
     DataLog & Sort() { emp::Sort(data); return *this; }
 
-    T Min() { emp::FindMin(data); }
-    T Max() { emp::FindMax(data); }
-    T Mean() { emp::CalcMean(data); }
+    T Min() const { emp::FindMin(data); }
+    T Max() const { emp::FindMax(data); }
+    T Mean() const { emp::Mean(data); }
+    T Variance() const { emp::Variance(data); }
+    T StdDev() const { emp::StandardDeviation(data); }
+    T StdError() const { emp::StandardError(data); }
 
     /// The following function prints an ascii bar graph on to the screen (or provided stream).
     void AsciiBarGraph( size_t max_width=80,          ///< What's the widest bars allowed?
@@ -70,7 +74,7 @@ namespace emp {
     {
       emp::AsciiHistogram(data, num_bins, max_width, show_scale, os);
     }
-  };   
+  };
 }
 
 #endif

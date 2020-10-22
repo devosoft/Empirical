@@ -12,13 +12,26 @@
 
 #include "Systematics.h"
 
-
 // Mutation info functions. Assumes each taxon has a struct containing an unordered map
 // with keys that are strings indicating types of mutations and keys that are numbers
 // indicating the number of that type of mutation that occurred to make this taxon from
 // the parent.
 
 namespace emp {
+
+    template<typename systematics_t>
+    Ptr<typename systematics_t::taxon_t> FindDominant(systematics_t & s) {
+        double best = -999999;
+        Ptr<typename systematics_t::taxon_t> best_tax = nullptr;
+        for (Ptr<typename systematics_t::taxon_t> tax : s.GetActive()) {
+            double f = tax->GetData().GetFitness();
+            if (f > best) {
+                best = f;
+                best_tax = tax;
+            }
+        }
+        return best_tax;
+    }
 
     /// Returns the total number of times a mutation of type @param type
     /// that along @param taxon 's lineage. (Different from CountMuts in
@@ -142,18 +155,14 @@ namespace emp {
     /// along @param taxon 's lineage.
     template <typename taxon_t>
     int CountUniquePhenotypes(Ptr<taxon_t> taxon) {
-        int count = 0;
         std::set<decltype(taxon->GetData().phenotype)> seen;
 
         while (taxon) {
-            if (!Has(seen, taxon->GetData().phenotype)) {
-                count++;
-                seen.insert(taxon->GetData().phenotype);
-            }
+            seen.insert(taxon->GetData().phenotype);
             taxon = taxon->GetParent();
         }
 
-        return count;
+        return seen.size();
     }
 
 };

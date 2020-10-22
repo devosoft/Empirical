@@ -644,7 +644,7 @@ TEST_CASE("Test matchbin_utils", "[tools]")
     // Fails with random seed 1, passes with other random seeds (2 & 3)
     // Failure on seed 1 appears stochastic, but we should investigate further and
     // clean up this test.
-    emp::Random rand(3);
+    emp::Random rand(1);
 
   emp::MatchBin<
     std::string,
@@ -664,11 +664,13 @@ TEST_CASE("Test matchbin_utils", "[tools]")
   REQUIRE( bin.ViewRegulator(hi) == 0.0 );
   REQUIRE( bin.ViewRegulator(salut) == 0.0 );
 
+  // baseline, "salut" should match much better
   auto res = bin.GetVals(bin.Match(0, ndraws));
   const size_t count = std::count(std::begin(res), std::end(res), "salut");
-  REQUIRE( count > ndraws/2);
+  REQUIRE( count > ndraws/2 );
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
 
+  // downregulate "salut," now "hi" should match better
   bin.AdjRegulator(salut, 20.0); // downregulate
   REQUIRE( bin.ViewRegulator(salut) == 20.0 );
   REQUIRE( bin.ViewRegulator(hi) == 0.0 );
@@ -676,6 +678,7 @@ TEST_CASE("Test matchbin_utils", "[tools]")
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
 
+  // upregulate both, "hi" should still match better
   bin.AdjRegulator(hi, -20.0); // upregulate
   bin.AdjRegulator(salut, -20.0); // upregulate
   REQUIRE( bin.ViewRegulator(salut) == 0.0 );
@@ -684,6 +687,7 @@ TEST_CASE("Test matchbin_utils", "[tools]")
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
 
+  // set salut and hi regulators, salut hi should still match better
   bin.SetRegulator(salut, 2.0); // downregulate
   bin.SetRegulator(hi, -2.0); // upregulate
   REQUIRE( bin.ViewRegulator(salut) == 2.0 );
@@ -693,6 +697,8 @@ TEST_CASE("Test matchbin_utils", "[tools]")
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") > 0 );
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > ndraws/2 );
 
+  // set salut and hi regulators, now salut should match better
+  // and should match even better than it at the top
   bin.SetRegulator(salut, -1.0); // upregulate
   bin.SetRegulator(hi, 1.0); // downregulate
   REQUIRE( bin.ViewRegulator(salut) == -1.0 );
@@ -702,27 +708,35 @@ TEST_CASE("Test matchbin_utils", "[tools]")
   REQUIRE( hi_count > count );
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
 
+  // reverse-decay regulator, regulator values should be unaffected
   bin.DecayRegulator(salut, -2);
   REQUIRE( bin.ViewRegulator(salut) == -1.0 );
   REQUIRE( bin.ViewRegulator(hi) == 1.0 );
 
+  // salut should still match even better than it at the top
   res = bin.GetVals(bin.Match(0, ndraws));
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
 
+  // decay the salut regulator but not the hi regulator
   bin.DecayRegulator(salut, 1);
   bin.DecayRegulator(hi, 0);
   REQUIRE( bin.ViewRegulator(salut) == -1.0 );
   REQUIRE( bin.ViewRegulator(hi) == 1.0 );
 
+  // salut should still match even better than it did at the top
   res = bin.GetVals(bin.Match(0, ndraws));
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") > count );
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );
 
+  // decay the regulators down to baseline
   bin.DecayRegulator(salut, 500);
   bin.DecayRegulators();
   REQUIRE( bin.ViewRegulator(salut) == 0.0 );
   REQUIRE( bin.ViewRegulator(hi) == 0.0 );
+  // salut should match better than hi, but not as well as it did when it was
+  // upregulated
+  res = bin.GetVals(bin.Match(0, ndraws));
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") > ndraws/2 );
   REQUIRE( std::count(std::begin(res), std::end(res), "salut") < hi_count );
   REQUIRE( std::count(std::begin(res), std::end(res), "hi") > 0 );

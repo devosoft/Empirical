@@ -71,6 +71,7 @@ namespace emp {
         : ITERATOR_T(_in), v_ptr(_v), revision(_v->revision) { ; }
       iterator_wrapper(const this_t &) = default;
       iterator_wrapper(this_t &&) = default;
+      iterator_wrapper() = default;
       ~iterator_wrapper() { ; }
 
       // Debug tools to make sure this iterator is okay.

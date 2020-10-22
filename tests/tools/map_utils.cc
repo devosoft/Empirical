@@ -3,6 +3,7 @@
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "tools/map_utils.h"
+#include "tools/vector_utils.h"
 
 #include <sstream>
 #include <iostream>
@@ -36,4 +37,13 @@ TEST_CASE("Test map_utils", "[tools]")
   REQUIRE( emp::Find(test_123, "0", "nothing") == "nothing" );
   REQUIRE( emp::Find(test_123, "1", "nothing") == "1" );
   REQUIRE( emp::FindRef(test_123, "1", "nothing") == "1" );
+
+  // Test Keys
+  emp::vector<int> key_v2 = emp::Keys(test_map);
+  REQUIRE( emp::Has(key_v2, 0) );
+  REQUIRE( emp::Has(key_v2, 4) );
+  REQUIRE( emp::Has(key_v2, 8) );
+  REQUIRE( emp::Has(key_v2, 14) );
+  REQUIRE( emp::Has(key_v2, 20) );
+  REQUIRE( key_v2.size() == 5 );
 }

@@ -19,6 +19,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_set>
+#include <algorithm>
 #include <iterator>
 #include <limits>
 #include <regex>
@@ -42,7 +43,7 @@ namespace emp {
   /// Count the number of times a specific character appears in a string
   /// (a clean shortcut to std::count)
   static inline size_t count(const std::string & str, char c) {
-    return std::count(str.begin(), str.end(), c);
+    return (size_t) std::count(str.begin(), str.end(), c);
   }
 
   /// Convert a single chararcter to one that uses a proper escape sequence (in a string) if needed.
@@ -424,6 +425,10 @@ namespace emp {
 
   /// Determine if there are only digits in a string.
   inline bool is_digits(const std::string & test_str) {
+    // If string is empty, there are no digits.
+    if (test_str.size() == 0) return false;
+
+    // Otherwise return false if any character is not a digit.
     for (char c : test_str) if (!is_digit(c)) return false;
     return true;
   }
@@ -894,6 +899,24 @@ namespace emp {
     T out_val;
     ss >> out_val;
     return out_val;
+  }
+  
+  template <typename T>
+  inline std::string join(const emp::vector<T> & v, std::string join_str) {
+    
+    if (v.size() == 0) {
+      return "";
+    } else if (v.size() == 1) {
+      return to_string(v[0]);
+    } else {
+      std::stringstream res;
+      res << v[0];
+      for (size_t i = 1; i < v.size(); i++) {
+        res << join_str;
+        res << to_string(v[i]);
+      }
+      return res.str();
+    }
   }
 
   /**

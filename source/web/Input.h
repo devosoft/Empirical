@@ -53,7 +53,7 @@ namespace web {
       std::string step = "";
 
       std::string curr_val ="";
-
+      bool show_value = false;
       bool autofocus;
 
       std::function<void(std::string)> callback;
@@ -74,7 +74,15 @@ namespace web {
       std::string GetTypeName() const override { return "InputInfo"; }
 
       virtual void GetHTML(std::stringstream & HTML) override {
+
+        // CSS from https://stackoverflow.com/questions/46695616/align-range-slider-and-label
+
         HTML.str("");                                           // Clear the current text.
+        // HTML << "<form style=\"display:flex; flex-flow:row; align-items:center;\">";                                       // Needs to be part of form for label + output to work
+        if (label != "") {                                      // Add label, if one exists
+          HTML << "<label for=\"" << id << "\"> ";
+          HTML << label <<  "</label>";
+        }
         HTML << "<input type=\"" << type << "\"";               // Indicate input type.
         if (min != "") HTML << " min=\"" << min << "\"";        // Add a min allowed value if there is one.
         if (max != "") HTML << " max=\"" << max << "\"";        // Add a max allowed value if there is one.
@@ -82,7 +90,59 @@ namespace web {
         if (step != "") HTML << " step=\"" << step << "\"";     // Add a step if there is one.
         HTML << " id=\"" << id << "\"";                         // Indicate ID.
         HTML << " onchange=\"" << onchange_info << "\"";        // Indicate action on change.
-        HTML << ">" << label << "</input>";                     // Close and label the Input.
+        HTML << ">" << "</input>";                              // Close the Input.
+        if (show_value) {
+          HTML << "<output for=" << id << "onforminput=\"value = " << id << ".valueAsNumber;\"></output>";         // Add output to show value of slider
+        }
+        // HTML << "</form>";
+      }
+
+      virtual void TriggerJS() override {
+
+        if (show_value) {
+          // Inspired by https://codepen.io/chriscoyier/pen/imdrE
+          EM_ASM_ARGS({
+
+            function modifyOffset() {
+              var el;
+              var newPlace;
+              var offset;
+              var siblings;
+              var k;
+              var width    = this.offsetWidth;
+              var newPoint = (this.value - this.getAttribute("min")) / (this.getAttribute("max") - this.getAttribute("min"));
+              offset   = -1;
+              if (newPoint < 0) { newPlace = 0;  }
+              else if (newPoint > 1) { newPlace = width; }
+              else { newPlace = width * newPoint + offset; offset -= newPoint;}
+              siblings = this.parentNode.childNodes;
+              for (var i = 0; i < siblings.length; i++) {
+                sibling = siblings[i];
+                if (sibling.id == this.id) { k = true; }
+                if ((k == true) && (sibling.nodeName == "OUTPUT")) {
+                  outputTag = sibling;
+                }
+              }
+              outputTag.innerHTML  = this.value;
+            }
+
+            function modifyInputs() {
+                
+                var input_el = document.getElementById(UTF8ToString($0));
+                input_el.addEventListener("input", modifyOffset);
+                // the following taken from http://stackoverflow.com/questions/2856513/trigger-onchange-event-manually
+                if ("fireEvent" in input_el) {
+                    input_el.fireEvent("oninput");
+                } else {
+                    var evt = document.createEvent("HTMLEvents");
+                    evt.initEvent("input", false, true);
+                    input_el.dispatchEvent(evt);
+                }
+            }
+
+            modifyInputs();
+          }, id.c_str());
+        }
       }
 
       void DoChange(std::string new_val) {
@@ -184,6 +244,7 @@ namespace web {
 
       Info()->label = in_label;
       Info()->type = in_type;
+      Info()->show_value = show_value;
       Info()->autofocus = false;
       Info()->curr_val = "";
 

@@ -25,6 +25,22 @@ TEST_CASE("Test Graph", "[tools]")
 	REQUIRE(!graph.HasEdge(2,4));
 	REQUIRE((graph.GetEdgeCount() == 1));
 	
+	// Labels
+	graph.SetLabel(1, "node 1");
+	REQUIRE(graph.GetLabel(1) == "node 1");
+
+	// Degree
+	REQUIRE(graph.GetInDegree(1) == 1);
+	REQUIRE(graph.GetInDegree(0) == 0);
+	REQUIRE(graph.GetDegree(0) == 1);
+
+	// Getters
+	emp::Graph::Node n = graph.GetNode(1);
+	REQUIRE(n.GetLabel() == "node 1");
+	emp::vector<emp::Graph::Node> nodes = graph.GetNodes();
+	REQUIRE(nodes.size() == 10);
+	REQUIRE(nodes[1].GetLabel() == "node 1");
+
 	// Assignment
 	emp::Graph g2 = graph;
 	REQUIRE((g2.GetEdgeCount() == 1));
@@ -40,7 +56,13 @@ TEST_CASE("Test Graph", "[tools]")
 	graph.AddEdge(0,3);
 	graph.AddEdge(0,6);
 	REQUIRE((graph.GetDegree(0) == 3));
-	
+	emp::BitVector bit_v(10);
+	REQUIRE(graph.GetMaskedDegree(0, bit_v) == 0);
+	bit_v.Set(3);
+	REQUIRE(graph.GetMaskedDegree(0, bit_v) == 1);
+	bit_v.Set(6);
+	REQUIRE(graph.GetMaskedDegree(0, bit_v) == 2);
+
 	// GetEdgeSet
 	emp::BitVector bv = graph.GetEdgeSet(0);
 	REQUIRE(!bv[0]);
@@ -106,6 +128,9 @@ TEST_CASE("Test Graph", "[tools]")
 	REQUIRE((wgraph.GetWeight(0,1) == 3.2));
 	REQUIRE((wgraph.GetDegree(0) == 1));
 	
+	emp::vector<emp::vector<double> > weights = wgraph.GetWeights();
+	REQUIRE(weights[0][1] == 3.2);
+
 	// AddEdgePair
 	wgraph.AddEdgePair(3, 2, 1.5);
 	REQUIRE(wgraph.HasEdgePair(3,2));

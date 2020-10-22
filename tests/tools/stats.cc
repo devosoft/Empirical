@@ -33,6 +33,10 @@ TEST_CASE("Test stats", "[tools]") {
   REQUIRE(emp::StandardDeviation(vec2) == Approx(0.5).epsilon(0.001));
   REQUIRE(emp::StandardDeviation(deque1) == Approx(1.0488).epsilon(0.001));
 
+  REQUIRE(emp::StandardError(vec1) == Approx(0.3333).epsilon(0.001));
+  REQUIRE(emp::StandardError(vec2) == Approx(0.25).epsilon(0.001));
+  REQUIRE(emp::StandardError(deque1) == Approx(0.4281).epsilon(0.001));
+
   REQUIRE(emp::Sum(vec1) == 10);
   REQUIRE(emp::Sum(vec2) == 5);
   REQUIRE(emp::Sum(deque1) == 27);

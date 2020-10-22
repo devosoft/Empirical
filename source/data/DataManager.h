@@ -86,7 +86,7 @@ namespace emp {
     /// Returns a reference to the node named @param name.
     /// Throws an error if there is no node with that name in this manager
     node_t & Get(const std::string & name) {
-      emp_assert(Has(node_map, name), name);
+      emp_assert(Has(node_map, name), name, emp::to_string(Keys(node_map)));
       return *(node_map[name]);
     }
 
@@ -104,7 +104,7 @@ namespace emp {
      * my_data_manager.AddData("my_node_name", 1, 2, 3, 4, 5);  */
     template <typename... Ts>
     void AddData(const std::string & name, Ts... extra) {
-      emp_assert(Has(node_map, name), name);
+      emp_assert(Has(node_map, name), name, emp::to_string(Keys(node_map)));
       node_map[name]->Add(extra...);
     }
 
