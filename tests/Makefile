@@ -1,4 +1,4 @@
-TEST_NAMES := base bits compiler config data datastructs debug Evolve games geometry hardware io matchbin meta scholar tools
+TEST_NAMES := base bits compiler config control data datastructs debug Evolve functional games geometry hardware io matchbin math meta scholar testing tools
 
 CXX = clang++
 #CXX := g++
