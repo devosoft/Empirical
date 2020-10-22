@@ -52,6 +52,7 @@
 #include "../tools/string_utils.h"
 #include "ConfigManager.h"
 
+
 namespace emp {
   using namespace std::placeholders;
 
@@ -186,6 +187,8 @@ namespace emp {
       ~ConfigGroup() { ; }
 
       size_t GetSize() const { return entry_set.size(); }
+      std::string GetName() const {return name;}
+      std::string GetDesc() const {return desc;}
       ConfigEntry * GetEntry(size_t id) { return entry_set[id]; }
       ConfigEntry * GetLastEntry() { emp_assert(GetSize() > 0); return entry_set.back(); }
 
@@ -376,6 +379,8 @@ namespace emp {
       for (auto & x : group_set) delete x;
       for (auto & x : type_manager_map) delete x.second;
     }
+
+    friend class ConfigWebUI;
 
     ConfigEntry * operator[](const std::string & name) { return var_map[name]; }
     auto begin() -> decltype(var_map.begin()) { return var_map.begin(); }

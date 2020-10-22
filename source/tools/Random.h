@@ -26,7 +26,7 @@ namespace emp {
 
   ///  Middle Square Weyl Sequence: A versatile and non-patterned pseudo-random-number
   ///  generator.
-  ///  Based on: https://en.wikipedia.org/wiki/Middle-square_method 
+  ///  Based on: https://en.wikipedia.org/wiki/Middle-square_method
   class Random {
   protected:
 
@@ -246,6 +246,19 @@ namespace emp {
       uint32_t k = 0;
       for (uint32_t i = 0; i < n; ++i) if (P(p)) k++;
       return k;
+    }
+
+    inline uint32_t GetRandGeometric(double p){
+      emp_assert(p >= 0 && p <= 1, "Pobabilities must be between 0 and 1");
+      // TODO: When we have warnings, add one for passing a really small number to
+      // this function. Alternatively, make this function not ludicrously slow with small numbers.
+      // Looks like return floor(ln(GetDouble())/ln(1-p)) might be sufficient?
+      if (p == 0) {
+        return std::numeric_limits<uint32_t>::infinity();
+      }
+      uint32_t result = 1;
+      while (!P(p)) { result++;}
+      return result;
     }
 
   };

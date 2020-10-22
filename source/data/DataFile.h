@@ -34,10 +34,12 @@ namespace emp {
   protected:
     using fun_t = void(std::ostream &);
     using time_fun_t = std::function<bool(size_t)>;
+    using pre_fun_t = std::function<void()>;
 
     std::string filename;            ///< Name of the file that we are printing to (if one exists)
     std::ostream * os;               ///< Stream to print to.
     FunctionSet<fun_t> funs;         ///< Set of functions to call, one per column in the file.
+    FunctionSet<void()> pre_funs; ///< Set of functions to call before calculating data.
     emp::vector<std::string> keys;   ///< Keywords associated with each column.
     emp::vector<std::string> descs;  ///< Full description for each column.
     time_fun_t timing_fun;           ///< Function to determine updates to print on (default: all)
@@ -55,12 +57,12 @@ namespace emp {
       #else
       new std::ofstream(in_filename)
       #endif
-      ), funs(), keys(), descs()
+      ), funs(), pre_funs(), keys(), descs()
       , timing_fun([](size_t){return true;})
       , line_begin(b), line_spacer(s), line_end(e) { ; }
     DataFile(std::ostream & in_os,
              const std::string & b="", const std::string & s=",", const std::string & e="\n")
-      : filename(), os(&in_os), funs(), keys(), descs(), timing_fun([](size_t){return true;})
+      : filename(), os(&in_os), funs(), pre_funs(), keys(), descs(), timing_fun([](size_t){return true;})
       , line_begin(b), line_spacer(s), line_end(e) { ; }
 
     DataFile(const DataFile &) = default;
@@ -140,6 +142,7 @@ namespace emp {
 
     /// Run all of the functions and print the results as a new line in the file
     virtual void Update() {
+      pre_funs.Run();
       *os << line_begin;
       for (size_t i = 0; i < funs.size(); i++) {
         if (i > 0) *os << line_spacer;
@@ -153,6 +156,10 @@ namespace emp {
     /// update value passes the timing function (that is, the timing function returns true).
     virtual void Update(size_t update) { if (timing_fun(update)) Update(); }
 
+
+    void AddPreFun(pre_fun_t fun) {
+      pre_funs.Add(fun);
+    }
 
     /// If a function takes an ostream, pass in the correct one.
     /// Generic function for adding a column to the DataFile. In practice, you probably
@@ -331,12 +338,17 @@ namespace emp {
     /// Requires that @param node have the data::Stats or data::FullStats modifier.
     /// @param key and @param desc will have the name of the stat appended to the beginning.
     /// Note: excludes standard deviation, because it is easily calculated from variance
+    /// Note: Setting @param pull and/or @param reset to true only pulls on first statistic 
+    /// calculated and only resets on the last. Otherwise there would be a risk of data loss or
+    /// at least massive replication of computational effort. Even still, think carefully
+    /// before setting either of these to true when you're drawing varied information from the
+    /// same node.
     template <typename VAL_TYPE, emp::data... MODS>
     void AddStats(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-      AddMean(node, "mean_" + key, "mean of " + desc, reset, pull);
-      AddMin(node, "min_" + key, "min of " + desc, reset, pull);
-      AddMax(node, "max_" + key, "max of " + desc, reset, pull);
-      AddVariance(node, "variance_" + key, "variance of " + desc, reset, pull);
+      AddMean(node, "mean_" + key, "mean of " + desc, false, pull);
+      AddMin(node, "min_" + key, "min of " + desc);
+      AddMax(node, "max_" + key, "max of " + desc);
+      AddVariance(node, "variance_" + key, "variance of " + desc, reset);
     }
 
 
@@ -345,11 +357,16 @@ namespace emp {
     /// Requires that @param node have the data::Stats or data::FullStats modifier.
     /// @param key and @param desc will have the name of the stat appended to the beginning.
     /// Note: excludes standard deviation, because it is easily calculated from variance
+    /// Note: Setting @param pull and/or @param reset to true only pulls on first statistic 
+    /// calculated and only resets on the last. Otherwise there would be a risk of data loss or
+    /// at least massive replication of computational effort. Even still, think carefully
+    /// before setting either of these to true when you're drawing varied information from the
+    /// same node.
     template <typename VAL_TYPE, emp::data... MODS>
     void AddAllStats(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-      AddStats(node, key, desc, reset, pull);
-      AddSkew(node, "skew_" + key, "skew of " + desc, reset, pull);
-      AddKurtosis(node, "kurtosis_" + key, "kurtosis of " + desc, reset, pull);
+      AddStats(node, key, desc, false, pull);
+      AddSkew(node, "skew_" + key, "skew of " + desc);
+      AddKurtosis(node, "kurtosis_" + key, "kurtosis of " + desc, reset);
     }
 
     /// Add a function that always pulls the count of the @param bin_id 'th bin of the histogram
@@ -366,6 +383,28 @@ namespace emp {
           if (reset) node.Reset();
         };
       return Add(in_fun, key, desc);
+    }
+
+    /// Add a set of functions that always pull the count of each bin of the histogram
+    /// from @param node. Requires that @param node have the data::Histogram modifier.
+    /// If @param reset is set true, we will call Reset on that DataNode after pulling the
+    /// current value from the node
+    /// Note: Setting @param pull and/or @param reset to true only pulls on first statistic 
+    /// calculated and only resets on the last. Otherwise there would be a risk of data loss or
+    /// at least massive replication of computational effort. Even still, think carefully
+    /// before setting either of these to true when you're drawing varied information from the
+    /// same node.
+    template <typename VAL_TYPE, emp::data... MODS>
+    void AddAllHistBins(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
+        bool actual_reset = false;
+        bool actual_pull = pull;
+        for (size_t i = 0; i < node.GetHistCounts().size(); i++) {
+          if (i == node.GetHistCounts().size() - 1) {
+            actual_reset = reset;
+          }
+          AddHistBin(node, i, key + "_bin_" + emp::to_string(i), desc + " bin " + emp::to_string(i), actual_reset, actual_pull);
+          actual_pull = false;
+        }
     }
 
     /// Add a function that always pulls the inferiority (mean divided by max) from the DataNode @param node.
