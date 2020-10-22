@@ -1144,7 +1144,11 @@ TEST_CASE("Small vector, iterators", "[tools]") {
     REQUIRE(*it == v2[i]);
     i--;
   }
+  //emp::SmallVectorTemplateBase<T, true>uninitialized_copy(v.begin(), v.end(), v2.begin());
+  //REQUIRE(v[0]==v2[0]);
+
 }
+
 TEST_CASE("Small vector, pointers", "[tools]") {
     emp::SmallVector<int, 4> v = {0,1,2,3};
     REQUIRE(v.front() == v[0]);
@@ -1155,3 +1159,55 @@ TEST_CASE("Small vector, pointers", "[tools]") {
     REQUIRE(v2.back() == v2[v2.size()-1]);
 }
 
+TEST_CASE("Small vector, constructors", "[tools]") {
+    // Adapted from https://en.cppreference.com/w/cpp/container/vector/vector
+    emp::SmallVector<std::string, 5> words1 {"the", "frogurt", "is", "also", "cursed"};
+    
+    // words2 == words1
+    emp::SmallVector<std::string, 5> words2(words1.begin(), words1.end());
+
+    // words3 == words1
+    emp::SmallVector<std::string, 5> words3(words1);
+
+    // words4 is {"Mo", "Mo", "Mo", "Mo", "Mo"}
+    emp::SmallVector<std::string, 5> words4(5, "Mo");
+
+    REQUIRE(words1 == words2);
+    REQUIRE(words1 == words3);
+    REQUIRE(words4[4] == "Mo");
+}
+
+TEST_CASE("Small vector, tools", "[tools]") {
+  emp::SmallVector<std::string, 3> vec = {"a", "b", "c"};
+	std::string sum;
+	for(auto it=vec.begin(); it!=vec.end(); it++){
+		sum += *it;
+	}
+	REQUIRE(sum == "abc");
+
+	/// This throws an error...
+	// because it's a reverse iterator?
+	//sum += *vec.rend();
+	//REQUIRE(sum == "abca");
+
+	//auto itr = vec.emplace(vec.begin()+1, "1");
+	//REQUIRE(*itr == "1");
+	//REQUIRE(*(itr-1) == "a");
+
+	emp::SmallVector<bool, 0> bvec;
+	bvec.resize(1);
+	REQUIRE(bvec.size() == 1);
+	bvec[0] = true;
+	REQUIRE(bvec[0] == true);
+	bvec.resize(5,false);
+	REQUIRE(bvec[1] == false);
+
+	/// Can't seem to get front() and back() to work for bool vector
+	/// throws error on this line in vector.h "size_t pos = (size_t) (*this - v_ptr->begin());"
+	//auto b = bvec.front();
+
+	emp::SmallVector<bool, 4> bvec2 = { true, false, true, false };
+	REQUIRE(bvec2.size() == 4);
+	bvec2.pop_back();
+	REQUIRE(bvec2.size() == 3);
+}
