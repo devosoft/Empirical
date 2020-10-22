@@ -6,9 +6,9 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "Evolve/OEE.hpp"
-#include "Evolve/World.hpp"
-#include "Evolve/World_output.hpp"
+#include "emp/Evolve/OEE.hpp"
+#include "emp/Evolve/World.hpp"
+#include "emp/Evolve/World_output.hpp"
 
 TEST_CASE("OEE", "[evo]") {
     emp::Random random;
