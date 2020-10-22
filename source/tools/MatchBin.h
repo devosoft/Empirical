@@ -537,7 +537,7 @@ namespace emp {
     MatchBin(const MatchBin &other)
     : state( other.state )
     , uid_stepper( other.uid_stepper )
-    , cache( other.cache) { }
+    , cache( other.cache)
     , selector( other.selector ) { }
 
     // have to define this manually due to mutexes
