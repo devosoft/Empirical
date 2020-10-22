@@ -15,6 +15,7 @@
 #include <unordered_map>
 
 #include "../base/map.hpp"
+#include "../base/vector.hpp"
 
 namespace emp {
 
@@ -22,6 +23,19 @@ namespace emp {
   template <class MAP_T, class KEY_T>
   inline bool Has( const MAP_T & in_map, const KEY_T & key ) {
     return in_map.find(key) != in_map.end();
+  }
+
+
+  template <class MAP_T>
+  inline auto Keys( const MAP_T & in_map) -> emp::vector<typename std::remove_const<decltype(in_map.begin()->first)>::type> {
+    using KEY_T = typename std::remove_const<decltype(in_map.begin()->first)>::type;
+    emp::vector<KEY_T> keys;
+    for (auto it : in_map) {
+      keys.push_back(it.first);
+    }
+
+    return keys;
+
   }
 
 

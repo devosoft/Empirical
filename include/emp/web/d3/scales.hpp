@@ -79,6 +79,24 @@ namespace D3 {
       return EM_ASM_INT({return js.objects[$0]($1);},this->id, input);
     }
 
+    /// Calculate the ouput for [input], based on the scale's scaling function
+    std::string ApplyScaleString(double input) {
+      //TODO: make this work for other types
+      char * buffer = (char *) EM_ASM_INT({
+        result = js.objects[$0]($1);
+        // console.log(result);
+        var buffer = Module._malloc(result.length+1);
+	      Module.stringToUTF8(result, buffer, result.length*4+1);
+	      return buffer;
+
+      },this->id, input);
+
+      std::string result = std::string(buffer);
+      free(buffer);
+      return result;
+
+    }
+
 
     //TODO:Getters
 

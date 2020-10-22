@@ -285,4 +285,8 @@ TEST_CASE("Another Test math", "[math]")
   REQUIRE(emp::ToRange(12345678, 10, 20) == 20);
   REQUIRE(emp::ToRange<double>(12345678, 10, 20.1) == 20.1);
   REQUIRE(emp::ToRange(12345678.0, 10.7, 20.1) == 20.1);
+
+  REQUIRE(emp::Factorial(5) == 120);
+  REQUIRE(emp::Factorial(3) == 6);
+
 }

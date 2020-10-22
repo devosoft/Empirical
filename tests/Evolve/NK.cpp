@@ -21,12 +21,13 @@ TEST_CASE("Test NK Landscapes", "[Evolve]")
 	nk0.SetState(0, 0, 1.0);
 	nk0.SetState(1, 0, 1.0);
 	nk0.SetState(2, 0, 1.0);
-	nk0.SetState(3, 0, 1.0);
+	nk0.SetState(3, 0, 2.0);
 	nk0.SetState(4, 0, 1.0);
 	emp::vector<size_t> states(5, 0);
-	REQUIRE(nk0.GetFitness(states) == 5.0);
+	REQUIRE(nk0.GetFitness(states) == 6.0);
 	emp::BitVector bv(5);
-	REQUIRE(nk0.GetFitness(bv) == 5.0);
+	REQUIRE(nk0.GetFitness(bv) == 6.0);
+	REQUIRE(nk0.GetSiteFitness(3, bv) == 2);
 	nk0.RandomizeStates(rnd, 100);
 	REQUIRE(nk0.GetFitness(0, 0) != 1.0);
 

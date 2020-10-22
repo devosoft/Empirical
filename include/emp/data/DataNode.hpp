@@ -547,6 +547,8 @@ namespace emp {
     VAL_TYPE width;               ///< How wide is the overall histogram?
     IndexMap bins;                ///< Map of values to which bin they fall in.
     emp::vector<size_t> counts;   ///< Counts in each bin.
+    size_t overflow;
+    size_t underflow;
 
     using this_t = DataNodeModule<VAL_TYPE, data::Histogram, MODS...>;
     using parent_t = DataNodeModule<VAL_TYPE, MODS...>;
@@ -555,7 +557,7 @@ namespace emp {
     using base_t::val_count;
 
   public:
-    DataNodeModule() : offset(0.0), width(0), bins(), counts() { ; }
+    DataNodeModule() : offset(0.0), width(0), bins(), counts(), overflow(0), underflow(0) { ; }
 
     /// Returns the minimum value this histogram is capable of containing
     /// (i.e. the minimum value for the first bin)
@@ -573,6 +575,14 @@ namespace emp {
 
     /// Return a vector containing the count of items in each bin of the histogram
     const emp::vector<size_t> & GetHistCounts() const { return counts; }
+
+    /// Return the count of numbers added to this histogram that were above the
+    /// upper bound on the histogram
+    int GetOverflow() const {return overflow;}
+
+    /// Return the count of numbers added to this histogram that were belowed the
+    /// allowed lower bound
+    int GetUnderflow() const {return underflow;}
 
     /// Return a vector containing the lowest value allowed in each bin.
     emp::vector<double> GetBinMins() const {
@@ -603,9 +613,15 @@ namespace emp {
 
     /// Add @param val to the DataNode
     void AddDatum(const VAL_TYPE & val) {
-      size_t bin_id = bins.Index((double) (val - offset));
-      // size_t bin_id = counts.size() * ((double) (val - offset)) / (double) width;
-      counts[bin_id]++;
+      if ((double)(val - offset) >= width) {
+        overflow++;
+      } else if (val < offset) {
+        underflow++;
+      } else {
+        size_t bin_id = bins.Index((double) (val - offset));
+        // size_t bin_id = counts.size() * ((double) (val - offset)) / (double) width;
+        counts[bin_id]++;
+      }
       parent_t::AddDatum(val);
     }
 

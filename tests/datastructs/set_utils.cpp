@@ -41,6 +41,9 @@ TEST_CASE("Test set utils", "[datastructs]") {
   comp_set.insert(2);
   REQUIRE(emp::difference(s1, v1) == comp_set);
   comp_set.clear();
+  comp_set.insert(3);
+  REQUIRE(emp::difference(v1, s1) == comp_set);
+  comp_set.clear();
   comp_set.insert(1);
   REQUIRE(emp::intersection(s1, v1) == comp_set);
   REQUIRE(emp::intersection(v1, s1) == comp_set);
@@ -83,5 +86,23 @@ TEST_CASE("Test set utils", "[datastructs]") {
   comp_set.insert(3);
   REQUIRE(emp::symmetric_difference(v1, s1) == comp_set);
   REQUIRE(emp::symmetric_difference(s1, v1) == comp_set);
+
+  std::multiset<int> m_set;
+  m_set.insert(4);
+  m_set.insert(3);
+  REQUIRE(emp::Has(m_set, 3));
+  REQUIRE(!emp::Has(m_set, 5));
+
+  std::unordered_multiset<int> um_set;
+  um_set.insert(6);
+  um_set.insert(3);
+  REQUIRE(emp::Has(um_set, 3));
+  REQUIRE(!emp::Has(um_set, 7));
+
+  std::unordered_set<int> u_set;
+  u_set.insert(9);
+  u_set.insert(7);
+  REQUIRE(emp::Has(u_set, 7));
+  REQUIRE(!emp::Has(u_set, 4));
 
 }

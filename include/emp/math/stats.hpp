@@ -23,6 +23,7 @@
 #include "../base/map.hpp"
 #include "../base/vector.hpp"
 #include "../meta/type_traits.hpp"
+#include "../datastructs/vector_utils.hpp"
 #include "math.hpp"
 
 namespace emp {
@@ -72,7 +73,7 @@ namespace emp {
 
     // Shannon entropy calculation
     double result = 0;
-    for (auto element : counts) {
+    for (auto & element : counts) {
       double p = double(element.second)/elements.size();
       result +=  p * Log2(p);
     }
@@ -88,6 +89,17 @@ namespace emp {
   emp::sfinae_decoy<double, typename C::value_type>
   Mean(C & elements) {
     return (double)Sum(elements)/ (double) elements.size();
+  }
+
+  template <typename C>
+  emp::sfinae_decoy<double, typename C::value_type>
+  Median(C elements) {
+    emp::Sort(elements);
+    if (elements.size() % 2 == 1) {
+      return elements[elements.size() / 2];
+    } else {
+      return (elements[elements.size() / 2 - 1] + elements[elements.size() / 2])/2.0;
+    }
   }
 
 

@@ -62,11 +62,15 @@ TEST_CASE("Test Random", "[math]")
 	REQUIRE(b1_result < 350);
 
   size_t b2_result = rnd.GetRandBinomial(100, 0.3);
-  REQUIRE(b2_result > 15);
-  REQUIRE(b2_result < 50);
+	REQUIRE(b2_result > 15);
+	REQUIRE(b2_result < 50);
 
-  emp::RandomStdAdaptor randomStd(rnd);
+	emp::RandomStdAdaptor randomStd(rnd);
 	REQUIRE(randomStd(4) == 3);
+
+  REQUIRE(rnd.GetRandGeometric(1) == 1);
+  REQUIRE(rnd.GetRandGeometric(0) == std::numeric_limits<uint32_t>::infinity());
+  // REQUIRE(rnd.GetRandGeometric(.25) == 8);
 }
 
 TEST_CASE("Another Test random", "[math]")
