@@ -165,10 +165,19 @@ TEST_CASE("Test DataRange", "[data]") {
     REQUIRE(data.GetPercentile(25) == 0);
     REQUIRE(data.GetPercentile(100) == 1600);
 
-    // std::cout << std::endl;
-    // data.PrintDebug();
+    std::stringstream result;
 
-    // std::cout << std::endl;
+    data.PrintDebug(result);
+    REQUIRE(result.str() == "Main DataNode.\nDataNodeModule for data::Pull. (level 8)\nDataNodeModule for data::Range. (level 4)\nDataNodeModule for data::Log. (level 2)\nDataNodeModule for data::Current. (level 0)\nBASE DataNodeModule.\n");
+    result.str("");
+
+    data.PrintLog(result);
+    REQUIRE(result.str() == "100, 200, 300, 400, 500, -800, -800, 1600, 0, 0\n");
+    result.str("");
+
+    data.Add(5);
+    data.PrintCurrent(result);
+    REQUIRE(result.str() == "5");
 
 }
 
@@ -270,16 +279,23 @@ TEST_CASE("Test DataStats", "[data]") {
 TEST_CASE("Test histogram", "[data]") {
     emp::DataNode<double, emp::data::Current, emp::data::Range, emp::data::Histogram, emp::data::Pull, emp::data::Log> data;
     data.SetupBins(1,21,10);
-    data.Add(1,2,1,19);
+    data.Add(1,2,1,19, 0, -1, 49);
 
     REQUIRE(data.GetHistMin() == 1);
     REQUIRE(data.GetHistWidth(5) == 2);
+    REQUIRE(data.GetHistMax() == 21);
 
     REQUIRE(data.GetBinMins() == emp::vector<double>({1,3,5,7,9,11,13,15,17,19}));
-
+    
+    REQUIRE(data.GetOverflow() == 1);
+    REQUIRE(data.GetUnderflow() == 2);
     REQUIRE(data.GetHistCount(9) == 1);
     REQUIRE(data.GetHistCounts() == emp::vector<size_t>({3,0,0,0,0,0,0,0,0,1}));
 
     data.Reset();
     REQUIRE(data.GetHistCounts() == emp::vector<size_t>({0,0,0,0,0,0,0,0,0,0}));
+
+    std::stringstream result;
+    data.PrintDebug(result);
+    REQUIRE(result.str() == "Main DataNode.\nDataNodeModule for data::Pull. (level 8)\nDataNodeModule for data::Histogram. (level 5)\nDataNodeModule for data::Range. (level 4)\nDataNodeModule for data::Log. (level 2)\nDataNodeModule for data::Current. (level 0)\nBASE DataNodeModule.\n");
 }

@@ -16,6 +16,20 @@
 
 namespace emp {
 
+    template <typename WORLD_TYPE, typename OEE_TYPE>
+    DataFile & AddOEEFile(WORLD_TYPE & world, OEE_TYPE & oee_tracker, const std::string fpath = "oee_data.csv") {
+        auto & file = world.SetupFile(fpath);
+        std::function<size_t(void)> get_update = [&world](){return world.GetUpdate();};
+
+        file.AddFun(get_update, "update", "Update");
+        file.AddCurrent(*oee_tracker.GetDataNode("change"), "change", "change potential");
+        file.AddCurrent(*oee_tracker.GetDataNode("novelty"), "novelty", "novelty potential");
+        file.AddCurrent(*oee_tracker.GetDataNode("diversity"), "ecology", "ecology potential");
+        file.AddCurrent(*oee_tracker.GetDataNode("complexity"), "complexity", "complexity potential");
+        file.PrintHeaderKeys();
+        return file;
+    }
+
     template <typename WORLD_TYPE>
     DataFile & AddPhylodiversityFile(WORLD_TYPE & world, int systematics_id=0, const std::string & fpath="phylodiversity.csv"){
         auto & file = world.SetupFile(fpath);

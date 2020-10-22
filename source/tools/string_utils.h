@@ -19,6 +19,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_set>
+#include <algorithm>
 #include <iterator>
 #include <limits>
 
@@ -287,7 +288,28 @@ namespace emp {
     return value;
   }
 
-  /// Convert an integer to a roman numeral string.
+  /// Make first letter of each word upper case
+  static inline std::string to_titlecase(std::string value) {
+    constexpr int char_shift = 'a' - 'A';
+    bool next_upper = true;
+    for (size_t i = 0; i < value.size(); i++) {
+      if (next_upper && value[i] >= 'a' && value[i] <= 'z') {
+        value[i] = (char) (value[i] - char_shift);
+      } else if (!next_upper && value[i] >= 'A' && value[i] <= 'Z') {
+        value[i] = (char) (value[i] + char_shift);
+      }
+
+      if (value[i] == ' ') {
+        next_upper = true;
+      } else {
+        next_upper = false;
+      }
+    }
+    return value;
+  }
+
+
+  // Convert an integer to a roman numeral string.
   static inline std::string to_roman_numeral(int val, const std::string & prefix="") {
     std::string ret_string(prefix);
     if (val < 0) ret_string += to_roman_numeral(-val, "-");
@@ -864,6 +886,24 @@ namespace emp {
     T out_val;
     ss >> out_val;
     return out_val;
+  }
+  
+  template <typename T>
+  inline std::string join(const emp::vector<T> & v, std::string join_str) {
+    
+    if (v.size() == 0) {
+      return "";
+    } else if (v.size() == 1) {
+      return to_string(v[0]);
+    } else {
+      std::stringstream res;
+      res << v[0];
+      for (size_t i = 1; i < v.size(); i++) {
+        res << join_str;
+        res << to_string(v[i]);
+      }
+      return res.str();
+    }
   }
 
 

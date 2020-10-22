@@ -27,9 +27,10 @@ namespace emp {
     class Node {
     private:
       BitVector edge_set; /// What other node IDs is this one connected to?
+      std::string label;
     public:
-      Node(size_t num_nodes) : edge_set(num_nodes) { ; }
-      Node(const Node & in_node) : edge_set(in_node.edge_set) { ; }
+      Node(size_t num_nodes) : edge_set(num_nodes), label("") { ; }
+      Node(const Node & in_node) : edge_set(in_node.edge_set), label(in_node.label) { ; }
       ~Node() { ; }
 
       /// Set this node to have the same connections as another node.
@@ -64,6 +65,15 @@ namespace emp {
 
       /// Identify how many other nodes from a provided set (a BitVector) this one is connected to.
       size_t GetMaskedDegree(const BitVector & mask) const { return (mask & edge_set).CountOnes(); }
+
+      void SetLabel(std::string lab) {
+        label = lab;
+      }
+
+      std::string GetLabel() {
+        return label;
+      }
+
     };
 
   protected:
@@ -90,6 +100,9 @@ namespace emp {
       return edge_count;
     }
 
+    Node GetNode(int i) {return nodes[i];}
+    emp::vector<Node> GetNodes(){return nodes;}
+    
     /// Change the number of vertices in this graph.
     void Resize(size_t new_size) {
       nodes.resize(new_size, new_size);
@@ -106,15 +119,42 @@ namespace emp {
     }
 
     /// Get the degree of a specified node.
+    /// For directed graphs, this is the out-degree
     size_t GetDegree(size_t id) const {
       emp_assert(id < nodes.size());
       return nodes[id].GetDegree();
+    }
+
+    /// Get the in-degree (number of incoming edges)
+    /// of the node @param id. 
+    /// This should only be used for directed graphs (for
+    /// undirected graphs, GetDegree() is equivalent and faster) 
+    size_t GetInDegree(size_t id) const {
+      size_t count = 0;
+      for (auto & node : nodes) {
+        // Node is allowed to to have edge to itself so it's
+        // okay that we don't exclude it
+        if (node.HasEdge(id)) {
+          count++;
+        }
+      }
+      return count;
     }
 
     /// Get how many of a set of nodes that a specified node is connected to.
     size_t GetMaskedDegree(size_t id, const BitVector & mask) const {
       emp_assert(id < nodes.size());
       return nodes[id].GetMaskedDegree(mask);
+    }
+
+    /// Set label of node @param id
+    void SetLabel(size_t id, std::string lab) {
+      nodes[id].SetLabel(lab);
+    }
+
+    /// Get label of node @param id
+    std::string GetLabel(size_t id) {
+      return nodes[id].GetLabel();
     }
 
     /// Determine if a specific edge is included in this graph.
@@ -288,6 +328,8 @@ namespace emp {
         }
       }
     }
+
+    emp::vector<emp::vector<double> > GetWeights(){return weights;}
 
   };
 }
