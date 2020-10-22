@@ -4,11 +4,11 @@
 #define EMP_TRACK_MEM
 #endif
 
-#include "../third-party/Catch/single_include/catch.hpp"
+#include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "Evolve/OEE.h"
-#include "Evolve/World.h"
-#include "Evolve/World_output.h"
+#include "Evolve/OEE.hpp"
+#include "Evolve/World.hpp"
+#include "Evolve/World_output.hpp"
 
 TEST_CASE("OEE", "[evo]") {
     emp::Random random;
@@ -20,13 +20,13 @@ TEST_CASE("OEE", "[evo]") {
     emp::OEETracker<emp::Systematics<int, int>> oee(sys_ptr, [](int org){return org;}, [](int org){return org;}, true);
     oee.SetResolution(1);
     oee.SetGenerationInterval(1);
-    
+
     sys_ptr->AddOrg(1, 0, 0, false);
     sys_ptr->AddOrg(2, 1, 0, false);
     sys_ptr->AddOrg(3, 2, 0, false);
     sys_ptr->PrintStatus();
     oee.Update(0);
-    
+
     // Coalescence interval hasn't passed yet
     CHECK(oee.CoalescenceFilter(0).size() == 0);
     CHECK(oee.GetDataNode("change")->GetCurrent() == 0);
@@ -39,7 +39,7 @@ TEST_CASE("OEE", "[evo]") {
     sys_ptr->AddOrg(4, 2, 1, false);
     sys_ptr->PrintStatus();
     oee.Update(1);
-    
+
     // 1 and 2 should make it through filter
     CHECK(oee.CoalescenceFilter(1).size() == 2);
     CHECK(oee.GetDataNode("change")->GetCurrent() == 2);
