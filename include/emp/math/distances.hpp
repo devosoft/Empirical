@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2017-2018
  *
- *  @file distances.h
+ *  @file distances.hpp
  *  @brief Library of commonly used distance functions
  *  @note Status: BETA
  */

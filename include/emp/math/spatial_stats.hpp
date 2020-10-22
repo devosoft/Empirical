@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2019
  *
- *  @file spatial_stats.h
+ *  @file spatial_stats.hpp
  *  @brief Functions for calculating various spatial statistics.
  *  @note Status: BETA
  */
