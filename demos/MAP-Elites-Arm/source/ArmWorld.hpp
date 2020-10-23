@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2018
  *
- *  @file  ArmWorld.h
+ *  @file  ArmWorld.hpp
  *  @brief Defines the specialized world for the MAP-Elites app.
  */
 
