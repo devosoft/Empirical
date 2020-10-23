@@ -1157,6 +1157,10 @@ TEST_CASE("Small vector, pointers", "[tools]") {
     const emp::SmallVector<int, 5> v2 = {4,3,2,1,0};
     REQUIRE(v2.front() == v2[0]);
     REQUIRE(v2.back() == v2[v2.size()-1]);
+
+    REQUIRE(v.size_in_bytes() < v2.size_in_bytes());
+    REQUIRE(v.max_size() > 0);
+    REQUIRE(v.capacity_in_bytes() > 0);
 }
 
 TEST_CASE("Small vector, constructors", "[tools]") {
@@ -1175,6 +1179,19 @@ TEST_CASE("Small vector, constructors", "[tools]") {
     REQUIRE(words1 == words2);
     REQUIRE(words1 == words3);
     REQUIRE(words4[4] == "Mo");
+
+    // Move Constructors
+    emp::SmallVector<std::string, 5> words5((emp::SmallVector<std::string, 5>(words1)));
+    const emp::SmallVector<std::string, 5> words6(std::move(words2));
+    REQUIRE(words1 == words5);
+    REQUIRE(words1 == words6);
+
+    emp::SmallVector<std::string, 5> words7;
+    words7 = words1;
+    const emp::SmallVector<std::string, 5> words8 = words6;
+    REQUIRE(words1 == words7);
+    REQUIRE(words6 == words8);
+
 }
 
 TEST_CASE("Small vector, tools", "[tools]") {
@@ -1185,15 +1202,6 @@ TEST_CASE("Small vector, tools", "[tools]") {
 	}
 	REQUIRE(sum == "abc");
 
-	/// This throws an error...
-	// because it's a reverse iterator?
-	//sum += *vec.rend();
-	//REQUIRE(sum == "abca");
-
-	//auto itr = vec.emplace(vec.begin()+1, "1");
-	//REQUIRE(*itr == "1");
-	//REQUIRE(*(itr-1) == "a");
-
 	emp::SmallVector<bool, 0> bvec;
 	bvec.resize(1);
 	REQUIRE(bvec.size() == 1);
@@ -1201,10 +1209,6 @@ TEST_CASE("Small vector, tools", "[tools]") {
 	REQUIRE(bvec[0] == true);
 	bvec.resize(5,false);
 	REQUIRE(bvec[1] == false);
-
-	/// Can't seem to get front() and back() to work for bool vector
-	/// throws error on this line in vector.h "size_t pos = (size_t) (*this - v_ptr->begin());"
-	//auto b = bvec.front();
 
 	emp::SmallVector<bool, 4> bvec2 = { true, false, true, false };
 	REQUIRE(bvec2.size() == 4);
