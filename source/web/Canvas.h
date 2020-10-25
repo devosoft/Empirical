@@ -16,6 +16,7 @@
 
 #include "../base/vector.h"
 #include "../geometry/Circle2D.h"
+#include "../tools/string_utils.h"
 
 #include "CanvasAction.h"
 #include "CanvasShape.h"
@@ -284,8 +285,32 @@ namespace web {
 
     }
 
-  };
+    /// Save a PNG image of a canvas with node.js.
+    void SavePNG(const std::string& fname) {
+      const std::string command = R"(
+        setTimeout(function(){
 
+          fs = require('fs');
+
+          canvas = document.getElementById(%s);
+
+          // adapted from https://stackoverflow.com/a/11335500
+          var url = canvas.toDataURL('image/png');
+          var buffer = Buffer.from(data, 'base64');
+
+          fs.writeFileSync(%s, buffer);
+
+        }, 10);
+      )";
+
+      emscripten_run_script(
+        emp::format_string( command, Info()->id.c_str(), fname.c_str() ).c_str()
+      );
+
+
+    }
+
+  };
 
 }
 }
