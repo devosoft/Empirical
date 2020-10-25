@@ -411,3 +411,11 @@ TEST_CASE("Another Test string_utils", "[tools]")
   REQUIRE( quoted_strings[2] == "([{<three>}])" );
 
 }
+
+TEST_CASE("Test format_string", "[tools]") {
+
+	REQUIRE( emp::format_string("") == "" );
+	REQUIRE( emp::format_string("%s hi", "twee") == "twee hi" );
+	REQUIRE( emp::format_string("a %d b %s", 7, "foo") == "a 7 b foo" );
+
+}
