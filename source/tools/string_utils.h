@@ -585,7 +585,7 @@ namespace emp {
     in_string.resize(pos);
   }
 
-  /// Make a string safe(r) 
+  /// Make a string safe(r)
   static inline std::string slugify(const std::string & in_string) {
     //TODO handle complicated unicode strings
     std::string res = to_lower(in_string);
@@ -609,8 +609,8 @@ namespace emp {
   }
 
   /// Provide a string_view on a string from a starting point with a given size.
-  static inline std::string_view view_string(const std::string_view & str, 
-                                             size_t start, 
+  static inline std::string_view view_string(const std::string_view & str,
+                                             size_t start,
                                              size_t npos) {
     emp_assert(start + npos <= str.size());
     return str.substr(start, npos);
