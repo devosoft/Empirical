@@ -287,26 +287,34 @@ namespace web {
 
     /// Save a PNG image of a canvas with node.js.
     void SavePNG(const std::string& fname) const {
-      const std::string command = R"(
+
+      // adapted from https://stackoverflow.com/a/11335500
+      const std::string command_template = R"(
         setTimeout(function(){
 
           fs = require('fs');
 
-          canvas = document.getElementById(%s);
+          canvas = document.getElementById('%s');
 
-          // adapted from https://stackoverflow.com/a/11335500
           var url = canvas.toDataURL('image/png');
+          var regex = `^data:.+\/(.+);base64,(.*)$`;
+
+          var matches = url.match(regex);
+          var data = matches[2];
           var buffer = Buffer.from(data, 'base64');
 
-          fs.writeFileSync(%s, buffer);
+          fs.writeFileSync('%s' , buffer);
 
         }, 10);
       )";
 
-      emscripten_run_script(
-        emp::format_string( command, Info()->id.c_str(), fname.c_str() ).c_str()
-      );
 
+      const std::string id{ Info()->id };
+      const std::string command{
+        emp::format_string( command_template, id.c_str(), fname.c_str() )
+      };
+
+      emscripten_run_script( command.c_str() );
 
     }
 
