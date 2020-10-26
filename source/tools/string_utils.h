@@ -945,14 +945,14 @@ namespace emp {
     #pragma GCC diagnostic ignored "-Wformat-security"
 
     // Extra space for '\0'
-    const size_t size = std::snprintf( nullptr, 0, format.c_str(), args... ) + 1;
-    emp_assert( size >= 0, "Error during formatting." );
+    const size_t size = std::snprintf(nullptr, 0, format.c_str(), args...) + 1;
+    emp_assert( size >= 0 );
 
-    std::unique_ptr<char[]> buf( new char[ size ] );
-    snprintf( buf.get(), size, format.c_str(), args... );
+    emp::vector<char> buf( size );
+    std::snprintf( buf.data(), size, format.c_str(), args... );
 
      // We don't want the '\0' inside
-    return std::string( buf.get(), buf.get() + size - 1 );
+    return std::string( buf.data(), buf.data() + size - 1 );
 
     #pragma GCC diagnostic pop
 
