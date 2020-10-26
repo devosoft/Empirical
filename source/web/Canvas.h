@@ -265,10 +265,10 @@ namespace web {
     }
 
     /// Download a PNG image of a canvas.
-    void DownloadPNG() { DownloadPNG(Info()->id + ".png"); }
+    void DownloadPNG() const { DownloadPNG(Info()->id + ".png"); }
 
     /// Download a PNG image of a canvas.
-    void DownloadPNG(const std::string & fname) {
+    void DownloadPNG(const std::string & fname) const {
 
       const std::string ext = ".png";
       emscripten_run_script(
@@ -286,7 +286,7 @@ namespace web {
     }
 
     /// Save a PNG image of a canvas with node.js.
-    void SavePNG(const std::string& fname) {
+    void SavePNG(const std::string& fname) const {
       const std::string command = R"(
         setTimeout(function(){
 
