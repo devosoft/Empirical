@@ -16,6 +16,7 @@
 
 #include "../base/vector.h"
 #include "../geometry/Circle2D.h"
+#include "../tools/string_utils.h"
 
 #include "CanvasAction.h"
 #include "CanvasShape.h"
@@ -264,10 +265,10 @@ namespace web {
     }
 
     /// Download a PNG image of a canvas.
-    void DownloadPNG() { DownloadPNG(Info()->id + ".png"); }
+    void DownloadPNG() const { DownloadPNG(Info()->id + ".png"); }
 
     /// Download a PNG image of a canvas.
-    void DownloadPNG(const std::string & fname) {
+    void DownloadPNG(const std::string & fname) const {
 
       const std::string ext = ".png";
       emscripten_run_script(
@@ -284,8 +285,40 @@ namespace web {
 
     }
 
-  };
+    /// Save a PNG image of a canvas with node.js.
+    void SavePNG(const std::string& fname) const {
 
+      // adapted from https://stackoverflow.com/a/11335500
+      const std::string command_template = R"(
+        setTimeout(function(){
+
+          fs = require('fs');
+
+          canvas = document.getElementById('%s');
+
+          var url = canvas.toDataURL('image/png');
+          var regex = `^data:.+\/(.+);base64,(.*)$`;
+
+          var matches = url.match(regex);
+          var data = matches[2];
+          var buffer = Buffer.from(data, 'base64');
+
+          fs.writeFileSync('%s' , buffer);
+
+        }, 10);
+      )";
+
+
+      const std::string id{ Info()->id };
+      const std::string command{
+        emp::format_string( command_template, id.c_str(), fname.c_str() )
+      };
+
+      emscripten_run_script( command.c_str() );
+
+    }
+
+  };
 
 }
 }

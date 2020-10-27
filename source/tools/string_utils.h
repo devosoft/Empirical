@@ -12,6 +12,7 @@
 #ifndef EMP_STRING_UTILS_H
 #define EMP_STRING_UTILS_H
 
+#include <cstdio>
 #include <functional>
 #include <initializer_list>
 #include <iostream>
@@ -21,8 +22,10 @@
 #include <unordered_set>
 #include <iterator>
 #include <limits>
+#include <memory>
 
 #include "../base/array.h"
+#include "../base/assert.h"
 #include "../base/Ptr.h"
 #include "../base/vector.h"
 #include "../meta/reflection.h"
@@ -582,7 +585,7 @@ namespace emp {
     in_string.resize(pos);
   }
 
-  /// Make a string safe(r) 
+  /// Make a string safe(r)
   static inline std::string slugify(const std::string & in_string) {
     //TODO handle complicated unicode strings
     std::string res = to_lower(in_string);
@@ -606,8 +609,8 @@ namespace emp {
   }
 
   /// Provide a string_view on a string from a starting point with a given size.
-  static inline std::string_view view_string(const std::string_view & str, 
-                                             size_t start, 
+  static inline std::string_view view_string(const std::string_view & str,
+                                             size_t start,
                                              size_t npos) {
     emp_assert(start + npos <= str.size());
     return str.substr(start, npos);
@@ -929,6 +932,30 @@ namespace emp {
   static inline std::string to_quoted_list(const string_vec_t & in_strings,
                                            const std::string quote="'") {
     return to_english_list(quote_strings(in_strings, quote));
+  }
+
+
+  /// Apply sprintf-like formatting to a string.
+  /// See https://en.cppreference.com/w/cpp/io/c/fprintf.
+  /// Adapted from https://stackoverflow.com/a/26221725.
+  template<typename... Args>
+  std::string format_string( const std::string& format, Args... args ) {
+
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wformat-security"
+
+    // Extra space for '\0'
+    const size_t size = std::snprintf(nullptr, 0, format.c_str(), args...) + 1;
+    emp_assert( size >= 0 );
+
+    emp::vector<char> buf( size );
+    std::snprintf( buf.data(), size, format.c_str(), args... );
+
+     // We don't want the '\0' inside
+    return std::string( buf.data(), buf.data() + size - 1 );
+
+    #pragma GCC diagnostic pop
+
   }
 
 }

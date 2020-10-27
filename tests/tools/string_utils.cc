@@ -411,3 +411,25 @@ TEST_CASE("Another Test string_utils", "[tools]")
   REQUIRE( quoted_strings[2] == "([{<three>}])" );
 
 }
+
+TEST_CASE("Test format_string", "[tools]") {
+
+	REQUIRE( emp::format_string("") == "" );
+	REQUIRE( emp::format_string("%s hi", "twee") == "twee hi" );
+	REQUIRE( emp::format_string("a %d b %s", 7, "foo") == "a 7 b foo" );
+
+	const std::string multiline{ R"(
+		my code;
+		%s
+		more code;
+	)" };
+	const std::string replacement{ "foo code;" };
+
+
+	REQUIRE( emp::format_string(multiline, replacement.c_str()) == R"(
+		my code;
+		foo code;
+		more code;
+	)" );
+
+}
