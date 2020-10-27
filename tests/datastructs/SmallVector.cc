@@ -1144,12 +1144,11 @@ TEST_CASE("Small vector, iterators", "[tools]") {
     REQUIRE(*it == v2[i]);
     i--;
   }
-  //emp::SmallVectorTemplateBase<T, true>uninitialized_copy(v.begin(), v.end(), v2.begin());
-  //REQUIRE(v[0]==v2[0]);
 
 }
 
-TEST_CASE("Small vector, pointers", "[tools]") {
+TEST_CASE("Small vector, methods", "[tools]") {
+    // Front and back pointers
     emp::SmallVector<int, 4> v = {0,1,2,3};
     REQUIRE(v.front() == v[0]);
     REQUIRE(v.back() == v[v.size()-1]);
@@ -1158,13 +1157,21 @@ TEST_CASE("Small vector, pointers", "[tools]") {
     REQUIRE(v2.front() == v2[0]);
     REQUIRE(v2.back() == v2[v2.size()-1]);
 
+    // Size and capacity methods
     REQUIRE(v.size_in_bytes() < v2.size_in_bytes());
     REQUIRE(v.max_size() > 0);
-    REQUIRE(v.capacity_in_bytes() > 0);
+    REQUIRE(v.capacity_in_bytes() <= capacity_in_bytes(v2));
+
+    // std::swap smallvector implementation
+    emp::SmallVector<int, 4> v3 = v;
+    emp::SmallVector<int, 4> v4 = {4,3,2,1};
+    std::swap(v3, v4);
+    REQUIRE(v4 == v);
 }
 
 TEST_CASE("Small vector, constructors", "[tools]") {
     // Adapted from https://en.cppreference.com/w/cpp/container/vector/vector
+    const emp::SmallVector<std::string, 5> words0 = {"the", "frogurt", "is", "also", "cursed"};
     emp::SmallVector<std::string, 5> words1 {"the", "frogurt", "is", "also", "cursed"};
     
     // words2 == words1
@@ -1176,16 +1183,18 @@ TEST_CASE("Small vector, constructors", "[tools]") {
     // words4 is {"Mo", "Mo", "Mo", "Mo", "Mo"}
     emp::SmallVector<std::string, 5> words4(5, "Mo");
 
+    REQUIRE(words0 == words1);
     REQUIRE(words1 == words2);
-    REQUIRE(words1 == words3);
+    REQUIRE(words2 == words3);
     REQUIRE(words4[4] == "Mo");
 
     // Move Constructors
     emp::SmallVector<std::string, 5> words5((emp::SmallVector<std::string, 5>(words1)));
-    const emp::SmallVector<std::string, 5> words6(std::move(words2));
+    const emp::SmallVector<std::string, 5> words6((emp::SmallVector<std::string, 5>(words1)));
     REQUIRE(words1 == words5);
     REQUIRE(words1 == words6);
 
+    //Operator=
     emp::SmallVector<std::string, 5> words7;
     words7 = words1;
     const emp::SmallVector<std::string, 5> words8 = words6;
@@ -1195,6 +1204,7 @@ TEST_CASE("Small vector, constructors", "[tools]") {
 }
 
 TEST_CASE("Small vector, tools", "[tools]") {
+  // Adapted from vector.cc
   emp::SmallVector<std::string, 3> vec = {"a", "b", "c"};
 	std::string sum;
 	for(auto it=vec.begin(); it!=vec.end(); it++){
