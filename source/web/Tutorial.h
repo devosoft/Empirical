@@ -25,10 +25,6 @@ class Tutorial;
 
 
 
-// TODO:
-
-// util methods: StateHasTrigger(trigger_id), etc
-// improve overlayeffect (take doc?)
 
 
 class Trigger {
@@ -76,7 +72,7 @@ protected:
     }
 
     // How many states contain this trigger?
-    size_t GetStateCount() {
+    int GetStateCount() {
       return next_state_map.size();
     }
 
@@ -95,12 +91,13 @@ protected:
     // Helper functions to keep bookkeeping stuff out of Activate/Deactivate. 
     // Makes it simpler to override those functions in custom classes.
     void PerformActivation() {
-      emp_assert(!active);
+      if (active) return;
+      std::cout << "in Trigger Perform activation" << std::endl;
       Activate();
       active = true;
     }
     void PerformDeactivation() {
-      emp_assert(active);
+      if (!active) return;
       Deactivate();
       active = false;
     }
@@ -108,13 +105,14 @@ protected:
     // Add a pair of states that this trigger is associated with (it can move the tutorial from state to next_state).
     void AddStatePair(std::string state, std::string next_state) {
       emp_assert(!HasState(state));
+      emp_assert(state != next_state);
       next_state_map[state] = next_state;
     }
 
     void RemoveState(std::string state_name) {
       emp_assert(HasState(state_name));
       next_state_map.erase(state_name);
-      // deactivate if active?
+
     }
 
 };
@@ -146,7 +144,6 @@ public:
 
     }
 
-
     void Deactivate() override {
       std::cout << "In Deactivate! Event name: " << event_name.c_str() << std::endl;
       widget.RemoveListener(event_name, event_name + "_tutorial_handler");
@@ -173,7 +170,6 @@ private:
 };
 
 
-
 class VisualEffect {
 
   friend class Tutorial;
@@ -190,16 +186,15 @@ private:
   virtual void Activate() = 0;
   virtual void Deactivate() = 0;
 
-
   // Helper functions to keep bookkeeping stuff out of Activate/Deactivate. 
   // Makes it simpler to override those functions in custom classes.
   void PerformActivation() {
-    emp_assert(!active);
+    if (active) return;
     Activate();
     active = true;
   }
   void PerformDeactivation() {
-    emp_assert(active);
+    if (!active) return;
     Deactivate();
     active = false;
   }
@@ -213,6 +208,12 @@ private:
     states_set.erase(state_name);
   }
 
+  // How many states contain this visual?
+  int GetStateCount() {
+    return states_set.size();
+  }
+
+  bool IsActive() {return active;}
 };
 
 
@@ -286,7 +287,7 @@ std::string popover_id;
     emp_assert(parent_widget != nullptr);
 
     std::cout << "Adding popover" << std::endl;
-    widget.WrapWith(parent_widget, true);
+    widget.WrapWithInPlace(parent_widget);
     std::cout << "1" << std::endl;
     parent_widget.SetCSS("position", "relative");
     std::cout << "2" << std::endl;
@@ -333,14 +334,17 @@ private:
   std::string color;
   float opacity;
   int z_index;
+  bool intercept_mouse;
 
-  OverlayEffect(UI::Div& _parent, std::string _color, float _opacity, int _z_index) : parent(_parent), color(_color), opacity(_opacity), z_index(_z_index) {}
+  OverlayEffect(UI::Div& _parent, std::string _color, float _opacity, int _z_index, bool _intercept_mouse) : 
+  parent(_parent), color(_color), opacity(_opacity), z_index(_z_index), intercept_mouse(_intercept_mouse) {std::cout << "Overlay Constructor" << std::endl;}
 
   void Activate() {
 
     UI::Div over("overlay");
     overlay = over;
 
+    overlay.SetAttr("class", "Tutorial-Overlay-Effect");
     overlay.SetCSS("background-color", color);
     overlay.SetCSS("opacity", opacity);
     overlay.SetCSS("z_index", z_index);
@@ -349,15 +353,17 @@ private:
     overlay.SetCSS("height", "100%");
     overlay.SetCSS("top", "0px");
     overlay.SetCSS("left", "0px");
-    parent << overlay;
+    if (!intercept_mouse)
+      overlay.SetCSS("pointer-events", "none");
 
-    std::cout << "Added overlay" << std::endl;
+    parent << overlay;
 
   }
 
   void Deactivate() {
 
-    overlay -> parent ->RemoveChild(overlay);
+    overlay -> parent -> RemoveChild(overlay);
+    std::cout << "removed overlay" << std::endl;
 }
 
 };
@@ -392,6 +398,7 @@ private:
 
     // add the trigger id to set of id's
     void AddTrigger(std::string trigger_id) {
+      emp_assert(!HasTrigger(trigger_id));
       trigger_id_set.insert(trigger_id);
     }
 
@@ -403,7 +410,7 @@ private:
 
     // add the visual id to set of id's
     void AddVisualEffect(std::string visual_id) {
-      emp_assert(HasVisualEffect(visual_id));
+      emp_assert(!HasVisualEffect(visual_id));
       visual_id_set.insert(visual_id);
     }
 
@@ -461,7 +468,7 @@ private:
     }
 
     // how many VisualEffects does this state have?
-    size_t GetVisualCount() {
+    size_t GetVisualEffectCount() {
       return visual_id_set.size();
     }
 
@@ -472,7 +479,7 @@ private:
 
 class Tutorial {
 
-  friend void Trigger::Notify(); // Trigger's Notify() can access our private members. Needed so it can call OnTrigger()
+  friend void Trigger::Notify(); // Trigger's Notify() can access our private members. Needed so it can call OnTrigger().
 
 
 private:
@@ -494,15 +501,14 @@ private:
       return states.at(state_name);
   }
 
-
-  // Is the given trigger id an existing trigger?
-  bool HasTrigger(std::string trigger_id) {
-    return trigger_ptr_map.find(trigger_id) != trigger_ptr_map.end();
-  }
-
   void DeleteTrigger(std::string trigger_id) {
     delete trigger_ptr_map[trigger_id];
     trigger_ptr_map.erase(trigger_id);
+  }
+
+  void DeleteVisualEffect(std::string visual_id) {
+    delete visual_ptr_map[visual_id];
+    visual_ptr_map.erase(visual_id);
   }
 
   // Retrieve a pointer to the Trigger with the given ID
@@ -510,9 +516,6 @@ private:
     return trigger_ptr_map[trigger_id];
   }
   
-  bool HasVisualEffect(std::string visual_id) {
-    return visual_ptr_map.find(visual_id) != visual_ptr_map.end();
-  }
 
   // Retrieve a pointer to the Trigger with the given ID
   emp::Ptr<VisualEffect> GetVisualEffect(std::string visual_id) {
@@ -539,9 +542,10 @@ private:
         Stop();
       }
 
-      // execute callbacks for the state and trigger
-      if (GetState(current_state).callback) GetState(current_state).callback();
+      // execute callbacks for the trigger and state
       if (trigger -> callback) trigger -> callback();
+      if (GetState(current_state).callback) GetState(current_state).callback();
+      
 
     }
 
@@ -555,24 +559,49 @@ public:
     // These are the only functions to be called outside of this file :P
 
 
-    bool IsActive() {
-      return active;
-    }
+  bool IsActive() {
+    return active;
+  }
 
-    std::string GetCurrentState() {
-      if (active) return current_state;
-      return "";
+  std::string GetCurrentState() {
+    if (active) return current_state;
+    return "";
+  }
+
+    // Is the given trigger id an existing trigger?
+  bool HasTrigger(std::string trigger_id) {
+    return trigger_ptr_map.find(trigger_id) != trigger_ptr_map.end();
+  }
+
+    // Is the given visual id an existing trigger?
+  bool HasVisualEffect(std::string visual_id) {
+    std::cout << "In HasVisualEffect" << std::endl;
+    std::cout << (visual_ptr_map.find(visual_id) != visual_ptr_map.end()) << std::endl;
+    return visual_ptr_map.find(visual_id) != visual_ptr_map.end();
+  }
+
+  // Is the given state name an existing state?
+    bool HasState(std::string state_name) {
+      return states.find(state_name) != states.end(); // any other checks?
     }
 
     // Launch into the tutorial at a particular state
     void StartAtState(std::string state_name){
+
+      // Deactivate current state
       if (active)
         GetState(current_state).Deactivate(trigger_ptr_map, visual_ptr_map);
 
-      // todo: make sure there's a trigger, if not then stop here
-
       current_state = state_name;
-      std::cout << "visual size in Start: " << GetState(current_state).GetVisualCount() << std::endl;
+
+      // Stop here if new state is an end state
+      if (GetState(current_state).GetTriggerCount() == 0)
+      {
+        Stop();
+        return;
+      }
+
+      std::cout << "visual size in Start: " << GetState(current_state).GetVisualEffectCount() << std::endl;
       GetState(current_state).Activate(trigger_ptr_map, visual_ptr_map);
       active = true;
 
@@ -594,9 +623,6 @@ public:
       active = false;
 
       std::cout << "Tutorial Finished!" << std::endl;
-#ifdef __EMSCRIPTEN__
-      EM_ASM( {alert("Tutorial Complete!");} );
-#endif
     }
 
     // Create and store a new state with given name
@@ -608,10 +634,7 @@ public:
       return *this;
     }
 
-    // Is the given state name an existing state?
-    bool HasState(std::string state_name) {
-      return states.find(state_name) != states.end(); // any other checks?
-    }
+    
 
     Tutorial& AddManualTrigger(std::string cur_state, std::string next_state, std::string trigger_id="", 
                           std::function<void()> callback=nullptr) {
@@ -683,7 +706,7 @@ public:
 
     template<typename T, typename ... Args>
     Tutorial& AddCustomTrigger(std::string cur_state, std::string next_state, Args&&... args, 
-                          std::string trigger_id, std::function<void()> callback=nullptr) {
+                          std::string trigger_id="", std::function<void()> callback=nullptr) {
 
       std::cout << "The trigger id is: " << trigger_id << std::endl;
 
@@ -709,7 +732,7 @@ public:
     }
 
 
-    void RemoveTrigger(std::string trigger_id, std::string state_name) {
+    Tutorial& RemoveTrigger(std::string trigger_id, std::string state_name) {
       emp_assert(HasTrigger(trigger_id));
 
       emp::Ptr<Trigger> trigger_ptr = GetTrigger(trigger_id);
@@ -728,27 +751,37 @@ public:
       if (trigger_ptr -> GetStateCount() == 0)
         DeleteTrigger(trigger_id);
 
+        return *this;
     }
 
 
-    void FireTrigger(std::string trigger_id) {
+    Tutorial& FireTrigger(std::string trigger_id) {
       emp_assert(HasTrigger(trigger_id));
       GetTrigger(trigger_id) -> ManualFire(current_state);
+
+      return *this;
     }
 
 
-    void ActivateTrigger(std::string trigger_id) {
+    Tutorial& ActivateTrigger(std::string trigger_id) {
       emp_assert(HasTrigger(trigger_id));
+      std::cout << "Trying to activate trigger" << std::endl;
 
       emp::Ptr<Trigger> trigger_ptr = GetTrigger(trigger_id);
       trigger_ptr -> PerformActivation();
+
+      return *this;
     }
 
-    void DeactivateTrigger(std::string trigger_id) {
+    Tutorial& DeactivateTrigger(std::string trigger_id) {
       emp_assert(HasTrigger(trigger_id));
+
+      std::cout << "Try to deactivate trigger" << std::endl;
 
       emp::Ptr<Trigger> trigger_ptr = GetTrigger(trigger_id);
       trigger_ptr -> PerformDeactivation();
+
+      return *this;
     }
 
 
@@ -805,16 +838,21 @@ public:
 
 
 #ifdef __EMSCRIPTEN__
-    Tutorial& AddOverlayEffect(std::string state_name, UI::Div& parent, std::string color="black", float opacity=0.4, int z_index=100, std::string visual_id="") {
+    Tutorial& AddOverlayEffect(std::string state_name, UI::Div& parent, std::string color="black", float opacity=0.4, 
+                              int z_index=1000, bool intercept_mouse=false, std::string visual_id="") {
 
+      std::cout << "Add Overlay Effect" << std::endl;
       emp_assert(HasState(state_name));
-      emp_assert(!HasVisualEffect(visual_id));
+      
 
-      emp::Ptr<VisualEffect> visual_ptr = new OverlayEffect(parent, color, opacity, z_index);
+      emp::Ptr<VisualEffect> visual_ptr = new OverlayEffect(parent, color, opacity, z_index, intercept_mouse);
       visual_ptr -> AddState(state_name);
 
       if (visual_id.empty())
         visual_id = std::string("unnamed_visual_") + std::to_string(num_visuals_added);
+
+      std::cout << visual_id << std::endl;
+      emp_assert(!HasVisualEffect(visual_id));
 
       visual_ptr_map[visual_id] = visual_ptr;
       GetState(state_name).AddVisualEffect(visual_id);
@@ -856,36 +894,108 @@ public:
 
     }
 
-     void ActivateVisualEffect(std::string visual_id) {
-      emp_assert(HasTrigger(visual_id));
+    Tutorial& RemoveVisualEffect(std::string visual_id, std::string state_name) {
+      emp_assert(HasVisualEffect(visual_id));
+
+      emp::Ptr<VisualEffect> visual_ptr = GetVisualEffect(visual_id);
+
+      // deactivate the trigger if active
+      if (visual_ptr -> IsActive())
+        visual_ptr -> Deactivate();
+
+      // remove state from visual
+      visual_ptr -> RemoveState(state_name);
+
+      // remove visual from state
+      GetState(state_name).RemoveVisualEffect(visual_id);
+
+      // remove from tutorial if necessary
+      if (visual_ptr -> GetStateCount() == 0)
+        DeleteVisualEffect(visual_id);
+
+        return *this;
+    }
+
+     Tutorial& ActivateVisualEffect(std::string visual_id) {
+      emp_assert(HasVisualEffect(visual_id));
 
       emp::Ptr<VisualEffect> visual_ptr = GetVisualEffect(visual_id);
       visual_ptr -> PerformActivation();
+
+      return *this;
     }
 
-    void DeactivateVisualEffect(std::string visual_id) {
-      emp_assert(HasTrigger(visual_id));
+    Tutorial& DeactivateVisualEffect(std::string visual_id) {
+      std::cout << "In DeactivateVisualEffect" << std::endl;
+      std::cout << visual_id << std::endl;
+      emp_assert(HasVisualEffect(visual_id));
 
       emp::Ptr<VisualEffect> visual_ptr = GetVisualEffect(visual_id);
       visual_ptr -> PerformDeactivation();
+
+      return *this;
     }
 
 
-    void SetStateCallback(std::string state_name, std::function<void()> fun) {
+    Tutorial& SetStateCallback(std::string state_name, std::function<void()> fun) {
           emp_assert(HasState(state_name));
           GetState(state_name).callback = fun;
+
+          return *this;
       }
 
-    void SetTriggerCallback(std::string trigger_id, std::function<void()> fun) {
+    Tutorial& SetTriggerCallback(std::string trigger_id, std::function<void()> fun) {
         emp_assert(HasTrigger(trigger_id));
         GetTrigger(trigger_id) -> callback = fun;
+
+        return *this;
     }
 
 
-    // bool IsTriggerActive() {}
 
-    // bool 
 
+    bool IsTriggerActive(std::string trigger_id) {
+      emp_assert(HasTrigger(trigger_id));
+
+      return GetTrigger(trigger_id) -> IsActive();
+    }
+
+    int GetTriggerCount(std::string trigger_id) {
+      emp_assert(HasTrigger(trigger_id));
+
+      return GetTrigger(trigger_id) -> GetStateCount();
+    }
+
+
+    bool IsVisualEffectActive(std::string visual_id) {
+      emp_assert(HasVisualEffect(visual_id));
+
+      return GetVisualEffect(visual_id) -> IsActive();
+    }
+
+    int GetStateVisualEffectCount(std::string state_name, std::string visual_id) {
+      emp_assert(HasState(state_name));
+      emp_assert(HasVisualEffect(visual_id));
+
+      return GetState(state_name).GetVisualEffectCount();
+    }
+
+
+    bool StateHasTrigger(std::string state_name, std::string trigger_id) {
+      emp_assert(HasState(state_name));
+      emp_assert(HasTrigger(trigger_id));
+
+      return GetState(state_name).HasTrigger(trigger_id);
+    }
+
+    bool StateHasVisual(std::string state_name, std::string visual_id) {
+      emp_assert(HasState(state_name));
+      emp_assert(HasVisualEffect(visual_id));
+
+      return GetState(state_name).HasVisualEffect(visual_id);
+    }
+
+  
 
 };
 
