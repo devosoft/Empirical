@@ -6,9 +6,17 @@ Contents:
 :maxdepth: 1
 
 base/base
+bits/bits
+compiler/compiler
 data/data
-web/web
+datastructs/datastructs
+debug/debug
+functional/functional
+io/io
+math/math
+testing/testing
 tools/tools
+web/web
 ```
 
 - {ref}`genindex`
