@@ -12,6 +12,8 @@
 
 #include <string>
 
+#include "Document.h"
+
 namespace emp {
 namespace web {
 
@@ -24,6 +26,7 @@ namespace web {
       var JSDOM = jsdom.JSDOM;
 
       global.dom = (new JSDOM(`<div id="emp_base"></div>`));
+      global.window = dom.window;
       global.document = dom.window.document;
 
       // setup jquery
