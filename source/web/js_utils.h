@@ -672,6 +672,22 @@ namespace emp {
     });
   }
 
+  /// Helper function that returns DOM view port size in pixels.
+  EM_JS(int, GetViewPortSize, (), {
+   return Math.min(
+     Math.max(
+       document.documentElement.clientWidth,
+       $(window).width(),
+       window.innerWidth || 0
+     ),
+     Math.max(
+       document.documentElement.clientHeight,
+       $(window).height(),
+       window.innerHeight || 0
+     )
+    );
+  });
+
 }
 
 
