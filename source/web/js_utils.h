@@ -584,11 +584,11 @@ namespace emp {
   /// @endcond
 
   /// This function can be called to pass a map into JavaScript.
-  /// The resulting JavaScript object will be stored in emp.__incoming_map. 
+  /// The resulting JavaScript object will be stored in emp.__incoming_map.
   /// @param dict the map being passed into JavaScript
   template <typename KEY_T, typename VAL_T>
   void pass_map_to_javascript(const emp::map<KEY_T, VAL_T> & dict) {
-   
+
     emp::vector<KEY_T> keys;
     emp::vector<VAL_T> values;
 
@@ -630,16 +630,16 @@ namespace emp {
     });
   }
 
- 
-  /// This function can be called to pass two arrays of the same length into JavaScript (where a map is then created) 
-  /// One array should hold keys, and the other should hold values 
+
+  /// This function can be called to pass two arrays of the same length into JavaScript (where a map is then created)
+  /// One array should hold keys, and the other should hold values
   /// (note that the key-value pairs must line up across the arrays)
-  /// The resulting JavaScript object will be stored in emp.__incoming_map. 
+  /// The resulting JavaScript object will be stored in emp.__incoming_map.
   /// @param keys an array holding the keys to the map
   /// @param values an array holding the values to the map
   template <typename KEY_T, typename VAL_T, size_t SIZE>
   void pass_map_to_javascript(const emp::array<KEY_T, SIZE> & keys, const emp::array<VAL_T, SIZE> & values) {
-    
+
     // pass in keys vector to JS
     emp::pass_array_to_javascript(keys);
     EM_ASM({
@@ -671,6 +671,22 @@ namespace emp {
       delete emp_i.__incoming_map_values;
     });
   }
+
+  /// Helper function that returns DOM view port size in pixels.
+  EM_JS(int, GetViewPortSize, (), {
+   return Math.min(
+     Math.max(
+       document.documentElement.clientWidth,
+       $(window).width(),
+       window.innerWidth || 0
+     ),
+     Math.max(
+       document.documentElement.clientHeight,
+       $(window).height(),
+       window.innerHeight || 0
+     )
+    );
+  });
 
 }
 

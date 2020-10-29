@@ -12,28 +12,49 @@
 
 #include <string>
 
+#include "../base/vector.h"
+#include "../tools/string_utils.h"
+
+#include "Document.h"
+
 namespace emp {
 namespace web {
 
   struct NodeDomShim {
 
-    NodeDomShim() { EM_ASM(
+    NodeDomShim(const emp::vector<std::string>& init_divs={}) { EM_ASM(
 
       // setup jsdom
       var jsdom = require("jsdom");
       var JSDOM = jsdom.JSDOM;
 
       global.dom = (new JSDOM(`<div id="emp_base"></div>`));
-      global.document = dom.window.document;
 
       // setup jquery
       var jquery = require('jquery');
       global.$ = jquery( dom.window );
 
+      global.window = dom.window;
+      global.document = dom.window.document;
+
       // shim for alert
       global.alert = console.log;
 
-    ); }
+    );
+
+    for (const auto& id : init_divs) {
+      const std::string command = emp::format_string(
+        R"(
+          var to_add = document.createElement('div');
+          to_add.setAttribute('id', '%s');
+          document.getElementById('emp_base').appendChild(to_add);
+        )",
+        id.c_str()
+      );
+      emscripten_run_script( command.c_str() );
+    }
+
+  }
 
   };
 
