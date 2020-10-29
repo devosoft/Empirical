@@ -900,24 +900,6 @@ namespace emp {
     ss >> out_val;
     return out_val;
   }
-  
-  template <typename T>
-  inline std::string join(const emp::vector<T> & v, std::string join_str) {
-    
-    if (v.size() == 0) {
-      return "";
-    } else if (v.size() == 1) {
-      return to_string(v[0]);
-    } else {
-      std::stringstream res;
-      res << v[0];
-      for (size_t i = 1; i < v.size(); i++) {
-        res << join_str;
-        res << to_string(v[i]);
-      }
-      return res.str();
-    }
-  }
 
   /**
    * This function returns the values in a vector as a string separated
