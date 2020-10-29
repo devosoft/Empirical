@@ -1145,6 +1145,16 @@ TEST_CASE("Small vector, iterators", "[tools]") {
     i--;
   }
 
+  // Iterator based insert
+  emp::SmallVector<int, 10> v3 = {3};
+  v3.emp::SmallVectorImpl<int>::insert(v3.begin(), 2);
+  v3.emp::SmallVectorImpl<int>::insert(v3.end(), 1, 4);
+  v3.emp::SmallVectorImpl<int>::insert(v3.end(), v3.begin(), v3.begin()+2);
+  v3.emp::SmallVectorImpl<int>::insert(v3.end(), {6,7});
+  int Elt = 8;
+  v3.emp::SmallVectorImpl<int>::insert(v3.end(), std::move(Elt));
+  REQUIRE(v3 == emp::SmallVector<int, 10>{2,3,4,2,3,6,7,8});
+  REQUIRE(v3.size() == 8);
 }
 
 TEST_CASE("Small vector, methods", "[tools]") {
@@ -1167,6 +1177,7 @@ TEST_CASE("Small vector, methods", "[tools]") {
     emp::SmallVector<int, 4> v4 = {4,3,2,1};
     std::swap(v3, v4);
     REQUIRE(v4 == v);
+
 }
 
 TEST_CASE("Small vector, constructors", "[tools]") {
