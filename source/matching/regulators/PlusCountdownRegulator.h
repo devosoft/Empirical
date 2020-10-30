@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cmath>
 #include <ratio>
 #include <utility>
 
@@ -51,7 +52,9 @@ struct PlusCountdownRegulator {
   /// A positive value downregulates the item,
   /// a value of zero is neutral,
   /// and a negative value upregulates the item.
-  bool Set(const float & set) {
+  bool Set(const float& set) {
+    if ( std::isnan( set ) ) return false;
+
     timer = 1;
 
     // return whether regulator value changed
@@ -62,7 +65,9 @@ struct PlusCountdownRegulator {
   /// A negative value upregulates the item,
   /// a value of exactly zero is neutral
   /// and a postive value downregulates the item.
-  bool Adj(const float & amt) {
+  bool Adj(const float& amt) {
+    if ( std::isnan( amt ) ) return false;
+
     timer = 1;
 
     state += amt;
