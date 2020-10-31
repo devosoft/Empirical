@@ -1,6 +1,6 @@
 # Base Tools
 
-A handful of tools are available in the source/base/ folder in
+A handful of tools are available in the include/emp/base/ folder in
 Empirical. These mimic basic functionality available in C++ or the
 standard library, but provide extra protection against common memory use
 errors and additional information to the developer.
