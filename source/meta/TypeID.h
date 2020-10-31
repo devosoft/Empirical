@@ -52,6 +52,7 @@ namespace emp {
       virtual ~Info() { }
 
       virtual bool IsAbstract() const { return false; }
+      virtual bool IsArithmetic() const { return false; }
       virtual bool IsArray() const { return false; }
       virtual bool IsClass() const { return false; }
       virtual bool IsConst() const { return false; }
@@ -98,6 +99,7 @@ namespace emp {
     template <typename T>
     struct InfoData : public Info {
       bool IsAbstract() const override { return std::is_abstract<T>(); }
+      bool IsArithmetic() const override { return std::is_arithmetic<T>(); }
       bool IsArray() const override { return std::is_array<T>(); }
       bool IsClass() const override { return std::is_class<T>(); }
       bool IsConst() const override { return std::is_const<T>(); }
@@ -270,6 +272,7 @@ namespace emp {
     void SetInitialized(bool _in=true) { info_ptr->init = _in; }
 
     bool IsAbstract() const { return info_ptr->IsAbstract(); }
+    bool IsArithmetic() const { return info_ptr->IsArithmetic(); }
     bool IsArray() const { return info_ptr->IsArray() ; }
     bool IsClass() const { return info_ptr->IsClass() ; }
     bool IsConst() const { return info_ptr->IsConst() ; }
