@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2016-2018
  *
- *  @file  flex_function.hpp
+ *  @file  functions.hpp
  *  @brief A collection of broadly-useful functions (that don't fit elsewhere)
  *  @note Status: BETA (though new functions are added frequently)
  */
@@ -23,6 +23,7 @@
 
 #include "../math/constants.hpp"
 
+/*
 /// A simple macro to time how long it takes for a function to complete.
 #define EMP_FUNCTION_TIMER(TEST_FUN) {                                       \
     std::clock_t emp_start_time = std::clock();                              \
@@ -33,9 +34,9 @@
               << " ms" << std::endl;                                         \
     std::cout << "Result: " << emp_result << std::endl;                      \
   }
-
+*/
 namespace emp {
-
+  /*
   /// A function timer that takes a functor an identifies how long it takes to complete when run.
   static inline double TimeFun(std::function<void()> test_fun) {
     std::clock_t start_time = std::clock();
@@ -43,7 +44,8 @@ namespace emp {
     std::clock_t tot_time = std::clock() - start_time;
     return 1000.0 * ((double) tot_time) / (double) CLOCKS_PER_SEC;
   }
-
+  */ 
+ 
   /// Toggle an input bool.
   inline bool Toggle(bool & in_bool) { return (in_bool = !in_bool); }
 
@@ -60,7 +62,7 @@ namespace emp {
   inline bool AnyTrue(bool result, Ts... OTHER) {
     return result || AnyTrue(OTHER...);
   }
-
+  /*
   /// Build a vector with a range of values from min to max at the provided step size.
   template <typename T>
   static inline emp::vector<T> BuildRange(T min, T max, T step=1) {
@@ -74,10 +76,11 @@ namespace emp {
     return out_v;
   }
 
-
+  /*
   /// Determine the size of a built-in array.
   template <typename T, size_t N>
   constexpr size_t GetSize(T (&)[N]) { return N; }
+  
 
   /// A function that will always return a unique value (and trip an assert if it can't...)
   static size_t UniqueVal() {
@@ -94,6 +97,7 @@ namespace emp {
     ss << prefix << UniqueVal() << postfix;
     return ss.str();
   }
+  */
 }
 
 #endif

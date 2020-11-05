@@ -137,6 +137,10 @@ namespace emp {
 
     constexpr size_t size() const { return N; }
 
+    /// Determine the size of a built-in array.
+    template <typename T, size_t N>
+    constexpr size_t GetSize(T (&)[N]) { return N; }
+
     iterator begin() noexcept { return iterator(base_t::begin(), this); }
     const_iterator begin() const noexcept { return const_iterator(base_t::begin(), this); }
     iterator end() noexcept { return iterator(base_t::end(), this); }

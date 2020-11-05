@@ -323,6 +323,23 @@ namespace emp {
     return result;
   }
 
+  /// Toggle an input bool.
+  inline bool Toggle(bool & in_bool) { return (in_bool = !in_bool); }
+
+  /// Combine bools to AND them all together.
+  inline constexpr bool AllTrue() { return true; }
+  template <typename... Ts>
+  inline bool AllTrue(bool result, Ts... OTHER) {
+    return result && AllTrue(OTHER...);
+  }
+
+  /// Combine bools to OR them all together.
+  inline constexpr bool AnyTrue() { return false; }
+  template <typename... Ts>
+  inline bool AnyTrue(bool result, Ts... OTHER) {
+    return result || AnyTrue(OTHER...);
+  }
+
 }
 
 #endif
