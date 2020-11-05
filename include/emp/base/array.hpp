@@ -36,6 +36,10 @@ namespace emp {
 
 namespace emp {
 
+  /// Determine the size of a built-in array.
+  template <typename T, size_t N>
+  constexpr size_t GetSize(T (&)[N]) { return N; }
+
   /// We are in debug mode, so emp::array has the same interface as std::array, but with extra
   /// bounds checking.  Using vector as our base since it has the right pieces and is dyanmic.
   template <typename T, size_t N>
@@ -136,10 +140,6 @@ namespace emp {
     }
 
     constexpr size_t size() const { return N; }
-
-    /// Determine the size of a built-in array.
-    template <typename T, size_t N>
-    constexpr size_t GetSize(T (&)[N]) { return N; }
 
     iterator begin() noexcept { return iterator(base_t::begin(), this); }
     const_iterator begin() const noexcept { return const_iterator(base_t::begin(), this); }
