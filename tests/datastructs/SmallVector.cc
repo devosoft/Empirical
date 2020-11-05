@@ -1145,6 +1145,10 @@ TEST_CASE("Small vector, iterators", "[tools]") {
     i--;
   }
 
+  // Data buffer pointers
+  REQUIRE(*v.data() == 0);
+  REQUIRE(*v2.data() == 4);
+
   // Iterator based insert
   emp::SmallVector<int, 10> v3 = {3};
   v3.emp::SmallVectorImpl<int>::insert(v3.begin(), 2);
@@ -1174,9 +1178,24 @@ TEST_CASE("Small vector, methods", "[tools]") {
 
     // std::swap smallvector implementation
     emp::SmallVector<int, 4> v3 = v;
-    emp::SmallVector<int, 4> v4 = {4,3,2,1};
+    emp::SmallVector<int, 4> v4 = {8,7,6,5};
     std::swap(v3, v4);
-    REQUIRE(v4 == v);
+    REQUIRE(v3 != v);
+    REQUIRE(v4 < v3);
+
+    // Reserve
+    v3.reserve(10);
+    v4.reserve(5);
+    REQUIRE(v3.capacity() == 10);
+
+    // Append and Assign more than capacity
+    const int i = 7;
+    v3.append(7,i);
+    REQUIRE(v3.capacity() > 10);
+    v4.append(2,i);
+    REQUIRE(v4.capacity() > 5);
+    std::swap(v3, v4);
+    REQUIRE(v4.capacity() > 10);
 
 }
 
@@ -1212,9 +1231,16 @@ TEST_CASE("Small vector, constructors", "[tools]") {
     REQUIRE(words1 == words7);
     REQUIRE(words6 == words8);
 
+    words1.resize(10, "a");
+    words7 = words1;
+    REQUIRE(words1 == words7);
+    words1.resize(5);
+    words7 = words1;
+    REQUIRE(words1 == words7);
+
 }
 
-TEST_CASE("Small vector, tools", "[tools]") {
+TEST_CASE("Small vector, methods2", "[tools]") {
   // Adapted from vector.cc
   emp::SmallVector<std::string, 3> vec = {"a", "b", "c"};
 	std::string sum;
@@ -1223,6 +1249,7 @@ TEST_CASE("Small vector, tools", "[tools]") {
 	}
 	REQUIRE(sum == "abc");
 
+  // resize
 	emp::SmallVector<bool, 0> bvec;
 	bvec.resize(1);
 	REQUIRE(bvec.size() == 1);
@@ -1230,9 +1257,39 @@ TEST_CASE("Small vector, tools", "[tools]") {
 	REQUIRE(bvec[0] == true);
 	bvec.resize(5,false);
 	REQUIRE(bvec[1] == false);
+  bvec.resize(4);
+  REQUIRE(bvec.size() == 4);
+  bvec.resize(3, true);
+  REQUIRE(bvec.size() == 3);
 
+  // pop_back and pop_back_val
 	emp::SmallVector<bool, 4> bvec2 = { true, false, true, false };
 	REQUIRE(bvec2.size() == 4);
 	bvec2.pop_back();
 	REQUIRE(bvec2.size() == 3);
+  REQUIRE(bvec2.pop_back_val() == true);
+
+  // Assign with iterators
+  emp::SmallVector<bool, 4> bvec3 = { true, false, true, false };
+  emp::SmallVector<bool, 6> bvec4 = { true, false, true, false, true, false};
+  bvec3.assign(bvec4.begin(),bvec4.end());
+  REQUIRE(bvec3.size() == 6);
+  REQUIRE(bvec3 == bvec4);
+
+  // Erase
+  emp::SmallVector<int,10> myvector;
+  for (int i=1; i<=10; i++) myvector.push_back(i);
+
+  // erase the 6th element
+  myvector.erase (myvector.begin()+5);
+  REQUIRE(myvector.size() == 9);
+
+  // erase the first 3 elements:
+  myvector.erase (myvector.begin(),myvector.begin()+3);
+  REQUIRE(myvector.size() == 6);
+
+  // Emplace Back
+  myvector.emplace_back(100);
+  REQUIRE(myvector[6] == 100);
+
 }
