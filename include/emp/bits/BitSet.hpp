@@ -28,7 +28,6 @@
 #include "../math/math.hpp"
 #include "../math/Random.hpp"
 #include "../math/random_utils.hpp"
-#include "../tools/functions.hpp"
 #include "../polyfill/span.hpp"
 #include "bitset_utils.hpp"
 
