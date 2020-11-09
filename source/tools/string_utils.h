@@ -30,6 +30,7 @@
 #include "../base/vector.h"
 #include "../meta/reflection.h"
 #include "../meta/StringType.h"
+#include "../meta/type_traits.h"
 
 namespace emp {
 
@@ -110,8 +111,9 @@ namespace emp {
 
 
   /// Take a value and convert it to a C++-style literal.
-  template <typename LIT_TYPE>
-  inline std::string to_literal(const LIT_TYPE & value) {
+  template <typename T>
+  inline
+  typename std::enable_if<!emp::IsIterable<T>::value, std::string>::type to_literal(const T & value) {
     return std::to_string(value);
   }
 
@@ -131,6 +133,21 @@ namespace emp {
       ss << to_escaped_string(c);
     }
     ss << "\"";
+    return ss.str();
+  }
+
+  /// Take any iterable value and convert it to a C++-style literal.
+  template <typename T>
+  inline
+  typename std::enable_if<emp::IsIterable<T>::value, std::string>::type to_literal(const T & value) {
+    std::stringstream ss;
+    ss << "{ ";
+    for (auto iter = std::begin( value ); iter != std::end( value ); ++iter) {
+      if (iter != std::begin( value )) ss << " ";
+      ss << emp::to_literal< std::decay_t<decltype(*iter)> >( *iter );
+    }
+    ss << " }";
+
     return ss.str();
   }
 
