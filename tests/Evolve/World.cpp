@@ -321,6 +321,10 @@ TEST_CASE("Test fitness sharing", "[evo]")
   REQUIRE(pop.CalcFitnessID(0) == Approx(0.526316));
   REQUIRE(pop.CalcFitnessID(POP_SIZE-1) == 2);
 
+  // Check neighbor function works for mixed
+  REQUIRE(pop.GetValidNeighborOrgIDs(21).size() == POP_SIZE);
+  REQUIRE(pop.IsNeighbor(21, 20));
+
   // Run a tournament...
   emp::TournamentSelect(pop, 5, POP_SIZE);
   pop.Update();
@@ -369,6 +373,11 @@ TEST_CASE("Test fitness sharing", "[evo]")
   auto fit_fun = [](int & org){ return (double) org; };
   grid_world.SetSharedFitFun(fit_fun, [](int & a, int & b){ return (double) (a>b)?(a-b):(b-a); }, 3, 1);
   RouletteSelect(grid_world, 500);
+
+  // Check neighbor function works for grid
+  emp::vector<size_t> valid_neighbors = {0, 1, 20};
+  REQUIRE(grid_world.GetValidNeighborOrgIDs(21) == valid_neighbors);
+  REQUIRE(grid_world.IsNeighbor(21, 20));
 
   std::cout << std::endl;
   grid_world.PrintGrid();
