@@ -53,7 +53,6 @@
 #include "../datastructs/tuple_struct.hpp"
 #include "../datastructs/tuple_utils.hpp"
 #include "../debug/mem_track.hpp"
-#include "../tools/functions.hpp"
 
 #include "init.hpp"
 #include "js_utils.hpp"

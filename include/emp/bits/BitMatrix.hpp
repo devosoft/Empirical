@@ -15,10 +15,6 @@
 #include <typeinfo>
 
 
-#ifndef functions
-#include "../tools/functions.hpp"
-#endif
-
 #include "BitSet.hpp"
 #include "bitset_utils.hpp"
 

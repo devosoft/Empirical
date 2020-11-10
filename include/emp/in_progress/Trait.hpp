@@ -18,7 +18,6 @@
 #include <vector>
 
 #include "../base/assert.hpp"
-#include "../tools/functions.hpp"
 #include "../meta/meta.hpp"
 
 namespace emp {
