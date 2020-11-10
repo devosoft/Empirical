@@ -606,6 +606,14 @@ namespace emp {
       if (LastBitID() > 0) { bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID()); }
     }
 
+    /// Convert this BitVector to a string.
+    std::string ToString() const {
+      std::string out_string;
+      out_string.reserve(num_bits);
+      for (size_t i = num_bits; i > 0; --i) out_string.push_back('0' + Get(i-1));
+      return out_string;
+    }
+
     /// Regular print function (from most significant bit to least)
     void Print(std::ostream & out=std::cout) const {
       for (size_t i = num_bits; i > 0; --i) out << Get(i-1);
