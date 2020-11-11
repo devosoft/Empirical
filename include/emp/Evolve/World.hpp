@@ -1104,15 +1104,18 @@ namespace emp {
       emp_assert(pop_sizes.size() == 2);
 
       int size_x = (int) pop_sizes[0];
+      int size_y = (int) pop_sizes[1];
 
       if(id1 == id2) { //self, not neighbors
 	      return false;
       }
 
-      int row_diff = (id1 - id2) / size_x;
-      int col_diff = (id1 - id2)%size_x;
+      int diff = id1 - id2;
+      int row_diff = abs(diff / size_x);
+      int col_diff = abs(diff%size_x);
 
-      if((abs(row_diff) <= 1) && (abs(col_diff) <= 1))	return true;
+      if((row_diff <= 1 || row_diff == (size_y-1)) && 
+        (col_diff <= 1 || col_diff == (size_x-1)))	return true;
       else return false;
 
     };

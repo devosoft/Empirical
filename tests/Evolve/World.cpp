@@ -376,15 +376,14 @@ TEST_CASE("Test fitness sharing", "[evo]")
 
   std::cout << std::endl;
   grid_world.PrintGrid();
-  std::cout << "Final Org Counts:\n";
+  //std::cout << "Final Org Counts:\n";
   //   grid_world.PrintOrgCounts(print_fun);
   //   std::cout << std::endl;
 
 }
 
-TEST_CASE("Test GetValidNeigborOrgIDs on Grid", "[Evolve]")
+TEST_CASE("Test GetValidNeighborOrgIDs on Grid", "[Evolve]")
 {
-  size_t POP_SIZE = 100;
   emp::Random random(1);
   std::function<void(int &, std::ostream &)> print_fun = [](int & val, std::ostream & os) {
     val %= 63;
@@ -395,19 +394,24 @@ TEST_CASE("Test GetValidNeigborOrgIDs on Grid", "[Evolve]")
   };
 
   emp::World<int> grid_world(random);
-  const size_t side = (size_t) std::sqrt(POP_SIZE);
-  grid_world.SetPopStruct_Grid(side, side);
-  grid_world.Resize(side, side);
+  grid_world.SetPopStruct_Grid(5, 10);
+  grid_world.Resize(5, 10);
   grid_world.SetPrintFun(print_fun);
 
-  grid_world.InjectAt(30, side+1);
-  grid_world.InjectAt(31, side+2);
+  grid_world.InjectAt(30, 12);
+  grid_world.InjectAt(31, 13);
+  grid_world.InjectAt(34, 7);
+  grid_world.InjectAt(30, 0);
+  grid_world.InjectAt(32, 49);
 
   // Check neighbor function works for grid
-  emp::vector<size_t> valid_neighbors = {side+2};
-  REQUIRE(grid_world.IsNeighbor(side+1, side+2));
-  REQUIRE(grid_world.IsNeighbor(side+2, side+1));
-  REQUIRE(grid_world.GetValidNeighborOrgIDs(side+1) == valid_neighbors);
+  std::cout << "Testing Neighbor functions in Grid\n";
+  grid_world.PrintGrid();
+  emp::vector<size_t> valid_neighbors = {7, 13};
+  REQUIRE(grid_world.IsNeighbor(12, 13));
+  REQUIRE(grid_world.IsNeighbor(13, 12));
+  REQUIRE(grid_world.GetValidNeighborOrgIDs(12) == valid_neighbors);
+  REQUIRE(grid_world.IsNeighbor(0, 49));
 
   std::cout << std::endl;
 }
