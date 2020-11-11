@@ -374,16 +374,40 @@ TEST_CASE("Test fitness sharing", "[evo]")
   grid_world.SetSharedFitFun(fit_fun, [](int & a, int & b){ return (double) (a>b)?(a-b):(b-a); }, 3, 1);
   RouletteSelect(grid_world, 500);
 
-  // Check neighbor function works for grid
-  grid_world.PrintGrid();
-  emp::vector<size_t> valid_neighbors = {0, 1, 20};
-  REQUIRE(grid_world.GetValidNeighborOrgIDs(21) == valid_neighbors);
-  REQUIRE(grid_world.IsNeighbor(21, 20));
-
   std::cout << std::endl;
   grid_world.PrintGrid();
   std::cout << "Final Org Counts:\n";
   //   grid_world.PrintOrgCounts(print_fun);
   //   std::cout << std::endl;
 
+}
+
+TEST_CASE("Test GetValidNeigborOrgIDs on Grid", "[Evolve]")
+{
+  size_t POP_SIZE = 100;
+  emp::Random random(1);
+  std::function<void(int &, std::ostream &)> print_fun = [](int & val, std::ostream & os) {
+    val %= 63;
+    if (val < 10) os << (char) ('0' + val);
+    else if (val < 36) os << (char) ('a' + (val - 10));
+    else if (val < 62) os << (char) ('A' + (val - 36));
+    else os << '+';
+  };
+
+  emp::World<int> grid_world(random);
+  const size_t side = (size_t) std::sqrt(POP_SIZE);
+  grid_world.SetPopStruct_Grid(side, side);
+  grid_world.Resize(side, side);
+  grid_world.SetPrintFun(print_fun);
+
+  grid_world.InjectAt(30, side+1);
+  grid_world.InjectAt(31, side+2);
+
+  // Check neighbor function works for grid
+  emp::vector<size_t> valid_neighbors = {side+2};
+  REQUIRE(grid_world.IsNeighbor(side+1, side+2));
+  REQUIRE(grid_world.IsNeighbor(side+2, side+1));
+  REQUIRE(grid_world.GetValidNeighborOrgIDs(side+1) == valid_neighbors);
+
+  std::cout << std::endl;
 }

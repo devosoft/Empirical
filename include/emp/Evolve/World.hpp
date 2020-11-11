@@ -1098,10 +1098,12 @@ namespace emp {
     };
 
     // Neighbors are in 8-sized neighborhood excluding self
-    fun_is_neighbor = [this](size_t id1, size_t id2) {
+    fun_is_neighbor = [this](size_t pos1, size_t pos2) {
+      int id1 = (int)pos1;
+      int id2 = (int)pos2;
       emp_assert(pop_sizes.size() == 2);
 
-      const size_t size_x = pop_sizes[0];
+      int size_x = (int) pop_sizes[0];
 
       if(id1 == id2) { //self, not neighbors
 	      return false;
