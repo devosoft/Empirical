@@ -375,6 +375,7 @@ TEST_CASE("Test fitness sharing", "[evo]")
   RouletteSelect(grid_world, 500);
 
   // Check neighbor function works for grid
+  grid_world.PrintGrid();
   emp::vector<size_t> valid_neighbors = {0, 1, 20};
   REQUIRE(grid_world.GetValidNeighborOrgIDs(21) == valid_neighbors);
   REQUIRE(grid_world.IsNeighbor(21, 20));
