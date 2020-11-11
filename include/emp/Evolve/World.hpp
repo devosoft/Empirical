@@ -1109,8 +1109,8 @@ namespace emp {
 	      return false;
       }
 
-      double row_diff = (id1 - id2) / size_x;
-      double col_diff = id1%size_x - id2%size_x;
+      int row_diff = (id1 - id2) / size_x;
+      int col_diff = (id1 - id2)%size_x;
 
       if((abs(row_diff) <= 1) && (abs(col_diff) <= 1))	return true;
       else return false;
