@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <limits>
 
 #include "../datastructs/AssociativeArrayCache.h"
@@ -177,6 +178,32 @@ public:
         if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
       }
     }
+  }
+
+  uid_t GetUid( const Val& val ) const {
+
+    const auto found = std::find_if(
+      std::begin( data ),
+      std::end( data ),
+      [&val]( const auto& entry ) { return entry.val == val; }
+    );
+
+    emp_assert( found != std::end( data ) );
+
+    return std::distance( std::begin( data ), found );
+  }
+
+  uid_t GetUid( const tag_t& tag ) const {
+
+    const auto found = std::find_if(
+      std::begin( data ),
+      std::end( data ),
+      [&tag]( const auto& entry ) { return entry.tag == tag; }
+    );
+
+    emp_assert( found != std::end( data ) );
+
+    return std::distance( std::begin( data ), found );
   }
 
 };
