@@ -29,7 +29,6 @@
 #include "../base/Ptr.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../functional/GenericFunction.hpp"
-#include "functions.hpp"
 
 namespace emp {
 
