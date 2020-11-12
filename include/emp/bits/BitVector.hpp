@@ -710,11 +710,30 @@ namespace emp {
       return val;
     }
 
-    /// Push given bit onto the vector
+    /// Push given bit(s) onto the vector
     void PushBack(bool bit=true, size_t num=1) {
-      Resize(num_bits + 1);
+      Resize(num_bits + num);
       for (size_t i=0; i < num; i++)
         Set(num_bits-1, bit);
+    }
+
+    /// Insertbits into vector, including middle
+    void Insert(size_t index, bool value=true, size_t num=1) {
+      Resize(num_bits + num);
+      for (size_t j = num_bits - 1; j >= index + num; j--) {
+        Set(j, Get(j - num));
+      }
+      for (size_t i = index; i < index + num; i++) {
+        Set(i, value);
+      }
+    }
+
+    /// Delete bits from vector, including middle
+    void Delete(size_t index, size_t num=1) {
+      for (size_t j = index; j < num_bits - num; j++) {
+        Set(j, Get(j + num));
+      }
+      Resize(num_bits - num);
     }
 
     /// Return the position of the first one after start_pos; return -1 if no ones in vector.

@@ -270,6 +270,22 @@ TEST_CASE("Test BitVector", "[bits]")
 	REQUIRE(!bv_g.PopBack());
 	REQUIRE(bv_g.PopBack());
 	REQUIRE(bv_g.size() == 1);
+
+	// Insert and Delete
+	bv_g.Insert(1, false);
+	REQUIRE(bv_g.size() == 2);
+	bv_g.Insert(1, true, 3);
+	REQUIRE(!bv_g.Get(0));
+	REQUIRE(bv_g.Get(1));
+	REQUIRE(bv_g.Get(2));
+	REQUIRE(!bv_g.Get(4));
+
+	bv_g.Delete(0);
+	REQUIRE(bv_g.size() == 4);
+	REQUIRE(bv_g.Get(0));
+	bv_g.Delete(1, 2);
+	REQUIRE(bv_g.size() == 2);
+	REQUIRE(!bv_g.Get(1));
 }
 
 TEST_CASE("Another Test BitVector", "[bits]")
