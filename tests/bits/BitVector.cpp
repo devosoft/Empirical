@@ -259,6 +259,17 @@ TEST_CASE("Test BitVector", "[bits]")
 	REQUIRE(bv_f.count() == 1);
 	bv_f <<= 1;
 	REQUIRE(bv_f.none());
+
+	// Pop Back and Push Back
+	emp::BitVector bv_g(0);
+	bv_g.PushBack(false);
+	bv_g.PushBack(true);
+	bv_g.PushBack(false);
+	REQUIRE(!bv_g.Get(0));
+	REQUIRE(bv_g.Get(1));
+	REQUIRE(!bv_g.PopBack());
+	REQUIRE(bv_g.PopBack());
+	REQUIRE(bv_g.size() == 1);
 }
 
 TEST_CASE("Another Test BitVector", "[bits]")

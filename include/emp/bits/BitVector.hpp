@@ -702,6 +702,21 @@ namespace emp {
       return (int) (pos_found + (field_id * FIELD_BITS));
     }
 
+    /// Pop the last bit in the vector
+    bool PopBack() {
+      bool val = Get(num_bits-1);
+      if (val)  Set(num_bits-1, 0);
+      Resize(num_bits - 1);
+      return val;
+    }
+
+    /// Push given bit onto the vector
+    void PushBack(bool bit=true, size_t num=1) {
+      Resize(num_bits + 1);
+      for (size_t i=0; i < num; i++)
+        Set(num_bits-1, bit);
+    }
+
     /// Return the position of the first one after start_pos; return -1 if no ones in vector.
     /// You can loop through all 1-bit positions of a BitVector "bv" with:
     ///
