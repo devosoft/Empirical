@@ -173,12 +173,12 @@ namespace emp {
         }
 
         // If this variable is a string or can be directly converted to a string, do so.
-        if constexpr (std::is_convertible<T, std::string>::value) {
+        else if constexpr (std::is_convertible<T, std::string>::value) {
           return (std::string) *ptr.ReinterpretCast<const base_t>();
         }
 
         // If this variable is a char, treat it as a single-character string.
-        if constexpr (std::is_same<T, char>::value) {
+        else if constexpr (std::is_same<T, char>::value) {
           return std::string(1, (char) *ptr.ReinterpretCast<const base_t>());
         }
 
@@ -188,7 +188,7 @@ namespace emp {
         }
 
         // If we made it this far, we don't know how to convert...
-        return "";
+        return "[N/A]";
       }
 
       bool FromDouble(double value, const emp::Ptr<void> ptr) const override {
