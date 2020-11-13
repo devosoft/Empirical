@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
+ *  @date 2016-2020.
  *
  *  @file  BitSet.hpp
  *  @brief A drop-in replacement for std::bitset, with additional bit magic features.
@@ -1336,31 +1336,23 @@ namespace emp {
     /// Compoount operator minus...
     const BitSet & operator-=(const BitSet & ar2) { return SUB_SELF(ar2); }
 
-    /// Function to allow drop-in replacement with std::bitset.
+    /// STL COMPATABILITY
+    /// A set of functions to allow drop-in replacement with std::bitset.
     constexpr static size_t size() { return NUM_BITS; }
-
-    /// Function to allow drop-in replacement with std::bitset.
     inline bool all() const { return All(); }
-
-    /// Function to allow drop-in replacement with std::bitset.
     inline bool any() const { return Any(); }
-
-    /// Function to allow drop-in replacement with std::bitset.
     inline bool none() const { return !Any(); }
-
-    /// Function to allow drop-in replacement with std::bitset.
     inline size_t count() const { return CountOnes_Mixed(); }
-
-    /// Function to allow drop-in replacement with std::bitset.
     inline BitSet & flip() { return Toggle(); }
-
-    /// Function to allow drop-in replacement with std::bitset.
     inline BitSet & flip(size_t pos) { return Toggle(pos); }
-
-    /// Function to allow drop-in replacement with std::bitset.
     inline BitSet & flip(size_t start, size_t end) { return Toggle(start, end); }
+    inline void reset() { Clear(); }
+    inline void reset(size_t id) { Set(id, false); }
+    inline void set() { SetAll(); }
+    inline void set(size_t id) { Set(id); }
+    inline bool test(size_t index) const { return Get(index); }
 
-    template <class Archive>
+   template <class Archive>
     void serialize( Archive & ar )
     {
       ar( bit_set );
