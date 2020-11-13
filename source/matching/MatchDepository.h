@@ -180,6 +180,16 @@ public:
     }
   }
 
+  bool HasVal( const Val& val ) const {
+    const auto found = std::find_if(
+      std::begin( data ),
+      std::end( data ),
+      [&val]( const auto& entry ) { return entry.val == val; }
+    );
+
+    return found != std::end( data );
+  }
+
   uid_t GetUid( const Val& val ) const {
 
     const auto found = std::find_if(
