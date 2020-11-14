@@ -10,6 +10,8 @@
 #ifndef EMP_INIT_H
 #define EMP_INIT_H
 
+#include <type_traits>
+
 /// If __EMSCRIPTEN__ is defined, initialize everything.  Otherwise create useful stubs.
 #ifdef __EMSCRIPTEN__
 
@@ -57,13 +59,16 @@ namespace emp {
     namespace internal {
       /// If a variable is passed in to Live(), construct a function to look up its current value.
       template <typename VAR_TYPE>
-      std::function<std::string()> Live_impl(VAR_TYPE & var, bool) {
+      std::function<std::string()> Live_impl(VAR_TYPE & var, int) {
         return [&var](){ return emp::to_string(var); };
       }
 
       /// If a non-variable is passed in to Live(), assume it is a function and print it each redraw.
-      template <typename IN_TYPE>
-      std::function<std::string()> Live_impl(IN_TYPE && fun, int) {
+      template <
+        typename IN_TYPE,
+        typename = std::enable_if_t< std::is_invocable<IN_TYPE>::value >
+      >
+      std::function<std::string()> Live_impl(IN_TYPE && fun, bool) {
         return [fun](){ return emp::to_string(fun()); };
       }
     }
@@ -71,7 +76,7 @@ namespace emp {
     /// Take a function or variable and set it up so that it can update each time a text box is redrawn.
     template <typename T>
     std::function<std::string()> Live(T && val) {
-      return internal::Live_impl(std::forward<T>(val), true);
+      return internal::Live_impl(std::forward<T>(val), bool{});
     }
 
     inline std::string ToJSLiteral(bool x) {
