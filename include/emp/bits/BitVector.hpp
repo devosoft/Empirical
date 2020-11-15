@@ -593,9 +593,52 @@ namespace emp {
     BitProxy operator[](size_t index) { return BitProxy(*this, index); }
 
     /// Set all bits to 0.
-    void Clear() {
+    BitVector & Clear() {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = 0U;
+      return *this;
+    }
+
+    /// Set specific bit to 0.
+    BitVector & Clear(size_t index) {
+      return Set(index, false);
+    }
+
+    /// Set a range of bits to 0 in the range [start, stop)
+    BitVector & Clear(const size_t start, const size_t stop) {
+      emp_assert(start <= stop, start, stop, num_bits);
+      emp_assert(stop <= num_bits, stop, num_bits);
+      const size_t start_pos = FieldPos(start);
+      const size_t stop_pos = FieldPos(stop);
+      const size_t start_field = FieldID(start);
+      const size_t stop_field = FieldID(stop);
+      constexpr field_t val_one = 1;
+
+      // If the start field and stop field are the same, just step through the bits.
+      if (start_field == stop_field) {
+        const size_t num_bits = stop - start;
+        const field_t mask = ~(((val_one << num_bits) - 1) << start_pos);
+        bit_set[start_field] &= mask;
+      }
+
+      // Otherwise handle the ends and clear the chunks in between.
+      else {
+        // Clear portions of start field
+        const size_t start_bits = FIELD_BITS - start_pos;
+        const field_t start_mask = ~(((val_one << start_bits) - 1) << start_pos);
+        bit_set[start_field] &= start_mask;
+
+        // Middle fields
+        for (size_t cur_field = start_field + 1; cur_field < stop_field; cur_field++) {
+          bit_set[cur_field] = 0;
+        }
+
+        // Clear portions of stop field
+        const field_t stop_mask = ~((val_one << stop_pos) - 1);
+        bit_set[stop_field] &= stop_mask;
+      }
+
+      return *this;
     }
 
     /// Set all bits to 1.
