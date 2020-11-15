@@ -906,23 +906,22 @@ namespace emp {
     /// Compound operator for shift right...
     const BitVector & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
-    /// Function to allow drop-in replacement with std::vector<bool>.
+    /// STL COMPATABILITY
+    /// A set of functions to allow drop-in replacement with std::bitset.
     size_t size() const { return num_bits; }
-
-    /// Function to allow drop-in replacement with std::vector<bool>.
     void resize(std::size_t new_size) { Resize(new_size); }
-
-    /// Function to allow drop-in replacement with std::vector<bool>.
     bool all() const { return All(); }
-
-    /// Function to allow drop-in replacement with std::vector<bool>.
     bool any() const { return Any(); }
-
-    /// Function to allow drop-in replacement with std::vector<bool>.
     bool none() const { return !Any(); }
-
-    /// Function to allow drop-in replacement with std::vector<bool>.
     size_t count() const { return CountOnes_Mixed(); }
+    BitVector & flip() { return Toggle(); }
+    BitVector & flip(size_t pos) { return Toggle(pos); }
+    BitVector & flip(size_t start, size_t end) { return Toggle(start, end); }
+    void reset() { Clear(); }
+    void reset(size_t id) { Set(id, false); }
+    void set() { SetAll(); }
+    void set(size_t id) { Set(id); }
+    bool test(size_t index) const { return Get(index); }
   };
 
 }
