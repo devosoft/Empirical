@@ -717,7 +717,7 @@ namespace emp {
         Set(num_bits-1, bit);
     }
 
-    /// Insertbits into vector, including middle
+    /// Insert bits into vector, including middle
     void Insert(size_t index, bool value=true, size_t num=1) {
       Resize(num_bits + num);
       for (size_t j = num_bits - 1; j >= index + num; j--) {

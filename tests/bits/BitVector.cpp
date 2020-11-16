@@ -12,6 +12,7 @@
 #include <sstream>
 #include <map>
 #include <limits>
+#include <ratio>
 
 TEST_CASE("Test BitVector", "[bits]")
 {
@@ -286,6 +287,17 @@ TEST_CASE("Test BitVector", "[bits]")
 	bv_g.Delete(1, 2);
 	REQUIRE(bv_g.size() == 2);
 	REQUIRE(!bv_g.Get(1));
+}
+
+TEST_CASE("Benchmark BitVector Inserts", "[bits]"){
+	emp::BitVector bv(0);
+	bv.Insert(0, true, 2);
+	EMP_VOID_FUNCTION_TIMER([&bv](){
+		for ( size_t i = 1; i <= std::mega::num; ++i ) {
+			bv.Insert(i-1, false);
+		}
+	}());
+	REQUIRE(bv.size() == std::mega::num + 2);
 }
 
 TEST_CASE("Another Test BitVector", "[bits]")
