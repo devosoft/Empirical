@@ -1399,14 +1399,34 @@ namespace emp {
 }
 
 /// For hashing BitSets
-namespace std
-{
+namespace std {
+
     template <size_t N>
-    struct hash<emp::BitSet<N>>
-    {
-        size_t operator()( const emp::BitSet<N>& bs ) const
-        {
-          return emp::murmur_hash(bs.GetBytes());
+    struct hash< emp::BitSet<N> > {
+        size_t operator()( const emp::BitSet<N>& bs ) const {
+          if constexpr ( sizeof( size_t ) == 4 ) {
+            if constexpr ( N < 4 * 8 ) {
+              return bs.GetUInt32( 0 );
+            } else if constexpr ( N < 8 * 8 ) {
+              return emp::hash_combine(  bs.GetUInt32( 0 ), bs.GetUInt32( 1 ) );
+            } else if constexpr ( N < 12 * 8 ) {
+              return emp::hash_combine(
+                emp::hash_combine( bs.GetUInt32( 0 ), bs.GetUInt32( 1 ) ),
+                bs.GetUInt32( 2 )
+              );
+            } else if constexpr ( N < 16 * 8 ) {
+              return emp::hash_combine(
+                emp::hash_combine( bs.GetUInt32( 0 ), bs.GetUInt32( 1 ) ),
+                emp::hash_combine( bs.GetUInt32( 2 ), bs.GetUInt32( 3 ) )
+              );
+            } else return emp::murmur_hash( bs.GetBytes() );
+          } else if constexpr ( sizeof( size_t ) == 8 ) {
+            if constexpr ( N < 8 * 8 ) {
+              return bs.GetUInt64( 0 );
+            } else if constexpr ( N < 16 * 8 ) {
+              return emp::hash_combine(  bs.GetUInt64( 0 ), bs.GetUInt64( 1 ) );
+            } else return emp::murmur_hash( bs.GetBytes() );
+          }
         }
     };
 }
