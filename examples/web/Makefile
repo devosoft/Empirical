@@ -7,7 +7,7 @@
 #    WebAssembly.
 
 # Flags to use regardless of compiler
-CFLAGS_all := -std=c++17 -Wall -Wno-unused-function -I../../source/
+CFLAGS_all := -std=c++17 -Wall -Wno-unused-function -I../../include/
 
 # Emscripten compiler information
 CXX_web := emcc
@@ -24,8 +24,8 @@ CFLAGS_native_debug := $(CFLAGS_all) $(OFLAGS_native_debug)
 CFLAGS_native_opt := $(CFLAGS_all) $(OFLAGS_native_opt)
 CFLAGS_native := $(CFLAGS_native_opt)
 
-CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' -s NO_EXIT_RUNTIME=1
-CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../source/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' -s NO_EXIT_RUNTIME=1
+CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' -s NO_EXIT_RUNTIME=1
+CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../include/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]' -s NO_EXIT_RUNTIME=1
 
 
 JS_TARGETS := Animate.js Animate2.js Attributes.js Canvas.js Div.js DP.js Example.js Font.js Graph.js Hello.js Image.js keypress.js Sudoku.js Table.js TextArea.js Tween.js Web.js
@@ -33,8 +33,6 @@ JS_TARGETS := Animate.js Animate2.js Attributes.js Canvas.js Div.js DP.js Exampl
 TARGETS := debug-Animate debug-keypress debug-Slate debug-web
 
 default: web
-
-WEB := ../../source/web
 
 CXX := $(CXX_web)
 CFLAGS_web := $(CFLAGS_web_opt)
@@ -54,11 +52,11 @@ native: all
 
 all: $(TARGETS)
 
-$(JS_TARGETS): %.js : %.cc # $(WEB)/%.h
+$(JS_TARGETS): %.js : %.cpp # $(WEB)/%.h
 	$(CXX_web) $(CFLAGS_web) $< -o $@
 
 
-debug-%: $*.cc
+debug-%: $*.cpp
 	$(CXX_native) $(CFLAGS_native) $< -o $@
 
 clean:
