@@ -664,9 +664,9 @@ namespace emp {
 
     /// Print a space between each field (or other provided spacer)
     void PrintFields(std::ostream & out=std::cout, const std::string & spacer=" ") const {
-      for (size_t i = num_bits; i > 0; i--) {
-        out << Get(i-1);
-        if (i % FIELD_BITS == 0) out << spacer;
+      for (size_t i = num_bits-1; i < num_bits; i--) {
+        out << Get(i);
+        if (i && (i % FIELD_BITS == 0)) out << spacer;
       }
     }
 
