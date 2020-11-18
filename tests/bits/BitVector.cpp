@@ -107,12 +107,6 @@ TEST_CASE("Test BitVector", "[bits]")
 	REQUIRE((ss.str() == "01000001"));
 	ss.str(std::string()); // clear ss
 
-	emp::BitVector bv4(96);
-	bv4.SetByte(1,1);
-	bv4.PrintFields(ss);
-	REQUIRE((ss.str() == "000000000000000000000000000000000 000000000000000000000000000000000000000000000000000000100000000"));
-	ss.str(std::string()); // clear ss
-
 	// Find & Pop Bit
 	bv3.SetByte(0,74);
 	REQUIRE((bv3.PopBit() == 1));
@@ -133,6 +127,34 @@ TEST_CASE("Test BitVector", "[bits]")
 	ones = bv3.GetOnes();
 	REQUIRE((ones[0] == 1));
 	REQUIRE((ones[1] == 3));
+
+	// Larger BitVector
+	emp::BitVector bv4(96);
+	bv4.SetByte(1,1);
+	bv4.PrintFields(ss);
+	REQUIRE(ss.str() == "00000000000000000000000000000000 0000000000000000000000000000000000000000000000000000000100000000");
+
+	// test single set.
+	bv4[62] = 1;
+	ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
+	REQUIRE(ss.str() == "00000000000000000000000000000000 0100000000000000000000000000000000000000000000000000000100000000");
+	// test toggle of range (across boundary)
+	bv4.Toggle(61, 70);
+	ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
+	REQUIRE(ss.str() == "00000000000000000000000000111111 1010000000000000000000000000000000000000000000000000000100000000");
+	// test clearing a range in a single field.
+	bv4.Clear(65, 69);
+	ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
+	REQUIRE(ss.str() == "00000000000000000000000000100001 1010000000000000000000000000000000000000000000000000000100000000");
+	// test toggling a larger range
+	bv4.Toggle(55, 75);
+	ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
+	REQUIRE(ss.str() == "00000000000000000000011111011110 0101111110000000000000000000000000000000000000000000000100000000");
+	// test clearing a field across bounderies
+	bv4.Clear(56, 74);
+	ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
+	REQUIRE(ss.str() == "00000000000000000000010000000000 0000000010000000000000000000000000000000000000000000000100000000");
+	ss.str(std::string()); // clear ss
 
 	// Logic operators
 	emp::BitVector bv5(8);
