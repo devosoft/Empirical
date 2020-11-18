@@ -26,7 +26,7 @@ namespace emp {
 
   ///  Middle Square Weyl Sequence: A versatile and non-patterned pseudo-random-number
   ///  generator.
-  ///  Based on: https://en.wikipedia.org/wiki/Middle-square_method 
+  ///  Based on: https://en.wikipedia.org/wiki/Middle-square_method
   class Random {
   protected:
 
