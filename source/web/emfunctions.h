@@ -24,7 +24,7 @@ namespace emp {
   static void DelayCall(const std::function<void()> & in_fun, int delay) {
     uint32_t callback_id = JSWrapOnce(in_fun); // Wrap and dispose when called.
     (void)callback_id;
-    EM_ASM_ARGS({
+    EM_ASM({
         window.setTimeout(function() { emp.Callback($0); }, $1);
       }, callback_id, delay);
   }
@@ -33,7 +33,7 @@ namespace emp {
   static void OnResize(const std::function<void()> & in_fun) {
     uint32_t callback_id = JSWrap(in_fun);
     (void)callback_id;
-    EM_ASM_ARGS({
+    EM_ASM({
         window.addEventListener("resize", function() { emp.Callback($0); });
       }, callback_id);
   }
@@ -42,7 +42,7 @@ namespace emp {
   static void OnResize(const std::function<void(int,int)> & in_fun) {
     uint32_t callback_id = JSWrap(in_fun);
     (void)callback_id;
-    EM_ASM_ARGS({
+    EM_ASM({
         window.addEventListener("resize", function() {
             emp.Callback($0, window.innerWidth, window.innerHeight);
           });
@@ -60,14 +60,14 @@ namespace emp {
 
   /// Set the background color of this web page.
   static void SetBackgroundColor(const std::string color) {
-    EM_ASM_ARGS({
+    EM_ASM({
         var color = UTF8ToString($0);
         $("body").first().css("background-color", color);
       }, color.c_str());
   }
 
   static void SetColor(const std::string color) {
-    EM_ASM_ARGS({
+    EM_ASM({
         var color = UTF8ToString($0);
         $("body").first().css("color", color);
       }, color.c_str());
@@ -75,14 +75,14 @@ namespace emp {
 
   // These may already be in HTML5 for Emscripten
   static void SetCursor(const char * type) {
-    EM_ASM_ARGS({
+    EM_ASM({
         var type = UTF8ToString($0);
         document.body.style.cursor = type;
     }, type);
   }
 
   static void OpenWindow(const std::string & url) {
-    EM_ASM_ARGS({
+    EM_ASM({
         var url = UTF8ToString($0);
         window.open = url;
     }, url.c_str());

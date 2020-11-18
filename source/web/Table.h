@@ -211,7 +211,7 @@ namespace web {
         if (state == Widget::ACTIVE) {
           // Create a span tag to anchor the new widget.
           std::string cell_id = emp::to_string(id, '_', r, '_', c);
-          EM_ASM_ARGS({
+          EM_ASM({
               parent_id = UTF8ToString($0);
               child_id = UTF8ToString($1);
               $('#' + parent_id).append('<span id="' + child_id + '"></span>');

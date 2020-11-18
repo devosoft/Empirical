@@ -34,8 +34,8 @@ namespace emp {
   /// std::map<const char*, std::string> type_map = GetTypeToStringMap();
   /// std::string type_string = type_map[typeid(T).name()];
   ///
-  /// Now we can pass type_string.c_str() into EM_ASM_ARGS:
-  /// `EM_ASM_ARGS({
+  /// Now we can pass type_string.c_str() into EM_ASM:
+  /// `EM_ASM({
   ///    var value = getValue($0, $1);
   /// }, pointer, type_string.c_str();`
 
@@ -92,7 +92,7 @@ namespace emp {
       EM_ASM({emp_i.__incoming_array = [];});
     }
 
-    EM_ASM_ARGS({
+    EM_ASM({
     	var curr_array = emp_i.__incoming_array;
     	var depth = 0;
 
@@ -120,7 +120,7 @@ namespace emp {
       EM_ASM({emp_i.__incoming_array = [];});
     };
 
-    EM_ASM_ARGS({
+    EM_ASM({
       emp_i.__curr_array = emp_i.__incoming_array;
       var depth = 0;
 
@@ -135,7 +135,7 @@ namespace emp {
     // Iterate over array, get values, and add them to incoming array.
     for (auto val : values) {
       (void) val;
-      EM_ASM_ARGS({
+      EM_ASM({
         emp_i.__curr_array.push(UTF8ToString($0));
       }, val.c_str());
     };
@@ -155,7 +155,7 @@ namespace emp {
     }
 
     // Initialize objects in Javascript
-    EM_ASM_ARGS({
+    EM_ASM({
     	var curr_array = emp_i.__incoming_array;
     	var depth = 0;
 
@@ -184,7 +184,7 @@ namespace emp {
       		    != map_type_names.end()), values[j].var_types[i].name());
 
       	// Load data into array of objects
-      	EM_ASM_ARGS({
+      	EM_ASM({
     	    var curr_array = emp_i.__incoming_array;
     	    var depth = 0;
 
@@ -228,7 +228,7 @@ namespace emp {
     }
 
     // Append empty arrays to array that we are currently handling in recursion
-    EM_ASM_ARGS({
+    EM_ASM({
     	var curr_array = emp_i.__incoming_array;
     	var depth = 0;
     	while (curr_array.length > 0) {
@@ -262,7 +262,7 @@ namespace emp {
     }
 
     // Append empty arrays to array that we are currently handling in recursion
-    EM_ASM_ARGS({
+    EM_ASM({
     	var curr_array = emp_i.__incoming_array;
     	var depth = 0;
     	while (curr_array.length > 0) {
@@ -535,7 +535,7 @@ namespace emp {
     }
 
     for (size_t i = 0; i < arr.size(); i++) {
-      EM_ASM_ARGS({
+      EM_ASM({
 	      emp_i.__outgoing_array = emp_i.__temp_array[emp_i.__temp_array.length - 1][$0];
 	    }, i);
       pass_array_to_cpp(arr[i], true);
@@ -564,7 +564,7 @@ namespace emp {
     }
 
     for (int i = 0; i < size; i++) {
-      EM_ASM_ARGS({
+      EM_ASM({
 	      emp_i.__outgoing_array = emp_i.__temp_array[emp_i.__temp_array.length - 1][$0];
       }, i);
       while ((int)arr.size() <= i) {

@@ -78,7 +78,7 @@ namespace emp {
     if constexpr ( is_introspective_tuple<T>() ) {
       using JSON_TYPE = T;
       //std::cout << "Loading ARGNID: " << ARG_ID << std::endl;
-      EM_ASM_ARGS({
+      EM_ASM({
         emp_i.object_queue = [];
         emp_i.curr_obj = emp_i.cb_args[$0];
       }, ARG_ID);
@@ -98,12 +98,12 @@ namespace emp {
   }
 
   template <int ARG_ID, size_t SIZE, typename T> static void LoadArg(emp::array<T, SIZE> & arg_var){
-    EM_ASM_ARGS({emp_i.__outgoing_array = emp_i.cb_args[$0];}, ARG_ID);
+    EM_ASM({emp_i.__outgoing_array = emp_i.cb_args[$0];}, ARG_ID);
     pass_array_to_cpp(arg_var);
   }
 
   template <int ARG_ID, typename T> static void LoadArg(emp::vector<T> & arg_var){
-    EM_ASM_ARGS({emp_i.__outgoing_array = emp_i.cb_args[$0];}, ARG_ID);
+    EM_ASM({emp_i.__outgoing_array = emp_i.cb_args[$0];}, ARG_ID);
     pass_vector_to_cpp(arg_var);
   }
 
@@ -183,7 +183,7 @@ namespace emp {
   LoadArg(JSON_TYPE & arg_var, std::string var) {
     //std::cout << "Loading " << var << " ARGNID: " << ARG_ID << std::endl;
     //LoadArg<ARG_ID>(std::get<ARG_ID>(arg_var.emp__tuple_body));
-    EM_ASM_ARGS({
+    EM_ASM({
       emp_i.object_queue.push(emp_i.curr_obj);
       emp_i.curr_obj = emp_i.curr_obj[UTF8ToString($0)];
     }, var.c_str());
@@ -213,19 +213,19 @@ namespace emp {
   // Helper functions to individually store return values to JS
 
   // static void StoreReturn(const bool & ret_var) {
-  //   EM_ASM_ARGS({ emp_i.cb_return = $0; }, ret_var);
+  //   EM_ASM({ emp_i.cb_return = $0; }, ret_var);
   // }
 
   static void StoreReturn(const int & ret_var) {
-    EM_ASM_ARGS({ emp_i.cb_return = $0; }, ret_var);
+    EM_ASM({ emp_i.cb_return = $0; }, ret_var);
   }
 
   static void StoreReturn(const double & ret_var) {
-    EM_ASM_ARGS({ emp_i.cb_return = $0; }, ret_var);
+    EM_ASM({ emp_i.cb_return = $0; }, ret_var);
   }
 
   static void StoreReturn(const std::string & ret_var) {
-    EM_ASM_ARGS({ emp_i.cb_return = UTF8ToString($0); }, ret_var.c_str());
+    EM_ASM({ emp_i.cb_return = UTF8ToString($0); }, ret_var.c_str());
   }
 
   template <typename T, size_t N>
@@ -243,22 +243,22 @@ namespace emp {
 
   /// Helper functions to store values inside JSON objects
   static void StoreReturn(const int & ret_var, std::string var) {
-    EM_ASM_ARGS({ emp_i.curr_obj[UTF8ToString($1)] = $0; }, ret_var, var.c_str());
+    EM_ASM({ emp_i.curr_obj[UTF8ToString($1)] = $0; }, ret_var, var.c_str());
   }
 
   static void StoreReturn(const double & ret_var, std::string var) {
-    EM_ASM_ARGS({ emp_i.curr_obj[UTF8ToString($1)] = $0; }, ret_var, var.c_str());
+    EM_ASM({ emp_i.curr_obj[UTF8ToString($1)] = $0; }, ret_var, var.c_str());
   }
 
   static void StoreReturn(const std::string & ret_var, std::string var) {
-    EM_ASM_ARGS({ emp_i.curr_obj[UTF8ToString($1)] = UTF8ToString($0); }
+    EM_ASM({ emp_i.curr_obj[UTF8ToString($1)] = UTF8ToString($0); }
                                                     , ret_var.c_str(), var.c_str());
   }
 
   template <typename T, size_t N>
   static void StoreReturn(const emp::array<T, N> & ret_var, std::string var) {
     pass_array_to_javascript(ret_var);
-    EM_ASM_ARGS({ emp_i.curr_obj[UTF8ToString($0)] = emp_i.__incoming_array;}, var.c_str());
+    EM_ASM({ emp_i.curr_obj[UTF8ToString($0)] = emp_i.__incoming_array;}, var.c_str());
   }
 
   template <typename JSON_TYPE, int FIELD>
@@ -282,7 +282,7 @@ namespace emp {
   template <typename RETURN_TYPE>
   static emp::sfinae_decoy<void, decltype(RETURN_TYPE::n_fields)>
   StoreReturn(const RETURN_TYPE & ret_var, std::string var) {
-    EM_ASM_ARGS({
+    EM_ASM({
       emp_i.curr_obj[UTF8ToString($0)] = {};
       emp_i.object_queue.push(emp_i.curr_obj);
       emp_i.curr_obj = emp_i.curr_obj[UTF8ToString($0)];
@@ -471,7 +471,7 @@ namespace emp {
     callback_array.push_back(new_cb);
 
     if (fun_name != "") {
-      EM_ASM_ARGS({
+      EM_ASM({
           var fun_name = UTF8ToString($1);
           emp[fun_name] = function() {
             emp_i.cb_args = [];

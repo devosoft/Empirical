@@ -31,7 +31,7 @@ namespace web {
     const size_t fun_id = JSWrap(std::forward<FUN_TYPE>(fun), "", true);
     (void) fun_id;
 
-    EM_ASM_ARGS({  $( document ).ready(function() { emp.Callback($0); });  }, fun_id);
+    EM_ASM({  $( document ).ready(function() { emp.Callback($0); });  }, fun_id);
   }
 
   /// Data common to all web events.

@@ -87,7 +87,7 @@ namespace web {
 
       // Find the current object only once.
 #ifdef __EMSCRIPTEN__
-      EM_ASM_ARGS({
+      EM_ASM({
           var id = UTF8ToString($0);
           emp_i.cur_obj = $( '#' + id );
         }, widget_id.c_str());
@@ -96,7 +96,7 @@ namespace web {
       for (auto css_pair : settings) {
         if (css_pair.second == "") continue; // Ignore empty entries.
 #ifdef __EMSCRIPTEN__
-        EM_ASM_ARGS({
+        EM_ASM({
             var name = UTF8ToString($0);
             var value = UTF8ToString($1);
             emp_i.cur_obj.css( name, value);
@@ -113,7 +113,7 @@ namespace web {
       emp_assert(Has(setting));
 
 #ifdef __EMSCRIPTEN__
-      EM_ASM_ARGS({
+      EM_ASM({
           var id = UTF8ToString($0);
           var setting = UTF8ToString($1);
           var value = UTF8ToString($2);
@@ -129,7 +129,7 @@ namespace web {
     static void Apply(const std::string & widget_id, const std::string & setting,
                       const std::string & value) {
 #ifdef __EMSCRIPTEN__
-      EM_ASM_ARGS({
+      EM_ASM({
           var id = UTF8ToString($0);
           var setting = UTF8ToString($1);
           var value = UTF8ToString($2);

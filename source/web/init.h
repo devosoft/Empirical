@@ -93,7 +93,7 @@ namespace emp {
 #else
 
 #define EM_ASM(...)
-#define EM_ASM_ARGS(...)
+#define EM_ASM(...)
 #define EM_ASM_INT(...) 0
 #define EM_ASM_DOUBLE(...) 0.0
 #define EM_ASM_INT_V(...) 0

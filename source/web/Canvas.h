@@ -56,7 +56,7 @@ namespace web {
 
       // Setup a canvas to be drawn on.
       void TargetCanvas() {
-        EM_ASM_ARGS({
+        EM_ASM({
             var cname = UTF8ToString($0);
             var canvas = document.getElementById(cname);
             emp_i.ctx = canvas.getContext('2d');

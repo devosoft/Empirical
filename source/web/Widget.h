@@ -345,7 +345,7 @@ namespace web {
         else ss << "<span id='" << id << "'></span>";
 
         // Now do the replacement.
-        EM_ASM_ARGS({
+        EM_ASM({
             var widget_id = UTF8ToString($0);
             var out_html = UTF8ToString($1);
             $('#' + widget_id).replaceWith(out_html);
