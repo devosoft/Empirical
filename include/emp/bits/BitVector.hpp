@@ -729,31 +729,38 @@ namespace emp {
     }
 
     // Returns mask that keeps bits higher than index
-    field_t Mask_High(size_t index) {
-      field_t pos_mask = 0;
-      for (size_t i = 0; i < num_bits - index - 1; i++) {
-        pos_mask |= 1 << FieldPos(i);
+    BitVector & Mask_High(size_t index) {
+      field_id = FieldPos(index);
+      int field_t_bits = sizeof(bit_set[0]) * 8;
+      for (int i = 0; i < field_id; i++) {
+        bit_set[i] = 0;
       }
-      return pos_mask;
+      
+      bit_set[field_id] &= MaskLow<field_t>(index % field_t_bits);
+      return *this;
     }
     // Returns mask that keeps bits lower than index
-    field_t Mask_Low(size_t index) {
-      field_t pos_mask = 0;
-      for (size_t i = 0; i < index; i++) {
-        pos_mask |= 1 << FieldPos(num_bits - i - 1);
+    BitVector & Mask_Low(size_t index) {
+      field_id = FieldPos(index);
+      int field_t_bits = sizeof(bit_set[0]) * 8;
+      
+      for (int i = field_id + 1; i < NumFields(); i++) {
+        bit_set[i] = 0;
       }
-      return pos_mask;
+      bit_set[field_id] &= MaskLow<field_t>(index % field_t_bits);
+      return *this;
     }
 
     /// Insert bits into vector, including middle using bitmagic
     void Insert2(size_t index, bool value=true, size_t num=1) {
       Resize(num_bits + num);
       // masklow and shift right
-      auto high_bits = *bit_set & Mask_High(index);
-      //high_bits.ShiftRight(num);
-      // maskhigh
-      //bit_set &= Mask_Low(index);
-      // Put 3 parts together
+      BitVector a = *this;
+      a.Mask_High(index);
+      a.ShiftRight(num);
+      BitVector b = *this;
+      a.Mask_Low(index);
+
       //bit_set |= high_bits;
       for (size_t i = index; i < index + num; i++) {
         Set(i, value);

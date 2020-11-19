@@ -298,8 +298,11 @@ TEST_CASE("Benchmark BitVector Inserts", "[bits]"){
 		}
 	}());
 	REQUIRE(bv.size() == std::mega::num + 2);
+
+	
 	emp::BitVector bv_a(0);
 	bv_a.Insert(0,false, 7);
+
 	//bv_a.Insert2(0, true);
 	REQUIRE(bv_a.Mask_High(0) == 63);
 	bv_a.Mask_High(1);
