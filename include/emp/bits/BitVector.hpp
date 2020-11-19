@@ -717,12 +717,44 @@ namespace emp {
         Set(num_bits-1, bit);
     }
 
-    /// Insert bits into vector, including middle
+    /// Insert bits into vector, including middle using Set()
     void Insert(size_t index, bool value=true, size_t num=1) {
       Resize(num_bits + num);
       for (size_t j = num_bits - 1; j >= index + num; j--) {
         Set(j, Get(j - num));
       }
+      for (size_t i = index; i < index + num; i++) {
+        Set(i, value);
+      }
+    }
+
+    // Returns mask that keeps bits higher than index
+    field_t Mask_High(size_t index) {
+      field_t pos_mask = 0;
+      for (size_t i = 0; i < num_bits - index - 1; i++) {
+        pos_mask |= 1 << FieldPos(i);
+      }
+      return pos_mask;
+    }
+    // Returns mask that keeps bits lower than index
+    field_t Mask_Low(size_t index) {
+      field_t pos_mask = 0;
+      for (size_t i = 0; i < index; i++) {
+        pos_mask |= 1 << FieldPos(num_bits - i - 1);
+      }
+      return pos_mask;
+    }
+
+    /// Insert bits into vector, including middle using bitmagic
+    void Insert2(size_t index, bool value=true, size_t num=1) {
+      Resize(num_bits + num);
+      // masklow and shift right
+      auto high_bits = *bit_set & Mask_High(index);
+      //high_bits.ShiftRight(num);
+      // maskhigh
+      //bit_set &= Mask_Low(index);
+      // Put 3 parts together
+      //bit_set |= high_bits;
       for (size_t i = index; i < index + num; i++) {
         Set(i, value);
       }
