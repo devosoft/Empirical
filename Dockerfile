@@ -106,7 +106,7 @@ RUN \
     cmake=3.10.2-1ubuntu2.18.04.1 \
     build-essential=12.4ubuntu1 \
     python-virtualenv=15.1.0+ds-1.1 \
-    python-pip=9.0.1-2.3~ubuntu1.18.04.3 \
+    python-pip \
     python3-virtualenv \
     python3-pip \
     nodejs=8.10.0~dfsg-2ubuntu0.4 \
