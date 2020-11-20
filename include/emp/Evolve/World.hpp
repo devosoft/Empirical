@@ -132,7 +132,7 @@ namespace emp {
     using fun_get_neighbor_t    = std::function<WorldPosition(WorldPosition)>;
 
     /// Function type for determining if two organisms are neighbors.
-    using fun_is_neighbor_t     = std::function<bool(size_t, size_t)>;
+    using fun_is_neighbor_t     = std::function<bool(WorldPosition, WorldPosition)>;
 
   protected:
     // Internal state member variables
@@ -840,7 +840,7 @@ namespace emp {
     WorldPosition GetRandomNeighborPos(WorldPosition pos) { return fun_get_neighbor(pos); }
 
     /// Use the specified function to determine if two indices are neighboring.
-    bool IsNeighbor(size_t id1, size_t id2) {return fun_is_neighbor(id1, id2); }
+    bool IsNeighbor(WorldPosition id1, WorldPosition id2) { return fun_is_neighbor(id1, id2); }
 
     /// Get the id of a random *occupied* cell.
     size_t GetRandomOrgID();
@@ -980,7 +980,7 @@ namespace emp {
 
     // Since neighbors are anywhere in the same population, all organisms in the same
     // population are neighbors.
-    fun_is_neighbor = [](size_t pos1, size_t pos2) {return true;};
+    fun_is_neighbor = [](WorldPosition pos1, WorldPosition pos2) { return true;};
 
     // Kill random organisms and move end into vacant position to keep pop compact.
     fun_kill_org = [this](){
@@ -1029,7 +1029,7 @@ namespace emp {
     fun_get_neighbor = [this](WorldPosition pos) { return pos.SetIndex(GetRandomCellID()); };
 
     // Neighbors are anywhere in same population, so all organisms are neighbors.
-    fun_is_neighbor = [](size_t pos1, size_t pos2) {return true;};
+    fun_is_neighbor = [](WorldPosition pos1, WorldPosition pos2) { return true; };
 
     // Kill random organisms and move end into vacant position to keep pop compact.
     fun_kill_org = [this](){
@@ -1098,9 +1098,9 @@ namespace emp {
     };
 
     // Neighbors are in 8-sized neighborhood excluding self
-    fun_is_neighbor = [this](size_t pos1, size_t pos2) {
-      int id1 = (int)pos1;
-      int id2 = (int)pos2;
+    fun_is_neighbor = [this](WorldPosition pos1, WorldPosition pos2) {
+      int id1 = (int)pos1.GetIndex();
+      int id2 = (int)pos2.GetIndex();
       emp_assert(pop_sizes.size() == 2);
 
       int size_x = (int) pop_sizes[0];
@@ -1394,7 +1394,7 @@ namespace emp {
     emp::vector<size_t> valid_IDs(0);
     for(size_t i = 0; i < pop.size(); i++) {
       if ((bool) (pop[i].Raw()) && IsNeighbor(id, i)) {
-	valid_IDs.push_back(i);
+	      valid_IDs.push_back(i);
       }
     }
     return valid_IDs;
