@@ -38,7 +38,7 @@ namespace emp {
     static bool init = false;      // Make sure we only initialize once!
     if (!init) {
       // Setup the animation callback in Javascript
-      EM_ASM({
+      MAIN_THREAD_EM_ASM({
         window.requestAnimFrame = (function(callback) {
             return window.requestAnimationFrame
               || window.webkitRequestAnimationFrame
@@ -92,12 +92,12 @@ namespace emp {
 
 #else
 
-#define EM_ASM(...)
-#define EM_ASM(...)
-#define EM_ASM_INT(...) 0
-#define EM_ASM_DOUBLE(...) 0.0
-#define EM_ASM_INT_V(...) 0
-#define EM_ASM_DOUBLE_V(...) 0.0
+#define MAIN_THREAD_EM_ASM(...)
+#define MAIN_THREAD_EM_ASM(...)
+#define MAIN_THREAD_EM_ASM_INT(...) 0
+#define MAIN_THREAD_EM_ASM_DOUBLE(...) 0.0
+#define MAIN_THREAD_EM_ASM_INT_V(...) 0
+#define MAIN_THREAD_EM_ASM_DOUBLE_V(...) 0.0
 
 #include <fstream>
 

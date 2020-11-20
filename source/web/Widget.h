@@ -345,7 +345,7 @@ namespace web {
         else ss << "<span id='" << id << "'></span>";
 
         // Now do the replacement.
-        EM_ASM({
+        MAIN_THREAD_EM_ASM({
             var widget_id = UTF8ToString($0);
             var out_html = UTF8ToString($1);
             $('#' + widget_id).replaceWith(out_html);
@@ -436,7 +436,7 @@ namespace web {
   double Widget::GetXPos() {
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       var rect = $('#' + id).position();
       if (rect === undefined) return -1.0;
@@ -447,7 +447,7 @@ namespace web {
   double Widget::GetYPos() {
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       var rect = $('#' + id).position();
       if (rect === undefined) return -1.0;
@@ -458,7 +458,7 @@ namespace web {
   double Widget::GetWidth(){
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       return $('#' + id).width();
     }, GetID().c_str());
@@ -466,7 +466,7 @@ namespace web {
   double Widget::GetHeight(){
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       return $('#' + id).height();
     }, GetID().c_str());
@@ -474,7 +474,7 @@ namespace web {
   double Widget::GetInnerWidth(){
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       return $('#' + id).innerWidth();
     }, GetID().c_str());
@@ -482,7 +482,7 @@ namespace web {
   double Widget::GetInnerHeight(){
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       return $('#' + id).innerHeight();
     }, GetID().c_str());
@@ -490,7 +490,7 @@ namespace web {
   double Widget::GetOuterWidth(){
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       return $('#' + id).outerWidth();
     }, GetID().c_str());
@@ -498,7 +498,7 @@ namespace web {
   double Widget::GetOuterHeight(){
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       return $('#' + id).outerHeight();
     }, GetID().c_str());

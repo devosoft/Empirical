@@ -101,7 +101,7 @@ namespace web {
       for (auto & w : dependants) { w.Redraw(); }
 
       // Setup the callback for the next frame of the Tween.
-      EM_ASM({
+      MAIN_THREAD_EM_ASM({
           requestAnimFrame(function() { emp.Callback($0); });
         }, callback_id);
     }

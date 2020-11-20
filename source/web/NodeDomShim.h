@@ -22,7 +22,7 @@ namespace web {
 
   struct NodeDomShim {
 
-    NodeDomShim(const emp::vector<std::string>& init_divs={}) { EM_ASM(
+    NodeDomShim(const emp::vector<std::string>& init_divs={}) { MAIN_THREAD_EM_ASM(
 
       // setup jsdom
       var jsdom = require("jsdom");

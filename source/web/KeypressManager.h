@@ -82,7 +82,7 @@ namespace web {
         std::bind( &KeypressManager::DoCallback, this, _1 );
       callback_id = JSWrap( callback_fun );
 
-      EM_ASM({
+      MAIN_THREAD_EM_ASM({
           document.addEventListener('keydown', function(evt) {
               var is_used = emp.Callback($0, evt);
               if (is_used == 1) evt.preventDefault();

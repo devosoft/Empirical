@@ -83,7 +83,7 @@ namespace web {
     void Apply(const std::string & widget_id) {
       // Find the current object only once.
 #ifdef __EMSCRIPTEN__
-      EM_ASM({
+      MAIN_THREAD_EM_ASM({
           var id = UTF8ToString($0);
           emp_i.cur_obj = $( '#' + id );
         }, widget_id.c_str());
@@ -91,7 +91,7 @@ namespace web {
 
       for (auto event_pair : listeners) {
 #ifdef __EMSCRIPTEN__
-        EM_ASM({
+        MAIN_THREAD_EM_ASM({
           var name = UTF8ToString($0);
           emp_i.cur_obj.on( name, function(evt) { emp.Callback($1, evt); } );
         }, event_pair.first.c_str(), event_pair.second);
@@ -108,7 +108,7 @@ namespace web {
                       const std::string event_name,
                       size_t fun_id) {
 #ifdef __EMSCRIPTEN__
-        EM_ASM({
+        MAIN_THREAD_EM_ASM({
           var id = UTF8ToString($0);
           var name = UTF8ToString($1);
           $( '#' + id ).on( name, function(evt) { emp.Callback($2, evt); } );
