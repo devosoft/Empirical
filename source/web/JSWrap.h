@@ -45,6 +45,9 @@
 #include <tuple>
 #include <type_traits>
 
+#include <emscripten/emscripten.h>
+#include <emscripten/threading.h>
+
 #include "../meta/meta.h"
 
 #include "../base/assert.h"
@@ -444,7 +447,7 @@ namespace emp {
     // The following function returns a static callback array; callback ID's all index into
     // this array.
     static emp::vector<JSWrap_Callback_Base *> & CallbackArray() {
-      static emp::vector<JSWrap_Callback_Base *> callback_array(1, nullptr);
+      thread_local emp::vector<JSWrap_Callback_Base *> callback_array{nullptr};
       return callback_array;
     }
 
@@ -525,11 +528,19 @@ namespace emp {
   /// @cond SIMPLIFY
 }
 
-/// Once you use JSWrap to create an ID, you can call the wrapped function from Javascript
-/// by supplying CPPCallback with the id and all args.
+extern "C" {
 
-extern "C" void empCppCallback(size_t cb_id)
-{
+/// What is the pthread id of the process that executes main?
+/// if we are operating in pthread proxy mode, this should be set by main
+int emp_main_pthread{};
+
+/// Dispatches callback sent from the browser thread on the main thread
+/// (whether the browser thread is the main thread or not).
+void empDoCppCallback(const size_t cb_id) {
+
+  // if main pthread has been recorded, we should be on it
+  emp_assert( emp_main_pthread == 0 || pthread_self() == emp_main_pthread );
+
   // Convert the uint passed in from 32 bits to 64 and THEN convert it to a pointer.
   auto * cb_obj = emp::internal::CallbackArray()[cb_id];
 
@@ -542,7 +553,38 @@ extern "C" void empCppCallback(size_t cb_id)
     delete cb_obj;
     emp::internal::CallbackArray()[cb_id] = nullptr;
   }
+
 }
+
+/// Once you use JSWrap to create an ID, you can call the wrapped function from Javascript
+/// by supplying CPPCallback with the id and all args.
+void empCppCallback(const size_t cb_id) {
+
+  // if main pthread was not reported or this callback was triggered from
+  // JavaScript on the main thread, assume we are operating on the main browser
+  // thread
+  if ( emp_main_pthread == 0 || pthread_self() == emp_main_pthread ) {
+
+    empDoCppCallback( cb_id );
+
+  // otherwise, we are operating in pthread proxy mode
+  // (off of the main browser thread, in a web worker) and need to route the
+  // callback there
+  } else {
+
+    emscripten_async_queue_on_thread_(
+      emp_main_pthread,
+      EM_FUNC_SIG_VI, // VI = no return value, one argument
+      (void*) &empDoCppCallback,
+      NULL,
+      cb_id
+    );
+
+  }
+
+}
+
+} // extern "C"
 
 /// @endcond
 
