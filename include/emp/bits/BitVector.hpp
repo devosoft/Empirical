@@ -642,11 +642,49 @@ namespace emp {
     }
 
     /// Set all bits to 1.
-    void SetAll() {
+    BitVector & SetAll() {
       const size_t NUM_FIELDS = NumFields();
       constexpr field_t all0 = 0;
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~all0;
       if (LastBitID() > 0) { bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID()); }
+      return *this;
+    }
+
+    /// Set a range of bits to one: [start, stop)
+    BitVector & SetRange(size_t start, size_t stop) {
+      emp_assert(start <= stop, start, stop, num_bits);
+      emp_assert(stop <= num_bits, stop, num_bits);
+      const size_t start_pos = FieldPos(start);
+      const size_t stop_pos = FieldPos(stop);
+      const size_t start_field = FieldID(start);
+      const size_t stop_field = FieldID(stop);
+      constexpr field_t val_one = 1;
+
+      // If the start field and stop field are the same, just step through the bits.
+      if (start_field == stop_field) {
+        const size_t num_bits = stop - start;
+        const field_t mask = ((val_one << num_bits) - 1) << start_pos;
+        bit_set[start_field] |= mask;
+      }
+
+      // Otherwise handle the ends and clear the chunks in between.
+      else {
+        // Set portions of start field
+        const size_t start_bits = FIELD_BITS - start_pos;
+        const field_t start_mask = ((val_one << start_bits) - 1) << start_pos;
+        bit_set[start_field] |= start_mask;
+
+        // Middle fields
+        for (size_t cur_field = start_field + 1; cur_field < stop_field; cur_field++) {
+          bit_set[cur_field] = ((field_t) 0) - 1;
+        }
+
+        // Set portions of stop field
+        const field_t stop_mask = (val_one << stop_pos) - 1;
+        bit_set[stop_field] |= stop_mask;
+      }
+
+      return *this;
     }
 
     /// Convert this BitVector to a string.
