@@ -610,7 +610,7 @@ namespace emp {
       emp_assert(stop <= num_bits, stop, num_bits);
       const size_t start_pos = FieldPos(start);
       const size_t stop_pos = FieldPos(stop);
-      const size_t start_field = FieldID(start);
+      size_t start_field = FieldID(start);
       const size_t stop_field = FieldID(stop);
       constexpr field_t val_one = 1;
 
@@ -624,12 +624,15 @@ namespace emp {
       // Otherwise handle the ends and clear the chunks in between.
       else {
         // Clear portions of start field
-        const size_t start_bits = FIELD_BITS - start_pos;
-        const field_t start_mask = ~(((val_one << start_bits) - 1) << start_pos);
-        bit_set[start_field] &= start_mask;
+        if (start_pos != 0) {
+          const size_t start_bits = FIELD_BITS - start_pos;
+          const field_t start_mask = ~(((val_one << start_bits) - 1) << start_pos);
+          bit_set[start_field] &= start_mask;
+          start_field++;
+        }
 
         // Middle fields
-        for (size_t cur_field = start_field + 1; cur_field < stop_field; cur_field++) {
+        for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
           bit_set[cur_field] = 0;
         }
 
