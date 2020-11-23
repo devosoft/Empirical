@@ -47,6 +47,9 @@
 
 #include <emscripten/emscripten.h>
 #include <emscripten/threading.h>
+#ifdef __EMSCRIPTEN_PTHREADS__
+#include <pthread.h>
+#endif //  __EMSCRIPTEN_PTHREADS__
 
 #include "../meta/meta.h"
 
@@ -530,16 +533,9 @@ namespace emp {
 
 extern "C" {
 
-/// What is the pthread id of the process that executes main?
-/// if we are operating in pthread proxy mode, this should be set by main
-int emp_main_pthread{};
-
 /// Dispatches callback sent from the browser thread on the main thread
 /// (whether the browser thread is the main thread or not).
 void empDoCppCallback(const size_t cb_id) {
-
-  // if main pthread has been recorded, we should be on it
-  emp_assert( emp_main_pthread == 0 || pthread_self() == emp_main_pthread );
 
   // Convert the uint passed in from 32 bits to 64 and THEN convert it to a pointer.
   auto * cb_obj = emp::internal::CallbackArray()[cb_id];
@@ -547,6 +543,31 @@ void empDoCppCallback(const size_t cb_id) {
   // Run DoCallback() on the generic base class type, which is virtual and will call
   // the correct template automatically.
   cb_obj->DoCallback();
+
+  // dispatch all pending offscreen canvas updates to the browser thread
+  #ifdef __EMSCRIPTEN_PTHREADS__
+  EM_ASM({
+
+    emp_i.pending_offscreen_canvas_ids.forEach( function( key, val, set ){
+
+      bitmap = emp_i.offscreen_canvases[key].transferToImageBitmap();
+      postMessage(
+        {
+          // this cmd corresponds to a 'nop' on emscripten's part
+          // see https://github.com/emscripten-core/emscripten/blob/bec6d1c1c1c982ecba787b8d51907d2ba51e6555/src/library_pthread.js#L366
+          // and also https://github.com/emscripten-core/emscripten/blob/be50706a38240e2f0679b60d58945f0e296ee9ee/system/lib/pthread/library_pthread_stub.c#L28
+          cmd: 'processQueuedMainThreadWork',
+          emp_canvas_id : key,
+          emp_bitmap : bitmap,
+        },
+        [ bitmap ] // transfer ownership of the bitmap
+      );
+    });
+
+    emp_i.pending_offscreen_canvas_ids.clear();
+
+  });
+  #endif
 
   // If we have indicated that this callback is single use, delete it now.
   if (cb_obj->IsDisposable()) {
@@ -560,27 +581,32 @@ void empDoCppCallback(const size_t cb_id) {
 /// by supplying CPPCallback with the id and all args.
 void empCppCallback(const size_t cb_id) {
 
-  // if main pthread was not reported or this callback was triggered from
-  // JavaScript on the main thread, assume we are operating on the main browser
-  // thread
-  if ( emp_main_pthread == 0 || pthread_self() == emp_main_pthread ) {
+  #ifndef __EMSCRIPTEN_PTHREADS__
 
     empDoCppCallback( cb_id );
 
-  // otherwise, we are operating in pthread proxy mode
-  // (off of the main browser thread, in a web worker) and need to route the
-  // callback there
-  } else {
+  #else
+
+  // dispatch the callback to the worker thread main was proxied to
+
+    const pthread_t proxy_pthread_id = EM_ASM_INT({
+
+      if ( Object.keys( PThread.pthreads ).length !== 0 ) {
+        console.assert( Object.keys( PThread.pthreads ).length === 1 );
+        return Object.keys(PThread.pthreads)[0];
+      } else return 0;
+
+    });
 
     emscripten_async_queue_on_thread_(
-      emp_main_pthread,
+      proxy_pthread_id,
       EM_FUNC_SIG_VI, // VI = no return value, one argument
       (void*) &empDoCppCallback,
       NULL,
       cb_id
     );
 
-  }
+  #endif // __EMSCRIPTEN_PTHREADS__
 
 }
 

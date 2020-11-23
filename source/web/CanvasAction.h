@@ -36,26 +36,26 @@ namespace web {
     /// Helper function to set the fill status.
     void Fill(const std::string & style="") {
       if (style != "") {
-        MAIN_THREAD_EM_ASM({
+        EM_ASM({
             emp_i.ctx.fillStyle = UTF8ToString($0);
           }, style.c_str());
       }
-      MAIN_THREAD_EM_ASM({ emp_i.ctx.fill(); });
+      EM_ASM({ emp_i.ctx.fill(); });
     }
 
     /// Helper function to set the stroke status.
     void Stroke(const std::string & style="") {
       if (style != "") {
-        MAIN_THREAD_EM_ASM({
+        EM_ASM({
             emp_i.ctx.strokeStyle = UTF8ToString($0);
           }, style.c_str());
       }
-      MAIN_THREAD_EM_ASM({ emp_i.ctx.stroke(); });
+      EM_ASM({ emp_i.ctx.stroke(); });
     }
 
     /// Helper function to set the stroke status.
     void LineWidth(double line_width=1.0) {
-      MAIN_THREAD_EM_ASM({
+      EM_ASM({
           emp_i.ctx.lineWidth = $0;
         }, line_width);
     }
@@ -79,7 +79,7 @@ namespace web {
     CanvasStrokeColor(const std::string & c) : color(c) { ; }
 
     void Apply() {
-      MAIN_THREAD_EM_ASM({
+      EM_ASM({
         var color = UTF8ToString($0);
         emp_i.ctx.strokeStyle = color;
       }, color.c_str());
@@ -95,7 +95,7 @@ namespace web {
     CanvasRotate(double a) : angle(a) { ; }
 
     void Apply() {
-      MAIN_THREAD_EM_ASM({
+      EM_ASM({
         emp_i.ctx.rotate($0);
       }, angle);
     }
@@ -111,7 +111,7 @@ namespace web {
     CanvasFont(const std::string & f) : font(f) { ; }
 
     void Apply() {
-      MAIN_THREAD_EM_ASM({
+      EM_ASM({
         emp_i.ctx.font = UTF8ToString($0);
       }, font.c_str());
     }
@@ -137,11 +137,11 @@ namespace web {
     void Apply() {
       image.OnLoad([this](){
         if (width == 0.0) {
-          MAIN_THREAD_EM_ASM({
+          EM_ASM({
             emp_i.ctx.drawImage(emp_i.images[$0], $1, $2);
           }, image.GetID(), position.GetX(), position.GetY());
         } else {
-          MAIN_THREAD_EM_ASM({
+          EM_ASM({
             emp_i.ctx.drawImage(emp_i.images[$0], $1, $2, $3, $4);
           }, image.GetID(), position.GetX(), position.GetY(), width, height);
         }

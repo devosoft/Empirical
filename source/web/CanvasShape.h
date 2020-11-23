@@ -81,7 +81,7 @@ namespace web {
       , radius(circle.GetRadius()) { ; }
 
     void Apply() {
-      MAIN_THREAD_EM_ASM({
+      EM_ASM({
           emp_i.ctx.beginPath();
           emp_i.ctx.arc($0, $1, $2, 0, Math.PI*2);
         }, p.GetX(), p.GetY(), radius);  // Draw the circle
@@ -104,7 +104,7 @@ namespace web {
       : CanvasShape(_x, _y, fc, lc), w(_w), h(_h) { ; }
 
     void Apply() {
-      MAIN_THREAD_EM_ASM({
+      EM_ASM({
           emp_i.ctx.beginPath();
           emp_i.ctx.rect($0, $1, $2, $3);
         }, p.GetX(), p.GetY(), w, h);  // Draw the rectangle
@@ -122,7 +122,7 @@ namespace web {
       : CanvasShape(_p), w(_w), h(_h) { ; }
 
     void Apply() {
-      MAIN_THREAD_EM_ASM({
+      EM_ASM({
           emp_i.ctx.clearRect($0, $1, $2, $3);
         }, p.GetX(), p.GetY(), w, h);  // Draw the rectangle
     }
@@ -147,17 +147,17 @@ namespace web {
     CanvasPolygon & AddPoint(Point p) { points.emplace_back(p); return *this; }
 
     void Apply() {
-      MAIN_THREAD_EM_ASM({
+      EM_ASM({
         emp_i.ctx.translate($0,$1);
         emp_i.ctx.beginPath();
         emp_i.ctx.moveTo($2, $3);
       }, p.GetX(), p.GetY(), points[0].GetX(), points[0].GetY());  // Setup the polygon
       for (size_t i = 1; i < points.size(); i++) {
-        MAIN_THREAD_EM_ASM({
+        EM_ASM({
           emp_i.ctx.lineTo($0, $1);
         }, points[i].GetX(), points[i].GetY());  // Draw the lines for the polygon
       }
-      MAIN_THREAD_EM_ASM({
+      EM_ASM({
         emp_i.ctx.closePath();
         emp_i.ctx.translate($0,$1);
       }, -p.GetX(), -p.GetY());  // Close the polygon
@@ -179,7 +179,7 @@ namespace web {
       : CanvasLine(p1.GetX(), p1.GetY(), p2.GetX(), p2.GetY(), lc, lw) { ; }
 
     void Apply() {
-      MAIN_THREAD_EM_ASM({
+      EM_ASM({
         emp_i.ctx.beginPath();
         emp_i.ctx.moveTo($0, $1);
         emp_i.ctx.lineTo($2, $3);
@@ -208,13 +208,13 @@ namespace web {
 
     void Apply() {
       // Startup the line path.
-      MAIN_THREAD_EM_ASM({
+      EM_ASM({
         emp_i.ctx.beginPath();
         emp_i.ctx.moveTo($0, $1);
       }, p.GetX(), p.GetY());
       // Loop through all internal points...
       for (auto p : points) {
-        MAIN_THREAD_EM_ASM({ emp_i.ctx.lineTo($0, $1); }, p.GetX(), p.GetY());
+        EM_ASM({ emp_i.ctx.lineTo($0, $1); }, p.GetX(), p.GetY());
       }
 
       LineWidth(line_width);
@@ -235,10 +235,10 @@ namespace web {
 
     void Apply() {
       if (center) {
-        MAIN_THREAD_EM_ASM({ emp_i.ctx.textAlign = "center"; });
-        MAIN_THREAD_EM_ASM({ emp_i.ctx.textBaseline = "middle"; });
+        EM_ASM({ emp_i.ctx.textAlign = "center"; });
+        EM_ASM({ emp_i.ctx.textBaseline = "middle"; });
       }
-      MAIN_THREAD_EM_ASM({
+      EM_ASM({
         emp_i.ctx.fillStyle = UTF8ToString($3);
         var text = UTF8ToString($2);
         emp_i.ctx.fillText(text,$0,$1);

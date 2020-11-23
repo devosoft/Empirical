@@ -52,15 +52,31 @@ namespace web {
              << "\" height=\"" << height << "\">";
         // @CAO We can include fallback content here for browsers that don't support canvas.
         HTML << "</canvas>";
+
+        // create an offscreen canvas
+        #ifdef __EMSCRIPTEN_PTHREADS__
+        EM_ASM({
+          var cname = UTF8ToString($0);
+          emp_i.offscreen_canvases[ cname ] = new OffscreenCanvas($1, $2);
+        }, id.c_str(), width, height);
+        #endif // __EMSCRIPTEN_PTHREADS__
       }
 
       // Setup a canvas to be drawn on.
       void TargetCanvas() {
-        MAIN_THREAD_EM_ASM({
-            var cname = UTF8ToString($0);
-            var canvas = document.getElementById(cname);
-            emp_i.ctx = canvas.getContext('2d');
+        #ifdef __EMSCRIPTEN_PTHREADS__
+        EM_ASM({
+          var cname = UTF8ToString($0);
+          var canvas = emp_i.offscreen_canvases[ cname ];
+          emp_i.pending_offscreen_canvas_ids.add( cname );
+          emp_i.ctx = canvas.getContext('2d');
         }, id.c_str());
+        #else
+        EM_ASM({
+          var cname = UTF8ToString($0);
+          var canvas = document.getElementById(cname);
+        }, id.c_str());
+        #endif
       }
 
       // Trigger any JS code needed on re-draw.

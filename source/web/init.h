@@ -18,24 +18,19 @@
 #include <emscripten.h>
 #include "../tools/string_utils.h"
 
+#ifdef  __EMSCRIPTEN_PTHREADS__
+#include <pthread.h>
+#endif //  __EMSCRIPTEN_PTHREADS__
+
 extern "C" {
   extern void EMP_Initialize();
 }
 
 namespace emp {
 
-  /// Do all initializations for using EMP tricks with Emscripten.
-  static void Initialize() {
-    static bool init = false;      // Make sure we only initialize once!
-    if (!init) {
-      EMP_Initialize();   // Call JS initializations
-      init = true;
-    }
-  }
-
   /// Setup timings on animations through Emscripten.
   static void InitializeAnim() {
-    static bool init = false;      // Make sure we only initialize once!
+    thread_local bool init = false;      // Make sure we only initialize once!
     if (!init) {
       // Setup the animation callback in Javascript
       MAIN_THREAD_EM_ASM({
@@ -49,9 +44,80 @@ namespace emp {
           })();
       });
     }
-
     init = true;
   }
+
+  /// Add a listener on the browser thread that will look for incoming
+  /// bitmaps and transfer them into web canvases.
+  static void InitializeBitmapListener() {
+    #ifdef __EMSCRIPTEN_PTHREADS__
+
+    // adapted from https://stackoverflow.com/a/18002694
+    if ( EM_ASM_INT({ // detect if we are a web worker
+      return typeof WorkerGlobalScope !== 'undefined'
+        && self instanceof WorkerGlobalScope;
+    }) ) {
+      MAIN_THREAD_EM_ASM({
+        console.assert( Object.keys( PThread.pthreads ).length === 1 );
+        Object.values(PThread.pthreads)[0].worker.addEventListener(
+          'message',
+          function( event ){
+            if ( event.data.emp_canvas_id ) {
+              document.getElementById(
+                event.data.emp_canvas_id
+              ).getContext("bitmaprenderer").transferFromImageBitmap( event.data.emp_bitmap
+              );
+            }
+          }
+        )
+      });
+    }
+
+    #endif // __EMSCRIPTEN_PTHREADS__
+  }
+
+  /// Create a offscreen canvases registry that maps id to impl and a registry
+  /// for updated canvases that need to be sent to the main thread.
+  static void InitializeOffscreenCanvasRegistries() {
+    #ifdef __EMSCRIPTEN_PTHREADS__
+
+    // adapted from https://stackoverflow.com/a/18002694
+    if ( EM_ASM_INT({ // detect if we are a web worker
+      return typeof WorkerGlobalScope !== 'undefined'
+        && self instanceof WorkerGlobalScope;
+    }) ) EM_ASM({
+      emp_i.offscreen_canvases = {};
+      emp_i.pending_offscreen_canvas_ids = new Set();
+    });
+
+    #endif // __EMSCRIPTEN_PTHREADS__
+  }
+
+  /// Do all initializations for using EMP tricks with Emscripten.
+  static void Initialize() {
+
+    // have to dip into javascript because static and thread_local are wonky
+    // with pthreads
+    const bool should_run = EM_ASM_INT({
+      if ( !globalThis.emp_init_once_flag ) {
+        globalThis.emp_init_once_flag = true;
+        return true;
+      } else return false;
+    });
+
+    if ( should_run ) {
+      EMP_Initialize();   // Call JS initializations
+      InitializeAnim();
+
+      #ifdef __EMSCRIPTEN_PTHREADS__
+      MAIN_THREAD_EM_ASM({ _EMP_Initialize(); });
+      InitializeBitmapListener();
+      InitializeOffscreenCanvasRegistries();
+      #endif
+
+    }
+  }
+
 
   namespace web {
     // Some helper functions.
