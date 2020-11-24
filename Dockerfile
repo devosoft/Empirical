@@ -114,7 +114,7 @@ RUN \
     tar=1.29b-2ubuntu0.1 \
     gzip=1.6-5ubuntu1 \
     libpthread-stubs0-dev=0.3-4 \
-    libc6-dbg=2.27-3ubuntu1.2 \
+    libc6-dbg=2.27-3ubuntu1.3 \
     gdb=8.2-0ubuntu1~18.04 \
     doxygen \
     && \
