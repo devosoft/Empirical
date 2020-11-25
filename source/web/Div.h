@@ -345,6 +345,13 @@ namespace web {
       return Info()->GetRegistered(test_name);
     }
 
+    /// Determine if a specified widget is internal to this one.
+    bool HasChild(const std::string & test_name) const {
+      emp_assert(info);
+      return Info()->IsRegistered(test_name);
+    }
+
+
     /// Get all direct child widgets to this div.
     emp::vector<Widget> & Children() { return Info()->m_children; }
 
