@@ -102,7 +102,7 @@ namespace web {
       for (auto & w : targets) { w.Redraw(); }
 
       // Setup the callback for the next frame of the animation.
-      MAIN_THREAD_EM_ASM({
+      MAIN_THREAD_ASYNC_EM_ASM({
           requestAnimFrame(function() { emp.Callback($0); });
         }, callback_id);
 

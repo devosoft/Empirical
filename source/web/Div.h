@@ -180,7 +180,7 @@ namespace web {
         // If this element (as new parent) is active, anchor widget and activate it!
         if (state == Widget::ACTIVE) {
           // Create a span tag to anchor the new widget.
-          MAIN_THREAD_EM_ASM({
+          MAIN_THREAD_ASYNC_EM_ASM({
               parent_id = UTF8ToString($0);
               child_id = UTF8ToString($1);
               $('#' + parent_id).append('<span id="' + child_id + '"></span>');
@@ -264,7 +264,7 @@ namespace web {
         }
 
         if (scroll_top >= 0.0) {
-          MAIN_THREAD_EM_ASM({
+          MAIN_THREAD_ASYNC_EM_ASM({
               var div_id = UTF8ToString($0);
               var div_obj = document.getElementById(div_id);
               if (div_obj == null) alert(div_id);
