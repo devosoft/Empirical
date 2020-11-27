@@ -179,12 +179,13 @@ namespace web {
 
         // If this element (as new parent) is active, anchor widget and activate it!
         if (state == Widget::ACTIVE) {
+          std::cout << "ActivatingChild" << std::endl;
           // Create a span tag to anchor the new widget.
           MAIN_THREAD_ASYNC_EM_ASM({
-              parent_id = UTF8ToString($0);
-              child_id = UTF8ToString($1);
-              $('#' + parent_id).append('<span id="' + child_id + '"></span>');
-            }, id.c_str(), in.GetID().c_str());
+            parent_id = UTF8ToString($0);
+            child_id = UTF8ToString($1);
+            $(`#${parent_id}`).append(`<span id="${child_id}"></span>`);
+          }, id.c_str(), in.GetID().c_str());
 
           // Now that the new widget has some place to hook in, activate it!
           in->DoActivate();
