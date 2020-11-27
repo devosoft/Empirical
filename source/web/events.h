@@ -34,6 +34,19 @@ namespace web {
     MAIN_THREAD_EM_ASM({  $( document ).ready(function() { emp.Callback($0); });  }, fun_id);
   }
 
+  /// Runs the specified function when the document is finished loading.
+  template <typename FUN_TYPE> void OnDocumentLoad(FUN_TYPE && fun) {
+    // const size_t fun_id = JSWrapOnce(fun);
+    const size_t fun_id = JSWrap(std::forward<FUN_TYPE>(fun), "", true);
+    (void) fun_id;
+
+    MAIN_THREAD_EM_ASM({
+        $( window ).on( "load", function() { emp.Callback($0); });
+      },
+      fun_id
+    );
+  }
+
   /// Data common to all web events.
   struct Event {
     bool bubbles;           ///< Is this a bubbling event?

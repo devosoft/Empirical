@@ -273,8 +273,12 @@ namespace web {
 
       // Activate is delayed until the document is ready, when DoActivate will be called.
       virtual void DoActivate(bool top_level=true) {
-        state = Widget::ACTIVE;         // Activate this widget and its children.
-        if (top_level) ReplaceHTML();   // Print full contents to document.
+
+        if ( state != Widget::ACTIVE ) {
+          state = Widget::ACTIVE;
+          if ( top_level ) ReplaceHTML();
+        }
+
       }
 
       virtual bool AppendOK() const { return false; } // Most widgets can't be appended to.
@@ -508,6 +512,7 @@ namespace web {
     auto * cur_info = info;
     info->state = WAITING;
     OnDocumentReady( std::function<void(void)>([cur_info](){ cur_info->DoActivate(); }) );
+    OnDocumentLoad( std::function<void(void)>([cur_info](){ cur_info->DoActivate(); }) );
   }
 
   void Widget::Freeze() {
