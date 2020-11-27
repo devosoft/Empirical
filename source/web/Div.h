@@ -128,7 +128,7 @@ namespace web {
       void ClearChildren() {
         // Unregister all children and then delete links to them.
         for (Widget & child : m_children) Unregister(child);
-        m_children.resize(0);
+        m_children.clear();
         if (state == Widget::ACTIVE) ReplaceHTML();
       }
 
