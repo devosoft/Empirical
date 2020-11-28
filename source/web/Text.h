@@ -76,6 +76,14 @@ namespace web {
 
     using INFO_TYPE = TextInfo;
 
+    // Prune current text.
+    Text & PruneTo( const size_t n ) {
+      if ( n < Info()->strings.GetSize() ) {
+        Info()->strings.PopFront( Info()->strings.GetSize() - n );
+      }
+      return *this;
+    }
+
     /// Erase current text.
     Text & Clear() { Info()->strings.Clear(); return *this; }
   };
