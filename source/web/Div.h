@@ -267,7 +267,7 @@ namespace web {
         if (scroll_top >= 0.0) {
           MAIN_THREAD_ASYNC_EM_ASM({
               var div_id = UTF8ToString($0);
-              var div_obj = document.getElementById(div_id);
+              var div_obj = $(`#${div_id}`);
               if (div_obj == null) alert(div_id);
               // alert('id=' + div_id + '  top=' + $1 +
               //       '  height=' + div_obj.scrollHeight);
