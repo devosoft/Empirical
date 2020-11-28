@@ -23,6 +23,7 @@
 #include <iterator>
 #include <limits>
 #include <memory>
+#include <numeric>
 
 #include "../base/array.h"
 #include "../base/assert.h"
@@ -253,6 +254,15 @@ namespace emp {
     // If we made it here without a problem, it must be correct!
     return true;
   }
+
+  /// Concatenate n copies of a string.
+  inline std::string repeat( const std::string& value, const size_t n ) {
+    const emp::vector<std::string> repeated( n, value );
+    return std::accumulate(
+      std::begin(repeated), std::end(repeated), std::string{}
+    );
+  }
+
 
   /// Convert a literal string representation to an actual string.
   static inline std::string from_literal_string(const std::string & value) {
