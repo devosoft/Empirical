@@ -179,7 +179,6 @@ namespace web {
 
         // If this element (as new parent) is active, anchor widget and activate it!
         if (state == Widget::ACTIVE) {
-          std::cout << "ActivatingChild" << std::endl;
           // Create a span tag to anchor the new widget.
           MAIN_THREAD_ASYNC_EM_ASM({
             parent_id = UTF8ToString($0);
