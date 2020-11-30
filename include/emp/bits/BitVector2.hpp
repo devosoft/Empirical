@@ -27,8 +27,8 @@
  */
 
 
-#ifndef EMP_BIT_VECTOR_H
-#define EMP_BIT_VECTOR_H
+#ifndef EMP_BIT_VECTOR2_H
+#define EMP_BIT_VECTOR2_H
 
 #include <iostream>
 #include <bitset>
@@ -69,69 +69,63 @@ namespace emp {
     size_t NumBytes()  const { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
 
     /// BitProxy lets us use operator[] on with BitVector as an lvalue.
-    struct BitProxy {
+    class BitProxy {
+    private:
       BitVector & bit_vector;  ///< Which BitVector does this proxy belong to?
       size_t index;            ///< Which position in the bit vector does this proxy point at?
 
+      // Helper functions.
+      bool Get() const { return bit_vector.Get(index); }
+
+    public:
       /// Setup a new proxy with the associated vector and index.
       BitProxy(BitVector & _v, size_t _idx) : bit_vector(_v), index(_idx) {;}
 
       /// Assignment operator to the bit associated with this proxy (as an lvalue).
-      BitProxy & operator=(bool b) {
-        bit_vector.Set(index, b);
-        return *this;
-      }
+      BitProxy & operator=(bool b) { bit_vector.Set(index, b); return *this; }
 
       /// Conversion of this proxy to Boolean (as an rvalue)
-      operator bool() const {
-        return bit_vector.Get(index);
-      }
+      operator bool() const { return bit_vector.Get(index); }
 
       /// Compound assignement operator AND using BitProxy as lvalue.
-      /// @note Implemented in BitProxy since it needs to work, but may not be efficient.
+      /// @note In BitProxy since it needs to work, but may not be efficient.
       BitProxy & operator &=(bool b) {
-        const bool v = bit_vector.Get(index);
-        bit_vector.Set(index, v & b);
+        bit_vector.Set(index, Get() & b);
         return *this;
       }
 
       /// Compound assignement operator OR using BitProxy as lvalue.
-      /// @note Implemented in BitProxy since it needs to work, but may not be efficient.
+      /// @note In BitProxy since it needs to work, but may not be efficient.
       BitProxy & operator |=(bool b) {
-        const bool v = bit_vector.Get(index);
-        bit_vector.Set(index, v | b);
+        bit_vector.Set(index, Get() | b);
         return *this;
       }
 
       /// Compound assignement operator XOR using BitProxy as lvalue.
       /// @note Implemented in BitProxy since it needs to work, but may not be efficient.
       BitProxy & operator ^=(bool b) {
-        const bool v = bit_vector.Get(index);
-        bit_vector.Set(index, v ^ b);
+        bit_vector.Set(index, Get() ^ b);
         return *this;
       }
 
       /// Compound assignement operator PLUS using BitProxy as lvalue.
       /// @note Implemented in BitProxy since it needs to work, but may not be efficient.
       BitProxy & operator +=(bool b) {
-        const bool v = bit_vector.Get(index);
-        bit_vector.Set(index, v || b);
+        bit_vector.Set(index, Get() || b);
         return *this;
       }
 
       /// Compound assignement operator MINUS using BitProxy as lvalue.
       /// @note Implemented in BitProxy since it needs to work, but may not be efficient.
       BitProxy & operator -=(bool b) {
-        const bool v = bit_vector.Get(index);
-        bit_vector.Set(index, v - b);
+        bit_vector.Set(index, Get() - b);
         return *this;
       }
 
       /// Compound assignement operator TIMES using BitProxy as lvalue.
       /// @note Implemented in BitProxy since it needs to work, but may not be efficient.
       BitProxy & operator *=(bool b) {
-        const bool v = bit_vector.Get(index);
-        bit_vector.Set(index, v && b);
+        bit_vector.Set(index, Get() && b);
         return *this;
       }
 
@@ -142,7 +136,7 @@ namespace emp {
         emp_assert(b == true);
         return *this;
       }
-    };
+    }; // --- End of BitProxy
 
     /// Identify the field that a specified bit is in.
     static constexpr size_t FieldID(const size_t index)  { return index / FIELD_BITS; }
