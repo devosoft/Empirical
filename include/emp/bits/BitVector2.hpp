@@ -55,9 +55,11 @@ namespace emp {
     // cases.
     using field_t = size_t;
 
-    static constexpr size_t FIELD_BITS = sizeof(field_t)*8; ///< How many bits are in a field?
-    size_t num_bits;                                        ///< How many total bits are we using?
-    Ptr<field_t> bit_set;                                   ///< What is the status of each bit?
+    static constexpr size_t FIELD_SIZE = sizeof(field_t); ///< Number of bytes in a field
+    static constexpr size_t FIELD_BITS = FIELD_SIZE*8;    ///< Number of bits in a field
+
+    size_t num_bits;        ///< How many total bits are we using?
+    Ptr<field_t> bit_set;   ///< What is the status of each bit?
 
     /// End position of the stored bits in the last field; 0 if perfect fit.
     size_t LastBitID() const { return num_bits & (FIELD_BITS - 1); }
@@ -120,11 +122,11 @@ namespace emp {
     static constexpr size_t FieldPos(const size_t index) { return index & (FIELD_BITS-1); }
 
     /// Identify which field a specified byte position would be in.
-    static constexpr size_t Byte2Field(const size_t index) { return index/sizeof(field_t); }
+    static constexpr size_t Byte2Field(const size_t index) { return index/FIELD_SIZE; }
 
     /// Convert a byte position in BitVector to a byte position in the target field.
     static constexpr size_t Byte2FieldPos(const size_t index) {
-      return (index & (sizeof(field_t)-1)) << 3;
+      return (index & (FIELD_SIZE-1)) << 3;
     }
 
     /// Assume that the size of the bit_set has already been adjusted to be the size of the one
@@ -477,24 +479,7 @@ namespace emp {
       bit_set[field_id] = (bit_set[field_id] & ~(static_cast<field_t>(255) << pos_id)) | (val_uint << pos_id);
     }
 
-    /// Retrieve the 32-bit uint from the specified uint index.
-    /*
-    uint32_t GetUInt(size_t index) const {
-      // If the fields are already 32 bits, return.
-      if constexpr (sizeof(field_t) == 4) return bit_set[index];
-
-      emp_assert(sizeof(field_t) == 8);
-
-      const size_t field_id = index/2;
-      const size_t field_pos = 1 - (index & 1);
-
-      emp_assert(field_id < NumFields());
-
-      return (uint32_t) (bit_set[field_id] >> (field_pos * 32));
-    }
-    */
-   // Retrieve the 32-bit uint from the specified uint index.
-   // new implementation based on bitset.h GetUInt32
+   // Retrieve the 32-bit uint from the specified uint index (based on bitset.h GetUInt32)
     uint32_t GetUInt(size_t index) const {
       emp_assert(index * 32 < num_bits);
 
@@ -531,19 +516,30 @@ namespace emp {
 
     }
 
+    // @CAO: THIS IS CURRENTLY INCORRECT.  If the FIELD_SIZE is 4, we are using
+    // index as a field index, not a bit index.  If FILED_SIZE is 8, we're ignoring
+    // rollover into the next field.
+    
     void SetUIntAtBit(size_t index, uint32_t value) {
-      if constexpr (sizeof(field_t) == 4) bit_set[index] = value;
-
-      emp_assert(sizeof(field_t) == 8);
-
       const size_t field_id = FieldID(index);
       const size_t field_pos = FieldPos(index);
-      const field_t mask = ((field_t) ((uint32_t) -1)) << (1-field_pos);
+      const field_t mask1 = ((field_t) ((uint32_t) -1)) >> field_pos;
+      const size_t end_pos = field_pos + 32;
+      const size_t overshoot = (end_pos > FIELD_BITS) ? end_pos - FIELD_BITS : 0;
+      const field_t mask2 = MaskLow<field_t>(overshoot);
 
-      emp_assert(field_id < NumFields());
+      emp_assert(index+32 <= num_bits);
+      emp_assert(!overshoot || field_id+1 < NumFields());
 
-      bit_set[field_id] &= mask;   // Clear out bits that we are setting.
-      bit_set[field_id] |= ((field_t) value) << (field_pos * 32);
+      // Clear bits that we are setting 1's then OR in new value.
+      bit_set[field_id] &= ~mask1;
+      bit_set[field_id] |= ((field_t) value) >> field_pos;
+
+      // Repeat for next field if needed.
+      if (overshoot) {
+        bit_set[field_id+1] &= ~mask2;
+        bit_set[field_id+1] |= ((field_t) value) << (32-overshoot);
+      }
     }
 
     /// Retrive the 32-bit uint at the specified BIT index.
