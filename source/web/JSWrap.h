@@ -547,7 +547,8 @@ void empDoCppCallback(const size_t cb_id) {
   // dispatch all pending offscreen canvas updates to the browser thread
   #ifdef __EMSCRIPTEN_PTHREADS__
   EM_ASM({
-
+    emp_i.pending_offscreen_canvas_ids
+      = emp_i.pending_offscreen_canvas_ids || new Set();
     emp_i.pending_offscreen_canvas_ids.forEach( function( key, val, set ){
 
       bitmap = emp_i.offscreen_canvases[key].transferToImageBitmap();
