@@ -1,4 +1,4 @@
-TEST_NAMES = BitSet BitMatrix bitset_utils BitVector
+TEST_NAMES = BitSet BitMatrix bitset_utils BitVector BitVector2
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/
