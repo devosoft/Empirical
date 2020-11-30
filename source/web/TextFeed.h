@@ -111,7 +111,6 @@ namespace web {
       // ideally, we would use MAIN_THREAD_ASYNC_EM_ASM but that seems to
       // garble string arguments (as of emscripten 1.38.48)
       MAIN_THREAD_EM_ASM({
-        console.log( UTF8ToString($1) );
         var content = document.createElement('span');
         content.innerHTML = UTF8ToString($1);
         $( `#${UTF8ToString($0)}` ).append( content );
