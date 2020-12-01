@@ -18,7 +18,7 @@ in private:
 ```cpp
 emp::Ptr<DataMonitor<double, emp::<data::Histogram>>> my_data_node; // double and Histogram can be replaced by what you need
 /*
-Current modifiers (found in source/data/DataNode.h):
+Current modifiers (found in include/emp/data/DataNode.h):
     Current, Info, Log, Archive, Range, FullRange,
     Histogram, Pull, SignalReset, SignalData,
     SignalDatum, SignalRange, SignalLimits
@@ -39,7 +39,7 @@ World_file & SetupMyDataFile(const std::string & filename) {
     //Histograms need every bin set up, most others don't need anything else
     file.AddHistBin(node, 0, "[Hist]()-1", "Count for hist bin -1");
 
-    /* Current options for Add: (Found in source/data/DataFile.h)
+    /* Current options for Add: (Found in include/emp/data/DataFile.h)
         Add, AddFun, AddVar, AddCurrent, AddMean,
         AddTotal, AddMin, AddMax, AddHistBin, AddInferiority
     */
@@ -78,7 +78,7 @@ In your `project_name.cc` file in main:
 //Timing repeat for how often you want data printed
 my_world.SetupPopulationFile().SetTimingRepeat(10);
 
-/* Lots of premade options for files (found in source/Evolve/World.h)
+/* Lots of premade options for files (found in include/emp/Evolve/World.h)
     SetupFile, setupFitnessFile,
     SetupSystematicsFile, SetupPopulationFile
 */

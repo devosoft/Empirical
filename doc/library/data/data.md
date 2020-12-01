@@ -8,7 +8,7 @@ arguments) which control how much information they will collect about
 the data they are passed. For instance, the `data::Current` modifier
 gives the DataNode the power to remember the last value it was passed,
 whereas the `data::Stats` modifier keeps track of a variety of
-statisticcs about the distribution of data that the node has been
+statistics about the distribution of data that the node has been
 passed. Except where otherwise noted, modifiers can be combined freely.
 Some also have dependencies on simpler modifiers. On the whole,
 DataNodes are designed to be as light-weight as possible while still
@@ -32,28 +32,28 @@ for collecting data over the course of a computational experiment.
 ### DataNodes
 
 ```{eval-rst}
-.. doxygenfile:: data/DataNode.h
+.. doxygenfile:: emp/data/DataNode.hpp
   :project: Empirical
 ```
 
 ### DataManagers
 
 ```{eval-rst}
-.. doxygenfile:: data/DataManager.h
+.. doxygenfile:: emp/data/DataManager.hpp
   :project: Empirical
 ```
 
 ### DataInterfaces
 
 ```{eval-rst}
-.. doxygenfile:: data/DataInterface.h
+.. doxygenfile:: emp/data/DataInterface.hpp
   :project: Empirical
 ```
 
 ### DataFiles
 
 ```{eval-rst}
-.. doxygenfile:: data/DataFile.h
+.. doxygenfile:: emp/data/DataFile.hpp
   :project: Empirical
 ```
 

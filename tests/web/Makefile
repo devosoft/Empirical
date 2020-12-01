@@ -3,7 +3,7 @@ SHELL := /bin/bash
 TEST_NAMES = ConfigPanel Collapse LoadingModal Card CommentBox Modal ToggleSwitch CodeBlock LoadingIcon FontAwesomeIcon ClickCounterDemo ClickCollapseDemo Element js_utils visualizations JSWrap Widget
 
 # Flags to use regardless of compiler
-CFLAGS_all := -Wall -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments -Wno-dollar-in-identifier-extension -std=c++17 -I../../source/ -I../../
+CFLAGS_all := -Wall -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments -Wno-dollar-in-identifier-extension -std=c++17 -I../../include/ -I../../
 
 # Emscripten compiler information
 CXX_web := emcc
@@ -13,17 +13,17 @@ OFLAGS_web := -Werror -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEM
 #initializer lists - to compile files with them, we need to remove -Werror
 OFLAGS_web_braces := -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864
 
-CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../source/web/library_emp.js --js-library ../../source/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "stringToUTF8"]' -s WASM=0
+CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../include/emp/web/library_emp.js --js-library ../../include/emp/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "stringToUTF8"]' -s WASM=0
 
 test: $(addprefix test-, $(TEST_NAMES)) test-color_map test-GetUrlParams
 
-test-%: %.cc
+test-%: %.cpp
 	source ../../third-party/emsdk/emsdk_env.sh; \
 	$(CXX_web) $(CFLAGS_web) $< -o $@.js
 	../../third-party/node_modules/karma/bin/karma start karma.conf.js --filename $@
 
-test-color_map: color_map.cc ../../third-party/Catch/single_include/catch2/catch.hpp
-	g++ $(CFLAGS_all) color_map.cc -o color_map.out
+test-color_map: color_map.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
+	g++ $(CFLAGS_all) color_map.cpp -o color_map.out
 	./color_map.out
 
 test-GetUrlParams: GetUrlParams.cc

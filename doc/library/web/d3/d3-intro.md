@@ -47,14 +47,14 @@ we\'ll use the Empirical web module to build the whole web page:
 ``` cpp
 // Always include web_init.h when you're doing web stuff -
 // it makes sure everything gets initialized right
-#include "../Empirical/web/web_init.h"
+#include "../Empirical/include/emp/web/web_init.hpp"
 
 // We're using a document object to arrange everything
 // we're drawing.
-#include "../Empirical/web/Document.h"
+#include "../Empirical/include/emp/web/Document.hpp"
 
 //Contains pre-built visualizations
-#include "../Empirical/web/d3/visualizations.h"
+#include "../Empirical/include/emp/web/d3/visualizations.hpp"
 
 // The document object is in charge of all of the Javascript
 // and html that goes in the <div> element in the html. It
@@ -83,8 +83,8 @@ Now we need to compile it:
 
 ``` bash
 emcc my_program.cc -o my_program.js \ #.js extension tells Emscripten to compile to Javascript
-     --js-library ../Empirical/web/library_emp.js    \ #Include the Empirical Javascript library
-     --js-library ../Empirical/web/d3/library_d3.js  \ #Include Javascript library for D3 wrapper
+     --js-library ../Empirical/include/emp/web/library_emp.js    \ #Include the Empirical Javascript library
+     --js-library ../Empirical/include/emp/web/d3/library_d3.js  \ #Include Javascript library for D3 wrapper
      -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" \ #Tells Emscripten what to export from C++
      -s ASSERTIONS=2 \ #Emscripten needs to know this
      -s DEMANGLE_SUPPORT=1 \ #Make names of variables in Javascript more readable
@@ -118,9 +118,9 @@ file:
     <body>
         <!-- Include necessary javascript libraries
         (jquery, d3, and a d3 tooltip library) -->
-        <script src="Empirical/web/jquery-1.11.2.min.js"></script>
-        <script src="Empirical/web/d3/d3.min.js" charset="utf-8"></script>
-        <script src="Empirical/web/d3/d3-tip.js" charset="utf-8"></script>
+        <script src="Empirical/include/emp/web/jquery-1.11.2.min.js"></script>
+        <script src="Empirical/include/emp/web/d3/d3.min.js" charset="utf-8"></script>
+        <script src="Empirical/include/emp/web/d3/d3-tip.js" charset="utf-8"></script>
 
         <!-- Include the Javascript file you
         compiled your C++ code to -->
@@ -280,9 +280,9 @@ let\'s say we have this html file:
     <body>
         <!-- Include necessary javascript libraries
         (jquery, and d3) -->
-        <script src="Empirical/web/jquery-1.11.2.min.js">
+        <script src="Empirical/include/emp/web/jquery-1.11.2.min.js">
         </script>
-        <script src="Empirical/web/d3/d3.min.js" charset="utf-8">
+        <script src="Empirical/include/emp/web/d3/d3.min.js" charset="utf-8">
         </script>
 
         <!-- Include the Javascript file you compiled your
