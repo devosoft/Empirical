@@ -4,8 +4,8 @@
 #include <numeric>
 #include <ratio>
 
-#include "../../base/vector.h"
-#include "../../datastructs/SmallVector.h"
+#include "../../base/vector.hpp"
+#include "../../datastructs/SmallVector.hpp"
 
 namespace emp {
 namespace statics {
@@ -30,7 +30,7 @@ struct RankedSelector {
 
     res_t res( scores.size() );
     std::iota( std::begin(res), std::end(res), 0 );
-    
+
     const auto partition = std::partition(
       std::begin( res ),
       std::end( res ),
