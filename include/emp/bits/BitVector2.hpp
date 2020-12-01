@@ -9,13 +9,13 @@
  *
  *  Compile with -O3 and -msse4.2 for fast bit counting.
  *
- *  @todo Most of the operators don't check to make sure that both Bitvextors are the same size.
+ *  @todo Most of the operators don't check to make sure that both BitVectors are the same size.
  *        We should create versions (Intersection() and Union()?) that adjust sizes if needed.
  *
  *  @todo Do small BitVector optimization.  Currently we have number of bits (8 bytes) and a
  *        pointer to the memory for the bitset (another 8 bytes), but we could use those 16 bytes
  *        as 1 byte of size info followed by 15 bytes of bitset (120 bits!)
- *  @todo For BitVectors larger than 120 bits, we can use a factory to preserve bit info.
+ *  @todo For BitVectors larger than 120 bits, we can use a factory to preserve/adjust bit info.
  *  @todo Implement append(), resize()...
  *  @todo Implement techniques to push bits (we have pop)
  *  @todo Implement techniques to insert or remove bits from middle.
@@ -516,10 +516,7 @@ namespace emp {
 
     }
 
-    // @CAO: THIS IS CURRENTLY INCORRECT.  If the FIELD_SIZE is 4, we are using
-    // index as a field index, not a bit index.  If FILED_SIZE is 8, we're ignoring
-    // rollover into the next field.
-    
+    /// Set a 32-bit uint at the specified BIT index.
     void SetUIntAtBit(size_t index, uint32_t value) {
       const size_t field_id = FieldID(index);
       const size_t field_pos = FieldPos(index);
@@ -559,8 +556,8 @@ namespace emp {
     /// Retrieve the specified number of bits (stored in the field type) at the target bit index.
     template <size_t OUT_BITS>
     field_t GetValueAtBit(size_t index) {
-      // @CAO This function needs to be generalized to return more then sizeof(field_t)*8 bits.
-      static_assert(OUT_BITS <= sizeof(field_t)*8, "Requesting too many bits to fit in a UInt");
+      // @CAO This function needs to be generalized to return more then one field of bits.
+      static_assert(OUT_BITS <= FIELD_BITS, "Requesting too many bits to fit in a field");
       return GetUIntAtBit(index) & MaskLow<field_t>(OUT_BITS);
     }
 
