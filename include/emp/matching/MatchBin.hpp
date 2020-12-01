@@ -39,7 +39,7 @@
 #include "../base/vector.hpp"
 #include "../datastructs/IndexMap.hpp"
 #include "../bits/BitSet.hpp"
-#include "../matchbin/matchbin_utils.hpp"
+#include "../matching/matchbin_utils.hpp"
 #include "../data/DataFile.hpp"
 #include "../data/DataNode.hpp"
 #include "../base/errors.hpp"
