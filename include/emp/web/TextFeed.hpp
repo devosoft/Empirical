@@ -16,7 +16,7 @@
 #include <limits>
 #include <string>
 
-#include "Widget.h"
+#include "Widget.hpp"
 
 namespace emp {
 namespace web {
