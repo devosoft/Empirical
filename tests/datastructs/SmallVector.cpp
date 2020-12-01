@@ -14,7 +14,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "datastructs/SmallVector.h"
+#include "emp/datastructs/SmallVector.hpp"
 
 #include <list>
 #include <stdarg.h>
@@ -1203,7 +1203,7 @@ TEST_CASE("Small vector, constructors", "[tools]") {
     // Adapted from https://en.cppreference.com/w/cpp/container/vector/vector
     const emp::SmallVector<std::string, 5> words0 = {"the", "frogurt", "is", "also", "cursed"};
     emp::SmallVector<std::string, 5> words1 {"the", "frogurt", "is", "also", "cursed"};
-    
+
     // words2 == words1
     emp::SmallVector<std::string, 5> words2(words1.begin(), words1.end());
 

@@ -4,10 +4,10 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "matching/MatchDepository.hpp"
-#include "matching/selectors_static/RankedSelector.hpp"
-#include "tools/matchbin_regulators.hpp"
-#include "tools/matchbin_metrics.hpp"
+#include "emp/matching/MatchDepository.hpp"
+#include "emp/matching/selectors_static/RankedSelector.hpp"
+#include "emp/tools/matchbin_regulators.hpp"
+#include "emp/tools/matchbin_metrics.hpp"
 
 TEST_CASE("MatchDepository Put, Get, GetSize, Clear", "[tools]") {
 

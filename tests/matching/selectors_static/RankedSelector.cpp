@@ -4,8 +4,8 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "base/vector.hpp"
-#include "matching/selectors_static/RankedSelector.hpp"
+#include "emp/base/vector.hpp"
+#include "emp/matching/selectors_static/RankedSelector.hpp"
 
 using tenth = std::ratio<1, 10>;
 
