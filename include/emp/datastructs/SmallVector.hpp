@@ -27,8 +27,8 @@
 #include <type_traits>
 #include <utility>
 
-#include "../base/assert.h"
-#include "../tools/math.h"
+#include "../base/assert.hpp"
+#include "../math/math.hpp"
 
 #include "AlignedCharArrayUnion.h"
 
