@@ -51,8 +51,8 @@ Let's take a look at what we want to compile.
 
 #include <iostream>
 
-#include "base/vector.h"
-#include "config/command_line.h"
+#include "emp/base/vector.hpp"
+#include "emp/config/command_line.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -65,8 +65,8 @@ int main(int argc, char* argv[])
 This part is where Empirical source is brought in.
 
 ```cpp
-#include "base/vector.h"
-#include "config/command_line.h"
+#include "emp/base/vector.hpp"
+#include "emp/config/command_line.hpp"
 ```
 
 The main function uses Empirical's vector and argument parsing tools to
@@ -134,7 +134,7 @@ Let's take a look at what we want to compile first, though.
 //  Copyright (C) Michigan State University, 2017.
 //  Released under the MIT Software license; see doc/LICENSE
 
-#include "web/web.h"
+#include "emp/web/web.hpp"
 
 namespace UI = emp::web;
 
@@ -149,7 +149,7 @@ int main()
 The line
 
 ```cpp
-#include "web/web.h"
+#include "emp/web/web.hpp"
 ```
 
 brings in Empirical's web tools, which provide a convenient interface

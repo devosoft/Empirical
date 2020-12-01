@@ -1,4 +1,4 @@
-TEST_NAMES := matching selectors_static
+TEST_NAMES := _DepositoryEntry MatchBin MatchBin_logging matchbin_utils MatchDepository matching selectors_static
 
 CXX = clang++
 #CXX := g++
