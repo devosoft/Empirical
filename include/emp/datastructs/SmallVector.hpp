@@ -30,7 +30,7 @@
 #include "../base/assert.hpp"
 #include "../math/math.hpp"
 
-#include "AlignedCharArrayUnion.h"
+#include "AlignedCharArrayUnion.hpp"
 
 namespace emp {
 
