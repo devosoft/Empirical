@@ -33,6 +33,7 @@ jobs:
       - run: git fetch origin master:refs/remotes/origin/master
       - run: npm install source-map
       - run: make install-test-dependencies
-      - run: source third-party/emsdk/emsdk_env.sh
       - run: ${CXX} --version
-      - run: make ${TEST_SET} CXX=${CXX}
+      - run: |
+          source third-party/emsdk/emsdk_env.sh
+          make ${TEST_SET} CXX=${CXX}
