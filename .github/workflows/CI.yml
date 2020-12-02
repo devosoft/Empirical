@@ -13,7 +13,7 @@ jobs:
       matrix:
         cxx: [clang++, g++]
         test-set:
-          - test-web
+          # - test-web
           - test-native-regular
           - test-native-fulldebug
           - test-native-opt
