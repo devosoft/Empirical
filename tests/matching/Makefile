@@ -1,42 +1,53 @@
-TEST_NAMES := _DepositoryEntry MatchBin MatchBin_logging matchbin_utils MatchDepository matching selectors_static
+TEST_NAMES := _DepositoryEntry MatchBin MatchBin_logging matchbin_utils MatchDepository RankedSelector
 
-CXX = clang++
-#CXX := g++
+# -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
+FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/
 
 default: test
 
-test-%:
-	cd $(@:test-%=%) && make test
+cov-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
+	$(CXX) $(FLAGS) $< -lstdc++fs -o $@.out
+	#echo "running $@.out"
+	# execute test
+	./$@.out
+	llvm-profdata merge default.profraw -o default.profdata
+	llvm-cov show ./$@.out -instr-profile=default.profdata > coverage_$@.txt
+	python ../../third-party/force-cover/fix_coverage.py coverage_$@.txt
 
-test: $(addprefix test-, $(TEST_NAMES))
+test-prep:
+	mkdir -p temp
 
-coverage-%:
-	cd $(@:coverage-%=%) && make coverage
+test-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
+	$(CXX) $(FLAGS) $< -lstdc++fs -o $@.out
+	# execute test
+	./$@.out
 
-coverage: coverage_conversion $(addprefix coverage-, $(TEST_NAMES))
+# Test in debug mode without pointer tracker
+test: test-prep $(addprefix test-, $(TEST_NAMES))
+	rm -rf test*.out
 
-coverage_conversion:
-	cd .. && ./convert_for_tests.sh
+coverage: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../coverage_source/ -I../../ -I../../third-party/cereal/include/ -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 -fprofile-instr-generate -fcoverage-mapping -fno-inline -fno-elide-constructors -O0
+coverage: test-prep $(addprefix cov-, $(TEST_NAMES))
 
-opt-%:
-	cd $(@:opt-%=%) && make opt
+# Test optimized version without debug features
+opt: FLAGS := -std=c++17 -pthread -DNDEBUG -O3 -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../
+opt: test-prep $(addprefix test-, $(TEST_NAMES))
+	rm -rf test*.out
 
-opt: $(addprefix opt-, $(TEST_NAMES))
+# Test in debug mode with pointer tracking
+fulldebug: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 # -Wmisleading-indentation
+fulldebug: test-prep $(addprefix test-, $(TEST_NAMES))
+	rm -rf test*.out
 
-fulldebug-%:
-	cd $(@:fulldebug-%=%) && make fulldebug
+cranky: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
+cranky: test-prep $(addprefix test-, $(TEST_NAMES))
+	rm -rf test*.out
 
-fulldebug: $(addprefix fulldebug-, $(TEST_NAMES))
+../../third-party/Catch/single_include/catch2/catch.hpp:
+	git submodule init
+	git submodule update
 
-cranky-%:
-	cd $(@:cranky-%=%) && make cranky
-
-cranky: $(addprefix cranky-, $(TEST_NAMES))
-
-test-web:
-	  cd web && bash run_tests.sh
-
-clean: $(addprefix clean-, $(TEST_NAMES)) clean-web
+clean:
 	rm -f *.out
 	rm -f *.o
 	rm -f *.gcda
@@ -45,6 +56,3 @@ clean: $(addprefix clean-, $(TEST_NAMES)) clean-web
 	rm -f *.gcov
 	rm -f ./Coverage*
 	rm -rf ./temp
-
-clean-%:
-	cd $(@:clean-%=%) && make clean
