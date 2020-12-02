@@ -78,3 +78,23 @@ jobs:
       - run: docker build -t devosoft/empirical .
       - run: docker ps -a
       - run: sudo docker run devosoft/empirical /bin/bash -c "cd /opt/Empirical/doc && make html coverage | ./headtail.sh"
+  deploy-dockerhub:
+    name: Deploy to DockerHub
+    runs-on: ubuntu-16.04
+    needs:
+      - test
+      - test-web
+      - test-coverage
+      - test-documentation
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v1
+        with:
+          push: true
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: devosoft/empirical
+          tag_with_ref: true
