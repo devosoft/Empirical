@@ -15,10 +15,9 @@
  *  @todo Do small BitVector optimization.  Currently we have number of bits (8 bytes) and a
  *        pointer to the memory for the bitset (another 8 bytes), but we could use those 16 bytes
  *        as 1 byte of size info followed by 15 bytes of bitset (120 bits!)
- *  @todo For BitVectors larger than 120 bits, we can use a factory to preserve/adjust bit info.
- *  @todo Implement append(), resize()...
- *  @todo Implement techniques to push bits (we have pop)
- *  @todo Implement techniques to insert or remove bits from middle.
+ *  @todo For large BitVectors we can use a factory to preserve/adjust bit info.  That should be
+ *        just as efficient than a reserve, but without the need to store extra in-class info.
+ *  @todo Implement append(), resize(), push_bit(), insert(), remove()
  *  @todo Think about how itertors should work for BitVector.  It should probably go bit-by-bit,
  *        but there are very few circumstances where that would be useful.  Going through the
  *        positions of all ones would be more useful, but perhaps less intuitive.
@@ -64,7 +63,7 @@ namespace emp {
     static constexpr field_t FIELD_ALL = ~FIELD_0;        ///< All bits in a field set to 1
 
     size_t num_bits;        ///< Total number of bits are we using
-    Ptr<field_t> bits;   ///< Pointer to array with the status of each bit
+    Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
 
     /// Num bits used in partial field at the end; 0 if perfect fit.
     size_t NumEndBits() const { return num_bits & (FIELD_BITS - 1); }
@@ -123,7 +122,7 @@ namespace emp {
     static constexpr size_t FieldPos(const size_t index) { return index & (FIELD_BITS-1); }
 
     /// Identify which field a specified byte position would be in.
-    static constexpr size_t Byte2Field(const size_t index) { return index/FIELD_SIZE; }
+    static constexpr size_t Byte2Field(const size_t index) { return index / FIELD_SIZE; }
 
     /// Convert a byte position in BitVector to a byte position in the target field.
     static constexpr size_t Byte2FieldPos(const size_t index) {
@@ -142,6 +141,11 @@ namespace emp {
 
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = in[i];
+    }
+
+    /// Any bits past the last "real" on in the last field should be kept as zeros.
+    void ClearExcessBits() {
+      if (NumEndBits() > 0) bits[NumFields() - 1] &= MaskLow<field_t>(NumEndBits());
     }
 
     /// Helper: call SHIFT with positive number
@@ -170,8 +174,7 @@ namespace emp {
       }
 
       // Mask out any bits that have left-shifted away
-      const size_t last_bit_id = NumEndBits();
-      if (last_bit_id) { bits[NUM_FIELDS - 1] &= MaskLow<field_t>(last_bit_id); }
+      ClearExcessBits();
     }
 
 
@@ -303,8 +306,7 @@ namespace emp {
 
       if (NUM_FIELDS == old_num_fields) {   // We can use our existing bit field
         num_bits = new_bits;
-        // If there are extra bits, zero them out.
-        if (NumEndBits() > 0) bits[NUM_FIELDS - 1] &= MaskLow<field_t>(NumEndBits());
+        ClearExcessBits();                  // If there are extra bits, zero them out.
       }
 
       else {  // We must change the number of bitfields.  Resize & copy old info.
@@ -633,7 +635,7 @@ namespace emp {
     BitVector & SetAll() {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = FIELD_ALL;
-      if (NumEndBits() > 0) { bits[NUM_FIELDS - 1] &= MaskLow<field_t>(NumEndBits()); }
+      ClearExcessBits();
       return *this;
     }
 
@@ -804,21 +806,21 @@ namespace emp {
     /// Return positions of all ones.
     emp::vector<size_t> GetOnes() const {
       // @CAO -- There are probably better ways to do this with bit tricks.
-      emp::vector<size_t> out_set(CountOnes());
+      emp::vector<size_t> out_vals(CountOnes());
       size_t cur_pos = 0;
       for (size_t i = 0; i < num_bits; i++) {
-        if (Get(i)) out_set[cur_pos++] = i;
+        if (Get(i)) out_vals[cur_pos++] = i;
       }
-      return out_set;
+      return out_vals;
     }
 
     /// Perform a Boolean NOT on this BitVector and return the result.
     BitVector NOT() const {
       const size_t NUM_FIELDS = NumFields();
-      BitVector out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bits[i] = ~bits[i];
-      if (NumEndBits() > 0) out_set.bits[NUM_FIELDS - 1] &= MaskLow<field_t>(NumEndBits());
-      return out_set;
+      BitVector out_bv(*this);
+      for (size_t i = 0; i < NUM_FIELDS; i++) out_bv.bits[i] = ~bits[i];
+      out_bv.ClearExcessBits();
+      return out_bv;
     }
 
     /// Perform a Boolean AND on this BitVector and return the result.
@@ -842,7 +844,7 @@ namespace emp {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_bv(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_bv.bits[i] = ~(bits[i] & bv2.bits[i]);
-      if (NumEndBits() > 0) out_bv.bits[NUM_FIELDS - 1] &= MaskLow<field_t>(NumEndBits());
+      out_bv.ClearExcessBits();
       return out_bv;
     }
 
@@ -851,7 +853,7 @@ namespace emp {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_bv(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_bv.bits[i] = ~(bits[i] | bv2.bits[i]);
-      if (NumEndBits() > 0) out_bv.bits[NUM_FIELDS - 1] &= MaskLow<field_t>(NumEndBits());
+      out_bv.ClearExcessBits();
       return out_bv;
     }
 
@@ -868,7 +870,7 @@ namespace emp {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_bv(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_bv.bits[i] = ~(bits[i] ^ bv2.bits[i]);
-      if (NumEndBits() > 0) out_bv.bits[NUM_FIELDS - 1] &= MaskLow<field_t>(NumEndBits());
+      out_bv.ClearExcessBits();
       return out_bv;
     }
 
@@ -877,7 +879,7 @@ namespace emp {
     BitVector & NOT_SELF() {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~bits[i];
-      if (NumEndBits() > 0) bits[NUM_FIELDS - 1] &= MaskLow<field_t>(NumEndBits());
+      ClearExcessBits();
       return *this;
     }
 
@@ -899,7 +901,7 @@ namespace emp {
     BitVector & NAND_SELF(const BitVector & bv2) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] & bv2.bits[i]);
-      if (NumEndBits() > 0) bits[NUM_FIELDS - 1] &= MaskLow<field_t>(NumEndBits());
+      ClearExcessBits();
       return *this;
     }
 
@@ -907,7 +909,7 @@ namespace emp {
     BitVector & NOR_SELF(const BitVector & bv2) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] | bv2.bits[i]);
-      if (NumEndBits() > 0) bits[NUM_FIELDS - 1] &= MaskLow<field_t>(NumEndBits());
+      ClearExcessBits();
       return *this;
     }
 
@@ -922,16 +924,16 @@ namespace emp {
     BitVector & EQU_SELF(const BitVector & bv2) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] ^ bv2.bits[i]);
-      if (NumEndBits() > 0) bits[NUM_FIELDS - 1] &= MaskLow<field_t>(NumEndBits());
+      ClearExcessBits();
       return *this;
     }
 
     /// Positive shifts go left and negative go right (0 does nothing); return result.
     BitVector SHIFT(const int shift_size) const {
-      BitVector out_set(*this);
-      if (shift_size > 0) out_set.ShiftRight((size_t) shift_size);
-      else if (shift_size < 0) out_set.ShiftLeft((size_t) -shift_size);
-      return out_set;
+      BitVector out_bv(*this);
+      if (shift_size > 0) out_bv.ShiftRight((size_t) shift_size);
+      else if (shift_size < 0) out_bv.ShiftLeft((size_t) -shift_size);
+      return out_bv;
     }
 
     /// Positive shifts go left and negative go right; store result here, and return this object.
