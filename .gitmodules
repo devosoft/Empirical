@@ -3,7 +3,7 @@
 	url = https://github.com/catchorg/Catch2.git
 [submodule "third-party/force-cover"]
 	path = third-party/force-cover
-	url = https://github.com/emilydolson/force-cover.git
+	url = https://github.com/mmore500/force-cover.git
 [submodule "third-party/cereal"]
 	path = third-party/cereal
 	url = https://github.com/mmore500/cereal.git
