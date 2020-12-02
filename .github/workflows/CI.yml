@@ -47,3 +47,21 @@ jobs:
         uses: GabrielBB/xvfb-action@v1
         with:
           run: make test-web
+  test-coverage:
+    name: Measure Test Coverage
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+    steps:
+      - run: sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+      - run: wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+      - run: sudo apt-add-repository "deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-7 main"
+      - run: sudo apt-get update -qq
+      - run: sudo apt-get install -qq g++-8
+      - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
+      - run: sudo apt-get install cmake build-essential python-virtualenv python-pip nodejs tar gzip libclang-7-dev llvm-7 clang-7 libstdc++-7-dev # might have to happen after we update g++
+      - run: git fetch origin master:refs/remotes/origin/master
+      - run: make install-test-dependencies
+      - run: make install-coverage-dependencies
+      - run: make coverage CXX=clang++
+      - run: curl -s https://codecov.io/bash | bash
