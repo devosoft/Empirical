@@ -13,7 +13,6 @@ jobs:
       matrix:
         cxx: [clang++, g++]
         test-set:
-          # - test-web
           - test-native-regular
           - test-native-fulldebug
           - test-native-opt
@@ -36,3 +35,15 @@ jobs:
       - run: |
           source third-party/emsdk/emsdk_env.sh
           make ${TEST_SET} CXX=${CXX}
+  test-web:
+    name: Web Tests
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+    steps:
+      - run: sudo apt-get install -qq g++-8 cmake build-essential python-pip python-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
+      - run: make install-test-dependencies
+      - name: Run headless test
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: make test-web
