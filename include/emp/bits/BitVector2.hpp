@@ -58,6 +58,11 @@ namespace emp {
     static constexpr size_t FIELD_SIZE = sizeof(field_t); ///< Number of bytes in a field
     static constexpr size_t FIELD_BITS = FIELD_SIZE*8;    ///< Number of bits in a field
 
+    static constexpr field_t FIELD_0 = (field_t) 0;       ///< All bits in a field set to 0
+    static constexpr field_t FIELD_1 = (field_t) 1;       ///< Least significant bit set to 1
+    static constexpr field_t FIELD_255 = (field_t) 255;   ///< Least significant 8 bits set to 1
+    static constexpr field_t FIELD_ALL = ~FIELD_0;        ///< All bits in a field set to 1
+
     size_t num_bits;        ///< Total number of bits are we using
     Ptr<field_t> bits;   ///< Pointer to array with the status of each bit
 
@@ -166,8 +171,7 @@ namespace emp {
 
       // Mask out any bits that have left-shifted away
       const size_t last_bit_id = NumEndBits();
-      constexpr field_t val_one = 1;
-      if (last_bit_id) { bits[NUM_FIELDS - 1] &= (val_one << last_bit_id) - val_one; }
+      if (last_bit_id) { bits[NUM_FIELDS - 1] &= MaskLow<field_t>(last_bit_id); }
     }
 
 
@@ -384,8 +388,7 @@ namespace emp {
       emp_assert(index < num_bits, index, num_bits);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
-      constexpr field_t val_one = 1;
-      const field_t pos_mask = val_one << pos_id;
+      const field_t pos_mask = FIELD_1 << pos_id;
 
       if (value) bits[field_id] |= pos_mask;
       else       bits[field_id] &= ~pos_mask;
@@ -401,8 +404,7 @@ namespace emp {
       emp_assert(index < num_bits, index, num_bits);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
-      constexpr field_t val_one = 1;
-      const field_t pos_mask = val_one << pos_id;
+      const field_t pos_mask = FIELD_1 << pos_id;
 
       bits[field_id] ^= pos_mask;
 
@@ -417,12 +419,11 @@ namespace emp {
       const size_t stop_pos = FieldPos(stop);
       size_t start_field = FieldID(start);
       const size_t stop_field = FieldID(stop);
-      constexpr field_t val_one = 1;
 
       // If the start field and stop field are the same, just step through the bits.
       if (start_field == stop_field) {
-        const size_t num_bits = stop - start;
-        const field_t mask = ((val_one << num_bits) - 1) << start_pos;
+        const size_t num_flips = stop - start;
+        const field_t mask = MaskLow<field_t>(num_flips) << start_pos;
         bits[start_field] ^= mask;
       }
 
@@ -431,7 +432,7 @@ namespace emp {
         // Toggle correct portions of start field
         if (start_pos != 0) {
           const size_t start_bits = FIELD_BITS - start_pos;
-          const field_t start_mask = ((val_one << start_bits) - 1) << start_pos;
+          const field_t start_mask = MaskLow<field_t>(start_bits) << start_pos;
           bits[start_field] ^= start_mask;
           start_field++;
         }
@@ -442,7 +443,7 @@ namespace emp {
         }
 
         // Set portions of stop field
-        const field_t stop_mask = (val_one << stop_pos) - 1;
+        const field_t stop_mask = MaskLow<field_t>(stop_pos);
         bits[stop_field] ^= stop_mask;
       }
 
@@ -473,7 +474,7 @@ namespace emp {
       const size_t field_id = Byte2Field(index);
       const size_t pos_id = Byte2FieldPos(index);
       const field_t val_uint = value;
-      bits[field_id] = (bits[field_id] & ~(static_cast<field_t>(255) << pos_id)) | (val_uint << pos_id);
+      bits[field_id] = (bits[field_id] & ~(FIELD_255 << pos_id)) | (val_uint << pos_id);
     }
 
    // Retrieve the 32-bit uint from the specified uint index (based on bitset.h GetUInt32)
@@ -511,21 +512,21 @@ namespace emp {
     void SetUIntAtBit(size_t index, uint32_t value) {
       const size_t field_id = FieldID(index);
       const size_t field_pos = FieldPos(index);
-      const field_t mask1 = ((field_t) ((uint32_t) -1)) >> field_pos;
+      const field_t mask1 = MaskLow<field_t>(field_pos);
       const size_t end_pos = field_pos + 32;
       const size_t overshoot = (end_pos > FIELD_BITS) ? end_pos - FIELD_BITS : 0;
-      const field_t mask2 = MaskLow<field_t>(overshoot);
+      const field_t mask2 = ~MaskLow<field_t>(overshoot);
 
       emp_assert(index+32 <= num_bits);
       emp_assert(!overshoot || field_id+1 < NumFields());
 
       // Clear bits that we are setting 1's then OR in new value.
-      bits[field_id] &= ~mask1;
+      bits[field_id] &= mask1;
       bits[field_id] |= ((field_t) value) >> field_pos;
 
       // Repeat for next field if needed.
       if (overshoot) {
-        bits[field_id+1] &= ~mask2;
+        bits[field_id+1] &= mask2;
         bits[field_id+1] |= ((field_t) value) << (32-overshoot);
       }
     }
@@ -565,6 +566,7 @@ namespace emp {
     bool None() const { return !Any(); }
 
     /// Return true if ALL bits are set to 1, otherwise return false.
+    // @CAO: Can speed up by not duplicating the whole BitVector.
     bool All() const { return (~(*this)).None(); }
 
     /// Casting a bit array to bool identifies if ANY bits are set to 1.
@@ -596,12 +598,11 @@ namespace emp {
       const size_t stop_pos = FieldPos(stop);
       size_t start_field = FieldID(start);
       const size_t stop_field = FieldID(stop);
-      constexpr field_t val_one = 1;
 
       // If the start field and stop field are the same, just step through the bits.
       if (start_field == stop_field) {
         const size_t num_bits = stop - start;
-        const field_t mask = ~(((val_one << num_bits) - 1) << start_pos);
+        const field_t mask = ~(MaskLow<field_t>(num_bits) << start_pos);
         bits[start_field] &= mask;
       }
 
@@ -610,7 +611,7 @@ namespace emp {
         // Clear portions of start field
         if (start_pos != 0) {
           const size_t start_bits = FIELD_BITS - start_pos;
-          const field_t start_mask = ~(((val_one << start_bits) - 1) << start_pos);
+          const field_t start_mask = ~(MaskLow<field_t>(start_bits) << start_pos);
           bits[start_field] &= start_mask;
           start_field++;
         }
@@ -621,7 +622,7 @@ namespace emp {
         }
 
         // Clear portions of stop field
-        const field_t stop_mask = ~((val_one << stop_pos) - 1);
+        const field_t stop_mask = ~MaskLow<field_t>(stop_pos);
         bits[stop_field] &= stop_mask;
       }
 
@@ -631,8 +632,7 @@ namespace emp {
     /// Set all bits to 1.
     BitVector & SetAll() {
       const size_t NUM_FIELDS = NumFields();
-      constexpr field_t all0 = 0;
-      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~all0;
+      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = FIELD_ALL;
       if (NumEndBits() > 0) { bits[NUM_FIELDS - 1] &= MaskLow<field_t>(NumEndBits()); }
       return *this;
     }
@@ -645,12 +645,11 @@ namespace emp {
       const size_t stop_pos = FieldPos(stop);
       size_t start_field = FieldID(start);
       const size_t stop_field = FieldID(stop);
-      constexpr field_t val_one = 1;
 
       // If the start field and stop field are the same, just step through the bits.
       if (start_field == stop_field) {
         const size_t num_bits = stop - start;
-        const field_t mask = ((val_one << num_bits) - 1) << start_pos;
+        const field_t mask = MaskLow<field_t>(num_bits) << start_pos;
         bits[start_field] |= mask;
       }
 
@@ -659,18 +658,18 @@ namespace emp {
         // Set portions of start field
         if (start_pos != 0) {
           const size_t start_bits = FIELD_BITS - start_pos;
-          const field_t start_mask = ((val_one << start_bits) - 1) << start_pos;
+          const field_t start_mask = MaskLow<field_t>(start_bits) << start_pos;
           bits[start_field] |= start_mask;
           start_field++;
         }
 
         // Middle fields
         for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
-          bits[cur_field] = ((field_t) 0) - 1;
+          bits[cur_field] = FIELD_ALL;
         }
 
         // Set portions of stop field
-        const field_t stop_mask = (val_one << stop_pos) - 1;
+        const field_t stop_mask = MaskLow<field_t>(stop_pos);
         bits[stop_field] |= stop_mask;
       }
 
@@ -776,8 +775,7 @@ namespace emp {
       if (field_id == NUM_FIELDS) return -1;  // Failed to find bit!
 
       const size_t pos_found = find_bit(bits[field_id]);
-      constexpr field_t val_one = 1;
-      bits[field_id] &= ~(val_one << pos_found);
+      bits[field_id] &= ~(FIELD_1 << pos_found);
       return (int) (pos_found + (field_id * FIELD_BITS));
     }
 
