@@ -18,7 +18,7 @@ jobs:
           - test-native-fulldebug
           - test-native-opt
           - test-examples
-          - test-cookiecutter
+          # - test-cookiecutter
     env:
       CXX: ${{ matrix.cxx }}
       TEST_SET: ${{ matrix.test-set }}
