@@ -19,6 +19,9 @@ jobs:
           - test-native-opt
           - test-examples
           - test-cookiecutter
+    env:
+      CXX: ${{ matrix.cxx }}
+      TEST_SET: ${{ matrix.test-set }}
     steps:
       - uses: actions/checkout@v2
         with:
