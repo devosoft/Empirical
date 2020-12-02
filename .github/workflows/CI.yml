@@ -37,6 +37,7 @@ jobs:
           make ${TEST_SET} CXX=${CXX}
   test-web:
     name: Web Tests
+    runs-on: ubuntu-16.04
     steps:
       - uses: actions/checkout@v2
         with:
@@ -49,6 +50,7 @@ jobs:
           run: make test-web
   test-coverage:
     name: Measure Test Coverage
+    runs-on: ubuntu-16.04
     steps:
       - uses: actions/checkout@v2
         with:
