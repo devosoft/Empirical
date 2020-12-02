@@ -30,10 +30,9 @@ jobs:
       - run: sudo apt-get update -qq
       - run: sudo apt-get install -qq g++-8 cmake build-essential python-virtualenv python-pip nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
       - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
-      - run: export python="/usr/bin/python"
       - run: git fetch origin master:refs/remotes/origin/master
       - run: npm install source-map
-      - run: make install-test-dependencies
+      - run: export python="/usr/bin/python" && make install-test-dependencies
       - run: source third-party/emsdk/emsdk_env.sh
       - run: ${CXX} --version
       - name: Run headless test
