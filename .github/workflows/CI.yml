@@ -35,7 +35,4 @@ jobs:
       - run: make install-test-dependencies
       - run: source third-party/emsdk/emsdk_env.sh
       - run: ${CXX} --version
-      - name: Run headless test
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          run: make ${TEST_SET} CXX=${CXX}
+      - run: make ${TEST_SET} CXX=${CXX}
