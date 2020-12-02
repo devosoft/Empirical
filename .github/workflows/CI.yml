@@ -63,6 +63,7 @@ jobs:
       - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
       - run: sudo apt-get install cmake build-essential python-virtualenv python-pip nodejs tar gzip libclang-7-dev llvm llvm-dev libllvm7 llvm-7 llvm-7-dev clang-7 libstdc++-7-dev # might have to happen after we update g++
       - run: sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-7 90
+      - run: sudo update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-7 90
       - run: git fetch origin master:refs/remotes/origin/master
       - run: make install-test-dependencies
       - run: export CXX=clang++-7 && make install-coverage-dependencies
