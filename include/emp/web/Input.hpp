@@ -127,7 +127,7 @@ namespace web {
             }
 
             function modifyInputs() {
-                
+
                 var input_el = document.getElementById(UTF8ToString($0));
                 input_el.addEventListener("input", modifyOffset);
                 // the following taken from http://stackoverflow.com/questions/2856513/trigger-onchange-event-manually
@@ -236,8 +236,14 @@ namespace web {
     /// @param in_type The type of this input.
     /// @param in_label The label that should appear on the Input.
     /// @param in_id The HTML ID to use for this Input (leave blank for auto-generated)
-    Input(const std::function<void(std::string)> & in_cb, const std::string & in_type,
-          const std::string & in_label, const std::string & in_id="", bool show_value=false, bool is_checked=false)
+    Input(
+      const std::function<void(std::string)> & in_cb,
+      const std::string & in_type,
+      const std::string & in_label,
+      const std::string & in_id="",
+      bool show_value=false,
+      bool is_checked=false
+    )
       : WidgetFacet(in_id)
     {
       info = new InputInfo(in_id);

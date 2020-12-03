@@ -592,9 +592,9 @@ namespace web {
         if (IsActive()) Style::Apply(info->id, setting, value);
       }
 
-      virtual void DoCSS(const std::string & clss) {
-        info->extras.style.AddClass(clss);
-        if (IsActive()) Style::ApplyClass(info->id, clss);
+      virtual void DoCSS(const std::string & class_) {
+        info->extras.style.AddClass(class_);
+        if (IsActive()) Style::ApplyClass(info->id, class_);
       }
 
       /// Attr-related options may be overridden in derived classes that have multiple attributes.
