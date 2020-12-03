@@ -333,141 +333,55 @@ namespace emp {
                       const std::string & ranger="-") const;
 
 
-
-
-
-
-
+    // >>>>>>>>>>  Boolean Logic and Shifting Operations  <<<<<<<<<< //
 
     /// Perform a Boolean NOT on this BitVector and return the result.
-    BitVector NOT() const {
-      const size_t NUM_FIELDS = NumFields();
-      BitVector out_bv(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_bv.bits[i] = ~bits[i];
-      out_bv.ClearExcessBits();
-      return out_bv;
-    }
+    BitVector NOT() const;
 
     /// Perform a Boolean AND on this BitVector and return the result.
-    BitVector AND(const BitVector & bv2) const {
-      const size_t NUM_FIELDS = NumFields();
-      BitVector out_bv(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_bv.bits[i] = bits[i] & bv2.bits[i];
-      return out_bv;
-    }
+    BitVector AND(const BitVector & bv2) const;
 
     /// Perform a Boolean OR on this BitVector and return the result.
-    BitVector OR(const BitVector & bv2) const {
-      const size_t NUM_FIELDS = NumFields();
-      BitVector out_bv(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_bv.bits[i] = bits[i] | bv2.bits[i];
-      return out_bv;
-    }
+    BitVector OR(const BitVector & bv2) const;
 
     /// Perform a Boolean NAND on this BitVector and return the result.
-    BitVector NAND(const BitVector & bv2) const {
-      const size_t NUM_FIELDS = NumFields();
-      BitVector out_bv(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_bv.bits[i] = ~(bits[i] & bv2.bits[i]);
-      out_bv.ClearExcessBits();
-      return out_bv;
-    }
+    BitVector NAND(const BitVector & bv2) const;
 
     /// Perform a Boolean NOR on this BitVector and return the result.
-    BitVector NOR(const BitVector & bv2) const {
-      const size_t NUM_FIELDS = NumFields();
-      BitVector out_bv(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_bv.bits[i] = ~(bits[i] | bv2.bits[i]);
-      out_bv.ClearExcessBits();
-      return out_bv;
-    }
+    BitVector NOR(const BitVector & bv2) const;
 
     /// Perform a Boolean XOR on this BitVector and return the result.
-    BitVector XOR(const BitVector & bv2) const {
-      const size_t NUM_FIELDS = NumFields();
-      BitVector out_bv(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_bv.bits[i] = bits[i] ^ bv2.bits[i];
-      return out_bv;
-    }
+    BitVector XOR(const BitVector & bv2) const;
 
     /// Perform a Boolean EQU on this BitVector and return the result.
-    BitVector EQU(const BitVector & bv2) const {
-      const size_t NUM_FIELDS = NumFields();
-      BitVector out_bv(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_bv.bits[i] = ~(bits[i] ^ bv2.bits[i]);
-      out_bv.ClearExcessBits();
-      return out_bv;
-    }
-
+    BitVector EQU(const BitVector & bv2) const;
 
     /// Perform a Boolean NOT with this BitVector, store result here, and return this object.
-    BitVector & NOT_SELF() {
-      const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~bits[i];
-      ClearExcessBits();
-      return *this;
-    }
+    BitVector & NOT_SELF();
 
     /// Perform a Boolean AND with this BitVector, store result here, and return this object.
-    BitVector & AND_SELF(const BitVector & bv2) {
-      const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] & bv2.bits[i];
-      return *this;
-    }
+    BitVector & AND_SELF(const BitVector & bv2);
 
     /// Perform a Boolean OR with this BitVector, store result here, and return this object.
-    BitVector & OR_SELF(const BitVector & bv2) {
-      const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] | bv2.bits[i];
-      return *this;
-    }
+    BitVector & OR_SELF(const BitVector & bv2);
 
     /// Perform a Boolean NAND with this BitVector, store result here, and return this object.
-    BitVector & NAND_SELF(const BitVector & bv2) {
-      const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] & bv2.bits[i]);
-      ClearExcessBits();
-      return *this;
-    }
+    BitVector & NAND_SELF(const BitVector & bv2);
 
     /// Perform a Boolean NOR with this BitVector, store result here, and return this object.
-    BitVector & NOR_SELF(const BitVector & bv2) {
-      const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] | bv2.bits[i]);
-      ClearExcessBits();
-      return *this;
-    }
+    BitVector & NOR_SELF(const BitVector & bv2);
 
     /// Perform a Boolean XOR with this BitVector, store result here, and return this object.
-    BitVector & XOR_SELF(const BitVector & bv2) {
-      const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] ^ bv2.bits[i];
-      return *this;
-    }
+    BitVector & XOR_SELF(const BitVector & bv2);
 
     /// Perform a Boolean EQU with this BitVector, store result here, and return this object.
-    BitVector & EQU_SELF(const BitVector & bv2) {
-      const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] ^ bv2.bits[i]);
-      ClearExcessBits();
-      return *this;
-    }
+    BitVector & EQU_SELF(const BitVector & bv2);
 
     /// Positive shifts go left and negative go right (0 does nothing); return result.
-    BitVector SHIFT(const int shift_size) const {
-      BitVector out_bv(*this);
-      if (shift_size > 0) out_bv.ShiftRight((size_t) shift_size);
-      else if (shift_size < 0) out_bv.ShiftLeft((size_t) -shift_size);
-      return out_bv;
-    }
+    BitVector SHIFT(const int shift_size) const;
 
     /// Positive shifts go left and negative go right; store result here, and return this object.
-    BitVector & SHIFT_SELF(const int shift_size) {
-      if (shift_size > 0) ShiftRight((size_t) shift_size);
-      else if (shift_size < 0) ShiftLeft((size_t) -shift_size);
-      return *this;
-    }
-
+    BitVector & SHIFT_SELF(const int shift_size);
 
     /// Operator bitwise NOT...
     BitVector operator~() const { return NOT(); }
@@ -502,8 +416,9 @@ namespace emp {
     /// Compound operator for shift right...
     const BitVector & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
-    /// STL COMPATABILITY
-    /// A set of functions to allow drop-in replacement with std::bitset.
+    // >>>>>>>>>>  Standard Library Compatability  <<<<<<<<<< //
+    // A set of functions to allow drop-in replacement with std::bitset.
+
     size_t size() const { return num_bits; }
     void resize(std::size_t new_size) { Resize(new_size); }
     bool all() const { return All(); }
@@ -1162,6 +1077,136 @@ namespace emp {
       if (start != end) out << ranger << end;
     }
   }
+
+    /// Perform a Boolean NOT on this BitVector and return the result.
+    BitVector BitVector::NOT() const {
+      const size_t NUM_FIELDS = NumFields();
+      BitVector out_bv(*this);
+      for (size_t i = 0; i < NUM_FIELDS; i++) out_bv.bits[i] = ~bits[i];
+      out_bv.ClearExcessBits();
+      return out_bv;
+    }
+
+    /// Perform a Boolean AND on this BitVector and return the result.
+    BitVector BitVector::AND(const BitVector & bv2) const {
+      const size_t NUM_FIELDS = NumFields();
+      BitVector out_bv(*this);
+      for (size_t i = 0; i < NUM_FIELDS; i++) out_bv.bits[i] = bits[i] & bv2.bits[i];
+      return out_bv;
+    }
+
+    /// Perform a Boolean OR on this BitVector and return the result.
+    BitVector BitVector::OR(const BitVector & bv2) const {
+      const size_t NUM_FIELDS = NumFields();
+      BitVector out_bv(*this);
+      for (size_t i = 0; i < NUM_FIELDS; i++) out_bv.bits[i] = bits[i] | bv2.bits[i];
+      return out_bv;
+    }
+
+    /// Perform a Boolean NAND on this BitVector and return the result.
+    BitVector BitVector::NAND(const BitVector & bv2) const {
+      const size_t NUM_FIELDS = NumFields();
+      BitVector out_bv(*this);
+      for (size_t i = 0; i < NUM_FIELDS; i++) out_bv.bits[i] = ~(bits[i] & bv2.bits[i]);
+      out_bv.ClearExcessBits();
+      return out_bv;
+    }
+
+    /// Perform a Boolean NOR on this BitVector and return the result.
+    BitVector BitVector::NOR(const BitVector & bv2) const {
+      const size_t NUM_FIELDS = NumFields();
+      BitVector out_bv(*this);
+      for (size_t i = 0; i < NUM_FIELDS; i++) out_bv.bits[i] = ~(bits[i] | bv2.bits[i]);
+      out_bv.ClearExcessBits();
+      return out_bv;
+    }
+
+    /// Perform a Boolean XOR on this BitVector and return the result.
+    BitVector BitVector::XOR(const BitVector & bv2) const {
+      const size_t NUM_FIELDS = NumFields();
+      BitVector out_bv(*this);
+      for (size_t i = 0; i < NUM_FIELDS; i++) out_bv.bits[i] = bits[i] ^ bv2.bits[i];
+      return out_bv;
+    }
+
+    /// Perform a Boolean EQU on this BitVector and return the result.
+    BitVector BitVector::EQU(const BitVector & bv2) const {
+      const size_t NUM_FIELDS = NumFields();
+      BitVector out_bv(*this);
+      for (size_t i = 0; i < NUM_FIELDS; i++) out_bv.bits[i] = ~(bits[i] ^ bv2.bits[i]);
+      out_bv.ClearExcessBits();
+      return out_bv;
+    }
+
+
+    /// Perform a Boolean NOT with this BitVector, store result here, and return this object.
+    BitVector & BitVector::NOT_SELF() {
+      const size_t NUM_FIELDS = NumFields();
+      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~bits[i];
+      ClearExcessBits();
+      return *this;
+    }
+
+    /// Perform a Boolean AND with this BitVector, store result here, and return this object.
+    BitVector & BitVector::AND_SELF(const BitVector & bv2) {
+      const size_t NUM_FIELDS = NumFields();
+      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] & bv2.bits[i];
+      return *this;
+    }
+
+    /// Perform a Boolean OR with this BitVector, store result here, and return this object.
+    BitVector & BitVector::OR_SELF(const BitVector & bv2) {
+      const size_t NUM_FIELDS = NumFields();
+      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] | bv2.bits[i];
+      return *this;
+    }
+
+    /// Perform a Boolean NAND with this BitVector, store result here, and return this object.
+    BitVector & BitVector::NAND_SELF(const BitVector & bv2) {
+      const size_t NUM_FIELDS = NumFields();
+      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] & bv2.bits[i]);
+      ClearExcessBits();
+      return *this;
+    }
+
+    /// Perform a Boolean NOR with this BitVector, store result here, and return this object.
+    BitVector & BitVector::NOR_SELF(const BitVector & bv2) {
+      const size_t NUM_FIELDS = NumFields();
+      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] | bv2.bits[i]);
+      ClearExcessBits();
+      return *this;
+    }
+
+    /// Perform a Boolean XOR with this BitVector, store result here, and return this object.
+    BitVector & BitVector::XOR_SELF(const BitVector & bv2) {
+      const size_t NUM_FIELDS = NumFields();
+      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = bits[i] ^ bv2.bits[i];
+      return *this;
+    }
+
+    /// Perform a Boolean EQU with this BitVector, store result here, and return this object.
+    BitVector & BitVector::EQU_SELF(const BitVector & bv2) {
+      const size_t NUM_FIELDS = NumFields();
+      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = ~(bits[i] ^ bv2.bits[i]);
+      ClearExcessBits();
+      return *this;
+    }
+
+    /// Positive shifts go left and negative go right (0 does nothing); return result.
+    BitVector BitVector::SHIFT(const int shift_size) const {
+      BitVector out_bv(*this);
+      if (shift_size > 0) out_bv.ShiftRight((size_t) shift_size);
+      else if (shift_size < 0) out_bv.ShiftLeft((size_t) -shift_size);
+      return out_bv;
+    }
+
+    /// Positive shifts go left and negative go right; store result here, and return this object.
+    BitVector & BitVector::SHIFT_SELF(const int shift_size) {
+      if (shift_size > 0) ShiftRight((size_t) shift_size);
+      else if (shift_size < 0) ShiftLeft((size_t) -shift_size);
+      return *this;
+    }
+
 
 }
 
