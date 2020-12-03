@@ -197,10 +197,10 @@ int main() {
       //   chai.assert.deepEqual(data_points.data(), [[1, 5], [2, 3], [3, 6], [4, 1], [5, 10]]);
       // });
 
-      it('they should be connected by a line', function() {
-        var path = d3.select("#line_graph").selectAll(".line-seg").attr("d");
-        chai.assert.equal(path, "M60,110L162.5,150L265,90L367.5,190L470,10");
-      });
+      // it('they should be connected by a line', function() {
+      //   var path = d3.select("#line_graph").selectAll(".line-seg").attr("d");
+      //   chai.assert.equal(path, "M60,110L162.5,150L265,90L367.5,190L470,10");
+      // });
 
       // it('should have an x and y axis', function() {
       //   var data_points = d3.select("#line_graph").selectAll(".data-point");
