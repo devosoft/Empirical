@@ -38,7 +38,7 @@
 #include "../base/errors.hpp"
 #include "../base/vector.hpp"
 #include "../control/Signal.hpp"
-#include "../tools/mem_track.hpp"
+#include "../debug/mem_track.hpp"
 
 #include "events.hpp"
 #include "Font.hpp"

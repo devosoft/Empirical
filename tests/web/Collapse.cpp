@@ -6,15 +6,15 @@
 #include <unordered_map>
 #include <string>
 
-#include "base/assert.hpp"
-#include "web/_MochaTestRunner.hpp"
-#include "web/Document.hpp"
-#include "web/web.hpp"
-#include "web/Div.hpp"
-#include "web/Button.hpp"
-#include "web/js_utils.hpp"
+#include "emp/base/assert.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/web/Document.hpp"
+#include "emp/web/web.hpp"
+#include "emp/web/Div.hpp"
+#include "emp/web/Button.hpp"
+#include "emp/web/js_utils.hpp"
 
-#include "prefab/Collapse.hpp"
+#include "emp/prefab/Collapse.hpp"
 
 struct Test_Collapse_String : emp::web::BaseTest {
 

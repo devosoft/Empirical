@@ -32,12 +32,12 @@
 #include <functional>
 #include <unordered_map>
 
-#include "base/assert.hpp"
-#include "web/_MochaTestRunner.hpp"
-#include "web/Document.hpp"
-#include "web/web.hpp"
+#include "emp/base/assert.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/web/Document.hpp"
+#include "emp/web/web.hpp"
 
-#include "web/Button.hpp"
+#include "emp/web/Button.hpp"
 
 int x = 0; // live variable
 

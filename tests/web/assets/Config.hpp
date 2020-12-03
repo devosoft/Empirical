@@ -1,6 +1,6 @@
 #pragma once
 
-#include "config/config.h"
+#include "emp/config/config.hpp"
 
 // Config class for testing purposes.
 // If edits are made here, changes may need

@@ -9,7 +9,7 @@
  *
  */
 
-#include "web/Widget.h"
+#include "../web/Widget.hpp"
 
 namespace emp{
 namespace web{

@@ -5,18 +5,18 @@
 #include <functional>
 #include <unordered_map>
 
-#include "base/assert.hpp"
-#include "web/_MochaTestRunner.hpp"
-#include "web/Document.hpp"
-#include "web/web.hpp"
-#include "web/UrlParams.hpp"
+#include "emp/base/assert.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/web/Document.hpp"
+#include "emp/web/web.hpp"
+#include "emp/web/UrlParams.hpp"
 
-#include "config/command_line.h"
-#include "config/ArgManager.h"
-#include "prefab/ConfigPanel.h"
-#include "prefab/LoadingModal.h"
+#include "emp/config/command_line.hpp"
+#include "emp/config/ArgManager.hpp"
+#include "emp/prefab/ConfigPanel.hpp"
+#include "emp/prefab/LoadingModal.hpp"
 
-#include "assets/Config.h"
+#include "assets/Config.hpp"
 
 Config cfg; // config class used in all test to construct config panel
 

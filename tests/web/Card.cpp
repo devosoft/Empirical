@@ -5,12 +5,12 @@
 #include <functional>
 #include <unordered_map>
 
-#include "base/assert.hpp"
-#include "web/_MochaTestRunner.hpp"
-#include "web/Document.hpp"
-#include "web/Div.hpp"
-#include "web/web.hpp"
-#include "prefab/Card.hpp"
+#include "emp/base/assert.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/web/Document.hpp"
+#include "emp/web/Div.hpp"
+#include "emp/web/web.hpp"
+#include "emp/prefab/Card.hpp"
 
 
 // Test that the Card class properly gets attached and laid out via emp::web::Document.

@@ -30,14 +30,14 @@
 #include <unordered_map>
 #include <string>
 
-#include "base/assert.hpp"
-#include "web/_MochaTestRunner.hpp"
-#include "web/Document.hpp"
-#include "web/Element.hpp"
-#include "web/web.hpp"
-#include "web/js_utils.hpp"
+#include "emp/base/assert.hpp"
+#include "emp/web/_MochaTestRunner.hpp"
+#include "emp/web/Document.hpp"
+#include "emp/web/Element.hpp"
+#include "emp/web/web.hpp"
+#include "emp/web/js_utils.hpp"
 
-#include "prefab/Collapse.hpp"
+#include "emp/prefab/Collapse.hpp"
 
 struct Test_Collapse_Click_Initial : emp::web::BaseTest {
 
