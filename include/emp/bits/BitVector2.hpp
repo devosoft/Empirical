@@ -204,6 +204,26 @@ namespace emp {
       }
     }
 
+    // Scan this bitvector to make sure that there are no internal problems.
+    bool OK() const {
+      // Do some checking on the bits array ptr to make sure it's value.
+      if (bits) {
+#ifdef EMP_TRACK_MEM
+        emp_assert(bits.DebugIsArray()); // Must be marked as an array.
+        emp_assert(bits.OK());           // Pointer must be okay.
+#endif
+      }
+
+      // Otherwise bits is null; num_bits should be zero.
+      else emp_assert(num_bits == 0);
+
+      // Make sure final bits are zeroed out.
+      field_t excess_bits = bits[NumFields() - 1] & ~MaskLow<field_t>(NumEndBits());
+      emp_assert(!excess_bits);
+
+      return true;
+    }
+
   public:
     /// Build a new BitVector with specified bit count (default 0) and initialization (default 0)
     BitVector(size_t in_num_bits=0, bool init_val=false) : num_bits(in_num_bits), bits(nullptr) {
@@ -213,10 +233,7 @@ namespace emp {
 
     /// Copy constructor of existing bit field.
     BitVector(const BitVector & in) : num_bits(in.num_bits), bits(nullptr) {
-      #ifdef EMP_TRACK_MEM
-      emp_assert(in.bits.IsNull() || in.bits.DebugIsArray());
-      emp_assert(in.bits.OK());
-      #endif
+      emp_assert(in.OK());
 
       // There is only something to copy if there are a non-zero number of bits!
       if (num_bits) {
@@ -230,10 +247,7 @@ namespace emp {
 
     /// Move constructor of existing bit field.
     BitVector(BitVector && in) : num_bits(in.num_bits), bits(in.bits) {
-      #ifdef EMP_TRACK_MEM
-      emp_assert(bits == nullptr || bits.DebugIsArray());
-      emp_assert(bits.OK());
-      #endif
+      emp_assert(in.OK());
 
       in.bits = nullptr;
       in.num_bits = 0;
@@ -254,11 +268,7 @@ namespace emp {
 
     /// Assignment operator.
     BitVector & operator=(const BitVector & in) {
-      #ifdef EMP_TRACK_MEM
-      emp_assert(in.bits == nullptr || in.bits.DebugIsArray());
-      emp_assert(in.bits != nullptr || in.num_bits == 0);
-      emp_assert(in.bits.OK());
-      #endif
+      emp_assert(in.OK());
 
       if (&in == this) return *this;
       const size_t in_num_fields = in.NumFields();
