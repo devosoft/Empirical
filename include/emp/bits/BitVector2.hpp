@@ -115,114 +115,37 @@ namespace emp {
       }
     }; // --- End of BitProxy
 
-    /// Identify the field that a specified bit is in.
+    // Identify the field that a specified bit is in.
     static constexpr size_t FieldID(const size_t index)  { return index / FIELD_BITS; }
 
-    /// Identify the position within a field where a specified bit is.
+    // Identify the position within a field where a specified bit is.
     static constexpr size_t FieldPos(const size_t index) { return index & (FIELD_BITS-1); }
 
-    /// Identify which field a specified byte position would be in.
+    // Identify which field a specified byte position would be in.
     static constexpr size_t Byte2Field(const size_t index) { return index / FIELD_SIZE; }
 
-    /// Convert a byte position in BitVector to a byte position in the target field.
+    // Convert a byte position in BitVector to a byte position in the target field.
     static constexpr size_t Byte2FieldPos(const size_t index) {
       return (index & (FIELD_SIZE-1)) << 3;
     }
 
-    /// Assume that the size of the bits has already been adjusted to be the size of the one
-    /// being copied and only the fields need to be copied over.
-    void RawCopy(const Ptr<field_t> in) {
-      #ifdef EMP_TRACK_MEM
-      emp_assert(in.IsNull() == false);
-      emp_assert(bits.DebugIsArray() && in.DebugIsArray());
-      emp_assert(bits.DebugGetArrayBytes() == in.DebugGetArrayBytes(),
-                 bits.DebugGetArrayBytes(), in.DebugGetArrayBytes());
-      #endif
+    // Assume that the size of the bits has already been adjusted to be the size of the one
+    // being copied and only the fields need to be copied over.
+    void RawCopy(const Ptr<field_t> in);
 
-      const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = in[i];
-    }
-
-    /// Any bits past the last "real" on in the last field should be kept as zeros.
+    // Any bits past the last "real" on in the last field should be kept as zeros.
     void ClearExcessBits() {
       if (NumEndBits() > 0) bits[NumFields() - 1] &= MaskLow<field_t>(NumEndBits());
     }
 
-    /// Helper: call SHIFT with positive number
-    void ShiftLeft(const size_t shift_size) {
-      const size_t field_shift = shift_size / FIELD_BITS;
-      const size_t bit_shift = shift_size % FIELD_BITS;
-      const size_t bit_overflow = FIELD_BITS - bit_shift;
-      const size_t NUM_FIELDS = NumFields();
+    // Helper: call SHIFT with positive number
+    void ShiftLeft(const size_t shift_size);
 
-      // Loop through each field, from L to R, and update it.
-      if (field_shift) {
-        for (size_t i = NUM_FIELDS; i > field_shift; --i) {
-          bits[i-1] = bits[i - field_shift - 1];
-        }
-        for (size_t i = field_shift; i > 0; --i) bits[i-1] = 0;
-      }
-
-      // account for bit_shift
-      if (bit_shift) {
-        for (size_t i = NUM_FIELDS - 1; i > field_shift; --i) {
-          bits[i] <<= bit_shift;
-          bits[i] |= (bits[i-1] >> bit_overflow);
-        }
-        // Handle final field (field_shift position)
-        bits[field_shift] <<= bit_shift;
-      }
-
-      // Mask out any bits that have left-shifted away
-      ClearExcessBits();
-    }
-
-
-    /// Helper for calling SHIFT with negative number
-    void ShiftRight(const size_t shift_size) {
-      const size_t field_shift = shift_size / FIELD_BITS;
-      const size_t bit_shift = shift_size % FIELD_BITS;
-      const size_t bit_overflow = FIELD_BITS - bit_shift;
-      const size_t NUM_FIELDS = NumFields();
-      const size_t field_shift2 = NUM_FIELDS - field_shift;
-
-      // account for field_shift
-      if (field_shift) {
-        for (size_t i = 0; i < field_shift2; ++i) {
-          bits[i] = bits[i + field_shift];
-        }
-        for (size_t i = field_shift2; i < NUM_FIELDS; i++) bits[i] = 0U;
-      }
-
-      // account for bit_shift
-      if (bit_shift) {
-        for (size_t i = 0; i < (field_shift2 - 1); ++i) {
-          bits[i] >>= bit_shift;
-          bits[i] |= (bits[i+1] << bit_overflow);
-        }
-        bits[field_shift2 - 1] >>= bit_shift;
-      }
-    }
+    // Helper for calling SHIFT with negative number
+    void ShiftRight(const size_t shift_size);
 
     // Scan this bitvector to make sure that there are no internal problems.
-    bool OK() const {
-      // Do some checking on the bits array ptr to make sure it's value.
-      if (bits) {
-#ifdef EMP_TRACK_MEM
-        emp_assert(bits.DebugIsArray()); // Must be marked as an array.
-        emp_assert(bits.OK());           // Pointer must be okay.
-#endif
-      }
-
-      // Otherwise bits is null; num_bits should be zero.
-      else emp_assert(num_bits == 0);
-
-      // Make sure final bits are zeroed out.
-      field_t excess_bits = bits[NumFields() - 1] & ~MaskLow<field_t>(NumEndBits());
-      emp_assert(!excess_bits);
-
-      return true;
-    }
+    bool OK() const;
 
   public:
     /// Build a new BitVector with specified bit count (default 0) and initialization (default 0)
@@ -1005,7 +928,96 @@ namespace emp {
     bool test(size_t index) const { return Get(index); }
   };
 
+  // ------------------------ Implementations for Internal Functions ------------------------
+
+    void BitVector::RawCopy(const Ptr<BitVector::field_t> in) {
+      #ifdef EMP_TRACK_MEM
+      emp_assert(in.IsNull() == false);
+      emp_assert(bits.DebugIsArray() && in.DebugIsArray());
+      emp_assert(bits.DebugGetArrayBytes() == in.DebugGetArrayBytes(),
+                 bits.DebugGetArrayBytes(), in.DebugGetArrayBytes());
+      #endif
+
+      const size_t NUM_FIELDS = NumFields();
+      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = in[i];
+    }
+
+    void BitVector::ShiftLeft(const size_t shift_size) {
+      const size_t field_shift = shift_size / FIELD_BITS;
+      const size_t bit_shift = shift_size % FIELD_BITS;
+      const size_t bit_overflow = FIELD_BITS - bit_shift;
+      const size_t NUM_FIELDS = NumFields();
+
+      // Loop through each field, from L to R, and update it.
+      if (field_shift) {
+        for (size_t i = NUM_FIELDS; i > field_shift; --i) {
+          bits[i-1] = bits[i - field_shift - 1];
+        }
+        for (size_t i = field_shift; i > 0; --i) bits[i-1] = 0;
+      }
+
+      // account for bit_shift
+      if (bit_shift) {
+        for (size_t i = NUM_FIELDS - 1; i > field_shift; --i) {
+          bits[i] <<= bit_shift;
+          bits[i] |= (bits[i-1] >> bit_overflow);
+        }
+        // Handle final field (field_shift position)
+        bits[field_shift] <<= bit_shift;
+      }
+
+      // Mask out any bits that have left-shifted away
+      ClearExcessBits();
+    }
+
+    void BitVector::ShiftRight(const size_t shift_size) {
+      const size_t field_shift = shift_size / FIELD_BITS;
+      const size_t bit_shift = shift_size % FIELD_BITS;
+      const size_t bit_overflow = FIELD_BITS - bit_shift;
+      const size_t NUM_FIELDS = NumFields();
+      const size_t field_shift2 = NUM_FIELDS - field_shift;
+
+      // account for field_shift
+      if (field_shift) {
+        for (size_t i = 0; i < field_shift2; ++i) {
+          bits[i] = bits[i + field_shift];
+        }
+        for (size_t i = field_shift2; i < NUM_FIELDS; i++) bits[i] = 0U;
+      }
+
+      // account for bit_shift
+      if (bit_shift) {
+        for (size_t i = 0; i < (field_shift2 - 1); ++i) {
+          bits[i] >>= bit_shift;
+          bits[i] |= (bits[i+1] << bit_overflow);
+        }
+        bits[field_shift2 - 1] >>= bit_shift;
+      }
+    }
+
+    bool BitVector::OK() const {
+      // Do some checking on the bits array ptr to make sure it's value.
+      if (bits) {
+#ifdef EMP_TRACK_MEM
+        emp_assert(bits.DebugIsArray()); // Must be marked as an array.
+        emp_assert(bits.OK());           // Pointer must be okay.
+#endif
+      }
+
+      // Otherwise bits is null; num_bits should be zero.
+      else emp_assert(num_bits == 0);
+
+      // Make sure final bits are zeroed out.
+      field_t excess_bits = bits[NumFields() - 1] & ~MaskLow<field_t>(NumEndBits());
+      emp_assert(!excess_bits);
+
+      return true;
+    }
+
 }
+
+
+// ---------------------- Implementations to work with standard library ----------------------
 
 namespace std {
   /// Hash function to allow BitVector to be used with maps and sets (must be in std).
