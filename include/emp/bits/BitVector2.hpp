@@ -184,6 +184,21 @@ namespace emp {
     /// Update the bit value at the specified index.
     BitVector & Set(size_t index, bool value=true);
 
+    /// Set all bits to 1.
+    BitVector & SetAll();
+
+    /// Set a range of bits to one: [start, stop)
+    BitVector & SetRange(size_t start, size_t stop);
+
+    /// Set all bits to 0.
+    BitVector & Clear();
+
+    /// Set specific bit to 0.
+    BitVector & Clear(size_t index) { return Set(index, false); }
+
+    /// Set a range of bits to 0 in the range [start, stop)
+    BitVector & Clear(const size_t start, const size_t stop);    
+
     /// Const index operator -- return the bit at the specified position.
     bool operator[](size_t index) const { return Get(index); }
 
@@ -269,242 +284,60 @@ namespace emp {
     /// A simple hash function for bit vectors.
     std::size_t Hash() const;
 
-
-
-
-
-
-    /// Set all bits to 0.
-    BitVector & Clear() {
-      const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = 0U;
-      return *this;
-    }
-
-    /// Set specific bit to 0.
-    BitVector & Clear(size_t index) { return Set(index, false); }
-
-    /// Set a range of bits to 0 in the range [start, stop)
-    BitVector & Clear(const size_t start, const size_t stop) {
-      emp_assert(start <= stop, start, stop, num_bits);
-      emp_assert(stop <= num_bits, stop, num_bits);
-      const size_t start_pos = FieldPos(start);
-      const size_t stop_pos = FieldPos(stop);
-      size_t start_field = FieldID(start);
-      const size_t stop_field = FieldID(stop);
-
-      // If the start field and stop field are the same, just step through the bits.
-      if (start_field == stop_field) {
-        const size_t num_bits = stop - start;
-        const field_t mask = ~(MaskLow<field_t>(num_bits) << start_pos);
-        bits[start_field] &= mask;
-      }
-
-      // Otherwise handle the ends and clear the chunks in between.
-      else {
-        // Clear portions of start field
-        if (start_pos != 0) {
-          const size_t start_bits = FIELD_BITS - start_pos;
-          const field_t start_mask = ~(MaskLow<field_t>(start_bits) << start_pos);
-          bits[start_field] &= start_mask;
-          start_field++;
-        }
-
-        // Middle fields
-        for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
-          bits[cur_field] = 0;
-        }
-
-        // Clear portions of stop field
-        const field_t stop_mask = ~MaskLow<field_t>(stop_pos);
-        bits[stop_field] &= stop_mask;
-      }
-
-      return *this;
-    }
-
-    /// Set all bits to 1.
-    BitVector & SetAll() {
-      const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = FIELD_ALL;
-      ClearExcessBits();
-      return *this;
-    }
-
-    /// Set a range of bits to one: [start, stop)
-    BitVector & SetRange(size_t start, size_t stop) {
-      emp_assert(start <= stop, start, stop, num_bits);
-      emp_assert(stop <= num_bits, stop, num_bits);
-      const size_t start_pos = FieldPos(start);
-      const size_t stop_pos = FieldPos(stop);
-      size_t start_field = FieldID(start);
-      const size_t stop_field = FieldID(stop);
-
-      // If the start field and stop field are the same, just step through the bits.
-      if (start_field == stop_field) {
-        const size_t num_bits = stop - start;
-        const field_t mask = MaskLow<field_t>(num_bits) << start_pos;
-        bits[start_field] |= mask;
-      }
-
-      // Otherwise handle the ends and clear the chunks in between.
-      else {
-        // Set portions of start field
-        if (start_pos != 0) {
-          const size_t start_bits = FIELD_BITS - start_pos;
-          const field_t start_mask = MaskLow<field_t>(start_bits) << start_pos;
-          bits[start_field] |= start_mask;
-          start_field++;
-        }
-
-        // Middle fields
-        for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
-          bits[cur_field] = FIELD_ALL;
-        }
-
-        // Set portions of stop field
-        const field_t stop_mask = MaskLow<field_t>(stop_pos);
-        bits[stop_field] |= stop_mask;
-      }
-
-      return *this;
-    }
-
-    /// Convert this BitVector to a string.
-    std::string ToString() const {
-      std::string out_string;
-      out_string.reserve(num_bits);
-      for (size_t i = num_bits; i > 0; --i) out_string.push_back('0' + Get(i-1));
-      return out_string;
-    }
-
-    /// Regular print function (from most significant bit to least)
-    void Print(std::ostream & out=std::cout) const {
-      for (size_t i = num_bits; i > 0; --i) out << Get(i-1);
-    }
-
-    /// Print a space between each field (or other provided spacer)
-    void PrintFields(std::ostream & out=std::cout, const std::string & spacer=" ") const {
-      for (size_t i = num_bits-1; i < num_bits; i--) {
-        out << Get(i);
-        if (i && (i % FIELD_BITS == 0)) out << spacer;
-      }
-    }
-
-    /// Print from smallest bit position to largest.
-    void PrintArray(std::ostream & out=std::cout) const {
-      for (size_t i = 0; i < num_bits; i++) out << Get(i);
-    }
-
-    /// Print the positions of all one bits, spaces are the default separator.
-    void PrintOneIDs(std::ostream & out=std::cout, const std::string & spacer=" ") const {
-      for (size_t i = 0; i < num_bits; i++) { if (Get(i)) out << i << spacer; }
-    }
-
-    /// Print the ones in a range format.  E.g., 2-5,7,10-15
-    void PrintAsRange(std::ostream & out=std::cout,
-                      const std::string & spacer=",",
-                      const std::string & ranger="-") const
-    {
-      emp::vector<size_t> ones = GetOnes();
-
-      for (size_t pos = 0; pos < ones.size(); pos++) {
-        if (pos) out << spacer;
-
-        size_t start = ones[pos];
-        while (pos+1 < ones.size() && ones[pos+1] == ones[pos]+1) pos++;
-        size_t end = ones[pos];
-
-        out << start;
-        if (start != end) out << ranger << end;
-      }
-    }
-
-    /// Count 1's by looping through once for each bit equal to 1
-    size_t CountOnes_Sparse() const {
-      const size_t NUM_FIELDS = NumFields();
-      size_t bit_count = 0;
-      for (size_t i = 0; i < NUM_FIELDS; i++) {
-        field_t cur_field = bits[i];
-        while (cur_field) {
-          cur_field &= (cur_field-1);       // Peel off a single 1.
-          bit_count++;      // And increment the counter
-        }
-      }
-      return bit_count;
-    }
-    // TODO: see https://arxiv.org/pdf/1611.07612.pdf for faster pop counts
-    size_t CountOnes_Mixed() const {
-      const field_t NUM_FIELDS = (1 + ((num_bits - 1) / FIELD_BITS));
-      size_t bit_count = 0;
-      for (size_t i = 0; i < NUM_FIELDS; i++) {
-          // when compiling with -O3 and -msse4.2, this is the fastest population count method.
-          std::bitset<FIELD_BITS> std_bs(bits[i]);
-          bit_count += std_bs.count();
-       }
-
-      return bit_count;
-    }
-
     /// Count the number of ones in the BitVector.
-    size_t CountOnes() const { return CountOnes_Mixed(); }
+    size_t CountOnes() const;
+
+    /// Faster counting of ones for very sparse bit vectors.
+    size_t CountOnes_Sparse() const;
 
     /// Count the number of zeros in the BitVector.
     size_t CountZeros() const { return GetSize() - CountOnes(); }
 
     /// Return the position of the first one; return -1 if no ones in vector.
-    int FindBit() const {
-      const size_t NUM_FIELDS = NumFields();
-      size_t field_id = 0;
-      while (field_id < NUM_FIELDS && bits[field_id]==0) field_id++;
-      return (field_id < NUM_FIELDS) ?
-        (int) (find_bit(bits[field_id]) + (field_id * FIELD_BITS))  :  -1;
-    }
+    int FindBit() const;
 
     /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
-    int PopBit() {
-      const size_t NUM_FIELDS = NumFields();
-      size_t field_id = 0;
-      while (field_id < NUM_FIELDS && bits[field_id]==0) field_id++;
-      if (field_id == NUM_FIELDS) return -1;  // Failed to find bit!
-
-      const size_t pos_found = find_bit(bits[field_id]);
-      bits[field_id] &= ~(FIELD_1 << pos_found);
-      return (int) (pos_found + (field_id * FIELD_BITS));
-    }
+    int PopBit();
 
     /// Return the position of the first one after start_pos; return -1 if no ones in vector.
     /// You can loop through all 1-bit positions of a BitVector "bv" with:
     ///
     ///   for (int pos = bv.FindBit(); pos >= 0; pos = bv.FindBit(pos+1)) { ... }
 
-    int FindBit(const size_t start_pos) const {
-      if (start_pos >= num_bits) return -1;
-      size_t field_id  = FieldID(start_pos);     // What field do we start in?
-      const size_t field_pos = FieldPos(start_pos);    // What position in that field?
-      if (field_pos && (bits[field_id] & ~(MaskLow<field_t>(field_pos)))) {  // First field hit!
-        return (int) (find_bit(bits[field_id] & ~(MaskLow<field_t>(field_pos))) +
-                      field_id * FIELD_BITS);
-      }
-
-      // Search other fields...
-      const size_t NUM_FIELDS = NumFields();
-      if (field_pos) field_id++;
-      while (field_id < NUM_FIELDS && bits[field_id]==0) field_id++;
-      return (field_id < NUM_FIELDS) ?
-        (int) (find_bit(bits[field_id]) + (field_id * FIELD_BITS)) : -1;
-    }
+    int FindBit(const size_t start_pos) const;
 
     /// Return positions of all ones.
-    emp::vector<size_t> GetOnes() const {
-      // @CAO -- There are probably better ways to do this with bit tricks.
-      emp::vector<size_t> out_vals(CountOnes());
-      size_t cur_pos = 0;
-      for (size_t i = 0; i < num_bits; i++) {
-        if (Get(i)) out_vals[cur_pos++] = i;
-      }
-      return out_vals;
-    }
+    emp::vector<size_t> GetOnes() const;
+
+
+    // >>>>>>>>>>  Print/String Functions  <<<<<<<<<< //
+
+    /// Convert this BitVector to a string.
+    std::string ToString() const;
+
+    /// Regular print function (from most significant bit to least)
+    void Print(std::ostream & out=std::cout) const;
+
+    /// Print a space between each field (or other provided spacer)
+    void PrintFields(std::ostream & out=std::cout, const std::string & spacer=" ") const;
+
+    /// Print from smallest bit position to largest.
+    void PrintArray(std::ostream & out=std::cout) const;
+
+    /// Print the positions of all one bits, spaces are the default separator.
+    void PrintOneIDs(std::ostream & out=std::cout, const std::string & spacer=" ") const;
+
+    /// Print the ones in a range format.  E.g., 2-5,7,10-15
+    void PrintAsRange(std::ostream & out=std::cout,
+                      const std::string & spacer=",",
+                      const std::string & ranger="-") const;
+
+
+
+
+
+
+
 
     /// Perform a Boolean NOT on this BitVector and return the result.
     BitVector NOT() const {
@@ -676,7 +509,7 @@ namespace emp {
     bool all() const { return All(); }
     bool any() const { return Any(); }
     bool none() const { return !Any(); }
-    size_t count() const { return CountOnes_Mixed(); }
+    size_t count() const { return CountOnes(); }
     BitVector & flip() { return Toggle(); }
     BitVector & flip(size_t pos) { return Toggle(pos); }
     BitVector & flip(size_t start, size_t end) { return Toggle(start, end); }
@@ -868,6 +701,99 @@ namespace emp {
 
     if (value) bits[field_id] |= pos_mask;
     else       bits[field_id] &= ~pos_mask;
+
+    return *this;
+  }
+
+  /// Set all bits to 1.
+  BitVector & BitVector::SetAll() {
+    const size_t NUM_FIELDS = NumFields();
+    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = FIELD_ALL;
+    ClearExcessBits();
+    return *this;
+  }
+
+  /// Set a range of bits to one: [start, stop)
+  BitVector & BitVector::SetRange(size_t start, size_t stop) {
+    emp_assert(start <= stop, start, stop, num_bits);
+    emp_assert(stop <= num_bits, stop, num_bits);
+    const size_t start_pos = FieldPos(start);
+    const size_t stop_pos = FieldPos(stop);
+    size_t start_field = FieldID(start);
+    const size_t stop_field = FieldID(stop);
+
+    // If the start field and stop field are the same, just step through the bits.
+    if (start_field == stop_field) {
+      const size_t num_bits = stop - start;
+      const field_t mask = MaskLow<field_t>(num_bits) << start_pos;
+      bits[start_field] |= mask;
+    }
+
+    // Otherwise handle the ends and clear the chunks in between.
+    else {
+      // Set portions of start field
+      if (start_pos != 0) {
+        const size_t start_bits = FIELD_BITS - start_pos;
+        const field_t start_mask = MaskLow<field_t>(start_bits) << start_pos;
+        bits[start_field] |= start_mask;
+        start_field++;
+      }
+
+      // Middle fields
+      for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
+        bits[cur_field] = FIELD_ALL;
+      }
+
+      // Set portions of stop field
+      const field_t stop_mask = MaskLow<field_t>(stop_pos);
+      bits[stop_field] |= stop_mask;
+    }
+
+    return *this;
+  }
+  
+  /// Set all bits to 0.
+  BitVector & BitVector::Clear() {
+    const size_t NUM_FIELDS = NumFields();
+    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = 0U;
+    return *this;
+  }
+
+  /// Set a range of bits to 0 in the range [start, stop)
+  BitVector & BitVector::Clear(const size_t start, const size_t stop) {
+    emp_assert(start <= stop, start, stop, num_bits);
+    emp_assert(stop <= num_bits, stop, num_bits);
+    const size_t start_pos = FieldPos(start);
+    const size_t stop_pos = FieldPos(stop);
+    size_t start_field = FieldID(start);
+    const size_t stop_field = FieldID(stop);
+
+    // If the start field and stop field are the same, just step through the bits.
+    if (start_field == stop_field) {
+      const size_t num_bits = stop - start;
+      const field_t mask = ~(MaskLow<field_t>(num_bits) << start_pos);
+      bits[start_field] &= mask;
+    }
+
+    // Otherwise handle the ends and clear the chunks in between.
+    else {
+      // Clear portions of start field
+      if (start_pos != 0) {
+        const size_t start_bits = FIELD_BITS - start_pos;
+        const field_t start_mask = ~(MaskLow<field_t>(start_bits) << start_pos);
+        bits[start_field] &= start_mask;
+        start_field++;
+      }
+
+      // Middle fields
+      for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
+        bits[cur_field] = 0;
+      }
+
+      // Clear portions of stop field
+      const field_t stop_mask = ~MaskLow<field_t>(stop_pos);
+      bits[stop_field] &= stop_mask;
+    }
 
     return *this;
   }
@@ -1105,7 +1031,137 @@ namespace emp {
     return hash_val ^ ((97*num_bits) << 8);
   }
 
+  // TODO: see https://arxiv.org/pdf/1611.07612.pdf for fast pop counts
+  /// Count the number of ones in the BitVector.
+  size_t BitVector::CountOnes() const { 
+    const field_t NUM_FIELDS = (1 + ((num_bits - 1) / FIELD_BITS));
+    size_t bit_count = 0;
+    for (size_t i = 0; i < NUM_FIELDS; i++) {
+        // when compiling with -O3 and -msse4.2, this is the fastest population count method.
+        std::bitset<FIELD_BITS> std_bs(bits[i]);
+        bit_count += std_bs.count();
+      }
 
+    return bit_count;
+  }
+
+  /// Faster counting of ones for very sparse bit vectors.
+  size_t BitVector::CountOnes_Sparse() const {
+    const size_t NUM_FIELDS = NumFields();
+    size_t bit_count = 0;
+    for (size_t i = 0; i < NUM_FIELDS; i++) {
+      field_t cur_field = bits[i];
+      while (cur_field) {
+        cur_field &= (cur_field-1);       // Peel off a single 1.
+        bit_count++;                      // Increment the counter
+      }
+    }
+    return bit_count;
+  }
+
+  /// Return the position of the first one; return -1 if no ones in vector.
+  int BitVector::FindBit() const {
+    const size_t NUM_FIELDS = NumFields();
+    size_t field_id = 0;
+    while (field_id < NUM_FIELDS && bits[field_id]==0) field_id++;
+    return (field_id < NUM_FIELDS) ?
+      (int) (find_bit(bits[field_id]) + (field_id * FIELD_BITS))  :  -1;
+  }
+
+  /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
+  int BitVector::PopBit() {
+    const size_t NUM_FIELDS = NumFields();
+    size_t field_id = 0;
+    while (field_id < NUM_FIELDS && bits[field_id]==0) field_id++;
+    if (field_id == NUM_FIELDS) return -1;  // Failed to find bit!
+
+    const size_t pos_found = find_bit(bits[field_id]);
+    bits[field_id] &= ~(FIELD_1 << pos_found);
+    return (int) (pos_found + (field_id * FIELD_BITS));
+  }
+
+  /// Return the position of the first one after start_pos; return -1 if no ones in vector.
+  /// You can loop through all 1-bit positions of a BitVector "bv" with:
+  ///
+  ///   for (int pos = bv.FindBit(); pos >= 0; pos = bv.FindBit(pos+1)) { ... }
+
+  int BitVector::FindBit(const size_t start_pos) const {
+    if (start_pos >= num_bits) return -1;
+    size_t field_id  = FieldID(start_pos);     // What field do we start in?
+    const size_t field_pos = FieldPos(start_pos);    // What position in that field?
+    if (field_pos && (bits[field_id] & ~(MaskLow<field_t>(field_pos)))) {  // First field hit!
+      return (int) (find_bit(bits[field_id] & ~(MaskLow<field_t>(field_pos))) +
+                    field_id * FIELD_BITS);
+    }
+
+    // Search other fields...
+    const size_t NUM_FIELDS = NumFields();
+    if (field_pos) field_id++;
+    while (field_id < NUM_FIELDS && bits[field_id]==0) field_id++;
+    return (field_id < NUM_FIELDS) ?
+      (int) (find_bit(bits[field_id]) + (field_id * FIELD_BITS)) : -1;
+  }
+
+  /// Return positions of all ones.
+  emp::vector<size_t> BitVector::GetOnes() const {
+    // @CAO -- There are better ways to do this with bit tricks.
+    emp::vector<size_t> out_vals(CountOnes());
+    size_t cur_pos = 0;
+    for (size_t i = 0; i < num_bits; i++) {
+      if (Get(i)) out_vals[cur_pos++] = i;
+    }
+    return out_vals;
+  }
+
+  /// Convert this BitVector to a string.
+  std::string BitVector::ToString() const {
+    std::string out_string;
+    out_string.reserve(num_bits);
+    for (size_t i = num_bits; i > 0; --i) out_string.push_back('0' + Get(i-1));
+    return out_string;
+  }
+
+  /// Regular print function (from most significant bit to least)
+  void BitVector::Print(std::ostream & out) const {
+    for (size_t i = num_bits; i > 0; --i) out << Get(i-1);
+  }
+
+  /// Print a space between each field (or other provided spacer)
+  void BitVector::PrintFields(std::ostream & out, const std::string & spacer) const {
+    for (size_t i = num_bits-1; i < num_bits; i--) {
+      out << Get(i);
+      if (i && (i % FIELD_BITS == 0)) out << spacer;
+    }
+  }
+
+  /// Print from smallest bit position to largest.
+  void BitVector::PrintArray(std::ostream & out) const {
+    for (size_t i = 0; i < num_bits; i++) out << Get(i);
+  }
+
+  /// Print the positions of all one bits, spaces are the default separator.
+  void BitVector::PrintOneIDs(std::ostream & out, const std::string & spacer) const {
+    for (size_t i = 0; i < num_bits; i++) { if (Get(i)) out << i << spacer; }
+  }
+
+  /// Print the ones in a range format.  E.g., 2-5,7,10-15
+  void BitVector::PrintAsRange(std::ostream & out,
+                    const std::string & spacer,
+                    const std::string & ranger) const
+  {
+    emp::vector<size_t> ones = GetOnes();
+
+    for (size_t pos = 0; pos < ones.size(); pos++) {
+      if (pos) out << spacer;
+
+      size_t start = ones[pos];
+      while (pos+1 < ones.size() && ones[pos+1] == ones[pos]+1) pos++;
+      size_t end = ones[pos];
+
+      out << start;
+      if (start != end) out << ranger << end;
+    }
+  }
 
 }
 
