@@ -53,7 +53,7 @@ namespace web {
         DoSet(in_attr, in_val);
       } else if(settings[in_attr].find(in_val) == std::string::npos){
         // New value is not a duplicate of any values assigned to this attribute. Append it.
-        settings[in_attr] += " , " + in_val;
+        settings[in_attr] += " " + in_val;
       }
       return *this;
     }
