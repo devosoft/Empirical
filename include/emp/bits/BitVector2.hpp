@@ -169,77 +169,39 @@ namespace emp {
     /// Move operator.
     BitVector & operator=(BitVector && in);
 
-    /// Automatically convert BitVector to other vector types.
-    template <typename T>
-    operator emp::vector<T>() {
-      emp::vector<T> out(GetSize());
-      for (size_t i = 0; i < GetSize(); i++) {
-        out[i] = (T) Get(i);
-      }
-      return out;
-    }
+    /// How many bits do we currently have?
+    size_t GetSize() const { return num_bits; }
+
+    /// Retrive the bit value from the specified index.
+    bool Get(size_t index) const;
+
+    /// A safe version of Get() for indexing out of range. Useful for representing collections.
+    bool Has(size_t index) const { return (index < num_bits) ? Get(index) : false; }
+
+    /// Update the bit value at the specified index.
+    BitVector & Set(size_t index, bool value=true);
+
+    /// Change every bit in the sequence.
+    BitVector & Toggle() { return NOT_SELF(); }
+
+    /// Change a specified bit to the opposite value
+    BitVector & Toggle(size_t index);
+
+    /// Flips all the bits in a range [start, end)
+    BitVector & Toggle(size_t start, size_t stop);
 
     /// Resize this BitVector to have the specified number of bits.
-    BitVector & Resize(size_t new_bits) {
-      const size_t old_num_fields = NumFields();
-      num_bits = new_bits;
-      const size_t NUM_FIELDS = NumFields();
-
-      if (NUM_FIELDS == old_num_fields) {   // We can use our existing bit field
-        num_bits = new_bits;
-        ClearExcessBits();                  // If there are extra bits, zero them out.
-      }
-
-      else {  // We must change the number of bitfields.  Resize & copy old info.
-        Ptr<field_t> old_bits = bits;
-        if (num_bits > 0) bits = NewArrayPtr<field_t>(NUM_FIELDS);
-        else bits = nullptr;
-        const size_t min_fields = std::min(old_num_fields, NUM_FIELDS);
-        for (size_t i = 0; i < min_fields; i++) bits[i] = old_bits[i];
-        for (size_t i = min_fields; i < NUM_FIELDS; i++) bits[i] = 0U;
-        if (old_bits) old_bits.DeleteArray();
-      }
-
-      return *this;
-    }
+    BitVector & Resize(size_t new_bits);
 
     /// Test if two bit vectors are identical.
-    bool operator==(const BitVector & in) const {
-      if (num_bits != in.num_bits) return false;
-
-      const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; ++i) {
-        if (bits[i] != in.bits[i]) return false;
-      }
-      return true;
-    }
+    bool operator==(const BitVector & in) const;
 
     /// Compare the would-be numerical values of two bit vectors.
-    bool operator<(const BitVector & in) const {
-      if (num_bits != in.num_bits) return num_bits < in.num_bits;
-
-      const size_t NUM_FIELDS = NumFields();
-      for (size_t i = NUM_FIELDS; i > 0; --i) {   // Start loop at the largest field.
-        const size_t pos = i-1;
-        if (bits[pos] == in.bits[pos]) continue;  // If same, keep looking!
-        return (bits[pos] < in.bits[pos]);        // Otherwise, do comparison
-      }
-      return false; // Bit vectors are identical.
-    }
+    bool operator<(const BitVector & in) const;
 
     /// Compare the would-be numerical values of two bit vectors.
-    bool operator<=(const BitVector & in) const {
-      if (num_bits != in.num_bits) return num_bits <= in.num_bits;
-
-      const size_t NUM_FIELDS = NumFields();
-      for (size_t i = NUM_FIELDS; i > 0; --i) {   // Start loop at the largest field.
-        const size_t pos = i-1;
-        if (bits[pos] == in.bits[pos]) continue;  // If same, keep looking!
-        return (bits[pos] < in.bits[pos]);        // Otherwise, do comparison
-      }
-      return true;
-    }
-
+    bool operator<=(const BitVector & in) const;
+    
     /// Determine if two bit vectors are different.
     bool operator!=(const BitVector & in) const { return !operator==(in); }
 
@@ -249,89 +211,9 @@ namespace emp {
     /// Compare the would-be numerical values of two bit vectors.
     bool operator>=(const BitVector & in) const { return !operator<(in); }
 
-    /// How many bits do we currently have?
-    size_t GetSize() const { return num_bits; }
+    /// Automatically convert BitVector to other vector types.
+    template <typename T> operator emp::vector<T>();
 
-    /// Retrive the bit value from the specified index.
-    bool Get(size_t index) const {
-      emp_assert(index < num_bits, index, num_bits);
-      const size_t field_id = FieldID(index);
-      const size_t pos_id = FieldPos(index);
-      return (bits[field_id] & (static_cast<field_t>(1) << pos_id)) != 0;
-    }
-
-    /// A safe version of Get() for indexing out of range. Typically used when a BitVector
-    /// represents a collection.
-    bool Has(size_t index) const {
-      return (index < num_bits) ? Get(index) : false;
-    }
-
-    /// Update the bit value at the specified index.
-    BitVector & Set(size_t index, bool value=true) {
-      emp_assert(index < num_bits, index, num_bits);
-      const size_t field_id = FieldID(index);
-      const size_t pos_id = FieldPos(index);
-      const field_t pos_mask = FIELD_1 << pos_id;
-
-      if (value) bits[field_id] |= pos_mask;
-      else       bits[field_id] &= ~pos_mask;
-
-      return *this;
-    }
-
-    /// Change every bit in the sequence.
-    BitVector & Toggle() { return NOT_SELF(); }
-
-    /// Change a specified bit to the opposite value
-    BitVector & Toggle(size_t index) {
-      emp_assert(index < num_bits, index, num_bits);
-      const size_t field_id = FieldID(index);
-      const size_t pos_id = FieldPos(index);
-      const field_t pos_mask = FIELD_1 << pos_id;
-
-      bits[field_id] ^= pos_mask;
-
-      return *this;
-    }
-
-    /// Flips all the bits in a range [start, end)
-    BitVector & Toggle(size_t start, size_t stop) {
-      emp_assert(start <= stop, start, stop, num_bits);
-      emp_assert(stop <= num_bits, stop, num_bits);
-      const size_t start_pos = FieldPos(start);
-      const size_t stop_pos = FieldPos(stop);
-      size_t start_field = FieldID(start);
-      const size_t stop_field = FieldID(stop);
-
-      // If the start field and stop field are the same, just step through the bits.
-      if (start_field == stop_field) {
-        const size_t num_flips = stop - start;
-        const field_t mask = MaskLow<field_t>(num_flips) << start_pos;
-        bits[start_field] ^= mask;
-      }
-
-      // Otherwise handle the ends and clear the chunks in between.
-      else {
-        // Toggle correct portions of start field
-        if (start_pos != 0) {
-          const size_t start_bits = FIELD_BITS - start_pos;
-          const field_t start_mask = MaskLow<field_t>(start_bits) << start_pos;
-          bits[start_field] ^= start_mask;
-          start_field++;
-        }
-
-        // Middle fields
-        for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
-          bits[cur_field] = ~bits[cur_field];
-        }
-
-        // Set portions of stop field
-        const field_t stop_mask = MaskLow<field_t>(stop_pos);
-        bits[stop_field] ^= stop_mask;
-      }
-
-      return *this;
-    }
 
     /// A simple hash function for bit vectors.
     std::size_t Hash() const {
@@ -878,165 +760,313 @@ namespace emp {
 
   // ------------------------ Implementations for Internal Functions ------------------------
 
-    void BitVector::RawCopy(const Ptr<BitVector::field_t> in) {
-      #ifdef EMP_TRACK_MEM
-      emp_assert(in.IsNull() == false);
-      emp_assert(bits.DebugIsArray() && in.DebugIsArray());
-      emp_assert(bits.DebugGetArrayBytes() == in.DebugGetArrayBytes(),
-                 bits.DebugGetArrayBytes(), in.DebugGetArrayBytes());
-      #endif
+  void BitVector::RawCopy(const Ptr<BitVector::field_t> in) {
+    #ifdef EMP_TRACK_MEM
+    emp_assert(in.IsNull() == false);
+    emp_assert(bits.DebugIsArray() && in.DebugIsArray());
+    emp_assert(bits.DebugGetArrayBytes() == in.DebugGetArrayBytes(),
+                bits.DebugGetArrayBytes(), in.DebugGetArrayBytes());
+    #endif
 
-      const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = in[i];
+    const size_t NUM_FIELDS = NumFields();
+    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = in[i];
+  }
+
+  void BitVector::ShiftLeft(const size_t shift_size) {
+    const size_t field_shift = shift_size / FIELD_BITS;
+    const size_t bit_shift = shift_size % FIELD_BITS;
+    const size_t bit_overflow = FIELD_BITS - bit_shift;
+    const size_t NUM_FIELDS = NumFields();
+
+    // Loop through each field, from L to R, and update it.
+    if (field_shift) {
+      for (size_t i = NUM_FIELDS; i > field_shift; --i) {
+        bits[i-1] = bits[i - field_shift - 1];
+      }
+      for (size_t i = field_shift; i > 0; --i) bits[i-1] = 0;
     }
 
-    void BitVector::ShiftLeft(const size_t shift_size) {
-      const size_t field_shift = shift_size / FIELD_BITS;
-      const size_t bit_shift = shift_size % FIELD_BITS;
-      const size_t bit_overflow = FIELD_BITS - bit_shift;
-      const size_t NUM_FIELDS = NumFields();
-
-      // Loop through each field, from L to R, and update it.
-      if (field_shift) {
-        for (size_t i = NUM_FIELDS; i > field_shift; --i) {
-          bits[i-1] = bits[i - field_shift - 1];
-        }
-        for (size_t i = field_shift; i > 0; --i) bits[i-1] = 0;
+    // account for bit_shift
+    if (bit_shift) {
+      for (size_t i = NUM_FIELDS - 1; i > field_shift; --i) {
+        bits[i] <<= bit_shift;
+        bits[i] |= (bits[i-1] >> bit_overflow);
       }
-
-      // account for bit_shift
-      if (bit_shift) {
-        for (size_t i = NUM_FIELDS - 1; i > field_shift; --i) {
-          bits[i] <<= bit_shift;
-          bits[i] |= (bits[i-1] >> bit_overflow);
-        }
-        // Handle final field (field_shift position)
-        bits[field_shift] <<= bit_shift;
-      }
-
-      // Mask out any bits that have left-shifted away
-      ClearExcessBits();
+      // Handle final field (field_shift position)
+      bits[field_shift] <<= bit_shift;
     }
 
-    void BitVector::ShiftRight(const size_t shift_size) {
-      const size_t field_shift = shift_size / FIELD_BITS;
-      const size_t bit_shift = shift_size % FIELD_BITS;
-      const size_t bit_overflow = FIELD_BITS - bit_shift;
-      const size_t NUM_FIELDS = NumFields();
-      const size_t field_shift2 = NUM_FIELDS - field_shift;
+    // Mask out any bits that have left-shifted away
+    ClearExcessBits();
+  }
 
-      // account for field_shift
-      if (field_shift) {
-        for (size_t i = 0; i < field_shift2; ++i) {
-          bits[i] = bits[i + field_shift];
-        }
-        for (size_t i = field_shift2; i < NUM_FIELDS; i++) bits[i] = 0U;
-      }
+  void BitVector::ShiftRight(const size_t shift_size) {
+    const size_t field_shift = shift_size / FIELD_BITS;
+    const size_t bit_shift = shift_size % FIELD_BITS;
+    const size_t bit_overflow = FIELD_BITS - bit_shift;
+    const size_t NUM_FIELDS = NumFields();
+    const size_t field_shift2 = NUM_FIELDS - field_shift;
 
-      // account for bit_shift
-      if (bit_shift) {
-        for (size_t i = 0; i < (field_shift2 - 1); ++i) {
-          bits[i] >>= bit_shift;
-          bits[i] |= (bits[i+1] << bit_overflow);
-        }
-        bits[field_shift2 - 1] >>= bit_shift;
+    // account for field_shift
+    if (field_shift) {
+      for (size_t i = 0; i < field_shift2; ++i) {
+        bits[i] = bits[i + field_shift];
       }
+      for (size_t i = field_shift2; i < NUM_FIELDS; i++) bits[i] = 0U;
     }
 
-    bool BitVector::OK() const {
-      // Do some checking on the bits array ptr to make sure it's value.
-      if (bits) {
+    // account for bit_shift
+    if (bit_shift) {
+      for (size_t i = 0; i < (field_shift2 - 1); ++i) {
+        bits[i] >>= bit_shift;
+        bits[i] |= (bits[i+1] << bit_overflow);
+      }
+      bits[field_shift2 - 1] >>= bit_shift;
+    }
+  }
+
+  bool BitVector::OK() const {
+    // Do some checking on the bits array ptr to make sure it's value.
+    if (bits) {
 #ifdef EMP_TRACK_MEM
-        emp_assert(bits.DebugIsArray()); // Must be marked as an array.
-        emp_assert(bits.OK());           // Pointer must be okay.
+      emp_assert(bits.DebugIsArray()); // Must be marked as an array.
+      emp_assert(bits.OK());           // Pointer must be okay.
 #endif
+    }
+
+    // Otherwise bits is null; num_bits should be zero.
+    else emp_assert(num_bits == 0);
+
+    // Make sure final bits are zeroed out.
+    field_t excess_bits = bits[NumFields() - 1] & ~MaskLow<field_t>(NumEndBits());
+    emp_assert(!excess_bits);
+
+    return true;
+  }
+
+
+  // ------------------- Implementations of Constructors and Assignments --------------------
+
+  /// Build a new BitVector with specified bit count (default 0) and initialization (default 0)
+  BitVector::BitVector(size_t in_num_bits, bool init_val) : num_bits(in_num_bits), bits(nullptr) {
+    if (num_bits) bits = NewArrayPtr<field_t>(NumFields());
+    if (init_val) SetAll(); else Clear();
+  }
+
+  /// Copy constructor of existing bit field.
+  BitVector::BitVector(const BitVector & in) : num_bits(in.num_bits), bits(nullptr) {
+    emp_assert(in.OK());
+
+    // There is only something to copy if there are a non-zero number of bits!
+    if (num_bits) {
+      #ifdef EMP_TRACK_MEM
+      emp_assert(!in.bits.IsNull() && in.bits.DebugIsArray(), in.bits.IsNull(), in.bits.DebugIsArray());
+      #endif
+      bits = NewArrayPtr<field_t>(NumFields());
+      RawCopy(in.bits);
+    }
+  }
+
+  /// Move constructor of existing bit field.
+  BitVector::BitVector(BitVector && in) : num_bits(in.num_bits), bits(in.bits) {
+    emp_assert(in.OK());
+
+    in.bits = nullptr;
+    in.num_bits = 0;
+  }
+
+  /// Copy, but with a resize.
+  BitVector::BitVector(const BitVector & in, size_t new_size) : BitVector(in) {
+    if (num_bits != new_size) Resize(new_size);
+  }
+
+  /// Destructor
+  BitVector::~BitVector() {
+    if (bits) {        // A move constructor can make bits == nullptr
+      bits.DeleteArray();
+      bits = nullptr;
+    }
+  }
+
+  /// Assignment operator.
+  BitVector & BitVector::operator=(const BitVector & in) {
+    emp_assert(in.OK());
+
+    if (&in == this) return *this;
+    const size_t in_num_fields = in.NumFields();
+    const size_t prev_num_fields = NumFields();
+    num_bits = in.num_bits;
+
+    if (in_num_fields != prev_num_fields) {
+      if (bits) bits.DeleteArray();
+      if (num_bits) bits = NewArrayPtr<field_t>(in_num_fields);
+      else bits = nullptr;
+    }
+
+    if (num_bits) RawCopy(in.bits);
+
+    return *this;
+  }
+
+  /// Move operator.
+  BitVector & BitVector::operator=(BitVector && in) {
+    emp_assert(&in != this);        // in is an r-value, so this shouldn't be possible...
+    if (bits) bits.DeleteArray();   // If we already had a bitset, get rid of it.
+    num_bits = in.num_bits;         // Update the number of bits...
+    bits = in.bits;                 // And steal the old memory for what those bits are.
+    in.bits = nullptr;              // Prepare in for deletion without deallocating.
+    in.num_bits = 0;
+
+    return *this;
+  }
+
+  // --------------------  Implementations of other public functions -------------------
+  
+  /// Retrive the bit value from the specified index.
+  bool BitVector::Get(size_t index) const {
+    emp_assert(index < num_bits, index, num_bits);
+    const size_t field_id = FieldID(index);
+    const size_t pos_id = FieldPos(index);
+    return (bits[field_id] & (static_cast<field_t>(1) << pos_id)) != 0;
+  }
+
+  /// Update the bit value at the specified index.
+  BitVector & BitVector::Set(size_t index, bool value) {
+    emp_assert(index < num_bits, index, num_bits);
+    const size_t field_id = FieldID(index);
+    const size_t pos_id = FieldPos(index);
+    const field_t pos_mask = FIELD_1 << pos_id;
+
+    if (value) bits[field_id] |= pos_mask;
+    else       bits[field_id] &= ~pos_mask;
+
+    return *this;
+  }
+
+  /// Change a specified bit to the opposite value
+  BitVector & BitVector::Toggle(size_t index) {
+    emp_assert(index < num_bits, index, num_bits);
+    const size_t field_id = FieldID(index);
+    const size_t pos_id = FieldPos(index);
+    const field_t pos_mask = FIELD_1 << pos_id;
+
+    bits[field_id] ^= pos_mask;
+
+    return *this;
+  }
+
+  /// Flips all the bits in a range [start, end)
+  BitVector & BitVector::Toggle(size_t start, size_t stop) {
+    emp_assert(start <= stop, start, stop, num_bits);
+    emp_assert(stop <= num_bits, stop, num_bits);
+    const size_t start_pos = FieldPos(start);
+    const size_t stop_pos = FieldPos(stop);
+    size_t start_field = FieldID(start);
+    const size_t stop_field = FieldID(stop);
+
+    // If the start field and stop field are the same, just step through the bits.
+    if (start_field == stop_field) {
+      const size_t num_flips = stop - start;
+      const field_t mask = MaskLow<field_t>(num_flips) << start_pos;
+      bits[start_field] ^= mask;
+    }
+
+    // Otherwise handle the ends and clear the chunks in between.
+    else {
+      // Toggle correct portions of start field
+      if (start_pos != 0) {
+        const size_t start_bits = FIELD_BITS - start_pos;
+        const field_t start_mask = MaskLow<field_t>(start_bits) << start_pos;
+        bits[start_field] ^= start_mask;
+        start_field++;
       }
 
-      // Otherwise bits is null; num_bits should be zero.
-      else emp_assert(num_bits == 0);
-
-      // Make sure final bits are zeroed out.
-      field_t excess_bits = bits[NumFields() - 1] & ~MaskLow<field_t>(NumEndBits());
-      emp_assert(!excess_bits);
-
-      return true;
-    }
-
-
-    // ------------------- Implementations of Constructors and Assignments --------------------
-
-    /// Build a new BitVector with specified bit count (default 0) and initialization (default 0)
-    BitVector::BitVector(size_t in_num_bits, bool init_val) : num_bits(in_num_bits), bits(nullptr) {
-      if (num_bits) bits = NewArrayPtr<field_t>(NumFields());
-      if (init_val) SetAll(); else Clear();
-    }
-
-    /// Copy constructor of existing bit field.
-    BitVector::BitVector(const BitVector & in) : num_bits(in.num_bits), bits(nullptr) {
-      emp_assert(in.OK());
-
-      // There is only something to copy if there are a non-zero number of bits!
-      if (num_bits) {
-        #ifdef EMP_TRACK_MEM
-        emp_assert(!in.bits.IsNull() && in.bits.DebugIsArray(), in.bits.IsNull(), in.bits.DebugIsArray());
-        #endif
-        bits = NewArrayPtr<field_t>(NumFields());
-        RawCopy(in.bits);
-      }
-    }
-
-    /// Move constructor of existing bit field.
-    BitVector::BitVector(BitVector && in) : num_bits(in.num_bits), bits(in.bits) {
-      emp_assert(in.OK());
-
-      in.bits = nullptr;
-      in.num_bits = 0;
-    }
-
-    /// Copy, but with a resize.
-    BitVector::BitVector(const BitVector & in, size_t new_size) : BitVector(in) {
-      if (num_bits != new_size) Resize(new_size);
-    }
-
-    /// Destructor
-    BitVector::~BitVector() {
-      if (bits) {        // A move constructor can make bits == nullptr
-        bits.DeleteArray();
-        bits = nullptr;
-      }
-    }
-
-    /// Assignment operator.
-    BitVector & BitVector::operator=(const BitVector & in) {
-      emp_assert(in.OK());
-
-      if (&in == this) return *this;
-      const size_t in_num_fields = in.NumFields();
-      const size_t prev_num_fields = NumFields();
-      num_bits = in.num_bits;
-
-      if (in_num_fields != prev_num_fields) {
-        if (bits) bits.DeleteArray();
-	      if (num_bits) bits = NewArrayPtr<field_t>(in_num_fields);
-        else bits = nullptr;
+      // Middle fields
+      for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
+        bits[cur_field] = ~bits[cur_field];
       }
 
-      if (num_bits) RawCopy(in.bits);
-
-      return *this;
+      // Set portions of stop field
+      const field_t stop_mask = MaskLow<field_t>(stop_pos);
+      bits[stop_field] ^= stop_mask;
     }
 
-    /// Move operator.
-    BitVector & BitVector::operator=(BitVector && in) {
-      emp_assert(&in != this);        // in is an r-value, so this shouldn't be possible...
-      if (bits) bits.DeleteArray();   // If we already had a bitset, get rid of it.
-      num_bits = in.num_bits;         // Update the number of bits...
-      bits = in.bits;                 // And steal the old memory for what those bits are.
-      in.bits = nullptr;              // Prepare in for deletion without deallocating.
-      in.num_bits = 0;
+    return *this;
+  }
 
-      return *this;
+  /// Resize this BitVector to have the specified number of bits.
+  BitVector & BitVector::Resize(size_t new_bits) {
+    const size_t old_num_fields = NumFields();
+    num_bits = new_bits;
+    const size_t NUM_FIELDS = NumFields();
+
+    if (NUM_FIELDS == old_num_fields) {   // We can use our existing bit field
+      num_bits = new_bits;
+      ClearExcessBits();                  // If there are extra bits, zero them out.
     }
+
+    else {  // We must change the number of bitfields.  Resize & copy old info.
+      Ptr<field_t> old_bits = bits;
+      if (num_bits > 0) bits = NewArrayPtr<field_t>(NUM_FIELDS);
+      else bits = nullptr;
+      const size_t min_fields = std::min(old_num_fields, NUM_FIELDS);
+      for (size_t i = 0; i < min_fields; i++) bits[i] = old_bits[i];
+      for (size_t i = min_fields; i < NUM_FIELDS; i++) bits[i] = 0U;
+      if (old_bits) old_bits.DeleteArray();
+    }
+
+    return *this;
+  }
+
+  /// Test if two bit vectors are identical.
+  bool BitVector::operator==(const BitVector & in) const {
+    if (num_bits != in.num_bits) return false;
+
+    const size_t NUM_FIELDS = NumFields();
+    for (size_t i = 0; i < NUM_FIELDS; ++i) {
+      if (bits[i] != in.bits[i]) return false;
+    }
+    return true;
+  }
+
+  /// Compare the would-be numerical values of two bit vectors.
+  bool BitVector::operator<(const BitVector & in) const {
+    if (num_bits != in.num_bits) return num_bits < in.num_bits;
+
+    const size_t NUM_FIELDS = NumFields();
+    for (size_t i = NUM_FIELDS; i > 0; --i) {   // Start loop at the largest field.
+      const size_t pos = i-1;
+      if (bits[pos] == in.bits[pos]) continue;  // If same, keep looking!
+      return (bits[pos] < in.bits[pos]);        // Otherwise, do comparison
+    }
+    return false; // Bit vectors are identical.
+  }
+
+  /// Compare the would-be numerical values of two bit vectors.
+  bool BitVector::operator<=(const BitVector & in) const {
+    if (num_bits != in.num_bits) return num_bits <= in.num_bits;
+
+    const size_t NUM_FIELDS = NumFields();
+    for (size_t i = NUM_FIELDS; i > 0; --i) {   // Start loop at the largest field.
+      const size_t pos = i-1;
+      if (bits[pos] == in.bits[pos]) continue;  // If same, keep looking!
+      return (bits[pos] < in.bits[pos]);        // Otherwise, do comparison
+    }
+    return true;
+  }
+
+  /// Automatically convert BitVector to other vector types.
+  template <typename T>
+  BitVector::operator emp::vector<T>() {
+    emp::vector<T> out(GetSize());
+    for (size_t i = 0; i < GetSize(); i++) {
+      out[i] = (T) Get(i);
+    }
+    return out;
+  }
+
+
+
 
 
 }
