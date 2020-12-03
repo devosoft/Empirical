@@ -182,97 +182,97 @@ int main() {
   emp::JSWrap(ClearLineGraph, "ClearLineGraph");
   emp::JSWrap(ClearTreeViz, "ClearTreeViz");
 
-  // EM_ASM({
-  //
-  //   describe('Line Graph', function() {
-  //
-  //     before( function(done) {
-  //       emp.done = done;
-  //       emp.MakeLineGraph("done");
-  //     });
-  //
-  //     it('should have data-points for each piece of test data', function() {
-  //       var data_points = d3.select("#line_graph").selectAll(".data-point");
-  //       chai.assert.equal(data_points.size(), 5);
-  //       chai.assert.deepEqual(data_points.data(), [[1, 5], [2, 3], [3, 6], [4, 1], [5, 10]]);
-  //     });
-  //
-  //     it('they should be connected by a line', function() {
-  //       var path = d3.select("#line_graph").selectAll(".line-seg").attr("d");
-  //       chai.assert.equal(path, "M60,110L162.5,150L265,90L367.5,190L470,10");
-  //     });
-  //
-  //     it('should have an x and y axis', function() {
-  //       var data_points = d3.select("#line_graph").selectAll(".data-point");
-  //       chai.assert.equal(d3.select("#x_axis").select("path").attr("d"), "M60.5,6V0.5H470.5V6");
-  //       chai.assert.equal(d3.select("#x_axis_label").text(), "x");
-  //       chai.assert.equal(d3.select("#y_axis").select("path").attr("d"), "M-6,10.5H0.5V190.5H-6");
-  //       chai.assert.equal(d3.select("#y_axis_label").text(), "y");
-  //     });
-  //
-  //     describe('Adding data', function(){
-  //
-  //       before( function(done) {
-  //         emp.done = done;
-  //         emp.TestAnimateStep_LineGraph("done");
-  //       });
-  //
-  //       it('should let you add data and rescale accordingly', function() {
-  //         emp.emp__0draw_data();
-  //         var data_points = d3.select("#line_graph").selectAll(".data-point");
-  //         chai.assert.equal(data_points.size(), 6);
-  //         chai.assert.deepEqual(data_points.data(), [[1, 5], [2, 3], [3, 6], [4, 1], [5, 10], [6,12]]);
-  //         var paths = d3.select("#line_graph").selectAll(".line-seg");
-  //         chai.assert.equal(paths.nodes()[0].getAttribute("d"), "M60,136.26865671641792L126.12903225806453,163.13432835820896L192.25806451612905,122.83582089552239L258.38709677419354,190L324.5161290322581,69.10447761194028");
-  //         chai.assert.equal(paths.nodes()[1].getAttribute("d"), "M324.5161290322581,69.10447761194028L390.6451612903226,42.23880597014926");
-  //       });
-  //
-  //     });
-  //
-  //     after(function(){
-  //       emp.ClearLineGraph();
-  //     });
-  //
-  //   });
-  // });
+  EM_ASM({
 
-  // EM_ASM({
-  //
-  //   describe('Tree visualization', function() {
-  //
-  //     before( function(done) {
-  //       emp.done = done;
-  //       emp.MakeTreeViz("done");
-  //     });
-  //
-  //     it('should have a node and link for each piece of data', function() {
-  //       var data_points = d3.select("#tree_viz").selectAll("circle");
-  //       var links = d3.select("#tree_viz").selectAll(".link");
-  //       chai.assert.equal(data_points.size(), 163);
-  //       chai.assert.equal(links.size(), 162);
-  //     });
-  //
-  //     describe('Adding a node', function(){
-  //
-  //       before( function(done) {
-  //         emp.done = done;
-  //         emp.TestAnimateStep_Tree("done");
-  //       });
-  //
-  //       it('should let you add data', function() {
-  //         var data = d3.select("#tree_viz").selectAll("circle").data();
-  //         var new_data = data.filter(function(d){return d.data.name==10});
-  //         chai.assert.equal(new_data[0].parent.data.name, 0);
-  //       });
-  //
-  //     });
-  //
-  //     after(function(){
-  //       emp.ClearTreeViz();
-  //     });
-  //
-  //   });
-  // });
+    describe('Line Graph', function() {
+
+      before( function(done) {
+        emp.done = done;
+        emp.MakeLineGraph("done");
+      });
+
+      it('should have data-points for each piece of test data', function() {
+        var data_points = d3.select("#line_graph").selectAll(".data-point");
+        chai.assert.equal(data_points.size(), 5);
+        chai.assert.deepEqual(data_points.data(), [[1, 5], [2, 3], [3, 6], [4, 1], [5, 10]]);
+      });
+
+      it('they should be connected by a line', function() {
+        var path = d3.select("#line_graph").selectAll(".line-seg").attr("d");
+        chai.assert.equal(path, "M60,110L162.5,150L265,90L367.5,190L470,10");
+      });
+
+      it('should have an x and y axis', function() {
+        var data_points = d3.select("#line_graph").selectAll(".data-point");
+        chai.assert.equal(d3.select("#x_axis").select("path").attr("d"), "M60.5,6V0.5H470.5V6");
+        chai.assert.equal(d3.select("#x_axis_label").text(), "x");
+        chai.assert.equal(d3.select("#y_axis").select("path").attr("d"), "M-6,10.5H0.5V190.5H-6");
+        chai.assert.equal(d3.select("#y_axis_label").text(), "y");
+      });
+
+      describe('Adding data', function(){
+
+        before( function(done) {
+          emp.done = done;
+          emp.TestAnimateStep_LineGraph("done");
+        });
+
+        it('should let you add data and rescale accordingly', function() {
+          emp.emp__0draw_data();
+          var data_points = d3.select("#line_graph").selectAll(".data-point");
+          chai.assert.equal(data_points.size(), 6);
+          chai.assert.deepEqual(data_points.data(), [[1, 5], [2, 3], [3, 6], [4, 1], [5, 10], [6,12]]);
+          var paths = d3.select("#line_graph").selectAll(".line-seg");
+          chai.assert.equal(paths.nodes()[0].getAttribute("d"), "M60,136.26865671641792L126.12903225806453,163.13432835820896L192.25806451612905,122.83582089552239L258.38709677419354,190L324.5161290322581,69.10447761194028");
+          chai.assert.equal(paths.nodes()[1].getAttribute("d"), "M324.5161290322581,69.10447761194028L390.6451612903226,42.23880597014926");
+        });
+
+      });
+
+      after(function(){
+        emp.ClearLineGraph();
+      });
+
+    });
+  });
+
+  EM_ASM({
+
+    describe('Tree visualization', function() {
+
+      before( function(done) {
+        emp.done = done;
+        emp.MakeTreeViz("done");
+      });
+
+      it('should have a node and link for each piece of data', function() {
+        var data_points = d3.select("#tree_viz").selectAll("circle");
+        var links = d3.select("#tree_viz").selectAll(".link");
+        chai.assert.equal(data_points.size(), 163);
+        chai.assert.equal(links.size(), 162);
+      });
+
+      describe('Adding a node', function(){
+
+        before( function(done) {
+          emp.done = done;
+          emp.TestAnimateStep_Tree("done");
+        });
+
+        it('should let you add data', function() {
+          var data = d3.select("#tree_viz").selectAll("circle").data();
+          var new_data = data.filter(function(d){return d.data.name==10});
+          chai.assert.equal(new_data[0].parent.data.name, 0);
+        });
+
+      });
+
+      after(function(){
+        emp.ClearTreeViz();
+      });
+
+    });
+  });
 
   emp::JSWrap(TestSetAttrString, "TestSetAttrString");
   emp::JSWrap(TestSetAttrInt, "TestSetAttrInt");
