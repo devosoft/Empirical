@@ -457,3 +457,15 @@ TEST_CASE("Test format_string", "[tools]") {
 	)" );
 
 }
+
+TEST_CASE("Test repeat", "[tools]") {
+
+	REQUIRE( emp::repeat("", 0) == "" );
+	REQUIRE( emp::repeat("", 1) == "" );
+	REQUIRE( emp::repeat("", 2) == "" );
+
+	REQUIRE( emp::repeat("abc", 0) == "" );
+	REQUIRE( emp::repeat("abc", 1) == "abc" );
+	REQUIRE( emp::repeat("abc", 2) == "abcabc" );
+
+}
