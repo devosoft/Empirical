@@ -729,42 +729,43 @@ namespace emp {
     }
 
     // Returns mask that keeps bits higher than index
-    BitVector & Mask_High(size_t index) {
-      field_id = FieldPos(index);
+    void Mask_High(size_t index) {
+      size_t field_id = FieldID(index);
       int field_t_bits = sizeof(bit_set[0]) * 8;
-      for (int i = 0; i < field_id; i++) {
+      for (size_t i = 0; i < field_id; i++)
         bit_set[i] = 0;
-      }
-      
-      bit_set[field_id] &= MaskLow<field_t>(index % field_t_bits);
-      return *this;
+      if (index < num_bits) 
+        bit_set[field_id] &= (MaskLow<field_t>((num_bits - index - 1) % field_t_bits) << (index + 1));
     }
+
     // Returns mask that keeps bits lower than index
-    BitVector & Mask_Low(size_t index) {
-      field_id = FieldPos(index);
+    void Mask_Low(size_t index) {
+      size_t field_id = FieldID(index);
       int field_t_bits = sizeof(bit_set[0]) * 8;
-      
-      for (int i = field_id + 1; i < NumFields(); i++) {
+      for (size_t i = field_id + 1; i < NumFields(); i++)
         bit_set[i] = 0;
-      }
-      bit_set[field_id] &= MaskLow<field_t>(index % field_t_bits);
-      return *this;
+      if (index > 0)
+        bit_set[field_id] &= MaskLow<field_t>(index % field_t_bits);
     }
 
     /// Insert bits into vector, including middle using bitmagic
+    /// https://devolab.org/?p=2249
     void Insert2(size_t index, bool value=true, size_t num=1) {
       Resize(num_bits + num);
-      // masklow and shift right
-      BitVector a = *this;
-      a.Mask_High(index);
-      a.ShiftRight(num);
-      BitVector b = *this;
-      a.Mask_Low(index);
-
-      //bit_set |= high_bits;
+      // mask high and shift left: 101101 -> 1010000
+      thread_local BitVector a = *this;
+      if (index == 0)
+        a.Mask_High(index - 1);
+      a.ShiftLeft(num);
+      // mask low and | together 101101 -> 000101 ->1010101
+      thread_local BitVector b = *this;
+      b.Mask_Low(index);
+      a |= b;
+      // set specified bits -> 1010101 -> 101_101
       for (size_t i = index; i < index + num; i++) {
-        Set(i, value);
+        a.Set(i, value);
       }
+      std::swap(a, *this);
     }
 
     /// Delete bits from vector, including middle

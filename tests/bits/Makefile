@@ -1,4 +1,5 @@
-TEST_NAMES = BitSet BitMatrix bitset_utils BitVector
+#TEST_NAMES = BitSet BitMatrix bitset_utils BitVector
+TEST_NAMES = BitVector
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/
@@ -24,15 +25,15 @@ test-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
 
 # Test in debug mode without pointer tracker
 test: test-prep $(addprefix test-, $(TEST_NAMES))
-	rm -rf test*.out
+	#rm -rf test*.out
 
 coverage: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../coverage_source/ -I../../ -I../../third-party/cereal/include/ -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 -fprofile-instr-generate -fcoverage-mapping -fno-inline -fno-elide-constructors -O0
 coverage: test-prep $(addprefix cov-, $(TEST_NAMES))
 
 # Test optimized version without debug features
-opt: FLAGS := -std=c++17 -pthread -DNDEBUG -O3 -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../
+opt: FLAGS := -std=c++17 -pg -pthread -DNDEBUG -O3 -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../
 opt: test-prep $(addprefix test-, $(TEST_NAMES))
-	rm -rf test*.out
+	#rm -rf test*.out
 
 # Test in debug mode with pointer tracking
 fulldebug: FLAGS := -std=c++17 -pthread -g -Wall -Wno-unused-function -I../../include/ -I../../third-party/cereal/include/ -I../../ -pedantic -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -ftemplate-backtrace-limit=0 # -Wmisleading-indentation

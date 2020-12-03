@@ -287,35 +287,50 @@ TEST_CASE("Test BitVector", "[bits]")
 	bv_g.Delete(1, 2);
 	REQUIRE(bv_g.size() == 2);
 	REQUIRE(!bv_g.Get(1));
+
+	// Test Mask_High, Mask_Low, Insert2
+	emp::BitVector a(0);
+	a.Insert(0,true, 7);
+	REQUIRE(a.Get(3));
+	emp::BitVector b = a;
+	emp::BitVector c = a;
+	b.Mask_High(3);
+	c.Mask_Low(3);
+	REQUIRE(b.Get(4));
+	REQUIRE(c.Get(2));
+	REQUIRE(!b.Get(3));
+	REQUIRE(!c.Get(3));
+	a.Insert2(4, false);
+	REQUIRE(!a.Get(4));
+	a.Insert2(4, true, 2);
+	REQUIRE(a.Get(4));
+	REQUIRE(a.Get(5));
 }
 
 TEST_CASE("Benchmark BitVector Inserts", "[bits]"){
-	emp::BitVector bv(0);
+	emp::BitVector bv(10);
 	bv.Insert(0, true, 2);
+	std::cout << "Set/Get Insert: ";
 	EMP_VOID_FUNCTION_TIMER([&bv](){
 		for ( size_t i = 1; i <= std::mega::num; ++i ) {
-			bv.Insert(i-1, false);
+			auto bv1 = bv;
+			bv1.Insert(1, false);
+			//bv.PopBack();
 		}
 	}());
-	REQUIRE(bv.size() == std::mega::num + 2);
+	// REQUIRE(bv.size() == std::mega::num + 2);
 
-	
-	emp::BitVector bv_a(0);
-	bv_a.Insert(0,false, 7);
-
-	//bv_a.Insert2(0, true);
-	REQUIRE(bv_a.Mask_High(0) == 63);
-	bv_a.Mask_High(1);
-	bv_a.Mask_High(2);
-	bv_a.Mask_High(3);
-	bv_a.Mask_High(4);
-	bv_a.Mask_High(5);
-	bv_a.Mask_Low(1);
-	bv_a.Mask_Low(2);
-	bv_a.Mask_Low(3);
-	bv_a.Mask_Low(4);
-	bv_a.Mask_Low(5);
-
+	emp::BitVector bv2(10);
+	bv2.Insert(0, true, 2);
+	std::cout << "BitMagic Insert: ";
+	EMP_VOID_FUNCTION_TIMER([&bv2](){
+		for ( size_t i = 1; i <= std::mega::num; ++i ) {
+			auto bv3 = bv2;
+			bv3.Insert2(1, false);
+			//bv2.PopBack();
+		}
+	}());
+	// REQUIRE(bv2.size() == std::mega::num + 1);
 }
 
 TEST_CASE("Another Test BitVector", "[bits]")
