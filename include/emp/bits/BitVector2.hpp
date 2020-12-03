@@ -169,6 +169,9 @@ namespace emp {
     /// Move operator.
     BitVector & operator=(BitVector && in);
 
+
+    // >>>>>>>>>>  Accessors  <<<<<<<<<< //
+
     /// How many bits do we currently have?
     size_t GetSize() const { return num_bits; }
 
@@ -181,6 +184,12 @@ namespace emp {
     /// Update the bit value at the specified index.
     BitVector & Set(size_t index, bool value=true);
 
+    /// Const index operator -- return the bit at the specified position.
+    bool operator[](size_t index) const { return Get(index); }
+
+    /// Index operator -- return a proxy to the bit at the specified position so it can be an lvalue.
+    BitProxy operator[](size_t index) { return BitProxy(*this, index); }
+
     /// Change every bit in the sequence.
     BitVector & Toggle() { return NOT_SELF(); }
 
@@ -190,8 +199,21 @@ namespace emp {
     /// Flips all the bits in a range [start, end)
     BitVector & Toggle(size_t start, size_t stop);
 
+    /// Return true if ANY bits are set to 1, otherwise return false.
+    bool Any() const;
+
+    /// Return true if NO bits are set to 1, otherwise return false.
+    bool None() const { return !Any(); }
+
+    /// Return true if ALL bits are set to 1, otherwise return false.
+    // @CAO: Can speed up by not duplicating the whole BitVector.
+    bool All() const { return (~(*this)).None(); }
+
     /// Resize this BitVector to have the specified number of bits.
     BitVector & Resize(size_t new_bits);
+
+
+    // >>>>>>>>>>  Operators  <<<<<<<<<< //
 
     /// Test if two bit vectors are identical.
     bool operator==(const BitVector & in) const;
@@ -214,134 +236,43 @@ namespace emp {
     /// Automatically convert BitVector to other vector types.
     template <typename T> operator emp::vector<T>();
 
-
-    /// A simple hash function for bit vectors.
-    std::size_t Hash() const {
-      std::size_t hash_val = 0;
-      const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) {
-        hash_val ^= bits[i];
-      }
-      return hash_val ^ ((97*num_bits) << 8);
-    }
-
-    /// Retrive the byte at the specified byte index.
-    uint8_t GetByte(size_t index) const {
-      emp_assert(index < NumBytes(), index, NumBytes());
-      const size_t field_id = Byte2Field(index);
-      const size_t pos_id = Byte2FieldPos(index);
-      return (bits[field_id] >> pos_id) & 255U;
-    }
-
-    /// Update the byte at the specified byte index.
-    void SetByte(size_t index, uint8_t value) {
-      emp_assert(index < NumBytes(), index, NumBytes());
-      const size_t field_id = Byte2Field(index);
-      const size_t pos_id = Byte2FieldPos(index);
-      const field_t val_uint = value;
-      bits[field_id] = (bits[field_id] & ~(FIELD_255 << pos_id)) | (val_uint << pos_id);
-    }
-
-   // Retrieve the 32-bit uint from the specified uint index (based on bitset.h GetUInt32)
-    uint32_t GetUInt(size_t index) const {
-      emp_assert(index * 32 < num_bits);
-
-      uint32_t res;
-
-      std::memcpy(
-        &res,
-        bits.Cast<unsigned char>().Raw() + index * (32/8),
-        sizeof(res)
-      );
-
-      return res;
-    }
-
-    /// Update the 32-bit uint at the specified uint index.
-    void SetUInt(const size_t index, uint32_t value) {
-      emp_assert(index * 32 < num_bits);
-
-      std::memcpy(
-        bits.Cast<unsigned char>().Raw() + index * (32/8),
-        &value,
-        sizeof(value)
-      );
-
-      // Check to make sure that if there are any end bits, there are no excess ones.
-      emp_assert(NumEndBits() == 0 ||
-                 ( bits[NumFields() - 1] & ~MaskLow<field_t>(NumEndBits()) ) == 0 );
-
-    }
-
-    /// Set a 32-bit uint at the specified BIT index.
-    void SetUIntAtBit(size_t index, uint32_t value) {
-      const size_t field_id = FieldID(index);
-      const size_t field_pos = FieldPos(index);
-      const field_t mask1 = MaskLow<field_t>(field_pos);
-      const size_t end_pos = field_pos + 32;
-      const size_t overshoot = (end_pos > FIELD_BITS) ? end_pos - FIELD_BITS : 0;
-      const field_t mask2 = ~MaskLow<field_t>(overshoot);
-
-      emp_assert(index+32 <= num_bits);
-      emp_assert(!overshoot || field_id+1 < NumFields());
-
-      // Clear bits that we are setting 1's then OR in new value.
-      bits[field_id] &= mask1;
-      bits[field_id] |= ((field_t) value) >> field_pos;
-
-      // Repeat for next field if needed.
-      if (overshoot) {
-        bits[field_id+1] &= mask2;
-        bits[field_id+1] |= ((field_t) value) << (32-overshoot);
-      }
-    }
-
-    /// Retrive the 32-bit uint at the specified BIT index.
-    uint32_t GetUIntAtBit(size_t index) {
-      // @CAO Need proper assert for non-32-size bit fields!
-      // emp_assert(index < num_bits);
-      const size_t field_id = FieldID(index);
-      const size_t pos_id = FieldPos(index);
-      if (pos_id == 0) return (uint32_t) bits[field_id];
-      const size_t NUM_FIELDS = NumFields();
-      const uint32_t part1 = (uint32_t) (bits[field_id] >> pos_id);
-      const uint32_t part2 =
-        (uint32_t)((field_id+1 < NUM_FIELDS) ? bits[field_id+1] << (FIELD_BITS-pos_id) : 0);
-      return part1 | part2;
-    }
-
-    /// Retrieve the specified number of bits (stored in the field type) at the target bit index.
-    template <size_t OUT_BITS>
-    field_t GetValueAtBit(size_t index) {
-      // @CAO This function needs to be generalized to return more then one field of bits.
-      static_assert(OUT_BITS <= FIELD_BITS, "Requesting too many bits to fit in a field");
-      return GetUIntAtBit(index) & MaskLow<field_t>(OUT_BITS);
-    }
-
-    /// Return true if ANY bits are set to 1, otherwise return false.
-    bool Any() const {
-      const size_t NUM_FIELDS = NumFields();
-      for (size_t i = 0; i < NUM_FIELDS; i++) {
-        if (bits[i]) return true;
-      }
-      return false;
-    }
-
-    /// Return true if NO bits are set to 1, otherwise return false.
-    bool None() const { return !Any(); }
-
-    /// Return true if ALL bits are set to 1, otherwise return false.
-    // @CAO: Can speed up by not duplicating the whole BitVector.
-    bool All() const { return (~(*this)).None(); }
-
     /// Casting a bit array to bool identifies if ANY bits are set to 1.
     explicit operator bool() const { return Any(); }
 
-    /// Const index operator -- return the bit at the specified position.
-    bool operator[](size_t index) const { return Get(index); }
 
-    /// Index operator -- return a proxy to the bit at the specified position so it can be an lvalue.
-    BitProxy operator[](size_t index) { return BitProxy(*this, index); }
+    // >>>>>>>>>>  Access Groups of bits  <<<<<<<<<< //
+
+    /// Retrive the byte at the specified byte index.
+    uint8_t GetByte(size_t index) const;
+
+    /// Update the byte at the specified byte index.
+    void SetByte(size_t index, uint8_t value);
+
+   // Retrieve the 32-bit uint from the specified uint index (based on bitset.h GetUInt32)
+    uint32_t GetUInt(size_t index) const;
+
+    /// Update the 32-bit uint at the specified uint index.
+    void SetUInt(const size_t index, uint32_t value);
+
+    /// Set a 32-bit uint at the specified BIT index.
+    void SetUIntAtBit(size_t index, uint32_t value);
+
+    /// Retrive the 32-bit uint at the specified BIT index.
+    uint32_t GetUIntAtBit(size_t index);
+
+    /// Retrieve the specified number of bits (stored in the field type) at the target bit index.
+    template <size_t OUT_BITS> field_t GetValueAtBit(size_t index);
+
+
+    // >>>>>>>>>>  Other Analyses  <<<<<<<<<< //
+
+    /// A simple hash function for bit vectors.
+    std::size_t Hash() const;
+
+
+
+
+
 
     /// Set all bits to 0.
     BitVector & Clear() {
@@ -351,9 +282,7 @@ namespace emp {
     }
 
     /// Set specific bit to 0.
-    BitVector & Clear(size_t index) {
-      return Set(index, false);
-    }
+    BitVector & Clear(size_t index) { return Set(index, false); }
 
     /// Set a range of bits to 0 in the range [start, stop)
     BitVector & Clear(const size_t start, const size_t stop) {
@@ -994,6 +923,14 @@ namespace emp {
     return *this;
   }
 
+  bool BitVector::Any() const {
+    const size_t NUM_FIELDS = NumFields();
+    for (size_t i = 0; i < NUM_FIELDS; i++) {
+      if (bits[i]) return true;
+    }
+    return false;
+  }
+
   /// Resize this BitVector to have the specified number of bits.
   BitVector & BitVector::Resize(size_t new_bits) {
     const size_t old_num_fields = NumFields();
@@ -1065,7 +1002,108 @@ namespace emp {
     return out;
   }
 
+  /// Retrive the byte at the specified byte index.
+  uint8_t BitVector::GetByte(size_t index) const {
+    emp_assert(index < NumBytes(), index, NumBytes());
+    const size_t field_id = Byte2Field(index);
+    const size_t pos_id = Byte2FieldPos(index);
+    return (bits[field_id] >> pos_id) & 255U;
+  }
 
+  /// Update the byte at the specified byte index.
+  void BitVector::SetByte(size_t index, uint8_t value) {
+    emp_assert(index < NumBytes(), index, NumBytes());
+    const size_t field_id = Byte2Field(index);
+    const size_t pos_id = Byte2FieldPos(index);
+    const field_t val_uint = value;
+    bits[field_id] = (bits[field_id] & ~(FIELD_255 << pos_id)) | (val_uint << pos_id);
+  }
+
+  // Retrieve the 32-bit uint from the specified uint index (based on bitset.h GetUInt32)
+  uint32_t BitVector::GetUInt(size_t index) const {
+    emp_assert(index * 32 < num_bits);
+
+    uint32_t res;
+
+    std::memcpy(
+      &res,
+      bits.Cast<unsigned char>().Raw() + index * (32/8),
+      sizeof(res)
+    );
+
+    return res;
+  }
+
+  /// Update the 32-bit uint at the specified uint index.
+  void BitVector::SetUInt(const size_t index, uint32_t value) {
+    emp_assert(index * 32 < num_bits);
+
+    std::memcpy(
+      bits.Cast<unsigned char>().Raw() + index * (32/8),
+      &value,
+      sizeof(value)
+    );
+
+    // Check to make sure that if there are any end bits, there are no excess ones.
+    emp_assert(NumEndBits() == 0 ||
+                ( bits[NumFields() - 1] & ~MaskLow<field_t>(NumEndBits()) ) == 0 );
+
+  }
+
+  /// Set a 32-bit uint at the specified BIT index.
+  void BitVector::SetUIntAtBit(size_t index, uint32_t value) {
+    const size_t field_id = FieldID(index);
+    const size_t field_pos = FieldPos(index);
+    const field_t mask1 = MaskLow<field_t>(field_pos);
+    const size_t end_pos = field_pos + 32;
+    const size_t overshoot = (end_pos > FIELD_BITS) ? end_pos - FIELD_BITS : 0;
+    const field_t mask2 = ~MaskLow<field_t>(overshoot);
+
+    emp_assert(index+32 <= num_bits);
+    emp_assert(!overshoot || field_id+1 < NumFields());
+
+    // Clear bits that we are setting 1's then OR in new value.
+    bits[field_id] &= mask1;
+    bits[field_id] |= ((field_t) value) >> field_pos;
+
+    // Repeat for next field if needed.
+    if (overshoot) {
+      bits[field_id+1] &= mask2;
+      bits[field_id+1] |= ((field_t) value) << (32-overshoot);
+    }
+  }
+
+  /// Retrive the 32-bit uint at the specified BIT index.
+  uint32_t BitVector::GetUIntAtBit(size_t index) {
+    // @CAO Need proper assert for non-32-size bit fields!
+    // emp_assert(index < num_bits);
+    const size_t field_id = FieldID(index);
+    const size_t pos_id = FieldPos(index);
+    if (pos_id == 0) return (uint32_t) bits[field_id];
+    const size_t NUM_FIELDS = NumFields();
+    const uint32_t part1 = (uint32_t) (bits[field_id] >> pos_id);
+    const uint32_t part2 =
+      (uint32_t)((field_id+1 < NUM_FIELDS) ? bits[field_id+1] << (FIELD_BITS-pos_id) : 0);
+    return part1 | part2;
+  }
+
+  /// Retrieve the specified number of bits (stored in the field type) at the target bit index.
+  template <size_t OUT_BITS>
+  BitVector::field_t BitVector::GetValueAtBit(size_t index) {
+    // @CAO This function needs to be generalized to return more then one field of bits.
+    static_assert(OUT_BITS <= FIELD_BITS, "Requesting too many bits to fit in a field");
+    return GetUIntAtBit(index) & MaskLow<field_t>(OUT_BITS);
+  }
+
+  /// A simple hash function for bit vectors.
+  std::size_t BitVector::Hash() const {
+    std::size_t hash_val = 0;
+    const size_t NUM_FIELDS = NumFields();
+    for (size_t i = 0; i < NUM_FIELDS; i++) {
+      hash_val ^= bits[i];
+    }
+    return hash_val ^ ((97*num_bits) << 8);
+  }
 
 
 
