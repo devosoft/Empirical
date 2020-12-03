@@ -149,77 +149,25 @@ namespace emp {
 
   public:
     /// Build a new BitVector with specified bit count (default 0) and initialization (default 0)
-    BitVector(size_t in_num_bits=0, bool init_val=false) : num_bits(in_num_bits), bits(nullptr) {
-      if (num_bits) bits = NewArrayPtr<field_t>(NumFields());
-      if (init_val) SetAll(); else Clear();
-    }
+    BitVector(size_t in_num_bits=0, bool init_val=false);
 
     /// Copy constructor of existing bit field.
-    BitVector(const BitVector & in) : num_bits(in.num_bits), bits(nullptr) {
-      emp_assert(in.OK());
-
-      // There is only something to copy if there are a non-zero number of bits!
-      if (num_bits) {
-        #ifdef EMP_TRACK_MEM
-        emp_assert(!in.bits.IsNull() && in.bits.DebugIsArray(), in.bits.IsNull(), in.bits.DebugIsArray());
-        #endif
-        bits = NewArrayPtr<field_t>(NumFields());
-        RawCopy(in.bits);
-      }
-    }
+    BitVector(const BitVector & in);
 
     /// Move constructor of existing bit field.
-    BitVector(BitVector && in) : num_bits(in.num_bits), bits(in.bits) {
-      emp_assert(in.OK());
-
-      in.bits = nullptr;
-      in.num_bits = 0;
-    }
+    BitVector(BitVector && in);
 
     /// Copy, but with a resize.
-    BitVector(const BitVector & in, size_t new_size) : BitVector(in) {
-      if (num_bits != new_size) Resize(new_size);
-    }
+    BitVector(const BitVector & in, size_t new_size);
 
     /// Destructor
-    ~BitVector() {
-      if (bits) {        // A move constructor can make bits == nullptr
-        bits.DeleteArray();
-        bits = nullptr;
-      }
-    }
+    ~BitVector();
 
     /// Assignment operator.
-    BitVector & operator=(const BitVector & in) {
-      emp_assert(in.OK());
-
-      if (&in == this) return *this;
-      const size_t in_num_fields = in.NumFields();
-      const size_t prev_num_fields = NumFields();
-      num_bits = in.num_bits;
-
-      if (in_num_fields != prev_num_fields) {
-        if (bits) bits.DeleteArray();
-	      if (num_bits) bits = NewArrayPtr<field_t>(in_num_fields);
-        else bits = nullptr;
-      }
-
-      if (num_bits) RawCopy(in.bits);
-
-      return *this;
-    }
+    BitVector & operator=(const BitVector & in);
 
     /// Move operator.
-    BitVector & operator=(BitVector && in) {
-      emp_assert(&in != this);        // in is an r-value, so this shouldn't be possible...
-      if (bits) bits.DeleteArray();   // If we already had a bitset, get rid of it.
-      num_bits = in.num_bits;         // Update the number of bits...
-      bits = in.bits;                 // And steal the old memory for what those bits are.
-      in.bits = nullptr;              // Prepare in for deletion without deallocating.
-      in.num_bits = 0;
-
-      return *this;
-    }
+    BitVector & operator=(BitVector && in);
 
     /// Automatically convert BitVector to other vector types.
     template <typename T>
@@ -1013,6 +961,83 @@ namespace emp {
 
       return true;
     }
+
+
+    // ------------------- Implementations of Constructors and Assignments --------------------
+
+    /// Build a new BitVector with specified bit count (default 0) and initialization (default 0)
+    BitVector::BitVector(size_t in_num_bits, bool init_val) : num_bits(in_num_bits), bits(nullptr) {
+      if (num_bits) bits = NewArrayPtr<field_t>(NumFields());
+      if (init_val) SetAll(); else Clear();
+    }
+
+    /// Copy constructor of existing bit field.
+    BitVector::BitVector(const BitVector & in) : num_bits(in.num_bits), bits(nullptr) {
+      emp_assert(in.OK());
+
+      // There is only something to copy if there are a non-zero number of bits!
+      if (num_bits) {
+        #ifdef EMP_TRACK_MEM
+        emp_assert(!in.bits.IsNull() && in.bits.DebugIsArray(), in.bits.IsNull(), in.bits.DebugIsArray());
+        #endif
+        bits = NewArrayPtr<field_t>(NumFields());
+        RawCopy(in.bits);
+      }
+    }
+
+    /// Move constructor of existing bit field.
+    BitVector::BitVector(BitVector && in) : num_bits(in.num_bits), bits(in.bits) {
+      emp_assert(in.OK());
+
+      in.bits = nullptr;
+      in.num_bits = 0;
+    }
+
+    /// Copy, but with a resize.
+    BitVector::BitVector(const BitVector & in, size_t new_size) : BitVector(in) {
+      if (num_bits != new_size) Resize(new_size);
+    }
+
+    /// Destructor
+    BitVector::~BitVector() {
+      if (bits) {        // A move constructor can make bits == nullptr
+        bits.DeleteArray();
+        bits = nullptr;
+      }
+    }
+
+    /// Assignment operator.
+    BitVector & BitVector::operator=(const BitVector & in) {
+      emp_assert(in.OK());
+
+      if (&in == this) return *this;
+      const size_t in_num_fields = in.NumFields();
+      const size_t prev_num_fields = NumFields();
+      num_bits = in.num_bits;
+
+      if (in_num_fields != prev_num_fields) {
+        if (bits) bits.DeleteArray();
+	      if (num_bits) bits = NewArrayPtr<field_t>(in_num_fields);
+        else bits = nullptr;
+      }
+
+      if (num_bits) RawCopy(in.bits);
+
+      return *this;
+    }
+
+    /// Move operator.
+    BitVector & BitVector::operator=(BitVector && in) {
+      emp_assert(&in != this);        // in is an r-value, so this shouldn't be possible...
+      if (bits) bits.DeleteArray();   // If we already had a bitset, get rid of it.
+      num_bits = in.num_bits;         // Update the number of bits...
+      bits = in.bits;                 // And steal the old memory for what those bits are.
+      in.bits = nullptr;              // Prepare in for deletion without deallocating.
+      in.num_bits = 0;
+
+      return *this;
+    }
+
 
 }
 
