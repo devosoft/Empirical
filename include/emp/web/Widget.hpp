@@ -134,6 +134,7 @@ namespace web {
     bool IsTable()    const { return GetInfoTypeName() == "TableInfo"; }
     bool IsText()     const { return GetInfoTypeName() == "TextInfo"; }
     bool IsTextArea() const { return GetInfoTypeName() == "TextAreaInfo"; }
+    bool IsTextFeed() const { return GetInfoTypeName() == "TextFeedInfo"; }
 
     bool IsD3Visualiation() const { return GetInfoTypeName() == "D3VisualizationInfo"; }
 

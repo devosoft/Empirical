@@ -8,7 +8,7 @@ echo "compilation done"
 # Bank of tests to run.
 catchWebTests=(color_map)               # Tests that should be run as compiled C++ executables (that ideally use Catch like all other non-web tests).
 nodeWebTests=(GetUrlParams)    # Tests that should be run as compiled JS scripts via node.
-karmaWebTests=(jswrap widget js_utils element test_visualizations)                  # Tests that should be run as compiled JS using Karma.
+karmaWebTests=(jswrap widget js_utils element textfeed test_visualizations)                  # Tests that should be run as compiled JS using Karma.
 
 # Run Empirical web tests that are compiled C++ programs that (SHOULD) use the Catch framework.
 echo "=== Running compiled C++ web tests ==="

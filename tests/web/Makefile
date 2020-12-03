@@ -15,7 +15,7 @@ OFLAGS_web_braces := -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMO
 CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../include/emp/web/library_emp.js --js-library ../../include/emp/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "stringToUTF8"]' -s WASM=0
 
 default: all
-all: jswrap.js element.js GetUrlParams.js js_utils.js test_visualizations.js widget.js color_map
+all: jswrap.js element.js textfeed.js GetUrlParams.js js_utils.js test_visualizations.js widget.js color_map
 
 color_map: color_map.cpp
 	g++ $(CFLAGS_all) color_map.cpp -o color_map.out
@@ -38,8 +38,11 @@ widget.js: Widget.cpp
 element.js: Element.cpp
 	$(CXX_web) $(CFLAGS_web) Element.cpp -o element.js
 
+textfeed.js: TextFeed.cpp
+	$(CXX_web) $(CFLAGS_web) TextFeed.cpp -o textfeed.js
+
 clean:
-	rm -f element.js GetUrlParams.js JSWrap.js widget.js js_utils.js test_visualizations.js jswrap.js *.js.map *.js.mem *~ color_map.out
+	rm -f element.js TextFeed.js GetUrlParams.js JSWrap.js widget.js js_utils.js test_visualizations.js jswrap.js *.js.map *.js.mem *~ color_map.out
 
 # Debugging information
 #print-%: ; @echo $*=$($*)
