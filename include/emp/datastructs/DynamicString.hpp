@@ -52,16 +52,6 @@ namespace emp {
       return ss.str();
     }
 
-    /// Remove n items from back.
-    void PopBack(const size_t n=1) {
-      fun_set.erase( std::prev( std::end( fun_set ), n ), std::end( fun_set ) );
-    }
-
-    /// Remove n items from front.
-    void PopFront(const size_t n=1) {
-      fun_set.erase( std::begin(fun_set), std::next(std::begin(fun_set), n) );
-    }
-
     /// Set the value of a specified component to the provided function.
     DynamicString & Set(size_t id, const value_t & in_fun) {
       fun_set[id] = in_fun;

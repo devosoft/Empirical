@@ -79,18 +79,6 @@ namespace web {
     /// How many text items are contained?
     size_t GetSize() const { return Info()->strings.GetSize(); }
 
-    /// Prune current text.
-    Text & PruneTo(const size_t n) {
-      if ( n < GetSize() ) Info()->strings.PopFront( GetSize() - n );
-      return *this;
-    }
-
-    /// Remove the back element of the text.
-    Text & PopBack(const size_t n=1) {
-      Info()->strings.PopBack( n );
-      return *this;
-    }
-
     /// Erase current text.
     Text & Clear() { Info()->strings.Clear(); return *this; }
   };
