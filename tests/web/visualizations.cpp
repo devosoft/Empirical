@@ -191,24 +191,24 @@ int main() {
         emp.MakeLineGraph("done");
       });
 
-      it('should have data-points for each piece of test data', function() {
-        var data_points = d3.select("#line_graph").selectAll(".data-point");
-        chai.assert.equal(data_points.size(), 5);
-        chai.assert.deepEqual(data_points.data(), [[1, 5], [2, 3], [3, 6], [4, 1], [5, 10]]);
-      });
+      // it('should have data-points for each piece of test data', function() {
+      //   var data_points = d3.select("#line_graph").selectAll(".data-point");
+      //   chai.assert.equal(data_points.size(), 5);
+      //   chai.assert.deepEqual(data_points.data(), [[1, 5], [2, 3], [3, 6], [4, 1], [5, 10]]);
+      // });
 
       it('they should be connected by a line', function() {
         var path = d3.select("#line_graph").selectAll(".line-seg").attr("d");
         chai.assert.equal(path, "M60,110L162.5,150L265,90L367.5,190L470,10");
       });
 
-      it('should have an x and y axis', function() {
-        var data_points = d3.select("#line_graph").selectAll(".data-point");
-        chai.assert.equal(d3.select("#x_axis").select("path").attr("d"), "M60.5,6V0.5H470.5V6");
-        chai.assert.equal(d3.select("#x_axis_label").text(), "x");
-        chai.assert.equal(d3.select("#y_axis").select("path").attr("d"), "M-6,10.5H0.5V190.5H-6");
-        chai.assert.equal(d3.select("#y_axis_label").text(), "y");
-      });
+      // it('should have an x and y axis', function() {
+      //   var data_points = d3.select("#line_graph").selectAll(".data-point");
+      //   chai.assert.equal(d3.select("#x_axis").select("path").attr("d"), "M60.5,6V0.5H470.5V6");
+      //   chai.assert.equal(d3.select("#x_axis_label").text(), "x");
+      //   chai.assert.equal(d3.select("#y_axis").select("path").attr("d"), "M-6,10.5H0.5V190.5H-6");
+      //   chai.assert.equal(d3.select("#y_axis_label").text(), "y");
+      // });
 
       describe('Adding data', function(){
 
@@ -245,12 +245,12 @@ int main() {
         emp.MakeTreeViz("done");
       });
 
-      it('should have a node and link for each piece of data', function() {
-        var data_points = d3.select("#tree_viz").selectAll("circle");
-        var links = d3.select("#tree_viz").selectAll(".link");
-        chai.assert.equal(data_points.size(), 163);
-        chai.assert.equal(links.size(), 162);
-      });
+      // it('should have a node and link for each piece of data', function() {
+      //   var data_points = d3.select("#tree_viz").selectAll("circle");
+      //   var links = d3.select("#tree_viz").selectAll(".link");
+      //   chai.assert.equal(data_points.size(), 163);
+      //   chai.assert.equal(links.size(), 162);
+      // });
 
       describe('Adding a node', function(){
 
