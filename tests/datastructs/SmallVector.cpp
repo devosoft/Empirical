@@ -1185,8 +1185,15 @@ TEST_CASE("Small vector, methods", "[tools]") {
 
     // Reserve
     v3.reserve(10);
+    std::swap(v3, v4);
+    REQUIRE(v3.size() == 4);
+    std::swap(v3, v4);
+
     v4.reserve(5);
     REQUIRE(v3.capacity() == 10);
+    std::swap(v3, v4);
+    REQUIRE(v3.size() == 4);
+    std::swap(v3, v4);
 
     // Append and Assign more than capacity
     const int i = 7;
@@ -1196,6 +1203,27 @@ TEST_CASE("Small vector, methods", "[tools]") {
     REQUIRE(v4.capacity() > 5);
     std::swap(v3, v4);
     REQUIRE(v4.capacity() > 10);
+
+    emp::SmallVector<int, 4> v8 = {8,7};
+    emp::SmallVector<int, 4> v9 = {1,2,6,5};
+    std::swap(v8, v9);
+    REQUIRE(v8.size() == 4);
+    REQUIRE(v9.size() == 2);
+    std::swap(v8, v9);
+    REQUIRE(v9.size() == 4);
+    REQUIRE(v8.size() == 2);
+
+    emp::SmallVector<int, 4> empty{};
+    v8 = empty;
+    REQUIRE( v8.empty() );
+
+    v9 = emp::SmallVector<int, 4>{};
+    REQUIRE( v9.empty() );
+
+    v9 = emp::SmallVector<int, 4>{1, 2};
+    REQUIRE( v9.size() == 2 );
+    v9 = emp::SmallVector<int, 4>{1};
+    REQUIRE( v9.size() == 1 );
 
 }
 
@@ -1261,6 +1289,10 @@ TEST_CASE("Small vector, methods2", "[tools]") {
   REQUIRE(bvec.size() == 4);
   bvec.resize(3, true);
   REQUIRE(bvec.size() == 3);
+  bvec.resize(100, true);
+  REQUIRE(bvec.size() == 100);
+  bvec.resize(1000, true);
+  REQUIRE(bvec.size() == 1000);
 
   // pop_back and pop_back_val
 	emp::SmallVector<bool, 4> bvec2 = { true, false, true, false };
