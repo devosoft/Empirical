@@ -200,20 +200,26 @@ namespace prefab {
         const std::string name_input_mobile_slider = name + "_input_mobile_slider";
         web::Input slider( [](std::string x) {
           std::cout << "empty slider function" << std::endl;},
-          "range", NULL, name_input_slider
+          "range",
+          "",
+          name_input_slider
         );
         setting_element << slider;
 
         web::Input number([](std::string val) {
           std::cout << "empty number function" << std::endl;
           },
-          "number", NULL, name_input_number
+          "number",
+          "",
+          name_input_number
         );
         setting_element << number;
         web::Input mobile_slider([](std::string val) {
           std::cout << "empty mobile slider function" << std::endl;
           },
-          "range", NULL, name_input_mobile_slider
+          "range",
+          "",
+          name_input_mobile_slider
         );
         box.AddMobileContent("<hr>");
         box.AddMobileContent(mobile_slider);
@@ -298,7 +304,7 @@ namespace prefab {
             config.Set(name, val);
             DoOnChangeFun(val);
           },
-          NULL,
+          "",
           emp::from_string<bool>(value),
           name + "_input_checkbox"
         );
@@ -321,7 +327,7 @@ namespace prefab {
             config.Set(name, val);
             DoOnChangeFun(val);
           },
-          "text", NULL, name + "_input_textbox"
+          "text", "", name + "_input_textbox"
         );
         setting_element << text_input;
         text_input.SetAttr(
