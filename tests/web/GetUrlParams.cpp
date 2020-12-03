@@ -8,7 +8,10 @@
 #include "emp/config/ArgManager.hpp"
 #include "emp/web/init.hpp"
 #include "emp/web/JSWrap.hpp"
+#include "emp/web/NodeDomShim.hpp"
 #include "emp/web/UrlParams.hpp"
+
+const emp::web::NodeDomShim shim;
 
 int main() {
 

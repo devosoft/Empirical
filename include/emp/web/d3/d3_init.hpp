@@ -29,7 +29,7 @@ namespace D3 {
     // #endif
 
     int NextD3ID() {
-        return EM_ASM_INT_V({
+        return MAIN_THREAD_EM_ASM_INT({
             id = js.next_id++;
             js.counts[id] = 0;
             js.objects[id] = -1;

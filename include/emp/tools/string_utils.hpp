@@ -12,6 +12,7 @@
 #ifndef EMP_STRING_UTILS_H
 #define EMP_STRING_UTILS_H
 
+#include <cstdio>
 #include <functional>
 #include <initializer_list>
 #include <iostream>
@@ -23,12 +24,16 @@
 #include <iterator>
 #include <limits>
 #include <regex>
+#include <memory>
+#include <numeric>
 
 #include "../base/array.hpp"
+#include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../meta/reflection.hpp"
 #include "../meta/StringType.hpp"
+#include "../meta/type_traits.hpp"
 
 namespace emp {
 
@@ -126,8 +131,9 @@ namespace emp {
   }
 
   /// Take a value and convert it to a C++-style literal.
-  template <typename LIT_TYPE>
-  inline std::string to_literal(const LIT_TYPE & value) {
+  template <typename T>
+  inline
+  typename std::enable_if<!emp::IsIterable<T>::value, std::string>::type to_literal(const T & value) {
     return std::to_string(value);
   }
 
@@ -147,6 +153,21 @@ namespace emp {
       ss << to_escaped_string(c);
     }
     ss << "\"";
+    return ss.str();
+  }
+
+  /// Take any iterable value and convert it to a C++-style literal.
+  template <typename T>
+  inline
+  typename std::enable_if<emp::IsIterable<T>::value, std::string>::type to_literal(const T & value) {
+    std::stringstream ss;
+    ss << "{ ";
+    for (auto iter = std::begin( value ); iter != std::end( value ); ++iter) {
+      if (iter != std::begin( value )) ss << " ";
+      ss << emp::to_literal< std::decay_t<decltype(*iter)> >( *iter );
+    }
+    ss << " }";
+
     return ss.str();
   }
 
@@ -252,6 +273,15 @@ namespace emp {
     // If we made it here without a problem, it must be correct!
     return true;
   }
+
+  /// Concatenate n copies of a string.
+  inline std::string repeat( const std::string& value, const size_t n ) {
+    const emp::vector<std::string> repeated( n, value );
+    return std::accumulate(
+      std::begin(repeated), std::end(repeated), std::string{}
+    );
+  }
+
 
   /// Convert a literal string representation to an actual string.
   static inline std::string from_literal_string(const std::string & value) {
@@ -904,7 +934,7 @@ namespace emp {
   /**
    * This function returns the values in a vector as a string separated
    * by a given delimeter.
-   * 
+   *
    * @param v a vector
    * @param join_str delimeter
    * @return string of vector values
@@ -990,6 +1020,30 @@ namespace emp {
   static inline std::string to_quoted_list(const string_vec_t & in_strings,
                                            const std::string quote="'") {
     return to_english_list(quote_strings(in_strings, quote));
+  }
+
+
+  /// Apply sprintf-like formatting to a string.
+  /// See https://en.cppreference.com/w/cpp/io/c/fprintf.
+  /// Adapted from https://stackoverflow.com/a/26221725.
+  template<typename... Args>
+  std::string format_string( const std::string& format, Args... args ) {
+
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wformat-security"
+
+    // Extra space for '\0'
+    const size_t size = std::snprintf(nullptr, 0, format.c_str(), args...) + 1;
+    emp_assert( size >= 0 );
+
+    emp::vector<char> buf( size );
+    std::snprintf( buf.data(), size, format.c_str(), args... );
+
+     // We don't want the '\0' inside
+    return std::string( buf.data(), buf.data() + size - 1 );
+
+    #pragma GCC diagnostic pop
+
   }
 
 }

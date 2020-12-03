@@ -49,24 +49,24 @@ namespace D3 {
       this->label = label;
       this->orientation = type;
       if (type == "left") {
-          EM_ASM_ARGS({
+          MAIN_THREAD_EM_ASM({
               js.objects[$0] = d3.axisLeft(js.objects[$1]);
           }, this->id, scale.GetID());
       } else if (type == "right") {
-          EM_ASM_ARGS({
+          MAIN_THREAD_EM_ASM({
               js.objects[$0] = d3.axisRight(js.objects[$1]);
           }, this->id, scale.GetID());
       } else if (type == "bottom") {
-          EM_ASM_ARGS({
+          MAIN_THREAD_EM_ASM({
               js.objects[$0] = d3.axisBottom(js.objects[$1]);
           }, this->id, scale.GetID());
       } else if (type == "top") {
-        EM_ASM_ARGS({
+        MAIN_THREAD_EM_ASM({
             js.objects[$0] = d3.axisTop(js.objects[$1]);
         }, this->id, scale.GetID());
       } else {
           std::cout << "WARNING: Invalid type given to axis constructor" << std::endl;
-          EM_ASM_ARGS({
+          MAIN_THREAD_EM_ASM({
               js.objects[$0] = d3.axisBottom(js.objects[$1]);
           }, this->id, scale.GetID());
       }
@@ -83,7 +83,7 @@ namespace D3 {
       emp::remove_whitespace(dom_id);
       dom_id += "_axis";
 
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         var axis_range = js.objects[$0].scale().range();
 	    js.objects[$3] = js.objects[$1].append("g");
 
@@ -137,7 +137,7 @@ namespace D3 {
     // technically the contents of the selection are changed
     template <typename T>
     Axis& ApplyAxis(const SelectionOrTransition<T> & selection) {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    js.objects[$1].call(js.objects[$0]);
 	  }, this->id, selection.GetID());
       return *this;
@@ -149,7 +149,7 @@ namespace D3 {
     Axis& SetScale(SCALE_TYPE & scale) {
       this->scale = scale;
 
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    js.objects[$0].scale(js.objects[$1]);
 	  }, this->id, scale.GetID());
       return *this;
@@ -182,35 +182,35 @@ namespace D3 {
     Axis& SetTickValues(emp::array<T, SIZE> values) {
       emp::pass_array_to_javascript(values);
 
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
   	    js.objects[$0].tickValues(emp_i.__incoming_array);
 	  }, this->id);
       return *this;
     }
 
     Axis& SetTickSize(float size) {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    js.objects[$0].tickSize($1);
       }, this->id, size);
       return *this;
     }
 
     Axis& SetTickSizeInner(float size) {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    js.objects[$0].tickSizeInner($1);
 	  }, this->id, size);
       return *this;
     }
 
     Axis& SetTickSizeOuter(float size) {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    js.objects[$0].tickSizeOuter($1);
   	  }, this->id, size);
       return *this;
     }
 
     Axis& SetTickPadding(int padding) {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    js.objects[$0].tickPadding($1);
 	  }, this->id, padding);
       return *this;
@@ -218,7 +218,7 @@ namespace D3 {
 
     /// Set the number of ticks along the axis
     Axis& SetTicks(int count){
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    js.objects[$0].ticks($1);
 	  }, this->id, count);
       return *this;
@@ -228,7 +228,7 @@ namespace D3 {
     /// following
     /// [the rules for d3.format()](https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format)
     Axis& SetTickFormat(std::string format) {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         js.objects[$0].tickFormat(d3.format(UTF8ToString($1)));
       }, this->id, format.c_str());
       return *this;
@@ -255,7 +255,7 @@ namespace D3 {
     x_axis.Draw(selection);
     y_axis.Draw(selection);
 
-    EM_ASM_ARGS({
+    MAIN_THREAD_EM_ASM({
       x_range = js.objects[$0].scale().range();
       y_range = js.objects[$1].scale().range();
 

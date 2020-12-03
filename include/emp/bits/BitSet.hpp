@@ -376,6 +376,17 @@ namespace emp {
     /// Constructor to generate a random BitSet with provided prob of 1's.
     BitSet(Random & random, const double p1) { Clear(); Randomize(random, p1); }
 
+    /// Constructor to generate a BitSet from a std::bitset.
+    explicit BitSet(const std::bitset<NUM_BITS>& bitset) {
+      Clear(); // have to clear out field bits beyond NUM_BITS
+      for (size_t bit{}; bit < NUM_BITS; ++bit) Set( bit, bitset[bit] );
+    }
+
+    /// Constructor to generate a BitSet from a string.
+    explicit BitSet(const std::string& bitstring)
+    : BitSet( std::bitset<NUM_BITS>( bitstring ) )
+    { emp_assert( bitstring.size() == NUM_BITS ); }
+
     /// Constructor to fill in a bit set from a vector.
     template <typename T>
     BitSet(const std::initializer_list<T> l) {
@@ -1386,14 +1397,34 @@ namespace emp {
 }
 
 /// For hashing BitSets
-namespace std
-{
+namespace std {
+
     template <size_t N>
-    struct hash<emp::BitSet<N>>
-    {
-        size_t operator()( const emp::BitSet<N>& bs ) const
-        {
-          return emp::murmur_hash(bs.GetBytes());
+    struct hash< emp::BitSet<N> > {
+        size_t operator()( const emp::BitSet<N>& bs ) const {
+          if constexpr ( 8 * sizeof( size_t ) == 32 ) {
+            if constexpr ( N <= 32 ) {
+              return bs.GetUInt32( 0 );
+            } else if constexpr ( N <= 32 * 2 ) {
+              return emp::hash_combine(  bs.GetUInt32( 0 ), bs.GetUInt32( 1 ) );
+            } else if constexpr ( N <= 32 * 3 ) {
+              return emp::hash_combine(
+                emp::hash_combine( bs.GetUInt32( 0 ), bs.GetUInt32( 1 ) ),
+                bs.GetUInt32( 2 )
+              );
+            } else if constexpr ( N <= 32 * 4 ) {
+              return emp::hash_combine(
+                emp::hash_combine( bs.GetUInt32( 0 ), bs.GetUInt32( 1 ) ),
+                emp::hash_combine( bs.GetUInt32( 2 ), bs.GetUInt32( 3 ) )
+              );
+            } else return emp::murmur_hash( bs.GetBytes() );
+          } else if constexpr ( 8 * sizeof( size_t ) == 64 ) {
+            if constexpr ( N <= 64 ) {
+              return bs.GetUInt64( 0 );
+            } else if constexpr ( N <= 64 * 2 ) {
+              return emp::hash_combine(  bs.GetUInt64( 0 ), bs.GetUInt64( 1 ) );
+            } else return emp::murmur_hash( bs.GetBytes() );
+          } else { emp_assert( false ); return 0; }
         }
     };
 }

@@ -447,4 +447,39 @@ TEST_CASE("Test to_web_safe_string", "[tools]" ){
   REQUIRE( emp::to_web_safe_string("'one and two'" ) == "&aposone and two&apos");
   // requires that strings with multiple reserved characters are replaced as expected
   REQUIRE ( emp::to_web_safe_string("<h1>\"Hello\" & 'bye'</h1>") == "&lth1&gt&quotHello&quot &amp &aposbye&apos&lt/h1&gt" );
+
+}
+
+TEST_CASE("Test format_string", "[tools]") {
+
+	REQUIRE( emp::format_string("") == "" );
+	REQUIRE( emp::format_string("%s hi", "twee") == "twee hi" );
+	REQUIRE( emp::format_string("a %d b %s", 7, "foo") == "a 7 b foo" );
+
+	const std::string multiline{ R"(
+		my code;
+		%s
+		more code;
+	)" };
+	const std::string replacement{ "foo code;" };
+
+
+	REQUIRE( emp::format_string(multiline, replacement.c_str()) == R"(
+		my code;
+		foo code;
+		more code;
+	)" );
+
+}
+
+TEST_CASE("Test repeat", "[tools]") {
+
+	REQUIRE( emp::repeat("", 0) == "" );
+	REQUIRE( emp::repeat("", 1) == "" );
+	REQUIRE( emp::repeat("", 2) == "" );
+
+	REQUIRE( emp::repeat("abc", 0) == "" );
+	REQUIRE( emp::repeat("abc", 1) == "abc" );
+	REQUIRE( emp::repeat("abc", 2) == "abcabc" );
+
 }

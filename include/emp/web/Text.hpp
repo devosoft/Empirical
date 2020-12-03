@@ -76,6 +76,9 @@ namespace web {
 
     using INFO_TYPE = TextInfo;
 
+    /// How many text items are contained?
+    size_t GetSize() const { return Info()->strings.GetSize(); }
+
     /// Erase current text.
     Text & Clear() { Info()->strings.Clear(); return *this; }
   };

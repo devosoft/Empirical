@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-TEST_NAMES = ConfigPanel Collapse LoadingModal Card CommentBox Modal ToggleSwitch CodeBlock LoadingIcon FontAwesomeIcon ClickCounterDemo ClickCollapseDemo Element js_utils visualizations JSWrap Widget
+TEST_NAMES = ConfigPanel Collapse LoadingModal Card CommentBox Modal ToggleSwitch CodeBlock LoadingIcon FontAwesomeIcon ClickCounterDemo ClickCollapseDemo Element TextFeed js_utils visualizations JSWrap Widget
 
 # Flags to use regardless of compiler
 CFLAGS_all := -Wall -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments -Wno-dollar-in-identifier-extension -std=c++17 -I../../include/ -I../../
@@ -20,6 +20,8 @@ test: $(addprefix test-, $(TEST_NAMES)) test-color_map test-GetUrlParams
 test-%: %.cpp
 	source ../../third-party/emsdk/emsdk_env.sh; \
 	$(CXX_web) $(CFLAGS_web) $< -o $@.js
+	cp ../../third-party/package.json .
+	npm install
 	../../third-party/node_modules/karma/bin/karma start karma.conf.js --filename $@
 
 test-color_map: color_map.cpp ../../third-party/Catch/single_include/catch2/catch.hpp

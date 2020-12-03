@@ -45,14 +45,19 @@
 #include <tuple>
 #include <type_traits>
 
-#include "../meta/meta.hpp"
+#include <emscripten/emscripten.h>
+#include <emscripten/threading.h>
+#ifdef __EMSCRIPTEN_PTHREADS__
+#include <pthread.h>
+#endif //  __EMSCRIPTEN_PTHREADS__
+
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
-
 #include "../datastructs/tuple_struct.hpp"
 #include "../datastructs/tuple_utils.hpp"
 #include "../debug/mem_track.hpp"
+#include "../meta/meta.hpp"
 #include "../tools/functions.hpp"
 
 #include "init.hpp"
@@ -78,7 +83,7 @@ namespace emp {
     if constexpr ( is_introspective_tuple<T>() ) {
       using JSON_TYPE = T;
       //std::cout << "Loading ARGNID: " << ARG_ID << std::endl;
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         emp_i.object_queue = [];
         emp_i.curr_obj = emp_i.cb_args[$0];
       }, ARG_ID);
@@ -86,90 +91,90 @@ namespace emp {
       load_tuple.LoadJSDataArg(arg_var);
     }
     else {
-      arg_var = (T) EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, ARG_ID);
+      arg_var = (T) MAIN_THREAD_EM_ASM_DOUBLE({ return emp_i.cb_args[$0]; }, ARG_ID);
     }
   }
 
   template <int ARG_ID> static void LoadArg(std::string & arg_var) {
-    char * tmp_var = (char *) EM_ASM_INT({
+    char * tmp_var = (char *) MAIN_THREAD_EM_ASM_INT({
         return allocate(intArrayFromString(emp_i.cb_args[$0]), 'i8', ALLOC_STACK);
       }, ARG_ID);
     arg_var = tmp_var;   // @CAO Do we need to free the memory in tmp_var?
   }
 
   template <int ARG_ID, size_t SIZE, typename T> static void LoadArg(emp::array<T, SIZE> & arg_var){
-    EM_ASM_ARGS({emp_i.__outgoing_array = emp_i.cb_args[$0];}, ARG_ID);
+    MAIN_THREAD_EM_ASM({emp_i.__outgoing_array = emp_i.cb_args[$0];}, ARG_ID);
     pass_array_to_cpp(arg_var);
   }
 
   template <int ARG_ID, typename T> static void LoadArg(emp::vector<T> & arg_var){
-    EM_ASM_ARGS({emp_i.__outgoing_array = emp_i.cb_args[$0];}, ARG_ID);
+    MAIN_THREAD_EM_ASM({emp_i.__outgoing_array = emp_i.cb_args[$0];}, ARG_ID);
     pass_vector_to_cpp(arg_var);
   }
 
   //Helper functions to load arguments from inside Javascript objects by name.
   template <int ARG_ID> static void LoadArg(int16_t & arg_var, std::string var) {
-    arg_var = (int16_t) EM_ASM_INT({
+    arg_var = (int16_t) MAIN_THREAD_EM_ASM_INT({
       return emp_i.curr_obj[UTF8ToString($0)];
     }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(int32_t & arg_var, std::string var) {
-    arg_var = (int32_t) EM_ASM_INT({
+    arg_var = (int32_t) MAIN_THREAD_EM_ASM_INT({
       return emp_i.curr_obj[UTF8ToString($0)];
     }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(int64_t & arg_var, std::string var) {
-    arg_var = (int64_t) EM_ASM_DOUBLE({
+    arg_var = (int64_t) MAIN_THREAD_EM_ASM_DOUBLE({
       return emp_i.curr_obj[UTF8ToString($0)];
     }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(uint16_t & arg_var, std::string var) {
-    arg_var = (uint16_t) EM_ASM_INT({
+    arg_var = (uint16_t) MAIN_THREAD_EM_ASM_INT({
       return emp_i.curr_obj[UTF8ToString($0)];
     }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(uint32_t & arg_var, std::string var) {
-    arg_var = (uint32_t) EM_ASM_INT({
+    arg_var = (uint32_t) MAIN_THREAD_EM_ASM_INT({
       return emp_i.curr_obj[UTF8ToString($0)];
     }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(uint64_t & arg_var, std::string var) {
-    arg_var = (uint64_t) EM_ASM_DOUBLE({
+    arg_var = (uint64_t) MAIN_THREAD_EM_ASM_DOUBLE({
       return emp_i.curr_obj[UTF8ToString($0)];
     }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(bool & arg_var, std::string var) {
-    arg_var = (bool) EM_ASM_INT({
+    arg_var = (bool) MAIN_THREAD_EM_ASM_INT({
       return emp_i.curr_obj[UTF8ToString($0)];
     }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(char & arg_var, std::string var) {
-    arg_var = (char) EM_ASM_INT({
+    arg_var = (char) MAIN_THREAD_EM_ASM_INT({
       return emp_i.curr_obj[UTF8ToString($0)];
     }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(double & arg_var, std::string var) {
-    arg_var = EM_ASM_DOUBLE({
+    arg_var = MAIN_THREAD_EM_ASM_DOUBLE({
       return emp_i.curr_obj[UTF8ToString($0)];
     }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(float & arg_var, std::string var) {
-    arg_var = (float) EM_ASM_DOUBLE({
+    arg_var = (float) MAIN_THREAD_EM_ASM_DOUBLE({
       return emp_i.curr_obj[UTF8ToString($0)];
     }, var.c_str());
   }
 
   template <int ARG_ID> static void LoadArg(std::string & arg_var, std::string var) {
-    char * tmp_var = (char *) EM_ASM_INT({
+    char * tmp_var = (char *) MAIN_THREAD_EM_ASM_INT({
       if (emp_i.curr_obj[UTF8ToString($0)] == null){
         emp_i.curr_obj[UTF8ToString($0)] = "undefined";
       }
@@ -184,7 +189,7 @@ namespace emp {
   LoadArg(JSON_TYPE & arg_var, std::string var) {
     //std::cout << "Loading " << var << " ARGNID: " << ARG_ID << std::endl;
     //LoadArg<ARG_ID>(std::get<ARG_ID>(arg_var.emp__tuple_body));
-    EM_ASM_ARGS({
+    MAIN_THREAD_EM_ASM({
       emp_i.object_queue.push(emp_i.curr_obj);
       emp_i.curr_obj = emp_i.curr_obj[UTF8ToString($0)];
     }, var.c_str());
@@ -205,7 +210,7 @@ namespace emp {
   template <typename JSON_TYPE, int ARG_ID>
   struct LoadTuple<JSON_TYPE, ARG_ID, 0> {
     static void LoadJSDataArg(JSON_TYPE & arg_var) {
-        EM_ASM({emp_i.curr_obj = emp_i.object_queue.pop();});
+        MAIN_THREAD_EM_ASM({emp_i.curr_obj = emp_i.object_queue.pop();});
     }
   };
 
@@ -214,25 +219,25 @@ namespace emp {
   // Helper functions to individually store return values to JS
 
   // static void StoreReturn(const bool & ret_var) {
-  //   EM_ASM_ARGS({ emp_i.cb_return = $0; }, ret_var);
+  //   MAIN_THREAD_EM_ASM({ emp_i.cb_return = $0; }, ret_var);
   // }
 
   static void StoreReturn(const int & ret_var) {
-    EM_ASM_ARGS({ emp_i.cb_return = $0; }, ret_var);
+    MAIN_THREAD_EM_ASM({ emp_i.cb_return = $0; }, ret_var);
   }
 
   static void StoreReturn(const double & ret_var) {
-    EM_ASM_ARGS({ emp_i.cb_return = $0; }, ret_var);
+    MAIN_THREAD_EM_ASM({ emp_i.cb_return = $0; }, ret_var);
   }
 
   static void StoreReturn(const std::string & ret_var) {
-    EM_ASM_ARGS({ emp_i.cb_return = UTF8ToString($0); }, ret_var.c_str());
+    MAIN_THREAD_EM_ASM({ emp_i.cb_return = UTF8ToString($0); }, ret_var.c_str());
   }
 
   template <typename T, size_t N>
   static void StoreReturn(const emp::array<T, N> & ret_var) {
     pass_array_to_javascript(ret_var);
-    EM_ASM({ emp_i.cb_return = emp_i.__incoming_array; });
+    MAIN_THREAD_EM_ASM({ emp_i.cb_return = emp_i.__incoming_array; });
   }
 
   /// If the return type has a personalized function to handle the return, use it!
@@ -244,22 +249,22 @@ namespace emp {
 
   /// Helper functions to store values inside JSON objects
   static void StoreReturn(const int & ret_var, std::string var) {
-    EM_ASM_ARGS({ emp_i.curr_obj[UTF8ToString($1)] = $0; }, ret_var, var.c_str());
+    MAIN_THREAD_EM_ASM({ emp_i.curr_obj[UTF8ToString($1)] = $0; }, ret_var, var.c_str());
   }
 
   static void StoreReturn(const double & ret_var, std::string var) {
-    EM_ASM_ARGS({ emp_i.curr_obj[UTF8ToString($1)] = $0; }, ret_var, var.c_str());
+    MAIN_THREAD_EM_ASM({ emp_i.curr_obj[UTF8ToString($1)] = $0; }, ret_var, var.c_str());
   }
 
   static void StoreReturn(const std::string & ret_var, std::string var) {
-    EM_ASM_ARGS({ emp_i.curr_obj[UTF8ToString($1)] = UTF8ToString($0); }
+    MAIN_THREAD_EM_ASM({ emp_i.curr_obj[UTF8ToString($1)] = UTF8ToString($0); }
                                                     , ret_var.c_str(), var.c_str());
   }
 
   template <typename T, size_t N>
   static void StoreReturn(const emp::array<T, N> & ret_var, std::string var) {
     pass_array_to_javascript(ret_var);
-    EM_ASM_ARGS({ emp_i.curr_obj[UTF8ToString($0)] = emp_i.__incoming_array;}, var.c_str());
+    MAIN_THREAD_EM_ASM({ emp_i.curr_obj[UTF8ToString($0)] = emp_i.__incoming_array;}, var.c_str());
   }
 
   template <typename JSON_TYPE, int FIELD>
@@ -269,7 +274,7 @@ namespace emp {
   template <typename RETURN_TYPE>
   static typename std::enable_if<RETURN_TYPE::n_fields != -1, void>::type
   StoreReturn(const RETURN_TYPE & ret_var) {
-    EM_ASM({
+    MAIN_THREAD_EM_ASM({
       emp_i.cb_return = {};
       emp_i.object_queue = [];
       emp_i.curr_obj = emp_i.cb_return;
@@ -283,7 +288,7 @@ namespace emp {
   template <typename RETURN_TYPE>
   static emp::sfinae_decoy<void, decltype(RETURN_TYPE::n_fields)>
   StoreReturn(const RETURN_TYPE & ret_var, std::string var) {
-    EM_ASM_ARGS({
+    MAIN_THREAD_EM_ASM({
       emp_i.curr_obj[UTF8ToString($0)] = {};
       emp_i.object_queue.push(emp_i.curr_obj);
       emp_i.curr_obj = emp_i.curr_obj[UTF8ToString($0)];
@@ -305,7 +310,7 @@ namespace emp {
   template <typename JSON_TYPE>
   struct StoreTuple<JSON_TYPE, 0> {
     static void StoreJSDataArg(const JSON_TYPE & ret_var) {
-      EM_ASM({emp_i.curr_obj = emp_i.object_queue.pop();});
+      MAIN_THREAD_EM_ASM({emp_i.curr_obj = emp_i.object_queue.pop();});
     }
   };
 
@@ -445,7 +450,7 @@ namespace emp {
     // The following function returns a static callback array; callback ID's all index into
     // this array.
     static emp::vector<JSWrap_Callback_Base *> & CallbackArray() {
-      static emp::vector<JSWrap_Callback_Base *> callback_array(1, nullptr);
+      thread_local emp::vector<JSWrap_Callback_Base *> callback_array{nullptr};
       return callback_array;
     }
 
@@ -472,7 +477,7 @@ namespace emp {
     callback_array.push_back(new_cb);
 
     if (fun_name != "") {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
           var fun_name = UTF8ToString($1);
           emp[fun_name] = function() {
             emp_i.cb_args = [];
@@ -526,11 +531,12 @@ namespace emp {
   /// @cond SIMPLIFY
 }
 
-/// Once you use JSWrap to create an ID, you can call the wrapped function from Javascript
-/// by supplying CPPCallback with the id and all args.
+extern "C" {
 
-extern "C" void empCppCallback(size_t cb_id)
-{
+/// Dispatches callback sent from the browser thread on the main thread
+/// (whether the browser thread is the main thread or not).
+void empDoCppCallback(const size_t cb_id) {
+
   // Convert the uint passed in from 32 bits to 64 and THEN convert it to a pointer.
   auto * cb_obj = emp::internal::CallbackArray()[cb_id];
 
@@ -538,12 +544,74 @@ extern "C" void empCppCallback(size_t cb_id)
   // the correct template automatically.
   cb_obj->DoCallback();
 
+  // dispatch all pending offscreen canvas updates to the browser thread
+  #ifdef __EMSCRIPTEN_PTHREADS__
+  EM_ASM({
+    emp_i.pending_offscreen_canvas_ids
+      = emp_i.pending_offscreen_canvas_ids || new Set();
+    emp_i.pending_offscreen_canvas_ids.forEach( function( key, val, set ){
+
+      bitmap = emp_i.offscreen_canvases[key].transferToImageBitmap();
+      postMessage(
+        {
+          // this cmd corresponds to a 'nop' on emscripten's part
+          // see https://github.com/emscripten-core/emscripten/blob/bec6d1c1c1c982ecba787b8d51907d2ba51e6555/src/library_pthread.js#L366
+          // and also https://github.com/emscripten-core/emscripten/blob/be50706a38240e2f0679b60d58945f0e296ee9ee/system/lib/pthread/library_pthread_stub.c#L28
+          cmd: 'processQueuedMainThreadWork',
+          emp_canvas_id : key,
+          emp_bitmap : bitmap,
+        },
+        [ bitmap ] // transfer ownership of the bitmap
+      );
+    });
+
+    emp_i.pending_offscreen_canvas_ids.clear();
+
+  });
+  #endif
+
   // If we have indicated that this callback is single use, delete it now.
   if (cb_obj->IsDisposable()) {
     delete cb_obj;
     emp::internal::CallbackArray()[cb_id] = nullptr;
   }
+
 }
+
+/// Once you use JSWrap to create an ID, you can call the wrapped function from Javascript
+/// by supplying CPPCallback with the id and all args.
+void empCppCallback(const size_t cb_id) {
+
+  #ifndef __EMSCRIPTEN_PTHREADS__
+
+    empDoCppCallback( cb_id );
+
+  #else
+
+  // dispatch the callback to the worker thread main was proxied to
+
+    const pthread_t proxy_pthread_id = EM_ASM_INT({
+
+      if ( Object.keys( PThread.pthreads ).length !== 0 ) {
+        console.assert( Object.keys( PThread.pthreads ).length === 1 );
+        return Object.keys(PThread.pthreads)[0];
+      } else return 0;
+
+    });
+
+    emscripten_async_queue_on_thread_(
+      proxy_pthread_id,
+      EM_FUNC_SIG_VI, // VI = no return value, one argument
+      (void*) &empDoCppCallback,
+      NULL,
+      cb_id
+    );
+
+  #endif // __EMSCRIPTEN_PTHREADS__
+
+}
+
+} // extern "C"
 
 /// @endcond
 
