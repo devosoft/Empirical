@@ -7,7 +7,7 @@
  *  @brief A drop-in replacement for std::vector<bool>, with additional bitwise logic features.
  *  @note Status: RELEASE
  *
- *  Compile with -O3 and -msse4.2 for fast bit counting.
+ *  @note Compile with -O3 and -msse4.2 for fast bit counting.
  *
  *  @todo Most of the operators don't check to make sure that both BitVectors are the same size.
  *        We should create versions (Intersection() and Union()?) that adjust sizes if needed.
@@ -26,8 +26,8 @@
  */
 
 
-#ifndef EMP_BIT_VECTOR2_H
-#define EMP_BIT_VECTOR2_H
+#ifndef EMP_BIT_VECTOR_H
+#define EMP_BIT_VECTOR_H
 
 #include <iostream>
 #include <bitset>
@@ -228,25 +228,17 @@ namespace emp {
     BitVector & Resize(size_t new_bits);
 
 
-    // >>>>>>>>>>  Operators  <<<<<<<<<< //
+    // >>>>>>>>>>  Comparison Operators  <<<<<<<<<< //
 
-    /// Test if two bit vectors are identical.
     bool operator==(const BitVector & in) const;
+    bool operator!=(const BitVector & in) const { return !(*this == in); }
+    bool operator< (const BitVector & in) const;
+    bool operator> (const BitVector & in) const { return in < *this; }
+    bool operator<=(const BitVector & in) const { return !(in < *this); }
+    bool operator>=(const BitVector & in) const { return !(*this < in); }
 
-    /// Compare the would-be numerical values of two bit vectors.
-    bool operator<(const BitVector & in) const;
 
-    /// Compare the would-be numerical values of two bit vectors.
-    bool operator<=(const BitVector & in) const;
-    
-    /// Determine if two bit vectors are different.
-    bool operator!=(const BitVector & in) const { return !operator==(in); }
-
-    /// Compare the would-be numerical values of two bit vectors.
-    bool operator>(const BitVector & in) const { return !operator<=(in); }
-
-    /// Compare the would-be numerical values of two bit vectors.
-    bool operator>=(const BitVector & in) const { return !operator<(in); }
+    // >>>>>>>>>>  Conversion Operators  <<<<<<<<<< //
 
     /// Automatically convert BitVector to other vector types.
     template <typename T> operator emp::vector<T>();
@@ -434,6 +426,8 @@ namespace emp {
     void set(size_t id) { Set(id); }
     bool test(size_t index) const { return Get(index); }
   };
+
+
 
   // ------------------------ Implementations for Internal Functions ------------------------
 
@@ -818,19 +812,6 @@ namespace emp {
       return (bits[pos] < in.bits[pos]);        // Otherwise, do comparison
     }
     return false; // Bit vectors are identical.
-  }
-
-  /// Compare the would-be numerical values of two bit vectors.
-  bool BitVector::operator<=(const BitVector & in) const {
-    if (num_bits != in.num_bits) return num_bits <= in.num_bits;
-
-    const size_t NUM_FIELDS = NumFields();
-    for (size_t i = NUM_FIELDS; i > 0; --i) {   // Start loop at the largest field.
-      const size_t pos = i-1;
-      if (bits[pos] == in.bits[pos]) continue;  // If same, keep looking!
-      return (bits[pos] < in.bits[pos]);        // Otherwise, do comparison
-    }
-    return true;
   }
 
   /// Automatically convert BitVector to other vector types.
