@@ -73,6 +73,27 @@ TEST_CASE("Small vector, iterators", "[tools]") {
   v3.emp::SmallVectorImpl<int>::insert(v3.end(), std::move(Elt));
   REQUIRE(v3 == emp::SmallVector<int, 10>{2,3,4,2,3,6,7,8});
   REQUIRE(v3.size() == 8);
+
+  v3.emp::SmallVectorImpl<int>::insert(std::next(v3.begin()), 99);
+  REQUIRE(v3 == emp::SmallVector<int, 10>{2,99,3,4,2,3,6,7,8});
+  REQUIRE(v3.size() == 9);
+
+  v3.emp::SmallVectorImpl<int>::insert(std::prev(v3.end()), 3, 99);
+  REQUIRE(v3 == emp::SmallVector<int, 10>{2,99,3,4,2,3,6,7,99,99,99,8});
+  REQUIRE(v3.size() == 12);
+
+  v3.emp::SmallVectorImpl<int>::insert(
+    std::prev(v3.end()), v3.begin(), v3.begin()+2
+  );
+  REQUIRE(v3 == emp::SmallVector<int, 10>{2,99,3,4,2,3,6,7,99,99,99,2,99,8});
+  REQUIRE(v3.size() == 14);
+
+  v3.emp::SmallVectorImpl<int>::insert(
+    std::next(v3.begin()), v3.begin(), v3.begin()+1
+  );
+  REQUIRE(v3 == emp::SmallVector<int, 10>{2,2,99,3,4,2,3,6,7,99,99,99,2,99,8});
+  REQUIRE(v3.size() == 15);
+
 }
 
 TEST_CASE("Small vector, methods", "[tools]") {
