@@ -163,4 +163,10 @@ TEST_CASE("Another Test vector utils", "[datastructs]") {
   REQUIRE(vv[1][0] == 4);
   REQUIRE(vv2[0][2] == 7);
   REQUIRE(vv2[1][0] == 2);
+
+  // Test build range
+  emp::vector<size_t> vr = emp::BuildRange<size_t>(1, 5);
+  REQUIRE(vr.size() == 5);
+  REQUIRE(vr[0] == 1);
+
 }

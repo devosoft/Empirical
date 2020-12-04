@@ -17,7 +17,7 @@
 #include "../datastructs/map_utils.hpp"
 #include "../tools/string_utils.hpp"
 #include "../math/Random.hpp"
-#include "../matchbin/MatchBin.hpp"
+#include "../matching/MatchBin.hpp"
 #include "../base/vector.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/array.hpp"

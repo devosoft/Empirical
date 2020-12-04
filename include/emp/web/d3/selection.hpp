@@ -47,7 +47,7 @@ namespace D3 {
       DERIVED Select(std::string selector) const {
         int new_id = NextD3ID();
 
-        EM_ASM_ARGS({
+        MAIN_THREAD_EM_ASM({
   	      var new_selection = js.objects[$0].select(UTF8ToString($1));
   	      js.objects[$2] = new_selection;
         }, this->id, selector.c_str(), new_id);
@@ -60,7 +60,7 @@ namespace D3 {
       DERIVED SelectAll(std::string selector) const {
         int new_id = NextD3ID();
 
-        EM_ASM_ARGS({
+        MAIN_THREAD_EM_ASM({
         //   console.log($0, js.objects[$0]);
   	      var new_selection = js.objects[$0].selectAll(UTF8ToString($1));
           js.objects[$2] = new_selection;
@@ -78,7 +78,7 @@ namespace D3 {
       /// `D3::Selection(i)`).
       // TODO: Allow arguments
       DERIVED& Call(std::string function){
-        EM_ASM_ARGS({
+        MAIN_THREAD_EM_ASM({
           var func_string = UTF8ToString($1);
           if (typeof window[func_string] === "function") {
             func_string = window[func_string];
@@ -100,7 +100,7 @@ namespace D3 {
       emp::sfinae_decoy<DERIVED&, decltype(&T::operator())>
       Call(T function){
         uint32_t fun_id = emp::JSWrap(function, "", false);
-        EM_ASM_ARGS({
+        MAIN_THREAD_EM_ASM({
           emp.__new_object = js.objects[$0].call(function(selection) {
                                                   return emp.Callback($1, $0);
                                                  });
@@ -164,14 +164,14 @@ namespace D3 {
       /// Remove the elements in this selection/transition from the document
       /// For transitions, this happens at the end of the transition.
       void Remove(){
-        EM_ASM_ARGS({js.objects[$0].remove()},
+        MAIN_THREAD_EM_ASM({js.objects[$0].remove()},
           this->id);
       }
 
       DERIVED Merge(DERIVED & other) {
           int new_id = NextD3ID();
         //   std::cout << "New id should be: " << new_id << std::endl;
-          EM_ASM_ARGS({
+          MAIN_THREAD_EM_ASM({
               js.objects[$2] = js.objects[$0].merge(js.objects[$1]);
             //   console.log("Merged: ", js.objects[$2], $2);
           }, this->id, other.GetID(), new_id);
@@ -219,7 +219,7 @@ namespace D3 {
       typename std::enable_if<std::is_fundamental<T>::value, DERIVED&>::type
       SetAttr(std::string name, T value) {
 
-        EM_ASM_ARGS({js.objects[$0].attr(UTF8ToString($1), $2)},
+        MAIN_THREAD_EM_ASM({js.objects[$0].attr(UTF8ToString($1), $2)},
     		  this->id, name.c_str(), value);
         return *(static_cast<DERIVED *>(this));
       }
@@ -234,7 +234,7 @@ namespace D3 {
         //This should probably be JSWrapOnce, but that breaks the visualization
         uint32_t fun_id = emp::JSWrap(value, "", false);
 
-        EM_ASM_ARGS({
+        MAIN_THREAD_EM_ASM({
           js.objects[$0].attr(UTF8ToString($1), function(d, i, k) {
                                                         return emp.Callback($2, d, i, k);
                                                       });
@@ -261,7 +261,7 @@ namespace D3 {
       SetAttr(std::string name, T value) {
         emp::pass_array_to_javascript(value);
 
-        EM_ASM_ARGS({
+        MAIN_THREAD_EM_ASM({
     	    js.objects[$0].attr(UTF8ToString($1), emp_i.__incoming_array);
         }, this->id, name.c_str());
 
@@ -283,7 +283,7 @@ namespace D3 {
       //std::string version because std::strings are better
       DERIVED& SetStyle(std::string name, std::string value, bool priority=false){
         if (priority){
-    	    EM_ASM_ARGS({
+    	    MAIN_THREAD_EM_ASM({
             var func_string = UTF8ToString($2);
     	    if (typeof window[func_string] === "function") {
               func_string = window[func_string];
@@ -307,7 +307,7 @@ namespace D3 {
       //string literals
       DERIVED& SetStyle(std::string name, const char* value, bool priority=false){
         if (priority){
-    	    EM_ASM_ARGS({
+    	    MAIN_THREAD_EM_ASM({
     	      var func_string = UTF8ToString($2);
     	      if (typeof window[func_string] === "function") {
                 func_string = window[func_string];
@@ -340,11 +340,11 @@ namespace D3 {
       typename std::enable_if<std::is_fundamental<T>::value, DERIVED&>::type
       SetStyle(std::string name, T value, bool priority=false){
         if (priority){
-    	    EM_ASM_ARGS({js.objects[$0].style(UTF8ToString($1), $2, "important")},
+    	    MAIN_THREAD_EM_ASM({js.objects[$0].style(UTF8ToString($1), $2, "important")},
               this->id, name.c_str(), value);
           }
         else {
-    	    EM_ASM_ARGS({js.objects[$0].style(UTF8ToString($1), $2)},
+    	    MAIN_THREAD_EM_ASM({js.objects[$0].style(UTF8ToString($1), $2)},
               this->id, name.c_str(), value);
         }
         return *(static_cast<DERIVED *>(this));
@@ -570,7 +570,7 @@ namespace D3 {
     //TODO: D3 supports passing a selection, but it's kind of a weird edge case
     Transition NewTransition(std::string name="") const {
       int new_id = NextD3ID();
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
  	    var transition = js.objects[$0].transition(UTF8ToString($1));
 	    js.objects[$2] = transition;
     }, this->id, name.c_str(), new_id);
@@ -619,7 +619,7 @@ namespace D3 {
 
       int new_id = NextD3ID();
 
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    var func_string = UTF8ToString($2);
         if (typeof window[func_string] === "function") {
           func_string = window[func_string];
@@ -652,7 +652,7 @@ namespace D3 {
       uint32_t fun_id = emp::JSWrap(listener, "", false);
       int new_id = NextD3ID();
 
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	      js.objects[$0].on(UTF8ToString($1),
 		  function(d, i){
 		     js.objects[$4] = d3.select(this);
@@ -666,7 +666,7 @@ namespace D3 {
     /// @endcond
 
     Transition& SetDuration(double time) {
-        EM_ASM_ARGS({
+        MAIN_THREAD_EM_ASM({
             js.objects[$0].duration($1);
         }, this->id, time);
         return (*this);
@@ -678,7 +678,7 @@ namespace D3 {
     /// for more information.
     // std::string verison
     Transition& SetProperty(std::string name, std::string value){
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         var arg1 = UTF8ToString($1);				                              	\
         var func_string = UTF8ToString($2);
         if (typeof window[func_string] === "function") {
@@ -700,7 +700,7 @@ namespace D3 {
 
     // Const char * version so raw strings work
     Transition& SetProperty(std::string name, const char* value){
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         var arg1 = UTF8ToString($1);				                              	\
         var func_string = UTF8ToString($2);
         if (typeof window[func_string] === "function") {
@@ -722,7 +722,7 @@ namespace D3 {
     template <typename T>
     typename std::enable_if<std::is_fundamental<T>::value, Transition&>::type
     SetProperty(std::string name, T value){
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
           js.objects[$0].each("end", function() {
             d3.select(this).property(UTF8ToString($1), $2);
           });
@@ -737,7 +737,7 @@ namespace D3 {
     emp::sfinae_decoy<Transition&, decltype(&T::operator())>
     SetProperty(std::string name, T value) {
       uint32_t fun_id = emp::JSWrap(value, "", false);
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         js.objects[$0].each("end", function(){
                 d3.select(this).property(UTF8ToString($1),
                                           function(d, i, j) {
@@ -754,7 +754,7 @@ namespace D3 {
     /// Sets this selection's inner html to the specified string, or the string returned by running the
     /// specified function on the element's bound data
     Transition& SetHtml(std::string value){
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         var func_string = UTF8ToString($1);
         if (typeof window[func_string] === "function") {
           func_string = window[func_string];
@@ -777,7 +777,7 @@ namespace D3 {
     emp::sfinae_decoy<Transition&, decltype(&T::operator())>
     SetHtml(T func){
       uint32_t fun_id = emp::JSWrap(func, "", false);
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         js.objects[$0].each("end", function(){
                   d3.select(this).html(function(d, i, j) {
                         return emp.Callback($1, d, i, j);
@@ -794,7 +794,7 @@ namespace D3 {
     /// Example: Add the data-point class with selection.SetClassed("data-point", true);
     // Value can also be a function that takes bound data and returns a bool
     Transition& SetClassed(std::string classname, bool value) {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         js.objects[$0].each("end", function(){
             d3.select(this).classed(UTF8ToString($1), $2);
         });
@@ -809,7 +809,7 @@ namespace D3 {
     emp::sfinae_decoy<Transition&, decltype(&T::operator())>
     SetClassed(std::string, std::string classname, T func){
       uint32_t fun_id = emp::JSWrap(func, "", false);
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         js.objects[$0].each("end", function(){
                   d3.select(this).classed(UTF8ToString($1),
                                             function(d, i, j) {
@@ -837,7 +837,7 @@ namespace D3 {
         return (typeof func_string === "function");
       }, value.c_str()) && "String passed to SetClassed is not a Javascript function", value);
 
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         var arg1 = UTF8ToString($1);				                              	\
         var func_string = UTF8ToString($2);
         if (typeof window[func_string] === "function") {
@@ -944,7 +944,7 @@ namespace D3 {
 
     /// Default constructor - constructs empty selection
     Selection(){
-        EM_ASM_ARGS({js.objects[$0] = d3.selection();}, this->id);
+        MAIN_THREAD_EM_ASM({js.objects[$0] = d3.selection();}, this->id);
     };
 
     /// Create Selection object with a specific id.
@@ -968,12 +968,12 @@ namespace D3 {
     /// just the first [false]
     Selection(std::string selector, bool all = false) {
       if (all){
-        EM_ASM_ARGS({
+        MAIN_THREAD_EM_ASM({
   	      js.objects[$0] = d3.selectAll(UTF8ToString($1));
         }, this->id, selector.c_str());
       }
       else {
-        EM_ASM_ARGS({
+        MAIN_THREAD_EM_ASM({
   	      js.objects[$0] = d3.select(UTF8ToString($1));
         }, this->id, selector.c_str());
       }
@@ -1008,7 +1008,7 @@ namespace D3 {
     Selection Data(Dataset & values, std::string key=""){
       int update_id = NextD3ID();
 
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         //We could make this slightly prettier with macros, but would
         //add an extra comparison
 	    var in_string = UTF8ToString($1);
@@ -1041,7 +1041,7 @@ namespace D3 {
       int update_id = NextD3ID();
       uint32_t fun_id = emp::JSWrap(key, "", false);
 
-  	  EM_ASM_ARGS({
+  	  MAIN_THREAD_EM_ASM({
         var update_sel = js.objects[$0].data(js.objects[$2],
                                                 function(d,i) {
                                                   return emp.Callback($1, d, i);
@@ -1063,7 +1063,7 @@ namespace D3 {
     //   int update_id = NextD3ID();
     //   emp::pass_array_to_javascript(values);
     //
-    //   EM_ASM_ARGS({
+    //   MAIN_THREAD_EM_ASM({
     //     var update_sel = js.objects[$0].data(emp_i.__incoming_array);
 	//     js.objects[$1] = update_sel;
     //
@@ -1084,7 +1084,7 @@ namespace D3 {
         //   std::cout << "In bind data: " << values[0].x0() << std::endl;
       emp::pass_array_to_javascript(values);
 
-  	  EM_ASM_ARGS({
+  	  MAIN_THREAD_EM_ASM({
 	    var in_string = UTF8ToString($1);
 	    var fn = window["emp"][in_string];
 	    if (typeof fn === "function"){
@@ -1114,7 +1114,7 @@ namespace D3 {
       emp::pass_array_to_javascript(values);
       uint32_t fun_id = emp::JSWrap(key, "", false);
 
-  	  EM_ASM_ARGS({
+  	  MAIN_THREAD_EM_ASM({
         var update_sel = js.objects[$0].data(emp_i.__incoming_array,
                                                 function(d,i,k) {
                                                   return emp.Callback($1, d, i, k);
@@ -1132,7 +1132,7 @@ namespace D3 {
 
     Dataset GetData() const {
         int new_id = NextD3ID();
-        EM_ASM_ARGS({
+        MAIN_THREAD_EM_ASM({
             js.objects[$1] = [js.objects[$0].data()];
         }, this->id, new_id);
         return Dataset(new_id);
@@ -1148,7 +1148,7 @@ namespace D3 {
 
       int new_id = NextD3ID();
 
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    var append_selection = js.objects[$0].enter()
                                .append(UTF8ToString($1));
 	    js.objects[$2] = append_selection;
@@ -1165,13 +1165,13 @@ namespace D3 {
       int new_id = NextD3ID();
 
       if (before.c_str()){
-	    EM_ASM_ARGS({
+	    MAIN_THREAD_EM_ASM({
 	      var new_sel = js.objects[$0].enter().insert(UTF8ToString($1),
 						  UTF8ToString($2));
 	      js.objects[$3] = new_sel;
         }, this->id, name.c_str(), before.c_str(), new_id);
       } else {
-	    EM_ASM_ARGS({
+	    MAIN_THREAD_EM_ASM({
 	      var new_sel = js.objects[$0].enter().insert(UTF8ToString($1));
 	      js.objects[$2] = new_sel;
         }, this->id, name.c_str(), new_id);
@@ -1189,7 +1189,7 @@ namespace D3 {
 
       int new_id = NextD3ID();
 
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    var enter_selection = js.objects[$0].enter();
 	    js.objects[$1] = enter_selection;
       }, this->id, new_id);
@@ -1205,7 +1205,7 @@ namespace D3 {
 
       int new_id = NextD3ID();
 
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    var exit_selection = js.objects[$0].exit().remove();
 	    js.objects[$1] = exit_selection;
       }, this->id, new_id);
@@ -1221,7 +1221,7 @@ namespace D3 {
 
       int new_id = NextD3ID();
 
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    var exit_selection = js.objects[$0].exit();
 	    js.objects[$1] = exit_selection;
       }, this->id, new_id);
@@ -1272,7 +1272,7 @@ namespace D3 {
     template <typename T>
     typename std::enable_if<std::is_fundamental<T>::value, Selection&>::type
     SetProperty(std::string name, T value){
-      EM_ASM_ARGS({js.objects[$0].property(UTF8ToString($1),
+      MAIN_THREAD_EM_ASM({js.objects[$0].property(UTF8ToString($1),
 					   $2)}, this->id, name.c_str());
       return *this;
     }
@@ -1311,7 +1311,7 @@ namespace D3 {
     /// Example: Add the data-point class with selection.SetClassed("data-point", true);
     // Value can also be a function that takes bound data and returns a bool
     Selection& SetClassed(std::string classname, bool value) {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         js.objects[$0].classed(UTF8ToString($1), $2);
       }, this->id, classname.c_str(), value);
       return *this;
@@ -1417,7 +1417,7 @@ namespace D3 {
     Selection Append(std::string name){
       int new_id = NextD3ID();
 
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    var new_selection = js.objects[$0].append(UTF8ToString($1));
 	    js.objects[$2] = new_selection;
       }, this->id, name.c_str(), new_id);
@@ -1433,13 +1433,13 @@ namespace D3 {
       int new_id = NextD3ID();
 
       if (before.c_str()){
-	    EM_ASM_ARGS({
+	    MAIN_THREAD_EM_ASM({
 	      var new_sel = js.objects[$0].insert(UTF8ToString($1),
 						  UTF8ToString($2));
 	      js.objects[$3] = new_sel;
         }, this->id, name.c_str(), before.c_str(), new_id);
       } else {
-  	    EM_ASM_ARGS({
+  	    MAIN_THREAD_EM_ASM({
 	      var new_sel = js.objects[$0].insert(UTF8ToString($1));
 	      js.objects[$2] = new_sel;
         }, this->id, name.c_str(), new_id);
@@ -1451,7 +1451,7 @@ namespace D3 {
     /// the transition will be given that name
     Transition MakeTransition(std::string name=""){
       int new_id = NextD3ID();
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
  	    var transition = js.objects[$0].transition(UTF8ToString($1));
 	    js.objects[$2] = transition;
       }, this->id, name.c_str(), new_id);
@@ -1461,7 +1461,7 @@ namespace D3 {
 
     Transition MakeTransition(Transition & t){
       int new_id = NextD3ID();
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
  	    var transition = js.objects[$0].transition(js.objects[$1]);
 	    js.objects[$2] = transition;
     }, this->id, t.GetID(), new_id);
@@ -1472,7 +1472,7 @@ namespace D3 {
 
     /// Interrupt the transition with the name [name] on the current selection
     Selection& Interrupt(std::string name=""){
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    js.objects[$0].interrupt(UTF8ToString($1));
  	  }, this->id, name.c_str());
       return *this;
@@ -1484,7 +1484,7 @@ namespace D3 {
     /// "transform" attribute to "translate(x, y)", because doing that is a pain
     /// in C++ (even more so than in Javascript)
     Selection& Move(int x, int y) {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         js.objects[$0].attr("transform", "translate("+$1+","+$2+")");
       }, this->id, x, y);
       return *this;
@@ -1495,7 +1495,7 @@ namespace D3 {
     /// "transform" attribute to "rotate(degrees)", because doing that is a pain
     /// in C++ (even more so than in Javascript)
     Selection& Rotate(int degrees) {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         js.objects[$0].attr("transform", "rotate("+$1+")");
       }, this->id, degrees);
       return *this;
@@ -1503,18 +1503,18 @@ namespace D3 {
 
     /// Change the order of elements in the document to match their order in this selection
     Selection& Order(){
-      EM_ASM_ARGS({js.objects[$0].order()},
+      MAIN_THREAD_EM_ASM({js.objects[$0].order()},
 			this->id);
       return *this;
     }
 
     Selection& Raise() {
-      EM_ASM_ARGS({js.objects[$0].raise();}, this->id);
+      MAIN_THREAD_EM_ASM({js.objects[$0].raise();}, this->id);
       return *this;
     }
 
     Selection& Lower() {
-      EM_ASM_ARGS({js.objects[$0].lower();}, this->id);
+      MAIN_THREAD_EM_ASM({js.objects[$0].lower();}, this->id);
       return *this;
     }
 
@@ -1552,7 +1552,7 @@ namespace D3 {
 
       int new_id = NextD3ID();
 
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    var func_string = UTF8ToString($2);
         if (typeof window[func_string] === "function") {
           func_string = window[func_string];
@@ -1588,7 +1588,7 @@ namespace D3 {
       uint32_t fun_id = emp::JSWrap(listener, "", false);
       int new_id = NextD3ID();
 
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	      js.objects[$0].on(UTF8ToString($1),
 		  function(){
 		     js.objects[$4] = d3.select(this);
@@ -1633,14 +1633,14 @@ namespace D3 {
     //This function exists in case you want to bind the tooltip to an
     //event other than mouseover/out
     void SetupToolTip(ToolTip & tip) {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
        js.objects[$0].call(js.objects[$1]);
    }, this->id, tip.GetID());
     }
 
     //Tell tooltip to appear on mouseover and dissapear on mouseout
     void BindToolTipMouseover(ToolTip & tip) {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
        js.objects[$0].on("mouseover", js.objects[$1].show)
                      .on("mouseout", js.objects[$1].hide);
       }, this->id, tip.GetID());

@@ -12,7 +12,6 @@
 #include "../../../include/emp/base/assert.hpp"
 #include "../../../include/emp/base/vector.hpp"
 #include "../../../include/emp/config/command_line.hpp"
-#include "../../../include/emp/tools/functions.hpp"
 #include "../../../include/emp/math/sequence_utils.hpp"
 
 int main(int argc, char* argv[])

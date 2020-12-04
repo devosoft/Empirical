@@ -24,7 +24,7 @@ namespace web {
 
     emp::vector<emp::vector<std::string>> incoming;
 
-    EM_ASM({
+    MAIN_THREAD_EM_ASM({
       const params = new URLSearchParams(location.search);
       emp_i.__outgoing_array = Array.from(
         params.entries()

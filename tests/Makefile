@@ -1,4 +1,4 @@
-TEST_NAMES := base bits compiler config control data datastructs debug Evolve functional games geometry hardware io matchbin math meta scholar testing tools
+TEST_NAMES := base bits compiler config control data datastructs debug Evolve functional games geometry hardware io matching math meta scholar testing tools
 
 CXX = clang++
 #CXX := g++
@@ -13,7 +13,7 @@ test: $(addprefix test-, $(TEST_NAMES))
 coverage-%:
 	cd $(@:coverage-%=%) && make coverage
 
-coverage: coverage_conversion $(addprefix coverage-, $(TEST_NAMES))
+coverage: coverage_conversion coverage-datastructs coverage-matching #$(addprefix coverage-, $(TEST_NAMES))
 
 coverage_conversion:
 	./convert_for_tests.sh
@@ -34,7 +34,7 @@ cranky-%:
 cranky: $(addprefix cranky-, $(TEST_NAMES))
 
 test-web:
-	  cd web && bash run_tests.sh
+	  cd web && make test
 
 clean: $(addprefix clean-, $(TEST_NAMES)) clean-web
 	rm -f *.out

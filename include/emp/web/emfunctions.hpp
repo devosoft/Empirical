@@ -24,7 +24,7 @@ namespace emp {
   static void DelayCall(const std::function<void()> & in_fun, int delay) {
     uint32_t callback_id = JSWrapOnce(in_fun); // Wrap and dispose when called.
     (void)callback_id;
-    EM_ASM_ARGS({
+    MAIN_THREAD_ASYNC_EM_ASM({
         window.setTimeout(function() { emp.Callback($0); }, $1);
       }, callback_id, delay);
   }
@@ -33,7 +33,7 @@ namespace emp {
   static void OnResize(const std::function<void()> & in_fun) {
     uint32_t callback_id = JSWrap(in_fun);
     (void)callback_id;
-    EM_ASM_ARGS({
+    MAIN_THREAD_ASYNC_EM_ASM({
         window.addEventListener("resize", function() { emp.Callback($0); });
       }, callback_id);
   }
@@ -42,7 +42,7 @@ namespace emp {
   static void OnResize(const std::function<void(int,int)> & in_fun) {
     uint32_t callback_id = JSWrap(in_fun);
     (void)callback_id;
-    EM_ASM_ARGS({
+    MAIN_THREAD_ASYNC_EM_ASM({
         window.addEventListener("resize", function() {
             emp.Callback($0, window.innerWidth, window.innerHeight);
           });
@@ -50,24 +50,24 @@ namespace emp {
   }
 
   /// Get the current time, as provided by the web browser.
-  inline double GetTime() { return EM_ASM_DOUBLE_V({ return (new Date()).getTime(); }); }
+  inline double GetTime() { return MAIN_THREAD_EM_ASM_DOUBLE({ return (new Date()).getTime(); }); }
 
   /// Determine with width of the current window.
-  inline int GetWindowInnerWidth() { return EM_ASM_INT_V({ return window.innerWidth; }); }
+  inline int GetWindowInnerWidth() { return MAIN_THREAD_EM_ASM_INT({ return window.innerWidth; }); }
 
   /// Determine with height of the current window.
-  inline int GetWindowInnerHeight() { return EM_ASM_INT_V({ return window.innerHeight; }); }
+  inline int GetWindowInnerHeight() { return MAIN_THREAD_EM_ASM_INT({ return window.innerHeight; }); }
 
   /// Set the background color of this web page.
   static void SetBackgroundColor(const std::string color) {
-    EM_ASM_ARGS({
+    MAIN_THREAD_ASYNC_EM_ASM({
         var color = UTF8ToString($0);
         $("body").first().css("background-color", color);
       }, color.c_str());
   }
 
   static void SetColor(const std::string color) {
-    EM_ASM_ARGS({
+    MAIN_THREAD_ASYNC_EM_ASM({
         var color = UTF8ToString($0);
         $("body").first().css("color", color);
       }, color.c_str());
@@ -75,14 +75,14 @@ namespace emp {
 
   // These may already be in HTML5 for Emscripten
   static void SetCursor(const char * type) {
-    EM_ASM_ARGS({
+    MAIN_THREAD_ASYNC_EM_ASM({
         var type = UTF8ToString($0);
         document.body.style.cursor = type;
     }, type);
   }
 
   static void OpenWindow(const std::string & url) {
-    EM_ASM_ARGS({
+    MAIN_THREAD_ASYNC_EM_ASM({
         var url = UTF8ToString($0);
         window.open = url;
     }, url.c_str());
@@ -106,7 +106,7 @@ namespace emp {
 
     /// Get the value of @param attribute in the element with @param id as its id.
     inline std::string GetElementAttribute(const std::string & id, const std::string & attribute) {
-      char * buffer = (char * )EM_ASM_INT({
+      char * buffer = (char * )MAIN_THREAD_EM_ASM_INT({
         var text = document.getElementById(UTF8ToString($0))[UTF8ToString($1)];
         var buffer = Module._malloc(text.length+1);
         Module.stringToUTF8(text, buffer, text.length*4+1);
