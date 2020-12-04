@@ -3,11 +3,11 @@
 #define CATCH_CONFIG_MAIN
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/datastructs/AssociativeArrayCache.hpp"
+#include "emp/datastructs/SmallFifoMap.hpp"
 
-TEST_CASE("AssociativeArrayCache") {
+TEST_CASE("SmallFifoMap") {
 
-  emp::AssociativeArrayCache<size_t, std::string, 2> cache;
+  emp::SmallFifoMap<size_t, std::string, 2> cache;
 
   REQUIRE( cache.capacity() == 2 );
 
@@ -17,18 +17,23 @@ TEST_CASE("AssociativeArrayCache") {
 
   cache.set( 42, "42" );
   REQUIRE( *cache.get( 42 ) == "42" );
+  REQUIRE( cache[ 42 ] == "42" );
   REQUIRE( cache.size() == 1 );
   REQUIRE( !cache.empty() );
 
   cache.set( 101, "101" );
   REQUIRE( *cache.get( 42 ) == "42" );
   REQUIRE( *cache.get( 101 ) == "101" );
+  REQUIRE( cache[ 42 ] == "42" );
+  REQUIRE( cache[ 101 ] == "101" );
   REQUIRE( cache.size() == 2 );
   REQUIRE( !cache.empty() );
 
   cache.set( 12, "12" );
   REQUIRE( *cache.get( 12 ) == "12" );
   REQUIRE( *cache.get( 101 ) == "101" );
+  REQUIRE( cache[ 12 ] == "12" );
+  REQUIRE( cache[ 101 ] == "101" );
   REQUIRE( cache.get( 42 ) == nullptr );
   REQUIRE( cache.size() == 2 );
   REQUIRE( !cache.empty() );

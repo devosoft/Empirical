@@ -8,9 +8,8 @@
  *
  */
 
-
-#ifndef EMP_MATCH_BIN_H
-#define EMP_MATCH_BIN_H
+#ifndef EMP_MATCH_BIN_HPP
+#define EMP_MATCH_BIN_HPP
 
 // the default log filename can be set by passing
 // '-D filename.csv' to the compiler
@@ -1003,4 +1002,4 @@ void load(
 
 } // namespace cereal
 
-#endif
+#endif // #ifndef EMP_MATCH_BIN_HPP

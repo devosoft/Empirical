@@ -13,8 +13,8 @@
  */
 
 
-#ifndef EMP_BIT_SET_H
-#define EMP_BIT_SET_H
+#ifndef EMP_BIT_SET_HPP
+#define EMP_BIT_SET_HPP
 
 #include <iostream>
 #include <initializer_list>
@@ -1430,4 +1430,4 @@ namespace std {
 }
 
 
-#endif
+#endif // #ifndef EMP_BIT_SET_HPP

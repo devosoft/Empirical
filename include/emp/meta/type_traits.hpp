@@ -24,7 +24,10 @@ namespace emp {
 
   // adapted from https://stackoverflow.com/a/29634934
   namespace detail {
-    // To allow ADL with custom begin/end
+
+    // using statements allow Argument-Dependent Lookup (ADL)
+    // with custom begin/end
+    // see https://en.cppreference.com/w/cpp/language/adl
     using std::begin;
     using std::end;
 
@@ -46,6 +49,7 @@ namespace emp {
     std::false_type is_iterable_impl(...);
   }
 
+  /// Determine if a type is iterable.
   template <typename T>
   using IsIterable = decltype(detail::is_iterable_impl<T>(0));
 
