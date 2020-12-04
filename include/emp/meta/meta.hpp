@@ -306,6 +306,9 @@ namespace emp {
     return static_cast<typename function_traits<Function>::function>(lambda);
   }
 
+  /// Determine the size of a built-in array.
+  template <typename T, size_t N>
+  constexpr size_t GetSize(T (&)[N]) { return N; }
 
 }
 

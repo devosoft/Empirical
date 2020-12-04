@@ -25,14 +25,6 @@
 #include "assert.hpp"
 #include "../meta/TypeID.hpp"
 
-namespace emp {
-
-  /// Determine the size of a built-in array.
-  template <typename T, size_t N>
-  constexpr size_t GetSize(T (&)[N]) { return N; }
-
-}
-
 #ifdef EMP_NDEBUG
 
 namespace emp {

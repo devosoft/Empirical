@@ -100,7 +100,4 @@ TEST_CASE("Another test array", "[base]")
 
   REQUIRE(sum == 40425);
 
-  int some_ints[] = {1, 2, 4, 8};
-  REQUIRE(emp::GetSize(some_ints) == 4);
-
 }
