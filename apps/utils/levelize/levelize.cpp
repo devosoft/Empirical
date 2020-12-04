@@ -8,10 +8,15 @@
 #include "../../../include/emp/io/File.hpp"
 #include "../../../include/emp/tools/string_utils.hpp"
 
+using level_t = uint32_t;
+
 struct FileInfo {
   std::string filename;
   std::string path;
   std::set<std::string> depends; // Which OTHER files does this one depend on?
+
+  static constexpr level_t NO_LEVEL = (level_t) -1;
+  level_t level = NO_LEVEL;
 };
 
 int main(int argc, char * argv[])
@@ -35,11 +40,51 @@ int main(int argc, char * argv[])
   // For each file, scan for its dependencies.
   for (auto & [filename, info] : file_map) {
     emp::File file(info.path);
-    file.KeepIf( [](const std::string & line){ return line.find("#include") != std::string::npos; } );
+    file.KeepIfContains("#include");
+
+    // Now test which OTHER filenames it is including.
+    for (const std::string & filename : filenames) {
+      if (file.Contains(filename)) info.depends.insert(filename);
+    }
   }
 
-  // List out the files.
+  // Now that we know dependences, figure out levels!
+  bool progress = true;
+  while (progress) {
+    progress = false;
+
+    // Loop through each file to see if we can determine its level.
+    for (auto & [filename, info] : file_map) {
+      if (info.level != FileInfo::NO_LEVEL) continue;  // Already has a level!
+
+      // See if we can determine a level for this file.
+      level_t new_level = 0;
+      for (const std::string & depend_name : info.depends) {
+        level_t test_level = file_map[depend_name].level;
+
+        // If a dependency doesn't have a level yet, stop working on this one.
+        if (test_level == FileInfo::NO_LEVEL) {
+          new_level = FileInfo::NO_LEVEL;
+          break;
+        }
+
+        // Otherwise see if we need to update our new_level for this file.
+        if (test_level >= new_level) new_level = test_level + 1;
+      }
+
+      // If we have a level for this file now, use it an indicate progress!
+      if (new_level != FileInfo::NO_LEVEL) {
+        info.level = new_level;
+        progress = true;
+      }
+    }
+  }
+
+  // List out the files and their levels.
   for (auto [filename, info] : file_map) {
-    std::cout << info.path << " : " << filename << "\n";
+    std::cout << filename << " : LEVEL " << info.level << " (" << info.path << ")\n";
+    std::cout << "Depends on:";
+    for (const std::string & name : info.depends) std::cout << " " << name;
+    std::cout << std::endl;
   }
 }
