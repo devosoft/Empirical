@@ -40,11 +40,16 @@ int main(int argc, char * argv[])
   // For each file, scan for its dependencies.
   for (auto & [filename, info] : file_map) {
     emp::File file(info.path);
-    file.KeepIfContains("#include");
+    file.KeepIfContains("#include");      // Only scan through include lines.
+    file.RemoveIfContains("third-party"); // Ignore includes from third-party directory (may duplicate names)
 
-    // Now test which OTHER filenames it is including.
+    // Now test which OTHER filenames it is including.  Search for the filename with
+    // a " or / in front of it (to make sure it's not part of another name)
     for (const std::string & filename : filenames) {
-      if (file.Contains(filename)) info.depends.insert(filename);
+      if (file.Contains(emp::to_string("\"", filename)) ||
+          file.Contains(emp::to_string("/", filename)) ) {
+        info.depends.insert(filename);
+      }
     }
   }
 
@@ -82,7 +87,10 @@ int main(int argc, char * argv[])
 
   // List out the files and their levels.
   for (auto [filename, info] : file_map) {
-    std::cout << filename << " : LEVEL " << info.level << " (" << info.path << ")\n";
+//    std::cout << emp::to_ansi_bold(filename)
+    std::cout << filename
+              << " : LEVEL " << info.level
+              << " (" << info.path << ")\n";
     std::cout << "Depends on:";
     for (const std::string & name : info.depends) std::cout << " " << name;
     std::cout << std::endl;
