@@ -75,6 +75,30 @@ namespace emp {
     else return value;
   }
 
+  /// Figure out which type is an unsigned integer with a specified number of bits.
+  template <size_t BIT_COUNT, typename DEFAULT=void> struct uint_bit_count {
+    using type = DEFAULT;
+  };
+  template <> struct uint_bit_count<8> { using type = uint8_t; };
+  template <> struct uint_bit_count<16> { using type = uint16_t; };
+  template <> struct uint_bit_count<32> { using type = uint32_t; };
+  template <> struct uint_bit_count<64> { using type = uint64_t; };
+
+  template <size_t BIT_COUNT, typename DEFAULT=void>
+  using uint_bit_count_t = typename uint_bit_count<BIT_COUNT, DEFAULT>::type;
+
+  /// Figure out which type is an integer with a specified number of bits.
+  template <size_t BIT_COUNT, typename DEFAULT=void> struct int_bit_count {
+    using type = DEFAULT;
+  };
+  template <> struct int_bit_count<8> { using type = int8_t; };
+  template <> struct int_bit_count<16> { using type = int16_t; };
+  template <> struct int_bit_count<32> { using type = int32_t; };
+  template <> struct int_bit_count<64> { using type = int64_t; };
+
+  template <size_t BIT_COUNT, typename DEFAULT=void>
+  using int_bit_count_t = typename int_bit_count<BIT_COUNT, DEFAULT>::type;
+
   /// Match the constness of another type.
   template <typename T, typename MATCH_T>
   struct match_const { using type = std::remove_const_t<T>; };
