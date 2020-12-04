@@ -113,7 +113,7 @@ namespace emp {
   }
 
   /// Take a string and replace reserved HTML characters with character entities
-  std::string to_web_safe_string(const std::string & value) {
+  inline std::string to_web_safe_string(const std::string & value) {
     std::string web_safe = value;
     std::regex apm("[&]");
     std::regex open_brace("[<]");
