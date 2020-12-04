@@ -65,10 +65,8 @@ debug:
 	$(MAKE) debug -C web/
 
 web-test:
-	$(MAKE) debug -C prefab/
-	$(MAKE) -C prefab/
-	$(MAKE) debug -C web/
-	$(MAKE) -C web/
+	cd prefab && make && make debug
+	cd web && make && make debug
 
 native-test:
 	# $(MAKE) -C base/
