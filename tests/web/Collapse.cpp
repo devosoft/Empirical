@@ -27,17 +27,17 @@ struct Test_Collapse_String : emp::web::BaseTest {
    *
    * <span aria-controls=".set1" aria-expanded="true" class="collapse_toggle" data-target=".set1" data-toggle="collapse" role="button">Controller 1.2</span>
    *
-   * <span class="collapse show , set1">[1] Target Content (set1)</span>
+   * <span class="collapse show set1">[1] Target Content (set1)</span>
    *
-   * <span aria-controls=".set2" aria-expanded="false" class="collapse_toggle , collapsed" data-target=".set2" data-toggle="collapse" role="button">Controller 2</span>
+   * <span aria-controls=".set2" aria-expanded="false" class="collapse_toggle collapsed" data-target=".set2" data-toggle="collapse" role="button">Controller 2</span>
    *
-   * <span class="collapse , set2">[2] Target Content (set2)</span>
+   * <span class="collapse set2">[2] Target Content (set2)</span>
    *
-   * <div id="target3" class="collapse , set2">
+   * <div id="target3" class="collapse set2">
    *  <span>[3] Target Content (set2)</span>
    * </div>
    *
-   * <div id="master_controller" aria-controls=".set1 , .set2" aria-expanded="true" class="collapse_toggle" data-target=".set1 , .set2" data-toggle="collapse" role="button"><span id="emp__#">Controller of all</span></div>
+   * <div id="master_controller" aria-controls=".set1 .set2" aria-expanded="true" class="collapse_toggle" data-target=".set1 .set2" data-toggle="collapse" role="button"><span id="emp__#">Controller of all</span></div>
    *
    * </div>
    */
@@ -354,7 +354,7 @@ struct Test_Collapse_String : emp::web::BaseTest {
           });
 
           it('should have aria-controls set to the classes set1 and set2', function() {
-            chai.assert.equal(controller.getAttribute("aria-controls"), ".set1 , .set2");
+            chai.assert.equal(controller.getAttribute("aria-controls"), ".set1 .set2");
           });
 
           it('should have aria-expanded set to true', function() {
@@ -362,7 +362,7 @@ struct Test_Collapse_String : emp::web::BaseTest {
           });
 
           it('should have data-target set to the classes set1 set2', function() {
-            chai.assert.equal(controller.getAttribute("data-target"), ".set1 , .set2");
+            chai.assert.equal(controller.getAttribute("data-target"), ".set1 .set2");
           });
 
           it('should have data-toggle set to collapse', function() {
@@ -476,23 +476,23 @@ struct Test_Collapse_Widget : emp::web::BaseTest {
    *
    * <div id="emp_test_container">
    *
-   * <div id="btn1" aria-controls=".emp__collapse_class_0" aria-expanded="true" class="btn btn-info , collapse_toggle" data-target=".emp__collapse_class_0" data-toggle="collapse" role="button">
+   * <div id="btn1" aria-controls=".emp__collapse_class_0" aria-expanded="true" class="btn btn-info collapse_toggle" data-target=".emp__collapse_class_0" data-toggle="collapse" role="button">
    *  <span>Button 1: controls box 1</span>
    * </div>
    *
-   * <div id="box1" class="collapse show , emp__collapse_class_0">
+   * <div id="box1" class="collapse show emp__collapse_class_0">
    *  <span><h3>Box 1</h3></span>
    * </div>
    *
-   * <div id="btn2" aria-controls=".emp__collapse_class_1" aria-expanded="false" class="btn btn-info , collapse_toggle collapsed" data-target=".emp__collapse_class_1" data-toggle="collapse" role="button">
+   * <div id="btn2" aria-controls=".emp__collapse_class_1" aria-expanded="false" class="btn btn-info collapse_toggle collapsed" data-target=".emp__collapse_class_1" data-toggle="collapse" role="button">
    *  <span>Button 2: controls box 2</span>
    * </div>
    *
-   * <div id="box2" class="collapse , emp__collapse_class_1">
+   * <div id="box2" class="collapse emp__collapse_class_1">
    *  <span><h3>Box 2</h3></span>
    * </div>
    *
-   * <div id="btn3" aria-controls=".emp__collapse_class_0 , .emp__collapse_class_1" aria-expanded="true" class="btn btn-success" data-target=".emp__collapse_class_0 , .emp__collapse_class_1" data-toggle="collapse" role="button">
+   * <div id="btn3" aria-controls=".emp__collapse_class_0 .emp__collapse_class_1" aria-expanded="true" class="btn btn-success" data-target=".emp__collapse_class_0 .emp__collapse_class_1" data-toggle="collapse" role="button">
    *  <span>Button 3: controls all boxes</span>
    * </div>
    *
@@ -801,7 +801,7 @@ struct Test_Collapse_Widget : emp::web::BaseTest {
           });
 
           it('should have aria-controls set to emp__collapse_class_0 and emp__collapse_class_1 ', function() {
-            chai.assert.equal(controller.getAttribute("aria-controls"), ".emp__collapse_class_0 , .emp__collapse_class_1");
+            chai.assert.equal(controller.getAttribute("aria-controls"), ".emp__collapse_class_0 .emp__collapse_class_1");
           });
 
           it('should have aria-expanded set to true', function() {
@@ -809,7 +809,7 @@ struct Test_Collapse_Widget : emp::web::BaseTest {
           });
 
           it('should have data-target set to class emp__collapse_class_0 and emp__collapse_class_1', function() {
-            chai.assert.equal(controller.getAttribute("data-target"), ".emp__collapse_class_0 , .emp__collapse_class_1");
+            chai.assert.equal(controller.getAttribute("data-target"), ".emp__collapse_class_0 .emp__collapse_class_1");
           });
 
           it('should have data-toggle set to collapse', function() {
@@ -871,7 +871,7 @@ struct Test_Collapse_Widget : emp::web::BaseTest {
       });
 
       it('should have the second controller controlling emp__collapse_class_0 and emp__collapse_class_1', function(){
-        chai.assert.equal(js_controllers[1], ".emp__collapse_class_0 , .emp__collapse_class_1");
+        chai.assert.equal(js_controllers[1], ".emp__collapse_class_0 .emp__collapse_class_1");
       });
     });
 
@@ -923,13 +923,13 @@ struct Test_Collapse_Vector : emp::web::BaseTest {
    *  button controller
    * </button>
    *
-   * <div id="t1" class="collapse show , collapse_id">
+   * <div id="t1" class="collapse show collapse_id">
    *  <span id="emp__2">target 1</span>
    * </div>
-   * <div id="t2" class="collapse show , collapse_id">
+   * <div id="t2" class="collapse show collapse_id">
    *  <span id="emp__3">target 2</span>
    * </div>
-   * <div id="t3" class="collapse show , collapse_id">
+   * <div id="t3" class="collapse show collapse_id">
    *  <span id="emp__4">target 2</span>
    * </div>
    */
@@ -1171,11 +1171,11 @@ struct Test_Expand_On_Click : emp::web::BaseTest {
   /*
    * Construct the following HTML structure:
    *
-   * <span id="emp__1" aria-controls=".collapse_id" aria-expanded="false" class="collapse_toggle , collapsed" data-target=".collapse_id" data-toggle="collapse" role="button">
+   * <span id="emp__1" aria-controls=".collapse_id" aria-expanded="false" class="collapse_toggle collapsed" data-target=".collapse_id" data-toggle="collapse" role="button">
    * Controller1
    * </span>
    *
-   * <span id="emp__3" class="collapse , collapse_id">Target1</span>
+   * <span id="emp__3" class="collapse collapse_id">Target1</span>
    */
 
   Test_Expand_On_Click()
@@ -1299,7 +1299,7 @@ struct Test_Collapse_On_Click : emp::web::BaseTest {
    * Controller1
    * </span>
    *
-   * <span id="emp__3" class="collapse show , collapse_id">Target1</span>
+   * <span id="emp__3" class="collapse show collapse_id">Target1</span>
    */
 
   Test_Collapse_On_Click()
