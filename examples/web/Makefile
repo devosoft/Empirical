@@ -53,10 +53,6 @@ all: $(TARGETS)
 %.js : %.cpp
 	$(CXX_web) $(CFLAGS_web) $< -o $@
 
-
-debug-%: $*.cpp
-	$(CXX_native) $(CFLAGS_native) $< -o $@
-
 clean:
 	rm -f debug-* $(JS_TARGETS) *.js.map *.js.mem *.wasm *.wasm.map *.wast *~ source/*.o source/*/*.o
 
