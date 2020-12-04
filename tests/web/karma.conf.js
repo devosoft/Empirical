@@ -31,7 +31,7 @@ module.exports = function(config) {
       {pattern: 'include/emp/prefab/HighlightJS.js'},
       'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js',
       'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css',
-      'https://cdn.jsdelivr.net/gh/devosoft/Empirical/source/fresh-prefab/DefaultPrefabStyles.less',
+      'https://cdn.jsdelivr.net/gh/devosoft/Empirical@mastersource/fresh-prefab/DefaultPrefabStyles.less',
       'https://cdn.jsdelivr.net/npm/less',
       'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js',
       {pattern: 'include/emp/prefab/LoadingModal.js'},

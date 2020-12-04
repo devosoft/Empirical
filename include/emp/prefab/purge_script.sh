@@ -5,8 +5,8 @@
 # changes take effect in the web application (This may take a few minutes)
 
 # You may also purge the cache for just one file by going to the appropiate URL
-# http://purge[dot]jsdelivr[dot]net/gh/devosoft/Empirical/source/prefab/DefaultConfigPanelStyle.css
-# http://purge[dot]jsdelivr[dot]net/gh/devosoft/Empirical/source/prefab/LoadingModal.js
+# http://purge[dot]jsdelivr[dot]net/gh/devosoft/Empirical/include/emp/prefab/DefaultConfigPanelStyle.css
+# http://purge[dot]jsdelivr[dot]net/gh/devosoft/Empirical/include/emp/prefab/LoadingModal.js
 
 # If you have questions about using js-Delivr's purging API,
 # contact Dmitry
@@ -19,9 +19,9 @@ curl -X POST http://purge.jsdelivr.net \
 -H 'content-type: application/json' \
 -d'{
 "path":[
-"/gh/devosoft/Empirical/source/prefab/DefaultPrefabStyles.less",
-"/gh/devosoft/Empirical/source/prefab/LoadingModal.js",
-"/gh/devosoft/Empirical/source/prefab/HighlightJS.js"
+"/gh/devosoft/Empirical/include/emp/prefab/DefaultPrefabStyles.less",
+"/gh/devosoft/Empirical/include/emp/prefab/LoadingModal.js",
+"/gh/devosoft/Empirical/include/emp/prefab/HighlightJS.js"
 ]
 }'
 

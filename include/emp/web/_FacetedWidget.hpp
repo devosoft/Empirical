@@ -5,7 +5,7 @@
  *
  *  @file  FacetedWidget.h
  *  @brief The FacetedWidget class is used to access the protected methods of WidgetFacet such
- *          as SetCSS and SetAttr. An example of its use can be found in source/prefab/Collapse.h
+ *          as SetCSS and SetAttr. An example of its use can be found in include/emp/prefab/Collapse.h
  *
  */
 
