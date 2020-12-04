@@ -209,6 +209,13 @@ namespace emp {
       );
     }
 
+    /// Remove all strings that contain a specific substring.
+    File & RemoveIfContains(const std::string & pattern) {
+      return KeepIf( 
+        [&pattern](const std::string & line){ return line.find(pattern) == std::string::npos; }
+      );
+    }
+
     /// Remove all lines that are empty strings.
     File & RemoveEmpty() {
       return KeepIf( [](const std::string & str){ return (bool) str.size(); } );
