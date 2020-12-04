@@ -1,4 +1,16 @@
-#pragma once
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ *
+ *  @file PlusCountdownRegulator.hpp
+ *  @brief Regulator that modifies match distance through addition
+ *  and decays to baseline with a countdown timer.
+ *
+ */
+
+#ifndef EMP_PLUS_COUNTDOWN_REGULATOR_HPP
+#define EMP_PLUS_COUNTDOWN_REGULATOR_HPP
 
 #include <algorithm>
 #include <cmath>
@@ -100,3 +112,5 @@ struct PlusCountdownRegulator {
 };
 
 } // namespace emp
+
+#endif // #ifndef EMP_PLUS_COUNTDOWN_REGULATOR_HPP

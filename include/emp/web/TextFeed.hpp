@@ -3,13 +3,13 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  TextFeedFeed.h
+ *  @file  TextFeedFeed.hpp
  *  @brief A representation of text on a web page optimized for rapid appends.
  *
  */
 
-#ifndef EMP_WEB_TEXTFEED_H
-#define EMP_WEB_TEXTFEED_H
+#ifndef EMP_WEB_TEXTFEED_HPP
+#define EMP_WEB_TEXTFEED_HPP
 
 #include <cstddef>
 #include <deque>
@@ -137,7 +137,7 @@ namespace web {
 
   }
 
-}
-}
+} // namespace web
+} // namespace emp
 
-#endif
+#endif// #ifndef EMP_WEB_TEXTFEED_HPP

@@ -1,4 +1,15 @@
-#pragma once
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ *
+ *  @file RankedSelector.hpp
+ *  @brief Selector that picks the N best matches within a threshold.
+ *
+ */
+
+#ifndef EMP_RANKED_SELECTOR_HPP
+#define EMP_RANKED_SELECTOR_HPP
 
 #include <algorithm>
 #include <numeric>
@@ -103,3 +114,5 @@ struct RankedSelector {
 
 } // namespace statics
 } // namespace emp
+
+#endif // #ifndef EMP_RANKED_SELECTOR_HPP

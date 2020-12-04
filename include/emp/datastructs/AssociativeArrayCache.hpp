@@ -1,4 +1,16 @@
-#pragma once
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ *
+ *  @file  AssociativeArrayCache.hpp
+ *  @brief Store key value pairs in a fixed-sized array, bumping out the oldest
+ *  value when full. Optimized for small N. Requires N < 256.
+ *
+ */
+
+#ifndef EMP_ASSOCIATIVE_ARRAY_CACHE_HPP
+#define EMP_ASSOCIATIVE_ARRAY_CACHE_HPP
 
 #include <algorithm>
 #include <utility>
@@ -22,6 +34,7 @@ private:
 
   unsigned char size_{};
 
+  // index of stalest element in cache, according to insertion order
   unsigned char oldest{};
 
   static_assert( N < 256 );
@@ -44,36 +57,43 @@ public:
 
   const_iterator cend() const { return cbegin() + size(); }
 
+  /// How many key-value pairs are in the cache?
   size_t size() const { return size_; }
 
+  /// Does the cache contain any key-value pairs?
   bool empty() const { return size() == 0; }
 
+  /// How many key-value pairs can the cache contain?
   static constexpr size_t capacity() { return N; }
 
+  /// Clear the cache.
   void clear() { size_ = 0; }
 
-public:
-
+  /// Find key-value pair iterator in cache.
   iterator find(const Key& key) { return std::find_if(
     begin(),
     end(),
     [&key](const auto& kv){ const auto& [k, v] = kv; return k == key; }
   ); }
 
+  /// Find key-value pair iterator in cache.
   const_iterator find(const Key& key) const {
     return const_cast<AssociativeArrayCache*>(this)->find(key);
   }
 
+  /// Get corresponding value from cache.
   Value* get(const Key& key) {
     const auto it = find( key );
     if ( it == end() ) return nullptr;
     return std::addressof( it->second );
   }
 
+  /// Get corresponding value from cache.
   Value const* get(const Key& key) const {
     return const_cast<AssociativeArrayCache*>(this)->get( key );
   }
 
+  /// Put a key-value pair in the cache.
   template<
     class K,
     class V,
@@ -97,3 +117,5 @@ public:
 };
 
 } // namespace emp
+
+#endif // #ifndef EMP_ASSOCIATIVE_ARRAY_CACHE_HPP

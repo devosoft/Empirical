@@ -1,4 +1,16 @@
-#pragma once
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ *
+ *  @file MatchDepository.hpp
+ *  @brief A container for tag-based lookup, optimized for situations where
+ *  tags are not removed from the lookup set.
+ *
+ */
+
+#ifndef EMP_MATCH_DEPOSITORY_HPP
+#define EMP_MATCH_DEPOSITORY_HPP
 
 #include <algorithm>
 #include <limits>
@@ -219,3 +231,5 @@ public:
 };
 
 } // namespace emp
+
+#endif // #ifndef EMP_MATCH_DEPOSITORY_HPP

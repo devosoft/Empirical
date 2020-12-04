@@ -1,20 +1,23 @@
-//===- emp/ADT/SmallVector.h - 'Normally small' vectors --------*- C++ -*-===//
-//
-// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
-// See https://emp.org/LICENSE.txt for license information.
-// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-//
-//===----------------------------------------------------------------------===//
-//
-// This file defines the SmallVector class.
-//
-//===----------------------------------------------------------------------===//
+/**
+ *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
+ *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
+ *  @date 2020
+ *
+ *  @file  SmallVector.hpp
+ *  @brief A drop-in replacement for std::vector with optimization to handle
+ *  small vector sizes without dynamic allocation. It contains some number of
+ *  elements in-place, which allows it to avoid heap allocation when the actual
+ *  number of elements is below that threshold. This allows normal "small"
+ *  cases to be fast without losing generality for large inputs.
+ *
+ *  @note Adapted from the LLVM Project, under the Apache License v2.0 with
+ *  LLVM Exceptions. See https://llvm.org/LICENSE.txt for license information.
+ *  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+ */
 
-#ifndef EMP_SMALL_VECTOR_H
-#define EMP_SMALL_VECTOR_H
+#ifndef EMP_SMALL_VECTOR_HPP
+#define EMP_SMALL_VECTOR_HPP
 
-// #include "emp/Support/MathExtras.h"
-// #include "emp/Support/type_traits.h"
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -940,4 +943,4 @@ namespace std {
 
 } // end namespace std
 
-#endif // EMP_SMALL_VECTOR_H
+#endif // EMP_SMALL_VECTOR_HPP
