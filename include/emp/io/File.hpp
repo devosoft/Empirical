@@ -1,15 +1,14 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018-2019
+ *  @date 2018-2020.
  *
  *  @file  File.hpp
  *  @brief The File object maintains a simple, in-memory file.
  *  @note Status: BETA
  *
- *  @todo We need to modify this code to make sure File can also work with Emscripten,
- *        appropriately. Alternatively, we might want to have a more flexible file class
- *        that wraps this one.
+ *  @todo We need to modify this code so that File can work with Emscripten.
+ *        Alternatively, we might want to have a more flexible file class that wraps this one.
  *
  */
 
@@ -168,6 +167,14 @@ namespace emp {
       return *this;
     }
 
+    /// Test if a substring exists on ANY line of a file.
+    bool Contains(const std::string & pattern) const {
+      for (const std::string & line : lines) {
+        if (line.find(pattern) != std::string::npos) return true;
+      }
+      return false;
+    }
+
     /// Convert this file into an std::set of lines (loses line ordering).
     std::set<std::string> AsSet() const {
       std::set<std::string> line_set;
@@ -185,7 +192,7 @@ namespace emp {
       return *this;
     }
 
-    /// Purge functions that don't meet a certain criterion.
+    /// Purge all lines that don't the criterion function.
     File & KeepIf(const std::function<bool(const std::string &)> & fun) {
       emp::vector<std::string> new_lines;
       for (std::string & cur_line : lines) {
@@ -193,6 +200,13 @@ namespace emp {
       }
       std::swap(lines, new_lines);
       return *this;
+    }
+
+    /// Keep only strings that contain a specific substring.
+    File & KeepIfContains(const std::string & pattern) {
+      return KeepIf( 
+        [&pattern](const std::string & line){ return line.find(pattern) != std::string::npos; }
+      );
     }
 
     /// Remove all lines that are empty strings.
