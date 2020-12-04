@@ -17,18 +17,23 @@ TEST_CASE("SmallFifoMap") {
 
   cache.set( 42, "42" );
   REQUIRE( *cache.get( 42 ) == "42" );
+  REQUIRE( cache[ 42 ] == "42" );
   REQUIRE( cache.size() == 1 );
   REQUIRE( !cache.empty() );
 
   cache.set( 101, "101" );
   REQUIRE( *cache.get( 42 ) == "42" );
   REQUIRE( *cache.get( 101 ) == "101" );
+  REQUIRE( cache[ 42 ] == "42" );
+  REQUIRE( cache[ 101 ] == "101" );
   REQUIRE( cache.size() == 2 );
   REQUIRE( !cache.empty() );
 
   cache.set( 12, "12" );
   REQUIRE( *cache.get( 12 ) == "12" );
   REQUIRE( *cache.get( 101 ) == "101" );
+  REQUIRE( cache[ 12 ] == "12" );
+  REQUIRE( cache[ 101 ] == "101" );
   REQUIRE( cache.get( 42 ) == nullptr );
   REQUIRE( cache.size() == 2 );
   REQUIRE( !cache.empty() );

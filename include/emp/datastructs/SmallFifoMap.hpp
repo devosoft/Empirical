@@ -81,16 +81,28 @@ public:
     return const_cast<SmallFifoMap*>(this)->find(key);
   }
 
-  /// Get corresponding value from cache.
+  /// Get corresponding value from cache. Return nullptr if key not in cache.
   Value* get(const Key& key) {
     const auto it = find( key );
     if ( it == end() ) return nullptr;
     return std::addressof( it->second );
   }
 
-  /// Get corresponding value from cache.
+  /// Get corresponding value from cache. Return nullptr if key not in cache.
   Value const* get(const Key& key) const {
     return const_cast<SmallFifoMap*>(this)->get( key );
+  }
+
+  /// Get corresponding value from cache.
+  Value& operator[](const Key& key) {
+    const auto it = find( key );
+    emp_assert( it != end() );
+    return it->second;
+  }
+
+  /// Get corresponding value from cache.
+  const Value& operator[](const Key& key) const {
+    return const_cast<SmallFifoMap*>(this)->operator[]( key );
   }
 
   /// Put a key-value pair in the cache.

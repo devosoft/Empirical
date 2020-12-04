@@ -49,7 +49,7 @@ private:
   emp::SmallFifoMap< query_t, res_t, RawCacheSize > cache_raw;
 
   // Cache of match results with regulation.
-  emp::SmallFifoMap<query_t, res_t, RegulatedCacheSize>cache_regulated;
+  emp::SmallFifoMap< query_t, res_t, RegulatedCacheSize > cache_regulated;
 
   /// Perform matching with regulation.
   res_t DoRegulatedMatch( const query_t& query ) {
