@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2020
  *
- *  @file  AssociativeArrayCache.hpp
+ *  @file  SmallFifoMap.hpp
  *  @brief Store key value pairs in a fixed-sized array, bumping out the oldest
  *  value when full. Optimized for small N. Requires N < 256.
  *
@@ -22,7 +22,7 @@
 namespace emp {
 
 template<class Key, class Value, size_t N>
-class AssociativeArrayCache {
+class SmallFifoMap {
 
   using value_type = std::pair<Key, Value>;
 
@@ -78,7 +78,7 @@ public:
 
   /// Find key-value pair iterator in cache.
   const_iterator find(const Key& key) const {
-    return const_cast<AssociativeArrayCache*>(this)->find(key);
+    return const_cast<SmallFifoMap*>(this)->find(key);
   }
 
   /// Get corresponding value from cache.
@@ -90,7 +90,7 @@ public:
 
   /// Get corresponding value from cache.
   Value const* get(const Key& key) const {
-    return const_cast<AssociativeArrayCache*>(this)->get( key );
+    return const_cast<SmallFifoMap*>(this)->get( key );
   }
 
   /// Put a key-value pair in the cache.

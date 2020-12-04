@@ -3,11 +3,11 @@
 #define CATCH_CONFIG_MAIN
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/datastructs/AssociativeArrayCache.hpp"
+#include "emp/datastructs/SmallFifoMap.hpp"
 
-TEST_CASE("AssociativeArrayCache") {
+TEST_CASE("SmallFifoMap") {
 
-  emp::AssociativeArrayCache<size_t, std::string, 2> cache;
+  emp::SmallFifoMap<size_t, std::string, 2> cache;
 
   REQUIRE( cache.capacity() == 2 );
 

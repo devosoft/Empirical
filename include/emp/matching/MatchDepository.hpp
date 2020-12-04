@@ -15,7 +15,7 @@
 #include <algorithm>
 #include <limits>
 
-#include "../datastructs/AssociativeArrayCache.hpp"
+#include "../datastructs/SmallFifoMap.hpp"
 #include "../datastructs/SmallVector.hpp"
 
 #include "_DepositoryEntry.hpp"
@@ -46,10 +46,10 @@ private:
   emp::vector< emp::internal::DepositoryEntry<Val, tag_t, Regulator> > data;
 
   // Cache of match results without regulation.
-  emp::AssociativeArrayCache< query_t, res_t, RawCacheSize > cache_raw;
+  emp::SmallFifoMap< query_t, res_t, RawCacheSize > cache_raw;
 
   // Cache of match results with regulation.
-  emp::AssociativeArrayCache<query_t, res_t, RegulatedCacheSize>cache_regulated;
+  emp::SmallFifoMap<query_t, res_t, RegulatedCacheSize>cache_regulated;
 
   /// Perform matching with regulation.
   res_t DoRegulatedMatch( const query_t& query ) {
