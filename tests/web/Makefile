@@ -28,7 +28,7 @@ test-color_map: color_map.cpp ../../third-party/Catch/single_include/catch2/catc
 	g++ $(CFLAGS_all) color_map.cpp -o color_map.out
 	./color_map.out
 
-test-GetUrlParams: GetUrlParams.cc
+test-GetUrlParams: GetUrlParams.cpp
 	source ../../third-party/emsdk/emsdk_env.sh; \
 	$(CXX_web) $(CFLAGS_web) $< -o $@.js
 	node $@.js
