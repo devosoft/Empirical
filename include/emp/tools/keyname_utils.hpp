@@ -33,7 +33,7 @@ namespace emp::keyname {
 
   using unpack_t = std::unordered_map<std::string, std::string>;
 
-  std::string pack(const unpack_t & dict) {
+  inline std::string pack(const unpack_t & dict) {
 
     std::map<std::string, std::string> regular, underscore, ext;
 
@@ -73,7 +73,7 @@ namespace emp::keyname {
 
   }
 
-  unpack_t unpack(const std::string & filename) {
+  inline unpack_t unpack(const std::string & filename) {
 
     unpack_t res;
 

@@ -26,6 +26,17 @@ module.exports = function(config) {
       {pattern: 'third-party/node_modules/chai/chai.js'},
       {pattern: 'include/emp/web/d3/d3.min.js'},
       {pattern: 'include/emp/web/d3/d3-tip.min.js'},
+      'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.0/styles/default.min.css',
+      'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.0/highlight.min.js',
+      {pattern: 'include/emp/prefab/HighlightJS.js'},
+      'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js',
+      'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css',
+      'https://cdn.jsdelivr.net/gh/devosoft/Empirical@mastersource/fresh-prefab/DefaultPrefabStyles.less',
+      'https://cdn.jsdelivr.net/npm/less',
+      'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js',
+      {pattern: 'include/emp/prefab/LoadingModal.js'},
+      // TODO: put all prefab dependencies in a directory and link it somehow
+      // {pattern: 'tests/web/CodeBlock/*', included: false},
       {pattern: 'tests/web/assets/*', included: false},
       {pattern: `tests/web/${config.filename}.js.map`, included: false},
       {pattern: `tests/web/${config.filename}.js`},
@@ -75,6 +86,7 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
+    // set this to false to keep the browser window open to interactively debug
     singleRun: true,
 
     // Concurrency level
