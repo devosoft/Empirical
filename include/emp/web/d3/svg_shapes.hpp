@@ -65,7 +65,7 @@ namespace D3 {
 
       s = s.Append("path");
 
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    var sel = js.objects[$0].attr("d", js.objects[$1](js.objects[$2]));
     }, s.GetID(), this->id, data.GetID());
       return s;
@@ -89,7 +89,7 @@ namespace D3 {
   class SymbolGenerator : public SvgShapeGenerator {
   public:
     SymbolGenerator() {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
   	    var new_line = d3.symbol();
   	    js.objects[$0] = new_line;
       }, this->id);
@@ -124,7 +124,7 @@ namespace D3 {
     /// function in the current window, the emp namespace, or the d3 namespace.
     //If size is a constant, it's in pixels, so an int is reasonable
     void SetSize(int size) {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    js.objects[$0].size($1);
 	  }, this->id, size);
     }
@@ -162,7 +162,7 @@ namespace D3 {
     /// If interpolation is "bundle", "cardinal", "cardinal-open", or "cardinal-closed", a tension
     /// parameter is used.
     void SetTension(float tension){
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    js.objects[$0].tension($1);
 	  }, this->id, tension);
     }
@@ -186,7 +186,7 @@ namespace D3 {
   class LineGenerator : public BaseLineGenerator {
   public:
     LineGenerator() {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    var new_line = d3.line();
 	    js.objects[$0] = new_line;
       }, this->id);
@@ -199,7 +199,7 @@ namespace D3 {
     /// will also stack).
     template <typename X_SCALE_TYPE>
     void AddXScale(X_SCALE_TYPE & scale){
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    var scale = js.objects[$1];
 	    var curr_x = js.objects[$0].x();
 
@@ -215,7 +215,7 @@ namespace D3 {
     /// will also stack).
     template <typename Y_SCALE_TYPE>
     void AddYScale(Y_SCALE_TYPE & scale){
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    var scale = js.objects[$1];
 	    var curr_y = js.objects[$0].y();
 
@@ -259,7 +259,7 @@ namespace D3 {
     template <typename T>
     typename std::enable_if<std::is_fundamental<T>::value, void>::type
     SetX(T x) {
-      EM_ASM_ARGS({js.objects[$0].x($1);}, this->id, x);
+      MAIN_THREAD_EM_ASM({js.objects[$0].x($1);}, this->id, x);
     }
 
     // handles C++ functions
@@ -307,7 +307,7 @@ namespace D3 {
     template <typename T>
     typename std::enable_if<std::is_fundamental<T>::value, void>::type
     SetY(T y) {
-      EM_ASM_ARGS({js.objects[$0].y($1);}, this->id, y);
+      MAIN_THREAD_EM_ASM({js.objects[$0].y($1);}, this->id, y);
     }
 
     // handles C++ functions
@@ -325,12 +325,12 @@ namespace D3 {
   public:
     LinkGenerator(std::string type) {
         if (type == "vertical") {
-            EM_ASM_ARGS({js.objects[$0] = d3.linkVertical();}, this->id);
+            MAIN_THREAD_EM_ASM({js.objects[$0] = d3.linkVertical();}, this->id);
         } else if (type == "horizontal") {
-            EM_ASM_ARGS({js.objects[$0] = d3.linkHorizontal();}, this->id);
+            MAIN_THREAD_EM_ASM({js.objects[$0] = d3.linkHorizontal();}, this->id);
         } else {
             std::cout << "WARNING: Invalid link type" << std::endl;
-            EM_ASM_ARGS({js.objects[$0] = d3.linkVertical();}, this->id);
+            MAIN_THREAD_EM_ASM({js.objects[$0] = d3.linkVertical();}, this->id);
         }
     }
 
@@ -344,7 +344,7 @@ namespace D3 {
     template <typename T>
     typename std::enable_if<std::is_fundamental<T>::value, void>::type
     SetSource(T source) {
-      EM_ASM_ARGS({js.objects[$0].source($1);}, this->id, source);
+      MAIN_THREAD_EM_ASM({js.objects[$0].source($1);}, this->id, source);
     }
 
     // handles C++ functions
@@ -367,7 +367,7 @@ namespace D3 {
     template <typename T>
     typename std::enable_if<std::is_fundamental<T>::value, void>::type
     SetY(T target) {
-      EM_ASM_ARGS({js.objects[$0].target($1);}, this->id, target);
+      MAIN_THREAD_EM_ASM({js.objects[$0].target($1);}, this->id, target);
     }
 
     // handles C++ functions
@@ -384,7 +384,7 @@ namespace D3 {
   class AreaGenerator : public LineGenerator {
   public:
     AreaGenerator() {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    var new_line = d3.area();
 	    js.objects[$0] = new_line;
       }, this->id);
@@ -393,13 +393,13 @@ namespace D3 {
     //Handles setting x0 accessor to a constant
     template <typename T>
     void SetX0(T x) {
-      EM_ASM_ARGS({js.objects[$0].x0($1);}, this->id, x);
+      MAIN_THREAD_EM_ASM({js.objects[$0].x0($1);}, this->id, x);
     }
 
     //Handles setting y0 accessor to a constant
     template <typename T>
     void SetY0(T y) {
-      EM_ASM_ARGS({js.objects[$0].y0($1);}, this->id, y);
+      MAIN_THREAD_EM_ASM({js.objects[$0].y0($1);}, this->id, y);
     }
 
     //Handles setting x0 accessor to a function or string
@@ -415,13 +415,13 @@ namespace D3 {
     //Handles setting x1 accessor to a constant
     template <typename T>
     void SetX1(T x) {
-      EM_ASM_ARGS({js.objects[$0].x1($1);}, this->id, x);
+      MAIN_THREAD_EM_ASM({js.objects[$0].x1($1);}, this->id, x);
     }
 
     //Handles setting y1 accessor to a constant
     template <typename T>
     void SetY1(T y) {
-      EM_ASM_ARGS({js.objects[$0].y1($1);}, this->id, y);
+      MAIN_THREAD_EM_ASM({js.objects[$0].y1($1);}, this->id, y);
     }
 
     //Handles setting x1 accessor to a function or string
@@ -438,14 +438,14 @@ namespace D3 {
   class RadialLineGenerator : public BaseLineGenerator {
   public:
     RadialLineGenerator(){
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
   	    var new_line = d3.radialLine();
   	    js.objects[$0] = new_line;
       }, this->id);
     }
 
     void SetRadius(float radius) {
-      EM_ASM_ARGS({js.objects[$0].radius($1);}, this->id, radius);
+      MAIN_THREAD_EM_ASM({js.objects[$0].radius($1);}, this->id, radius);
     }
 
     void SetRadius(std::string radius) {
@@ -453,7 +453,7 @@ namespace D3 {
     }
 
     void SetAngle(float angle) {
-      EM_ASM_ARGS({js.objects[$0].angle($1);}, this->id, angle);
+      MAIN_THREAD_EM_ASM({js.objects[$0].angle($1);}, this->id, angle);
     }
 
     void SetAngle(std::string angle) {
@@ -464,14 +464,14 @@ namespace D3 {
   class RadialAreaGenerator : public RadialLineGenerator {
   public:
     RadialAreaGenerator() {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
      	var new_line = d3.radialArea();
   	    js.objects[$0] = new_line;
       }, this->id);
     }
 
     void SetInnerRadius(float radius) {
-      EM_ASM_ARGS({js.objects[$0].innerRadius($1);}, this->id, radius);
+      MAIN_THREAD_EM_ASM({js.objects[$0].innerRadius($1);}, this->id, radius);
     }
 
     void SetInnerRadius(std::string radius) {
@@ -479,7 +479,7 @@ namespace D3 {
     }
 
     void SetOuterRadius(float radius) {
-      EM_ASM_ARGS({js.objects[$0].outerRadius($1);}, this->id, radius);
+      MAIN_THREAD_EM_ASM({js.objects[$0].outerRadius($1);}, this->id, radius);
     }
 
     void SetOuterRadius(std::string radius) {
@@ -487,7 +487,7 @@ namespace D3 {
     }
 
     void SetStartAngle(float angle) {
-      EM_ASM_ARGS({js.objects[$0].startAngle($1);}, this->id, angle);
+      MAIN_THREAD_EM_ASM({js.objects[$0].startAngle($1);}, this->id, angle);
     }
 
     void SetStartAngle(std::string angle) {
@@ -495,7 +495,7 @@ namespace D3 {
     }
 
     void SetEndAngle(float angle) {
-      EM_ASM_ARGS({js.objects[$0].endAngle($1);}, this->id, angle);
+      MAIN_THREAD_EM_ASM({js.objects[$0].endAngle($1);}, this->id, angle);
     }
 
     void SetEndAngle(std::string angle) {
@@ -506,7 +506,7 @@ namespace D3 {
   class ChordGenerator : public RadialAreaGenerator {
   public:
     ChordGenerator()  {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
     	var new_line = d3.ribbon();
   	    js.objects[$0] = new_line;
       }, this->id);
@@ -514,7 +514,7 @@ namespace D3 {
 
     template <typename T>
     void SetSource(T source) {
-      EM_ASM_ARGS({js.objects[$0].source($1);}, this->id, source);
+      MAIN_THREAD_EM_ASM({js.objects[$0].source($1);}, this->id, source);
     }
 
     void SetSource(std::string source) {
@@ -523,7 +523,7 @@ namespace D3 {
 
     template <typename T>
     void SetTarget(T target) {
-      EM_ASM_ARGS({js.objects[$0].target($1);}, this->id, target);
+      MAIN_THREAD_EM_ASM({js.objects[$0].target($1);}, this->id, target);
     }
 
     void SetTarget(std::string target) {
@@ -534,14 +534,14 @@ namespace D3 {
   class ArcGenerator : public RadialAreaGenerator {
   public:
     ArcGenerator()  {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
   	    var new_line = d3.arc();
   	    js.objects[$0] = new_line;
       }, this->id);
     }
 
     void SetCornerRadius(float radius) {
-      EM_ASM_ARGS({js.objects[$0].cornerRadius($1);}, this->id, radius);
+      MAIN_THREAD_EM_ASM({js.objects[$0].cornerRadius($1);}, this->id, radius);
     }
 
     void SetCornerRadius(std::string radius) {
@@ -549,7 +549,7 @@ namespace D3 {
     }
 
     void SetPadRadius(float radius) {
-      EM_ASM_ARGS({js.objects[$0].padRadius($1);}, this->id, radius);
+      MAIN_THREAD_EM_ASM({js.objects[$0].padRadius($1);}, this->id, radius);
     }
 
     void SetPadRadius(std::string radius) {
@@ -557,7 +557,7 @@ namespace D3 {
     }
 
     void SetPadAngle(float angle) {
-      EM_ASM_ARGS({js.objects[$0].padAngle($1);}, this->id, angle);
+      MAIN_THREAD_EM_ASM({js.objects[$0].padAngle($1);}, this->id, angle);
     }
 
     void SetPadAngle(std::string angle) {

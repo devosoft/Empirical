@@ -1,3 +1,7 @@
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2020.
+//  Released under the MIT Software license; see doc/LICENSE
+
 #define CATCH_CONFIG_MAIN
 
 #include "emp/tools/string_utils.hpp"
@@ -434,4 +438,38 @@ TEST_CASE("Another Test string_utils", "[tools]")
   REQUIRE( quoted_strings[2] == "([{<three>}])" );
 
   REQUIRE( emp::to_titlecase("Harry Potter and the pRisoner of azkaban") == "Harry Potter And The Prisoner Of Azkaban");
+}
+
+TEST_CASE("Test format_string", "[tools]") {
+
+	REQUIRE( emp::format_string("") == "" );
+	REQUIRE( emp::format_string("%s hi", "twee") == "twee hi" );
+	REQUIRE( emp::format_string("a %d b %s", 7, "foo") == "a 7 b foo" );
+
+	const std::string multiline{ R"(
+		my code;
+		%s
+		more code;
+	)" };
+	const std::string replacement{ "foo code;" };
+
+
+	REQUIRE( emp::format_string(multiline, replacement.c_str()) == R"(
+		my code;
+		foo code;
+		more code;
+	)" );
+
+}
+
+TEST_CASE("Test repeat", "[tools]") {
+
+	REQUIRE( emp::repeat("", 0) == "" );
+	REQUIRE( emp::repeat("", 1) == "" );
+	REQUIRE( emp::repeat("", 2) == "" );
+
+	REQUIRE( emp::repeat("abc", 0) == "" );
+	REQUIRE( emp::repeat("abc", 1) == "abc" );
+	REQUIRE( emp::repeat("abc", 2) == "abcabc" );
+
 }

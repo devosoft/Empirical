@@ -31,7 +31,20 @@ namespace web {
     const size_t fun_id = JSWrap(std::forward<FUN_TYPE>(fun), "", true);
     (void) fun_id;
 
-    EM_ASM_ARGS({  $( document ).ready(function() { emp.Callback($0); });  }, fun_id);
+    MAIN_THREAD_EM_ASM({  $( document ).ready(function() { emp.Callback($0); });  }, fun_id);
+  }
+
+  /// Runs the specified function when the document is finished loading.
+  template <typename FUN_TYPE> void OnDocumentLoad(FUN_TYPE && fun) {
+    // const size_t fun_id = JSWrapOnce(fun);
+    const size_t fun_id = JSWrap(std::forward<FUN_TYPE>(fun), "", true);
+    (void) fun_id;
+
+    MAIN_THREAD_EM_ASM({
+        $( window ).on( "load", function() { emp.Callback($0); });
+      },
+      fun_id
+    );
   }
 
   /// Data common to all web events.
@@ -53,8 +66,8 @@ namespace web {
 
     template <int ARG_ID>
     void LoadFromArg() {
-      bubbles = EM_ASM_INT({ return emp_i.cb_args[$0].bubbles; }, ARG_ID);
-      cancelable = EM_ASM_INT({ return emp_i.cb_args[$0].cancelable; }, ARG_ID);
+      bubbles = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].bubbles; }, ARG_ID);
+      cancelable = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].cancelable; }, ARG_ID);
     }
   };
 
@@ -81,16 +94,16 @@ namespace web {
     void LoadFromArg() {
       Event::LoadFromArg<ARG_ID>();
 
-      altKey = EM_ASM_INT({ return emp_i.cb_args[$0].altKey; }, ARG_ID);
-      ctrlKey = EM_ASM_INT({ return emp_i.cb_args[$0].ctrlKey; }, ARG_ID);
-      metaKey = EM_ASM_INT({ return emp_i.cb_args[$0].metaKey; }, ARG_ID);
-      shiftKey = EM_ASM_INT({ return emp_i.cb_args[$0].shiftKey; }, ARG_ID);
-      button = EM_ASM_INT({ return emp_i.cb_args[$0].button; }, ARG_ID);
-      detail = EM_ASM_INT({ return emp_i.cb_args[$0].detail; }, ARG_ID);
-      clientX = EM_ASM_INT({ return emp_i.cb_args[$0].clientX; }, ARG_ID);
-      clientY = EM_ASM_INT({ return emp_i.cb_args[$0].clientY; }, ARG_ID);
-      screenX = EM_ASM_INT({ return emp_i.cb_args[$0].screenX; }, ARG_ID);
-      screenY = EM_ASM_INT({ return emp_i.cb_args[$0].screenY; }, ARG_ID);
+      altKey = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].altKey; }, ARG_ID);
+      ctrlKey = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].ctrlKey; }, ARG_ID);
+      metaKey = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].metaKey; }, ARG_ID);
+      shiftKey = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].shiftKey; }, ARG_ID);
+      button = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].button; }, ARG_ID);
+      detail = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].detail; }, ARG_ID);
+      clientX = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].clientX; }, ARG_ID);
+      clientY = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].clientY; }, ARG_ID);
+      screenX = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].screenX; }, ARG_ID);
+      screenY = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].screenY; }, ARG_ID);
     }
   };
 
@@ -110,12 +123,12 @@ namespace web {
     void LoadFromArg() {
       Event::LoadFromArg<ARG_ID>();
 
-      altKey = EM_ASM_INT({ return emp_i.cb_args[$0].altKey; }, ARG_ID);
-      ctrlKey = EM_ASM_INT({ return emp_i.cb_args[$0].ctrlKey; }, ARG_ID);
-      metaKey = EM_ASM_INT({ return emp_i.cb_args[$0].metaKey; }, ARG_ID);
-      shiftKey = EM_ASM_INT({ return emp_i.cb_args[$0].shiftKey; }, ARG_ID);
-      charCode = EM_ASM_INT({ return emp_i.cb_args[$0].charCode; }, ARG_ID);
-      keyCode = EM_ASM_INT({ return emp_i.cb_args[$0].keyCode; }, ARG_ID);
+      altKey = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].altKey; }, ARG_ID);
+      ctrlKey = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].ctrlKey; }, ARG_ID);
+      metaKey = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].metaKey; }, ARG_ID);
+      shiftKey = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].shiftKey; }, ARG_ID);
+      charCode = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].charCode; }, ARG_ID);
+      keyCode = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].keyCode; }, ARG_ID);
     }
   };
 
@@ -132,10 +145,10 @@ namespace web {
     void LoadFromArg() {
       Event::LoadFromArg<ARG_ID>();
 
-      deltaX = EM_ASM_INT({ return emp_i.cb_args[$0].deltaX; }, ARG_ID);
-      deltaY = EM_ASM_INT({ return emp_i.cb_args[$0].deltaY; }, ARG_ID);
-      deltaZ = EM_ASM_INT({ return emp_i.cb_args[$0].deltaZ; }, ARG_ID);
-      deltaMode = EM_ASM_INT({ return emp_i.cb_args[$0].deltaMode; }, ARG_ID);
+      deltaX = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].deltaX; }, ARG_ID);
+      deltaY = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].deltaY; }, ARG_ID);
+      deltaZ = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].deltaZ; }, ARG_ID);
+      deltaMode = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].deltaMode; }, ARG_ID);
     }
   };
 }

@@ -34,6 +34,8 @@ namespace web {
       // When a name is provided, create an associated Widget info.
       Info()->DoSetTag(in_tag);
     }
+    /// Construct Element from a Widget.
+    Element(const Widget & in) : Div(in) { ; }
   };
 
 }

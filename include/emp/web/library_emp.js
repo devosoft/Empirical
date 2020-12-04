@@ -368,6 +368,7 @@ mergeInto(LibraryManager.library, {
   EMP_Initialize__deps: ['$emp', '$emp_i'],
   EMP_Initialize: function () {
     empCppCallback = Module.cwrap('empCppCallback', null, ['number']);
+    empDoCppCallback = Module.cwrap('empDoCppCallback', null, ['number']);
   },
 
   EMP_GetCBArgCount__deps: ['$emp', '$emp_i'],

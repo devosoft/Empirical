@@ -1,3 +1,7 @@
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2020.
+//  Released under the MIT Software license; see doc/LICENSE
+
 #define CATCH_CONFIG_MAIN
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
@@ -8,8 +12,8 @@
 #include <cereal/types/vector.hpp>
 
 #include "emp/data/DataNode.hpp"
-#include "emp/matchbin/matchbin_utils.hpp"
-#include "emp/matchbin/MatchBin.hpp"
+#include "emp/matching/matchbin_utils.hpp"
+#include "emp/matching/MatchBin.hpp"
 #include "emp/math/Random.hpp"
 
 #include <sstream>
