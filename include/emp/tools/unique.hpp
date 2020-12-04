@@ -1,16 +1,14 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
+ *  @date 2016-2020
  *
- *  @file  flex_function.hpp
- *  @brief A collection of broadly-useful functions (that don't fit elsewhere)
- *  @note Status: BETA (though new functions are added frequently)
+ *  @file  unique.hpp
+ *  @brief Methods to generate UIDs.
  */
 
-
-#ifndef EMP_UNIQUE_H
-#define EMP_UNIQUE_H
+#ifndef EMP_UNIQUE_HPP
+#define EMP_UNIQUE_HPP
 
 #include <functional>
 #include <iostream>
@@ -22,6 +20,7 @@
 #include "../math/constants.hpp"
 
 namespace emp {
+
   /// A function that will always return a unique value (and trip an assert if it can't...)
   static size_t UniqueVal() {
     static size_t val = 0;
@@ -37,8 +36,7 @@ namespace emp {
     ss << prefix << UniqueVal() << postfix;
     return ss.str();
   }
-}
 
+} // namespace emp
 
-
-#endif
+#endif // #ifndef EMP_UNIQUE_HPP
