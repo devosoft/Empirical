@@ -63,7 +63,6 @@
 #include "emp/math/sequence_utils.hpp"
 #include "emp/math/stats.hpp"
 #include "emp/tools/attrs.hpp"
-#include "emp/tools/functions.hpp"
 #include "emp/tools/keyname_utils.hpp"
 #include "emp/tools/string_utils.hpp"
 #include "emp/tools/TypeTracker.hpp"
