@@ -533,8 +533,13 @@ namespace emp {
 
 extern "C" {
 
-/// Dispatches callback sent from the browser thread on the main thread
-/// (whether the browser thread is the main thread or not).
+/// This function is dispatched by empCppCallback. It should be dispatched on
+/// the thread hosting the main Empirical runtime.
+/// If running with Emscripten pthreads, that would be the worker thread hosting
+/// the main Empirical runtime. If not running with Emscripten pthreads, that
+/// would be the main browser thread.
+/// (In a few limited cases when running with Emscripten pthreads, this function
+/// is called on the main browser thread.)
 void empDoCppCallback(const size_t cb_id) {
 
   // Convert the uint passed in from 32 bits to 64 and THEN convert it to a pointer.
@@ -578,8 +583,13 @@ void empDoCppCallback(const size_t cb_id) {
 
 }
 
-/// Once you use JSWrap to create an ID, you can call the wrapped function from Javascript
-/// by supplying CPPCallback with the id and all args.
+/// Once you use JSWrap to create an ID, you can call the wrapped function from
+/// Javascript by supplying CPPCallback with the id and all args.
+/// If running with Emscripten pthreads, this method is to be called from the
+/// DOM and it will forward the call to empDoCppCallback on the web worker
+/// hosting Empirical runtime.
+/// If not running with Emscripten pthreads, this method simply calls
+/// empDoCppCallback (on the main browser thread).
 void empCppCallback(const size_t cb_id) {
 
   #ifndef __EMSCRIPTEN_PTHREADS__
