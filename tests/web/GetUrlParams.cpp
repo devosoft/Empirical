@@ -1,6 +1,7 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2015-2019.
 //  Released under the MIT Software license; see doc/LICENSE
+
 #include <functional>
 
 #include "emp/base/assert.hpp"
@@ -8,7 +9,10 @@
 #include "emp/config/ArgManager.hpp"
 #include "emp/web/init.hpp"
 #include "emp/web/JSWrap.hpp"
+#include "emp/web/NodeDomShim.hpp"
 #include "emp/web/UrlParams.hpp"
+
+const emp::web::NodeDomShim shim;
 
 int main() {
 

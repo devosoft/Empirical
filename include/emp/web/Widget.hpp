@@ -134,6 +134,7 @@ namespace web {
     bool IsTable()    const { return GetInfoTypeName() == "TableInfo"; }
     bool IsText()     const { return GetInfoTypeName() == "TextInfo"; }
     bool IsTextArea() const { return GetInfoTypeName() == "TextAreaInfo"; }
+    bool IsTextFeed() const { return GetInfoTypeName() == "TextFeedInfo"; }
 
     bool IsD3Visualiation() const { return GetInfoTypeName() == "D3VisualizationInfo"; }
 
@@ -273,8 +274,12 @@ namespace web {
 
       // Activate is delayed until the document is ready, when DoActivate will be called.
       virtual void DoActivate(bool top_level=true) {
-        state = Widget::ACTIVE;         // Activate this widget and its children.
-        if (top_level) ReplaceHTML();   // Print full contents to document.
+
+        if ( state != Widget::ACTIVE ) {
+          state = Widget::ACTIVE;
+          if ( top_level ) ReplaceHTML();
+        }
+
       }
 
       virtual bool AppendOK() const { return false; } // Most widgets can't be appended to.
@@ -345,7 +350,7 @@ namespace web {
         else ss << "<span id='" << id << "'></span>";
 
         // Now do the replacement.
-        EM_ASM_ARGS({
+        MAIN_THREAD_EM_ASM({
             var widget_id = UTF8ToString($0);
             var out_html = UTF8ToString($1);
             $('#' + widget_id).replaceWith(out_html);
@@ -436,7 +441,7 @@ namespace web {
   double Widget::GetXPos() {
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       var rect = $('#' + id).position();
       if (rect === undefined) return -1.0;
@@ -447,7 +452,7 @@ namespace web {
   double Widget::GetYPos() {
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       var rect = $('#' + id).position();
       if (rect === undefined) return -1.0;
@@ -458,7 +463,7 @@ namespace web {
   double Widget::GetWidth(){
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       return $('#' + id).width();
     }, GetID().c_str());
@@ -466,7 +471,7 @@ namespace web {
   double Widget::GetHeight(){
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       return $('#' + id).height();
     }, GetID().c_str());
@@ -474,7 +479,7 @@ namespace web {
   double Widget::GetInnerWidth(){
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       return $('#' + id).innerWidth();
     }, GetID().c_str());
@@ -482,7 +487,7 @@ namespace web {
   double Widget::GetInnerHeight(){
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       return $('#' + id).innerHeight();
     }, GetID().c_str());
@@ -490,7 +495,7 @@ namespace web {
   double Widget::GetOuterWidth(){
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       return $('#' + id).outerWidth();
     }, GetID().c_str());
@@ -498,7 +503,7 @@ namespace web {
   double Widget::GetOuterHeight(){
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       return $('#' + id).outerHeight();
     }, GetID().c_str());
@@ -508,6 +513,7 @@ namespace web {
     auto * cur_info = info;
     info->state = WAITING;
     OnDocumentReady( std::function<void(void)>([cur_info](){ cur_info->DoActivate(); }) );
+    OnDocumentLoad( std::function<void(void)>([cur_info](){ cur_info->DoActivate(); }) );
   }
 
   void Widget::Freeze() {

@@ -11,6 +11,8 @@
 #ifndef EMP_RANDOM_UTILS_H
 #define EMP_RANDOM_UTILS_H
 
+#include <functional>
+
 #include "../base/vector.hpp"
 #include "../bits/BitVector.hpp"
 #include "Random.hpp"
@@ -110,6 +112,21 @@ namespace emp {
   inline void RandomizeVector(emp::vector<T> & vals, Random & random, T min, T max) {
     for (T & v : vals) v = (T) random.GetDouble((double) min, (double) max);
   }
+
+  inline size_t CountRngTouches(std::function< void( emp::Random& ) > routine) {
+    emp::Random rand_baseline{ 1 };
+    emp::Random rand_comparison{ 1 };
+
+    routine( rand_baseline );
+    const auto after_routine = rand_baseline.GetUInt();
+
+    size_t count{};
+    while( rand_comparison.GetUInt() != after_routine ) ++count;
+
+    return count;
+
+  }
+
 }
 
 #endif
