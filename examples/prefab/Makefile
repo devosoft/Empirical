@@ -32,6 +32,9 @@ JS_TARGETS := Card.js CodeBlock.js Collapse.js CommentBox.js ConfigPanel.js Font
 CXX := $(CXX_web)
 CFLAGS_web := $(CFLAGS_web_opt)
 
+Card.js: Card.cpp
+	$(CXX_web) $(CFLAGS_web) $< -o $@
+
 %.js: %.cpp
 	$(CXX_web) $(CFLAGS_web) $< -o $@
 
