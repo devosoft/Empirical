@@ -14,6 +14,7 @@ default:
 	$(MAKE) -C io/
 	$(MAKE) -C math/
 	$(MAKE) -C meta/
+	$(MAKE) -C prefab/
 	$(MAKE) -C ProjectTemplate/
 	$(MAKE) -C testing/
 	$(MAKE) -C tools/
@@ -35,6 +36,7 @@ clean:
 	$(MAKE) clean -C io/
 	$(MAKE) clean -C math/
 	$(MAKE) clean -C meta/
+	$(MAKE) clean -C prefab/
 	$(MAKE) clean -C ProjectTemplate/
 	$(MAKE) clean -C testing/
 	$(MAKE) clean -C tools/
@@ -56,12 +58,15 @@ debug:
 	$(MAKE) debug -C io/
 	$(MAKE) debug -C math/
 	$(MAKE) debug -C meta/
+	$(MAKE) debug -C prefab/
 	$(MAKE) debug -C ProjectTemplate/
 	$(MAKE) debug -C testing/
 	$(MAKE) debug -C tools/
 	$(MAKE) debug -C web/
 
 web-test:
+	$(MAKE) debug -C prefab/
+	$(MAKE) -C prefab/
 	$(MAKE) debug -C web/
 	$(MAKE) -C web/
 

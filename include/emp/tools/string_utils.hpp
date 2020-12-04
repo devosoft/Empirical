@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <iterator>
 #include <limits>
+#include <regex>
 #include <memory>
 #include <numeric>
 
@@ -111,6 +112,23 @@ namespace emp {
     return ss.str();
   }
 
+  /// Take a string and replace reserved HTML characters with character entities
+  std::string to_web_safe_string(const std::string & value) {
+    std::string web_safe = value;
+    std::regex apm("[&]");
+    std::regex open_brace("[<]");
+    std::regex close_brace("[>]");
+    std::regex single_quote("[']");
+    std::regex double_quote("[\"]");
+
+    web_safe = std::regex_replace(web_safe, apm, "&amp");
+    web_safe = std::regex_replace(web_safe, open_brace, "&lt");
+    web_safe = std::regex_replace(web_safe, close_brace, "&gt");
+    web_safe = std::regex_replace(web_safe, single_quote, "&apos");
+    web_safe = std::regex_replace(web_safe, double_quote, "&quot");
+
+    return web_safe;
+  }
 
   /// Take a value and convert it to a C++-style literal.
   template <typename T>
@@ -329,17 +347,12 @@ namespace emp {
         value[i] = (char) (value[i] + char_shift);
       }
 
-      if (value[i] == ' ') {
-        next_upper = true;
-      } else {
-        next_upper = false;
-      }
+      next_upper = (value[i] == ' ');
     }
     return value;
   }
 
-
-  // Convert an integer to a roman numeral string.
+  /// Convert an integer to a roman numeral string.
   static inline std::string to_roman_numeral(int val, const std::string & prefix="") {
     std::string ret_string(prefix);
     if (val < 0) ret_string += to_roman_numeral(-val, "-");
@@ -918,6 +931,14 @@ namespace emp {
     return out_val;
   }
 
+  /**
+   * This function returns the values in a vector as a string separated
+   * by a given delimeter.
+   *
+   * @param v a vector
+   * @param join_str delimeter
+   * @return string of vector values
+   */
   template <typename T>
   inline std::string join(const emp::vector<T> & v, std::string join_str) {
 

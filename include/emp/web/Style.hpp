@@ -128,17 +128,17 @@ namespace web {
 #endif
       }
 
-      for (std::string clss : classes) {
+      for (std::string class_ : classes) {
 
 #ifdef EMSCRIPTEN
         EM_ASM_ARGS({
             var name = UTF8ToString($0);
-            emp_i.cur_obj.addClass( name);
-          }, clss.c_str());
+            emp_i.cur_obj.addClass( name );
+          }, class_.c_str());
 #else
-        std::cout << "Adding class to '" << widget_id << "': '" << clss;
+        std::cout << "Adding class to '" << widget_id << "': '" << class_;
 #endif
-        
+
       }
 
     }
