@@ -48,7 +48,7 @@ web-debug: CXX := $(CXX_web)
 web-debug: CFLAGS := $(CFLAGS_web_debug)
 web-debug: all
 
-$(JS_TARGETS): %.js : %.cpp # $(WEB)/%.h
+%.js : %.cpp
 	$(CXX_web) $(CFLAGS_web) $< -o $@
 
 

@@ -50,7 +50,7 @@ native: all
 
 all: $(TARGETS)
 
-$(JS_TARGETS): %.js : %.cpp # $(WEB)/%.h
+%.js : %.cpp
 	$(CXX_web) $(CFLAGS_web) $< -o $@
 
 
