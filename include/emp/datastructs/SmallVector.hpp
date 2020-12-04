@@ -33,9 +33,40 @@
 #include "../base/assert.hpp"
 #include "../math/math.hpp"
 
-#include "AlignedCharArrayUnion.hpp"
-
 namespace emp {
+
+// helpers for AlignedCharArrayUnion
+namespace detail {
+
+template <typename T, typename... Ts> class AlignerImpl {
+  T t;
+  AlignerImpl<Ts...> rest;
+  AlignerImpl() = delete;
+};
+
+template <typename T> class AlignerImpl<T> {
+  T t;
+  AlignerImpl() = delete;
+};
+
+template <typename T, typename... Ts> union SizerImpl {
+  char arr[sizeof(T)];
+  SizerImpl<Ts...> rest;
+};
+
+template <typename T> union SizerImpl<T> { char arr[sizeof(T)]; };
+} // end namespace detail
+
+/// A suitably aligned and sized character array member which can hold elements
+/// of any type.
+///
+/// These types may be arrays, structs, or any other types. This exposes a
+/// `buffer` member which can be used as suitable storage for a placement new of
+/// any of these types.
+template <typename T, typename... Ts> struct AlignedCharArrayUnion {
+  alignas(::emp::detail::AlignerImpl<T, Ts...>) char buffer[sizeof(
+      emp::detail::SizerImpl<T, Ts...>)];
+};
 
 /// This is all the non-templated stuff common to all SmallVectors.
 class SmallVectorBase {
