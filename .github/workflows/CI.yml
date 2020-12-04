@@ -43,6 +43,7 @@ jobs:
         with:
           submodules: 'recursive'
       - run: sudo apt-get install -qq g++-8 cmake build-essential python-pip python-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
+      - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
       - run: make install-test-dependencies
       - name: Run headless test
         uses: GabrielBB/xvfb-action@v1
