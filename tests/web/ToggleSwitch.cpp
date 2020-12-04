@@ -11,7 +11,7 @@
 #include "emp/web/web.hpp"
 #include "emp/web/Div.hpp"
 
-#include "prefab/ToggleSwitch.hpp"
+#include "emp/prefab/ToggleSwitch.hpp"
 
 
 struct Test_ToggleSwitch_init_on : emp::web::BaseTest {
