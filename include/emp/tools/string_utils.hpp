@@ -27,7 +27,6 @@
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../meta/reflection.hpp"
-#include "../meta/StringType.hpp"
 
 namespace emp {
 
@@ -971,6 +970,11 @@ namespace emp {
     return to_english_list(quote_strings(in_strings, quote));
   }
 
+
+  /// Make a string appear bold when printed to the command line.
+  inline std::string to_ansi_bold(const std::string & in_string) {
+    return std::string("\e[1m") + in_string + "\e[0m";
+  }
 }
 
 #endif
