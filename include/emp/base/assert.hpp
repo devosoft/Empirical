@@ -191,14 +191,14 @@ namespace emp {
   /// Base case for assert_print...
   void assert_print() { ; }
 
+  template <int N>
+  constexpr bool is_literal_string(const char (&x)[N]) { return true; }
+  constexpr bool is_literal_string(...) { return false; }
+
   /// Print out information about the next variable and recurse...
   template <typename T, typename... EXTRA>
   void assert_print(std::string name, T && val, EXTRA &&... extra) {
-    if constexpr (std::is_convertible       <decltype(val), const char *>::value &&
-                  !std::is_rvalue_reference <decltype(val)>::value &&
-                  !std::is_pointer          <decltype(val)>::value &&
-                  !std::is_array            <decltype(val)>::value &&
-                  !std::is_class            <decltype(val)>::value) {
+    if (is_literal_string(val)) {
       std::cerr << "MESSAGE: " << val << std::endl;
     } else {
       std::cerr << name << ": [" << val << "]" << std::endl;
