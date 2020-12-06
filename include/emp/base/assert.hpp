@@ -194,7 +194,15 @@ namespace emp {
   /// Print out information about the next variable and recurse...
   template <typename T, typename... EXTRA>
   void assert_print(std::string name, T && val, EXTRA &&... extra) {
-    std::cerr << name << ": [" << val << "]" << std::endl;
+    if constexpr (std::is_convertible       <decltype(val), const char *>::value &&
+                  !std::is_rvalue_reference <decltype(val)>::value &&
+                  !std::is_pointer          <decltype(val)>::value &&
+                  !std::is_array            <decltype(val)>::value &&
+                  !std::is_class            <decltype(val)>::value) {
+      std::cerr << "MESSAGE: " << val << std::endl;
+    } else {
+      std::cerr << name << ": [" << val << "]" << std::endl;
+    }
     assert_print(std::forward<EXTRA>(extra)...);
   }
 
@@ -231,6 +239,11 @@ namespace emp {
 /// Require a specified condition to be true.  If it is false, immediately halt execution.
 /// Print also extra information on any variables or experessions provided as variadic args.
 /// Note: If NDEBUG is defined, emp_assert() will not do anything.
+
+// Developer note: We don't make the first macro arguments "TEST" because we need to ensure
+//                 that something is in the ... for later use (prior to C++20, we can't
+//                 have zero arguments if one is possible.)
+
 #define emp_assert(...)                                                                          \
   do {                                                                                           \
     !(EMP_GET_ARG_1(__VA_ARGS__, ~)) &&                                                          \
