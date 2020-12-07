@@ -52,42 +52,43 @@ namespace emp {
     using field_t = typename emp::uint_bit_count_t<NUM_BITS, size_t>;
 
     // Compile-time constants
-    static constexpr size_t FIELD_BYTES = sizeof(field_t);
-    static constexpr size_t FIELD_BITS = 8 * FIELD_BYTES;
+    static constexpr size_t FIELD_BITS = 8 * sizeof(field_t);
     static constexpr size_t FIELD_LOG2 = emp::Log2(FIELD_BITS);
     static constexpr size_t NUM_FIELDS = (1 + ((NUM_BITS - 1) / FIELD_BITS));
     static constexpr size_t TOTAL_BYTES = 1 + ((NUM_BITS - 1) >> 3);
+    static constexpr size_t LAST_FIELD = NUM_FIELDS - 1;
 
     // Track number of bits in the final field; use 0 if a perfect fit.
     static constexpr size_t NUM_END_BITS = NUM_BITS & (FIELD_BITS - 1);
 
-    static constexpr field_t FIELD_0 = (field_t) 0;        ///< All bits in a field set to 0
-    static constexpr field_t FIELD_1 = (field_t) 1;        ///< Least significant bit set to 1
-    static constexpr field_t FIELD_255 = (field_t) 255;    ///< Least significant 8 bits set to 1
-    static constexpr field_t FIELD_ALL = ~FIELD_0;         ///< All bits in a field set to 1
+    // Mask to use to clear out any end bits that should be zeroes.
+    static constexpr field_t END_MASK = MaskLow<field_t>(NUM_END_BITS);
+
+    static constexpr field_t FIELD_0 = (field_t) 0;      ///< All bits in a field set to 0
+    static constexpr field_t FIELD_1 = (field_t) 1;      ///< Least significant bit set to 1
+    static constexpr field_t FIELD_255 = (field_t) 255;  ///< Least significant 8 bits set to 1
+    static constexpr field_t FIELD_ALL = ~FIELD_0;       ///< All bits in a field set to 1
 
     field_t bit_set[NUM_FIELDS];  ///< Fields to hold the actual bits for this BitSet.
 
-    inline static size_t FieldID(const size_t index) {
-      emp_assert((index >> FIELD_LOG2) < NUM_FIELDS);
-      return index >> FIELD_LOG2;
-    }
+    // Identify the field that a specified bit is in.
+    static size_t FieldID(const size_t index) { return index >> FIELD_LOG2; }
 
-    inline static size_t FieldPos(const size_t index) {
-      return index & (FIELD_BITS - 1);
-    }
+    // Identify the position within a field where a specified bit is.
+    static size_t FieldPos(const size_t index) { return index & (FIELD_BITS - 1); }
 
-    inline static size_t Byte2Field(const size_t index) {
-      return index / FIELD_BYTES;
-    }
+    // Identify which field a specified byte position would be in.
+    static size_t Byte2Field(const size_t index) { return index / sizeof(field_t); }
 
-    inline static size_t Byte2FieldPos(const size_t index) {
-      return FieldPos(index * 8);
-    }
+    // Convert a byte position in BitVector to a byte position in the target field.
+    static size_t Byte2FieldPos(const size_t index) { return FieldPos(index * 8); }
 
-    inline void Copy(const field_t in_set[NUM_FIELDS]) {
-      std::memcpy(bit_set, in_set, sizeof(bit_set));
-    }
+    // Copy an array of bits into this BitSet (internal use only!)
+    void Copy(const field_t in_set[NUM_FIELDS]) { std::memcpy(bit_set, in_set, sizeof(bit_set)); }
+
+    // Any bits past the last "real" bit in the last field should be kept as zeros.
+    void ClearExcessBits() { if constexpr (NUM_END_BITS) bit_set[LAST_FIELD] &= END_MASK; }
+
 
     /// Helper: call SHIFT with positive number instead
     void ShiftLeft(const size_t shift_size) {
@@ -103,7 +104,7 @@ namespace emp {
 
       // Loop through each field, from L to R, and update it.
       if (field_shift) {
-        for (int i = (int) NUM_FIELDS - 1; i >= field_shift; --i) {
+        for (int i = (int) LAST_FIELD; i >= field_shift; --i) {
           bit_set[i] = bit_set[i - field_shift];
         }
         for (int i = field_shift - 1; i >= 0; i--) bit_set[i] = 0;
@@ -111,7 +112,7 @@ namespace emp {
 
       // account for bit_shift
       if (bit_shift) {
-        for (int i = (int) NUM_FIELDS - 1; i > field_shift; --i) {
+        for (int i = (int) LAST_FIELD; i > field_shift; --i) {
           bit_set[i] <<= bit_shift;
           bit_set[i] |= (bit_set[i-1] >> bit_overflow);
         }
@@ -120,7 +121,7 @@ namespace emp {
       }
 
       // Mask out any bits that have left-shifted away
-      if (NUM_END_BITS) { bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(NUM_END_BITS); }
+      if (NUM_END_BITS) { bit_set[LAST_FIELD] &= MaskLow<field_t>(NUM_END_BITS); }
     }
 
 
@@ -150,11 +151,11 @@ namespace emp {
 
       // account for bit_shift
       if (bit_shift) {
-        for (size_t i = 0; i < (NUM_FIELDS - 1 - field_shift); ++i) {
+        for (size_t i = 0; i < (LAST_FIELD - field_shift); ++i) {
           bit_set[i] >>= bit_shift;
           bit_set[i] |= (bit_set[i+1] << bit_overflow);
         }
-        bit_set[NUM_FIELDS - 1 - field_shift] >>= bit_shift;
+        bit_set[LAST_FIELD - field_shift] >>= bit_shift;
       }
     }
 
@@ -209,7 +210,7 @@ namespace emp {
 
         // if necessary, shift filler bits out of the middle
         if constexpr ((bool)NUM_END_BITS) {
-          const int filler_idx = (NUM_FIELDS - 1 + field_shift) % NUM_FIELDS;
+          const int filler_idx = (LAST_FIELD + field_shift) % NUM_FIELDS;
           for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
             bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
             bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
@@ -220,13 +221,13 @@ namespace emp {
         if (bit_shift) {
 
           const field_t keystone = NUM_END_BITS ? (
-            (bit_set[NUM_FIELDS - 1] << (FIELD_BITS - NUM_END_BITS))
+            (bit_set[LAST_FIELD] << (FIELD_BITS - NUM_END_BITS))
             | (bit_set[NUM_FIELDS - 2] >> NUM_END_BITS)
           ) : (
-            bit_set[NUM_FIELDS - 1]
+            bit_set[LAST_FIELD]
           );
 
-          for (int i = NUM_FIELDS - 1; i > 0; --i) {
+          for (int i = LAST_FIELD; i > 0; --i) {
             bit_set[i] <<= bit_shift;
             bit_set[i] |= (bit_set[i-1] >> bit_overflow);
           }
@@ -240,7 +241,7 @@ namespace emp {
 
       // Mask out filler bits
       if constexpr ((bool)NUM_END_BITS) {
-        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(NUM_END_BITS);
+        bit_set[LAST_FIELD] &= MaskLow<field_t>(NUM_END_BITS);
       }
 
     }
@@ -287,7 +288,7 @@ namespace emp {
 
         // if necessary, shift filler bits out of the middle
         if constexpr ((bool)NUM_END_BITS) {
-          const int filler_idx = NUM_FIELDS - 1 - field_shift;
+          const int filler_idx = LAST_FIELD - field_shift;
           for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
             bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
             bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
@@ -307,18 +308,18 @@ namespace emp {
             bit_set[NUM_FIELDS-1] |= bit_set[0] << NUM_END_BITS;
           }
 
-          for (size_t i = 0; i < NUM_FIELDS - 1; ++i) {
+          for (size_t i = 0; i < LAST_FIELD; ++i) {
             bit_set[i] >>= bit_shift;
             bit_set[i] |= (bit_set[i+1] << bit_overflow);
           }
-          bit_set[NUM_FIELDS - 1] >>= bit_shift;
-          bit_set[NUM_FIELDS - 1] |= keystone << bit_overflow;
+          bit_set[LAST_FIELD] >>= bit_shift;
+          bit_set[LAST_FIELD] |= keystone << bit_overflow;
         }
       }
 
       // Mask out filler bits
       if constexpr ((bool)NUM_END_BITS) {
-        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(NUM_END_BITS);
+        bit_set[LAST_FIELD] &= MaskLow<field_t>(NUM_END_BITS);
       }
 
     }
@@ -445,7 +446,7 @@ namespace emp {
 
       // mask out filler bits
       if constexpr (static_cast<bool>(NUM_END_BITS)) {
-        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(NUM_END_BITS);
+        bit_set[LAST_FIELD] &= MaskLow<field_t>(NUM_END_BITS);
       }
 
       return *this;
@@ -609,10 +610,10 @@ namespace emp {
       // Mask out filler bits if necessary
       if constexpr (static_cast<bool>(NUM_END_BITS)) {
         // we only need to do this
-        // if (index * 32 == (NUM_FIELDS - 1) * FIELD_BITS)
+        // if (index * 32 == LAST_FIELD * FIELD_BITS)
         // but just doing it always is probably faster
         // check to make sure there are no leading ones in the unused bits
-        emp_assert((bit_set[NUM_FIELDS - 1] & ~MaskLow<field_t>(NUM_END_BITS)) == 0);
+        emp_assert((bit_set[LAST_FIELD] & ~MaskLow<field_t>(NUM_END_BITS)) == 0);
       }
 
     }
@@ -680,10 +681,10 @@ namespace emp {
       // Mask out filler bits if necessary
       if constexpr (static_cast<bool>(NUM_END_BITS)) {
         // we only need to do this
-        // if (index * 64 == (NUM_FIELDS - 1) * FIELD_BITS)
+        // if (index * 64 == LAST_FIELD * FIELD_BITS)
         // but just doing it always is probably faster
         // check to make sure there are no leading ones in the unused bits
-        emp_assert((bit_set[NUM_FIELDS - 1] & ~MaskLow<field_t>(NUM_END_BITS)) == 0);
+        emp_assert((bit_set[LAST_FIELD] & ~MaskLow<field_t>(NUM_END_BITS)) == 0);
       }
 
 
@@ -752,7 +753,7 @@ namespace emp {
     void SetAll() {
       std::memset(bit_set, 255, sizeof(bit_set));;
       if constexpr (static_cast<bool>(NUM_END_BITS)) {
-        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(NUM_END_BITS);
+        bit_set[LAST_FIELD] &= MaskLow<field_t>(NUM_END_BITS);
       }
     }
 
@@ -861,7 +862,7 @@ namespace emp {
     BitSet NOT() const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~bit_set[i];
-      if (NUM_END_BITS > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(NUM_END_BITS);
+      if (NUM_END_BITS > 0) out_set.bit_set[LAST_FIELD] &= MaskLow<field_t>(NUM_END_BITS);
       return out_set;
     }
 
@@ -883,7 +884,7 @@ namespace emp {
     BitSet NAND(const BitSet & set2) const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-      if (NUM_END_BITS > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(NUM_END_BITS);
+      if (NUM_END_BITS > 0) out_set.bit_set[LAST_FIELD] &= MaskLow<field_t>(NUM_END_BITS);
       return out_set;
     }
 
@@ -891,7 +892,7 @@ namespace emp {
     BitSet NOR(const BitSet & set2) const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-      if (NUM_END_BITS > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(NUM_END_BITS);
+      if (NUM_END_BITS > 0) out_set.bit_set[LAST_FIELD] &= MaskLow<field_t>(NUM_END_BITS);
       return out_set;
     }
 
@@ -906,7 +907,7 @@ namespace emp {
     BitSet EQU(const BitSet & set2) const {
       BitSet out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-      if (NUM_END_BITS > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(NUM_END_BITS);
+      if (NUM_END_BITS > 0) out_set.bit_set[LAST_FIELD] &= MaskLow<field_t>(NUM_END_BITS);
       return out_set;
     }
 
@@ -914,7 +915,7 @@ namespace emp {
     /// Perform a Boolean NOT on this BitSet, store result here, and return this object.
     BitSet & NOT_SELF() {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
-      if (NUM_END_BITS > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(NUM_END_BITS);
+      if (NUM_END_BITS > 0) bit_set[LAST_FIELD] &= MaskLow<field_t>(NUM_END_BITS);
       return *this;
     }
 
@@ -933,14 +934,14 @@ namespace emp {
     /// Perform a Boolean NAND with a second BitSet, store result here, and return this object.
     BitSet & NAND_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-      if (NUM_END_BITS > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(NUM_END_BITS);
+      if (NUM_END_BITS > 0) bit_set[LAST_FIELD] &= MaskLow<field_t>(NUM_END_BITS);
       return *this;
     }
 
     /// Perform a Boolean NOR with a second BitSet, store result here, and return this object.
     BitSet & NOR_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-      if (NUM_END_BITS > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(NUM_END_BITS);
+      if (NUM_END_BITS > 0) bit_set[LAST_FIELD] &= MaskLow<field_t>(NUM_END_BITS);
       return *this;
     }
 
@@ -953,7 +954,7 @@ namespace emp {
     /// Perform a Boolean EQU with a second BitSet, store result here, and return this object.
     BitSet & EQU_SELF(const BitSet & set2) {
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-      if (NUM_END_BITS > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(NUM_END_BITS);
+      if (NUM_END_BITS > 0) bit_set[LAST_FIELD] &= MaskLow<field_t>(NUM_END_BITS);
       return *this;
     }
 
@@ -1071,7 +1072,7 @@ namespace emp {
 
         // if necessary, shift filler bits out of the middle
         if constexpr ((bool)NUM_END_BITS) {
-          const int filler_idx = (NUM_FIELDS - 1 + field_shift) % NUM_FIELDS;
+          const int filler_idx = (LAST_FIELD + field_shift) % NUM_FIELDS;
           for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
             bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
             bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
@@ -1082,13 +1083,13 @@ namespace emp {
         if (bit_shift) {
 
           const field_t keystone = NUM_END_BITS ? (
-            (bit_set[NUM_FIELDS - 1] << (FIELD_BITS - NUM_END_BITS))
+            (bit_set[LAST_FIELD] << (FIELD_BITS - NUM_END_BITS))
             | (bit_set[NUM_FIELDS - 2] >> NUM_END_BITS)
           ) : (
-            bit_set[NUM_FIELDS - 1]
+            bit_set[LAST_FIELD]
           );
 
-          for (int i = NUM_FIELDS - 1; i > 0; --i) {
+          for (int i = LAST_FIELD; i > 0; --i) {
             bit_set[i] <<= bit_shift;
             bit_set[i] |= (bit_set[i-1] >> bit_overflow);
           }
@@ -1102,7 +1103,7 @@ namespace emp {
 
       // mask out filler bits
       if constexpr ((bool)NUM_END_BITS) {
-        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(NUM_END_BITS);
+        bit_set[LAST_FIELD] &= MaskLow<field_t>(NUM_END_BITS);
       }
 
       return *this;
@@ -1145,7 +1146,7 @@ namespace emp {
 
         // if necessary, shift filler bits out of the middle
         if constexpr ((bool)NUM_END_BITS) {
-          constexpr int filler_idx = NUM_FIELDS - 1 - field_shift;
+          constexpr int filler_idx = LAST_FIELD - field_shift;
           for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
             bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
             bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
@@ -1165,18 +1166,18 @@ namespace emp {
             bit_set[NUM_FIELDS-1] |= bit_set[0] << NUM_END_BITS;
           }
 
-          for (size_t i = 0; i < NUM_FIELDS - 1; ++i) {
+          for (size_t i = 0; i < LAST_FIELD; ++i) {
             bit_set[i] >>= bit_shift;
             bit_set[i] |= (bit_set[i+1] << bit_overflow);
           }
-          bit_set[NUM_FIELDS - 1] >>= bit_shift;
-          bit_set[NUM_FIELDS - 1] |= keystone << bit_overflow;
+          bit_set[LAST_FIELD] >>= bit_shift;
+          bit_set[LAST_FIELD] |= keystone << bit_overflow;
         }
       }
 
       // mask out filler bits
       if constexpr ((bool)NUM_END_BITS) {
-        bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(NUM_END_BITS);
+        bit_set[LAST_FIELD] &= MaskLow<field_t>(NUM_END_BITS);
       }
 
       return *this;
