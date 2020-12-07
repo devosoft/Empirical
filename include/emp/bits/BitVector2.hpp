@@ -21,6 +21,7 @@
  *  @todo Think about how itertors should work for BitVector.  It should probably go bit-by-bit,
  *        but there are very few circumstances where that would be useful.  Going through the
  *        positions of all ones would be more useful, but perhaps less intuitive.
+ *  @todo Port Rotate() over from BitSet.
  *
  *  @note This class is 15-20% slower than emp::BitSet, but more flexible & run-time configurable.
  */
@@ -56,13 +57,12 @@ namespace emp {
     using field_t = size_t;
 
     // Compile-time constants
-    static constexpr size_t FIELD_BYTES = sizeof(field_t); ///< Number of bytes in a field
-    static constexpr size_t FIELD_BITS = FIELD_BYTES*8;    ///< Number of bits in a field
+    static constexpr size_t FIELD_BITS = sizeof(field_t)*8; ///< Number of bits in a field
 
-    static constexpr field_t FIELD_0 = (field_t) 0;        ///< All bits in a field set to 0
-    static constexpr field_t FIELD_1 = (field_t) 1;        ///< Least significant bit set to 1
-    static constexpr field_t FIELD_255 = (field_t) 255;    ///< Least significant 8 bits set to 1
-    static constexpr field_t FIELD_ALL = ~FIELD_0;         ///< All bits in a field set to 1
+    static constexpr field_t FIELD_0 = (field_t) 0;         ///< All bits in a field set to 0
+    static constexpr field_t FIELD_1 = (field_t) 1;         ///< Least significant bit set to 1
+    static constexpr field_t FIELD_255 = (field_t) 255;     ///< Least significant 8 bits set to 1
+    static constexpr field_t FIELD_ALL = ~FIELD_0;          ///< All bits in a field set to 1
 
     size_t num_bits;        ///< Total number of bits are we using
     Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
@@ -83,18 +83,16 @@ namespace emp {
     static constexpr size_t FieldPos(const size_t index) { return index & (FIELD_BITS-1); }
 
     // Identify which field a specified byte position would be in.
-    static constexpr size_t Byte2Field(const size_t index) { return index / FIELD_BYTES; }
+    static constexpr size_t Byte2Field(const size_t index) { return index / sizeof(field_t); }
 
     // Convert a byte position in BitVector to a byte position in the target field.
-    static constexpr size_t Byte2FieldPos(const size_t index) {
-      return (index & (FIELD_BYTES-1)) << 3;
-    }
+    static constexpr size_t Byte2FieldPos(const size_t index) { return FieldPos(index * 8); }
 
     // Assume that the size of the bits has already been adjusted to be the size of the one
     // being copied and only the fields need to be copied over.
     void RawCopy(const Ptr<field_t> in);
 
-    // Any bits past the last "real" on in the last field should be kept as zeros.
+    // Any bits past the last "real" bit in the last field should be kept as zeros.
     void ClearExcessBits() {
       if (NumEndBits() > 0) bits[NumFields() - 1] &= MaskLow<field_t>(NumEndBits());
     }
@@ -405,22 +403,25 @@ namespace emp {
   }
 
   void BitVector::ShiftLeft(const size_t shift_size) {
+    // If we are shifting out of range, clear the bits and stop.
+    if (shift_size >= num_bits) { Clear(); return; }
+
     const size_t field_shift = shift_size / FIELD_BITS;
     const size_t bit_shift = shift_size % FIELD_BITS;
     const size_t bit_overflow = FIELD_BITS - bit_shift;
-    const size_t NUM_FIELDS = NumFields();
+    const size_t LAST_FIELD = NumFields() - 1;
 
     // Loop through each field, from L to R, and update it.
     if (field_shift) {
-      for (size_t i = NUM_FIELDS; i > field_shift; --i) {
-        bits[i-1] = bits[i - field_shift - 1];
+      for (size_t i = LAST_FIELD; i >= field_shift; --i) {
+        bits[i] = bits[i - field_shift];
       }
       for (size_t i = field_shift; i > 0; --i) bits[i-1] = 0;
     }
 
     // account for bit_shift
     if (bit_shift) {
-      for (size_t i = NUM_FIELDS - 1; i > field_shift; --i) {
+      for (size_t i = LAST_FIELD; i > field_shift; --i) {
         bits[i] <<= bit_shift;
         bits[i] |= (bits[i-1] >> bit_overflow);
       }
@@ -433,6 +434,9 @@ namespace emp {
   }
 
   void BitVector::ShiftRight(const size_t shift_size) {
+    // If we are shifting out of range, clear the bits and stop.
+    if (shift_size >= num_bits) { Clear(); return; }
+
     const size_t field_shift = shift_size / FIELD_BITS;
     const size_t bit_shift = shift_size % FIELD_BITS;
     const size_t bit_overflow = FIELD_BITS - bit_shift;
