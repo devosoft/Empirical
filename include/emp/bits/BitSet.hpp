@@ -31,7 +31,9 @@
 #include "../meta/type_traits.hpp"
 #include "../tools/functions.hpp"
 #include "../polyfill/span.hpp"
+
 #include "bitset_utils.hpp"
+#include "_bitset_helpers.hpp"
 
 namespace emp {
 
@@ -43,6 +45,8 @@ namespace emp {
     template <size_t FRIEND_BITS> friend class BitSet;
 
   private:
+    using this_t = BitSet<NUM_BITS>;
+
     // Determine the size of the fields to use.  By default, size_t will be the natural size for
     // the machine; exact fits in other sizes may also allow for skipping zeroing out extra bits.
     using field_t = typename emp::uint_bit_count_t<NUM_BITS, size_t>;
@@ -63,32 +67,6 @@ namespace emp {
     static constexpr field_t FIELD_ALL = ~FIELD_0;         ///< All bits in a field set to 1
 
     field_t bit_set[NUM_FIELDS];  ///< Fields to hold the actual bits for this BitSet.
-
-    /// BitProxy lets us use operator[] on with BitSet as an lvalue.
-    class BitProxy {
-    private:
-      BitSet<NUM_BITS> & bit_set;  ///< BitSet object that this proxy refers to.
-      size_t index;                ///< Position in BitSet the this proxy refers to.
-    public:
-      BitProxy(BitSet<NUM_BITS> & _set, size_t _idx) : bit_set(_set), index(_idx) {
-        emp_assert(_idx < bit_set.size());
-      }
-
-      /// Set the bit value that this proxy refers to.
-      BitProxy & operator=(bool b) {    // lvalue handling...
-        bit_set.Set(index, b);
-        return *this;
-      }
-
-      /// Convert BitProxy to a regular boolean value.
-      operator bool() const {            // rvalue handling...
-        return bit_set.Get(index);
-      }
-
-      /// Flip this bit.
-      BitProxy & Toggle() { bit_set.Toggle(index); return *this; }
-    };
-    friend class BitProxy;
 
     inline static size_t FieldID(const size_t index) {
       emp_assert((index >> FIELD_LOG2) < NUM_FIELDS);
@@ -765,7 +743,7 @@ namespace emp {
     bool operator[](size_t index) const { return Get(index); }
 
     /// Index into a BitSet, returning a proxy that will allow bit assignment to work.
-    BitProxy operator[](size_t index) { return BitProxy(*this, index); }
+    BitProxy<this_t> operator[](size_t index) { return BitProxy<this_t>(*this, index); }
 
     /// Set all bits to zero.
     void Clear() { std::memset(bit_set, 0, sizeof(bit_set)); }
