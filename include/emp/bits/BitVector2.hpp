@@ -37,7 +37,9 @@
 #include "../base/vector.hpp"
 #include "../math/math.hpp"
 #include "../tools/functions.hpp"
+
 #include "bitset_utils.hpp"
+#include "_bitset_helpers.hpp"
 
 namespace emp {
 
@@ -68,52 +70,11 @@ namespace emp {
     /// Num bits used in partial field at the end; 0 if perfect fit.
     size_t NumEndBits() const { return num_bits & (FIELD_BITS - 1); }
 
-    /// How many feilds do we need?
+    /// How many feilds do we need for the current set of bits?
     size_t NumFields() const { return num_bits ? (1 + ((num_bits - 1) / FIELD_BITS)) : 0; }
 
-    /// How many bytes are used in the current vector (round up to whole bytes.)
+    /// How many bytes are used for the current set of bits? (rounded up!)
     size_t NumBytes()  const { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
-
-    /// BitProxy lets us use operator[] on with BitVector as an lvalue.
-    class BitProxy {
-    private:
-      BitVector & bit_vector;  ///< Which BitVector does this proxy belong to?
-      size_t index;            ///< Which position in the bit vector does this proxy point at?
-
-      // Helper functions.
-      inline bool Get() const { return bit_vector.Get(index); }
-      inline BitProxy & Set(bool b) { bit_vector.Set(index, b); return *this; }
-      inline BitProxy & Toggle() { bit_vector.Toggle(index); return *this; }
-      inline BitProxy & SetIf(bool test, bool b) { if (test) Set(b); return *this; }
-      inline BitProxy & ToggleIf(bool test) { if (test) Toggle(); return *this; }
-
-    public:
-      /// Setup a new proxy with the associated vector and index.
-      BitProxy(BitVector & _v, size_t _idx) : bit_vector(_v), index(_idx) {;}
-
-      /// Assignment operator to the bit associated with this proxy (as an lvalue).
-      BitProxy & operator=(bool b) { return Set(b); }
-
-      /// Conversion of this proxy to Boolean (as an rvalue)
-      operator bool() const { return Get(); }
-
-      // Compound assignement operators with BitProxy as the lvalue.
-      BitProxy & operator &=(bool b) { return SetIf(!b, 0); }
-      BitProxy & operator *=(bool b) { return SetIf(!b, 0); }
-      BitProxy & operator |=(bool b) { return SetIf(b, 1); }
-      BitProxy & operator +=(bool b) { return SetIf(b, 1); }
-      BitProxy & operator -=(bool b) { return SetIf(b, 0); }
-
-      /// Compound assignement operator XOR using BitProxy as lvalue.
-      BitProxy & operator ^=(bool b) { return ToggleIf(b); }
-
-      /// Compound assignement operator DIV using BitProxy as lvalue.
-      /// @note Never use this function except for consistency in a template since must divide by 1.
-      BitProxy & operator /=(bool b) {
-        emp_assert(b == true, "BitVector Division by Zero error.");
-        return *this;
-      }
-    }; // --- End of BitProxy
 
     // Identify the field that a specified bit is in.
     static constexpr size_t FieldID(const size_t index)  { return index / FIELD_BITS; }
@@ -203,7 +164,7 @@ namespace emp {
     bool operator[](size_t index) const { return Get(index); }
 
     /// Index operator -- return a proxy to the bit at the specified position so it can be an lvalue.
-    BitProxy operator[](size_t index) { return BitProxy(*this, index); }
+    BitProxy<BitVector> operator[](size_t index) { return BitProxy<BitVector>(*this, index); }
 
     /// Change every bit in the sequence.
     BitVector & Toggle() { return NOT_SELF(); }
