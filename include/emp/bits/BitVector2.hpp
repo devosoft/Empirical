@@ -37,6 +37,7 @@
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../math/math.hpp"
+#include "../math/Random.hpp"
 #include "../tools/functions.hpp"
 
 #include "bitset_utils.hpp"
@@ -115,6 +116,9 @@ namespace emp {
 
     /// Move constructor of existing bit field.
     BitVector(BitVector && in);
+
+    /// Initializer list constructor.
+    template <typename T> BitVector(const std::initializer_list<T> l);
 
     /// Copy, but with a resize.
     BitVector(const BitVector & in, size_t new_size);
@@ -509,6 +513,16 @@ namespace emp {
 
     in.bits = nullptr;
     in.num_bits = 0;
+  }
+
+  /// Initializer list constructor.
+  template <typename T>
+  BitVector::BitVector(const std::initializer_list<T> l) : num_bits(l.size()), bits(nullptr) {
+    if (num_bits) bits = NewArrayPtr<field_t>(NumFields());
+
+    size_t idx = 0;
+    for (auto i = std::rbegin(l); i != std::rend(l); ++i) Set(idx++, *i);
+    ClearExcessBits();
   }
 
   /// Copy, but with a resize.
