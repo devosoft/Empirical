@@ -1578,37 +1578,37 @@ TEST_CASE("Another Test BitSet", "[bits]")
 
 }
 
-TEST_CASE("Test BitSet timing", "[bits]")
-{
-  const size_t set_size = 100000;
-  typedef emp::BitSet<set_size> TEST_TYPE;
+// TEST_CASE("Test BitSet timing", "[bits]")
+// {
+//   const size_t set_size = 100000;
+//   typedef emp::BitSet<set_size> TEST_TYPE;
 
-  TEST_TYPE set1;
-  TEST_TYPE set2;
+//   TEST_TYPE set1;
+//   TEST_TYPE set2;
 
-  for (size_t i = 0; i < set_size; i++) {
-    if (!(i%2) && (i%5)) set1[i] = 1;
-    if (!(i%3) && (i%7)) set2.Set(i, true);
-  }
+//   for (size_t i = 0; i < set_size; i++) {
+//     if (!(i%2) && (i%5)) set1[i] = 1;
+//     if (!(i%3) && (i%7)) set2.Set(i, true);
+//   }
 
-  // TIMING!!!!!
-  std::clock_t emp_start_time = std::clock();
+//   // TIMING!!!!!
+//   std::clock_t emp_start_time = std::clock();
 
-  TEST_TYPE set3(set1 & set2);
-  TEST_TYPE set4 = (set1 | set2);
-  size_t total = 0;
+//   TEST_TYPE set3(set1 & set2);
+//   TEST_TYPE set4 = (set1 | set2);
+//   size_t total = 0;
 
-  // should probably assert that this does what we want it to do...
-  for (size_t i = 0; i < 100000; i++) {
-    set3 |= (set4 << 3);
-    set4 &= (set3 >> 3);
-    auto set5 = set3 & set4;
-    total += set5.CountOnes();
-  }
+//   // should probably assert that this does what we want it to do...
+//   for (size_t i = 0; i < 100000; i++) {
+//     set3 |= (set4 << 3);
+//     set4 &= (set3 >> 3);
+//     auto set5 = set3 & set4;
+//     total += set5.CountOnes();
+//   }
 
-  std::clock_t emp_tot_time = std::clock() - emp_start_time;
-  double time = 1000.0 * ((double) emp_tot_time) / (double) CLOCKS_PER_SEC;
-  //REQUIRE(time < 13000); // WARNING: WILL VARY ON DIFFERENT SYSTEMS
+//   std::clock_t emp_tot_time = std::clock() - emp_start_time;
+//   double time = 1000.0 * ((double) emp_tot_time) / (double) CLOCKS_PER_SEC;
+//   REQUIRE(time < 13000); // WARNING: WILL VARY ON DIFFERENT SYSTEMS
 
-  // END TIMING!!!
-}
+//   // END TIMING!!!
+// }
