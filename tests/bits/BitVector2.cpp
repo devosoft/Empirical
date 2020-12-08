@@ -69,7 +69,6 @@ TEST_CASE("Test BitVector", "[bits]")
 
 	// Count Ones
 	REQUIRE((bv2.CountOnes() == 9));
-	REQUIRE((bv2.CountOnes_Mixed() == 9));
 	REQUIRE((bv2.CountOnes_Sparse() == 9));
 	REQUIRE((bv2.count() == 9));
 
@@ -332,9 +331,34 @@ TEST_CASE("Another Test BitVector", "[bits]")
 
 }
 
+TEST_CASE("Test range of BitVector constructors.", "[bits]") {
+  // test list initializer
+  {
+    emp::BitVector bs_empty{0,0,0};
+    emp::BitVector bs_first{1,0,0};
+    emp::BitVector bs_last{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1};
+    emp::BitVector bs_two{0,0,1,0,0,0,0,0,0,0,1,0,0};
+    emp::BitVector bs_full{1,1,1,1,1,1,1,1};
+
+    REQUIRE(bs_empty.CountOnes() == 0);
+    REQUIRE(bs_first.CountOnes() == 1);
+    REQUIRE(bs_last.CountOnes() == 1);
+    REQUIRE(bs_two.CountOnes() == 2);
+    REQUIRE(bs_full.CountOnes() == 8);
+
+    REQUIRE(bs_empty.GetSize() == 3);
+    REQUIRE(bs_first.GetSize() == 3);
+    REQUIRE(bs_last.GetSize() == 25);
+    REQUIRE(bs_two.GetSize() == 13);
+    REQUIRE(bs_full.GetSize() == 8);
+  }
+
+}
+
 TEST_CASE("BitVector padding bits protected", "[bits]") {
 #ifdef TDEBUG
 
+  emp::assert_clear();
   for (size_t i = 1; i < 32; ++i) {
 
     emp::BitVector vec(i);
