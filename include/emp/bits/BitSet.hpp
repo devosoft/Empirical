@@ -119,20 +119,10 @@ namespace emp {
     /// Constructor to fill in a bit set from a vector.
     template <typename T>
     BitSet(const std::initializer_list<T> l) {
-      // TODO: should we enforce the initializer list to be the same length as the bitset?
-      // emp_assert(l.size() == NUM_BITS);
-
-      // check that initializer list isn't longer than bitset
-      emp_assert(l.size() <= NUM_BITS);
-
+      emp_assert(l.size() <= NUM_BITS, "Initializer longer than BitSet", l.size(), NUM_BITS);
       Clear();
-
-      size_t idx = 0;
-      for (auto i = std::rbegin(l); i != std::rend(l); ++i) {
-        Set(idx, *i);
-        ++idx;
-      }
-
+      auto it = std::rbegin(l); // Right-most bit is position 0.
+      for (size_t idx = 0; idx < NUM_BITS; ++idx) Set(idx, (idx < l.size()) && *it++);
     }
 
     /// Destructor.
@@ -545,6 +535,13 @@ namespace emp {
     /// Print all bits to the provided output stream.
     void Print(std::ostream & out=std::cout) const {
       for (size_t i = NUM_BITS; i > 0; i--) { out << Get(i-1); }
+
+      // out << "/";
+      // for (size_t i = NUM_BITS; i < NUM_FIELDS * FIELD_BITS; i++) {
+      //   const size_t field_id = FieldID(i);
+      //   const size_t pos_id = FieldPos(i);
+      //   out << ((bit_set[field_id] & (((field_t)1U) << pos_id)) != 0);
+      // }
     }
 
     /// Print all bits from smallest to largest, as if this were an array, not a bit representation.
