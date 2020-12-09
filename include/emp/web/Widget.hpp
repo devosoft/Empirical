@@ -35,8 +35,9 @@
 
 #include <string>
 
-#include "../base/vector.hpp"
 #include "../base/errors.hpp"
+#include "../base/vector.hpp"
+#include "../control/Signal.hpp"
 #include "../debug/mem_track.hpp"
 
 #include "events.hpp"
@@ -78,9 +79,12 @@ namespace web {
   /// Widget is effectively a smart pointer to a WidgetInfo object, plus some basic accessors.
   class Widget {
     friend internal::WidgetInfo; friend internal::DivInfo; friend internal::TableInfo;
-  public:
+  protected:
     using WidgetInfo = internal::WidgetInfo;
     WidgetInfo * info;                        ///< Information associated with this widget.
+
+    /// If an Append doesn't work with current class, forward it to the parent and try there.
+    template <typename FWD_TYPE> Widget & ForwardAppend(FWD_TYPE && arg);
 
     /// Set the information associated with this widget.
     Widget & SetInfo(WidgetInfo * in_info);
@@ -134,6 +138,7 @@ namespace web {
     bool IsTable()    const { return GetInfoTypeName() == "TableInfo"; }
     bool IsText()     const { return GetInfoTypeName() == "TextInfo"; }
     bool IsTextArea() const { return GetInfoTypeName() == "TextAreaInfo"; }
+    bool IsTextFeed() const { return GetInfoTypeName() == "TextFeedInfo"; }
 
     bool IsD3Visualiation() const { return GetInfoTypeName() == "D3VisualizationInfo"; }
 
@@ -221,6 +226,7 @@ namespace web {
       emp::vector<Widget> dependants; ///< Widgets to be refreshed if this one is triggered
       Widget::ActivityState state;    ///< Is this element active in DOM?
 
+      emp::Signal<void()> on_update_js_signal; /// Signal for JavaScript functions to be called with TriggerJS()
 
       /// WidgetInfo cannot be built unless within derived class, so constructor is protected
       WidgetInfo(const std::string & in_id="")
@@ -273,8 +279,12 @@ namespace web {
 
       // Activate is delayed until the document is ready, when DoActivate will be called.
       virtual void DoActivate(bool top_level=true) {
-        state = Widget::ACTIVE;         // Activate this widget and its children.
-        if (top_level) ReplaceHTML();   // Print full contents to document.
+
+        if ( state != Widget::ACTIVE ) {
+          state = Widget::ACTIVE;
+          if ( top_level ) ReplaceHTML();
+        }
+
       }
 
       virtual bool AppendOK() const { return false; } // Most widgets can't be appended to.
@@ -332,7 +342,14 @@ namespace web {
       virtual void GetHTML(std::stringstream & ss) = 0;
 
       // Derived widgets may also provide JavaScript code to be run on redraw.
-      virtual void TriggerJS() { ; }
+      virtual void TriggerJS() {
+        on_update_js_signal.Trigger();
+      }
+
+      // Add JS function to be executed when TriggerJS() is called
+      SignalKey RegisterUpdateJS(const std::function<void()> &fun){
+        return on_update_js_signal.AddAction(fun);
+      }
 
       // Assume that the associated ID exists and replace it with the current HTML code.
       virtual void ReplaceHTML() {
@@ -345,7 +362,7 @@ namespace web {
         else ss << "<span id='" << id << "'></span>";
 
         // Now do the replacement.
-        EM_ASM_ARGS({
+        MAIN_THREAD_EM_ASM({
             var widget_id = UTF8ToString($0);
             var out_html = UTF8ToString($1);
             $('#' + widget_id).replaceWith(out_html);
@@ -436,7 +453,7 @@ namespace web {
   double Widget::GetXPos() {
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       var rect = $('#' + id).position();
       if (rect === undefined) return -1.0;
@@ -447,7 +464,7 @@ namespace web {
   double Widget::GetYPos() {
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       var rect = $('#' + id).position();
       if (rect === undefined) return -1.0;
@@ -458,7 +475,7 @@ namespace web {
   double Widget::GetWidth(){
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       return $('#' + id).width();
     }, GetID().c_str());
@@ -466,7 +483,7 @@ namespace web {
   double Widget::GetHeight(){
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       return $('#' + id).height();
     }, GetID().c_str());
@@ -474,7 +491,7 @@ namespace web {
   double Widget::GetInnerWidth(){
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       return $('#' + id).innerWidth();
     }, GetID().c_str());
@@ -482,7 +499,7 @@ namespace web {
   double Widget::GetInnerHeight(){
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       return $('#' + id).innerHeight();
     }, GetID().c_str());
@@ -490,7 +507,7 @@ namespace web {
   double Widget::GetOuterWidth(){
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       return $('#' + id).outerWidth();
     }, GetID().c_str());
@@ -498,7 +515,7 @@ namespace web {
   double Widget::GetOuterHeight(){
     if (!info) return -1.0;
     emp_assert(GetID() != "");  // Must have a name!
-    return EM_ASM_DOUBLE({
+    return MAIN_THREAD_EM_ASM_DOUBLE({
       var id = UTF8ToString($0);
       return $('#' + id).outerHeight();
     }, GetID().c_str());
@@ -508,6 +525,7 @@ namespace web {
     auto * cur_info = info;
     info->state = WAITING;
     OnDocumentReady( std::function<void(void)>([cur_info](){ cur_info->DoActivate(); }) );
+    OnDocumentLoad( std::function<void(void)>([cur_info](){ cur_info->DoActivate(); }) );
   }
 
   void Widget::Freeze() {
@@ -574,9 +592,9 @@ namespace web {
         if (IsActive()) Style::Apply(info->id, setting, value);
       }
 
-      virtual void DoCSS(const std::string & clss) {
-        info->extras.style.AddClass(clss);
-        if (IsActive()) Style::ApplyClass(info->id, clss);
+      virtual void DoCSS(const std::string & class_) {
+        info->extras.style.AddClass(class_);
+        if (IsActive()) Style::ApplyClass(info->id, class_);
       }
 
       /// Attr-related options may be overridden in derived classes that have multiple attributes.
@@ -585,6 +603,13 @@ namespace web {
         info->extras.attr.DoSet(setting, value);
         if (IsActive()) Attributes::Apply(info->id, setting, value);
       }
+
+      /// New attribute value will be appended to any existing values for this widget, not overridden.
+      virtual void DoAddAttr(const std::string attr, const std::string & value){
+        info->extras.attr.DoAddAttr(attr, value);
+        if (IsActive()) Attributes::Apply(info->id, attr, info->extras.attr.GetAttrValue(attr));
+      }
+
       /// Listener options may be overridden in derived classes that have multiple listen targets.
       /// By default DoListen will track new listens and set them up immediately, if active.
       virtual void DoListen(const std::string & event_name, size_t fun_id) {
@@ -595,6 +620,11 @@ namespace web {
     public:
       using return_t = RETURN_TYPE;
 
+      std::string GetHTML(){
+        std::stringstream ss;
+        info->GetHTML(ss);
+        return ss.str();
+      }
       /// Set a specific CSS value for this widget.
       template <typename SETTING_TYPE>
       return_t & SetCSS(const std::string & setting, SETTING_TYPE && value) {
@@ -618,6 +648,23 @@ namespace web {
                         OTHER_SETTINGS... others) {
         SetCSS(setting1, val1);                      // Set the first CSS value.
         return SetCSS(setting2, val2, others...);    // Recurse to the others.
+      }
+
+      /// Add more than one value to an attribute.
+      template <typename T>
+      return_t & AddAttr(const std::string attr, T && value){
+        emp_assert(info != nullptr);
+        DoAddAttr(attr, emp::to_string(value));
+        return (return_t &) *this;
+      }
+
+      /// Multiple Attributes can be added to simultaneously.
+      template <typename T1, typename T2, typename... OTHER_SETTINGS>
+      return_t & AddAttr(const std::string & setting1, T1 && val1,
+                            const std::string & setting2, T2 && val2,
+                            OTHER_SETTINGS... others) {
+        AddAttr(setting1, val1);                      // Set the first CSS value.
+        return AddAttr(setting2, val2, others...);    // Recurse to the others.
       }
 
       /// Multiple Attributes can be provided simultaneously.
@@ -663,9 +710,9 @@ namespace web {
       }
 
       /// Provide an event and a function that will be called when that event is triggered.
-      /// In this case, the function takes a mouse event as an argument, with full info about mouse.
+      /// In this case, the function takes a keyboard event as an argument, with full info about keyboard.
       return_t & On(const std::string & event_name,
-                    const std::function<void(MouseEvent evt)> & fun) {
+                    const std::function<void(KeyboardEvent evt)> & fun) {
         emp_assert(info != nullptr);
         size_t fun_id = JSWrap(fun);
         DoListen(event_name, fun_id);
@@ -673,9 +720,9 @@ namespace web {
       }
 
       /// Provide an event and a function that will be called when that event is triggered.
-      /// In this case, the function takes a keyboard event as an argument, with full info about keyboard.
+      /// In this case, the function takes a mouse event as an argument, with full info about mouse.
       return_t & On(const std::string & event_name,
-                    const std::function<void(KeyboardEvent evt)> & fun) {
+                    const std::function<void(MouseEvent evt)> & fun) {
         emp_assert(info != nullptr);
         size_t fun_id = JSWrap(fun);
         DoListen(event_name, fun_id);
@@ -886,17 +933,17 @@ namespace web {
           // switch out parent's existing child for wrapper
           parent_info->RemoveChild((return_t &) *this);
           parent_info->AddChild(wrapper);
-        } else if (Info(wrapper)->ptr_count == 1) {
-          emp::LibraryWarning(
-            "Only one reference held to wrapper. ",
-            "It will be destroyed when it goes out of scope."
-          );
         }
 
         // put this Widget inside of the wrapper
         wrapper << (return_t &) *this;
 
         return (return_t &) *this;
+      }
+
+      // Add JS function to on_update_js_sig
+      SignalKey RegisterUpdateJS(const std::function<void()> & fun){
+        return info->RegisterUpdateJS(fun);
       }
 
     };

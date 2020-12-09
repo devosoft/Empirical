@@ -114,6 +114,7 @@ namespace web {
     // Setup a quick way to retrieve old widgets by name.
     web::Button Button (const std::string & in_id) { return web::Button(Find(in_id)); }
     web::Canvas Canvas (const std::string & in_id) { return web::Canvas(Find(in_id)); }
+    web::Element Element (const std::string & in_id) { return web::Element(Find(in_id)); }
     web::FileInput FileInput (const std::string & in_id) { return web::FileInput(Find(in_id)); }
     web::Input Input (const std::string & in_id) { return web::Input(Find(in_id)); }
     web::Image Image (const std::string & in_id) { return web::Image(Find(in_id)); }

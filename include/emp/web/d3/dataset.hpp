@@ -26,7 +26,7 @@ namespace D3 {
     Dataset(int i) : D3_Base(i) {;};
 
     void CaptureIncoming(){
-        EM_ASM({js.objects[$0] = emp.__incoming_data;}, this->id);
+        MAIN_THREAD_EM_ASM({js.objects[$0] = emp.__incoming_data;}, this->id);
     };
 
     template <typename T>
@@ -34,7 +34,7 @@ namespace D3 {
     Min(T comp) {
         uint32_t fun_id = emp::JSWrap(comp, "", false);
 
-        double min = EM_ASM_DOUBLE({
+        double min = MAIN_THREAD_EM_ASM_DOUBLE({
           return d3.min(js.objects[$0], function(d) {return emp.Callback($1, d);});
         }, this->id, fun_id);
 
@@ -48,7 +48,7 @@ namespace D3 {
     Max(T comp) {
         uint32_t fun_id = emp::JSWrap(comp, "", false);
 
-        double max = EM_ASM_DOUBLE({
+        double max = MAIN_THREAD_EM_ASM_DOUBLE({
           return d3.max(js.objects[$0], function(d) {return emp.Callback($1, d);});
         }, this->id, fun_id);
 
@@ -68,11 +68,11 @@ namespace D3 {
 
     JSONDataset(int i) : Dataset(i) {;}
     JSONDataset() {
-      EM_ASM_ARGS({js.objects[$0] = [];}, this->id);
+      MAIN_THREAD_EM_ASM({js.objects[$0] = [];}, this->id);
 
       //Useful function for dealing with nested JSON data structures
       //Assumes nested objects are stored in an array called children
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         //Inspired by Niels' answer to
         //http://stackoverflow.com/questions/12899609/how-to-add-an-object-to-a-nested-javascript-object-using-a-parent-id/37888800#37888800
         js.objects[$0] = function(root, id) {
@@ -97,7 +97,7 @@ namespace D3 {
     };
 
     void LoadDataFromFile(std::string filename) {
-      EM_ASM_ARGS ({
+      MAIN_THREAD_EM_ASM ({
         d3.json(UTF8ToString($1), function(data){js.objects[$0]=data;});
       }, id, filename.c_str());
     }
@@ -106,7 +106,7 @@ namespace D3 {
     void LoadDataFromFile(std::string filename, std::function<void(DATA_TYPE)> fun) {
       emp::JSWrap(fun, "__json_load_fun__"+emp::to_string(id));
 
-      EM_ASM_ARGS ({
+      MAIN_THREAD_EM_ASM ({
         d3.json(UTF8ToString($1), function(data){
             js.objects[$0]=data;
             emp["__json_load_fun__"+$0](data);
@@ -117,7 +117,7 @@ namespace D3 {
     void LoadDataFromFile(std::string filename, std::function<void(void)> fun) {
       emp::JSWrap(fun, "__json_load_fun__"+emp::to_string(id));
       std::cout << filename.c_str() << std::endl;
-      EM_ASM_ARGS ({
+      MAIN_THREAD_EM_ASM ({
         var filename = UTF8ToString($1);
         d3.json(filename, function(data){
             js.objects[$0]=data;
@@ -129,14 +129,14 @@ namespace D3 {
 
 
     void Append(std::string json) {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         js.objects[$0].push(JSON.parse(UTF8ToString($1)));
       }, this->id, json.c_str());
     }
 
     void AppendNested(std::string json) {
 
-      int fail = EM_ASM_INT({
+      int fail = MAIN_THREAD_EM_ASM_INT({
 
         var obj = JSON.parse(UTF8ToString($2));
 
@@ -162,7 +162,7 @@ namespace D3 {
     //Appends into large trees can be sped up by maintaining a list of
     //possible parent nodes
     int AppendNestedFromList(std::string json, JSObject & options) {
-      int pos = EM_ASM_INT({
+      int pos = MAIN_THREAD_EM_ASM_INT({
         var parent_node = null;
         var pos = -1;
         var child_node = JSON.parse(UTF8ToString($1));
@@ -193,7 +193,7 @@ namespace D3 {
 
 
     void LoadDataFromFile(std::string location, std::string callback, bool header=true) {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         var acc = function(d){
             return ([+d[0], +d[1]]);
         };
@@ -235,7 +235,7 @@ namespace D3 {
     /// Put the last row of the array into arr
     template <std::size_t N, typename T>
     void GetLastRow(emp::array<T, N> & arr) {
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
         emp_i.__outgoing_array = js.objects[$0][js.objects[$0].length - 1];
       }, GetID());
       emp::pass_array_to_cpp(arr);
