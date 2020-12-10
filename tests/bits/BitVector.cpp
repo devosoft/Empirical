@@ -317,7 +317,6 @@ TEST_CASE("Test BitVector", "[bits]")
 	REQUIRE(bv_g.Get(0));
 	REQUIRE(bv_g.Get(1));
 	REQUIRE(bv_g.Get(2));
-	std::cout << bv_g.Get(0) << bv_g.Get(1) << bv_g.Get(2) << std::endl;
 	REQUIRE(bv_g.size() == 3);
 
 	bv_g.Insert(1, true);
@@ -325,7 +324,6 @@ TEST_CASE("Test BitVector", "[bits]")
 	REQUIRE(bv_g.Get(2));
 	REQUIRE(bv_g.Get(1));
 	REQUIRE(bv_g.Get(0));
-	std::cout << bv_g.Get(0) << bv_g.Get(1) << bv_g.Get(2) << bv_g.Get(3) << std::endl;
 	REQUIRE(bv_g.size() == 4);
 
 	bv_g.Insert(1, false);
