@@ -14,6 +14,19 @@
 #include <limits>
 #include <ratio>
 
+TEST_CASE("Benchmark BitVector Inserts", "[bits]"){
+	emp::BitVector bv(0);
+	bv.Insert(0, true, 4096);
+	std::cout << "Bit Magic Insert: ";
+	EMP_VOID_FUNCTION_TIMER([&bv](){
+		for ( size_t i = 1; i <= std::mega::num; ++i ) {
+			auto bv1 = bv;
+			bv1.Insert(1, false);
+			//bv.PopBack();
+		}
+	}());
+}
+
 TEST_CASE("Test BitVector", "[bits]")
 {
 	// Constructor
@@ -32,15 +45,19 @@ TEST_CASE("Test BitVector", "[bits]")
 	// Assignment operator
 	emp::BitVector bv1(10);
 	bv1 = bv;
+	REQUIRE(bv1 == bv);
 	REQUIRE(bv1.Get(0));
 	emp::BitVector bv20(20);
 	emp::BitVector bv30(30);
 	bv20.Set(1);
 	REQUIRE(bv20.Get(1));
 	bv20 = bv;
+	REQUIRE(bv20 == bv);
+	REQUIRE(bv20.size()==bv.size());
 	REQUIRE(!bv20.Get(1));
 	bv20 = bv30;
 	REQUIRE(!bv20.Get(1));
+	REQUIRE(bv20 == bv30);
 
 	// Resize
 	bv1.Set(9);
@@ -261,76 +278,81 @@ TEST_CASE("Test BitVector", "[bits]")
 	bv_f <<= 1;
 	REQUIRE(bv_f.none());
 
+	// Test Mask_High, Mask_Low
+	emp::BitVector a(0);
+	//a.Insert(0,true, 7);
+	for (int i = 0; i < 3; i++)
+		a.PushBack(true);
+	a.PushBack(false);
+	REQUIRE(a.Get(0));
+	REQUIRE(a.Get(1));
+	REQUIRE(a.Get(2));
+	REQUIRE(!a.Get(3));
+	emp::BitVector b = a;
+	emp::BitVector c = a;
+	b.Mask_High(0);
+	c.Mask_Low(1);
+	REQUIRE(b.Get(1));
+	REQUIRE(!b.Get(0));
+	REQUIRE(b.Get(2));
+	//REQUIRE(!b.Get(2));
+	REQUIRE(c.Get(0));
+	REQUIRE(!c.Get(1));
+	REQUIRE(!c.Get(2));
+	//REQUIRE(!c.Get(7));
+
 	// Pop Back and Push Back
 	emp::BitVector bv_g(0);
-	bv_g.PushBack(false);
+	bv_g.PushBack(true);
 	bv_g.PushBack(true);
 	bv_g.PushBack(false);
-	REQUIRE(!bv_g.Get(0));
+	REQUIRE(bv_g.Get(0));
 	REQUIRE(bv_g.Get(1));
 	REQUIRE(!bv_g.PopBack());
-	REQUIRE(bv_g.PopBack());
-	REQUIRE(bv_g.size() == 1);
+	//REQUIRE(bv_g.PopBack());
+	REQUIRE(bv_g.size() == 2);
 
 	// Insert and Delete
-	bv_g.Insert(1, false);
-	REQUIRE(bv_g.size() == 2);
-	bv_g.Insert(1, true, 3);
-	REQUIRE(!bv_g.Get(0));
+	bv_g.Insert(1, true);
+	REQUIRE(bv_g.Get(0));
 	REQUIRE(bv_g.Get(1));
 	REQUIRE(bv_g.Get(2));
-	REQUIRE(!bv_g.Get(4));
+	std::cout << bv_g.Get(0) << bv_g.Get(1) << bv_g.Get(2) << std::endl;
+	REQUIRE(bv_g.size() == 3);
+
+	bv_g.Insert(1, true);
+	REQUIRE(bv_g.Get(3));
+	REQUIRE(bv_g.Get(2));
+	REQUIRE(bv_g.Get(1));
+	REQUIRE(bv_g.Get(0));
+	std::cout << bv_g.Get(0) << bv_g.Get(1) << bv_g.Get(2) << bv_g.Get(3) << std::endl;
+	REQUIRE(bv_g.size() == 4);
+
+	bv_g.Insert(1, false);
+	REQUIRE(bv_g.Get(0));
+	REQUIRE(!bv_g.Get(1));
+	REQUIRE(bv_g.Get(2));
+	REQUIRE(bv_g.Get(3));
 
 	bv_g.Delete(0);
 	REQUIRE(bv_g.size() == 4);
-	REQUIRE(bv_g.Get(0));
+	REQUIRE(!bv_g.Get(0));
 	bv_g.Delete(1, 2);
 	REQUIRE(bv_g.size() == 2);
-	REQUIRE(!bv_g.Get(1));
+	REQUIRE(bv_g.Get(1));
 
-	// Test Mask_High, Mask_Low, Insert2
-	emp::BitVector a(0);
-	a.Insert(0,true, 7);
-	REQUIRE(a.Get(3));
-	emp::BitVector b = a;
-	emp::BitVector c = a;
-	b.Mask_High(3);
-	c.Mask_Low(3);
-	REQUIRE(b.Get(4));
-	REQUIRE(c.Get(2));
-	REQUIRE(!b.Get(3));
-	REQUIRE(!c.Get(3));
-	a.Insert2(4, false);
-	REQUIRE(!a.Get(4));
-	a.Insert2(4, true, 2);
-	REQUIRE(a.Get(4));
-	REQUIRE(a.Get(5));
-}
-
-TEST_CASE("Benchmark BitVector Inserts", "[bits]"){
-	emp::BitVector bv(10);
-	bv.Insert(0, true, 2);
-	std::cout << "Set/Get Insert: ";
-	EMP_VOID_FUNCTION_TIMER([&bv](){
-		for ( size_t i = 1; i <= std::mega::num; ++i ) {
-			auto bv1 = bv;
-			bv1.Insert(1, false);
-			//bv.PopBack();
-		}
-	}());
-	// REQUIRE(bv.size() == std::mega::num + 2);
-
-	emp::BitVector bv2(10);
-	bv2.Insert(0, true, 2);
-	std::cout << "BitMagic Insert: ";
-	EMP_VOID_FUNCTION_TIMER([&bv2](){
-		for ( size_t i = 1; i <= std::mega::num; ++i ) {
-			auto bv3 = bv2;
-			bv3.Insert2(1, false);
-			//bv2.PopBack();
-		}
-	}());
-	// REQUIRE(bv2.size() == std::mega::num + 1);
+	emp::BitVector zo(1);
+	zo.PushBack(true);
+	zo.PushBack(true);
+	zo.PushBack(false);
+	zo.PushBack(true);
+	emp::BitVector * zo_ptr = &zo;
+	thread_local emp::BitVector z1 = *zo_ptr;
+	z1 = *zo_ptr;
+	emp::BitVector z2 = *zo_ptr;
+	REQUIRE(zo == z1);
+	REQUIRE(zo == z2);
+	REQUIRE(z2 == z1);
 }
 
 TEST_CASE("Another Test BitVector", "[bits]")
