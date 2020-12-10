@@ -298,7 +298,6 @@ namespace emp {
       }
 
       if (num_bits) RawCopy(in_set.bit_set);
-
       return *this;
     }
 
@@ -717,24 +716,13 @@ namespace emp {
         Set(num_bits-1, bit);
     }
 
-    /// Insert bits into vector, including middle using Set()
-    void Insert(size_t index, bool value=true, size_t num=1) {
-      Resize(num_bits + num);
-      for (size_t j = num_bits - 1; j >= index + num; j--) {
-        Set(j, Get(j - num));
-      }
-      for (size_t i = index; i < index + num; i++) {
-        Set(i, value);
-      }
-    }
-
     // Returns mask that keeps bits higher than index
     void Mask_High(size_t index) {
       size_t field_id = FieldID(index);
       int field_t_bits = sizeof(bit_set[0]) * 8;
       for (size_t i = 0; i < field_id; i++)
         bit_set[i] = 0;
-      if (index < num_bits) 
+      if (index >= 0)
         bit_set[field_id] &= (MaskLow<field_t>((num_bits - index - 1) % field_t_bits) << (index + 1));
     }
 
@@ -744,21 +732,23 @@ namespace emp {
       int field_t_bits = sizeof(bit_set[0]) * 8;
       for (size_t i = field_id + 1; i < NumFields(); i++)
         bit_set[i] = 0;
-      if (index > 0)
+      if (index < num_bits)
         bit_set[field_id] &= MaskLow<field_t>(index % field_t_bits);
     }
 
     /// Insert bits into vector, including middle using bitmagic
     /// https://devolab.org/?p=2249
-    void Insert2(size_t index, bool value=true, size_t num=1) {
+    void Insert(size_t index, bool value=true, size_t num=1) {
       Resize(num_bits + num);
       // mask high and shift left: 101101 -> 1010000
-      thread_local BitVector a = *this;
-      if (index == 0)
-        a.Mask_High(index - 1);
-      a.ShiftLeft(num);
+      thread_local BitVector a{};
+      a = *this;
+      if (index > 0)
+        a.Mask_High(index + num - 2);
+      a <<= num;
       // mask low and | together 101101 -> 000101 ->1010101
-      thread_local BitVector b = *this;
+      thread_local BitVector b{};
+      b = *this;
       b.Mask_Low(index);
       a |= b;
       // set specified bits -> 1010101 -> 101_101
@@ -766,6 +756,7 @@ namespace emp {
         a.Set(i, value);
       }
       std::swap(a, *this);
+
     }
 
     /// Delete bits from vector, including middle
