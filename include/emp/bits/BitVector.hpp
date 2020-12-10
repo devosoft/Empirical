@@ -37,7 +37,6 @@
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../math/math.hpp"
-#include "../tools/functions.hpp"
 #include "bitset_utils.hpp"
 
 namespace emp {

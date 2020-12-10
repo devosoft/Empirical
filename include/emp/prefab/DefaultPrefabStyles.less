@@ -1,0 +1,139 @@
+/*
+ * These are the default styles for prefab elements. You can
+ * override any of these settings in your own CSS file as long
+ * as it's linked after the this default CSS file in the
+ * head of the HTML document.
+ *
+ * Using LESS CSS in this file. It uses syntax very similar to
+ * CSS, but allows us to reduce duplicate code by adding variables
+ * and compound classes (mixins). More cool features of LESS can 
+ * be found here: http://lesscss.org/
+ *
+ * NOTE: If you modify this file, run the purge_script.sh script
+ * to see your changes take effect in the browser.
+ * (Empirical/include/emp/prefab/purge_script.sh)
+ */
+
+@CardHeaderTextColor: #3a3939;
+@CardHeaderHoverColor: #C0C0C0;
+@CommentBoxColor: #ede9e8;
+
+/* Glyphicon Toggle */
+.collapse_toggle[aria-expanded=true] .fa-angle-double-down {
+  display: none;
+}
+.collapse_toggle[aria-expanded=true] .fa-angle-double-right {
+  display: none;
+}
+.collapse_toggle[aria-expanded=false] .fa-angle-double-up {
+  display: none;
+}
+.toggle_icon_right_margin {
+  margin-right: 10px;
+}
+
+.collapse_toggle {
+  .fa:hover {
+    text-decoration: underline;
+  }
+}
+
+.toggle_glyph {
+  .collapse_toggle();
+  .setting_heading();
+  float: right;
+}
+
+/* Card */
+.card{
+  margin-bottom: 10px;
+}
+
+/* Card Header */
+.setting_heading{
+  color: @CardHeaderTextColor;
+}
+
+/* Change background of card header on hover to convey collapsibility */
+.collapse_toggle_card_header:hover {
+  background-color: @CardHeaderHoverColor;
+}
+
+/* Card Body */
+.setting_element {
+  width: 100%;
+}
+.title_area {
+  width: 38%;
+  display: inline-block;
+}
+.btn {
+  text-align: left;
+}
+/* Form Inputs */
+.input_slider {
+  width: 38%;
+  margin-right: 10px;
+}
+.input_number {
+  width: 18%;
+  right: 10px;
+}
+.input_text {
+  width: 57%;
+}
+.input_bool {
+  width: 12%;
+  float: right;
+}
+
+/* Comment Box */
+.commentbox_triangle {
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+
+  border-bottom: 12px solid @CommentBoxColor;
+  margin-left: 15px;
+}
+.commentbox_content {
+  padding: 10px;
+  background-color: @CommentBoxColor;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  width: 95%;
+}
+.mobile_commentbox {
+  display: none;
+}
+
+/* Loading modal  */
+.bd-example-modal-lg .modal-dialog {
+  display: table;
+  position: relative;
+  margin: 0 auto;
+  top: calc(50% - 24px);
+}
+
+.bd-example-modal-lg .modal-dialog .modal-content {
+  background-color: transparent;
+  border: none;
+}
+
+/* Mobile Version */
+@media screen and (max-width: 992px) {
+  .input_slider {
+      display: none;
+  }
+  /* Dropdown Bubble */
+  .mobile_commentbox {
+      display: inline;
+  }
+  .title_area {
+      width: 80%;
+  }
+  .input_bool {
+      width: 18%;
+  }
+}

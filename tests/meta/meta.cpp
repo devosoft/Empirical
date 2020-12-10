@@ -82,3 +82,8 @@ TEST_CASE("Test meta-programming helpers (meta.h)", "[meta]")
 	REQUIRE( emp::CombineHash(2,3,4) == 0x4f2bc6c1c6c76 );
 
 }
+
+TEST_CASE("Test GetSize", "[meta]") {
+  int some_ints[] = {1, 2, 4, 8};
+  REQUIRE(emp::GetSize(some_ints) == 4);
+}

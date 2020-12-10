@@ -43,7 +43,7 @@ namespace emp {
     const value_t & GetFunction(size_t id) const { return fun_set[id]; }
 
     /// Remove all contents on this DynamicString
-    DynamicString & Clear() { fun_set.resize(0); return *this; }
+    DynamicString & Clear() { fun_set.clear(); return *this; }
 
     /// Convert to an std::string.
     std::string str() {

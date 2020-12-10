@@ -68,8 +68,8 @@ demos/NK/web/NK.js.mem
 
 doc/doxygen/
 examples/*/*
-!examples/*/*.cc
-!examples/*/*.h
+!examples/*/*.cpp
+!examples/*/*.hpp
 !examples/*/*.html
 !examples/*/images
 !examples/*/Makefile
@@ -86,4 +86,3 @@ third-party/doxygen/
 third-party/emsdk/
 build/
 doc/_build/
-

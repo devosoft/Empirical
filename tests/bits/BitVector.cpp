@@ -8,6 +8,7 @@
 
 #include "emp/bits/BitVector.hpp"
 #include "emp/base/vector.hpp"
+#include "emp/tools/timing.hpp"
 
 #include <sstream>
 #include <map>
