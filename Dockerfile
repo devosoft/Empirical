@@ -122,7 +122,7 @@ RUN \
 
 RUN \
   apt-get install -y \
-    curl=7.58.0-2ubuntu3.10 \
+    curl \
     git=1:2.17.1-1ubuntu0.7 \
     htop=2.1.0-3 \
     man \
