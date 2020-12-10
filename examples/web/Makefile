@@ -30,12 +30,11 @@ CFLAGS_web_opt := $(CFLAGS_all) $(OFLAGS_web_opt) --js-library ../../include/emp
 
 JS_TARGETS := Animate.js Animate2.js Attributes.js Canvas.js Div.js DP.js Example.js Font.js Graph.js Hello.js Image.js keypress.js Sudoku.js Table.js TextArea.js Tween.js Web.js
 
-TARGETS := debug-Animate debug-keypress debug-Slate debug-web
-
-default: web
-
 CXX := $(CXX_web)
 CFLAGS_web := $(CFLAGS_web_opt)
+
+%.js: %.cpp
+	$(CXX_web) $(CFLAGS_web) $< -o $@
 
 debug: CFLAGS_web := $(CFLAGS_web_debug)
 debug: $(JS_TARGETS)
@@ -48,16 +47,7 @@ web-debug: CXX := $(CXX_web)
 web-debug: CFLAGS := $(CFLAGS_web_debug)
 web-debug: all
 
-native: all
-
-all: $(TARGETS)
-
-$(JS_TARGETS): %.js : %.cpp # $(WEB)/%.h
-	$(CXX_web) $(CFLAGS_web) $< -o $@
-
-
-debug-%: $*.cpp
-	$(CXX_native) $(CFLAGS_native) $< -o $@
+default: web
 
 clean:
 	rm -f debug-* $(JS_TARGETS) *.js.map *.js.mem *.wasm *.wasm.map *.wast *~ source/*.o source/*/*.o

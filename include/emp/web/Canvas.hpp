@@ -16,6 +16,7 @@
 
 #include "../base/vector.hpp"
 #include "../geometry/Circle2D.hpp"
+#include "../tools/string_utils.hpp"
 
 #include "CanvasAction.hpp"
 #include "CanvasShape.hpp"
@@ -51,15 +52,31 @@ namespace web {
              << "\" height=\"" << height << "\">";
         // @CAO We can include fallback content here for browsers that don't support canvas.
         HTML << "</canvas>";
+
+        // create an offscreen canvas
+        #ifdef __EMSCRIPTEN_PTHREADS__
+        EM_ASM({
+          var cname = UTF8ToString($0);
+          emp_i.offscreen_canvases[ cname ] = new OffscreenCanvas($1, $2);
+        }, id.c_str(), width, height);
+        #endif // __EMSCRIPTEN_PTHREADS__
       }
 
       // Setup a canvas to be drawn on.
       void TargetCanvas() {
-        EM_ASM_ARGS({
-            var cname = UTF8ToString($0);
-            var canvas = document.getElementById(cname);
-            emp_i.ctx = canvas.getContext('2d');
+        #ifdef __EMSCRIPTEN_PTHREADS__
+        EM_ASM({
+          var cname = UTF8ToString($0);
+          var canvas = emp_i.offscreen_canvases[ cname ];
+          emp_i.pending_offscreen_canvas_ids.add( cname );
+          emp_i.ctx = canvas.getContext('2d');
         }, id.c_str());
+        #else
+        EM_ASM({
+          var cname = UTF8ToString($0);
+          var canvas = document.getElementById(cname);
+        }, id.c_str());
+        #endif
       }
 
       // Trigger any JS code needed on re-draw.
@@ -264,10 +281,10 @@ namespace web {
     }
 
     /// Download a PNG image of a canvas.
-    void DownloadPNG() { DownloadPNG(Info()->id + ".png"); }
+    void DownloadPNG() const { DownloadPNG(Info()->id + ".png"); }
 
     /// Download a PNG image of a canvas.
-    void DownloadPNG(const std::string & fname) {
+    void DownloadPNG(const std::string & fname) const {
 
       const std::string ext = ".png";
       emscripten_run_script(
@@ -284,8 +301,40 @@ namespace web {
 
     }
 
-  };
+    /// Save a PNG image of a canvas with node.js.
+    void SavePNG(const std::string& fname) const {
 
+      // adapted from https://stackoverflow.com/a/11335500
+      const std::string command_template = R"(
+        setTimeout(function(){
+
+          fs = require('fs');
+
+          canvas = document.getElementById('%s');
+
+          var url = canvas.toDataURL('image/png');
+          var regex = `^data:.+\/(.+);base64,(.*)$`;
+
+          var matches = url.match(regex);
+          var data = matches[2];
+          var buffer = Buffer.from(data, 'base64');
+
+          fs.writeFileSync('%s' , buffer);
+
+        }, 10);
+      )";
+
+
+      const std::string id{ Info()->id };
+      const std::string command{
+        emp::format_string( command_template, id.c_str(), fname.c_str() )
+      };
+
+      emscripten_run_script( command.c_str() );
+
+    }
+
+  };
 
 }
 }

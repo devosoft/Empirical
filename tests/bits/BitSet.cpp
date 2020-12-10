@@ -1612,3 +1612,13 @@ TEST_CASE("Test BitSet timing", "[bits]")
 
   // END TIMING!!!
 }
+
+TEST_CASE("Test BitSet string construction", "[tools]") {
+
+  REQUIRE( emp::BitSet<5>( "01001" ) == emp::BitSet<5>{0, 1, 0, 0, 1} );
+  REQUIRE(
+    emp::BitSet<5>( std::bitset<5>( "01001" ) )
+    == emp::BitSet<5>{0, 1, 0, 0, 1}
+  );
+
+}

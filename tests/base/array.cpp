@@ -99,4 +99,5 @@ TEST_CASE("Another test array", "[base]")
   }
 
   REQUIRE(sum == 40425);
+
 }

@@ -290,3 +290,14 @@ TEST_CASE("Another Test math", "[math]")
   REQUIRE(emp::Factorial(3) == 6);
 
 }
+
+TEST_CASE("Test Boolean Math", "[math]")
+{
+  bool test_bool = true;
+  emp::Toggle(test_bool);
+  REQUIRE(test_bool == false);
+
+  REQUIRE(emp::AnyTrue(true, false, false, false, true, false) == true);
+  REQUIRE(emp::AllTrue(true, false, false, false, true, false) == false);
+
+}

@@ -12,8 +12,6 @@
 #include <string>
 #include <type_traits>
 
-#include "../tools/functions.hpp"
-
 namespace emp {
 
   class ce_string {

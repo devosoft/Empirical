@@ -1,9 +1,9 @@
 # Other Tools
 
-## Functions
+## Timing Functions
 
 ```{eval-rst}
-.. doxygenfile:: emp/tools/functions.hpp
+.. doxygenfile:: emp/tools/timing.hpp
   :project: Empirical
 ```
 

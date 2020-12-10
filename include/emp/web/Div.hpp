@@ -127,7 +127,7 @@ namespace web {
       void ClearChildren() {
         // Unregister all children and then delete links to them.
         for (Widget & child : m_children) Unregister(child);
-        m_children.resize(0);
+        m_children.clear();
         if (state == Widget::ACTIVE) ReplaceHTML();
       }
 
@@ -168,7 +168,7 @@ namespace web {
       // @param in the Widget to add
       void AddChild(Widget in) override {
         // If the inserted widget is already active, remove it from its old position.
-        emp_assert(in->parent == nullptr && "Cannot insert widget if already has parent!", in->id);
+        emp_assert(in->parent == nullptr && "Cannot insert widget if already has parent!", in->id, in->parent->id);
         emp_assert(in->state != Widget::ACTIVE && "Cannot insert a stand-alone active widget!");
 
         // Setup parent-child relationship
@@ -179,11 +179,11 @@ namespace web {
         // If this element (as new parent) is active, anchor widget and activate it!
         if (state == Widget::ACTIVE) {
           // Create a span tag to anchor the new widget.
-          EM_ASM_ARGS({
-              parent_id = UTF8ToString($0);
-              child_id = UTF8ToString($1);
-              $('#' + parent_id).append('<span id="' + child_id + '"></span>');
-            }, id.c_str(), in.GetID().c_str());
+          MAIN_THREAD_ASYNC_EM_ASM({
+            parent_id = UTF8ToString($0);
+            child_id = UTF8ToString($1);
+            $(`#${parent_id}`).append(`<span id="${child_id}"></span>`);
+          }, id.c_str(), in.GetID().c_str());
 
           // Now that the new widget has some place to hook in, activate it!
           in->DoActivate();
@@ -263,9 +263,9 @@ namespace web {
         }
 
         if (scroll_top >= 0.0) {
-          EM_ASM_ARGS({
+          MAIN_THREAD_ASYNC_EM_ASM({
               var div_id = UTF8ToString($0);
-              var div_obj = document.getElementById(div_id);
+              var div_obj = $(`#${div_id}`);
               if (div_obj == null) alert(div_id);
               // alert('id=' + div_id + '  top=' + $1 +
               //       '  height=' + div_obj.scrollHeight);
@@ -278,7 +278,7 @@ namespace web {
     // float scroll_frac = ((float) (hardware->GetIP() - 3)) / (float) hardware->GetNumInsts();
     // if (scroll_frac < 0.0) scroll_frac = 0.0;
 
-    // EM_ASM_ARGS({
+    // MAIN_THREAD_EM_ASM({
     //     var code = UTF8ToString($0);
     //     var code_obj = document.getElementById("code");
     //     code_obj.innerHTML = code;
@@ -286,6 +286,8 @@ namespace web {
     //     var cycle_obj = document.getElementById("cycle_count");
     //     cycle_obj.innerHTML = "&nbsp;&nbsp;&nbsp;Cycles Used = " + $2;
     // }, ss.str().c_str(), scroll_frac, hardware->GetExeCount());
+
+        internal::WidgetInfo::TriggerJS();
 
       }
 
@@ -343,6 +345,13 @@ namespace web {
       emp_assert(info);
       return Info()->GetRegistered(test_name);
     }
+
+    /// Determine if a specified widget is internal to this one.
+    bool HasChild(const std::string & test_name) const {
+      emp_assert(info);
+      return Info()->IsRegistered(test_name);
+    }
+
 
     /// Get all direct child widgets to this div.
     emp::vector<Widget> & Children() { return Info()->m_children; }

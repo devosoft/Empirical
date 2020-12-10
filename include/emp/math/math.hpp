@@ -314,6 +314,18 @@ namespace emp {
     return *max_found;
   }
 
+  /// Returns the next power of two (in 64-bits) that is strictly greater than A.
+  /// Returns zero on overflow.
+  inline uint64_t NextPowerOf2(uint64_t A) {
+    A |= (A >> 1);
+    A |= (A >> 2);
+    A |= (A >> 4);
+    A |= (A >> 8);
+    A |= (A >> 16);
+    A |= (A >> 32);
+    return A + 1;
+  }
+
   inline constexpr int Factorial(int i) {
     int result = 1;
     while (i > 0) {
@@ -321,6 +333,23 @@ namespace emp {
       i--;
     }
     return result;
+  }
+
+  /// Toggle an input bool.
+  inline bool Toggle(bool & in_bool) { return (in_bool = !in_bool); }
+
+  /// Combine bools to AND them all together.
+  inline constexpr bool AllTrue() { return true; }
+  template <typename... Ts>
+  inline bool AllTrue(bool result, Ts... OTHER) {
+    return result && AllTrue(OTHER...);
+  }
+
+  /// Combine bools to OR them all together.
+  inline constexpr bool AnyTrue() { return false; }
+  template <typename... Ts>
+  inline bool AnyTrue(bool result, Ts... OTHER) {
+    return result || AnyTrue(OTHER...);
   }
 
 }

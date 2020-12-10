@@ -67,7 +67,7 @@
 /// Call a Javascript function that accepts either a string indicating the name of a
 /// callback function or a normal string
 #define D3_CALLBACK_FUNCTION_1_ARG(FUNC, CALLBACK)                             \
-  EM_ASM_ARGS({                                                                \
+  MAIN_THREAD_EM_ASM({                                                                \
       var func_string = UTF8ToString($0);                                 \
       CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_WINDOW("d3", "emp");   \
       emp.__new_object = FUNC(func_string);                                    \
@@ -76,7 +76,7 @@
 /// Same as D3_CALLBACK_FUNCTION_1_ARG, but accepts an additional argument, ARG1, that goes
 /// before the callback function in the call to FUNC
 #define D3_CALLBACK_FUNCTION_2_ARGS(FUNC, CALLBACK, ARG1)                      \
-  EM_ASM_ARGS({                                                                \
+  MAIN_THREAD_EM_ASM({                                                                \
       var arg1 = UTF8ToString($0);                                        \
       var func_string = UTF8ToString($1);                                 \
       CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_WINDOW("d3", "emp");   \
@@ -87,7 +87,7 @@
 
 //Layer of indirection so macro gets expanded
 #define D3_CALLBACK_METHOD_2_ARGS_IMPL(MACRO, FUNC, ARG1, ARG2)     \
-  EM_ASM_ARGS({                                                     \
+  MAIN_THREAD_EM_ASM({                                                     \
       var arg1 = UTF8ToString($1);                             \
       var func_string = UTF8ToString($2);                      \
       MACRO;                                                        \
@@ -103,7 +103,7 @@
 
 //Layer of indirection so macro gets expanded
 #define D3_CALLBACK_METHOD_1_ARG_IMPL(MACRO, FUNC, ARG1)    \
-EM_ASM_ARGS({                                               \
+MAIN_THREAD_EM_ASM({                                               \
     var func_string = UTF8ToString($1);                \
     MACRO;                                                  \
     emp.__new_object = js.objects[$0].FUNC(func_string);    \
@@ -119,7 +119,7 @@ D3_CALLBACK_METHOD_1_ARG_IMPL(CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_
 //JSWrap and passes it to the FUNC method of the current d3 object, along with an argument
 #define D3_CALLBACK_METHOD_CPP_FUNCTION_2_ARGS(FUNC, ARG1, CPP_FUN)        \
   uint32_t fun_id = emp::JSWrap(CPP_FUN, "", false);                       \
-  EM_ASM_ARGS({                                                            \
+  MAIN_THREAD_EM_ASM({                                                            \
     emp.__new_object = js.objects[$0].FUNC(UTF8ToString($1),          \
                                     function(d, i, j) {                    \
                                       return emp.Callback($2, d, i, j);    \
@@ -131,7 +131,7 @@ D3_CALLBACK_METHOD_1_ARG_IMPL(CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_
   //JSWrap and passes it to the FUNC method of the current d3 object, along with an argument
   #define D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(FUNC, CPP_FUN)               \
     uint32_t fun_id = emp::JSWrap(CPP_FUN, "", false);                       \
-    EM_ASM_ARGS({                                                            \
+    MAIN_THREAD_EM_ASM({                                                            \
       emp.__new_object = js.objects[$0].FUNC(function(d, i, j) {             \
                                             return emp.Callback($1, d, i, j);\
                                             });                              \
@@ -140,7 +140,7 @@ D3_CALLBACK_METHOD_1_ARG_IMPL(CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_
 
 //Store return of one of the above functions in js.objects
 void StoreNewObject(int id){
-    EM_ASM_ARGS({
+    MAIN_THREAD_EM_ASM({
         js.objects[$0] = emp.__new_object;
 
     }, id);

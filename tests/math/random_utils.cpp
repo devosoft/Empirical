@@ -1,3 +1,7 @@
+//  This file is part of Empirical, https://github.com/devosoft/Empirical
+//  Copyright (C) Michigan State University, 2020.
+//  Released under the MIT Software license; see doc/LICENSE
+
 #define CATCH_CONFIG_MAIN
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
@@ -52,5 +56,21 @@ TEST_CASE("Test random_utils", "[math]")
 		REQUIRE(doubleVec[i] < 15.0);
 		REQUIRE(doubleVec[i] >= -15.0);
 	}
+
+}
+
+TEST_CASE("Test CountRngTouches", "[math]") {
+
+	REQUIRE( 0 == emp::CountRngTouches([](emp::Random& rand){
+	}) );
+
+	REQUIRE( 1 == emp::CountRngTouches([](emp::Random& rand){
+		rand.GetUInt();
+	}) );
+
+	REQUIRE( 2 == emp::CountRngTouches([](emp::Random& rand){
+		rand.GetUInt();
+		rand.GetUInt();
+	}) );
 
 }

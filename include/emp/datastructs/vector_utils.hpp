@@ -248,6 +248,19 @@ namespace emp {
     return new_vec;
   }
 
+  /// Build a vector with a range of values from min to max at the provided step size.
+  template <typename T>
+  static inline emp::vector<T> BuildRange(T min, T max, T step=1) {
+    emp_assert(max > min);
+    size_t vsize = (size_t) ((max-min) / step) + 1;
+    emp::vector<T> out_v(vsize);
+    size_t pos = 0;
+    for (T i = min; i < max; i += step) {
+      out_v[pos++] = i;
+    }
+    return out_v;
+  }
+
   /// Tree manipulation in vectors.
   constexpr size_t tree_left(size_t id) { return id*2+1; }
   constexpr size_t tree_right(size_t id) { return id*2+2; }

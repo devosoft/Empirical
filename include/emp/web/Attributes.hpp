@@ -16,6 +16,7 @@
 #endif
 
 #include "../tools/string_utils.hpp"
+#include "../base/errors.hpp"
 
 #include <map>
 #include <string>
@@ -41,6 +42,24 @@ namespace web {
     Attributes & DoSet(const std::string & in_set, const std::string & in_val) {
       settings[in_set] = in_val;
       return *this;
+    }
+
+    /// Append a new value to an existing attribute
+    /// @param in_attr attribute name
+    /// @param in_val attribute value to be added
+    Attributes & DoAddAttr(const std::string in_attr, const std::string & in_val) {
+      if (!Has(in_attr)){
+        // Attribute has not been assigned to this Widget. Add it with DoSet instead
+        DoSet(in_attr, in_val);
+      } else if(settings[in_attr].find(in_val) == std::string::npos){
+        // New value is not a duplicate of any values assigned to this attribute. Append it.
+        settings[in_attr] += " " + in_val;
+      }
+      return *this;
+    }
+
+    std::string GetAttrValue(const std::string & in_set){
+      return settings[in_set];
     }
 
     /// Record that attribute "a" is set to value "v" (converted to string) and return this object.
@@ -85,7 +104,7 @@ namespace web {
 
       // Find the current object only once.
 #ifdef __EMSCRIPTEN__
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
           var id = UTF8ToString($0);
           emp_i.cur_obj = $( '#' + id );
         }, widget_id.c_str());
@@ -94,7 +113,7 @@ namespace web {
       for (auto attr_pair : settings) {
         if (attr_pair.second == "") continue; // Ignore empty entries.
 #ifdef __EMSCRIPTEN__
-        EM_ASM_ARGS({
+        MAIN_THREAD_EM_ASM({
             var name = UTF8ToString($0);
             var value = UTF8ToString($1);
             emp_i.cur_obj.attr( name, value);
@@ -106,12 +125,12 @@ namespace web {
       }
     }
 
-    /// Apply onlay a SPECIFIC attributes setting from the setting library to widget_id.
+    /// Apply only a SPECIFIC attributes setting from the setting library to widget_id.
     void Apply(const std::string & widget_id, const std::string & setting) {
       emp_assert(Has(setting));
 
 #ifdef __EMSCRIPTEN__
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
           var id = UTF8ToString($0);
           var setting = UTF8ToString($1);
           var value = UTF8ToString($2);
@@ -127,7 +146,7 @@ namespace web {
     static void Apply(const std::string & widget_id, const std::string & setting,
                       const std::string & value) {
 #ifdef __EMSCRIPTEN__
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
           var id = UTF8ToString($0);
           var setting = UTF8ToString($1);
           var value = UTF8ToString($2);

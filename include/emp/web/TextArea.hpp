@@ -84,7 +84,7 @@ namespace web {
       }
 
       void UpdateText(const std::string & in_string) {
-        EM_ASM_ARGS({
+        MAIN_THREAD_EM_ASM({
             var id = UTF8ToString($0);
             var text = UTF8ToString($1);
             $('#' + id).val(text);
