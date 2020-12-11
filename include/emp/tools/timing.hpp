@@ -31,6 +31,7 @@
               << " ms" << std::endl;                                         \
     std::cout << "Result: " << emp_result << std::endl;                      \
   }
+
 /// A simple macro to time how long it takes for a function to complete.
   #define EMP_VOID_FUNCTION_TIMER(TEST_FUN) {                                \
     std::clock_t emp_start_time = std::clock();                              \

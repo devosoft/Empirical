@@ -700,47 +700,68 @@ namespace emp {
       return (int) (pos_found + (field_id * FIELD_BITS));
     }
 
-    /// Pop the last bit in the vector
+    /**
+     * Pop the last bit in the vector.
+     *
+     * @return value of the popped bit.
+    */
     bool PopBack() {
-      bool val = Get(num_bits-1);
-      if (val)  Set(num_bits-1, 0);
+      const bool val = Get(num_bits-1);
+      Set(num_bits-1, 0);
       Resize(num_bits - 1);
       return val;
     }
 
-    /// Push given bit(s) onto the vector
-    void PushBack(bool bit=true, size_t num=1) {
+    /**
+     * Push given bit(s) onto the vector.
+     *
+     * @param bit value of bit to be pushed.
+     * @param num number of bits to be pushed.
+    */
+    void PushBack(const bool bit=true, const size_t num=1) {
       Resize(num_bits + num);
       for (size_t i=0; i < num; i++)
         Set(num_bits-1, bit);
     }
 
-    // Returns mask that keeps bits higher than index
-    void Mask_High(size_t index) {
-      size_t field_id = FieldID(index);
-      int field_t_bits = sizeof(bit_set[0]) * 8;
+    /**
+     * Zero out bits lower than or at index.
+     *
+     * @param index location to end the zeroing out.
+    */
+    void Mask_High(const size_t index) {
+      const size_t field_id = FieldID(index);
       for (size_t i = 0; i < field_id; i++)
         bit_set[i] = 0;
       if (index >= 0)
-        bit_set[field_id] &= (MaskLow<field_t>((num_bits - index - 1) % field_t_bits) << (index + 1));
+        bit_set[field_id] &= (MaskLow<field_t>((num_bits - index - 1) % FIELD_BITS) << (index + 1));
     }
 
-    // Returns mask that keeps bits lower than index
-    void Mask_Low(size_t index) {
-      size_t field_id = FieldID(index);
-      int field_t_bits = sizeof(bit_set[0]) * 8;
+    /**
+     * Zero out bits higher than or at index.
+     *
+     * @param index location to start the zeroing out.
+    */
+    void Mask_Low(const size_t index) {
+      const size_t field_id = FieldID(index);
       for (size_t i = field_id + 1; i < NumFields(); i++)
         bit_set[i] = 0;
       if (index < num_bits)
-        bit_set[field_id] &= MaskLow<field_t>(index % field_t_bits);
+        bit_set[field_id] &= MaskLow<field_t>(index % FIELD_BITS);
     }
 
-    /// Insert bits into vector, including middle using bitmagic
-    /// https://devolab.org/?p=2249
-    void Insert(size_t index, bool value=true, size_t num=1) {
+    /**
+     * Insert bit(s) into any index of vector using bit magic.
+     * Blog post on implementation reasoning: https://devolab.org/?p=2249
+     *
+     * @param index location to insert bit(s).
+     * @param val value of bit(s) to insert.
+     * @param num number of bits to insert, default 1.
+    */
+    void Insert(const size_t index, const bool val=true, const size_t num=1) {
       Resize(num_bits + num);
       // mask high and shift left: 101101 -> 1010000
-      thread_local BitVector a{};
+      thread_local BitVector a{};   // use thread_local to prevent reallocation
       a = *this;
       if (index > 0)
         a.Mask_High(index + num - 2);
@@ -752,16 +773,22 @@ namespace emp {
       a |= b;
       // set specified bits -> 1010101 -> 101_101
       for (size_t i = index; i < index + num; i++) {
-        a.Set(i, value);
+        a.Set(i, val);
       }
       std::swap(a, *this);
-
     }
 
-    /// Delete bits from vector, including middle
-    void Delete(size_t index, size_t num=1) {
-      for (size_t j = index; j < num_bits - num; j++) {
-        Set(j, Get(j + num));
+    /**
+     * Delete bits from any index in a vector.
+     *
+     * TODO: consider a bit magic approach here.
+     *
+     * @param index location to delete bit(s).
+     * @param num number of bits to delete, default 1.
+    */
+    void Delete(const size_t index, const size_t num=1) {
+      for (size_t bit = index; bit < num_bits - num; bit++) {
+        Set(bit, Get(bit + num));
       }
       Resize(num_bits - num);
     }

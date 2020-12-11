@@ -16,6 +16,7 @@
 #include <ratio>
 
 TEST_CASE("Benchmark BitVector Inserts", "[bits]"){
+	// Expected timing: 38 ms Optimized, 2150 ms Non-optimized
 	emp::BitVector bv(0);
 	bv.Insert(0, true, 4096);
 	std::cout << "Bit Magic Insert: ";
@@ -23,7 +24,6 @@ TEST_CASE("Benchmark BitVector Inserts", "[bits]"){
 		for ( size_t i = 1; i <= std::mega::num; ++i ) {
 			auto bv1 = bv;
 			bv1.Insert(1, false);
-			//bv.PopBack();
 		}
 	}());
 }
@@ -278,30 +278,28 @@ TEST_CASE("Test BitVector", "[bits]")
 	REQUIRE(bv_f.count() == 1);
 	bv_f <<= 1;
 	REQUIRE(bv_f.none());
+}
 
+TEST_CASE("Test Mask_High, Mask_Low", "[bits]") {
 	// Test Mask_High, Mask_Low
 	emp::BitVector a(0);
-	//a.Insert(0,true, 7);
-	for (int i = 0; i < 3; i++)
-		a.PushBack(true);
-	a.PushBack(false);
+	a.Insert(0,true, 7);
 	REQUIRE(a.Get(0));
 	REQUIRE(a.Get(1));
 	REQUIRE(a.Get(2));
-	REQUIRE(!a.Get(3));
 	emp::BitVector b = a;
 	emp::BitVector c = a;
 	b.Mask_High(0);
 	c.Mask_Low(1);
 	REQUIRE(b.Get(1));
 	REQUIRE(!b.Get(0));
-	REQUIRE(b.Get(2));
-	//REQUIRE(!b.Get(2));
+	REQUIRE(b.Get(6));
 	REQUIRE(c.Get(0));
 	REQUIRE(!c.Get(1));
 	REQUIRE(!c.Get(2));
-	//REQUIRE(!c.Get(7));
+}
 
+TEST_CASE("Test PopBack, PushBack, Insert, Delete", "[bits]") {
 	// Pop Back and Push Back
 	emp::BitVector bv_g(0);
 	bv_g.PushBack(true);
@@ -310,7 +308,6 @@ TEST_CASE("Test BitVector", "[bits]")
 	REQUIRE(bv_g.Get(0));
 	REQUIRE(bv_g.Get(1));
 	REQUIRE(!bv_g.PopBack());
-	//REQUIRE(bv_g.PopBack());
 	REQUIRE(bv_g.size() == 2);
 
 	// Insert and Delete
@@ -339,19 +336,6 @@ TEST_CASE("Test BitVector", "[bits]")
 	bv_g.Delete(1, 2);
 	REQUIRE(bv_g.size() == 2);
 	REQUIRE(bv_g.Get(1));
-
-	emp::BitVector zo(1);
-	zo.PushBack(true);
-	zo.PushBack(true);
-	zo.PushBack(false);
-	zo.PushBack(true);
-	emp::BitVector * zo_ptr = &zo;
-	thread_local emp::BitVector z1 = *zo_ptr;
-	z1 = *zo_ptr;
-	emp::BitVector z2 = *zo_ptr;
-	REQUIRE(zo == z1);
-	REQUIRE(zo == z2);
-	REQUIRE(z2 == z1);
 }
 
 TEST_CASE("Another Test BitVector", "[bits]")
