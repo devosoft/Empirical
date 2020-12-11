@@ -191,16 +191,15 @@ namespace emp {
   /// Base case for assert_print...
   void assert_print() { ; }
 
-  template <int N>
-  constexpr bool is_literal_string(const char (&x)[N]) { return true; }
-  constexpr bool is_literal_string(...) { return false; }
-
   /// Print out information about the next variable and recurse...
   template <typename T, typename... EXTRA>
   void assert_print(std::string name, T && val, EXTRA &&... extra) {
-    if (is_literal_string(val)) {
+    // If we had a literal string fed in, print it as a message.
+    if (name[0] == '"') {
       std::cerr << "MESSAGE: " << val << std::endl;
-    } else {
+    }
+    // Otherwise assume that we have a variable and print that.
+    else {
       std::cerr << name << ": [" << val << "]" << std::endl;
     }
     assert_print(std::forward<EXTRA>(extra)...);
