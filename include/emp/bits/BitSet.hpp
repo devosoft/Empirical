@@ -93,6 +93,8 @@ namespace emp {
     // Any bits past the last "real" bit in the last field should be kept as zeros.
     void ClearExcessBits() { if constexpr (NUM_END_BITS > 0) bit_set[LAST_FIELD] &= END_MASK; }
 
+    // Convert the bit_set to bytes.
+    unsigned char * BytePtr() { return reinterpret_cast<unsigned char*>(bit_set); }
 
     /// Helper: call SHIFT with positive number instead
     void ShiftLeft(const size_t shift_size);
@@ -132,27 +134,19 @@ namespace emp {
     ~BitSet() = default;
 
     /// Assignment operator.
-    BitSet & operator=(const BitSet<NUM_BITS> & in_set) {
-      Copy(in_set.bit_set);
-      return *this;
-    }
+    BitSet & operator=(const BitSet<NUM_BITS> & in_set) { Copy(in_set.bit_set); return *this; }
 
     /// Set all bits randomly, with a 50% probability of being a 0 or 1.
     void Randomize(Random & random) {
-      // Randomize all fields, then mask off bits in the last field if not complete.
-
-      random.RandFill(
-        reinterpret_cast<unsigned char*>(bit_set),
-        (NUM_BITS+7)/8
-      );
-
+      random.RandFill(BytePtr(), TOTAL_BYTES);
       ClearExcessBits();
     }
 
-    /// Set all bits randomly, with a given probability of being a 1.
-    void Randomize(Random & random, const double p1) {
-      if (p1 == 0.5) return Randomize(random); // If 0.5 probability, generate by field!
-      for (size_t i = 0; i < NUM_BITS; i++) Set(i, random.P(p1));
+    /// Set all bits randomly, with a given probability of being a on.
+    void Randomize(Random & random, const double p) {
+      if (p == 0.0) return Clear();
+      if (p == 0.5) return Randomize(random); // If 0.5 probability, generate by field!
+      for (size_t i = 0; i < NUM_BITS; i++) Set(i, random.P(p));
     }
 
     /// Mutate bits, return how many mutations were performed
@@ -279,7 +273,7 @@ namespace emp {
     }
 
     /// Set the bit at a specified index.
-    void Set(size_t index, bool value=true) {
+    BitSet & Set(size_t index, bool value=true) {
       emp_assert(index < NUM_BITS);
       const size_t field_id = FieldID(index);
       const size_t pos_id = FieldPos(index);
@@ -287,6 +281,8 @@ namespace emp {
 
       if (value) bit_set[field_id] |= pos_mask;
       else       bit_set[field_id] &= ~pos_mask;
+
+      return *this;
     }
 
     /// Flip all bits in this BitSet
@@ -367,11 +363,7 @@ namespace emp {
     void SetUInt32(const size_t index, const uint32_t value) {
       emp_assert(index * 32 < NUM_BITS);
 
-      std::memcpy(
-        reinterpret_cast<unsigned char*>(bit_set) + index * (32/8),
-        &value,
-        sizeof(value)
-      );
+      std::memcpy( BytePtr() + index * (32/8), &value, sizeof(value) );
 
       ClearExcessBits();
     }
@@ -417,23 +409,13 @@ namespace emp {
       if constexpr (FIELD_BITS == 64) {
         bit_set[index] = value;
       } else if constexpr (FIELD_BITS == 32 && (NUM_FIELDS % 2 == 0)) {
-        std::memcpy(
-          reinterpret_cast<unsigned char*>(bit_set) + index * (64/8),
-          &value,
-          sizeof(value)
+        std::memcpy( BytePtr() + index * (64/8), &value, sizeof(value)
         );
       } else if constexpr (FIELD_BITS == 32 && NUM_FIELDS == 1) {
-        std::memcpy(
-          reinterpret_cast<unsigned char*>(bit_set),
-          &value,
-          32/8
-        );
+        std::memcpy( BytePtr(), &value, 32/8 );
       } else {
-        std::memcpy(
-          reinterpret_cast<unsigned char*>(bit_set) + index * (64/8),
-          &value,
-          std::min<size_t>(64, NUM_FIELDS * FIELD_BITS - 64 * index)/8
-        );
+        std::memcpy( BytePtr() + index * (64/8), &value,
+                     std::min<size_t>(64, NUM_FIELDS * FIELD_BITS - 64 * index)/8 );
       }
 
       ClearExcessBits();
@@ -496,12 +478,13 @@ namespace emp {
     BitProxy<this_t> operator[](size_t index) { return BitProxy<this_t>(*this, index); }
 
     /// Set all bits to zero.
-    void Clear() { std::memset(bit_set, 0, sizeof(bit_set)); }
+    BitSet & Clear() { std::memset(bit_set, 0, sizeof(bit_set)); return *this; }
 
     /// Set all bits to one.
-    void SetAll() {
-      std::memset(bit_set, 255, sizeof(bit_set));;
+    BitSet & SetAll() {
+      std::memset(bit_set, 255, sizeof(bit_set));
       ClearExcessBits();
+      return *this;
     }
 
     /// Overload ostream operator to return Print.
