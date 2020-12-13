@@ -20,6 +20,7 @@ namespace emp {
       T & bit_container; ///< Which container does this proxy belong to?
       size_t index;      ///< Which position in the bit vector does this proxy point at?
 
+  public:
       // Helper functions.
       inline bool Get() const { return bit_container.Get(index); }
       inline BitProxy & Set(bool b) { bit_container.Set(index, b); return *this; }
@@ -27,7 +28,6 @@ namespace emp {
       inline BitProxy & SetIf(bool test, bool b) { if (test) Set(b); return *this; }
       inline BitProxy & ToggleIf(bool test) { if (test) Toggle(); return *this; }
 
-  public:
       /// Setup a new proxy with the associated vector and index.
       BitProxy(T & _v, size_t _idx) : bit_container(_v), index(_idx) {;}
 
