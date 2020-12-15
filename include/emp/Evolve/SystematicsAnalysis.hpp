@@ -10,8 +10,6 @@
 #ifndef EMP_EVO_SYSTEMATICS_ANALYSIS_H
 #define EMP_EVO_SYSTEMATICS_ANALYSIS_H
 
-#include "Systematics.hpp"
-
 // Mutation info functions. Assumes each taxon has a struct containing an unordered map
 // with keys that are strings indicating types of mutations and keys that are numbers
 // indicating the number of that type of mutation that occurred to make this taxon from
