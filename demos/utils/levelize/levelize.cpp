@@ -54,6 +54,7 @@ int main(int argc, char * argv[])
   }
 
   // Now that we know dependences, figure out levels!
+  level_t max_level = 0;
   bool progress = true;
   while (progress) {
     progress = false;
@@ -80,19 +81,25 @@ int main(int argc, char * argv[])
       // If we have a level for this file now, use it an indicate progress!
       if (new_level != FileInfo::NO_LEVEL) {
         info.level = new_level;
+        if (new_level > max_level) max_level = new_level;
         progress = true;
       }
     }
   }
 
   // List out the files and their levels.
-  for (auto [filename, info] : file_map) {
-//    std::cout << emp::to_ansi_bold(filename)
-    std::cout << filename
-              << " : LEVEL " << info.level
-              << " (" << info.path << ")\n";
-    std::cout << "Depends on:";
-    for (const std::string & name : info.depends) std::cout << " " << name;
-    std::cout << std::endl;
+  for (level_t level = 0; level <= max_level; level++) {
+    std::cout << "============ LEVEL " << level << " ============\n";
+    for (auto [filename, info] : file_map) {
+      if (info.level != level) continue;
+  //    std::cout << emp::to_ansi_bold(filename)
+      std::cout << filename << " " << " (" << info.path << ")\n";
+      if (level == 0) continue;
+      std::cout << " :";
+      for (const std::string & name : info.depends) {
+        std::cout << " " << name << "(" << file_map[name].level << ")";
+      }
+      std::cout << std::endl;
+    }
   }
 }
