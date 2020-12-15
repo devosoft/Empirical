@@ -39,7 +39,7 @@ namespace emp {
     std::string filename;            ///< Name of the file that we are printing to (if one exists)
     std::ostream * os;               ///< Stream to print to.
     FunctionSet<fun_t> funs;         ///< Set of functions to call, one per column in the file.
-    FunctionSet<void()> pre_funs; ///< Set of functions to call before calculating data.
+    FunctionSet<void()> pre_funs;    ///< Set of functions to call before calculating data.
     emp::vector<std::string> keys;   ///< Keywords associated with each column.
     emp::vector<std::string> descs;  ///< Full description for each column.
     time_fun_t timing_fun;           ///< Function to determine updates to print on (default: all)
