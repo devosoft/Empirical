@@ -13,6 +13,7 @@
 *.wasm
 *.wast
 *-bak.cc
+*-bak.cpp
 *.dat
 *.exe
 *tmp.*
@@ -36,7 +37,7 @@ demos/Avida/Avida
 demos/Avida/web/Avida.js
 demos/Emphatic/Emphatic
 demos/Emphatic/examples/ConceptTest
-demos/Emphatic/examples/ConceptTest.cc
+demos/Emphatic/examples/ConceptTest.cpp
 demos/MABE/examples/NK
 demos/NK.bak/
 demos/NK/NK
@@ -60,6 +61,7 @@ demos/NK/Makefile
 demos/NK/source
 demos/NK/source/native
 demos/NK/source/NKWorld.h
+demos/NK/source/NKWorld.hpp
 demos/NK/source/web
 demos/NK/web/jquery-1.11.2.min.js
 demos/NK/web/NK.asm.js
@@ -70,10 +72,11 @@ doc/doxygen/
 examples/*/*
 !examples/*/*.cc
 !examples/*/*.h
+!examples/*/*.cpp
+!examples/*/*.hpp
 !examples/*/*.html
 !examples/*/images
 !examples/*/Makefile
-examples/timing/short_strings.html
 
 tests/*.csv
 tests/StatsConfig.cfg
