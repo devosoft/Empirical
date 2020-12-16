@@ -1,11 +1,11 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
+ *  @date 2020.
  *
- *  @file  flex_function.hpp
- *  @brief A collection of broadly-useful functions (that don't fit elsewhere)
- *  @note Status: BETA (though new functions are added frequently)
+ *  @file  timing.hpp
+ *  @brief A collection of tools to help measure timing of code.
+ *  @note Status: BETA
  */
 
 
