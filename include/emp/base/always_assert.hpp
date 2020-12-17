@@ -42,7 +42,9 @@
     do {                                                                       \
       !(EMP_GET_ARG_1(__VA_ARGS__, ~))                                         \
       && emp::assert_trigger(                                                  \
-        __FILE__, __LINE__, EMP_STRINGIFY( EMP_GET_ARG_1(__VA_ARGS__, ~) )     \
+        __FILE__, __LINE__,                                                    \
+        EMP_STRINGIFY( EMP_GET_ARG_1(__VA_ARGS__, ~),  ),                      \
+        EMP_WRAP_ARGS(emp_assert_TO_PAIR, __VA_ARGS__)                         \
       );                                                                       \
     } while(0)
 
@@ -63,7 +65,9 @@
     do {                                                                       \
       !(EMP_GET_ARG_1(__VA_ARGS__, ~))                                         \
       && emp::assert_trigger(                                                  \
-        __FILE__, __LINE__, EMP_WRAP_ARGS(emp_assert_TO_PAIR, __VA_ARGS__)     \
+        __FILE__, __LINE__,                                                    \
+        EMP_STRINGIFY( EMP_GET_ARG_1(__VA_ARGS__, ~) )                         \
+        EMP_WRAP_ARGS(emp_assert_TO_PAIR, __VA_ARGS__)                         \
       )                                                                        \
       && (std::abort(), false);                                                \
     } while(0)
