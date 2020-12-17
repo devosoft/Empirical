@@ -24,7 +24,7 @@ namespace emp {
 
   template <typename... EXTRA>
   bool assert_trigger(
-    std::string filename, size_t line, std::string expr, EXTRA &&... extra
+    std::string filename, size_t line, std::string expr, EXTRA &&...
   ) {
     emp::assert_fail_info.filename = __FILE__;
     emp::assert_fail_info.line_num = __LINE__;
