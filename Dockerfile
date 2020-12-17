@@ -163,6 +163,10 @@ RUN \
   echo "finalized set up dependency versions"
 
 RUN \
+  pip install wheel==0.30.0 \
+    && \
+  pip3 install wheel==0.30.0 \
+    && \
   pip3 install -r /opt/Empirical/doc/requirements.txt \
     && \
   echo "installed documentation build requirements"
