@@ -22,14 +22,14 @@ RUN \
 # xvfb nonsense adapted from https://github.com/samgiles/docker-xvfb
 RUN \
   apt-get install -y \
-    xvfb=2:1.19.6* \
-    x11vnc=0.9.13* \
-    x11-xkb-utils=7.7* \
-    xfonts-100dpi=1:1.0.4* \
-    xfonts-75dpi=1:1.0.4* \
-    xfonts-scalable=1:1.0.3* \
+    xvfb=2:1.19.6-1ubuntu4 \
+    x11vnc=0.9.13-3 \
+    x11-xkb-utils=7.7+3 \
+    xfonts-100dpi=1:1.0.4+nmu1 \
+    xfonts-75dpi=1:1.0.4+nmu1 \
+    xfonts-scalable=1:1.0.3-1.1 \
     xfonts-cyrillic=1:1.0.4 \
-    x11-apps=7.7* \
+    x11-apps=7.7+6ubuntu1 \
     && \
   echo "installed xvfb"
 
@@ -89,11 +89,11 @@ ENV DISPLAY :99
 
 RUN \
   apt-get install -y \
-    gtk2-engines-pixbuf=2.24.32* \
-    firefox=81.0* \
-    libnss3=2:3.35* \
-    lsb-release=9.20170808* \
-    xdg-utils= 1.1.2* \
+    gtk2-engines-pixbuf=2.24.32-1ubuntu1 \
+    firefox=59.0.2+build1-0ubuntu1 \
+    libnss3=2:3.35-2ubuntu2 \
+    lsb-release=9.20170808ubuntu1 \
+    xdg-utils=1.1.2-1ubuntu2 \
     && \
   echo "installed headless firefox dependencies"
 
@@ -102,34 +102,34 @@ RUN echo 'kernel.unprivileged_userns_clone=1' > /etc/sysctl.d/userns.conf
 
 RUN \
   apt-get install -y \
-    g++-8=8.4.0* \
-    cmake=3.10.2* \
-    build-essential=12.4* \
-    python-virtualenv=15.1.0* \
-    python-pip=9.0.1* \
-    python3-virtualenv=15.1.0* \
-    python3-pip=9.0.1* \
-    nodejs=8.10.0* \
-    npm=3.5.2* \
-    tar=1.29* \
-    gzip=1.6* \
-    libpthread-stubs0-dev=0.3* \
-    libc6-dbg=2.27* \
-    gdb=8.2* \
-    doxygen=1.8.13* \
+    g++-8=8-20180414-1ubuntu2 \
+    cmake=3.10.2-1ubuntu2 \
+    build-essential=12.4ubuntu1 \
+    python-virtualenv=15.1.0+ds-1.1 \
+    python-pip=9.0.1-2 \
+    python3-virtualenv=8.1.1-2 \
+    python3-pip=8.1.1-2 \
+    nodejs=8.10.0~dfsg-2 \
+    npm=3.5.2-0ubuntu4 \
+    tar=1.29b-2 \
+    gzip=1.6-5ubuntu1 \
+    libpthread-stubs0-dev=0.3-4 \
+    libc6-dbg=2.27-3ubuntu1 \
+    gdb=8.1-0ubuntu3 \
+    doxygen=1.8.13-10 \
     && \
   echo "installed core dependencies"
 
 RUN \
   apt-get install -y \
-    curl=7.58.0* \
-    git=1:2.17.1* \
-    htop=2.1.0* \
+    curl=7.58.0-2ubuntu3 \
+    git=1:2.17.0-1ubuntu1 \
+    htop=2.1.0-3 \
     man \
-    unzip=6.0* \
-    vim=2:8.0.1453* \
-    nano=2.9.3* \
-    wget=1.19.4* \
+    unzip=6.0-21ubuntu1 \
+    vim=2:8.0.1453-1ubuntu1 \
+    nano=2.9.3-2 \
+    wget=1.19.4-1ubuntu2 \
     && \
   echo "installed creature comforts"
 
