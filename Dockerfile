@@ -22,14 +22,14 @@ RUN \
 # xvfb nonsense adapted from https://github.com/samgiles/docker-xvfb
 RUN \
   apt-get install -y \
-    xvfb \
-    x11vnc \
-    x11-xkb-utils \
-    xfonts-100dpi \
-    xfonts-75dpi \
-    xfonts-scalable \
-    xfonts-cyrillic \
-    x11-apps \
+    xvfb=2:1.19.6* \
+    x11vnc=0.9.13* \
+    x11-xkb-utils=7.7* \
+    xfonts-100dpi=1:1.0.4* \
+    xfonts-75dpi=1:1.0.4* \
+    xfonts-scalable=1:1.0.3* \
+    xfonts-cyrillic=1:1.0.4 \
+    x11-apps=7.7* \
     && \
   echo "installed xvfb"
 
@@ -89,11 +89,11 @@ ENV DISPLAY :99
 
 RUN \
   apt-get install -y \
-    gtk2-engines-pixbuf \
-    firefox \
-    libnss3 \
-    lsb-release \
-    xdg-utils \
+    gtk2-engines-pixbuf=2.24.32* \
+    firefox=81.0* \
+    libnss3=2:3.35* \
+    lsb-release=9.20170808* \
+    xdg-utils= 1.1.2* \
     && \
   echo "installed headless firefox dependencies"
 
@@ -102,34 +102,34 @@ RUN echo 'kernel.unprivileged_userns_clone=1' > /etc/sysctl.d/userns.conf
 
 RUN \
   apt-get install -y \
-    g++-8=8.4.0-1ubuntu1~18.04 \
-    cmake=3.10.2-1ubuntu2.18.04.1 \
-    build-essential=12.4ubuntu1 \
-    python-virtualenv=15.1.0+ds-1.1 \
-    python-pip \
-    python3-virtualenv \
-    python3-pip \
-    nodejs=8.10.0~dfsg-2ubuntu0.4 \
-    npm=3.5.2-0ubuntu4 \
-    tar=1.29b-2ubuntu0.1 \
-    gzip=1.6-5ubuntu1 \
-    libpthread-stubs0-dev=0.3-4 \
-    libc6-dbg=2.27-3ubuntu1.3 \
-    gdb=8.2-0ubuntu1~18.04 \
-    doxygen \
+    g++-8=8.4.0* \
+    cmake=3.10.2* \
+    build-essential=12.4* \
+    python-virtualenv=15.1.0* \
+    python-pip=9.0.1* \
+    python3-virtualenv=15.1.0* \
+    python3-pip=9.0.1* \
+    nodejs=8.10.0* \
+    npm=3.5.2* \
+    tar=1.29* \
+    gzip=1.6* \
+    libpthread-stubs0-dev=0.3* \
+    libc6-dbg=2.27* \
+    gdb=8.2* \
+    doxygen=1.8.13* \
     && \
   echo "installed core dependencies"
 
 RUN \
   apt-get install -y \
-    curl=7.58.0-2ubuntu3.10 \
-    git=1:2.17.1-1ubuntu0.7 \
-    htop=2.1.0-3 \
+    curl=7.58.0* \
+    git=1:2.17.1* \
+    htop=2.1.0* \
     man \
-    unzip=6.0-21ubuntu1 \
-    vim \
-    nano=2.9.3-2 \
-    wget=1.19.4-1ubuntu2.2 \
+    unzip=6.0* \
+    vim=2:8.0.1453* \
+    nano=2.9.3* \
+    wget=1.19.4* \
     && \
   echo "installed creature comforts"
 
@@ -221,7 +221,7 @@ RUN \
   yarn install \
   && \
   echo "installed karma-firefox-launcher"
-  
+
 RUN \
   pip install -r /opt/Empirical/third-party/requirements.txt \
     && \
