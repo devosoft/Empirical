@@ -11,6 +11,8 @@
 #ifndef EMP_TDEBUG_ASSERT_TRIGGER_HPP
 #define EMP_TDEBUG_ASSERT_TRIGGER_HPP
 
+#include <string>
+
 namespace emp {
 
   constexpr bool assert_on = true;
