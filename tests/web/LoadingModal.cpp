@@ -89,7 +89,7 @@ struct Test_Loading_Modal_Open_HTMLLayout : public emp::web::BaseTest {
           });
 
           it('should display block', function() {
-            chai.assert.equal(modal.getAttribute("style"), "display: block;");
+            chai.assert.include(modal.getAttribute("style"), "display: block;");
           });
 
           it('should have one child', function() {
@@ -288,7 +288,7 @@ struct Test_Loading_Modal_Closed_HTMLLayout : public emp::web::BaseTest {
           });
 
           it('should display block', function() {
-            chai.assert.equal(modal.getAttribute("style"), "display: none;");
+            chai.assert.include(modal.getAttribute("style"), "display: none;");
           });
 
           it('should have aria-hidden set to true', function() {
