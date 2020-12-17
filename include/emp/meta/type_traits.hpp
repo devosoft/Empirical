@@ -17,6 +17,9 @@
 #include <utility>
 
 #include "../base/Ptr.hpp"
+#include "../base/_is_streamable.hpp"
+//^ provides is_streamable implementation,
+// located in base directory to preserve levelization
 
 #include "meta.hpp"
 

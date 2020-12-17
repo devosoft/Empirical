@@ -15,6 +15,8 @@
 #include <string>
 #include <sstream>
 
+#include "_is_streamable.hpp"
+
 namespace emp {
 
   constexpr bool assert_on = true;
@@ -25,7 +27,10 @@ namespace emp {
   /// Print out information about the next variable and recurse...
   template <typename T, typename... EXTRA>
   void assert_print(std::string name, T && val, EXTRA &&... extra) {
-    std::cerr << name << ": [" << val << "]" << std::endl;
+    if constexpr ( emp::is_streamable<decltype( std::cerr ), T>::value ) {
+      std::cerr << name << ": [" << val << "]" << std::endl;
+    } else std::cerr << name << ": (non-streamable type)" << std::endl;
+
     assert_print(std::forward<EXTRA>(extra)...);
   }
 

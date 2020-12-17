@@ -17,6 +17,8 @@
 
 #include <emscripten.h>
 
+#include "_is_streamable.hpp"
+
 namespace emp {
 
   static int TripAssert() {
@@ -30,7 +32,9 @@ namespace emp {
   /// Print out information about the next variable and recurse...
   template <typename T, typename... EXTRA>
   void assert_print(std::stringstream & ss, std::string name, T && val, EXTRA &&... extra) {
-    ss << name << ": [" << val << "]" << std::endl;
+    if constexpr ( emp::is_streamable<std::stringstream, T>::value ) {
+      ss << name << ": [" << val << "]" << std::endl;
+    } else ss << name << ": (non-streamable type)" << std::endl;
     assert_print(ss, std::forward<EXTRA>(extra)...);
   }
 
