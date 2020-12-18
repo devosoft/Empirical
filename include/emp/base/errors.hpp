@@ -130,7 +130,14 @@ namespace emp {
     std::stringstream ss;
     Notify_impl(ss, std::forward<Ts>(args)...);
 #ifdef __EMSCRIPTEN__
-    EM_ASM_ARGS({ msg = UTF8ToString($0); alert(msg); }, ss.str().c_str());
+    EM_ASM_ARGS({
+      msg = UTF8ToString($0);
+      if (typeof alert == "undefined") {
+        // node polyfill
+        globalThis.alert = console.log;
+      }
+      alert(msg);
+    }, ss.str().c_str());
 #else
     std::cerr << ss.str() << std::endl;
 #endif

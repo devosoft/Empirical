@@ -21,7 +21,14 @@
 
 namespace emp {
 #ifdef __EMSCRIPTEN__
-  void Alert(const std::string & msg) { EM_ASM_ARGS({ msg = UTF8ToString($0); alert(msg); }, msg.c_str()); }
+  void Alert(const std::string & msg) { EM_ASM_ARGS({
+    msg = UTF8ToString($0);
+    if (typeof alert == "undefined") {
+      // node polyfill
+      globalThis.alert = console.log;
+    }
+    alert(msg);
+  }, msg.c_str() ); }
 #else
   /// Send msg to cerr if in C++, or show msg in an alert box if compiled to Javascript
   /// Input can be any number of arguments of any types as long as the can be converted to
