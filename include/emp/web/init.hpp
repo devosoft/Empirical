@@ -93,8 +93,25 @@ namespace emp {
     #endif // __EMSCRIPTEN_PTHREADS__
   }
 
+  /// globalThis polyfill to provide globalThis support in older environments
+  /// adapted from https://mathiasbynens.be/notes/globalthis
+  static void SetupGlobalThisPolyfill() {
+    EM_ASM({
+      (function() {
+        if (typeof globalThis === 'object') return;
+        Object.prototype.__defineGetter__('__magic__', function() {
+          return this;
+        });
+        __magic__.globalThis = __magic__; // lolwat
+        delete Object.prototype.__magic__;
+      }());
+    });
+  }
+
   /// Do all initializations for using EMP tricks with Emscripten.
   static void Initialize() {
+
+    SetupGlobalThisPolyfill();
 
     // have to dip into javascript because static and thread_local are wonky
     // with pthreads
