@@ -35,19 +35,7 @@
 /// Helper macro used throughout...
 #define emp_assert_warning_TO_PAIR(X) EMP_STRINGIFY(X) , X
 
-#if defined( __EMSCRIPTEN__ )
-
-  #define emp_always_assert_warning_impl(...)                                          \
-    do {                                                                       \
-      !(EMP_GET_ARG_1(__VA_ARGS__, ~))                                         \
-      && emp::assert_trigger(                                                  \
-        __FILE__, __LINE__,                                                    \
-        EMP_STRINGIFY( EMP_GET_ARG_1(__VA_ARGS__, ~) )                         \
-        EMP_WRAP_ARGS(emp_assert_warning_TO_PAIR, __VA_ARGS__)                 \
-      );                                                                       \
-    } while(0)
-
-#elif defined( _MSC_VER )
+#if defined( _MSC_VER )
 
   #define emp_always_assert_warning_msvc_impl(TEST)                                    \
     do {                                                                       \
