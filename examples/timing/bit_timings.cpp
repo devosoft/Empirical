@@ -13,6 +13,8 @@
 #include "emp/math/Random.hpp"
 
 #define TEST_SIZES 1, 8, 31, 32, 50, 63, 64, 100, 1000, 10000, 1000000, 1048576
+#define TEST_COUNT 1000000
+
 
 // Return the timing of a function in seconds.
 template <typename T>
@@ -23,6 +25,18 @@ double TimeFunction(T && fun) {
   return total_time / (double) CLOCKS_PER_SEC;
 }
 
+// Return the timing of a function in seconds.
+template <typename T>
+double MultiTimeFunction(T && fun) {
+  std::clock_t start_time = std::clock();
+  for (size_t i = 0; i < TEST_COUNT; ++i) fun();
+  std::clock_t total_time = std::clock() - start_time; 
+  return total_time / (double) CLOCKS_PER_SEC;
+}
+
+
+using size_timings_t = std::map<size_t, double>;          // Map bit sizes to the associated time.
+using timings_t = std::map<std::string, size_timings_t>;  // Map names to all timings.
 
 template <size_t... SIZES> struct SpeedTester { };
 
@@ -33,14 +47,23 @@ struct SpeedTester<SIZE1, OTHER_SIZES...> : public SpeedTester<OTHER_SIZES...>{
   emp::BitSet<SIZE1> bs;
   emp::BitVector bv;
 
+  using base_t = SpeedTester<OTHER_SIZES...>;
+
   template <size_t ID> auto GetBitSet() {
     if constexpr(ID == 0) return bs;
-    else return SpeedTester<OTHER_SIZES...>::template GetBitSet<ID-1>();
+    else return base_t::template GetBitSet<ID-1>();
   }
 
   template <size_t ID> auto GetBitVector() {
     if constexpr(ID == 0) return bs;
-    else return SpeedTester<OTHER_SIZES...>::template GetBitVector<ID-1>();
+    else return base_t::template GetBitVector<ID-1>();
+  }
+
+  void TestClear(size_timings_t & bs_map, size_timings_t & bv_map) {
+    std::cout << "Testing clear for size " << SIZE1 << std::endl;
+    bs_map[SIZE1] = MultiTimeFunction([this](){ bs.Clear(); });
+    bv_map[SIZE1] = MultiTimeFunction([this](){ bv.Clear(); });
+    base_t::TestClear(bs_map, bv_map);
   }
 
   SpeedTester() : bv(SIZE1) { }
@@ -53,7 +76,24 @@ struct SpeedTester<> {
 
   auto GetBitSet() { return 0; }
   auto GetBitVector() { return 0; }
+
+  void TestClear(size_timings_t &, size_timings_t &) { }
+
 };
+
+void PrintResults(timings_t bs_timings, timings_t bv_timings, const std::string & name) {
+  emp::vector<size_t> sizes{ TEST_SIZES };
+
+  std::cout << "=== Timings for '" << name << "' ===\n";
+
+  for (size_t size : sizes) {
+    std::cout << "  size: " << size
+              << "  BitSet: " << bs_timings[name][size]
+              << "  BitVector: " << bv_timings[name][size]
+              << std::endl;
+  }
+
+}
 
 int main()
 {
@@ -61,8 +101,14 @@ int main()
 
   const emp::vector<size_t> test_sizes = { TEST_SIZES };
 
-  for (size_t num_bits : test_sizes) {
-    std::cout << "Testing with " << num_bits << " bits." << std::endl;
-  }
+  SpeedTester<TEST_SIZES> speed_tester;
 
+  timings_t bs_timings;
+  timings_t bv_timings;
+
+  // Conduct the tests.
+  speed_tester.TestClear(bs_timings["clear"], bv_timings["clear"]);
+
+  // Print the results.
+  PrintResults(bs_timings, bv_timings, "clear");
 }
