@@ -5,6 +5,7 @@
 //  Some code testing the speed of random operations.
 
 #include <ctime>         // For std::clock
+#include <iomanip>       // For std::setw
 #include <map>
 
 #include "emp/base/vector.hpp"
@@ -12,7 +13,7 @@
 #include "emp/bits/BitVector.hpp"
 #include "emp/math/Random.hpp"
 
-#define TEST_SIZES 1, 8, 31, 32, 50, 63, 64, 100, 1000, 10000, 1000000, 1048576
+#define TEST_SIZES 1, 8, 31, 32, 50, 63, 64, 100, 1000, 10000, 100000, 1000000
 #define TEST_COUNT 1000000
 
 
@@ -66,6 +67,13 @@ struct SpeedTester<SIZE1, OTHER_SIZES...> : public SpeedTester<OTHER_SIZES...>{
     base_t::TestClear(bs_map, bv_map);
   }
 
+  void TestSetAll(size_timings_t & bs_map, size_timings_t & bv_map) {
+    std::cout << "Testing set_all for size " << SIZE1 << std::endl;
+    bs_map[SIZE1] = MultiTimeFunction([this](){ bs.SetAll(); });
+    bv_map[SIZE1] = MultiTimeFunction([this](){ bv.SetAll(); });
+    base_t::TestSetAll(bs_map, bv_map);
+  }
+
   SpeedTester() : bv(SIZE1) { }
 };
 
@@ -78,6 +86,7 @@ struct SpeedTester<> {
   auto GetBitVector() { return 0; }
 
   void TestClear(size_timings_t &, size_timings_t &) { }
+  void TestSetAll(size_timings_t &, size_timings_t &) { }
 
 };
 
@@ -87,9 +96,10 @@ void PrintResults(timings_t bs_timings, timings_t bv_timings, const std::string 
   std::cout << "=== Timings for '" << name << "' ===\n";
 
   for (size_t size : sizes) {
-    std::cout << "  size: " << size
-              << "  BitSet: " << bs_timings[name][size]
-              << "  BitVector: " << bv_timings[name][size]
+    std::cout << std::left
+              << "  size: " << std::setw(7) << size
+              << "  BitSet: " << std::setw(8) << bs_timings[name][size]
+              << "  BitVector: " << std::setw(8) << bv_timings[name][size]
               << std::endl;
   }
 
@@ -108,7 +118,9 @@ int main()
 
   // Conduct the tests.
   speed_tester.TestClear(bs_timings["clear"], bv_timings["clear"]);
+  speed_tester.TestSetAll(bs_timings["set_all"], bv_timings["set_all"]);
 
   // Print the results.
   PrintResults(bs_timings, bv_timings, "clear");
+  PrintResults(bs_timings, bv_timings, "set_all");
 }
