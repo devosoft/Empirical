@@ -27,7 +27,7 @@ namespace emp {
   }
 
   /// Base case for assert_print...
-  void assert_print(std::stringstream &) { ; }
+  inline void assert_print(std::stringstream &) { ; }
 
   /// Print out information about the next variable and recurse...
   template <typename T, typename... EXTRA>
