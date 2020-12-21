@@ -99,6 +99,9 @@ namespace web {
 
     /// Erase current text.
     TextFeed & Clear() { Info()->strings.clear(); return *this; }
+
+    /// Remove last text item.
+    TextFeed & PopBack() { Info()->strings.pop_back(); return *this; }
   };
 
   /// Add new text to this string.
