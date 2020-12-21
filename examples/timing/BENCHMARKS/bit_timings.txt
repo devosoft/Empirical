@@ -1,0 +1,27 @@
+=== Timings for 'clear' ===
+  size: 1        BitSet: 2e-06     BitVector: 0.001612
+  size: 8        BitSet: 1e-06     BitVector: 0.001576
+  size: 31       BitSet: 0         BitVector: 0.001732
+  size: 32       BitSet: 0         BitVector: 0.001645
+  size: 50       BitSet: 0         BitVector: 0.001807
+  size: 63       BitSet: 1e-06     BitVector: 0.001625
+  size: 64       BitSet: 1e-06     BitVector: 0.001794
+  size: 100      BitSet: 3e-05     BitVector: 0.001979
+  size: 1000     BitSet: 0.000245  BitVector: 0.002341
+  size: 10000    BitSet: 0.007033  BitVector: 0.007333
+  size: 100000   BitSet: 0.07219   BitVector: 0.063752
+  size: 1000000  BitSet: 1.22148   BitVector: 1.20182 
+
+=== Timings for 'set_all' ===
+  size: 1        BitSet: 0         BitVector: 0.002516
+  size: 8        BitSet: 0         BitVector: 0.002305
+  size: 31       BitSet: 0         BitVector: 0.002397
+  size: 32       BitSet: 0         BitVector: 0.002355
+  size: 50       BitSet: 1e-06     BitVector: 0.002412
+  size: 63       BitSet: 0         BitVector: 0.002537
+  size: 64       BitSet: 1e-06     BitVector: 0.00223 
+  size: 100      BitSet: 1e-06     BitVector: 0.002674
+  size: 1000     BitSet: 0.00021   BitVector: 0.002929
+  size: 10000    BitSet: 0.006575  BitVector: 0.007958
+  size: 100000   BitSet: 0.058491  BitVector: 0.053586
+  size: 1000000  BitSet: 1.1352    BitVector: 1.17839
