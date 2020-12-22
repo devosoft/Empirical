@@ -71,12 +71,13 @@ demos/NK/web/NK.js.mem
 doc/doxygen/
 examples/*/*
 !examples/*/*.cc
-!examples/*/*.h
 !examples/*/*.cpp
+!examples/*/*.h
 !examples/*/*.hpp
 !examples/*/*.html
 !examples/*/images
 !examples/*/Makefile
+!examples/timing/BENCHMARKS
 
 tests/*.csv
 tests/StatsConfig.cfg
