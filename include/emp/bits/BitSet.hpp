@@ -122,13 +122,7 @@ namespace emp {
     BitSet(Random & random, const double p1) { Clear(); Randomize(random, p1); }
 
     /// Constructor to fill in a bit set from a vector.
-    template <typename T>
-    BitSet(const std::initializer_list<T> l) {
-      emp_assert(l.size() <= NUM_BITS, "Initializer longer than BitSet", l.size(), NUM_BITS);
-      Clear();
-      auto it = std::rbegin(l); // Right-most bit is position 0.
-      for (size_t idx = 0; idx < NUM_BITS; ++idx) Set(idx, (idx < l.size()) && *it++);
-    }
+    template <typename T> BitSet(const std::initializer_list<T> l);
 
     /// Destructor.
     ~BitSet() = default;
@@ -137,36 +131,41 @@ namespace emp {
     BitSet & operator=(const BitSet<NUM_BITS> & in_set) { Copy(in_set.bit_set); return *this; }
 
     /// Set all bits randomly, with a 50% probability of being a 0 or 1.
-    void Randomize(Random & random) {
+    BitSet &  Randomize(Random & random) {
       random.RandFill(BytePtr(), TOTAL_BYTES);
       ClearExcessBits();
+      return *this;
     }
 
     /// Set all bits randomly, with a given probability of being a on.
-    void Randomize(Random & random, const double p) {
+    BitSet & Randomize(Random & random, const double p) {
+      // Try to find a shortcut if p allows....
       if (p == 0.0) return Clear();
-      if (p == 0.5) return Randomize(random); // If 0.5 probability, generate by field!
+      if (p == 0.5) return Randomize(random);
+      if (p == 1.0) return SetAll();
       for (size_t i = 0; i < NUM_BITS; i++) Set(i, random.P(p));
+      return *this;
     }
 
-    /// Mutate bits, return how many mutations were performed
-    size_t Mutate(
-      Random & random,
-      const size_t num_muts, // @CAO: use tools/Binomial in Distribution.h with this part?
-      const size_t min_idx=0 // draw this from a distribution to make some
-                            // bits more volatile than others
-    ) {
-      emp_assert(min_idx <= NUM_BITS);
-      emp_assert(num_muts <= NUM_BITS - min_idx);
+    /// Flip random bits.
+    BitSet & FlipRandom(Random & random,
+                        const double p,
+                        const size_t start_pos=0,
+                        const size_t stop_pos=NUM_BITS)
+    {
+      emp_assert(start_pos <= stop_pos);
+      emp_assert(stop_pos <= NUM_BITS);
+      emp_assert(num_flips <= stop_pos - start_pos);
 
-      std::vector<size_t> res;
-      Choose(random, NUM_BITS - min_idx, num_muts, res);
+      for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Toggle(i);
 
-      for (size_t idx : res) Toggle(idx + min_idx);
-
-      return num_muts;
-
+      return *this;
     }
+
+    // size_t Mutate(
+    //   Random & random,
+    //   const size_t num_muts, // @CAO: use tools/Binomial in Distribution.h with this part?
+    //   const size_t min_idx=0 // Preserve some early bits?
 
     /// Assign from a BitSet of a different size.
     template <size_t FROM_BITS>
@@ -1273,8 +1272,18 @@ namespace emp {
     ClearExcessBits();
   }
 
+  // ------------------------- Longer Constructors --------------------------
+  template <size_t NUM_BITS>
+  template <typename T>
+  BitSet<NUM_BITS>::BitSet(const std::initializer_list<T> l) {
+    emp_assert(l.size() <= NUM_BITS, "Initializer longer than BitSet", l.size(), NUM_BITS);
+    Clear();
+    auto it = std::rbegin(l); // Right-most bit is position 0.
+    for (size_t idx = 0; idx < NUM_BITS; ++idx) Set(idx, (idx < l.size()) && *it++);
+  }
 
-  // --------------------  Extra Functions  --------------------
+
+  // -------------------------  Extra Functions  -------------------------
 
   template <size_t NUM_BITS1, size_t NUM_BITS2>
   BitSet<NUM_BITS1+NUM_BITS2> join(const BitSet<NUM_BITS1> & in1, const BitSet<NUM_BITS2> & in2) {
