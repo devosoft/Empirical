@@ -8,13 +8,13 @@
 #include <iomanip>       // For std::setw
 #include <map>
 
+#include "emp/bits/BitVector2.hpp"
 #include "emp/base/vector.hpp"
 #include "emp/bits/BitSet.hpp"
-#include "emp/bits/BitVector.hpp"
 #include "emp/math/Random.hpp"
 
 #define TEST_SIZES 1, 8, 31, 32, 50, 63, 64, 100, 1000, 10000, 100000, 1000000
-#define TEST_COUNT 1000000
+#define TEST_COUNT 500000
 
 
 // Return the timing of a function in seconds.
