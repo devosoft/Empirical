@@ -478,11 +478,11 @@ namespace emp {
     BitProxy<this_t> operator[](size_t index) { return BitProxy<this_t>(*this, index); }
 
     /// Set all bits to zero.
-    BitSet & Clear() { std::memset(bit_set, 0, sizeof(bit_set)); return *this; }
+    BitSet & Clear() { for (field_t & x : bit_set) x = FIELD_0; return *this; }
 
     /// Set all bits to one.
     BitSet & SetAll() {
-      std::memset(bit_set, 255, sizeof(bit_set));
+      for (field_t & x : bit_set) x = FIELD_ALL;
       ClearExcessBits();
       return *this;
     }
