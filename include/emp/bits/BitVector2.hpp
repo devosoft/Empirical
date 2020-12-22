@@ -93,6 +93,9 @@ namespace emp {
     // being copied and only the fields need to be copied over.
     void RawCopy(const Ptr<field_t> in);
 
+    // Convert the bits to bytes.
+    unsigned char * BytePtr() { return bits.ReinterpretCast<unsigned char>(); }
+
     // Any bits past the last "real" bit in the last field should be kept as zeros.
     void ClearExcessBits() {
       if (NumEndBits() > 0) bits[NumFields() - 1] &= MaskLow<field_t>(NumEndBits());
@@ -116,6 +119,12 @@ namespace emp {
 
     /// Move constructor of existing bit field.
     BitVector(BitVector && in);
+
+    /// Constructor to generate a random BitVector (with equal prob of 0 or 1).
+    BitVector(size_t in_num_bits, Random & random);
+
+    /// Constructor to generate a random BitVector with provided prob of 1's.
+    BitVector(size_t in_num_bits, Random & random, const double p1);
 
     /// Initializer list constructor.
     template <typename T> BitVector(const std::initializer_list<T> l);
@@ -190,6 +199,38 @@ namespace emp {
     /// Resize this BitVector to have the specified number of bits.
     BitVector & Resize(size_t new_bits);
 
+    /// Set all bits randomly, with a 50% probability of being a 0 or 1.
+    BitVector &  Randomize(Random & random) {
+      random.RandFill(BytePtr(), NumBytes());
+      ClearExcessBits();
+      return *this;
+    }
+
+    /// Set all bits randomly, with a given probability of being a on.
+    BitVector & Randomize(Random & random, const double p) {
+      // Try to find a shortcut if p allows....
+      if (p == 0.0) return Clear();
+      if (p == 0.5) return Randomize(random);
+      if (p == 1.0) return SetAll();
+      for (size_t i = 0; i < num_bits; i++) Set(i, random.P(p));
+      return *this;
+    }
+
+    /// Flip random bits.
+    BitVector & FlipRandom(Random & random,
+                           double p,
+                           const size_t start_pos=0,
+                           size_t stop_pos=(size_t) -1)
+    {
+      if (stop_pos == (size_t) -1) stop_pos = num_bits;
+
+      emp_assert(start_pos <= stop_pos);
+      emp_assert(stop_pos <= num_bits);
+
+      for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Toggle(i);
+
+      return *this;
+    }
 
     // >>>>>>>>>>  Comparison Operators  <<<<<<<<<< //
 
@@ -452,7 +493,7 @@ namespace emp {
       for (size_t i = 0; i < field_shift2; ++i) {
         bits[i] = bits[i + field_shift];
       }
-      for (size_t i = field_shift2; i < NUM_FIELDS; i++) bits[i] = 0U;
+      for (size_t i = field_shift2; i < NUM_FIELDS; i++) bits[i] = FIELD_0;
     }
 
     // account for bit_shift
@@ -478,7 +519,7 @@ namespace emp {
     else emp_assert(num_bits == 0);
 
     // Make sure final bits are zeroed out.
-    field_t excess_bits = bits[NumFields() - 1] & ~MaskLow<field_t>(NumEndBits());
+    [[maybe_unused]] field_t excess_bits = bits[NumFields() - 1] & ~MaskLow<field_t>(NumEndBits());
     emp_assert(!excess_bits);
 
     return true;
@@ -513,6 +554,26 @@ namespace emp {
 
     in.bits = nullptr;
     in.num_bits = 0;
+  }
+
+  /// Constructor to generate a random BitVector (with equal prob of 0 or 1).
+  BitVector::BitVector(size_t in_num_bits, Random & random)
+  : num_bits(in_num_bits), bits(nullptr)
+  {
+    if (num_bits) {
+      bits = NewArrayPtr<field_t>(NumFields());
+      Randomize(random);
+    }
+  }
+
+  /// Constructor to generate a random BitVector with provided prob of 1's.
+  BitVector::BitVector(size_t in_num_bits, Random & random, const double p1)
+  : num_bits(in_num_bits), bits(nullptr)
+  {
+    if (num_bits) {
+      bits = NewArrayPtr<field_t>(NumFields());
+      Randomize(random, p1);
+    }
   }
 
   /// Initializer list constructor.
@@ -643,7 +704,7 @@ namespace emp {
   /// Set all bits to 0.
   BitVector & BitVector::Clear() {
     const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = 0U;
+    for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = FIELD_0;
     return *this;
   }
 
@@ -762,7 +823,7 @@ namespace emp {
       else bits = nullptr;
       const size_t min_fields = std::min(old_num_fields, NUM_FIELDS);
       for (size_t i = 0; i < min_fields; i++) bits[i] = old_bits[i];
-      for (size_t i = min_fields; i < NUM_FIELDS; i++) bits[i] = 0U;
+      for (size_t i = min_fields; i < NUM_FIELDS; i++) bits[i] = FIELD_0;
       if (old_bits) old_bits.DeleteArray();
     }
 
