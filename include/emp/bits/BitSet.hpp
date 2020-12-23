@@ -155,7 +155,7 @@ namespace emp {
     {
       emp_assert(start_pos <= stop_pos);
       emp_assert(stop_pos <= NUM_BITS);
-      emp_assert(num_flips <= stop_pos - start_pos);
+      emp_assert(p >= 0.0 && p <= 1.0, p);
 
       for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Toggle(i);
 
