@@ -54,9 +54,12 @@ struct PlusCountdownRegulator {
       0.0f,
       1.0f
     );
-    emp_assert(state <= 0.0f || res >= raw_score, state, res, raw_score);
-    emp_assert(state >= 0.0f || res <= raw_score, state, res, raw_score);
-    emp_assert(res >= 0.0f && res <= 1.0f, res);
+    emp_assert(state <= 0.0f || res >= raw_score || std::isnan(state),
+      state, res, raw_score);
+    emp_assert(state >= 0.0f || res <= raw_score || std::isnan(state),
+      state, res, raw_score);
+    emp_assert( (res >= 0.0f && res <= 1.0f) || std::isnan(state),
+      res);
     return res;
 
   }
