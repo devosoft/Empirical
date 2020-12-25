@@ -17,8 +17,9 @@
 #define TEST_SIZES 1, 8, 31, 32, 50, 63, 64, 100, 1000, 10000, 100000, 1000000
 
 // How many total bits should we work with?  The below represents 80 meg worth per test.
-#define TEST_BITS 5000000
-#define TEST_COUNT 1000
+static constexpr size_t TEST_BITS = 5120000;
+static constexpr size_t TEST_COUNT = 1000;
+
 
 // Return the timing of a function in seconds.
 template <typename T>
@@ -108,8 +109,12 @@ void PrintResults(timings_t bs_timings, timings_t bv_timings, const std::string 
   std::cout << "=== Timings for '" << name << "' ===\n";
 
   for (size_t size : sizes) {
+  size_t obj_bits = (size > 256) ? size : 256;
+  size_t obj_count = TEST_BITS / obj_bits;
+
     std::cout << std::left
               << "  size: " << std::setw(7) << size
+              << "  count: " << std::setw(7) << obj_count              
               << "  BitSet: " << std::setw(8) << bs_timings[name][size]
               << "  BitVector: " << std::setw(8) << bv_timings[name][size]
               << "  Ratio: " << std::setw(8) << (bs_timings[name][size] / bv_timings[name][size])
