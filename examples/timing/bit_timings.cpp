@@ -43,10 +43,10 @@ double MultiTimeFunction(T && fun) {
 using size_timings_t = std::map<size_t, double>;          // Map bit sizes to the associated time.
 using timings_t = std::map<std::string, size_timings_t>;  // Map names to all timings.
 
-template <size_t... SIZES> struct SpeedTester { };
+template <size_t... SIZES> struct SpeedTester_impl { };
 
 template <size_t SIZE1, size_t... OTHER_SIZES>
-struct SpeedTester<SIZE1, OTHER_SIZES...> : public SpeedTester<OTHER_SIZES...>{
+struct SpeedTester_impl<SIZE1, OTHER_SIZES...> : public SpeedTester_impl<OTHER_SIZES...>{
   static constexpr size_t CUR_BITS = SIZE1;
   static constexpr size_t OTHER_COUNT = sizeof...(OTHER_SIZES);
 
@@ -59,7 +59,7 @@ struct SpeedTester<SIZE1, OTHER_SIZES...> : public SpeedTester<OTHER_SIZES...>{
   emp::array< emp::BitSet<SIZE1>, OBJ_COUNT > bs_objs;
   emp::array< emp::BitVector, OBJ_COUNT > bv_objs;
 
-  using base_t = SpeedTester<OTHER_SIZES...>;
+  using base_t = SpeedTester_impl<OTHER_SIZES...>;
 
   template <size_t SIZE_ID> auto GetBitSet(size_t index) {
     if constexpr(SIZE_ID == 0) return bs_objs[index];
@@ -85,13 +85,13 @@ struct SpeedTester<SIZE1, OTHER_SIZES...> : public SpeedTester<OTHER_SIZES...>{
     base_t::TestSetAll(bs_map, bv_map);
   }
 
-  SpeedTester() {
+  SpeedTester_impl() {
     for (auto & x : bv_objs) x.resize(SIZE1);
   }
 };
 
 template <>
-struct SpeedTester<> {
+struct SpeedTester_impl<> {
   static constexpr size_t CUR_BITS = 0;
   static constexpr size_t OTHER_COUNT = 0;
 
@@ -100,46 +100,54 @@ struct SpeedTester<> {
 
   void TestClear(size_timings_t &, size_timings_t &) { }
   void TestSetAll(size_timings_t &, size_timings_t &) { }
-
 };
 
-void PrintResults(timings_t bs_timings, timings_t bv_timings, const std::string & name) {
-  emp::vector<size_t> sizes{ TEST_SIZES };
+struct SpeedTester {
+  SpeedTester_impl<TEST_SIZES> impl;
 
-  std::cout << "=== Timings for '" << name << "' ===\n";
+  timings_t bs_timings;
+  timings_t bv_timings;
 
-  for (size_t size : sizes) {
-  size_t obj_bits = (size > 256) ? size : 256;
-  size_t obj_count = TEST_BITS / obj_bits;
+  void PrintResults(timings_t bs_timings, timings_t bv_timings, const std::string & name) {
+    emp::vector<size_t> sizes{ TEST_SIZES };
 
-    std::cout << std::left
-              << "  size: " << std::setw(7) << size
-              << "  count: " << std::setw(7) << obj_count              
-              << "  BitSet: " << std::setw(8) << bs_timings[name][size]
-              << "  BitVector: " << std::setw(8) << bv_timings[name][size]
-              << "  Ratio: " << std::setw(8) << (bs_timings[name][size] / bv_timings[name][size])
-              << std::endl;
+    std::cout << "=== Timings for '" << name << "' ===\n";
+
+    for (size_t size : sizes) {
+      size_t obj_bits = (size > 256) ? size : 256;
+      size_t obj_count = TEST_BITS / obj_bits;
+
+      std::cout << std::left
+                << "  size: " << std::setw(7) << size
+                << "  count: " << std::setw(7) << obj_count              
+                << "  BitSet: " << std::setw(8) << bs_timings[name][size]
+                << "  BitVector: " << std::setw(8) << bv_timings[name][size]
+                << "  Ratio: " << std::setw(8) << (bs_timings[name][size] / bv_timings[name][size])
+                << std::endl;
+    }
   }
 
-}
+  void RunTests() {
+    // Conduct the tests.
+    impl.TestClear(bs_timings["clear"], bv_timings["clear"]);
+    impl.TestSetAll(bs_timings["set_all"], bv_timings["set_all"]);
+  }
+
+  void PrintResults() {
+    // Print the results.
+    PrintResults(bs_timings, bv_timings, "clear");
+    PrintResults(bs_timings, bv_timings, "set_all");
+  }
+};
+
 
 int main()
 {
   const emp::vector<size_t> test_sizes = { TEST_SIZES };
 
-  SpeedTester<TEST_SIZES> speed_tester;
-
-  timings_t bs_timings;
-  timings_t bv_timings;
+  SpeedTester speed_tester;
 
   emp::Random random;
-
-  // Conduct the tests.
-  speed_tester.TestClear(bs_timings["clear"], bv_timings["clear"]);
-  speed_tester.TestSetAll(bs_timings["set_all"], bv_timings["set_all"]);
-
-  // Print the results.
-  PrintResults(bs_timings, bv_timings, "clear");
-  PrintResults(bs_timings, bv_timings, "set_all");
-  
+  speed_tester.RunTests();
+  speed_tester.PrintResults();  
 }
