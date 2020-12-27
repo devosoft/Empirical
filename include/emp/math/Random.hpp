@@ -103,9 +103,7 @@ namespace emp {
 
 
     /// @return A pseudo-random 32-bit (4 byte) unsigned int value.
-    inline uint32_t GetUInt() {
-      return Get();
-    }
+    inline uint32_t GetUInt() { return Get(); }
 
     /// @return A pseudo-random 32-bit unsigned int value between 0 and max
     template <typename T>
@@ -124,6 +122,28 @@ namespace emp {
     inline uint32_t GetUInt(const Range<T> range) {
       return GetUInt(range.GetLower(), range.GetUpper());
     }
+
+
+    /// @return A pseudo-random 32 bits (unsigned int) with a 12.5% chance of each bit being 1.
+    inline uint32_t GetBits12_5() { return Get() & Get() & Get(); }
+
+    /// @return A pseudo-random 32 bits (unsigned int) with a 25% chance of each bit being 1.
+    inline uint32_t GetBits25() { return Get() & Get(); }
+
+    /// @return A pseudo-random 32 bits (unsigned int) with a 37.5% chance of each bit being 1.
+    inline uint32_t GetBits37_5() { return (Get() | Get()) & Get(); }
+
+    /// @return A pseudo-random 32 bits (unsigned int) with a 50% chance of each bit being 1.
+    inline uint32_t GetBits50() { return Get(); }
+
+    /// @return A pseudo-random 32 bits (unsigned int) with a 62.5% chance of each bit being 1.
+    inline uint32_t GetBits62_5() { return (Get() & Get()) | Get(); }
+
+    /// @return A pseudo-random 32 bits (unsigned int) with a 75% chance of each bit being 1.
+    inline uint32_t GetBits75() { return Get() | Get(); }
+
+    /// @return A pseudo-random 32 bits (unsigned int) with a 87.5% chance of each bit being 1.
+    inline uint32_t GetBits87_5() { return Get() | Get() | Get(); }
 
 
     /// @return A pseudo-random 64-bit (8 byte) unsigned int value.
