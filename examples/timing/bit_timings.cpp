@@ -46,9 +46,9 @@ using timings_t = std::map<std::string, size_timings_t>;  // Map names to all ti
 template <size_t... SIZES> struct SpeedTester_impl { };
 
 template <size_t SIZE1, size_t... OTHER_SIZES>
-struct SpeedTester_impl<SIZE1, OTHER_SIZES...> : public SpeedTester_impl<OTHER_SIZES...>{
+struct SpeedTester_impl<SIZE1, OTHER_SIZES...> : public SpeedTester_impl<OTHER_SIZES...> {
   static constexpr size_t CUR_BITS = SIZE1;
-  static constexpr size_t OTHER_COUNT = sizeof...(OTHER_SIZES);
+  static constexpr bool HAS_OTHERS = sizeof...(OTHER_SIZES) > 0;
 
   // How many bits should we treat each object as?  Put a floor of 256 bits.
   static constexpr size_t OBJ_BITS = (CUR_BITS > 256) ? CUR_BITS : 256;
@@ -75,47 +75,33 @@ struct SpeedTester_impl<SIZE1, OTHER_SIZES...> : public SpeedTester_impl<OTHER_S
     std::cout << "Testing 'clear' for size " << SIZE1 << std::endl;
     bs_map[SIZE1] = MultiTimeFunction( [this](){ for (auto & x : bs_objs) x.Clear(); } );
     bv_map[SIZE1] = MultiTimeFunction( [this](){ for (auto & x : bv_objs) x.Clear(); } );
-    base_t::TestClear(bs_map, bv_map);
+    if constexpr (HAS_OTHERS) base_t::TestClear(bs_map, bv_map);
   }
 
   void TestSetAll(size_timings_t & bs_map, size_timings_t & bv_map) {
     std::cout << "Testing 'set_all' for size " << SIZE1 << std::endl;
     bs_map[SIZE1] = MultiTimeFunction([this](){ for (auto & x : bs_objs) x.SetAll(); });
     bv_map[SIZE1] = MultiTimeFunction([this](){ for (auto & x : bv_objs) x.SetAll(); });
-    base_t::TestSetAll(bs_map, bv_map);
+    if constexpr (HAS_OTHERS) base_t::TestSetAll(bs_map, bv_map);
   }
 
   void TestRandomize(size_timings_t & bs_map, size_timings_t & bv_map, emp::Random & random) {
     std::cout << "Testing 'randomize' for size " << SIZE1 << std::endl;
     bs_map[SIZE1] = MultiTimeFunction([this, &random](){ for (auto & x : bs_objs) x.Randomize(random); });
     bv_map[SIZE1] = MultiTimeFunction([this, &random](){ for (auto & x : bv_objs) x.Randomize(random); });
-    base_t::TestRandomize(bs_map, bv_map, random);
+    if constexpr (HAS_OTHERS) base_t::TestRandomize(bs_map, bv_map, random);
   }
 
   void TestRandomize75(size_timings_t & bs_map, size_timings_t & bv_map, emp::Random & random) {
     std::cout << "Testing 'randomize75' for size " << SIZE1 << std::endl;
     bs_map[SIZE1] = MultiTimeFunction([this, &random](){ for (auto & x : bs_objs) x.Randomize(random, 0.75); });
     bv_map[SIZE1] = MultiTimeFunction([this, &random](){ for (auto & x : bv_objs) x.Randomize(random, 0.75); });
-    base_t::TestRandomize75(bs_map, bv_map, random);
+    if constexpr (HAS_OTHERS) base_t::TestRandomize75(bs_map, bv_map, random);
   }
 
   SpeedTester_impl() {
     for (auto & x : bv_objs) x.resize(SIZE1);
   }
-};
-
-template <>
-struct SpeedTester_impl<> {
-  static constexpr size_t CUR_BITS = 0;
-  static constexpr size_t OTHER_COUNT = 0;
-
-  auto GetBitSet() { return 0; }
-  auto GetBitVector() { return 0; }
-
-  void TestClear(size_timings_t &, size_timings_t &) { }
-  void TestSetAll(size_timings_t &, size_timings_t &) { }
-  void TestRandomize(size_timings_t &, size_timings_t &, emp::Random &) { }
-  void TestRandomize75(size_timings_t &, size_timings_t &, emp::Random &) { }
 };
 
 struct SpeedTester {
