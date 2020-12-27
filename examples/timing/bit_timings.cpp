@@ -99,6 +99,13 @@ struct SpeedTester_impl<SIZE1, OTHER_SIZES...> : public SpeedTester_impl<OTHER_S
     if constexpr (HAS_OTHERS) base_t::TestRandomize75(bs_map, bv_map, random);
   }
 
+  void TestRandomize82(size_timings_t & bs_map, size_timings_t & bv_map, emp::Random & random) {
+    std::cout << "Testing 'randomize82' for size " << SIZE1 << std::endl;
+    bs_map[SIZE1] = MultiTimeFunction([this, &random](){ for (auto & x : bs_objs) x.Randomize(random, 0.82); });
+    bv_map[SIZE1] = MultiTimeFunction([this, &random](){ for (auto & x : bv_objs) x.Randomize(random, 0.82); });
+    if constexpr (HAS_OTHERS) base_t::TestRandomize82(bs_map, bv_map, random);
+  }
+
   SpeedTester_impl() {
     for (auto & x : bv_objs) x.resize(SIZE1);
   }
@@ -136,6 +143,7 @@ struct SpeedTester {
     impl.TestSetAll(bs_timings["set_all"], bv_timings["set_all"]);
     impl.TestRandomize(bs_timings["randomize"], bv_timings["randomize"], random);
     impl.TestRandomize75(bs_timings["randomize75"], bv_timings["randomize75"], random);
+    impl.TestRandomize82(bs_timings["randomize82"], bv_timings["randomize82"], random);
   }
 
   void PrintResults() {
@@ -144,6 +152,7 @@ struct SpeedTester {
     PrintResults(bs_timings, bv_timings, "set_all");
     PrintResults(bs_timings, bv_timings, "randomize");
     PrintResults(bs_timings, bv_timings, "randomize75");
+    PrintResults(bs_timings, bv_timings, "randomize82");
   }
 };
 
