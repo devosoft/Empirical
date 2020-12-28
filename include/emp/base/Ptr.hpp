@@ -31,6 +31,18 @@
 
 namespace emp {
 
+  // ------------ Pre-declare some helper types and functions --------------
+
+  template <typename TYPE> class Ptr;
+
+
+  template <typename T>
+  inline void FillMemory(emp::Ptr<unsigned char *>  mem_ptr, const size_t num_bytes, T fill_value);
+
+  /// Fill an array by repeatedly calling the provided fill functions.
+  template <typename T>
+  inline void FillMemoryFunction(emp::Ptr<unsigned char *>  mem_ptr, const size_t num_bytes, T fill_fun);
+
   namespace internal {
     /// An anonymous log2 calculator for hashing below.
     static constexpr size_t Log2(size_t x) { return x <= 1 ? 0 : (Log2(x/2) + 1); }
@@ -699,6 +711,33 @@ namespace emp {
     /// Does this Ptr point to a memory position after or equal to a raw pointer?
     bool operator>=(const TYPE * in_ptr) const { return ptr >= in_ptr; }
 
+    /// Fill an array with the provided fill_value.
+    /// If fill_value is a function, repeatedly call function.
+    template <typename T>
+    void FillMemoryFunction(const size_t num_bytes, T fill_fun) {
+      // Make sure a pointer is active before we write to it.
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
+      emp_assert(Tracker().IsArrayID(id), "Only arrays can fill memory.", id);
+      emp_assert(Tracker().GetArrayBytes(id) >= num_bytes),
+        "Overfilling memory.", id, ptr, pos, sizeof(TYPE), Tracker().GetArrayBytes(id));
+      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
+
+      emp::FillMemoryFunction(*this, num_bytes, fill_fun);
+    }
+
+    /// Fill an array with the provided fill_value.
+    /// If fill_value is a function, repeatedly call function.
+    template <typename T>
+    void FillMemory(const size_t num_bytes, T fill_value) {
+      // Make sure a pointer is active before we write to it.
+      emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
+      emp_assert(Tracker().IsArrayID(id), "Only arrays can fill memory.", id);
+      emp_assert(Tracker().GetArrayBytes(id) >= num_bytes),
+        "Overfilling memory.", id, ptr, pos, sizeof(TYPE), Tracker().GetArrayBytes(id));
+      emp_assert(ptr != nullptr, "Do not follow a null pointer!");
+
+      emp::FillMemory(*this, num_bytes, fill_value);
+    }
 
     /// Some debug testing functions
     int DebugGetCount() const { return Tracker().GetIDCount(id); }
@@ -850,6 +889,22 @@ namespace emp {
     bool operator>(const TYPE * in_ptr)  const { return ptr > in_ptr; }
     bool operator>=(const TYPE * in_ptr) const { return ptr >= in_ptr; }
 
+    // Extra functionality (not in raw pointers)
+
+    /// Fill an array with the provided fill_value.
+    /// If fill_value is a function, repeatedly call function.
+    template <typename T>
+    void FillMemoryFunction(const size_t num_bytes, T fill_fun) {
+      emp::FillMemoryFunction(*this, num_bytes, fill_fun);
+    }
+
+    /// Fill an array with the provided fill_value.
+    /// If fill_value is a function, repeatedly call function.
+    template <typename T>
+    void FillMemory(const size_t num_bytes, T fill_value) {
+      emp::FillMemory(*this, num_bytes, fill_value);
+    }
+
     // Stubs for debug-related functions when outside debug mode.
     int DebugGetCount() const { return -1; }
     bool DebugIsArray() const { emp_assert(false); return false; }
@@ -928,6 +983,54 @@ namespace emp {
     return Ptr<T>(ptr, array_size, true);
   }
 
+  /// Fill an array with the provided fill_value.
+  /// If fill_value is a function, repeatedly call function.
+  template <typename T>
+  void FillMemory(emp::Ptr<unsigned char>  mem_ptr, const size_t num_bytes, T fill_value) {
+    // If the fill value is a function, call that function for each memory position.
+    if constexpr (std::is_invocable_v<T>) {
+      FillMemoryFunction(mem_ptr, num_bytes, std::forward<T>(fill_value));
+    }
+
+    constexpr size_t FILL_SIZE = sizeof(T);
+
+    const size_t leftover = num_bytes % FILL_SIZE;
+    const size_t limit = num_bytes - leftover;
+    unsigned char * dest = mem_ptr.Raw();
+
+    // Fill out random bytes in groups of FILL_SIZE.
+    for (size_t byte = 0; byte < limit; byte += FILL_SIZE) {
+      std::memcpy(dest+byte, &fill_value, FILL_SIZE);
+    }
+
+    // If we don't have a multiple of FILL_SIZE, fill in part of the remaining.
+    if (leftover) std::memcpy(dest+limit, &fill_value, leftover);
+  }
+
+  /// Fill an array by repeatedly calling the provided fill functions.
+  template <typename T>
+  void FillMemoryFunction(emp::Ptr<unsigned char>  mem_ptr, const size_t num_bytes, T fill_fun) {
+    static_assert(std::is_invocable_v<T>, "FillMemoryFunction requires an invocable fill_fun.");
+    using return_t = decltype(fill_fun);
+    constexpr size_t FILL_SIZE = sizeof(return_t);
+
+    const size_t leftover = num_bytes % FILL_SIZE;
+    const size_t limit = num_bytes - leftover;
+    unsigned char * dest = mem_ptr.Raw();
+
+    // Fill out random bytes in groups of FILL_SIZE.
+    return_t fill_value;
+    for (size_t byte = 0; byte < limit; byte += FILL_SIZE) {
+      fill_value = fill_fun();
+      std::memcpy(dest+byte, &fill_value, FILL_SIZE);
+    }
+
+    // If we don't have a multiple of FILL_SIZE, fill in part of the remaining.
+    if (leftover) {
+      fill_value = fill_fun();
+      std::memcpy(dest+limit, &fill_value, leftover);
+    }
+  }
 
 }
 
