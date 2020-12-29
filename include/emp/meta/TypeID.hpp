@@ -202,7 +202,7 @@ namespace emp {
         // If this type is convertable to a double, cast the pointer to the correct type, de-reference it,
         // and then return the conversion.  Otherwise return NaN
         if constexpr (std::is_convertible<double, T>::value) {
-          *ptr.ReinterpretCast<base_t>() = value;
+          *ptr.ReinterpretCast<base_t>() = (base_t) value;
           return true;
         }
 
@@ -232,7 +232,7 @@ namespace emp {
 
         // If this variable is a numeric value, use from_string.
         else if constexpr (std::is_arithmetic<T>::value) {
-          *ptr.ReinterpretCast<base_t>() = stod(value);
+          *ptr.ReinterpretCast<base_t>() = (base_t) stod(value);
           return true;
         }
 
