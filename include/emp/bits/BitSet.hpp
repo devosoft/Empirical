@@ -94,7 +94,7 @@ namespace emp {
     void ClearExcessBits() { if constexpr (NUM_END_BITS > 0) bit_set[LAST_FIELD] &= END_MASK; }
 
     // Convert the bit_set to bytes.
-    unsigned char * BytePtr() { return reinterpret_cast<unsigned char*>(bit_set); }
+    emp::Ptr<unsigned char> BytePtr() { return reinterpret_cast<unsigned char*>(bit_set); }
 
     /// Helper: call SHIFT with positive number instead
     void ShiftLeft(const size_t shift_size);
@@ -730,8 +730,9 @@ namespace emp {
       }
 
       // shift out filler bits
-      if constexpr (static_cast<bool>((8-NUM_BITS%8)%8)) {
-        this->ShiftRight((8-NUM_BITS%8)%8);
+      constexpr size_t filler_bits = NUM_BITS % 8;
+      if constexpr (filler_bits != 0) {
+        this->ShiftRight(8-filler_bits);
       }
 
       return *this;
