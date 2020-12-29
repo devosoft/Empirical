@@ -11,6 +11,9 @@
  *  compiled with EMP_TRACK_MEM set, then these pointers perform extra tests to ensure that
  *  they point to valid memory and that memory is freed before pointers are released.
  *
+ *  If you want to prevent pointers to pointers (a common source of errors, but MAY be done
+ *  intentionally) you can define EMP_NO_PTR_TO_PTR
+ * 
  *  If you trip an assert, you can re-do the run a track a specific pointer by defining
  *  EMP_ABORT_PTR_NEW or EMP_ABORT_PTR_DELETE to the ID of the pointer in question.  This will
  *  allow you to track the pointer more easily in a debugger.
@@ -37,11 +40,11 @@ namespace emp {
 
 
   template <typename T>
-  inline void FillMemory(emp::Ptr<unsigned char *>  mem_ptr, const size_t num_bytes, T fill_value);
+  inline void FillMemory(emp::Ptr<unsigned char>  mem_ptr, const size_t num_bytes, T fill_value);
 
   /// Fill an array by repeatedly calling the provided fill functions.
   template <typename T>
-  inline void FillMemoryFunction(emp::Ptr<unsigned char *>  mem_ptr, const size_t num_bytes, T fill_fun);
+  inline void FillMemoryFunction(emp::Ptr<unsigned char>  mem_ptr, const size_t num_bytes, T fill_fun);
 
   namespace internal {
     /// An anonymous log2 calculator for hashing below.
@@ -340,7 +343,11 @@ namespace emp {
     TYPE * ptr;                 ///< The raw pointer associated with this Ptr object.
     size_t id;                  ///< A unique ID for this pointer type.
 
-    BasePtr(TYPE * in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) { }
+    BasePtr(TYPE * in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) {
+      #ifdef EMP_NO_PTR_TO_PTR
+      emp_assert(!std::is_pointer_v<TYPE>, "Pointers to pointers are disallowed!");
+      #endif
+    }
 
     static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
 
@@ -528,6 +535,9 @@ namespace emp {
     template <typename T2>
     [[nodiscard]] Ptr<T2> ReinterpretCast() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
+      #ifdef EMP_NO_PTR_TO_PTR
+      emp_assert(!std::is_pointer_v<TYPE>, "Reinterpreting as pointers to pointers is disallowed!");
+      #endif
       return reinterpret_cast<T2*>(ptr);
     }
 
@@ -718,8 +728,8 @@ namespace emp {
       // Make sure a pointer is active before we write to it.
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
       emp_assert(Tracker().IsArrayID(id), "Only arrays can fill memory.", id);
-      emp_assert(Tracker().GetArrayBytes(id) >= num_bytes),
-        "Overfilling memory.", id, ptr, pos, sizeof(TYPE), Tracker().GetArrayBytes(id));
+      emp_assert(Tracker().GetArrayBytes(id) >= num_bytes,
+        "Overfilling memory.", id, ptr, sizeof(TYPE), Tracker().GetArrayBytes(id));
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
 
       emp::FillMemoryFunction(*this, num_bytes, fill_fun);
@@ -732,8 +742,8 @@ namespace emp {
       // Make sure a pointer is active before we write to it.
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
       emp_assert(Tracker().IsArrayID(id), "Only arrays can fill memory.", id);
-      emp_assert(Tracker().GetArrayBytes(id) >= num_bytes),
-        "Overfilling memory.", id, ptr, pos, sizeof(TYPE), Tracker().GetArrayBytes(id));
+      emp_assert(Tracker().GetArrayBytes(id) >= num_bytes,
+        "Overfilling memory.", id, ptr, sizeof(TYPE), Tracker().GetArrayBytes(id));
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
 
       emp::FillMemory(*this, num_bytes, fill_value);
@@ -775,7 +785,7 @@ namespace emp {
 
   };
 
-#else
+#else  // EMP_MEM_TRACK off...
 
 
   template <typename TYPE>
