@@ -1021,7 +1021,7 @@ namespace emp {
   template <typename T>
   void FillMemoryFunction(emp::Ptr<unsigned char>  mem_ptr, const size_t num_bytes, T fill_fun) {
     static_assert(std::is_invocable_v<T>, "FillMemoryFunction requires an invocable fill_fun.");
-    using return_t = decltype(fill_fun);
+    using return_t = decltype(fill_fun());
     constexpr size_t FILL_SIZE = sizeof(return_t);
 
     const size_t leftover = num_bytes % FILL_SIZE;
