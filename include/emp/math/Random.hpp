@@ -178,24 +178,10 @@ namespace emp {
     }
 
 
-    /// Randomize a contiguous segment of memory.
-    void RandFill(unsigned char * dest, const size_t num_bytes) {
-      size_t leftover = num_bytes % 4;
-      size_t limit = num_bytes - leftover;
-
-      // Fill out random bytes in groups of four.
-      for (size_t byte = 0; byte < limit; byte += 4) {
-        uint32_t rnd = Get();
-        std::memcpy(dest+byte, &rnd, 4);
-      }
-
-      // If we don't have a multiple of four, fill in the remaining.
-      if (leftover) {
-        uint32_t rnd = Get();
-        std::memcpy(dest+num_bytes-leftover, &rnd, leftover);
-      }
+    // Randomize a contiguous segment of memory.
+    void RandFill(emp::Ptr<unsigned char> dest, const size_t num_bytes) {
+      dest.FillMemoryFunction( num_bytes, [this](){ return Get(); } );
     }
-
 
     // Random Event Generation //////////////////////////////////////////////////
 
