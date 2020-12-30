@@ -194,7 +194,7 @@ namespace emp {
     template <Prob P>
     void RandFillP(emp::Ptr<unsigned char> dest, const size_t num_bytes) {
       if constexpr (P == PROB_0) {
-        dest.FillMemoryFunction( num_bytes, [this](){ return 0; } );
+        dest.FillMemoryFunction( num_bytes, [](){ return 0; } );
       } else if constexpr (P == PROB_12_5) {
         dest.FillMemoryFunction( num_bytes, [this](){ return GetBits12_5(); } );
       } else if constexpr (P == PROB_25) {
@@ -210,44 +210,21 @@ namespace emp {
       } else if constexpr (P == PROB_87_5) {
         dest.FillMemoryFunction( num_bytes, [this](){ return GetBits87_5(); } );
       } else if constexpr (P == PROB_100) {
-        dest.FillMemoryFunction( num_bytes, [this](){ return (size_t) -1; } );
+        dest.FillMemoryFunction( num_bytes, [](){ return (size_t) -1; } );
       }
     }
 
-    /// Randomize a contiguous segment of memory with a 12.5% chance of each bit being a 1.
-    void RandFill12_5(emp::Ptr<unsigned char> dest, const size_t num_bytes) {
-      dest.FillMemoryFunction( num_bytes, [this](){ return GetBits12_5(); } );
-    }
-
-    /// Randomize a contiguous segment of memory with a 25% chance of each bit being a 1.
-    void RandFill25(emp::Ptr<unsigned char> dest, const size_t num_bytes) {
-      dest.FillMemoryFunction( num_bytes, [this](){ return GetBits25(); } );
-    }
-
-    /// Randomize a contiguous segment of memory with a 37.5% chance of each bit being a 1.
-    void RandFill37_5(emp::Ptr<unsigned char> dest, const size_t num_bytes) {
-      dest.FillMemoryFunction( num_bytes, [this](){ return GetBits37_5(); } );
-    }
-
-    /// Randomize a contiguous segment of memory with a 50% chance of each bit being a 1.
-    void RandFill50(emp::Ptr<unsigned char> dest, const size_t num_bytes) {
-      dest.FillMemoryFunction( num_bytes, [this](){ return GetBits50(); } );
-    }
-
-    /// Randomize a contiguous segment of memory with a 62.5% chance of each bit being a 1.
-    void RandFill62_5(emp::Ptr<unsigned char> dest, const size_t num_bytes) {
-      dest.FillMemoryFunction( num_bytes, [this](){ return GetBits62_5(); } );
-    }
-
-    /// Randomize a contiguous segment of memory with a 75% chance of each bit being a 1.
-    void RandFill75(emp::Ptr<unsigned char> dest, const size_t num_bytes) {
-      dest.FillMemoryFunction( num_bytes, [this](){ return GetBits75(); } );
-    }
-
-    /// Randomize a contiguous segment of memory with a 87.5% chance of each bit being a 1.
-    void RandFill87_5(emp::Ptr<unsigned char> dest, const size_t num_bytes) {
-      dest.FillMemoryFunction( num_bytes, [this](){ return GetBits87_5(); } );
-    }
+    // Shortcuts to eandomize a contiguous segment of memory with fixed probabilities of a 1.
+    using mem_ptr = emp::Ptr<unsigned char>;
+    void RandFill0(   mem_ptr dest, const size_t bytes) { RandFillP<PROB_0>   (dest, bytes); }
+    void RandFill12_5(mem_ptr dest, const size_t bytes) { RandFillP<PROB_12_5>(dest, bytes); }
+    void RandFill25(  mem_ptr dest, const size_t bytes) { RandFillP<PROB_25>  (dest, bytes); }
+    void RandFill37_5(mem_ptr dest, const size_t bytes) { RandFillP<PROB_37_5>(dest, bytes); }
+    void RandFill50(  mem_ptr dest, const size_t bytes) { RandFillP<PROB_50>  (dest, bytes); }
+    void RandFill62_5(mem_ptr dest, const size_t bytes) { RandFillP<PROB_62_5>(dest, bytes); }
+    void RandFill75(  mem_ptr dest, const size_t bytes) { RandFillP<PROB_75>  (dest, bytes); }
+    void RandFill87_5(mem_ptr dest, const size_t bytes) { RandFillP<PROB_87_5>(dest, bytes); }
+    void RandFill100( mem_ptr dest, const size_t bytes) { RandFillP<PROB_100> (dest, bytes); }
 
     // Random Event Generation //////////////////////////////////////////////////
 
