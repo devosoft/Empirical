@@ -1,9 +1,9 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2018
+ *  @date 2016-2020.
  *
- *  @file  flex_function.hpp
+ *  @file  functions.hpp
  *  @brief A collection of broadly-useful functions (that don't fit elsewhere)
  *  @note Status: BETA (though new functions are added frequently)
  */
@@ -79,14 +79,14 @@ namespace emp {
   template <typename T, size_t N>
   constexpr size_t GetSize(T (&)[N]) { return N; }
 
-  /// A function that will always return a unique value (and trip an assert if it can't...)
+  /// @return a unique value (and trip an assert if it can't...)
   static size_t UniqueVal() {
     static size_t val = 0;
     emp_assert(val < MaxValue<size_t>() && "Ran out of unique values in size_t!");
     return val++;
   }
 
-  /// A function that will always return a unique stringname (using UniqVal) with provided
+  /// @return a unique stringname (using UniqVal) with provided
   /// prefix and postfix.)
   static inline std::string UniqueName(const std::string & prefix="",
                                        const std::string & postfix="") {
