@@ -3,7 +3,7 @@
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2015-2018
  *
- *  @file  Canvas.hpp
+ *  @file  _NativeCanvas.hpp
  *  @brief Manage an HTML canvas object.
  *
  */
@@ -21,6 +21,7 @@
 #include "../tools/string_utils.hpp"
 
 #include "_LineShape.hpp"
+#include "CanvasShape.hpp"
 #include "Color.hpp"
 
 namespace emp {
@@ -189,10 +190,10 @@ namespace web {
     }
 
     /// Draw an arbitrary shape onto this canvas.
-    // Canvas & Draw(const CanvasShape & shape) {
-    //   emp_assert(false, "unimplemented");
-    //   return *this;
-    // }
+    Canvas & Draw(const CanvasShape & shape) {
+      shape.Apply( window );
+      return *this;
+    }
 
     /// Change the default stroke color.
     Canvas & StrokeColor(std::string c) {
