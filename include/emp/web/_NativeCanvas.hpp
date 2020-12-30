@@ -130,6 +130,7 @@ namespace web {
       shape.setOutlineColor( (sf::Color) emp::web::Color( lc ) );
       shape.setOutlineThickness( lw );
 
+      window.draw( shape );
       return *this;
     }
 
