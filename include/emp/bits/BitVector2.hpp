@@ -206,12 +206,27 @@ namespace emp {
       return *this;
     }
 
+    /// Set all bits randomly, with probability specified at compile time.
+    template <Random::Prob P>
+    BitVector &  RandomizeP(Random & random) {
+      random.RandFillP<P>(BytePtr(), NumBytes());
+      ClearExcessBits();
+      return *this;
+    }
+
     /// Set all bits randomly, with a given probability of being a on.
     BitVector & Randomize(Random & random, const double p) {
       // Try to find a shortcut if p allows....
       if (p == 0.0) return Clear();
-      if (p == 0.5) return Randomize(random);
-      if (p == 1.0) return SetAll();
+      else if (p == 0.125) return RandomizeP<Random::PROB_12_5>(random);
+      else if (p == 0.25)  return RandomizeP<Random::PROB_25>(random);
+      else if (p == 0.375) return RandomizeP<Random::PROB_37_5>(random);
+      else if (p == 0.5)   return RandomizeP<Random::PROB_50>(random);
+      else if (p == 0.625) return RandomizeP<Random::PROB_62_5>(random);
+      else if (p == 0.75)  return RandomizeP<Random::PROB_75>(random);
+      else if (p == 0.875) return RandomizeP<Random::PROB_87_5>(random);
+      else if (p == 1.0)   return SetAll();
+
       for (size_t i = 0; i < num_bits; i++) Set(i, random.P(p));
       return *this;
     }
