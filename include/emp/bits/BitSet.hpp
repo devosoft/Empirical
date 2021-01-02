@@ -137,6 +137,7 @@ namespace emp {
       return *this;
     }
 
+    /// Set all bits randomly, with probability specified at compile time.
     template <Random::Prob P>
     BitSet &  RandomizeP(Random & random) {
       random.RandFillP<P>(BytePtr(), TOTAL_BYTES);
@@ -173,6 +174,36 @@ namespace emp {
       emp_assert(p >= 0.0 && p <= 1.0, p);
 
       for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Toggle(i);
+
+      return *this;
+    }
+
+    /// Set random bits (does not check if already set.)
+    BitSet & SetRandom(Random & random,
+                        const double p,
+                        const size_t start_pos=0,
+                        const size_t stop_pos=NUM_BITS)
+    {
+      emp_assert(start_pos <= stop_pos);
+      emp_assert(stop_pos <= NUM_BITS);
+      emp_assert(p >= 0.0 && p <= 1.0, p);
+
+      for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Set(i);
+
+      return *this;
+    }
+
+    /// Unset random bits (does not check if already zero.)
+    BitSet & ClearRandom(Random & random,
+                        const double p,
+                        const size_t start_pos=0,
+                        const size_t stop_pos=NUM_BITS)
+    {
+      emp_assert(start_pos <= stop_pos);
+      emp_assert(stop_pos <= NUM_BITS);
+      emp_assert(p >= 0.0 && p <= 1.0, p);
+
+      for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Clear(i);
 
       return *this;
     }
