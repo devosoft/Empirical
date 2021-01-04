@@ -18,6 +18,7 @@
 #include <iterator>
 
 #include "../base/assert.hpp"
+#include "../base/Ptr.hpp"
 #include "../bits/bitset_utils.hpp"
 #include "Range.hpp"
 
