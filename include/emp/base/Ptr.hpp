@@ -27,6 +27,7 @@
 #ifndef EMP_PTR_H
 #define EMP_PTR_H
 
+#include <cstring>
 #include <unordered_map>
 
 #include "assert.hpp"
