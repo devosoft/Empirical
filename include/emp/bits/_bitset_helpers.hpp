@@ -23,7 +23,8 @@ namespace emp {
   public:
       // Helper functions.
       inline bool Get() const { return bit_container.Get(index); }
-      inline BitProxy & Set(bool b) { bit_container.Set(index, b); return *this; }
+      inline BitProxy & Set(bool b=true) { bit_container.Set(index, b); return *this; }
+      inline BitProxy & Clear() { bit_container.Clear(index); return *this; }
       inline BitProxy & Toggle() { bit_container.Toggle(index); return *this; }
       inline BitProxy & SetIf(bool test, bool b) { if (test) Set(b); return *this; }
       inline BitProxy & ToggleIf(bool test) { if (test) Toggle(); return *this; }
