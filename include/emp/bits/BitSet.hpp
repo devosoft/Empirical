@@ -118,8 +118,11 @@ namespace emp {
     /// Constructor to generate a random BitSet (with equal prob of 0 or 1).
     BitSet(Random & random) { Randomize(random); }
 
-    /// Constructor to generate a random BitSet with provided prob of 1's.
-    BitSet(Random & random, const double p1) { Clear(); Randomize(random, p1); }
+    /// Constructor to generate a random BitSet with provided PROBABILITY of 1's.
+    BitSet(Random & random, const double p1) { Randomize(random, p1); }
+
+    /// Constructor to generate a random BitSet with provided NUMBER of 1's.
+    BitSet(Random & random, const size_t one_count) { Randomize(random, one_count); }
 
     /// Constructor to fill in a bit set from a vector.
     template <typename T> BitSet(const std::initializer_list<T> l);
@@ -160,6 +163,50 @@ namespace emp {
       else if (p == 1.0)   return SetAll();
 
       for (size_t i = 0; i < NUM_BITS; i++) Set(i, random.P(p));
+      return *this;
+    }
+
+    /// Set all bits randomly, with a given probability of being a on.
+    BitSet & Randomize(Random & random, const size_t target_ones) {
+      emp_assert(target_ones <= NUM_BITS);
+
+      // Approximate the probability of ones as a starting point.
+      double p = ((double) target_ones) / (double) NUM_BITS;
+
+      // Try to find a shortcut if p allows....
+      // (These are currently guessed values)
+      if (p < 0.12) Clear();
+      else if (p < 0.2)  RandomizeP<Random::PROB_12_5>(random);
+      else if (p < 0.35) RandomizeP<Random::PROB_25>(random);
+      else if (p < 0.42) RandomizeP<Random::PROB_37_5>(random);
+      else if (p < 0.58) RandomizeP<Random::PROB_50>(random);
+      else if (p < 0.65) RandomizeP<Random::PROB_62_5>(random);
+      else if (p < 0.8)  RandomizeP<Random::PROB_75>(random);
+      else if (p < 0.88) RandomizeP<Random::PROB_87_5>(random);
+      else SetAll();
+
+      size_t cur_ones = CountOnes();
+
+      // See if we need to add more ones.
+      while (cur_ones < target_ones) {
+        size_t pos = random.GetUInt(NUM_BITS);
+        auto bit = operator[](pos);
+        if (!bit) {
+          bit.Set();
+          cur_ones++;
+        }
+      }
+
+      // See if we have too many ones.
+      while (cur_ones > target_ones) {
+        size_t pos = random.GetUInt(NUM_BITS);
+        auto bit = operator[](pos);
+        if (bit) {
+          bit.Clear();
+          cur_ones--;
+        }
+      }
+
       return *this;
     }
 
