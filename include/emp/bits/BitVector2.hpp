@@ -323,6 +323,9 @@ namespace emp {
 
     // >>>>>>>>>>  Print/String Functions  <<<<<<<<<< //
 
+    /// Convert a specified bit to a character.
+    char GetAsChar(size_t id) const { return Get(id) ? '1' : '0'; }
+
     /// Convert this BitVector to a string.
     std::string ToString() const;
 
@@ -1068,7 +1071,7 @@ namespace emp {
   std::string BitVector::ToString() const {
     std::string out_string;
     out_string.reserve(num_bits);
-    for (size_t i = num_bits; i > 0; --i) out_string.push_back('0' + Get(i-1));
+    for (size_t i = num_bits; i > 0; --i) out_string.push_back(GetAsChar(i-1));
     return out_string;
   }
 
