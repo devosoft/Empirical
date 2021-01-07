@@ -22,12 +22,31 @@ TEST_CASE("Benchmark BitVector Inserts", "[bits]"){
 
 	// Expected timing: 38 ms Optimized, 2150 ms Non-optimized
 	emp::BitVector bv(0);
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
 	bv.Insert(0, true, 4096);
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
 	std::cout << "Bit Magic Insert: ";
 	EMP_VOID_FUNCTION_TIMER([&bv](){
 		for ( size_t i{}; i <= std::mega::num; ++i ) {
+			#ifdef TDEBUG
+			REQUIRE(emp::assert_last_fail == 0);
+			#endif
 			auto bv1 = bv;
+			#ifdef TDEBUG
+			REQUIRE(emp::assert_last_fail == 0);
+			#endif
 			bv1.Insert(1, false);
+			#ifdef TDEBUG
+			REQUIRE(emp::assert_last_fail == 0);
+			#endif
 		}
 	}());
 
