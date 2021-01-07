@@ -26,6 +26,10 @@ TEST_CASE("Benchmark BitVector Inserts", "[bits]"){
 			bv1.Insert(1, false);
 		}
 	}());
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
 }
 
 TEST_CASE("Test BitVector", "[bits]")
@@ -278,6 +282,11 @@ TEST_CASE("Test BitVector", "[bits]")
 	REQUIRE(bv_f.count() == 1);
 	bv_f <<= 1;
 	REQUIRE(bv_f.none());
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
 }
 
 TEST_CASE("Test Mask_High, Mask_Low", "[bits]") {
@@ -297,6 +306,11 @@ TEST_CASE("Test Mask_High, Mask_Low", "[bits]") {
 	REQUIRE(c.Get(0));
 	REQUIRE(!c.Get(1));
 	REQUIRE(!c.Get(2));
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
 }
 
 TEST_CASE("Test PopBack, PushBack, Insert, Delete", "[bits]") {
@@ -336,6 +350,11 @@ TEST_CASE("Test PopBack, PushBack, Insert, Delete", "[bits]") {
 	bv_g.Delete(1, 2);
 	REQUIRE(bv_g.size() == 2);
 	REQUIRE(bv_g.Get(1));
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
 }
 
 TEST_CASE("Another Test BitVector", "[bits]")
@@ -362,6 +381,10 @@ TEST_CASE("Another Test BitVector", "[bits]")
   bv80[65] = 1;
   REQUIRE(bv80.GetUIntAtBit(64) == 130);
   REQUIRE(bv80.GetValueAtBit<5>(64) == 2);
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
 
 }
 
@@ -398,4 +421,9 @@ TEST_CASE("BitVector regression test for #277", "[bits]") {
   vec2.SetUIntAtBit(0, 15);
   for (size_t i = 0; i < 4; ++i) REQUIRE(vec1[i]);
   for (size_t i = 0; i < 4; ++i) REQUIRE(vec2[i]);
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
 }

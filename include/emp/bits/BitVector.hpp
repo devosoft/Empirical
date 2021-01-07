@@ -524,7 +524,8 @@ namespace emp {
         || (
           bit_set[NumFields() - 1]
           & ~MaskLow<field_t>(LastBitID())
-        ) == 0
+        ) == 0,
+        LastBitID(), bit_set[NumFields() - 1]
       );
 
     }
