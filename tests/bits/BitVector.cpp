@@ -16,6 +16,10 @@
 #include <ratio>
 
 TEST_CASE("Benchmark BitVector Inserts", "[bits]"){
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
 	// Expected timing: 38 ms Optimized, 2150 ms Non-optimized
 	emp::BitVector bv(0);
 	bv.Insert(0, true, 4096);
@@ -34,6 +38,10 @@ TEST_CASE("Benchmark BitVector Inserts", "[bits]"){
 
 TEST_CASE("Test BitVector", "[bits]")
 {
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
 	// Constructor
 	emp::BitVector bv(10);
 
@@ -290,6 +298,11 @@ TEST_CASE("Test BitVector", "[bits]")
 }
 
 TEST_CASE("Test Mask_High, Mask_Low", "[bits]") {
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
 	// Test Mask_High, Mask_Low
 	emp::BitVector a(0);
 	a.Insert(0,true, 7);
@@ -314,6 +327,11 @@ TEST_CASE("Test Mask_High, Mask_Low", "[bits]") {
 }
 
 TEST_CASE("Test PopBack, PushBack, Insert, Delete", "[bits]") {
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
 	// Pop Back and Push Back
 	emp::BitVector bv_g(0);
 	bv_g.PushBack(true);
@@ -357,8 +375,12 @@ TEST_CASE("Test PopBack, PushBack, Insert, Delete", "[bits]") {
 
 }
 
-TEST_CASE("Another Test BitVector", "[bits]")
-{
+TEST_CASE("Another Test BitVector", "[bits]") {
+
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
   emp::BitVector bv10(10);
   emp::BitVector bv32(32);
   emp::BitVector bv50(50);
@@ -391,6 +413,8 @@ TEST_CASE("Another Test BitVector", "[bits]")
 TEST_CASE("BitVector padding bits protected", "[bits]") {
 #ifdef TDEBUG
 
+	REQUIRE(emp::assert_last_fail == 0);
+
   for (size_t i = 1; i < 32; ++i) {
 
     emp::BitVector vec(i);
@@ -412,6 +436,10 @@ TEST_CASE("BitVector padding bits protected", "[bits]") {
 }
 
 TEST_CASE("BitVector regression test for #277", "[bits]") {
+	#ifdef TDEBUG
+	REQUIRE(emp::assert_last_fail == 0);
+	#endif
+
   emp::BitVector vec1(4);
   emp::BitVector vec2(4);
 
