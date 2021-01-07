@@ -21,7 +21,7 @@ TEST_CASE("Benchmark BitVector Inserts", "[bits]"){
 	bv.Insert(0, true, 4096);
 	std::cout << "Bit Magic Insert: ";
 	EMP_VOID_FUNCTION_TIMER([&bv](){
-		for ( size_t i = 1; i <= std::mega::num; ++i ) {
+		for ( size_t i{}; i <= std::mega::num; ++i ) {
 			auto bv1 = bv;
 			bv1.Insert(1, false);
 		}
