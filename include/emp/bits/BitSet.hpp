@@ -210,7 +210,7 @@ namespace emp {
       return *this;
     }
 
-    /// Flip random bits.
+    /// Flip random bits with a given probability.
     BitSet & FlipRandom(Random & random,
                         const double p,
                         const size_t start_pos=0,
@@ -225,7 +225,7 @@ namespace emp {
       return *this;
     }
 
-    /// Set random bits (does not check if already set.)
+    /// Set random bits with a given probability (does not check if already set.)
     BitSet & SetRandom(Random & random,
                         const double p,
                         const size_t start_pos=0,
@@ -240,7 +240,7 @@ namespace emp {
       return *this;
     }
 
-    /// Unset random bits (does not check if already zero.)
+    /// Unset random bits with a given probability (does not check if already zero.)
     BitSet & ClearRandom(Random & random,
                         const double p,
                         const size_t start_pos=0,
@@ -253,6 +253,33 @@ namespace emp {
       for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Clear(i);
 
       return *this;
+    }
+
+    /// Flip a specified number of random bits.
+    BitSet & FlipRandom(Random & random,
+                        const size_t num_bits)
+    {
+      emp_assert(num_bits <= NUM_BITS);
+      this_t target_bits(random, num_bits);
+      return *this ^= target_bits;
+    }
+
+    /// Set a specified number of random bits (does not check if already set.)
+    BitSet & SetRandom(Random & random,
+                        const size_t num_bits)
+    {
+      emp_assert(num_bits <= NUM_BITS);
+      this_t target_bits(random, num_bits);
+      return *this |= target_bits;
+    }
+
+    /// Unset  a specified number of random bits (does not check if already zero.)
+    BitSet & ClearRandom(Random & random,
+                        const size_t num_bits)
+    {
+      emp_assert(num_bits <= NUM_BITS);
+      this_t target_bits(random, NUM_BITS - num_bits);
+      return *this &= target_bits;
     }
 
     // size_t Mutate(
