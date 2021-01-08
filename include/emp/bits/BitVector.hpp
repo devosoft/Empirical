@@ -330,7 +330,7 @@ namespace emp {
       if (NUM_FIELDS == old_num_fields) {   // We can use our existing bit field
         num_bits = new_bits;
         // If there are extra bits, zero them out.
-        if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+        if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= emp::MaskLow<field_t>(LastBitID());
       }
 
       else {  // We have to change the number of bitfields.  Resize & copy old info.
@@ -523,7 +523,7 @@ namespace emp {
         LastBitID() == 0
         || (
           bit_set[NumFields() - 1]
-          & ~MaskLow<field_t>(LastBitID())
+          & ~emp::MaskLow<field_t>(LastBitID())
         ) == 0,
         LastBitID(), bit_set[NumFields() - 1]
       );
@@ -564,7 +564,7 @@ namespace emp {
     field_t GetValueAtBit(size_t index) {
       // @CAO This function needs to be generalized to return more then sizeof(field_t)*8 bits.
       static_assert(OUT_BITS <= sizeof(field_t)*8, "Requesting too many bits to fit in a UInt");
-      return GetUIntAtBit(index) & MaskLow<field_t>(OUT_BITS);
+      return GetUIntAtBit(index) & emp::MaskLow<field_t>(OUT_BITS);
     }
 
     /// Return true if ANY bits are set to 1, otherwise return false.
@@ -602,7 +602,7 @@ namespace emp {
       const size_t NUM_FIELDS = NumFields();
       constexpr field_t all0 = 0;
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~all0;
-      if (LastBitID() > 0) { bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID()); }
+      if (LastBitID() > 0) { bit_set[NUM_FIELDS - 1] &= emp::MaskLow<field_t>(LastBitID()); }
     }
 
     /// Regular print function (from most significant bit to least)
@@ -730,12 +730,12 @@ namespace emp {
      *
      * @param index location to end the zeroing out.
     */
-    void Mask_High(const size_t index) {
+    void MaskHigh(const size_t index) {
       const size_t field_id = FieldID(index);
       for (size_t i = 0; i < field_id; i++)
         bit_set[i] = 0;
       if (index >= 0)
-        bit_set[field_id] &= (MaskLow<field_t>((num_bits - index - 1) % FIELD_BITS) << (index + 1));
+        bit_set[field_id] &= (emp::MaskLow<field_t>((num_bits - index - 1) % FIELD_BITS) << (index + 1));
     }
 
     /**
@@ -743,12 +743,12 @@ namespace emp {
      *
      * @param index location to start the zeroing out.
     */
-    void Mask_Low(const size_t index) {
+    void MaskLow(const size_t index) {
       const size_t field_id = FieldID(index);
       for (size_t i = field_id + 1; i < NumFields(); i++)
         bit_set[i] = 0;
       if (index < num_bits)
-        bit_set[field_id] &= MaskLow<field_t>(index % FIELD_BITS);
+        bit_set[field_id] &= emp::MaskLow<field_t>(index % FIELD_BITS);
     }
 
     /**
@@ -766,11 +766,11 @@ namespace emp {
       temp = *this;
 
       // mask high and shift left: 101101 -> 1010000
-      if (index > 0) this->Mask_High(index + num - 2);
+      if (index > 0) this->MaskHigh(index + num - 2);
       *this <<= num;
 
       // mask low and | together 101101 -> 000101 ->1010101
-      temp.Mask_Low(index);
+      temp.MaskLow(index);
       *this |= temp;
 
       // set specified bits: 1010101 -> 101_101
@@ -802,8 +802,8 @@ namespace emp {
       if (start_pos >= num_bits) return -1;
       size_t field_id  = FieldID(start_pos);     // What field do we start in?
       const size_t field_pos = FieldPos(start_pos);    // What position in that field?
-      if (field_pos && (bit_set[field_id] & ~(MaskLow<field_t>(field_pos)))) {  // First field hit!
-        return (int) (find_bit(bit_set[field_id] & ~(MaskLow<field_t>(field_pos))) +
+      if (field_pos && (bit_set[field_id] & ~(emp::MaskLow<field_t>(field_pos)))) {  // First field hit!
+        return (int) (find_bit(bit_set[field_id] & ~(emp::MaskLow<field_t>(field_pos))) +
                       field_id * FIELD_BITS);
       }
 
@@ -831,7 +831,7 @@ namespace emp {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~bit_set[i];
-      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= emp::MaskLow<field_t>(LastBitID());
       return out_set;
     }
 
@@ -856,7 +856,7 @@ namespace emp {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= emp::MaskLow<field_t>(LastBitID());
       return out_set;
     }
 
@@ -865,7 +865,7 @@ namespace emp {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= emp::MaskLow<field_t>(LastBitID());
       return out_set;
     }
 
@@ -882,7 +882,7 @@ namespace emp {
       const size_t NUM_FIELDS = NumFields();
       BitVector out_set(*this);
       for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      if (LastBitID() > 0) out_set.bit_set[NUM_FIELDS - 1] &= emp::MaskLow<field_t>(LastBitID());
       return out_set;
     }
 
@@ -891,7 +891,7 @@ namespace emp {
     BitVector & NOT_SELF() {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
-      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= emp::MaskLow<field_t>(LastBitID());
       return *this;
     }
 
@@ -913,7 +913,7 @@ namespace emp {
     BitVector & NAND_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= emp::MaskLow<field_t>(LastBitID());
       return *this;
     }
 
@@ -921,7 +921,7 @@ namespace emp {
     BitVector & NOR_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= emp::MaskLow<field_t>(LastBitID());
       return *this;
     }
 
@@ -936,7 +936,7 @@ namespace emp {
     BitVector & EQU_SELF(const BitVector & set2) {
       const size_t NUM_FIELDS = NumFields();
       for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LastBitID());
+      if (LastBitID() > 0) bit_set[NUM_FIELDS - 1] &= emp::MaskLow<field_t>(LastBitID());
       return *this;
     }
 
