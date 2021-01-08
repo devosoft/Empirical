@@ -347,7 +347,7 @@ namespace emp {
     emp::unordered_map<std::string, ConfigEntry *> var_map;   // All variables across groups.
     std::string version_id;                         // Unique version ID to ensure synced config.
     emp::vector<ConfigGroup *> group_set;           // All of the config groups.
-    std::stringstream warnings;                     // Aggrigate warnings for combined display.
+    std::stringstream warnings;                     // Aggregate warnings for combined display.
     int delay_warnings;                             // Count of delays to collect warnings for printing.
     emp::unordered_map<std::string, std::string> alias_map;   // Map all aliases to original name.
 

@@ -326,6 +326,11 @@ namespace emp {
     return A + 1;
   }
 
+  /// Tests if a number is a power of two.
+  inline constexpr bool IsPowerOf2(const size_t x) {
+    return x > 0 && !(x & (x - 1));
+  }
+
   inline constexpr int Factorial(int i) {
     int result = 1;
     while (i > 0) {
