@@ -85,6 +85,7 @@ RUN \
     vim \
     nano \
     wget \
+    ssh-client \
     && \
   apt-get clean \
     && \
