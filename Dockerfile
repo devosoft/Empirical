@@ -86,6 +86,7 @@ RUN \
     nano \
     wget \
     ssh-client \
+    libasound2 \
     && \
   apt-get clean \
     && \
