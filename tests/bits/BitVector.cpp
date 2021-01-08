@@ -316,13 +316,13 @@ TEST_CASE("Test BitVector", "[bits]")
 
 }
 
-TEST_CASE("Test Mask_High, Mask_Low", "[bits]") {
+TEST_CASE("Test MaskHigh, MaskLow", "[bits]") {
 
 	#ifdef TDEBUG
 	REQUIRE(emp::assert_last_fail == 0);
 	#endif
 
-	// Test Mask_High, Mask_Low
+	// Test MaskHigh, MaskLow
 	emp::BitVector a(0);
 	a.Insert(0,true, 7);
 	REQUIRE(a.Get(0));
@@ -330,8 +330,8 @@ TEST_CASE("Test Mask_High, Mask_Low", "[bits]") {
 	REQUIRE(a.Get(2));
 	emp::BitVector b = a;
 	emp::BitVector c = a;
-	b.Mask_High(0);
-	c.Mask_Low(1);
+	b.MaskHigh(0);
+	c.MaskLow(1);
 	REQUIRE(b.Get(1));
 	REQUIRE(!b.Get(0));
 	REQUIRE(b.Get(6));
