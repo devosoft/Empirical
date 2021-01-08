@@ -322,7 +322,7 @@ namespace emp {
     }
 
     /// Resize this BitVector to have the specified number of bits.
-    BitVector & Resize(size_t new_bits) {
+    BitVector & Resize(const size_t new_bits) {
       const size_t old_num_fields = NumFields();
       num_bits = new_bits;
       const size_t NUM_FIELDS = NumFields();
