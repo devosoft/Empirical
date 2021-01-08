@@ -761,22 +761,21 @@ namespace emp {
     */
     void Insert(const size_t index, const bool val=true, const size_t num=1) {
       Resize(num_bits + num);
+
+      thread_local BitVector temp{}; // use thread_local to prevent reallocation
+      temp = *this;
+
       // mask high and shift left: 101101 -> 1010000
-      thread_local BitVector a{};   // use thread_local to prevent reallocation
-      a = *this;
-      if (index > 0)
-        a.Mask_High(index + num - 2);
-      a <<= num;
+      if (index > 0) this->Mask_High(index + num - 2);
+      *this <<= num;
+
       // mask low and | together 101101 -> 000101 ->1010101
-      thread_local BitVector b{};
-      b = *this;
-      b.Mask_Low(index);
-      a |= b;
-      // set specified bits -> 1010101 -> 101_101
-      for (size_t i = index; i < index + num; i++) {
-        a.Set(i, val);
-      }
-      std::swap(a, *this);
+      temp.Mask_Low(index);
+      *this |= temp;
+
+      // set specified bits: 1010101 -> 101_101
+      for (size_t i = index; i < index + num; i++) this->Set(i, val);
+
     }
 
     /**
