@@ -597,7 +597,7 @@ namespace emp {
                   << std::endl;
       }
       emp_assert(Tracker().IsDeleted(_in.id) == false, _in.id, "Do not copy deleted pointers.");
-      if (ptr != _in.ptr) {        // Assignments only need to happen if ptrs are different.
+      if (id != _in.id) {        // Assignments only need to happen if ptrs are different.
         if (internal::ptr_debug) std::cout << "...pointers differ -- copying!" << std::endl;
         Tracker().DecID(id);
         ptr = _in.ptr;
