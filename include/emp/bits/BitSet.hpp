@@ -134,153 +134,37 @@ namespace emp {
     BitSet & operator=(const BitSet<NUM_BITS> & in_set) { Copy(in_set.bit_set); return *this; }
 
     /// Set all bits randomly, with a 50% probability of being a 0 or 1.
-    BitSet &  Randomize(Random & random) {
-      random.RandFill(BytePtr(), TOTAL_BYTES);
-      ClearExcessBits();
-      return *this;
-    }
+    BitSet &  Randomize(Random & random);
 
     /// Set all bits randomly, with probability specified at compile time.
-    template <Random::Prob P>
-    BitSet &  RandomizeP(Random & random) {
-      random.RandFillP<P>(BytePtr(), TOTAL_BYTES);
-      ClearExcessBits();
-      return *this;
-    }
+    template <Random::Prob P> BitSet &  RandomizeP(Random & random);
 
+    /// Set all bits randomly, with a given probability of being a one.
+    BitSet & Randomize(Random & random, const double p);
 
-    /// Set all bits randomly, with a given probability of being a on.
-    BitSet & Randomize(Random & random, const double p) {
-      // Try to find a shortcut if p allows....
-      if (p == 0.0) return Clear();
-      else if (p == 0.125) return RandomizeP<Random::PROB_12_5>(random);
-      else if (p == 0.25)  return RandomizeP<Random::PROB_25>(random);
-      else if (p == 0.375) return RandomizeP<Random::PROB_37_5>(random);
-      else if (p == 0.5)   return RandomizeP<Random::PROB_50>(random);
-      else if (p == 0.625) return RandomizeP<Random::PROB_62_5>(random);
-      else if (p == 0.75)  return RandomizeP<Random::PROB_75>(random);
-      else if (p == 0.875) return RandomizeP<Random::PROB_87_5>(random);
-      else if (p == 1.0)   return SetAll();
-
-      for (size_t i = 0; i < NUM_BITS; i++) Set(i, random.P(p));
-      return *this;
-    }
-
-    /// Set all bits randomly, with a given probability of being a on.
-    BitSet & Randomize(Random & random, const size_t target_ones) {
-      emp_assert(target_ones <= NUM_BITS);
-
-      // Approximate the probability of ones as a starting point.
-      double p = ((double) target_ones) / (double) NUM_BITS;
-
-      // Try to find a shortcut if p allows....
-      // (These are currently guessed values)
-      if (p < 0.12) Clear();
-      else if (p < 0.2)  RandomizeP<Random::PROB_12_5>(random);
-      else if (p < 0.35) RandomizeP<Random::PROB_25>(random);
-      else if (p < 0.42) RandomizeP<Random::PROB_37_5>(random);
-      else if (p < 0.58) RandomizeP<Random::PROB_50>(random);
-      else if (p < 0.65) RandomizeP<Random::PROB_62_5>(random);
-      else if (p < 0.8)  RandomizeP<Random::PROB_75>(random);
-      else if (p < 0.88) RandomizeP<Random::PROB_87_5>(random);
-      else SetAll();
-
-      size_t cur_ones = CountOnes();
-
-      // See if we need to add more ones.
-      while (cur_ones < target_ones) {
-        size_t pos = random.GetUInt(NUM_BITS);
-        auto bit = operator[](pos);
-        if (!bit) {
-          bit.Set();
-          cur_ones++;
-        }
-      }
-
-      // See if we have too many ones.
-      while (cur_ones > target_ones) {
-        size_t pos = random.GetUInt(NUM_BITS);
-        auto bit = operator[](pos);
-        if (bit) {
-          bit.Clear();
-          cur_ones--;
-        }
-      }
-
-      return *this;
-    }
-
+    /// Set all bits randomly, with a given probability of being a one.
+    BitSet & Randomize(Random & random, const size_t target_ones);
+    
     /// Flip random bits with a given probability.
-    BitSet & FlipRandom(Random & random,
-                        const double p,
-                        const size_t start_pos=0,
-                        const size_t stop_pos=NUM_BITS)
-    {
-      emp_assert(start_pos <= stop_pos);
-      emp_assert(stop_pos <= NUM_BITS);
-      emp_assert(p >= 0.0 && p <= 1.0, p);
-
-      for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Toggle(i);
-
-      return *this;
-    }
+    BitSet & FlipRandom(Random & random, const double p,
+                        const size_t start_pos=0, const size_t stop_pos=NUM_BITS);
 
     /// Set random bits with a given probability (does not check if already set.)
-    BitSet & SetRandom(Random & random,
-                        const double p,
-                        const size_t start_pos=0,
-                        const size_t stop_pos=NUM_BITS)
-    {
-      emp_assert(start_pos <= stop_pos);
-      emp_assert(stop_pos <= NUM_BITS);
-      emp_assert(p >= 0.0 && p <= 1.0, p);
-
-      for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Set(i);
-
-      return *this;
-    }
+    BitSet & SetRandom(Random & random, const double p,
+                        const size_t start_pos=0, const size_t stop_pos=NUM_BITS);
 
     /// Unset random bits with a given probability (does not check if already zero.)
-    BitSet & ClearRandom(Random & random,
-                        const double p,
-                        const size_t start_pos=0,
-                        const size_t stop_pos=NUM_BITS)
-    {
-      emp_assert(start_pos <= stop_pos);
-      emp_assert(stop_pos <= NUM_BITS);
-      emp_assert(p >= 0.0 && p <= 1.0, p);
-
-      for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Clear(i);
-
-      return *this;
-    }
+    BitSet & ClearRandom(Random & random, const double p,
+                        const size_t start_pos=0, const size_t stop_pos=NUM_BITS);
 
     /// Flip a specified number of random bits.
-    BitSet & FlipRandom(Random & random,
-                        const size_t num_bits)
-    {
-      emp_assert(num_bits <= NUM_BITS);
-      this_t target_bits(random, num_bits);
-      return *this ^= target_bits;
-    }
+    BitSet & FlipRandom(Random & random, const size_t num_bits);
 
     /// Set a specified number of random bits (does not check if already set.)
-    BitSet & SetRandom(Random & random,
-                        const size_t num_bits)
-    {
-      emp_assert(num_bits <= NUM_BITS);
-      this_t target_bits(random, num_bits);
-      return *this |= target_bits;
-    }
+    BitSet & SetRandom(Random & random, const size_t num_bits);
 
     /// Unset  a specified number of random bits (does not check if already zero.)
-    BitSet & ClearRandom(Random & random,
-                        const size_t num_bits)
-    {
-      emp_assert(num_bits <= NUM_BITS);
-      this_t target_bits(random, NUM_BITS - num_bits);
-      return *this &= target_bits;
-    }
+    BitSet & ClearRandom(Random & random, const size_t num_bits);
 
     // size_t Mutate(
     //   Random & random,
@@ -1401,6 +1285,167 @@ namespace emp {
     Clear();
     auto it = std::rbegin(l); // Right-most bit is position 0.
     for (size_t idx = 0; idx < NUM_BITS; ++idx) Set(idx, (idx < l.size()) && *it++);
+  }
+
+  // -------------------------  Randomization -------------------------
+
+  /// Set all bits randomly, with a 50% probability of being a 0 or 1.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::Randomize(Random & random) {
+    random.RandFill(BytePtr(), TOTAL_BYTES);
+    ClearExcessBits();
+    return *this;
+  }
+
+  /// Set all bits randomly, with probability specified at compile time.
+  template <size_t NUM_BITS>
+  template <Random::Prob P>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::RandomizeP(Random & random) {
+    random.RandFillP<P>(BytePtr(), TOTAL_BYTES);
+    ClearExcessBits();
+    return *this;
+  }
+
+
+  /// Set all bits randomly, with a given probability of being a on.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::Randomize(Random & random, const double p) {
+    // Try to find a shortcut if p allows....
+    if (p == 0.0) return Clear();
+    else if (p == 0.125) return RandomizeP<Random::PROB_12_5>(random);
+    else if (p == 0.25)  return RandomizeP<Random::PROB_25>(random);
+    else if (p == 0.375) return RandomizeP<Random::PROB_37_5>(random);
+    else if (p == 0.5)   return RandomizeP<Random::PROB_50>(random);
+    else if (p == 0.625) return RandomizeP<Random::PROB_62_5>(random);
+    else if (p == 0.75)  return RandomizeP<Random::PROB_75>(random);
+    else if (p == 0.875) return RandomizeP<Random::PROB_87_5>(random);
+    else if (p == 1.0)   return SetAll();
+
+    for (size_t i = 0; i < NUM_BITS; i++) Set(i, random.P(p));
+    return *this;
+  }
+
+  /// Set all bits randomly, with a given probability of being a on.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::Randomize(Random & random, const size_t target_ones) {
+    emp_assert(target_ones <= NUM_BITS);
+
+    // Approximate the probability of ones as a starting point.
+    double p = ((double) target_ones) / (double) NUM_BITS;
+
+    // Try to find a shortcut if p allows....
+    // (These are currently guessed values)
+    if (p < 0.12) Clear();
+    else if (p < 0.2)  RandomizeP<Random::PROB_12_5>(random);
+    else if (p < 0.35) RandomizeP<Random::PROB_25>(random);
+    else if (p < 0.42) RandomizeP<Random::PROB_37_5>(random);
+    else if (p < 0.58) RandomizeP<Random::PROB_50>(random);
+    else if (p < 0.65) RandomizeP<Random::PROB_62_5>(random);
+    else if (p < 0.8)  RandomizeP<Random::PROB_75>(random);
+    else if (p < 0.88) RandomizeP<Random::PROB_87_5>(random);
+    else SetAll();
+
+    size_t cur_ones = CountOnes();
+
+    // See if we need to add more ones.
+    while (cur_ones < target_ones) {
+      size_t pos = random.GetUInt(NUM_BITS);
+      auto bit = operator[](pos);
+      if (!bit) {
+        bit.Set();
+        cur_ones++;
+      }
+    }
+
+    // See if we have too many ones.
+    while (cur_ones > target_ones) {
+      size_t pos = random.GetUInt(NUM_BITS);
+      auto bit = operator[](pos);
+      if (bit) {
+        bit.Clear();
+        cur_ones--;
+      }
+    }
+
+    return *this;
+  }
+
+  /// Flip random bits with a given probability.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::FlipRandom(Random & random,
+                                                  const double p,
+                                                  const size_t start_pos,
+                                                  const size_t stop_pos)
+  {
+    emp_assert(start_pos <= stop_pos);
+    emp_assert(stop_pos <= NUM_BITS);
+    emp_assert(p >= 0.0 && p <= 1.0, p);
+
+    for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Toggle(i);
+
+    return *this;
+  }
+
+  /// Set random bits with a given probability (does not check if already set.)
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::SetRandom(Random & random,
+                      const double p,
+                      const size_t start_pos,
+                      const size_t stop_pos)
+  {
+    emp_assert(start_pos <= stop_pos);
+    emp_assert(stop_pos <= NUM_BITS);
+    emp_assert(p >= 0.0 && p <= 1.0, p);
+
+    for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Set(i);
+
+    return *this;
+  }
+
+  /// Unset random bits with a given probability (does not check if already zero.)
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::ClearRandom(Random & random,
+                      const double p,
+                      const size_t start_pos,
+                      const size_t stop_pos)
+  {
+    emp_assert(start_pos <= stop_pos);
+    emp_assert(stop_pos <= NUM_BITS);
+    emp_assert(p >= 0.0 && p <= 1.0, p);
+
+    for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Clear(i);
+
+    return *this;
+  }
+
+  /// Flip a specified number of random bits.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::FlipRandom(Random & random,
+                                                  const size_t num_bits)
+  {
+    emp_assert(num_bits <= NUM_BITS);
+    this_t target_bits(random, num_bits);
+    return *this ^= target_bits;
+  }
+
+  /// Set a specified number of random bits (does not check if already set.)
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::SetRandom(Random & random,
+                                                 const size_t num_bits)
+  {
+    emp_assert(num_bits <= NUM_BITS);
+    this_t target_bits(random, num_bits);
+    return *this |= target_bits;
+  }
+
+  /// Unset  a specified number of random bits (does not check if already zero.)
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::ClearRandom(Random & random,
+                                                   const size_t num_bits)
+  {
+    emp_assert(num_bits <= NUM_BITS);
+    this_t target_bits(random, NUM_BITS - num_bits);
+    return *this &= target_bits;
   }
 
 
