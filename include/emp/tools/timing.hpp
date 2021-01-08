@@ -32,6 +32,16 @@
     std::cout << "Result: " << emp_result << std::endl;                      \
   }
 
+/// A simple macro to time how long it takes for a function to complete.
+  #define EMP_VOID_FUNCTION_TIMER(TEST_FUN) {                                \
+    std::clock_t emp_start_time = std::clock();                              \
+    TEST_FUN;                                                                \
+    std::clock_t emp_tot_time = std::clock() - emp_start_time;               \
+    std::cout << "Time: "                                                    \
+              << 1000.0 * ((double) emp_tot_time) / (double) CLOCKS_PER_SEC  \
+              << " ms" << std::endl;                                         \
+  }
+
 namespace emp {
 
   /// A function timer that takes a functor an identifies how long it takes to complete when run.
