@@ -88,7 +88,13 @@ namespace emp {
     static size_t Byte2FieldPos(const size_t index) { return FieldPos(index * 8); }
 
     // Copy an array of bits into this BitSet (internal use only!)
-    void Copy(const field_t in_set[NUM_FIELDS]) { std::memcpy(bit_set, in_set, sizeof(bit_set)); }
+    template <size_t IN_FIELDS, size_t COPY_FIELDS=NUM_FIELDS>
+    void Copy(const field_t in_set[IN_FIELDS]) {
+      static_assert(COPY_FIELDS <= IN_FIELDS, "Cannot copy more fields than we are given.");
+      static_assert(COPY_FIELDS <= NUM_FIELDS, "Cannot copy into more fields than are available.");
+      constexpr size_t COPY_BYTES = COPY_FIELDS * sizeof(field_t);
+      std::memcpy(bit_set, in_set, COPY_BYTES);
+    }
 
     // Any bits past the last "real" bit in the last field should be kept as zeros.
     void ClearExcessBits() { if constexpr (NUM_END_BITS > 0) bit_set[LAST_FIELD] &= END_MASK; }
