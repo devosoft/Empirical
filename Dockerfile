@@ -87,6 +87,7 @@ RUN \
     wget \
     ssh-client \
     libasound2 \
+    gpg-agent \
     && \
   apt-get clean \
     && \
