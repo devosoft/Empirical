@@ -37,6 +37,7 @@ RUN \
     libc6=2.27-3ubuntu1 \
     libc6-dev \
     libc6-dbg \
+    libsfml-dev \
     build-essential \
     xvfb \
     x11vnc \
