@@ -78,8 +78,14 @@ namespace emp {
     // Identify the field that a specified bit is in.
     static size_t FieldID(const size_t index) { return index >> FIELD_LOG2; }
 
+    // Identify the byte that a specified bit is in.
+    static size_t ByteID(const size_t index) { return index >> 3; }
+
     // Identify the position within a field where a specified bit is.
     static size_t FieldPos(const size_t index) { return index & (FIELD_BITS - 1); }
+
+    // Identify the position within a byte where a specified bit is.
+    static size_t BytePos(const size_t index) { return index & 7; }
 
     // Identify which field a specified byte position would be in.
     static size_t Byte2Field(const size_t index) { return index / sizeof(field_t); }
@@ -122,13 +128,13 @@ namespace emp {
     BitSet(const BitSet & in_set) { Copy(in_set.bit_set); }
 
     /// Constructor to generate a random BitSet (with equal prob of 0 or 1).
-    BitSet(Random & random) { Randomize(random); }
+    BitSet(Random & random) { Randomize(random); ClearExcessBits(); }
 
     /// Constructor to generate a random BitSet with provided PROBABILITY of 1's.
-    BitSet(Random & random, const double p1) { Randomize(random, p1); }
+    BitSet(Random & random, double p1) { Randomize(random, p1); ClearExcessBits(); }
 
     /// Constructor to generate a random BitSet with provided NUMBER of 1's.
-    BitSet(Random & random, const size_t one_count) { Randomize(random, one_count); }
+    BitSet(Random & random, size_t num_ones) { Randomize(random, num_ones); ClearExcessBits(); }
 
     /// Constructor to fill in a bit set from a vector.
     template <typename T> BitSet(const std::initializer_list<T> l);
@@ -143,13 +149,17 @@ namespace emp {
     BitSet &  Randomize(Random & random);
 
     /// Set all bits randomly, with probability specified at compile time.
-    template <Random::Prob P> BitSet &  RandomizeP(Random & random);
+    template <Random::Prob P>
+    BitSet & RandomizeP(Random & random,
+                        const size_t start_pos=0, const size_t stop_pos=NUM_BITS);
 
     /// Set all bits randomly, with a given probability of being a one.
-    BitSet & Randomize(Random & random, const double p);
+    BitSet & Randomize(Random & random, const double p,
+                       const size_t start_pos=0, const size_t stop_pos=NUM_BITS);
 
     /// Set all bits randomly, with a given probability of being a one.
-    BitSet & Randomize(Random & random, const size_t target_ones);
+    BitSet & Randomize(Random & random, const size_t target_ones,
+                       const size_t start_pos=0, const size_t stop_pos=NUM_BITS);
     
     /// Flip random bits with a given probability.
     BitSet & FlipRandom(Random & random, const double p,
@@ -1306,56 +1316,91 @@ namespace emp {
   /// Set all bits randomly, with probability specified at compile time.
   template <size_t NUM_BITS>
   template <Random::Prob P>
-  BitSet<NUM_BITS> & BitSet<NUM_BITS>::RandomizeP(Random & random) {
-    random.RandFillP<P>(BytePtr(), TOTAL_BYTES);
-    ClearExcessBits();
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::RandomizeP(Random & random,
+                                                  const size_t start_pos, const size_t stop_pos) {
+    const size_t start_byte_id = ByteID(start_pos);            // At which byte do we start?
+    const unsigned char start_byte = BytePtr()[start_byte_id]; // Save first byte to restore bits.
+    const size_t start_bit_id = BytePos(start_pos);            // Which bit to start at in byte?
+    const size_t end_byte_id = ByteID(stop_pos);                // At which byte do we stop?
+    const size_t end_bit_id = BytePos(stop_pos);                // Which bit to stop before in byte?
+ 
+    random.RandFillP<P>(BytePtr() + start_byte_id, end_byte_id - start_byte_id);
+ 
+    // If we are not starting at the beginning of a byte, restore missing bits.
+    if (start_bit_id) {
+      unsigned char mask = (1 >> start_bit_id) - 1;
+      (BytePtr()[start_byte_id] &= ~mask) |= (start_byte & mask);
+    }
+
+    // If we have a byte at the end to partially randomize, do so.
+    if (end_bit_id) {
+      unsigned char & end_byte = BytePtr()[end_byte_id];
+      for (size_t i = 0; i < end_bit_id; i++) {
+        if (random.P(P)) end_byte |= ((unsigned char) 1 << i);
+      }
+    }
     return *this;
   }
 
 
   /// Set all bits randomly, with a given probability of being a on.
   template <size_t NUM_BITS>
-  BitSet<NUM_BITS> & BitSet<NUM_BITS>::Randomize(Random & random, const double p) {
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::Randomize(Random & random, const double p,
+                                                 const size_t start_pos, const size_t stop_pos) {
     // Try to find a shortcut if p allows....
-    if (p == 0.0) return Clear();
-    else if (p == 0.125) return RandomizeP<Random::PROB_12_5>(random);
-    else if (p == 0.25)  return RandomizeP<Random::PROB_25>(random);
-    else if (p == 0.375) return RandomizeP<Random::PROB_37_5>(random);
-    else if (p == 0.5)   return RandomizeP<Random::PROB_50>(random);
-    else if (p == 0.625) return RandomizeP<Random::PROB_62_5>(random);
-    else if (p == 0.75)  return RandomizeP<Random::PROB_75>(random);
-    else if (p == 0.875) return RandomizeP<Random::PROB_87_5>(random);
-    else if (p == 1.0)   return SetAll();
+    if (p == 0.0) return Clear(start_pos, stop_pos);
+    else if (p == 0.125) return RandomizeP<Random::PROB_12_5>(random, start_pos, stop_pos);
+    else if (p == 0.25)  return RandomizeP<Random::PROB_25>(random, start_pos, stop_pos);
+    else if (p == 0.375) return RandomizeP<Random::PROB_37_5>(random, start_pos, stop_pos);
+    else if (p == 0.5)   return RandomizeP<Random::PROB_50>(random, start_pos, stop_pos);
+    else if (p == 0.625) return RandomizeP<Random::PROB_62_5>(random, start_pos, stop_pos);
+    else if (p == 0.75)  return RandomizeP<Random::PROB_75>(random, start_pos, stop_pos);
+    else if (p == 0.875) return RandomizeP<Random::PROB_87_5>(random, start_pos, stop_pos);
+    else if (p == 1.0)   return SetRange(start_pos, stop_pos);
 
-    for (size_t i = 0; i < NUM_BITS; i++) Set(i, random.P(p));
+    // This is not a special value of P, so let's set each bit manually (for now)
+    for (size_t i = start_pos; i < stop_pos; i++) Set(i, random.P(p));
     return *this;
   }
 
   /// Set all bits randomly, with a given probability of being a on.
   template <size_t NUM_BITS>
-  BitSet<NUM_BITS> & BitSet<NUM_BITS>::Randomize(Random & random, const size_t target_ones) {
-    emp_assert(target_ones <= NUM_BITS);
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::Randomize(Random & random, const size_t target_ones,
+                                                 const size_t start_pos, const size_t stop_pos) {
+    emp_assert(start_pos <= stop_pos);
+    emp_assert(stop_pos <= NUM_BITS)
+
+    const size_t target_size = stop_pos - start_pos;
+    emp_assert(target_ones <= target_size);
 
     // Approximate the probability of ones as a starting point.
-    double p = ((double) target_ones) / (double) NUM_BITS;
+    double p = ((double) target_ones) / (double) target_size;
+
+    // If we are not randomizing the whole sequence, we need to track the number of ones
+    // in the NON-randomized region to subtract off later.
+    size_t kept_ones = 0;
+    if (target_size != NUM_BITS) {
+      Clear(start_pos, stop_pos);
+      kept_ones = CountOnes();
+    }
 
     // Try to find a shortcut if p allows....
-    // (These are currently guessed values)
-    if (p < 0.12) Clear();
-    else if (p < 0.2)  RandomizeP<Random::PROB_12_5>(random);
-    else if (p < 0.35) RandomizeP<Random::PROB_25>(random);
-    else if (p < 0.42) RandomizeP<Random::PROB_37_5>(random);
-    else if (p < 0.58) RandomizeP<Random::PROB_50>(random);
-    else if (p < 0.65) RandomizeP<Random::PROB_62_5>(random);
-    else if (p < 0.8)  RandomizeP<Random::PROB_75>(random);
-    else if (p < 0.88) RandomizeP<Random::PROB_87_5>(random);
-    else SetAll();
+    // (These values are currently educated guesses)
+    if (p < 0.12) { if (target_size == NUM_BITS) Clear(start_pos, stop_pos); }
+    else if (p < 0.2)  RandomizeP<Random::PROB_12_5>(random, start_pos, stop_pos);
+    else if (p < 0.35) RandomizeP<Random::PROB_25>(random, start_pos, stop_pos);
+    else if (p < 0.42) RandomizeP<Random::PROB_37_5>(random, start_pos, stop_pos);
+    else if (p < 0.58) RandomizeP<Random::PROB_50>(random, start_pos, stop_pos);
+    else if (p < 0.65) RandomizeP<Random::PROB_62_5>(random, start_pos, stop_pos);
+    else if (p < 0.8)  RandomizeP<Random::PROB_75>(random, start_pos, stop_pos);
+    else if (p < 0.88) RandomizeP<Random::PROB_87_5>(random, start_pos, stop_pos);
+    else SetRange(start_pos, stop_pos);
 
-    size_t cur_ones = CountOnes();
+    size_t cur_ones = CountOnes() - kept_ones;
 
-    // See if we need to add more ones.
+    // Do we need to add more ones?
     while (cur_ones < target_ones) {
-      size_t pos = random.GetUInt(NUM_BITS);
+      size_t pos = random.GetUInt(start_pos, stop_pos);
       auto bit = operator[](pos);
       if (!bit) {
         bit.Set();
@@ -1365,7 +1410,7 @@ namespace emp {
 
     // See if we have too many ones.
     while (cur_ones > target_ones) {
-      size_t pos = random.GetUInt(NUM_BITS);
+      size_t pos = random.GetUInt(start_pos, stop_pos);
       auto bit = operator[](pos);
       if (bit) {
         bit.Clear();
