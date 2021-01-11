@@ -149,28 +149,19 @@ namespace emp {
     constexpr static size_t GetSize() { return NUM_BITS; }
 
     /// Retrieve the bit as a specified index.
-    bool Get(size_t index) const {
-      emp_assert(index >= 0 && index < NUM_BITS);
-      const size_t field_id = FieldID(index);
-      const size_t pos_id = FieldPos(index);
-      return (bit_set[field_id] & (((field_t)1U) << pos_id)) != 0;
-    }
+    bool Get(size_t index) const;
 
     /// A safe version of Get() for indexing out of range. Useful for representing collections.
     bool Has(size_t index) const { return (index < NUM_BITS) ? Get(index) : false; }
 
     /// Set the bit at a specified index.
-    BitSet & Set(size_t index, bool value=true) {
-      emp_assert(index < NUM_BITS);
-      const size_t field_id = FieldID(index);
-      const size_t pos_id = FieldPos(index);
-      const field_t pos_mask = ((field_t)1U) << pos_id;
+    BitSet & Set(size_t index, bool value=true);
 
-      if (value) bit_set[field_id] |= pos_mask;
-      else       bit_set[field_id] &= ~pos_mask;
+    /// Set all bits to one.
+    BitSet & SetAll();
 
-      return *this;
-    }
+    /// Set a range of bits to one: [start, stop)
+    BitSet & SetRange(size_t start, size_t stop);
 
     /// Set all bits randomly, with a 50% probability of being a 0 or 1.
     BitSet &  Randomize(Random & random);
@@ -501,13 +492,6 @@ namespace emp {
 
     /// Set all bits to zero.
     BitSet & Clear() { for (field_t & x : bit_set) x = FIELD_0; return *this; }
-
-    /// Set all bits to one.
-    BitSet & SetAll() {
-      for (field_t & x : bit_set) x = FIELD_ALL;
-      ClearExcessBits();
-      return *this;
-    }
 
     /// Overload ostream operator to return Print.
     friend std::ostream& operator<<(std::ostream &out, const BitSet& bs){
@@ -1330,6 +1314,53 @@ namespace emp {
     return *this;
   }
 
+  /// Set all bits to one.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::SetAll() {
+    for (field_t & x : bit_set) x = FIELD_ALL;
+    ClearExcessBits();
+    return *this;
+  }
+
+  /// Set a range of bits to one: [start, stop)
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::SetRange(size_t start, size_t stop) {
+    emp_assert(start <= stop, start, stop);
+    emp_assert(stop <= NUM_BITS, stop, NUM_BITS);
+    const size_t start_pos = FieldPos(start);
+    const size_t stop_pos = FieldPos(stop);
+    size_t start_field = FieldID(start);
+    const size_t stop_field = FieldID(stop);
+
+    // If the start field and stop field are the same, just set those bits.
+    if (start_field == stop_field) {
+      const size_t bit_count = stop - start;
+      const field_t mask = MaskLow<field_t>(bit_count) << start_pos;
+      bit_set[start_field] |= mask;
+    }
+
+    // Otherwise handle the ends and clear the chunks in between.
+    else {
+      // Set portions of start field
+      if (start_pos != 0) {
+        const size_t start_bits = FIELD_BITS - start_pos;
+        const field_t start_mask = MaskLow<field_t>(start_bits) << start_pos;
+        bit_set[start_field] |= start_mask;
+        start_field++;
+      }
+
+      // Middle fields
+      for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
+        bit_set[cur_field] = FIELD_ALL;
+      }
+
+      // Set portions of stop field
+      const field_t stop_mask = MaskLow<field_t>(stop_pos);
+      bit_set[stop_field] |= stop_mask;
+    }
+
+    return *this;
+  }
 
   // -------------------------  Implementations Randomization functions -------------------------
 
