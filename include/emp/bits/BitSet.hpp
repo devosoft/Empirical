@@ -142,8 +142,35 @@ namespace emp {
     /// Destructor.
     ~BitSet() = default;
 
-    /// Assignment operator.
+    /// Assignment operator (no separate move opperator since no resources to move...)
     BitSet & operator=(const BitSet<NUM_BITS> & in_set) { Copy(in_set.bit_set); return *this; }
+
+    /// How many bits are in this BitSet?
+    constexpr static size_t GetSize() { return NUM_BITS; }
+
+    /// Retrieve the bit as a specified index.
+    bool Get(size_t index) const {
+      emp_assert(index >= 0 && index < NUM_BITS);
+      const size_t field_id = FieldID(index);
+      const size_t pos_id = FieldPos(index);
+      return (bit_set[field_id] & (((field_t)1U) << pos_id)) != 0;
+    }
+
+    /// A safe version of Get() for indexing out of range. Useful for representing collections.
+    bool Has(size_t index) const { return (index < NUM_BITS) ? Get(index) : false; }
+
+    /// Set the bit at a specified index.
+    BitSet & Set(size_t index, bool value=true) {
+      emp_assert(index < NUM_BITS);
+      const size_t field_id = FieldID(index);
+      const size_t pos_id = FieldPos(index);
+      const field_t pos_mask = ((field_t)1U) << pos_id;
+
+      if (value) bit_set[field_id] |= pos_mask;
+      else       bit_set[field_id] &= ~pos_mask;
+
+      return *this;
+    }
 
     /// Set all bits randomly, with a 50% probability of being a 0 or 1.
     BitSet &  Randomize(Random & random);
@@ -277,32 +304,8 @@ namespace emp {
     /// Compare two BitSet objects, based on the associated binary value.
     bool operator>=(const BitSet & in_set) const { return !operator<(in_set); }
 
-    /// How many bits are in this BitSet?
-    constexpr static size_t GetSize() { return NUM_BITS; }
-
     /// How many bytes are in this BitSet?
     constexpr static size_t GetNumBytes() { return TOTAL_BYTES; }
-
-    /// Retrieve the bit as a specified index.
-    bool Get(size_t index) const {
-      emp_assert(index >= 0 && index < NUM_BITS);
-      const size_t field_id = FieldID(index);
-      const size_t pos_id = FieldPos(index);
-      return (bit_set[field_id] & (((field_t)1U) << pos_id)) != 0;
-    }
-
-    /// Set the bit at a specified index.
-    BitSet & Set(size_t index, bool value=true) {
-      emp_assert(index < NUM_BITS);
-      const size_t field_id = FieldID(index);
-      const size_t pos_id = FieldPos(index);
-      const field_t pos_mask = ((field_t)1U) << pos_id;
-
-      if (value) bit_set[field_id] |= pos_mask;
-      else       bit_set[field_id] &= ~pos_mask;
-
-      return *this;
-    }
 
     /// Flip all bits in this BitSet
     BitSet & Toggle() { return NOT_SELF(); }
@@ -1303,7 +1306,32 @@ namespace emp {
     for (size_t idx = 0; idx < NUM_BITS; ++idx) Set(idx, (idx < l.size()) && *it++);
   }
 
-  // -------------------------  Randomization -------------------------
+  // --------------------  Implementations of common accessors -------------------
+
+  template <size_t NUM_BITS>
+  bool BitSet<NUM_BITS>::Get(size_t index) const {
+    emp_assert(index >= 0 && index < NUM_BITS);
+    const size_t field_id = FieldID(index);
+    const size_t pos_id = FieldPos(index);
+    return (bit_set[field_id] & (((field_t)1U) << pos_id)) != 0;
+  }
+
+  /// Set the bit at a specified index.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::Set(size_t index, bool value) {
+    emp_assert(index < NUM_BITS);
+    const size_t field_id = FieldID(index);
+    const size_t pos_id = FieldPos(index);
+    const field_t pos_mask = FIELD_1 << pos_id;
+
+    if (value) bit_set[field_id] |= pos_mask;
+    else       bit_set[field_id] &= ~pos_mask;
+
+    return *this;
+  }
+
+
+  // -------------------------  Implementations Randomization functions -------------------------
 
   /// Set all bits randomly, with a 50% probability of being a 0 or 1.
   template <size_t NUM_BITS>
