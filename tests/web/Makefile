@@ -13,7 +13,7 @@ OFLAGS_web := -Werror -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEM
 #initializer lists - to compile files with them, we need to remove -Werror
 OFLAGS_web_braces := -pedantic -Wno-dollar-in-identifier-extension -s TOTAL_MEMORY=67108864
 
-CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../include/emp/web/library_emp.js --js-library ../../include/emp/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "stringToUTF8"]' -s WASM=0
+CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../include/emp/web/library_emp.js --js-library ../../include/emp/web/d3/library_d3.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback', '_empDoCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "stringToUTF8"]' -s WASM=0
 
 test: $(addprefix test-, $(TEST_NAMES)) test-color_map test-GetUrlParams
 
@@ -29,6 +29,11 @@ test-color_map: color_map.cpp ../../third-party/Catch/single_include/catch2/catc
 	./color_map.out
 
 test-GetUrlParams: GetUrlParams.cpp
+	source ../../third-party/emsdk/emsdk_env.sh; \
+	$(CXX_web) $(CFLAGS_web) $< -o $@.js
+	node $@.js
+
+test-CanvasShape: CanvasShape.cpp
 	source ../../third-party/emsdk/emsdk_env.sh; \
 	$(CXX_web) $(CFLAGS_web) $< -o $@.js
 	node $@.js
