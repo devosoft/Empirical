@@ -722,6 +722,11 @@ namespace emp {
     /// Does this Ptr point to a memory position after or equal to a raw pointer?
     bool operator>=(const TYPE * in_ptr) const { return ptr >= in_ptr; }
 
+    [[nodiscard]] Ptr<TYPE> operator+(int value) const { return ptr + value; }
+    [[nodiscard]] Ptr<TYPE> operator-(int value) const { return ptr - value; }
+    [[nodiscard]] Ptr<TYPE> operator+(size_t value) const { return ptr + value; }
+    [[nodiscard]] Ptr<TYPE> operator-(size_t value) const { return ptr - value; }
+
     /// Fill an array with the provided fill_value.
     /// If fill_value is a function, repeatedly call function.
     template <typename T>
@@ -899,6 +904,11 @@ namespace emp {
     bool operator<=(const TYPE * in_ptr) const { return ptr <= in_ptr; }
     bool operator>(const TYPE * in_ptr)  const { return ptr > in_ptr; }
     bool operator>=(const TYPE * in_ptr) const { return ptr >= in_ptr; }
+
+    [[nodiscard]] Ptr<TYPE> operator+(int value) const { return ptr + value; }
+    [[nodiscard]] Ptr<TYPE> operator-(int value) const { return ptr - value; }
+    [[nodiscard]] Ptr<TYPE> operator+(size_t value) const { return ptr + value; }
+    [[nodiscard]] Ptr<TYPE> operator-(size_t value) const { return ptr - value; }
 
     // Extra functionality (not in raw pointers)
 
