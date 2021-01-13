@@ -215,6 +215,37 @@ namespace emp {
       }
     }
 
+    /// Randomize a contiguous segment of memory between specified bit positions.
+    template <Prob P>
+    void RandFillP(emp::Ptr<unsigned char> dest, const size_t num_bytes,
+                   size_t start_bit, size_t stop_bit)
+    {
+      const size_t start_byte_id = start_bit >> 3;               // At which byte do we start?
+      const unsigned char start_byte = BytePtr()[start_byte_id]; // Save first byte to restore bits.
+      const size_t start_bit_id = start_bit & 7;                 // Which bit to start at in byte?
+      const size_t end_byte_id = stop_bit >> 3;                  // At which byte do we stop?
+      const size_t end_bit_id = stop_pos & 7;                    // Which bit to stop before in byte?
+  
+      // Randomize the full bits we need to use.
+      RandFillP<P>(dest + start_byte_id, end_byte_id - start_byte_id);
+  
+      // If we are not starting at the beginning of a byte, restore missing bits.
+      if (start_bit_id) {
+        const unsigned char mask = (1 << start_bit_id) - 1;      // Signify how byte is divided.
+        (dest[start_byte_id] &= ~mask) |= (start_byte & mask);   // Stitch together byte parts.
+      }
+
+      // If we have a byte at the end to partially randomize, do so.
+      if (end_bit_id) {
+        unsigned char & end_byte = dest[end_byte_id];            // Grab reference to end byte
+        const unsigned char mask = (1 << end_bit_id) - 1;        // Signify how byte is divided.
+        end_byte &= ~mask;                                       // Clear out bits to be randomized.
+        for (size_t i = 0; i < end_bit_id; i++) {                // Step through bits to flip.
+          if (random.P(P)) end_byte |= ((unsigned char) 1 << i); // Set appropriate bits.
+        }
+      }
+    }
+
     // Shortcuts to eandomize a contiguous segment of memory with fixed probabilities of a 1.
     using mem_ptr = emp::Ptr<unsigned char>;
     void RandFill0(   mem_ptr dest, const size_t bytes) { RandFillP<PROB_0>   (dest, bytes); }
