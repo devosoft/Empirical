@@ -186,14 +186,17 @@ namespace emp {
                 PROB_75  = 750, PROB_87_5 = 875,
                 PROB_100 = 1000 };
 
+    /// Shortcut type for all functions that deal witch chunks of memory.
+    using mem_ptr_t = emp::Ptr<unsigned char>;
+
     /// Randomize a contiguous segment of memory.
-    void RandFill(emp::Ptr<unsigned char> dest, const size_t num_bytes) {
+    void RandFill(mem_ptr_t dest, const size_t num_bytes) {
       dest.FillMemoryFunction( num_bytes, [this](){ return Get(); } );
     }
 
     /// Randomize a contiguous segment of memory.
     template <Prob P>
-    void RandFillP(emp::Ptr<unsigned char> dest, const size_t num_bytes) {
+    void RandFillP(mem_ptr_t dest, const size_t num_bytes) {
       if constexpr (P == PROB_0) {
         dest.FillMemoryFunction( num_bytes, [](){ return 0; } );
       } else if constexpr (P == PROB_12_5) {
@@ -217,7 +220,7 @@ namespace emp {
 
     /// Randomize a contiguous segment of memory between specified bit positions.
     template <Prob P>
-    void RandFillP(emp::Ptr<unsigned char> dest, const size_t num_bytes,
+    void RandFillP(mem_ptr_t dest, const size_t num_bytes,
                    size_t start_bit, size_t stop_bit)
     {
       const size_t start_byte_id = start_bit >> 3;               // At which byte do we start?
@@ -246,17 +249,85 @@ namespace emp {
       }
     }
 
-    // Shortcuts to eandomize a contiguous segment of memory with fixed probabilities of a 1.
-    using mem_ptr = emp::Ptr<unsigned char>;
-    void RandFill0(   mem_ptr dest, const size_t bytes) { RandFillP<PROB_0>   (dest, bytes); }
-    void RandFill12_5(mem_ptr dest, const size_t bytes) { RandFillP<PROB_12_5>(dest, bytes); }
-    void RandFill25(  mem_ptr dest, const size_t bytes) { RandFillP<PROB_25>  (dest, bytes); }
-    void RandFill37_5(mem_ptr dest, const size_t bytes) { RandFillP<PROB_37_5>(dest, bytes); }
-    void RandFill50(  mem_ptr dest, const size_t bytes) { RandFillP<PROB_50>  (dest, bytes); }
-    void RandFill62_5(mem_ptr dest, const size_t bytes) { RandFillP<PROB_62_5>(dest, bytes); }
-    void RandFill75(  mem_ptr dest, const size_t bytes) { RandFillP<PROB_75>  (dest, bytes); }
-    void RandFill87_5(mem_ptr dest, const size_t bytes) { RandFillP<PROB_87_5>(dest, bytes); }
-    void RandFill100( mem_ptr dest, const size_t bytes) { RandFillP<PROB_100> (dest, bytes); }
+    // Shortcuts to randomize a contiguous segment of memory with fixed probabilities of a 1.
+    void RandFill0(   mem_ptr_t dest, const size_t bytes) { RandFillP<PROB_0>   (dest, bytes); }
+    void RandFill12_5(mem_ptr_t dest, const size_t bytes) { RandFillP<PROB_12_5>(dest, bytes); }
+    void RandFill25(  mem_ptr_t dest, const size_t bytes) { RandFillP<PROB_25>  (dest, bytes); }
+    void RandFill37_5(mem_ptr_t dest, const size_t bytes) { RandFillP<PROB_37_5>(dest, bytes); }
+    void RandFill50(  mem_ptr_t dest, const size_t bytes) { RandFillP<PROB_50>  (dest, bytes); }
+    void RandFill62_5(mem_ptr_t dest, const size_t bytes) { RandFillP<PROB_62_5>(dest, bytes); }
+    void RandFill75(  mem_ptr_t dest, const size_t bytes) { RandFillP<PROB_75>  (dest, bytes); }
+    void RandFill87_5(mem_ptr_t dest, const size_t bytes) { RandFillP<PROB_87_5>(dest, bytes); }
+    void RandFill100( mem_ptr_t dest, const size_t bytes) { RandFillP<PROB_100> (dest, bytes); }
+
+    void RandFill0(   mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit)
+      { RandFillP<PROB_0>   (dest, bytes, start_bit, stop_bit); }
+    void RandFill12_5(mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit)
+      { RandFillP<PROB_12_5>(dest, bytes, start_bit, stop_bit); }
+    void RandFill25(  mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit)
+      { RandFillP<PROB_25>  (dest, bytes, start_bit, stop_bit); }
+    void RandFill37_5(mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit)
+      { RandFillP<PROB_37_5>(dest, bytes, start_bit, stop_bit); }
+    void RandFill50(  mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit)
+      { RandFillP<PROB_50>  (dest, bytes, start_bit, stop_bit); }
+    void RandFill62_5(mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit)
+      { RandFillP<PROB_62_5>(dest, bytes, start_bit, stop_bit); }
+    void RandFill75(  mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit)
+      { RandFillP<PROB_75>  (dest, bytes, start_bit, stop_bit); }
+    void RandFill87_5(mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit)
+      { RandFillP<PROB_87_5>(dest, bytes, start_bit, stop_bit); }
+    void RandFill100( mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit)
+      { RandFillP<PROB_100> (dest, bytes, start_bit, stop_bit); }
+
+    /// Randomize a contiguous segment of memory with a given probability of each bit being a on.
+    void RandFill(mem_ptr_t dest, const size_t num_bytes, const double p) {
+      // Try to find a shortcut if p allows....
+      if (p == 0.0)        return RandFill0(dest, num_bytes);
+      else if (p == 0.125) return RandFill12_5(dest, num_bytes);
+      else if (p == 0.25)  return RandFill25(dest, num_bytes);
+      else if (p == 0.375) return RandFill37_5(dest, num_bytes);
+      else if (p == 0.5)   return RandFill50(dest, num_bytes);
+      else if (p == 0.625) return RandFill62_5(dest, num_bytes);
+      else if (p == 0.75)  return RandFill75(dest, num_bytes);
+      else if (p == 0.875) return RandFill87_5(dest, num_bytes);
+      else if (p == 1.0)   return RandFill100(dest, num_bytes);
+
+      // This is not a special value of P, so let's set each bit manually
+      // (slow, but good for now; ideally use closest faster option above and modify)
+      for (size_t i = 0; i < num_bytes; i++) dest[i] = GetByte(p);
+    }
+
+    /// Randomize a contiguous segment of memory with a given probability of each bit being a on.
+    void RandFill(mem_ptr_t dest, const size_t num_bytes, const double p,
+                  const size_t start_bit, const size_t stop_bit) {
+      emp_assert((stop_bit >> 3) <= num_bytes);
+
+      // Try to find a shortcut if p allows....
+      if (p == 0.0)        return RandFill0(dest, num_bytes, start_bit, stop_bit);
+      else if (p == 0.125) return RandFill12_5(dest, num_bytes, start_bit, stop_bit);
+      else if (p == 0.25)  return RandFill25(dest, num_bytes, start_bit, stop_bit);
+      else if (p == 0.375) return RandFill37_5(dest, num_bytes, start_bit, stop_bit);
+      else if (p == 0.5)   return RandFill50(dest, num_bytes, start_bit, stop_bit);
+      else if (p == 0.625) return RandFill62_5(dest, num_bytes, start_bit, stop_bit);
+      else if (p == 0.75)  return RandFill75(dest, num_bytes, start_bit, stop_bit);
+      else if (p == 0.875) return RandFill87_5(dest, num_bytes, start_bit, stop_bit);
+      else if (p == 1.0)   return RandFill100(dest, num_bytes, start_bit, stop_bit);
+
+      // This is not a special value of P, so let's set each bit manually
+      // (slow, but good for now; ideally use closest faster option above and modify)
+      size_t cur_byte = start_bit >> 3;
+      unsigned char cur_mask = 1 << (start_bit & 7);
+      for (size_t i = start_bit; i < stop_bit; i++) {
+        if (P(p)) dest[cur_byte] |= cur_mask;     // Set the target bit.
+        else dest[cur_byte] &= ~cur_mask;         // Clear out the target bit.
+        cur_mask <<= 1;                           // Move to the next bit.
+        if (!cur_mask) {                          // If the next bit is out of this byte...
+          cur_byte++;                             //   move to the next byte.
+          cur_mask = 1;                           //   reset the mask.
+        }
+      }
+    }
+
 
     // Random Event Generation //////////////////////////////////////////////////
 
