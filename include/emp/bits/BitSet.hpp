@@ -163,6 +163,15 @@ namespace emp {
     /// Set a range of bits to one: [start, stop)
     BitSet & SetRange(size_t start, size_t stop);
 
+    /// Set all bits to zero.
+    BitSet & Clear() { for (field_t & x : bit_set) x = FIELD_0; return *this; }
+
+    /// Set specific bit to 0.
+    BitSet & Clear(size_t index) { return Set(index, false); }
+
+    /// Set bits to 0 in the range [start, stop)
+    BitSet & Clear(const size_t start, const size_t stop);
+
     /// Set all bits randomly, with a 50% probability of being a 0 or 1.
     BitSet &  Randomize(Random & random);
 
@@ -489,9 +498,6 @@ namespace emp {
 
     /// Index into a BitSet, returning a proxy that will allow bit assignment to work.
     BitProxy<this_t> operator[](size_t index) { return BitProxy<this_t>(*this, index); }
-
-    /// Set all bits to zero.
-    BitSet & Clear() { for (field_t & x : bit_set) x = FIELD_0; return *this; }
 
     /// Overload ostream operator to return Print.
     friend std::ostream& operator<<(std::ostream &out, const BitSet& bs){
@@ -1361,6 +1367,47 @@ namespace emp {
 
     return *this;
   }
+
+  /// Set a range of bits to 0 in the range [start, stop)
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::Clear(const size_t start, const size_t stop) {
+    emp_assert(start <= stop, start, stop);
+    emp_assert(stop <= NUM_BITS, stop, NUM_BITS);
+    const size_t start_pos = FieldPos(start);
+    const size_t stop_pos = FieldPos(stop);
+    size_t start_field = FieldID(start);
+    const size_t stop_field = FieldID(stop);
+
+    // If the start field and stop field are the same, just step through the bits.
+    if (start_field == stop_field) {
+      const size_t num_bits = stop - start;
+      const field_t mask = ~(MaskLow<field_t>(num_bits) << start_pos);
+      bit_set[start_field] &= mask;
+    }
+
+    // Otherwise handle the ends and clear the chunks in between.
+    else {
+      // Clear portions of start field
+      if (start_pos != 0) {
+        const size_t start_bits = FIELD_BITS - start_pos;
+        const field_t start_mask = ~(MaskLow<field_t>(start_bits) << start_pos);
+        bit_set[start_field] &= start_mask;
+        start_field++;
+      }
+
+      // Middle fields
+      for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
+        bit_set[cur_field] = 0;
+      }
+
+      // Clear portions of stop field
+      const field_t stop_mask = ~MaskLow<field_t>(stop_pos);
+      bit_set[stop_field] &= stop_mask;
+    }
+
+    return *this;
+  }
+
 
   // -------------------------  Implementations Randomization functions -------------------------
 
