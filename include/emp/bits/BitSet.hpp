@@ -172,6 +172,21 @@ namespace emp {
     /// Set bits to 0 in the range [start, stop)
     BitSet & Clear(const size_t start, const size_t stop);
 
+    /// Index into a const BitSet (i.e., cannot be set this way.)
+    bool operator[](size_t index) const { return Get(index); }
+
+    /// Index into a BitSet, returning a proxy that will allow bit assignment to work.
+    BitProxy<this_t> operator[](size_t index) { return BitProxy<this_t>(*this, index); }
+
+    /// Flip all bits in this BitSet
+    BitSet & Toggle() { return NOT_SELF(); }
+
+    /// Flip a single bit
+    BitSet & Toggle(size_t index);
+
+    /// Flips all the bits in a range [start, stop)
+    BitSet & Toggle(size_t start, size_t stop);
+
     /// Set all bits randomly, with a 50% probability of being a 0 or 1.
     BitSet &  Randomize(Random & random);
 
@@ -306,27 +321,6 @@ namespace emp {
 
     /// How many bytes are in this BitSet?
     constexpr static size_t GetNumBytes() { return TOTAL_BYTES; }
-
-    /// Flip all bits in this BitSet
-    BitSet & Toggle() { return NOT_SELF(); }
-
-    /// Flip a single bit
-    BitSet & Toggle(size_t index) {
-      emp_assert(index >= 0 && index < NUM_BITS);
-      const size_t field_id = FieldID(index);
-      const size_t pos_id = FieldPos(index);
-      (bit_set[field_id] ^= (((field_t)1U) << pos_id));
-      return *this;
-    }
-
-    /// Flips all the bits in a range [start, end)
-    BitSet & Toggle(size_t start, size_t end) {
-      emp_assert(start <= end && end <= NUM_BITS);
-      for(size_t index = start; index < end; index++) {
-        Toggle(index);
-      }
-      return *this;
-    }
 
     /// Get the full byte starting from the bit at a specified index.
     uint8_t GetByte(size_t index) const {
@@ -492,12 +486,6 @@ namespace emp {
 
     /// Return true if ALL bits in the BitSet are one, else return false.
     bool All() const { return (~(*this)).None(); }
-
-    /// Index into a const BitSet (i.e., cannot be set this way.)
-    bool operator[](size_t index) const { return Get(index); }
-
-    /// Index into a BitSet, returning a proxy that will allow bit assignment to work.
-    BitProxy<this_t> operator[](size_t index) { return BitProxy<this_t>(*this, index); }
 
     /// Overload ostream operator to return Print.
     friend std::ostream& operator<<(std::ostream &out, const BitSet& bs){
@@ -1046,7 +1034,7 @@ namespace emp {
     inline size_t count() const { return CountOnes_Mixed(); }
     inline BitSet & flip() { return Toggle(); }
     inline BitSet & flip(size_t pos) { return Toggle(pos); }
-    inline BitSet & flip(size_t start, size_t end) { return Toggle(start, end); }
+    inline BitSet & flip(size_t start, size_t stop) { return Toggle(start, stop); }
     inline void reset() { Clear(); }
     inline void reset(size_t id) { Set(id, false); }
     inline void set() { SetAll(); }
@@ -1407,6 +1395,60 @@ namespace emp {
 
     return *this;
   }
+
+  /// Flip a single bit
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::Toggle(size_t index) {
+    emp_assert(index >= 0 && index < NUM_BITS);
+    const size_t field_id = FieldID(index);
+    const size_t pos_id = FieldPos(index);
+    const field_t pos_mask = FIELD_1 << pos_id;
+
+    bit_set[field_id] ^= pos_mask;
+
+    return *this;
+  }
+
+  /// Flips all the bits in a range [start, stop)
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::Toggle(size_t start, size_t stop) {
+    emp_assert(start <= stop, start, stop);
+    emp_assert(stop <= NUM_BITS, stop, NUM_BITS);
+    const size_t start_pos = FieldPos(start);
+    const size_t stop_pos = FieldPos(stop);
+    size_t start_field = FieldID(start);
+    const size_t stop_field = FieldID(stop);
+
+    // If the start field and stop field are the same, just step through the bits.
+    if (start_field == stop_field) {
+      const size_t num_flips = stop - start;
+      const field_t mask = MaskLow<field_t>(num_flips) << start_pos;
+      bit_set[start_field] ^= mask;
+    }
+
+    // Otherwise handle the ends and clear the chunks in between.
+    else {
+      // Toggle correct portions of start field
+      if (start_pos != 0) {
+        const size_t start_bits = FIELD_BITS - start_pos;
+        const field_t start_mask = MaskLow<field_t>(start_bits) << start_pos;
+        bit_set[start_field] ^= start_mask;
+        start_field++;
+      }
+
+      // Middle fields
+      for (size_t cur_field = start_field; cur_field < stop_field; cur_field++) {
+        bit_set[cur_field] = ~bit_set[cur_field];
+      }
+
+      // Set portions of stop field
+      const field_t stop_mask = MaskLow<field_t>(stop_pos);
+      bit_set[stop_field] ^= stop_mask;
+    }
+
+    return *this;
+  }
+
 
 
   // -------------------------  Implementations Randomization functions -------------------------
