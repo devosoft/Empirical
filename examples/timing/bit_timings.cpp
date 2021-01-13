@@ -35,7 +35,7 @@ template <typename T>
 double MultiTimeFunction(T && fun) {
   std::clock_t start_time = std::clock();
   for (size_t i = 0; i < TEST_COUNT; ++i) fun();
-  std::clock_t total_time = std::clock() - start_time; 
+  double total_time = (double) (std::clock() - start_time);
   return total_time / (double) CLOCKS_PER_SEC;
 }
 
