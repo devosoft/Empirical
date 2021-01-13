@@ -65,6 +65,8 @@ namespace emp {
     static constexpr field_t FIELD_255 = (field_t) 255;     ///< Least significant 8 bits set to 1
     static constexpr field_t FIELD_ALL = ~FIELD_0;          ///< All bits in a field set to 1
 
+    static constexpr size_t MAX_BITS = (size_t) -1;         ///< Value larger than any bit ID.
+
     size_t num_bits;        ///< Total number of bits are we using
     Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
 
@@ -168,7 +170,7 @@ namespace emp {
     /// Set specific bit to 0.
     BitVector & Clear(size_t index) { return Set(index, false); }
 
-    /// Set a range of bits to 0 in the range [start, stop)
+    /// Set bits to 0 in the range [start, stop)
     BitVector & Clear(const size_t start, const size_t stop);    
 
     /// Const index operator -- return the bit at the specified position.
@@ -199,53 +201,46 @@ namespace emp {
     /// Resize this BitVector to have the specified number of bits.
     BitVector & Resize(size_t new_bits);
 
+
+    // >>>>>>>>>>  Randomization functions  <<<<<<<<<< //
+
     /// Set all bits randomly, with a 50% probability of being a 0 or 1.
-    BitVector &  Randomize(Random & random) {
-      random.RandFill(BytePtr(), NumBytes());
-      ClearExcessBits();
-      return *this;
-    }
+    BitVector &  Randomize(Random & random);
 
     /// Set all bits randomly, with probability specified at compile time.
     template <Random::Prob P>
-    BitVector &  RandomizeP(Random & random) {
-      random.RandFillP<P>(BytePtr(), NumBytes());
-      ClearExcessBits();
-      return *this;
-    }
+    BitVector & RandomizeP(Random & random,
+                        const size_t start_pos=0, const size_t stop_pos=MAX_BITS);
 
-    /// Set all bits randomly, with a given probability of being a on.
-    BitVector & Randomize(Random & random, const double p) {
-      // Try to find a shortcut if p allows....
-      if (p == 0.0) return Clear();
-      else if (p == 0.125) return RandomizeP<Random::PROB_12_5>(random);
-      else if (p == 0.25)  return RandomizeP<Random::PROB_25>(random);
-      else if (p == 0.375) return RandomizeP<Random::PROB_37_5>(random);
-      else if (p == 0.5)   return RandomizeP<Random::PROB_50>(random);
-      else if (p == 0.625) return RandomizeP<Random::PROB_62_5>(random);
-      else if (p == 0.75)  return RandomizeP<Random::PROB_75>(random);
-      else if (p == 0.875) return RandomizeP<Random::PROB_87_5>(random);
-      else if (p == 1.0)   return SetAll();
+    /// Set all bits randomly, with a given probability of being a one.
+    BitVector & Randomize(Random & random, const double p,
+                       const size_t start_pos=0, const size_t stop_pos=MAX_BITS);
 
-      for (size_t i = 0; i < num_bits; i++) Set(i, random.P(p));
-      return *this;
-    }
+    /// Set all bits randomly, with a given probability of being a one.
+    BitVector & Randomize(Random & random, const size_t target_ones,
+                       const size_t start_pos=0, const size_t stop_pos=MAX_BITS);
+    
+    /// Flip random bits with a given probability.
+    BitVector & FlipRandom(Random & random, const double p,
+                        const size_t start_pos=0, const size_t stop_pos=MAX_BITS);
 
-    /// Flip random bits.
-    BitVector & FlipRandom(Random & random,
-                           double p,
-                           const size_t start_pos=0,
-                           size_t stop_pos=(size_t) -1)
-    {
-      if (stop_pos == (size_t) -1) stop_pos = num_bits;
+    /// Set random bits with a given probability (does not check if already set.)
+    BitVector & SetRandom(Random & random, const double p,
+                        const size_t start_pos=0, const size_t stop_pos=MAX_BITS);
 
-      emp_assert(start_pos <= stop_pos);
-      emp_assert(stop_pos <= num_bits);
+    /// Unset random bits with a given probability (does not check if already zero.)
+    BitVector & ClearRandom(Random & random, const double p,
+                        const size_t start_pos=0, const size_t stop_pos=MAX_BITS);
 
-      for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Toggle(i);
+    /// Flip a specified number of random bits.
+    BitVector & FlipRandom(Random & random, const size_t num_bits);
 
-      return *this;
-    }
+    /// Set a specified number of random bits (does not check if already set.)
+    BitVector & SetRandom(Random & random, const size_t num_bits);
+
+    /// Unset  a specified number of random bits (does not check if already zero.)
+    BitVector & ClearRandom(Random & random, const size_t num_bits);
+
 
     // >>>>>>>>>>  Comparison Operators  <<<<<<<<<< //
 
@@ -649,7 +644,7 @@ namespace emp {
     return *this;
   }
 
-  // --------------------  Implementations of other public functions -------------------
+  // --------------------  Implementations of common accessors -------------------
   
   /// Retrive the bit value from the specified index.
   bool BitVector::Get(size_t index) const {
