@@ -187,6 +187,15 @@ namespace emp {
     /// Flips all the bits in a range [start, stop)
     BitSet & Toggle(size_t start, size_t stop);
 
+    /// Return true if ANY bits in the BitSet are one, else return false.
+    bool Any() const { for (auto i : bit_set) if (i) return true; return false; }
+
+    /// Return true if NO bits in the BitSet are one, else return false.
+    bool None() const { return !Any(); }
+
+    /// Return true if ALL bits in the BitSet are one, else return false.
+    bool All() const { return (~(*this)).None(); }
+
     /// Set all bits randomly, with a 50% probability of being a 0 or 1.
     BitSet &  Randomize(Random & random);
 
@@ -477,15 +486,6 @@ namespace emp {
 
     /// What is the maximum value this BitSet could contain, as a double?
     static constexpr double MaxDouble() { return emp::Pow2(NUM_BITS) - 1.0; }
-
-    /// Return true if ANY bits in the BitSet are one, else return false.
-    bool Any() const { for (auto i : bit_set) if (i) return true; return false; }
-
-    /// Return true if NO bits in the BitSet are one, else return false.
-    bool None() const { return !Any(); }
-
-    /// Return true if ALL bits in the BitSet are one, else return false.
-    bool All() const { return (~(*this)).None(); }
 
     /// Overload ostream operator to return Print.
     friend std::ostream& operator<<(std::ostream &out, const BitSet& bs){
@@ -1466,27 +1466,9 @@ namespace emp {
   template <Random::Prob P>
   BitSet<NUM_BITS> & BitSet<NUM_BITS>::RandomizeP(Random & random,
                                                   const size_t start_pos, const size_t stop_pos) {
-    const size_t start_byte_id = ByteID(start_pos);            // At which byte do we start?
-    const unsigned char start_byte = BytePtr()[start_byte_id]; // Save first byte to restore bits.
-    const size_t start_bit_id = BytePos(start_pos);            // Which bit to start at in byte?
-    const size_t end_byte_id = ByteID(stop_pos);                // At which byte do we stop?
-    const size_t end_bit_id = BytePos(stop_pos);                // Which bit to stop before in byte?
- 
-    random.RandFillP<P>(BytePtr() + start_byte_id, end_byte_id - start_byte_id);
- 
-    // If we are not starting at the beginning of a byte, restore missing bits.
-    if (start_bit_id) {
-      unsigned char mask = (1 >> start_bit_id) - 1;
-      (BytePtr()[start_byte_id] &= ~mask) |= (start_byte & mask);
-    }
-
-    // If we have a byte at the end to partially randomize, do so.
-    if (end_bit_id) {
-      unsigned char & end_byte = BytePtr()[end_byte_id];
-      for (size_t i = 0; i < end_bit_id; i++) {
-        if (random.P(P)) end_byte |= ((unsigned char) 1 << i);
-      }
-    }
+    emp_assert(start_pos <= stop_pos);
+    emp_assert(stop_pos <= NUM_BITS);
+    random.RandFillP<P>(BytePtr(), TOTAL_BYTES, start_pos, stop_pos);
     return *this;
   }
 
@@ -1495,19 +1477,10 @@ namespace emp {
   template <size_t NUM_BITS>
   BitSet<NUM_BITS> & BitSet<NUM_BITS>::Randomize(Random & random, const double p,
                                                  const size_t start_pos, const size_t stop_pos) {
-    // Try to find a shortcut if p allows....
-    if (p == 0.0) return Clear(start_pos, stop_pos);
-    else if (p == 0.125) return RandomizeP<Random::PROB_12_5>(random, start_pos, stop_pos);
-    else if (p == 0.25)  return RandomizeP<Random::PROB_25>(random, start_pos, stop_pos);
-    else if (p == 0.375) return RandomizeP<Random::PROB_37_5>(random, start_pos, stop_pos);
-    else if (p == 0.5)   return RandomizeP<Random::PROB_50>(random, start_pos, stop_pos);
-    else if (p == 0.625) return RandomizeP<Random::PROB_62_5>(random, start_pos, stop_pos);
-    else if (p == 0.75)  return RandomizeP<Random::PROB_75>(random, start_pos, stop_pos);
-    else if (p == 0.875) return RandomizeP<Random::PROB_87_5>(random, start_pos, stop_pos);
-    else if (p == 1.0)   return SetRange(start_pos, stop_pos);
-
-    // This is not a special value of P, so let's set each bit manually (for now)
-    for (size_t i = start_pos; i < stop_pos; i++) Set(i, random.P(p));
+    emp_assert(start_pos <= stop_pos);
+    emp_assert(stop_pos <= NUM_BITS);
+    emp_assert(p >= 0.0 && p <= 1.0, p);
+    random.RandFill(BytePtr(), TOTAL_BYTES, p, start_pos, stop_pos);
     return *this;
   }
 
