@@ -592,6 +592,16 @@ namespace emp {
     }
   }
 
+  /// Constructor to generate a random BitVector with provided number of 1's.
+  BitVector::BitVector(size_t in_num_bits, Random & random, const size_t target_ones)
+  : num_bits(in_num_bits), bits(nullptr)
+  {
+    if (num_bits) {
+      bits = NewArrayPtr<field_t>(NumFields());
+      Randomize(random, target_ones);
+    }
+  }
+
   /// Initializer list constructor.
   template <typename T>
   BitVector::BitVector(const std::initializer_list<T> l) : num_bits(l.size()), bits(nullptr) {
