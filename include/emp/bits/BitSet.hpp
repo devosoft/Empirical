@@ -1473,7 +1473,7 @@ namespace emp {
   }
 
 
-  /// Set all bits randomly, with a given probability of being a on.
+  /// Set all bits randomly, with a given probability of being on.
   template <size_t NUM_BITS>
   BitSet<NUM_BITS> & BitSet<NUM_BITS>::Randomize(Random & random, const double p,
                                                  const size_t start_pos, const size_t stop_pos) {
@@ -1484,12 +1484,12 @@ namespace emp {
     return *this;
   }
 
-  /// Set all bits randomly, with a given probability of being a on.
+  /// Set all bits randomly, with a given number of them being on.
   template <size_t NUM_BITS>
   BitSet<NUM_BITS> & BitSet<NUM_BITS>::Randomize(Random & random, const size_t target_ones,
                                                  const size_t start_pos, const size_t stop_pos) {
     emp_assert(start_pos <= stop_pos);
-    emp_assert(stop_pos <= NUM_BITS)
+    emp_assert(stop_pos <= NUM_BITS);
 
     const size_t target_size = stop_pos - start_pos;
     emp_assert(target_ones <= target_size);
@@ -1543,6 +1543,7 @@ namespace emp {
   }
 
   /// Flip random bits with a given probability.
+  // @CAO: Possibly faster to generate a sequence of bits and XORing with them.
   template <size_t NUM_BITS>
   BitSet<NUM_BITS> & BitSet<NUM_BITS>::FlipRandom(Random & random,
                                                   const double p,
