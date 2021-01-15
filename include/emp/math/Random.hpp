@@ -195,42 +195,42 @@ namespace emp {
     }
 
     /// Randomize a contiguous segment of memory.
-    template <Prob P>
+    template <Prob PROB>
     void RandFillP(mem_ptr_t dest, const size_t num_bytes) {
-      if constexpr (P == PROB_0) {
+      if constexpr (PROB == PROB_0) {
         dest.FillMemoryFunction( num_bytes, [](){ return 0; } );
-      } else if constexpr (P == PROB_12_5) {
+      } else if constexpr (PROB == PROB_12_5) {
         dest.FillMemoryFunction( num_bytes, [this](){ return GetBits12_5(); } );
-      } else if constexpr (P == PROB_25) {
+      } else if constexpr (PROB == PROB_25) {
         dest.FillMemoryFunction( num_bytes, [this](){ return GetBits25(); } );
-      } else if constexpr (P == PROB_37_5) {
+      } else if constexpr (PROB == PROB_37_5) {
         dest.FillMemoryFunction( num_bytes, [this](){ return GetBits37_5(); } );
-      } else if constexpr (P == PROB_50) {
+      } else if constexpr (PROB == PROB_50) {
         dest.FillMemoryFunction( num_bytes, [this](){ return GetBits50(); } );
-      } else if constexpr (P == PROB_62_5) {
+      } else if constexpr (PROB == PROB_62_5) {
         dest.FillMemoryFunction( num_bytes, [this](){ return GetBits62_5(); } );
-      } else if constexpr (P == PROB_75) {
+      } else if constexpr (PROB == PROB_75) {
         dest.FillMemoryFunction( num_bytes, [this](){ return GetBits75(); } );
-      } else if constexpr (P == PROB_87_5) {
+      } else if constexpr (PROB == PROB_87_5) {
         dest.FillMemoryFunction( num_bytes, [this](){ return GetBits87_5(); } );
-      } else if constexpr (P == PROB_100) {
+      } else if constexpr (PROB == PROB_100) {
         dest.FillMemoryFunction( num_bytes, [](){ return (size_t) -1; } );
       }
     }
 
     /// Randomize a contiguous segment of memory between specified bit positions.
-    template <Prob P>
+    template <Prob PROB>
     void RandFillP(mem_ptr_t dest, const size_t num_bytes,
                    size_t start_bit, size_t stop_bit)
     {
-      const size_t start_byte_id = start_bit >> 3;               // At which byte do we start?
-      const unsigned char start_byte = BytePtr()[start_byte_id]; // Save first byte to restore bits.
-      const size_t start_bit_id = start_bit & 7;                 // Which bit to start at in byte?
-      const size_t end_byte_id = stop_bit >> 3;                  // At which byte do we stop?
-      const size_t end_bit_id = stop_pos & 7;                    // Which bit to stop before in byte?
+      const size_t start_byte_id = start_bit >> 3;             // At which byte do we start?
+      const unsigned char start_byte = dest[start_byte_id];    // Save first byte to restore bits.
+      const size_t start_bit_id = start_bit & 7;               // Which bit to start at in byte?
+      const size_t end_byte_id = stop_bit >> 3;                // At which byte do we stop?
+      const size_t end_bit_id = stop_bit & 7;                  // Which bit to stop before in byte?
   
       // Randomize the full bits we need to use.
-      RandFillP<P>(dest + start_byte_id, end_byte_id - start_byte_id);
+      RandFillP<PROB>(dest + start_byte_id, end_byte_id - start_byte_id);
   
       // If we are not starting at the beginning of a byte, restore missing bits.
       if (start_bit_id) {
@@ -244,7 +244,7 @@ namespace emp {
         const unsigned char mask = (1 << end_bit_id) - 1;        // Signify how byte is divided.
         end_byte &= ~mask;                                       // Clear out bits to be randomized.
         for (size_t i = 0; i < end_bit_id; i++) {                // Step through bits to flip.
-          if (random.P(P)) end_byte |= ((unsigned char) 1 << i); // Set appropriate bits.
+          if (P(PROB)) end_byte |= ((unsigned char) 1 << i); // Set appropriate bits.
         }
       }
     }
@@ -336,6 +336,20 @@ namespace emp {
     inline bool P(const double p) {
       emp_assert(p >= 0.0 && p <= 1.0, p);
       return (Get() < (p * RAND_CAP));
+    }
+
+    /// Full random byte with each bit being a one with a given probability.
+    unsigned char GetByte(const double p) {
+      unsigned char out_byte = 0;
+      if (P(p)) out_byte |= 1;
+      if (P(p)) out_byte |= 2;
+      if (P(p)) out_byte |= 4;
+      if (P(p)) out_byte |= 8;
+      if (P(p)) out_byte |= 16;
+      if (P(p)) out_byte |= 32;
+      if (P(p)) out_byte |= 64;
+      if (P(p)) out_byte |= 128;
+      return out_byte;
     }
 
 
