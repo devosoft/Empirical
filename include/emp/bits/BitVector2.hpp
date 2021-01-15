@@ -128,6 +128,9 @@ namespace emp {
     /// Constructor to generate a random BitVector with provided prob of 1's.
     BitVector(size_t in_num_bits, Random & random, const double p1);
 
+    /// Constructor to generate a random BitVector with provided number of 1's.
+    BitVector(size_t in_num_bits, Random & random, const size_t target_ones);
+
     /// Initializer list constructor.
     template <typename T> BitVector(const std::initializer_list<T> l);
 
@@ -233,13 +236,13 @@ namespace emp {
                         const size_t start_pos=0, const size_t stop_pos=MAX_BITS);
 
     /// Flip a specified number of random bits.
-    BitVector & FlipRandom(Random & random, const size_t num_bits);
+    BitVector & FlipRandom(Random & random, const size_t target_bits);
 
     /// Set a specified number of random bits (does not check if already set.)
-    BitVector & SetRandom(Random & random, const size_t num_bits);
+    BitVector & SetRandom(Random & random, const size_t target_bits);
 
     /// Unset  a specified number of random bits (does not check if already zero.)
-    BitVector & ClearRandom(Random & random, const size_t num_bits);
+    BitVector & ClearRandom(Random & random, const size_t target_bits);
 
 
     // >>>>>>>>>>  Comparison Operators  <<<<<<<<<< //
@@ -411,19 +414,19 @@ namespace emp {
     inline BitVector operator>>(const size_t shift_size) const { return SHIFT((int)shift_size); }
 
     /// Compound operator bitwise AND...
-    const BitVector & operator&=(const BitVector & ar2) { return AND_SELF(ar2); }
+    BitVector & operator&=(const BitVector & ar2) { return AND_SELF(ar2); }
 
     /// Compound operator bitwise OR...
-    const BitVector & operator|=(const BitVector & ar2) { return OR_SELF(ar2); }
+    BitVector & operator|=(const BitVector & ar2) { return OR_SELF(ar2); }
 
     /// Compound operator bitwise XOR...
-    const BitVector & operator^=(const BitVector & ar2) { return XOR_SELF(ar2); }
+    BitVector & operator^=(const BitVector & ar2) { return XOR_SELF(ar2); }
 
     /// Compound operator for shift left...
-    const BitVector & operator<<=(const size_t shift_size) { return SHIFT_SELF(-(int)shift_size); }
+    BitVector & operator<<=(const size_t shift_size) { return SHIFT_SELF(-(int)shift_size); }
 
     /// Compound operator for shift right...
-    const BitVector & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
+    BitVector & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
     // >>>>>>>>>>  Standard Library Compatability  <<<<<<<<<< //
     // A set of functions to allow drop-in replacement with std::bitset.
@@ -842,6 +845,165 @@ namespace emp {
 
     return *this;
   }
+
+  // -------------------------  Implementations Randomization functions -------------------------
+
+  /// Set all bits randomly, with a 50% probability of being a 0 or 1.
+  BitVector & BitVector::Randomize(Random & random) {
+    random.RandFill(BytePtr(), NumBytes());
+    ClearExcessBits();
+    return *this;
+  }
+
+  /// Set all bits randomly, with probability specified at compile time.
+  template <Random::Prob P>
+  BitVector & BitVector::RandomizeP(Random & random,
+                                    const size_t start_pos, const size_t stop_pos) {
+    emp_assert(start_pos <= stop_pos);
+    emp_assert(stop_pos <= num_bits);
+    random.RandFillP<P>(BytePtr(), NumBytes(), start_pos, stop_pos);
+    return *this;
+  }
+
+
+  /// Set all bits randomly, with a given probability of being on.
+  BitVector & BitVector::Randomize(Random & random, const double p,
+                                                 const size_t start_pos, const size_t stop_pos) {
+    emp_assert(start_pos <= stop_pos);
+    emp_assert(stop_pos <= num_bits);
+    emp_assert(p >= 0.0 && p <= 1.0, p);
+    random.RandFill(BytePtr(), NumBytes(), p, start_pos, stop_pos);
+    return *this;
+  }
+
+  /// Set all bits randomly, with a given number of them being on.
+  BitVector & BitVector::Randomize(Random & random, const size_t target_ones,
+                                                 const size_t start_pos, const size_t stop_pos) {
+    emp_assert(start_pos <= stop_pos);
+    emp_assert(stop_pos <= num_bits);
+
+    const size_t target_size = stop_pos - start_pos;
+    emp_assert(target_ones <= target_size);
+
+    // Approximate the probability of ones as a starting point.
+    double p = ((double) target_ones) / (double) target_size;
+
+    // If we are not randomizing the whole sequence, we need to track the number of ones
+    // in the NON-randomized region to subtract off later.
+    size_t kept_ones = 0;
+    if (target_size != num_bits) {
+      Clear(start_pos, stop_pos);
+      kept_ones = CountOnes();
+    }
+
+    // Try to find a shortcut if p allows....
+    // (These values are currently educated guesses)
+    if (p < 0.12) { if (target_size == num_bits) Clear(start_pos, stop_pos); }
+    else if (p < 0.2)  RandomizeP<Random::PROB_12_5>(random, start_pos, stop_pos);
+    else if (p < 0.35) RandomizeP<Random::PROB_25>(random, start_pos, stop_pos);
+    else if (p < 0.42) RandomizeP<Random::PROB_37_5>(random, start_pos, stop_pos);
+    else if (p < 0.58) RandomizeP<Random::PROB_50>(random, start_pos, stop_pos);
+    else if (p < 0.65) RandomizeP<Random::PROB_62_5>(random, start_pos, stop_pos);
+    else if (p < 0.8)  RandomizeP<Random::PROB_75>(random, start_pos, stop_pos);
+    else if (p < 0.88) RandomizeP<Random::PROB_87_5>(random, start_pos, stop_pos);
+    else SetRange(start_pos, stop_pos);
+
+    size_t cur_ones = CountOnes() - kept_ones;
+
+    // Do we need to add more ones?
+    while (cur_ones < target_ones) {
+      size_t pos = random.GetUInt(start_pos, stop_pos);
+      auto bit = operator[](pos);
+      if (!bit) {
+        bit.Set();
+        cur_ones++;
+      }
+    }
+
+    // See if we have too many ones.
+    while (cur_ones > target_ones) {
+      size_t pos = random.GetUInt(start_pos, stop_pos);
+      auto bit = operator[](pos);
+      if (bit) {
+        bit.Clear();
+        cur_ones--;
+      }
+    }
+
+    return *this;
+  }
+
+  /// Flip random bits with a given probability.
+  // @CAO: Possibly faster to generate a sequence of bits and XORing with them.
+  BitVector & BitVector::FlipRandom(Random & random,
+                                                  const double p,
+                                                  const size_t start_pos,
+                                                  const size_t stop_pos)
+  {
+    emp_assert(start_pos <= stop_pos);
+    emp_assert(stop_pos <= num_bits);
+    emp_assert(p >= 0.0 && p <= 1.0, p);
+
+    for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Toggle(i);
+
+    return *this;
+  }
+
+  /// Set random bits with a given probability (does not check if already set.)
+  BitVector & BitVector::SetRandom(Random & random,
+                      const double p,
+                      const size_t start_pos,
+                      const size_t stop_pos)
+  {
+    emp_assert(start_pos <= stop_pos);
+    emp_assert(stop_pos <= num_bits);
+    emp_assert(p >= 0.0 && p <= 1.0, p);
+
+    for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Set(i);
+
+    return *this;
+  }
+
+  /// Unset random bits with a given probability (does not check if already zero.)
+  BitVector & BitVector::ClearRandom(Random & random,
+                      const double p,
+                      const size_t start_pos,
+                      const size_t stop_pos)
+  {
+    emp_assert(start_pos <= stop_pos);
+    emp_assert(stop_pos <= num_bits);
+    emp_assert(p >= 0.0 && p <= 1.0, p);
+
+    for (size_t i=start_pos; i < stop_pos; ++i) if (random.P(p)) Clear(i);
+
+    return *this;
+  }
+
+  /// Flip a specified number of random bits.
+  BitVector & BitVector::FlipRandom(Random & random, const size_t target_bits)
+  {
+    emp_assert(num_bits <= num_bits);
+    BitVector choice(num_bits, random, target_bits);
+    return XOR_SELF(choice);
+  }
+
+  /// Set a specified number of random bits (does not check if already set.)
+  BitVector & BitVector::SetRandom(Random & random, const size_t target_bits)
+  {
+    emp_assert(num_bits <= num_bits);
+    BitVector choice(num_bits, random, target_bits);
+    return OR_SELF(choice);
+  }
+
+  /// Unset  a specified number of random bits (does not check if already zero.)
+  BitVector & BitVector::ClearRandom(Random & random, const size_t target_bits)
+  {
+    emp_assert(num_bits <= num_bits);
+    BitVector choice(num_bits, random, num_bits - target_bits);
+    return AND_SELF(choice);
+  }
+
+
 
   /// Test if two bit vectors are identical.
   bool BitVector::operator==(const BitVector & in) const {
