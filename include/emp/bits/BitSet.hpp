@@ -152,6 +152,9 @@ namespace emp {
     /// How many bits are in this BitSet?
     constexpr static size_t GetSize() { return NUM_BITS; }
 
+    /// How many bytes are in this BitSet?
+    constexpr static size_t GetNumBytes() { return TOTAL_BYTES; }
+
     /// Retrieve the bit as a specified index.
     bool Get(size_t index) const;
 
@@ -247,6 +250,98 @@ namespace emp {
     template <size_t T2> bool operator<=(const BitSet<T2> & in) const { return !(in < *this); }
     template <size_t T2> bool operator>=(const BitSet<T2> & in) const { return !(*this < in); }
 
+    /// Casting a BitSet to bool identifies if ANY bits are set to 1.
+    explicit operator bool() const { return Any(); }
+
+
+    // >>>>>>>>>>  Access Groups of bits  <<<<<<<<<< //
+
+    /// Retrive the byte at the specified byte index.
+    uint8_t GetByte(size_t index) const;
+
+    /// Get a read-only view into the internal array used by BitSet.
+    /// @return Read-only span of BitSet's bytes.
+    std::span<const std::byte> GetBytes() const;
+
+    /// Update the byte at the specified byte index.
+    void SetByte(size_t index, uint8_t value);
+
+
+    /// Get specified type at a given index (in steps of that type size)
+    template <typename T> T GetValueAtIndex(const size_t index) const;
+
+    // Retrieve the 8-bit uint from the specified uint index.
+    uint8_t GetUInt8(size_t index) const { return GetValueAtIndex<uint8_t>(index); }
+
+    // Retrieve the 16-bit uint from the specified uint index.
+    uint16_t GetUInt16(size_t index) const { return GetValueAtIndex<uint16_t>(index); }
+
+    // Retrieve the 32-bit uint from the specified uint index.
+    uint32_t GetUInt32(size_t index) const { return GetValueAtIndex<uint32_t>(index); }
+    
+    // Retrieve the 64-bit uint from the specified uint index.
+    uint64_t GetUInt64(size_t index) const { return GetValueAtIndex<uint64_t>(index); }
+
+    // By default, retrieve the 32-bit uint from the specified uint index.
+    uint32_t GetUInt(size_t index) const { return GetUInt32(index); }
+
+
+    /// Set specified type at a given index (in steps of that type size)
+    template <typename T> void SetValueAtIndex(const size_t index, T value);
+
+    /// Update the 8-bit uint at the specified uint index.
+    void SetUInt8(const size_t index, uint8_t value) { SetValueAtIndex(index, value); }
+
+    /// Update the 16-bit uint at the specified uint index.
+    void SetUInt16(const size_t index, uint16_t value) { SetValueAtIndex(index, value); }
+
+    /// Update the 32-bit uint at the specified uint index.
+    void SetUInt32(const size_t index, uint32_t value) { SetValueAtIndex(index, value); }
+
+    /// Update the 64-bit uint at the specified uint index.
+    void SetUInt64(const size_t index, uint64_t value) { SetValueAtIndex(index, value); }
+
+    /// By default, update the 32-bit uint at the specified uint index.
+    void SetUInt(const size_t index, uint32_t value) { SetUInt32(index, value); }
+
+
+    /// Get specified type starting at a given BIT position.
+    template <typename T> T GetValueAtBit(const size_t index);
+
+    // Retrieve the 8-bit uint from the specified uint index.
+    uint8_t GetUInt8AtBit(size_t index) const { return GetValueAtBit<uint8_t>(index); }
+
+    // Retrieve the 16-bit uint from the specified uint index.
+    uint16_t GetUInt16AtBit(size_t index) const { return GetValueAtBit<uint16_t>(index); }
+
+    // Retrieve the 32-bit uint from the specified uint index.
+    uint32_t GetUInt32AtBit(size_t index) const { return GetValueAtBit<uint32_t>(index); }
+    
+    // Retrieve the 64-bit uint from the specified uint index.
+    uint64_t GetUInt64AtBit(size_t index) const { return GetValueAtBit<uint64_t>(index); }
+
+    // By default, retrieve the 32-bit uint from the specified uint index.
+    uint32_t GetUIntAtBit(size_t index) const { return GetUInt32AtBit(index); }
+
+
+    template <typename T> void SetValueAtBit(const size_t index, T value);
+
+    /// Update the 8-bit uint at the specified uint index.
+    void SetUInt8AtBit(const size_t index, uint8_t value) { SetValueAtBit(index, value); }
+
+    /// Update the 16-bit uint at the specified uint index.
+    void SetUInt16AtBit(const size_t index, uint16_t value) { SetValueAtBit(index, value); }
+
+    /// Update the 32-bit uint at the specified uint index.
+    void SetUInt32AtBit(const size_t index, uint32_t value) { SetValueAtBit(index, value); }
+
+    /// Update the 64-bit uint at the specified uint index.
+    void SetUInt64AtBit(const size_t index, uint64_t value) { SetValueAtBit(index, value); }
+
+    /// By default, update the 32-bit uint at the specified uint index.
+    void SetUIntAtBit(const size_t index, uint32_t value) { SetUInt32AtBit(index, value); }
+
+
     ////////////////////////////////////////////
     ////////////////////////////////////////////
     ////////////////////////////////////////////
@@ -308,146 +403,6 @@ namespace emp {
       out_bits.Import(*this, start_bit);
 
       return out_bits;
-    }
-
-
-    /// How many bytes are in this BitSet?
-    constexpr static size_t GetNumBytes() { return TOTAL_BYTES; }
-
-    /// Get the full byte starting from the bit at a specified index.
-    uint8_t GetByte(size_t index) const {
-      emp_assert(index < TOTAL_BYTES);
-      const size_t field_id = Byte2Field(index);
-      const size_t pos_id = Byte2FieldPos(index);
-      return (bit_set[field_id] >> pos_id) & 255;
-    }
-
-    /// Get a read-only view into the internal array used by BitSet.
-    /// @return Read-only span of BitSet's bytes.
-    std::span<const std::byte> GetBytes() const {
-      return std::span<const std::byte>(
-        reinterpret_cast<const std::byte*>(bit_set),
-        TOTAL_BYTES
-      );
-    }
-
-    /// Set the full byte starting at the bit at the specified index.
-    void SetByte(size_t index, uint8_t value) {
-      emp_assert(index < TOTAL_BYTES);
-      const size_t field_id = Byte2Field(index);
-      const size_t pos_id = Byte2FieldPos(index);
-      const field_t val_uint = value;
-      bit_set[field_id] = (bit_set[field_id] & ~(((field_t)255U) << pos_id)) | (val_uint << pos_id);
-    }
-
-    /// Get the unsigned int; index in in 32-bit jumps
-    /// (i.e., this is a field ID not bit id)
-    uint32_t GetUInt(const size_t index) const { return GetUInt32(index); }
-
-    /// Set the unsigned int; index in in 32-bit jumps
-    /// (i.e., this is a field ID not bit id)
-    void SetUInt(const size_t index, const uint32_t value) {
-      SetUInt32(index, value);
-    }
-
-    /// Get the field_t unsigned int; index in in 32-bit jumps
-    /// (i.e., this is a field ID not bit id)
-    uint32_t GetUInt32(const size_t index) const {
-      emp_assert(index * 32 < NUM_BITS);
-
-      uint32_t res;
-
-      std::memcpy(
-        &res,
-        reinterpret_cast<const unsigned char*>(bit_set) + index * (32/8),
-        sizeof(res)
-      );
-
-      return res;
-    }
-
-    /// Set the field_t unsigned int; index in in 32-bit jumps
-    /// (i.e., this is a field ID not bit id)
-    void SetUInt32(const size_t index, const uint32_t value) {
-      emp_assert(index * 32 < NUM_BITS);
-
-      std::memcpy( BytePtr() + index * (32/8), &value, sizeof(value) );
-
-      ClearExcessBits();
-    }
-
-    /// Get the field_t unsigned int; index in in 64-bit jumps
-    /// (i.e., this is a field ID not bit id)
-    uint64_t GetUInt64(const size_t index) const {
-      emp_assert(index * 64 < NUM_BITS);
-
-      uint64_t res = 0;
-
-      if constexpr (FIELD_BITS == 64) {
-        res = bit_set[index];
-      } else if constexpr (FIELD_BITS == 32 && (NUM_FIELDS % 2 == 0)) {
-        std::memcpy(
-          &res,
-          reinterpret_cast<const unsigned char*>(bit_set) + index * (64/8),
-          sizeof(res)
-        );
-      } else if constexpr (FIELD_BITS == 32 && NUM_FIELDS == 1) {
-        std::memcpy(
-          &res,
-          reinterpret_cast<const unsigned char*>(bit_set),
-          32/8
-        );
-      } else {
-        std::memcpy(
-          &res,
-          reinterpret_cast<const unsigned char*>(bit_set) + index * (64/8),
-          std::min<size_t>(64, NUM_FIELDS * FIELD_BITS - 64 * index)/8
-        );
-      }
-
-      return res;
-
-    }
-
-    /// Set the field_t unsigned int; index in in 64-bit jumps
-    /// (i.e., this is a field ID not bit id)
-    void SetUInt64(const size_t index, const uint64_t value) {
-      emp_assert(index * 64 < NUM_BITS);
-
-      if constexpr (FIELD_BITS == 64) {
-        bit_set[index] = value;
-      } else if constexpr (FIELD_BITS == 32 && (NUM_FIELDS % 2 == 0)) {
-        std::memcpy( BytePtr() + index * (64/8), &value, sizeof(value)
-        );
-      } else if constexpr (FIELD_BITS == 32 && NUM_FIELDS == 1) {
-        std::memcpy( BytePtr(), &value, 32/8 );
-      } else {
-        std::memcpy( BytePtr() + index * (64/8), &value,
-                     std::min<size_t>(64, NUM_FIELDS * FIELD_BITS - 64 * index)/8 );
-      }
-
-      ClearExcessBits();
-    }
-
-    /// Get the full uint32_t unsigned int starting from the bit at a specified index.
-    uint32_t GetUIntAtBit(const size_t index) { return GetUInt32AtBit(index); }
-
-    /// Get the full uint32_t unsigned int starting from the bit at a specified index.
-    uint32_t GetUInt32AtBit(const size_t index) {
-      emp_assert(index < NUM_BITS);
-
-      BitSet<32> res;
-      res.Import(*this, index);
-
-      return res.GetUInt32(0);
-
-    }
-
-    /// Get OUT_BITS bits starting from the bit at a specified index (max 32)
-    template <size_t OUT_BITS>
-    uint32_t GetValueAtBit(const size_t index) {
-      static_assert(OUT_BITS <= 32, "Requesting too many bits to fit in a UInt");
-      return GetUIntAtBit(index) & MaskLow<uint32_t>(OUT_BITS);
     }
 
     /// Get the unsigned numeric value represented by the BitSet as a double
@@ -699,15 +654,12 @@ namespace emp {
     BitSet & REVERSE_SELF() {
 
       // reverse bytes
-      std::reverse(
-        reinterpret_cast<unsigned char *>(bit_set),
-        reinterpret_cast<unsigned char *>(bit_set) + TOTAL_BYTES
-      );
+      std::reverse( BytePtr(), BytePtr() + TOTAL_BYTES );
 
       // reverse each byte
       // adapted from https://stackoverflow.com/questions/2602823/in-c-c-whats-the-simplest-way-to-reverse-the-order-of-bits-in-a-byte
       for (size_t i = 0; i < TOTAL_BYTES; ++i) {
-        unsigned char & b = reinterpret_cast<unsigned char *>(bit_set)[i];
+        unsigned char & b = BytePtr()[i];
         b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
         b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
         b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
@@ -1631,6 +1583,99 @@ namespace emp {
     }
     return false;
   }
+
+
+  // -------------------------  Access Groups of bits -------------------------
+
+  /// Get the full byte starting from the bit at a specified index.
+  template <size_t NUM_BITS>
+  uint8_t BitSet<NUM_BITS>::GetByte(size_t index) const {
+    emp_assert(index < TOTAL_BYTES);
+    const size_t field_id = Byte2Field(index);
+    const size_t pos_id = Byte2FieldPos(index);
+    return (bit_set[field_id] >> pos_id) & 255;
+  }
+
+
+  /// Get a read-only view into the internal array used by BitSet.
+  /// @return Read-only span of BitSet's bytes.
+  template <size_t NUM_BITS>
+  std::span<const std::byte> BitSet<NUM_BITS>::GetBytes() const {
+    return std::span<const std::byte>(
+      reinterpret_cast<const std::byte*>(bit_set),
+      TOTAL_BYTES
+    );
+  }
+
+
+  /// Set the full byte starting at the bit at the specified index.
+  template <size_t NUM_BITS>
+  void BitSet<NUM_BITS>::SetByte(size_t index, uint8_t value) {
+    emp_assert(index < TOTAL_BYTES);
+    const size_t field_id = Byte2Field(index);
+    const size_t pos_id = Byte2FieldPos(index);
+    const field_t val_uint = value;
+    bit_set[field_id] = (bit_set[field_id] & ~(((field_t)255U) << pos_id)) | (val_uint << pos_id);
+  }
+
+
+  /// Get specified type at a given index (in steps of that type size)
+  template <size_t NUM_BITS>
+  template <typename T>
+  T BitSet<NUM_BITS>::GetValueAtIndex(const size_t index) const {
+    // For the moment, must fit inside bounds; eventually should pad with zeros.
+    emp_assert((index + 1) * sizeof(T) <= TOTAL_BYTES);
+
+    T out_value;
+    std::memcpy( &out_value, BytePtr() + index * sizeof(T), sizeof(T) );
+    return out_value;
+  }
+
+
+  /// Set specified type at a given index (in steps of that type size)
+  template <size_t NUM_BITS>
+  template <typename T>
+  void BitSet<NUM_BITS>::SetValueAtIndex(const size_t index, T in_value) {
+    // For the moment, must fit inside bounds; eventually should pad with zeros.
+    emp_assert((index + 1) * sizeof(T) <= TOTAL_BYTES);
+
+    std::memcpy( BytePtr() + index * sizeof(T), &in_value, sizeof(T) );
+
+    ClearExcessBits();
+  }
+
+
+  /// Get the specified type starting from a given BIT position.
+  template <size_t NUM_BITS>
+  template <typename T>
+  T BitSet<NUM_BITS>::GetValueAtBit(const size_t index) {
+    // For the moment, must fit inside bounds; eventually should pad with zeros.
+    emp_assert((index+7)/8 + sizeof(T) < TOTAL_BYTES);
+
+    BitSet<sizeof(T)> out_bits;
+    out_bits.Import(*this, index);
+
+    return out_bits.template GetValueAtIndex<T>(0);
+  }
+
+
+  /// Set the specified type starting from a given BIT position.
+  // @CAO: Can be optimized substantially, especially for long BitSets.
+  template <size_t NUM_BITS>
+  template <typename T>
+  void BitSet<NUM_BITS>::SetValueAtBit(const size_t index, T value) {
+    // For the moment, must fit inside bounds; eventually should pad with zeros.
+    emp_assert((index+7)/8 + sizeof(T) < TOTAL_BYTES);
+    constexpr size_t type_bits = sizeof(T) * 8;
+
+    Clear(index, index+type_bits);       // Clear out the bits where new value will go.
+    BitSet<NUM_BITS> in_bits;            // Setup a bitset to place the new bits in.
+    in_bits.SetValueAtIndex(0, value);   // Insert the new bits.
+    in_bits << index;                    // Shift new bits into place.
+    OR_SELF(in_bits);                    // Place new bits into current BitSet.
+  }
+
+
 
   // -------------------------  Extra Functions  -------------------------
 
