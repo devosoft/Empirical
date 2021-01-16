@@ -212,28 +212,27 @@ namespace emp {
 
     /// Set all bits randomly, with probability specified at compile time.
     template <Random::Prob P>
-    BitVector & RandomizeP(Random & random,
-                        const size_t start_pos=0, const size_t stop_pos=MAX_BITS);
+    BitVector & RandomizeP(Random & random, const size_t start_pos=0, size_t stop_pos=MAX_BITS);
 
     /// Set all bits randomly, with a given probability of being a one.
     BitVector & Randomize(Random & random, const double p,
-                       const size_t start_pos=0, const size_t stop_pos=MAX_BITS);
+                       const size_t start_pos=0, size_t stop_pos=MAX_BITS);
 
     /// Set all bits randomly, with a given probability of being a one.
     BitVector & Randomize(Random & random, const size_t target_ones,
-                       const size_t start_pos=0, const size_t stop_pos=MAX_BITS);
+                          const size_t start_pos=0, size_t stop_pos=MAX_BITS);
     
     /// Flip random bits with a given probability.
     BitVector & FlipRandom(Random & random, const double p,
-                        const size_t start_pos=0, const size_t stop_pos=MAX_BITS);
+                           const size_t start_pos=0, size_t stop_pos=MAX_BITS);
 
     /// Set random bits with a given probability (does not check if already set.)
     BitVector & SetRandom(Random & random, const double p,
-                        const size_t start_pos=0, const size_t stop_pos=MAX_BITS);
+                          const size_t start_pos=0, size_t stop_pos=MAX_BITS);
 
     /// Unset random bits with a given probability (does not check if already zero.)
     BitVector & ClearRandom(Random & random, const double p,
-                        const size_t start_pos=0, const size_t stop_pos=MAX_BITS);
+                            const size_t start_pos=0, size_t stop_pos=MAX_BITS);
 
     /// Flip a specified number of random bits.
     BitVector & FlipRandom(Random & random, const size_t target_bits);
@@ -868,7 +867,9 @@ namespace emp {
   /// Set all bits randomly, with probability specified at compile time.
   template <Random::Prob P>
   BitVector & BitVector::RandomizeP(Random & random,
-                                    const size_t start_pos, const size_t stop_pos) {
+                                    const size_t start_pos, size_t stop_pos) {
+    if (stop_pos == MAX_BITS) stop_pos = num_bits;
+
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= num_bits);
     random.RandFillP<P>(BytePtr(), NumBytes(), start_pos, stop_pos);
@@ -878,9 +879,11 @@ namespace emp {
 
   /// Set all bits randomly, with a given probability of being on.
   BitVector & BitVector::Randomize(Random & random, const double p,
-                                                 const size_t start_pos, const size_t stop_pos) {
-    emp_assert(start_pos <= stop_pos);
-    emp_assert(stop_pos <= num_bits);
+                                   const size_t start_pos, size_t stop_pos) {
+    if (stop_pos == MAX_BITS) stop_pos = num_bits;
+
+    emp_assert(start_pos <= stop_pos, start_pos, stop_pos);
+    emp_assert(stop_pos <= num_bits, stop_pos, num_bits);
     emp_assert(p >= 0.0 && p <= 1.0, p);
     random.RandFill(BytePtr(), NumBytes(), p, start_pos, stop_pos);
     return *this;
@@ -888,7 +891,9 @@ namespace emp {
 
   /// Set all bits randomly, with a given number of them being on.
   BitVector & BitVector::Randomize(Random & random, const size_t target_ones,
-                                                 const size_t start_pos, const size_t stop_pos) {
+                                   const size_t start_pos, size_t stop_pos) {
+    if (stop_pos == MAX_BITS) stop_pos = num_bits;
+
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= num_bits);
 
@@ -948,8 +953,10 @@ namespace emp {
   BitVector & BitVector::FlipRandom(Random & random,
                                                   const double p,
                                                   const size_t start_pos,
-                                                  const size_t stop_pos)
+                                                  size_t stop_pos)
   {
+    if (stop_pos == MAX_BITS) stop_pos = num_bits;
+
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= num_bits);
     emp_assert(p >= 0.0 && p <= 1.0, p);
@@ -963,8 +970,10 @@ namespace emp {
   BitVector & BitVector::SetRandom(Random & random,
                       const double p,
                       const size_t start_pos,
-                      const size_t stop_pos)
+                      size_t stop_pos)
   {
+    if (stop_pos == MAX_BITS) stop_pos = num_bits;
+
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= num_bits);
     emp_assert(p >= 0.0 && p <= 1.0, p);
@@ -978,8 +987,10 @@ namespace emp {
   BitVector & BitVector::ClearRandom(Random & random,
                       const double p,
                       const size_t start_pos,
-                      const size_t stop_pos)
+                      size_t stop_pos)
   {
+    if (stop_pos == MAX_BITS) stop_pos = num_bits;
+
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= num_bits);
     emp_assert(p >= 0.0 && p <= 1.0, p);
