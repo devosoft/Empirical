@@ -42,6 +42,7 @@ namespace emp {
     static constexpr const uint64_t RAND_CAP = 4294967296;  // 2^32
     static constexpr const uint64_t STEP_SIZE = 0xb5ad4eceda1ce2a9;  ///< Weyl sequence step size
 
+    static constexpr const unsigned char BYTE1 = (unsigned char) 1;
 
     /// Basic Random number
     /// Returns a random number [0, RAND_CAP)
@@ -220,31 +221,42 @@ namespace emp {
 
     /// Randomize a contiguous segment of memory between specified bit positions.
     template <Prob PROB>
-    void RandFillP(mem_ptr_t dest, const size_t num_bytes,
-                   size_t start_bit, size_t stop_bit)
+    void RandFillP(mem_ptr_t dest, const size_t num_bytes, size_t start_bit, size_t stop_bit)
     {
-      const size_t start_byte_id = start_bit >> 3;             // At which byte do we start?
-      const unsigned char start_byte = dest[start_byte_id];    // Save first byte to restore bits.
-      const size_t start_bit_id = start_bit & 7;               // Which bit to start at in byte?
-      const size_t end_byte_id = stop_bit >> 3;                // At which byte do we stop?
-      const size_t end_bit_id = stop_bit & 7;                  // Which bit to stop before in byte?
+      const size_t start_byte_id = start_bit >> 3;     // At which byte do we start?
+      const size_t end_byte_id = stop_bit >> 3;        // At which byte do we stop?
+      const size_t start_bit_id = start_bit & 7;       // Which bit to start at in byte?
+      const size_t end_bit_id = stop_bit & 7;          // Which bit to stop before in byte?
+      constexpr double p = ((double) PROB) / 1000.0;   // Determine actual probability of a 1
+
+      // If the start byte and end byte are the same, just fill those in.
+      if (start_byte_id == end_byte_id) {
+        for (size_t i = start_bit_id; i < end_bit_id; ++i) {
+          uint8_t mask = (uint8_t) (1 << i);
+          if (P(p)) dest[start_byte_id] |= mask;
+          else dest[start_byte_id] &= ~mask;
+        }
+        return;
+      }
   
+      const uint8_t start_byte = dest[start_byte_id];    // Save first byte to restore bits.
+
       // Randomize the full bits we need to use.
       RandFillP<PROB>(dest + start_byte_id, end_byte_id - start_byte_id);
   
       // If we are not starting at the beginning of a byte, restore missing bits.
       if (start_bit_id) {
-        const unsigned char mask = (1 << start_bit_id) - 1;      // Signify how byte is divided.
-        (dest[start_byte_id] &= ~mask) |= (start_byte & mask);   // Stitch together byte parts.
+        const uint8_t mask = (uint8_t) ((1 << start_bit_id) - 1); // Signify how byte is divided.
+        (dest[start_byte_id] &= ~mask) |= (start_byte & mask);  // Stitch together byte parts.
       }
 
       // If we have a byte at the end to partially randomize, do so.
       if (end_bit_id) {
-        unsigned char & end_byte = dest[end_byte_id];            // Grab reference to end byte
-        const unsigned char mask = (1 << end_bit_id) - 1;        // Signify how byte is divided.
-        end_byte &= ~mask;                                       // Clear out bits to be randomized.
-        for (size_t i = 0; i < end_bit_id; i++) {                // Step through bits to flip.
-          if (P(PROB)) end_byte |= ((unsigned char) 1 << i); // Set appropriate bits.
+        uint8_t & end_byte = dest[end_byte_id];                 // Grab reference to end byte
+        const uint8_t mask = (uint8_t) ((1 << end_bit_id) - 1); // Signify how byte is divided.
+        end_byte &= ~mask;                                      // Clear out bits to be randomized.
+        for (size_t i = 0; i < end_bit_id; i++) {               // Step through bits to flip.
+          if (P(p)) end_byte |= ((uint8_t) 1 << i);          // Set appropriate bits.
         }
       }
     }
@@ -279,7 +291,7 @@ namespace emp {
     void RandFill100( mem_ptr_t dest, const size_t bytes, size_t start_bit, size_t stop_bit)
       { RandFillP<PROB_100> (dest, bytes, start_bit, stop_bit); }
 
-    /// Randomize a contiguous segment of memory with a given probability of each bit being a on.
+    /// Randomize a contiguous segment of memory with a given probability of each bit being on.
     void RandFill(mem_ptr_t dest, const size_t num_bytes, const double p) {
       // Try to find a shortcut if p allows....
       if (p == 0.0)        return RandFill0(dest, num_bytes);
@@ -297,7 +309,7 @@ namespace emp {
       for (size_t i = 0; i < num_bytes; i++) dest[i] = GetByte(p);
     }
 
-    /// Randomize a contiguous segment of memory with a given probability of each bit being a on.
+    /// Randomize a contiguous segment of memory with a given probability of each bit being on.
     void RandFill(mem_ptr_t dest, const size_t num_bytes, const double p,
                   const size_t start_bit, const size_t stop_bit) {
       emp_assert((stop_bit >> 3) <= num_bytes);
@@ -316,7 +328,7 @@ namespace emp {
       // This is not a special value of P, so let's set each bit manually
       // (slow, but good for now; ideally use closest faster option above and modify)
       size_t cur_byte = start_bit >> 3;
-      unsigned char cur_mask = 1 << (start_bit & 7);
+      uint8_t cur_mask = (uint8_t) (1 << (start_bit & 7));
       for (size_t i = start_bit; i < stop_bit; i++) {
         if (P(p)) dest[cur_byte] |= cur_mask;     // Set the target bit.
         else dest[cur_byte] &= ~cur_mask;         // Clear out the target bit.
