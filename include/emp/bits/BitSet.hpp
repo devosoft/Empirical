@@ -8,8 +8,12 @@
  *  @note Status: RELEASE
  *
  *  @note Like std::bitset, bit zero is on the right side.  Unlike std::bitset, emp::BitSet
- *       gives access to bit fields for easy access to different sized chunk of bits and
- *       implementation new bit-magic tricks.
+ *        gives access to bit fields for easy access to different sized chunk of bits and
+ *        implementation new bit-magic tricks.
+ * 
+ *  @todo Some of the functions allow a start bit and end bit; each of these should be checked
+ *        to make sure that they will work if the start and end are part of the same byte.  One
+ *        option is to do this well ONCE with a macro that properly fills in the details.
  */
 
 
@@ -225,6 +229,7 @@ namespace emp {
                         const size_t start_pos=0, const size_t stop_pos=NUM_BITS);
 
     /// Flip a specified number of random bits.
+    /// @note: This was previously called Mutate.
     BitSet & FlipRandom(Random & random, const size_t num_bits);
 
     /// Set a specified number of random bits (does not check if already set.)
@@ -233,10 +238,22 @@ namespace emp {
     /// Unset  a specified number of random bits (does not check if already zero.)
     BitSet & ClearRandom(Random & random, const size_t num_bits);
 
-    // size_t Mutate(
-    //   Random & random,
-    //   const size_t num_muts, // @CAO: use tools/Binomial in Distribution.h with this part?
-    //   const size_t min_idx=0 // Preserve some early bits?
+    // >>>>>>>>>>  Comparison Operators  <<<<<<<<<< //
+
+    template <size_t T2> bool operator==(const BitSet<T2> & in) const;
+    template <size_t T2> bool operator!=(const BitSet<T2> & in) const { return !(*this == in); }
+    template <size_t T2> bool operator< (const BitSet<T2> & in) const;
+    template <size_t T2> bool operator> (const BitSet<T2> & in) const { return in < *this; }
+    template <size_t T2> bool operator<=(const BitSet<T2> & in) const { return !(in < *this); }
+    template <size_t T2> bool operator>=(const BitSet<T2> & in) const { return !(*this < in); }
+
+    ////////////////////////////////////////////
+    ////////////////////////////////////////////
+    ////////////////////////////////////////////
+    ///////////// CONTINUE HERE!! //////////////
+    ////////////////////////////////////////////
+    ////////////////////////////////////////////
+    ////////////////////////////////////////////
 
     /// Assign from a BitSet of a different size.
     template <size_t FROM_BITS>
@@ -293,40 +310,6 @@ namespace emp {
       return out_bits;
     }
 
-    /// Test if two BitSet objects are identical.
-    bool operator==(const BitSet & in_set) const {
-      for (size_t i = 0; i < NUM_FIELDS; ++i) {
-        if (bit_set[i] != in_set.bit_set[i]) return false;
-      }
-      return true;
-    }
-
-    /// Compare two BitSet objects, based on the associated binary value.
-    bool operator<(const BitSet & in_set) const {
-      for (int i = NUM_FIELDS-1; i >= 0; --i) {         // Start loop at the largest field.
-        if (bit_set[i] == in_set.bit_set[i]) continue;  // If same, keep looking!
-        return (bit_set[i] < in_set.bit_set[i]);        // Otherwise, do comparison
-      }
-      return false;
-    }
-
-    /// Compare two BitSet objects, based on the associated binary value.
-    bool operator<=(const BitSet & in_set) const {
-      for (int i = NUM_FIELDS-1; i >= 0; --i) {         // Start loop at the largest field.
-        if (bit_set[i] == in_set.bit_set[i]) continue;  // If same, keep looking!
-        return (bit_set[i] < in_set.bit_set[i]);        // Otherwise, do comparison
-      }
-      return true;
-    }
-
-    /// Test if two BitSet objects are different.
-    bool operator!=(const BitSet & in_set) const { return !operator==(in_set); }
-
-    /// Compare two BitSet objects, based on the associated binary value.
-    bool operator>(const BitSet & in_set) const { return !operator<=(in_set); }
-
-    /// Compare two BitSet objects, based on the associated binary value.
-    bool operator>=(const BitSet & in_set) const { return !operator<(in_set); }
 
     /// How many bytes are in this BitSet?
     constexpr static size_t GetNumBytes() { return TOTAL_BYTES; }
@@ -1621,6 +1604,33 @@ namespace emp {
     return *this &= target_bits;
   }
 
+
+  // -------------------------  Implementations of Comparison Operators -------------------------
+
+  /// Test if two BitSet objects are identical.
+  template <size_t NUM_BITS>
+  template <size_t SIZE2>
+  bool BitSet<NUM_BITS>::operator==(const BitSet<SIZE2> & in_set) const {
+    if constexpr (NUM_BITS != SIZE2) return false;
+
+    for (size_t i = 0; i < NUM_FIELDS; ++i) {
+      if (bit_set[i] != in_set.bit_set[i]) return false;
+    }
+    return true;
+  }
+
+  /// Compare two BitSet objects, based on the associated binary value.
+  template <size_t NUM_BITS>
+  template <size_t SIZE2>
+  bool BitSet<NUM_BITS>::operator<(const BitSet<SIZE2> & in_set) const {
+    if constexpr (NUM_BITS != SIZE2) return NUM_BITS < SIZE2;
+
+    for (int i = NUM_FIELDS-1; i >= 0; --i) {         // Start loop at the largest field.
+      if (bit_set[i] == in_set.bit_set[i]) continue;  // If same, keep looking!
+      return (bit_set[i] < in_set.bit_set[i]);        // Otherwise, do comparison
+    }
+    return false;
+  }
 
   // -------------------------  Extra Functions  -------------------------
 
