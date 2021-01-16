@@ -246,6 +246,8 @@ namespace emp {
     /// Is an ID associated with an array?
     bool IsArrayID(size_t id) {
       if (internal::ptr_debug) std::cout << "IsArrayID: " << id << std::endl;
+      if (id == UNTRACKED_ID) return false;
+      if (id >= id_info.size()) return false;
       return id_info[id].IsArray();
     }
 
@@ -344,6 +346,8 @@ namespace emp {
     TYPE * ptr;                 ///< The raw pointer associated with this Ptr object.
     size_t id;                  ///< A unique ID for this pointer type.
 
+    static constexpr size_t UNTRACKED_ID = (size_t) -1;
+
     BasePtr(TYPE * in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) {
       #ifdef EMP_NO_PTR_TO_PTR
       emp_assert(!std::is_pointer_v<TYPE>, "Pointers to pointers are disallowed!");
@@ -371,8 +375,8 @@ namespace emp {
     /// Indexing into array
     TYPE & operator[](size_t pos) const {
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
-      emp_assert(Tracker().IsArrayID(id), "Only arrays can be indexed into.", id);
-      emp_assert(Tracker().GetArrayBytes(id) > (pos*sizeof(TYPE)),
+      emp_assert(id == UNTRACKED_ID || Tracker().IsArrayID(id), "Only arrays can be indexed into.", id);
+      emp_assert(id == UNTRACKED_ID || Tracker().GetArrayBytes(id) > (pos*sizeof(TYPE)),
         "Indexing out of range.", id, ptr, pos, sizeof(TYPE), Tracker().GetArrayBytes(id));
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
       return ptr[pos];
@@ -674,7 +678,7 @@ namespace emp {
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
 
       // We should not automatically convert managed pointers to raw pointers; use .Raw()
-      emp_assert(id == UNTRACKED_ID /*, typeid(TYPE).name() */, id,
+      emp_assert(id != UNTRACKED_ID /*, typeid(TYPE).name() */, id,
                  "Use Raw() to convert to an untracked Ptr");
       return ptr;
     }
@@ -733,8 +737,8 @@ namespace emp {
     void FillMemoryFunction(const size_t num_bytes, T fill_fun) {
       // Make sure a pointer is active before we write to it.
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
-      emp_assert(Tracker().IsArrayID(id), "Only arrays can fill memory.", id);
-      emp_assert(Tracker().GetArrayBytes(id) >= num_bytes,
+      emp_assert(id == UNTRACKED_ID || Tracker().IsArrayID(id), "Only arrays can fill memory.", id);
+      emp_assert(id == UNTRACKED_ID || Tracker().GetArrayBytes(id) >= num_bytes,
         "Overfilling memory.", id, ptr, sizeof(TYPE), Tracker().GetArrayBytes(id));
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
 
@@ -747,7 +751,7 @@ namespace emp {
     void FillMemory(const size_t num_bytes, T fill_value) {
       // Make sure a pointer is active before we write to it.
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
-      emp_assert(Tracker().IsArrayID(id), "Only arrays can fill memory.", id);
+      emp_assert(Tracker().IsArrayID(id) || id == UNTRACKED_ID, "Only arrays can fill memory.", id);
       emp_assert(Tracker().GetArrayBytes(id) >= num_bytes,
         "Overfilling memory.", id, ptr, sizeof(TYPE), Tracker().GetArrayBytes(id));
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
