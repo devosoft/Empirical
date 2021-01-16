@@ -39,6 +39,7 @@
 #include "../math/math.hpp"
 #include "../math/Random.hpp"
 #include "../tools/functions.hpp"
+#include "../polyfill/span.hpp"
 
 #include "bitset_utils.hpp"
 #include "_bitset_helpers.hpp"
@@ -151,6 +152,9 @@ namespace emp {
 
     /// How many bits do we currently have?
     size_t GetSize() const { return num_bits; }
+
+    /// How many bytes are in this BitVector?
+    size_t GetNumBytes() const { return NumBytes(); }
 
     /// Retrive the bit value from the specified index.
     bool Get(size_t index) const;
@@ -268,10 +272,14 @@ namespace emp {
     /// Retrive the byte at the specified byte index.
     uint8_t GetByte(size_t index) const;
 
+    /// Get a read-only view into the internal array used by BitVector.
+    /// @return Read-only span of BitVector's bytes.
+    std::span<const std::byte> GetBytes() const;
+
     /// Update the byte at the specified byte index.
     void SetByte(size_t index, uint8_t value);
 
-   // Retrieve the 32-bit uint from the specified uint index (based on bitset.h GetUInt32)
+    // Retrieve the 32-bit uint from the specified uint index (based on bitset.h GetUInt32)
     uint32_t GetUInt(size_t index) const;
 
     /// Update the 32-bit uint at the specified uint index.
@@ -1025,6 +1033,7 @@ namespace emp {
   }
 
 
+  // -------------------------  Implementations of Comparison Operators -------------------------
 
   /// Test if two bit vectors are identical.
   bool BitVector::operator==(const BitVector & in) const {
@@ -1060,12 +1069,24 @@ namespace emp {
     return out;
   }
 
+
+  // -------------------------  Access Groups of bits -------------------------
+
   /// Retrive the byte at the specified byte index.
   uint8_t BitVector::GetByte(size_t index) const {
     emp_assert(index < NumBytes(), index, NumBytes());
     const size_t field_id = Byte2Field(index);
     const size_t pos_id = Byte2FieldPos(index);
     return (bits[field_id] >> pos_id) & 255U;
+  }
+
+  /// Get a read-only view into the internal array used by BitVector.
+  /// @return Read-only span of BitVector's bytes.
+  std::span<const std::byte> BitVector::GetBytes() const {
+    return std::span<const std::byte>(
+      bits.ReinterpretCast<const std::byte>(),
+      NumBytes()
+    );
   }
 
   /// Update the byte at the specified byte index.
