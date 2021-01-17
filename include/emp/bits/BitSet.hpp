@@ -163,6 +163,9 @@ namespace emp {
     /// How many bytes are in this BitSet?
     constexpr static size_t GetNumBytes() { return TOTAL_BYTES; }
 
+    /// How many distinct values could be held in this bitset?
+    static constexpr double GetNumStates() { return emp::Pow2(NUM_BITS); }
+
     /// Retrieve the bit as a specified index.
     bool Get(size_t index) const;
 
@@ -358,26 +361,6 @@ namespace emp {
     ////////////////////////////////////////////
     ////////////////////////////////////////////
 
-
-    /// Get the unsigned numeric value represented by the BitSet as a double
-    double GetDouble() const {
-
-      if constexpr (NUM_BITS <= 64) {
-        uint64_t res{};
-        std::memcpy(&res, bit_set, TOTAL_BYTES);
-        return res;
-      } else {
-        double res = 0.0;
-        for (size_t i = 0; i < (NUM_BITS + 63) / 64; ++i) {
-          res += GetUInt64(i) * emp::Pow2(i * 64);
-        }
-        return res;
-      }
-
-    }
-
-    /// What is the maximum value this BitSet could contain, as a double?
-    static constexpr double MaxDouble() { return emp::Pow2(NUM_BITS) - 1.0; }
 
     /// Overload ostream operator to return Print.
     friend std::ostream& operator<<(std::ostream &out, const BitSet& bs){
