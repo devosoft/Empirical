@@ -78,7 +78,7 @@ namespace emp {
     size_t NumFields() const { return num_bits ? (1 + ((num_bits - 1) / FIELD_BITS)) : 0; }
 
     /// How many bytes are used for the current set of bits? (rounded up!)
-    size_t NumBytes()  const { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
+    size_t NumBytes() const { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
 
     // Identify the field that a specified bit is in.
     static constexpr size_t FieldID(const size_t index)  { return index / FIELD_BITS; }
@@ -97,7 +97,12 @@ namespace emp {
     void RawCopy(const Ptr<field_t> in);
 
     // Convert the bits to bytes.
-    unsigned char * BytePtr() { return bits.ReinterpretCast<unsigned char>(); }
+    emp::Ptr<unsigned char> BytePtr() { return bits.ReinterpretCast<unsigned char>(); }
+
+    // Convert the bits to const bytes vector.
+    emp::Ptr<const unsigned char> BytePtr() const {
+      return bits.ReinterpretCast<const unsigned char>();
+    }
 
     // Any bits past the last "real" bit in the last field should be kept as zeros.
     void ClearExcessBits() {
@@ -146,6 +151,12 @@ namespace emp {
 
     /// Move operator.
     BitVector & operator=(BitVector && in);
+
+    /// Assignment from another BitVector without changing size.
+    BitVector & Import( const BitVector & from_bv, const size_t from_bit=0 );
+
+    /// Convert to a BitVector of a different size.
+    BitVector Export(size_t out_size, size_t start_bit=0) const;
 
 
     // >>>>>>>>>>  Accessors  <<<<<<<<<< //
@@ -279,20 +290,79 @@ namespace emp {
     /// Update the byte at the specified byte index.
     void SetByte(size_t index, uint8_t value);
 
-    // Retrieve the 32-bit uint from the specified uint index (based on bitset.h GetUInt32)
-    uint32_t GetUInt(size_t index) const;
+    /// Get specified type at a given index (in steps of that type size)
+    template <typename T> T GetValueAtIndex(const size_t index) const;
+
+    // Retrieve the 8-bit uint from the specified uint index.
+    uint8_t GetUInt8(size_t index) const { return GetValueAtIndex<uint8_t>(index); }
+
+    // Retrieve the 16-bit uint from the specified uint index.
+    uint16_t GetUInt16(size_t index) const { return GetValueAtIndex<uint16_t>(index); }
+
+    // Retrieve the 32-bit uint from the specified uint index.
+    uint32_t GetUInt32(size_t index) const { return GetValueAtIndex<uint32_t>(index); }
+    
+    // Retrieve the 64-bit uint from the specified uint index.
+    uint64_t GetUInt64(size_t index) const { return GetValueAtIndex<uint64_t>(index); }
+
+    // By default, retrieve the 32-bit uint from the specified uint index.
+    uint32_t GetUInt(size_t index) const { return GetUInt32(index); }
+
+
+    /// Set specified type at a given index (in steps of that type size)
+    template <typename T> void SetValueAtIndex(const size_t index, T value);
+
+    /// Update the 8-bit uint at the specified uint index.
+    void SetUInt8(const size_t index, uint8_t value) { SetValueAtIndex(index, value); }
+
+    /// Update the 16-bit uint at the specified uint index.
+    void SetUInt16(const size_t index, uint16_t value) { SetValueAtIndex(index, value); }
 
     /// Update the 32-bit uint at the specified uint index.
-    void SetUInt(const size_t index, uint32_t value);
+    void SetUInt32(const size_t index, uint32_t value) { SetValueAtIndex(index, value); }
 
-    /// Set a 32-bit uint at the specified BIT index.
-    void SetUIntAtBit(size_t index, uint32_t value);
+    /// Update the 64-bit uint at the specified uint index.
+    void SetUInt64(const size_t index, uint64_t value) { SetValueAtIndex(index, value); }
 
-    /// Retrive the 32-bit uint at the specified BIT index.
-    uint32_t GetUIntAtBit(size_t index);
+    /// By default, update the 32-bit uint at the specified uint index.
+    void SetUInt(const size_t index, uint32_t value) { SetUInt32(index, value); }
 
-    /// Retrieve the specified number of bits (stored in the field type) at the target bit index.
-    template <size_t OUT_BITS> field_t GetValueAtBit(size_t index);
+
+    /// Get specified type starting at a given BIT position.
+    template <typename T> T GetValueAtBit(const size_t index) const;
+
+    // Retrieve the 8-bit uint from the specified uint index.
+    uint8_t GetUInt8AtBit(size_t index) const { return GetValueAtBit<uint8_t>(index); }
+
+    // Retrieve the 16-bit uint from the specified uint index.
+    uint16_t GetUInt16AtBit(size_t index) const { return GetValueAtBit<uint16_t>(index); }
+
+    // Retrieve the 32-bit uint from the specified uint index.
+    uint32_t GetUInt32AtBit(size_t index) const { return GetValueAtBit<uint32_t>(index); }
+    
+    // Retrieve the 64-bit uint from the specified uint index.
+    uint64_t GetUInt64AtBit(size_t index) const { return GetValueAtBit<uint64_t>(index); }
+
+    // By default, retrieve the 32-bit uint from the specified uint index.
+    uint32_t GetUIntAtBit(size_t index) const { return GetUInt32AtBit(index); }
+
+
+    template <typename T> void SetValueAtBit(const size_t index, T value);
+
+    /// Update the 8-bit uint at the specified uint index.
+    void SetUInt8AtBit(const size_t index, uint8_t value) { SetValueAtBit(index, value); }
+
+    /// Update the 16-bit uint at the specified uint index.
+    void SetUInt16AtBit(const size_t index, uint16_t value) { SetValueAtBit(index, value); }
+
+    /// Update the 32-bit uint at the specified uint index.
+    void SetUInt32AtBit(const size_t index, uint32_t value) { SetValueAtBit(index, value); }
+
+    /// Update the 64-bit uint at the specified uint index.
+    void SetUInt64AtBit(const size_t index, uint64_t value) { SetValueAtBit(index, value); }
+
+    /// By default, update the 32-bit uint at the specified uint index.
+    void SetUIntAtBit(const size_t index, uint32_t value) { SetUInt32AtBit(index, value); }
 
 
     // >>>>>>>>>>  Other Analyses  <<<<<<<<<< //
@@ -663,6 +733,29 @@ namespace emp {
 
     return *this;
   }
+
+    /// Assign from a BitSet of a different size.
+  BitVector & BitVector::Import(const BitVector & from_bv, const size_t from_bit) {
+    emp_assert(&from_bv != this);
+    emp_assert(from_bit < from_bv.GetSize());
+
+    size_t init_size = GetSize();
+    *this = from_bv;
+    *this << from_bit;
+    Resize(init_size);
+
+    return *this;
+  }
+
+  /// Convert to a Bitset of a different size.
+  BitVector BitVector::Export(size_t out_size, size_t start_bit) const {
+
+    BitVector out_bits(out_size);
+    out_bits.Import(*this, start_bit);
+
+    return out_bits;
+  }
+
 
   // --------------------  Implementations of common accessors -------------------
   
@@ -1098,81 +1191,60 @@ namespace emp {
     bits[field_id] = (bits[field_id] & ~(FIELD_255 << pos_id)) | (val_uint << pos_id);
   }
 
-  // Retrieve the 32-bit uint from the specified uint index (based on bitset.h GetUInt32)
-  uint32_t BitVector::GetUInt(size_t index) const {
-    emp_assert(index * 32 < num_bits);
 
-    uint32_t res;
+  /// Get specified type at a given index (in steps of that type size)
+  template <typename T>
+  T BitVector::GetValueAtIndex(const size_t index) const {
+    // For the moment, must fit inside bounds; eventually should pad with zeros.
+    emp_assert((index + 1) * sizeof(T) <= NumBytes());
 
-    std::memcpy(
-      &res,
-      bits.Cast<unsigned char>().Raw() + index * (32/8),
-      sizeof(res)
-    );
-
-    return res;
+    T out_value;
+    std::memcpy( &out_value, BytePtr() + index * sizeof(T), sizeof(T) );
+    return out_value;
   }
 
-  /// Update the 32-bit uint at the specified uint index.
-  void BitVector::SetUInt(const size_t index, uint32_t value) {
-    emp_assert(index * 32 < num_bits);
 
-    std::memcpy(
-      bits.Cast<unsigned char>().Raw() + index * (32/8),
-      &value,
-      sizeof(value)
-    );
+  /// Set specified type at a given index (in steps of that type size)
+  template <typename T>
+  void BitVector::SetValueAtIndex(const size_t index, T in_value) {
+    // For the moment, must fit inside bounds; eventually should pad with zeros.
+    emp_assert((index + 1) * sizeof(T) <= NumBytes());
 
-    // Check to make sure that if there are any end bits, there are no excess ones.
-    emp_assert(NumEndBits() == 0 ||
-                ( bits[NumFields() - 1] & ~MaskLow<field_t>(NumEndBits()) ) == 0 );
+    std::memcpy( BytePtr() + index * sizeof(T), &in_value, sizeof(T) );
 
+    ClearExcessBits();
   }
 
-  /// Set a 32-bit uint at the specified BIT index.
-  void BitVector::SetUIntAtBit(size_t index, uint32_t value) {
-    const size_t field_id = FieldID(index);
-    const size_t field_pos = FieldPos(index);
-    const field_t mask1 = MaskLow<field_t>(field_pos);
-    const size_t end_pos = field_pos + 32;
-    const size_t overshoot = (end_pos > FIELD_BITS) ? end_pos - FIELD_BITS : 0;
-    const field_t mask2 = ~MaskLow<field_t>(overshoot);
 
-    emp_assert(index+32 <= num_bits);
-    emp_assert(!overshoot || field_id+1 < NumFields());
+  /// Get the specified type starting from a given BIT position.
+  template <typename T>
+  T BitVector::GetValueAtBit(const size_t index) const {
+    // For the moment, must fit inside bounds; eventually should pad with zeros.
+    emp_assert((index+7)/8 + sizeof(T) < NumBytes());
 
-    // Clear bits that we are setting 1's then OR in new value.
-    bits[field_id] &= mask1;
-    bits[field_id] |= ((field_t) value) >> field_pos;
+    BitVector out_bits(sizeof(T));
+    out_bits.Import(*this, index);
 
-    // Repeat for next field if needed.
-    if (overshoot) {
-      bits[field_id+1] &= mask2;
-      bits[field_id+1] |= ((field_t) value) << (32-overshoot);
-    }
+    return out_bits.template GetValueAtIndex<T>(0);
   }
 
-  /// Retrive the 32-bit uint at the specified BIT index.
-  uint32_t BitVector::GetUIntAtBit(size_t index) {
-    // @CAO Need proper assert for non-32-size bit fields!
-    // emp_assert(index < num_bits);
-    const size_t field_id = FieldID(index);
-    const size_t pos_id = FieldPos(index);
-    if (pos_id == 0) return (uint32_t) bits[field_id];
-    const size_t NUM_FIELDS = NumFields();
-    const uint32_t part1 = (uint32_t) (bits[field_id] >> pos_id);
-    const uint32_t part2 =
-      (uint32_t)((field_id+1 < NUM_FIELDS) ? bits[field_id+1] << (FIELD_BITS-pos_id) : 0);
-    return part1 | part2;
+
+  /// Set the specified type starting from a given BIT position.
+  // @CAO: Can be optimized substantially, especially for long BitVectors.
+  template <typename T>
+  void BitVector::SetValueAtBit(const size_t index, T value) {
+    // For the moment, must fit inside bounds; eventually should pad with zeros.
+    emp_assert((index+7)/8 + sizeof(T) < NumBytes());
+    constexpr size_t type_bits = sizeof(T) * 8;
+
+    Clear(index, index+type_bits);       // Clear out the bits where new value will go.
+    BitVector in_bits(GetSize());        // Setup a bitset to place the new bits in.
+    in_bits.SetValueAtIndex(0, value);   // Insert the new bits.
+    in_bits << index;                    // Shift new bits into place.
+    OR_SELF(in_bits);                    // Place new bits into current BitVector.
   }
 
-  /// Retrieve the specified number of bits (stored in the field type) at the target bit index.
-  template <size_t OUT_BITS>
-  BitVector::field_t BitVector::GetValueAtBit(size_t index) {
-    // @CAO This function needs to be generalized to return more then one field of bits.
-    static_assert(OUT_BITS <= FIELD_BITS, "Requesting too many bits to fit in a field");
-    return GetUIntAtBit(index) & MaskLow<field_t>(OUT_BITS);
-  }
+
 
   /// A simple hash function for bit vectors.
   std::size_t BitVector::Hash() const {
