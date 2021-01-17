@@ -167,6 +167,9 @@ namespace emp {
     /// How many bytes are in this BitVector?
     size_t GetNumBytes() const { return NumBytes(); }
 
+    /// How many distinct values could be held in this BitVector?
+    double GetNumStates() const { return emp::Pow2(num_bits); }
+
     /// Retrive the bit value from the specified index.
     bool Get(size_t index) const;
 
@@ -382,15 +385,15 @@ namespace emp {
     /// Return the position of the first one; return -1 if no ones in vector.
     int FindBit() const;
 
-    /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
-    int PopBit();
-
     /// Return the position of the first one after start_pos; return -1 if no ones in vector.
     /// You can loop through all 1-bit positions of a BitVector "bv" with:
     ///
     ///   for (int pos = bv.FindBit(); pos >= 0; pos = bv.FindBit(pos+1)) { ... }
-
+    ///
     int FindBit(const size_t start_pos) const;
+
+    /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
+    int PopBit();
 
     /// Return positions of all ones.
     emp::vector<size_t> GetOnes() const;
@@ -1245,13 +1248,14 @@ namespace emp {
   }
 
 
+  // -------------------------  Other Analyses -------------------------
 
   /// A simple hash function for bit vectors.
   std::size_t BitVector::Hash() const {
     std::size_t hash_val = 0;
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) {
-      hash_val ^= bits[i];
+      hash_val ^= bits[i] + i*1000000009;
     }
     return hash_val ^ ((97*num_bits) << 8);
   }
@@ -1272,9 +1276,9 @@ namespace emp {
 
   /// Faster counting of ones for very sparse bit vectors.
   size_t BitVector::CountOnes_Sparse() const {
-    const size_t NUM_FIELDS = NumFields();
     size_t bit_count = 0;
-    for (size_t i = 0; i < NUM_FIELDS; i++) {
+    const size_t NUM_FIELDS = NumFields();
+    for (size_t i = 0; i < NUM_FIELDS; ++i) {
       field_t cur_field = bits[i];
       while (cur_field) {
         cur_field &= (cur_field-1);       // Peel off a single 1.
@@ -1291,18 +1295,6 @@ namespace emp {
     while (field_id < NUM_FIELDS && bits[field_id]==0) field_id++;
     return (field_id < NUM_FIELDS) ?
       (int) (find_bit(bits[field_id]) + (field_id * FIELD_BITS))  :  -1;
-  }
-
-  /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
-  int BitVector::PopBit() {
-    const size_t NUM_FIELDS = NumFields();
-    size_t field_id = 0;
-    while (field_id < NUM_FIELDS && bits[field_id]==0) field_id++;
-    if (field_id == NUM_FIELDS) return -1;  // Failed to find bit!
-
-    const size_t pos_found = find_bit(bits[field_id]);
-    bits[field_id] &= ~(FIELD_1 << pos_found);
-    return (int) (pos_found + (field_id * FIELD_BITS));
   }
 
   /// Return the position of the first one after start_pos; return -1 if no ones in vector.
@@ -1325,6 +1317,18 @@ namespace emp {
     while (field_id < NUM_FIELDS && bits[field_id]==0) field_id++;
     return (field_id < NUM_FIELDS) ?
       (int) (find_bit(bits[field_id]) + (field_id * FIELD_BITS)) : -1;
+  }
+
+  /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
+  int BitVector::PopBit() {
+    const size_t NUM_FIELDS = NumFields();
+    size_t field_id = 0;
+    while (field_id < NUM_FIELDS && bits[field_id]==0) field_id++;
+    if (field_id == NUM_FIELDS) return -1;  // Failed to find bit!
+
+    const size_t pos_found = find_bit(bits[field_id]);
+    bits[field_id] &= ~(FIELD_1 << pos_found);
+    return (int) (pos_found + (field_id * FIELD_BITS));
   }
 
   /// Return positions of all ones.
