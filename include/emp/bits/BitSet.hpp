@@ -149,6 +149,14 @@ namespace emp {
     /// Assignment operator (no separate move opperator since no resources to move...)
     BitSet & operator=(const BitSet<NUM_BITS> & in_set) { Copy(in_set.bit_set); return *this; }
 
+    /// Assignment from another BitSet of a different size.
+    template <size_t FROM_BITS>
+    BitSet & Import( const BitSet<FROM_BITS> & from_set, const size_t from_bit=0 );
+
+    /// Convert to a Bitset of a different size.
+    template <size_t TO_BITS>
+    BitSet<TO_BITS> Export(size_t start_bit=0) const;
+
     /// How many bits are in this BitSet?
     constexpr static size_t GetSize() { return NUM_BITS; }
 
@@ -306,7 +314,7 @@ namespace emp {
 
 
     /// Get specified type starting at a given BIT position.
-    template <typename T> T GetValueAtBit(const size_t index);
+    template <typename T> T GetValueAtBit(const size_t index) const;
 
     // Retrieve the 8-bit uint from the specified uint index.
     uint8_t GetUInt8AtBit(size_t index) const { return GetValueAtBit<uint8_t>(index); }
@@ -350,60 +358,6 @@ namespace emp {
     ////////////////////////////////////////////
     ////////////////////////////////////////////
 
-    /// Assign from a BitSet of a different size.
-    template <size_t FROM_BITS>
-    BitSet & Import(
-      const BitSet<FROM_BITS> & from_set,
-      const size_t from_bit=0
-    ) {
-
-      if constexpr (FROM_BITS == NUM_BITS) emp_assert(&from_set != this);
-
-      emp_assert(from_bit < FROM_BITS);
-
-      if (FROM_BITS - from_bit < NUM_BITS) Clear();
-
-      const size_t DEST_BYTES = (NUM_BITS + 7)/8;
-      const size_t FROM_BYTES = (FROM_BITS + 7)/8 - from_bit/8;
-
-      const size_t COPY_BYTES = std::min(DEST_BYTES, FROM_BYTES);
-
-      std::memcpy(
-        bit_set,
-        reinterpret_cast<const unsigned char*>(from_set.bit_set) + from_bit/8,
-        COPY_BYTES
-      );
-
-      if (from_bit%8) {
-
-        this->ShiftRight(from_bit%8);
-
-        if (FROM_BYTES > COPY_BYTES) {
-          reinterpret_cast<unsigned char*>(bit_set)[COPY_BYTES-1] |= (
-            reinterpret_cast<const unsigned char*>(
-              from_set.bit_set
-            )[from_bit/8 + COPY_BYTES]
-            << (8 - from_bit%8)
-          );
-        }
-
-      }
-
-      ClearExcessBits();
-
-      return *this;
-
-    }
-
-    /// Convert to a Bitset of a different size.
-    template <size_t FROM_BITS>
-    BitSet<FROM_BITS> Export(size_t start_bit=0) const {
-
-      BitSet<FROM_BITS> out_bits;
-      out_bits.Import(*this, start_bit);
-
-      return out_bits;
-    }
 
     /// Get the unsigned numeric value represented by the BitSet as a double
     double GetDouble() const {
@@ -1209,7 +1163,8 @@ namespace emp {
     ClearExcessBits();
   }
 
-  // ------------------------- Longer Constructors --------------------------
+  // -------------------- Longer Constructors and bit copying ---------------------
+
   template <size_t NUM_BITS>
   template <typename T>
   BitSet<NUM_BITS>::BitSet(const std::initializer_list<T> l) {
@@ -1217,6 +1172,63 @@ namespace emp {
     Clear();
     auto it = std::rbegin(l); // Right-most bit is position 0.
     for (size_t idx = 0; idx < NUM_BITS; ++idx) Set(idx, (idx < l.size()) && *it++);
+  }
+
+  /// Assign from a BitSet of a different size.
+  template <size_t NUM_BITS>
+  template <size_t FROM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::Import(
+    const BitSet<FROM_BITS> & from_set,
+    const size_t from_bit
+  ) {
+    // Only check for same-ness if the two types are the same.
+    if constexpr (FROM_BITS == NUM_BITS) emp_assert(&from_set != this);
+
+    emp_assert(from_bit < FROM_BITS);
+
+    if (FROM_BITS - from_bit < NUM_BITS) Clear();
+
+    const size_t DEST_BYTES = (NUM_BITS + 7)/8;
+    const size_t FROM_BYTES = (FROM_BITS + 7)/8 - from_bit/8;
+
+    const size_t COPY_BYTES = std::min(DEST_BYTES, FROM_BYTES);
+
+    std::memcpy(
+      bit_set,
+      reinterpret_cast<const unsigned char*>(from_set.bit_set) + from_bit/8,
+      COPY_BYTES
+    );
+
+    if (from_bit%8) {
+
+      this->ShiftRight(from_bit%8);
+
+      if (FROM_BYTES > COPY_BYTES) {
+        reinterpret_cast<unsigned char*>(bit_set)[COPY_BYTES-1] |= (
+          reinterpret_cast<const unsigned char*>(
+            from_set.bit_set
+          )[from_bit/8 + COPY_BYTES]
+          << (8 - from_bit%8)
+        );
+      }
+
+    }
+
+    ClearExcessBits();
+
+    return *this;
+
+  }
+
+  /// Convert to a Bitset of a different size.
+  template <size_t NUM_BITS>
+  template <size_t TO_BITS>
+  BitSet<TO_BITS> BitSet<NUM_BITS>::Export(size_t start_bit) const {
+
+    BitSet<TO_BITS> out_bits;
+    out_bits.Import(*this, start_bit);
+
+    return out_bits;
   }
 
   // --------------------  Implementations of common accessors -------------------
@@ -1648,7 +1660,7 @@ namespace emp {
   /// Get the specified type starting from a given BIT position.
   template <size_t NUM_BITS>
   template <typename T>
-  T BitSet<NUM_BITS>::GetValueAtBit(const size_t index) {
+  T BitSet<NUM_BITS>::GetValueAtBit(const size_t index) const {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
     emp_assert((index+7)/8 + sizeof(T) < TOTAL_BYTES);
 
