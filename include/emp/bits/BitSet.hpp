@@ -358,6 +358,15 @@ namespace emp {
     /// A simple hash function for bit vectors.
     std::size_t Hash() const;
 
+    /// Count the number of ones in the BitVector.
+    size_t CountOnes() const;
+
+    /// Faster counting of ones for very sparse bit vectors.
+    size_t CountOnes_Sparse() const;
+
+    /// Count the number of zeros in the BitVector.
+    size_t CountZeros() const { return GetSize() - CountOnes(); }
+
 
 
     ////////////////////////////////////////////
@@ -389,35 +398,6 @@ namespace emp {
     void PrintOneIDs(std::ostream & out=std::cout, char spacer=' ') const {
       for (size_t i = 0; i < NUM_BITS; i++) { if (Get(i)) out << i << spacer; }
     }
-
-    /// Count 1's by looping through once for each bit equal to 1
-    size_t CountOnes_Sparse() const {
-      size_t bit_count = 0;
-      for (auto i : bit_set) {
-        while (i) {
-          i &= (i-1);       // Peel off a single 1.
-          bit_count++;      // And increment the counter
-        }
-      }
-      return bit_count;
-    }
-
-    /// Count 1's in semi-parallel; fastest for even 0's & 1's
-    size_t CountOnes_Mixed() const {
-
-      size_t bit_count = 0;
-      for (size_t f = 0; f < NUM_FIELDS; ++f) {
-          // when compiling with -O3 and -msse4.2, this is the fastest population count method.
-          // this is due to using a dedicated instuction that runs in 1 clock cycle.
-          std::bitset<FIELD_BITS> std_bs(bit_set[f]);
-          bit_count += std_bs.count();
-       }
-
-      return bit_count;
-    }
-
-    /// Count the number of ones in the BitSet using bit tricks for a speedup.
-    size_t CountOnes() const { return CountOnes_Mixed(); }
 
     /// Return the index of the first one in the sequence; return -1 if no ones are available.
     int FindBit() const {
@@ -903,7 +883,7 @@ namespace emp {
     inline bool all() const { return All(); }
     inline bool any() const { return Any(); }
     inline bool none() const { return !Any(); }
-    inline size_t count() const { return CountOnes_Mixed(); }
+    inline size_t count() const { return CountOnes(); }
     inline BitSet & flip() { return Toggle(); }
     inline BitSet & flip(size_t pos) { return Toggle(pos); }
     inline BitSet & flip(size_t start, size_t stop) { return Toggle(start, stop); }
@@ -1678,9 +1658,36 @@ namespace emp {
   std::size_t BitSet<NUM_BITS>::Hash() const {
     std::size_t hash_val = 0;
     for (size_t i = 0; i < NUM_FIELDS; i++) {
-      hash_val ^= bits[i] + i*1000000009;
+      hash_val ^= bit_set[i] + i*1000000009;
     }
-    return hash_val ^ ((97*num_bits) << 8);
+    return hash_val;
+  }
+
+  // TODO: see https://arxiv.org/pdf/1611.07612.pdf for fast pop counts
+  /// Count the number of ones in the BitVector.
+  template <size_t NUM_BITS>
+  size_t BitSet<NUM_BITS>::CountOnes() const { 
+    size_t bit_count = 0;
+    for (size_t i = 0; i < NUM_FIELDS; ++i) {
+        // when compiling with -O3 and -msse4.2, this is the fastest population count method.
+        std::bitset<FIELD_BITS> std_bs(bit_set[i]);
+        bit_count += std_bs.count();
+      }
+
+    return bit_count;
+  }
+
+  /// Faster counting of ones for very sparse bit vectors.
+  template <size_t NUM_BITS>
+  size_t BitSet<NUM_BITS>::CountOnes_Sparse() const {
+    size_t bit_count = 0;
+    for (field_t cur_field : bit_set) {
+      while (cur_field) {
+        cur_field &= (cur_field-1);       // Peel off a single 1.
+        bit_count++;                      // Increment the counter
+      }
+    }
+    return bit_count;
   }
 
 
