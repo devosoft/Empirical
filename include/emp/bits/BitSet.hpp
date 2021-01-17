@@ -353,6 +353,13 @@ namespace emp {
     void SetUIntAtBit(const size_t index, uint32_t value) { SetUInt32AtBit(index, value); }
 
 
+    // >>>>>>>>>>  Other Analyses  <<<<<<<<<< //
+
+    /// A simple hash function for bit vectors.
+    std::size_t Hash() const;
+
+
+
     ////////////////////////////////////////////
     ////////////////////////////////////////////
     ////////////////////////////////////////////
@@ -371,13 +378,6 @@ namespace emp {
     /// Print all bits to the provided output stream.
     void Print(std::ostream & out=std::cout) const {
       for (size_t i = NUM_BITS; i > 0; i--) { out << Get(i-1); }
-
-      // out << "/";
-      // for (size_t i = NUM_BITS; i < NUM_FIELDS * FIELD_BITS; i++) {
-      //   const size_t field_id = FieldID(i);
-      //   const size_t pos_id = FieldPos(i);
-      //   out << ((bit_set[field_id] & (((field_t)1U) << pos_id)) != 0);
-      // }
     }
 
     /// Print all bits from smallest to largest, as if this were an array, not a bit representation.
@@ -1670,6 +1670,18 @@ namespace emp {
     OR_SELF(in_bits);                    // Place new bits into current BitSet.
   }
 
+
+  // -------------------------  Other Analyses -------------------------
+
+  /// A simple hash function for bit vectors.
+  template <size_t NUM_BITS>
+  std::size_t BitSet<NUM_BITS>::Hash() const {
+    std::size_t hash_val = 0;
+    for (size_t i = 0; i < NUM_FIELDS; i++) {
+      hash_val ^= bits[i] + i*1000000009;
+    }
+    return hash_val ^ ((97*num_bits) << 8);
+  }
 
 
   // -------------------------  Extra Functions  -------------------------
