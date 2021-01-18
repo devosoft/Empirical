@@ -522,6 +522,7 @@ namespace emp {
 
     // TODO move to math utils
     // adapted from https://stackoverflow.com/a/39949009
+    // profiling result https://quick-bench.com/q/-c32FIZ0rRRnJCM2PNp-Nq_vq1E
     inline double static fastDivide(const double y, const double x) {
         // calculates y/x
         union {
