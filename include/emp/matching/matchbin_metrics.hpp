@@ -493,6 +493,82 @@ namespace emp {
 
   };
 
+  /// Matches based on longest streaks of equal and unequal bits in two bitsets.
+  /// This implementation uses Incorrect Math from Downing's Intelligence
+  /// Emerging.
+  /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
+  template<size_t Width>
+  struct OptimizedApproxDualStreakMetric : public BaseMetric<
+    emp::BitSet<Width>,
+    emp::BitSet<Width>
+  > {
+
+    using query_t = emp::BitSet<Width>;
+    using tag_t = emp::BitSet<Width>;
+
+    size_t dim() const override { return 1; }
+
+    size_t width() const override { return Width; }
+
+    std::string name() const override {
+      return emp::to_string(Width) + "-bit " + base();
+    }
+
+    std::string base() const override { return "Approx Dual Streak Metric"; }
+
+    double operator()(const query_t& a, const tag_t& b) const override {
+      return calculate(a, b);
+    }
+
+    // TODO move to math utils
+    // adapted from https://stackoverflow.com/a/39949009
+    inline double static fastDivide(const double y, const double x) {
+        // calculates y/x
+        union {
+            double dbl;
+            unsigned long long ull;
+        } u;
+        u.dbl = x;                      // x = x
+        u.ull = ( 0xbfcdd6a18f6a6f52ULL - u.ull ) >> (unsigned char)1;
+                                        // pow( x, -0.5 )
+        u.dbl *= u.dbl;                 // pow( pow(x,-0.5), 2 ) = pow( x, -1 ) = 1.0/x
+        return u.dbl * y;               // (1.0/x) * y = y/x
+    }
+
+    // TODO move to math utils
+    inline static double customPow(const size_t k) {
+      // lookup table provides a big speedup in runtime MAM
+      static const emp::array<double, Width + 1> lookup = [](){
+        emp::array<double, Width + 1> res;
+        res[0] = 1.0;
+        for ( size_t i = 1; i <= Width; ++i ) res[i] = res[i - 1] * 0.5;
+        return res;
+      }();
+      return lookup[ k ];
+    }
+
+    inline static double calculate(const query_t& a, const tag_t& b) {
+      const emp::BitSet<Width> bs = a^b;
+      const size_t same = (~bs).LongestSegmentOnes();
+      const size_t different = bs.LongestSegmentOnes();
+      const double ps = ProbabilityKBitSequence(same);
+      const double pd = ProbabilityKBitSequence(different);
+
+      const double match = fastDivide(pd, ps + pd);
+      // Note: here, close match score > poor match score
+      // However, we're computing distance where smaller means closer match.
+      // Note also: 0.0 < match < 1.0
+      // So, we subtract match score from 1.0 to get a distance.
+      return 1.0 - match;
+    }
+
+    inline static double ProbabilityKBitSequence(const size_t k) {
+      // Bad Math
+      return static_cast<double>(Width - k + 1) * customPow(k);
+    }
+
+  };
+
   /// Compute the probability of K or more heads in a row out of N flips.
   /// Adapted from https://www.askamathematician.com/2010/07/q-whats-the-chance-of-getting-a-run-of-k-successes-in-n-bernoulli-trials-why-use-approximations-when-the-exact-answer-is-known/
   /// Helper class for exact streak metrics
