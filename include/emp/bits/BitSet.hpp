@@ -128,6 +128,16 @@ namespace emp {
       std::memcpy(bit_set, in_set, sizeof(bit_set));
     }
 
+    template<size_t shift>
+    void ShiftLeft() {
+      // profiled this templated, special case variant
+      // and did see a difference in runtime MAM
+
+      // TODO currently only implemented for NUM_FIELDS == 1
+      static_assert( NUM_FIELDS == 1 );
+      bit_set[0] <<= shift;
+    }
+
     /// Helper: call SHIFT with positive number instead
     void ShiftLeft(const size_t shift_size) {
 
@@ -900,8 +910,14 @@ namespace emp {
       size_t length = 0;
       BitSet out_set(*this);
       while(out_set.Any()){
-        out_set.AND_SELF(out_set<<1);
+        BitSet temp( out_set );
+        // optimization currently only implemented for NUM_FIELDS == 1
+        if constexpr (NUM_FIELDS == 1) temp.template ShiftLeft<1>();
+        else temp <<= 1;
+
+        out_set.AND_SELF(temp);
         ++length;
+
       }
       return length;
     }
