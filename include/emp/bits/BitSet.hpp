@@ -934,53 +934,49 @@ namespace emp {
     /// Perform a Boolean NOT on this BitSet and return the result.
     BitSet NOT() const {
       BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~bit_set[i];
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      out_set.NOT_SELF();
       return out_set;
     }
 
     /// Perform a Boolean AND with a second BitSet and return the result.
     BitSet AND(const BitSet & set2) const {
       BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] & set2.bit_set[i];
+      out_set.AND_SELF( set2 );
       return out_set;
     }
 
     /// Perform a Boolean OR with a second BitSet and return the result.
     BitSet OR(const BitSet & set2) const {
       BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] | set2.bit_set[i];
+      out_set.OR_SELF( set2 );
       return out_set;
     }
 
     /// Perform a Boolean NAND with a second BitSet and return the result.
     BitSet NAND(const BitSet & set2) const {
       BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      out_set.NAND_SELF( set2 );
       return out_set;
     }
 
     /// Perform a Boolean NOR with a second BitSet and return the result.
     BitSet NOR(const BitSet & set2) const {
       BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      out_set.NOR_SELF( set2 );
       return out_set;
     }
 
     /// Perform a Boolean XOR with a second BitSet and return the result.
     BitSet XOR(const BitSet & set2) const {
       BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] ^ set2.bit_set[i];
+      out_set.XOR_SELF( set2 );
       return out_set;
     }
 
     /// Perform a Boolean EQU with a second BitSet and return the result.
     BitSet EQU(const BitSet & set2) const {
       BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-      if (LAST_BIT > 0) out_set.bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+      out_set.EQU_SELF( set2 );
       return out_set;
     }
 
