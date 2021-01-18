@@ -791,7 +791,15 @@ namespace emp {
     static constexpr double MaxDouble() { return emp::Pow2(NUM_BITS) - 1.0; }
 
     /// Return true if ANY bits in the BitSet are one, else return false.
-    bool Any() const { for (auto i : bit_set) if (i) return true; return false; }
+    bool Any() const {
+      // profiled the if constexpr else
+      // and did see a difference on perf reports and in runtime MAM
+      if constexpr (NUM_FIELDS == 1) return bit_set[0];
+      else {
+        for (auto i : bit_set) if (i) return true;
+        return false;
+      }
+    }
 
     /// Return true if NO bits in the BitSet are one, else return false.
     bool None() const { return !Any(); }
