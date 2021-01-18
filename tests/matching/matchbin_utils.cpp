@@ -67,7 +67,8 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   }
 
   // test ApproxDualStreakMetric
-  emp::ExactDualStreakMetric<4> metric;
+  {
+  emp::ApproxDualStreakMetric<4> metric;
 
   REQUIRE( metric({0,0,0,0},{0,0,0,0}) < metric({0,0,0,0},{1,0,0,0}) );
   REQUIRE( metric({0,0,0,0},{0,0,0,1}) < metric({0,0,0,0},{0,1,0,0}) );
