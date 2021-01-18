@@ -367,7 +367,24 @@ namespace emp {
     /// Count the number of zeros in the BitVector.
     size_t CountZeros() const { return GetSize() - CountOnes(); }
 
+    /// Return the position of the first one; return -1 if no ones in vector.
+    int FindBit() const;
 
+    /// Return the position of the first one after start_pos; return -1 if no ones in vector.
+    /// You can loop through all 1-bit positions of a BitSet "bits" with:
+    ///
+    ///   for (int pos = bits.FindBit(); pos >= 0; pos = bits.FindBit(pos+1)) { ... }
+    ///
+    int FindBit(const size_t start_pos) const;
+
+    /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
+    int PopBit();
+
+    /// Return positions of all ones.
+    emp::vector<size_t> GetOnes() const;
+
+    /// Find the length of the longest continuous series of ones.
+    size_t LongestSegmentOnes() const;
 
     ////////////////////////////////////////////
     ////////////////////////////////////////////
@@ -397,56 +414,6 @@ namespace emp {
     /// Print the locations of all one bits, using the provided spacer (default is a single space)
     void PrintOneIDs(std::ostream & out=std::cout, char spacer=' ') const {
       for (size_t i = 0; i < NUM_BITS; i++) { if (Get(i)) out << i << spacer; }
-    }
-
-    /// Return the index of the first one in the sequence; return -1 if no ones are available.
-    int FindBit() const {
-      size_t field_id = 0;
-      while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
-      return (field_id < NUM_FIELDS) ? (int) (find_bit(bit_set[field_id]) + (field_id << FIELD_LOG2)) : -1;
-    }
-
-    /// Return index of first one in sequence (or -1 if no ones); change this position to zero.
-    int PopBit() {
-      size_t field_id = 0;
-      while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
-      if (field_id == NUM_FIELDS) return -1;  // Failed to find bit!
-
-      const int pos_found = (int) find_bit(bit_set[field_id]);
-      bit_set[field_id] &= ~(1U << pos_found);
-      return pos_found + (int)(field_id << FIELD_LOG2);
-    }
-
-    /// Return index of first one in sequence AFTER start_pos (or -1 if no ones)
-    int FindBit(const size_t start_pos) const {
-      // @CAO -- There are better ways to do this with bit tricks
-      //         (but start_pos is tricky...)
-      for (size_t i = start_pos; i < NUM_BITS; i++) {
-        if (Get(i)) return (int) i;
-      }
-      return -1;
-    }
-
-    /// Return a vector indicating the posistions of all ones in the BitSet.
-    emp::vector<size_t> GetOnes() const {
-      // @CAO -- There are better ways to do this with bit tricks.
-      emp::vector<size_t> out_set(CountOnes());
-      size_t cur_pos = 0;
-      for (size_t i = 0; i < NUM_BITS; i++) {
-        if (Get(i)) out_set[cur_pos++] = i;
-      }
-      return out_set;
-    }
-
-    /// Finds the length of the longest segment of ones.
-    size_t LongestSegmentOnes() const {
-      size_t length = 0;
-      BitSet out_set(*this);
-      while(out_set.Any()){
-        out_set.AND_SELF(out_set<<1);
-        ++length;
-      }
-      return length;
     }
 
 
@@ -1689,6 +1656,69 @@ namespace emp {
     }
     return bit_count;
   }
+
+    /// Return the index of the first one in the sequence; return -1 if no ones are available.
+  template <size_t NUM_BITS>
+  int BitSet<NUM_BITS>::FindBit() const {
+    size_t field_id = 0;
+    while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
+    return (field_id < NUM_FIELDS) ?
+      (int) (find_bit(bit_set[field_id]) + (field_id << FIELD_LOG2))  :  -1;
+  }
+
+  /// Return index of first one in sequence AFTER start_pos (or -1 if no ones)
+  template <size_t NUM_BITS>
+  int BitSet<NUM_BITS>::FindBit(const size_t start_pos) const {
+    if (start_pos >= NUM_BITS) return -1;            // If we're past the end, return fail.
+    size_t field_id  = FieldID(start_pos);           // What field do we start in?
+    const size_t field_pos = FieldPos(start_pos);    // What position in that field?
+
+    // If there's a hit in a partial first field, return it.
+    if (field_pos && (bit_set[field_id] & ~(MaskLow<field_t>(field_pos)))) {
+      return (int) (find_bit(bit_set[field_id] & ~(MaskLow<field_t>(field_pos))) +
+                    field_id * FIELD_BITS);
+    }
+
+    // Search other fields...
+    if (field_pos) field_id++;
+    while (field_id < NUM_FIELDS && bit_set[field_id]==0) field_id++;
+    return (field_id < NUM_FIELDS) ?
+      (int) (find_bit(bit_set[field_id]) + (field_id * FIELD_BITS)) : -1;
+  }
+
+
+  /// Return index of first one in sequence (or -1 if no ones); change this position to zero.
+  template <size_t NUM_BITS>
+  int BitSet<NUM_BITS>::PopBit() {
+    const int out_bit = FindBit();
+    if (out_bit >= 0) Clear(out_bit);
+    return out_bit;
+  }
+
+  /// Return a vector indicating the posistions of all ones in the BitSet.
+  template <size_t NUM_BITS>
+  emp::vector<size_t> BitSet<NUM_BITS>::GetOnes() const {
+    // @CAO -- There are better ways to do this with bit tricks.
+    emp::vector<size_t> out_set(CountOnes());
+    size_t cur_pos = 0;
+    for (size_t i = 0; i < NUM_BITS; i++) {
+      if (Get(i)) out_set[cur_pos++] = i;
+    }
+    return out_set;
+  }
+
+  /// Find the length of the longest continuous series of ones.
+  template <size_t NUM_BITS>
+  size_t BitSet<NUM_BITS>::LongestSegmentOnes() const {
+    size_t length = 0;
+    BitSet test_bits(*this);
+    while(test_bits.Any()){
+      ++length;
+      test_bits.AND_SELF(test_bits<<1);
+    }
+    return length;
+  }
+
 
 
   // -------------------------  Extra Functions  -------------------------
