@@ -398,6 +398,9 @@ namespace emp {
     /// Return positions of all ones.
     emp::vector<size_t> GetOnes() const;
 
+    /// Find the length of the longest continuous series of ones.
+    size_t LongestSegmentOnes() const;
+
 
     // >>>>>>>>>>  Print/String Functions  <<<<<<<<<< //
 
@@ -1303,10 +1306,12 @@ namespace emp {
   ///   for (int pos = bv.FindBit(); pos >= 0; pos = bv.FindBit(pos+1)) { ... }
 
   int BitVector::FindBit(const size_t start_pos) const {
-    if (start_pos >= num_bits) return -1;
-    size_t field_id  = FieldID(start_pos);     // What field do we start in?
+    if (start_pos >= num_bits) return -1;            // If we're past the end, return fail.
+    size_t field_id  = FieldID(start_pos);           // What field do we start in?
     const size_t field_pos = FieldPos(start_pos);    // What position in that field?
-    if (field_pos && (bits[field_id] & ~(MaskLow<field_t>(field_pos)))) {  // First field hit!
+
+    // If there's a hit in a partial first field, return it.
+    if (field_pos && (bits[field_id] & ~(MaskLow<field_t>(field_pos)))) {
       return (int) (find_bit(bits[field_id] & ~(MaskLow<field_t>(field_pos))) +
                     field_id * FIELD_BITS);
     }
@@ -1321,14 +1326,9 @@ namespace emp {
 
   /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
   int BitVector::PopBit() {
-    const size_t NUM_FIELDS = NumFields();
-    size_t field_id = 0;
-    while (field_id < NUM_FIELDS && bits[field_id]==0) field_id++;
-    if (field_id == NUM_FIELDS) return -1;  // Failed to find bit!
-
-    const size_t pos_found = find_bit(bits[field_id]);
-    bits[field_id] &= ~(FIELD_1 << pos_found);
-    return (int) (pos_found + (field_id * FIELD_BITS));
+    const int out_bit = FindBit();
+    if (out_bit >= 0) Clear(out_bit);
+    return out_bit;
   }
 
   /// Return positions of all ones.
@@ -1340,6 +1340,17 @@ namespace emp {
       if (Get(i)) out_vals[cur_pos++] = i;
     }
     return out_vals;
+  }
+
+  /// Find the length of the longest continuous series of ones.
+  size_t BitVector::LongestSegmentOnes() const {
+    size_t length = 0;
+    BitVector test_bits(*this);
+    while(test_bits.Any()){
+      ++length;
+      test_bits.AND_SELF(test_bits<<1);
+    }
+    return length;
   }
 
   /// Convert this BitVector to a string.
