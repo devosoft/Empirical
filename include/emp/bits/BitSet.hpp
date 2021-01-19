@@ -430,387 +430,97 @@ namespace emp {
 
 
     /// Perform a Boolean NOT on this BitSet and return the result.
-    BitSet NOT() const {
-      BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~bit_set[i];
-      out_set.ClearExcessBits();
-      return out_set;
-    }
+    BitSet NOT() const;
 
     /// Perform a Boolean AND with a second BitSet and return the result.
-    BitSet AND(const BitSet & set2) const {
-      BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] & set2.bit_set[i];
-      return out_set;
-    }
+    BitSet AND(const BitSet & set2);
 
     /// Perform a Boolean OR with a second BitSet and return the result.
-    BitSet OR(const BitSet & set2) const {
-      BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] | set2.bit_set[i];
-      return out_set;
-    }
+    BitSet OR(const BitSet & set2) const;
 
     /// Perform a Boolean NAND with a second BitSet and return the result.
-    BitSet NAND(const BitSet & set2) const {
-      BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-      out_set.ClearExcessBits();
-      return out_set;
-    }
+    BitSet NAND(const BitSet & set2) const;
 
     /// Perform a Boolean NOR with a second BitSet and return the result.
-    BitSet NOR(const BitSet & set2) const {
-      BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-      out_set.ClearExcessBits();
-      return out_set;
-    }
+    BitSet NOR(const BitSet & set2) const;
 
     /// Perform a Boolean XOR with a second BitSet and return the result.
-    BitSet XOR(const BitSet & set2) const {
-      BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] ^ set2.bit_set[i];
-      return out_set;
-    }
+    BitSet XOR(const BitSet & set2) const;
 
     /// Perform a Boolean EQU with a second BitSet and return the result.
-    BitSet EQU(const BitSet & set2) const {
-      BitSet out_set(*this);
-      for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-      out_set.ClearExcessBits();
-      return out_set;
-    }
-
+    BitSet EQU(const BitSet & set2) const;
 
     /// Perform a Boolean NOT on this BitSet, store result here, and return this object.
-    BitSet & NOT_SELF() {
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
-      ClearExcessBits();
-      return *this;
-    }
+    BitSet & NOT_SELF();
 
     /// Perform a Boolean AND with a second BitSet, store result here, and return this object.
-    BitSet & AND_SELF(const BitSet & set2) {
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] & set2.bit_set[i];
-      return *this;
-    }
+    BitSet & AND_SELF(const BitSet & set2);
 
     /// Perform a Boolean OR with a second BitSet, store result here, and return this object.
-    BitSet & OR_SELF(const BitSet & set2) {
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] | set2.bit_set[i];
-      return *this;
-    }
+    BitSet & OR_SELF(const BitSet & set2);
 
     /// Perform a Boolean NAND with a second BitSet, store result here, and return this object.
-    BitSet & NAND_SELF(const BitSet & set2) {
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-      ClearExcessBits();
-      return *this;
-    }
+    BitSet & NAND_SELF(const BitSet & set2);
 
     /// Perform a Boolean NOR with a second BitSet, store result here, and return this object.
-    BitSet & NOR_SELF(const BitSet & set2) {
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-      ClearExcessBits();
-      return *this;
-    }
+    BitSet & NOR_SELF(const BitSet & set2);
 
     /// Perform a Boolean XOR with a second BitSet, store result here, and return this object.
-    BitSet & XOR_SELF(const BitSet & set2) {
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] ^ set2.bit_set[i];
-      return *this;
-    }
+    BitSet & XOR_SELF(const BitSet & set2);
 
     /// Perform a Boolean EQU with a second BitSet, store result here, and return this object.
-    BitSet & EQU_SELF(const BitSet & set2) {
-      for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-      ClearExcessBits();
-      return *this;
-    }
+    BitSet & EQU_SELF(const BitSet & set2);
 
     /// Positive shifts go right and negative shifts go left (0 does nothing);
     /// return result.
-    BitSet SHIFT(const int shift_size) const {
-      BitSet out_set(*this);
-      if (shift_size > 0) out_set.ShiftRight((field_t) shift_size);
-      else if (shift_size < 0) out_set.ShiftLeft((field_t) (-shift_size));
-      return out_set;
-    }
+    BitSet SHIFT(const int shift_size) const;
 
     /// Positive shifts go right and negative shifts go left (0 does nothing);
     /// store result here, and return this object.
-    BitSet & SHIFT_SELF(const int shift_size) {
-      if (shift_size > 0) ShiftRight((field_t) shift_size);
-      else if (shift_size < 0) ShiftLeft((field_t) -shift_size);
-      return *this;
-    }
+    BitSet & SHIFT_SELF(const int shift_size);
 
     /// Reverse the order of bits in the bitset
-    BitSet & REVERSE_SELF() {
-
-      // reverse bytes
-      std::reverse( BytePtr(), BytePtr() + TOTAL_BYTES );
-
-      // reverse each byte
-      // adapted from https://stackoverflow.com/questions/2602823/in-c-c-whats-the-simplest-way-to-reverse-the-order-of-bits-in-a-byte
-      for (size_t i = 0; i < TOTAL_BYTES; ++i) {
-        unsigned char & b = BytePtr()[i];
-        b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
-        b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
-        b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
-      }
-
-      // shift out filler bits
-      constexpr size_t filler_bits = NUM_BITS % 8;
-      if constexpr (filler_bits != 0) {
-        this->ShiftRight(8-filler_bits);
-      }
-
-      return *this;
-
-    }
+    BitSet & REVERSE_SELF();
 
     /// Reverse order of bits in the bitset.
-    BitSet REVERSE() const {
-      BitSet out_set(*this);
-      return out_set.REVERSE_SELF();
-    }
-
+    BitSet REVERSE() const;
 
     /// Positive rotates go left and negative rotates go left (0 does nothing);
     /// return result.
-    BitSet ROTATE(const int rotate_size) const {
-      BitSet out_set(*this);
-      if (rotate_size > 0) out_set.RotateRight((field_t) rotate_size);
-      else if (rotate_size < 0) out_set.RotateLeft((field_t) (-rotate_size));
-      return out_set;
-    }
+    BitSet ROTATE(const int rotate_size) const;
 
     /// Positive rotates go right and negative rotates go left (0 does nothing);
     /// store result here, and return this object.
-    BitSet & ROTATE_SELF(const int rotate_size) {
-      if (rotate_size > 0) RotateRight((field_t) rotate_size);
-      else if (rotate_size < 0) RotateLeft((field_t) -rotate_size);
-      return *this;
-    }
+    BitSet & ROTATE_SELF(const int rotate_size);
 
     /// Helper: call ROTATE with negative number instead
     template<size_t shift_size_raw>
-    BitSet & ROTL_SELF() {
-      constexpr size_t shift_size = shift_size_raw % NUM_BITS;
-
-      // special case: for exactly one field_t, try to go low level
-      // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
-      if constexpr (NUM_FIELDS == 1) {
-        field_t & n = bit_set[0];
-        size_t c = shift_size;
-
-        // mask necessary to suprress shift count overflow warnings
-        c &= FIELD_LOG2_MASK;
-        n = (n<<c) | (n>>( (-(c+FIELD_BITS-NUM_BITS)) & FIELD_LOG2_MASK ));
-
-      } else {
-
-        // note that we already modded shift_size by NUM_BITS
-        // so there's no need to mod by FIELD_SIZE here
-        constexpr int field_shift = NUM_END_BITS ? (
-          (shift_size + FIELD_BITS - NUM_END_BITS) / FIELD_BITS
-        ) : (
-          shift_size / FIELD_BITS
-        );
-        // if we field shift, we need to shift bits by (FIELD_BITS - NUM_END_BITS)
-        // more to account for the filler that gets pulled out of the middle
-        constexpr int bit_shift = NUM_END_BITS && field_shift ? (
-          (shift_size + FIELD_BITS - NUM_END_BITS) % FIELD_BITS
-        ) : (
-          shift_size % FIELD_BITS
-        );
-        constexpr int bit_overflow = FIELD_BITS - bit_shift;
-
-        // if rotating more than field capacity, we need to rotate fields
-        if constexpr ((bool)field_shift) {
-          std::rotate(
-            std::rbegin(bit_set),
-            std::rbegin(bit_set)+field_shift,
-            std::rend(bit_set)
-          );
-        }
-
-        // if necessary, shift filler bits out of the middle
-        if constexpr ((bool)NUM_END_BITS) {
-          const int filler_idx = (LAST_FIELD + field_shift) % NUM_FIELDS;
-          for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
-            bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
-            bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
-          }
-        }
-
-        // account for bit_shift
-        if (bit_shift) {
-
-          const field_t keystone = NUM_END_BITS ? (
-            (bit_set[LAST_FIELD] << (FIELD_BITS - NUM_END_BITS))
-            | (bit_set[NUM_FIELDS - 2] >> NUM_END_BITS)
-          ) : (
-            bit_set[LAST_FIELD]
-          );
-
-          for (int i = LAST_FIELD; i > 0; --i) {
-            bit_set[i] <<= bit_shift;
-            bit_set[i] |= (bit_set[i-1] >> bit_overflow);
-          }
-          // Handle final field
-          bit_set[0] <<= bit_shift;
-          bit_set[0] |= keystone >> bit_overflow;
-
-        }
-
-      }
-
-      ClearExcessBits();
-
-      return *this;
-
-    }
-
+    BitSet & ROTL_SELF();
 
     /// Helper for calling ROTATE with positive number
     template<size_t shift_size_raw>
-    BitSet & ROTR_SELF() {
-
-      constexpr size_t shift_size = shift_size_raw % NUM_BITS;
-
-      // special case: for exactly one field_t, try to go low level
-      // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
-      if constexpr (NUM_FIELDS == 1) {
-        field_t & n = bit_set[0];
-        size_t c = shift_size;
-
-        // mask necessary to suprress shift count overflow warnings
-        c &= FIELD_LOG2_MASK;
-        n = (n>>c) | (n<<( (NUM_BITS-c) & FIELD_LOG2_MASK ));
-
-      } else {
-
-        constexpr field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
-        constexpr int bit_shift = shift_size % FIELD_BITS;
-        constexpr field_t bit_overflow = FIELD_BITS - bit_shift;
-
-        // if rotating more than field capacity, we need to rotate fields
-        if constexpr ((bool)field_shift) {
-          std::rotate(
-            std::begin(bit_set),
-            std::begin(bit_set)+field_shift,
-            std::end(bit_set)
-          );
-        }
-
-        // if necessary, shift filler bits out of the middle
-        if constexpr ((bool)NUM_END_BITS) {
-          constexpr int filler_idx = LAST_FIELD - field_shift;
-          for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
-            bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
-            bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
-          }
-        }
-
-        // account for bit_shift
-        if (bit_shift) {
-
-          const field_t keystone = NUM_END_BITS ? (
-            bit_set[0] >> (FIELD_BITS - NUM_END_BITS)
-          ) : (
-            bit_set[0]
-          );
-
-          if constexpr ((bool)NUM_END_BITS) {
-            bit_set[NUM_FIELDS-1] |= bit_set[0] << NUM_END_BITS;
-          }
-
-          for (size_t i = 0; i < LAST_FIELD; ++i) {
-            bit_set[i] >>= bit_shift;
-            bit_set[i] |= (bit_set[i+1] << bit_overflow);
-          }
-          bit_set[LAST_FIELD] >>= bit_shift;
-          bit_set[LAST_FIELD] |= keystone << bit_overflow;
-        }
-      }
-
-      ClearExcessBits();
-
-      return *this;
-
-    }
+    BitSet & ROTR_SELF();
 
     /// Addition of two Bitsets.
     /// Wraps if it overflows.
     /// Returns result.
-    BitSet ADD(const BitSet & set2) const{
-      BitSet out_set(*this);
-      return out_set.ADD_SELF(set2);
-    }
+    BitSet ADD(const BitSet & set2) const;
 
     /// Addition of two Bitsets.
     /// Wraps if it overflows.
     /// Returns this object.
-    BitSet & ADD_SELF(const BitSet & set2) {
-      bool carry = false;
-
-      for (size_t i = 0; i < NUM_BITS/FIELD_BITS; ++i) {
-        field_t addend = set2.bit_set[i] + static_cast<field_t>(carry);
-        carry = set2.bit_set[i] > addend;
-
-        field_t sum = bit_set[i] + addend;
-        carry |= bit_set[i] > sum;
-
-        bit_set[i] = sum;
-      }
-
-      if constexpr (static_cast<bool>(NUM_END_BITS)) {
-        bit_set[NUM_BITS/FIELD_BITS] = (
-          bit_set[NUM_BITS/FIELD_BITS]
-          + set2.bit_set[NUM_BITS/FIELD_BITS]
-          + static_cast<field_t>(carry)
-        ) & END_MASK;
-      }
-
-      return *this;
-    }
+    BitSet & ADD_SELF(const BitSet & set2);
 
     /// Subtraction of two Bitsets.
     /// Wraps around if it underflows.
     /// Returns result.
-    BitSet SUB(const BitSet & set2) const{
-      BitSet out_set(*this);
-      return out_set.SUB_SELF(set2);
-    }
+    BitSet SUB(const BitSet & set2) const;
 
     /// Subtraction of two Bitsets.
     /// Wraps if it underflows.
     /// Returns this object.
-    BitSet & SUB_SELF(const BitSet & set2){
-
-      bool carry = false;
-
-      for (size_t i = 0; i < NUM_BITS/FIELD_BITS; ++i) {
-        field_t subtrahend = set2.bit_set[i] + static_cast<field_t>(carry);
-        carry = set2.bit_set[i] > subtrahend;
-        carry |= bit_set[i] < subtrahend;
-        bit_set[i] -= subtrahend;
-     }
-
-      if constexpr (static_cast<bool>(NUM_END_BITS)) {
-        bit_set[NUM_BITS/FIELD_BITS] = (
-          bit_set[NUM_BITS/FIELD_BITS]
-          - set2.bit_set[NUM_BITS/FIELD_BITS]
-          - static_cast<field_t>(carry)
-        ) & END_MASK;
-      }
-
-      return *this;
-    }
-
+    BitSet & SUB_SELF(const BitSet & set2);
+    
     /// Operator bitwise NOT...
     BitSet operator~() const { return NOT(); }
 
@@ -1796,6 +1506,418 @@ namespace emp {
     bs.Print(out);
     return out;
   }
+
+
+  // -------------------------  Whole BitSet manipulation functions  -------------------------
+
+  /// Perform a Boolean NOT on this BitSet and return the result.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> BitSet<NUM_BITS>::NOT() const {
+    BitSet<NUM_BITS> out_set(*this);
+    for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~bit_set[i];
+    out_set.ClearExcessBits();
+    return out_set;
+  }
+
+  /// Perform a Boolean AND with a second BitSet and return the result.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> BitSet<NUM_BITS>::AND(const BitSet<NUM_BITS> & set2) const {
+    BitSet<NUM_BITS> out_set(*this);
+    for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] & set2.bit_set[i];
+    return out_set;
+  }
+
+  /// Perform a Boolean OR with a second BitSet and return the result.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> BitSet<NUM_BITS>::OR(const BitSet<NUM_BITS> & set2) const {
+    BitSet<NUM_BITS> out_set(*this);
+    for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] | set2.bit_set[i];
+    return out_set;
+  }
+
+  /// Perform a Boolean NAND with a second BitSet and return the result.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> BitSet<NUM_BITS>::NAND(const BitSet<NUM_BITS> & set2) const {
+    BitSet<NUM_BITS> out_set(*this);
+    for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
+    out_set.ClearExcessBits();
+    return out_set;
+  }
+
+  /// Perform a Boolean NOR with a second BitSet and return the result.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> BitSet<NUM_BITS>::NOR(const BitSet<NUM_BITS> & set2) const {
+    BitSet<NUM_BITS> out_set(*this);
+    for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
+    out_set.ClearExcessBits();
+    return out_set;
+  }
+
+  /// Perform a Boolean XOR with a second BitSet and return the result.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> BitSet<NUM_BITS>::XOR(const BitSet<NUM_BITS> & set2) const {
+    BitSet<NUM_BITS> out_set(*this);
+    for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] ^ set2.bit_set[i];
+    return out_set;
+  }
+
+  /// Perform a Boolean EQU with a second BitSet and return the result.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> BitSet<NUM_BITS>::EQU(const BitSet & set2) const {
+    BitSet<NUM_BITS> out_set(*this);
+    for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
+    out_set.ClearExcessBits();
+    return out_set;
+  }
+
+
+  /// Perform a Boolean NOT on this BitSet, store result here, and return this object.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::NOT_SELF() {
+    for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~bit_set[i];
+    ClearExcessBits();
+    return *this;
+  }
+
+  /// Perform a Boolean AND with a second BitSet, store result here, and return this object.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::AND_SELF(const BitSet<NUM_BITS> & set2) {
+    for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] & set2.bit_set[i];
+    return *this;
+  }
+
+  /// Perform a Boolean OR with a second BitSet, store result here, and return this object.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::OR_SELF(const BitSet<NUM_BITS> & set2) {
+    for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] | set2.bit_set[i];
+    return *this;
+  }
+
+  /// Perform a Boolean NAND with a second BitSet, store result here, and return this object.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::NAND_SELF(const BitSet<NUM_BITS> & set2) {
+    for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
+    ClearExcessBits();
+    return *this;
+  }
+
+  /// Perform a Boolean NOR with a second BitSet, store result here, and return this object.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>NOR_SELF(const BitSet<NUM_BITS> & set2) {
+    for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
+    ClearExcessBits();
+    return *this;
+  }
+
+  /// Perform a Boolean XOR with a second BitSet, store result here, and return this object.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::XOR_SELF(const BitSet<NUM_BITS> & set2) {
+    for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = bit_set[i] ^ set2.bit_set[i];
+    return *this;
+  }
+
+  /// Perform a Boolean EQU with a second BitSet, store result here, and return this object.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::EQU_SELF(const BitSet<NUM_BITS> & set2) {
+    for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
+    ClearExcessBits();
+    return *this;
+  }
+
+  /// Positive shifts go right and negative shifts go left (0 does nothing);
+  /// return result.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> BitSet<NUM_BITS>::SHIFT(const int shift_size) const {
+    BitSet<NUM_BITS> out_set(*this);
+    if (shift_size > 0) out_set.ShiftRight((field_t) shift_size);
+    else if (shift_size < 0) out_set.ShiftLeft((field_t) (-shift_size));
+    return out_set;
+  }
+
+  /// Positive shifts go right and negative shifts go left (0 does nothing);
+  /// store result here, and return this object.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::SHIFT_SELF(const int shift_size) {
+    if (shift_size > 0) ShiftRight((field_t) shift_size);
+    else if (shift_size < 0) ShiftLeft((field_t) -shift_size);
+    return *this;
+  }
+
+  /// Reverse the order of bits in the bitset
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::REVERSE_SELF() {
+
+    // reverse bytes
+    std::reverse( BytePtr(), BytePtr() + TOTAL_BYTES );
+
+    // reverse each byte
+    // adapted from https://stackoverflow.com/questions/2602823/in-c-c-whats-the-simplest-way-to-reverse-the-order-of-bits-in-a-byte
+    for (size_t i = 0; i < TOTAL_BYTES; ++i) {
+      unsigned char & b = BytePtr()[i];
+      b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+      b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+      b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+    }
+
+    // shift out filler bits
+    constexpr size_t filler_bits = NUM_BITS % 8;
+    if constexpr (filler_bits != 0) {
+      this->ShiftRight(8-filler_bits);
+    }
+
+    return *this;
+
+  }
+
+  /// Reverse order of bits in the bitset.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> BitSet<NUM_BITS>::REVERSE() const {
+    BitSet<NUM_BITS> out_set(*this);
+    return out_set.REVERSE_SELF();
+  }
+
+
+  /// Positive rotates go left and negative rotates go left (0 does nothing);
+  /// return result.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> BitSet<NUM_BITS>::ROTATE(const int rotate_size) const {
+    BitSet<NUM_BITS> out_set(*this);
+    if (rotate_size > 0) out_set.RotateRight((field_t) rotate_size);
+    else if (rotate_size < 0) out_set.RotateLeft((field_t) (-rotate_size));
+    return out_set;
+  }
+
+  /// Positive rotates go right and negative rotates go left (0 does nothing);
+  /// store result here, and return this object.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::ROTATE_SELF(const int rotate_size) {
+    if (rotate_size > 0) RotateRight((field_t) rotate_size);
+    else if (rotate_size < 0) RotateLeft((field_t) -rotate_size);
+    return *this;
+  }
+
+  /// Helper: call ROTATE with negative number instead
+  template <size_t NUM_BITS>
+  template<size_t shift_size_raw>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::ROTL_SELF() {
+    constexpr size_t shift_size = shift_size_raw % NUM_BITS;
+
+    // special case: for exactly one field_t, try to go low level
+    // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
+    if constexpr (NUM_FIELDS == 1) {
+      field_t & n = bit_set[0];
+      size_t c = shift_size;
+
+      // mask necessary to suprress shift count overflow warnings
+      c &= FIELD_LOG2_MASK;
+      n = (n<<c) | (n>>( (-(c+FIELD_BITS-NUM_BITS)) & FIELD_LOG2_MASK ));
+
+    } else {
+
+      // note that we already modded shift_size by NUM_BITS
+      // so there's no need to mod by FIELD_SIZE here
+      constexpr int field_shift = NUM_END_BITS ? (
+        (shift_size + FIELD_BITS - NUM_END_BITS) / FIELD_BITS
+      ) : (
+        shift_size / FIELD_BITS
+      );
+      // if we field shift, we need to shift bits by (FIELD_BITS - NUM_END_BITS)
+      // more to account for the filler that gets pulled out of the middle
+      constexpr int bit_shift = NUM_END_BITS && field_shift ? (
+        (shift_size + FIELD_BITS - NUM_END_BITS) % FIELD_BITS
+      ) : (
+        shift_size % FIELD_BITS
+      );
+      constexpr int bit_overflow = FIELD_BITS - bit_shift;
+
+      // if rotating more than field capacity, we need to rotate fields
+      if constexpr ((bool)field_shift) {
+        std::rotate(
+          std::rbegin(bit_set),
+          std::rbegin(bit_set)+field_shift,
+          std::rend(bit_set)
+        );
+      }
+
+      // if necessary, shift filler bits out of the middle
+      if constexpr ((bool)NUM_END_BITS) {
+        const int filler_idx = (LAST_FIELD + field_shift) % NUM_FIELDS;
+        for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
+          bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
+          bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
+        }
+      }
+
+      // account for bit_shift
+      if (bit_shift) {
+
+        const field_t keystone = NUM_END_BITS ? (
+          (bit_set[LAST_FIELD] << (FIELD_BITS - NUM_END_BITS))
+          | (bit_set[NUM_FIELDS - 2] >> NUM_END_BITS)
+        ) : (
+          bit_set[LAST_FIELD]
+        );
+
+        for (int i = LAST_FIELD; i > 0; --i) {
+          bit_set[i] <<= bit_shift;
+          bit_set[i] |= (bit_set[i-1] >> bit_overflow);
+        }
+        // Handle final field
+        bit_set[0] <<= bit_shift;
+        bit_set[0] |= keystone >> bit_overflow;
+
+      }
+
+    }
+
+    ClearExcessBits();
+
+    return *this;
+
+  }
+
+
+  /// Helper for calling ROTATE with positive number
+  template <size_t NUM_BITS>
+  template<size_t shift_size_raw>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::ROTR_SELF() {
+
+    constexpr size_t shift_size = shift_size_raw % NUM_BITS;
+
+    // special case: for exactly one field_t, try to go low level
+    // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
+    if constexpr (NUM_FIELDS == 1) {
+      field_t & n = bit_set[0];
+      size_t c = shift_size;
+
+      // mask necessary to suprress shift count overflow warnings
+      c &= FIELD_LOG2_MASK;
+      n = (n>>c) | (n<<( (NUM_BITS-c) & FIELD_LOG2_MASK ));
+
+    } else {
+
+      constexpr field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
+      constexpr int bit_shift = shift_size % FIELD_BITS;
+      constexpr field_t bit_overflow = FIELD_BITS - bit_shift;
+
+      // if rotating more than field capacity, we need to rotate fields
+      if constexpr ((bool)field_shift) {
+        std::rotate(
+          std::begin(bit_set),
+          std::begin(bit_set)+field_shift,
+          std::end(bit_set)
+        );
+      }
+
+      // if necessary, shift filler bits out of the middle
+      if constexpr ((bool)NUM_END_BITS) {
+        constexpr int filler_idx = LAST_FIELD - field_shift;
+        for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
+          bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
+          bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
+        }
+      }
+
+      // account for bit_shift
+      if (bit_shift) {
+
+        const field_t keystone = NUM_END_BITS ? (
+          bit_set[0] >> (FIELD_BITS - NUM_END_BITS)
+        ) : (
+          bit_set[0]
+        );
+
+        if constexpr ((bool)NUM_END_BITS) {
+          bit_set[NUM_FIELDS-1] |= bit_set[0] << NUM_END_BITS;
+        }
+
+        for (size_t i = 0; i < LAST_FIELD; ++i) {
+          bit_set[i] >>= bit_shift;
+          bit_set[i] |= (bit_set[i+1] << bit_overflow);
+        }
+        bit_set[LAST_FIELD] >>= bit_shift;
+        bit_set[LAST_FIELD] |= keystone << bit_overflow;
+      }
+    }
+
+    ClearExcessBits();
+
+    return *this;
+
+  }
+
+  /// Addition of two Bitsets.
+  /// Wraps if it overflows.
+  /// Returns result.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> BitSet<NUM_BITS>::ADD(const BitSet & set2) const{
+    BitSet<NUM_BITS> out_set(*this);
+    return out_set.ADD_SELF(set2);
+  }
+
+  /// Addition of two Bitsets.
+  /// Wraps if it overflows.
+  /// Returns this object.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::ADD_SELF(const BitSet<NUM_BITS> & set2) {
+    bool carry = false;
+
+    for (size_t i = 0; i < NUM_BITS/FIELD_BITS; ++i) {
+      field_t addend = set2.bit_set[i] + static_cast<field_t>(carry);
+      carry = set2.bit_set[i] > addend;
+
+      field_t sum = bit_set[i] + addend;
+      carry |= bit_set[i] > sum;
+
+      bit_set[i] = sum;
+    }
+
+    if constexpr (static_cast<bool>(NUM_END_BITS)) {
+      bit_set[NUM_BITS/FIELD_BITS] = (
+        bit_set[NUM_BITS/FIELD_BITS]
+        + set2.bit_set[NUM_BITS/FIELD_BITS]
+        + static_cast<field_t>(carry)
+      ) & END_MASK;
+    }
+
+    return *this;
+  }
+
+  /// Subtraction of two Bitsets.
+  /// Wraps around if it underflows.
+  /// Returns result.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> BitSet<NUM_BITS>::SUB(const BitSet<NUM_BITS> & set2) const{
+    BitSet<NUM_BITS> out_set(*this);
+    return out_set.SUB_SELF(set2);
+  }
+
+  /// Subtraction of two Bitsets.
+  /// Wraps if it underflows.
+  /// Returns this object.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::SUB_SELF(const BitSet<NUM_BITS> & set2){
+
+    bool carry = false;
+
+    for (size_t i = 0; i < NUM_BITS/FIELD_BITS; ++i) {
+      field_t subtrahend = set2.bit_set[i] + static_cast<field_t>(carry);
+      carry = set2.bit_set[i] > subtrahend;
+      carry |= bit_set[i] < subtrahend;
+      bit_set[i] -= subtrahend;
+    }
+
+    if constexpr (static_cast<bool>(NUM_END_BITS)) {
+      bit_set[NUM_BITS/FIELD_BITS] = (
+        bit_set[NUM_BITS/FIELD_BITS]
+        - set2.bit_set[NUM_BITS/FIELD_BITS]
+        - static_cast<field_t>(carry)
+      ) & END_MASK;
+    }
+
+    return *this;
+  }
+
 
   // -------------------------  Extra Functions  -------------------------
 
