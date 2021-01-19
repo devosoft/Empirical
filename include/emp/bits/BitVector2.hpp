@@ -21,7 +21,6 @@
  *  @todo Think about how itertors should work for BitVector.  It should probably go bit-by-bit,
  *        but there are very few circumstances where that would be useful.  Going through the
  *        positions of all ones would be more useful, but perhaps less intuitive.
- *  @todo Port Rotate() over from BitSet.
  *
  *  @note This class is 15-20% slower than emp::BitSet, but more flexible & run-time configurable.
  */
@@ -114,6 +113,12 @@ namespace emp {
 
     // Helper for calling SHIFT with negative number
     void ShiftRight(const size_t shift_size);
+
+    /// Helper: call ROTATE with negative number instead
+    void RotateLeft(const size_t shift_size_raw);
+
+    /// Helper for calling ROTATE with positive number
+    void RotateRight(const size_t shift_size_raw);
 
     // Scan this bitvector to make sure that there are no internal problems.
     bool OK() const;
@@ -478,6 +483,49 @@ namespace emp {
     /// Positive shifts go left and negative go right; store result here, and return this object.
     BitVector & SHIFT_SELF(const int shift_size);
 
+    /// Reverse the order of bits in the bitset
+    BitVector & REVERSE_SELF();
+
+    /// Reverse order of bits in the bitset.
+    BitVector REVERSE() const;
+
+    /// Positive rotates go left and negative rotates go left (0 does nothing);
+    /// return result.
+    BitVector ROTATE(const int rotate_size) const;
+
+    /// Positive rotates go right and negative rotates go left (0 does nothing);
+    /// store result here, and return this object.
+    BitVector & ROTATE_SELF(const int rotate_size);
+
+    /// Helper: call ROTATE with negative number instead
+    template<size_t shift_size_raw>
+    BitVector & ROTL_SELF();
+
+    /// Helper for calling ROTATE with positive number
+    template<size_t shift_size_raw>
+    BitVector & ROTR_SELF();
+
+    /// Addition of two BitVectors.
+    /// Wraps if it overflows.
+    /// Returns result.
+    BitVector ADD(const BitVector & set2) const;
+
+    /// Addition of two BitVectors.
+    /// Wraps if it overflows.
+    /// Returns this object.
+    BitVector & ADD_SELF(const BitVector & set2);
+
+    /// Subtraction of two BitVectors.
+    /// Wraps around if it underflows.
+    /// Returns result.
+    BitVector SUB(const BitVector & set2) const;
+
+    /// Subtraction of two BitVectors.
+    /// Wraps if it underflows.
+    /// Returns this object.
+    BitVector & SUB_SELF(const BitVector & set2);
+
+
     /// Operator bitwise NOT...
     BitVector operator~() const { return NOT(); }
 
@@ -603,6 +651,161 @@ namespace emp {
       }
       bits[field_shift2 - 1] >>= bit_shift;
     }
+  }
+
+  /// Helper: call ROTATE with negative number
+  void BitVector::RotateLeft(const size_t shift_size_raw) {
+    const field_t shift_size = shift_size_raw % NUM_BITS;
+
+    // use different approaches based on BitVector size
+    if constexpr (NUM_FIELDS == 1) {
+      // special case: for exactly one field_T, try to go low level
+      // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
+      field_t & n = bit_set[0];
+      size_t c = shift_size;
+
+      // mask necessary to suprress shift count overflow warnings
+      c &= FIELD_LOG2_MASK;
+      n = (n<<c) | (n>>( (-(c+FIELD_BITS-NUM_BITS)) & FIELD_LOG2_MASK ));
+
+    } else if constexpr (NUM_FIELDS < 32) {
+      // for small BitVectors, shifting L/R and ORing is faster
+      emp::BitVector dup(*this);
+      dup.ShiftLeft(shift_size);
+      ShiftRight(NUM_BITS - shift_size);
+      OR_SELF(dup);
+    } else {
+      // for big BitVectors, manual rotating is fater
+
+      // note that we already modded shift_size by NUM_BITS
+      // so there's no need to mod by FIELD_SIZE here
+      const int field_shift = NUM_END_BITS ? (
+        (shift_size + FIELD_BITS - NUM_END_BITS) / FIELD_BITS
+      ) : (
+        shift_size / FIELD_BITS
+      );
+      // if we field shift, we need to shift bits by (FIELD_BITS - NUM_END_BITS)
+      // more to account for the filler that gets pulled out of the middle
+      const int bit_shift = NUM_END_BITS && field_shift ? (
+        (shift_size + FIELD_BITS - NUM_END_BITS) % FIELD_BITS
+      ) : (
+        shift_size % FIELD_BITS
+      );
+      const int bit_overflow = FIELD_BITS - bit_shift;
+
+      // if rotating more than field capacity, we need to rotate fields
+      std::rotate(
+        std::rbegin(bit_set),
+        std::rbegin(bit_set)+field_shift,
+        std::rend(bit_set)
+      );
+
+      // if necessary, shift filler bits out of the middle
+      if constexpr ((bool)NUM_END_BITS) {
+        const int filler_idx = (LAST_FIELD + field_shift) % NUM_FIELDS;
+        for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
+          bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
+          bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
+        }
+      }
+
+      // account for bit_shift
+      if (bit_shift) {
+
+        const field_t keystone = NUM_END_BITS ? (
+          (bit_set[LAST_FIELD] << (FIELD_BITS - NUM_END_BITS))
+          | (bit_set[NUM_FIELDS - 2] >> NUM_END_BITS)
+        ) : (
+          bit_set[LAST_FIELD]
+        );
+
+        for (int i = LAST_FIELD; i > 0; --i) {
+          bit_set[i] <<= bit_shift;
+          bit_set[i] |= (bit_set[i-1] >> bit_overflow);
+        }
+        // Handle final field
+        bit_set[0] <<= bit_shift;
+        bit_set[0] |= keystone >> bit_overflow;
+
+      }
+
+    }
+
+    // Mask out filler bits
+    ClearExcessBits();
+  }
+
+
+  /// Helper for calling ROTATE with positive number
+  void BitVector::RotateRight(const size_t shift_size_raw) {
+
+    const size_t shift_size = shift_size_raw % NUM_BITS;
+
+    // use different approaches based on BitVector size
+    if constexpr (NUM_FIELDS == 1) {
+      // special case: for exactly one field_t, try to go low level
+      // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
+
+      field_t & n = bit_set[0];
+      size_t c = shift_size;
+
+      // mask necessary to suprress shift count overflow warnings
+      c &= FIELD_LOG2_MASK;
+      n = (n>>c) | (n<<( (NUM_BITS-c) & FIELD_LOG2_MASK ));
+
+    } else if constexpr (NUM_FIELDS < 32) {
+      // for small BitVectors, shifting L/R and ORing is faster
+      emp::BitVector dup(*this);
+      dup.ShiftRight(shift_size);
+      ShiftLeft(NUM_BITS - shift_size);
+      OR_SELF(dup);
+    } else {
+      // for big BitVectors, manual rotating is fater
+
+      const field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
+      const int bit_shift = shift_size % FIELD_BITS;
+      const field_t bit_overflow = FIELD_BITS - bit_shift;
+
+      // if rotating more than field capacity, we need to rotate fields
+      std::rotate(
+        std::begin(bit_set),
+        std::begin(bit_set)+field_shift,
+        std::end(bit_set)
+      );
+
+      // if necessary, shift filler bits out of the middle
+      if constexpr (NUM_END_BITS > 0) {
+        const int filler_idx = LAST_FIELD - field_shift;
+        for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
+          bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
+          bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
+        }
+      }
+
+      // account for bit_shift
+      if (bit_shift) {
+
+        const field_t keystone = NUM_END_BITS ? (
+          bit_set[0] >> (FIELD_BITS - NUM_END_BITS)
+        ) : (
+          bit_set[0]
+        );
+
+        if constexpr (NUM_END_BITS > 0) {
+          bit_set[NUM_FIELDS-1] |= bit_set[0] << NUM_END_BITS;
+        }
+
+        for (size_t i = 0; i < LAST_FIELD; ++i) {
+          bit_set[i] >>= bit_shift;
+          bit_set[i] |= (bit_set[i+1] << bit_overflow);
+        }
+        bit_set[LAST_FIELD] >>= bit_shift;
+        bit_set[LAST_FIELD] |= keystone << bit_overflow;
+      }
+    }
+
+    // Mask out filler bits
+    ClearExcessBits();
   }
 
   bool BitVector::OK() const {
@@ -740,7 +943,7 @@ namespace emp {
     return *this;
   }
 
-    /// Assign from a BitSet of a different size.
+    /// Assign from a BitVector of a different size.
   BitVector & BitVector::Import(const BitVector & from_bv, const size_t from_bit) {
     emp_assert(&from_bv != this);
     emp_assert(from_bit < from_bv.GetSize());
@@ -1538,6 +1741,269 @@ namespace emp {
     return *this;
   }
 
+  /// Reverse the order of bits in the bitset
+  BitVector & BitVector::REVERSE_SELF() {
+    // reverse bytes
+    std::reverse( BytePtr(), BytePtr() + NumBytes() );
+
+    // reverse each byte
+    // adapted from https://stackoverflow.com/questions/2602823/in-c-c-whats-the-simplest-way-to-reverse-the-order-of-bits-in-a-byte
+    for (size_t i = 0; i < NumBytes(); ++i) {
+      unsigned char & b = BytePtr()[i];
+      b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+      b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+      b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+    }
+
+    // shift out filler bits
+    size_t filler_bits = num_bits % 8;
+    if (filler_bits) {
+      this->ShiftRight(8-filler_bits);
+    }
+
+    return *this;
+
+  }
+
+  /// Reverse order of bits in the bitset.
+  BitVector BitVector::REVERSE() const {
+    BitVector out_set(*this);
+    return out_set.REVERSE_SELF();
+  }
+
+
+  /// Positive rotates go left and negative rotates go left (0 does nothing);
+  /// return result.
+  BitVector BitVector::ROTATE(const int rotate_size) const {
+    BitVector out_set(*this);
+    if (rotate_size > 0) out_set.RotateRight((field_t) rotate_size);
+    else if (rotate_size < 0) out_set.RotateLeft((field_t) (-rotate_size));
+    return out_set;
+  }
+
+  /// Positive rotates go right and negative rotates go left (0 does nothing);
+  /// store result here, and return this object.
+  BitVector & BitVector::ROTATE_SELF(const int rotate_size) {
+    if (rotate_size > 0) RotateRight((field_t) rotate_size);
+    else if (rotate_size < 0) RotateLeft((field_t) -rotate_size);
+    return *this;
+  }
+
+  /// Helper: call ROTATE with negative number instead
+  template<size_t shift_size_raw>
+  BitVector & BitVector::ROTL_SELF() {
+    constexpr size_t shift_size = shift_size_raw % num_bits;
+
+    // special case: for exactly one field_t, try to go low level
+    // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
+    if constexpr (NUM_FIELDS == 1) {
+      field_t & n = bit_set[0];
+      size_t c = shift_size;
+
+      // mask necessary to suprress shift count overflow warnings
+      c &= FIELD_LOG2_MASK;
+      n = (n<<c) | (n>>( (-(c+FIELD_BITS-num_bits)) & FIELD_LOG2_MASK ));
+
+    } else {
+
+      // note that we already modded shift_size by num_bits
+      // so there's no need to mod by FIELD_SIZE here
+      constexpr int field_shift = NUM_END_BITS ? (
+        (shift_size + FIELD_BITS - NUM_END_BITS) / FIELD_BITS
+      ) : (
+        shift_size / FIELD_BITS
+      );
+      // if we field shift, we need to shift bits by (FIELD_BITS - NUM_END_BITS)
+      // more to account for the filler that gets pulled out of the middle
+      constexpr int bit_shift = NUM_END_BITS && field_shift ? (
+        (shift_size + FIELD_BITS - NUM_END_BITS) % FIELD_BITS
+      ) : (
+        shift_size % FIELD_BITS
+      );
+      constexpr int bit_overflow = FIELD_BITS - bit_shift;
+
+      // if rotating more than field capacity, we need to rotate fields
+      if constexpr ((bool)field_shift) {
+        std::rotate(
+          std::rbegin(bit_set),
+          std::rbegin(bit_set)+field_shift,
+          std::rend(bit_set)
+        );
+      }
+
+      // if necessary, shift filler bits out of the middle
+      if constexpr ((bool)NUM_END_BITS) {
+        const int filler_idx = (LAST_FIELD + field_shift) % NUM_FIELDS;
+        for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
+          bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
+          bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
+        }
+      }
+
+      // account for bit_shift
+      if (bit_shift) {
+
+        const field_t keystone = NUM_END_BITS ? (
+          (bit_set[LAST_FIELD] << (FIELD_BITS - NUM_END_BITS))
+          | (bit_set[NUM_FIELDS - 2] >> NUM_END_BITS)
+        ) : (
+          bit_set[LAST_FIELD]
+        );
+
+        for (int i = LAST_FIELD; i > 0; --i) {
+          bit_set[i] <<= bit_shift;
+          bit_set[i] |= (bit_set[i-1] >> bit_overflow);
+        }
+        // Handle final field
+        bit_set[0] <<= bit_shift;
+        bit_set[0] |= keystone >> bit_overflow;
+
+      }
+
+    }
+
+    ClearExcessBits();
+
+    return *this;
+
+  }
+
+
+  /// Helper for calling ROTATE with positive number
+  template<size_t shift_size_raw>
+  BitVector & BitVector::ROTR_SELF() {
+
+    constexpr size_t shift_size = shift_size_raw % num_bits;
+
+    // special case: for exactly one field_t, try to go low level
+    // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
+    if constexpr (NUM_FIELDS == 1) {
+      field_t & n = bit_set[0];
+      size_t c = shift_size;
+
+      // mask necessary to suprress shift count overflow warnings
+      c &= FIELD_LOG2_MASK;
+      n = (n>>c) | (n<<( (num_bits-c) & FIELD_LOG2_MASK ));
+
+    } else {
+
+      constexpr field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
+      constexpr int bit_shift = shift_size % FIELD_BITS;
+      constexpr field_t bit_overflow = FIELD_BITS - bit_shift;
+
+      // if rotating more than field capacity, we need to rotate fields
+      if constexpr ((bool)field_shift) {
+        std::rotate(
+          std::begin(bit_set),
+          std::begin(bit_set)+field_shift,
+          std::end(bit_set)
+        );
+      }
+
+      // if necessary, shift filler bits out of the middle
+      if constexpr ((bool)NUM_END_BITS) {
+        constexpr int filler_idx = LAST_FIELD - field_shift;
+        for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
+          bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
+          bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
+        }
+      }
+
+      // account for bit_shift
+      if (bit_shift) {
+
+        const field_t keystone = NUM_END_BITS ? (
+          bit_set[0] >> (FIELD_BITS - NUM_END_BITS)
+        ) : (
+          bit_set[0]
+        );
+
+        if constexpr ((bool)NUM_END_BITS) {
+          bit_set[NUM_FIELDS-1] |= bit_set[0] << NUM_END_BITS;
+        }
+
+        for (size_t i = 0; i < LAST_FIELD; ++i) {
+          bit_set[i] >>= bit_shift;
+          bit_set[i] |= (bit_set[i+1] << bit_overflow);
+        }
+        bit_set[LAST_FIELD] >>= bit_shift;
+        bit_set[LAST_FIELD] |= keystone << bit_overflow;
+      }
+    }
+
+    ClearExcessBits();
+
+    return *this;
+
+  }
+
+  /// Addition of two Bitsets.
+  /// Wraps if it overflows.
+  /// Returns result.
+  BitVector BitVector::ADD(const BitVector & set2) const{
+    BitVector out_set(*this);
+    return out_set.ADD_SELF(set2);
+  }
+
+  /// Addition of two Bitsets.
+  /// Wraps if it overflows.
+  /// Returns this object.
+  BitVector & BitVector::ADD_SELF(const BitVector & set2) {
+    bool carry = false;
+
+    for (size_t i = 0; i < num_bits/FIELD_BITS; ++i) {
+      field_t addend = set2.bit_set[i] + static_cast<field_t>(carry);
+      carry = set2.bit_set[i] > addend;
+
+      field_t sum = bit_set[i] + addend;
+      carry |= bit_set[i] > sum;
+
+      bit_set[i] = sum;
+    }
+
+    if constexpr (static_cast<bool>(NUM_END_BITS)) {
+      bit_set[num_bits/FIELD_BITS] = (
+        bit_set[num_bits/FIELD_BITS]
+        + set2.bit_set[num_bits/FIELD_BITS]
+        + static_cast<field_t>(carry)
+      ) & END_MASK;
+    }
+
+    return *this;
+  }
+
+  /// Subtraction of two Bitsets.
+  /// Wraps around if it underflows.
+  /// Returns result.
+  BitVector BitVector::SUB(const BitVector & set2) const{
+    BitVector out_set(*this);
+    return out_set.SUB_SELF(set2);
+  }
+
+  /// Subtraction of two Bitsets.
+  /// Wraps if it underflows.
+  /// Returns this object.
+  BitVector & BitVector::SUB_SELF(const BitVector & set2){
+
+    bool carry = false;
+
+    for (size_t i = 0; i < num_bits/FIELD_BITS; ++i) {
+      field_t subtrahend = set2.bit_set[i] + static_cast<field_t>(carry);
+      carry = set2.bit_set[i] > subtrahend;
+      carry |= bit_set[i] < subtrahend;
+      bit_set[i] -= subtrahend;
+    }
+
+    if constexpr (static_cast<bool>(NUM_END_BITS)) {
+      bit_set[num_bits/FIELD_BITS] = (
+        bit_set[num_bits/FIELD_BITS]
+        - set2.bit_set[num_bits/FIELD_BITS]
+        - static_cast<field_t>(carry)
+      ) & END_MASK;
+    }
+
+    return *this;
+  }
 
 }
 
