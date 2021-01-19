@@ -22,7 +22,7 @@ namespace emp {
   constexpr bool assert_on = true;
 
   /// Base case for assert_print...
-  void assert_print() { ; }
+  inline void assert_print() { ; }
 
   /// Print out information about the next variable and recurse...
   template <typename T, typename... EXTRA>
