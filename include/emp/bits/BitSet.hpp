@@ -386,13 +386,31 @@ namespace emp {
     /// Find the length of the longest continuous series of ones.
     size_t LongestSegmentOnes() const;
 
-    ////////////////////////////////////////////
-    ////////////////////////////////////////////
-    ////////////////////////////////////////////
-    ///////////// CONTINUE HERE!! //////////////
-    ////////////////////////////////////////////
-    ////////////////////////////////////////////
-    ////////////////////////////////////////////
+
+    // >>>>>>>>>>  Print/String Functions  <<<<<<<<<< //
+
+    /// Convert a specified bit to a character.
+    char GetAsChar(size_t id) const { return Get(id) ? '1' : '0'; }
+
+    /// Convert this BitVector to a string.
+    std::string ToString() const;
+
+    /// Regular print function (from most significant bit to least)
+    void Print(std::ostream & out=std::cout) const;
+
+    /// Print a space between each field (or other provided spacer)
+    void PrintFields(std::ostream & out=std::cout, const std::string & spacer=" ") const;
+
+    /// Print all bits from smallest to largest, as if this were an array, not a bit representation.
+    void PrintArray(std::ostream & out=std::cout) const;
+
+    /// Print the locations of all one bits, using the provided spacer (default is a single space)
+    void PrintOneIDs(std::ostream & out=std::cout, char spacer=' ') const;
+
+    /// Print the ones in a range format.  E.g., 2-5,7,10-15
+    void PrintAsRange(std::ostream & out=std::cout,
+                      const std::string & spacer=",",
+                      const std::string & ranger="-") const;
 
 
     /// Overload ostream operator to return Print.
@@ -401,20 +419,14 @@ namespace emp {
       return out;
     }
 
-    /// Print all bits to the provided output stream.
-    void Print(std::ostream & out=std::cout) const {
-      for (size_t i = NUM_BITS; i > 0; i--) { out << Get(i-1); }
-    }
 
-    /// Print all bits from smallest to largest, as if this were an array, not a bit representation.
-    void PrintArray(std::ostream & out=std::cout) const {
-      for (size_t i = 0; i < NUM_BITS; i++) out << Get(i);
-    }
-
-    /// Print the locations of all one bits, using the provided spacer (default is a single space)
-    void PrintOneIDs(std::ostream & out=std::cout, char spacer=' ') const {
-      for (size_t i = 0; i < NUM_BITS; i++) { if (Get(i)) out << i << spacer; }
-    }
+    ////////////////////////////////////////////
+    ////////////////////////////////////////////
+    ////////////////////////////////////////////
+    ///////////// CONTINUE HERE!! //////////////
+    ////////////////////////////////////////////
+    ////////////////////////////////////////////
+    ////////////////////////////////////////////
 
 
     /// Perform a Boolean NOT on this BitSet and return the result.
@@ -1720,6 +1732,70 @@ namespace emp {
   }
 
 
+  // -------------------------  Print/String Functions  ------------------------- //
+
+  /// Convert this BitVector to a string.
+  template <size_t NUM_BITS>
+  std::string BitSet<NUM_BITS>::ToString() const {
+    std::string out_string;
+    out_string.reserve(NUM_BITS);
+    for (size_t i = NUM_BITS; i > 0; --i) out_string.push_back(GetAsChar(i-1));
+    return out_string;
+  }
+
+  /// Regular print function (from most significant bit to least)
+  template <size_t NUM_BITS>
+  void BitSet<NUM_BITS>::Print(std::ostream & out) const {
+    for (size_t i = NUM_BITS; i > 0; i--) { out << Get(i-1); }
+  }
+
+  /// Print a space between each field (or other provided spacer)
+  template <size_t NUM_BITS>
+  void BitSet<NUM_BITS>::PrintFields(std::ostream & out, const std::string & spacer) const {
+    for (size_t i = NUM_BITS-1; i < NUM_BITS; i--) {
+      out << Get(i);
+      if (i && (i % FIELD_BITS == 0)) out << spacer;
+    }
+  }
+
+  /// Print all bits from smallest to largest, as if this were an array, not a bit representation.
+  template <size_t NUM_BITS>
+  void BitSet<NUM_BITS>::PrintArray(std::ostream & out) const {
+    for (size_t i = 0; i < NUM_BITS; i++) out << Get(i);
+  }
+
+  /// Print the locations of all one bits, using the provided spacer (default is a single space)
+  template <size_t NUM_BITS>
+  void BitSet<NUM_BITS>::PrintOneIDs(std::ostream & out, char spacer) const {
+    for (size_t i = 0; i < NUM_BITS; i++) { if (Get(i)) out << i << spacer; }
+  }
+
+  /// Print the ones in a range format.  E.g., 2-5,7,10-15
+  template <size_t NUM_BITS>
+  void BitSet<NUM_BITS>::PrintAsRange(std::ostream & out,
+                                      const std::string & spacer,
+                                      const std::string & ranger) const
+  {
+    emp::vector<size_t> ones = GetOnes();        // Identify the one to represent in output.
+
+    for (size_t pos = 0; pos < ones.size(); pos++) {
+      if (pos) out << spacer;                    // If not first range, put a space before it.
+      size_t start = ones[pos];                  // The current range starts here.
+      while (pos+1 < ones.size() &&              // If there is another one...
+             ones[pos+1] == ones[pos]+1) pos++;  // ...and it is sequential to this one, grab it.
+      size_t end = ones[pos];                    // The last one we got to is the end position.
+
+      out << start;                              // Output the range start.
+      if (start != end) out << ranger << end;    // If there's more than one in range, show range.
+    }
+  }
+
+  /// Overload ostream operator to return Print.
+  template <size_t NUM_BITS>
+  std::ostream & operator<<(std::ostream & out, const BitSet<NUM_BITS> & bs) {
+    bs.Print(out);
+    return out;
+  }
 
   // -------------------------  Extra Functions  -------------------------
 
