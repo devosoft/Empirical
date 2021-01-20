@@ -112,6 +112,9 @@ namespace emp {
     // Any bits past the last "real" bit in the last field should be kept as zeros.
     void ClearExcessBits() { if constexpr (NUM_END_BITS > 0) bit_set[LAST_FIELD] &= END_MASK; }
 
+    // Convert the bit_set to const bytes.
+    emp::Ptr<const unsigned char> BytePtr() const { return reinterpret_cast<const unsigned char*>(bit_set); }
+
     // Convert the bit_set to bytes.
     emp::Ptr<unsigned char> BytePtr() { return reinterpret_cast<unsigned char*>(bit_set); }
 
@@ -132,7 +135,7 @@ namespace emp {
     BitSet() { Clear(); }
 
     /// Copy constructor from another BitSet
-    BitSet(const BitSet & in_set) { Copy(in_set.bit_set); }
+    BitSet(const BitSet<NUM_BITS> & in_set) { Copy<NUM_FIELDS>(in_set.bit_set); }
 
     /// Constructor to generate a random BitSet (with equal prob of 0 or 1).
     BitSet(Random & random) { Randomize(random); ClearExcessBits(); }
@@ -141,7 +144,7 @@ namespace emp {
     BitSet(Random & random, double p1) { Randomize(random, p1); ClearExcessBits(); }
 
     /// Constructor to generate a random BitSet with provided NUMBER of 1's.
-    BitSet(Random & random, size_t num_ones) { Randomize(random, num_ones); ClearExcessBits(); }
+    BitSet(Random & random, size_t num_ones) { RandomizeFixed(random, num_ones); ClearExcessBits(); }
 
     /// Constructor to fill in a bit set from a vector.
     template <typename T> BitSet(const std::initializer_list<T> l);
@@ -150,7 +153,7 @@ namespace emp {
     ~BitSet() = default;
 
     /// Assignment operator (no separate move opperator since no resources to move...)
-    BitSet & operator=(const BitSet<NUM_BITS> & in_set) { Copy(in_set.bit_set); return *this; }
+    BitSet & operator=(const BitSet<NUM_BITS> & in_set) { Copy<NUM_FIELDS>(in_set.bit_set); return *this; }
 
     /// Assignment from another BitSet of a different size.
     template <size_t FROM_BITS>
@@ -229,8 +232,8 @@ namespace emp {
     BitSet & Randomize(Random & random, const double p,
                        const size_t start_pos=0, const size_t stop_pos=NUM_BITS);
 
-    /// Set all bits randomly, with a given probability of being a one.
-    BitSet & Randomize(Random & random, const size_t target_ones,
+    /// Set all bits randomly, with a fixed number of them being ones.
+    BitSet & RandomizeFixed(Random & random, const size_t target_ones,
                        const size_t start_pos=0, const size_t stop_pos=NUM_BITS);
     
     /// Flip random bits with a given probability.
@@ -247,13 +250,13 @@ namespace emp {
 
     /// Flip a specified number of random bits.
     /// @note: This was previously called Mutate.
-    BitSet & FlipRandom(Random & random, const size_t num_bits);
+    BitSet & FlipRandomCount(Random & random, const size_t num_bits);
 
     /// Set a specified number of random bits (does not check if already set.)
-    BitSet & SetRandom(Random & random, const size_t num_bits);
+    BitSet & SetRandomCount(Random & random, const size_t num_bits);
 
     /// Unset  a specified number of random bits (does not check if already zero.)
-    BitSet & ClearRandom(Random & random, const size_t num_bits);
+    BitSet & ClearRandomCount(Random & random, const size_t num_bits);
 
     // >>>>>>>>>>  Comparison Operators  <<<<<<<<<< //
 
@@ -533,19 +536,19 @@ namespace emp {
     BitSet operator>>(const size_t shift_size) const { return SHIFT((int)shift_size); }
 
     /// Compound operator bitwise AND...
-    const BitSet & operator&=(const BitSet & ar2) { return AND_SELF(ar2); }
+    BitSet & operator&=(const BitSet & ar2) { return AND_SELF(ar2); }
 
     /// Compound operator bitwise OR...
-    const BitSet & operator|=(const BitSet & ar2) { return OR_SELF(ar2); }
+    BitSet & operator|=(const BitSet & ar2) { return OR_SELF(ar2); }
 
     /// Compound operator bitwise XOR...
-    const BitSet & operator^=(const BitSet & ar2) { return XOR_SELF(ar2); }
+    BitSet & operator^=(const BitSet & ar2) { return XOR_SELF(ar2); }
 
     /// Compound operator shift left...
-    const BitSet & operator<<=(const size_t shift_size) { return SHIFT_SELF(-(int)shift_size); }
+    BitSet & operator<<=(const size_t shift_size) { return SHIFT_SELF(-(int)shift_size); }
 
     /// Compound operator shift right...
-    const BitSet & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
+    BitSet & operator>>=(const size_t shift_size) { return SHIFT_SELF((int)shift_size); }
 
     /// Operator plus...
     BitSet operator+(const BitSet & ar2) const { return ADD(ar2); }
@@ -1078,8 +1081,9 @@ namespace emp {
 
   /// Set all bits randomly, with a given number of them being on.
   template <size_t NUM_BITS>
-  BitSet<NUM_BITS> & BitSet<NUM_BITS>::Randomize(Random & random, const size_t target_ones,
-                                                 const size_t start_pos, const size_t stop_pos) {
+  BitSet<NUM_BITS> &
+  BitSet<NUM_BITS>::RandomizeFixed(Random & random, const size_t target_ones,
+                                   const size_t start_pos, const size_t stop_pos) {
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= NUM_BITS);
 
@@ -1185,8 +1189,8 @@ namespace emp {
 
   /// Flip a specified number of random bits.
   template <size_t NUM_BITS>
-  BitSet<NUM_BITS> & BitSet<NUM_BITS>::FlipRandom(Random & random,
-                                                  const size_t num_bits)
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::FlipRandomCount(Random & random,
+                                                       const size_t num_bits)
   {
     emp_assert(num_bits <= NUM_BITS);
     this_t target_bits(random, num_bits);
@@ -1195,8 +1199,8 @@ namespace emp {
 
   /// Set a specified number of random bits (does not check if already set.)
   template <size_t NUM_BITS>
-  BitSet<NUM_BITS> & BitSet<NUM_BITS>::SetRandom(Random & random,
-                                                 const size_t num_bits)
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::SetRandomCount(Random & random,
+                                                      const size_t num_bits)
   {
     emp_assert(num_bits <= NUM_BITS);
     this_t target_bits(random, num_bits);
@@ -1205,8 +1209,8 @@ namespace emp {
 
   /// Unset  a specified number of random bits (does not check if already zero.)
   template <size_t NUM_BITS>
-  BitSet<NUM_BITS> & BitSet<NUM_BITS>::ClearRandom(Random & random,
-                                                   const size_t num_bits)
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::ClearRandomCount(Random & random,
+                                                        const size_t num_bits)
   {
     emp_assert(num_bits <= NUM_BITS);
     this_t target_bits(random, NUM_BITS - num_bits);
@@ -1641,7 +1645,7 @@ namespace emp {
   BitSet<NUM_BITS> & BitSet<NUM_BITS>::REVERSE_SELF() {
 
     // reverse bytes
-    std::reverse( BytePtr(), BytePtr() + TOTAL_BYTES );
+    std::reverse( BytePtr().Raw(), BytePtr().Raw() + TOTAL_BYTES );
 
     // reverse each byte
     // adapted from https://stackoverflow.com/questions/2602823/in-c-c-whats-the-simplest-way-to-reverse-the-order-of-bits-in-a-byte
