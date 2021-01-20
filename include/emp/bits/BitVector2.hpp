@@ -30,6 +30,8 @@
 #define EMP_BIT_VECTOR_H
 
 #include <iostream>
+#include <initializer_list>
+#include <cstring>
 #include <bitset>
 
 #include "../base/assert.hpp"
@@ -64,8 +66,11 @@ namespace emp {
     static constexpr field_t FIELD_1 = (field_t) 1;         ///< Least significant bit set to 1
     static constexpr field_t FIELD_255 = (field_t) 255;     ///< Least significant 8 bits set to 1
     static constexpr field_t FIELD_ALL = ~FIELD_0;          ///< All bits in a field set to 1
-
     static constexpr size_t MAX_BITS = (size_t) -1;         ///< Value larger than any bit ID.
+
+    // Number of bits needed to specify position in a field + mask
+    static constexpr size_t FIELD_LOG2 = emp::Log2(FIELD_BITS);
+    static constexpr field_t FIELD_LOG2_MASK = MaskLow<field_t>(FIELD_LOG2);
 
     size_t num_bits;        ///< Total number of bits are we using
     Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
@@ -73,8 +78,17 @@ namespace emp {
     /// Num bits used in partial field at the end; 0 if perfect fit.
     size_t NumEndBits() const { return num_bits & (FIELD_BITS - 1); }
 
+    /// How many EXTRA bits are leftover in the gap at the end?
+    size_t EndGap() const { return NumEndBits() ? (FIELD_BITS - NumEndBits()) : 0; }
+
+    /// A mask to cut off all of the final bits.
+    field_t EndMask() const { return MaskLow<field_t>(NumEndBits()); }
+
     /// How many feilds do we need for the current set of bits?
     size_t NumFields() const { return num_bits ? (1 + ((num_bits - 1) / FIELD_BITS)) : 0; }
+
+    /// What is the ID of the last occupied field?
+    size_t LastField() const { return NumFields() - 1; }
 
     /// How many bytes are used for the current set of bits? (rounded up!)
     size_t NumBytes() const { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
@@ -104,9 +118,7 @@ namespace emp {
     }
 
     // Any bits past the last "real" bit in the last field should be kept as zeros.
-    void ClearExcessBits() {
-      if (NumEndBits() > 0) bits[NumFields() - 1] &= MaskLow<field_t>(NumEndBits());
-    }
+    void ClearExcessBits() { if (NumEndBits()) bits[LastField()] &= EndMask(); }
 
     // Helper: call SHIFT with positive number
     void ShiftLeft(const size_t shift_size);
@@ -297,6 +309,9 @@ namespace emp {
 
     /// Update the byte at the specified byte index.
     void SetByte(size_t index, uint8_t value);
+
+    /// Return a span with all fields in order.
+    std::span<field_t> FieldSpan() { return std::span<field_t>(bits.Raw(), NumFields()); }
 
     /// Get specified type at a given index (in steps of that type size)
     template <typename T> T GetValueAtIndex(const size_t index) const;
@@ -601,11 +616,10 @@ namespace emp {
     const size_t field_shift = shift_size / FIELD_BITS;
     const size_t bit_shift = shift_size % FIELD_BITS;
     const size_t bit_overflow = FIELD_BITS - bit_shift;
-    const size_t LAST_FIELD = NumFields() - 1;
 
     // Loop through each field, from L to R, and update it.
     if (field_shift) {
-      for (size_t i = LAST_FIELD; i >= field_shift; --i) {
+      for (size_t i = LastField(); i >= field_shift; --i) {
         bits[i] = bits[i - field_shift];
       }
       for (size_t i = field_shift; i > 0; --i) bits[i-1] = 0;
@@ -613,7 +627,7 @@ namespace emp {
 
     // account for bit_shift
     if (bit_shift) {
-      for (size_t i = LAST_FIELD; i > field_shift; --i) {
+      for (size_t i = LastField() ; i > field_shift; --i) {
         bits[i] <<= bit_shift;
         bits[i] |= (bits[i-1] >> bit_overflow);
       }
@@ -655,77 +669,71 @@ namespace emp {
 
   /// Helper: call ROTATE with negative number
   void BitVector::RotateLeft(const size_t shift_size_raw) {
-    const field_t shift_size = shift_size_raw % NUM_BITS;
+    if (num_bits == 0) return;   // Nothing to rotate in an empty BitVector.
 
-    // use different approaches based on BitVector size
-    if constexpr (NUM_FIELDS == 1) {
-      // special case: for exactly one field_T, try to go low level
-      // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
-      field_t & n = bit_set[0];
+    const field_t shift_size = shift_size_raw % num_bits;
+    const size_t NUM_FIELDS = NumFields();
+
+    // Use different approaches based on BitVector size
+    if (NUM_FIELDS == 1) {
+      // Special case: for exactly one field_T, try to go low level.
+      // Adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
+      field_t & n = bits[0];
       size_t c = shift_size;
 
-      // mask necessary to suprress shift count overflow warnings
+      // Mask necessary to suprress shift count overflow warnings.
       c &= FIELD_LOG2_MASK;
-      n = (n<<c) | (n>>( (-(c+FIELD_BITS-NUM_BITS)) & FIELD_LOG2_MASK ));
-
-    } else if constexpr (NUM_FIELDS < 32) {
-      // for small BitVectors, shifting L/R and ORing is faster
+      n = (n<<c) | (n>>( (-(c+FIELD_BITS-num_bits)) & FIELD_LOG2_MASK ));
+    }
+    else if (NUM_FIELDS < 32) {  // For small BitVectors, shifting L/R and ORing is faster.
       emp::BitVector dup(*this);
       dup.ShiftLeft(shift_size);
-      ShiftRight(NUM_BITS - shift_size);
+      ShiftRight(num_bits - shift_size);
       OR_SELF(dup);
-    } else {
-      // for big BitVectors, manual rotating is fater
+    }
+    else {  // For big BitVectors, manual rotating is fater
+      // Note: we already modded shift_size by num_bits, so no need to mod by FIELD_SIZE
+      const int field_shift = ( shift_size + EndGap() ) / FIELD_BITS;
 
-      // note that we already modded shift_size by NUM_BITS
-      // so there's no need to mod by FIELD_SIZE here
-      const int field_shift = NUM_END_BITS ? (
-        (shift_size + FIELD_BITS - NUM_END_BITS) / FIELD_BITS
-      ) : (
-        shift_size / FIELD_BITS
-      );
-      // if we field shift, we need to shift bits by (FIELD_BITS - NUM_END_BITS)
-      // more to account for the filler that gets pulled out of the middle
-      const int bit_shift = NUM_END_BITS && field_shift ? (
-        (shift_size + FIELD_BITS - NUM_END_BITS) % FIELD_BITS
-      ) : (
-        shift_size % FIELD_BITS
-      );
+      // If we field shift, we need to shift bits by (FIELD_BITS - NumEndBits())
+      // to account for the filler that gets pulled out of the middle
+      const int bit_shift = NumEndBits() && (shift_size + field_shift ? EndGap() : 0) % FIELD_BITS;
       const int bit_overflow = FIELD_BITS - bit_shift;
 
       // if rotating more than field capacity, we need to rotate fields
+      auto field_span = FieldSpan();
       std::rotate(
-        std::rbegin(bit_set),
-        std::rbegin(bit_set)+field_shift,
-        std::rend(bit_set)
+        field_span.rbegin(),
+        field_span.rbegin()+field_shift,
+        field_span.rend()
       );
 
       // if necessary, shift filler bits out of the middle
-      if constexpr ((bool)NUM_END_BITS) {
-        const int filler_idx = (LAST_FIELD + field_shift) % NUM_FIELDS;
+      if (NumEndBits()) {
+        const int filler_idx = (LastField() + field_shift) % NUM_FIELDS;
         for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
-          bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
-          bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
+          bits[i-1] |= bits[i] << NumEndBits();
+          bits[i] >>= (FIELD_BITS - NumEndBits());
         }
       }
 
       // account for bit_shift
       if (bit_shift) {
 
-        const field_t keystone = NUM_END_BITS ? (
-          (bit_set[LAST_FIELD] << (FIELD_BITS - NUM_END_BITS))
-          | (bit_set[NUM_FIELDS - 2] >> NUM_END_BITS)
+        const field_t keystone = NumEndBits() ? (
+          (bits[LastField()] << (FIELD_BITS - NumEndBits()))
+          | (bits[NUM_FIELDS - 2] >> NumEndBits())
         ) : (
-          bit_set[LAST_FIELD]
+          bits[LastField()]
         );
 
-        for (int i = LAST_FIELD; i > 0; --i) {
-          bit_set[i] <<= bit_shift;
-          bit_set[i] |= (bit_set[i-1] >> bit_overflow);
+        for (int i = LastField(); i > 0; --i) {
+          bits[i] <<= bit_shift;
+          bits[i] |= (bits[i-1] >> bit_overflow);
         }
         // Handle final field
-        bit_set[0] <<= bit_shift;
-        bit_set[0] |= keystone >> bit_overflow;
+        bits[0] <<= bit_shift;
+        bits[0] |= keystone >> bit_overflow;
 
       }
 
@@ -738,26 +746,26 @@ namespace emp {
 
   /// Helper for calling ROTATE with positive number
   void BitVector::RotateRight(const size_t shift_size_raw) {
-
-    const size_t shift_size = shift_size_raw % NUM_BITS;
+    const size_t shift_size = shift_size_raw % num_bits;
+    const size_t NUM_FIELDS = NumFields();
 
     // use different approaches based on BitVector size
-    if constexpr (NUM_FIELDS == 1) {
+    if (NUM_FIELDS == 1) {
       // special case: for exactly one field_t, try to go low level
       // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
 
-      field_t & n = bit_set[0];
+      field_t & n = bits[0];
       size_t c = shift_size;
 
       // mask necessary to suprress shift count overflow warnings
       c &= FIELD_LOG2_MASK;
-      n = (n>>c) | (n<<( (NUM_BITS-c) & FIELD_LOG2_MASK ));
+      n = (n>>c) | (n<<( (num_bits-c) & FIELD_LOG2_MASK ));
 
-    } else if constexpr (NUM_FIELDS < 32) {
+    } else if (NUM_FIELDS < 32) {
       // for small BitVectors, shifting L/R and ORing is faster
       emp::BitVector dup(*this);
       dup.ShiftRight(shift_size);
-      ShiftLeft(NUM_BITS - shift_size);
+      ShiftLeft(num_bits - shift_size);
       OR_SELF(dup);
     } else {
       // for big BitVectors, manual rotating is fater
@@ -767,40 +775,41 @@ namespace emp {
       const field_t bit_overflow = FIELD_BITS - bit_shift;
 
       // if rotating more than field capacity, we need to rotate fields
+      auto field_span = FieldSpan();
       std::rotate(
-        std::begin(bit_set),
-        std::begin(bit_set)+field_shift,
-        std::end(bit_set)
+        field_span.begin(),
+        field_span.begin()+field_shift,
+        field_span.end()
       );
 
       // if necessary, shift filler bits out of the middle
-      if constexpr (NUM_END_BITS > 0) {
-        const int filler_idx = LAST_FIELD - field_shift;
+      if (NumEndBits()) {
+        const int filler_idx = LastField() - field_shift;
         for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
-          bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
-          bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
+          bits[i-1] |= bits[i] << NumEndBits();
+          bits[i] >>= (FIELD_BITS - NumEndBits());
         }
       }
 
       // account for bit_shift
       if (bit_shift) {
 
-        const field_t keystone = NUM_END_BITS ? (
-          bit_set[0] >> (FIELD_BITS - NUM_END_BITS)
+        const field_t keystone = NumEndBits() ? (
+          bits[0] >> (FIELD_BITS - NumEndBits())
         ) : (
-          bit_set[0]
+          bits[0]
         );
 
-        if constexpr (NUM_END_BITS > 0) {
-          bit_set[NUM_FIELDS-1] |= bit_set[0] << NUM_END_BITS;
+        if (NumEndBits()) {
+          bits[NUM_FIELDS-1] |= bits[0] << NumEndBits();
         }
 
-        for (size_t i = 0; i < LAST_FIELD; ++i) {
-          bit_set[i] >>= bit_shift;
-          bit_set[i] |= (bit_set[i+1] << bit_overflow);
+        for (size_t i = 0; i < LastField(); ++i) {
+          bits[i] >>= bit_shift;
+          bits[i] |= (bits[i+1] << bit_overflow);
         }
-        bit_set[LAST_FIELD] >>= bit_shift;
-        bit_set[LAST_FIELD] |= keystone << bit_overflow;
+        bits[LastField()] >>= bit_shift;
+        bits[LastField()] |= keystone << bit_overflow;
       }
     }
 
@@ -821,7 +830,7 @@ namespace emp {
     else emp_assert(num_bits == 0);
 
     // Make sure final bits are zeroed out.
-    [[maybe_unused]] field_t excess_bits = bits[NumFields() - 1] & ~MaskLow<field_t>(NumEndBits());
+    [[maybe_unused]] field_t excess_bits = bits[LastField()] & ~MaskLow<field_t>(NumEndBits());
     emp_assert(!excess_bits);
 
     return true;
@@ -1744,7 +1753,7 @@ namespace emp {
   /// Reverse the order of bits in the bitset
   BitVector & BitVector::REVERSE_SELF() {
     // reverse bytes
-    std::reverse( BytePtr(), BytePtr() + NumBytes() );
+    std::reverse( BytePtr().Raw(), BytePtr().Raw() + NumBytes() );
 
     // reverse each byte
     // adapted from https://stackoverflow.com/questions/2602823/in-c-c-whats-the-simplest-way-to-reverse-the-order-of-bits-in-a-byte
@@ -1793,11 +1802,13 @@ namespace emp {
   template<size_t shift_size_raw>
   BitVector & BitVector::ROTL_SELF() {
     constexpr size_t shift_size = shift_size_raw % num_bits;
+    const size_t NUM_FIELDS = NumFields();
+    const size_t LAST_FIELD = LastField();
 
     // special case: for exactly one field_t, try to go low level
     // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
-    if constexpr (NUM_FIELDS == 1) {
-      field_t & n = bit_set[0];
+    if (NUM_FIELDS == 1) {
+      field_t & n = bits[0];
       size_t c = shift_size;
 
       // mask necessary to suprress shift count overflow warnings
@@ -1808,55 +1819,56 @@ namespace emp {
 
       // note that we already modded shift_size by num_bits
       // so there's no need to mod by FIELD_SIZE here
-      constexpr int field_shift = NUM_END_BITS ? (
-        (shift_size + FIELD_BITS - NUM_END_BITS) / FIELD_BITS
+      int field_shift = NumEndBits() ? (
+        (shift_size + FIELD_BITS - NumEndBits()) / FIELD_BITS
       ) : (
         shift_size / FIELD_BITS
       );
-      // if we field shift, we need to shift bits by (FIELD_BITS - NUM_END_BITS)
+      // if we field shift, we need to shift bits by (FIELD_BITS - NumEndBits())
       // more to account for the filler that gets pulled out of the middle
-      constexpr int bit_shift = NUM_END_BITS && field_shift ? (
-        (shift_size + FIELD_BITS - NUM_END_BITS) % FIELD_BITS
+      int bit_shift = NumEndBits() && field_shift ? (
+        (shift_size + FIELD_BITS - NumEndBits()) % FIELD_BITS
       ) : (
         shift_size % FIELD_BITS
       );
-      constexpr int bit_overflow = FIELD_BITS - bit_shift;
+      int bit_overflow = FIELD_BITS - bit_shift;
 
       // if rotating more than field capacity, we need to rotate fields
-      if constexpr ((bool)field_shift) {
+      if (field_shift) {
+        auto field_span = FieldSpan();
         std::rotate(
-          std::rbegin(bit_set),
-          std::rbegin(bit_set)+field_shift,
-          std::rend(bit_set)
+          field_span.rbegin(),
+          field_span.rbegin()+field_shift,
+          field_span.rend()
         );
       }
 
       // if necessary, shift filler bits out of the middle
-      if constexpr ((bool)NUM_END_BITS) {
+      if (NumEndBits()) {
         const int filler_idx = (LAST_FIELD + field_shift) % NUM_FIELDS;
         for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
-          bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
-          bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
+          bits[i-1] |= bits[i] << NumEndBits();
+          bits[i] >>= (FIELD_BITS - NumEndBits());
         }
       }
 
       // account for bit_shift
       if (bit_shift) {
 
-        const field_t keystone = NUM_END_BITS ? (
-          (bit_set[LAST_FIELD] << (FIELD_BITS - NUM_END_BITS))
-          | (bit_set[NUM_FIELDS - 2] >> NUM_END_BITS)
+        const field_t keystone = NumEndBits() ? (
+          (bits[LAST_FIELD] << (FIELD_BITS - NumEndBits()))
+          | (bits[NUM_FIELDS - 2] >> NumEndBits())
         ) : (
-          bit_set[LAST_FIELD]
+          bits[LAST_FIELD]
         );
 
         for (int i = LAST_FIELD; i > 0; --i) {
-          bit_set[i] <<= bit_shift;
-          bit_set[i] |= (bit_set[i-1] >> bit_overflow);
+          bits[i] <<= bit_shift;
+          bits[i] |= (bits[i-1] >> bit_overflow);
         }
         // Handle final field
-        bit_set[0] <<= bit_shift;
-        bit_set[0] |= keystone >> bit_overflow;
+        bits[0] <<= bit_shift;
+        bits[0] |= keystone >> bit_overflow;
 
       }
 
@@ -1872,13 +1884,14 @@ namespace emp {
   /// Helper for calling ROTATE with positive number
   template<size_t shift_size_raw>
   BitVector & BitVector::ROTR_SELF() {
-
-    constexpr size_t shift_size = shift_size_raw % num_bits;
+    const size_t shift_size = shift_size_raw % num_bits;
+    const size_t NUM_FIELDS = NumFields();
+    const size_t LAST_FIELD = LastField();
 
     // special case: for exactly one field_t, try to go low level
     // adapted from https://stackoverflow.com/questions/776508/best-practices-for-circular-shift-rotate-operations-in-c
-    if constexpr (NUM_FIELDS == 1) {
-      field_t & n = bit_set[0];
+    if (NUM_FIELDS == 1) {
+      field_t & n = bits[0];
       size_t c = shift_size;
 
       // mask necessary to suprress shift count overflow warnings
@@ -1887,47 +1900,48 @@ namespace emp {
 
     } else {
 
-      constexpr field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
-      constexpr int bit_shift = shift_size % FIELD_BITS;
-      constexpr field_t bit_overflow = FIELD_BITS - bit_shift;
+      field_t field_shift = (shift_size / FIELD_BITS) % NUM_FIELDS;
+      int bit_shift = shift_size % FIELD_BITS;
+      field_t bit_overflow = FIELD_BITS - bit_shift;
 
       // if rotating more than field capacity, we need to rotate fields
-      if constexpr ((bool)field_shift) {
+      if (field_shift) {
+        auto field_span = FieldSpan();
         std::rotate(
-          std::begin(bit_set),
-          std::begin(bit_set)+field_shift,
-          std::end(bit_set)
+          field_span.begin(),
+          field_span.begin()+field_shift,
+          field_span.end()
         );
       }
 
       // if necessary, shift filler bits out of the middle
-      if constexpr ((bool)NUM_END_BITS) {
-        constexpr int filler_idx = LAST_FIELD - field_shift;
+      if (NumEndBits()) {
+        int filler_idx = LAST_FIELD - field_shift;
         for (int i = filler_idx + 1; i < (int)NUM_FIELDS; ++i) {
-          bit_set[i-1] |= bit_set[i] << NUM_END_BITS;
-          bit_set[i] >>= (FIELD_BITS - NUM_END_BITS);
+          bits[i-1] |= bits[i] << NumEndBits();
+          bits[i] >>= (FIELD_BITS - NumEndBits());
         }
       }
 
       // account for bit_shift
       if (bit_shift) {
 
-        const field_t keystone = NUM_END_BITS ? (
-          bit_set[0] >> (FIELD_BITS - NUM_END_BITS)
+        const field_t keystone = NumEndBits() ? (
+          bits[0] >> (FIELD_BITS - NumEndBits())
         ) : (
-          bit_set[0]
+          bits[0]
         );
 
-        if constexpr ((bool)NUM_END_BITS) {
-          bit_set[NUM_FIELDS-1] |= bit_set[0] << NUM_END_BITS;
+        if (NumEndBits()) {
+          bits[LastField()] |= bits[0] << NumEndBits();
         }
 
         for (size_t i = 0; i < LAST_FIELD; ++i) {
-          bit_set[i] >>= bit_shift;
-          bit_set[i] |= (bit_set[i+1] << bit_overflow);
+          bits[i] >>= bit_shift;
+          bits[i] |= (bits[i+1] << bit_overflow);
         }
-        bit_set[LAST_FIELD] >>= bit_shift;
-        bit_set[LAST_FIELD] |= keystone << bit_overflow;
+        bits[LAST_FIELD] >>= bit_shift;
+        bits[LAST_FIELD] |= keystone << bit_overflow;
       }
     }
 
@@ -1952,21 +1966,21 @@ namespace emp {
     bool carry = false;
 
     for (size_t i = 0; i < num_bits/FIELD_BITS; ++i) {
-      field_t addend = set2.bit_set[i] + static_cast<field_t>(carry);
-      carry = set2.bit_set[i] > addend;
+      field_t addend = set2.bits[i] + static_cast<field_t>(carry);
+      carry = set2.bits[i] > addend;
 
-      field_t sum = bit_set[i] + addend;
-      carry |= bit_set[i] > sum;
+      field_t sum = bits[i] + addend;
+      carry |= bits[i] > sum;
 
-      bit_set[i] = sum;
+      bits[i] = sum;
     }
 
-    if constexpr (static_cast<bool>(NUM_END_BITS)) {
-      bit_set[num_bits/FIELD_BITS] = (
-        bit_set[num_bits/FIELD_BITS]
-        + set2.bit_set[num_bits/FIELD_BITS]
+    if (NumEndBits()) {
+      bits[num_bits/FIELD_BITS] = (
+        bits[num_bits/FIELD_BITS]
+        + set2.bits[num_bits/FIELD_BITS]
         + static_cast<field_t>(carry)
-      ) & END_MASK;
+      ) & EndMask();
     }
 
     return *this;
@@ -1988,18 +2002,18 @@ namespace emp {
     bool carry = false;
 
     for (size_t i = 0; i < num_bits/FIELD_BITS; ++i) {
-      field_t subtrahend = set2.bit_set[i] + static_cast<field_t>(carry);
-      carry = set2.bit_set[i] > subtrahend;
-      carry |= bit_set[i] < subtrahend;
-      bit_set[i] -= subtrahend;
+      field_t subtrahend = set2.bits[i] + static_cast<field_t>(carry);
+      carry = set2.bits[i] > subtrahend;
+      carry |= bits[i] < subtrahend;
+      bits[i] -= subtrahend;
     }
 
-    if constexpr (static_cast<bool>(NUM_END_BITS)) {
-      bit_set[num_bits/FIELD_BITS] = (
-        bit_set[num_bits/FIELD_BITS]
-        - set2.bit_set[num_bits/FIELD_BITS]
+    if (NumEndBits()) {
+      bits[num_bits/FIELD_BITS] = (
+        bits[num_bits/FIELD_BITS]
+        - set2.bits[num_bits/FIELD_BITS]
         - static_cast<field_t>(carry)
-      ) & END_MASK;
+      ) & EndMask();
     }
 
     return *this;
