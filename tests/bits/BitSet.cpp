@@ -286,11 +286,11 @@ void test_more_comparators(){
  * Random bitset
  */
 void test_random(){
-  emp::Random rndm;
-  emp::BitSet<8> bs8(rndm);
-  bs8.Randomize(rndm, 1);
+  emp::Random random;
+  emp::BitSet<8> bs8(random);
+  bs8.Randomize(random, 1.0);
   REQUIRE(bs8.all());
-  bs8.Randomize(rndm, 0);
+  bs8.Randomize(random, 0.0);
   REQUIRE(bs8.none());
 }
 
@@ -970,44 +970,55 @@ TEST_CASE("Another Test BitSet", "[bits]")
   REQUIRE((bs2 + bs1).Get(64));
   }
 
-  // test GetDouble() and MaxDouble()
   {
   emp::BitSet<3> bs0{0,0,0};
-  REQUIRE(bs0.GetDouble() == 0.0);
-  REQUIRE(bs0.MaxDouble() == 7.0);
+  REQUIRE(bs0.GetUInt8(0) == 0);
+  REQUIRE(bs0.GetUInt16(0) == 0);
+  REQUIRE(bs0.GetUInt32(0) == 0);
+  REQUIRE(bs0.GetUInt64(0) == 0);
+  REQUIRE(bs0.GetNumStates() == 8);
 
   emp::BitSet<3> bs1{0,0,1};
-  REQUIRE(bs1.GetDouble() == 1.0);
+  REQUIRE(bs1.GetUInt8(0) == 1);
+  REQUIRE(bs1.GetUInt16(0) == 1);
+  REQUIRE(bs1.GetUInt32(0) == 1);
+  REQUIRE(bs1.GetUInt64(0) == 1);
 
   emp::BitSet<3> bs2{0,1,1};
-  REQUIRE(bs2.GetDouble() == 3.0);
+  REQUIRE(bs2.GetUInt8(0) == 3);
+  REQUIRE(bs2.GetUInt16(0) == 3);
+  REQUIRE(bs2.GetUInt32(0) == 3);
+  REQUIRE(bs2.GetUInt64(0) == 3);
 
   emp::BitSet<3> bs3{1,1,1};
-  REQUIRE(bs3.GetDouble() == 7.0);
+  REQUIRE(bs3.GetUInt8(0) == 7);
 
   emp::BitSet<3> bs4{1,1,0};
-  REQUIRE(bs4.GetDouble() == 6.0);
+  REQUIRE(bs4.GetUInt8(0) == 6);
 
   emp::BitSet<32> bs5;
   bs5.SetUInt(0, 1789156UL);
-  REQUIRE(bs5.GetDouble() == 1789156ULL);
-  REQUIRE(bs5.MaxDouble() == 4294967295.0);
+  REQUIRE(bs5.GetUInt64(0) == 1789156ULL);
+  REQUIRE(bs5.GetNumStates() == 4294967296ULL);
 
-  emp::BitSet<64> bs6;
-  bs6.SetUInt64(0, 1789156816848ULL);
-  REQUIRE(bs6.GetDouble() == 1789156816848ULL);
-  REQUIRE(bs6.MaxDouble() == 18446744073709551615.0);
+  emp::BitSet<63> bs6;
+  bs6.SetUInt64(0, 789156816848ULL);
+  REQUIRE(bs6.GetUInt64(0) == 789156816848ULL);
+  REQUIRE(bs6.GetNumStates() == 9223372036854775808ULL);
 
-  emp::BitSet<65> bs7;
-  bs7.SetUInt64(0, 1789156816848ULL);
-  bs7.Set(64);
-  REQUIRE(bs7.GetDouble() == 1789156816848.0 + emp::Pow2(64.0));
-  REQUIRE(bs7.MaxDouble() == 36893488147419103231.0);
 
-  emp::BitSet<1027> bs8;
-  bs8.Set(1026);
-  REQUIRE(std::isinf(bs8.GetDouble()));
-  REQUIRE(std::isinf(bs8.MaxDouble()));
+  // @CAO: Removed GetDouble() due to confusing name (GetUInt64() gives the same answer, but with
+  //       the correct encoding.
+  // emp::BitSet<65> bs7;
+  // bs7.SetUInt64(0, 1789156816848ULL);
+  // bs7.Set(64);
+  // REQUIRE(bs7.GetDouble() == 1789156816848.0 + emp::Pow2(64.0));
+  // REQUIRE(bs7.MaxDouble() == 36893488147419103231.0);
+
+  // emp::BitSet<1027> bs8;
+  // bs8.Set(1026);
+  // REQUIRE(std::isinf(bs8.GetDouble()));
+  // REQUIRE(std::isinf(bs8.MaxDouble()));
   }
 
   // test list initializer
@@ -1257,8 +1268,8 @@ TEST_CASE("Another Test BitSet", "[bits]")
 
   // Test arbitrary bit retrieval of UInts
   bs80[65] = 1;
-  REQUIRE(bs80.GetUIntAtBit(64) == 130);
-  REQUIRE(bs80.GetValueAtBit<5>(64) == 2);
+  REQUIRE(bs80.GetUInt32AtBit(64) == 130);
+  REQUIRE(bs80.GetUInt8AtBit(64) == 2);
 
   emp::BitSet<96> bs;
 
@@ -1358,44 +1369,44 @@ TEST_CASE("Another Test BitSet", "[bits]")
   MultiTester<161>::test<160>();
   MultiTester<2050>::test<2048>();
 
-  // tests for Mutate
+  // tests for RandomizeFixed
   {
-    emp::Random rando(1);
+    emp::Random random(1);
     emp::BitSet<25> bs_25;
     emp::BitSet<32> bs_32;
     emp::BitSet<50> bs_50;
     emp::BitSet<64> bs_64;
     emp::BitSet<80> bs_80;
 
-    bs_25.Mutate(rando, 0);
+    bs_25.FlipRandomCount(random, 0);
     REQUIRE(!bs_25.CountOnes());
 
-    bs_32.Mutate(rando, 0);
+    bs_32.FlipRandomCount(random, 0);
     REQUIRE(!bs_32.CountOnes());
 
-    bs_50.Mutate(rando, 0);
+    bs_50.FlipRandomCount(random, 0);
     REQUIRE(!bs_50.CountOnes());
 
-    bs_64.Mutate(rando, 0);
+    bs_64.FlipRandomCount(random, 0);
     REQUIRE(!bs_64.CountOnes());
 
-    bs_80.Mutate(rando, 0);
+    bs_80.FlipRandomCount(random, 0);
     REQUIRE(!bs_80.CountOnes());
 
 
-    bs_25.Mutate(rando, 1);
+    bs_25.FlipRandomCount(random, 1);
     REQUIRE( bs_25.CountOnes() == 1);
 
-    bs_32.Mutate(rando, 1);
+    bs_32.FlipRandomCount(random, 1);
     REQUIRE( bs_32.CountOnes() == 1);
 
-    bs_50.Mutate(rando, 1);
+    bs_50.FlipRandomCount(random, 1);
     REQUIRE( bs_50.CountOnes() == 1);
 
-    bs_64.Mutate(rando, 1);
+    bs_64.FlipRandomCount(random, 1);
     REQUIRE( bs_64.CountOnes() == 1);
 
-    bs_80.Mutate(rando, 1);
+    bs_80.FlipRandomCount(random, 1);
     REQUIRE( bs_80.CountOnes() == 1);
 
     bs_25.Clear();
@@ -1405,19 +1416,19 @@ TEST_CASE("Another Test BitSet", "[bits]")
     bs_80.Clear();
 
     for (size_t i = 1; i < 5000; ++i) {
-      bs_25.Mutate(rando, 1);
+      bs_25.FlipRandomCount(random, 1);
       REQUIRE(bs_25.CountOnes() <= i);
 
-      bs_32.Mutate(rando, 1);
+      bs_32.FlipRandomCount(random, 1);
       REQUIRE(bs_32.CountOnes() <= i);
 
-      bs_50.Mutate(rando, 1);
+      bs_50.FlipRandomCount(random, 1);
       REQUIRE(bs_50.CountOnes() <= i);
 
-      bs_64.Mutate(rando, 1);
+      bs_64.FlipRandomCount(random, 1);
       REQUIRE(bs_64.CountOnes() <= i);
 
-      bs_80.Mutate(rando, 1);
+      bs_80.FlipRandomCount(random, 1);
       REQUIRE(bs_80.CountOnes() <= i);
     }
 
@@ -1433,23 +1444,23 @@ TEST_CASE("Another Test BitSet", "[bits]")
     REQUIRE(bs_80.CountOnes() < 3*bs_80.size()/4);
 
     for (size_t i = 0; i < 10; ++i) {
-      bs_25.Mutate(rando, bs_25.size());
+      bs_25.FlipRandomCount(random, bs_25.size());
       REQUIRE(bs_25.CountOnes() > bs_25.size()/4);
       REQUIRE(bs_25.CountOnes() < 3*bs_25.size()/4);
 
-      bs_32.Mutate(rando, bs_32.size());
+      bs_32.FlipRandomCount(random, bs_32.size());
       REQUIRE(bs_32.CountOnes() > bs_32.size()/4);
       REQUIRE(bs_32.CountOnes() < 3*bs_32.size()/4);
 
-      bs_50.Mutate(rando, bs_50.size());
+      bs_50.FlipRandomCount(random, bs_50.size());
       REQUIRE(bs_50.CountOnes() > bs_50.size()/4);
       REQUIRE(bs_50.CountOnes() < 3*bs_50.size()/4);
 
-      bs_64.Mutate(rando, bs_64.size());
+      bs_64.FlipRandomCount(random, bs_64.size());
       REQUIRE(bs_64.CountOnes() > bs_64.size()/4);
       REQUIRE(bs_64.CountOnes() < 3*bs_64.size()/4);
 
-      bs_80.Mutate(rando, bs_80.size());
+      bs_80.FlipRandomCount(random, bs_80.size());
       REQUIRE(bs_80.CountOnes() > bs_80.size()/4);
       REQUIRE(bs_80.CountOnes() < 3*bs_80.size()/4);
     }
