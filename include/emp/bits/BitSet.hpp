@@ -69,6 +69,9 @@ namespace emp {
     // Track number of bits in the final field; use 0 if a perfect fit.
     static constexpr size_t NUM_END_BITS = NUM_BITS & (FIELD_BITS - 1);
 
+    /// How many EXTRA bits are leftover in the gap at the end?
+    static constexpr size_t END_GAP = NUM_END_BITS ? (FIELD_BITS - NUM_END_BITS) : 0;
+
     // Mask to use to clear out any end bits that should be zeroes.
     static constexpr field_t END_MASK = MaskLow<field_t>(NUM_END_BITS);
 
@@ -419,21 +422,11 @@ namespace emp {
       return out;
     }
 
-
-    ////////////////////////////////////////////
-    ////////////////////////////////////////////
-    ////////////////////////////////////////////
-    ///////////// CONTINUE HERE!! //////////////
-    ////////////////////////////////////////////
-    ////////////////////////////////////////////
-    ////////////////////////////////////////////
-
-
     /// Perform a Boolean NOT on this BitSet and return the result.
     BitSet NOT() const;
 
     /// Perform a Boolean AND with a second BitSet and return the result.
-    BitSet AND(const BitSet & set2);
+    BitSet AND(const BitSet & set2) const;
 
     /// Perform a Boolean OR with a second BitSet and return the result.
     BitSet OR(const BitSet & set2) const;
@@ -1603,7 +1596,7 @@ namespace emp {
 
   /// Perform a Boolean NOR with a second BitSet, store result here, and return this object.
   template <size_t NUM_BITS>
-  BitSet<NUM_BITS> & BitSet<NUM_BITS>NOR_SELF(const BitSet<NUM_BITS> & set2) {
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::NOR_SELF(const BitSet<NUM_BITS> & set2) {
     for (size_t i = 0; i < NUM_FIELDS; i++) bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
     ClearExcessBits();
     return *this;
