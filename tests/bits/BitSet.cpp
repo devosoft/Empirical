@@ -1268,8 +1268,9 @@ TEST_CASE("Another Test BitSet", "[bits]")
 
   // Test arbitrary bit retrieval of UInts
   bs80[65] = 1;
+  REQUIRE(bs80.GetUInt32(2) == 130);
   REQUIRE(bs80.GetUInt32AtBit(64) == 130);
-  REQUIRE(bs80.GetUInt8AtBit(64) == 2);
+  REQUIRE(bs80.GetUInt8AtBit(64) == 130);
 
   emp::BitSet<96> bs;
 
