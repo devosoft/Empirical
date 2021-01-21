@@ -1285,7 +1285,8 @@ namespace emp {
   template <typename T>
   T BitSet<NUM_BITS>::GetValueAtIndex(const size_t index) const {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
-    emp_assert((index + 1) * sizeof(T) <= TOTAL_BYTES);
+    emp_assert((index + 1) * sizeof(T) <= NUM_FIELDS * sizeof(field_t),
+              index, sizeof(T), NUM_BITS, NUM_FIELDS);
 
     T out_value;
     std::memcpy( &out_value, BytePtr() + index * sizeof(T), sizeof(T) );
@@ -1298,7 +1299,8 @@ namespace emp {
   template <typename T>
   void BitSet<NUM_BITS>::SetValueAtIndex(const size_t index, T in_value) {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
-    emp_assert((index + 1) * sizeof(T) <= TOTAL_BYTES);
+    emp_assert((index + 1) * sizeof(T) <= NUM_FIELDS * sizeof(field_t),
+              index, sizeof(T), NUM_BITS, NUM_FIELDS);
 
     std::memcpy( BytePtr() + index * sizeof(T), &in_value, sizeof(T) );
 
@@ -1311,9 +1313,9 @@ namespace emp {
   template <typename T>
   T BitSet<NUM_BITS>::GetValueAtBit(const size_t index) const {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
-    emp_assert((index+7)/8 + sizeof(T) < TOTAL_BYTES);
+    emp_assert((index+7)/8 + sizeof(T) < NUM_FIELDS * sizeof(field_t));
 
-    BitSet<sizeof(T)> out_bits;
+    BitSet<sizeof(T)*8> out_bits;
     out_bits.Import(*this, index);
 
     return out_bits.template GetValueAtIndex<T>(0);
@@ -1326,7 +1328,7 @@ namespace emp {
   template <typename T>
   void BitSet<NUM_BITS>::SetValueAtBit(const size_t index, T value) {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
-    emp_assert((index+7)/8 + sizeof(T) < TOTAL_BYTES);
+    emp_assert((index+7)/8 + sizeof(T) < NUM_FIELDS * sizeof(field_t));
     constexpr size_t type_bits = sizeof(T) * 8;
 
     Clear(index, index+type_bits);       // Clear out the bits where new value will go.
@@ -1334,6 +1336,8 @@ namespace emp {
     in_bits.SetValueAtIndex(0, value);   // Insert the new bits.
     in_bits << index;                    // Shift new bits into place.
     OR_SELF(in_bits);                    // Place new bits into current BitSet.
+
+    ClearExcessBits();
   }
 
 
