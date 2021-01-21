@@ -93,6 +93,9 @@ namespace emp {
     /// How many bytes are used for the current set of bits? (rounded up!)
     size_t NumBytes() const { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
 
+    /// How many bytes are allocated? (rounded up!)
+    size_t TotalBytes() const { return NumFields() * sizeof(field_t); }
+
     // Identify the field that a specified bit is in.
     static constexpr size_t FieldID(const size_t index)  { return index / FIELD_BITS; }
 
@@ -1414,7 +1417,7 @@ namespace emp {
   template <typename T>
   T BitVector::GetValueAtIndex(const size_t index) const {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
-    emp_assert((index + 1) * sizeof(T) <= NumBytes());
+    emp_assert((index + 1) * sizeof(T) <= TotalBytes());
 
     T out_value;
     std::memcpy( &out_value, BytePtr() + index * sizeof(T), sizeof(T) );
@@ -1426,7 +1429,7 @@ namespace emp {
   template <typename T>
   void BitVector::SetValueAtIndex(const size_t index, T in_value) {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
-    emp_assert((index + 1) * sizeof(T) <= NumBytes());
+    emp_assert((index + 1) * sizeof(T) <= TotalBytes());
 
     std::memcpy( BytePtr() + index * sizeof(T), &in_value, sizeof(T) );
 
@@ -1438,9 +1441,9 @@ namespace emp {
   template <typename T>
   T BitVector::GetValueAtBit(const size_t index) const {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
-    emp_assert((index+7)/8 + sizeof(T) < NumBytes());
+    emp_assert((index+7)/8 + sizeof(T) < TotalBytes());
 
-    BitVector out_bits(sizeof(T));
+    BitVector out_bits(sizeof(T)*8);
     out_bits.Import(*this, index);
 
     return out_bits.template GetValueAtIndex<T>(0);
@@ -1452,7 +1455,7 @@ namespace emp {
   template <typename T>
   void BitVector::SetValueAtBit(const size_t index, T value) {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
-    emp_assert((index+7)/8 + sizeof(T) < NumBytes());
+    emp_assert((index+7)/8 + sizeof(T) < TotalBytes());
     constexpr size_t type_bits = sizeof(T) * 8;
 
     Clear(index, index+type_bits);       // Clear out the bits where new value will go.
@@ -1460,6 +1463,8 @@ namespace emp {
     in_bits.SetValueAtIndex(0, value);   // Insert the new bits.
     in_bits << index;                    // Shift new bits into place.
     OR_SELF(in_bits);                    // Place new bits into current BitVector.
+
+    ClearExcessBits();
   }
 
 
