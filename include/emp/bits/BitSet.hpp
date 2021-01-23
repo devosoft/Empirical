@@ -138,13 +138,13 @@ namespace emp {
     BitSet(const BitSet<NUM_BITS> & in_set) { Copy<NUM_FIELDS>(in_set.bit_set); }
 
     /// Constructor to generate a random BitSet (with equal prob of 0 or 1).
-    BitSet(Random & random) { Randomize(random); ClearExcessBits(); }
+    BitSet(Random & random) { Clear(); Randomize(random); }
 
     /// Constructor to generate a random BitSet with provided PROBABILITY of 1's.
-    BitSet(Random & random, double p1) { Randomize(random, p1); ClearExcessBits(); }
+    BitSet(Random & random, double p1) { Clear(); Randomize(random, p1); }
 
     /// Constructor to generate a random BitSet with provided NUMBER of 1's.
-    BitSet(Random & random, size_t num_ones) { RandomizeFixed(random, num_ones); ClearExcessBits(); }
+    BitSet(Random & random, size_t num_ones) { Clear(); RandomizeFixed(random, num_ones); }
 
     /// Constructor to fill in a bit set from a vector.
     template <typename T> BitSet(const std::initializer_list<T> l);
@@ -162,6 +162,9 @@ namespace emp {
     /// Convert to a Bitset of a different size.
     template <size_t TO_BITS>
     BitSet<TO_BITS> Export(size_t start_bit=0) const;
+
+    /// For debugging: make sure that there are no obvous problems with a BitSet object.
+    bool OK() const;
 
     /// How many bits are in this BitSet?
     constexpr static size_t GetSize() { return NUM_BITS; }
@@ -879,6 +882,17 @@ namespace emp {
     return out_bits;
   }
 
+    /// For debugging: make sure that there are no obvous problems with a BitSet object.
+  template <size_t NUM_BITS>
+  bool BitSet<NUM_BITS>::OK() const {
+    // Make sure final bits are zeroed out.
+    emp_assert((bit_set[LAST_FIELD] & ~END_MASK) == 0);
+
+    return true;
+  }
+
+
+
   // --------------------  Implementations of common accessors -------------------
 
   template <size_t NUM_BITS>
@@ -1064,6 +1078,7 @@ namespace emp {
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= NUM_BITS);
     random.RandFillP<P>(BytePtr(), TOTAL_BYTES, start_pos, stop_pos);
+    ClearExcessBits();
     return *this;
   }
 
@@ -1076,7 +1091,8 @@ namespace emp {
     emp_assert(stop_pos <= NUM_BITS);
     emp_assert(p >= 0.0 && p <= 1.0, p);
     random.RandFill(BytePtr(), TOTAL_BYTES, p, start_pos, stop_pos);
-    return *this;
+    ClearExcessBits();
+     return *this;
   }
 
   /// Set all bits randomly, with a given number of them being on.
