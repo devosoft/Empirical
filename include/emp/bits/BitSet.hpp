@@ -423,7 +423,7 @@ namespace emp {
 
 
     /// Overload ostream operator to return Print.
-    friend std::ostream& operator<<(std::ostream &out, const BitSet& bs){
+    friend std::ostream& operator<<(std::ostream &out, const BitSet& bs) {
       bs.Print(out);
       return out;
     }
@@ -1515,13 +1515,6 @@ namespace emp {
       out << start;                              // Output the range start.
       if (start != end) out << ranger << end;    // If there's more than one in range, show range.
     }
-  }
-
-  /// Overload ostream operator to return Print.
-  template <size_t NUM_BITS>
-  std::ostream & operator<<(std::ostream & out, const BitSet<NUM_BITS> & bs) {
-    bs.Print(out);
-    return out;
   }
 
 
