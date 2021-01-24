@@ -17,8 +17,8 @@
  */
 
 
-#ifndef EMP_BIT_SET_H
-#define EMP_BIT_SET_H
+#ifndef EMP_BIT_SET_HPP
+#define EMP_BIT_SET_HPP
 
 #include <iostream>
 #include <initializer_list>
@@ -136,6 +136,12 @@ namespace emp {
 
     /// Copy constructor from another BitSet
     BitSet(const BitSet<NUM_BITS> & in_set) { Copy<NUM_FIELDS>(in_set.bit_set); }
+
+    /// Constructor to generate a BitSet from a std::bitset.
+    explicit BitSet(const std::bitset<NUM_BITS> & bitset);
+
+    /// Constructor to generate a BitSet from a string of '0's and '1's.
+    explicit BitSet(const std::string & bitstring);
 
     /// Constructor to generate a random BitSet (with equal prob of 0 or 1).
     BitSet(Random & random) { Clear(); Randomize(random); }
@@ -815,6 +821,21 @@ namespace emp {
   }
 
   // -------------------- Longer Constructors and bit copying ---------------------
+
+  /// Constructor to generate a BitSet from a std::bitset.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS>::BitSet(const std::bitset<NUM_BITS> & bitset) {
+    Clear(); // have to clear out field bits beyond NUM_BITS
+    for (size_t bit{}; bit < NUM_BITS; ++bit) Set( bit, bitset[bit] );
+  }
+
+  /// Constructor to generate a BitSet from a string of '0's and '1's.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS>::BitSet(const std::string & bitstring)
+    : BitSet( std::bitset<NUM_BITS>( bitstring ) )
+  {
+    emp_assert( bitstring.size() == NUM_BITS );
+  }
 
   template <size_t NUM_BITS>
   template <typename T>
