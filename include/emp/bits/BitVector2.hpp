@@ -450,6 +450,12 @@ namespace emp {
                       const std::string & spacer=",",
                       const std::string & ranger="-") const;
 
+    /// Overload ostream operator to return Print.
+    friend std::ostream& operator<<(std::ostream &out, const BitVector & bv) {
+      bv.Print(out);
+      return out;
+    }
+
 
     // >>>>>>>>>>  Boolean Logic and Shifting Operations  <<<<<<<<<< //
 
@@ -827,14 +833,14 @@ namespace emp {
       emp_assert(bits.DebugIsArray()); // Must be marked as an array.
       emp_assert(bits.OK());           // Pointer must be okay.
 #endif
+
+      // Make sure final bits are zeroed out.
+      [[maybe_unused]] field_t excess_bits = bits[LastField()] & ~MaskLow<field_t>(NumEndBits());
+      emp_assert(!excess_bits);
     }
 
     // Otherwise bits is null; num_bits should be zero.
     else emp_assert(num_bits == 0);
-
-    // Make sure final bits are zeroed out.
-    [[maybe_unused]] field_t excess_bits = bits[LastField()] & ~MaskLow<field_t>(NumEndBits());
-    emp_assert(!excess_bits);
 
     return true;
   }
@@ -874,6 +880,7 @@ namespace emp {
   BitVector::BitVector(size_t in_num_bits, Random & random)
   : num_bits(in_num_bits), bits(nullptr)
   {
+    Clear();
     if (num_bits) {
       bits = NewArrayPtr<field_t>(NumFields());
       Randomize(random);
@@ -884,6 +891,7 @@ namespace emp {
   BitVector::BitVector(size_t in_num_bits, Random & random, const double p1)
   : num_bits(in_num_bits), bits(nullptr)
   {
+    Clear();
     if (num_bits) {
       bits = NewArrayPtr<field_t>(NumFields());
       Randomize(random, p1);
@@ -894,6 +902,7 @@ namespace emp {
   BitVector::BitVector(size_t in_num_bits, Random & random, const size_t target_ones)
   : num_bits(in_num_bits), bits(nullptr)
   {
+    Clear();
     if (num_bits) {
       bits = NewArrayPtr<field_t>(NumFields());
       Randomize(random, target_ones);
@@ -955,14 +964,15 @@ namespace emp {
     return *this;
   }
 
-    /// Assign from a BitVector of a different size.
+  /// Assign from a BitVector of a different size.
+  // @CAO: Can manually copy to  skip unused fields for a speedup.
   BitVector & BitVector::Import(const BitVector & from_bv, const size_t from_bit) {
     emp_assert(&from_bv != this);
     emp_assert(from_bit < from_bv.GetSize());
 
-    size_t init_size = GetSize();
+    const size_t init_size = GetSize();
     *this = from_bv;
-    *this << from_bit;
+    *this >>= from_bit;
     Resize(init_size);
 
     return *this;
@@ -1443,8 +1453,8 @@ namespace emp {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
     emp_assert((index+7)/8 + sizeof(T) < TotalBytes());
 
-    BitVector out_bits(sizeof(T)*8);
-    out_bits.Import(*this, index);
+    BitVector out_bits(*this);
+    out_bits >>= index;
 
     return out_bits.template GetValueAtIndex<T>(0);
   }
@@ -2037,12 +2047,6 @@ namespace std {
       return b.Hash();
     }
   };
-
-  /// operator<< to work with ostream (must be in std to work)
-  inline std::ostream & operator<<(std::ostream & out, const emp::BitVector & bit_v) {
-    bit_v.Print(out);
-    return out;
-  }
 }
 
 #endif
