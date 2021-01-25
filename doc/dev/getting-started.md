@@ -314,3 +314,20 @@ recipe:
     git status ## sanity check
     git push ## should fail
     git push --force ## override what's in GitHub's copy of the branch/pull request
+
+## How to Set Up X11 Display for SFML on Windows:
+1. Download MobaXterm
+2. Open a WSL-Ubuntu Session
+3. Hover over the XServer icon at the top right of the screen and note the DISPLAY value (X.X.X.X:X.X)
+4. Type at the command prompt: export DISPLAY=X.X.X.X:X.X
+5. Run your desired programs!
+
+## How to Set Up X11 Display for SFML on HPCC:
+adapted from https://wiki.hpcc.msu.edu/display/~colbrydi@msu.edu/2013/10
+1. specify display, start the Xvfb server, and save the process ID
+2. Run the following commands
+-   export DISPLAY=":${SLURM_JOB_ID-1}"
+-   rm -f "/tmp/.X11-unix/X${SLURM_JOB_ID-1}"
+-   rm -f "/tmp/.X${SLURM_JOB_ID-1}-lock"
+-   Xvfb "${DISPLAY}" -auth /dev/null/ &
+-   export XVFB_PID=$!
