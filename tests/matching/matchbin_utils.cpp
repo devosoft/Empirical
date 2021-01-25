@@ -67,7 +67,8 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
   }
 
   // test ApproxDualStreakMetric
-  emp::ExactDualStreakMetric<4> metric;
+  {
+  emp::ApproxDualStreakMetric<4> metric;
 
   REQUIRE( metric({0,0,0,0},{0,0,0,0}) < metric({0,0,0,0},{1,0,0,0}) );
   REQUIRE( metric({0,0,0,0},{0,0,0,1}) < metric({0,0,0,0},{0,1,0,0}) );
@@ -84,6 +85,29 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
     REQUIRE(metric(a,b) >= 0.0);
   }
 
+  }
+
+  // test OptimizedApproxDualStreakMetric
+  {
+  emp::OptimizedApproxDualStreakMetric<4> metric;
+
+  REQUIRE( metric({0,0,0,0},{0,0,0,0}) < metric({0,0,0,0},{1,0,0,0}) );
+  REQUIRE( metric({0,0,0,0},{0,0,0,1}) < metric({0,0,0,0},{0,1,0,0}) );
+  REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,1}) );
+  REQUIRE( metric({0,0,0,0},{1,1,0,0}) < metric({0,0,0,0},{1,1,0,1}) );
+  REQUIRE( metric({0,0,0,0},{1,1,0,1}) < metric({0,0,0,0},{1,1,1,0}) );
+  REQUIRE( metric({0,0,0,0},{0,0,1,1}) > metric({0,0,0,0},{0,0,1,0}) );
+
+  emp::Random rand(1);
+  for (size_t i = 0; i < 1000; ++i) {
+    emp::BitSet<4> a(rand);
+    emp::BitSet<4> b(rand);
+    // optimizations aren't free ¯\_(ツ)_/¯, approximation okay
+    REQUIRE(metric(a,b) <= 1.05);
+    REQUIRE(metric(a,b) >= -0.05);
+  }
+
+  }
 
   // test ExactSingleStreakMetric
   {
