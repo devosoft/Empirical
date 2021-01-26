@@ -148,6 +148,13 @@ namespace emp {
     /// Move constructor of existing bit field.
     BitVector(BitVector && in);
 
+    /// Constructor to generate a BitVector from a std::bitset.
+    template <size_t NUM_BITS>
+    explicit BitVector(const std::bitset<NUM_BITS> & bitset);
+
+    /// Constructor to generate a BitVector from a string of '0's and '1's.
+    explicit BitVector(const std::string & bitstring);
+
     /// Constructor to generate a random BitVector (with equal prob of 0 or 1).
     BitVector(size_t in_num_bits, Random & random);
 
@@ -874,6 +881,25 @@ namespace emp {
 
     in.bits = nullptr;
     in.num_bits = 0;
+  }
+
+  /// Constructor to generate a BitVector from a std::bitset.
+  template <size_t NUM_BITS>
+  BitVector::BitVector(const std::bitset<NUM_BITS> & bitset) : num_bits(NUM_BITS), bits(nullptr) {
+    if (num_bits) {
+      bits = NewArrayPtr<field_t>(NumFields());
+      for (size_t i = 0; i < NUM_BITS; i++) bits[i] = bitset.Get(i);
+    }
+  }
+
+  /// Constructor to generate a BitVector from a string of '0's and '1's.
+  BitVector::BitVector(const std::string & bitstring) : num_bits(bitstring.size()), bits(nullptr) {
+    if (num_bits) {
+      bits = NewArrayPtr<field_t>(NumFields());
+      for (size_t i = 0; i < num_bits; i++) {
+        bits[i] = (bitstring[num_bits - i - 1] != '0');
+      }
+    }
   }
 
   /// Constructor to generate a random BitVector (with equal prob of 0 or 1).
