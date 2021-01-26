@@ -179,6 +179,13 @@ namespace emp {
     /// Move operator.
     BitVector & operator=(BitVector && in);
 
+    /// Assignement operator from a std::bitset.
+    template <size_t NUM_BITS>
+    BitVector & operator=(const std::bitset<NUM_BITS> & bitset);
+
+    /// Assignement operator from a string of '0's and '1's.
+    BitVector & operator=(const std::string & bitstring);
+
     /// Assignment from another BitVector without changing size.
     BitVector & Import( const BitVector & from_bv, const size_t from_bit=0 );
 
@@ -989,6 +996,48 @@ namespace emp {
 
     return *this;
   }
+
+  /// Assignement operator from a std::bitset.
+  template <size_t NUM_BITS>
+  BitVector & BitVector::operator=(const std::bitset<NUM_BITS> & bitset) {
+    const size_t start_fields = NumFields();
+    num_bits = NUM_BITS;
+    const size_t new_fields = NumFields();
+
+    // Update the size of internal fields if needed.
+    if (start_fields != new_fields) {
+      if (bits) bits.DeleteArray();   // If we already had a bitset, get rid of it.
+      if constexpr (NUM_BITS) bits = NewArrayPtr<field_t>(new_fields);
+      else bits = nullptr;
+    }
+
+    // If we have bits, copy them in.
+    if constexpr (NUM_BITS) {
+      for (size_t i = 0; i < NUM_BITS; i++) bits[i] = bitset.Get(i);
+    }
+  }
+
+  /// Assignement operator from a string of '0's and '1's.
+  BitVector & BitVector::operator=(const std::string & bitstring) {
+    const size_t start_fields = NumFields();
+    num_bits = bitstring.size();
+    const size_t new_fields = NumFields();
+
+    // Update the size of internal fields if needed.
+    if (start_fields != new_fields) {
+      if (bits) bits.DeleteArray();   // If we already had a bitset, get rid of it.
+      if (num_bits) bits = NewArrayPtr<field_t>(new_fields);
+      else bits = nullptr;
+    }
+
+    // If we have bits, copy them in.
+    if (num_bits) {
+      for (size_t i = 0; i < num_bits; i++) {
+        bits[i] = (bitstring[num_bits - i - 1] != '0');
+      }
+    }
+  }
+
 
   /// Assign from a BitVector of a different size.
   // @CAO: Can manually copy to  skip unused fields for a speedup.
