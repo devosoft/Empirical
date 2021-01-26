@@ -40,6 +40,17 @@ namespace emp {
     return hash1 ^ (hash2 + 0x9e3779b9 + (hash1 << 6) + (hash1 >> 2));
   }
 
+  /// Allow hash_combine to work with more than two input values.
+  template <typename... Ts>
+  constexpr inline std::size_t hash_combine(std::size_t hash1, std::size_t hash2,
+                                            std::size_t hash3, Ts... extras)
+  {
+    // combine the first two, put them at the end (so the same ones don't keep getting recombined
+    // every step of the way through), and recurse.
+    std::size_t partial_hash = hash_combine(hash1, hash2);
+    return hash_combine(hash3, extras..., partial_hash);
+  }
+
   // helper functions for murmur hash
   namespace internal {
     constexpr uint64_t rotate(const size_t x, const size_t r) {
