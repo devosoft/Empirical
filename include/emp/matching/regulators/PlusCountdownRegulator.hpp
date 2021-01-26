@@ -19,7 +19,7 @@
 
 namespace emp {
 
-template <typename Slope=std::deci>
+template <typename Slope=std::deci, typename ClampLeeway=std::ratio<0>>
 struct PlusCountdownRegulator {
 
   using set_t = float;
@@ -28,6 +28,9 @@ struct PlusCountdownRegulator {
 
   static constexpr float slope = (
     static_cast<float>(Slope::num) / static_cast<float>(Slope::den)
+  );
+  static constexpr float clamp_leeway = (
+    static_cast<float>(ClampLeeway::num) / static_cast<float>(ClampLeeway::den)
   );
 
   // positive = downregulated
@@ -51,8 +54,8 @@ struct PlusCountdownRegulator {
   float operator()(const float raw_score) const {
     const float res = std::clamp(
       slope * state + raw_score,
-      0.0f,
-      1.0f
+      -clamp_leeway,
+      1.0f + clamp_leeway
     );
     emp_assert(state <= 0.0f || res >= raw_score
       || raw_score > 1.0f || std::isnan(state),
@@ -61,8 +64,10 @@ struct PlusCountdownRegulator {
       state >= 0.0f || res <= raw_score
       || raw_score < 0.0f || std::isnan(state),
       state, res, raw_score);
-    emp_assert( (res >= 0.0f && res <= 1.0f) || std::isnan(state),
-      res);
+    emp_assert(
+      (res >= -clamp_leeway && res <= 1.0f + clamp_leeway) || std::isnan(state),
+      res
+    );
     return res;
 
   }
