@@ -51,6 +51,25 @@ namespace emp {
     return hash_combine(hash3, extras..., partial_hash);
   }
 
+  /// Allow hash combine to take a VECTOR of size_t's to combine into a single hash.
+  constexpr inline std::size_t hash_combine(emp::vector<std::size_t> hashes)
+  {
+    const size_t num_hashes = hashes.size();   // Track how many hashes we are combining.
+    emp_assert(num_hashes > 0);                // At least one hash is required!
+    if (num_hashes == 1) return hashes[0];     // If we have exactly one, just return it.
+
+    // Combine the last two hashes into partial hash.
+    std::size_t partial_hash = hash_combine(hashes[num_hashes-1], hashes[num_hashes-2]);
+    if (num_hashes == 2) return partial_hash;
+
+    // Replace the last two hashes with the single partial hash.
+    hashes.pop_back();
+    hashes[num_hashes-2] = partial_hash;
+
+    // Recurse!
+    return hash_combine(hashes);
+  }
+
   // helper functions for murmur hash
   namespace internal {
     constexpr uint64_t rotate(const size_t x, const size_t r) {
