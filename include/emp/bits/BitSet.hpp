@@ -292,23 +292,32 @@ namespace emp {
     /// Update the byte at the specified byte index.
     void SetByte(size_t index, uint8_t value);
 
+    /// Get the overall value of this BitSet, using a uint encoding, but including all bits
+    /// and returning the value as a double.
+    double GetValue() const {
+      // @CAO CONTINUE HERE!
+      return 0.0;
+    }
 
     /// Get specified type at a given index (in steps of that type size)
     template <typename T> T GetValueAtIndex(const size_t index) const;
 
-    // Retrieve the 8-bit uint from the specified uint index.
+    /// Retrieve a 'size_t' chunk from the current bits at the specified index.
+    std::size_t GetSizeT(size_t index) const { return GetValueAtIndex<size_t>(index); }
+
+    /// Retrieve the 8-bit uint from the specified uint index.
     uint8_t GetUInt8(size_t index) const { return GetValueAtIndex<uint8_t>(index); }
 
-    // Retrieve the 16-bit uint from the specified uint index.
+    /// Retrieve the 16-bit uint from the specified uint index.
     uint16_t GetUInt16(size_t index) const { return GetValueAtIndex<uint16_t>(index); }
 
-    // Retrieve the 32-bit uint from the specified uint index.
+    /// Retrieve the 32-bit uint from the specified uint index.
     uint32_t GetUInt32(size_t index) const { return GetValueAtIndex<uint32_t>(index); }
     
-    // Retrieve the 64-bit uint from the specified uint index.
+    /// Retrieve the 64-bit uint from the specified uint index.
     uint64_t GetUInt64(size_t index) const { return GetValueAtIndex<uint64_t>(index); }
 
-    // By default, retrieve the 32-bit uint from the specified uint index.
+    /// By default, retrieve the 32-bit uint from the specified uint index.
     uint32_t GetUInt(size_t index) const { return GetUInt32(index); }
 
 
@@ -334,19 +343,19 @@ namespace emp {
     /// Get specified type starting at a given BIT position.
     template <typename T> T GetValueAtBit(const size_t index) const;
 
-    // Retrieve the 8-bit uint from the specified uint index.
+    /// Retrieve the 8-bit uint from the specified uint index.
     uint8_t GetUInt8AtBit(size_t index) const { return GetValueAtBit<uint8_t>(index); }
 
-    // Retrieve the 16-bit uint from the specified uint index.
+    /// Retrieve the 16-bit uint from the specified uint index.
     uint16_t GetUInt16AtBit(size_t index) const { return GetValueAtBit<uint16_t>(index); }
 
-    // Retrieve the 32-bit uint from the specified uint index.
+    /// Retrieve the 32-bit uint from the specified uint index.
     uint32_t GetUInt32AtBit(size_t index) const { return GetValueAtBit<uint32_t>(index); }
     
-    // Retrieve the 64-bit uint from the specified uint index.
+    /// Retrieve the 64-bit uint from the specified uint index.
     uint64_t GetUInt64AtBit(size_t index) const { return GetValueAtBit<uint64_t>(index); }
 
-    // By default, retrieve the 32-bit uint from the specified uint index.
+    /// By default, retrieve the 32-bit uint from the specified uint index.
     uint32_t GetUIntAtBit(size_t index) const { return GetUInt32AtBit(index); }
 
 
@@ -1383,11 +1392,23 @@ namespace emp {
   /// A simple hash function for bit vectors.
   template <size_t NUM_BITS>
   std::size_t BitSet<NUM_BITS>::Hash() const {
-    std::size_t hash_val = 0;
-    for (size_t i = 0; i < NUM_FIELDS; i++) {
-      hash_val ^= bit_set[i] + i*1000000009;
+    /// If we have a vector of size_t, treat it as a vector of hash values to combine.
+    if constexpr (std::is_same_v<field_t, size_t>) {
+      return hash_combine(bit_set, NUM_FIELDS);
     }
-    return hash_val;
+
+    constexpr size_t SIZE_T_BITS = sizeof(std::size_t)*8;
+
+    // If all of the bits will fit into a single size_t, return it.
+    if constexpr (NUM_BITS <= SIZE_T_BITS) return GetSizeT(0);
+
+    // If the bits fit into TWO size_t units, merge them.
+    if constexpr (NUM_BITS <= 2 * SIZE_T_BITS) {
+      return emp::hash_combine(GetSizeT(0), GetSizeT(1));
+    }
+
+    // Otherwise just use murmur hash (should never happen and slightly slower, but generalizes).
+    return emp::murmur_hash( GetBytes() );
   }
 
   // TODO: see https://arxiv.org/pdf/1611.07612.pdf for fast pop counts
