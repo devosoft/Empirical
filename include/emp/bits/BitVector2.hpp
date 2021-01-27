@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2020.
+ *  @date 2016-2021.
  *
  *  @file  BitVector.hpp
  *  @brief A drop-in replacement for std::vector<bool>, with additional bitwise logic features.
@@ -327,6 +327,10 @@ namespace emp {
 
     /// Update the byte at the specified byte index.
     void SetByte(size_t index, uint8_t value);
+
+    /// Get the overall value of this BitVector, using a uint encoding, but including all bits
+    /// and returning the value as a double.
+    double GetValue() const;
 
     /// Return a span with all fields in order.
     std::span<field_t> FieldSpan() { return std::span<field_t>(bits.Raw(), NumFields()); }
@@ -1502,6 +1506,17 @@ namespace emp {
     bits[field_id] = (bits[field_id] & ~(FIELD_255 << pos_id)) | (val_uint << pos_id);
   }
 
+  /// Get the overall value of this BitSet, using a uint encoding, but including all bits
+  /// and returning the value as a double.
+  double BitVector::GetValue() const {
+    // To grab the most significant field, figure out how much to shift it by.
+    const size_t shift_bits = num_bits - FIELD_BITS;
+    double out_value = (double) (*this >> shift_bits)[0];
+
+    for (size_t i = 0; i < shift_bits; i++) out_value *= 2.0;
+
+    return out_value;
+  }
 
   /// Get specified type at a given index (in steps of that type size)
   template <typename T>
@@ -2129,8 +2144,8 @@ namespace std {
   /// Hash function to allow BitVector to be used with maps and sets (must be in std).
   template <>
   struct hash<emp::BitVector> {
-    std::size_t operator()(const emp::BitVector & b) const {
-      return b.Hash();
+    std::size_t operator()(const emp::BitVector & bv) const {
+      return bv.Hash();
     }
   };
 }
