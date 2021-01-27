@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2020.
+ *  @date 2016-2021.
  *
  *  @file  BitSet.hpp
  *  @brief A drop-in replacement for std::bitset, with additional bit magic features.
@@ -294,18 +294,7 @@ namespace emp {
 
     /// Get the overall value of this BitSet, using a uint encoding, but including all bits
     /// and returning the value as a double.
-    double GetValue() const {
-      // If we have 64 bits or fewer, we can load the full value and return it.
-      if constexpr (NUM_FIELDS == 1) return (double) bit_set[0];
-
-      // Otherwise grab the most significant field and figure out how much to shift it by.
-      constexpr size_t SHIFT_BITS = NUM_BITS - FIELD_BITS;
-      double out_value = (double) (*this >> SHIFT_BITS)[0];
-
-      for (size_t i = 0; i < SHIFT_BITS; i++) out_value *= 2.0;
-
-      return out_value;
-    }
+    double GetValue() const;
 
     /// Get specified type at a given index (in steps of that type size)
     template <typename T> T GetValueAtIndex(const size_t index) const;
@@ -1333,6 +1322,21 @@ namespace emp {
     bit_set[field_id] = (bit_set[field_id] & ~(((field_t)255U) << pos_id)) | (val_uint << pos_id);
   }
 
+  /// Get the overall value of this BitSet, using a uint encoding, but including all bits
+  /// and returning the value as a double.
+  template <size_t NUM_BITS>
+  double BitSet<NUM_BITS>::GetValue() const {
+    // If we have 64 bits or fewer, we can load the full value and return it.
+    if constexpr (NUM_FIELDS == 1) return (double) bit_set[0];
+
+    // Otherwise grab the most significant field and figure out how much to shift it by.
+    constexpr size_t SHIFT_BITS = NUM_BITS - FIELD_BITS;
+    double out_value = (double) (*this >> SHIFT_BITS)[0];
+
+    for (size_t i = 0; i < SHIFT_BITS; i++) out_value *= 2.0;
+
+    return out_value;
+  }
 
   /// Get specified type at a given index (in steps of that type size)
   template <size_t NUM_BITS>
@@ -2006,7 +2010,7 @@ namespace std
     {
         size_t operator()( const emp::BitSet<N>& bs ) const
         {
-          return emp::murmur_hash(bs.GetBytes());
+          return bs.Hash();
         }
     };
 }
