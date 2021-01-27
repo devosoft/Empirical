@@ -37,6 +37,7 @@
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
+#include "../datastructs/hash_utils.hpp"
 #include "../math/math.hpp"
 #include "../math/Random.hpp"
 #include "../tools/functions.hpp"
@@ -408,7 +409,7 @@ namespace emp {
     // >>>>>>>>>>  Other Analyses  <<<<<<<<<< //
 
     /// A simple hash function for bit vectors.
-    std::size_t Hash() const;
+    std::size_t Hash(size_t start_field=0) const;
 
     /// Count the number of ones in the BitVector.
     size_t CountOnes() const;
@@ -1015,6 +1016,8 @@ namespace emp {
     if constexpr (NUM_BITS) {
       for (size_t i = 0; i < NUM_BITS; i++) bits[i] = bitset.Get(i);
     }
+
+    return *this;
   }
 
   /// Assignement operator from a string of '0's and '1's.
@@ -1036,6 +1039,8 @@ namespace emp {
         bits[i] = (bitstring[num_bits - i - 1] != '0');
       }
     }
+
+    return *this;
   }
 
 
@@ -1556,13 +1561,19 @@ namespace emp {
   // -------------------------  Other Analyses -------------------------
 
   /// A simple hash function for bit vectors.
-  std::size_t BitVector::Hash() const {
-    std::size_t hash_val = 0;
-    const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) {
-      hash_val ^= bits[i] + i*1000000009;
-    }
-    return hash_val ^ ((97*num_bits) << 8);
+  std::size_t BitVector::Hash(size_t start_field) const {
+    static_assert(std::is_same_v<field_t, size_t>, "Hash() requires fields to be size_t");
+    
+    // If there are no fields left, hash on size one.
+    if (start_field == NumFields()) return num_bits;
+
+    // If we have only one field left, combine it with size.
+    if (start_field == NumFields()-1) return hash_combine(bits[start_field], num_bits);
+
+    // Otherwise we have more than one field.  Combine and recurse.
+    size_t partial_hash = hash_combine(bits[start_field], bits[start_field+1]);
+
+    return hash_combine(partial_hash, Hash(start_field+2));
   }
 
   // TODO: see https://arxiv.org/pdf/1611.07612.pdf for fast pop counts
