@@ -295,8 +295,16 @@ namespace emp {
     /// Get the overall value of this BitSet, using a uint encoding, but including all bits
     /// and returning the value as a double.
     double GetValue() const {
-      // @CAO CONTINUE HERE!
-      return 0.0;
+      // If we have 64 bits or fewer, we can load the full value and return it.
+      if constexpr (NUM_FIELDS == 1) return (double) bit_set[0];
+
+      // Otherwise grab the most significant field and figure out how much to shift it by.
+      constexpr size_t SHIFT_BITS = NUM_BITS - FIELD_BITS;
+      double out_value = (double) (*this >> SHIFT_BITS)[0];
+
+      for (size_t i = 0; i < SHIFT_BITS; i++) out_value *= 2.0;
+
+      return out_value;
     }
 
     /// Get specified type at a given index (in steps of that type size)
