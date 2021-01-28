@@ -15,6 +15,8 @@
 #include <algorithm>
 #include <limits>
 
+#include "../../../third-party/robin-hood-hashing/src/include/robin_hood.h"
+
 #include "../datastructs/SmallFifoMap.hpp"
 #include "../datastructs/SmallVector.hpp"
 
@@ -27,7 +29,7 @@ template<
   typename Metric,
   typename Selector,
   typename Regulator,
-  size_t RawCacheSize=0,
+  bool UseRawCache=1,
   size_t RegulatedCacheSize=0
 > class MatchDepository {
 
@@ -46,7 +48,7 @@ private:
   emp::vector< emp::internal::DepositoryEntry<Val, tag_t, Regulator> > data;
 
   // Cache of match results without regulation.
-  emp::SmallFifoMap< query_t, res_t, RawCacheSize > cache_raw;
+  robin_hood::unordered_flat_map< query_t, res_t > cache_raw;
 
   // Cache of match results with regulation.
   emp::SmallFifoMap< query_t, res_t, RegulatedCacheSize > cache_regulated;
@@ -67,7 +69,12 @@ private:
       }
     );
 
-    return Selector::select( scores );
+    const auto res = Selector::select( scores );
+
+    if constexpr (RegulatedCacheSize > 0) cache_regulated.set( query, res );
+
+    return res;
+
   }
 
   /// Return ptr to cached regulated result on success, nullptr on failure.
@@ -89,15 +96,23 @@ private:
       [&](const auto& entry){ return Metric::calculate(query, entry.tag); }
     );
 
-    return Selector::select( scores );
+    const auto res = Selector::select( scores );
+
+    if constexpr ( UseRawCache ) cache_raw.emplace( query, res );
+
+    return res;
   }
 
   /// Return ptr to cached raw result on success, nullptr on failure.
-  res_t* DoRawLookup( const query_t& query ) { return cache_raw.get( query ); }
+  res_t* DoRawLookup( const query_t& query ) {
+    const auto res = cache_raw.find( query );
+    return (res == std::end( cache_raw )) ? nullptr : &(res->second);
+  }
 
   /// Clear cached raw, regulated results.
   void ClearCache() {
-    if constexpr ( RawCacheSize > 0 ) cache_raw.clear();
+    // clear is an expensive operation on robin_hood::unordered_flat_map
+    if constexpr ( UseRawCache ) if ( cache_raw.size() ) cache_raw.clear();
     if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
   }
 
@@ -125,7 +140,7 @@ public:
   __attribute__ ((hot))
   res_t MatchRaw( const query_t& query ) {
 
-    if constexpr ( RawCacheSize > 0 ) {
+    if constexpr ( UseRawCache ) {
       if (const auto res = DoRawLookup( query ); res != nullptr) return *res;
     }
 
