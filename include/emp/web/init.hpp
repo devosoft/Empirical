@@ -22,6 +22,12 @@
 #include <pthread.h>
 #endif //  __EMSCRIPTEN_PTHREADS__
 
+// temporary patch for https://github.com/emscripten-core/emscripten/issues/11539
+#define MAIN_THREAD_EMP_ASM(...) [&](){ \
+  [[maybe_unused]] volatile int no_optimize{}; \
+  MAIN_THREAD_EM_ASM(__VA_ARGS__); \
+}()
+
 extern "C" {
   extern void EMP_Initialize();
 }
@@ -33,7 +39,7 @@ namespace emp {
     thread_local bool init = false;      // Make sure we only initialize once!
     if (!init) {
       // Setup the animation callback in Javascript
-      MAIN_THREAD_EM_ASM({
+      MAIN_THREAD_EMP_ASM({
         window.requestAnimFrame = (function(callback) {
             return window.requestAnimationFrame
               || window.webkitRequestAnimationFrame
@@ -57,7 +63,7 @@ namespace emp {
       return typeof WorkerGlobalScope !== 'undefined'
         && self instanceof WorkerGlobalScope;
     }) ) {
-      MAIN_THREAD_EM_ASM({
+      MAIN_THREAD_EMP_ASM({
         console.assert( Object.keys( PThread.pthreads ).length === 1 );
         Object.values(PThread.pthreads)[0].worker.addEventListener(
           'message',
@@ -127,7 +133,7 @@ namespace emp {
       InitializeAnim();
 
       #ifdef __EMSCRIPTEN_PTHREADS__
-      MAIN_THREAD_EM_ASM({ _EMP_Initialize(); });
+      MAIN_THREAD_EMP_ASM({ _EMP_Initialize(); });
       InitializeBitmapListener();
       InitializeOffscreenCanvasRegistries();
       #endif
@@ -175,8 +181,8 @@ namespace emp {
 
 #else
 
-#define MAIN_THREAD_EM_ASM(...)
-#define MAIN_THREAD_EM_ASM(...)
+#define MAIN_THREAD_EMP_ASM(...)
+#define MAIN_THREAD_EMP_ASM(...)
 #define MAIN_THREAD_EM_ASM_INT(...) 0
 #define MAIN_THREAD_EM_ASM_DOUBLE(...) 0.0
 #define MAIN_THREAD_EM_ASM_INT_V(...) 0

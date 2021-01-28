@@ -113,7 +113,7 @@ namespace web {
       const std::string to_append = strings.empty() ? text : (separator + text);
       // ideally, we would use MAIN_THREAD_ASYNC_EM_ASM but that seems to
       // garble string arguments (as of emscripten 1.38.48)
-      MAIN_THREAD_EM_ASM({
+      MAIN_THREAD_EMP_ASM({
         var content = document.createElement('span');
         content.innerHTML = UTF8ToString($1);
         $( `#${UTF8ToString($0)}` ).append( content );
@@ -132,7 +132,7 @@ namespace web {
     }
 
     // prevent runaway async execution! do this every N?
-    // MAIN_THREAD_EM_ASM({
+    // MAIN_THREAD_EMP_ASM({
     //   ()=>{}; // nop
     // });
 

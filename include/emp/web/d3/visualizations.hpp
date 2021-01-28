@@ -99,7 +99,7 @@ public:
       info = new D3VisualizationInfo(this, in_id);
       Info()->width = w;
       Info()->height = h;
-      MAIN_THREAD_EM_ASM({window["emp"]["__default_draw_data_callback"] =
+      MAIN_THREAD_EMP_ASM({window["emp"]["__default_draw_data_callback"] =
               function(){;};});
   }
 
@@ -140,7 +140,7 @@ public:
   }
 
   void CallDrawCallback() {
-    MAIN_THREAD_EM_ASM({window["emp"][UTF8ToString($0)]()}, draw_data_callback.c_str());
+    MAIN_THREAD_EMP_ASM({window["emp"][UTF8ToString($0)]()}, draw_data_callback.c_str());
   }
 
   /*
@@ -616,7 +616,7 @@ public:
       }
 
       D3::Transition t = GetSVG()->MakeTransition();
-      MAIN_THREAD_EM_ASM({js.objects[$0].ease(d3.easeLinear).delay(10).duration(300);}, t.GetID());
+      MAIN_THREAD_EMP_ASM({js.objects[$0].ease(d3.easeLinear).delay(10).duration(300);}, t.GetID());
       y_axis->Rescale(y_max, y_min, t);
       x_axis->Rescale(x_min, x_max, t);
       t.On("end", GetID()+"draw_data");
@@ -642,7 +642,7 @@ public:
   //   new_segs.EnterAppend("path").SetAttr("class", "line-seg");
   //   new_segs.SetAttr("d", GetID()+"genpath");
   //
-  //   // MAIN_THREAD_EM_ASM({
+  //   // MAIN_THREAD_EMP_ASM({
   //   //
   //   //   js.objects[$0].selectAll(".line-seg").attr("d", function(d){console.log("in d", d, $1, js.objects[$1]); return js.objects[$1](d);});
   //   // }, GetSVG()->GetID(), line_gen->GetID(), s.GetID());
@@ -653,7 +653,7 @@ public:
     // s.SelectAll(".data-point").SetAttr("cy", GetID()+"y");
     // s.SelectAll(".data-point").SetAttr("cx", GetID()+"x");
 
-    MAIN_THREAD_EM_ASM({
+    MAIN_THREAD_EMP_ASM({
         function pathTween(d1, precision) {
           return function() {
             var path0 = this;
@@ -895,7 +895,7 @@ public:
   virtual void Setup() {
     InitializeVariables();
 
-    MAIN_THREAD_EM_ASM({
+    MAIN_THREAD_EMP_ASM({
       js.objects[$0] = [js.objects[$1][0]];
     }, possible_parents.GetID(), data->GetID());
 
@@ -908,7 +908,7 @@ public:
     int pos = data->AppendNestedFromList(child_json, possible_parents);
     (void) pos;
 
-    MAIN_THREAD_EM_ASM({
+    MAIN_THREAD_EMP_ASM({
         while (js.objects[$0].length < $1 + 1) {
           js.objects[$0].push(-1);
         }
@@ -966,7 +966,7 @@ public:
   };
 
   std::function<void(NODE, int)> node_mouseover = [this](NODE d, int i){
-    MAIN_THREAD_EM_ASM({
+    MAIN_THREAD_EMP_ASM({
 
       var trace_lineage = function(root, id) {
         if (root.name == id){
@@ -1070,7 +1070,7 @@ public:
   std::function<void(LegendNode, int)> legend_mouseover = [this](LegendNode d, int il) {
     legend.SelectAll("rect").Filter([d](LegendNode in_data){return d.loc() != in_data.loc();}).SetClassed("faded", true);
     GetSVG()->SelectAll(".node").Filter([d](LegendNode in_data){return d.loc() != in_data.loc();}).SetClassed("faded", true);
-    MAIN_THREAD_EM_ASM({emp.filter_fun = function(d){return d.source.loc != $0;}}, d.loc());
+    MAIN_THREAD_EMP_ASM({emp.filter_fun = function(d){return d.source.loc != $0;}}, d.loc());
     GetSVG()->SelectAll(".link").Filter("filter_fun").SetClassed("faded", true);
   };
 
@@ -1082,12 +1082,12 @@ public:
              .Filter([d](LegendNode in_data){return d.loc() != in_data.loc();})
              .SetClassed("faded", false);
 
-    MAIN_THREAD_EM_ASM({emp.filter_fun = function(d){return d.source.loc != $0;}}, d.loc());
+    MAIN_THREAD_EMP_ASM({emp.filter_fun = function(d){return d.source.loc != $0;}}, d.loc());
     GetSVG()->SelectAll(".link").Filter("filter_fun").SetClassed("faded", false);
   };
 
   emp::vector<int> GetLocHistory(int id) {
-    MAIN_THREAD_EM_ASM({
+    MAIN_THREAD_EMP_ASM({
       var org = js.objects[$1](js.objects[$0][0], $2);
       var loc_history = [];
       loc_history.push(org.loc);

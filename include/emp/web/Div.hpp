@@ -278,7 +278,7 @@ namespace web {
     // float scroll_frac = ((float) (hardware->GetIP() - 3)) / (float) hardware->GetNumInsts();
     // if (scroll_frac < 0.0) scroll_frac = 0.0;
 
-    // MAIN_THREAD_EM_ASM({
+    // MAIN_THREAD_EMP_ASM({
     //     var code = UTF8ToString($0);
     //     var code_obj = document.getElementById("code");
     //     code_obj.innerHTML = code;

@@ -84,7 +84,7 @@ namespace D3{
     /// up to this object's data pointer.
     TreeLayout(JSONDataset * dataset){
         //Create layout object
-        MAIN_THREAD_EM_ASM({js.objects[$0] = d3.tree();}, this->id);
+        MAIN_THREAD_EMP_ASM({js.objects[$0] = d3.tree();}, this->id);
 
         make_line = new D3::LinkGenerator("horizontal");
 
@@ -100,7 +100,7 @@ namespace D3{
     /// Default constructor - if you use this you need connect a dataset with SetDataset
     TreeLayout(){
         //Create layout object
-        MAIN_THREAD_EM_ASM({js.objects[$0] = d3.tree();}, this->id);
+        MAIN_THREAD_EMP_ASM({js.objects[$0] = d3.tree();}, this->id);
 
         make_line = new D3::LinkGenerator("horizontal");
 
@@ -138,7 +138,7 @@ namespace D3{
       int link_exit = NextD3ID();
       std::cout << "Tree data id: " << data->GetID() << std::endl;
     //   make_line->Log();
-      MAIN_THREAD_EM_ASM({
+      MAIN_THREAD_EMP_ASM({
 
         // Based on code from http://www.d3noob.org/2014/01/tree-diagrams-in-d3js_11.html
         var root = d3.hierarchy(js.objects[$1][0]);
@@ -194,7 +194,7 @@ namespace D3{
 
     /// Set the width of the tree area to [w] and the height to [h]
     void SetSize(int w, int h) {
-      MAIN_THREAD_EM_ASM({js.objects[$0].size([$1,$2]);}, this->id, w, h);
+      MAIN_THREAD_EMP_ASM({js.objects[$0].size([$1,$2]);}, this->id, w, h);
     }
 
   };

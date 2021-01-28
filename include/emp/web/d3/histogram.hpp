@@ -22,7 +22,7 @@ namespace D3 {
         uint32_t value_fun_id = -1;
     public:
         Histogram(){
-            MAIN_THREAD_EM_ASM({js.objects[$0] = d3.histogram();}, this->id);
+            MAIN_THREAD_EMP_ASM({js.objects[$0] = d3.histogram();}, this->id);
         };
 
         ~Histogram() {
@@ -30,7 +30,7 @@ namespace D3 {
         }
 
         Histogram& SetDomain(double x, double y) {
-            MAIN_THREAD_EM_ASM({js.objects[$0].domain([$1, $2]);}, this->id, x, y);
+            MAIN_THREAD_EMP_ASM({js.objects[$0].domain([$1, $2]);}, this->id, x, y);
             return (*this);
         }
 
@@ -39,7 +39,7 @@ namespace D3 {
         }
 
         emp::array<double, 2> GetDomain() {
-            MAIN_THREAD_EM_ASM({emp_i.__outgoing_array = js.objects[$0].domain();}
+            MAIN_THREAD_EMP_ASM({emp_i.__outgoing_array = js.objects[$0].domain();}
                         , this->id);
             emp::array<double, 2> domain;
             emp::pass_array_to_cpp(domain);
@@ -51,12 +51,12 @@ namespace D3 {
         }
 
         Histogram& SetThresholds(int count) {
-            MAIN_THREAD_EM_ASM({js.objects[$0].thresholds($1);}, this->id, count);
+            MAIN_THREAD_EMP_ASM({js.objects[$0].thresholds($1);}, this->id, count);
             return (*this);
         }
 
         Histogram& SetThresholds(std::string threshold_generator) {
-            MAIN_THREAD_EM_ASM({
+            MAIN_THREAD_EMP_ASM({
                 js.objects[$0].thresholds(UTF8ToString($1));
             }, this->id, threshold_generator.c_str());
             return (*this);
@@ -72,7 +72,7 @@ namespace D3 {
         Dataset Call(emp::vector<DATA_TYPE> data) {
             emp::pass_array_to_javascript(data);
             Dataset bins = Dataset();
-            MAIN_THREAD_EM_ASM({
+            MAIN_THREAD_EMP_ASM({
                 console.log(emp_i.__incoming_array);
                 js.objects[$1] = js.objects[$0](emp_i.__incoming_array);
                 console.log(js.objects[$1]);
@@ -91,7 +91,7 @@ namespace D3 {
         emp::sfinae_decoy<Histogram, decltype(&T::operator())>
         SetValueAccessor(T func) {
           value_fun_id = JSWrap(func, emp::to_string(id)+"_return_value");
-          MAIN_THREAD_EM_ASM({
+          MAIN_THREAD_EMP_ASM({
               js.objects[$0].value(window["emp"][$0+"_return_value"]);
           }, this->id);
           return (*this);

@@ -15,15 +15,17 @@
 #define EMP_KEY_NAME_UTILS_H
 
 #include <algorithm>
+#include <array>
 #include <unordered_map>
 #include <map>
 #include <string>
-#ifndef __EMSCRIPTEN__
-#include <filesystem>
-#else
+
+#if defined(__EMSCRIPTEN__) \
+  && __EMSCRIPTEN_major__ == 1 && __EMSCRIPTEN_minor__ <= 38
 #include <experimental/filesystem>
+#else
+#include <filesystem>
 #endif
-#include <array>
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
@@ -78,10 +80,11 @@ namespace emp::keyname {
     unpack_t res;
 
     const auto kv_strs = emp::slice(
-#ifndef __EMSCRIPTEN__
-      std::filesystem::path(filename).filename().string(), // get basename
-#else
+#if defined(__EMSCRIPTEN__) \
+  && __EMSCRIPTEN_major__ == 1 && __EMSCRIPTEN_minor__ <= 38
       std::experimental::filesystem::path(filename).filename().string(), // get basename
+#else
+      std::filesystem::path(filename).filename().string(), // get basename
 #endif
       '+'
     );
