@@ -605,6 +605,13 @@ namespace emp {
 
   template <size_t NUM_BITS>
   void BitSet<NUM_BITS>::ShiftLeft(const size_t shift_size) {
+    // If we have only a single field, this operation can be quick.
+    if constexpr (NUM_FIELDS == 1) {
+      bit_set[0] <<= shift_size;
+      ClearExcessBits();
+      return;
+    }
+
     // If we are shifting out of range, clear the bits and stop.
     if (shift_size >= NUM_BITS) { Clear(); return; }
 
@@ -638,6 +645,12 @@ namespace emp {
   /// Helper for calling SHIFT with negative number
   template <size_t NUM_BITS>
   void BitSet<NUM_BITS>::ShiftRight(const size_t shift_size) {
+    // If we have only a single field, this operation can be quick.
+    if constexpr (NUM_FIELDS == 1) {
+      bit_set[0] >>= shift_size;
+      return;
+    }
+
     if (!shift_size) return;
 
     const field_t field_shift = shift_size / FIELD_BITS;
@@ -1578,8 +1591,7 @@ namespace emp {
   template <size_t NUM_BITS>
   BitSet<NUM_BITS> BitSet<NUM_BITS>::NOT() const {
     BitSet<NUM_BITS> out_set(*this);
-    for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~bit_set[i];
-    out_set.ClearExcessBits();
+    out_set.NOT_SELF();
     return out_set;
   }
 
@@ -1587,7 +1599,7 @@ namespace emp {
   template <size_t NUM_BITS>
   BitSet<NUM_BITS> BitSet<NUM_BITS>::AND(const BitSet<NUM_BITS> & set2) const {
     BitSet<NUM_BITS> out_set(*this);
-    for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] & set2.bit_set[i];
+    out_set.AND_SELF(set2);
     return out_set;
   }
 
@@ -1595,7 +1607,7 @@ namespace emp {
   template <size_t NUM_BITS>
   BitSet<NUM_BITS> BitSet<NUM_BITS>::OR(const BitSet<NUM_BITS> & set2) const {
     BitSet<NUM_BITS> out_set(*this);
-    for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] | set2.bit_set[i];
+    out_set.OR_SELF(set2);
     return out_set;
   }
 
@@ -1603,8 +1615,7 @@ namespace emp {
   template <size_t NUM_BITS>
   BitSet<NUM_BITS> BitSet<NUM_BITS>::NAND(const BitSet<NUM_BITS> & set2) const {
     BitSet<NUM_BITS> out_set(*this);
-    for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] & set2.bit_set[i]);
-    out_set.ClearExcessBits();
+    out_set.NAND_SELF(set2);
     return out_set;
   }
 
@@ -1612,8 +1623,7 @@ namespace emp {
   template <size_t NUM_BITS>
   BitSet<NUM_BITS> BitSet<NUM_BITS>::NOR(const BitSet<NUM_BITS> & set2) const {
     BitSet<NUM_BITS> out_set(*this);
-    for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] | set2.bit_set[i]);
-    out_set.ClearExcessBits();
+    out_set.NOR_SELF(set2);
     return out_set;
   }
 
@@ -1621,7 +1631,7 @@ namespace emp {
   template <size_t NUM_BITS>
   BitSet<NUM_BITS> BitSet<NUM_BITS>::XOR(const BitSet<NUM_BITS> & set2) const {
     BitSet<NUM_BITS> out_set(*this);
-    for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = bit_set[i] ^ set2.bit_set[i];
+    out_set.XOR_SELF(set2);
     return out_set;
   }
 
@@ -1629,8 +1639,7 @@ namespace emp {
   template <size_t NUM_BITS>
   BitSet<NUM_BITS> BitSet<NUM_BITS>::EQU(const BitSet & set2) const {
     BitSet<NUM_BITS> out_set(*this);
-    for (size_t i = 0; i < NUM_FIELDS; i++) out_set.bit_set[i] = ~(bit_set[i] ^ set2.bit_set[i]);
-    out_set.ClearExcessBits();
+    out_set.EQU_SELF(set2);
     return out_set;
   }
 
