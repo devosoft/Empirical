@@ -135,6 +135,7 @@ namespace emp {
 
       // TODO currently only implemented for NUM_FIELDS == 1
       static_assert( NUM_FIELDS == 1 );
+      static_assert( LAST_BIT == 0 );
       bit_set[0] <<= shift;
     }
 
