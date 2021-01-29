@@ -685,6 +685,12 @@ namespace emp {
     // If we are shifting out of range, clear the bits and stop.
     if (shift_size >= num_bits) { Clear(); return; }
 
+    // If we have only a single field, this operation can be quick.
+    if (NumFields() == 1) {
+      (bits[0] <<= shift_size) &= EndMask();
+      return;
+    }
+
     const size_t field_shift = shift_size / FIELD_BITS;
     const size_t bit_shift = shift_size % FIELD_BITS;
     const size_t bit_overflow = FIELD_BITS - bit_shift;
@@ -715,6 +721,12 @@ namespace emp {
     // If we are shifting out of range, clear the bits and stop.
     if (shift_size >= num_bits) { Clear(); return; }
 
+    // If we have only a single field, this operation can be quick.
+    if (NumFields() == 1) {
+      bits[0] >>= shift_size;
+      return;
+    }
+    
     const size_t field_shift = shift_size / FIELD_BITS;
     const size_t bit_shift = shift_size % FIELD_BITS;
     const size_t bit_overflow = FIELD_BITS - bit_shift;
@@ -1686,13 +1698,13 @@ namespace emp {
   /// Insert bit(s) into any index of vector using bit magic.
   /// Blog post on implementation reasoning: https://devolab.org/?p=2249
   /// @param index location to insert bit(s).
-  /// @param val value of bit(s) to insert.
+  /// @param val value of bit(s) to insert (default true)
   /// @param num number of bits to insert, default 1.
-  void BitVector::Insert(const size_t index, const bool val=true, const size_t num=1) {
+  void BitVector::Insert(const size_t index, const bool val, const size_t num) {
     Resize(num_bits + num);                 // Adjust to new number of bits.
     thread_local BitVector low_bits(*this); // Copy current bits; thread_local prevents reallocation
-    SHIFT_SELF(-(int)num);                  // Place the high bits in place.
-    Clear(0, index+num);                    // Reduce current to just old positions.
+    SHIFT_SELF(-(int)num);                  // Shift the high bits into place.
+    Clear(0, index+num);                    // Reduce current to just high bits.
     low_bits.Clear(index, num_bits);        // Reduce copy to just low bits.
     if (val) SetRange(index, index+num);    // If new bits should be ones, make it so.
   }
@@ -1701,7 +1713,7 @@ namespace emp {
   /// Delete bits from any index in a vector.
   /// @param index location to delete bit(s).
   /// @param num number of bits to delete, default 1.
-  void BitVector::Delete(const size_t index, const size_t num=1) {
+  void BitVector::Delete(const size_t index, const size_t num) {
     RawMove(index+num, num_bits, index);  // Shift positions AFTER delete into place.
     Resize(num_bits - num);               // Crop off end bits.
   }
