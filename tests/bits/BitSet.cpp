@@ -156,6 +156,7 @@ void test_bytes() {
   std::index_sequence<16, 17, 32, 33, 64, 65, 128, 129> bits_to_test{};
   do_byte_tests(bits_to_test);
 }
+
 /**
  * Left and Right shifts
  */
@@ -422,20 +423,20 @@ struct ImportExportTester {
 
     dest.template Import(source);
 
-    for(size_t i = 0; i < std::min(source.GetSize(), dest.GetSize()); ++i) {
+    for (size_t i = 0; i < std::min(source.GetSize(), dest.GetSize()); ++i) {
       REQUIRE(source.Get(i) == dest.Get(i));
     }
-    for(size_t i = source.GetSize(); i < dest.GetSize(); ++i) {
+    for (size_t i = source.GetSize(); i < dest.GetSize(); ++i) {
       REQUIRE(dest.Get(i) == 0);
     }
 
     dest.Clear();
     dest = source.template Export<dest.GetSize()>();
 
-    for(size_t i = 0; i < std::min(source.GetSize(), dest.GetSize()); ++i) {
+    for (size_t i = 0; i < std::min(source.GetSize(), dest.GetSize()); ++i) {
       REQUIRE(source.Get(i) == dest.Get(i));
     }
-    for(size_t i = source.GetSize(); i < dest.GetSize(); ++i) {
+    for (size_t i = source.GetSize(); i < dest.GetSize(); ++i) {
       REQUIRE(dest.Get(i) == 0);
     }
 
@@ -443,7 +444,7 @@ struct ImportExportTester {
     source.Randomize(rand);
     dest.Randomize(rand);
 
-    for(size_t from_bit = 0; from_bit < source.GetSize(); ++from_bit) {
+    for (size_t from_bit = 0; from_bit < source.GetSize(); ++from_bit) {
       // std::cout << "---------" << std::endl;
       // std::cout << source << std::endl;
       dest.template Import(source, from_bit);
@@ -451,20 +452,20 @@ struct ImportExportTester {
       // std::cout << from_bit << std::endl;
       // std::cout << source << std::endl;
       // std::cout << dest << std::endl;
-      for(size_t i = 0; i < std::min(source.GetSize() - from_bit, dest.GetSize()); ++i) {
+      for (size_t i = 0; i < std::min(source.GetSize() - from_bit, dest.GetSize()); ++i) {
         REQUIRE(source.Get(i+from_bit) == dest.Get(i));
       }
-      for(size_t i = source.GetSize() - from_bit; i < dest.GetSize(); ++i) {
+      for (size_t i = source.GetSize() - from_bit; i < dest.GetSize(); ++i) {
         REQUIRE(dest.Get(i) == 0);
       }
 
       dest.Clear();
       dest = source.template Export<dest.GetSize()>(from_bit);
 
-      for(size_t i = 0; i < std::min(source.GetSize() - from_bit, dest.GetSize()); ++i) {
+      for (size_t i = 0; i < std::min(source.GetSize() - from_bit, dest.GetSize()); ++i) {
         REQUIRE(source.Get(i+from_bit) == dest.Get(i));
       }
-      for(size_t i = source.GetSize() - from_bit; i < dest.GetSize(); ++i) {
+      for (size_t i = source.GetSize() - from_bit; i < dest.GetSize(); ++i) {
         REQUIRE(dest.Get(i) == 0);
       }
 
@@ -916,12 +917,12 @@ TEST_CASE("Another Test BitSet", "[bits]")
   bs1.Set(64); // 10000...
   bs2.Set(0);  // ...00001
 
-  for(size_t i = 0; i < 64; ++i) REQUIRE((bs1 - bs2).Get(i));
+  for (size_t i = 0; i < 64; ++i) REQUIRE((bs1 - bs2).Get(i));
   REQUIRE(!(bs1 - bs2).Get(64));
 
   bs1 -= bs2;
 
-  for(size_t i = 0; i < 64; ++i) {
+  for (size_t i = 0; i < 64; ++i) {
     REQUIRE(bs1.Get(i));
   }
   REQUIRE(!bs1.Get(64));
@@ -932,41 +933,41 @@ TEST_CASE("Another Test BitSet", "[bits]")
 
   bs2.Set(0);  // ...00001
 
-  for(size_t i = 0; i < 65; ++i) REQUIRE((bs1 - bs2).Get(i));
+  for (size_t i = 0; i < 65; ++i) REQUIRE((bs1 - bs2).Get(i));
 
   bs1 -= bs2;
 
-  for(size_t i = 0; i < 65; ++i) REQUIRE(bs1.Get(i));
+  for (size_t i = 0; i < 65; ++i) REQUIRE(bs1.Get(i));
 
   /* PART 3 */
   bs1.Clear();
   bs2.Clear();
 
-  for(size_t i = 0; i < 65; ++i) bs1.Set(i); // 11111...11111
+  for (size_t i = 0; i < 65; ++i) bs1.Set(i); // 11111...11111
   bs2.Set(0);  // ...00001
 
-  for(size_t i = 0; i < 65; ++i) REQUIRE(!(bs1 + bs2).Get(i));
-  for(size_t i = 0; i < 65; ++i) REQUIRE(!(bs2 + bs1).Get(i));
+  for (size_t i = 0; i < 65; ++i) REQUIRE(!(bs1 + bs2).Get(i));
+  for (size_t i = 0; i < 65; ++i) REQUIRE(!(bs2 + bs1).Get(i));
 
   bs1 += bs2;
 
-  for(size_t i = 0; i < 65; ++i) REQUIRE(!bs1.Get(i));
+  for (size_t i = 0; i < 65; ++i) REQUIRE(!bs1.Get(i));
 
   /* PART 4 */
   bs1.Clear();
   bs2.Clear();
 
-  for(size_t i = 0; i < 64; ++i) bs1.Set(i); // 01111...11111
+  for (size_t i = 0; i < 64; ++i) bs1.Set(i); // 01111...11111
   bs2.Set(0);  // ...00001
 
-  for(size_t i = 0; i < 64; ++i) REQUIRE(!(bs1 + bs2).Get(i));
+  for (size_t i = 0; i < 64; ++i) REQUIRE(!(bs1 + bs2).Get(i));
   REQUIRE((bs1 + bs2).Get(64));
-  for(size_t i = 0; i < 64; ++i) REQUIRE(!(bs2 + bs1).Get(i));
+  for (size_t i = 0; i < 64; ++i) REQUIRE(!(bs2 + bs1).Get(i));
   REQUIRE((bs2 + bs1).Get(64));
 
   bs1 += bs2;
 
-  for(size_t i = 0; i < 64; ++i) REQUIRE(!bs1.Get(i));
+  for (size_t i = 0; i < 64; ++i) REQUIRE(!bs1.Get(i));
   REQUIRE((bs2 + bs1).Get(64));
   }
 
@@ -1051,11 +1052,11 @@ TEST_CASE("Another Test BitSet", "[bits]")
     // Import
 
     d1[0].Import(orig, 0);
-    for(size_t i = 0; i < 2; ++i) d2[i].Import(orig, i * 16);
-    for(size_t i = 0; i < 4; ++i) d4[i].Import(orig, i * 8);
-    for(size_t i = 0; i < 8; ++i) d8[i].Import(orig, i * 4);
-    for(size_t i = 0; i < 16; ++i) d16[i].Import(orig, i * 2);
-    for(size_t i = 0; i < 32; ++i) d32[i].Import(orig, i * 1);
+    for (size_t i = 0; i < 2; ++i) d2[i].Import(orig, i * 16);
+    for (size_t i = 0; i < 4; ++i) d4[i].Import(orig, i * 8);
+    for (size_t i = 0; i < 8; ++i) d8[i].Import(orig, i * 4);
+    for (size_t i = 0; i < 16; ++i) d16[i].Import(orig, i * 2);
+    for (size_t i = 0; i < 32; ++i) d32[i].Import(orig, i * 1);
 
     for (size_t i = 0; i < 32; ++i) {
       REQUIRE(orig[i] == d1[i/32][i%32]);
@@ -1069,11 +1070,11 @@ TEST_CASE("Another Test BitSet", "[bits]")
     // Export
 
     d1[0] = orig.Export<32>(0);
-    for(size_t i = 0; i < 2; ++i) d2[i] = orig.Export<16>(i * 16);
-    for(size_t i = 0; i < 4; ++i) d4[i] = orig.Export<8>(i * 8);
-    for(size_t i = 0; i < 8; ++i) d8[i] = orig.Export<4>(i * 4);
-    for(size_t i = 0; i < 16; ++i) d16[i] = orig.Export<2>(i * 2);
-    for(size_t i = 0; i < 32; ++i) d32[i] = orig.Export<1>(i * 1);
+    for (size_t i = 0; i < 2; ++i) d2[i] = orig.Export<16>(i * 16);
+    for (size_t i = 0; i < 4; ++i) d4[i] = orig.Export<8>(i * 8);
+    for (size_t i = 0; i < 8; ++i) d8[i] = orig.Export<4>(i * 4);
+    for (size_t i = 0; i < 16; ++i) d16[i] = orig.Export<2>(i * 2);
+    for (size_t i = 0; i < 32; ++i) d32[i] = orig.Export<1>(i * 1);
 
     for (size_t i = 0; i < 32; ++i) {
       REQUIRE(orig[i] == d1[i/32][i%32]);
