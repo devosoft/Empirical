@@ -113,6 +113,9 @@ namespace emp {
     // being copied and only the fields need to be copied over.
     void RawCopy(const Ptr<field_t> in);
 
+    // Move bits from one position in the genome to another; leave old positions unchanged.
+    void RawMove(const size_t from_start, const size_t from_stop, const size_t to);
+
     // Convert the bits to bytes.
     emp::Ptr<unsigned char> BytePtr() { return bits.ReinterpretCast<unsigned char>(); }
 
@@ -424,6 +427,28 @@ namespace emp {
     /// Count the number of zeros in the BitVector.
     size_t CountZeros() const { return GetSize() - CountOnes(); }
 
+    /// Pop the last bit in the vector.
+    /// @return value of the popped bit.
+    bool PopBack();
+
+    /// Push given bit(s) onto the back of a vector.
+    /// @param bit value of bit to be pushed.
+    /// @param num number of bits to be pushed.
+    void PushBack(const bool bit=true, const size_t num=1);
+
+    /// Insert bit(s) into any index of vector using bit magic.
+    /// Blog post on implementation reasoning: https://devolab.org/?p=2249
+    /// @param index location to insert bit(s).
+    /// @param val value of bit(s) to insert.
+    /// @param num number of bits to insert, default 1.
+    void Insert(const size_t index, const bool val=true, const size_t num=1);
+
+    /// Delete bits from any index in a vector.
+    /// TODO: consider a bit magic approach here.
+    /// @param index location to delete bit(s).
+    /// @param num number of bits to delete, default 1.
+    void Delete(const size_t index, const size_t num=1);
+
     /// Return the position of the first one; return -1 if no ones in vector.
     int FindBit() const;
 
@@ -635,6 +660,25 @@ namespace emp {
 
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = in[i];
+  }
+
+  // Move bits from one position in the genome to another; leave old positions unchanged.
+  // @CAO: Can speed up by focusing only on the moved fields (i.e., don't shift unused bits).
+  void BitVector::RawMove(const size_t from_start, const size_t from_stop, const size_t to) {
+    emp_assert(from_start < from_stop);
+    emp_assert(from_stop < num_bits);
+    emp_assert(to < num_bits);
+
+    if (from_start == to) return;
+    const size_t move_size = from_stop - from_start;    // How bit is the chunk to move?
+    const size_t to_stop = Min(to+move_size, num_bits); // Where is the end to move it to?
+    const int shift = (int) from_start - (int) to;      // How far will the moved piece shift?
+    thread_local BitVector move_bits(*this);            // Vector to hold moved bits.
+    move_bits.SHIFT_SELF(shift);                        // Put the moved bits in place.
+    Clear(to, to_stop);                                 // Make room for the moved bits.
+    move_bits.Clear(0, to);                             // Clear everything BEFORE moved bits.
+    move_bits.Clear(to_stop, num_bits);                 // Clear everything AFTER moved bits.
+    OR_SELF(move_bits);                                 // Merge bitstrings together.
   }
 
   void BitVector::ShiftLeft(const size_t shift_size) {
@@ -1049,7 +1093,7 @@ namespace emp {
 
 
   /// Assign from a BitVector of a different size.
-  // @CAO: Can manually copy to  skip unused fields for a speedup.
+  // @CAO: Can manually copy to skip unused fields for a speedup.
   BitVector & BitVector::Import(const BitVector & from_bv, const size_t from_bit) {
     emp_assert(&from_bv != this);
     emp_assert(from_bit < from_bv.GetSize());
@@ -1153,6 +1197,10 @@ namespace emp {
   BitVector & BitVector::Clear(const size_t start, const size_t stop) {
     emp_assert(start <= stop, start, stop, num_bits);
     emp_assert(stop <= num_bits, stop, num_bits);
+
+    // If we're not actually clearning anything, stop now.
+    if (start == stop) return *this;
+
     const size_t start_pos = FieldPos(start);
     const size_t stop_pos = FieldPos(stop);
     size_t start_field = FieldID(start);
@@ -1617,6 +1665,45 @@ namespace emp {
       }
     }
     return bit_count;
+  }
+
+  /// Pop the last bit in the vector.
+  /// @return value of the popped bit.
+  bool BitVector::PopBack() {
+    const bool val = Get(num_bits-1);
+    Resize(num_bits - 1);
+    return val;
+  }
+
+  /// Push given bit(s) onto the back of a vector.
+  /// @param bit value of bit to be pushed.
+  /// @param num number of bits to be pushed.
+  void BitVector::PushBack(const bool bit, const size_t num) {
+    Resize(num_bits + num);
+    if (bit) SetRange(num_bits-num-1, num_bits);
+  }
+
+  /// Insert bit(s) into any index of vector using bit magic.
+  /// Blog post on implementation reasoning: https://devolab.org/?p=2249
+  /// @param index location to insert bit(s).
+  /// @param val value of bit(s) to insert.
+  /// @param num number of bits to insert, default 1.
+  void BitVector::Insert(const size_t index, const bool val=true, const size_t num=1) {
+    Resize(num_bits + num);                 // Adjust to new number of bits.
+    thread_local BitVector low_bits(*this); // Copy current bits; thread_local prevents reallocation
+    SHIFT_SELF(-(int)num);                  // Place the high bits in place.
+    Clear(0, index+num);                    // Reduce current to just old positions.
+    low_bits.Clear(index, num_bits);        // Reduce copy to just low bits.
+    if (val) SetRange(index, index+num);    // If new bits should be ones, make it so.
+  }
+
+
+  /// Delete bits from any index in a vector.
+  /// @param index location to delete bit(s).
+  /// @param num number of bits to delete, default 1.
+  void BitVector::Delete(const size_t index, const size_t num=1) {
+    RawMove(index+num, num_bits, index);  // Shift positions AFTER delete into place.
+    Resize(num_bits - num);               // Crop off end bits.
   }
 
   /// Return the position of the first one; return -1 if no ones in vector.
