@@ -440,27 +440,6 @@ namespace emp {
       return out;
     }
 
-    /// Perform a Boolean NOT on this BitSet and return the result.
-    BitSet NOT() const;
-
-    /// Perform a Boolean AND with a second BitSet and return the result.
-    BitSet AND(const BitSet & set2) const;
-
-    /// Perform a Boolean OR with a second BitSet and return the result.
-    BitSet OR(const BitSet & set2) const;
-
-    /// Perform a Boolean NAND with a second BitSet and return the result.
-    BitSet NAND(const BitSet & set2) const;
-
-    /// Perform a Boolean NOR with a second BitSet and return the result.
-    BitSet NOR(const BitSet & set2) const;
-
-    /// Perform a Boolean XOR with a second BitSet and return the result.
-    BitSet XOR(const BitSet & set2) const;
-
-    /// Perform a Boolean EQU with a second BitSet and return the result.
-    BitSet EQU(const BitSet & set2) const;
-
     /// Perform a Boolean NOT on this BitSet, store result here, and return this object.
     BitSet & NOT_SELF();
 
@@ -481,6 +460,27 @@ namespace emp {
 
     /// Perform a Boolean EQU with a second BitSet, store result here, and return this object.
     BitSet & EQU_SELF(const BitSet & set2);
+
+    /// Perform a Boolean NOT on this BitSet and return the result.
+    BitSet NOT() const { return BitSet<NUM_BITS>(*this).NOT_SELF(); }
+
+    /// Perform a Boolean AND with a second BitSet and return the result.
+    BitSet AND(const BitSet & in) const { return BitSet<NUM_BITS>(*this).AND_SELF(in); }
+
+    /// Perform a Boolean OR with a second BitSet and return the result.
+    BitSet OR(const BitSet & in) const { return BitSet<NUM_BITS>(*this).OR_SELF(in); }
+
+    /// Perform a Boolean NAND with a second BitSet and return the result.
+    BitSet NAND(const BitSet & in) const { return BitSet<NUM_BITS>(*this).NAND_SELF(in); }
+
+    /// Perform a Boolean NOR with a second BitSet and return the result.
+    BitSet NOR(const BitSet & in) const { return BitSet<NUM_BITS>(*this).NOR_SELF(in); }
+
+    /// Perform a Boolean XOR with a second BitSet and return the result.
+    BitSet XOR(const BitSet & in) const { return BitSet<NUM_BITS>(*this).XOR_SELF(in); }
+
+    /// Perform a Boolean EQU with a second BitSet and return the result.
+    BitSet EQU(const BitSet & in) const { return BitSet<NUM_BITS>(*this).EQU_SELF(in); }
 
     /// Positive shifts go right and negative shifts go left (0 does nothing);
     /// return result.
@@ -1586,62 +1586,6 @@ namespace emp {
 
 
   // -------------------------  Whole BitSet manipulation functions  -------------------------
-
-  /// Perform a Boolean NOT on this BitSet and return the result.
-  template <size_t NUM_BITS>
-  BitSet<NUM_BITS> BitSet<NUM_BITS>::NOT() const {
-    BitSet<NUM_BITS> out_set(*this);
-    out_set.NOT_SELF();
-    return out_set;
-  }
-
-  /// Perform a Boolean AND with a second BitSet and return the result.
-  template <size_t NUM_BITS>
-  BitSet<NUM_BITS> BitSet<NUM_BITS>::AND(const BitSet<NUM_BITS> & set2) const {
-    BitSet<NUM_BITS> out_set(*this);
-    out_set.AND_SELF(set2);
-    return out_set;
-  }
-
-  /// Perform a Boolean OR with a second BitSet and return the result.
-  template <size_t NUM_BITS>
-  BitSet<NUM_BITS> BitSet<NUM_BITS>::OR(const BitSet<NUM_BITS> & set2) const {
-    BitSet<NUM_BITS> out_set(*this);
-    out_set.OR_SELF(set2);
-    return out_set;
-  }
-
-  /// Perform a Boolean NAND with a second BitSet and return the result.
-  template <size_t NUM_BITS>
-  BitSet<NUM_BITS> BitSet<NUM_BITS>::NAND(const BitSet<NUM_BITS> & set2) const {
-    BitSet<NUM_BITS> out_set(*this);
-    out_set.NAND_SELF(set2);
-    return out_set;
-  }
-
-  /// Perform a Boolean NOR with a second BitSet and return the result.
-  template <size_t NUM_BITS>
-  BitSet<NUM_BITS> BitSet<NUM_BITS>::NOR(const BitSet<NUM_BITS> & set2) const {
-    BitSet<NUM_BITS> out_set(*this);
-    out_set.NOR_SELF(set2);
-    return out_set;
-  }
-
-  /// Perform a Boolean XOR with a second BitSet and return the result.
-  template <size_t NUM_BITS>
-  BitSet<NUM_BITS> BitSet<NUM_BITS>::XOR(const BitSet<NUM_BITS> & set2) const {
-    BitSet<NUM_BITS> out_set(*this);
-    out_set.XOR_SELF(set2);
-    return out_set;
-  }
-
-  /// Perform a Boolean EQU with a second BitSet and return the result.
-  template <size_t NUM_BITS>
-  BitSet<NUM_BITS> BitSet<NUM_BITS>::EQU(const BitSet & set2) const {
-    BitSet<NUM_BITS> out_set(*this);
-    out_set.EQU_SELF(set2);
-    return out_set;
-  }
 
 
   /// Perform a Boolean NOT on this BitSet, store result here, and return this object.
