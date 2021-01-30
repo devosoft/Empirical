@@ -17,10 +17,44 @@
 #include <utility>
 
 #include "../base/Ptr.hpp"
+#include "../base/_is_streamable.hpp"
+//^ provides is_streamable implementation,
+// located in base directory to preserve levelization
 
 #include "meta.hpp"
 
 namespace emp {
+
+  // adapted from https://stackoverflow.com/a/29634934
+  namespace detail {
+
+    // using statements allow Argument-Dependent Lookup (ADL)
+    // with custom begin/end
+    // see https://en.cppreference.com/w/cpp/language/adl
+    using std::begin;
+    using std::end;
+
+    template <typename T>
+    auto is_iterable_impl(int)
+    -> decltype (
+      // begin/end and operator !=
+      begin(std::declval<T&>()) != end(std::declval<T&>()),
+      // Handle evil operator ,
+      void(),
+      // operator ++
+      ++std::declval<decltype(begin(std::declval<T&>()))&>(),
+      // operator*
+      void(*begin(std::declval<T&>())),
+      std::true_type{}
+    );
+
+    template <typename T>
+    std::false_type is_iterable_impl(...);
+  }
+
+  /// Determine if a type is iterable.
+  template <typename T>
+  using IsIterable = decltype(detail::is_iterable_impl<T>(0));
 
   // Determine if a type has a ToString() member function.
   template <typename T, typename=void> struct HasToString : std::false_type { };

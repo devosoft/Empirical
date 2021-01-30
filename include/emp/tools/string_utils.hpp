@@ -12,6 +12,7 @@
 #ifndef EMP_STRING_UTILS_H
 #define EMP_STRING_UTILS_H
 
+#include <cstdio>
 #include <functional>
 #include <initializer_list>
 #include <iostream>
@@ -22,8 +23,12 @@
 #include <algorithm>
 #include <iterator>
 #include <limits>
+#include <regex>
+#include <memory>
+#include <numeric>
 
 #include "../base/array.hpp"
+#include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../meta/reflection.hpp"
@@ -105,10 +110,28 @@ namespace emp {
     return ss.str();
   }
 
+  /// Take a string and replace reserved HTML characters with character entities
+  inline std::string to_web_safe_string(const std::string & value) {
+    std::string web_safe = value;
+    std::regex apm("[&]");
+    std::regex open_brace("[<]");
+    std::regex close_brace("[>]");
+    std::regex single_quote("[']");
+    std::regex double_quote("[\"]");
+
+    web_safe = std::regex_replace(web_safe, apm, "&amp");
+    web_safe = std::regex_replace(web_safe, open_brace, "&lt");
+    web_safe = std::regex_replace(web_safe, close_brace, "&gt");
+    web_safe = std::regex_replace(web_safe, single_quote, "&apos");
+    web_safe = std::regex_replace(web_safe, double_quote, "&quot");
+
+    return web_safe;
+  }
 
   /// Take a value and convert it to a C++-style literal.
-  template <typename LIT_TYPE>
-  inline std::string to_literal(const LIT_TYPE & value) {
+  template <typename T>
+  inline
+  typename std::enable_if<!emp::IsIterable<T>::value, std::string>::type to_literal(const T & value) {
     return std::to_string(value);
   }
 
@@ -128,6 +151,21 @@ namespace emp {
       ss << to_escaped_string(c);
     }
     ss << "\"";
+    return ss.str();
+  }
+
+  /// Take any iterable value and convert it to a C++-style literal.
+  template <typename T>
+  inline
+  typename std::enable_if<emp::IsIterable<T>::value, std::string>::type to_literal(const T & value) {
+    std::stringstream ss;
+    ss << "{ ";
+    for (auto iter = std::begin( value ); iter != std::end( value ); ++iter) {
+      if (iter != std::begin( value )) ss << " ";
+      ss << emp::to_literal< std::decay_t<decltype(*iter)> >( *iter );
+    }
+    ss << " }";
+
     return ss.str();
   }
 
@@ -234,6 +272,15 @@ namespace emp {
     return true;
   }
 
+  /// Concatenate n copies of a string.
+  inline std::string repeat( const std::string& value, const size_t n ) {
+    const emp::vector<std::string> repeated( n, value );
+    return std::accumulate(
+      std::begin(repeated), std::end(repeated), std::string{}
+    );
+  }
+
+
   /// Convert a literal string representation to an actual string.
   static inline std::string from_literal_string(const std::string & value) {
     emp_assert(is_literal_string(value));
@@ -298,17 +345,12 @@ namespace emp {
         value[i] = (char) (value[i] + char_shift);
       }
 
-      if (value[i] == ' ') {
-        next_upper = true;
-      } else {
-        next_upper = false;
-      }
+      next_upper = (value[i] == ' ');
     }
     return value;
   }
 
-
-  // Convert an integer to a roman numeral string.
+  /// Convert an integer to a roman numeral string.
   static inline std::string to_roman_numeral(int val, const std::string & prefix="") {
     std::string ret_string(prefix);
     if (val < 0) ret_string += to_roman_numeral(-val, "-");
@@ -886,10 +928,18 @@ namespace emp {
     ss >> out_val;
     return out_val;
   }
-  
+
+  /**
+   * This function returns the values in a vector as a string separated
+   * by a given delimeter.
+   *
+   * @param v a vector
+   * @param join_str delimeter
+   * @return string of vector values
+   */
   template <typename T>
   inline std::string join(const emp::vector<T> & v, std::string join_str) {
-    
+
     if (v.size() == 0) {
       return "";
     } else if (v.size() == 1) {
@@ -975,6 +1025,31 @@ namespace emp {
   inline std::string to_ansi_bold(const std::string & in_string) {
     return std::string("\e[1m") + in_string + "\e[0m";
   }
+
+  
+  /// Apply sprintf-like formatting to a string.
+  /// See https://en.cppreference.com/w/cpp/io/c/fprintf.
+  /// Adapted from https://stackoverflow.com/a/26221725.
+  template<typename... Args>
+  std::string format_string( const std::string& format, Args... args ) {
+
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wformat-security"
+
+    // Extra space for '\0'
+    const size_t size = std::snprintf(nullptr, 0, format.c_str(), args...) + 1;
+    emp_assert( size >= 0 );
+
+    emp::vector<char> buf( size );
+    std::snprintf( buf.data(), size, format.c_str(), args... );
+
+     // We don't want the '\0' inside
+    return std::string( buf.data(), buf.data() + size - 1 );
+
+    #pragma GCC diagnostic pop
+
+  }
+
 }
 
 #endif

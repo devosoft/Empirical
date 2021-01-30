@@ -48,7 +48,6 @@
 #include "../base/unordered_map.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"
-#include "../tools/functions.hpp"
 #include "../tools/string_utils.hpp"
 #include "ConfigManager.hpp"
 
@@ -187,8 +186,10 @@ namespace emp {
       ~ConfigGroup() { ; }
 
       size_t GetSize() const { return entry_set.size(); }
-      std::string GetName() const {return name;}
-      std::string GetDesc() const {return desc;}
+
+      std::string GetName() const { return name; }
+      std::string GetDesc() const { return desc; }
+
       ConfigEntry * GetEntry(size_t id) { return entry_set[id]; }
       ConfigEntry * GetLastEntry() { emp_assert(GetSize() > 0); return entry_set.back(); }
 
@@ -346,7 +347,7 @@ namespace emp {
     emp::unordered_map<std::string, ConfigEntry *> var_map;   // All variables across groups.
     std::string version_id;                         // Unique version ID to ensure synced config.
     emp::vector<ConfigGroup *> group_set;           // All of the config groups.
-    std::stringstream warnings;                     // Aggrigate warnings for combined display.
+    std::stringstream warnings;                     // Aggregate warnings for combined display.
     int delay_warnings;                             // Count of delays to collect warnings for printing.
     emp::unordered_map<std::string, std::string> alias_map;   // Map all aliases to original name.
 
@@ -673,6 +674,11 @@ namespace emp {
                      std::bind(&ConfigManager<MANAGED_TYPE>::NewObject, new_manager, _1) );
       AddUseCallback(type_keyword,
                      std::bind(&ConfigManager<MANAGED_TYPE>::UseObject, new_manager, _1) );
+    }
+
+    /// Access group_set using this method since it is protected
+    emp::vector<ConfigGroup *> GetGroupSet(){
+      return group_set;
     }
 
   };

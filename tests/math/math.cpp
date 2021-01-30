@@ -290,3 +290,30 @@ TEST_CASE("Another Test math", "[math]")
   REQUIRE(emp::Factorial(3) == 6);
 
 }
+
+TEST_CASE("Test Boolean Math", "[math]")
+{
+  bool test_bool = true;
+  emp::Toggle(test_bool);
+  REQUIRE(test_bool == false);
+
+  REQUIRE(emp::AnyTrue(true, false, false, false, true, false) == true);
+  REQUIRE(emp::AllTrue(true, false, false, false, true, false) == false);
+
+}
+
+TEST_CASE("Test IsPowerOf2", "[math]") {
+
+  REQUIRE( emp::IsPowerOf2( 0 ) == false );
+  REQUIRE( emp::IsPowerOf2( 1 ) );
+  REQUIRE( emp::IsPowerOf2( 2 ) );
+  REQUIRE( emp::IsPowerOf2( 3 ) == false );
+  REQUIRE( emp::IsPowerOf2( 4 ) );
+  REQUIRE( emp::IsPowerOf2( 5 ) == false );
+  REQUIRE( emp::IsPowerOf2( 6 ) == false );
+  REQUIRE( emp::IsPowerOf2( 7 ) == false );
+  REQUIRE( emp::IsPowerOf2( 8 ) );
+  REQUIRE( emp::IsPowerOf2( 9 ) == false );
+  REQUIRE( emp::IsPowerOf2( 10 ) == false );
+
+}

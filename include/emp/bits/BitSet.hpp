@@ -33,7 +33,6 @@
 #include "../math/Random.hpp"
 #include "../math/random_utils.hpp"
 #include "../meta/type_traits.hpp"
-#include "../tools/functions.hpp"
 #include "../polyfill/span.hpp"
 
 #include "bitset_utils.hpp"
@@ -879,7 +878,7 @@ namespace emp {
 
     if (FROM_BITS - from_bit < NUM_BITS) Clear();
 
-    const size_t DEST_BYTES = (NUM_BITS + 7)/8;
+    constexpr size_t DEST_BYTES = (NUM_BITS + 7)/8;
     const size_t FROM_BYTES = (FROM_BITS + 7)/8 - from_bit/8;
 
     const size_t COPY_BYTES = std::min(DEST_BYTES, FROM_BYTES);

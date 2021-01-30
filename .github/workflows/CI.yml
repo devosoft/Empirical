@@ -1,0 +1,106 @@
+name: CI
+on:
+  push:
+    branches: [ master, dev ]
+  pull_request:
+    branches:
+      - '**'
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-16.04
+    strategy:
+      matrix:
+        cxx: [clang++, g++]
+        test-set:
+          - test-native-regular
+          - test-native-fulldebug
+          - test-native-opt
+          - test-examples
+          # - test-cookiecutter
+    env:
+      CXX: ${{ matrix.cxx }}
+      TEST_SET: ${{ matrix.test-set }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - run: sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+      - run: sudo apt-get update -qq
+      - run: sudo apt-get install -qq g++-8 cmake build-essential python-pip python-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
+      - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
+      - run: git fetch origin master:refs/remotes/origin/master
+      - run: make install-test-dependencies
+      - run: ${CXX} --version
+      - run: |
+          source third-party/emsdk/emsdk_env.sh
+          make ${TEST_SET} CXX=${CXX}
+  test-web:
+    name: Web Tests
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - run: sudo apt-get install -qq g++-8 cmake build-essential python-pip python-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
+      - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
+      - run: make install-test-dependencies
+      - name: Run headless test
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: make test-web
+  test-coverage:
+    name: Measure Test Coverage
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - run: sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+      - run: wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+      - run: sudo apt-add-repository "deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial-7 main"
+      - run: sudo apt-get update -qq
+      - run: sudo apt-get install -qq g++-8
+      - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
+      - run: sudo apt-get install cmake build-essential python-virtualenv python-pip nodejs tar gzip libclang-7-dev llvm llvm-dev libllvm7 llvm-7 llvm-7-dev clang-7 libstdc++-7-dev # might have to happen after we update g++
+      - run: sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-7 90
+      - run: sudo update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-7 90
+      - run: sudo update-alternatives --install /usr/bin/llvm-profdata llvm-profdata /usr/bin/llvm-profdata-7 90
+      - run: sudo update-alternatives --install /usr/bin/llvm-cov llvm-cov /usr/bin/llvm-cov-7 90
+      - run: git fetch origin master:refs/remotes/origin/master
+      - run: make install-test-dependencies
+      - run: export CXX=clang++-7 && make install-coverage-dependencies
+      - run: export CXX=clang++-7 && make coverage
+      - run: curl -s https://codecov.io/bash | bash
+  test-documentation:
+    name: Test Documentation Build
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - uses: docker-practice/actions-setup-docker@v1
+      - run: docker build -t devosoft/empirical .
+      - run: docker ps -a
+      - run: sudo docker run devosoft/empirical /bin/bash -c "cd /opt/Empirical/doc && make html coverage | ./headtail.sh"
+  deploy-dockerhub:
+    name: Deploy to DockerHub
+    runs-on: ubuntu-16.04
+    if: github.ref == 'refs/heads/master'
+    needs:
+      - test
+      - test-web
+      - test-coverage
+      - test-documentation
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v1
+        with:
+          push: true
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: devosoft/empirical
+          tag_with_ref: true

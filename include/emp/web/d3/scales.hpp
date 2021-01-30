@@ -37,12 +37,12 @@ namespace D3 {
     template <typename T, size_t SIZE>
     Scale& SetRange(emp::array<T,SIZE> values) {
       emp::pass_array_to_javascript(values);
-      EM_ASM_ARGS({js.objects[$0].range(emp_i.__incoming_array);}, this->id);
+      MAIN_THREAD_EM_ASM({js.objects[$0].range(emp_i.__incoming_array);}, this->id);
       return *this;
     }
 
     Scale& SetRange(double min, double max) {
-      EM_ASM_ARGS({js.objects[$0].range([$1, $2]);}, this->id, min, max);
+      MAIN_THREAD_EM_ASM({js.objects[$0].range([$1, $2]);}, this->id, min, max);
       return *this;
     }
 
@@ -51,19 +51,19 @@ namespace D3 {
     template <typename T, size_t SIZE>
     Scale& SetDomain(emp::array<T,SIZE> values) {
       emp::pass_array_to_javascript(values);
-      EM_ASM_ARGS({js.objects[$0].domain(emp_i.__incoming_array);}, this->id);
+      MAIN_THREAD_EM_ASM({js.objects[$0].domain(emp_i.__incoming_array);}, this->id);
       return *this;
     }
 
     Scale& SetDomain(double min, double max) {
-      EM_ASM_ARGS({js.objects[$0].domain([$1, $2]);}, this->id, min, max);
+      MAIN_THREAD_EM_ASM({js.objects[$0].domain([$1, $2]);}, this->id, min, max);
       return *this;
     }
 
     /// Make a copy of this scale
     Scale Copy() {
       int new_id = EM_ASM_INT_V({return js.objects.next_id++});
-      EM_ASM_ARGS({
+      MAIN_THREAD_EM_ASM({
 	    js.objects[$1] = js.objects[$0].copy();
     }, this->id, new_id);
       return Scale(new_id);
@@ -105,7 +105,7 @@ namespace D3 {
 
   class QuantizeScale : public Scale {
   public:
-    QuantizeScale() : Scale(true) {EM_ASM_ARGS({js.objects[$0]=d3.scaleQuantize()},this->id);}
+    QuantizeScale() : Scale(true) {MAIN_THREAD_EM_ASM({js.objects[$0]=d3.scaleQuantize()},this->id);}
     QuantizeScale(bool derived) : Scale(true) {;}
 
     template <typename T>
@@ -117,7 +117,7 @@ namespace D3 {
 
   class QuantileScale : public QuantizeScale {
   public:
-    QuantileScale() : QuantizeScale(true) { EM_ASM_ARGS({js.objects[$0] = d3.scaleQuantile();}, this->id);}
+    QuantileScale() : QuantizeScale(true) { MAIN_THREAD_EM_ASM({js.objects[$0] = d3.scaleQuantile();}, this->id);}
     QuantileScale(bool derived) : QuantizeScale(true) {;}
     //TODO: Quantiles()
   };
@@ -125,7 +125,7 @@ namespace D3 {
   class ThresholdScale : public QuantizeScale {
   public:
     ThresholdScale() : QuantizeScale(true) {
-      EM_ASM_ARGS({js.objects[$0] = d3.scaleThreshold()}, this->id);
+      MAIN_THREAD_EM_ASM({js.objects[$0] = d3.scaleThreshold()}, this->id);
     }
     ThresholdScale(bool derived) : QuantizeScale(true) {;}
   };
@@ -133,7 +133,7 @@ namespace D3 {
   class IdentityScale : public Scale {
   public:
     IdentityScale() : Scale(true) {
-      EM_ASM_ARGS({js.objects[$0] = d3.scaleIdentity();}, this->id);
+      MAIN_THREAD_EM_ASM({js.objects[$0] = d3.scaleIdentity();}, this->id);
     }
 
     IdentityScale(bool derived) : Scale(true){;}
@@ -144,14 +144,14 @@ namespace D3 {
     }
 
     IdentityScale& SetTicks(int count) {
-      EM_ASM_ARGS({js.objects[$0].ticks($1);}, this->id, count);
+      MAIN_THREAD_EM_ASM({js.objects[$0].ticks($1);}, this->id, count);
       return *this;
     }
 
     IdentityScale& SetTickFormat(int count, std::string format) {
       //TODO: format is technically optional, but what is the point of this
       //function without it?
-      EM_ASM_ARGS({js.objects[$0].tick($1, UTF8ToString($2));},
+      MAIN_THREAD_EM_ASM({js.objects[$0].tick($1, UTF8ToString($2));},
 		  this->id, count, format.c_str());
       return *this;
     }
@@ -160,7 +160,7 @@ namespace D3 {
   class LinearScale : public IdentityScale {
   public:
     LinearScale() : IdentityScale(true) {
-      EM_ASM_ARGS({js.objects[$0] = d3.scaleLinear();}, this->id);
+      MAIN_THREAD_EM_ASM({js.objects[$0] = d3.scaleLinear();}, this->id);
     }
 
     LinearScale(bool derived) : IdentityScale(true) {;}
@@ -168,12 +168,12 @@ namespace D3 {
     template <typename T, size_t SIZE>
     LinearScale& SetRangeRound(emp::array<T,SIZE> values) {
       emp::pass_array_to_javascript(values);
-      EM_ASM_ARGS({js.objects[$0].rangeRound(emp.__incoming_array);}, this->id);
+      MAIN_THREAD_EM_ASM({js.objects[$0].rangeRound(emp.__incoming_array);}, this->id);
       return *this;
     }
 
     LinearScale& SetRangeRound(double min, double max) {
-      EM_ASM_ARGS({js.objects[$0].rangeRound([$1, $2]);}, this->id, min, max);
+      MAIN_THREAD_EM_ASM({js.objects[$0].rangeRound([$1, $2]);}, this->id, min, max);
       return *this;
     }
 
@@ -184,15 +184,15 @@ namespace D3 {
     }
 
     LinearScale& Clamp(bool clamp) {
-      EM_ASM_ARGS({js.objects[$0].clamp($1);}, this->id, clamp);
+      MAIN_THREAD_EM_ASM({js.objects[$0].clamp($1);}, this->id, clamp);
       return *this;
     }
 
     LinearScale& Nice(int count = -1) {
       if (count != -1){
-	    EM_ASM_ARGS({js.objects[$0].nice($1);}, this->id, count);
+	    MAIN_THREAD_EM_ASM({js.objects[$0].nice($1);}, this->id, count);
       } else {
-	    EM_ASM_ARGS({js.objects[$0].nice();}, this->id);
+	    MAIN_THREAD_EM_ASM({js.objects[$0].nice();}, this->id);
       }
       return *this;
     }
@@ -202,7 +202,7 @@ namespace D3 {
   class LogScale : public LinearScale {
   public:
     LogScale() : LinearScale(true) {
-      EM_ASM_ARGS({js.objects[$0] = d3.scaleLog();}, this->id);
+      MAIN_THREAD_EM_ASM({js.objects[$0] = d3.scaleLog();}, this->id);
     }
 
     LogScale(bool derived) : LinearScale(true){;};
@@ -212,13 +212,13 @@ namespace D3 {
   class PowScale : public LinearScale {
   public:
     PowScale() : LinearScale(true) {
-      EM_ASM_ARGS({js.objects[$0] = d3.scalePow();}, this->id);
+      MAIN_THREAD_EM_ASM({js.objects[$0] = d3.scalePow();}, this->id);
     }
 
     PowScale(bool derived) : LinearScale(true){;};
 
     PowScale& Exponent(double ex) {
-        EM_ASM_ARGS({js.objects[$0].exponent($1);}, this->id, ex);
+        MAIN_THREAD_EM_ASM({js.objects[$0].exponent($1);}, this->id, ex);
         return *this;
     }
   };
@@ -230,7 +230,7 @@ namespace D3 {
   class TimeScale : public LinearScale {
   public:
     TimeScale() : LinearScale(true) {
-      EM_ASM_ARGS({js.objects[$0] = d3.scaleTime();}, this->id);
+      MAIN_THREAD_EM_ASM({js.objects[$0] = d3.scaleTime();}, this->id);
     }
 
     TimeScale(bool derived) : LinearScale(true){;};

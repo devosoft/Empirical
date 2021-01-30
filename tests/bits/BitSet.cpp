@@ -1623,5 +1623,15 @@ TEST_CASE("Another Test BitSet", "[bits]")
 //   double time = 1000.0 * ((double) emp_tot_time) / (double) CLOCKS_PER_SEC;
 //   REQUIRE(time < 13000); // WARNING: WILL VARY ON DIFFERENT SYSTEMS
 
-//   // END TIMING!!!
-// }
+  // END TIMING!!!
+//}
+
+TEST_CASE("Test BitSet string construction", "[tools]") {
+
+  REQUIRE( emp::BitSet<5>( "01001" ) == emp::BitSet<5>{0, 1, 0, 0, 1} );
+  REQUIRE(
+    emp::BitSet<5>( std::bitset<5>( "01001" ) )
+    == emp::BitSet<5>{0, 1, 0, 0, 1}
+  );
+
+}

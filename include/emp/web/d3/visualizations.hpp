@@ -99,7 +99,7 @@ public:
       info = new D3VisualizationInfo(this, in_id);
       Info()->width = w;
       Info()->height = h;
-      EM_ASM({window["emp"]["__default_draw_data_callback"] =
+      MAIN_THREAD_EM_ASM({window["emp"]["__default_draw_data_callback"] =
               function(){;};});
   }
 
@@ -140,7 +140,7 @@ public:
   }
 
   void CallDrawCallback() {
-    EM_ASM_ARGS({window["emp"][UTF8ToString($0)]()}, draw_data_callback.c_str());
+    MAIN_THREAD_EM_ASM({window["emp"][UTF8ToString($0)]()}, draw_data_callback.c_str());
   }
 
   /*
@@ -476,7 +476,7 @@ public:
   void SetXAccessor(std::string func) {
     return_x = [func](DATA_TYPE d){
       emp::StoreReturn(d);
-      return EM_ASM_DOUBLE({
+      return MAIN_THREAD_EM_ASM_DOUBLE({
         var func_string = UTF8ToString($0);
         if (typeof window[func_string] === function) {
           func_string = window[func_string];
@@ -514,7 +514,7 @@ public:
   void SetYAccessor(std::string func) {
     return_y = [func](DATA_TYPE d){
       emp::StoreReturn(d);
-      return EM_ASM_DOUBLE({
+      return MAIN_THREAD_EM_ASM_DOUBLE({
         var func_string = UTF8ToString($0);
         if (typeof window[func_string] === function) {
           func_string = window[func_string];
@@ -537,19 +537,19 @@ public:
   void DrawPointsFromDataset() {
 
     // Adjust axes
-    x_min = std::min(EM_ASM_DOUBLE({
+    x_min = std::min(MAIN_THREAD_EM_ASM_DOUBLE({
         return d3.min(js.objects[$0], window["emp"][UTF8ToString($1)+"return_x"]);
     }, dataset->GetID(), this->GetID().c_str()), x_min);
 
-    x_max = std::max(EM_ASM_DOUBLE({
+    x_max = std::max(MAIN_THREAD_EM_ASM_DOUBLE({
         return d3.max(js.objects[$0], window["emp"][UTF8ToString($1)+"return_x"]);
     }, dataset->GetID(), this->GetID().c_str()), x_max);
 
-    y_min = std::min(EM_ASM_DOUBLE({
+    y_min = std::min(MAIN_THREAD_EM_ASM_DOUBLE({
         return d3.min(js.objects[$0], window["emp"][UTF8ToString($1)+"return_y"]);
     }, dataset->GetID(), this->GetID().c_str()), y_min);
 
-    y_max = std::max(EM_ASM_DOUBLE({
+    y_max = std::max(MAIN_THREAD_EM_ASM_DOUBLE({
         return d3.max(js.objects[$0], window["emp"][UTF8ToString($1)+"return_y"]);
     }, dataset->GetID(), this->GetID().c_str()), y_max);
 
@@ -616,7 +616,7 @@ public:
       }
 
       D3::Transition t = GetSVG()->MakeTransition();
-      EM_ASM_ARGS({js.objects[$0].ease(d3.easeLinear).delay(10).duration(300);}, t.GetID());
+      MAIN_THREAD_EM_ASM({js.objects[$0].ease(d3.easeLinear).delay(10).duration(300);}, t.GetID());
       y_axis->Rescale(y_max, y_min, t);
       x_axis->Rescale(x_min, x_max, t);
       t.On("end", GetID()+"draw_data");
@@ -642,7 +642,7 @@ public:
   //   new_segs.EnterAppend("path").SetAttr("class", "line-seg");
   //   new_segs.SetAttr("d", GetID()+"genpath");
   //
-  //   // EM_ASM_ARGS({
+  //   // MAIN_THREAD_EM_ASM({
   //   //
   //   //   js.objects[$0].selectAll(".line-seg").attr("d", function(d){console.log("in d", d, $1, js.objects[$1]); return js.objects[$1](d);});
   //   // }, GetSVG()->GetID(), line_gen->GetID(), s.GetID());
@@ -653,7 +653,7 @@ public:
     // s.SelectAll(".data-point").SetAttr("cy", GetID()+"y");
     // s.SelectAll(".data-point").SetAttr("cx", GetID()+"x");
 
-    EM_ASM_ARGS({
+    MAIN_THREAD_EM_ASM({
         function pathTween(d1, precision) {
           return function() {
             var path0 = this;
@@ -895,7 +895,7 @@ public:
   virtual void Setup() {
     InitializeVariables();
 
-    EM_ASM_ARGS({
+    MAIN_THREAD_EM_ASM({
       js.objects[$0] = [js.objects[$1][0]];
     }, possible_parents.GetID(), data->GetID());
 
@@ -908,7 +908,7 @@ public:
     int pos = data->AppendNestedFromList(child_json, possible_parents);
     (void) pos;
 
-    EM_ASM_ARGS({
+    MAIN_THREAD_EM_ASM({
         while (js.objects[$0].length < $1 + 1) {
           js.objects[$0].push(-1);
         }
@@ -966,7 +966,7 @@ public:
   };
 
   std::function<void(NODE, int)> node_mouseover = [this](NODE d, int i){
-    EM_ASM_ARGS({
+    MAIN_THREAD_EM_ASM({
 
       var trace_lineage = function(root, id) {
         if (root.name == id){
@@ -1023,7 +1023,7 @@ public:
     double theta = atan2(y, x)*(180/emp::PI);
     (void) theta;
 
-    char * color = (char *) EM_ASM_INT({
+    char * color = (char *) MAIN_THREAD_EM_ASM_INT({
         var text = d3.hcl($1, 150, $0*175).toString();
 	    var buffer = Module._malloc(text.length+1);
 	    Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
@@ -1050,7 +1050,7 @@ public:
     double theta = atan2(y, x)*(180/emp::PI);
     (void) theta;
 
-    char * color = (char *) EM_ASM_INT({
+    char * color = (char *) MAIN_THREAD_EM_ASM_INT({
         var text = d3.hcl($1, 150, $0*175).darker().toString();
       var buffer = Module._malloc(text.length+1);
       Module.stringToUTF8(text, buffer, lengthBytesUTF8(text)+1);
@@ -1070,7 +1070,7 @@ public:
   std::function<void(LegendNode, int)> legend_mouseover = [this](LegendNode d, int il) {
     legend.SelectAll("rect").Filter([d](LegendNode in_data){return d.loc() != in_data.loc();}).SetClassed("faded", true);
     GetSVG()->SelectAll(".node").Filter([d](LegendNode in_data){return d.loc() != in_data.loc();}).SetClassed("faded", true);
-    EM_ASM_ARGS({emp.filter_fun = function(d){return d.source.loc != $0;}}, d.loc());
+    MAIN_THREAD_EM_ASM({emp.filter_fun = function(d){return d.source.loc != $0;}}, d.loc());
     GetSVG()->SelectAll(".link").Filter("filter_fun").SetClassed("faded", true);
   };
 
@@ -1082,12 +1082,12 @@ public:
              .Filter([d](LegendNode in_data){return d.loc() != in_data.loc();})
              .SetClassed("faded", false);
 
-    EM_ASM_ARGS({emp.filter_fun = function(d){return d.source.loc != $0;}}, d.loc());
+    MAIN_THREAD_EM_ASM({emp.filter_fun = function(d){return d.source.loc != $0;}}, d.loc());
     GetSVG()->SelectAll(".link").Filter("filter_fun").SetClassed("faded", false);
   };
 
   emp::vector<int> GetLocHistory(int id) {
-    EM_ASM_ARGS({
+    MAIN_THREAD_EM_ASM({
       var org = js.objects[$1](js.objects[$0][0], $2);
       var loc_history = [];
       loc_history.push(org.loc);

@@ -61,6 +61,8 @@ namespace emp {
 
     ~Random() { ; }
 
+    /// Advance pseudorandom number generation engine one step.
+    void StepEngine() { Get(); }
 
     /// @return The current seed used to initialize this pseudo-random sequence.
     inline uint64_t GetSeed() const { return original_seed; }

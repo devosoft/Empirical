@@ -21,248 +21,37 @@
  *     int a = 6;
  *     emp_assert(a==5, a);
  *
- *  When compiled in debug mode (i.e. without the -DNDEBUG flag), this will trigger an assertion
- *  error and print the value of a.
- *
- *
- *  @todo: Add emp_assert_warning() for non-terminating assert.  Should be able to disable with
- *         a command-line option (-DEMP_NO_WARNINGS)
+ *  When compiled in debug mode (i.e. without the -DNDEBUG flag), this will
+ *  trigger an assertion error and print the value of a.
  */
 
-#ifndef EMP_ASSERT_H
-#define EMP_ASSERT_H
+#ifndef EMP_ASSERT_HPP
+#define EMP_ASSERT_HPP
 
-#include <iostream>
-#include <string>
-#include <sstream>
+#include "always_assert.hpp"
 
-#include "macros.hpp"
-
-/// @cond DEFINES
-
-/// If we are in emscripten, make sure to include the header.
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#endif
-
-/// NDEBUG and TDEBUG should trigger their EMP equivilents.
+/// NDEBUG hould trigger its EMP equivalent.
 #ifdef NDEBUG
 #define EMP_NDEBUG
 #endif
 
-#ifdef TDEBUG
-#define EMP_TDEBUG
-#endif
+#if defined( EMP_NDEBUG )
+  /// Ideally, this assert should use the expression (to prevent compiler
+  /// error), but should not generate any assembly code.
+  /// For now, just make it blank (other options commented out).
+  #define emp_assert(...)
+  // #define emp_assert(EXPR) ((void) sizeof(EXPR) )
+  // #define emp_assert(EXPR, ...) { constexpr bool __emp_assert_tmp = false && (EXPR); (void) __emp_assert_tmp; }
 
-namespace emp {
-  template <typename... Ts>
-  void trigger_emp_error(std::string filename, size_t line, Ts &&... args) {
-    std::cerr << "Fatal Error (In " << filename << " line " << line
-              <<  "): ";
-    (std::cerr << ... << args);
-    std::cerr << std::endl;
-    abort();
-  }
-}
-
-/// Universal error (to use in place of emp_assert(false, ...); no need to debug toggle )
-#define emp_error(...)                                                                           \
-  do {                                                                                           \
-    emp::trigger_emp_error(__FILE__, __LINE__, __VA_ARGS__);                                     \
-  } while(0)
-
-
-/// Helper macros used throughout...
-#define emp_assert_TO_PAIR(X) EMP_STRINGIFY(X) , X
-
-/// Turn off all asserts in EMP_NDEBUG
-#ifdef EMP_NDEBUG
-namespace emp {
-  constexpr bool assert_on = false;
-}
-
-// GROUP 1:   --- Debug OFF ---
-
-/// Ideally, this assert should use the expression (to prevent compiler error), but should not
-/// generate any assembly code.  For now, just make it blank (other options commented out)
-#define emp_assert(...)
-// #define emp_assert(EXPR) ((void) sizeof(EXPR) )
-// #define emp_assert(EXPR, ...) { constexpr bool __emp_assert_tmp = false && (EXPR); (void) __emp_assert_tmp; }
-
-// Asserts to check only when in Emscripten should also be disabled.
-#define emp_emscripten_assert(...)
-
-
-// GROUP 2:   --- Unit Testing ON ---
-#elif defined(EMP_TDEBUG)           // EMP_NDEBUG not set, but EMP_TDEBUG is!
-
-namespace emp {
-  constexpr bool assert_on = true;
-  struct AssertFailInfo {
-    std::string filename;
-    int line_num;
-    std::string error;
-  };
-  AssertFailInfo assert_fail_info;
-  bool assert_last_fail = false;
-
-  template <typename... EXTRA>
-  bool assert_trigger(std::string filename, size_t line, std::string expr) {
-    emp::assert_fail_info.filename = __FILE__;
-    emp::assert_fail_info.line_num = __LINE__;
-    emp::assert_fail_info.error = expr;
-    emp::assert_last_fail = true;
-
-    return true;
-  }
-
-  void assert_clear() { emp::assert_last_fail = false; }
-}
-
-// Unit Testing ON
-
-#define emp_assert(...)                                                                       \
-  do {                                                                                        \
-    !(EMP_GET_ARG_1(__VA_ARGS__, ~)) &&                                                       \
-    emp::assert_trigger(__FILE__, __LINE__, EMP_STRINGIFY( EMP_GET_ARG_1(__VA_ARGS__, ~) ));  \
-  } while(0)
-
-// Unit-testing asserts to check only when in Emscripten should depend on if we are in Emscripten
-#ifdef __EMSCRIPTEN__
-#define emp_emscripten_assert(...) emp_assert(__VA_ARGS__)
 #else
-#define emp_emscripten_assert(...)
+  /// Require a specified condition to be true. If it is false, immediately
+  /// halt execution. Print also extra information on any variables or
+  /// expressions provided as variadic args. Note: If NDEBUG is defined,
+  /// emp_assert() will not do anything. Due to macro parsing limitations, extra
+  /// information will not be printed when compiling with MSVC.
+  #define emp_assert(...) emp_always_assert(__VA_ARGS__)
+
 #endif
 
 
-// GROUP 3:   --- Emscripten debug ON ---
-#elif __EMSCRIPTEN__  // Neither EMP_NDEBUG nor EMP_TDEBUG set, but compiling with Emscripten
-
-namespace emp {
-  constexpr bool assert_on = true;
-  static int TripAssert() {
-    static int trip_count = 0;
-    return ++trip_count;
-  }
-
-  /// Base case for assert_print...
-  void assert_print(std::stringstream &) { ; }
-
-  /// Print out information about the next variable and recurse...
-  template <typename T, typename... EXTRA>
-  void assert_print(std::stringstream & ss, std::string name, T && val, EXTRA &&... extra) {
-    ss << name << ": [" << val << "]" << std::endl;
-    assert_print(ss, std::forward<EXTRA>(extra)...);
-  }
-
-  template <typename IGNORE, typename... EXTRA>
-  bool assert_trigger(std::string filename, size_t line, std::string expr, IGNORE, EXTRA &&... extra) {
-    std::stringstream ss;
-    ss << "Assert Error (In " << filename << " line " << line << "): " << expr << '\n';
-    assert_print(ss, std::forward<EXTRA>(extra)...);
-    if (emp::TripAssert() <= 3) {
-      EM_ASM_ARGS({ msg = UTF8ToString($0); alert(msg); }, ss.str().c_str());
-    }
-
-    // Print the current state of the stack.
-    EM_ASM( console.log('Callstack:\n' + stackTrace()); );
-    return true;
-  }
-}
-
-// Debug; Emscripten ON
-
-#define emp_assert(...)                                                                       \
-  do {                                                                                        \
-    !(EMP_GET_ARG_1(__VA_ARGS__, ~)) &&                                                       \
-    emp::assert_trigger(__FILE__, __LINE__, EMP_WRAP_ARGS(emp_assert_TO_PAIR, __VA_ARGS__) ); \
-  } while(0)
-
-// Emscripten asserts should be on since we are in Emscripten
-#define emp_emscripten_assert(...) emp_assert(__VA_ARGS__)
-
-
-// GROUP 4:   --- Debug ON, but Emscripten OFF ---
-#else
-
-namespace emp {
-  constexpr bool assert_on = true;
-
-  /// Base case for assert_print...
-  void assert_print() { ; }
-
-  /// Print out information about the next variable and recurse...
-  template <typename T, typename... EXTRA>
-  void assert_print(std::string name, T && val, EXTRA &&... extra) {
-    // If we had a literal string fed in, print it as a message.
-    if (name[0] == '"') {
-      std::cerr << "MESSAGE: " << val << std::endl;
-    }
-    // Otherwise assume that we have a variable and print that.
-    else {
-      std::cerr << name << ": [" << val << "]" << std::endl;
-    }
-    assert_print(std::forward<EXTRA>(extra)...);
-  }
-
-  template <typename Ignore, typename... EXTRA>
-  bool assert_trigger(std::string filename, size_t line, std::string expr, Ignore, EXTRA &&... extra) {
-    std::cerr << "Assert Error (In " << filename << " line " << line
-              <<  "): " << expr << std::endl;
-    assert_print(std::forward<EXTRA>(extra)...);
-    return true;
-  }
-}
-
-/// @endcond
-
-// Debug; Not Emscripten
-
-// MS Visual Studio has some issues with complex macros.  For them, we will use a simple one.
-#ifdef _MSC_VER
-
-/// Require a specified condition to be true.  If it is false, immediately halt execution.
-/// Since we are in MS Visual Studio mode, no extra information will be printed.
-/// Note: If NDEBUG is defined, emp_assert() will not do anything.
-#define emp_assert_msc_impl(TEST)                                                           \
-  do {                                                                                 \
-    !(TEST) && emp::assert_trigger(__FILE__, __LINE__, #TEST, 0) && (abort(), false);  \
-  } while(0)
-#define emp_assert_msc(TEST) emp_assert_msc_impl(TEST)
-#define emp_assert(...) emp_assert_msc(EMP_GET_ARG_1(__VA_ARGS__, ~))
-
-
-// Ended ifdef when we are using Visual Studio; now do else for when we are not.
-#else
-
-/// Require a specified condition to be true.  If it is false, immediately halt execution.
-/// Print also extra information on any variables or experessions provided as variadic args.
-/// Note: If NDEBUG is defined, emp_assert() will not do anything.
-
-// Developer note: We don't make the first macro arguments "TEST" because we need to ensure
-//                 that something is in the ... for later use (prior to C++20, we can't
-//                 have zero arguments if one is possible.)
-
-#define emp_assert(...)                                                                          \
-  do {                                                                                           \
-    !(EMP_GET_ARG_1(__VA_ARGS__, ~)) &&                                                          \
-    emp::assert_trigger(__FILE__, __LINE__, EMP_WRAP_ARGS(emp_assert_TO_PAIR, __VA_ARGS__) ) &&  \
-    (abort(), false);                                                                            \
-  } while(0)
-
-#endif
-// Ended else on ifdef when we are NOT using Visual Studio
-
-// Emscripten-only asserts should be disabled since we are not in Emscripten
-/// Require a specified condition to be true if this program was compiled to Javascript with Emscripten.
-/// Note: If NDEBUG is defined, emp_emscripten_assert() will not do anything.
-#define emp_emscripten_assert(...) emp_assert(__VA_ARGS__)
-
-/// @cond DEFINES
-
-#endif // NDEBUG
-
-
-#endif // Include guard
-
-/// @endcond
+#endif // #ifndef EMP_ASSERT_HPP

@@ -25,7 +25,7 @@ namespace emp {
   /// @param a First 32-bit unsigned int.
   /// @param b Second 32-bit unsigned int.
   /// @return 64-bit unsigned int representing the szudzik hash of both inputs.
-  uint64_t szudzik_hash(uint32_t a_, uint32_t b_)
+  inline uint64_t szudzik_hash(uint32_t a_, uint32_t b_)
   {
     uint64_t a = a_, b = b_;
     return a >= b ? a * a + a + b : a + b * b;
@@ -69,7 +69,7 @@ namespace emp {
 
   // helper functions for murmur hash
   namespace internal {
-    constexpr uint64_t rotate(const size_t x, const size_t r) {
+    constexpr inline uint64_t rotate(const size_t x, const size_t r) {
       return (x << r) | (x >> (64 - r));
     }
     constexpr inline void fmix64(uint64_t& k) {
@@ -89,7 +89,7 @@ namespace emp {
   /// @param key Span of bytes to hash.
   /// @param seed Optional seed.
   /// @return Hash of key.
-  constexpr size_t murmur_hash(
+  constexpr inline size_t murmur_hash(
     const std::span<const std::byte> key,
     const size_t seed = 0
   ) {

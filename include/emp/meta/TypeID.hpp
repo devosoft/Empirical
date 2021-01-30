@@ -33,7 +33,7 @@ namespace emp {
   struct TypeID;
   template <typename T> static TypeID GetTypeID();
 
-  void SetupTypeNames();
+  inline void SetupTypeNames();
 
   namespace internal {
     // Internal class to setup type names on startup.
