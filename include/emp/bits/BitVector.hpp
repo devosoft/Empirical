@@ -40,7 +40,6 @@
 #include "../datastructs/hash_utils.hpp"
 #include "../math/math.hpp"
 #include "../math/Random.hpp"
-#include "../tools/functions.hpp"
 #include "../polyfill/span.hpp"
 
 #include "bitset_utils.hpp"
@@ -667,11 +666,12 @@ namespace emp {
   // Move bits from one position in the genome to another; leave old positions unchanged.
   // @CAO: Can speed up by focusing only on the moved fields (i.e., don't shift unused bits).
   void BitVector::RawMove(const size_t from_start, const size_t from_stop, const size_t to) {
-    emp_assert(from_start < from_stop);
-    emp_assert(from_stop < num_bits);
-    emp_assert(to < num_bits);
+    emp_assert(from_start <= from_stop);  // Must move legal region.
+    emp_assert(from_stop <= num_bits);    // Cannot move from past end.
+    emp_assert(to <= num_bits);           // Must move to somewhere legal.
 
-    if (from_start == to) return;
+    if (from_start == from_stop || from_start == to) return;
+
     const size_t move_size = from_stop - from_start;    // How bit is the chunk to move?
     const size_t to_stop = Min(to+move_size, num_bits); // Where is the end to move it to?
     const int shift = (int) from_start - (int) to;      // How far will the moved piece shift?
@@ -1694,7 +1694,7 @@ namespace emp {
   /// @param num number of bits to be pushed.
   void BitVector::PushBack(const bool bit, const size_t num) {
     Resize(num_bits + num);
-    if (bit) SetRange(num_bits-num-1, num_bits);
+    if (bit) SetRange(num_bits-num, num_bits);
   }
 
   /// Insert bit(s) into any index of vector using bit magic.
@@ -1704,11 +1704,12 @@ namespace emp {
   /// @param num number of bits to insert, default 1.
   void BitVector::Insert(const size_t index, const bool val, const size_t num) {
     Resize(num_bits + num);                 // Adjust to new number of bits.
-    thread_local BitVector low_bits(*this); // Copy current bits; thread_local prevents reallocation
+    BitVector low_bits(*this);              // Copy current bits
     SHIFT_SELF(-(int)num);                  // Shift the high bits into place.
     Clear(0, index+num);                    // Reduce current to just high bits.
     low_bits.Clear(index, num_bits);        // Reduce copy to just low bits.
     if (val) SetRange(index, index+num);    // If new bits should be ones, make it so.
+    OR_SELF(low_bits);                      // Put the low bits back in place.
   }
 
 
