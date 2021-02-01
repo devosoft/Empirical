@@ -6,7 +6,7 @@ FLAGS = -std=c++17 -pthread -Wall -Wno-unused-function -Wno-unused-private-field
 default: test
 
 cov-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
-	$(CXX) $(FLAGS) $< -lstdc++fs -o $@.out
+	$(CXX) $(FLAGS) $< -o $@.out
 	#echo "running $@.out"
 	# execute test
 	./$@.out
@@ -18,7 +18,7 @@ test-prep:
 	mkdir -p temp
 
 test-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
-	$(CXX) $(FLAGS) $< -lstdc++fs -o $@.out
+	$(CXX) $(FLAGS) $< -o $@.out
 	# execute test
 	./$@.out
 
