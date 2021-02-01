@@ -254,7 +254,7 @@ namespace emp {
     }
 
     inline static double calculate(const query_t& a, const tag_t& b) {
-      return (b - a).GetDouble() / emp::BitSet<Width>::MaxDouble();
+      return (b - a).GetValue() / emp::BitSet<Width>::GetNumStates();
     }
 
   };
@@ -281,8 +281,8 @@ namespace emp {
     }
 
     inline static double calculate(const query_t& a, const tag_t& b) {
-      constexpr double max_dist = emp::BitSet<Width>::MaxDouble() + 1.0;
-      return (b >= a ? (b - a).GetDouble() : max_dist) / max_dist;
+      constexpr double max_dist = emp::BitSet<Width>::GetNumStates();
+      return (b >= a ? (b - a).GetValue() : max_dist) / max_dist;
     }
 
   };
@@ -312,10 +312,8 @@ namespace emp {
     }
 
     inline static double calculate(const query_t& a, const tag_t& b) {
-      constexpr double max_dist = (
-        (emp::BitSet<Width>::MaxDouble() + 1.0) / 2.0
-      );
-      return std::min(a - b, b - a).GetDouble() / max_dist;
+      constexpr double max_dist = emp::BitSet<Width>::GetNumStates() / 2.0;
+      return std::min(a - b, b - a).GetValue() / max_dist;
     }
 
   };
@@ -344,9 +342,7 @@ namespace emp {
     }
 
     inline static double calculate(const query_t& a, const tag_t& b) {
-      return (
-        a > b ? a - b : b - a
-      ).GetDouble() /  emp::BitSet<Width>::MaxDouble();
+      return (a > b ? a - b : b - a).GetValue() /  emp::BitSet<Width>::GetNumStates();
     }
 
   };
