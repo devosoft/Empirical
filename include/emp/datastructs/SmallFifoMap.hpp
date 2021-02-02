@@ -67,7 +67,7 @@ public:
   static constexpr size_t capacity() { return N; }
 
   /// Clear the cache.
-  void clear() { size_ = 0; }
+  void clear() { size_ = 0; oldest = 0; }
 
   /// Find key-value pair iterator in cache.
   iterator find(const Key& key) { return std::find_if(
