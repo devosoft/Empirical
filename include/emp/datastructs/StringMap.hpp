@@ -1,7 +1,7 @@
 /**
  *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2018-2019.
+ *  @date 2018-2021.
  *
  *  @file StringMap.hpp
  *  @brief An std::unordered_map wrapper that deals smootly with strigns and fast compile-time optimizations.
@@ -25,21 +25,6 @@
 
 #include "../base/unordered_map.hpp"
 #include "../tools/string_utils.hpp"
-
-/// Macro to covert a literal string to a unique ID, mostly at compile time.  Specifically,
-/// the string is converted to a unique type at compile time, which is then mapped to a unique
-/// function.  That function is run a run-time, but preserves the id to return so it is
-/// calculated only once.
-#define EMP_STRING(STR)                            \
-  ([](){                                           \
-    constexpr auto temp = EMP_TEXT_PACK(STR);      \
-    return emp::StringID::Get<decltype(temp)>();   \
-  }())
-
-
-/// Macro to build a fake member function for StringMap that can only be passed a literal
-/// string that will be converted at compile time.
-#define CTGet(STR) Get( EMP_STRING(STR) )
 
 
 namespace emp {
