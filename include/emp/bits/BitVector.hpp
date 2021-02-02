@@ -167,6 +167,10 @@ namespace emp {
     /// Constructor to generate a random BitVector with provided number of 1's.
     BitVector(size_t in_num_bits, Random & random, const size_t target_ones);
 
+    /// Constructor to generate a random BitVector with provided number of 1's.
+    BitVector(size_t in_num_bits, Random & random, const int target_ones)
+      : BitVector(in_num_bits, random, (size_t) target_ones) { }
+
     /// Initializer list constructor.
     template <typename T> BitVector(const std::initializer_list<T> l);
 
@@ -326,6 +330,10 @@ namespace emp {
     /// Get a read-only view into the internal array used by BitVector.
     /// @return Read-only span of BitVector's bytes.
     std::span<const std::byte> GetBytes() const;
+
+    /// Get a read-only pointer to the internal array used by BitVector.
+    /// @return Read-only pointer to BitVector's bytes.
+    emp::Ptr<const unsigned char> RawBytes() const { return BytePtr(); }
 
     /// Update the byte at the specified byte index.
     void SetByte(size_t index, uint8_t value);
@@ -958,7 +966,7 @@ namespace emp {
   BitVector::BitVector(const std::bitset<NUM_BITS> & bitset) : num_bits(NUM_BITS), bits(nullptr) {
     if (num_bits) {
       bits = NewArrayPtr<field_t>(NumFields());
-      for (size_t i = 0; i < NUM_BITS; i++) bits[i] = bitset.Get(i);
+      for (size_t i = 0; i < NUM_BITS; i++) bits[i] = bitset[i];
     }
   }
 
