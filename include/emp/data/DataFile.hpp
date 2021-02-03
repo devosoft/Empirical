@@ -345,7 +345,7 @@ namespace emp {
     /// Requires that @param node have the data::Stats or data::FullStats modifier.
     /// @param key and @param desc will have the name of the stat appended to the beginning.
     /// Note: excludes standard deviation, because it is easily calculated from variance
-    /// Note: Setting @param pull and/or @param reset to true only pulls on first statistic 
+    /// Note: Setting @param pull and/or @param reset to true only pulls on first statistic
     /// calculated and only resets on the last. Otherwise there would be a risk of data loss or
     /// at least massive replication of computational effort. Even still, think carefully
     /// before setting either of these to true when you're drawing varied information from the
@@ -364,7 +364,7 @@ namespace emp {
     /// Requires that @param node have the data::Stats or data::FullStats modifier.
     /// @param key and @param desc will have the name of the stat appended to the beginning.
     /// Note: excludes standard deviation, because it is easily calculated from variance
-    /// Note: Setting @param pull and/or @param reset to true only pulls on first statistic 
+    /// Note: Setting @param pull and/or @param reset to true only pulls on first statistic
     /// calculated and only resets on the last. Otherwise there would be a risk of data loss or
     /// at least massive replication of computational effort. Even still, think carefully
     /// before setting either of these to true when you're drawing varied information from the
@@ -396,7 +396,7 @@ namespace emp {
     /// from @param node. Requires that @param node have the data::Histogram modifier.
     /// If @param reset is set true, we will call Reset on that DataNode after pulling the
     /// current value from the node
-    /// Note: Setting @param pull and/or @param reset to true only pulls on first statistic 
+    /// Note: Setting @param pull and/or @param reset to true only pulls on first statistic
     /// calculated and only resets on the last. Otherwise there would be a risk of data loss or
     /// at least massive replication of computational effort. Even still, think carefully
     /// before setting either of these to true when you're drawing varied information from the
