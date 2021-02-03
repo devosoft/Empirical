@@ -12,7 +12,7 @@
 
 #include "emp/base/vector.hpp"
 
-TEST_CASE("Test BitVector Constructors", "[bits]"){
+TEST_CASE("1: Test BitVector Constructors", "[bits]"){
   // Create a size 50 bit vector, default to all zeros.
   emp::BitVector bv1(50);
   REQUIRE( bv1.GetSize() == 50 );
@@ -88,7 +88,7 @@ TEST_CASE("Test BitVector Constructors", "[bits]"){
   REQUIRE( bv13.CountOnes() == 7 );
 }
 
-TEST_CASE("Test BitVector Assignemnts", "[bits]"){
+TEST_CASE("2: Test BitVector Assignemnts", "[bits]"){
   emp::vector< emp::BitVector > v;
 
   // Try all BitVector sizes from 0 to 128.
@@ -137,6 +137,48 @@ TEST_CASE("Test BitVector Assignemnts", "[bits]"){
   REQUIRE( v[75].GetSize() == 60 );
   REQUIRE( v[75].CountOnes() == 27 );
 
+}
+
+
+TEST_CASE("3: Test BitVector Accessors", "[bits]"){
+  emp::BitVector bv0(0);
+  emp::BitVector bv1(1, true);
+  emp::BitVector bv8( "10001101" );
+  emp::BitVector bv32( "10001101100011011000110110001101" );
+  emp::BitVector bv64( "1000110110001101100000011000110000001101100000000000110110001101" );
+  emp::BitVector bv75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
+
+  emp::Random random;
+  emp::BitVector bv1k(1000, random, 0.75);
+  
+  // Make sure all sizes are correct.
+  REQUIRE( bv0.GetSize() == 0 );
+  REQUIRE( bv1.GetSize() == 1 );
+  REQUIRE( bv8.GetSize() == 8 );
+  REQUIRE( bv32.GetSize() == 32 );
+  REQUIRE( bv64.GetSize() == 64 );
+  REQUIRE( bv75.GetSize() == 75 );
+  REQUIRE( bv1k.GetSize() == 1000 );
+
+  // Check byte counts (should always round up!)
+  REQUIRE( bv0.GetNumBytes() == 0 );
+  REQUIRE( bv1.GetNumBytes() == 1 );     // round up!
+  REQUIRE( bv8.GetNumBytes() == 1 );
+  REQUIRE( bv32.GetNumBytes() == 4 );
+  REQUIRE( bv64.GetNumBytes() == 8 );
+  REQUIRE( bv75.GetNumBytes() == 10 );   // round up!
+  REQUIRE( bv1k.GetNumBytes() == 125 );
+
+  // How many states can be represented in each size of BitVector?
+  REQUIRE( bv0.GetNumStates() == 1.0 );
+  REQUIRE( bv1.GetNumStates() == 2.0 );
+  REQUIRE( bv8.GetNumStates() == 256.0 );
+  REQUIRE( bv32.GetNumStates() == 4294967296.0 );
+  REQUIRE( bv64.GetNumStates() >= 18446744073709551610.0 );
+  REQUIRE( bv64.GetNumStates() <= 18446744073709551720.0 );
+  REQUIRE( bv75.GetNumStates() >= 37778931862957161709560.0 );
+  REQUIRE( bv75.GetNumStates() <= 37778931862957161709570.0 );
+  REQUIRE( bv1k.GetNumStates() == emp::Pow2(1000) );
 }
 
 
