@@ -186,6 +186,13 @@ namespace emp {
       return Add(in_fun, key, desc);
     }
 
+    /// Add a function that always prints the value @param.
+    template <typename T>
+    size_t AddVal(const T & val, const std::string & key="", const std::string & desc="") {
+      std::function<fun_t> in_fun = [val](std::ostream & os){ os << val; };
+      return Add(in_fun, key, desc);
+    }
+
     /// Add a function that always pulls the current value from the DataNode @param node.
     /// Requires that @param node have the data::Current modifier.
     /// If @param reset is set true, we will call Reset on that DataNode after pulling the
