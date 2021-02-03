@@ -88,6 +88,56 @@ TEST_CASE("Test BitVector Constructors", "[bits]"){
   REQUIRE( bv13.CountOnes() == 7 );
 }
 
+TEST_CASE("Test BitVector Assignemnts", "[bits]"){
+  emp::vector< emp::BitVector > v;
+
+  // Try all BitVector sizes from 0 to 128.
+  // Lot's of move operators will trigger as vector grows.
+  for (size_t i = 0; i <= 128; i++) {
+    v.emplace_back(i);
+  }
+
+  // And a few larger BitVectors...
+  v.emplace_back(1023);
+  v.emplace_back(1024);
+  v.emplace_back(1025);
+  v.emplace_back(1000000);
+
+  // Copy each BitVector into bv2 and do some manipulations then copy back.
+  for (emp::BitVector & bv : v) {
+    emp::BitVector bv2 = bv;
+    for (size_t i = 1; i < bv2.GetSize(); i += 2) {
+      bv2[i] = 1;
+    }
+    bv = bv2;
+  }
+
+  // Now make sure the we constructed bits correctly!
+  for (const emp::BitVector & bv : v) {
+    REQUIRE( bv.CountOnes() == bv.GetSize()/2 );
+  }
+
+  emp::vector< emp::BitVector > v2;
+  v2.push_back( emp::BitVector({0,1,0,1,0,1}) );
+
+  v2 = v; // Copy over all BitVectors.
+
+  std::bitset<600> bit_set;
+  bit_set[1] = 1;   bit_set[22] = 1;   bit_set[444] = 1;
+
+  v[10] = bit_set;  // Copy in an std::bitset.
+
+  REQUIRE( v[10].GetSize() == 600 );
+  REQUIRE( v[10].CountOnes() == 3 );
+
+  std::string bit_string = "100110010100000111011001100101000001110110011001010000011101";
+
+  v[75] = bit_string;
+
+  REQUIRE( v[75].GetSize() == 60 );
+  REQUIRE( v[75].CountOnes() == 27 );
+
+}
 
 
 TEST_CASE("Test BitVector", "[bits]")
