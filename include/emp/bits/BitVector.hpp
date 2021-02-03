@@ -1073,13 +1073,14 @@ namespace emp {
     // Update the size of internal fields if needed.
     if (start_fields != new_fields) {
       if (bits) bits.DeleteArray();   // If we already had a bitset, get rid of it.
-      if constexpr (NUM_BITS) bits = NewArrayPtr<field_t>(new_fields);
+      if constexpr (NUM_BITS > 0) bits = NewArrayPtr<field_t>(new_fields);
       else bits = nullptr;
-    }
+      ClearExcessBits();              // Make sure excess bits are zeros.
+   }
 
     // If we have bits, copy them in.
-    if constexpr (NUM_BITS) {
-      for (size_t i = 0; i < NUM_BITS; i++) bits[i] = bitset.Get(i);
+    if constexpr (NUM_BITS > 0) {
+      for (size_t i = 0; i < NUM_BITS; i++) Set(i, bitset[i]);
     }
 
     return *this;
@@ -1096,12 +1097,13 @@ namespace emp {
       if (bits) bits.DeleteArray();   // If we already had a bitset, get rid of it.
       if (num_bits) bits = NewArrayPtr<field_t>(new_fields);
       else bits = nullptr;
+      Clear();
     }
 
     // If we have bits, copy them in.
     if (num_bits) {
       for (size_t i = 0; i < num_bits; i++) {
-        bits[i] = (bitstring[num_bits - i - 1] != '0');
+        if (bitstring[num_bits - i - 1] != '0') Set(i);
       }
     }
 
