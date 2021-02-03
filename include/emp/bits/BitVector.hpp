@@ -138,9 +138,6 @@ namespace emp {
     /// Helper for calling ROTATE with positive number
     void RotateRight(const size_t shift_size_raw);
 
-    // Scan this bitvector to make sure that there are no internal problems.
-    bool OK() const;
-
   public:
     /// Build a new BitVector with specified bit count (default 0) and initialization (default 0)
     BitVector(size_t in_num_bits=0, bool init_val=false);
@@ -198,6 +195,9 @@ namespace emp {
 
     /// Convert to a BitVector of a different size.
     BitVector Export(size_t out_size, size_t start_bit=0) const;
+
+    // Scan this bitvector to make sure that there are no internal problems.
+    bool OK() const;
 
 
     // >>>>>>>>>>  Accessors  <<<<<<<<<< //
@@ -489,6 +489,9 @@ namespace emp {
 
     /// Print a space between each field (or other provided spacer)
     void PrintFields(std::ostream & out=std::cout, const std::string & spacer=" ") const;
+
+    /// Print out as much detail as possible about the internals of the BitVector.
+    void PrintDebug(std::ostream & out=std::cout) const;
 
     /// Print from smallest bit position to largest.
     void PrintArray(std::ostream & out=std::cout) const;
@@ -911,24 +914,14 @@ namespace emp {
     ClearExcessBits();
   }
 
-  bool BitVector::OK() const {
-    // Do some checking on the bits array ptr to make sure it's value.
-    if (bits) {
-#ifdef EMP_TRACK_MEM
-      emp_assert(bits.DebugIsArray()); // Must be marked as an array.
-      emp_assert(bits.OK());           // Pointer must be okay.
-#endif
 
-      // Make sure final bits are zeroed out.
-      [[maybe_unused]] field_t excess_bits = bits[LastField()] & ~MaskLow<field_t>(NumEndBits());
-      emp_assert(!excess_bits);
-    }
-
-    // Otherwise bits is null; num_bits should be zero.
-    else emp_assert(num_bits == 0);
-
-    return true;
-  }
+  ///////////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////
+  // ----------------------------------------------------------------------------------------
+  // --------------------- Implementations of Public Member Functions -----------------------
+  // ----------------------------------------------------------------------------------------
+  ///////////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////
 
 
   // ------------------- Implementations of Constructors and Assignments --------------------
@@ -966,8 +959,9 @@ namespace emp {
   BitVector::BitVector(const std::bitset<NUM_BITS> & bitset) : num_bits(NUM_BITS), bits(nullptr) {
     if (num_bits) {
       bits = NewArrayPtr<field_t>(NumFields());
-      for (size_t i = 0; i < NUM_BITS; i++) bits[i] = bitset[i];
+      for (size_t i = 0; i < NUM_BITS; i++) if (bitset[i]) Set(i);
     }
+    ClearExcessBits();
   }
 
   /// Constructor to generate a BitVector from a string of '0's and '1's.
@@ -975,8 +969,9 @@ namespace emp {
     if (num_bits) {
       bits = NewArrayPtr<field_t>(NumFields());
       for (size_t i = 0; i < num_bits; i++) {
-        bits[i] = (bitstring[num_bits - i - 1] != '0');
+        if (bitstring[num_bits - i - 1] != '0') Set(i);
       }
+      ClearExcessBits();
     }
   }
 
@@ -984,9 +979,9 @@ namespace emp {
   BitVector::BitVector(size_t in_num_bits, Random & random)
   : num_bits(in_num_bits), bits(nullptr)
   {
-    Clear();
     if (num_bits) {
       bits = NewArrayPtr<field_t>(NumFields());
+      Clear();
       Randomize(random);
     }
   }
@@ -995,9 +990,9 @@ namespace emp {
   BitVector::BitVector(size_t in_num_bits, Random & random, const double p1)
   : num_bits(in_num_bits), bits(nullptr)
   {
-    Clear();
     if (num_bits) {
       bits = NewArrayPtr<field_t>(NumFields());
+      Clear();
       Randomize(random, p1);
     }
   }
@@ -1006,9 +1001,9 @@ namespace emp {
   BitVector::BitVector(size_t in_num_bits, Random & random, const size_t target_ones)
   : num_bits(in_num_bits), bits(nullptr)
   {
-    Clear();
     if (num_bits) {
       bits = NewArrayPtr<field_t>(NumFields());
+      Clear();
       Randomize(random, target_ones);
     }
   }
@@ -1136,6 +1131,29 @@ namespace emp {
 
     return out_bits;
   }
+
+  bool BitVector::OK() const {
+    // Do some checking on the bits array ptr to make sure it's value.
+    if (bits) {
+#ifdef EMP_TRACK_MEM
+      emp_assert(bits.DebugIsArray()); // Must be marked as an array.
+      emp_assert(bits.OK());           // Pointer must be okay.
+#endif
+
+      // If there are end bits, make sure that everything past the last one is clear.
+      if (NumEndBits()) {
+        // Make sure final bits are zeroed out.
+        [[maybe_unused]] field_t excess_bits = bits[LastField()] & ~MaskLow<field_t>(NumEndBits());
+        emp_assert(!excess_bits);
+      }
+    }
+
+    // Otherwise bits is null; num_bits should be zero.
+    else emp_assert(num_bits == 0);
+
+    return true;
+  }
+
 
 
   // --------------------  Implementations of common accessors -------------------
@@ -1633,7 +1651,8 @@ namespace emp {
     emp_assert((index+7)/8 + sizeof(T) < TotalBytes());
     constexpr size_t type_bits = sizeof(T) * 8;
 
-    Clear(index, index+type_bits);       // Clear out the bits where new value will go.
+    const size_t max_pos = Min(index+type_bits, num_bits);
+    Clear(index, max_pos);               // Clear out the bits where new value will go.
     BitVector in_bits(GetSize());        // Setup a bitset to place the new bits in.
     in_bits.SetValueAtIndex(0, value);   // Insert the new bits.
     in_bits << index;                    // Shift new bits into place.
@@ -1664,7 +1683,8 @@ namespace emp {
   // TODO: see https://arxiv.org/pdf/1611.07612.pdf for fast pop counts
   /// Count the number of ones in the BitVector.
   size_t BitVector::CountOnes() const { 
-    const field_t NUM_FIELDS = (1 + ((num_bits - 1) / FIELD_BITS));
+    if (num_bits == 0) return 0;
+    const field_t NUM_FIELDS = NumFields();
     size_t bit_count = 0;
     for (size_t i = 0; i < NUM_FIELDS; i++) {
         // when compiling with -O3 and -msse4.2, this is the fastest population count method.
@@ -1813,6 +1833,21 @@ namespace emp {
       out << Get(i);
       if (i && (i % FIELD_BITS == 0)) out << spacer;
     }
+  }
+
+  /// Print a space between each field (or other provided spacer)
+  void BitVector::PrintDebug(std::ostream & out) const {
+    for (size_t field = 0; field < NumFields(); field++) {
+      for (size_t bit_id = 0; bit_id < FIELD_BITS; bit_id++) {
+        bool bit = (FIELD_1 << bit_id) & bits[field];
+        out << ( bit ? 1 : 0 );
+      }
+      out << " : " << field << std::endl;
+    }
+    size_t end_pos = NumEndBits();
+    if (end_pos == 0) end_pos = FIELD_BITS;
+    for (size_t i = 0; i < end_pos; i++) out << " ";
+    out << "^" << std::endl;
   }
 
   /// Print from smallest bit position to largest.
