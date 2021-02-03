@@ -1,65 +1,97 @@
 #define CATCH_CONFIG_MAIN
-#ifndef NDEBUG
-	#undef NDEBUG
-	#define TDEBUG 1
-#endif
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/bits/BitVector.hpp"
-#include "emp/base/vector.hpp"
-#include "emp/tools/timing.hpp"
+#include "emp/math/Random.hpp"
 
 #include <sstream>
 #include <map>
 #include <limits>
 #include <ratio>
 
-TEST_CASE("Benchmark BitVector Inserts", "[bits]"){
-	// #ifdef TDEBUG
-	// REQUIRE(emp::assert_last_fail == 0);
-	// #endif
+#include "emp/base/vector.hpp"
 
-	// Expected timing: 38 ms Optimized, 2150 ms Non-optimized
-	emp::BitVector bv(0);
+TEST_CASE("Test BitVector Constructors", "[bits]"){
+  // Create a size 50 bit vector, default to all zeros.
+  emp::BitVector bv1(50);
+  REQUIRE( bv1.GetSize() == 50 );
+  REQUIRE( bv1.CountOnes() == 0 );
+  REQUIRE( (~bv1).CountOnes() == 50 );
 
-	// #ifdef TDEBUG
-	// REQUIRE(emp::assert_last_fail == 0);
-	// #endif
+  // Create a size 1000 BitVector, default to all ones.
+  emp::BitVector bv2(1000, true);
+  REQUIRE( bv2.GetSize() == 1000 );
+  REQUIRE( bv2.CountOnes() == 1000 );
 
-	bv.Insert(0, true, 4096);
+  // Try a range of BitVector sizes, from 0 to 200.
+  for (size_t bv_size = 0; bv_size <= 200; bv_size++) {
+    emp::BitVector bv3(bv_size);
+    REQUIRE( bv3.GetSize() == bv_size );
+    REQUIRE( bv3.CountOnes() == 0 );
+    for (size_t i = 0; i < bv_size; i++) bv3[i] = true;
+    REQUIRE( bv3.CountOnes() == bv_size );
+  }
 
-	// #ifdef TDEBUG
-	// REQUIRE(emp::assert_last_fail == 0);
-	// #endif
+  // Build a relatively large BitVector.
+  emp::BitVector bv4(1000000);
+  for (size_t i = 0; i < bv4.GetSize(); i += 100) bv4[i].Toggle();
+  REQUIRE( bv4.CountOnes() == 10000 );
 
-	std::cout << "Bit Magic Insert: ";
-	EMP_VOID_FUNCTION_TIMER([&bv](){
-		for ( size_t i{}; i <= std::mega::num; ++i ) {
-			// #ifdef TDEBUG
-			// REQUIRE(emp::assert_last_fail == 0);
-			// #endif
-			auto bv1 = bv;
-			// #ifdef TDEBUG
-			// REQUIRE(emp::assert_last_fail == 0);
-			// #endif
-			bv1.Insert(1, false);
-			// #ifdef TDEBUG
-			// REQUIRE(emp::assert_last_fail == 0);
-			// #endif
-		}
-	}());
+  // Try out the copy constructor.
+  emp::BitVector bv5(bv4);
+  REQUIRE( bv5.GetSize() == 1000000 );
+  REQUIRE( bv5.CountOnes() == 10000 );
 
-	// #ifdef TDEBUG
-	// REQUIRE(emp::assert_last_fail == 0);
-	// #endif
+  // And the move constructor.
+  auto old_ptr = bv5.RawBytes();         // Grab a pointer to where bv5 currently has its bytes.
+  emp::BitVector bv6( std::move(bv5) );  // Move bv5 bytes into bv6.
+  REQUIRE( bv6.RawBytes() == old_ptr );
+  REQUIRE( bv5.RawBytes() == nullptr );
+
+  // Construct from std::bitset.
+  std::bitset<6> bit_set;
+  bit_set[1] = 1;   bit_set[2] = 1;   bit_set[4] = 1;
+  emp::BitVector bv7(bit_set);
+  REQUIRE( bv7.GetSize() == 6 );
+  REQUIRE( bv7.CountOnes() == 3 );
+
+  // Construct from string.
+  std::string bit_string = "10011001010000011101";
+  emp::BitVector bv8(bit_string);
+  REQUIRE( bv8.GetSize() == 20 );
+  REQUIRE( bv8.CountOnes() == 9 );
+
+  // Some random BitVectors
+  emp::Random random;
+  emp::BitVector bv9(1000, random);            // 50/50 chance for each bit.
+  const size_t bv9_ones = bv9.CountOnes();
+  REQUIRE( bv9_ones >= 400 );
+  REQUIRE( bv9_ones <= 600 );
+
+  emp::BitVector bv10(1000, random, 0.8);      // 80% chance of ones.
+  const size_t bv10_ones = bv10.CountOnes();
+  REQUIRE( bv10_ones >= 750 );
+  REQUIRE( bv10_ones <= 850 );
+
+  emp::BitVector bv11(1000, random, 117);      // Exactly 117 ones, randomly placed.
+  const size_t bv11_ones = bv11.CountOnes();
+  REQUIRE( bv11_ones == 117 );
+
+  emp::BitVector bv12(bv11, 500);              // Construct with just first half of bv11.
+  const size_t bv12_ones = bv12.CountOnes();
+  REQUIRE( bv12_ones >= 20 );
+  REQUIRE( bv12_ones <= 90 );
+
+  emp::BitVector bv13({1,0,0,0,1,1,1,0,0,0,1,1,1}); // Construct with initializer list.
+  REQUIRE( bv13.GetSize() == 13 );
+  REQUIRE( bv13.CountOnes() == 7 );
 }
+
+
 
 TEST_CASE("Test BitVector", "[bits]")
 {
-	// #ifdef TDEBUG
-	// REQUIRE(emp::assert_last_fail == 0);
-	// #endif
 
 	// Constructor
 	emp::BitVector bv(10);
