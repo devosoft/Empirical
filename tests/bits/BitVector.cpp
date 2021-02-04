@@ -179,6 +179,62 @@ TEST_CASE("3: Test BitVector Accessors", "[bits]"){
   REQUIRE( bv75.GetNumStates() >= 37778931862957161709560.0 );
   REQUIRE( bv75.GetNumStates() <= 37778931862957161709570.0 );
   REQUIRE( bv1k.GetNumStates() == emp::Pow2(1000) );
+
+  // Test Get()
+  REQUIRE( bv1.Get(0) == 1 );
+  REQUIRE( bv8.Get(0) == 1 );
+  REQUIRE( bv8.Get(4) == 1 );
+  REQUIRE( bv8.Get(6) == 0 );
+  REQUIRE( bv8.Get(7) == 1 );
+  REQUIRE( bv75.Get(0) == 0 );
+  REQUIRE( bv75.Get(1) == 1 );
+  REQUIRE( bv75.Get(72) == 0 );
+  REQUIRE( bv75.Get(73) == 1 );
+  REQUIRE( bv75.Get(74) == 1 );
+
+  // Test Has() (including out of range)
+  REQUIRE( bv0.Has(0) == false );
+  REQUIRE( bv0.Has(1000000) == false );
+
+  REQUIRE( bv1.Has(0) == true );
+  REQUIRE( bv1.Has(1) == false );
+
+  REQUIRE( bv8.Has(0) == true );
+  REQUIRE( bv8.Has(4) == true );
+  REQUIRE( bv8.Has(6) == false );
+  REQUIRE( bv8.Has(7) == true );
+  REQUIRE( bv8.Has(8) == false );
+
+  REQUIRE( bv75.Has(0) == false );
+  REQUIRE( bv75.Has(1) == true );
+  REQUIRE( bv75.Has(72) == false );
+  REQUIRE( bv75.Has(73) == true );
+  REQUIRE( bv75.Has(74) == true );
+  REQUIRE( bv75.Has(75) == false );
+  REQUIRE( bv75.Has(79) == false );
+  REQUIRE( bv75.Has(1000000) == false );
+
+  // Test Set(), changing in most (but not all) cases.
+  bv1.Set(0, 0);
+  REQUIRE( bv1.Get(0) == 0 );
+  bv8.Set(0, 1);
+  REQUIRE( bv8.Get(0) == 1 );  // Already a 1!
+  bv8.Set(4, 0);
+  REQUIRE( bv8.Get(4) == 0 );
+  bv8.Set(6, 1);
+  REQUIRE( bv8.Get(6) == 1 );
+  bv8.Set(7, 0);
+  REQUIRE( bv8.Get(7) == 0 );
+  bv75.Set(0, 1);
+  REQUIRE( bv75.Get(0) == 1 );
+  bv75.Set(1, 0);
+  REQUIRE( bv75.Get(1) == 0 );
+  bv75.Set(72, 1);
+  REQUIRE( bv75.Get(72) == 1 );
+  bv75.Set(73, 1);
+  REQUIRE( bv75.Get(73) == 1 );  // Already a 1!
+  bv75.Set(74, 0);
+  REQUIRE( bv75.Get(74) == 0 );
 }
 
 
