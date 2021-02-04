@@ -968,10 +968,10 @@ namespace emp {
   BitVector::BitVector(const std::string & bitstring) : num_bits(bitstring.size()), bits(nullptr) {
     if (num_bits) {
       bits = NewArrayPtr<field_t>(NumFields());
+      Clear();
       for (size_t i = 0; i < num_bits; i++) {
-        if (bitstring[num_bits - i - 1] != '0') Set(i);
+        if (bitstring[i] != '0') Set(i);
       }
-      ClearExcessBits();
     }
   }
 
@@ -1103,7 +1103,7 @@ namespace emp {
     // If we have bits, copy them in.
     if (num_bits) {
       for (size_t i = 0; i < num_bits; i++) {
-        if (bitstring[num_bits - i - 1] != '0') Set(i);
+        if (bitstring[i] != '0') Set(i);
       }
     }
 
