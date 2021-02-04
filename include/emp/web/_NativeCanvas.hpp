@@ -65,32 +65,37 @@ namespace web {
 
     /// Set Canvas size.
     void SetSize(const double w, const double h) {
-      emp_assert(false, "unimplemented");
+      this->SetWidth(w);
+      this->SetHeight(h);
     }
 
     /// Add a Circle to this canvas; provide constructor for the CanvasCircle with a position and radius
     /// as well as optional face color, line color, and line width.
-    template <typename... Ts>
-    Canvas & Circle(Point center, double _r, Ts &&... vals) {
-      emp_assert(false, "unimplemented");
-      return *this;
+    Canvas & Circle(Point center, double _r, const std::string& fc="white", const std::string& lc="black", const float thickness=2) {
+      double x = center.GetX() - _r;
+      double y = center.GetY() - _r;
+      return this->Circle(x, y, _r, fc, lc, thickness);
     }
 
-    template <typename... Ts>
-    Canvas & Circle(double _x, double _y, double _r, Ts &&... vals) {
-      emp_assert(false, "unimplemented");
+    Canvas & Circle(double _x, double _y, double _r, const std::string& fc="white", const std::string& lc="black", const float thickness=2) {
+      sf::CircleShape circle(_r);
+      circle.setPosition(_x, _y);
+      circle.setFillColor((sf::Color) emp::web::Color( fc ));
+      circle.setOutlineColor((sf::Color) emp::web::Color( lc ));
+      circle.setOutlineThickness(thickness);
+      window.draw( circle );
       return *this;
     }
 
     /// Add a Rectangle to this canvas at x,y with width w and heigh h.  Optional face color and
     /// line color.
-    template <typename... Ts>
-    Canvas & Rect(Point corner, double w, double h, Ts &&... vals) {
-      emp_assert(false, "unimplemented");
-      return *this;
+    Canvas & Rect(
+      Point corner, const double w, const double h,
+      const std::string& fc="", const std::string& lc="", const double lw=1.0
+    ) {
+      return this->Rect(corner.GetX(),corner.GetY(), w, h, fc, lc, lw);
     }
 
-    template <typename... Ts>
     Canvas & Rect(
       const double x, const double y, const double w, const double h,
       const std::string& fc="", const std::string& lc="", const double lw=1.0
@@ -120,7 +125,6 @@ namespace web {
 
 
     /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
-    template <typename... Ts>
     Canvas & Line(
       const double x1, const double y1, const double x2, const double y2,
       const std::string& fc="", const std::string& lc="", const double lw=1.0
@@ -135,10 +139,11 @@ namespace web {
       return *this;
     }
 
-    template <typename... Ts>
-    Canvas & Line(emp::Point p1, emp::Point p2, Ts &&... vals) {
-      emp_assert(false, "unimplemented");
-      return *this;
+    Canvas & Line(
+      emp::Point p1, emp::Point p2, const std::string& fc="", 
+      const std::string& lc="", const double lw=1.0
+      ) {
+      return this->Line(p1.GetX(), p1.GetY(), p2.GetX(), p2.GetY(), fc, lc, lw);
     }
 
     /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
@@ -184,8 +189,8 @@ namespace web {
 
     /// Draw a circle onto this canvas.
     Canvas & Draw(const emp::Circle & circle,
-                  const std::string & fc="", const std::string & lc="") {
-                    emp_assert(false, "unimplemented");
+                  const std::string & fc="white", const std::string & lc="black") {
+                    this->Circle(width/2, height/2, 5, fc, lc);
       return *this;
     }
 
