@@ -217,22 +217,22 @@ TEST_CASE("3: Test BitVector Accessors", "[bits]"){
   // Test Set(), changing in most (but not all) cases.
   bv1.Set(0, 0);
   REQUIRE( bv1.Get(0) == 0 );
-  bv8.Set(0, 1);
-  REQUIRE( bv8.Get(0) == 1 );  // Already a 1!
+  bv8.Set(0, 1);                // Already a 1!
+  REQUIRE( bv8.Get(0) == 1 );
   bv8.Set(4, 0);
   REQUIRE( bv8.Get(4) == 0 );
   bv8.Set(6, 1);
   REQUIRE( bv8.Get(6) == 1 );
   bv8.Set(7, 0);
   REQUIRE( bv8.Get(7) == 0 );
-  bv75.Set(0, 1);
-  REQUIRE( bv75.Get(0) == 1 );
+  bv75.Set(0, 0);               // Already a 0!
+  REQUIRE( bv75.Get(0) == 0 );
   bv75.Set(1, 0);
   REQUIRE( bv75.Get(1) == 0 );
-  bv75.Set(72, 1);
+  bv75.Set(72);                 // No second arg!
   REQUIRE( bv75.Get(72) == 1 );
-  bv75.Set(73, 1);
-  REQUIRE( bv75.Get(73) == 1 );  // Already a 1!
+  bv75.Set(73);                 // No second arg AND already a 1!
+  REQUIRE( bv75.Get(73) == 1 );
   bv75.Set(74, 0);
   REQUIRE( bv75.Get(74) == 0 );
 }
