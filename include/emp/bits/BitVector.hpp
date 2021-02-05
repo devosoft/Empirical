@@ -1298,7 +1298,7 @@ namespace emp {
 
     emp_assert(start <= stop, start, stop, num_bits);
     emp_assert(stop <= num_bits, stop, num_bits);
-    
+
     const size_t start_pos = FieldPos(start);
     const size_t stop_pos = FieldPos(stop);
     size_t start_field = FieldID(start);
@@ -1605,10 +1605,10 @@ namespace emp {
   /// and returning the value as a double.
   double BitVector::GetValue() const {
     // To grab the most significant field, figure out how much to shift it by.
-    const size_t shift_bits = num_bits - FIELD_BITS;
-    double out_value = (double) (*this >> shift_bits)[0];
+    const size_t shift_bits = (num_bits > 64) ? (num_bits - 64) : 0;
+    double out_value = (double) (*this >> shift_bits).GetUInt64(0);
 
-    for (size_t i = 0; i < shift_bits; i++) out_value *= 2.0;
+    out_value *= emp::Pow2(shift_bits);
 
     return out_value;
   }
