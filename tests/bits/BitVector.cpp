@@ -279,9 +279,24 @@ TEST_CASE("3: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
   bv8.Toggle(7,8);                    REQUIRE(bv8.GetValue() == 167.0);  // 10100111
   bv8.Toggle();                       REQUIRE(bv8.GetValue() ==  88.0);  // 01011000
 
+  // Test a full field.
+  constexpr double ALL_ON = (double) ((uint64_t) -1);
+  emp::BitVector bv64( "11011000110110001101" ); REQUIRE(bv64.GetValue() == 727835.0);
+  bv64.Resize(64);      REQUIRE(bv64.GetValue() == 727835.0);        // ...0 010110001101100011011
+  bv64.Set(6);          REQUIRE(bv64.GetValue() == 727899.0);        // ...0 010110001101101011011
+  bv64.Set(0, 0);       REQUIRE(bv64.GetValue() == 727898.0);        // ...0 010110001101101011010
+  bv64.SetRange(4, 9);  REQUIRE(bv64.GetValue() == 728058.0);        // ...0 010110001101111111010
+  bv64.SetAll();        REQUIRE(bv64.GetValue() == ALL_ON);          // ...1 111111111111111111111
+  bv64.Clear(2);        REQUIRE(bv64.GetValue() == ALL_ON - 4);      // ...1 111111111111111111011
+  bv64.Clear(5,5);      REQUIRE(bv64.GetValue() == ALL_ON - 4);      // ...1 111111111111111111011
+  bv64.Clear(5,7);      REQUIRE(bv64.GetValue() == ALL_ON - 100);    // ...1 111111111111110011011
+  bv64.Clear();         REQUIRE(bv64.GetValue() == 0.0);             // ...0 000000000000000000000
+  bv64.Toggle(19);      REQUIRE(bv64.GetValue() == emp::Pow2(19));   // ...0 010000000000000000000
+  bv64.Toggle(15,20);   REQUIRE(bv64.GetValue() == 491520.0);        // ...0 001111000000000000000
+  bv64.Toggle();        REQUIRE(bv64.GetValue() == ALL_ON-491520.0); // ...1 110000111111111111111
+  bv64.Toggle(0,64);    REQUIRE(bv64.GetValue() == 491520.0);        // ...0 001111000000000000000
 
-  emp::BitVector bv32( "10001101100011011000110110001101" );
-  emp::BitVector bv64( "1000110110001101100000011000110000001101100000000000110110001101" );
+
   emp::BitVector bv75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
 
   emp::Random random;
