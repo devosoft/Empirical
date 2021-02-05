@@ -140,7 +140,7 @@ TEST_CASE("2: Test BitVector Assignemnts", "[bits]"){
 }
 
 
-TEST_CASE("3: Test BitVector Accessors", "[bits]"){
+TEST_CASE("3: Test Simple BitVector Accessors", "[bits]"){
   emp::BitVector bv0(0);
   emp::BitVector bv1(1, true);
   emp::BitVector bv8( "10001101" );
@@ -237,6 +237,40 @@ TEST_CASE("3: Test BitVector Accessors", "[bits]"){
   REQUIRE( bv75.Get(74) == 0 );
 }
 
+TEST_CASE("3: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
+  // Make sure range-based accessors still work when there are no bits. 
+  emp::BitVector bv0(0);
+  bv0.SetRange(0,0);
+  bv0.SetAll();
+  bv0.Clear();
+  bv0.Clear(0,0);
+  bv0.Toggle();
+  bv0.Toggle(0,0);
+  REQUIRE( bv0.GetSize() == 0 );
+
+  // Now try range-based accessors on a single bit. 
+  emp::BitVector bv1(1, false);  REQUIRE( bv1[0] == false );   REQUIRE( bv1.CountOnes() == 0 );
+  bv1.Set(0);                    REQUIRE( bv1[0] == true );    REQUIRE( bv1.CountOnes() == 1 );
+  bv1.Clear(0);                  REQUIRE( bv1[0] == false );   REQUIRE( bv1.CountOnes() == 0 );
+  bv1.Toggle(0);                 REQUIRE( bv1[0] == true );    REQUIRE( bv1.CountOnes() == 1 );
+  bv1.Clear();                   REQUIRE( bv1[0] == false );   REQUIRE( bv1.CountOnes() == 0 );
+  bv1.SetAll();                  REQUIRE( bv1[0] == true );    REQUIRE( bv1.CountOnes() == 1 );
+  bv1.Toggle();                  REQUIRE( bv1[0] == false );   REQUIRE( bv1.CountOnes() == 0 );
+  bv1.SetRange(0,1);             REQUIRE( bv1[0] == true );    REQUIRE( bv1.CountOnes() == 1 );
+  bv1.Clear(0,1);                REQUIRE( bv1[0] == false );   REQUIRE( bv1.CountOnes() == 0 );
+  bv1.Toggle(0,1);               REQUIRE( bv1[0] == true );    REQUIRE( bv1.CountOnes() == 1 );
+  bv1.Set(0, false);             REQUIRE( bv1[0] == false );   REQUIRE( bv1.CountOnes() == 0 );
+  bv1.SetRange(0,0);             REQUIRE( bv1[0] == false );   REQUIRE( bv1.CountOnes() == 0 );
+  bv1.SetRange(1,1);             REQUIRE( bv1[0] == false );   REQUIRE( bv1.CountOnes() == 0 );
+
+  emp::BitVector bv8( "10001101" );
+  emp::BitVector bv32( "10001101100011011000110110001101" );
+  emp::BitVector bv64( "1000110110001101100000011000110000001101100000000000110110001101" );
+  emp::BitVector bv75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
+
+  emp::Random random;
+  emp::BitVector bv1k(1000, random, 0.75);
+}
 
 TEST_CASE("Test BitVector", "[bits]")
 {
