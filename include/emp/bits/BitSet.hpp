@@ -101,11 +101,12 @@ namespace emp {
 
     // Copy an array of bits into this BitSet (internal use only!)
     template <size_t IN_FIELDS, size_t COPY_FIELDS=NUM_FIELDS>
-    void Copy(const field_t in_set[IN_FIELDS]) {
+    BitSet & Copy(const field_t in_set[IN_FIELDS]) {
       static_assert(COPY_FIELDS <= IN_FIELDS, "Cannot copy more fields than we are given.");
       static_assert(COPY_FIELDS <= NUM_FIELDS, "Cannot copy into more fields than are available.");
       constexpr size_t COPY_BYTES = COPY_FIELDS * sizeof(field_t);
       std::memcpy(bit_set, in_set, COPY_BYTES);
+      return *this;
     }
 
     // Any bits past the last "real" bit in the last field should be kept as zeros.
@@ -158,7 +159,7 @@ namespace emp {
     ~BitSet() = default;
 
     /// Assignment operator (no separate move opperator since no resources to move...)
-    BitSet & operator=(const BitSet<NUM_BITS> & in_set) { Copy<NUM_FIELDS>(in_set.bit_set); return *this; }
+    BitSet & operator=(const BitSet<NUM_BITS> & in_set) { return Copy<NUM_FIELDS>(in_set.bit_set); }
 
     /// Assignment from another BitSet of a different size.
     template <size_t FROM_BITS>
@@ -843,8 +844,8 @@ namespace emp {
   /// Constructor to generate a BitSet from a std::bitset.
   template <size_t NUM_BITS>
   BitSet<NUM_BITS>::BitSet(const std::bitset<NUM_BITS> & bitset) {
-    Clear(); // have to clear out field bits beyond NUM_BITS
     for (size_t bit{}; bit < NUM_BITS; ++bit) Set( bit, bitset[bit] );
+    ClearExcessBits();
   }
 
   /// Constructor to generate a BitSet from a string of '0's and '1's.
@@ -1343,9 +1344,8 @@ namespace emp {
 
     // Otherwise grab the most significant field and figure out how much to shift it by.
     constexpr size_t SHIFT_BITS = NUM_BITS - FIELD_BITS;
-    double out_value = (double) (*this >> SHIFT_BITS)[0];
-
-    for (size_t i = 0; i < SHIFT_BITS; i++) out_value *= 2.0;
+    double out_value = (double) (*this >> SHIFT_BITS).bit_set[0];
+    out_value *= emp:Pow2(SHIFT_BITS);
 
     return out_value;
   }
