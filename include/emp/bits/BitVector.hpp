@@ -1191,6 +1191,8 @@ namespace emp {
 
   /// Set a range of bits to one: [start, stop)
   BitVector & BitVector::SetRange(size_t start, size_t stop) {
+    if (start == stop) return *this;  // Empty range.
+
     emp_assert(start <= stop, start, stop, num_bits);
     emp_assert(stop <= num_bits, stop, num_bits);
     const size_t start_pos = FieldPos(start);
@@ -1292,8 +1294,11 @@ namespace emp {
 
   /// Flips all the bits in a range [start, end)
   BitVector & BitVector::Toggle(size_t start, size_t stop) {
+    if (start == stop) return *this;  // Empty range.
+
     emp_assert(start <= stop, start, stop, num_bits);
     emp_assert(stop <= num_bits, stop, num_bits);
+    
     const size_t start_pos = FieldPos(start);
     const size_t stop_pos = FieldPos(stop);
     size_t start_field = FieldID(start);
