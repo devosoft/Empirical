@@ -263,7 +263,23 @@ TEST_CASE("3: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
   bv1.SetRange(0,0);             REQUIRE( bv1[0] == false );   REQUIRE( bv1.CountOnes() == 0 );
   bv1.SetRange(1,1);             REQUIRE( bv1[0] == false );   REQUIRE( bv1.CountOnes() == 0 );
 
-  emp::BitVector bv8( "10001101" );
+  // Test when a full byte is used.
+  emp::BitVector bv8( "10001101" );   REQUIRE(bv8.GetValue() == 177.0);  // 10110001
+  bv8.Set(2);                         REQUIRE(bv8.GetValue() == 181.0);  // 10110101
+  bv8.Set(0, 0);                      REQUIRE(bv8.GetValue() == 180.0);  // 10110100
+  bv8.SetRange(1, 4);                 REQUIRE(bv8.GetValue() == 190.0);  // 10111110
+  bv8.SetAll();                       REQUIRE(bv8.GetValue() == 255.0);  // 11111111
+  bv8.Clear(3);                       REQUIRE(bv8.GetValue() == 247.0);  // 11110111
+  bv8.Clear(5,5);                     REQUIRE(bv8.GetValue() == 247.0);  // 11110111
+  bv8.Clear(5,7);                     REQUIRE(bv8.GetValue() == 151.0);  // 10010111
+  bv8.Clear();                        REQUIRE(bv8.GetValue() ==   0.0);  // 00000000
+  bv8.Toggle(4);                      REQUIRE(bv8.GetValue() ==  16.0);  // 00010000
+  bv8.Toggle(4,6);                    REQUIRE(bv8.GetValue() ==  32.0);  // 00100000
+  bv8.Toggle(0,3);                    REQUIRE(bv8.GetValue() ==  39.0);  // 00100111
+  bv8.Toggle(7,8);                    REQUIRE(bv8.GetValue() == 167.0);  // 10100111
+  bv8.Toggle();                       REQUIRE(bv8.GetValue() ==  88.0);  // 01011000
+
+
   emp::BitVector bv32( "10001101100011011000110110001101" );
   emp::BitVector bv64( "1000110110001101100000011000110000001101100000000000110110001101" );
   emp::BitVector bv75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
