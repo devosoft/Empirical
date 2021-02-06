@@ -226,6 +226,7 @@ namespace emp {
 
   /// A fast 2^x command.
   static constexpr double Pow2(double exp) {
+    if (exp > 1024) return std::numeric_limits<double>::infinity();
     return (exp < 0.0) ? (1.0/internal::Pow2_impl(-exp)) : internal::Pow2_impl(exp);
   }
 
