@@ -328,8 +328,28 @@ TEST_CASE("3: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
   bv88.Clear(52,78);    REQUIRE(bv88.CountOnes() == 4);   // Leave two 1s on each side of range
   bv88.SetRange(64,66); REQUIRE(bv88.CountOnes() == 6);   // Set two more 1s, just into 2nd field.
 
+  // A larger BitVector with lots of random tests.
   emp::Random random;
-  emp::BitVector bv1k(1000, random, 0.75);
+  emp::BitVector bv1k(1000, random, 0.65);
+  size_t num_ones = bv1k.CountOnes();  REQUIRE(num_ones > 550);
+  bv1k.Toggle();                       REQUIRE(bv1k.CountOnes() == 1000 - num_ones);
+
+  for (size_t test_id = 0; test_id < 10000; ++test_id) {
+    size_t val1 = random.GetUInt(1000);
+    size_t val2 = random.GetUInt(1001);
+    if (val1 > val2) std::swap(val1, val2);
+    bv1k.Toggle(val1, val2);
+
+    val1 = random.GetUInt(1000);
+    val2 = random.GetUInt(1001);
+    if (val1 > val2) std::swap(val1, val2);
+    bv1k.Clear(val1, val2);
+
+    val1 = random.GetUInt(1000);
+    val2 = random.GetUInt(1001);
+    if (val1 > val2) std::swap(val1, val2);
+    bv1k.SetRange(val1, val2);
+  }
 }
 
 TEST_CASE("Test BitVector", "[bits]")
