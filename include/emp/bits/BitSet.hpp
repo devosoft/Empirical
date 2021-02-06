@@ -398,6 +398,9 @@ namespace emp {
     ///
     int FindBit(const size_t start_pos) const;
 
+    /// Find the most-significant set-bit.
+    int FindMaxOne() const;
+
     /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
     int PopBit();
 
@@ -1342,10 +1345,21 @@ namespace emp {
     // If we have 64 bits or fewer, we can load the full value and return it.
     if constexpr (NUM_FIELDS == 1) return (double) bit_set[0];
 
-    // Otherwise grab the most significant field and figure out how much to shift it by.
-    constexpr size_t SHIFT_BITS = NUM_BITS - FIELD_BITS;
-    double out_value = (double) (*this >> SHIFT_BITS).bit_set[0];
-    out_value *= emp:Pow2(SHIFT_BITS);
+    // Otherwise grab the most significant one and figure out how much to shift it by.
+    const size_t max_one = FindMaxOne();
+
+    // If there are no ones, this value must be 0.
+    if (max_one == -1) return 0.0;
+
+    // If all ones are in the least-significant field, just return it.
+    // NOTE: If we have more than one field, FIELD_SIZE is usually 64 already.
+    if (max_one < 64) return (double) GetUInt64(0);
+
+    // To grab the most significant field, figure out how much to shift it by.
+    const size_t shift_bits = max_one - 63;
+    double out_value = (double) (*this >> shift_bits).GetUInt64(0);
+
+    out_value *= emp::Pow2(shift_bits);
 
     return out_value;
   }
@@ -1357,6 +1371,9 @@ namespace emp {
     // For the moment, must fit inside bounds; eventually should pad with zeros.
     emp_assert((index + 1) * sizeof(T) <= NUM_FIELDS * sizeof(field_t),
               index, sizeof(T), NUM_BITS, NUM_FIELDS);
+
+    // If we are using the native field type, just grab it from bit_set.
+    if constexpr( std::is_same<T, field_t>() ) return bit_set[index];
 
     T out_value;
     std::memcpy( &out_value, BytePtr() + index * sizeof(T), sizeof(T) );
@@ -1491,6 +1508,32 @@ namespace emp {
       (int) (find_bit(bit_set[field_id]) + (field_id * FIELD_BITS)) : -1;
   }
 
+  /// Find the most-significant set-bit.
+  template <size_t NUM_BITS>
+  int BitSet<NUM_BITS>::FindMaxOne() const {
+    // Find the max field with a one.
+    int max_field = ((int) NUM_FIELDS) - 1;
+    while (max_field >= 0 && bit_set[max_field] == 0) max_field--;
+
+    // If there are no ones, return -1.
+    if (max_field == -1) return -1;
+
+    const field_t field = bit_set[max_field]; // Save a local copy of this field.
+    field_t mask = (field_t) -1;              // Mask off the bits still under consideration.
+    size_t offset = 0;                        // Indicate where the mask should be applied.
+    size_t range = FIELD_BITS;                // Indicate how many bits are in the mask.
+
+    while (range > 1) {
+      // Cut the range in half and see if we need to adjust the offset.
+      range /= 2;      // Cut range size in half
+      mask >>= range;  // Cut the mask down.
+
+      // Check the upper half of original range; if has a one shift new offset to there.
+      if (field & (mask << (offset + range))) offset += range;
+    }
+
+    return (int) (max_field * FIELD_BITS + offset);
+  }
 
   /// Return index of first one in sequence (or -1 if no ones); change this position to zero.
   template <size_t NUM_BITS>
