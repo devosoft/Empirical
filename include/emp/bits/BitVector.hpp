@@ -1607,8 +1607,16 @@ namespace emp {
   /// Get the overall value of this BitSet, using a uint encoding, but including all bits
   /// and returning the value as a double.
   double BitVector::GetValue() const {
+    const size_t max_one = FindMaxOne();
+
+    // If there are no ones, this value must be 0.
+    if (max_one == -1) return 0.0;
+
+    // If all ones are in the least-significant field, just return it.
+    if (max_one < 64) return (double) GetUInt64(0);
+
     // To grab the most significant field, figure out how much to shift it by.
-    const size_t shift_bits = (num_bits > 64) ? (num_bits - 64) : 0;
+    const size_t shift_bits = max_one - 63;
     double out_value = (double) (*this >> shift_bits).GetUInt64(0);
 
     out_value *= emp::Pow2(shift_bits);
