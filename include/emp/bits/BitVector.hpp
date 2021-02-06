@@ -466,6 +466,9 @@ namespace emp {
     ///
     int FindBit(const size_t start_pos) const;
 
+    /// Find the most-significant set-bit.
+    int FindMaxOne() const;
+
     /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
     int PopBit();
 
@@ -1787,6 +1790,32 @@ namespace emp {
     while (field_id < NUM_FIELDS && bits[field_id]==0) field_id++;
     return (field_id < NUM_FIELDS) ?
       (int) (find_bit(bits[field_id]) + (field_id * FIELD_BITS)) : -1;
+  }
+
+  /// Find the most-significant set-bit.
+  int BitVector::FindMaxOne() const {
+    // Find the max field with a one.
+    int max_field = NumFields() - 1;
+    while (max_field >= 0 && bits[max_field] == 0) max_field--;
+
+    // If there are no ones, return -1.
+    if (max_field == -1) return -1;
+
+    const field_t field = bits[max_field]; // Save a local copy of this field.
+    field_t mask = (field_t) -1;           // Mask off the bits still under consideration.
+    size_t offset = 0;                     // Indicate where the mask should be applied.
+    size_t range = FIELD_BITS;             // Indicate how many bits are in the mask.
+
+    while (range > 1) {
+      // Cut the range in half and see if we need to adjust the offset.
+      range /= 2;      // Cut range size in half
+      mask >>= range;  // Cut the mask down.
+
+      // Check the upper half of original range; if has a one shift new offset to there.
+      if (field & (mask << (offset + range))) offset += range;
+    }
+
+    return (int) (max_field * FIELD_BITS + offset);
   }
 
   /// Return the position of the first one and change it to a zero.  Return -1 if no ones.
