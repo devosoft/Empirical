@@ -111,9 +111,8 @@ struct PlusCountdownRegulator {
       timer -= std::min(timer, static_cast<unsigned char>(steps));
     }
 
-    return timer == 0 ? (
-      std::exchange(state, 0.0f) != 0.0f
-    ) : false;
+    if ( timer == 0 ) return std::exchange(state, 0.0f) != 0.0f;
+    else return false;
 
   }
 
