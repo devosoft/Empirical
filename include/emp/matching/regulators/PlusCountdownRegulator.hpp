@@ -19,7 +19,12 @@
 
 namespace emp {
 
-template <typename Slope=std::deci, typename ClampLeeway=std::ratio<0>>
+template <
+  typename Slope=std::deci,
+  typename MaxUpreg=std::ratio<1>,
+  typename ClampLeeway=std::ratio<0>,
+  size_t CountdownStart=1
+>
 struct PlusCountdownRegulator {
 
   using set_t = float;
@@ -28,6 +33,9 @@ struct PlusCountdownRegulator {
 
   static constexpr float slope = (
     static_cast<float>(Slope::num) / static_cast<float>(Slope::den)
+  );
+  static constexpr float max_up = (
+    -static_cast<float>(MaxUpreg::num) / static_cast<float>(MaxUpreg::den)
   );
   static constexpr float clamp_leeway = (
     static_cast<float>(ClampLeeway::num) / static_cast<float>(ClampLeeway::den)
@@ -43,7 +51,7 @@ struct PlusCountdownRegulator {
   // 0.0f   | neutral
   // -1.0f  | -= slope
   // ...   | ...
-  // -inf  | -= 1.0f
+  // -inf  | -= MaxUpreg
 
   // countdown timer to reseting state
   unsigned char timer{};
@@ -53,7 +61,7 @@ struct PlusCountdownRegulator {
   __attribute__ ((hot))
   float operator()(const float raw_score) const {
     const float res = std::clamp(
-      slope * state + raw_score,
+      std::max(slope * state, max_up) + raw_score,
       -clamp_leeway,
       1.0f + clamp_leeway
     );
@@ -78,7 +86,7 @@ struct PlusCountdownRegulator {
   bool Set(const float& set) {
     if ( std::isnan( set ) ) return false;
 
-    timer = 1;
+    timer = CountdownStart;
 
     // return whether regulator value changed
     // (i.e., we need to purge the cache)
@@ -91,7 +99,7 @@ struct PlusCountdownRegulator {
   bool Adj(const float& amt) {
     if ( std::isnan( amt ) ) return false;
 
-    timer = 1;
+    timer = CountdownStart;
 
     state += amt;
 
