@@ -280,24 +280,53 @@ TEST_CASE("3: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
   bv8.Toggle();                       REQUIRE(bv8.GetValue() ==  88.0);  // 01011000
 
   // Test a full field.
-  constexpr double ALL_ON = (double) ((uint64_t) -1);
+  constexpr double ALL_64 = (double) ((uint64_t) -1);
   emp::BitVector bv64( "11011000110110001101" ); REQUIRE(bv64.GetValue() == 727835.0);
   bv64.Resize(64);      REQUIRE(bv64.GetValue() == 727835.0);        // ...0 010110001101100011011
   bv64.Set(6);          REQUIRE(bv64.GetValue() == 727899.0);        // ...0 010110001101101011011
   bv64.Set(0, 0);       REQUIRE(bv64.GetValue() == 727898.0);        // ...0 010110001101101011010
   bv64.SetRange(4, 9);  REQUIRE(bv64.GetValue() == 728058.0);        // ...0 010110001101111111010
-  bv64.SetAll();        REQUIRE(bv64.GetValue() == ALL_ON);          // ...1 111111111111111111111
-  bv64.Clear(2);        REQUIRE(bv64.GetValue() == ALL_ON - 4);      // ...1 111111111111111111011
-  bv64.Clear(5,5);      REQUIRE(bv64.GetValue() == ALL_ON - 4);      // ...1 111111111111111111011
-  bv64.Clear(5,7);      REQUIRE(bv64.GetValue() == ALL_ON - 100);    // ...1 111111111111110011011
+  bv64.SetAll();        REQUIRE(bv64.GetValue() == ALL_64);          // ...1 111111111111111111111
+  bv64.Clear(2);        REQUIRE(bv64.GetValue() == ALL_64 - 4);      // ...1 111111111111111111011
+  bv64.Clear(5,5);      REQUIRE(bv64.GetValue() == ALL_64 - 4);      // ...1 111111111111111111011
+  bv64.Clear(5,7);      REQUIRE(bv64.GetValue() == ALL_64 - 100);    // ...1 111111111111110011011
   bv64.Clear();         REQUIRE(bv64.GetValue() == 0.0);             // ...0 000000000000000000000
   bv64.Toggle(19);      REQUIRE(bv64.GetValue() == emp::Pow2(19));   // ...0 010000000000000000000
   bv64.Toggle(15,20);   REQUIRE(bv64.GetValue() == 491520.0);        // ...0 001111000000000000000
-  bv64.Toggle();        REQUIRE(bv64.GetValue() == ALL_ON-491520.0); // ...1 110000111111111111111
+  bv64.Toggle();        REQUIRE(bv64.GetValue() == ALL_64-491520.0); // ...1 110000111111111111111
   bv64.Toggle(0,64);    REQUIRE(bv64.GetValue() == 491520.0);        // ...0 001111000000000000000
 
 
   emp::BitVector bv75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
+
+  // Test a full + partial field.
+  constexpr double ALL_88 = ((double) ((uint64_t) -1)) * emp::Pow2(24);
+  emp::BitVector bv88( "11011000110110001101" ); REQUIRE(bv88.GetValue() == 727835.0);
+  bv88.Resize(88);      REQUIRE(bv88.GetValue() == 727835.0);        // ...0 010110001101100011011
+
+  // Start with same tests as last time...
+  bv88.Set(6);          REQUIRE(bv88.GetValue() == 727899.0);        // ...0 010110001101101011011
+  bv88.Set(0, 0);       REQUIRE(bv88.GetValue() == 727898.0);        // ...0 010110001101101011010
+  bv88.SetRange(4, 9);  REQUIRE(bv88.GetValue() == 728058.0);        // ...0 010110001101111111010
+  bv88.SetAll();        REQUIRE(bv88.GetValue() == ALL_88);          // ...1 111111111111111111111
+  bv88.Clear(2);        REQUIRE(bv88.GetValue() == ALL_88 - 4);      // ...1 111111111111111111011
+  bv88.Clear(5,5);      REQUIRE(bv88.GetValue() == ALL_88 - 4);      // ...1 111111111111111111011
+  bv88.Clear(5,7);      REQUIRE(bv88.GetValue() == ALL_88 - 100);    // ...1 111111111111110011011
+  bv88.Clear();         REQUIRE(bv88.GetValue() == 0.0);             // ...0 000000000000000000000
+  bv88.Toggle(19);      REQUIRE(bv88.GetValue() == emp::Pow2(19));   // ...0 010000000000000000000
+  bv88.Toggle(15,20);   REQUIRE(bv88.GetValue() == 491520.0);        // ...0 001111000000000000000
+  bv88.Toggle();        REQUIRE(bv88.GetValue() == ALL_88-491520.0); // ...1 110000111111111111111
+  bv88.Toggle(0,88);    REQUIRE(bv88.GetValue() == 491520.0);        // ...0 001111000000000000000
+
+  bv88 <<= 20;          REQUIRE(bv88.CountOnes() == 4);   // four ones, moved to bits 35-39
+  bv88 <<= 27;          REQUIRE(bv88.CountOnes() == 4);   // four ones, moved to bits 62-65
+  bv88 <<= 22;          REQUIRE(bv88.CountOnes() == 4);   // four ones, moved to bits 84-87
+  bv88 <<= 1;           REQUIRE(bv88.CountOnes() == 3);   // three ones left, moved to bits 85-87
+  bv88 <<= 2;           REQUIRE(bv88.CountOnes() == 1);   // one one left, at bit 87
+  bv88 >>= 30;          REQUIRE(bv88.CountOnes() == 1);   // one one left, now at bit 57
+  bv88.Toggle(50,80);   REQUIRE(bv88.CountOnes() == 29);  // Toggling 30 bits, only one was on.
+  bv88.Clear(52,78);    REQUIRE(bv88.CountOnes() == 4);   // Leave two 1s on each side of range
+  bv88.SetRange(64,66); REQUIRE(bv88.CountOnes() == 6);   // Set two more 1s, just into 2nd field.
 
   emp::Random random;
   emp::BitVector bv1k(1000, random, 0.75);
