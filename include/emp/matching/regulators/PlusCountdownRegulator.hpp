@@ -15,6 +15,8 @@
 #include <algorithm>
 #include <cmath>
 #include <ratio>
+#include <string>
+#include <tuple>
 #include <utility>
 
 namespace emp {
@@ -124,6 +126,20 @@ struct PlusCountdownRegulator {
 
   /// Return a float representing the state of the regulator.
   const float & View() const { return state; }
+
+  bool operator==( const PlusCountdownRegulator& other ) const {
+    return std::tuple{
+      state, timer
+    } == std::tuple{
+      other.state, other.timer
+    };
+  }
+
+  bool operator!=( const PlusCountdownRegulator& other ) const {
+    return !operator==( other );
+  }
+
+  std::string name() const { return "Plus Countdown Regulator"; }
 
 };
 
