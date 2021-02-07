@@ -23,7 +23,7 @@ template <
   typename Slope=std::deci,
   typename MaxUpreg=std::ratio<1>,
   typename ClampLeeway=std::ratio<0>,
-  size_t CountdownStart=1
+  uint32_t CountdownStart=1
 >
 struct PlusCountdownRegulator {
 
@@ -54,7 +54,7 @@ struct PlusCountdownRegulator {
   // -inf  | -= MaxUpreg
 
   // countdown timer to reseting state
-  unsigned char timer{};
+  uint32_t timer{};
 
   /// Apply regulation to a raw match score.
   /// Returns a value between 0.0f and 1.0f
@@ -110,14 +110,12 @@ struct PlusCountdownRegulator {
 
   /// Timer decay.
   /// Return whether MatchBin should be updated
-  bool Decay(const int steps) {
-    if (steps < 0) {
-      // if reverse decay is requested
-      timer += -steps;
-    } else {
-      // if forward decay is requested
-      timer -= std::min(timer, static_cast<unsigned char>(steps));
-    }
+  bool Decay(const int32_t steps) {
+
+    const int64_t res = static_cast<int64_t>(timer) + steps;
+    constexpr int64_t floor = std::numeric_limits<decltype(timer)>::lowest();
+    constexpr int64_t ceil = std::numeric_limits<decltype(timer)>::max();
+    timer = std::clamp( res, floor, ceil );
 
     if ( timer == 0 ) return std::exchange(state, 0.0f) != 0.0f;
     else return false;
