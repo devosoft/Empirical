@@ -132,7 +132,7 @@ namespace emp {
 
   public:
     /// Constructor: Assume all zeroes in set
-    BitSet() { Clear(); }
+    BitSet(bool init_val=false) { if (init_val) SetAll(); else Clear(); }
 
     /// Copy constructor from another BitSet
     BitSet(const BitSet<NUM_BITS> & in_set) { Copy<NUM_FIELDS>(in_set.bit_set); }
@@ -151,6 +151,9 @@ namespace emp {
 
     /// Constructor to generate a random BitSet with provided NUMBER of 1's.
     BitSet(Random & random, size_t num_ones) { Clear(); RandomizeFixed(random, num_ones); }
+
+    /// Constructor to generate a random BitSet with provided NUMBER of 1's.
+    BitSet(Random & random, int num_ones) { Clear(); RandomizeFixed(random, num_ones); }
 
     /// Constructor to fill in a bit set from a vector.
     template <typename T> BitSet(const std::initializer_list<T> l);
@@ -288,6 +291,10 @@ namespace emp {
     /// Get a read-only view into the internal array used by BitSet.
     /// @return Read-only span of BitSet's bytes.
     std::span<const std::byte> GetBytes() const;
+
+    /// Get a read-only pointer to the internal array used by BitVector.
+    /// @return Read-only pointer to BitVector's bytes.
+    emp::Ptr<const unsigned char> RawBytes() const { return BytePtr(); }
 
     /// Update the byte at the specified byte index.
     void SetByte(size_t index, uint8_t value);
