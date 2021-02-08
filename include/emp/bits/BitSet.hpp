@@ -132,7 +132,7 @@ namespace emp {
 
   public:
     /// Constructor: Assume all zeroes in set
-    BitSet(bool init_val=false) { if (init_val) SetAll(); else Clear(); }
+    explicit BitSet(bool init_val=false) { if (init_val) SetAll(); else Clear(); }
 
     /// Copy constructor from another BitSet
     BitSet(const BitSet<NUM_BITS> & in_set) { Copy<NUM_FIELDS>(in_set.bit_set); }
@@ -141,7 +141,10 @@ namespace emp {
     explicit BitSet(const std::bitset<NUM_BITS> & bitset);
 
     /// Constructor to generate a BitSet from a string of '0's and '1's.
-    explicit BitSet(const std::string & bitstring);
+    BitSet(const std::string & bitstring);
+
+    /// Constructor to generate a BitSet from a literal string of '0's and '1's.
+    BitSet(const char * bitstring) : BitSet(std::string(bitstring)) { }
 
     /// Constructor to generate a random BitSet (with equal prob of 0 or 1).
     BitSet(Random & random) { Clear(); Randomize(random); }
@@ -163,6 +166,12 @@ namespace emp {
 
     /// Assignment operator (no separate move opperator since no resources to move...)
     BitSet & operator=(const BitSet<NUM_BITS> & in_set) { return Copy<NUM_FIELDS>(in_set.bit_set); }
+
+    /// Assignement operator from a std::bitset.
+    BitSet & operator=(const std::bitset<NUM_BITS> & bitset);
+
+    /// Assignement operator from a string of '0's and '1's.
+    BitSet & operator=(const std::string & bitstring);
 
     /// Assignment from another BitSet of a different size.
     template <size_t FROM_BITS>
@@ -431,6 +440,9 @@ namespace emp {
 
     /// Print a space between each field (or other provided spacer)
     void PrintFields(std::ostream & out=std::cout, const std::string & spacer=" ") const;
+
+    /// Print out details about the internals of the BitSet.
+    void PrintDebug(std::ostream & out=std::cout) const;
 
     /// Print all bits from smallest to largest, as if this were an array, not a bit representation.
     void PrintArray(std::ostream & out=std::cout) const;
@@ -861,9 +873,10 @@ namespace emp {
   /// Constructor to generate a BitSet from a string of '0's and '1's.
   template <size_t NUM_BITS>
   BitSet<NUM_BITS>::BitSet(const std::string & bitstring)
-    : BitSet( std::bitset<NUM_BITS>( bitstring ) )
   {
-    emp_assert( bitstring.size() == NUM_BITS );
+    emp_assert(bitstring.size() <= NUM_BITS);
+    Clear();
+    for (size_t i = 0; i < bitstring.size(); i++) Set(i, bitstring[i] != '0');
   }
 
   template <size_t NUM_BITS>
@@ -871,9 +884,26 @@ namespace emp {
   BitSet<NUM_BITS>::BitSet(const std::initializer_list<T> l) {
     emp_assert(l.size() <= NUM_BITS, "Initializer longer than BitSet", l.size(), NUM_BITS);
     Clear();
-    auto it = std::rbegin(l); // Right-most bit is position 0.
+    auto it = std::begin(l); // Right-most bit is position 0.
     for (size_t idx = 0; idx < NUM_BITS; ++idx) Set(idx, (idx < l.size()) && *it++);
   }
+
+    /// Assignement operator from a std::bitset.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::operator=(const std::bitset<NUM_BITS> & bitset) {
+    for (size_t i = 0; i < NUM_BITS; i++) Set(i, bitset[i]);
+    return *this;
+  }
+
+  /// Assignement operator from a string of '0's and '1's.
+  template <size_t NUM_BITS>
+  BitSet<NUM_BITS> & BitSet<NUM_BITS>::operator=(const std::string & bitstring) {
+    emp_assert(bitstring.size() <= NUM_BITS);
+    Clear();
+    for (size_t i = 0; i < bitstring.size(); i++) Set(i, bitstring[i] != '0');
+    return *this;
+  }
+
 
   /// Assign from a BitSet of a different size.
   template <size_t NUM_BITS>
@@ -1599,6 +1629,22 @@ namespace emp {
       out << Get(i);
       if (i && (i % FIELD_BITS == 0)) out << spacer;
     }
+  }
+
+  /// Print a space between each field (or other provided spacer)
+  template <size_t NUM_BITS>
+  void BitSet<NUM_BITS>::PrintDebug(std::ostream & out) const {
+    for (size_t field = 0; field < NUM_FIELDS; field++) {
+      for (size_t bit_id = 0; bit_id < FIELD_BITS; bit_id++) {
+        bool bit = (FIELD_1 << bit_id) & bit_set[field];
+        out << ( bit ? 1 : 0 );
+      }
+      out << " : " << field << std::endl;
+    }
+    size_t end_pos = NUM_END_BITS;
+    if (end_pos == 0) end_pos = FIELD_BITS;
+    for (size_t i = 0; i < end_pos; i++) out << " ";
+    out << "^" << std::endl;
   }
 
   /// Print all bits from smallest to largest, as if this were an array, not a bit representation.
