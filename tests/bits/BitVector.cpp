@@ -237,7 +237,7 @@ TEST_CASE("3: Test Simple BitVector Accessors", "[bits]"){
   REQUIRE( bv75.Get(74) == 0 );
 }
 
-TEST_CASE("3: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
+TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
   // Make sure range-based accessors still work when there are no bits. 
   emp::BitVector bv0(0);
   bv0.SetRange(0,0);
@@ -351,6 +351,16 @@ TEST_CASE("3: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
     bv1k.SetRange(val1, val2);
   }
 }
+
+
+      /////////////////////////////////////////////
+     /////////////////////////////////////////////
+    /////////////////////////////////////////////
+   //////////  CAO: CONTINUE HERE!   ///////////
+  /////////////////////////////////////////////
+ /////////////////////////////////////////////
+/////////////////////////////////////////////
+
 
 TEST_CASE("Test BitVector", "[bits]")
 {
