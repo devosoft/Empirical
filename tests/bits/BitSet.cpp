@@ -31,6 +31,351 @@
 #include "emp/base/map.hpp"
 
 
+template <size_t... VALS> struct TestBVConstruct;
+
+template <size_t VAL1, size_t... VALS>
+struct TestBVConstruct<VAL1, VALS...> {
+  static void Run() {
+    emp::BitSet<VAL1> bs;
+    REQUIRE( bs.GetSize() == VAL1 );
+    REQUIRE( bs.CountOnes() == 0 );
+    for (size_t i = 0; i < VAL1; i++) bs[i] = true;
+    REQUIRE( bs.CountOnes() == VAL1 );
+
+    TestBVConstruct<VALS...>::Run();
+  }
+};
+
+// Base case for constructors...
+template <>
+struct TestBVConstruct<> {
+  static void Run(){}
+};
+
+TEST_CASE("1: Test BitSet Constructors", "[bits]"){
+  // Create a size 50 bit vector, default to all zeros.
+  emp::BitSet<50> bs1;
+  REQUIRE( bs1.GetSize() == 50 );
+  REQUIRE( bs1.CountOnes() == 0 );
+  REQUIRE( (~bs1).CountOnes() == 50 );
+
+  // Create a size 1000 BitSet, default to all ones.
+  emp::BitSet<1000> bs2(true);
+  REQUIRE( bs2.GetSize() == 1000 );
+  REQUIRE( bs2.CountOnes() == 1000 );
+
+  // Try a range of BitSet sizes, from 1 to 200.
+  TestBVConstruct<1,2,7,8,9,15,16,17,31,32,33,63,64,65,127,128,129,191,192,193,200>::Run();
+
+  // Build a relatively large BitSet.
+  emp::BitSet<1000000> bs4;
+  for (size_t i = 0; i < bs4.GetSize(); i += 100) bs4[i].Toggle();
+  REQUIRE( bs4.CountOnes() == 10000 );
+
+  // Try out the copy constructor.
+  emp::BitSet<1000000> bs5(bs4);
+  REQUIRE( bs5.GetSize() == 1000000 );
+  REQUIRE( bs5.CountOnes() == 10000 );
+
+  // Construct from std::bitset.
+  std::bitset<6> bit_set;
+  bit_set[1] = 1;   bit_set[2] = 1;   bit_set[4] = 1;
+  emp::BitSet<6> bs7(bit_set);
+  REQUIRE( bs7.GetSize() == 6 );
+  REQUIRE( bs7.CountOnes() == 3 );
+
+  // Construct from string.
+  std::string bit_string = "10011001010000011101";
+  emp::BitSet<20> bs8(bit_string);
+  REQUIRE( bs8.GetSize() == 20 );
+  REQUIRE( bs8.CountOnes() == 9 );
+
+  // Some random BitSets
+  emp::Random random;
+  emp::BitSet<1000> bs9(random);            // 50/50 chance for each bit.
+  const size_t bs9_ones = bs9.CountOnes();
+  REQUIRE( bs9_ones >= 400 );
+  REQUIRE( bs9_ones <= 600 );
+
+  emp::BitSet<1000> bs10(random, 0.8);      // 80% chance of ones.
+  const size_t bs10_ones = bs10.CountOnes();
+  REQUIRE( bs10_ones >= 750 );
+  REQUIRE( bs10_ones <= 850 );
+
+  emp::BitSet<1000> bs11(random, 117);      // Exactly 117 ones, randomly placed.
+  const size_t bs11_ones = bs11.CountOnes();
+  REQUIRE( bs11_ones == 117 );
+
+  emp::BitSet<13> bs12({1,0,0,0,1,1,1,0,0,0,1,1,1}); // Construct with initializer list.
+  REQUIRE( bs12.GetSize() == 13 );
+  REQUIRE( bs12.CountOnes() == 7 );
+}
+
+
+template <size_t... VALS> struct TestBVAssign;
+
+template <size_t VAL1, size_t... VALS>
+struct TestBVAssign<VAL1, VALS...> {
+  static void Run() {
+    emp::BitSet<VAL1> bs;
+
+    // Copy to a second bs, make changes, then copy back.
+    emp::BitSet<VAL1> bs2;
+
+    for (size_t i = 1; i < bs2.GetSize(); i += 2) {
+      bs2[i] = 1;
+    }
+
+    bs = bs2;
+
+    REQUIRE( bs.CountOnes() == bs.GetSize()/2 );
+
+    // Try copying in from an std::bitset.
+    std::bitset<VAL1> bit_set;
+    size_t num_ones = 0;
+    if constexpr (VAL1 > 1)   { bit_set[1] = 1; num_ones++; }
+    if constexpr (VAL1 > 22)  { bit_set[22] = 1; num_ones++; }
+    if constexpr (VAL1 > 444) { bit_set[444] = 1; num_ones++; }
+
+    bs2 = bit_set;  // Copy in an std::bitset.
+
+    REQUIRE( bs2.GetSize() == VAL1 );
+    REQUIRE( bs2.CountOnes() == num_ones );
+
+    // Try copying from an std::string
+    std::string bit_string = "100110010100000111011001100101000001110110011001010000011101";
+    while (bit_string.size() < VAL1) bit_string += bit_string;
+    bit_string.resize(VAL1);
+
+    num_ones = 0;
+    for (char x : bit_string) if (x == '1') num_ones++;
+
+    bs2 = bit_string;
+
+    REQUIRE( bs2.GetSize() == VAL1 );
+    REQUIRE( bs2.CountOnes() == num_ones );
+
+    TestBVAssign<VALS...>::Run();
+  }
+};
+
+// Base case for constructors...
+template<> struct TestBVAssign<> { static void Run(){} };
+
+TEST_CASE("2: Test BitSet Assignemnts", "[bits]"){
+  // Try a range of BitSet sizes, from 1 to 200.
+  TestBVAssign<1,2,7,8,9,15,16,17,31,32,33,63,64,65,127,128,129,191,192,193,200,1023,1024,1025,1000000>::Run();
+}
+
+
+TEST_CASE("3: Test Simple BitSet Accessors", "[bits]"){
+  emp::BitSet<1>  bs1(true);
+  emp::BitSet<8>  bs8( "10001101" );
+  emp::BitSet<32> bs32( "10001101100011011000110110001101" );
+  emp::BitSet<64> bs64( "1000110110001101100000011000110000001101100000000000110110001101" );
+  emp::BitSet<75> bs75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
+
+  emp::Random random;
+  emp::BitSet<1000> bs1k(random, 0.75);
+  
+  // Make sure all sizes are correct.
+  REQUIRE( bs1.GetSize() == 1 );
+  REQUIRE( bs8.GetSize() == 8 );
+  REQUIRE( bs32.GetSize() == 32 );
+  REQUIRE( bs64.GetSize() == 64 );
+  REQUIRE( bs75.GetSize() == 75 );
+  REQUIRE( bs1k.GetSize() == 1000 );
+
+  // Check byte counts (should always round up!)
+  REQUIRE( bs1.GetNumBytes() == 1 );     // round up!
+  REQUIRE( bs8.GetNumBytes() == 1 );
+  REQUIRE( bs32.GetNumBytes() == 4 );
+  REQUIRE( bs64.GetNumBytes() == 8 );
+  REQUIRE( bs75.GetNumBytes() == 10 );   // round up!
+  REQUIRE( bs1k.GetNumBytes() == 125 );
+
+  // How many states can be represented in each size of BitSet?
+  REQUIRE( bs1.GetNumStates() == 2.0 );
+  REQUIRE( bs8.GetNumStates() == 256.0 );
+  REQUIRE( bs32.GetNumStates() == 4294967296.0 );
+  REQUIRE( bs64.GetNumStates() >= 18446744073709551610.0 );
+  REQUIRE( bs64.GetNumStates() <= 18446744073709551720.0 );
+  REQUIRE( bs75.GetNumStates() >= 37778931862957161709560.0 );
+  REQUIRE( bs75.GetNumStates() <= 37778931862957161709570.0 );
+  REQUIRE( bs1k.GetNumStates() == emp::Pow2(1000) );
+
+  // Test Get()
+  REQUIRE( bs1.Get(0) == 1 );
+  REQUIRE( bs8.Get(0) == 1 );
+  REQUIRE( bs8.Get(4) == 1 );
+  REQUIRE( bs8.Get(6) == 0 );
+  REQUIRE( bs8.Get(7) == 1 );
+  REQUIRE( bs75.Get(0) == 0 );
+  REQUIRE( bs75.Get(1) == 1 );
+  REQUIRE( bs75.Get(72) == 0 );
+  REQUIRE( bs75.Get(73) == 1 );
+  REQUIRE( bs75.Get(74) == 1 );
+
+  // Test Has() (including out of range)
+  REQUIRE( bs1.Has(0) == true );
+  REQUIRE( bs1.Has(1) == false );
+  REQUIRE( bs1.Has(1000000) == false );
+
+  REQUIRE( bs8.Has(0) == true );
+  REQUIRE( bs8.Has(4) == true );
+  REQUIRE( bs8.Has(6) == false );
+  REQUIRE( bs8.Has(7) == true );
+  REQUIRE( bs8.Has(8) == false );
+
+  REQUIRE( bs75.Has(0) == false );
+  REQUIRE( bs75.Has(1) == true );
+  REQUIRE( bs75.Has(72) == false );
+  REQUIRE( bs75.Has(73) == true );
+  REQUIRE( bs75.Has(74) == true );
+  REQUIRE( bs75.Has(75) == false );
+  REQUIRE( bs75.Has(79) == false );
+  REQUIRE( bs75.Has(1000000) == false );
+
+  // Test Set(), changing in most (but not all) cases.
+  bs1.Set(0, 0);
+  REQUIRE( bs1.Get(0) == 0 );
+  bs8.Set(0, 1);                // Already a 1!
+  REQUIRE( bs8.Get(0) == 1 );
+  bs8.Set(4, 0);
+  REQUIRE( bs8.Get(4) == 0 );
+  bs8.Set(6, 1);
+  REQUIRE( bs8.Get(6) == 1 );
+  bs8.Set(7, 0);
+  REQUIRE( bs8.Get(7) == 0 );
+  bs75.Set(0, 0);               // Already a 0!
+  REQUIRE( bs75.Get(0) == 0 );
+  bs75.Set(1, 0);
+  REQUIRE( bs75.Get(1) == 0 );
+  bs75.Set(72);                 // No second arg!
+  REQUIRE( bs75.Get(72) == 1 );
+  bs75.Set(73);                 // No second arg AND already a 1!
+  REQUIRE( bs75.Get(73) == 1 );
+  bs75.Set(74, 0);
+  REQUIRE( bs75.Get(74) == 0 );
+}
+
+TEST_CASE("4: Test BitSet Set*, Clear* and Toggle* Accessors", "[bits]") {
+  // Now try range-based accessors on a single bit. 
+  emp::BitSet<1> bs1(false);  REQUIRE( bs1[0] == false );   REQUIRE( bs1.CountOnes() == 0 );
+  bs1.Set(0);                 REQUIRE( bs1[0] == true );    REQUIRE( bs1.CountOnes() == 1 );
+  bs1.Clear(0);               REQUIRE( bs1[0] == false );   REQUIRE( bs1.CountOnes() == 0 );
+  bs1.Toggle(0);              REQUIRE( bs1[0] == true );    REQUIRE( bs1.CountOnes() == 1 );
+  bs1.Clear();                REQUIRE( bs1[0] == false );   REQUIRE( bs1.CountOnes() == 0 );
+  bs1.SetAll();               REQUIRE( bs1[0] == true );    REQUIRE( bs1.CountOnes() == 1 );
+  bs1.Toggle();               REQUIRE( bs1[0] == false );   REQUIRE( bs1.CountOnes() == 0 );
+  bs1.SetRange(0,1);          REQUIRE( bs1[0] == true );    REQUIRE( bs1.CountOnes() == 1 );
+  bs1.Clear(0,1);             REQUIRE( bs1[0] == false );   REQUIRE( bs1.CountOnes() == 0 );
+  bs1.Toggle(0,1);            REQUIRE( bs1[0] == true );    REQUIRE( bs1.CountOnes() == 1 );
+  bs1.Set(0, false);          REQUIRE( bs1[0] == false );   REQUIRE( bs1.CountOnes() == 0 );
+  bs1.SetRange(0,0);          REQUIRE( bs1[0] == false );   REQUIRE( bs1.CountOnes() == 0 );
+  bs1.SetRange(1,1);          REQUIRE( bs1[0] == false );   REQUIRE( bs1.CountOnes() == 0 );
+
+  // Test when a full byte is used.
+  emp::BitSet<8> bs8( "10001101" );   REQUIRE(bs8.GetValue() == 177.0);  // 10110001
+  bs8.Set(2);                         REQUIRE(bs8.GetValue() == 181.0);  // 10110101
+  bs8.Set(0, 0);                      REQUIRE(bs8.GetValue() == 180.0);  // 10110100
+  bs8.SetRange(1, 4);                 REQUIRE(bs8.GetValue() == 190.0);  // 10111110
+  bs8.SetAll();                       REQUIRE(bs8.GetValue() == 255.0);  // 11111111
+  bs8.Clear(3);                       REQUIRE(bs8.GetValue() == 247.0);  // 11110111
+  bs8.Clear(5,5);                     REQUIRE(bs8.GetValue() == 247.0);  // 11110111
+  bs8.Clear(5,7);                     REQUIRE(bs8.GetValue() == 151.0);  // 10010111
+  bs8.Clear();                        REQUIRE(bs8.GetValue() ==   0.0);  // 00000000
+  bs8.Toggle(4);                      REQUIRE(bs8.GetValue() ==  16.0);  // 00010000
+  bs8.Toggle(4,6);                    REQUIRE(bs8.GetValue() ==  32.0);  // 00100000
+  bs8.Toggle(0,3);                    REQUIRE(bs8.GetValue() ==  39.0);  // 00100111
+  bs8.Toggle(7,8);                    REQUIRE(bs8.GetValue() == 167.0);  // 10100111
+  bs8.Toggle();                       REQUIRE(bs8.GetValue() ==  88.0);  // 01011000
+
+  // Test a full field.
+  constexpr double ALL_64 = (double) ((uint64_t) -1);
+  emp::BitSet<64> bs64( "11011000110110001101" );
+  REQUIRE(bs64.GetValue() == 727835.0);
+  bs64.Set(6);          REQUIRE(bs64.GetValue() == 727899.0);        // ...0 010110001101101011011
+  bs64.Set(0, 0);       REQUIRE(bs64.GetValue() == 727898.0);        // ...0 010110001101101011010
+  bs64.SetRange(4, 9);  REQUIRE(bs64.GetValue() == 728058.0);        // ...0 010110001101111111010
+  bs64.SetAll();        REQUIRE(bs64.GetValue() == ALL_64);          // ...1 111111111111111111111
+  bs64.Clear(2);        REQUIRE(bs64.GetValue() == ALL_64 - 4);      // ...1 111111111111111111011
+  bs64.Clear(5,5);      REQUIRE(bs64.GetValue() == ALL_64 - 4);      // ...1 111111111111111111011
+  bs64.Clear(5,7);      REQUIRE(bs64.GetValue() == ALL_64 - 100);    // ...1 111111111111110011011
+  bs64.Clear();         REQUIRE(bs64.GetValue() == 0.0);             // ...0 000000000000000000000
+  bs64.Toggle(19);      REQUIRE(bs64.GetValue() == emp::Pow2(19));   // ...0 010000000000000000000
+  bs64.Toggle(15,20);   REQUIRE(bs64.GetValue() == 491520.0);        // ...0 001111000000000000000
+  bs64.Toggle();        REQUIRE(bs64.GetValue() == ALL_64-491520.0); // ...1 110000111111111111111
+  bs64.Toggle(0,64);    REQUIRE(bs64.GetValue() == 491520.0);        // ...0 001111000000000000000
+
+
+  emp::BitSet<75> bs75( "010001011100010111110000011110100011111000001110100000111110010011111000011" );
+
+  // Test a full + partial field.
+  constexpr double ALL_88 = ((double) ((uint64_t) -1)) * emp::Pow2(24);
+  emp::BitSet<88> bs88( "11011000110110001101" ); REQUIRE(bs88.GetValue() == 727835.0);
+  REQUIRE(bs88.GetValue() == 727835.0);                              // ...0 010110001101100011011
+
+  // Start with same tests as last time...
+  bs88.Set(6);          REQUIRE(bs88.GetValue() == 727899.0);        // ...0 010110001101101011011
+  bs88.Set(0, 0);       REQUIRE(bs88.GetValue() == 727898.0);        // ...0 010110001101101011010
+  bs88.SetRange(4, 9);  REQUIRE(bs88.GetValue() == 728058.0);        // ...0 010110001101111111010
+  bs88.SetAll();        REQUIRE(bs88.GetValue() == ALL_88);          // ...1 111111111111111111111
+  bs88.Clear(2);        REQUIRE(bs88.GetValue() == ALL_88 - 4);      // ...1 111111111111111111011
+  bs88.Clear(5,5);      REQUIRE(bs88.GetValue() == ALL_88 - 4);      // ...1 111111111111111111011
+  bs88.Clear(5,7);      REQUIRE(bs88.GetValue() == ALL_88 - 100);    // ...1 111111111111110011011
+  bs88.Clear();         REQUIRE(bs88.GetValue() == 0.0);             // ...0 000000000000000000000
+  bs88.Toggle(19);      REQUIRE(bs88.GetValue() == emp::Pow2(19));   // ...0 010000000000000000000
+  bs88.Toggle(15,20);   REQUIRE(bs88.GetValue() == 491520.0);        // ...0 001111000000000000000
+  bs88.Toggle();        REQUIRE(bs88.GetValue() == ALL_88-491520.0); // ...1 110000111111111111111
+  bs88.Toggle(0,88);    REQUIRE(bs88.GetValue() == 491520.0);        // ...0 001111000000000000000
+
+  bs88 <<= 20;          REQUIRE(bs88.CountOnes() == 4);   // four ones, moved to bits 35-39
+  bs88 <<= 27;          REQUIRE(bs88.CountOnes() == 4);   // four ones, moved to bits 62-65
+  bs88 <<= 22;          REQUIRE(bs88.CountOnes() == 4);   // four ones, moved to bits 84-87
+  bs88 <<= 1;           REQUIRE(bs88.CountOnes() == 3);   // three ones left, moved to bits 85-87
+  bs88 <<= 2;           REQUIRE(bs88.CountOnes() == 1);   // one one left, at bit 87
+  bs88 >>= 30;          REQUIRE(bs88.CountOnes() == 1);   // one one left, now at bit 57
+  bs88.Toggle(50,80);   REQUIRE(bs88.CountOnes() == 29);  // Toggling 30 bits, only one was on.
+  bs88.Clear(52,78);    REQUIRE(bs88.CountOnes() == 4);   // Leave two 1s on each side of range
+  bs88.SetRange(64,66); REQUIRE(bs88.CountOnes() == 6);   // Set two more 1s, just into 2nd field.
+
+  // A larger BitSet with lots of random tests.
+  emp::Random random;
+  emp::BitSet<1000> bs1k(random, 0.65);
+  size_t num_ones = bs1k.CountOnes();  REQUIRE(num_ones > 550);
+  bs1k.Toggle();                       REQUIRE(bs1k.CountOnes() == 1000 - num_ones);
+
+  for (size_t test_id = 0; test_id < 10000; ++test_id) {
+    size_t val1 = random.GetUInt(1000);
+    size_t val2 = random.GetUInt(1001);
+    if (val1 > val2) std::swap(val1, val2);
+    bs1k.Toggle(val1, val2);
+
+    val1 = random.GetUInt(1000);
+    val2 = random.GetUInt(1001);
+    if (val1 > val2) std::swap(val1, val2);
+    bs1k.Clear(val1, val2);
+
+    val1 = random.GetUInt(1000);
+    val2 = random.GetUInt(1001);
+    if (val1 > val2) std::swap(val1, val2);
+    bs1k.SetRange(val1, val2);
+  }
+}
+
+
+      /////////////////////////////////////////////
+     /////////////////////////////////////////////
+    /////////////////////////////////////////////
+   //////////  CAO: CONTINUE HERE!   ///////////
+  /////////////////////////////////////////////
+ /////////////////////////////////////////////
+/////////////////////////////////////////////
+
+
+
+
 /// Ensures that
 /// 1) A == B
 /// 2) A and B can be constexprs or non-contexprs.
@@ -979,13 +1324,13 @@ TEST_CASE("Another Test BitSet", "[bits]")
   REQUIRE(bs0.GetUInt64(0) == 0);
   REQUIRE(bs0.GetNumStates() == 8);
 
-  emp::BitSet<3> bs1{0,0,1};
+  emp::BitSet<3> bs1{1,0,0};
   REQUIRE(bs1.GetUInt8(0) == 1);
   REQUIRE(bs1.GetUInt16(0) == 1);
   REQUIRE(bs1.GetUInt32(0) == 1);
   REQUIRE(bs1.GetUInt64(0) == 1);
 
-  emp::BitSet<3> bs2{0,1,1};
+  emp::BitSet<3> bs2{1,1,0};
   REQUIRE(bs2.GetUInt8(0) == 3);
   REQUIRE(bs2.GetUInt16(0) == 3);
   REQUIRE(bs2.GetUInt32(0) == 3);
@@ -994,7 +1339,7 @@ TEST_CASE("Another Test BitSet", "[bits]")
   emp::BitSet<3> bs3{1,1,1};
   REQUIRE(bs3.GetUInt8(0) == 7);
 
-  emp::BitSet<3> bs4{1,1,0};
+  emp::BitSet<3> bs4{0,1,1};
   REQUIRE(bs4.GetUInt8(0) == 6);
 
   emp::BitSet<32> bs5;
