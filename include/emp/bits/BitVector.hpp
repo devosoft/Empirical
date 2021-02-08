@@ -153,7 +153,7 @@ namespace emp {
     explicit BitVector(const std::bitset<NUM_BITS> & bitset);
 
     /// Constructor to generate a BitVector from a string of '0's and '1's.
-    explicit BitVector(const std::string & bitstring);
+    BitVector(const std::string & bitstring);
 
     /// Constructor to generate a random BitVector (with equal prob of 0 or 1).
     BitVector(size_t in_num_bits, Random & random);
@@ -493,7 +493,7 @@ namespace emp {
     /// Print a space between each field (or other provided spacer)
     void PrintFields(std::ostream & out=std::cout, const std::string & spacer=" ") const;
 
-    /// Print out as much detail as possible about the internals of the BitVector.
+    /// Print out details about the internals of the BitVector.
     void PrintDebug(std::ostream & out=std::cout) const;
 
     /// Print from smallest bit position to largest.
@@ -1017,7 +1017,7 @@ namespace emp {
     if (num_bits) bits = NewArrayPtr<field_t>(NumFields());
 
     size_t idx = 0;
-    for (auto i = std::rbegin(l); i != std::rend(l); ++i) Set(idx++, *i);
+    for (auto i = std::begin(l); i != std::end(l); ++i) Set(idx++, *i);
     ClearExcessBits();
   }
 
