@@ -15,11 +15,18 @@
 #include <algorithm>
 #include <cmath>
 #include <ratio>
+#include <string>
+#include <tuple>
 #include <utility>
 
 namespace emp {
 
-template <typename Slope=std::deci, typename ClampLeeway=std::ratio<0>>
+template <
+  typename Slope=std::deci,
+  typename MaxUpreg=std::ratio<1>,
+  typename ClampLeeway=std::ratio<0>,
+  uint32_t CountdownStart=1
+>
 struct PlusCountdownRegulator {
 
   using set_t = float;
@@ -28,6 +35,9 @@ struct PlusCountdownRegulator {
 
   static constexpr float slope = (
     static_cast<float>(Slope::num) / static_cast<float>(Slope::den)
+  );
+  static constexpr float max_up = (
+    -static_cast<float>(MaxUpreg::num) / static_cast<float>(MaxUpreg::den)
   );
   static constexpr float clamp_leeway = (
     static_cast<float>(ClampLeeway::num) / static_cast<float>(ClampLeeway::den)
@@ -43,17 +53,17 @@ struct PlusCountdownRegulator {
   // 0.0f   | neutral
   // -1.0f  | -= slope
   // ...   | ...
-  // -inf  | -= 1.0f
+  // -inf  | -= MaxUpreg
 
   // countdown timer to reseting state
-  unsigned char timer{};
+  uint32_t timer{};
 
   /// Apply regulation to a raw match score.
   /// Returns a value between 0.0f and 1.0f
   __attribute__ ((hot))
   float operator()(const float raw_score) const {
     const float res = std::clamp(
-      slope * state + raw_score,
+      std::max(slope * state, max_up) + raw_score,
       -clamp_leeway,
       1.0f + clamp_leeway
     );
@@ -78,7 +88,7 @@ struct PlusCountdownRegulator {
   bool Set(const float& set) {
     if ( std::isnan( set ) ) return false;
 
-    timer = 1;
+    timer = CountdownStart;
 
     // return whether regulator value changed
     // (i.e., we need to purge the cache)
@@ -91,7 +101,7 @@ struct PlusCountdownRegulator {
   bool Adj(const float& amt) {
     if ( std::isnan( amt ) ) return false;
 
-    timer = 1;
+    timer = CountdownStart;
 
     state += amt;
 
@@ -102,23 +112,34 @@ struct PlusCountdownRegulator {
 
   /// Timer decay.
   /// Return whether MatchBin should be updated
-  bool Decay(const int steps) {
-    if (steps < 0) {
-      // if reverse decay is requested
-      timer += -steps;
-    } else {
-      // if forward decay is requested
-      timer -= std::min(timer, static_cast<unsigned char>(steps));
-    }
+  bool Decay(const int32_t steps) {
 
-    return timer == 0 ? (
-      std::exchange(state, 0.0f) != 0.0f
-    ) : false;
+    const int64_t res = static_cast<int64_t>(timer) + steps;
+    constexpr int64_t floor = std::numeric_limits<decltype(timer)>::lowest();
+    constexpr int64_t ceil = std::numeric_limits<decltype(timer)>::max();
+    timer = std::clamp( res, floor, ceil );
+
+    if ( timer == 0 ) return std::exchange(state, 0.0f) != 0.0f;
+    else return false;
 
   }
 
   /// Return a float representing the state of the regulator.
   const float & View() const { return state; }
+
+  bool operator==( const PlusCountdownRegulator& other ) const {
+    return std::tuple{
+      state, timer
+    } == std::tuple{
+      other.state, other.timer
+    };
+  }
+
+  bool operator!=( const PlusCountdownRegulator& other ) const {
+    return !operator==( other );
+  }
+
+  std::string name() const { return "Plus Countdown Regulator"; }
 
 };
 

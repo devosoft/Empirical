@@ -192,7 +192,7 @@ public:
   }
 
   /// Apply decay to a regulator.
-  void DecayRegulator(const uid_t uid, const int steps=1) {
+  void DecayRegulator(const uid_t uid, const int32_t steps=1) {
     if ( data.at(uid).reg.Decay(steps) ) {
       if constexpr ( RegulatedCacheSize > 0 ) cache_regulated.clear();
     }
