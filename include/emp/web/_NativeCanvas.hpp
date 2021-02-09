@@ -23,6 +23,7 @@
 #include "_LineShape.hpp"
 #include "CanvasShape.hpp"
 #include "Color.hpp"
+#include "LiberationSansRegular.hpp"
 
 namespace emp {
 namespace web {
@@ -91,14 +92,14 @@ namespace web {
     /// line color.
     Canvas & Rect(
       Point corner, const double w, const double h,
-      const std::string& fc="", const std::string& lc="", const double lw=1.0
+      const std::string& fc="white", const std::string& lc="black", const double lw=1.0
     ) {
       return this->Rect(corner.GetX(),corner.GetY(), w, h, fc, lc, lw);
     }
 
     Canvas & Rect(
       const double x, const double y, const double w, const double h,
-      const std::string& fc="", const std::string& lc="", const double lw=1.0
+      const std::string& fc="white", const std::string& lc="black", const double lw=1.0
     ) {
       sf::RectangleShape shape( sf::Vector2f(w, h) );
       shape.setPosition(x, y);
@@ -153,18 +154,28 @@ namespace web {
       return *this;
     }
 
-    /// Add a string to this canvas at x,y with specified text.  Optional face color and
-    /// line color.
-    template <typename... Ts>
-    Canvas & Text(emp::Point p, Ts &&... vals) {
-      emp_assert(false, "unimplemented");
-      return *this;
+    /// Add a string to this canvas at x,y with specified text.  Optional face color,
+    /// line color, size, and thickness.
+    Canvas & Text(emp::Point p, const std::string& words="", const std::string& fc="black", 
+      const std::string& lc="black", const float size = 15, const float thickness=0.5) {
+      return this->Text(p.GetX(), p.GetY(), words, fc, lc, size, thickness);
     }
 
-    template <typename... Ts>
-    Canvas & Text(double x, double y, Ts &&... vals) {
-      emp_assert(false, "unimplemented");
-      return *this;
+    Canvas & Text(double x, double y, const std::string& words="", const std::string& fc="black", 
+      const std::string& lc="black", const float size = 15, const float thickness=0.5) {
+        // Declare and load a font
+        sf::Font font;
+        font.loadFromMemory(LiberationSans_Regular_ttf, LiberationSans_Regular_ttf_len);
+
+        sf::Text message(words, font);
+        message.setPosition(x, y);
+        message.setCharacterSize(size);
+        message.setFillColor((sf::Color) emp::web::Color( fc ));
+        message.setOutlineColor((sf::Color) emp::web::Color( lc ));
+        message.setOutlineThickness(thickness);
+        window.draw( message );
+        return *this;
+
     }
 
     /// Add a string to this canvas centered at x,y with specified text.  Optional face color and

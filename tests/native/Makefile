@@ -18,7 +18,7 @@ test-prep:
 	mkdir -p temp
 
 test-%: %.cpp ../../third-party/Catch/single_include/catch2/catch.hpp
-	$(CXX) $(FLAGS) $< -lsfml-graphics -o $@.out
+	$(CXX) $(FLAGS) $< -lsfml-graphics -lsfml-window -lsfml-system -o $@.out
 	# execute test
 	./$@.out
 
