@@ -1940,9 +1940,11 @@ TEST_CASE("Another Test BitSet", "[bits]")
 TEST_CASE("Test BitSet string construction", "[tools]") {
 
   REQUIRE( emp::BitSet<5>( "01001" ) == emp::BitSet<5>{0, 1, 0, 0, 1} );
+
+  // std::bitset treats bits in the opposite direction of emp::BitSet.
   REQUIRE(
     emp::BitSet<5>( std::bitset<5>( "01001" ) )
-    == emp::BitSet<5>{0, 1, 0, 0, 1}
+    == emp::BitSet<5>{1, 0, 0, 1, 0}
   );
 
 }
