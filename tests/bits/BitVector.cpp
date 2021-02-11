@@ -351,9 +351,10 @@ TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
     bv1k.SetRange(val1, val2);
   }
 
-  emp::BitVector bv_empty = "000000";
-  emp::BitVector bv_mixed = "010101";
-  emp::BitVector bv_full  = "111111";
+  // Test Any(), All() and None()
+  emp::BitVector bv_empty("000000");
+  emp::BitVector bv_mixed("010101");
+  emp::BitVector bv_full ("111111");
 
   REQUIRE(bv_empty.Any() == false);
   REQUIRE(bv_mixed.Any() == true);
@@ -366,6 +367,34 @@ TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
   REQUIRE(bv_empty.None() == true);
   REQUIRE(bv_mixed.None() == false);
   REQUIRE(bv_full.None() == false);
+}
+
+TEST_CASE("5: Test Randomize() and variants", "[bits]") {
+  emp::Random random;
+  emp::BitVector bv(200);
+
+  REQUIRE(bv.None() == true);
+
+  bv.Randomize(random);
+  size_t num_ones = bv.CountOnes();
+  REQUIRE(num_ones > 50);
+  REQUIRE(num_ones < 150);
+
+  // 85% Chance of 1
+  bv.Randomize(random, 0.85);
+  num_ones = bv.CountOnes();
+  REQUIRE(num_ones > 120);
+  REQUIRE(num_ones < 200);
+
+  // 15% Chance of 1
+  bv.Randomize(random, 0.15);
+  num_ones = bv.CountOnes();
+  REQUIRE(num_ones > 0);
+  REQUIRE(num_ones < 80);
+
+  // Try randomizing only a portion of the genome.
+  uint64_t first_bits = bv.GetUInt64(0);
+  bv.Randomize(random, 0.7, 64, 200);
 }
 
 
