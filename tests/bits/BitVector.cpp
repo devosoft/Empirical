@@ -350,6 +350,22 @@ TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
     if (val1 > val2) std::swap(val1, val2);
     bv1k.SetRange(val1, val2);
   }
+
+  emp::BitVector bv_empty = "000000";
+  emp::BitVector bv_mixed = "010101";
+  emp::BitVector bv_full  = "111111";
+
+  REQUIRE(bv_empty.Any() == false);
+  REQUIRE(bv_mixed.Any() == true);
+  REQUIRE(bv_full.Any() == true);
+
+  REQUIRE(bv_empty.All() == false);
+  REQUIRE(bv_mixed.All() == false);
+  REQUIRE(bv_full.All() == true);
+
+  REQUIRE(bv_empty.None() == true);
+  REQUIRE(bv_mixed.None() == false);
+  REQUIRE(bv_full.None() == false);
 }
 
 
