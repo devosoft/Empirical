@@ -134,9 +134,17 @@ namespace emp {
       // and did see a difference in runtime MAM
 
       // TODO currently only implemented for NUM_FIELDS == 1
-      static_assert( NUM_FIELDS == 1 );
-      static_assert( LAST_BIT == 0 );
-      bit_set[0] <<= shift;
+      //static_assert( NUM_FIELDS == 1 );
+      //static_assert( LAST_BIT == 0 );
+      if constexpr (NUM_FIELDS != 1) {
+        ShiftLeft(shift);
+      
+      }
+      else {
+        if constexpr (LAST_BIT != 0)
+            bit_set[NUM_FIELDS - 1] &= MaskLow<field_t>(LAST_BIT);
+        bit_set[0] <<= shift;
+      }
     }
 
     /// Helper: call SHIFT with positive number instead
