@@ -123,8 +123,8 @@ namespace emp {
     protected:
       VAR_TYPE & entry_ref;
     public:
-      tConfigEntry(const std::string _name, const std::string _type,
-                   const std::string _d_val, const std::string _desc,
+      tConfigEntry(const std::string& _name, const std::string& _type,
+                   const std::string& _d_val, const std::string& _desc,
                    VAR_TYPE & _ref)
         : ConfigEntry(_name, _type, _d_val, _desc), entry_ref(_ref) { ; }
       ~tConfigEntry() { ; }
@@ -142,8 +142,8 @@ namespace emp {
     protected:
       const VAR_TYPE literal_val;
     public:
-      tConfigConstEntry(const std::string _name, const std::string _type,
-                        const std::string _d_val, const std::string _desc,
+      tConfigConstEntry(const std::string& _name, const std::string& _type,
+                        const std::string& _d_val, const std::string& _desc,
                         const VAR_TYPE & _literal_val)
         : ConfigEntry(_name, _type, _d_val, _desc), literal_val(_literal_val) { ; }
       ~tConfigConstEntry() { ; }
@@ -165,8 +165,8 @@ namespace emp {
     /// Special settings entry for settings created during the run (only accissibly dynamically)
     class ConfigLiveEntry : public ConfigEntry {
     public:
-      ConfigLiveEntry(const std::string _name, const std::string _type,
-                       const std::string _d_val, const std::string _desc)
+      ConfigLiveEntry(const std::string& _name, const std::string& _type,
+                       const std::string& _d_val, const std::string& _desc)
         : ConfigEntry(_name, _type, _d_val, _desc) { ; }
       ~ConfigLiveEntry() { ; }
 
