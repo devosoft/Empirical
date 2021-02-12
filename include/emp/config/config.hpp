@@ -44,6 +44,7 @@
 #include <sstream>
 #include <unordered_set>
 
+#include "../base/assert.hpp"
 #include "../base/errors.hpp"
 #include "../base/unordered_map.hpp"
 #include "../base/vector.hpp"
@@ -105,6 +106,12 @@ namespace emp {
 
     /// Identify if this setting is fixed at compile time.
     virtual bool IsConst() const = 0;
+
+    /// Reset this setting to its default.
+    void Reset(std::stringstream & warnings) {
+      this->SetValue( GetDefault(), warnings );
+    }
+
   };
 
   /// Master configuration class that manages all of the settings.
@@ -424,6 +431,25 @@ namespace emp {
         GetActiveGroup()->Add(var_map[setting_name]);
       }
       var_map[setting_name]->SetValue(new_value, warnings);
+      if (!delay_warnings && warnings.rdbuf()->in_avail()) {
+        emp::NotifyWarning(warnings.str());
+        warnings.str(std::string()); // Clear the warnings.
+      }
+      return *this;
+    }
+
+    Config & Reset(const std::string& setting_name) {
+      emp_assert( var_map.count( setting_name ), setting_name );
+      var_map[setting_name]->Reset(warnings);
+      if (!delay_warnings && warnings.rdbuf()->in_avail()) {
+        emp::NotifyWarning(warnings.str());
+        warnings.str(std::string()); // Clear the warnings.
+      }
+      return *this;
+    }
+
+    Config & Reset() {
+      for (auto& [name, entry] : var_map) entry->Reset(warnings);
       if (!delay_warnings && warnings.rdbuf()->in_avail()) {
         emp::NotifyWarning(warnings.str());
         warnings.str(std::string()); // Clear the warnings.
