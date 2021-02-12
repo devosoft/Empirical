@@ -126,7 +126,8 @@ namespace emp {
       tConfigEntry(const std::string& _name, const std::string& _type,
                    const std::string& _d_val, const std::string& _desc,
                    VAR_TYPE & _ref)
-        : ConfigEntry(_name, _type, _d_val, _desc), entry_ref(_ref) { ; }
+        : ConfigEntry(_name, _type, emp::to_string(_ref), _desc)
+        , entry_ref(_ref) { ; }
       ~tConfigEntry() { ; }
 
       std::string GetValue() const { return emp::to_string(entry_ref); }
@@ -145,7 +146,8 @@ namespace emp {
       tConfigConstEntry(const std::string& _name, const std::string& _type,
                         const std::string& _d_val, const std::string& _desc,
                         const VAR_TYPE & _literal_val)
-        : ConfigEntry(_name, _type, _d_val, _desc), literal_val(_literal_val) { ; }
+        : ConfigEntry(_name, _type, emp::to_string(_literal_val), _desc)
+        , literal_val(_literal_val) { ; }
       ~tConfigConstEntry() { ; }
 
       std::string GetValue() const { return default_val; }
