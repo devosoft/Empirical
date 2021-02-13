@@ -371,30 +371,36 @@ TEST_CASE("4: Test BitVector Set*, Clear* and Toggle* Accessors", "[bits]") {
 
 TEST_CASE("5: Test Randomize() and variants", "[bits]") {
   emp::Random random;
-  emp::BitVector bv(200);
+  emp::BitVector bv(1000);
 
   REQUIRE(bv.None() == true);
 
   bv.Randomize(random);
   size_t num_ones = bv.CountOnes();
-  REQUIRE(num_ones > 50);
-  REQUIRE(num_ones < 150);
+  REQUIRE(num_ones > 300);
+  REQUIRE(num_ones < 700);
 
   // 85% Chance of 1
   bv.Randomize(random, 0.85);
   num_ones = bv.CountOnes();
-  REQUIRE(num_ones > 120);
-  REQUIRE(num_ones < 200);
+  REQUIRE(num_ones > 700);
+  REQUIRE(num_ones < 950);
 
   // 15% Chance of 1
   bv.Randomize(random, 0.15);
   num_ones = bv.CountOnes();
-  REQUIRE(num_ones > 0);
-  REQUIRE(num_ones < 80);
+  REQUIRE(num_ones > 50);
+  REQUIRE(num_ones < 300);
 
   // Try randomizing only a portion of the genome.
   uint64_t first_bits = bv.GetUInt64(0);
-  bv.Randomize(random, 0.7, 64, 200);
+  bv.Randomize(random, 0.7, 64, 1000);
+
+  REQUIRE(bv.GetUInt64(0) == first_bits);  // Make sure first bits haven't changed
+
+  num_ones = bv.CountOnes();
+  REQUIRE(num_ones > 500);                 // Expected with new randomization is ~665 ones.
+  REQUIRE(num_ones < 850);
 }
 
 
