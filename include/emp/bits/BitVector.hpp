@@ -277,9 +277,9 @@ namespace emp {
     BitVector & Randomize(Random & random, const double p,
                        const size_t start_pos=0, size_t stop_pos=MAX_BITS);
 
-    /// Set all bits randomly, with a given probability of being a one.
-    BitVector & Randomize(Random & random, const size_t target_ones,
-                          const size_t start_pos=0, size_t stop_pos=MAX_BITS);
+    /// Set all bits randomly, with a given number of ones.
+    BitVector & ChooseRandom(Random & random, const int target_ones,
+                             const size_t start_pos=0, size_t stop_pos=MAX_BITS);
     
     /// Flip random bits with a given probability.
     BitVector & FlipRandom(Random & random, const double p,
@@ -294,13 +294,13 @@ namespace emp {
                             const size_t start_pos=0, size_t stop_pos=MAX_BITS);
 
     /// Flip a specified number of random bits.
-    BitVector & FlipRandom(Random & random, const size_t target_bits);
+    BitVector & FlipRandomCount(Random & random, const size_t target_bits);
 
     /// Set a specified number of random bits (does not check if already set.)
-    BitVector & SetRandom(Random & random, const size_t target_bits);
+    BitVector & SetRandomCount(Random & random, const size_t target_bits);
 
     /// Unset  a specified number of random bits (does not check if already zero.)
-    BitVector & ClearRandom(Random & random, const size_t target_bits);
+    BitVector & ClearRandomCount(Random & random, const size_t target_bits);
 
 
     // >>>>>>>>>>  Comparison Operators  <<<<<<<<<< //
@@ -1007,7 +1007,7 @@ namespace emp {
     if (num_bits) {
       bits = NewArrayPtr<field_t>(NumFields());
       Clear();
-      Randomize(random, target_ones);
+      ChooseRandom(random, target_ones);
     }
   }
 
@@ -1404,14 +1404,15 @@ namespace emp {
   }
 
   /// Set all bits randomly, with a given number of them being on.
-  BitVector & BitVector::Randomize(Random & random, const size_t target_ones,
-                                   const size_t start_pos, size_t stop_pos) {
+  BitVector & BitVector::ChooseRandom(Random & random, const int target_ones,
+                                      const size_t start_pos, size_t stop_pos) {
     if (stop_pos == MAX_BITS) stop_pos = num_bits;
 
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= num_bits);
 
     const size_t target_size = stop_pos - start_pos;
+    emp_assert(target_ones >= 0);
     emp_assert(target_ones <= target_size);
 
     // Approximate the probability of ones as a starting point.
@@ -1515,7 +1516,7 @@ namespace emp {
   }
 
   /// Flip a specified number of random bits.
-  BitVector & BitVector::FlipRandom(Random & random, const size_t target_bits)
+  BitVector & BitVector::FlipRandomCount(Random & random, const size_t target_bits)
   {
     emp_assert(num_bits <= num_bits);
     BitVector choice(num_bits, random, target_bits);
@@ -1523,7 +1524,7 @@ namespace emp {
   }
 
   /// Set a specified number of random bits (does not check if already set.)
-  BitVector & BitVector::SetRandom(Random & random, const size_t target_bits)
+  BitVector & BitVector::SetRandomCount(Random & random, const size_t target_bits)
   {
     emp_assert(num_bits <= num_bits);
     BitVector choice(num_bits, random, target_bits);
@@ -1531,7 +1532,7 @@ namespace emp {
   }
 
   /// Unset  a specified number of random bits (does not check if already zero.)
-  BitVector & BitVector::ClearRandom(Random & random, const size_t target_bits)
+  BitVector & BitVector::ClearRandomCount(Random & random, const size_t target_bits)
   {
     emp_assert(num_bits <= num_bits);
     BitVector choice(num_bits, random, num_bits - target_bits);
