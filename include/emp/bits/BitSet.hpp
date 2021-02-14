@@ -153,10 +153,10 @@ namespace emp {
     BitSet(Random & random, double p1) { Clear(); Randomize(random, p1); }
 
     /// Constructor to generate a random BitSet with provided NUMBER of 1's.
-    BitSet(Random & random, size_t num_ones) { Clear(); RandomizeFixed(random, num_ones); }
+    BitSet(Random & random, size_t num_ones) { Clear(); ChooseRandom(random, num_ones); }
 
     /// Constructor to generate a random BitSet with provided NUMBER of 1's.
-    BitSet(Random & random, int num_ones) { Clear(); RandomizeFixed(random, num_ones); }
+    BitSet(Random & random, int num_ones) { Clear(); ChooseRandom(random, num_ones); }
 
     /// Constructor to fill in a bit set from a vector.
     template <typename T> BitSet(const std::initializer_list<T> l);
@@ -254,7 +254,7 @@ namespace emp {
                        const size_t start_pos=0, const size_t stop_pos=NUM_BITS);
 
     /// Set all bits randomly, with a fixed number of them being ones.
-    BitSet & RandomizeFixed(Random & random, const size_t target_ones,
+    BitSet & ChooseRandom(Random & random, const size_t target_ones,
                        const size_t start_pos=0, const size_t stop_pos=NUM_BITS);
     
     /// Flip random bits with a given probability.
@@ -1178,7 +1178,7 @@ namespace emp {
   /// Set all bits randomly, with a given number of them being on.
   template <size_t NUM_BITS>
   BitSet<NUM_BITS> &
-  BitSet<NUM_BITS>::RandomizeFixed(Random & random, const size_t target_ones,
+  BitSet<NUM_BITS>::ChooseRandom(Random & random, const size_t target_ones,
                                    const size_t start_pos, const size_t stop_pos) {
     emp_assert(start_pos <= stop_pos);
     emp_assert(stop_pos <= NUM_BITS);
