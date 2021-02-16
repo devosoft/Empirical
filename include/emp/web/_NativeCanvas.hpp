@@ -14,11 +14,14 @@
 
 #include <string>
 
+
+
 #include <SFML/Graphics.hpp>
 
 #include "../base/vector.hpp"
 #include "../geometry/Circle2D.hpp"
 #include "../tools/string_utils.hpp"
+#include "../base/errors.hpp"
 
 #include "_LineShape.hpp"
 #include "CanvasShape.hpp"
@@ -27,7 +30,7 @@
 
 namespace emp {
 namespace web {
-
+//try {
   /// Manage a SFML Canvas object.
   class Canvas {
 
@@ -59,10 +62,14 @@ namespace web {
     double GetHeight() const { return height; }
 
     /// Set a new width for this Canvas.
-    void SetWidth(const double w) { emp_assert(false, "unimplemented"); }
+    void SetWidth(const double w) { 
+         LibraryWarning("No support for changing width."); 
+    }
 
     /// Set a new height for this Canvas.
-    void SetHeight(const double h) { emp_assert(false, "unimplemented"); }
+    void SetHeight(const double h) { 
+        LibraryWarning("No support for changing height."); 
+    }
 
     /// Set Canvas size.
     void SetSize(const double w, const double h) {
@@ -149,8 +156,11 @@ namespace web {
 
     /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
     template <typename... Ts>
-    Canvas & MultiLine(emp::Point p1, const emp::vector<emp::Point> & points, Ts &&... vals) {
-      emp_assert(false, "unimplemented");
+    Canvas & MultiLine(emp::Point p1, const emp::vector<emp::Point> & points, const std::string& fc="", 
+      const std::string& lc="", const double lw=1.0) {
+          for (auto p2 : points) {
+              this->Line(p1.GetX(), p1.GetY(), p2.GetX(), p2.GetY(), fc, lc, lw);
+          }
       return *this;
     }
 
@@ -163,16 +173,20 @@ namespace web {
 
     Canvas & Text(double x, double y, const std::string& words="", const std::string& fc="black", 
       const std::string& lc="black", const float size = 15, const float thickness=0.5) {
+
         // Declare and load a font
         sf::Font font;
         font.loadFromMemory(LiberationSans_Regular_ttf, LiberationSans_Regular_ttf_len);
 
+        // Create a text object and set attributes
         sf::Text message(words, font);
         message.setPosition(x, y);
         message.setCharacterSize(size);
         message.setFillColor((sf::Color) emp::web::Color( fc ));
         message.setOutlineColor((sf::Color) emp::web::Color( lc ));
         message.setOutlineThickness(thickness);
+
+        // draw the message on the canvas
         window.draw( message );
         return *this;
 
@@ -180,21 +194,34 @@ namespace web {
 
     /// Add a string to this canvas centered at x,y with specified text.  Optional face color and
     /// line color.
-    template <typename... Ts>
-    Canvas & CenterText(emp::Point p, Ts &&... vals) {
-      emp_assert(false, "unimplemented");
+    Canvas & CenterText(emp::Point p, const std::string& words="", const std::string& fc="black", 
+      const std::string& lc="black", const float size = 15, const float thickness=0.5) {
+      this->CenterText(p.GetX(), p.GetY(), words, fc, lc, size, thickness);
       return *this;
     }
 
-    template <typename... Ts>
-    Canvas & CenterText(double x, double y, Ts &&... vals) {
-      emp_assert(false, "unimplemented");
-      return *this;
+    Canvas & CenterText(double x, double y, const std::string& words="", const std::string& fc="black", 
+      const std::string& lc="black", const float size = 15, const float thickness=0.5) {
+      // Declare and load a font
+        sf::Font font;
+        font.loadFromMemory(LiberationSans_Regular_ttf, LiberationSans_Regular_ttf_len);
+
+        sf::Text message(words, font);
+        //message.setPosition(x, y);
+        x += message.getLocalBounds().width/2;
+        y += message.getLocalBounds().height/2;
+        message.setPosition(x, y);
+        message.setCharacterSize(size);
+        message.setFillColor((sf::Color) emp::web::Color( fc ));
+        message.setOutlineColor((sf::Color) emp::web::Color( lc ));
+        message.setOutlineThickness(thickness);
+        window.draw( message );
+        return *this;
     }
 
     /// Update the default font for text.
     Canvas & Font(const std::string font) {
-      emp_assert(false, "unimplemented");
+       LibraryWarning("No support for selecting fonts.");
       return *this;
     }
 
@@ -231,7 +258,7 @@ namespace web {
 
     /// Clear to a specific background color.
     Canvas & Clear(const std::string & bg_color) {
-      emp_assert(false, "unimplemented");
+      window.clear((sf::Color) emp::web::Color( bg_color ));
       return *this;
     }
 
@@ -250,7 +277,15 @@ namespace web {
 
   };
 
+/*
+}
+catch(const std::exception& e)
+{
+    std::cout << "X11 Display not configured correctly." << std::endl;
+}
+*/
 } // namespace web
 } // namespace emp
+
 
 #endif

@@ -78,49 +78,92 @@ TEST_CASE("Test Circle Thickness", "[native]") {
   canvas.SavePNG("circle_thickness.png");
 
 }
-/*
-TEST_CASE("Test Rectangle Locations", "[native]") {
-
-  emp::web::Canvas canvas{ 500, 500 };
-  
-  canvas.Circle(20, 40, 20);
-  canvas.Circle(230, 40, 20);
-  canvas.Circle(440, 40, 20);
-  canvas.Circle(20, 440, 20);
-  canvas.Circle(230, 440, 20);
-  canvas.Circle(440, 440, 20);
-  
-  canvas.SavePNG("rect_location.png");
-
-}
 
 TEST_CASE("Test Rectangle Locations", "[native]") {
 
   emp::web::Canvas canvas{ 500, 500 };
   
-  canvas.Circle(20, 40, 20);
-  canvas.Circle(230, 40, 20);
-  canvas.Circle(440, 40, 20);
-  canvas.Circle(20, 440, 20);
-  canvas.Circle(230, 440, 20);
-  canvas.Circle(440, 440, 20);
+  canvas.Rect(20, 40, 20, 30);
+  canvas.Rect(230, 40, 20, 30);
+  canvas.Rect(440, 40, 20, 30);
+  canvas.Rect(20, 440, 20, 30);
+  canvas.Rect(230, 440, 20, 30);
+  canvas.Rect(440, 440, 20, 30);
   
   canvas.SavePNG("rect_location.png");
 
 }
+
+TEST_CASE("Test Rectangle Colors", "[native]") {
+
+  emp::web::Canvas canvas{ 500, 500 };
+  
+  canvas.Rect(20, 40, 20, 30, "white", "black");
+  canvas.Rect(160, 40, 20, 30, "white", "red");
+  canvas.Rect(300, 40, 20, 30, "white", "yellow");
+  canvas.Rect(440, 40, 20, 30, "white", "blue");
+  canvas.Rect(20, 80, 20, 30, "black", "white");
+  canvas.Rect(160, 80, 20, 30, "red", "black");
+  canvas.Rect(300, 80, 20, 30, "yellow", "black");
+  canvas.Rect(440, 80, 20, 30, "blue", "black");
+  
+  canvas.SavePNG("rect_color.png");
+
+}
+
+TEST_CASE("Test Rectangle Size/Thickness", "[native]") {
+
+  emp::web::Canvas canvas{ 500, 500 };
+  
+  canvas.Rect(20, 85, 10, 5, "white", "black", 1);
+  canvas.Rect(60, 65, 30, 25, "white", "black", 3);
+  canvas.Rect(140, 40, 55, 50, "white", "black", 5);
+  canvas.Rect(300, 15, 80, 75, "white", "black", 7);
+  canvas.SavePNG("rect_size_thick.png");
+
+}
+
 
 TEST_CASE("Test Text Locations", "[native]") {
 
   emp::web::Canvas canvas{ 500, 500 };
   
-  canvas.text(20, 40, "upper left");
-  canvas.text(230, 40, "upper middle");
-  canvas.text(440, 40, "top right");
-  canvas.text(20, 440, "bottom left");
-  canvas.text(230, 440, "bottom middle");
-  canvas.text(440, 440, "bottom right");
+  canvas.Text(20, 40, "upper left");
+  canvas.Text(220, 40, "upper middle");
+  canvas.Text(420, 40, "upper right");
+  canvas.Text(20, 440, "bottom left");
+  canvas.Text(220, 440, "bottom middle");
+  canvas.Text(420, 440, "bottom right");
   
   canvas.SavePNG("text_location.png");
 
 }
-*/
+
+TEST_CASE("Test Text Color", "[native]") {
+
+  emp::web::Canvas canvas{ 500, 500 };
+  
+  canvas.Text(60, 40, "black", "black", "black", 20);
+  canvas.Text(60, 80, "white", "white", "black", 20);
+  canvas.Text(60, 120, "red", "red", "black", 20);
+  canvas.Text(60, 160, "yellow", "yellow", "black", 20);
+  canvas.Text(60, 200, "blue", "blue", "black", 20);
+  
+  canvas.SavePNG("text_color.png");
+
+}
+
+TEST_CASE("Test CenterText Locations", "[native]") {
+
+  emp::web::Canvas canvas{ 500, 500 };
+  
+  canvas.CenterText(20, 40, "upper left");
+  canvas.CenterText(220, 40, "upper middle");
+  canvas.CenterText(420, 40, "upper right");
+  canvas.CenterText(20, 440, "bottom left");
+  canvas.CenterText(220, 440, "bottom middle");
+  canvas.CenterText(420, 440, "bottom right");
+  
+  canvas.SavePNG("centertext_location.png");
+
+}
