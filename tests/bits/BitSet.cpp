@@ -362,6 +362,23 @@ TEST_CASE("4: Test BitSet Set*, Clear* and Toggle* Accessors", "[bits]") {
     if (val1 > val2) std::swap(val1, val2);
     bs1k.SetRange(val1, val2);
   }
+
+  // Test Any(), All() and None()
+  emp::BitSet<6> bs_empty = "000000";
+  emp::BitSet<6> bs_mixed = "010101";
+  emp::BitSet<6> bs_full  = "111111";
+
+  REQUIRE(bs_empty.Any() == false);
+  REQUIRE(bs_mixed.Any() == true);
+  REQUIRE(bs_full.Any() == true);
+
+  REQUIRE(bs_empty.All() == false);
+  REQUIRE(bs_mixed.All() == false);
+  REQUIRE(bs_full.All() == true);
+
+  REQUIRE(bs_empty.None() == true);
+  REQUIRE(bs_mixed.None() == false);
+  REQUIRE(bs_full.None() == false);
 }
 
 
