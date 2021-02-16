@@ -50,7 +50,8 @@ TEST_CASE("MatchDepository MatchRaw", "[tools]") {
     emp::AbsDiffMetric,
     emp::statics::RankedSelector<>,
     emp::AdditiveCountdownRegulator<>,
-    4
+    true,
+    2
   > depo;
 
   REQUIRE( depo.GetSize() == 0 );
@@ -112,7 +113,8 @@ TEST_CASE("MatchDepository MatchRegulated", "[tools]") {
     emp::AbsDiffMetric,
     emp::statics::RankedSelector<>,
     emp::AdditiveCountdownRegulator<>,
-    4
+    true,
+    2
   > depo;
 
   REQUIRE( depo.GetSize() == 0 );
