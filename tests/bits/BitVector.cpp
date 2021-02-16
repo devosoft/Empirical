@@ -401,6 +401,13 @@ TEST_CASE("5: Test Randomize() and variants", "[bits]") {
   num_ones = bv.CountOnes();
   REQUIRE(num_ones > 500);                 // Expected with new randomization is ~665 ones.
   REQUIRE(num_ones < 850);
+
+  // Try randomizing using specific numbers of ones.
+  bv.ChooseRandom(random, 1);       REQUIRE(bv.CountOnes() == 1);
+  bv.ChooseRandom(random, 12);      REQUIRE(bv.CountOnes() == 12);
+  bv.ChooseRandom(random, 128);     REQUIRE(bv.CountOnes() == 128);
+  bv.ChooseRandom(random, 507);     REQUIRE(bv.CountOnes() == 507);
+  bv.ChooseRandom(random, 999);     REQUIRE(bv.CountOnes() == 999);
 }
 
 
