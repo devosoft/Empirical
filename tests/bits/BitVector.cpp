@@ -408,6 +408,35 @@ TEST_CASE("5: Test Randomize() and variants", "[bits]") {
   bv.ChooseRandom(random, 128);     REQUIRE(bv.CountOnes() == 128);
   bv.ChooseRandom(random, 507);     REQUIRE(bv.CountOnes() == 507);
   bv.ChooseRandom(random, 999);     REQUIRE(bv.CountOnes() == 999);
+
+  // Test the probabilistic CHANGE functions.
+  bv.Clear();                     REQUIRE(bv.CountOnes() == 0);   // Set all bits to 0.
+
+  bv.FlipRandom(random, 0.3);     // Exprected: 300 ones (from flipping zeros)
+  num_ones = bv.CountOnes();      REQUIRE(num_ones > 230);  REQUIRE(num_ones < 375);
+
+  bv.FlipRandom(random, 0.3);     // Exprected: 420 ones (hit by ONE but not both flips)
+  num_ones = bv.CountOnes();      REQUIRE(num_ones > 345);  REQUIRE(num_ones < 495);
+
+  bv.SetRandom(random, 0.5);      // Expected: 710 (already on OR newly turned on)
+  num_ones = bv.CountOnes();      REQUIRE(num_ones > 625);  REQUIRE(num_ones < 775);
+
+  bv.SetRandom(random, 0.8);      // Expected: 942 (already on OR newly turned on)
+  num_ones = bv.CountOnes();      REQUIRE(num_ones > 900);  REQUIRE(num_ones < 980);
+
+  bv.ClearRandom(random, 0.2);    // Expected 753.6 (20% of those on now off)
+  num_ones = bv.CountOnes();      REQUIRE(num_ones > 675);  REQUIRE(num_ones < 825);
+
+
+    // /// Flip a specified number of random bits.
+    // BitVector & FlipRandomCount(Random & random, const size_t target_bits);
+
+    // /// Set a specified number of random bits (does not check if already set.)
+    // BitVector & SetRandomCount(Random & random, const size_t target_bits);
+
+    // /// Unset  a specified number of random bits (does not check if already zero.)
+    // BitVector & ClearRandomCount(Random & random, const size_t target_bits);
+
 }
 
 
