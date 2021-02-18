@@ -382,6 +382,100 @@ TEST_CASE("4: Test BitSet Set*, Clear* and Toggle* Accessors", "[bits]") {
 }
 
 
+TEST_CASE("5: Test Randomize() and variants", "[bits]") {
+  emp::Random random;
+  emp::BitSet<1000> bs;
+
+  REQUIRE(bs.None() == true);
+
+  // Do all of the random tests 10 times.
+  for (size_t test_num = 0; test_num < 10; test_num++) {
+    bs.Randomize(random);
+    size_t num_ones = bs.CountOnes();
+    REQUIRE(num_ones > 300);
+    REQUIRE(num_ones < 700);
+
+    // 85% Chance of 1
+    bs.Randomize(random, 0.85);
+    num_ones = bs.CountOnes();
+    REQUIRE(num_ones > 700);
+    REQUIRE(num_ones < 950);
+
+    // 15% Chance of 1
+    bs.Randomize(random, 0.15);
+    num_ones = bs.CountOnes();
+    REQUIRE(num_ones > 50);
+    REQUIRE(num_ones < 300);
+
+    // Try randomizing only a portion of the genome.
+    uint64_t first_bits = bs.GetUInt64(0);
+    bs.Randomize(random, 0.7, 64, 1000);
+
+    REQUIRE(bs.GetUInt64(0) == first_bits);  // Make sure first bits haven't changed
+
+    num_ones = bs.CountOnes();
+    REQUIRE(num_ones > 500);                 // Expected with new randomization is ~665 ones.
+    REQUIRE(num_ones < 850);
+
+    // Try randomizing using specific numbers of ones.
+    bs.ChooseRandom(random, 1);       REQUIRE(bs.CountOnes() == 1);
+    bs.ChooseRandom(random, 12);      REQUIRE(bs.CountOnes() == 12);
+    bs.ChooseRandom(random, 128);     REQUIRE(bs.CountOnes() == 128);
+    bs.ChooseRandom(random, 507);     REQUIRE(bs.CountOnes() == 507);
+    bs.ChooseRandom(random, 999);     REQUIRE(bs.CountOnes() == 999);
+
+    // Test the probabilistic CHANGE functions.
+    bs.Clear();                     REQUIRE(bs.CountOnes() == 0);   // Set all bits to 0.
+
+    bs.FlipRandom(random, 0.3);     // Exprected: 300 ones (from flipping zeros)
+    num_ones = bs.CountOnes();      REQUIRE(num_ones > 230);  REQUIRE(num_ones < 375);
+
+    bs.FlipRandom(random, 0.3);     // Exprected: 420 ones (hit by ONE but not both flips)
+    num_ones = bs.CountOnes();      REQUIRE(num_ones > 345);  REQUIRE(num_ones < 495);
+
+    bs.SetRandom(random, 0.5);      // Expected: 710 (already on OR newly turned on)
+    num_ones = bs.CountOnes();      REQUIRE(num_ones > 625);  REQUIRE(num_ones < 775);
+
+    bs.SetRandom(random, 0.8);      // Expected: 942 (already on OR newly turned on)
+    num_ones = bs.CountOnes();      REQUIRE(num_ones > 900);  REQUIRE(num_ones < 980);
+
+    bs.ClearRandom(random, 0.2);    // Expected 753.6 (20% of those on now off)
+    num_ones = bs.CountOnes();      REQUIRE(num_ones > 675);  REQUIRE(num_ones < 825);
+
+    bs.FlipRandom(random, 0.5);     // Exprected: 500 ones (each bit has a 50% chance of flipping)
+    num_ones = bs.CountOnes();      REQUIRE(num_ones > 425);  REQUIRE(num_ones < 575);
+
+
+    // Repeat with fixed-sized changes.
+    bs.Clear();                        REQUIRE(bs.CountOnes() == 0);     // Set all bits to 0.
+
+    bs.FlipRandomCount(random, 123);   // Flip exactly 123 bits to 1.
+    num_ones = bs.CountOnes();         REQUIRE(num_ones == 123);
+
+    bs.FlipRandomCount(random, 877);   // Flip exactly 877 bits; Expected 784.258 ones
+    num_ones = bs.CountOnes();         REQUIRE(num_ones > 700);  REQUIRE(num_ones < 850);
+
+
+    bs.SetAll();                       REQUIRE(bs.CountOnes() == 1000);  // Set all bits to 1.
+
+    bs.ClearRandomCount(random, 123);
+    num_ones = bs.CountOnes();         REQUIRE(num_ones == 877);
+
+    bs.ClearRandomCount(random, 877);  // Clear exactly 877 bits; Expected 107.871 ones
+    num_ones = bs.CountOnes();         REQUIRE(num_ones > 60);  REQUIRE(num_ones < 175);
+
+    bs.SetRandomCount(random, 500);    // Half of the remaining ones should be set; 553.9355 expected.
+    num_ones = bs.CountOnes();         REQUIRE(num_ones > 485);  REQUIRE(num_ones < 630);
+
+
+    bs.Clear();                        REQUIRE(bs.CountOnes() == 0);     // Set all bits to 0.
+    bs.SetRandomCount(random, 567);    // Half of the remaining ones should be set; 607.871 expected.
+    num_ones = bs.CountOnes();         REQUIRE(num_ones == 567);
+  }
+}
+
+
+
       /////////////////////////////////////////////
      /////////////////////////////////////////////
     /////////////////////////////////////////////
