@@ -375,68 +375,90 @@ TEST_CASE("5: Test Randomize() and variants", "[bits]") {
 
   REQUIRE(bv.None() == true);
 
-  bv.Randomize(random);
-  size_t num_ones = bv.CountOnes();
-  REQUIRE(num_ones > 300);
-  REQUIRE(num_ones < 700);
+  // Do all of the random tests 10 times.
+  for (size_t test_num = 0; test_num < 10; test_num++) {
+    bv.Randomize(random);
+    size_t num_ones = bv.CountOnes();
+    REQUIRE(num_ones > 300);
+    REQUIRE(num_ones < 700);
 
-  // 85% Chance of 1
-  bv.Randomize(random, 0.85);
-  num_ones = bv.CountOnes();
-  REQUIRE(num_ones > 700);
-  REQUIRE(num_ones < 950);
+    // 85% Chance of 1
+    bv.Randomize(random, 0.85);
+    num_ones = bv.CountOnes();
+    REQUIRE(num_ones > 700);
+    REQUIRE(num_ones < 950);
 
-  // 15% Chance of 1
-  bv.Randomize(random, 0.15);
-  num_ones = bv.CountOnes();
-  REQUIRE(num_ones > 50);
-  REQUIRE(num_ones < 300);
+    // 15% Chance of 1
+    bv.Randomize(random, 0.15);
+    num_ones = bv.CountOnes();
+    REQUIRE(num_ones > 50);
+    REQUIRE(num_ones < 300);
 
-  // Try randomizing only a portion of the genome.
-  uint64_t first_bits = bv.GetUInt64(0);
-  bv.Randomize(random, 0.7, 64, 1000);
+    // Try randomizing only a portion of the genome.
+    uint64_t first_bits = bv.GetUInt64(0);
+    bv.Randomize(random, 0.7, 64, 1000);
 
-  REQUIRE(bv.GetUInt64(0) == first_bits);  // Make sure first bits haven't changed
+    REQUIRE(bv.GetUInt64(0) == first_bits);  // Make sure first bits haven't changed
 
-  num_ones = bv.CountOnes();
-  REQUIRE(num_ones > 500);                 // Expected with new randomization is ~665 ones.
-  REQUIRE(num_ones < 850);
+    num_ones = bv.CountOnes();
+    REQUIRE(num_ones > 500);                 // Expected with new randomization is ~665 ones.
+    REQUIRE(num_ones < 850);
 
-  // Try randomizing using specific numbers of ones.
-  bv.ChooseRandom(random, 1);       REQUIRE(bv.CountOnes() == 1);
-  bv.ChooseRandom(random, 12);      REQUIRE(bv.CountOnes() == 12);
-  bv.ChooseRandom(random, 128);     REQUIRE(bv.CountOnes() == 128);
-  bv.ChooseRandom(random, 507);     REQUIRE(bv.CountOnes() == 507);
-  bv.ChooseRandom(random, 999);     REQUIRE(bv.CountOnes() == 999);
+    // Try randomizing using specific numbers of ones.
+    bv.ChooseRandom(random, 1);       REQUIRE(bv.CountOnes() == 1);
+    bv.ChooseRandom(random, 12);      REQUIRE(bv.CountOnes() == 12);
+    bv.ChooseRandom(random, 128);     REQUIRE(bv.CountOnes() == 128);
+    bv.ChooseRandom(random, 507);     REQUIRE(bv.CountOnes() == 507);
+    bv.ChooseRandom(random, 999);     REQUIRE(bv.CountOnes() == 999);
 
-  // Test the probabilistic CHANGE functions.
-  bv.Clear();                     REQUIRE(bv.CountOnes() == 0);   // Set all bits to 0.
+    // Test the probabilistic CHANGE functions.
+    bv.Clear();                     REQUIRE(bv.CountOnes() == 0);   // Set all bits to 0.
 
-  bv.FlipRandom(random, 0.3);     // Exprected: 300 ones (from flipping zeros)
-  num_ones = bv.CountOnes();      REQUIRE(num_ones > 230);  REQUIRE(num_ones < 375);
+    bv.FlipRandom(random, 0.3);     // Exprected: 300 ones (from flipping zeros)
+    num_ones = bv.CountOnes();      REQUIRE(num_ones > 230);  REQUIRE(num_ones < 375);
 
-  bv.FlipRandom(random, 0.3);     // Exprected: 420 ones (hit by ONE but not both flips)
-  num_ones = bv.CountOnes();      REQUIRE(num_ones > 345);  REQUIRE(num_ones < 495);
+    bv.FlipRandom(random, 0.3);     // Exprected: 420 ones (hit by ONE but not both flips)
+    num_ones = bv.CountOnes();      REQUIRE(num_ones > 345);  REQUIRE(num_ones < 495);
 
-  bv.SetRandom(random, 0.5);      // Expected: 710 (already on OR newly turned on)
-  num_ones = bv.CountOnes();      REQUIRE(num_ones > 625);  REQUIRE(num_ones < 775);
+    bv.SetRandom(random, 0.5);      // Expected: 710 (already on OR newly turned on)
+    num_ones = bv.CountOnes();      REQUIRE(num_ones > 625);  REQUIRE(num_ones < 775);
 
-  bv.SetRandom(random, 0.8);      // Expected: 942 (already on OR newly turned on)
-  num_ones = bv.CountOnes();      REQUIRE(num_ones > 900);  REQUIRE(num_ones < 980);
+    bv.SetRandom(random, 0.8);      // Expected: 942 (already on OR newly turned on)
+    num_ones = bv.CountOnes();      REQUIRE(num_ones > 900);  REQUIRE(num_ones < 980);
 
-  bv.ClearRandom(random, 0.2);    // Expected 753.6 (20% of those on now off)
-  num_ones = bv.CountOnes();      REQUIRE(num_ones > 675);  REQUIRE(num_ones < 825);
+    bv.ClearRandom(random, 0.2);    // Expected 753.6 (20% of those on now off)
+    num_ones = bv.CountOnes();      REQUIRE(num_ones > 675);  REQUIRE(num_ones < 825);
+
+    bv.FlipRandom(random, 0.5);     // Exprected: 500 ones (each bit has a 50% chance of flipping)
+    num_ones = bv.CountOnes();      REQUIRE(num_ones > 425);  REQUIRE(num_ones < 575);
 
 
-    // /// Flip a specified number of random bits.
-    // BitVector & FlipRandomCount(Random & random, const size_t target_bits);
+    // Repeat with fixed-sized changes.
+    bv.Clear();                        REQUIRE(bv.CountOnes() == 0);     // Set all bits to 0.
 
-    // /// Set a specified number of random bits (does not check if already set.)
-    // BitVector & SetRandomCount(Random & random, const size_t target_bits);
+    bv.FlipRandomCount(random, 123);   // Flip exactly 123 bits to 1.
+    num_ones = bv.CountOnes();         REQUIRE(num_ones == 123);
 
-    // /// Unset  a specified number of random bits (does not check if already zero.)
-    // BitVector & ClearRandomCount(Random & random, const size_t target_bits);
+    bv.FlipRandomCount(random, 877);   // Flip exactly 877 bits; Expected 784.258 ones
+    num_ones = bv.CountOnes();         REQUIRE(num_ones > 700);  REQUIRE(num_ones < 850);
 
+
+    bv.SetAll();                       REQUIRE(bv.CountOnes() == 1000);  // Set all bits to 1.
+
+    bv.ClearRandomCount(random, 123);
+    num_ones = bv.CountOnes();         REQUIRE(num_ones == 877);
+
+    bv.ClearRandomCount(random, 877);  // Clear exactly 877 bits; Expected 107.871 ones
+    num_ones = bv.CountOnes();         REQUIRE(num_ones > 60);  REQUIRE(num_ones < 175);
+
+    bv.SetRandomCount(random, 500);    // Half of the remaining ones should be set; 553.9355 expected.
+    num_ones = bv.CountOnes();         REQUIRE(num_ones > 485);  REQUIRE(num_ones < 630);
+
+
+    bv.Clear();                        REQUIRE(bv.CountOnes() == 0);     // Set all bits to 0.
+    bv.SetRandomCount(random, 567);    // Half of the remaining ones should be set; 607.871 expected.
+    num_ones = bv.CountOnes();         REQUIRE(num_ones == 567);
+  }
 }
 
 
