@@ -461,6 +461,70 @@ TEST_CASE("5: Test Randomize() and variants", "[bits]") {
   }
 }
 
+TEST_CASE("6: Test getting and setting whole chunks of bits", "[bits]") {
+  constexpr size_t num_bits = 113;
+  constexpr size_t num_bytes = 15;
+  
+  emp::BitVector bv(num_bits);
+  REQUIRE(bv.GetSize() == num_bits);
+  REQUIRE(bv.GetNumBytes() == num_bytes);
+
+  // All bytes should start out empty.
+  for (size_t i = 0; i < num_bytes; i++) REQUIRE(bv.GetByte(i) == 0);
+
+  bv.SetByte(2, 11);
+  REQUIRE(bv.GetByte(2) == 11);
+
+  REQUIRE(bv.GetValue() == 720896.0);
+
+  bv.SetByte(5, 7);
+  REQUIRE(bv.GetByte(0) == 0);
+  REQUIRE(bv.GetByte(1) == 0);
+  REQUIRE(bv.GetByte(2) == 11);
+  REQUIRE(bv.GetByte(3) == 0);
+  REQUIRE(bv.GetByte(4) == 0);
+  REQUIRE(bv.GetByte(5) == 7);
+  REQUIRE(bv.GetByte(6) == 0);
+  REQUIRE(bv.CountOnes() == 6);
+
+  for (size_t i = 0; i < num_bytes; i++) REQUIRE(bv.GetByte(i) == bv.GetUInt8(i));
+
+  REQUIRE(bv.GetUInt16(0) == 0);
+  REQUIRE(bv.GetUInt16(1) == 11);
+  REQUIRE(bv.GetUInt16(2) == 1792);
+  REQUIRE(bv.GetUInt16(3) == 0);
+
+  REQUIRE(bv.GetUInt32(0) == 720896);
+  REQUIRE(bv.GetUInt32(1) == 1792);
+  REQUIRE(bv.GetUInt32(2) == 0);
+
+  REQUIRE(bv.GetUInt64(0) == 7696582115328);
+  REQUIRE(bv.GetUInt64(1) == 0);
+}
+
+
+    // void SetUInt8(const size_t index, uint8_t value) { SetValueAtIndex(index, value); }
+    // void SetUInt16(const size_t index, uint16_t value) { SetValueAtIndex(index, value); }
+    // void SetUInt32(const size_t index, uint32_t value) { SetValueAtIndex(index, value); }
+    // void SetUInt64(const size_t index, uint64_t value) { SetValueAtIndex(index, value); }
+
+
+    // template <typename T> T GetValueAtBit(const size_t index) const;
+    // template <typename T> void SetValueAtBit(const size_t index, T value);
+
+    // uint8_t GetUInt8AtBit(size_t index) const { return GetValueAtBit<uint8_t>(index); }
+    // uint16_t GetUInt16AtBit(size_t index) const { return GetValueAtBit<uint16_t>(index); }
+    // uint32_t GetUInt32AtBit(size_t index) const { return GetValueAtBit<uint32_t>(index); }
+    // uint64_t GetUInt64AtBit(size_t index) const { return GetValueAtBit<uint64_t>(index); }
+    // uint32_t GetUIntAtBit(size_t index) const { return GetUInt32AtBit(index); }
+
+    // void SetUInt8AtBit(const size_t index, uint8_t value) { SetValueAtBit(index, value); }
+    // void SetUInt16AtBit(const size_t index, uint16_t value) { SetValueAtBit(index, value); }
+    // void SetUInt32AtBit(const size_t index, uint32_t value) { SetValueAtBit(index, value); }
+    // void SetUInt64AtBit(const size_t index, uint64_t value) { SetValueAtBit(index, value); }
+    // void SetUIntAtBit(const size_t index, uint32_t value) { SetUInt32AtBit(index, value); }
+
+
 
       /////////////////////////////////////////////
      /////////////////////////////////////////////
