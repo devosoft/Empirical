@@ -1666,15 +1666,15 @@ namespace emp {
   // @CAO: Can be optimized substantially, especially for long BitVectors.
   template <typename T>
   void BitVector::SetValueAtBit(const size_t index, T value) {
-    // For the moment, must fit inside bounds; eventually should pad with zeros.
+    // For the moment, must fit inside bounds; eventually should (?) pad with zeros.
     emp_assert((index+7)/8 + sizeof(T) < TotalBytes());
     constexpr size_t type_bits = sizeof(T) * 8;
 
-    const size_t max_pos = Min(index+type_bits, num_bits);
-    Clear(index, max_pos);               // Clear out the bits where new value will go.
-    BitVector in_bits(GetSize());        // Setup a bitset to place the new bits in.
+    const size_t end_pos = Min(index+type_bits, num_bits);
+    Clear(index, end_pos);               // Clear out the bits where new value will go.
+    BitVector in_bits(GetSize());        // Setup a bitset for the new bits.
     in_bits.SetValueAtIndex(0, value);   // Insert the new bits.
-    in_bits << index;                    // Shift new bits into place.
+    in_bits <<= index;                   // Shift new bits into place.
     OR_SELF(in_bits);                    // Place new bits into current BitVector.
 
     ClearExcessBits();
