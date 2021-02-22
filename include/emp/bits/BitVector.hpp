@@ -76,37 +76,37 @@ namespace emp {
     Ptr<field_t> bits;      ///< Pointer to array with the status of each bit
 
     /// Num bits used in partial field at the end; 0 if perfect fit.
-    size_t NumEndBits() const { return num_bits & (FIELD_BITS - 1); }
+    [[nodiscard]] size_t NumEndBits() const { return num_bits & (FIELD_BITS - 1); }
 
     /// How many EXTRA bits are leftover in the gap at the end?
-    size_t EndGap() const { return NumEndBits() ? (FIELD_BITS - NumEndBits()) : 0; }
+    [[nodiscard]] size_t EndGap() const { return NumEndBits() ? (FIELD_BITS - NumEndBits()) : 0; }
 
     /// A mask to cut off all of the final bits.
-    field_t EndMask() const { return MaskLow<field_t>(NumEndBits()); }
+    [[nodiscard]] field_t EndMask() const { return MaskLow<field_t>(NumEndBits()); }
 
     /// How many feilds do we need for the current set of bits?
-    size_t NumFields() const { return num_bits ? (1 + ((num_bits - 1) / FIELD_BITS)) : 0; }
+    [[nodiscard]] size_t NumFields() const { return num_bits ? (1 + ((num_bits - 1) / FIELD_BITS)) : 0; }
 
     /// What is the ID of the last occupied field?
-    size_t LastField() const { return NumFields() - 1; }
+    [[nodiscard]] size_t LastField() const { return NumFields() - 1; }
 
     /// How many bytes are used for the current set of bits? (rounded up!)
-    size_t NumBytes() const { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
+    [[nodiscard]] size_t NumBytes() const { return num_bits ? (1 + ((num_bits - 1) >> 3)) : 0; }
 
     /// How many bytes are allocated? (rounded up!)
-    size_t TotalBytes() const { return NumFields() * sizeof(field_t); }
+    [[nodiscard]] size_t TotalBytes() const { return NumFields() * sizeof(field_t); }
 
     // Identify the field that a specified bit is in.
-    static constexpr size_t FieldID(const size_t index)  { return index / FIELD_BITS; }
+    [[nodiscard]] static constexpr size_t FieldID(const size_t index)  { return index / FIELD_BITS; }
 
     // Identify the position within a field where a specified bit is.
-    static constexpr size_t FieldPos(const size_t index) { return index & (FIELD_BITS-1); }
+    [[nodiscard]] static constexpr size_t FieldPos(const size_t index) { return index & (FIELD_BITS-1); }
 
     // Identify which field a specified byte position would be in.
-    static constexpr size_t Byte2Field(const size_t index) { return index / sizeof(field_t); }
+    [[nodiscard]] static constexpr size_t Byte2Field(const size_t index) { return index / sizeof(field_t); }
 
     // Convert a byte position in BitVector to a byte position in the target field.
-    static constexpr size_t Byte2FieldPos(const size_t index) { return FieldPos(index * 8); }
+    [[nodiscard]] static constexpr size_t Byte2FieldPos(const size_t index) { return FieldPos(index * 8); }
 
     // Assume that the size of the bits has already been adjusted to be the size of the one
     // being copied and only the fields need to be copied over.
@@ -116,10 +116,10 @@ namespace emp {
     void RawMove(const size_t from_start, const size_t from_stop, const size_t to);
 
     // Convert the bits to bytes.
-    emp::Ptr<unsigned char> BytePtr() { return bits.ReinterpretCast<unsigned char>(); }
+    [[nodiscard]] emp::Ptr<unsigned char> BytePtr() { return bits.ReinterpretCast<unsigned char>(); }
 
     // Convert the bits to const bytes vector.
-    emp::Ptr<const unsigned char> BytePtr() const {
+    [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const {
       return bits.ReinterpretCast<const unsigned char>();
     }
 
